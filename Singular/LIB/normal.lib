@@ -1,0 +1,1236 @@
+// $Id: normal.lib,v 1.1 1997-11-05 18:16:55 Singular Exp $
+///////////////////////////////////////////////////////////////////////////////
+// normal.lib
+// algorithms for computing the normalization based on
+// the ideas of De Jong,Vasconcelos
+// written by Gert-Martin Greuel and Gerhard Pfister
+///////////////////////////////////////////////////////////////////////////////
+
+LIBRARY: normal.lib: PROCEDURE FOR NORMALIZATION (I)
+
+  normal(ideal I)
+  // computes a set of rings such that their product is the
+  // normalization of the reduced basering/I
+
+LIB "sing.lib";
+LIB "primdec.lib";
+LIB "elim.lib";
+LIB "presolve.lib";
+///////////////////////////////////////////////////////////////////////////////
+
+proc isR_HomJR (list Li)
+USAGE:   isR_HomJR (Li);  Li = list: ideal SBid, ideal J, poly p
+COMPUTE: module Hom_R(J,R) = R:J and compare with R
+ASSUME:  R    = P/SBid,  P = basering
+         SBid = standard basis of an ideal in P,
+         J    = ideal in P containing the polynomial p,
+         p    = nonzero divisor of R
+RETURN:  1 if R = R:J, 0 if not
+EXAMPLE: example isR_HomJR;  shows an example
+{
+   int n, ii;
+ def P = basering;
+   ideal SBid = Li[1];
+   ideal J = Li[2];
+   poly p = Li[3];
+   attrib(SBid,"isSB",1);
+   attrib(p,"isSB",1);
+ qring R    = SBid;
+   ideal J  = fetch(P,J);
+   poly p   = fetch(P,p);
+   ideal f  = quotient(p,J);
+   ideal lp = std(p);
+   n=1;
+   for (ii=1; ii<=size(f); ii++ )
+   {
+      if ( reduce(f[ii],lp) != 0)
+      { n = 0; break; }
+   }
+   return (n);
+ //?spaeter hier einen Test ob Hom(I,R) = Hom(I,I)?
+}
+example
+{"EXAMPLE:";  echo = 2;
+  ring r   = 0,(x,y,z),dp;
+  ideal id = y7-x5+z2;
+  ideal J  = x3,y+z;
+  poly p   = xy;
+  list Li  = std(id),J,p;
+  isR_HomJR (Li);
+
+  ring s   = 0,(t,x,y),dp;
+  ideal id = x2-y2*(y-t);
+  ideal J  = jacob(id);
+  poly p   = J[1];
+  list Li  = std(id),J,p;
+  isR_HomJR (Li);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc extraweight (list # )
+USAGE:   extraweight (P); P=name of an existing ring (true name, not a string)
+RETURN:  intvec, size=nvars(P), consisting of the weights of the variables of P
+NOTE:    This is useful when enlarging P but keeping the weights of the old
+         variables
+EXAMPLE: example extraweight;  shows an example
+{
+   int ii,q,fi,fo,fia;
+   intvec rw,nw;
+   string os;
+   def P = #[1];
+   string osP = ordstr(P);
+   fo  = 1;
+//------------------------- find weights in ordstr(P) -------------------------
+   fi  = find(osP,"(",fo);
+   fia = find(osP,"a",fo)+find(osP,"w",fo)+find(osP,"W",fo);
+   while ( fia )
+   {
+      os = osP[fi+1,find(osP,")",fi)-fi-1];
+      if( find(os,",") )
+      {
+         execute "nw = "+os+";";
+         if( size(nw) > ii )
+         {
+             rw = rw,nw[ii+1..size(nw)];
+         }
+         else  {  ii = ii - size(nw); }
+
+         if( find(osP[1,fi],"a",fo) ) { ii = size(nw); }
+      }
+      else
+      {
+         execute "q = "+os+";";
+         if( q > ii )
+         {
+            nw = 0; nw[q-ii] = 0;
+            nw = nw + 1;          //creates an intvec 1,...,1 of length q-ii
+            rw = rw,nw;
+         }
+         else { ii = ii - q; }
+      }
+      fo  = fi+1;
+      fi  = find(osP,"(",fo);
+      fia = find(osP,"a",fo)+find(osP,"w",fo)+find(osP,"W",fo);
+   }
+//-------------- adjust weight vector to length = nvars(P)  -------------------
+   if( fo > 1 )
+   {                                            // case when weights were found
+      rw = rw[2..size(rw)];
+      if( size(rw) > nvars(P) )
+      {
+         rw = rw[1..nvars(P)];
+      }
+      if( size(rw) < nvars(P) )
+      {
+         nw=0; nw[nvars(P)-size(rw)]=0; nw=nw+1; rw=rw,nw;
+      }
+   }
+   else
+   {                                         // case when no weights were found
+      rw[nvars(P)]= 0; rw=rw+1;
+   }
+   return(rw);
+}
+example
+{"EXAMPLE:";  echo = 2;
+  ring r0 = 0,(x,y,z),dp;
+  extraweight(r0);
+  ring r1 = 0,x(1..5),(ds(3),wp(2,3));
+  extraweight(r1);
+  ring r2 = 0,x(1..5),(a(1,2,3,0),dp);
+  extraweight(r2);
+  ring r3 = 0,x(1..10),(a(1..5),dp(5),a(10..13),Wp(5..9));
+  extraweight(r3);
+  // an example for enlarging the ring:
+  intvec v = 6,2,3,4,5;
+  ring R = 0,x(1..10),(a(extraweight(r1),v),dp);
+  ordstr(R);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc HomJJ (list Li,list #)
+USAGE:   HomJJ (Li);  Li = list: SBid,id,J,poly p
+ASSUME:  R    = P/id,  P = basering, a polynomial ring, id an ideal of P,
+         SBid = standard basis of id,
+         J    = ideal of P containing the polynomial p,
+         p    = nonzero divisor of R
+COMPUTE: Endomorphism ring End_R(J)=Hom_R(J,J) with its ring structure where
+         R is the quotient ring of P modulo the standard basis SBid
+RETURN:  a list of two objects
+         _[1]: a polynomial ring, containing two ideals, 'endid' and 'endphi'
+               s.t. _[1]/endid = Hom_R(J,J) and
+               endphi describes the canonical map R -> Hom_R(J,J)
+         _[2]: an integer which is 1 if phi is an isomorphism, 0 if not
+EXAMPLE: example HomJJ;  shows an example
+{
+//---------- initialisation ---------------------------------------------------
+
+   int isIso,isPr,isCo,isRe,isEq,ii,jj,q,y;
+   intvec rw,rw1;
+   list L;
+   if( size(#) >=1 )
+   {
+      if( typeof(#[1]) == "int" ) { y = #[1]; }
+   }
+ def P = basering;
+   ideal SBid, id, J = Li[1], Li[2], Li[3];
+   poly p = Li[4];
+   attrib(SBid,"isSB",1);
+   int homo = homog(Li[2]);               //is 1 if id is homogeneous, 0 if not
+
+//---- set attributes for special cases where algorithm can be simplified -----
+   if( homo==1 )
+   {
+      rw = extraweight(P);
+   }
+   if( typeof(attrib(id,"isPrim"))=="int" )
+   {
+      if(attrib(id,"isPrim")==1)  { isPr=1; }
+   }
+   if( typeof(attrib(id,"isIsolatedSingularity"))=="int" )
+   {
+      if(attrib(id,"isIsolatedSingularity")==1) { isIso=1; }
+   }
+   if( typeof(attrib(id,"isCohenMacaulay"))=="int" )
+   {
+      if(attrib(id,"isCohenMacaulay")==1) { isCo=1; }
+   }
+   if( typeof(attrib(id,"isRegInCodim2"))=="int" )
+   {
+      if(attrib(id,"isRegInCodim2")==1) { isRe=1; }
+   }
+   if( typeof(attrib(id,"isEquidimensional"))=="int" )
+   {
+      if(attrib(id,"isEquidimensional")==1) { isEq=1; }
+   }
+//-------------------------- go to quotient ring ------------------------------
+ qring R  = SBid;
+   ideal id = fetch(P,id);
+   ideal J  = fetch(P,J);
+   poly p   = fetch(P,p);
+   ideal f,rf,f2;
+   module syzf;
+
+//---------- computation of p*Hom(J,J) as R-ideal -----------------------------
+   f  = quotient(p*J,J);
+   if(y==1)
+   {
+      "the module Hom(rad(J),rad(J)) presented by the values on";
+      "the non-zerodivisor";
+      "  ";
+      p;
+      " ";
+      f;
+   }
+   f2 = std(p);
+
+   if(isIso==0)
+   {
+     ideal f1=std(f);
+     attrib(f1,"isSB",1);
+    // if( codim(f1,f2) >= 0 )
+    // {
+    //  dbprint(printlevel-voice+3,"// dimension of non-normal locus is zero");
+    //    isIso=1;
+    // }
+  }
+//---------- Test: Hom(J,J) == R ?, if yes, go home ---------------------------
+   rf = interred(reduce(f,f2));       // represents p*Hom(J,J)/p*R = Hom(J,J)/R
+   if ( size(rf) == 0 )
+   {
+      if ( homog(f) && find(ordstr(basering),"s")==0 )
+      {
+         ring newR1 = char(P),(X(1..nvars(P))),(a(rw),dp);
+      }
+      else
+      {
+         ring newR1 = char(P),(X(1..nvars(P))),dp;
+      }
+      ideal endphi = maxideal(1);
+      ideal endid = fetch(P,id);
+      attrib(endid,"isCohenMacaulay",isCo);
+      attrib(endid,"isPrim",isPr);
+      attrib(endid,"isIsolatedSingularity",isIso);
+      attrib(endid,"isRegInCodim2",isRe);
+      attrib(endid,"isEqudimensional",isEq);
+      attrib(endid,"isCompleteIntersection",0);
+      attrib(endid,"isRad",0);
+      export endid;
+      export endphi;
+      L = newR1;
+      L = insert(L,1,1);
+      dbprint(printlevel-voice+3,"// case R = Hom(J,J)");
+      if(y==1)
+      {
+         "R=Hom(rad(J),rad(J))";
+         "   ";
+         newR1;
+         "   ";
+         "the new ideal";
+         endid;
+         "   ";
+         "the old ring";
+         "   ";
+         P;
+         "   ";
+         "the old ideal";
+         "   ";
+         setring P;
+         id;
+         "   ";
+         setring newR1;
+         "the map";
+         "   ";
+         endphi;
+         "   ";
+         pause;
+      }
+      setring P;
+      return(L);
+   }
+   if(y==1)
+   {
+      "R is not equal to Hom(rad(J),rad(J)), we have to try again";
+      pause;
+   }
+//---------- Hom(J,j) != R: create new ring and map form old ring -------------
+// the ring newR1/SBid+syzf will be isomorphic to Hom(J,J) as R-module
+
+   f = mstd(f)[2];                                   // minimizes f (partially)
+   f = p,rf;          // generates pJ:J mod(p), i.e. p*Hom(J,J)/p*R as R-module
+   q = size(f);
+   syzf = syz(f);
+
+   if ( homo==1 )
+   {
+      rw1 = rw,0;
+      for ( ii=2; ii<=q; ii++ )
+      {
+         rw  = rw, deg(f[ii])-deg(f[1]);
+         rw1 = rw1, deg(f[ii])-deg(f[1]);
+      }
+      ring newR1 = char(R),(X(1..nvars(R)),T(1..q)),(a(rw1),dp);
+   }
+   else
+   {
+      ring newR1 = char(R),(X(1..nvars(R)),T(1..q)),dp;
+   }
+
+   map psi1 = P,maxideal(1);
+   ideal SBid = psi1(SBid);
+   attrib(SBid,"isSB",1);
+
+ qring newR = std(SBid);
+   map psi = R,ideal(X(1..nvars(R)));
+   ideal id = psi(id);
+   ideal f = psi(f);
+   module syzf = psi(syzf);
+   ideal pf,Lin,Quad,Q;
+   matrix T,A;
+   list L1;
+
+//---------- computation of Hom(J,J) as ring ----------------------------------
+// determine kernel of: R[T1,...,Tq] -> J:J >-> R[1/p]=R[t]/(t*p-1),
+// Ti -> fi/p -> t*fi (p=f1=f[1]), to get ring structure. This is of course
+// the same as the kernel of R[T1,...,Tq] -> pJ:J >-> R, Ti -> fi.
+// It is a fact, that the kernel is generated by the linear and the quadratic
+// relations
+
+   pf = f[1]*f;
+   T = matrix(ideal(T(1..q)),1,q);
+   Lin = ideal(T*syzf);
+   if(y==1)
+   {
+      "the ring structure of Hom(rad(J),rad(J)) as R-algebra";
+      " ";
+      "the linear relations";
+      " ";
+      Lin;
+      "   ";
+   }
+   for (ii=2; ii<=q; ii++ )
+   {
+      for ( jj=2; jj<=ii; jj++ )
+      {
+         A = lift(pf,f[ii]*f[jj]);
+         Quad = Quad, ideal(T(jj)*T(ii) - T*A);          // quadratic relations
+      }
+   }
+   if(y==1)
+   {
+      "the quadratic relations";
+      "   ";
+      interred(Quad);
+      pause;
+   }
+   Q = Lin+Quad;
+   Q = subst(Q,T(1),1);
+   Q = interred(reduce(Q,std(0)));
+//---------- reduce number of variables by substitution, if possible ----------
+   if (homo==1)
+   {
+      ring newRing = char(R),(X(1..nvars(R)),T(2..q)),(a(rw),dp);
+   }
+   else
+   {
+      ring newRing = char(R),(X(1..nvars(R)),T(2..q)),dp;
+   }
+
+   ideal endid  = imap(newR,id)+imap(newR,Q);
+   ideal endphi = ideal(X(1..nvars(R)));
+
+   map phi = basering,maxideal(1);
+   list Le = elimpart(endid);
+           //this proc and the next loop try to
+   q = size(Le[2]);                 //substitute as many variables as possible
+   rw1 = 0;
+   rw1[nvars(basering)] = 0;
+   rw1 = rw1+1;
+
+   while( size(Le[2]) != 0 )
+   {
+      endid = Le[1];
+      map ps = newRing,Le[5];
+      phi = phi(ps);
+      kill ps;
+
+      for( ii=1; ii<=size(rw1); ii++ )
+      {
+         if( Le[4][ii]==0 )
+         {
+            rw1[ii]=0;                             //look for substituted vars
+         }
+      }
+      Le=elimpart(endid);
+      q = q + size(Le[2]);
+   }	
+   endphi = phi(endphi);
+
+//---------- return -----------------------------------------------------------
+// in the homogeneous case put weights for the remaining vars correctly, i.e.
+// delete from rw those weights for which the corresponding entry of rw1 is 0
+
+   if (homo==1 && nvars(newRing)-q >1 && size(endid) >0 )
+   {
+      jj=1;
+      for( ii=2; ii<size(rw1); ii++)
+      {
+         jj++;
+         if( rw1[ii]==0 )
+         {
+            rw=rw[1..jj-1],rw[jj+1..size(rw)];
+            jj=jj-1;
+         }
+      }
+      if( rw1[1]==0 ) { rw=rw[2..size(rw)]; }
+      if( rw1[size(rw1)]==0 ){ rw=rw[1..size(rw)-1]; }
+
+      ring lastRing = char(R),(T(1..nvars(newRing)-q)),(a(rw),dp);
+   }
+   else
+   {
+      ring lastRing = char(R),(T(1..nvars(newRing)-q)),dp;
+   }
+
+   ideal lastmap;
+   q = 1;
+   for(ii=1; ii<=size(rw1); ii++ )
+   {
+      if ( rw1[ii]==1 ) { lastmap[ii] = T(q); q=q+1; }
+      if ( rw1[ii]==0 ) { lastmap[ii] = 0; }
+   }
+   map phi = newRing,lastmap;
+   ideal endid  = phi(endid);
+   ideal endphi = phi(endphi);
+   attrib(endid,"isCohenMacaulay",isCo);
+   attrib(endid,"isPrim",isPr);
+   attrib(endid,"isIsolatedSingularity",isIso);
+   attrib(endid,"isRegInCodim2",isRe);
+   attrib(endid,"isEquidimensional",isEq);
+   attrib(endid,"isCompleteIntersection",0);
+   attrib(endid,"isRad",0);
+   export(endid);
+   export(endphi);
+   if(y==1)
+   {
+      "the new ring after reduction of the number of variables";
+      "   ";
+      lastRing;
+      "   ";
+      "the new ideal";
+      endid;
+      "   ";
+      "the old ring";
+      "   ";
+      P;
+      "   ";
+      "the old ideal";
+      "   ";
+      setring P;
+      id;
+      "   ";
+      setring lastRing;
+      "the map";
+      "   ";
+      endphi;
+      "   ";
+      pause;
+   }
+   L = lastRing;
+   L = insert(L,0,1);
+   return(L);
+}
+example
+{"EXAMPLE:";  echo = 2;
+  ring r   = 0,(x,y),wp(2,3);
+  ideal id = y^2-x^3;
+  ideal J  = x,y;
+  poly p   = x;
+  list Li = std(id),id,J,p;
+  list L   = HomJJ(Li);
+  def end = L[1];      // defines ring L[1], containing ideals endid and endphi
+  setring end;         // makes end the basering
+  end;
+  endid;               // end/endid is isomorphic to End(r/id) as ring
+  map psi = r,endphi;  // defines the canonical map r/id -> End(r/id)
+  psi;
+
+  ring r   = 32003,(x,y,z),dp;
+  ideal id = x2-xy-xz+yz;
+  ideal J =y-z,x-z;
+  poly p = x+16001y+16001z;
+  list Li = std(id),id,J,p;
+  list L   = HomJJ(Li,0);
+  def end = L[1];      // defines ring L[1], containing ideals endid and endphi
+  setring end;         // makes end the basering
+  end;
+  endid;               // end/endid is isomorphic to End(r/id) as ring
+
+}
+
+///////////////////////////////////////////////////////////////////////////////
+proc normal(ideal id, list #)
+USAGE:   normal(i,choose);  i ideal,choose empty or 1
+         in case you choose 1 the factorizing Buchberger algorithm
+         is not used which is sometimes more efficient
+RETURN:  a list of rings L=R1,...,Rk, in each Ri are two ideals
+         Si,Mi such that the product of Ri/Mi is the normalization
+         Si is a standardbasis of Mi
+NOTE:    to use the rings: def r=L[i];setring r;
+EXAMPLE: example normal; shows an example
+{
+   int i,j,y;
+   list result,prim,keepresult;
+
+   if(size(#)==0)
+   {
+      prim[1]=id;
+      if( typeof(attrib(id,"isEquidimensional"))=="int" )
+      {
+        if(attrib(id,"isEquidimensional")==1)
+        {
+           attrib(prim[1],"isEquidimensional",1);
+        }
+      }
+      else
+      {
+         attrib(prim[1],"isEquidimensional",0);
+      }
+      if( typeof(attrib(id,"isCompleteIntersection"))=="int" )
+      {
+        if(attrib(id,"isCompleteIntersection")==1)
+        {
+           attrib(prim[1],"isCompleteIntersection",1);
+        }
+      }
+      else
+      {
+         attrib(prim[1],"isCompleteIntersection",0);
+      }
+
+      if( typeof(attrib(id,"isPrim"))=="int" )
+      {
+        if(attrib(id,"isPrim")==1)  {attrib(prim[1],"isPrim",1); }
+      }
+      else
+      {
+         attrib(prim[1],"isPrim",0);
+      }
+      if( typeof(attrib(id,"isIsolatedSingularity"))=="int" )
+      {
+         if(attrib(id,"isIsolatedSingularity")==1)
+             {attrib(prim[1],"isIsolatedSingularity",1); }
+      }
+      else
+      {
+         attrib(prim[1],"isIsolatedSingularity",0);
+      }
+      if( typeof(attrib(id,"isCohenMacaulay"))=="int" )
+      {
+         if(attrib(id,"isCohenMacaulay")==1)
+           { attrib(prim[1],"isCohenMacaulay",1); }
+      }
+      else
+      {
+         attrib(prim[1],"isCohenMacaulay",0);
+      }
+      if( typeof(attrib(id,"isRegInCodim2"))=="int" )
+      {
+         if(attrib(id,"isRegInCodim2")==1)
+         { attrib(prim[1],"isRegInCodim2",1);}
+      }
+      else
+      {
+          attrib(prim[1],"isRegInCodim2",0);
+      }
+      return(normalizationPrimes(prim[1],maxideal(1)));
+   }
+   else
+   {
+      if(#[1]==0)
+      {
+         prim=minAssPrimes(id);
+      }
+      else
+      {
+         prim=minAssPrimes(id,1);
+      }
+
+      if(y==1)
+      {
+         "we have ";size(prim);"components";
+      }
+      for(i=1;i<=size(prim);i++)
+      {
+         if(y==1)
+         {
+            "we are in loop";i;
+         }
+         attrib(prim[i],"isCohenMacaulay",0);
+         attrib(prim[i],"isPrim",1);
+         attrib(prim[i],"isRegInCodim2",0);
+         attrib(prim[i],"isIsolatedSingularity",0);
+         attrib(prim[i],"isEquidimensional",0);
+         attrib(prim[i],"isCompleteIntersection",0);
+
+         if( typeof(attrib(id,"isEquidimensional"))=="int" )
+         {
+           if(attrib(id,"isEquidimensional")==1)
+           {
+              attrib(prim[i],"isEquidimensional",1);
+           }
+         }
+         else
+         {
+            attrib(prim[i],"isEquidimensional",0);
+         }
+         if( typeof(attrib(id,"isIsolatedSingularity"))=="int" )
+         {
+            if(attrib(id,"isIsolatedSingularity")==1)
+             {attrib(prim[i],"isIsolatedSingularity",1); }
+         }
+         else
+         {
+            attrib(prim[i],"isIsolatedSingularity",0);
+         }
+
+         keepresult=normalizationPrimes(prim[i],maxideal(1));
+         for(j=1;j<=size(keepresult);j++)
+         {
+            result=insert(result,keepresult[j]);
+         }
+      }
+      return(result);
+   }
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring  r = 0,(x,y,z),dp;
+
+}
+
+
+proc normalizationPrimes(ideal i,ideal ihp, list #)
+USAGE:   normalizationPrimes(i);  i prime ideal
+RETURN:  a list of one ring L=R, in  R are two ideals
+         S,M such that R/M is the normalization
+         S is a standardbasis of M
+NOTE:    to use the ring: def r=L[1];setring r;
+EXAMPLE: example normalizationPrimes; shows an example
+{
+   int y;
+   if(y==1)
+   {
+      "START one normalization loop with the ideal";
+      "        ";
+      i;
+      "        ";
+      basering;
+      "        ";
+      pause;
+   }
+
+   def BAS=basering;
+   list result,keepresult1,keepresult2;
+   ideal J,SB,MB,KK;
+   int depth,lauf,prdim;
+   int ti=timer;
+
+   if(size(i)==0)
+   {
+      if(y==1)
+      {
+          "the ideal was the zero-ideal";
+      }
+         execute "ring newR7="+charstr(basering)+",("+varstr(basering)+"),("
+                      +ordstr(basering)+");";
+         ideal KK=ideal(0);
+         ideal PP=fetch(BAS,ihp);
+         export PP;
+         export KK;
+         result=newR7;
+         setring BAS;
+         return(result);
+
+   }
+
+   if(y==1)
+   {
+      "                                  ";
+      "                                  ";
+      " SB-computation of the input ideal";
+      "                                  ";
+   }
+   list SM=mstd(i);
+
+   if(y==1)
+   {
+      " the dimension is                 ";
+      dim(SM[1]);
+      "                                  ";
+   }
+
+   if(size(#)>0)
+   {
+      list JM=#[1],#[1];
+      attrib(JM[1],"isSB",1);
+      if( typeof(attrib(#[1],"isRad"))!="int" )
+      {
+         attrib(JM[2],"isRad",0);
+      }
+   }
+
+   if(attrib(i,"isPrim")==1)
+   {
+      attrib(SM[2],"isPrim",1);
+   }
+   else
+   {
+      attrib(SM[2],"isPrim",0);
+   }
+   if(attrib(i,"isIsolatedSingularity")==1)
+   {
+      attrib(SM[2],"isIsolatedSingularity",1);
+   }
+   else
+   {
+      attrib(SM[2],"isIsolatedSingularity",0);
+   }
+   if(attrib(i,"isCohenMacaulay")==1)
+   {
+      attrib(SM[2],"isCohenMacaulay",1);
+   }
+   else
+   {
+      attrib(SM[2],"isCohenMacaulay",0);
+   }
+   if(attrib(i,"isRegInCodim2")==1)
+   {
+      attrib(SM[2],"isRegInCodim2",1);
+   }
+   else
+   {
+      attrib(SM[2],"isRegInCodim2",0);
+   }
+    if(attrib(i,"isEquidimensional")==1)
+   {
+      attrib(SM[2],"isEquidimensional",1);
+   }
+   else
+   {
+      attrib(SM[2],"isEquidimensional",0);
+   }
+    if(attrib(i,"isCompleteIntersection")==1)
+   {
+      attrib(SM[2],"isCompleteIntersection",1);
+   }
+   else
+   {
+      attrib(SM[2],"isCompleteIntersection",0);
+   }
+
+   //the smooth case
+   if(size(#)>0)
+   {
+      if(dim(JM[1])==-1)
+      {
+         if(y==1)
+         {
+            "the ideal was smooth";
+         }
+         MB=SM[2];
+         execute "ring newR6="+charstr(basering)+",("+varstr(basering)+"),("
+                      +ordstr(basering)+");";
+         ideal KK=fetch(BAS,MB);
+         ideal PP=fetch(BAS,ihp);
+         export PP;
+         export KK;
+         result=newR6;
+         setring BAS;
+         return(result);
+     }
+   }
+
+   //the zero-dimensional case
+   if((dim(SM[1])==0)&&(homog(SM[2])==1))
+   {
+      if(y==1)
+      {
+         "the ideal was zero-dimensional and homogeneous";
+      }
+      MB=maxideal(1);
+      execute "ring newR5="+charstr(basering)+",("+varstr(basering)+"),("
+                      +ordstr(basering)+");";
+      ideal KK=fetch(BAS,MB);
+      ideal PP=fetch(BAS,ihp);
+      export PP;
+      export KK;
+      result=newR5;
+      setring BAS;
+      return(result);
+   }
+
+   //the one-dimensional case
+   //in this case it is a line because
+   //it is irreducible and homogeneous
+   if((dim(SM[1])==1)&&(attrib(SM[2],"isPrim")==1)
+        &&(homog(SM[2])==1))
+   {
+      if(y==1)
+      {
+         "the ideal defines a line";
+      }
+      MB=SM[2];
+      execute "ring newR4="+charstr(basering)+",("+varstr(basering)+"),("
+                      +ordstr(basering)+");";
+      ideal KK=fetch(BAS,MB);
+      ideal PP=fetch(BAS,ihp);
+      export PP;
+      export KK;
+      result=newR4;
+      setring BAS;
+      return(result);
+   }
+
+   //the higher dimensional case
+   //we test first of all CohenMacaulay and
+   //complete intersection
+   if(((size(SM[2])+dim(SM[1]))==nvars(basering))&&(homog(SM[2])==1))
+   {
+      //test for complete intersection
+      attrib(SM[2],"isCohenMacaulay",1);
+      attrib(SM[2],"isCompleteIntersection",1);
+      attrib(SM[2],"isEquidimensional",1);
+      if(y==1)
+      {
+         "it is a complete Intersection";
+      }
+   }
+//   if(attrib(i,"isIsolatedSingularity")==0)
+//   {
+//      list L=sres(SM[2],0);
+//      prdim=ncols(betti(L))-1;
+//      depth=nvars(basering)-prdim;
+//   }
+
+  // if(attrib(SM[2],"isCohenMacaulay")==0)
+  // {
+  //    test for CohenMacaulay
+  //    if((dim(SM[1]))==depth)
+  //    {
+  //    attrib(SM[2],"isCohenMacaulay",1);
+  //    "it is CohenMacaulay";
+  //    }
+  // }
+
+   //compute the singular locus+lower dimensional components
+   if(((attrib(SM[2],"isIsolatedSingularity")==0)||(homog(SM[2])==0))
+        &&(size(#)==0))
+   {
+
+      J=minor(jacob(SM[2]),nvars(basering)-dim(SM[1]));
+      //ti=timer;
+      if(y==1)
+      {
+         "SB of singular locus will be computed";
+      }
+      ideal sin=J+SM[2];
+
+    //kills the embeded components
+//    if(homog(SM[2])==1)
+//    {
+//       sin=sat(sin,maxideal(1))[1];
+//    }
+
+      list JM=mstd(sin);
+      if(y==1)
+      {
+         "                                  ";
+         "the dimension of the singular locus is";
+         dim(JM[1]);
+         "                                  ";
+      }
+
+      attrib(JM[2],"isRad",0);
+      //   timer-ti;
+      attrib(JM[1],"isSB",1);
+      if(dim(JM[1])==-1)
+      {
+         if(y==1)
+         {
+            "it is smooth";
+         }
+         MB=SM[2];
+         execute "ring newR3="+charstr(basering)+",("+varstr(basering)+"),("
+                      +ordstr(basering)+");";
+         ideal KK=fetch(BAS,MB);
+         ideal PP=fetch(BAS,ihp);
+         export PP;
+         export KK;
+         result=newR3;
+         setring BAS;
+         return(result);
+      }
+      if(dim(JM[1])==0)
+      {
+         attrib(SM[2],"isIsolatedSingularity",1);
+      }
+      if(dim(JM[1])<=nvars(basering)-2)
+      {
+         attrib(SM[2],"isRegInCodim2",1);
+      }
+   }
+   else
+   {
+     if(size(#)==0)
+     {
+        list JM=maxideal(1),maxideal(1);
+        attrib(JM[1],"isSB",1);
+        attrib(SM[2],"isRegInCodim2",1);
+     }
+   }
+   //if it is an isolated singularity things are easier
+   if((dim(JM[1])==0)&&(homog(SM[2])==1))
+   {
+      attrib(SM[2],"isIsolatedSingularity",1);
+      ideal SL=simplify(reduce(maxideal(1),SM[1]),2);
+      ideal Ann=quotient(SM[2],SL[1]);
+      ideal qAnn=simplify(reduce(Ann,SM[1]),2);
+
+      if(size(qAnn)==0)
+      {
+         if(y==1)
+         {
+            "                                  ";
+            "the ideal rad(J):                 ";
+            "                                  ";
+            maxideal(1);
+            "                                  ";
+            "                                  ";
+         }
+         //again test for normality
+         //Hom(I,R)=R
+         list RR;
+  //       list RR=SM[1],maxideal(1),SL[1];
+  //       "test with Hom(I,R)";
+  //       ti=timer;
+  //       if(isR_HomJR(RR)==1)
+  //       {
+  //         "it was normal";
+  //          timer-ti;
+  //          SB=SM[1];
+  //          SM=SM[2];
+  //          export SB,MB;
+  //          result=BAS;
+  //          return(result);
+  //       }
+  //       timer-ti;
+         RR=SM[1],SM[2],maxideal(1),SL[1];
+         ti=timer;
+         RR=HomJJ(RR,y);
+   //      timer-ti;
+         if(RR[2]==0)
+         {
+            def newR=RR[1];
+            setring newR;
+            map psi=BAS,endphi;
+         //   ti=timer;
+            list tluser=normalizationPrimes(endid,psi(ihp));
+
+        //    timer-ti;
+            setring BAS;
+            return(tluser);
+         }
+         MB=SM[2];
+         execute "ring newR7="+charstr(basering)+",("+varstr(basering)+"),("
+                      +ordstr(basering)+");";
+         ideal KK=fetch(BAS,MB);
+         ideal PP=fetch(BAS,ihp);
+         export PP;
+         export KK;
+         result=newR7;
+         setring BAS;
+         return(result);
+
+       }
+       else
+       {	
+          ideal id=qAnn+SM[2];
+
+          attrib(id,"isCohenMacaulay",0);
+          attrib(id,"isPrim",0);
+          attrib(id,"isIsolatedSingularity",1);
+          attrib(id,"isRegInCodim2",0);
+          attrib(id,"isCompleteIntersection",0);
+          attrib(id,"isEquidimensional",0);
+
+          keepresult1=normalizationPrimes(id,ihp);
+          ideal id1=quotient(SM[2],Ann)+SM[2];
+//          evtl. qAnn nehmen
+//          ideal id=SL[1]+SM[2];
+
+          attrib(id1,"isCohenMacaulay",0);
+          attrib(id1,"isPrim",0);
+          attrib(id1,"isIsolatedSingularity",1);
+          attrib(id1,"isRegInCodim2",0);
+          attrib(id1,"isCompleteIntersection",0);
+          attrib(id1,"isEquidimensional",0);
+
+          keepresult2=normalizationPrimes(id1,ihp);
+
+          for(lauf=1;lauf<=size(keepresult2);lauf++)
+          {
+             keepresult1=insert(keepresult1,keepresult2[lauf]);
+          }
+          return(keepresult1);
+       }
+   }
+
+   //test for non-normality
+   //Hom(I,I)<>R
+   //we can use Hom(I,I) to continue
+
+   ideal SL=simplify(reduce(JM[2],SM[1]),2);
+   ideal Ann=quotient(SM[2],SL[1]);
+   ideal qAnn=simplify(reduce(Ann,SM[1]),2);
+
+   if(size(qAnn)==0)
+   {
+      list RR;
+ //      "test with Hom(I,I) before the radical computation";
+        //again test for normality
+        //Hom(I,R)=R
+ //     list RR=SM[1],JM[2],SL[1];
+ //     "test with Hom(I,R)";
+ //     ti=timer;
+ //     if(isR_HomJR(RR)==1)
+ //     {
+ //      "it was normal";
+ //        timer-ti;
+ //        SB=SM[1];
+ //        SM=SM[2];
+ //        export SB,MB;
+ //        result=BAS;
+ //        return(result);
+ //     }
+ //     timer-ti;
+
+ //     list  RR=SM[1],SM[2],JM[2],SL[1];
+ //     ti=timer;
+      list RS;
+ //   list RS=HomJJ(RR);
+ //   timer-ti;
+ //     if(RS[2]==0)
+ //     {
+ //        "Hom(I,I) was sucessfull without radical";
+ //        def newR=RS[1];
+ //        setring newR;
+ //        list tluser=normalizationPrimes(SM);
+ //        setring BAS;
+ //        return(tluser);
+ //     }
+
+      //now we have to compute the radical
+      if(y==1)
+      {
+         "radical computation";
+      }
+//      ti=timer;
+
+
+      if((attrib(JM[2],"isRad")==0)&&(attrib(SM[2],"isEquidimensional")==0))
+      {
+           //J=radical(JM[2]);
+          J=radical(SM[2]+ideal(SL[1]));
+
+          // evtl. test auf J=SM[2]+ideal(SL[1]) dann schon normal
+      }
+      if((attrib(JM[2],"isRad")==0)&&(attrib(SM[2],"isEquidimensional")==1))
+      {
+          ideal JJ=SM[2]+ideal(SL[1]);
+         // evtl. test auf J=SM[2]+ideal(SL[1]) dann schon normal
+          if(attrib(SM[2],"isCompleteIntersection")==0)
+          {
+             J=equiRadical(JM[2]);
+             //J=equiRadical(JJ);
+          }
+          else
+          {
+             //J=radical(JM[2]);
+             J=quotient(JJ,minor(jacob(JJ),size(JJ)));
+          }
+      }
+//    timer-ti;
+
+      JM=J,J;
+
+      //evtl. fuer SL[1] anderen Nichtnullteiler aus J waehlen
+      // SL=simplify(reduce(J,SM[1]),2);
+      // Ann=quotient(SM[2],SL[1]);
+      // qAnn=simplify(reduce(Ann,SM[1]),2);
+      // if(size(qAnn)!=0)
+      // {
+        // keepresult1=normalizationPrimes(qAnn+SM[2]);
+        // keepresult2=normalizationPrimes(SL[1]+SM[2]);
+        // for(lauf=1;lauf<=size(keepresult2);j++)
+        // {
+        //    keepresult1=insert(keepresult1,keepresult2[lauf]);
+        // }
+        // return(keepresult1);
+      // }
+      RR=SM[1],SM[2],JM[2],SL[1];
+
+//   evtl eine geeignete Potenz von JM?
+     if(y==1)
+     {
+        "compute Hom(rad(J),rad(J)):";
+     }
+//   ti=timer;
+
+     RS=HomJJ(RR,y);
+//   timer-ti;
+
+      if(RS[2]==1)
+      {
+         def lastR=RS[1];
+         setring lastR;
+         ideal KK=endid;
+         ideal PP=fetch(BAS,ihp);
+         export PP;
+         export KK;
+         setring BAS;
+        // return(RS[1]);
+         return(lastR);
+      }
+      int n=nvars(basering);
+      ideal MJ=JM[2];
+      def newR=RS[1];
+      setring newR;
+
+      map psi=BAS,endphi;
+      list tluser=
+             normalizationPrimes(endid,psi(ihp),simplify(psi(MJ)+endid,4));
+            // normalizationPrimes(endid);
+      setring BAS;
+      return(tluser);
+   }
+   else
+   {
+      int equi=attrib(SM[2],"isEquidimensional");
+      ideal new1=qAnn+SM[2];
+      execute "ring newR1="+charstr(basering)+",("+varstr(basering)+"),("
+                      +ordstr(basering)+");";
+      if(y==1)
+      {
+         "zero-divisor found";
+      }
+      ideal vid=fetch(BAS,new1);
+      ideal ihp=fetch(BAS,ihp);
+      attrib(vid,"isCohenMacaulay",0);
+      attrib(vid,"isPrim",0);
+      attrib(vid,"isIsolatedSingularity",0);
+      attrib(vid,"isRegInCodim2",0);
+      if(equi==1)
+      {
+         attrib(vid,"isEquidimensional",1);
+      }
+      else
+      {
+         attrib(vid,"isEquidimensional",0);
+      }
+      attrib(vid,"isCompleteIntersection",0);
+
+      keepresult1=normalizationPrimes(vid,ihp);
+
+      setring BAS;
+      ideal new2=quotient(SM[2],Ann)+SM[2];
+// evtl. qAnn nehmen
+//      ideal new2=SL[1]+SM[2];
+      execute "ring newR2="+charstr(basering)+",("+varstr(basering)+"),("
+                      +ordstr(basering)+");";
+
+      ideal vid=fetch(BAS,new2);
+      ideal ihp=fetch(BAS,ihp);
+      attrib(vid,"isCohenMacaulay",0);
+      attrib(vid,"isPrim",0);
+      attrib(vid,"isIsolatedSingularity",0);
+      attrib(vid,"isRegInCodim2",0);
+      if(equi==1)
+      {
+         attrib(vid,"isEquidimensional",1);
+      }
+      else
+      {
+         attrib(vid,"isEquidimensional",0);
+      }
+      attrib(vid,"isCompleteIntersection",0);
+
+      keepresult2=normalizationPrimes(vid,ihp);
+
+      setring BAS;
+      for(lauf=1;lauf<=size(keepresult2);lauf++)
+      {
+         keepresult1=insert(keepresult1,keepresult2[lauf]);
+      }
+      return(keepresult1);
+   }
+}
+example
+{ "EXAMPLE:";echo = 2;
+   //Huneke
+  ring qr=31991,(a,b,c,d,e),dp;
+  ideal i=
+  5abcde-a5-b5-c5-d5-e5,
+  ab3c+bc3d+a3be+cd3e+ade3,
+  a2bc2+b2cd2+a2d2e+ab2e2+c2de2,
+  abc5-b4c2d-2a2b2cde+ac3d2e-a4de2+bcd2e3+abe5,
+  ab2c4-b5cd-a2b3de+2abc2d2e+ad4e2-a2bce3-cde5,
+  a3b2cd-bc2d4+ab2c3e-b5de-d6e+3abcd2e2-a2be4-de6,
+  a4b2c-abc2d3-ab5e-b3c2de-ad5e+2a2bcde2+cd2e4,
+  b6c+bc6+a2b4e-3ab2c2de+c4d2e-a3cde2-abd3e2+bce5;
+  
+  list pr=normal(i);
+  def r1=pr[1];
+  setring r1;
+  KK;
+}
