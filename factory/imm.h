@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: imm.h,v 1.13 1998-04-14 15:15:29 pohl Exp $ */
+/* $Id: imm.h,v 1.14 1998-05-11 10:03:07 schmidt Exp $ */
 
 #ifndef INCL_IMM_H
 #define INCL_IMM_H
@@ -279,7 +279,7 @@ inline InternalCF * imm_mul ( InternalCF * lhs, InternalCF * rhs )
     else
 	return int2imm( (int)result );
 }
-#endif
+#endif /* ! __MWERKS__ */
 
 inline InternalCF * imm_mul_p ( const InternalCF * const lhs, const InternalCF * const rhs )
 {
