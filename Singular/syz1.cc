@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.8 1997-06-09 12:21:29 Singular Exp $ */
+/* $Id: syz1.cc,v 1.9 1997-06-17 14:30:03 pohl Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -1952,6 +1952,20 @@ static int syInitSyzMod(resolvente res,resolvente orderedRes,
   return result;
 }
 
+static void sySetHighdeg()
+  {
+    long long t=1, h_d=1;
+    long long h_n=1+pVariables;
+    while ((t=((t*h_n)/h_d))<INT_MAX)
+    {
+      h_d++;
+      h_n++;
+    }
+    h_d--;
+    highdeg = h_d;
+    //Print("max deg=%d\n",highdeg);
+  }
+
 /*2
 * implementation of LaScala's algorithm
 * assumes that the given module is homogeneous
@@ -2009,18 +2023,7 @@ resolvente syLaScala1(ideal arg,int * length)
       if (j<actdeg) actdeg = j;
     }
   }
-  {
-    highdeg=1;
-    long long t=1;
-    long long h_n=1+pVariables;
-    while ((t=(((long long)t*(long long)h_n)/(long long)highdeg))<INT_MAX)
-    {
-      highdeg++;
-      h_n++;
-    }
-    highdeg--;
-    //Print("max deg=%d\n",highdeg);
-  }  
+  sySetHighdeg();
   binomials = (int*)Alloc(pVariables*(highdeg+1)*sizeof(int));
   syBinomSet();
   pSetm =syzSetm;
@@ -2229,18 +2232,7 @@ resolvente syLaScala2(ideal arg,int * length)
       if (j<actdeg) actdeg = j;
     }
   }
-  {
-    highdeg=1;
-    long long t=1;
-    long long h_n=1+pVariables;
-    while ((t=(((long long)t*(long long)h_n)/(long long)highdeg))<INT_MAX)
-    {
-      highdeg++;
-      h_n++;
-    }
-    highdeg--;
-    //Print("max deg=%d\n",highdeg);
-  }  
+  sySetHighdeg();
   binomials = (int*)Alloc(pVariables*(highdeg+1)*sizeof(int));
   syBinomSet();
   pSetm =syzSetm;
