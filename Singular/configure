@@ -4562,11 +4562,12 @@ else
 #define HAVE_DYNAMIC_LOADING 1
 EOF
  
+  echo "$ac_t""yes" 1>&6
   case "$ac_cv_singuname" in
 	unknown) ;;
 	HPUX-9)
 	  echo $ac_n "checking for shl_load in -ldld""... $ac_c" 1>&6
-echo "configure:4570: checking for shl_load in -ldld" >&5
+echo "configure:4571: checking for shl_load in -ldld" >&5
 ac_lib_var=`echo dld'_'shl_load | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -4574,7 +4575,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-ldld  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 4578 "configure"
+#line 4579 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 /* We use char because int might match the return type of a gcc2
@@ -4585,7 +4586,7 @@ int main() {
 shl_load()
 ; return 0; }
 EOF
-if { (eval echo configure:4589: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest; then
+if { (eval echo configure:4590: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -4612,11 +4613,12 @@ else
   echo "$ac_t""no" 1>&6
 fi
 
+	  NEED_LIBS="-ldld ${NEED_LIBS}"
 	  LD_DYN_FLAGS="-E"
 	;;
 	HPUX-10)
 	  echo $ac_n "checking for shl_load in -ldld""... $ac_c" 1>&6
-echo "configure:4620: checking for shl_load in -ldld" >&5
+echo "configure:4622: checking for shl_load in -ldld" >&5
 ac_lib_var=`echo dld'_'shl_load | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -4624,7 +4626,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-ldld  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 4628 "configure"
+#line 4630 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 /* We use char because int might match the return type of a gcc2
@@ -4635,7 +4637,7 @@ int main() {
 shl_load()
 ; return 0; }
 EOF
-if { (eval echo configure:4639: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest; then
+if { (eval echo configure:4641: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -4662,6 +4664,7 @@ else
   echo "$ac_t""no" 1>&6
 fi
 
+	  NEED_LIBS="-ldld ${NEED_LIBS}"
 	  LD_DYN_FLAGS="-E"
 	;;
 	ix86-Linux)
@@ -4669,11 +4672,10 @@ fi
 	;;
   esac
   
-  echo "$ac_t""yes" 1>&6
 fi
 
 echo $ac_n "checking which exponent type to use""... $ac_c" 1>&6
-echo "configure:4677: checking which exponent type to use" >&5
+echo "configure:4679: checking which exponent type to use" >&5
 if test "$with_exp_type" = "char"; then
   echo "$ac_t""char" 1>&6
   cat >> confdefs.h <<\EOF
