@@ -1,5 +1,5 @@
 dnl # emacs edit mode for this file is -*- sh -*-
-dnl # $Id: configure.in,v 1.26 2000-09-04 13:31:28 obachman Exp $
+dnl # $Id: configure.in,v 1.27 2000-09-04 14:02:45 obachman Exp $
 
 dnl #
 dnl # configure.in - process this file with `autoconf' to generate
@@ -12,7 +12,7 @@ dnl #
 #
 # - initialisation.
 #
-AC_REVISION($Id: configure.in,v 1.26 2000-09-04 13:31:28 obachman Exp $)
+AC_REVISION($Id: configure.in,v 1.27 2000-09-04 14:02:45 obachman Exp $)
 AC_INIT(canonicalform.cc)
 AC_CONFIG_HEADER(config.h)
 AC_CONFIG_AUX_DIR(bin)
@@ -252,7 +252,7 @@ if test "x$gmp_in_installation" != xyes; then
     ])
 fi
 
-AC_CHECK_HEADERS(stdio.h stdlib.h string.h time.h math.h omalloc.h, ,
+AC_CHECK_HEADERS(stdio.h stdlib.h string.h time.h math.h, ,
   [ AC_MSG_ERROR(C header files not found) ])
 
 if test "x$enable_streamio" != xno; then
@@ -273,6 +273,8 @@ if test "x$enable_timing" != xno; then
     [ AC_MSG_ERROR(\`sys/times.h' or \`sys/param.h' not found.  Try
                   \`configure --disable-timing') ])
 fi
+
+AC_CHECK_HEADERS(omalloc.h,,)
 
 # font-lock-trick: '
 
@@ -392,7 +394,7 @@ AC_MSG_CHECKING(whether to use omalloc)
 if test "$with_omalloc" = yes; then
   if test "$ac_cv_header_omalloc_h" != yes; then
     if test "$enable_omalloc" = yes; then
-       AC_MSG_WARN(did not find omalloc.h, install before compiling)
+       warn_omalloc=yes
     else
        with_omalloc=no
     fi
@@ -401,7 +403,7 @@ else
   if test "$with_omalloc" != no; then
     if test "$enable_omalloc" = yes; then
       if test "$ac_cv_header_omalloc_h" != yes; then
-        AC_MSG_WARN(did not find omalloc.h, install before compiling)
+        warn_omalloc=yes
       fi
       with_omalloc=yes
     else
@@ -414,6 +416,10 @@ if test "$with_omalloc" = yes; then
   with_memman=no 
 fi
 AC_MSG_RESULT($with_omalloc)
+if test "$warn_omalloc" = yes; then
+  AC_MSG_WARN(did not find omalloc.h -- install before compiling)
+fi
+
     
 # memory manager
 if test "x$with_memman" != xno; then
