@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: nctools.lib,v 1.3 2004-03-19 16:28:50 levandov Exp $";
+version="$Id: nctools.lib,v 1.4 2004-04-08 21:13:15 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: nctools.lib     General tools for noncommutative algebras
@@ -19,7 +19,7 @@ Weyl([p]);              Creates Weyl algebra structure in a basering (two differ
 CreateWeyl(n, [p]);      Returns n-th Weyl algebra in x(i),D(i) presentation; in char p, if an integer p is given
 Heisenberg(N, [p]);     Returns N-th  Heisenberg algebra in x(i),y(i),h(i) realization,
 Exterior();             Returns qring, the exterior algebra of a basering,
-Fin_dim_algebra(matrix M, list #); Creates finite dimensional algebra structure from the multiplication matrix M,
+Fin_dim_algebra(matrix M, list #); Creates finite dimensional algebra structure from basering and the multiplication matrix M,
 
 AUXILIARY PROCEDURES:
 Newton(f);  		Newton diagram of a polynomial f,

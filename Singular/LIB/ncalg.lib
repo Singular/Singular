@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ncalg.lib,v 1.2 2004-03-19 16:28:49 levandov Exp $";
+version="$Id: ncalg.lib,v 1.3 2004-04-08 21:13:16 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY:  lieA.lib      definitions of important G-algebras
@@ -13,6 +13,7 @@ sl2([p]);    returns U(sl_2) in the (e,f,h) presentation; in char p, if an integ
 g2([p]);     returns U(g_2) in the (x(i),y(i),Ha,Hb) presentation; in char p, if an integer p is given,
 gl3([p]);    returns U(gl_3) in the (e_ij (1<i,j<3)) presentation; in char p, if an integer p is given,
 Qso3([n]);   returns U_q(so_3) in the presentation of Klimyk, if integer n is given, the quantum parameter will be specialized at the n-th root of unity, 
+Qso3Casimir(n); returns a list with the normalized Casimir elements of U_q(so_3) for the quantum parameter specialized at the n-th root of unity,
 Qsl3([n]);   returns ring, corresponding to the U_q(sl_3) as the factor algebra of V_q(sl3), if integer n is given, the quantum parameter q will be specialized at the n-th root of unity,
 
 ALIAS PROCEDURES:
@@ -20,6 +21,7 @@ A(n[,p]);   returns U(A(n))=U(sl_(n+1)) in char p, if an integer p is given.
 ";
 
 LIB "nctools.lib";
+LIB "general.lib";
 ///////////////////////////////////////////////////////////////////////////////
 
 // functions for debug/logging 
@@ -385,7 +387,7 @@ proc Qso3(list #)
 "USAGE:   Qso3([n]), n an optional integer
 RETURN:  ring, corresponding to the U_q(so_3) in the presentation of Klimyk; if n is specified, the quantum parameter Q will be specialized at the (2*n)-th root of unity
 NOTE:    you have to activate this ring with the "setring" command
-SEE ALSO: sl, g2, gl3, Qsl3 
+SEE ALSO: sl, g2, gl3, Qsl3, Qso3Casimir
 EXAMPLE: example Qso3; shows examples
 "{
   int @p = myInt(#); 
@@ -409,6 +411,56 @@ example
    def K = Qso3(3);
    setring K;
    K;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc Qso3Casimir(int n)
+"USAGE:   Qso3Casimir(n), n an integer
+RETURN:  list with the normalized Casimir elements of U_q(so_3) for the quantum parameter specialized at the n-th root of unity
+NOTE:    the result of the procedure makes sense only in U_q(so_3)
+SEE ALSO: Qso3
+EXAMPLE: example Qso3Casimir; shows examples
+"{
+  if ( npars(basering) !=1 )
+  {
+    "Error: wrong algebra. U_q(so3) has only one parameter";
+    return(0);
+  }
+  if (n<1) { return(0); }
+  number Q = par(1);
+  int N=(n-1)/2;
+  int NV=nvars(basering);
+  number k1,k2;
+  poly p,rs,hlp;
+  list cp;
+  int j;
+  p=var(1);
+  for(j=0; j<=N; j++)
+  {
+    k1 = binomial(n-j,j,0);
+    k1=k1/(n-j);
+    k1=k1*((-1)^j);
+    k2=((Q^2)/(Q^4-1))^(2*j);
+    k2=k2*k1;
+    hlp=k2*(p)^(n-(2*j));
+    rs=rs+hlp;
+    hlp=0; k2=0; k1=0;
+  }
+  rs=cleardenom(rs);
+  cp[1] = rs;
+  for(j=2; j<=NV; j++)
+  {
+    cp[j] = subst(rs,var(1),var(j));
+  }
+  return(cp);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   def R = Qso3(5);
+   setring R;
+   list C=Qso3Casimir(5);
+   C;
 }
 	
 ///////////////////////////////////////////////////////////////////////////////
