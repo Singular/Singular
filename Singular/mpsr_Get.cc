@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_Get.cc,v 1.36 2001-08-27 14:47:15 Singular Exp $ */
+/* $Id: mpsr_Get.cc,v 1.37 2001-09-25 15:45:43 Singular Exp $ */
 /***************************************************************
  *
  * File:       mpsr_Get.cc
@@ -911,6 +911,7 @@ mpsr_Status_t mpsr_GetDump(MP_Link_pt link)
   status = (MP_InitMsg(link) == MP_Success ? mpsr_Success : mpsr_MP_Failure);
   while ((status == mpsr_Success) && (! MP_TestEofMsg(link)))
   {
+    memset(&mlv,0,sizeof(mlv));
     status=mpsr_GetLeftv(link, &mlv, 0);
 
     if (status == mpsr_Success)
