@@ -1,4 +1,4 @@
-dnl
+onl
 dnl Written by Olaf Bachmann (obachman@mathematik.uni-kl.de) 
 dnl
 dnl configure.in for MP
@@ -230,11 +230,17 @@ AC_HEADER_CHECK(stddef.h,:, echo "*** no stddef.h";exit)
 
 dnl Wrong preprocessor statement in /usr/include/values.h causes
 dnl problems on FreeBSD
-AC_HEADER_CHECK(values.h, freebsd_problem=no, 
-                AC_CHECK_FILE(/usr/include/values.h,freebsd_problem=yes, 
-                              echo "*** no values.h";exit)) 
-if test "$freebsd_problem" != no; then
+AC_HEADER_CHECK(values.h, freebsd_problem=no 
+                          no_values_h=no, 
+                AC_CHECK_FILE(/usr/include/values.h,
+		              freebsd_problem=yes 
+			      no_values_h=no, 
+			      no_values_h=yes 
+			      freebsd_problem=no)) 
+if test "${freebsd_problem}" != no; then
   grep -v "#warning" /usr/include/values.h > ./values.h
+elif test "${no_values_h}" != no; then
+  cp ./values.h.subst ./values.h
   AC_TRY_CPP( #include "values.h" , 
               CPPFLAGS="-I. ${CPPFLAGS}",
               echo "*** no values.h";exit)
@@ -429,52 +435,42 @@ fi
 if test "${with_rsh+set}" = set; then
   AC_CHECK_PROG(with_rsh, ${with_rsh}, ${with_rsh})
   if test "$ac_cv_prog_with_rsh" = $with_rsh; then
-    ac_rsh_programs=${with_rsh}
+    mp_rsh_cmdline=${with_rsh}
   else
-   ac_rsh_programs=
+    mp_rsh_cmdline=no
   fi
+else
+  mp_rsh_cmdline=no
 fi
 
-
-
-AC_CHECK_PROG(mp_rsh, rsh, rsh, no)
-if test "$ac_cv_prog_mp_rsh" = rsh; then
-   ac_rsh_programs="$ac_rsh_programs rsh"
+if test "$mp_rsh_cmdline" = no; then
+  AC_CHECK_PROG(mp_ssh, ssh, ssh, no)
+  AC_CHECK_PROG(mp_remsh, remsh, remsh, no)
+  AC_CHECK_PROG(mp_rsh, rsh, rsh, no)
+  if test "$ac_cv_prog_mp_ssh" = ssh; then
+     mp_rsh_found=ssh
+  elif test "$ac_cv_prog_mp_remsh" = remsh; then
+     mp_rsh_found=remsh
+  elif test "$ac_cv_prog_mp_rsh" = rsh; then
+     mp_rsh_found=rsh
+  else
+     mp_rsh_found=no
+  fi
+else
+  mp_rsh_found=${mp_rsh_cmdline}
 fi
 
-AC_CHECK_PROG(mp_remsh, remsh, remsh, no)
-if test "$ac_cv_prog_mp_remsh" = remsh; then
-   ac_rsh_programs="$ac_rsh_programs remsh"
-fi
+AC_MSG_CHECKING(which remote shell command to use)
+AC_MSG_RESULT(${mp_rsh_found})
 
-AC_CHECK_PROG(mp_ssh, ssh, ssh, no)
-if test "$ac_cv_prog_mp_ssh" = ssh; then
-   ac_rsh_programs="$ac_rsh_programs ssh"
-fi
-
-for mp_rsh in $ac_rsh_programs; do
-    AC_MSG_CHECKING(whether $mp_rsh works)
-    if $mp_rsh `hostname` -n uname > /dev/null 2>&1; then
-      mp_rsh_found=$mp_rsh
-      AC_MSG_RESULT(yes, with hostname)
-      break;
-    elif $mp_rsh localhost -n uname > /dev/null 2>&1; then
-      mp_rsh_found=$mp_rsh
-      AC_MSG_RESULT(yes, with localhost)
-      break;
-    else
-      mp_rsh_found=none
-      AC_MSG_RESULT(no)
-    fi
-done
-if test "${mp_rsh_found}" = none; then
-   AC_MSG_WARN("No working remote shell command found")
+if test "$mp_rsh_found" = no; then
+   AC_MSG_WARN("No remote shell command found")
 else
   AC_DEFINE_UNQUOTED(MP_RSH_COMMAND, "$mp_rsh_found")
-   # check whether it alsow works with localhost, instead of hostname
-   if $mp_rsh localhost -n uname  > /dev/null 2>&1; then
-     AC_DEFINE(RSH_CAN_LOCALHOST)
-   fi
+   # check whether it also works with localhost, instead of hostname
+   #if $mp_rsh localhost -n uname  > /dev/null 2>&1; then
+   #  AC_DEFINE(RSH_CAN_LOCALHOST)
+   #fi
 fi
 
 
