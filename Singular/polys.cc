@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.41 1999-09-28 09:31:56 obachman Exp $ */
+/* $Id: polys.cc,v 1.42 1999-09-28 15:02:32 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -925,7 +925,7 @@ poly pMultT(poly a, poly exp )
             return NULL /*FALSE*/;
           }
         }
-        pMonAddFast(a,exp);
+        pMonAddOn(a,exp);
       }
       prev=a;
       pIter(a);
