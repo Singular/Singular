@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.66 1998-05-13 15:48:29 Singular Exp $
+@comment $Id: general.doc,v 1.67 1998-05-14 11:58:13 anne Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -54,11 +54,12 @@
 @subsection How to enter and exit
 @cindex How to enter and exit
 
-To start @sc{Singular}, enter @code{Singular} at the system prompt.  You
-get a header which, among others, reports the version name and
+To start @sc{Singular}, enter @code{Singular} at the system prompt. The 
+@sc{Singular} banner appears which, among others, reports the version name and
 compilation date.  Enter @code{help;} to get the online manual at the
 @sc{Singular} prompt @code{>}.  Commands always need to be terminated by
-a @code{;} (semicolon) and @code{<ENTER>}.  or @code{$}. To exit
+a @code{;} (semicolon) and @code{<ENTER>}. (No @code{;} is necessary after
+a @code{@{}. To exit
 @sc{Singular} type @code{quit;}, @code{exit;} or @code{$}.
 
 @sc{Singular} may also be started with command-line options and with
@@ -72,9 +73,9 @@ Singular  [options] [file1 [file2 ...]]
 
 
 @c --------------------------------------------------------------------------
-@node SINGULAR prompt,The online help system,How to enter and exit, Interactive use
-@subsection SINGULAR prompt
-@cindex SINGULAR prompt
+@node The SINGULAR prompt,The online help system,How to enter and exit, Interactive use
+@subsection The SINGULAR prompt
+@cindex The SINGULAR prompt
 @cindex prompt
 @cindex error recovery
 The @sc{Singular} prompt @code{>} asks the user for input of a command, while
@@ -90,10 +91,12 @@ interpreted as empty statements.
 @subsection The online help system
 @cindex The online help system
 
-@sc{Singular} uses @code{info} for it's help system.
+As online help system the program @code{info} (Gnu @code{texinfo} package)
+is used.
 @xref{Top, An Introduction to Info, Getting started, info, The Info Manual}.
 
-The whole manual is decomposed into "nodes" of information.
+The whole manual is decomposed into "nodes" of information, closely related
+to the division of the printed manual into sections and subsections.
 A node contains text describing a specific topic at a specific level of
 detail. The top line of a node is its "header".  This node's header
 (the upper most line) tells the name of this node (@code{Node:}),
@@ -118,6 +121,8 @@ go to the "previous" node
 go to the "up" node
 @item m
 pick a menu item specified by name. Reads name of menu entry
+@item TAB
+completes names of subtopics selected by @code{m} 
 @item f
 follow a cross reference.  Reads name of reference
 @item l
@@ -137,8 +142,12 @@ extra window)
 show help on info system (use @code{l} to come back or @code{CTRL-X 0} to remove
 extra window)
 @item s
-search through this Info file for a specified string,
+search through this info file for a specified string,
 and select the node in which the next occurrence is found
+@item 1,..,9
+pick i-th subtopic from a menu
+@item 0
+pick last subtopic from a menu
 @end table
 
 @c --------------------------------------------------------------------------
@@ -148,10 +157,10 @@ and select the node in which the next occurrence is found
 
 Typing @code{CTRL-C} (control C) interrupts @sc{Singular} (system dependend).
 @sc{Singular} prints the current command and the current line.
-You have the following choices:
+The following choices are available:
 @table @code
 @item a
-return to the toplevel after finishing the current command
+returns to the toplevel after finishing the current command
 @item c
 continues
 @item q
@@ -163,8 +172,11 @@ quits  @sc{Singular}
 @subsection Editing input
 @cindex Editing input
 
-On U*ix operating systems, the following keys can be used for editing the input
-and retrieving previous input lines (@code{CTRL} denotes the control key):
+On Unix-like operating systems, @sc{Singular} maintains a history of the
+last lines of input, stored in a file named .singularrc. The following 
+keys can be used for editing 
+the input and retrieving previous input lines (@code{CTRL} denotes the 
+control key):
 @table @code
 @item CTRL-B
 move cursor left
@@ -176,7 +188,7 @@ move cursor to beginning of line
 move cursor to end of line
 @item CTRL-D
 delete character under cursor
-(or return @kbd{EOF}, if the current line is empty)
+(or return @kbd{EOF}, if the current line is empty and quit @sc{Singular})
 @item BACKSPACE
 @itemx DELETE
 @itemx CTRL-H
@@ -390,7 +402,7 @@ a polynomial ring over a field
 @item
 a series ring, i.e a localization of a polynomial ring
 @item
-a factor ring by an ideal of one of the above
+a quotient ring by an ideal of one of the above
 @item
 a tensor products of one of the above
 @end itemize
@@ -405,13 +417,14 @@ Each object of type
 @code{resolution},
 @code{vector}
 belongs to a specific ring.
-Also @code{list}, if one of the list elements belong to a ring.
+Also @code{list}, if one of the list elements belongs to a ring.
 These objects are local to the ring, hence their names can be used for other
-objects in other rings.
+objects in other rings (Objects of other types do not belong to any ring and
+and are hence globally accessible, independently of the ring).
 Objects from one ring can be mapped to another
 ring with an object of type @code{map}
 (or with the commands @code{fetch} or @code{imap}).
-They are all algebras over the ground
+All rings are algebras over the ground
 field. Hence, in order to compute in one of the ground fields,
 one has to define a ring (with at least one variable and a monomial
 ordering).
@@ -424,7 +437,7 @@ the rational numbers Q (char 0)
 a finite field Z/p, p a prime <= 32003 (char p)
 @item
 @tex
-\noindent a finite field with $q=p^n$ elements ($p^n<=\le 2^{15}$)
+\noindent a finite field with $q=p^n$ elements ($p^n \le 2^{15}$)
 @end tex
 @ifinfo
 a finite field with q=p^n elements (p^n<=2^15)
@@ -432,7 +445,7 @@ a finite field with q=p^n elements (p^n<=2^15)
 @item
 transcendental extension K(A,B,C,...), K=Q or Z/p
 @item
-algebraic extension K[Z]/MinPol, K=Q or Z/p
+algebraic extension K[A]/minpoly, K=Q or Z/p
 @item
 floating point real numbers with simple precision (real)
 @end itemize
@@ -466,7 +479,7 @@ or until it is changed with @code{setring} or @code{keepring} or
 it gets killed. The actual basering always carries the additional name
 @code{basering}. 
 
-The coefficient field is given by either
+The coefficient field is given by one of the following:
 @enumerate
 @item
 the characteristic (0 or a prime <= 32003)
@@ -474,22 +487,22 @@ the characteristic (0 or a prime <= 32003)
 an expression_list of the characteristic and
 the names of  parameters.
 If there is only one parameter you may define a minimal polynomial for it
-to work in an algebraic extension of Q or F(p).
-See @ref{minpoly}
+to work in an algebraic extension of Q or Z/p.
+See @ref{minpoly}.
 @item
 an expression_list of the number of element
 (a small prime characteristic p to the power of a small exponent n) and a
 name for a primitive element (generating the multiplicative group).
 The maximal values for p and n depend on the files in the directory @code{gftables}.
-They define the finite field with p^n elements.
+They define the finite fields with p^n elements.
 @item
 the name @code{real}. The field elements will be the machine floating
 point numbers.
 @end enumerate
 
-@*If you write a  characteristic which is not a prime,
+If the specified (non-zero) characteristic is not a prime,
 it is automatically converted
-to the next lower prime or you receive an error message.
+to the next lower prime.
 
 The names of ring variables
 are like variable names (comma separated).
@@ -585,7 +598,7 @@ be omitted.
                // the same ring as r6
                // this option is offered for
                // a few powers of primes
-               // (see file gftable/49)
+               // (see file gftables/49)
                // the computations are faster
                // in this representation
 @end example
@@ -610,10 +623,9 @@ be omitted.
 
 @item @strong{Note:}
 Computations in rings with one parameter are faster
-than computations with more parameters. (Cancellation of common factors
-are only implemented in the first case)
+than computations with more parameters. 
 
-@* Computation over the field @code{real} has computing errors because
+Computation over the field @code{real} has computing errors because
 of rounding.
 @item @strong{Use in procedures:}
 All changes of the basering by a definition of a new @code{ring} or a
@@ -642,6 +654,28 @@ See
 @subsection Term orderings
 @cindex Term orderings
 
+@tex
+A monomial ordering (term ordering) on $K[x_1, \ldots, x_n]$ is
+a total ordering $<$ on the
+set of monomials (power products) $\{x^\alpha|\alpha \in \bf{N}^n\}$
+which is compatible with the
+natural semigroup structure, i.e.\ $x^\alpha < x^\beta$ implies $x^\gamma
+x^\alpha < x^\gamma x^\beta$ for any $\gamma \in \bf{N}^n$.
+We do not require
+$<$ to be  a wellordering.
+@end tex
+@ifinfo
+A monomial ordering (term ordering) on $[x_1, ..., x_n] is
+a total ordering < on the
+set of monomials (power products) @{x^a | a in N^n@}
+which is compatible with the
+natural semigroup structure, i.e. x^a < x^b implies x^c*x^a < x^c*x^b for any
+c in N^n.
+We do not require
+< to be  a wellordering.
+@end ifinfo
+See the literature cited in @ref{References}.
+
 The most important term orderings or monomial orderings in @sc{Singular} are:
 @*global or p-orderings: @code{lp, dp, wp, Dp, Wp} refer to a polynomial ring,
 @*local or s-orderings: @code{ls, ds, ws, Ds, Ws} refer to a series ring,
@@ -654,18 +688,18 @@ Given such an ordering say, ord, the ring r created by
 @tex
 is by definition Loc K$[x_1,...,x_n]$, where K=Z/p and Loc denotes
 localization with respect to the muliplicatively closed set
-$$\{ 1+f | lead(f) < 1 \}.$$
+$$\{ 1+f | 1 > lead(f) \}.$$
 Here lead means the leading monomial with respect to ord, 1
 is the constant monomial 1 and $>$ means bigger with respect to
 ord. For global orderings, $x_i > 1$, hence Loc K$[x_1,...,x_n]$ =
-K$[x_1,...,x_n]$, for local orderings, $x_i < 1$, hence Loc K$[x_1,...,x_n]$ =
+K$[x_1,...,x_n]$, for local orderings, $1 > x_i$, hence Loc K$[x_1,...,x_n]$ =
 K[$x_1,...,x_n$]$_{(x)}$ (the localization of K[$x_1,...,x_n$] with
 respect to the maximal ideal $(x_1,...,x_n)$).
 In general we have K[$x_1,...,x_n$]$ \subseteq $Loc K[$x_1,...,x_n$]$ \subseteq $ K[$x_1,...,x_n$]$_{(x)}$.
 A product ordering which is for example
 of the form (s-ordering(k),p-ordering(l)), n=k+l, (the variables
 $x1,...,xk$ being s-ordered, $x_{k+1},...,x_n$ p-ordered) creates
-           Loc$_(x)$K[$x_1,...,x_k] \otimes $K[$x_{k+1},...,x_n$].
+           Loc$_{(x)}$K[$x_1,...,x_k] \otimes $K[$x_{k+1},...,x_n$].
 Many other rings between the polynomial ring and the power
 series ring are realized by the choice of an ordering.
 @end tex
@@ -689,106 +723,22 @@ Many other rings between the polynomial ring and the power
 series ring are realized by the choice of an ordering.
 @end ifinfo
 
-The great variety of differnt orderings and their efficient
+The great variety of different orderings and their efficient
 implementation makes @sc{Singular} a powerful tool for many different tasks,
 in particular in Algebraic Geometry, Algebra and Singularity theory.
 
 On the other hand it requires careful thinking about the 'correct'
 ordering for a specific task. Even if the rings are the same,
 the result of a standard basis computation depends on the
-ordering. For instance, the commands dim, mult, degree, hilb,
+ordering. For instance, the commands @code{dim}, @code{mult}, @code{degree},
+@code{hilb},
 etc. compute the dimension, multiplicity, etc. of the ideal
 generated by the leading terms of the given generators. In
 many cases of interest, e.g. if a degree-ordering is choosen
 and if the generators are a standard basis, the computed
 result will be the corresponding invariant of the ideal itself.
 Nevertheless, it remains the task of the user to give a correct
-interpretation of the result.
-
-@iftex
---------------------------------------------------------------------------
-@end iftex
-
-@tex
-A monomial ordering (term ordering) on $K[x_1, \ldots, x_n]$ is
-a total ordering $<$ on the
-set of monomials (power products) $\{x^\alpha|\alpha \in \bf{N}^n\}$
-which is compatible with the
-natural semigroup structure, i.e.\ $x^\alpha < x^\beta$ implies $x^\gamma
-x^\alpha < x^\gamma x^\beta$ for any $\gamma \in \bf{N}^n$.
-We do not require
-$<$ to be  a wellordering.
-@end tex
-@ifinfo
-A monomial ordering (term ordering) on $[x_1, ..., x_n] is
-a total ordering < on the
-set of monomials (power products) @{x^a | a in N^n@}
-which is compatible with the
-natural semigroup structure, i.e. x^a < x^b implies x^c*x^a < x^c*x^b for any
-c in N^n.
-We do not require
-< to be  a wellordering.
-@end ifinfo
-See the literature cited in @ref{Introduction}, (section 'Background').
-
-@sc{Singular} offers the following monomial orderings which are implemented
-in an effective way:
-@menu
-* Global orderings:: lp, dp, wp, Dp, Wp.
-* Local orderings:: ls, ds, ws, Ds, Ws.
-* Module orderings:: c, C.
-* Matrix orderings:: M.
-* Product orderings::
-* Extra weight vector:: a.
-@end menu
-@iftex
-@itemize @bullet
-@item
-global orderings or p-orderings: @code{lp, dp, Dp, wp, Wp} (p refers to polynomial ring)
-@item
-local orderings or s-orderings: @code{ls, ds, Ds, ws, Ws} (s refers to series ring)
-@item
-module orderings @code{c, C} (ordering of the components of a vector)
-@item
-matrix orderings @code{M} (may be used to define any allowed ordering)
-@item
-any of the above orderings may be combined to yield product or
-block orderings.
-@item
-ordering @code{a} (inserting an extra weight vector)
-@end itemize
-@end iftex
-
-@tex
-Global orderings are wellorderings (i.e.\ $1 < x_i$ for each variable
-$x_i$), local orderings satisfy $1 > x_i$ for each variable.   If some variables are ordered globally and others locally we
-call it a mixed ordering.   Local or mixed orderings are not wellorderings.
-
-If $K$ is the groundfield, $x = (x_1, \ldots, x_n)$ the
-variables and $<$ a monomial ordering, then {\bf Loc K}$[x]$ denotes the
-localization of $K[x]$ with respect to the multiplicatively closed set $\{1 +
-g \mid g = 0$ or $g \in K[x]\backslash \{0\}$ and $L(g) < 1\}$.   $L(g)$
-denotes the leading monomial of $g$, i.e.\ the biggest monomial of $g$ with
-respect to $<$.   The result of any computation which uses standard basis
-computations has to be interpreted in {\bf Loc K}$[x]$ (like @code{std, syz, res,
-mres, sres, mult, degree, dim, hilb, mstd}, etc.).
-@end tex
-@ifinfo
-Global orderings are wellorderings (i.e.1 < x_i for each variable
-x_i), local orderings satisfy 1 > x_i for each variable.
-If some variables are ordered globally and others locally we
-call it a mixed ordering.   Local or mixed orderings are not wellorderings.
-
-If K is the groundfield, x = (x_1, @dots{}, x_n) the
-variables and < a monomial ordering, then Loc K[x] denotes the
-localization of K[x] with respect to the multiplicatively closed set @{1 +
-g | g = 0 or g in K[x]\@{0@} and L(g) < 1@}.   L(g)
-denotes the leading monomial of g, i.e. the biggest monomial of g with
-respect to <.   The result of any computation which uses standard basis
-computations has to be interpreted in Loc K[x] (like @code{std, syz, res,
-mres, sres, mult, degree, dim, hilb, mstd}, etc.).
-@end ifinfo
-
+interpretation of the result, i.e., interpret the result in Loc K[x].
 
 @c ---------------------------------------------------------------------------
 @c ---------------------------------------------------------------------------
@@ -824,12 +774,16 @@ Algorithms for uni- and multivariate polynomial factorization and gcd computatio
 @table @code
 @item facstd
 @ref{facstd}
-@*computes the a list of Groebner bases via the Factorizing Groebenr Basis Algorithm: the intersection of the zero sets is the zero set of the given ideal
+@*computes a list of Groebner bases via the Factorizing Groebner Basis 
+Algorithm: the intersection of the zero sets is the zero set of the given ideal
 @item fglm
 @ref{fglm}
 @*computes the Groebner basis provided that a reduced Groebner basis w.r.t.
 another ordering is known
 @*The given ideal must be zero-dimensional.
+@item mstd
+@ref{mstd}
+@*computes a standard basis and a minimal set of generators.
 @item std
 @ref{std}
 @*computes the standard and Groebner basis
@@ -852,8 +806,9 @@ a @code{std} computation guided by the hilbert series
 @subsubheading Further processing of standard bases
 @table @code
 @item degree
-@ref{degree}@*
-computes the (Krull) dimension, codimension and the multiplicity
+@ref{degree}
+@*computes the (Krull) dimension, codimension and the multiplicity. (The 
+result is only displayed to the screen.)
 @item dim
 @ref{dim}@*
 computes the dimension of the ideal/module generated by
@@ -905,7 +860,7 @@ computes a free resolution of an ideal or module with Schreyer's
 method. The input has to be a standard basis.
 @item syz
 @ref{syz}@*
-copmutes the first syzygy (i.e. the module of relations of the
+computes the first syzygy (i.e. the module of relations of the
 given generators)
 @end table
 
@@ -913,7 +868,7 @@ given generators)
 @table @code
 @item betti
 @ref{betti}@*
-compute the graded Betti numbers of a module from a free resolution
+computes the graded Betti numbers of a module from a free resolution
 @item minres
 @ref{minres}@*
 minimizes a free resolution of an ideal or module
@@ -923,11 +878,11 @@ minimizes a free resolution of an ideal or module
 @table @code
 @item extgcd
 @ref{extgcd}@*
-compute the extended gcd of two polynomials.  Implemented as extended euclidean
+computes the extended gcd of two polynomials. Implemented as extended euclidean
 algorithm.  Applicable to univariate polynomials only.
 @item factorize
 @ref{factorize}@*
-compute factorization of univariate and multivariate polynomials into
+computes factorization of univariate and multivariate polynomials into
 irreduzible factors.
 
 The most basic algorithm is univariate factorization in prime characteristic.
@@ -936,12 +891,13 @@ factorization in prime characteristic is implemented using Hensel-lifting to
 lift from univariate factorizations to multivariate factorizations.
 
 For characteristic 0, an univariate Hensel-lifting is done to lift from prime
-characteristic to characteristic 0.  For multivariate factorization, the problem
+characteristic to characteristic 0.  For multivariate factorization, the 
+problem
 is reduced to the univariate case first, then a multivariate Hensel-lifting is
 used to lift the univariate factorization.
 @item gcd
 @ref{gcd}@*
-compute univariate and multivariate polynomial greatest common
+computes univariate and multivariate polynomial greatest common
 divisors.
 
 For prime characteristic, a subresultant gcd is used.  In characteristic 0, a
@@ -973,11 +929,10 @@ For matrices with integer entries a modular algorithm is used.
 @sc{Singular} has a comfortable programming language similar to C
 with @code{for}, @code{if} ... @code{else}, @code{while}   etc.
 
-It is interpreted. Every user has therefore a convinient way
-to write procedures (or libraries) for his own purposes, using
-the functions of the kernel of @sc{Singular} and from other libraries.
-
-See the section 'Writing procedures' of the tutorial.
+It is interpreted. Therefore every user may write procedures (or libraries) 
+for his own purposes, using
+the implemented commands of the kernel of @sc{Singular} and 
+those from other libraries.
 
 @menu
 * General command syntax::      
@@ -1108,7 +1063,7 @@ E.g. @code{1..3} which is equivalent to @code{1, 2, 3}.
 @item @code{::}
 access specifier within packages (complete name is package_name@code{::}identifier)
 @item @code{_}
-expression last printed.  
+accesses the last displayed result.
 @item @code{~}
 breakpoint in procedures.  @xref{Break points}.
 @item @code{#}
@@ -1117,7 +1072,7 @@ list of parameters in procedures without explicit parameter list.
 @item @code{@@}
 is a letter.  Its use in identifiers is discouraged.
 @item @code{$}
-exits @sc{Singular}
+terminates @sc{Singular}
 @end table
 
 @c ------------------------------------------------------------
@@ -1132,16 +1087,18 @@ exits @sc{Singular}
 identifiers) have to be declared prior to their use.
 The general syntax of a declaration is
 
-type name [ @code{=} expression ] @code{;}
+<type> name [ @code{=} expression ] @code{;}
 
-where type stands for one of the data types of @sc{Singular}, name for the name
-of the object you are declaring, and expression is any expression of type or one
+where <type> stands for one of the data types of @sc{Singular}, 
+name for the name of the object to be declared, and 
+expression is any expression of type or one
 that can be converted to type.  @xref{Type conversion and casting}). Expression
-is assigned to name as initial value.  When expression is missing some default
+is assigned to name as initial value.  When expression is missing a default
 value is assigned whenever possible.
 
-@xref{typeof}, for a complete list of types.  To get information on the name and
-the object named by it, you may use the @code{type} command (@ref{type}).
+@xref{typeof}, for a complete list of types.  To get information on the 
+name and the object named by it, the @code{type} command may be used
+(@ref{type}).
 @xref{Data types}, for a description of @sc{Singular}'s data types.
 
 It is possible to redefine or overwrite an already existing name (if it
@@ -1241,7 +1198,7 @@ Assignments convert the type of an expression to the type
 of the left-hand side of the assignment.
 Operations, which require certain
 types of operands can also implicitly convert the type of an
-expression (e.g. you can multiply a polynomial by an integer because
+expression (e.g. it is possible to multiply a polynomial by an integer because
 the integer is automatically converted to polynomial).
 Possible conversions are:
 @* @sp 1
@@ -1254,10 +1211,10 @@ Possible conversions are:
 @code{number} @expansion{} @code{poly}
 @item
 @code{int} @expansion{} @code{vector}
-(i @expansion{} i*gen(1))
+  (i @expansion{} i*gen(1))
 @item
 @code{poly} @expansion{} @code{vector}
-(p @expansion{} p*gen(1))
+  (p @expansion{} p*gen(1))
 @item
 @code{int} @expansion{} @code{intvec}
 @item
@@ -1320,7 +1277,7 @@ an a x b matrix.
 @item
 to @code{intvec} from expression lists of @code{int}. (The list may be empty)
 @item
-to @code{module} from expression lists of @code{vector}
+to @code{module} from expression lists of @code{vector},
 @code{int}, @code{number}, @code{poly}. (The list may be empty)
 @item
 to @code{module} from @code{matrix}, @code{vector}, @code{ideal}.
@@ -1404,8 +1361,8 @@ the sequence of commands stored in the specified procedure.
 @end menu
 @c -------------------------------------------------
 @node Procedure definition, Names in procedures, Procedures, Procedures
-@subsection Proc in a library
-@cindex Proc in a library
+@subsection Procedure definition
+@cindex Procedure definition
 @c ------------------------------------------------------------
 @c   This piece of text exists also in the file types.doc, 
 @c   chapter "proc declaration".
@@ -1524,7 +1481,7 @@ debugging harder).
 @c    " { tab(5-n)+\"*\"+tab(n)+\"+\"+tab(n)+\"*\"; }";
 @end example
 
-@*A convenient and recommended way to define procedures is to prepare a file
+A convenient and recommended way to define procedures is to prepare a file
 and read this file with the @code{LIB} command.
 The differences between procedures from libraries and
 other procedures are that the help and example part are ignored in 
@@ -1569,7 +1526,14 @@ the proc.
 Names can be made global by @code{export} (see @ref{export}).
 These global names will not be deleted automatically.
 Ring dependent variables are stored together with the ring and deleted
-when the ring is deleted. You can 'move up' a ring by one nesting level
+when the ring is deleted. 
+
+Internally, local variables are stored using the nesting level. A variable
+is said to have nesting level 1, if it is local to a procedure that was 
+called interactively, nesting level 2, if is local to a procedure that
+was called by a procedure of nesting level 1 etc. @code{listvar()} also
+displays the nesting level, nesting level 0 is used for global objects
+(See @ref{listvar}). A ring may be 'moved up' by one nesting level
 with @code{keepring} (see @ref{keepring}). All variables living in that
 ring will be moved together with that ring.
 
@@ -1591,10 +1555,6 @@ works in this basering without knowing its name. Therefore a name has to be
 assigned to the basering before executing e.g. map commands. This is done by 
 the assignment @code{def r=basering;}, writing @code{ring r=basering;} leads
 to an error.
-
-Internally, local variables are stored using the nesting level.
-You will see the nesting level
-if you do a @code{listvar()} command inside a proc(See @ref{listvar}).
 
 @c ---------------------------------------
 @node Parameter list, Procedure commands, Names in procedures, Procedures
@@ -1634,6 +1594,7 @@ which means the arguments are referenced by @code{#[1], #[2]}, etc.
   @{
   ... // can only be called with 2 arguments
       // of any type
+      // (i,j) is the same as (def i,def j)
   @}
 
   proc x5 (i,list #)
@@ -1643,7 +1604,7 @@ which means the arguments are referenced by @code{#[1], #[2]}, etc.
   @}
 
 @end example
-@item @strong{Notes:}
+@item @strong{Note:}
 @* The parameter_list may stretch across multiple lines.
 @* A parameter may have any type (including the types @code{proc}
    and @code{ring}). If a parameter is of type ring, then it
@@ -1689,17 +1650,17 @@ see @ref{return}
 @cindex Loading of procedure files
 Files containing @sc{Singular} procedures may be loaded in two ways
 (the whole library will be loaded, the quotes "" are necessary):
-@*@code{< "file_name";}       (if the library does not contain helptext
-and examples) @*@code{LIB "file_name";}
+@*@code{< "file_name";}       (if the library does not contain info 
+and version string) @*@code{LIB "file_name";}
 
 To list all loaded procedures resp. libraries, type
 @code{listvar(proc);} resp.
 @code{LIB;}
 
-To close a procedure type
+To remove a procedure type
 @code{kill proc_name;}
 
-If the libary does not contain an info string and a version string 
+If the library contains neither an info string nor a version string 
 it can be loaded by @code{<"..."} because it contains valid @sc{Singular} 
 commands. With @code{<} the whole file is read by @sc{Singular} and the 
 body of the procedures is stored in the main memory. Help and example 
@@ -1722,7 +1683,7 @@ with the LIB command. Because of these limitations and problems the use of
 @code{LIB} string_expression@code{;}
 @item @strong{Purpose:}
 reads a library of procedures (proc) from a file. If the given
-filename does not start with @kbd{.} or @kbd{/}, the following directories ares
+filename does not start with @kbd{.} or @kbd{/}, the following directories are
 searched for the file: the current directory,
 the directories given in the environment variable
 @code{SINGULARPATH}@footnote{@code{SPATH} on MS-DOS},
@@ -1774,70 +1735,6 @@ library} to @ref{A syntax example} without loosing any relevant information.
 * version::                     
 * A syntax example::            
 @end menu
-
-@c ---------------------------------------
-@c @node loading, Format of a library, libraries, libraries
-@c @subsection loading
-@c @cindex LIB
-@c @cindex loading
-@c Files containing @sc{Singular} procedures may be loaded in two ways
-@c (the whole library will be loaded, the quotes "" are necessary):
-@c @*@code{< "file_name";}       (if the library does not contain helptext
-@c and examples) @*@code{LIB "file_name";}
-@c
-@c To list all loaded procedures resp. libraries, type
-@c @code{listvar(proc);} resp.
-@c @code{LIB;}
-@c
-@c To close a procedure type
-@c @code{kill proc_name;}
-@c
-@c If the libary does not contain helptext and examples it can be loaded by
-@c @code{<"..."} because it contains valid Singular commands.
-@c With @code{<} the whole file is read by Singular and the body of the
-@c procedures is stored in the main memory. Any other text in the file is
-@c executed. Problems may occur if one of the commands in the file is a
-@c procedure call. These problems do not occur if all procedures are called
-@c with the LIB command.
-@c
-@c @menu
-@c * LIB command::
-@c @end menu
-@c
-@c ----------------------------------
-@c @node LIB command, , loading, loading
-@c @subsubsection LIB
-@c @cindex LIB
-@c @table @code
-@c @item @strong{Syntax:}
-@c @code{LIB} string_expression@code{;}
-@c @item @strong{Purpose:}
-@c read a library of procedures (proc) from a file. If the given
-@c filename does not start with @kbd{.} or @kbd{/}, the following directories ares
-@c searched for the file: the current directory,
-@c the directories given in the environment variable
-@c @code{SINGULARPATH}@footnote{@code{SPATH} on MS-DOS},
-@c @code{usr/local/share/Singular}
-@c Only a directory of the library is loaded, the body of the proc
-@c is read during the first call of this proc. This minimizes
-@c the memory consumption by unused procedures.
-@c @item @strong{Example:}
-@c @example
-@c   LIB "lib"; // the names of the procedures in the
-@c              // file lib are now known to @sc{Singular}
-@c @end example
-@c @end table
-@c @menu
-@c * LIB in a library::
-@c * string expressions::
-@c * proc::
-@c * procedures and Libraries::
-@c * SINGULAR libraries:: all standard libraries.
-@c @end menu
-@c @iftex
-@c See @ref{LIB in a library}; @ref{proc}; @ref{procedures and Libraries};
-@c @ref{string expressions}; @ref{SINGULAR libraries}.
-@c @end iftex
 
 @c ---------------------------------------
 @c @node Format of a library, LIB in a library, Libraries, Libraries
@@ -1988,12 +1885,12 @@ d: template.lib,v 1.2 1998/05/07 08:19:32 singular Exp $;
          LIBRARY: template.lib
 
      This is just an example of a library aimed at illustrating how
-     a library should be written
+     a library should look like
 
    Author: The Singular Team <singular@@mathematik.uni-kl.de>
    last modified: 19.04.1998
 
-   dummy1(i,j);   example procedure accessible for the user.
+   dummy1(p,i,j);   example procedure accessible for the user.
   ";
 
   ///////////////////////////////////////////////////////////////////////////
@@ -2124,7 +2021,7 @@ See @ref{~}.
 @subsection Printing of data
 The procedure @code{dbprint} is useful for optional output of data:
 it takes 2 arguments and prints the second argument, if the first
-argumet is positive, and does nothing otherwise.
+argumet is positive; it does nothing otherwise.
 @menu
 * dbprint::
 * voice::
@@ -2138,7 +2035,8 @@ See @ref{dbprint}; @ref{voice}.
 @subsection libparse
 @cindex libparse
 
-@sc{libparse} is a stand-alone program contained in the @sc{Singular} package,
+@code{libparse} is a stand-alone program contained in the @sc{Singular} 
+package,
 which cannot be called inside of @sc{Singular}. It is a debugging tool for
 libraries which performs exactly the same checks as the LIB command in
 @sc{Singular}, but generates more output during parsing.
@@ -2165,7 +2063,7 @@ The following syntax checks will be performed in any case:
     ( number of " must be even ).
 @item general library syntax
     ( only LIB, static, proc (with paramaters, help, body and example)
-and comments, i.e // and '/* ... */' are allowed).
+and comments, i.e // and @code{/* ... */} are allowed).
 @end itemize
 Its output lists all procedures that have been parsed successfully:
 
