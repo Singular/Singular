@@ -246,7 +246,7 @@ Singular: mod2.h Makefile version.h scanner.cc  ${OBJS} mmalloc.o \
 	  ${OBJS} ${LDFLAGS} ${LIBS} -lomalloc_ndebug mmalloc.o
 
 %.static: version.h
-	test -r $* && mv $* save_$*
+	test -r $* && cp $* save_$*
 	${MAKE} DL_KERNEL=0 $*
 	${INSTALL_PROGRAM} $* $*.static
 	rm -f $*
@@ -394,9 +394,10 @@ installbin: ${SING_EXEC} libparse ESingular TSingular ${RUN_SINGULARS}
 	${INSTALL_PROGRAM} libparse ${RUN_SINGULARS} ${bindir}
 	${INSTALL_PROGRAM} ESingular ${bindir}
 	${INSTALL_PROGRAM} TSingular ${bindir}
+	${INSTALL_PROGRAM} ${DL_LIBS} ${bindir}
 	chmod a+x ${SINGULAR}
 	rm -f ${bindir}/${SING_EXEC}${EXEC_EXT}
-	cd ${bindir}; ${LN_S} ${SINGULAR} Singular${EXEC_EXT};\
+	cd ${bindir}; ${LN_S} ${SINGULAR} Singular${EXEC_EXT};
 
 installslib: LIB
 	test -r ${slibdir} || ${LN_S} `pwd`/LIB ${slibdir}
@@ -448,7 +449,7 @@ install-bindist: $(HEADERS) $(SOURCES) Makefile depend
 	${MAKE} ${SING_EXEC} ESingular TSingular libparse ${RUN_SINGULARS}
 	${MKINSTALLDIRS} ${install_bindir} 
 	${INSTALL_PROGRAM} -s  ${SING_EXEC} ${install_bindir}/Singular
-	${INSTALL_PROGRAM} -s  libparse ${RUN_SINGULARS} ESingular TSingular ${install_bindir}
+	${INSTALL_PROGRAM} -s  libparse ${DL_LIBS} ${RUN_SINGULARS} ESingular TSingular ${install_bindir}
 	echo "#undef MAKE_DISTRIBUTION " > distrib.h
 
 install-sharedist: ${SLIBS_FILES} LIB/gftables
@@ -611,19 +612,19 @@ CXXP		= gcc
 CFLAGSP		= -pg -O3 ${PIPE}
 CXXFLAGSP	= -pg -O3 ${PIPE}
 CXXTEMPLFLAGSP	= -fno-implicit-templates
-DEFSP		= -DNDEBUG -DOM_NDEBUG -DDO_PROFILE -D@SING_UNAME@ @DEFS@
+DEFSP		= -DNDEBUG -DOM_NDEBUG -DDO_PROFILE -D@SING_UNAME@ @DEFS@ -DDL_TAIL=$(DL_TAILP)
 LDFLAGSP	= -static @LDFLAGS@
 
 CFLAGSB		= -g -O3 ${PIPE}
 CXXFLAGSB	= -g -O3 ${PIPE}
 CXXTEMPLFLAGSB	= -fno-implicit-templates
-DEFSB		= -D@SING_UNAME@ -DOM_NDEBUG -DNDEBUG @DEFS@
+DEFSB		= -D@SING_UNAME@ -DOM_NDEBUG -DNDEBUG @DEFS@ -DDL_TAIL=$(DL_TAILB)
 LDFLAGSB	= -static @LDFLAGS@
 
 # bprof object  file to link with
 BPROFOBJ	= /usr/local/lib/bmon.o
 
-DEFST           = -DNO_INLINE -DNDEBUG -D@SING_UNAME@ -DOM_TRACK=2 -DOM_CHECK=0 @DEFS@
+DEFST           = -DNO_INLINE -DNDEBUG -D@SING_UNAME@ -DOM_TRACK=2 -DOM_CHECK=0 @DEFS@ -DDL_TAIL=$(DL_TAILT)
 LDFLAGST        = @LDFLAGS@
 CFLAGST		= -g  -O2 -w ${PIPE}
 CXXFLAGST	= -g  -O2 -w ${PIPE}
@@ -641,7 +642,6 @@ CXXFLAGST	= -g  -O2 -w ${PIPE}
 p_Procs.sop: p_Procs_Lib.dl_op
 	${CXXP} ${CXXFLAGSP} ${SFLAGS} ${SLDFLAGS} $< -o $@
 
-
 %.dl_op: %.cc
 	${CXXP} ${CXXFLAGSP} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSP} ${SFLAGS} -c $< -o $@
 
@@ -656,7 +656,7 @@ $(OBJP2) : %.op: %.c
 	$(CCP)  ${CFLAGSP} ${CPPFLAGS} ${DEFSP} -c $< -o $@
 
 Singularp: scanner.cc   $(OBJP) mmalloc.op\
-           iparith.op mpsr_Tok.op claptmpl.op tesths.cc version.h
+           iparith.op mpsr_Tok.op claptmpl.op tesths.cc version.h $(DL_LIBSP)
 	$(CXXP) ${CXXFLAGSP} ${CXXTEMPLFLAGSP} ${CPPFLAGS} ${DEFSP} -o Singularp \
 	tesths.cc iparith.op mpsr_Tok.op claptmpl.op $(OBJP) ${LDFLAGSP} ${LIBS} -lomalloc_p mmalloc.op\
 	${LD_DYN_FLAGS} 
@@ -731,7 +731,7 @@ mpsr_Tok.ot: iparith.inc mpsr_Tok.cc
 #
 # for Singulara
 #
-DEFSA = -DOM_CHECK=1 -DHAVE_ASSUME -DNDEBUG -D@SING_UNAME@ @DEFS@
+DEFSA = -DOM_CHECK=1 -DHAVE_ASSUME -DNDEBUG -D@SING_UNAME@ @DEFS@ -DDL_TAIL=$(DL_TAILA)
 CFLAGSA		= -g  -O -Wall -Wno-unused ${PIPE}
 CXXFLAGSA	= -g  -O -Wall -Wno-unused ${PIPE}
 
@@ -750,7 +750,7 @@ claptmpl.oa: claptmpl.cc mod2.h
 $(OBJA2) : %.oa: %.c
 	$(CCP)  ${CFLAGSA} ${CPPFLAGS} ${DEFSA} -c $< -o $@
 
-Singulara: scanner.cc   $(OBJA) iparith.oa mpsr_Tok.oa claptmpl.oa tesths.cc version.h  mmalloc.oa
+Singulara: scanner.cc   $(OBJA) iparith.oa mpsr_Tok.oa claptmpl.oa tesths.cc version.h  mmalloc.oa $(DL_LIBSA)
 	$(CXXP) ${CXXFLAGSA} ${CPPFLAGS} ${DEFSA} -o Singulara \
 	tesths.cc iparith.oa mpsr_Tok.oa claptmpl.oa $(OBJA) ${LDFLAGS} ${LIBS} -lomalloc mmalloc.oa \
 	${LD_DYN_FLAGS} 
