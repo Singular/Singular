@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.148 1999-09-13 18:46:54 wichmann Exp $
+@comment $Id: reference.doc,v 1.149 1999-09-16 09:28:46 wichmann Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -3868,7 +3868,7 @@ computations and act like boolean switches. Use the prefix @code{no} to
 disable an option.
 @table @asis
 @item @code{none}
-resets all options to the default
+turns off all options (including the @code{prompt} option)
 @item @code{returnSB}
 the functions @code{syz}, @code{intersect}, @code{quotient},
 @code{modulo} return a standard base instead of a generating set if
