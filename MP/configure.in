@@ -174,12 +174,11 @@ if test "$ac_check_prog" = yes; then
   AC_CHECK_LIB(bsd, socket)
   AC_CHECK_LIB(gmp, mpz_init)
 
-  if test "$enable_gmp" != no; then
-    AC_MSG_WARN(Did not find gmp library: Install before making programs)
-    NEED_LIBS="-lgmp $LIBS"
-  else
+  if test "$ac_cv_lib_gmp_mpz_init" != yes || "$enable_gmp" != no; then
     AC_MSG_WARN(Did not find gmp library: Linking programs with MP will fail)
     NEED_LIBS=$LIBS
+  else
+    NEED_LIBS="-lgmp $LIBS"
   fi
   
   AC_CHECK_FUNCS(select socket gethostname gethostbyname strtol)
@@ -423,7 +422,7 @@ AC_DEFINE_UNQUOTED(MP_RSH_COMMAND, "$ac_cv_rsh_program")
 AC_MSG_RESULT($ac_cv_rsh_program)
 
 AC_MSG_CHECKING(whether remote shell command works)
-if $ac_cv_rsh_program `hostname` -n uname >\& /dev/null; then
+if $ac_cv_rsh_program `hostname` -n uname \>\& /dev/null; then
   AC_MSG_RESULT(yes)
 else
   AC_MSG_RESULT(no)

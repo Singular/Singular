@@ -1,3 +1,11 @@
+Sun Aug 10 18:58:27 1997  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
+
+
+	* configure.in: check for working rsh slightly changed;
+	        check for existing gmp lib when needed for linking with
+	        programs fixed
+	
+
 Mon Jun 30 17:53:17 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
 	* INSTALL: Updated installation instructions by new options
