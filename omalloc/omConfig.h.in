@@ -4,7 +4,7 @@
  *  Purpose: configuration for omalloc  
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omConfig.h.in,v 1.5 2000-08-14 12:37:00 obachman Exp $
+ *  Version: $Id: omConfig.h.in,v 1.6 2000-09-12 16:02:18 obachman Exp $
  *******************************************************************/
 #ifndef OM_CONFIG_H
 #define OM_CONFIG_H
@@ -160,6 +160,10 @@
 /* define to enable tracking of stack backtraces */
 #ifndef OM_TRACK_BACKTRACE
 #undef OM_TRACK_BACKTRACE
+#endif
+/* define to enable tracking of custom value */
+#ifndef OM_TRACK_CUSTOM
+#undef OM_TRACK_CUSTOM
 #endif
 /* define to enable internal debugging */
 #ifndef OM_INTERNAL_DEBUG

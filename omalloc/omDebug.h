@@ -3,7 +3,7 @@
  *  Purpose: declaration of common Debug/Check/Track stuff
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 7/00
- *  Version: $Id: omDebug.h,v 1.7 2000-08-18 09:05:51 obachman Exp $
+ *  Version: $Id: omDebug.h,v 1.8 2000-09-12 16:02:18 obachman Exp $
  *******************************************************************/
 #ifndef OM_DEBUG_H
 #define OM_DEBUG_H
@@ -64,6 +64,23 @@ void omMarkMemoryAsStatic();
 void omUnMarkAsStaticAddr(void* addr);
 void omUnMarkMemoryAsStatic();
 #endif /* ! OM_NDEBUG */
+
+
+#ifdef OM_TRACK_CUSTOM
+#ifdef OM_NDEBUG
+#define omSetCustomOfAddr(addr) ((void)0)
+#define omGetCustomOfAddr(addr) ((void*)0)
+#define omSetCustomOfTrackAddr(addr) ((void)0)
+#define omGetCustomOfTrackAddr(addr) ((void*)0)
+#else
+void omSetCustomOfTrackAddr(void* addr, void* value);
+void* omGetCustomOfTrackAddr(void* addr);
+#define omSetCustomOfAddr(addr,value) \
+  do{if (omIsTrackAddr(addr)) omSetCustomOfTrackAddr(addr,value);}while(0)
+#define omGetCustomOfAddr(addr) \
+  (omIsTrackAddr(addr) ? omGetCustomOfTrackAddr(addr) : NULL)
+#endif /* OM_NDEBUG */
+#endif /* OM_TRACK_CUSTOM */
 
 /*BEGINPRIVATE*/
 

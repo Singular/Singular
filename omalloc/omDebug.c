@@ -3,7 +3,7 @@
  *  Purpose: implementation of main omTest functions
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 7/00
- *  Version: $Id: omDebug.c,v 1.7 2000-08-18 09:05:51 obachman Exp $
+ *  Version: $Id: omDebug.c,v 1.8 2000-09-12 16:02:18 obachman Exp $
  *******************************************************************/
 #include <limits.h>
 #include "omConfig.h"
@@ -224,15 +224,17 @@ char* _omDebugStrDup(const char* addr, OM_TFL_DECL)
   }
   track = MAX(track, om_Opts.MinTrack);
 
+#if 0
+  // this breaks if SizeOfAddr(addr) > PAGESIZE
   if (omIsBinPageAddr(addr))
   {
     size = omSizeOfAddr(addr);
   }
   else
+#endif
   {
     size = ULONG_MAX;
   }
-
   while (addr[i] != '\0' && i < size) i++;
   if (i == size)
   {

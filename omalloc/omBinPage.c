@@ -3,7 +3,7 @@
  *  Purpose: implementation of routines for primitve BinPage managment
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omBinPage.c,v 1.3 2000-08-14 12:26:41 obachman Exp $
+ *  Version: $Id: omBinPage.c,v 1.4 2000-09-12 16:02:17 obachman Exp $
  *******************************************************************/
 #include <limits.h>
 #include "omAlloc.h"
@@ -321,9 +321,6 @@ static omBinPageRegion omAllocNewBinPagesRegion(int min_pages)
   om_Info.CurrentRegionsAlloc++;
   if (om_Info.CurrentRegionsAlloc > om_Info.MaxRegionsAlloc)
     om_Info.MaxRegionsAlloc = om_Info.CurrentRegionsAlloc;
-
-  /* Update info so that max fields can be updated */
-  omUpdateInfo();
 
   return region;
 }

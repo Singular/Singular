@@ -3,7 +3,7 @@
  *  Purpose: implementation of main omDebug functions
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omDebugTrack.c,v 1.5 2000-08-24 14:07:10 obachman Exp $
+ *  Version: $Id: omDebugTrack.c,v 1.6 2000-09-12 16:02:18 obachman Exp $
  *******************************************************************/
 #include <limits.h>
 #include "omConfig.h"
@@ -57,6 +57,9 @@ struct omTrackAddr_s
 
   /* track > 2 */
   void*             bin_size;
+    #ifdef OM_TRACK_CUSTOM
+  void*             custom;
+    #endif
     #ifdef OM_TRACK_FILE_LINE 
       #define OM_TRACK_ADDR_MEM_3 free_line
 
@@ -647,5 +650,33 @@ void omMarkMemoryAsStatic()
 {
   omIterateTroughAddrs(0, 1, _omMarkAsStatic, NULL);
 }
+
+#ifdef OM_TRACK_CUSTOM
+void omSetCustomOfTrackAddr(void* addr, void* value)
+{
+  omTrackAddr d_addr = omOutAddr_2_TrackAddr(addr);
+  omAssume(omIsTrackAddr(addr));
+  
+  if (d_addr->track > 2)
+  {
+    d_addr->custom = value;
+  }
+}
+
+void* omGetCustomOfTrackAddr(void* addr)
+{
+  omTrackAddr d_addr = omOutAddr_2_TrackAddr(addr);
+  omAssume(omIsTrackAddr(addr));
+  
+  if (d_addr->track > 2)
+  {
+    return d_addr->custom;
+  }
+  else
+  {
+    return NULL;
+  }
+}
+#endif
 
 #endif /* OM_HAVE_TRACK */
