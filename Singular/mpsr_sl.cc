@@ -6,7 +6,7 @@
  *  Purpose: implementation of sl_link routines for MP
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: mpsr_sl.cc,v 1.2 2001-08-27 14:47:17 Singular Exp $
+ *  Version: $Id: mpsr_sl.cc,v 1.3 2001-09-19 09:49:37 Singular Exp $
  *******************************************************************/
 
 #include "mod2.h"
@@ -174,13 +174,15 @@ LINKAGE BOOLEAN slOpenMPFile(si_link l, short flag)
 LINKAGE MP_Link_pt slOpenMPConnect(int n_argc, char **n_argv)
 {
   char *argv[] = {"--MPtransp", "TCP", "--MPmode", "connect", "--MPport",
-                  "1025",  "--MPhost", "localhost"};
+                  "1025",  "--MPhost", "localhost","--MPrsh","ssh"};
 
   char *port = IMP_GetCmdlineArg(n_argc, n_argv, "--MPport");
   char *host = IMP_GetCmdlineArg(n_argc, n_argv, "--MPhost");
+  char *rsh = IMP_GetCmdlineArg(n_argc, n_argv, "--MPrsh");
 
   if (port == NULL) port = (char*) feOptValue(FE_OPT_MPPORT);
   if (host == NULL) host = (char*) feOptValue(FE_OPT_MPHOST);
+  if (rsh == NULL) rsh = (char*) feOptValue(FE_OPT_MPRSH);
 
   if (port != NULL)
     argv[5] = port;
@@ -188,8 +190,10 @@ LINKAGE MP_Link_pt slOpenMPConnect(int n_argc, char **n_argv)
     argv[7] = host;
   else
     argv[7] = mp_Env->thishost;
+  if (rsh != NULL)
+    argv[9] = rsh;
 
-  return MP_OpenLink(mp_Env, 8, argv);
+  return MP_OpenLink(mp_Env, 10, argv);
 }
 
 LINKAGE MP_Link_pt slOpenMPListen(int n_argc, char **n_argv)

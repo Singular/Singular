@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feOpt.cc,v 1.17 2001-08-27 14:46:57 Singular Exp $ */
+/* $Id: feOpt.cc,v 1.18 2001-09-19 09:49:37 Singular Exp $ */
 /*
 * ABSTRACT: Implementation of option buisness
 */
@@ -144,6 +144,9 @@ struct fe_option feOptSpec[] =
 
   {"MPhost",           required_argument,   LONG_OPTION_RETURN,
    "HOST",     "Use HOST for MP connections",                          feOptString,    0,   0},
+
+  {"MPrsh",           required_argument,   LONG_OPTION_RETURN,
+   "RSH",     "Use RSH for MP connections",                          feOptString,    0,   0},
 #endif
 
   {"ticks-per-sec",     required_argument,  LONG_OPTION_RETURN,
