@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.25 1998-09-24 09:59:47 Singular Exp $ */
+/* $Id: longalg.cc,v 1.26 1998-10-06 08:24:26 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -707,6 +707,11 @@ void napWrite(alg p)
 {
   if (p==NULL)
     StringAppendS("0");
+  else if (napDeg(p)==0)
+  {
+    //StringAppendS("-1");
+    nacWrite(p->ko);
+  }
   else
   {
     StringAppendS("(");
@@ -1569,7 +1574,12 @@ BOOLEAN naGreaterZero(number za)
   if ((zb!=NULL) && (zb->z==NULL)) WerrorS("internal zero error(3)");
 #endif
   naTest(za);
-  return ((zb!=NULL) && (zb->z!=NULL)) && (!naIsMOne(za));
+  if ((zb!=NULL) && (zb->z!=NULL))
+  {
+    if (zb->n!=NULL) return TRUE;
+    if ((napDeg(zb->z)==0) && !nacGreaterZero(zb->z->ko)) return FALSE;
+  }
+  return TRUE;
 }
 
 

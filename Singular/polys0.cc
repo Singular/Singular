@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys0.cc,v 1.8 1998-01-05 16:39:27 Singular Exp $ */
+/* $Id: polys0.cc,v 1.9 1998-10-06 08:24:27 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to convert polynomials to strings
@@ -44,7 +44,14 @@ static void writemon(poly p, int ko)
   }
   else if (nIsMOne(pGetCoeff(p)))
   {
-    StringAppendS("-");
+    if (nGreaterZero(pGetCoeff(p)))
+    {
+      nWrite(p->coef);
+      wroteCoef=((pShortOut==0)||(currRing->parameter!=NULL));
+      writeGen=TRUE;
+    }
+    else 
+      StringAppendS("-");
   }
 
   int i;
