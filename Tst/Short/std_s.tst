@@ -1,4 +1,4 @@
-// $Id: std_s.tst,v 1.3 1999-09-27 12:51:45 obachman Exp $
+// $Id: std_s.tst,v 1.4 1999-10-20 12:35:13 obachman Exp $
 
 // std_s.tst -- long tests for std
 // uses rcyclic examples from ISSAC'98 paper
@@ -224,7 +224,7 @@ proc extend_orderings(list olist, int j)
 
 proc mystd
 {
-  basering;
+  "(" + charstr(basering) + "),(" + varstr(basering) + "),(" + ordstr(basering) + ");";
   print(#[1]);	
   int t1 = timer;
   def id_res = std(#[1]);
@@ -338,3 +338,7 @@ std_range(2,5, 0, global_orderings);
 
 std_range(6,10, 0,list("dp"));
 tst_status(1);$
+LIB "poly.lib";
+killall();
+killall("proc");
+exit;
