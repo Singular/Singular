@@ -1,9 +1,8 @@
-// $Id: general.lib,v 1.18 1999-08-23 14:54:03 Singular Exp $
-//system("random",787422842);
+// $Id: general.lib,v 1.19 1999-09-21 17:32:15 Singular Exp $
 //GMG, last modified 18.6.99
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: general.lib,v 1.18 1999-08-23 14:54:03 Singular Exp $";
+version="$Id: general.lib,v 1.19 1999-09-21 17:32:15 Singular Exp $";
 info="
 LIBRARY:  general.lib   PROCEDURES OF GENERAL TYPE
 

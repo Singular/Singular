@@ -1,9 +1,8 @@
-// $Id: elim.lib,v 1.7 1999-08-03 11:43:06 obachman Exp $
-// system("random",787422842);
+// $Id: elim.lib,v 1.8 1999-09-21 17:32:15 Singular Exp $
 // (GMG, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: elim.lib,v 1.7 1999-08-03 11:43:06 obachman Exp $";
+version="$Id: elim.lib,v 1.8 1999-09-21 17:32:15 Singular Exp $";
 info="
 LIBRARY:  elim.lib      PROCEDURES FOR ELIMINATIOM, SATURATION AND BLOWING UP
 

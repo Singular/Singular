@@ -1,10 +1,8 @@
-
-// $Id: sing.lib,v 1.16 1999-08-03 11:43:10 obachman Exp $
-//system("random",787422842);
+// $Id: sing.lib,v 1.17 1999-09-21 17:32:18 Singular Exp $
 //(GMG/BM, last modified 26.06.96)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: sing.lib,v 1.16 1999-08-03 11:43:10 obachman Exp $";
+version="$Id: sing.lib,v 1.17 1999-09-21 17:32:18 Singular Exp $";
 info="
 LIBRARY:  sing.lib      PROCEDURES FOR SINGULARITIES
 AUTHORS:  Gert-Martin Greuel, email: greuel@mathematik.uni-kl.de

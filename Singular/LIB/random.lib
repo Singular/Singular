@@ -1,9 +1,8 @@
-// $Id: random.lib,v 1.9 1999-07-28 17:51:08 Singular Exp $
-//system("random",787422842);
+// $Id: random.lib,v 1.10 1999-09-21 17:32:18 Singular Exp $
 //(GMG/BM, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: random.lib,v 1.9 1999-07-28 17:51:08 Singular Exp $";
+version="$Id: random.lib,v 1.10 1999-09-21 17:32:18 Singular Exp $";
 info="
 LIBRARY:  random.lib    PROCEDURES OF RANDOM MATRIX AND POLY OPERATIONS
 

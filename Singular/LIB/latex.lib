@@ -1,10 +1,10 @@
-// $Id: latex.lib,v 1.9 1999-07-07 14:39:10 obachman Exp $
+// $Id: latex.lib,v 1.10 1999-09-21 17:32:16 Singular Exp $
 //                        1998/04/17
 // author : Christian Gorzel email: gorzelc@math.uni-muenster.de
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: latex.lib,v 1.9 1999-07-07 14:39:10 obachman Exp $";
+version="$Id: latex.lib,v 1.10 1999-09-21 17:32:16 Singular Exp $";
 info="
 LIBRARY: latex.lib    PROCEDURES FOR TYPESET OF SINGULAROBJECTS IN LATEX2E
 
@@ -241,7 +241,7 @@ EXAMPLE: example texdemo; executes the generation
   if (size(#))
   { if (typeof(#[1])=="int") {TeXdemostart = #[1];}
   }
-  system("random",TeXdemostart);
+  system("--random",TeXdemostart);
 
   if (size(#) ==2)
   { if (typeof(#[2]) == "string") { fname = #[2];}
