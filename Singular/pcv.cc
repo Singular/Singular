@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: pcv.cc,v 1.11 1998-12-08 12:33:42 mschulze Exp $ */
+/* $Id: pcv.cc,v 1.12 1998-12-08 12:48:42 mschulze Exp $ */
 /*
 * ABSTRACT: conversion between polys and coeff vectors
 */
@@ -115,7 +115,7 @@ void pcvClean()
   }
 }
 
-int pcvM2n(poly m)
+unsigned pcvM2n(poly m)
 {
   unsigned n=0,d=0;
   for(int i=0;i<pVariables;i++)
