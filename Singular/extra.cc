@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.42 1998-04-27 15:00:50 krueger Exp $ */
+/* $Id: extra.cc,v 1.43 1998-04-28 08:45:22 pohl Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -12,7 +12,7 @@
 #include <ctype.h>
 #include "mod2.h"
 
-#ifndef macintosh
+#ifndef __MWERKS__
 #ifdef TIME_WITH_SYS_TIME
 # include <time.h>
 # ifdef HAVE_SYS_TIME_H
@@ -200,7 +200,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
     }
     else
 /*==================== sh ==================================*/
-    #ifndef macintosh
+    #ifndef __MWERKS__
     if(strcmp((char*)(h->Data()),"sh")==0)
     {
       #ifndef MSDOS
@@ -276,7 +276,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
     else
 /*==================== pid ==================================*/
     #ifndef MSDOS
-    #ifndef macintosh
+    #ifndef __MWERKS__
     if (strcmp((char*)(h->Data()),"pid")==0)
     {
       res->rtyp=INT_CMD;
@@ -304,7 +304,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
     }
     else
 /*==================== tty ==================================*/
-    #ifndef macintosh
+    #ifndef __MWERKS__
     #ifndef MSDOS
     #if defined(HAVE_FEREAD) || defined(HAVE_READLINE)
     if (strcmp((char*)(h->Data()),"tty")==0)
@@ -466,7 +466,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
     else
 #endif
 /*==================== alarm ==================================*/
-#ifndef macintosh
+#ifndef __MWERKS__
 #ifndef MSDOS
 #ifndef atarist
 #ifdef unix
