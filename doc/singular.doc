@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.99 2000-10-24 09:39:39 Singular Exp $
+@comment $Id: singular.doc,v 1.100 2000-12-11 13:25:43 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -372,8 +372,9 @@ LIB "all.lib";
 @cindex Invariant theory
 
 @menu
-* finvar_lib:: procedures to calculate invariant rings of finite groups
+* finvar_lib:: procedures to compute invariant rings of finite groups
 * ainvar_lib:: procedures to compute invariants rings of the additive group
+* rinvar_lib:: procedures to compute invariants ring of reductive groups
 @end menu
 
 @c ----------------------------------------------------------
@@ -381,9 +382,13 @@ LIB "all.lib";
 @subsection finvar_lib
 @c lib finvar.lib
 @c ----------------------------------------------------------
-@node ainvar_lib, , finvar_lib, Invariant theory
-@subsection invar_lib
+@node ainvar_lib, rinvar_lib, finvar_lib, Invariant theory
+@subsection ainvar_lib
 @c lib ainvar.lib
+@c ----------------------------------------------------------
+@node rinvar_lib, , ainvar_lib, Invariant theory
+@subsection rinvar_lib
+@c lib rinvar.lib
 @c ----------------------------------------------------------------------------
 @node Symbolic-numerical solving, Visualization, Invariant theory, SINGULAR libraries
 @section Symbolic-numerical solving
@@ -394,6 +399,7 @@ LIB "all.lib";
 * solve_lib:: procedures to solve polynomial systems
 * triang_lib:: procedures for decomposing zero-dimensional ideals
 * ntsolve_lib:: one real solution of polynomial systems (Newton iteration)
+* zeroset_lib:: procedures for roots and factorization
 @end menu
 
 @c ---------------------------------------------------------
@@ -410,9 +416,13 @@ LIB "all.lib";
 @subsection triang_lib
 @c lib triang.lib no_ex
 @c ---------------------------------------------------------
-@node ntsolve_lib, , triang_lib, Symbolic-numerical solving
+@node ntsolve_lib, zeroset_lib, triang_lib, Symbolic-numerical solving
 @subsection ntsolve_lib
 @c lib ntsolve.lib
+@c ---------------------------------------------------------
+@node zeroset_lib, , ntsolve_lib, Symbolic-numerical solving
+@subsection zeroset_lib
+@c lib zeroset.lib
 
 @c ----------------------------------------------------------------------------
 @node Visualization, , Symbolic-numerical solving, SINGULAR libraries
