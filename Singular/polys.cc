@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.37 1999-04-30 10:39:54 obachman Exp $ */
+/* $Id: polys.cc,v 1.38 1999-05-25 16:49:39 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -2109,18 +2109,130 @@ void pNormalize(poly p)
 */
 static poly pSubst1 (poly p,int n)
 {
-  poly qq,result = NULL;
-
-  while (p != NULL)
+  if (p == NULL) return NULL;
+  if (pNext(p) == NULL)
   {
-    qq = p;
-    pIter(p);
-    qq->next = NULL;
-    pSetExp(qq,n,0);
-    pSetm(qq);
-    result = pAdd(result,qq);
+    if (pGetExp(p, n) != 0)
+    {
+      pSetExp(p, n, 0);
+      pSetm(p);
+    }
+    return p;
   }
-  return result;
+
+  int l = pLength(p) - 1;
+  poly* monoms = (poly*) Alloc(l*sizeof(poly));
+  int i;
+  
+  for (i=0; i<l; i++)
+  {
+    if (pGetExp(p, n) != 0)
+    {
+      pSetExp(p, n, 0);
+      pSetm(p);
+    }
+    monoms[i] = p;
+    pIter(p);
+  }
+  if (pGetExp(p, n) != 0)
+  {
+    pSetExp(p, n, 0);
+    pSetm(p);
+  }
+  for (i = l-1; i >= 0; i--)
+  {
+    pNext(monoms[i]) = NULL;
+    p = pAdd(p, monoms[i]);
+  }
+  pTest(p);
+  Free(monoms, l*sizeof(poly));
+  return p;
+}
+
+/*3
+* substitute the n-th variable by number e in p
+* destroy p
+*/
+static poly pSubst2 (poly p,int n, number e)
+{
+  number nn, nm;
+  int exp;
+  assume( ! nIsZero(e) );
+  
+  if (p == NULL) return NULL;
+  if (pNext(p) == NULL)
+  {
+    exp = pGetExp(p, n);
+    if (exp != 0)
+    {
+      nPower(e, exp, &nn);
+      nm = nMult(nn, pGetCoeff(p));
+      pSetCoeff(p, nm);
+      nDelete(&nn);
+      pSetExp(p, n, 0);
+      pSetm(p);
+    }
+    return p;
+  }
+
+  int l = pLength(p) - 1;
+  poly* monoms = (poly*) Alloc(l*sizeof(poly));
+  int i;
+  
+  for (i=0; i<l; i++)
+  {
+    exp = pGetExp(p, n);
+    if (exp != 0)
+    {
+      nPower(e, exp, &nn);
+      nm = nMult(nn, pGetCoeff(p));
+      pSetCoeff(p, nm);
+      nDelete(&nn);
+      pSetExp(p, n, 0);
+      pSetm(p);
+    }
+    monoms[i] = p;
+    pIter(p);
+  }
+  exp = pGetExp(p, n);
+  if (exp != 0)
+  {
+    nPower(e, exp, &nn);
+    nm = nMult(nn, pGetCoeff(p));
+    pSetCoeff(p, nm);
+    nDelete(&nn);
+    pSetExp(p, n, 0);
+    pSetm(p);
+  }
+  for (i = l-1; i >= 0; i--)
+  {
+    pNext(monoms[i]) = NULL;
+    p = pAdd(p, monoms[i]);
+  }
+  Free(monoms, l*sizeof(poly));
+  pTest(p);
+  return p;
+}
+
+poly pSubst0(poly p, int n)
+{
+  spolyrec res;
+  poly h = &res;
+  pNext(h) = p;
+  
+  while (pNext(h)!=NULL)
+  {
+    if (pGetExp(pNext(h),n)!=0)
+    {
+      pDelete1(&pNext(h));
+    }
+    else
+    {
+      pIter(h);
+    }
+  }
+  pTest(pNext(&res));
+  return pNext(&res);
 }
 
 /*2
@@ -2129,8 +2241,13 @@ static poly pSubst1 (poly p,int n)
 */
 poly pSubst(poly p, int n, poly e)
 {
-  if ((e!=NULL)&&(pIsConstant(e))&&(nIsOne(pGetCoeff(e))))
-    return pSubst1(p,n);
+  if (e == NULL) return pSubst0(p, n);
+
+  if (pIsConstant(e))
+  {
+    if (nIsOne(pGetCoeff(e))) return pSubst1(p,n);
+    else return pSubst2(p, n, pGetCoeff(e));
+  }
 
   int exponent,i;
   poly h, res, m;
