@@ -453,7 +453,9 @@ MP_Status_t open_tcp_launch_mode(link, argc, argv)
 
        worked everywhere */
 
-    rsh_argv[0] = MP_RSH_COMMAND;
+    rsh_argv[0] = IMP_GetCmdlineArg(argc, argv, "-MPrsh");
+    if (rsh_argv[0] == NULL)
+      rsh_argv[0] = MP_RSH_COMMAND;
     rsh_argv[1] = IMP_GetCmdlineArg(argc, argv, "-MPhost");
     rsh_argv[2] = "-n";
     /* Let's not be too strict, and allow an empty -MPhost argument */
