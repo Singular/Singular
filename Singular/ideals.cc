@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.6 1997-05-02 15:10:13 Singular Exp $ */
+/* $Id: ideals.cc,v 1.7 1997-05-21 13:05:12 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -2919,22 +2919,27 @@ ideal idMinEmbedding(ideal arg)
 {
   if (idIs0(arg)) return idInit(1,arg->rank);
 
-  int i,j,k=0,pC;
+  int i,j,k,pC;
   poly p,q;
   int rg=arg->rank;
-  ideal res = idInit(IDELEMS(arg),rg);
+  ideal res = idCopy(arg);
   intvec *indexMap=new intvec(rg+1);
   intvec *toKill=new intvec(rg+1);
 
-  for (i=indexMap->length()-1;i>0;i--)
-    (*indexMap)[i] = i;
-  for (j=IDELEMS(arg)-1;j>=0;j--)
+  loop
   {
-    if (arg->m[j]!=NULL)
+    k = 0;
+    for (i=indexMap->length()-1;i>0;i--)
     {
-      if ((pIsConstantComp(arg->m[j])) && (pNext(arg->m[j])==NULL))
+      (*indexMap)[i] = i;
+      (*toKill)[i] = 0;
+    }
+    for (j=IDELEMS(res)-1;j>=0;j--)
+    {
+      if ((res->m[j]!=NULL) && (pIsConstantComp(res->m[j])) && 
+           (pNext(res->m[j])==NULL))
       {
-        pC = pGetComp(arg->m[j]);
+        pC = pGetComp(res->m[j]);
         if ((*toKill)[pC]==0)
         {
           rg--;
@@ -2942,37 +2947,37 @@ ideal idMinEmbedding(ideal arg)
           for (i=indexMap->length()-1;i>=pC;i--)
             (*indexMap)[i]--;
         }
-      }
-      else
-      {
-        res->m[k] = pCopy(arg->m[j]);
+        pDelete(&(res->m[j]));
         k++;
       }
     }
-  }
-  if (rg>0)
-  {
-    res->rank=rg;
-    for (j=IDELEMS(res)-1;j>=0;j--)
-    {
-      while ((res->m[j]!=NULL) && ((*toKill)[pGetComp(res->m[j])]==1))
-        pDelete1(&res->m[j]);
-      p = res->m[j];
-      while ((p!=NULL) && (pNext(p)!=NULL))
-      {
-        pSetComp(p,(*indexMap)[pGetComp(p)]);
-        while ((pNext(p)!=NULL) && ((*toKill)[pGetComp(pNext(p))]==1))
-          pDelete1(&pNext(p));
-        pIter(p);
-      }
-      if (p!=NULL) pSetComp(p,(*indexMap)[pGetComp(p)]);
-    }
     idSkipZeroes(res);
-  }
-  else
-  {
-    idDelete(&res);
-    res=idFreeModule(1);
+    if (k==0) break;
+    if (rg>0)
+    {
+      res->rank=rg;
+      for (j=IDELEMS(res)-1;j>=0;j--)
+      {
+        while ((res->m[j]!=NULL) && ((*toKill)[pGetComp(res->m[j])]==1))
+          pDelete1(&res->m[j]);
+        p = res->m[j];
+        while ((p!=NULL) && (pNext(p)!=NULL))
+        {
+          pSetComp(p,(*indexMap)[pGetComp(p)]);
+          while ((pNext(p)!=NULL) && ((*toKill)[pGetComp(pNext(p))]==1))
+            pDelete1(&pNext(p));
+          pIter(p);
+        }
+        if (p!=NULL) pSetComp(p,(*indexMap)[pGetComp(p)]);
+      }
+      idSkipZeroes(res);
+    }
+    else
+    {
+      idDelete(&res);
+      res=idFreeModule(1);
+      break;
+    }
   }
   delete toKill;
   delete indexMap;

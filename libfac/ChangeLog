@@ -1,6 +1,16 @@
 Tue May 13 11:32:11 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
 	* Makefile.in (uninstall): took out template installation
+	(all): added OPTOBJ target so that the dir is created, if necessary
+
+Tue May 13 20:09:03 1997  Olaf Bachmann  <obachman@schlupp.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* configure.in: Exit with error if factory.h was not found and
+	  --enable-factory option was not explicitely given
+
+Tue May 13 11:32:11 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* Makefile.in (uninstall): took out template installation
 
 Tue May  6 09:30:51 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 

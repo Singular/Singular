@@ -3153,12 +3153,50 @@ EOF
 
 
 
+echo $ac_n "checking whether _AIX is defined""... $ac_c" 1>&6
+if eval "test \"`echo '$''{'ac_cv_is_aix'+set}'`\" = set"; then
+  echo $ac_n "(cached) $ac_c" 1>&6
+else
+  cat > conftest.$ac_ext <<EOF
+#line 3162 "configure"
+#include "confdefs.h"
+#ifdef _AIX
+    yes
+#endif
+
+EOF
+if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
+  egrep "yes" >/dev/null 2>&1; then
+  rm -rf conftest*
+  ac_cv_is_aix=yes
+else
+  rm -rf conftest*
+  ac_cv_is_aix=no
+fi
+rm -f conftest*
+
+fi
+
+if test "$ac_cv_is_aix" = yes; then
+  echo "$ac_t""yes" 1>&6
+else
+  echo "$ac_t""no" 1>&6
+fi
+
+
 if test ${GXX} = yes; then
   CXXFLAGS="-O3 -w -fomit-frame-pointer"
   CXXTEMPLFLAGS="-fno-implicit-templates"
+  if test "$ac_cv_is_aix" = yes; then
+    CXXNOOPTFLAGS="-O -w -fomit-frame-pointer"
+  else
+    CXXNOOPTFLAGS=$CXXFLAGS
+  fi
 else
   CXXTEMPFLAGS=""
+  CXXNOOPTFLAGS=$CXXFLAGS
 fi
+
 
 
 if test ${GCC} = yes; then
@@ -3296,6 +3334,7 @@ s%@WITH_LIBFAC@%$WITH_LIBFAC%g
 s%@NEED_LIBS@%$NEED_LIBS%g
 s%@ALLOCA@%$ALLOCA%g
 s%@CXXTEMPLFLAGS@%$CXXTEMPLFLAGS%g
+s%@CXXNOOPTFLAGS@%$CXXNOOPTFLAGS%g
 
 CEOF
 EOF

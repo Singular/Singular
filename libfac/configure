@@ -793,18 +793,20 @@ if test -z "$AR"; then
   { echo "configure: error: Need ar" 1>&2; exit 1; }
 fi
 
-ac_safe=`echo "factory.h" | tr './\055' '___'`
-echo $ac_n "checking for factory.h""... $ac_c" 1>&6
+for ac_hdr in factory.h
+do
+ac_safe=`echo "$ac_hdr" | tr './\055' '___'`
+echo $ac_n "checking for $ac_hdr""... $ac_c" 1>&6
 if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 803 "configure"
+#line 805 "configure"
 #include "confdefs.h"
-#include <factory.h>
+#include <$ac_hdr>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:808: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:810: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -818,12 +820,24 @@ rm -f conftest*
 fi
 if eval "test \"`echo '$ac_cv_header_'$ac_safe`\" = yes"; then
   echo "$ac_t""yes" 1>&6
-  :
+    ac_tr_hdr=HAVE_`echo $ac_hdr | tr 'abcdefghijklmnopqrstuvwxyz./\055' 'ABCDEFGHIJKLMNOPQRSTUVWXYZ___'`
+  cat >> confdefs.h <<EOF
+#define $ac_tr_hdr 1
+EOF
+ 
 else
   echo "$ac_t""no" 1>&6
-echo "configure: warning: factory.h not found!" 1>&2
 fi
+done
 
+
+if test "$ac_cv_header_factory_h" != yes; then
+  if test "$enable_factory" != yes; then
+    { echo "configure: error: Need factory.h to built libfac" 1>&2; exit 1; }
+  else
+    echo "configure: warning: Make sure to _install_ factory.h befor building libfac" 1>&2
+  fi
+fi
 
 
 
@@ -832,7 +846,7 @@ if eval "test \"`echo '$''{'ac_cv_c_const'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 836 "configure"
+#line 850 "configure"
 #include "confdefs.h"
 
 int main() { return 0; }
@@ -882,7 +896,7 @@ ccp = (char const *const *) p;
 
 ; return 0; }
 EOF
-if { (eval echo configure:886: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:900: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   ac_cv_c_const=yes
 else
@@ -908,7 +922,7 @@ else
   ac_cv_c_inline=no
 for ac_kw in inline __inline__ __inline; do
   cat > conftest.$ac_ext <<EOF
-#line 912 "configure"
+#line 926 "configure"
 #include "confdefs.h"
 
 int main() { return 0; }
@@ -916,7 +930,7 @@ int t() {
 } $ac_kw foo() {
 ; return 0; }
 EOF
-if { (eval echo configure:920: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:934: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   ac_cv_c_inline=$ac_kw; break
 fi

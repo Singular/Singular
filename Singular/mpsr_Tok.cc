@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_Tok.cc,v 1.8 1997-05-02 22:09:29 obachman Exp $ */
+/* $Id: mpsr_Tok.cc,v 1.9 1997-05-21 13:05:15 obachman Exp $ */
 
 /***************************************************************
  *
@@ -565,5 +565,27 @@ mpsr_cmd mpsr_cmds[] =
 } // That's all
 
 #endif // GENTABLE
+
+#else // NOT HAVE_MPSR
+
+#ifdef GENTABLE
+
+// simply touch mpsr_Tok.inc so that Make does not get confused
+#ifndef macintosh
+extern "C" int system(char *);
+#else
+#include <stdio.h>
+#endif
+
+void mpsr_ttGen()
+{
+#ifndef macintosh
+  system("touch mpsr_Tok.inc");
+#else
+  FILE fd = fopen("mpsr_Tok.inc", "w");
+  close(fd);
+#endif
+}
+#endif
 
 #endif // HAVE_MPSR

@@ -393,13 +393,34 @@ AC_CHECK_SIZEOF(void*,4)
 dnl
 dnl Last, but not least, customize CFLAGS
 dnl
+AC_MSG_CHECKING(whether _AIX is defined)
+AC_CACHE_VAL(ac_cv_is_aix,
+AC_EGREP_CPP(yes,
+[#ifdef _AIX
+    yes
+#endif
+], ac_cv_is_aix=yes, ac_cv_is_aix=no, 1))
+if test "$ac_cv_is_aix" = yes; then
+  AC_MSG_RESULT(yes)
+else
+  AC_MSG_RESULT(no)
+fi
+
+
 if test ${GXX} = yes; then
   CXXFLAGS="-O3 -w -fomit-frame-pointer"
   CXXTEMPLFLAGS="-fno-implicit-templates"
+  if test "$ac_cv_is_aix" = yes; then
+    CXXNOOPTFLAGS="-O -w -fomit-frame-pointer"
+  else
+    CXXNOOPTFLAGS=$CXXFLAGS
+  fi
 else
   CXXTEMPFLAGS=""
+  CXXNOOPTFLAGS=$CXXFLAGS
 fi
 AC_SUBST(CXXTEMPLFLAGS)
+AC_SUBST(CXXNOOPTFLAGS)
 
 if test ${GCC} = yes; then
   CFLAGS="-O3 -w -fomit-frame-pointer"

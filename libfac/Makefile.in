@@ -1,4 +1,4 @@
-# $Id: Makefile.in,v 1.5 1997-05-13 10:09:17 obachman Exp $
+# $Id: Makefile.in,v 1.6 1997-05-21 13:05:34 obachman Exp $
 #################################################
 SHELL		= /bin/sh
 RM		= rm -f
@@ -83,9 +83,13 @@ DEBCHARSETOBJ =	DEBOBJ/csutil.o DEBOBJ/charset.o DEBOBJ/reorder.o
 ## Primary targets
 ##
 
-.SUFFIXES:      .cc .h .o
 
-all: ${TARGETNAME}
+all: OPTOBJ ${TARGETNAME} 
+
+OPTOBJ:
+	${MKINSTALLDIRS} OPTOBJ
+
+.SUFFIXES:      .cc .h .o
 
 OPTOBJ/%.o: %.cc 
 	$(CXX) $(CXXFLAGS) $(CXXTEMPLFLAGS) $(CPPFLAGS) $(DEFS) -c $< -o $@

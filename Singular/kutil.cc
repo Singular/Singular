@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.4 1997-04-08 16:49:21 Singular Exp $ */
+/* $Id: kutil.cc,v 1.5 1997-05-21 13:05:13 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for std
 */
@@ -3350,7 +3350,7 @@ void initBuchMoraPos (kStrategy strat)
       strat->posInL = posInL0;
       strat->posInT = posInT0;
     }
-    if (TEST_OPT_NOTREGULARITY) strat->posInL =posInLSpecial;
+    //if (strat->minim>0) strat->posInL =posInLSpecial;
   }
   else
   {
@@ -3365,6 +3365,7 @@ void initBuchMoraPos (kStrategy strat)
       strat->posInT = posInT17;
     }
   }
+  if (strat->minim>0) strat->posInL =posInLSpecial;
   // for further tests only
   if ((BTEST1(11)) || (BTEST1(12)))
     strat->posInL = posInL11;

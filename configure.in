@@ -42,6 +42,18 @@ if test "x$prefix" = xNONE; then
   ac_configure_args="$ac_configure_args --prefix=$ac_default_prefix"
 fi
 
+AC_MSG_CHECKING(whether _AIX is defined)
+AC_CACHE_VAL(ac_cv_is_aix,
+AC_EGREP_CPP(yes,
+[#ifdef _AIX
+    yes
+#endif
+], ac_cv_is_aix=yes, ac_cv_is_aix=no, 1))
+if test "$ac_cv_is_aix" = yes; then
+  AC_MSG_RESULT(yes)
+else
+  AC_MSG_RESULT(no)
+fi
 
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
@@ -58,20 +70,7 @@ AC_CHECK_HEADERS(gmp.h MP.h  MPT.h factory.h factor.h)
 
 if test "$ac_cv_lib_gmp_mpz_init" = yes && \
  test "$ac_cv_header_gmp_h" = yes; then
-  if echo $target_os | egrep aix; then
-    AC_EGREP_CPP(yes,\
-     [#include <gmp.h>
-    #if defined(__GNU_MP_VERSION) &&  __GNU_MP_VERSION == 2
-    no
-    #else
-    yes
-    #endif
-    ],
-    ac_gmp_ok=yes,
-    AC_MSG_WARN(Found gmp lib version>2 which is broken under AIX: Can not use it))
-  else
     ac_gmp_ok=yes
-  fi
 fi
 
 if test "$ac_cv_lib_MP_IMP_PutGmpInt" = yes && \
@@ -121,9 +120,18 @@ if test "$enable_gmp" != yes && test "$enable_gmp" != no; then
   fi
 fi
 if test "$enable_gmp" = yes && test -d gmp; then
-  AC_MSG_RESULT(yes)
-  CONFIG_SUBDIRS="gmp"
-  ac_configure_args="$ac_configure_args --enable-gmp"
+  if test "$ac_cv_is_aix" = yes && test "$GCC" = yes; then
+    AC_MSG_RESULT(no)
+    AC_MSG_WARN(Building gmp v2 with gcc results in a gmp lib with bugs)
+    AC_MSG_WARN(Install gmp v2 with another compiler first or use gmp v1.3)
+    AC_MSG_WARN(For the time being gmp is neither configured/built nor used) 
+    enable_gmp=no
+    ac_configure_args="$ac_configure_args --disable-gmp"
+  else
+    AC_MSG_RESULT(yes)
+    CONFIG_SUBDIRS="gmp"
+    ac_configure_args="$ac_configure_args --enable-gmp"
+  fi
 else
   AC_MSG_RESULT(no)
   if  test "$enable_gmp" = yes && test ! -d gmp; then
@@ -142,9 +150,16 @@ if test "$enable_MP" != yes && test "$enable_MP" != no; then
   fi
 fi
 if test "$enable_MP" = yes && test -d MP; then
-  AC_MSG_RESULT(yes)
-  CONFIG_SUBDIRS="$CONFIG_SUBDIRS MP"
-  ac_configure_args="$ac_configure_args --enable-MP"
+  if test "$ac_gmp_ok" = yes || test "$enable_gmp" = yes; then
+    AC_MSG_RESULT(yes)
+    CONFIG_SUBDIRS="$CONFIG_SUBDIRS MP"
+    ac_configure_args="$ac_configure_args --enable-MP"
+  else
+    AC_MSG_RESULT(no)
+    AC_MSG_WARN(Can not build MP for Singular without having gmp)
+    enable_MP=no
+    ac_configure_args="$ac_configure_args --disable-MP"
+  fi
 else
   AC_MSG_RESULT(no)
   if  test "$enable_MP" = yes && test ! -d MP; then
@@ -163,9 +178,16 @@ if test "$enable_factory" != yes && test "$enable_factory" != no; then
   fi
 fi
 if test "$enable_factory" = yes && test -d factory; then
+  if test "$ac_gmp_ok" = yes || test "$enable_gmp" = yes; then
   AC_MSG_RESULT(yes)
   CONFIG_SUBDIRS="$CONFIG_SUBDIRS factory"
   ac_configure_args="$ac_configure_args --enable-factory"
+  else
+    AC_MSG_RESULT(no)
+    AC_MSG_WARN(Can not build factory without having gmp)
+    enable_factory=no
+    ac_configure_args="$ac_configure_args --disable-factory"
+  fi
 else
   AC_MSG_RESULT(no)
   if  test "$enable_factory" = yes && test ! -d factory; then
@@ -184,9 +206,16 @@ if test "$enable_libfac" != yes && test "$enable_libfac" != no; then
   fi
 fi
 if test "$enable_libfac" = yes && test -d libfac; then
+  if test "$ac_factory_ok" = yes || test "$enable_factory" = yes; then
   AC_MSG_RESULT(yes)
   CONFIG_SUBDIRS="$CONFIG_SUBDIRS libfac"
   ac_configure_args="$ac_configure_args --enable-libfac"
+  else
+    AC_MSG_RESULT(no)
+    AC_MSG_WARN(Can not build libfac without factory)
+    enable_libfac=no
+    ac_configure_args="$ac_configure_args --disable-libfac"
+  fi
 else
   AC_MSG_RESULT(no)
   if  test "$enable_libfac" = yes && test ! -d libfac; then
@@ -198,7 +227,7 @@ fi
 
 AC_MSG_CHECKING(whether to configure and build Singular)
 if test "$enable_Singular" != yes && test "$enable_Singular" != no; then
-  if test "$with_Singular" != no && test "$ac_Singular_ok" != yes; then
+  if test "$with_Singular" != no; then
     enable_Singular=yes
   else
     enable_Singular=no
@@ -221,163 +250,76 @@ fi
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl Check whether or not to use various packages
 dnl
-AC_MSG_CHECKING(whether to use gmp)
-if test "$with_gmp" != no; then
-  if test "$ac_gmp_ok" != yes; then
-    if test "$enable_gmp" = yes; then
-      if echo $target_os | egrep aix; then
-	ac_with_gmp=no
-	ac_aix_warn=yes
-      else
-	ac_with_gmp=yes
-      fi
-    else
-      ac_with_gmp=no
-    fi
-  else
-    ac_with_gmp=yes
-  fi
-  if test "$ac_with_gmp"=yes; then
-    if test "$with_gmp" != yes; then
-      with_gmp=yes
-      ac_configure_args="$ac_configure_args --with-gmp"
-    fi
+AC_MSG_CHECKING(whether to use with gmp)
+if test "$with_gmp" != no && test "$with_gmp" != yes; then
+  if test "$ac_gmp_ok" = yes || test "$enable_gmp" = yes; then
+    with_gmp=yes
   else
     with_gmp=no
-    ac_configure_args="$ac_configure_args --without-gmp"
   fi
+  ac_configure_args="$ac_configure_args --with-gmp=$with_gmp"
 fi
-if test "$with_gmp" != no; then
+if test "$with_gmp" = yes; then
   AC_MSG_RESULT(yes)
 else
   AC_MSG_RESULT(no)
 fi
-if test "$ac_aix_warn" = yes; then
-  AC_MSG_WARN(gmp version 2 has a bug under AIX)
-fi
 
-AC_MSG_CHECKING(whether to use MP)
-if test "$with_MP" != no; then
-  if test "$ac_MP_ok" != yes; then
-    if test "$enable_MP" = yes; then
-      if test "$with_gmp" != yes; then
-	ac_with_MP=no
-	ac_gmp_warn=yes
-      else
-	ac_with_MP=yes
-      fi
-    else
-      ac_with_MP=no
-    fi
-  else
-    ac_with_MP=yes
-  fi
-  if test "$ac_with_MP"=yes; then
-    if test "$with_MP" != yes; then
-      with_MP=yes
-      ac_configure_args="$ac_configure_args --with-MP"
-    fi
+AC_MSG_CHECKING(whether to use with MP)
+if test "$with_MP" != no && test "$with_MP" != yes; then
+  if test "$ac_MP_ok" = yes || test "$enable_MP" = yes; then
+    with_MP=yes
   else
     with_MP=no
-    ac_configure_args="$ac_configure_args --without-MP"
   fi
+  ac_configure_args="$ac_configure_args --with-MP=$with_MP"
 fi
-if test "$with_MP" != no; then
+if test "$with_MP" = yes; then
   AC_MSG_RESULT(yes)
 else
   AC_MSG_RESULT(no)
 fi
-if test "$ac_gmp_warn" = yes; then
-  AC_MSG_WARN(Need gmp to use MP)
-fi
 
-AC_MSG_CHECKING(whether to use factory)
-if test "$with_factory" != no; then
-  if test "$ac_factory_ok" != yes; then
-    if test "$enable_factory" = yes; then
-      if test "$with_gmp" != yes; then
-	ac_with_factory=no
-	ac_gmp_warn=yes
-      else
-	ac_with_factory=yes
-      fi
-    else
-      ac_with_factory=no
-    fi
-  else
-    ac_with_factory=yes
-  fi
-  if test "$ac_with_factory"=yes; then
-    if test "$with_factory" != yes; then
-      with_factory=yes
-      ac_configure_args="$ac_configure_args --with-factory"
-    fi
+AC_MSG_CHECKING(whether to use with factory)
+if test "$with_factory" != no && test "$with_factory" != yes; then
+  if test "$ac_factory_ok" = yes || test "$enable_factory" = yes; then
+    with_factory=yes
   else
     with_factory=no
-    ac_configure_args="$ac_configure_args --without-factory"
   fi
+  ac_configure_args="$ac_configure_args --with-factory=$with_factory"
 fi
-if test "$with_factory" != no; then
+if test "$with_factory" = yes; then
   AC_MSG_RESULT(yes)
 else
   AC_MSG_RESULT(no)
-fi
-if test "$ac_gmp_warn" = yes; then
-  AC_MSG_WARN(Need gmp to use factory)
-fi
-  
-AC_MSG_CHECKING(whether to use libfac)
-if test "$with_libfac" != no; then
-  if test "$ac_libfac_ok" != yes; then
-    if test "$enable_libfac" = yes; then
-      if test "$with_gmp" != yes || test "$with_factory" != yes; then
-	ac_with_libfac=no
-	ac_gmp_warn=yes
-      else
-	ac_with_libfac=yes
-      fi
-    else
-      ac_with_libfac=no
-    fi
-  else
-    ac_with_libfac=yes
-  fi
-  if test "$ac_with_libfac"=yes; then
-    if test "$with_libfac" != yes; then
-      with_libfac=yes
-      ac_configure_args="$ac_configure_args --with-libfac"
-    fi
-  else
-    with_libfac=no
-    ac_configure_args="$ac_configure_args --without-libfac"
-  fi
-fi
-if test "$with_libfac" != no; then
-  AC_MSG_RESULT(yes)
-else
-  AC_MSG_RESULT(no)
-fi
-if test "$ac_gmp_warn" = yes; then
-  AC_MSG_WARN(Need gmp and factory to use libfac)
 fi
 
-AC_MSG_CHECKING(whether to build with Singular)
-if test "$with_Singular" != no; then
-  if test "$enable_Singular" = yes; then
-	ac_with_Singular=yes
+AC_MSG_CHECKING(whether to use with libfac)
+if test "$with_libfac" != no && test "$with_libfac" != yes; then
+  if test "$ac_libfac_ok" = yes || test "$enable_libfac" = yes; then
+    with_libfac=yes
   else
-    ac_with_Singular=no
+    with_libfac=no
   fi
-  if test "$ac_with_Singular"=yes; then
-    if test "$with_Singular" != yes; then
-      with_Singular=yes
-      ac_configure_args="$ac_configure_args --with-Singular"
-    fi
+  ac_configure_args="$ac_configure_args --with-libfac=$with_libfac"
+fi
+if test "$with_libfac" = yes; then
+  AC_MSG_RESULT(yes)
+else
+  AC_MSG_RESULT(no)
+fi
+
+AC_MSG_CHECKING(whether to use with Singular)
+if test "$with_Singular" != no && test "$with_Singular" != yes; then
+  if test "$enable_Singular" = yes; then
+    with_Singular=yes
   else
     with_Singular=no
-    ac_configure_args="$ac_configure_args --without-Singular"
   fi
+  ac_configure_args="$ac_configure_args --with-Singular=$with_Singular"
 fi
+
 if test "$with_Singular" != no; then
   AC_MSG_RESULT(yes)
 else

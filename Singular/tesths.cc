@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.14 1997-05-20 08:52:11 Singular Exp $ */
+/* $Id: tesths.cc,v 1.15 1997-05-21 13:05:16 obachman Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -58,10 +58,8 @@ int main(          /* main entry to Singular */
 #ifdef GENTABLE
   extern ttGen1();
   extern ttGen2();
-#ifdef HAVE_MPSR    
   extern mpsr_ttGen(); // For initialization of (CMD, MP_COP) tables
   mpsr_ttGen();
-#endif  
   ttGen1();
   ttGen2();
 #else
@@ -152,7 +150,11 @@ int main(          /* main entry to Singular */
               printf("\tWeyl algebra,\n");
 #endif
 #ifdef HAVE_GMP
+#if defined (__GNU_MP_VERSION) && defined (__GNU_MP_VERSION_MINOR)
               printf("\tGMP(%d.%d),\n",__GNU_MP_VERSION,__GNU_MP_VERSION_MINOR);
+#else
+              printf("\tGMP(1.3),\n");
+#endif              
 #endif
 #ifdef HAVE_DBM
               printf("\tDBM,\n");

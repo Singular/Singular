@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: misc.cc,v 1.13 1997-05-20 08:52:10 Singular Exp $ */
+/* $Id: misc.cc,v 1.14 1997-05-21 13:05:15 obachman Exp $ */
 /*
 * ABSTRACT:
 */
@@ -32,7 +32,10 @@
 #include "timer.h"
 #include "intvec.h"
 #define SI_DONT_HAVE_GLOBAL_VARS
+
+#ifdef HAVE_FACTORY
 #include <factory.h>
+#endif
 
 /*0 implementation*/
 
@@ -179,8 +182,8 @@ int siRand()
 #define HELP_NOT_OPEN  1
 #define HELP_NOT_FOUND 2
 #ifndef macintosh
-#define Index_File     SINGULAR_INFODIR "singular.hlp"
-#define Help_File      SINGULAR_INFODIR "singular.hlp"
+#define Index_File     SINGULAR_INFODIR "/singular.hlp"
+#define Help_File      SINGULAR_INFODIR "/singular.hlp"
 #else
 #define Index_File     "singular.hlp"
 #define Help_File      "singular.hlp"

@@ -11,6 +11,32 @@ Mon May 12 16:48:14 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de
 
 	* misc.cc: Added / to Help_File and Info_File
 
+Wed May 21 08:56:19 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* tesths.cc (main): made -v option gmp v1.3 clean
+
+Tue May 20 14:02:42 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* misc.cc: Put #include <factory.h> into #ifdef HAVE_FACTORY brackets
+
+* hannes: ipshell.cc: fixed a bug in iiExport (multiple exports in rings)
+          subexpr.cc: implemented sleftv::Copy for ring/qring
+          syz1.cc: added missing idSkipZeros to LaScala*
+                    
+Wed May 14 16:40:19 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* Makefile.in: changed mpcheck.data so that the brain-dead sed on
+	  the suns does not mess up the output on files with long lines
+
+Tue May 13 11:32:41 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* claptmpl.cc: changed template initializiation of libfac, so that
+	  class.cc and tmpl_inst.h does not need to be included
+
+Mon May 12 16:48:14 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* misc.cc: Added / to Help_File and Info_File
+
 Tue May  6 08:29:57 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
 	* added factorycheck target in Makefile.in

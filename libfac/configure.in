@@ -88,7 +88,15 @@ fi
 dnl
 dnl Checks for header files.
 dnl
-AC_CHECK_HEADER(factory.h,,AC_MSG_WARN(factory.h not found!))
+AC_CHECK_HEADERS(factory.h)
+
+if test "$ac_cv_header_factory_h" != yes; then
+  if test "$enable_factory" != yes; then
+    AC_MSG_ERROR(Need factory.h to built libfac)
+  else
+    AC_MSG_WARN(Make sure to _install_ factory.h befor building libfac)
+  fi
+fi
 
 dnl
 dnl Checks for libraries.
