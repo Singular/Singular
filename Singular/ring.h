@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.34 1999-09-29 10:59:39 obachman Exp $ */
+/* $Id: ring.h,v 1.35 1999-09-29 17:19:05 Singular Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -135,6 +135,9 @@ enum
   ringorder_Ds,
   ringorder_ws,
   ringorder_Ws,
+  #ifdef HAVE_SHIFTED_EXPONENTS
+  ringorder_L,
+  #endif
   ringorder_unspec
 };
 

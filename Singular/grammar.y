@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.70 1999-09-27 11:38:33 obachman Exp $ */
+/* $Id: grammar.y,v 1.71 1999-09-29 17:19:04 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -1321,16 +1321,16 @@ ringcmd:
           {
             BOOLEAN do_pop = FALSE;
             char *ring_name = $2.name;
-#ifdef HAVE_NAMESPACES
-            if (((sleftv)$2).req_packhdl != NULL)
-            {
-              namespaceroot->push( IDPACKAGE(((sleftv)$2).req_packhdl) , "");
-              do_pop = TRUE;
-              if( (((sleftv)$2).req_packhdl != NULL) &&
-                  (((sleftv)$2).packhdl != ((sleftv)$2).req_packhdl))
-                ring_name = mstrdup($2.name);
-            }
-#endif /* HAVE_NAMESPACES */
+            #ifdef HAVE_NAMESPACES
+              if (((sleftv)$2).req_packhdl != NULL)
+              {
+                namespaceroot->push( IDPACKAGE(((sleftv)$2).req_packhdl) , "");
+                do_pop = TRUE;
+                if( (((sleftv)$2).req_packhdl != NULL) &&
+                    (((sleftv)$2).packhdl != ((sleftv)$2).req_packhdl))
+                  ring_name = mstrdup($2.name);
+              }
+            #endif /* HAVE_NAMESPACES */
             idhdl b=
             rInit(ring_name,      /* ringname */
                   &$4,            /* characteristik and list of parameters*/
