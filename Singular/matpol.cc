@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.cc,v 1.30 1999-12-16 13:35:19 pohl Exp $ */
+/* $Id: matpol.cc,v 1.31 1999-12-20 12:50:21 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -353,7 +353,7 @@ class mp_permmatrix
 * entries of a are minors and go to result (only if not in R) 
 */
 void mpMinorToResult(ideal result, int &elems, matrix a, int r, int c,
-                     ideal &R)
+                     ideal R)
 {
   poly *q1;
   int e=IDELEMS(result);
@@ -379,15 +379,15 @@ void mpMinorToResult(ideal result, int &elems, matrix a, int r, int c,
       {
         if (elems>=e)
         {
-          if(e<100000)
+          if(e<SIZE_OF_SYSTEM_PAGE)
           {
             pEnlargeSet(&(result->m),e,e);
             e += e;
           }
           else
           {
-            pEnlargeSet(&(result->m),e,100000);
-            e += 100000;
+            pEnlargeSet(&(result->m),e,SIZE_OF_SYSTEM_PAGE);
+            e += SIZE_OF_SYSTEM_PAGE;
           }
           IDELEMS(result) =e;
         }
@@ -403,7 +403,7 @@ void mpMinorToResult(ideal result, int &elems, matrix a, int r, int c,
 * produces recursively the ideal of all arxar-minors of a
 */
 void mpRecMin(int ar,ideal result,int &elems,matrix a,int lr,int lc,
-              poly barDiv, ideal &R)
+              poly barDiv, ideal R)
 {
   int k;
   int kr=lr-1,kc=lc-1;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.194 1999-12-02 23:03:48 wenk Exp $ */
+/* $Id: iparith.cc,v 1.195 1999-12-20 12:50:19 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -219,7 +219,7 @@ cmdnames cmds[] =
   { "maxideal",    0, MAXID_CMD ,         CMD_1},
   { "memory",      0, MEMORY_CMD ,        CMD_1},
   { "minbase",     0, MINBASE_CMD ,       CMD_1},
-  { "minor",       0, MINOR_CMD ,         CMD_2},
+  { "minor",       0, MINOR_CMD ,         CMD_23},
   { "minres",      0, MINRES_CMD ,        CMD_1},
   { "mod",         0, '%',                '%'},
   { "module",      0, MODUL_CMD ,         MODUL_CMD},
@@ -1011,8 +1011,9 @@ static BOOLEAN jjDIV_I(leftv res, leftv u, leftv v)
     WerrorS("div. by 0");
     return TRUE;
   }
-  //int c=a%ABS(b);
-  //if(c<0) c+=ABS(b);
+  int bb=ABS(b);
+  int c=a%bb;
+  if(c<0) c+=bb;
   //res->data = (char *)((a-c) / b);
   res->data = (char *)(a / b);
   return FALSE;
@@ -3979,6 +3980,13 @@ static BOOLEAN jjJET_ID_IV(leftv res, leftv u, leftv v, leftv w)
                              (intvec *)w->Data());
   return FALSE;
 }
+static BOOLEAN jjMINOR3(leftv res, leftv u, leftv v, leftv w)
+{
+  assumeStdFlag(w);
+  res->data = (char *)idMinors(
+                        (matrix)u->Data(),(int)v->Data(),(ideal)w->Data());
+  return FALSE;
+}
 static BOOLEAN jjPREIMAGE(leftv res, leftv u, leftv v, leftv w)
 {
   idhdl h;
@@ -4305,6 +4313,7 @@ struct sValCmd3 dArith3[]=
 ,{jjMATRIX_Id,      MATRIX_CMD, MATRIX_CMD, IDEAL_CMD,  INT_CMD,    INT_CMD }
 ,{jjMATRIX_Mo,      MATRIX_CMD, MATRIX_CMD, MODUL_CMD,  INT_CMD,    INT_CMD }
 ,{jjMATRIX_Ma,      MATRIX_CMD, MATRIX_CMD, MATRIX_CMD, INT_CMD,    INT_CMD }
+,{jjMINOR3,         MINOR_CMD,  IDEAL_CMD,  MATRIX_CMD, INT_CMD,    IDEAL_CMD}
 ,{jjCALL3MANY,      MODUL_CMD,  MODUL_CMD,  DEF_CMD,    DEF_CMD,    DEF_CMD }
 #ifdef OLD_RES
 ,{jjRES3,           MRES_CMD,   NONE,       IDEAL_CMD,  INT_CMD,    ANY_TYPE }
