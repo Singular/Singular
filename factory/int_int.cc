@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_int.cc,v 1.4 1997-06-19 12:22:48 schmidt Exp $ */
+/* $Id: int_int.cc,v 1.5 1997-07-16 10:18:46 schmidt Exp $ */
 
 #include <config.h>
 
@@ -777,3 +777,13 @@ InternalInteger::sqrt()
     else
 	return new InternalInteger( result );
 }
+
+//{{{ int InternalInteger::ilog2()
+// docu: see CanonicalForm::ilog2()
+int
+InternalInteger::ilog2()
+{
+    ASSERT( mpz_cmp_si( &thempi, 0 ) > 0, "log arg <= 0" );
+    return mpz_sizeinbase( &thempi, 2 ) - 1;
+}
+//}}}
