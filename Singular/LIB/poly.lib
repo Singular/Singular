@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: poly.lib,v 1.31 2000-12-31 15:14:47 obachman Exp $";
+version="$Id: poly.lib,v 1.32 2001-01-09 12:19:20 Singular Exp $";
 category="General purpose";
 info="
 LIBRARY:  poly.lib      Procedures for Manipulating Polys, Ideals, Modules
@@ -29,6 +29,7 @@ PROCEDURES:
 ";
 
 LIB "general.lib";
+LIB "ring.lib";
 ///////////////////////////////////////////////////////////////////////////////
 
 proc cyclic (int n)

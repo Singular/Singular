@@ -1,7 +1,6 @@
 LIB "inout.lib";
 
 example allprint;
-example dbpri;
 example lprint;
 example pmat;
 example rMacaulay; 
