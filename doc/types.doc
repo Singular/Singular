@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.52 1998-05-18 17:05:44 Singular Exp $
+@comment $Id: types.doc,v 1.53 1998-05-18 18:03:13 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -112,7 +112,7 @@ is local to the procedure.
 @end table
 
 @c ref
-See @ref{def}; @ref{typeof}.
+See @ref{typeof}.
 @c ref
 
 @c ---------------------------------------
@@ -251,6 +251,9 @@ compute the Groebner basis from a Groebner basis w.r.t. a different
 ordering (see @ref{fglm})
 @item finduni
 find univariate polynomials in a zero dimensional ideal (see @ref{finduni})
+@item groebner
+Groebner basis computation (a wrapper around @code{std,stdhilb,stdfglm},...)
+(see @ref{groebner})
 @item homog
 homogenization with respect to a variable (see @ref{homog})
 @item hilb
@@ -351,6 +354,11 @@ to represent boolean values
 (FALSE is represented by 0, every other value means TRUE, see
 @ref{boolean expressions}).
 
+Integers consist of a sequence of digits, possibly preceded by a sign.
+A space is considered as a separator, so it is not allowed between digits.
+A sequence of digits outside the allowed range is converted to the type
+@code{number} if possible.
+
 @menu
 * int declarations::
 * int expressions::
@@ -389,26 +397,7 @@ defines an integer variable.
 @subsection int expressions
 @cindex int expressions
 
-Integers consist of a sequence of digits, possibly preceded by a sign.
-A space is considered as a separator, so it is not allowed between digits.
-A sequence of digits outside the allowed range will be converted to the type
-number if possible.
 @example
-@c example
-  int j=1;
-  ring r;
-  int i=dim(std(ideal(x,y)));// dimension of factor ring defined by (x,y)
-                 // (i.e. R/(x,y)) if it is given by a standard basis
-  int compare = i<j;
-  compare;      // 0 (FALSE) if i >= j, 1 (TRUE) if i<j
-@c example
-@end example
-Integers may be converted to polynomials by an assignment,
-e.g.
-@example
-  poly g=j;
-  // define the constant polynomial g equal to the image of
-  // the integer j in the actual coefficient field
 @end example
 
 An int expression is:
@@ -437,23 +426,35 @@ characteristic 0.
 @strong{Example:}
 @example
 @c example
-  12345678901;
-  typeof(_);
-  ring r=0,x,dp;
-  12345678901;
-  typeof(_);
-  // using the type cast number for a greater allowed range
-  number(11)*13*17*100*200*2000*503*1111*222222;
-  // Note: 11*13*17*100*200*2000*503*1111*222222
-  // would return a machine integer:
-  11*13*17*100*200*2000*503*1111*222222;
-  ring rp;
-  12345678901;
-  typeof(_);
-  int i;
-  i+2;
-  intvec v=i..i+3;
-  v;
+12345678901;
+typeof(_);
+ring r=0,x,dp;
+12345678901;
+typeof(_);
+// using the type cast number for a greater allowed range
+number(11)*13*17*100*200*2000*503*1111*222222;
+// Note: 11*13*17*100*200*2000*503*1111*222222
+// would return a machine integer:
+11*13*17*100*200*2000*503*1111*222222;
+ring rp;
+12345678901;
+typeof(_);
+int i;
+i+2;
+intvec v=i..i+3;
+v;
+//----------------------------------------------------
+int j=1;
+ring r;
+i=dim(std(ideal(x,y)));// dimension of factor ring defined by (x,y)
+               // (i.e. R/(x,y)) if it is given by a standard basis
+int compare = i<j;
+compare;      // 0 (FALSE) if i >= j, 1 (TRUE) if i<j
+//----------------------------------------------------
+// Integers may be converted to polynomials by an assignment,
+poly g=j;
+// define the constant polynomial g equal to the image of
+// the integer j in the actual coefficient field
 @c example
 @end example
 @c ref
@@ -463,30 +464,30 @@ See
 @c ref
 
 @c ------------------------------
-@node int operations, boolean expressions, int expressions, int
+@node int operations, int related functions, int expressions, int
 @subsection int operations
 @cindex int operations
 @cindex mod
 @cindex div
 
-@table @asis
-@item @code{++}
-will change its operand to its successor, is itself no int expression
-@item @code{--}
-will change its operand to its predecessor, is itself no int expression
-@item @code{+}
+@table @code
+@item ++
+changes its operand to its successor, is itself no int expression
+@item --
+changes its operand to its predecessor, is itself no int expression
+@item +
 addition
-@item @code{-}
+@item -
 negation or subtraction
-@item @code{*}
+@item *
 multiplication
-@item @code{div}
+@item div, /
 division in the integers (omitting the remainder)
-@item @code{%}, @code{mod}
+@item %, mod
 modulo (the remainder of the division)
-@item @code{^,**}
+@item ^, **
 power, exponentiation
-@item @code{<}, @code{>}, @code{<=}, @code{>=}, @code{==}, @code{<>}
+@item <, >, <=, >=, ==, <>
 comparison
 @end table
 
@@ -494,13 +495,74 @@ comparison
 @example
 @c example
   int i=1;
-  i++; i ; i--; i; // ++ and -- will not return a value as in C
+  i++; i ; i--; i; // ++ and -- do not return a value as in C
   i+2, 2-i, 5^2, 5 div 2, 8%3, 1<2, 2<=2;
 @c example
 @end example
 
 @c ------------------------------
-@node boolean expressions, boolean operations, int operations, int
+@node int related functions, boolean expressions,int operations, int
+@subsection int related functions
+@cindex int related functions
+
+@table @code
+@item char
+characteristic of the coefficient field of a ring (see @ref{char})
+@item deg
+degree of a poly resp. vector (see @ref{deg})
+@item det
+determinant (see @ref{det})
+@item dim
+Krull dimension of basering modulo ideal resp. module (see @ref{dim})
+@item extgcd
+Bezout representation of gcd (see @ref{extgcd})
+@item find
+position of a substring in a string (see @ref{find})
+@item gcd
+greatest common divisor (see @ref{gcd})
+@item koszul
+Koszul matrix (see @ref{koszul})
+@item memory
+memory usage (see @ref{memory})
+@item mult
+multiplicity of an ideal resp. module (see @ref{mult})
+@item ncols
+number of columns (see @ref{ncols})
+@item npars
+number of ring parameters (see @ref{npars})
+@item nrows
+number of rows of a matrix resp.
+the rank of the free module where the vector / module lives
+(see @ref{nrows})
+@item nvars
+number of ring variables (see @ref{nvars})
+@item ord
+degree of the leading term of a poly resp. vector (see @ref{ord})
+@item par
+n-th paramter of the basering (see @ref{par})
+@item pardeg
+degree of a number considered as a polynomial in the ring parameters (see @ref{pardeg})
+@item prime
+the next lower prime (see @ref{prime})
+@item random
+a pseudo random integer between the given limits (see @ref{random})
+@item regularity
+regularity of a resolution (see @ref{regularity})
+@item rvar
+test, if the given expression or string is a ring variable (see @ref{rvar})
+@item size
+number of elements in an object (see @ref{size})
+@item trace
+trace of an integer matrix (see @ref{trace})
+@item var
+n-th ring variable of the basering (see @ref{var})
+@item vdim
+vector space dimension of basering modulo ideal resp. of freemodule modulo
+module (see @ref{vdim})
+@end table
+
+@c ------------------------------
+@node boolean expressions, boolean operations, int related functions, int
 @subsection boolean expressions
 @cindex boolean expressions
 @cindex ==
@@ -575,17 +637,18 @@ boolean expressions combined by boolean operations (@code{and},
 
 @strong{Note:} All arguments of a logical expressions are first
 evaluated and then the value of the logical expression is
-determined. For example, the logical expressions @code{(1 || a)} is
-evaluated by first evaluating @code{a}, even though the value of
+determined. For example, the value of the logical expressionss
+@code{(1 || a)} is
+determined by evaluating @code{a}, even though the value of
 @code{a} has no influence on the value of @code{(1 || a)}. Note that
 this is different from the left-to-right evaluation of logical
-expressions (as found in most programming languages) which, for
-example, determine the value of @code{(1 || a)} without evaluating @code{a}.
+expressions (as found in most programming languages) which
+determine the value of @code{(1 || a)} without evaluating @code{a}.
 See @ref{Evaluation of logical expressions}.
 @end enumerate
 
 @c ------------------------------
-@node boolean operations, int related functions, boolean expressions, int
+@node boolean operations, , boolean expressions, int
 @subsection boolean operations
 @cindex boolean operations
 @table @code
@@ -599,78 +662,17 @@ logical or, may also be written as @code{||}
 logical not, may also be written as @code{!}
 @end table
 
-@c ------------------------------
-@node int related functions,  , boolean operations, int
-@subsection int related functions
-@cindex int related functions
-
-@table @code
-@item char
-characteristic of the coefficient field of a ring (see @ref{char})
-@item deg
-degree of a poly resp. vector (see @ref{deg})
-@item det
-determinant (see @ref{det})
-@item dim
-Krull dimension of basering modulo ideal resp. module (see @ref{dim})
-@item extgcd
-Bezout representation of gcd (see @ref{extgcd})
-@item find
-position of a substring in a string (see @ref{find})
-@item gcd
-greatest common divisor (see @ref{gcd})
-@item koszul
-Koszul matrix (see @ref{koszul})
-@item memory
-memory usage (see @ref{memory})
-@item mult
-multiplicity of an ideal resp. module (see @ref{mult})
-@item ncols
-number of columns (see @ref{ncols})
-@item npars
-number of ring parameters (see @ref{npars})
-@item nrows
-number of rows of a matrix resp.
-the rank of the free module where the vector / module lives
-(see @ref{nrows})
-@item nvars
-number of ring variables (see @ref{nvars})
-@item ord
-degree of the leading term of a poly resp. vector (see @ref{ord})
-@item par
-n-th paramter of the basering (see @ref{par})
-@item pardeg
-degree of a number considered as a polynomial in the ring parameters (see @ref{pardeg})
-@item prime
-the next lower prime (see @ref{prime})
-@item random
-a pseudo random integer between the given limits (see @ref{random})
-@item regularity
-regularity of a resolution (see @ref{regularity})
-@item rvar
-test, if the given expression or string is a ring variable (see @ref{rvar})
-@item size
-number of elements in an object (see @ref{size})
-@item trace
-trace of an integer matrix (see @ref{trace})
-@item var
-n-th ring variable of the basering (see @ref{var})
-@item vdim
-vector space dimension of basering modulo ideal resp. of freemodule modulo
-module (see @ref{vdim})
-@end table
-
 @c ---------------------------------------
 @node intmat, intvec, int, Data types
 @section intmat
 @cindex intmat
 
-Integer matrices are matrices with entries of integers. For the range of
+Integer matrices are matrices with integer entries. For the range of
 integers see @ref{Limitations}. Integer matrices do not belong to a
 ring, they may be defined without a basering being defined. An intmat
 can be multiplied by and added to an int; in this case the int is
-converted into an intmat of the right size with the int on the
-diagonal. The int @code{1}, for example, is converted into the unit
+converted into an intmat of the right size with the integer on the
+diagonal. The integer @code{1}, for example, is converted into the unit
 matrix.
 
 @menu
@@ -716,7 +718,7 @@ elements, only the first rows*cols elements are used.
 @subsection intmat expressions
 @cindex intmat expressions
 
-A intmat expression is:
+An intmat expression is:
 @enumerate
 @item
 a list of int expressions, intvec expressions and intmat expressions
@@ -819,7 +821,7 @@ trace of an intmat (see @ref{trace})
 Variables of type intvec are lists of integers.  For the range of
 integers see @ref{Limitations}. They can be used for simulating
 integers sets (and other sets if the intvec entry is used as an index
-for other objects). They are also return values of certain interpreter
+for other objects). They are also used as return values of certain interpreter
 related functions (see @ref{Functions}). Addition and subtraction of an
 intvec with in int is done element wise.
 @example
@@ -954,8 +956,6 @@ is an element of the intvec; the index 1 gives the first element.
 @cindex intvec related functions
 
 @table @code
-@item factorize
-multiplicities of factors of a polynomial (see @ref{factorize}
 @item hilb
 returns Hilbert series as intvec (see @ref{hilb})
 @item indepSet
@@ -970,9 +970,6 @@ returns quasihgomogeneous weights (see @ref{qhweight})
 length of the intvec (see @ref{size})
 @item sortvec
 permutation for sorting ideals/modules (see @ref{sortvec})
-@item stdhilb
-Hilbert series for Hilbert driven standard basis computation (see
-@ref{stdhilb})
 @item transpose
 transpose of an intvec, returns an intmat (see @ref{transpose})
 @item weight
@@ -1173,9 +1170,9 @@ written.
   write (l,1,";",2,";","ideal i=",i,";");
   status(l, "open", "yes");    // now link is open
   status(l, "mode");           // for writing
+  close(l);                    // link is closed
   write("example.txt","int j=5;");// data is appended to file
   read("example.txt");         // data is returned as string
-  close(l);                    // link is closed
   execute read(l);             // read string is executed
   close(l);                    // link is closed
   // dump vars overwriting previous file content:
@@ -1267,7 +1264,7 @@ either for reading or for writing, but not for both at the same time. A
   listvar();                    // notice that current ring was set
   close(l);                     // link is closed
   dump("MPfile:w example.mp");  // dump everything to example.mp
-  kill i, s, r;                 // kill everything
+  kill i, s;                    // kill everything
   getdump("MPfile: example.mp");// get previous dump
   listvar();                    // got all variables and values back
 @c example
@@ -1341,7 +1338,7 @@ application is the value of @code{system("Singular") + " -b"}.
 @item if no hostname is specified the localhost is used as default host.
 @end itemize
 
-To open a MPtcp link in launch mode, the application to launch must
+To open an MPtcp link in launch mode, the application to launch must
 either be given with an absolute pathname, or must be in a directory
 contained in the search path. The launched application acts as a server,
 whereas the @sc{Singular} that actually opened the link acts as a
@@ -1397,11 +1394,6 @@ is data to read.
   write (l,quote(std(eval(i))));   // std(i) is computed on server
   def j = read(l);j; // result of computation on server is read
 
-  write(l,quote(std(i)));// std of polynomial "i" is computed on server
-  def k = read(l);
-  k; basering;       // notice that a new ring was created and set
-  listvar(all);
-
   write(l, quote(getdump(mp_ll))); // server reads dump
   dump(l);           //  dump is written to server (includes proc's)
   read(l);           // result of previous write-command is read
@@ -1438,8 +1430,8 @@ calling @code{write(}link@code{,} key_string@code{)}, the entry with key
 key_string is deleted from the data base. The value of an entry is
 returned by the command @code{read(}link@code{,}
 key_string@code{)}. With only one argument, @code{read(}link@code{)}
-returns the next key in the data base. Using this feature you can scan a
-data base in order to access all entries of the data base.
+returns the next key in the data base. Using this feature a
+data base can be scanned in order to access all entries of the data base.
 
 If a data base with name @code{name} is opened for writing for the first
 time, two files (@code{name.pag} and @code{name.dir}) are automatically
@@ -1458,9 +1450,8 @@ The DBM link describing string has to be one of the following:
 @*opens the data base for reading and writing.
 @end enumerate
 
-Note, that @code{name} without the suffix @code{.pag} or @code{.dir} is
-the name of the data base which is used for DBM links (see the example
-below). The name may contain an (absolute) path.
+Note, that @code{name} must be given without the suffix @code{.pag} ors
+@code{.dir}. The name may contain an (absolute) path.
 
 @strong{Example:}
 @example
@@ -2150,6 +2141,9 @@ Krull dimension of free module over the basering modulo the module of leading te
 elimination of variables (see @ref{eliminate})
 @item freemodule
 the free module of given rank (see @ref{freemodule})
+@item groebner
+Groebner basis computation (a wrapper around @code{std,stdhilb,stdfglm},...)
+(see @ref{groebner})
 @item hilb
 Hilbert function of a standard basis (see @ref{hilb})
 @item homog
