@@ -1,8 +1,8 @@
-// $Id: finvar.lib,v 1.25 1999-12-13 15:53:37 obachman Exp $
+// $Id: finvar.lib,v 1.26 2000-05-02 14:52:48 Singular Exp $
 // author: Agnes Eileen Heydtmann, email:agnes@math.uni-sb.de
 // last change: 98/11/05
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: finvar.lib,v 1.25 1999-12-13 15:53:37 obachman Exp $"
+version="$Id: finvar.lib,v 1.26 2000-05-02 14:52:48 Singular Exp $"
 info="
 LIBRARY:  finvar.lib       LIBRARY TO CALCULATE INVARIANT RINGS OF FINITE GROUPS
 AUTHOR: Agnes E. Heydtmann, email: agnes@math.uni-sb.de
@@ -5288,7 +5288,7 @@ EXAMPLE: example invariant_ring; shows an example
           { matrix S=secondary_no_molien(l[1],L[1],l[2],v);
           }
           else
-          { matix S=secondary_no_molien(l[1],L[1],v);
+          { matrix S=secondary_no_molien(l[1],L[1],v);
           }
           return(l[1],S);
         }
@@ -5311,10 +5311,10 @@ EXAMPLE: example invariant_ring; shows an example
     if (ch==0)
     { list l=primary_char0_no_molien(L[1],v);
       if (size(l)==2)
-      { matix S=secondary_no_molien(l[1],L[1],l[2],v);
+      { matrix S=secondary_no_molien(l[1],L[1],l[2],v);
       }
       else
-      { matix S=secondary_no_molien(l[1],L[1],v);
+      { matrix S=secondary_no_molien(l[1],L[1],v);
       }
       return(l[1],S);
     }
@@ -5322,10 +5322,10 @@ EXAMPLE: example invariant_ring; shows an example
     { if (L[1]<>0)                     // testing whether we are in the modular
       { list l=primary_charp_no_molien(L[1],v); // case
         if (size(l)==2)
-        { matix S=secondary_no_molien(l[1],L[1],l[2],v);
+        { matrix S=secondary_no_molien(l[1],L[1],l[2],v);
         }
         else
-        { matix S=secondary_no_molien(l[1],L[1],v);
+        { matrix S=secondary_no_molien(l[1],L[1],v);
         }
         return(l[1],S);
       }
@@ -5520,10 +5520,10 @@ EXAMPLE: example invariant_ring_random; shows an example
           }
           list l=primary_charp_no_molien_random(L[1],max,v);
           if (size(l)==2)
-          { matix S=secondary_no_molien(l[1],L[1],l[2],v);
+          { matrix S=secondary_no_molien(l[1],L[1],l[2],v);
           }
           else
-          { matix S=secondary_no_molien(l[1],L[1],v);
+          { matrix S=secondary_no_molien(l[1],L[1],v);
           }
           return(l[1],S);
         }
@@ -5546,10 +5546,10 @@ EXAMPLE: example invariant_ring_random; shows an example
     if (ch==0)
     { list l=primary_char0_no_molien_random(L[1],max,v);
       if (size(l)==2)
-      { matix S=secondary_no_molien(l[1],L[1],l[2],v);
+      { matrix S=secondary_no_molien(l[1],L[1],l[2],v);
       }
       else
-      { matix S=secondary_no_molien(l[1],L[1],v);
+      { matrix S=secondary_no_molien(l[1],L[1],v);
       }
       return(l[1],S);
     }
@@ -5557,10 +5557,10 @@ EXAMPLE: example invariant_ring_random; shows an example
     { if (L[1]<>0)                     // testing whether we are in the modular
       { list l=primary_charp_no_molien_random(L[1],max,v); // case
         if (size(l)==2)
-        { matix S=secondary_no_molien(l[1],L[1],l[2],v);
+        { matrix S=secondary_no_molien(l[1],L[1],l[2],v);
         }
         else
-        { matix S=secondary_no_molien(l[1],L[1],v);
+        { matrix S=secondary_no_molien(l[1],L[1],v);
         }
         return(l[1],S);
       }
