@@ -1259,17 +1259,6 @@ BOOLEAN spmulProc( leftv result,leftv first,leftv second )
     return  (state!=semicOK);
 }
 
-BOOLEAN    spectrumOp3  ( leftv res, leftv u, leftv v, leftv w )
-{
-  char v_str=(char *)v->Data();
-  if (strcmp(v_str, "+")==0)
-    return spaddProc(res,u,w);
-  else if (strcmp(v_str, "*")==0)
-    return spmulProc(res,u,w);
-  Werror("unknown operation '%s' for spectrum",v_str);
-  return TRUE;
-}
-
 // ----------------------------------------------------------------------------
 //  this procedure is called from the interpreter
 // ----------------------------------------------------------------------------

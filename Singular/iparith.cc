@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.192 1999-11-29 14:46:54 Singular Exp $ */
+/* $Id: iparith.cc,v 1.193 1999-12-01 13:22:52 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -47,9 +47,6 @@
 #endif
 #ifdef HAVE_FGLM
 #include "fglm.h"
-#endif
-#ifdef HAVE_SPECTRUM
-#include "spectrum.h"
 #endif
 
 #include "ipshell.h"
@@ -4330,10 +4327,6 @@ struct sValCmd3 dArith3[]=
 ,{jjWRONG3,         RESULTANT_CMD, POLY_CMD,POLY_CMD,   POLY_CMD,   POLY_CMD }
 #endif
 ,{jjRING3,          RING_CMD,   RING_CMD,   DEF_CMD,    DEF_CMD,    DEF_CMD }
-#ifdef HAVE_SPECTRUM
-,{spectrumOp3,      SPECTRUM_CMD, LIST_CMD, LIST_CMD,   STRING_CMD, INT_CMD }
-,{spectrumOp3,      SPECTRUM_CMD, LIST_CMD, LIST_CMD,   STRING_CMD, LIST_CMD }
-#endif
 #ifdef OLD_RES
 ,{jjRES3,           SRES_CMD,   NONE,       IDEAL_CMD,  INT_CMD,    ANY_TYPE }
 ,{jjRES3,           SRES_CMD,   NONE,       MODUL_CMD,  INT_CMD,    ANY_TYPE }

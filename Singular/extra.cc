@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.123 1999-11-29 18:07:14 obachman Exp $ */
+/* $Id: extra.cc,v 1.124 1999-12-01 13:22:51 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -485,7 +485,6 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
      return FALSE;
    }
    else
-   {
 /*==================== spectrum =============================*/
    #ifdef HAVE_SPECTRUM
    if(strcmp(sys_cmd,"spectrum") == 0)
@@ -507,7 +506,6 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
      return spectrumProc(res,h);
    }
    else
-   {
 /*==================== semic =============================*/
    if(strcmp(sys_cmd,"semic") == 0)
    {
@@ -523,14 +521,40 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
      return TRUE;
    }
    else
+/*==================== spadd =============================*/
+   if(strcmp(sys_cmd,"spadd") == 0)
    {
+     if ((h->next!=NULL)
+     && (h->Typ()==LIST_CMD)
+     && (h->next->Typ()==LIST_CMD))
+     {
+       if (h->next->next==NULL)
+         return spaddProc(res,h,h->next);
+     }
+     return TRUE;
+   }
+   else
+/*==================== spmul =============================*/
+   if(strcmp(sys_cmd,"spmul") == 0)
+   {
+     if ((h->next!=NULL)
+     && (h->Typ()==LIST_CMD)
+     && (h->next->Typ()==INT_CMD))
+     {
+       if (h->next->next==NULL)
+         return spmulProc(res,h,h->next);
+     }
+     return TRUE;
+   }
+   else
    #endif
 /*================= Extended system call ========================*/
-#ifndef MAKE_DISTRIBUTION
+   {
+     #ifndef MAKE_DISTRIBUTION
      return(jjEXTENDED_SYSTEM(res, args));
-#else
+     #else
      Werror( "system(\"%s\",...) %s", sys_cmd, feNotImplemented );
-#endif
+     #endif
    }
   } /* typ==string */
   return TRUE;
