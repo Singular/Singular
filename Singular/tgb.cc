@@ -2058,9 +2058,12 @@ static int poly_crit(const void* ap1, const void* ap2){
   p1=*((poly*) ap1);
   p2=*((poly*)ap2);
   
-  if (pLmCmp(p1,p2)!=0) return pLmCmp(p1,p2);
-  if (pLength(p1)<pLength(p2)) return -1;
-  if (pLength(p1)>pLength(p2)) return 1;
+  int c=pLmCmp(p1,p2);
+  if (c /*pLmCmp(p1,p2)*/!=0) return c /*pLmCmp(p1,p2)*/;
+  int l1=pLength(p1);
+  int l2=pLength(p2);
+  if (l1<l2) return -1;
+  if (l1>l2) return 1;
   return 0;
 }
 ideal t_rep_gb(ring r,ideal arg_I){
