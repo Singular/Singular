@@ -16,6 +16,12 @@ complete Singular distribution, see also the README, COPYING, and
 INSTALL files contained in the top directory of the full Singular
 distribution.
 
+Installation for the Impatient 
+==============================
+Being in the directory which contains this file, type
+
+  ./configure
+  make 
 
 Basic Installation
 ==================

@@ -234,8 +234,8 @@ unistallinfo:
 mostlyclean: clean
 
 clean:
-	-rm -rf Singular* *.o *.og core *.d *.dd *~ \#* /tmp/mp*
-	cd ${testdir}; rm -f *.got *dump* *.diff
+	-rm -rf Singular* *.o *.og core *.d *.dd *~ \#* /tmp/mp* \
+	        *.got *dump* *.diff
 	cd ${docdir}; ${MAKE} clean
 
 distclean: clean
@@ -253,25 +253,25 @@ info dvi ps html:
 	cd ${docdir}; ${MAKE} $@
 
 check:	Singular ${testdir}/general_test.in ${testdir}/general_test.out
-	- SINGULARPATH=`pwd`/LIB; export SINGULARPATH; \
+	- @ SINGULARPATH=`pwd`/LIB; export SINGULARPATH; \
 	PATH=`pwd`:${PATH}; export PATH;\
-	cd ${testdir}; ./comparecheck general_test.in general_test.out
-	if test "${WITH_MP}" = yes; then ${MAKE} mpcheck; fi; 
-	if test "${WITH_FACTORY}" = yes && test "${WITH_LIBFAC}" = yes; then \
+	${testdir}/comparecheck ${testdir}/general_test.in ${testdir}/general_test.out
+	@ if test "${WITH_MP}" = yes; then ${MAKE} mpcheck; fi; 
+	@ if test "${WITH_FACTORY}" = yes && test "${WITH_LIBFAC}" = yes; then \
 	  ${MAKE} factorycheck;\
 	fi	
          	    
 
 mpcheck: Singular ${testdir}/mpcheck ${testdir}/mpcheck.data
-	- SINGULARPATH=`pwd`/LIB; export SINGULARPATH; \
+	- @ SINGULARPATH=`pwd`/LIB; export SINGULARPATH; \
 	PATH=`pwd`:${PATH}; export PATH;\
-	cd ${testdir}; ./mpcheck mpcheck.data
+	${testdir}/mpcheck ${testdir}/mpcheck.data
 
 factorycheck: Singular ${testdir}/comparecheck ${testdir}/fac_test.in \
 		${testdir}/fac_test.out
 	- SINGULARPATH=`pwd`/LIB; export SINGULARPATH; \
 	PATH=`pwd`:${PATH}; export PATH;\
-	cd ${testdir}; ./comparecheck fac_test.in fac_test.out
+	${testdir}/comparecheck ${testdir}/fac_test.in ${testdir}/fac_test.out
 	
 ##
 ## miscellanous targets
