@@ -3,7 +3,7 @@
  *  Purpose: translation of return addr to RetInfo
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omRet2Info.c,v 1.11 2000-12-12 15:26:18 obachman Exp $
+ *  Version: $Id: omRet2Info.c,v 1.12 2000-12-14 17:24:31 obachman Exp $
  *******************************************************************/
 #include <stdio.h>
 #include <string.h>
@@ -116,7 +116,7 @@ int omPrintRetInfo(omRetInfo info, int max, FILE* fd, const char* fmt)
         {
           if (*info[i].func != '\0')
           {
-            char* found = strchr(info[i].func, '(');
+            char* found = (char*) strchr(info[i].func, '(');
             if (found) *found = '\0';
             fprintf(fd, "%-20s", info[i].func);
             if (found) *found = '(';

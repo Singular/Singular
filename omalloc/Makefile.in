@@ -3,7 +3,7 @@
 ### Purpose: Makefile for omalloc
 ### Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
 ### Created: 11/99
-### Version: $Id: Makefile.in,v 1.6 2000-12-12 15:26:14 obachman Exp $
+### Version: $Id: Makefile.in,v 1.7 2000-12-14 17:24:30 obachman Exp $
 #################################################################
 
 SHELL		= /bin/sh
@@ -60,7 +60,7 @@ OM_MALLOC_SOURCE = @OM_MALLOC_SOURCE@
 # normal C source files
 CSOURCES=							   \
 omBinPage.c      omList.c         omAllocEmulate.c omDebug.c       \
-omAlloc.c        omDebugCheck.c   omOpts.c         omGetBackTrace.c\
+om_Alloc.c        omDebugCheck.c   omOpts.c         omGetBackTrace.c\
 omAllocSystem.c  omError.c        omStats.c	   omRet2Info.c   \
 omBin.c          omFindExec.c     omDebugTrack.c                   \
 omalloc_provide.c 	  
