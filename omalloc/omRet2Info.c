@@ -3,7 +3,7 @@
  *  Purpose: translation of return addr to RetInfo
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omRet2Info.c,v 1.9 2000-10-27 15:28:52 obachman Exp $
+ *  Version: $Id: omRet2Info.c,v 1.10 2000-11-03 15:47:25 obachman Exp $
  *******************************************************************/
 #include <stdio.h>
 #include <string.h>
@@ -82,7 +82,7 @@ FunctionName
 File:Line
         */
       while ((filled < j) && 
-             (fscanf(pipe, "%100[^\n]\n%100[^:]:%d\n", info[filled].func, info[filled].file, &(info[filled].line)) == 3))
+             (fscanf(pipe, "%200[^\n]\n%200[^:]:%d\n", info[filled].func, info[filled].file, &(info[filled].line)) == 3))
       {
         if (*info[filled].func != '?' && *info[filled].file != '?' && info[filled].line > 0)
           filled++;

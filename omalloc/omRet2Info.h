@@ -3,7 +3,7 @@
  *  Purpose: translation of return addr to RetInfo
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omRet2Info.h,v 1.6 2000-09-18 09:12:16 obachman Exp $
+ *  Version: $Id: omRet2Info.h,v 1.7 2000-11-03 15:47:25 obachman Exp $
  *******************************************************************/
 #ifndef OM_RET_2_INFO_H
 #define OM_RET_2_INFO_H
@@ -12,8 +12,8 @@
 struct omRetInfo_s
 {
   void* addr;
-  char  func[100]; /* if you change these numbers, alos change */
-  char  file[100]; /* the fscanf statement in BackTrace_2_RetInfo */
+  char  func[200]; /* if you change these numbers, alos change */
+  char  file[200]; /* the fscanf statement in BackTrace_2_RetInfo */
   int   line;
 };
 
