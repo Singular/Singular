@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 #################################################################
-# $Id: regress.cmd,v 1.22 1998-07-14 11:58:22 obachman Exp $
+# $Id: regress.cmd,v 1.23 1998-07-14 12:23:47 obachman Exp $
 # FILE:    regress.cmd 
 # PURPOSE: Script which runs regress test of Singular
 # CREATED: 2/16/98
@@ -110,7 +110,7 @@ $report_val = 5;
 # default value (in %) above which differences cause an error on -e
 $error_val = 5;
 # default value in 1/100 seconds, above which time differences are reported
-$mintime_val = 10;
+$mintime_val = 100;
 $hostname = &mysystem_catch("hostname");
 chop $hostname;
 
@@ -203,8 +203,8 @@ sub tst_status_check
     return (1, "Can not open $root.stat \n");
   open(NEW_RES_FILE, "<$root.new.stat") ||
     return (1, "Can not open $root.new.stat \n");
-  open(STATUS_DIFF_FILE, ">$root.stat.diff") ||
-    return (1, "Can not open $root.stat.diff \n");
+  open(STATUS_DIFF_FILE, ">$root.stat.sdiff") ||
+    return (1, "Can not open $root.stat.sdiff \n");
 
   $new_line = <NEW_RES_FILE>;
   $line = <RES_FILE>;
@@ -249,7 +249,7 @@ sub tst_status_check
   close(RES_FILE);
   close(NEW_RES_FILE);
   close(STATUS_DIFF_FILE);
-  mysystem("rm -f $root.stat.diff")
+  mysystem("rm -f $root.stat.sdiff")
     if ($exit_status == 0 && $keep ne "yes");
   
   return ($exit_status, $error_cause);
@@ -306,6 +306,7 @@ sub tst_status_merge
   close(NEW_RES_FILE);
   close(TEMP_FILE);
   &mysystem("$mv -f $root.tmp.stat $root.stat");
+  &mysystem("$rm -f $root.new.stat $root.stat.sdiff");
 }
 
 sub tst_check
@@ -387,6 +388,10 @@ sub tst_check
 	if ($exit_status)
 	{
 	  $error_cause = "Differences in res files";
+	}
+	else
+	{
+	  &mysystem("$rm -f $root.diff");
 	}
       }
     }
