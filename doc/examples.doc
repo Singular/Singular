@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.38 1999-05-06 16:53:26 Singular Exp $
+@comment $Id: examples.doc,v 1.39 1999-06-21 17:18:51 Singular Exp $
 @comment this file contains the examples
 
 @c The following directives are necessary for proper compilation
@@ -2065,10 +2065,10 @@ the primary ideal and the corresponding prime ideal.
 @section Normalization
 @cindex Normalization
 The normalization will be computed for a reduced ring @math{R/I}. The
-result is a list of rings; ideals are always called @code{KK} in the
+result is a list of rings; ideals are always called @code{norid} in the
 rings of this list. The normalization of @math{R/I} is the product of
 the factor rings of the rings in the list divided out by the ideals
-@code{KK}.
+@code{norid}.
 
 @example
 @c example
@@ -2079,15 +2079,15 @@ the factor rings of the rings in the list divided out by the ideals
   list pr=normal(I);
   def S=pr[1];
   setring S;
-  KK;
+  norid;
   // ----- second example: union of straight lines -----
   ring R1=0,(x,y,z),dp;
   ideal I=(x-y)*(x-z)*(y-z);
   list qr=normal(I);
   def S1=qr[1]; def S2=qr[2]; def S3=qr[3];
-  setring S1; KK;
-  setring S2; KK;
-  setring S3; KK;
+  setring S1; norid;
+  setring S2; norid;
+  setring S3; norid;
 @c example
 @end example
 @end ifset
