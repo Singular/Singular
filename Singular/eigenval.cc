@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: eigenval.cc,v 1.6 2002-02-16 10:56:14 mschulze Exp $ */
+/* $Id: eigenval.cc,v 1.7 2002-02-16 13:49:03 mschulze Exp $ */
 /*
 * ABSTRACT: eigenvalues of constant square matrices
 */
@@ -241,6 +241,7 @@ lists evEigenvalue(matrix M)
 
   poly t=pOne();
   pSetExp(t,1,1);
+  pSetm(t);
 
   for(int j0=1,j=2,k=0;j<=n+1;j0=j,j++)
   {

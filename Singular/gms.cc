@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: gms.cc,v 1.4 2002-02-16 11:00:46 mschulze Exp $ */
+/* $Id: gms.cc,v 1.5 2002-02-16 13:49:03 mschulze Exp $ */
 /*
 * ABSTRACT: Gauss-Manin system normal form
 */
@@ -48,6 +48,7 @@ lists gmsNF(ideal p,ideal g,matrix B,int D,int K)
         d=pDivideM(pHead(p->m[k]),pHead(g->m[j]));
         p->m[k]=pSub(p->m[k],pMult(pCopy(d),pCopy(g->m[j])));
         pSetExp(d,1,pGetExp(d,1)+1);
+        pSetm(d);
         for(i=0;i<MATROWS(B);i++)
           p->m[k]=pAdd(p->m[k],
             pDiff(pMult(pCopy(d),pCopy(MATELEM(B,i+1,j+1))),i+2));
