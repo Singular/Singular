@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: silink.cc,v 1.21 1998-08-04 16:54:08 Singular Exp $ */
+/* $Id: silink.cc,v 1.22 1998-08-06 08:52:57 Singular Exp $ */
 
 /*
 * ABSTRACT: general interface to links
@@ -214,7 +214,10 @@ leftv slRead(si_link l, leftv a)
 
   // here comes the eval:
   if (v != NULL)
-    v->Eval();
+  {
+    if (v->Eval() && !errorreported)
+      WerrorS("eval: failed");
+  }
   else
     Werror("read: Error for link of type %s, mode: %s, name: %s",
            l->m->type, l->mode, l->name);
