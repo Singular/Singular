@@ -1,5 +1,20 @@
 Tue Feb 16 19:00:03 1999  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
+	* GNUmakefile.in (basefactorysrc): `imm.cc' added
+	  (ftestm4src): `divrem.m4' added
+	  (distfiles): `factory.cfg' added
+
+	* factory.cfg: new file
+
+	* GNUmakefile.in (.PHONY): dependencies `doxy', `doxyclean' added
+	  (doxy, doxyclean): new targets
+	  (mostlyclean): dependency `doxyclean' added
+
+	* GNUmakefile.in (doxysrc, doxyincl): new variables
+	  (doxyfiles): new variable
+
+	* GNUmakefile.in (ftestm4src): `sqrfree.m4' added
+
 	* GNUmakefile.in (ftestsrc, ftestincl): ntl-stuff added
 	  (ftestm4src): `gcd.ntl.m4', `revert.m4' added
 
