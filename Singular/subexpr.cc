@@ -4,7 +4,7 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id: subexpr.cc,v 1.81 2002-05-02 15:16:02 Singular Exp $ */
+/* $Id: subexpr.cc,v 1.82 2002-06-10 15:25:35 Singular Exp $ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -1283,7 +1283,10 @@ void syMake(leftv v,char * id, idhdl packhdl)
 #ifdef HAVE_NS
   v->packhdl = NULL;
   if(packhdl != NULL)
+  {
+  //  Print("setting req_packhdl to %s\n",IDID(packhdl));
     v->req_packhdl = IDPACKAGE(packhdl);
+  }  
   else v->req_packhdl = currPack;
 //  if (v->req_packhdl!=basePack)
 //    Print("search %s in %s\n",id,v->req_packhdl->libname);

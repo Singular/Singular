@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.66 2002-02-26 11:36:41 Singular Exp $ */
+/* $Id: longalg.cc,v 1.67 2002-06-10 15:25:33 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -1398,7 +1398,7 @@ number naCopy(number p)
   erg->s = src->s;
   return (number)erg;
 }
-number na_Copy(number p, ring r)
+number na_Copy(number p, const ring r)
 {
   if (p==NULL) return NULL;
   lnumber erg;
