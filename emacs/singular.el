@@ -1,6 +1,6 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.57 2000-05-05 18:40:34 obachman Exp $
+;; $Id: singular.el,v 1.58 2000-05-17 10:54:10 obachman Exp $
 
 ;;; Commentary:
 
@@ -4112,12 +4112,8 @@ hooks on `singular-exec-hook'.
 Type \\[describe-mode] in the Singular buffer for a list of commands."
   (interactive)
 
-  (let ((process (singular-process t)))
-    (and (eq (get-buffer (singular-process-name-to-buffer-name 
-			  singular-name-default))
-	     (current-buffer))
-	 process
-	 (singular-kill-singular)))
+  (if (singular-process t)
+      (singular-kill-singular))
       
   (singular-internal singular-executable-last
 		     singular-directory-last
