@@ -839,19 +839,19 @@ void Initialization(char *Ord)
 {
   ProdCrit=0;
   ChainCrit=0;
-	offset=(currRing->N % 8 == 0) ? (currRing->N/8)*8 : (currRing->N/8+1)*8;
-	if (strstr(Ord,"dp\0") || strstr(Ord,"Dp\0"))
-	{
-		degree_compatible=1;
-		ListGreatMove=ListGreatMoveDegree;
-	}
-	else
-	{
-		degree_compatible=0;
-		ListGreatMove=ListGreatMoveOrder;
-	}
-
-	Define(&G);
+  offset=(currRing->N % 8 == 0) ? (currRing->N/8)*8 : (currRing->N/8+1)*8;
+  if (strstr(Ord,"dp\0") || strstr(Ord,"Dp\0"))
+  {
+    degree_compatible=1;
+    ListGreatMove=ListGreatMoveDegree;
+  }
+  else
+  {
+    degree_compatible=0;
+    ListGreatMove=ListGreatMoveOrder;
+  }
+  
+  Define(&G);
 };
 
 static Poly *h,*f;
@@ -879,7 +879,7 @@ void Q2TG()
         }
 }
 
-int ComputeBasis(jList *_T,jList *_Q)
+int ComputeBasis(jList *_T, jList *_Q)
 {
   int gb_l,i,ret_value=1;
 
@@ -887,90 +887,89 @@ int ComputeBasis(jList *_T,jList *_Q)
 
   //  Debug();
 
-  while((h=FindMinList(Q))!=NULL)
+  while( (h=FindMinList(Q)) != NULL )
   {
  
-    //        Print("New element\n");
+    //  Print("New element\n");
     //	Debug();
 
-        if (!degree_compatible)
-        {
-                if (!ValidatePoly(h,G))
-                {
-                        DestroyPoly(h);
-                        continue;
-                };
-
-                h->changed=0;
-
-                NFL(h,G);
-
-                if (!h->root)
-                {
-                        DestroyPoly(h);
-                        continue;
-                };
-        }
-
-        if (h->root)
-        {
-                if (pIsConstant(h->root))
-                {
-                        WarnS("Constant in basis\n");
-			return 0;
-                }
-
-                if (h->changed && ListGreatMove(T,Q,h->root))
-
-                {
-//			Print("<-\n");
-                        DestroyTree(G->root);
-                        G->root=create();
-                        T2G();
-                }
-        }
-
-	//	Print("PNF\n");
-        PNF(h,G);
-	if (TEST_OPT_PROT)
-	{
-	  Print("s%d",pow_(h->root));
-	}
-        insert_(&G,h);
-        InsertInList(T,h);
-
-	//	Print("For each PNF\n");
-        if (degree_compatible)
-            ForEachPNF(T,pow_(h->root));
-
-	//	Print("Control of prolongations\n");
-        if (h->changed)
-            ForEachControlProlong(T);
-        else
-            ControlProlong(h);
-
-	//	Debug();
-
-	//	Print("NFListQ\n");
-        if (degree_compatible)
-            NFListQ();
-	//Debug();
+    if (!degree_compatible)
+    {
+      if (!ValidatePoly(h,G))
+      {
+	DestroyPoly(h);
+	continue;
+      };
+      
+      h->changed=0;
+      
+      NFL(h,G);
+      
+      if (!h->root)
+      {
+	DestroyPoly(h);
+	continue;
+      };
     }
 
-//    gb_l=GB_length();
-
+    if (h->root)
+    {
+      if (pIsConstant(h->root))
+      {
+	// WarnS("Constant in basis\n");
+	return 0;
+      }
+      
+      if (h->changed && ListGreatMove(T,Q,h->root))
+      {
+	// Print("<-\n");
+	DestroyTree(G->root);
+	G->root=create();
+	T2G();
+      }
+    }
+    
+    //	Print("PNF\n");
+    PNF(h,G);
+    if (TEST_OPT_PROT)
+    {
+      Print("s%d",pow_(h->root));
+    }
+    insert_(&G,h);
+    InsertInList(T,h);
+    
+    //	Print("For each PNF\n");
+    if (degree_compatible)
+      ForEachPNF(T,pow_(h->root));
+    
+    //	Print("Control of prolongations\n");
+    if (h->changed)
+      ForEachControlProlong(T);
+    else
+      ControlProlong(h);
+    
+    //	Debug();
+    
+    //	Print("NFListQ\n");
+    if (degree_compatible)
+      NFListQ();
+    //Debug();
+  }
+  
+  //    gb_l=GB_length();
+  
   if (TEST_OPT_PROT)
   {
-    Print("\nLength of Janet basis: %d",CountList(T));
-    Print("\nproduct criterion:%d chain criterion:%d\n",ProdCrit,ChainCrit);
-//    Print("Length of Groebner basis:    %d\n",gb_l);
+    Print("\nLength of Janet basis: %d", CountList(T));
+    Print("\nproduct criterion:%d chain criterion:%d\n", ProdCrit, ChainCrit);
+    //    Print("Length of Groebner basis:    %d\n",gb_l);
   }
-
-    DestroyTree(G->root);
-    GCF(G);
-    DestroyFreeNodes();
-
-    return 1;
+  
+  DestroyTree(G->root);
+  GCF(G);
+  DestroyFreeNodes();
+  
+  return 1;
 }
 
 void T2G()

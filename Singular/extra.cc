@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.200 2003-10-15 17:07:24 levandov Exp $ */
+/* $Id: extra.cc,v 1.201 2003-10-17 15:59:48 levandov Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -593,18 +593,18 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
    else
 /*==================== janet =============================*/
  if(strcmp(sys_cmd,"janet") == 0)
+ {
+   if ((h!=NULL) && ((h->Typ() == IDEAL_CMD) || (h->Typ()== MODUL_CMD)))
    {
-     if ((h!=NULL) && ((h->Typ() == IDEAL_CMD) || (h->Typ()== MODUL_CMD)))
-     {
-	return jjJanetBasis(res,h);
-     }
-     else
-     {
-      WerrorS("ideal expected");
-      return TRUE;
-     }
+     return jjJanetBasis(res,h);
    }
    else
+   {
+     WerrorS("ideal or module expected");
+     return TRUE;
+   }
+ }
+ else
 /*==================== spectrum =============================*/
    #ifdef HAVE_SPECTRUM
    if(strcmp(sys_cmd,"spectrum") == 0)
