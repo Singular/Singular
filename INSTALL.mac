@@ -26,8 +26,14 @@ LICENSING
 Please see the file COPYING contained in the distribution for license
 information on Singular. In particular, notice that we only grant you
 permission to use Singular if you have registered yourself as a
-Singular user by sending email to <singular@mathematik.uni-kl.de>
-with the subject line (or, mail body) `register'.
+Singular user by using the registration form on the Singular homepage
+                  
+                   http://www.singular.uni-kl.de
+
+If for some reason you cannot access the registration form, you can also
+register by sending an email to <singular@mathematik.uni-kl.de>
+with subject line `register' and body containing the following data:
+your name, e-mail address, organisation, country and platform(s).
 
 
 TO INSTALL SINGULAR
