@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.61 2002-05-02 15:16:00 Singular Exp $ */
+/* $Id: ipid.cc,v 1.62 2002-06-18 13:45:44 anne Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -832,7 +832,7 @@ void paCleanUp(package pack)
       dynl_close (pack->handle);
 #endif /* HAVE_DYNAMIC_LOADING */
     }
-    omFree((ADDRESS)pack->libname);
+    omfree((ADDRESS)pack->libname);
     memset((void *) pack, 0, sizeof(sip_package));
     pack->language=LANG_NONE;
   }
