@@ -1,6 +1,9 @@
 Tue Jun  9 16:52:29 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
+	* Makefile.in (install): `singular.hlp' added as dependency
+	
 	* Makefile.in: Major clean up.  Many doc fixes.
+	(install): 
 
 	* Makefile.in (${SINGULAR}, Makefile): `cd ${prefix}' replaced by
 	  `cd ..'
