@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.19 2005-02-03 18:29:32 levandov Exp $
+ *  Version: $Id: gring.cc,v 1.20 2005-02-09 12:55:12 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -1800,8 +1800,8 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD, poly CCN, poly DDN, ring r)
   {
     C = mpCopy(CC);
     /* analyze C */
-    if (MATELEM(C,1,2)==NULL) 
-      pN=NULL;
+    if ( MATELEM(C,1,2) == NULL ) 
+      pN = NULL; /* check the consistency later */
     else 
       pN = p_GetCoeff(MATELEM(C,1,2),r);
     tmpIsSkewConstant = 1;
@@ -1809,7 +1809,10 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD, poly CCN, poly DDN, ring r)
     {
       for(j=i+1; j<=r->N; j++)
       { 
-	qN = p_GetCoeff(MATELEM(C,i,j),r);
+	if (MATELEM(C,i,j) == NULL)
+	  qN = NULL;
+	else
+	  qN = p_GetCoeff(MATELEM(C,i,j),r);
 	if ( qN == NULL )   /* check the consistency: Cij!=0 */
         // find also illegal pN
 	{
