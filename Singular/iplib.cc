@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.76 2000-11-20 20:17:03 Singular Exp $ */
+/* $Id: iplib.cc,v 1.77 2000-11-21 15:33:10 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -618,9 +618,16 @@ BOOLEAN iiTryLoadLib(leftv v, char *id)
   {
     sprintf(libname, "%s%s", id, suffix[i]);
     *libname = mytolower(*libname);
-    if((LT = type_of_LIB(libname, libnamebuf)) != LT_NONE)
+    if((LT = type_of_LIB(libname, libnamebuf)) > LT_NOTFOUND)
     {
-      if(!(LoadResult = iiLibCmd(omStrDup(libname), FALSE)))
+      char *s=omStrDup(libname);
+      char libnamebuf[256];
+
+      if (LT==LT_SINGULAR)
+        LoadResult = iiLibCmd(s, FALSE);
+      else if ((LT==LT_ELF) || (LT==LT_HPUX))
+        LoadResult = load_modules(s,libnamebuf,FALSE);
+      if(!LoadResult )
       {
         v->name = iiConvName(libname);
         break;
@@ -1235,7 +1242,7 @@ lib_types type_of_LIB(char *newlib, char *libnamebuf)
 
   if (fp==NULL)
   {
-    return LT;
+    return LT_NOTFOUND;
   }
   if((sb.st_mode & S_IFMT) != S_IFREG)
   {

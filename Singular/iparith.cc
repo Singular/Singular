@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.233 2000-11-20 20:17:04 Singular Exp $ */
+/* $Id: iparith.cc,v 1.234 2000-11-21 15:33:11 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -3274,6 +3274,9 @@ static BOOLEAN jjLOAD(leftv res, leftv v, BOOLEAN autoexport)
       default:
       case LT_NONE:
         Werror("%s: unknown type", s);
+        break;
+      case LT_NOTFOUND:
+        Werror("cannot open %s", s);
         break;
 
       case LT_SINGULAR:
