@@ -7,7 +7,7 @@
  *  Note:    this file is included by p_Procs.cc
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Procs_Generate.cc,v 1.1 2000-12-07 15:04:00 obachman Exp $
+ *  Version: $Id: p_Procs_Generate.cc,v 1.2 2000-12-12 08:44:50 obachman Exp $
  *******************************************************************/
 
 
@@ -19,11 +19,40 @@
 
 #ifdef p_Procs_Static
 #include "p_Procs_Static.h"
-#elif defined(p_Procs_Dynamic) || defined(p_Procs_Lib)
+#else
 #include "p_Procs_Dynamic.h"
 #endif
 
 #include "p_Procs_Impl.h"
+
+#ifndef p_Procs_Static
+int FieldGeneralProcs = 0,
+  FieldIndepProcs = 0,
+  FieldZpProcs = 0,
+  FieldQProcs = 0,
+  KernelProcs = 0,
+  UnknownProcs = 0;
+
+// returns 1, if proc should go into kernel, 0 otherwise
+int IsKernelProc(p_Proc proc, p_Field field, p_Length length, p_Ord ord)
+{
+  // general procs go into kernel
+  if (field == FieldGeneral && length == LengthGeneral && ord == OrdGeneral)
+    return 1;
+  
+  // plus procs with FieldZp
+  if (field == FieldZp && 
+      // which are not general in length or ord
+      !((length == LengthGeneral && p_ProcDependsOn_Length(proc)) ||
+        (ord == OrdGeneral && p_ProcDependsOn_Ord(proc))) &&
+      // and whose length is smaller than five 
+      (!p_ProcDependsOn_Length(proc) || (length >= LengthFour)))
+    return 1;
+  
+  return 0;
+}
+
+#endif
 
 #define DoSetProc(what, field, length, ord) \
       GenerateProc(#what, what##_Proc, field, length, ord)
@@ -57,9 +86,31 @@ void AddProc(const char* s_what, p_Proc proc, p_Field field, p_Length length, p_
   sprintf(s_full_proc_name, "%s__%s_%s_%s", s_what, s_field, s_length, s_ord);
              
   (generated_p_procs[proc])[index(proc, field, length, ord)] = s_full_proc_name;
-  
   // define all macros 
   printf("\n// definition of %s\n", s_full_proc_name);
+#ifndef p_Procs_Static
+  if (IsKernelProc(proc, field, length, ord))
+  {
+    KernelProcs++;
+    printf("#ifdef p_Procs_Kernel\n");
+  }
+  else
+  {
+    const char* module = p_ProcField_2_Module(proc, field);
+    if (strcmp(module, "FieldGeneral") == 0)
+      FieldGeneralProcs++;
+    else if (strcmp(module, "FieldIndep") == 0)
+      FieldIndepProcs++;
+    else if (strcmp(module, "FieldZp") == 0)
+      FieldZpProcs++;
+    else if (strcmp(module, "FieldQ") == 0)
+      FieldQProcs++;
+    else
+      UnknownProcs++;
+
+    printf("#ifdef p_Procs_%s\n", module);
+  }
+#endif  
   i = 0;
   while (macros_field[i] != NULL)
   {
@@ -106,15 +157,14 @@ void AddProc(const char* s_what, p_Proc proc, p_Field field, p_Length length, p_
   printf("#undef %s\n#define %s %s\n", s_what, s_what, s_full_proc_name);
   printf("#include \"%s__Template.cc\"\n", s_what);
   printf("#undef %s\n", s_what);
+#ifndef p_Procs_Static
+  printf("#endif // p_Procs_[Kernel|Field*]\n");
+#endif
 }
 
 void GenerateProc(const char* s_what, p_Proc proc, p_Field field, p_Length length, p_Ord ord)
 {
-  if (
-#ifdef p_Procs_Lib
-    (field != FieldGeneral || length != LengthGeneral || ord != OrdGeneral) &&
-#endif
-    ! AlreadyHaveProc(proc, field, length, ord))
+  if (! AlreadyHaveProc(proc, field, length, ord))
     AddProc(s_what, proc, field, length, ord);
 }
 
@@ -133,15 +183,12 @@ int main()
  * This file provides the needed implementation of p_Procs for 
  *               %s
  * See the end for a summary. 
- *******************************************************************/
+ *******************************************************************/\n",
 
-#define %s\n\n",
-#ifdef p_Procs_Dynamic
-         "p_Procs_Dynamic", "p_Procs_Dynamic"
-#elif defined(p_Procs_Static)
-         "p_Procs_Static", "p_Procs_Static"
+#if defined(p_Procs_Static)
+         "p_Procs_Static"
 #else
-         "p_Procs_Lib", "p_Procs_Lib"
+         "p_Procs_Dynamic"
 #endif
          );
 
@@ -152,8 +199,6 @@ int main()
       (char**) calloc(index((p_Proc)i, FieldUnknown, LengthUnknown, OrdUnknown), sizeof(char*));
   }
 
-// only need FieldGeneral_LengthGeneral_OrdGeneral for p_Procs_Dynamic
-#ifndef p_Procs_Dynamic  
   // set default procs
   for (field = 0; field < (int) FieldUnknown; field++)
   {
@@ -161,14 +206,11 @@ int main()
     {
       for (ord=0; ord < (int)OrdUnknown; ord++)
       {
-#endif
         if (IsValidSpec((p_Field) field, (p_Length) length, (p_Ord) ord))
             SetProcs((p_Field) field, (p_Length) length, (p_Ord) ord);
-#ifndef p_Procs_Dynamic
       }
     }
   }
-#endif
 
 // we only need lookup tables for p_Procs_Static
 #ifdef p_Procs_Static
@@ -228,11 +270,24 @@ int main()
  *   HAVE_FAST_ORD      = %d, 
  *   HAVE_FAST_ZERO_ORD = %d
  *   
- *   Generated PolyProcs= %d
- *
- *******************************************************************/\n",
-         HAVE_FAST_P_PROCS, HAVE_FAST_FIELD, HAVE_FAST_LENGTH, HAVE_FAST_ORD, HAVE_FAST_ZERO_ORD,
-         NumberOfHaveProcs);
+ *   Generated PolyProcs= %d\n",
+         HAVE_FAST_P_PROCS, HAVE_FAST_FIELD, HAVE_FAST_LENGTH, HAVE_FAST_ORD, 
+         HAVE_FAST_ZERO_ORD, NumberOfHaveProcs);
+
+#ifndef p_Procs_Static
+  printf(" * 
+ * KernelProcs          = %d
+ * FieldIndepProcs      = %d
+ * FieldZpProcs         = %d
+ * FieldQProcs          = %d
+ * FieldGeneralProcs    = %d
+ * FieldUnknownProcs    = %d\n",
+         KernelProcs, FieldIndepProcs, FieldZpProcs,FieldQProcs,
+         FieldGeneralProcs, UnknownProcs);
+#endif  
+
+  printf(" *
+ *******************************************************************/\n");
 }
 
 

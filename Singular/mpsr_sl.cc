@@ -1,11 +1,13 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sing_mp.cc,v 1.34 2000-11-21 15:35:46 Singular Exp $ */
-
-/*
-* ABSTRACT: interface to MP links
-*/
+/***************************************************************
+ *  File:    mpsr_sl.cc
+ *  Purpose: implementation of sl_link routines for MP
+ *  Author:  obachman (Olaf Bachmann)
+ *  Created: 12/00
+ *  Version: $Id: mpsr_sl.cc,v 1.1 2000-12-12 08:44:49 obachman Exp $
+ *******************************************************************/
 
 #include "mod2.h"
 
@@ -23,6 +25,7 @@
 #include "silink.h"
 #include "feOpt.h"
 
+
 static int Batch_ReadEval(si_link silink);
 
 #ifdef MPSR_DEBUG
@@ -33,7 +36,7 @@ static int Batch_ReadEval(si_link silink);
 #define MP_SET_LINK_OPTIONS(link) ((void *) 0)
 #endif
 
-MP_Env_pt mp_Env = NULL;
+static MP_Env_pt mp_Env = NULL;
 
 /* =============== general utilities ====================================== */
 static void FreeCmdArgs(int argc, char** argv)
@@ -105,7 +108,7 @@ static void GetCmdArgs(int *argc, char ***argv, char *str)
  * MPfile  specific stuff
  *
  ***************************************************************/
-static BOOLEAN slOpenMPFile(si_link l, short flag)
+LINKAGE BOOLEAN slOpenMPFile(si_link l, short flag)
 {
   char *argv[] = {"--MPtransp", "FILE", "--MPmode", "append",
                   "--MPfile", "/tmp/mpout"};
@@ -165,7 +168,7 @@ static BOOLEAN slOpenMPFile(si_link l, short flag)
  *
  ***************************************************************/
 
-static MP_Link_pt slOpenMPConnect(int n_argc, char **n_argv)
+LINKAGE MP_Link_pt slOpenMPConnect(int n_argc, char **n_argv)
 {
   char *argv[] = {"--MPtransp", "TCP", "--MPmode", "connect", "--MPport",
                   "1025",  "--MPhost", "localhost"};
@@ -186,7 +189,7 @@ static MP_Link_pt slOpenMPConnect(int n_argc, char **n_argv)
   return MP_OpenLink(mp_Env, 8, argv);
 }
 
-static MP_Link_pt slOpenMPListen(int n_argc, char **n_argv)
+LINKAGE MP_Link_pt slOpenMPListen(int n_argc, char **n_argv)
 {
   char *argv[] = {"--MPtransp", "TCP", "--MPmode", "listen",
                   "--MPport", "1025"};
@@ -199,7 +202,7 @@ static MP_Link_pt slOpenMPListen(int n_argc, char **n_argv)
   return MP_OpenLink(mp_Env, 6, argv);
 }
 
-static MP_Link_pt slOpenMPLaunch(int n_argc, char **n_argv)
+MP_Link_pt slOpenMPLaunch(int n_argc, char **n_argv)
 {
   char *argv[] = {"--MPtransp", "TCP", "--MPmode", "launch",
                   "--MPhost", "localhost",
@@ -248,7 +251,7 @@ static MP_Link_pt slOpenMPLaunch(int n_argc, char **n_argv)
   return link;
 }
 
-static MP_Link_pt slOpenMPFork(si_link l, int n_argc, char **n_argv)
+LINKAGE MP_Link_pt slOpenMPFork(si_link l, int n_argc, char **n_argv)
 {
   MP_Link_pt link = NULL;
   char *argv[] = {"--MPtransp", "TCP", "--MPmode", "fork", "--MPport", "1703"};
@@ -287,7 +290,7 @@ static MP_Link_pt slOpenMPFork(si_link l, int n_argc, char **n_argv)
 
 
 
-static BOOLEAN slOpenMPTcp(si_link l, short flag)
+LINKAGE BOOLEAN slOpenMPTcp(si_link l, short flag)
 {
   MP_Link_pt link = NULL;
   char **argv;
@@ -335,7 +338,7 @@ static BOOLEAN slOpenMPTcp(si_link l, short flag)
  *
  ***************************************************************/
 
-static BOOLEAN slWriteMP(si_link l, leftv v)
+LINKAGE BOOLEAN slWriteMP(si_link l, leftv v)
 {
   leftv next = (v != NULL ? v->next : (leftv) NULL);
   mpsr_ClearError();
@@ -366,7 +369,7 @@ static BOOLEAN slWriteMP(si_link l, leftv v)
   return FALSE;
 }
 
-leftv slReadMP(si_link l)
+LINKAGE leftv slReadMP(si_link l)
 {
   leftv v = NULL;
   mpsr_ClearError();
@@ -389,7 +392,7 @@ static void SentQuitMsg(si_link l)
   omFreeBin(v, sleftv_bin);
 }
 
-static BOOLEAN slCloseMP(si_link l)
+LINKAGE BOOLEAN slCloseMP(si_link l)
 {
   if ((strcmp(l->mode, "launch") == 0 || strcmp(l->mode, "fork") == 0) &&
       (MP_GetLinkStatus((MP_Link_pt)l->data,MP_LinkReadyWriting) == MP_TRUE))
@@ -399,14 +402,14 @@ static BOOLEAN slCloseMP(si_link l)
   return FALSE;
 }
 
-static BOOLEAN slKillMP(si_link l)
+LINKAGE BOOLEAN slKillMP(si_link l)
 {
   MP_KillLink((MP_Link_pt) l->data);
   SI_LINK_SET_CLOSE_P(l);
   return FALSE;
 }
 
-static BOOLEAN slDumpMP(si_link l)
+LINKAGE BOOLEAN slDumpMP(si_link l)
 {
   mpsr_ClearError();
   if (mpsr_PutDump((MP_Link_pt) l->data) != mpsr_Success)
@@ -418,7 +421,7 @@ static BOOLEAN slDumpMP(si_link l)
     return FALSE;
 }
 
-static BOOLEAN slGetDumpMP(si_link l)
+LINKAGE BOOLEAN slGetDumpMP(si_link l)
 {
   mpsr_ClearError();
   if (mpsr_GetDump((MP_Link_pt) l->data) != mpsr_Success)
@@ -430,7 +433,7 @@ static BOOLEAN slGetDumpMP(si_link l)
     return FALSE;
 }
 
-static char* slStatusMP(si_link l, char* request)
+LINKAGE char* slStatusMP(si_link l, char* request)
 {
   if (strcmp(request, "read") == 0)
   {
@@ -455,7 +458,7 @@ static char* slStatusMP(si_link l, char* request)
  *
  ***************************************************************/
 
-int Batch_ReadEval(si_link silink)
+static int Batch_ReadEval(si_link silink)
 {
   leftv v = NULL;
   // establish top-level identifier for link
@@ -501,7 +504,7 @@ static BOOLEAN stop = 1;
 #endif
 
 
-int Batch_do(const char* port, const char* host)
+LINKAGE int Batch_do(const char* port, const char* host)
 {
 #ifdef MPSR_BATCH_DEBUG
   fprintf(stderr, "Was started with pid %d\n", getpid());
@@ -538,39 +541,5 @@ int Batch_do(const char* port, const char* host)
   }
 
   return Batch_ReadEval(silink);
-}
-
-/***************************************************************
- *
- * MP link Extension inits
- *
- ***************************************************************/
-
-void slInitMPFileExtension(si_link_extension s)
-{
-  s->Open=slOpenMPFile;
-  s->Close=slCloseMP;
-  s->Close=slKillMP;
-  s->Read=slReadMP;
-  //s->Read2=NULL;
-  s->Dump=slDumpMP;
-  s->GetDump=slGetDumpMP;
-  s->Write=slWriteMP;
-  s->Status=slStatusMP;
-  s->type="MPfile";
-}
-
-void slInitMPTcpExtension(si_link_extension s)
-{
-  s->Open=slOpenMPTcp;
-  s->Close=slCloseMP;
-  s->Kill=slKillMP;
-  s->Read=slReadMP;
-  //s->Read2=NULL;
-  s->Dump=slDumpMP;
-  s->GetDump=slGetDumpMP;
-  s->Write=slWriteMP;
-  s->Status=slStatusMP;
-  s->type="MPtcp";
 }
 #endif

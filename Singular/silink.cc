@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: silink.cc,v 1.37 2000-12-06 11:03:29 Singular Exp $ */
+/* $Id: silink.cc,v 1.38 2000-12-12 08:44:52 obachman Exp $ */
 
 /*
 * ABSTRACT: general interface to links
@@ -34,6 +34,7 @@ static char* GetIdString(idhdl h);
 static int DumpRhs(FILE *fd, idhdl h);
 static BOOLEAN DumpQring(FILE *fd, idhdl h, char *type_str);
 static BOOLEAN DumpAsciiMaps(FILE *fd, idhdl h, idhdl rhdl);
+static si_link_extension slTypeInit(si_link_extension s, const char* type);
 
 /* ====================================================================== */
 si_link_extension si_link_root=NULL;
@@ -82,22 +83,35 @@ BOOLEAN slInit(si_link l, char *istr)
   if (type != NULL)
   {
     si_link_extension s = si_link_root;
+    si_link_extension prev = s;
 
-    while (s != NULL && (strcmp(s->type, type) != 0)) s = s->next;
+    while (strcmp(s->type, type) != 0)
+    {
+      if (s->next == NULL) 
+      {
+        prev = s;
+        s = NULL;
+        break;
+      }
+      else
+      {
+        s = s->next;
+      }
+    }
 
     if (s != NULL)
       l->m = s;
     else
     {
-      Warn("Found unknown link type: %s", type);
-      Warn("Use default link type: %s", si_link_root->type);
-      l->m = si_link_root;
+      l->m = slTypeInit(prev, type);
     }
     omFree(type);
   }
   else
     l->m = si_link_root;
 
+  if (l->m == NULL) return TRUE;
+  
   l->name = (name != NULL ? name : omStrDup(""));
   l->mode = (mode != NULL ? mode : omStrDup(""));
   l->ref = 1;
@@ -808,13 +822,45 @@ BOOLEAN slGetDumpAscii(si_link l)
 
 /*------------Initialization at Start-up time------------------------*/
 
-#ifdef HAVE_DBM
-#include "sing_dbm.h"
-#endif
+#include "slInit.h"
 
+static si_link_extension slTypeInit(si_link_extension s, const char* type)
+{
+  assume(s != NULL);
+  s->next = NULL;
+  si_link_extension ns = (si_link_extension)omAlloc0Bin(s_si_link_extension_bin);
+  
 #ifdef HAVE_MPSR
-#include "sing_mp.h"
+  if (strcmp(type, "MPfile") == 0)
+    s->next = slInitMPFileExtension(ns);
+  else if (strcmp(type, "MPtcp") == 0)
+    s->next = slInitMPTcpExtension(ns);
+#ifdef HAVE_DBM
+  else
 #endif
+#endif
+#ifdef HAVE_DBM
+  if (strcmp(type, "DBM") == 0)
+    s->next = slInitDBMExtension(ns);
+#endif
+#if defined(HAVE_DBM) || defined(HAVE_MPSR)
+  else
+#endif
+  {
+    Warn("Found unknown link type: %s", type);
+    Warn("Use default link type: %s", si_link_root->type);
+    omFreeBin(ns, s_si_link_extension_bin);
+    return si_link_root;
+  }
+  
+  if (s->next == NULL)
+  {
+    Werror("Can not initialize link type %s", type);
+    omFreeBin(ns, s_si_link_extension_bin);
+    return NULL;
+  }
+  return s->next;
+}
 
 void slStandardInit()
 {
@@ -831,19 +877,5 @@ void slStandardInit()
   si_link_root->Status=slStatusAscii;
   si_link_root->type="ASCII";
   s = si_link_root;
-#ifdef HAVE_DBM
-#ifndef HAVE_MODULE_DBM
-  s->next = (si_link_extension)omAlloc0Bin(s_si_link_extension_bin);
-  s = s->next;
-  slInitDBMExtension(s);
-#endif
-#endif
-#ifdef HAVE_MPSR
-  s->next = (si_link_extension)omAlloc0Bin(s_si_link_extension_bin);
-  s = s->next;
-  slInitMPFileExtension(s);
-  s->next = (si_link_extension)omAlloc0Bin(s_si_link_extension_bin);
-  s = s->next;
-  slInitMPTcpExtension(s);
-#endif
+  s->next = NULL;
 }

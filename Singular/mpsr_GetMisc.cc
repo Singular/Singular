@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_GetMisc.cc,v 1.23 2000-12-06 11:03:22 Singular Exp $ */
+/* $Id: mpsr_GetMisc.cc,v 1.24 2000-12-12 08:44:48 obachman Exp $ */
 
 /***************************************************************
  *
@@ -443,8 +443,11 @@ void mpsr_CopyExternalData(MPT_ExternalData_t *dest,
 
 #include "mmalloc.h"
 
-void mpsr_Init()
+static int mpsr_is_initialized = 0;
+
+LINKAGE void mpsr_Init()
 {
+  if (mpsr_is_initialized) return;
 #ifndef EXTERNAL_MALLOC_H
   // memory management functions of MP (and MPT)
   IMP_RawMemAllocFnc = malloc;

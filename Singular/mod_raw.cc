@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mod_raw.cc,v 1.9 2000-12-07 15:03:57 obachman Exp $ */
+/* $Id: mod_raw.cc,v 1.10 2000-12-12 08:44:48 obachman Exp $ */
 /*
  * ABSTRACT: machine depend code for dynamic modules
  *
@@ -10,6 +10,8 @@
  *           dynl_error()
  *           dunl_close()
 */
+
+#include <stdio.h>
 
 #include "mod2.h"
 #include "static.h"
@@ -35,7 +37,7 @@ static BOOLEAN warn_proc = FALSE;
 #define DL_TAIL "so"
 #endif
 
-void* dynl_open_binary_warn(char* binary_name)
+void* dynl_open_binary_warn(char* binary_name, const char* msg)
 {
   void* handle = NULL;
   const char* bin_dir = feGetResource('b');
@@ -49,7 +51,7 @@ void* dynl_open_binary_warn(char* binary_name)
     {
       Warn("Could not open dynamic library: %s", path_name);
       Warn("Error message from system: %s", dynl_error());
-      Warn("Singular will work properly, but much slower.");
+      if (msg != NULL) Warn("%s", msg);
       Warn("See the INSTALL section in the Singular manual for details.");
       warn_handle = TRUE;
     }
@@ -57,7 +59,7 @@ void* dynl_open_binary_warn(char* binary_name)
   return  handle;
 }
 
-void* dynl_sym_warn(void* handle, char* proc)
+void* dynl_sym_warn(void* handle, char* proc, const char* msg)
 {
   void *proc_ptr = NULL;
   if (handle != NULL)
@@ -67,7 +69,7 @@ void* dynl_sym_warn(void* handle, char* proc)
     {
       Warn("Could load a procedure from a dynamic library");
       Warn("Error message from system: %s", dynl_error());
-      Warn("Singular will work properly, but much slower.");
+      if (msg != NULL) Warn("%s", msg);
       Warn("See the INSTALL section in the Singular manual for details.");
       warn_proc = TRUE;
     }
@@ -82,6 +84,7 @@ void* dynl_sym_warn(void* handle, char* proc)
 #if defined(ix86_Linux) || defined(DecAlpha_Linux) || defined(ix86_Linux_libc5)
 #include <dlfcn.h>
 
+static void* kernel_handle = NULL;
 void *dynl_open(
   char *filename    /* I: filename to load */
   )
@@ -91,6 +94,12 @@ void *dynl_open(
 
 void *dynl_sym(void *handle, char *symbol)
 {
+  if (handle == DYNL_KERNEL_HANDLE)
+  {
+    if (kernel_handle == NULL)
+      kernel_handle = dynl_open(NULL);
+    handle = kernel_handle;
+  }
   return(dlsym(handle, symbol));
 }
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.81 2000-11-28 11:50:53 obachman Exp $ */
+/* $Id: kutil.cc,v 1.82 2000-12-12 08:44:46 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -19,9 +19,14 @@
 #undef KDEBUG
 #define KDEBUG 2
 #endif
+
 // define if enterL, enterT should use memmove instead of doing it manually
-// on topgun, this is slightly faster (see monodromy_l.tst)
+// on topgun, this is slightly faster (see monodromy_l.tst, homog_gonnet.sing)
 #define ENTER_USE_MEMMOVE
+
+// define, if the my_memmove inlines should be used instead of 
+// system memmove -- it does not seem to pay off, though
+// #define ENTER_USE_MYMEMMOVE
 
 #include "tok.h"
 #include "kutil.h"
@@ -41,6 +46,50 @@
 #ifdef KDEBUG 
 #undef KDEBUG
 #define KDEBUG 2
+#endif
+
+#ifdef ENTER_USE_MYMEMMOVE
+inline void _my_memmove_d_gt_s(unsigned long* d, unsigned long* s, long l)
+{
+  register unsigned long* _dl = (unsigned long*) d;
+  register unsigned long* _sl = (unsigned long*) s;
+  register long _i = l - 1;
+
+  do
+  {
+    _dl[_i] = _sl[_i];
+    _i--;
+  }
+  while (_i >= 0);
+}
+
+inline void _my_memmove_d_lt_s(unsigned long* d, unsigned long* s, long l)
+{
+  register long _ll = l;
+  register unsigned long* _dl = (unsigned long*) d;
+  register unsigned long* _sl = (unsigned long*) s;
+  register long _i = 0;
+
+  do
+  {
+    _dl[_i] = _sl[_i];
+    _i++;
+  }
+  while (_i < _ll);
+}
+
+inline void _my_memmove(void* d, void* s, long l)
+{
+  unsigned long _d = (unsigned long) d;
+  unsigned long _s = (unsigned long) s;
+  unsigned long _l = ((l) + SIZEOF_LONG - 1) >> LOG_SIZEOF_LONG;
+
+  if (_d > _s) _my_memmove_d_gt_s(_d, _s, _l);
+  else _my_memmove_d_lt_s(_d, _s, _l);
+}
+
+#undef memmove
+#define memmove(d,s,l) _my_memmove(d, s, l)
 #endif
 
 
@@ -426,6 +475,19 @@ int kFindInT(poly p, TSet T, int tlength)
   return -1;
 }
 
+int kFindInT(poly p, kStrategy strat)
+{
+  int i;
+  do
+  {
+    i = kFindInT(p, strat->T, strat->tl);
+    if (i >= 0) return i;
+    strat = strat->next;
+  }
+  while (strat != NULL);
+  return -1;
+}
+  
 #ifdef KDEBUG
 
 void sTObject::wrp()
@@ -749,8 +811,6 @@ void deleteInS (int i,kStrategy strat)
 */
 void deleteInL (LSet set, int *length, int j,kStrategy strat)
 {
-  int i;
-
   if (set[j].lcm!=NULL)
     pLmFree(set[j].lcm);
   if (set[j].p!=NULL)
@@ -763,57 +823,23 @@ void deleteInL (LSet set, int *length, int j,kStrategy strat)
     else
     {
       // search p in T, if it is there, do not delete it
-      int i=strat->tl;
-      poly p=set[j].p;
-      if (p!=NULL)
-      loop
+      if (pOrdSgn != -1 || kFindInT(set[j].p, strat) < 0)
       {
-        if (i < 0)
-        {
-          if (strat->next!=NULL)
-          {
-            strat=strat->next;
-            i=strat->tl;
-          }
-          else
-          {
-            /* not found : */
-            if (set[j].bucket != NULL)
-            {
-              kBucketDeleteAndDestroy(&set[j].bucket);
-              pNext(p) = NULL;
-              if (set[j].t_p != NULL) pNext(set[j].t_p) = NULL;
-            }
-            if (set[j].t_p != NULL)
-            {
-              p_Delete(&(set[j].t_p), set[j].tailRing);
-              p_LmFree(p, currRing);
-            }
-            else
-            {
-              pDelete(&p);
-            }
-            break;
-          }
-        }
-        else
-        {
-          if (strat->T[i].p==p)
-          {
-            /* found : */
-            p=NULL;
-            break;
-          }
-          i--;
-        }
+        // assure that for global ordereings kFindInT fails
+        assume(pOrdSgn == -1 || kFindInT(set[j].p, strat) < 0);
+        set[j].Delete();
       }
     }
-    set[j].p=NULL;
   }
-  if ((*length)>0)
+  if (*length > 0 && j < *length)
   {
+#ifdef ENTER_USE_MEMMOVE
+    memmove(&(set[j]), &(set[j+1]), (*length - j)*sizeof(LObject));
+#else    
+    int i;
     for (i=j; i < (*length); i++)
       set[i] = set[i+1];
+#endif
   }
 #ifdef KDEBUG
   memset(&(set[*length]),0,sizeof(LObject));
@@ -4057,7 +4083,7 @@ BOOLEAN kStratChangeTailRing(kStrategy strat, LObject *L, TObject* T, unsigned l
   ring new_tailRing = rModifyRing(currRing,
                                   // Hmmm .. the condition pFDeg == pDeg
                                   // might be too strong
-                                  (strat->homog && pFDeg == pDeg), 
+                                  (strat->homog && pFDeg == pDeg && pOrdSgn == 1), 
                                   !strat->ak, 
                                   expbound);
 

@@ -5,7 +5,7 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id: mod2.h.in,v 1.94 2000-12-07 15:03:56 obachman Exp $
+ *  Version: $Id: mod2.h.in,v 1.95 2000-12-12 08:44:47 obachman Exp $
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H
@@ -309,6 +309,15 @@ int hpux9_system(const char* system);
 /* define to enable assume */
 #ifndef HAVE_ASSUME
 #undef HAVE_ASSUME
+#endif
+
+/* define LINKAGE to "extern C" if compiling for shared libs */
+#ifndef LINKAGE
+#if defined(PIC)
+#define LINKAGE extern "C"
+#else
+#define LINKAGE
+#endif
 #endif
 
 

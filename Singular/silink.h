@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: silink.h,v 1.14 2000-08-14 12:56:49 obachman Exp $ */
+/* $Id: silink.h,v 1.15 2000-12-12 08:44:53 obachman Exp $ */
 /*
 * ABSTRACT: general interface to links
 */
@@ -46,8 +46,6 @@ struct sip_link
   short ref;           // reference counter
 };
 
-BOOLEAN slExtend(si_link_extension s);
-
 // flags:
 #define SI_LINK_CLOSE   0
 #define SI_LINK_OPEN    1
@@ -84,6 +82,8 @@ inline si_link slCopy(si_link l)
   l->ref++;
   return l;
 }
+
+#include "omalloc.h"
 inline char* slString(si_link l)
 {
   if (l->name != NULL)

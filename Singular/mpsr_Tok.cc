@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_Tok.cc,v 1.26 2000-05-16 08:50:49 Singular Exp $ */
+/* $Id: mpsr_Tok.cc,v 1.27 2000-12-12 08:44:48 obachman Exp $ */
 
 /***************************************************************
  *
@@ -87,7 +87,7 @@ mpsr_Status_t mpsr_tok2mp(short tok, MP_DictTag_t *dict, MP_Common_t *cop)
     return mpsr_Success;
   }
   else
-    return mpsr_SetError(mpsr_UnknownSingularToken);
+    return mpsr_UnknownSingularToken;
 }
 
 mpsr_Status_t mpsr_mp2tok(MP_DictTag_t dict, MP_Common_t cop, short *o_tok)
@@ -96,11 +96,11 @@ mpsr_Status_t mpsr_mp2tok(MP_DictTag_t dict, MP_Common_t cop, short *o_tok)
   short tok;
 
   if (sr_dict == MAX_SR_DICT)
-    return mpsr_SetError(mpsr_UnknownDictionary);
+    return mpsr_UnknownDictionary;
 
   tok = mp2tok[sr_dict][cop];
   if (tok == MAX_TOK)
-    return mpsr_SetError(mpsr_UnkownOperator);
+    return mpsr_UnkownOperator;
 
   *o_tok = tok;
   return mpsr_Success;

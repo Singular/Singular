@@ -4,7 +4,7 @@
 
 //**************************************************************************/
 //
-// $Id: sing_dbm.cc,v 1.14 2000-09-18 09:19:33 obachman Exp $
+// $Id: sing_dbm.cc,v 1.15 2000-12-12 08:44:53 obachman Exp $
 //
 //**************************************************************************/
 //  'sing_dbm.cc' containes command to handle dbm-files under
@@ -35,7 +35,7 @@ typedef struct {
 } DBM_info;
 
 //**************************************************************************/
-BOOLEAN dbOpen(si_link l, short flag)
+LINKAGE BOOLEAN dbOpen(si_link l, short flag)
 {
   char *mode = "r";
   DBM_info *db;
@@ -72,7 +72,7 @@ BOOLEAN dbOpen(si_link l, short flag)
 }
 
 //**************************************************************************/
-BOOLEAN dbClose(si_link l)
+LINKAGE BOOLEAN dbClose(si_link l)
 {
   DBM_info *db = (DBM_info *)l->data;
 
@@ -85,7 +85,7 @@ BOOLEAN dbClose(si_link l)
 
 //**************************************************************************/
 static datum d_value;
-leftv dbRead2(si_link l, leftv key)
+LINKAGE leftv dbRead2(si_link l, leftv key)
 {
   DBM_info *db = (DBM_info *)l->data;
   leftv v=NULL;
@@ -131,12 +131,12 @@ leftv dbRead2(si_link l, leftv key)
   }
   return v;
 }
-leftv dbRead1(si_link l)
+LINKAGE leftv dbRead1(si_link l)
 {
   return dbRead2(l,NULL);
 }
 //**************************************************************************/
-BOOLEAN dbWrite(si_link l, leftv key)
+LINKAGE BOOLEAN dbWrite(si_link l, leftv key)
 {
   DBM_info *db = (DBM_info *)l->data;
   BOOLEAN b=TRUE;
@@ -204,19 +204,5 @@ BOOLEAN dbWrite(si_link l, leftv key)
 //  else return "unknown status request";
 //}
 //**************************************************************************/
-si_link_extension slInitDBMExtension(si_link_extension s)
-{
-  s->Open=dbOpen;
-  s->Close=dbClose;
-  s->Kill=dbClose;
-  s->Read=dbRead1;
-  s->Read2=dbRead2;
-  s->Write=dbWrite;
-  //s->Dump=NULL;
-  //s->GetDump=NULL;
-  //s->Status=dbStatus;
-  s->Status=slStatusAscii;
-  s->type="DBM";
-  return s;
-}
+
 #endif /* HAVE_DBM */

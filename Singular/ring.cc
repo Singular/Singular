@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.148 2000-12-07 15:04:02 obachman Exp $ */
+/* $Id: ring.cc,v 1.149 2000-12-12 08:44:51 obachman Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -670,12 +670,13 @@ void rWrite(ring r)
 
   int nblocks=rBlocks(r);
 
-  omCheckAddrSize(r,sizeof(ip_sring));
+  // omCheckAddrSize(r,sizeof(ip_sring));
   omCheckAddrSize(r->order,nblocks*sizeof(int));
   omCheckAddrSize(r->block0,nblocks*sizeof(int));
   omCheckAddrSize(r->block1,nblocks*sizeof(int));
   omCheckAddrSize(r->wvhdl,nblocks*sizeof(int_ptr));
   omCheckAddrSize(r->names,r->N*sizeof(char_ptr));
+
 
   nblocks--;
 

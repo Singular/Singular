@@ -5,8 +5,8 @@
  *  File:    p_Procs_Static.cc
  *  Purpose: source for static version of p_Procs
  *  Author:  obachman (Olaf Bachmann)
- *  Created: 8/00
- *  Version: $Id: p_Procs_Static.cc,v 1.1 2000-12-07 15:04:01 obachman Exp $
+ *  Created: 12/00
+ *  Version: $Id: p_Procs_Static.cc,v 1.2 2000-12-12 08:44:50 obachman Exp $
  *******************************************************************/
 #include "mod2.h"
 #include "structs.h"
@@ -21,7 +21,6 @@
 
 BOOLEAN p_procs_dynamic = FALSE;
 
-#define LINKAGE
 #include "p_Procs_Static.inc"
 
 // include generated configuration

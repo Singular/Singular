@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.68 2000-11-28 11:50:52 obachman Exp $ */
+/* $Id: kstd1.cc,v 1.69 2000-12-12 08:44:45 obachman Exp $ */
 /*
 * ABSTRACT:
 */
@@ -9,8 +9,11 @@
 // define if LDEG should not be used in inner reduction loops
 // #define NO_LDEG
 
-// define if buckets should be use
-#define MORA_USE_BUCKETS
+// define if buckets should be used
+// #define MORA_USE_BUCKETS
+
+// define if tailrings should be used
+// #define HAVE_TAIL_RING
 
 #include "mod2.h"
 #include "tok.h"
@@ -203,7 +206,7 @@ int redEcart (LObject* h,kStrategy strat)
         if ((strat->T[i].ecart < ei || (strat->T[i].ecart == ei &&
                                         strat->T[i].length < li))
             &&
-            pLmShortDivisibleBy(strat->T[i].p, strat->sevT[i], h->p, ~h->sev))
+            p_LmShortDivisibleBy(strat->T[i].GetLmTailRing(), strat->sevT[i], h->GetLmTailRing(), ~h->sev, strat->tailRing))
 #else
           j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h, i);
         if (j < 0) break;
@@ -474,7 +477,7 @@ static poly redMoraNF (poly h,kStrategy strat, int flag)
       if (kModDeg(H.p)>Kstd1_deg) pDeleteLm(&H.p);
       if (H.p==NULL) return NULL;
     }
-    if (pLmShortDivisibleBy(strat->T[j].p, strat->sevT[j], H.p, not_sev))
+    if (p_LmShortDivisibleBy(strat->T[j].GetLmTailRing(), strat->sevT[j], H.GetLmTailRing(), not_sev, strat->tailRing))
     {
       //if (strat->interpt) test_int_std(strat->kIdeal);
       /*- remember the found T-poly -*/
@@ -1105,6 +1108,11 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   kTest_TS(strat);
   strat->use_buckets = kMoraUseBucket(strat);
   /*- compute-------------------------------------------*/
+
+#ifdef HAVE_TAIL_RING
+  kStratInitChangeTailRing(strat);
+#endif  
+  
   while (strat->Ll >= 0)
   {
 #ifdef HAVE_ASSUME
@@ -1521,7 +1529,11 @@ intvec * kModW, * kHomW;
 
 long kModDeg(poly p, ring r)
 {
-  long o=pWDegree(p, r);
+  // Hmm obachman: on 1-2, this is pTotalDegree
+  // I think that I had changed this to pWDegree sometime in 10/2000
+  // However, this breaks eliminate, etc
+  // long o=pWDegree(p, r);
+  long o=pTotaldegree(p, r);
   long i=p_GetComp(p, r);
   if (i==0) return o;
   return o+(*kModW)[i-1];

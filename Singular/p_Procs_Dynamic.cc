@@ -5,8 +5,8 @@
  *  File:    p_Procs_Dynamic.cc
  *  Purpose: source for dynamically loaded version of p_Procs
  *  Author:  obachman (Olaf Bachmann)
- *  Created: 8/00
- *  Version: $Id: p_Procs_Dynamic.cc,v 1.1 2000-12-07 15:03:59 obachman Exp $
+ *  Created: 12/00
+ *  Version: $Id: p_Procs_Dynamic.cc,v 1.2 2000-12-12 08:44:49 obachman Exp $
  *******************************************************************/
 #include "mod2.h"
 #include "structs.h"
@@ -22,8 +22,12 @@
 
 BOOLEAN p_procs_dynamic = TRUE;
 
-// no external linkage
-#define LINKAGE 
+#define WARN_MSG "Singular will work properly, but much slower."
+
+// need external linkage, so that dynl_sym works
+#undef LINKAGE
+#define LINKAGE extern "C"
+#define p_Procs_Kernel
 #include "p_Procs_Dynamic.inc"
 
 #include "p_Procs_Dynamic.h"
@@ -34,16 +38,45 @@ BOOLEAN p_procs_dynamic = TRUE;
 // define to bound for length of p_Proc name
 #define MAX_PROCNAME_LEN 200
 
-static void* p_procs_handle = NULL;
-void InitSetDynamicProcs()
+static void* p_procs_handle_FieldIndep = NULL;
+static void* p_procs_handle_FieldZp = NULL;
+static void* p_procs_handle_FieldQ = NULL;
+static void* p_procs_handle_FieldGeneral = NULL;
+
+static void* p_ProcInitHandle(void** handle, const char* module)
 {
-  if (p_procs_handle == NULL)
-    p_procs_handle =  dynl_open_binary_warn("p_Procs");
+  if (*handle == NULL)
+  {
+    char name[25];
+    sprintf(name, "p_Procs_%s", module);
+    *handle = dynl_open_binary_warn(name, WARN_MSG);
+  }
+  return *handle;
 }
-#define InitSetProcs(f, l, o) InitSetDynamicProcs()
 
+static inline void* p_ProcGetHandle(p_Proc proc, p_Field field)
+{
+  const char* module =  p_ProcField_2_Module(proc, field);
+  
+  if (strcmp(module, "FieldIndep") == 0) 
+    return p_ProcInitHandle(&p_procs_handle_FieldIndep, module);
+  else if (strcmp(module, "FieldZp") == 0) 
+    return p_ProcInitHandle(&p_procs_handle_FieldZp, module);
+  else if (strcmp(module, "FieldQ") == 0) 
+    return p_ProcInitHandle(&p_procs_handle_FieldQ, module);
+  else if (strcmp(module, "FieldGeneral") == 0) 
+    return p_ProcInitHandle(&p_procs_handle_FieldGeneral, module);
+  else
+  {
+    assume(0);
+    return NULL;
+  }
+}
 
-void* GetGeneralProc(p_Proc proc)
+  
+#define InitSetProcs(f, l, o) ((void)0)
+
+static void* GetGeneralProc(p_Proc proc)
 {
   switch(proc)
   {
@@ -85,7 +118,7 @@ void* GetGeneralProc(p_Proc proc)
 #ifdef RDEBUG
 #include "omalloc.h"
 
-char* GetGeneralProcName(p_Proc proc)
+static char* GetGeneralProcName(p_Proc proc)
 {
   switch(proc)
   {
@@ -122,51 +155,44 @@ char* GetGeneralProcName(p_Proc proc)
   }
   return "p_Unknown_Proc";
 }
-char* GetDynamicProcName(const char* proc_s, p_Proc proc, 
-                         p_Field field, p_Length length, p_Ord ord)
-{
-  void* proc_ptr = NULL;
-  char proc_name[MAX_PROCNAME_LEN];
-  
-  if (p_procs_handle != NULL && 
-      (field != FieldGeneral || length != LengthGeneral || ord != OrdGeneral))
-  {
-    sprintf(proc_name, "%s__%s_%s_%s", proc_s, 
-            p_FieldEnum_2_String(field), 
-            p_LengthEnum_2_String(length), 
-            p_OrdEnum_2_String(ord));
-    proc_ptr = dynl_sym_warn(p_procs_handle, proc_name);
-    if (proc_ptr != NULL) 
-    {
-      char* name = omStrDup(proc_name);
-      omMarkAsStaticAddr(name);
-      return name;
-    }
-  }
-  return GetGeneralProcName(proc);
-}
-  
 #endif
 
 
-void* GetDynamicProc(const char* proc_s, p_Proc proc, 
-                     p_Field field, p_Length length, p_Ord ord)
+static void* GetDynamicProc(const char* proc_s, p_Proc proc, 
+                            p_Field field, p_Length length, p_Ord ord
+#ifdef RDEBUG
+                     , int get_name = 0
+#endif
+                     )
 {
   void* proc_ptr = NULL;
-  
-  if (p_procs_handle != NULL && 
-      (field != FieldGeneral || length != LengthGeneral || ord != OrdGeneral))
-  {
-    char proc_name[MAX_PROCNAME_LEN];
-    sprintf(proc_name, "%s__%s_%s_%s", proc_s, 
-            p_FieldEnum_2_String(field), 
-            p_LengthEnum_2_String(length), 
-            p_OrdEnum_2_String(ord));
-    proc_ptr = dynl_sym(p_procs_handle, proc_name);
-  }
+  char proc_name[MAX_PROCNAME_LEN];
+  sprintf(proc_name, "%s__%s_%s_%s", proc_s, 
+          p_FieldEnum_2_String(field), 
+          p_LengthEnum_2_String(length), 
+          p_OrdEnum_2_String(ord));
+  // first, try to get the proc from the kernel
+  proc_ptr = dynl_sym(DYNL_KERNEL_HANDLE, proc_name);
   if (proc_ptr == NULL)
-    proc_ptr = GetGeneralProc(proc);
-
+  {
+    proc_ptr = dynl_sym_warn(p_ProcGetHandle(proc, field), proc_name, WARN_MSG);
+    // last but not least use general proc
+    if (proc_ptr == NULL)
+    {
+      proc_ptr = GetGeneralProc(proc);
+#ifdef RDEBUG
+      sprintf(proc_name, GetGeneralProcName(proc));
+#endif      
+    }
+  }
+#ifdef RDEBUG
+  if (get_name)
+  {
+    char* name = omStrDup(proc_name);
+    omMarkAsStaticAddr(name);
+    return (void*) name;
+  }
+#endif
   return  proc_ptr;
 }
   
@@ -181,7 +207,7 @@ do                                                                  \
 {                                                                   \
   if (set_names)                                                    \
     _p_procs->what = (what##_Proc_Ptr)                              \
-       GetDynamicProcName(#what,  what##_Proc, field, length, ord); \
+       GetDynamicProc(#what,  what##_Proc, field, length, ord, 1);  \
   else                                                              \
     DoReallySetProc(what, field, length, ord);                      \
 }                                                                   \

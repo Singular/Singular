@@ -249,10 +249,14 @@ dnl check for general libraries, header files, typedefs, etc
 dnl
 # lib checks
 AC_CHECK_LIB(m, atof)
+SAVE_LIBS=${LIBS}
+LIBS=
 AC_CHECK_LIB(bsd, socket)
 AC_CHECK_LIB(socket, listen)
 AC_CHECK_LIB(nsl, gethostbyname)
 AC_CHECK_LIB(ucb, index)
+MP_LIBS=${LIBS}
+LIBS=
 
 # check for dl lib
 case "$ac_cv_singuname" in
@@ -278,6 +282,7 @@ esac
 AC_SUBST(LD_DYN_FLAGS)
 AC_SUBST(SFLAGS)
 AC_SUBST(SLDFLAGS)
+LIBS=${SAVE_LIBS}
 
 # heder file checks
 AC_HEADER_STDC
@@ -452,7 +457,7 @@ AC_CHECK_LIB(ncurses,tgetent,,\
   AC_CHECK_LIB(termcap,tgetent)))
 
 # readline
-if test "$with_readline" = dynamic && test "$ac_cv_have_dl" != yes; then
+if test "$with_readline" = dynamic && test "$ac_have_dl" != yes; then
   AC_MSG_WARN(can not build dynamic readline without dynamic linking)
   with_readline=static
 fi
@@ -558,11 +563,13 @@ NEED_LIBS=$LIBS
 # gmp, smallgmp, MP, MPT, factory, libfac
 AC_CHECK_LIB(gmp, main)
 if test "ac_cv_lib_gmp_main" = yes && test "$with-apint" = smallgmp; then
-  LIBS=NEED_LIBS
+  LIBS=${NEED_LIBS}
 fi
 AC_CHECK_LIB(smallgmp, main)
-AC_CHECK_LIB(MP, IMP_PutGmpInt)
-AC_CHECK_LIB(MPT, MPT_GetTre)
+SAVE_LIBS=$LIBS
+AC_CHECK_LIB(MP, IMP_PutGmpInt,,,$MP_LIBS)
+AC_CHECK_LIB(MPT, MPT_GetTree,,,$MP_LIBS)
+LIBS=$SAVE_LIBS
 AC_CHECK_LIB(singcf, atof)
 AC_CHECK_LIB(singfac, atof)
 AC_CHECK_LIB(omalloc, omTestAddr)
@@ -655,7 +662,8 @@ if test "${with_MP}" != yes && test "${with_MP}" != no; then
      (test "$ac_MP_ok" =  yes || test "$enable_MP" = yes); then
     AC_MSG_RESULT(yes)
     AC_DEFINE(HAVE_MPSR)
-    NEED_LIBS="-lMPT -lMP ${NEED_LIBS}"
+    HAVE_MPSR=1
+    MP_LIBS="-lMPT -lMP ${MP_LIBS}"
   else
     AC_MSG_RESULT(no)
   fi
@@ -664,7 +672,8 @@ elif  test "${with_MP}" = yes; then
      (test "$ac_MP_ok" =  yes || test "$enable_MP" = yes); then
     AC_MSG_RESULT(yes)
     AC_DEFINE(HAVE_MPSR)
-    NEED_LIBS="-lMPT -lMP ${NEED_LIBS}"
+    HAVE_MPSR=1
+    MP_LIBS="-lMPT -lMP ${MP_LIBS}"
   else
     AC_MSG_RESULT(no)
     AC_MSG_ERROR(can not build with MP)
@@ -672,6 +681,8 @@ elif  test "${with_MP}" = yes; then
 else
   AC_MSG_RESULT(no)
 fi
+AC_SUBST(HAVE_MPSR)
+AC_SUBST(MP_LIBS)
 
 AC_MSG_CHECKING(whether to have factory)
 if test "${with_factory}" != yes && test "${with_factory}" != no; then

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: khstd.cc,v 1.12 2000-11-08 15:34:57 obachman Exp $ */
+/* $Id: khstd.cc,v 1.13 2000-12-12 08:44:45 obachman Exp $ */
 /*
 * ABSTRACT:utils for hilbert driven kStd
 */
@@ -15,6 +15,7 @@
 #include "stairc.h"
 #include "kstd1.h"
 #include "khstd.h"
+
 
 /*2
 * compare the given hilbert series with the current one,
@@ -50,6 +51,7 @@ void khCheck( ideal Q, intvec *w, intvec *hilb, int &eledeg, int &count,
     // if weights for variables were given to std computations,
     // then pFDeg == degp == kHomModDeg (see kStd)
     if ((degp!=kModDeg) && (degp!=kHomModDeg)) degp=pTotaldegree;
+    // degp = pWDegree;
     l = hilb->length()-1;
     mw = (*hilb)[l];
     newhilb = hHstdSeries(strat->Shdl,w,strat->kHomW,Q,strat->tailRing);

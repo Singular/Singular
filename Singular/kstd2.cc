@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.65 2000-12-07 15:03:55 obachman Exp $ */
+/* $Id: kstd2.cc,v 1.66 2000-12-12 08:44:46 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -646,6 +646,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       // posInS only depends on the leading term
       strat->enterS(strat->P, pos, strat, strat->tl);
       if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
+//      Print("[%d]",hilbeledeg);
       if (strat->P.lcm!=NULL) pLmFree(strat->P.lcm);
       if (strat->sl>srmax) srmax = strat->sl;
     }

@@ -5,8 +5,8 @@
  *  File:    p_Procs_Impl.h
  *  Purpose: implementation of primitive procs for polys
  *  Author:  obachman (Olaf Bachmann)
- *  Created: 8/00
- *  Version: $Id: p_Procs_Impl.h,v 1.1 2000-12-07 15:04:00 obachman Exp $
+ *  Created: 12/00
+ *  Version: $Id: p_Procs_Impl.h,v 1.2 2000-12-12 08:44:50 obachman Exp $
  *******************************************************************/
 #ifndef P_PROCS_IMPL_H
 #define P_PROCS_IMPL_H
@@ -101,14 +101,14 @@
 // Here are the different parameters for setting the PolyProcs:
 
 // If you add/remove things from here, also remeber to adjust the
-// respective *_2_String 
+// respective *_2_String
 typedef enum p_Field
 {
   FieldGeneral = 0,
   FieldZp,          
+  FieldQ,
   FieldR,
   FieldGF,
-  FieldQ,
 #if HAVE_MORE_FIELDS_IMPLEMENTED
   FieldLong_R,
   FieldLong_C,
@@ -198,9 +198,9 @@ static inline char* p_FieldEnum_2_String(p_Field field)
   {
       case FieldGeneral: return "FieldGeneral";
       case FieldZp: return "FieldZp";          
+      case FieldQ: return "FieldQ";
       case FieldR: return "FieldR";
       case FieldGF: return "FieldGF";
-      case FieldQ: return "FieldQ";
 #if HAVE_MORE_FIELDS_IMPLEMENTED
       case FieldLong_R: return "FieldLong_R";
       case FieldLong_C: return "FieldLong_C";
@@ -281,6 +281,57 @@ static inline char* p_ProcEnum_2_String(p_Proc proc)
       case p_Unknown_Proc: return "p_Unknown_Proc";
   }
   return "NoProc_2_String";
+}
+
+static inline int p_ProcDependsOn_Field(p_Proc proc)
+{
+  if (proc == p_ShallowCopyDelete_Proc ||
+      proc == p_Merge_q_Proc)
+    return 0;
+  return 1;
+}
+
+static inline int p_ProcDependsOn_Ord(p_Proc proc)
+{
+  switch(proc)
+  {
+      case p_Add_q_Proc:
+      case p_Minus_mm_Mult_qq_Proc:
+      case pp_Mult_mm_Noether_Proc:
+      case p_kBucketSetLm_Proc:
+      case p_Merge_q_Proc:
+        return 1;
+        
+      default:
+        return 0;
+  }
+}
+
+static inline int p_ProcDependsOn_Length(p_Proc proc)
+{
+  switch(proc)
+  {
+      case p_Delete_Proc:
+      case p_Mult_nn_Proc:
+      case p_Neg_Proc:
+        return 0;
+        
+      default:
+        return 1;
+  }
+}
+  
+// returns string specifying the module into which the p_Proc
+// should go
+static inline const char* p_ProcField_2_Module(p_Proc proc,  p_Field field)
+{
+  if (! p_ProcDependsOn_Field(proc))
+    return "FieldIndep";
+  else
+  {
+    if (field > FieldQ) field = FieldGeneral;
+    return p_FieldEnum_2_String(field);
+  }
 }
 
 /***************************************************************
@@ -453,17 +504,6 @@ static inline void FastProcFilter(p_Proc proc, p_Field &field,
         pp_Mult_mm_Noether_Filter(field, length, ord);
         break;
         
-      case p_kBucketSetLm_Proc:
-      {
-        if (field != FieldZp)
-        {
-          field = FieldGeneral;
-          length = LengthGeneral;
-          ord = OrdGeneral;
-          return;
-        }
-      }
-
       default: break;
   }
 

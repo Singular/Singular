@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.151 2000-12-07 15:42:30 obachman Exp $ */
+/* $Id: extra.cc,v 1.152 2000-12-12 08:44:43 obachman Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -77,10 +77,6 @@
 #endif
 
 #include "silink.h"
-#ifdef HAVE_MPSR
-#include "mpsr.h"
-#include "MPT_GP.h"
-#endif
 #include "walk.h"
 
 /*
@@ -1084,49 +1080,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       delete[] r.deg_tab;      // Ist das ein Problem??
 
       omFreeSize((ADDRESS)points,currRing->N*l*sizeof(short));
-      return FALSE;
-    }
-    else
-#endif
-/*==================== gp =================*/
-#ifdef HAVE_MPSR
-    if (strcmp(sys_cmd, "gp") == 0)
-    {
-      if (h->Typ() != LINK_CMD)
-      {
-        WerrorS("No Link arg");
-        return FALSE;
-      }
-      si_link l = (si_link) h->Data();
-      if (strcmp(l->m->type, "MPfile") != 0)
-      {
-        WerrorS("No MPfile link");
-        return TRUE;
-      }
-      if( ! SI_LINK_R_OPEN_P(l)) // open r ?
-      {
-        if (slOpen(l, SI_LINK_READ)) return TRUE;
-      }
-
-      MP_Link_pt link = (MP_Link_pt) l->data;
-      if (MP_InitMsg(link) != MP_Success)
-      {
-        WerrorS("Can not Init");
-      }
-      MPT_Tree_pt tree = NULL;
-      if (MPT_GetTree(link, &tree) != MPT_Success)
-      {
-        WerrorS("Can not get tree");
-        return TRUE;
-      }
-      MPT_GP_pt gp_tree = MPT_GetGP(tree);
-      if (gp_tree == NULL || ! gp_tree->IsOk(gp_tree))
-      {
-        WerrorS("gp error");
-        return TRUE;
-      }
-      delete gp_tree;
-      MPT_DeleteTree(tree);
       return FALSE;
     }
     else

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.82 2000-09-18 09:19:38 obachman Exp $ */
+/* $Id: tesths.cc,v 1.83 2000-12-12 08:44:55 obachman Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -29,6 +29,7 @@
 #include "feOpt.h"
 #include "distrib.h"
 #include "version.h"
+#include "slInit.h"
 
 #ifdef HAVE_FACTORY
 #define SI_DONT_HAVE_GLOBAL_VARS
@@ -212,9 +213,12 @@ int main(          /* main entry to Singular */
   if (fe_fgets_stdin==fe_fgets_dummy)
   {
 #ifdef HAVE_MPSR
-    extern int Batch_do(const char* port, const char* host);
-    return Batch_do((char*) feOptValue(FE_OPT_MPPORT),
-                    (char*) feOptValue(FE_OPT_MPHOST));
+    BatchDoProc batch_do = slInitMPBatchDo();
+    if (batch_do != NULL)
+      return (*batch_do)((char*) feOptValue(FE_OPT_MPPORT),
+                         (char*) feOptValue(FE_OPT_MPHOST));
+    else
+      return 1;
 #else
     assume(0);
 #endif

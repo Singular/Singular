@@ -105,10 +105,6 @@ int inits(void)
 /*4 private data of other modules*/
   memset(&sLastPrinted,0,sizeof(sleftv));
   sLastPrinted.rtyp=NONE;
-#ifdef HAVE_MPSR
-  extern void mpsr_Init();
-  mpsr_Init();
-#endif
   return t;
 }
 

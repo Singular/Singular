@@ -10,8 +10,8 @@
  *              InitSetProc(field, length ord)
  *           have to be defined before this file is included
  *  Author:  obachman (Olaf Bachmann)
- *  Created: 8/00
- *  Version: $Id: p_Procs_Set.h,v 1.1 2000-12-07 15:04:00 obachman Exp $
+ *  Created: 12/00
+ *  Version: $Id: p_Procs_Set.h,v 1.2 2000-12-12 08:44:50 obachman Exp $
  *******************************************************************/
 
 // extract p_Procs properties from a ring

@@ -5,8 +5,8 @@
  *  File:    p_Procs_Static.h
  *  Purpose: Configuration for static p_Procs
  *  Author:  obachman (Olaf Bachmann)
- *  Created: 8/00
- *  Version: $Id: p_Procs_Static.h,v 1.1 2000-12-07 15:04:01 obachman Exp $
+ *  Created: 12/00
+ *  Version: $Id: p_Procs_Static.h,v 1.2 2000-12-12 08:44:51 obachman Exp $
  *******************************************************************/
 
 #ifndef P_PROCS_STATIC_H

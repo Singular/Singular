@@ -5,8 +5,8 @@
  *  File:    p_KBucketSetLm__Template.cc
  *  Purpose: template for setting the Lm of a bucket
  *  Author:  obachman (Olaf Bachmann)
- *  Created: 8/00
- *  Version: $Id: p_kBucketSetLm__Template.cc,v 1.3 2000-12-07 15:04:01 obachman Exp $
+ *  Created: 12/00
+ *  Version: $Id: p_kBucketSetLm__Template.cc,v 1.4 2000-12-12 08:44:51 obachman Exp $
  *******************************************************************/
 
 LINKAGE void p_kBucketSetLm(kBucket_pt bucket)

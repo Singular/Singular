@@ -5,8 +5,8 @@
  *  File:    p_Procs_Lib.cc
  *  Purpose: source for shared library of p_Procs
  *  Author:  obachman (Olaf Bachmann)
- *  Created: 8/00
- *  Version: $Id: p_Procs_Lib.cc,v 1.1 2000-12-07 15:06:39 obachman Exp $
+ *  Created: 12/00
+ *  Version: $Id: p_Procs_Lib.cc,v 1.2 2000-12-12 08:44:50 obachman Exp $
  *******************************************************************/
 #include "mod2.h"
 #include "structs.h"
@@ -19,7 +19,5 @@
 #include "p_MemCopy.h"
 #include "kbuckets.h"
 
-#define LINKAGE extern "C"
-
-#include "p_Procs_Lib.inc"
+#include "p_Procs_Dynamic.inc"
 
