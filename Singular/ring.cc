@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.103 2000-08-14 12:56:47 obachman Exp $ */
+/* $Id: ring.cc,v 1.104 2000-08-18 15:42:08 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -2552,20 +2552,14 @@ BOOLEAN rComplete(ring r, int force)
   // ----------------------------
   // indices and ordsgn vector for comparison
   //
-#ifndef WORDS_BIGENDIAN
-  r->pCompLowIndex = r->ExpLSize - 1 - r->pCompHighIndex;
-  r->pCompHighIndex = r->ExpLSize - 1;
-#else
-  r->pCompLowIndex=0;
   // r->pCompHighIndex already set
-#endif
-  r->pCompLSize = r->pCompHighIndex - r->pCompLowIndex + 1;
+  r->pCompLSize = r->pCompHighIndex + 1;
   r->ordsgn=(long *)omAlloc0(r->pCompLSize*sizeof(long));
 
-  for(j=r->pCompLowIndex;j<=r->pCompHighIndex;j++)
+  for(j=0;j<=r->pCompHighIndex;j++)
   {
-    r->ordsgn[r->pCompLSize - (j - r->pCompLowIndex) - 1]
-      = tmp_ordsgn[j-r->pCompLowIndex];
+    r->ordsgn[r->pCompLSize - j - 1]
+      = tmp_ordsgn[j];
   }
 
   omFreeSize((ADDRESS)tmp_ordsgn,(2*(n+r->N)*sizeof(long)));
@@ -2582,48 +2576,10 @@ BOOLEAN rComplete(ring r, int force)
   }
   omFreeSize((ADDRESS)tmp_typ,(2*(n+r->N)*sizeof(sro_ord)));
 
-#ifndef WORDS_BIGENDIAN
-  // LITTLE_ENDIAN: revert some stuff in r->typ
-  for(j=r->OrdSize-1;j>=0;j--)
-  {
-    if(r->typ[j].ord_typ==ro_cp)
-    {
-      int end_place=r->typ[j].data.cp.place
-                     +r->typ[j].data.cp.end-r->typ[j].data.cp.start;
-      r->typ[j].data.cp.place=r->ExpESize-end_place-1;
-    }
-    //else if(r->typ[j].ord_typ==ro_syzcomp)
-    //{
-    //  int place=r->typ[j].data.syzcomp.place;
-    //  r->typ[j].data.syzcomp.place=r->ExpLSize-place-1;
-    //}
-    else
-    {
-      int new_index=r->ExpLSize-r->typ[j].data.dp.place-1;
-      r->typ[j].data.dp.place=new_index;
-    }
-  }
-#endif
-
   // ----------------------------
   // indices for (first copy of ) variable entries in exp.e vector (VarOffset):
-#ifdef WORDS_BIGENDIAN
   // BIGENDIAN:
   r->VarOffset=v;
-#else
-  // LITTLE-Endian: revert
-  r->VarOffset=(int *)omAlloc((r->N+1)*sizeof(int));
-  for(j=r->N;j>=0;j--)
-  {
-    int tmp=v[j];
-    r->VarOffset[j] = r->ExpESize-(tmp & 0xffffff)-1;
-    r->VarOffset[j] |= (tmp & (~0xffffff));
-  }
-  omFreeSize((ADDRESS)v,(r->N+1)*sizeof(int));
-  j=r->pVarLowIndex;
-  r->pVarLowIndex=r->ExpESize-r->pVarHighIndex-1;
-  r->pVarHighIndex=r->ExpESize-j-1;
-#endif
 
   // ----------------------------
   // other indicies
@@ -2632,7 +2588,6 @@ BOOLEAN rComplete(ring r, int force)
   r->pDivHigh=r->pVarHighIndex;
 #endif
   r->pCompIndex=(r->VarOffset[0] & 0xffffff); //r->VarOffset[0];
-#ifdef WORDS_BIGENDIAN
   i=0; // position
   j=0; // index in r->typ
   if (i==r->pCompIndex) i++;
@@ -2643,18 +2598,6 @@ BOOLEAN rComplete(ring r, int force)
   }
   if (i==r->pCompIndex) i++;
   r->pOrdIndex=i;
-#else
-  i=r->ExpLSize-1;
-  j=0; // index in r->typ
-  if (i==r->pCompIndex) i--;
-  while ((j < r->OrdSize)
-  && ((r->typ[j].ord_typ==ro_syzcomp) || (r->typ[j].ord_typ==ro_syz)))
-  {
-    i--; j++;
-  }
-  if (i==r->pCompIndex) i--;
-  r->pOrdIndex=i;
-#endif
   return FALSE;
 }
 #else /* not HAVE_SHIFTED_EXPONENTS: */
@@ -3197,7 +3140,11 @@ void rDebugPrint(ring r)
   #endif
   PrintS("ordsgn:\n");
   for(j=0;j<r->pCompLSize;j++)
+    #ifdef HAVE_SHIFTED_EXPONENTS
+    Print("  ordsgn %d at pos %d\n",r->ordsgn[j],j);
+    #else
     Print("  ordsgn %d at pos %d\n",r->ordsgn[j],j+r->pCompLowIndex);
+    #endif
   Print("OrdSgn:%d\n",r->OrdSgn);
   PrintS("ordrec:\n");
   for(j=0;j<r->OrdSize;j++)
@@ -3224,7 +3171,9 @@ void rDebugPrint(ring r)
   Print("pDivLow:%d ",r->pDivLow);
   Print("pDivHigh:%d\n",r->pDivHigh);
 #endif
+#ifndef HAVE_SHIFTED_EXPONENTS
   Print("pCompLowIndex:%d ",r->pCompLowIndex);
+#endif
   Print("pCompHighIndex:%d\n",r->pCompHighIndex);
   Print("pOrdIndex:%d pCompIndex:%d\n", r->pOrdIndex, r->pCompIndex);
   Print("ExpESize:%d ",r->ExpESize);
@@ -3234,8 +3183,13 @@ void rDebugPrint(ring r)
   for(j=0;j<r->ExpLSize;j++)
   {
     Print("L[%d]: ",j);
+    #ifdef HAVE_SHIFTED_EXPONENTS
+    if (j<=r->pCompHighIndex)
+      Print("ordsgn %d ", r->ordsgn[j]);
+    #else
     if ((j>=r->pCompLowIndex) && (j<=r->pCompHighIndex))
       Print("ordsgn %d ", r->ordsgn[j-r->pCompLowIndex]);
+    #endif
     else
       PrintS("no comp ");
     #ifdef HAVE_SHIFTED_EXPONENTS
@@ -3272,7 +3226,6 @@ void rDebugPrint(ring r)
       PrintLn();
   }
 }
-
 void pDebugPrint(poly p)
 {
   int i,j;

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-comp.h,v 1.22 2000-03-22 11:20:54 Singular Exp $ */
+/* $Id: polys-comp.h,v 1.23 2000-08-18 15:42:06 Singular Exp $ */
 
 /***************************************************************
  *
@@ -13,6 +13,9 @@
  ***************************************************************/
 
 #include "polys-impl.h"
+
+
+#ifndef HAVE_SHIFTED_EXPONENTS
 
 // need to undefine this, since longs might be negative
 #define u_s
@@ -91,6 +94,47 @@ while (0)
 
 
 #endif // WORDS_BIGENDIAN
+#else // ndef HAVE_SHIFTED_EXPONENTS
+
+// copied from BIGENDIAN case, with modification: pCompLowIndex=0
+
+// need to undefine this, since longs might be negative
+#define u_s
+
+#define _memcmp(p1, p2, i, l, actionE, actionD) \
+do                                              \
+{                                               \
+  i = 0;                                        \
+  while (i < l)                                 \
+  {                                             \
+    if (p1[i] != p2[i]) actionD;                \
+    i++;                                        \
+  }                                             \
+  actionE;                                      \
+}                                               \
+while (0)
+
+#define _prMonCmp(p1, p2, r, actionE, actionG, actionS)   \
+do                                                        \
+{                                                         \
+  register const u_s long* s1 = &(p1->exp.l[0]);          \
+  register const u_s long* s2 = &(p2->exp.l[0]);          \
+  int _l = r->pCompLSize;                                 \
+  register int _i;                                        \
+  _memcmp(s1, s2, _i, _l, actionE, goto _NotEqual);       \
+                                                          \
+  _NotEqual:                                              \
+  if (r->ordsgn[_i] != 1)                                 \
+  {                                                       \
+    if (s2[_i] > s1[_i]) actionG;                         \
+    actionS;                                              \
+  }                                                       \
+  if (s1[_i] > s2[_i]) actionG;                           \
+  actionS;                                                \
+}                                                         \
+while (0)
+
+#endif
 
 #if defined(PDEBUG) && defined(HAVE_SHIFTED_EXPONENTS)
 extern int pDBsyzComp;

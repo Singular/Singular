@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.41 2000-08-14 12:56:24 obachman Exp $ */
+/* $Id: ipid.cc,v 1.42 2000-08-18 15:42:06 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -58,6 +58,81 @@ idhdl idrec::get(const char * s, int lev)
   idhdl found=NULL;
   int l;
   char *id;
+  if (s[1]=='\0')
+  {
+    while (h!=NULL)
+    {
+      omCheckAddr(IDID(h));
+// =============================================================
+#if 0
+// timings: ratchwum: 515 s, wilde13: 373 s, nepomuck: 267 s, lukas 863 s
+    id=IDID(h);
+    l=IDLEV(h);
+    if ((l==0) && (*(short *)s==*(short *)id) && (0 == strcmp(s+1,id+1)))
+    {
+      found=h;
+    }
+    else if ((l==lev) && (*(short *)s==*(short *)id) && (0 == strcmp(s+1,id+1)))
+    {
+      return h;
+    }
+#endif
+// =============================================================
+#if 0
+// timings: ratchwum: 515 s, wilde13: 398 s, nepomuck: 269 s, lukas 834 s
+    id=IDID(h);
+    if (*(short *)s==*(short *)id)
+    {
+      l=IDLEV(h);
+      if ((l==0) && (0 == strcmp(s+1,id+1)))
+      {
+        found=h;
+      }
+      else if ((l==lev) && (0 == strcmp(s+1,id+1)))
+      {
+        return h;
+      }
+    }
+#endif
+// =============================================================
+#if 1
+// timings: ratchwum: 501 s, wilde13: 357 s, nepomuck: 267 s, lukas 816 s
+// timings bug4: ratchwum: s, wilde13: s, nepomuck: 379.74 s, lukas s
+    l=IDLEV(h);
+    if ((l==0)||(l==lev))
+    {
+      id=IDID(h);
+      if (*(short *)s==*(short *)id)
+      {
+        if (0 == strcmp(s+1,id+1))
+        {
+          if (l==lev) return h;
+          found=h;
+        }
+      }
+    }
+#endif
+// =============================================================
+#if 0
+// timings: ratchwum: s, wilde13: s, nepomuck: s, lukas s
+// timings bug4: ratchwum: s, wilde13: s, nepomuck: s, lukas s
+    l=IDLEV(h);
+    if ((l==0)||(l==lev))
+    {
+      id=IDID(h);
+      if (*(short *)s==*(short *)id)
+      {
+        if (l==lev) return h;
+        found=h;
+      }
+    }
+#endif
+// =============================================================
+    h = IDNEXT(h);
+  }
+  }
+  else
+  {
   while (h!=NULL)
   {
     omCheckAddr(IDID(h));
@@ -93,8 +168,9 @@ idhdl idrec::get(const char * s, int lev)
     }
 #endif
 // =============================================================
-#if 1
+#if 0
 // timings: ratchwum: 501 s, wilde13: 357 s, nepomuck: 267 s, lukas 816 s
+// timings bug4: ratchwum: s, wilde13: s, nepomuck: 379.74 s, lukas s
     l=IDLEV(h);
     if ((l==0)||(l==lev))
     {
@@ -110,7 +186,26 @@ idhdl idrec::get(const char * s, int lev)
     }
 #endif
 // =============================================================
+#if 1
+// timings: ratchwum: s, wilde13: s, nepomuck: s, lukas s
+// timings bug4: ratchwum: s, wilde13: s, nepomuck: s, lukas s
+    l=IDLEV(h);
+    if ((l==0)||(l==lev))
+    {
+      id=IDID(h);
+      if (*(short *)s==*(short *)id)
+      {
+        if (0 == strcmp(s+2,id+2))
+        {
+          if (l==lev) return h;
+          found=h;
+        }
+      }
+    }
+#endif
+// =============================================================
     h = IDNEXT(h);
+  }
   }
   return found;
 }
@@ -613,7 +708,8 @@ idhdl ggetid(const char *n, BOOLEAN local)
   {
     h3 = currRing->idroot->get(n,myynest);
   }
-  if (h3==NULL) {
+  if (h3==NULL)
+  {
     if (h2!=NULL) return h2;
     if(!local) return h;
   }
@@ -952,13 +1048,17 @@ namehdl namerec::pop(BOOLEAN change_nesting)
 idhdl namerec::get(const char * s, int lev, BOOLEAN root)
 {
   namehdl ns;
-  if(root) {
+  if(root)
+  {
     ns = this->root;
-  } else {
+  }
+  else
+  {
     ns = this;
   }
   //printf("//====== namerec::get(%s, %d) from '%s'\n", s, lev, ns->name);
-  if(ns==NULL) {
+  if(ns==NULL)
+  {
     //printf("//======== namerec::get() from null\n");
     return NULL;
   }

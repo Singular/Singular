@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.32 2000-08-14 12:56:52 obachman Exp $ */
+/* $Id: structs.h,v 1.33 2000-08-18 15:42:10 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -289,7 +289,9 @@ struct sip_sring
   short      pDivHigh; /* the same as pVarLow..pVarHigh, */
                        /* but as index in the 'long' field */
   #endif
+  #ifndef HAVE_SHIFTED_EXPONENTS
   short      pCompLowIndex; // better: use pCompareLowIndexL
+  #endif
   short      pCompHighIndex; /* use p->exp.l[pCompLowIndex..ppCompHighIndex] */
                              /* for comparing monomials */
   short      pCompLSize; // pCompHighIndex - pCompLowIndex + 1
