@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_map.cc,v 1.7 1997-07-23 16:22:34 schmidt Exp $ */
+/* $Id: cf_map.cc,v 1.8 1997-08-01 11:45:54 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -204,19 +204,7 @@ CFMap::operator () ( const CanonicalForm & f ) const
 ostream&
 operator << ( ostream& s, const CFMap & m )
 {
-    if ( m.P.isEmpty() )
-	s << "( )";
-    else {
-	MPListIterator i = m.P;
-	s << "( " << i.getItem();
-	i++;
-	while ( i.hasItem() ) {
-	    s << ", " << i.getItem();
-	    i++;
-	}
-	s << " )";
-    }
-    return s;
+    return s << m.P;
 }
 //}}}
 #endif /* NOSTREAMIO */
