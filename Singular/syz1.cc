@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.22 1998-03-27 11:41:00 obachman Exp $ */
+/* $Id: syz1.cc,v 1.23 1998-04-01 19:01:42 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -2229,23 +2229,25 @@ lists syConvRes(syStrategy syzstr)
     syzstr->fullres = syReorder(syzstr->res,syzstr->length,syzstr);
   }
   resolvente tr;
-  int typ0;
+  int typ0=IDEAL_CMD;
   if (syzstr->minres!=NULL)
     tr = syzstr->minres;
   else
     tr = syzstr->fullres;
-  resolvente trueres=(resolvente)Alloc0((syzstr->length)*sizeof(ideal));
-  for (int i=(syzstr->length)-1;i>=0;i--)
+  resolvente trueres=NULL;
+  if (syzstr->length>0)
   {
-    if (tr[i]!=NULL)
+    trueres=(resolvente)Alloc0((syzstr->length)*sizeof(ideal));
+    for (int i=(syzstr->length)-1;i>=0;i--)
     {
-      trueres[i] = idCopy(tr[i]);
+      if (tr[i]!=NULL)
+      {
+        trueres[i] = idCopy(tr[i]);
+      }
     }
-  }
-  if (idRankFreeModule(trueres[0])==0)
-    typ0 = IDEAL_CMD;
-  else
-    typ0 = MODUL_CMD;
+    if (idRankFreeModule(trueres[0])>0)
+      typ0 = MODUL_CMD;
+  }    
   return liMakeResolv(trueres,syzstr->length,-1,typ0,NULL);
 }
 
