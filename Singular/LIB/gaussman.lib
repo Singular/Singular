@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: gaussman.lib,v 1.11 2000-12-05 21:12:22 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.12 2000-12-06 11:21:03 mschulze Exp $";
 info="
 LIBRARY:  gaussman.lib  GAUSS-MANIN CONNECTION OF A SINGULARITY
 
@@ -188,7 +188,7 @@ EXAMPLE: example monomat; shows an example
     dbprint(printlevel-voice+2,"//gaussman::monomat: k="+string(k));
 
     dbprint(printlevel-voice+2,"//gaussman::monomat: compute C");
-    C=coeffs(redNF(w,sJ,U),m,product(maxideal(1)));
+    C=coeffs(redNF(w,sJ,U),m);
     A0=A0+C*var(1)^k;
 
     if(sdH>0)
@@ -417,7 +417,7 @@ EXAMPLE: example vfilt; shows an example
     dbprint(printlevel-voice+2,"//gaussman::vfilt: k="+string(k));
 
     dbprint(printlevel-voice+2,"//gaussman::vfilt: compute C");
-    C=coeffs(redNF(w,sJ,U),m,product(maxideal(1)));
+    C=coeffs(redNF(w,sJ,U),m);
     A=A+C*var(1)^k;
 
     if(sdH>0)
@@ -823,7 +823,7 @@ EXAMPLE: example vjacob; shows an example
   list M;
   for(i=ncols(m);i>=1;i--)
   {
-    M[i]=lift(V,coeffs(redNF(m[i]*m,sJ),m)*V,product(maxideal(1)));
+    M[i]=lift(V,coeffs(redNF(m[i]*m,sJ),m)*V);
   }
 
   int i0,j0,i1,j1;
