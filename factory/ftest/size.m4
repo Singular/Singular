@@ -1,11 +1,11 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: size.m4,v 1.3 1997-11-05 16:12:18 schmidt Exp $ */
+/* $Id: size.m4,v 1.4 1998-04-06 10:49:03 schmidt Exp $ */
 
 ftestSetNameOfGame( size, `"
 Usage: size [<options>] [<envSpec>] <f> [<x>]
-  calculates number of monomials of canonical form f.  If
-  variable x is specified, calculates number of monomials of f
-  with level higher or equal than level of x.
+  calculates number of monomials of canonical form <f>.  If
+  variable <x> is specified, calculates number of monomials of
+  <f> with level higher or equal than level of <x>.
 "'`' )
 
 //{{{ docu
@@ -44,11 +44,11 @@ main ( int argc, char ** argv )
     ftestGetInVar( x, Variable() );
 
     // do the test!
-    ftestRun(
-	if ( ftestArgGiven( x ) )
-	    result = size( f, x );
-	else
-	    result = size( f ); );
+    if ( ftestArgGiven( x ) ) {
+	ftestRun( result = size( f, x ); );
+    } else {
+	ftestRun( result = size( f ); );
+    }
 
     // print results
     if ( ftestArgGiven( x ) ) {

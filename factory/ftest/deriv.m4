@@ -1,10 +1,10 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: deriv.m4,v 1.4 1997-11-05 16:13:07 schmidt Exp $ */
+/* $Id: deriv.m4,v 1.5 1998-04-06 10:50:46 schmidt Exp $ */
 
 ftestSetNameOfGame( deriv, `"
 Usage: deriv [<options>] [<envSpec>] <f> [<x>]
-  calculates df/dx or derivation of canonical form f with respect
-  to main variable if variable x is not specified.
+  calculates df/dx or derivation of canonical form <f> with
+  respect to main variable if variable <x> is not specified.
 "'`' )
 
 //{{{ docu
@@ -43,11 +43,11 @@ main ( int argc, char ** argv )
     ftestGetInVar( x, Variable() );
 
     // do the test!
-    ftestRun(
-	if ( ftestArgGiven( x ) )
-	    result = f.deriv( x );
-	else
-	    result = f.deriv(); );
+    if ( ftestArgGiven( x ) ) {
+	ftestRun( result = f.deriv( x ); );
+    } else {
+	ftestRun( result = f.deriv(); );
+    }
 
     // print results
     if ( ftestArgGiven( x ) ) {

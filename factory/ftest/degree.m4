@@ -1,11 +1,11 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: degree.m4,v 1.2 1997-11-05 16:12:12 schmidt Exp $ */
+/* $Id: degree.m4,v 1.3 1998-04-06 10:50:28 schmidt Exp $ */
 
 ftestSetNameOfGame( degree, `"
 Usage: degree [<options>] [<envSpec>] <f> [<x>]
-  returns degree of canonical form f with respect to its main
-  variable.  If variable x is specified, returns degree of f with
-  respect to x.
+  returns degree of canonical form <f> with respect to its main
+  variable.  If variable <x> is specified, returns degree of <f>
+  with respect to <x>.
 "'`' )
 
 //{{{ docu
@@ -44,11 +44,11 @@ main ( int argc, char ** argv )
     ftestGetInVar( x, Variable() );
 
     // do the test!
-    ftestRun(
-	if ( ftestArgGiven( x ) )
-	    result = degree( f, x );
-	else
-	    result = degree( f ); );
+    if ( ftestArgGiven( x ) ) {
+	ftestRun( result = degree( f, x ); );
+    } else {
+	ftestRun( result = degree( f ); );
+    }
 
     // print results
     if ( ftestArgGiven( x ) ) {

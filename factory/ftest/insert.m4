@@ -1,10 +1,11 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: insert.m4,v 1.1 1997-11-05 16:10:15 schmidt Exp $ */
+/* $Id: insert.m4,v 1.2 1998-04-06 10:48:37 schmidt Exp $ */
 
 ftestSetNameOfGame( insert, `"
 Usage: insert [<options>] [<envSpec>] <f> <g> [<v>]
-  inserts canonical form g for variable v in canonical form f.
-  v defaults to main variable of f if not explicitely specified.
+  inserts canonical form <g> for variable <v> in canonical form
+  <f>.  <v> defaults to main variable of <f> if not explicitely
+  specified.
 "'`' )
 
 //{{{ docu
@@ -45,11 +46,11 @@ main ( int argc, char ** argv )
     ftestGetInVar( v, f.mvar() );
 
     // do the test!
-    ftestRun(
-	if ( ftestArgGiven( v ) )
-	    result = f( g, v );
-	else
-	    result = f( g ); );
+    if ( ftestArgGiven( v ) ) {
+	ftestRun( result = f( g, v ); );
+    } else {
+	ftestRun( result = f( g ); );
+    }
 
     // print results
     if ( ftestArgGiven( v ) ) {
