@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.35 1998-05-15 11:07:24 Singular Exp $ */
+/* $Id: grammar.y,v 1.36 1998-05-16 12:15:27 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -780,7 +780,7 @@ expr_arithmetic:
           {
             if(iiExprArith2(&$$,&$1,DOTDOT,&$3)) YYERROR;
           }
-        | NOT expr 
+        | NOT expr
           {
             memset(&$$,0,sizeof($$));
             int i; TESTSETINT($2,i);
@@ -1096,7 +1096,7 @@ exportcmd:
 
 killcmd:
         KILL_CMD exprlist
-	{
+        {
           leftv v=&$2;
           do
           {
@@ -1112,7 +1112,7 @@ killcmd:
             v=v->next;
           } while (v!=NULL);
           $2.CleanUp();
-	}
+        }
         ;
 
 listcmd:
@@ -1172,8 +1172,8 @@ ringcmd:
           ordering           /* list of (multiplier ordering (weight(s))) */
           {
             //noringvars = FALSE;
-	    idhdl b=
-	    rInit($2.name,        /* ringname */
+            idhdl b=
+            rInit($2.name,        /* ringname */
                   &$4,            /* characteristik and list of parameters*/
                   &$6,            /* names of ringvariables */
                   &$8,            /* ordering */
@@ -1248,10 +1248,21 @@ setringcmd:
                     //if (TEST_OPT_KEEPVARS)
                     //{
                       idhdl p=IDRING(h)->idroot;
+                      idhdl root=p;
                       int prevlev=myynest-1;
                       while (p!=NULL)
                       {
-                        if (IDLEV(p)==myynest) IDLEV(p)=prevlev;
+                        if (IDLEV(p)==myynest)
+                        {
+                          idhdl old=root->get(IDID(p),prevlev);
+                          if (old!=NULL)
+                          {
+                            if (BVERBOSE(V_REDEFINE))
+                              Warn("redefining %s",IDID(p));
+                            killhdl(old,&root);
+                          }
+                          IDLEV(p)=prevlev;
+                        }
                         p=IDNEXT(p);
                       }
                     //}
