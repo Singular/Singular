@@ -1,21 +1,19 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fac_multihensel.cc,v 1.1 1996-12-06 14:46:22 schmidt Exp $
+// $Id: fac_multihensel.cc,v 1.2 1997-03-27 09:45:49 schmidt Exp $
 
 /*
  * $Log: not supported by cvs2svn $
+ * Revision 1.1  1996/12/06 14:46:22  schmidt
+ * Initial revision
+ *
  */
 
-#undef TIMING
-#undef DEBUGOUTPUT
-
-#ifndef NDEBUG
-//#define DEBUGOUTPUT
-#endif
-
+#include "assert.h"
+#include "debug.h"
 #include "timing.h"
 
-#include "assert.h"
 #include "cf_defs.h"
+
 #include "cf_eval.h"
 #include "cf_map.h"
 #include "cf_binom.h"
@@ -223,7 +221,7 @@ findCorrCoeffs ( const CFArray & P, const CFArray & Q, const CFArray & P0, const
     DEBDECLEVEL( cerr, "findCorrCoeffs" );
     return A;
 }
-		
+
 
 static bool
 liftStep ( CFArray & P, int k, int r, int t, const modpk & b, const Evaluation & A, const CFArray & lcG, const CanonicalForm & Uk, int * n, int h )
