@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: readcf.y,v 1.5 1997-12-08 18:24:42 schmidt Exp $ */
+/* $Id: readcf.y,v 1.6 1997-12-13 12:51:41 schmidt Exp $ */
 
 %{
 
@@ -17,6 +17,7 @@
 #include "assert.h"
 
 #include "cf_defs.h"
+#include "gfops.h"
 #include "canonicalform.h"
 #include "parseutil.h"
 #include "variable.h"
@@ -97,7 +98,15 @@ int yylex()
 	return NUM;
     }
     else if ( isalpha( c ) ) {
-	if ( c == getDefaultVarName() ) {
+	// look for generators of GF(q)
+	if ( getCharacteristic() > 0 && getGFDegree() > 1 && c == gf_name ) {
+#ifdef BISONPP
+	    this->yylval = getGFGenerator();
+#else
+	    yylval = getGFGenerator();
+#endif
+	}
+	else if ( c == getDefaultVarName() ) {
 	    int cc;
 	    cc = defaultin->get();
 	    if ( cc == '_' ) {
