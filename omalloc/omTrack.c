@@ -3,13 +3,11 @@
  *  Purpose: routines for getting Backtraces of stack
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omTrack.c,v 1.2 1999-11-22 18:13:00 obachman Exp $
+ *  Version: $Id: omTrack.c,v 1.3 2000-05-31 13:34:32 obachman Exp $
  *******************************************************************/
 #include <limits.h>
-
 #include "omConfig.h"
 #include "omFindExec.h"
-#include "omPrivate.h"
 
 #ifndef MAXPATHLEN
 #define MAXPATHLEN 1024
@@ -87,11 +85,10 @@ switch(i)                                       \
 }
 #endif /* OM_FRAME_ADDR_RVALUE */
 
-static char* om_this_prog = NULL;
+static char om_this_prog[MAXPATHLEN] = "";
 static void* om_this_main_frame_addr = NULL;
 static void* om_this_prog_min_return_addr = ((void*) 1023);
 static void* om_this_prog_max_return_addr = ((void*) ULONG_MAX -1);
-
 
 void omInitTrack(const char* argv0)
 {
@@ -99,14 +96,13 @@ void omInitTrack(const char* argv0)
   
   if (argv0 != NULL && omFindExec(argv0, buf))
   {
-    __omTypeAllocChunk(char*, om_this_prog, strlen(buf));
     strcpy(om_this_prog, buf);
   }
 #if defined(OM_FRAME_ADDR_WORKS) 
   om_this_main_frame_addr = OM_FRAME_ADDR(1);
 #endif
 #if defined(OM_PROG_NM) && defined(HAVE_POPEN)
-  if (om_this_prog != NULL)
+  if (*om_this_prog != '\0')
   {
     char command[MAXPATHLEN + 30];
     FILE *pipe;
@@ -178,7 +174,7 @@ int omGetCurrentBackTrace(void** addr, int max_frames)
         }
 #ifdef OM_FRAME_ADDR_WORKS
         OM_GET_FRAME_ADDR(r_addr, i + 1);
-        /* check that next frame is in really between main and this_frame */
+        /* check that next frame is really in between main and this_frame */
         if ((r_addr >= om_this_main_frame_addr && 
              om_this_main_frame_addr >= this_frame) ||
             (r_addr <= om_this_main_frame_addr && 
@@ -200,7 +196,7 @@ int omPrintBackTrace(void** addr, int max_frames, FILE* fd)
   int i = 0;
   if (max_frames > OM_MAX_BT_FRAMES) max_frames = OM_MAX_BT_FRAMES;
 #if defined(HAVE_POPEN) && defined(OM_PROG_ADDR2LINE)
-  if (om_this_prog != NULL)
+  if (*om_this_prog != '\0')
   {
     char command[2*MAXPATHLEN + 15 + OM_MAX_BT_FRAMES*(2*SIZEOF_VOIDP + 4)];
     FILE *pipe;
@@ -224,6 +220,11 @@ int omPrintBackTrace(void** addr, int max_frames, FILE* fd)
         int k=0;
         while ((l=fgetc(pipe)) != EOF)
         {
+          /* An output entry of addr2line looks as follows:
+FunctionName
+File:Line
+             The above is pretty ugly, huh? 
+          */
           if (nl == 0) 
           {
             fprintf(fd, "  #%d %p in ", j, addr[j]);

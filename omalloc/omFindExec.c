@@ -3,14 +3,16 @@
  *  Purpose: routine which determines absolute pathname of executable
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omFindExec.c,v 1.1.1.1 1999-11-18 17:45:54 obachman Exp $
+ *  Version: $Id: omFindExec.c,v 1.2 2000-05-31 13:34:31 obachman Exp $
  *******************************************************************/
 
 #include "omConfig.h"
 
 #if ! defined(__MWERKS__) && defined(HAVE_UNISTD_H) && defined(STDC_HEADERS)
 
+#ifdef HAVE_UNISTD_H
 #include <unistd.h> /* always defiend */
+#endif
 #include <stdlib.h>
 #include <strings.h>
 

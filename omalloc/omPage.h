@@ -3,32 +3,32 @@
  *  Purpose: declaration of routines for primitve page managment
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omPage.h,v 1.2 1999-12-13 16:27:59 obachman Exp $
+ *  Version: $Id: omPage.h,v 1.3 2000-05-31 13:34:32 obachman Exp $
  *******************************************************************/
 #ifndef OM_PAGE_H
 #define OM_PAGE_H
 
 /***********************************************************************
  *
- * Identifying whether an address is from a page requested with omGetPage()
- * For this to work, omRegisterExternalAddr must be called with every address
- * gotten from an external malloc 
+ * Identifying whether an address is a BinAddr or LargeAddr:
+ * For this to work, omRegisterBinAddr or omRegisterLargeAddr must be called 
+ * with every address gotten from an external malloc  routine
  */
 
-/* Here is how it works (assume SIZEOF_LONG == 4, SIZEOF_SYSTEM_PAGE = 2^12)
+/* Here is how it works (assume SIZEOF_LONG == 4, SIZEOF_SYSTEM_PAGE = 2^12):
    Let
    Addr: |    15               |  5       |    12        |
-          PAGE_INDEX           PAGE_SHIFT  PAGE_OFFSET
+          PAGE_INDEX            PAGE_SHIFT PAGE_OFFSET
 
-                                   PAGE_BASE
+                                      PAGE_BASE
 
    omPageIndicies is an array of bit-fields which is indexed by
-                  PAGE_INDEX - omMinPageIndex. I'ts maximal length
+                  PAGE_INDEX - omMinPageIndex. Its maximal length
                   is 2^15. PAGE_SHIFT is used as index into the bit-field.
                   If it's value is 1, then addr is from omPage, else
                   not.
 
-   omMinPageIndex is iminimal page index of registered addr
+   omMinPageIndex is minimal page index of registered addr
 
    In other words: omIsPageAddr iff
    omPageIndicies[PAGE_INDEX - omMinPageIndex] & (1 << PAGE_SHIFT) */
@@ -37,7 +37,7 @@
 #define OM_SIZEOF_INDEX_PAGE (SIZEOF_SYSTEM_PAGE << LOG_BIT_SIZEOF_LONG)
 
 #define omGetPageShiftOfAddr(addr) \
-  (((unsigned long) addr) & (OM_SIZEOF_INDEX_PAGE -1)) >> LOG_BIT_SIZEOF_SYSTEM_PAGE)
+  ((((unsigned long) addr) & (OM_SIZEOF_INDEX_PAGE -1)) >> LOG_BIT_SIZEOF_SYSTEM_PAGE)
 
 #define omGetPageIndexOfAddr(addr) \
   (((unsigned long) addr) >> (LOG_BIT_SIZEOF_LONG + LOG_BIT_SIZEOF_SYSTEM_PAGE))
@@ -54,7 +54,7 @@ extern unsigned long *omPageIndicies;
 #define omRegisterPageIndex(index)                      \
 do                                                      \
 {                                                       \
-  if (index > omMinPageIndex || index < omMaxPageIndex) \
+  if (index < omMinPageIndex || index > omMaxPageIndex) \
   {                                                     \
     omPageIndexFault(index);                            \
   }                                                     \
@@ -113,6 +113,7 @@ int omGetNumberOfAllocatedPages();
   (omGetPageOfAddr(a1) == omGetPageOfAddr(a2))
 
 int omIsAddrOnFreePage(void* addr);
+int omIsAddrOnRegisteredPage(void* addr);
 
 #define omIsNotAddrOnFreePage(addr) (!omIsAddrOnFreePage(addr))
 

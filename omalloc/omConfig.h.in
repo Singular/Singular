@@ -1,9 +1,10 @@
+/* -*-c++-*- */
 /*******************************************************************
  *  File:    omConfig.h.in
  *  Purpose: configuration for omalloc  
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omConfig.h.in,v 1.2 1999-11-22 18:12:58 obachman Exp $
+ *  Version: $Id: omConfig.h.in,v 1.3 2000-05-31 13:34:31 obachman Exp $
  *******************************************************************/
 #ifndef OM_CONFIG_H
 #define OM_CONFIG_H
@@ -12,7 +13,21 @@
  * Defines which are set by configure
  ******************************************************************/
 /* define if you can inline */
+#ifndef OM_INLINE
 #undef OM_INLINE
+#endif
+/* define for inline decl in headers */
+#ifndef OM_INLINE_DECL
+#define OM_INLINE_DECL extern
+#endif
+/* define for inline implementation in Include*/
+#ifndef OM_INLINE_IMPL
+#undef OM_INLINE_IMPL
+#endif
+/* define for local inline */
+#ifndef OM_INLINE_LOCAL
+#define OM_INLINE_LOCAL static
+#endif
 /* define to the name of addr2line program, undef otherwise */
 #ifndef OM_PROG_ADDR2LINE
 #undef OM_PROG_ADDR2LINE
@@ -29,6 +44,10 @@
 #ifndef HAVE_READLINK
 #undef HAVE_READLINK
 #endif
+/* define if you have sbrk */
+#ifndef HAVE_SBRK
+#undef HAVE_SBRK
+#endif
 /* define if you have getcwd */
 #ifndef HAVE_GETCWD
 #undef HAVE_GETCWD
@@ -37,6 +56,10 @@
 #ifndef HAVE_GETWD
 #undef HAVE_GETWD
 #endif
+/* define if you have a working mmap */
+#ifndef HAVE_WORKING_MMAP
+#undef HAVE_WORKING_MMAP
+#endif
 /* define if you have STDC_HEADERS */
 #ifndef STDC_HEADERS
 #undef STDC_HEADERS
@@ -44,6 +67,14 @@
 /* define if you have unistd.h */
 #ifndef HAVE_UNISTD_H
 #undef HAVE_UNISTD_H
+#endif
+/* define if you have fcntl.h */
+#ifndef HAVE_FCNTL_H
+#define HAVE_FCNTL_H
+#endif
+/* define if you have sys/mman.h */
+#ifndef HAVE_SYS_MMAN_H
+#define HAVE_SYS_MMAN_H
 #endif
 /* define to func which returns ith return addr */
 #ifndef OM_RETURN_ADDR
@@ -73,6 +104,14 @@
 #ifndef SIZEOF_LONG
 #define SIZEOF_LONG 4
 #endif
+/* Define sizeof(double) */
+#ifndef SIZEOF_DOUBLE
+#define SIZEOF_DOUBLE 4
+#endif
+/* Define sizeof(size_t) */
+#ifndef SIZEOF_SIZE_T
+#define SIZEOF_SIZE_T 4
+#endif
 #ifndef SIZEOF_SYSTEM_PAGE
 /* Define pagesize of your system */
 #define SIZEOF_SYSTEM_PAGE 4096
@@ -81,55 +120,43 @@
 /* size of page as we can use it */
 #define SIZEOF_OM_PAGE SIZEOF_SYSTEM_PAGE
 #endif
+/* define if you want to use mmap for valloc */
+#ifndef OM_HAVE_VALLOC_MMAP
+#undef OM_HAVE_VALLOC_MMAP
+#endif
+/* define if you want to use malloc-provided valloc */
+#ifndef HAVE_VALLOC_MALLOC
+#undef OM_HAVE_VALLOC_MALLOC
+#endif
+#ifndef OM_MALLOC_PROVIDES_SIZEOF_ADDR
+/* define if your malloc provides a working OM_MALLOC_SIZEOF_ADDR */
+#undef OM_MALLOC_PROVIDES_SIZEOF_ADDR
+#endif
+#ifndef OM_PROVIDE_MALLOC
+/* define if you want omalloc to provide ANSI-C conforming
+   malloc/calloc/realloc/free funcs */
+#undef OM_PROVIDE_MALLOC
+#endif
+#ifndef OM_EMULATE_OMALLOC
+/* define if you only want to emulate omalloc, but not actually use it */
+#undef OM_EMULATE_OMALLOC
+#endif
 #ifndef OM_ALIGN_8
 /* define if you want your memory to be 8-aligned */
 #undef OM_ALIGN_8
 #endif
-/* define if you want enable memory statistics */
-#undef OM_HAVE_STAT
-#ifndef HAVE_GMALLOC
-/* Define if our gmalloc is to be used */
-#undef HAVE_GMALLOC
+#ifndef OM_ALIGNMENT_NEEDS_WORK
+/* define if you insist on AllocAligned returnes 8-aligned */
+#undef OM_ALIGNMENT_NEEDS_WORK
 #endif
-#ifndef PROVIDE_MALLOC
-/* define you you want omalloc to provide malloc, free, realloc */
-#undef PROVIDE_MALLOC
+/* define if you want to have a dense distribution of bins */
+#ifndef OM_HAVE_DENSE_BIN_DISTRIBUTION
+#undef OM_HAVE_DENSE_BIN_DISTRIBUTION
 #endif
-
-/* define what to do on total out of memory */
-#ifndef OM_OUT_OF_MEMORY
-#define OM_OUT_OF_MEMORY() \
-   fprintf(stderr, "***Emergency Exit: Out of Memory\n"); exit(1);
+/* define to enable internal debugging */
+#ifndef OM_INTERNAL_DEBUG
+#undef OM_INTERNAL_DEBUG
 #endif
-
-/* define hook which is called when running out of memory */
-#ifndef OM_OUT_OF_MEMORY_HOOK
-#define OM_OUT_OF_MEMORY_HOOK() 
-#endif
-
-/* define this if you want to monitor memory usage */
-#ifndef OM_CHECK_PRINT
-#define OM_CHECK_PRINT(bytesMalloc, bytesValloc)
-#endif
-
-/* define low-level malloc/free routines */
-#ifndef OM_MALLOC
-#define OM_MALLOC(size) malloc(size)
-#endif
-#ifndef OM_REALLOC
-#define OM_REALLOC(addr, newsize) realloc(addr, newsize)
-#endif
-#ifndef OM_FREE
-#define OM_FREE(addr)   free(addr)
-#endif
-#ifndef OM_VALLOC
-#define OM_VALLOC(size) valloc(size)
-#endif
-#ifndef OM_VFREE
-#define OM_VFREE(addr)  free(addr)
-#endif
-
-
 
 /*******************************************************************
  * Defines which are not set by configure
@@ -139,23 +166,56 @@
 #define SIZEOF_VOIDP SIZEOF_LONG
 #endif
 
+/* SIZEOF_VOIDP == 8 || SIZEOF_VOIDP == 4 checked by configure */
 #if SIZEOF_VOIDP == 8
 #define LOG_SIZEOF_LONG  3
 #define LOG_SIZEOF_VOIDP 3
+#define LOG_BIT_SIZEOF_LONG 6
 #else
 #define LOG_SIZEOF_LONG  2
 #define LOG_SIZEOF_VOIDP 2
+#define LOG_BIT_SIZEOF_LONG 5
+#endif
+
+/* SIZEOF_SYSTEM_PAGE == 4096 || SIZEOF_SYSTEM_PAGE == 8192 checked by configure */
+#if SIZEOF_SYSTEM_PAGE == 8192
+#define LOG_BIT_SIZEOF_SYSTEM_PAGE 13
+#else
+#define LOG_BIT_SIZEOF_SYSTEM_PAGE 12
 #endif
 
 #ifndef CHAR_BIT
 #define CHAR_BIT 8
 #endif
 
-#define BIT_SIZEOF_LONG CHAR_BIT*SIZEOF_LONG
+#define BIT_SIZEOF_LONG (CHAR_BIT << LOG_SIZEOF_LONG)
+
+#ifdef OM_ALIGN_8
+#define SIZEOF_OM_ALIGNMENT 8
+#define SIZEOF_OM_ALIGNMENT_1 7
+#define LOG_SIZEOF_OM_ALIGNMENT 3 
+#define SIZEOF_STRICT_ALIGNMENT 8
+#else
+#define SIZEOF_OM_ALIGNMENT 4
+#define SIZEOF_OM_ALIGNMENT_1 3
+#define LOG_SIZEOF_OM_ALIGNMENT 2
+#ifdef OM_ALIGNMENT_NEEDS_WORK
+#define SIZEOF_STRICT_ALIGNMENT 8
+#else
+#define SIZEOF_STRICT_ALIGNMENT 4
+#endif
+#endif
+
+#define OM_ALIGN_SIZE(size) \
+   (((size) + SIZEOF_OM_ALIGNMENT_1) & (~SIZEOF_OM_ALIGNMENT_1))
+
+#define OM_STRICT_ALIGN_SIZE(size)                                          \
+   (((size) + SIZEOF_STRICT_ALIGNMENT - 1) & (~ (SIZEOF_STRICT_ALIGNMENT - 1)))
+
 
 /* define to enable assume */
 #ifndef HAVE_OM_ASSUME
-#ifndef NDEBUG
+#if !defined(NDEBUG) || defined(OM_INTERNAL_DEBUG)
 #define HAVE_OM_ASSUME
 #endif
 #endif

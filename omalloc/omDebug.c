@@ -3,478 +3,737 @@
  *  Purpose: implementation of main omDebug functions
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omDebug.c,v 1.2 1999-11-22 18:12:58 obachman Exp $
+ *  Version: $Id: omDebug.c,v 1.3 2000-05-31 13:34:31 obachman Exp $
  *******************************************************************/
 #include "omConfig.h"
-#include "omPrivate.h"
-#include "omLocal.h"
-#include "omList.h"
-#include "omDebug.h"
 
-static int omdCheckBinAddrSize(void* addr, size_t size, int level);
-static int omdPrintBinError(const char* msg, void* addr, size_t size,
-                            omBin bin);
-static const char* omdTestBinAddrSize(void* addr, size_t size, int level, 
-                                      omBin *bin);
-static const char* omdTestBin(omBin bin, int level);
-static const char* omdTestBinPage(omBinPage page, int level);
-static int   omdIsKnownTopBin(omBin bin);
+#ifdef OM_HAVE_DEBUG
+
+#include "omAlloc.h"
 
 /*******************************************************************
  *  
- *   Checking addresses 
+ * Declarations
  *  
  *******************************************************************/
-int omdCheckBinAddr(void* addr, int level)
+/* number of bytes for padding before addr: needs to > 0 and a multiple of OM_SIZEOF_STRICT_ALIGNMENT */
+#ifndef OM_SIZEOF_FRONT_PADDING
+#define OM_SIZEOF_FRONT_PADDING SIZEOF_STRICT_ALIGNMENT
+#endif
+/* number of bytes for padding after addr: needs to be a multiple of OM_SIZEOF_STRICT_ALIGNMENT */ 
+#ifndef OM_SIZEOF_BACK_PADDING
+#define OM_SIZEOF_BACK_PADDING SIZEOF_STRICT_ALIGNMENT
+#endif
+
+struct omDebugAddr_s;
+typedef struct omDebugAddr_s omDebugAddr_t;
+typedef omDebugAddr_t * omDebugAddr;
+
+struct omDebugAddr_s
 {
-  return omdCheckBinAddrSize(addr, 0, level);
+  char              debug;
+  char              check;
+  short             alloc_line;
+  char*             alloc_file;
+  /* debug > 1 */
+  void*             alloc_frames[OM_MAX_FRAMES];
+  /* debug > 2 */
+  void*             size_bin;
+  omFlags_t         flags;
+  omDebugCount_t    debugs;
+  /* debug > 3 */
+  short             free_line;
+  char*             free_file;
+  /* debug > 4 */
+  void*             free_frames[OM_MAX_FRAMES];
+};
+
+/* this is only needed to determine SIZEOF_DEBUG_ADDR_i */
+static struct omDebugAddr_s debug_addr;
+#define OM_SIZEOF_DEBUG_ADDR_1  OM_STRICT_ALIGN_SIZE(((void*)&debug_addr.alloc_frames-(void*)&debug_addr))
+#define OM_SIZEOF_DEBUG_ADDR_2  OM_STRICT_ALIGN_SIZE(((void*)&debug_addr.size_bin-(void*)&debug_addr))
+#define OM_SIZEOF_DEBUG_ADDR_3  (OM_STRICT_ALIGN_SIZE(((void*)&debug_addr.free_line-(void*)&debug_addr))+SIZEOF_FRONT_PADDING)
+#define OM_SIZEOF_DEBUG_ADDR_4  (OM_STRICT_ALIGN_SIZE(((void*)&debug_addr.free_frames-(void*)&debug_addr))+SIZEOF_FRONT_PADDING)
+#define OM_SIZEOF_DEBUG_ADDR_5  OM_SIZEOF_DEBUG_ADDR
+#define OM_SIZEOF_DEBUG_ADDR    (OM_STRICT_ALIGN_SIZE(sizeof(struct omDebugAddr_s)) + SIZEOF_FRONT_PADDING)
+
+OM_INLINE_LOCAL omDebugAddr omAddr_2_DebugAddr(void* addr)
+{
+  void* page = omGetPageOfAddr(addr);
+  size_t size = omGetTopeBinOfPage((omBinPage) page)->sizeW << LOG_SIZEOF_LONG;
+  page += SIZEOF_OM_BIN_PAGE_HEADER;
+  return (omDebugAddr) (page + (void*) (((unsigned long)addr - (unsigned long)page) / size)*size);
 }
 
-int omdCheckBlockAddr(void* addr, size_t size, int level)
+#define OM_BIN_FLAG     1           /* size_bin is bin, if set, else size */
+#define OM_USED_FLAG    2           /* is in use, if set */
+#define OM_FREE_FLAG    4           /* had been freed, if set */
+#define OM_STATIC_FLAG  8           /* if set, considered to be static, i.e. never be freed */
+#define OM_MAX_FLAG             64  /* define, but never use it */
+#define SET_FLAG(var, flag)     (var |= (flag))
+#define CLEAR_FLAG(var, flag)   (var &= ~(flag))
+#define IS_FLAG_SET(var, flag)  (var & (flag))
+
+
+#define _omDebugAddr_2_OutAddr(d_addr)   (((void*) d_addr) + OM_SIZEOF_DEBUG_ADDR_HEADER)
+#define _omOutAddr_2_DebugAddr(addr)     ((omDebugAddr) ((void*) addr - OM_SIZEOF_DEBUG_ADDR_HEADER))
+#define _omOutSize_2_DebugSize(size)     (size + OM_SIZEOF_DEBUG_ADDR_HEADER + OM_SIZEOF_BACK_PADDING)
+#define _omDebugSize_2_OutSize(size)     (size - OM_SIZEOF_DEBUG_ADDR_HEADER - OM_SIZEOF_BACK_PADDING)
+
+#ifdef OM_INTERNAL_DEBUG
+static void* omDebugAddr_2_OutAddr(void* d_addr) {return _omDebugAddr_2_OutAddr(d_addr);}
+static void* omOutAddr_2_DebugAddr(void* addr)   {return _omOutAddr_2_DebugAddr(addr);}
+static size_t omOutSize_2_DebugSize(size_t size) {return _omOutSize_2_DebugSize(size);} 
+static size_t omDebugSize_2_OutSize(size_t size) {return _omOutSize_2_DebugSize(size);}
+#else
+#define omDebugAddr_2_OutAddr   _omDebugAddr_2_OutAddr
+#define omOutAddr_2_DebugAddr   _omOutAddr_2_DebugAddr
+#define omOutSize_2_DebugSize   _omOutSize_2_DebugSize
+#define omDebugSize_2_OutSize   _omDebugSize_2_OutSize
+#endif
+
+static void* om_Frames[OM_MAX_FRAMES];
+
+/*******************************************************************
+ *  
+ * Public routines --they are just dispatcher to equivalent first-level,
+ * i.e.,  _om*  routines
+ *  
+ *******************************************************************/
+
+void* omTestAllocBin(omBin bin, char check, char debug, char* file, int line)
 {
-  if (size == 0)
+  return _omTestAlloc(bin,
+                      OM_BIN_FLAGS,MAX(check,om_Opts.MinCheck),MAX(debug,om_Opts.MinDebug),f,l,OM_DEBUG_RETURN_ADDR);
+}
+void* omTestAlloc0Bin(omBin bin, char check, char debug, char* file, int line)
+{
+  return _omTestAlloc(bin, 
+                      OM_BIN_FLAG|OM_ZERO_FLAG,MAX(check,om_Opts.MinCheck),MAX(debug,om_Opts.MinDebug),f,l,OM_DEBUG_RETURN_ADDR);
+}
+void* omTestReallocBin(void* old_addr, omBin old_bin, omBin new_bin, char check, char debug, char* file, int line)
+{
+  return _omTestRealloc(old_addr, old_bin, new_bin, 
+                        OM_BIN_FLAG,OM_BIN_FLAG,MAX(check,om_Opts.MinCheck),MAX(debug,om_Opts.MinDebug),f,l,OM_DEBUG_RETURN_ADDR);
+}   
+void* omTestRealloc0Bin(void* old_addr, omBin old_bin, omBin new_bin, char check, char debug, char* file, int line)
+{
+  return _omTestRealloc(old_addr, old_bin, new_bin, 
+                        OM_BIN_FLAG,OM_BIN_FLAG|OM_ZERO_FLAG,MAX(check,om_Opts.MinCheck),MAX(debug,om_Opts.MinDebug),f,l,OM_DEBUG_RETURN_ADDR);
+}
+void omTestFreeBin(void* addr, omBin bin, char check, char* file, int line)
+{
+  _omTestFree(addr, bin, 
+              OM_BIN_FLAG,MAX(check,om_Opts.MinCheck),f,l,OM_DEBUG_RETURN_ADDR);
+}
+
+void* omTestAlloc(size_t size, char check, char debug, char* file, int line)
+{
+  return _omTestAlloc(size, 
+                      OM_SIZE_FLAG,MAX(check,om_Opts.MinCheck),MAX(debug,om_Opts.MinDebug),f,l,OM_DEBUG_RETURN_ADDR);
+}
+void* omTestAlloc0(size_t size, char check, char debug, char* file, int line)
+{
+  return _omTestAlloc(size, 
+                      OM_SIZE_FLAG|OM_ZERO_FLAG, MAX(check,om_Opts.MinCheck),MAX(debug,om_Opts.MinDebug),f,l,OM_DEBUG_RETURN_ADDR);
+}
+void* omTestAllocAligned(size_t size, char check, char debug, char* file, int line)
+{
+  return _omTestAlloc(size, 
+                      OM_SIZE_FLAG|OM_ALIGNED_FLAG,MAX(check,om_Opts.MinCheck),MAX(debug,om_Opts.MinDebug),f,l,OM_DEBUG_RETURN_ADDR);
+}
+void* omTestAlloc0Aligned(size_t size, char check, char debug, char* file, int line)
+{
+  return _omTestAlloc(size, 
+                      OM_SIZE_FLAG|OM_ALIGNED_FLAG|OM_ZERO_FLAG,MAX(check,om_Opts.MinCheck),MAX(debug,om_Opts.MinDebug),f,l,OM_DEBUG_RETURN_ADDR);
+}
+
+void* omTestRealloc(void* addr, size_t new_size, char check, char debug, char* file, int line)
+{
+  return _omTestRealloc(addr, NULL, new_size, 
+                        0,OM_SIZE_FLAG,MAX(check,om_Opts.MinCheck),MAX(debug,om_Opts.MinDebug),f,l,OM_DEBUG_RETURN_ADDR);
+}
+void* omTestRealloc0(void* addr, size_t new_size, char check, char debug, char* file, int line)
+{
+  return _omTestRealloc(addr, NULL, new_size, 
+                        0, OM_SIZE_FLAG|OM_ZERO_FLAG, MAX(check,om_Opts.MinCheck),MAX(debug,om_Opts.MinDebug),f,l,OM_DEBUG_RETURN_ADDR);
+}
+void* omTestReallocAligned(void* addr, size_t new_size, char check, char debug, char* file, int line)
+{
+  return _omTestRealloc(addr, NULL, new_size, 
+                        0,OM_SIZE_FLAG|OM_ALIGNED_FLAG,MAX(check,om_Opts.MinCheck),MAX(debug,om_Opts.MinDebug),f,l,OM_DEBUG_RETURN_ADDR);
+}
+void* omTestRealloc0Aligned(void* addr, size_t new_size, char check, char debug, char* file, int line)
+{
+  return _omTestRealloc(addr, NULL, new_size, 
+                        0,OM_SIZE_FLAG|OM_ZERO_FLAG|OM_ALIGNED_FLAG,MAX(check,om_Opts.MinCheck),MAX(debug,om_Opts.MinDebug),f,l,OM_DEBUG_RETURN_ADDR,OM_REALLOC0_ALIGNED);
+}
+
+void* omTestReallocSize(void* addr, size_t old_size, size_t new_size, char check, char debug, char* file, int line)
+{
+  return _omTestRealloc(addr, old_size, new_size, 
+                        OM_SIZE_FLAG,OM_SIZE_FLAG,MAX(check,om_Opts.MinCheck),MAX(debug,om_Opts.MinDebug),f,l,OM_DEBUG_RETURN_ADDR,OM_REALLOC_SIZE);
+}
+void* omTestRealloc0Size(void* addr, size_t old_size, size_t new_size, char check, char debug, char* file, int line)
+{
+  return _omTestRealloc(addr, old_size, new_size, 
+                        OM_SIZE_FLAG,OM_SIZE_FLAG|OM_ZERO_FLAG,MAX(check,om_Opts.MinCheck),MAX(debug,om_Opts.MinDebug),f,l,OM_DEBUG_RETURN_ADDR,OM_REALLOC0_SIZE);
+}
+void* omTestReallocAlignedSize(void* addr, size_t old_size, size_t new_size, char check, char debug, char* file, int line)
+{
+  return _omTestRealloc(addr, old_size, new_size, 
+                        OM_SIZE_FLAG,OM_SIZE_FLAG|OM_ALIGNED_FLAG,MAX(check,om_Opts.MinCheck),MAX(debug,om_Opts.MinDebug),f,l,OM_DEBUG_RETURN_ADDR,OM_REALLOC_ALIGNED_SIZE);
+}
+void* omTestRealloc0AlignedSize(void* addr, size_t old_size, size_t new_size, char check, char debug, char* file, int line)
+{
+  return _omTestRealloc(addr, old_size, new_size, 
+                        OM_SIZE_FLAG,OM_SIZE_FLAG|OM_ZERO_FLAG|OM_ALIGNED_FLAG,MAX(check,om_Opts.MinCheck),MAX(debug,om_Opts.MinDebug),f,l,OM_DEBUG_RETURN_ADDR,OM_REALLOC0_ALIGNED_SIZE);
+}
+
+void omTestFreeSize(void* addr, size_t size, char check, char* file, int line)
+{
+  _omTestFree(addr, size, 
+              OM_SIZE_FLAG, MAX(check,om_Opts.MinCheck),f,l,OM_DEBUG_RETURN_ADDR,OM_FREE_SIZE);
+}
+void omTestFree(void* addr, size_t size, char check, char* file, int line)
+{
+  _omTestFree(addr, NULL, 
+              0, MAX(check,om_Opts.MinCheck),f,l,OM_DEBUG_RETURN_ADDR,OM_FREE);
+}
+
+omError_t omTestAddrBin(void* addr, omBin bin, char check, char* file, int line)
+{
+  return _omTestAddr(addr, bin, 
+                     OM_USED_FLAG|OM_BIN_FLAG|OM_COUNT_FLAG, MAX(check,om_Opts.MinCheck),f,l,OM_DEBUG_RETURN_ADDR);
+}
+omError_t omTestAddrSize(void* addr, size_t size, char check, char* file, int line)
+{
+  return _omTestAddr(addr, size, 
+                     OM_USED_FLAG|OM_SIZE_FLAG|OM_COUNT_FLAG, MAX(check,om_Opts.MinCheck),f,l,OM_DEBUG_RETURN_ADDR);
+}
+omError_t omTestAddr(void* adr, char check, char* file, int line)
+{
+  return _omTestAddr(addr, NULL, 
+                     OM_USED_FLAG|OM_COUNT_FLAG,MAX(check,om_Opts.MinCheck),f,l,OM_DEBUG_RETURN_ADDR);
+}
+omError_t omTestAlignedAddrBin(void* addr, omBin bin, char check, char* file, int line)
+{
+  return _omTestAddr(addr, bin, 
+                     OM_USED_FLAG|OM_BIN_FLAG|OM_ALIGNED_FLAG|OM_COUNT_FLAG, MAX(check,om_Opts.MinCheck),f,l,OM_DEBUG_RETURN_ADDR);
+}
+omError_t omTestAlignedAddr(void* adr, char check, char* file, int line)
+{
+  return _omTestAddr(addr,  bin, 
+                     OM_USED_FLAG|OM_BIN_FLAG|OM_ALIGNED_FLAG|OM_COUNT_FLAG,MAX(check,om_Opts.MinCheck),f,l,OM_DEBUG_RETURN_ADDR);
+}
+omError_t omTestAlignedAddrSize(void* addr, size_t size, char check, char* file, int line)
+{
+  return _omTestAddr(addr, bin,    
+                     OM_USED_FLAG|OM_BIN_FLAG|OM_ALIGNED_FLAG|OM_COUNT_FLAG, MAX(check,om_Opts.MinCheck),f,l,OM_DEBUG_RETURN_ADDR);
+}
+
+/* TBC */
+omError_t omTestBin(omBin bin, char check, char* file, int line)
+{
+  return omError_NoError;
+}
+omError_t omTestMemory(char check, char debug)
+{
+  return omError_NoError;
+}
+
+/*******************************************************************
+ *  
+ * First level _om* routines: call respective checks and dispatch
+ * to second level, i.e., __om routines
+ *  
+ *******************************************************************/
+static void* _omTestAlloc(void* bin_size, 
+                          int flags, char check, char debug,char* f,const int l,void* r)
+{
+  void* addr;
+  
+  om_ReportError = omError_MemoryCorrupted;
+  if (flags & BIN_FLAG)
+    (void) _omTestBin((omBin)bin_size,check-1,f,l,r);
+  else 
+    (void) _omTestMemory(check-2,f,l,r);
+
+  addr = __omTestAlloc(bin_size, flags, debug, f, l, r);
+  
+#ifdef OM_INTERNAL_DEBUG
+  om_ReportError = omError_InternalBug;
+  (void) _omTestAddr(addr, bin_size,flags|OM_USED_FLAGS,check, __FILE__,__LINE__,0);
+#endif
+
+  om_ReportError = omError_NoError;
+  return new_addr;
+}
+
+
+static void* _omTestRealloc(void* old_addr, void* old_bin_size, void* new_bin_size,
+                            int old_flags, int new_flags, char check, char debug, char* f, const int l, void* r)
+{
+  void* new_addr = NULL;
+  
+  (void*) _omTestAddr(old_addr, old_flags|OM_USED_FLAG, old_bin_size, check, f, l, r);
+
+  new_addr = __omTestRealloc(old_addr, old_bin_size, new_bin_size,
+                             old_flags, new_flags, debug, f, l, r);
+#ifdef OM_INTERNAL_DEBUG
+  om_ReportError = omError_InternalBug;
+  (void) _omTestAddr(new_addr, bin_size,flags|OM_USED_FLAGS,check, __FILE__,__LINE__,0);
+  om_ReportError = omError_NoError;
+#endif
+
+  return new_addr;
+}
+
+
+static void _omTestFree(void* addr, void* size_bin,
+                        int flags, char check, char* f, const int l, void* r)
+{
+  if (! _omTestAddr(addr, size_bin, flags, check, f, l, r))
+    __omTestFree(addr,size_bin,flags,f,l,r);
+  
+#ifdef OM_INTERNAL_DEBUG
+  om_ReportError = omError_InternalBug;
+  if (flags & BIN_FLAG)
+    (void) _omTestBin((omBin)bin_size,check-1,__FILE__,__LINE__,0);
+  else 
+    (void) _omTestMemory(check-2,__FILE__,__LINE__,0);
+  om_ReportError = omError_NoError;
+#endif
+}
+
+
+static omError_t _omTestAddr(void* addr, void* size_bin,
+                        int flags, char check, char* f, const int l, void* r)
+{
+  if (check <= 0) return omError_NoError;
+  
+  if (!__omPrimitiveTestAddr(addr, size_bin, flags, f, l, r) ||
+      !__omTestAddr(addr, size_bin, flags, f, l, r))
+    return om_ErrorStatus;
+  
+  if (check > 1) 
   {
-    omError("0 size");
-    return 0;
+    if (omIsDebugAddr(addr))
+    {
+      if (! _omTestBin(omGetBinOfAddr(addr), 1,check-1, f, l, r))
+        return om_ErrorStatus;
+      if (flags & OM_BIN_FLAG)
+        return _omTestBin((omBin) bin_size, 0, check - 1, f, l, r);
+    }
+    else
+    {
+      if (omIsBinAddr(addr))
+        return _omTestBin(omGetBinOfAddr(addr), 0, check-1, f, l, r);
+      else if (check > 2)
+        return _omTestMemory(check-2, f, l, r);
+    }
   }
-  if (size <= OM_MAX_BLOCK_SIZE)
-    return omdCheckBinAddrSize(addr, size, level);
-  else
-    return 1;
+
+  return om_ErrorStatus = omError_NoError;
 }
 
-int omdCheckChunkAddr(void* addr, int level)
+
+static omError_t _omTestBin(omBin bin, char is_debug_bin, 
+                            char check, char* f, const int l, void* r)
 {
-  omBinPage page;
-  addr = addr - SIZEOF_OM_ALIGNMENT;
-  page = *((omBinPage*) addr);
-  if (page != om_LargePage)
-    return omdCheckBinAddrSize(addr, -1, level);
-  else
-    return 1;
+  if (check <= 0) return omError_NoError;
+  
+  if (! __omPrimitiveTestBin(bin, f, l, r) ||
+      ! __omTestBin(bin, is_debug_bin, check - 1, f, l, r))
+    return om_ErrorStatus;
+  
+  if (check > 1) 
+    return _omTestMemory(check - 1, f, l, r);
+
+  return om_ErrorStatus = omError_NoError;
 }
-    
-/*******************************************************************
- *  
- * Checking Bins
- *  
- *******************************************************************/
-static int omdIsKnownTopBin(omBin bin)
+
+
+static omError_t _omTestMemory(char check, char* f, const int l, void* r)
 {
   int i = 0;
   omSpecBin s_bin;
+  void* addr;
+  
+  if (check <= 0) return omError_NoError;
+  
+  if (! omTestBinPagesReagions(check, f, l, r)) return om_ErrorStatus;
   
   for (i=0; i<= OM_MAX_BIN_INDEX; i++)
   {
-    if (bin == &om_StaticBin[i]) return 1;
+    if (! __omTestBin(&om_StaticBin[i], 0, check - 1, f, l, r))
+      return om_ErrorStatus;
+  }
+
+  for (i=0; i<= OM_MAX_DEBUG_BIN_INDEX; i++)
+  {
+    if (! __omTestBin(&om_StaticDebugBin[i], 1, check -1, f, l, r))
+      return om_ErrorStatus;
   }
   
   s_bin = om_SpecBin;
   while (s_bin != NULL)
   {
-    if (bin == s_bin->bin) return 1;
+    if (! __omTestBin(s_bin->bin, 0,check - 1, f, l, r)) 
+      return om_ErrorStatus;
     s_bin = s_bin->next;
   }
   
-  return 0;
-}
 
-int omdCheckBin(omBin bin, int level)
-{
-  const char* msg = omdTestBin(bin, level);
-  if (msg != NULL) 
+  addr = FirstKeptDebugAddr;
+  
+  while (addr != NULL)
   {
-    omdPrintBinError(msg, NULL, 0, bin);
-    return 0;
+    if (! __omTestAddr(addr, NULL, OM_FREE_FLAG, f, l, r))
+      return om_ErrorStatus;
+    addr = *((void**) addr);
   }
-  return 1;
-}
-
-int omdCheckBins(int level)
-{
-  if (level <= 0)
-  {
-    return 1;
-  }
-  else
-  {
     
-    int i = 0;
-    omSpecBin s_bin;
-  
-    for (i=0; i<= OM_MAX_BIN_INDEX; i++)
-    {
-      if (! omdCheckBin(&om_StaticBin[i], level)) return 0;
-    }
-    s_bin = om_SpecBin;
-    while (s_bin != NULL)
-    {
-      if (! omdCheckBin(s_bin->bin, level)) return 0;
-      s_bin = s_bin->next;
-    }
-    return 1;
-  }
+  return om_ErrorStatus = omError_NoError;
 }
 
 /*******************************************************************
  *  
- *  CheckAlloc CheckFree
+ * Second level __om* routines: do the actual work, no checks, 
+ * assume that everything is ok
  *  
  *******************************************************************/
-
-void* omdCheckAllocBin(omBin bin, const int zero, int level)
+static void* __omTestAlloc(void* bin_size, 
+                           int flags, char check, char debug,char* f,const int l,void* r)
 {
-  void* res;
+  void* o_addr;
+  o_size = (flags & OM_BIN_FLAG ? ((omBin)bin)->sizeW << LOG_SIZEOF_LONG : (size_t) bin_size);
   
-  omdCheckBins(level-2);
-
-  if (zero)
-    __omTypeAlloc0Bin(void*, res, bin);
-  else
-    __omTypeAllocBin(void*, res, bin);
-
-  omdCheckBinAddr(res, level-1);
-  omdCheckBins(level-2);
-
-  return res;
-}
-  
-void  omdCheckFreeBin(void* addr, int level)
-{
-  omdCheckBins(level-2);
-
-  if (omdCheckBinAddr(addr, level))
-    __omFreeBin(addr);
-
-  omdCheckBins(level - 2);
-}
-
-void* omdCheckAllocBlock(size_t size, const int zero, int level)
-{
-  void* res;
-  
-  if (level > 0 && size <= 0) 
+  if (debug > 0)
   {
-    omdPrintBinError("requested AllocBlock size <= 0", 
-                     NULL, size, NULL);
-    size = 1;
-  }
+    omDebugAddr d_addr;
+    size_t d_size, o_size;
 
-  omdCheckBins(level-2);
-
-  if (zero)
-    __omTypeAlloc0Block(void*, res, size);
-  else
-    __omTypeAllocBlock(void*, res, size);
-  
-  omdCheckBlockAddr(res, size, level - 1);
-  omdCheckBins(level - 2);
-
-  return res;
-}
-
-void omdCheckFreeBlock(void* addr, size_t size, int level)
-{
-  omdCheckBins(level - 2);
-  if (! omdCheckBlockAddr(addr, size, level)) return;
-  
-  __omFreeBlock(addr, size);
-  
-  omdCheckBins(level - 2);
-}
-
-
-void* omdCheckAllocChunk(size_t size, const int zero, int level)
-{
-  void* res;
-  
-  if (level > 0 && size <= 0) 
-  {
-    omdPrintBinError("requested AllocBlock size <= 0", 
-                     NULL, size, NULL);
-    size = 1;
-  }
-  omdCheckBins(level - 2);
-
-  if (zero)
-    __omTypeAlloc0Chunk(void*, res, size);
-  else
-    __omTypeAllocChunk(void*, res, size);
-  
-  omdCheckChunkAddr(res, level - 1);
-  omdCheckBins(level - 2);
-
-  return res;
-}
-
-void omdCheckFreeChunk(void* addr, int level)
-{
-  if (! omdCheckChunkAddr(addr, level)) return;
-  
-  __omFreeChunk(addr);
-  
-  omdCheckBins(level - 2);
-}
-
-
-/*******************************************************************
- *  
- *  Checking a bin address
- *  
- *******************************************************************/
-static int omdPrintBinError(const char* msg, void* addr, size_t size,omBin bin)
-{
-  fprintf(stderr, 
-          "for addr:%p (%d) bin:%p (%ld:%ld)\n",
-          addr, size, (void*) bin, 
-          (bin != NULL ? bin->max_blocks : 0), 
-          (bin != NULL ? bin->sizeW : 0));
-  fflush(stderr);
-  return 0;
-}
-
-static int omdCheckBinAddrSize(void* addr, size_t size, int level)
-{
-  omBin bin = NULL;
-  const char* msg = omdTestBinAddrSize(addr, size, level, &bin);
-  if (msg != NULL)
-    return omdPrintBinError(msg, addr, size, bin);
-  else
-    return 1;
-}
-
-
-/* Check that addr is activ (used) adr of bin */
-static const char* 
-omdTestBinAddrSize(void* addr, size_t size, int level, omBin* r_bin)
-{
-  omBin bin;
-  omBinPage page;
-  omBin h_bin;
-  const char* msg;
-  
-  if (level <= 0) return NULL;
-  
-  if (addr == NULL) return omError("NULL addr");
-
-  if (size > OM_MAX_BLOCK_SIZE) return NULL;
-
-  bin = omGetTopBinOfAddr(addr);
-  
-  if (bin == NULL) return omError("NULL Bin");
-
-  if (! omdIsKnownTopBin(bin))
-    return omError("Addr not from Bin (Bin unknown)");
-  *r_bin = bin;
-  
-  if ((msg = omdTestBin(bin, level - 1)) != NULL) return msg;
-
-  // check for right bin
-  if (size > 0)
-  {
-    if (omIsStaticBin(bin))
-      h_bin = omSize2Bin(size);
-    else
-      h_bin = omGetSpecBin(size);
-    if (bin != h_bin) return omError("size is wrong");
-    if (! omIsStaticBin(bin)) omUnGetSpecBin(&h_bin);
-  }
-
-  // check page 
-  page = omGetPageOfAddr(addr);
-  if ((msg = omdTestBinPage(page, level - 1)) != NULL) return msg;
-  
-  // look that page is in queue of pages of this Bin
-  h_bin = omGetBinOfPage(page);
-  *r_bin = h_bin;
-  if ( ! omIsOnGList(h_bin->last_page, prev, page))
-    return omError("page of addr not from this Bin");
-
-  // check that addr is aligned within bin
-  if (bin->max_blocks >= 1)
-  {
-    if ( ( ( (unsigned long) addr) 
-           - ((unsigned long) page) 
-           - SIZEOF_OM_BIN_PAGE_HEADER) 
-         % (bin->sizeW * SIZEOF_VOIDP)
-         != 0)
-      return omError("addr unaligned within page");
-  }
-  
-  // check that addr is not on current list of page
-  if (level > 0 && omIsOnList(page->current, addr))
-    return omError("used addr on free list of page");
-  
-  return NULL;
-}
-
-static const char* omdTestBinPage(omBinPage page, int level)
-{
-  omBin bin;
-  
-  if (level <= 0) return NULL;
-  
-  if (page == NULL) return omError("NULL page");
-  if (page != omGetPageOfAddr(page)) return omError("page unaligned");
-
-  bin = omGetTopBinOfPage(page);
-  if (bin->max_blocks > 1)
-  {
-    if (page->used_blocks > bin->max_blocks - 1)
-      return omError("used_blocks of page > max_blocks - 1");
-  
-    if (page->used_blocks == bin->max_blocks - 1 && 
-        page->current != NULL)
-      return omError("used_blocks and current out of sync");
-
-    if (page->used_blocks < 0)
-      return omError("used_blocks of page < 0");
-  }
-  else
-  {
-    if (page->used_blocks != 0)
-      return omError("used_blocks != 0 of with max_blocks <= 1");
-  }
-  
-  if (page->current == NULL &&
-      ( ! (page->used_blocks == 0 || 
-            page->used_blocks == bin->max_blocks - 1 ||
-           bin->max_blocks < 1)))
-    return omError("used_blocks and current out of sync");
-  
-  if (level > 2 && omListHasCycle(page->current))
-    return omError("current list has cycle");
-  
-  if (level > 1)
-  {
-    void* current = page->current;
-    int i = 1;
-    if (current != NULL &&
-        omListLength(current) != bin->max_blocks - page->used_blocks - 1)
-      return omError("used_blocks and current out of sync");
-
-    while (current != NULL)
+    d_size = omOutSize_2_DebugSize(o_size, debug);
+    
+    d_addr = omAllocDebugAddr(d_size);
+    
+    d_addr->next = (void*) -1;
+    d_addr->debug = debug;
+    d_addr->alloc_file = f;
+    d_addr->alloc_line = l;
+    
+    if (debug > 1)
     {
-      if (omGetPageOfAddr(current) != page) 
-        return omError("current has address not from page");
+      memset(&d_addr->alloc_frames, 0, OM_MAX_FRAMES*SIZEOF_VOIDP);
+      omGetCurrentBackTrace(&d_addr->alloc_frames, OM_MAX_FRAMES, r);
       
-      if ( ( ( (unsigned long) current) 
-             - ((unsigned long) page) 
-             - SIZEOF_OM_BIN_PAGE_HEADER) 
-           % (bin->sizeW * SIZEOF_LONG)
-           != 0)
-        return omError("current has unaligned adress");
-      current = *((void**) current);
-      i++;
-    }
-  }
-  return NULL;
-}
-
-static const char* omdTestBin(omBin bin, int level)
-{
-  int where;
-  omBinPage page;
-  omBin top_bin = bin;
-  const char* msg;
-  
-  if (level <= 0) return NULL;
-  
-  if (bin == NULL) return omError("NULL Bin");
-
-  if (! omdIsKnownTopBin(bin)) return omError("TopBin unknown");
-  
-  if (level > 2 && 
-      omGListHasCycle(bin, next)) 
-    return omError("bin->next list has cycle");
-
-  do
-  {
-    if (bin->last_page == NULL || bin->current_page == om_ZeroPage)
-    {
-      if (! (bin->current_page == om_ZeroPage && bin->last_page == NULL))
-        return omError("current_page out of sync with last_page");
-      continue;
-    }
-
-    if ((msg = omdTestBinPage(bin->current_page, level-1)) != NULL)
-      return msg;
-
-    if ((msg = omdTestBinPage(bin->last_page, level- 1)) != NULL)
-      return msg;
-    
-    if (bin->last_page->next != NULL) 
-      return omError("last_page->next != NULL");
-
-    if (level == 0) continue;
-    
-    /* check page list for cycles */
-    if (level > 2)
-    {
-      if (omGListHasCycle(bin->last_page, prev))
-        return omError("prev chain of bin has cycles");
-      page = omGListLast(bin->last_page, prev);
-      if (omGListHasCycle(page, next))
-        return omError("next chain of bin has cycles");
-    }
-
-    /* check that current_page is on list of pages */
-    if (! omIsOnGList(bin->last_page, prev, bin->current_page))
-      return"current_page not in page list";
-
-    /* now check single pages */
-    page = bin->last_page;
-    where = 1;
-    while (page != NULL)
-    {
-      if (page != bin->last_page && page != bin->current_page &&
-          ((msg = omdTestBinPage(page, level - 1)) != NULL))
-        return msg;
-
-      if (page != bin->last_page && 
-          (page->next == NULL || page->next->prev != page))
-        return omError("page->next wrong");
-      if (page->prev != NULL && page->prev->next != page)
-        return omError("page->prev wrong");
-
-      if (omGetTopBinOfPage(page) != top_bin)
-        return omError("TopBin of page wrong");
-
-      if (omGetStickyOfPage(page) != bin->sticky)
-        return omError("Sticky of page wrong");
-
-      if (omGetBinOfPage(page) != bin)
-        return omError("Bin of Page wrong");
-       
-      if (where == -1)
+      if (debug > 2)
       {
-        if (page->used_blocks != 0 || page->current != NULL)
-          return omError("used_blocks and current of fpage out of sync");
+        char* pattern;
+        
+        d_addr->size_bin = size_bin;
+        d_addr->flags = flags | USED_FLAG;
+        d_addr->debugs = 0;
+
+        if (debug > 3)
+        {
+          d_addr->free_line = -1;
+          d_addr->free_file = (char*) -1;
+          
+          if (debug > 4)
+            memset(&d_addr->free_frames, 0, OM_MAX_FRAMES*SIZEOF_VOIDP);
+        }
+
+        memset(omDebugAddr_2_FrontPattern(d_addr), OM_FRONT_PATTER, OM_SIZEOF_FRONT_PATTERN);
+        memset(omDebugAddr_2_BackPattern(d_addr), OM_BACK_PATTER, omDebugAddr_2_BackPatternSize(d_addr));
+      }
+    }
+    o_addr = omDebugAddr_2_OutAddr(d_addr);
+    if (flags & OM_ZERO_FLAG) memset(o_addr, 0, o_size);
+  }
+  else
+  {
+    if (flags & OM_BIN_FLAG)
+    {
+      omBin bin = (omBin) bin_size;
+
+      if (flags & ZERO_FLAG)
+        __omTypeAllo0cBin(void*, o_addr, bin);
+      else
+        __omTypeAllocBin(void*, o_addr, bin);
+    }
+    else
+    {
+      if (flags & ZERO_FLAG)
+      {
+        if (flags & OM_ALIGNED_FLAG)
+          __omTypeAlloc0Aligned(void*, o_addr, o_size);
+        else
+          __omTypeAlloc0(void*, o_addr, o_size);
       }
       else
       {
-        if (page == bin->current_page)
-        {
-          where = -1;
-        }
+        if (flags & OM_ALIGNED_FLAG)
+          __omTypeAllocAligned(void*, o_addr, o_size);
         else
-        {
-          if (page->current == NULL ||
-              page->used_blocks < 0 ||
-              page->used_blocks == bin->max_blocks - 1)
-            return omError("used_blocks and current of upage out of sync");
-        }
+          __omTypeAlloc(void*, o_addr, o_size);
       }
-      page = page->prev;
     }
   }
-  while ((bin = bin->next) != NULL);
   
-  return NULL;
+  if (! (flags & OM_ZERO_FLAG)) memset(o_addr, OM_INIT_PATTERN, o_size);
+  
+  return o_addr;
+}
+static omDebugAddr omAllocDebugAddr(size_t d_size)
+{
+  omDebugAddr d_addr;
+  omBin bin;
+  
+  if (d_size <= OM_MAX_DEBUG_BLOCK_SIZE)
+    bin = omSize2DebugBin(d_size);
+  else
+    bin = omGetSpecBin(d_size);
+  
+  __omTypeAllocBin(omTestAddr, d_addr, bin);
+  
+  omAssume(bin->current_page == omGetPageOfAddr(d_addr));
+
+  omSetDebugOfUsedBlocks(bin->current_page->used_blocks);
+  
+  return d_addr;
 }
 
 
+static void* __omTestRealloc(void* old_addr, void* old_bin_size, void* new_bin_size,
+                             int old_flags, int new_flags, char debug, char* f,const int l,void* r)
+{
+  void* new_addr;
+  
+  if (om_Opts.Keep > 0 || debug > 0 || omIsDebugAddr(old_addr))
+  {
+    new_addr = __omTestAlloc(new_bin_size, new_flags, debug, f, l, r);
+    memcpy(new_addr, old_addr, omSizeOfAddr(old_addr));
+    __omTestFree(old_addr, old_bin_size, old_flags, f, l, r);
+  }
+  else
+  {
+    if (new_flags & OM_BIN_FLAG) 
+    {
+      omBin new_bin = (omBin) new_bin_size;
+      omBin old_bin = (omBin) old_bin_size;
+      
+      omAssume(old_flags & OM_BIN_FLAG);
+      if (new_flags & OM_ZERO_FLAG)
+        __omTypeRealloc0Bin(old_addr, old_bin, void*, new_addr, new_bin);
+      else
+        __omTypeReallocBin(old_addr, old_bin, void*, new_addr, new_bin);
+    }
+    else
+    {
+      size_t new_size = (size_t) new_bin_size;
+      omAssume(!(new_flags & OM_BIN_FLAG) && !(old_flags & OM_BIN_FLAG));
+      
+      if (flags & OM_SIZE_FLAG)
+      {
+        size_t old_size = (size_t) old_bin_size;
+        
+        if (new_flags & OM_ZERO_FLAG)
+        {
+          if (new_flags & OM_ALIGNED_FLAG)
+            __omTypeRealloc0AlignedSize(old_addr, old_size, (void*), new_addr, new_size);
+          else
+            __omTypeRealloc0Size(old_addr, old_size, (void*), new_addr, new_size);
+        }
+        else
+        {
+          if (new_flags & OM_ALIGNED_FLAG)
+            __omTypeReallocAlignedSize(old_addr, old_size, (void*), new_addr, new_size);
+          else
+            __omTypeReallocSize(old_addr, old_size, (void*), new_addr, new_size);
+        }
+      }
+      else
+      {
+        if (new_flags & OM_ZERO_FLAG)
+        {
+          if (new_flags & OM_ALIGNED_FLAG)
+            __omTypeRealloc0Aligned(old_addr, (void*), new_addr, new_size);
+          else
+            __omTypeRealloc0(old_addr, (void*), new_addr, new_size);
+        }
+        else
+        {
+          if (new_flags & OM_ALIGNED_FLAG)
+            __omTypeReallocAligned(old_addr, (void*), new_addr, new_size);
+          else
+            __omTypeRealloc(old_addr, (void*), new_addr, new_size);
+        }
+      }
+    }
+  }
+
+  return new_addr;
+}
+
+
+unsigned long om_NumberOfKeptAddrs = 0;
+omDebugAddr om_FirstKeptDebugAddr = NULL;
+omDebugAddr om_LastKeptDebugAddr = NULL;
+static void __omTestFree(void* addr, void* size_bin, int flags, char* f,const int l,void* r)
+{
+  if (omIsDebugAddr(addr))
+  {
+    omDebugAddr d_addr = omOutAddr_2_DebugAddr(addr);
     
+    d_addr->next = NULL;
+    
+    if (d_addr->debug > 2)
+    {
+      d_addr->flags &= ~OM_USED_FLAG;
+      d_addr->flags |= OM_FREE_FLAG;
+      
+      if (d_addr->debug > 3)
+      {
+        d_addr->free_line = l;
+        d_addr->free_file = f;
+        
+        if (d_addr->debug > 4)
+          omGetCurrentBackTrace(&d_addr->free_frames, OM_MAX_FRAMES, r);
+      }
+    }
+  }
+  
+  if (om_Opts.Keep > 0)
+  {
+    if (om_NumberOfKeptAddrs)
+    {
+      omAssume(om_FirstKeptDebugAddr != NULL && om_LastKeptDebugAddr != NULL &&
+               ((om_NumberOfKeptAddr == 1 && om_LastKeptDebugAddr == om_FirstKeptDebugAddr) ||
+                (om_NumberOfKeptAddr != 1 && om_LastKeptDebugAddr != om_FirstKeptDebugAddr)));
+      om_NumberOfKeptAddrs++;
+      *((void**) om_LastKeptAddr) = addr;
+      om_LastKeptAddr = addr;
+    }
+    else
+    {
+      om_NumberOfKeptAddrs = 1;
+      om_LastKeptAddr = addr;
+      om_FirstKeptAddr = addr;
+      *((void**) om_LastKeptAddr) = NULL;
+    }
+    
+    if (om_NumberOfKeptAddrs > om_Opts.Keep)
+    {
+      addr = om_FirstKeptAddr;
+      om_FirstKeptAddr = *((void**) addr);
+      om_NumberOfKeptAddrs--;
+    }
+    else
+      return;
+  }
+  else
+  {
+    if (! omIsDebugAddr(addr))
+    {
+      if (flags & OM_BIN_FLAG) 
+        ___omFreeBin(addr);
+      else if (flags & OM_SIZE_FLAG)
+        __omFreeSize(addr, (size_t) bin_size);
+      else
+        __omFree(addr);
+
+      return;
+    }
+  }
+  
+  if (omIsDebugAddr(addr))
+    omFreeDebugAddr(addr);
+  else
+    __omFree(addr);
+}
+static void omFreeDebugAddr(void* d_addr)
+{
+  omBinPage page;
+  
+  omAssume(d_addr != NULL && omIsDebugAddr(d_addr));
+
+  page = (omBinPage) omGetPageOfAddr((void*) d_addr);
+  omAssume(omIsBinPage(page));
+
+  omUnsetDebugOfUsedBlocks(page->used_blocks);
+
+  om_JustFreedPage = NULL;
+
+  ___omFreeBin(d_addr);
+
+  if (page != om_JustFreedPage)
+    omSetDebugOfUsedBlocks(page->used_blocks);
+}
+
+/*******************************************************************
+ *  
+ * Second level omCheck routines: do the actual checks
+ *  
+ *******************************************************************/
+
+#define omIsAddrInValidRange(addr) 1
+
+omError_t omCheckAddr(void* addr, void* bin_size, int flags, char level, char* f, const int l, void* r)
+{
+  if (addr == NULL) 
+    return omReportAddrError(omError_NullAddr, addr, bin_size, flags, f, l, r, "");
+  
+  if (((long) addr  & (SIZEOF_OM_ALIGNMENT - 1)))
+    return omReportAddrError(omError_UnalignedAddr, addr, bin_size, flags, f, l, r,  "");
+
+  if ((flags & OM_ALIGN_FLAG) &&  ((long) addr  & (SIZEOF_OM_STRICT_ALIGNMENT - 1)))
+    return omReportAddrError(omError_UnalignedAddr, addr, bin_size, flags, f, l, r,  "");
+
+  if (! omIsAddrInValidRange(addr))
+    return omReportAddrError(omError_InvalidRange, addr, bin_size, flags, f, l, r,  "");
+
+  if (omIsBinPageAddr(addr))
+  {
+    if (! omCheckPageHeader(omGetPageOfAddr(addr))) 
+      return omReportAddrError(omError_MemoryCorrupted, addr, bin_size, flags, f, l, r,  
+                               "Page Header corrupted");
+
+    if (omIsDebugAddr(addr))
+    {
+      omDebugAddr d_addr = omAddr_2_DebugAddr(addr);
+      if (d_addr->debug < 0 || d_addr->debug > OM_DEBUG_MAX)
+        return omReportAddrError(omError_MemoryCorrupted, addr, bin_size, flags, f, l, r, 
+                                 "debug:%d out of range", d_addr->debug);
+      if (omDebugAddr_2_OutAddr(d_addr) != addr)
+        return omReportAddrError(omError_FalseAddr, addr, bin_size, flags, f, l, r, 
+                                 "omDebugAddr_2_OutAddr(d_addr):%d  != addr:%d",
+                                 omDebugAddr_2_OutAddr(d_addr), addr);
+      if (! omCheckDebugAddr(d_addr, bin_size, flags, level, f, l, r))
+        return om_ErrorStatus;
+      
+      if (level > 1 && 
+          !omCheckBinAddr(d_addr, NULL, (flags &~ OM_SIZE_FLAG) &~ OM_BIN_FLAG , level, f, l, r))
+        return om_ErrorStatus;
+      else
+        return om_ErrorStatus = omError_NoError;
+    }
+    else
+    {
+      return omCheckBinAddr(addr, bin_size, flags, level, f, l, r);
+    }
+  }
+  else
+  {
+    return omCheckLargeAddr(addr, bin_size, flags, level, f, l, r);
+  }
+}
+
+omError_t omCheckLargeAddr(void* addr, void* bin_size, int flags, char level, char* f, const int l, void* r)
+{
+  
 
 
-
+      
+#endif /* OM_HAVE_DEBUG */

@@ -3,36 +3,74 @@ dnl File: configure.in
 dnl Purpose: Process this file with autoconf to produce configure
 dnl Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
 dnl Created: 11/99
-dnl Version: $Id: configure.in,v 1.2 1999-11-22 18:12:57 obachman Exp $
+dnl Version: $Id: configure.in,v 1.3 2000-05-31 13:34:29 obachman Exp $
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 
 AC_INIT(omAlloc.c)
-AC_CONFIG_HEADER(omConfig.h)
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl help for configure
 dnl
 AC_ARG_WITH(
-  align8,
-  [  --with-align8           only use 8-aligned memory])
+  external_config_h,
+  [ --with-external-config_h=HEADER_FILE
+                    use HEADER_FILE for external configuration])
 AC_ARG_WITH(
-  align8,
-  [  --enable-stat           enable memory statistics])
-AC_ARG_ENABLE(
+  external_config_c,
+  [ --with-external-config_c=C_FILE
+                    use C_FILE for external implementations])
+AC_ARG_WITH(
+  malloc,
+  [ --with-malloc=system|dlmalloc|gmalloc|pmalloc|external
+                    which malloc to use, default: dlmalloc ])
+AC_ARG_WITH(
+  external_malloc_h,
+  [ --with-external-malloc-h=HEADER_FILE
+		    use HEADER_FILE for external malloc declaration])
+AC_ARG_WITH(
+  external_malloc_c,
+  [ --with-external-malloc-h=C_FILE
+		    use C_FILE for external malloc implementation])
+AC_ARG_WITH(
+  valloc,
+  [ --with-valloc=mmap|malloc|emulate
+                    how to get page-aligned memory, default: use first possible])
+AC_ARG_WITH(
+  provide_malloc,
+  [ --with-provide-malloc  
+                    provide ANSI-C conforming malloc/calloc/realloc/free])
+AC_ARG_WITH(
+  emulate_omalloc,
+  [ --with-emulate-omalloc
+                    provide only omallocs interface, but do not use its features])
+AC_ARG_WITH(
+  align,
+  [ --with-align=8|sloppy|strict 
+                    how memory is aligned, 
+                    default: if possible sloppy, else strict])
+AC_ARG_WITH(
+  dense_bins,
+  [ --with-dense-bins  use dense bin distribution])
+AC_ARG_WITH(
+  inline,
+  [ --without-inline   do not inline])
+AC_ARG_WITH(
+  internal_debug,
+  [ --with-internal-debug       
+                       turn on internal debugging])
+AC_ARG_WITH(
   mtrack,
-  [  --disable-mtrack        disable backtrace and memory track])
-AC_ARG_WITH(
-  return_addr_func,
-  [  --with_return_addr_func=FUNC
-                             use FUNC as function for determening return addr
-                             Default: __bultin_return_address])
+  [ --without-mtrack   disable backtrace and memory track])
 AC_ARG_WITH(
   frame_addr_func,
-  [  --with_frame_addr_func=FUNC
-                             use FUNC as function for determening frame addr
-                             Default: __bultin_frame_address])
-
-                             
+  [ --with_frame_addr_func=FUNC
+                    use FUNC as function for determening frame addr
+                    default: __bultin_frame_address])
+AC_ARG_WITH(
+  return_addr_func,
+  [ --with_return_addr_func=FUNC
+                    use FUNC as function for determening return addr
+                    default: __bultin_return_address])
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl get singuname
@@ -60,21 +98,21 @@ fi
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl compiler/make  config
 dnl
-
 if test "${CFLAGS+set}" != set; then
   CFLAGS="-O"
   ac_cflags_set=no
 fi
-
 AC_PROG_MAKE_SET
 AC_PROG_CC
 AC_PROG_CPP
 AC_C_CONST
 AC_C_INLINE
-if test "$ac_cv_c_inline" != no; then
-  AC_DEFINE_UNQUOTED(OM_INLINE, static $ac_cv_c_inline)
-fi
 AC_PROG_RANLIB
+AC_PROG_LN_S
+
+dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
+dnl check for programs
+dnl
 AC_CHECK_PROG(AR, ar, ar, :)
 if test "$ac_cv_prog_AR" != ar; then
   AC_MSG_ERROR(*** ar program not found)
@@ -93,17 +131,307 @@ if test "$ac_cv_prog_NM" = nm; then
   AC_DEFINE_UNQUOTED(OM_PROG_NM, "$ac_cv_prog_NM")
 fi
 
-# header file checks
+dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
+dnl header file checks
+dnl
 AC_HEADER_STDC
 AC_CHECK_HEADERS(limits.h,,
   AC_MSG_ERROR(Can not compile without limits.h))
-AC_CHECK_HEADERS(unistd.h)
+AC_CHECK_HEADERS(unistd.h sys/mman.h fcntl.h)
 
-AC_CHECK_FUNCS(popen readlink getcwd getwd)
+AC_CHECK_FUNCS(popen readlink getcwd getwd mmap sbrk)
 
+dnl llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
+dnl Find out more about particularity of the system
+dnl
 
-if test "$enable_mtrack" != no; then
+# sizes
+AC_CHECK_SIZEOF(long,4)
+AC_CHECK_SIZEOF(void*,4)
+AC_CHECK_SIZEOF(double, 8)
+AC_CHECK_SIZEOF(size_t, 4)
 
+if test "$ac_cv_sizeof_long" != "$ac_cv_sizeof_voidp"; then
+  AC_MSG_ERROR(need equal sizes for long and void*)
+fi
+if test "$ac_cv_sizeof_voidp" != 4 && test "$ac_cv_sizeof_voidp" != 8; then
+  AC_MSG_ERROR(need void* to be 4 or 8 bytes long)
+fi
+if test "$ac_cv_sizeof_double" != 4 && test "$ac_cv_sizeof_double" != 8; then
+  AC_MSG_ERROR(need double to be 4 or 8 bytes long)
+fi
+
+dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
+dnl figure out page size of the system
+dnl
+AC_MSG_CHECKING(size of system page)
+AC_CACHE_VAL(ac_cv_pagesize,
+AC_TRY_RUN([#include <stdio.h>
+#include "omGetPageSize.h"
+
+main()
+{
+  FILE *f=fopen("conftestval", "w");
+  if (!f) exit(1);
+  fprintf(f, "%d\n", omalloc_getpagesize);
+  exit(0);
+}], ac_cv_pagesize=`cat conftestval`, ac_cv_pagesize=0, ac_cv_pagesize=0))
+AC_MSG_RESULT($ac_cv_pagesize)
+if test "$ac_cv_pagesize" = 4096 || test "$ac_cv_pagesize" = 8192; then
+  AC_DEFINE_UNQUOTED(SIZEOF_SYSTEM_PAGE, $ac_cv_pagesize)
+else
+AC_MSG_ERROR(need sytem page to be of size 4096 or 8192, but is $ac_cv_pagesize)
+fi
+
+dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
+dnl check whether mmap actually works
+dnl
+if test "$ac_cv_func_mmap" = yes; then
+AC_MSG_CHECKING(whether mmap works)
+AC_CACHE_VAL(ac_cv_working_mmap,
+AC_TRY_RUN([
+#include "omMmap.c"
+main()
+{
+  void* addr = omVallocMmap(128*${ac_cv_pagesize});
+  if (addr == 0 || ((unsigned long) addr % ${ac_cv_pagesize}))
+    exit(1);
+  exit(omVfreeMmap(addr, 128*${ac_cv_pagesize}));
+}], ac_cv_working_mmap=yes, ac_cv_working_mmap=no, ac_cv_working_mmap=no))
+AC_MSG_RESULT($ac_cv_working_mmap)
+if test "$ac_cv_working_mmap" = yes; then
+  AC_DEFINE(HAVE_WORKING_MMAP)
+fi
+fi
+
+dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
+dnl for strict alignment
+dnl
+AC_CACHE_CHECK(whether alignment needs to be strict, ac_cv_align_need_strict,
+AC_TRY_RUN([ 
+main() 
+{
+  void* ptr = (void*) malloc(12); 
+  double* d_ptr; 
+  if ((unsigned long) ptr % 8 == 0) ptr = ptr + 4;  
+  d_ptr = (double*) ptr;
+  *d_ptr = (double) 1.1;
+  if (*d_ptr != (double) 1.1) exit(1);
+  else exit(0);
+}
+], ac_cv_align_need_strict=no, ac_cv_align_need_strict=yes, ac_cv_align_need_strict=yes))
+
+dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
+dnl external config files
+dnl
+AC_MSG_CHECKING(for external config files)
+if test "${with_external_config_h+set}" = set; then
+    AC_DEFINE(OM_HAVE_EXTERNAL_CONFIG_H)
+    EXTERNAL_CONFIG_HEADER=${with_external_config_h}
+fi
+if test "${with_external_config_c+set}" = set; then
+    AC_DEFINE(OM_HAVE_EXTERNAL_CONFIG_C)
+    EXTERNAL_CONFIG_SOURCE=${with_external_config_c}
+fi
+AC_SUBST(EXTERNAL_CONFIG_HEADER)
+AC_SUBST(EXTERNAL_CONFIG_SOURCE)
+if test "${EXTERNAL_CONFIG_HEADER+set}" = set || test "${EXTERNAL_CONFIG_SOURCE+set}" = set; then
+AC_MSG_RESULT(${EXTERNAL_CONFIG_HEADER} ${EXTERNAL_CONFIG_SOURCE})
+else
+AC_MSG_RESULT(none)
+fi
+
+dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
+dnl for malloc
+dnl
+AC_MSG_CHECKING(which malloc to use)
+if test "${with_malloc}" = system; then
+  OM_MALLOC_HEADER=omMallocSystem.h
+  if test "${with_provide_malloc}" = yes; then
+    AC_MSG_ERROR("can not provide malloc for --with_malloc=system")
+  fi
+elif test "${with_malloc}" = gmalloc; then
+  OM_MALLOC_HEADER=gmalloc.h
+  OM_MALLOC_SOURCE=gmalloc.c
+elif test "${with_malloc}" = pmalloc; then
+  OM_MALLOC_HEADER=pmalloc.h
+  OM_MALLOC_SOURCE=pmalloc.c
+elif test "${with_malloc}" = external; then
+  if test "${with_external_malloc_h+set}" != set; then 
+    AC_MSG_ERROR(need --with_external_malloc_h for external malloc)
+  fi
+  if test "${with_provide_malloc}" = yes; then
+    AC_MSG_ERROR("can not provide malloc for --with_malloc=external")
+  fi
+  OM_MALLOC_HEADER=$with_external_malloc_h
+  OM_MALLOC_SOURCE=$with_external_malloc_c
+else 
+  with_malloc=dlmalloc
+  OM_MALLOC_HEADER=dlmalloc.h
+  OM_MALLOC_SOURCE=dlmalloc.c
+fi
+AC_MSG_RESULT($with_malloc)
+AC_SUBST(OM_MALLOC_HEADER)
+AC_SUBST(OM_MALLOC_SOURCE)
+if test "${OM_MALLOC_SOURCE+set}" = set; then
+  AC_DEFINE(OM_HAVE_MALLOC_SOURCE)
+fi
+
+AC_MSG_CHECKING(whether malloc provides SizeOfAddr)
+if test "${ac_cv_malloc_sizeof_addr}" = no; then
+  AC_MSG_RESULT( (cached) no)
+elif test "${ac_cv_malloc_sizeof_addr}" = "${OM_MALLOC_HEADER}_${OM_MALLOC_SOURCE}"; then
+   AC_MSG_RESULT( (cached) yes)
+else
+AC_TRY_RUN([
+#include "$OM_MALLOC_HEADER"
+#ifdef OM_HAVE_MALLOC_SOURCE
+#include "$OM_MALLOC_SOURCE"
+#endif
+
+main()
+{
+  void* addr = OM_MALLOC_MALLOC(512);
+  if (OM_MALLOC_SIZEOF_ADDR(addr) < 512)
+    exit(1);
+  exit(0);
+}
+], ac_cv_malloc_sizeof_addr="${OM_MALLOC_HEADER}_${OM_MALLOC_SOURCE}", ac_cv_malloc_sizeof_addr=no, ac_cv_malloc_sizeof_addr=no)
+if test "${ac_cv_malloc_sizeof_addr}" = no; then
+AC_MSG_RESULT(no)
+else
+AC_MSG_RESULT(yes)
+fi
+fi
+if test "$ac_cv_malloc_sizeof_addr" != no; then
+AC_DEFINE(OM_MALLOC_PROVIDES_SIZEOF_ADDR)
+fi
+
+if test "${with_provide_malloc}" = yes; then
+  AC_DEFINE(OM_PROVIDE_MALLOC)
+fi
+
+dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
+dnl check whether valloc is provided and that it works
+dnl
+AC_MSG_CHECKING(whether working valloc exists)
+if test "${ac_cv_working_valloc}" = no; then
+  AC_MSG_RESULT( (cached) no)
+elif test "${ac_cv_working_valloc}" = "${OM_MALLOC_HEADER}_${OM_MALLOC_SOURCE}"; then
+  AC_MSG_RESULT( (cached) yes)
+else
+AC_TRY_RUN([
+#include "$OM_MALLOC_HEADER"
+#ifdef OM_HAVE_MALLOC_SOURCE
+#include "$OM_MALLOC_SOURCE"
+#endif
+
+main()
+{
+  void* addr = OM_MALLOC_VALLOC(128*${ac_cv_pagesize});
+  if (addr == 0 || ((unsigned long) addr % ${ac_cv_pagesize}))
+    exit(1);
+  OM_MALLOC_VFREE(addr, 128*${ac_cv_pagesize});
+  exit(0);
+}
+], ac_cv_working_valloc="${OM_MALLOC_HEADER}_${OM_MALLOC_SOURCE}", ac_cv_working_valloc=no, ac_cv_working_valloc=no)
+if test "${ac_cv_working_valloc}" = no; then
+AC_MSG_RESULT(no)
+else
+AC_MSG_RESULT(yes)
+fi
+fi
+
+dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
+dnl for valloc
+dnl
+AC_MSG_CHECKING(which valloc to use)
+if test "${with_valloc+set}" != set || test "${with_valloc}" = mmap; then
+  if test "${ac_cv_working_mmap}" = yes; then
+    with_valloc=mmap
+    AC_DEFINE(OM_HAVE_VALLOC_MMAP)
+  else
+    with_valloc=malloc
+  fi
+fi
+if test "${with_valloc}" = malloc; then
+  if test "{ac_cv_working_valloc}" != no; then
+    AC_DEFINE(OM_HAVE_VALLOC_MALLOC)
+  else
+    with_valloc=emulate
+  fi
+fi
+AC_MSG_RESULT($with_valloc)
+
+dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
+dnl emulation
+dnl
+AC_MSG_CHECKING(whether to emulate omalloc)
+if test "${with_emulate_omalloc}" = yes; then
+  AC_DEFINE(OM_EMULATE_OMALLOC)
+  AC_MSG_RESULT(yes)
+else
+  AC_MSG_RESULT(no)
+fi
+
+dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
+dnl alignment 
+dnl
+AC_MSG_CHECKING(how to align)
+if test "$with_align" = 8 || test "$ac_cv_sizeof_long" = 8; then
+  ac_cv_align=8
+  AC_DEFINE(OM_ALIGN_8)
+else
+if test "$ac_cv_align_need_strict" = "yes" || test "$with_align" = "strict"; then
+  AC_DEFINE(OM_ALIGNMENT_NEEDS_WORK)
+  ac_cv_align="strict"
+else
+  ac_cv_align="sloppy"
+fi	
+fi
+AC_MSG_RESULT($ac_cv_align)
+
+dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
+dnl dense bins
+dnl
+AC_MSG_CHECKING(whether to use dense bins)
+if test "$with_dense_bins" = yes; then
+AC_MSG_RESULT(yes)
+AC_DEFINE(OM_HAVE_DENSE_BIN_DISTRIBUTION)
+else
+AC_MSG_RESULT(no)
+fi
+
+dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
+dnl debug and inline
+dnl
+AC_MSG_CHECKING(whether to use internal debug)
+if test "$with_internal_debug" = yes; then
+AC_MSG_RESULT(yes)
+AC_DEFINE(OM_INTERNAL_DEBUG)
+with_inline=no
+else
+AC_MSG_RESULT(no)
+fi
+
+AC_MSG_CHECKING(whether to inline)
+if test "$ac_cv_c_inline" != no && test "$with_inline" != no; then
+  AC_DEFINE_UNQUOTED(OM_INLINE, static $ac_cv_c_inline)
+  AC_DEFINE_UNQUOTED(OM_INLINE_DECL, static $ac_cv_c_inline)
+  AC_DEFINE_UNQUOTED(OM_INLINE_IMPL, static $ac_cv_c_inline)
+  AC_DEFINE_UNQUOTED(OM_INLINE_LOCAL, static $ac_cv_c_inline)
+  AC_MSG_RESULT(yes)
+else
+  AC_DEFINE_UNQUOTED(OM_INLINE_DECL, extern)
+  AC_DEFINE_UNQUOTED(OM_INLINE_IMPL,)
+  AC_DEFINE_UNQUOTED(OM_INLINE_LOCAL, static)
+  AC_MSG_RESULT(no)
+fi
+
+dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
+dnl mtrack business
+dnl
+if test "$with_mtrack" != no; then
 # get function for return address
 if test "${with_return_addr_func+set}" = set; then
 if test "${with_return_addr_func}" != no; then
@@ -226,185 +554,17 @@ fi
 fi # "$ac_cv_frame_addr_func_works" = yes;
 fi # "${ac_cv_frame_addr_func+set}" = set;
 
-fi  # "$enable_mtrack" != no;
+fi  # "$with_mtrack" != no;
 
 
-dnl llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
-dnl Find out more about particularity of the system
+dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
+dnl last but not least, let's be smart about CFLAGS
 dnl
-
-# sizes
-AC_CHECK_SIZEOF(long,4)
-AC_CHECK_SIZEOF(void*,4)
-AC_CHECK_SIZEOF(double, 8)
-if test "$ac_cv_sizeof_long" != "$ac_cv_sizeof_voidp"; then
-  AC_MSG_ERROR(need equal sizes for long and void*)
-fi
-if test "$ac_cv_sizeof_voidp" != 4 && "$ac_cv_sizeof_voidp" != 8; then
-  AC_MSG_ERROR(need void* to be 4 or 8 bytes long)
-fi
-
-AC_MSG_CHECKING(align8)
-if test "$with_align8" = yes || test "$ac_cv_sizeof_long" = 8; then
-  $ac_cv_align8 = yes
-else
-AC_CACHE_VAL(ac_cv_align8,
-AC_TRY_RUN([ 
-int main() 
-{
-  void* ptr = (void*) malloc(12); 
-  double* d_ptr; 
-  if ((unsigned long) ptr % 8 == 0) ptr = ptr + 4;  
-  d_ptr = (double*) ptr;
-  *d_ptr = (double) 1.1;
-  if (*d_ptr != (double) 1.1) return 1;
-  else return 0;
-}
-], ac_cv_align8=no, ac_cv_align8=yes, ac_cv_align8=yes))
-fi
-AC_MSG_RESULT($ac_cv_align8)
-
-if test $ac_cv_align8 = "yes"; then
-  AC_DEFINE(OM_ALIGN_8)
-fi
-
-dnl
-dnl
-dnl figure out the page size of your system
-dnl
-dnl
-AC_MSG_CHECKING(size of system page)
-AC_CACHE_VAL(ac_cv_pagesize,
-AC_TRY_RUN([#include <stdio.h>
-#define HAVE_GMALLOC
-#include "gmalloc.c"
-
-main()
-{
-  FILE *f=fopen("conftestval", "w");
-  if (!f) exit(1);
-  fprintf(f, "%d\n", getpagesize());
-  exit(0);
-}], ac_cv_pagesize=`cat conftestval`, ac_cv_pagesize=0, ac_cv_pagesize=0))
-AC_MSG_RESULT($ac_cv_pagesize)
-if test "$ac_cv_pagesize" != 0; then
-  AC_DEFINE_UNQUOTED(SIZEOF_SYSTEM_PAGE, $ac_cv_pagesize)
-fi
-
-dnl
-dnl figure out what to do w.r.t. valloc
-dnl
-
-AC_MSG_CHECKING(for page aligned valloc)
-AC_CACHE_VAL(ac_cv_have_page_alignment,
-
-cat > pagetest.c << EOF
-#include <stdio.h>
-#ifndef ADJUSTMENT
-#define ADJUSTMENT 0
-#endif
-#define REPEAT 1000
-main()
-{
-  long i;
-  unsigned long p1 = (unsigned long) valloc(SIZEOF_SYSTEM_PAGE - ADJUSTMENT);
-  unsigned long p2;
-  unsigned long diffs = 0;
-
-  if ((p1 == 0) || (p1 & (SIZEOF_SYSTEM_PAGE - 1))) exit(1);
-
-  for (i = 0; i<REPEAT; i++)
-  {
-    p2 = (unsigned long) valloc(SIZEOF_SYSTEM_PAGE - ADJUSTMENT);
-    if ((p2 == 0) || (p2 & (SIZEOF_SYSTEM_PAGE - 1))) exit(1);
-    diffs += (p2 - p1);
-    p1 = p2;
-  }
-
-  if ( ((double) diffs)/((double)REPEAT) < ((double) SIZEOF_SYSTEM_PAGE)*1.05 )
-  {
-    FILE *f=fopen("conftestval", "w");
-    if (!f) exit(1);
-    fprintf(f, "%d\n", SIZEOF_SYSTEM_PAGE - ADJUSTMENT);
-    exit(0);
-  }
-  exit(1);
-}
-EOF
-
-ac_cv_have_page_alignment=no
-if test "$with_gmalloc" != yes && \
-   test "$ac_cv_func_valloc" = yes && \
-   test "$ac_cv_pagesize" != 0; then
-AC_TRY_RUN([
-#define ADJUSTMENT 0
-#include "pagetest.c"
-], ac_cv_have_page_alignment="ac_cv_usable_pagesize="`cat  conftestval`,
-ac_cv_have_page_alignment=no, ac_cv_have_page_alignment=no)
-  if test "$ac_cv_have_page_alignment" = no; then
-AC_TRY_RUN([
-#define ADJUSTMENT SIZEOF_VOIDP
-#include "pagetest.c"
-], ac_cv_have_page_alignment="ac_cv_usable_pagesize="`cat  conftestval`,
-ac_cv_have_page_alignment=no, ac_cv_have_page_alignment=no)
-  fi
-fi
-
-if test "$ac_cv_have_page_alignment" = no && test "$ac_cv_pagesize" != 0; then
-AC_TRY_RUN([
-#define ADJUSTMENT 0
-#define HAVE_GMALLOC
-#include "gmalloc.c"
-#include "pagetest.c"
-], ac_cv_have_page_alignment="ac_cv_have_gmalloc=yes; ac_cv_usable_pagesize="`cat  conftestval`,
-ac_cv_have_page_alignment=no, ac_cv_have_page_alignment=no)
-  if test "$ac_cv_have_page_alignment" = no; then
-AC_TRY_RUN([
-#define ADJUSTMENT SIZEOF_VOIDP
-#define HAVE_GMALLOC
-#include "gmalloc.c"
-#include "pagetest.c"
-], ac_cv_have_page_alignment="ac_cv_have_gmalloc=yes; ac_cv_usable_pagesize="`cat  conftestval`,
-ac_cv_have_page_alignment=no, ac_cv_have_page_alignment=no)
-  fi
-fi
-rm -rf conftesteval pagetest.c
-
-)
-
-if test "$ac_cv_have_page_alignment" != no && test "$ac_cv_with_gmalloc" != no; then
-  eval $ac_cv_have_page_alignment
-  AC_DEFINE_UNQUOTED(OM_VALLOC, valloc)
-  AC_DEFINE_UNQUOTED(OM_VFREE, free)
-  if test "$ac_cv_have_gmalloc" = yes; then
-    AC_DEFINE(HAVE_GMALLOC)
-    AC_MSG_RESULT(from gmalloc)
-  else
-    AC_MSG_RESULT(from system)
-  fi
-  AC_DEFINE_UNQUOTED(SIZEOF_OM_PAGE, $ac_cv_usable_pagesize)
-else
-  AC_MSG_RESULT(no)
-  AC_MSG_ERROR(need valloc)
-fi
-
-
-dnl llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
-dnl check for stat
-dnl
-AC_MSG_CHECKING(whether to enable statistics)
-if test "$enable_stat" = yes; then
-  AC_MSG_RESULT(yes)
-  AC_DEFINE(OM_HAVE_STAT)
-else
-  AC_MSG_RESULT(no)
-fi
-
-
 if test "${GCC}" = yes && test "$ac_cflags_set" = no ; then
   CFLAGS="-pipe -Wall -O3 -fomit-frame-pointer"
 fi
 
+AC_CONFIG_HEADER(omConfig.h omMalloc.h:${OM_MALLOC_HEADER})
 
 AC_OUTPUT(Makefile, \
  if test "$CONFIG_HEADERS"; then echo timestamp > stamp-h; fi)

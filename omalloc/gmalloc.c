@@ -1,18 +1,10 @@
-/****************************************
-*  Computer Algebra System SINGULAR     *
-****************************************/
-/* $Id: gmalloc.c,v 1.1.1.1 1999-11-18 17:45:52 obachman Exp $ */
-
-/* gmalloc used by Singular to have a trusted malloc and valloc
-   slightly edited to include mod2.h and to only provide its functionality
-   if HAVE_GMALLOC is defined
-*/
-
-#ifdef HAVE_CONFIG_H
-#include "omConfig.h"
-#endif
-
-#ifdef HAVE_GMALLOC
+/*******************************************************************
+ *  File:    gmalloc.c
+ *  Purpose: implementation of malloc and friends from libc of 
+ *           Linux kernel version 5
+ *  Version: $Id: gmalloc.c,v 1.2 2000-05-31 13:34:29 obachman Exp $
+ *******************************************************************/
+#include "omMalloc.h"
 
 #define __USE_XOPEN
 #define __USE_XOPEN_EXTENDED
@@ -1414,4 +1406,3 @@ memalign (alignment, size)
   return result;
 }
 
-#endif /* HAVE_GMALLOC */

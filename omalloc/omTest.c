@@ -1,378 +1,590 @@
-#include "omConfig.h"
-#include "omPrivate.h"
-#include "omDebug.h"
-#include "omLocal.h"
-#include "omList.h"
-#include "omTrack.h"
-#include "omFindExec.h"
+#include <time.h>
+#include <string.h>
 
-#define MAX_SIZE 1024
-#define D_LEVEL 10
+#define CHECK_LEVEL   2
+// #define MAX_CELLS     600000
+#define MAX_CELLS     5000
 
-struct TestAddr_s;
-typedef struct TestAddr_s TestAddr_t;
-typedef TestAddr_t* TestAddr;
+#ifdef OM_TEST_MALLOC
+#define OM_EMULATE_OMALLOC
+#endif
 
-struct TestAddr_s
+#include "omAlloc.h"
+
+#if defined(OM_TEST_MALLOC) || CHECK_LEVEL == 0
+#include "omEmulate.h"
+#endif
+
+#ifdef OM_TEST_MALLOC
+#define omPrintBinStats(fd) ((void)0)
+#endif
+
+struct omMemCell_s
 {
-  TestAddr next;
-  size_t   size;
+  void* addr;
+  omBin bin;
+  int spec;
 };
 
-TestAddr bin_addr_list[MAX_SIZE >> 2];
-TestAddr block_addr_list[MAX_SIZE >> 2];
-TestAddr chunk_addr_list[MAX_SIZE >> 2];
-omBin    bin_list[MAX_SIZE >> 2];
+typedef struct omMemCell_s omMemCell_t;
+typedef omMemCell_t* omMemCell;
 
-void InitLists()
-{
-  int i;
-  for (i=0; i<MAX_SIZE >> 2; i++)
-  {
-    bin_addr_list[i] = NULL;
-    block_addr_list[i] = NULL;
-    chunk_addr_list[i] = NULL;
-/*    bin_list[i] = omGetSpecHeap(i*4); */
-  }
-}
-  
-#if D_LEVEL == 0
-#define ALLOC_CHUNK(size)       _omAllocChunk(size)
-#define ALLOC_BLOCK(size)       _omAllocBlock(size)
-#define ALLOC_BIN(size)         _omAllocBin(omGetSpecBin(size))
-#define FREE_BIN(addr)          _omFreeBin(addr)
-#define FREE_BLOCK(addr, size)  _omFreeBlock(addr, size)
-#define FREE_CHUNK(addr)        _omFreeChunk(addr)
-#define omPrintBinStats(fd)     ((void)0)
-#elif D_LEVEL > 0
-#define ALLOC_CHUNK(size)       omdCheckAllocChunk(size, 0, D_LEVEL)
-#define ALLOC_BLOCK(size)       omdCheckAllocBlock(size, 0, D_LEVEL)
-#define ALLOC_BIN(size)         omdCheckAllocBin(omGetSpecBin(size), 0, D_LEVEL)
-#define FREE_BIN(addr)          omdCheckFreeBin(addr, D_LEVEL)
-#define FREE_BLOCK(addr, size)  omdCheckFreeBlock(addr, size, D_LEVEL)
-#define FREE_CHUNK(addr)        omdCheckFreeChunk(addr, D_LEVEL)
+
+#if CHECK_LEVEL > 2
+#define myprintf(format, args...) \
+  printf(format, ## args)
+#define myfflush(what) fflush(what)
 #else
-#define ALLOC_CHUNK(size)       malloc(size)
-#define ALLOC_BLOCK(size)       malloc(size)
-#define ALLOC_BIN(size)         malloc(size)
-#define FREE_BIN(addr)          free(addr)
-#define FREE_BLOCK(addr, size)  free(addr)
-#define FREE_CHUNK(addr)        free(addr)
-#define omPrintBinStats(fd)     ((void)0)
+#define myprintf(format, args...) ((void) 0)
+#define myfflush(what)            ((void) 0)
 #endif
 
-#if 0
-void TestAddrs()
-{
-  TestAddr addr;
-  
-  addr = bin_addr_list;
-  while (addr != NULL)
-  {
-    omdCheckBinAddr(addr, omGetSpecBin(addr->size), 2);
-    if (omIsOnList(addr->next, addr)) omError("addr on own list");
-    if (omIsOnList(block_addr_list, addr)) omError("addr on block_list");
-    if (omIsOnList(chunk_addr_list, addr)) omError("addr on chunck_list");
-    addr = addr->next;
-  }
-  addr = block_addr_list;
-  while (addr != NULL)
-  {
-    omdCheckBlockAddr(addr, addr->size, 2);
-    if (omIsOnList(addr->next, addr)) omError("addr on own list");
-    if (omIsOnList(chunk_addr_list, addr)) omError("addr on chunck_list");
-    addr = addr->next;
-  }
-  addr = chunk_addr_list;
-  while (addr != NULL)
-  {
-    omdCheckChunkAddr(addr, 2);
-    if (omIsOnList(addr->next, addr)) omError("addr on own list");
-    addr = addr->next;
-  }
-}
+#define GET_SIZE(spec)      (spec & ((1 << 14) -1))
+#define SET_SIZE(spec, size) spec = ((spec & ~((1 << 14) -1)) | (size))
+#define IS_ALIGNED(spec)    (spec & (1 << 15))
+// #define IS_ALIGNED(spec) 0
+#define IS_ZERO(spec)       (spec & (1 << 16))
+#define IS_FREE_SPEC(spec)  (spec & (1 << 17))
+#define IS_MACRO(spec)      (!(spec & (1 << 18))  && !(spec & (1 << 19)))
+#define IS_INLINE(spec)     ((spec & (1 << 18))  && !(spec & (1 << 19)))
+#define IS_FUNC(spec)       (!(spec & (1 << 18))  && (spec & (1 << 19)))
+#define IS_CHECK(spec)      ((spec & (1 << 18))  && (spec & (1 << 19)))
+#define IS_FREE_MACRO(spec)      (!(spec & (1 << 20))  && !(spec & (1 << 21)))
+#define IS_FREE_INLINE(spec)     ((spec & (1 << 20))  && !(spec & (1 << 21)))
+#define IS_FREE_FUNC(spec)       (!(spec & (1 << 20))  && (spec & (1 << 21)))
+#define IS_FREE_CHECK(spec)      ((spec & (1 << 20))  && (spec & (1 << 21)))
+#define DO_FREE(spec)            (!(spec & (1 << 23))  && !(spec & (1 << 24))) 
+#define DO_REALLOC(spec)         ((spec & (1 << 23))  && (spec & (1 << 24)))
+#define IS_BIN(spec)        (spec & (1 << 26))
+#ifndef OM_TEST_MALLOC
+#define IS_SPEC_BIN(spec)   (spec & (1 << 25))
 #else
-#define TestAddrs() ((void)0)
+#define IS_SPEC_BIN(spec)   0
 #endif
-  
-  
-void TestAllocChunk(size_t size)
-{
-  TestAddr addr = 
-    (TestAddr) ALLOC_CHUNK(size);
-  addr->size = size;
-  addr->next = chunk_addr_list[size >> 2];
-  chunk_addr_list[size >> 2] = addr;
-}
 
-void TestFreeChunk(size_t size)
+#define SPEC_MAX  ((1 << 27) -1)
+#define SIZE_MAX  ((1 << 15) -1)
+#define RANGE_MIN (1 << 10)
+#define RANGE_MAX (1 << 14)
+
+#define PAGES_PER_REGION 128
+
+void omTestCheck(omMemCell cell)
 {
-  TestAddr addr = chunk_addr_list[size >> 2];
-  TestAddr a2;
-  if (addr != NULL) 
+  int i, j;
+  size_t size = GET_SIZE(cell->spec);
+  if (cell->bin != NULL)
   {
-    if (addr->next != NULL)
+    if (IS_ALIGNED(cell->spec))
     {
-      while (addr->next->next != NULL) addr = addr->next;
-      a2 = addr->next;
-      addr->next = NULL;
-      FREE_CHUNK((void*)a2);
+      if (omCheckAlignedBinAddrBin(cell->addr, cell->bin, CHECK_LEVEL)) return;
     }
     else
     {
-      FREE_CHUNK(addr);
-      chunk_addr_list[size >> 2] = NULL;
+      if (omCheckBinAddrBin(cell->addr, cell->bin, CHECK_LEVEL)) return;
     }
   }
-}
-
-void FreeAllChunk()
-{
-  int i;
-  for (i=0; i<MAX_SIZE >> 2; i++)
+  else
   {
-    while (chunk_addr_list[i] != NULL) TestFreeChunk(i*4);
-  }
-}
-
-void TestAllAddrs()
-{
-  int i;
-  TestAddr addr;
-  for (i=0; i<MAX_SIZE >> 2; i++)
-  {
-    addr = chunk_addr_list[i];
-    while (addr != NULL)
+    if (IS_ALIGNED(cell->spec))
     {
-      omdCheckChunkAddr(addr, D_LEVEL);
-      addr = addr->next;
+      if (omCheckAlignedAddrSize(cell->addr, size, CHECK_LEVEL)) return;
+    }
+    else
+    {
+      if (omCheckAddrSize(cell->addr, size, CHECK_LEVEL)) return;
+    }
+    
+  }
+  if (omCheckAddr(cell->addr, CHECK_LEVEL - 1)) return;
+  if (IS_ZERO(cell->spec)) j = 0;
+  else j = 255;
+  for (i=0; i< size; i++)
+  {
+    if (((unsigned char*) cell->addr)[i] != j) 
+    {
+      omReportError(omError_Unknown, "byte %d modified: is %d should be %d", i, ((unsigned char*) cell->addr)[i], j);
+      return;
     }
   }
 }
+
+void omTestAlloc(omMemCell cell, int spec)
+{
+  int size = GET_SIZE(spec);
+  void* addr;
+  omBin bin = NULL;
+
+  if (IS_BIN(spec) && (size <= OM_MAX_BLOCK_SIZE || IS_SPEC_BIN(spec)))
+  {
+    if (IS_SPEC_BIN(spec))
+    {
+      
+      if (IS_ALIGNED(spec))
+        bin = omGetAlignedSpecBin(size);
+      else
+        bin = omGetSpecBin(size); 
+    }
+    else
+    {
+      if (IS_ALIGNED(spec))
+        bin = omSmallSize2AlignedBin(size);
+      else
+        bin = omSmallSize2Bin(size);
+    }
+    
+    if (IS_MACRO(spec))
+    {
+      if (IS_ZERO(spec))
+        omTypeAlloc0Bin(void*, addr, bin);
+      else
+        omTypeAllocBin(void*, addr, bin);
+    }
+    else if (IS_INLINE(spec))
+    {
+      if (IS_ZERO(spec))
+        addr = omAlloc0Bin(bin);
+      else
+        addr = omAllocBin(bin);
+    }
+    else if (IS_FUNC(spec))
+    {
+      if (IS_ZERO(spec))
+        addr = omFuncAlloc0Bin(bin);
+      else
+        addr = omFuncAllocBin(bin);
+    }
+    else
+    {
+      if (IS_ZERO(spec))
+        addr = omCheckAlloc0Bin(bin, CHECK_LEVEL);
+      else
+        addr = omCheckAllocBin(bin, CHECK_LEVEL);
+    }
+  }
+  else
+  {
+    if (IS_MACRO(spec))
+    {
+      if (IS_ZERO(spec))
+      {
+        if (IS_ALIGNED(spec))
+          omTypeAlloc0Aligned(void*, addr, size);
+        else
+          omTypeAlloc0(void*, addr, size);
+      }
+      else
+      {
+        if (IS_ALIGNED(spec))
+          omTypeAllocAligned(void*, addr, size);
+        else
+          omTypeAlloc(void*, addr, size);
+      }
+    }
+    else if (IS_INLINE(spec))
+    {
+      if (IS_ZERO(spec))
+      {
+        if (IS_ALIGNED(spec))
+          addr = omAlloc0Aligned(size);
+        else
+          addr = omAlloc0(size);
+      }
+      else
+      {
+        if (IS_ALIGNED(spec))
+          addr = omAllocAligned(size);
+        else
+          addr = omAlloc(size);
+      }
+    }
+    else if (IS_FUNC(spec))
+    {
+      if (IS_ZERO(spec))
+      {
+        if (IS_ALIGNED(spec))
+          addr = omFuncAlloc0Aligned(size);
+        else
+          addr = omFuncAlloc0(size);
+      }
+      else
+      {
+        if (IS_ALIGNED(spec))
+          addr = omFuncAllocAligned(size);
+        else
+          addr = omFuncAlloc(size);
+      }
+    }
+    else
+    {
+      if (IS_ZERO(spec))
+      {
+        if (IS_ALIGNED(spec))
+          addr = omCheckAlloc0Aligned(size, CHECK_LEVEL);
+        else
+          addr = omCheckAlloc0(size, CHECK_LEVEL);
+      }
+      else
+      {
+        if (IS_ALIGNED(spec))
+          addr = omCheckAllocAligned(size, CHECK_LEVEL);
+        else
+          addr = omCheckAlloc(size, CHECK_LEVEL);
+      }
+    }
+  }
+  if (!IS_ZERO(spec)) memset(addr, 255, size);
+  cell->addr = addr;
+  cell->bin = bin;
+  cell->spec = spec;
+  omTestCheck(cell);
+}
+
+void omTestFree(omMemCell cell)
+{
+  void* addr = cell->addr;
+  int spec = cell->spec;
+  omBin bin = cell->bin;
+  size_t size = GET_SIZE(spec);
+
+  omTestCheck(cell);
+  if (IS_FREE_SPEC(spec))
+  {
+    if (bin != NULL)
+    {
+      if (IS_FREE_MACRO(spec))
+        omFreeBin(addr, bin);
+      else if (IS_FREE_INLINE(spec))
+        omFreeBin(addr, bin);
+      else if (IS_FREE_FUNC(spec))
+        omFuncFreeBin(addr, bin);
+      else
+        omCheckFreeBin(addr, bin, CHECK_LEVEL);
+    }
+    else
+    {
+      if (IS_FREE_MACRO(spec))
+        omFreeSize(addr, size);
+      else if (IS_FREE_INLINE(spec))
+        omFreeSize(addr, size);
+      else if (IS_FREE_FUNC(spec))
+        omFuncFreeSize(addr, size);
+      else
+        omCheckFreeSize(addr, size, CHECK_LEVEL);
+    }
+  }
+  else
+  {
+    if (IS_FREE_MACRO(spec))
+      omFree(addr);
+    else if (IS_FREE_INLINE(spec))
+      omFree(addr);
+    else if (IS_FREE_FUNC(spec))
+      omFuncFree(addr);
+    else
+      omCheckFree(addr, CHECK_LEVEL);
+  }
+  if (bin != NULL && IS_SPEC_BIN(spec))
+    omUnGetSpecBin(&bin);
+  cell->addr = NULL;
+  cell->spec = 0;
+  cell->bin = NULL;
+}
+
+void omTestRealloc(omMemCell cell, int new_spec)
+{
+  void* old_addr = cell->addr;
+  int old_spec = cell->spec;
+  omBin old_bin = cell->bin;
+  size_t old_size = GET_SIZE(old_spec);
+  void* new_addr;
+  omBin new_bin = NULL;
+  size_t new_size = GET_SIZE(new_spec);
+
+  omTestCheck(cell);
+  omCheckAddrSize(old_addr, old_size, CHECK_LEVEL);
+  if (IS_FREE_SPEC(old_spec))
+  {
+    if (old_bin != NULL && IS_BIN(new_spec) && ((new_size <= OM_MAX_BLOCK_SIZE) || IS_SPEC_BIN(new_spec)))
+    {
+      if (IS_SPEC_BIN(new_spec))
+      {
+      
+        if (IS_ALIGNED(new_spec))
+          new_bin = omGetAlignedSpecBin(new_size);
+        else
+          new_bin = omGetSpecBin(new_size); 
+      }
+      else
+      {
+        if (IS_ALIGNED(new_spec))
+          new_bin = omSmallSize2AlignedBin(new_size);
+        else
+          new_bin = omSmallSize2Bin(new_size);
+      }
+        
+      if (IS_MACRO(new_spec))
+      {
+        if (IS_ZERO(new_spec)) omTypeRealloc0Bin(old_addr, old_bin, void*, new_addr, new_bin);
+        else omTypeReallocBin(old_addr, old_bin, void*, new_addr, new_bin);
+      }
+      else if (IS_INLINE(new_spec))
+      {
+        if (IS_ZERO(new_spec)) new_addr = omRealloc0Bin(old_addr, old_bin, new_bin);
+        else new_addr = omReallocBin(old_addr, old_bin, new_bin);
+      }
+      else if (IS_FUNC(new_spec))
+      {
+        if (IS_ZERO(new_spec)) new_addr = omFuncRealloc0Bin(old_addr, old_bin, new_bin);
+        else new_addr = omFuncReallocBin(old_addr, old_bin, new_bin);
+      }
+      else 
+      {
+        if (IS_ZERO(new_spec)) new_addr = omCheckRealloc0Bin(old_addr, old_bin, new_bin, CHECK_LEVEL);
+        else new_addr = omCheckReallocBin(old_addr, old_bin, new_bin, CHECK_LEVEL);
+      }
+    }
+    else
+    {
+      if (IS_MACRO(new_spec))
+      {
+        if (IS_ZERO(new_spec))
+        {
+          if (IS_ALIGNED(new_spec)) omTypeRealloc0AlignedSize(old_addr, old_size, void*, new_addr, new_size);
+          else  omTypeRealloc0Size(old_addr, old_size, void*, new_addr, new_size);
+        }
+        else
+        {
+          if (IS_ALIGNED(new_spec))  omTypeReallocAlignedSize(old_addr, old_size, void*, new_addr, new_size);
+          else  omTypeReallocSize(old_addr, old_size, void*, new_addr, new_size);
+        }
+      }
+      else if (IS_INLINE(new_spec))
+      {
+        if (IS_ZERO(new_spec))
+        {
+          if (IS_ALIGNED(new_spec)) new_addr = omRealloc0AlignedSize(old_addr, old_size, new_size);
+          else  new_addr = omRealloc0Size(old_addr, old_size, new_size);
+        }
+        else
+        {
+          if (IS_ALIGNED(new_spec)) new_addr = omReallocAlignedSize(old_addr, old_size, new_size);
+          else  new_addr = omReallocSize(old_addr, old_size, new_size);
+        } 
+      }
+      else if (IS_FUNC(new_spec))
+      {
+        if (IS_ZERO(new_spec))
+        {
+          if (IS_ALIGNED(new_spec)) new_addr = omFuncRealloc0AlignedSize(old_addr, old_size, new_size);
+          else  new_addr = omFuncRealloc0Size(old_addr, old_size, new_size);
+        }
+        else
+        {
+          if (IS_ALIGNED(new_spec)) new_addr = omFuncReallocAlignedSize(old_addr, old_size, new_size);
+          else   new_addr = omFuncReallocSize(old_addr, old_size, new_size); 
+        }
+      }
+      else 
+      {
+        if (IS_ZERO(new_spec))
+        {
+          if (IS_ALIGNED(new_spec))  new_addr = omCheckRealloc0AlignedSize(old_addr, old_size, new_size, CHECK_LEVEL);
+          else  new_addr = omCheckRealloc0Size(old_addr, old_size, new_size, CHECK_LEVEL);
+        }
+        else
+        {
+          if (IS_ALIGNED(new_spec)) new_addr = omCheckReallocAlignedSize(old_addr, old_size, new_size, CHECK_LEVEL);
+          else   new_addr = omCheckReallocSize(old_addr, old_size, new_size, CHECK_LEVEL);
+        }
+      }
+    }
+  }
+  else
+  {
+    if (IS_MACRO(new_spec))
+    {
+      if (IS_ZERO(new_spec))
+      {
+        if (IS_ALIGNED(new_spec)) omTypeRealloc0Aligned(old_addr, void*, new_addr, new_size);
+        else  omTypeRealloc0(old_addr, void*, new_addr, new_size);
+      }
+      else
+      {
+        if (IS_ALIGNED(new_spec))  omTypeReallocAligned(old_addr, void*, new_addr, new_size);
+        else  omTypeRealloc(old_addr, void*, new_addr, new_size);
+      }
+    }
+    else if (IS_INLINE(new_spec))
+    {
+      if (IS_ZERO(new_spec))
+      {
+        if (IS_ALIGNED(new_spec)) new_addr = omRealloc0Aligned(old_addr, new_size);
+        else  new_addr = omRealloc0(old_addr, new_size);
+      }
+      else
+      {
+        if (IS_ALIGNED(new_spec)) new_addr = omReallocAligned(old_addr, new_size);
+        else  new_addr = omRealloc(old_addr, new_size);
+      } 
+    }
+    else if (IS_FUNC(new_spec))
+    {
+      if (IS_ZERO(new_spec))
+      {
+        if (IS_ALIGNED(new_spec)) new_addr = omFuncRealloc0Aligned(old_addr, new_size);
+        else  new_addr = omFuncRealloc0(old_addr, new_size);
+      }
+      else
+      {
+        if (IS_ALIGNED(new_spec)) new_addr = omFuncReallocAligned(old_addr, new_size);
+        else   new_addr = omFuncRealloc(old_addr, new_size); 
+      }
+    }
+    else 
+    {
+      if (IS_ZERO(new_spec))
+      {
+        if (IS_ALIGNED(new_spec))  new_addr = omCheckRealloc0Aligned(old_addr, new_size, CHECK_LEVEL);
+        else  new_addr = omCheckRealloc0(old_addr, new_size, CHECK_LEVEL);
+      }
+      else
+      {
+        if (IS_ALIGNED(new_spec)) new_addr = omCheckReallocAligned(old_addr, new_size, CHECK_LEVEL);
+        else   new_addr = omCheckRealloc(old_addr, new_size, CHECK_LEVEL);
+      }
+    }
+  }
+  if (! IS_ZERO(new_spec)) memset(new_addr, 255, new_size);
+  else memset(new_addr, 0, new_size);
+  if (old_bin != NULL) omUnGetSpecBin(&old_bin);
+  cell->addr = new_addr;
+  cell->bin = new_bin;
+  cell->spec = new_spec;
+  omTestCheck(cell);
+}
+ 
+
+int size_range = RANGE_MIN;
+int size_range_number = RANGE_MAX / RANGE_MIN;
+
+int MyRandSpec()
+{
+  int spec = 1 + (int) ( ((double) SPEC_MAX)* rand()/(RAND_MAX + 1.0));
   
-  
-#if 0
-void TestAllocBlock(size_t size)
-{
-  TestAddr addr = 
-    (TestAddr) ALLOC_BLOCK(size);
-  addr->size = size;
-  block_addr_list = omInsertInSortedList(block_addr_list, size, addr);
-}
-
-void TestFreeBlock(size_t size)
-{
-  TestAddr addr = omFindInSortedList(block_addr_list, size, size);
-  if (addr != NULL) 
+  if (! size_range_number)
   {
-    block_addr_list = omRemoveFromList(block_addr_list, addr);
-    FREE_BLOCK(addr, addr->size);
+    size_range = size_range << 1;
+    if (size_range > RANGE_MAX) size_range = RANGE_MIN;
+    size_range_number = RANGE_MAX / size_range;
   }
-}
-
-void FreeAllBlock()
-{
-  TestAddr addr;
-  while (block_addr_list != NULL)
-  {
-    addr = block_addr_list;
-    block_addr_list = block_addr_list->next;
-    FREE_BLOCK(addr, addr->size);
-  }
-}
-
-void TestAllocBin(size_t size)
-{
-  TestAddr addr = 
-    (TestAddr) ALLOC_BIN(size);
-  addr->size = size;
-  bin_addr_list = omInsertInSortedList(bin_addr_list, size, addr);
-}
-
-void TestFreeBin(size_t size)
-{
-  TestAddr addr = omFindInSortedList(bin_addr_list, size, size);
-  if (addr != NULL) 
-  {
-    bin_addr_list = omRemoveFromList(bin_addr_list, addr);
-    FREE_BIN(addr);
-  }
-}
-  
-void FreeAllBin()
-{
-  TestAddr addr;
-  while (bin_addr_list != NULL)
-  {
-    addr = bin_addr_list;
-    bin_addr_list = bin_addr_list->next;
-    FREE_BIN(addr);
-  }
-}
-#else
-#define TestAllocBin(p) TestAllocChunk(p)
-#define TestFreeBin(p)  TestFreeChunk(p)
-#define FreeAllBin() FreeAllChunk()
-
-#define TestAllocBlock(p) TestAllocChunk(p)
-#define TestFreeBlock(p)  TestFreeChunk(p)
-#define FreeAllBlock() FreeAllChunk()
-#endif 
-
-
-int InitSizeGen(int i)
-{
-  int size;
-  srand(1);
-  size = 1 + (int) ( ((double) MAX_SIZE)* rand()/(RAND_MAX + 1.0));
-  if (size < 8) return 8;
-  return size;
-}
-
-int NextSizeGen(int prev)
-{
-  int size;
-  size = 1 + (int) ( ((double) MAX_SIZE) * rand()/(RAND_MAX + 1.0));
-#if D_LEVEL > 4
-  printf("%d:", size);
-#endif
-  fflush(stdout);
-  if (size < 8) return 8;
-  return size;
-}
-
-void PrintTest()
-{
-  omError("sub");
+  SET_SIZE(spec, GET_SIZE(spec) & (size_range -1));
+  size_range_number--;
+  if (GET_SIZE(spec) == 0) spec++;
+  return spec;
 }
 
 int main(int argc, char* argv[])
 {
-  int limit, i, size, free_all;
+  int i=0;
+  int spec, j;
+  omMemCell_t cells[MAX_CELLS];
+  int seed = time(NULL);
+  int n = 1;
+  int n_cells = MAX_CELLS;
+  int decr = 10;
+
   omInitTrack(argv[0]);
-#if 0
-  void *a1, *a2, *a3, *a4, *a5;
-  omBin bin = omGetSpecBin(5000);
+  omInitInfo();
+  om_Opts.PagesPerRegion = PAGES_PER_REGION;
   
-  
-  a1 = omdCheckAllocBin(bin, 0, D_LEVEL);
-  a2 = omdCheckAllocBin(bin, 0, D_LEVEL);
-  a3 = omdCheckAllocBin(bin, 0, D_LEVEL);
-  a4 = omdCheckAllocBin(bin, 0, D_LEVEL);
-  a5 = omdCheckAllocBin(bin, 0, D_LEVEL);
-  
-  omPrintBinStats(stdout);
-  omdCheckFreeBin(a1, bin, D_LEVEL);
-  omPrintBinStats(stdout);
-  omdCheckFreeBin(a5, bin, D_LEVEL);
-  omPrintBinStats(stdout);
-  omdCheckFreeBin(a2, bin, D_LEVEL);
-  omPrintBinStats(stdout);
-  omdCheckFreeBin(a3, bin, D_LEVEL);
-  omPrintBinStats(stdout);
-  omdCheckFreeBin(a4, bin, D_LEVEL);
-  omPrintBinStats(stdout);
+  if (argc > 1) sscanf(argv[1], "%d", &seed);
+  srand(seed);
 
-  return(0);
-#endif
-  InitLists();
-  if (argc > 1) 
-    sscanf(argv[1], "%d", &limit);
-  else
-    limit = 200;
-
-  if (argc > 2)
-    sscanf(argv[2], "%d", &free_all);
-  else
-    free_all = 10000;
+  if (argc > 2) sscanf(argv[2], "%d", &n);
+  if (argc > 3) sscanf(argv[2], "%d", &decr);
   
-  size = InitSizeGen(limit);
-  i = 0;
-  
-  for (i=1; i<= limit; i++)
+  printf("seed == %d\n", seed);
+  fflush(stdout);
+  while (1)
   {
-    size = NextSizeGen(size);
-    TestAllocBin(size);
-    TestAddrs();
-    TestAllocBlock(size);
-    TestAddrs();
-    TestAllocChunk(size);
-    TestAddrs();
-    size = NextSizeGen(size);
-    TestAllocBin(size);
-    TestAddrs();
-    TestAllocBlock(size);
-    TestAddrs();
-    TestAllocChunk(size);
-    TestAddrs();
-    TestFreeBin(size);
-    TestAddrs();
-    TestFreeBlock(size);
-    TestAddrs();
-    TestFreeChunk(size);
-    TestAddrs();
-    
-    if (i % 300 == 0)
+    if (i == n_cells)
     {
-      omdCheckBins(D_LEVEL);
-      TestAllAddrs();
-      omDeleteStickyAllBinTag(1);
-      printf("DeleteSticky\n");
-      omdCheckBins(D_LEVEL);
-      TestAllAddrs();
-    }
-    else if (i % 200 == 0)
-    {
-      omdCheckBins(D_LEVEL);
-      TestAllAddrs();
-      omUnSetStickyAllBinTag(1);
-      printf("UnSetSticky");
-      TestAllAddrs();
-      omdCheckBins(D_LEVEL);
-    }
-    else if (i % 100 == 0)
-    {
-      omdCheckBins(D_LEVEL);
-      TestAllAddrs();
-      omSetStickyAllBinTag(1);
-      printf("SetSticky");
-      omdCheckBins(D_LEVEL);
-      TestAllAddrs();
-    }
-    
-    if (i % 100 == 0)
-    {
-      printf("i=%d\n",i);
+      i = 0;
+      printf("Cells: %d\n", n_cells);
+      omPrintStats(stdout);
+      omPrintInfo(stdout);
       omPrintBinStats(stdout);
-      if (i % free_all == 0)
+      printf("\n");
+      fflush(stdout);
+      while (i< n_cells)
       {
-        printf("\nFreeAllChunk\n");
-        FreeAllChunk();
-#if 0
-        omPrintBinStats(stdout);
-        if (i % 20000 == 0)
-        {
-          printf("\nFreeAllBlock\n");
-          FreeAllBlock();
-          omPrintBinStats(stdout);
-          if (i % 40000 == 0)
-          {
-            printf("\nFreeAllBin\n");
-            FreeAllBin();
-            omPrintBinStats(stdout);
-          }
-        }
-#endif
+        omTestFree(&cells[i]);
+        i++;
+      }
+      omPrintStats(stdout);
+      omPrintInfo(stdout);
+      omPrintBinStats(stdout);
+      i=0;
+      n--;
+      if (n <= 0 || n_cells <= 100)
+      {
+        exit(0);
+      }
+      else
+      {
+        n_cells = n_cells / decr;
+      }
+    }
+    spec = MyRandSpec();
+    myprintf("%d:%d:%d", i, spec, GET_SIZE(spec));
+    myfflush(stdout);
+    if (DO_FREE(spec))
+    {
+      myprintf(" FREE");
+      if (i != 0) 
+      {
+        j = spec % i;
+        myprintf(" %d ", j);
+        myfflush(stdout);
+        omTestFree(&cells[j]);
+        omTestAlloc(&cells[j], spec);
+      }
+    }
+    else if (DO_REALLOC(spec))
+    {
+      if (i != 0) 
+      {
+        myprintf(" REALLOC");
+        j = spec % i;
+        myprintf(" %d ", j);
+        myfflush(stdout);
+        omTestRealloc(&cells[j], spec);
+      }
+    }
+    else
+    {
+      myprintf(" ALLOC");
+      myfflush(stdout);
+      omTestAlloc(&cells[i], spec);
+      i++;
+      if (i % 1000 == 0)
+      {
+        printf("%d\n", i / 1000);
+        fflush(stdout);
+      }
+    }
+    myprintf("\n");
+    myfflush(stdout);
+    if (CHECK_LEVEL > 2)
+    {
+      for (j=0; j<i; j++)
+      {
+        omTestCheck(&cells[j]);
       }
     }
   }
-  omPrintBinStats(stdout);
-  FreeAllBlock();
-  omPrintBinStats(stdout);
-  FreeAllChunk();
-  omPrintBinStats(stdout);
-  FreeAllBin();
-  omPrintBinStats(stdout);
   return 0;
 }
-
+      
+        
