@@ -1,11 +1,14 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: canonicalform.h,v 1.4 1997-04-07 14:54:53 schmidt Exp $
+// $Id: canonicalform.h,v 1.5 1997-04-18 15:58:17 schmidt Exp $
 
 #ifndef INCL_CANONICALFORM_H
 #define INCL_CANONICALFORM_H
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.4  1997/04/07 14:54:53  schmidt
+include <config.h> added
+
 Revision 1.3  1997/03/26 16:28:31  schmidt
 stream-io wrapped by NOSTREAMIO
 
@@ -298,6 +301,8 @@ typedef List<CanonicalForm> CFList;
 typedef ListIterator<CanonicalForm> CFListIterator;
 typedef Array<CanonicalForm> CFArray;
 typedef Matrix<CanonicalForm> CFMatrix;
+
+CFFList sqrFree ( const CanonicalForm & f, bool sort );
 
 CFFList sqrFree( const CanonicalForm & f );
 

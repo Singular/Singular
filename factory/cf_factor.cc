@@ -1,8 +1,11 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_factor.cc,v 1.2 1997-04-07 15:02:42 schmidt Exp $
+// $Id: cf_factor.cc,v 1.3 1997-04-18 15:58:18 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.2  1997/04/07 15:02:42  schmidt
+#include <config.h> added
+
 Revision 1.1  1997/03/18 14:43:52  schmidt
 Removed test on MULTIFACTOR #define
 
@@ -65,13 +68,22 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
     return FpFactorizeUnivariateCZ( f, false, 1, alpha );
 }
 
-CFFList sqrFree ( const CanonicalForm & f )
+CFFList sqrFree ( const CanonicalForm & f, bool sort )
 {
 //    ASSERT( f.isUnivariate(), "multivariate factorization not implemented" );
+    CFFList result;
+
     if ( getCharacteristic() == 0 )
-	return sqrFreeZ( f );
+	result = sqrFreeZ( f );
     else
-	return sqrFreeFp( f );
+	result = sqrFreeFp( f );
+
+    return ( sort ? sortCFFList( result ) : result );
+}
+
+CFFList sqrFree ( const CanonicalForm & f )
+{
+    return sqrFree( f, false );
 }
 
 bool isSqrFree ( const CanonicalForm & f )
