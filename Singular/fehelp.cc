@@ -118,6 +118,7 @@ void feHelp(char *str)
     return;
   }
 
+  // try proc help and library help
   if (! key_is_regexp && heOnlineHelp(str)) return;
 
   // Try to match approximately with key in index file
@@ -534,7 +535,7 @@ static BOOLEAN heOnlineHelp(char* s)
   // try help for a library
   int ls = strlen(s);
   char* str = NULL;
-  // chekc that it ends with "[.,_]lib"
+  // check that it ends with "[.,_]lib"
   if (strlen(s) >=4 &&  strcmp(&s[ls-3], "lib") == 0)
   {
     if (s[ls - 4] == '.') str = s;
@@ -632,6 +633,7 @@ static void heBrowserHelp(heEntry hentry)
   // check checksums of procs
   int kchksum = (hentry != NULL && hentry->chksum > 0 ?
                  heKeyChksum(hentry->key) : 0);
+  Print("chksum for %s:procinfo:%d, idx:%d\n",hentry->key, kchksum,hentry->chksum);
   if (kchksum  && kchksum != hentry->chksum && heOnlineHelp(hentry->key))
     return;
 
