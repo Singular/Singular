@@ -1,6 +1,9 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.26 1998-05-07 16:41:51 Singular Exp $
+@comment $Id: types.doc,v 1.27 1998-05-08 06:48:32 wichmann Exp $
 @comment this file contains the type definitions
+@c * wichmann: + added comment on MP and Unix platforms.
+@c             + added comment on .rhosts file.
+@c             + used new doc2tex feature @c ref.
 
 @c The following directives are necessary for proper compilation
 @c with emacs (C-c C-e C-b).
@@ -106,13 +109,9 @@ is local to the procedure.
 @c example
 @end example
 @end table
-@menu
-* def::
-* typeof::
-@end menu
-@iftex
+@c ref
 See @ref{def}; @ref{typeof}.
-@end iftex
+@c ref
 @c {{{endfold}}}
 @c {{{endfold}}}
 
@@ -195,12 +194,9 @@ and is therefore faster
 @item
 a typecast to ideal.
 @end enumerate
-@menu
-* Type conversion and casting::
-@end menu
-@iftex
+@c ref
 See @ref{Type conversion and casting}.
-@end iftex
+@c ref
 @c {{{endfold}}}
 
 @c ------------------------------
@@ -444,12 +440,9 @@ must be converted to the type number over a ring with characteristic 0.
   v;
 @c example
 @end example
-@menu
-* Type conversion and casting::
-@end menu
-@iftex
+@c ref
 See @ref{Type conversion and casting}.
-@end iftex
+@c ref
 @c {{{endfold}}}
 
 @c ------------------------------
@@ -849,12 +842,9 @@ intvec comparison (done lexicographically, yielding int):
 @code{<>}, @code{==}, @code{<=}, @code{>=}, @code{>}, @code{<}
 @end enumerate
 
-@menu
-* Type conversion and casting::
-@end menu
-@iftex
+@c ref
 See @ref{Type conversion and casting}.
-@end iftex
+@c ref
 
 @strong{Example:}
 @example
@@ -1141,8 +1131,11 @@ ring description is written together with the data. Reading from an MP
 link returns an expression (not a string) which was evaluated after the
 read operation. If the expression read from an MP link is not from the
 same ring as the current ring, then a @code{read} changes the current
-ring.  Currently, data is written without attributes (which is likely to
-change in future versions). For a general description of MP, see
+ring.  
+
+Currently, MP links are only available on Unix platforms and data is
+written without attributes (which is likely to change in future
+versions). For a general description of MP, see
 @code{http://symbolicnet.mcs.kent.edu:/areas/mp.html}.
 
 @menu
@@ -1295,7 +1288,8 @@ portnumber are substituted by the values from the link
 specification. The client "listens" at the given port until the server
 application does a connect call. If @sc{Singular} is used as server
 application it has to be started with the command line option @code{-b}.
-
+Since launching is done using @code{rsh}, the host on which the
+application should run must have an entry in your @code{.rhosts} file.
 
 It the MPtcp link is opened in fork mode a child of the current
 @sc{Singular} is forked. All variables and their values are inherited by
@@ -1513,12 +1507,9 @@ a typecast to list
 @item
 the empty list @code{list()}
 @end enumerate
-@menu
-* Type conversion and casting::
-@end menu
-@iftex
+@c ref
 See @ref{Type conversion and casting}.
-@end iftex
+@c ref
 @c {{{endfold}}}
 
 @c ------------------------------
@@ -1613,14 +1604,9 @@ $[i]_p \in $Z/p$ \rightarrow i \in [-p/2,p/2] \subseteq $Z$ \rightarrow [i]_{p'}
 as usual
 @end table
 
-@menu
-* imap::
-* fetch::
-* subst::
-@end menu
-@iftex
+@c ref
 See @ref{imap}; @ref{fetch}; @ref{subst}.
-@end iftex
+@c ref
 
 @c ------------------------------
 @node map declarations, map expressions, map, map
@@ -1667,17 +1653,10 @@ There are standard mappings for the identity map: @code{fetch} and @code{imap}.
 @c example
 @end example
 @end table
-@menu
-* map::
-* ideal expressions::
-* ring::
-* fetch::
-* imap::
-@end menu
-@iftex
+@c ref
 See @ref{map}; @ref{ideal expressions}; @ref{ring};
 @ref{imap}; @ref{fetch}.
-@end iftex
+@c ref
 @c {{{endfold}}}
 
 @c ------------------------------
@@ -1803,12 +1782,9 @@ matrix expressions combined by arithmetic operations @code{+,-,*}
 @item
 a typecast to matrix.
 @end enumerate
-@menu
-* Type conversion and casting::
-@end menu
-@iftex
+@c ref
 See @ref{Type conversion and casting}.
-@end iftex
+@c ref
 @c {{{endfold}}}
 
 @c ------------------------------
@@ -1993,12 +1969,9 @@ multiplication of a module expressions with an ideal or poly expression (@code{*
 @item
 a typecast to module.
 @end enumerate
-@menu
-* Type conversion and casting::
-@end menu
-@iftex
+@c ref
 See @ref{Type conversion and casting}.
-@end iftex
+@c ref
 @c {{{endfold}}}
 
 @c ------------------------------
@@ -2199,14 +2172,9 @@ number s combined by arithmetic operations @code{+,-,*,/} or @code{^,**}.
   2 / 3, 4/ 8,  2 /2 ; // are int expressions (of value 0, 0 and 1)
   1.7e-2; 1.7e+2 // are valid (but  1.7e2 not), if the field is `real`
 @end example
-@menu
-* ring::
-* number::
-* Type conversion and casting::
-@end menu
-@iftex
+@c ref
 See @ref{number}; @ref{ring}; @ref{Type conversion and casting}.
-@end iftex
+@c ref
 @c {{{endfold}}}
 
 @c ------------------------------
@@ -2326,13 +2294,9 @@ poly expressions combined by arithmetic operations +,-,*,/ or ^.
          // but not equal to 2x^3
          // which will be interpreted as (2x)^3
 @end example
-@menu
-* ring::
-* Type conversion and casting::
-@end menu
-@iftex
+@c ref
 See @ref{ring}; @ref{Type conversion and casting}.
-@end iftex
+@c ref
 @c {{{endfold}}}
 
 @c ------------------------------
@@ -2523,13 +2487,9 @@ a function returning resolution
 @item
 a typecast from list to resolution.
 @end enumerate
-@menu
-* Type conversion and casting::
-@end menu
-@iftex
+@c ref
 See @ref{Type conversion and casting}.
-@ref{Type conversion and casting}.
-@end iftex
+@c ref
 @c {{{endfold}}}
 
 @c ------------------------------
@@ -2750,12 +2710,9 @@ string expressions combined by the operation @code{+}.
   typeof(s);
   @expansion{} string
 @end example
-@menu
-* Type conversion and casting::
-@end menu
-@iftex
+@c ref
 See @ref{Type conversion and casting}.
-@end iftex
+@c ref
 @c {{{endfold}}}
 
 @c ------------------------------
@@ -2912,13 +2869,9 @@ combined by arithmetic operation @code{*}.
   v*(z+x);
 @c example
 @end example
-@menu
-* ring::
-* Type conversion and casting::
-@end menu
-@iftex
+@c ref
 See @ref{ring}; @ref{Type conversion and casting}.
-@end iftex
+@c ref
 @c {{{endfold}}}
 
 @c ------------------------------
