@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.145 2000-09-18 09:18:54 obachman Exp $ */
+/* $Id: extra.cc,v 1.146 2000-09-25 12:26:30 obachman Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -629,20 +629,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
   {
     char *sys_cmd=(char *)(h->Data());
     h=h->next;
-    if (strcmp(sys_cmd, "pTest") == 0)
-    {
-      poly lm = (poly)h->Data();
-      poly p = lm;
-      poly tail = lm->next;
-      if (tail != NULL)
-      {
-        pNext(lm) = pNext(tail);
-        pNext(tail) = lm;
-        pTest(tail);
-      }
-      return FALSE;
-    }
-    else
 #ifdef RDEBUG
 /*==================== poly debug ==================================*/
     if(strcmp(sys_cmd,"p")==0)

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.cc,v 1.17 2000-09-18 09:19:06 obachman Exp $ */
+/* $Id: kbuckets.cc,v 1.18 2000-09-25 12:26:31 obachman Exp $ */
 
 #include "mod2.h"
 #include "tok.h"
@@ -37,44 +37,45 @@ inline unsigned int pLogLength(poly p)
   return pLogLength((unsigned int) pLength(p));
 }
 
-#if defined(PDEBUG) && ! defined(HAVE_PSEUDO_BUCKETS)
+#ifdef KDEBUG
 
-void kbTest(kBucket_pt bucket, int i)
+#ifndef HAVE_PSEUDO_BUCKETS
+BOOLEAN kbTest_i(kBucket_pt bucket, int i)
 {
-  if (_p_Test(bucket->buckets[i], bucket->bucket_ring, PDEBUG))
+  pFalseReturn(p_Test(bucket->buckets[i], bucket->bucket_ring));
+  if (bucket->buckets_length[i] != pLength(bucket->buckets[i]))
   {
-    if (bucket->buckets_length[i] != pLength(bucket->buckets[i]))
-    {
-      dReportError("Bucket %d lengths difference should:%d has:%d",
-                   i, bucket->buckets_length[i], pLength(bucket->buckets[i]));
-    }
-    else if (i > 0 && (int) pLogLength(bucket->buckets_length[i]) > i)
-    {
-      dReportError("Bucket %d too long %d",
-                   i, bucket->buckets_length[i]);
-    }
+    dReportError("Bucket %d lengths difference should:%d has:%d",
+                 i, bucket->buckets_length[i], pLength(bucket->buckets[i]));
+  }
+  else if (i > 0 && (int) pLogLength(bucket->buckets_length[i]) > i)
+  {
+    dReportError("Bucket %d too long %d",
+                 i, bucket->buckets_length[i]);
   }
   if (i==0 && bucket->buckets_length[0] > 1)
   {
     dReportError("Bucket 0 too long");
   }
+  return TRUE;
 }
 
 
-void kbTests(kBucket_pt bucket)
+BOOLEAN kbTest(kBucket_pt bucket)
 {
   int i;
   poly lm = bucket->buckets[0];
 
   omCheckAddrBin(bucket, kBucket_bin);
-  kbTest(bucket, 0);
+  if (! kbTest_i(bucket, 0)) return FALSE;
   for (i=1; i<= (int) bucket->buckets_used; i++)
   {
-    kbTest(bucket, i);
+    if (!kbTest_i(bucket, i)) return FALSE;
     if (lm != NULL &&  bucket->buckets[i] != NULL
         && pLmCmp(lm, bucket->buckets[i]) != 1)
     {
       dReportError("Bucket %d larger than lm", i);
+      return FALSE;
     }
   }
 
@@ -83,16 +84,19 @@ void kbTests(kBucket_pt bucket)
     if (bucket->buckets[i] != NULL || bucket->buckets_length[i] != 0)
     {
       dReportError("Bucket %d not zero", i);
+      return FALSE;
     }
   }
+  return TRUE;
 }
 
-#else
-
-#define kbTests(bucket) (NULL)
-#define kbTest(bucket, i) (NULL)
-
-#endif // PDEBUG
+#else // HAVE_PSEUDO_BUCKETS
+BOOLEAN kbTest(kBucket_pt bucket)
+{
+  return TRUE;
+}
+#endif // ! HAVE_PSEUDO_BUCKETS
+#endif // KDEBUG
 
 //////////////////////////////////////////////////////////////////////////
 ///
@@ -188,8 +192,6 @@ void kBucketInit(kBucket_pt bucket, poly lm, int length)
   }
 }
 
-static int kBucketCanonicalize(kBucket_pt bucket);
-
 static void kBucketSetLm(kBucket_pt bucket)
 {
   int j = 0;
@@ -271,7 +273,7 @@ poly kBucketExtractLm(kBucket_pt bucket)
   return lm;
 }
 
-static int kBucketCanonicalize(kBucket_pt bucket)
+int kBucketCanonicalize(kBucket_pt bucket)
 {
   poly p = bucket->buckets[1];
   poly lm;
@@ -412,7 +414,7 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
 
 #ifndef HAVE_PSEUDO_BUCKETS
   kBucketMergeLm(bucket);
-  kbTests(bucket);
+  kbTest(bucket);
   i = pLogLength(l1);
 
   if (i <= bucket->buckets_used && bucket->buckets[i] != NULL)
@@ -452,7 +454,7 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
                                bucket->l, l1,
                                spNoether, bucket->bucket_ring);
 #endif
-  kbTests(bucket);
+  kbTest(bucket);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -494,7 +496,7 @@ void kBucketTakeOutComp(kBucket_pt bucket,
   *r_p = p;
   *l = lp;
 
-  kbTests(bucket);
+  kbTest(bucket);
 }
 
 void kBucketDecrOrdTakeOutComp(kBucket_pt bucket,
@@ -580,435 +582,8 @@ number kBucketPolyRed(kBucket_pt bucket,
 
   p_DeleteLm(&lm, bucket->bucket_ring);
   if (reset_vec) pSetCompP(a1, 0);
-  kbTests(bucket);
+  kbTest(bucket);
   return rn;
 }
 
-/////////////////////////////////////////////////////////////////////////////
-// Reduction of a poly using buckets
-//
-
-#ifdef KB_USE_BUCKETS
-/*2
-*  reduction procedure for the homogeneous case
-*  and the case of a degree-ordering
-*/
-void kBucketRedHomog (LObject* h,kStrategy strat)
-{
-  if (strat->tl<0)
-  {
-    return;
-  }
-  int j = 0;
-  int k = 0;
-  poly lm;
-#ifdef KDEBUG
-  if (TEST_OPT_DEBUG)
-  {
-    PrintS("red:");
-    wrp(h->p);
-    PrintS(" ");
-  }
-#endif
-
-  kBucketInit(&(strat->bucket), h->p, h->length);
-
-  lm = kBucketGetLm(&(strat->bucket));
-
-  for(;;)
-  {
-#ifdef KDEBUG
-    if (TEST_OPT_DEBUG) Print("%d",j);
-#endif
-    j = 0;
-
-#ifdef KB_HAVE_SHORT_EVECTORS
-    unsigned long ev = ~ pGetShortExpVector(lm);
-#endif
-
-    if (strat->ak)
-    {
-      while(j <= strat->tl)
-      {
-        if (pLmDivisibleBy(strat->T[j].p,lm)) goto Found;
-        j++;
-      }
-    }
-    else
-    {
-      while(j <= strat->tl)
-      {
-#ifdef KB_HAVE_SHORT_EVECTORS
-        if ((strat->T[j].sev & ev) || ! pLmDivisibleByNoComp(strat->T[j].p,lm))
-          j++;
-        else
-          goto Found;
-#else
-        if (pLmDivisibleByNoComp(strat->T[j].p,lm)) goto Found;
-        j++;
-#endif
-      }
-    }
-
-    assume(j > strat->tl);
-    kBucketClear(&(strat->bucket), &(h->p), &(h->length));
-    if (TEST_OPT_INTSTRATEGY) pCleardenom((*h).p);
-    assume(pLength(h->p) == h->length);
-    return;
-
-    Found:
-    // now we found one to reduce with
-    assume(pDivisibleBy(strat->T[j].p,lm));
-
-#ifdef KDEBUG
-    if (TEST_OPT_DEBUG)
-    {
-        wrp(strat->T[j].p);
-    }
-#endif
-    assume(strat->T[j].length <= 0 ||
-           strat->T[j].length == pLength(strat->T[j].p));
-      /*- compute the s-polynomial -*/
-    if (strat->T[j].length <= 0)
-      strat->T[j].length = pLength(strat->T[j].p);
-
-    number up = kBucketPolyRed(&(strat->bucket),
-                               strat->T[j].p, strat->T[j].length,
-                               strat->kNoether);
-    nDelete(&up);
-    lm = kBucketGetLm(&(strat->bucket));
-
-    if (lm == NULL)
-    {
-      h->p = NULL;
-      h->length = 0;
-#ifdef KDEBUG
-      if (TEST_OPT_DEBUG) PrintS(" to 0\n");
-#endif
-      if (h->lcm!=NULL) pLmFree((*h).lcm);
-#ifdef KDEBUG
-      (*h).lcm=NULL;
-#endif
-      return;
-    }
-  }
-}
-
-
-/*2
-*  reduction procedure for the sugar-strategy (honey)
-* reduces h with elements from T choosing first possible
-* element in T with respect to the given ecart
-*/
-void kBucketRedHoney (LObject*  h,kStrategy strat)
-{
-  if (strat->tl<0)
-  {
-    return;
-  }
-
-  poly pi;
-  int i,j,at,reddeg,d,pass,ei, li;
-
-  pass = j = 0;
-  d = reddeg = pFDeg((*h).p)+(*h).ecart;
-#ifdef KDEBUG
-  if (TEST_OPT_DEBUG)
-  {
-    PrintS("red:");
-    wrp((*h).p);
-  }
-#endif
-  kTest(strat);
-
-  if (strat->fromT)
-  {
-    HeapPoly b_hp(h->heap), r_hp(h->p, h->length);
-    pCopyHeapPoly(&b_hp, &r_hp, FALSE);
-    kBucketInit(&(strat->bucket), b_hp.p, b_hp.length, h->heap);
-  }
-  else
-    kBucketInit(&(strat->bucket),  h->p, h->length, h->heap);
-
-  poly lm = kBucketGetLm(&(strat->bucket));
-
-  strat->fromT=FALSE;
-
-  while (1)
-  {
-    j = 0;
-#ifdef KB_HAVE_SHORT_EVECTORS
-    unsigned long ev = ~ pGetShortExpVector(lm);
-#endif
-
-    if (strat->ak)
-    {
-      while(j <= strat->tl)
-      {
-        if (pLmDivisibleBy(strat->T[j].p,lm)) goto Found;
-        j++;
-      }
-    }
-    else
-    {
-      while(j <= strat->tl)
-      {
-#ifdef KB_HAVE_SHORT_EVECTORS
-        if ((strat->T[j].sev & ev) || ! pLmDivisibleByNoComp(strat->T[j].p,lm))
-          j++;
-        else
-          goto Found;
-#else
-        if (pLmDivisibleByNoComp(strat->T[j].p,lm)) goto Found;
-        j++;
-#endif
-      }
-    }
-
-    assume(j > strat->tl);
-#ifdef KDEBUG
-    if (TEST_OPT_DEBUG) PrintLn();
-#endif
-    kBucketClear(&(strat->bucket), &(h->p), &(h->length));
-    if (TEST_OPT_INTSTRATEGY) pCleardenom(h->p);// also does a pContent
-    return;
-
-    Found:
-    assume(pDivisibleBy(strat->T[j].p,lm));
-#ifdef KDEBUG
-    if (TEST_OPT_DEBUG) Print(" T[%d]",j);
-#endif
-    pi = strat->T[j].p;
-    ei = strat->T[j].ecart;
-    li = strat->T[j].length;
-    if (li == 0)
-    {
-      strat->T[j].length = pLength(pi);
-      li =  strat->T[j].length;
-    }
-
-
-    /*
-     * the polynomial to reduce with (up to the moment) is;
-     * pi with ecart ei
-     */
-    i = j;
-    loop
-      {
-        /*- takes the first possible with respect to ecart -*/
-        i++;
-        if (i > strat->tl)
-          break;
-        if ((!TEST_OPT_REDBEST) && (ei <= (*h).ecart))
-          break;
-        if ((strat->T[i].ecart < ei) && pLmDivisibleBy(strat->T[i].p,lm))
-        {
-#ifdef KDEBUG
-          if (TEST_OPT_DEBUG) Print(" T[%d]",i);
-#endif
-          /*
-           * the polynomial to reduce with is now;
-           */
-          pi = strat->T[i].p;
-          ei = strat->T[i].ecart;
-          li = strat->T[i].length;
-          if (li == 0)
-          {
-            strat->T[i].length = pLength(pi);
-            li =  strat->T[i].length;
-          }
-        }
-      }
-
-    /*
-     * end of search: have to reduce with pi
-     */
-    if ((pass!=0) && (ei > (*h).ecart))
-    {
-      /*
-       * It is not possible to reduce h with smaller ecart;
-       * if possible h goes to the lazy-set L,i.e
-       * if its position in L would be not the last one
-       */
-      if (strat->Ll >= 0) /* L is not empty */
-      {
-        h->p = lm;
-        at = strat->posInL(strat->L,strat->Ll,*h,strat);
-        if(at <= strat->Ll)
-          /*- h will not become the next element to reduce -*/
-        {
-          kBucketClear(&(strat->bucket), &(h->p), &(h->length));
-          enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
-#ifdef KDEBUG
-          if (TEST_OPT_DEBUG) Print(" ecart too big: -> L%d\n",at);
-#endif
-          h->p = NULL;
-          h->length = 0;
-          h->heap = NULL;
-          return;
-        }
-      }
-    }
-#ifdef KDEBUG
-    if (TEST_OPT_DEBUG)
-    {
-      PrintS("\nwith ");
-      wrp(pi);
-    }
-#endif
-
-    // Poly Reduction
-    number up = kBucketPolyRed(&(strat->bucket),
-                               pi, li,
-                               strat->kNoether);
-    nDelete(&up);
-    lm = kBucketGetLm(&(strat->bucket));
-
-#ifdef KDEBUG
-    if (TEST_OPT_DEBUG)
-    {
-      PrintS(" to ");
-      wrp((*h).p);
-      PrintLn();
-    }
-#endif
-    if (lm == NULL)
-    {
-      if (h->lcm!=NULL) pLmFree((*h).lcm);
-#ifdef KDEBUG
-      (*h).lcm=NULL;
-#endif
-      h->p = NULL;
-      h->length = 0;
-      return;
-    }
-    /* compute the ecart */
-    if (ei <= (*h).ecart)
-      (*h).ecart = d-pFDeg(lm);
-    else
-      (*h).ecart = d-pFDeg(lm)+ei-(*h).ecart;
-    /*
-     * try to reduce the s-polynomial h
-     *test first whether h should go to the lazyset L
-     *-if the degree jumps
-     *-if the number of pre-defined reductions jumps
-     */
-    pass++;
-    d = pFDeg(lm)+(*h).ecart;
-    if ((strat->Ll >= 0) && ((d > reddeg) || (pass > strat->LazyPass)))
-    {
-      h->p = lm;
-      at = strat->posInL(strat->L,strat->Ll,*h,strat);
-      if (at <= strat->Ll)
-      {
-        kBucketClear(&(strat->bucket), &(h->p), &(h->length));
-        assume(pLength(h->p) == h->length);
-        /*test if h is already standardbasis element*/
-        i=strat->sl+1;
-        do
-        {
-          i--;
-          if (i<0)
-          {
-            // we actually should do a pCleardenom(h->p) here
-            return;
-          }
-        } while (!pLmDivisibleBy(strat->S[i], h->p));
-
-        // enter in Lazyset and return
-        enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
-#ifdef KDEBUG
-        if (TEST_OPT_DEBUG)
-          Print(" degree jumped: -> L%d\n",at);
-#endif
-        h->p = NULL;
-        h->length = 0;
-        h->heap = NULL;
-        return;
-      }
-    }
-    else if (TEST_OPT_PROT && (strat->Ll < 0) && (d > reddeg))
-    {
-      reddeg = d;
-      Print(".%d",d); mflush();
-    }
-  }
-}
-
-/*2
-*compute the normalform of the tail p->next of p
-*with respect to S
-*/
-void kBucketRedTail(LObject *hp, int pos, kStrategy strat)
-{
-  poly h, hn, redstart = NULL;
-  int length = 1, j;
-
-  if (strat->noTailReduction) return;
-  h = hp->p;
-  hn = pNext(h);
-  strat->redTailChange=FALSE;
-
-  while(hn != NULL)
-  {
-    j = 0;
-    while (j <= pos)
-    {
-      if (pDivisibleBy(strat->S[j], hn))
-      {
-        if (redstart == NULL)
-        {
-#ifdef KB_USE_HEAPS
-          int i;
-          if (hp->length <= 0) hp->length = pLength(hp->p);
-          h = hp->p;
-          for (i = 1, h = hp->p; i < length; i++, h = pNext(h));
-          hn = pNext(h);
-#endif
-          strat->redTailChange = TRUE;
-          redstart = h;
-
-          kBucketInit(&(strat->bucket), hn, -1, hp->heap);
-        }
-        number up = kBucketPolyRed(&(strat->bucket), strat->S[j],
-                                   pLength(strat->S[j]),
-                                   strat->kNoether);
-        nDelete(&up);
-        hn = kBucketGetLm(&(strat->bucket));
-        if (hn == NULL)
-        {
-          pNext(h) = NULL;
-          goto Finish;
-        }
-        j = 0;
-      }
-      else
-      {
-        j++;
-      }
-    }
-
-    if (redstart != NULL)
-    {
-      hn = kBucketExtractLm(&(strat->bucket));
-      pNext(h) = hn;
-      h = hn;
-      hn = kBucketGetLm(&(strat->bucket));
-    }
-    else
-    {
-      pNext(h) = hn;
-      h = hn;
-      hn = pNext(h);
-    }
-    length++;
-  }
-
-
-  Finish:
-  assume(pLength(hp->p) == length);
-  hp->length = length;
-}
-
-#endif // KB_USE_BUCKETS
 

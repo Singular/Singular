@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which are of constant time
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline2.h,v 1.5 2000-09-20 12:56:36 obachman Exp $
+ *  Version: $Id: pInline2.h,v 1.6 2000-09-25 12:26:35 obachman Exp $
  *******************************************************************/
 #ifndef PINLINE2_H
 #define PINLINE2_H
@@ -267,7 +267,7 @@ PINLINE2 poly p_Copy(poly p, const ring r)
 PINLINE2 poly p_Copy(poly p, const ring lmRing, const ring tailRing)
 {
 #ifndef PDEBUG
-  if (tailRing->p_Procs->p_Copy == lmRing->p_Procs->p_Copy)
+  if (tailRing == lmRing)
     return tailRing->p_Procs->p_Copy(p, tailRing);
 #endif    
   if (p != NULL)
@@ -289,7 +289,7 @@ PINLINE2 void p_Delete(poly *p, const ring r)
 PINLINE2 void p_Delete(poly *p,  const ring lmRing, const ring tailRing)
 {
 #ifndef PDEBUG
-  if (tailRing->p_Procs->p_Delete == lmRing->p_Procs->p_Delete)
+  if (tailRing == lmRing)
   {
     tailRing->p_Procs->p_Delete(p, tailRing);
     return;
@@ -328,7 +328,7 @@ PINLINE2 poly p_Mult_nn(poly p, number n, const ring lmRing,
                         const ring tailRing)
 {
 #ifndef PDEBUG
-  if (lmRing->p_Procs->p_Mult_nn == tailRing->p_Procs->p_Mult_nn)
+  if (lmRing == tailRing)
   {
     return p_Mult_nn(p, n, tailRing);
   }
@@ -336,7 +336,7 @@ PINLINE2 poly p_Mult_nn(poly p, number n, const ring lmRing,
   poly pnext = pNext(p);
   pNext(p) = NULL;
   p = lmRing->p_Procs->p_Mult_nn(p, n, lmRing);
-  pNext(p) = tailRing->p_Procs->p_Mult_nn(pNext(p), n, tailRing);
+  pNext(p) = tailRing->p_Procs->p_Mult_nn(pnext, n, tailRing);
   return p;
 }
    

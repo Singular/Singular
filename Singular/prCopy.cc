@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: prCopy.cc,v 1.7 2000-09-18 09:19:31 obachman Exp $ */
+/* $Id: prCopy.cc,v 1.8 2000-09-25 12:26:36 obachman Exp $ */
 /*
 * ABSTRACT - implementation of functions for Copy/Move/Delete for Polys
 */
@@ -126,7 +126,7 @@ poly prCopy(poly p)
     res = pr_Copy_REqual_NSimple_NoSort(p, currRing, currRing);
   else
     res = pr_Copy_REqual_NoNSimple_NoSort(p, currRing, currRing);
-  assume(pTest(res));
+  pTest(res);
   return res;
 }
 
@@ -137,7 +137,7 @@ poly prCopyR(poly p, ring src_r)
     res =  pr_Copy_NoREqual_NSimple_Sort(p, src_r, currRing);
   else
     res =  pr_Copy_NoREqual_NoNSimple_Sort(p, src_r, currRing);
-  assume(pTest(res));
+  pTest(res);
   return res;
 }
 
@@ -148,7 +148,7 @@ poly prCopyR_NoSort(poly p, ring src_r)
     res =  pr_Copy_NoREqual_NSimple_NoSort(p, src_r, currRing);
   else
     res =  pr_Copy_NoREqual_NoNSimple_NoSort(p, src_r, currRing);
-  assume(pTest(res));
+  pTest(res);
   return res;
 }
 
@@ -161,7 +161,7 @@ poly prMoveR(poly &p, ring src_r)
     res =  pr_Move_NoREqual_NSimple_Sort(p, src_r, currRing);
   else
     res =  pr_Move_NoREqual_NoNSimple_Sort(p, src_r, currRing);
-  assume(pTest(res));
+  pTest(res);
   return res;
 }
 
@@ -172,7 +172,7 @@ poly prMoveR_NoSort(poly &p, ring src_r)
     res =  pr_Move_NoREqual_NSimple_NoSort(p, src_r, currRing);
   else
     res =  pr_Move_NoREqual_NoNSimple_NoSort(p, src_r, currRing);
-  assume(pTest(res));  
+  pTest(res);  
   return res;
 }
   
@@ -216,7 +216,7 @@ idrCopy(ideal id, ring src_r, ring dest_r, prCopyProc_t prproc)
   {
     p = id->m[i];
     res->m[i] = prproc(p, src_r, dest_r);
-    assume(pTest(res->m[i]));
+    pTest(res->m[i]);
   }
   return res;
 }

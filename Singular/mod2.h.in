@@ -5,7 +5,7 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id: mod2.h.in,v 1.90 2000-09-18 09:19:17 obachman Exp $
+ *  Version: $Id: mod2.h.in,v 1.91 2000-09-25 12:26:34 obachman Exp $
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H
@@ -570,7 +570,8 @@ extern int pShortOut;
 extern "C" {
 #endif
 // routine which is used to report the error
-extern void dReportError(const char* fmt, ...);
+// returns 0
+extern int dReportError(const char* fmt, ...);
 // within a debugger, set a breakpoint on dErrorBreak
 // which is called after the error has been reported
 extern void dErrorBreak();

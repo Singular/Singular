@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.30 2000-09-18 09:19:10 obachman Exp $ */
+/* $Id: kutil.h,v 1.31 2000-09-25 12:26:34 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -15,8 +15,8 @@
 #define setmax 16
 
 #undef NO_KINLINE
-#if defined(NDEBUG) && !defined(NO_INLINE)
-#define KINLINE inline
+#if defined(KDEBUG) && !defined(NO_INLINE)
+#define KINLINE static inline
 #else
 #define KINLINE
 #define NO_KINLINE 1
@@ -34,7 +34,6 @@ public:
     { 
       memset((void*) this, 0, sizeof(sTObject)); 
     }
-  KINLINE poly SetP(poly p_new);
 };
 
 class sLObject
@@ -44,19 +43,22 @@ public:
   poly  tail;
   poly  p1,p2; /*- the pair p comes from -*/
   poly  lcm;   /*- the lcm of p1,p2 -*/
-  int is_bucket;
   int ecart,length, pLength;
   unsigned long sev;
   kBucket_pt bucket;
+  ring lmRing, tailRing;
   sLObject() 
     { 
       memset((void*) this, 0, sizeof(sLObject));
+      lmRing = tailRing = currRing;
     }
   // spoly related things
-  KINLINE poly SetP(poly new_p);
-  KINLINE poly Iter();
+  KINLINE void SetLmTail(poly lm, poly new_p, int use_bucket);
+  KINLINE void Iter(ring r = currRing);
   KINLINE void Tail_Minus_mm_Mult_qq(poly m, poly qq, int lq, poly spNoether);
-  KINLINE poly GetP(ring LmRing);
+  KINLINE void sLObject::Tail_Mult_nn(number n);
+  KINLINE poly GetP(ring LmRing = currRing);
+  KINLINE void CanonicalizeP();
 };
 
 typedef class sTObject TObject;
@@ -100,8 +102,6 @@ public:
   leftv kIdeal;
   intvec * kModW;
   intvec * kHomW;
-  omBin THeap;       // if != NULL, heap for monoms of T
-  BOOLEAN use_redheap; // if TRUE, use extra heap for reductions
   BOOLEAN *pairtest;/*used for enterOnePair*/
   int cp,c3;
   int sl,mu;
@@ -123,6 +123,7 @@ public:
   BOOLEAN noetherSet;
   BOOLEAN update;
   BOOLEAN posInLOldFlag;
+  BOOLEAN use_buckets;
   ring tailRing;
   /*FALSE, if posInL == posInL10*/
   char    redTailChange;
@@ -133,6 +134,8 @@ public:
     {
       memset(this, 0, sizeof(skStrategy));
       tailRing = currRing;
+      P.tailRing = currRing;
+      P.lmRing = currRing;
     };
   
 };
@@ -186,7 +189,6 @@ void cancelunit (LObject* p);
 void HEckeTest (poly pp,kStrategy strat);
 void redtailS (poly* h,int maxIndex);
 void redtailMora (poly* h,int maxIndex);
-void kinitBbaHeaps(kStrategy heap);
 void initBuchMoraCrit(kStrategy strat);
 void initHilbCrit(ideal F, ideal Q, intvec **hilb,kStrategy strat);
 void initBuchMoraPos(kStrategy strat);
@@ -198,31 +200,41 @@ void kFreeStrat(kStrategy strat);
 BOOLEAN homogTest(polyset F, int Fmax);
 BOOLEAN newHEdge(polyset S, int ak,kStrategy strat);
 
+/***************************************************************
+ *
+ * stuff to be inlined
+ *
+ ***************************************************************/
+
 KINLINE TSet initT ();
+KINLINE poly k_LmInit_lmRing_2_tailRing(poly p, ring lmRing, ring tailRing);
+KINLINE poly k_LmInit_tailRing_2_lmRing(poly p, ring tailRing, ring lmRing);
+KINLINE poly k_LmShallowCopyDelete_lmRing_2_tailRing(poly p, ring lmRing, ring tailRing);
+KINLINE poly k_LmShallowCopyDelete_tailRing_2_lmRing(poly p, ring tailRing, ring lmRing);
 
 #ifdef KDEBUG
-#define kTest(A) K_Test(__FILE__,__LINE__,A)
-#define kTest_TS(A) K_Test_TS(__FILE__,__LINE__,A)
-#define kTest_T(T) K_Test_T(__FILE__,__LINE__,T)
-#define kTest_L(L) K_Test_L(__FILE__,__LINE__,L)
-#define kTest_S(strat) K_Test_S(__FILE__,__LINE__,strat)
-#define kTest_Pref(L) K_Test(__FILE__,__LINE__,L, 2)
-BOOLEAN K_Test(char *f, int l,kStrategy strat, int pref=0);
-BOOLEAN K_Test_TS(char *f, int l,kStrategy strat);
-BOOLEAN K_Test_T(char *f, int l, TObject* T, ring tailRing = currRing, int tpos = -1);
-BOOLEAN K_Test_L(char* f, int l, LObject* L, ring tailRing = currRing,
+// test strat
+BOOLEAN kTest(kStrategy strat);
+// test strat, and test that S is contained in T
+BOOLEAN kTest_TS(kStrategy strat);
+// test LObject 
+BOOLEAN kTest_L(LObject* L, ring tailRing = NULL,
                  BOOLEAN testp = FALSE, int lpos = -1,
                  TSet T = NULL, int tlength = -1);
-BOOLEAN K_Test_S(char* f, int l, kStrategy strat);
+// test TObject
+BOOLEAN kTest_T(TObject* T, ring tailRing = currRing, int tpos = -1);
+// test set strat->SevS
+BOOLEAN kTest_S(kStrategy strat);
+#define k_Test_T(t, r)  kTest_T(t, r)
 #else
-#define kTest(A)    (TRUE)
-#define kTest_Pref(A) (TRUE)
-#define kTest_TS(A) (TRUE)
-#define kTest_T(T)  (TRUE)
-#define kTest_S(T)  (TRUE)
-#define kTest_L(T)  (TRUE)
+#define kTest(A)        ((void)0)
+#define kTest_TS(A)     ((void)0)
+#define kTest_T(T)      ((void)0)
+#define kTest_S(T)      ((void)0)
+#define kTest_L(T)      ((void)0)
+#define k_Test_T(T,r)   ((void)0)
 #endif
-#endif
+
 
 /***************************************************************
  *
@@ -263,8 +275,8 @@ void ksReducePolyTail(LObject* PR,
 // Const:   Pair->p1, Pair->p2
 // Changes: Pair->p == S-Poly of p1, p2
 // Assume:  Pair->p1 != NULL && Pair->p2
-void ksCreateSpoly(LObject* Pair,
-                   poly spNoether = NULL);
+void ksCreateSpoly(LObject* Pair, poly spNoether = NULL, 
+                   int use_buckets=0, ring tailRing=currRing);
 
 
 /*2
@@ -300,3 +312,4 @@ void ksOldSpolyTail(poly p1, poly q, poly q2, poly spNoether);
 #include "kInline.cc"
 
 
+#endif

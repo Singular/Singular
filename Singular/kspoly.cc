@@ -1,10 +1,11 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kspoly.cc,v 1.9 2000-09-25 10:44:47 obachman Exp $ */
+/* $Id: kspoly.cc,v 1.10 2000-09-25 12:26:32 obachman Exp $ */
 /*
 *  ABSTRACT -  Routines for Spoly creation and reductions
 */
+#define PDEBUG 2
 #include "mod2.h"
 #include "kutil.h"
 #include "polys.h"
@@ -20,6 +21,9 @@
 #endif
 
 
+#define NEW_STUFF
+
+#ifdef NEW_STUFF
 /***************************************************************
  *
  * Reduces PR with PW
@@ -31,9 +35,212 @@ void ksReducePoly(LObject* PR,
                   poly spNoether,
                   number *coef)
 {
-  assume(kTest_L(PR));
-  assume(kTest_T(PW));
+  
+  kTest_L(PR);
+  k_Test_T(PW, PR->tailRing);
+  
+  poly p1 = PR->p;
+  poly p2 = PW->p;
+  poly t2 = pNext(p2), lm = p1;
+  ring lmRing = PR->lmRing;
+  ring tailRing = PR->tailRing;
 
+  pAssume1(p2 != NULL && p1 != NULL && 
+           p_DivisibleBy(p2,  currRing, p1, lmRing));
+
+  pAssume1(p_GetComp(p1, lmRing) == p_GetComp(p2, currRing) ||
+           (p_GetComp(p2, currRing) == 0 && 
+            p_MaxComp(pNext(p2),tailRing) == 0));
+
+  if (t2==NULL)
+  {
+    PR->Iter();
+    p_LmDelete(lm, lmRing);
+    if (coef != NULL) *coef = n_Init(1, currRing);
+    return;
+  }
+
+  if (! n_IsOne(pGetCoeff(p2), currRing))
+  {
+    number bn = pGetCoeff(lm);
+    number an = pGetCoeff(p2);
+    int ct = ksCheckCoeff(&an, &bn);
+    pSetCoeff(lm, bn);
+    if ((ct == 0) || (ct == 2)) 
+      PR->Tail_Mult_nn(an);
+    if (coef != NULL) *coef = an;
+    else n_Delete(&an, currRing);
+  }
+  else
+  {
+    if (coef != NULL) *coef = n_Init(1, currRing);
+  }
+  
+  if (lmRing != tailRing)
+    k_LmShallowCopyDelete_lmRing_2_tailRing(lm, currRing, tailRing);
+  if (currRing != tailRing)
+  {
+    poly p_temp = k_LmInit_lmRing_2_tailRing(p2, currRing, tailRing);
+    p_ExpVectorSub(lm, p_temp, tailRing);
+    p_LmFree(p_temp, tailRing);
+  }
+  else
+  {
+    p_ExpVectorSub(lm, p2, tailRing);
+  }
+
+  if (PR->bucket != NULL && PW->pLength <= 0)
+    PW->pLength = pLength(PW->p);
+    
+  PR->Tail_Minus_mm_Mult_qq(lm, t2, PW->pLength-1, spNoether);
+
+  PR->Iter();
+  
+  p_LmDelete(lm, tailRing);
+}
+#endif
+
+/***************************************************************
+ *
+ * Creates S-Poly of p1 and p2
+ * 
+ *
+ ***************************************************************/
+#ifdef NEW_STUFF
+void ksCreateSpoly(LObject* Pair,poly spNoether, 
+                   int use_buckets, ring tailRing)
+{
+  assume(kTest_L(Pair));
+  poly p1 = Pair->p1;
+  poly p2 = Pair->p2;
+  Pair->tailRing = tailRing;
+  Pair->lmRing = currRing;
+  
+  
+  assume(p1 != NULL);
+  assume(p2 != NULL);
+  assume(tailRing != NULL);
+
+  poly a1 = pNext(p1), a2 = pNext(p2);
+  number lc1 = pGetCoeff(p1), lc2 = pGetCoeff(p2);
+  poly m1, m2;
+  int co=0, ct = ksCheckCoeff(&lc1, &lc2);
+  int x, l1;
+
+  if (pGetComp(p1)!=pGetComp(p2))
+  {
+    if (pGetComp(p1)==0)
+    {
+      co=1;
+      p_SetCompP(p1,pGetComp(p2), currRing, tailRing);
+    }
+    else
+    {
+      co=2;
+      p_SetCompP(p2, pGetComp(p1), currRing, tailRing);
+    }
+  }
+
+  // get m1 = LCM(LM(p1), LM(p2))/LM(p1)
+  //     m2 = LCM(LM(p1), LM(p2))/LM(p2)
+  m1 = p_Init(tailRing);
+  m2 = p_Init(tailRing);
+  for (int i = pVariables; i; i--)
+  {
+    x = pGetExpDiff(p1, p2, i);
+    if (x > 0)
+    {
+      p_SetExp(m2,i,x, tailRing);
+      p_SetExp(m1,i,0, tailRing);
+    }
+    else
+    {
+      p_SetExp(m1,i,-x, tailRing);
+      p_SetExp(m2,i,0, tailRing);
+    }
+  }
+  p_Setm(m1, tailRing);
+  p_Setm(m2, tailRing);           // now we have m1 * LM(p1) == m2 * LM(p2)
+  pSetCoeff0(m1, lc2);
+  pSetCoeff0(m2, lc1); // and now, m1 * LT(p1) == m2 * LT(p2)
+
+  // get m2 * a2
+  a2 = tailRing->p_Procs->pp_Mult_mm(a2, m2, spNoether, currRing);
+  Pair->SetLmTail(m2, a2, use_buckets);
+
+  // get m2*a2 - m1*a1
+  Pair->Tail_Minus_mm_Mult_qq(m1, a1, 0, spNoether);
+  Pair->Iter();
+  
+  // Clean-up time
+  p_LmDelete(m1, tailRing);
+  p_LmDelete(m2, tailRing);
+  
+  if (co != 0)
+  {
+    if (co==1)
+    {
+      p_SetCompP(p1,0, currRing, tailRing);
+    }
+    else
+    {
+      p_SetCompP(p2,0, currRing, tailRing);
+    }
+  }
+}
+#endif
+
+//////////////////////////////////////////////////////////////////////////
+// Reduces PR at Current->next with PW
+// Assumes PR != NULL, Current contained in PR 
+//         Current->next != NULL, LM(PW) devides LM(Current->next)
+// Changes: PR
+// Const:   PW
+#ifdef NEW_STUFF
+void ksSpolyTail(LObject* PR, TObject* PW, poly Current, poly spNoether)
+{
+  poly Lp = PR->p;
+  number coef;
+  poly Save = PW->p;
+  ring lmRing = PR->lmRing;
+  
+  assume(Lp != NULL && Current != NULL && pNext(Current) != NULL);
+  assume(PR->bucket == NULL);
+  pAssume(pIsMonomOf(Lp, Current));
+
+  if (Lp == Save)
+    PW->p = p_Copy(Save, currRing, PR->tailRing);
+
+  
+  PR->p = pNext(Current);
+  PR->lmRing = PR->tailRing;
+  ksReducePoly(PR, PW, spNoether, &coef);
+  
+  if (! n_IsOne(coef, currRing))
+  {
+    pNext(Current) = NULL;
+    p_Mult_nn(Lp, coef, currRing, PR->tailRing);
+  }
+  n_Delete(&coef, currRing);
+  pNext(Current) = PR->p;
+  PR->p = Lp;
+  PR->lmRing = lmRing;
+  if (PW->p != Save)
+  {
+    p_Delete(&(PW->p), currRing, PR->tailRing);
+    PW->p = Save; // == Lp
+  }
+}
+
+#endif
+
+#ifndef NEW_STUFF
+
+void ksReducePoly(LObject* PR,
+                  TObject* PW,
+                  poly spNoether,
+                  number *coef)
+{
   poly p1 = PR->p;
   poly p2 = PW->p;
 
@@ -78,6 +285,9 @@ void ksReducePoly(LObject* PR,
 
   pDeleteLm(&lm);
 }
+#endif
+
+#ifndef NEW_STUFF
 
 /***************************************************************
  *
@@ -86,8 +296,8 @@ void ksReducePoly(LObject* PR,
  *
  ***************************************************************/
 void ksCreateSpoly(LObject* Pair, 
-                   poly spNoether)
-                   
+                   poly spNoether,
+                   int use_buckets, ring tailRing)
 {
   assume(kTest_L(Pair));
   poly p1 = Pair->p1;
@@ -164,7 +374,9 @@ void ksCreateSpoly(LObject* Pair,
     }
   }
 }
+#endif
 
+#ifndef NEW_STUFF
 //////////////////////////////////////////////////////////////////////////
 // Reduces PR at Current->next with PW
 // Assumes PR != NULL, Current contained in PR 
@@ -201,6 +413,7 @@ void ksSpolyTail(LObject* PR, TObject* PW, poly Current, poly spNoether)
   }
 }
 
+#endif
 
 /***************************************************************
  *

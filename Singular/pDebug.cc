@@ -6,7 +6,7 @@
  *  Purpose: implementation of debug related poly routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pDebug.cc,v 1.4 2000-09-18 09:19:23 obachman Exp $
+ *  Version: $Id: pDebug.cc,v 1.5 2000-09-25 12:26:35 obachman Exp $
  *******************************************************************/
 
 #ifndef PDEBUG_CC
@@ -35,7 +35,7 @@ BOOLEAN dPolyReportError(poly p, ring r, const char* fmt, ...)
   va_list ap;
   va_start(ap, fmt);
   
-  fprintf(stderr, "// ***dPolyError: ");
+  fprintf(stderr, "\n// ***dPolyError: ");
   vfprintf(stderr, fmt, ap);
   fprintf(stderr, "\n occured at\n");
   omPrintCurrentBackTraceMax(stderr, 8);
@@ -189,6 +189,11 @@ BOOLEAN _p_Test(poly p, ring r, int level)
                         == omError_NoError, "memory error");
 
   pFalseReturn(p_CheckRing(r));
+
+  // this checks that p does not contain a loop: rather expensive O(length^2)
+  if (level > 1)
+    pFalseReturn(omTestList(p, level) == omError_NoError);
+  
   int ismod = p_GetComp(p, r) > 0;
   
   while (p != NULL)

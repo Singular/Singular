@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstdfac.cc,v 1.40 2000-09-18 09:19:09 obachman Exp $ */
+/* $Id: kstdfac.cc,v 1.41 2000-09-25 12:26:32 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
@@ -58,7 +58,6 @@ static void copyT (kStrategy o,kStrategy n)
     t[j].ecart=o->T[j].ecart;
     t[j].length=o->T[j].length;
     t[j].sev=o->T[j].sev;
-    // t[j].heap=NULL; // done by Alloc0
   }
   n->T=t;
 }
@@ -91,6 +90,9 @@ static void copyL (kStrategy o,kStrategy n)
     l[j].length=o->L[j].length;
     l[j].p1=NULL;
     l[j].p2=NULL;
+    l[j].lmRing=o->L[j].lmRing;
+    l[j].tailRing=o->L[j].tailRing;
+    l[j].bucket=o->L[j].bucket;
 
     // copy .p1 ----------------------------------------------
     p = o->L[j].p1;
@@ -805,7 +807,6 @@ lists kStdfac(ideal F, ideal Q, tHomog h,intvec ** w,ideal D)
   initBuchMoraPos(strat);
   initBba(F,strat);
   initBuchMora(F, Q,strat);
-  kinitBbaHeaps(strat);
   if (D!=NULL)
   {
     strat->D=idCopy(D);

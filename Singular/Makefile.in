@@ -365,7 +365,7 @@ uninstallbin:
 ## clean targest
 ##
 mostlyclean: 
-	-rm -f Singular Singular-static Singulara Singularg Singularp Singularb libparse feOpt*.inc p_Procs.inc
+	-rm -f Singular Singular-static Singulara Singularg Singularp Singularb libparse feOpt*.inc p_Procs.inc p_Procs_debug.inc
 	-rm -f *.o *.og core *.op *.ob *.ot Singulart *.od *_d.cc *_d.c p_Procs *.oa
 	-rm ESingular* TSingular*
 
@@ -641,9 +641,9 @@ OBJD1 := $(CXXSOURCESD:.cc=.od)
 OBJD2 := $(CSOURCESD:.c=.od)
 
 p_ProcsGen_d.cc: p_Procs.cc p_Procs.h mod2.h 
-	$(CCG) -DGENERATE_P_PROCS ${CPPFLAGS} -E -P p_Procs.cc | $(PERL) -p -e 's/;/;\n/g' | $(PERL) -p -e 's/\{/\n\{/g' | $(PERL) -p -e 's/\}/\n\}/g' > $@
+	$(CCG) -DNDEBUG -DGENERATE_P_PROCS ${CPPFLAGS} -E -P p_Procs.cc | $(PERL) -p -e 's/;/;\n/g' | $(PERL) -p -e 's/\{/\n\{/g' | $(PERL) -p -e 's/\}/\n\}/g' > $@
 p_ProcsGen_d: p_Procs_d.cc
-	gcc -g -Wall -DGENERATE_P_PROCS p_Procs_d.cc -o p_ProcsGen_d
+	gcc -g -Wall -DNDEBUG -DGENERATE_P_PROCS p_Procs_d.cc -o p_ProcsGen_d
 
 %_d.c : %.c
 	$(CCG) $(CFLAGSG) ${CPPFLAGS} -E -P $< | $(PERL) -p -e 's/;/;\n/g' | $(PERL) -p -e 's/\{/\n\{/g' | $(PERL) -p -e 's/\}/\n\}/g' > $@

@@ -312,6 +312,7 @@ struct soptionStruct optionStruct[]=
 {
   {"prot",         Sy_bit(OPT_PROT),           ~Sy_bit(OPT_PROT)   },
   {"redSB",        Sy_bit(OPT_REDSB),          ~Sy_bit(OPT_REDSB)   },
+  {"notBuckets",   Sy_bit(OPT_NOT_BUCKETS),    ~Sy_bit(OPT_NOT_BUCKETS)   },
   /* 2 Gebauer/Moeller */
   {"notSugar",     Sy_bit(OPT_NOT_SUGAR),      ~Sy_bit(OPT_NOT_SUGAR)   },
   {"interrupt",    Sy_bit(OPT_INTERRUPT),      ~Sy_bit(OPT_INTERRUPT)   },

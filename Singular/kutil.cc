@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.62 2000-09-25 10:44:47 obachman Exp $ */
+/* $Id: kutil.cc,v 1.63 2000-09-25 12:26:33 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -230,7 +230,14 @@ void cleanT (kStrategy strat)
 
 LSet initL ()
 {
-  return (LSet)omAlloc(setmax*sizeof(LObject));
+  int i;
+  LSet l = (LSet)omAlloc(setmax*sizeof(LObject));
+  for (i=0;i<setmax;i++)
+  {
+    l[i].lmRing = currRing;
+    l[i].tailRing = currRing;
+  }
+  return l;
 }
 
 static inline void enlargeL (LSet* L,int* length,int incr)
@@ -288,32 +295,37 @@ BOOLEAN isInPairsetB(poly q,int*  k,kStrategy strat)
 }
 
 #ifdef KDEBUG
-BOOLEAN K_Test_L(char *f , int l, LObject *L, ring tailRing,
-                 BOOLEAN testp, int lpos, TSet T, int tlength)
-{
-  BOOLEAN ret = TRUE;
+#define kFalseReturn(x) do { if (!x) return FALSE;} while (0)
 
-  #ifdef PDEBUG
+BOOLEAN kTest_L(LObject *L, ring strat_tailRing, 
+                BOOLEAN testp, int lpos, TSet T, int tlength)
+{
+  ring tailRing = L->tailRing;
+  ring lmRing   = L->lmRing;
+  r_assume(tailRing != NULL && lmRing != NULL);
+  r_assume(strat_tailRing == NULL || strat_tailRing == tailRing);
+
   if (testp)
   {
-    if (! _pp_Test(L->p, currRing, tailRing, PDEBUG))
+    if (L->bucket != NULL)
     {
-      Warn("for L->p");
-      ret = FALSE;
+      kFalseReturn(kbTest(L->bucket));
+      r_assume(L->bucket->bucket_ring == tailRing);
+    }
+    else if (! _pp_Test(L->p, lmRing, tailRing, PDEBUG))
+    {
+      pFalseReturn(pp_Test(L->p, lmRing, tailRing));
     }
   }
-  #endif
 
   if (L->pLength != 0 && L->pLength != pLength(L->p))
-  {
-    dReportError("L[%d] length error: has %d, specified to have %d",
-          lpos, pLength(L->p), L->pLength);
-    ret = FALSE;
-  }
+    return dReportError("L[%d] length error: has %d, specified to have %d",
+                        lpos, pLength(L->p), L->pLength);
+
   if (L->p1 == NULL)
   {
-    // L->p2 either NULL or poly from global heap
-    ret &= _pp_Test(L->p2, currRing, tailRing, PDEBUG);
+    // L->p2 either NULL or "normal" poly
+    pFalseReturn(pp_Test(L->p2, lmRing, tailRing));
   }
   else if (tlength > 0 && T != NULL)
   {
@@ -322,73 +334,53 @@ BOOLEAN K_Test_L(char *f , int l, LObject *L, ring tailRing,
     for (i=0; i<tlength; i++)
       if (L->p1 == T[i].p) break;
     if (i>=tlength)
-    {
-      dReportError("L[%d].p1 not in T",lpos);
-      ret = FALSE;
-    }
+      return dReportError("L[%d].p1 not in T",lpos);
     for (i=0; i<tlength; i++)
       if (L->p2 == T[i].p) break;
     if (i>=tlength)
-    {
-      dReportError("L[%d].p2 not in T",lpos);
-      ret &= FALSE;
-    }
+      return dReportError("L[%d].p2 not in T",lpos);
   }
-  return ret;
+  return TRUE;
 }
 
-BOOLEAN K_Test (char *f, int l, kStrategy strat, int pref)
+BOOLEAN kTest (kStrategy strat)
 {
   int i;
-  BOOLEAN ret = TRUE;
-  // test P
-  ret = K_Test_L(f, l, &(strat->P), strat->tailRing,
-                 (strat->P.p != NULL && pNext(strat->P.p) != strat->tail),
-                 -1, strat->T, strat->tl+1);
 
-  if (ret == FALSE)
-  {
-    Warn("for strat->P");
-  }
+  // test P
+  kFalseReturn(kTest_L(&(strat->P), strat->tailRing,
+                       (strat->P.p != NULL && pNext(strat->P.p)!=strat->tail),
+                       -1, strat->T, strat->tl+1));
 
   // test T
   if (strat->T != NULL)
   {
     for (i=0; i<=strat->tl; i++)
-    {
-      if (K_Test_T(f, l, &(strat->T[i]), strat->tailRing, i) == FALSE)
-      {
-        ret = FALSE;
-      }
-    }
+      kFalseReturn(kTest_T(&(strat->T[i]), strat->tailRing, i));
   }
+
   // test L
   if (strat->L != NULL)
   {
     for (i=0; i<=strat->Ll; i++)
     {
       if (strat->L[i].p == NULL)
-      {
-        dReportError("L[%d].p is NULL", i);
-        ret = FALSE;
-      }
-      if (K_Test_L(f, l, &(strat->L[i]), strat->tailRing,
-                   (pNext(strat->L[i].p) != strat->tail), i,
-                   strat->T, strat->tl + 1) == FALSE)
-      {
-        dReportError("for strat->L[%d]", i);
-        ret = FALSE;
-      }
+        return dReportError("L[%d].p is NULL", i);
+
+      kFalseReturn(kTest_L(&(strat->L[i]), strat->tailRing,
+                           (pNext(strat->L[i].p) != strat->tail), i,
+                           strat->T, strat->tl + 1));
     }
   }
+
   // test S
   if (strat->S != NULL)
-    ret = ret &&  K_Test_S(f, l, strat);
+    kFalseReturn(kTest_S(strat));
 
-  return ret;
+  return TRUE;
 }
 
-BOOLEAN K_Test_S(char* f, int l, kStrategy strat)
+BOOLEAN kTest_S(kStrategy strat)
 {
   int i;
   BOOLEAN ret = TRUE;
@@ -397,37 +389,29 @@ BOOLEAN K_Test_S(char* f, int l, kStrategy strat)
     if (strat->S[i] != NULL && strat->sevS[i] != 0 && strat->sevS[i] !=
         pGetShortExpVector(strat->S[i]))
     {
-      dReportError("S[%d] wrong sev: has %o, specified to have %o in %s:%d",
-           i , pGetShortExpVector(strat->S[i]), strat->sevS[i],f, l);
-      ret = FALSE;
+      return dReportError("S[%d] wrong sev: has %o, specified to have %o",
+                          i , pGetShortExpVector(strat->S[i]), strat->sevS[i]);
     }
   }
   return ret;
 }
 
 
-BOOLEAN K_Test_T(char* f, int l, TObject * T, ring tailRing, int i)
+BOOLEAN kTest_T(TObject * T, ring tailRing, int i)
 {
-  #ifdef PDEBUG
-  BOOLEAN ret = _pp_Test(T->p, currRing, tailRing, PDEBUG);
-  #else
-  BOOLEAN ret=FALSE;
-  #endif
-  if (ret == FALSE) Warn("for T[%d]", i);
+  pFalseReturn(pp_Test(T->p, currRing, tailRing));
   if (T->pLength != 0 &&
       T->pLength != pLength(T->p))
   {
-    dReportError("T[%d] length error: has %d, specified to have %d in %s:%d",
-          i , pLength(T->p), T->pLength,f, l);
-    ret = FALSE;
+    return dReportError("T[%d] length error: has %d, specified to have %d",
+                        i , pLength(T->p), T->pLength);
   }
   if (T->sev != 0 && p_GetShortExpVector(T->p, currRing) != T->sev)
   {
-    dReportError("T[%d] wrong sev: has %o, specified to have %o in %s:%d",
-          i , p_GetShortExpVector(T->p, currRing), T->sev,f, l);
-    ret = FALSE;
+    return dReportError("T[%d] wrong sev: has %o, specified to have %o",
+                        i , p_GetShortExpVector(T->p, currRing), T->sev);
   }
-  return ret;
+  return TRUE;
 }
 
 
@@ -443,28 +427,25 @@ int kFindInT(poly p, TSet T, int tlength)
 }
 
 
-BOOLEAN K_Test_TS(char *f, int l, kStrategy strat)
+BOOLEAN kTest_TS(kStrategy strat)
 {
   int i, j;
   BOOLEAN ret = TRUE;
-  K_Test(f, l, strat);
+  kFalseReturn(kTest(strat));
 
-  // test S
+  // test containment of S inT
   if (strat->S != NULL)
   {
     for (i=0; i<=strat->sl; i++)
     {
       if (kFindInT(strat->S[i], strat->T, strat->tl) < 0)
-      {
-        dReportError("S[%d] not in T", i);
-        ret = FALSE;
-      }
+        return dReportError("S[%d] not in T", i);
     }
   }
-  return ret;
+  return TRUE;
 }
 
-#endif
+#endif // KDEBUG
 
 /*2
 *cancels the i-th polynomial in the standardbase s
@@ -2604,7 +2585,6 @@ void initSL (ideal F, ideal Q,kStrategy strat)
   LObject h;
   int   i,pos;
 
-  /* h.ecart=0; h.length=0;*/ memset(&h,0,sizeof(h));
   if (Q!=NULL) i=IDELEMS(Q);
   else i=0;
   i=((i+16)/16)*16;
@@ -3022,7 +3002,6 @@ void updateS(BOOLEAN toT,kStrategy strat)
 //    if (strat->fromQ!=NULL) Print("(Q:%d) ",strat->fromQ[i]);
 //    pWrite(strat->S[i]);
 //  }
-  memset(&h,0,sizeof(h));
   if (pOrdSgn==1)
   {
     while (suc != -1)
@@ -3266,7 +3245,10 @@ void enterT (LObject p,kStrategy strat)
   strat->T[atT].p = p.p;
   strat->T[atT].ecart = p.ecart;
   strat->T[atT].length = p.length;
-  strat->T[atT].pLength = p.pLength;
+  if (strat->use_buckets && p.pLength <= 0)
+    strat->T[atT].pLength = pLength(p.p);
+  else
+    strat->T[atT].pLength = 0;
   if (p.sev == 0)
   {
     p.sev = pGetShortExpVector(p.p);
@@ -3324,7 +3306,9 @@ void initHilbCrit(ideal F, ideal Q, intvec **hilb,kStrategy strat)
 void initBuchMoraCrit(kStrategy strat)
 {
   strat->sugarCrit =        TEST_OPT_SUGARCRIT;
-  strat->Gebauer =          BTEST1(2) || strat->homog || strat->sugarCrit;
+  // obachman: Hmm.. I need BTEST1(2) for notBuckets ..
+  //  strat->Gebauer =          BTEST1(2) || strat->homog || strat->sugarCrit;
+  strat->Gebauer =          strat->homog || strat->sugarCrit;
   strat->honey =            !strat->homog || strat->sugarCrit || TEST_OPT_WEIGHTM;
   if (TEST_OPT_NOT_SUGAR) strat->honey = FALSE;
   strat->pairtest = NULL;
@@ -3641,13 +3625,6 @@ BOOLEAN newHEdge(polyset S, int ak,kStrategy strat)
 
 void kFreeStrat(kStrategy strat)
 {
-#if 0
-  if (strat->THeap != NULL)
-  {
-    mmMergeHeap(currPolyBin, strat->THeap);
-    mmUnGetTempHeap(&(strat->THeap));
-  }
-#endif
   omFreeSize(strat, sizeof(skStrategy));
 }
 

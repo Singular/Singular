@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.h,v 1.10 2000-09-12 16:00:58 obachman Exp $ */
+/* $Id: kbuckets.h,v 1.11 2000-09-25 12:26:31 obachman Exp $ */
 #include "structs.h"
 
 /////////////////////////////////////////////////////////////////////////
@@ -26,14 +26,15 @@ void kBucketDestroy(kBucket_pt *bucket);
 
 // Converts p into a bucket poly (Bpoly) and destroys p
 // Assumes length <= 0 || pLength(p) == length
-//         Monoms of p are from heap
-//         Uses heap for intermediate monom allocations
 void kBucketInit(kBucket_pt bucket, poly p, int length);
 
 // Converts Bpoly into a poly and clears bucket
 // i.e., afterwards Bpoly == 0
 void kBucketClear(kBucket_pt bucket, poly *p, int *length);
 
+// Canonicalizes Bpoly, i.e. converts polys of buckets into one poly in
+// one bucket: Returns number of bucket into which it is canonicalized
+int kBucketCanonicalize(kBucket_pt bucket);
 
 /////////////////////////////////////////////////////////////////////////////
 // Gets leading monom of bucket, does NOT change Bpoly!!!!!
@@ -94,6 +95,17 @@ void kBucket_Mult_n(kBucket_pt bucket, number n);
 void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
                             poly spNother = NULL);
 
+
+//////////////////////////////////////////////////////////////////////////
+///
+/// Tests
+/// 
+/// 
+#ifdef KDEBUG 
+BOOLEAN kbTest(kBucket_pt bucket);
+#else
+#define kbTest(bucket)  ((void)0)
+#endif
 
 //////////////////////////////////////////////////////////////////////////
 ///

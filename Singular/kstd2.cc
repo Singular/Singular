@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.47 2000-09-18 09:19:08 obachman Exp $ */
+/* $Id: kstd2.cc,v 1.48 2000-09-25 12:26:32 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -66,7 +66,7 @@ static int redHomog (LObject* h,kStrategy strat)
     {
       if (j > strat->tl) return 1;
       if (pLmShortDivisibleBy(strat->T[j].p, strat->T[j].sev, 
-                            h->p, not_sev)) break;
+                              h->p, not_sev)) break;
       j++;
     }
     
@@ -255,6 +255,7 @@ static int redHoney (LObject*  h,kStrategy strat)
         if(at <= strat->Ll)
           /*- h will not become the next element to reduce -*/
         {
+          h->CanonicalizeP();
           enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
           if (TEST_OPT_DEBUG) Print(" ecart too big: -> L%d\n",at);
           (*h).p = NULL;
@@ -324,6 +325,7 @@ static int redHoney (LObject*  h,kStrategy strat)
           if (i<0) return 1;
         } while (!pLmShortDivisibleBy(strat->S[i], strat->sevS[i], 
                                     h->p, not_sev));
+        h->CanonicalizeP();
         enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
         if (TEST_OPT_DEBUG)
           Print(" degree jumped: -> L%d\n",at);
@@ -552,17 +554,6 @@ void initBba(ideal F,kStrategy strat)
   }
 }
 
-void kinitBbaHeaps(kStrategy heap)
-{
-#if 0
-  // use extra heap for monoms of T, if not syzcomp
-  if (!strat->red == redSyz)
-  {
-    strat->THeap = mmCreateTempHeap();
-  }
-#endif
-}
-
 ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 {
   int   srmax,lrmax, red_result;
@@ -576,11 +567,16 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   /*set enterS, spSpolyShort, reduce, red, initEcart, initEcartPair*/
   /*Shdl=*/initBuchMora(F, Q,strat);
   if (strat->minim>0) strat->M=idInit(IDELEMS(F),F->rank);
-  kinitBbaHeaps(strat);
   srmax = strat->sl;
   reduc = olddeg = lrmax = 0;
-  /* compute------------------------------------------------------- */
+
+  if (!TEST_OPT_NOT_BUCKETS && 
+      (strat->red == redHomog || strat->red == redHoney))
+    strat->use_buckets = 1;
+
   kTest_TS(strat);
+  
+  /* compute------------------------------------------------------- */
   while (strat->Ll >= 0)
   {
     if (strat->Ll > lrmax) lrmax =strat->Ll;/*stat.*/
@@ -608,7 +604,9 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       pLmFree(strat->P.p);
       /* the real one */
       ksCreateSpoly(&(strat->P),
-                    strat->kNoether);
+                    strat->kNoether,
+                    strat->use_buckets, 
+                    strat->tailRing);
     }
     if((strat->P.p1==NULL) && (strat->minim>0)) strat->P.p2=pCopy(strat->P.p);
 
@@ -624,6 +622,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     {
       /* statistic */
       if (TEST_OPT_PROT) PrintS("s");
+      strat->P.GetP();
       /* enter P.p into s and L */
       {
         int pos=posInS(strat->S,strat->sl,strat->P.p);
@@ -633,6 +632,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
           if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
           {
             strat->P.p = redtailBba(strat->P.p,pos-1,strat);
+            if (strat->redTailChange)  strat->P.pLength = 0;
             pCleardenom(strat->P.p);
           }
         }
@@ -640,7 +640,10 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         {
           pNorm(strat->P.p);
           if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
+          {
             strat->P.p = redtailBba(strat->P.p,pos-1,strat);
+            if (strat->redTailChange)  strat->P.pLength = 0;
+          }
         }
 
         if (TEST_OPT_DEBUG){PrintS("new s:");wrp(strat->P.p);PrintLn();}
