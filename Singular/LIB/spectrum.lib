@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: spectrum.lib,v 1.17 2002-03-06 14:22:12 mschulze Exp $";
+version="$Id: spectrum.lib,v 1.18 2003-05-30 09:49:37 mschulze Exp $";
 category="Singularities";
 info="
 LIBRARY:  spectrum.lib  Singularity Spectrum for Nondegenerate Singularities
@@ -24,7 +24,7 @@ list S:
 @end format
 NOTE:     if a second argument 1 is given,
           no test for a degenerate principal part will be done
-SEE_ALSO: gaussman_lib
+SEE_ALSO: gmssing_lib
 KEYWORDS: singularities; Gauss-Manin connection; spectrum
 EXAMPLE:  example spectrumnd; shows an example
 "
@@ -59,12 +59,12 @@ example
 
 proc semicont(list #)
 {
-  ERROR("semicont was replaced by spsemicont in gaussman.lib");
+  ERROR("semicont was replaced by spsemicont in gmssing.lib");
 }
 ///////////////////////////////////////////////////////////////////////////////
 
 proc semicontqh(list #)
 {
-  ERROR("semicontqh was replaced by spsemicont in gaussman.lib");
+  ERROR("semicontqh was replaced by spsemicont in gmssing.lib");
 }
 ///////////////////////////////////////////////////////////////////////////////
