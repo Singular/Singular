@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_complex.h,v 1.2 1999-05-17 11:31:45 Singular Exp $ */
+/* $Id: mpr_complex.h,v 1.3 1999-06-15 16:39:00 Singular Exp $ */
 
 /* 
 * ABSTRACT - multipolynomial resultants - real floating-point numbers using gmp
@@ -117,7 +117,7 @@ gmp_float exp( const gmp_float & );
 gmp_float max( const gmp_float &, const gmp_float & );
 
 gmp_float numberToFloat( number num );
-char *floatToStr( const gmp_float & r, const unsigned int oprec );
+char *floatToStr( const gmp_float & r, const size_t oprec );
 
 typedef gmp_float mprfloat_g;
 //<-
@@ -173,7 +173,7 @@ inline complex numberToComplex( number num )
 {
   return complex( numberToFloat(num) );
 }
-char *complexToStr( const complex & c, const  unsigned int oprec );
+char *complexToStr( const complex & c, const  size_t oprec );
 //<-
 
 #endif MPR_COMPLEX_H
