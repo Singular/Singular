@@ -484,85 +484,87 @@ void sleftv::Copy(leftv source)
   rtyp=source->Typ();
   void *d=source->Data();
   if(!errorreported)
-  switch (rtyp)
   {
-    case INTVEC_CMD:
-    case INTMAT_CMD:
-      data=(void *)ivCopy((intvec *)d);
-      break;
-    case MATRIX_CMD:
-      data=(void *)mpCopy((matrix)d);
-      break;
-    case IDEAL_CMD:
-    case MODUL_CMD:
-      data= (void *)idCopy((ideal)d);
-      break;
-    case STRING_CMD:
-      data= (void *)mstrdup((char *)d);
-      break;
-    case POINTER_CMD:
-      data=d;
-      break;
-    case PROC_CMD:
-      data= (void *)piCopy((procinfov) d);
-      break;
-    case POLY_CMD:
-    case VECTOR_CMD:
-      data= (void *)pCopy((poly)d);
-      break;
-    case INT_CMD:
-      data= d;
-      break;
-    case NUMBER_CMD:
-      data= (void *)nCopy((number)d);
-      break;
-    case MAP_CMD:
-      data= (void *)maCopy((map)d);
-      break;
-    case LIST_CMD:
-      data= (void *)lCopy((lists)d);
-      break;
-    case LINK_CMD:
-      data = (void *)slCopy((si_link)d);
-      break;
-    case RING_CMD:
-    case QRING_CMD:
-      {
-        if (d!=NULL)
-        {
-          ring r=(ring)d;
-          r->ref++;
-          data=d;
-        }
-        else
-        {
-          WerrorS("invalid ring description");
-        }
+    switch (rtyp)
+    {
+      case INTVEC_CMD:
+      case INTMAT_CMD:
+        data=(void *)ivCopy((intvec *)d);
         break;
-      }
-    case RESOLUTION_CMD:
-      data=(void*)syCopy((syStrategy)d);
-      break;
-#ifdef TEST
-    case DEF_CMD:
-    case NONE:
-      break; /* error recovery: do nothing */
-    //case COMMAND:
-    default:
-      Warn("Copy: cannot copy type %s(%d)",Tok2Cmdname(rtyp),rtyp);
-#endif
-  }
-  flag=source->flag;
+      case MATRIX_CMD:
+        data=(void *)mpCopy((matrix)d);
+        break;
+      case IDEAL_CMD:
+      case MODUL_CMD:
+        data= (void *)idCopy((ideal)d);
+        break;
+      case STRING_CMD:
+        data= (void *)mstrdup((char *)d);
+        break;
+      case POINTER_CMD:
+        data=d;
+        break;
+      case PROC_CMD:
+        data= (void *)piCopy((procinfov) d);
+        break;
+      case POLY_CMD:
+      case VECTOR_CMD:
+        data= (void *)pCopy((poly)d);
+        break;
+      case INT_CMD:
+        data= d;
+        break;
+      case NUMBER_CMD:
+        data= (void *)nCopy((number)d);
+        break;
+      case MAP_CMD:
+        data= (void *)maCopy((map)d);
+        break;
+      case LIST_CMD:
+        data= (void *)lCopy((lists)d);
+        break;
+      case LINK_CMD:
+        data = (void *)slCopy((si_link)d);
+        break;
+      case RING_CMD:
+      case QRING_CMD:
+        {
+          if (d!=NULL)
+          {
+            ring r=(ring)d;
+            r->ref++;
+            data=d;
+          }
+          else
+          {
+            WerrorS("invalid ring description");
+          }
+          break;
+        }
+      case RESOLUTION_CMD:
+        data=(void*)syCopy((syStrategy)d);
+        break;
+      #ifdef TEST
+      case DEF_CMD:
+      case NONE:
+        break; /* error recovery: do nothing */
+      //case COMMAND:
+      default:
+        Warn("Copy: cannot copy type %s(%d)",Tok2Cmdname(rtyp),rtyp);
+      #endif
+    }
+    flag=source->flag;
 #ifdef HAVE_NAMESPACES
-  packhdl = source->packhdl;
-  req_packhdl = source->req_packhdl;
+    packhdl = source->packhdl;
+    req_packhdl = source->req_packhdl;
 #endif /* HAVE_NAMESPACES */
-  if ((source->attribute!=NULL)||(source->e!=NULL))
-    attribute=source->CopyA();
-  if (source->next!=NULL)
-  {
-    next=(leftv)Alloc(sizeof(sleftv));
-    next->Copy(source->next);
+    if ((source->attribute!=NULL)||(source->e!=NULL))
+      attribute=source->CopyA();
+    if (source->next!=NULL)
+    {
+      next=(leftv)Alloc(sizeof(sleftv));
+      next->Copy(source->next);
+    }
   }
 }
 
@@ -587,13 +589,13 @@ void * sleftv::CopyD(int t)
 
 void * sleftv::CopyD()
 {
-  if ((rtyp!=IDHDL)&&(e==NULL)
-  &&(rtyp!=VNOETHER)&&(rtyp!=LIB_CMD)&&(rtyp!=VMINPOLY))
-  {
-    void *x=data;
-    data=NULL;
-    return x;
-  }
+  //if ((rtyp!=IDHDL)&&(e==NULL)
+  //&&(rtyp!=VNOETHER)&&(rtyp!=LIB_CMD)&&(rtyp!=VMINPOLY))
+  //{
+  //  void *x=data;
+  //  data=NULL;
+  //  return x;
+  //}
   return CopyD(Typ());
 }
 

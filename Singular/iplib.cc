@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.36 1998-10-21 10:25:34 krueger Exp $ */
+/* $Id: iplib.cc,v 1.37 1998-10-21 15:56:06 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -109,7 +109,7 @@ char * iiProcArgs(char *e,BOOLEAN withParenth)
     {
       *e='\0';
       // check for space:
-      if (strlen(argstr)+12 /* parameter + ;*/ +strlen(s)>= argstrlen)
+      if ((int)strlen(argstr)+12 /* parameter + ;*/ +(int)strlen(s)>= argstrlen)
       {
         argstrlen*=2;
         char *a=(char *)AllocL( argstrlen);

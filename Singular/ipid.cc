@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.19 1998-10-21 10:25:32 krueger Exp $ */
+/* $Id: ipid.cc,v 1.20 1998-10-21 15:56:05 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -43,15 +43,46 @@ idhdl idrec::get(const char * s, int lev)
   idhdl h = this;
   idhdl found=NULL;
   int l;
+  char *id;
   while (h!=NULL)
   {
-    l=IDLEV(h);
     mmTestLP(IDID(h));
-    if ((l==lev) && (0 == strcmp(s,IDID(h)))) return h;
-    if ((l==0) && (found==NULL) && (0 == strcmp(s,IDID(h))))
+//    id=IDID(h);
+//    l=IDLEV(h);
+//    if ((l==0) && (*(short *)s==*(short *)id) && (0 == strcmp(s+1,id+1)))
+//    {
+//      found=h;
+//    }
+//    else if ((l==lev) && (*(short *)s==*(short *)id) && (0 == strcmp(s+1,id+1)))
+//    {
+//      return h;
+//    }  
+    id=IDID(h);
+    if (*(short *)s==*(short *)id)
     {
-      found=h;
+      l=IDLEV(h);
+      if ((l==0) && (0 == strcmp(s+1,id+1)))
+      {
+        found=h;
+      }
+      else if ((l==lev) && (0 == strcmp(s+1,id+1)))
+      {
+        return h;
+      }
     }
+//    l=IDLEV(h);
+//    if ((l==0)||(l==lev))
+//    { 
+//      id=IDID(h);
+//      if (*(short *)s==*(short *)id)
+//      {
+//        if (0 == strcmp(s+1,id+1))
+//        {
+//          if (l==lev) return h;
+//          found=h;
+//        }
+//      }
+//    }
     h = IDNEXT(h);
   }
   return found;

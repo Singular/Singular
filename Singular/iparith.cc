@@ -132,9 +132,6 @@ cmdnames cmds[] =
   { "coeffs",      0, COEFFS_CMD ,        CMD_23},
   { "continue",    0, CONTINUE_CMD ,      CONTINUE_CMD},
   { "contract",    0, CONTRACT_CMD ,      CMD_2},
-  #ifdef DRING
-  { "dring",       0, DRING_CMD,          DRING_CMD},
-  #endif
   { "dbprint",     0, DBPRINT_CMD ,       CMD_M},
   { "def",         0, DEF_CMD ,           ROOT_DECL},
   { "defined",     0, DEFINED_CMD ,       CMD_1},
@@ -5481,18 +5478,29 @@ int IsCmd(char *n, int & tok)
       }
     }
     i=(an+en)/2;
-    v=strcmp(n,cmds[i].name);
-    if(v<0)
+    if (*n < *(cmds[i].name))
     {
       en=i;
     }
-    else if(v>0)
+    else if (*n > *(cmds[i].name))
     {
       an=i;
     }
-    else /*v==0*/
+    else
     {
-      break;
+      v=strcmp(n,cmds[i].name);
+      if(v<0)
+      {
+        en=i;
+      }
+      else if(v>0)
+      {
+        an=i;
+      }
+      else /*v==0*/
+      {
+        break;
+      }
     }
   }
   lastreserved=cmds[i].name;

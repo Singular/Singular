@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.36 1998-10-21 10:25:30 krueger Exp $ */
+/* $Id: ipassign.cc,v 1.37 1998-10-21 15:56:04 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -866,7 +866,7 @@ static BOOLEAN jjA_L_LIST(leftv l, leftv r)
     r=r->next;
     h->next=NULL;
     rt=h->Typ();
-    if ((rt==0)||(rt==NONE))
+    if ((rt==0)||(rt==NONE)||(rt==DEF_CMD))
     {
       L->Clean();
       Werror("`%s` is undefined",h->Fullname());
@@ -904,7 +904,7 @@ static BOOLEAN jiA_L_LIST(leftv l, leftv r)
 {
   int sl = r->listLength();
   lists L=(lists)Alloc(sizeof(slists));
-  leftv h=NULL;
+  leftv h=NULL,o_r=r;
   int i;
   int rt;
 
@@ -923,14 +923,8 @@ static BOOLEAN jiA_L_LIST(leftv l, leftv r)
     rt=h->Typ();
     if ((rt==0)||(rt==DEF_CMD))
     {
-//<<<<<<< ipassign.cc
-//      L->Clean();
-//      Werror("`%s` is undefined",h->Fullname());
-//      return TRUE;
-//=======
-      Werror("`%s` is undefined",h->Name());
+      Werror("`%s` is undefined",h->Fullname());
       goto err;
-//>>>>>>> 1.35
     }
     if ((rt==RING_CMD)||(rt==QRING_CMD))
     {
@@ -938,14 +932,16 @@ static BOOLEAN jiA_L_LIST(leftv l, leftv r)
       L->m[i].data=h->Data();
       ((ring)L->m[i].data)->ref++;
     }
-    else
-      L->m[i].Copy(h);
+    L->m[i].Copy(h);
     if(errorreported)  goto err;
   }
   IDLIST((idhdl)l->data)->Clean();
   IDLIST((idhdl)l->data)=L;
+  ipMoveId((idhdl)l->data);
+  o_r->CleanUp();
   return FALSE;
 err:
+  o_r->CleanUp();
   L->Clean();
   return TRUE;
 }
@@ -1256,10 +1252,7 @@ BOOLEAN iiAssign(leftv l, leftv r)
     && (((l->rtyp==IDHDL) && (IDTYP((idhdl)l->data)==LIST_CMD))
       || (l->rtyp==LIST_CMD)))
     {
-       if(r->next!=NULL)
-         b=jiA_L_LIST(l,r);
-       else
-         b=jiAssign_list(l,r);
+       b=jiAssign_list(l,r);
        if(!b)
        {
          //Print("jjA_L_LIST: - 2 \n");
