@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: imm.h,v 1.8 1997-11-20 15:25:05 schmidt Exp $ */
+/* $Id: imm.h,v 1.9 1997-12-09 08:54:42 schmidt Exp $ */
 
 #ifndef INCL_IMM_H
 #define INCL_IMM_H
@@ -27,11 +27,14 @@ const int GFMARK = 3;
 const int MINIMMEDIATE = -268435454; // -2^28-2
 const int MAXIMMEDIATE = 268435454;  // 2^28-2
 #ifdef macintosh
-const long long int MINIMMEDIATELL = -268435454;
-const long long int MAXIMMEDIATELL = 268435454;
+const INT64 MINIMMEDIATELL = -268435454;
+const INT64 MAXIMMEDIATELL = 268435454;
+#elif defined WINNT
+const INT64 MINIMMEDIATELL = -268435454i64;
+const INT64 MAXIMMEDIATELL = 268435454i64;
 #else
-const long long int MINIMMEDIATELL = -268435454LL;
-const long long int MAXIMMEDIATELL = 268435454LL;
+const INT64 MINIMMEDIATELL = -268435454LL;
+const INT64 MAXIMMEDIATELL = 268435454LL;
 #endif
 
 //{{{ conversion functions
@@ -175,8 +178,10 @@ imm_sign ( const InternalCF * const op )
 }
 //}}}
 
-//{{{ comparison operators
-inline int imm_cmp ( const InternalCF * const lhs, const InternalCF * const rhs )
+//{{{ inline int imm_cmp, imm_cmp_p, imm_cmp_gf ( const InternalCF * const lhs, const InternalCF * const rhs )
+// docu: see CanonicalForm::operator <(), CanonicalForm::operator ==()
+inline int
+imm_cmp ( const InternalCF * const lhs, const InternalCF * const rhs )
 {
     if ( imm2int( lhs ) == imm2int( rhs ) )
 	return 0;
@@ -186,7 +191,8 @@ inline int imm_cmp ( const InternalCF * const lhs, const InternalCF * const rhs 
 	return -1;
 }
 
-inline int imm_cmp_p ( const InternalCF * const lhs, const InternalCF * const rhs )
+inline int
+imm_cmp_p ( const InternalCF * const lhs, const InternalCF * const rhs )
 {
     if ( imm2int( lhs ) == imm2int( rhs ) )
 	return 0;
@@ -194,7 +200,8 @@ inline int imm_cmp_p ( const InternalCF * const lhs, const InternalCF * const rh
 	return 1;
 }
 
-inline int imm_cmp_gf ( const InternalCF * const lhs, const InternalCF * const rhs )
+inline int
+imm_cmp_gf ( const InternalCF * const lhs, const InternalCF * const rhs )
 {
     if ( imm2int( lhs ) == imm2int( rhs ) )
 	return 0;
@@ -244,7 +251,7 @@ inline InternalCF * imm_sub_gf ( const InternalCF * const lhs, const InternalCF 
 
 inline InternalCF * imm_mul ( InternalCF * lhs, InternalCF * rhs )
 {
-    long long int result = (long long int)imm2int( lhs ) * imm2int( rhs );
+    INT64 result = (INT64)imm2int( lhs ) * imm2int( rhs );
     if ( ( result > MAXIMMEDIATELL ) || ( result < MINIMMEDIATELL ) ) {
 	InternalCF * res = CFFactory::basic( IntegerDomain, imm2int( lhs ), true );
 	return res->mulcoeff( rhs );
