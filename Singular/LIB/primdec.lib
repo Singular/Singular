@@ -1,4 +1,4 @@
-// $Id: primdec.lib,v 1.40 1999-07-26 13:37:49 Singular Exp $
+// $Id: primdec.lib,v 1.41 1999-07-28 10:21:30 Singular Exp $
 ////////////////////////////////////////////////////////////////////////////////
 // primdec.lib                                                                //
 // algorithms for primary decomposition based on                              //
@@ -10,7 +10,7 @@
 // written by Wolfram Decker and Hans Schoenemann                             //
 ////////////////////////////////////////////////////////////////////////////////
 
-version="$Id: primdec.lib,v 1.40 1999-07-26 13:37:49 Singular Exp $";
+version="$Id: primdec.lib,v 1.41 1999-07-28 10:21:30 Singular Exp $";
 info="
 LIBRARY: primdec.lib      PROCEDURES FOR PRIMARY DECOMPOSITION
 AUTHORS:  Gerhard Pfister, email: pfister@mathematik.uni-kl.de (GTZ)
@@ -19,9 +19,9 @@ AUTHORS:  Gerhard Pfister, email: pfister@mathematik.uni-kl.de (GTZ)
 
 PROCEDURES:
   primdecGTZ(I);    complete primary decomposition via Gianni,Trager,Zacharias
-  primdecSY(I);     complete primary decomposition via Shimoyama-Yokoyama
+  primdecSY(I...);  complete primary decomposition via Shimoyama-Yokoyama
   minAssGTZ(I);     the minimal associated primes via Gianni,Trager,Zacharias
-  minAssChar(I);    the minimal associated primes using characteristic sets
+  minAssChar(I...); the minimal associated primes using characteristic sets
   testPrimary(L,k); tests the result of the primary decomposition
   radical(I);       computes the radical of the ideal I
   equiRadical(I);   the radical of the equidimensional part of the ideal I
@@ -2832,10 +2832,8 @@ proc radicalEHV(ideal i,ideal re,list #)
          }
          if(il==1)
          {
-
-            return(radI1);
+           return(radI1);
          }
-
          I2=sat(I,radI1)[1];
 
          if(deg(I2[1])<=0)
@@ -4023,8 +4021,12 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc primdecSY(ideal i)
-"USAGE:  primdecSY(i); i ideal
+proc primdecSY(ideal i, list #)
+"USAGE:  primdecSY(i[,c]); i ideal
+         if c=0, the given ordering of the variables is used.
+         if c=1, minAssChar tries to use an optimal ordering,
+         if c=2, minAssGTZ is used
+         if c=3, minAssGTZ and facstd is used
 RETURN:  a list, say pr, of primary ideals and their associated primes
          pr[i][1], resp. pr[i][2] is the i-th primary resp. prime component
 NOTE:    Algorithm of Shimoyama-Yokoyama
@@ -4033,7 +4035,10 @@ NOTE:    Algorithm of Shimoyama-Yokoyama
 EXAMPLE: example primdecSY; shows an example
 "
 {
-   return(prim_dec(i,1));
+   if (size(#)==1)
+   { return(prim_dec(i,1)); }
+   else
+   { return(prim_dec(i,#[1])); }
 }
 example
 { "EXAMPLE:";  echo = 2;
@@ -4067,15 +4072,21 @@ example
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-proc minAssChar(ideal i)
-"USAGE:  minAssChar(i); i ideal
+proc minAssChar(ideal i, list #)
+"USAGE:   minAssChar(i[,c]); i ideal,
+         if c=0, the given ordering of the variables is used.
+         Otherwise, the system tries to find an optimal ordering,
+         which in some cases may considerably speed up the algorithm
 RETURN:  list = the minimal associated prime ideals of i
 NOTE:    implemented for characteristic 0, works also in char k > 0,
          the result may be not completely decomposed in small characteristic
 EXAMPLE: example minAssChar; shows an example
 "
 {
-   return(min_ass_prim_charsets(i,1));
+  if (size(#)==1)
+  { return(min_ass_prim_charsets(i,#[1])); }
+  else
+  { return(min_ass_prim_charsets(i,1)); }
 }
 example
 { "EXAMPLE:";  echo = 2;
