@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.34 1998-05-08 15:49:45 Singular Exp $
+@comment $Id: reference.doc,v 1.35 1998-05-08 16:03:18 obachman Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -3905,7 +3905,7 @@ See @ref{ideal expressions}; @ref{vector expressions}; @ref{std}.
 @cindex regularity
 @table @code
 @item @strong{Syntax:}
-@code{regularity (} list_expression @code{)}}
+@code{regularity (} list_expression @code{)}
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
@@ -4629,22 +4629,35 @@ depends on the desired function, may be none
 @item @strong{Purpose:}
 interface to internal data and the operating system.
 @*Not all functions will work on every platform.
-@item @strong{functions}
-@code{system("sh"},string_expression @code{)} is the shell escape,
-  returns the return code of the shell@*
-@code{system("pid")} return the process number (for creating unique names)@*
-@code{system("getenv",}string_expression@code{)}
-  return shell environment variable given as the second argument@*
-@code{system("tty")} reset the terminal@*
-@code{system("version")} return the version number of  @sc{Singular}
-(type int)@*
-@code{system("random"},int_expression @code{)} reset the random generator to the given value@*
-@c @code{system("writemat"},file_name,matrix_expression@code{)} append a matrix
-@c in the Macaulay format to the file.@*
-@code{system("gen")} return the generating element of the multiplicative
-group of Z/p\@{0@} (as int) where p is the characteristic of the basering@*
-@code{system("HC")} return the order of the highest corner of the last @code{std}
-computation or 0.
+@item @strong{Functions}
+@table @code
+@item @code{system("sh"},string_expression @code{)} 
+shell escape, returns the return code of the shell
+@item @code{system("pid")} 
+returns the process number (for creating unique names)
+@item @code{system("getenv",}string_expression@code{)}
+returns shell environment variable given as the second argument
+@item @code{system("tty")} 
+resets the terminal
+@item @code{system("version")} 
+returns the version number of  @sc{Singular} (type int)
+@item @code{system("random"},int_expression @code{)} 
+resets the random generator to the given value and return it (type int)
+@item @code{system("random")} 
+returns the seed of the random generator (type int)
+@item @code{system("gen")} 
+returns the generating element of the multiplicative
+group of Z/p\@{0@} (as int) where p is the characteristic of the basering
+@item @code{system("HC")} 
+returns the order of the highest corner of the last
+computation or 0
+@item @code{system("whoami")} 
+returns the absolute (path) name of the running @sc{Singular} (type string)
+@item @code{system("--option_name")} 
+returns the value of the (command-line)
+option @code{"option_name"}; for on/off options, the return value is of type 
+int and either 1 or 0; for all other options, the return type is string.
+@end table
 @item @strong{Example for UNIX:}
 @example
   // a listing of the current directory:
@@ -4656,6 +4669,11 @@ computation or 0.
   @expansion{} /tmp/xx4711
   system("getenv","PATH");
   @expansion{} /bin:/usr/bin:/usr/local/bin
+  system("whoami");
+  @expansion{} /usr/local/bin/Singular
+  // report minimal display time
+  system("--min-time");
+  @expansion{} 0.5
 @end example
 @item @strong{Example for MSDOS:}
 @example
@@ -5428,6 +5446,7 @@ See @ref{Control structures}; @ref{boolean expressions}; @ref{break}.
 * short::
 * timer::
 * TRACE var::
+* rtimer::
 * voice::
 @end menu
 @c ---------------------------------------
@@ -5691,26 +5710,41 @@ the previous setting.
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
-the time used for each command will be printed if timer >0 and if this
-time is bigger than approx. 0.5 sec.
-@*Default setting of timer is 0.
-@*How to use timer in order to measure the time for a sequence of commands,
-see example below.
+(1) the CPU time used for each command is printed if timer >0 and if this
+time is bigger than a (customizable) minimal time; 
+@*(2) yields the used CPU time since the start-up of @sc{Singular} in a
+(customizable) resolution.
+
+The default setting of @code{timer} is 0, the default minimal time is
+0.5 seconds, and the default timer resolution is 1 (i.e., default unit
+of time is one second). The minimal time and timer resolution
+can be set using the commandline options @code{--min-time} and
+@code{--ticks-per-sec} and can be checked using
+@code{system("--min-time")} and @code{system("--ticks-per-sec")}. 
+
+How to use @code{timer} in order to measure the time for a sequence of
+commands, see example below.
 @item @strong{Example:}
 @example
 @c example
   timer = 1; // The time of each command is printed
-  int t=timer;
+  int t=timer; // initialize t by timer
   ring r=0,(x,y,z),dp;
   poly p=(x+2y+3z+4xy+5xz+6yz)^20;
   // timer as int_expression:
-  timer-t;  // returns the time used in sec
-            // since t was set to timer
+  t = timer - t;
+  t;  // yields the time in ticks-per-sec (default 1)
+      // since t was initialized by timer
+  execute "int tps=" + system("--ticks-per-sec");
+  t/tps; // yields the time in seconds
 @c example
 @end example
 @end table
+@c ref
+See @ref{Commandline options}, @ref{system}, @ref{rtimer}.
+@c ref
 @c ---------------------------------------
-@node TRACE var, voice, timer, System variables
+@node TRACE var, rtimer, timer, System variables
 @subsection TRACE
 @cindex TRACE
 
@@ -5744,7 +5778,22 @@ in this line is suspended until the user presses @code{<RETURN>}.
 See @ref{int expressions}.
 @end iftex
 @c ---------------------------------------
-@node voice,  , TRACE var, System variables
+@node rtimer, voice, TRACE var, System variables
+@subsection rtimer
+@cindex timer
+@table @code
+@item @strong{Type:}
+int
+@item @strong{Purpose:}
+identical to @code{timer}, except that real times (i.e., wall-clock)
+times ar reported, instead of CPU times.
+@end table
+@c ref
+See @ref{timer}, @ref{Commandline options}, @ref{system}.
+@c ref
+
+@c ---------------------------------------
+@node voice,, rtimer, System variables
 @subsection voice
 @cindex voice
 

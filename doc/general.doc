@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.44 1998-05-08 13:53:26 wichmann Exp $
+@comment $Id: general.doc,v 1.45 1998-05-08 16:03:17 obachman Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -360,17 +360,17 @@ Seed (i.e., set initial value of) pseudo random generator with integer
 random generated is seeded with a time-based @code{SEED} (e.g., the
 number of seconds since January, 1, 1970, on Unix systems).
 
-@item @code{--min-time=SECS}
-If the @code{timer} variables is set, do only report times larger than
-@code{SECS} seconds (@code{SECS} needs to be a floating point number
-greater than 0). By default, this value is set to 0.5 (i.e., half a
-second), e.g. the option @code{--min-time=0.01} forces Singular to
-report all times larger than 1/100 of a second.
+@item @code{--min-time=SECS} 
+If the @code{timer} (resp.  @code{rtimer}) variables is set, do only
+report times larger than @code{SECS} seconds (@code{SECS} needs to be a
+floating point number greater than 0). By default, this value is set to
+0.5 (i.e., half a second), e.g. the option @code{--min-time=0.01} forces
+Singular to report all times larger than 1/100 of a second.
 
 @item @code{--ticks-per-sec=TICKS} 
-Sets unit of timer to @code{TICKS} per second (i.e. the value reported by 
-the @code{timer} variable divided by @code{TICKS} gives the time in
-seconds). By default, this value is 1.
+Sets unit of timer to @code{TICKS} per second (i.e. the value reported
+by the @code{timer} and @code{rtimer} variable divided by @code{TICKS}
+gives the time in seconds). By default, this value is 1.
 
 @end table
 
@@ -393,8 +393,16 @@ further specified) . This option is mandatory when the @code{--batch}
 option is given. See also @ref{MPtcp links}.
 
 @end table
-
-
+The value of options given to @sc{singular} (resp. their default values, 
+if an option was not given), can be checked with the command
+@code{system(LongOptionNameString)}. See also @ref{system}.  
+@strong{Example:}
+@example
+@c example
+system("--quiet");    // if "quiet" 1, otherwise 0
+system("--min-time"); // minimal reported time 
+@c example
+@end example
 @c --------------------------------------------------------------------------
 @c ---------------------------------------------------------------------------
 @node Rings and orderings, Implemented algorithms, Interactive use, General concepts

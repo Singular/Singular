@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.18 1998-05-08 07:52:41 wichmann Exp $
+@comment $Id: singular.doc,v 1.19 1998-05-08 16:03:19 obachman Exp $
 @comment this file contains the main structure of the manual
 @c ------------------------
 @comment %**start of header
@@ -222,7 +222,7 @@ If a variable  can have more than two values, then
 define it, if necessary, before it is used for the first time.
 For example, if the following is used within a procedure
 @example
-if (! defined(DEBUG)) { int DEBUG = 1;}
+if (! defined(DEBUG)) @{ int DEBUG = 1;@}
 @dots{}
 if (DEBUG == 3)  @{@dots{}@}
 if (DEBUG == 2)  @{@dots{}@}
