@@ -1,0 +1,383 @@
+version="$Id: control.lib,v 1.1 2004-07-20 12:09:58 levandov Exp $";
+category="Miscellaneous";
+info="
+LIBRARY:  control.lib Procedures for System and Control Theory 
+AUTHORS:  Oleksandr Iena  yena@mathematik.uni-kl.de
+@*        Markus Becker   mbecker@mathematik.uni-kl.de
+
+SUPPORT: Forschungsschwerpunkt 'Mathematik und Praxis'
+
+PROCEDURES:
+declare(string NameOfRing, string Variables[, list #]);
+Defining the ring, optional parameter is a string of parameters.
+ 
+Print();                      Well-formatted output of lists, modules and matrixes
+control(module R);            Compute everthing related to controllability
+autonom(module R);            Compute everything related to autonomy 
+LeftKernel(module R);         Computing the left kernel of R
+RightKernel(module R);        Computing the right kernel of R
+
+static space(int n)           Procedure used inside the procedure 'Print' to have a better formatted output
+static control_output();      Generating the output for the procedure 'control'
+static autonom_output();      Generating the output for the procedure 'autonom'
+
+";
+
+LIB "homolog.lib"; 
+LIB "inout.lib";
+LIB "poly.lib";
+
+
+proc declare(string NameOfRing, string Variables, list #)
+{
+  if(size(#)==0)
+  {
+    execute("ring "+NameOfRing+"=0,("+Variables+"),dp;");
+  }
+  else
+  {
+    execute( "ring " + NameOfRing + "=(0," + #[1] + "),(" + Variables + "),dp;" );
+  };
+  keepring(basering);
+  return();
+};
+example
+{"EXAMPLE:";echo = 2;
+  string v="x,y,z";
+  string p="q,p";
+ 
+  declare("Ring_1",v);
+  print(nameof(basering));
+  print(basering);
+  
+  declare("Ring_2",v,p);
+  print(basering);
+  print(nameof(basering));
+
+};
+//
+//maybe reasonable to add this in declare
+//
+//  print("Please enter your representation matrix in the following form: 
+//  module R=[1st row],[2nd row],...");
+//  print("Type the command: R=transpose(R)");
+//  print(" To compute controllability please enter: control(R)");
+//  print(" To compute autonomy please enter: autonom(R)");
+//
+//
+//
+
+static proc space(int n)
+//the procedure is used in the procedure Print to have a better formatted output
+//USAGE:spase(int n)
+//RETURN: string consisting of n spases
+{
+  int i;
+  string s="";
+  for(i=1;i<=n;i++)
+  {
+    s=s+" ";
+  };
+  return(s);
+};
+
+proc Print(M)
+//procedure for a well-formatted output of lists, modules and matrixes
+{
+  if ( (typeof(M)=="module")||(typeof(M)=="matrix") )
+  {
+  int @R=nrows(M);
+  int @C=ncols(M);
+  int i;
+  int j;
+  list MaxLength=list();
+  int Size=0;
+  int max;
+  string s;
+  
+  for(i=1;i<=@C;i++)
+  { 
+    max=0; 
+    
+    for(j=1;j<=@R;j++)
+    {
+      Size=size( string( M[j,i] ) );
+      if( Size>max )
+      {
+        max=Size;
+      };
+    };
+    MaxLength[i] = max;
+  };
+  
+  for(i=1;i<=@R;i++)
+  {
+    s="";
+    for(j=1;j<@C;j++)
+    {
+      s=s+string(M[i,j])+space( MaxLength[j]-size( string( M[i,j] ) ) ) +",";
+    };
+    
+    s=s+string(M[i,j])+space( MaxLength[j]-size( string( M[i,j] ) ) );
+
+    if (i!=@R)
+    {
+      s=s+",";
+    };
+    print(s);
+  };
+
+  return();    
+  };
+  
+  if(typeof(M)=="list")
+  {
+    int sz=size(M);
+    int i;
+    for(i=1;i<=sz;i++)
+    {
+      Print(M[i]);
+      print("");
+    }; 
+
+    return();
+  };
+  print(M);
+  return();
+};
+
+proc RightKernel(matrix M)
+{ 
+  return(syz(M));
+}; 
+
+proc LeftKernel(matrix M)
+{
+  return( transpose( syz( transpose(M) ) ) );
+};
+
+static proc control_output(int i, int NVars, module R, module Ext_1) 
+//in this procedure the output list with all the contollability properties of the system is generated
+{
+  
+  if(i==1)
+  { 
+    module RK=RightKernel(R);
+    return( 
+            list ("not controllable , image representation for controllable part:",
+         	   RK,	    
+	          "kernel representation for controllable part:",
+		   LeftKernel( RK ),
+		  "obstruction to controllability",
+		   Ext_1
+		 ) 
+          );
+  };
+  
+  if(i>NVars)
+  {  
+    return("strongly controllable");
+  };
+  
+  //
+  //now i<=NVars
+  //
+       
+  if( (i==2) )
+  {
+    return("controllable, not reflexive"); 
+  };
+    
+  if( (i>=3) )
+  {
+    return("reflexive, not strongly controllable");
+  };              
+  
+};  
+
+
+proc control(module R)
+//"Computes the controllability of a behaviour represented by the matrix R"
+{
+  int i;
+  int NVars=nvars(basering); 
+  int ExtIsZero;
+ 
+       
+  module Ext_1 = Ext_R(1,R);
+   
+  ExtIsZero=is_zero(Ext_1);
+  i=1;
+  while( (ExtIsZero) && (i<=NVars) )
+  {
+    i++;
+    ExtIsZero = is_zero( Ext_R(i,R) );
+  };
+  
+  return( control_output( i, NVars, R, Ext_1 ) );
+};
+example
+{"EXAMPLE:";echo = 2; 
+  //-------------------------------
+  ring r=0,(s1,s2,s3),dp;
+  module R=[0,-s3,s2],
+           [s3,0,-s1];
+  R=transpose(R);	   
+  Print( R );  
+  Print( control(R) );
+
+  module Rc=[0,-s3,s2],
+            [s3,0,-s1],
+	    [-s2,s1,0];
+  Rc=transpose(Rc);	    
+  Print( Rc );
+  Print( control(Rc) );
+  kill r;
+  //----------------------------------
+  //reflector antenna
+  ring A = (0, K1, K2, Te, Kp, Kc),(Dt, delta), dp;
+  module R;
+  R = [Dt, -K1, 0, 0, 0, 0, 0, 0, 0],
+       [0, Dt+K2/Te, 0, 0, 0, 0, -Kp/Te*delta, -Kc/Te*delta, -Kc/Te*delta],
+       [0, 0, Dt, -K1, 0, 0, 0, 0, 0],
+       [0, 0, 0, Dt+K2/Te, 0, 0, -Kc/Te*delta, -Kp/Te*delta, -Kc/Te*delta],
+       [0, 0, 0, 0, Dt, -K1, 0, 0, 0],
+       [0, 0, 0, 0, 0, Dt+K2/Te, -Kc/Te*delta, -Kc/Te*delta, -Kp/Te*delta];
+  R=transpose(R);
+  Print(R);
+  Print(control(R));
+  kill A;
+  //----------------------------------
+  //Flexible Rod
+  ring A = 0,(D1, delta), dp;
+  module R;
+  R = [D1, -D1*delta, -1],
+      [2*D1*delta, -D1-D1*delta^2, 0];
+  R=transpose(R);
+  Print(R);
+  Print(control(R));
+  kill A;
+  //-------------------------------------
+  //TwoPendula
+  ring r=(0,m1,m2,M,g,L1,L2),Dt,dp;
+  module R;
+  R =  [m1*L1*Dt^2, m2*L2*Dt^2, -1, (M+m1+m2)*Dt^2], 
+       [m1*L1^2*Dt^2-m1*L1*g, 0, 0, m1*L1*Dt^2],
+       [0, m2*L2^2*Dt^2-m2*L2*g, 0, m2*L2*Dt^2];
+  R=transpose(R);
+  Print(R);
+  Print(control(R));
+  kill r;
+  //----------------------------------------
+  //Wind Tunnel
+  ring A = (0,a, omega, zeta, k),(D1, delta),dp;
+  module R;
+  R = [D1+a, -k*a*delta, 0, 0],
+      [0, D1, -1, 0],
+      [0, omega^2, D1+2*zeta*omega, -omega^2];
+  R=transpose(R);
+  Print(R);
+  Print(control(R));
+  kill A;
+};
+
+static proc autonom_output( int i, int NVars ) 
+//in this procedure the output list with all the autonomy properties of the system is generated
+{
+  
+  if(i==0)
+  { 
+    return( "not autonomous" );
+  };
+  
+  if( i>NVars )
+  {  
+    return( "trivial" );
+  };
+  
+  //
+  //now i<=NVars
+  //
+    
+     
+  if( i==1 )
+  //in case that NVars==1 there is no sence to consider the notion
+  //of strongly autonomous behavior, because it does not imply 
+  //that system is overdetermined in this case
+  {
+    return( "autonomous, not overdetermined" ); 
+  };
+    
+  if( i==NVars )
+  {  
+    return( "strongly autonomous, in particular overdetermined" );
+  };
+  
+  if( i<NVars )
+  {
+    return( "overdetermined, not strongly autonomous" );
+  };
+    
+};  
+  
+
+
+
+proc autonom(module R)
+//"Computes the autonomy of a behaviour represented by the matrix R"
+{
+  int i;
+  int NVars=nvars(basering);
+  int ExtIsZero;
+    
+  
+  R=transpose(R); 
+  
+  
+  ExtIsZero=is_zero(Ext_R(0,R)); 
+  
+  i=0;
+  while( (ExtIsZero)&&(i<=NVars) )
+  {
+    i++;
+    ExtIsZero = is_zero(Ext_R(i,R));
+  };
+  
+  return(autonom_output(i,NVars));
+     
+};
+example
+{"EXAMPLE:"; echo = 2;
+  ring r=0,(s1,s2,s3),dp;
+  module R=[0,-s3,s2],
+           [s3,0,-s1];
+  R=transpose(R);	   
+  Print( R );  
+  Print( autonom(R) );
+
+  module Rc=[0,-s3,s2],
+            [s3,0,-s1],
+	    [-s2,s1,0];
+  Rc=transpose(Rc);	    
+  Print( Rc );
+  Print( autonom(Rc) );
+  kill r;
+  //-----------------------------------
+  ring r=0,(s1,s2),dp;
+  module R= [s1,-s2],
+            [s2, s1];
+  R=transpose(R);
+  Print( R );
+  Print( autonom(R) );
+  kill r;
+  //-----------------------------------
+  ring r=0,(s1,s2,s3,s4),dp;
+  module R= [s1,-s2],
+            [s2, s1],
+	    [s3,-s4],
+	    [s4, s3];	    
+  R=transpose(R);
+  Print( R );
+  Print( autonom(R) );
+};  
+
