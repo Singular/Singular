@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.h,v 1.12 1997-08-29 11:30:01 schmidt Exp $ */
+/* $Id: canonicalform.h,v 1.13 1997-08-29 13:14:57 schmidt Exp $ */
 
 #ifndef INCL_CANONICALFORM_H
 #define INCL_CANONICALFORM_H
@@ -229,11 +229,18 @@ CanonicalForm mapdomain ( const CanonicalForm & f, CanonicalForm (*mf)( const Ca
 
 bool divides ( const CanonicalForm & f, const CanonicalForm & g );
 
+//{{{ inline CanonicalForm deriv ( const CanonicalForm & f, const Variable & x )
+//{{{ docu
+//
+// deriv() - inline function version of method deriv().
+//
+//}}}
 inline CanonicalForm
 deriv ( const CanonicalForm & f, const Variable & x )
 {
     return f.deriv(x);
 }
+//}}}
 
 inline CanonicalForm
 abs ( const CanonicalForm & f )
