@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: tricks.doc,v 1.1 1999-07-15 14:15:08 obachman Exp $
+@comment $Id: tricks.doc,v 1.2 1999-09-13 19:57:50 wichmann Exp $
 @comment this file contains the "Tricks and pittfals" sections
 
 @c The following directives are necessary for proper compilation
@@ -42,20 +42,20 @@ the (weighted) degree of a monomial must be smaller than 2147483648
 the exponent of a ring variable and the rank of any free module
 must be smaller than 32768
 @item
-a ring must have 505 variables or less
-@*(501 on a DEC Alpha)
+a ring must have at most 505 variables (501 on a DEC Alpha)
 @c TBC -- number of parameters
 @item
-the precision of long floating point numbers (for ground field real)
+the precision of long floating point numbers (for ground field @code{real})
 must be smaller than 32768
 @item
 integers (of type @code{int}) have the limited range
 from -2147483647 to 2147483647
 @item
-floating point numbers (type @code{number} from field @code{real})
-have the limited range (machine dependent, usually -1.0e-38 to 1.0e+38).
-The string representation of overflow and underflow varies also.
-(Linux: Inf, HPUX: +.+00e+00, @dots{})
+floating point numbers (type @code{number} from field @code{real}) have
+a limited range which is machine dependent. A typical range is -1.0e-38
+to 1.0e+38.  The string representation of overflow and underflow is
+machine dependent, too, for example "@code{Inf}" on Linux or 
+"@code{+.+00e+00}" on HPUX.
 @c @item
 @c a token (in the input) must have 16383 characters or less.
 @c @*(Tokens are strings, blocks of statements, numbers)
@@ -93,9 +93,9 @@ differences. Most notably:
 @subsection No rvalue of increments and assignments
 @cindex rvalue
 
-The increment @code{++} (resp.@: decrement operator @code{--}) has no
-rvalue, i.e., cannot be used on the right-hand sides of assignments.
-So, instead of
+The increment operator @code{++} (resp.@: decrement operator @code{--})
+has no rvalue, i.e., cannot be used on the right-hand sides of
+assignments.  So, instead of
 
 @smallexample
 j = i++;  // WRONG!!!
@@ -128,14 +128,21 @@ then the value of the logical expression is determined. For example, the
 logical expressions @code{(a || b)} is evaluated by first evaluating
 @code{a} @emph{and} @code{b}, even though the value of @code{b} has no
 influence on the value of @code{(a || b)}, if @code{a} evaluates to
-true. Therefore, the following results in a syntax error
+true. 
+
+Note, that this evaluation is different from the left-to-right,
+conditional evaluation of logical expressions (as found in most
+programming languages). For example, in these other languages, the value
+of @code{(1 || b)} is determined without ever evaluating @code{b}.  This
+causes some problems with boolean tests on variables, which might not be
+defined at evaluation time. For example, the following results in an
+error, if the variable @code{i} is undefined:
 
 @smallexample
 if (defined(i) && i > 0) @{@} // WRONG!!!
 @end smallexample
 
-@noindent if the variable @code{i} is undefined. This must be written
-instead as
+This must be written instead as:
 
 @smallexample
 if (defined(i))
@@ -143,11 +150,6 @@ if (defined(i))
   if (i > 0) @{@}
 @}
 @end smallexample
-
-Note that this evaluation is different from the left-to-right, conditional
-evaluation of logical expressions (as found in most programming
-languages). For example, in these other languages, the value of @code{(1
-|| b)} is determined without ever evaluating @code{b}.
 @c ------------------------------------------------------------
 @c end of duplicate text
 @c ------------------------------------------------------------
@@ -156,15 +158,15 @@ However, there are several short work-arounds for this problem:
 @enumerate
 @item
 If a variable (say, @code{i}) is only to be used as a boolean flag, then
-define (value is true) and undefine (value is false) @code{i} instead of
+define (value is TRUE) and undefine (value is FALSE) @code{i} instead of
 assigning a value. Using this scheme, it is sufficient to simply write
 
 @smallexample
 if (defined(i))
 @end smallexample
 
-in order to check whether @code{i} is true. Use the command @code{kill}
-to undefine a variable (@pxref{kill}).
+in order to check whether @code{i} is TRUE. Use the command @code{kill}
+to undefine a variable, i.e.@: to assign it a FALSE value (@pxref{kill}).
 @item
 If a variable  can have more than two values, then
 define it, if necessary, before it is used for the first time.
@@ -231,9 +233,9 @@ for (i,j = 1,5; i<5 || j<10; i++, j++) @{@dots{}@}
 
 In @sc{Singular}, curly brackets (@code{@{} @code{@}}) @strong{must
 always} be used to enclose the statement body following such constructs
-like @code{if}, @code{else}, @code{for}, @code{while}, even if this
+like @code{if}, @code{else}, @code{for}, or @code{while}, even if this
 block consists of only a single statement. Similarly, in the return
-statement of a procedure parentheses (@code{(} @code{)}) @strong{must
+statement of a procedure, parentheses (@code{(} @code{)}) @strong{must
 always} be used to enclose the return value.  Even if there is no value
 to return, parentheses have to be used after a return statement
 (i.e., @code{return();}).  For example,
@@ -242,7 +244,7 @@ to return, parentheses have to be used after a return statement
 if (i == 1) return i;    // WRONG!!!!!
 @end smallexample
 
-@noindent results in a errors. Instead, it must be written as
+@noindent results in an error. Instead, it must be written as
 
 @smallexample
 if (i == 1) @{ return (i); @}
@@ -300,8 +302,8 @@ typeof(t1); typeof(t2);
 @end smallexample
 
 Furthermore, it is mandatory to assign the return value of a procedure
-to a variable of type def, if a procedure changes the current ring using
-the @code{keepring} command (@pxref{keepring}) and returns a
+to a variable of type @code{def}, if a procedure changes the current
+ring using the @code{keepring} command (@pxref{keepring}) and returns a
 ring-dependent value (like a polynomial or module).
 
 @smallexample
@@ -337,21 +339,30 @@ int i,j = tworeturn();
 @cindex integer division
 @cindex div
 
-A sequence of digits and @code{/} without spaces is of type number.
-With spaces it is an expression of type int
-(and @code{/} is the integer division).
-To avoid confusion use the operand @code{div}.
+If two numerical constants (i.e., two sequences of digits) are divided
+using the @code{/} operator, the surrounding whitespace determines
+which division to use: if there is no space between the constants and
+the @code{/} operator (e.g., "3/2"), both numerical constants are
+treated as of type @code{number} and the current ring division is
+used. If there is at least one space surrounding the @code{/} operator
+(e.g., "3 / 2"), both numerical constants are treated as of type
+@code{int} and an integer division is performed. To avoid confusion, use
+the @code{div} operator instead of @code{/} for integer division and an
+explicit type cast to @code{number} for ring division. Note, that this
+problem does only occur for divisions of numerical constants.
 @smallexample
 @c example error
   ring r=32002,x,dp;
-  3/2;
-  3 / 2;
+  3/2;    // ring division
+  3 / 2;  // integer division
   3 div 2;
   number(3) / number(2);
   number a=3;
   number b=2;
-  a / b;
-  a div b;
+  a/b;
+  int c=3;
+  int d=2;
+  c / d;
 @c example
 @end smallexample
 
@@ -369,20 +380,20 @@ The computation of a monomial has precedence over all operators:
 @c example
 @end smallexample
 
-@item meaning of mult
+@item meaning of @code{mult}
 @cindex mult
 @cindex degree
 
-For an arbitrary ideal or module i, mult(i) returns the multiplicity
-of the ideal generated by the leading monomials of the given generators
-of i, hence depends on the monomial ordering!
+For an arbitrary ideal or module @code{i}, @code{mult(i)} returns the
+multiplicity of the ideal generated by the leading monomials of the
+given generators of @code{i}, hence depends on the monomial ordering!
 
 A standard mistake is to interpret @code{degree(i)} or @code{mult(i)}
 for an inhomogeneous ideal @code{i} as the degree of the homogenization
 or as something like the 'degree of the affine part'. For the ordering
-dp (degree reverse lexicographical) the converse is true: if @code{i} is
-given by a standard basis, @code{mult(i)} is the degree of the
-homogeneous ideal obtained by homogenization of @code{i} and then
+@code{dp} (degree reverse lexicographical) the converse is true: if
+@code{i} is given by a standard basis, @code{mult(i)} is the degree of
+the homogeneous ideal obtained by homogenization of @code{i} and then
 putting the homogenizing variable to 0, hence it is the degree of the
 part at infinity (this can also be checked by looking at the initial
 ideal).
@@ -391,26 +402,37 @@ ideal).
 @cindex ideals
 @cindex size
 
-@code{size} counts the non-zero entries of an ideal (resp.@:
-module). Use @code{ncols} to determine the actual number of entries in
-the ideal (resp.@: module).
+@code{size} counts the non-zero entries of an ideal or module. Use
+@code{ncols} to determine the actual number of entries in the ideal or module.
 
-@item computations in qrings
+@item computations in @code{qring}
+@cindex qring
 
-@sc{Singular} computes in a quotient ring as long as possible with the
-given representative of a polynomial, say, @code{f}.  I.e., it usually
-does not reduce @code{f} w.r.t. the quotient ideal.  This is only done
-when necessary
-during standard bases computations or by an explicit reduction using
-the command @code{reduce(f, std(0))} (@pxref{reduce}).
+In order to speed up computations in quotient rings, @sc{Singular}
+usually does not reduce polynomials w.r.t.@: the quotient ideal; rather
+the given representative is used as long as possible during
+computations. If it is necessary, reduction is done during standard base
+computations. To reduce a polynomial @code{f} by hand w.r.t.@: the
+current quotient ideal use the command @code{reduce(f,std(0))}
+(@pxref{reduce}).
 
 @item substring selection
+@cindex string
 
-Two comma - separated @code{int}s in square brackets after a string select a
-substring. An @code{intvec} in square brackets after a string selects
-the respective single characters of the string and returns them as an
-expression list of two strings.
-In particular,
+To extract substrings from a @code{string}, square brackets are used,
+enclosing either two comma-separated @code{int}s or an
+@code{intvec}. Although two comma-separated @code{int}s represent an
+@code{intvec}, they mean different things in substring access. Square
+brackets enclosing two @code{int}s (e.g.@: @code{s[2,6]}) return a
+substring where the first integer denotes the starting position and the
+second integer denotes the length of the substring. The result is
+returned as a @code{string}. Square brackets enclosing an @code{intvec}
+(e.g.@: @code{s[intvec(2,6)]}) return the characters of the string at the
+position given by the values of the @code{intvec}. The result is
+returned as an expression list of strings. 
+@c  Note, that this problem does
+@c  not occur for square brackets enclosing a single @code{int} or more than
+@c  two @code{int}s. Those always return an expression list of strings.
 
 @smallexample
 @c example
@@ -453,7 +475,7 @@ In @sc{Singular}, an identifier (i.e., a "word") is resolved in the
 following way and order: It is checked for
 @enumerate
 @item
-a reserved name,
+a reserved name (like @code{ring}, @code{std}, @dots{}),
 @item
 a local  variable (w.r.t. a procedure),
 @item
