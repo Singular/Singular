@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.18 1998-01-17 18:08:02 Singular Exp $ */
+/* $Id: syz1.cc,v 1.19 1998-01-27 15:47:07 pohl Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -904,7 +904,7 @@ static void syOrder(poly p,syStrategy syzstr,int index,
   int *F1=syzstr->Firstelem[index-1];
   int *H1=syzstr->Howmuch[index-1];
   poly pp;
-  polyset or=syzstr->orderedRes[index]->m;
+  polyset o_r=syzstr->orderedRes[index]->m;
   polyset or1=syzstr->orderedRes[index-1]->m;
 
   if (p==NULL) return;
@@ -920,7 +920,7 @@ static void syOrder(poly p,syStrategy syzstr,int index,
       break;
     else
     {
-      orc = pGetComp(or[j]);
+      orc = pGetComp(o_r[j]);
       if (trind1[orc]>tc+1) break;
       j += H1[orc];
     }
@@ -931,15 +931,15 @@ static void syOrder(poly p,syStrategy syzstr,int index,
     return;
   }
   ie++;
-  if (or[j]!=NULL)
+  if (o_r[j]!=NULL)
   {
     for (k=ie-1;k>j;k--)
     {
-      or[k] = or[k-1];
+      o_r[k] = o_r[k-1];
       bc[k] = bc[k-1];
     }
   }
-  or[j] = p;
+  o_r[j] = p;
   bc[j] = realcomp-1;
   (H1[pGetComp(p)])++;
   for (k=0;k<i;k++)
@@ -976,7 +976,7 @@ static void syRedNextPairs(SSet nextPairs, syStrategy syzstr,
   int ** Hin=syzstr->Howmuch;
   int ** bin=syzstr->backcomponents;
   number coefgcd,n;
-  ideal or=syzstr->orderedRes[index+1];
+  ideal o_r=syzstr->orderedRes[index+1];
   polyset redset=syzstr->orderedRes[index]->m;
   poly p=NULL,q;
   BOOLEAN isDivisible;
@@ -997,10 +997,10 @@ static void syRedNextPairs(SSet nextPairs, syStrategy syzstr,
         ll = l+Hin[index][pGetComp(tso.lcm)];
         while ((l<ll) && (!isDivisible))
         {
-          if (or->m[l]!=NULL)
+          if (o_r->m[l]!=NULL)
           {
             isDivisible = isDivisible || 
-              pDivisibleBy2(or->m[l],tso.lcm);
+              pDivisibleBy2(o_r->m[l],tso.lcm);
           }
           l++;
         }
