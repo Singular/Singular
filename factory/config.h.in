@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C -*- */
-/* $Id: config.h.in,v 1.1 1997-06-05 13:55:25 schmidt Exp $ */
+/* $Id: config.h.in,v 1.2 1997-06-19 12:48:16 schmidt Exp $ */
 
 #ifndef INCL_CONFIG_H
 #define INCL_CONFIG_H
@@ -8,6 +8,7 @@
  *
  * config.h.in - used by configure to create config.h.
  *
+ */
 /* }}} */
 
 /************** START OF CONFIGURABLE SECTION **************/
