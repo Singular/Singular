@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.3 2004-08-03 17:33:56 Singular Exp $ */
+/* $Id: kutil.cc,v 1.4 2004-08-13 18:29:03 levandov Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -916,8 +916,16 @@ static inline void clearS (poly p, unsigned long p_sev, int* at, int* k,
 /*2
 *enters p at position at in L
 */
+#ifdef PDEBUG
+/* int zaehler=0; */
+/* for counting number of pairs in Plural */
+#endif PDEBUG
+
 void enterL (LSet *set,int *length, int *LSetmax, LObject p,int at)
 {
+#ifdef PDEBUG
+  /*  zaehler++; */
+#endif PDEBUG
   int i;
   // this should be corrected
   assume(p.FDeg == p.pFDeg());
@@ -979,10 +987,10 @@ BOOLEAN sugarDivisibleBy(int ecart1, int ecart2)
 /*2
 * put the pair (s[i],p)  into the set B, ecart=ecart(p)
 */
+
 void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR = -1)
 {
   assume(i<=strat->sl);
-
   int      l,j,compare;
   LObject  Lp;
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gr_kstd2.cc,v 1.2 2003-12-08 17:31:01 Singular Exp $ */
+/* $Id: gr_kstd2.cc,v 1.3 2004-08-13 18:29:03 levandov Exp $ */
 /*
 *  ABSTRACT -  Kernel: noncomm. alg. of Buchberger
 */
@@ -915,6 +915,11 @@ ideal gr_bba (ideal F, ideal Q, kStrategy strat)
   }
   if (TEST_OPT_PROT) messageStat(srmax,lrmax,hilbcount,strat);
   if (Q!=NULL) updateResult(strat->Shdl,Q,strat);
+#ifdef PDEBUG
+/* for counting number of pairs [enterL] in Plural */
+/*   extern int zaehler; */
+/*   Print("Total pairs considered:%d\n",zaehler); zaehler=0; */
+#endif PDEBUG
   return (strat->Shdl);
 }
 #endif
