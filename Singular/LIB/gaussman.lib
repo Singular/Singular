@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.75 2002-03-06 16:39:09 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.76 2002-03-08 09:40:23 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -1289,7 +1289,7 @@ EXAMPLE:  example endvfilt; shows examples
   module U=freemodule(ncols(m));
   for(i=ncols(m);i>=1;i--)
   {
-    M[i]=division(V0,coeffs(reduce(m[i]*m,g,U),m)*V0)[1];
+    M[i]=division(coeffs(reduce(m[i]*m,g,U),m)*V0,V0)[1];
   }
 
   int j,k,i0,j0,i1,j1;
