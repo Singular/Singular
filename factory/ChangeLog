@@ -4,17 +4,15 @@ Tue Mar 17 16:57:10 MET 1998  Jens Schmidt
 	* ChangeLog:
 	  ***** merge from branch `factory-gcd' to main trunk
 
-Tue Mar 17 16:34:46 MET 1998  Jens Schmidt
-
 	* GNUmakefile.in:
 	  ***** merge from branch `factory-gcd' to main trunk
-
-Tue Mar 17 15:27:30 MET 1998  Jens Schmidt
 
 	* timing.h, examples/application.cc:
 	  ***** merge from branch `factory-gcd' to main trunk
 
 Tue Mar 17 14:22:56 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+    **************** <<< changes in branch `factory-gcd' ****************
 
 	* int_poly.cc (dividecoeff, divremcoeff): use `divideTermList()'
 	  to do their work
@@ -62,6 +60,8 @@ Fri Mar 13 17:05:10 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 	* ftmpl_inst.cc:
 	  ***** merge from main trunk to branch `factory-gcd'
 
+    **************** >>> changes in branch `factory-gcd' ****************
+
 Thu Mar 12 12:21:33 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* cf_gcd.cc (maxnorm): function removed.  All references replaced
@@ -98,8 +98,6 @@ Wed Mar 11 10:39:33 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 	* GNUmakefile.in (ftestm4src): `norm.m4' and `commonden.m4' added
 	  to distribution
 
-	* templates/ftmpl_functions.h: doc checked
-
 	* templates/ftmpl_functions.h (tabs): new function
 
 	* ffops.cc (ff_setprime): uses `memset()' to clear inversion
@@ -123,6 +121,8 @@ Tue Mar 10 15:44:06 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 	  distribution
 
 Fri Feb 27 10:24:22 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+    **************** <<< changes in branch `factory-gcd' ****************
 
 	* var_intglobal.cc, var_intglobal.h: files removed (do not belong
 	  to this branch!)
@@ -181,6 +181,8 @@ Thu Feb 26 17:58:31 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 	  (execute): bug fix.  Assertion fixed.
 
 	* gcd_pmultiv.cc: new file
+
+    **************** >>> changes in branch `factory-gcd' ****************
 
 Fri Feb 20 17:41:23 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 

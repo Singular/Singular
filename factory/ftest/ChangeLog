@@ -1,8 +1,14 @@
+Mon Mar 23 16:38:41 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* randomgcd.m4, ranMulGCD.fex: files removed
+
 Wed Mar 11 20:33:40 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* commonden.m4, norm.m4: new files
 
 Wed Feb 25 17:26:18 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+    **************** <<< changes in branch `factory-gcd' ****************
 
 	* runfex (printData): arguments `$name' and `$note' re-added
 	  which are printed on occurence of `h' in `$options'.  All
@@ -46,6 +52,8 @@ Fri Feb 20 18:29:40 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 	* ftest_util.cc (ftestError): returns on `errno' == `noError'
 
 	* ftest_util.h (ftestErrorT): `Ok' renamed to `noError'
+
+    **************** >>> changes in branch `factory-gcd' ****************
 
 Thu Feb 19 16:07:09 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
