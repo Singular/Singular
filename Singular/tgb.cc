@@ -2279,8 +2279,9 @@ static void go_on_F4 (calc_dat* c){
   poly* done=(poly*) omalloc(done_size*sizeof(poly));
   int done_index=0; //done_index must always be smaller than done_size
   int chosen_size=PAR_N_F4*2;
-  monom_poly* chosen=(monom_poly*) omalloc(done_size*sizeof(monom_poly));
+  monom_poly* chosen=(monom_poly*) omalloc(chosen_size*sizeof(monom_poly));
   int chosen_index=0;
+  //  monom_poly* vgl=(monom_poly*) omalloc(chosen_size*sizeof(monom_poly));
   int i=0;
   c->average_length=0;
   for(i=0;i<c->n;i++){
