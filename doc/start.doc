@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: start.doc,v 1.18 1998-05-19 20:06:55 schmidt Exp $
+@comment $Id: start.doc,v 1.19 1998-05-20 11:44:51 pohl Exp $
 @comment this file contains the "Introduction" chapter.
 
 @c The following directives are necessary for proper compilation
@@ -265,7 +265,7 @@ obtained by
 @example
 help intmat;
 @end example  
-This showss the text from @ref{intmat} in the printed maual. 
+This shows the text from @ref{intmat} in the printed maual. 
 Define a @code{3 x 3} matrix of integers, and initialize it with some values.
 @example
 @c  intmat m[3][3] = 1..9; // bug here, converts the 3x3 intmat into 9x1, hence
