@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: INSTALL_rpm.texi,v 1.6 2002-03-26 16:58:02 mschulze Exp $
+@comment $Id: INSTALL_rpm.texi,v 1.7 2002-03-26 17:10:06 mschulze Exp $
 @c FILE: INSTALL_rpm.texi
 @c PURPOSE: Installation instruction for Singular on RPM based Linux systems
 @c
@@ -9,7 +9,7 @@
 @end ifclear
 
 @ifclear singularmanual
-@majorheading Installation of @sc{Singular} @value{VERSION} on @sc{rpm} based @sc{Linux} systems
+@majorheading Installation of @sc{Singular} @value{RPM_VERSION} on @sc{rpm} based @sc{Linux} systems
 @end ifclear
 
 @sc{rpm} is a powerful package manager, which can be used to build, install, query, verify, update, and erase individual software packages.
