@@ -747,6 +747,7 @@ static BOOLEAN ringIsLocal( void )
 {
   poly    m   = pOne();
   poly    one = pOne();
+  BOOLEAN res=TRUE;
 
   for( int i=pVariables; i>0; i-- )
   {
@@ -755,7 +756,8 @@ static BOOLEAN ringIsLocal( void )
 
     if( pCmp( m,one )>0 )
     {
-      return  FALSE;
+      res=FALSE;
+      break;
     }
     pSetExp( m,i,0 );
   }
@@ -763,7 +765,7 @@ static BOOLEAN ringIsLocal( void )
   pDelete( &m );
   pDelete( &one );
 
-  return  TRUE;
+  return  res;
 }
 
 // ----------------------------------------------------------------------------
