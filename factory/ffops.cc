@@ -1,7 +1,9 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ffops.cc,v 1.6 1997-12-08 18:24:37 schmidt Exp $ */
+/* $Id: ffops.cc,v 1.7 1998-03-11 09:40:31 schmidt Exp $ */
 
 #include <config.h>
+
+#include <string.h>
 
 #include "assert.h"
 
@@ -19,7 +21,7 @@ void ff_setprime ( const int p )
 	ff_prime = p;
 	ff_halfprime = ff_prime / 2;
 	if ( ! ff_big )
-	    for ( int i = 0; i < ff_prime; i++ ) ff_invtab[i] = 0;
+	    memset( ff_invtab, 0, ff_prime*sizeof(short) );
     }
 }
 
