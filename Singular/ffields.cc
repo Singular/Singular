@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ffields.cc,v 1.21 1999-09-16 12:33:53 Singular Exp $ */
+/* $Id: ffields.cc,v 1.22 1999-09-22 13:28:43 Singular Exp $ */
 /*
 * ABSTRACT: finite fields with a none-prime number of elements (via tables)
 */
@@ -584,7 +584,7 @@ void nfShowMipo()
 
 static void nfReadMipo(char *s)
 {
-  char *l=strchr(s,';')+1;
+  const char *l=strchr(s,';')+1;
   char *n;
   int i=strtol(l,&n,10);
   l=n;
