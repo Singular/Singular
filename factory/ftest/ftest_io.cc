@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftest_io.cc,v 1.7 1997-10-15 13:53:21 schmidt Exp $ */
+/* $Id: ftest_io.cc,v 1.8 1997-10-28 17:20:53 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -34,38 +34,52 @@ ftestGetCanonicalForm ( const char * canFormSpec )
     // get string to read canonical form from
     const char * stringF = canFormSpec;
     stringF = ftestSkipBlancs( stringF );
-    if ( *stringF == '$' ) {
-	const char * tokenCursor = ftestSkipBlancs( stringF+1 );
-	// read canonical form from environment
-	stringF = getenv( tokenCursor );
-	if ( ! stringF )
+    if ( *stringF == '<' ) {
+	CanonicalForm f;
+	
+	stringF++;
+	if ( *stringF == '-' ) {
+	    // read canonical form from stdin
+	    cin >> f;
+	} else
 	    ftestError( CanFormSpecError,
-			"no environment variable `$%s' set\n",
-			tokenCursor );
-    }
-
-    // create terminated CanonicalForm
-    int i = strlen( stringF );
-    char * terminatedStringF = new char[i+2];
-    char * stringCursor = terminatedStringF;
-    while ( *stringF ) {
-	switch ( *stringF ) {
-	case '.': *stringCursor = '*'; break;
-	case '{': *stringCursor = '('; break;
-	case '}': *stringCursor = ')'; break;
-	default: *stringCursor = *stringF; break;
+			"not a valid canonical form specification `<%s'\n",
+			stringF );
+	return f;
+    } else {
+	if ( *stringF == '$' ) {
+	    const char * tokenCursor = ftestSkipBlancs( stringF+1 );
+	    // read canonical form from environment
+	    stringF = getenv( tokenCursor );
+	    if ( ! stringF )
+		ftestError( CanFormSpecError,
+			    "no environment variable `$%s' set\n",
+			    tokenCursor );
 	}
-	stringF++; stringCursor++;
+
+	// create terminated CanonicalForm
+	int i = strlen( stringF );
+	char * terminatedStringF = new char[i+2];
+	char * stringCursor = terminatedStringF;
+	while ( *stringF ) {
+	    switch ( *stringF ) {
+	    case '.': *stringCursor = '*'; break;
+	    case '{': *stringCursor = '('; break;
+	    case '}': *stringCursor = ')'; break;
+	    default: *stringCursor = *stringF; break;
+	    }
+	    stringF++; stringCursor++;
+	}
+	*stringCursor++ = ';';
+	*stringCursor = '\0';
+
+	// read f
+	CanonicalForm f;
+	istrstream( terminatedStringF ) >> f;
+
+	delete [] terminatedStringF;
+	return f;
     }
-    *stringCursor++ = ';';
-    *stringCursor = '\0';
-
-    // read f
-    CanonicalForm f;
-    istrstream( terminatedStringF ) >> f;
-
-    delete [] terminatedStringF;
-    return f;
 }
 //}}}
 
