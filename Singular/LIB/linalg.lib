@@ -1,6 +1,6 @@
 //GMG last modified: 04/25/2000
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: linalg.lib,v 1.21 2001-11-20 13:00:41 mschulze Exp $";
+version="$Id: linalg.lib,v 1.22 2002-01-22 15:27:42 mschulze Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  linalg.lib  Algorithmic Linear Algebra
@@ -29,7 +29,7 @@ PROCEDURES:
  eigenvals(M);        eigenvalues and multiplicities of M
  jordan(M);           Jordan data of M
  jordanbasis(M);      Jordan basis and weight filtration of M
- jordanmatrix(e,b);   Jordan matrix with Jordan data (e,b)
+ jordanmatrix(e,s,m); Jordan matrix with Jordan data (e,s,m)
  jordannf(M);         Jordan normal form of M
 ";
 
@@ -1334,11 +1334,11 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc spnf(ideal e,list #)
-"USAGE:   spnf(e[,m][,V]); ideal e, intvec m, list V of modules
-ASSUME:  ncols(e)=size(m)=size(V)
+"USAGE:   spnf(e[,m][,V]); ideal e, intvec m, list V
+ASSUME:  ncols(e)==size(m)==size(V); typeof(V[i])=="int"
 RETURN:
 @format
-list sp;  spectrum normal form of (e,m[,V])
+list sp;  spectrum normal form of (e,m,V)
   ideal sp[1];  numbers in e in increasing order
   intvec sp[2]; 
     int sp[2][i];  multiplicity of number sp[1][i] in e
@@ -1467,9 +1467,10 @@ ASSUME:  eigenvalues of M in basefield
 RETURN:
 @format
 list l; 
-  ideal l[1];  eigenvalues of M
+  ideal l[1];
+    number l[1][i];  i-th eigenvalue of M
   intvec l[2]; 
-    int l[2][i];  multiplicity of eigenvalue l[1][i]
+    int l[2][i];  multiplicity of i-th eigenvalue of M
 @end format
 EXAMPLE: example eigenvals; shows examples
 "
@@ -1730,11 +1731,10 @@ example
 
 proc jordanmatrix(ideal e,intvec s,intvec m)
 "USAGE:   jordanmatrix(e,s,m); ideal e, intvec s, intvec m
-ASSUME:  ncols(e)=size(s)=size(m)
+ASSUME:  ncols(e)==size(s)==size(m)
 RETURN:
 @format
-matrix J;  Jordan matrix with eigenvalues e, Jordan block sizes s, 
-           and multiplicities m
+matrix J;  list(e,s,m)==jordan(J)
 @end format
 EXAMPLE: example jordanmatrix; shows examples
 "
