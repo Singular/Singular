@@ -3,14 +3,13 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.h,v 1.19 1998-10-22 12:26:13 krueger Exp $ */
+/* $Id: ipid.h,v 1.20 1998-11-04 15:55:30 obachman Exp $ */
 /*
 * ABSTRACT: identfier handling
 */
 #include <string.h>
 #include "structs.h"
 #include "subexpr.h"
-//#include "polys-impl.h"
 
 struct sip_sring
 {
@@ -36,9 +35,11 @@ struct sip_sring
   short      ref;
 
   // what follows below here should be set by rComplete, _only_
-  short     VarOffset; /* controls indexing of exponents */
-  short     VarCompIndex; /* controls locations of component in exp vector */
-
+  int       *VarOffset;   /* controls indexing of exponents */
+  short     VarCompIndex; /* location of component in exp vector */
+  short     VarLowIndex;  /* lowest index of an exponent */
+  short     VarHighIndex; /* Highest index of an expoentn */
+  
 #ifdef RDEBUG
   short      no; /* unique id for rings */
 #endif

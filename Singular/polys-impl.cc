@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.cc,v 1.15 1998-04-07 18:37:41 Singular Exp $ */
+/* $Id: polys-impl.cc,v 1.16 1998-11-04 15:55:32 obachman Exp $ */
 
 /***************************************************************
  *
@@ -31,11 +31,99 @@
 
 /***************************************************************
  *
- * Low - level routines for which deal with var indicies
+ * Low - level routines which deal with var indicies
  *
  ***************************************************************/
+// And here is how we determine the way exponents are stored:
+// There are the following four possibilities:
+//
+//
+// BIGENDIAN -- lex order
+// e_1, e_2, ... , e_n,..,comp:  pVarOffset = -1,
+//                               pVarLowIndex = 0,
+//                               pVarHighIndex = pVariables-1
+//                               pVarCompIndex = pVariables + #(..)
+// BIGENDIAN -- rev lex order
+// e_n, ... , e_2, e_1,..,comp:  pVarOffset = pVariables,
+//                               pVarLowIndex = 0,
+//                               pVarHighIndex = pVariables-1
+//                               pVarCompIndex = pVariables + #(..)
+// LITTLEENDIAN -- rev lex order
+// comp,.., e_1, e_2, ... , e_n : pVarOffset = #(..),
+//                                pVarLowIndex = 1 + #(..),
+//                                pVarHighIndex = #(..) + pVariables
+//                                pVarCompIndex = 0
+// LITTLEENDIAN -- lex order
+// comp,..,e_n, .... , e_2, e_1 : pVarOffset = pVariables + 1 + #(..)
+//                                pVarLowIndex = 1 + #(..)
+//                                pVarHighIndex = #(..) + pVariables
+//                                pVarCompIndex = 0
+//
+// Furthermore, the size of the exponent vector is always a multiple
+// of the word size -- "empty exponents" (exactly #(..) ones) are
+// filled in between comp and first/last exponent -- i.e. comp and
+// first/last exponent might not be next to each other
+
+void pGetVarIndicies_Lex(int nvars, int* VarOffset, int &VarCompIndex,
+                                int &VarLowIndex, int &VarHighIndex)
+{
+  long temp = (nvars+1)*sizeof(Exponent_t);
+  if ((temp % sizeof(long)) == 0)
+    temp = temp / sizeof(long);
+  else
+    temp = (temp / sizeof(long)) + 1; // temp == pVariables1W
+#ifdef WORDS_BIGENDIAN
+  VarCompIndex = temp * sizeof(long)/sizeof(Exponent_t) - 1;
+  VarOffset[0] = VarCompIndex;
+  for (temp=1; temp<=nvars; temp++)
+    Varoffset[temp] = temp - 1;
+  VarLowIndex  = 0;
+  VarHighIndex = nvars - 1;
+#else //  ! WORDS_BIGENDIAN
+  temp *= sizeof(long)/sizeof(Exponent_t);
+  VarHighIndex = temp -1;
+  VarLowIndex = temp - nvars;
+  VarOffset[0] = 0;
+  for (long i = 1; i<=nvars;i++)
+    VarOffset[i] = temp - i;
+  VarCompIndex = 0;
+#endif // WORDS_BIGENDIAN
+}
+
+void pGetVarIndicies_RevLex(int nvars,int *VarOffset,int &VarCompIndex,
+                            int &VarLowIndex, int &VarHighIndex)
+{
+  long temp = (nvars+1)*sizeof(Exponent_t);
+  if ((temp % sizeof(long)) == 0)
+    temp = temp / sizeof(long);
+  else
+    temp = (temp / sizeof(long)) + 1; // temp == pVariables1W
+#ifdef WORDS_BIGENDIAN
+  VarCompIndex = temp * sizeof(long)/sizeof(Exponent_t) - 1;
+  VarOffset[0] = VarCompIndex;
+  for (temp=1; temp <= nvars; temp++)
+    VarOffset[temp] = nvars - temp;
+  VarLowIndex  = 0;
+  VarHighIndex = nvars-1;
+#else //  ! WORDS_BIGENDIAN
+  temp *= sizeof(long)/sizeof(Exponent_t);
+  VarHighIndex = temp -1;
+  VarLowIndex = temp - nvars;
+  VarOffset[0] = 0;
+  for (int i = 1; i<=nvars; i++)
+    VarOffset[i] = temp - nvars - 1 + i;
+  VarCompIndex = 0;
+#endif // WORDS_BIGENDIAN
+}
+
+void pGetVarIndicies(int nvars, int *VarOffset, int &VarCompIndex,
+                     int &VarLowIndex, int &VarHighIndex)
+{
+  pGetVarIndicies_Lex(nvars,VarOffset, VarCompIndex, VarLowIndex,VarHighIndex);
+}
+
 // gets var indicies w.r.t. the ring r
-void pGetVarIndicies(ring r, int &VarOffset, int &VarCompIndex,
+void pGetVarIndicies(ring r, int *VarOffset, int &VarCompIndex,
                      int &VarLowIndex, int &VarHighIndex)
 {
   // at the moment, non-default var indicies are only used for simple orderings
@@ -589,6 +677,7 @@ void pDBCopyAddFast(poly p1, poly p2, poly p3, char* f, int l)
   if (! pEqual(ptemp, p1))
     Print("Error in pCopyMonAddFast in %s:%d\n", f, l);
   pFree1(ptemp);
+  pTest(p1);
 }
 
 void pDBCopyAddFastHomog(poly p1, poly p2, poly p3, Order_t Order,

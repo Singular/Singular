@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.24 1998-10-15 11:46:06 obachman Exp $ */
+/* $Id: polys-impl.h,v 1.25 1998-11-04 15:55:32 obachman Exp $ */
 
 /***************************************************************
  *
@@ -63,7 +63,7 @@ extern int pMonomSizeW;
 extern int pVariables1W;
 // Ceiling((pVariables) / sizeof(void*))
 extern int pVariablesW;
-extern int pVarOffset;
+extern int *pVarOffset;
 extern int pVarLowIndex;
 extern int pVarHighIndex;
 extern int pVarCompIndex;
@@ -73,132 +73,26 @@ extern int pVarCompIndex;
  * Primitives for determening/setting  the way exponents are arranged
  *
  ***************************************************************/
-// And here is how we determine the way exponents are stored:
-// There are the following four possibilities:
-//
-//
-// BIGENDIAN -- lex order
-// e_1, e_2, ... , e_n,..,comp:  pVarOffset = -1,
-//                               pVarLowIndex = 0,
-//                               pVarHighIndex = pVariables-1
-//                               pVarCompIndex = pVariables + #(..)
-// BIGENDIAN -- rev lex order
-// e_n, ... , e_2, e_1,..,comp:  pVarOffset = pVariables,
-//                               pVarLowIndex = 0,
-//                               pVarHighIndex = pVariables-1
-//                               pVarCompIndex = pVariables + #(..)
-// LITTLEENDIAN -- rev lex order
-// comp,.., e_1, e_2, ... , e_n : pVarOffset = #(..),
-//                                pVarLowIndex = 1 + #(..),
-//                                pVarHighIndex = #(..) + pVariables
-//                                pVarCompIndex = 0
-// LITTLEENDIAN -- lex order
-// comp,..,e_n, .... , e_2, e_1 : pVarOffset = pVariables + 1 + #(..)
-//                                pVarLowIndex = 1 + #(..)
-//                                pVarHighIndex = #(..) + pVariables
-//                                pVarCompIndex = 0
-//
-// Furthermore, the size of the exponent vector is always a multiple
-// of the word size -- "empty exponents" (exactly #(..) ones) are
-// filled in between comp and first/last exponent -- i.e. comp and
-// first/last exponent might not be next to each other
+#define _pExpIndex(i) pVarOffset[(i)]
+#define _pRingExpIndex(r, i)  (r)->VarOffset[(i)]
 
-#ifdef WORDS_BIGENDIAN
+#define _pCompIndex        pVarOffset[0]
+#define _pRingCompIndex(r)  ((r)->VarOffset[0])
 
-#define _pHasReverseExp     (pVarOffset != -1)
-
-#define _pExpIndex(i)                           \
-  (pVarOffset == -1 ? (i) - 1 : pVarOffset - (i))
-#define _pRingExpIndex(r, i)                           \
-  ((r)->VarOffset == -1 ? (i) - 1 : (r)->VarOffset - (i))
-
-#define _pCompIndex        pVarCompIndex
-#define _pRingCompIndex(r)  (r->VarCompIndex)
-
-#else // ! WORDS_BIGENDIAN
-
-#define _pHasReverseExp    (pVarOffset > (SIZEOF_LONG / SIZEOF_EXPONENT) - 1)
-
-#define _pExpIndex(i)                                   \
-  (pVarOffset > (SIZEOF_LONG / SIZEOF_EXPONENT) - 1?   \
-   pVarOffset - (i) : pVarOffset + (i))
-#define _pRingExpIndex(r, i)                                \
-  ((r)->VarOffset > (SIZEOF_LONG / SIZEOF_EXPONENT) - 1?   \
-   (r)->VarOffset - (i) : (r)->VarOffset + (i))
-
-#define _pCompIndex          0
-#define _pRingCompIndex(r)   0
-
-#endif // WORDS_BIGENDIAN
-
-inline void pGetVarIndicies_Lex(int nvars, int &VarOffset, int &VarCompIndex,
-                                int &VarLowIndex, int &VarHighIndex)
-{
-  long temp = (nvars+1)*sizeof(Exponent_t);
-  if ((temp % sizeof(long)) == 0)
-    temp = temp / sizeof(long);
-  else
-    temp = (temp / sizeof(long)) + 1; // temp == pVariables1W
-#ifdef WORDS_BIGENDIAN
-  VarCompIndex = temp * sizeof(long)/sizeof(Exponent_t) - 1;
-  VarOffset    = -1;
-  VarLowIndex  = 0;
-  VarHighIndex = nvars - 1;
-#else //  ! WORDS_BIGENDIAN
-  temp *= sizeof(long)/sizeof(Exponent_t);
-  VarHighIndex = temp -1;
-  VarLowIndex = temp - nvars;
-  VarOffset = temp;
-  VarCompIndex = 0;
-#endif // WORDS_BIGENDIAN
-}
-
-#define pSetVarIndicies_Lex(nvars)                      \
-  pGetVarIndicies_Lex(nvars,pVarOffset,pVarCompIndex,   \
-                      pVarLowIndex,pVarHighIndex)
-
-
-
-inline void pGetVarIndicies_RevLex(int nvars,int &VarOffset,int &VarCompIndex,
-                                   int &VarLowIndex, int &VarHighIndex)
-{
-  long temp = (nvars+1)*sizeof(Exponent_t);
-  if ((temp % sizeof(long)) == 0)
-    temp = temp / sizeof(long);
-  else
-    temp = (temp / sizeof(long)) + 1; // temp == pVariables1W
-#ifdef WORDS_BIGENDIAN
-  VarCompIndex = temp * sizeof(long)/sizeof(Exponent_t) - 1;
-  VarOffset    = nvars;
-  VarLowIndex  = 0;
-  VarHighIndex = nvars-1;
-#else //  ! WORDS_BIGENDIAN
-  temp *= sizeof(long)/sizeof(Exponent_t);
-  VarHighIndex = temp -1;
-  VarLowIndex = temp - nvars;
-  VarOffset = temp - nvars -1;
-  VarCompIndex = 0;
-#endif // WORDS_BIGENDIAN
-}
-
-#define pSetVarIndicies_RevLex(nvars)                   \
- pGetVarIndicies_RevLex(nvars,pVarOffset,pVarCompIndex, \
-                        pVarLowIndex,pVarHighIndex)
-
-// The default settings:
-inline void pGetVarIndicies(int nvars, int &VarOffset, int &VarCompIndex,
-                            int &VarLowIndex, int &VarHighIndex)
-{
-  pGetVarIndicies_Lex(nvars,VarOffset, VarCompIndex, VarLowIndex,VarHighIndex);
-}
-// gets var indicies w.r.t. the ring r
-extern void pGetVarIndicies(ring r, int &VarOffset, int &VarCompIndex,
+// for simple, lex orderings  
+extern void pGetVarIndicies_Lex(int nvars, int* VarOffset, int &VarCompIndex,
+                                int &VarLowIndex, int &VarHighIndex);
+// for simple, revlex orderings
+extern void pGetVarIndicies_RevLex(int nvars,int *VarOffset,int &VarCompIndex,
+                                   int &VarLowIndex, int &VarHighIndex);
+// for all non-simple orderings
+extern void pGetVarIndicies(int nvars, int *VarOffset, int &VarCompIndex,
                             int &VarLowIndex, int &VarHighIndex);
-
-#define pSetVarIndicies(nvars)                      \
-  pGetVarIndicies(nvars, pVarOffset, pVarCompIndex, \
-                  pVarLowIndex, pVarHighIndex)
-
+// gets var indicies w.r.t. the ring r -- 
+// determines which one of three pGetVarIndicies((int nvars, ...) to use
+// based on properties of r
+extern void pGetVarIndicies(ring r, int *VarOffset, int &VarCompIndex,
+                            int &VarLowIndex, int &VarHighIndex);
 
 /***************************************************************
  *
@@ -275,26 +169,18 @@ inline Exponent_t _pGetExpDiff(poly p1, poly p2, int i)
 
 inline void _pGetExpV(poly p, Exponent_t *ev)
 {
-  if (_pHasReverseExp)
-  {
-    for (int i = pVarLowIndex, j = pVariables; j; i++, j--)
-      ev[j] = p->exp[i];
-  }
-  else
-    memcpy(&ev[1], &(p->exp[pVarLowIndex]), pVariables*sizeof(Exponent_t));
+  for (int j = pVariables; j; j--)
+      ev[j] = _pGetExp(p, j);
+
   ev[0] = _pGetComp(p);
 }
 
 extern pSetmProc pSetm;
 inline void _pSetExpV(poly p, Exponent_t *ev)
 {
-  if (_pHasReverseExp)
-  {
-    for (int i = pVarLowIndex, j = pVariables; j; i++, j--)
-      p->exp[i] = ev[j];
-  }
-  else
-    memcpy(&(p->exp[pVarLowIndex]), &ev[1], pVariables*sizeof(Exponent_t));
+  for (int j = pVariables; j; j--)
+      _pSetExp(p, j, ev[j]);
+
   _pSetComp(p, ev[0]);
   pSetm(p);
 }
@@ -648,14 +534,27 @@ DECLARE(int, __pExpQuerSum2(poly p, int from, int to))
 
 #define _pExpQuerSum(p)  __pExpQuerSum2(p, pVarLowIndex, pVarHighIndex)
 
-#define _pExpQuerSum1(p,to)                             \
- (_pHasReverseExp ?                                     \
-    __pExpQuerSum2(p, _pExpIndex(to), _pExpIndex(1)) :  \
-    __pExpQuerSum2(p, _pExpIndex(1), _pExpIndex(to)))
+inline int _pExpQuerSum1(poly p, int to)
+{
+  int ei_to = _pExpIndex(to);
+  int ei_1 = _pExpIndex(1);
+  
+  if (ei_1 > ei_to)
+    return __pExpQuerSum2(p, ei_to, ei_1);
+  else
+    return __pExpQuerSum2(p, ei_1, ei_to);
+}
 
-#define _pExpQuerSum2(p,from,to)                            \
- (_pHasReverseExp ?                                         \
-    __pExpQuerSum2(p, _pExpIndex(to), _pExpIndex(from)) :   \
-    __pExpQuerSum2(p, _pExpIndex(from), _pExpIndex(to)))
+
+inline int _pExpQuerSum2(poly p,int from,int to)
+{
+  int ei_to = _pExpIndex(to);
+  int ei_from = _pExpIndex(from);
+  
+  if (ei_from > ei_to)
+    return __pExpQuerSum2(p, ei_to, ei_from);
+  else
+    return __pExpQuerSum2(p, ei_from, ei_to);
+}
 
 #endif // POLYS_IMPL_H

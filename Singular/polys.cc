@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.32 1998-09-24 10:46:22 Singular Exp $ */
+/* $Id: polys.cc,v 1.33 1998-11-04 15:55:34 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -39,7 +39,7 @@ int pVariables1W;   // number of words of (pVariables+1) exponents
 int pMonomSize;     // size of monom (in bytes)
 int pMonomSizeW;    // size of monom (in words)
 int pLexSgn;        // 1, for lex monom comps; -1 otherwise (exception: ls)
-int pVarOffset;     // controls the way exponents are stored in a vector
+int *pVarOffset;     // controls the way exponents are stored in a vector
 int pVarLowIndex;   // lowest exponent index
 int pVarHighIndex;  // highest exponent index
 int pVarCompIndex;  // Location of component in exponent vector
@@ -980,7 +980,8 @@ static void SimpleChoose(int o_r, int comp_order, pCompProc *p)
       case ringorder_ws:
       case ringorder_ls:
       case ringorder_unspec:
-        pSetVarIndicies_RevLex(pVariables);
+        pGetVarIndicies_RevLex(pVariables, pVarOffset, pVarCompIndex,
+                               pVarLowIndex, pVarHighIndex);
         pLexSgn = -1;
         if (comp_order == ringorder_C || o_r == ringorder_unspec)
         {
@@ -1002,7 +1003,8 @@ static void SimpleChoose(int o_r, int comp_order, pCompProc *p)
 #else
       default:
 #endif
-        pSetVarIndicies_Lex(pVariables);
+        pGetVarIndicies_Lex(pVariables, pVarOffset, pVarCompIndex,
+                            pVarLowIndex, pVarHighIndex);
         pLexSgn = 1;
         if (comp_order == ringorder_c)
         {
@@ -1026,7 +1028,9 @@ static void SimpleChoose(int o_r, int comp_order, pCompProc *p)
     pFDeg = pTotaldegree;
     pLDeg = ldeg1c;
     if (o_r == ringorder_ls)
-      pSetVarIndicies_Lex(pVariables);
+      pGetVarIndicies_Lex(pVariables, pVarOffset, pVarCompIndex,
+                          pVarLowIndex, pVarHighIndex);
+
   }
 }
 
@@ -1043,7 +1047,8 @@ static void SimpleChooseC(int o_r, pCompProc *p)
       case ringorder_ds:
       case ringorder_ls:
       case ringorder_ws:
-        pSetVarIndicies_RevLex(pVariables);
+        pGetVarIndicies_RevLex(pVariables, pVarOffset, pVarCompIndex,
+                               pVarLowIndex, pVarHighIndex);
         pLexSgn = -1;
         *p = pComp_otCOMPEXP;
         break;
@@ -1057,7 +1062,8 @@ static void SimpleChooseC(int o_r, pCompProc *p)
 #else
       default:
 #endif
-        pSetVarIndicies_Lex(pVariables);
+        pGetVarIndicies_Lex(pVariables, pVarOffset, pVarCompIndex,
+                            pVarLowIndex, pVarHighIndex);
         pLexSgn = 1;
         *p = pComp_otCOMPEXP;
 #ifdef PDEBUG
@@ -1072,7 +1078,8 @@ static void SimpleChooseC(int o_r, pCompProc *p)
     pFDeg = pTotaldegree;
     pLDeg = ldeg1c;
     if (o_r == ringorder_ls)
-     pSetVarIndicies_Lex(pVariables);
+        pGetVarIndicies_Lex(pVariables, pVarOffset, pVarCompIndex,
+                            pVarLowIndex, pVarHighIndex);
   }
 }
 
@@ -1205,6 +1212,7 @@ void pChangeRing(int n, int Sgn, int * orders, int * b0, int * b1,
   tmpR.block0 = b0;
   tmpR.block1 = b1;
   tmpR.wvhdl = wv;
+  rComplete(&tmpR);
   pSetGlobals(&tmpR);
 }
 
@@ -1241,12 +1249,11 @@ void pSetGlobals(ring r, BOOLEAN complete)
     pMonomSize = pMonomSizeW*sizeof(void*);
   }
 
-  // Set default Var Indicies
-  pSetVarIndicies(pVariables);
-
   // Initialize memory management
   mmSpecializeBlock(pMonomSize);
 
+  pVarOffset = r->VarOffset;
+  
   pOrdSgn = r->OrdSgn;
   pVectorOut=(r->order[0]==ringorder_c);
   order=r->order;
@@ -1289,6 +1296,8 @@ void pSetGlobals(ring r, BOOLEAN complete)
   /*------- more than one block ----------------------*/
   else
   {
+    pGetVarIndicies(pVariables, pVarOffset, pVarCompIndex, pVarLowIndex,
+                    pVarHighIndex);
     //pLexOrder=TRUE;
     pVectorOut=order[0]==ringorder_c;
     if ((pVectorOut)||(order[0]==ringorder_C))

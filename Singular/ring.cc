@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.34 1998-11-02 09:05:40 Singular Exp $ */
+/* $Id: ring.cc,v 1.35 1998-11-04 15:55:35 obachman Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -670,10 +670,14 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
 
 void rComplete(ring r)
 {
-  int VarCompIndex, VarOffset, dummy;
-  pGetVarIndicies(r, VarOffset, VarCompIndex, dummy, dummy);
-  r->VarOffset = (short) VarOffset;
-  r->VarCompIndex = (short) VarCompIndex;
+  int VarCompIndex, VarLowIndex, VarHighIndex;
+  
+  r->VarOffset = (int*) Alloc((r->N + 1)*sizeof(int));
+  pGetVarIndicies(r, r->VarOffset, VarCompIndex, 
+                  VarLowIndex, VarHighIndex);
+  r->VarCompIndex = VarCompIndex;
+  r->VarLowIndex = VarLowIndex;
+  r->VarHighIndex = VarHighIndex;
 }
 
 /*2
@@ -927,6 +931,7 @@ void rKill(ring r)
         }
         Free((ADDRESS)r->parameter,r->P*sizeof(char *));
       }
+      Free((ADDRESS)r->VarOffset, (r->N +1)*sizeof(int));
     }
 #ifdef TEST
     else
@@ -1784,6 +1789,8 @@ ring rCopy(ring r)
   }
   res->idroot = NULL;
   if (r->qideal!=NULL) res->qideal= idCopy(r->qideal);
+  res->VarOffset = (int*) Alloc((r->N + 1)*sizeof(int));
+  memcpy4(res->VarOffset, r->VarOffset, (r->N + 1)*sizeof(int));
 
 #ifdef RDEBUG
   rNumber++;
