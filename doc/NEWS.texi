@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.13 2000-05-23 14:41:22 obachman Exp $
+@comment $Id: NEWS.texi,v 1.14 2000-06-14 10:19:07 obachman Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -78,22 +78,25 @@ The current syntax is going to change slightly in the final version 2.0.
 @heading New @sc{Singular} libraries
 
 @table @asis
-@item @code{spectrum_lib}
+@item @code{ip.lib} procedures for computing toric ideals
+TODO: better docu, tests, proper incooperation
+@item @code{toric.lib} procedures for Integer Programming using Groebner bases
+TODO: better docu, tests, proper incooperation
+@item @code{spectrum.lib} procedures for computing spectra
 TODO: docu, tests, proper incooperation
-@item @code{CaMuReg_lib}  procedures for computing Castelnuovo-Mumford
-regularity
-@* TODO: docu, tests
-@item @nref{mondromy_lib}
+@item @code{Mregular.lib}  procedures for computing the Castelnuovo-Mumford regularity
+TODO: docu, tests
+@item @nref{mondromy.lib}
 procedures for computing the monodromy of a singularity
-@item @code{spectrum_lib}
+@item @code{spectrum.lib}
 TBC: docu, examples, tests
-@item @nref{spcurve_lib}
+@item @nref{spcurve.lib}
 procedures for cm codimension 2 singularities
-@item @nref{triang_lib}
+@item @nref{triang.lib}
 procedures for solving triangular systems
-@item @nref{solve_lib}
+@item @nref{solve.lib}
 procedures for solving polynomial systems
-@item @nref{surf_lib}
+@item @nref{surf.lib}
 visualization of curves and surfaces with @code{surf}
 @end table
 
@@ -153,11 +156,11 @@ can be called with argument, must be called with parenthesis.
 
 @heading Changes in @sc{Singular} libraries
 @table @asis
-@item @nref{ainvar_lib}
+@item @nref{ainvar.lib}
 renamed @code{invar.lib} to @code{ainvar.lib}
-@item @nref{deform_lib}
+@item @nref{deform.lib}
 renamed procedures @code{Y1, T2, T12} to @code{T_1, T_2, T_12}.
-@item @nref{poly_lib}
+@item @nref{poly.lib}
 new procedures numerator/denominator
 @end table
 

@@ -1,7 +1,7 @@
 #####################################################################
 ### 
 ### Makefile for Singular documentation 
-### $Id: Makefile.in,v 1.68 2000-05-23 15:23:41 obachman Exp $
+### $Id: Makefile.in,v 1.69 2000-06-14 10:19:06 obachman Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -352,7 +352,7 @@ ${SINGULAR}:
 #	cd ..; ${MAKE} ${SINGULAR}
 
 Makefile: Makefile.in
-	cd ..; ${MAKE} doc/Makefile
+	cd ..; 	CONFIG_FILES="doc/Makefile" CONFIG_HEADERS= ./config.status
 
 html-done: ${MANUAL_FILES}
 
