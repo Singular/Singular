@@ -190,7 +190,6 @@ char * find_executable (const char *name)
     buf[ret] ='\0';
     link = find_executable_link(buf);
   }
-  // follow, if we have a link
   if (link != NULL && (ret=readlink(link, buf, MAXPATHLEN)) > 0)
   {
     char *p = strrchr(link, '/');
