@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.h,v 1.9 1997-07-16 10:17:10 schmidt Exp $ */
+/* $Id: canonicalform.h,v 1.10 1997-07-31 13:04:37 schmidt Exp $ */
 
 #ifndef INCL_CANONICALFORM_H
 #define INCL_CANONICALFORM_H
@@ -244,11 +244,18 @@ abs ( const CanonicalForm & f )
 	return f;
 }
 
+//{{{ inline CanonicalForm sqrt ( const CanonicalForm & a )
+//{{{ docu
+//
+// sqrt() - inline function version of method sqrt().
+//
+//}}}
 inline CanonicalForm
 sqrt ( const CanonicalForm & a )
 {
     return a.sqrt();
 }
+//}}}
 
 //{{{ inline int ilog2 ( const CanonicalForm & a )
 //{{{ docu
