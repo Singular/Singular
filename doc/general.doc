@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.172 1999-12-13 15:32:44 obachman Exp $
+@comment $Id: general.doc,v 1.173 1999-12-15 18:12:09 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -382,7 +382,7 @@ quits  @sc{Singular}
 @node Editing input,Command line options,Interrupting SINGULAR,Interactive use
 @subsection Editing input
 @cindex Editing input
-@c @cindex SINGULARHIST
+@cindex SINGULARHIST
 
 @c This section describes only a subset of the key bindings of
 @c @sc{Singular} binaries built with the GNU Readline library.
@@ -430,16 +430,13 @@ Library, Command Line Editing, readline, The GNU Readline Library
 Manual}, for more information. If a shared version of this library can
 be found on your machine, then additional command-line editing
 features like  history completion are available.
-TBC !!!
-
-
-@c On Unix-like operating systems, @sc{Singular}
-@c maintains a history of the last lines of input.  If the environment
-@c variable @code{SINGULARHIST} is set and has a name of a file as value,
-@c then the input history is stored across sessions using this
-@c file. Otherwise, i.e., if the environment variable @code{SINGULARHIST}
-@c is not set, then the history of the last inputs is only available for
-@c the commands of the current session.
+In particuliar, if @sc{Singular} is able to load taht library and
+if the environment
+variable @code{SINGULARHIST} is set and has a name of a file as value,
+then the input history is stored across sessions using this
+file. Otherwise, i.e., if the environment variable @code{SINGULARHIST}
+is not set, then the history of the last inputs is only available for
+the commands of the current session.
 
 @c --------------------------------------------------------------------------
 @node Command line options, Startup sequence, Editing input, Interactive use
