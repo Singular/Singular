@@ -4,12 +4,14 @@
  *           routines for omalloc
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omPrivate.h,v 1.1.1.1 1999-11-18 17:45:53 obachman Exp $
+ *  Version: $Id: omPrivate.h,v 1.2 1999-11-22 18:12:59 obachman Exp $
  *******************************************************************/
 #ifndef OM_PRIVATE_H
 #define OM_PRIVATE_H
 
 #include <stdlib.h>
+#include <string.h>
+
 /*******************************************************************
  *  
  *  Misc defines
@@ -99,19 +101,13 @@ extern  omBin       om_Size2Bin[];
 #include "omTables.inc"
  
 
-#define omSize2Bin(size) \
-  ((size) <= OM_MAX_BLOCK_SIZE ? \
-   om_Size2Bin[((size) -1) >> LOG_SIZEOF_OM_ALIGNMENT] : \
-   om_LargeBin) 
 
 /*******************************************************************
  *  
  *  lowest level alloc/free macros
  *  
  *******************************************************************/
-extern void* omAllocBinFromFullPage(omBinPage page, omBin bin);
-extern void* omAllocBlockFromFullPage(omBinPage page, omBin bin, 
-                                      const size_t size, const int zero);
+extern void* omAllocBinFromFullPage(omBin bin);
 extern void  omFreeToPageFault(omBinPage page, void* addr);
 
 #include "omMemOps.h"
@@ -132,7 +128,7 @@ while (0)
 #define __omFreeToPage(addr, page)              \
 do                                              \
 {                                               \
-  if ((page)->used_blocks > 0)                 \
+  if ((page)->used_blocks > 0)                  \
   {                                             \
     *((void**)addr) = (page)->current;          \
     ((page)->used_blocks)--;                    \
@@ -147,31 +143,31 @@ while (0)
 
 
 /*******************************************************************/
-/* Bin                                                            */
-#define __omTypeAllocBin(type, addr, bin)             \
+/* Bin                                                             */
+#define __omTypeAllocBin(type, addr, bin)               \
 do                                                      \
 {                                                       \
-  register omBinPage __om_page = (bin)->current_page; \
+  register omBinPage __om_page = (bin)->current_page;   \
   if (__om_page->current != NULL)                       \
     __omTypeAllocFromPage(type, addr, __om_page);       \
   else                                                  \
-    addr = (type) omAllocBinFromFullPage(__om_page, bin); \
+    addr = (type) omAllocBinFromFullPage(bin);          \
 }                                                       \
 while (0)
 
-#define __omTypeAlloc0Bin(type, addr, bin)    \
+#define __omTypeAlloc0Bin(type, addr, bin)      \
 do                                              \
 {                                               \
-  __omTypeAllocBin(type, addr, bin);          \
-  omMemsetW(addr, 0, (bin)->sizeW);            \
+  __omTypeAllocBin(type, addr, bin);            \
+  omMemsetW(addr, 0, (bin)->sizeW);             \
 }                                               \
 while (0)
 
-#define __omFreeBin(addr)                                      \
+#define __omFreeBin(addr)                                       \
 do                                                              \
 {                                                               \
   register void* __om_addr = (void*) (addr);                    \
-  register omBinPage __om_page = omGetPageOfAddr(__om_addr);   \
+  register omBinPage __om_page = omGetPageOfAddr(__om_addr);    \
   __omFreeToPage(__om_addr, __om_page);                         \
 }                                                               \
 while (0)
@@ -179,74 +175,108 @@ while (0)
 
 /*******************************************************************/
 /* Block                                                           */
-#define ___omTypeAllocBlock(type, addr, size, init, action_zero, action_init)   \
-do                                                                              \
-{                                                                               \
-  omBin ___om_bin = omSize2Bin(size);                                           \
-  register omBinPage ___om_page = ___om_bin->current_page;                      \
-  if (___om_page->current != NULL)                                              \
-  {                                                                             \
-    __omTypeAllocFromPage(type, addr, ___om_page);                              \
-    action_zero                                                                 \
-  }                                                                             \
-  else                                                                          \
-  {                                                                             \
-    addr = (type) omAllocBlockFromFullPage(___om_page, ___om_bin, size, init);  \
-  }                                                                             \
-  action_init                                                                   \
-}                                                                               \
-while (0)
+#define omSmallSize2Bin(size) om_Size2Bin[((size) -1) >> LOG_SIZEOF_OM_ALIGNMENT]
+#define omSize2Bin(size) ((size) <= OM_MAX_BLOCK_SIZE ? omSmallSize2Bin(size) : om_LargeBin)
+
+#define omAllocLargeBlock(size)       OM_MALLOC(size)
+#define omFreeLargeBlock(addr, size)  OM_FREE(addr)
 
 #define __omTypeAllocBlock(type, addr, size)    \
 do                                              \
 {                                               \
-  ___omTypeAllocBlock(type, addr, size, 0, ,);   \
+  if (size <= OM_MAX_BLOCK_SIZE)                \
+  {                                             \
+    omBin __om_bin = omSmallSize2Bin(size);     \
+    __omTypeAllocBin(type, addr, __om_bin);     \
+  }                                             \
+  else                                          \
+  {                                             \
+    addr = (type) omAllocLargeBlock(size);      \
+  }                                             \
 }                                               \
-while (0)
+while(0)
 
-#define __omTypeAlloc0Block(type, addr, size)                   \
-do                                                              \
-{                                                               \
-  ___omTypeAllocBlock(type, addr, size, 1,                      \
-                      omMemsetW(addr, 0, ___om_bin->sizeW);, );   \
-}                                                               \
+#define __omTypeAlloc0Block(type, addr, size)   \
+do                                              \
+{                                               \
+  if (size <= OM_MAX_BLOCK_SIZE)                \
+  {                                             \
+    omBin __om_bin = omSmallSize2Bin(size);     \
+    __omTypeAlloc0Bin(type, addr, __om_bin);    \
+  }                                             \
+  else                                          \
+  {                                             \
+    addr = (type) omAllocLargeBlock(size);      \
+    memset(addr, 0, size);                      \
+  }                                             \
+}                                               \
 while (0)
 
 #define __omFreeBlock(addr, size)               \
 do                                              \
 {                                               \
-  omBin _om_bin = omSize2Bin(size);          \
-  omBinPage _om_page = _om_bin->current_page; \
-  __omFreeToPage(addr, _om_page);               \
+  if (size <= OM_MAX_BLOCK_SIZE)                \
+  {                                             \
+    __omFreeBin(addr);                          \
+  }                                             \
+  else                                          \
+  {                                             \
+    omFreeLargeBlock(addr, size);               \
+  }                                             \
 }                                               \
 while (0)
 
-
 /*******************************************************************/
 /* Chunk                                                           */
-#define ___omTypeAllocChunk(type, addr, size, init, action_init)                    \
-do                                                                                  \
-{                                                                                   \
-  void* ___om_addr;                                                                 \
-  size_t ___om_size = (size) + SIZEOF_OM_ALIGNMENT;                                 \
-  ___omTypeAllocBlock(void*, ___om_addr, ___om_size, init,                          \
-                      action_init,                                                  \
-                      *((void**) ___om_addr) = (void*) ___om_bin->current_page;);   \
-  addr = (type) (___om_addr + SIZEOF_OM_ALIGNMENT);                                 \
-}                                                                                   \
+#define omAllocLargeChunk(size)  OM_MALLOC(size)
+#define omFreeLargeChunk(addr)   OM_FREE(addr)
+ 
+#define __omTypeAllocChunk(type, addr, size)                \
+do                                                          \
+{                                                           \
+  void* __om_addr;                                          \
+  size_t __om_size = (size) + SIZEOF_OM_ALIGNMENT;          \
+  if (__om_size <= OM_MAX_BLOCK_SIZE)                       \
+  {                                                         \
+    omBin __om_bin = omSmallSize2Bin(__om_size);                 \
+    __omTypeAllocBin(void*, __om_addr, __om_bin);           \
+    *((void**) __om_addr) = (void*) __om_bin->current_page; \
+  }                                                         \
+  else                                                      \
+  {                                                         \
+    __om_addr = omAllocLargeChunk(__om_size);               \
+    *((void**) __om_addr) = om_LargePage;                   \
+  }                                                         \
+  addr = (type) (__om_addr + SIZEOF_OM_ALIGNMENT);          \
+}                                                           \
 while (0)
 
-#define __omTypeAllocChunk(type, addr, size) \
-  ___omTypeAllocChunk(type, addr, size, 0,)
-
-#define __omTypeAlloc0Chunk(type, addr, size) \
-  ___omTypeAllocChunk(type, addr, size, 1, omMemsetW(___om_addr, 0, ___om_bin->sizeW);)
+#define __omTypeAlloc0Chunk(type, addr, size)               \
+do                                                          \
+{                                                           \
+  void* __om_addr;                                          \
+  size_t __om_size = (size) + SIZEOF_OM_ALIGNMENT;          \
+  if (__om_size <= OM_MAX_BLOCK_SIZE)                       \
+  {                                                         \
+    omBin __om_bin = omSmallSize2Bin(__om_size);            \
+    __omTypeAlloc0Bin(void*, __om_addr, __om_bin);          \
+    *((void**) __om_addr) = (void*) __om_bin->current_page; \
+  }                                                         \
+  else                                                      \
+  {                                                         \
+    __om_addr = omAllocLargeChunk(__om_size);               \
+    memset(__om_addr, 0, __om_size);                        \
+    *((void**) __om_addr) = om_LargePage;                   \
+  }                                                         \
+  addr = (type) (__om_addr + SIZEOF_OM_ALIGNMENT);          \
+}                                                           \
+while (0)
 
 #define __omFreeChunk(addr)                                 \
 do                                                          \
 {                                                           \
   void* __addr = ((void*) (addr)) - SIZEOF_OM_ALIGNMENT;    \
-  omBinPage __om_page = *((omBinPage*) __addr);               \
+  omBinPage __om_page = *((omBinPage*) __addr);             \
   __omFreeToPage(__addr, __om_page);                        \
 }                                                           \
 while (0)
@@ -313,6 +343,10 @@ OM_FREE_FUNC_WRAPPER(FreeChunk)
 
 omBin omGetSpecBin(size_t size);
 void  omUnGetSpecBin(omBin *bin);
+unsigned long omGetNewStickyAllBinTag();
+void omSetStickyAllBinTag(unsigned long sticky);
+void omUnSetStickyAllBinTag(unsigned long sticky);
+void omDeleteStickyAllBinTag(unsigned long sticky);
 
 #endif /* ! OM_GENERATE_INC */
 

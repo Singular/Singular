@@ -3,7 +3,7 @@
  *  Purpose: implementation of routines for operations on linked lists
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omList.c,v 1.1.1.1 1999-11-18 17:45:53 obachman Exp $
+ *  Version: $Id: omList.c,v 1.2 1999-11-22 18:12:59 obachman Exp $
  *******************************************************************/
 #ifndef NULL
 #define NULL ((void*) 0)
@@ -156,7 +156,7 @@ void* _omInsertInSortedList(void* list, int next, int long_field, void* addr)
     void* prev = list;
     void* curr = NEXT(list);
     
-    while (curr != NULL && VALUE(list, long_field) < what)
+    while (curr != NULL && VALUE(curr, long_field) < what)
     {
       prev = curr;
       ITER(curr);

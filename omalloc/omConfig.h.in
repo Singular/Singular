@@ -3,7 +3,7 @@
  *  Purpose: configuration for omalloc  
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omConfig.h.in,v 1.1.1.1 1999-11-18 17:45:52 obachman Exp $
+ *  Version: $Id: omConfig.h.in,v 1.2 1999-11-22 18:12:58 obachman Exp $
  *******************************************************************/
 #ifndef OM_CONFIG_H
 #define OM_CONFIG_H
@@ -60,6 +60,14 @@
 /* define if OM_FRAME_ADDR actually works */
 #ifndef OM_FRAME_ADDR_WORKS
 #undef OM_FRAME_ADDR_WORKS
+#endif
+/* define if OM_RETURN_ADDR actually rvalue */
+#ifndef OM_RETURN_ADDR_RVALUE
+#undef OM_RETURN_ADDR_RVALUE
+#endif
+/* define if OM_FRAME_ADDR actually rvalue */
+#ifndef OM_FRAME_ADDR_RVALUE
+#undef OM_FRAME_ADDR_RVALUE
 #endif
 /* Define sizeof(long) */
 #ifndef SIZEOF_LONG

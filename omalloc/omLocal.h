@@ -4,7 +4,7 @@
  *           routines for omalloc
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omLocal.h,v 1.1.1.1 1999-11-18 17:45:52 obachman Exp $
+ *  Version: $Id: omLocal.h,v 1.2 1999-11-22 18:12:59 obachman Exp $
  *******************************************************************/
 #ifndef OM_LOCAL_H
 #define OM_LOCAL_H
@@ -43,9 +43,11 @@ extern omSpecBin om_SpecBin;
 #define omSetTopBinAndStickyOfPage(page, bin, sticky) \
   (page)->bin_sticky= (void*)((unsigned long)sticky + (unsigned long)bin)
 
+#define omGetTopBinOfAddr(addr) \
+  omGetTopBinOfPage(((omBinPage) omGetPageOfAddr(addr)))
 
 #if defined(OM_INLINE) || defined(OM_ALLOC_C)
-OM_INLINE omBin omBinOfPage(omBinPage page)
+OM_INLINE omBin omGetBinOfPage(omBinPage page)
 {
   unsigned long sticky = omGetStickyOfPage(page);
   omBin bin = omGetTopBinOfPage(page);
@@ -56,8 +58,13 @@ OM_INLINE omBin omBinOfPage(omBinPage page)
   }
   return bin;
 }
+OM_INLINE omBin omGetBinOfAddr(void* addr)
+{
+  return omGetBinOfPage(omGetPageOfAddr(addr));
+}
 #else
-extern omBin omBinOfPage(omBinPage page);
+extern omBin omGetBinOfPage(omBinPage page);
+extern omBin omGetBinOfAddr(void* addr);
 #endif /* defined(OM_INLINE) || defined(OM_ALLOC_C) */
 
 /*******************************************************************
@@ -68,6 +75,7 @@ extern omBin omBinOfPage(omBinPage page);
 #include <stdio.h>
 extern int omIsStaticBin(omBin bin);
 extern void omPrintBinStats(FILE* fd);
+extern void omPrintBinStat(FILE * fd, omBin bin);
 
 /*******************************************************************
  *
@@ -76,28 +84,24 @@ extern void omPrintBinStats(FILE* fd);
  ******************************************************************/
 #ifndef HAVE_OM_ASSUME
 
-#define omError(msg)    (msg)
 #define omAssume(x) ((void) 0)
 
 #else /* ! HAVE_OM_ASSUME */
 
-extern const char* omReportError(const char* msg, 
-                                 const char* file, const int line);
-
-#define omError(msg)  omReportError(msg, __FILE__, __LINE__)
-#define omAssume(x)   _omAssume(x, __FILE__, __LINE__)  
-
-#define _omAssume(x, f, l)                      \
+#define omAssume(x)                             \
 do                                              \
 {                                               \
   if (! (x))                                    \
   {                                             \
-    omReportError("omAssume violation", f, l);  \
+    omReportError("omAssume violation");        \
   }                                             \
 }                                               \
 while (0)
 
 #endif /* HAVE_OM_ASSUME */
+
+extern const char* omReportError(const char* msg);
+#define omError(msg)  omReportError(msg)
 
 /*******************************************************************
  *******************************************************************

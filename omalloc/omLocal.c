@@ -4,7 +4,7 @@
  *           routines for omalloc
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omLocal.c,v 1.1.1.1 1999-11-18 17:45:53 obachman Exp $
+ *  Version: $Id: omLocal.c,v 1.2 1999-11-22 18:12:59 obachman Exp $
  *******************************************************************/
 
 #include <stdio.h>
@@ -12,10 +12,12 @@
 #include "omPrivate.h"
 #include "omLocal.h"
 #include "omPage.h"
+#include "omTrack.h"
 
-const char* omReportError(const char* msg, const char* file, const int line)
+const char* omReportError(const char* msg)
 {
-  fprintf(stderr, "***Error: %s in %s:%d\n", msg, file, line);
+  fprintf(stderr, "***Error: %s: occured at \n", msg);
+  omPrintCurrentBackTrace(1, 20, stderr);
   return msg;
 }
 

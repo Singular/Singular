@@ -3,7 +3,7 @@
  *  Purpose: implementation of main omDebug functions
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omDebug.c,v 1.1.1.1 1999-11-18 17:45:53 obachman Exp $
+ *  Version: $Id: omDebug.c,v 1.2 1999-11-22 18:12:58 obachman Exp $
  *******************************************************************/
 #include "omConfig.h"
 #include "omPrivate.h"
@@ -11,48 +11,47 @@
 #include "omList.h"
 #include "omDebug.h"
 
-static int omdCheckBinAddrSize(void* addr, omBin bin, size_t size,
-                               int level, const char* fn, const int l);
-static int omdPrintBinError(const char* msg, void* addr, size_t size,omBin bin,
-                            const char* fn, const int l);
-static const char* omdTestBinAddrSize(void* addr, omBin bin, size_t size, 
-                                      int level);
+static int omdCheckBinAddrSize(void* addr, size_t size, int level);
+static int omdPrintBinError(const char* msg, void* addr, size_t size,
+                            omBin bin);
+static const char* omdTestBinAddrSize(void* addr, size_t size, int level, 
+                                      omBin *bin);
 static const char* omdTestBin(omBin bin, int level);
 static const char* omdTestBinPage(omBinPage page, int level);
-static int   omdIsKnownBin(omBin bin);
+static int   omdIsKnownTopBin(omBin bin);
 
 /*******************************************************************
  *  
  *   Checking addresses 
  *  
  *******************************************************************/
-int omdCheckBinAddr(void* addr, omBin bin, int level, 
-                    const char* fn, const int l)
+int omdCheckBinAddr(void* addr, int level)
 {
-  if (! omdCheckBinAddrSize(addr, bin, bin->sizeW*SIZEOF_LONG, level, fn, l))
-    return 0;
-  return omdCheckBins(level - 2, fn, l);
+  return omdCheckBinAddrSize(addr, 0, level);
 }
 
-int omdCheckBlockAddr(void* addr, size_t size, int level, 
-                      const char* fn, const int l)
+int omdCheckBlockAddr(void* addr, size_t size, int level)
 {
-  omBin bin = omSize2Bin(size);
-  if (bin != om_LargeBin && 
-      ! omdCheckBinAddrSize(addr, bin, size, level, fn, l))
+  if (size == 0)
+  {
+    omError("0 size");
     return 0;
-  return omdCheckBins(level - 2, fn, l);
+  }
+  if (size <= OM_MAX_BLOCK_SIZE)
+    return omdCheckBinAddrSize(addr, size, level);
+  else
+    return 1;
 }
 
-int omdCheckChunkAddr(void* addr, int level, const char* fn, const int l)
+int omdCheckChunkAddr(void* addr, int level)
 {
   omBinPage page;
   addr = addr - SIZEOF_OM_ALIGNMENT;
   page = *((omBinPage*) addr);
-  if (page != om_LargePage &&
-      ! omdCheckBinAddr(addr, omBinOfPage(page), level, fn, l))
-    return 0;
-  return omdCheckBins(level - 2, fn, l);
+  if (page != om_LargePage)
+    return omdCheckBinAddrSize(addr, -1, level);
+  else
+    return 1;
 }
     
 /*******************************************************************
@@ -60,7 +59,7 @@ int omdCheckChunkAddr(void* addr, int level, const char* fn, const int l)
  * Checking Bins
  *  
  *******************************************************************/
-static int omdIsKnownBin(omBin bin)
+static int omdIsKnownTopBin(omBin bin)
 {
   int i = 0;
   omSpecBin s_bin;
@@ -80,18 +79,18 @@ static int omdIsKnownBin(omBin bin)
   return 0;
 }
 
-int omdCheckBin(omBin bin, int level, const char* fn, const int l)
+int omdCheckBin(omBin bin, int level)
 {
   const char* msg = omdTestBin(bin, level);
   if (msg != NULL) 
   {
-    if (fn != NULL) omdPrintBinError(msg, NULL, 0, bin, fn, l);
+    omdPrintBinError(msg, NULL, 0, bin);
     return 0;
   }
   return 1;
 }
 
-int omdCheckBins(int level, const char* fn, const int l)
+int omdCheckBins(int level)
 {
   if (level <= 0)
   {
@@ -105,12 +104,12 @@ int omdCheckBins(int level, const char* fn, const int l)
   
     for (i=0; i<= OM_MAX_BIN_INDEX; i++)
     {
-      if (! omdCheckBin(&om_StaticBin[i], level, fn, l)) return 0;
+      if (! omdCheckBin(&om_StaticBin[i], level)) return 0;
     }
     s_bin = om_SpecBin;
     while (s_bin != NULL)
     {
-      if (! omdCheckBin(s_bin->bin, level, fn, l)) return 0;
+      if (! omdCheckBin(s_bin->bin, level)) return 0;
       s_bin = s_bin->next;
     }
     return 1;
@@ -123,104 +122,98 @@ int omdCheckBins(int level, const char* fn, const int l)
  *  
  *******************************************************************/
 
-void* omdCheckAllocBin(omBin bin, const int zero, int level, 
-                       const char* fn, const int l)
+void* omdCheckAllocBin(omBin bin, const int zero, int level)
 {
   void* res;
   
-  omdCheckBins(level-2, fn, l);
+  omdCheckBins(level-2);
 
   if (zero)
     __omTypeAlloc0Bin(void*, res, bin);
   else
     __omTypeAllocBin(void*, res, bin);
 
-  omdCheckBinAddr(res, bin, level-1,fn, l);
-  omdCheckBins(level-2, fn, l);
+  omdCheckBinAddr(res, level-1);
+  omdCheckBins(level-2);
 
   return res;
 }
   
-void  omdCheckFreeBin(void* addr, omBin bin, 
-                      int level, const char* fn, const int l)
+void  omdCheckFreeBin(void* addr, int level)
 {
-  omdCheckBins(level-2, fn, l);
+  omdCheckBins(level-2);
 
-  if (omdCheckBinAddr(addr, bin, level, fn, l))
+  if (omdCheckBinAddr(addr, level))
     __omFreeBin(addr);
 
-  omdCheckBin(bin, level - 1, fn, l);
-  omdCheckBins(level - 2, fn, l);
+  omdCheckBins(level - 2);
 }
 
-void* omdCheckAllocBlock(size_t size, const int zero, 
-                        int level, const char* fn, const int l)
+void* omdCheckAllocBlock(size_t size, const int zero, int level)
 {
   void* res;
   
   if (level > 0 && size <= 0) 
   {
-    if (fn != NULL) omdPrintBinError("requested AllocBlock size <= 0", 
-                                     NULL, size, NULL, fn, l);
+    omdPrintBinError("requested AllocBlock size <= 0", 
+                     NULL, size, NULL);
     size = 1;
   }
 
-  omdCheckBins(level-2, fn, l);
+  omdCheckBins(level-2);
 
   if (zero)
     __omTypeAlloc0Block(void*, res, size);
   else
     __omTypeAllocBlock(void*, res, size);
   
-  omdCheckBlockAddr(res, size, level - 1, fn, l);
-  omdCheckBins(level - 2, fn, l);
+  omdCheckBlockAddr(res, size, level - 1);
+  omdCheckBins(level - 2);
 
   return res;
 }
 
-void omdCheckFreeBlock(void* addr, size_t size, 
-                       int level, const char* fn, const int l)
+void omdCheckFreeBlock(void* addr, size_t size, int level)
 {
-  omdCheckBins(level - 2, fn, l);
-  if (! omdCheckBlockAddr(addr, size, level, fn, l)) return;
+  omdCheckBins(level - 2);
+  if (! omdCheckBlockAddr(addr, size, level)) return;
   
   __omFreeBlock(addr, size);
   
-  omdCheckBins(level - 2, fn, l);
+  omdCheckBins(level - 2);
 }
 
 
-void* omdCheckAllocChunk(size_t size, const int zero, 
-                        int level, const char* fn, const int l)
+void* omdCheckAllocChunk(size_t size, const int zero, int level)
 {
   void* res;
   
   if (level > 0 && size <= 0) 
   {
-    if (fn != NULL) omdPrintBinError("requested AllocBlock size <= 0", 
-                                     NULL, size, NULL, fn, l);
+    omdPrintBinError("requested AllocBlock size <= 0", 
+                     NULL, size, NULL);
     size = 1;
   }
-  omdCheckBins(level - 2, fn, l);
+  omdCheckBins(level - 2);
 
   if (zero)
     __omTypeAlloc0Chunk(void*, res, size);
   else
     __omTypeAllocChunk(void*, res, size);
   
-  omdCheckChunkAddr(res, level - 1, fn, l);
-  omdCheckBins(level - 2, fn, l);
+  omdCheckChunkAddr(res, level - 1);
+  omdCheckBins(level - 2);
 
   return res;
 }
 
-void omdCheckFreeChunk(void* addr, int level, const char* fn, const int l)
+void omdCheckFreeChunk(void* addr, int level)
 {
-  if (! omdCheckChunkAddr(addr, level, fn, l)) return;
+  if (! omdCheckChunkAddr(addr, level)) return;
   
   __omFreeChunk(addr);
   
-  omdCheckBins(level - 2, fn, l);
+  omdCheckBins(level - 2);
 }
 
 
@@ -229,24 +222,23 @@ void omdCheckFreeChunk(void* addr, int level, const char* fn, const int l)
  *  Checking a bin address
  *  
  *******************************************************************/
-static int omdPrintBinError(const char* msg, void* addr, size_t size,omBin bin,
-                            const char* fn, const int l)
+static int omdPrintBinError(const char* msg, void* addr, size_t size,omBin bin)
 {
   fprintf(stderr, 
-          "***BinError:
-%s: occured for addr:%p (%d) bin:%p (%ld:%ld) in %s:%d\n",
-          msg, addr, size, (void*) bin, 
+          "for addr:%p (%d) bin:%p (%ld:%ld)\n",
+          addr, size, (void*) bin, 
           (bin != NULL ? bin->max_blocks : 0), 
-          (bin != NULL ? bin->sizeW : 0), fn, l);
+          (bin != NULL ? bin->sizeW : 0));
+  fflush(stderr);
   return 0;
 }
 
-static int omdCheckBinAddrSize(void* addr, omBin bin, size_t size,
-                               int level, const char* fn, const int l)
+static int omdCheckBinAddrSize(void* addr, size_t size, int level)
 {
-  const char* msg = omdTestBinAddrSize(addr, bin, size, level);
+  omBin bin = NULL;
+  const char* msg = omdTestBinAddrSize(addr, size, level, &bin);
   if (msg != NULL)
-    return omdPrintBinError(msg, addr, size, bin, fn, l);
+    return omdPrintBinError(msg, addr, size, bin);
   else
     return 1;
 }
@@ -254,37 +246,47 @@ static int omdCheckBinAddrSize(void* addr, omBin bin, size_t size,
 
 /* Check that addr is activ (used) adr of bin */
 static const char* 
-omdTestBinAddrSize(void* addr, omBin bin, size_t size, int level)
+omdTestBinAddrSize(void* addr, size_t size, int level, omBin* r_bin)
 {
+  omBin bin;
   omBinPage page;
   omBin h_bin;
   const char* msg;
   
-
   if (level <= 0) return NULL;
   
   if (addr == NULL) return omError("NULL addr");
+
+  if (size > OM_MAX_BLOCK_SIZE) return NULL;
+
+  bin = omGetTopBinOfAddr(addr);
+  
   if (bin == NULL) return omError("NULL Bin");
 
-  if (! omdIsKnownBin(bin))
+  if (! omdIsKnownTopBin(bin))
     return omError("Addr not from Bin (Bin unknown)");
+  *r_bin = bin;
   
   if ((msg = omdTestBin(bin, level - 1)) != NULL) return msg;
 
   // check for right bin
-  if (omIsStaticBin(bin))
-    h_bin = omSize2Bin(size);
-  else
-    h_bin = omGetSpecBin(size);
-  if (bin != h_bin) return omError("size is wrong");
-  if (! omIsStaticBin(bin)) omUnGetSpecBin(&h_bin);
+  if (size > 0)
+  {
+    if (omIsStaticBin(bin))
+      h_bin = omSize2Bin(size);
+    else
+      h_bin = omGetSpecBin(size);
+    if (bin != h_bin) return omError("size is wrong");
+    if (! omIsStaticBin(bin)) omUnGetSpecBin(&h_bin);
+  }
 
   // check page 
   page = omGetPageOfAddr(addr);
   if ((msg = omdTestBinPage(page, level - 1)) != NULL) return msg;
   
   // look that page is in queue of pages of this Bin
-  h_bin = omBinOfPage(page);
+  h_bin = omGetBinOfPage(page);
+  *r_bin = h_bin;
   if ( ! omIsOnGList(h_bin->last_page, prev, page))
     return omError("page of addr not from this Bin");
 
@@ -346,6 +348,7 @@ static const char* omdTestBinPage(omBinPage page, int level)
   if (level > 1)
   {
     void* current = page->current;
+    int i = 1;
     if (current != NULL &&
         omListLength(current) != bin->max_blocks - page->used_blocks - 1)
       return omError("used_blocks and current out of sync");
@@ -361,7 +364,8 @@ static const char* omdTestBinPage(omBinPage page, int level)
            % (bin->sizeW * SIZEOF_LONG)
            != 0)
         return omError("current has unaligned adress");
-      current = *((void**) (current + SIZEOF_VOIDP));
+      current = *((void**) current);
+      i++;
     }
   }
   return NULL;
@@ -378,7 +382,7 @@ static const char* omdTestBin(omBin bin, int level)
   
   if (bin == NULL) return omError("NULL Bin");
 
-  if (! omdIsKnownBin(bin)) return omError("Bin unknown");
+  if (! omdIsKnownTopBin(bin)) return omError("TopBin unknown");
   
   if (level > 2 && 
       omGListHasCycle(bin, next)) 
@@ -439,7 +443,7 @@ static const char* omdTestBin(omBin bin, int level)
       if (omGetStickyOfPage(page) != bin->sticky)
         return omError("Sticky of page wrong");
 
-      if (omBinOfPage(page) != bin)
+      if (omGetBinOfPage(page) != bin)
         return omError("Bin of Page wrong");
        
       if (where == -1)
@@ -456,7 +460,7 @@ static const char* omdTestBin(omBin bin, int level)
         else
         {
           if (page->current == NULL ||
-              page->used_blocks == 0 ||
+              page->used_blocks < 0 ||
               page->used_blocks == bin->max_blocks - 1)
             return omError("used_blocks and current of upage out of sync");
         }
