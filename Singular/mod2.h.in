@@ -31,6 +31,8 @@
 #undef HAVE_LIBFAC_P
 /* Define if you have stdc headers */
 #undef STDC_HEADERS
+/* Define if you have asm/sigcontext.h */
+#undef HAVE_ASM_SIGCONTEXT_H
 /* Define if you have sys/file.h */
 #undef HAVE_SYS_FILE_H
 /* Define if you have sys/stat.h */

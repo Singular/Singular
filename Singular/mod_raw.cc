@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mod_raw.cc,v 1.1 1999-04-01 10:10:08 krueger Exp $ */
+/* $Id: mod_raw.cc,v 1.2 1999-05-10 12:51:30 krueger Exp $ */
 /*
  * ABSTRACT: machine depend code for dynamic modules
  *
@@ -26,7 +26,7 @@ void *dynl_open(
   char *filename    /* I: filename to load */
   )
 {
-  return(dlopen(filename, RTLD_GLOBAL));
+  return(dlopen(filename, RTLD_NOW|RTLD_GLOBAL));
 }
 
 void *dynl_sym(void *handle, char *symbol)

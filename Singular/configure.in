@@ -296,7 +296,7 @@ AC_HEADER_STDC
 AC_CHECK_HEADERS(limits.h unistd.h,,
   AC_MSG_ERROR(Can not compile without limits.h unistd.h))
 
-AC_CHECK_HEADERS(malloc.h sys/file.h sys/ioctl.h sys/time.h sys/times.h sys/types.h sys/stat.h fcntl.h sys/param.h pwd.h)
+AC_CHECK_HEADERS(malloc.h sys/file.h sys/ioctl.h sys/time.h sys/times.h sys/types.h sys/stat.h fcntl.h sys/param.h pwd.h asm/sigcontext.h)
 
 # typedefs, structures
 AC_C_CONST

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: cntrlc.cc,v 1.22 1998-12-18 11:11:24 obachman Exp $ */
+/* $Id: cntrlc.cc,v 1.23 1999-05-10 12:51:18 krueger Exp $ */
 /*
 * ABSTRACT - interupt handling
 */
@@ -73,7 +73,7 @@ void sigint_handler(int sig);
 #endif
 
 #if defined(linux) && defined(__i386__)
-#ifdef HAVE_SIGCONTEXT
+#if defined(HAVE_SIGCONTEXT) || defined(HAVE_ASM_SIGCONTEXT_H)
 #include <asm/sigcontext.h>
 #else
 struct sigcontext_struct {
