@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.141 1999-08-23 14:52:12 anne Exp $
+@comment $Id: reference.doc,v 1.142 1999-08-23 17:25:50 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -4668,7 +4668,8 @@ be a minimal resolution of I considered with homogeneous maps of degree 0.
 The regularity is the smallest number $s$ with the property deg($e_{a,i})
  \leq s+i$ for all $i$.
 @end tex
-@*If the resolution is not minimal only an upper bound is returned.
+@*If applied to a non minimal resolution, given as a list,
+only an upper bound is returned.
 @*If the input to the commands @code{res} and @code{mres} is homogeneous
 the regularity is computed and used as a degree bound during
 the computation unless @code{option(notRegularity);} is given.
@@ -4681,11 +4682,6 @@ the computation unless @code{option(notRegularity);} is given.
   def jr=res(j,0);
   regularity(jr);
   list jj=jr;
-  regularity(jj);
-  // example for upper bound behaviour:
-  jj=nres(j,0);
-  regularity(jj);
-  jj=minres(jj);
   regularity(jj);
 @c example
 @end smallexample
