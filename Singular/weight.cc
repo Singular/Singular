@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: weight.cc,v 1.21 2001-05-28 12:35:50 Singular Exp $ */
+/* $Id: weight.cc,v 1.22 2001-11-27 12:33:03 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -240,13 +240,13 @@ BOOLEAN kQHWeight(leftv res,leftv v)
 
 short * iv2array(intvec * iv)
 {
-  short *s=(short *)omAlloc((pVariables+1)*sizeof(short));
+  short *s=(short *)omAlloc0((pVariables+1)*sizeof(short));
   int len=0;
   if(iv!=NULL)
     len=iv->length();
   int i;
-  for(i=pVariables;i>len;i--) s[i]=1;
-  for(;i>0;i--)               s[i]=(*iv)[i-1];
+  //for(i=pVariables;i>len;i--) s[i]=1;
+  for(i=len;i>0;i--)               s[i]=(*iv)[i-1];
   return s;
 }
 
