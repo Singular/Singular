@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.88 2000-01-28 17:55:58 Singular Exp $ */
+/* $Id: ideals.cc,v 1.89 2000-02-02 14:26:11 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -2243,7 +2243,7 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
   //pChangeRing(pVariables,currRing->OrdSgn,ord,block0,block1,wv);
   rChangeCurrRing(&tmpR, TRUE);
   currRing = &tmpR;
-  h = idInit(IDELEMS(h1),1);
+  h = idInit(IDELEMS(h1),h1->rank);
   // fetch data from the old ring
   for (k=0;k<IDELEMS(h1);k++) h->m[k] = prCopyR( h1->m[k], origR);
   // compute kStd
