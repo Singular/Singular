@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.l,v 1.6 1998-04-16 08:12:55 pohl Exp $ */
+/* $Id: libparse.l,v 1.7 1998-04-20 10:05:54 krueger Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -20,8 +20,8 @@
 #  include "tok.h"
 #  include "febase.h"
 #  include "mmemory.h"
-#  include "libparse.h"
 #endif
+#include "libparse.h"
 
 #ifdef HAVE_LIBPARSER
 #define YY_SKIP_YYWRAP
@@ -39,7 +39,7 @@ int brace2 = 0;  /* ( ) */
 int brace3 = 0;  /* [ ] */
 int quote  = 0;  /* " */
 int offset = 0;
-int p_static = 0;
+BOOLEAN p_static = FALSE;
 int old_state = 0;
 lib_cmds last_cmd = LP_NONE;
 
@@ -111,9 +111,6 @@ int    _isatty(int filedes);
 
 #ifdef STANDALONE_PARSER
 procinfov pi;
-procinfo *iiInitSingularProcinfo(procinfov pi, char *libname,
-                                 char *procname, int line, long pos,
-				 int pstatic = 0);
 printpi(procinfov pi);
 pi_clear(procinfov pi);
 extern "C" {
@@ -235,21 +232,21 @@ info=+"\"" { old_state = YYSTATE; quote++; BEGIN(string);
              }
            }
 
-static     { p_static=1; }
+static     { p_static=TRUE; }
 
 (proc[ \t]+{name})|([ \t]proc[ \t]+{name}) {
              char proc[256];
              BEGIN(pdef);
-#if YYLPDEBUG
+#if YYLPDEBUG > 0
              printf("Newlib:%s\n", newlib);
 #endif
 #ifdef STANDALONE_PARSER
-             if ( pi != NULL ) {
-               printpi(pi);
-               pi_clear(pi);
-             }
-             pi = (procinfo *)malloc(sizeof(procinfo));
-             iiInitSingularProcinfo(pi, newlib, yytext+5, yylplineno,
+               if ( pi != NULL ) {
+                 printpi(pi);
+                 pi_clear(pi);
+               }
+               pi = (procinfo *)malloc(sizeof(procinfo));
+               iiInitSingularProcinfo(pi, newlib, yytext+5, yylplineno,
 					current_pos(0), p_static);
 #else STANDALONE_PARSER
              if( mode == LOAD_LIB) {
@@ -270,8 +267,10 @@ static     { p_static=1; }
                printf("PROC %d at %d/%d: (%d) %s\n", p_static,
 		      yylplineno, current_pos(0), brace1, yytext);
 #endif
-               p_static=0;
+               p_static=FALSE;
+#ifndef STANDALONE_PARSER
              }
+#endif STANDALONE_PARSER
            }
 example    {
              BEGIN(pexample);
@@ -545,12 +544,12 @@ LIB[ \t]+"\"" { quote++;
 <comment>.               { }
 
 \n                       { yylplineno++; }
-;                        { p_static = 0;
+;                        { p_static = FALSE;
 #if YYLPDEBUG
                             printf("%s", yytext);
 #endif
                          }
-.                        { p_static = 0; 
+.                        { p_static = FALSE; 
                            yylp_errno = YYLP_BAD_CHAR;
 #if YYLPDEBUG
                            printf("[%s]", yytext);
@@ -624,6 +623,7 @@ void make_version(char *p,int what)
 
 void copy_string(lp_modes mode)
 {
+#ifndef STANDALONE_PARSER
   if((last_cmd == LP_INFO)&&(mode == GET_INFO)) {
     long current_location = ftell(yylpin);
     int len = (int)(current_pos(0) - string_start);
@@ -632,6 +632,7 @@ void copy_string(lp_modes mode)
     fread(text_buffer, len, 1, yylpin);
     fseek(yylpin, current_location, SEEK_SET);
   }
+#endif /* STANDALONE_PARSER */
 }
 
 void print_init()
@@ -666,7 +667,7 @@ main( int argc, char *argv[] )
 	  "line", "example-eoe");
   yylplex(argv[0], argv[0], &lib_style);
   if(yylp_errno) {
-    printf("ERROR accured: ");
+    printf("ERROR accured: [%d] ", yylp_errno);
     printf(yylp_errlist[yylp_errno], yylplineno);
     printf("\n");
   } 

@@ -8,7 +8,7 @@
 
 procinfo *iiInitSingularProcinfo(procinfov pi, char *libname,
                                  char *procname, int line, long pos,
-				 int pstatic = 0)
+				 BOOLEAN pstatic = FALSE)
 {
   pi->libname = (char *)malloc(strlen(libname)+1);
   memcpy(pi->libname, libname, strlen(libname));
