@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: INSTALL_rpm.texi,v 1.10 2002-07-01 13:00:43 Singular Exp $
+@comment $Id: INSTALL_rpm.texi,v 1.11 2002-07-01 13:01:48 Singular Exp $
 @c FILE: INSTALL_rpm.texi
 @c PURPOSE: Installation instruction for Singular on RPM based Linux systems
 @c
@@ -33,7 +33,7 @@ contains icons and menues for @sc{gnome} and @sc{kde}.
 
 The above @sc{rpm} packages are available at
 @display
-@uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular}.
+@uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/UNIX}.
 @end display
 
 @include register.texi
