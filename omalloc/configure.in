@@ -3,7 +3,7 @@ dnl File: configure.in
 dnl Purpose: Process this file with autoconf to produce configure
 dnl Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
 dnl Created: 11/99
-dnl Version: $Id: configure.in,v 1.14 2001-05-15 12:19:38 Singular Exp $
+dnl Version: $Id: configure.in,v 1.15 2001-08-21 13:59:31 Singular Exp $
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 
 AC_INIT(om_Alloc.c)
@@ -595,7 +595,7 @@ AC_MSG_RESULT(Void_t)
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl wrap it up
 dnl
-AC_CONFIG_HEADER(omConfig.h mylimits.h omMalloc.h:${OM_MALLOC_HEADER})
+AC_CONFIG_HEADER(omConfig.h omlimits.h omMalloc.h:${OM_MALLOC_HEADER})
 
 AC_OUTPUT(Makefile, \
  if test "$CONFIG_HEADERS"; then echo timestamp > stamp-h; fi)

@@ -2607,7 +2607,7 @@ done
 ac_given_srcdir=$srcdir
 ac_given_INSTALL="$INSTALL"
 
-trap 'rm -fr `echo "Makefile omConfig.h mylimits.h omMalloc.h:${OM_MALLOC_HEADER}" | sed "s/:[^ ]*//g"` conftest*; exit 1' 1 2 15
+trap 'rm -fr `echo "Makefile omConfig.h omlimits.h omMalloc.h:${OM_MALLOC_HEADER}" | sed "s/:[^ ]*//g"` conftest*; exit 1' 1 2 15
 EOF
 cat >> $CONFIG_STATUS <<EOF
 
@@ -2777,7 +2777,7 @@ ac_eD='%g'
 if test "${CONFIG_HEADERS+set}" != set; then
 EOF
 cat >> $CONFIG_STATUS <<EOF
-  CONFIG_HEADERS="omConfig.h mylimits.h omMalloc.h:${OM_MALLOC_HEADER}"
+  CONFIG_HEADERS="omConfig.h omlimits.h omMalloc.h:${OM_MALLOC_HEADER}"
 EOF
 cat >> $CONFIG_STATUS <<\EOF
 fi
