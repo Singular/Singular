@@ -245,7 +245,8 @@ feOpt.h: feOpt.inc feOptES.inc
 
 feOpt.inc: feOpt.cc mod2.h
 	$(CXX) -DGENERATE_OPTION_INDEX -DHAVE_ASO=0 feOpt.cc -o feOpt
-	feOpt
+	./feOpt
+	/bin/rm -f feOpt feOpt.exe
 
 feOptES.inc: feOpt.cc
 	$(CXX) -DGENERATE_OPTION_INDEX  -DHAVE_ASO=0 -DESINGULAR feOpt.cc
