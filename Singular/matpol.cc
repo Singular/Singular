@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.cc,v 1.19 1998-09-29 21:14:45 siebert Exp $ */
+/* $Id: matpol.cc,v 1.20 1998-09-30 14:12:48 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -90,12 +90,7 @@ matrix mpCopy (matrix a)
   {
     t = a->m[i];
     pNormalize(t);
-#ifdef MDEBUG
-//    b->m[i] = pDBCopy(t,f,l);
     b->m[i] = pCopy(t);
-#else
-    b->m[i] = pCopy(t);
-#endif
   }
   b->rank=a->rank;
   return b;
@@ -391,7 +386,7 @@ matrix mpOneStepBareiss (matrix a, poly *H, int *r, int *c)
   int row = *r;
 
   /* step of Bareiss */
-  if((row && Bareiss->mpPivotRow(&w,row-1)) || Bareiss->mpPivotBareiss(&w))
+  if(((row!=0) && Bareiss->mpPivotRow(&w,row-1)) || Bareiss->mpPivotBareiss(&w))
   {
     Bareiss->mpElimBareiss(div);
     div = Bareiss->mpGetElem(Bareiss->mpGetRdim(), Bareiss->mpGetCdim());
@@ -579,7 +574,7 @@ matrix mpWedge(matrix a, int ar)
           MATELEM(tmp,i,j) = MATELEM(a,rowchoise[i-1],colchoise[j-1]);
         }
       }
-      p = mpDet(tmp);
+      p = mpDetBareiss(tmp);
       if ((k+l) & 1) p=pNeg(p);
       MATELEM(result,l,k) = p;
       k++;
@@ -1412,6 +1407,7 @@ static poly mpDivide(poly a, poly b)
         pSetm(r);
       }
       y = nDiv(pGetCoeff(r),x);
+      nNormalize(y);
       pSetCoeff(r,y);
       pIter(r);
     } while (r != NULL);
