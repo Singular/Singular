@@ -1,5 +1,5 @@
 ;;; Emacs edit mode for this file is  -*- Emacs-Lisp -*-
-;;; $Id: .emacs-singular,v 1.6 1999-10-22 14:03:56 wichmann Exp $
+;;; $Id: .emacs-singular,v 1.7 1999-11-01 16:14:21 obachman Exp $
 
 ;;;
 ;;; .emacs-singular - Emacs initialization file to use for
@@ -88,6 +88,9 @@
 
 ;; turn on c++-mode for files ending in ".sing"
 (setq auto-mode-alist (cons '("\\.sing\\'" . c++-mode) auto-mode-alist))
+(setq auto-mode-alist (cons '("\\.lib\\'" .  c++-mode) auto-mode-alist))
+(add-hook 'c++-mode-hook
+	  (function (lambda () (font-lock-mode 1))))
 
 ;; this is a work-around for early version of Font Lock mode
 ;; which do not use `defface' to define faces.  It forces
@@ -103,7 +106,7 @@
 
 ;; pre-customized settings
 (custom-set-variables
- '(font-lock-maximum-decoration nil t)
+ '(font-lock-maximum-decoration t t)
  '(next-line-add-newlines nil)
  '(paren-mode (quote paren) nil (paren))
  '(show-paren-mode t nil (paren))
@@ -111,13 +114,25 @@
  '(singular-cursor-key-model (quote terminal))
  '(transient-mark-mode t)
  '(singular-section-face-alist (quote ((input . singular-section-input-face) (output)))))
+
 (custom-set-faces
- '(singular-section-input-face ((t (:bold t))))
- '(singular-section-output-face ((t (:bold nil))))
- '(font-lock-comment-face ((t (:bold nil :foreground "Grey30"))) t)
+ '(show-paren-match-face ((((class color)) (:foreground "Red"))))
  '(font-lock-string-face ((((class color) (background light)) (:foreground "Blue")) (((class color) (background dark)) (:foreground "LightSkyBlue"))) t)
+ '(font-lock-variable-name-face ((t (:foreground "black"))) t)
  '(paren-match ((t (:foreground "Red"))) t)
- '(show-paren-match-face ((((class color)) (:foreground "Red")))))
+ '(singular-section-input-face ((t (:bold t))))
+ '(font-lock-keyword-face ((t (:bold t :foreground "violet"))) t)
+ '(singular-section-output-face ((t (:bold nil))))
+ '(font-lock-type-face ((t (:bold t :foreground "violet"))) t)
+ '(font-lock-comment-face ((t (:bold nil :foreground "Red"))) t)
+ '(font-lock-function-name-face ((t (:bold t :foreground "blue3"))) t))
+;; obachman: played around a little bit, found this better
+;;  '(singular-section-input-face ((t (:bold t))))
+;;  '(singular-section-output-face ((t (:bold nil))))
+;;  '(font-lock-comment-face ((t (:bold nil :foreground "Grey30"))) t)
+;;  '(font-lock-string-face ((((class color) (background light)) (:foreground "Blue")) (((class color) (background dark)) (:foreground "LightSkyBlue"))) t)
+;;  '(paren-match ((t (:foreground "Red"))) t)
+;;  '(show-paren-match-face ((((class color)) (:foreground "Red")))))
 
 )
 
