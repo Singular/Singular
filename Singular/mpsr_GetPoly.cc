@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_GetPoly.cc,v 1.11 1997-12-15 22:46:34 obachman Exp $ */
+/* $Id: mpsr_GetPoly.cc,v 1.12 1998-03-23 22:51:02 obachman Exp $ */
 
 /***************************************************************
  *
@@ -562,10 +562,8 @@ mpsr_Status_t mpsr_GetRingAnnots(MPT_Node_pt node, ring &r, BOOLEAN &mv)
     rKill(subring);
   }
 
-#ifdef COMP_FAST
   // complete ring constructions
   rComplete(r);
-#endif  
   return mpsr_Success;
 }
 

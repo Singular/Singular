@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.18 1998-03-19 16:05:51 obachman Exp $ */
+/* $Id: ring.cc,v 1.19 1998-03-23 22:51:06 obachman Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -219,9 +219,7 @@ idhdl rDefault(char *s)
   currRing->OrdSgn    = 1;
   
   /* complete ring intializations */
-#ifdef COMP_FAST    
   rComplete(currRing);
-#endif    
   rSetHdl(tmp,TRUE);
   return currRingHdl;
 }
@@ -642,10 +640,8 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
     }
   }
   tmpR.OrdSgn = typ;
-#ifdef COMP_FAST  
   // Complete the initialization
-    rComplete(&tmpR);
-#endif  
+  rComplete(&tmpR);
   /* try to enter the ring into the name list*/
   if ((tmp = enterid(s, myynest, RING_CMD, &idroot))==NULL)
   {
@@ -662,17 +658,16 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
   return currRingHdl;
 }
 
-#ifdef COMP_FAST
 // set those fields of the ring, which can be computed from other fields:
 // More particularly, sets r->VarOffset 
 
 void rComplete(ring r)
 {
-  int dummy, VarOffset;
-  pGetVarIndicies(r, VarOffset, dummy, dummy);
+  int VarCompIndex, VarOffset, dummy;
+  pGetVarIndicies(r, VarOffset, VarCompIndex, dummy, dummy);
   r->VarOffset = (short) VarOffset;
+  r->VarCompIndex = (short) VarCompIndex;
 }
-#endif
   
 /*2
  * set a new ring from the data:
@@ -1600,9 +1595,7 @@ int rSum(ring r1, ring r2, ring &sum)
   }
   sum=(ring)Alloc(sizeof(ip_sring));
   memcpy(sum,&tmpR,sizeof(ip_sring));
-#ifdef COMP_FAST  
   rComplete(sum);
-#endif  
   return 1;
 }
 
@@ -1666,10 +1659,7 @@ ring rCopy(ring r)
 rOrderType_t rGetOrderType(ring r)
 {
   // check for simple ordering
-  if ((r->order[0] == ringorder_unspec) ||
-      ((r->order[2] == 0) &&
-       (r->order[1] != ringorder_M &&
-        r->order[0] != ringorder_M)))
+  if (rHasSimpleOrder(r))
   {
     if ((r->order[1] == ringorder_c) || (r->order[1] == ringorder_C))
     {
@@ -1705,3 +1695,23 @@ rOrderType_t rGetOrderType(ring r)
   else 
     return rOrderType_General;
 }
+
+BOOLEAN rHasSimpleOrder(ring r)
+{
+  return 
+    (r->order[0] == ringorder_unspec) ||
+    ((r->order[2] == 0) &&
+     (r->order[1] != ringorder_M &&
+      r->order[0] != ringorder_M));
+}
+// returns TRUE, if simple lp or ls ordering
+BOOLEAN rHasSimpleLexOrder(ring r)
+{
+  return rHasSimpleOrder(r) &&
+    (r->order[0] == ringorder_ls ||
+     r->order[0] == ringorder_lp ||
+     r->order[1] == ringorder_ls ||
+     r->order[1] == ringorder_lp);
+}
+
+     

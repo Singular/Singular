@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.cc,v 1.11 1998-03-19 16:05:49 obachman Exp $ */
+/* $Id: polys-impl.cc,v 1.12 1998-03-23 22:51:03 obachman Exp $ */
 
 /***************************************************************
  *
@@ -28,20 +28,17 @@
 #include "ring.h"
 #include "ipid.h"
 
-#ifdef COMP_FAST
 /***************************************************************
  *
  * Low - level routines for which deal with var indicies
  *
  ***************************************************************/
 // gets var indicies w.r.t. the ring r
-void pGetVarIndicies(ring r, int &VarOffset, 
+void pGetVarIndicies(ring r, int &VarOffset, int &VarCompIndex,
                      int &VarLowIndex, int &VarHighIndex)
 {
   // at the moment, non-default var indicies are only used for simple orderings
-  if ((r->order[0] == ringorder_unspec)  ||
-      (r->order[2] == 0 &&
-       r->order[0] != ringorder_M && r->order[1] != ringorder_M))
+  if (rHasSimpleOrder(r))
   {
     short s_order;
     if (r->order[0] == ringorder_c || r->order[0] == ringorder_C)
@@ -56,7 +53,8 @@ void pGetVarIndicies(ring r, int &VarOffset,
         case ringorder_ds:
         case ringorder_ws:
         case ringorder_unspec:
-          pGetVarIndicies_RevLex(r->N, VarOffset, VarLowIndex, VarHighIndex);
+          pGetVarIndicies_RevLex(r->N, VarOffset, VarCompIndex, 
+                                 VarLowIndex, VarHighIndex);
           break;
 
 #ifdef PDEBUG
@@ -69,7 +67,8 @@ void pGetVarIndicies(ring r, int &VarOffset,
 #else
         default:
 #endif
-          pGetVarIndicies_Lex(r->N, VarOffset, VarLowIndex, VarHighIndex);
+          pGetVarIndicies_Lex(r->N, VarOffset, VarCompIndex, 
+                              VarLowIndex, VarHighIndex);
 #ifdef PDEBUG
           break;
         default:
@@ -80,7 +79,7 @@ void pGetVarIndicies(ring r, int &VarOffset,
   }
   else
     // default var indicies are used
-    pGetVarIndicies(r->N, VarOffset, VarLowIndex, VarHighIndex);
+    pGetVarIndicies(r->N, VarOffset, VarCompIndex, VarLowIndex, VarHighIndex);
 }
 
 
@@ -174,7 +173,6 @@ poly _pFetchCopy(ring r, poly p)
   return pOrdPolyMerge(res);
 #endif
 }
-#endif // COMP_FAST
 
 
 /***************************************************************
@@ -553,8 +551,6 @@ Exponent_t pPDMultExp(poly p, int v, Exponent_t e, char* f, int l)
   return ((p)->exp[_pExpIndex(v)]) *= (e);
 }
 
-#ifdef COMP_FAST
-
 // checks whether fast monom add did not overflow
 void pDBMonAddFast(poly p1, poly p2, char* f, int l)
 {
@@ -567,9 +563,6 @@ void pDBMonAddFast(poly p1, poly p2, char* f, int l)
   {
     pAddExp(ptemp, i, pGetExp(p2, i));
   }
-#ifdef TEST_MAC_ORDER
-  if (bNoAdd) bSetm(ptemp);else
-#endif
   pGetOrder(ptemp) += pGetOrder(p2);
 
   if (! pEqual(ptemp, p1))
@@ -580,31 +573,6 @@ void pDBMonAddFast(poly p1, poly p2, char* f, int l)
   pFree1(ptemp);
 }
 
-#ifdef TEST_MAC_ORDER
-// checks whether fast monom add did not overflow
-void pbDBMonAddFast0(poly p1, poly p2, char* f, int l)
-{
-  poly ptemp = pNew();
-  pCopy2(ptemp, p1);
-
-  _pbMonAddFast0(p1, p2);
-
-  for (int i=1; i<=pVariables; i++)
-  {
-    pAddExp(ptemp, i, pGetExp(p2, i));
-  }
-  if (bNoAdd) bSetm(ptemp);else
-  pGetOrder(ptemp) += pGetOrder(p2);
-
-  if (! pEqual(ptemp, p1))
-  {
-    Print("Error in pbMonAddFast in %s:%d\n", f, l);
-  }
-
-  pFree1(ptemp);
-}
-
-#endif
 void pDBCopyAddFast(poly p1, poly p2, poly p3, char* f, int l)
 {
   if (p2 == p1 || p3 == p1)
@@ -622,6 +590,15 @@ void pDBCopyAddFast(poly p1, poly p2, poly p3, char* f, int l)
   pFree1(ptemp);
 }
 
+void pDBCopyAddFastHomog(poly p1, poly p2, poly p3, Order_t Order,
+                         char* f, int l)
+{
+  pDBCopyAddFast(p1, p2, p3, f, l);
+  if (p1->Order != Order)
+    Print("Error in pCopyAddFastHomog: Order is different from sum\n");
+}
+
+    
 
 static BOOLEAN OldpDivisibleBy(poly a, poly b)
 {
@@ -673,8 +650,6 @@ BOOLEAN pDBDivisibleBy2(poly a, poly b, char* f, int l)
   }
   return f_istrue;
 }
-
-#endif // COMP_FAST
 
 #endif // PDEBUG != 0
 

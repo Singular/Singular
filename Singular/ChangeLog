@@ -1,3 +1,14 @@
+1998-03-23  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
+
+	* taged version 1.1.7 -- unconditional fast version
+
+	* polys-impl.cc, polys.cc: No COMP_FAST any more
+
+	* Makefile.in: Introduced variable PERL, set by configure
+
+	* kstdfac.cc (kStratCopy): kModW iv is not copied, but just the
+	pointer is set
+
 1998-03-18  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
 	* Makefile.in: added Singularb target for bprof
@@ -7,7 +18,7 @@
 
 1998-03-16  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
-	* polys-impl.h: #define COMP_FAST
+	* polys-impl.h: no #define COMP_FAST
 
 	* configure.in,Makefile.in: check for flex -P; increased version
 	number to 1.1.7

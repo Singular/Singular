@@ -1,6 +1,6 @@
 #!/usr/local/bin/perl
 ###########################################################################
-# $Id: spSpolyLoop.pl,v 1.2 1998-03-19 16:05:53 obachman Exp $
+# $Id: spSpolyLoop.pl,v 1.3 1998-03-23 22:51:09 obachman Exp $
 
 ###########################################################################
 ##
@@ -215,12 +215,12 @@ sub Generate_EnumTypes
       }
       else
       {
-	Warning("No enum values for type: $etype");
+	& Warning("No enum values for type: $etype");
       }
     }
     else
     {
-      Warning("Unknown enumeration type index: $key");
+      & Warning("Unknown enumeration type index: $key");
     }
   }
   return $source;
@@ -241,11 +241,14 @@ $spSpolyLoopBodyTemplate = <<_EOT_
   number tm   = pGetCoeff(monom),         // coefficient of monom
          tneg = CALL_NCOPYNEG(tm),        // - (coefficient of monom)
          tb;                              // used for tm*coeff(a1)
+  Order_t order;                          // used for homog case
 
+  if (a2==NULL) goto Finish;              // we are done if a2 is 0
+
+  CALL_INITORDER(order, a2);              // inits order for homog case
   
-  if (a2==NULL) goto Finish; // we are done if a2 is 0
 
-  CALL_PCOPYADDFAST(b, a1, monom);  // now a2 != NULL -- set up b
+  CALL_PCOPYADDFAST(b, a1, monom, order);  // now a2 != NULL -- set up b
 
   // MAIN LOOP:
   Top:     // compare b = monom*a1 and a2 w.r.t. monomial ordering
@@ -271,7 +274,7 @@ $spSpolyLoopBodyTemplate = <<_EOT_
     CALL_NDELETE("&tb");
     pIter(a1);
     if (a2 == NULL || a1 == NULL) goto Finish; // are we done ?
-    CALL_PCOPYADDFAST(b, a1, monom); // No! So, get new b = a1*monom
+    CALL_PCOPYADDFAST(b, a1, monom, order); // No! So, get new b = a1*monom
     goto Top;
 
   NotEqual:     // b != a2 
@@ -291,7 +294,7 @@ $spSpolyLoopBodyTemplate = <<_EOT_
       pIter(a1);
       b = pNew();
       if (a1 == NULL) goto Finish; // are we done?
-      CALL_PCOPYADDFAST(b, a1, monom); // No! So, update b = a1*monom
+      CALL_PCOPYADDFAST(b, a1, monom, order); // No! So, update b = a1*monom
       goto Top;
     }
  
@@ -304,6 +307,7 @@ $spSpolyLoopBodyTemplate = <<_EOT_
    CALL_NDELETE("&tneg");
    pFree1(b);
 } 
+
 _EOT_
   ;
 
@@ -315,7 +319,7 @@ sub NCOPYNEG
 {
   local($number, $argv) = @_;
   
-  return "npNegM($number)" if (GetCharacteristic($argv) eq "chMODP");
+  return "npNegM($number)" if (& GetCharacteristic($argv) eq "chMODP");
   return "nNeg(nCopy($number))";
 }
 
@@ -323,7 +327,7 @@ sub NDELETE
 {
   local($number, $argv) = @_;
   
-  return "" if (GetCharacteristic($argv) eq "chMODP");
+  return "" if (& GetCharacteristic($argv) eq "chMODP");
   return "nDelete($number)";
 }
 
@@ -331,7 +335,7 @@ sub NMULT
 {
   local($m1, $m2, $argv) = @_;
   
-  return "npMultM($m1, $m2)" if (GetCharacteristic($argv) eq "chMODP");
+  return "npMultM($m1, $m2)" if (& GetCharacteristic($argv) eq "chMODP");
   return "nMult($m1, $m2)";
 }
 
@@ -339,7 +343,7 @@ sub NSUB
 {
   local($m1, $m2, $argv) = @_;
   
-  return "npSubM($m1, $m2)" if (GetCharacteristic($argv) eq "chMODP");
+  return "npSubM($m1, $m2)" if (& GetCharacteristic($argv) eq "chMODP");
   return "nSub($m1, $m2)";
 }
 
@@ -347,7 +351,7 @@ sub NEQUAL
 {
   local($m1, $m2, $argv) = @_;
   
-  return "npEqualM($m1, $m2)" if (GetCharacteristic($argv) eq "chMODP");
+  return "npEqualM($m1, $m2)" if (& GetCharacteristic($argv) eq "chMODP");
   return "nEqual($m1, $m2)";
 } 
 
@@ -356,13 +360,26 @@ sub MULTCOPYX
   local($p, $monom, $n, $exp, $spNoether, $argv) = @_;
   
   return "spMultCopyX($p, $monom, $n, $exp, $spNoether)" 
-    if (GetCharacteristic($argv) eq "chMODP");
+    if (& GetCharacteristic($argv) eq "chMODP");
   return "spGMultCopyX($p, $monom, $n, $exp, $spNoether)";
 }
 
+sub INITORDER
+{
+  local($order, $p, $argv) = @_;
+  
+  return "$order = $p->Order" if (&GetHomog($argv) eq "homYES");
+  return "";
+}
+
+  
 sub PCOPYADDFAST
 {
-  return "pCopyAddFast($_[0], $_[1], $_[2])";
+  local($p1, $p2, $p3, $order, $argv) = @_;
+  
+  return "pCopyAddFastHomog($p1, $p2, $p3, $order)" 
+    if (&GetHomog($argv) eq "homYES");
+  return "pCopyAddFast0($p1, $p2, $p3)";
 }
 
 ###########################################################################
@@ -433,11 +450,11 @@ sub Generate_SpolyLoop
 
   $loopbody = &Expand($spSpolyLoopBodyTemplate, $argv);
 
-  Warning("Can not realize $argv: Changed to $rargv") if ($argv ne $rargv);
+  & Warning("Can not realize $argv: Changed to $rargv") if ($argv ne $rargv);
 
   if (grep(/$rargv/, keys(%loops)))
   {
-    Warning("Duplicate entry $rargv: Ignoring $argv");
+    & Warning("Duplicate entry $rargv: Ignoring $argv");
     return;
   }
   else
@@ -454,7 +471,7 @@ sub Generate_SpolyLoops
   
   foreach $argv (@_)
   {
-    Generate_SpolyLoop($argv);
+    & Generate_SpolyLoop($argv);
   }
   return (%loops);
 }
@@ -547,7 +564,7 @@ sub GenerateBody_GetSpolyLoop
     return ($checks{$prefix});
   }
   
-  foreach $key (GetNextKeys($prefix, @_))
+  foreach $key (& GetNextKeys($prefix, @_))
   {
     if ($key =~ /\w+/)
     {
@@ -558,7 +575,7 @@ sub GenerateBody_GetSpolyLoop
       {
 	if ($prop ne $curr_prop)
 	{
-	  Warning("Different propes at same level: $prop : $curr_prop");
+	  & Warning("Different propes at same level: $prop : $curr_prop");
 	  next;
 	}
       }
@@ -581,7 +598,7 @@ sub GenerateBody_GetSpolyLoop
       {
 	$nextprefix = $prefix."_".$key;
       }
-      $newsource=GenerateBody_GetSpolyLoop($nextprefix,grep(/$nextprefix/,@_));
+      $newsource=&GenerateBody_GetSpolyLoop($nextprefix,grep(/$nextprefix/,@_));
       if ($newsource)
       {
 	$source = $source."if ($prop == $key)\n{\n".$newsource."}\n";
@@ -593,7 +610,7 @@ sub GenerateBody_GetSpolyLoop
   if ($gen_key)
   {
     $gen_key  = $prefix."_".$gen_key unless ($prefix eq "");
-    $source = $source . GenerateBody_GetSpolyLoop($gen_key,grep(/$gen_key/,@_));
+    $source = $source . &GenerateBody_GetSpolyLoop($gen_key,grep(/$gen_key/,@_));
   }
   return ($source);
 }
@@ -617,7 +634,7 @@ sub Generate_GetSpolyLoop
   
   return ($header. 
 	  ")\n{\n" . 
-	  GenerateBody_GetSpolyLoop("", @_). 
+	  &GenerateBody_GetSpolyLoop("", @_). 
 	  "return NULL;\n}\n");
 }
 

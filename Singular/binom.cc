@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: binom.cc,v 1.13 1998-03-16 14:56:25 obachman Exp $ */
+/* $Id: binom.cc,v 1.14 1998-03-23 22:50:54 obachman Exp $ */
 
 /*
 * ABSTRACT - set order (=number of monomial) for dp
@@ -140,7 +140,6 @@ int bComp1dpc(poly p1, poly p2)
   /* now o1==o2: */
   if (o1>0)
   {
-  #ifdef COMP_FAST
     register long d;
     if (pVariablesW >2 )
     {
@@ -159,31 +158,6 @@ int bComp1dpc(poly p1, poly p2)
     NotEqual:
     if (d>0) return -1; /*pLexSgn*/
     return 1; /*-pLexSgn*/
-  #else  
-    {
-      int i = pVariables;
-      if ((p1->exp[i] == p2->exp[i]))
-      {
-        do
-        {
-          i--;
-          if (i <= 1)
-          {
-             /*4 handle module case:*/
-             if (p1->exp[0]==p2->exp[0])
-               return 0;
-             else if (p1->exp[0] > p2->exp[0])
-               return -pComponentOrder;
-             else
-               return pComponentOrder;
-          }
-        } while ((p1->exp[i] == p2->exp[i]));
-      }
-      if (p1->exp[i] < p2->exp[i])
-        return 1;
-      return -1;
-    }
-  #endif
   }
   o1=pGetComp(p1)-pGetComp(p2);
   if (o1 == 0) return 0;

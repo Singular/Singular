@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.13 1998-03-19 16:05:46 obachman Exp $ */
+/* $Id: kstd2.cc,v 1.14 1998-03-23 22:50:59 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -26,9 +26,7 @@
 #include "comm.h"
 #include "lists.h"
 #endif
-#ifdef COMP_FAST
 #include "spSpolyLoop.h"
-#endif
 
 // #include "timer.h"
 
@@ -1546,7 +1544,6 @@ poly kNF2 (ideal F,ideal Q,poly q,kStrategy strat, int lazyReduce)
   strat->enterS = enterSBba;
   /*- set S -*/
   strat->sl = -1;
-  // strat->spSpolyLoop = spGetSpolyLoop(currRing, strat);
   strat->spSpolyLoop = spGetSpolyLoop(currRing, MAX(strat->ak, pMaxComp(q)),
                                       strat->syzComp, FALSE);
   /*- init local data struct.---------------------------------------- -*/
@@ -1661,7 +1658,8 @@ ideal stdred(ideal F, ideal Q, tHomog h,intvec ** w)
   strat->LazyDegree = 1;
   if ((h==testHomog))
   {
-    if (idRankFreeModule(F)==0)
+    strat->ak = idRankFreeModule(F);
+    if (strat->ak==0)
     {
       h = (tHomog)idHomIdeal(F,Q);
       w=NULL;
@@ -1674,6 +1672,7 @@ ideal stdred(ideal F, ideal Q, tHomog h,intvec ** w)
     if ((w!=NULL) && (*w!=NULL))
     {
       kModW = *w;
+      strat->kModW = *w;
       pOldFDeg = pFDeg;
       pFDeg = kModDeg;
       toReset = TRUE;

@@ -1,7 +1,5 @@
 #include "mod2.h"
 #include "polys.h"
-
-#ifdef COMP_FAST
 #include "tok.h"
 #include "kstd1.h"
 #include "numbers.h"
@@ -43,7 +41,7 @@ void spSpolyLoop_General
   
   if (a2==NULL) goto Finish; // we are done if a2 is 0
 
-  pCopyAddFast(b, a1, monom);  // now a2 != NULL -- set up b
+  pCopyAddFast0(b, a1, monom);  // now a2 != NULL -- set up b
 
   // MAIN LOOP:
   Top:     // compare b = monom*a1 and a2 w.r.t. monomial ordering
@@ -68,7 +66,7 @@ void spSpolyLoop_General
     nDelete(&tb);
     pIter(a1);
     if (a2 == NULL || a1 == NULL) goto Finish; // are we done ?
-    pCopyAddFast(b, a1, monom); // No! So, get new b = a1*monom
+    pCopyAddFast0(b, a1, monom); // No! So, get new b = a1*monom
     goto Top;
 
   NotEqual:     // b != a2 
@@ -86,7 +84,7 @@ void spSpolyLoop_General
       pIter(a1);
       b = pNew();
       if (a1 == NULL) goto Finish; // are we done?
-      pCopyAddFast(b, a1, monom); // No! So, update b = a1*monom
+      pCopyAddFast0(b, a1, monom); // No! So, update b = a1*monom
       goto Top;
     }
  
@@ -188,6 +186,5 @@ spSpolyLoopProc spGetSpolyLoop(ring r, rOrderType_t rot, BOOLEAN homog)
   return spSpolyLoop_General;
 }
 
-#endif // COMP_FAST
 
 

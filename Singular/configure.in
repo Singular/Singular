@@ -136,7 +136,6 @@ else
   CPPFLAGS="-I${includedir} ${CPPFLAGS}"
 fi
 
-dnl programs to built the grammar/parser
 dnl check for info
 if test "$with_info" != no; then
   AC_CHECK_PROG(INFO, info, info)
@@ -145,6 +144,8 @@ if test "$with_info" != no; then
   fi
 fi
 
+dnl check for perl
+AC_CHECK_PROG(PERL, perl5, perl)
   
 dnl
 dnl CHECK --without arguments

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.16 1998-03-19 16:05:44 obachman Exp $ */
+/* $Id: kstd1.cc,v 1.17 1998-03-23 22:50:58 obachman Exp $ */
 /*
 * ABSTRACT:
 */
@@ -28,9 +28,7 @@
 #ifdef STDTRACE
 #include "comm.h"
 #endif
-#ifdef COMP_FAST
 #include "spSpolyLoop.h"
-#endif
 
 //#include "ipprint.h"
 
@@ -1843,7 +1841,8 @@ ideal std(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
 #endif
   )
   {
-    if (idRankFreeModule(F)==0)       
+    strat->ak = idRankFreeModule(F);
+    if (strat->ak == 0)       
     {
       h = (tHomog)idHomIdeal(F,Q);    
       w=NULL;
@@ -1866,6 +1865,7 @@ ideal std(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
     if ((w!=NULL) && (*w!=NULL))      
     {
       kModW = *w;
+      strat->kModW = *w;
       pOldFDeg = pFDeg;
       pFDeg = kModDeg;
       toReset = TRUE;
@@ -1950,7 +1950,8 @@ lists TraceStd(leftv lv,int rw, ideal F, ideal Q, tHomog h,intvec ** w, intvec *
 #endif
   )
   {
-    if (idRankFreeModule(F)==0)
+    strat->ak = idRankFreeModule(F);
+    if (strat->ak == 0)
     {
       h = (tHomog)idHomIdeal(F,Q);
       w=NULL;
@@ -1966,6 +1967,7 @@ lists TraceStd(leftv lv,int rw, ideal F, ideal Q, tHomog h,intvec ** w, intvec *
     if ((w!=NULL) && (*w!=NULL))
     {
       kModW = *w;
+      strat->kModW = *w;
       pOldFDeg = pFDeg;
       pFDeg = kModDeg;
       toReset = TRUE;
@@ -1975,6 +1977,7 @@ lists TraceStd(leftv lv,int rw, ideal F, ideal Q, tHomog h,intvec ** w, intvec *
   }
   strat->homog=h;
   spSet(currRing);
+  strat->spSpolyLoop = spGetSpolyLoop(currRing, strat);
 //   if (pOrdSgn==-1)
 //   {
 //     if (w!=NULL)
@@ -2037,7 +2040,8 @@ lists min_std(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
 #endif
   )
   {
-    if (idRankFreeModule(F)==0)
+    strat->ak = idRankFreeModule(F);
+    if (strat->ak == 0)
     {
       h = (tHomog)idHomIdeal(F,Q);
       w=NULL;
@@ -2055,6 +2059,7 @@ lists min_std(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
     if ((w!=NULL) && (*w!=NULL))
     {
       kModW = *w;
+      strat->kModW = *w;
       pOldFDeg = pFDeg;
       pFDeg = kModDeg;
       toReset = TRUE;

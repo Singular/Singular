@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.13 1998-03-19 16:05:47 obachman Exp $ */
+/* $Id: kutil.cc,v 1.14 1998-03-23 22:51:00 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for std
 */
@@ -24,11 +24,8 @@
 #include "subexpr.h"
 #include "kstd1.h"
 #include "kutil.h"
-//#include "longrat.h"
-
-#ifdef COMP_FAST
 #include "spSpolyLoop.h"
-#endif
+//#include "longrat.h"
 
 static poly redMora (poly h,int maxIndex,kStrategy strat);
 static poly redBba (poly h,int maxIndex,kStrategy strat);
@@ -3631,9 +3628,6 @@ void initBuchMora (ideal F,ideal Q,kStrategy strat)
   strat->kIdeal = NULL;
   strat->fromT = FALSE;
   strat->noTailReduction = !TEST_OPT_REDTAIL;
-#ifdef COMP_FAST
-  strat->spSpolyLoop = spGetSpolyLoop(currRing, strat);
-#endif
   if(!TEST_OPT_SB_1)
   {
     updateS(TRUE,strat);

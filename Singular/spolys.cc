@@ -19,11 +19,7 @@
 #include "febase.h"
 #include "spolys0.h"
 #include "spolys.h"
-
-
-#ifdef COMP_FAST
 #include "spSpolyLoop.h"
-#endif
 
 
 /*0 implementation*/
@@ -41,8 +37,6 @@ poly (*spSpolyRedNew)(poly p1, poly p2,poly spNoether,
                       spSpolyLoopProc spSpolyLoop);
 poly (*spSpolyCreate)(poly p1, poly p2,poly spNoether);
 poly (*spSpolyShortBba)(poly p1, poly p2);
-
-// #undef COMP_FAST
 
 /*2
 * assume m = L(m) and Lc(m) = 1
@@ -262,7 +256,7 @@ void spMultCopyX(poly p, poly m, poly n, number exp, poly spNoether)
 * pNext(m) = result = a2-a1*m
 * do not destroy a1, but a2
 */
-#ifndef COMP_FAST
+#ifdef OLD_SPOLY_LOOP
 static void spSpolyLoop(poly a1, poly a2, poly m,poly spNoether)
 {
   poly a, b, s;
@@ -342,7 +336,7 @@ static void spSpolyLoop(poly a1, poly a2, poly m,poly spNoether)
     }
   }
 }
-#endif
+#endif // OLD_SPOLY_LOOP
 
 /*2
 * reduction of p2 with p1
@@ -363,7 +357,7 @@ static poly spPSpolyRed(poly p1, poly p2,poly spNoether, spSpolyLoopProc SpolyLo
     reset_vec=TRUE;
   }
   spMonSub(p2,p1);
-#ifdef COMP_FAST 
+#ifndef OLD_SPOLY_LOOP
   if (SpolyLoop != NULL) 
     SpolyLoop(a1, a2, p2, spNoether);
   else 
@@ -423,7 +417,7 @@ static poly spPSpolyRedNew(poly p1, poly p2,poly spNoether,
   m = pNew();
   spMemcpy(m,p2);
   spMonSub(m,p1);
-#ifdef COMP_FAST
+#ifndef OLD_SPOLY_LOOP
   if (SpolyLoop != NULL)
     SpolyLoop(a1, a2, m , spNoether);
   else
@@ -433,7 +427,7 @@ static poly spPSpolyRedNew(poly p1, poly p2,poly spNoether,
     spSpolyLoop(a1, a2, m,spNoether);
   else
     spSpolyLoop1(a1, a2, m,spNoether);
-#endif    
+#endif  // OLD_SPOLY_LOOP  
   a2 = pNext(m);
   if (reset_vec)
     spModuleToPoly(a1);

@@ -32,8 +32,8 @@ includedir	= @includedir@
 CC		= @CC@
 CXX		= @CXX@
 LEXP		= @LEXP@
+PERL		= @PERL@
 BISON		= bison
-PERL		= perl
 @SET_MAKE@
 INSTALL		= ./install-sh -c
 INSTALL_PROGRAM	= ${INSTALL}
@@ -293,7 +293,7 @@ clean:
 	cd ${docdir}; ${MAKE} clean
 
 distclean: clean
-	-rm -rf depend iparith.inc mpsr_Tok.inc spSpolyLoop.inc 
+	-rm -rf depend iparith.inc mpsr_Tok.inc 
 	-rm -rf ${DIST_NAME} ${testdir}/out stamp-h
 	-rm mod2.h Makefile TAGS* config.status config.cache config.log
 	cd ${docdir}; ${MAKE} distclean
@@ -301,8 +301,8 @@ distclean: clean
 maintainer-clean: distclean
 	@echo "This command is intended for maintainers to use;"
 	@echo "Rebuilding the deleted files requires flex"
-	@echo "bison and autoconf"
-	-rm configure scanner.cc grammar.h grammar.cc libparse.cc 
+	@echo "bison, perl and autoconf"
+	-rm configure scanner.cc grammar.h grammar.cc libparse.cc spSpolyLoop.inc
 
 info dvi ps html:
 	cd ${docdir}; ${MAKE} $@
@@ -557,7 +557,7 @@ installp: Singularp
 	$(CXXM) -DGENTABLE ${CPPFLAGS} ${DEFSG} $< >> $@
 
 %.d: %.c mod2.h
-	echo $(@:.d=.og) $(@:.d=.op) $(@:.dd=.ob) " " \\ > $@
+	echo $(@:.d=.og) $(@:.d=.op) $(@:.d=.ob) " " \\ > $@
 	$(CCM) ${CPPFLAGS} ${DEFSG} $< >> $@
 
 depend: $(CXXSOURCES:.cc=.dd) $(CSOURCES:.c=.d) mod2.h

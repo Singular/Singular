@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.10 1998-03-19 16:05:51 obachman Exp $ */
+/* $Id: ring.h,v 1.11 1998-03-23 22:51:07 obachman Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -39,11 +39,7 @@ char * rParStr(ring r);
 int    rIsExtension(ring r);
 int    rIsExtension();
 int    rSum(ring r1, ring r2, ring &sum);
-#ifdef COMP_FAST
 void   rComplete(ring r);
-#else
-#define rComplete(r)
-#endif
 
 
 enum
@@ -78,7 +74,10 @@ typedef enum rOrderType_t
   rOrderType_Schreyer     // Schreyer ordering
 } rOrderType_t;
 
-rOrderType_t rGetOrderType(ring r);
+BOOLEAN rHasSimpleOrder(ring r);
+// returns TRUE, if simple lp or ls ordering
+BOOLEAN rHasSimpleLexOrder(ring r);
+rOrderType_t    rGetOrderType(ring r);
 
 #ifdef RDEBUG
 extern short rNumber;

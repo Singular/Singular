@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.10 1998-03-18 14:28:52 obachman Exp $ */
+/* $Id: polys.h,v 1.11 1998-03-23 22:51:05 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
 */
@@ -18,10 +18,7 @@ extern poly     ppNoether;
 extern BOOLEAN  pVectorOut;
 // 1 for lex ordering (except ls), -1 otherwise
 extern int pLexSgn;
-
-#ifdef COMP_FAST
 extern int pComponentOrder;
-#endif
 
 #ifdef DRING
 // D=k[x,d,y] is the Weyl-Algebra [y], y commuting with all others
@@ -192,6 +189,10 @@ extern  poly pHeadProc(poly p);
 #define pCopyAddFast(p1, p2, p3)    _pCopyAddFast(p1, p2, p3)
 // Similar to pCopyAddFast, except that we do not care about the next field
 #define pCopyAddFast0(p1, p2, p3)  _pCopyAddFast0(p1, p2, p3)
+// Similar to pCopyAddFast0, except that we do not recompute the Order,
+// but assume that it is the sum of the Order of p2 and p3
+#define pCopyAddFastHomog(p1, p2, p3, Order)  \
+  _pCopyAddFastHomog(p1, p2, p3, Order)
 
 poly      pmInit(char *s, BOOLEAN &ok);   /* monom -> poly */
 void      ppDelete(poly * a, ring r);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_GetMisc.cc,v 1.7 1997-12-15 22:46:33 obachman Exp $ */
+/* $Id: mpsr_GetMisc.cc,v 1.8 1998-03-23 22:51:01 obachman Exp $ */
 
 /***************************************************************
  *
@@ -93,9 +93,7 @@ static ring rDefault(short ch, char *name)
   r->order[2]  = 0;
   r->block0[2] = 0;
   r->block1[2] = 0;
-#ifdef COMP_FAST  
   rComplete(r);
-#endif  
   return r;
 }
 
