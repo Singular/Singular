@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_algorithm.h,v 1.5 1997-09-01 09:10:10 schmidt Exp $ */
+/* $Id: cf_algorithm.h,v 1.6 1997-09-04 15:21:57 schmidt Exp $ */
 
 #ifndef INCL_CF_ALGORITHM_H
 #define INCL_CF_ALGORITHM_H
@@ -13,7 +13,9 @@
 // on canonical forms (factorization, gcd, etc.).
 //
 // This header file corresponds to:
-// cf_chinese.cc, cf_factor.cc, cf_linsys.cc, cf_resultant.cc
+//
+// cf_algorithms.cc, cf_chinese.cc, cf_factor.cc, cf_linsys.cc,
+// cf_resultant.cc
 //
 //}}}
 
@@ -24,10 +26,20 @@
 
 /*BEGINPUBLIC*/
 
-//{{{ declarations from cf_chinese.cc
-void chineseRemainder( const CanonicalForm x1, const CanonicalForm q1, const CanonicalForm x2, const CanonicalForm q2, CanonicalForm & xnew, CanonicalForm & qnew );
+//{{{ declarations from cf_algorithm.cc
+CanonicalForm psr ( const CanonicalForm & f, const CanonicalForm & g, const Variable & x );
 
-void chineseRemainder( const CFArray & x, const CFArray & q, CanonicalForm & xnew, CanonicalForm & qnew );
+CanonicalForm psq ( const CanonicalForm & f, const CanonicalForm & g, const Variable & x );
+
+void psqr ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & q, CanonicalForm & r, const Variable & x );
+
+CanonicalForm common_den ( const CanonicalForm & f );
+//}}}
+
+//{{{ declarations from cf_chinese.cc
+void chineseRemainder ( const CanonicalForm x1, const CanonicalForm q1, const CanonicalForm x2, const CanonicalForm q2, CanonicalForm & xnew, CanonicalForm & qnew );
+
+void chineseRemainder ( const CFArray & x, const CFArray & q, CanonicalForm & xnew, CanonicalForm & qnew );
 //}}}
 
 //{{{ declarations from cf_factor.cc
@@ -41,15 +53,15 @@ bool isSqrFree ( const CanonicalForm & f );
 //}}}
 
 //{{{ declarations from cf_linsys.cc
-bool linearSystemSolve( CFMatrix & M );
+bool linearSystemSolve ( CFMatrix & M );
 
-CanonicalForm determinant( const CFMatrix & M, int n );
+CanonicalForm determinant ( const CFMatrix & M, int n );
 //}}}
 
 //{{{ declarations from cf_resultant.cc
 CFArray subResChain ( const CanonicalForm & f, const CanonicalForm & g, const Variable & x );
 
-CanonicalForm resultant( const CanonicalForm & f, const CanonicalForm& g, const Variable & x );
+CanonicalForm resultant ( const CanonicalForm & f, const CanonicalForm & g, const Variable & x );
 //}}}
 
 /*ENDPUBLIC*/
