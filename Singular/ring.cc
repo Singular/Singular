@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.100 2000-03-22 11:20:54 Singular Exp $ */
+/* $Id: ring.cc,v 1.101 2000-03-31 13:19:19 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -2643,14 +2643,29 @@ BOOLEAN rComplete(ring r, int force)
   r->pDivLow=r->pVarLowIndex;
   r->pDivHigh=r->pVarHighIndex;
 #endif
-  r->pCompIndex=r->VarOffset[0];
+  r->pCompIndex=(r->VarOffset[0] & 0xffffff); //r->VarOffset[0];
 #ifdef WORDS_BIGENDIAN
-  // HANNES--think of s,c,dp; s, dp, C,
-  if(r->pCompIndex==0) r->pOrdIndex=1;
-  else                 r->pOrdIndex=0;
+  i=0; // position
+  j=0; // index in r->typ
+  if (i==r->pCompIndex) i++;
+  while ((j < r->OrdSize)
+  && ((r->typ[j].ord_typ==ro_syzcomp) || (r->typ[j].ord_typ==ro_syz)))
+  {
+    i++; j++;
+  }
+  if (i==r->pCompIndex) i++;
+  r->pOrdIndex=i;
 #else
-  if(r->pCompIndex == r->ExpESize-1) r->pOrdIndex=r->ExpLSize-2;
-  else                               r->pOrdIndex=r->ExpLSize-1;
+  i=r->ExpLSize-1;
+  j=0; // index in r->typ
+  if (i==r->pCompIndex) i--;
+  while ((j < r->OrdSize)
+  && ((r->typ[j].ord_typ==ro_syzcomp) || (r->typ[j].ord_typ==ro_syz)))
+  {
+    i--; j++;
+  }
+  if (i==r->pCompIndex) i--;
+  r->pOrdIndex=i;
 #endif
   return FALSE;
 }
