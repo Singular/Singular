@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_base.cc,v 1.8 1999-07-28 08:22:15 wenk Exp $ */
+/* $Id: mpr_base.cc,v 1.9 1999-09-24 12:41:36 Singular Exp $ */
 
 /*
  * ABSTRACT - multipolynomial resultants - resultant matrices
@@ -24,7 +24,11 @@
 #include "matpol.h"
 #include "numbers.h"
 #include "longalg.h"
+#ifdef HAVE_FACTORY
 #include "clapsing.h"
+#else
+#include "matpol.h"
+#endif
 #include "sparsmat.h"
 
 #include <math.h>
@@ -2535,7 +2539,11 @@ const number resMatrixDense::getDetAt( const number* evpoint )
   mprSTICKYPROT(ST__DET);
 
   // evaluate determinant of matrix m using factory singclap_det
+  #ifdef HAVE_FACTORY
   poly res= singclap_det( m );
+  #else
+  poly res= mpDetBareiss( m );
+  #endif
 
   // avoid errors for det==0
   number numres;
@@ -2595,7 +2603,11 @@ const number resMatrixDense::getSubDet()
     j++;
   }
 
+  #ifdef HAVE_FACTORY
   poly res= singclap_det( mat );
+  #else
+  poly res= mpDetBareiss( mat );
+  #endif
 
   number numres;
   if ( res && pGetCoeff( res ) )
