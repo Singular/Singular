@@ -1,4 +1,4 @@
-// $Id: poly.lib,v 1.4 1997-07-11 11:10:21 obachman Exp $
+// $Id: poly.lib,v 1.5 1997-08-04 14:46:51 Singular Exp $
 //system("random",787422842);
 //(GMG, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
@@ -15,7 +15,9 @@ LIBRARY:  poly.lib      PROCEDURES FOR MANIPULATING POLYS, IDEALS, MODULES
  mindeg(poly/...);      int/intmat = degree/s of terms of minimal order
  mindeg1(poly/...);     int = [weighted] minimal degree of input
  normalize(poly/...);   normalize poly/... such that leading coefficient is 1
+ rad_con(p,I);          check radical containment of poly p in ideal I
            (parameters in square brackets [] are optional)
+
 
 LIB "general.lib";
 ///////////////////////////////////////////////////////////////////////////////
@@ -472,4 +474,48 @@ example
    normalize(matrix(m));             // by automatic type conversion to module!
 }
 ///////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////////
+// Input: <ideal>=<f1,f2,...,fm> and <polynomial> g
+// Question: Does g lie in the radical of <ideal>?
+// Solution: Compute a standard basis G for <f1,f2,...,fm,gz-1> where z is a new
+//           variable. Then g is contained in the radical of <ideal> <=> 1 is
+//           generator in G.
+////////////////////////////////////////////////////////////////////////////////
+proc rad_con (poly g,ideal I)
+  USAGE:   rad_con(<poly>,<ideal>);
+  RETURNS: 1 (TRUE) (type <int>) if <poly> is contained in the radical of
+           <ideal>, 0 (FALSE) (type <int>) otherwise
+  EXAMPLE: example rad_con; shows an example
+{ def br=basering;
+  int n=nvars(br);
+  int dB=degBound;
+  degBound=0;
+  string mp=string(minpoly);
+  execute "ring R=("+charstr(br)+"),(x(1..n),z),dp;";
+  execute "minpoly=number("+mp+");";
+  ideal irrel=x(1..n);
+  map f=br,irrel;
+  poly p=f(g);
+  ideal J=f(I)+ideal(p*z-1);
+  J=std(J);
+  degBound=dB;
+  if (J[1]==1)
+  { return(1);
+  }
+  else
+  { return(0);
+  }
+}
+example
+{ "  EXAMPLE: Sturmfels: Algorithms in Invariant Theory 2.3.7.";
+  echo=2;
+           ring R=0,(x,y,z),dp;
+           ideal I=x2+y2,z2;
+           poly f=x4+y4;
+           rad_con(f,I);
+           ideal J=x2+y2,z2,x4+y4;
+           poly g=z;
+           rad_con(g,I);
+}
 

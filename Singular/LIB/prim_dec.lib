@@ -1,4 +1,4 @@
-// $Id: prim_dec.lib,v 1.1 1997-05-05 12:02:59 Singular Exp $
+// $Id: prim_dec.lib,v 1.2 1997-08-04 14:46:51 Singular Exp $
 ///////////////////////////////////////////////////////
 // pseudoprimdec.lib
 // algorithms for primary decomposition based on
@@ -37,6 +37,7 @@ LIBRARY: prim_dec.lib: PROCEDURE FOR PRIMARY DECOMPOSITION (II)
 
 LIB "general.lib";
 LIB "elim.lib";
+LIB "poly.lib";
 LIB "primdec.lib";
 ///////////////////////////////////////////////////////
 // ini_mod
@@ -1045,96 +1046,51 @@ proc special_ideals_equal( ideal k1, ideal k2)
 
 
 
-proc lcm (ideal i)
-USAGE:   lcm(i); i list of polynomials
-RETURN:  poly = lcm(i[1],...,i[size(i)])
-NOTE:    
-EXAMPLE: example lcm; shows an example
-{
-  int k,j;
-  poly p,q;
-  int sizei=size(i);
-  for(j=1;j<=sizei;j++)
-  {
-    if(deg(i[j])>0)
-    {
-      p=i[j];
-      break;
-    }
-  }
-  if(deg(p)==-1)
-  {
-    return(1);
-  }
-  for (k=j+1;k<=sizei;k++)
-  {
-     if(deg(i[k])!=0)
-     {
-        q=gcd(p,i[k]);
-        if(deg(q)!=0)     // gcd!=1
-        {
-           p=system("pdivide",p,q);
-        }
-        p=p*i[k];
-     }
-   }
-  return(p);
-}
-example
-{ "EXAMPLE:"; echo = 2;
-   ring  r = 0,(x,y,z),lp;
-   poly  p = (x+y)*(y+z);
-   poly  q = (z4+2)*(y+z);
-   ideal l=p,q;
-   poly  pr= lcm(l);
-   pr;
-   l=1,-1,p,1,-1,q,1;
-   pr=lcm(l);
-   pr;
-}
+//proc lcm (ideal i)
+//USAGE:   lcm(i); i list of polynomials
+//RETURN:  poly = lcm(i[1],...,i[size(i)])
+//NOTE:    
+//EXAMPLE: example lcm; shows an example
+//{
+//  int k,j;
+//  poly p,q;
+//  int sizei=size(i);
+//  for(j=1;j<=sizei;j++)
+//  {
+//    if(deg(i[j])>0)
+//    {
+//      p=i[j];
+//      break;
+//    }
+//  }
+//  if(deg(p)==-1)
+//  {
+//    return(1);
+//  }
+//  for (k=j+1;k<=sizei;k++)
+//  {
+//     if(deg(i[k])!=0)
+//     {
+//        q=gcd(p,i[k]);
+//        if(deg(q)!=0)     // gcd!=1
+//        {
+//           p=system("pdivide",p,q);
+//        }
+//        p=p*i[k];
+//     }
+//   }
+//  return(p);
+//}
+//example
+//{ "EXAMPLE:"; echo = 2;
+//   ring  r = 0,(x,y,z),lp;
+//   poly  p = (x+y)*(y+z);
+//   poly  q = (z4+2)*(y+z);
+//   ideal l=p,q;
+//   poly  pr= lcm(l);
+//   pr;
+//   l=1,-1,p,1,-1,q,1;
+//   pr=lcm(l);
+//   pr;
+//}
 
-
-
-////////////////////////////////////////////////////////////////////////////////
-// Input: <ideal>=<f1,f2,...,fm> and <polynomial> g
-// Question: Does g lie in the radical of <ideal>?
-// Solution: Compute a standard basis G for <f1,f2,...,fm,gz-1> where z is a new
-//           variable. Then g is contained in the radical of <ideal> <=> 1 is
-//           generator in G.
-////////////////////////////////////////////////////////////////////////////////
-proc rad_con (poly g,ideal I)
-  USAGE:   rad_con(<poly>,<ideal>);
-  RETURNS: 1 (TRUE) (type <int>) if <poly> is contained in the radical of
-           <ideal>, 0 (FALSE) (type <int>) otherwise
-  EXAMPLE: example rad_con; shows an example
-{ def br=basering;
-  int n=nvars(br);
-  int dB=degBound;
-  degBound=0;
-  string mp=string(minpoly);
-  execute "ring R=("+charstr(br)+"),(x(1..n),z),dp;";
-  execute "minpoly=number("+mp+");";
-  ideal irrel=x(1..n);
-  map f=br,irrel;
-  poly p=f(g);
-  ideal J=f(I)+ideal(p*z-1);
-  J=std(J);
-  degBound=dB;
-  if (J[1]==1)
-  { return(1);
-  }
-  else
-  { return(0);
-  }
-}
-example
-{ "  EXAMPLE: Sturmfels: Algorithms in Invariant Theory 2.3.7.";
-  echo=2;
-           ring R=0,(x,y,z),dp;
-           ideal I=x2+y2,z2;
-           poly f=x4+y4;
-           rad_con(f,I);
-           ideal J=x2+y2,z2,x4+y4;
-           poly g=z;
-           rad_con(g,I);
-}
