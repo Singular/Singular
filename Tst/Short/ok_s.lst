@@ -19,12 +19,11 @@ bug_9
 bug_barei
 bug_c_dp
 bug_mres
-; CORE bug_primdec
+bug_primdec
 cyc_5_lp
-; CORE bug_res
-; CORE bug_sres
+bug_sres
 bug_sres_betti
-; CORE bug_sres_cyc5
+bug_sres_cyc5
 dbm_s
 deform_s
 fetch_s

@@ -1,5 +1,1 @@
-bug_sres_cyc5  ; core dump
-bug_sres ; (c, ls) and (c, dp) problem -- core dump
-bug_res  ; test of all res commands on the on example of bug_sres
-bug_primdec ; CORE
-
+; NO BUGS !!!

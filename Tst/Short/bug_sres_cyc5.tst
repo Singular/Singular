@@ -8,5 +8,6 @@ bcde+1acde+1abde+1abce+1abcd,
 abcde-f5;
 // should only complain, but not dump core as in 1.3.6
 list I =sres(i,0);
+sres(std(i), 0);
 LIB "tst.lib"; tst_status(1);
 $
