@@ -1,6 +1,6 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.24 1998-08-07 10:07:06 wichmann Exp $
+;; $Id: singular.el,v 1.25 1998-08-07 14:56:27 wichmann Exp $
 
 ;;; Commentary:
 
@@ -1326,6 +1326,9 @@ If it is already unfolded, do nothing."
 If there is a subexpression specified its content is removed when the
 chunk is displayed.")
 
+(defvar singular-demo-print-messages t
+  "If non-nil, print message on how to continue demo mode")
+
 (defvar singular-demo-mode nil
   "Non-nil if Singular demo mode is on.
 
@@ -1395,7 +1398,8 @@ new state of Singular demo mode."
 	  singular-demo-mode t)
     (if singular-demo-command-on-enter
 	(send-string (singular-process) singular-demo-command-on-enter))
-    (message "Hit <Return> to continue demoq")
+    (if singular-demo-print-messages
+	(message "Hit RET to start demo"))
     (force-mode-line-update))
 
    ;; leave demo mode
@@ -1668,6 +1672,12 @@ NOT READY[old input copying, demo mode,
 
      (;; send input from pmark to point after doing history expansion
       t
+      ;; I don't know if this is the right point to insert the message
+      ;; print message if demo mode is active
+      (and singular-demo-mode
+	   singular-demo-print-messages
+	   (message "Hit RET to continue demo"))
+
       ;; go to desired position
       (if comint-eol-on-send (end-of-line))
       (if send-full-section (goto-char (point-max)))
