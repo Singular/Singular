@@ -2,6 +2,10 @@
 #include "kbuckets.h"
 typedef poly fastmultrec(poly f, poly g, ring r);
 static const int pass_option=1;
+static int mults=0;
+int Mults(){
+  return mults;
+}
 static void degsplit(poly p,int n,poly &p1,poly&p2, int vn, ring r){
   poly erg1_i, erg2_i;
   erg1_i=NULL;
@@ -82,7 +86,7 @@ static poly do_unifastmult(poly f,int df,poly g,int dg, int vn, fastmultrec rec,
 
   //construct erg, factor
   poly erg=NULL;
-  poly factor=pOne();
+  poly factor=p_ISet(1,r);
 
   p_SetExp(factor,vn,n,r);
   erg=pp_Mult_mm(p11,factor,r);
@@ -124,10 +128,12 @@ static poly do_unifastmult(poly f,int df,poly g,int dg, int vn, fastmultrec rec,
     poly s2=rec(g0,f1,r);
     p_SetExp(factor,vn,pot,r);
     poly h=p_Mult_mm(((s1!=NULL)?s1:s2),factor,r);
-    pDelete(&f1);
-    pDelete(&f0);
-    pDelete(&g0);
-    pDelete(&g1);
+    p_Delete(&f1,r);
+    p_Delete(&f0,r);
+    p_Delete(&g0,r);
+    p_Delete(&g1,r);
+    p_Delete(&p00,r);
+    p_Delete(&p11,r);
     erg=p_Add_q(erg,h,r);
   }
   
@@ -247,6 +253,7 @@ poly unifastmult(poly f,poly g, ring r){
 }
 
 poly multifastmult(poly f, poly g, ring r){
+  mults++;
   if((f==NULL)||(g==NULL)) return NULL;
   if (pLength(f)*pLength(g)<100)
     return pp_Mult_qq(f,g,r);
