@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.64 2002-01-30 14:33:02 Singular Exp $ */
+/* $Id: longalg.cc,v 1.65 2002-02-14 15:08:52 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -1425,8 +1425,8 @@ number naAdd(number la, number lb)
   lnumber b = (lnumber)lb;
   if (a==NULL) return naCopy(lb);
   if (b==NULL) return naCopy(la);
-  omCheckAddrSize(a,sizeof(rnumber));
-  omCheckAddrSize(b,sizeof(rnumber));
+  omCheckAddrSize(a,sizeof(snumber));
+  omCheckAddrSize(b,sizeof(snumber));
   lu = (lnumber)omAllocBin(rnumber_bin);
   if (b->n!=NULL) x = napMultCopy(a->z, b->n);
   else            x = napCopy(a->z);
@@ -1490,8 +1490,8 @@ number naSub(number la, number lb)
   lnumber a = (lnumber)la;
   lnumber b = (lnumber)lb;
 
-  omCheckAddrSize(a,sizeof(rnumber));
-  omCheckAddrSize(b,sizeof(rnumber));
+  omCheckAddrSize(a,sizeof(snumber));
+  omCheckAddrSize(b,sizeof(snumber));
   lu = (lnumber)omAllocBin(rnumber_bin);
   if (b->n!=NULL) x = napMultCopy(a->z, b->n);
   else            x = napCopy(a->z);
@@ -1549,8 +1549,8 @@ number naMult(number la, number lb)
   lnumber lo;
   napoly x;
 
-  omCheckAddrSize(a,sizeof(rnumber));
-  omCheckAddrSize(b,sizeof(rnumber));
+  omCheckAddrSize(a,sizeof(snumber));
+  omCheckAddrSize(b,sizeof(snumber));
   naTest(la);
   naTest(lb);
 
@@ -1673,8 +1673,8 @@ number naDiv(number la, number lb)
     WerrorS("div. by 0");
     return NULL;
   }
-  omCheckAddrSize(a,sizeof(rnumber));
-  omCheckAddrSize(b,sizeof(rnumber));
+  omCheckAddrSize(a,sizeof(snumber));
+  omCheckAddrSize(b,sizeof(snumber));
   lo = (lnumber)omAllocBin(rnumber_bin);
   if (b->n!=NULL)
     lo->z = napMultCopy(a->z, b->n);
@@ -1747,7 +1747,7 @@ number naInvers(number a)
     WerrorS("div. by 0");
     return NULL;
   }
-  omCheckAddrSize(b,sizeof(rnumber));
+  omCheckAddrSize(b,sizeof(snumber));
   lo = (lnumber)omAlloc0Bin(rnumber_bin);
   lo->s = b->s;
   if (b->n!=NULL)
@@ -1978,7 +1978,7 @@ BOOLEAN naIsOne(number za)
   napoly x, y;
   number t;
   if (a==NULL) return FALSE;
-  omCheckAddrSize(a,sizeof(rnumber));
+  omCheckAddrSize(a,sizeof(snumber));
 #ifdef LDEBUG
   if (a->z==NULL) WerrorS("internal zero error(4)");
 #endif
@@ -2026,7 +2026,7 @@ BOOLEAN naIsMOne(number za)
   napoly x, y;
   number t;
   if (a==NULL) return FALSE;
-  omCheckAddrSize(a,sizeof(rnumber));
+  omCheckAddrSize(a,sizeof(snumber));
 #ifdef LDEBUG
   if (a->z==NULL)
   {
@@ -2795,7 +2795,7 @@ BOOLEAN naDBTest(number a, char *f,int l)
   lnumber x=(lnumber)a;
   if (x == NULL)
     return TRUE;
-  omCheckAddrSize(a, sizeof(rnumber));
+  omCheckAddrSize(a, sizeof(snumber));
   napoly p = x->z;
   if (p==NULL)
   {
