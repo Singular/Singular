@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftmpl_list.cc,v 1.7 1998-03-10 14:51:32 schmidt Exp $ */
+/* $Id: ftmpl_list.cc,v 1.8 2003-02-11 16:28:51 Singular Exp $ */
 
 #include <factoryconf.h>
 
@@ -310,8 +310,8 @@ template <class T>
 void List<T>::sort( int (*swapit) ( const T&, const T& ) )
 {
     if ( first != last ) {
-	int swap = 1;
-	while ( swap ) {
+	int swap;
+	do {
 	    swap = 0;
 	    ListItem<T> *cur = first;
 	    while ( cur->next ) {
@@ -323,7 +323,7 @@ void List<T>::sort( int (*swapit) ( const T&, const T& ) )
 		}
 		cur = cur->next;
 	    }
-	}
+	} while (swap);
     }
 }
 
