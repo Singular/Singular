@@ -1,8 +1,12 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fac_univar.cc,v 1.2 1996-06-13 10:43:49 stobbe Exp $
+// $Id: fac_univar.cc,v 1.3 1996-06-26 13:17:03 stobbe Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.2  1996/06/13 10:43:49  stobbe
+"ZFactorizeUnivariate: fix to last bug fix (no assignment)
+"
+
 Revision 1.1  1996/06/13 10:34:04  stobbe
 "ZFactorizeUnivariate: do not use Berlekamp-Algorithm since there is a
                       bug in the Factory-Implementation of Berlekamp
@@ -544,12 +548,10 @@ ZFactorizeUnivariate( const CanonicalForm& ff, bool issqrfree )
     }
     if ( ZF.getFirst().factor().inCoeffDomain() )
 	ZF.removeFirst();
-    if ( ! cont.isOne() )
-
-	if ( lc( ff ).sign() < 0 )
-	    ZF.insert( CFFactor( -cont, 1 ) );
-	else
-	    ZF.insert( CFFactor( cont, 1 ) );
+    if ( lc( ff ).sign() < 0 )
+	ZF.insert( CFFactor( -cont, 1 ) );
+    else  if ( ! cont.isOne() )
+	ZF.insert( CFFactor( cont, 1 ) );
     if ( D != 0 ) {
 	delete [] D;
 	delete [] Dh;
