@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.58 2001-11-20 13:00:34 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.59 2001-12-13 12:02:47 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -12,8 +12,8 @@ OVERVIEW: A library to compute Hodge-theoretic invariants
 
 PROCEDURES:
  gmsring(t,s);              Gauss-Manin system of t with variable s
- gmsnf(p,K[,Kmax]);         Gauss-Manin system normal form of p
- gmscoeffs(p,K[,Kmax]);     Gauss-Manin system basis representation of p
+ gmsnf(p,K[,Kmax]);         normal form of p in Gauss-Manin system
+ gmscoeffs(p,K[,Kmax]);     basis representation of p in Gauss-Manin system
  monodromy(t);              Jordan data of monodromy of t
  spectrum(t);               singularity spectrum of t
  sppairs(t);                spectral pairs of t
@@ -108,7 +108,7 @@ static proc stdtrans(ideal I)
 proc gmsring(poly t,string s)
 "USAGE:    gmsring(t,s); poly t, string s
 ASSUME:   characteristic 0; local degree ordering;
-          isolated citical point 0 of t
+          isolated critical point 0 of t
 RETURN:
 @format
 ring G;  Gauss-Manin system of t with variable s
@@ -147,7 +147,7 @@ EXAMPLE:  example gmsring; shows examples
     }
     else
     {
-      ERROR("isolated citical point 0 expected");
+      ERROR("isolated critical point 0 expected");
     }
   }  
   matrix a=l[2];
@@ -433,7 +433,7 @@ static proc saturate(int K0)
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc tmat(matrix A0,ideal r,module H,int k0,int K,int K0)
+static proc basisrep(matrix A0,ideal r,module H,int k0,int K,int K0)
 {
   dbprint(printlevel-voice+2,"// compute matrix A of t");
   dbprint(printlevel-voice+2,"// k="+string(K+k0+1));
@@ -456,7 +456,7 @@ static proc eigvals(matrix A0,ideal r,module H,int k0,int K0)
   dbprint(printlevel-voice+2,
     "// compute eigenvalues e with multiplicities m of A");
   matrix A;
-  A,A0,r=tmat(A0,r,H,k0,0,K0);
+  A,A0,r=basisrep(A0,r,H,k0,0,K0);
   list l=eigenvals(A);
   def e,m=l[1..2];
   dbprint(printlevel-voice+2,"// e="+string(e));
@@ -474,7 +474,7 @@ static proc transf(matrix A,matrix A0,ideal r,module H,module H0,ideal e,intvec 
   number e0,e1=min(e),max(e);
   dbprint(printlevel-voice+2,"// e0="+string(e0));
   dbprint(printlevel-voice+2,"// e1="+string(e1));
-  A,A0,r=tmat(A0,r,H,k0,K+k1,K0+k1);
+  A,A0,r=basisrep(A0,r,H,k0,K+k1,K0+k1);
   module U0=s^k0*freemodule(mu);
 
   if(e1>=e0+1)
@@ -555,7 +555,7 @@ static proc transf(matrix A,matrix A0,ideal r,module H,module H0,ideal e,intvec 
 proc monodromy(poly t)
 "USAGE:    monodromy(t); poly t
 ASSUME:   characteristic 0; local degree ordering;
-          isolated citical point 0 of t
+          isolated critical point 0 of t
 RETURN:   list l;  Jordan data jordan(M) of monodromy matrix exp(-2*pi*i*M)
 SEE ALSO: mondromy_lib, linalg.lib
 KEYWORDS: singularities; Gauss-Manin connection; Brieskorn lattice; monodromy
@@ -591,7 +591,7 @@ example
 proc spectrum(poly t)
 "USAGE:    spectrum(t); poly t
 ASSUME:   characteristic 0; local degree ordering;
-          isolated citical point 0 of t
+          isolated critical point 0 of t
 RETURN:
 @format
 list sp;  singularity spectrum of t
@@ -620,7 +620,7 @@ example
 proc sppairs(poly t)
 "USAGE:    sppairs(t); poly t
 ASSUME:   characteristic 0; local degree ordering;
-          isolated citical point 0 of t
+          isolated critical point 0 of t
 RETURN:
 @format
 list spp;  spectral pairs of t
@@ -792,7 +792,7 @@ example
 proc vfilt(poly t)
 "USAGE:    vfilt(t); poly t
 ASSUME:   characteristic 0; local degree ordering;
-          isolated citical point 0 of t
+          isolated critical point 0 of t
 RETURN:
 @format
 list v;  V-filtration on H''/s*H''
@@ -825,7 +825,7 @@ example
 proc vwfilt(poly t)
 "USAGE:    vwfilt(t); poly t
 ASSUME:   characteristic 0; local degree ordering;
-          isolated citical point 0 of t
+          isolated critical point 0 of t
 RETURN:
 @format
 list vw;  weighted V-filtration on H''/s*H''
@@ -942,7 +942,7 @@ static proc commutator(matrix A)
 proc tmatrix(poly t,list #)
 "USAGE:    tmatrix(t); poly t
 ASSUME:   characteristic 0; local degree ordering;
-          isolated citical point 0 of t
+          isolated critical point 0 of t
 RETURN:   list A;  t-matrix A[1]+s*A[2] on H''
 KEYWORDS: singularities; Gauss-Manin connection; Brieskorn lattice;
           mixed Hodge structure; opposite Hodge filtration; V-filtration;
@@ -1520,11 +1520,10 @@ proc spsemicont(list sp0,list sp,list #)
 RETURN:
 @format
 list l;
-  intvec l[i];  if k<=l[i] then spissemicont(sub(sp0,spmul(sp,k))[,1])==1
+  intvec l[i];  if the spectra sp0 occur with multiplicities k 
+                in a deformation of a [quasihomogeneous] singularity 
+                with spectrum sp then k<=l[i]
 @end format
-NOTE:    if the spectra sp occur with multiplicities k in a deformation
-         of the [quasihomogeneous] singularity with spectrum sp0 then 
-         spissemicont(sub(sp0,spmul(sp,k))[,1])==1
 EXAMPLE: example spsemicont; shows examples
 "
 {
