@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.63 2001-02-22 09:40:17 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.64 2002-01-07 17:22:10 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -865,6 +865,7 @@ static BOOLEAN jjA_L_LIST(leftv l, leftv r)
     {
       L->Clean();
       Werror("`%s` is undefined",h->Fullname());
+      //listall();
       goto err;
     }
     //if ((rt==RING_CMD)||(rt==QRING_CMD))

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.94 2001-11-14 17:13:25 greuel Exp $ */
+/* $Id: iplib.cc,v 1.95 2002-01-07 17:22:10 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -529,9 +529,11 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
       iiRETURNEXPR[myynest+1].CleanUp();
       err=TRUE;
     }
+    currRing=iiLocalRing[myynest];
   }
   if ((currRing!=NULL) &&
-    ((currRingHdl==NULL)||(IDRING(currRingHdl)!=currRing)))
+    ((currRingHdl==NULL)||(IDRING(currRingHdl)!=currRing)
+     ||(IDLEV(currRingHdl)>=myynest)))
   {
     rSetHdl(rFindHdl(currRing,NULL, NULL));
     iiLocalRing[myynest]=NULL;
