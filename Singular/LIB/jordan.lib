@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: jordan.lib,v 1.16 1999-11-12 11:21:27 mschulze Exp $";
+version="$Id: jordan.lib,v 1.17 2000-03-10 10:32:36 mschulze Exp $";
 info="
 LIBRARY: jordan.lib  PROCEDURES TO COMPUTE THE JORDAN NORMAL FORM
 AUTHOR:  Mathias Schulze, email: mschulze@mathematik.uni-kl.de
@@ -193,7 +193,14 @@ EXAMPLE: example jordan; shows an example.
             print("//eigenvalues not in the coefficient field");
             return(list());
           }
-          eM0[j]=-(eM0[j][2]/var(1))/eM0[j][1];
+          if(eM0[j][1]==0)
+          {
+            eM0[j]=0;
+          }
+          else
+          {
+            eM0[j]=-eM0[j][2]/(eM0[j][1]/var(1));
+          }
         }
       }
       else
@@ -205,7 +212,14 @@ EXAMPLE: example jordan; shows an example.
             print("//eigenvalues not in the coefficient field");
             return(list());
           }
-          eM0[j]=-eM0[j][1]/(eM0[j][2]/var(1));
+          if(eM0[j][2]==0)
+          {
+            eM0[j]=0;
+          }
+          else
+          {
+            eM0[j]=-eM0[j][1]/(eM0[j][2]/var(1));
+          }
         }
       }
       dbprint(printlevel-voice+2,"//...eigenvalues computed");
