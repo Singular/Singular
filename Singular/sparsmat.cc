@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sparsmat.cc,v 1.41 2000-10-16 12:06:41 obachman Exp $ */
+/* $Id: sparsmat.cc,v 1.42 2000-10-19 15:00:22 obachman Exp $ */
 
 /*
 * ABSTRACT: operations with sparse matrices (bareiss, ...)
@@ -1695,7 +1695,7 @@ poly smMult(poly a, poly b)
   }
   if (pNext(b) == NULL)
   {
-    if (pIsConstantComp(b))
+    if (pLmIsConstantComp(b))
       return ppMult_nn(a, pGetCoeff(b));
     else
       return ppMult_mm(a, b);
@@ -1726,7 +1726,7 @@ void smPolyDiv(poly a, poly b)
   {
     do
     {
-      if (!pIsConstantComp(b))
+      if (!pLmIsConstantComp(b))
       {
         for (i=pVariables; i; i--)
           pSubExp(a,i,pGetExp(b,i));
@@ -1782,11 +1782,11 @@ poly smMultDiv(poly a, poly b, const poly c)
     a = b;
     b = r;
   }
-  if ((c == NULL) || pIsConstantComp(c))
+  if ((c == NULL) || pLmIsConstantComp(c))
   {
     if (pNext(b) == NULL)
     {
-      if (pIsConstantComp(b))
+      if (pLmIsConstantComp(b))
         return ppMult_nn(a, pGetCoeff(b));
       else
         return ppMult_mm(a, b);

@@ -5,7 +5,7 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id: mod2.h.in,v 1.91 2000-09-25 12:26:34 obachman Exp $
+ *  Version: $Id: mod2.h.in,v 1.92 2000-10-19 15:00:17 obachman Exp $
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H
@@ -305,7 +305,6 @@ int hpux9_system(const char* system);
 /* the maximal ascii length of an int number + 1 = 11 for 32 bit int */
 #define MAX_INT_LEN 11
 #define MAX_INT_VAL 0x7fffffff
-extern int pShortOut;
 
 #ifdef DO_PROFILE
 /* define to enable explicit profiling of some crucial inline

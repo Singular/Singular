@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.38 2000-10-16 12:06:41 obachman Exp $ */
+/* $Id: structs.h,v 1.39 2000-10-19 15:00:22 obachman Exp $ */
 /*
 * ABSTRACT
 */
@@ -265,6 +265,11 @@ struct sip_sring
 
   short      P;      /* number of pars */
   short      OrdSgn; /* 1 for polynomial rings, -1 otherwise */
+
+  BOOLEAN   VectorOut;
+  BOOLEAN   ShortOut;
+  BOOLEAN   CanShortOut;
+  
   // what follows below here should be set by rComplete, _only_
   short      pVarLowIndex;  /* lowest index of a variable */
   short      pVarHighIndex; /* highest index of a variable */

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.cc,v 1.38 2000-09-18 09:19:35 obachman Exp $ */
+/* $Id: syz.cc,v 1.39 2000-10-19 15:00:23 obachman Exp $ */
 
 /*
 * ABSTRACT: resolutions
@@ -336,9 +336,9 @@ static void syMinStep1(resolvente res, int length)
           while (k<IDELEMS(res[index]))
           {
             p = res[index]->m[k];
-            while ((p!=NULL) && ((!pIsConstantComp(p)) || (pGetComp(p)!=j)))
+            while ((p!=NULL) && ((!pLmIsConstantComp(p)) || (pGetComp(p)!=j)))
               pIter(p);
-            if ((p!=NULL) && (pIsConstantComp(p)) && (pGetComp(p)==j)) break;
+            if ((p!=NULL) && (pLmIsConstantComp(p)) && (pGetComp(p)==j)) break;
             k++;
           }
           if (k>=IDELEMS(res[index]))
@@ -633,7 +633,7 @@ static poly sypCopyConstant(poly inp)
 
   while (inp!=NULL)
   {
-    if (pIsConstantComp(inp))
+    if (pLmIsConstantComp(inp))
     {
       if (outp==NULL)
       {
@@ -1075,7 +1075,7 @@ int syIsMinimizedFrom(resolvente res,int length)
       p = res[j-1]->m[i];
       while (p!=NULL)
       {
-        if (pIsConstantComp(p)) return j;
+        if (pLmIsConstantComp(p)) return j;
         p = pNext(p);
       }
     }

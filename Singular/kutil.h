@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.33 2000-10-16 12:06:36 obachman Exp $ */
+/* $Id: kutil.h,v 1.34 2000-10-19 15:00:16 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -15,8 +15,8 @@
 #define setmax 16
 
 #undef NO_KINLINE
-#if defined(KDEBUG) && !defined(NO_INLINE)
-#define KINLINE static inline
+#if !defined(KDEBUG) && !defined(NO_INLINE)
+#define KINLINE inline
 #else
 #define KINLINE
 #define NO_KINLINE 1
@@ -24,51 +24,60 @@
 
 typedef int* intset;
 
-class sTObject
+class sTObject  
 {
 public:
-  poly  p;
-  int ecart,length, pLength;
+  poly p;       // Lm(p) \in currRing Tail(p) \in tailRing
+  poly t_p;     // t_p \in tailRing
+  ring tailRing;
+  int ecart, length, pLength;
   unsigned long sev;
-  sTObject() 
-    { 
-      memset((void*) this, 0, sizeof(sTObject)); 
-    }
-  sTObject(poly _p)
-    {
-      memset((void*) this, 0, sizeof(sTObject)); 
-      p = _p;
-    }
+
+  // initialization
+  KINLINE void Init(ring r = currRing);
+  KINLINE sTObject(ring tailRing = currRing);
+  KINLINE sTObject(poly p, ring tailRing = currRing);
+  KINLINE sTObject(poly p, ring c_r, ring tailRing);
+  KINLINE sTObject(sTObject* T, int copy);
+
+  KINLINE void Set(ring r=currRing);
+  KINLINE void Set(poly p_in, ring r=currRing);
+  KINLINE void Set(poly p_in, ring c_r, ring t_r);
+
+  KINLINE void sTObject::Delete();
+  
+  // ring-dependent Lm access
+  KINLINE poly GetLm();
+  KINLINE poly GetLm(ring r);
+
+  // Iterations
+  KINLINE void LmDeleteAndIter();
+
+  // arithmetic
+  KINLINE void Mult_nn(number n);
 };
 
-class sLObject
+class sLObject : public sTObject
 {
 public:
-  poly  p;
-  poly  tail;
   poly  p1,p2; /*- the pair p comes from -*/
   poly  lcm;   /*- the lcm of p1,p2 -*/
-  int ecart,length, pLength;
-  unsigned long sev;
   kBucket_pt bucket;
-  ring lmRing, tailRing;
-  sLObject() 
-    { 
-      memset((void*) this, 0, sizeof(sLObject));
-      lmRing = tailRing = currRing;
-    }
-  sLObject(poly _p) 
-    { 
-      memset((void*) this, 0, sizeof(sLObject));
-      lmRing = tailRing = currRing;
-      p = _p;
-    }
+
+  // initialization
+  KINLINE void Init(ring tailRing = currRing);
+  KINLINE sLObject(ring tailRing = currRing);
+  KINLINE sLObject(poly p, ring tailRing = currRing);
+  KINLINE sLObject(poly p, ring c_r, ring tailRing);
+
+  // Iterations
+  KINLINE void LmDeleteAndIter();
+
   // spoly related things
-  KINLINE void SetLmTail(poly lm, poly new_p, int use_bucket);
-  KINLINE void Iter(ring r = currRing);
+  KINLINE void SetLmTail(poly lm, poly new_p, int use_bucket, ring r);
   KINLINE void Tail_Minus_mm_Mult_qq(poly m, poly qq, int lq, poly spNoether);
-  KINLINE void sLObject::Tail_Mult_nn(number n);
-  KINLINE poly GetP(ring LmRing = currRing, omBin bin = NULL);
+  KINLINE void Tail_Mult_nn(number n);
+  KINLINE poly GetP(omBin lmBin = NULL);
   KINLINE void CanonicalizeP();
 };
 
@@ -214,15 +223,15 @@ BOOLEAN newHEdge(polyset S, int ak,kStrategy strat);
  ***************************************************************/
 
 KINLINE TSet initT ();
-KINLINE poly k_LmInit_lmRing_2_tailRing(poly p, ring lmRing, ring tailRing, omBin bin);
-KINLINE poly k_LmInit_tailRing_2_lmRing(poly p, ring tailRing, ring lmRing, omBin bin);
-KINLINE poly k_LmShallowCopyDelete_lmRing_2_tailRing(poly p, ring lmRing, ring tailRing, omBin bin);
-KINLINE poly k_LmShallowCopyDelete_tailRing_2_lmRing(poly p, ring tailRing, ring lmRing,  omBin bin);
+KINLINE poly k_LmInit_currRing_2_tailRing(poly p, ring tailRing, omBin bin);
+KINLINE poly k_LmInit_tailRing_2_currRing(poly p, ring tailRing, omBin bin);
+KINLINE poly k_LmShallowCopyDelete_currRing_2_tailRing(poly p, ring tailRing, omBin bin);
+KINLINE poly k_LmShallowCopyDelete_tailRing_2_currRing(poly p, ring tailRing,  omBin bin);
 
-KINLINE poly k_LmInit_lmRing_2_tailRing(poly p, ring lmRing, ring tailRing);
-KINLINE poly k_LmInit_tailRing_2_lmRing(poly p, ring tailRing, ring lmRing);
-KINLINE poly k_LmShallowCopyDelete_lmRing_2_tailRing(poly p, ring lmRing, ring tailRing);
-KINLINE poly k_LmShallowCopyDelete_tailRing_2_lmRing(poly p, ring tailRing, ring lmRing);
+KINLINE poly k_LmInit_currRing_2_tailRing(poly p, ring tailRing);
+KINLINE poly k_LmInit_tailRing_2_currRing(poly p, ring tailRing);
+KINLINE poly k_LmShallowCopyDelete_currRing_2_tailRing(poly p, ring tailRing);
+KINLINE poly k_LmShallowCopyDelete_tailRing_2_currRing(poly p, ring tailRing);
 
 #ifdef KDEBUG
 // test strat
@@ -234,17 +243,15 @@ BOOLEAN kTest_L(LObject* L, ring tailRing = NULL,
                  BOOLEAN testp = FALSE, int lpos = -1,
                  TSet T = NULL, int tlength = -1);
 // test TObject
-BOOLEAN kTest_T(TObject* T, ring tailRing = currRing, int tpos = -1);
+BOOLEAN kTest_T(TObject* T, int tpos = -1, char T = '?');
 // test set strat->SevS
 BOOLEAN kTest_S(kStrategy strat);
-#define k_Test_T(t, r)  kTest_T(t, r)
 #else
 #define kTest(A)        ((void)0)
 #define kTest_TS(A)     ((void)0)
 #define kTest_T(T)      ((void)0)
 #define kTest_S(T)      ((void)0)
 #define kTest_L(T)      ((void)0)
-#define k_Test_T(T,r)   ((void)0)
 #endif
 
 
@@ -315,10 +322,10 @@ poly ksCreateShortSpoly(poly p1, poly p2);
 int ksCheckCoeff(number *a, number *b);
 
 // old stuff
-poly ksOldSpolyRed(poly p1, poly p2, poly spNoether = NULL);
-poly ksOldSpolyRedNew(poly p1, poly p2, poly spNoether = NULL);
-poly ksOldCreateSpoly(poly p1, poly p2, poly spNoether = NULL);
-void ksOldSpolyTail(poly p1, poly q, poly q2, poly spNoether);
+KINLINE poly ksOldSpolyRed(poly p1, poly p2, poly spNoether = NULL);
+KINLINE poly ksOldSpolyRedNew(poly p1, poly p2, poly spNoether = NULL);
+KINLINE poly ksOldCreateSpoly(poly p1, poly p2, poly spNoether = NULL, ring r = currRing);
+KINLINE void ksOldSpolyTail(poly p1, poly q, poly q2, poly spNoether, ring r = currRing);
 
 
 #include "kInline.cc"

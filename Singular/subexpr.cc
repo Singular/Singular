@@ -4,7 +4,7 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id: subexpr.cc,v 1.69 2000-09-19 15:22:25 Singular Exp $ */
+/* $Id: subexpr.cc,v 1.70 2000-10-19 15:00:23 obachman Exp $ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -1011,8 +1011,9 @@ void * sleftv::Data()
       case VMAXDEG:    return (void *)Kstd1_deg;
       case VMAXMULT:   return (void *)Kstd1_mu;
       case TRACE:      return (void *)traceit;
-      case VSHORTOUT:  return (void *)pShortOut;
-      case VMINPOLY:   if ((currRing->minpoly!=NULL)&&(!rField_is_GF()))
+      case VSHORTOUT:  return (void *)(currRing != NULL ? currRing->ShortOut : 0);
+      case VMINPOLY:   if (currRing != NULL && 
+                           (currRing->minpoly!=NULL)&&(!rField_is_GF()))
                        /* Q(a), Fp(a), but not GF(q) */
                          return (void *)currRing->minpoly;
                        else

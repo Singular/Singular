@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kspoly.cc,v 1.12 2000-10-16 12:06:34 obachman Exp $ */
+/* $Id: kspoly.cc,v 1.13 2000-10-19 15:00:14 obachman Exp $ */
 /*
 *  ABSTRACT -  Routines for Spoly creation and reductions
 */
@@ -32,32 +32,31 @@ void ksReducePoly(LObject* PR,
                   poly spNoether,
                   number *coef)
 {
-  
-  kTest_L(PR);
-  k_Test_T(PW, PR->tailRing);
-  
-  poly p1 = PR->p;
-  poly p2 = PW->p;
-  poly t2 = pNext(p2), lm = p1;
-  ring lmRing = PR->lmRing;
   ring tailRing = PR->tailRing;
+  kTest_L(PR);
+  kTest_T(PW);
+  
+  poly p1 = PR->GetLm(tailRing);
+  poly p2 = PW->GetLm(tailRing);
+  poly t2 = pNext(p2), lm = p1;
+  p_CheckPolyRing(p1, tailRing);
+  p_CheckPolyRing(p2, tailRing);
 
   pAssume1(p2 != NULL && p1 != NULL && 
-           p_DivisibleBy(p2,  currRing, p1, lmRing));
+           p_DivisibleBy(p2,  p1, tailRing));
 
-  pAssume1(p_GetComp(p1, lmRing) == p_GetComp(p2, currRing) ||
-           (p_GetComp(p2, currRing) == 0 && 
+  pAssume1(p_GetComp(p1, tailRing) == p_GetComp(p2, tailRing) ||
+           (p_GetComp(p2, tailRing) == 0 && 
             p_MaxComp(pNext(p2),tailRing) == 0));
 
   if (t2==NULL)
   {
-    PR->Iter();
-    p_LmDelete(lm, lmRing);
-    if (coef != NULL) *coef = n_Init(1, currRing);
+    PR->LmDeleteAndIter();
+    if (coef != NULL) *coef = n_Init(1, tailRing);
     return;
   }
 
-  if (! n_IsOne(pGetCoeff(p2), currRing))
+  if (! n_IsOne(pGetCoeff(p2), tailRing))
   {
     number bn = pGetCoeff(lm);
     number an = pGetCoeff(p2);
@@ -66,34 +65,20 @@ void ksReducePoly(LObject* PR,
     if ((ct == 0) || (ct == 2)) 
       PR->Tail_Mult_nn(an);
     if (coef != NULL) *coef = an;
-    else n_Delete(&an, currRing);
+    else n_Delete(&an, tailRing);
   }
   else
   {
-    if (coef != NULL) *coef = n_Init(1, currRing);
+    if (coef != NULL) *coef = n_Init(1, tailRing);
   }
   
-  if (lmRing != tailRing)
-    k_LmShallowCopyDelete_lmRing_2_tailRing(lm, currRing, tailRing);
-  if (currRing != tailRing)
-  {
-    poly p_temp = k_LmInit_lmRing_2_tailRing(p2, currRing, tailRing);
-    p_ExpVectorSub(lm, p_temp, tailRing);
-    p_LmFree(p_temp, tailRing);
-  }
-  else
-  {
-    p_ExpVectorSub(lm, p2, tailRing);
-  }
+  p_ExpVectorSub(lm, p2, tailRing);
 
   if (PR->bucket != NULL && PW->pLength <= 0)
-    PW->pLength = pLength(PW->p);
+    PW->pLength = pLength(p2);
     
   PR->Tail_Minus_mm_Mult_qq(lm, t2, PW->pLength-1, spNoether);
-
-  PR->Iter();
-  
-  p_LmDelete(lm, tailRing);
+  PR->LmDeleteAndIter();
 }
 
 /***************************************************************
@@ -109,8 +94,6 @@ void ksCreateSpoly(LObject* Pair,poly spNoether,
   poly p1 = Pair->p1;
   poly p2 = Pair->p2;
   Pair->tailRing = tailRing;
-  Pair->lmRing = currRing;
-  
   
   assume(p1 != NULL);
   assume(p2 != NULL);
@@ -161,15 +144,14 @@ void ksCreateSpoly(LObject* Pair,poly spNoether,
 
   // get m2 * a2
   a2 = tailRing->p_Procs->pp_Mult_mm(a2, m2, spNoether, currRing);
-  Pair->SetLmTail(m2, a2, use_buckets);
+  Pair->SetLmTail(m2, a2, use_buckets, tailRing);
 
   // get m2*a2 - m1*a1
   Pair->Tail_Minus_mm_Mult_qq(m1, a1, 0, spNoether);
-  Pair->Iter();
   
   // Clean-up time
+  Pair->LmDeleteAndIter();
   p_LmDelete(m1, tailRing);
-  p_LmDelete(m2, tailRing);
   
   if (co != 0)
   {
@@ -190,39 +172,31 @@ void ksCreateSpoly(LObject* Pair,poly spNoether,
 //         Current->next != NULL, LM(PW) devides LM(Current->next)
 // Changes: PR
 // Const:   PW
-void ksSpolyTail(LObject* PR, TObject* PW, poly Current, poly spNoether)
+void ksReducePolyTail(LObject* PR, TObject* PW, poly Current, poly spNoether)
 {
-  poly Lp = PR->p;
-  number coef;
-  poly Save = PW->p;
-  ring lmRing = PR->lmRing;
+  poly Lp =     PR->GetLm();
+  poly Save =   PW->GetLm();
   
   assume(Lp != NULL && Current != NULL && pNext(Current) != NULL);
   assume(PR->bucket == NULL);
   pAssume(pIsMonomOf(Lp, Current));
 
-  if (Lp == Save)
-    PW->p = p_Copy(Save, currRing, PR->tailRing);
+  LObject Red(pNext(Current), PR->tailRing);
+  TObject With(PW, Lp == Save);
+  number coef;
 
-  
-  PR->p = pNext(Current);
-  PR->lmRing = PR->tailRing;
-  ksReducePoly(PR, PW, spNoether, &coef);
+  ksReducePoly(&Red, &With, spNoether, &coef);
   
   if (! n_IsOne(coef, currRing))
   {
     pNext(Current) = NULL;
-    p_Mult_nn(Lp, coef, currRing, PR->tailRing);
+    PR->Mult_nn(coef);
   }
+
   n_Delete(&coef, currRing);
-  pNext(Current) = PR->p;
-  PR->p = Lp;
-  PR->lmRing = lmRing;
-  if (PW->p != Save)
-  {
-    p_Delete(&(PW->p), currRing, PR->tailRing);
-    PW->p = Save; // == Lp
-  }
+  pNext(Current) = Red.GetLm(PR->tailRing);
+
+  if (Lp == Save) With.Delete();
 }
 
 /***************************************************************
@@ -440,59 +414,6 @@ x1:
 }
 
 
-/***************************************************************
- *
- * Routines for backwards-Compatibility
- * 
- * 
- ***************************************************************/
-poly ksOldSpolyRed(poly p1, poly p2, poly spNoether)
-{
-  LObject L;
-  TObject T;
-
-  L.p = p2;
-  T.p = p1;
-  
-  ksReducePoly(&L, &T, spNoether);
-  
-  return L.p;
-}
-
-poly ksOldSpolyRedNew(poly p1, poly p2, poly spNoether)
-{
-  LObject L;
-  TObject T;
-
-  L.p = pCopy(p2);
-  T.p = p1;
-  
-  ksReducePoly(&L, &T, spNoether);
-  
-  return L.p;
-}
-
-poly ksOldCreateSpoly(poly p1, poly p2, poly spNoether)
-{
-  LObject L;
-  L.p1 = p1;
-  L.p2 = p2;
-  
-  ksCreateSpoly(&L, spNoether);
-  return L.p;
-}
-
-void ksOldSpolyTail(poly p1, poly q, poly q2, poly spNoether)
-{
-  LObject L;
-  TObject T;
-
-  L.p = q;
-  T.p = p1;
-  
-  ksSpolyTail(&L, &T, q2, spNoether);
-  return;
-}
 
 
 

@@ -7,7 +7,7 @@
  *           currRing
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
- *  Version: $Id: p_polys.h,v 1.4 2000-10-16 12:06:38 obachman Exp $
+ *  Version: $Id: p_polys.h,v 1.5 2000-10-19 15:00:18 obachman Exp $
  *******************************************************************/
 #ifndef P_POLYS_H
 #define P_POLYS_H
@@ -98,8 +98,10 @@ PINLINE2 Exponent_t p_GetExpDiff(poly p1, poly p2, int i, ring r);
 PINLINE2 poly p_New(ring r);
 PINLINE2 poly p_New(ring r, omBin bin);
 PINLINE1 poly p_Init(ring r);
-PINLINE1 poly p_Init(ring rm, omBin bin);
+PINLINE1 poly p_Init(ring r, omBin bin);
 PINLINE1 poly p_LmInit(poly p, ring r);
+PINLINE1 poly p_LmInit(poly s_p, ring s_r, ring d_p);
+PINLINE1 poly p_LmInit(poly s_p, ring s_r, ring d_p, omBin d_bin);
 PINLINE1 poly p_Head(poly p, ring r);
 PINLINE2 void p_DeleteLm(poly *p, ring r);
 PINLINE2 void p_DeleteLm(poly p, ring r);
@@ -169,10 +171,18 @@ PINLINE1 BOOLEAN p_LmShortDivisibleBy(poly a, unsigned long sev_a,
 PINLINE1 BOOLEAN p_DivisibleBy(poly a, ring r_a, poly b, ring r_b);
 PINLINE1 BOOLEAN p_LmDivisibleBy(poly a, ring r_a, poly b, ring r_b);
 
+/***************************************************************
+ *
+ * Misc things on Lm
+ *
+ ***************************************************************/
+// test if the monomial is a constant as a vector component
+// i.e., test if all exponents are zero 
+PINLINE1 BOOLEAN p_LmIsConstantComp(const poly p, const ring r);
 
 /***************************************************************
  *
- * Copying/Deleteion of polys: args may be NULL
+ * Copying/Deletion of polys: args may be NULL
  *
  ***************************************************************/
 // returns a copy of p

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.60 2000-09-19 12:43:29 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.61 2000-10-19 15:00:13 obachman Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -97,10 +97,21 @@ static BOOLEAN jjTRACE(leftv res, leftv a)
 }
 static BOOLEAN jjSHORTOUT(leftv res, leftv a)
 {
-#ifdef HAVE_TCL
-  if (!tclmode)
+  if (currRing != NULL)
+  {
+    BOOLEAN shortOut = (BOOLEAN)a->Data();
+#if HAVE_CAN_SHORT_OUT
+    if (!shortOut)
+      currRing->ShortOut = 0;
+    else
+    {
+      if (currRing->CanShortOut)
+        currRing->ShortOut = 1;
+    }
+#else
+    currRing->ShortOut = shortOut;
 #endif
-    pShortOut=(int)a->Data();
+  }
   return FALSE;
 }
 static BOOLEAN jjMINPOLY(leftv res, leftv a)

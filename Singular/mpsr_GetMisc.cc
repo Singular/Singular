@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_GetMisc.cc,v 1.20 2000-08-14 12:56:42 obachman Exp $ */
+/* $Id: mpsr_GetMisc.cc,v 1.21 2000-10-19 15:00:17 obachman Exp $ */
 
 /***************************************************************
  *
@@ -74,7 +74,7 @@ static ring rDefault(short ch, char *name)
   ring r = (ring) omAlloc0Bin(sip_sring_bin);
   r->ch = ch;
   r->N = 1;
-  r->names = (char **) omAllocBin(char_ptr_bin);
+  r->names = (char **) omAlloc0Bin(char_ptr_bin);
   r->names[0] = omStrDup(name);
 
   r->wvhdl = (int **)omAlloc0(3 * sizeof(int *));

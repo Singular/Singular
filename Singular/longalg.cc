@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.43 2000-09-18 09:19:12 obachman Exp $ */
+/* $Id: longalg.cc,v 1.44 2000-10-19 15:00:16 obachman Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -773,7 +773,7 @@ void napWrite(alg p)
         && (!nacIsMOne(p->ko))))
       {
         nacWrite(p->ko);
-        wroteCoeff=(pShortOut==0);
+        wroteCoeff=(currRing->ShortOut==0);
       }
       else if (nacIsMOne(p->ko))
       {
@@ -787,11 +787,11 @@ void napWrite(alg p)
           if (wroteCoeff)
             StringAppendS("*");
           else
-            wroteCoeff=(pShortOut==0);
+            wroteCoeff=(currRing->ShortOut==0);
           StringAppendS(naParNames[i]);
           if (p->e[i] > 1)
           {
-            if (pShortOut == 0)
+            if (currRing->ShortOut == 0)
               StringAppendS("^");
             StringAppend("%d", p->e[i]);
           }

@@ -6,7 +6,7 @@
  *  Purpose: implementation of std related inline routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: kInline.cc,v 1.4 2000-10-04 13:12:01 obachman Exp $
+ *  Version: $Id: kInline.cc,v 1.5 2000-10-19 15:00:13 obachman Exp $
  *******************************************************************/
 #ifndef KINLINE_CC
 #define KINLINE_CC
@@ -26,7 +26,6 @@ KINLINE skStrategy::skStrategy()
   memset(this, 0, sizeof(skStrategy));
   tailRing = currRing;
   P.tailRing = currRing;
-  P.lmRing = currRing;
 #ifdef HAVE_LM_BIN
   lmBin = omGetStickyBinOfBin(currRing->PolyBin);
 #endif
@@ -45,22 +44,199 @@ KINLINE skStrategy::~skStrategy()
                              currRing->PolyBin));
 }
   
-KINLINE TSet initT () { return (TSet)omAlloc0(setmax*sizeof(TObject)); }
+/***************************************************************
+ *
+ * Operation on TObjects
+ *
+ ***************************************************************/
 
-KINLINE void sLObject::SetLmTail(poly lm, poly p_tail, int use_bucket)
+KINLINE TSet initT () 
+{ 
+  TSet T = (TSet)omAlloc0(setmax*sizeof(TObject)); 
+  for (int i=0; i<setmax; i++)
+  {
+    T[i].tailRing = currRing;
+  }
+  return T;
+}
+
+// initialization
+KINLINE void sTObject::Set(ring r)
 {
-  p = lm;
-  assume(p != NULL);
+  tailRing = r;
+}
+KINLINE void sTObject::Init(ring r)
+{
+  memset(this, 0, sizeof(sTObject));
+  Set(r);
+}
+KINLINE sTObject::sTObject(ring r)
+{
+  Init(r);
+}
+KINLINE void sTObject::Set(poly p_in, ring r)
+{
+  if (r != currRing)
+  {
+    assume(r == tailRing);
+    p_Test(p_in, r);
+    t_p = p_in;
+  }
+  else
+  {
+    pp_Test(p_in, currRing, tailRing);
+    p = p_in;
+  }
+}
+
+KINLINE sTObject::sTObject(poly p_in, ring r) 
+{
+  Init(r);
+  Set(p_in, r);
+}
+
+KINLINE void sTObject::Set(poly p_in, ring c_r, ring t_r)
+{
+  if (c_r != t_r)
+  {
+    assume(c_r == currRing && t_r == tailRing);
+    pp_Test(p_in, currRing, t_r);
+    p = p_in;
+  }
+  else 
+  {
+    Set(p_in, c_r);
+  }
+}
+
+KINLINE sTObject::sTObject(poly p_in, ring c_r, ring t_r)
+{
+  Init(t_r);
+  Set(p_in, c_r, t_r);
+}
+
+KINLINE sTObject::sTObject(sTObject* T, int copy)
+{
+  *this = *T;
+  if (copy)
+  {
+    if (t_p != NULL)
+    {
+      t_p = p_Copy(t_p, tailRing);
+      p = k_LmInit_tailRing_2_currRing(t_p, tailRing);
+    }
+    else
+    {
+      p = p_Copy(p, currRing, tailRing);
+    }
+  }
+}
+
+KINLINE void sTObject::Delete()
+{
+  if (t_p != NULL)
+  {
+    p_Delete(&t_p, tailRing);
+    if (p != NULL)
+      p_LmFree(p, currRing);
+  }
+  else
+  {
+    p_Delete(&p, currRing, tailRing);
+  }
+}
+
+// Lm Extraction
+KINLINE poly sTObject::GetLm()
+{
+  if (p == NULL && t_p != NULL)
+    p = k_LmInit_tailRing_2_currRing(t_p, tailRing);
+
+  return p;
+}
+KINLINE poly sTObject::GetLm(ring r)
+{
+  if (r == currRing) 
+    return GetLm();
+  
+  if (t_p == NULL && p != NULL)
+    t_p = k_LmInit_currRing_2_tailRing(p, tailRing);
+
+  return t_p;
+}
+
+// Iterations
+KINLINE void sTObject::LmDeleteAndIter()
+{
+  assume(p != NULL || t_p != NULL);
+  if (t_p != NULL)
+  {
+    t_p = p_LmDeleteAndNext(t_p, tailRing);
+    if (p != NULL)
+    {
+      p_LmFree(p, currRing);
+      p = NULL;
+    }
+  }
+  else
+  {
+    p = p_LmDeleteAndNext(p, currRing);
+  }
+}
+
+// arithmetic
+KINLINE void sTObject::Mult_nn(number n)
+{
+  if (t_p != NULL)
+  {    t_p = tailRing->p_Procs->p_Mult_nn(t_p, n, tailRing);
+    if (p != NULL) pSetCoeff0(p, pGetCoeff(t_p));
+  }
+  else
+  {
+    p = p_Mult_nn(p, n, currRing, tailRing);
+  }
+}
+
+/***************************************************************
+ *
+ * Operation on LObjects
+ *
+ ***************************************************************/
+// Initialization
+KINLINE void sLObject::Init(ring r)
+{
+  memset(this, 0, sizeof(sLObject));
+  Set(r);
+}
+KINLINE sLObject::sLObject(ring r)
+{
+  Init(r);
+}
+KINLINE sLObject::sLObject(poly p_in, ring r)
+{
+  Init(r);
+  Set(p_in, r);
+}
+
+KINLINE sLObject::sLObject(poly p_in, ring c_r, ring t_r)
+{
+  Init(t_r);
+  Set(p_in, c_r, t_r);
+}
+
+KINLINE void sLObject::SetLmTail(poly lm, poly p_tail, int use_bucket, ring tailRing)
+{
   if (use_bucket)
   {
     bucket = kBucketCreate(tailRing);
     kBucketInit(bucket, p_tail, 0);
-    pNext(p) = NULL;
+    pNext(lm) = NULL;
   }
   else
   {
-    pNext(p) = p_tail;
+    pNext(lm) = p_tail;
   }
+  Set(lm, tailRing);
 }
 
 KINLINE void sLObject::Tail_Mult_nn(number n)
@@ -71,8 +247,9 @@ KINLINE void sLObject::Tail_Mult_nn(number n)
   }
   else
   {
-    assume(p != NULL);
-    pNext(p) = tailRing->p_Procs->p_Mult_nn(pNext(p), n, tailRing);
+    poly _p = (t_p != NULL ? t_p : p);
+    assume(_p != NULL);
+    pNext(_p) = tailRing->p_Procs->p_Mult_nn(pNext(_p), n, tailRing);
   }
 }
 
@@ -85,74 +262,59 @@ KINLINE void sLObject::Tail_Minus_mm_Mult_qq(poly m, poly q, int lq,
   }
   else
   {
-    assume(p != NULL);
+    poly _p = (t_p != NULL ? t_p : p);
+    assume(_p != NULL);
     int dummy;
-    pNext(p) = tailRing->p_Procs->p_Minus_mm_Mult_qq(pNext(p), m, q, 
-                                                     dummy,spNoether,tailRing);
+    pNext(_p) = tailRing->p_Procs->p_Minus_mm_Mult_qq(pNext(_p), m, q, 
+                                                      dummy,spNoether,tailRing);
   }
 }
 
-KINLINE void sLObject::Iter(ring r = currRing)
+KINLINE void sLObject::LmDeleteAndIter()
 {
-  assume(p != NULL);
+  sTObject::LmDeleteAndIter();
   if (bucket != NULL)
   {
-    p = kBucketExtractLm(bucket);
-    if (p == NULL)
+    poly _p = kBucketExtractLm(bucket);
+    if (_p == NULL)
     {
       kBucketDestroy(&bucket);
       return;
     }
-  }
-  else
-  {
-    pIter(p);
-  }
-  if (p != NULL)
-  {
-    if (r != tailRing)
-    {
-      p = k_LmShallowCopyDelete_tailRing_2_lmRing(p, tailRing, r);
-    }
-    lmRing = r;
+    Set(_p, tailRing);
   }
 }
 
 KINLINE void sLObject::CanonicalizeP()
 {
+  kTest_L(this);
+
   if (bucket != NULL)
     kBucketCanonicalize(bucket);
+
+  if (p == NULL)
+    p = k_LmInit_tailRing_2_currRing(t_p, tailRing);
 }
 
-KINLINE poly sLObject::GetP(ring get_lmRing = currRing, omBin lmBin = NULL)
+KINLINE poly sLObject::GetP(omBin lmBin = NULL)
 {
   kTest_L(this);
-  if (p != NULL)
+  if (p == NULL)
+    p = k_LmInit_tailRing_2_currRing(t_p, tailRing, 
+                                     (lmBin!=NULL?lmBin:currRing->PolyBin));
+  else if (lmBin != NULL && lmBin != currRing->PolyBin)
+    p = p_LmShallowCopyDelete(p, currRing, lmBin);
+  
+  if (bucket != NULL)
   {
-    if (bucket != NULL)
-    {
-      kBucketClear(bucket, &pNext(p), &pLength);
-      kBucketDestroy(&bucket);
-      pLength++;
-    }
-    
-    if (get_lmRing == NULL) get_lmRing = currRing;
-    if (get_lmRing != lmRing)
-    {
-      if (lmBin == NULL) lmBin = get_lmRing->PolyBin;
-      p = k_LmShallowCopyDelete_tailRing_2_lmRing(p,lmRing, get_lmRing,lmBin);
-      lmRing = get_lmRing;
-    }
-    else if (lmBin != NULL)
-    {
-      p = p_LmShallowCopyDelete(p, lmRing, lmBin);
-    }
+    kBucketClear(bucket, &pNext(p), &pLength);
+    kBucketDestroy(&bucket);
+    pLength++;
+    if (t_p != NULL) pNext(t_p) = pNext(p);
   }
-    
   kTest_L(this);
   return p;
 }
-
 
 /***************************************************************
  *
@@ -160,66 +322,101 @@ KINLINE poly sLObject::GetP(ring get_lmRing = currRing, omBin lmBin = NULL)
  *
  ***************************************************************/
   
-KINLINE poly k_LmInit_lmRing_2_tailRing(poly p, ring lmRing, ring tailRing, omBin tailBin)
+KINLINE poly k_LmInit_currRing_2_tailRing(poly p, ring tailRing, omBin tailBin)
 {
-  int i;
-  poly np = p_Init(tailRing, tailBin);
+  
+  poly np = p_LmInit(p, currRing, tailRing, tailBin);
   pNext(np) = pNext(p);
   pSetCoeff0(np, pGetCoeff(p));
-  
-  for (i=1; i<=tailRing->N;i++)
-  {
-    p_SetExp(np, i, p_GetExp(p, i,lmRing), tailRing);
-  }
-  if (rRing_has_Comp(tailRing))
-  {
-    p_SetComp(np, p_GetComp(p,lmRing), tailRing);
-  }
-  p_Setm(np, tailRing);
   return np;
-
 }
 
-KINLINE poly k_LmInit_tailRing_2_lmRing(poly p, ring tailRing, ring lmRing, omBin lmBin)
+KINLINE poly k_LmInit_tailRing_2_currRing(poly p, ring tailRing, omBin lmBin)
 {
-  return k_LmInit_lmRing_2_tailRing(p, tailRing, lmRing, lmBin);
+  poly np = p_LmInit(p, tailRing, currRing, lmBin);
+  pNext(np) = pNext(p);
+  pSetCoeff0(np, pGetCoeff(p));
+  return np;
 }
 
 // this should be made more efficient
-KINLINE poly k_LmShallowCopyDelete_lmRing_2_tailRing(poly p, ring lmRing, ring tailRing, omBin tailBin)
+KINLINE poly k_LmShallowCopyDelete_currRing_2_tailRing(poly p, ring tailRing, omBin tailBin)
 {
-  poly np = k_LmInit_lmRing_2_tailRing(p, lmRing, tailRing, tailBin);
-  p_LmFree(p, lmRing);
+  poly np = k_LmInit_currRing_2_tailRing(p, tailRing, tailBin);
+  p_LmFree(p, currRing);
   return np;
 }
 
-KINLINE poly k_LmShallowCopyDelete_tailRing_2_lmRing(poly p, ring tailRing, ring lmRing, omBin lmBin)
+KINLINE poly k_LmShallowCopyDelete_tailRing_2_currRing(poly p, ring tailRing, omBin lmBin)
 {
-  poly np = k_LmInit_tailRing_2_lmRing(p, tailRing, lmRing, lmBin);
+  poly np = k_LmInit_tailRing_2_currRing(p, tailRing, lmBin);
   p_LmFree(p, tailRing);
   return np;
 }
 
-KINLINE poly k_LmInit_lmRing_2_tailRing(poly p, ring lmRing, ring tailRing)
+KINLINE poly k_LmInit_currRing_2_tailRing(poly p, ring tailRing)
 {
-  return k_LmInit_lmRing_2_tailRing(p, lmRing, tailRing, tailRing->PolyBin);
+  return k_LmInit_currRing_2_tailRing(p, tailRing, tailRing->PolyBin);
 }
 
-KINLINE poly k_LmInit_tailRing_2_lmRing(poly p, ring tailRing, ring lmRing)
+KINLINE poly k_LmInit_tailRing_2_currRing(poly p, ring tailRing)
 {
-  return  k_LmInit_tailRing_2_lmRing(p, tailRing, lmRing, lmRing->PolyBin);
+  return  k_LmInit_tailRing_2_currRing(p, tailRing, currRing->PolyBin);
 }
 
-KINLINE poly k_LmShallowCopyDelete_lmRing_2_tailRing(poly p, ring lmRing, ring tailRing)
+KINLINE poly k_LmShallowCopyDelete_currRing_2_tailRing(poly p, ring tailRing)
 {
-  return k_LmShallowCopyDelete_lmRing_2_tailRing(p, lmRing, tailRing, tailRing->PolyBin);
+  return k_LmShallowCopyDelete_currRing_2_tailRing(p, tailRing, tailRing->PolyBin);
 }
 
-KINLINE poly k_LmShallowCopyDelete_tailRing_2_lmRing(poly p, ring tailRing, ring lmRing)
+KINLINE poly k_LmShallowCopyDelete_tailRing_2_currRing(poly p, ring tailRing)
 {
-  return  k_LmShallowCopyDelete_tailRing_2_lmRing(p, tailRing, lmRing, lmRing->PolyBin);
+  return  k_LmShallowCopyDelete_tailRing_2_currRing(p, tailRing, currRing->PolyBin);
 }
 
+/***************************************************************
+ *
+ * Routines for backwards-Compatibility
+ * 
+ * 
+ ***************************************************************/
+KINLINE poly ksOldSpolyRed(poly p1, poly p2, poly spNoether)
+{
+  LObject L(p2);
+  TObject T(p1);
+
+  ksReducePoly(&L, &T, spNoether);
+  
+  return L.GetLm();
+}
+
+KINLINE poly ksOldSpolyRedNew(poly p1, poly p2, poly spNoether)
+{
+  LObject L(p_Copy(p2, currRing));
+  TObject T(p1);
+
+  ksReducePoly(&L, &T, spNoether);
+  
+  return L.GetLm();
+}
+
+KINLINE poly ksOldCreateSpoly(poly p1, poly p2, poly spNoether, ring r)
+{
+  LObject L(r);
+  L.p1 = p1;
+  L.p2 = p2;
+  
+  ksCreateSpoly(&L, spNoether);
+  return L.GetLm();
+}
+
+KINLINE void ksOldSpolyTail(poly p1, poly q, poly q2, poly spNoether, ring r)
+{
+  LObject L(q,  currRing, r);
+  TObject T(p1, currRing, r);
+
+  ksReducePolyTail(&L, &T, q2, spNoether);
+}
 #endif // defined(KINLINE) || defined(KUTIL_CC)
 #endif // KINLINE_CC
 

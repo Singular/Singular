@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.55 2000-10-04 13:12:01 obachman Exp $ */
+/* $Id: kstd1.cc,v 1.56 2000-10-19 15:00:14 obachman Exp $ */
 /*
 * ABSTRACT:
 */
@@ -9,9 +9,10 @@
 #include "mod2.h"
 #include "tok.h"
 #include "omalloc.h"
+#include "kutil.h"
+#include "kInline.cc"
 #include "polys.h"
 #include "febase.h"
-#include "kutil.h"
 #include "kstd1.h"
 #include "khstd.h"
 #include "stairc.h"

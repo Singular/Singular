@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstdfac.cc,v 1.42 2000-10-04 13:12:02 obachman Exp $ */
+/* $Id: kstdfac.cc,v 1.43 2000-10-19 15:00:15 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
@@ -39,6 +39,7 @@ static void copyT (kStrategy o,kStrategy n)
 
   for (j=0; j<=o->tl; j++)
   {
+    t[j] = o->T[j];
     p = o->T[j].p;
     i = -1;
     loop
@@ -55,9 +56,7 @@ static void copyT (kStrategy o,kStrategy n)
         break;
       }
     }
-    t[j].ecart=o->T[j].ecart;
-    t[j].length=o->T[j].length;
-    t[j].sev=o->T[j].sev;
+    t[j].t_p = NULL;
   }
   n->T=t;
 }
@@ -73,6 +72,7 @@ static void copyL (kStrategy o,kStrategy n)
 
   for (j=0; j<=o->Ll; j++)
   {
+    l[j] = o->L[j];
     // copy .p ----------------------------------------------
     if (pNext(o->L[j].p)!=o->tail)
       l[j].p=pCopy(o->L[j].p);
@@ -86,14 +86,10 @@ static void copyL (kStrategy o,kStrategy n)
       l[j].lcm=pLmInit(o->L[j].lcm);
     else
       l[j].lcm=NULL;
-    l[j].ecart=o->L[j].ecart;
-    l[j].length=o->L[j].length;
     l[j].p1=NULL;
     l[j].p2=NULL;
-    l[j].lmRing=o->L[j].lmRing;
-    l[j].tailRing=o->L[j].tailRing;
-    l[j].bucket=o->L[j].bucket;
-
+    l[j].t_p = NULL;
+    
     // copy .p1 ----------------------------------------------
     p = o->L[j].p1;
     i = -1;
@@ -188,7 +184,7 @@ kStrategy kStratCopy(kStrategy o)
   }
   s->kIdeal=NULL;
   //s->P=s->L[s->Ll+1];
-  memset(&s->P,0,sizeof(s->P));
+  s->P.Init(o->tailRing);
   s->update=o->update;
   s->posInLOldFlag=o->posInLOldFlag;
   s->kModW = o->kModW;
@@ -578,7 +574,7 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
         }
         else
         {
-          memset(&n->P,0,sizeof(n->P));
+          n->P.Init(strat->tailRing);
         }
 
         n->P.p=fac->m[i];
@@ -879,6 +875,7 @@ lists kStdfac(ideal F, ideal Q, tHomog h,intvec ** w,ideal D)
     pFDeg = pOldFDeg;
   }
   pLexOrder = b;
+  delete(strat);
   strat=orgstrat;
   while (strat!=NULL)
   {

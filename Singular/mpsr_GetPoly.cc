@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_GetPoly.cc,v 1.29 2000-09-18 09:19:22 obachman Exp $ */
+/* $Id: mpsr_GetPoly.cc,v 1.30 2000-10-19 15:00:18 obachman Exp $ */
 
 /***************************************************************
  *
@@ -738,7 +738,7 @@ static mpsr_Status_t GetVarNamesAnnot(MPT_Node_pt node, ring r)
 
   mpsr_assume(r != NULL);
   N = r->N;
-  r->names = (char **) omAlloc(N * sizeof(char *));
+  r->names = (char **) omAlloc0(N * sizeof(char *));
 
   // fill in varnames from the back
   if (annot != NULL && annot->value != NULL)

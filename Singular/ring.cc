@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.121 2000-10-16 15:37:14 Singular Exp $ */
+/* $Id: ring.cc,v 1.122 2000-10-19 15:00:21 obachman Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -140,45 +140,6 @@ void rSetHdl(idhdl h, BOOLEAN complete)
    /*------------ change the global ring -----------------------*/
   rChangeCurrRing(rg,complete);
   currRingHdl = h;
-
-    /*------------ set pShortOut -----------------------*/
-  if (complete /*&&(h!=NULL)*/)
-  {
-    #ifdef HAVE_TCL
-    if (tclmode)
-    {
-      PrintTCLS('R',IDID(h));
-      pShortOut=(int)FALSE;
-    }
-    else
-    #endif
-    {
-      pShortOut=(int)TRUE;
-      if ((rg->parameter!=NULL) && (rg->ch<2))
-      {
-        for (i=0;i<rPar(rg);i++)
-        {
-          if(strlen(rg->parameter[i])>1)
-          {
-            pShortOut=(int)FALSE;
-            break;
-          }
-        }
-      }
-      if (pShortOut)
-      {
-        for (i=(rg->N-1);i>=0;i--)
-        {
-          if(strlen(rg->names[i])>1)
-          {
-            pShortOut=(int)FALSE;
-            break;
-          }
-        }
-      }
-    }
-  }
-
 }
 
 idhdl rDefault(char *s)
@@ -203,7 +164,7 @@ idhdl rDefault(char *s)
   r->N     = 3;
   /*r->P     = 0; Alloc0 in idhdl::set, ipid.cc*/
   /*names*/
-  r->names = (char **) omAlloc(3 * sizeof(char_ptr));
+  r->names = (char **) omAlloc0(3 * sizeof(char_ptr));
   r->names[0]  = omStrDup("x");
   r->names[1]  = omStrDup("y");
   r->names[2]  = omStrDup("z");
@@ -674,10 +635,6 @@ int rIsRingVar(char *n)
   return -1;
 }
 
-char* RingVar(short i)
-{
-  return currRing->names[i];
-}
 
 void rWrite(ring r)
 {
@@ -1769,7 +1726,7 @@ static ring rCopy0(ring r, BOOLEAN copy_qideal = TRUE,
     res->block1 = NULL;
   }
 
-  res->names   = (char **)omAlloc(r->N * sizeof(char_ptr));
+  res->names   = (char **)omAlloc0(r->N * sizeof(char_ptr));
   for (i=0; i<res->N; i++)
   {
     res->names[i] = omStrDup(r->names[i]);
@@ -2499,10 +2456,56 @@ void rKillModifiedRing(ring r)
   omFreeBin(r,ip_sring_bin);
 }
 
+static void rSetOutParams(ring r)
+{
+  r->VectorOut = (r->order[0] == ringorder_c);
+  r->ShortOut = TRUE;
+#ifdef HAVE_TCL
+  if (tcllmode)
+  {
+    r->ShortOut = FALSE;
+  }
+  else
+#endif
+  {
+    int i;
+    if ((r->parameter!=NULL) && (r->ch<2))
+    {
+      for (i=0;i<rPar(r);i++)
+      {
+        if(strlen(r->parameter[i])>1)
+        {
+          r->ShortOut=FALSE;
+          break;
+        }
+      }
+    }
+    if (r->ShortOut)
+    {
+      // Hmm... sometimes (e.g., from maGetPreimage) new variables
+      // are intorduced, but their name is never set
+      // hence, do the following awkward trick
+      int N = omSizeWOfAddr(r->names);
+      if (r->N < N) N = r->N;
+      
+      for (i=(N-1);i>=0;i--)
+      {
+        if(r->names[i] != NULL && strlen(r->names[i])>1)
+        {
+          r->ShortOut=FALSE;
+          break;
+        }
+      }
+    }
+  }
+  r->CanShortOut = r->ShortOut;
+}
+  
+  
 BOOLEAN rComplete(ring r, int force)
 {
   if (r->VarOffset!=NULL && force == 0) return FALSE;
-
+  rSetOutParams(r);
   int n=rBlocks(r)-1;
   int i;
   int bits;

@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which iter over ExpVector
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline1.h,v 1.6 2000-10-16 12:06:36 obachman Exp $
+ *  Version: $Id: pInline1.h,v 1.7 2000-10-19 15:00:18 obachman Exp $
  *******************************************************************/
 #ifndef PINLINE1_H
 #define PINLINE1_H
@@ -87,6 +87,28 @@ PINLINE1 poly p_LmInit(poly p, ring r)
   _pNext(np) = NULL;
   _pSetCoeff0(np, NULL);
   return np;
+}
+PINLINE1 poly p_LmInit(poly s_p, ring s_r, ring d_r)
+{
+  pAssume1(d_r != NULL);
+  return p_LmInit(s_p, s_r, d_r, d_r->PolyBin);
+}
+PINLINE1 poly p_LmInit(poly s_p, ring s_r, ring d_r, omBin d_bin)
+{
+  p_CheckPolyRing1(s_p, s_r);
+  p_CheckRing(d_r);
+  pAssume1(d_r->N <= s_r->N);
+  poly d_p = p_Init(d_r, d_bin);
+  for (int i=1; i<=d_r->N;i++)
+  {
+    p_SetExp(d_p, i, p_GetExp(s_p, i,s_r), d_r);
+  }
+  if (rRing_has_Comp(d_r))
+  {
+    p_SetComp(d_p, p_GetComp(s_p,s_r), d_r);
+  }
+  p_Setm(d_p, d_r);
+  return d_p;
 }
 PINLINE1 poly p_Head(poly p, ring r)
 {
@@ -421,55 +443,28 @@ PINLINE1 BOOLEAN p_LmShortDivisibleBy(poly a, unsigned long sev_a, ring r_a,
 #endif
 }
 
+/***************************************************************
+ *
+ * Misc things on Lm
+ *
+ ***************************************************************/
+// test if the monomial is a constant as a vector component
+// i.e., test if all exponents are zero 
+PINLINE1 BOOLEAN p_LmIsConstantComp(const poly p, const ring r)
+{
+  int i = r->VarL_Size - 1;
+  
+  do
+  {
+    if (p->exp[r->VarL_Offset[i]] != 0) 
+      return FALSE;
+    i--;
+  }
+  while (i >= 0);
+  return TRUE;
+}
+
+
 #endif // !defined(NO_PINLINE1) || defined(PINLINE1_CC)
 #endif // PINLINE1_CC
 
-#if 0
-#include <stdio.h>
-
-const unsigned long mask = 0x01010101;
-int old_test(unsigned long l1,unsigned long l2)
-{
-  unsigned char* c1 = &l1;
-  unsigned char* c2 = &l2;
-  
-  if (c1[0] < c2[0] || c1[1] < c2[1] || c1[2] < c2[2] || c1[3] < c2[3])
-    return 0;
-  return 1;
-}
-
-int new_test(unsigned long l1,unsigned long l2)
-{
-  
-  if ( (l2 > l1) || ((l1 & mask) ^ (l2 & mask)) != ((l1 - l2) & mask))
-    return 0;
-  return 1;
-}
-
-print_it(unsigned long l1,unsigned long l2)
-{
-  printf("%d:%d\n", old_test(l1, l2), new_test(l1, l2));
-  fflush(NULL);
-}
-
-
-void main()
-{
-  unsigned long mask = 0x01010101;
-  unsigned long l1, l2;
-  char *c1, *c2;
-  unsigned long seed = time(NULL);
-  
-  for (;;)
-  {
-    l1 = random();
-    l2 = random();
-    
-    if (old_test(l1,l2) != new_test(l1, l2))
-    {
-      print_it(l1, l2);
-    }
-  }
-}
-
-#endif

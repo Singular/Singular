@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.47 2000-09-20 12:56:36 obachman Exp $ */
+/* $Id: polys1.cc,v 1.48 2000-10-19 15:00:20 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -57,20 +57,6 @@ BOOLEAN   pIsConstantPoly(poly p)
       if (pGetExp(p,i)!=0) return FALSE;
     }
     pIter(p);
-  }
-  return TRUE;
-}
-
-/*2
-*test if the monomial is a constant as a vector component
-*/
-BOOLEAN   pIsConstantComp(const poly p)
-{
-  int i;
-
-  for (i=pVariables;i;i--)
-  {
-    if (pGetExp(p,i)!=0) return FALSE;
   }
   return TRUE;
 }
@@ -1198,7 +1184,7 @@ int pVar(poly m)
 //{
 //  while (p!=NULL)
 //  {
-//    if (pIsConstantComp(p))
+//    if (pLmIsConstantComp(p))
 //    {
 //      *k = pGetComp(p);
 //      return TRUE;
@@ -1215,7 +1201,7 @@ BOOLEAN   pVectorHasUnitB(poly p, int * k)
 
   while (q!=NULL)
   {
-    if (pIsConstantComp(q))
+    if (pLmIsConstantComp(q))
     {
       i = pGetComp(q);
       qq = p;
@@ -1241,7 +1227,7 @@ void   pVectorHasUnit(poly p, int * k, int * len)
   *len = 0;
   while (q!=NULL)
   {
-    if (pIsConstantComp(q))
+    if (pLmIsConstantComp(q))
     {
       i = pGetComp(q);
       qq = p;

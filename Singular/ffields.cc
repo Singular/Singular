@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ffields.cc,v 1.26 2000-09-18 09:18:56 obachman Exp $ */
+/* $Id: ffields.cc,v 1.27 2000-10-19 15:00:11 obachman Exp $ */
 /*
 * ABSTRACT: finite fields with a none-prime number of elements (via tables)
 */
@@ -409,7 +409,7 @@ void nfWrite (number &a)
     StringAppendS(nfParameter);
     if ((int)a!=1)
     {
-      if(pShortOut==0)  StringAppendS("^");
+      if(currRing->ShortOut==0)  StringAppendS("^");
       StringAppend("%d",(int)a);
     }
   }

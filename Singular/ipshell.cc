@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.56 2000-09-18 09:19:06 obachman Exp $ */
+/* $Id: ipshell.cc,v 1.57 2000-10-19 15:00:13 obachman Exp $ */
 /*
 * ABSTRACT:
 */
@@ -200,8 +200,13 @@ static void list1(char* s, idhdl h,BOOLEAN c, BOOLEAN fullname)
 
 void type_cmd(idhdl h)
 {
-  int saveShortOut=pShortOut;
-  pShortOut=1;
+  BOOLEAN oldShortOut = FALSE;
+  
+  if (currRing != NULL)
+  {
+    oldShortOut = currRing->ShortOut;
+    currRing->ShortOut = 1;
+  }
   list1("// ",h,FALSE,FALSE);
   if (IDTYP(h)!=INT_CMD)
   {
@@ -212,7 +217,8 @@ void type_cmd(idhdl h)
     expr.data=(void *)h;
     expr.Print();
   }
-  pShortOut=saveShortOut;
+  if (currRing != NULL)
+    currRing->ShortOut = oldShortOut;
 }
 
 static void killlocals0(int v, idhdl * localhdl)

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.65 2000-10-16 12:06:35 obachman Exp $ */
+/* $Id: kutil.cc,v 1.66 2000-10-19 15:00:15 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -235,7 +235,6 @@ LSet initL ()
   LSet l = (LSet)omAlloc(setmax*sizeof(LObject));
   for (i=0;i<setmax;i++)
   {
-    l[i].lmRing = currRing;
     l[i].tailRing = currRing;
   }
   return l;
@@ -302,9 +301,9 @@ BOOLEAN kTest_L(LObject *L, ring strat_tailRing,
                 BOOLEAN testp, int lpos, TSet T, int tlength)
 {
   ring tailRing = L->tailRing;
-  ring lmRing   = L->lmRing;
-  r_assume(tailRing != NULL && lmRing != NULL);
-  r_assume(strat_tailRing == NULL || strat_tailRing == tailRing);
+  ring lmRing   = currRing;
+  if (strat_tailRing == NULL) strat_tailRing = tailRing;
+  r_assume(strat_tailRing == tailRing);
 
   if (testp)
   {
@@ -313,15 +312,8 @@ BOOLEAN kTest_L(LObject *L, ring strat_tailRing,
       kFalseReturn(kbTest(L->bucket));
       r_assume(L->bucket->bucket_ring == tailRing);
     }
-    else if (! _pp_Test(L->p, lmRing, tailRing, PDEBUG))
-    {
-      pFalseReturn(pp_Test(L->p, lmRing, tailRing));
-    }
+    kFalseReturn(kTest_T(L, lpos, 'L'));
   }
-
-  if (L->pLength != 0 && L->pLength != pLength(L->p))
-    return dReportError("L[%d] length error: has %d, specified to have %d",
-                        lpos, pLength(L->p), L->pLength);
 
   if (L->p1 == NULL)
   {
@@ -357,7 +349,7 @@ BOOLEAN kTest (kStrategy strat)
   if (strat->T != NULL)
   {
     for (i=0; i<=strat->tl; i++)
-      kFalseReturn(kTest_T(&(strat->T[i]), strat->tailRing, i));
+      kFalseReturn(kTest_T(&(strat->T[i]), i, 'T'));
   }
 
   // test L
@@ -365,9 +357,6 @@ BOOLEAN kTest (kStrategy strat)
   {
     for (i=0; i<=strat->Ll; i++)
     {
-      if (strat->L[i].p == NULL)
-        return dReportError("L[%d].p is NULL", i);
-
       kFalseReturn(kTest_L(&(strat->L[i]), strat->tailRing,
                            (pNext(strat->L[i].p) != strat->tail), i,
                            strat->T, strat->tl + 1));
@@ -398,19 +387,69 @@ BOOLEAN kTest_S(kStrategy strat)
 }
 
 
-BOOLEAN kTest_T(TObject * T, ring tailRing, int i)
+// check that Lm's of a poly from T are "equal"
+static const char* kTest_LmEqual(poly p, poly t_p, ring tailRing)
 {
-  pFalseReturn(pp_Test(T->p, currRing, tailRing));
-  if (T->pLength != 0 &&
-      T->pLength != pLength(T->p))
+  int i;
+  for (i=1; i<=tailRing->N; i++)
   {
-    return dReportError("T[%d] length error: has %d, specified to have %d",
-                        i , pLength(T->p), T->pLength);
+    if (p_GetExp(p, i, currRing) != p_GetExp(t_p, i, tailRing))
+      return "Lm[i] different";
   }
-  if (T->sev != 0 && p_GetShortExpVector(T->p, currRing) != T->sev)
+  if (p_GetComp(p, currRing) != p_GetComp(t_p, tailRing))
+    return "Lm[0] different";
+  if (pNext(p) != pNext(t_p))
+    return "Lm.next different";
+  if (pGetCoeff(p) != pGetCoeff(t_p))
+    return "Lm.coeff different";
+  return NULL;
+}
+    
+BOOLEAN kTest_T(TObject * T, int i, char TN)
+{
+  poly p = T->p;
+  ring r = currRing;
+  
+  if (T->tailRing != currRing)
   {
-    return dReportError("T[%d] wrong sev: has %o, specified to have %o",
-                        i , p_GetShortExpVector(T->p, currRing), T->sev);
+    pFalseReturn(p_Test(T->t_p, T->tailRing));
+    if (T->p != NULL) pFalseReturn(p_LmTest(T->p, currRing));
+    if (T->p != NULL && T->t_p != NULL)
+    {
+      const char* msg = kTest_LmEqual(T->p, T->t_p, T->tailRing);
+      if (msg != NULL)
+        return dReportError("%c[%d] %s", TN, i, msg);
+      r = T->tailRing;
+      p = T->t_p;
+    }
+    else
+    {
+      if (T->p == NULL && T->t_p == NULL)
+        return dReportError("%c[%d].poly is NULL", TN, i);
+    }
+    if (T->p == NULL)
+    {
+      p = T->t_p;
+      r = T->tailRing;
+    }
+  }
+  else
+  {
+    if (T->t_p != NULL)
+      return dReportError("%c[%d].t_p != NULL but tailRing == currRing", TN, i);
+    pFalseReturn(p_Test(T->p, currRing));
+  }
+
+  if (T->pLength != 0 &&
+      T->pLength != pLength(p))
+  {
+    return dReportError("%c[%d] length error: has %d, specified to have %d",
+                        TN, i , pLength(p), T->pLength);
+  }
+  if (T->sev != 0 && p_GetShortExpVector(p, r) != T->sev)
+  {
+    return dReportError("%c[%d] wrong sev: has %o, specified to have %o",
+                        TN, i , p_GetShortExpVector(p, r), T->sev);
   }
   return TRUE;
 }
@@ -3244,27 +3283,26 @@ void enterT (LObject p,kStrategy strat)
   }
   else atT = 0;
 
-  if (strat->tailBin != NULL)
+  strat->T[atT] = p;
+
+  if (strat->tailBin != NULL && pNext(p.p) != NULL)
     pNext(p.p)=p_ShallowCopyDelete(pNext(p.p),
                                    (strat->tailRing != NULL ? 
                                     strat->tailRing : currRing),
                                    strat->tailBin);
   strat->T[atT].p = p.p;
-  strat->T[atT].ecart = p.ecart;
-  strat->T[atT].length = p.length;
   if (strat->use_buckets && p.pLength <= 0)
     strat->T[atT].pLength = pLength(p.p);
   else
     strat->T[atT].pLength = 0;
   if (p.sev == 0)
   {
-    p.sev = pGetShortExpVector(p.p);
+    strat->T[atT].sev = pGetShortExpVector(p.p);
   }
   else
   {
     assume(p.sev == pGetShortExpVector(p.p));
   }
-  strat->T[atT].sev = p.sev;
   strat->tl++;
 }
 
@@ -3282,32 +3320,24 @@ void enterTBba (LObject p, int atT,kStrategy strat)
   if (strat->tl == strat->tmax-1) enlargeT(&strat->T,&strat->tmax,setmax);
   for (i=strat->tl+1; i>=atT+1; i--)
     strat->T[i] = strat->T[i-1];
-  strat->T[atT].p = p.p;
-  if (strat->honey)
-    strat->T[atT].ecart = p.ecart;
-  if (TEST_OPT_INTSTRATEGY)
-    strat->T[atT].length = p.length;
 
-  if (strat->tailBin != NULL)
+  strat->T[atT] = p;
+  if (strat->tailBin != NULL && (pNext(p.p) != NULL))
     pNext(p.p)=p_ShallowCopyDelete(pNext(p.p),
                                    (strat->tailRing != NULL ? 
                                     strat->tailRing : currRing),
                                    strat->tailBin);
   if (strat->use_buckets && p.pLength <= 0)
     strat->T[atT].pLength = pLength(p.p);
-  else
-    strat->T[atT].pLength = p.pLength;
 
   if (p.sev == 0)
   {
-    p.sev = pGetShortExpVector(p.p);
+    strat->T[atT].sev = pGetShortExpVector(p.p);
   }
   else
   {
     assume(p.sev == pGetShortExpVector(p.p));
   }
-  strat->T[atT].sev = p.sev;
-
   strat->tl++;
 }
 

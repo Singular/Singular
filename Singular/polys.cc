@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.63 2000-10-16 12:06:38 obachman Exp $ */
+/* $Id: polys.cc,v 1.64 2000-10-19 15:00:19 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -41,8 +41,6 @@ int *pVarOffset;    // controls the way exponents are stored in a vector
 
 /* 1 for polynomial ring, -1 otherwise */
 int     pOrdSgn;
-/* TRUE for momomial output as x2y, FALSE for x^2*y */
-int pShortOut = (int)TRUE;
 // it is of type int, not BOOLEAN because it is also in ip
 /* TRUE if the monomial ordering is not compatible with pFDeg */
 BOOLEAN pLexOrder;
@@ -666,7 +664,6 @@ void pSetGlobals(ring r, BOOLEAN complete)
   pVarOffset = r->VarOffset;
 
   pOrdSgn = r->OrdSgn;
-  pVectorOut=(r->order[0]==ringorder_c);
   order=r->order;
   block0=r->block0;
   block1=r->block1;
@@ -738,8 +735,7 @@ void pSetGlobals(ring r, BOOLEAN complete)
     //pGetVarIndicies(pVariables, pVarOffset, pVarCompIndex, pVarLowIndex,
     //                pVarHighIndex);
     //pLexOrder=TRUE;
-    pVectorOut=order[0]==ringorder_c;
-    if ((pVectorOut)||(order[0]==ringorder_C)||(order[0]==ringorder_S)||(order[0]==ringorder_s))
+    if ((r->VectorOut)||(order[0]==ringorder_C)||(order[0]==ringorder_S)||(order[0]==ringorder_s))
     {
       if(block1[1]!=pVariables) pLexOrder=TRUE;
       firstBlockEnds=block1[1];

@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.52 2000-10-16 12:06:40 obachman Exp $ */
+/* $Id: ring.h,v 1.53 2000-10-19 15:00:22 obachman Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -20,7 +20,6 @@ void   rSetHdl(idhdl h, BOOLEAN complete = TRUE);
 ring   rInit(sleftv* pn, sleftv* rv, sleftv* ord);
 idhdl  rDefault(char *s);
 int    rIsRingVar(char *n);
-char * RingVar(short);
 void   rWrite(ring r);
 void   rKill(idhdl h);
 void   rKill(ring r);
@@ -127,7 +126,6 @@ inline BOOLEAN rField_has_simple_Alloc(ring r=currRing)
 { return (rField_is_Zp(r) || rField_is_GF(r) || rField_is_R(r)); }
 
 /* Z/p, GF(p,n), R: nCopy, nNew, nDelete are dummies*/
-
 inline BOOLEAN rField_is_Extension(ring r=currRing)
 { return (rField_is_Q_a(r)) || (rField_is_Zp_a(r)); } /* Z/p(a) and Q(a)*/
 
@@ -145,6 +143,21 @@ inline int rBlocks(ring r)
   return i+1;
 }
 
+// misc things
+inline char* rRingVar(short i)
+{
+  return currRing->names[i];
+}
+inline char* rRingVar(short i, ring r)
+{
+  return r->names[i];
+}
+inline BOOLEAN rShortOut(ring r)
+{
+  return (r->ShortOut);
+}
+
+// order stuff
 typedef enum rRingOrder_t
 {
   ringorder_no = 0,

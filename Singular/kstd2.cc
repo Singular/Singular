@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.50 2000-10-16 12:06:35 obachman Exp $ */
+/* $Id: kstd2.cc,v 1.51 2000-10-19 15:00:14 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -35,7 +35,7 @@ static poly kFromInput(poly p,kStrategy strat)
 
   if (pGetComp(q)>strat->syzComp) return NULL;
   while ((q!=NULL) && (pGetComp(q)<=strat->syzComp)) pIter(q);
-  if (pIsConstantComp(q))
+  if (pLmIsConstantComp(q))
     return pHead(q);
   return NULL;
 }
@@ -623,7 +623,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     {
       /* statistic */
       if (TEST_OPT_PROT) PrintS("s");
-      strat->P.GetP(currRing, strat->lmBin);
+      strat->P.GetP(strat->lmBin);
       /* enter P.p into s and L */
       {
         int pos=posInS(strat->S,strat->sl,strat->P.p);

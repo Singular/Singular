@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.40 2000-10-16 12:06:39 obachman Exp $ */
+/* $Id: polys.h,v 1.41 2000-10-19 15:00:19 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials of the
              currRing
@@ -208,6 +208,13 @@ extern poly pHeadProc(poly p);
 #define ppMult_qq(p, q)             pp_Mult_qq(p, q, currRing)
 // p*Coeff(m) for such monomials pm of p, for which m is divisble by pm
 #define ppMult_Coeff_mm_DivSelect(p, m)   pp_Mult_Coeff_mm_DivSelect(p, m, currRing)
+/***************************************************************
+ *
+ * Predicates on polys/Lm's
+ *
+ ***************************************************************/
+#define pLmIsConstantComp(p)        p_LmIsConstantComp(p, currRing)
+
 
 /***************************************************************
  *
@@ -232,7 +239,6 @@ extern int pComponentOrder;
 /*-------------predicate on polys ----------------------*/
 BOOLEAN   pIsConstant(const poly p);
 BOOLEAN   pIsConstantPoly(poly p);
-BOOLEAN   pIsConstantComp(const poly p);
 int       pIsPurePower(const poly p);
 #define   pIsVector(p)     (pGetComp(p)!=0)
 BOOLEAN   pHasNotCF(poly p1, poly p2);   /*has no common factor ?*/
@@ -290,11 +296,11 @@ int       pWeight(int c);
 #define   pSetCompP(a,i)    p_SetCompP(a, i, currRing)
 
 
-char*     pString(poly p);
-char*     pString0(poly p);
-void      pWrite(poly p);
-void      pWrite0(poly p);
-void      wrp(poly p);
+char*     pString(poly p, ring r = currRing);
+char*     pString0(poly p, ring r = currRing);
+void      pWrite(poly p, ring r = currRing);
+void      pWrite0(poly p, ring r = currRing);
+void      wrp(poly p, ring r = currRing);
 
 void      pEnlargeSet(polyset *p, int length, int increment);
 poly      pISet(int i);

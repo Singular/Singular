@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.105 2000-10-16 15:32:20 obachman Exp $ */
+/* $Id: ideals.cc,v 1.106 2000-10-19 15:00:12 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -3270,7 +3270,7 @@ static int idReadOutUnits(ideal arg,int* comp)
       j = pGetComp(p);
       if ((*componentIsUsed)[j]==0)
       {
-        if (pIsConstantComp(p))
+        if (pLmIsConstantComp(p))
         {
           generator = i;
           (*componentIsUsed)[j] = 1;
