@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sparsmat.cc,v 1.53 2001-10-09 16:36:23 Singular Exp $ */
+/* $Id: sparsmat.cc,v 1.54 2003-02-04 09:13:29 Singular Exp $ */
 
 /*
 * ABSTRACT: operations with sparse matrices (bareiss, ...)
@@ -2503,14 +2503,17 @@ static number smCleardenom(ideal id)
   for (int i=0; i<IDELEMS(id); i++)
   {
     a = id->m[i];
-    x = nCopy(pGetCoeff(a));
-    pCleardenom(a);
-    y = nDiv(x,pGetCoeff(a));
-    nDelete(&x);
-    x = nMult(res,y);
-    nNormalize(x);
-    nDelete(&res);
-    res = x;
+    if (a!=NULL)
+    {
+      x = nCopy(pGetCoeff(a));
+      pCleardenom(a);
+      y = nDiv(x,pGetCoeff(a));
+      nDelete(&x);
+      x = nMult(res,y);
+      nNormalize(x);
+      nDelete(&res);
+      res = x;
+    }
   }
   return res;
 }
