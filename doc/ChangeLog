@@ -1,4 +1,51 @@
+Wed May 13 09:07:31 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* start.doc (How to use this manual): slightly reordered
+
+	* general.doc (How to enter and exit, SINGULAR prompt): minor
+	  fixes
+	  (The online help system, Interrupting SINGULAR): more minor
+	  fixes
+	  (Editing input): reordered, rewritten
+	  (Implemented algorithms): information added on gcd and
+	  factorization
+
 Tue May 12 09:21:20 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* start.doc (Getting started): minor fixes
+
+	* general.doc (Names and objects): subsection split up to `Names'
+	  and `Objects'.  All menues and nodes updated.
+	  (Names, Objects): rewritten
+
+	* general.doc (How to enter and exit): references changed to new
+	  syntax
+	  (The online help system): reference to info system added
+	  (The online help system): minor changes
+	  (Interrupting SINGULAR): minor changes
+	  (General syntax of a ring definition): references changed to new
+	  syntax
+	  (Proc definition): minor changes
+
+	* copyright.tex: entru for Factory updated
+
+	* .cvsignore: entry `*.lib' removed, `doc2tex' added
+
+	* start.doc (Getting started): Minor bug fixes (errors on `{' and
+	  `}')
+
+	* start.doc, singular.doc, reference.doc (Functions and
+	  variables): renamed to `Functions and system variables'.  All
+	  references changed.
+
+	* general.doc (Debugging tools): Minor fixes.  Menu updated.
+	  (tracing of procedures): renamed to `Tracing of procedures'.
+	  Node struture updated.
+	  (Break points, Printing of data, How to enter and exit):
+	  cosmetic changes
+
+	* general.doc (Special characters): reordered.  Special characters
+	  `_' and `~' added.  Lot of other fixes.
 
 	* Makefile.in (usercard.dvi): new target
 	  (dvi): `usercard.dvi' added
