@@ -1,9 +1,9 @@
 // KK,GMG last modified: 17.12.00
 ///////////////////////////////////////////////////////////////////////////////
-version  = "$Id: classify.lib,v 1.45 2000-12-22 13:39:53 greuel Exp $";
+version  = "$Id: classify.lib,v 1.46 2000-12-23 17:10:16 greuel Exp $";
 category="Singularities";
 info="
-LIBRARY:  classify.lib  Arnold Classifier of Singularties
+LIBRARY:  classify.lib  Arnold Classifier of Singularities
 AUTHOR:   Kai Krueger, krueger@mathematik.uni-kl.de
 
 OVERVIEW:
@@ -11,20 +11,20 @@ OVERVIEW:
    equivalence, based on the determinator of singularities by V.I. Arnold.
 
 PROCEDURES:
-basicinvariants(f);  computes Milnor number, determinacy-bound and corank of f
-classify(f);         normal form of poly f determined with Arnold's method
-corank(f);           computes the corank of f (i.e. of the Hessian of f)
-Hcode(v);            coding of intvec v acoording to the number repetitions
-init_debug([n]);     print trace and debugging information depending on int n
-internalfunctions(); display names of internal procedures of this library
-milnorcode(f[,e]);   Hilbert poly of [e-th] Milnor algebra coded with Hcode
-morsesplit(f);       residual part of f after applying the splitting lemma
-quickclass(f)        normal form of f determined by invariants (milnorcode)
-singularity(s,[]);   normal form of singularity given by its name s and index
-swap (a,b);          returns b,a
-A_L(s/f)             shortcut for quickclass(f) or normalform(s)
-normalform(s);       normal form of singularity given by its name s
-debug_log(lev,[])    print trace and debugging information w.r.t level>@DeBug
+basicinvariants(f); computes Milnor number, determinacy-bound and corank of
+classify(f);        normal form of poly f determined with Arnold's method
+ corank(f);          computes the corank of f (i.e. of the Hessian of f)
+ Hcode(v);           coding of intvec v acoording to the number repetitions
+ init_debug([n]);    print trace and debugging information depending on int n
+ internalfunctions();display names of internal procedures of this library
+ milnorcode(f[,e]);  Hilbert poly of [e-th] Milnor algebra coded with Hcode
+ morsesplit(f);      residual part of f after applying the splitting lemma
+ quickclass(f)       normal form of f determined by invariants (milnorcode)
+ singularity(s,[]);  normal form of singularity given by its name s and index
+ swap(a,b);          returns b,a
+ A_L(s/f)            shortcut for quickclass(f) or normalform(s)
+ normalform(s);      normal form of singularity given by its name s
+ debug_log(lev,[])   print trace and debugging information w.r.t level>@DeBug
            (parameters in square brackets [] are optional)
 ";
 
@@ -2260,15 +2260,15 @@ static proc HKclass7_teil_1 (intvec sg, string SG_Typ, int cnt)
 ///////////////////////////////////////////////////////////////////////////////
 proc singularity(string typ, list #)
 "USAGE:    singularity(t, l); t=string (name of singularity),
-          l=list of integers (index/indices of singularity)
-COMPUTE:  get the Singularity named by type t from the database.
+          l=list of integers/polynomials (indices/parmeters of singularity)
+COMPUTE:  get the singularity named by type t from the database.
           list l is as follows:
-          l= k [,r [,s [,a [,b [,c [,d]]]]]] k,r,s=int   a,b,c,d=poly
-          The name of the dbm-databasefile is: NFlist.[dir,pag]
+          l= k [,r [,s [,a [,b [,c [,d]..]: k,r,s=int   a,b,c,d=poly.
+          The name of the dbm-databasefile is: NFlist.[dir,pag].
           The file is found in the current directory. If it does not
           exists, please run the script MakeDBM first.
 RETURN:   Normal form and corank of the singularity named by type t and its
-          index (indices) l
+          index (indices) l.
 EXAMPLE:  example singularity; shows an example"
 {
   poly a1, a2, a3, a4, f;
@@ -2527,7 +2527,7 @@ proc corank(poly f)
 "USAGE:    corank(f);   f=poly
 RETURN:   the corank of the Hessian matrix of f, of type int
 REMARK:   corank(f) is the number of variables occuring in the residual
-          singulartity after applying 'morsesplit' to f
+          singularity after applying 'morsesplit' to f
 EXAMPLE:  example corank; shows an example"
 {
   matrix M = jacob(jacob(jet(f,2)));
@@ -2760,14 +2760,14 @@ static proc DecodeNormalFormString (string S_in)
 
 ///////////////////////////////////////////////////////////////////////////////
 proc A_L
-"USAGE:    A_L(f);         f=poly
-          A_L(\"name\");    type=string
-COMPUTE:  the normal form in Arnold's list of the singularity given either
-          by a polynomial f or by its name.
-RETURN:   A_L(f): compute via 'milnorcode' the class of f and
-          return the normal form of f found in the database.
-          A_L(\"name\"): Get the normal form from the database for
-          the singularity given by its name.
+"USAGE:    A_L(f);  f poly
+          A_L(s);  s string, the name of the singularity
+COMPUTE:  the normal form of f in Arnold's list of singularities in case 1,
+          in case 2 nothing has to be computed.
+RETURN:   A_L(f): compute via 'milnorcode' the class of f and return the normal
+          form of f found in the database.
+          A_L(\"name\"): get the normal form from the database for the
+          singularity given by its name.
 EXAMPLE:  example A_L; shows an example"
 {
   // if trace/debug mode not set, do it!
@@ -2860,7 +2860,7 @@ RETURN:  nothing, display names of internal procedures of classify.lib
 EXAMPLE: no example"
 { "   Internal functions for the classification using Arnold's method,";
  "   the function numbers correspond to numbers in Arnold's classifier:";
- "Klassifiziere(poly f);        determine the type of the singularity f
+ "Klassifiziere(poly f);      //determine the type of the singularity f
   Funktion1bis (poly f, list cstn)
   Funktion3 (poly f, list cstn)
   Funktion6 (poly f, list cstn)
@@ -2885,11 +2885,11 @@ EXAMPLE: no example"
   Isomorphie_s82_x (poly f, poly fk, int k)
   Isomorphie_s82_z (poly f, poly fk, int k)
   Isomorphie_s17 (poly f, poly fk, int k, int ct)
-  printresult (string f, string typ, int Mu, int m, int corank, int K)
+  printresult (string f,string typ,int Mu,int m,int corank,int K)
   ";
   "   Internal functions for the classifcation by invariants:
   Cubic (poly f)
-  parity (int e)               return the parity of e
+  parity (int e)             //return the parity of e
   HKclass (intvec i)
   HKclass3( intvec i, string SG_Typ, int cnt)
   HKclass3_teil_1 (intvec i, string SG_Typ, int cnt)
@@ -2900,7 +2900,7 @@ EXAMPLE: no example"
   HKclass7_teil_1 (intvec i, string SG_Typ, int cnt)
   ";
   "   Internal functions for the Morse-splitting lemma:
-  Morse(poly fi, int K, int corank)          Splittinglemma itself
+  Morse(poly fi, int K, int corank)  //splitting lemma itself
   Coeffs (list #)
   Coeff
   ";
@@ -2909,7 +2909,7 @@ EXAMPLE: no example"
   Singularitaet(string typ,int k,int r,int s,poly a,poly b,poly c,poly d)
   RandomPolyK
   Faktorisiere(poly f, poly g, int p, int k)   compute g = (ax+by^k)^p
-  Teile(poly f, poly g);                  Teilt f durch g.
+  Teile(poly f, poly g);             //divides f by g
   GetRf(poly f, int n);
   Show(poly f);
   checkring();

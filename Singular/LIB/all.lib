@@ -1,74 +1,77 @@
-// $Id: all.lib,v 1.31 2000-12-22 13:37:10 greuel Exp $
+// $Id: all.lib,v 1.32 2000-12-23 17:08:07 greuel Exp $
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: all.lib,v 1.31 2000-12-22 13:37:10 greuel Exp $";
-category="General purpose";
+version="$Id: all.lib,v 1.32 2000-12-23 17:08:07 greuel Exp $";
+category = "General purpose";
 info="
 LIBRARY:  all.lib   Load all libraries
 
+@format 
 General purpose
-  general_lib:     ELEMENTARY COMPUTATIONS OF GENERAL TYPE
-  inout_lib:       PRINTING AND MANIPULATING IN- AND OUTPUT
-  poly_lib:        CREATING AND MANIPULATING POLYS, IDEALS, MODULES
-  random_lib:      CREATING RANDOM AND SPARSE MATRICES, IDEALS, POLYS
-  ring_lib:        MANIPULATING RINGS AND MAPS
+  general_lib:     Elementary Computations of General Type
+  inout_lib:       Printing and Manipulating In- and Output
+  poly_lib:        Procedures for Manipulating Polys, Ideals, Modules
+  random_lib:      Creating Random and Sparse Matrices, Ideals, Polys
+  ring_lib:        Manipulating Rings and Maps
 
 Linear algebra
-  jordan_lib:      JORDAN NORMAL FORM OF A MATRIX WITH RATIONAL EIGENVALUES
-  linalg_lib:      ALGORITHMIC LINEAR ALGEBRA
-  matrix_lib:      ELEMENTARY MATRIX OPERATIONS
+  jordan_lib:      Jordan Normal Form of a Matrix with rational Eigenvalues
+  linalg_lib:      Algorithmic Linear Algebra
+  matrix_lib:      Elementary Matrix Operations
 
 Commutative algebra
-  algebra_lib:     COMPUTE WITH ALGBRAS AND ALGEBRA MAPS
-  elim_lib:        ELIMINATION, SATURATION AND BLOWING UP
-  homolog_lib:     HOMOLOGICAL ALGEBRA AND CUP PRODUCT
-  intprog_lib:     INTEGER PROGRAMMING WITH GROEBNER BASIS METHODS
-  mregular_lib:    CASTELNUOVO-MUMFORD REGULARITY OF CM-SCHEMES AND CURVES
-  normal_lib:      NORMALIZATION OF AN AFFINE RING
-  primdec_lib:     PRIMARY DECOMPOSITION AND RADICAL OF IDEALS
-  primitiv_lib:    COMPUTING A PRIMITIVE ELEMENT
-  reesclos_lib:    REES ALGEBRA AND INTEGRAL CLOSURE OF IDEALS
-  toric_lib:       STANDARD BASIS OF TORIC IDEALS
+  algebra_lib:     Compute with Algbras and Algebra Maps
+  elim_lib:        Elimination, Saturation and Blowing up
+  homolog_lib:     Procedures for Homological Algebra
+  intprog_lib:     Integer Programming with Groebner Basis Methods
+  mregular_lib:    Castelnuovo-Mumford Regularity of CM-Schemes and Curves
+  normal_lib:      Normalization of Affine Rings
+  primdec_lib:     Primary Decomposition and Radical of Ideals
+  primitiv_lib:    Computing a Primitive Element
+  reesclos_lib:    Rees Algebra and Integral Closure of Ideals
+  toric_lib:       Standard Basis of Toric Ideals
 
 Singularities
-  classify_lib:    ARNOLD CLASSIFIER OF SINGULARTIES
-  deform_lib:      MINIVERSAL DEFORMATION OF SINGULARITIES AND MODULES
-  equising_lib:    EQUISINGULARITY STRATUM OF A FAMILY OF PLANE CURVES
-  gaussman_lib:    GAUSS-MANIN CONNECTION OF A HYPERSURFACE SINGULARITY
-  hnoether_lib:    HAMBURGER-NOETHER (PUISEUX) DEVELOPMENT 
-  mondromy_lib:    MONODROMY OF AN ISOLATED HYPERSURFACE SINGULARITY
-  qhmoduli.lib:    MODULI SPACES OF SEMI-QUASIHOMOGENEOUS SINGULARITIES
-  sing_lib:        INVARIANTS OF SINGULARITIES
-  spcurve_lib:     DEFORMATIONS AND INVARIANTS OF CM-CODIM 2 SINGULARITIES
-  spectrum_lib:    SINGULARITY SPECTRA FOR NONDEGENERATE SINGULARITIES
+  classify_lib:    Arnold Classifier of Singularities
+  deform_lib:      Miniversal Deformation of Singularities and Modules
+  equising_lib:    Equisingularity Stratum of a Family of Plane Curves
+  gaussman_lib:    Gauss-Manin Connection of a Singularity
+  hnoether_lib:    Hamburger-Noether (Puiseux) Development
+  mondromy_lib:    Monodromy of an Isolated Hypersurface Singularity
+  qhmoduli.lib:    Moduli Spaces of Semi-Quasihomogeneous Singularities
+  sing_lib:        Invariants of Singularities
+  spcurve_lib:     Deformations and Invariants of CM-codim 2 Singularities
+  spectrum_lib:    Singularity Spectrum for Nondegenerate Singularities
 
 Invariant theory
-  ainvar_lib:      INVARIANTS RINGS OF THE ADDITIVE GROUP
-  finvar_lib:      INVARIANT RINGS OF FINITE GROUPS
-  rinvar_lib:      INVARIANT RINGS OF REDUCTIVE GROUPS
-  stratify_lib:    ALGORITHMIC STRATIFICATION FOR UNIPOTENT GROUP-ACTIONS
+  ainvar_lib:      Invariant Rings of the Additive Group
+  finvar_lib:      Invariant Rings of Finite Groups
+  rinvar_lib:      Invariant Rings of Reductive Groups
+  stratify_lib:    Algorithmic Stratification for Unipotent Group-Actions
 
 Symbolic-numerical solving
-  ntsolve_lib:     REAL NEWTON SOLVING OF POLYNOMIAL SYSTEMS
-  presolve_lib:    PRE-SOLVING OF POLYNOMIAL EQUATIONS
-  solve_lib:       COMPLEX SOLVING OF POLYNOMIAL SYSTEMS
-  triang_lib:      DECOMPOSE ZERO-DIMENSIONAL IDEALS INTO TRIANGULAR SETS
-  zeroset_lib:     procedures for roots and factorization
+  ntsolve_lib:     Real Newton Solving of Polynomial Systems
+  presolve_lib:    Pre-Solving of Polynomial Equations
+  solve_lib:       Complex Solving of Polynomial Systems
+  triang_lib:      Decompose Zero-dimensional Ideals into Triangular Sets
+  zeroset_lib:     Procedures For Roots and Factorization
 
 Visualization
-  graphics_lib:    PROCEDURES TO USE GRAPHICS WITH MATHEMATICA
-  latex_lib:       TYPESETTING OF SINGULAR-OBJECTS IN LATEX2E
-  paramet_lib:     PARAMETRIZATION OF VARIETIES
-  surf_lib:        PROCEDURES FOR GRAPHICS WITH SURF
+  graphics_lib:    Procedures to use Graphics with Mathematica
+  latex_lib:       Typesetting of Singular-Objects in LaTex2e
+  paramet_lib:     Parametrization of Varieties
+  surf_lib:        Procedures for Graphics with Surf
 
 Coding theory
-  brnoeth_lib:     BRILL-NOETHER ALGORITHM, WEIERSTRASS-SG AND AG-CODES
+  brnoeth_lib:     Brill-Noether Algorithm, Weierstrass-SG and AG-codes
 
 Miscellaneous
-  makedbm_lib:     DATA BASE OF SINGULARITIES FOR THE ARNOLD-CLASSIFIER
-  template_lib:    A TEMPLATE FOR A SINGULAR LIBRARY
+  makedbm_lib:     Data Base of Singularities for the Arnold-Classifier
+  template_lib:    A Template for a Singular Library
 
 Utilities
-  tst_lib:         PROCEDURES FOR RUNNING AUTOMATIC TST TESTS
+  tst_lib:         Procedures for running automatic tst Tests
+
+@end format
 ";
 
 ///////////////////////////////////////////////////////////////////////////////
