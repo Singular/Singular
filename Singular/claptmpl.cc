@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: claptmpl.cc,v 1.22 2000-05-29 15:05:19 Singular Exp $
+// $Id: claptmpl.cc,v 1.23 2000-05-29 15:59:58 Singular Exp $
 /*
 * ABSTRACT - instantiation of all templates
 */
@@ -48,6 +48,11 @@
     template class Matrix<CanonicalForm>;
     template class SubMatrix<CanonicalForm>;
     template class Array<REvaluation>;
+
+    #ifndef NOSTREAMIO
+    template ostream & operator<<(ostream &, const List<Factor<CanonicalForm> > &);
+    template ostream & operator<<(ostream &, const List<Variable> &);
+    #endif
 
     #ifndef __MWERKS__
       template List<CFFactor> Union ( const List<CFFactor>&, const List<CFFactor>& );
