@@ -298,3 +298,77 @@ poly multifastmult(poly f, poly g, ring r){
       return(erg);
     }
 }
+poly pFastPower(poly f, int n, ring r){
+  if (n==1) return f;
+  if (n==0) return p_ISet(1,r);
+  assume(n>=0);
+  int i_max=1;
+  int pot_max=0;
+  while(i_max*2<=n){
+    i_max*=2;
+    pot_max++;
+  }
+  int field_size=pot_max+1;
+  int* int_pot_array=(int*) omalloc(field_size*sizeof(int));
+  poly* pot_array=(poly*) omalloc(field_size*sizeof(poly));
+  int i;
+  int pot=1;
+  //initializing int_pot
+  for(i=0;i<field_size;i++){
+    int_pot_array[i]=pot;
+    pot*=2;
+  }
+  //calculating pot_array
+  pot_array[0]=f; //do not delete it
+  for(i=1;i<field_size;i++){
+    poly p=pot_array[i-1];
+    pot_array[i]=multifastmult(p,p,r);
+    //pot_array[i]=pp_Mult_qq(p,p,r);
+  }
+  
+
+
+  int work_n=n;
+  assume(work_n>=int_pot_array[field_size-1]);
+  poly erg=p_ISet(1,r);
+
+
+  //forward maybe faster, later
+  // for(i=field_size-1;i>=0;i--){
+
+//       assume(work_n<2*int_pot_array[i]);
+//       if(int_pot_array[i]<=work_n){
+// 	work_n-=int_pot_array[i];
+// 	poly prod=multifastmult(erg,pot_array[i],r);
+// 	pDelete(&erg);
+// 	erg=prod;
+//       }
+
+//       if(i!=0) pDelete(&pot_array[i]);
+//   }
+  
+  
+  for(i=field_size-1;i>=0;i--){
+
+      assume(work_n<2*int_pot_array[i]);
+      if(int_pot_array[i]<=work_n){
+	work_n-=int_pot_array[i];
+	int_pot_array[i]=1;
+      }
+      else int_pot_array[i]=0;
+   
+  }
+  for(i=0;i<field_size;i++){
+    if(int_pot_array[i]==1){
+      poly prod=multifastmult(erg,pot_array[i],r);
+      //      poly prod=pp_Mult_qq(erg,pot_array[i],r);
+      pDelete(&erg);
+      erg=prod;
+    }
+    if(i!=0) pDelete(&pot_array[i]);
+  }
+  //free res
+  omfree(pot_array);
+  omfree(int_pot_array);
+  return erg;
+}
