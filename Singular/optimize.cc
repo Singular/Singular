@@ -55,6 +55,12 @@ static poly maEggT(const poly m1, const poly m2, poly &q1, poly &q2,const ring r
   return ggt;
 }
 
+/********************************************************************
+ **                                                                 *
+ * maFindBestggT                                                    *
+ * finds ggT with the highest cost                                  *
+ *******************************************************************/
+
 static mapoly maFindBestggT(mapoly mp, mapoly & choice, mapoly & fp, mapoly & fq,const ring r)
 {
   int ggt_deg = 0;
@@ -122,6 +128,13 @@ static mapoly maFindBestggT(mapoly mp, mapoly & choice, mapoly & fp, mapoly & fq
 
   
 }
+
+/********************************************************************
+ **                                                                 *
+ * maPoly_Optimize                                                  *
+ * adds and integrates subexpressions                               *
+ *******************************************************************/
+
 void maPoly_Optimize(mapoly mpoly, ring src_r){
   assume(mpoly!=NULL && mpoly->src!=NULL);
   mapoly iter = mpoly;
@@ -148,16 +161,3 @@ void maPoly_Optimize(mapoly mpoly, ring src_r){
   }
 
 }
-#if 0
-ring map_r = 32003, (a, b, c), Wp(1,2,3);
-ideal map_id = a5+a4, ab+ab3+c*b2+ca5, a3b2+c3 + ab, ab2 + a2b4;
-
-
-ring image_r;
-ideal image_id = x2y3, y, z+x6;
-
-map Phi = map_r, image_id;
-
-system("mapmb", Phi, map_id);
-
-#endif
