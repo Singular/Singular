@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: subexpr.h,v 1.4 1998-01-16 14:29:58 krueger Exp $ */
+/* $Id: subexpr.h,v 1.5 1998-03-06 11:50:38 krueger Exp $ */
 /*
 * ABSTRACT: handling of leftv
 */
@@ -91,6 +91,7 @@ class proc_singular
 {
 public:
   long   proc_start;       // position where proc is starting
+  long   def_end;          // position where proc header is ending
   long   help_start;       // position where help is starting
   long   body_start;       // position where proc-body is starting
   long   body_end;         // position where proc-body is ending
@@ -128,6 +129,7 @@ public:
   char          *procname;
   language_defs language;
   short         ref;
+  char          is_static;        // if set, proc not accessible for user
   procinfodata  data;
 };
 
@@ -139,4 +141,17 @@ inline procinfov piCopy(procinfov pi)
 void piKill(procinfov l);
 char *piProcinfo(procinfov pi, char *request);
 void piShowProcinfo(procinfov pi, char *txt);
+#ifdef HAVE_LIBPARSER
+class libstack
+{
+ public:
+  libstackv next;
+  char      *libname;
+  BOOLEAN   to_be_done;
+  int       cnt;
+  void      push(char *p, char * libname);
+  libstackv pop(char *p);
+  inline char *get() { return(libname); }
+};
+#endif /* HAVE_LIBPARSER */
 #endif

@@ -116,6 +116,12 @@
 /* works around a quirk in the generation of parser tables */
 #define INIT_BUG
 
+/* Define to use new namespaces techniks */
+#undef HAVE_NAMESPACES
+
+/* Define to use scanner when loading libraries */
+#define HAVE_LIBPARSER
+
 /*#define PROFILING*/
 #ifdef PROFILING
 #define PROFILER ,0,0
@@ -187,6 +193,12 @@ char *strstr(const char *haystack, const char *needle);
 
 /* define YYDEBUG 1 for debugging bison texts, 0 otherwise */
 #define YYDEBUG 0
+
+#ifndef HAVE_LIBPARSER
+#  undef YYLPDEBUG
+#else
+#  define YYLPDEBUG 0
+#endif
 
 #ifndef FALSE
 #define FALSE       0

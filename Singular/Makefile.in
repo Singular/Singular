@@ -95,11 +95,11 @@ CXXSOURCES=grammar.cc scanner.cc algmap.cc attrib.cc binom.cc clapconv.cc \
     tesths.cc timer.cc weight.cc \
     mpsr_Put.cc mpsr_PutPoly.cc mpsr_Tok.cc mpsr_GetPoly.cc \
     mpsr_Get.cc mpsr_GetMisc.cc mpsr_Error.cc \
-    ndbm.cc spSpolyLoop.cc
+    ndbm.cc spSpolyLoop.cc libparse.cc
 
 CSOURCES=mmalloc.c mmallocb.c mmallocs.c mmblock.c mmheap.c mmspec.c mmutil.c weight0.c
 
-SOURCES=${CSOURCES} ${CXXSOURCES} grammar.y scanner.l
+SOURCES=${CSOURCES} ${CXXSOURCES} grammar.y scanner.l libparse.l
 
 HEADERS=algmap.h hutil.h lists.h stairc.h attrib.h ideals.h \
 	longalg.h mpsr_Tok.h structs.h binom.h intvec.h longrat.h \
@@ -141,7 +141,7 @@ OBJS=grammar.o scanner.o matpol.o binom.o\
      sing_mp.o fglm.o fglmzero.o fglmvec.o fglmhom.o fglmgauss.o cntrlc.o \
      algmap.o clapconv.o  clapmem.o clapsing.o claptmpl.o\
      mpsr_Error.o mpsr_Put.o mpsr_PutPoly.o mpsr_GetPoly.o \
-     mpsr_Get.o mpsr_GetMisc.o ndbm.o spSpolyLoop.o
+     mpsr_Get.o mpsr_GetMisc.o ndbm.o spSpolyLoop.o libparse.o
 
 ##
 ## PRIMARY Targets
@@ -164,7 +164,7 @@ OBJS=grammar.o scanner.o matpol.o binom.o\
 all:	Singular
 
 Singular: mod2.h Makefile version.h scanner.cc ${OBJS} iparith.o \
-						mpsr_Tok.o tesths.cc
+					mpsr_Tok.o tesths.cc libparse.cc
 	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${DEFS} -o Singular \
 	tesths.cc iparith.o mpsr_Tok.o ${OBJS} ${LDFLAGS} ${LIBS}
 
@@ -173,6 +173,12 @@ Singular-static: mod2.h Makefile version.h scanner.cc ${OBJS} iparith.o \
 	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${DEFS} -o Singular-static \
 	tesths.cc iparith.o mpsr_Tok.o \
 	${OBJS} ${STATIC_LDFLAGS} ${LDFLAGS} ${LIBS}
+
+libparse: libparse_main.o utils.o
+	${CXX} -o libparse libparse_main.o utils.o
+
+libparse_main.o: libparse.cc
+	${CXX} -c -o libparse_main.o libparse.cc -DSTANDALONE_PARSER
 
 iparith.o mpsr_Tok.o : iparith.inc mpsr_Tok.inc
 
@@ -196,6 +202,9 @@ iparith.inc mpsr_Tok.inc: iparith.cc ipconv.cc tok.h mpsr_Tok.cc grammar.h mod2.
 		echo /bin/rm gentable;\
 		/bin/rm gentable; \
 	fi
+
+libparse.cc: libparse.l
+	${LEX} -I -Pyylp -olibparse.cc libparse.l
 
 version.h: ${SOURCES} ${HEADERS} Makefile.in mod2.h.in configure.in
 	echo "#define SINGULAR_VERSION_ID " `date '+%y%m%d%H'` >version.h
@@ -364,7 +373,7 @@ OBJG1=	grammar.og scanner.og matpol.og binom.og\
      cntrlc.og  \
      mpsr_Error.og mpsr_Put.og mpsr_PutPoly.og mpsr_GetPoly.og \
      mpsr_Get.og mpsr_GetMisc.og \
-     ndbm.og spSpolyLoop.og
+     ndbm.og spSpolyLoop.og libparse.og
 
 OBJG2= mmalloc.og mmallocb.og mmallocs.og mmblock.og mmheap.og \
      mmspec.og mmutil.og weight0.og
@@ -428,7 +437,7 @@ OBJP1=	grammar.op scanner.op matpol.op binom.op\
      cntrlc.op  \
      mpsr_Error.op mpsr_Put.op mpsr_PutPoly.op mpsr_GetPoly.op \
      mpsr_Get.op mpsr_GetMisc.op \
-     ndbm.op spSpolyLoop.op
+     ndbm.op spSpolyLoop.op libparse.op
 
 OBJP2= mmalloc.op mmallocb.op mmallocs.op mmblock.op mmheap.op \
      mmspec.op mmutil.op weight0.op

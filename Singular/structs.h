@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.8 1998-02-27 14:06:26 Singular Exp $ */
+/* $Id: structs.h,v 1.9 1998-03-06 11:50:38 krueger Exp $ */
 /*
 * ABSTRACT
 */
@@ -154,6 +154,13 @@ extern BITSET verbose;
 extern int    yydebug;
 #endif
 #endif
+
+#ifdef HAVE_LIBPARSER
+#ifdef __cplusplus
+class libstack;
+typedef libstack *  libstackv;
+#endif
+#endif /* HAVE_LIBPARSER */
 
 #endif
 

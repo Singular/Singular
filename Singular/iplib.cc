@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.10 1998-02-27 14:06:18 Singular Exp $ */
+/* $Id: iplib.cc,v 1.11 1998-03-06 11:50:37 krueger Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -21,9 +21,20 @@
 #include "ipshell.h"
 #include "lists.h"
 
-procinfo *iiInitSingularProcinfo(procinfo *pi, char *libname,
-                                 char *procname, int line, long pos);
+procinfo *iiInitSingularProcinfo(procinfo *pi, char *libname, char *procname,
+				 int line, long pos, BOOLEAN pstatic=FALSE);
 char *iiConvName(char *p);
+#ifdef HAVE_LIBPARSER
+int yylplex(char *libname, char *libfile);
+void yylprestart (FILE *input_file );
+int current_pos(int i=0);
+extern int yylp_errno;
+extern int yylplineno;
+extern char *yylp_errlist[];
+void print_init();
+void reinit_yylp();
+libstackv library_stack;
+#endif
 
 /*2
 * find the library of an proc:
@@ -135,7 +146,9 @@ char* iiGetLibProcBuffer(procinfo *pi, int part )
   }
   if(part==1)
   { // load proc part
-    fgets(buf, sizeof(buf), fp);
+    procbuflen = pi->data.s.def_end - pi->data.s.proc_start;
+    //fgets(buf, sizeof(buf), fp);
+    fread( buf, procbuflen, 1, fp);
     char ct;
     char *e;
     s=iiProcName(buf,ct,e);
@@ -473,6 +486,48 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
 #endif
   }
 
+#ifdef HAVE_LIBPARSER
+  extern FILE *yylpin;
+  libstackv ls_start = library_stack;
+
+  yylpin = fp;
+# if YYLPDEBUG > 1
+  print_init();
+#  endif
+  yylplex(newlib, libnamebuf);
+  if(yylp_errno) {
+    Werror("Library %s: ERROR occured: in line %d, %d.", newlib, yylplineno,
+	 current_pos(0));
+    Werror(yylp_errlist[yylp_errno], yylplineno);
+    Werror("Cannot load library,... aborting.");
+    reinit_yylp();
+    fclose( yylpin );
+    FreeL((ADDRESS)newlib);
+    return TRUE;
+  } 
+  reinit_yylp();
+  fclose( yylpin );
+  {
+    libstackv ls;
+    for(ls = library_stack; (ls != NULL) && (ls != ls_start); ) {
+      if(ls->to_be_done) { 
+	//Print("// Processing id %d LIB:%s\n", ls->cnt, ls->get());
+	ls->to_be_done=FALSE;
+	iiLibCmd(ls->get());
+	ls = ls->pop(newlib);
+	//Print("Done\n");
+      }
+    }
+#if 0
+    Print("--------------------\n");
+    for(ls = library_stack; ls != NULL; ls = ls->next) {
+      Print("%s: LIB-stack:(%d), %s %s\n", newlib, ls->cnt, ls->get(),
+        ls->to_be_done ? "not loaded" : "loaded");
+    }
+    Print("--------------------\n");
+#endif
+  }
+#else /* HAVE_LIBPARSER */
   // processing head section
   if (fgets( buf, sizeof(buf), fp))
   {
@@ -498,7 +553,6 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
       Warn( "loading %s", libnamebuf );
     }
   }
-
 
   #define IN_HEADER 1
   #define IN_BODY   2
@@ -608,6 +662,7 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
     pos = ftell(fp);
   } while (fgets( buf, sizeof(buf), fp));
   fclose( fp );
+
   //if (h!=NULL) IDPROC(h) = pi;
   if (BVERBOSE(V_DEBUG_LIB))
   {
@@ -618,12 +673,13 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
     if(v==-1)
       Warn("LIB `%s` has no version flag",newlib);
   }
+#endif /* HAVE_LIBPARSER */
   FreeL((ADDRESS)newlib);
   return FALSE;
 }
 
-procinfo *iiInitSingularProcinfo(procinfov pi, char *libname,
-                                 char *procname, int line, long pos)
+procinfo *iiInitSingularProcinfo(procinfov pi, char *libname, char *procname,
+				 int line, long pos, BOOLEAN pstatic=FALSE)
 {
   pi->libname = mstrdup(libname);
 
@@ -635,6 +691,7 @@ procinfo *iiInitSingularProcinfo(procinfov pi, char *libname,
   } else pi->procname = mstrdup(procname);
   pi->language = LANG_SINGULAR;
   pi->ref = 1;
+  pi->is_static = pstatic;
   pi->data.s.proc_start = pos;
   pi->data.s.help_start = 0L;
   pi->data.s.body_start = 0L;
@@ -707,3 +764,37 @@ char *iiLineNo(char *procname, int lineno)
   //  lineno + pi->data.s.body_lineno);
   return(buf);
 }
+/*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+#ifdef HAVE_LIBPARSER
+void libstack::push(char *p, char *libname)
+{
+  idhdl hl = idroot->get("LIB",0);
+  libstackv lp;
+  char *f = NULL;
+  if(hl!=NULL) f = strstr(IDSTRING(hl),libname);
+  if( (hl==NULL) || (f == NULL)) {
+    for(lp = this;lp!=NULL;lp=lp->next) {
+      if(strcmp(lp->get(), libname)==0) break;
+    }
+    if(lp==NULL) {
+      libstackv ls = (libstack *)Alloc0(sizeof(libstack));
+      ls->next = this;
+      ls->libname = mstrdup(libname);
+      ls->to_be_done = TRUE;
+      if(this != NULL) ls->cnt = this->cnt+1; else ls->cnt = 0;
+      library_stack = ls;
+    } 
+  }
+}
+
+libstackv libstack::pop(char *p)
+{
+  libstackv ls = this;
+  //FreeL(ls->libname);
+  library_stack = ls->next;
+  Free((ADDRESS)ls, sizeof(libstack));
+  return(library_stack);
+}
+
+#endif /* HAVE_LIBPARSER */
+/*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
