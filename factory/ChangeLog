@@ -1,3 +1,32 @@
+Tue Jun  9 11:52:45 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* configure.in (ac_save_path): renamed to `$save_path'.  All
+	  references changed
+	  (expl_datadir, expl_gftabledir): renamed to `$explicit_datadir',
+	  `$explicit_gftabledir', resp.  All references changed.
+
+	* configure.in: checks for gmp.h and libgmp.a search in
+	  `$includedir' and `$libdir', resp.
+
+	* configure.in: new section added to get a safer explicit path
+	  expansion
+
+	* configure.in: `$gftabledir' is not longer handled in a special
+	  way for Singular
+
+Mon Jun  8 17:26:55 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* singext.h: doc fix
+
+	* gfops.cc, singext.h (cf_get_table): use `feFopen()' to load
+	  GF(q) tables if built with Singular.  Declaration added to
+	  `singext.h' (by Hannes).
+
+	* configure.in: calls to `AC_PATH_PROG' ``fixed''.  Necessary
+	  because of some old autoconf version (by Olaf)
+
+	* ftmpl_inst.cc: test on `WINNT' disabled with gcc
+
 Wed Jun 03 16:47:54 1998    <pohl@FUECHSE>
 
 	* ftmpl_factor.h (template <class T> class Factor):
@@ -8,6 +37,58 @@ Wed Jun 03 14:47:41 1998    <pohl@FUECHSE>
 
 	* timing.h, readcf.y, int_poly.cc, imm.h: test on WINNT
 	  disabled with gcc
+
+Mon May 11 11:36:22 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* config.h.in (INT64): unused declarations for MetroWerks removed
+
+	* imm.cc (imm_mul): wrapped by `#ifdef __MWERKS__'
+
+	* ffops.h (ff_bignorm): definition of `ff_bignorm' removed for
+	  MetroWerks
+	  (ff_mul): made a declaration for MetroWerks.  Defined in
+	  `ffops.cc'.
+
+	* imm.cc (imm_mul): new file for MetroWerks
+
+	* imm.h (MINIMMEDIATELL, MAXIMMEDIATELL): definition of long long
+	  constants removed for mac
+	  (imm_mul): made a declaration for MetroWerks.  Defined in
+	  `imm.cc'.
+
+	* fac_cantzass.cc (CantorZassenhausFactorFFGF,
+	  CantorZassenhausFactorExt): new local variables `firstFactor',
+	  `secondFactor' introduced to fix order of evaluation of
+	  recursive factorizations
+
+Mon Apr 20 16:34:14 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* .cvsignore (stamp-h): entry re-added.  After all, its
+	  necessary.
+
+	* configure.in (MKINSTALLDIRS, MAKEHEADER): instead of using an
+	  absolute path, use relativ path and our own variables
+	  `FACTORY_MKINSTALLDIRS' and `FACTORY_MAKEHEADER'.  Do not use
+	  cache to get the variables' values.
+	* GNUmakefile.in (MKINSTALLDIRS, MAKEHEADER): use the values from
+	  `FACTORY_MKINSTALLDIRS' and `FACTORY_MAKEHEADER', resp.
+
+Tue Apr 14 14:05:47 1998  Wilfred Pohl  <pohl@mathematik.uni-kl.de>
+
+	* fac_univar.cc (UnivariateQuadraticLift): type for `log()' must
+	  be float, hence constant `2' replaced by `2.0'
+
+	* config.h.in (INT64): new typedef for Metroworks compiler
+
+Mon Apr  6 14:06:49 MET DST 1998  Jens Schmidt
+
+	* int_intdiv.cc:
+	  ***** merge from branch `factory-gcd' to main trunk
+
+	* ftmpl_inst.cc: instantiations for `tabs( int )' added
+
+	* fac_univar.cc (UnivariateQuadraticLift, UnivariateLinearLift):
+	  call to `div( CF, CF )' replaced by call to `operator / ( CF, CF )'
 
 Mon Mar 23 17:00:00 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
