@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.cc,v 1.24 1997-12-18 17:05:33 schmidt Exp $ */
+/* $Id: canonicalform.cc,v 1.25 1998-01-22 10:56:12 schmidt Exp $ */
 
 #include <config.h>
 
@@ -1054,7 +1054,7 @@ CanonicalForm::operator () ( const CanonicalForm & f, const Variable & v ) const
 // for ( int i = degree( f ); i >= 0; i-- )
 //     foo( i, f[ i ] );
 //
-// This is much slower than
+// which is much slower than
 //
 // for ( int i = degree( f ), CFIterator I = f; I.hasTerms(); I++ ) {
 //     // fill gap with zeroes
@@ -1328,9 +1328,8 @@ operator != ( const CanonicalForm & lhs, const CanonicalForm & rhs )
 // Nevertheless, from a programmer's point of view it may be
 // sensible to order these objects, e.g. to sort them.
 //
-// For this reason, the ordering defined by these operators in
-// any case is a total ordering which fulfills the law of
-// trichotomy.
+// Therefore, the ordering defined by these operators in any case
+// is a total ordering which fulfills the law of trichotomy.
 //
 // It is clear how this is done in the case of the integers and
 // the rationals.  For finite fields, all you can say is that
@@ -1487,6 +1486,206 @@ operator % ( const CanonicalForm &c1, const CanonicalForm &c2 )
     CanonicalForm result( c1 );
     result %= c2;
     return result;
+}
+//}}}
+
+//{{{ CanonicalForm bgcd ( const CanonicalForm & f, const CanonicalForm & g )
+//{{{ docu
+//
+// bgcd() - return base coefficient gcd.
+//
+// If both f and g are integers and `SW_RATIONAL' is off the
+// positive greatest common divisor of f and g is returned.
+// Otherwise, if `SW_RATIONAL' is on or one of f and g is not an
+// integer, the greatest common divisor is trivial: either zero
+// if f and g equal zero or one (both from the current domain).
+//
+// f and g should come from one base domain which should be not
+// the prime power domain.
+//
+// Implementation: 
+//
+// CanonicalForm::bgcd() handles the immediate case with a
+//   standard euclidean algorithm.  For the non-immediate cases
+//   `InternalCF::bgcdsame()' or `InternalCF::bgcdcoeff()', resp. are
+//   called following the usual level/levelcoeff approach.
+//
+// InternalCF::bgcdsame() and
+// InternalCF::bgcdcoeff() throw an assertion ("not implemented")
+//
+// InternalInteger::bgcdsame() is a wrapper around `mpz_gcd()'
+//   which takes some care about immediate results and the sign
+//   of the result
+// InternalInteger::bgcdcoeff() is a wrapper around
+//   `mpz_gcd_ui()' which takes some care about the sign
+//   of the result
+//
+// InternalRational::bgcdsame() and
+// InternalRational::bgcdcoeff() always return one
+//
+//}}}
+CanonicalForm
+bgcd ( const CanonicalForm & f, const CanonicalForm & g )
+{
+    // check immediate cases
+    int what = is_imm( g.value );
+    if ( is_imm( f.value ) ) {
+	ASSERT( ! what || (what == is_imm( f.value )), "incompatible operands" );
+	if ( what == 0 )
+	    return g.value->bgcdcoeff( f.value );
+	else if ( what == INTMARK && ! cf_glob_switches.isOn( SW_RATIONAL ) ) {
+	    // calculate gcd using standard integer
+	    // arithmetic
+	    int fInt = imm2int( f.value );
+	    int gInt = imm2int( g.value );
+
+	    if ( fInt < 0 ) fInt = -fInt;
+	    if ( gInt < 0 ) gInt = -gInt;
+	    // swap fInt and gInt
+	    if ( gInt > fInt ) {
+		int swap = gInt;
+		gInt = fInt;
+		fInt = swap;
+	    }
+
+	    // now, 0 <= gInt <= fInt.  Start the loop.
+	    while ( gInt ) {
+		// calculate (fInt, gInt) = (gInt, fInt%gInt)
+		int r = fInt % gInt;
+		fInt = gInt;
+		gInt = r;
+	    }
+
+	    return CanonicalForm( fInt );
+	} else
+	    // we do not go for maximal speed for these stupid
+	    // special cases
+	    return CanonicalForm( f.isZero() && g.isZero ? 0 : 1 );
+    }
+    else if ( what )
+	return f.value->bgcdcoeff( g.value );
+
+    int fLevel = f.value->level();
+    int gLevel = g.value->level();
+
+    // check levels
+    if ( fLevel == gLevel ) {
+	fLevel = f.value->levelcoeff();
+	gLevel = g.value->levelcoeff();
+
+	// check levelcoeffs
+	if ( fLevel == gLevel )
+	    return f.value->bgcdsame( g.value );
+	else if ( fLevel < gLevel )
+	    return g.value->bgcdcoeff( f.value );
+	else
+	    return f.value->bgcdcoeff( g.value );
+    }
+    else if ( fLevel < gLevel )
+	return g.value->bgcdcoeff( f.value );
+    else
+	return f.value->bgcdcoeff( g.value );
+}
+//}}}
+
+//{{{ CanonicalForm bextgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, CanonicalForm & b )
+//{{{ docu
+//
+// bextgcd() - return base coefficient extended gcd.
+//
+//}}}
+CanonicalForm
+bextgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, CanonicalForm & b )
+{
+    // check immediate cases
+    int what = is_imm( g.value );
+    if ( is_imm( f.value ) ) {
+	ASSERT( ! what || (what == is_imm( f.value )), "incompatible operands" );
+	if ( what == 0 )
+	    return g.value->bextgcdcoeff( f.value, b, a );
+	else if ( what == INTMARK && ! cf_glob_switches.isOn( SW_RATIONAL ) ) {
+	    // calculate extended gcd using standard integer
+	    // arithmetic
+	    int fInt = imm2int( f.value );
+	    int gInt = imm2int( g.value );
+
+	    // to avoid any system dpendencies with `%', we work
+	    // with positive numbers only.  To a pity, we have to
+	    // redo all the checks when assigning to a and b.
+	    if ( fInt < 0 ) fInt = -fInt;
+	    if ( gInt < 0 ) gInt = -gInt;
+	    // swap fInt and gInt
+	    if ( gInt > fInt ) {
+		int swap = gInt;
+		gInt = fInt;
+		fInt = swap;
+	    }
+
+	    int u = 1; int v = 0;
+	    int uNext = 0; int vNext = 1;
+
+	    // at any step, we have:
+	    // fInt_0 * u + gInt_0 * v = fInt
+	    // fInt_0 * uNext + gInt_0 * vNext = gInt
+	    // where fInt_0 and gInt_0 denote the values of fint
+	    // and gInt, resp., at the beginning
+	    while ( gInt ) {
+		int r = fInt % gInt;
+		int q = fInt / gInt;
+		int uSwap = u - q * uNext;
+		int vSwap = v - q * vNext;
+
+		// update variables
+		fInt = gInt;
+		gInt = r;
+		u = uNext; v = vNext;
+		uNext = uSwap; vNext = vSwap;
+	    }
+
+	    // now, assign to a and b
+	    int fTest = imm2int( f.value );
+	    int gTest = imm2int( g.value );
+	    if ( gTest > fTest ) {
+		a = v; b = u;
+	    } else {
+		a = u; b = v;
+	    }
+	    if ( fTest < 0 ) a = -a;
+	    if ( gTest < 0 ) b = -b;
+	    return CanonicalForm( fInt );
+	} else
+	    // stupid special cases
+	    if ( ! f.isZero() ) {
+		a = 1/f; b = 0; return CanonicalForm( 1 );
+	    } else if ( ! g.isZero() ) {
+		a = 0; b = 1/g; return CanonicalForm( 1 );
+	    } else {
+		a = 0; b = 0; return CanonicalForm( 0 );
+	    }
+    }
+    else if ( what )
+	return f.value->bextgcdcoeff( g.value, a, b );
+
+    int fLevel = f.value->level();
+    int gLevel = g.value->level();
+
+    // check levels
+    if ( fLevel == gLevel ) {
+	fLevel = f.value->levelcoeff();
+	gLevel = g.value->levelcoeff();
+
+	// check levelcoeffs
+	if ( fLevel == gLevel )
+	    return f.value->bextgcdsame( g.value, a, b );
+	else if ( fLevel < gLevel )
+	    return g.value->bextgcdcoeff( f.value, b, a );
+	else
+	    return f.value->bextgcdcoeff( g.value, a, b );
+    }
+    else if ( fLevel < gLevel )
+	return g.value->bextgcdcoeff( f.value, b, a );
+    else
+	return f.value->bextgcdcoeff( g.value, a, b );
 }
 //}}}
 

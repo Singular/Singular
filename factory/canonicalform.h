@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.h,v 1.19 1997-12-17 08:57:49 schmidt Exp $ */
+/* $Id: canonicalform.h,v 1.20 1998-01-22 10:56:22 schmidt Exp $ */
 
 #ifndef INCL_CANONICALFORM_H
 #define INCL_CANONICALFORM_H
@@ -139,6 +139,10 @@ public:
     friend void divrem ( const CanonicalForm&, const CanonicalForm&, CanonicalForm&, CanonicalForm& );
     friend bool divremt ( const CanonicalForm&, const CanonicalForm&, CanonicalForm&, CanonicalForm& );
 
+    friend CanonicalForm bgcd ( const CanonicalForm &, const CanonicalForm & );
+    friend CanonicalForm bextgcd ( const CanonicalForm &, const CanonicalForm &, CanonicalForm &, CanonicalForm & );
+
+    // input/output
 #ifndef NOSTREAMIO
     void print( ostream&, char * ) const;
     friend ostream& operator << ( ostream&, const CanonicalForm& );
@@ -154,14 +158,10 @@ public:
 };
 //}}}
 
-// some useful functions
-
 //{{{ function declarations from canonicalform.cc
 CanonicalForm power ( const CanonicalForm & f, int n );
 
 CanonicalForm power ( const Variable & v, int n );
-
-bool divides ( const CanonicalForm & f, const CanonicalForm & g );
 //}}}
 
 //{{{ function declarations from cf_gcd.cc
@@ -242,7 +242,7 @@ tailcoeff ( const CanonicalForm & f ) { return f.tailcoeff(); }
 inline int
 level ( const CanonicalForm & f ) { return f.level(); }
 
-inline CanonicalForm
+inline Variable
 mvar ( const CanonicalForm & f ) { return f.mvar(); }
 
 inline CanonicalForm
