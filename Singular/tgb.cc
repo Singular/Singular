@@ -104,8 +104,8 @@ static int monom_poly_crit(const void* ap1, const void* ap2){
   monom_poly* p2;
   p1=((monom_poly*) ap1);
   p2=((monom_poly*)ap2);
-  if(p1->f>p2->f) return 1;
-  if(p1->f<p2->f) return -1;  
+  if(((unsigned long) p1->f)>((unsigned long) p2->f)) return 1;
+  if(((unsigned long) p1->f)<((unsigned long)p2->f)) return -1;  
 
   return pLmCmp(p1->m,p2->m);
  
@@ -2701,6 +2701,7 @@ static void go_on_F4 (calc_dat* c){
   
 
   }
+  c->normal_forms+=nfs;
   Print("M[%i, ",nfs);
   //next Step, simplify all pairs
   for(i=0;i<chosen_index;i++)
