@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: shortfl.cc,v 1.11 1999-09-16 12:34:01 Singular Exp $ */
+/* $Id: shortfl.cc,v 1.12 1999-09-24 12:23:26 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -27,6 +27,11 @@ union nf
   float F() const {return _f;}
   number N() const {return _n;}
 };
+
+float nrFloat(number n)
+{
+  return nf(n).F();
+}
 
 BOOLEAN nrGreaterZero (number k)
 {
@@ -343,7 +348,7 @@ static number nrMap0(number from)
     }
     i--;
     rr=(float)mpz_limb_d(z)[i];
-    while(i)
+    while(i>0)
     {
       i--;
       y=(float)mpz_limb_d(z)[i];
@@ -357,12 +362,8 @@ static number nrMap0(number from)
   j=s=mpz_limb_size(n);
   if(j>i)
   {
-    g=n;
-    n=z;
-    z=g;
-    t=j;
-    j=i;
-    i=t;
+    g=n; n=z; z=g;
+    t=j; j=i; i=t;
   }
   t=i-j;
   if(t>4)
