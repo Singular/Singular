@@ -1,0 +1,568 @@
+# @configure_input@
+# $Id: GNUmakefile.in,v 1.1 1997-06-02 15:56:32 schmidt Exp $
+#
+# GNUmakefile - master makefile for factory.
+# note:		use GNU make to make with this makefile.
+#
+
+SHELL =		/bin/sh
+
+#
+# - versions.
+#
+
+version =	@factory_version@
+distname =	factory-$(version)
+
+#
+# - paths.
+#
+
+prefix =	@prefix@
+exec_prefix =	@exec_prefix@
+libdir =	@libdir@
+datadir =	@datadir@
+gftabledir =	@gftabledir@
+includedir =	@includedir@
+tagtemplatedir =@tagtemplatedir@
+templatedir =	@templatedir@
+
+srcdir =	@srcdir@
+VPATH =		@srcdir@
+
+#
+# - the name of the game.
+#
+
+# files with version tag included (used to install factory)
+taglibfactory =	@taglibfactory@
+taglibmem =	@taglibmem@
+tagheaderfactory=@tagheaderfactory@
+tagfactoryconf =@tagfactoryconf@
+
+# raw file names (used to build factory)
+libfactory =	@libfactory@
+libmem =	@libmem@
+headerfactory =	@headerfactory@
+factoryconf =	@factoryconf@
+
+#
+# - programs.
+#
+
+CC =		@CC@
+CXX =		@CXX@
+# seems configure sometimes finds non-BSD install, so we better
+# hardcode path to our install-sh
+INSTALL =	$(srcdir)/bin/install-sh -c
+INSTALL_DATA =	@INSTALL_DATA@
+INSTALL_PROGRAM=@INSTALL_PROGRAM@
+LN_S =		@LN_S@
+RANLIB =	@RANLIB@
+
+AR =		@AR@
+BISON =		@BISON@
+MKINSTALLDIRS =	@MKINSTALLDIRS@
+MAKEHEADER =	@MAKEHEADER@
+
+#
+# - flags.
+#
+
+CFLAGS =	@CFLAGS@
+CPPFLAGS =	@CPPFLAGS@
+CXXFLAGS =	@CXXFLAGS@
+DEFS =		@DEFS@
+LDFLAGS =	@LDFLAGS@
+LIBS =		@LIBS@
+
+ARFLAGS =	@ARFLAGS@
+MAKEHEADERFLAGS=@MAKEHEADERFLAGS@
+
+#
+# - some other variables.
+#
+
+factorysrc =	@factorysrc@
+factoryincl =	@factoryincl@
+memmansrc =	@memmansrc@
+memmanincl =	@memmanincl@
+
+alltargets =	@alltargets@
+installtargets =@installtargets@
+uninstalltargets=@uninstalltargets@
+
+#
+# end of configuration dependend stuff
+########################################
+
+#
+# - compiler flags.
+#
+
+LIBCFLAGS =	-Wall \
+		-I. -I$(srcdir) \
+		$(DEFS) $(CPPFLAGS) $(CFLAGS)
+
+LIBCXXFLAGS =	-Wall -fno-implicit-templates \
+		-I. -I$(srcdir) \
+		$(DEFS) $(CPPFLAGS) $(CXXFLAGS)
+
+# flags to translate tmpl_inst.cc
+TMPLCXXFLAGS =	-Wall \
+		-I. -I$(srcdir) \
+		$(DEFS) $(CPPFLAGS) $(CXXFLAGS)
+
+# flags to link test programs
+TESTLDFLAGS = 	-L. \
+		$(LIBS) $(LDFLAGS)
+
+DEPCXXFLAGS =	-I. -I$(srcdir) \
+		$(DEFS) $(CPPFLAGS)
+
+#
+# - source files.
+#
+
+# factory, source files
+basefactorysrc := \
+		canonicalform.cc \
+		cf_binom.cc \
+		cf_char.cc \
+		cf_chinese.cc \
+		cf_eval.cc \
+		cf_factor.cc \
+		cf_factory.cc \
+		cf_gcd.cc \
+		cf_generator.cc \
+		cf_globals.cc \
+		cf_irred.cc \
+		cf_iter.cc \
+		cf_linsys.cc \
+		cf_map.cc \
+		cf_ops.cc \
+		cf_primes.cc \
+		cf_random.cc \
+		cf_reval.cc \
+		cf_switches.cc \
+		cf_util.cc \
+		debug.cc \
+		fac_berlekamp.cc \
+		fac_cantzass.cc \
+		fac_distrib.cc \
+		fac_ezgcd.cc \
+		fac_iterfor.cc \
+		fac_multihensel.cc \
+		fac_multivar.cc \
+		fac_sqrfree.cc \
+		fac_univar.cc \
+		fac_util.cc \
+		ffops.cc \
+		gf_tabutil.cc \
+		gfops.cc \
+		initgmp.cc \
+		int_cf.cc \
+		int_int.cc \
+		int_poly.cc \
+		int_pp.cc \
+		int_rat.cc \
+		variable.cc
+singfactorysrc := \
+		singext.cc
+useiofactorysrc := \
+		parseutil.cc \
+		readcf.y
+distfactorysrc := \
+		$(basefactorysrc) \
+		$(singfactorysrc) \
+		$(useiofactorysrc)
+
+# factory, object files and dependencies
+factoryobj :=	$(factorysrc:.cc=.o)
+factoryobj :=	$(factoryobj:.y=.o)
+factorydep :=	$(factorysrc:.cc=.d)
+factorydep :=	$(factorydep:.y=.d)
+
+# factory, header files
+basefactoryincl := \
+		assert.h \
+		canonicalform.h \
+		cf_binom.h \
+		cf_chinese.h \
+		cf_defs.h \
+		cf_eval.h \
+		cf_factor.h \
+		cf_factory.h \
+		cf_generator.h \
+		cf_globals.h \
+		cf_gmp.h \
+		cf_irred.h \
+		cf_iter.h \
+		cf_map.h \
+		cf_primes.h \
+		cf_primetab.h \
+		cf_random.h \
+		cf_reval.h \
+		cf_switches.h \
+		cf_util.h \
+		debug.h \
+		fac_berlekamp.h \
+		fac_cantzass.h \
+		fac_distrib.h \
+		fac_iterfor.h \
+		fac_multivar.h \
+		fac_sqrfree.h \
+		fac_univar.h \
+		fac_util.h \
+		ffops.h \
+		gf_tabutil.h \
+		gfops.h \
+		gmpext.h \
+		imm.h \
+		int_cf.h \
+		int_int.h \
+		int_poly.h \
+		int_pp.h \
+		int_rat.h \
+		timing.h \
+		variable.h
+singfactoryincl := \
+		singext.h
+useiofactoryincl := \
+		parseutil.h
+distfactoryincl := \
+		$(basefactoryincl) \
+		$(singfactoryincl) \
+		$(useiofactoryincl)
+
+# memory manager, source files
+basememmansrc := \
+		newdelete.cc
+newmemmansrc :=	\
+		mmalloc.c \
+		mmallocb.c \
+		mmallocs.c \
+		mmblock.c \
+		mmheap.c \
+		mminit.c \
+		mmspec.c \
+		mmutil.c
+oldmemmansrc :=	\
+		memutil.c
+distmemmansrc := \
+		$(basememmansrc) \
+		$(newmemmansrc) \
+		$(oldmemmansrc)
+
+# memory manager, object files and dependencies
+memmanobj :=	$(memmansrc:.cc=.o)
+memmanobj :=	$(memmanobj:.c=.o)
+memmandep :=	$(memmansrc:.cc=.d)
+memmandep :=	$(memmandep:.c=.d)
+
+# memory manager, header files
+newmemmanincl := \
+		mmprivate.h \
+		memman.h
+oldmemmanincl := \
+		memutil.h
+distmemmanincl := \
+		$(newmemmanincl) \
+		$(oldmemmanincl)
+
+# factory template files
+templatesrc :=	\
+		array.cc \
+		factor.cc \
+		list.cc \
+		matrix.cc
+templateincl :=	\
+		array.h \
+		factor.h \
+		functions.h \
+		list.h \
+		matrix.h
+
+# header templates
+hdrtemplsrc := \
+		factoryconf.template \
+		factory.template
+hdrtempldep :=	$(hdrtemplsrc:.template=.d)
+
+# all the C/C++ source files in the distribution
+distsrc :=	\
+		$(distfactorysrc) $(distmemmansrc) \
+		$(addprefix templates/,$(templatesrc)) \
+		readcf.cc tmpl_inst.cc
+
+# all the C/C++ include files in the distribution
+distincl :=	\
+		$(distfactoryincl) $(distmemmanincl) \
+		$(addprefix templates/,$(templateincl))
+
+# all files in the distribution
+distfiles :=	\
+		$(distsrc) $(distincl) $(hdrtemplsrc) \
+		GNUmakefile.in configure.in acconfig.h stamp-h.in \
+		config.h.in configure \
+		bin/install-sh bin/makeheader bin/mkinstalldirs
+
+#
+# - phony targets.
+#
+
+.PHONY:		all cf mem depend dist\
+		clean mostlyclean distclean maintainer-clean realmaintainer-clean \
+		install installcf installcflinks installmem installgftables \
+		uninstall uninstallcf uninstallcflinks uninstallmem uninstallgftables
+
+#
+# - pattern rules.
+#
+
+# how to create library objets
+%.o: %.cc config.h
+	$(CXX) -c $< $(LIBCXXFLAGS) -o $@
+%.o: %.c config.h
+	$(CC) -c $< $(LIBCFLAGS) -o $@
+
+# how to create dependency files
+%.d: %.cc config.h
+	echo $@ "\\" > $@
+	$(CXX) -MM $< $(DEPCXXFLAGS) >> $@
+%.d: %.c config.h
+	echo $@ "\\" > $@
+	$(CXX) -MM $< $(DEPCXXFLAGS) >> $@
+%.d: %.template
+	echo $@ $(@:.d=.h) : "\\" > $@
+	sed -n '/^\/\*MAKEHEADER/!d; n; s/^#include "//; s/"//; p;' $< | tr '\012' ' ' >> $@
+	echo >> $@
+
+# how to create header files from header templates
+%.h: %.template
+	$(MAKEHEADER) $(MAKEHEADERFLAGS) $< $@
+
+#
+# - building factory.
+#
+
+all:		$(alltargets)
+
+cf:		factoryconf.h factory.h $(libfactory)
+
+mem:		$(libmem)
+
+#
+# - explicit targets.
+#
+
+$(libfactory):	$(factoryobj)
+		$(AR) $(ARFLAGS) $@ $^
+		$(RANLIB) $@
+
+$(libmem):	$(memmanobj)
+		$(AR) $(ARFLAGS) $@ $^
+		$(RANLIB) $@
+
+$(srcdir)/readcf.cc: readcf.y
+		$(BISON) $< -o $@
+
+tmpl_inst.o:	tmpl_inst.cc factoryconf.h factory.h \
+		$(addprefix templates/,$(templatesrc)) \
+		$(addprefix templates/,$(templateincl))
+		$(CXX) -c $< $(TMPLCXXFLAGS) -o $@
+
+gengftables.o:	gengftables.cc factory.h cf_util.h gf_tabutil.h
+
+gengftables:	gengftables.o tmpl_inst.o cf mem
+		$(CXX) $< tmpl_inst.o -lcf -lcfmem $(TESTLDFLAGS) -o $@
+
+#! not ready yet (gengftables.cc not in the distribution yet)
+gftables:	gengftables
+		$(MKINSTALLDIRS) gftables
+		./gengftables
+
+# specify dependency in case user does not 'make depend'
+factoryconf.h:	config.h
+
+TAGS:
+		etags $(addprefix $(srcdir)/, $(distsrc) $(distincl))
+
+#
+# - install targets.
+#
+
+install:	$(installtargets)
+
+installcf:	cf
+		$(MKINSTALLDIRS) $(libdir)
+		$(MKINSTALLDIRS) $(includedir)
+		$(MKINSTALLDIRS) $(tagtemplatedir)
+		$(INSTALL_DATA) $(libfactory) $(libdir)/$(taglibfactory)
+		$(INSTALL_DATA) $(headerfactory) $(includedir)/$(tagheaderfactory)
+		$(INSTALL_DATA) $(factoryconf) $(includedir)/$(tagfactoryconf)
+		$(INSTALL_DATA) $(srcdir)/tmpl_inst.cc $(tagtemplatedir)
+		for file in $(templatesrc) $(templateincl); do \
+		  $(INSTALL_DATA) $(srcdir)/templates/$$file $(tagtemplatedir); \
+		done
+
+# remove old links before installing new ones
+installcflinks:	installcf
+		-rm -f $(libdir)/$(libfactory)
+		-rm -f $(includedir)/$(headerfactory)
+		-rm -f $(includedir)/$(factoryconf)
+		-rm -f $(templatedir)
+		$(LN_S) $(libdir)/$(taglibfactory) $(libdir)/$(libfactory)
+		$(LN_S) $(includedir)/$(tagheaderfactory) $(includedir)/$(headerfactory)
+		$(LN_S) $(includedir)/$(tagfactoryconf) $(includedir)/$(factoryconf)
+		$(LN_S) $(tagtemplatedir) $(templatedir)
+
+# remove old link before installing new one
+installmem:	mem
+		$(MKINSTALLDIRS) $(libdir)
+		-rm -f $(libdir)/$(libmem)
+		$(INSTALL_DATA) $(libmem) $(libdir)/$(taglibmem)
+		$(LN_S) $(libdir)/$(taglibmem) $(libdir)/$(libmem)
+
+installgftables: gftables
+		$(MKINSTALLDIRS) $(gftabledir)
+		for file in $</*; do \
+		  $(INSTALL_DATA) $$file $(gftabledir); \
+		done
+
+#
+# - uninstall targets.
+#
+
+uninstall:	$(uninstalltargets)
+
+uninstallcf:
+		-rm -f $(libdir)/$(taglibfactory)
+		-rm -f $(includedir)/$(tagheaderfactory)
+		-rm -f $(includedir)/$(tagfactoryconf)
+		-for file in $(templatesrc) $(templateincl) tmpl_inst.cc; do \
+		  rm -f $(tagtemplatedir)/$$file; \
+		done
+		-rmdir $(libdir)
+		-rmdir $(tagtemplatedir)
+		-rmdir $(includedir)
+
+uninstallcflinks: uninstallcf
+		-rm -f $(libdir)/$(libfactory)
+		-rm -f $(includedir)/$(headerfactory)
+		-rm -f $(includedir)/$(factoryconf)
+		-rm -f $(templatedir)
+		-rmdir $(libdir)
+		-rmdir $(includedir)
+
+uninstallmem:
+		-rm -f $(libdir)/$(taglibmem)
+		-rm -f $(libdir)/$(libmem)
+		-rmdir $(libdir)
+
+uninstallgftables:
+		-rm -rf $(gftabledir)
+
+#
+# - building a distribution.
+#
+
+dist:		$(srcdir)/readcf.cc \
+		$(srcdir)/config.h.in $(srcdir)/stamp-h.in \
+		$(srcdir)/configure
+		rm -f $(distname).tar.gz
+		rm -rf $(distname)
+		$(MKINSTALLDIRS) $(distname)/templates
+		$(MKINSTALLDIRS) $(distname)/bin
+		for file in $(distfiles); do \
+#! better use ln instead of cp
+		  cp $(srcdir)/$$file $(distname)/$$file; \
+		done
+		chmod -R u+w,o+r $(distname)
+		chmod 777 $(distname)
+		tar cf $(distname).tar $(distname)
+		gzip $(distname).tar
+
+#
+# - cleaning up.
+#
+
+clean:		
+		-rm -f $(libfactory) $(libmem) \
+		  factoryconf.h factory.h *.o *.d core *~
+
+# remove gftables only if we built them
+mostlyclean:	clean
+		-rm -f TAGS
+		-if test ! -f gftables/README; then \
+		  rm -rf gftables; \
+		fi
+
+distclean:	mostlyclean
+		-rm -f $(distname).tar.gz GNUmakefile stamp-h \
+		  config.cache config.log config.status config.h
+		-rm -rf $(distname)
+
+maintainer-clean: distclean
+		@echo "This command is intended for maintainers to use;"
+		@echo "it deletes files that require bison to rebuild."
+		-rm -f $(srcdir)/readcf.cc
+
+realmaintainer-clean: maintainer-clean
+		@echo "This command is intended for *real* maintainers to use; it"
+		@echo "deletes files that requires the autoconf tools to rebuild."
+		-rm -f $(srcdir)/configure $(srcdir)/config.h.in $(srcdir)/stamp-h.in
+
+#
+# - include dependencies but do not generate them automatically if
+#     there are not any dependencies at all.  this trick saves some
+#     time when you do not want to compile but do some maintenance
+#     which do not require the dependencies.  say 'make depend' to
+#     create the dependencies explicitly.
+#
+
+depend:		config.h factoryconf.h \
+		$(factorydep) $(memmandep) $(hdrtempldep)
+
+ifneq ($(wildcard *.d),)
+  include $(factorydep) $(memmandep) $(hdrtempldep)
+endif
+
+#
+# - configure stuff.
+#
+
+$(srcdir)/configure: configure.in
+		cd $(srcdir) && autoconf
+
+# autoheader might not change config.h.in, so touch a stamp file
+$(srcdir)/config.h.in: stamp-h.in
+		@:
+
+$(srcdir)/stamp-h.in: configure.in acconfig.h
+		cd $(srcdir) && autoheader
+		echo timestamp > $(srcdir)/stamp-h.in
+
+# seems gmake needs at least a trivial command.  otherwise all
+# files which depend on config.h will be remade even if congig.h
+# did not change.
+config.h:	stamp-h
+		@:
+
+stamp-h:	config.h.in config.status
+		CONFIG_FILES= CONFIG_HEADERS=config.h ./config.status
+		echo timestamp > stamp-h
+
+GNUmakefile:	GNUmakefile.in config.status
+		CONFIG_FILES=GNUmakefile CONFIG_HEADERS= ./config.status
+
+config.status:	configure
+		./config.status --recheck
+
+#
+# - some extra targets inserted by configure.
+#
+
+@timingtargets@
+@debouttargets@
+@debtimingtargets@
