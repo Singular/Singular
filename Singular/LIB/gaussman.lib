@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: gaussman.lib,v 1.9 2000-12-04 13:48:43 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.10 2000-12-05 09:50:28 Singular Exp $";
 info="
 LIBRARY:  gaussman.lib  GAUSS-MANIN CONNECTION OF A SINGULARITY
 
@@ -823,7 +823,8 @@ EXAMPLE: example vjacob; shows an example
   list M;
   for(i=ncols(m);i>=1;i--)
   {
-    M[i]=lift(V,coeffs(redNF(m[i]*m,sJ),m)*V,product(maxideal(1)));
+    //M[i]=lift(V,coeffs(redNF(m[i]*m,sJ),m)*V,product(maxideal(1)));
+    M[i]=lift(V,coeffs(redNF(m[i]*m,sJ),m)*V);
   }
 
   int i0,j0,i1,j1;
