@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.92 1998-07-23 11:08:24 Singular Exp $
+@comment $Id: reference.doc,v 1.93 1998-07-23 11:10:47 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -1921,7 +1921,7 @@ number, poly, vector, ideal, module, matrix or list
 identity map on common subrings.  @code{imap} is the map between rings,
 and qrings with the compatible ground coefficient field which is the identity on
 variables and parameters of the same name and 0 otherwise.
-(See @ref{mpa} for a description of possible mapping between
+(See @ref{map} for a description of possible mapping between
 different ground fields).
 Useful for mapping from a homogenizing ring to the original ring or
 for mappings from/to rings with/without parameters. Compared with
