@@ -41,7 +41,7 @@ and then unpack the architecture independent tar file, followed by
 the architecture-dependent files for those architectures you use:
 
   cd /usr/local/	# or wherever you install 3rd-party software
-  gzip -dc Singular-<x.y.z>-share.tar.gz .tar.gz | tar -pxf -
+  gzip -dc Singular-<x.y.z>-share.tar.gz | tar -pxf -
   gzip -dc Singular-<x.y.z>-<uname description> | tar -pxf -
 
 You may replace `/usr/local/' with what you like, but refer to the

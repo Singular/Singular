@@ -129,8 +129,52 @@ TROUBLES
   program we need. If you remove this program, make sure that the GNU
   info program is executed if you call 'info' from your shell.
 
+* General: Singular can not find its libraries or info-file:
+  (1) Start up Singular, and issue the command `system("Singular");'.
+      If this does not return the correct and expanded location of the 
+      Singular executable, then you found a bug in Singular, which we
+      ask you to report (see below).
+  (2) Check whether the directories containing the libraries and
+      info-file can be found by Singular: If $bindir denotes the
+      directory where the Singular executable resides, then Singular
+      looks for library files as follows (<x.y.z> stands for the
+      actual version):
+      1.) In all paths specified by the environment variable SINGULARPATH
+      2.) $bindir/LIB
+      3.) $bindir/LIB/<x.y.z>
+      4.) $bindir/../../Singular/LIB
+      5.) $bindir/../../Singular/LIB/<x.y.z>
+      6.) /usr/local/Singular/LIB/
+      7.) /usr/local/Singular/LIB/<x.y.z>
+      The info-file, i.e., the file singular.hlp is looked for at the
+      following places: 
+      1.) $bindir/../doc/singular.hlp
+      2.) $bindir/../info/singular.hlp
+      3.) $bindir/../../Singular/doc/<x.y.z>/singular.hlp
+      4.) $bindir/../../Singular/doc/singular.hlp
+      5.) $bindir/../../info/singular.hlp
+      6.) /usr/local/Singular/doc/<x.y.z>/singular.hlp
+      7.) /usr/local/Singular/doc/singular.hlp
+      8.) /usr/local/info/singular.hlp
+      9.) In all directories contained in the Singular SearchPath.
+  (3) As a last resort, you can set the environment variable
+      SINGULARPATH, so that the directories containing the Singular
+      libraries and info-files are contained in the value of
+      SINGULARPATH. 
+  You can inspect the used SearchPath and info-file by starting up
+  Singular with the `-v' option, or  by issuing the command
+  `system("with")'. 
+      
+* General: Singular can not find the `info' program:
+  Install the info program on your system -- see the section 
+  "TO INSTALL THE ON-LINE DOCUMENTATION" above.
+
 * For any other troubles, please send mail to
-   singular@mathematik.uni-kl.de
+        singular@mathematik.uni-kl.de 
+  and include the header which is displayed by starting up Singular
+  with the `-v' option, and a description of your machine (issue the
+  command `uname -a' on your shell) in your report.
+
 
 More information about Singular: Comments, Questions, Bug Reports
 =================================================================

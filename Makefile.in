@@ -122,6 +122,8 @@ sharedist: ${SINGULAR}
 	${MKINSTALLDIRS} ${TMPDIR}/info
 	cp Singular/LIB/*.lib ${TMPDIR}/Singular/LIB/${SINGULAR_VERSION}
 	cp -R Singular/LIB/gftables ${TMPDIR}/Singular/LIB/
+	cd ${TMPDIR}/Singular/LIB/${SINGULAR_VERSION}; \
+		${LN_S} ../gftables .
 	cp doc/singular.hlp doc/singular.ps doc/usercard.ps \
            doc/singular.dvi doc/usercard.dvi \
            ${TMPDIR}/Singular/doc/${SINGULAR_VERSION}
