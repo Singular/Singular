@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_Tok.cc,v 1.28 2001-01-30 16:58:52 Singular Exp $ */
+/* $Id: mpsr_Tok.cc,v 1.29 2001-02-26 12:02:46 levandov Exp $ */
 
 /***************************************************************
  *
@@ -578,7 +578,7 @@ mpsr_cmd mpsr_cmds[] =
 #ifdef GENTABLE
 
 // simply touch mpsr_Tok.inc so that Make does not get confused
-#ifndef macintosh
+#if !defined(macintosh) && !defined(HPUX_9)
 extern "C" int system(char *);
 #else
 #include <stdio.h>
