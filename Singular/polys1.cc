@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.17 1999-01-07 12:21:52 Singular Exp $ */
+/* $Id: polys1.cc,v 1.18 1999-02-26 14:27:46 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -706,8 +706,9 @@ void pEnlargeSet(polyset *p, int l, int increment)
   h=(polyset)ReAlloc((poly*)*p,l*sizeof(poly),(l+increment)*sizeof(poly));
   if (increment>0)
   {
-    for (i=l; i<l+increment; i++)
-      h[i]=NULL;
+    //for (i=l; i<l+increment; i++)
+    //  h[i]=NULL;
+    memset(&(h[l]),0,increment*sizeof(poly));
   }
   *p=h;
 }
