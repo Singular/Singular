@@ -15,7 +15,7 @@ if [ $LV -eq 2 ];
     fi
     if [ $MIDV -eq 5 ];
 	then
-	if [ $TV -le 3 ];
+	if [ $TV -le 4 ];
 	    then goodversion=true;
 	fi
     fi
