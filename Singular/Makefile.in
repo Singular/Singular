@@ -71,7 +71,7 @@ CXXSOURCES=grammar.cc scanner.cc algmap.cc attrib.cc binom.cc clapconv.cc \
     ipprint.cc ipshell.cc khstd.cc kstdfac.cc \
     comm.cc kstd1.cc kstd2.cc kutil.cc lists.cc \
     longalg.cc longrat.cc longrat0.cc \
-    maps.cc matpol.cc misc.cc \
+    maps.cc matpol.cc misc.cc sdb.cc \
     mminit.cc modulop.cc sparsmat.cc \
     fglm.cc fglmzero.cc fglmvec.cc fglmgauss.cc fglmhom.cc fglmcomb.cc \
     numbers.cc polys.cc polys0.cc polys1.cc polys-impl.cc \
@@ -93,7 +93,7 @@ HEADERS=algmap.h hutil.h lists.h stairc.h attrib.h ideals.h \
 	longalg.h mpsr_Tok.h structs.h binom.h intvec.h longrat.h \
 	numbers.h stype.h clapconv.h ipconv.h maps.h page.h \
 	subexpr.h clapsing.h ipid.h matpol.h polys.h syz.h \
-	cntrlc.h ipprint.h ring.h timer.h \
+	cntrlc.h ipprint.h ring.h timer.h sdb.h \
 	febase.h ipshell.h shortfl.h tok.h \
 	mmemory.h mmprivate.h mmheap.h mmpage.h page.h \
 	ffields.h khstd.h silink.h sparsmat.h \
@@ -129,7 +129,7 @@ OBJS=grammar.o scanner.o matpol.o binom.o\
      algmap.o clapconv.o  clapmem.o clapsing.o claptmpl.o\
      mpsr_Error.o mpsr_Put.o mpsr_PutPoly.o mpsr_GetPoly.o \
      mpsr_Get.o mpsr_GetMisc.o ndbm.o spSpolyLoop.o libparse.o \
-     find_exec.o getopt.o fereadl.o  mod_raw.o \
+     find_exec.o getopt.o fereadl.o  mod_raw.o sdb.o \
 	pcv.o
 
 ##
@@ -342,7 +342,7 @@ OBJG1=	grammar.og scanner.og matpol.og binom.og\
      mminit.og sing_dld.og sing_dbm.og silink.og sparsmat.og\
      sing_mp.og fglm.og fglmzero.og fglmvec.og fglmgauss.og fglmhom.og\
      algmap.og clapconv.og  clapmem.og clapsing.og \
-     cntrlc.og  \
+     cntrlc.og  sdb.og\
      mpsr_Error.og mpsr_Put.og mpsr_PutPoly.og mpsr_GetPoly.og \
      mpsr_Get.og mpsr_GetMisc.og \
      ndbm.og spSpolyLoop.og libparse.og  mod_raw.og \
@@ -418,7 +418,7 @@ OBJP1=	grammar.op scanner.op matpol.op binom.op\
      mminit.op sing_dld.op sing_dbm.op silink.op sparsmat.op\
      sing_mp.op fglm.op fglmzero.op fglmvec.op fglmgauss.op fglmhom.op\
      algmap.op clapconv.op  clapmem.op clapsing.op \
-     cntrlc.op  \
+     cntrlc.op  sdb.op\
      mpsr_Error.op mpsr_Put.op mpsr_PutPoly.op mpsr_GetPoly.op \
      mpsr_Get.op mpsr_GetMisc.op \
      ndbm.op spSpolyLoop.op libparse.op  mod_raw.op \
@@ -444,7 +444,7 @@ OBJB1=	grammar.ob scanner.ob matpol.ob binom.ob\
      mminit.ob sing_dld.ob sing_dbm.ob silink.ob sparsmat.ob\
      sing_mp.ob fglm.ob fglmzero.ob fglmvec.ob fglmgauss.ob fglmhom.ob\
      algmap.ob clapconv.ob  clapmem.ob clapsing.ob \
-     cntrlc.ob  \
+     cntrlc.ob  sdb.ob \
      mpsr_Error.ob mpsr_Put.ob mpsr_PutPoly.ob mpsr_GetPoly.ob \
      mpsr_Get.ob mpsr_GetMisc.ob \
      ndbm.ob spSpolyLoop.ob libparse.ob mod_raw.ob \

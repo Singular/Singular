@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: scanner.l,v 1.15 1999-03-19 17:42:33 obachman Exp $ */
+/* $Id: scanner.l,v 1.16 1999-04-15 17:28:06 Singular Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -18,7 +18,7 @@
 int feReadLine(char* b, int l);
 #define ALLOC(a) Alloc((a))
 int yylineno  = 0;
-static int blocknest = 0;
+int blocknest = 0;
 extern char * yytext;
 //extern unsigned char * yytext;
 extern int yyleng;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.53 1999-04-01 10:09:58 krueger Exp $ */
+/* $Id: iplib.cc,v 1.54 1999-04-15 17:28:04 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -244,27 +244,25 @@ BOOLEAN iiPStart(idhdl pn, sleftv  * v)
   char * str;
   BOOLEAN err=FALSE;
   int old_echo=si_echo;
+  char save_flags=0;
+  procinfov pi=NULL;
 
   /* init febase ======================================== */
   /* we do not enter this case if filename != NULL !! */
   if (pn!=NULL)
   {
-    procinfov pi;
     pi = IDPROC(pn);
     if(pi!=NULL)
     {
+      save_flags=pi->trace_flag;
       if( pi->data.s.body==NULL )
       {
-        iiGetLibProcBuffer(IDPROC(pn));
-        if (IDPROC(pn)->data.s.body==NULL) return TRUE;
+        iiGetLibProcBuffer(pi);
+        if (pi->data.s.body==NULL) return TRUE;
       }
-      newBuffer( mstrdup(IDPROC(pn)->data.s.body), BT_proc,
-                 pi, IDPROC(pn)->data.s.body_lineno );
+      newBuffer( mstrdup(pi->data.s.body), BT_proc,
+                 pi, pi->data.s.body_lineno-(v!=NULL) );
     }
-    //else
-    //{ // for security only
-    //  newBuffer( mstrdup(IDSTRING(pn)), BT_proc, IDID(pn) );
-    //}
   }
   /* generate argument list ======================================*/
   if (v!=NULL)
@@ -279,13 +277,12 @@ BOOLEAN iiPStart(idhdl pn, sleftv  * v)
   }
   /* start interpreter ======================================*/
   myynest++;
-  //Print("%-*.*s PStart <<%s>>, level:%d\n",2*myynest,2*myynest," ",IDID(pn),myynest);
   err=yyparse();
   killlocals(myynest);
   myynest--;
   si_echo=old_echo;
-  //Print("%-*.*s PEnd  <<%s>>, level:%d\n",2*myynest,2*myynest," ",IDID(pn),myynest);
-
+  if (pi!=NULL)
+    pi->trace_flag=save_flags;
   return err;
 }
 
@@ -627,9 +624,9 @@ BOOLEAN iiReLoadLib(idhdl packhdl)
 #ifdef HAVE_NAMESPACES
   char libnamebuf[128];
   package pack = IDPACKAGE(packhdl);
-  
+
   if(pack->language == LANG_NONE) return FALSE;
-  
+
   FILE * fp = feFopen( pack->libname, "r", libnamebuf, FALSE);
   if (fp==NULL)
   {
@@ -765,7 +762,7 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
 #else /* HAVE_NAMESPACES */
   LoadResult = iiLoadLIB(fp, libnamebuf, newlib, NULL, FALSE, tellerror);
 #endif /* HAVE_NAMESPACES */
-  
+
 #ifdef HAVE_NAMESPACES
   if(!LoadResult) IDPACKAGE(pl)->loaded = TRUE;
   namespaceroot->pop();
@@ -835,7 +832,7 @@ static BOOLEAN iiLoadLIB(FILE *fp, char *libnamebuf, char*newlib,
   reinit_yylp();
   fclose( yylpin );
   fp = NULL;
-  
+
 #ifdef HAVE_NAMESPACES
   namespaceroot->pop();
 #endif /* HAVE_NAMESPACES */
@@ -939,11 +936,11 @@ BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN tellerror)
   BOOLEAN RET=TRUE;
   int token;
   char FullName[256];
-  
+
   if( *fullname != '/' &&  *fullname != '.' )
     sprintf(FullName, "./%s", newlib);
   else strcpy(FullName, fullname);
-  
+
 
   if(IsCmd(plib, &token))
   {
@@ -964,7 +961,7 @@ BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN tellerror)
     if(IDTYP(pl)!=PACKAGE_CMD)
     {
       Warn("not of typ package.");
-      goto load_modules_end; 
+      goto load_modules_end;
     }
   }
   namespaceroot->push(IDPACKAGE(pl), IDID(pl));
@@ -973,7 +970,7 @@ BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN tellerror)
   {
     WerrorS("dynl_open failed");
     Werror("%s not found", newlib);
-    goto load_modules_end; 
+    goto load_modules_end;
   }
   else
   {
@@ -987,7 +984,7 @@ BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN tellerror)
   load_modules_end:
   namespaceroot->pop();
   return RET;
-  
+
 }
 #endif /* HAVE_DYNAMIC_LOADING */
 
@@ -1143,7 +1140,7 @@ lib_types type_of_LIB(char *newlib, char *libnamebuf)
 
   FILE * fp = feFopen( newlib, "r", libnamebuf, FALSE );
   ret = stat(libnamebuf, &sb);
-  
+
   if (fp==NULL)
   {
     return LT;
@@ -1173,7 +1170,7 @@ lib_types type_of_LIB(char *newlib, char *libnamebuf)
     goto lib_type_end;
   }
   if(isprint(buf[0]) || buf[0]=='\n') { LT = LT_SINGULAR; goto lib_type_end; }
-  
+
   lib_type_end:
   fclose(fp);
   return LT;

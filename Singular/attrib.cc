@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: attrib.cc,v 1.11 1999-03-16 15:33:04 Singular Exp $ */
+/* $Id: attrib.cc,v 1.12 1999-04-15 17:28:02 Singular Exp $ */
 
 /*
 * ABSTRACT: attributes to leftv and idhdl
@@ -266,7 +266,7 @@ BOOLEAN atATTRIB1(leftv res,leftv a)
   {
     procinfo *p=(procinfo *)v->Data();
     if (p->trace_flag!=0)
-      Print("trace:%d\n",p->trace_flag);
+      Print("TRACE:%d\n",p->trace_flag);
   }    
   if (hasFlag(v,FLAG_STD))
   {
@@ -299,7 +299,7 @@ BOOLEAN atATTRIB2(leftv res,leftv a,leftv b)
     res->rtyp=INT_CMD;
     res->data=(void *)(((ideal)v->Data())->rank);
   }
-  else if ((v->Typ()==PROC_CMD) && (strcmp(name,"trace")==0))
+  else if ((v->Typ()==PROC_CMD) && (strcmp(name,"TRACE")==0))
   {
     procinfo *p=(procinfo *)v->Data();
     res->rtyp=INT_CMD;
@@ -361,11 +361,11 @@ BOOLEAN atATTRIB3(leftv res,leftv a,leftv b,leftv c)
     ideal I=(ideal)v->Data();
     I->rank=max(I->rank,(int)c->Data());
   }
-  else if ((strcmp(name,"trace")==0)&&(v->Typ()==PROC_CMD))
+  else if ((strcmp(name,"TRACE")==0)&&(v->Typ()==PROC_CMD))
   {
     if (c->Typ()!=INT_CMD)
     {
-      WerrorS("attrib `trace` must be int");
+      WerrorS("attrib `TRACE` must be int");
       return TRUE;
     }
     procinfo *p=(procinfo *)v->Data();

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.h,v 1.16 1999-03-11 15:58:07 Singular Exp $ */
+/* $Id: ipshell.h,v 1.17 1999-04-15 17:28:05 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -17,6 +17,8 @@ extern int  traceit ;
 #define TRACE_SHOW_LINE   4
 #define TRACE_SHOW_RINGS  8
 #define TRACE_SHOW_LINE1  16
+#define TRACE_BREAKPOINT  32
+#define TRACE_TMP_BREAKPOINT  64
 extern leftv iiCurrArgs;
 extern int iiOp; /* the current operation*/
 extern int  myynest;

@@ -1,11 +1,14 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.inc,v 1.20 1999-03-16 15:33:06 Singular Exp $ */
+/* $Id: febase.inc,v 1.21 1999-04-15 17:28:02 Singular Exp $ */
 /*
 * ABSTRACT: handling of 'voices'
 */
 #include <ctype.h>
+#include "sdb.h"
+
+extern int blocknest; /* scaner.l internal */
 
 int    yy_noeof=0;     // the scanner "state"
 int    yy_blocklineno; // to get the lineno of the block start from scanner
@@ -153,8 +156,6 @@ void newBuffer(char* s, feBufferTypes t, procinfo* pi, int lineno)
                      break;
     case BT_if:
     case BT_else:
-                     yylineno = yy_blocklineno;
-                     break;
     case BT_break:
                      yylineno = yy_blocklineno-1;
                      break;
@@ -400,7 +401,7 @@ static int fePrintEcho(char *anf)
         Print("(none) %3d%c ",yylineno,prompt_char);
       else
         Print("%s %3d%c ",currentVoice->filename,yylineno,prompt_char);
-    }
+     }
     #ifdef HAVE_TCL
     if(tclmode)
     {
@@ -425,6 +426,12 @@ static int fePrintEcho(char *anf)
   {
     Print("{%d}",yylineno);
     mflush();
+  }
+  if ((blocknest==0)
+  && (currentVoice->pi!=NULL)
+  && (currentVoice->pi->trace_flag&TRACE_BREAKPOINT))
+  {
+    sdb(currentVoice, anf, len_s);
   }
   prompt_char = '.';
   return len_s;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.57 1999-03-19 14:17:58 obachman Exp $ */
+/* $Id: grammar.y,v 1.58 1999-04-15 17:28:03 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -593,10 +593,6 @@ expr:   expr_arithmetic
           {
             if(iiExprArith3(&$$,$1,&$3,&$5,&$7)) YYERROR;
           }
-        | CMD_M '(' ')'
-          {
-            if(iiExprArithM(&$$,NULL,$1)) YYERROR;
-          }
         | CMD_23 '(' expr ',' expr ')'
           {
             if(iiExprArith2(&$$,&$3,$1,&$5,TRUE)) YYERROR;
@@ -625,6 +621,14 @@ expr:   expr_arithmetic
           {
             if(iiExprArith3(&$$,$1,&$3,&$5,&$7)) YYERROR;
           }
+        | CMD_M '(' ')'
+          {
+            if(iiExprArithM(&$$,NULL,$1)) YYERROR;
+          }
+        | CMD_M '(' exprlist ')'
+          {
+            if(iiExprArithM(&$$,&$3,$1)) YYERROR;
+          }
         | MATRIX_CMD '(' expr ',' expr ',' expr ')'
           {
             if(iiExprArith3(&$$,MATRIX_CMD,&$3,&$5,&$7)) YYERROR;
@@ -636,10 +640,6 @@ expr:   expr_arithmetic
         | INTMAT_CMD '(' expr ')'
           {
             if(iiExprArith1(&$$,&$3,INTMAT_CMD)) YYERROR;
-          }
-        | CMD_M '(' exprlist ')'
-          {
-            if(iiExprArithM(&$$,&$3,$1)) YYERROR;
           }
         | quote_start expr quote_end
           {
@@ -1552,9 +1552,6 @@ ifcmd: IF_CMD '(' expr ')' BLOCKTOK
             {
               if (currentVoice->ifsw!=2)
               {
-                char *s=$2+strlen($2)-1;
-                while ((*s=='\0')||(*s=='\n')) s--;
-                s[1]='\0';
                 Warn("`else` without `if` in level %d",myynest);
               }
               FreeL((ADDRESS)$2);
