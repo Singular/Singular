@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.187 2000-05-15 12:59:52 Singular Exp $
+@comment $Id: reference.doc,v 1.188 2000-05-19 14:07:22 obachman Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -1377,9 +1377,7 @@ prevent local evaluations  when writing to an MPtcp link.
 @end table
 @c ref
 See
-@ifclear ix86-Win
 @ref{MPfile links};
-@end ifclear
 @ref{quote};
 @ref{write}.
 @c ref
@@ -4735,9 +4733,7 @@ effect of exactly one quote).
 See
 @ref{eval};
 @ref{write};
-@ifclear ix86-Win
 @ref{MPfile links}.
-@end ifclear
 @c ref
 @c ---------------------------------------
 @node quotient, random, quote, Functions
@@ -4855,13 +4851,11 @@ reads data from a link.
 @*For ASCII links, the content of the entire
 file is returned as one string. If the ASCII link is the empty string,
 @code{read} reads from standard input.
-@ifclear ix86-Win
 @*For MP links, one expression is read
 from the link and returned after an evaluation.
 @*For MPtcp links the @code{read} command blocks as long as there is no
 data to read from the link. The @code{status} command can be used to
 check whether or not there is data to read.
-@end ifclear
 @*For DBM links, a @code{read} with one argument returns the value of
 the next entry in the data base, and a @code{read} with two arguments
 returns the value to the key given as the second argument from the data
@@ -6183,14 +6177,12 @@ writes data to a link.
 strings  (and separated by a newline character) before they are
 written. As a consequence, only such values which can be converted to a
 string can be written to an  @code{ASCII} link.
-@ifclear ix86-Win
 @*For MP links,
 ring-dependent expressions are written together with a ring
 description. To prevent an evaluation of the expression before it is
 written, the @code{quote} command (possibly together with @code{eval})
 can be used. A @code{write} blocks (i.e. does not return to the prompt),
 as long as a MPtcp link is not ready for writing.
-@end ifclear
 @*For DBM links, @code{write} with three arguments inserts the first
 string as key and the second string as value into the dbm data
 base.

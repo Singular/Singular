@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: start.doc,v 1.44 1999-08-23 17:08:12 Singular Exp $
+@comment $Id: start.doc,v 1.45 2000-05-19 14:07:24 obachman Exp $
 @comment this file contains the "Introduction" chapter.
 @c * wichmann: + added changes by GMG.
 
@@ -97,7 +97,7 @@ version 1.0 and in 1998 to the release of version 1.2
 and on improved implementations of the algorithms,
 libraries for primary decomposition, ring normalization, etc.)
 
-For the highlights of the new @sc{Singular} version 1.4 see ...
+For the highlights of the new @sc{Singular} version @value{VERSION} see ...
 (TBC)
 
 @c Thus, we hope to offer a useful system

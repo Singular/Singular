@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: pl2doc.pl,v 1.15 2000-04-27 10:07:23 obachman Exp $
+# $Id: pl2doc.pl,v 1.16 2000-05-19 14:07:22 obachman Exp $
 ###################################################################
 #  Computer Algebra System SINGULAR
 #
@@ -200,7 +200,7 @@ sub OutInfo
   while ($info =~ m/(.*\n)/g)
   {
     $line = $1;
-    if ($1 =~ /^(\w[A-z0-9 ]+?):(.*\n)/)
+    if ($1 =~ /^([A-Z][A-Z0-9 ]+?):(.*\n)/)
     {
       $ref .= OutInfoItem($FH, $item, $text, $l_fun) if $item && $text;
       $item = $1;
