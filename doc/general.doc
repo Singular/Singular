@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.3 1998-04-24 15:15:08 krueger Exp $
+@comment $Id: general.doc,v 1.4 1998-04-27 07:42:11 Singular Exp $
 @comment this file contains the general information about Singular
 
 @menu
@@ -36,4 +36,18 @@
 @section Implemented algorithms
 @cindex Implemented algorithms
 
+
+The basic algorithm in @sc{Singular} is a general standard basis algorithm for
+any monomial ordering which is compatible with the natural semigroup
+structure of the exponents. This includes wellorderings (Buchberger algorithm)
+and tangent cone orderings (Mora algorithm) as special cases.
+
+Different syzygy algorithms, free resolutions (@code{sres, res, mres}) for computation of free resolutions
+of modules over the above rings.
+
+Combinatorial algorithms for computing dimensions, hilbert series, multiplicities, ...
+
+An algorithm for uni- and multivariate polynomial factorization.
+
+See the file 'singular_algorithms.tex' for details and further algorithms.
 
