@@ -253,6 +253,7 @@ cmdnames cmds[] =
   { "resolution",  0, RESOLUTION_CMD ,    RING_DECL},
   { "resultant",   0, RESULTANT_CMD,      CMD_3},
   { "return",      0, RETURN ,            RETURN},
+  { "RETURN",      0, END_GRAMMAR ,       RETURN},
   { "ring",        0, RING_CMD ,          RING_CMD},
   { "rvar",        0, IS_RINGVAR ,        CMD_1},
   { "setring",     0, SETRING_CMD ,       SETRING_CMD},
