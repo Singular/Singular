@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.46 1999-03-08 14:10:22 Singular Exp $
+// $Id: clapsing.cc,v 1.47 1999-03-15 13:58:30 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -201,7 +201,9 @@ poly singclap_gcd ( poly f, poly g )
 
   if (f!=NULL) pCleardenom(f);
   if (g!=NULL) pCleardenom(g);
-
+  else         return pCopy(f); // g==0 => gcd=f (but do a pCleardenom)
+  if (f==NULL) return pCopy(g); // f==0 => gcd=g (but do a pCleardenom)
+ 
   // for now there is only the possibility to handle polynomials over
   // Q and Fp ...
   if (( nGetChar() == 0 || nGetChar() > 1 )
@@ -256,6 +258,7 @@ poly singclap_gcd ( poly f, poly g )
 
   pDelete(&f);
   pDelete(&g);
+  pTest(res);
   return res;
 }
 
