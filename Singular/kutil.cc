@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.28 1998-07-30 17:50:45 Singular Exp $ */
+/* $Id: kutil.cc,v 1.29 1998-09-24 17:13:10 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -214,8 +214,6 @@ inline static intset initec (int maxnr)
 
 static inline void enlargeT (TSet* T,int* length,int incr)
 {
-  TSet h;
-
   *T = (TSet)ReAlloc((ADDRESS)(*T),(*length)*sizeof(TObject),
                                    ((*length)+incr)*sizeof(TObject));
   (*length) += incr;
