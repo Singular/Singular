@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: imm.h,v 1.16 1998-06-03 12:52:20 pohl Exp $ */
+/* $Id: imm.h,v 1.17 1998-06-26 16:18:04 schmidt Exp $ */
 
 #ifndef INCL_IMM_H
 #define INCL_IMM_H
@@ -81,41 +81,52 @@ inline InternalCF * int2imm_gf ( int i )
 }
 //}}}
 
-//{{{ predicates
+// predicates
 inline int is_imm ( const InternalCF * const ptr )
 {
     // returns 0 if ptr is not immediate
     return ( (int)ptr & 3 );
 }
 
-inline int imm_iszero ( const InternalCF * const ptr )
-{
-    return imm2int( ptr ) == 0;
-}
-
-inline int imm_isone ( const InternalCF * const ptr )
+//{{{ inline int imm_isone, imm_isone_p, imm_isone_gf ( const InternalCF * const ptr )
+// docu: see CanonicalForm::isOne()
+inline int
+imm_isone ( const InternalCF * const ptr )
 {
     return imm2int( ptr ) == 1;
 }
 
-inline int imm_iszero_p ( const InternalCF * const ptr )
-{
-    return imm2int( ptr ) == 0;
-}
-
-inline int imm_isone_p ( const InternalCF * const ptr )
+inline int
+imm_isone_p ( const InternalCF * const ptr )
 {
     return imm2int( ptr ) == 1;
 }
 
-inline int imm_iszero_gf ( const InternalCF * const ptr )
-{
-    return gf_iszero( imm2int( ptr ) );
-}
-
-inline int imm_isone_gf ( const InternalCF * const ptr )
+inline int
+imm_isone_gf ( const InternalCF * const ptr )
 {
     return gf_isone( imm2int( ptr ) );
+}
+//}}}
+
+//{{{ inline int imm_iszero, imm_iszero_p, imm_iszero_gf ( const InternalCF * const ptr )
+// docu: see CanonicalForm::isZero()
+inline int
+imm_iszero ( const InternalCF * const ptr )
+{
+    return imm2int( ptr ) == 0;
+}
+
+inline int
+imm_iszero_p ( const InternalCF * const ptr )
+{
+    return imm2int( ptr ) == 0;
+}
+
+inline int
+imm_iszero_gf ( const InternalCF * const ptr )
+{
+    return gf_iszero( imm2int( ptr ) );
 }
 //}}}
 
@@ -388,20 +399,26 @@ inline void imm_divrem_gf ( const InternalCF * const lhs, const InternalCF * con
     r = int2imm_gf( gf_q );
 }
 
-inline InternalCF * imm_neg ( const InternalCF * const op )
+//{{{ inline InternalCF * imm_neg, imm_neg_p, imm_neg_gf ( const InternalCF * const op )
+// docu: see CanonicalForm::operator -()
+inline InternalCF *
+imm_neg ( const InternalCF * const op )
 {
     return int2imm( -imm2int( op ) );
 }
 
-inline InternalCF * imm_neg_p ( const InternalCF * const op )
+inline InternalCF *
+imm_neg_p ( const InternalCF * const op )
 {
     return int2imm_p( ff_neg( imm2int( op ) ) );
 }
 
-inline InternalCF * imm_neg_gf ( const InternalCF * const op )
+inline InternalCF *
+imm_neg_gf ( const InternalCF * const op )
 {
     return int2imm_gf( gf_neg( imm2int( op ) ) );
 }
+//}}}
 //}}}
 
 //{{{ input/output
