@@ -350,18 +350,21 @@ else
   AC_MSG_RESULT(no)
 fi
 
-if "$enable_gmp" = yes; then
+if test "$enable_gmp" = yes; then
 # for gmp-3.0 to work for all ix86 processors, set generic target
 if test "$target" = NONE; then 
 case "$ac_cv_singuname" in 
 	ix86*) 
 	gmp_target=`./config.guess | sed 's/^\w*-/i386-/'`
-	echo $gmp_target
 	ac_configure_args="$ac_configure_args --target=$gmp_target" 
 	;;
 esac
 fi
-
+# furthermore, disable building of dynamic libraries, for we want to
+# link against the static ones
+if test "$enable_shared" != no; then
+  ac_configure_args="$ac_configure_args --disable-shared"
+fi
 fi
 
 
