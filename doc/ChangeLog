@@ -1,3 +1,37 @@
+Tue Jun  9 16:52:29 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* Makefile.in: Major clean up.  Many doc fixes.
+
+	* Makefile.in (${SINGULAR}, Makefile): `cd ${prefix}' replaced by
+	  `cd ..'
+
+	* Makefile.in (Makefile): bug fix
+
+	* Makefile.in (clean, mostlyclean, distclean, maintainer-clean):
+	  completely rewritten
+
+	* Makefile.in (%.tex): issues a warning
+
+	* Makefile.in (TEXI2DVI): new variable
+	  (tutor.dvi, singular.dvi): uses `texi2info' instead of `tex' to
+	  translate texi sources
+
+	* Makefile.in (SINGULAR_OBJS): renamed to `DOC2TEX_FILES'.  All
+	  references changed.
+	  (MANUAL_FILES, TUTOR_FILES, tutor.dvi, singular.hlp,
+	   singular.dvi, html): new variables referenced in the
+	  corresponding targets
+
+	* Makefile.in (singular.hlp, singular.dvi, html): explicit
+	  dependency on `Makefile' removed
+
+	* Makefile.in (all): dependency `html' added
+	  (html): several bug fixes, clean-up
+
+	* Makefile.in (ps): target rewritten.  Depends on `usercard.ps'
+	  and `%.ps'.
+	  (usercard.ps, %.ps): new targets
+
 Wed May 27 15:16:31 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* usercard.tex: minor fixes, some sections added
