@@ -56,7 +56,7 @@
 #include <ctype.h>
 #include <new>
 #include <cstring>
-#include <gmp.h>
+#include <si_gmp.h>
 
 #define LLL_MAX(a,b) (a > b ? a : b)
 
