@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.204 2000-02-04 16:47:19 Singular Exp $ */
+/* $Id: iparith.cc,v 1.205 2000-02-17 10:32:41 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -178,7 +178,7 @@ cmdnames cmds[] =
   { "getdump",     0, GETDUMP_CMD,        CMD_1},
   { "gcd",         0, GCD_CMD ,           CMD_2},
   { "GCD",         2, GCD_CMD ,           CMD_2},
-  { "hilb",        0, HILBERT_CMD ,       CMD_12},
+  { "hilb",        0, HILBERT_CMD ,       CMD_123},
   { "highcorner",  0, HIGHCORNER_CMD,     CMD_1},
   { "homog",       0, HOMOG_CMD ,         CMD_12},
   { "hres",        0, HRES_CMD ,          CMD_2},
@@ -3996,6 +3996,26 @@ static BOOLEAN jjFIND3(leftv res, leftv u, leftv v, leftv w)
   }
   return FALSE;
 }
+static BOOLEAN jjHILBERT3(leftv res, leftv u, leftv v, leftv w)
+{
+  assumeStdFlag(u);
+  intvec *module_w=(intvec *)atGet(u,"isHomog");
+  intvec *wdegree=(intvec*)w->Data();
+  intvec *iv=hFirstSeries((ideal)u->Data(),module_w,currQuotient,wdegree);
+  switch((int)v->Data())
+  {
+    case 1:
+      res->data=(void *)iv;
+      return FALSE;
+    case 2:
+      res->data=(void *)hSecondSeries(iv);
+      delete iv;
+      return FALSE;
+  }
+  WerrorS(feNotImplemented);
+  delete iv;
+  return TRUE;
+}
 static BOOLEAN jjINTMAT3(leftv res, leftv u, leftv v,leftv w)
 {
   intvec* im= NewIntvec3((int)v->Data(),(int)w->Data(), 0);
@@ -4334,6 +4354,8 @@ struct sValCmd3 dArith3[]=
 ,{jjCOEFFS3_KB,     COEFFS_CMD, MATRIX_CMD, MODUL_CMD,  MODUL_CMD,  POLY_CMD }
 ,{jjELIMIN_HILB,    ELIMINATION_CMD,IDEAL_CMD, IDEAL_CMD, POLY_CMD, INTVEC_CMD }
 ,{jjFIND3,          FIND_CMD,   INT_CMD,    STRING_CMD, STRING_CMD, INT_CMD }
+,{jjHILBERT3,       HILBERT_CMD,INTVEC_CMD, IDEAL_CMD,  INT_CMD,    INTVEC_CMD }
+,{jjHILBERT3,       HILBERT_CMD,INTVEC_CMD, MODUL_CMD,  INT_CMD,    INTVEC_CMD }
 ,{jjCALL3MANY,      IDEAL_CMD,  IDEAL_CMD,  DEF_CMD,    DEF_CMD,    DEF_CMD }
 //,{jjCALL3MANY,      INTERSECT_CMD,  NONE,   DEF_CMD,    DEF_CMD,    DEF_CMD }
 ,{lInsert3,         INSERT_CMD, LIST_CMD,   LIST_CMD,   DEF_CMD,    INT_CMD }
@@ -5558,7 +5580,7 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
         //Print("test %s\n",Tok2Cmdname(dArith1[i].arg));
         if ((ai=iiTestConvert(at,dArith1[i].arg))!=0)
         {
-	  int r=res->rtyp=dArith1[i].res;
+          int r=res->rtyp=dArith1[i].res;
           if (r<0)
           {
             res->rtyp=-r;

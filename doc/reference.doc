@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.180 2000-02-04 15:39:55 Singular Exp $
+@comment $Id: reference.doc,v 1.181 2000-02-17 10:31:58 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -2105,21 +2105,23 @@ See
 @*@code{hilb (} module_expression @code{)}
 @*@code{hilb (} ideal_expression@code{,} int_expression @code{)}
 @*@code{hilb (} module_expression@code{,} int_expression @code{)}
+@*@code{hilb (} ideal_expression@code{,} int_expression @code{,} intvec_expression @code{)}
+@*@code{hilb (} module_expression@code{,} int_expression @code{,} intvec_expression @code{)}
 @item @strong{Type:}
 none (if called with one argument)
-@*intvec (if called with two arguments)
+@*intvec (if called with two or three arguments)
 @item @strong{Purpose:}
 computes the Hilbert series of the ideal, resp.@: module,
 defined by the leading terms of the generators
-of the given ideal resp.@: module. If the ring order is a weighted
-degree order, the Hilbert series is computed w.r.t. these weights.
+of the given ideal resp.@: module. If weights w are given as third argument,
+the Hilbert series is computed w.r.t. these weights w.
 In the other cases all weights are one. If the input is
 homogeneous w.r.t. the weights and a standard basis,
 this is the (weighted) Hilbert series of the original
 ideal, resp.@: module.
 
 Prints first and second Hilbert series with one argument,
-returns the n-th (n=1,2) Hilbert series as intvec with two arguments.
+returns the n-th (n=1,2) Hilbert series as intvec with two or three arguments.
 The leading number of the intvec is not part of the Hilbert series and
 is used in the Hilbert driven standard basis computation.
 @item @strong{Example:}
@@ -2131,6 +2133,8 @@ is used in the Hilbert driven standard basis computation.
   hilb(s);
   hilb(s,1);
   hilb(s,2);
+  intvec w=2,2,2;
+  hilb(s,1,w);
 @c example
 @end smallexample
 @end table
@@ -5464,8 +5468,7 @@ second argument of type intvec as Hilbert series
 if the ideal, resp.@: module, is homogeneous,
 (Hilbert driven standard basis computation, @ref{stdhilb}).
 If the ideal is quasihomogeneous with some weights w and if the Hilbert series
-is computed w.r.t. to this weights, then use w as third argument if the ordering
-is not weighted degree with w.
+is computed w.r.t. to this weights, then use w as third argument.
 @*Use an optional second argument of type @code{poly}, resp.@ @code{vector}
 to construct the standard basis from an already computed one (given as the
 first argument) and one additional generator (the second argument).
@@ -5505,7 +5508,7 @@ chooses the "best" algorithm to compute a Groebner basis.
   ring whom = 32003, (x,y,z), wp(w);
   ideal i = fetch(r,i);
   ideal j = std(i);
-  intvec iw = hilb(j,1);
+  intvec iw = hilb(j,1,w); 
   ring wlex = 32003, (x,y,z), lp;
   ideal i = fetch(whom,i);
   ideal j = std(i,iw,w);

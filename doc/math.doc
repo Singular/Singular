@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.51 1999-11-29 14:45:59 Singular Exp $
+@comment $Id: math.doc,v 1.52 2000-02-17 10:31:57 Singular Exp $
 @comment this file contains the mathematical background of Singular
 
 @c The following directives are necessary for proper compilation
@@ -105,13 +105,15 @@ and the Hilbert function H_L(I) of the leading ideal L(I) coincide.
 @cindex Hilbert function
 @cindex Hilbert series
 @tex
-Let M $=\bigoplus_i M_i$ be a graded module over $K[x_1,..,x_n]$.
+Let M $=\bigoplus_i M_i$ be a graded module over $K[x_1,..,x_n]$ with 
+respect to weights $(w_1,..w_n)$.
 The {\bf Hilbert function} of $M$, $H_M$, is defined (on the integers) by
 $$H_M(k) :=dim_K M_k.$$
 The {\bf Hilbert-Poincare series}  of $M$ is the power series
 $$\hbox{HP}_M(t) :=\sum_{i=-\infty}^\infty
 H_M(i)t^i=\sum_{i=-\infty}^\infty dim_K M_i \cdot t^i.$$
-It turns out that $\hbox{HP}_M(t)$ can be written in two useful ways:
+It turns out that $\hbox{HP}_M(t)$ can be written in two useful ways
+for weights $(1,..,1)$:
 $$\hbox{HP}_M(t)={Q(t)\over (1-t)^n}={P(t)\over (1-t)^{dim(M)}}$$
 where $Q(t)$ and $P(t)$ are polynomials in ${\bf Z}[t]$.
 $Q(t)$ is called the {\bf first Hilbert series},
@@ -121,7 +123,8 @@ then \hbox{$H_M(s)=\sum_{k=0}^N a_k$ ${d+s-k-1}\choose{d-1}$}
 (the {\bf Hilbert polynomial}) for $s \ge N$.
 @end tex
 @ifinfo
-Let M =(+) M_i be a graded module over K[x_1,...,x_n].
+Let M =(+) M_i be a graded module over K[x_1,...,x_n] with
+respect to weights (w_1,..w_n).
 The Hilbert function of M H_M is defined by
 @display
 H_M(k)=dim_K M_k.
@@ -130,7 +133,8 @@ The Hilbert-Poincare series  of M is the power series
 @display
 HP_M(t)=sum_i dim_K (M_i)*t^i.
 @end display
-It turns out that HP_M(t) can be written in two useful ways:
+It turns out that HP_M(t) can be written in two useful ways
+for weights $(1,..,1)$:
 @display
 H_M(t)=Q(t)/(1-t)^n=P(t)/(1-t)^dim(M).
 @end display
@@ -143,6 +147,23 @@ H_M(s)=sum_(k=0)^N a_k binomial(d+s-k-1,d-1) (the Hilbert polynomial)
 @end display
 for s >= N.
 @end ifinfo
+@*
+@*
+@tex
+Generalizing these to quasihomogeneous modules we get
+$$\hbox{HP}_M(t)={Q(t)\over {\Pi_{i=1}^n(1-t^{w_i})}}$$
+where $Q(t)$ is a polynomial in ${\bf Z}[t]$.
+$Q(t)$ is called the {\bf first (weighted) Hilbert series} of M.
+@end tex
+@ifinfo
+Generalizing these to quasihomogeneous modules we get
+@display
+H_M(t)=Q(t)/Prod((1-t)^(w_i)).
+@end display
+where Q(t) is a polynomial in Z[t].
+Q(t) is called the first (weighted) Hilbert series of M.
+@end ifinfo
+
 @c ---------------------------------------------------------------------------
 @node Syzygies and resolutions, Characteristic sets, Hilbert function, Mathematical background
 @section Syzygies and resolutions
