@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.33 1998-04-23 10:17:03 schmidt Exp $
+// $Id: clapsing.cc,v 1.34 1998-04-24 17:19:29 schmidt Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -26,7 +26,7 @@
 
 // FACTORY_GCD_TEST: use new gcd instead of old one.
 // FACTORY_GCD_STAT: print statistics on polynomials.  Works only
-//   with appropriately translated new gcd.
+//   with the file `gcd_stat.cc' and `gcd_stat.h'.
 // FACTORY_GCD_TIMING: accumulate time used for gcd calculations.
 //   Time may be printed (and reset) with `system("gcdtime");'.
 //   For tis define, `timing.h' from the factory source directory
@@ -40,7 +40,14 @@
 //   `FACTORY_GCD_DEBOUT' is off.
 
 #ifdef FACTORY_GCD_STAT
-#define FACTORY_GCD_TEST
+#include "gcd_stat.h"
+#define FACTORY_GCDSTAT( tag, f, g, d ) \
+  printGcdStat( tag, f, g, d, rPar( currRing ) == 1 )
+#define FACTORY_CONTSTAT( tag, f ) \
+  printContStat( tag, f, rPar( currRing ) == 1 )
+#else
+#define FACTORY_GCDSTAT( tag, f, g, d )
+#define FACTORY_CONTSTAT( tag, f )
 #endif
 
 #ifdef FACTORY_GCD_TIMING
@@ -410,18 +417,23 @@ void singclap_divide_content ( poly f )
       h = convSingTrClapP( ((lnumber)pGetCoeff(p))->z );
       p = pNext( p );
 #ifdef FACTORY_GCD_STAT
-      fprintf( stderr, "cont:\t" );
+      // save g
+      CanonicalForm gOld = g;
 #endif
+
 #ifdef FACTORY_GCD_TEST
       g = CFPrimitiveGcdUtil::gcd( g, h );
 #else
       g = gcd( g, h );
 #endif
+
+      FACTORY_GCDSTAT( "cont", gOld, h, g );
       FACTORY_CFTROUT( "g = ", g );
       L.append( h );
     }
     TIMING_END( contentTimer );
     FACTORY_CFTROUT( "C = ", g );
+    FACTORY_CONTSTAT( "CONT", g );
     if ( g == 1 )
     {
       pTest(f);
@@ -980,10 +992,6 @@ alg singclap_alglcm ( alg f, alg g )
  else               setCharacteristic( -nGetChar() );
  alg res;
 
-#ifdef FACTORY_GCD_STAT
- fprintf( stderr, "algLcm:\t" );
-#endif
-
  if (currRing->minpoly!=NULL)
  {
    CanonicalForm mipo=convSingTrClapP(((lnumber)currRing->minpoly)->z);
@@ -1037,10 +1045,6 @@ void singclap_algdividecontent ( alg f, alg g, alg &ff, alg &gg )
  if (nGetChar()==1) setCharacteristic( 0 );
  else               setCharacteristic( -nGetChar() );
  ff=gg=NULL;
-
-#ifdef FACTORY_GCD_STAT
- fprintf( stderr, "alCont:\t" );
-#endif
 
  if (currRing->minpoly!=NULL)
  {
