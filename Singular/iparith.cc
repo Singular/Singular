@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.171 1999-08-18 14:31:41 siebert Exp $ */
+/* $Id: iparith.cc,v 1.172 1999-08-19 11:28:08 obachman Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1875,7 +1875,7 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
     (!idHomIdeal (u_id,NULL)))
     {
        WerrorS
-       ("`lres` can not be called in q ring or with inhomogeneous input");
+       ("`lres` not implemented for inhomogeneous input or qring");
        return TRUE;
     }
     r=syLaScala3(u_id,&dummy);
