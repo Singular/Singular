@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: start.doc,v 1.28 1998-07-09 07:39:11 Singular Exp $
+@comment $Id: start.doc,v 1.29 1998-07-27 11:31:19 Singular Exp $
 @comment this file contains the "Introduction" chapter.
 @c * wichmann: + added chages by GMG.
 
@@ -22,14 +22,28 @@
 @end ignore
 
 
+@ifset singularmanual
 @menu
 * Background::
 * How to use this manual::
 * Getting started::
 @end menu
+@end ifset
+@ifclear singularmanual
+@menu
+* Background::
+* How to use this tutorial::
+* Getting started::
+@end menu
+@end ifclear
 
 @c ------------------------------------------------------------------
+@ifset singularmanual
 @node Background, How to use this manual, Introduction, Introduction
+@end ifset
+@ifclear singularmanual
+@node Background, How to use this tutorial, Introduction, Introduction
+@end ifclear
 @section Background
 @cindex Background
 
@@ -90,9 +104,16 @@ libraries for primary decomposition, ring normalization, etc.
 @c of systems of polynomial equations.
 
 @c ------------------------------------------------------------------
+@ifset singularmanual
 @node How to use this manual, Getting started, Background, Introduction
 @section How to use this manual
 @cindex How to use this manual
+@end ifset
+@ifclear singularmanual
+@node How to use this tutorial, Getting started, Background, Introduction
+@section How to use this tutorial
+@cindex How to use this tutorial
+@end ifclear
 
 @ifset singularmanual
 @subsubheading For the impatient user
@@ -221,7 +242,12 @@ get the previous input line)
 @end itemize
 
 @c ------------------------------------------------------------------
+@ifset singularmanual
 @node Getting started,  , How to use this manual, Introduction
+@end ifset
+@ifclear singularmanual
+@node Getting started,  , How to use this tutorial, Introduction
+@end ifclear
 @section Getting started
 @cindex Getting started
 
@@ -415,9 +441,9 @@ ordering @code{dp}.
 characteristic 32003, variable names @code{a}, @code{b}, @code{c},
 @code{d} and lexicographical ordering.
 
-@item ring r3=7,(x(1..10)),ls;
+@item ring r3=7,(x(1..10)),ds;
 characteristic 7, variable names @code{x(1)},@dots{},@code{x(10)}, negative
-lexicographical ordering.
+degree revers lexicographical ordering (@code{ds}).
 
 @item ring r4=(0,a),(mu,nu),lp;
 transcendental extension of @math{Q} by @math{a}, variable names
@@ -478,7 +504,6 @@ with respect to the monomial ordering of the basering.
 
 @example
 poly f =  x3+y3+(x-y)*x2y2+z2;
-poly g =  f^2 *(2x-y);
 f;
 @expansion{} x3y2-x2y3+x3+y3+z2
 @end example
@@ -499,6 +524,7 @@ coordinates of the point for the ring variables, and check if the result
 is zero:
 
 @example
+poly g =  f^2 *(2x-y);
 ideal I = f,g;
 ideal J= subst(I,var(1),1);
 J = subst(J,var(2),2);

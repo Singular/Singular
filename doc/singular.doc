@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.49 1998-07-20 16:50:18 Singular Exp $
+@comment $Id: singular.doc,v 1.50 1998-07-27 11:31:18 Singular Exp $
 @comment this file contains the main structure of the manual
 @c ------------------------
 @comment %**start of header
@@ -52,7 +52,7 @@ this is the texinfo file describing Singular (version @value{VERSION})
 @c ----------------------------------------------------------------------------
 @node Top, Preface, (dir), (dir)
 @ifinfo
-@c @manual 
+@c @manual
 @c q:quit, m:menu item, n:next node, p:previous node, u:up, g:goto node
 @c @end manual
 @sp 1
@@ -478,7 +478,7 @@ the ideal (resp.@: module).
 @sc{Singular} computes in a quotient rings as long as possible with the
 given representative of a polynomial, say, @code{f}.  I.e., it usually
 does not reduce @code{f} w.r.t. the quotient ideal.  This is only done
-when necessary 
+when necessary
 during standard bases computations or by an explicit reduction using
 the command @code{reduce(f, std(0))} (@pxref{reduce}).
 
