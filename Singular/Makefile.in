@@ -31,13 +31,13 @@ includedir	= @includedir@
 ##
 CC		= @CC@
 CXX		= @CXX@
-INSTALL		= @INSTALL@
-INSTALL_DATA	= @INSTALL_DATA@
-INSTALL_PROGRAM = @INSTALL_PROGRAM@
-MKINSTALLDIRS   = @MKINSTALLDIRS@
 BISON		= bison
 LEX		= flex
 @SET_MAKE@
+INSTALL		= ./install-sh -c
+INSTALL_PROGRAM	= ${INSTALL}
+INSTALL_DATA	= ${INSTALL} -m 644
+MKINSTALLDIRS   = ./mkinstalldirs
 
 ##
 ## compiler and linker options

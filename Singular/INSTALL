@@ -147,7 +147,7 @@ Singular's configure script pays attention to the following
                factorizations. Requires that libsingcf.a, factory.h
                and the factory template files are installed on your
                system. If these files are not found, then Singular is
-               built without factory, and polynomail factorization
+               built without factory, and polynomial factorization
                routines are disabled.
 
   'libfac'   : Uses the libfac library for characteristic set
@@ -161,7 +161,7 @@ options were given and searches through the given includedir and the
 system's default include directories for header files, and through the
 given libdir and through the system's default library directory for
 the library files. If one of the requirements for a PACKAGE is not
-met, Singular, configure prints a warning message and builds Singular
+met, configure prints a warning message and builds Singular
 without the respective PACKAGE, disabling its functionality. To
 explicitly built Singular without one of the above PACKAGEs, give
 configure (an) appropriate '--without-PACKAGE' option(s). See the

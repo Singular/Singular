@@ -103,14 +103,6 @@ if test -n "$INFO"; then
 fi
 
   
-dnl programs for installation
-ac_save_path=${PATH}
-PATH="$PATH:.."  
-AC_PROG_INSTALL
-AC_PATH_PROG(MKINSTALLDIRS, mkinstalldirs, -mkdir)
-PATH="$ac_save_path"
-
-
 dnl
 dnl CHECK --without arguments
 dnl
@@ -226,7 +218,7 @@ if test "$with_MP" != no; then
     AC_CHECK_HEADERS(MP.h MPT.h)
     if test "$ac_cv_lib_MPT_MPT_GetTree" = yes && \
      test "$ac_cv_header_MP_h" = yes && \
-     test "$ac_cv_lib_MP_MP_OpenLink" = yes && \
+     test "$ac_cv_lib_MP_IMP_PutGmpInt" = yes && \
      test "$ac_cv_header_MPT_h" = yes; then
       AC_DEFINE(HAVE_MPSR)
       NEED_LIBS="-lMPT -lMP ${NEED_LIBS}"
