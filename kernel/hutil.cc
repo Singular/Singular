@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hutil.cc,v 1.2 2004-01-21 09:09:12 Singular Exp $ */
+/* $Id: hutil.cc,v 1.3 2004-10-28 14:16:27 Singular Exp $ */
 /*
 * ABSTRACT: Utilities for staircase operations
 */
@@ -140,7 +140,7 @@ void hDelete(scfmon ev, int ev_length)
   if (ev_length>0)
   {
     for (i=ev_length-1;i>=0;i--)
-      omFreeSize(hsecure[i],(pVariables+1)*sizeof(Exponent_t));
+      omFreeSize(hsecure[i],(pVariables+1)*sizeof(int));
     omFreeSize(hsecure, ev_length*sizeof(scmon));
     omFreeSize(ev,  ev_length*sizeof(scmon));
   }
