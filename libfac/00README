@@ -1,29 +1,51 @@
-This is the file 00README.libfac for version 0.3.0 of libfac.
+This is the file 00README.libfac for version 0.3.2 of Singular-libfac.
 
 ######### What is Singular-libfac?
-libfac is an extension to Singular-factory (see the factory documentation for
-details about factory and what it does; look at REQUIREMENTS how to get
-factory), 
+Singular-libfac is an extension to Singular-factory
+(see the Singular-factory documentation for details about Singular-factory
+and what it does; look at REQUIREMENTS how to get Singular-factory), 
 which implements factorization of polynomials over finite fields and algorithms
 for manipulation of polynomial ideals via the characteristic set methods 
 (e.g., calculating the characteristic set and the irreducible characteristic 
 series).
 
-Note: libfac is just beta-code (as long version is < 1.0.0). There are bugs, I 
-think. Please help to test this code! Submit a bug-report if you found a bug!
+Note: Singular-libfac is just beta-code (as long version is < 1.0.0).
+There are bugs, I think. Please help to test this code!
+Submit a bug-report if you found a bug!
 
 ######### Copyright #####################
-This software is copyrighted by Michael Messollen <michael@math.uni-sb.de>.
+This software is copyrighted by Michael Messollen <mmessollen@web.de>.
     (c) 1996 Michael Messollen <michael@math.uni-sb.de>
+    (c) 2000 Michael Messollen <mmessollen@web.de>
 
-For detail see the file COPYING    
+This software is copyrighted but you are allowed to distribute it freely in its
+unmodified version (as source or binary), as long as this copyright notice 
+accompanies your distribution.
+If you modify the sources of this software, you are allowed to distribute this
+modified version, as long as this copyright notice accompanies your 
+distribution and you state anywhere in this copyright notice that you modified
+this version of the software.
 
-The authors of Macaulay2 and Singular are allowed to distribute the sources
-with their source code of the respective programs.
+But be aware: USE THIS SOFTWARE AT YOUR OWN RISK (SEE DISCLAIMER) !
+
+######### DISCLAIMER #####################
+
+  IN NO EVENT SHALL THE AUTHOR OR DISTRIBUTORS BE LIABLE TO ANY PARTY
+  FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES
+  ARISING OUT OF THE USE OF THIS SOFTWARE, ITS DOCUMENTATION, OR ANY
+  DERIVATIVES THEREOF, EVEN IF THE AUTHOR HAS BEEN ADVISED OF THE
+  POSSIBILITY OF SUCH DAMAGE.
+
+  THE AUTHOR AND DISTRIBUTORS SPECIFICALLY DISCLAIM ANY WARRANTIES,
+  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE
+  IS PROVIDED ON AN "AS IS" BASIS, AND THE AUTHOR AND DISTRIBUTORS HAVE
+  NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
+  MODIFICATIONS.
 
 ######### REQUIREMENTS ###################
-* You need the library factory, which is part of Singular, to compile this 
-  code. Get it from 
+* You need the library Singular-factory, which is part of Singular, to compile
+this code. Get it from 
   ftp://www.mathematik.uni-kl.de/pub/Math/Singular/Factory  or
   http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/Factory
   
@@ -53,15 +75,16 @@ B) Using Makefile.dist
 **** Get an earlier version and patch Makefile.dist for your needs, ****
 **** or, better, use configure.
 
- If you have found a bug (beside the KNOWN BUGS, see KNOWN BUGS section later),
-*please* email me: michael@math.uni-sb.de or singular@mathematik.uni-kl.de
+
+ If you have found a bug in an unmodified version (beside the KNOWN BUGS, see 
+KNOWN BUGS section later), *please* email me: mmessollen@web.de
 Please include the characteristic and the ideal(s)/polynomial(s) you tried as
 well as the factoryversion you used (Best to include all your input!).
 
-Please allow some days for an answer.
+As I am no longer at the university, please allow some days for an answer.
 
 Have fun!
- Michael Messollen ( michael@math.uni-sb.de )
+ Michael Messollen ( mmessollen@web.de )
 
 ##### 
 I would like to thank Dongming Wang <Dongming.Wang@imag.fr> who showed me the 
@@ -81,7 +104,7 @@ o The  irreducible characteristic series stuff doesn't work for some problems.
   You will get a warning:
          "Factorization over algebraic function field required!"
   if this program needs factorization over an algebraic function field, which
-  is not yet implemented.
+  is not yet implemented (but I'm working on it).
   Don't trust the result you'll get in such a case!!!!!!
 Since version 0.3.0 this problem is gone. (or should be :-) )
 
@@ -104,11 +127,14 @@ respective program, if and how this is incorporated.
 
 o Factorization is slow for large polynomials. There are mainly two reasons
   for this:
-   a) the factorization algorithm is shipped with no "tricks" yet.
+   a) the factorization algorithm is shipped with no "tricks" yet. (I'm working
+      on that, but it heavily depends on b) )
    b) factory has an extremely slow GCD-algorithm for the case of 
-      characteristic  p>0
+      characteristic  p>0 ( people are working on it )
   There will be a quite different, faster factorization algorithm in the 
   future.
+
+Problems will be fixed in a later version of libfac .
 
 ######### Changes:
 Version coding scheme: major.minor.bugfixnumber
@@ -198,3 +224,9 @@ V0.3.0b o implemented Tragers algorithm; this is now the default used in
           for char=p there seems to be an internal factory memory-problem in
           some cases
         o released Sep 11 1997
+
+V0.3.1  o now ready for cygwin32
+	o released Jan 15 1998
+
+V0.3.2	o New Copyright
+	o released Jan 31 2001
