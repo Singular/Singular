@@ -1,8 +1,12 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fac_univar.cc,v 1.3 1996-06-26 13:17:03 stobbe Exp $
+// $Id: fac_univar.cc,v 1.4 1996-07-12 08:37:20 stobbe Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.3  1996/06/26 13:17:03  stobbe
+"ZFactorizeUnivariate: now handles the sign of the argument right.
+"
+
 Revision 1.2  1996/06/13 10:43:49  stobbe
 "ZFactorizeUnivariate: fix to last bug fix (no assignment)
 "
@@ -381,6 +385,7 @@ ZFactorizeUnivariate( const CanonicalForm& ff, bool issqrfree )
 	H = sqrFree( g );
     for ( J = H; J.hasItem(); ++J ) {
 	f = J.getItem().factor();
+	if ( f.inCoeffDomain() ) continue;
 	n = f.degree() / 2 + 1;
 	if ( D != 0 ) {
 	    delete [] D;
@@ -550,7 +555,7 @@ ZFactorizeUnivariate( const CanonicalForm& ff, bool issqrfree )
 	ZF.removeFirst();
     if ( lc( ff ).sign() < 0 )
 	ZF.insert( CFFactor( -cont, 1 ) );
-    else  if ( ! cont.isOne() )
+    else
 	ZF.insert( CFFactor( cont, 1 ) );
     if ( D != 0 ) {
 	delete [] D;
