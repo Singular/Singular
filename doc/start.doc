@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: start.doc,v 1.29 1998-07-27 11:31:19 Singular Exp $
+@comment $Id: start.doc,v 1.30 1998-07-28 12:04:01 Singular Exp $
 @comment this file contains the "Introduction" chapter.
 @c * wichmann: + added chages by GMG.
 
@@ -48,7 +48,7 @@
 @cindex Background
 
 @sc{Singular} is a Computer Algebra system for polynomial
-computations with emphasize on the special needs of commutative
+computations with emphasis on the special needs of commutative
 algebra, algebraic geometry, and singularity theory.
 
 @sc{Singular}'s main computational objects are ideals and
@@ -58,7 +58,7 @@ rationals, floats, algebraic extensions, transcendental extensions) or
 quotient rings with respect to an ideal.
 
 @sc{Singular} features one of the fastest and most general
-implementation of various algorithms for computing Groebner
+implementations of various algorithms for computing Groebner
 resp.@: standard bases. The implementation includes Buchberger's algorithm
 (if the ordering is a wellordering) and Mora's algorithm (if the
 ordering is a tangent cone ordering) as special cases.  Furthermore, it
@@ -123,9 +123,12 @@ step-by-step manner to introduce into @sc{Singular}.
 
 @ref{Examples} should come next for real learning-by-doing or to quickly
 solve some given mathematical problems without dwelling to deeply into
-@sc{Singular}.  This chapter contains a lot of real-life examples and
+@sc{Singular}. 
+@ifset singularmanual
+This chapter contains a lot of real-life examples and
 detailed instructions and explanations on how to solve mathematical
 problems using @sc{Singular}.
+@end ifset
 
 @c ------------------------------------------------------------------------
 @ifset singularmanual
@@ -244,11 +247,12 @@ get the previous input line)
 @c ------------------------------------------------------------------
 @ifset singularmanual
 @node Getting started,  , How to use this manual, Introduction
+@section Getting started
 @end ifset
 @ifclear singularmanual
 @node Getting started,  , How to use this tutorial, Introduction
+@chapter Getting started
 @end ifclear
-@section Getting started
 @cindex Getting started
 
 @sc{Singular} is a special purpose system for polynomial
@@ -270,10 +274,15 @@ are available without a ring.
 
 @c ------------------------------------------------------------------
 @node First steps, Rings and standard bases, Getting started, Getting started
+@ifset singularmanual
 @subsection First steps
+@end ifset
+@ifclear singularmanual
+@section First steps
+@end ifclear
 @cindex First steps
 
-Once @sc{Singular} is started, it attends an input after the prompt
+Once @sc{Singular} is started, it awaits an input after the prompt
 @code{>}.  Every statement has to be terminated by @code{;} .
 
 @example
@@ -299,7 +308,7 @@ k != 2;
 @expansion{} 0
 @end example
 
-@noindent The value of an object is displayed by simply typing its name
+@noindent The value of an object is displayed by simply typing its name.
 
 @example
 k;
@@ -324,11 +333,11 @@ with the special symbol @code{_} .
 
 Text starting with @code{//} denotes a comment and is ignored in
 calculations, as seen in the previous example. Furthermore @sc{Singular}
-maintains a history of the last inputs, which may be accessed by
+maintains a history of the previous lines of input, which may be accessed by
 @code{CTRL-P} (previous) and @code{CTRL-N} (next) or the arrows on the
 keyboard. Note, that the history is not available on Macintosh systems.
 
-The whole manual is online available with the command @code{help;} .
+The whole manual is available online by typing the command @code{help;} .
 Explanation on single topics, e.g., on @code{intmat}, which defines a
 matrix of integers, are obtained by
 
@@ -337,7 +346,7 @@ help intmat;
 @end example
 
 @ifset singularmanual
-@noindent This shows the text from @ref{intmat}, in the printed manual.
+@noindent This shows the text of @ref{intmat}, in the printed manual.
 @end ifset
 @ifclear singularmanual
 @noindent This shows the text from node @code{intmat}, in the printed manual.
@@ -350,14 +359,14 @@ $3 \times 3$
 @ifinfo
 3 x 3
 @end ifinfo
-matrix of integers and initialize it with some values, row-wise
+matrix of integers and initialize it with some values, row by row
 from left to right:
 
 @example
 intmat m[3][3] = 1,2,3,4,5,6,7,8,9;
 @end example
 
-@noindent A single matrix entry may be selected and changed with the
+@noindent A single matrix entry may be selected and changed using
 square brackets @code{[} and @code{]}.
 
 @example
@@ -374,7 +383,7 @@ end of a block. If you define a variable without giving an initial
 value, as the variable @code{tr} in the example below, @sc{Singular}
 assigns a default value for the specific type. In this case, the default
 value for integers is @code{0}. Note, that the integer variable @code{j}
-is defined above.
+has already been defined above.
 
 @example
 int tr;
@@ -395,7 +404,7 @@ is especially useful to define new rings inside procedures.
 "example for strings:";
 @expansion{} example for strings:
 string s="The element of m ";
-s = s + "at position [3,2] is:";  // concatenation
+s = s + "at position [2,3] is:";  // concatenation of strings by +
 s , m[2,3] , ".";
 @expansion{} The element of m at position [3,2] is: 6 .
 s="m[2,1]=0; m;";
@@ -411,7 +420,12 @@ this list and prints all results separated by spaces.
 
 @c ------------------------------------------------------------------
 @node Rings and standard bases, Procedures and libraries, First steps, Getting started
+@ifset singularmanual
 @subsection Rings and standard bases
+@end ifset
+@ifclear singularmanual
+@section Rings and standard bases
+@end ifclear
 @cindex Rings and standard bases
 
 To calculate with objects as ideals, matrices, modules, and polynomial
@@ -427,7 +441,7 @@ ring variables, and the third part determines the monomial ordering to
 be used. So the example above declares a polynomial ring called @code{r}
 with a ground field of characteristic @math{0} (i.e., the rational
 numbers) and ring variables called @code{x}, @code{y}, and @code{z}. The
-@code{dp} at the end means, that the degree reverse lexicographical
+@code{dp} at the end means that the degree reverse lexicographical
 ordering should be used.
 
 Other ring declarations:
@@ -537,7 +551,7 @@ J;
 @noindent Since the result is not zero, the point @code{(1,2,0)} does
 not lye on the variety @code{V(f,g)}.
 
-Another question is to decide wether some function vanishes on a
+Another question is to decide whether some function vanishes on a
 variety, or in algebraic terms if a polynomial is contained in a given
 ideal. For this we calculate a standard basis using the command
 @code{groebner} and afterwards reduce the polynomial with respect to
@@ -549,11 +563,11 @@ reduce(g,sI);
 @expansion{} 0
 @end example
 
-@noindent As the result is @code{0} the polynomial @code{f} belongs to the
-ideal defined by @code{g}.
+@noindent As the result is @code{0} the polynomial @code{g} belongs to the
+ideal defined by @code{f}.
 
 The function @code{groebner}, like many other functions in
-@sc{Singular}, prints a protocol during calculation, if you want so. The
+@sc{Singular}, prints a protocol during calculation, if desired. The
 command @code{option(prot);} enables protocoling whereas
 @code{option(noprot);} turns it off.
 @ifset singularmanual
@@ -562,7 +576,8 @@ of the different symbols printed during calculation.
 @end ifset
 
 The command @code{kbase} calculates a basis of the polynomial ring
-modulo an ideal. As an example we calculate the Milnor number of a
+modulo an ideal, if the quotient ring is finite dimensional. 
+As an example we calculate the Milnor number of a
 hypersurface singularity in the global and local case. This is the
 vector space dimension of the polynomial ring modulo the Jacobian ideal
 in the global case resp.@: of the power series ring modulo the Jacobian
@@ -581,10 +596,10 @@ J;
 @end example
 
 @noindent @sc{Singular} prints the line @code{// ** redefining J
-**}. That means, that we previously have defined a variable with name
+**}. This indicates that we have previously defined a variable with name
 @code{J} of type ideal (see above).
 
-To get a representing set of the quotient vectorspace first we
+To obtain a representing set of the quotient vectorspace we first
 calculate a standard basis, then we apply the function @code{kbase} to
 this standard basis.
 
@@ -620,8 +635,9 @@ $K[x,y,z]/\hbox{\rm jacob}(f)$.
 @ifinfo
 K[x,y,z]/jacob(f).
 @end ifinfo
-As in @sc{Singular} the functions may take directly the input from
-earlier calculations, all may be written together in one single statement.
+As in @sc{Singular} the functions may take the input directly from
+earlier calculations, the whole sequence of commands may be written 
+in one single statement.
 
 @example
 size(kbase(groebner(jacob(f))));
@@ -639,14 +655,19 @@ vdim(groebner(jacob(f)));
 
 @c ------------------------------------------------------------------
 @node Procedures and libraries, Change of rings, Rings and standard bases, Getting started
+@ifset singularmanual
 @subsection Procedures and libraries
+@end ifset
+@ifclear singularmanual
+@section Procedures and libraries
+@end ifclear
 @cindex Procedures and libraries
 
-@sc{Singular} offers a comfortable programming language, with syntax
+@sc{Singular} offers a comfortable programming language, with a syntax
 close to C. So it is possible to define procedures which collect several
 commands to a new one. Procedures are defined with the keyword
 @code{proc} followed by a name and an optional parameter list with
-specified types.  Finally, a procedure may return values with the
+specified types.  Finally, a procedure may return values using the
 command @code{return}.
 
 Define the following procedure called @code{Milnor}:
@@ -675,7 +696,8 @@ Milnor(f);
 @noindent Note, that the result may depend on the basering as we will
 see in the next chapter.
 
-With @sc{Singular} come several libraries, a collection of useful
+The distribution of  @sc{Singular} contains  several libraries, each of 
+which is a collection of useful
 procedures based on the kernel commands, which extend the functionality
 of @sc{Singular}. The command @code{help "all.lib";} lists all libraries
 together with a one-line explanation.
@@ -685,7 +707,7 @@ together with a one-line explanation.
 @c library has been loaded. The command @code{LIB "all.lib";} loads all
 @c libraries.
 
-One of these libraries is @code{sing.lib} which contains already a
+One of these libraries is @code{sing.lib} which already contains a
 procedure called @code{milnor} to calculate the Milnor number not only
 for hypersurfaces but more generally for complete intersection
 singularities.
@@ -698,8 +720,8 @@ which we omit here.
 LIB "sing.lib";
 @end example
 
-As all input in @sc{Singular} is case sensitiv, there is no conflict with
-the previous  defined @code{proc Milnor} but the result is the same.
+As all input in @sc{Singular} is case sensitive, there is no conflict with
+the previously  defined procedure @code{Milnor}, but the result is the same.
 
 @example
 milnor(f);
@@ -707,7 +729,7 @@ milnor(f);
 @end example
 
 The procedures in a library have a help part
-which is shown with
+which is displayed by typing 
 
 @example
 help milnor;
@@ -722,7 +744,7 @@ help milnor;
 @c @expansion{}
 @end example
 
-@noindent as well as some examples, which are executed with
+@noindent as well as some examples, which are executed by
 
 @example
 example milnor;
@@ -742,8 +764,9 @@ example milnor;
 @c @expansion{}
 @end example
 
-@noindent Likewise the library itself has a help part, to show all the functions
-available for the user defined in the library.
+@noindent Likewise, the library itself has a help part, to show a list of 
+all the functions
+available for the user which are contained in the library.
 
 @example
 help sing.lib;
@@ -753,7 +776,12 @@ help sing.lib;
 
 @c ------------------------------------------------------------------
 @node Change of rings, Modules and their annihilator, Procedures and libraries, Getting started
+@ifset singularmanual
 @subsection Change of rings
+@end ifset
+@ifclear singularmanual
+@section Change of rings
+@end ifclear
 @cindex Change of rings
 
 To calculate the local Milnor number we have to do the calculation with the
@@ -790,7 +818,7 @@ this will be explained in @ref{map}.
 The most general way to fetch data from one ring to another is to use maps.
 @end ifclear
 
-Here the terms are ordered by increasing exponents. The local Milnor
+In this ring the terms are ordered by increasing exponents. The local Milnor
 number is now
 
 @example
@@ -801,15 +829,15 @@ Milnor(f);
 This shows that @code{f} has outside the origin in affine 3-space
 singularities with local Milnor number adding up to
 @tex
-$28-4=3$.
+$12-4=8$.
 @end tex
 @ifinfo
-28-4=3.
+12-4=8.
 @end ifinfo
 Using global and local orderings as above is a convenient way to check
-wether a variety has outside the origin a singularity or not.
+whether a variety has singularities outside the origin.
 
-The command @code{jacob} applied twice gives the Hessian of @code{f} a
+The command @code{jacob} applied twice gives the Hessian of @code{f}, a
 @tex
 $3\times3$-matrix.
 @end tex
@@ -860,9 +888,9 @@ $1\times1$-minors
 @ifinfo
 1 x 1 - minors
 @end ifinfo
-is empty. With the command @code{option} the algorithm of the standard
-basis may be affected. For instance a reduced standard basis is obtained
-in the following way
+is empty. The algorithm of the standard basis computations may be 
+affected by the command @code{option}. For instance, a reduced standard 
+basis is obtained in the following way
 
 @example
 option(redSB);
@@ -889,12 +917,17 @@ hence the variety is empty.
 
 @c ------------------------------------------------------------------
 @node Modules and their annihilator, Resolution, Change of rings, Getting started
+@ifset singularmanual
 @subsection Modules and their annihilator
+@end ifset
+@ifclear singularmanual
+@section Modules and their annihilator
+@end ifclear
 @cindex Modules and and their annihilator
 
-We shall give now three more advanced examples.
+Now we shall give now three more advanced examples.
 
-@sc{Singular} is able to calculate with modules over all the rings,
+@sc{Singular} is able to handle modules over all the rings,
 which can be defined as a basering. A free module of rank @code{n}
 is defined as follows:
 
@@ -918,7 +951,8 @@ print(freemodule(4));
 To define a module, we give a list of vectors generating a submodule of
 a free module. Then this set of vectors may be identified with the
 columns of a matrix.  For that reason in @sc{Singular} matrices and
-modules may be interchanged.
+modules may be interchanged. However, the representation is different
+(modules may be considered as sparse represented matrices). 
 
 @example
 ring r =0,(x,y,z),dp;
@@ -930,7 +964,7 @@ print(MM);
 @expansion{} x,-y
 @end example
 
-The submodule @math{MD} may, however, be also considered as the module
+However the submodule @math{MD} may also be considered as the module
 of relations of the factor module
 @tex
 $r^3/MD$.
@@ -938,7 +972,7 @@ $r^3/MD$.
 @ifinfo
 r^3/MD.
 @end ifinfo
-In this way @sc{Singular} can treat arbitrary finitely generated modules
+In this way, @sc{Singular} can treat arbitrary finitely generated modules
 over the
 @ifset singularmanual
 basering (@pxref{Representation of mathematical objects}).
@@ -955,7 +989,7 @@ syz(MD);
 @expansion{} _[1]=x*gen(2)+y*gen(1)
 @end example
 
-We want to calculate as application the annihilator of a given module.
+We want to calculate, as an application, the annihilator of a given module.
 Let
 @tex
 $M = r^3/U$,
@@ -1002,13 +1036,18 @@ quotient(U,freemodule(nrows(U)));
 
 @c ------------------------------------------------------------------
 @node Resolution,  , Modules and their annihilator, Getting started
+@ifset singularmanual
 @subsection Resolution
+@end ifset
+@ifclear singularmanual
+@section Resolution
+@end ifclear
 @cindex Resolution
 
-The corresponding commands in @sc{Singular} are first the command
-@code{mres( ,n)} which calculates a minimal free resolution with the
-standard basis method up to the length @math{n}, where @math{n=0} means
-the full resolution.
+There are several commands in @sc{Singular} for computing free resolutions.
+The command @code{mres(... ,n)}, for example, calculates a minimal free 
+resolution with the standard basis method up to the length @math{n}, 
+where @math{n=0} corresponds to the full resolution.
 
 Here we use the possibility to inspect the calculation process using the
 option @code{prot}.
@@ -1071,3 +1110,8 @@ print(rs[3]);
 @expansion{} -2z,  x-y+4z,
 @expansion{} -z,   -y+3z
 @end example
+
+
+
+
+
