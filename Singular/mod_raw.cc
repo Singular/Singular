@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mod_raw.cc,v 1.7 2000-03-08 15:02:42 obachman Exp $ */
+/* $Id: mod_raw.cc,v 1.8 2000-05-23 13:10:10 Singular Exp $ */
 /*
  * ABSTRACT: machine depend code for dynamic modules
  *
@@ -12,6 +12,12 @@
 */
 
 #include "mod2.h"
+#include "static.h"
+#ifdef HAVE_STATIC
+#undef HAVE_DYNAMIC_LOADING
+#undef HAVE_DYN_RL
+#endif
+
 #if defined(HAVE_DYNAMIC_LOADING) || defined(HAVE_DYN_RL)
 #include "mod_raw.h"
 

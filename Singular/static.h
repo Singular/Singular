@@ -1,2 +1,2 @@
-#undef HAVE_STATIC
+#define HAVE_STATIC
 
