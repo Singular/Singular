@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys0.cc,v 1.18 2000-11-28 11:50:56 obachman Exp $ */
+/* $Id: polys0.cc,v 1.19 2000-12-06 12:38:30 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to convert polynomials to strings
@@ -25,24 +25,24 @@ static void writemon(poly p, int ko, ring r)
   BOOLEAN wroteCoef=FALSE,writeGen=FALSE;
 
   if (pGetCoeff(p)!=NULL)
-    nNormalize(pGetCoeff(p));
+    n_Normalize(pGetCoeff(p),r);
 
   if (((p_GetComp(p,r) == (short)ko)
     &&(p_LmIsConstantComp(p, r)))
-  || ((!nIsOne(pGetCoeff(p)))
-    && (!nIsMOne(pGetCoeff(p)))
+  || ((!n_IsOne(pGetCoeff(p),r))
+    && (!n_IsMOne(pGetCoeff(p),r))
   )
   )
   {
-    nWrite(p->coef);
+    n_Write(p->coef,r);
     wroteCoef=(rShortOut(r) == FALSE ||(r->parameter!=NULL));
     writeGen=TRUE;
   }
-  else if (nIsMOne(pGetCoeff(p)))
+  else if (n_IsMOne(pGetCoeff(p),r))
   {
-    if (nGreaterZero(pGetCoeff(p)))
+    if (n_GreaterZero(pGetCoeff(p),r))
     {
-      nWrite(p->coef);
+      n_Write(p->coef,r);
       wroteCoef=(rShortOut(r) == FALSE ||(r->parameter!=NULL));
       writeGen=TRUE;
     }
@@ -91,7 +91,7 @@ char* p_String0(poly p, ring lmRing, ring tailRing)
     p = pNext(p);
     while (p!=NULL)
     {
-      if ((p->coef==NULL)||nGreaterZero(p->coef))
+      if ((p->coef==NULL)||n_GreaterZero(p->coef,tailRing))
         StringAppendS("+");
       writemon(p,0, tailRing);
       p = pNext(p);
@@ -112,7 +112,7 @@ char* p_String0(poly p, ring lmRing, ring tailRing)
     pIter(p);
     while ((p!=NULL) && (k == p_GetComp(p, tailRing)))
     {
-      if (nGreaterZero(p->coef)) StringAppendS("+");
+      if (n_GreaterZero(p->coef,tailRing)) StringAppendS("+");
       writemon(p,k,tailRing);
       pIter(p);
     }
