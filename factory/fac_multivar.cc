@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_multivar.cc,v 1.6 1997-06-19 12:23:25 schmidt Exp $ */
+/* $Id: fac_multivar.cc,v 1.7 1997-08-29 08:38:28 schmidt Exp $ */
 
 #include <config.h>
 
@@ -8,6 +8,7 @@
 #include "timing.h"
 
 #include "cf_defs.h"
+#include "cf_algorithm.h"
 #include "fac_multivar.h"
 #include "fac_univar.h"
 #include "cf_reval.h"

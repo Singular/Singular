@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.h,v 1.10 1997-07-31 13:04:37 schmidt Exp $ */
+/* $Id: canonicalform.h,v 1.11 1997-08-29 08:35:15 schmidt Exp $ */
 
 #ifndef INCL_CANONICALFORM_H
 #define INCL_CANONICALFORM_H
@@ -306,16 +306,6 @@ typedef List<CanonicalForm> CFList;
 typedef ListIterator<CanonicalForm> CFListIterator;
 typedef Array<CanonicalForm> CFArray;
 typedef Matrix<CanonicalForm> CFMatrix;
-
-CFFList sqrFree ( const CanonicalForm & f, bool sort );
-
-CFFList sqrFree( const CanonicalForm & f );
-
-bool isSqrFree( const CanonicalForm & f );
-
-CFFList factorize( const CanonicalForm & f, bool issqrfree = false );
-
-CFFList factorize( const CanonicalForm & f, const Variable & alpha );
 
 // calculate the determinant of the n'th minor of M
 

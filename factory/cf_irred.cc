@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_irred.cc,v 1.2 1997-06-19 12:24:26 schmidt Exp $ */
+/* $Id: cf_irred.cc,v 1.3 1997-08-29 08:38:25 schmidt Exp $ */
 
 #include <config.h>
 
@@ -7,6 +7,7 @@
 
 #include "cf_defs.h"
 #include "canonicalform.h"
+#include "cf_algorithm.h"
 #include "cf_random.h"
 
 static bool

@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_univar.cc,v 1.12 1997-07-31 13:36:22 schmidt Exp $ */
+/* $Id: fac_univar.cc,v 1.13 1997-08-29 08:38:32 schmidt Exp $ */
 
 #include <config.h>
 
@@ -10,6 +10,7 @@
 #include "timing.h"
 
 #include "cf_defs.h"
+#include "cf_algorithm.h"
 #include "fac_util.h"
 #include "fac_univar.h"
 #include "fac_cantzass.h"
