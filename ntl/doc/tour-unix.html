@@ -1,0 +1,407 @@
+<html>
+<head>
+<title>
+A Tour of NTL: Obtaining and Installing NTL for UNIX  </title>
+</head>
+
+<body bgcolor="#fff9e6">
+<center>
+<a href="tour-stdcxx.html"><img src="arrow1.gif" alt="[Previous]" align=bottom></a>
+ <a href="tour.html"><img src="arrow2.gif" alt="[Up]" align=bottom></a> 
+<a href="tour-win.html"> <img src="arrow3.gif" alt="[Next]" align=bottom></a>
+</center>
+
+<h1> 
+<p align=center>
+A Tour of NTL: Obtaining and Installing NTL for UNIX 
+</p>
+</h1>
+
+<p> <hr> <p>
+
+To obtain the source code and documentation for NTL,
+<a href="http://www.shoup.net/ntl/download.html">
+download <tt>ntl-xxx.tar.gz</tt></a>,
+placing it a directory, and then, working in this directory,
+do the following.
+Here, "<tt>xxx</tt>" denotes the current version number.
+
+<p>
+<b>Step 1.</b>
+Extract the source files by executing:
+<pre>
+   % gunzip ntl-xxx.tar.gz
+   % tar xvf ntl-xxx.tar
+</pre>
+
+<p>
+Note that this will unpack everything into a sub-directory <tt>ntl-xxx</tt>,
+creating this directory if necessary.
+Next:
+<pre>
+   % cd ntl-xxx
+   % ls
+</pre>
+You should see a file "<tt>README</tt>", and directories 
+"<tt>include</tt>", "<tt>doc</tt>", and "<tt>src</tt>".
+The directory "<tt>doc</tt>" contains all the documentation.
+The file "<tt>doc/tour.html</tt>" contains a copy of the on-line documentation.
+The directory "<tt>include</tt>" 
+contains all the header files within a subdirectory
+"<tt>include/NTL</tt>".
+The directory "<tt>src</tt>" contains everything else.
+Go there now:
+<pre>
+   % cd src
+</pre>
+
+<p>
+<b>Step 2.</b>
+Run the configuration script.
+
+<p>
+Execute the command
+<pre>
+   % ./configure [ variable=value ]...
+</pre>
+
+This configure script generates the file "<tt>makefile</tt>" and the file
+"<tt>../include/NTL/config.h</tt>", based upon the values assigned to the
+variables on the command line.
+
+
+<p>
+
+Here are the most important variables, and their default values.
+
+<p>
+<pre>
+   CC=gcc               # The C compiler
+   CXX=g++              # The C++ compiler
+   CFLAGS=-O2           # C complilation flags
+   CXXFLAGS=$(CFLAGS)   # C++ compilation flags (by default, same as CFLAGS)
+
+   PREFIX=/usr/local    # Directory in which to install NTL library components
+
+   NTL_STD_CXX=off      # ISO Mode switch
+
+   NTL_GMP_LIP=off      # Switch 'on' to enable the use of GMP as the primary
+                        # long integer package
+   NTL_GMP_HACK=off     # Switch 'on' to enable the use of GMP as a supplemental
+                        # long integer package
+
+   GMP_PREFIX=none      # Directory in which GMP components have been installed
+</pre>
+
+<p>
+<i>Examples.</i>
+<p>
+
+<ul>
+<li>
+If you are happy with all the default values, run:
+<pre>
+   % ./configure
+</pre>
+Actually, the initially installed <tt>makefile</tt> and <tt>config.h</tt> files
+already reflect the default values, and you do not have to even run
+the configure script.
+
+<p>
+<li>
+If your C/C++ compilers are called cc/CC, run:
+<pre>
+   % ./configure CC=cc CXX=CC
+</pre>
+
+<p>
+<li>
+If you want to use, say, the options <tt>-g</tt> and <tt>-O</tt> for 
+compiling <tt>C</tt> and <tt>C++</tt>, run:
+<pre>
+   % ./configure "CFLAGS=-g -O"
+</pre>
+Note the use of quotes to keep the argument in one piece.
+
+<p>
+<li>
+If <a href="tour-gmp.html">GMP (the GNU Multi-Precision package)</a>  
+is installed in a standard system directory, and you want to use it
+to obtain better performance for long integer arithemtic, run:
+<pre>
+   % ./configure NTL_GMP_LIP=on
+</pre>
+If GMP was installed in a non-standard directory <tt>&lt;gmp_prefix&gt;</tt>,
+so that <tt>&lt;gmp_prefix&gt;/include</tt> contains <tt>gmp.h</tt>
+and <tt>&lt;gmp_prefix&gt;/lib</tt> contains <tt>libgmp.a</tt>,
+run:
+<pre>
+   % ./configure NTL_GMP_LIP=on GMP_PREFIX=&lt;gmp_prefix&gt;
+</pre>
+Go <a href="tour-gmp.html">here</a> for complete details.
+
+<p>
+<li>
+If you want to use 
+<a href="tour-stdcxx.html">ISO mode to enable namespaces</a>, run:
+<pre>
+   % ./configure NTL_STD_CXX=on
+</pre>
+
+<p>
+<li>
+If you want to install NTL in directory <tt>&lt;prefix&gt;</tt>,
+run:
+<pre>
+   % ./configure PREFIX=&lt;prefix&gt;
+</pre>
+</ul>
+
+<p>
+There are a number of more esoteric configuration variables that can be set.
+See <a href="config.txt"><tt>config.txt</tt></a> for a complete
+description.
+
+<p>
+Note that all of these configuration options can also be set
+by editing the two files <tt>makefile</tt>
+and <tt>../include/NTL/def_config.h</tt> by hand.
+These files are fairly simple and well documented, and so this is not
+too hard to do.
+
+<p>
+Note that the file "<tt>../include/NTL/def_config.h</tt>"
+contains a backup copy of the original <tt>config.h</tt> file,
+and that the file "<tt>def_makefile</tt>"
+contains a backup copy of the original <tt>makefile</tt> file.
+
+<p>
+This command is intended only as a convenience 
+and -- more importantly -- to allow the configuration process
+to be script driven.
+This script does not perform any "magic", like finding out what
+the local C compiler is called, etc.  
+If the defaults are not
+correct for your platform, you have to set an appropriate variable.
+
+
+
+<p>
+<b>Step 3.</b>
+Execute <tt>make</tt>.
+
+<p>
+Just type:
+<pre>
+   % make
+</pre>
+
+<p>
+The build  process after this point is fully automatic.
+But here is a description of what happens.
+
+<p>
+
+<ol>
+<li>
+The makefile 
+builds the file "<tt>../include/NTL/mach_desc.h</tt>", which defines some machine characteristics
+such as word size and machine precision.
+This is done by compiling and running a <tt>C</tt> program
+called <tt>MakeDesc</tt>
+that figures out these characteristics on its
+own, and prints some diagnostics to the terminal.
+
+<p>
+<li>
+A script is run that "automagically"
+determines the best way to write a timing function
+on your platform.
+It tries different routines in the files <tt>GetTime1.c</tt>,
+<tt>GetTime2.c</tt>, etc., and when it finds a good one,
+it copies the file into <tt>GetTime.c</tt>.
+
+<p>
+<li>
+The files "<tt>lip_gmp_aux.c</tt>" and "<tt>../include/NTL/gmp_aux.h</tt>"
+are generated for use with GMP.
+If not using GMP, these files are still created, but they are empty.
+
+
+<p>
+<li>
+The configuration wizard script is run.
+This script works in a sub-directory, 
+compiling several programs,
+and performing a number of timing experiments,
+in order to determine the optimal setting for a number of flags
+in the file <tt>../include/NTL/config.h</tt>.
+When the script finishes (it may take several minutes),
+you will be told what the wizard thinks are the best settings,
+and your <tt>config.h</tt> file will be automatically updated.
+Note that any flags you set in Step 2 
+will be in
+effect while the wizard runs, and will be retained in the updated
+<tt>config.h</tt> file, with the exception of the flags
+<pre>
+   NTL_LONG_LONG NTL_AVOID_FLOAT NTL_TBL_REM NTL_AVOID_BRANCHING NTL_FFT_PIPELINE
+</pre>
+which are set by the wizard. 
+Also note that if you <i>do not</i> want the wizard to run,
+you should pass <tt>WIZARD=off</tt> to the configure script;
+however, this is not recommended.
+
+<p>
+<li>
+The makefile will compile all the source files,
+and then creates the library "<tt>ntl.a</tt>" in the current directory.
+</ol>
+
+<p>
+Note that for finer control  you can optionally  break up this process into the four
+component steps:
+<pre>
+   % make setup1
+   % make setup2
+   % make setup3
+   % make setup4
+   % make ntl.a
+</pre>
+
+
+<p>
+
+<p>
+<b>After NTL is built.</b>
+
+<p>
+Executing <tt>make check</tt> runs a series of timing and test programs.
+It is a good idea to run this to see if everything really
+went well.
+
+<p>
+Executing <tt>make install</tt>
+copies a number of files to a directory <tt>&lt;prefix&gt;</tt> that you
+specify by passing <tt>PREFIX=&lt;prefix&gt;</tt>
+as an argument to <tt>configure</tt> at configuration time,
+or as an argument to <tt>make install</tt> at installation time.
+The default is <tt>/usr/local</tt>, so either you need root 
+permissions, or you choose a <tt>&lt;prefix&gt;</tt> for which
+you have write permission.
+The files <tt>../include/NTL/*</tt> are copied into
+<tt>&lt;prefix&gt;/include/NTL</tt>.
+The file <tt>ntl.a</tt> is copied to <tt>&lt;prefix&gt;/lib/libntl.a</tt>.
+The files <tt>../doc/*</tt> are copied into
+<tt>&lt;prefix&gt;/doc/NTL</tt>.
+
+<p>
+You can also "fine tune" the installation procedure further.
+See the <a href="config.txt">configure documentation</a> for details.
+
+<p>
+Executing <tt>make uninstall</tt> undoes <tt>make install</tt>.
+
+
+<p>
+Executing <tt>make clobber</tt> essentially
+undoes <tt>make</tt>.
+<i>Make sure you do this if you re-build NTL for a different architecture!</i>
+
+<p>
+Executing <tt>make clean</tt> will remove object files, but not 
+<tt>ntl.a</tt>.
+To rebuild after executing <tt>make clean</tt>, execute <tt>make ntl.a</tt>.
+
+
+<p>
+Assuming you have installed NTL as above,
+to compile a program <tt>foo.c</tt> that uses NTL,
+execute
+<pre>
+   g++ -I&lt;prefix&gt;/include; -L&lt;prefix&gt;/lib foo.c -o foo -lntl -lm
+</pre>
+This compiles <tt>foo.c</tt> as a <tt>C++</tt> program
+and creates the binary <tt>foo</tt>.
+<p>
+If you built NTL using <a href="tour-gmp.html">GMP</a>, execute:
+<pre>
+   g++ -I&lt;prefix&gt;/include -L&lt;prefix&gt;/lib -L&lt;gmp_prefix&gt;/lib  foo.c -lntl -lgmp -lm
+</pre>
+<p>
+Of course, if <tt>&lt;prefix&gt;</tt> and <tt>&lt;gmp_prefix&gt;</tt>
+are the same, you do not need to  duplicate the <tt>-L</tt> 
+flags, and if either are standard directories, like <tt>/usr/local</tt>,
+you can leave out the corresponding <tt>-I</tt> and <tt>-L</tt>
+flags altogether.
+<p>
+This works even if you are not working in the directory
+in which you built NTL.
+If you <i>are</i> working in that directory, you can just execute
+<pre>
+   make foo
+</pre>
+
+<p>
+
+<p>
+
+<p>
+<b>Known build problems.</b>
+
+<p>
+NTL should compile without errors.
+The only known problems on Unix systems are due to compiler bugs.
+In particular, some versions of <tt>g++</tt> on some platforms
+may cause the compiler to crash.
+
+<p>
+I have had reports that version 2.96 of <tt>g++</tt> has this
+problem on some platforms, although I have not been able to re-create
+the problem on any platform that I have access to (even with v2.96).
+
+<p>
+I also have reports that other versions of <tt>g++</tt> crash
+when compiling NTL on a DEC Alpha.
+
+<p>
+Hopefully, these and similar bugs in <tt>g++</tt> will eventually
+be fixed by the <tt>g++</tt> people.
+In the meantime, a very crude work-around is to compile the files
+that cause <tt>g++</tt> to crash without optimization.
+An easy way to do this is as follows:
+<ol>
+<li>
+if the build crashes compiling, say, <tt>foo.c</tt>,
+copy <tt>makefile</tt> to, say, <tt>mf2</tt>;
+edit file <tt>mf2</tt>, deleting the <tt>-O2</tt> from the <tt>CFLAGS</tt>
+definition;
+<li>
+run the command <tt>make -f mf2 foo.o</tt>;
+<li>
+assuming that worked OK, run the command <tt>make ntl.a</tt>;
+<li>
+if it crashes again, say on file <tt>bar.c</tt>,
+run the command <tt>make -f mf2 bar.o</tt>;
+<li>
+run the command <tt>make ntl.a</tt>, repeating steps 4 and 5 as necessary.
+</ol>
+
+<p>
+
+If you have build problems such as this,
+it would be quite useful to other NTL users if you
+could experiment with the code a bit,
+and try to find an equivalent way to write the problem code so that
+the compiler does not crash.
+I will then try to get these work-arounds into future NTL releases.
+
+<p> <p>
+
+<center>
+<a href="tour-stdcxx.html"><img src="arrow1.gif" alt="[Previous]" align=bottom></a>
+ <a href="tour.html"><img src="arrow2.gif" alt="[Up]" align=bottom></a> 
+<a href="tour-win.html"> <img src="arrow3.gif" alt="[Next]" align=bottom></a>
+</center>
+
+</body>
+</html>

@@ -1,0 +1,18 @@
+
+if test "$1" = "on"
+then
+   echo "$3"
+   exit 0
+fi
+
+
+if test "$2" = "on"
+then
+   echo "$3"
+   exit 0
+fi
+
+echo "$4"
+
+exit 0
+

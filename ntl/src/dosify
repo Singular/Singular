@@ -1,0 +1,59 @@
+
+rm -r dos
+
+mkdir dos
+mkdir dos/src
+mkdir dos/include
+mkdir dos/include/NTL
+mkdir dos/doc
+mkdir dos/GetTime
+mkdir dos/MakeDesc
+mkdir dos/misc
+mkdir dos/tests
+
+cp ../README dos/README.txt
+
+cp GetTime4.c dos/src/GetTime.cpp
+
+cp mach_desc.win dos/include/NTL/mach_desc.h
+
+
+cp GetTime1.c dos/GetTime/GetTime1.cpp
+cp GetTime2.c dos/GetTime/GetTime2.cpp
+cp GetTime3.c dos/GetTime/GetTime3.cpp
+cp GetTime4.c dos/GetTime/GetTime4.cpp
+cp GetTime5.c dos/GetTime/GetTime5.cpp
+
+cp MakeDesc.c dos/MakeDesc/MakeDesc.cpp
+cp MakeDescAux.c dos/MakeDesc/MakeDescAux.cpp
+
+cp newnames.c dos/misc/newnames.cpp
+cp gen_gmp_aux.c dos/misc/gen_gmp_aux.cpp
+cp gen_lip_gmp_aux.c dos/misc/gen_lip_gmp_aux.cpp
+
+for i in $1
+do
+   cp $i dos/src/`basename $i .c`.cpp
+done
+
+for i in $2
+do
+   cp ../include/NTL/$i dos/include/NTL/$i
+done
+
+for i in $3
+do
+   cp ../doc/$i dos/doc/$i
+done
+
+for i in $4
+do
+   cp $i dos/tests/`basename $i .c`.cpp
+done
+
+cp $5 dos/tests
+
+cp $6 dos/src
+
+cp ../include/NTL/def_config.h dos/include/NTL/config.h
+

@@ -1,0 +1,173 @@
+
+echo "making CanZassTest"
+make CanZassTest
+echo "running CanZassTest"
+./CanZassTest < CanZassTestIn > XXX
+sh RemoveProg CanZassTest
+if diff XXX CanZassTestOut
+then
+echo "CanZassTest OK"
+else
+echo "bad CanZassTest"
+fi
+
+echo
+echo "---------------------------------"
+echo "making BerlekampTest"
+make BerlekampTest
+echo "running BerlekampTest"
+./BerlekampTest < BerlekampTestIn > XXX
+sh RemoveProg BerlekampTest
+if diff XXX BerlekampTestOut
+then
+echo "BerlekampTest OK"
+else
+echo "bad BerlekampTest"
+fi
+
+
+echo
+echo "---------------------------------"
+echo "making ZZXFacTest"
+make ZZXFacTest
+echo "running ZZXFacTest"
+./ZZXFacTest < ZZXFacTestIn > XXX
+sh RemoveProg ZZXFacTest
+if diff XXX ZZXFacTestOut
+then
+echo "ZZXFacTest OK"
+else
+echo "bad ZZXFacTest"
+fi
+
+echo
+echo "---------------------------------"
+echo "making MoreFacTest"
+make MoreFacTest
+echo "running MoreFacTest"
+./MoreFacTest < MoreFacTestIn 
+sh RemoveProg MoreFacTest
+
+echo
+echo "---------------------------------"
+echo "making GF2EXTest"
+make GF2EXTest
+echo "running GF2EXTest"
+./GF2EXTest
+sh RemoveProg GF2EXTest
+
+
+echo
+echo "---------------------------------"
+echo "making MatrixTest"
+make MatrixTest
+echo "running MatrixTest"
+./MatrixTest < MatrixTestIn > XXX
+sh RemoveProg MatrixTest
+if diff XXX MatrixTestOut
+then
+echo "MatrixTest OK"
+else
+echo "bad MatrixTest"
+fi
+
+echo
+echo "---------------------------------"
+echo "making CharPolyTest"
+make CharPolyTest
+echo "running CharPolyTest"
+./CharPolyTest < CharPolyTestIn > XXX
+sh RemoveProg CharPolyTest
+if diff XXX CharPolyTestOut
+then
+echo "CharPolyTest OK"
+else
+echo "bad CharPolyTest"
+fi
+
+echo
+echo "---------------------------------"
+echo "making BitMatTest"
+make BitMatTest
+echo "running BitMatTest"
+./BitMatTest
+sh RemoveProg BitMatTest
+
+
+echo
+echo "---------------------------------"
+echo "making RRTest"
+make RRTest
+echo "running RRTest"
+./RRTest < RRTestIn > XXX
+sh RemoveProg RRTest
+if diff XXX RRTestOut
+then
+echo "RRTest OK"
+else
+echo "bad RRTest"
+fi
+
+echo
+echo "---------------------------------"
+echo "making QuadTest"
+make QuadTest
+echo "running QuadTest"
+./QuadTest < QuadTestIn > XXX
+sh RemoveProg QuadTest
+if diff XXX QuadTestOut
+then
+echo "QuadTest OK"
+else
+echo "bad QuadTest"
+fi
+
+
+echo
+echo "---------------------------------"
+echo "making LLLTest"
+make LLLTest
+echo "running LLLTest"
+./LLLTest < LLLTestIn > XXX
+sh RemoveProg LLLTest
+if diff XXX LLLTestOut
+then
+echo "LLLTest OK"
+else
+echo "bad LLLTest"
+fi
+
+echo
+echo "---------------------------------"
+echo "making subset"
+make subset
+echo "subset 40 40 20 10 999999 f"
+./subset <<here
+  40 40 20 10 999999 f
+here
+echo "subset 40 40 20 10 999999 q"
+./subset <<here
+  40 40 20 10 999999 q
+here
+
+sh RemoveProg subset
+
+
+echo
+echo "---------------------------------"
+echo "making ZZ_pEXTest"
+make ZZ_pEXTest
+echo "running ZZ_pEXTest"
+./ZZ_pEXTest 
+sh RemoveProg ZZ_pEXTest
+
+
+echo
+echo "---------------------------------"
+echo "making lzz_pEXTest"
+make lzz_pEXTest
+echo "running lzz_pEXTest"
+./lzz_pEXTest 
+sh RemoveProg lzz_pEXTest
+
+exit 0

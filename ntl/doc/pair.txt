@@ -1,0 +1,95 @@
+/**************************************************************************\
+
+MODULE: pair
+
+SUMMARY:
+
+Macros are defined providing template-like classes for pairs.
+
+The macro NTL_pair_decl(S,T,pair_S_T) declares a class pair_S_T whose
+implementation can be instatntiated with NTL_pair_impl(S,T,pair_S_T).  It is
+presumed that the underlying types have a default constructor, a copy
+constructor, and assignment operator, and a destructor (this is
+normally the case for most types).
+
+If S and T support I/O operator << and >>, then pair_S_T can be made
+to support these operators as well using NTL_pair_io_decl(S,T,pair_S_T) and
+NTL_pair_io_impl(S,T,pair_S_T).
+
+The same goes for the equaltity operators == and != using
+NTL_pair_eq_decl(S,T,pair_S_T) and NTL_pair_eq_impl(S,T,pair_S,T).
+
+The decalaration 
+
+   pair_S_T p;
+
+creates a pair object using the default constructors for S and T.  The
+member p.a is the first component (of type S) and the member p.b is
+the second component (of type T).
+
+
+\**************************************************************************/
+
+
+
+#include <NTL/tools.h>
+
+class pair_S_T {  
+public:  
+   S a;  
+   T b;  
+  
+   pair_S_T(); 
+   // default constructor...invokes default constructors for S and T
+
+   pair_S_T(const pair_S_T& x); // copy
+
+   pair_S_T& operator=(const pair_S_T& x); // assignment
+
+   pair_S_T(const S& x, const T& y);  // initialize with (x, y)
+
+   ~pair_S_T(); 
+   // destructor...invokes destructors for S and T
+};  
+  
+pair_S_T cons(const S& x, const T& y); 
+// returns pair_S_T(x, y)
+
+
+/**************************************************************************\
+
+                             Input/Output
+
+The I/O operators can be declared with NTL_pair_io_decl(S,T,pair_S_T), and
+implemented using NTL_pair_io_impl(S,T,pair_S_T).  
+Elements are read and written using the underlying I/O 
+operators << and >> for S and T.
+
+The I/O format for a pair_a_b is
+
+   [a b]
+
+\**************************************************************************/
+
+
+
+istream& operator>>(istream&, pair_S_T&);  
+ostream& operator<<(ostream&, const pair_S_T&);  
+
+
+/**************************************************************************\
+
+                              Equality Testing
+
+The equality testing operators == and != can be declared with
+NTL_pair_eq_decl(S,T,pair_S_T) and implemented with 
+NTL_pair_eq_impl(S,T,pair_S,T).  The tests are performed using 
+the underlying operator == for S and T.
+
+\**************************************************************************/
+
+
+long operator==(const pair_S_T& x, const pair_S_T& y);
+long operator!=(const pair_S_T& x, const pair_S_T& y); 
+
+

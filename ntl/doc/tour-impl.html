@@ -1,0 +1,195 @@
+<html>
+<head>
+<title>
+A Tour of NTL: NTL Implementation and Portability  </title>
+</head>
+
+<body bgcolor="#fff9e6">
+<center>
+<a href="tour-win.html"><img src="arrow1.gif" alt="[Previous]" align=bottom></a>
+ <a href="tour.html"><img src="arrow2.gif" alt="[Up]" align=bottom></a> 
+<a href="tour-gmp.html"> <img src="arrow3.gif" alt="[Next]" align=bottom></a>
+</center>
+
+<h1> 
+<p align=center>
+A Tour of NTL: NTL Implementation and Portability 
+</p>
+</h1>
+
+<p> <hr> <p>
+
+NTL is designed to be portable, fast,
+and relatively easy to use and extend.
+
+<p>
+To make NTL portable, no assembly code is used (well, almost none, see below).
+This is highly desirable, as architectures are constantly
+changing and evolving, and maintaining assembly
+code is quite costly.
+By avoiding assembly code, NTL should remain usable,
+with virtually no maintenance, for many years.
+
+<p>
+However, NTL makes two requirements
+of its platform,
+neither of which are guaranteed by the <tt>C++</tt> language
+definition, but nevertheless appear to be essentially universal:
+
+<ol>
+<li>
+Integers are represented
+using 2's complement, and integer overflow is not trapped,
+but rather just wraps around; i.e., arithemtic on <tt>long int</tt>s
+is simply performed modulo <tt>2^w</tt>, where <tt>w</tt> is the 
+"word size".
+<li>
+Double precision floating point
+conforms to the IEEE standard.
+</ol>
+
+
+<p>
+Relying on floating point may seem prone to errors,
+but with the guarantees provided by the IEEE standard,
+one can prove the correctness of the NTL code that uses floating point.
+Actually, NTL is quite conservative, and substantially weaker
+conditions are sufficient for correctness.
+In particular, NTL works 
+with any mix of double precision and extended double precision
+operations (which arise, for example, with Intel x86 processors).
+
+<p>
+NTL <i>does</i> require that the special quantities "infinity"
+and "not a number" are implemented correctly.
+
+<p>
+The assumption about integer overflow "wrap-around" is technically
+non-standard, but nevertheless universally supported in practice.
+However, some care has been taken to minimize the dependency on
+this assumption.
+Right now, the only places where this asumption is required
+in in the <tt>zaddmulp</tt> and related macros in <tt>c_lip.c</tt>,
+and in the various single-precision <tt>MulMod</tt> routines
+found in <tt>ZZ.h</tt>, as well as <tt>g_lip.c</tt> and <tt>c_lip.c</tt>.
+
+<p>
+There are three basic strategies for implementing long integer arithmetic.
+
+<p>
+The <i>default</i> strategy is implemented in the 
+<i>traditional long integer arithmetic package</i>.
+This package is derived from the LIP package originally developed by
+A. K. Lenstra, although it has evolved quite a bit within NTL.
+This package uses no assembly code and is very portable.
+
+<p>
+The <i>second</i> strategy is to use the Gnu Multi-Precision Package (GMP)
+as a <i>supplemental long integer arithmetic package</i>.
+In this strategy, the representation of long integers is identical
+to that in he traditional long integer package.
+This representation is incompatible with the GMP representation,
+and on-the-fly conversions are done between the two representations
+(only when this is sensible).
+This strategy typically yields better performance, but requires
+that GMP is installed on your platform.
+
+<p>
+The <i>third</i> strategy is to use GMP as the 
+<i>primary long integer arithmetic package</i>.
+In this strategy, the representation of long integers is in a 
+form compatible with GMP.
+This strategy typically yields the best performance,
+but requires
+that GMP is installed on your platform, and also
+introduces some minor backwar incompatabilities in the programming
+interface.
+
+<p>
+<a href="tour-gmp.html">Go here</a> for more details on the use
+of GMP with NTL.
+
+<p>
+Long integer multiplication is implemented using the classical
+algorithm, crossing over to Karatsuba for very big numbers.
+Long integer division is currently only implemented using
+the classical algorithm -- unless you use NTL with GMP (version 3 or later)
+as either a supplemental or primary long integer package,
+which
+employs an algorithm that is about twice as slow as multiplication
+for very large numbers.
+<p>
+Polynomial multiplication and division is carried out
+using a combination of the classical algorithm, Karatsuba,
+the FFT using small primes, and the FFT using the Schoenhagge-Strassen
+approach.
+The choice of algorithm depends on the coefficient domain.
+<p>
+Many algorithms employed throughout NTL are inventions
+of the author (<a href="http://www.shoup.net">Victor Shoup</a>) 
+and his colleagues 
+<a href="http://math-www.uni-paderborn.de/~aggathen/joachim.html">Joachim von zur Gathen</a>
+and
+<a href="http://www4.ncsu.edu/~kaltofen">Erich Kaltofen</a>,
+as well as <a href="mailto:abbott@dima.unige.it">John Abbott</a>
+and
+<a href="http://www.loria.fr/~zimmerma">Paul Zimmermann</a>.
+
+<p>
+Note that the GMP library itself generally relies on assembly code.
+There is also one place in NTL where assembly code is sometimes used directly.
+This is in the <tt>quad_float</tt> module, when compiling on
+a Linux/x86 platform. <a href="quad_float.txt">[more details]</a>.
+
+<p>
+<h3>
+Some of NTL's imperfections
+</h3>
+<p>
+
+NTL is not a "perfect" library.
+Here are some limitations of NTL that a "perfect" library would not have:
+<p>
+<ul>
+<li>
+NTL is neither thread-safe or re-entrant, and making it so 
+would require a fundamental redesign.
+<p>
+
+<li>
+NTL provides only a very crude form of error handling:
+print an error message and abort.
+For most NTL users, this is quite sufficient.
+The alternative would be to have NTL throw exceptions.
+Writing code that handles exceptions correctly is quite difficult.
+The easy part is throwing and catching exceptions.
+The hard part is writing code <i>through which</i> an exception
+can be safely and correctly thrown.
+Retrofitting NTL to throw exceptions at this late date
+would be quite difficult and error prone, and I do not think
+that there is much demand for it.
+
+<p>
+
+<li>
+NTL does not release all of its resources.
+There are some routines which for effeciciency reasons will
+allocate some memory and never give it back to the system,
+so as to avoid re-allocations on subsequent calls.
+The amount of memory "stolen" by NTL in this way is fairly reasonable,
+and I have heard no complaints yet about its effects.
+
+</ul>
+
+
+<p>
+
+<center>
+<a href="tour-win.html"><img src="arrow1.gif" alt="[Previous]" align=bottom></a>
+ <a href="tour.html"><img src="arrow2.gif" alt="[Up]" align=bottom></a> 
+<a href="tour-gmp.html"> <img src="arrow3.gif" alt="[Next]" align=bottom></a>
+</center>
+
+
+</body>
+</html>

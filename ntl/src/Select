@@ -1,0 +1,10 @@
+
+if test "$1" = "on"
+then
+   echo "$2"
+else
+   echo "$3"
+fi
+
+exit 0
+

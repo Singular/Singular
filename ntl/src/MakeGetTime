@@ -1,0 +1,102 @@
+
+if test -f GetTime.c
+then
+   rm GetTime.c
+fi
+
+echo "does anybody really know what time it is?"
+
+
+if test -f TestGetTime
+then
+sh RemoveProg TestGetTime
+fi
+
+echo $1 -o TestGetTime TestGetTime.c GetTime1.c $2
+$1 -o TestGetTime TestGetTime.c GetTime1.c $2
+
+if test -f TestGetTime
+then
+if ./TestGetTime 1 1048576 1048575
+then
+cp GetTime1.c GetTime.c
+echo "using GetTime1.c"
+exit 0
+fi
+fi
+
+if test -f TestGetTime
+then
+sh RemoveProg TestGetTime
+fi
+
+echo $1 -o TestGetTime TestGetTime.c GetTime2.c $2
+$1 -o TestGetTime TestGetTime.c GetTime2.c $2
+
+if test -f TestGetTime
+then
+if ./TestGetTime 1 1048576 1048575
+then
+cp GetTime2.c GetTime.c
+echo "using GetTime2.c"
+exit 0
+fi
+fi
+
+if test -f TestGetTime
+then
+sh RemoveProg TestGetTime
+fi
+
+echo $1 -o TestGetTime TestGetTime.c GetTime3.c $2
+$1 -o TestGetTime TestGetTime.c GetTime3.c $2
+
+if test -f TestGetTime
+then
+if ./TestGetTime 1 1048576 1048575
+then
+cp GetTime3.c GetTime.c
+echo "using GetTime3.c"
+exit 0
+fi
+fi
+
+if test -f TestGetTime
+then
+sh RemoveProg TestGetTime
+fi
+
+echo $1 -o TestGetTime TestGetTime.c GetTime4.c $2
+$1 -o TestGetTime TestGetTime.c GetTime4.c $2
+
+
+if test -f TestGetTime
+then
+if ./TestGetTime 1 1048576 1048575
+then
+cp GetTime4.c GetTime.c
+echo "using GetTime4.c"
+exit 0
+fi
+fi
+
+if test -f TestGetTime
+then
+sh RemoveProg TestGetTime
+fi
+
+echo $1 -o TestGetTime TestGetTime.c GetTime5.c $2
+$1 -o TestGetTime TestGetTime.c GetTime5.c $2
+
+
+if test -f TestGetTime
+then
+cp GetTime5.c GetTime.c
+echo "using GetTime5.c"
+echo "warning: this GetTime function always returns 0"
+exit 0
+else
+echo "some thing is wrong..."
+exit 1
+fi
+
