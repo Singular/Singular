@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.114 2000-11-14 16:04:52 obachman Exp $ */
+/* $Id: ideals.cc,v 1.115 2000-12-05 09:05:58 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1898,7 +1898,7 @@ static ideal idInitializeQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb,
   pSetComp(p,kmax);
   pSetmComp(p);
 /*--- constructing the big matrix ------------------------*/
-  ideal h4 = idInit(16,kmax);
+  ideal h4 = idInit(16,kmax+k-1);
   h4->m[0] = q;
   if (k2 == 0)
   {
@@ -1980,13 +1980,15 @@ ideal idQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN resultIsIdeal)
   intvec * weights1;
 
   ideal s_h4 = idInitializeQuot (h1,h2,h1IsStb,&addOnlyOne,&kmax);
+  
   hom = (tHomog)idHomModule(s_h4,currQuotient,&weights1);
+
   ring orig_ring=currRing;
   ring syz_ring=rCurrRingAssure_SyzComp();
   rSetSyzComp(kmax-1);
   if (orig_ring!=syz_ring)
-    s_h4 = idrMoveR_NoSort(s_h4,orig_ring);
-
+  //  s_h4 = idrMoveR_NoSort(s_h4,orig_ring);
+    s_h4 = idrMoveR(s_h4,orig_ring);
   idTest(s_h4);
   ideal s_h3;
   if (addOnlyOne)
