@@ -1,0 +1,62 @@
+;;;
+;;; .emacs - sample .emacs file to use for Singular interactive mode.
+;;;
+
+;;;
+;;; - extra key bindings.
+;;;
+(add-hook 'singular-interactive-mode-hook
+	  (function (lambda ()
+		      ;; control cursor keys
+		      (cond
+		       ;; Emacs
+		       ((eq singular-emacs-flavor 'emacs)
+			(local-set-key [C-prior] 'singular-scroll-right)
+			(local-set-key [C-next] 'singular-scroll-left)
+			(local-set-key [C-up] 'comint-previous-prompt)
+			(local-set-key [C-down] 'comint-next-prompt))
+		       ;; XEmacs
+		       (t
+			(local-set-key [(control prior)] 'singular-scroll-right)
+			(local-set-key [(control next)] 'singular-scroll-left)
+			(local-set-key [(control up)] 'comint-previous-prompt)
+			(local-set-key [(control down)] 'comint-next-prompt))))))
+
+;;;
+;;; - other, "non-customizable" settings.
+;;;
+
+;; maybe we should make this a customizable variable?
+(add-hook 'singular-interactive-mode-hook
+	  (function (lambda () (font-lock-mode 1))))
+
+;;;
+;;; - customizing stuff.
+;;;
+
+;; this is a work-around for early version of Font Lock mode
+;; which do not use `defface' to define faces.  It forces
+;; `custom-set-faces' to define the faces immediately.
+(make-face 'font-lock-comment-face)
+(make-face 'font-lock-string-face)
+
+(custom-set-variables
+ '(custom-file "~/work/elisp/singular/.emacs")
+ '(font-lock-maximum-decoration nil t)
+ '(next-line-add-newlines nil)
+ '(paren-mode (quote paren) nil (paren))
+ '(show-paren-mode t nil (paren))
+ '(singular-cursor-keys (quote (cursor)))
+ '(singular-history-keys (quote (control meta)))
+ '(transient-mark-mode t))
+(custom-set-faces
+ '(font-lock-comment-face ((t (:bold nil :foreground "Grey50"))) t)
+ '(font-lock-string-face ((((class color) (background light)) (:foreground "Blue")) (((class color) (background dark)) (:foreground "LightSkyBlue"))) t)
+ '(paren-match ((t (:foreground "Red"))) t)
+ '(show-paren-match-face ((((class color)) (:foreground "Red")))))
+
+;;;
+;;; - load and start Singular interactive mode.
+;;;
+(load-file "~/work/elisp/singular/singular.el")
+(singular)
