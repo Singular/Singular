@@ -1,11 +1,11 @@
-dnl $Id: ftest_util.m4,v 1.11 1997-11-13 08:37:43 schmidt Exp $
+dnl $Id: ftest_util.m4,v 1.12 1997-11-21 11:10:00 schmidt Exp $
 dnl
 dnl ftest_util.m4 - m4 macros used by the factory test environment.
 dnl
 dnl "External" macro start with prefix `ftest', "internal" macros
 dnl with prefix `_'.
 dnl
-dnl Note: mind the ';'!
+dnl Note: Be carefull where to place the ';'!
 dnl
 dnl do not output anything of this library
 divert(-1)
@@ -41,7 +41,7 @@ ifelse(
 # $2: usage of algorithm
 #
 # These are stored in the macros `ftestAlgorithm' and
-# `ftestUsage', resp.  Leave notice on creator of this file.
+# `ftestUsage', resp.  Leaves notice on creator of this file.
 #
 define(`ftestSetNameOfGame', `dnl
 define(`ftestAlgorithm',``$1'')dnl
@@ -51,7 +51,9 @@ define(`ftestUsage',``$2'')dnl
 #
 # ftestPreprocInit() - initial preprocessor directives.
 #
-# In addition, we change m4's comment character.
+# In addition, change m4's comment character.  Change it in
+# this place (and not earlier) because we want to replace
+# `ftestAlgorithm' in the file-docu of the generated file.
 #
 define(`ftestPreprocInit', `dnl
 changecom(`//')dnl
@@ -75,11 +77,19 @@ define(`ftestGlobalInit', `dnl
 #
 # ftestMainInit() - initialization in main().
 #
+# Set the name of the game, check for missing arguments (in
+# this case print the usage and exit), and catche signals.
+#
 define(`ftestMainInit', `dnl
 `int optind = 0;
     ftestStatusT check = UndefinedResult;
 
     ftestSetName( argv[0], "'ftestAlgorithm`", 'ftestUsage`);
+
+    if ( argc == 1 ) {
+        ftestUsagePrint();
+        exit( 0 );
+    }
 
     ftestSignalCatch()'')
 
@@ -96,6 +106,8 @@ define(`ftestMainExit', `dnl
 # $2: name of output variable
 #
 # Stores type of variable in macro _ftestOutType_<name>.
+# Does some extra magic for int's to avoid warnings on
+# uninitialized variables.
 #
 define(`ftestOutVar', `dnl
 define(`_ftestOutType_'_qstripTWS(`$2'), `$1')dnl
@@ -110,6 +122,11 @@ ifelse(`$1', `int',
 # $2: name of input variable
 #
 # Stores type of variable in macro _ftestInType_<name>.
+# Furthermore, declares a variable ftestArgGiven<name> for later
+# checks whether this variable has been set from commandline or
+# not.
+# Does some extra magic for int's to avoid warnings on
+# uninitialized variables.
 #
 define(`ftestInVar', `dnl
 define(`_ftestInType_'_qstripTWS(`$2'), `$1')dnl
@@ -127,8 +144,11 @@ define(`ftestGetOpts', `dnl
 #
 # ftestGetEnv() - read environment.
 #
+# And print it directly after reading it.
+#
 define(`ftestGetEnv', `dnl
 `ftestGetEnv( argc, argv, optind );
+
     ftestPrintEnv()'')
 
 #
@@ -136,6 +156,14 @@ define(`ftestGetEnv', `dnl
 #
 # $1: name of input variable
 # $2: default for optional command line arguments
+#
+# Before reading the argument, check whether it really exists.
+# If so, call the appropriate function to convert the string into
+# the type of the variable you are reading.  If there are not any
+# more arguments, and there is no default specified, print an
+# error.  If there is a default value, use it instead.
+# In any case, save the fact whether the argument was given or
+# not in the variable ftestArgGiven<name>.
 #
 define(`ftestGetInVar', `dnl
 ifelse(`$#', `1',
@@ -161,19 +189,18 @@ define(`ftestArgGiven', `dnl
 `ftestArgGiven'_qstripTWS(`$1')')
 
 #
-# ftestSetEnv() - set factory environment.
-#
-define(`ftestSetEnv', `dnl
-`ftestSetEnv();
-    ftestPrintEnv()'')
-
-#
 # ftestRun() - run test.
 #
 # $1: code to execute
 #
+# Do not forget to terminate the code to execute with a
+# semicolon!
+#
 define(`ftestRun', `dnl
-`ftestWriteSeed();			// save random generator seed
+`// save random generator seed now since the algorithm
+    // most likely is going to change it
+    ftestWriteSeed();
+
     if ( ftestAlarm )
 	alarm( ftestAlarm );		// set alarm
     TIMING_START(ftestTimer);
@@ -181,7 +208,9 @@ define(`ftestRun', `dnl
 	$1
 	ftestCircle--;
     };
-    TIMING_END(ftestTimer)'')
+    TIMING_END(ftestTimer);
+    if ( ftestAlarm )			// reset alarm
+	alarm( 0 )'')
 
 #
 # ftestCheck() - run check.
@@ -209,6 +238,16 @@ ifelse(`$#', `0', ,
 define(`ftestOutput', `dnl
 `ftestPrintTimer( timing_ftestTimer_time );
     ftestPrintCheck( check )'_ftestOutput($@)')
+
+#
+# ftestSetEnv() - set factory environment.
+#
+# This macro is quite spurious, but I keep it for future
+# use.
+#
+define(`ftestSetEnv', `dnl
+`ftestSetEnv();
+    ftestPrintEnv()'')
 
 dnl switch on output again
 divert`'dnl
