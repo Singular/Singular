@@ -1,5 +1,13 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_factor.cc,v 1.4 1997-06-19 12:27:17 schmidt Exp $ */
+/* $Id: cf_factor.cc,v 1.5 1997-08-29 08:37:35 schmidt Exp $ */
+
+//{{{ docu
+//
+// cf_factor.cc - factorization and square free algorithms.
+//
+// Used by: fac_multivar.cc, fac_univar.cc, cf_irred.cc
+//
+//}}}
 
 #include <config.h>
 
@@ -11,13 +19,11 @@
 #include "cf_globals.h"
 #include "canonicalform.h"
 #include "cf_iter.h"
-#include "cf_factor.h"
 #include "fac_berlekamp.h"
 #include "fac_cantzass.h"
 #include "fac_univar.h"
 #include "fac_multivar.h"
 #include "fac_sqrfree.h"
-
 
 static bool isUnivariateBaseDomain( const CanonicalForm & f )
 {
@@ -28,7 +34,7 @@ static bool isUnivariateBaseDomain( const CanonicalForm & f )
     return ok;
 }
 
-CFFList factorize ( const CanonicalForm & f, bool issqrfree )
+CFFList factorize ( const CanonicalForm & f, bool issqrfree = false )
 {
     if ( f.inCoeffDomain() )
 	return CFFList( f );
@@ -55,7 +61,7 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
     return FpFactorizeUnivariateCZ( f, false, 1, alpha );
 }
 
-CFFList sqrFree ( const CanonicalForm & f, bool sort )
+CFFList sqrFree ( const CanonicalForm & f, bool sort = false )
 {
 //    ASSERT( f.isUnivariate(), "multivariate factorization not implemented" );
     CFFList result;
