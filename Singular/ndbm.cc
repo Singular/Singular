@@ -4,7 +4,7 @@
 
 //**************************************************************************/
 //
-// $Id: ndbm.cc,v 1.7 1998-01-05 16:39:24 Singular Exp $
+// $Id: ndbm.cc,v 1.8 1998-01-27 15:34:08 pohl Exp $
 //
 //**************************************************************************/
 // 'ndbm.cc' containes all low-level functions to manipulate dbm-files
@@ -38,6 +38,8 @@ static char sccsid[] = "@(#)ndbm.c        5.3 (Berkeley) 3/9/86";
 #   define L_SET SEEK_SET
 #   define EPERM 1
 #   define ENOSPC 28
+#   define ENOMEM 23
+#   define bcopy(a,b,c) memmove(b,a,c)
 #else /* not macintosh */
 #   include <sys/types.h>
 #   include <sys/stat.h>
