@@ -1,7 +1,7 @@
 #####################################################################
 ### 
 ### Makefile for Singular documentation 
-### $Id: Makefile.in,v 1.67 2000-05-23 14:41:21 obachman Exp $
+### $Id: Makefile.in,v 1.68 2000-05-23 15:23:41 obachman Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -265,7 +265,7 @@ ${IMAGES_HTML} : ${IMAGES_SRC}
 ###########################################################
 # misc targets
 #
-install: singular.hlp html singular.idx
+install: singular.hlp html singular.idx standalone
 	${MKINSTALLDIRS} ${infodir}
 	${INSTALL_DATA} singular.hlp ${infodir}
 	test -r ${htmldir} || ln -s `pwd`/${HTML_SUBDIR} ${htmldir}
