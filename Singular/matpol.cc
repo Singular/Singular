@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.cc,v 1.4 1997-11-13 09:09:27 siebert Exp $ */
+/* $Id: matpol.cc,v 1.5 1997-11-24 12:48:27 pohl Exp $ */
 
 /*
 * ABSTRACT:
@@ -1030,7 +1030,7 @@ int mp_permmatrix::mpPivotBareiss(row_col_weight *C)
 {
   poly p, *a;
   int i, j, iopt, jopt;
-  float f, fo, r, ro, lp;
+  float sum, f1, f2, fo, r, ro, lp;
   float *dr = C->wrow, *dc = C->wcol;
 
   fo = 1.0e20;
@@ -1048,10 +1048,10 @@ int mp_permmatrix::mpPivotBareiss(row_col_weight *C)
       p = this->mpRowAdr(i)[qcol[0]];
       if (p)
       {
-        f = mpPolyWeight(p);
-        if (f < fo)
+        f1 = mpPolyWeight(p);
+        if (f1 < fo)
         {
-          fo = f;
+          fo = f1;
           if (iopt >= 0)
             pDelete(&(this->mpRowAdr(iopt)[qcol[0]]));
           iopt = i;
@@ -1066,6 +1066,9 @@ int mp_permmatrix::mpPivotBareiss(row_col_weight *C)
   }
   this->mpRowWeight(dr);
   this->mpColWeight(dc);
+  sum = 0.0;
+  for(i=s_m; i>=0; i--)
+    sum += dr[i];
   for(i=s_m; i>=0; i--)
   {
     r = dr[i];
@@ -1076,18 +1079,18 @@ int mp_permmatrix::mpPivotBareiss(row_col_weight *C)
       if (p)
       {
         lp = mpPolyWeight(p);
-        f = (dc[j]-lp) * (r-lp);
-        f = sqrt(f) * lp;
-        if (f < fo)
+        ro = r - lp;
+        f1 = ro * (dc[j]-lp);
+        if (f1 != 0.0)
         {
-          fo = f;
-          ro = r;
-          iopt = i;
-          jopt = j;
+          f2 = lp * (sum - ro - dc[j]);
+          f2 += f1;
         }
-        else if ((f == fo) && (r > ro))
+        else
+          f2 = lp-r-dc[j];
+        if (f2 < fo)
         {
-          ro = r;
+          fo = f2;
           iopt = i;
           jopt = j;
         }
@@ -1339,7 +1342,28 @@ static void mpReplace(int j, int n, int &sign, int *perm)
 */
 static float mpPolyWeight(poly p)
 {
-  return (float)pLength(p);
+  int i;
+  float res;
+
+  if (pNext(p) == NULL)
+  {
+    res = (float)nSize(pGetCoeff(p));
+    if (pTotaldegree(p) != 0) res += 1.0;
+  }
+  else
+  {
+    i = 0;
+    res = 0.0;
+    do
+    {
+      i++;
+      res += (float)nSize(pGetCoeff(p));
+      pIter(p);
+    }
+    while (p);
+    res += (float)i;
+  }
+  return res;
 }
 
 static int nextperm(perm * z, int max)
