@@ -19,6 +19,7 @@ bug_9
 bug_c_dp
 dbm_s
 ; DIFF deform_s
+deform_new_s
 fetch_s
 fglm1_s
 finduni_s
@@ -44,8 +45,8 @@ minor_s
 modulo_s
 monodromy_s
 mpsr_s
-; INFINITE normal
-; INFINITE paramet
+normal
+paramet
 polylib_s
 primdec_s
 primitiv_s
