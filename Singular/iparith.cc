@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.169 1999-08-13 17:12:20 Singular Exp $ */
+/* $Id: iparith.cc,v 1.170 1999-08-16 15:43:55 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -281,8 +281,7 @@ cmdnames cmds[] =
   { "sortvec",     0, SORTVEC_CMD ,       CMD_1},
   #ifdef HAVE_SPECTRUM
   { "spectrum",    0, SPECTRUM_CMD ,      CMD_123},
-  { "semic",       0, SEMIC_CMD ,         CMD_2},
-  { "semicsqh",    0, SEMICH_CMD ,        CMD_2},
+  { "semic",       0, SEMIC_CMD ,         CMD_23},
   #endif
   #ifdef OLD_RES
   { "sres",        0, SRES_CMD ,          CMD_23},
@@ -2284,7 +2283,6 @@ struct sValCmd2 dArith2[]=
 #ifdef HAVE_SPECTRUM
 ,{spectrumProc2,SPECTRUM_CMD,  LIST_CMD,       POLY_CMD,   INT_CMD PROFILER}
 ,{semicProc,   SEMIC_CMD,      INT_CMD,        LIST_CMD,   LIST_CMD PROFILER}
-,{semichProc,  SEMICH_CMD,     INT_CMD,        LIST_CMD,   LIST_CMD PROFILER}
 #endif
 //,{jjRES,       SRES_CMD,       LIST_CMD,       IDEAL_CMD,  INT_CMD PROFILER}
 //,{jjRES,       SRES_CMD,       LIST_CMD,       MODUL_CMD,  INT_CMD PROFILER}
@@ -4322,6 +4320,8 @@ struct sValCmd3 dArith3[]=
 ,{jjWRONG3,         RESULTANT_CMD, POLY_CMD,POLY_CMD,   POLY_CMD,   POLY_CMD }
 #endif
 #ifdef HAVE_SPECTRUM
+,{semicProc3,       SEMIC_CMD,  INT_CMD,    LIST_CMD,   LIST_CMD,   INT_CMD }
+,{spectrumOp3,      SPECTRUM_CMD, LIST_CMD, LIST_CMD,   STRING_CMD, INT_CMD } 
 ,{spectrumOp3,      SPECTRUM_CMD, LIST_CMD, LIST_CMD,   STRING_CMD, LIST_CMD } 
 #endif
 #ifdef OLD_RES

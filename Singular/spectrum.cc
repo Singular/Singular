@@ -281,10 +281,10 @@ static BOOLEAN isWell( void )
   {
     return  TRUE;
   }
-  else if( b>=3 
-  && (( currRing->order[0] ==ringorder_a 
+  else if( b>=3
+  && (( currRing->order[0] ==ringorder_a
         && currRing->block1[0]==pVariables  )
-    || (currRing->order[0]==ringorder_M 
+    || (currRing->order[0]==ringorder_M
         && currRing->block1[0]==pVariables*pVariables )))
   {
     for( int i=pVariables-1; i>=0; i-- )
@@ -867,7 +867,7 @@ BOOLEAN spectrumfProc( leftv result,leftv first )
 
   //  check for a local polynomial ring
 
-  if( currRing->OrdSgn != -1 ) 
+  if( currRing->OrdSgn != -1 )
   // ?? HS: the test above is also true for k[x][[y]], k[[x]][y]
   //if( !ringIsLocal( ) )
   {
@@ -1258,96 +1258,6 @@ BOOLEAN spmulProc( leftv result,leftv first,leftv second )
     return  (state!=semicOK);
 }
 
-// ----------------------------------------------------------------------------
-//  this procedure is called from the interpreter
-// ----------------------------------------------------------------------------
-//  first  = list of spectrum numbers
-//  second = list of spectrum numbers
-//  result = semicontinuity index
-// ----------------------------------------------------------------------------
-
-BOOLEAN semicProc( leftv result,leftv first,leftv second )
-{
-    semicState  state;
-
-    // -----------------
-    //  check arguments
-    // -----------------
-
-    lists l1 = (lists)first->Data( );
-    lists l2 = (lists)second->Data( );
-
-    if( (state=list_is_spectrum( l1 ))!=semicOK )
-    {
-        WerrorS( "first argument is not a spectrum" );
-        list_error( state );
-    }
-    else if( (state=list_is_spectrum( l2 ))!=semicOK )
-    {
-        WerrorS( "second argument is not a spectrum" );
-        list_error( state );
-    }
-    else
-    {
-        spectrum s1( l1 );
-        spectrum s2( l2 );
-
-        result->rtyp = INT_CMD;
-        result->data = (void*)(s1.mult_spectrum( s2 ));
-    }
-
-    // -----------------
-    //  check arguments
-    // -----------------
-
-    return  (state!=semicOK);
-}
-
-// ----------------------------------------------------------------------------
-//  this procedure is called from the interpreter
-// ----------------------------------------------------------------------------
-//  first  = list of spectrum numbers
-//  second = list of spectrum numbers
-//  result = semicontinuity index
-// ----------------------------------------------------------------------------
-
-BOOLEAN semichProc( leftv result,leftv first,leftv second )
-{
-    semicState  state;
-
-    // -----------------
-    //  check arguments
-    // -----------------
-
-    lists l1 = (lists)first->Data( );
-    lists l2 = (lists)second->Data( );
-
-    if( (state=list_is_spectrum( l1 ))!=semicOK )
-    {
-        WerrorS( "first argument is not a spectrum" );
-        list_error( state );
-    }
-    else if( (state=list_is_spectrum( l2 ))!=semicOK )
-    {
-        WerrorS( "second argument is not a spectrum" );
-        list_error( state );
-    }
-    else
-    {
-        spectrum s1( l1 );
-        spectrum s2( l2 );
-
-        result->rtyp = INT_CMD;
-        result->data = (void*)(s1.mult_spectrumh( s2 ));
-    }
-
-    // -----------------
-    //  check arguments
-    // -----------------
-
-    return  (state!=semicOK);
-}
-
 BOOLEAN    spectrumProc2 ( leftv res,leftv u, leftv v)
 {
   if (((int)v->Data())==1)
@@ -1364,6 +1274,64 @@ BOOLEAN    spectrumOp3  ( leftv res, leftv u, leftv v, leftv w )
     return spmulProc(res,u,w);
   Werror("unknown operation '%s' for spectrum",v_str);
   return TRUE;
+}
+
+// ----------------------------------------------------------------------------
+//  this procedure is called from the interpreter
+// ----------------------------------------------------------------------------
+//  first  = list of spectrum numbers
+//  second = list of spectrum numbers
+//  result = semicontinuity index
+// ----------------------------------------------------------------------------
+
+BOOLEAN    semicProc3   ( leftv res,leftv u,leftv v,leftv w )
+{
+    semicState  state;
+    BOOLEAN qh=((int)w->Data())==1);
+
+    // -----------------
+    //  check arguments
+    // -----------------
+
+    lists l1 = (lists)first->Data( );
+    lists l2 = (lists)second->Data( );
+
+    if( (state=list_is_spectrum( l1 ))!=semicOK )
+    {
+        WerrorS( "first argument is not a spectrum" );
+        list_error( state );
+    }
+    else if( (state=list_is_spectrum( l2 ))!=semicOK )
+    {
+        WerrorS( "second argument is not a spectrum" );
+        list_error( state );
+    }
+    else
+    {
+        spectrum s1( l1 );
+        spectrum s2( l2 );
+
+        result->rtyp = INT_CMD;
+        if (qh)
+          result->data = (void*)(s1.mult_spectrumh( s2 ));
+        else
+          result->data = (void*)(s1.mult_spectrum( s2 ));
+    }
+
+    // -----------------
+    //  check status
+    // -----------------
+
+    return  (state!=semicOK);
+}
+BOOLEAN    semicProc   ( leftv res,leftv u,leftv v )
+{
+  sleft tmp;
+  memset(&tmp,0,sizeof(tmp);
+  tmp.rtyp=INT_CMD;
+  /* tmp.data = (void *)0;  -- done by memset */
+
+  return  semicProc3(res,u,v,&tmp);
 }
 #endif /* HAVE_SPECTRUM */
 // ----------------------------------------------------------------------------
