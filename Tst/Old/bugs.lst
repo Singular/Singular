@@ -1,8 +1,4 @@
 ;;; here are those from universal.lst which are still buggy
-m8ex     ; order of polys in ideal which is result of intersection
-m10ex    ; qring and ext
-err5     ; qring stuff
 syzygies ; should be ok, minor differences
 m90si_1.tst ; exchanged ls to (c, ls) --> Singularg already complains
 regul    ; result of mres, now infinite loop
-

@@ -29,14 +29,14 @@ graphics
 highcorner_s
 hres_s
 hnoether_s
-; DIFF homolog_s
+; DIFF PROBABLY BUG homolog_s
 imap
 intdet_s
 intersect_s
 invar
 invarlib
 latex
-; DIFF lift_s
+lift_s
 liftstd_s
 lres_s
 minor_s

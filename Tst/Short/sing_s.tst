@@ -14,7 +14,7 @@ example is_regs;
 example milnor;
 //example nf_icis;   (Fehler in proc sparsetriag von random.lib) 
 example slocus;
-example spectrum;
+example qhspectrum;
 example Tjurina;
 example tjurina;
 example T1;

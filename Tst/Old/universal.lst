@@ -45,7 +45,7 @@ prim
 qrin
 rang
 re
-; BUG regul
+; DIFF regul
 ringdef
 row
 rvari
@@ -71,16 +71,16 @@ m3ex
 m4ex
 m5ex
 m7ex
-; DIFF m8ex
+m8ex
 m9ex
-; DIFF m10ex
-; DIFF m11ex
+m10ex
+m11ex
 m13ex
 m15ex
 m16ex
 m17ex
 m18ex
-; DIFF m19ex
+m19ex
 polylib
 ringlib
 lamm
@@ -163,7 +163,7 @@ redtail
 string
 namof
 koszul
-; BUG res 
+res 
 sres
 ; DIFF syzygies
 varlist
@@ -252,7 +252,7 @@ m81si
 m82si
 m83si
 m84si
-; BUG m85si
+m85si
 m86si
 m88si
 m89si
@@ -280,7 +280,7 @@ m110si
 m111si
 m112si
 m113si
-; BUG m114si
+m114si
 m115si
 m116si
 m117si

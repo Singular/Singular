@@ -1,12 +1,11 @@
-lift_s
-homolog_s
 sres_s 
 res_s    ; -1, -14 in resolvente (TS)
 bug_sres ; (c, ls) problem (TS)
 bug_res  ; sres has wrong betti result (TS)
 bug_sres_betti ; again, sres has wrong betti result (TS)
+bug_sres_cyc5  ; core dump
 ; INFINITE  
 deform_s
 normal
-paramet
+paramet ; uses normal
 
