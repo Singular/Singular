@@ -1,5 +1,5 @@
   @comment -*-texinfo-*-
-@comment $Id: plureference.doc,v 1.25 2004-10-21 18:14:36 levandov Exp $
+@comment $Id: plureference.doc,v 1.26 2005-03-08 13:50:35 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -183,7 +183,7 @@ print(betti(RM),"betti");
 poly
 @item @strong{Purpose:}
 Computes the Lie bracket @code{[p,q]=pq-qp} of the first polynomial with
-the second in a special way.
+the second. Uses special routines, based on the Leibniz rule.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -191,22 +191,14 @@ ring r=(0,Q),(x,y,z),Dp;
 minpoly=Q^4+Q^2+1;
 matrix C[3][3];
 matrix D[3][3];
-C[1,2]=Q2;
-C[1,3]=1/Q2;
-C[2,3]=Q2;
-D[1,2]=-Q*z;
-D[1,3]=1/Q*y;
-D[2,3]=-Q*x; 
-ncalgebra(C,D);
-// it is Quantum deformation of U(so_3).
-poly p=Q^4*x2+y2+Q^4*z2+Q*(1-Q^4)*x*y*z;
-// it is the central element  
-p=p^3;
-p;
-poly q=(x+Q*y+Q^2*z)^4;
-// it is big noncentral element
-q;
-bracket(p,q); 
+C[1,2]=Q2;    C[1,3]=1/Q2;  C[2,3]=Q2;
+D[1,2]=-Q*z;  D[1,3]=1/Q*y; D[2,3]=-Q*x; 
+ncalgebra(C,D);  // this is a quantum deformation of U(so_3).
+poly p=Q^4*x2+y2+Q^4*z2+Q*(1-Q^4)*x*y*z; // this is the central element  
+p=p^3; // it is still central
+poly q=(x+Q*y+Q^2*z)^4;  // take some big noncentral element
+size(q); // check how many monomials are in q
+bracket(p,q); // check p*q=q*p
 @c example
 @end smallexample 
 @end table
@@ -228,7 +220,7 @@ the same as the type of the first argument
 eliminates variables occurring as factors of the second argument from an
 ideal, resp.@: module, by intersecting it with the subring not containing
 these variables.
-@*@code{eliminate} does not need a special ordering nor a Groebner basis as input.
+@item @strong{Note:} @code{eliminate} does not need a special ordering nor a Groebner basis as input.
 @c @item @strong{Note:}
 @c Since elimination is expensive, for homogeneous input it might be useful
 @c first to compute the Hilbert function of the ideal (first
@@ -240,21 +232,18 @@ these variables.
 @c example error
 ring r=0,(e,f,h,a),Dp;
 matrix d[4][4];
-d[1,2]=-h;
-d[1,3]=2*e;
-d[2,3]=-2*f;
-ncalgebra(1,d);
-// it is U(sl_2)+K[a]
+d[1,2]=-h; d[1,3]=2*e; d[2,3]=-2*f;
+ncalgebra(1,d);  // this is U(sl_2), tensored with K[a] over K
 option(redSB);
 option(redTail);
-poly p=4*e*f+h^2-2*h-a;
-// this is central element with parameter
+poly p=4*e*f+h^2-2*h-a;  // this is central element with parameter
 ideal I=e^3,f^3, h^3-4*h,p;
-ideal J=eliminate(I,efh);
+ideal J=eliminate(I,e*f*h);
 // this will give us the central character of I
 J;
-// now we try to eliminate h, that is to intersect with subalgebra [e,f]
-// which is not is not admissible subalgebra!
+// now we try to eliminate h, 
+// that is to intersect I with subalgebra [e,f]
+// which is not admissible subalgebra!
 eliminate(I,h); 
 eliminate(I,a);
 @c example
@@ -387,9 +376,8 @@ ring ABP=0,(p4,p5,a,b),dp;
 def Usl3 = sl(3);
 def BIG = Usl3+ABP;
 setring BIG;
-poly P4=3*x(1)*y(1)+3*x(2)*y(2)+3*x(3)*y(3)+h(1)^2+h(1)*h(2)+h(2)^2-3*h(1)-3*h(2);  // central element of U(sl_3) of degree 2
-poly P5=3/2*x(3)*y(1)*y(2)+3/2*x(1)*x(2)*y(3)+1/2*x(1)*y(1)*h(1)-1*x(2)*y(2)*h(1)+1/2*x(3)*y(3)*h(1)+1/9*h(1)^3+x(1)*y(1)*h(2)-1/2*x(2)*y(2)*h(2)-1/2*x(3)*y(3)*h(2)+1/6*h(1)^2*h(2)-1/6*h(1)*h(2)^2-1/9*h(2)^3-2*x(1)*y(1)+x(2)*y(2)-1/2*x(3)*y(3)-2/3*h(1)^2-1/6*h(1)*h(2)+1/3*h(2)^2+h(1);
-P5=18*P5; // central element of U(sl_3) of degree 3 with integer coefficients
+poly P4 = 3*x(1)*y(1)+3*x(2)*y(2)+3*x(3)*y(3)+h(1)^2+h(1)*h(2)+h(2)^2-3*h(1)-3*h(2);  // central element of U(sl_3) of degree 2
+poly P5 = 4*x(1)*y(1) + h(1)^2 - 2*h(1); // central element of the subalgebra of U(sl_3), isomorphic to U(sl_2)
 ideal J = x(1),x(2),h(1)-a,h(2)-b; // we are interested in the module U(sl_3)/J, depending on parameters a,b
 ideal I = p4-P4,p5-P5;
 ideal K = I,J;
@@ -1106,7 +1094,7 @@ ncalgebra(1,d);
 ideal i=x,y,z;
 i=std(i);
 resolution F=nres(i,0);
-// now we print the resolution out, pretty print its components
+// now we print the resolution componentwise
 // and check that F is indeed exact
 F;
 for (int a=1;a<=size(list(F));a++)
@@ -1115,7 +1103,7 @@ for (int a=1;a<=size(list(F));a++)
   print(matrix(F[a]));
   if (a>1)
   {
-    printf("The defect of exactness at: (%s,%s)",a-1,a);
+    printf("Obstruction of exactness at: (%s,%s)",a-1,a);
     std(flatten(transpose(F[a])*transpose(F[a-1])));
   }
 }
@@ -1146,7 +1134,13 @@ poly, vector, ideal, module or matrix
 for a given object in the given ring, creates its opposite object
 in the opposite ring (the last one is assumed to be the current ring).
 @item @strong{Remark:}
-for an object O, (O^opp)^opp = O. 
+for an object
+@iftex
+ $O, (O^opp)^opp = O$.
+@end iftex
+@ifinfo
+ O, (O^opp)^opp = O. 
+@end ifinfo
 @smallexample
 @c example 
 LIB "ncalg.lib";
@@ -1405,10 +1399,10 @@ map Phi = R,C;
 setring R;
 ideal PreJ = preimage(Usl2,Phi,J); // central character of J
 PreJ;
-factorize(PreJ[1],1); // two characters
+factorize(PreJ[1],1); // there are two characters for J
 ideal PreK = preimage(Usl2,Phi,K); // central character of K
 PreK;
-factorize(PreK[1],1); // three characters
+factorize(PreK[1],1); // there are three characters for K
  
 @c example
 @end smallexample
@@ -1464,6 +1458,10 @@ $\{a \in R \mid aJ \subset I\}$,
 $\{b \in R^n \mid bJ \subset M\}$.
 @end tex
 @end itemize
+@item @strong{Note:}
+Should be used for two-sided ideals (bimodules) only, otherwise the
+result may have no meaning.
+
 @item @strong{Example:}
 @smallexample
 @c example
@@ -1537,17 +1535,13 @@ The commands @code{reduce} and @code{NF} are synonymous.
 @c example
 ring r=(0,a),(e,f,h),Dp;
 matrix d[3][3];
-d[1,2]=-h;
-d[1,3]=2e;
-d[2,3]=-2f;
-ncalgebra(1,d);
-// it is parametric U(sl_2)
+d[1,2]=-h;  d[1,3]=2e;  d[2,3]=-2f;
+ncalgebra(1,d);  // this is parametric U(sl_2)
 ideal I=e2,f2,h2-1;
 I=std(I);
 ideal J=e,h-a;
 J=std(J);
-poly z=4*e*f+h^2-2*h;
-// z is the central element
+poly z=4*e*f+h^2-2*h;   // z is the central element of U(sl_2)
 // the central character of I:
 NF(z,I);
 // the central character of J:
@@ -1606,26 +1600,21 @@ To view the progress of long running computations, use
 @c example
 ring R=0,(x,y,z),dp;
 matrix d[3][3];
-d[1,2]=-z;
-d[1,3]=2x;
-d[2,3]=-2y;
+d[1,2]=-z;  d[1,3]=2x;  d[2,3]=-2y;
 ncalgebra(1,d); //U(sl_2)
-ideal I=x3,y3,z3-z;
+ideal I=x2,y2,z2-1;
 I=std(I);
 I;
 kill R;
+//------------------------------------------
 ring Rq3=(0,Q),(x,y,z),dp; //U'_q(so_3)
 minpoly=Q^2-Q+1; // at the 3rd root of unity
 matrix C[3][3];
 matrix D[3][3];
-C[1,2]=Q2;
-C[1,3]=1/Q2;
-C[2,3]=Q2;
-D[1,2]=-Q*z;
-D[1,3]=1/Q*y;
-D[2,3]=-Q*x; 
+C[1,2]=Q2;    C[1,3]=1/Q2;  C[2,3]=Q2;
+D[1,2]=-Q*z;  D[1,3]=1/Q*y; D[2,3]=-Q*x; 
 ncalgebra(C,D);
-ideal J=x3,y3,z3-z;
+ideal J=x2,y2,z2;
 J=std(J);
 J;
 
@@ -1696,17 +1685,13 @@ if @code{S} is a matrix of a left syzygy module of left submodule given by matri
 @c example
 LIB "nctools.lib";
 LIB "poly.lib";
-ring Rq=(0,Q),(x,y,z),dp; //U_q(so_3)
+ring Rq=(0,Q),(x,y,z),dp; // U_q(so_3)
 minpoly = RootOfUnity(6); // Q is a 6th root of unity
 matrix C[3][3];
 matrix D[3][3];
-C[1,2]=Q2;
-C[1,3]=1/Q2;
-C[2,3]=Q2;
-D[1,2]=-Q*z;
-D[1,3]=1/Q*y;
-D[2,3]=-Q*x; 
-ncalgebra(C,D);
+C[1,2]=Q2;    C[1,3]=1/Q2;  C[2,3]=Q2;
+D[1,2]=-Q*z;  D[1,3]=1/Q*y; D[2,3]=-Q*x; 
+ncalgebra(C,D); 
 option(redSB);
 option(redTail); // we wish to have minimal bases
 poly Cq=Q^4*x2+y2+Q^4*z2+Q*(1-Q^4)*x*y*z;
@@ -1762,8 +1747,8 @@ d[1,2]=-z;
 d[1,3]=2x;
 d[2,3]=-2y;
 ncalgebra(1,d); 
-// it is algebra U(sl_2)
-int N=3;
+// this is algebra U(sl_2)
+int N=2;
 poly f=1;
 for(int n=0;n<=N;n++)
 { 
@@ -1781,7 +1766,8 @@ J;
 @c example
 @end smallexample
 @item @strong{Remark:}
-There are algebras with no two-sided ideals (like Weyl algebras).
+There are algebras with no two-sided ideals except 0 and the
+whole algebra (like Weyl algebras).
 @end table
 
 

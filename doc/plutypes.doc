@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: plutypes.doc,v 1.22 2004-08-12 16:58:22 levandov Exp $
+@comment $Id: plutypes.doc,v 1.23 2005-03-08 13:50:36 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -240,6 +240,8 @@ normal form with respect to a Groebner basis (see @ref{reduce @value{PSUFFIX}})
 @c free resolution of an ideal resp.@: module but not changing the given ideal resp.@: module(see @ref{res @value{PSUFFIX}})
 @item std
 Groebner basis computation (see @ref{std @value{PSUFFIX}})
+@item syz
+computation of the first syzygy module (see @ref{syz @value{PSUFFIX}})
 @item twostd
 two-sided Groebner basis computation (see @ref{twostd})
 @end table
@@ -1250,6 +1252,10 @@ S;
 @cindex ring related functions @value{PSUFFIX}
 
 @table @code
+@item{envelope}
+enveloping ring (see @ref{envelope})
+@item{opposite}
+opposite ring (see @ref{opposite})
 @item qring
 quotient ring (see @ref{qring @value{PSUFFIX}}) 
 @end table
