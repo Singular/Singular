@@ -1,16 +1,16 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.23 1998-05-05 12:09:46 Singular Exp $
+@comment $Id: reference.doc,v 1.24 1998-05-06 09:54:08 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
 @c with emacs (C-c C-e C-b).
-@c @setfilename reference.info
-@c @node Top, Functions and variables
-@c @menu
-@c * Functions and variables::
-@c @end menu
-@c @node Functions and variables, Tricks and pitfalls, Data types, Top
-@c @chapter Functions and variables
+@setfilename reference.info
+@node Top, Functions and variables
+@menu
+* Functions and variables::
+@end menu
+@node Functions and variables, Tricks and pitfalls, Data types, Top
+@chapter Functions and variables
 
 
 @c ---------------------------------------
@@ -504,8 +504,8 @@ See @ref{ring}; @ref{char}; @ref{ordstr}; @ref{varstr}.
 
 @table @code
 @item @strong{Syntax:}
-@code{cleardenom (}poly_expression@code{)}
-@*@code{cleardenom (}vector_expression@code{)}
+@code{cleardenom (} poly_expression @code{)}
+@*@code{cleardenom (} vector_expression @code{)}
 @item @strong{Type:}
 same as the input type
 @item @strong{Purpose:}
@@ -561,8 +561,8 @@ See @ref{link}, @ref{link}; @ref{open}.
 
 @table @code
 @item @strong{Syntax:}
-@code{coef (}poly_expression @code{,} product_of_ringvars @code{)}
-@*@code{coef (}vector_expression@code{,} product_of_ringvars@code{,} matrix_name@code{,} matrix_name @code{)}
+@code{coef (} poly_expression @code{,} product_of_ringvars @code{)}
+@*@code{coef (} vector_expression@code{,} product_of_ringvars@code{,} matrix_name@code{,} matrix_name @code{)}
 @item @strong{Type:}
 matrix in the first case
 @*none in the second case
@@ -610,14 +610,14 @@ See @ref{poly expressions}; @ref{coeffs}.
 
 @table @code
 @item @strong{Syntax:}
-@code{coeffs (}poly_expression @code{,} ring_variable @code{)}
-@*@code{coeffs (}ideal_expression@code{,} ring_variable @code{)}
-@*@code{coeffs (}vector_expression@code{,} ring_variable @code{)}
-@*@code{coeffs (}module_expression@code{,} ring_variable @code{)}
-@*@code{coeffs (}poly_expression@code{,} ring_variable@code{,} matrix_name @code{)}
-@*@code{coeffs (}ideal_expression@code{,} ring_variable@code{,} matrix_name @code{)}
-@*@code{coeffs (}vector_expression@code{,} ring_variable@code{,} matrix_name @code{)}
-@*@code{coeffs (}module_expression@code{,} ring_variable@code{,} matrix_name @code{)}
+@code{coeffs (} poly_expression @code{,} ring_variable @code{)}
+@*@code{coeffs (} ideal_expression@code{,} ring_variable @code{)}
+@*@code{coeffs (} vector_expression@code{,} ring_variable @code{)}
+@*@code{coeffs (} module_expression@code{,} ring_variable @code{)}
+@*@code{coeffs (} poly_expression@code{,} ring_variable@code{,} matrix_name @code{)}
+@*@code{coeffs (} ideal_expression@code{,} ring_variable@code{,} matrix_name @code{)}
+@*@code{coeffs (} vector_expression@code{,} ring_variable@code{,} matrix_name @code{)}
+@*@code{coeffs (} module_expression@code{,} ring_variable@code{,} matrix_name @code{)}
 @item @strong{Type:}
 matrix
 @item @strong{Purpose:}
@@ -678,7 +678,7 @@ See @ref{poly expressions}; @ref{coef}.
 
 @table @code
 @item @strong{Syntax:}
-@code{contract (}ideal_expression@code{,} ideal_expression@code{)}
+@code{contract (} ideal_expression@code{,} ideal_expression @code{)}
 @item @strong{Type:}
 matrix
 @item @strong{Purpose:}
@@ -3795,7 +3795,7 @@ See @ref{int expressions}; @ref{intmat expressions}.
 @code{read (} link_expression @code{)}
 @*for DBM links:
 @*@code{read (} link_expression @code{)}
-@*@code{read (}  link_expression@code{,} string_expression @code{)} 
+@*@code{read (} link_expression@code{,} string_expression @code{)} 
 @item @strong{Type:}
 any
 @item @strong{Purpose:}
