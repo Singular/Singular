@@ -10,6 +10,7 @@
 //       try to create spolys as formal sums
 
 #include "tgb.h"
+static const int bundle_size=50;
 #if 1
 static omBin lm_bin=NULL;
 static inline poly p_Init_Special(const ring r)
@@ -2369,6 +2370,17 @@ tgb_sparse_matrix::~tgb_sparse_matrix(){
   }
   omfree(mp);
 }
+int row_cmp_gen(const void* a, const void* b){
+  const mac_poly ap= *((mac_poly*) a);
+  const mac_poly bp=*((mac_poly*) b);
+  if (ap==NULL) return 1;
+  if (bp==NULL) return -1;
+  if (ap->exp>bp->exp) return -1;
+  return 1;
+}
+void tgb_sparse_matrix::sort_rows(){
+  qsort(mp,rows,sizeof(mac_poly),row_cmp_gen);
+}
 void tgb_sparse_matrix::print(){
   int i;
   int j;
@@ -2398,6 +2410,7 @@ void tgb_sparse_matrix::set(int i, int j, number n){
 
   if (((*set_this)==NULL)||((*set_this)->exp>j))
   {
+    if (nIsZero(n)) return;
     mac_poly old=(*set_this);
     (*set_this)=new mac_poly_r();
     (*set_this)->exp=j;
@@ -2406,10 +2419,20 @@ void tgb_sparse_matrix::set(int i, int j, number n){
     return;
   }
   assume((*set_this)->exp==j);
-
-  nDelete(&(*set_this)->coef);
-  (*set_this)->coef=n;
-
+  if(!nIsZero(n))
+  {
+    nDelete(&(*set_this)->coef);
+    (*set_this)->coef=n;
+  }
+  else
+  {
+    nDelete(&(*set_this)->coef);
+    mac_poly dt=(*set_this);
+    (*set_this)=dt->next;
+    delete dt;
+    
+   
+  }
   return;
 }
 
@@ -2495,6 +2518,13 @@ void tgb_sparse_matrix::add_lambda_times_row(int add_to,int summand,number facto
 
 }
 void tgb_sparse_matrix::mult_row(int row,number factor){
+  if (nIsZero(factor))
+  {
+    mac_destroy(mp[row]);
+    mp[row]=NULL;
+   
+    return;
+  }
   mac_mult_cons(mp[row],factor);
 }
 void tgb_sparse_matrix::free_row(int row, BOOLEAN free_non_zeros){
@@ -2510,7 +2540,7 @@ void tgb_sparse_matrix::free_row(int row, BOOLEAN free_non_zeros){
       mp[row]=next;
     }
   }
-  
+  mp[row]=NULL;
 }
 //transfers ownership of m to mat
 void init_with_mac_poly(tgb_sparse_matrix* mat, int row, mac_poly m){
@@ -2549,6 +2579,7 @@ void simple_gauss(tgb_sparse_matrix* mat){
   int i;
   int pn=mat->get_rows();
   int matcol=mat->get_columns();
+  int* area=(int*) omalloc(sizeof(int)*((matcol-1)/bundle_size+1));
   assume(pn>0);
   //first clear zeroes
   for(i=0;i<pn;i++)
@@ -2556,12 +2587,26 @@ void simple_gauss(tgb_sparse_matrix* mat){
     if(mat->zero_row(i))
     {
       mat->perm_rows(i,pn-1);
-      row_cache[pn-1]=matcol;
       pn--;
       if(i!=pn){i--;}
     }
-    else
+ 
+  }
+  mat->sort_rows();
+  for(i=0;i<pn;i++)
       row_cache[i]=mat->min_col_not_zero_in_row(i);
+  int last_area=-1;
+  for(i=0;i<pn;i++)
+  {
+    int this_area=row_cache[i]/bundle_size;
+    assume(this_area>=last_area);
+    if(this_area>last_area)
+    {
+      int j;
+      for(j=last_area+1;j<=this_area;j++)
+	area[j]=i;
+      last_area=this_area;
+    }
   }
   while(row<pn-1){
     //row is the row where pivot should be
@@ -2675,7 +2720,7 @@ void simple_gauss(tgb_sparse_matrix* mat){
 #endif
     row++;
   }
-
+  omfree(area);
   omfree(row_cache);
 }
 void simple_gauss2(tgb_matrix* mat){

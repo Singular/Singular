@@ -140,6 +140,7 @@ class tgb_sparse_matrix{
   int rows;
   BOOLEAN free_numbers;
  public:
+  void sort_rows();
   friend poly free_row_to_poly(tgb_sparse_matrix* mat, int row, poly* monoms, int monom_index);
   friend void init_with_mac_poly(tgb_sparse_matrix* mat, int row, mac_poly m);
   tgb_sparse_matrix(int i, int j);
