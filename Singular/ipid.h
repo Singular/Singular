@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.h,v 1.21 1998-11-19 14:04:35 krueger Exp $ */
+/* $Id: ipid.h,v 1.22 1998-12-07 11:39:16 krueger Exp $ */
 /*
 * ABSTRACT: identfier handling
 */
@@ -78,6 +78,7 @@ struct sip_package
   char          *libname;
   short         ref;
   language_defs language;
+  BOOLEAN       loaded;
   void          *handle;
 };
 
