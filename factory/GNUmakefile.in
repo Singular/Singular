@@ -1,5 +1,5 @@
 # @configure_input@
-# $Id: GNUmakefile.in,v 1.34 1998-04-20 15:06:48 schmidt Exp $
+# $Id: GNUmakefile.in,v 1.35 1998-06-29 14:36:44 schmidt Exp $
 
 #
 # GNUmakefile.in - used by `configure' to create `GNUmakefile', the
@@ -134,8 +134,10 @@ basefactorysrc := \
 		cf_gcd.cc \
 		cf_generator.cc \
 		cf_globals.cc \
+		cf_inline.cc \
 		cf_irred.cc \
 		cf_iter.cc \
+		cf_iter_inline.cc \
 		cf_linsys.cc \
 		cf_map.cc \
 		cf_ops.cc \
