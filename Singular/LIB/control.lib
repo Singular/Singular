@@ -1,4 +1,4 @@
-version="$Id: control.lib,v 1.17 2004-12-14 21:05:09 levandov Exp $";
+version="$Id: control.lib,v 1.18 2004-12-16 16:28:53 levandov Exp $";
 category="Applications";
 info="
 LIBRARY:  control.lib Procedures for System and Control Theory 
@@ -17,7 +17,9 @@ autonom(module R);            analysis of autonomy-related properties of R (usin
 autonom2(module R);           analysis of autonomy-related properties of R (using dimension),
 LeftKernel(module R);         a left kernel of R,
 RightKernel(module R);        a right kernel of R,
-LeftInverse(module R)         a left inverse of matrix (module).
+LeftInverse(module R)         a left inverse of matrix (module),
+
+smith(module M);              a Smith form of a module M.
 
 AUXILIARY PROCEDURES:
 ncdetection(ring r);          computes an ideal, presenting an involution map on non-comm algebra r;
@@ -60,8 +62,10 @@ exWindTunnel();              Wind Tunnel.
 LIB "homolog.lib"; 
 LIB "poly.lib";
 LIB "primdec.lib";
+LIB "matrix.lib";
 // -- noncommutative procs:
 LIB "ncalg.lib";
+LIB "nctools.lib";
 LIB "nchomolog.lib"; 
 LIB "gkdim.lib";
 //---------------------------------------------------------------
@@ -269,20 +273,36 @@ example
   print( LeftKernel(M) );
 };
 //------------------------------------------------------------------------
-proc LeftInverse(matrix M)
-"USAGE:  LeftInverse(M);
-           M:  matrix
-RETURN:  left inverse of M if exists, i.e., matrix L such that LM == id;
+proc LeftInverse(module M)
+"USAGE:  LeftInverse(M);  M a module
+RETURN:  matrix L such that LM == Id;
 EXAMPLE:  example LeftInverse; shows an example
+NOTE: exists only in the case when Id \subseteq M!
 "
 {
+  // now it works also for the NC case;
   int NCols=ncols(M);
-  M=transpose(M);
-  //  matrix I[NCols][NCols];
-  //  I=I+1;
-  //  module Id=I;
   module Id = freemodule(NCols);
-  return( transpose( lift( module(M),Id ) )  );
+  M = transpose(M);
+  Id = std(Id);
+  matrix T;
+  option(redSB);
+  option(redTail);
+  // check the correctness:
+  // Id \subseteq M
+  module N = liftstd(M, T);
+  ideal TT = ideal(NF(N,Id));
+  TT = simplify(TT,2);
+
+  if (TT[1]!=0)
+  {
+    "No left inverse exists";
+    return(matrix(0));
+  }
+  matrix T2 = lift(N, Id);
+  T2 = transpose(T2)*transpose(T);
+  T2 =  transpose(T2);
+  return(T2);
 }
 example
 {"EXAMPLE:";echo =2;
@@ -294,7 +314,13 @@ example
 //-----------------------------------------------------------------------
 static proc dim_Our(module R)
 {
-  return(GKdim(R));
+  int d;
+  if (Is_NC())
+  {
+    d = GKdim(R);
+  }
+  else { d = dim(R); }
+  return(d);
 }
 //-----------------------------------------------------------------------
 static proc Ann_Our(module R)
@@ -310,17 +336,25 @@ static proc Ann_Our(module R)
 
 }
 //-----------------------------------------------------------------------
-static proc Ext_Our(int i, module R,list #)
+static proc Ext_Our(int i, module R, list #)
 // just a copy of 'Ext_R' from "homolog.lib" in commutative case
 {
-  if ( size(#)==0 )
-  { 
-    return( ncExt_R(i,R) ); 
+  int ISNC = Is_NC();
+  int ExtraArg = ( size(#)>0 );
+  if (ISNC)
+  {
+    // ExtraArg not yet implemented and thus ignored
+    return( ncExt_R(i,R) );
+  }
+  // the commutative case:
+  if (ExtraArg)
+  {
+    return( Ext_R(i,R,#[1]) );
   }
   else
   {
-    return( Ext_R(i,R,#[1]) );
-  };
+    return( Ext_R(i,R) );
+  }
 }
 //------------------------------------------------------------------------
 static proc is_zero_Our
@@ -359,7 +393,7 @@ NOTE:  this procedure is used in 'control' procedure
 		   LeftKernel( RK ),
 		  "obstruction to controllability",
 		   Ext_1,
-		  "annihilator of torsion module(of obstruction to controllability)",
+		  "annihilator of torsion module (of obstruction to controllability)",
 		   Ann_Our(Ext_1),
 		   DofS,
 		   d
@@ -870,11 +904,9 @@ proc ncdetection(def r)
         LExp = LExp + v[k];
       }
       //      if( (d-d_lead != 0) || (LExp > 1) )
-      if ( ( (d-d_lead) != 0) || (LExp > 1) || ( (LExp==0) && !( (d_lead==1) || (d_lead==-1)) ) )
+if ( ( (d-d_lead) != 0) || (LExp > 1) || ( (LExp==0) && ((d_lead>1) || (d_lead<-1)) ) )
       {
-	"i,j";
-	i,j;
-        return( "wrong input" );
+        return(theta);
       }
 
       if( v[j] == 1)                   //relation of type var(j)*var(i) = var(i)*var(j) -lambda*var(j)
@@ -1030,7 +1062,7 @@ NOTE:  effective with the liftstd procedure
       }
     }
   }
-  // return the result [in string=format]
+  // return the result [in string-format]
   L = simplify(L,2+4); // skip zeroes and double entries
   list SL;
   for (j=1; j<=size(L);j++)
@@ -1070,8 +1102,8 @@ RETURN:  canonized list
     if (typeof(M[i])=="module")
     {
       M[i] = std(M[i]);
-      M[i] = prune(M[i]); // mimimal embedding
-      M[i] = std(M[i]);
+      //      M[i] = prune(M[i]); // mimimal embedding
+      //      M[i] = std(M[i]);
     }
   }
   return(M);
@@ -1088,4 +1120,231 @@ example
   list C = control(R);
   list CC = canonize(C);
   view(CC);
+}
+
+//---------------------------------------------------------------
+
+static proc smdeg(matrix N)  
+// returns an intvec of length 2 with the index of an element of N with smallest degree
+{
+  int n = nrows(N);
+  int m = ncols(N);
+  int d,d_temp;
+  intvec v;
+  int i,j;            // counter
+  
+  for(i=1;i<=n;i++) // hier wird ein Element ausgewaehlt(!=0) und mit dessen Grad gestartet
+  {
+    for(j=1;j<=m;j++)
+    {
+      if( deg(N[i,j])!=-1 )
+      {
+    d=deg(N[i,j]);
+    break;
+      }
+    }
+    if(d!=-1)
+    {
+      break;
+    }  
+  }
+  for(i =1; i<=n; i++)
+  {
+    for(j=1;j<=m;j++)
+    {
+      d_temp = deg(N[i,j]);
+      if ((d_temp < d) && (N[i,j]!=0) )
+      {
+    d=d_temp;
+      }
+    }
+  }
+  for (i=1; i<=n; i++)
+  {
+    for (j =1; j<=m;j++)
+    {
+      if ( (deg(N[i,j]) == d) && (N[i,j]!=0) )
+      {
+    v = i,j;
+    return(v);
+      }
+    }
+  }
+}
+
+static proc NoNon0Pol(vector v)
+// returns 1, if there is only one non-zero element in v and 0 else
+{
+  int i,j;
+  int n = nrows(v);
+  for(j=1; j<=n;j++)
+  {
+    if(v[j]!=0)
+    {
+      i++;
+    }
+  }
+  if ( i!=1 )
+  {
+    i=0;
+  }
+  return(i);
+}
+
+
+proc smith( module M )
+"USAGE: smith(M), M a module or a matrix,
+RETURN: a list of length 4 with the following entries:
+[1]: The Smith-Form S of M, 
+[2]: the rank of M, 
+[3]: a unimodular matrix U,
+[4]: a unimodular matrix V, 
+such that U*M*V=S. An empty list is returned when no Smith Form exists. 
+NOTE: The Smith form only exists over PIDs (principal ideal domains).
+"
+{
+  if (nvars(basering)>1)
+    {
+      list @L;
+      return (@L);
+    }
+  matrix N = matrix(M);         //Typecasting
+  int n = nrows(N);
+  int m = ncols(N);
+  matrix P = unitmat(n);       //left transformation matrix
+  matrix Q = unitmat(m);       //right transformation matrix
+  int k, i, j, deg_temp;
+  poly tmp;
+  vector v;
+  list L;                      //for extgcd-computation
+  intmat f[1][n];              //to save degrees
+  matrix lambda[1][n];         //to save leadcoefficients
+  intmat g[1][m];              //to save degrees
+  matrix mu[1][m];             //to save leadcoefficients
+  int ii;                       //counter
+  ideal J;                      //for extgcd-computations
+  matrix T;                     //----------"------------
+  
+  while ((k!=n) && (k!=m) )    
+  {
+    k++;
+    while ((k<=n) && (k<=m))  //outer while-loop for column-operations
+    {
+      while(k<=m )        //inner while-loop for row-operations
+      {
+    if( (n>m) && (k < n) && (k<m))
+    {      
+      if( simplify((ideal(submat(N,k+1..n,k+1..m))),2)== 0)
+      {
+        return(N,k-1,P,Q);
+      }
+    }
+        i,j = smdeg(submat(N,k..n,k..m)); //choose smallest degree in the remaining submatrix
+        i=i+(k-1);                        //indices adjusted to the whole matrix
+	j=j+(k-1);
+	if(i!=k)                    //take the element with smallest degree in the first position
+        {
+          N=permrow(N,i,k);
+          P=permrow(P,i,k);
+        }
+        if(j!=k)
+        {
+          N=permcol(N,j,k);
+          Q=permcol(Q,j,k);
+        }
+        if(NoNon0Pol(N[k])==1)
+        {
+          break;
+        }
+        tmp=leadcoef(N[k,k]);
+        deg_temp=ord(N[k,k]);             //ord outputs the leading degree of N[k,k]
+        for(ii=k+1;ii<=n;ii++)
+        {
+          lambda[1,ii]=leadcoef(N[ii,k])/tmp;     
+          f[1,ii]=deg(N[ii,k])-deg_temp;
+        }
+        for(ii=k+1;ii<=n;ii++)
+        {
+          N = addrow(N,k,-lambda[1,ii]*var(1)^f[1,ii],ii);
+      N = normalize(N);
+          P = addrow(P,k,-lambda[1,ii]*var(1)^f[1,ii],ii);
+    }
+      }
+      if (k>n)
+      {
+    break;
+      }
+      if(NoNon0Pol(transpose(N)[k])==1)
+      {
+        break;
+      }
+      tmp=leadcoef(N[k,k]);
+      deg_temp=ord(N[k,k]); //ord outputs the leading degree of N[k][k]
+      
+      for(ii=k+1;ii<=m;ii++)
+      {
+        mu[1,ii]=leadcoef(N[k,ii])/tmp;     
+        g[1,ii]=deg(N[k,ii])-deg_temp;
+      }
+      for(ii=k+1;ii<=m;ii++)
+      {
+        N=addcol(N,k,-mu[1,ii]*var(1)^g[1,ii],ii);
+        N=normalize(N);
+        Q=addcol(Q,k,-mu[1,ii]*var(1)^g[1,ii],ii);
+      }
+    }
+    if( (k!=1) && (k<n) && (k<m) )
+    {
+      L=extgcd(N[k-1,k-1],N[k,k]);  //one can use this line if extgcd-bug is fixed
+      
+      //the next lines are needed for the divisibility condition of the entries of the Smith Form
+      
+      if(!(N[k-1,k-1]==L[1]))  //means that N[k-1,k-1] is not a divisor of N[k,k]
+	{
+	  N=addrow(N,k-1,L[2],k);
+	  normalize(N);
+	  P=addrow(P,k-1,L[2],k);
+	  
+	  N=addcol(N,k,-L[3],k-1);
+	  N=normalize(N);
+	  Q=addcol(Q,k,-L[3],k-1);
+	  k=k-2;
+	}
+    }
+  }  
+  if( (k<=n) && (k<=m) )
+    {
+      if( N[k,k]==0)
+      {
+	return(N,k-1,P,Q);
+      }
+    }
+  return(N,k,P,Q);
+}
+example
+{
+  "EXAMPLE:";echo = 2;
+  option(redSB);
+  option(redTail);
+  ring r=0,x,dp;
+  // This is example is trivial, but we want to see,
+  // that nothing is changed, when the matrix is already in Smith-Form!
+  module M = [x,0,0],[0,x2,0],[0,0,x3];
+  print(M);
+  list L = smith(M);
+  print(L[1]);
+  matrix N=matrix(M);
+  matrix B=L[3]*N*L[4];
+  B=normalize(std(B));
+  print(B);
+  //------- and yet another example --------------
+  module M2=[x2,x,3x3-4],[2x2-1,4x,5x2],[2x5,3x,4x];
+  print(M2);
+  list P=smith(M2);
+  print(P[1]);
+  matrix N2=matrix(M2);
+  matrix B2=P[3]*N2*P[4];
+  print(B2);
+  B2=normalize(std(B2));
+  print(B2);
 }
