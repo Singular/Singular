@@ -7,7 +7,7 @@
  *  Author:  obachman (Olaf Bachmann), hannes (Hannes Schoenemann),
  *           bricken (Michael Brickenstein) 
  *  Created: 01/02
- *  Version: $Id: fast_maps.h,v 1.5 2002-01-19 10:41:13 obachman Exp $
+ *  Version: $Id: fast_maps.h,v 1.6 2002-01-19 11:22:52 Singular Exp $
  *******************************************************************/
 
 /*******************************************************************************
@@ -73,7 +73,7 @@ inline mapoly maMonomial_Free(mapoly monomial, ring src_r, ring dest_r = NULL)
 
 // inserts ("adds") monomial what into poly into
 mapoly maPoly_InsertMonomial(mapoly into, mapoly what, ring src_r);
-mapoly maPoly_InsertMonomial(mapoly into, poly p, ring src_r, sBucket_pt bucket = NULL)
+mapoly maPoly_InsertMonomial(mapoly into, poly p, ring src_r, sBucket_pt bucket = NULL);
 
 
 // optimizes mpoly for later evaluation
