@@ -1,7 +1,7 @@
-// $Id: standard.lib,v 1.39 1999-07-30 10:37:59 obachman Exp $
+// $Id: standard.lib,v 1.40 1999-08-03 13:28:21 obachman Exp $
 //////////////////////////////////////////////////////////////////////////////
 
-version="$Id: standard.lib,v 1.39 1999-07-30 10:37:59 obachman Exp $";
+version="$Id: standard.lib,v 1.40 1999-08-03 13:28:21 obachman Exp $";
 info="
 LIBRARY: standard.lib   PROCEDURES WHICH ARE ALWAYS LOADED AT START-UP
 
@@ -63,7 +63,7 @@ example
 /////////////////////////////////////////////////////////////////////////////
 
 proc stdhilb(ideal i,list #)
-"USAGE:   stdhilb(i);  i ideal
+"USAGE:  stdhilb(i);  i ideal
          stdhilb(i,v); i homogeneous ideal, v intvec (the Hilbert function)
 RETURN:  stdhilb(i): a standard basis of i (computing v internally)
          stdhilb(i,v): standard basis of i, using the given Hilbert function
