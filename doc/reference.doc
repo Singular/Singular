@@ -1,8 +1,17 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.5 1998-04-27 13:39:52 Singular Exp $
+@comment $Id: reference.doc,v 1.6 1998-04-27 14:29:37 krueger Exp $
 @comment this file contains the reference part of the manual
 @c ---------------------------------------
-@node Functions, Control structures, Declaration commands, Commands
+@c @node Functions, Control structures, Declaration commands, Commands
+@menu
+* Functions::
+* Control structures::
+* Proc commands::
+* Other commands::
+* System variables::
+@end menu
+
+@node Functions, Control structures, Commands, Commands
 @section Functions
 @cindex Functions
 

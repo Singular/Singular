@@ -1,12 +1,14 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.4 1998-04-27 07:42:11 Singular Exp $
+@comment $Id: general.doc,v 1.5 1998-04-27 14:29:17 krueger Exp $
 @comment this file contains the general information about Singular
 
 @menu
 * Interactive use::
 * Rings and orderings::
 * The SINGULAR language::
-* Procedures and libraries::
+* Procedures::
+* Libraries::
+* Debugging tools::
 * Implemented algorithms::
 @end menu
 @c ---------------------------------------------------------------------------
@@ -25,14 +27,13 @@
 @cindex The SINGULAR language
 
 @c ---------------------------------------------------------------------------
-@c @node , Implemented algorithms, The SINGULAR language, General concepts
 @include libraries.tex
 @c @node Procedures, Libraries, The SINGULAR language, General concepts
 @c @node Libraries, Debugging tools, Procedures, General concepts
 @c @node Debugging tools, Implemented algorithms, Libraries, General concepts
 
 @c ---------------------------------------------------------------------------
-@node Implemented algorithms, , Procedures and libraries, General concepts
+@node Implemented algorithms, , Debugging tools, General concepts
 @section Implemented algorithms
 @cindex Implemented algorithms
 
