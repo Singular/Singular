@@ -1,4 +1,4 @@
-// $Id: homolog.lib,v 1.3 1997-05-06 13:08:33 Singular Exp $
+// $Id: homolog.lib,v 1.4 1997-09-12 07:40:34 Singular Exp $
 //(BM/GMG, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -565,7 +565,7 @@ RETURN:  Ext, of type module, a presentation of Ext^k(M',N') if v is of type
            [3] = matrix/list of matrices, each representing a kbase of Ext^k
                  (if finite dimensional)
 DISPLAY: printlevel >=0: degree of Ext^k for each k  (default)
-         printlevel >=1: Ak, Ak+1 and kbase of Ext^k in Hom(Fk,G0)
+         printlevel >=1: matrices Ak, Ak+1 and kbase of Ext^k in Hom(Fk,G0)
                             (if finite dimensional)
 NOTE:    In order to compute Ext^k(M,N) use the command Ext(k,syz(M),syz(N));
          or: list P=mres(M,2); list Q=mres(N,2); Ext(k,P[2],Q[2]);
@@ -640,7 +640,7 @@ EXAMPLE: example Ext;   shows examples
         ker   = modulo(A,B);
         imag  = imag,D;
         extMN = modulo(ker,imag);
-        dbprint(p-1,"// Computing Ext^"+string(k)+":",
+        dbprint(p-1,"// Computing Ext^"+string(k)+" (help Ext; gives an explanation):",
          "// Let 0<--coker(M)<--F0<--F1<--F2<--... be a resolution of coker(M),",
          "// and 0<--coker(N)<--G0<--G1 a presentation of coker(N),",
          "// then Hom(F"+string(k)+",G0)-->Hom(F"+string(k+1)+",G0) is given by:",A,

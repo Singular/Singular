@@ -1,10 +1,11 @@
-// $Id: sing.lib,v 1.3 1997-05-01 17:49:56 Singular Exp $
+// $Id: sing.lib,v 1.4 1997-09-12 07:40:37 Singular Exp $
 //system("random",787422842);
 //(GMG/BM, last modified 26.06.96)
 ///////////////////////////////////////////////////////////////////////////////
 
 LIBRARY:  sing.lib      PROCEDURES FOR SINGULARITIES
 
+ codim (id1, id2);      vector space dimension of of id2/id1 if finite
  deform(i);             infinitesimal deformations of ideal i
  dim_slocus(i);         dimension of singular locus of ideal i
  is_active(f,id);       is poly f an active element mod id? (id ideal/module)
@@ -15,15 +16,147 @@ LIBRARY:  sing.lib      PROCEDURES FOR SINGULARITIES
  milnor(i);             milnor number of ideal i; (assume i is ICIS in nf)
  nf_icis(i);            generic combinations of generators; get ICIS in nf
  slocus(i);             ideal of singular locus of ideal i
+ spectrum(f,w);         spectrum numbers of w-homogeneous polynomial f
  Tjurina(i);            SB of Tjurina module of ideal i (assume i is ICIS)
  tjurina(i);            Tjurina number of ideal i (assume i is ICIS)
  T1(i);                 T1-module of ideal i
  T2((i);                T2-module of ideal i
  T12(i);                T1- and T2-module of ideal i
- codim (id1, id2);      codimension of of id2 in id1
 
 LIB "inout.lib";
 LIB "random.lib";
+///////////////////////////////////////////////////////////////////////////////
+
+proc codim (id1, id2)
+USAGE:   codim(id1,id2); id1,id2 ideal or module
+ASSUME:  both must be standard bases w.r.t. ordering ds or Ds or homogeneous
+         and standardbases w.r.t. ordering dp or Dp
+RETURN:  int, which is:
+         1. the codimension of id2 in id1, i.e. the vectorspace dimension of
+            id1/id2 if id2 is contained in id1 and if this number is finite
+         2. -1 if the dimension of id1/id2 is infinite
+         3. -2 if id2 is not contained in id1,
+COMPUTE: consider the two hilberseries iv1(t) and iv2(t), then, in case 1.,
+         q(t)=(iv2(t)-iv1(t))/(1-t)^n must be rational, and the result is the
+         sum of the coefficients of q(t) (n number of variables)
+NOTE:    As always, id1 and id2 must be consider as ideals in the localization
+         of the polynomial ring w.r.t. the monomial ordering
+EXAMPLE: example codim; shows an example
+{
+   intvec iv1, iv2, iv;
+   int i, d1, d2, dd, i1, i2, ia, ie;
+  //--------------------------- check id2 < id1 -------------------------------
+   ideal led = lead(id1);
+   attrib(led, "isSB",1);
+   i = size(NF(lead(id2),led));
+   if ( i > 0 )
+   {
+     return(-2);
+   }
+  //--------------------------- 1. check finiteness ---------------------------
+   i1 = dim(id1);
+   i2 = dim(id2);
+   if (i1 < 0)
+   {
+     if (i2 == 0)
+     {
+       return vdim(id2);
+     }
+     else
+     {
+       return(-1);
+     }
+   }
+   if (i2 != i1)
+   {
+     return(-1);
+   }
+   if (i2 <= 0)
+   {
+     return(vdim(id2)-vdim(id1));
+   }
+  //--------------------------- module ---------------------------------------
+   d1 = nrows(id1);
+   d2 = nrows(id2);
+   dd = 0;
+   if (d1 > d2)
+   {
+     id2=id2,maxideal(1)*gen(d1);
+     dd = -1;
+   }
+   if (d2 > d1)
+   {
+     id1=id1,maxideal(1)*gen(d2);
+     dd = 1;
+   }
+  //--------------------------- compute first hilbertseries ------------------
+   iv1 = hilb(id1,1);
+   i1 = size(iv1);
+   iv2 = hilb(id2,1);
+   i2 = size(iv2);
+  //--------------------------- difference of hilbertseries ------------------
+   if (i2 > i1)
+   {
+     for ( i=1; i<=i1; i=i+1)
+     {
+       iv2[i] = iv2[i]-iv1[i];
+     }
+     ie = i2;
+     iv = iv2;
+   }
+   else
+   {
+     for ( i=1; i<=i2; i=i+1)
+     {
+       iv1[i] = iv2[i]-iv1[i];
+     }
+     iv = iv1;
+     for (ie=i1;ie>=0;ie=ie-1)
+     {
+       if (ie == 0)
+       {
+	 return(0);
+       }
+       if (iv[ie] != 0)
+       {
+         break;
+       }
+     }
+   }
+   ia = 1;
+   while (iv[ia] == 0) { ia=ia+1; }
+  //--------------------------- ia <= nonzeros <= ie -------------------------
+   iv1 = iv[ia];
+   for(i=ia+1;i<=ie;i=i+1)
+   {
+     iv1=iv1,iv[i];
+   }
+  //--------------------------- compute second hilbertseries -----------------
+   iv2 = hilb(iv1);
+  //--------------------------- check finitenes ------------------------------
+   i2 = size(iv2);
+   i1 = ie - ia + 1 - i2;
+   if (i1 != nvars(basering))
+   {
+     return(-1);
+   }
+  //--------------------------- compute result -------------------------------
+   i1 = 0;
+   for ( i=1; i<=i2; i=i+1)
+   {
+     i1 = i1 + iv2[i];
+   }
+   return(i1+dd);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r  = 0,(x,y,z),dp;
+   ideal j = y6,x4;
+   ideal m = x,y;
+   attrib(m,"isSB",1);  //let Singular know that ideals are a standard basis
+   attrib(j,"isSB",1);  
+   codim(m,j);          // should be 23 (Milnor number -1 of y7-x5)
+}
 ///////////////////////////////////////////////////////////////////////////////
 
 proc deform (ideal id)
@@ -361,6 +494,58 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
+proc spectrum (poly f, intvec w)
+USAGE:   spectrum(f,w);  f=poly, w=intvec;
+ASSUME:  f is a weighted homogeneous isolated singularity w.r.t. the weights
+         given by w; w must consist of as many positive integers as there
+         are variables of the basering
+COMPUTE: the spectral numbers of the w-homogeneous polynomial f, computed in a
+         ring of charcteristik 0
+RETURN:  intvec  d,s1,...,su  where: 
+         d = w-degree(f)  and  si/d = ith spectral-number(f)
+         No return value if basering has parameters or if f is no isolated 
+         singularity, displays a warning in this case
+EXAMPLE: example spectrum; shows an example
+{
+   int i,d,W;
+   intvec sp;
+   def r   = basering;
+   if( find(charstr(r),",")!=0 )
+   {
+       "// coefficient field must not have parameters!";
+       return();
+    }
+   ring s  = 0,x(1..nvars(r)),ws(w);
+   map phi = r,maxideal(1);
+   poly f  = phi(f);
+   d       = ord(f);
+   W       = sum(w)-d;
+   ideal k = std(jacob(f));
+   if( vdim(k) == -1 )
+   {
+       "// f is no isolated singuarity!";
+       return();
+    }
+   k = kbase(k);
+   for (i=1; i<=size(k); i++)
+   { 
+      sp[i]=W+ord(k[i]);
+   }
+   list L  = sort(sp);
+   sp      = d,L[1];
+   return(sp);
+}
+example 
+{ "EXAMPLE:"; echo = 2;
+   ring r;
+   poly f=x3+y5+z2;
+   intvec w=10,6,15;
+   spectrum(f,w);
+   // the spectrum numbers are:
+   // 1/30,7/30,11/30,13/30,17/30,19/30,23/30,29/30
+}
+///////////////////////////////////////////////////////////////////////////////
+
 proc Tjurina (id, list #)
 USAGE:   Tjurina(id[,<any>]);  id=ideal or poly
 ASSUME:  id=ICIS (isolated complete intersection singularity)
@@ -458,7 +643,12 @@ EXAMPLE: example T1; shows an example
      ideal t1  = std(J+jacob(J[1]));
      module nb = [1]; module pnb;
      dbprint(printlevel-voice+3,"// dim T1 = "+string(vdim(t1)));
-     if( size(#)>0 ) { return(t1*gen(1),nb,pnb); }
+     if( size(#)>0 ) 
+     { 
+        module st1 = t1*gen(1); 
+        attrib(st1,"isSB",1);
+        return(st1,nb,pnb); 
+     }
      return(t1);
   }
 //--------------------------- presentation of J -------------------------------
@@ -655,20 +845,23 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 proc codim (id1, id2)
-USAGE:  codim(id1,id2); id1,id2 ideal or module, both result of std
-RETURN:  result is the number of elements in id1 but not in id2 if finite,
-	 conditions:
-	 1.  id2 is contained in id1, if not return -2
-	 2.  finiteness
-	     consider the two hilberseries iv1(t) and iv2(t)
-	     q(t)=(iv2(t)-iv1(t))/(1-t)^n must be rational, if not return -1
-	     (n dimension of basering)
-         then the result is the sum of the coeff. of q(t)
+USAGE:   codim(id1,id2); id1,id2 ideal or module, both must be standard bases
+RETURN:  int, which is:
+         1. the codimension of id2 in id1, i.e. the vectorspace dimension of
+            id1/id2 if id2 is contained in id1 and if this number is finite
+         2. -1 if the dimension of id1/id2 is infinite
+         3. -2 if id2 is not contained in id1,
+COMPUTE: consider the two hilberseries iv1(t) and iv2(t), then, in case 1.,
+         q(t)=(iv2(t)-iv1(t))/(1-t)^n must be rational, and the result is the
+         sum of the coefficients of q(t) (n dimension of basering)
+EXAMPLE: example codim; shows an example
 {
    intvec iv1, iv2, iv;
    int i, d1, d2, dd, i1, i2, ia, ie;
-  //--------------------------- check id2 < id1 ------------------------------
-   i = size(NF(lead(id2),lead(id1)));
+  //--------------------------- check id2 < id1 -------------------------------
+   ideal led = lead(id1);
+   attrib(led, "isSB",1);
+   i = size(NF(lead(id2),led));
    if ( i > 0 )
    {
      return(-2);
@@ -695,10 +888,10 @@ RETURN:  result is the number of elements in id1 but not in id2 if finite,
    {
      return(vdim(id2)-vdim(id1));
    }
-   if (mult(id2) != mult(id1))
-   {
-     return(-1);
-   }
+ // if (mult(id2) != mult(id1))
+ //{
+ //  return(-1);
+ // }
   //--------------------------- module ---------------------------------------
    d1 = nrows(id1);
    d2 = nrows(id2);
@@ -772,4 +965,12 @@ RETURN:  result is the number of elements in id1 but not in id2 if finite,
    }
    return(i1+dd);
 }
-
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r  = 0,(x,y,z),dp;
+   ideal j = y6,x4;
+   ideal m = x,y;
+   attrib(m,"isSB",1);  //let Singular know that ideals are a standard basis
+   attrib(j,"isSB",1);  
+   codim(m,j);          // should be 23 (Milnor number -1 of y7-x5)
+}

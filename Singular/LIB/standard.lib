@@ -1,4 +1,4 @@
-// $Id: standard.lib,v 1.3 1997-08-01 13:42:14 obachman Exp $
+// $Id: standard.lib,v 1.4 1997-09-12 07:40:37 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
 
 LIBRARY: standard.lib	PROCEDURES WHICH ARE ALWAYS LOADED AT START-UP
@@ -9,11 +9,10 @@ LIBRARY: standard.lib	PROCEDURES WHICH ARE ALWAYS LOADED AT START-UP
 
 proc stdfglm (ideal i, list #)
 USAGE:   stdfglm(i[,s]); i ideal, s string (any allowed ordstr of a ring)
-RETURN:  stdfglm(i);    standard basis of i in the given ring, calculated via 
-			fglm from ordering "dp" to the current ordering.
-	 stdfglm(i,s);  standard basis of i in the given ring, calculated via
-		        fglm from ordering s (as a string) to the given 
-			ordering.
+RETURN:  stdfglm(i): standard basis of i in the basering, calculated via fglm
+                     from ordering "dp" to the ordering of the basering.
+         stdfglm(i,s): standard basis of i in the basering, calculated via
+                     fglm from ordering s to the ordering of the basering.
 EXAMPLE: example stdfglm; shows an example
 {
    string os;
@@ -42,15 +41,20 @@ EXAMPLE: example stdfglm; shows an example
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring r=0,(x,y,z), lp; ideal i=y3+x2, x2y+x2, x3-x2, z4-x2-y;
-   ideal is=stdfglm(i,"Dp"); is;
+   ring r  = 0,(x,y,z),lp; 
+   ideal i = y3+x2, x2y+x2, x3-x2, z4-x2-y;
+   ideal i1= stdfglm(i);         //uses fglm from "dp" to "lp"
+   i1;      
+   ideal i2= stdfglm(i,"Dp");    //uses fglm from "Dp" to "lp"
+   i2;
 }
 ///////////////////////////////////////////////////////////////////////////////
 
 proc stdhilbert(ideal i,list #)
-USAGE:  stdhilbert(i);  i ideal
-        stdhilbert(i,v); i homogeneous ideal, v intvec (the Hilbert function)
-RETURN: stdhilbert(i);  standard basis of i computed using the Hilbert function
+USAGE:   stdhilbert(i);  i ideal
+         stdhilbert(i,v); i homogeneous ideal, v intvec (the Hilbert function)
+RETURN:  stdhilbert(i): a standard basis of i (computing v internally)
+         stdhilbert(i,v): standard basis of i, using the given Hilbert function
 EXAMPLE: example stdhilbert; shows an example
 {
    def R=basering;
@@ -102,8 +106,12 @@ EXAMPLE: example stdhilbert; shows an example
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring r=0,(x,y,z), lp; ideal i=y3+x2, x2y+x2, x3-x2, z4-x2-y;
-   ideal is=stdhilbert(i); is;
+   ring  r = 0,(x,y,z),lp; 
+   ideal i = y3+x2, x2y+x2, x3-x2, z4-x2-y;
+   ideal i1= stdhilbert(i); i1;
+   // is in this case equivalent to:
+   intvec v=1,0,0,-3,0,1,0,3,-1,-1;
+   ideal i2=stdhilbert(i,v);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
