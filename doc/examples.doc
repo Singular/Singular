@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.51 1999-08-17 06:34:54 wichmann Exp $
+@comment $Id: examples.doc,v 1.52 1999-08-23 14:51:08 anne Exp $
 @comment this file contains the examples
 
 @c The following directives are necessary for proper compilation
@@ -232,7 +232,7 @@ procedure which computes the Milnor number and the Tjurina number.
 We shall demonstrate:
 @itemize @bullet
 @item
-loading the library @code{sing.lib}
+load the library @code{sing.lib}
 @c item
 @c disable the protocol option
 @item
@@ -255,7 +255,7 @@ lists may be empty.)
   @item
   the procedure @code{tjur} where the parameters are not specified. They
   are referred
-  to by @code{#[1]} for the 1st, @code{#[2]} for the 2nd parameter etc.
+  to by @code{#[1]} for the 1st, @code{#[2]} for the 2nd parameter, etc.
   @code{tjur} returns the Tjurina number (and displays a comment).
   @item
   the procedure @code{milrina} which returns a list consisting of two
@@ -335,7 +335,7 @@ the number of critical points of @code{f} in the affine plane
 (counted with multiplicities)
 @item
 the number of singular points of @code{f} on the affine plane curve @code{f}=0
-(counted with multiplicities)
+(counted with multiplicities).
 @end itemize
 
 We start with the ring @code{r1} from section @ref{Milnor and Tjurina} and its elements.
@@ -360,39 +360,39 @@ Note that polynomials, ideals, matrices (of polys), vectors,
   which works for almost identical rings,
   e.g., if the rings differ only by the ordering or by the names of the
   variables and which may be used to rename variables).
-  Integers and strings however do not belong to any ring. Once
+  Integers and strings, however, do not belong to any ring. Once
   defined they are globally known.
 @item
 The result of the computation here (together with the previous one in
  @ref{Milnor and Tjurina}) shows that (for @code{t}=0)
 @tex
-$\hbox{dim}_K(\hbox{Loc}_{(x)}K[x_1,\ldots,x_n]/\hbox{jacob}(f))$
+$\hbox{dim}_K(\hbox{Loc}_{(x,y,z)}K[x,y,z]/\hbox{jacob}(f))$
 @end tex
 @ifinfo
-  dim_K(Loc_(x)K[x1,...,xn]/jacob(f))
+  dim_K(Loc_(x,y,z)K[x,y,z]/jacob(f))
 @end ifinfo
 = 250 (previously computed) while
 @tex
-$\hbox{dim}_K(K[x_1,\ldots,x_n]/\hbox{jacob}(f))$
+$\hbox{dim}_K(K[x,y,z]/\hbox{jacob}(f))$
 @end tex
 @ifinfo
-  dim_K(K[x1,...,xn]/jacob(f))
+  dim_K(K[x,y,z]/jacob(f))
 @end ifinfo
 = 536. Hence @code{f} has 286 critical points,
   counted with multiplicity, outside the origin.
   Moreover, since
 @tex
-$\hbox{dim}_K(\hbox{Loc}_{(x)}K[x_1,\ldots,x_n]/(\hbox{jacob}(f)+(f)))$
+$\hbox{dim}_K(\hbox{Loc}_{(x,y,z)}K[x,y,z]/(\hbox{jacob}(f)+(f)))$
 @end tex
 @ifinfo
-dim_K(Loc_(x)K[x1,...,xn]/(jacob(f)+(f)))
+dim_K(Loc_(x,y,z)K[x,y,z]/(jacob(f)+(f)))
 @end ifinfo
 = 195 =
 @tex
-$\hbox{dim}_K(K[x_1,\ldots,x_n]/(\hbox{jacob}(f)+(f)))$,
+$\hbox{dim}_K(K[x,y,z]/(\hbox{jacob}(f)+(f)))$,
 @end tex
 @ifinfo
-dim_K(K[x1,...,xn]/(jacob(f)+(f))),
+dim_K(K[x,y,z]/(jacob(f)+(f))),
 @end ifinfo
 the affine surface @code{f}=0 is smooth outside the origin.
 @end itemize
@@ -481,7 +481,7 @@ But a very small deformation does not (the undeformed
 example is degenerate with respect to the Newton boundary).
 This example demonstrates that it might be wise, for complicated
 examples, to do the calculation first in positive char (e.g., 32003).
-It was shown, that in complicated examples, more than 95 percent of
+It has been shown, that in complicated examples, more than 95 percent of
 the time needed for a standard basis computation is used in the
 computation of the coefficients (in char 0).
 The representation of long integers with real is demonstrated.
@@ -539,7 +539,7 @@ Let us now deform a given 0-dimensional ideal j by introducing a parameter t
 and compute over the ground field Q(t).
 We compute the dimension at the generic point,
 @end ifclear
-i.e.
+i.e.,
 @tex
 $dim_{Q(t)}Q(t)[x,y]/j$.
 @end tex
@@ -597,15 +597,15 @@ j_0=j_t=a
 @cindex T1
 @cindex T2
 
-T1 resp.@: T2 of an ideal j do usually denote the modules of
-infinitesimal deformations resp.@: of obstructions.
+T1, resp.@: T2, of an ideal j usually denote the modules of
+infinitesimal deformations, resp.@: of obstructions.
 In @sc{Singular} there are procedures @code{T1} and @code{T2} in
 @code{sing.lib} such that
 @code{T1(j)} and @code{T2(j)} compute a standard basis of
 a presentation of these modules.
-If T1 nad T2 are finite dimensional K-vector spaces (e.g., for isolated
+If T1 and T2 are finite dimensional K-vector spaces (e.g., for isolated
 singularities), a basis can be computed by applying
-@code{kbase(T1(j));} resp.@: @code{kbase(T2(j));}, the dimensions by
+@code{kbase(T1(j));}, resp.@: @code{kbase(T2(j));}, the dimensions by
 applying @code{vdim}.
 For a complete intersection j the procedure @code{Tjurina} also
 computes T1, but faster (T2=0 in this case).
@@ -735,12 +735,12 @@ singularity.
 @item
 The procedure @code{deform} in @code{sing.lib} returns a matrix whose columns
 @ifinfo
-@code{h_1,..., h_s}
+@code{h_1,..., h_r}
 @end ifinfo
 @tex
-$h_1,\ldots,h_s$
+$h_1,\ldots,h_r$
 @end tex
-represent all of 1st order deformations. More precisly, if
+represent all 1st order deformations. More precisely, if
 @ifinfo
 I in R is the ideal generated by @code{f_1,...,f_s}, then any infinitesimal
 deformation of R/I over K[e]/(e^2) is given by @code{f+eg},
@@ -748,8 +748,8 @@ where f=(f_1,...,f_s), g a K-linear combination of the h_i.
 @end ifinfo
 @tex
 $I \subset R$ is the ideal generated by $f_1,...,f_s$, then any infinitesimal
-deformation of $R/I$ over $K[\epsilon]/(\epsilon^2)i$ is given
-by $f+\epsilon g$,
+deformation of $R/I$ over $K[\varepsilon]/(\varepsilon^2)$ is given
+by $f+\varepsilon g$,
 where $f=(f_1,...,f_s)$, $g$ a $K$-linear combination of the $h_i$.
 @end tex
 
@@ -768,7 +768,7 @@ choose his own names.
 @item
 If the user sets @code{printlevel=2;} before running @code{versal}, some
 intermediate results are shown. This is useful since @code{versal}
-is already complicated and since it might run quite long on more
+is already complicated and might run for some time on more
 complicated examples. (type @code{help versal;})
 @end itemize
 
@@ -810,7 +810,7 @@ in each of the cases the miniversal deformation:
   Fs;
   // the miniversal deformation of V(j) is the projection from the
   // miniversal total space to the miniversal base space:
-  // { (A,B,C,D,E,F,x,y,z) | xy+A+Bz=0, y2+z2+x3+C+Dx+Ex2+Fy=0 }
+  // { (A,B,C,D,E,F,x,y,z) | xy+F+Ez=0, y2+z2+x3+D+Cx+Bx2+Ay=0 }
   //  --> { (A,B,C,D,E,F) }
   //----------------------------------------------------
   // general case (cone over rational normal curve of degree 4):
@@ -821,7 +821,7 @@ in each of the cases the miniversal deformation:
   // Def_r is the name of the miniversal base space with
   // parameters A(1),...,A(4)
   versal(i,0,"Def_r","A(");
-  "// used time:",timer-time,"sec";   // time for miniversal
+  "// used time:",timer-time,"sec";   // time of last command
   // the miniversal deformation of V(i) is the projection from the
   // miniversal total space to the miniversal base space:
   // { (A(1..4),x,y,z,u,v) |
@@ -893,8 +893,8 @@ In general there will be many more solutions in the second case.
   "//",s,"solutions over GF("+string(p)+")";
   // Now go to the field with p^3 elements:
   // As long as there is no map from Z/p to the field with p^3 elements
-  // implemented, use the folowing trick: convert the ideal to be maped
-  // to the new ring to a string and then execute that string in the
+  // implemented, use the following trick: convert the ideal to be mapped
+  // to the new ring to a string and then execute this string in the
   // new ring
   string ms="ideal m="+string(m)+";";
   ms;
@@ -905,11 +905,11 @@ In general there will be many more solutions in the second case.
   execute ms;
   s=0;
   ideal mt;
-  for (i(1)=0;i(1)<p^k-k;i(1)=i(1)+1)
+  for (i(1)=0;i(1)<p^k-1;i(1)=i(1)+1)
   {
-    for (i(2)=0;i(2)<p^k-k;i(2)=i(2)+1)
+    for (i(2)=0;i(2)<p^k-1;i(2)=i(2)+1)
     {
-      for (i(3)=0;i(3)<p^k-k;i(3)=i(3)+1)
+      for (i(3)=0;i(3)<p^k-1;i(3)=i(3)+1)
       {
         mt=m;
         for (l=1;l<=n;l=l+1)
@@ -965,7 +965,7 @@ J=(x1-f1(t1,...,tr),...,xn-fn(t1,...,tr)) in k[t1,...tr,x1,...,xn]
 @end smallexample
 
 @end ifinfo
-i.e of the ideal j obtained from J by eliminating the variables
+i.e, of the ideal j obtained from J by eliminating the variables
 @tex
 $t_1,\ldots,t_r$.
 @end tex
@@ -973,13 +973,13 @@ $t_1,\ldots,t_r$.
 t1,...,tr.
 @end ifinfo
 This can be done by computing a standard basis of J with respect to a product
-ordering where the block of t-variables comes before the block of
+ordering where the block of t-variables precedes the block of
 x-variables and then selecting those polynomials which do not contain
 any t. In @sc{Singular} the most convenient way is to use the
 @code{eliminate} command.
 In contrast to the first method, with @code{eliminate} the result needs not be a
 standard basis in the given ordering.
-Hence, there may be cases where the first method is to be preferred.
+Hence, there may be cases where the first method is the preferred one.
 
 @strong{WARNING:} In the case of a local or a mixed ordering, elimination needs special
 care. f may be considered as a map of germs
@@ -993,7 +993,7 @@ but even
 if this map germ is finite, we are in general not able to compute the image
 germ because for this we would need an implementation of the Weierstrass
 preparation theorem. What we can compute, and what @code{eliminate} actually does,
-is the following. Let V(J) be the zero-set of J in
+is the following: let V(J) be the zero-set of J in
 @tex
 $k^r\times(k^n,0)$,
 @end tex
@@ -1011,17 +1011,17 @@ can be computed.
 @*can be computed.
 @end ifinfo
 Note that this germ contains also those components
-of V(J) which meet the fibre of pr outside the origin.
+of V(J) which meet the fiber of pr outside the origin.
 This is achieved by an ordering with the block of t-variables having a
-global ordering (and coming before the x-variables) and the x-variables having
+global ordering (and preceding the x-variables) and the x-variables having
 a local ordering. In a local situation we propose @code{eliminate} with
 ordering ls.
 
 In any case, if the input is weighted homogeneous (=quasihomogeneous),
-the variables should be given the correct weights.
+the weights given to the variables should be chosen accordingly.
 @sc{Singular} offers a function @code{weight} which proposes,
 given an ideal or module, integer weights for the variables, such that
-the ideal resp.@: module is as homogeneous as possible with respect to these weights.
+the ideal, resp.@: module, is as homogeneous as possible with respect to these weights.
 The function finds correct weights, if the input is weighted homogeneous
 (but is rather slow for many variables). In order to check, whether the
 input is quasihomogeneous, use the function @code{qhweight}, which returns
@@ -1153,7 +1153,7 @@ There are the following commands to compute a resolution:
 @end ifset
 computes a free resolution of an ideal or module using a heuristically
 chosen method.
-This is the prefered method to compute free resolutions of ideals or
+This is the preferred method to compute free resolutions of ideals or
 modules.
 @item lres
 @ifset singularmanual
@@ -1165,7 +1165,7 @@ method. The input needs to be homogeneous.
 @ifset singularmanual
 @ref{mres}@*
 @end ifset
-computes a minimal free resolution of an ideal or module with the Syzygy
+computes a minimal free resolution of an ideal or module with the syzygy
 method.
 @item sres
 @ifset singularmanual
@@ -1180,13 +1180,15 @@ method. The input has to be a standard basis.
 computes a free resolution of an ideal or module with the standard basis
 method.
 @item minres
+@ifset singularmanual
+@ref{minres}@*
+@end ifset
 minimizes a free resolution of an ideal or module.
 @item syz
 @ifset singularmanual
 @ref{syz}@*
 @end ifset
-computes the first Syzygy (i.e., the module of relations of the
-given generators).
+computes the first syzygy module.
 @end table
 @code{res(i,r)}, @code{lres(i,r)}, @code{sres(i,r)}, @code{mres(i,r)},
 @code{nres(i,r)} compute the first r modules of the resolution
@@ -1205,7 +1207,7 @@ K^3
 @end ifinfo
 has a free resolution of length 2 and that i is given by the 2x2 minors
 of the 2nd matrix in the resolution.
-We test this for the two transversal cusps in
+We test this for two transversal cusps in
 @tex
 $K^3$.
 @end tex
@@ -1280,10 +1282,10 @@ the @code{lres} command.
 @cindex  Ext
 
 We start by showing how to calculate the @math{n}-th Ext group of an
-ideal. The ingredients to do this, are by the definition of Ext the
+ideal. The ingredients to do this are by the definition of Ext the
 following: calculate a (minimal) resolution at least up to length
-@math{n}, apply the Hom-functor, and calculate the @math{n}-th Homology
-group, so form the quotient
+@math{n}, apply the Hom-functor, and calculate the @math{n}-th homology
+group, that is form the quotient
 @tex
 $\hbox{\rm ker} / \hbox{\rm Im}$
 @end tex
@@ -1308,7 +1310,7 @@ A/(A intersect B)
 in the usual way. As we have a chain complex this is obviously the same
 as ker/Im.
 
-We collect these statements in this short procedure.
+We collect these statements in the following short procedure:
 
 @smallexample
 proc ext(int n, ideal I)
@@ -1344,12 +1346,12 @@ example.
 
 If @math{M} is a module, then
 @tex
-$\hbox{Ext}^1(M,M)$ resp.\ $\hbox{Ext}^2(M,M)$
+$\hbox{Ext}^1(M,M)$, resp.\ $\hbox{Ext}^2(M,M)$,
 @end tex
 @ifinfo
-Ext^1(M,M) resp.@: Ext^2(M,M)
+Ext^1(M,M), resp.@: Ext^2(M,M),
 @end ifinfo
-are the modules of infinitesimal deformations resp.@: of obstructions of
+are the modules of infinitesimal deformations, resp.@: of obstructions, of
 @math{M} (like T1 and T2 for a singularity).  Similar to the treatment
 for singularities, the semiuniversal deformation of @math{M} can be
 computed (if
@@ -1395,19 +1397,19 @@ and obstructions
 @end ifinfo
 of the residue field @math{K=R/m} of an ordinary cusp,
 @tex
-R=Loc$_m K[x,y]/(x^2-y^3)$, m=($x,y$).
+$R=Loc_m K[x,y]/(x^2-y^3)$, $m=(x,y)$.
 @end tex
 @ifinfo
 R=Loc_m K[x,y]/(x^2-y^3), m=(x,y).
 @end ifinfo
-For
+To compute
 @tex
 $\hbox{Ext}^1(m,m)$
 @end tex
 @ifinfo
 Ext^1(m,m),
 @end ifinfo
-here we have to compute @code{Ext(1,syz(m),syz(m))} with
+we have to apply @code{Ext(1,syz(m),syz(m))} with
 @code{syz(m)} the first syzygy module of @math{m}, which is isomorphic to
 @tex
 $\hbox{Ext}^2(K,K)$.
@@ -1422,7 +1424,7 @@ $\hbox{Ext}^k(R/i,R)$
 @ifinfo
 Ext^k(R/i,R)
 @end ifinfo
-for some ideal @math{i} and with an extra option
+for some ideal @math{i} and with an extra option.
 @end itemize
 
 @smallexample
@@ -1440,8 +1442,10 @@ for some ideal @math{i} and with an extra option
   printlevel=0;
   module E = Ext(1,syz(m),syz(m));
   print(std(E));
-  //We see from the matrices that T2K and E are isomorphic
-  //as it should be; but both are differently presented
+  //The matrices which we have just computed are presentation matrices
+  //of the modules T2K and E. Hence we may ignore those columns 
+  //containing 1 as an entry and see that T2K and E are isomorphic
+  //as expected, but differently presented.
   //-------------------------------------------
   ring S=0,(x,y,z),dp;
   ideal  i = x2y,y2z,z3x;
@@ -1513,7 +1517,7 @@ or germs of hypersurfaces
 getting in this way
 projective, affine or local polar curves.
 
-We shall compute now this for a family of curves.  We need the library
+Now let us compute this for a family of curves.  We need the library
 @code{elim.lib} for saturation and @code{sing.lib} for the singular
 locus.
 
@@ -1551,7 +1555,6 @@ locus.
   // Local polar curve:
   ring r = 0,(x,z,t),ds;              // local ordering ds
   poly f = z5+xz3+x2-tz6;
-  dim_slocus(f);                      // dimension of singular locus
   ideal j = diff(f,x),diff(f,z);
   dim(std(j));                        // V(j) 1-dimensional
   dim(std(j+ideal(f)));               // V(j,f) also 1-dimensional
