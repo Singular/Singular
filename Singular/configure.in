@@ -46,10 +46,10 @@ dnl
 dnl here are some defaults
 
 SINGULAR_MAJOR_VERSION=${SINGULAR_MAJOR_VERSION:-2}
-SINGULAR_MINOR_VERSION=${SINGULAR_MINOR_VERSION:-0}
+SINGULAR_MINOR_VERSION=${SINGULAR_MINOR_VERSION:-1}
 SINGULAR_SUB_VERSION=${SINGULAR_SUB_VERSION:-0}
 SINGULAR_VERSION="${SINGULAR_VERSION:-$SINGULAR_MAJOR_VERSION${VERSION_SEP}$SINGULAR_MINOR_VERSION${VERSION_SEP}$SINGULAR_SUB_VERSION}"
-VERSION_DATE=${VERSION_DATE:-"February 2001"}
+VERSION_DATE=${VERSION_DATE:-"March 2001"}
 
 dnl pass them on into the Makefiles
 AC_SUBST(SINGULAR_VERSION)
@@ -787,15 +787,15 @@ else
 fi
 
 AC_MSG_CHECKING(whether to have namespaces)
-if test "$with_namespaces" != yes; then
-  AC_MSG_RESULT(no)
+if test "$with_namespaces" != no; then
+  AC_MSG_RESULT(yes)
 else
   AC_DEFINE(HAVE_NAMESPACES)
-  AC_MSG_RESULT(yes)
+  AC_MSG_RESULT(no)
 fi
 
 AC_MSG_CHECKING(whether to have dynamic modules)
-if test "$with_dynamic_modules" != yes || test "$ac_have_dl" != yes; then
+if test "$with_dynamic_modules" == no || test "$ac_have_dl" != yes; then
   AC_MSG_RESULT(no)
 else
   AC_DEFINE(HAVE_DYNAMIC_LOADING)
