@@ -128,7 +128,7 @@ SINGUNAME	= @SINGUNAME@
 localdir        = /usr/local
 install_prefix  = ${localdir}/Singular/${S_VERSION}
 
-BINDIST_DIRS    = Singular doc
+BINDIST_DIRS    = Singular doc IntegerProgramming
 SHAREDIST_DIRS  = Singular doc emacs
 TMPDIR		= ${TMP_DIR}/singdist
 
@@ -143,7 +143,9 @@ install-dist install-local: install-bindist install-sharedist
 install-bindist:
 	for DIR in ${BINDIST_DIRS}; \
 	do \
-	  (cd $${DIR}; ${MAKE} install-bindist install_prefix=${install_prefix});\
+	  if test -d $${DIR}; then \
+	    (cd $${DIR}; ${MAKE} install-bindist install_prefix=${install_prefix});\
+	  fi \
 	done
 
 install-sharedist: ${SINGULAR}
