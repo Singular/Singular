@@ -4,7 +4,7 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id: subexpr.cc,v 1.65 2000-09-18 09:19:35 obachman Exp $ */
+/* $Id: subexpr.cc,v 1.66 2000-09-18 09:31:50 obachman Exp $ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -705,7 +705,7 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
           {
             return omStrDup((char*)d);
           }
-
+    
         case POLY_CMD:
         case VECTOR_CMD:
           if (typed)
@@ -742,13 +742,13 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
           }
           s = StringAppendS((char*) (typed ? ")" : ""));
           return omStrDup(s);
-
+          
         case MATRIX_CMD:
           s= iiStringMatrix((matrix)d,dim);
           if (typed)
           {
             char* ns = (char*) omAlloc(strlen(s) + 40);
-            sprintf(ns, "matrix(ideal(%s),%d,%d)", s,
+            sprintf(ns, "matrix(ideal(%s),%d,%d)", s, 
                     ((ideal) d)->nrows, ((ideal) d)->ncols);
             omCheckAddr(ns);
             return ns;
@@ -800,7 +800,7 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
         case RING_CMD:
         case QRING_CMD:
           s  = rString((ring)d);
-
+          
           if (typed)
           {
             char* ns;
@@ -820,7 +820,7 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
             return ns;
           }
           return s;
-
+          
         case RESOLUTION_CMD:
         {
           lists l = syConvRes((syStrategy)d);
@@ -845,7 +845,7 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
           }
           return omStrDup(s);
         }
-
+          
         case LINK_CMD:
           s = slString((si_link) d);
           if (typed)
@@ -857,7 +857,8 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
             return ns;
           }
           return s;
-
+          
+        
         case LIST_CMD:
           return lString((lists) d, typed, dim);
     } /* end switch: (Typ()) */
@@ -865,7 +866,7 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
   return omStrDup("");
 }
 
-
+    
 int  sleftv::Typ()
 {
   if (e==NULL)
@@ -1047,35 +1048,34 @@ void * sleftv::Data()
   if (iiCheckRing(t))
     return NULL;
   char *r=NULL;
-  int index=e->start;
   switch (t)
   {
     case INTVEC_CMD:
     {
       intvec *iv=(intvec *)d;
-      if ((index<1)||(index>iv->length()))
+      if ((e->start<1)||(e->start>iv->length()))
       {
         if (!errorreported)
-          Werror("wrong range[%d] in intvec(%d)",index,iv->length());
+          Werror("wrong range[%d] in intvec(%d)",e->start,iv->length());
       }
       else
-        r=(char *)((*iv)[index-1]);
+        r=(char *)((*iv)[e->start-1]);
       break;
     }
     case INTMAT_CMD:
     {
       intvec *iv=(intvec *)d;
-      if ((index<1)
-         ||(index>iv->rows())
+      if ((e->start<1)
+         ||(e->start>iv->rows())
          ||(e->next->start<1)
          ||(e->next->start>iv->cols()))
       {
         if (!errorreported)
-        Werror("wrong range[%d,%d] in intmat(%dx%d)",index,e->next->start,
+        Werror("wrong range[%d,%d] in intmat(%dx%d)",e->start,e->next->start,
                                                      iv->rows(),iv->cols());
       }
       else
-        r=(char *)(IMATELEM((*iv),index,e->next->start));
+        r=(char *)(IMATELEM((*iv),e->start,e->next->start));
       break;
     }
     case IDEAL_CMD:
@@ -1083,101 +1083,60 @@ void * sleftv::Data()
     case MAP_CMD:
     {
       ideal I=(ideal)d;
-      if ((index<1)||(index>IDELEMS(I)))
+      if ((e->start<1)||(e->start>IDELEMS(I)))
       {
         if (!errorreported)
-          Werror("wrong range[%d] in ideal/module(%d)",index,IDELEMS(I));
+          Werror("wrong range[%d] in ideal/module(%d)",e->start,IDELEMS(I));
       }
       else
-        r=(char *)I->m[index-1];
+        r=(char *)I->m[e->start-1];
       break;
     }
     case STRING_CMD:
     {
-      // this was a memory leak
-      // we evalute it, cleanup and replace this leftv by it's evalutated form
-      // the evalutated form will be build in tmp
-      sleftv tmp;
-      memset(&tmp,0,sizeof(tmp));
-      tmp.rtyp=STRING_CMD;
+      // this is a memory leak
+      // OB: ???
+      // Hannes, any chance to get around this ???
       r=(char *)omAllocBin(size_two_bin);
-      if ((index>0)&& (index<=(int)strlen((char *)d)))
+      omMarkAsStaticAddr(r);
+      if ((e->start>0)&& (e->start<=(int)strlen((char *)d)))
       {
-        r[0]=*(((char *)d)+index-1);
+        r[0]=*(((char *)d)+e->start-1);
         r[1]='\0';
       }
       else
       {
         r[0]='\0';
       }
-      tmp.data=r;
-      if (rtyp==IDHDL)
-      {
-        tmp.next=next; next=NULL;
-        CleanUp();
-        memcpy(this,&tmp,sizeof(tmp));
-      }
-      // and, remember, r is also the result...
-      else
-      {
-        // ???
-        // here we still have a memory leak...
-	// example: list L="123","456";
-	// L[1][2];
-	// therefore, it should never happen:
-	assume(0);
-	// but if it happens: here is the temporary fix:
-	omMarkAsStaticAddr(r);
-      }
       break;
     }
     case MATRIX_CMD:
     {
-      if ((index<1)
-         ||(index>MATROWS((matrix)d))
+      if ((e->start<1)
+         ||(e->start>MATROWS((matrix)d))
          ||(e->next->start<1)
          ||(e->next->start>MATCOLS((matrix)d)))
       {
         if (!errorreported)
-          Werror("wrong range[%d,%d] in intmat(%dx%d)",
-                  index,e->next->start,
-                  MATROWS((matrix)d),MATCOLS((matrix)d));
+          Werror("wrong range[%d,%d] in intmat(%dx%d)",e->start,e->next->start,
+                                                     MATROWS((matrix)d),MATCOLS((matrix)d));
       }
       else
-        r=(char *)MATELEM((matrix)d,index,e->next->start);
+        r=(char *)MATELEM((matrix)d,e->start,e->next->start);
       break;
     }
     case LIST_CMD:
     {
       lists l=(lists)d;
-      if ((0<index)&&(index<=l->nr))
+      int i=e->start-1;
+      if ((0<=i)&&(i<=l->nr))
       {
-        if ((e->next!=NULL)
-        && (l->m[index-1].rtyp==STRING_CMD))
-	// string[..].Data() modifies sleftv, so let's do it ourself
-	{
-	  char *dd=(char*)l->m[index-1].data;
-	  int j=e->next->start-1;
-	  r=(char *)omAllocBin(size_two_bin);
-          if ((j>=0)&& (j<(int)strlen((char *)dd)))
-	  {
-	    r[0]=*(((char *)dd)+j);
-	    r[1]='\0';
-	  }
-	  else
-	  {
-	    r[0]='\0';
-	  }
-	}
-        else
-	{
-	  l->m[index-1].e=e->next;
-          r=(char *)l->m[index-1].Data();
-          l->m[index-1].e=NULL;
-	}
+        l->m[e->start-1].e=e->next;
+        r=(char *)l->m[i].Data();
+        l->m[e->start-1].e=NULL;
       }
       else //if (!errorreported)
-        Werror("wrong range[%d] in list(%d)",index,l->nr+1);
+        Werror("wrong range[%d] in list(%d)",e->start,l->nr+1);
       break;
     }
 #ifdef TEST
@@ -1427,7 +1386,7 @@ void syMake(leftv v,char * id, idhdl packhdl)
       BOOLEAN ok=FALSE;
       poly p = ((currRingHdl!=NULL)     /* ring required */
                &&(!yyInRingConstruction) /* not in decl */
-               &&(IDLEV(currRingHdl)!=myynest)) /* already in case 4/6 */
+	       &&(IDLEV(currRingHdl)!=myynest)) /* already in case 4/6 */
                      ? pmInit(id,ok) : (poly)NULL;
       if (ok)
       {
@@ -1548,7 +1507,7 @@ int sleftv::Eval()
             syMake(&d->arg1,n, d->arg1.req_packhdl); //assume  type of arg1==DEF_CMD
 #else
           syMake(&d->arg1,n);
-#endif
+#endif          
           omCheckAddr(d->arg1.name);
           if (d->arg1.rtyp==IDHDL)
           {
