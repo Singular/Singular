@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.59 2000-11-03 14:50:17 obachman Exp $ */
+/* $Id: kstd1.cc,v 1.60 2000-11-06 14:47:34 obachman Exp $ */
 /*
 * ABSTRACT:
 */
@@ -841,11 +841,11 @@ void reorderT(kStrategy strat)
       {
         strat->T[j+1]=strat->T[j];
         strat->sevT[j+1]=strat->sevT[j];
-        strat->R[strat->T[j+1].r] = &(strat->T[j+1]);
+        strat->R[strat->T[j+1].i_r] = &(strat->T[j+1]);
       }
       strat->T[at+1]=p;
       strat->sevT[at+1] = sev;
-      strat->R[p.r] = &(strat->T[at+1]);
+      strat->R[p.i_r] = &(strat->T[at+1]);
     }
   }
 }

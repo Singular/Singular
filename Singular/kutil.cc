@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.72 2000-11-03 14:50:18 obachman Exp $ */
+/* $Id: kutil.cc,v 1.73 2000-11-06 14:47:35 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -10,6 +10,8 @@
 #define KUTIL_CC
 
 // #define PDEBUG 2
+// #define PDEBUG 2
+// #define PDIV_DEBUG
 
 #include <stdlib.h>
 #include <string.h>
@@ -219,7 +221,7 @@ static inline void enlargeT (TSet &T, TObject** &R, unsigned long* &sevT,
 
   R = (TObject**)omrealloc0Size(R,length*sizeof(TObject*),
                                 (length+incr)*sizeof(TObject*));
-  for (i=0;i<length;i++) R[T[i].r] = &(T[i]);
+  for (i=0;i<length;i++) R[T[i].i_r] = &(T[i]);
   length += incr;
 }
 
@@ -278,6 +280,9 @@ LSet initL ()
   for (i=0;i<setmax;i++)
   {
     l[i].tailRing = currRing;
+    l[i].i_r1 = -1;
+    l[i].i_r2 = -1;
+    l[i].i_r = -1;
   }
   return l;
 }
@@ -485,13 +490,11 @@ BOOLEAN kTest_L(LObject *L, ring strat_tailRing,
   {
     // now p1 and p2 must be != NULL and must be contained in T
     int i;
-    for (i=0; i<tlength; i++)
-      if (L->p1 == T[i].p) break;
-    if (i>=tlength)
+    i = kFindInT(L->p1, T, tlength);
+    if (i < 0)
       return dReportError("L[%d].p1 not in T",lpos);
-    for (i=0; i<tlength; i++)
-      if (L->p2 == T[i].p) break;
-    if (i>=tlength)
+    i = kFindInT(L->p2, T, tlength);
+    if (i < 0)
       return dReportError("L[%d].p2 not in T",lpos);
   }
   return TRUE;
@@ -504,7 +507,7 @@ BOOLEAN kTest (kStrategy strat)
   // test P
   kFalseReturn(kTest_L(&(strat->P), strat->tailRing,
                        (strat->P.p != NULL && pNext(strat->P.p)!=strat->tail),
-                       -1, strat->T, strat->tl+1));
+                       -1, strat->T, strat->tl));
 
   // test T
   if (strat->T != NULL)
@@ -516,7 +519,7 @@ BOOLEAN kTest (kStrategy strat)
         return dReportError("strat->sevT[%d] out of sync", i);
     }
   }
-
+  
   // test L
   if (strat->L != NULL)
   {
@@ -524,16 +527,15 @@ BOOLEAN kTest (kStrategy strat)
     {
       kFalseReturn(kTest_L(&(strat->L[i]), strat->tailRing,
                            (pNext(strat->L[i].p) != strat->tail), i,
-                           strat->T, strat->tl + 1));
+                           strat->T, strat->tl));
       if (strat->use_buckets && pNext(strat->L[i].p) != strat->tail && 
           strat->L[i].p1 != NULL)
       {
         assume(strat->L[i].bucket != NULL);
       }
-
     }
   }
-
+  
   // test S
   if (strat->S != NULL)
     kFalseReturn(kTest_S(strat));
@@ -565,23 +567,39 @@ BOOLEAN kTest_TS(kStrategy strat)
   BOOLEAN ret = TRUE;
   kFalseReturn(kTest(strat));
 
+  // test strat->R, strat->T[i].i_r
+  for (i=0; i<=strat->tl; i++)
+  {
+    if (strat->T[i].i_r < 0 || strat->T[i].i_r > strat->tl)
+      return dReportError("strat->T[%d].i_r == %d out of bounds", i, 
+                          strat->T[i].i_r);
+    if (strat->R[strat->T[i].i_r] != &(strat->T[i]))
+      return dReportError("T[%d].i_r with R out of sync", i);
+  }   
   // test containment of S inT
   if (strat->S != NULL)
   {
-    for (i=0; i<=strat->tl; i++)
-    {
-      if (strat->R[strat->T[i].r] != &(strat->T[i]))
-        return dReportError("T[%d].r with R out of sync", i);
-    }
     for (i=0; i<=strat->sl; i++)
     {
       j = kFindInT(strat->S[i], strat->T, strat->tl);
       if (j < 0)
         return dReportError("S[%d] not in T", i);
-      if (strat->S_2_R[i] != strat->T[j].r)
-        return dReportError("S_2_R[%d]=%d != T[%d].r=%d\n",
-                            i, strat->S_2_R[i], j, strat->T[j].r);
+      if (strat->S_2_R[i] != strat->T[j].i_r)
+        return dReportError("S_2_R[%d]=%d != T[%d].i_r=%d\n",
+                            i, strat->S_2_R[i], j, strat->T[j].i_r);
     }
+  }
+  // test strat->L[i].i_r1
+  for (i=0; i<=strat->Ll; i++)
+  {
+    if (strat->L[i].i_r1 >= 0 && 
+        (strat->L[i].i_r1 > strat->tl ||
+         strat->L[i].T_1(strat)->p != strat->L[i].p1))
+      return dReportError("L[%d].i_r1 out of sync", i);
+    if (strat->L[i].i_r2 >= 0 && 
+        (strat->L[i].i_r2 > strat->tl ||
+         strat->L[i].T_2(strat)->p != strat->L[i].p2))
+      return dReportError("L[%d].i_r2 out of sync", i);
   }
   return TRUE;
 }
@@ -770,7 +788,7 @@ BOOLEAN sugarDivisibleBy(int ecart1, int ecart2)
 /*2
 * put the pair (s[i],p)  into the set B, ecart=ecart(p)
 */
-void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat)
+void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR = -1)
 {
   assume(i<=strat->sl);
 
@@ -945,6 +963,11 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat)
     Lp.p1 = strat->S[i];
     Lp.p2 = p;
     pNext(Lp.p) = strat->tail;
+    if (atR >= 0)
+    {
+      Lp.i_r2 = atR;
+      Lp.i_r1 = strat->S_2_R[i];
+    }
     strat->initEcartPair(&Lp,strat->S[i],p,strat->ecartS[i],ecart);
     if (TEST_OPT_INTSTRATEGY)
     {
@@ -959,7 +982,7 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat)
 * put the pair (s[i],p) into the set L, ecart=ecart(p)
 * in the case that s forms a SB of (s)
 */
-void enterOnePairSpecial (int i,poly p,int ecart,kStrategy strat)
+void enterOnePairSpecial (int i,poly p,int ecart,kStrategy strat, int atR = -1)
 {
   int      l,j,compare;
   LObject  Lp;
@@ -1001,6 +1024,11 @@ void enterOnePairSpecial (int i,poly p,int ecart,kStrategy strat)
     /*- the pair (S[i],p) enters B -*/
     Lp.p1 = strat->S[i];
     Lp.p2 = p;
+    if (atR >= 0)
+    {
+      Lp.i_r1 = strat->S_2_R[i];
+      Lp.i_r2 = atR;
+    }
     pNext(Lp.p) = strat->tail;
     strat->initEcartPair(&Lp,strat->S[i],p,strat->ecartS[i],ecart);
     if (TEST_OPT_INTSTRATEGY)
@@ -1246,7 +1274,7 @@ void chainCrit (poly p,int ecart,kStrategy strat)
 /*2
 *(s[0],h),...,(s[k],h) will be put to the pairset L
 */
-void initenterpairs (poly h,int k,int ecart,int isFromQ,kStrategy strat)
+void initenterpairs (poly h,int k,int ecart,int isFromQ,kStrategy strat, int atR = -1)
 {
 
   if ((strat->syzComp==0)
@@ -1265,7 +1293,7 @@ void initenterpairs (poly h,int k,int ecart,int isFromQ,kStrategy strat)
           if (!strat->fromQ[j])
           {
             new_pair=TRUE;
-            enterOnePair(j,h,ecart,isFromQ,strat);
+            enterOnePair(j,h,ecart,isFromQ,strat, atR);
           //Print("j:%d, Ll:%d\n",j,strat->Ll);
           }
         }
@@ -1275,7 +1303,7 @@ void initenterpairs (poly h,int k,int ecart,int isFromQ,kStrategy strat)
         new_pair=TRUE;
         for (j=0; j<=k; j++)
         {
-          enterOnePair(j,h,ecart,isFromQ,strat);
+          enterOnePair(j,h,ecart,isFromQ,strat, atR);
           //Print("j:%d, Ll:%d\n",j,strat->Ll);
         }
       }
@@ -1288,7 +1316,7 @@ void initenterpairs (poly h,int k,int ecart,int isFromQ,kStrategy strat)
         || (pGetComp(strat->S[j])==0))
         {
           new_pair=TRUE;
-          enterOnePair(j,h,ecart,isFromQ,strat);
+          enterOnePair(j,h,ecart,isFromQ,strat, atR);
         //Print("j:%d, Ll:%d\n",j,strat->Ll);
         }
       }
@@ -1301,11 +1329,11 @@ void initenterpairs (poly h,int k,int ecart,int isFromQ,kStrategy strat)
 *(s[0],h),...,(s[k],h) will be put to the pairset L(via initenterpairs)
 *superfluous elements in S will be deleted
 */
-void enterpairs (poly h,int k,int ecart,int pos,kStrategy strat)
+void enterpairs (poly h,int k,int ecart,int pos,kStrategy strat, int atR = -1)
 {
   int j=pos;
 
-  initenterpairs(h,k,ecart,0,strat);
+  initenterpairs(h,k,ecart,0,strat, atR);
   if ((!strat->fromT)
   && ((strat->syzComp==0)
     ||(pGetComp(h)<=strat->syzComp)))
@@ -1327,7 +1355,7 @@ void enterpairs (poly h,int k,int ecart,int pos,kStrategy strat)
 *(s[0],h),...,(s[k],h) will be put to the pairset L(via initenterpairs)
 *superfluous elements in S will be deleted
 */
-void enterpairsSpecial (poly h,int k,int ecart,int pos,kStrategy strat)
+void enterpairsSpecial (poly h,int k,int ecart,int pos,kStrategy strat, int atR = -1)
 {
   int j;
 
@@ -1336,7 +1364,7 @@ void enterpairsSpecial (poly h,int k,int ecart,int pos,kStrategy strat)
     if ((pGetComp(h)==pGetComp(strat->S[j]))
     || (0==pGetComp(strat->S[j])))
     {
-      enterOnePairSpecial(j,h,ecart,strat);
+      enterOnePairSpecial(j,h,ecart,strat, atR);
     }
   }
   j=pos;
@@ -2473,6 +2501,69 @@ all_done:
 *compute the normalform of the tail p->next of p
 *with respect to S
 */
+TObject* kFindDivisibleByInS(kStrategy strat, int pos, LObject* L, TObject *T)
+{
+  int j = 0;
+  const unsigned long not_sev = ~L->sev;
+  const unsigned long* sev = strat->sevS;
+  poly p;
+  ring r;
+  L->GetLm(p, r);
+  
+  assume(~not_sev == p_GetShortExpVector(p, r));
+
+  if (r == currRing)
+  {
+    while (1)
+    {
+      if (j > pos) return NULL;
+#if defined(PDEBUG) || defined(PDIV_DEBUG)
+      if (p_LmShortDivisibleBy(strat->S[j], sev[j], p, not_sev, r))
+        break;
+#else
+      if (!(sev[j] & not_sev) &&
+          p_LmDivisibleBy(strat->S[j], p, r))
+        break;
+      
+#endif
+      j++;
+    }
+    // if called from NF, T objects do not exist:
+    if (strat->tl < 0) 
+    {
+      T->Set(strat->S[j], r);
+      return T;
+    }
+    else
+    {
+      assume (j >= 0 && j <= strat->tl && strat->S_2_T(j) != NULL);
+      return strat->S_2_T(j);
+    }
+  }
+  else
+  {
+    TObject* t;
+    while (1)
+    {
+      if (j > pos) return NULL;
+#if defined(PDEBUG) || defined(PDIV_DEBUG)
+      t = strat->S_2_T(j);
+      assume(t != NULL && t->t_p != NULL && t->tailRing == r);
+      if (p_LmShortDivisibleBy(t->t_p, sev[j], p, not_sev, r))
+        return t;
+#else      
+      if (! (sev[j] & not_sev))
+      {
+        t = strat->S_2_T(j);
+        assume(t != NULL && t->t_p != NULL && t->tailRing == r);
+        if (p_LmDivisibleBy(t->t_p, p, r)) return t;
+      }
+#endif
+      j++;
+    }
+  }
+}
+
 poly redtailBba (LObject* L, int pos, kStrategy strat)
 {
   poly h, hn;
@@ -2480,61 +2571,34 @@ poly redtailBba (LObject* L, int pos, kStrategy strat)
   unsigned long not_sev;
   strat->redTailChange=FALSE;
   poly p = L->p;
+  LObject Ln(strat->tailRing);
+  TObject* With;
+  // placeholder in case strat->tl < 0
+  TObject  With_s(strat->tailRing);
 
   if (strat->noTailReduction)
-  {
     return p;
-  }
   h = p;
   hn = pNext(h);
   while(hn != NULL)
   {
-    j = 0;
-    not_sev = ~ p_GetShortExpVector(hn, strat->tailRing);
-    while (j <= pos)
+    while (1)
     {
-      if (p_LmShortDivisibleBy(strat->S[j], strat->sevS[j], currRing, 
-                               hn, not_sev, strat->tailRing))
+      Ln.Set(hn, strat->tailRing);
+      Ln.sev = p_GetShortExpVector(hn, strat->tailRing);
+      With = kFindDivisibleByInS(strat, pos, &Ln, &With_s);
+      if (With == NULL) break;
+      strat->redTailChange=TRUE;
+      if (! ksReducePolyTail(L, With, h, strat->kNoether))
       {
-        strat->redTailChange=TRUE;
-        assume(p != strat->S[j]);
-        if (strat->tailRing != currRing)
-        {
-          int i = kFindInT(strat->S[j], strat->T, strat->tl);
-          assume(i >= 0);
-          if (! ksReducePolyTail(L, &(strat->T[i]), h, strat->kNoether))
-          {
-            // reducing the tail violated exp bound
-            kStratChangeTailRing(strat,
-                                 rModifyRing(currRing, strat->homog, 
-                                             ! strat->ak,
-                                             strat->tailRing->bitmask << 1));
-            if (L->tailRing != strat->tailRing)
-            {
-              pShallowCopyDeleteProc 
-                pscd =pGetShallowCopyDeleteProc(L->tailRing,strat->tailRing);
-              L->ShallowCopyDelete(strat->tailRing, pscd);
-            }
-            return redtailBba(L, pos, strat);
-          }
-        }
+        // reducing the tail would violate the exp bound
+        if (kStratChangeTailRing(strat, L))
+          return redtailBba(L, pos, strat);
         else
-        {
-          TObject With(strat->S[j], currRing, strat->tailRing);
-          ksReducePolyTail(L, &With, h, strat->kNoether);
-        }
-        hn = pNext(h);
-        if (hn == NULL)
-        {
-          return p;
-        }
-        not_sev = ~ p_GetShortExpVector(hn, strat->tailRing);
-        j = 0;
+          return NULL;
       }
-      else
-      {
-        j++;
-      }
+      hn = pNext(h);
+      if (hn == NULL) return p;
     }
     h = hn;
     hn = pNext(h);
@@ -2964,7 +3028,7 @@ void initSSpecial (ideal F, ideal Q, ideal P,kStrategy strat)
           }
           h.sev = pGetShortExpVector(h.p);
           pos = posInS(strat->S,strat->sl,h.p);
-          enterpairsSpecial(h.p,strat->sl,h.ecart,pos,strat);
+          enterpairsSpecial(h.p,strat->sl,h.ecart,pos,strat,strat->tl+1);
           strat->enterS(h,pos,strat, strat->tl+1);
           enterT(h,strat);
         }
@@ -3400,7 +3464,7 @@ void enterT(LObject p, kStrategy strat, int atT = -1)
   {
     strat->T[i] = strat->T[i-1];
     strat->sevT[i] = strat->sevT[i-1];
-    strat->R[strat->T[i].r] = &(strat->T[i]);
+    strat->R[strat->T[i].i_r] = &(strat->T[i]);
   }
 
   if (strat->tailBin != NULL && (pNext(p.p) != NULL))
@@ -3420,7 +3484,7 @@ void enterT(LObject p, kStrategy strat, int atT = -1)
 
   strat->tl++;
   strat->R[strat->tl] = &(strat->T[atT]);
-  strat->T[atT].r = strat->tl;
+  strat->T[atT].i_r = strat->tl;
   strat->sevT[atT] = (p.sev == 0 ? pGetShortExpVector(p.p) : p.sev);
   kTest_T(&(strat->T[atT]));
 }
@@ -3816,8 +3880,12 @@ BOOLEAN kCheckSpolyCreation(kStrategy strat,
   return FALSE;
 }
                        
-void kStratChangeTailRing(kStrategy strat, ring new_tailRing)
+BOOLEAN kStratChangeTailRing(kStrategy strat, LObject *L, TObject* T, unsigned long expbound)
 {
+  if (expbound == 0) expbound = strat->tailRing->bitmask << 1;
+  if (expbound >= currRing->bitmask) return FALSE;
+  ring new_tailRing = rModifyRing(currRing,strat->homog, !strat->ak, expbound);
+  
   if (TEST_OPT_PROT)
     Print("[%d", (long) new_tailRing->bitmask);
   kTest_TS(strat);
@@ -3843,6 +3911,11 @@ void kStratChangeTailRing(kStrategy strat, ring new_tailRing)
       (strat->P.p != NULL && pNext(strat->P.p) != strat->tail))
     strat->P.ShallowCopyDelete(new_tailRing, p_shallow_copy_delete);
   
+  if (L != NULL && L->tailRing != new_tailRing)
+    L->ShallowCopyDelete(new_tailRing, p_shallow_copy_delete);
+  if (T != NULL && T->tailRing != new_tailRing)
+    T->ShallowCopyDelete(new_tailRing, new_tailBin, p_shallow_copy_delete);
+    
   omMergeStickyBinIntoBin(strat->tailBin, strat->tailRing->PolyBin);
   if (strat->tailRing != currRing)
     rKillModifiedRing(strat->tailRing);
@@ -3852,6 +3925,7 @@ void kStratChangeTailRing(kStrategy strat, ring new_tailRing)
   kTest_TS(strat);
   if (TEST_OPT_PROT)
     PrintS("]");
+  return TRUE;
 }
 
 void kStratInitChangeTailRing(kStrategy strat)
@@ -3877,9 +3951,8 @@ void kStratInitChangeTailRing(kStrategy strat)
   e = p_GetMaxExp(l, currRing);
   if (e <= 1) e = 2;
   
-  new_tailRing = rModifyRing(currRing, strat->homog, ! strat->ak, e);
-  if (new_tailRing != currRing)
-    kStratChangeTailRing(strat, new_tailRing);
+  
+  kStratChangeTailRing(strat, NULL, NULL, e);
 }
 
 #endif // KUTIL_CC

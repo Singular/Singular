@@ -6,7 +6,7 @@
  *  Purpose: implementation of std related inline routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: kInline.cc,v 1.12 2000-11-03 14:50:16 obachman Exp $
+ *  Version: $Id: kInline.cc,v 1.13 2000-11-06 14:47:33 obachman Exp $
  *******************************************************************/
 #ifndef KINLINE_CC
 #define KINLINE_CC
@@ -28,6 +28,8 @@ KINLINE skStrategy::skStrategy()
   memset(this, 0, sizeof(skStrategy));
   tailRing = currRing;
   P.tailRing = currRing;
+  tl = -1;
+  sl = -1;
 #ifdef HAVE_LM_BIN
   lmBin = omGetStickyBinOfBin(currRing->PolyBin);
 #endif
@@ -47,6 +49,15 @@ KINLINE skStrategy::~skStrategy()
   if (currRing != tailRing)
     rKillModifiedRing(tailRing);
 }
+
+KINLINE TObject* skStrategy::S_2_T(int i)
+{
+  assume(i>= 0 && i<=sl);
+  assume(S_2_R[i] >= 0 && S_2_R[i] <= tl);
+  TObject* T = R[S_2_R[i]];
+  assume(T != NULL && T->p == S[i]);
+  return T;
+}
   
 /***************************************************************
  *
@@ -60,6 +71,7 @@ KINLINE TSet initT ()
   for (int i=0; i<setmax; i++)
   {
     T[i].tailRing = currRing;
+    T[i].i_r = -1;
   }
   return T;
 }
@@ -82,6 +94,7 @@ KINLINE void sTObject::Set(ring r)
 KINLINE void sTObject::Init(ring r)
 {
   memset(this, 0, sizeof(sTObject));
+  i_r = -1;
   Set(r);
 }
 KINLINE sTObject::sTObject(ring r)
@@ -212,6 +225,13 @@ KINLINE void sTObject::GetLm(poly &p_r, ring &r_r) const
   }
 }
 
+KINLINE int sTObject::GetpLength()
+{
+  assume(pLength <= 0 || pLength == ::pLength(p != NULL ? p : t_p));
+  if (pLength <= 0) pLength = ::pLength(p != NULL ? p : t_p);
+  return pLength;
+}
+
 KINLINE void sTObject::SetLmCurrRing()
 {
   if (p == NULL && t_p != NULL)
@@ -331,6 +351,9 @@ KINLINE void  sTObject::pNorm()
 KINLINE void sLObject::Init(ring r)
 {
   memset(this, 0, sizeof(sLObject));
+  i_r1 = -1;
+  i_r2 = -1;
+  i_r = -1;
   Set(r);
 }
 KINLINE sLObject::sLObject(ring r)
@@ -471,6 +494,47 @@ KINLINE sLObject& sLObject::operator=(const sTObject& t)
   return *this;
 }
 
+KINLINE TObject* sLObject::T_1(const skStrategy* strat)
+{
+  if (p1 == NULL) return NULL;
+  if (i_r1 == -1) i_r1 = kFindInT(p1, strat->T, strat->tl);
+  assume(i_r1 >= 0 && i_r1 <= strat->tl);
+  TObject* T = strat->R[i_r1];
+  assume(T->p == p1);
+  return T;
+}
+
+KINLINE TObject* sLObject::T_2(const skStrategy* strat)
+{
+  if (p1 == NULL) return NULL;
+  assume(p2 != NULL);
+  if (i_r2 == -1) i_r2 = kFindInT(p2, strat->T, strat->tl);
+  assume(i_r2 >= 0 && i_r2 <= strat->tl);
+  TObject* T = strat->R[i_r2];
+  assume(T->p == p2);
+  return T;
+}
+
+KINLINE void    sLObject::T_1_2(const skStrategy* strat, 
+                                TObject* &T_1, TObject* &T_2)
+{
+  if (p1 == NULL)
+  {
+    T_1 = NULL; 
+    T_2 = NULL;
+    return;
+  }
+  assume(p1 != NULL && p2 != NULL);
+  if (i_r1 == -1) i_r1 = kFindInT(p1, strat->T, strat->tl);
+  if (i_r2 == -1) i_r2 = kFindInT(p2, strat->T, strat->tl);
+  assume(i_r1 >= 0 && i_r1 <= strat->tl);
+  assume(i_r2 >= 0 && i_r2 <= strat->tl);
+  T_1 = strat->R[i_r1];
+  T_2 = strat->R[i_r2];
+  assume(T_1->p == p1);
+  assume(T_2->p == p2);
+  return;
+}
 
 /***************************************************************
  *

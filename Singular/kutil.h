@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.40 2000-11-03 14:50:19 obachman Exp $ */
+/* $Id: kutil.h,v 1.41 2000-11-06 14:47:36 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -29,6 +29,10 @@
 #endif
 
 typedef int* intset;
+typedef class sTObject TObject;
+typedef class sLObject LObject;
+typedef TObject * TSet;
+typedef LObject * LSet;
 
 class sTObject  
 {
@@ -36,7 +40,7 @@ public:
   poly p;       // Lm(p) \in currRing Tail(p) \in tailRing
   poly t_p;     // t_p \in tailRing
   ring tailRing;
-  int ecart, length, pLength, r;
+  int ecart, length, pLength, i_r;
   poly max; // p_MaxExp(pNext(p))
   
 
@@ -63,6 +67,8 @@ public:
   // this returns Lm and ring r (preferably from tailRing), but does not
   // allocate a new poly
   KINLINE void GetLm(poly &p, ring &r) const;
+
+  KINLINE int GetpLength();
 
   // makes sure that T.p exists
   KINLINE void SetLmCurrRing();
@@ -97,7 +103,7 @@ public:
   
   poly  lcm;   /*- the lcm of p1,p2 -*/
   kBucket_pt bucket;
-  int   r1, r2;
+  int   i_r1, i_r2;
 
   // initialization
   KINLINE void Init(ring tailRing = currRing);
@@ -122,12 +128,14 @@ public:
 
   // enable assignment from TObject
   KINLINE sLObject& operator=(const sTObject&);
+
+  // get T's corresponding to p1, p2: they might return NULL
+  KINLINE TObject* T_1(const skStrategy* strat);
+  KINLINE TObject* T_2(const skStrategy* strat);
+  KINLINE void     T_1_2(const skStrategy* strat, 
+                         TObject* &T_1, TObject* &T_2);
 };
 
-typedef class sTObject TObject;
-typedef class sLObject LObject;
-typedef TObject * TSet;
-typedef LObject * LSet;
 
 extern int HCord;
 
@@ -203,6 +211,9 @@ public:
   
   KINLINE skStrategy();
   KINLINE ~skStrategy();
+
+  // return TObject corresponding to S[i]
+  KINLINE TObject* S_2_T(int i);
 };
 
 void deleteHC(poly *p, int *e, int *l, kStrategy strat);
@@ -237,7 +248,7 @@ int posInL17 (const LSet set, const int length,
 KINLINE poly redtailBba (poly p,int pos,kStrategy strat);
 poly redtailBba (LObject *L, int pos,kStrategy strat);
 poly redtail (poly p,int pos,kStrategy strat);
-void enterpairs (poly h, int k, int ec, int pos,kStrategy strat);
+void enterpairs (poly h, int k, int ec, int pos,kStrategy strat, int atR = -1);
 void entersets (LObject h);
 void pairs ();
 void message (int i,int* reduc,int* olddeg,kStrategy strat);
@@ -268,6 +279,8 @@ void completeReduce (kStrategy strat);
 void kFreeStrat(kStrategy strat);
 BOOLEAN homogTest(polyset F, int Fmax);
 BOOLEAN newHEdge(polyset S, int ak,kStrategy strat);
+// returns index of p in TSet, or -1 if not found
+int kFindInT(poly p, TSet T, int tlength);
 
 /***************************************************************
  *
@@ -400,8 +413,15 @@ KINLINE void ksOldSpolyTail(poly p1, poly q, poly q2, poly spNoether, ring r = c
 //             exponent bound of strat->tailRing
 //      FALSE, otherwise
 BOOLEAN kCheckSpolyCreation(kStrategy strat, poly &m1, poly &m2);
-// change the strat such that strat strat->tailRing == new_tailRing
-void kStratChangeTailRing(kStrategy strat, ring new_tailRing);
+// change strat->tailRing and adjust all data in strat, L, and T: 
+// new tailRing has larger exponent bound 
+// do nothing and return FALSE if exponent bound increase would result in
+// larger exponent bound that that of currRing
+BOOLEAN kStratChangeTailRing(kStrategy strat, 
+                             LObject* L = NULL, TObject* T = NULL,
+                             // take this as new_expbound: if 0
+                             // new expbound is 2*expbound of tailRing
+                             unsigned long new_expbound = 0);
 // initiate a change of the tailRing of strat -- should be called
 // right before main loop in bba
 void kStratInitChangeTailRing(kStrategy strat);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.57 2000-11-03 14:50:17 obachman Exp $ */
+/* $Id: kstd2.cc,v 1.58 2000-11-06 14:47:34 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -686,16 +686,14 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     {
       poly m1 = NULL, m2 = NULL;
       /* check that spoly creation is ok */
-      if (strat->tailRing != currRing && 
-          !kCheckSpolyCreation(strat, m1, m2))
+      while (strat->tailRing != currRing && 
+             !kCheckSpolyCreation(strat, m1, m2))
       {
         assume(m1 == NULL && m2 == NULL);
         // if not, change to a ring where exponents are at least
         // twice as large as current ones -- should be enough to
         // get through ksCreateSpoly correctly
-        kStratChangeTailRing(strat,
-                             rModifyRing(currRing, strat->homog, ! strat->ak,
-                                         strat->tailRing->bitmask << 1));
+        kStratChangeTailRing(strat);
       }
       /* deletes the short spoly and computes */
       pLmFree(strat->P.p);
@@ -763,7 +761,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
         // put stuff into T-Set
         enterT(strat->P, strat);
-        enterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat);
+        enterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
         // posInS only depends on the leading term
         strat->enterS(strat->P, pos, strat, strat->tl);
         if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
@@ -835,6 +833,12 @@ poly kNF2 (ideal F,ideal Q,poly q,kStrategy strat, int lazyReduce)
     omFreeSize((ADDRESS)strat->ecartS,IDELEMS(strat->Shdl)*sizeof(int));
   if (strat->sevS != NULL)
     omFreeSize((ADDRESS)strat->sevS,IDELEMS(strat->Shdl)*sizeof(unsigned long));
+  omfree(strat->T);
+  omfree(strat->sevT);
+  omfree(strat->R);
+  omfree(strat->S_2_R);
+  omfree(strat->L);
+  omfree(strat->B);
   idDelete(&strat->Shdl);
   test=save_test;
   if (TEST_OPT_PROT) PrintLn();
@@ -890,6 +894,12 @@ ideal kNF2 (ideal F,ideal Q,ideal q,kStrategy strat, int lazyReduce)
     omFreeSize((ADDRESS)strat->ecartS,IDELEMS(strat->Shdl)*sizeof(int));
   if (strat->sevS != NULL)
     omFreeSize((ADDRESS)strat->sevS,IDELEMS(strat->Shdl)*sizeof(unsigned long));
+  omfree(strat->T);
+  omfree(strat->sevT);
+  omfree(strat->R);
+  omfree(strat->S_2_R);
+  omfree(strat->L);
+  omfree(strat->B);
   idDelete(&strat->Shdl);
   test=save_test;
   if (TEST_OPT_PROT) PrintLn();

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstdfac.cc,v 1.45 2000-11-03 14:50:18 obachman Exp $ */
+/* $Id: kstdfac.cc,v 1.46 2000-11-06 14:47:35 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
@@ -40,8 +40,8 @@ static void copyT (kStrategy o,kStrategy n)
 
   for (j=0; j<=o->tl; j++)
   {
-    r[t[j].r] = &t[j];
     t[j] = o->T[j];
+    r[t[j].i_r] = &t[j];
     p = o->T[j].p;
     i = -1;
     loop
@@ -141,6 +141,9 @@ static void copyL (kStrategy o,kStrategy n)
     l[j].pLength=o->L[j].pLength;
     // copy .sev -----------------------------------------------
     l[j].sev=o->L[j].sev;
+    l[j].i_r = o->L[j].i_r;
+    l[j].i_r1 = o->L[j].i_r1;
+    l[j].i_r2 = o->L[j].i_r2;
   }
   n->L=l;
 }
@@ -169,6 +172,8 @@ kStrategy kStratCopy(kStrategy o)
   memcpy(s->sevS,o->sevS,IDELEMS(o->Shdl)*sizeof(unsigned long));
   s->S_2_R=(int*)omAlloc(IDELEMS(o->Shdl)*sizeof(int));
   memcpy(s->S_2_R,o->S_2_R,IDELEMS(o->Shdl)*sizeof(int));
+  s->R=(TObject**)omAlloc(o->tmax*sizeof(TObject*));
+  memcpy(s->R, o->R, o->tmax*sizeof(TObject*));
   s->sevT=(unsigned long *)omAlloc(o->tmax*sizeof(unsigned long));
   memcpy(s->sevT,o->sevT,IDELEMS(o->Shdl)*sizeof(unsigned long));
   if(o->fromQ!=NULL)
@@ -325,8 +330,8 @@ static void completeReduceFac (kStrategy strat, lists FL)
         PrintLn();
       }
       enterpairs(n->P.p,n->sl,n->P.ecart,pos,n);
-      n->enterS(n->P,pos,n);
       enterT(n->P,n);
+      n->enterS(n->P,pos,n, n->tl);
 
       /* construct D */
       if (IDELEMS(fac)>1)
@@ -508,7 +513,6 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
     /* reduction of the element choosen from L */
     kTest_TS(strat);
     strat->red(&strat->P,strat);
-    kTest_TS(strat);
     if (strat->P.p != NULL)
     {
       int facdeg=pFDeg(strat->P.p);
@@ -613,9 +617,9 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
           PrintLn();
         }
         enterpairs(n->P.p,n->sl,n->P.ecart,pos,n);
-        n->enterS(n->P,pos,n);
-        if (n->sl>srmax) srmax = n->sl;
         enterT(n->P,n);
+        n->enterS(n->P,pos,n, n->tl);
+        if (n->sl>srmax) srmax = n->sl;
 
         /* construct D */
         if (IDELEMS(fac)>1)

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kspoly.cc,v 1.16 2000-10-30 13:40:17 obachman Exp $ */
+/* $Id: kspoly.cc,v 1.17 2000-11-06 14:47:33 obachman Exp $ */
 /*
 *  ABSTRACT -  Routines for Spoly creation and reductions
 */
@@ -65,33 +65,18 @@ BOOLEAN ksReducePoly(LObject* PR,
   if (tailRing != currRing)
   {
     // check that reduction does not violate exp bound
-    if (! p_LmExpVectorAddIsOk(lm, PW->max, tailRing))
+    while (! p_LmExpVectorAddIsOk(lm, PW->max, tailRing))
     {
       // undo changes of lm
       p_ExpVectorAdd(lm, p2, tailRing);
       if (strat == NULL) return FALSE;
-      // change tailring
-      kStratChangeTailRing(strat, 
-                           rModifyRing(currRing, strat->homog, ! strat->ak,
-                                       strat->tailRing->bitmask << 1));
-
-      // adjust local variables
-      if (PR->tailRing != strat->tailRing || PW->tailRing != strat->tailRing)
-      {
-        pShallowCopyDeleteProc 
-          pscd =pGetShallowCopyDeleteProc(tailRing,strat->tailRing);
-        
-        if (PR->tailRing != strat->tailRing) 
-          PR->ShallowCopyDelete(strat->tailRing,pscd);
-        if (PW->tailRing != strat->tailRing)
-          PW->ShallowCopyDelete(strat->tailRing,strat->tailBin, pscd);
-      }
+      if (! kStratChangeTailRing(strat, PR, PW)) return FALSE;
       tailRing = strat->tailRing;
       p1 = PR->GetLmTailRing();
       p2 = PW->GetLmTailRing();
       t2 = pNext(p2);
       lm = p1;
-      p_ExpVectorAdd(lm, p2, tailRing);
+      p_ExpVectorSub(lm, p2, tailRing);
     }
   }
 
@@ -113,12 +98,10 @@ BOOLEAN ksReducePoly(LObject* PR,
   }
   
   
-  // may be we need the length?
-  if (PR->bucket != NULL && PW->pLength <= 0)
-    PW->pLength = pLength(p2);
-    
   // and finally, 
-  PR->Tail_Minus_mm_Mult_qq(lm, t2, PW->pLength-1, spNoether);
+  PR->Tail_Minus_mm_Mult_qq(lm, t2, 
+                            (PR->bucket != NULL ? PW->GetpLength() - 1 : 0), 
+                            spNoether);
   PR->LmDeleteAndIter();
   return TRUE;
 }
