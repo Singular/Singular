@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftest_util.cc,v 1.16 1998-04-06 11:08:59 schmidt Exp $ */
+/* $Id: ftest_util.cc,v 1.17 1998-04-06 11:31:09 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -409,7 +409,7 @@ ftestParseVars ( const char * tokenString )
 	    char * mipoString = new char[mipoLen+1];
 	    strncpy( mipoString, tokenString, mipoLen );
 	    mipoString[mipoLen] = '\0';
-	    ftestRead( mipoString, mipo );
+	    ftestReadString( mipoString, mipo );
 	    delete [] mipoString;
 
 	    tokenString = ftestSkipBlancs( tokenCursor );
