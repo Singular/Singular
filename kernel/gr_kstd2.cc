@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gr_kstd2.cc,v 1.6 2005-02-25 15:07:05 Singular Exp $ */
+/* $Id: gr_kstd2.cc,v 1.7 2005-03-17 14:15:40 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: noncomm. alg. of Buchberger
 */
@@ -845,7 +845,7 @@ ideal gr_bba (ideal F, ideal Q, kStrategy strat)
     /* picks the last element from the lazyset L */
     strat->P = strat->L[strat->Ll];
     strat->Ll--;
-    kTest(strat);
+    //kTest(strat);
     if (pNext(strat->P.p) == strat->tail)
     {
       /* deletes the short spoly and computes */
@@ -920,7 +920,7 @@ ideal gr_bba (ideal F, ideal Q, kStrategy strat)
 #ifdef KDEBUG
     strat->P.lcm=NULL;
 #endif
-    kTest(strat);
+    //kTest(strat);
   }
   if (TEST_OPT_DEBUG) messageSets(strat);
   /* complete reduction of the standard basis--------- */
