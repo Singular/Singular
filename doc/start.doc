@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: start.doc,v 1.40 1999-07-22 14:50:10 pohl Exp $
+@comment $Id: start.doc,v 1.41 1999-07-28 14:46:21 anne Exp $
 @comment this file contains the "Introduction" chapter.
 @c * wichmann: + added changes by GMG.
 
@@ -187,7 +187,7 @@ examples on how to use it.
 @ref{Tricks and pitfalls}, is a loose collection of limitations and
 features which may be unexpected by those who expect the
 @sc{Singular} language to be an exact copy of the C programming language or of
-some Computer Algebra system's languages.  But some mathematical tips are
+some Computer Algebra system's languages.  But some mathematical hints are
 collected there, as well.
 
 @ref{Mathematical background}, introduces some of the mathematical
@@ -256,7 +256,7 @@ get the previous input line)
 @cindex Getting started
 
 @sc{Singular} is a special purpose system for polynomial
-computations. Hence, the most powerful computations in @sc{Singular}
+computations. Hence, most of the powerful computations in @sc{Singular}
 require the prior definition of a ring. Most important rings are
 polynomial rings over a field, localizations hereof, or quotient rings of
 such rings modulo an ideal. However, some simple computations with
@@ -507,7 +507,7 @@ in @sc{Singular} is discussed in detail in
 the chapter "Rings and orderings" of the @sc{Singular} manual.
 @end ifclear
 
-The basering now is @code{r5}. Since we want to calculate in the ring
+The basering is now @code{r8}. Since we want to calculate in the ring
 @code{r}, which we defined first, we have to switch back to it. This can
 be done using the function @code{setring}:
 
@@ -757,7 +757,7 @@ help milnor;
 @c @expansion{}
 @end smallexample
 
-@noindent as well as some smallexamples, which are executed by
+@noindent as well as some examples, which are executed by
 
 @smallexample
 example milnor;
@@ -1059,9 +1059,9 @@ quotient(U,freemodule(nrows(U)));
 @cindex Resolution
 
 There are several commands in @sc{Singular} for computing free resolutions.
-The command @code{mres(... ,n)}, for example, calculates a minimal free
-resolution with the standard basis method up to the length @math{n},
-where @math{n=0} corresponds to the full resolution.
+The most general command is @code{res(... ,n)} which determines heuristically
+what method to use for the given problem. It computes the free resolution
+up to the length @math{n}, where @math{n=0} corresponds to the full resolution.
 
 Here we use the possibility to inspect the calculation process using the
 option @code{prot}.
@@ -1076,7 +1076,7 @@ R;
 @expansion{} //        block   2 : ordering C
 ideal I = x4+x3y+x2yz,x2y2+xy2z+y2z2,x2z2+2xz3,2x2z2+xyz2;
 option(prot);
-resolution rs = mres(I,0);
+resolution rs = res(I,0);
 @expansion{} v4(3)s-s.s.s5(3)s6-s.s-s7(2)s-s-s
 @expansion{} product criterion:0 chain criterion:8
 @expansion{} (6)(5).(4).(3)..(2)..(1).[1]
