@@ -36,7 +36,7 @@ install_slibdir = ${install_prefix}/LIB
 CC		= @CC@
 LD              = @LD@
 CXX		= @CXX@
-LEX		= @LEX@
+LEX		= sh flexer.sh
 PERL		= @PERL@
 BISON		= bison
 INSTALL		= @INSTALL@
@@ -242,7 +242,9 @@ GFTABLES = $(wildcard LIB/gftables/[1-9]*)
 		echo Error: no lex given, could not rebuilt scanner.cc;\
                 exit 1; \
 	fi
-	${LEX} -s -I -t $< > scanner.cc
+	${LEX} -s -I -t $< > scanner.cc.lmp
+	cp scanner.cc.lmp scanner.cc
+
 .y.cc:
 	@if test "x${BISON}" = x; then \
 		echo Error: no bison given, could not rebuilt grammar.cc;\
@@ -310,7 +312,8 @@ libparse.cc: libparse.l
 		echo Error: no lex given, could not rebuilt libparse.cc;\
                 exit 1; \
 	fi
-	${LEX} -I -Pyylp -olibparse.cc libparse.l
+	${LEX} -I -Pyylp -t libparse.l >libparse.cc.lmp
+	cp libparse.cc.lmp libparse.cc
 
 # Hmm compiling with -fomit-frame-pointer resulted in access violation
 # under cygwin
