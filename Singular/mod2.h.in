@@ -133,6 +133,8 @@
 
 /* Define to use new namespaces techniks */
 #undef HAVE_NAMESPACES
+
+/* Define to enable dynamic module code */
 #undef HAVE_DYNAMIC_LOADING
 
 /* Define to use scanner when loading libraries */
