@@ -1,6 +1,6 @@
 // Last change 10.12.2000 (TB)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: rinvar.lib,v 1.6 2001-01-11 17:13:00 Singular Exp $";
+version="$Id: rinvar.lib,v 1.7 2001-02-02 16:34:03 mschulze Exp $";
 category="Invariant theory";
 info="
 LIBRARY:  rinvar.lib      Invariant Rings of Reductive Groups
@@ -198,7 +198,7 @@ example
 
 proc HilbertWeights(ideal I, wt)
 "USAGE:   HilbertWeights(I, w); ideal I, intvec wt
-PUROPSE: compute the weights of the "slack" varaibles needed for the
+PUROPSE: compute the weights of the "slack" variables needed for the
          computation of the algebraic relations of the generators of 'I' s.t.
          the Hilbert driven 'std' can be used.
 RETURN: intvec
