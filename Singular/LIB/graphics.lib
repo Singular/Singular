@@ -1,20 +1,20 @@
-// $Id: graphics.lib,v 1.1 1998-05-13 17:26:11 Singular Exp $
+// $Id: graphics.lib,v 1.2 1998-06-19 13:36:00 gorzel Exp $
 //
 // author : Christian Gorzel email: gorzelc@math.uni-muenster.de
 //
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: graphics.lib,v 1.1 1998-05-13 17:26:11 Singular Exp $";
+version="$Id: graphics.lib,v 1.2 1998-06-19 13:36:00 gorzel Exp $";
 info="
 LIBRARY: graphics.lib    PROCEDURES FOR GRAPHICS WITH MATHEMATICA
 
- staircase(ideal I);  string of Mathematica input for displaying staircase of I
+ staircase(fname,I);  Mathematica text for displaying staircase of I
  mathinit();          string for loading Mathematica's ImplicitPlot
- plot(ideal I,list #);string with Mathematica text for various plots
+ plot(fname,I[# s]);  Mathematica text for various plots
 ";
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc staircase(ideal I)
+proc staircase(string fname,ideal I)
 "USAGE:   staircase(); I ideal in two variables
 RETURN:  string with Mathematica input for displaying staircase (exponent
          vectors of initial ideal) of I
@@ -56,22 +56,22 @@ EXAMPLE: example staircase; shows an example
        "Table[Circle[{i,j},0.1],{i,0," +
            string(maxx) + "},{j,0," + string(maxy) + "}]}," + newline +
      "  Axes->True,AspectRatio->Automatic]]";
-
+ s = s + endstr(fname);
  return(s);
 }
 example
 { "EXAMPLE:"; echo =2;
   ring r0 = 0,(x,y),ls;
   ideal I = -1x2y6-1x4y2, 7x6y5+1/2x7y4+6x4y6;
-  staircase(std(I));
+  staircase("",std(I));
 
   ring r1 = 0,(x,y),dp;
   ideal I = fetch(r0,I);
-  staircase(std(I));
+  staircase("",std(I));
 
   ring r2 = 0,(x,y),wp(2,3);
   ideal I = fetch(r0,I);
-  staircase(std(I));
+  staircase("",std(I));
 
   // Paste the output into a Mathematica notebook
   // active evalutation of the cell with SHIFT RETURN
@@ -95,6 +95,7 @@ example
   // active evalutation of the cell with SHIFT RETURN
 }
 ///////////////////////////////////////////////////////////////////////////////
+
 static proc checkshort()
 {
   ring @r;
@@ -121,9 +122,36 @@ static proc determvars(ideal I)
  return(v);
 }
 ///////////////////////////////////////////////////////////////////////////////
-proc  plot(ideal I,list #)
-"USAGE:   plot(I[,#]); I ideal , #  strings representing the plot region or
-                                   further ideals
+
+static proc endstr(string filename)
+{ int i;
+  string suffix,cmd,name;
+
+ if(size(filename))
+ {
+  for (i=size(filename);i;i--)
+  { if (filename[i] == ".") {break;}
+  }
+
+ if (i>0)
+ { suffix = filename[i,size(filename)-i+1]; 
+   name = ">" + filename[1,i-1]+ ".m";
+ }
+ else { print("--Error: Suffix of filename incorrect"); return("");}
+// if (suffix ==".m") { cmd = "Display[\" " + filename + "\",% ]";}
+ if (suffix ==".mps") { cmd = "Display[\" " + filename + "\",%] ";} 
+ if (suffix ==".ps") { cmd = "Display[\" ! psfix > " + filename + "\", %]";} 
+ if (suffix ==".eps") 
+                { cmd = "Display[\" ! psfix -epsf > " + filename + "\", %]";} 
+
+ }
+ return(newline + cmd);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+proc  plot(string fname,ideal I,list #)
+"USAGE:   plot(I[,#]); fname string; I ideal , # strings representing the
+                         plot region or further ideals
 RETURN:  string, text with Mathematica commands to display a plot
 NOTE:    The plotregion is defaulted to -1,1 around zero
          (mostly interested in local situation in singularity theory)
@@ -150,6 +178,10 @@ EXAMPLE: example plot; shows an example
   string basr = nameof(basering);
   ideal J;
 
+  if (ncols(I)>3)
+  { "-- Error: can only draw upto dimension 3";
+    return("");
+  }
   ring @r = 0,(s,t),lp;
   ideal @J,@I;
 
@@ -163,6 +195,10 @@ EXAMPLE: example plot; shows an example
   VARS = determvars(I);
    // "VARS: ";VARS;
 
+  if (size(VARS)>2 or VARS==0)
+  { "-- Error: Need some variables, but can only draw in 2 or 3 dimensions";
+    return("");
+  }
   if (size(matrix(I))==1 and size(VARS)==2)
   { i =size(I[1]);
    //I[2]=I[1][(i/ 2 + 1)..i]; I[2];
@@ -287,7 +323,7 @@ EXAMPLE: example plot; shows an example
   {closing = "," +newline +
               " Boxed->True, Axes->True, ViewPoint->{1.3,-2.4,2}";}
 
-  str = str + closing + "];";
+  str = str + closing + "];" + endstr(fname);
 
   return(str);
 }
@@ -298,13 +334,13 @@ example
 
    ideal I = x1^3 + x1, x1^2;
    ideal J = x1^2,-x1+x1^3; "";
-   plot(J); "";
-   plot(I,"-2,2",J);
+   plot("",J); "";
+   plot("",I,"-2,2",J);
 
    ring rr1 = 0,x,dp;  export rr1;
    ideal I(1) = 2x2-1/2x3 +1, x-1;
    ideal I(2) = x3-x ,x; "";
-   plot(I(1),I(2),"-2,4");
+   plot("",I(1),I(2),"-2,4");
 
  // Paste the output into a Mathematica notebook
  // active evalutation of the cell with SHIFT RETURN
@@ -314,7 +350,7 @@ example
    // --------- space curves --------------
    I(1) = x3,-1/10x3+x2,x2;
    I(2) = x2,-x2+2,-2x2-x+1; "";
-   plot(I(1),I(2));
+   plot("",I(1),I(2));
 
  // Paste the output into a Mathematica notebook
  // active evalutation of the cell with SHIFT RETURN
@@ -335,16 +371,16 @@ example
    // adjust the plotregion properly to get a good picture
 
    poly f = (x-y)*(x2+y);
-   plot(f); "";
+   plot("",f); "";
    ideal J = jacob(f);
    J; "";
-   plot(J[1],J[2]);     // bad resolution
+   plot("",J[1],J[2]);     // bad resolution
    "";
-   plot(J[1],J[2],"-10,10","-10,10");  // get better picture in this way
+   plot("",J[1],J[2],"-10,10","-10,10");  // get better picture in this way
 
-   plot(I(1),I(2),"-2.5,2.5"); "";
+   plot("",I(1),I(2),"-2.5,2.5"); "";
 
-   plot(I(3),"-2,2");
+   plot("",I(3),"-2,2");
 
  // Paste the output into a Mathematica notebook
  // active evalutation of the cell with SHIFT RETURN
@@ -357,8 +393,8 @@ example
    // the Whitney-Umbrella
 
    ideal J(2) = xy,y,x2; "";
-   plot(J(1),"-2,1","1,2");  "";
-   plot(J(2),"-1.5,1.5","-2,2");
+   plot("",J(1),"-2,1","1,2");  "";
+   plot("",J(2),"-1.5,1.5","-2,2");
 
  // Paste the output into a Mathematica notebook
  // active evalutation of the cell with SHIFT RETURN
