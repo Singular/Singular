@@ -621,11 +621,8 @@ char * versionString()
     #endif
   #endif
 #endif
-#ifdef SRING
-              StringAppendS("super algebra,");
-#endif
-#ifdef DRING
-              StringAppendS("Weyl algebra,");
+#ifdef PLURAL
+              StringAppendS("PLURAL,");
 #endif
 #ifdef HAVE_DBM
               StringAppendS("DBM,\n\t");

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.288 2003-02-26 15:40:25 levandov Exp $ */
+/* $Id: iparith.cc,v 1.289 2003-03-10 16:43:45 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -173,9 +173,6 @@ cmdnames cmds[] =
   { "dim",         0, DIM_CMD ,           CMD_1},
   { "div",         0, INTDIV_CMD ,        MULDIV_OP},
   { "division",    0, DIVISION_CMD ,      CMD_M},
-#ifdef DRING
-  { "dring",       0, DRING_CMD ,         DRING_CMD},
-#endif
   { "dump",        0, DUMP_CMD,           CMD_1},
   { "extgcd",      0, EXTGCD_CMD ,        CMD_2},
   { "EXTGCD",      2, EXTGCD_CMD ,        CMD_2},
@@ -199,6 +196,9 @@ cmdnames cmds[] =
   { "getdump",     0, GETDUMP_CMD,        CMD_1},
   { "gcd",         0, GCD_CMD ,           CMD_2},
   { "GCD",         2, GCD_CMD ,           CMD_2},
+#ifdef HAVE_PLURAL
+  { "gring",       0, GRING_CMD ,         GRING_CMD},
+#endif
   { "hilb",        0, HILBERT_CMD ,       CMD_123},
   { "highcorner",  0, HIGHCORNER_CMD,     CMD_1},
   { "homog",       0, HOMOG_CMD ,         CMD_12},
@@ -342,9 +342,6 @@ cmdnames cmds[] =
 //  { "Up",          0, -1 ,                SYSVAR},
 
 /* set sys vars*/
-//#ifdef SRING
-  { "alternating", 0, VALTVARS ,          SYSVAR},
-//#endif
   { "degBound",    0, VMAXDEG ,           SYSVAR},
   { "echo",        0, VECHO ,             SYSVAR},
   { "minpoly",     0, VMINPOLY ,          SYSVAR},

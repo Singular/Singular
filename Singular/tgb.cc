@@ -646,8 +646,6 @@ static inline poly p_MoveHead(poly p, omBin b)
 
 
 
-//very important: ILM
-
 //len should be weighted length in char 0
 static int simple_posInS (kStrategy strat, poly p,int len, BOOLEAN is_char0)
 {

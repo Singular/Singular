@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: attrib.cc,v 1.19 2000-09-18 09:18:52 obachman Exp $ */
+/* $Id: attrib.cc,v 1.20 2003-03-10 16:43:45 Singular Exp $ */
 
 /*
 * ABSTRACT: attributes to leftv and idhdl
@@ -370,8 +370,6 @@ BOOLEAN atKILLATTR1(leftv res,leftv a)
   }
   resetFlag(a,FLAG_STD);
   resetFlag((idhdl)a->data,FLAG_STD);
-  resetFlag(a,FLAG_DOPERATOR);
-  resetFlag((idhdl)a->data,FLAG_DOPERATOR);
   if (a->attribute!=NULL)
   {
     atKillAll((idhdl)a->data);

@@ -4,7 +4,7 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id: subexpr.cc,v 1.84 2002-11-26 13:56:57 Singular Exp $ */
+/* $Id: subexpr.cc,v 1.85 2003-03-10 16:43:54 Singular Exp $ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -324,9 +324,6 @@ void sleftv::CleanUp(ring r)
       case IDHDL:
       case PACKAGE_CMD:
       case ANY_TYPE:
-#ifdef SRING
-      case VALTVARS:
-#endif
       case VECHO:
       case VPAGELENGTH:
       case VPRINTLEVEL:
@@ -360,9 +357,6 @@ void sleftv::CleanUp(ring r)
       case PACKAGE_CMD:
       case IDHDL:
       case ANY_TYPE:
-#ifdef SRING
-      case VALTVARS:
-#endif
       case VECHO:
       case VPAGELENGTH:
       case VPRINTLEVEL:
@@ -854,9 +848,6 @@ int  sleftv::Typ()
     {
       case IDHDL:
         return IDTYP((idhdl)data);
-#ifdef SRING
-      case VALTVARS:
-#endif
       case VECHO:
       case VPAGELENGTH:
       case VPRINTLEVEL:

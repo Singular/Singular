@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.65 2002-12-13 16:20:05 Singular Exp $ */
+/* $Id: ipid.cc,v 1.66 2003-03-10 16:43:50 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -709,7 +709,6 @@ idhdl ggetid(const char *n, BOOLEAN local)
 void ipListFlag(idhdl h)
 {
   if (hasFlag(h,FLAG_STD)) PrintS(" (SB)");
-  if (hasFlag(h,FLAG_DRING)) PrintS(" (D)");
 #ifdef HAVE_PLURAL  
   if (hasFlag(h,FLAG_TWOSTD)) PrintS(" (2SB)");
 #endif  

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.cc,v 1.43 2001-08-27 14:47:10 Singular Exp $ */
+/* $Id: matpol.cc,v 1.44 2003-03-10 16:43:52 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -485,11 +485,7 @@ poly mpDet (matrix m)
     return NULL;
   }
   k=rChar();
-  if (((k > 0) && (k <= n))
-#ifdef SRING
-  || (pSRING)
-#endif
-  )
+  if ((k > 0) && (k <= n))
     return mpLeibnitz(m);
   ONE = nInit(1);
   ma[1]=mpCopy(m);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.67 2002-11-21 13:36:20 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.68 2003-03-10 16:43:50 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -1450,17 +1450,6 @@ BOOLEAN iiAssign(leftv l, leftv r)
         idDelete((ideal *)&olm);
         if (module_assign)   lm->rank=rk;
         else if (map_assign) ((map)lm)->preimage=pr;
-#ifdef DRING
-        else if (pDRING)
-        {
-          int i=IDELEMS(lm)-1;
-          while (i>=0)
-          {
-            pdSetDFlagP(lm->m[i],1);
-            i--;
-          }
-        }
-#endif
         l=l->LData();
         if (l->rtyp==IDHDL)
           IDMATRIX((idhdl)l->data)=lm;
