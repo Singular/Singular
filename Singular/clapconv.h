@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapconv.h,v 1.9 2000-11-03 13:02:59 Singular Exp $
+// $Id: clapconv.h,v 1.10 2000-12-07 12:04:56 Singular Exp $
 /*
 * ABSTRACT: convert data between Singular and factory
 */
@@ -15,8 +15,8 @@
 #include "longalg.h"
 #include <factory.h>
 
-alg convClapPSingTr ( const CanonicalForm & f );
-CanonicalForm convSingTrClapP( alg p );
+napoly convClapPSingTr ( const CanonicalForm & f );
+CanonicalForm convSingTrClapP( napoly p );
 
 poly convClapPSingP ( const CanonicalForm & f );
 CanonicalForm convSingPClapP( poly p );
@@ -27,8 +27,8 @@ poly convClapAPSingAP ( const CanonicalForm & f );
 CanonicalForm convSingGFClapGF ( poly p );
 poly convClapGFSingGF ( const CanonicalForm & f );
 
-CanonicalForm convSingAClapA ( alg p , const Variable & a );
-alg convClapASingA ( const CanonicalForm & f );
+CanonicalForm convSingAClapA ( napoly p , const Variable & a );
+napoly convClapASingA ( const CanonicalForm & f );
 
 CanonicalForm convSingTrPClapP ( poly p );
 poly convClapPSingTrP ( const CanonicalForm & f );
