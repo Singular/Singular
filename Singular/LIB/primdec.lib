@@ -1,4 +1,4 @@
-// $Id: primdec.lib,v 1.44 1999-08-03 13:01:02 obachman Exp $
+// $Id: primdec.lib,v 1.45 1999-08-17 11:27:40 pfister Exp $
 ///////////////////////////////////////////////////////////////////////////////
 // primdec.lib                                                               //
 // algorithms for primary decomposition based on                             //
@@ -10,7 +10,7 @@
 // written by Wolfram Decker and Hans Schoenemann                            //
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: primdec.lib,v 1.44 1999-08-03 13:01:02 obachman Exp $";
+version="$Id: primdec.lib,v 1.45 1999-08-17 11:27:40 pfister Exp $";
 info="
 LIBRARY: primdec.lib:   PROCEDURES FOR PRIMARY DECOMPOSITION
 AUTHORS:  Gerhard Pfister, email: pfister@mathematik.uni-kl.de (GTZ)
@@ -425,9 +425,10 @@ proc primaryTest (ideal i, poly p)
 {
    int m=1;
    int n=nvars(basering);
-   int e;
+   int e,f;
    poly t;
    ideal h;
+   list act;
 
    ideal prm=p;
    attrib(prm,"isSB",1);
@@ -455,25 +456,52 @@ proc primaryTest (ideal i, poly p)
       //if not (0) is returned, else var(n)+h is added to prm
 
       e=deg(lead(i[m]));
-      t=leadcoef(i[m])*e*var(n)+(i[m]-lead(i[m]))/var(n)^(e-1);
 
-      i[m]=poly(e)^e*leadcoef(i[m])^(e-1)*i[m];
-
-      if(i[m]==0)
-      { 
-        if ( voice >=15 )
-        { 
-           "// WARNING: The characteristic is perhaps too small to use";
-           "// the algorithm of Gianni/Trager/Zacharias.";
-           "// This may result in an infinte loop";
-           "// current nesting level in primaryTest:",voice;"";
-        }
-
-      }
-      if (reduce(i[m]-t^e,prm,1) !=0)
+      if(char(basering)!=0)
       {
-        return(ideal(0));
+         f=1;
+         if(e mod char(basering)==0)
+         {
+           if ( voice >=15 )
+           { 
+              "// WARNING: The characteristic is perhaps too small to use";
+              "// the algorithm of Gianni/Trager/Zacharias.";
+              "// This may result in an infinte loop";
+              "// loop in primaryTest, voice:",voice;"";
+           }
+           while(e mod char(basering)==0)
+           {
+              f=f*char(basering);
+              e=e/char(basering);  
+           }
+       
+         }
+         t=leadcoef(i[m])*e*var(n)^f+(i[m]-lead(i[m]))/var(n)^((e-1)*f);
+         i[m]=poly(e)^e*leadcoef(i[m])^(e-1)*i[m];
+         if (reduce(i[m]-t^e,prm,1) !=0)
+         {
+           return(ideal(0));
+         }
+         if(f>1)
+         {       
+            act=factorize(t);
+            if(size(act[1])>2)
+            {
+              return(ideal(0));   
+            }
+            t=act[1][2];
+         }
       }
+      else
+      {
+         t=leadcoef(i[m])*e*var(n)+(i[m]-lead(i[m]))/var(n)^(e-1);
+         i[m]=poly(e)^e*leadcoef(i[m])^(e-1)*i[m];
+         if (reduce(i[m]-t^e,prm,1) !=0)
+         {
+           return(ideal(0));
+         }
+      }
+
       h=interred(t);
       t=h[1];
 
