@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.38 1998-06-03 10:04:20 obachman Exp $ */
+/* $Id: febase.cc,v 1.39 1998-06-03 12:58:35 obachman Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -198,7 +198,7 @@ static char* feGetSearchPath(const char* bindir)
       path += strlen(path);
     }
     
-    sprintf(path, "%s/LIB%c%s/LIB/%s",
+    sprintf(path, "%s/Singular/LIB%c%sSingular/LIB/%s",
             SINGULAR_ROOT_DIR, FS_SEP,
             SINGULAR_ROOT_DIR, S_VERSION1);
     
