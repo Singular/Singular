@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.65 1998-05-19 08:16:02 pohl Exp $
+@comment $Id: reference.doc,v 1.66 1998-05-19 08:55:48 wichmann Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -3464,36 +3464,45 @@ shows correct usage in error messages (default)
 @end example
 @end table
 
+@*The output reported on @code{option(prot)} has the following meaning:
+@multitable @columnfractions .01 .15 .1 .65
+@item @tab @code{facstd} @tab @code{F} @tab found a new factor
+@item @tab @tab @tab all other characters: like the output of @code{std}
 
-The output reported on @code{option(prot)} has the following meaning:
-@table @code
-@item facstd
-@code{F} - found a new factor@*
-all other characters: like the output of @code{std}
-@item fglm 
-@item lres
-@item mres 
-@code{[c]} - computations of the @code{d}-th syzygy module
-all other characters: like the output of @code{std}
-@item minres
-@code{[c]} - minimizing of the @code{d}-th syzygy module
-@item res 
-@code{[c]} - computations of the @code{d}-th syzygy module
-all other characters: like the output of @code{std}
-@item sres
-@item std 
-@code{s} - found a new element of the standard basis@*
-@code{-} - reduced a pair to 0@*
-@code{.} - postponed a reduction of an S-polynomial@*
-@code{H(d)} - found a 'highest corner' of degree @code{d},
-              no need to consider higher degrees@*
-@code{(n)} - @code{n} critical pairs are still to be reduced@*
-@code{(S:n)} - doing complete reduction of @code{n} elements@*
-@code{d} - the degree of the leading terms is currently @code{n}
-@item syz
-all characters: like the output of @code{std}
-@end table
+@item @tab @code{fglm} @tab @code{.} @tab basis monom found
+@item @tab @tab @code{+} @tab egde monom found
+@item @tab @tab @code{-} @tab border monom found
 
+@item @tab @code{lres}
+
+@item @tab @code{mres} @tab @code{[c]} @tab computations of the @code{d}-th
+syzygy module 
+@item @tab @tab @tab all other characters: like the output of @code{std}  
+
+@item @tab @code{minres} @tab @code{[c]} @tab minimizing of the @code{d}-th
+syzygy module 
+
+@item @tab @code{res} @tab @code{[c]} @tab computations of the @code{d}-th
+syzygy module 
+@item @tab @tab @tab all other characters: like the output of @code{std}
+
+@item @tab @code{sres}
+
+@item @tab @code{std} @tab @code{s} @tab found a new element of the standard
+basis 
+@item @tab @tab @code{-} @tab reduced a pair to 0
+@item @tab @tab @code{.} @tab postponed a reduction of an S-polynomial
+@item @tab @tab @code{H(d)} @tab found a 'highest corner' of degree @code{d},
+no need to consider higher degrees 
+@item @tab @tab @code{(n)} @tab @code{n} critical pairs are still to be
+reduced 
+@item @tab @tab @code{(S:n)} @tab doing complete reduction of @code{n}
+elements 
+@item @tab @tab @code{d} @tab the degree of the leading terms is currently
+@code{n} 
+
+@item @tab @code{syz} @tab @tab all characters: like the output of @code{std}
+@end multitable
 
 @c ref
 See
@@ -5988,13 +5997,16 @@ See @ref{Command line options}, @ref{system}, @ref{rtimer}.
 int
 @item @strong{Purpose:}
 sets level of debugging.
-@* @code{TRACE=1} :
+@table @asis
+@item @code{TRACE=1} 
 messages about entering and leaving of procedures are displayed.
-@* @code{TRACE=3} :
+@item @code{TRACE=3} 
 messages about entering and leaving of procedures together with
 line numbers are displayed.
-@* @code{TRACE=4} : each line is echoed and the interpretation of commands
-in this line is suspended until the user presses @code{<RETURN>}.
+@item @code{TRACE=4} 
+each line is echoed and the interpretation of commands
+in this line is suspended until the user presses @code{RETURN}.
+@end table
 @*@code{TRACE} is defaulted to 0.
 @*@code{TRACE} does not affect the output of commands.
 @item @strong{Example:}
