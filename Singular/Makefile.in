@@ -68,8 +68,8 @@ CXXSOURCES=grammar.cc scanner.cc algmap.cc attrib.cc binom.cc clapconv.cc \
     ipassign.cc ipconv.cc ipid.cc iplib.cc \
     ipprint.cc ipshell.cc khstd.cc kstdfac.cc \
     comm.cc kstd1.cc kstd2.cc kutil.cc lists.cc \
-    longalg.cc longrat.cc \
-    longrat0.cc maps.cc matpol.cc misc.cc \
+    longalg.cc longrat.cc longrat0.cc \
+    lamat.cc maps.cc matpol.cc misc.cc \
     mminit.cc modulop.cc \
     fglm.cc fglmzero.cc fglmvec.cc fglmgauss.cc fglmhom.cc fglmcomb.cc \
     numbers.cc polys.cc polys0.cc polys1.cc polys-impl.cc \
@@ -91,7 +91,7 @@ HEADERS=algmap.h hutil.h lists.h stairc.h attrib.h ideals.h \
 	subexpr.h clapsing.h ipid.h matpol.h polys.h syz.h \
 	cntrlc.h ipprint.h mmemory.h ring.h timer.h \
 	febase.h ipshell.h mmprivat.h shortfl.h tok.h \
-	ffields.h khstd.h silink.h \
+	lamat.h ffields.h khstd.h silink.h \
 	fglm.h comm.h kstd1.h modulop.h sing_dbm.h weight.h \
 	fglmgauss.h fglmvec.h kstd2.h mpsr.h sing_mp.h \
 	kstdfac.h mpsr_Get.h spolys.h \
@@ -111,7 +111,7 @@ DISTFILES=${SOURCES} ${HEADERS} Makefile.in configure.in configure \
 
 OBJS=grammar.o scanner.o matpol.o binom.o\
      febase.o feread.o timer.o intvec.o attrib.o lists.o\
-     longrat.o longrat0.o misc.o ring.o numbers.o maps.o\
+     longrat.o longrat0.o lamat.o misc.o ring.o numbers.o maps.o\
      hilb.o comm.o kstd1.o kstd2.o kutil.o khstd.o kstdfac.o modulop.o spolys.o\
      ideals.o subexpr.o hdegree.o hutil.o ffields.o shortfl.o \
      longalg.o spolys0.o syz.o syz0.o syz1.o weight.o weight0.o \
@@ -324,7 +324,7 @@ DEFSG		= @DEFS@
 
 OBJG1=	grammar.og scanner.og matpol.og binom.og\
      febase.og feread.og timer.og intvec.og attrib.og lists.og\
-     longrat.og longrat0.og misc.og ring.og numbers.og maps.og\
+     longrat.og longrat0.og lamat.og misc.og ring.og numbers.og maps.og\
      hilb.og comm.og kstd1.og kstd2.og kutil.og khstd.og kstdfac.og modulop.og \
      spolys.og ideals.og subexpr.og hdegree.og hutil.og ffields.og shortfl.og \
      longalg.og spolys0.og syz.og syz0.og syz1.og weight.og \
@@ -398,7 +398,7 @@ BPROFOBJ	= /usr/local/lib/bmon.o
 
 OBJP1=	grammar.op scanner.op matpol.op binom.op\
      febase.op feread.op timer.op intvec.op attrib.op lists.op\
-     longrat.op longrat0.op misc.op ring.op numbers.op maps.op\
+     longrat.op longrat0.op lamat.op misc.op ring.op numbers.op maps.op\
      hilb.op comm.op kstd1.op kstd2.op kutil.op khstd.op kstdfac.op modulop.op \
      spolys.op ideals.op subexpr.op hdegree.op hutil.op ffields.op shortfl.op \
      longalg.op spolys0.op syz.op syz0.op syz1.op weight.op \
@@ -423,7 +423,7 @@ OBJP=$(OBJP1) $(OBJP2) claptmpl.op
 
 OBJB1=	grammar.ob scanner.ob matpol.ob binom.ob\
      febase.ob feread.ob timer.ob intvec.ob attrib.ob lists.ob\
-     longrat.ob longrat0.ob misc.ob ring.ob numbers.ob maps.ob\
+     longrat.ob longrat0.ob lamat.ob misc.ob ring.ob numbers.ob maps.ob\
      hilb.ob comm.ob kstd1.ob kstd2.ob kutil.ob khstd.ob kstdfac.ob modulop.ob \
      spolys.ob ideals.ob subexpr.ob hdegree.ob hutil.ob ffields.ob shortfl.ob \
      longalg.ob spolys0.ob syz.ob syz0.ob syz1.ob weight.ob \
