@@ -1,25 +1,24 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: resultant.m4,v 1.1 1997-09-12 12:26:17 schmidt Exp $ */
+/* $Id: resultant.m4,v 1.2 1997-09-24 07:36:33 schmidt Exp $ */
+
+ftestSetNameOfGame( resultant,
+        `"Usage: resultant [<options>] [<envSpec>] <f> <g> <x>\n"
+        "  calculates resultant( f, g, x ).\n"' )
 
 //{{{ docu
 //
-// resultant.m4 - resultant test program.
+// ftestAlgorithm.m4 - ftestAlgorithm test program.
 //
-// Syntax: type `resultant -?' for more information
+// To create ftestAlgorithm.cc, run m4 using the ftest_util.m4 library in
+// the following way:
+//
+// m4 ftest_util.m4 ftestAlgorithm.m4 > ftestAlgorithm.cc'
 //
 //}}}
 
 ftestPreprocInit();
 
-#include <factory.h>
-
-#include "ftest_util.h"
-
 ftestGlobalInit();
-
-//
-// - functions.
-//
 
 //
 // - main program.
@@ -27,6 +26,7 @@ ftestGlobalInit();
 int
 main ( int argc, char ** argv )
 {
+    // initialization
     ftestMainInit();
 
     // declare input and output variables
@@ -42,14 +42,12 @@ main ( int argc, char ** argv )
     ftestGetInVar( g );
     ftestGetInVar( x );
 
-    ftestSetEnv();
-
     // do the test!
     ftestRun(
 	result = resultant( f, g, x ); );
 
     // print results
-    ftestOutput( "resultant", "resultant( f, g, x ) =", result );
+    ftestOutput( "resultant(f, g, x)", result );
 
     // clean up
     ftestMainExit();
