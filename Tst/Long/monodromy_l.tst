@@ -1,8 +1,8 @@
 LIB "tst.lib";
 tst_init();
-tst_ignore("CVS ID $Id: monodromy_l.tst,v 1.5 1998-12-28 14:37:14 mschulze Exp $");
+tst_ignore("CVS ID $Id: monodromy_l.tst,v 1.6 1999-05-05 17:24:07 Singular Exp $");
 
-LIB "monodromy.lib";
+LIB "monodrom.lib";
 LIB "jordan.lib";
 
 list unimodal=
