@@ -1377,11 +1377,6 @@ else
  { echo "configure: error: libm.a not found" 1>&2; exit 1; } 
 fi
 
-# the following test breaks the configure script
-#AC_CHECK_LIB(g++, strsignal, ,
-#    [ AC_MSG_WARN(libg++ not found.
-#                    You will not be able to build the Factory Test Environment
-#                    (though Factory itself should compile)) ])
 
 #
 # - check for header files.
@@ -1402,12 +1397,12 @@ if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 1406 "configure"
+#line 1401 "configure"
 #include "confdefs.h"
 #include <$ac_hdr>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:1411: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:1406: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -1442,12 +1437,12 @@ if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 1446 "configure"
+#line 1441 "configure"
 #include "confdefs.h"
 #include <$ac_hdr>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:1451: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:1446: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -1482,12 +1477,12 @@ if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 1486 "configure"
+#line 1481 "configure"
 #include "confdefs.h"
 #include <$ac_hdr>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:1491: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:1486: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -1520,12 +1515,12 @@ if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 1524 "configure"
+#line 1519 "configure"
 #include "confdefs.h"
 #include <$ac_hdr>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:1529: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:1524: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -1553,7 +1548,7 @@ done
 
   # since the FTE will compile only with stream IO enabled we will not
   # check for the necessary header files if stream IO is disabled
-  for ac_hdr in stdarg.h signal.h errno.h unistd.h GetOpt.h
+  for ac_hdr in stdarg.h signal.h errno.h unistd.h
 do
 ac_safe=`echo "$ac_hdr" | tr './\055' '___'`
 echo $ac_n "checking for $ac_hdr""... $ac_c" 1>&6
@@ -1561,12 +1556,12 @@ if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 1565 "configure"
+#line 1560 "configure"
 #include "confdefs.h"
 #include <$ac_hdr>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:1570: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:1565: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -1604,12 +1599,12 @@ if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 1608 "configure"
+#line 1603 "configure"
 #include "confdefs.h"
 #include <$ac_hdr>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:1613: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:1608: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -1662,11 +1657,11 @@ else
   ac_cv_c_cross=yes
 else
 cat > conftest.$ac_ext <<EOF
-#line 1666 "configure"
+#line 1661 "configure"
 #include "confdefs.h"
 main(){return(0);}
 EOF
-{ (eval echo configure:1670: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }
+{ (eval echo configure:1665: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }
 if test -s conftest && (./conftest; exit) 2>/dev/null; then
   ac_cv_c_cross=no
 else
@@ -1694,7 +1689,7 @@ if eval "test \"`echo '$''{'ac_cv_c_const'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 1698 "configure"
+#line 1693 "configure"
 #include "confdefs.h"
 
 int main() { return 0; }
@@ -1744,7 +1739,7 @@ ccp = (char const *const *) p;
 
 ; return 0; }
 EOF
-if { (eval echo configure:1748: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:1743: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   ac_cv_c_const=yes
 else
@@ -1770,7 +1765,7 @@ else
   ac_cv_c_inline=no
 for ac_kw in inline __inline__ __inline; do
   cat > conftest.$ac_ext <<EOF
-#line 1774 "configure"
+#line 1769 "configure"
 #include "confdefs.h"
 
 int main() { return 0; }
@@ -1778,7 +1773,7 @@ int t() {
 } $ac_kw foo() {
 ; return 0; }
 EOF
-if { (eval echo configure:1782: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:1777: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   ac_cv_c_inline=$ac_kw; break
 fi
@@ -1811,11 +1806,11 @@ else
   ac_cv_shift=yes
 else
 cat > conftest.$ac_ext <<EOF
-#line 1815 "configure"
+#line 1810 "configure"
 #include "confdefs.h"
  int main() { if (-2 >> 1 == -1) exit(0); else exit(1); } 
 EOF
-{ (eval echo configure:1819: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }
+{ (eval echo configure:1814: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }
 if test -s conftest && (./conftest; exit) 2>/dev/null; then
   ac_cv_shift=yes
 else
