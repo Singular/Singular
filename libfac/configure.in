@@ -66,6 +66,7 @@ fi
 LDFLAGS="-L. ${LDFLAGS}"
 
 if test "${CXXFLAGS+set}" != set; then
+  ac_cxxflags_set=no
   if test "$with_debug" = yes; then
     CXXFLAGS="-g"
   else
@@ -116,7 +117,7 @@ dnl
 dnl Last, but not least, customize CFLAGS
 dnl
 if test ${GXX} = yes; then
-  if test "${CXXFLAGS+set}" != set; then
+  if test "$ac_cxxflags_set" = no; then
     if test "$with_debug" = yes; then
       CXXFLAGS="-O -g"
     else

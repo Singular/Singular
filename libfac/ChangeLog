@@ -3,6 +3,16 @@ Tue May 13 11:32:11 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de
 	* Makefile.in (uninstall): took out template installation
 	(all): added OPTOBJ target so that the dir is created, if necessary
 
+Sun May 25 14:06:12 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* configure.in: Fixed handling of CXXFLAGS -- it is not touched if
+	  set as env var
+
+Fri May 23 11:10:18 1997  Olaf Bachmann  <obachman@schlupp.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* configure.in (CXXFLAGS): Check whether they are set before value
+	  is assigned 
+
 Tue May 13 20:09:03 1997  Olaf Bachmann  <obachman@schlupp.mathematik.uni-kl.de (Olaf Bachmann)>
 
 	* configure.in: Exit with error if factory.h was not found and
