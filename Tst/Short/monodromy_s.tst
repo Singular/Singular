@@ -1,8 +1,8 @@
 LIB "tst.lib";
 tst_init();
-tst_ignore("CVS ID $Id: monodromy_s.tst,v 1.5 1999-04-30 16:57:46 obachman Exp $");
+tst_ignore("CVS ID $Id: monodromy_s.tst,v 1.6 1999-06-01 12:17:36 mschulze Exp $");
 
-LIB "monodrom.lib";
+LIB "monodrmy.lib";
 LIB "jordan.lib";
 
 ring R=0,(x,y),ds;
