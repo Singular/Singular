@@ -1,4 +1,4 @@
-/* $Id: NTLconvert.h,v 1.2 2002-07-30 15:20:02 Singular Exp $ */
+/* $Id: NTLconvert.h,v 1.3 2003-06-20 10:01:02 Singular Exp $ */
 #ifndef INCL_NTLCONVERT_H
 #define INCL_NTLCONVERT_H
 
@@ -27,6 +27,10 @@
 #include <limits.h>
 #include <NTL/ZZ_pEXFactoring.h>
 #include <NTL/GF2EXFactoring.h>
+
+#ifdef NTL_CLIENT               // in <NTL/tools.h>: using of name space NTL
+NTL_CLIENT
+#endif
 
 ZZ_pX convertFacCF2NTLZZpX(CanonicalForm f);
 GF2X convertFacCF2NTLGF2X(CanonicalForm f);
