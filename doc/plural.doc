@@ -73,12 +73,12 @@
 @c @include general.tex
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
-@node PLURAL conventions, Data types @value{PSUFFIX}, Tricks and pitfalls, PLURAL
+@node PLURAL conventions, Data types @value{PSUFFIX}, (dir) ,Top
 @section  PLURAL conventions
 @end ifset 
 
 @ifclear singularmanual
-@node  PLURAL conventions, Data types @value{PSUFFIX}, Top, Top
+@node  PLURAL conventions, Data types @value{PSUFFIX}, (dir) ,Top
 @chapter PLURAL conventions
 @end ifclear 
 
@@ -114,7 +114,7 @@
 @end ifset
 
 @node Functions @value{PSUFFIX}, Mathematical background @value{PSUFFIX}, Data types @value{PSUFFIX}, Top
-
+@comment  node-name,  next,  previous,  up
 @ifset singularmanual
 @section Functions  @value{PSUFFIX}
 @end ifset
@@ -146,7 +146,7 @@
 
 @c ----------------------------------------------------------------------------
 
-@node Mathematical background @value{PSUFFIX}, PLURAL libraries, Functions @value{PSUFFIX}, Top
+@node Mathematical background @value{PSUFFIX}, PLURAL libraries, Functions @value{PSUFFIX},  Top
 
 @ifset singularmanual
 @section Mathematical background @value{PSUFFIX}
@@ -161,12 +161,12 @@
 
 @c --------------------------------------------------------------------
 @ifset singularmanual
-@node PLURAL libraries, Release Notes, Mathematical background @value{PSUFFIX}, PLURAL
+@node PLURAL libraries, Release Notes @value{PSUFFIX}, Mathematical background @value{PSUFFIX}, Top
 @section PLURAL libraries
 @end ifset
 
 @ifclear singularmanual
-@node PLURAL libraries, Release Notes, Mathematical background @value{PSUFFIX}, Top
+@node PLURAL libraries, Release Notes @value{PSUFFIX}, Mathematical background @value{PSUFFIX}, Top
 @appendix  PLURAL libraries
 @end ifclear
 
@@ -183,63 +183,86 @@ Use the @code{LIB} command for loading of single libraries.
 
 @menu
 * center_lib::
+* involution_lib::
+* gkdim_lib::
 * ncall_lib::
 * ncalg_lib::
 * ncdecomp_lib::               
 * nctools_lib::
-* gkdim_lib::
 * qmatrix_lib::
 @end menu
 
 @c ----------------------------------------------------------
-@node center_lib, ncall_lib, PLURAL libraries, PLURAL libraries
+@node center_lib, involution_lib, PLURAL libraries, PLURAL libraries
 @section center_lib
+@cindex center_lib
+@cindex center.lib
 
 @c lib center.lib
 
+@c ----------------------------------------------------------
+@node involution_lib,  gkdim_lib, center_lib, PLURAL libraries
+@section involution_lib
+@cindex involution_lib
+@cindex involution.lib
+
+@c lib involution.lib
 
 @c ----------------------------------------------------------
-@node ncall_lib, ncalg_lib, center_lib, PLURAL libraries
-@section ncall_lib
-
-The library @code{ncall.lib} provides a convenient way to load all 
-libraries, featuring non-commutative algorithms of the SINGULAR:PLURAL distribution.
-
-
-@c lib ncall.lib
-
-@c ----------------------------------------------------------
-@node ncalg_lib, ncdecomp_lib, ncall_lib, PLURAL libraries
-@section ncalg_lib
-
-@c lib ncalg.lib
-
-@c ----------------------------------------------------------
-
-
-@node ncdecomp_lib, nctools_lib, ncalg_lib, PLURAL libraries
-@section ncdecomp_lib
-
-@c lib ncdecomp.lib
-
-@c ----------------------------------------------------------
-
-@node nctools_lib, gkdim_lib, ncdecomp_lib, PLURAL libraries
-@section nctools_lib
-
-@c lib nctools.lib
-
-@c ----------------------------------------------------------
-
-@node gkdim_lib, qmatrix_lib, nctools_lib, PLURAL libraries
+@node gkdim_lib, ncall_lib, involution_lib, PLURAL libraries
 @section gkdim_lib
+@cindex gkdim_lib
+@cindex gkdim.lib
 
 @c lib gkdim.lib
 
 @c ----------------------------------------------------------
+@node ncall_lib, ncalg_lib, gkdim_lib, PLURAL libraries
+@section ncall_lib
+@cindex ncall_lib
+@cindex ncall.lib
 
-@node qmatrix_lib,  , gkdim_lib, PLURAL libraries
+The library @code{ncall.lib} provides a convenient way to load all
+libraries, featuring non-commutative algorithms of the @sc{Singular} distribution.
+
+@strong{Example:}
+@smallexample
+@c example
+option(loadLib);
+option(noredefine);
+LIB "ncall.lib";
+@c example
+@end smallexample
+
+@c ----------------------------------------------------------
+@node ncalg_lib, ncdecomp_lib, ncall_lib, PLURAL libraries
+@section ncalg_lib
+@cindex ncalg_lib
+@cindex ncalg.lib
+
+@c lib ncalg.lib
+
+@c ----------------------------------------------------------
+@node ncdecomp_lib, nctools_lib, ncalg_lib, PLURAL libraries
+@section ncdecomp_lib
+@cindex ncdecomp_lib
+@cindex ncdecomp.lib
+
+@c lib ncdecomp.lib
+
+@c ----------------------------------------------------------
+@node nctools_lib, qmatrix_lib, ncdecomp_lib, PLURAL libraries
+@section nctools_lib
+@cindex nctools_lib
+@cindex nctools.lib
+
+@c lib nctools.lib
+
+@c ---------------------------------------------------------
+@node qmatrix_lib,  , nctools_lib, PLURAL libraries
 @section qmatrix_lib
+@cindex qmatrix_lib
+@cindex qmatrix.lib
 
 @c lib qmatrix.lib
 
