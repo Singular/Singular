@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.12 1997-08-20 18:48:55 Singular Exp $
+// $Id: clapsing.cc,v 1.13 1997-09-16 13:45:29 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -344,11 +344,11 @@ void singclap_divide_content ( poly f )
         #endif
         c->z=convClapPSingTr( i.getItem() / g );
         nTest((number)c);
-        #ifdef LDEBUG
-        number cn=(number)c;
-        StringSet(""); nWrite(nt); StringAppend(" == ");
-        nWrite(cn);PrintS(StringAppend("\n"));
-        #endif
+        //#ifdef LDEBUG
+        //number cn=(number)c;
+        //StringSet(""); nWrite(nt); StringAppend(" ==> ");
+        //nWrite(cn);PrintS(StringAppend("\n"));
+        //#endif
       }
     }
     pTest(f);
@@ -833,5 +833,27 @@ BOOLEAN jjCHARSERIES(leftv res, leftv u)
 {
   res->data=singclap_irrCharSeries((ideal)u->Data());
   return (res->data==NULL);
+}
+
+alg singclap_alglcm ( alg f, alg g )
+{
+  // over Q(a) / Fp(a)
+ if (nGetChar()==1) setCharacteristic( 0 );
+ else               setCharacteristic( -nGetChar() );
+ alg res;
+ if (currRing->minpoly!=NULL)
+ {
+   CanonicalForm mipo=convSingTrClapP(((lnumber)currRing->minpoly)->z);
+   Variable a=rootOf(mipo);
+   CanonicalForm F( convSingAClapA( f,a ) ), G( convSingAClapA( g,a ) );
+   res= convClapASingA( (F/ gcd( F, G ))*G );
+ }
+ else
+ {
+   CanonicalForm F( convSingTrClapP( f ) ), G( convSingTrClapP( g ) );
+   res= convClapPSingTr( (F/gcd( F, G ))*G );
+ }
+ Off(SW_RATIONAL);
+ return res;
 }
 #endif

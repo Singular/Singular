@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.4 1997-07-09 15:54:04 Singular Exp $ */
+/* $Id: structs.h,v 1.5 1997-09-16 13:45:33 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -44,6 +44,7 @@ struct snumber;
 struct sip_command;
 struct sip_package;
 struct s_si_link_extension;
+struct reca;
 
 typedef struct _ssubexpr   sSubexpr;
 typedef struct _sssym      ssym;
@@ -55,6 +56,7 @@ typedef struct sip_sring   ip_sring;
 typedef struct sip_link    ip_link;
 typedef struct sip_command ip_command;
 typedef struct sip_package ip_package;
+
 
 /* the pointer types */
 typedef ip_sring *         ring;
@@ -78,6 +80,7 @@ typedef ip_command *       command;
 typedef ip_package *       package;
 typedef struct s_si_link_extension *si_link_extension;
 typedef ssyStrategy *      syStrategy;
+typedef struct reca *      alg;
 
 struct _scmdnames
 {

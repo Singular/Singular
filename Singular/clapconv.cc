@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapconv.cc,v 1.6 1997-04-25 15:03:51 obachman Exp $
+// $Id: clapconv.cc,v 1.7 1997-09-16 13:45:28 Singular Exp $
 /*
 * ABSTRACT: convert data between Singular and factory
 */
@@ -14,6 +14,7 @@
 #define SI_DONT_HAVE_GLOBAL_VARS
 #include "clapconv.h"
 #include "numbers.h"
+#include "longalg.h"
 #include "polys.h"
 #include "modulop.h"
 #include "mmemory.h"
@@ -174,7 +175,7 @@ convSingTrClapP( alg p )
       On(SW_USE_EZGCD);
       //if ( (!(int)(napGetCoeff( p )) & 1 )
       //&&  ( napGetCoeff( p )->s == 0))
-      //  napNormalize( napGetCoeff( p ) );
+      //  naNormalize( naGetCoeff( p ) );
       if ( (int)(napGetCoeff( p )) & 1 )
         term = nlInt( napGetCoeff( p ) );
       else
@@ -377,9 +378,9 @@ CanonicalForm convSingAClapA ( alg p , const Variable & a )
       On(SW_USE_EZGCD);
       //if ( (!(int)(napGetCoeff( p )) & 1 )
       //&&  ( napGetCoeff( p )->s == 0))
-      //  napNormalize( napGetCoeff( p ) );
+      //  naNormalize( naGetCoeff( p ) );
       if ( (int)(napGetCoeff( p )) & 1 )
-          term = nlInt( napGetCoeff( p ) );
+        term = nlInt( napGetCoeff( p ) );
       else
       {
         if ( napGetCoeff( p )->s == 3 )
@@ -465,6 +466,7 @@ CanonicalForm convSingTrPClapP ( poly p )
 
   while ( p!=NULL )
   {
+    nNormalize(&pGetCoeff(p));
     CanonicalForm term=convSingTrClapP(((lnumber)pGetCoeff(p))->z);
     for ( int i = 1; i <= n; i++ )
     {

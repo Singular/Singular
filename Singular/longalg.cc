@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.10 1997-09-15 08:51:47 Singular Exp $ */
+/* $Id: longalg.cc,v 1.11 1997-09-16 13:45:32 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -18,7 +18,11 @@
 #include "polys.h"
 #include "ideals.h"
 #include "ipid.h"
+#ifdef HAVE_FACTORY
+#include "clapsing.h"
+#endif
 #include "longalg.h"
+
 #define  FEHLER1 1
 #define  FEHLER2 1
 #define  FEHLER3 1
@@ -150,6 +154,7 @@ void naSetChar(int i, BOOLEAN complete, char ** param, int pars)
       nacIsOne       = npIsOne;
       nacIsMOne      = npIsMOne;
       nacGcd         = ndGcd;
+      nacLcm         = ndGcd;
     }
   }
 #ifdef TEST
@@ -797,7 +802,7 @@ static int napExp(alg a, alg b)
 {
   while (a->ne!=NULL) a = a->ne;
   int m = a->e[0];
-  if (m==0) return m;
+  if (m==0) return 0;
   while (b->ne!=NULL) b = b->ne;
   if (m > b->e[0]) m = b->e[0];
   return m;
@@ -1003,17 +1008,20 @@ static alg napGcd(alg a, alg b)
 
 number napLcm(alg a)
 {
-  number d, h;
-  alg b;
+  number h = nacInit(1);
 
-  h = nacInit(1);
-  b = a;
-  while (b!=NULL)
+  if (naIsChar0)
   {
-    d = nacLcm(h, b->ko);
-    nacDelete(&h);
-    h = d;
-    b = b->ne;
+    number d;
+    alg b = a;
+
+    while (b!=NULL)
+    {
+      d = nacLcm(h, b->ko);
+      nacDelete(&h);
+      h = d;
+      b = b->ne;
+    }
   }
   return h;
 }
@@ -1053,10 +1061,10 @@ alg napRedp (alg q)
     if (napDivPoly (naI->liste[i], q))
     {
       mmTestP((ADDRESS)q,RECA_SIZE + naNumbOfPar * sizeof(int));
-      StringSetS("");
-      napWrite(q);
-      napWrite(naI->liste[i]);
-      Print(StringAppendS("\n"));
+      //StringSetS("");
+      //napWrite(q);
+      //napWrite(naI->liste[i]);
+      //Print(StringAppendS("\n"));
       /* h = lt(q)/lt(naI->liste[i])*/
       h->ko = nacCopy(q->ko);
       for (j=naNumbOfPar-1; j>=0; j--)
@@ -1683,7 +1691,7 @@ void naWrite(number &phn)
     StringAppendS("0");
   else
   {
-    //phn->s = 0;
+    phn->s = 0;
     naNormalize(phn);
     napWrite(ph->z);
     if (ph->n!=NULL)
@@ -1818,17 +1826,14 @@ number naGcd(number a, number b)
 void naNormalize(number &pp)
 {
 
-  int  i,m;
-  number  h, h1;
-  alg x, y, r, x1, y1;
+  naTest(pp);
   lnumber p = (lnumber)pp;
 
   if ((p==NULL) /*|| (p->s==2)*/)
     return;
-  BOOLEAN normal_test=(p->s==2);
-  x = p->z;
-  y = p->n;
   p->s = 2;
+  alg x = p->z;
+  alg y = p->n;
   if ((y!=NULL) && (naMinimalPoly!=NULL))
   {
     y = napInvers(y, naMinimalPoly);
@@ -1838,28 +1843,56 @@ void naNormalize(number &pp)
     p->z = x;
     p->n = y = NULL;
   }
-  if (y==NULL)
+  /* normalize all coefficients in n and z (if in Q) */
+  if (naIsChar0)
   {
-    if (naIsChar0)
+    while(x!=NULL)
     {
-      r = x;
-      while (r!=NULL)
-      {
-        nacNormalize(r->ko);
-        r = r->ne;
-      }
+      nacNormalize(x->ko);
+      x=x->ne;
     }
-    return;
+    x = p->z;
+  }
+  if (y==NULL) return;
+  if (naIsChar0)
+  {
+    while(y!=NULL)
+    {
+      nacNormalize(y->ko);
+      y=y->ne;
+    }
+    y = p->n;
   }
   // p->n !=NULL:
+  /* collect all denoms from y and multiply x and y by it */
+  if (naIsChar0)
+  {
+    number n=napLcm(y);
+    napMultN(x,n);
+    napMultN(y,n);
+    nacDelete(&n);
+    while(x!=NULL)
+    {
+      nacNormalize(x->ko);
+      x=x->ne;
+    }
+    x = p->z;
+    while(y!=NULL)
+    {
+      nacNormalize(y->ko);
+      y=y->ne;
+    }
+    y = p->n;
+  }
 #if FEHLER1
   if (naMinimalPoly == NULL)
   {
     alg xx=x;
     alg yy=y;
-    for (i=(naNumbOfPar-1); i>=0; i--)
+    int i;
+    for (i=naNumbOfPar-1; i>=0; i--)
     {
-      m = napExpi(i, yy, xx);
+      int m = napExpi(i, yy, xx);
       if (m != 0)          // in this case xx!=NULL!=yy
       {
         while (xx != NULL)
@@ -1876,17 +1909,7 @@ void naNormalize(number &pp)
     }
   }
 #endif
-  if (naIsChar0)
-  {
-    h1 = nacInvers(y->ko);
-    nacNormalize(h1);
-    napMultN(x, h1);
-    napMultN(y->ne, h1);
-    nacDelete(&y->ko);
-    y->ko = nacInit(1);
-    nacDelete(&h1);
-  }
-  if (napDeg(y)==0)
+  if (napDeg(y)==0) /* i.e. y=const => simplify to (1/c)*z / monom */
   {
     if (nacIsOne(y->ko))
     {
@@ -1894,9 +1917,7 @@ void naNormalize(number &pp)
       p->n = NULL;
       return;
     }
-    h = nacInit(1);
-    h1 = nacDiv(h, y->ko);
-    nacDelete(&h);
+    number h1 = nacInvers(y->ko);
     nacNormalize(h1);
     napMultN(x, h1);
     nacDelete(&h1);
@@ -1904,109 +1925,96 @@ void naNormalize(number &pp)
     p->n = NULL;
     return;
   }
-  if (naNumbOfPar != 1)
-    return;
-  i = napExp(x, y);
-  if (i!=0)
+  if (naNumbOfPar == 1) /* apply built-in gcd */
   {
-    r = x;
-    while (r!=NULL)
+    alg x1,y1;
+    if (x->e[0] >= y->e[0])
     {
-      r->e[0] -= i;
-      r = r->ne;
-    }
-    r = y;
-    while (r!=NULL)
-    {
-      r->e[0] -= i;
-      r = r->ne;
-    }
-  }
-  if (y->ne==NULL)
-  {
-    if (nacIsOne(y->ko))
-    {
-      if (y->e[0]==0)
-      {
-        napDelete1(&y);
-        p->n = NULL;
-      }
-      return;
-    }
-    h = nacInit(1);
-    h1 = nacDiv(h, y->ko);
-    if (y->e[0]!=0)
-    {
-      nacDelete(&y->ko);
-      y->ko = h;
+      x1 = napCopy(x);
+      y1 = napCopy(y);
     }
     else
     {
-      napDelete1(&y);
-      nacDelete(&h);
-      p->n = NULL;
+      x1 = napCopy(y);
+      y1 = napCopy(x);
     }
-    napMultN(x, h1);
-    nacDelete(&h1);
-    return;
-  }
-  if (x->e[0] >= y->e[0])
-  {
-    x1 = napCopy(x);
-    y1 = napCopy(y);
-  }
-  else
-  {
-    x1 = napCopy(y);
-    y1 = napCopy(x);
-  }
-  loop
-  {
-    r = napRemainder(x1, y1);
-    if ((r==NULL) || (r->ne==NULL)) break;
-    x1 = y1;
-    y1 = r;
-  }
-  if (r!=NULL)
-  {
-    napDelete(&r);
-    napDelete(&y1);
-  }
-  else
-  {
-    napDivMod(x, y1, &(p->z), &r);
-    napDivMod(y, y1, &(p->n), &r);
-    napDelete(&y1);
-  }
-  x = p->z;
-  y = p->n;
-  if (y->ne==NULL)
-  {
-    if (nacIsOne(y->ko))
+    alg r;
+    loop
     {
-      if (y->e[0]==0)
-      {
-        napDelete1(&y);
-        p->n = NULL;
-      }
-      return;
+      r = napRemainder(x1, y1);
+      if ((r==NULL) || (r->ne==NULL)) break;
+      x1 = y1;
+      y1 = r;
     }
-    h = nacInit(1);
-    h1 = nacDiv(h, y->ko);
-    if (y->e[0]!=0)
+    if (r!=NULL)
     {
-      nacDelete(&(y->ko));
-      y->ko = h;
+      napDelete(&r);
+      napDelete(&y1);
     }
     else
     {
-      napDelete1(&y);
-      nacDelete(&h);
-      p->n = NULL;
+      napDivMod(x, y1, &(p->z), &r);
+      napDivMod(y, y1, &(p->n), &r);
+      napDelete(&y1);
     }
-    napMultN(x, h1);
-    nacDelete(&h1);
+    x = p->z;
+    y = p->n;
+    /* collect all denoms from y and multiply x and y by it */
+    if (naIsChar0)
+    {
+      number n=napLcm(y);
+      napMultN(x,n);
+      napMultN(y,n);
+      nacDelete(&n);
+      while(x!=NULL)
+      {
+        nacNormalize(x->ko);
+        x=x->ne;
+      }
+      x = p->z;
+      while(y!=NULL)
+      {
+        nacNormalize(y->ko);
+        y=y->ne;
+      }
+      y = p->n;
+    }
+    if (y->ne==NULL)
+    {
+      if (nacIsOne(y->ko))
+      {
+        if (y->e[0]==0)
+        {
+          napDelete1(&y);
+          p->n = NULL;
+        }
+        return;
+      }
+    }
   }
+#ifdef HAVE_FACTORY
+  else
+  {
+    alg l=singclap_alglcm(x,y);
+    if (napDeg(l)>0)
+    {
+      alg h,r;
+      napDivMod(x,l,&h,&r);
+      if (r!=NULL)
+      {
+        WerrorS("internal error (1) while normalizing");
+        p->z=h;
+      }
+      napDivMod(y,l,&h,&r);
+      if (r!=NULL)
+      {
+        WerrorS("internal error (2) while normalizing");
+        p->n=h;
+      }
+    }
+    napDelete(&l);
+  }
+#endif
 }
 
 /*2
@@ -2018,8 +2026,6 @@ number naLcm(number la, number lb)
   lnumber result;
   lnumber a = (lnumber)la;
   lnumber b = (lnumber)lb;
-  alg x;
-  number t, bt, r;
   result = (lnumber)Alloc0(sizeof(rnumber));
   //if (((naMinimalPoly==NULL) && (naI==NULL)) || !naIsChar0)
   //{
@@ -2027,22 +2033,39 @@ number naLcm(number la, number lb)
   //  return (number)result;
   //}
   naNormalize(lb);
-  x = napCopy(a->z);
-  t = napLcm(b->z);
+  naTest(la);
+  naTest(lb);
+  alg x = napCopy(a->z);
+  number t = napLcm(b->z); // get all denom of b->z
   if (!nacIsOne(t))
   {
-    bt = nacGcd(t, x->ko);
-    r = nacMult(t, x->ko);
-    nacDelete(&(x->ko));
-    x->ko = nacDiv(r, bt);
-    nacNormalize(x->ko);
-    nacDelete(&bt);
-    nacDelete(&r);
+    number bt, r;
+    alg xx=x;
+    while (xx!=NULL)
+    {
+      bt = nacGcd(t, xx->ko);
+      r = nacMult(t, xx->ko);
+      nacDelete(&(xx->ko));
+      xx->ko = nacDiv(r, bt);
+      nacNormalize(xx->ko);
+      nacDelete(&bt);
+      nacDelete(&r);
+      xx=xx->ne;
+    }
   }
   nacDelete(&t);
   result->z = x;
+#ifdef HAVE_FACTORY
+  if (b->n!=NULL)
+  {
+    result->z=singclap_alglcm(result->z,b->n);
+    napDelete(&x);
+  }
+#endif
+  naTest(la);
+  naTest(lb);
   naTest((number)result);
-  return (number)result;
+  return ((number)result);
 }
 
 /*2

@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.18 1997-08-08 12:59:20 obachman Exp $ */
+/* $Id: extra.cc,v 1.19 1997-09-16 13:45:31 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -535,50 +535,50 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
     /*==================== trace =============================*/
     /* Parameter : Ideal, Liste mit Links. */
     if(strcmp((char*)(h->Data()),"stdtrace")==0)
+    {
+      if ((h->next!=NULL) &&(h->next->Typ()==IDEAL_CMD))
       {
-        if ((h->next!=NULL) &&(h->next->Typ()==IDEAL_CMD))
+        leftv root  = NULL,
+              ptr   = NULL,
+              lv    = NULL;
+        lists l     = NULL;
+        ideal I     = (ideal)(h->next->Data());
+        lists links = (lists)(h->next->next->Data());
+        tHomog hom  = testHomog;
+        int rw      = (int)(h->next->next->next->Data());
+
+        if(I==NULL)
+          PrintS("I==NULL\n");
+        for(int i=0; i <= links->nr ; i++)
         {
-          leftv root  = NULL,
-                ptr   = NULL,
-                lv    = NULL;
-          lists l     = NULL;
-          ideal I     = (ideal)(h->next->Data());
-          lists links = (lists)(h->next->next->Data());
-          tHomog hom  = testHomog;
-          int rw      = (int)(h->next->next->next->Data());
-  
-          if(I==NULL)
-            PrintS("I==NULL\n");
-          for(int i=0; i <= links->nr ; i++)
+          lv = (leftv)Alloc0(sizeof(sleftv));
+          lv->Copy(&(links->m[i]));
+          if(root==NULL)
+          root=lv;
+          if(ptr==NULL)
           {
-            lv = (leftv)Alloc0(sizeof(sleftv));
-            lv->Copy(&(links->m[i]));
-            if(root==NULL)
-            root=lv;
-            if(ptr==NULL)
-            {
-              ptr=lv;
-              ptr->next=NULL;
-            }
-            else
-            {
-              ptr->next=lv;
-              ptr=lv;
-            }
+            ptr=lv;
+            ptr->next=NULL;
           }
-          ptr->next=NULL;
-          l=TraceStd(root,rw,I,currQuotient,testHomog,NULL);
-          idSkipZeroes(((ideal)l->m[0].Data()));
-          res->rtyp=LIST_CMD;
-          res->data=(void *) l;
-          res->next=NULL;
-          root->CleanUp();
-          Free(root,sizeof(sleftv));
-          return FALSE;
+          else
+          {
+            ptr->next=lv;
+            ptr=lv;
+          }
         }
-        else
-         WerrorS("ideal expected");
+        ptr->next=NULL;
+        l=TraceStd(root,rw,I,currQuotient,testHomog,NULL);
+        idSkipZeroes(((ideal)l->m[0].Data()));
+        res->rtyp=LIST_CMD;
+        res->data=(void *) l;
+        res->next=NULL;
+        root->CleanUp();
+        Free(root,sizeof(sleftv));
+        return FALSE;
       }
+      else
+         WerrorS("ideal expected");
+    }
     else  
 #endif    
 /*============================================================*/

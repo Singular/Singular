@@ -3,15 +3,14 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.h,v 1.3 1997-04-09 12:19:56 Singular Exp $ */
+/* $Id: longalg.h,v 1.4 1997-09-16 13:45:33 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
+#include "structs.h"
 #include "longrat.h"
 
-struct reca;
 struct slnumber;
-typedef struct reca * alg;
 typedef struct slnumber * lnumber;
 struct reca
 {
