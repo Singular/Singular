@@ -18,7 +18,7 @@
 #include "kstd1.h"
 #include "kbuckets.h"
 
-//#define FULLREDUCTIONS
+#define FULLREDUCTIONS
 //#define HALFREDUCTIONS
 #define HEAD_BIN
 //#define HOMOGENEOUS_EXAMPLE

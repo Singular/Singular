@@ -611,12 +611,18 @@ static inline poly p_MoveHead(poly p, omBin b)
 #endif
 static int init_red_phase1(calc_dat* c, int i, int j, int pos)
 {
+  
   c->work_on[pos].soon_free=NULL;
   c->work_on[pos].is_free=FALSE;
   c->work_on[pos].started=FALSE;
   c->work_on[pos].i=i;
   c->work_on[pos].j=j;
   c->work_on[pos].h=NULL;
+  c->work_on[pos].need_std_rep=FALSE;
+  soon_t_rep(i,j,c);
+  replace_pair(&c->work_on[pos],c);
+//verhindern daß ein Paar mehrmals ausgerechnet wird
+  soon_t_rep(c->work_on[pos].i, c->work_on[pos].j,c);
   return pos;
 }
 static void init_red_spoly_phase2(calc_dat* c,int pos){
@@ -1248,6 +1254,7 @@ static BOOLEAN redNF2_n_steps (redNF_inf* obj,calc_dat* c, int n)
 	  h = kBucketGetLm(obj->P->bucket);
 	
 	  if (must_replace_in_basis){
+	    obj->need_std_rep=TRUE;
 	    int pos_in_c=-1;
 	    poly p=strat->S[j];
 	    int z;
@@ -1304,7 +1311,7 @@ static BOOLEAN redNF2_n_steps (redNF_inf* obj,calc_dat* c, int n)
 	    }
 	  }
 	  if(must_expand){
-
+	    obj->need_std_rep=TRUE;
 	    add_to_reductors(c,sec_copy,pLength(sec_copy));
 	  }
 	  if (h==NULL) {
@@ -1571,11 +1578,34 @@ static BOOLEAN fillup(calc_dat* c){
   }
   return TRUE;
 }
-static void compute(calc_dat* c){
+static BOOLEAN compute(calc_dat* c){
   int i=(c->last_index+ 1)%PAR_N;
   int len;
+  BOOLEAN suc=FALSE;
   while(1){
     if(!c->work_on[i].is_free){
+      if ((!c->work_on[i].need_std_rep) && (has_t_rep(c->work_on[i].i,c->work_on[i].j,c))){
+	suc=TRUE;
+	//clear ressources ;; needs to be done
+	c->work_on[i].is_free=TRUE;
+	now_t_rep(c->work_on[i].i,c->work_on[i].j,c);
+
+	   int_pair_node* hf=c->work_on[i].soon_free;
+	    now_t_rep(c->work_on[i].i,c->work_on[i].j,c);
+	    while(hf!=NULL)
+	    {
+	      int_pair_node* s=hf;
+	      now_t_rep(hf->a,hf->b,c);
+		  
+	      hf=hf->next;
+	      omfree(s);
+	    }
+	    c->work_on[i].soon_free=NULL;
+	    
+	    c->work_on[i].is_free=TRUE;
+	    c->last_index=i;
+	    return suc;
+      }
         if (!c->work_on[i].started)
           init_red_spoly_phase2(c,i);
 	if (!c->work_on[i].is_free){
@@ -1595,6 +1625,7 @@ static void compute(calc_dat* c){
 	    c->work_on[i].is_free=TRUE;
             poly hr=c->work_on[i].h;
 	    len=pLength(hr);
+	    suc=TRUE;
 #ifdef FULLREDUCTIONS
 	    if (hr!=NULL)
 #ifdef REDTAIL_S
@@ -1625,6 +1656,7 @@ static void compute(calc_dat* c){
 	  }
 	}
 	else {
+	  suc=TRUE;
 	  int_pair_node* hf=c->work_on[i].soon_free;
 	  now_t_rep(c->work_on[i].i,c->work_on[i].j,c);
 	  while(hf!=NULL)
@@ -1643,7 +1675,7 @@ static void compute(calc_dat* c){
           c->misses_series++;
 	}
 	c->last_index=i;
-	return;
+	return suc;
     }
     
     
@@ -1692,8 +1724,10 @@ ideal t_rep_gb(ring r,ideal arg_I){
 
   }
   #endif
-  while(fillup(c)){
-    compute(c);
+  BOOLEAN SUC=TRUE;
+  while((!SUC)||fillup(c)){
+    if (is_empty(c)) break;
+    SUC=compute(c);
   }
   omfree(c->rep);
   for(int z=0;z<c->n;z++){
