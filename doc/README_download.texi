@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: README_download.texi,v 1.1 1999-12-08 12:47:56 obachman Exp $
+@comment $Id: README_download.texi,v 1.2 1999-12-08 17:00:39 obachman Exp $
 @c FILE: README_download.texi
 @c PURPOSE: downloading instructions, to be includeded in manual and README_ftp
 @c
@@ -34,6 +34,8 @@ system for which @sc{Singular} is compiled. Choose one of the following:
 @tab HP workstations running under HPUX version 9
 @item @code{HPUX-10}
 @tab HP workstations running under HPUX version 10
+@item @code{SunOS-5}
+@tab Sun workstations running Solaris version 5
 @end multitable
 Please contact us if
 you can not find an appropriate architecture dependent archive.

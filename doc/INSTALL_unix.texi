@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: INSTALL_unix.texi,v 1.7 1999-12-08 12:47:55 obachman Exp $
+@comment $Id: INSTALL_unix.texi,v 1.8 1999-12-08 17:00:39 obachman Exp $
 @c FILE: INSTALL_unix.texi
 @c PURPOSE: Installation instruction for Singular on  Unix 
 @c
@@ -9,7 +9,7 @@
 @end ifclear
 
 @ifclear singularmanual
-@majorheading UNIX INSTALLATION INSTRUCTIONS FOR SINGULAR VERSION @value{VERSION}
+@majorheading Unix installation instructions for @sc{SINGULAR} version @value{VERSION}
 @end ifclear
 
 @ifclear UNAME
@@ -46,7 +46,7 @@ you can not find an appropriate architecture dependent archive.
 
 You can obtain these (and other) archives from
 @display
-@uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/}. 
+@uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/Development}. 
 @end display
 
 @ifclear singularmanual

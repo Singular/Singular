@@ -1,5 +1,5 @@
 ;;; Emacs edit mode for this file is  -*- Emacs-Lisp -*-
-;;; $Id: .emacs-singular,v 1.8 1999-12-06 16:06:59 obachman Exp $
+;;; $Id: .emacs-singular,v 1.9 1999-12-08 17:00:40 obachman Exp $
 
 ;;;
 ;;; .emacs-singular - Emacs initialization file to use for
@@ -91,6 +91,10 @@
 (setq auto-mode-alist (cons '("\\.lib\\'" .  c++-mode) auto-mode-alist))
 (add-hook 'c++-mode-hook
 	  (function (lambda () (font-lock-mode 1))))
+
+;; somewhat nicer scrolling 
+(setq scroll-step 1)
+
 
 ;; this is a work-around for early version of Font Lock mode
 ;; which do not use `defface' to define faces.  It forces
