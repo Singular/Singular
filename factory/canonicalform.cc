@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.cc,v 1.7 1997-06-19 12:21:05 schmidt Exp $ */
+/* $Id: canonicalform.cc,v 1.8 1997-07-01 12:48:00 schmidt Exp $ */
 
 #include <config.h>
 
@@ -1116,13 +1116,16 @@ power ( const Variable & v, int n )
 
 int initializeGMP();
 int initializeCharacteristic();
+#ifdef SINGULAR
+int mmInit(void);
+#endif
 
 int
 initCanonicalForm( void )
 {
     static bool initialized = false;
     if ( ! initialized ) {
-#if defined (USE_MEMUTIL) && ! defined (USE_OLD_MEMMAN)
+#if (defined (USE_MEMUTIL) && ! defined (USE_OLD_MEMMAN)) || defined (SINGULAR)
 	(void)mmInit();
 #endif
 
