@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hilb.cc,v 1.20 2001-08-27 14:47:01 Singular Exp $ */
+/* $Id: hilb.cc,v 1.21 2003-03-11 16:48:04 Singular Exp $ */
 /*
 *  ABSTRACT -  Hilbert series
 */
@@ -124,7 +124,7 @@ static void hHilbStep(scmon pure, scfmon stc, int Nstc, varset var,
  int Nvar, int *pol, int Lpol)
 {
   int  iv = Nvar -1, ln, a, a0, a1, b, i;
-  Exponent_t  x, x0;
+  int  x, x0;
   scmon pn;
   scfmon sn;
   int  *pon;
@@ -191,7 +191,7 @@ static void hHilbStep(scmon pure, scfmon stc, int Nstc, varset var,
 static void hWDegree(intvec *wdegree)
 {
   int i, k;
-  Exponent_t x;
+  int x;
 
   for (i=pVariables; i; i--)
   {
@@ -210,7 +210,7 @@ static intvec * hSeries(ideal S, intvec *modulweight,
                 int notstc, intvec *wdegree, ideal Q, ring tailRing)
 {
   intvec *work, *hseries1=NULL;
-  Exponent_t  mc;
+  int  mc;
   int  *p0;
   int  i, j, k, l, ii, mw;
   hexist = hInit(S, Q, &hNexist, tailRing);
@@ -231,7 +231,7 @@ static intvec * hSeries(ideal S, intvec *modulweight,
   *p0 = 1;
   hwork = (scfmon)omAlloc(hNexist * sizeof(scmon));
   hvar = (varset)omAlloc((pVariables + 1) * sizeof(int));
-  hpure = (scmon)omAlloc((1 + (pVariables * pVariables)) * sizeof(Exponent_t));
+  hpure = (scmon)omAlloc((1 + (pVariables * pVariables)) * sizeof(int));
   stcmem = hCreate(pVariables - 1);
   Qpol = (int **)omAlloc((pVariables + 1) * sizeof(int *));
   Ql = (int *)omAlloc0((pVariables + 1) * sizeof(int));
@@ -271,7 +271,7 @@ static intvec * hSeries(ideal S, intvec *modulweight,
         if ((hNvar > 2) && (hNstc > 10))
           hOrdSupp(hstc, hNstc, hvar, hNvar);
         hHilbEst(hstc, hNstc, hvar, hNvar);
-        memset(hpure, 0, (pVariables + 1) * sizeof(Exponent_t));
+        memset(hpure, 0, (pVariables + 1) * sizeof(int));
         hPure(hstc, 0, &hNstc, hvar, hNvar, hpure, &hNpure);
         hLexS(hstc, hNstc, hvar, hNvar);
         Q0[hNvar] = 0;
@@ -347,7 +347,7 @@ static intvec * hSeries(ideal S, intvec *modulweight,
   omFreeSize((ADDRESS)Ql, (pVariables + 1) * sizeof(int));
   omFreeSize((ADDRESS)Qpol, (pVariables + 1) * sizeof(int *));
   hKill(stcmem, pVariables - 1);
-  omFreeSize((ADDRESS)hpure, (1 + (pVariables * pVariables)) * sizeof(Exponent_t));
+  omFreeSize((ADDRESS)hpure, (1 + (pVariables * pVariables)) * sizeof(int));
   omFreeSize((ADDRESS)hvar, (pVariables + 1) * sizeof(int));
   omFreeSize((ADDRESS)hwork, hNexist * sizeof(scmon));
   hDelete(hexist, hNexist);

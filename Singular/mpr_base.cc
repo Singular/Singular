@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_base.cc,v 1.28 2002-01-30 14:33:04 Singular Exp $ */
+/* $Id: mpr_base.cc,v 1.29 2003-03-11 16:57:25 Singular Exp $ */
 
 /*
  * ABSTRACT - multipolynomial resultants - resultant matrices
@@ -187,7 +187,7 @@ public:
    * Returns false, iff additional memory was allocated ( i.e. num >= max )
    * else returns true
    */
-  bool addPoint( const Exponent_t * vert );
+  bool addPoint( const int * vert );
 
   /** Adds a point to pointSet, copy vert[0,...,dim] ot point[num+1][0,...,dim].
    * Returns false, iff additional memory was allocated ( i.e. num >= max )
@@ -206,13 +206,13 @@ public:
   /** Adds point to pointSet, iff pointSet \cap point = \emptyset.
    * Returns true, iff added, else false.
    */
-  bool mergeWithExp( const Exponent_t * vert );
+  bool mergeWithExp( const int * vert );
 
   /* Adds support of poly p to pointSet, iff pointSet \cap point = \emptyset. */
   void mergeWithPoly( const poly p );
 
   /* Returns the row polynom multiplicator in vert[] */
-  void getRowMP( const int indx, Exponent_t * vert );
+  void getRowMP( const int indx, int * vert );
 
   /* Returns index of supp(LT(p)) in pointSet. */
   int getExpPos( const poly p );
@@ -474,7 +474,7 @@ bool pointSet::addPoint( const onePointP vert )
   return ret;
 }
 
-bool pointSet::addPoint( const Exponent_t * vert )
+bool pointSet::addPoint( const int * vert )
 {
   int i;
   bool ret;
@@ -530,7 +530,7 @@ bool pointSet::mergeWithExp( const onePointP vert )
   return false;
 }
 
-bool pointSet::mergeWithExp( const Exponent_t * vert )
+bool pointSet::mergeWithExp( const int * vert )
 {
   int i,j;
 
@@ -553,8 +553,8 @@ void pointSet::mergeWithPoly( const poly p )
 {
   int i,j;
   poly piter= p;
-  Exponent_t * vert;
-  vert= (Exponent_t *)omAlloc( (dim+1) * sizeof(Exponent_t) );
+  int * vert;
+  vert= (int *)omAlloc( (dim+1) * sizeof(int) );
 
   while ( piter )
   {
@@ -574,16 +574,16 @@ void pointSet::mergeWithPoly( const poly p )
 
     pIter( piter );
   }
-  omFreeSize( (ADDRESS) vert, (dim+1) * sizeof(Exponent_t) );
+  omFreeSize( (ADDRESS) vert, (dim+1) * sizeof(int) );
 }
 
 int pointSet::getExpPos( const poly p )
 {
-  Exponent_t * vert;
+  int * vert;
   int i,j;
 
   // hier unschoen...
-  vert= (Exponent_t *)omAlloc( (dim+1) * sizeof(Exponent_t) );
+  vert= (int *)omAlloc( (dim+1) * sizeof(int) );
 
   pGetExpV( p, vert );
   for ( i= 1; i <= num; i++ )
@@ -592,20 +592,20 @@ int pointSet::getExpPos( const poly p )
       if ( points[i]->point[j] != (Coord_t) vert[j] ) break;
     if ( j > dim ) break;
   }
-  omFreeSize( (ADDRESS) vert, (dim+1) * sizeof(Exponent_t) );
+  omFreeSize( (ADDRESS) vert, (dim+1) * sizeof(int) );
 
   if ( i > num ) return 0;
   else return i;
 }
 
-void pointSet::getRowMP( const int indx, Exponent_t * vert )
+void pointSet::getRowMP( const int indx, int * vert )
 {
   assume( indx > 0 && indx <= num && points[indx]->rcPnt );
   int i;
 
   vert[0]= 0;
   for ( i= 1; i <= dim; i++ )
-    vert[i]= (Exponent_t)(points[indx]->point[i] - points[indx]->rcPnt->point[i]);
+    vert[i]= (int)(points[indx]->point[i] - points[indx]->rcPnt->point[i]);
 }
 
 inline bool pointSet::smaller( int a, int b )
@@ -780,10 +780,10 @@ pointSet ** convexHull::newtonPolytopesP( const ideal gls )
   int i, j, k;
   int m;  // Anzahl der Exponentvektoren im i-ten Polynom (gls->m)[i] des Ideals gls
   int idelem= IDELEMS(gls);
-  Exponent_t * vert;
+  int * vert;
 
   n= pVariables;
-  vert= (Exponent_t *)omAlloc( (idelem+1) * sizeof(Exponent_t) );
+  vert= (int *)omAlloc( (idelem+1) * sizeof(int) );
 
   Q = (pointSet **)omAlloc( idelem * sizeof(pointSet*) );        // support hulls
   for ( i= 0; i < idelem; i++ )
@@ -812,7 +812,7 @@ pointSet ** convexHull::newtonPolytopesP( const ideal gls )
     mprSTICKYPROT("\n");
   } // i
 
-  omFreeSize( (ADDRESS) vert, (idelem+1) * sizeof(Exponent_t) );
+  omFreeSize( (ADDRESS) vert, (idelem+1) * sizeof(int) );
 
 #ifdef mprDEBUG_PROT
   PrintLn();
@@ -840,10 +840,10 @@ ideal convexHull::newtonPolytopesI( const ideal gls )
   int idelem= IDELEMS(gls);
   ideal id;
   poly p,pid,pd;
-  Exponent_t * vert;
+  int * vert;
 
   n= pVariables;
-  vert= (Exponent_t *)omAlloc( (idelem+1) * sizeof(Exponent_t) );
+  vert= (int *)omAlloc( (idelem+1) * sizeof(int) );
   id= idInit( idelem, 1 );
 
   for( i= 0; i < idelem; i++ )
@@ -876,7 +876,7 @@ ideal convexHull::newtonPolytopesI( const ideal gls )
     mprSTICKYPROT("\n");
   } // i
 
-  omFreeSize( (ADDRESS) vert, (idelem+1) * sizeof(Exponent_t) );
+  omFreeSize( (ADDRESS) vert, (idelem+1) * sizeof(int) );
 
 #ifdef mprDEBUG_PROT
   PrintLn();
@@ -1419,10 +1419,10 @@ int resMatrixSparse::createMatrix( pointSet *E )
   int rp,cp;
   poly rowp,epp;
   poly iterp;
-  Exponent_t *epp_mon, *eexp;
+  int *epp_mon, *eexp;
 
-  epp_mon= (Exponent_t *)omAlloc( (n+2) * sizeof(Exponent_t) );
-  eexp= (Exponent_t *)omAlloc0((pVariables+1)*sizeof(Exponent_t));
+  epp_mon= (int *)omAlloc( (n+2) * sizeof(int) );
+  eexp= (int *)omAlloc0((pVariables+1)*sizeof(int));
 
   totDeg= numSet0;
 
@@ -1480,8 +1480,8 @@ int resMatrixSparse::createMatrix( pointSet *E )
   } // for
 
   pDelete( &epp );
-  omFreeSize( (ADDRESS) epp_mon, (n+2) * sizeof(Exponent_t) );
-  omFreeSize( (ADDRESS) eexp, (pVariables+1)*sizeof(Exponent_t));
+  omFreeSize( (ADDRESS) epp_mon, (n+2) * sizeof(int) );
+  omFreeSize( (ADDRESS) eexp, (pVariables+1)*sizeof(int));
 
 #ifdef mprDEBUG_ALL
   if ( E->num <= 40 )

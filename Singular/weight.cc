@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: weight.cc,v 1.22 2001-11-27 12:33:03 Singular Exp $ */
+/* $Id: weight.cc,v 1.23 2003-03-11 16:54:06 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -74,12 +74,12 @@ static void wInit(polyset s, int sl, int mons, int *A)
 {
   int  n, a, i, j, *B, *C;
   poly p, q;
-  Exponent_t *pl;
+  int *pl;
 
   B = A;
   n = pVariables;
-  a = (n + 1) * sizeof(Exponent_t);
-  pl = (Exponent_t * )omAlloc(a);
+  a = (n + 1) * sizeof(int);
+  pl = (int *)omAlloc(a);
   for (i = 0; i <= sl; i++)
   {
     p = s[i];

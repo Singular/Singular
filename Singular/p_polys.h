@@ -7,7 +7,7 @@
  *           currRing
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
- *  Version: $Id: p_polys.h,v 1.23 2003-03-11 16:26:32 Singular Exp $
+ *  Version: $Id: p_polys.h,v 1.24 2003-03-11 16:42:40 Singular Exp $
  *******************************************************************/
 #ifndef P_POLYS_H
 #define P_POLYS_H
@@ -137,8 +137,8 @@ PINLINE1 BOOLEAN p_ExpVectorEqual(poly p1, poly p2, ring r);
 // returns sum of all exponents of p
 PINLINE1 unsigned long p_ExpVectorQuerSum(poly p, ring r);
 
-PINLINE1 void p_GetExpV(poly p, Exponent_t *ev, ring r);
-PINLINE1 void p_SetExpV(poly p, Exponent_t *ev, ring r);
+PINLINE1 void p_GetExpV(poly p, int *ev, ring r);
+PINLINE1 void p_SetExpV(poly p, int *ev, ring r);
 
 
 /***************************************************************

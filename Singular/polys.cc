@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.79 2003-01-30 14:59:59 Singular Exp $ */
+/* $Id: polys.cc,v 1.80 2003-03-11 16:52:40 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -837,11 +837,11 @@ poly pSubst(poly p, int n, poly e)
 
   int exponent,i;
   poly h, res, m;
-  Exponent_t *me,*ee;
+  int *me,*ee;
   number nu,nu1;
 
-  me=(Exponent_t *)omAlloc((pVariables+1)*sizeof(Exponent_t));
-  ee=(Exponent_t *)omAlloc((pVariables+1)*sizeof(Exponent_t));
+  me=(int *)omAlloc((pVariables+1)*sizeof(int));
+  ee=(int *)omAlloc((pVariables+1)*sizeof(int));
   if (e!=NULL) pGetExpV(e,ee);
   res=NULL;
   h=p;
@@ -867,8 +867,8 @@ poly pSubst(poly p, int n, poly e)
     }
     pDeleteLm(&h);
   }
-  omFreeSize((ADDRESS)me,(pVariables+1)*sizeof(Exponent_t));
-  omFreeSize((ADDRESS)ee,(pVariables+1)*sizeof(Exponent_t));
+  omFreeSize((ADDRESS)me,(pVariables+1)*sizeof(int));
+  omFreeSize((ADDRESS)ee,(pVariables+1)*sizeof(int));
   return res;
 }
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hdegree.cc,v 1.24 2001-01-18 16:21:14 Singular Exp $ */
+/* $Id: hdegree.cc,v 1.25 2003-03-11 16:45:25 Singular Exp $ */
 /*
 *  ABSTRACT -  dimension, multiplicity, HC, kbase
 */
@@ -72,13 +72,13 @@ static void hDimSolve(scmon pure, int Npure, scfmon rad, int Nrad,
 
 int  scDimInt(ideal S, ideal Q)
 {
-  Exponent_t  mc;
+  int  mc;
   hexist = hInit(S, Q, &hNexist);
   if (!hNexist)
     return pVariables;
   hwork = (scfmon)omAlloc(hNexist * sizeof(scmon));
   hvar = (varset)omAlloc((pVariables + 1) * sizeof(int));
-  hpure = (scmon)omAlloc((1 + (pVariables * pVariables)) * sizeof(Exponent_t));
+  hpure = (scmon)omAlloc((1 + (pVariables * pVariables)) * sizeof(int));
   mc = hisModule;
   if (!mc)
   {
@@ -100,7 +100,7 @@ int  scDimInt(ideal S, ideal Q)
       hSupp(hrad, hNrad, hvar, &hNvar);
       if (hNvar)
       {
-        memset(hpure, 0, (pVariables + 1) * sizeof(Exponent_t));
+        memset(hpure, 0, (pVariables + 1) * sizeof(int));
         hPure(hrad, 0, &hNrad, hvar, hNvar, hpure, &hNpure);
         hLexR(hrad, hNrad, hvar, hNvar);
         hDimSolve(hpure, hNpure, hrad, hNrad, hvar, hNvar);
@@ -116,7 +116,7 @@ int  scDimInt(ideal S, ideal Q)
       break;
   }
   hKill(radmem, pVariables - 1);
-  omFreeSize((ADDRESS)hpure, (1 + (pVariables * pVariables)) * sizeof(Exponent_t));
+  omFreeSize((ADDRESS)hpure, (1 + (pVariables * pVariables)) * sizeof(int));
   omFreeSize((ADDRESS)hvar, (pVariables + 1) * sizeof(int));
   omFreeSize((ADDRESS)hwork, hNexist * sizeof(scmon));
   hDelete(hexist, hNexist);
@@ -210,7 +210,7 @@ static void hIndSolve(scmon pure, int Npure, scfmon rad, int Nrad,
 intvec * scIndIntvec(ideal S, ideal Q)
 {
   intvec *Set=new intvec(pVariables);
-  Exponent_t  mc,i;
+  int  mc,i;
   hexist = hInit(S, Q, &hNexist);
   if (hNexist==0)
   {
@@ -220,8 +220,8 @@ intvec * scIndIntvec(ideal S, ideal Q)
   }
   hwork = (scfmon)omAlloc(hNexist * sizeof(scmon));
   hvar = (varset)omAlloc((pVariables + 1) * sizeof(int));
-  hpure = (scmon)omAlloc((1 + (pVariables * pVariables)) * sizeof(Exponent_t));
-  hInd = (scmon)omAlloc((1 + pVariables) * sizeof(Exponent_t));
+  hpure = (scmon)omAlloc((1 + (pVariables * pVariables)) * sizeof(int));
+  hInd = (scmon)omAlloc((1 + pVariables) * sizeof(int));
   mc = hisModule;
   if (mc==0)
   {
@@ -243,7 +243,7 @@ intvec * scIndIntvec(ideal S, ideal Q)
       hSupp(hrad, hNrad, hvar, &hNvar);
       if (hNvar!=0)
       {
-        memset(hpure, 0, (pVariables + 1) * sizeof(Exponent_t));
+        memset(hpure, 0, (pVariables + 1) * sizeof(int));
         hPure(hrad, 0, &hNrad, hvar, hNvar, hpure, &hNpure);
         hLexR(hrad, hNrad, hvar, hNvar);
         hIndSolve(hpure, hNpure, hrad, hNrad, hvar, hNvar);
@@ -261,8 +261,8 @@ intvec * scIndIntvec(ideal S, ideal Q)
   for(i=0; i<pVariables; i++)
     (*Set)[i] = hInd[i+1];
   hKill(radmem, pVariables - 1);
-  omFreeSize((ADDRESS)hpure, (1 + (pVariables * pVariables)) * sizeof(Exponent_t));
-  omFreeSize((ADDRESS)hInd, (1 + pVariables) * sizeof(Exponent_t));
+  omFreeSize((ADDRESS)hpure, (1 + (pVariables * pVariables)) * sizeof(int));
+  omFreeSize((ADDRESS)hInd, (1 + pVariables) * sizeof(int));
   omFreeSize((ADDRESS)hvar, (pVariables + 1) * sizeof(int));
   omFreeSize((ADDRESS)hwork, hNexist * sizeof(scmon));
   hDelete(hexist, hNexist);
@@ -559,7 +559,7 @@ lists scIndIndset(ideal S, BOOLEAN all, ideal Q)
   hMu = 0;
   hwork = (scfmon)omAlloc(hNexist * sizeof(scmon));
   hvar = (varset)omAlloc((pVariables + 1) * sizeof(int));
-  hpure = (scmon)omAlloc((1 + (pVariables * pVariables)) * sizeof(Exponent_t));
+  hpure = (scmon)omAlloc((1 + (pVariables * pVariables)) * sizeof(int));
   hrad = hexist;
   hNrad = hNexist;
   radmem = hCreate(pVariables - 1);
@@ -570,7 +570,7 @@ lists scIndIndset(ideal S, BOOLEAN all, ideal Q)
   if (hNvar)
   {
     hCo = hNvar;
-    memset(hpure, 0, (pVariables + 1) * sizeof(Exponent_t));
+    memset(hpure, 0, (pVariables + 1) * sizeof(int));
     hPure(hrad, 0, &hNrad, hvar, hNvar, hpure, &hNpure);
     hLexR(hrad, hNrad, hvar, hNvar);
     hDimSolve(hpure, hNpure, hrad, hNrad, hvar, hNvar);
@@ -627,7 +627,7 @@ lists scIndIndset(ideal S, BOOLEAN all, ideal Q)
     omFreeBin((ADDRESS)ISet,  indlist_bin);
   }
   hKill(radmem, pVariables - 1);
-  omFreeSize((ADDRESS)hpure, (1 + (pVariables * pVariables)) * sizeof(Exponent_t));
+  omFreeSize((ADDRESS)hpure, (1 + (pVariables * pVariables)) * sizeof(int));
   omFreeSize((ADDRESS)hvar, (pVariables + 1) * sizeof(int));
   omFreeSize((ADDRESS)hwork, hNexist * sizeof(scmon));
   hDelete(hexist, hNexist);
@@ -639,7 +639,7 @@ lists scIndIndset(ideal S, BOOLEAN all, ideal Q)
 static int hZeroMult(scmon pure, scfmon stc, int Nstc, varset var, int Nvar)
 {
   int  iv = Nvar -1, sum, a, a0, a1, b, i;
-  Exponent_t  x, x0;
+  int  x, x0;
   scmon pn;
   scfmon sn;
   if (!iv)
@@ -699,7 +699,7 @@ static void hProject(scmon pure, varset sel)
   hStaircase(hwork, &i, sel, i0);
   if ((i0 > 2) && (i > 10))
     hOrdSupp(hwork, i, sel, i0);
-  memset(hpur0, 0, (pVariables + 1) * sizeof(Exponent_t));
+  memset(hpur0, 0, (pVariables + 1) * sizeof(int));
   hPure(hwork, 0, &i, sel, i0, hpur0, &k);
   hLexS(hwork, i, sel, i0);
   hMu += hZeroMult(hpur0, hwork, i, sel, i0);
@@ -784,7 +784,7 @@ static void hDimMult(scmon pure, int Npure, scfmon rad, int Nrad,
 static void hDegree(ideal S, ideal Q)
 {
   int  di;
-  Exponent_t  mc;
+  int  mc;
   hexist = hInit(S, Q, &hNexist);
   if (!hNexist)
   {
@@ -796,8 +796,8 @@ static void hDegree(ideal S, ideal Q)
   hwork = (scfmon)omAlloc(hNexist * sizeof(scmon));
   hvar = (varset)omAlloc((pVariables + 1) * sizeof(int));
   hsel = (varset)omAlloc((pVariables + 1) * sizeof(int));
-  hpure = (scmon)omAlloc((1 + (pVariables * pVariables)) * sizeof(Exponent_t));
-  hpur0 = (scmon)omAlloc((1 + (pVariables * pVariables)) * sizeof(Exponent_t));
+  hpure = (scmon)omAlloc((1 + (pVariables * pVariables)) * sizeof(int));
+  hpur0 = (scmon)omAlloc((1 + (pVariables * pVariables)) * sizeof(int));
   mc = hisModule;
   hrad = (scfmon)omAlloc(hNexist * sizeof(scmon));
   if (!mc)
@@ -828,7 +828,7 @@ static void hDegree(ideal S, ideal Q)
       if (hNvar)
       {
         hCo = hNvar;
-        memset(hpure, 0, (pVariables + 1) * sizeof(Exponent_t));
+        memset(hpure, 0, (pVariables + 1) * sizeof(int));
         hPure(hrad, 0, &hNrad, hvar, hNvar, hpure, &hNpure);
         hLexR(hrad, hNrad, hvar, hNvar);
         hDimSolve(hpure, hNpure, hrad, hNrad, hvar, hNvar);
@@ -855,7 +855,7 @@ static void hDegree(ideal S, ideal Q)
         hStaircase(hstc, &hNstc, hvar, hNvar);
         if ((hNvar > 2) && (hNstc > 10))
           hOrdSupp(hstc, hNstc, hvar, hNvar);
-        memset(hpur0, 0, (pVariables + 1) * sizeof(Exponent_t));
+        memset(hpur0, 0, (pVariables + 1) * sizeof(int));
         hPure(hstc, 0, &hNstc, hvar, hNvar, hpur0, &hNpure);
         hLexS(hstc, hNstc, hvar, hNvar);
         hMu += hZeroMult(hpur0, hstc, hNstc, hvar, hNvar);
@@ -868,8 +868,8 @@ static void hDegree(ideal S, ideal Q)
   hCo = di;
   hKill(stcmem, pVariables - 1);
   hKill(radmem, pVariables - 1);
-  omFreeSize((ADDRESS)hpur0, (1 + (pVariables * pVariables)) * sizeof(Exponent_t));
-  omFreeSize((ADDRESS)hpure, (1 + (pVariables * pVariables)) * sizeof(Exponent_t));
+  omFreeSize((ADDRESS)hpur0, (1 + (pVariables * pVariables)) * sizeof(int));
+  omFreeSize((ADDRESS)hpure, (1 + (pVariables * pVariables)) * sizeof(int));
   omFreeSize((ADDRESS)hsel, (pVariables + 1) * sizeof(int));
   omFreeSize((ADDRESS)hvar, (pVariables + 1) * sizeof(int));
   omFreeSize((ADDRESS)hwork, hNexist * sizeof(scmon));
@@ -898,7 +898,7 @@ void scDegree(ideal S, ideal Q)
 
 static void hDegree0(ideal S, ideal Q)
 {
-  Exponent_t  mc;
+  int  mc;
   hexist = hInit(S, Q, &hNexist);
   if (!hNexist)
   {
@@ -909,7 +909,7 @@ static void hDegree0(ideal S, ideal Q)
     hMu = 0;
   hwork = (scfmon)omAlloc(hNexist * sizeof(scmon));
   hvar = (varset)omAlloc((pVariables + 1) * sizeof(int));
-  hpur0 = (scmon)omAlloc((1 + (pVariables * pVariables)) * sizeof(Exponent_t));
+  hpur0 = (scmon)omAlloc((1 + (pVariables * pVariables)) * sizeof(int));
   mc = hisModule;
   if (!mc)
   {
@@ -939,7 +939,7 @@ static void hDegree0(ideal S, ideal Q)
     {
       if ((hNvar > 2) && (hNstc > 10))
         hOrdSupp(hstc, hNstc, hvar, hNvar);
-      memset(hpur0, 0, (pVariables + 1) * sizeof(Exponent_t));
+      memset(hpur0, 0, (pVariables + 1) * sizeof(int));
       hPure(hstc, 0, &hNstc, hvar, hNvar, hpur0, &hNpure);
       if (hNpure == hNvar)
       {
@@ -956,7 +956,7 @@ static void hDegree0(ideal S, ideal Q)
       break;
   }
   hKill(stcmem, pVariables - 1);
-  omFreeSize((ADDRESS)hpur0, (1 + (pVariables * pVariables)) * sizeof(Exponent_t));
+  omFreeSize((ADDRESS)hpur0, (1 + (pVariables * pVariables)) * sizeof(int));
   omFreeSize((ADDRESS)hvar, (pVariables + 1) * sizeof(int));
   omFreeSize((ADDRESS)hwork, hNexist * sizeof(scmon));
   hDelete(hexist, hNexist);
@@ -991,7 +991,7 @@ static void hHedgeStep(scmon pure, scfmon stc,
                        int Nstc, varset var, int Nvar,poly hEdge)
 {
   int  iv = Nvar -1, k = var[Nvar], a, a0, a1, b, i;
-  Exponent_t  x, x0;
+  int  x, x0;
   scmon pn;
   scfmon sn;
   if (iv==0)
@@ -1050,7 +1050,7 @@ static void hHedgeStep(scmon pure, scfmon stc,
 void scComputeHC(ideal S, ideal Q, int ak, poly &hEdge, ring tailRing)
 {
   int  i;
-  Exponent_t  k = ak;
+  int  k = ak;
   hNvar = pVariables;
   hexist = hInit(S, Q, &hNexist, tailRing);
   if (k!=0)
@@ -1059,14 +1059,14 @@ void scComputeHC(ideal S, ideal Q, int ak, poly &hEdge, ring tailRing)
     hNstc = hNexist;
   hwork = (scfmon)omAlloc(hNexist * sizeof(scmon));
   hvar = (varset)omAlloc((hNvar + 1) * sizeof(int));
-  hpure = (scmon)omAlloc((1 + (hNvar * hNvar)) * sizeof(Exponent_t));
+  hpure = (scmon)omAlloc((1 + (hNvar * hNvar)) * sizeof(int));
   stcmem = hCreate(hNvar - 1);
   for (i = hNvar; i>0; i--)
     hvar[i] = i;
   hStaircase(hexist, &hNstc, hvar, hNvar);
   if ((hNvar > 2) && (hNstc > 10))
     hOrdSupp(hexist, hNstc, hvar, hNvar);
-  memset(hpure, 0, (hNvar + 1) * sizeof(Exponent_t));
+  memset(hpure, 0, (hNvar + 1) * sizeof(int));
   hPure(hexist, 0, &hNstc, hvar, hNvar, hpure, &hNpure);
   hLexS(hexist, hNstc, hvar, hNvar);
   if (hEdge!=NULL)
@@ -1078,7 +1078,7 @@ void scComputeHC(ideal S, ideal Q, int ak, poly &hEdge, ring tailRing)
   hKill(stcmem, hNvar - 1);
   omFreeSize((ADDRESS)hwork, hNexist * sizeof(scmon));
   omFreeSize((ADDRESS)hvar, (hNvar + 1) * sizeof(int));
-  omFreeSize((ADDRESS)hpure, (1 + (hNvar * hNvar)) * sizeof(Exponent_t));
+  omFreeSize((ADDRESS)hpure, (1 + (hNvar * hNvar)) * sizeof(int));
   hDelete(hexist, hNexist);
   pLmFree(pWork);
 }
@@ -1098,9 +1098,9 @@ static void scElKbase()
   last = pNext(last) = q;
 }
 
-static Exponent_t scMax( int i, scfmon stc, int Nvar)
+static int scMax( int i, scfmon stc, int Nvar)
 {
-  Exponent_t x, y=stc[0][Nvar];
+  int x, y=stc[0][Nvar];
   for (; i;)
   {
     i--;
@@ -1110,9 +1110,9 @@ static Exponent_t scMax( int i, scfmon stc, int Nvar)
   return y;
 }
 
-static Exponent_t scMin( int i, scfmon stc, int Nvar)
+static int scMin( int i, scfmon stc, int Nvar)
 {
-  Exponent_t x, y=stc[0][Nvar];
+  int x, y=stc[0][Nvar];
   for (; i;)
   {
     i--;
@@ -1122,9 +1122,9 @@ static Exponent_t scMin( int i, scfmon stc, int Nvar)
   return y;
 }
 
-static Exponent_t scRestrict( int &Nstc, scfmon stc, int Nvar)
+static int scRestrict( int &Nstc, scfmon stc, int Nvar)
 {
-  Exponent_t x, y;
+  int x, y;
   int i, j, Istc = Nstc;
 
   y = MAX_EXPONENT;
@@ -1173,10 +1173,10 @@ static Exponent_t scRestrict( int &Nstc, scfmon stc, int Nvar)
     return -1;
 }
 
-static void scAll( int Nvar, Exponent_t deg)
+static void scAll( int Nvar, int deg)
 {
   int i;
-  Exponent_t d = deg;
+  int d = deg;
   if (d == 0)
   {
     for (i=Nvar; i; i--) act[i] = 0;
@@ -1197,7 +1197,7 @@ static void scAll( int Nvar, Exponent_t deg)
   } while (d >= 0);
 }
 
-static void scAllKbase( int Nvar, Exponent_t ideg, Exponent_t deg)
+static void scAllKbase( int Nvar, int ideg, int deg)
 {
   do
   {
@@ -1207,11 +1207,11 @@ static void scAllKbase( int Nvar, Exponent_t ideg, Exponent_t deg)
   } while (ideg >= 0);
 }
 
-static void scDegKbase( scfmon stc, int Nstc, int Nvar, Exponent_t deg)
+static void scDegKbase( scfmon stc, int Nstc, int Nvar, int deg)
 {
   int  Ivar, Istc, i, j;
   scfmon sn;
-  Exponent_t x, ideg;
+  int x, ideg;
 
   if (deg == 0)
   {
@@ -1287,7 +1287,7 @@ static void scInKbase( scfmon stc, int Nstc, int Nvar)
 {
   int  Ivar, Istc, i, j;
   scfmon sn;
-  Exponent_t x, ideg;
+  int x, ideg;
 
   if (Nvar == 1)
   {
@@ -1377,7 +1377,7 @@ extern ideal scKBase(int deg, ideal s, ideal Q)
   hexist = hInit(s, Q, &hNexist);
   p = last = pInit();
   /*pNext(p) = NULL;*/
-  act = (scmon)omAlloc((pVariables + 1) * sizeof(Exponent_t));
+  act = (scmon)omAlloc((pVariables + 1) * sizeof(int));
   *act = 0;
   if (!hNexist)
   {
@@ -1408,7 +1408,7 @@ extern ideal scKBase(int deg, ideal s, ideal Q)
   }
 ende:
   hDelete(hexist, hNexist);
-  omFreeSize((ADDRESS)act, (pVariables + 1) * sizeof(Exponent_t));
+  omFreeSize((ADDRESS)act, (pVariables + 1) * sizeof(int));
   hKill(stcmem, pVariables - 1);
   pDeleteLm(&p);
   if (p == NULL)

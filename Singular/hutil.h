@@ -6,7 +6,7 @@
 /*
 * ABSTRACT
 */
-typedef Exponent_t * scmon;
+typedef int * scmon;
 typedef scmon * scfmon;
 typedef int * varset;
 struct monrec;
@@ -25,13 +25,13 @@ extern scfmon hexist, hstc, hrad, hwork;
 extern scmon hpure, hpur0;
 extern varset hvar, hsel;
 extern int hNexist, hNstc, hNrad, hNvar, hNpure;
-extern Exponent_t hisModule;
+extern int hisModule;
 extern monf stcmem, radmem;
 
 scfmon hInit(ideal S, ideal Q, int * Nexist, ring tailRing = currRing);
 void hWeight();
 void hDelete(scfmon ev, int ev_length);
-void hComp(scfmon exist, int Nexist, Exponent_t ak, scfmon stc, int * Nstc);
+void hComp(scfmon exist, int Nexist, int ak, scfmon stc, int * Nstc);
 void hSupp(scfmon stc, int Nstc, varset var, int * Nvar);
 void hOrdSupp(scfmon stc, int Nstc, varset var, int Nvar);
 void hStaircase(scfmon stc, int * Nstc, varset var, int Nvar);
@@ -46,7 +46,7 @@ void hLex2S(scfmon stc, int e1, int a2, int e2,varset var,
  int Nvar, scfmon w);
 void hLex2R(scfmon rad, int e1, int a2, int e2,varset var,
  int Nvar, scfmon w);
-void hStepS(scfmon stc, int Nstc, varset var, int Nvar,int *a, Exponent_t *x);
+void hStepS(scfmon stc, int Nstc, varset var, int Nvar,int *a, int *x);
 void hStepR(scfmon rad, int Nrad, varset var, int Nvar,int *a);
 monf hCreate(int Nvar);
 void hKill(monf xmem, int Nvar);

@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpr_numeric.cc,v 1.17 2001-11-12 10:58:55 pohl Exp $ */
+/* $Id: mpr_numeric.cc,v 1.18 2003-03-11 16:58:40 Singular Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - numeric stuff
@@ -109,7 +109,7 @@ poly vandermonde::numvec2poly( const number * q )
   c=0;
   sum=0;
 
-  Exponent_t *exp= (Exponent_t *) omAlloc( (n+1) * sizeof(Exponent_t) );
+  int *exp= (int *) omAlloc( (n+1) * sizeof(int) );
 
   for ( j= 0; j < n+1; j++ ) exp[j]=0;
 
@@ -146,7 +146,7 @@ poly vandermonde::numvec2poly( const number * q )
     sum+= exp[n];
   }
 
-  omFreeSize( (ADDRESS) exp, (n+1) * sizeof(Exponent_t) );
+  omFreeSize( (ADDRESS) exp, (n+1) * sizeof(int) );
 
   pSortAdd(pit);
   return pit;

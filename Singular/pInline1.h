@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which iter over ExpVector
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline1.h,v 1.20 2001-08-27 14:47:20 Singular Exp $
+ *  Version: $Id: pInline1.h,v 1.21 2003-03-11 16:43:15 Singular Exp $
  *******************************************************************/
 #ifndef PINLINE1_H
 #define PINLINE1_H
@@ -279,7 +279,7 @@ PINLINE1 unsigned long p_ExpVectorQuerSum(poly p, ring r)
   return s;
 }
 
-PINLINE1 void p_GetExpV(poly p, Exponent_t *ev, ring r)
+PINLINE1 void p_GetExpV(poly p, int *ev, ring r)
 {
   p_LmCheckPolyRing1(p, r);
   for (int j = r->N; j; j--)
@@ -287,7 +287,7 @@ PINLINE1 void p_GetExpV(poly p, Exponent_t *ev, ring r)
 
   ev[0] = _p_GetComp(p, r);
 }
-PINLINE1 void p_SetExpV(poly p, Exponent_t *ev, ring r)
+PINLINE1 void p_SetExpV(poly p, int *ev, ring r)
 {
   p_LmCheckPolyRing1(p, r);
   for (int j = r->N; j; j--)

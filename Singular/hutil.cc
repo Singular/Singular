@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hutil.cc,v 1.21 2003-02-18 15:35:05 Singular Exp $ */
+/* $Id: hutil.cc,v 1.22 2003-03-11 16:48:04 Singular Exp $ */
 /*
 * ABSTRACT: Utilities for staircase operations
 */
@@ -19,7 +19,7 @@ scfmon hexist, hstc, hrad, hwork;
 scmon hpure, hpur0;
 varset hvar, hsel;
 int  hNexist, hNstc, hNrad, hNvar, hNpure;
-Exponent_t hisModule;
+int hisModule;
 monf stcmem, radmem;
 
 // Making a global "security" copy of the allocated exponent vectors
@@ -28,7 +28,7 @@ monf stcmem, radmem;
 // (i.e. changed) except in hInit, or, if hInit would return the
 // "security" copy as well. But then, all the relevant data is held in
 // global variables, so we might do that here, as well.
-static Exponent_t **hsecure= NULL;
+static int **hsecure= NULL;
 
 scfmon hInit(ideal S, ideal Q, int *Nexist, ring tailRing)
 {
@@ -84,12 +84,12 @@ scfmon hInit(ideal S, ideal Q, int *Nexist, ring tailRing)
   if (!k)
     return NULL;
   ek = ex = (scfmon)omAlloc(k * sizeof(scmon));
-  hsecure = (Exponent_t**) omAlloc(k * sizeof(scmon));
+  hsecure = (int**) omAlloc(k * sizeof(scmon));
   for (i = sl; i>0; i--)
   {
     if (*si!=NULL)
     {
-      *ek = (Exponent_t*) omAlloc((pVariables+1)*sizeof(Exponent_t));
+      *ek = (int*) omAlloc((pVariables+1)*sizeof(int));
       pGetExpV(*si, *ek);
       ek++;
     }
@@ -99,7 +99,7 @@ scfmon hInit(ideal S, ideal Q, int *Nexist, ring tailRing)
   {
     if (*qi!=NULL)
     {
-      *ek = (Exponent_t*) omAlloc((pVariables+1)*sizeof(Exponent_t));
+      *ek = (int*) omAlloc((pVariables+1)*sizeof(int));
       pGetExpV(*qi, *ek);
       ek++;
     }
@@ -112,7 +112,7 @@ scfmon hInit(ideal S, ideal Q, int *Nexist, ring tailRing)
 void hWeight()
 {
   int i, k;
-  Exponent_t x;
+  int x;
 
   i = pVariables;
   loop
@@ -139,13 +139,13 @@ void hDelete(scfmon ev, int ev_length)
   int i;
 
   for (i=0;i<ev_length;i++)
-    omFreeSize(hsecure[i],(pVariables+1)*sizeof(Exponent_t));
+    omFreeSize(hsecure[i],(pVariables+1)*sizeof(int));
   omFreeSize(hsecure, ev_length*sizeof(scmon));
   omFreeSize(ev,  ev_length*sizeof(scmon));
 }
 
 
-void hComp(scfmon exist, int Nexist, Exponent_t ak, scfmon stc, int *Nstc)
+void hComp(scfmon exist, int Nexist, int ak, scfmon stc, int *Nstc)
 {
   int  i = Nexist, k = 0;
   scfmon ex = exist, co = stc;
@@ -194,13 +194,13 @@ void hSupp(scfmon stc, int Nstc, varset var, int *Nvar)
 void hOrdSupp(scfmon stc, int Nstc, varset var, int Nvar)
 {
   int  i, i1, j, jj, k, l;
-  Exponent_t  x;
+  int  x;
   scmon temp, count;
   float o, h, g, *v1;
 
   v1 = (float *)omAlloc(Nvar * sizeof(float));
-  temp = (Exponent_t *)omAlloc(Nstc * sizeof(Exponent_t));
-  count = (Exponent_t *)omAlloc(Nstc * sizeof(Exponent_t));
+  temp = (int *)omAlloc(Nstc * sizeof(int));
+  count = (int *)omAlloc(Nstc * sizeof(int));
   for (i = 1; i <= Nvar; i++)
   {
     i1 = var[i];
@@ -257,8 +257,8 @@ void hOrdSupp(scfmon stc, int Nstc, varset var, int Nvar)
     }
     v1[i-1] = h * (float)jj;
   }
-  omFreeSize((ADDRESS)count, Nstc * sizeof(Exponent_t));
-  omFreeSize((ADDRESS)temp, Nstc * sizeof(Exponent_t));
+  omFreeSize((ADDRESS)count, Nstc * sizeof(int));
+  omFreeSize((ADDRESS)temp, Nstc * sizeof(int));
   for (i = 1; i < Nvar; i++)
   {
     i1 = var[i+1];
@@ -938,10 +938,10 @@ void hLex2R(scfmon rad, int e1, int a2, int e2, varset var,
 }
 
 
-void hStepS(scfmon stc, int Nstc, varset var, int Nvar, int *a, Exponent_t *x)
+void hStepS(scfmon stc, int Nstc, varset var, int Nvar, int *a, int *x)
 {
   int  k1, i;
-  Exponent_t  y;
+  int  y;
   k1 = var[Nvar];
   y = *x;
   i = *a;
@@ -1033,7 +1033,7 @@ scfmon hGetmem(int lm, scfmon old, monp monmem)
 *  scmon p1, pn;
 *  p1 = p + 1;
 *  pn = p1 + pVariables;
-*  memcpy(pn, p1, pVariables * sizeof(Exponent_t));
+*  memcpy(pn, p1, pVariables * sizeof(int));
 *  return pn - 1;
 *}
 */
@@ -1044,7 +1044,7 @@ scmon hGetpure(scmon p)
   p1++;
   pn = p1;
   pn += pVariables;
-  memcpy(pn, p1, pVariables * sizeof(Exponent_t));
+  memcpy(pn, p1, pVariables * sizeof(int));
   return pn - 1;
 }
 
