@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.14 1998-03-23 22:50:59 obachman Exp $ */
+/* $Id: kstd2.cc,v 1.15 1998-04-06 17:59:30 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -1544,7 +1544,7 @@ poly kNF2 (ideal F,ideal Q,poly q,kStrategy strat, int lazyReduce)
   strat->enterS = enterSBba;
   /*- set S -*/
   strat->sl = -1;
-  strat->spSpolyLoop = spGetSpolyLoop(currRing, MAX(strat->ak, pMaxComp(q)),
+  strat->spSpolyLoop = spGetSpolyLoop(currRing, max(strat->ak, pMaxComp(q)),
                                       strat->syzComp, FALSE);
   /*- init local data struct.---------------------------------------- -*/
   /*Shdl=*/initS(F,Q,strat);
@@ -1589,7 +1589,7 @@ ideal kNF2 (ideal F,ideal Q,ideal q,kStrategy strat, int lazyReduce)
   /*- set S -*/
   strat->sl = -1;
   strat->spSpolyLoop =  spGetSpolyLoop(currRing, 
-                                       MAX(strat->ak, idRankFreeModule(q)),
+                                       max(strat->ak, idRankFreeModule(q)),
                                        strat->syzComp, FALSE);
   /*- init local data struct.---------------------------------------- -*/
   /*Shdl=*/initS(F,Q,strat);
@@ -1656,9 +1656,9 @@ ideal stdred(ideal F, ideal Q, tHomog h,intvec ** w)
   if (currRing->ch==0) strat->LazyPass=2;
   else                 strat->LazyPass=20;
   strat->LazyDegree = 1;
+  strat->ak = idRankFreeModule(F);
   if ((h==testHomog))
   {
-    strat->ak = idRankFreeModule(F);
     if (strat->ak==0)
     {
       h = (tHomog)idHomIdeal(F,Q);

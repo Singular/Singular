@@ -35,6 +35,10 @@
 #undef STDC_HEADERS
 /* Define if you have sys/file.h */
 #undef HAVE_SYS_FILE_H
+/* Define if you have sys/param.h */
+#undef HAVE_SYS_PARAM_H
+/* Define if you have sys/file.h */
+#undef HAVE_SYS_TYPES_H
 /* Define if you have sys/ioctl.h */
 #undef HAVE_SYS_IOCTL_H
 /* Define if you have sys/time.h */
@@ -45,6 +49,8 @@
 #undef TIME_WITH_SYS_TIME
 /* Define if you have alloca.h */
 #undef HAVE_ALLOCA_H
+/* Define if you have pwd.h */
+#undef HAVE_PWD_H
 /* Define if you have alloca */
 #undef HAVE_ALLOCA
 /* Define if you have getpagesize */
@@ -66,6 +72,12 @@
 #undef HAVE_BCOPY
 /* Define if sprintf does not return number of printed chars */
 #undef BSD_SPRINTF
+/* Define if the `S_IS*' macros in <sys/stat.h> do not work properly.  */
+#undef STAT_MACROS_BROKEN
+/* Define if you have the getcwd function.  */
+#undef HAVE_GETCWD
+/* Define if you have the getwd function.  */
+#undef HAVE_GETWD
 /* Define sizeof(char) */
 #define SIZEOF_CHAR 1
 /* Define sizeof(short) */

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.17 1998-03-23 22:50:58 obachman Exp $ */
+/* $Id: kstd1.cc,v 1.18 1998-04-06 17:59:29 obachman Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1641,7 +1641,7 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
   initBuchMoraPos(strat);
   initMora(F,strat);
   strat->spSpolyLoop = spGetSpolyLoop(currRing, 
-                                      MAX(strat->ak,pMaxComp(q)),
+                                      max(strat->ak,pMaxComp(q)),
                                       strat->syzComp, FALSE);
   strat->enterS = enterSMoraNF;
   /*- set T -*/
@@ -1736,7 +1736,7 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
   strat->enterS = enterSMoraNF;
   /*- set T -*/
   strat->spSpolyLoop = spGetSpolyLoop(currRing, 
-                                      MAX(strat->ak,idRankFreeModule(q)),
+                                      max(strat->ak,idRankFreeModule(q)),
                                       strat->syzComp, FALSE);
   strat->tl = -1;
   strat->tmax = setmax;
@@ -1835,13 +1835,13 @@ ideal std(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   if (currRing->ch==0) strat->LazyPass=2;
   else                 strat->LazyPass=20;
   strat->LazyDegree = 1;
+  strat->ak = idRankFreeModule(F);
   if ((h==testHomog)
 #ifdef DRING
   && (!pDRING)
 #endif
   )
   {
-    strat->ak = idRankFreeModule(F);
     if (strat->ak == 0)       
     {
       h = (tHomog)idHomIdeal(F,Q);    
@@ -1875,7 +1875,7 @@ ideal std(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   }
   strat->homog=h;
   spSet(currRing);
-  strat->spSpolyLoop = spGetSpolyLoop(currRing, strat);
+  strat->spSpolyLoop = spGetSpolyLoop(currRing, strat, syzComp);
   if (pOrdSgn==-1)
   {
     if (w!=NULL)
@@ -1941,6 +1941,7 @@ lists TraceStd(leftv lv,int rw, ideal F, ideal Q, tHomog h,intvec ** w, intvec *
     strat->newIdeal = newIdeal;
   strat->LazyPass=32000;
   strat->LazyDegree = 10;
+  strat->ak = idRankFreeModule(F);
 //   if(stdTrace!=NULL)
 //     stdTrace->GetPrimes(F,primes);  // Array mit Primzahlen muß geordnet sein !
 
@@ -1950,7 +1951,6 @@ lists TraceStd(leftv lv,int rw, ideal F, ideal Q, tHomog h,intvec ** w, intvec *
 #endif
   )
   {
-    strat->ak = idRankFreeModule(F);
     if (strat->ak == 0)
     {
       h = (tHomog)idHomIdeal(F,Q);
@@ -1977,7 +1977,7 @@ lists TraceStd(leftv lv,int rw, ideal F, ideal Q, tHomog h,intvec ** w, intvec *
   }
   strat->homog=h;
   spSet(currRing);
-  strat->spSpolyLoop = spGetSpolyLoop(currRing, strat);
+  strat->spSpolyLoop = spGetSpolyLoop(currRing, strat syzComp);
 //   if (pOrdSgn==-1)
 //   {
 //     if (w!=NULL)
@@ -2034,13 +2034,13 @@ lists min_std(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   else                 strat->LazyPass=20;
   strat->LazyDegree = 1;
   strat->minim=(reduced % 2)+1;
+  strat->ak = idRankFreeModule(F);
   if ((h==testHomog)
 #ifdef DRING
   && (!pDRING)
 #endif
   )
   {
-    strat->ak = idRankFreeModule(F);
     if (strat->ak == 0)
     {
       h = (tHomog)idHomIdeal(F,Q);
@@ -2079,7 +2079,7 @@ lists min_std(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   }
   strat->homog=h;
   spSet(currRing);
-  strat->spSpolyLoop = spGetSpolyLoop(currRing, strat);
+  strat->spSpolyLoop = spGetSpolyLoop(currRing, strat, syzComp);
   if (pOrdSgn==-1)
   {
     if (w!=NULL)

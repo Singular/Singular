@@ -24,10 +24,18 @@ inline spSpolyLoopProc spGetSpolyLoop(ring r, int modrank, int syzComp,
 
 inline spSpolyLoopProc spGetSpolyLoop(ring r, kStrategy strat)
 {
-  return spGetSpolyLoop(r, spGetOrderType(r, strat), 
+  return spGetSpolyLoop(r, spGetOrderType(r, strat->ak, strat->syzComp), 
                         ((strat->homog && strat->kModW==NULL && 
                           ! rHasSimpleLexOrder(r))));
 }
+
+inline spSpolyLoopProc spGetSpolyLoop(ring r, kStrategy strat, int syzComp)
+{
+  return spGetSpolyLoop(r, spGetOrderType(r, strat->ak, syzComp), 
+                        ((strat->homog && strat->kModW==NULL && 
+                          ! rHasSimpleLexOrder(r))));
+}
+
 
 inline spSpolyLoopProc spGetSpolyLoop(ring r)
 {

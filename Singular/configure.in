@@ -394,11 +394,11 @@ dnl CHECKS FOR HEADER FILES.
 dnl
 
 AC_HEADER_STDC
-
+AC_HEADER_STAT
 AC_CHECK_HEADERS(limits.h unistd.h,,
   AC_MSG_ERROR(Can not compile without limits.h unistd.h))
 
-AC_CHECK_HEADERS(sys/file.h sys/ioctl.h sys/time.h sys/times.h sys/types.h sys/stat.h fcntl.h)
+AC_CHECK_HEADERS(sys/file.h sys/ioctl.h sys/time.h sys/times.h sys/types.h sys/stat.h fcntl.h sys/param.h pwd.h)
 
 dnl Check dbm
 WITH_DBM=no
@@ -429,7 +429,7 @@ AC_PROG_GCC_TRADITIONAL
 AC_FUNC_MMAP
 AC_TYPE_SIGNAL
 AC_FUNC_VPRINTF
-AC_CHECK_FUNCS(gettimeofday strstr strtod strtol atexit bcopy)
+AC_CHECK_FUNCS(gettimeofday strstr strtod strtol atexit bcopy getcwd getwd)
 
 dnl
 dnl System specific tests

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.31 1998-02-27 16:28:01 Singular Exp $ */
+/* $Id: tesths.cc,v 1.32 1998-04-06 17:59:37 obachman Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -57,6 +57,8 @@ int main(          /* main entry to Singular */
   int i;
   thisfile = argv[0];
   BOOLEAN load_std_lib=TRUE;
+  feGetSearchPath(thisfile);
+  
   /*. process parameters */
   for (;(argc > 1) && (!feBatch); --argc, ++argv)
   {

@@ -1,3 +1,15 @@
+1998-04-06  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
+
+	* spSpolyLoop.h: neww calling interface for spGetSpolyLoop
+
+	* kstd1.cc (kNF): moved strat->ak field initailization out of
+	initBuchMora into single routines
+
+	* febase.cc (feGetSearchPath): added feGetSearchPath; changed
+	algorithm for searching files: $SINGULARPATH -> relative to
+	executable -> burnt-in locations
+	* added find_exec.c to get absolute pathname of executable
+
 Mon Apr  6 14:23:52 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* claptmpl.cc: instantiation for `tabs()' added

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstdfac.cc,v 1.13 1998-03-23 14:07:54 obachman Exp $ */
+/* $Id: kstdfac.cc,v 1.14 1998-04-06 17:59:31 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
@@ -725,9 +725,9 @@ lists stdfac(ideal F, ideal Q, tHomog h,intvec ** w,ideal D)
   if (currRing->ch==0) strat->LazyPass=2;
   else                 strat->LazyPass=20;
   strat->LazyDegree = 1;
+  strat->ak = idRankFreeModule(F);
   if ((h==testHomog))
   {
-    strat->ak = idRankFreeModule(F);
     if (strat->ak==0)
     {
       h = (tHomog)idHomIdeal(F,Q);

@@ -725,13 +725,5 @@ char * versionString()
               StringAppend("-g,");
 #endif
               StringAppend("random=%d\n",siRandomStart);
-#ifdef MSDOS
-              char *p=getenv("SPATH");
-#else
-              char *p=getenv("SINGULARPATH");
-#endif
-              if (p!=NULL)
-                return StringAppend("search path:%s:%s",p,SINGULAR_DATADIR);
-              else
-                return StringAppend("search path:%s", SINGULAR_DATADIR);
+              return StringAppend("search path %s", feGetSearchPath());
 }

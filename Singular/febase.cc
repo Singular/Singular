@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.26 1998-03-31 07:41:21 Singular Exp $ */
+/* $Id: febase.cc,v 1.27 1998-04-06 17:59:27 obachman Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -102,6 +102,74 @@ BOOLEAN tclmode=FALSE;
 #endif  /* MSDOS */
 #endif  /* macintosh */
 
+extern "C" char* find_executable_path(const char* argv0);
+
+#define SINGULAR_RELATIVE_DATA_DIR "LIB"
+
+static char* SearchPath = NULL;
+
+// Return the file search path for singular w.r.t. the following priorities:
+// Env-variables + Relative Data Dir + Burned-in data dir
+char* feGetSearchPath(const char* argv0)
+{   
+  if (SearchPath == NULL) 
+  {
+    char *env = NULL, *sibbling = NULL, *path;
+    int plength = 0, tmp;
+  
+#ifdef MSDOS
+    env=getenv("SPATH");
+#else
+    env=getenv("SINGULARPATH");
+#endif
+  
+    if (argv0 != NULL)
+      sibbling = find_executable_path(argv0);
+  
+    if (env != NULL)
+      plength = strlen(env) + 1;
+
+    if (sibbling != NULL)
+      plength += strlen(sibbling) + strlen(SINGULAR_RELATIVE_DATA_DIR) + 2;
+  
+    plength += strlen(SINGULAR_DATADIR) + 2;
+  
+    path = (char*) AllocL(plength*sizeof(char));
+    SearchPath = path;
+  
+    if (env != NULL)
+    {
+      tmp = strlen(env);
+      memcpy(path, env, tmp);
+      path = &(path[tmp]);
+      *path = FS_SEP;
+      path++;
+    }
+  
+    if (sibbling != NULL)
+    {
+      tmp = strlen(sibbling);
+      memcpy(path, sibbling, tmp);
+      path = &(path[tmp]);
+      *path = DIR_SEP;
+      path++;
+      tmp = strlen(SINGULAR_RELATIVE_DATA_DIR);
+      memcpy(path, SINGULAR_RELATIVE_DATA_DIR, tmp);
+      path = &(path[tmp]);
+      *path = FS_SEP;
+      path++;
+      FreeL(sibbling);
+    }
+  
+    tmp = strlen(SINGULAR_DATADIR);
+    memcpy(path,SINGULAR_DATADIR, tmp);
+    path = &(path[tmp]);
+    *path = '\0';
+  }
+  return SearchPath;
+}
+
+
 FILE * feFopen(char *path, char *mode, char *where,int useWerror)
 {
   FILE * f=fopen(path,mode);
@@ -156,32 +224,16 @@ FILE * feFopen(char *path, char *mode, char *where,int useWerror)
   &&(f==NULL))
   {
     char found = 0;
-    #ifdef MSDOS
-      char *env=getenv("SPATH");
-    #else
-      char *env=getenv("SINGULARPATH");
-    #endif
+    char* spath = feGetSearchPath();
     char *s;
-    #ifndef macintosh
-    // extend path by SINGULAR_DATADIR
-    s = (char*) AllocL((env != NULL ? strlen(env) : 0)
-                       +strlen(SINGULAR_DATADIR)+2);
-    if (env != NULL)
-    {
-      strcpy(s, env);
-      s[strlen(env)] = FS_SEP;
-      s[strlen(env)+1] = '\0';
-      strcat(s, SINGULAR_DATADIR);
-    }
-    else strcpy(s, SINGULAR_DATADIR);
-    env = s;
-    #endif
+
     if (where==NULL) s=(char *)AllocL(250);
     else             s=where;
-    if (env!=NULL)
+
+    if (spath!=NULL)
     {
       char *p,*q;
-      p = env;
+      p = spath;
       while( (q=strchr(p, FS_SEP)) != NULL)
       {
         *q = '\0';
@@ -215,9 +267,6 @@ FILE * feFopen(char *path, char *mode, char *where,int useWerror)
       if (where!=NULL) strcpy(s/*where*/,path);
       f=fopen(path,mode);
     }
-    #ifndef macintosh
-    FreeL(env);
-    #endif
     if (where==NULL) FreeL((ADDRESS)s);
   }
   if ((f==NULL)&&(useWerror))

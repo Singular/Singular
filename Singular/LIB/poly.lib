@@ -1,10 +1,10 @@
-// $Id: poly.lib,v 1.10 1998-04-03 22:47:09 krueger Exp $
+// $Id: poly.lib,v 1.11 1998-04-06 17:59:38 obachman Exp $
 //system("random",787422842);
 //(GMG, last modified 22.06.96)
 //(obachman: 17.12.97 -- added katsura)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: poly.lib,v 1.10 1998-04-03 22:47:09 krueger Exp $";
+version="$Id: poly.lib,v 1.11 1998-04-06 17:59:38 obachman Exp $";
 info="
 LIBRARY:  poly.lib      PROCEDURES FOR MANIPULATING POLYS, IDEALS, MODULES
 
@@ -21,7 +21,8 @@ LIBRARY:  poly.lib      PROCEDURES FOR MANIPULATING POLYS, IDEALS, MODULES
  mindeg1(poly/...);     int = [weighted] minimal degree of input
  normalize(poly/...);   normalize poly/... such that leading coefficient is 1
  rad_con(p,I);          check radical containment of poly p in ideal I
-           (parameters in square brackets [] are optional)
+ content(f);            content of polynomial/vector f
+          (parameters in square brackets [] are optional)
 ";
 
 LIB "general.lib";

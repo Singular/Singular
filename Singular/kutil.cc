@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.14 1998-03-23 22:51:00 obachman Exp $ */
+/* $Id: kutil.cc,v 1.15 1998-04-06 17:59:32 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for std
 */
@@ -3574,7 +3574,6 @@ void initBuchMoraPos (kStrategy strat)
 void initBuchMora (ideal F,ideal Q,kStrategy strat)
 {
   strat->interpt = BTEST1(OPT_INTERRUPT);
-  strat->ak = idRankFreeModule(F);
   strat->kHEdge=NULL;
   if (pOrdSgn==1) strat->kHEdgeFound=FALSE;
   /*- creating temp data structures------------------- -*/

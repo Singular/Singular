@@ -1,6 +1,6 @@
 #!/usr/local/bin/perl
 ###########################################################################
-# $Id: spSpolyLoop.pl,v 1.5 1998-03-31 12:20:23 obachman Exp $
+# $Id: spSpolyLoop.pl,v 1.6 1998-04-06 17:59:36 obachman Exp $
 
 ###########################################################################
 ##
@@ -10,6 +10,19 @@
 ## AUTHOR: obachman (3/98)
 ##
 
+###########################################################################
+##
+## How to add/modify generation of spSpolyLoops
+##
+
+# 1.) Add property/characterisitc to property specification and make
+# sure that property is checked for in spGetSpolyLoop(...) in
+# spSpolyLoop.cc
+# 
+# 2.) Modify macros of spSpolyLoops so that approriate actions are taken
+# for new properties
+# 
+# 3.) Add properties to check for in @input
 
 
 
@@ -638,7 +651,6 @@ sub Generate_GetSpolyLoop
 	  "return NULL;\n}\n");
 }
 
-
 ###########################################################################
 ##
 ## Input Specification
@@ -649,6 +661,11 @@ sub Generate_GetSpolyLoop
 	  "_homGEN,homYES".
 	  "_nwONE,nwTWO,nwEVEN,nwODD");
 
+
+###########################################################################
+##
+## Main program
+##
 
 #flatten out input
 @finput = &FlattenInput(@input);
@@ -668,16 +685,4 @@ foreach $key (sort(keys(%checks)))
 }
 
 print $getspolyloop;
-
-
-
-
-  
-
-
-
-
-
-
-
 
