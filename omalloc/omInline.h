@@ -4,7 +4,7 @@
  *           be inlined
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omInline.h,v 1.3 2000-08-14 12:26:45 obachman Exp $
+ *  Version: $Id: omInline.h,v 1.4 2000-08-16 16:08:33 obachman Exp $
  *******************************************************************/
 #if defined(OM_INLINE) || defined(OM_ALLOC_C)
 
@@ -154,8 +154,7 @@ OM_INLINE_IMPL char* _omStrDup(const char* s)
   while (s[i]) i++;
   i++;
   __omTypeAlloc(char*, r, i);
-  i = OM_ALIGN_SIZE(i) >> LOG_SIZEOF_LONG;
-  omMemcpyW(r, s, i);
+  memcpy(r, s, i);
   return r;
 }
 
