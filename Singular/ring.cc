@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.187 2002-02-06 15:30:31 Singular Exp $ */
+/* $Id: ring.cc,v 1.188 2002-02-08 08:48:26 anne Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -4126,7 +4126,7 @@ ring rCompose(lists  L)
          case ringorder_wp:
          case ringorder_Wp:
            R->wvhdl[j] =( int *)omAlloc((iv->length())*sizeof(int));
-           for (i=1; i<iv->length();i++) R->wvhdl[n][i-1]=(*iv)[i];
+           for (i=0; i<iv->length();i++) R->wvhdl[j][i]=(*iv)[i];
            break;
          case ringorder_ls:
          case ringorder_ds:
