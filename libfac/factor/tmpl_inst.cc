@@ -1,15 +1,15 @@
 /* Copyright 1997 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: tmpl_inst.cc,v 1.3 1997-09-12 07:20:00 Singular Exp $
+// $Id: tmpl_inst.cc,v 1.4 1998-02-27 10:34:02 schmidt Exp $
 ////////////////////////////////////////////////////////////
 
 
-#include <templates/array.cc>
-#include <templates/factor.cc>
-#include <templates/list.cc>
-#include <templates/functions.h>
-#include <templates/matrix.cc>
+#include <templates/ftmpl_array.cc>
+#include <templates/ftmpl_factor.cc>
+#include <templates/ftmpl_list.cc>
+#include <templates/ftmpl_functions.h>
+#include <templates/ftmpl_matrix.cc>
 
 #include <factory.h>
 
@@ -89,6 +89,9 @@ template class ListIterator<CFFList>;
 ////////////////////////////////////////////////////////////
 /*
 $Log: not supported by cvs2svn $
+Revision 1.3  1997/09/12 07:20:00  Singular
+* hannes/michael: libfac-0.3.0
+
 Revision 1.2  1997/04/25 22:34:36  michael
 Version for libfac-0.2.1
 
