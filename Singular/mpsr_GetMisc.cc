@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_GetMisc.cc,v 1.16 1999-09-16 12:34:00 Singular Exp $ */
+/* $Id: mpsr_GetMisc.cc,v 1.17 1999-09-27 13:53:43 obachman Exp $ */
 
 /***************************************************************
  *
@@ -77,7 +77,7 @@ static ring rDefault(short ch, char *name)
   r->names = (char **) Alloc(sizeof(char *));
   r->names[0] = mstrdup(name);
 
-  r->wvhdl = (short **)Alloc0(3 * sizeof(short *));
+  r->wvhdl = (int **)Alloc0(3 * sizeof(int *));
   /*order: dp,C,0*/
   r->order = (int *) Alloc(3 * sizeof(int *));
   r->block0 = (int *)Alloc(3 * sizeof(int *));
