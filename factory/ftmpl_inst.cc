@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftmpl_inst.cc,v 1.8 1998-06-08 15:28:22 schmidt Exp $ */
+/* $Id: ftmpl_inst.cc,v 1.9 1998-06-30 16:25:47 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -65,6 +65,9 @@ template List<CFFactor> Union ( const List<CFFactor> &, const List<CFFactor> & )
 #if ! defined(WINNT) || defined(__GNUC__)
 template CanonicalForm tmax ( const CanonicalForm &, const CanonicalForm & );
 template CanonicalForm tmin ( const CanonicalForm &, const CanonicalForm & );
+
+template Variable tmax ( const Variable &, const Variable & );
+template Variable tmin ( const Variable &, const Variable & );
 
 template int tmax ( const int &, const int & );
 template int tmin ( const int &, const int & );
