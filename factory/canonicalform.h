@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.h,v 1.17 1997-09-29 16:06:41 schmidt Exp $ */
+/* $Id: canonicalform.h,v 1.18 1997-10-10 10:39:52 schmidt Exp $ */
 
 #ifndef INCL_CANONICALFORM_H
 #define INCL_CANONICALFORM_H
@@ -38,6 +38,7 @@ class CanonicalForm
 private:
     InternalCF *value;
 public:
+    // constructors, destructors, selectors
     CanonicalForm();
     CanonicalForm( const CanonicalForm& );
     CanonicalForm( InternalCF* );
@@ -50,45 +51,12 @@ public:
 
     InternalCF* getval() const; // use with caution !!!
 
-    int sign() const;
+    CanonicalForm deepCopy() const;
 
+    // predicates
     bool isOne() const;
     bool isZero() const;
     bool isImm() const;
-
-    int intval() const;
-
-    CanonicalForm lc() const;
-    CanonicalForm LC() const;
-    CanonicalForm LC( const Variable & v ) const;
-
-    int degree() const;
-    int degree( const Variable & v ) const;
-
-    CanonicalForm tailcoeff() const;
-    int taildegree() const;
-
-    int level() const;
-    Variable mvar() const;
-
-    CanonicalForm num() const;
-    CanonicalForm den() const;
-
-    CanonicalForm deepCopy() const;
-
-    bool isFFinGF() const;
-    bool hasGcd() const { return false; }
-    CanonicalForm gcd( const CanonicalForm & f ) const;
-    CanonicalForm deriv() const;
-    CanonicalForm deriv( const Variable & x ) const;
-    CanonicalForm sqrt() const;
-    int ilog2() const;
-    static CanonicalForm genCoeff( int what, int i = 0 );
-
-    CanonicalForm genZero() const;
-    CanonicalForm genOne() const;
-
-    bool isUnivariate() const;
 
     bool inZ() const;
     bool inQ() const;
@@ -101,11 +69,31 @@ public:
     bool inPolyDomain() const;
     bool inQuotDomain() const;
 
+    bool isFFinGF() const;
+    bool isUnivariate() const;
+
+    // conversion functions
+    int intval() const;
     CanonicalForm mapinto () const;
 
-    CanonicalForm operator () ( const CanonicalForm & f ) const;
-    CanonicalForm operator () ( const CanonicalForm & f, const Variable & v ) const;
-    CanonicalForm operator [] ( int i ) const;
+    CanonicalForm lc () const;
+    CanonicalForm Lc () const;
+    CanonicalForm LC () const;
+    CanonicalForm LC ( const Variable & v ) const;
+
+    int degree () const;
+    int degree ( const Variable & v ) const;
+
+    CanonicalForm tailcoeff () const;
+    int taildegree () const;
+
+    int level () const;
+    Variable mvar () const;
+
+    CanonicalForm num () const;
+    CanonicalForm den () const;
+
+    // assignment operators
     CanonicalForm& operator = ( const CanonicalForm& );
     CanonicalForm& operator = ( const int );
 
@@ -117,6 +105,28 @@ public:
     CanonicalForm& div ( const CanonicalForm& );
     CanonicalForm& mod ( const CanonicalForm& );
 
+    // evaluation operators
+    CanonicalForm operator () ( const CanonicalForm & f ) const;
+    CanonicalForm operator () ( const CanonicalForm & f, const Variable & v ) const;
+
+    CanonicalForm operator [] ( int i ) const;
+
+    CanonicalForm deriv() const;
+    CanonicalForm deriv( const Variable & x ) const;
+
+    int sign() const;
+    CanonicalForm sqrt() const;
+    int ilog2() const;
+    bool hasGcd() const { return false; }
+    CanonicalForm gcd( const CanonicalForm & f ) const;
+
+    // comparison operators
+    friend bool operator == ( const CanonicalForm&, const CanonicalForm& );
+    friend bool operator != ( const CanonicalForm&, const CanonicalForm& );
+    friend bool operator > ( const CanonicalForm&, const CanonicalForm& );
+    friend bool operator < ( const CanonicalForm&, const CanonicalForm& );
+
+    // arithmetic operators
     friend CanonicalForm operator - ( const CanonicalForm& );
 
     friend CanonicalForm operator + ( const CanonicalForm&, const CanonicalForm& );
@@ -137,10 +147,10 @@ public:
     friend istream& operator >> ( istream&, CanonicalForm& );
 #endif /* NOSTREAMIO */
 
-    friend bool operator == ( const CanonicalForm&, const CanonicalForm& );
-    friend bool operator != ( const CanonicalForm&, const CanonicalForm& );
-    friend bool operator > ( const CanonicalForm&, const CanonicalForm& );
-    friend bool operator < ( const CanonicalForm&, const CanonicalForm& );
+    // obsolete methods
+    static CanonicalForm genCoeff( int what, int i = 0 );
+    CanonicalForm genZero() const;
+    CanonicalForm genOne() const;
 
     friend class CFIterator;
 };
@@ -198,9 +208,20 @@ int size ( const CanonicalForm & f, const Variable & v );
 int size ( const CanonicalForm & f );
 //}}}
 
-//{{{ inline functions
+//{{{ inline functions corresponding to CanonicalForm methods
+//{{{ docu
+//
+// - inline functions corresponding to CanonicalForm methods.
+//
+// These function exist for convenience only and because it is
+// more beautiful to write 'degree( f )' than 'f.degree()'.
+//
+//}}}
 inline CanonicalForm
 lc ( const CanonicalForm & f ) { return f.lc(); }
+
+inline CanonicalForm
+Lc ( const CanonicalForm & f ) { return f.Lc(); }
 
 inline CanonicalForm
 LC ( const CanonicalForm & f ) { return f.LC(); }
@@ -233,47 +254,19 @@ inline CanonicalForm
 den ( const CanonicalForm & f ) { return f.den(); }
 
 inline CanonicalForm
-mapinto ( const CanonicalForm & f ) { return f.mapinto(); }
+deriv ( const CanonicalForm & f, const Variable & x ) { return f.deriv( x ); }
 
-//{{{ inline CanonicalForm deriv ( const CanonicalForm & f, const Variable & x )
-//{{{ docu
-//
-// deriv() - inline function version of method deriv().
-//
-//}}}
 inline CanonicalForm
-deriv ( const CanonicalForm & f, const Variable & x )
-{
-    return f.deriv(x);
-}
-//}}}
+sqrt ( const CanonicalForm & a ) { return a.sqrt(); }
 
-//{{{ inline CanonicalForm sqrt ( const CanonicalForm & a )
-//{{{ docu
-//
-// sqrt() - inline function version of method sqrt().
-//
-//}}}
-inline CanonicalForm
-sqrt ( const CanonicalForm & a )
-{
-    return a.sqrt();
-}
-//}}}
-
-//{{{ inline int ilog2 ( const CanonicalForm & a )
-//{{{ docu
-//
-// ilog2() - inline function version of method ilog().
-//
-//}}}
 inline int
-ilog2 ( const CanonicalForm & a )
-{
-    return a.ilog2();
-}
+ilog2 ( const CanonicalForm & a ) { return a.ilog2(); }
+
+inline CanonicalForm
+mapinto ( const CanonicalForm & f ) { return f.mapinto(); }
 //}}}
 
+//{{{ inline functions
 inline CanonicalForm
 head ( const CanonicalForm & f )
 {
