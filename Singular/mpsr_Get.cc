@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_Get.cc,v 1.30 2000-02-29 16:33:09 Singular Exp $ */
+/* $Id: mpsr_Get.cc,v 1.31 2000-05-16 12:42:46 obachman Exp $ */
 /***************************************************************
  *
  * File:       mpsr_Get.cc
@@ -204,10 +204,16 @@ inline void InitIdentifierLeftv(mpsr_leftv mlv, char *name, short quote)
     {
       mlv->lv = mpsr_InitLeftv(IDHDL, (void *) h);
     }
+    else if (strcmp(name, "basering") == 0)
+    {
+      mlv->lv = mpsr_InitLeftv(IDHDL, (void*) currRingHdl);
+      mlv->lv->name=IDID(currRingHdl);
+      mlv->lv->attribute=IDATTR(currRingHdl);
+    }
     else
     {
       poly p;
-
+      
       pos = mpsr_rDefault(0, name, mlv->r);
       mpsr_SetCurrRing(mlv->r, TRUE);
       p = pOne();
@@ -253,7 +259,7 @@ inline mpsr_Status_t mpsr_GetIdentifierLeftv(MPT_Node_pt node, mpsr_leftv mlv,
   mpsr_assume(MP_IsIdType(node->type));
   char *id;
   MPT_Annot_pt proc_annot = MPT_Annot(node, MP_SingularDict,
-                                          MP_AnnotSingularProcDef);
+                                      MP_AnnotSingularProcDef);
 
   if (node->type == MP_CommonGreekIdentifierType ||
       node->type == MP_CommonGreekIdentifierType)
