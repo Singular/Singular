@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_PutPoly.cc,v 1.14 1999-03-08 17:30:48 Singular Exp $ */
+/* $Id: mpsr_PutPoly.cc,v 1.15 1999-03-12 12:05:24 Singular Exp $ */
 
 /***************************************************************
  *
@@ -23,6 +23,7 @@
 #include "mpsr_Tok.h"
 #include "longalg.h"
 #include "mmemory.h"
+#include "ring.h"
 #include "polys.h"
 #include "ipid.h"
 
@@ -92,7 +93,7 @@ static void SetPutFuncs(ring r)
   if (rField_is_Q(r))
     // rational numbers
     PutCoeff= PutRationalNumber;
-  else if (rField_is_Zp(r))
+  else if (rField_is_Zp(r) || rField_is_GF(r))
     // Form our point of view, ModuloP numbers and numbers from
     // GF(p,n) are the same, here. They only differ in the annots
     PutCoeff = PutModuloNumber;
@@ -344,8 +345,7 @@ mpsr_Status_t mpsr_PutRingAnnots(MP_Link_pt link, ring r, BOOLEAN mv)
                                     MP_AnnotRequired));
   // Hmm .. this is not according to a "proper" Singular ring,
   // but to be used in a recursive call of mpsr_PutRingAnnots
-  if (r->minpoly != NULL && r->parameter == NULL
-  && (rField_is_Q_a(r)||rField_is_GF(r)))
+  if (r->minpoly != NULL && r->parameter == NULL && r->ch > 0)
     failr(PutMinPolyAnnot(link,r));
   
   if (r->qideal != NULL)
@@ -383,7 +383,7 @@ static mpsr_Status_t PutProtoTypeAnnot(MP_Link_pt link, ring r,
                                     MP_AnnotNumberIsNormalized,
                                     0));
   }
-  else if (rField_is_Zp(r))
+  else if (rField_is_Zp(r) || rField_is_GF(r))
   {
     // modulo p numbers
     // are communicated as IMP_Uint32's
@@ -397,7 +397,7 @@ static mpsr_Status_t PutProtoTypeAnnot(MP_Link_pt link, ring r,
                                     MP_AnnotNumberModulos,
                                     MP_AnnotValuated));
     // with Modulo
-    mp_failr(MP_PutUint32Packet(link, rChar(r), 1));
+    mp_failr(MP_PutUint32Packet(link, rInternalChar(r), 1));
     if (r->parameter == NULL)
     {
       // which is (in our case) always a prime number
@@ -682,7 +682,7 @@ static mpsr_Status_t PutMinPolyAnnot(MP_Link_pt link, ring r)
 
   // need to set PutAlgAlgnumber and gNalgVars
   CurrPutRing = r;
-  if (rField_is_Zp(r)) // orig: (r->ch > 0) ???
+  if (rField_is_Zp(r) || rField_is_GF(r))
     PutAlgAlgNumber = PutModuloNumber;
   else
     PutAlgAlgNumber = PutRationalNumber;
