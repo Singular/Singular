@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.32 1998-05-08 14:11:51 wichmann Exp $
+@comment $Id: reference.doc,v 1.33 1998-05-08 14:55:27 wichmann Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -561,7 +561,7 @@ See @ref{link}, @ref{link}; @ref{open}.
 
 @table @code
 @item @strong{Syntax:}
-@code{coef (} poly_expression @code{,} product_of_ringvars @code{)}
+@code{coef (} poly_expression@code{,} product_of_ringvars @code{)}
 @*@code{coef (} vector_expression@code{,} product_of_ringvars@code{,} matrix_name@code{,} matrix_name @code{)}
 @item @strong{Type:}
 matrix in the first case
@@ -728,7 +728,7 @@ int_expression is positive.
 in order to print results subject to certain
 conditions.
 @item @strong{Syntax:}
-@code{dbprint (} expression@code{)}
+@code{dbprint (} expression @code{)}
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
@@ -1151,7 +1151,7 @@ See @ref{quote}; @ref{write}.
 @cindex execute
 @table @code
 @item @strong{Syntax:}
-execute string_expression
+@code{execute} string_expression
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
@@ -1448,7 +1448,7 @@ See @ref{string expressions}.
 @cindex finduni
 @table @code
 @item @strong{Syntax:}
-@code{finduni (} ideal_expression@code{)}
+@code{finduni (} ideal_expression @code{)}
 @item @strong{Type:}
 ideal
 @item @strong{Purpose:}
@@ -1751,7 +1751,7 @@ See @ref{poly expressions}; @ref{vector expressions}; @ref{ideal expressions};
 
 @table @code
 @item @strong{Syntax:}
-@code{imap (} ring_name @code{,} name @code{)}
+@code{imap (} ring_name@code{,} name @code{)}
 @item @strong{Type:}
 number, poly, vector, ideal, module, matrix or list
 (the same type as the second argument)
@@ -1835,8 +1835,8 @@ See @ref{std}; @ref{ideal expressions}.
 
 @table @code
 @item @strong{Syntax:}
-@code{insert (} list_expression @code{,} expression @code{)}
-@*@code{insert (} list_expression @code{,} expression @code{,} int_expression @code{)}
+@code{insert (} list_expression@code{,} expression @code{)}
+@*@code{insert (} list_expression@code{,} expression@code{,} int_expression @code{)}
 @item @strong{Type:}
 list
 @item @strong{Purpose:}
@@ -2714,10 +2714,10 @@ given by the list argument.
   ring r=31991,(t,x,y,z,w),ls;
   ideal T=t2x2+tx2y+x2yz,t2y2+ty2z+y2zw,
     t2z2+tz2w+xz2w,t2w2+txw2+xyw2;
-  list R3=sres(std(T),0);
-  size(R3);
-  list R4=minres(R3);
-  size(R4);
+  resolution R3=sres(std(T),0);
+  R3;
+  resolution R4=minres(R3);
+  R4;
 @c example
 @end example
 @end table
@@ -2826,10 +2826,10 @@ and opens the file given by the first string expression.
 @cindex mres
 @table @code
 @item @strong{Syntax:}
-@code{mres (} ideal_expression @code{,} int_expression @code{)}
-@*@code{mres (} module_expression @code{,} int_expression @code{)}
+@code{mres (} ideal_expression@code{,} int_expression @code{)}
+@*@code{mres (} module_expression@code{,} int_expression @code{)}
 @item @strong{Type:}
-list
+resolution
 @item @strong{Purpose:}
 computes a minimal free resolution of an ideal or module M with the
 standard basis method. More precisely, let A=matrix(M), then @code{mres}
@@ -2879,8 +2879,8 @@ first szyzgy module of L[p], is 0 (if the basering is not a qring).
   ring r  = 31991,(t,x,y,z,w),ls;
   ideal M = t2x2+tx2y+x2yz,t2y2+ty2z+y2zw,
             t2z2+tz2w+xz2w,t2w2+txw2+xyw2;
-  list L  = mres(M,0);
-  size(L);
+  resolution L = mres(M,0);
+  L;
   // projective dimension of M is 4
 @c example
 @end example
@@ -3899,7 +3899,7 @@ See @ref{ideal expressions}; @ref{vector expressions}; @ref{std}.
 @cindex regularity
 @table @code
 @item @strong{Syntax:}
-@code{regularity ( list_expression @code{)}}
+@code{regularity (} list_expression @code{)}}
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
@@ -3954,7 +3954,7 @@ See @ref{res}; @ref{mres}; @ref{sres}; @ref{minres}; @ref{option}.
 @code{res (} ideal_expression@code{,} int_expression @code{)}
 @*@code{res (} module_expression@code{,} int_expression @code{)}
 @item @strong{Type:}
-list
+resolution
 @item @strong{Purpose:}
 computes a minimal free resolution of an ideal or module M with the standard basis method.
 More precisely, let
@@ -4010,8 +4010,8 @@ $=M_i$
   ring r  = 31991,(t,x,y,z,w),ls;
   ideal M = t2x2+tx2y+x2yz,t2y2+ty2z+y2zw,
             t2z2+tz2w+xz2w,t2w2+txw2+xyw2;
-  list L  = res(M,0);
-  size(L);
+  resolution L = res(M,0);
+  L;
 @c example
 @end example
 @end table
@@ -4032,7 +4032,7 @@ See @ref{ideal expressions}; @ref{module expressions}; @ref{int expressions};
 @cindex reservedName
 @table @code
 @item @strong{Syntax:}
-@code{reservedName ( )}
+@code{reservedName ()}
 @item @strong{Type:}
 none
 @item @strong{Syntax:}
@@ -4307,7 +4307,7 @@ starting with the smallest.
 @code{sres (} ideal_expression@code{,} int_expression @code{)}
 @*@code{sres (} module_expression@code{,} int_expression @code{)}
 @item @strong{Type:}
-list
+resolution
 @item @strong{Purpose:}
 computes a free resolution of an ideal or module with Schreyer's
 method. The ideal/module has to be a standard basis.
@@ -4361,8 +4361,8 @@ $=M_i$
   ideal M = t2x2+tx2y+x2yz,t2y2+ty2z+y2zw,
             t2z2+tz2w+xz2w,t2w2+txw2+xyw2;
   M       = std(M);
-  list L  = sres(M,0);
-  size(L);
+  resolution L  = sres(M,0);
+  L;
 @c example
 @end example
 @end table
@@ -4488,7 +4488,7 @@ See @ref{ideal}; @ref{ring}; @ref{option}; @ref{facstd}; @ref{mstd};
 @cindex stdfglm
 @table @code
 @item @strong{Syntax:}
-@code{stdfglm (} ideal_expression@code{)}
+@code{stdfglm (} ideal_expression @code{)}
 @item @strong{Purpose:}
 returns a standard basis of an ideal in the basering, calculated via
 the FGLM algorithm from the ordering "dp" (degrevlex) to the ordering
@@ -4535,7 +4535,7 @@ See @ref{ideal}; @ref{ring}; @ref{option}; @ref{facstd}; @ref{mstd};
 @cindex stdhilbert
 @table @code
 @item @strong{Syntax:}
-@code{stdhilbert (} ideal_expression@code{)}
+@code{stdhilbert (} ideal_expression @code{)}
 @*@code{stdhilbert (} ideal_expression@code{,} intvec_expression @code{)}
 @item @strong{Type:}
 ideal
@@ -4763,7 +4763,7 @@ See @ref{matrix expressions}.
 @cindex type
 @table @code
 @item @strong{Syntax:}
-@code{type} name@code{;}
+@code{type} name @code{;}
 @*expression;
 @item @strong{Type:}
 none
@@ -5191,7 +5191,7 @@ See @ref{if}; @ref{Control structures}.
 @cindex export
 @table @code
 @item @strong{Syntax:}
-@code{export} name@code{;}
+@code{export} name @code{;}
 @*@code{export} list_of_names @code{;}
 @item @strong{Purpose:}
 converts a local variable to a global one.
@@ -5297,7 +5297,7 @@ See @ref{Control structures}; @ref{boolean expressions}.
 @cindex keepring
 @table @code
 @item @strong{Syntax:}
-@code{keepring} name@code{;}
+@code{keepring} name @code{;}
 @item @strong{Purpose:}
 moves the specified ring to the next (upper) level. @code{keepring} can only
 be used inside of procedures. There it provides the possibility to keep
