@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$$";
+version="$id: $";
 info="
 LIBRARY: ntsolve.lib     PROCEDURES TO FIND ONE REAL SOLUTION OF POLYNOMIAL
                          SYSTEMS USING NEWTON ITERATION
