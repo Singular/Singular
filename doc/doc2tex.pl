@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: doc2tex.pl,v 1.26 2000-12-21 15:15:36 obachman Exp $
+# $Id: doc2tex.pl,v 1.27 2003-04-25 13:23:46 levandov Exp $
 ###################################################################
 #  Computer Algebra System SINGULAR
 #
@@ -459,7 +459,7 @@ sub HandleRef
     $line++;
     last if (/^\@c\s*ref\s*$/);
     
-    while (/\@ref{(.*?)}/)
+    while (/\@ref{(.*?)}[;\.]/)
     {
       $refs{$1} = 1;
       $_ = $';

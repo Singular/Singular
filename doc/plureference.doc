@@ -1,5 +1,5 @@
   @comment -*-texinfo-*-
-@comment $Id: plureference.doc,v 1.10 2003-04-01 13:46:52 levandov Exp $
+@comment $Id: plureference.doc,v 1.11 2003-04-25 13:23:47 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -48,6 +48,7 @@ The general syntax of a function is
 @menu
 * bracket::
 * eliminate@value{PSUFFIX}::
+* kbase@value{PSUFFIX}::
 * memory@value{PSUFFIX}::
 * minres@value{PSUFFIX}::
 * mres@value{PSUFFIX}::
@@ -58,7 +59,7 @@ The general syntax of a function is
 * std@value{PSUFFIX}::
 * syz@value{PSUFFIX}:: 
 * twostd::
-* vdim::
+* vdim@value{PSUFFIX}::
 @end menu
 
 
@@ -104,7 +105,7 @@ system("bracket",p,q);
 @end table
 
 @c ---------------------------------------
-@node eliminate@value{PSUFFIX}, memory@value{PSUFFIX}, bracket, Functions@value{PSUFFIX}
+@node eliminate@value{PSUFFIX}, kbase@value{PSUFFIX}, bracket, Functions@value{PSUFFIX}
 @subsection eliminate@value{PSUFFIX}
 @cindex eliminate@value{PSUFFIX}
 
@@ -152,16 +153,63 @@ eliminate(I,a);
 @c example
 @end smallexample
 @end table
-@c @c ref
-@c See
-@c @ref{hilb};
-@c @ref{ideal};
-@c @ref{module};
-@c @ref{std}.
-@c @c ref
-
+@c ref
+See
+@ref{ideal@value{PSUFFIX}};
+@ref{module@value{PSUFFIX}};
+@ref{std@value{PSUFFIX}}.
+@c ref
+@c ------------------------------------------------
+@node kbase@value{PSUFFIX}, memory@value{PSUFFIX}, eliminate@value{PSUFFIX}, Functions@value{PSUFFIX}
+@subsection kbase@value{PSUFFIX}
+@cindex kbase@value{PSUFFIX}
+@table @code
+@item @strong{Syntax:}
+@code{kbase (} ideal_expression @code{)}
+@*@code{kbase (} module_expression @code{)}
+@*@code{kbase (} ideal_expression@code{,} int_expression@code{)}
+@*@code{kbase (} module_expression@code{,} int_expression@code{)}
+@item @strong{Type:}
+the same as the input type of the first argument
+@item @strong{Purpose:}
+with one argument:
+computes a vector space basis (consisting of monomials)
+of the quotient ring by the ideal,
+resp.@: of a free module by the module, in case it is finite dimensional
+and if the input is a standard basis with respect to the ring ordering.
+If the input is not a standard basis, the leading terms of the input are
+used and the result may have no meaning.
+@*With two arguments: computes the part of a vector space basis of the
+respective quotient with degree of the monomials equal to the
+second argument. Here, the quotient does not need to be finite dimensional.
+@item @strong{Example:}
+@smallexample
+@c @c example
+@c   ring r=0,(x,y,z),dp;
+@c   matrix d[3][3];
+@c   d[1,2]=-z;
+@c   d[1,3]=2x;
+@c   d[2,3]=-2y;
+@c   system("PLURAL",1,d);
+@c   ideal i=x2,y2,z2-1;
+@c   i=std(i);
+@c   i;
+@c   kbase(i);
+@c   vdim(i);
+@c   ideal j=x,z-1;
+@c   j=std(j);
+@c   kbase(j,3);
+@c @c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{ideal@value{PSUFFIX}};
+@ref{module@value{PSUFFIX}};
+@ref{vdim@value{PSUFFIX}}.
+@c ref
 @c ---------------------------------------
-@node  memory@value{PSUFFIX}, minres@value{PSUFFIX}, eliminate@value{PSUFFIX}, Functions@value{PSUFFIX}
+@node  memory@value{PSUFFIX}, minres@value{PSUFFIX}, kbase@value{PSUFFIX}, Functions@value{PSUFFIX}
 @subsection memory@value{PSUFFIX}
 @cindex memory@value{PSUFFIX}
 @cindex memory managment
@@ -188,12 +236,12 @@ see also @ref{option}).
 @item @strong{Example:}
 @smallexample
 @c example
-ring r=0,(x(1..500)),dp;
+ring r=0,(x(1..100)),dp;
 system("PLURAL",-1,0);
-poly p=(x(1)+x(500))^50;
+poly p=(x(1)+x(100))^50;
 proc ReportMemoryUsage()
 {  "Memory currently used by SINGULAR     :",memory(0),"Byte (",
-   memory(0)/1023, "KByte)" +newline+
+   memory(0)/101023, "KByte)" +newline+
    "Memory currently allocated from system:",memory(1), "Byte (",
    memory(1)/1023, "KByte)";
    "Maximal memory allocated from system  :",memory(2), "Byte (",
@@ -207,7 +255,7 @@ kill r;
 @end smallexample
 @end table
 @c ref
-
+@ref{option@value{PSUFFIX}};
 @c ref
 
 
@@ -259,12 +307,12 @@ print(matrix(MF[a]));
 @end smallexample
 @end table
 
-@c @c ref
-@c See
-@c @ref{res};
-@c @ref{mres};
-@c @ref{sres}.
-@c @c ref
+@c ref
+See
+@ref{minres@value{PSUFFIX}};
+@ref{mres@value{PSUFFIX}};
+@ref{nres@value{PSUFFIX}}.
+@c ref
 
 
 
@@ -352,18 +400,19 @@ print(matrix(M[a]));
 @c example
 @end smallexample
 @end table
-@c @c ref
-@c See
-@c @ref{ideal@value{PSUFFIX}};
-@c @ref{minres@value{PSUFFIX}};
-@c @ref{nres@value{PSUFFIX}};
-@c @ref{module@value{PSUFFIX}};
-@c @ref{res@value{PSUFFIX}};
-@c @c ref
+@c ref
+See
+@ref{ideal@value{PSUFFIX}};
+@ref{minres@value{PSUFFIX}};
+@ref{mres@value{PSUFFIX}};
+@ref{nres@value{PSUFFIX}};
+@ref{module@value{PSUFFIX}};
+
+@c ref
 
 
 
-
+@c ---------------------------------------
 @node  nres@value{PSUFFIX}, option@value{PSUFFIX}, mres@value{PSUFFIX}, Functions@value{PSUFFIX}
 @subsection nres@value{PSUFFIX}
 @cindex nres@value{PSUFFIX}
@@ -446,17 +495,15 @@ print(matrix(F[a]));
 @c example
 @end smallexample
 @end table
-@c @c @c ref
-@c @c See
-@c @c @ref{ideal};
-@c @c @ref{lres};
-@c @c @ref{hres};
-@c @c @ref{module};
-@c @c @ref{mres};
-@c @c @ref{res};
-@c @c @ref{resolution};
-@c @c @ref{sres}.
-@c @c @c ref
+@c ref
+See
+@ref{ideal@value{PSUFFIX}};
+@ref{module@value{PSUFFIX}};
+@ref{minres@value{PSUFFIX}};
+@ref{mres@value{PSUFFIX}};
+@ref{nres@value{PSUFFIX}};
+
+@c ref
 
 
 
@@ -592,10 +639,10 @@ shows memory usage in square brackets (see @ref{memory@value{PSUFFIX}}).
 
 @end table
 
-@c @c ref
-@c See
-@c @ref{std}.
-@c @c ref
+@c ref
+See
+@ref{std@value{PSUFFIX}}.
+@c ref
 
 
 
@@ -741,23 +788,22 @@ NF(z,J);
 @end smallexample
 @end table
 
-@c @c ref
-@c See
-@c @ref{ideal@value{PSUFFIX}},
-@c @ref{module@value{PSUFFIX}},
-@c @ref{std@value{PSUFFIX}}.
+@c ref
+See
+@ref{ideal@value{PSUFFIX}};
+@ref{module@value{PSUFFIX}};
+@ref{std@value{PSUFFIX}}.
+@c ref
 
-@c @ifset singularmanual
-@c @ref{vector}.
-@c @end ifset 
+@ifset singularmanual
+@c ref
+@ref{vector}.
+@c ref
+@end ifset 
 
-@c @ifclear singularmanual
-@c see also @code{vector} in @sc{Singular} manual.
-@c @end ifclear   
-
-
-
-
+@ifclear singularmanual
+see also @code{vector} in @sc{Singular} manual.
+@end ifclear   
 
 @c ---------------------------------------
 @node std@value{PSUFFIX}, syz@value{PSUFFIX}, reduce@value{PSUFFIX}, Functions@value{PSUFFIX}
@@ -820,18 +866,12 @@ J;
 @c example
 @end smallexample
 @end table
-@c @c ref
-@c See
-@c @ref{ideal};
-@c @ref{ring};
-@c @ref{option};
-@c @ref{facstd};
-@c @ref{fglm};
-@c @ref{groebner};
-@c @ref{mstd};
-@c @ref{stdfglm};
-@c @ref{stdhilb}.
-@c @c ref
+@c ref
+See
+@ref{ideal@value{PSUFFIX}};
+@ref{ring@value{PSUFFIX}};
+@ref{option@value{PSUFFIX}};
+@c ref
 
 
 @c -------------------------------------------------
@@ -871,17 +911,14 @@ print(a);
 @c example
 @end smallexample
 @end table
-@c @c ref
-@c See
-@c @ref{ideal};
-@c @ref{lres};
-@c @ref{hres};
-@c @ref{module};
-@c @ref{mres};
-@c @ref{nres};
-@c @ref{res};
-@c @ref{sres.
-@c @c ref
+@c ref
+See
+@ref{ideal@value{PSUFFIX}};
+@ref{module@value{PSUFFIX}};
+@ref{mres@value{PSUFFIX}};
+@ref{nres@value{PSUFFIX}};
+@ref{minres@value{PSUFFIX}};
+@c ref
 
 
 
@@ -946,13 +983,19 @@ There are algebras with no two-sided ideals (like Weyl algebras).
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
-computes the vector space dimension of the ring, resp.@: free module,
-modulo the ideal, resp.@: module,
-generated by the initial terms of the given generators.
+computes the vector space dimension of the 
+factor-module that equals
+ring (resp. free module) modulo the ideal (resp. submodule),
+generated by the initial terms of the given generators. 
+@* If the factor-module is not of finite dimension, -1 is returned.
+  
 If the generators form a Groebner basis,
-this is the same as the vector space dimension of the ring, resp.@:
-free module, modulo the ideal, resp.@: module.
-@*If the ideal, resp.@: module, is not zero-dimensional, -1 is returned.
+this is the same as the vector space dimension of the 
+factor-module. 
+
+@item @strong{Note:}
+you have the ring structure on the ring modulo the ideal if and only
+if the ideal is two-sided. 
 
 @item @strong{Example:}
 @smallexample
@@ -971,21 +1014,24 @@ vdim(I);
 @c example
 @end smallexample
 @end table
-@c @c ref
-@c See
-@c @ref{ideal@value{PSUFFIX} };
-@c @ref{std@value{PSUFFIX} };
-@c @c ref
-@c @ifset singularmanual
-@c @ref{dim};
-@c @ref{degree};
-@c @ref{mult};
-@c @ref{kbase}.
-@c @end ifset
-@c @ifclear singularmanual
-@c see also @sc{Singular} manual sections dim, degree, mult, kbase.
-@c @end ifclear
-@c @c ref
+@c ref
+See
+@ref{ideal@value{PSUFFIX} };
+@ref{std@value{PSUFFIX} };
+@ref{kbase@value{PSUFFIX}}.
+@c ref
+
+@ifset singularmanual
+@c ref
+@ref{dim};
+@ref{degree};
+@ref{mult};
+@c ref
+@end ifset
+
+@ifclear singularmanual
+see also @sc{Singular} manual sections dim, degree, mult, kbase.
+@end ifclear
 
 
 
@@ -997,7 +1043,9 @@ vdim(I);
 
 See SINGULAR Manual
 @ifset singularmanual
+@c ref
 (@ref{Control structures})
+@c ref
 @end ifset
 
 @c ---------------------------------------

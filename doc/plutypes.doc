@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: plutypes.doc,v 1.10 2003-04-01 13:46:53 levandov Exp $
+@comment $Id: plutypes.doc,v 1.11 2003-04-25 13:23:48 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -55,7 +55,8 @@ For the general syntax of a declaration see
 @cindex  untyped definitions 
 
 Under an ideal @sc{Plural} understand a @strong{left} ideal. Ideals are represented as lists of polynomials which are interpreted as
-left generators of  the ideal. For the operations with two-sided ideals see @ref{twostd}. 
+left generators of  the ideal. For the operations with two-sided ideals see 
+ @ref{twostd}. 
 
 
 Like polynomials ideals
@@ -233,7 +234,7 @@ minimized from the second module on
 (see @ref{nres@value{PSUFFIX}})          
 @item reduce
 normal form with respect to a Groebner basis (see @ref{reduce@value{PSUFFIX}})
-@c@item res
+@c @item res
 @c free resolution of an ideal resp.@: module but not changing the given ideal resp.@: module(see @ref{res@value{PSUFFIX}})
 @item std
 Groebner basis computation (see @ref{std@value{PSUFFIX}})
@@ -782,7 +783,7 @@ resp. module (see @ref{mres@value{PSUFFIX}})
 @item nres 
 computes a free resolution of an ideal resp.@: module M which is
 minimized from the second module on (see @ref{nres@value{PSUFFIX}})          
-@c@@item res
+@c @item res
 @c free resolution of an ideal resp.@: module but not changing the given ideal resp.@: module(see @ref{res@value{PSUFFIX}})
 @end table
 
@@ -910,5 +911,5 @@ following guide lines into consideration:
 
 @table @code
 @item qring
-quotient ring (see @ref{ qring}) 
+quotient ring (see @ref{qring@value{PSUFFIX}}) 
 @end table
