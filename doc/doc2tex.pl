@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: doc2tex.pl,v 1.12 1999-07-21 21:04:21 obachman Exp $
+# $Id: doc2tex.pl,v 1.13 1999-07-22 07:21:31 wichmann Exp $
 ###################################################################
 #  Computer Algebra System SINGULAR
 #
@@ -104,7 +104,7 @@ while (@ARGV && $ARGV[0] =~ /^-/)
 {
   $_ = shift(@ARGV);
   if (/^-S(ingular)?$/)  { $Singular = shift(@ARGV); next;}
-  if (/^-o(output)?$/)   { $tex_file = shift(@ARGV); next;}
+  if (/^-o(utput)?$/)    { $tex_file = shift(@ARGV); next;}
   if (/^-no_r(euse)?$/)  { $reuse = 0; next;}
   if (/^-c(lean)?$/)     { $clean = 1; next;}
   if (/^-no_e(x)?$/)     { $no_ex = 1; next;}
