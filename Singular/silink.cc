@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: silink.cc,v 1.43 2002-06-03 12:15:51 Singular Exp $ */
+/* $Id: silink.cc,v 1.44 2004-01-22 15:01:22 Singular Exp $ */
 
 /*
 * ABSTRACT: general interface to links
@@ -17,6 +17,7 @@
 #include "ipid.h"
 #include "silink.h"
 #include "ipshell.h"
+#include "matpol.h"
 #include "ring.h"
 #include "lists.h"
 #include "ideals.h"
