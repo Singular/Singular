@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.108 2000-08-24 15:20:39 obachman Exp $ */
+/* $Id: ring.cc,v 1.109 2000-08-30 16:04:39 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -42,6 +42,7 @@ static const char * const ringorder_name[] =
   "s", //ringorder_s,
   "lp", //ringorder_lp,
   "dp", //ringorder_dp,
+  "rp", //ringorder_rp,
   "Dp", //ringorder_Dp,
   "wp", //ringorder_wp,
   "Wp", //ringorder_Wp,
@@ -2306,7 +2307,98 @@ unsigned long rGetExpSize(unsigned long bitmask, int & bits)
   return bitmask;
 }
 
-BOOLEAN rComplete(ring r, int force)
+/*2
+ * create a copy of the ring r, which must be equivalent to currRing
+ * used for std computations
+ * may share data structures with currRing
+ * DOES CALL rComplete
+ */
+#if 0
+// TODO: exp_limit
+// omit_comp
+ring rModifyRing(ring r, BOOLEAN omit_degree, BOOLEAN omit_comp, int exp_limit)
+{
+  assume (r != NULL );
+  assume (exp_limit > 1);
+
+  ring res=(ring)omAllocBin(ip_sring_bin);
+
+  memcpy4(res,r,sizeof(ip_sring));
+  res->VarOffset = NULL;
+  res->ref=0;
+  if (r->parameter!=NULL)
+  {
+    res->minpoly=r->minpoly;
+    int l=rPar(r);
+    res->parameter=r->parameter;
+  }
+  int j1,j2;
+  int i=rBlocks(r);
+  res->wvhdl   = r->wvhdl;
+  res->order   = (int *) omAlloc(i * sizeof(int));
+  res->block0  = r->block0;
+  res->block1  = r->block1;
+  j=0; /*  index in r, index in res */
+  loop
+  {
+    switch(r->order[j])
+    {
+      case ringorder_C:
+      case ringorder_c:
+        if (!omit_comp)
+        {
+          res->order[j]=r->order[j];
+        }
+	else
+	{
+	  ............
+	}
+        break;
+      case ringorder_wp:
+      case ringorder_dp:
+      case ringorder_ws:
+      case ringorder_ds:
+        if(!omit_degree)
+        {
+          res->order[j]=r->order[j];
+          omit_degree=FALSE;
+        }
+        else
+        {
+          res->order[j]=ringorder_rp;
+        }
+        break;
+      case ringorder_Wp:
+      case ringorder_Dp:
+      case ringorder_Ws:
+      case ringorder_Ds:
+        if(!omit_degree)
+        {
+          res->order[j]=r->order[j];
+          omit_degree=FALSE;
+        }
+        else
+        {
+          res->order[j]=ringorder_lp;
+        }
+        break;
+      default:
+        res->order[j]=r->order[j];
+        break;
+    }
+    j++;
+    res->order[j]=ringorder_no;
+    if (j==i) break;
+  }
+
+  res->names   = r->names;
+  res->idroot = NULL;
+  res->qideal =  r->names;
+  rComplete(res);
+  return res;
+}
+
+BOOLEAN rComplete(ring r, int force) // #ifdef HAVE_SHIFTED_EXPONENTS
 {
   if (r->VarOffset!=NULL && force == 0) return FALSE;
 
@@ -2373,6 +2465,11 @@ BOOLEAN rComplete(ring r, int force)
 
       case ringorder_ls:
         rO_LexVars_neg(j, j_bits, r->block0[i],r->block1[i], prev_ordsgn,
+                       tmp_ordsgn,v, bits);
+        break;
+
+      case ringorder_rp:
+        rO_LexVars_neg(j, j_bits, r->block1[i],r->block0[i], prev_ordsgn,
                        tmp_ordsgn,v, bits);
         break;
 
@@ -3545,7 +3642,7 @@ void rSetSyzComp(int k)
 #ifdef PDEBUG
 #ifdef HAVE_SHIFTED_EXPONENTS
   extern int pDBsyzComp;
-  pDBsyzComp=k; 
+  pDBsyzComp=k;
 #endif
 #endif
 }
