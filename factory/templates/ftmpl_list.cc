@@ -1,9 +1,13 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftmpl_list.cc,v 1.5 1997-06-20 10:45:22 schmidt Exp $ */
+/* $Id: ftmpl_list.cc,v 1.6 1997-06-30 15:45:11 schmidt Exp $ */
 
 #include <factoryconf.h>
 
+#ifdef macintosh
+#include <::templates:ftmpl_list.h>
+#else
 #include <templates/ftmpl_list.h>
+#endif
 
 template <class T>
 ListItem<T>::ListItem( const ListItem<T>& i )
