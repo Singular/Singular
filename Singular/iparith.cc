@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.211 2000-05-15 12:47:44 Singular Exp $ */
+/* $Id: iparith.cc,v 1.212 2000-05-25 11:43:02 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -4061,6 +4061,12 @@ static BOOLEAN jjHILBERT3(leftv res, leftv u, leftv v, leftv w)
   assumeStdFlag(u);
   intvec *module_w=(intvec *)atGet(u,"isHomog");
   intvec *wdegree=(intvec*)w->Data();
+  if (wdegree->length()!=pVariables)
+  {
+    Werror("weight vector must have size %d, not %d",
+           pVariables,wdegree->length());
+    return TRUE;
+  }
   intvec *iv=hFirstSeries((ideal)u->Data(),module_w,currQuotient,wdegree);
   switch((int)v->Data())
   {
