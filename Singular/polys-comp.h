@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-comp.h,v 1.18 1999-11-15 17:20:39 obachman Exp $ */
+/* $Id: polys-comp.h,v 1.19 2000-02-02 18:04:59 Singular Exp $ */
 
 /***************************************************************
  *
@@ -71,8 +71,10 @@ while (0)
 #define _prMonCmp(p1, p2, r, actionE, actionG, actionS)             \
 do                                                                  \
 {                                                                   \
-  register const u_s long* __s1 = &(p1->exp.l[r->pCompLowIndex]);   \
-  register const u_s long* __s2 = &(p2->exp.l[r->pCompLowIndex]);   \
+  register const u_s long* __s1 =                                   \
+                    (const long *)&(p1->exp.l[r->pCompLowIndex]);   \
+  register const u_s long* __s2 =                                   \
+                    (const long *)&(p2->exp.l[r->pCompLowIndex]);   \
   register int __i = r->pCompLSize - 1;                             \
   _memcmp(__s1, __s2, __i, actionE, goto _NotEqual);                \
                                                                     \
