@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.136 2000-11-03 14:50:24 obachman Exp $ */
+/* $Id: ring.cc,v 1.137 2000-11-07 15:08:56 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -2391,13 +2391,34 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
   loop
   {
     BOOLEAN copy_block_index=TRUE;
-    switch(r->order[i])
+    int r_ord=r->order[i];
+    if (r->block0[i]==r->block1[i])
+    {
+      switch(r_ord)
+      {
+        case ringorder_wp:
+        case ringorder_dp:
+        case ringorder_Wp:
+        case ringorder_Dp:
+	  r_ord=ringorder_lp;
+          break;
+        case ringorder_Ws:
+        case ringorder_Ds:
+        case ringorder_ws:
+        case ringorder_ds:
+	  r_ord=ringorder_ls;
+          break;
+        default:
+          break;
+      }
+    }
+    switch(r_ord)
     {
       case ringorder_C:
       case ringorder_c:
         if (!omit_comp)
         {
-          order[j]=r->order[i];
+          order[j]=r_ord; /*r->order[i]*/;
         }
         else
         {
@@ -2413,7 +2434,7 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
       case ringorder_ds:
         if(!omit_degree)
         {
-          order[j]=r->order[i];
+          order[j]=r_ord; /*r->order[i]*/;
         }
         else
         {
@@ -2428,7 +2449,7 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
       case ringorder_Ds:
         if(!omit_degree)
         {
-          order[j]=r->order[i];
+          order[j]=r_ord; /*r->order[i];*/
         }
         else
         {
@@ -2438,7 +2459,7 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
         }
         break;
       default:
-        order[j]=r->order[i];
+        order[j]=r_ord; /*r->order[i];*/
         break;
     }
     if (copy_block_index)
