@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: claptmpl.cc,v 1.8 1997-05-21 13:05:09 obachman Exp $
+// $Id: claptmpl.cc,v 1.9 1997-06-17 09:52:48 pohl Exp $
 /*
 * ABSTRACT - instantiation of all templates
 */
@@ -10,50 +10,67 @@
 #include "mod2.h"
 
 #ifdef HAVE_FACTORY
-#define SINGULAR 1
-#include <factory.h>
+  #define SINGULAR 1
+  #include <factory.h>
 #endif
 
 #if defined(HAVE_FACTORY) || defined(HAVE_FGLM)
-#include <templates/list.cc>
-#endif
+  #ifdef macintosh
+    #include <::templates:list.cc>
+  #else
+    #include <templates/list.cc>
+  #endif
 
-#ifdef HAVE_FGLM
-#include "fglm.h"
-#endif
+  #ifdef HAVE_FGLM
+    #include "fglm.h"
+  #endif
 
-#ifdef HAVE_FACTORY
-#include <templates/array.cc>
-#include <templates/factor.cc>
-#include <templates/functions.h>
-#include <templates/matrix.cc>
+  #ifdef HAVE_FACTORY
+    #ifdef macintosh
+      #include <::templates:array.cc>
+      #include <::templates:factor.cc>
+      #include <::templates:functions.h>
+      #include <::templates:matrix.cc>
+      template List<CanonicalForm> Difference<CanonicalForm>(const List<CanonicalForm>&,const List<CanonicalForm>&);
+      template List<CanonicalForm> Union<CanonicalForm>(const List<CanonicalForm>&,const List<CanonicalForm>&);
+      template List<CFFactor> Union<CFFactor>(const List<CFFactor>&,const List<CFFactor>&);
+      template List<Variable> Union<Variable> ( const List<Variable>&, const List<Variable>& );
+      template List<Variable> Difference<Variable> ( const List<Variable>&, const List<Variable>& );
+    #else
+      #include <templates/array.cc>
+      #include <templates/factor.cc>
+      #include <templates/functions.h>
+      #include <templates/matrix.cc>
+    #endif
 
-template class Factor<CanonicalForm>;
-template class List<CFFactor>;
-template class ListItem<CFFactor>;
-template class ListItem<CanonicalForm>;
-template class ListIterator<CFFactor>;
-template class List<CanonicalForm>;
-template class ListIterator<CanonicalForm>;
-template class Array<CanonicalForm>;
-template class List<MapPair>;
-template class ListItem<MapPair>;
-template class ListIterator<MapPair>;
-template class Matrix<CanonicalForm>;
-template class SubMatrix<CanonicalForm>;
+    template class Factor<CanonicalForm>;
+    template class List<CFFactor>;
+    template class ListItem<CFFactor>;
+    template class ListItem<CanonicalForm>;
+    template class ListIterator<CFFactor>;
+    template class List<CanonicalForm>;
+    template class ListIterator<CanonicalForm>;
+    template class Array<CanonicalForm>;
+    template class List<MapPair>;
+    template class ListItem<MapPair>;
+    template class ListIterator<MapPair>;
+    template class Matrix<CanonicalForm>;
+    template class SubMatrix<CanonicalForm>;
 
-template List<CFFactor> Union ( const List<CFFactor>&, const List<CFFactor>& );
+    #ifndef macintosh
+      template List<CFFactor> Union ( const List<CFFactor>&, const List<CFFactor>& );
 
-template CanonicalForm tmax ( const CanonicalForm&, const CanonicalForm& );
-template CanonicalForm tmin ( const CanonicalForm&, const CanonicalForm& );
+      template CanonicalForm tmax ( const CanonicalForm&, const CanonicalForm& );
+      template CanonicalForm tmin ( const CanonicalForm&, const CanonicalForm& );
 
-template int tmax ( const int&, const int& );
-template int tmin ( const int&, const int& );
+      template int tmax ( const int&, const int& );
+      template int tmin ( const int&, const int& );
+    #endif
 
+  #endif
 // place here your own template stuff, not instantiated by factory
-
-#ifdef HAVE_LIBFAC_P
-#include <factor.h>
+  #ifdef HAVE_LIBFAC_P
+    #include <factor.h>
 
 // class.h:
 template <class T>
@@ -99,41 +116,42 @@ int operator== ( const Substitution<T> &f1, const Substitution<T> &f2 )
     return (f1.exp() == f2.exp()) && (f1.factor() == f2.factor());
 }
 
-template class List<int>;
-template class ListIterator<int>;
+    template class List<int>;
+    template class ListIterator<int>;
 
-template class List<IntList>;
-template class ListIterator<IntList>;
+    template class List<IntList>;
+    template class ListIterator<IntList>;
 
-template class Substitution<CanonicalForm>;
-template class Array<Variable>;
-template class Array<int>;
-typedef Substitution<CanonicalForm> SForm ;
-template class List<SForm>;
-template class ListIterator<SForm>;
-template class List<Variable>;
-template class ListIterator<Variable> ;
+    template class Substitution<CanonicalForm>;
+    template class Array<Variable>;
+    template class Array<int>;
+    typedef Substitution<CanonicalForm> SForm ;
+    template class List<SForm>;
+    template class ListIterator<SForm>;
+    template class List<Variable>;
+    template class ListIterator<Variable> ;
 
-template List<Variable> Union ( const List<Variable>&, const List<Variable>& );
-template List<Variable> Difference ( const List<Variable>&, const List<Variable>& );
+    #ifndef macintosh
+      template List<Variable> Union ( const List<Variable>&, const List<Variable>& );
+      template List<Variable> Difference ( const List<Variable>&, const List<Variable>& );
 
-template List<CanonicalForm> Union ( const List<CanonicalForm>&, const List<CanonicalForm>& );
-template List<CanonicalForm> Difference ( const List<CanonicalForm>&, const List<CanonicalForm>& );
+      template List<CanonicalForm> Union ( const List<CanonicalForm>&, const List<CanonicalForm>& );
+      template List<CanonicalForm> Difference ( const List<CanonicalForm>&, const List<CanonicalForm>& );
+    #endif
 
 // for charsets:
-template class List<CFList>;
-template class ListIterator<CFList>;
+    template class List<CFList>;
+    template class ListIterator<CFList>;
 
-#endif
+  #endif
 #endif
 
 #ifdef HAVE_FGLM
 // templates for fglm:
 
-template class List<fglmSelem>;
-template class ListIterator<fglmSelem>;
+  template class List<fglmSelem>;
+  template class ListIterator<fglmSelem>;
 
-template class List<fglmDelem>;
-template class ListIterator<fglmDelem>;
-
+  template class List<fglmDelem>;
+  template class ListIterator<fglmDelem>;
 #endif
