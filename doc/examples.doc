@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.32 1998-07-09 07:39:10 Singular Exp $
+@comment $Id: examples.doc,v 1.33 1998-07-22 11:46:33 siebert Exp $
 @comment this file contains the examples
 
 @c The following directives are necessary for proper compilation
@@ -1144,7 +1144,9 @@ from above.
   // Two transversal cusps in (k^3,0):
   ring r2 =0,(x,y,z),ds;
   ideal i =z2-1y3+x3y,xz,-1xy2+x4,x3z;
-  list resi=mres(i,0);       // computes a minimal resolution
+  resolution rs=mres(i,0);   // computes a minimal resolution
+  rs;                        // the standard representation of complexes
+    list resi=rs;            // convertion to a list
   print(resi[1]);            // the 1-st module is i minimized
   print(resi[2]);            // the 1-st syzygy module of i
   resi[3];                   // the 2-nd syzygy module of i
@@ -1157,10 +1159,12 @@ from above.
   ring P = 0,(a,b,c,d,e),dp;
   ideal j= 3c2-4bd+ae, -2bcd+3ad2+3b2e-4ace,
            8b2d2-9acd2-9b2ce+9ac2e+2abde-1a2e2;
-  list L=mres(j,0);
+  resolution rs=mres(j,0);
+  rs;
+  list L=rs;
   print(L[2]);
   // create an intmat with graded betti numbers
-  intmat B=betti(L);
+  intmat B=betti(rs);
   // this gives a nice output of betti numbers
   print(B,"betti");
   // the user has access to all betti numbers
