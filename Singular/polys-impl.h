@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.32 1999-09-27 15:05:29 obachman Exp $ */
+/* $Id: polys-impl.h,v 1.33 1999-09-28 15:01:20 obachman Exp $ */
 
 /***************************************************************
  *
@@ -98,7 +98,7 @@ extern int *pVarOffset;
 
 #define _pGetOrder(p)       ((p)->exp.l[currRing->pOrdIndex])
 
-#if defined(PDEBUG) && PDEBUG != 0
+#if defined(PDEBUG) && PDEBUG > 1
 extern Exponent_t pPDSetExp(poly p, int v, Exponent_t e, char* f, int l);
 extern Exponent_t pPDGetExp(poly p, int v, char* f, int l);
 extern Exponent_t pPDIncrExp(poly p, int v, char* f, int l);
@@ -136,7 +136,7 @@ extern Exponent_t pDBRingSetComp(ring r, poly p, Exponent_t k, char* f, int l);
 
 #define pSetCompS(p, k, l) pDBSetComp(p, k, l, __FILE__, __LINE__)
 
-#else  // ! (defined(PDEBUG) && PDEBUG != 0)
+#else  // ! (defined(PDEBUG) && PDEBUG > 1)
 
 #define _pSetExp(p,v,E)     (p)->exp.e[_pExpIndex(v)]=(E)
 #define _pGetExp(p,v)       (p)->exp.e[_pExpIndex(v)]
@@ -156,7 +156,7 @@ extern Exponent_t pDBRingSetComp(ring r, poly p, Exponent_t k, char* f, int l);
 #define _pRingSetComp(r,p,k)      (_pRingGetComp(r, p) = (k))
 #define pSetCompS(p, k,l)     _pSetComp(p, k)
 
-#endif // defined(PDEBUG) && PDEBUG != 0
+#endif // defined(PDEBUG) && PDEBUG > 1
 
 #define _pGetComp(p)        ((p)->exp.e[_pCompIndex])
 #define _pIncrComp(p)       _pGetComp(p)++
@@ -314,13 +314,13 @@ extern poly    _pFetchHeadDelete(ring r,poly a);
 #endif // DO_DEEP_PROFILE
 
 
-#if defined(PDEBUG) && PDEBUG == 1
-#define _pMonAddFast(p1, p2)  pDBMonAddFast(p1, p2, __FILE__, __LINE__)
-extern  void pDBMonAddFast(poly p1, poly p2, char* f, int l);
-inline void __pMonAddFast(poly p1, poly p2)
+#if defined(PDEBUG) && PDEBUG > 1
+#define _pMonAddOn(p1, p2)  pDBMonAddOn(p1, p2, __FILE__, __LINE__)
+extern  void pDBMonAddOn(poly p1, poly p2, char* f, int l);
+inline void __pMonAddOn(poly p1, poly p2)
 #else
-  DECLARE(void, _pMonAddFast(poly p1, poly p2))
-#endif // defined(PDEBUG) && PDEBUG == 1
+  DECLARE(void, _pMonAddOn(poly p1, poly p2))
+#endif // defined(PDEBUG) && PDEBUG > 1
 {
   int i = currRing->ExpLSize;
   long* s1 = &(p1->exp.l[0]);
@@ -335,13 +335,13 @@ inline void __pMonAddFast(poly p1, poly p2)
   }
 }
 
-#if defined(PDEBUG) && PDEBUG == 1
-#define _pMonSubFast(p1, p2)  pDBMonSubFast(p1, p2, __FILE__, __LINE__)
-extern  void pDBMonSubFast(poly p1, poly p2, char* f, int l);
-inline void __pMonSubFast(poly p1, poly p2)
+#if defined(PDEBUG) && PDEBUG > 1
+#define _pMonSubFrom(p1, p2)  pDBMonSubFrom(p1, p2, __FILE__, __LINE__)
+extern  void pDBMonSubFrom(poly p1, poly p2, char* f, int l);
+inline void __pMonSubFrom(poly p1, poly p2)
 #else
-  DECLARE(void, _pMonSubFast(poly p1, poly p2))
-#endif // defined(PDEBUG) && PDEBUG == 1
+  DECLARE(void, _pMonSubFrom(poly p1, poly p2))
+#endif // defined(PDEBUG) && PDEBUG > 1
 {
   int i = currRing->ExpLSize;
   long* s1 = &(p1->exp.l[0]);
@@ -358,13 +358,13 @@ inline void __pMonSubFast(poly p1, poly p2)
 }
 
 // Makes p1 a copy of p2 and adds on exponents of p3
-#if defined(PDEBUG) && PDEBUG == 1
-#define _pCopyAddFast(p1, p2, p3)  pDBCopyAddFast(p1, p2, p3, __FILE__, __LINE__)
-extern  void pDBCopyAddFast(poly p1, poly p2, poly p3, char* f, int l);
-inline void __pCopyAddFast(poly p1, poly p2, poly p3)
+#if defined(PDEBUG) && PDEBUG > 1
+#define _pMonAdd(p1, p2, p3)  pDBMonAdd(p1, p2, p3, __FILE__, __LINE__)
+extern  void pDBMonAdd(poly p1, poly p2, poly p3, char* f, int l);
+inline void __pMonAdd(poly p1, poly p2, poly p3)
 #else
-  DECLARE(void, _pCopyAddFast(poly p1, poly p2, poly p3))
-#endif // defined(PDEBUG) && PDEBUG == 1
+  DECLARE(void, _pMonAdd(poly p1, poly p2, poly p3))
+#endif // defined(PDEBUG) && PDEBUG > 1
 {
   long* s1 = &(p1->exp.l[0]);
   const long* s2 = &(p2->exp.l[0]);
@@ -382,37 +382,8 @@ inline void __pCopyAddFast(poly p1, poly p2, poly p3)
     s1++;
     s2++;
   }
-  // we first are supposed to do a copy from p2 to p1 -- therefore,
-  // component of p1 is set to comp of p2
-  // _pSetComp(p1, _pGetComp(p2));
 }
 
-// Similar to pCopyAddFast, except that we do not care about the "next" field
-#if defined(PDEBUG) && PDEBUG == 1
-#define _pCopyAddFast0(p1, p2, p3)  pDBCopyAddFast(p1, p2, p3, __FILE__, __LINE__)
-extern  void pDBCopyAddFast(poly p1, poly p2, poly p3, char* f, int l);
-inline void __pCopyAddFast0(poly p1, poly p2, poly p3)
-#else
-  DECLARE(void, _pCopyAddFast0(poly p1, poly p2, poly p3))
-#endif // defined(PDEBUG) && PDEBUG == 1
-{
-  long* s1 = &(p1->exp.l[0]);
-  const long* s2 = &(p2->exp.l[0]);
-  const long* s3 = &(p3->exp.l[0]);
-  const long* const ub = s3 + currRing->ExpLSize;
-
-  p1->coef = p2->coef;
-
-  for (;;)
-  {
-    *s1 = *s2 + *s3;
-    s3++;
-    if (s3 == ub) break;
-    s1++;
-    s2++;
-  }
-  // _pSetComp(p1, _pGetComp(p2));
-}
 
 #if SIZEOF_LONG == 4
 
@@ -474,13 +445,13 @@ DECLARE(BOOLEAN, __pDivisibleBy(poly a, poly b))
 }
 #endif
 
-#if defined(PDEBUG) && PDEBUG == 1
+#if defined(PDEBUG) && PDEBUG > 1
 #define _pDivisibleBy(a,b)   pDBDivisibleBy(a, b, __FILE__, __LINE__)
 extern  BOOLEAN pDBDivisibleBy(poly p1, poly p2, char* f, int l);
 inline BOOLEAN _pDivisibleBy_orig(poly a, poly b)
 #else
 inline BOOLEAN _pDivisibleBy(poly a, poly b)
-#endif // defined(PDEBUG) && PDEBUG == 1
+#endif // defined(PDEBUG) && PDEBUG > 1
 {
   if ((a!=NULL)&&((_pGetComp(a)==0) || (_pGetComp(a) == _pGetComp(b))))
   {
@@ -489,25 +460,25 @@ inline BOOLEAN _pDivisibleBy(poly a, poly b)
   return FALSE;
 }
 
-#if defined(PDEBUG) && PDEBUG == 1
+#if defined(PDEBUG) && PDEBUG > 1
 #define _pDivisibleBy1(a,b)   pDBDivisibleBy1(a, b, __FILE__, __LINE__)
 extern  BOOLEAN pDBDivisibleBy1(poly p1, poly p2, char* f, int l);
 inline BOOLEAN _pDivisibleBy1_orig(poly a, poly b)
 #else
 inline BOOLEAN _pDivisibleBy1(poly a, poly b)
-#endif // defined(PDEBUG) && PDEBUG == 1
+#endif // defined(PDEBUG) && PDEBUG > 1
 {
   if (_pGetComp(a) == 0 || _pGetComp(a) == _pGetComp(b))
     return __pDivisibleBy(a,b);
   return FALSE;
 }
 
-#if defined(PDEBUG) && PDEBUG == 1
+#if defined(PDEBUG) && PDEBUG > 1
 #define _pDivisibleBy2(a,b)   pDBDivisibleBy2(a, b, __FILE__, __LINE__)
 extern  BOOLEAN pDBDivisibleBy2(poly p1, poly p2, char* f, int l);
 #else
 #define _pDivisibleBy2(a,b) __pDivisibleBy(a,b)
-#endif // defined(PDEBUG) && PDEBUG == 1
+#endif // defined(PDEBUG) && PDEBUG > 1
 
 
 DECLARE(BOOLEAN, _pEqual(poly p1, poly p2))
@@ -524,6 +495,7 @@ DECLARE(BOOLEAN, _pEqual(poly p1, poly p2))
     s2++;
   }
 }
+
 /***************************************************************
  *
  * Misc. things

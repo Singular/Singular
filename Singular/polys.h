@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.22 1999-09-28 09:31:55 obachman Exp $ */
+/* $Id: polys.h,v 1.23 1999-09-28 15:01:20 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
 */
@@ -129,6 +129,7 @@ extern void pSetGlobals(ring r, BOOLEAN complete = TRUE);
 /*-----------the ordering of monomials:-------------*/
 extern pSetmProc pSetm;
 extern pCompProc pComp0;
+#define pSetmComp pSetm
 // this is needed here as long as monomials with negative exponents might be
 // compared (see in spolys.cc)
 extern pCompProc t_pComp0;
@@ -220,14 +221,13 @@ extern  poly pHeadProc(poly p);
 #define pRingDelete(r, m)        _pRingDelete(r, m)
 
 
-// Adds exponents of p2 to exponents of p1; updates all Order fields
-// assumes that exponents >= 0 and < MAX_EXPONENT / 2
-#define pMonAddFast(p1, p2) _pMonAddFast(p1, p2)
-#define pMonSubFast(p1, p2) _pMonSubFast(p1, p2)
-// Is equivalent to pCopy2(p1, p2);pMonAddFast(p1, p3);
-#define pCopyAddFast(p1, p2, p3)    _pCopyAddFast(p1, p2, p3)
-// Similar to pCopyAddFast, except that we do not care about the next field
-#define pCopyAddFast0(p1, p2, p3)  _pCopyAddFast0(p1, p2, p3)
+// Adds exponents of p2 to exponents of p1
+// assumes that exponents >= 0 and and one Component != 0
+#define pMonAddOn(p1, p2)   _pMonAddOn(p1, p2)
+// Similar to pMonAddOn, excpet that new exponents are written in p1
+#define pMonAdd(p1, p2, p3) _pMonAdd(p1, p2, p3)
+// Subtracts exponetns of p1 from p1, assumes both Components are Equal
+#define pMonSubFrom(p1, p2) _pMonSubFrom(p1, p2)
 
 poly      pmInit(char *s, BOOLEAN &ok);   /* monom -> poly */
 void      ppDelete(poly * a, ring r);

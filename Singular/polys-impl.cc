@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.cc,v 1.23 1999-09-27 15:05:29 obachman Exp $ */
+/* $Id: polys-impl.cc,v 1.24 1999-09-28 15:01:19 obachman Exp $ */
 
 /***************************************************************
  *
@@ -27,6 +27,7 @@
 #include "numbers.h"
 #include "polys.h"
 #include "ring.h"
+#include "polys-impl.h"
 
 inline void pRingCopy2ExpV(poly dest, poly src, ring src_r)
 {
@@ -662,9 +663,7 @@ poly _pHead0(poly p)
  *
  ***************************************************************/
 
-#ifdef PDEBUG
-
-#if PDEBUG != 0
+#if defined(PDEBUG) && PDEBUG > 1
 Exponent_t pPDSetExp(poly p, int v, Exponent_t e, char* f, int l)
 {
   if (v == 0)
@@ -852,18 +851,18 @@ Exponent_t pDBRingSetComp(ring r, poly p, Exponent_t k, char* f, int l)
 }
 
 // checks whether fast monom add did not overflow
-void pDBMonAddFast(poly p1, poly p2, char* f, int l)
+void pDBMonAddOn(poly p1, poly p2, char* f, int l)
 {
   poly ptemp = pNew();
   pCopy2(ptemp, p1);
 
   if (pGetComp(p1) != 0 && pGetComp(p2) != 0)
   {
-    Warn("Error in pMonAddFast: both components %d:%d !=0 in %s:%d",
+    Warn("Error in pMonAddOn: both components %d:%d !=0 in %s:%d",
          pGetComp(p1), pGetComp(p2), f, l);
   }
 
-  __pMonAddFast(p1, p2);
+  __pMonAddOn(p1, p2);
 
   for (int i=1; i<=pVariables; i++)
   {
@@ -873,27 +872,31 @@ void pDBMonAddFast(poly p1, poly p2, char* f, int l)
 
   if (! pEqual(ptemp, p1))
   {
-    Print("Error in pMonAddFast in %s:%d\n", f, l);
+    Print("Error in pMonAddOn in %s:%d\n", f, l);
   }
 
   pFree1(ptemp);
 }
 
-void pDBMonSubFast(poly p1, poly p2, char* f, int l)
+void pDBMonSubFrom(poly p1, poly p2, char* f, int l)
 {
   poly ptemp = pNew();
   pCopy2(ptemp, p1);
 
   if ((pGetComp(p1) != pGetComp(p2)) && (pGetComp(p2)!=0))
   {
-    Warn("Error in pMonSubFast: components are different %d:%d in %s:%d",
+    Warn("Error in pMonSubFrom: components are different %d:%d in %s:%d",
          pGetComp(p1), pGetComp(p2), f, l);
   }
 
-  __pMonSubFast(p1, p2);
+  __pMonSubFrom(p1, p2);
 
   for (int i=1; i<=pVariables; i++)
   {
+    if (pGetExp(ptemp, i) < pGetExp(p2, i))
+    {
+      Warn("Error in pMonSubFrom: %dth exponent %d of p1 smaller than %d of p2", i, pGetExp(ptemp, i), pGetExp(p2, i));
+    }
     pSubExp(ptemp, i, pGetExp(p2, i));
   }
   pSetComp(ptemp, pGetComp(ptemp)-pGetComp(p2));
@@ -901,33 +904,31 @@ void pDBMonSubFast(poly p1, poly p2, char* f, int l)
 
   if (! pEqual(ptemp, p1))
   {
-    Warn("Error in pMonSubFast in %s:%d", f, l);
+    Warn("Error in pMonSubFrom in %s:%d", f, l);
   }
 
   pFree1(ptemp);
 }
 
-void pDBCopyAddFast(poly p1, poly p2, poly p3, char* f, int l)
+void pDBMonAdd(poly p1, poly p2, poly p3, char* f, int l)
 {
   if (pGetComp(p3) != 0 && pGetComp(p2) != 0)
   {
-    Warn("Error in pCopyAddFast: both components %d:%d !=0 in %s:%d",
+    Warn("Error in pMonAdd: both components %d:%d !=0 in %s:%d",
          pGetComp(p3), pGetComp(p2), f, l);
-    //mmDBInfoBlock(p3);
-    //mmDBInfoBlock(p2);
   }
   if (p2 == p1 || p3 == p1)
   {
-    Print("Error in pCopyAddFast: Destination equals source in %s:%d\n", f, l);
+    Print("Error in pMonAdd: Destination equals source in %s:%d\n", f, l);
   }
   poly ptemp = pNew();
-  __pCopyAddFast(ptemp, p2, p3);
+  __pMonAdd(ptemp, p2, p3);
 
   pCopy2(p1, p2);
-  pDBMonAddFast(p1, p3, f, l);
+  pDBMonAddOn(p1, p3, f, l);
 
   if (! pEqual(ptemp, p1))
-    Print("Error in pCopyMonAddFast in %s:%d\n", f, l);
+    Print("Error in pCopyMonAddOn in %s:%d\n", f, l);
   pFree1(ptemp);
 }
 
@@ -982,8 +983,9 @@ BOOLEAN pDBDivisibleBy2(poly a, poly b, char* f, int l)
   return f_istrue;
 }
 
-#endif // PDEBUG != 0
+#endif //  defined(PDEBUG) && PDEBUG > 1
 
+#ifdef PDEBUG
 BOOLEAN pDBTest(poly p, char *f, int l)
 {
   return pDBTest(p, mm_specHeap, f,l);
@@ -997,6 +999,8 @@ BOOLEAN pDBTest(poly p, memHeap heap, char *f, int l)
 
   while (p!=NULL)
   {
+    if (heap != MM_UNKNOWN_HEAP)
+    {
 #ifdef MDEBUG
     if (!mmDBTestHeapBlock(p, heap, f,l))
       return FALSE;
@@ -1004,6 +1008,8 @@ BOOLEAN pDBTest(poly p, memHeap heap, char *f, int l)
       if (! mmDebugCheckHeapAddr(p, heap, MM_HEAP_ADDR_USED_FLAG, f, l))
         return FALSE;
 #endif
+    }
+
 #ifdef LDEBUG
     if (!nDBTest(p->coef,f,l))
       return FALSE;
@@ -1019,7 +1025,6 @@ BOOLEAN pDBTest(poly p, memHeap heap, char *f, int l)
       return FALSE;
     }
     int i=pVariables;
-#ifndef DRING
     for(;i;i--)
     {
       if (pGetExp(p,i)<0)
@@ -1033,7 +1038,6 @@ BOOLEAN pDBTest(poly p, memHeap heap, char *f, int l)
       Print("neg Component in %s:%d\n",f,l);
       return FALSE;
     }
-#endif
     if (ismod==0)
     {
       if (pGetComp(p)>0) ismod=1;
