@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_GetPoly.cc,v 1.13 1998-03-27 11:40:58 obachman Exp $ */
+/* $Id: mpsr_GetPoly.cc,v 1.14 1998-03-27 14:44:25 obachman Exp $ */
 
 /***************************************************************
  *
@@ -388,7 +388,8 @@ mpsr_Status_t mpsr_GetPoly(MP_Link_pt link, poly &p, MP_Uint32_t nmon,
   failr(GetCoeff(link, &(pp->coef)));
   if (gNvars > 1)
   {
-    mp_failr(IMP_GetSint32Vector(link, &gTa[1], gNvars));
+    MP_Sint32_t* Ta = &gTa[1];
+    mp_failr(IMP_GetSint32Vector(link, &Ta, gNvars));
     for (i=1; i<=gNvars; i++)
       pSetExp(pp,i , (Exponent_t) gTa[i]);
     pSetm(pp);
@@ -398,7 +399,7 @@ mpsr_Status_t mpsr_GetPoly(MP_Link_pt link, poly &p, MP_Uint32_t nmon,
       pp->next = pInit();
       pp = pp->next;
       failr(GetCoeff(link, &(pp->coef)));
-      mp_failr(IMP_GetSint32Vector(link, &gTa[1], gNvars));
+      mp_failr(IMP_GetSint32Vector(link, &Ta, gNvars));
       for (i=1; i<=gNvars; i++)
         pSetExp(pp, i, (Exponent_t) gTa[i]);
       pSetm(pp);

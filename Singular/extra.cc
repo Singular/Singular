@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.29 1998-02-27 14:06:09 Singular Exp $ */
+/* $Id: extra.cc,v 1.30 1998-03-27 14:44:24 obachman Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -482,6 +482,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
       for (k=0; k<IDELEMS(i1); k++)
       {
         i1->m[k] = maAlgpolyMap(r0, i0->m[k], i, j);
+        pTest(i1->m[k]);
       }
       res->rtyp = IDEAL_CMD;
       res->data = (void*)i1;
