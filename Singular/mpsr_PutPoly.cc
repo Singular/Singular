@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_PutPoly.cc,v 1.22 2001-01-20 11:40:13 Singular Exp $ */
+/* $Id: mpsr_PutPoly.cc,v 1.23 2004-04-13 15:38:03 Singular Exp $ */
 
 /***************************************************************
  *
@@ -242,7 +242,7 @@ static mpsr_Status_t PutAlgPoly(MP_Link_pt link, napoly a, ring ar)
  ***************************************************************/
 mpsr_Status_t mpsr_PutPolyData(MP_Link_pt link, poly p, ring cring)
 {
-  if (cring != CurrPutRing)
+  //if (cring != CurrPutRing)
     SetPutFuncs(cring);
 
 #ifdef MPSR_DEBUG
