@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.46 1998-05-11 07:47:08 Singular Exp $
+@comment $Id: general.doc,v 1.47 1998-05-11 11:59:38 wichmann Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -1082,7 +1082,7 @@ power, exponentiation
 is a letter
 @item  @code{#}
 the reserved name of a list of not specified parameters in procedures
-(see @ref{procedures and Libraries}).
+(see @ref{Procedures}).
 @item  @code{"}
 to start and end string constants
 @item  @code{`}
@@ -2274,7 +2274,7 @@ See @ref{dbprint}; @ref{voice}.
 @c ---------------------------------------
 @node libparse,,Printing of data,Debugging tools
 @subsection libparse
-@cindex{libparse}
+@cindex libparse
 
 @sc{libparse} is a stand-alone program contained in the @sc{Singular} package,
 which cannot be called inside of @sc{Singular}. It is a debugging tool for
