@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.74 1999-09-21 16:40:16 obachman Exp $ */
+/* $Id: tesths.cc,v 1.75 1999-09-24 12:24:41 Singular Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -68,7 +68,7 @@ int main(          /* main entry to Singular */
 //                               "", feOptSpec, &option_index))
         != EOF)
   {
-    if (optc == '?' || optc == 0) 
+    if (optc == '?' || optc == 0)
     {
       fprintf(stderr, "Use '%s --help' for a complete list of options\n", feArgv0);
       exit(1);
@@ -78,21 +78,21 @@ int main(          /* main entry to Singular */
       option_index = feGetOptIndex(optc);
 
     assume(option_index >= 0 && option_index < (int) FE_OPT_UNDEF);
-    
-    if (fe_optarg == NULL && 
+
+    if (fe_optarg == NULL &&
         (feOptSpec[option_index].type == feOptBool ||
          feOptSpec[option_index].has_arg == optional_argument))
       errormsg = feSetOptValue((feOptIndex) option_index, (int) 1);
     else
       errormsg = feSetOptValue((feOptIndex) option_index, fe_optarg);
-    
+
     if (errormsg)
     {
       if (fe_optarg == NULL)
-        fprintf(stderr, "Error: Option '--%s' %s\n", 
+        fprintf(stderr, "Error: Option '--%s' %s\n",
                feOptSpec[option_index].name, errormsg);
       else
-        fprintf(stderr, "Error: Option '--%s=%s' %s\n", 
+        fprintf(stderr, "Error: Option '--%s=%s' %s\n",
                feOptSpec[option_index].name, fe_optarg, errormsg);
       fprintf(stderr, "Use '%s --help' for a complete list of options\n", feArgv0);
       exit(1);
@@ -183,10 +183,9 @@ int main(          /* main entry to Singular */
     FILE * rc = feFopen("." DIR_SEPP ".singularrc", "r", buf);
     if (rc == NULL) rc = feFopen("~" DIR_SEPP ".singularrc", "r", buf);
     if (rc == NULL) rc = feFopen(".singularrc", "r", buf);
-    
+
     if (rc != NULL)
     {
-
       if (BVERBOSE(V_LOAD_LIB))
         Print("// ** executing %s\n", buf);
       fclose(rc);
