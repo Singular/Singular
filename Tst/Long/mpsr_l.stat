@@ -1,7 +1,0 @@
-Status Output of tst_status.out
-init >> USER    :obachman
-init >> HOSTNAME:topgun
-init >> uname -a:Linux topgun 2.2.5 #15 Thu Sep 2 18:37:32 CEST 1999 i586 unknown
-init >> date    :Thu Nov 18 14:53:42 CET 1999
-init >> version :1306
-init >> ticks   :100

@@ -1,0 +1,45 @@
+;; Tests which shoujld pass for shifted exponents
+allres_l
+; bug_4 wrong order
+classify_l
+deform_l
+det_minor
+fetch_l
+fglm1_l
+fglmquot1_l
+finvar_l
+gcd0_l
+gcdp_l
+; hnoether_l memory trouble
+homtest
+hres_l
+intdet_l
+lres_l
+makedbm_l
+minor_l
+modulo_l
+monodromy_l
+mpsr_l
+mre
+mre_nonhom
+Mregular
+pAdd0L_l
+pAdd0_l
+pAddL_l
+pAddManyVarsManyL_l
+pAddManyVars_l
+pAdd_l
+pMult0L_l
+pMult0_l
+pMultL_l
+pMult_l
+primdec_l
+primitiv_l
+res_l
+resultantp_l
+sing_l
+solve_l
+sres_l
+std_l
+triang_l
+tst_l

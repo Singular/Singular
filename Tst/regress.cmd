@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 #################################################################
-# $Id: regress.cmd,v 1.32 2000-08-14 11:27:06 obachman Exp $
+# $Id: regress.cmd,v 1.33 2000-09-04 13:49:23 obachman Exp $
 # FILE:    regress.cmd
 # PURPOSE: Script which runs regress test of Singular
 # CREATED: 2/16/98
@@ -410,7 +410,7 @@ sub tst_check
   &mysystem("$rm -f $statfile");
   if ($mtrack)
   {
-    $system_call = "$cat $root.tst | sed -e 's/\\\\\$/LIB \"general.lib\"; killall(); killall(\"proc\");system(\"mtrack\", \"$root.mtrack.unused\"); \\\$/' | $singular $singularOptions ";
+    $system_call = "$cat $root.tst | sed -e 's/\\\\\$/LIB \"general.lib\"; killall(); killall(\"proc\");kill killall;system(\"mtrack\", \"$root.mtrack.unused\"); \\\$/' | $singular $singularOptions ";
     $system_call .= ($verbosity > 2 ? " | $tee " : " > ");
     $system_call .= "$root.mtrack.res";
     $system_call .= " 2>&1 " if ($verbosity <= 2);

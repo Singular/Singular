@@ -1,11 +1,4 @@
-Status Output of tst_status.out
-init >> USER    :obachman
-init >> HOSTNAME:wilde13
-init >> uname -a:HP-UX wilde13 B.10.20 A 9000/780 2000149616 two-user license
-init >> date    :Tue Jun 27 16:52:38 METDST 2000
-init >> version :1308
-init >> ticks   :100
-1 >> tst_memory_0 :: wilde13:17169973
-1 >> tst_memory_1 :: wilde13:24647093
-1 >> tst_memory_2 :: wilde13:24694784
-1 >> tst_timer_1 :: wilde13:81716
+1 >> tst_memory_0 :: wilde13:17169973 967836913:2000090121:1-3-9:ix86-Linux:topgun:14716080
+1 >> tst_memory_1 :: wilde13:24647093 967836913:2000090121:1-3-9:ix86-Linux:topgun:17785244
+1 >> tst_memory_2 :: wilde13:24694784 967836913:2000090121:1-3-9:ix86-Linux:topgun:18919836
+1 >> tst_timer_1 :: wilde13:81716 967836913:2000090121:1-3-9:ix86-Linux:topgun:34351
