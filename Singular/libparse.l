@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.l,v 1.30 1998-11-10 17:03:29 Singular Exp $ */
+/* $Id: libparse.l,v 1.31 1998-12-02 15:56:05 krueger Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -838,11 +838,13 @@ void copy_string(lp_modes mode)
       if(offset>0) text_buffer[i-offset] = text_buffer[i];
     }
 #    ifdef HAVE_NAMESPACES
-    h0 = enterid( mstrdup("info"), myynest, STRING_CMD,
-                        &IDPACKAGE(pl)->idroot, FALSE );
-    if (h0!=NULL)
-    {
-       IDSTRING(h0) = mstrdup(text_buffer);
+    if( mode != GET_INFO ) {
+      h0 = enterid( mstrdup("info"), myynest, STRING_CMD,
+                          &IDPACKAGE(pl)->idroot, FALSE );
+      if (h0!=NULL)
+      {
+         IDSTRING(h0) = mstrdup(text_buffer);
+      }
     }
 #    endif /* HAVE_NAMESPACES */
   }
