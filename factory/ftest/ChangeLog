@@ -1,3 +1,8 @@
+Tue Feb 16 17:56:26 MET 1999  Jens Schmidt
+
+	* GNUmakefile.in, ChangeLog, gcd.ntl.m4, ntl_util.cc, ntl_util.h:
+	  ***** merge from branch `factory-gcd' to main trunk
+
 Tue Jul  7 18:19:42 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* gcd.m4 (normalizeGcd): new function
@@ -18,6 +23,20 @@ Fri Jul  3 11:26:56 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 	* divrem.m4 (ftestSetNameOfGame): doc fix
 
     **************** <<< changes in branch `factory-gcd' ****************
+
+Wed Jul  8 15:50:04 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* GNUmakefile.in (%.o): `ftest_util.h' and `ftest_io.h' added as
+	  dependencies
+
+	* GNUmakefile.in (ntl_util.o, %.ntl, %.ntl.o): new targets
+	  (NTLPATH): new variable
+
+	* gcd.ntl.m4: new file
+
+	* ntl_util.cc, ntl_util.h: new files
+
+Fri Jul  3 11:51:00 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* fbinops.m4 (binOpCFSpecArray): new entry for `psr()'
 	  (ftestPsrTest): new test function
