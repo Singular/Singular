@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fbinops.m4,v 1.2 1997-11-21 11:21:45 schmidt Exp $ */
+/* $Id: fbinops.m4,v 1.3 1997-12-17 12:16:40 schmidt Exp $ */
 
 ftestSetNameOfGame( fbinops, `"
 Usage: fbinops [<options>] [<envSpec>] <f> <operator> <g>
@@ -210,8 +210,8 @@ main ( int argc, char ** argv )
     ftestGetInVar( f );
 
     // declarations to search operator
-    const char * operatorName;
-    const char * operatorTag;
+    const char * operatorName = 0;
+    const char * operatorTag = 0;
     binOpCFT binOpCF = 0;
     binOpBoolT binOpBool = 0;
     binOpCFTestT binOpCFTest = 0;
