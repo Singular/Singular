@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.21 1998-05-18 15:52:23 Singular Exp $
+@comment $Id: math.doc,v 1.22 1998-05-18 16:57:22 Singular Exp $
 @comment this file contains the mathematical background of Singular
 This chapter introduces some of the mathematical notions and definitions used
 throughout the manual. Most sections are only a collection of the
@@ -47,34 +47,6 @@ It is known that any monomial ordering can be represented by a matrix M in
 GL(n,R), but, of course, only integer coefficients are of relevance in
 practice.
 
-@sc{Singular} offers the following monomial orderings which are implemented
-in an effective way:
-@menu
-* Global orderings:: lp, dp, wp, Dp, Wp.
-* Local orderings:: ls, ds, ws, Ds, Ws.
-* Module orderings:: c, C.
-* Matrix orderings:: M.
-* Product orderings::
-* Extra weight vector:: a.
-@end menu
-@iftex
-@itemize @bullet
-@item
-global orderings or p-orderings: @code{lp, dp, Dp, wp, Wp} (p refers to polynomial ring)
-@item
-local orderings or s-orderings: @code{ls, ds, Ds, ws, Ws} (s refers to series ring)
-@item
-module orderings @code{c, C} (ordering of the components of a vector)
-@item
-matrix orderings @code{M} (may be used to define any allowed ordering)
-@item
-any of the above orderings may be combined to yield product or
-block orderings.
-@item
-ordering @code{a} (inserting an extra weight vector)
-@end itemize
-@end iftex
-
 @tex
 Global orderings are wellorderings (i.e.\ $1 < x_i$ for each variable
 $x_i$), local orderings satisfy $1 > x_i$ for each variable.   If some variables are ordered globally and others locally we
@@ -102,6 +74,10 @@ denotes the leading monomial of g, i.e. the biggest monomial of g with
 respect to <.   The result of any computation which uses standard basis
 computations has to be interpreted in Loc K[x].
 @end ifinfo
+@sc{Singular} offers the monomial orderings described in the following sections,
+a definition of a ring includes the definition of its monomial ordering, see
+@ref{Rings and orderings}.
+in an effective way:
 @c --------------------------------------------------------------------------
 @node Global orderings, Local orderings, , Monomial orderings
 @subsection Global orderings
