@@ -1,8 +1,10 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.10 1998-04-27 15:33:49 Singular Exp $
+@comment $Id: types.doc,v 1.11 1998-04-27 15:51:38 Singular Exp $
 @comment this file contains the type definitions
+@c + moved subsection "boolean expressions" into section "int"
+@c + removed node boolean (now in node int)
+@c + added additional structure for link-chapter
 @menu
-* boolean::                     
 * ideal::                       
 * int::                         
 * intmat::                      
@@ -17,128 +19,12 @@
 * proc::                        
 * ring::                        
 * string::                      
-* def::         
+* def::                         
 * vector::                      
 @end menu
 
 @c ---------------------------------------
-@node boolean, ideal, Data types, Data types
-@section boolean
-@cindex boolean
-@c --> section boolean
-@c ------------------------------
-@menu
-* boolean declarations::        
-* boolean expressions::         
-* boolean operations::          
-* boolean related functions::   
-@end menu
-
-@node boolean declarations, boolean expressions, boolean, boolean
-@subsection boolean declarations
-@cindex boolean declarations
-
-@c ------------------------------
-@node boolean expressions, boolean operations, boolean declarations, boolean
-@subsection boolean expressions
-@cindex boolean expressions
-@cindex ==
-@cindex !=
-@cindex <>
-@cindex <=
-@cindex >=
-@cindex and
-@cindex &&
-@cindex or
-@cindex ||
-@cindex not
-@c --> subsection boolean expressions
-A boolean expression is really an int expression used in a logical context:
-@enumerate
-@item
-an int expression (<> 0 evaluates to @emph{TRUE}, 0 evaluates to @emph{FALSE})
-@item
-an integer comparison:
-@example
-  i == j
-  i != j    //or     i <> j
-  i <= j
-  i >= j
-  i > j
-  i < j
-@end example
-@item
-a number comparison:
-@example
-  m == n
-  m != n    //or     m <> n
-  m < n
-  m > n
-  m <= n
-  m >= n
-@end example
-For numbers from Z/p or from field extensions not all operations are useful:
-@* - 0 ist always the smallest element,
-@* - in Z/p the representatives in the range -p/2..p/2 are used for comparisons
-@* - in field extensions the last two operations
-(@code{>=,<=}) yield always TRUE (1) and
-the @code{<} and @code{>} are equivalent to @code{!=}.
-@item
-a polynomial comparison:
-@example
-  f == g
-  f != g    //or     f <> g
-  f <= g    //comparing the leading term w.r.t. the monomial order
-  f >= g
-@end example
-@item
-an intvec or intmat comparison:
-@example
-  v == w
-  v != w    //or     v <> w
-@end example
-@item
-a string comparison:
-@example
-  f == g
-  f != g    //or     f <> g
-  f <= g    // comparing lexicographically
-            // w.r.t. the order specified by ASCII
-  f >= g
-  f >  g
-  f <  g
-@end example
-@item
-boolean expressions combined by boolean operations:
-@code{and}, @code{or}, @code{not}.
-@*@code{and} may also be written as @code{&&}, @code{or} as @code{||},
-@code{not} as @code{!}
-(see @ref{Evaluation of logical expressions}).
-
-@strong{Remark:} All arguments of a logical expressions are first
-evaluated and then the value of the logical expression is
-determined. For example, the logical expressions @code{(1 || a)} is
-evaluated by first evaluating @code{a}, even though the value of
-@code{a} has no influence on the value of @code{(1 || a)}. Note that
-this is different from the left-to-right evaluation of logical
-expressions (as found in most programming languages like C) which, for
-example, determine the @code{(1 || a)} without evaluating @code{a}.
-@end enumerate
-@c <--
-
-@c ------------------------------
-@node boolean operations, boolean related functions, boolean expressions, boolean 
-@subsection boolean operations
-@cindex boolean operations
-
-@c ------------------------------
-@node boolean related functions, ,boolean operations, boolean
-@subsection boolean related functions
-@cindex boolean related functions
-@c <--
-
-@c ---------------------------------------
-@node ideal, int, boolean, Data types
+@node ideal, int, , Data types
 @section ideal
 @cindex ideal
 
@@ -365,6 +251,8 @@ Brackets may be used to access elements of ideals:
 * int declarations::            
 * int expressions::             
 * int operations::              
+* boolean expressions::         
+* boolean operations::          
 * int related functions::       
 @end menu
 
@@ -513,7 +401,100 @@ comparison
 @c <--
 
 @c ------------------------------
-@node int related functions, ,int operations, int
+@node boolean expressions, boolean operations, int operations, int
+@subsection boolean expressions
+@cindex boolean expressions
+@cindex ==
+@cindex !=
+@cindex <>
+@cindex <=
+@cindex >=
+@cindex and
+@cindex &&
+@cindex or
+@cindex ||
+@cindex not
+@c --> subsection boolean expressions
+A boolean expression is really an int expression used in a logical context:
+@enumerate
+@item
+an int expression (<> 0 evaluates to @emph{TRUE}, 0 evaluates to @emph{FALSE})
+@item
+an integer comparison:
+@example
+  i == j
+  i != j    //or     i <> j
+  i <= j
+  i >= j
+  i > j
+  i < j
+@end example
+@item
+a number comparison:
+@example
+  m == n
+  m != n    //or     m <> n
+  m < n
+  m > n
+  m <= n
+  m >= n
+@end example
+For numbers from Z/p or from field extensions not all operations are useful:
+@* - 0 ist always the smallest element,
+@* - in Z/p the representatives in the range -p/2..p/2 are used for comparisons
+@* - in field extensions the last two operations
+(@code{>=,<=}) yield always TRUE (1) and
+the @code{<} and @code{>} are equivalent to @code{!=}.
+@item
+a polynomial comparison:
+@example
+  f == g
+  f != g    //or     f <> g
+  f <= g    //comparing the leading term w.r.t. the monomial order
+  f >= g
+@end example
+@item
+an intvec or intmat comparison:
+@example
+  v == w
+  v != w    //or     v <> w
+@end example
+@item
+a string comparison:
+@example
+  f == g
+  f != g    //or     f <> g
+  f <= g    // comparing lexicographically
+            // w.r.t. the order specified by ASCII
+  f >= g
+  f >  g
+  f <  g
+@end example
+@item
+boolean expressions combined by boolean operations:
+@code{and}, @code{or}, @code{not}.
+@*@code{and} may also be written as @code{&&}, @code{or} as @code{||},
+@code{not} as @code{!}
+(see @ref{Evaluation of logical expressions}).
+
+@strong{Remark:} All arguments of a logical expressions are first
+evaluated and then the value of the logical expression is
+determined. For example, the logical expressions @code{(1 || a)} is
+evaluated by first evaluating @code{a}, even though the value of
+@code{a} has no influence on the value of @code{(1 || a)}. Note that
+this is different from the left-to-right evaluation of logical
+expressions (as found in most programming languages like C) which, for
+example, determine the @code{(1 || a)} without evaluating @code{a}.
+@end enumerate
+@c <--
+
+@c ------------------------------
+@node boolean operations, int related functions, boolean expressions, int
+@subsection boolean operations
+@cindex boolean operations
+
+@c ------------------------------
+@node int related functions,  , boolean operations, int
 @subsection int related functions
 @cindex int related functions
 @c --> section int related functions
@@ -844,6 +825,9 @@ returns weights for the weigted ecart method (see @ref{weight})
 * link expressions::            
 * link operations::             
 * link related functions::      
+* ASCII links::                 
+* MP links::                    
+* DBM links::                   
 @end menu
 
 @node link declarations, link expressions, link, link
@@ -861,9 +845,24 @@ returns weights for the weigted ecart method (see @ref{weight})
 @cindex link operations
 
 @c ------------------------------
-@node link related functions, ,link operations, link
+@node link related functions, ASCII links, link operations, link
 @subsection link related functions
 @cindex link related functions
+
+@c ------------------------------
+@node ASCII links, MP links, link related functions, link
+@subsection ASCII links
+@cindex ASCII links
+
+@c ------------------------------
+@node MP links, DBM links, ASCII links, link
+@subsection MP links
+@cindex MP links
+
+@c ------------------------------
+@node DBM links,  , MP links, link
+@subsection DBM links
+@cindex DBM links
 @c <--
 
 @c ---------------------------------------
