@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.25 2001-01-11 17:12:58 Singular Exp $";
+version="$Id: gaussman.lib,v 1.26 2001-01-11 17:15:34 Singular Exp $";
 category="Singularities";
 
 info="
@@ -151,7 +151,7 @@ RETURN:
           if mode=1:
             ideal e: exp(-2*pi*i*e) is the spectrum of the monodromy of f
 @end format
-SEE ALSO: monodromy.lib, jordan.lib
+SEE ALSO: monodromy_lib, jordan_lib
 KEYWORDS: singularities; Gauss-Manin connection; monodromy;
           Brieskorn lattice
 EXAMPLE:  example monodromy; shows an example
@@ -402,7 +402,7 @@ RETURN:
             ideal l[5]: standard basis of the Jacobian ideal
 @end format
 NOTE:     H' and H'' denote the Brieskorn lattices
-SEE ALSO: spectrum.lib
+SEE ALSO: spectrum_lib
 KEYWORDS: singularities; Gauss-Manin connection; spectrum;
           Brieskorn lattice; Hodge filtration; V-filtration;
 EXAMPLE:  example vfiltration; shows an example
