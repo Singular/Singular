@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.167 1999-08-12 10:57:33 Singular Exp $ */
+/* $Id: iparith.cc,v 1.168 1999-08-13 16:31:12 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2730,9 +2730,10 @@ static BOOLEAN jjJACOB_P(leftv res, leftv v)
 {
   ideal i=idInit(pVariables,1);
   int k;
+  poly p=(poly)(v->Data());
   for (k=pVariables;k>0;k--)
   {
-    i->m[k-1]=pDiff(pCopy((poly)(v->Data())),k);
+    i->m[k-1]=pDiff(p,k);
   }
   res->data = (char *)i;
   return FALSE;
