@@ -2,7 +2,7 @@
 //anne, added deleteSublist and watchdog 12.12.2000
 //eric, added absValue 11.04.2002
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: general.lib,v 1.42 2002-04-11 14:46:54 westenb Exp $";
+version="$Id: general.lib,v 1.43 2004-08-13 12:52:37 Singular Exp $";
 category="General purpose";
 info="
 LIBRARY:  general.lib   Elementary Computations of General Type
@@ -528,7 +528,8 @@ EXAMPLE: example killall; shows an example AND KILLS ALL YOUR VARIABLES
       // kills all user-defined variables whose name or type is not #i
       for ( @joni=size(@marie); @joni>2; @joni-- )
       {
-        if ( @marie[@joni] != "LIB" && typeof(`@marie[@joni]`) != "proc")
+        if ( @marie[@joni] != "LIB" && @marie[@joni] != "Top"
+             && typeof(`@marie[@joni]`) != "proc")
         {
           no_kill = 0;
           for (j=2; j<= size(#); j++)
