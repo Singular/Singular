@@ -9,7 +9,9 @@ prefix		= @prefix@
 docdir		= ${prefix}/doc
 examplesdir	= ${prefix}/examples
 SINGULAR	= @SINGULAR@
+singulardir	= ${prefix}/Singular 
 emacsdir	= ${install_prefix}/emacs
+
 
 PERL		= @PERL@
 INSTALL		= ../install-sh -c
@@ -29,12 +31,14 @@ hlp-cmpl.el: ${SINGULAR_HLP} cmpl.pl
 ex-cmpl.el: cmpl.pl ${examplesdir}
 		${PERL} cmpl.pl -cmpl ex -ex_dir ${examplesdir} > ex-cmpl.el
 
-# this is weird, if I work directly with _one_ pipe, 
-# then things break from time to time
-lib-cmpl.el: ${prefix}/Singular/Makefile cmpl.pl
+lib-cmpl-old.el: ${prefix}/Singular/Makefile cmpl.pl
 	${MAKE} --no-print-directory -s -f ${prefix}/Singular/Makefile echoLIBS > lib-temp
-	cat lib-temp | ${PERL} cmpl.pl -cmpl lib > lib-cmpl.el
+	cat lib-temp | ${PERL} cmpl.pl -cmpl lib > lib-cmpl-old.el
 	rm lib-temp
+
+lib-cmpl.el: ${prefix}/Singular/Makefile lib.pl
+	${MAKE} --no-print-directory -s -f ${prefix}/Singular/Makefile echoLIBS > lib-temp
+	${PERL} lib.pl -s ${singulardir} `cat lib-temp` > lib-cmpl.el
 
 clean mostlyclean distclean:
 	rm -f cmd-cmpl.el hlp-cmpl.el lib-cmpl.el ex-cmpl.el
