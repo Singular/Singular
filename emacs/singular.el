@@ -1,6 +1,6 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.40 1999-09-03 10:52:12 wichmann Exp $
+;; $Id: singular.el,v 1.41 1999-09-14 20:18:15 wichmann Exp $
 
 ;;; Commentary:
 
@@ -518,7 +518,7 @@ For Emacs, this function is called  at mode initialization time."
   (define-key singular-interactive-mode-map [(control c) (<)] 'singular-load-file)
 
   (define-key singular-interactive-mode-map [?\C-c ?\C-r]     'singular-restart)
-  (define-key singular-interactive-mode-map [(control c) ($)] 'singular-exit-singular))
+  (define-key singular-interactive-mode-map [?\C-c ?\$] 'singular-exit-singular))
 
 (defun singular-cursor-key-model-set (key-model)
   "Set keys according to KEY-MODEL.
@@ -704,6 +704,7 @@ This function is called  at mode initialization time."
     (define-key comint-mode-map [menu-bar completion] nil))
    ;;Xemacs
    (t
+    (easy-menu-remove '("Singular"))
     (easy-menu-remove '("Comint1"))	; XEmacs 20
     (easy-menu-remove '("Comint2"))	; XEmacs 20
     (easy-menu-remove '("History"))	; XEmacs 20
@@ -1013,7 +1014,10 @@ the user, otherwise it is expanded using `expand-file-name'."
     (singular-send-string process string)))
 
 (defun singular-load-library (nonstdlib &optional file)
-  "Read a Singular library (via 'LIB \"FILE\";')."
+  "Read a Singular library (via 'LIB \"FILE\";').
+If called interactively asks for the name of a standard Singular
+library. If interactively called with a prefix argument asks for a file
+name of a Singular library."
   (interactive "P")
   (let ((string (or file
 		    (if nonstdlib
@@ -1080,8 +1084,9 @@ process is started."
   "Write back the input history to file.
 If `singular-history-explicit-file-name' is non-nil, uses that as file
 name, otherwise tries environment variable `SINGULARHIST'.
-This function is called from `singular-exit-sentinel' every time a Singular
-process terminates regularly."
+This function is called either by `singular-exit-singular' or by
+`singular-exit-sentinel' every time a Singular process terminates
+regularly."
   (singular-debug 'interactive (message "Writing input ring back"))
   (let ((comint-input-ring-file-name (or singular-history-explicit-file-name
 					 (getenv "SINGULARHIST"))))
@@ -2521,34 +2526,56 @@ o otherwise, the constant `singular-help-fall-back-file-name' is used
 			  nil nil nil 'singular-help-topic-history)))
 
   ;; get help file and topic
-  (let ((help-topic (if (or (null help-topic) (string= help-topic ""))
-			"Top"
-		      help-topic))
-	(help-file-name (or singular-help-explicit-file-name
+  (let ((help-file-name (or singular-help-explicit-file-name
 			    singular-help-file-name
 			    (getenv "SINGULAR_INFO_FILE")
-			    singular-help-fall-back-file-name)))
+			    singular-help-fall-back-file-name))
+	(help-topic (cond ((or (null help-topic)
+			       (string= help-topic ""))
+			   "Top")
+			  ;; try to get the real topic from the alist.
+			  ;; It's OK if the alist is empty.
+			  ((cdr (assoc help-topic
+				       singular-help-topics-alist)))
+			  (t help-topic)))
+	(continue t))
 
-    ;; last not least, pop to Info buffer and jump to desired node
+    ;; pop to Info buffer
     (singular-pop-to-buffer singular-help-same-window "*info*")
 
-    ;; catch errors when jumping to node
-    (condition-case signal
-	(Info-find-node help-file-name help-topic)
-      (error
-       (let ((error-message (cadr signal)))
-	 (cond ((and (stringp error-message)
-		     (string-match "Info file .* does not exist" error-message))
-		(Info-directory))
-	       ;; assume that node has not been found but file has
-	       (t
-		(Info-find-node help-file-name "Top")))
-
+    ;; test whether we are already in Singular's online manual
+    (unless (and (boundp 'Info-current-file)
+		 (equal Info-current-file help-file-name))
+      ;; jump to Singular's top node
+      (condition-case signal
+	  (Info-find-node help-file-name "Top")
+	;; in case of an error jump to info directory
+	(error
+	 (Info-directory)
 	 ;; if we have been called interactively we pass the error down,
-	 ;; otherwise we only print a message
+	 ;; otherwise we assumes that we have been called from a hook and
+	 ;; call `singular-error'
 	 (if (interactive-p)
 	     (signal (car signal) (cdr signal))
-	   (singular-error "Error: %s" error-message)))))))
+	   (singular-error "Singular online manual %s not found"
+			   help-file-name))
+	 ;; do not continue
+	 (setq continue nil))))
+
+    (when continue
+      ;; jump to desired node
+      (condition-case signal
+	  (Info-goto-node help-topic)
+	;; in case of an error jump to Singular's top node
+	(error
+	 (Info-goto-node "Top")
+	 ;; if we have been called interactively we pass the error down,
+	 ;; otherwise we assumes that we have been called from a hook and
+	 ;; call `singular-error'
+	 (if (interactive-p)
+	     (signal (car signal) (cdr signal))
+	   (singular-error "Singular help topic %s not found"
+			   help-topic)))))))
 
 (defun singular-help-init ()
   "Initialize online help support for Singular interactive mode.
@@ -3764,28 +3791,73 @@ This function is called at mode initialization time."
   (set (make-local-variable 'singular-name-last) 
        singular-name-default)
   (set (make-local-variable 'singular-switches-last)
-       singular-switches-default))
+       singular-switches-default)
+  (set (make-local-variable 'singular-exit-insert-killed-marker) 
+       nil)
+  (set (make-local-variable 'singular-exit-cleanup-done) 
+       nil))
 
-(defun singular-exit-sentinel (process message)
- "Clean up after termination of Singular.
+(defvar singular-exit-insert-killed-marker nil 
+  "Switch indicating if text should be inserted on process finishing.
+If t, `singular-exit-sentinel' inserts a string at the process mark
+indicating that the Singular process was killed.
+
+This variable is buffer-local.")
+
+(defvar singular-exit-cleanup-done nil
+  "Switch indicating if cleanup after Singular exit is already done.
+Initial value is nil. Is set to t by `singular-exit-cleanup' and to nil by
+`singular-exit-sentinel'.
+
+This variable is buffer-local.")
+
+(defun singular-exit-cleanup ()
+  "Clean up after termination of Singular.
 Writes back input ring after regular termination of Singular if process
 buffer is still alive, deinstalls the library menu und calls several other
-exit procedures."
+exit procedures.
+Assumes that the current buffer is a Singular buffer.
+Sets the variable `singular-exit-cleanup-done' to t.
+
+This function is called by `singular-interrupt-singular' or by
+`singular-exit-sentinel'."
+  (singular-debug 'interactive
+		  (message "exit-cleanup called"))
+  (singular-demo-exit)
+  (singular-scan-header-exit)
+  (singular-menu-deinstall-libraries)
+  (singular-history-write)
+  (setq singular-exit-cleanup-done t))
+
+(defun singular-exit-sentinel (process message)
+  "Clean up after termination of Singular.
+Calls `singular-exit-cleanup' if `singular-exit-cleanup-done' is nil.
+If `singular-exit-insert-killed-marker' is non-nil, inserts a string at the
+process mark indicating that the process was killed."
   (save-excursion
     (singular-debug 'interactive
 		    (message "Sentinel: %s" (substring message 0 -1)))
-    ;; exit demo mode if necessary
-    (singular-demo-exit)
-    (singular-scan-header-exit)
-    (if (string-match "finished\\|exited" message)
+
+    (if (string-match "finished\\|exited\\|killed" message)
 	(let ((process-buffer (process-buffer process)))
-	  (if (and process-buffer
-		   (buffer-name process-buffer)
-		   (set-buffer process-buffer))
-	      ;; write back history
-	      (progn
-		(singular-menu-deinstall-libraries)
-		(singular-history-write)))))))
+	  (when (and process-buffer
+		     (buffer-name process-buffer)
+		     (set-buffer process-buffer))
+	    (when singular-exit-insert-killed-marker
+	      (goto-char (process-mark process))
+	      (insert "// ** Singular process killed **\n")
+	      (setq singular-exit-insert-killed-marker nil))
+	    (unless singular-exit-cleanup-done
+	      (singular-exit-cleanup)))))
+    (setq singular-exit-cleanup-done nil)))
+
+(defun singular-interrupt-singular ()
+  "Delete the Singular process running in the current buffer.
+Calls `singular-exit-cleanup' and deletes the Singular process."
+  (let ((process (singular-process)))
+    (singular-exit-cleanup)
+    (setq singular-exit-insert-killed-marker t)
+    (delete-process process)))
 
 (defun singular-exec (buffer name executable start-file switches)
   "Start a new Singular process NAME in BUFFER, running EXECUTABLE.
@@ -3949,9 +4021,11 @@ Type \\[describe-mode] in the Singular buffer for a list of commands."
 Starts a Singular process, with I/O through an Emacs buffer, using the
 previously used arguments.
 If called within a Singular buffer, uses the arguments of the most recent
-Singular process started in this buffer.
+Singular process started in this buffer. If there is a Singular process
+running in this buffer, it is deleted without warning!
 If called outside a Singular buffer, uses the arguments of the most recent
-Singular process started in any Singular buffer.
+Singular process started in any Singular buffer (and does not delete any
+Singular process).
 If no last values are available, uses the default values (see documentation
 of `singular').
 
@@ -3963,6 +4037,14 @@ hooks on `singular-exec-hook'.
 
 Type \\[describe-mode] in the Singular buffer for a list of commands."
   (interactive)
+
+  (let ((process (singular-process t)))
+    (and (eq (get-buffer (singular-process-name-to-buffer-name 
+			  singular-name-default))
+	     (current-buffer))
+	 process
+	 (singular-interrupt-singular)))
+      
   (singular-internal singular-executable-last
 		     singular-directory-last
 		     singular-switches-last
@@ -4043,15 +4125,18 @@ Type \\[describe-mode] in the Singular buffer for a list of commands."
 
   (singular-internal executable directory switches name))
 
-(defun singular-exit-singular ()
-  "Exit Singular and kill Singular buffer.
-Sends string \"quit;\" to Singular process."
-  (interactive)
-  (let ((string "quit;")
-	(process (singular-process)))
-    (singular-input-filter process string)
-    (singular-send-string process string))
-  (kill-buffer (current-buffer)))
+(defun singular-exit-singular (&optional kill-singular-buffer)
+  "Delete Singular process and kill Singular buffer.
+Deletes the buffers Singular process without warning and writes back the input
+history to file.
+If called with prefix argument, kills the Singular buffer."
+  (interactive "P")
+  (singular-debug 'interactive
+		  (message "exit singular called"))
+  
+  (singular-interrupt-singular)
+  (if kill-singular-buffer
+      (kill-buffer (current-buffer))))
 ;;}}}
 ;;}}}
 
