@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.188 1999-11-24 14:02:17 wichmann Exp $ */
+/* $Id: iparith.cc,v 1.189 1999-11-24 14:07:22 obachman Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2951,6 +2951,11 @@ static BOOLEAN jjPRIME(leftv res, leftv v)
   res->data = (char *)(i > 1 ? i : 2);
   return FALSE;
 }
+static BOOLEAN jjPRUNE(leftv res, leftv v)
+{
+  res->data = (char *)idMinEmbedding((ideal)v->Data());
+  return FALSE;
+}
 static BOOLEAN jjP2N(leftv res, leftv v)
 {
   number n;
@@ -3193,7 +3198,6 @@ static BOOLEAN jjLOAD(leftv res, leftv v, BOOLEAN autoexport)
 #define jjrOrdStr      (proc1)16
 #define jjrVarStr      (proc1)18
 #define jjrParStr      (proc1)19
-#define jjidMinEmbedding (proc1)20
 #define jjCOUNT_R        (proc1)22
 #define jjDIM_R          (proc1)23
 #define jjMINRES_R       (proc1)24
@@ -3231,7 +3235,6 @@ void jjInitTab1()
         case (int)jjrOrdStr:      dArith1[i].p=(proc1)rOrdStr; break;
         case (int)jjrVarStr:      dArith1[i].p=(proc1)rVarStr; break;
         case (int)jjrParStr:      dArith1[i].p=(proc1)rParStr; break;
-        case (int)jjidMinEmbedding: dArith1[i].p=(proc1)idMinEmbedding; break;
         case (int)jjCOUNT_R:      dArith1[i].p=(proc1)syLength; break;
         case (int)jjDIM_R:        dArith1[i].p=(proc1)syDim; break;
         case (int)jjMINRES_R:     dArith1[i].p=(proc1)syMinimize; break;
@@ -3338,11 +3341,6 @@ static BOOLEAN jjrParStr(leftv res, leftv v)
   res->data = rParStr((ring)v->Data());
   return FALSE;
 }
-static BOOLEAN jjidMinEmbedding(leftv res, leftv v)
-{
-  res->data = (char *)idMinEmbedding((ideal)v->Data());
-  return FALSE;
-}
 static BOOLEAN jjCOUNT_R(leftv res, leftv v)
 {
   res->data=(char *)syLength((syStrategy)v->Data());
@@ -3385,7 +3383,6 @@ static BOOLEAN jjidTransp(leftv res, leftv v)
 #define jjrOrdStr      (proc1)rOrdStr
 #define jjrVarStr      (proc1)rVarStr
 #define jjrParStr      (proc1)rParStr
-#define jjidMinEmbedding (proc1)idMinEmbedding
 #define jjCOUNT_R        (proc1)syLength
 #define jjDIM_R        (proc1)syDim
 #define jjMINRES_R     (proc1)syMinimize
@@ -3580,7 +3577,7 @@ struct sValCmd1 dArith1[]=
 ,{jjPRIME,      PRIME_CMD,       INT_CMD,        INT_CMD }
 ,{jjPRINT,      PRINT_CMD,       NONE,           LIST_CMD}
 ,{jjPRINT,      PRINT_CMD,       NONE,           DEF_CMD}
-,{jjidMinEmbedding, PRUNE_CMD,   XS(MODUL_CMD),  MODUL_CMD }
+,{jjPRUNE,      PRUNE_CMD,       MODUL_CMD,      MODUL_CMD }
 ,{kQHWeight,    QHWEIGHT_CMD,    INTVEC_CMD,     IDEAL_CMD }
 ,{kQHWeight,    QHWEIGHT_CMD,    INTVEC_CMD,     MODUL_CMD }
 ,{jjWRONG,      QRING_CMD,       0,              ANY_TYPE}

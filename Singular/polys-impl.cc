@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.cc,v 1.33 1999-11-15 17:20:39 obachman Exp $ */
+/* $Id: polys-impl.cc,v 1.34 1999-11-24 14:07:23 obachman Exp $ */
 
 /***************************************************************
  *
@@ -889,7 +889,7 @@ BOOLEAN pDBTest(poly p, memHeap heap, char *f, int l)
     pIter(p);
     if (pComp(old,p)!=1)
     {
-      WarnS("wrong order (");
+      Warn("wrong order (");
       wrp(old);
       Print(") in %s:%d (pComp=%d)\n",f,l,pComp(old,p));
       return FALSE;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.77 1999-11-23 17:09:20 hannes Exp $ */
+/* $Id: ideals.cc,v 1.78 1999-11-24 14:07:21 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1882,6 +1882,7 @@ ideal idQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN resultIsIdeal)
   if (orig_ring!=syz_ring)
     s_h4 = idrMoveR_NoSort(s_h4,orig_ring);
 
+  idTest(s_h4);
   ideal s_h3;
   if (addOnlyOne)
   {
