@@ -248,7 +248,7 @@ AC_HEADER_STDC
 AC_CHECK_HEADERS(limits.h unistd.h,,
   AC_MSG_ERROR(Can not compile without limits.h unistd.h))
 
-AC_CHECK_HEADERS(malloc.h sys/file.h sys/ioctl.h sys/time.h sys/times.h sys/types.h sys/stat.h fcntl.h sys/param.h pwd.h asm/sigcontext.h pwd.h)
+AC_CHECK_HEADERS(malloc.h sys/file.h sys/ioctl.h sys/time.h sys/times.h sys/types.h sys/stat.h fcntl.h sys/param.h pwd.h asm/sigcontext.h pwd.h termcap.h termios.h term.h)
 
 # typedefs, structures
 AC_C_CONST
@@ -484,7 +484,7 @@ AC_ARG_WITH(
   [  --with-perl5=[PERL5,no] uses PERL5 as perl5 program, default is perl5])
 AC_ARG_WITH(
   readline,
-  [  --without-readline      do not use readline for fancy display])
+  [  --with-readline          do use static readline for fancy display])
 AC_ARG_WITH(
   MP,
   [  --without-MP            do not use MP (no MP links)])
@@ -566,16 +566,12 @@ dnl and headers were not found under the condition that the respective
 dnl  --enable argument was given
 dnl
 
-# fereadl - io routines
-AC_CHECK_HEADERS(termcap.h)
-AC_CHECK_HEADERS(termios.h)
-AC_CHECK_HEADERS(term.h)
+AC_CHECK_LIB(ncurses,tgetent,,\
+ AC_CHECK_LIB(curses,tgetent,,\
+  AC_CHECK_LIB(termcap,tgetent)))
 
 # readline
-if test "$with_readline" != no; then
-  AC_CHECK_LIB(ncurses,tgetent,,\
-   AC_CHECK_LIB(curses,tgetent,,\
-   AC_CHECK_LIB(termcap,tgetent)))
+if test "$with_readline" = yes; then
    AC_CHECK_LIB(readline, rl_abort)
    AC_CHECK_HEADERS(readline/readline.h readline/history.h)
    if test "$ac_cv_lib_readline_rl_abort" = yes && \
@@ -651,16 +647,7 @@ ac_cv_have_readline="no"
     AC_DEFINE(HAVE_READLINE)
   else
     AC_MSG_WARN(building without readline: disabling fancy display)
-    AC_CHECK_LIB(ncurses,tgetent,,\
-    AC_CHECK_LIB(curses,tgetent,,\
-    AC_CHECK_LIB(termcap,tgetent,,\
-    AC_DEFINE(HAVE_FEREAD))))
   fi
-else
-    AC_CHECK_LIB(ncurses,tgetent,,\
-    AC_CHECK_LIB(curses,tgetent,,\
-    AC_CHECK_LIB(termcap,tgetent,,\
-  AC_DEFINE(HAVE_FEREAD))))
 fi
 
 NEED_LIBS=$LIBS

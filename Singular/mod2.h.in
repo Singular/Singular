@@ -4,7 +4,7 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id: mod2.h.in,v 1.78 1999-11-29 13:01:28 obachman Exp $
+ *  Version: $Id: mod2.h.in,v 1.79 1999-12-14 15:53:13 obachman Exp $
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H
@@ -16,8 +16,6 @@
 #undef HAVE_DL
 /* Define to use readline lib for fancy display */
 #undef HAVE_READLINE
-/* Define to use built-in command line parser */
-#undef HAVE_FEREAD
 /* Define if you want to use dld's */
 #undef HAVE_DLD
 /* Define to have dbm links */

@@ -1,7 +1,10 @@
 dnl Process this file with autoconf to produce a configure script
 AC_INIT(Singular/matpol.h)
 AC_PREFIX_DEFAULT(`pwd`)
-OUTPUT_MAKEFILES="Makefile doc/Makefile doc/version.texi doc/uname.texi"
+OUTPUT_MAKEFILES="Makefile"
+if test -d "doc"; then
+   OUTPUT_MAKEFILES="$OUTPUT_MAKEFILES doc/Makefile doc/version.texi doc/uname.texi"
+fi
 if test -d "rpm"; then
    OUTPUT_MAKEFILES=$OUTPUT_MAKEFILES" rpm/Makefile"
    OUTPUT_MAKEFILES=$OUTPUT_MAKEFILES" rpm/rpmrc rpm/Singular.spec"
@@ -208,8 +211,8 @@ AC_ARG_WITH(
   perl5,
   [  --with-perl5=[PERL5,no] uses PERL5 as perl5 program, default is perl5])
 AC_ARG_ENABLE(smallgmp, \
- [ --enable-PACKAGE        configure and build PACKAGE
-  --disable-PACKAGE       do not configure and build PACKAGE
+ [ --enable-PACKAGE        configure and/or build PACKAGE
+  --disable-PACKAGE       do not configure and/or build PACKAGE
    where PACKAGE can be:
      smallgmp             minimal version of gmp written in C only])
 AC_ARG_ENABLE(gmp, \
@@ -222,10 +225,18 @@ AC_ARG_ENABLE(libfac, \
  [    libfac               char set and modp poly factorization library])
 AC_ARG_ENABLE(sgroup, \
  [    sgroup               numerical semigroup computations])
+AC_ARG_ENABLE(mtrack, \
+ [    mtrack               utility to track unused memory])
 AC_ARG_ENABLE(Singular, \
  [    Singular             CAS for Polynomial Computations])
 AC_ARG_ENABLE(Texinfo, \
  [    Texinfo              Texinfo for info, texi2dvi, makeinfo])
+AC_ARG_ENABLE(Texi2html, \
+ [    Texi2html            Texinfo to HTML converter])
+AC_ARG_ENABLE(doc, \
+ [    doc                  Singular documentation])
+AC_ARG_ENABLE(emacs, \
+ [    emacs                emacs completion files])
 AC_ARG_WITH(MP,\
  [ --with-PACKAGE          use PACKAGE, provide dependent functionality
   --without-PACKAGE       do not use PACKAGE, disable dependent functionality
@@ -235,6 +246,8 @@ AC_ARG_WITH(factory, \
  [    factory              polynomial factorization library])
 AC_ARG_WITH(libfac, \
  [    libfac               char set and modp poly factorization library])
+AC_ARG_WITH(mtrack, \
+ [    mtrack               utility to track unused memory])
 AC_ARG_WITH(gmp, \
  [ --with-apint=PACKAGE    use PACKAGE for arbitary integer arithmetic
                           where PACKAGE can be gmp or smallgmp
@@ -304,26 +317,6 @@ fi
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl Check whether or not to configure and build various packages
 dnl
-AC_MSG_CHECKING(whether to configure and build texinfo)
-if test "$enable_texinfo" != no && test -d Texinfo; then
-  AC_MSG_RESULT(yes)
-  enable_texinfo=yes
-  CONFIG_SUBDIRS="$CONFIG_SUBDIRS Texinfo"
-  TEXI2DVI=${bindir}/texi2dvi
-  MAKEINFO="${bindir}/makeinfo --force"
-  TEXINDEX=${bindir}/texindex
-  AC_SUBST(TEXI2DVI)
-  AC_SUBST(MAKEINFO)
-  AC_SUBST(TEXINDEX)
-else
-  AC_MSG_RESULT(no)
-  AC_MSG_WARN(Building of doc might fail. Need Texinfo)
-  enable_texinfo=no
-  AC_CHECK_PROG(MAKEINFO, makeinfo, makeinfo, ${pwd}/warn_not_found.sh makeinfo)
-  AC_CHECK_PROG(TEXI2DVI, texi2dvi, texi2dvi, ${pwd}/warn_not_found.sh texi2dvi)
-  AC_CHECK_PROG(TEXINDEX, texindex, texindex, ${pwd}/warn_not_found.sh texindex)
-fi  
-
 
 AC_MSG_CHECKING(whether to configure and build gmp lib)
 if test "$enable_gmp" != yes && test "$enable_gmp" != no; then
@@ -498,12 +491,29 @@ else
   AC_MSG_RESULT(no)
 fi
 
+BUILD_SUBDIRS="$CONFIG_SUBDIRS"
+
+AC_MSG_CHECKING(whether to build mpr and use mtrack)
+if test -d mpr && test "$ac_cv_singuname" = ix86-Linux && test "$enable_mtrack" != no; then
+  AC_MSG_RESULT(yes)
+  if test "$enable_mtrack" != yes; then
+     ac_configure_args="$ac_configure_args --enable-mtrack"
+  fi 
+  enable_mtrack=yes
+  OUTPUT_MAKEFILES=$OUTPUT_MAKEFILES" mpr/Makefile"
+  BUILD_SUBDIRS="$BUILD_SUBDIRS mpr"
+else
+  AC_MSG_RESULT(no)
+  enable_mtrack=no
+fi
+
 AC_MSG_CHECKING(whether to configure and build Singular)
 if test "$enable_Singular" != yes && test "$enable_Singular" != no; then
   if test "$with_Singular" != no && test -d Singular; then
     enable_Singular=yes
     AC_MSG_RESULT(yes)
     CONFIG_SUBDIRS="$CONFIG_SUBDIRS Singular"
+    BUILD_SUBDIRS="$BUILD_SUBDIRS Singular"	
     ac_configure_args="$ac_configure_args --enable-Singular"
   else
     enable_Singular=no
@@ -513,6 +523,7 @@ elif test "$enable_Singular" = yes; then
   if test -d Singular; then
     AC_MSG_RESULT(yes)
     CONFIG_SUBDIRS="$CONFIG_SUBDIRS Singular"
+    BUILD_SUBDIRS="$BUILD_SUBDIRS Singular"	
   else
     AC_MSG_RESULT(no)
     AC_MSG_ERROR(can not build Singular without Singular directory)
@@ -521,6 +532,65 @@ else
   AC_MSG_RESULT(no)
 fi
 
+AC_MSG_CHECKING(whether to configure and build Texinfo)
+if test "$enable_Texinfo" != no && test -d Texinfo; then
+  AC_MSG_RESULT(yes)
+  enable_texinfo=yes
+  CONFIG_SUBDIRS="$CONFIG_SUBDIRS Texinfo"
+  BUILD_SUBDIRS="$BUILD_SUBDIRS Texinfo"	
+  TEXI2DVI=${bindir}/texi2dvi
+  MAKEINFO="${bindir}/makeinfo --force"
+  TEXINDEX=${bindir}/texindex
+  AC_SUBST(TEXI2DVI)
+  AC_SUBST(MAKEINFO)
+  AC_SUBST(TEXINDEX)
+  if test "$enable_Texinfo" != yes; then
+    ac_configure_args="$ac_configure_args --enable-Texinfo"
+  fi
+else
+  AC_MSG_RESULT(no)
+  AC_MSG_WARN(Building of doc might fail. Need Texinfo)
+  enable_texinfo=no
+  AC_CHECK_PROG(MAKEINFO, makeinfo, makeinfo, ${pwd}/warn_not_found.sh makeinfo)
+  AC_CHECK_PROG(TEXI2DVI, texi2dvi, texi2dvi, ${pwd}/warn_not_found.sh texi2dvi)
+  AC_CHECK_PROG(TEXINDEX, texindex, texindex, ${pwd}/warn_not_found.sh texindex)
+fi  
+
+
+AC_MSG_CHECKING(whether to build Texi2html)
+if test "$enable_Texi2html" != no && test -d Texi2html; then
+ AC_MSG_RESULT(yes)
+ BUILD_SUBDIRS="$BUILD_SUBDIRS Texi2html"
+ if test "$enable_Texi2html" != yes; then
+   ac_configure_args="$ac_configure_args --enable-Texi2html"
+ fi
+else
+ AC_MSG_RESULT(no)
+fi
+
+AC_MSG_CHECKING(whether to build doc)
+if test "$enable_doc" != no && test -d doc; then
+ AC_MSG_RESULT(yes)
+ BUILD_SUBDIRS="$BUILD_SUBDIRS doc"
+ if test "$enable_doc" != yes; then
+   enable_doc=yes
+   ac_configure_args="$ac_configure_args --enable-doc"
+ fi
+else
+ enable_doc=no
+ AC_MSG_RESULT(no)
+fi
+
+AC_MSG_CHECKING(whether to build emacs)
+if test "$enable_doc" = yes && test "$enable_emacs" != no && test -d emacs; then
+ AC_MSG_RESULT(yes)
+ BUILD_SUBDIRS="$BUILD_SUBDIRS emacs"
+ if test "$enable_emacs" != yes; then
+   ac_configure_args="$ac_configure_args --enable-emacs"
+ fi
+else
+ AC_MSG_RESULT(no)
+fi
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl Check whether or not to use various packages
@@ -604,13 +674,25 @@ else
   ac_configure_args="$ac_configure_args --without-libfac"
 fi
 
-AC_MSG_CHECKING(whether to use mtrack)
-if test -d mpr && test "$ac_cv_singuname" = ix86-Linux; then
-   AC_MSG_RESULT(yes)
-   ac_configure_args="$ac_configure_args --with-mtrack"
-   OUTPUT_MAKEFILES=$OUTPUT_MAKEFILES" mpr/Makefile"
-   BUILD_SUBDIRS="$BUILD_SUBDIRS mpr"
+
+AC_MSG_CHECKING(whether to use with mtrack)
+if test "$with_mtrack" != no && test "$with_mtrack" != yes; then
+  if test "$enable_mtrack" = yes; then
+    with_mtrack=yes
+  else
+    with_mtrack=no
+  fi
+  ac_configure_args="$ac_configure_args --with-mtrack=$with_mtrack"
+elif test "$with_mtrack" = yes && test "$enable_mtrack" != yes; then
+  with_mtrack=no
+  ac_configure_args="$ac_configure_args --with-mtrack=no"
 fi
+if test "$with_mtrack" != yes; then
+  AC_MSG_RESULT(no)
+else
+  AC_MSG_RESULT(yes)
+fi
+
 
 AC_MSG_CHECKING(whether to use with Singular)
 if test "$with_Singular" != no && test "$with_Singular" != yes; then
@@ -633,9 +715,6 @@ dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl Check for known subdirs
 dnl
 SUBDIRS=""
-if test -d doc; then
-  SUBDIRS="$SUBDIRS doc"
-fi
 if test -d smallgmp; then
   SUBDIRS="$SUBDIRS smallgmp"
 fi
@@ -651,25 +730,29 @@ fi
 if test -d libfac; then
   SUBDIRS="$SUBDIRS libfac"
 fi
-if test -d rpm; then
-  SUBDIRS="$SUBDIRS rpm"
-fi
 if test -d mpr; then
   SUBDIRS="$SUBDIRS mpr"
+fi
+if test -d sgroup; then
+  SUBDIRS="$SUBDIRS sgroup"
 fi
 if test -d Singular; then
   SUBDIRS="$SUBDIRS Singular"
 fi
-if test -d emacs; then
-  SUBDIRS="$SUBDIRS emacs"
-  BUILD_SUBDIRS="$BUILD_SUBDIRS emacs"
+if test -d Texinfo; then
+  SUBDIRS="$SUBDIRS Texinfo"
 fi
 if test -d Texi2html; then
   SUBDIRS="$SUBDIRS Texi2html"
-  BUILD_SUBDIRS="$BUILD_SUBDIRS Texi2html"
 fi
-if test -d sgroup; then
-  SUBDIRS="$SUBDIRS sgroup"
+if test -d doc; then
+  SUBDIRS="$SUBDIRS doc"
+fi
+if test -d emacs; then
+  SUBDIRS="$SUBDIRS emacs"
+fi
+if test -d rpm; then
+  SUBDIRS="$SUBDIRS rpm"
 fi
   
 

@@ -36,7 +36,7 @@ lib-cmpl.el: ${prefix}/Singular/Makefile cmpl.pl
 	cat lib-temp | ${PERL5} cmpl.pl -cmpl lib > lib-cmpl.el
 	rm lib-temp
 
-clean:
+clean mostlyclean distclean:
 	rm cmd-cmpl.el hlp-cmpl.el lib-cmpl.el ex-cmpl.el
 
 install-sharedist: all
