@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.72 1999-10-14 17:59:35 Singular Exp $ */
+/* $Id: ring.cc,v 1.73 1999-10-15 16:00:18 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -3193,5 +3193,6 @@ ring rAddSyzComp(ring r)
       res->qideal->m[i]=pPermPoly(r->qideal->m[i],NULL,r,NULL,0);
     }
   }
+  currQuotient=res->qideal;
   return res;
 }
