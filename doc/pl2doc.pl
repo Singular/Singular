@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: pl2doc.pl,v 1.16 2000-05-19 14:07:22 obachman Exp $
+# $Id: pl2doc.pl,v 1.17 2000-12-08 15:51:24 obachman Exp $
 ###################################################################
 #  Computer Algebra System SINGULAR
 #
@@ -282,12 +282,13 @@ sub FormatInfoText
       }
       next;
     }
-    if ($line =~ /([^\@]|^)\@(code|math){(.*?)}/)
+    my $ref = 'ref';
+    if ($line =~ /([^\@]|^)\@(code|math|xref|pxref|$ref){(.*?)}/)
     {
       my $l = $line;
       $l =~ s/^\s*//;
       $l =~ s/\s$//;
-      while ($l =~ /([^\@]|^)\@(code|math){(.*?)}/)
+      while ($l =~ /([^\@]|^)\@(code|math|xref|pxref|$ref){(.*?)}/)
       {
 	$text .= CleanAscii($`.$1);
 	$text .= "\@$2\{$3\}";

@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.195 2000-11-06 15:45:21 obachman Exp $
+@comment $Id: reference.doc,v 1.196 2000-12-08 15:51:24 obachman Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -4133,7 +4133,8 @@ restores the state of all options from an intvec (produced by @code{option(get)}
 @item @strong{Values:}
 The following options are used to manipulate the behavior of
 computations and act like boolean switches. Use the prefix @code{no} to
-disable an option.
+disable an option. Notice that some options are ring dependent and reset
+to their default values on a change of the current basering.
 @table @asis
 @item @code{none}
 turns off all options (including the @code{prompt} option)
@@ -4148,13 +4149,12 @@ orderings)
 @c @item @code{interrupt}
 @c allows fast interruption of standard basis computation
 @item @code{intStrategy}
-avoids divisions of coefficients during standard basis computations
+avoids divisions of coefficients during standard basis
+computations. This option is ring dependent. It is by default set for
+rings with characteristic 0 and not set for all other rings.
 @item @code{minRes}
 special (additional) minimizing during computations (@code{res}, @code{mres}),
 @*assumes homogeneous case and degree-compatible ordering
-@item @code{morePairs}
-creates additional (useless) pairs to speed up standard basis
-computation in some cases
 @item @code{notRegularity}
 disables the regularity bound for @code{res} and @code{mres} (see
 @ref{regularity})
@@ -4186,7 +4186,9 @@ See below for more details.
 @item @code{redSB}
 computes a reduced standard basis in any standard basis computation
 @item @code{redTail}
-reduction of the tails of polynomials during standard basis computations
+reduction of the tails of polynomials during standard basis
+computations. This option is ring dependent. By default, it is set for
+rings with global degree orderings and not set for all other rings.
 @item @code{sugarCrit}
 uses criteria similar to the homogeneous case to keep more useless pairs
 @item @code{weightM}
@@ -4294,7 +4296,10 @@ shows correct usage in error messages (set by default)
 @item @tab @tab @code{[}@math{n}@code{]} @tab finished module @math{n}
 @item @tab @tab @tab
 @item @tab @code{std}
-@tab @code{s} @tab found a new element of the standard basis
+@tab @code{[}@math{m}@code{:}@math{n}@code{]} 
+@tab internal ring change to poly representation with exponent bound
+@math{m} and @math{n} words in exponent vector
+@item @tab @tab @code{s} @tab found a new element of the standard basis
 @item @tab @tab @code{-} @tab reduced a pair/S-polynomial to 0
 @item @tab @tab @code{.} @tab postponed a reduction of a pair/S-polynomial
 @item @tab @tab @code{h} @tab used Hilbert series criterion

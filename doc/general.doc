@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.183 2000-11-17 17:01:58 Singular Exp $
+@comment $Id: general.doc,v 1.184 2000-12-08 15:51:22 obachman Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -3661,6 +3661,37 @@ to enforce a line-break.
 @code{old line @@* new line}
 @* @expansion{}
 @* old line @* new line
+@end table
+
+@item @code{@@ref@{...@}}
+References to other parts of the @sc{Singular} manual can be set using
+one of the following @code{@@ref@{node@}} constructs. Notice that
+@code{node} must be the name of a section of the @sc{Signular}
+manual. In particular, it may be a name of a function, library or library
+procedure.
+
+@table @asis
+@item @code{@@xref@{node@}}
+for a reference to the node @code{node} at the beginning of a sentence.
+@item @code{@@ref@{node@}}
+for a reference to the node @code{node} at the end of a sentence.
+@item @code{@@pxref@{node@}}
+for a reference to the node @code{node} within parenthesis.
+
+@item Example:
+@code{@@xref@{Tropical Storms@}, for more info.}
+@*@expansion{}*Note Hurricanes::, for more info.
+@*@expansion{}See Section 3.1 [Hurricanes], page 24, for more info.
+
+@code{For more information, see @@ref@{Hurricanes@}.}
+@*@expansion{}For more information, see *Note Hurricanes::.
+@*@expansion{}For more information, see Section 3.1 [Hurricanes], page 24.
+
+
+@code{... storms cause flooding (@@pxref@{Hurricanes@}) ...}
+@*@expansion{}... storms cause flooding (*Note Hurricanes::) ...
+@*@expansion{}... storms cause flooding (see Section 3.1 [Hurricanes],
+page 24) 
 @end table
 
 @item @code{@@math@{..@}}
