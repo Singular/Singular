@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.84 1998-05-19 08:53:19 schmidt Exp $
+@comment $Id: general.doc,v 1.85 1998-05-19 08:55:21 wichmann Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -477,26 +477,69 @@ subsections; this subsections lists some examples first.
 
 @itemize @bullet
 @item
+the ring 
 @tex
-the ring $Z/32003Z[x,y,z]$ with local degrevlex ordering:
+$Z/32003Z[x,y,z]$
 @end tex
 @ifinfo
-the ring Z/32003Z[x,y,z] with local degrevlex ordering:
+Z/32003Z[x,y,z]
 @end ifinfo
+with degree reverse lexicographical ordering (this is the default ring): 
 
 @example
-ring r = 32003, ( x, y, z ), ds;
+ring r;
+ring r = 32003,(x,y,z),dp;
 @end example
 
 @item
+the ring
 @tex
-the ring $Z/7Z[x_1,\ldots,x_6]$ with lexicographical ordering for $x_1$
-and $x_2$ and degree reverse lexicographical ordering for
+$Q[a,b,c,d]$
+@end tex
+@ifinfo
+Q[a,b,c,d]
+@end ifinfo
+with lexicographical ordering:
+
+@example
+ring r = 0,(a,b,c,d),lp;
+@end example
+
+@item
+the ring
+@tex
+$Z/32003Z[x,y,z]$
+@end tex
+@ifinfo
+Z/32003Z[x,y,z]
+@end ifinfo
+with local degree reverse lexicographical ordering:
+
+@example
+ring r = 32003,(x,y,z),ds;
+@end example
+
+@item
+the ring
+@tex
+$Z/7Z[x_1,\ldots,x_6]$
+@end tex
+@ifinfo
+Z/7Z[x1,...,x6]
+@end ifinfo
+with lexicographical ordering for
+@tex
+$x_1$ and $x_2$
+@end tex
+@ifinfo
+x1 and x2
+@end ifinfo
+and degree reverse lexicographical ordering for
+@tex
 $x_3,\ldots,x_6$:
 @end tex
 @ifinfo
-the ring Z/7Z[x1,...,x6] with lexicographical ordering for x1 and x2 and
-degree reverse lexicographical ordering for x3,...x6:
+x3,...,x6:
 @end ifinfo
 
 @example
@@ -505,11 +548,10 @@ ring r=10,( x(1..6) ),( lp(2),dp(4) );
 @end example
 
 @item
-@tex
 the ring
+@tex
 @end tex
 @ifinfo
-the ring
 @end ifinfo
 
 @example
@@ -517,38 +559,37 @@ ring r3=0,(x,y,z,a,b,c),(ds(3), dp(3));
 @end example
 
 @item
-@tex
 the ring
+@tex
 @end tex
 @ifinfo
-the ring
 @end ifinfo
 
 @example
-ring r4=0,(x,y,z),(c,dp);
+ring r=0,(x,y,z),(c,dp);
 @end example
 
 @item
-@tex
 the ring
+@tex
 @end tex
 @ifinfo
-the ring
 @end ifinfo
+with degree lexicographical ordering:
 
 @example
-ring r5=(7,a),(x,y,z),dp;
+ring r=(7,a),(x,y,z),Dp;
 @end example
 
 @item
+the ring 
 @tex
-the ring $K[x,y,z]$, where $K$ is $Z/7Z[a] / a^2+a+3$, the finite field with
-$49$ elements.
+$K[x,y,z]$ where $K$ is $Z/7Z[a] / a^2+a+3$,
 @end tex
 @ifinfo
-the ring K[x,y,z], where K is Z/7Z[a] / a^2+a+3, the finite field with
-49 elements.
+K[x,y,z], where K is Z/7Z[a] / a^2+a+3,
 @end ifinfo
+the finite field with 49 elements:
 
 @example
 ring r=(7,a),(x,y,z),dp; minpoly=a^2+a+3;
@@ -556,11 +597,10 @@ ring r=(7^2,a),(x,y,z),dp;
 @end example
 
 @item
-@tex
 the ring
+@tex
 @end tex
 @ifinfo
-the ring
 @end ifinfo
 
 @example
@@ -568,11 +608,10 @@ ring r8=(181,A,B,Z),(x,y,z),dp;
 @end example
 
 @item
-@tex
 the ring
+@tex
 @end tex
 @ifinfo
-the ring
 @end ifinfo
 
 @example
@@ -2085,7 +2124,7 @@ necessary.
 If @sc{Singular} does not come back to the prompt while calling a user
 defined procedure, probably a bracket or a @code{"} is missing.  The
 easiest way to leave the procedure is to type some brackets or @code{"}
-and then @code{<RETURN>} .
+and then @code{RETURN} .
 
 @menu
 * Tracing of procedures::
@@ -2100,7 +2139,7 @@ and then @code{<RETURN>} .
 Setting the @code{TRACE} variable to 1 (resp. 3) results in a listing of
 the called procedures (resp. together with line numbers).
 If @code{TRACE} is set to 4, @code{Singular}
-displays each line before its interpretation and waits for the @code{<RETURN>}
+displays each line before its interpretation and waits for the @code{RETURN}
 key being pressed.
 @menu
 * TRACE var::
