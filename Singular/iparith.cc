@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.159 1999-07-09 15:27:26 Singular Exp $ */
+/* $Id: iparith.cc,v 1.160 1999-07-12 18:24:57 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1572,7 +1572,7 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
   }
   else
   {
-    Werror("%s undefined in %s",v->Fullname(),u->Fullname());
+    Werror("identifier %s not found in %s",v->Fullname(),u->Fullname());
   }
   return TRUE;
 err_fetch:
