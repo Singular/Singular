@@ -649,6 +649,15 @@ static BOOLEAN jjCOLCOL(leftv res, leftv u, leftv v)
 
   switch(u->Typ())
   {
+      case 0:
+        //Print("%s of type 'ANY'. Trying load.\n", v->name);
+        if(iiTryLoadLib(u, u->name))
+        {
+          Werror("'%s' no such package", u->name);
+          return TRUE;
+        }
+        // else: use next case !!! no break !!!
+
       case PACKAGE_CMD:
         packhdl = (idhdl)u->data;
         if(!IDPACKAGE(packhdl)->loaded)
@@ -666,38 +675,16 @@ static BOOLEAN jjCOLCOL(leftv res, leftv u, leftv v)
         memset(v, 0, sizeof(sleftv));
         namespaceroot->pop();
         break;
-      case 0:
-        //Print("%s of type 'ANY'. Trying load.\n", v->name);
-        if(!iiTryLoadLib(u, u->name))
-        {
-          syMake(u, u->name);
-          packhdl = (idhdl)u->data;
-          if(v->rtyp == IDHDL)
-          {
-            v->name = mstrdup(v->name);
-          }
-          namespaceroot->push( IDPACKAGE(packhdl), IDID(packhdl));
-          syMake(v, v->name, packhdl);
-          memcpy(res, v, sizeof(sleftv));
-          memset(v, 0, sizeof(sleftv));
-          namespaceroot->pop();
-        }
-        else
-        {
-          Werror("'%s' no such package", u->name);
-          return TRUE;
-        }
-        break;
 
       case DEF_CMD:
         break;
 
       default:
-        Werror("<package>::<id> expected");
+        WerrorS("<package>::<id> expected");
         return TRUE;
   }
 #else /* HAVE_NAMESPACES */
-  Werror("package are not supported in this version");
+  WerrorS("package is not supported in this version");
 #endif /* HAVE_NAMESPACES */
   return FALSE;
 }
@@ -1973,8 +1960,8 @@ static BOOLEAN jjLOAD_E(leftv res, leftv v, leftv u)
   char * s=(char *)u->Data();
   if(strcmp(s, "with")==0)
     return jjLOAD(res, v, TRUE);
-  Werror("invalid second argument");
-  Werror("load(\"libname\" [,\"with\"]);");
+  WerrorS("invalid second argument");
+  WerrorS("load(\"libname\" [,\"with\"]);");
   return TRUE;
 }
 
@@ -3026,7 +3013,7 @@ static BOOLEAN jjLOAD(leftv res, leftv v, BOOLEAN autoexport)
 #ifdef HAVE_DYNAMIC_LOADING
         result = load_modules(s, libnamebuf, autoexport);
 #else /* HAVE_DYNAMIC_LOADING */
-        Werror("Dynamic modules are not supported by this version of Singular");
+        WerrorS("Dynamic modules are not supported by this version of Singular");
 #endif /* HAVE_DYNAMIC_LOADING */
         break;
   }
@@ -5713,8 +5700,8 @@ int IsCmd(char *n, int & tok)
     #endif
       if ((tok>=BEGIN_RING) && (tok<=END_RING))
       {
-         Werror("no ring active");
-         return 0;
+        WerrorS("no ring active");
+        return 0;
       }
     #ifdef SIQ
     }
