@@ -71,7 +71,7 @@ HTML_TUTOR_TOP     = tutor.htm
 TEX_FILES	= copyright.tex
 DOC2TEX_FILES	= \
 		examples.tex general.tex math.tex reference.tex \
-		start.tex types.tex pdata.tex tricks.tex
+		start.tex types.tex pdata.tex tricks.tex platform.tex
 
 MANUAL_FILES	= ${TEX_FILES} ${DOC2TEX_FILES}
 TUTOR_FILES	= \

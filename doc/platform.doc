@@ -1,0 +1,27 @@
+@comment -*-texinfo-*-
+@comment $Id: platform.doc,v 1.1 1999-07-23 13:58:53 obachman Exp $
+@comment this file contains the "Platform and pittfals" sections
+
+@c The following directives are necessary for proper compilation
+@c with emacs (C-c C-e C-r).  Please keep it as it is.  Since it
+@c is wrapped in `@ignore' and `@end ignore' it does not harm `tex' or
+@c `makeinfo' but is a great help in editing this file (emacs
+@c ignores the `@ignore').
+@ignore
+%**start
+\input texinfo.tex
+@setfilename platform.info
+@node Installation and Platform Specifics
+@menu
+* Installation and Platform Specifics::
+@end menu
+@node Installation and Platform Specifics, Index, SINGULAR libraries, Top
+@chapter Installation and Platform Specifics
+%**end
+@end ignore
+
+TBC:
+
+content of INSTALL file
+
+report platform-specific stuff of Singular

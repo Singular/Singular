@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: pl2doc.pl,v 1.3 1999-07-22 14:51:32 obachman Exp $
+# $Id: pl2doc.pl,v 1.4 1999-07-23 13:58:34 obachman Exp $
 ###################################################################
 #  Computer Algebra System SINGULAR
 #
@@ -8,7 +8,7 @@
 ####
 $Usage = <<EOT;
 Usage:  
-$0 [-o out_file -db db_file -no_ex -no_fun] library_perl_file.doc 
+$0 [-o out_file -db db_file -no_ex -no_fun -doc] library_perl_file.doc 
 Convert library_perl_file.pl to library_perl_file.doc
 EOT
 
@@ -21,7 +21,7 @@ while (@ARGV && $ARGV[0] =~ /^-/)
   if (/^-o$/)    { $out_file = shift(@ARGV); next;}
   if (/^-db$/) { $db_file = shift(@ARGV); next;}
   if (/^-no_fun$/)    { $no_fun = 1;next;}
-  if (/^-h(elp)?$/)      { print $Usage; exit;}
+  if (/^-h(elp)?$/)   { print $Usage; exit;}
   die "Error: Unknown option: $_:$Usage\n";
 }
 
