@@ -8,17 +8,19 @@
 (require 'comint)
 
 ;;{{{ Code Common to Both Modes
+;;{{{ Debugging Stuff
 (defvar singular-debug nil
-  "*List of states to debug.
-Currently, only the state `interactive' is supported.
+  "*List of modes to debug or `all' to debug all modes.
+Currently, only the mode `interactive' is supported.")
 
-This variable is buffer local.")
-
-(defmacro singular-debug (state form)
+(defmacro singular-debug (mode form)
   "Major debugging hook for singular.el.
-Evaluates FORM if and only if STATE is an element of
-`singular-debug'."
-  `(if (memq ,state singular-debug) ,form))
+Evaluates FORM if and only if `singular-debug' equals `all' or if MODE
+is an element of `singular-debug'."
+  `(if (or (eq singular-debug 'all)
+	   (memq ,mode singular-debug))
+       ,form))
+;;}}}
 ;;}}}
 
 ;;{{{ Singular Interactive Mode
@@ -30,31 +32,6 @@ Evaluates FORM if and only if STATE is an element of
     ()
   (setq singular-interactive-mode-map
 	(nconc (make-sparse-keymap) comint-mode-map)))
-;;}}}
-
-;;{{{ Customization Variables of comint
-(defvar singular-prompt-regexp "^> "
-  "Regexp to match prompt patterns in Singular.
-Should not match the continuation prompt \(`.'), only the regular
-prompt \(`>').")
-
-(defvar singular-delimiter-argument-list '(?= ?\( ?\) ?, ?;)
-  "List of characters to recognize as separate arguments.
-This variable is used to initialize `comint-delimiter-argument-list'.")
-
-(defvar singular-input-ignoredups t
-  "*If non-nil, don't add input matching the last on the input ring.
-This variable is used to initialize `comint-input-ignoredups'.")
-
-(defvar singular-buffer-maximum-size 2048
-  "*The maximum size in lines for Singular buffers.
-This variable is used to initialize `comint-buffer-maximum-size'.
-
-This variable is buffer-local.")
-
-(defvar singular-input-ring-size 64
-  "Size of input history ring.
-This variable is used to initialize `comint-input-ring-size'.")
 ;;}}}
 
 ;;{{{ Miscellaneous
@@ -77,40 +54,68 @@ The buffer name is the process name with surrounding `*'."
   (concat "*" process-name "*"))
 ;;}}}
   
+;;{{{ Customization Variables of comint
+(defvar singular-prompt-regexp "^> "
+  "Regexp to match prompt patterns in Singular.
+Should not match the continuation prompt \(`.'), only the regular
+prompt \(`>').")
+
+(defvar singular-delimiter-argument-list '(?= ?\( ?\) ?, ?;)
+  "List of characters to recognize as separate arguments.
+This variable is used to initialize `comint-delimiter-argument-list'
+when Singular interactive mode starts up.")
+
+(defvar singular-input-ignoredups t
+  "*If non-nil, don't add input matching the last on the input ring.
+This variable is used to initialize `comint-input-ignoredups' when
+Singular interactive mode starts up.")
+
+(defvar singular-buffer-maximum-size 2048
+  "*The maximum size in lines for Singular buffers.
+This variable is used to initialize `comint-buffer-maximum-size' when
+Singular interactive mode starts up.")
+
+(defvar singular-input-ring-size 64
+  "Size of input history ring.
+This variable is used to initialize `comint-input-ring-size' when
+Singular interactive mode starts up.")
+;;}}}
+
+;;{{{ Singular Interactive Mode
 (defun singular-interactive-mode ()
   "Major mode for interacting with Singular.
 
-\\[comint-send-input] after the end of Singular's output sends the text from the
-    end of process to the end of the current line.
-
-\\[comint-send-input] before end of Singular's output copies the current line minus
-    the prompt to the end of the buffer and sends it
-    \(\\[comint-copy-old-input] just copies the current line).
+NOT READY [how to send input]!
 
 NOT READY [multiple Singulars]!
 
-Singular buffers are automatically limited in length \(by default,
-to 2048 lines).  This limit may be adjusted by setting
-`singular-buffer-maximum-size'.
+Singular buffers are automatically limited in length \(by default, to
+2048 lines).  This limit may be adjusted by setting
+`singular-buffer-maximum-size' before Singular interactive mode starts
+up or by setting `comint-buffer-maximum-size' while Singular
+interactive mode is running.
 
 NOT READY [much more to come.  See shell.el.]!"
   (interactive)
-  (comint-mode)
+  ;; we do not run `comint-mode' because `make-comint' should
+  ;; have run it already
+  ;; (comint-mode)
 
   ;; miscellaneous
   (setq major-mode 'singular-interactive-mode)
-  (setq mode-name "Singular")
+  (setq mode-name "Singular Interactive")
   (use-local-map singular-interactive-mode-map)
-  (make-local-variable 'singular-debug)
 
   ;; customize comint for Singular
   (setq comint-prompt-regexp singular-prompt-regexp)
   (setq comint-delimiter-argument-list singular-delimiter-argument-list)
   (setq comint-input-ignoredups singular-input-ignoredups)
   (make-local-variable 'comint-buffer-maximum-size)
-  (make-local-variable 'singular-buffer-maximum-size)
   (setq comint-buffer-maximum-size singular-buffer-maximum-size)
   (setq comint-input-ring-size singular-input-ring-size)
+  (or (memq 'comint-truncate-buffer comint-output-filter-functions)
+      (setq comint-output-filter-functions
+	    (cons 'comint-truncate-buffer comint-output-filter-functions)))
 
   ;; get name of history file (if any)
   (setq comint-input-ring-file-name (getenv "SINGULARHIST"))
@@ -126,53 +131,59 @@ NOT READY [much more to come.  See shell.el.]!"
 ;;{{{ Starting Singular
 (defvar singular-start-file "~/.emacs_singularrc"
   "Name of start-up file to pass to Singular.
-If the file named by this variable exists it is given as
-initial input to any Singular process being started \(Note that
-this may lose due to a timing error if Singular discards input
-when it starts up.)")
+If the file named by this variable exists it is given as initial input
+to any Singular process being started.  Note that this may lose due to
+a timing error if Singular discards input when it starts up.")
 
 (defvar singular-default-executable "Singular"
-  "Default name of Singular executable.")
+  "Default name of Singular executable.
+Used by `singular' when new Singular processes are started.")
 
 (defvar singular-default-name "singular"
-  "Default process name for Singular process.")
+  "Default process name for Singular process.
+Used by `singular' when new Singular processes are started.")
 
 (defvar singular-default-switches '("-t")
-  "List of switches to pass to Singular processes on startup.")
+  "Default switches for Singular processes.
+Used by `singular' when new Singular processes are started.")
 
 (defun singular-exit-sentinel (process message)
  "Clean up after termination of Singular.
-Writes back input ring after regular termination of Singular
-if process buffer is still alive."
+Writes back input ring after regular termination of Singular if
+process buffer is still alive."
   (save-excursion
     (singular-debug 'interactive
-		    (message "Sentinel: %s" (substring message 0 -1)))
+		    (message "Sentinel message: %s" (substring message 0 -1)))
     (if (string-match "finished\\|exited" message)
 	(let ((process-buffer (process-buffer process)))
-	  (and process-buffer
-	       (buffer-name process-buffer)
-	       (set-buffer process-buffer)
-	       (comint-write-input-ring))))))
+	  (if (and process-buffer
+		   (buffer-name process-buffer)
+		   (set-buffer process-buffer))
+	      (progn
+		(singular-debug 'interactive (message "Writing input ring back"))
+		(comint-write-input-ring)))))))
 
 (defun singular (&optional singular-executable singular-name singular-switches)
   "Run an inferior Singular process, with I/O through an Emacs buffer.
 
-NOT READY [arguments and interactive use]!
+NOT READY [arguments, default values, and interactive use]!
 
 If buffer exists but Singular is not running, start new Singular.
 If buffer exists and Singular is running, just switch to buffer.
-If a file `~/.emacs_singularrc' exists, it is given as initial
-input \(Note that this may lose due to a timing error if Singular
-discards input when it starts up.)
-The buffer is put in Singular interactive mode, giving commands
-for sending input and handling ouput of Singular.  See
+If a file `~/.emacs_singularrc' exists, it is given as initial input.
+Note that this may lose due to a timing error if Singular discards
+input when it starts up.
+
+The buffer is put in Singular interactive mode, giving commands for
+sending input and handling ouput of Singular.  See
 `singular-interactive-mode'.
 
-\(Type \\[describe-mode] in the Singular buffer for a list of commands.)"
+Type \\[describe-mode] in the Singular buffer for a list of commands."
+  ;; handle interactive calls
   (interactive (list singular-default-executable
 		     singular-default-name
 		     singular-default-switches))
-  ;; make buffer name canonical
+
   (let* (;; get default values for optional arguments
 	 (singular-executable (or singular-executable
 				  singular-default-executable))
@@ -198,6 +209,7 @@ for sending input and handling ouput of Singular.  See
 
 ;; for convenience only
 (defalias 'Singular 'singular)
+;;}}}
 ;;}}}
 
 (provide 'singular)
