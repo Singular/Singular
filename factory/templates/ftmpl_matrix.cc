@@ -1,9 +1,9 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftmpl_matrix.cc,v 1.6 1997-06-19 13:11:26 schmidt Exp $ */
+/* $Id: ftmpl_matrix.cc,v 1.7 1997-06-20 10:45:23 schmidt Exp $ */
 
 #include <factoryconf.h>
 
-#include <templates/matrix.h>
+#include <templates/ftmpl_matrix.h>
 
 template <class T>
 Matrix<T>::Matrix( int nr, int nc ) : NR(nr), NC(nc)

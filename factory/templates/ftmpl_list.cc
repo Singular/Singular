@@ -1,9 +1,9 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftmpl_list.cc,v 1.4 1997-06-19 13:11:19 schmidt Exp $ */
+/* $Id: ftmpl_list.cc,v 1.5 1997-06-20 10:45:22 schmidt Exp $ */
 
 #include <factoryconf.h>
 
-#include <templates/list.h>
+#include <templates/ftmpl_list.h>
 
 template <class T>
 ListItem<T>::ListItem( const ListItem<T>& i )

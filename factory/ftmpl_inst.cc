@@ -1,13 +1,13 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftmpl_inst.cc,v 1.1 1997-06-19 12:45:45 schmidt Exp $ */
+/* $Id: ftmpl_inst.cc,v 1.2 1997-06-20 10:45:18 schmidt Exp $ */
 
 #include <factoryconf.h>
 
-#include <templates/array.cc>
-#include <templates/factor.cc>
-#include <templates/list.cc>
-#include <templates/functions.h>
-#include <templates/matrix.cc>
+#include <templates/ftmpl_array.cc>
+#include <templates/ftmpl_factor.cc>
+#include <templates/ftmpl_list.cc>
+#include <templates/ftmpl_functions.h>
+#include <templates/ftmpl_matrix.cc>
 
 #include <factory.h>
 

@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_map.cc,v 1.4 1997-06-19 12:24:17 schmidt Exp $ */
+/* $Id: cf_map.cc,v 1.5 1997-06-20 10:45:14 schmidt Exp $ */
 
 #include <config.h>
 
@@ -8,7 +8,7 @@
 #include "cf_defs.h"
 #include "cf_map.h"
 #include "cf_iter.h"
-#include "templates/functions.h"
+#include "templates/ftmpl_functions.h"
 
 
 static int cmpfunc ( const MapPair & p1, const MapPair & p2 );

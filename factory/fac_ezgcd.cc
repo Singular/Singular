@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_ezgcd.cc,v 1.5 1997-06-19 12:23:35 schmidt Exp $ */
+/* $Id: fac_ezgcd.cc,v 1.6 1997-06-20 10:45:16 schmidt Exp $ */
 
 #include <config.h>
 
@@ -7,7 +7,7 @@
 #include "debug.h"
 
 #include "cf_defs.h"
-#include "templates/functions.h"
+#include "templates/ftmpl_functions.h"
 #include "canonicalform.h"
 #include "fac_util.h"
 #include "cf_reval.h"

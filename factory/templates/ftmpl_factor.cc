@@ -1,9 +1,9 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftmpl_factor.cc,v 1.4 1997-06-19 13:11:14 schmidt Exp $ */
+/* $Id: ftmpl_factor.cc,v 1.5 1997-06-20 10:45:21 schmidt Exp $ */
 
 #include <factoryconf.h>
 
-#include <templates/factor.h>
+#include <templates/ftmpl_factor.h>
 
 
 template <class T>

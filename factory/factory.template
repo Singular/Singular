@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: factory.template,v 1.6 1997-06-19 12:36:20 schmidt Exp $ */
+/* $Id: factory.template,v 1.7 1997-06-20 10:45:17 schmidt Exp $ */
 
 #ifndef INCL_FACTORY_H
 #define INCL_FACTORY_H
@@ -16,10 +16,10 @@ extern "C" {
 }
 #endif
 
-#include <templates/array.h>
-#include <templates/factor.h>
-#include <templates/list.h>
-#include <templates/matrix.h>
+#include <templates/ftmpl_array.h>
+#include <templates/ftmpl_factor.h>
+#include <templates/ftmpl_list.h>
+#include <templates/ftmpl_matrix.h>
 
 // note that in this file the order of 'includes' matters!
 // in general, files at the end depend on file at the beginning.
