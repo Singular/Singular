@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ffields.cc,v 1.28 2000-12-05 11:15:08 obachman Exp $ */
+/* $Id: ffields.cc,v 1.29 2000-12-15 18:49:27 Singular Exp $ */
 /*
 * ABSTRACT: finite fields with a none-prime number of elements (via tables)
 */
@@ -698,17 +698,15 @@ number nfMapP(number c)
 /*2
 * set map function nMap ... -> GF(p,n)
 */
-BOOLEAN nfSetMap(ring r)
+nMapFunc nfSetMap(ring src, ring dst)
 {
-  if (rField_is_GF(r,nfCharQ))
+  if (rField_is_GF(src,nfCharQ))
   {
-    nMap=ndCopy;   /* GF(p,n) -> GF(p,n) */
-    return TRUE;
+    return ndCopy;   /* GF(p,n) -> GF(p,n) */
   }
-  if (rField_is_Zp(r,nfCharP))
+  if (rField_is_Zp(src,nfCharP))
   {
-    nMap=nfMapP;    /* Z/p -> GF(p,n) */
-    return TRUE;
+    return nfMapP;    /* Z/p -> GF(p,n) */
   }
-  return FALSE;     /* default */
+  return NULL;     /* default */
 }

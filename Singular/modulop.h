@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.h,v 1.12 2000-11-25 20:30:18 obachman Exp $ */
+/* $Id: modulop.h,v 1.13 2000-12-15 18:49:34 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
@@ -41,7 +41,7 @@ void    npInitChar(int c, ring r);
 
 //int     npGetChar();
 
-BOOLEAN npSetMap(ring r);
+nMapFunc npSetMap(ring src, ring dst);
 number  npMapP(number from);
 /*-------specials for spolys, do NOT use otherwise--------------------------*/
 /* for npMultM, npSubM, npNegM, npEqualM : */

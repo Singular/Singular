@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: algmap.cc,v 1.21 2000-12-08 14:47:44 Singular Exp $ */
+/* $Id: algmap.cc,v 1.22 2000-12-15 18:49:27 Singular Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials from rings with
 * 'alg' numbers
@@ -308,12 +308,11 @@ poly maAlgpolyMap(ring R, poly preimage, ideal F, ideal G)
   t = rPar(currRing);
   p0 = preimage;
   poly pr=NULL;
-  nMap=maNumberOne;
   while (p0!=NULL)
   {
     poly pr=pNext(p0);
     p0->next=NULL;
-    monpart = maEval((map)G, p0, R);
+    monpart = maEval((map)G, p0, R, maNumberOne);
     result = maLongalgMap(result, R, p0, s, t, &nom, monpart, F);
     pTest(result);
     if (nom)

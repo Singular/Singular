@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.240 2000-12-13 17:49:37 Singular Exp $ */
+/* $Id: iparith.cc,v 1.241 2000-12-15 18:49:29 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1619,6 +1619,7 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
   ring r=(ring)u->Data();
   idhdl w;
   int op=iiOp;
+  nMapFunc nMap;
 
   if ((w=r->idroot->get(v->Name(),myynest))!=NULL)
   {
@@ -1627,7 +1628,7 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
     int par_perm_size=0;
     BOOLEAN bo;
     //if (!nSetMap(rInternalChar(r),r->parameter,rPar(r),r->minpoly))
-    if (!nSetMap(r))
+    if ((nMap=nSetMap(r))==NULL)
     {
       if (rEqual(r,currRing))
       {
@@ -1692,7 +1693,7 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
     tmpW.rtyp=IDTYP(w);
     tmpW.data=IDDATA(w);
     if ((bo=maApplyFetch(op,NULL,res,&tmpW, r,
-                         perm,par_perm,par_perm_size)))
+                         perm,par_perm,par_perm_size,nMap)))
     {
       Werror("cannot map %s of type %s(%d)",v->name, Tok2Cmdname(w->typ),w->typ);
     }

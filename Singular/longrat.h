@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.h,v 1.18 2000-09-20 13:25:41 obachman Exp $ */
+/* $Id: longrat.h,v 1.19 2000-12-15 18:49:33 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers
 */
@@ -99,7 +99,7 @@ void     nlDBDelete(number *a, char *f, int l);
 #define  nlDelete(A) nlDBDelete(A,__FILE__,__LINE__)
 #endif
 
-BOOLEAN nlSetMap(ring r);
+nMapFunc nlSetMap(ring src, ring dst);
 
 #ifndef OM_ALLOC_H
 struct omBin_s;

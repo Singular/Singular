@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: shortfl.cc,v 1.14 1999-11-15 17:20:47 obachman Exp $ */
+/* $Id: shortfl.cc,v 1.15 2000-12-15 18:49:36 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -421,22 +421,19 @@ static number nrMapP(number from)
   return nf(r).N();
 }
 
-BOOLEAN nrSetMap(ring r)
+nMapFunc nrSetMap(ring src, ring dst)
 {
-  if (rField_is_R(r))
+  if (rField_is_R(src))
   {
-    nMap=ndCopy;
-    return TRUE;
+    return ndCopy;
   }
-  if (rField_is_Q(r))
+  if (rField_is_Q(src))
   {
-    nMap = nrMap0;   /*Q -> R*/
-    return TRUE;
+    return nrMap0;
   }
-  if(rField_is_Zp(r))
+  if(rField_is_Zp(src))
   {
-    nMap = nrMapP; /* Z/p' -> R */
-    return TRUE;
+    return nrMapP;
   }
-  return FALSE;
+  return NULL;
 }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.58 2000-12-06 11:03:18 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.59 2000-12-15 18:49:31 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -590,6 +590,7 @@ leftv iiMap(map theMap, char * what)
   idhdl w,r;
   leftv v;
   int i;
+  nMapFunc nMap;
 
 #ifdef HAVE_NAMESPACES
   idhdl pack;
@@ -600,11 +601,11 @@ leftv iiMap(map theMap, char * what)
 #endif /* HAVE_NAMESPACES */
   if ((r!=NULL) && ((r->typ == RING_CMD) || (r->typ== QRING_CMD)))
   {
-    //if (!nSetMap(rInternalChar(IDRING(r)),
+    //if ((nMap=nSetMap(rInternalChar(IDRING(r)),
     //             IDRING(r)->parameter,
     //             rPar(IDRING(r)),
-    //             IDRING(r)->minpoly))
-    if (!nSetMap(IDRING(r)))
+    //             IDRING(r)->minpoly)))
+    if ((nMap=nSetMap(IDRING(r)))==NULL)
     {
       if (rEqual(IDRING(r),currRing))
       {
@@ -637,7 +638,7 @@ leftv iiMap(map theMap, char * what)
       memset(&tmpW,0,sizeof(sleftv));
       tmpW.rtyp=IDTYP(w);
       tmpW.data=IDDATA(w);
-      if (maApplyFetch(MAP_CMD,theMap,v,&tmpW,IDRING(r),NULL,NULL,0))
+      if (maApplyFetch(MAP_CMD,theMap,v,&tmpW,IDRING(r),NULL,NULL,0,nMap))
       {
         Werror("cannot map %s(%d)",Tok2Cmdname(w->typ),w->typ);
         omFreeBin((ADDRESS)v, sleftv_bin);

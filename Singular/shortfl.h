@@ -6,7 +6,7 @@
 /*
 * ABSTRACT
 */
-/* $Id: shortfl.h,v 1.7 1999-11-15 17:20:47 obachman Exp $ */
+/* $Id: shortfl.h,v 1.8 2000-12-15 18:49:36 Singular Exp $ */
 #include "structs.h"
 
 BOOLEAN nrGreaterZero (number k);
@@ -31,7 +31,7 @@ int     nrGetChar();
 BOOLEAN nrDBTest(number a, char *f, int l);
 #endif
 
-BOOLEAN nrSetMap(ring r);
+nMapFunc nrSetMap(ring src, ring dst);
 
 float   nrFloat(number n);
 #endif

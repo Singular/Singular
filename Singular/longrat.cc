@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.33 2000-09-25 10:44:48 obachman Exp $ */
+/* $Id: longrat.cc,v 1.34 2000-12-15 18:49:32 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -123,30 +123,27 @@ static number nlMapP(number from)
 //static number nlMapLongR(number from);
 static number nlMapR(number from);
 
-BOOLEAN nlSetMap(ring r)
+nMapFunc nlSetMap(ring src, ring dst)
 {
-  if (rField_is_Q(r))
+  if (rField_is_Q(src))
   {
-    nMap = nlCopy;   /*Q -> Q*/
-    return TRUE;
+    return nlCopy;
   }
-  if (rField_is_Zp(r))
+  if (rField_is_Zp(src))
   {
-    nlPrimeM=rChar(r);
-    nMap = nlMapP; /* Z/p -> Q */
-    return TRUE;
+    nlPrimeM=rChar(src);
+    return nlMapP;
   }
-  if (rField_is_R(r))
+  if (rField_is_R(src))
   {
-    nMap = nlMapR; /* short R -> Q */
-    return TRUE;
+    return nlMapR;
   }
 //  if (rField_is_long_R(r))
 //  {
 //    nMap = nlMapLongR; /* long R -> Q */
 //    return TRUE;
 //  }
-  return FALSE;
+  return NULL;
 }
 
 #ifdef LDEBUG

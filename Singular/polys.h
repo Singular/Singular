@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.49 2000-12-07 12:22:42 Singular Exp $ */
+/* $Id: polys.h,v 1.50 2000-12-15 18:49:35 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials of the
              currRing
@@ -345,7 +345,7 @@ poly      pOrdPolyInsertSetm(poly p);
 // (i.e. that Order field is set correctly)
 poly      pOrdPolyMerge(poly p);
 
-poly      pPermPoly (poly p, int * perm, ring OldRing,
+poly      pPermPoly (poly p, int * perm, ring OldRing, nMapFunc nMap,
                      int *par_perm=NULL, int OldPar=0);
 
 /*BOOLEAN   pVectorHasUnitM(poly p, int * k);*/

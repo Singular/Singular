@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpc.cc,v 1.15 2000-12-13 17:49:37 Singular Exp $ */
+/* $Id: gnumpc.cc,v 1.16 2000-12-15 18:49:28 Singular Exp $ */
 /*
 * ABSTRACT: computations with GMP complex floating-point numbers
 *
@@ -33,19 +33,17 @@ static number ngcMapQ(number from)
     return NULL;
 }
 
-BOOLEAN ngcSetMap(ring r)
+nMapFunc ngcSetMap(ring src,ring dst)
 {
-  if (rField_is_long_C(r))
+  if (rField_is_long_C(src))
   {
-    nMap=ngcCopy;
-    return TRUE;
+    return ngcCopy;
   }
-  if(rField_is_Q(r))
+  if(rField_is_Q(src))
   {
-    nMap = ngcMapQ;
-    return TRUE;
+    return ngcMapQ;
   }
-  return FALSE;
+  return NULL;
 }
 
 number   ngcPar(int i)

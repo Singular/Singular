@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.57 2000-12-08 16:20:03 Singular Exp $ */
+/* $Id: polys1.cc,v 1.58 2000-12-15 18:49:35 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -808,7 +808,7 @@ poly pOrdPolyInsertSetm(poly p)
 /*2
 *returns a re-ordered copy of a polynomial, with permutation of the variables
 */
-poly pPermPoly (poly p, int * perm, ring oldRing,
+poly pPermPoly (poly p, int * perm, ring oldRing, nMapFunc nMap,
    int *par_perm, int OldPar)
 {
   int OldpVariables = oldRing->N;

@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglm.cc,v 1.23 2000-12-06 11:03:09 Singular Exp $
+// $Id: fglm.cc,v 1.24 2000-12-15 18:49:28 Singular Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -171,11 +171,10 @@ fglmConsistency( idhdl sringHdl, idhdl dringHdl, int * vperm )
         // both rings are qrings, now check if both quotients define the same ideal.
         // check if sring->qideal is contained in dring->qideal:
         rSetHdl( dringHdl );
-        //nSetMap( rInternalChar(sring), sring->parameter, npar, sring->minpoly );
-        nSetMap( sring );
+        nMapFunc nMap=nSetMap( sring );
         ideal sqind = idInit( IDELEMS( sring->qideal ), 1 );
         for ( k= IDELEMS( sring->qideal )-1; k >= 0; k-- )
-            (sqind->m)[k]= pPermPoly( (sring->qideal->m)[k], vperm, sring);
+          (sqind->m)[k]= pPermPoly( (sring->qideal->m)[k], vperm, sring, nMap);
         ideal sqindred = kNF( dring->qideal, NULL, sqind );
         if ( ! idIs0( sqindred ) ) {
             WerrorS( "the quotients do not agree" );
@@ -189,11 +188,10 @@ fglmConsistency( idhdl sringHdl, idhdl dringHdl, int * vperm )
         int * dsvperm = (int *)omAlloc0( (nvar+1)*sizeof( int ) );
         maFindPerm( dring->names, nvar, NULL, 0, sring->names, nvar, NULL, 0, 
                     dsvperm, NULL, sring->ch);
-        //nSetMap(rInternalChar(dring), dring->parameter, npar, dring->minpoly);
-        nSetMap(dring);
+        nMap=nSetMap(dring);
         ideal dqins = idInit( IDELEMS( dring->qideal ), 1 );
         for ( k= IDELEMS( dring->qideal )-1; k >= 0; k-- )
-            (dqins->m)[k]= pPermPoly( (dring->qideal->m)[k], dsvperm, sring);
+          (dqins->m)[k]=pPermPoly( (dring->qideal->m)[k], dsvperm, sring, nMap);
         ideal dqinsred = kNF( sring->qideal, NULL, dqins );
         if ( ! idIs0( dqinsred ) ) {
             WerrorS( "the quotients do not agree" );

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: maps.cc,v 1.31 2000-12-08 16:21:31 Singular Exp $ */
+/* $Id: maps.cc,v 1.32 2000-12-15 18:49:33 Singular Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */
@@ -86,7 +86,7 @@ poly maEvalVariable(poly p, int v,int pExp,matrix s)
   return res;
 }
 
-poly maEvalMonom(map theMap, poly p,ring preimage_r,matrix s)
+static poly maEvalMonom(map theMap, poly p,ring preimage_r,matrix s, nMapFunc nMap)
 {
     poly q=pOne();
     pSetCoeff(q,nMap(pGetCoeff(p)));
@@ -115,7 +115,7 @@ poly maEvalMonom(map theMap, poly p,ring preimage_r,matrix s)
   return q;
 }
 
-poly maEval(map theMap, poly p,ring preimage_r,matrix s)
+poly maEval(map theMap, poly p,ring preimage_r,nMapFunc nMap,matrix s)
 {
   poly result = NULL;
   int i;
@@ -140,11 +140,11 @@ poly maEval(map theMap, poly p,ring preimage_r,matrix s)
 
       for (i=0; i<l; i++)
       {
-        monoms[i]=maEvalMonom(theMap,p,preimage_r,s);
+        monoms[i]=maEvalMonom(theMap,p,preimage_r,s, nMap);
         pIter(p);
       }
     }
-    result=maEvalMonom(theMap,p,preimage_r,s);
+    result=maEvalMonom(theMap,p,preimage_r,s, nMap);
     if (l>0)
     {
       for(i = l-1; i>=0; i--)
@@ -395,14 +395,13 @@ poly maIMap(ring r, poly p)
 {
   /* the simplest case:*/
   if(r==currRing) return pCopy(p);
-  //nSetMap(rInternalChar(r),r->parameter,rPar(r),r->minpoly);
-  nSetMap(r);
+  nMapFunc nMap=nSetMap(r);
   int *perm=(int *)omAlloc0((r->N+1)*sizeof(int));
   //int *par_perm=(int *)omAlloc0(rPar(r)*sizeof(int));
   maFindPerm(r->names,r->N, r->parameter, r->P,
              currRing->names,currRing->N,currRing->parameter, currRing->P,
              perm,NULL, currRing->ch);
-  poly res=pPermPoly(p,perm,r/*,par_perm,rPar(r)*/);
+  poly res=pPermPoly(p,perm,r, nMap /*,par_perm,rPar(r)*/);
   omFreeSize((ADDRESS)perm,(r->N+1)*sizeof(int));
   //omFreeSize((ADDRESS)par_perm,rPar(r)*sizeof(int));
   return res;
@@ -488,7 +487,7 @@ max_deg_fertig_p:
 *                       use perm and par_perm, N and P,
 */
 BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
-                     int *perm, int *par_perm, int P)
+                     int *perm, int *par_perm, int P, nMapFunc nMap)
 {
   int i;
   int N = preimage_r->N;
@@ -529,11 +528,11 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
         res->data=(void *)prCopyR( (poly)data, preimage_r);
       else
       if ((what==IMAP_CMD) || ((what==FETCH_CMD) /* && (nMap!=nCopy)*/))
-        res->data=(void *)pPermPoly((poly)data,perm,preimage_r,par_perm,P);
+        res->data=(void *)pPermPoly((poly)data,perm,preimage_r,nMap,par_perm,P);
       else /*if (what==MAP_CMD)*/
       {
         matrix s=mpNew(N,maMaxDeg_P((poly)data, preimage_r));
-        res->data=(void *)maEval(theMap,(poly)data,preimage_r,s);
+        res->data=(void *)maEval(theMap,(poly)data,preimage_r,nMap,s);
         idDelete((ideal *)&s);
       }
       if (currRing->minpoly!=NULL)
@@ -569,7 +568,7 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
       {
         for (i=R*C-1;i>=0;i--)
         {
-          m->m[i]=pPermPoly(((ideal)data)->m[i],perm,preimage_r,par_perm,P);
+          m->m[i]=pPermPoly(((ideal)data)->m[i],perm,preimage_r,nMap,par_perm,P);
           pTest(m->m[i]);
         }
       }
@@ -578,7 +577,7 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
         matrix s=mpNew(N,maMaxDeg_Ma((ideal)data,preimage_r));
         for (i=R*C-1;i>=0;i--)
         {
-          m->m[i]=maEval(theMap,((ideal)data)->m[i],preimage_r,s);
+          m->m[i]=maEval(theMap,((ideal)data)->m[i],preimage_r,nMap,s);
           pTest(m->m[i]);
         }
         idDelete((ideal *)&s);
@@ -616,7 +615,7 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
         ||(l->m[i].rtyp==LIST_CMD))
         {
           if (maApplyFetch(what,theMap,&ml->m[i],&l->m[i],
-                           preimage_r,perm,par_perm,P))
+                           preimage_r,perm,par_perm,P,nMap))
           {
             ml->Clean();
             omFreeBin((ADDRESS)ml, slists_bin);

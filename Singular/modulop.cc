@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.cc,v 1.22 2000-12-06 11:03:20 Singular Exp $ */
+/* $Id: modulop.cc,v 1.23 2000-12-15 18:49:34 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
@@ -317,26 +317,23 @@ number npMapP(number from)
   return (number)i;
 }
 
-BOOLEAN npSetMap(ring r)
+nMapFunc npSetMap(ring src, ring dst)
 {
-  if (rField_is_Q(r))
+  if (rField_is_Q(src))
   {
-    nMap = npMap0;   /*Q -> Z/p*/
-    return TRUE;
+    return npMap0;
   }
-  if ( rField_is_Zp(r) )
+  if ( rField_is_Zp(src) )
   {
-    if (rChar(r) == npPrimeM)
+    if (rChar(src) == rChar(dst))
     {
-      nMap = ndCopy;  /* Z/p -> Z/p*/
-      return TRUE;
+      return ndCopy;
     }
     else
     {
-      npMapPrime=rChar(r);
-      nMap = npMapP; /* Z/p' -> Z/p */
-      return TRUE;
+      npMapPrime=rChar(src);
+      return npMapP;
     }
   }
-  return FALSE;      /* default */
+  return NULL;      /* default */
 }

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: numbers.h,v 1.22 2000-12-13 17:49:39 Singular Exp $ */
+/* $Id: numbers.h,v 1.23 2000-12-15 18:49:35 Singular Exp $ */
 /*
 * ABSTRACT: interface to coefficient aritmetics
 */
@@ -66,8 +66,7 @@ extern void    (*nDBDelete)(number * a,char *f, int l);
 extern void    (*nDelete)(number * a);
 #endif
 
-extern BOOLEAN (*nSetMap)(ring r);
-extern number  (*nMap)(number from);
+#define nSetMap(R) (currRing->cf->nSetMap(R,currRing))
 extern char *  (*nName)(number n);
 
 void nDummy1(number* d);

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.48 2000-12-14 16:38:55 obachman Exp $ */
+/* $Id: structs.h,v 1.49 2000-12-15 18:49:36 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -186,6 +186,7 @@ struct _scmdnames
 typedef struct _scmdnames cmdnames;
 
 typedef number (*numberfunc)(number a,number b);
+typedef number (*nMapFunc)(number a);
 struct n_Procs_s
 {
    n_Procs_s* next;
@@ -226,7 +227,7 @@ struct n_Procs_s
    void    (*nPower)(number a, int i, number * result);
    number  (*nGetDenom)(number &n);
    numberfunc nGcd, nLcm;
-   BOOLEAN (*nSetMap)(ring r);
+   nMapFunc (*nSetMap)(ring src, ring dst);
 #ifdef LDEBUG
    BOOLEAN (*nDBTest)(number a, char *f, int l);
    void    (*nDBDelete)(number * a,char *f, int l);
