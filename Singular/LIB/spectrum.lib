@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: spectrum.lib,v 1.14 2001-03-20 18:19:48 mschulze Exp $";
+version="$Id: spectrum.lib,v 1.15 2001-05-03 07:56:41 mschulze Exp $";
 category="Singularities";
 info="
 LIBRARY:  spectrum.lib  Singularity Spectrum for Nondegenerate Singularities
@@ -13,7 +13,7 @@ PROCEDURES:
 
 proc spectrumnd (poly f,list #)
 "USAGE:    spectrumnd(f[,1]); poly f
-ASSUME:   basering has local ordering, 
+ASSUME:   basering has characteristic 0 and local ordering, 
           f has isolated singularity at 0 and nondegenerate principal part
 RETURN:
 @format
@@ -29,6 +29,10 @@ KEYWORDS: singularities; Gauss-Manin connection; spectrum
 EXAMPLE:  example spectrumnd; shows an example
 "
 {
+  if(charstr(basering)!="0")
+  {
+    ERROR("characteristic 0 expected");
+  }
   if(size(#)==0)
   {
     list S=system("spectrum",f);
