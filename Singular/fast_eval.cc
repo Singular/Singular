@@ -29,6 +29,11 @@ static poly maPoly_EvalMon(poly src, ring src_r, poly* dest_id, ring dest_r)
   for(i=1;i<=src_r->N;i++)
   {
     e=p_GetExp(src,i,src_r);
+    if ((e>0) && (dest_id[i-1]==NULL))
+    {
+      p_Delete(&p,dest_r);
+      return NULL;
+    }  
     if ((p==NULL) && (e>0))
     {
       p=p_Copy(dest_id[i-1],dest_r);
