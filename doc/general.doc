@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.173 1999-12-15 18:12:09 Singular Exp $
+@comment $Id: general.doc,v 1.174 1999-12-15 22:32:50 greuel Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -228,7 +228,7 @@ if (system("version") >= 1306) // keep backwards-compatibility
   // if help browser is later on set to netscape,
   // allow it to fetch HTML pages from the net
   system("--allow-net", 1);
-@}
+@}; // the last semicolon is important: otherwise no ">", but "." prompt
 @end smallexample
 in your file @code{$HOME/.singularrc} sets your default browser to
 @code{info}, unless @sc{Singular} is run within emacs (in which case the 
@@ -695,7 +695,7 @@ with the following content
 if (system("version") >= 1306) // assure backwards-compatibility
 @{ 
   system("--allow-net", 1);    
-@}
+@}; // the last semicolon is important: otherwise no ">", but "." prompt
 @end smallexample
 in the directory containing the @sc{Singular} libraries, thereby
 allowing to fetch the HTML on-line help from the WWW home-site of
@@ -711,7 +711,7 @@ if (system("version") >= 1306) // assure backwards-compatibility
     // set default browser to info, unless we run within emacs
     system("--browser", "info"); 
   @}
-@}
+@}; // the last semicolon is important: otherwise no ">", but "." prompt
 @end smallexample
 in her home directory, which sets the default help browser to
 @code{info} (unless @sc{Singular} is run within emcas) and thereby
