@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.54 2000-02-03 12:29:23 siebert Exp $ */
+/* $Id: syz1.cc,v 1.55 2000-02-29 10:46:05 siebert Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -830,6 +830,7 @@ static intvec* syLinStrat(SSet nextPairs, syStrategy syzstr,
       break;
     }
   }
+  delete spl;
   return result;
 }
 #endif
@@ -880,7 +881,7 @@ static void syRedNextPairs(SSet nextPairs, syStrategy syzstr,
   number coefgcd,n;
   polyset redset=syzstr->orderedRes[index]->m;
   poly p=NULL,q;
-  intvec *spl1=NewIntvec1(howmuch+1);
+  intvec *spl1;
   SObject tso;
   long * ShiftedComponents = syzstr->ShiftedComponents[index];
   int* Components = syzstr->truecomponents[index];
@@ -1630,6 +1631,17 @@ void syKillComputation(syStrategy syzstr)
       }
       Free((ADDRESS)syzstr->fullres,(syzstr->length+1)*sizeof(ideal));
     }
+    if (syzstr->weights!=0)
+    {
+      for (i=0;i<syzstr->length;i++)
+      {
+        if (syzstr->weights[i]!=NULL)
+        {
+          delete syzstr->weights[i];
+        }
+      }
+      Free((ADDRESS)syzstr->weights,syzstr->length*sizeof(intvec*));
+    }
     ring origR = currRing;
 
     if ((syzstr->syRing != NULL) && (syzstr->syRing != origR))
@@ -1643,6 +1655,8 @@ void syKillComputation(syStrategy syzstr)
         {
           if ((syzstr->resPairs[i])[j].lcm!=NULL)
             pDelete(&((syzstr->resPairs[i])[j].lcm));
+          if ((i>0) && ((syzstr->resPairs[i])[j].syz!=NULL))
+            pDelete(&((syzstr->resPairs[i])[j].syz));
         }
         if (syzstr->orderedRes[i]!=NULL)
         {
@@ -1674,6 +1688,11 @@ void syKillComputation(syStrategy syzstr)
           Free((ADDRESS)syzstr->Firstelem[i],(IDELEMS(syzstr->res[i])+1)*sizeof(int));
           syzstr->Firstelem[i]=NULL;
         }
+        if (syzstr->elemLength[i]!=NULL)
+        {
+          Free((ADDRESS)syzstr->elemLength[i],(IDELEMS(syzstr->res[i])+1)*sizeof(int));
+          syzstr->elemLength[i]=NULL;
+        }
         if (syzstr->res[i]!=NULL)
         {
           for (j=0;j<IDELEMS(syzstr->res[i]);j++)
@@ -1682,14 +1701,8 @@ void syKillComputation(syStrategy syzstr)
               pDelete(&(syzstr->res[i]->m[j]));
           }
         }
-        if (syzstr->weights!=0)
-        {
-          if (syzstr->weights[i]!=NULL)
-          {
-            delete syzstr->weights[i];
-          }
-          Free((ADDRESS)syzstr->weights,syzstr->length*sizeof(intvec*));
-        }
+        if (syzstr->hilb_coeffs[i]!=NULL)
+          delete syzstr->hilb_coeffs[i];
         if (syzstr->sev[i] != NULL)
           Free((ADDRESS)syzstr->sev[i], (IDELEMS(syzstr->res[i])+1)*sizeof(unsigned long));
         idDelete(&(syzstr->res[i]));
@@ -1706,6 +1719,8 @@ void syKillComputation(syStrategy syzstr)
       Free((ADDRESS)syzstr->backcomponents,(syzstr->length+1)*sizeof(int*));
       Free((ADDRESS)syzstr->Howmuch,(syzstr->length+1)*sizeof(int*));
       Free((ADDRESS)syzstr->Firstelem,(syzstr->length+1)*sizeof(int*));
+      if (syzstr->hilb_coeffs!=NULL)
+        Free((ADDRESS)syzstr->hilb_coeffs,(syzstr->length+1)*sizeof(intvec*));
     }
     if (syzstr->cw!=NULL)
       delete syzstr->cw;
@@ -1713,6 +1728,8 @@ void syKillComputation(syStrategy syzstr)
       delete syzstr->betti;
     if (syzstr->resolution!=NULL)
       delete syzstr->resolution;
+    if (syzstr->Tl!=NULL)
+      delete syzstr->Tl;
     if ((syzstr->syRing != NULL) && (syzstr->syRing != origR))
     {
       rChangeCurrRing(origR, FALSE);

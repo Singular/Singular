@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.cc,v 1.34 2000-02-03 12:29:23 siebert Exp $ */
+/* $Id: syz.cc,v 1.35 2000-02-29 10:46:03 siebert Exp $ */
 
 /*
 * ABSTRACT: resolutions
@@ -589,6 +589,7 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
     {
       res[i] = idrMoveR_NoSort(res[i], syz_ring);
     }
+    rKill(syz_ring);
   }
   return res;
 }

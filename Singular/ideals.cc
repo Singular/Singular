@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.91 2000-02-07 17:24:17 Singular Exp $ */
+/* $Id: ideals.cc,v 1.92 2000-02-29 10:46:02 siebert Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -68,9 +68,9 @@ ideal idInit(int idsize, int rank)
   return hh;
 }
 
-#ifndef __OPTIMIZE__
+//#ifndef __OPTIMIZE__
 // this is mainly for outputting an ideal within the debugger
-void idPrint(ideal id)
+void idShow(ideal id)
 {
   Print("Module of rank %d,real rank %d and %d generators.\n",
          id->rank,idRankFreeModule(id),IDELEMS(id));
@@ -82,7 +82,7 @@ void idPrint(ideal id)
     }
   }
 }
-#endif
+//#endif
 
 /*2
 * initialise the maximal ideal (at 0)

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz0.cc,v 1.27 1999-11-25 13:12:26 siebert Exp $ */
+/* $Id: syz0.cc,v 1.28 2000-02-29 10:46:04 siebert Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -534,7 +534,6 @@ static ideal sySchreyersSyzygiesFB(ideal arg,intvec ** modcomp,ideal mW,BOOLEAN 
   int *Flength;
   polyset pairs,F=arg->m,*Shdl=&(result->m);
   poly p,q,toRed,syz,lastmonom,multWith;
-  ideal null;
   BOOLEAN isNotReduced=TRUE;
 
 //#define WRITE_BUCKETS
@@ -556,7 +555,6 @@ if (modcomp!=NULL) (*modcomp)->show(0,0);
     pairs=(polyset)Alloc0((Fl+gencQ)*sizeof(poly));
   }
   rkF=idRankFreeModule(arg);
-  null = idInit(1,rkF);
   Flength = (int*)Alloc0(Fl*sizeof(int));
   for(j=0;j<Fl;j++)
   {

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz2.cc,v 1.13 2000-02-03 12:27:33 siebert Exp $ */
+/* $Id: syz2.cc,v 1.14 2000-02-29 10:46:06 siebert Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -267,6 +267,7 @@ PrintLn();
     if (r1<=rr) break;
 #endif
   }
+  idDelete(&nP);
 #ifdef USE_CHAINCRIT
   while (cp!=NULL)
   {
@@ -399,6 +400,7 @@ inline void sySPRedSyz(syStrategy syzstr,sSObject redWith,poly q=NULL)
   pSetCoeff(p,nDiv(pGetCoeff(q),pGetCoeff(redWith.p)));
   int il=-1;
   kBucket_Minus_m_Mult_p(syzstr->syz_bucket,p,redWith.syz,&il,NULL);
+  pDelete(&p);
 }
 
 static poly syRed_Hilb(poly toRed,syStrategy syzstr,int index)
@@ -502,7 +504,7 @@ static void syRedNextPairs_Hilb(SSet nextPairs, syStrategy syzstr,
   number coefgcd,n;
   SSet redset=syzstr->resPairs[index];
   poly p=NULL,q,tp;
-  intvec *spl1=NewIntvec1(howmuch+1);
+  intvec *spl1;
   SObject tso;
   intvec *spl3=NULL;
 #ifdef USE_HEURISTIC1
@@ -780,6 +782,7 @@ Print("naechstes i ist: %d",i);
 #endif
   }
   delete spl1;
+  if (spl3!=NULL) delete spl3;
 }
 
 void sySetNewHilb(syStrategy syzstr, int toSub,int index,int actord)
@@ -788,7 +791,7 @@ void sySetNewHilb(syStrategy syzstr, int toSub,int index,int actord)
   actord += index;
   intvec * temp_hilb = hHstdSeries(syzstr->res[index+1],NULL,NULL,NULL);
   intvec * cont_hilb = hHstdSeries(syzstr->res[index],NULL,NULL,NULL);
-  if (syzstr->hilb_coeffs[index+1]==NULL)
+  if ((index+1<syzstr->length) && (syzstr->hilb_coeffs[index+1]==NULL))
   {
     syzstr->hilb_coeffs[index+1] = NewIntvec1(16*((actord/16)+1));
   }

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.h,v 1.20 2000-01-27 16:53:47 Singular Exp $ */
+/* $Id: ideals.h,v 1.21 2000-02-29 10:46:03 siebert Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -21,7 +21,7 @@ void idDelete (ideal* h);
   /*- deletes an ideal -*/
 #endif
 void idShow(ideal id);
-void idPrint(ideal id);
+#define idPrint(id) idShow(id)
   /*- initialise an ideal -*/
 ideal idMaxIdeal (int deg);
   /*- initialise the maximal ideal (at 0) -*/
