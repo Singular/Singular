@@ -1,10 +1,11 @@
-// last change:           05.12.2000
+// last change:           17.01.2001
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: paramet.lib,v 1.8 2000-12-22 14:20:59 greuel Exp $";
+version="$Id: paramet.lib,v 1.9 2001-01-17 08:58:54 keilen Exp $";
 category="Visualization";
 info="
 LIBRARY: paramet.lib   Parametrization of Varieties
 AUTHOR:  Thomas Keilen, keilen@mathematik.uni-kl.de
+SEE ALSO: normal.lib, primdec.lib, hnoether.lib
 
 OVERVIEW:
  A library to compute parametrizations of algebraic varieties (if possible)
@@ -12,30 +13,30 @@ OVERVIEW:
  a parametrization of a plane curve singularity with the aid of a
  Hamburger-Noether expansion.
 
- PROCEDURES:
- parametrize(I);       parametrizes a prime ideal via the normalization
+PROCEDURES:           
+ parametrize(I);       parametrizes a prime ideal via the normalization         
  parametrizepd(I);     calculates the prim.dec. and parametrizes the components
- parametrizesing(f);   parametrize an isolated plane curve singularity
+ parametrizesing(f);   parametrizes an isolated plane curve singularity
 ";
-
 ///////////////////////////////////////////////////////////////////////////////
 LIB "normal.lib";
 LIB "hnoether.lib";
 ///////////////////////////////////////////////////////////////////////////////
 
 proc parametrize(ideal I)
-"USAGE:  parametrize(I); I ideal in an arbitrary number of variables,
-         whose radical is prime, in a ring with global ordering
-RETURN:  a list containing the parametrization ideal resp. the original ideal,
-         the number of variables needed for the parametrization resp. 0, and
-         1 resp. 0 depending on whether the parametrization was successful
-         or not
-CREATE:  If the parametrization is successful, the basering will be changed to
-         the parametrization ring, that is to the ring PR=0,(s,t),dp;
-         respectively PR=0,t(1..d),dp;, depending on the dimension of the
-         parametrized variety.
-EXAMPLE: example parametrize; shows an example
-"
+"USAGE:   parametrize(I); I ideal in an arbitrary number of variables,
+          whose radical is prime, in a ring with global ordering  
+CREATE:   If the parametrization is successful, the basering will be changed to
+          the parametrization ring, that is to the ring PR=0,(s,t),dp; 
+          respectively PR=0,t(1..d),dp;, depending on the dimension of the 
+          parametrized variety.
+RETURN:   a list containing the parametrization ideal resp. the original ideal,
+          the number of variables needed for the parametrization resp. 0, and
+          1 resp. 0 depending on whether the parametrization was successful
+          or not
+SEE ALSO: primdecGTZ, normal, radical, parametrizepd
+KEYWORDS: parametrization, normalization
+EXAMPLE: example parametrize; shows an example"
 {
   intvec ov=option(get);
   option(noredefine);
@@ -100,17 +101,18 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc parametrizepd(ideal I)
-"USAGE:  parametrizepd(I); I ideal in a polynomial ring with global ordering
-RETURN:  a list of lists, where each entry contains the parametrization
-         of a primary component of I resp. 0, the number of variables
-         resp. 0, and 1 resp. 0 depending on whether the parametrization
-         of the component was successful or not
-CREATE:  If the parametrization is successful, the basering will be changed to
-         the parametrization ring, that is to the ring PR=0,(s,t),dp;
-         respectively PR=0,t(1..d),dp;, depending on the dimension of the
-         parametrized variety.
-EXAMPLE: example parametrizepd; shows an example
-"
+"USAGE:   parametrizepd(I); I ideal in a polynomial ring with global ordering
+CREATE:   If the parametrization is successful, the basering will be changed to
+          the parametrization ring, that is to the ring PR=0,(s,t),dp; 
+          respectively PR=0,t(1..d),dp;, depending on the dimension of the 
+          parametrized variety.
+RETURN:   a list of lists, where each entry contains the parametrization
+          of a primary component of I resp. 0, the number of variables
+          resp. 0, and 1 resp. 0 depending on whether the parametrization
+          of the component was successful or not
+SEE ALSO: primdecGTZ, normal, parametrize
+KEYWORDS: parametrization, normalization
+EXAMPLE:  example parametrizepd; shows an example"
 {
   intvec ov=option(get);
   option(noredefine);
@@ -179,13 +181,14 @@ example
 /////////////////////////////////////////////////////////////////////////////
 
 proc parametrizesing(poly f)
-"USAGE:  parametrizesing(); f a polynomial in two variables,ordering ls or ds
-RETURN:  a list of ideals, each ideal parametrizes a branch of the
-         singularity at the origin; resp. 0, if f was not of the desired kind
-CREATE:  If the parametrization is successful, the basering will be changed to
-         the parametrization ring, that is to the ring  0,(x,y),ls;
-EXAMPLE: example parametrizesing; shows an example
-"
+"USAGE:   parametrizesing(f); f a polynomial in two variables,ordering ls or ds
+CREATE:   If the parametrization is successful, the basering will be changed to
+          the parametrization ring, that is to the ring  0,(x,y),ls;
+RETURN:   a list containing the parametrizations of the different branches of the
+          singularity at the origin resp. 0, if f was not of the desired kind  
+SEE ALSO: hnoether.lib, reddevelop
+KEYWORDS: parametrization, curve singularities
+EXAMPLE:  example parametrizesing; shows an example"
 {
   intvec ov=option(get);
   option(noredefine);
@@ -215,181 +218,3 @@ example
   poly f=(x^2-y^3)*(x^2-y^2-y^3);
   parametrizesing(f);
 }
-
-////////////////////////////////////////////////////////////////////////////
-
-
-
-
-
-///////////////////////////////////////////////////////////////////////////
-////////         Examples
-///////////////////////////////////////////////////////////////////////////
-/*
-
-/// Examples for parametrize
-
-/// Example 1
-
-ring r=0,(x,y),dp;
-ideal i=x^2-y^3;
-parametrize(i);
-
-/// Example 2
-
-ring r=0,(x,y,z),dp;
-ideal i=x2-y2z2-y3;
-parametrize(i);
-
-/// Example 3
-
-ring r=0,(x,y,z),dp;
-ideal i=z2-x2y;
-parametrize(i);
-
-/// Example 4
-
-ring r=0,(x,y,z),dp;
-ideal i=z2-x2y;
-parametrize(i);
-
-/// Example 5
-
-ring r=0,(x,y,z),dp;
-ideal i=x2-y3;
-parametrize(i);
-
-/// Example 6
-
-ring r=0,(x,y,z),dp;
-ideal i=y2-xz,z2-x2y,x3-yz;
-parametrize(i);
-
-/// Example 7 - ideal is not prime
-
-ring r=0,(x,y),dp;
-ideal i=xy;
-parametrize(i);
-
-/// Example 8 - you get a parametrization of the reduced ideal
-
-ring r=0,(x,y),dp;
-ideal i=x2;
-parametrize(i);
-
-/// Example 9 - wrong ordering
-
-ring r=0,(x,y),ls;
-ideal i=x2-y3;
-parametrize(i);
-
-
-
-
-
-/////////////////////////////////////////////////////////////////////
-
-/// Examples for parametrizepd
-
-/// Example 1
-ring r=0,(x,y,z),dp;
-ideal i=y2z5-x2y2z2+y2z4-z6-z5+x4-x2z2,-y3z3+yz4+x2yz;
-parametrizepd(i);
-
-/// Example 2
-
-ring r=0,(x,y,z),dp;
-ideal i=z^2-x^2*y,y^2-x*z;
-parametrizepd(i);
-
-/// Example 3
-
-ring r=0,(x,y,z),dp;
-ideal i=y^5*z^2-x^2*y^6-x*y^3*z^3+x^3*y^4*z-x^4*y^2*z^2+x^6*y^3+x^5*z^3-x^7*y*z,y^6*z^2-x^2*y^7-2*x^4*y^3*z^2+2*x^6*y^4+x^8*z^2-x^(10)*y;
-parametrizepd(i);
-
-/// Example 4
-
-ring r=0,(x,y,z),dp;
-ideal i=y^6*z^2-x^2*y^7-x*y^4*z^3+x^3*y^5*z-x^3*y^2*z^2+x^5*y^3+x^4*z^3-x^6*y*z,y^8*z^2-x^2*y^9-2*x^3*y^4*z^2+2*x^5*y^5+x^6*z^2-x^8*y;
-parametrizepd(i);
-
-/// Example 5 - gives a parametrization which is not suitable for plotting reasons
-
-ring r=0,(x,y,z,u),dp;
-ideal i=x-zu,y2-zu2;
-parametrizepd(i);
-
-/// Example 6 - one component has no parametrization
-
-ring r=0,(x,y,z),dp;
-ideal i=-x2y3+x3yz+y2z2-xz3,y2z-xz2;
-parametrizepd(i);
-
-/// Example 7 - wrong ordering!
-
-ring r=0,(x,y,z),ls;
-ideal i=x2-y2z2-y3;
-parametrizepd(i);
-
-
-
-///////////////////////////////////////////////////////////////////
-
-/// Examples for parametrizesing
-
-/// Example 1
-
-ring r=0,(x,y),ls;
-poly f=x^2-y^3;
-parametrizesing(f);
-
-/// Example 2
-
-ring r=0,(x,y),ls;
-poly f=x^3+y^3-3*x*y;
-parametrizesing(f);
-
-/// Example 3
-
-ring r=0,(x,y),ls;
-poly f=y*x^2-y^8;
-parametrizesing(f);
-
-/// Example 4
-
-ring r=0,(x,y),ls;
-poly f=-x6-x5+2x3y2+x2y2-y4;
-parametrizesing(f);
-
-/// Example 5
-
-ring r=0,(x,y),ls;
-poly f=x6y4-x8y+x5y4-2x3y6-x7y+2x5y3-x2y6+y8+x4y3-x2y5;
-parametrizesing(f);
-
-/// Example 6 - wrong number of variables
-
-ring r=0,(x,y,z),dp;
-poly f=x2-y2z2-y3;
-parametrizesing(f);
-
-/// Example 7 - wrong ring ordering
-
-ring r=0,(x,y),dp;
-poly f=x2-y3;
-parametrizesing(f);
-
-
-/// To do:
-///        2) Let parametrize/parametrizepd print more detailed failure reasons.
-///        3) Let these two check, if the input is inside a ring with global
-///           ordering.
-///        4) Include a better check, whether some variable in the
-///           normalization can be dropped.
-///        5) Drop ordering lp in parametrizesing, as soon as the link to
-///           MuPAD allows to give back data in ordering ls.
-
-
-
-*/
