@@ -642,7 +642,7 @@ static int* make_connections(int from, int to, poly bound, calc_dat* c)
   int con_checked=0;
   int pos;
   BOOLEAN can_find_more=TRUE;
-  while(((not_yet_found>0) && (con_checked<connected_length))||can_find_more){
+  while(TRUE){
     if ((con_checked<connected_length)&& (not_yet_found>0)){
       pos=connected[con_checked];
       for(int i=0;i<cans_length;i++){
