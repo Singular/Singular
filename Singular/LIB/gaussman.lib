@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.47 2001-08-01 12:33:41 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.48 2001-08-01 13:21:36 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -1304,7 +1304,7 @@ EXAMPLE:  example sppairs; shows examples
     j=i+1;
     while(j<ncols(A)&&A[i,i]==A[j,j])
     {
-      if(w0[i]>w0[j])
+      if(w0[i]<w0[j])
       {
         k=w0[i];
         w0[i]=w0[j];
@@ -1315,7 +1315,7 @@ EXAMPLE:  example sppairs; shows examples
       }
       j++;
     }
-    if(j==ncols(A)&&A[i,i]==A[j,j]&&w0[i]>w0[j])
+    if(j==ncols(A)&&A[i,i]==A[j,j]&&w0[i]<w0[j])
     {
       k=w0[i];
       w0[i]=w0[j];
@@ -1460,7 +1460,7 @@ example
 { "EXAMPLE:"; echo=2;
   ring R=0,(x,y),ds;
   ideal a=-1/2,-3/10,-3/10,-1/10,-1/10,0,1/10,1/10,3/10,3/10,1/2;
-  intvec w=2,1,1,1,1,1,1,1,1,1,1;
+  intvec w=2,1,1,1,1,1,1,1,1,1,0;
   spprint(sppgen(a,w));
 }
 ///////////////////////////////////////////////////////////////////////////////
