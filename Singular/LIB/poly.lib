@@ -1,9 +1,9 @@
-// $Id: poly.lib,v 1.22 2000-01-10 16:30:31 obachman Exp $
+// $Id: poly.lib,v 1.23 2000-01-10 16:40:41 obachman Exp $
 //(GMG, last modified 22.06.96)
 //(obachman: 17.12.97 -- added katsura)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: poly.lib,v 1.22 2000-01-10 16:30:31 obachman Exp $";
+version="$Id: poly.lib,v 1.23 2000-01-10 16:40:41 obachman Exp $";
 info="
 LIBRARY:  poly.lib      PROCEDURES FOR MANIPULATING POLYS, IDEALS, MODULES
 
@@ -22,6 +22,8 @@ PROCEDURES:
  normalize(poly/...);   normalize poly/... such that leading coefficient is 1
  rad_con(p,I);          check radical containment of poly p in ideal I
  content(f);            content of polynomial/vector f
+ numerator(n);          numerator of number n
+ denominator(n)         denominator of number n
           (parameters in square brackets [] are optional)
 ";
 
