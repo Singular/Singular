@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz2.cc,v 1.8 1999-11-15 17:20:54 obachman Exp $ */
+/* $Id: syz2.cc,v 1.9 1999-11-18 18:43:58 siebert Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -45,7 +45,6 @@
 //#define USE_HEURISTIC1
 #define USE_HEURISTIC2
 
-extern void rSetmS(poly p, int* Components, long* ShiftedComponents);
 #ifdef SHOW_CRIT
 static int crit;
 static int crit1;
@@ -126,7 +125,7 @@ static void syCreateNewPairs_Hilb(syStrategy syzstr, int index,
 #endif
             p = pOne();
             pLcm((syzstr->resPairs[index])[i].p,toHandle,p);
-            rSetmS(p,Components, ShiftedComponents);
+            pSetm(p);
             j = 0;
             while (j<i)
             { 
@@ -231,11 +230,6 @@ Print("gefunden in Mod %d: ",index); pWrite((syzstr->resPairs[index])[ti].lcm);
           tso.isNotMinimal = (poly)1;
           tso.p = NULL;
           tso.length = -1;
-          currcomponents = syzstr->truecomponents[index];
-          currShiftedComponents = syzstr->ShiftedComponents[index];
-          rChangeSComps(currcomponents,
-                        currShiftedComponents,
-                        IDELEMS(syzstr->res[index])); // actueller index
           number coefgcd =
             nGcd(pGetCoeff(tso.p1),pGetCoeff(tso.p2));
           tso.syz = pCopy((syzstr->resPairs[index])[i].syz);
@@ -251,12 +245,7 @@ Print("gefunden in Mod %d: ",index); pWrite((syzstr->resPairs[index])[ti].lcm);
           pDelete(&tt);
           tso.syz = pAdd(pp,tso.syz);
           nDelete(&coefgcd);
-          currcomponents = syzstr->truecomponents[index-1];
-          currShiftedComponents = syzstr->ShiftedComponents[index-1];
           pSetComp(tso.lcm,pGetComp((syzstr->resPairs[index])[r1].syz));
-          rChangeSComps(currcomponents,
-                        currShiftedComponents,
-                        IDELEMS(syzstr->res[index])); // actueller index
 #ifdef SHOW_PROT
 Print("erzeuge Paar im Modul %d,%d mit: \n",index,tso.order);
 Print("poly1: ");pWrite(tso.p1);
@@ -291,121 +280,12 @@ PrintLn();
 * determines the place of a polynomial in the right ordered resolution
 * set the vectors of truecomponents
 */
-static BOOLEAN syOrder_Hilb(poly p,syStrategy syzstr,int index,
-                    int realcomp)
+static void syOrder_Hilb(poly p,syStrategy syzstr,int index)
 {
-  int i=IDELEMS(syzstr->res[index-1])+1,j=0,k,tc,orc,ie;
-  int *trind1=syzstr->truecomponents[index-1];
-  int *trind=syzstr->truecomponents[index];
-  long *shind=syzstr->ShiftedComponents[index];
-  poly pp;
-  polyset o_r=syzstr->orderedRes[index]->m;
-  BOOLEAN ret = FALSE;
+  int i=IDELEMS(syzstr->orderedRes[index]);
 
-  // if != 0, then new element can go into same component
-  // i.e., we do not need to leave space in shifted components
-  long same_comp = 0;
-
-  if (p==NULL) return FALSE;
-  if (realcomp==0) realcomp=1;
-  ie = IDELEMS(syzstr->orderedRes[index]);
-  while ((ie>0) && (syzstr->orderedRes[index]->m[ie-1]==NULL)) ie--;
-  if (ie==0)
-  {
-    j = 0;
-  }
-  else
-  {
-    if (index>1)
-      tc = trind1[pGetComp(p)];
-    else
-      tc = pGetComp(p);
-    loop
-    {
-      orc = pGetComp(o_r[j]);
-      if (trind1[orc]>tc+1) break;
-      else if (trind1[orc] == tc+1)
-      {
-        same_comp = 1;
-      }
-      j++;
-      if (j==ie) break;
-    } 
-  }
-  if (j == ie)
-  {
-    // new element is the last in ordered module
-    if (same_comp == 0)
-      same_comp = SYZ_SHIFT_BASE;
-
-    // test wheter we have enough space for new shifted component
-    if ((LONG_MAX - same_comp) <= shind[ie])
-    {
-      long new_space = syReorderShiftedComponents(shind, ie+1);
-      assume((LONG_MAX - same_comp) > shind[ie]);
-      ret = TRUE;
-      if (TEST_OPT_PROT) Print("(T%u)", new_space);
-    }
-
-    // yes, then set new shifted component
-    assume(ie == 0 || shind[ie] > 0);
-    shind[ie+1] = shind[ie] + same_comp;
-  }
-  else
-  {
-    // new element must come in between
-    // i.e. at place j+1
-    long prev, next;
-
-    // test whether new component can get shifted value
-    prev = shind[j];
-    next = shind[j+1];
-    assume(next > prev);
-    if ((same_comp && prev + 2 >= next) || (!same_comp && next - prev < 4))
-    {
-       long new_space = syReorderShiftedComponents(shind, ie+1);
-      prev = shind[j];
-      next = shind[j+1];
-      assume((same_comp && prev + 2 < next) || (!same_comp && next - prev >= 4));
-      ret = TRUE;
-     if (TEST_OPT_PROT) Print("(B%u)", new_space);
-    }
-
-    // make room for insertion of j+1 shifted component
-    for (k=ie+1; k > j+1; k--) shind[k] = shind[k-1];
-
-    if (same_comp)
-    {
-      // can simply add one
-      shind[j+1] = prev + 1;
-      assume(shind[j+1] + 1 < shind[j+2]);
-    }
-    else
-    {
-      // need to leave more breathing room - i.e. value goes in
-      // between
-      shind[j+1]  = prev + ((next - prev) >> 1);
-      assume (shind[j] + 1 < shind[j+1] && shind[j+1] + 1 < shind[j+2]);
-    }
-  }
-
-  if (o_r[j]!=NULL)
-  {
-    for (k=ie;k>j;k--)
-    {
-      o_r[k] = o_r[k-1];
-    }
-  }
-  o_r[j] = p;
-  for (k=0;k<IDELEMS((syzstr->res)[index]);k++)
-  {
-    if (trind[k]>j)
-      trind[k] += 1;
-  }
-  for (k=IDELEMS((syzstr->res)[index])-1;k>realcomp;k--)
-    trind[k] = trind[k-1];
-  trind[realcomp] = j+1;
-  return ret;
+  while ((i>0) && (syzstr->orderedRes[index]->m[i-1]==NULL)) i--;
+  syzstr->orderedRes[index]->m[i] = p;
 }
 
 static void syHalfPair(poly syz, int newEl, syStrategy syzstr, int index)
@@ -434,11 +314,10 @@ static void syHalfPair(poly syz, int newEl, syStrategy syzstr, int index)
   tso.order = pTotaldegree(syz);
   tso.syz = pHead(syz);
   pSetComp(tso.syz,newEl+1);
+  pSetm(tso.syz);
   tso.lcm = pHead(tso.syz);
   tso.length = pLength(syz);
-  if (syOrder_Hilb(syz,syzstr,index,newEl+1))
-    syResetShiftedComponents(syzstr, index+1,1);
-  rSetmS(tso.syz,syzstr->truecomponents[index],syzstr->ShiftedComponents[index]);
+  syOrder_Hilb(syz,syzstr,index);
 #ifdef SHOW_PROT
 Print("erzeuge Halbpaar im Module %d,%d mit: \n",index,tso.order);
 Print("syz: ");pWrite(tso.syz);
@@ -741,17 +620,7 @@ Print("syz: ");pWrite(tso.syz);
 Print("mit: ");pWrite(redset[j].p);
 Print("syz: ");pWrite(redset[j].syz);
 #endif
-            currcomponents = syzstr->truecomponents[index];
-            currShiftedComponents = syzstr->ShiftedComponents[index];
-            rChangeSComps(currcomponents,
-                          currShiftedComponents,
-                          IDELEMS(syzstr->res[index]));
             sySPRedSyz(syzstr,redset[j],q);
-            currcomponents = syzstr->truecomponents[index-1];
-            currShiftedComponents = syzstr->ShiftedComponents[index-1];
-            rChangeSComps(currcomponents,
-                          currShiftedComponents,
-                          IDELEMS(syzstr->res[index-1]));
             number up = kBucketPolyRed(syzstr->bucket,redset[j].p,
                          redset[j].length, NULL);
             nDelete(&up);
@@ -770,18 +639,8 @@ PrintLn();
           }
         }
         kBucketClear(syzstr->bucket,&tso.p,&tso.length);
-        currcomponents = syzstr->truecomponents[index];
-        currShiftedComponents = syzstr->ShiftedComponents[index];
-        rChangeSComps(currcomponents,
-                      currShiftedComponents,
-                      IDELEMS(syzstr->res[index]));
         int il;
         kBucketClear(syzstr->syz_bucket,&tso.syz,&il);
-        currcomponents = syzstr->truecomponents[index-1];
-        currShiftedComponents = syzstr->ShiftedComponents[index-1];
-        rChangeSComps(currcomponents,
-                      currShiftedComponents,
-                      IDELEMS(syzstr->res[index-1]));
       }
 #ifdef SHOW_PROT
 Print("erhalte Paar mit: \n");
@@ -815,17 +674,7 @@ Print(" mit index %d, %d ",tso.ind1,tso.ind2);
       {
         if (ks==IDELEMS(syzstr->res[index+1]))
           syEnlargeFields(syzstr,index+1);
-        currcomponents = syzstr->truecomponents[index];
-        currShiftedComponents = syzstr->ShiftedComponents[index];
-            rChangeSComps(currcomponents,
-                          currShiftedComponents,
-                          IDELEMS(syzstr->res[index]));
         syzstr->res[index+1]->m[ks] = syRed_Hilb(tso.syz,syzstr,index+1);
-        currcomponents = syzstr->truecomponents[index-1];
-        currShiftedComponents = syzstr->ShiftedComponents[index-1];
-            rChangeSComps(currcomponents,
-                          currShiftedComponents,
-                          IDELEMS(syzstr->res[index-1]));
         if (syzstr->res[index+1]->m[ks]!=NULL)
         {
           if (TEST_OPT_PROT) PrintS("s");
@@ -1103,18 +952,12 @@ syStrategy syHilb(ideal arg,int * length)
   }
   
   // Creare dp,S ring and change to it
-  syzstr->syRing = rCurrRingAssure_dp_S();
+  syzstr->syRing = rCurrRingAssure_dp_C();
   assume(syzstr->syRing != origR);
 
   // set initial ShiftedComps
   currcomponents = (int*)Alloc0((arg->rank+1)*sizeof(int));
   currShiftedComponents = (long*)Alloc0((arg->rank+1)*sizeof(long));
-  for (i=0;i<=arg->rank;i++)
-  {
-    currShiftedComponents[i] = (i)*SYZ_SHIFT_BASE;
-    currcomponents[i] = i;
-  }
-  rChangeSComps(currcomponents, currShiftedComponents, arg->rank);
 
 /*--- initializes the data structures---------------*/
 #ifdef SHOW_CRIT
@@ -1167,10 +1010,6 @@ Print("compute %d Paare im Module %d im Grad %d \n",howmuch,index,actdeg+index);
       i = syInitSyzMod(syzstr,index,idRankFreeModule(arg)+1);
     else
       i = syInitSyzMod(syzstr,index);
-    currcomponents = syzstr->truecomponents[max(index-1,0)];
-    currShiftedComponents = syzstr->ShiftedComponents[max(index-1,0)];
-    rChangeSComps(currcomponents, currShiftedComponents,
-                  IDELEMS(syzstr->res[max(index-1,0)]));
     j = syInitSyzMod(syzstr,index+1);
     if (index>0)
     {

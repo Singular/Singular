@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz0.cc,v 1.25 1999-11-15 17:20:53 obachman Exp $ */
+/* $Id: syz0.cc,v 1.26 1999-11-18 18:43:57 siebert Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -184,7 +184,7 @@ void sySchreyersSyzygiesFM(polyset F,int Fmax,polyset* Shdl,int* Smax,
   BOOLEAN notFound = FALSE;
 
 /*-------------initializing the sets--------------------*/
-  ideal idF=(ideal)AllocSizeOf(ip_sideal);
+  ideal idF=(ideal)Alloc0SizeOf(ip_sideal);
   ST=(polyset)Alloc0(Fl*sizeof(poly));
   S=(polyset)Alloc0(Fl*sizeof(poly));
   ecartS=(int*)Alloc(Fl*sizeof(int));
@@ -197,14 +197,21 @@ void sySchreyersSyzygiesFM(polyset F,int Fmax,polyset* Shdl,int* Smax,
   smax = Fl;
   tmax = 2*Fl;
   idF->m=F;IDELEMS(idF)=Fmax;
+  idF->nrows=1;
   rkF=idRankFreeModule(idF);
-  FreeSizeOf((ADDRESS)idF,ip_sideal);
 /*-------------sorting of F for index handling------------*/
   if (noSort)
   {
     oldF = F;
     F=syInitSort(F,rkF,Fmax,1,&modcomp);
   }
+#ifndef __OPTIMIZE__
+Print("Neue Anordnung: ");
+idF->m=F;IDELEMS(idF)=Fmax;
+idF->nrows=1;
+idPrint(idF);
+FreeSizeOf((ADDRESS)idF,ip_sideal);
+#endif
 /*----------------construction of the new ordering----------*/
   pSetSchreyerOrdM(F,Fl,rkF);
 /*----------------creating S--------------------------------*/
@@ -909,9 +916,9 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
         rChangeCurrRing(&tmpR, TRUE);
         if ((currRing->OrdSgn != 1) && (hom!=isHomog))
         {
-          for (i=0; i<IDELEMS(res[1]); i++)
+          for (i=0; i<IDELEMS(res[0]); i++)
           {
-            res[1]->m[i] = prMoveR( res[1]->m[i], origR);
+            res[0]->m[i] = prMoveR( res[0]->m[i], origR);
           }
         }
         else
@@ -921,7 +928,7 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
             res[0]->m[i] = prMoveR( res[0]->m[i], origR);
           }
         }
-        idTest(res[1]);
+        idTest(res[0]);
       }
     }
     if ((currRing->OrdSgn != 1) && (hom!=isHomog))

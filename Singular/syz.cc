@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.cc,v 1.29 1999-11-16 12:39:31 obachman Exp $ */
+/* $Id: syz.cc,v 1.30 1999-11-18 18:43:57 siebert Exp $ */
 
 /*
 * ABSTRACT: resolutions
@@ -407,6 +407,7 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
   int Kstd1_OldDeg=Kstd1_deg;
   BOOLEAN completeMinim;
   BOOLEAN oldDegBound=TEST_OPT_DEGBOUND;
+  BOOLEAN setRegularity=TRUE;
   int wlength=*length;
 
   if (maxlength!=-1) *length = maxlength+1;
@@ -457,6 +458,17 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
     intvec *w1 = syPrepareModComp(res[0],&w);
     if (w!=NULL) { delete w;w=NULL; }
     w = w1;
+    j = 0;
+    while ((j<IDELEMS(res[0])) && (res[0]->m[j]==NULL)) j++;
+    if (j<IDELEMS(res[0]))
+    {
+      if (pFDeg(res[0]->m[j])!=pTotaldegree(res[0]->m[j]))
+        setRegularity = FALSE;
+    }
+  }
+  else
+  {
+    setRegularity = FALSE;
   }
     
 /*--- the main loop --------------------------------------*/
@@ -483,13 +495,13 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
       *weights = tempW;
     }
 /*--- interreducing first -----------------------------------*/
+    if (syzIndex>0)
+    {
+      int rkI=idRankFreeModule(res[syzIndex]);
+      rSetSyzComp(rkI);
+    }
     if (minim || (syzIndex!=0))
     {
-      if (syzIndex>0)
-      {
-        int rkI=idRankFreeModule(res[syzIndex]);
-        rSetSyzComp(rkI);
-      }
       temp = kInterRed(res[syzIndex],currQuotient);
       idDelete(&res[syzIndex]);
       idSkipZeroes(temp);
@@ -499,7 +511,7 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
 /*--- computing the syzygy modules --------------------------------*/
     if ((currQuotient==NULL)&&(syzIndex==0)&& (!TEST_OPT_DEGBOUND))
     {
-      res[/*syzIndex+*/1] = idSyzygies(res[0/*syzIndex*/],hom,&w,FALSE,TRUE,&Kstd1_deg);
+      res[/*syzIndex+*/1] = idSyzygies(res[0/*syzIndex*/],hom,&w,FALSE,setRegularity,&Kstd1_deg);
       if ((!TEST_OPT_NOTREGULARITY) && (Kstd1_deg>0)) test |= Sy_bit(OPT_DEGBOUND);
     }
     else
