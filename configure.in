@@ -15,6 +15,9 @@ fi
 if test -d "modules/tools"; then
    OUTPUT_MAKEFILES=$OUTPUT_MAKEFILES" modules/tools/Makefile"
 fi
+if test -d "modules/modgen"; then
+   OUTPUT_MAKEFILES=$OUTPUT_MAKEFILES" modules/modgen/Makefile"
+fi
 if test -d "emacs"; then
    OUTPUT_MAKEFILES=$OUTPUT_MAKEFILES" emacs/Makefile"
 fi
@@ -40,6 +43,9 @@ else
   SINGUNAME=$ac_cv_singuname
   AC_SUBST(SINGUNAME)
 fi
+
+SING_UNAME=`echo $SINGUNAME | tr '-' '_' `
+AC_SUBST(SING_UNAME)
 
 VERSION_SEP="-"
 
