@@ -3,11 +3,12 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.h,v 1.4 1997-05-05 10:14:08 Singular Exp $ */
+/* $Id: longrat.h,v 1.5 1997-05-05 15:15:12 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers
 */
 #include "structs.h"
+
 #ifdef HAVE_GMP
 extern "C" {
 #ifdef macintosh
@@ -16,6 +17,12 @@ extern "C" {
 #include "gmp.h"
 #endif
 }
+#if (__GNU_MP_VERSION > 1) && (__GNU_MP_VERSION_MINOR >= 0)
+#  define HAVE_LIBGMP2
+#else
+#  define HAVE_LIBGMP1
+#endif 
+
 typedef MP_INT lint;
 
 #define SR_INT    1
