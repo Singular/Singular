@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sdb.cc,v 1.5 1999-05-17 13:34:03 Singular Exp $ */
+/* $Id: sdb.cc,v 1.6 1999-05-29 11:57:42 Singular Exp $ */
 /*
 * ABSTRACT: Singular debugger
 */
@@ -36,12 +36,13 @@ int sdb_checkline(char f)
 
 void sdb_edit(procinfo *pi)
 {
-  char * filename = "/tmp/sd000000";
+  char * filename = mstrdup("/tmp/sd000000");
   sprintf(filename+7,"%d",getpid());
   FILE *fp=fopen(filename,"w");
   if (fp==NULL)
   {
     Print("cannot open %s\n",filename);
+    FreeL(filename);
     return;
   }
   if (pi->language!= LANG_SINGULAR)
@@ -66,6 +67,7 @@ void sdb_edit(procinfo *pi)
         PrintS("cannot get the procedure body\n");
         fclose(fp);
         unlink(filename);
+        FreeL(filename);
         return;
       }
     }
@@ -107,6 +109,7 @@ void sdb_edit(procinfo *pi)
     }
   }
   unlink(filename);
+  FreeL(filename);
 }
 
 static char *sdb_find_arg(char *p)
