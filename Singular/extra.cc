@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.35 1998-04-14 07:06:26 Singular Exp $ */
+/* $Id: extra.cc,v 1.36 1998-04-16 11:45:39 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -283,7 +283,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
 /*==================== LaScala ==================================*/
     if(strcmp((char*)(h->Data()),"LaScala")==0)
     {
-      if ((h->next!=NULL) 
+      if ((h->next!=NULL)
       &&((h->next->Typ()==IDEAL_CMD)||(h->next->Typ()==MODUL_CMD)))
       {
         int dummy;
@@ -560,9 +560,9 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
       else
          WerrorS("ideal expected");
     }
-    else  
+    else
 #endif
-#ifdef HAVE_FACTORY      
+#ifdef HAVE_FACTORY
 /*==================== fastcomb =============================*/
     if(strcmp((char*)(h->Data()),"fastcomb")==0)
     {
@@ -606,7 +606,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
     }
     else
 #endif
-/*==================== divcount & mcount =============================*/      
+/*==================== divcount & mcount =============================*/
 #ifdef MONOM_COUNT
     if (strcmp((char*)(h->Data()),"mcount")==0)
     {
@@ -621,7 +621,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
       return FALSE;
     }
     else
-#endif      
+#endif
 #ifdef DIV_COUNT
     if (strcmp((char*)(h->Data()),"dcount")==0)
     {
@@ -636,7 +636,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
       return FALSE;
     }
     else
-#endif      
+#endif
 /*==================== barstep =============================*/
     if(strcmp((char*)(h->Data()),"barstep")==0)
     {
@@ -662,9 +662,9 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
       else
         WerrorS("matrix expected");
     }
-  }
-  
+    else
 /*============================================================*/
-  WerrorS("not implemented\n");
+      WerrorS( feNotImplemented );
+  }
   return TRUE;
 }
