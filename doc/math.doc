@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.59 2000-12-22 16:02:51 mschulze Exp $
+@comment $Id: math.doc,v 1.60 2000-12-22 16:11:36 mschulze Exp $
 @comment this file contains the mathematical background of Singular
 
 @c The following directives are necessary for proper compilation
@@ -432,7 +432,7 @@ the Tjurina number $\tau(f)=\dim_CO/(J_f,f)$.
 
 The {\bf Gauss-Manin connection} $G$ of $f$ at 0 is a regular $C\{t\}[\partial_t]$-module and a $\mu$-dimensional vector space over $C(t):=C\{t\}[t^{-1}]$ and $C\{\!\{\partial_t^{-1}\}\!\}[\partial_t]$ where $C\{\!\{\partial_t^{-1}\}\!\}$ is the ring of {\bf microdifferential operators} with constant coefficients.
 The {\bf V-filtration} $V$ on $G$ is defined by $V^\alpha:=\sum_{\alpha\le\beta}C C_\beta$, $V^{>\alpha}:=\sum_{\alpha<\beta}C C_\beta$, where $C_\alpha:=\ker(t\partial_t-\alpha)^{n+1}$ for $\alpha\in Q$.
-The {\bf Hodge filtration} $F$ on $G$ is defined by the {\bf Brieskorn lattice} $H''\subset G$ via $F_k:=^kH''$.
+The {\bf Hodge filtration} $F$ on $G$ is defined by the {\bf Brieskorn lattice} $H''\subset G$ via $F_k:=\partial_t^kH''$.
 Note that $F_0=H''$ and $F_{-1}=H'$.
 The {\bf spectrum} $S$ defined by $S(\alpha):=\dim_CGr_V^\alpha Gr^F_0G$ reflects the embedding of $H''$ in $G$ and fulfills $S(n-1-\alpha)=S(\alpha)$ and $S(\alpha)=0$ for $\alpha\le-1$ or $\alpha\ge n$.
 The {\bf spectral numbers} are those $\alpha$ with $S(\alpha)>0$ and $S(\alpha)$ is the multiplicity of the spectral number $\alpha$.
@@ -452,7 +452,7 @@ the Tjurina number tau(f) = dim_C ( O/(J_f,f) ).
 @end ifinfo
 
 Let us consider as an example @math{f=x^5+x^2y^2+y^5}.
-First, we compute a matrix @math{M} such that @math{\exp(-2\pi iM)} is a monodromy matrix of @math{f} and its Jordan normal form:
+First, we compute a matrix @math{M} such that @math{\exp(-2\pi iM)} is a monodromy matrix of @math{f} and the Jordan normal form of @math{M}:
 @smallexample
 @c example
   LIB "gaussman.lib";
