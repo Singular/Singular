@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.276 2002-02-26 09:01:11 mschulze Exp $ */
+/* $Id: iparith.cc,v 1.277 2002-02-26 12:25:17 mschulze Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -4821,40 +4821,21 @@ static BOOLEAN jjDIVISION4(leftv res, leftv v)
   leftv v3=v2->next;
   leftv v4=v3->next;
 
-  if(v1->Typ()!=IDEAL_CMD&&v1->Typ()!=MODUL_CMD&&v1->Typ()!=MATRIX_CMD)
+  int i1=iiTestConvert(v1->Typ(),MODUL_CMD);
+  int i2=iiTestConvert(v2->Typ(),MODUL_CMD);
+
+  if(i1==0||i2==0||v3->Typ()!=INT_CMD||v4->Typ()!=INTVEC_CMD)
   {
-    Warn("1st argument must be ideal, module, or matrix!");
-    return TRUE;
-  }
-  if(v1->Typ()!=v2->Typ()&&
-    (v1->Typ()!=MATRIX_CMD||v2->Typ()!=MODUL_CMD)&&
-    (v1->Typ()!=MODUL_CMD||v2->Typ()!=MATRIX_CMD))
-  {
-    Warn("2nd argument must be ideal, module, or matrix!");
-    return TRUE;
-  }
-  assumeStdFlag(v2);
-  if(v3->Typ()!=INT_CMD)
-  {
-    Warn("3rd argument must be int!");
-    return TRUE;
-  }
-  if(v4->Typ()!=INTVEC_CMD)
-  {
-    Warn("4th argument must be intvec!");
+    Warn("<module>,<module>,<int>,<intvec> expected!");
     return TRUE;
   }
 
-  ideal P;
-  if(v1->Typ()==MATRIX_CMD)
-    P=idMatrix2Module(mpCopy((matrix)v1->Data()));
-  else
-    P=(ideal)v1->Data();
-  ideal Q;
-  if(v2->Typ()==MATRIX_CMD)
-    Q=idMatrix2Module(mpCopy((matrix)v2->Data()));
-  else
-    Q=(ideal)v2->Data();
+  sleftv w1,w2;
+  iiConvert(v1->Typ(),MODUL_CMD,i1,v1,&w1);
+  iiConvert(v2->Typ(),MODUL_CMD,i2,v2,&w2);
+  ideal P=(ideal)w1.Data();
+  ideal Q=(ideal)w2.Data();
+
   int n=(int)v3->Data();
   short *w=iv2array((intvec *)v4->Data());
 
@@ -4865,9 +4846,6 @@ static BOOLEAN jjDIVISION4(leftv res, leftv v)
 
   matrix T=mpNew(IDELEMS(Q),IDELEMS(P));
   ideal R=idInit(IDELEMS(P),P->rank);
-  matrix U=mpNew(P->rank,P->rank);
-  for(int i=MATROWS(U);i>=1;i--)
-    MATELEM(U,i,i)=pOne();
 
   for(int i=IDELEMS(P)-1;i>=0;i--)
   {
@@ -4879,13 +4857,12 @@ static BOOLEAN jjDIVISION4(leftv res, leftv v)
       if(pDivisibleBy(Q->m[j],p))
       {
         poly p0=pDivideM(pHead(p),pHead(Q->m[j]));
-        p=pSub(p,ppMult_mm(Q->m[j],p0));
+        p=pJetW(pSub(p,ppMult_mm(Q->m[j],p0)),N,w);
+        pNormalize(p);
         if(pDegW(p0,w)>n)
           pDelete(&p0);
 	else
           MATELEM(T,j+1,i+1)=pAdd(MATELEM(T,j+1,i+1),p0);
-        p=ppJetW(p0=p,N,w);
-        pDelete(&p0);
         j=IDELEMS(Q)-1;
       }
       else
@@ -4907,23 +4884,27 @@ static BOOLEAN jjDIVISION4(leftv res, leftv v)
     }
   }
 
-  if(v1->Typ()==MATRIX_CMD)
-    idDelete(&P);
-  if(v2->Typ()==MATRIX_CMD)
-    idDelete(&Q);
   omFree(w);
 
   lists L=(lists)omAllocBin(slists_bin);
-  L->Init(3);
+  L->Init(2);
   L->m[0].rtyp=MATRIX_CMD;
   L->m[0].data=(void *)T;
-  L->m[1].rtyp=MATRIX_CMD;
-  L->m[1].data=(void *)U;
-  L->m[2].rtyp=v1->Typ();
-  if(v1->Typ()==MATRIX_CMD)
-    L->m[2].data=(void *)idModule2Matrix(R);
+  L->m[1].rtyp=v1->Typ();
+  if(v1->Typ()==POLY_CMD||v1->Typ()==VECTOR_CMD)
+  {
+    L->m[1].data=(void *)pCopy(R->m[0]);
+    idDelete(&R);
+  }
+  else if(v1->Typ()==IDEAL_CMD||v1->Typ()==MODUL_CMD)
+    L->m[1].data=(void *)R;
+  else if(v1->Typ()==MATRIX_CMD)
+    L->m[1].data=(void *)idModule2Matrix(R);
   else
-    L->m[2].data=(void *)R;
+  {
+    L->m[1].rtyp=MODUL_CMD;
+    L->m[1].data=(void *)R;
+  }
   res->data=L;
   res->rtyp=LIST_CMD;
 
