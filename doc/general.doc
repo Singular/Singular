@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.9 1998-04-28 12:03:54 krueger Exp $
+@comment $Id: general.doc,v 1.10 1998-04-28 18:13:13 Singular Exp $
 @comment this file contains the general information about Singular
 
 @menu
@@ -331,54 +331,39 @@ seconds.By default, this value is 1.
 @node Available rings, General syntax of a ring definition, Rings and orderings, Rings and orderings
 @subsection Available rings
 @cindex Available rings
-The most basic (and most complicated) object in @sc{Singular}
-is a @code{ring} (and @code{qring}). Each object of type
-@code{poly},
-@code{ideal},
-@code{vector},
-@code{module},
+
+Almost all computations in @sc{Singular} require a basering which may be
+@itemize @bullet
+@item
+a polynomial ring
+@item
+a series ring, i.e a localization of a polynomial ring
+@item
+a factor ring by an ideal of one of the above
+@item
+a tensor products of one of the above
+@end itemize
+
+Each object of type
 @code{map},
 @code{matrix},
-@code{number}
+@code{module},
+@code{number},
+@code{ideal},
+@code{poly},
+@code{resolution},
+@code{vector}
 belongs to a specific ring.
 Also @code{list}, if one of the objects belong to a ring.
 These objects are local to the ring, hence their names can be used for other
-objects in other rings. Objects from one ring can be mapped to another
+objects in other rings.
+Objects from one ring can be mapped to another
 ring with an object of type @code{map}
 (or with the commands @code{fetch} or @code{imap}).
-The rings which are available in @sc{Singular} are described in
-@ref{Baserings and ground fields}. They are all algebras over the ground
+They are all algebras over the ground
 field. Hence, in oder to compute in one of the ground fields,
 one has to define a ring (with at least one variable and a monomial
 ordering).
-
-The other types do not belong to a ring and can be accessed within every ring.
-
-@c ---------------------------------------------------------------------------
-@node General syntax of a ring definition, Term orderings, Available rings, Rings and orderings
-@subsection General syntax of a ring definition
-@cindex General syntax of a ring definition
-
-@strong{OldTitle:}@ section Baserings and ground fields
-
-Almost all computations in @sc{Singular} require a basering which may be a
-@itemize @bullet
-@item
-polynomial ring
-@item
-series ring, i.e a localization of a polynomial ring
-@item
-factor ring by an ideal of one of the above
-@item
-tensor products of one of the above
-@item
-exterior algebra
-@item
-tensor product of one of the above rings with an exterior  algebra
-@item
-Weyl algebra
-@end itemize
-(the last three algebras require a special compiled version with DRING resp. SRING)
 
 The ground field of these algebras may be
 @itemize @bullet
@@ -401,6 +386,192 @@ algebraic extension K[Z]/MinPol, K=Q or Z/p
 floating point real numbers with simple precision (real)
 @end itemize
 
+The other types do not belong to a ring and can be accessed within every ring.
+
+@c ---------------------------------------------------------------------------
+@node General syntax of a ring definition, Term orderings, Available rings, Rings and orderings
+@subsection General syntax of a ring definition
+@cindex General syntax of a ring definition
+
+
+@table @code
+@item @strong{Syntax:}
+@example
+  @code{ring} name @code{=} field@code{,}
+              @code{(} names_of_ring_variables @code{),}
+              @code{(} ordering @code{);}
+@end example
+@item @strong{Default:}
+@example
+  32003,(x,y,z),dp;
+@end example
+@item @strong{Purpose:}
+defines a base ring for polynomials, ideals, vectors, modules, resolutions
+and matrices and set it as the actual basering
+
+All advanced algorithm in @sc{Singular} require a ring.
+The last defined ring is the basering until a new ring is defined
+or until it is changed with @code{setring} or @code{keepring} or
+it gets killed.
+
+The coefficient field is given by either
+@table @bullet
+@item
+the characteristic (0 or a prime <= 32003)
+@item
+an expression_list of the characteristic and
+the names of  parameters.
+If there is only one parameter you may define a minimal polynomial for it
+to work in an algebraic extension of Q or F(p).
+See @ref{minpoly}
+@item
+an expression_list of the number of element
+(a small prime characteristic p to the power of a small exponent n) and a
+name for a primitive element (generating the multiplicative group).
+The maximal values for p and n depend on the files in the directory @code{gftables}.
+They define the finite field with p^n elements.
+@item
+the name @code{real}. The field elements will be the machine floating
+point numbers.
+@end table
+@*If you write a  characteristic which is not a prime,
+it is automatically converted
+to the next lower prime or you receive an error message.
+
+The names of ring variables
+are like variable names (comma separated).
+
+The ordering is a list
+of blockorderings which have an order keyword
+(lp, ls, dp, ds, Dp, Ds, wp, ws, Wp, Ws, M, c, a) and an optional number of variables
+(for lp, ls, dp, ds, Dp, Ds) or a list of
+weights (for wp, ws, Wp, Ws, a and M).
+If none of the orderings C or c (order by components) is given,
+C will be appended at the end of the list of orderings.
+@*
+If one element of the list consists of only one entry, the parentheses may
+be omitted.
+@item @strong{Example:}
+@example
+  ring r =
+  32003,       // coefficient field: Z/32003
+  ( x,y,z ),   // names for variables
+  ds;          // monomial ordering
+               // (degrevlex in a series ring)
+               // parenthesis of lists with only one element
+               // are optional
+@end example
+@example
+  ring r2=10,(x(1..6)),(lp(2),dp(4));
+               // defines a ring with name r2,
+               // (10 is substituted by the next lower prime)
+               // coefficient field: Z/7
+               // variables x(1),x(2),..,x(6)
+               // which is the polynomial ring (Z/7)[x(1),..,x(6)]
+               // with lexicographical ordering on x(1) and x(2)
+               // and then
+               // degree reverse lexicographical on x(3)..x(6)
+@end example
+@example
+  ring r3=0,(x,y,z,a,b,c),(ds(3), dp(3));
+               // defines a ring with name r3,
+               // coefficient field Q
+               // variables x,y,z,a,b,c
+               // which is the ring (Q[a,b,c])[x,y,z]_(x,y,z)
+@end example
+@example
+  ring r4=0,(x,y,z),(c,dp);
+               // defines a ring with name r4,
+               // coefficient field Q (rationals)
+               // variables x,y,z
+               // which is the polynomial ring Q[x,y,z]
+               // with ordering of vectors by
+               // first number of the component and then
+               // degree reverse lexicographical on x,y,z
+@end example
+@example
+  ring r5=(7,a),(x,y,z),dp;
+               // defines a ring with name r5,
+               // coefficient field K=(Z/7)(a)
+               // variables x,y,z
+               // which is the polynomial ring K[x,y,z]
+               // with ordering
+               // degree reverse lexicographical on x,y,z
+@end example
+@example
+  ring r6=(7,a),(x,y,z),dp;
+  minpoly=a^2+a+3;
+               // defines a ring with name r6,
+               // coefficient field K=(Z/7)[a]/a^2+a+3
+               // (the finite field with 49 elements)
+               // variables x,y,z
+               // which is the polynomial ring K[x,y,z]
+               // with ordering
+               // degree reverse lexicographical on x,y,z
+@end example
+@example
+  ring r7=(7^2,a),(x,y,z),dp;
+                // defines a ring with name r7,
+                // the same ring as r6
+                // this option is offered for
+                // a few powers of primes
+                // (see file gftable/49)
+                // the computations are faster
+                //   in this representation
+@end example
+@example
+  ring r8=(181,A,B,Z),(x,y,z),dp;
+               // defines a ring with name r8
+               // coefficient field K=Z/181(A,B,Z)
+               // variables x,y,z
+               // which is the polynomial ring K[x,y,z]
+               // degree reverse lexicographical on x,y,z
+@end example
+@example
+  ring r9=real,(x,y,z),dp;
+               // defines a ring with name r9
+               // coefficient field R
+               // (represented as floating point numbers)
+               // variables x,y,z
+               // which is the polynomial ring R[x,y,z]
+               // degree reverse lexicographical on x,y,z
+  number n=1.7e+2; // input format of real numbers
+@end example
+
+@item @strong{Note:}
+Computations in rings with one parameter are faster
+than computations with more parameters. (Cancellation of common factors
+are only implemented in the first case)
+
+@* Computation over the field @code{real} has computing errors because
+of rounding.
+@item @strong{Use in proc:}
+All changes of the base ring by a definition
+of a new ring or a setring command in a proc are local to this proc
+(i.e. will not affect the calling procedure)
+unless a @code{keepring} command is used.
+@end table
+@menu
+* ring::
+* Term orderings::
+* qring:: define quotient rings
+* charstr:: the coefficient field
+* npars:: number of parameters
+* nvars:: number of variables
+* ordstr:: the monomial ordering
+* parstr:: the parameters
+* par:: the parameter as number
+* varstr:: the ring variables
+* var:: the ring variables as poly
+* setring:: a local ring change
+* keepring:: ring change in the next (upper) level
+@end menu
+@iftex
+See @ref{ring}; @ref{Term orderings};
+@ref{qring}; @ref{charstr}; @ref{npars};
+@ref{nvars}; @ref{ordstr};
+@ref{varstr}; @ref{var}; @ref{setring}; @ref{keepring}.
+@end iftex
 @c ---------------------------------------------------------------------------
 @node Term orderings, ,General syntax of a ring definition, Rings and orderings
 @subsection Term orderings
@@ -559,7 +730,6 @@ computations has to be interpreted in Loc K[x] (like @code{std, syz, res,
 mres, sres, mult, degree, dim, hilb, mstd}, etc.).
 @end ifinfo
 
-@c ---------------------------------------------------------------------------
 @c ---------------------------------------------------------------------------
 @node The SINGULAR language, Procedures, Rings and orderings, General concepts
 @section The SINGULAR language
