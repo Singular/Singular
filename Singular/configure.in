@@ -847,7 +847,8 @@ else
 	  LD_DYN_FLAGS="-Xlinker -E"
 	;;
 	ix86-Linux)
-	  LD_DYN_FLAGS="-rdynamic -ldl"
+	  NEED_LIBS="-ldl ${NEED_LIBS}"
+	  LD_DYN_FLAGS="-rdynamic"
 	;;
   esac
   AC_SUBST(LD_DYN_FLAGS)
