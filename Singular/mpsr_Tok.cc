@@ -253,6 +253,7 @@ short sr_cmds[] =
   RESERVEDNAME_CMD,
   WRITE_CMD,
   QRING_CMD,
+  FGLM_CMD,
 };
 
 // struct used for specifying the cmd <-> cop relations

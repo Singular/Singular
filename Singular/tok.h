@@ -6,7 +6,7 @@
 /*
 * ABSTRACT
 */
-/* $Id: tok.h,v 1.2 1997-03-24 14:26:06 Singular Exp $ */
+/* $Id: tok.h,v 1.3 1997-03-26 17:07:29 Singular Exp $ */
 
 #ifndef MYYSTYPE
 #include "structs.h"
@@ -61,8 +61,9 @@ enum {
   DELETE_CMD,
   EXTGCD_CMD,
   FAC_CMD,
-  FIND_CMD,
   FACSTD_CMD,
+  FGLM_CMD,
+  FIND_CMD,
   GCD_CMD,
   INSERT_CMD,
   INT_CMD,

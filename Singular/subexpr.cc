@@ -1,8 +1,15 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/subexpr.cc,v 1.6 1997-03-26 14:58:06 obachman Exp $";
+static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/subexpr.cc,v 1.7 1997-03-26 17:07:27 Singular Exp $";
 /* $Log: not supported by cvs2svn $
+// Revision 1.6  1997/03/26  14:58:06  obachman
+// Wed Mar 26 14:02:15 1997  Olaf Bachmann
+// <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+//
+// 	* added reference counter to links, updated slKill, slCopy, slInit
+// 	* various small bug fixes for Batch mode
+//
 // Revision 1.4  1997/03/21  14:58:56  obachman
 // Fixed little bugs in sleftv::Eval and mpsr_GetMisc
 //
@@ -241,7 +248,7 @@ void sleftv::Print(leftv store, int spaces)
 
 void sleftv::CleanUp()
 {
-  if ((name!=NULL) && (rtyp!=IDHDL))
+  if ((name!=NULL) && (name!=sNoName) && (rtyp!=IDHDL))
   {
     //::Print("free %x (%s)\n",name,name);
     FreeL((ADDRESS)name);

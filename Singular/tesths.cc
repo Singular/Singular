@@ -1,13 +1,13 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Id: tesths.cc,v 1.2 1997-03-24 14:26:04 Singular Exp $";
+static char rcsid[] = "$Id: tesths.cc,v 1.3 1997-03-26 17:07:28 Singular Exp $";
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
 */
 
 #define S_VERSION1 "version: 0.9.3"
-#define S_VERSION2 "February  1997"
+#define S_VERSION2 "March  1997"
 
 #ifndef macintosh
 #include <unistd.h>

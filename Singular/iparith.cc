@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Id: iparith.cc,v 1.8 1997-03-26 14:37:12 Singular Exp $";
+static char rcsid[] = "$Id: iparith.cc,v 1.9 1997-03-26 17:07:24 Singular Exp $";
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
 */
@@ -45,6 +45,9 @@ static char rcsid[] = "$Id: iparith.cc,v 1.8 1997-03-26 14:37:12 Singular Exp $"
 #ifdef HAVE_LIBFACTORY
 #include "clapsing.h"
 #include "kstdfac.h"
+#endif
+#ifdef HAVE_FGLM
+#include "fglm.h"
 #endif
 #include "ipshell.h"
 
@@ -156,6 +159,7 @@ cmdnames cmds[] =
   { "export",      0, EXPORT_CMD ,        EXPORT_CMD},
   { "factorize",   0, FAC_CMD ,           CMD_12},
   { "fetch",       0, FETCH_CMD ,         CMD_2},
+  { "fglm",        0, FGLM_CMD ,          CMD_2},
   { "find",        0, FIND_CMD ,          CMD_23},
   { "forif",       0, IF_CMD ,            IF_CMD},
   { "freemodule",  0, FREEMODULE_CMD ,    CMD_1},
@@ -1364,7 +1368,7 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
     || ((currRing->N != r->N)&& (iiOp==FETCH_CMD)))
   )
     goto err_fetch;
-  if ((w=r->idroot->get(v->name,myynest))!=NULL)
+  if ((w=r->idroot->get(v->Name(),myynest))!=NULL)
   {
     int *perm=NULL;
     int *par_perm=NULL;
@@ -1417,7 +1421,7 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
   }
   else
   {
-    Werror("%s undefined in %s",v->name,u->Name());
+    Werror("%s undefined in %s",v->Name(),u->Name());
   }
   return TRUE;
 err_fetch:
@@ -1968,6 +1972,8 @@ struct sValCmd2 dArith2[]=
 #endif
 ,{jjFETCH,     FETCH_CMD,      ANY_TYPE/*set by p*/,RING_CMD,  ANY_TYPE }
 ,{jjFETCH,     FETCH_CMD,      ANY_TYPE/*set by p*/,QRING_CMD, ANY_TYPE }
+,{fglmProc,    FGLM_CMD,       IDEAL_CMD,      RING_CMD,   DEF_CMD }
+,{fglmProc,    FGLM_CMD,       IDEAL_CMD,      QRING_CMD,  DEF_CMD }
 ,{jjFIND2,     FIND_CMD,       INT_CMD,        STRING_CMD, STRING_CMD }
 ,{jjGCD_I,     GCD_CMD,        INT_CMD,        INT_CMD,    INT_CMD }
 #ifdef HAVE_LIBFACTORY

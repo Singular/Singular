@@ -1,62 +1,85 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglm.h,v 1.1.1.1 1997-03-19 13:18:54 obachman Exp $
-//=============================================
-//          Header-File for fglm.cc 
-//=============================================
+// $Id: fglm.h,v 1.2 1997-03-26 17:07:20 Singular Exp $
+
+/****************************************
+*  Computer Algebra System SINGULAR     *
+****************************************/
+/* 
+* ABSTRACT - The FGLM-Algorithm
+*   The main header file for the fglm algorithm          
+*   (See fglm.cc for details)
+*/
 
 #ifndef FGLM_H
 #define FGLM_H
+
+#define PROT(msg)
+#define STICKYPROT(msg) if (BTEST1(OPT_PROT)) Print(msg)
+#define PROT2(msg,arg)
+#define STICKYPROT2(msg,arg) if (BTEST1(OPT_PROT)) Print(msg,arg)
+#define fglmASSERT(ignore1,ignore2)
+
 #include "polys.h"
 #include "fglmvec.h"
+#ifndef NOSTREAMIO
 #include <iostream.h>
-
-class idealFunctionals;
-
-struct divInfo;
-
-class listElem
-{
-    int insertions;
-    int numVars;
-    poly monom;
-    divInfo * divisors; //. runs from divisors[0]..divisors[insertions-1] (max numVars-1)
-public:
-    listElem();
-    listElem( poly p, int basis, int var );
-    void cleanup();
-    poly & getMonom();
-    BOOLEAN isBasisOrEdge() const;
-    void newDivisor( int basis, int var );
-    void updateFunctionals( int basis, idealFunctionals & l ) const;
-    void updateFunctionals( const fglmVector v, idealFunctionals & l ) const;
-};
-ostream & operator << ( ostream &, const listElem & );
-
-class fglmElem
-{
-private:
-    int insertions;  // decreases during calcuation
-    poly monom;
-    fglmVector v;   // monom = poly(v) * var;
-    int var;
-public:
-    fglmElem( poly & m, fglmVector mv, int v );
-
-    void cleanup();
-    BOOLEAN isBasisOrEdge() const;
-    poly & getMonom();
-    fglmVector getVector();
-    int getVar();
-    int getInsertions();
-    void newDivisor();
-};
-ostream & operator << ( ostream &, const fglmElem & );
-
-ideal
-fglmProc( leftv first, leftv secod );
 #endif
 
+// Some data types needed by the fglm algorithm. claptmpl.cc has to know them.
+class fglmSelem
+{
+public:
+    int numVars;
+    poly monom;
+    int * divisors;
+    fglmSelem( poly p, int var );
 
+    void cleanup();
+    BOOLEAN isBasisOrEdge() const { return ( (divisors[0] == numVars) ? TRUE : FALSE ); }
+    void newDivisor( int var ) { divisors[ ++divisors[0] ]= var; }
+};
+#ifndef NOSTREAMIO
+ostream & operator << ( ostream &, const fglmSelem & );
+#endif
 
+class fglmDelem
+{
+public:
+    int insertions;  
+    poly monom;
+    fglmVector v;   
+    int var;
+    fglmDelem( poly & m, fglmVector mv, int v );
 
+    void cleanup();
+    BOOLEAN isBasisOrEdge() const { return ( (insertions == 0) ? TRUE : FALSE ); }
+    void newDivisor() { insertions--; }
+};
+#ifndef NOSTREAMIO
+ostream & operator << ( ostream &, const fglmDelem & );
+#endif
 
+// fglmzero(...):
+// The fglm algorithm for 0-dimensional ideals. ( fglmzero is defined in fglmzero.cc )
+// Calculates the reduced groebner basis of sourceIdeal in destRing.
+// The sourceIdeal has to be a reduced, 0-dimensional groebner basis in sourceRing.
+// Warning: There is no check, if the ideal is really 0-dimensional and minimal.
+// If it is minimal but not reduced, then it returns FALSE, otherwise TRUE.
+// if switchBack==TRUE, then the procedure sets the ring as currentRing which was
+// current when it was called ( When called there may be currRing != sourceRing ).
+// if switchBack==FALSE, then currRing==destRing at the end.
+// if deleteIdeal==TRUE then sourceIdeal is deleted (in any case, even if the
+// procedure fails)
+// if deleteIdeal==FALSE, then nothing happens to sourceIdeal
+BOOLEAN
+fglmzero( idhdl sourceRingHdl, ideal & sourceIdeal, idhdl destRingHdl, ideal & destideal, BOOLEAN switchBack = TRUE, BOOLEAN deleteIdeal = FALSE );
+
+// fglmproc(...):
+// The procedure which has to be called from the interpreter.
+// first is the sourceRing, second is the given ideal in sourceRing.
+// Returns the groebnerbasis of the sourceIdeal in the currentRing.
+// Checks, if the ideal is really a reduced groebner basis of a 
+// 0-dimensional Ideal. Returns TRUE if an error occoured.
+BOOLEAN
+fglmProc( leftv result, leftv first, leftv second );
+#endif

@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-static char rcsid[] = "$Id: extra.cc,v 1.2 1997-03-24 14:24:35 Singular Exp $";
+static char rcsid[] = "$Id: extra.cc,v 1.3 1997-03-26 17:07:15 Singular Exp $";
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -37,10 +37,6 @@ static char rcsid[] = "$Id: extra.cc,v 1.2 1997-03-24 14:24:35 Singular Exp $";
 #include "clapsing.h"
 #include "clapconv.h"
 #include "kstdfac.h"
-#endif
-
-#ifdef HAVE_FGLM
-#include "fglm.h"
 #endif
 
 #ifdef HAVE_MPSR
@@ -425,28 +421,6 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
         WerrorS("ideal expected");
     }
     else
-/*===================== fglm ========================*/
-#ifdef HAVE_FGLM
-    if (strcmp((char*)(h->Data()),"fglm")==0)
-    {
-      if (h->next!=NULL)
-      {
-        if (h->next->Typ()==RING_CMD)
-        {
-          if (h->next->next != NULL)
-          {
-            res->rtyp = IDEAL_CMD;
-            res->data= (void *)fglmProc(h->next, h->next->next);
-          }
-          else WerrorS("Needs two arguments (ring,ideal)\n");
-        }
-        else WerrorS("First argument has to be a ring\n");
-      }
-      else WerrorS("Needs two arguments (ring,ideal)\n");
-      return FALSE;
-    }
-    else
-#endif
 /*========================= dump ===============================*/
 #ifdef HAVE_MPSR
     if (strcmp((char*)(h->Data()),"dump")==0)

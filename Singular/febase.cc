@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Id: febase.cc,v 1.4 1997-03-25 12:40:45 Singular Exp $";
+static char rcsid[] = "$Id: febase.cc,v 1.5 1997-03-26 17:07:16 Singular Exp $";
 /*
 * ABSTRACT: i/o system, handling of 'voices'
 */
@@ -614,7 +614,6 @@ char * StringAppend(char *fmt, ...)
   feBufferStart += vsprintf(s, fmt, ap);
 #endif
   va_end(ap);
-  mmTest(feBuffer,feBufferLength);
   return feBuffer;
 }
 
@@ -633,7 +632,6 @@ char * StringAppendS(char *st)
   }
   strcat(feBufferStart, st);
   feBufferStart +=l;
-  mmTest(feBuffer,feBufferLength);
   return feBuffer;
 }
 

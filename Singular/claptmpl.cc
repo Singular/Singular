@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: claptmpl.cc,v 1.1.1.1 1997-03-19 13:18:44 obachman Exp $
+// $Id: claptmpl.cc,v 1.2 1997-03-26 17:07:14 Singular Exp $
 #include "mod2.h"
 
 #ifdef HAVE_LIBFACTORY
@@ -9,7 +9,6 @@
 
 #if defined(HAVE_LIBFACTORY) || defined(HAVE_FGLM)
 #include <templates/list.cc>
-#include <templates/dynamicArray.cc>
 #endif
 
 #ifdef HAVE_FGLM
@@ -80,10 +79,10 @@ template class ListIterator<CFList>;
 #ifdef HAVE_FGLM
 // templates for fglm:
 
-template class List<listElem>;
-template class ListIterator<listElem>;
+template class List<fglmSelem>;
+template class ListIterator<fglmSelem>;
 
-template class List<fglmElem>;
-template class ListIterator<fglmElem>;
+template class List<fglmDelem>;
+template class ListIterator<fglmDelem>;
 
 #endif
