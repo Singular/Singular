@@ -1,13 +1,19 @@
 
-/*  A Bison parser, made from ../source/readcf.y  */
+/*  A Bison parser, made from ../factory/readcf.y  */
 
 #define YYBISON 1  /* Identify Bison output.  */
 
 #define	NUM	258
 #define	NEG	259
 
-#line 4 "../source/readcf.y"
+#line 4 "../factory/readcf.y"
 
+
+#ifdef WINNT
+#include <malloc.h>
+#include <memory.h>
+#define alloca _alloca
+#endif
 
 #include <config.h>
 
@@ -119,8 +125,8 @@ static const short yyrhs[] = {    -1,
 
 #if YYDEBUG != 0
 static const short yyrline[] = { 0,
-    49,    50,    53,    54,    57,    58,    59,    60,    61,    62,
-    63,    64,    65
+    55,    56,    59,    60,    63,    64,    65,    66,    67,    68,
+    69,    70,    71
 };
 
 static const char * const yytname[] = {   "$","error","$illegal.","NUM","'-'",
@@ -618,43 +624,43 @@ yyreduce:
   switch (yyn) {
 
 case 4:
-#line 54 "../source/readcf.y"
+#line 60 "../factory/readcf.y"
 { *retvalue = yyvsp[-1].getval(); return 0; ;
     break;}
 case 5:
-#line 57 "../source/readcf.y"
+#line 63 "../factory/readcf.y"
 { yyval = yyvsp[0]; ;
     break;}
 case 6:
-#line 58 "../source/readcf.y"
+#line 64 "../factory/readcf.y"
 { yyval = yyvsp[-2].getval() + yyvsp[0].getval(); ;
     break;}
 case 7:
-#line 59 "../source/readcf.y"
+#line 65 "../factory/readcf.y"
 { yyval = yyvsp[-2].getval() - yyvsp[0].getval(); ;
     break;}
 case 8:
-#line 60 "../source/readcf.y"
+#line 66 "../factory/readcf.y"
 { yyval = yyvsp[-2].getval() * yyvsp[0].getval(); ;
     break;}
 case 9:
-#line 61 "../source/readcf.y"
+#line 67 "../factory/readcf.y"
 { yyval = yyvsp[-2].getval() / yyvsp[0].getval(); ;
     break;}
 case 10:
-#line 62 "../source/readcf.y"
+#line 68 "../factory/readcf.y"
 { yyval = -yyvsp[0].getval(); ;
     break;}
 case 11:
-#line 63 "../source/readcf.y"
+#line 69 "../factory/readcf.y"
 { yyval = yyvsp[0].getval(); ;
     break;}
 case 12:
-#line 64 "../source/readcf.y"
+#line 70 "../factory/readcf.y"
 { yyval = power( yyvsp[-2].getval(), yyvsp[0].getintval() ); ;
     break;}
 case 13:
-#line 65 "../source/readcf.y"
+#line 71 "../factory/readcf.y"
 { yyval = yyvsp[-1].getval(); ;
     break;}
 }
@@ -851,7 +857,7 @@ yyerrhandle:
   yystate = yyn;
   goto yynewstate;
 }
-#line 68 "../source/readcf.y"
+#line 74 "../factory/readcf.y"
 
 
 #ifdef BISONPP
