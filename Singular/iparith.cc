@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.337 2005-02-04 16:28:06 Singular Exp $ */
+/* $Id: iparith.cc,v 1.338 2005-02-08 18:58:30 levandov Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -4204,7 +4204,9 @@ struct sValCmd1 dArith1[]=
 ,{jjSYZYGY,     SYZYGY_CMD,      MODUL_CMD,      MODUL_CMD      ALLOW_PLURAL}
 #ifdef HAVE_PLURAL
 ,{jjENVELOPE,   ENVELOPE_CMD,    RING_CMD,       RING_CMD       ALLOW_PLURAL}
+,{jjENVELOPE,   ENVELOPE_CMD,    QRING_CMD,      QRING_CMD      ALLOW_PLURAL}
 ,{jjOPPOSITE,   OPPOSITE_CMD,    RING_CMD,       RING_CMD       ALLOW_PLURAL}
+,{jjOPPOSITE,   OPPOSITE_CMD,    QRING_CMD,      QRING_CMD      ALLOW_PLURAL}
 ,{jjTWOSTD,     TWOSTD_CMD,      IDEAL_CMD,      IDEAL_CMD      ALLOW_PLURAL}
 #endif
 ,{jjWRONG,      TRACE_CMD,       0,              INTVEC_CMD     ALLOW_PLURAL}
