@@ -1,8 +1,8 @@
-// $Id: deform.lib,v 1.19 1999-12-13 15:33:45 obachman Exp $
+// $Id: deform.lib,v 1.20 2000-05-12 12:20:25 krueger Exp $
 // author: Bernd Martin email: martin@math.tu-cottbus.de
 //(bm, last modified 4/98)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: deform.lib,v 1.19 1999-12-13 15:33:45 obachman Exp $";
+version="$Id: deform.lib,v 1.20 2000-05-12 12:20:25 krueger Exp $";
 info="
 LIBRARY:  deform.lib       PROCEDURES FOR COMPUTING MINIVERSAL DEFORMATION
 
@@ -534,7 +534,13 @@ example
   matrix Mo[2][2] = x2,y,-y2,x2;
   mod_versal(Mo,Io);
   printlevel = p;
-  if(system("with","Namespaces")) { kill Ring::Px,Top::Qx,Ring::So; }
+  if(system("with","Namespaces")) {
+     if(nameof(Current) == "Ring" ) {
+        kill Top::Px,Top::Qx,Top::So;
+     } else {
+        kill Ring::Px,Ring::So;
+     }
+  }
   kill Px,Qx,So;
 }
 //=============================================================================

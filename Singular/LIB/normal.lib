@@ -4,7 +4,7 @@
 // the criterion of Grauert/Remmert and ideas of De Jong & Vasconcelos
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: normal.lib,v 1.24 2000-05-10 13:05:16 pfister Exp $";
+version="$Id: normal.lib,v 1.25 2000-05-12 12:20:25 krueger Exp $";
 info="
 LIBRARY:  normal.lib     PROCEDURES FOR NORMALIZATION
 AUTHORS:  Gert-Martin Greuel, email: greuel@mathematik.uni-kl.de,
@@ -570,8 +570,8 @@ EXAMPLE: example normalizationPrimes; shows an example
       {
           "// the ideal was the zero-ideal";
       }
-         execute "ring newR7="+charstr(basering)+",("+varstr(basering)+"),("
-                      +ordstr(basering)+");";
+         execute("ring newR7="+charstr(basering)+",("+varstr(basering)+"),("
+                      +ordstr(basering)+");");
          ideal norid=ideal(0);
          ideal normap=fetch(BAS,ihp);
          export norid;
@@ -887,8 +887,8 @@ write (":a normal-fehler" ,
             return(tluser);
          }
          MB=SM[2];
-         execute "ring newR7="+charstr(basering)+",("+varstr(basering)+"),("
-                      +ordstr(basering)+");";
+         execute("ring newR7="+charstr(basering)+",("+varstr(basering)+"),("
+                      +ordstr(basering)+");");
          ideal norid=fetch(BAS,MB);
          ideal normap=fetch(BAS,ihp);
          export norid;
@@ -1045,8 +1045,8 @@ write (":a normal-fehler" ,
    {
       int equi=attrib(SM[2],"isEquidimensional");
       ideal new1=qAnn+SM[2];
-      execute "ring newR1="+charstr(basering)+",("+varstr(basering)+"),("
-                      +ordstr(basering)+");";
+      execute("ring newR1="+charstr(basering)+",("+varstr(basering)+"),("
+                      +ordstr(basering)+");");
       if(y>=1)
       {
          "// zero-divisor found";
@@ -1072,8 +1072,8 @@ write (":a normal-fehler" ,
       setring BAS;
       ideal new2=quotient(SM[2],Ann)+SM[2];
 // evtl. qAnn nehmen
-      execute "ring newR2="+charstr(basering)+",("+varstr(basering)+"),("
-                      +ordstr(basering)+");";
+      execute("ring newR2="+charstr(basering)+",("+varstr(basering)+"),("
+                      +ordstr(basering)+");");
 
       ideal vid=fetch(BAS,new2);
       ideal ihp=fetch(BAS,ihp);

@@ -1,8 +1,8 @@
-// $Id: inout.lib,v 1.16 2000-05-05 18:40:31 obachman Exp $
+// $Id: inout.lib,v 1.17 2000-05-12 12:20:25 krueger Exp $
 // (GMG/BM, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: inout.lib,v 1.16 2000-05-05 18:40:31 obachman Exp $";
+version="$Id: inout.lib,v 1.17 2000-05-12 12:20:25 krueger Exp $";
 info="
 LIBRARY:  inout.lib     PROCEDURES FOR MANIPULATING IN- AND OUTPUT
 
@@ -322,7 +322,7 @@ example
    // You may wish to assign s1 to a Singular ideal id:
    string sid = "ideal id =",rMacaulay(s1),";";
    ring r = 0,x(0..3),dp;
-   execute sid;
+   execute(sid);
    id; "";
    // The next example treats a matrix in Macaulay format. Using the execute
    // command, this could be assinged to a Singular matrix as above.
@@ -566,7 +566,7 @@ EXAMPLE: example showrecursive; shows an example
    }
    newvar = newvar[2,size(newvar)-1];
 
-   execute "ring newP=("+newchar+"),("+newvar+"),("+neword+");";
+   execute("ring newP=("+newchar+"),("+newvar+"),("+neword+");");
    def id = imap(P,id);
    show(id);
    return();
