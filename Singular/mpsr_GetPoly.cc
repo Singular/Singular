@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_GetPoly.cc,v 1.16 1998-04-21 10:59:28 obachman Exp $ */
+/* $Id: mpsr_GetPoly.cc,v 1.17 1998-05-25 21:17:16 obachman Exp $ */
 
 /***************************************************************
  *
@@ -715,7 +715,7 @@ static mpsr_Status_t GetProtoTypeAnnot(MPT_Node_pt node, ring r, BOOLEAN mv,
            mv2 == FALSE);
 
     // Now do the coercion
-    r->ch = (subring->ch == 1 ? 0 : - (subring->ch));
+    r->ch = (subring->ch == 0 ? 1 : - (subring->ch));
     r->parameter = (char **) Alloc((subring->N)*sizeof(char*));
     r->P = subring->N;
     for (i=0; i < subring->N; i++)
