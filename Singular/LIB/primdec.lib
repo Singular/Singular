@@ -1,4 +1,4 @@
-// $Id: primdec.lib,v 1.75 2000-05-30 12:31:44 pfister Exp $
+// $Id: primdec.lib,v 1.76 2000-06-05 11:22:47 pfister Exp $
 ///////////////////////////////////////////////////////////////////////////////
 // primdec.lib                                                               //
 // algorithms for primary decomposition based on                             //
@@ -10,7 +10,7 @@
 // written by Wolfram Decker and Hans Schoenemann                            //
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: primdec.lib,v 1.75 2000-05-30 12:31:44 pfister Exp $";
+version="$Id: primdec.lib,v 1.76 2000-06-05 11:22:47 pfister Exp $";
 info="
 LIBRARY: primdec.lib   PROCEDURES FOR PRIMARY DECOMPOSITION
 AUTHORS:  Gerhard Pfister, email: pfister@mathematik.uni-kl.de (GTZ)
@@ -30,6 +30,7 @@ PROCEDURES:
   equidimMax(I);    equidimensional locus of I
   equidimMaxEHV(I); equidimensional locus of I (Algorithm of Eisenbud,
                     Huneke and Vasconcelos)
+  zerodec(I);       zerodimensional decomposition for characteristic zero
 REMARK:
 These procedures are implemented to be used in characteristic 0.
 @*They also work in positive characteristic >> 0.
@@ -822,8 +823,8 @@ EXAMPLE: example zero_decomp; shows an example
      primary[2]=ideal(1);
      return(primary);
   }
-
   j=interred(j);
+
   attrib(j,"isSB",1);
   if(vdim(j)==deg(j[1]))
   {
@@ -2201,7 +2202,7 @@ EXAMPLE: example decomp; shows an example
           @n1=0;
           for(@n=1;@n<=size(fried);@n++)
           {
-             if(lead(fried[@n])==var(@k))
+             if(leadmonom(fried[@n])==var(@k))
              {
                 @n1=1;
                 break;
