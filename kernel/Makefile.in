@@ -316,6 +316,10 @@ installbin: ${DL_LIBS} ${DL_LIBSG}
 	-${INSTALL_PROGRAM} ${DL_LIBS} ${DL_LIBSG} ${bindir}
 	-${INSTALL_PROGRAM} ${DL_LIBS} ${DL_LIBSG} ../Singular
 
+install-bindist: ${DL_LIBS} libkernel.a
+	${MKINSTALLDIRS} ${bindir}
+	-${INSTALL_PROGRAM} ${DL_LIBS} ${bindir}
+
 ##
 ## clean targest
 ##
