@@ -1,16 +1,16 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: divrem.m4,v 1.2 1998-04-06 10:49:31 schmidt Exp $ */
+/* $Id: divrem.m4,v 1.3 1998-07-03 09:28:03 schmidt Exp $ */
 
 ftestSetNameOfGame( divrem, `"
 Usage: divrem [<options>] [<envSpec>] <f> <g> [<divisionCheck>]
-  calculates quotient `q' and remainder `r' of division from
+  calculates quotient q and remainder r of division from
   canonical form <f> by canonical form <g> such that f=g*q+r.
-  <g> should not equal zero.  The result is not defined if such
-  `q' and `r' do not exist.
-  If the optional integer `divisionCheck' is specified and non-
-  zero additional checks are done whether `q' and `r' exist.  The
+  <g> should not equal zero.  The result is not defined if such q
+  and r do not exist.
+  If the optional integer <divisionCheck> is specified and non-
+  zero additional checks are done whether q and r exist.  The
   result of the check is printed as a boolean.
-  The results are printed in the order `q' - `r' [ - `checkResult' ].
+  The results are printed in the order q - r [ - checkResult ].
 "'`' )
 
 //{{{ docu
@@ -105,8 +105,7 @@ main ( int argc, char ** argv )
     }
 
     // do the check
-    ftestCheck(
-	divremCheck( f, g, q, r, checkResult ); );
+    ftestCheck( divremCheck( f, g, q, r, checkResult ); );
 
     // print results
     if ( divisionCheck ) {
