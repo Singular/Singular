@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.21 2000-10-30 17:35:25 Singular Exp $
+@comment $Id: NEWS.texi,v 1.22 2000-11-14 16:19:20 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -78,7 +78,7 @@ The current syntax is going to change slightly in the final version 2.0.
 @heading New @sc{Singular} libraries
 
 @table @asis
-@item @nref{ip_lib} procedures for computing toric ideals
+@item @nref{intprog_lib} procedures for computing toric ideals
 TODO: better docu, tests, proper incooperation
 @item @nref{toric_lib} procedures for Integer Programming using Groebner bases
 TODO: better docu, tests, proper incooperation
