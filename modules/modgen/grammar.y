@@ -1,5 +1,5 @@
 /*
- * $Id: grammar.y,v 1.9 2000-03-29 09:31:42 krueger Exp $
+ * $Id: grammar.y,v 1.10 2000-03-29 14:29:11 krueger Exp $
  */
 
 %{
@@ -129,6 +129,8 @@ expr:   NAME '=' MSTRINGTOK
                 if( (vt=checkvar($1, VAR_STRING, &write_cmd)) ) {
                   if(write_cmd!=0)
                     write_cmd(&module_def, vt, STRING_CMD, $1, $3.string);
+                  if(vt==VAR_VERSION)
+                    make_version($3.string, &module_def);
                 }
                 else {
                   myyyerror("Line %d: Unknown variable '%s' in section %d\n",
