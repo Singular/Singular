@@ -24,9 +24,9 @@
 //#define HEAD_BIN
 //#define HOMOGENEOUS_EXAMPLE
 #define REDTAIL_S
-#define PAR_N 150
-#define AC_NEW_MIN 15
-#define AC_FLATTEN 2
+#define PAR_N 100
+#define AC_NEW_MIN 2
+#define AC_FLATTEN 1
 //#define REDTAIL_PROT
 //#define QUICK_SPOLY_TEST
 struct sorted_pair_node{

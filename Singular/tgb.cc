@@ -1430,7 +1430,7 @@ static void go_on (calc_dat* c){
     i++;
   }
   p[i]=NULL;
-  pre_comp(p,i,c);
+//  pre_comp(p,i,c);
   if(i==0){
     omfree(p);
     return;
@@ -2900,7 +2900,7 @@ void multi_reduce_step(find_erg & erg, red_object* r, calc_dat* c){
   }
   int i;
   int red_c=0;
-  if(red_len>3*c->average_length){
+  if(red_len>2*c->average_length){
     for(i=erg.to_reduce_l;i<=erg.to_reduce_u;i++){
       if((r[i].sum==NULL) ||(r[i].sum->ac->counter<=AC_FLATTEN)) red_c++;
     }
