@@ -1,4 +1,4 @@
-// $Id: ring.lib,v 1.3 1997-09-12 07:40:36 Singular Exp $
+// $Id: ring.lib,v 1.4 1997-09-12 08:18:04 Singular Exp $
 //(GMG, last modified 03.11.95)
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -7,19 +7,15 @@ LIBRARY:  ring.lib      PROCEDURES FOR MANIPULATING RINGS AND MAPS
  changechar("R",c[,r]); make a copy R of basering [ring r] with new char c
  changeord("R",o[,r]);  make a copy R of basering [ring r] with new ord o
  changevar("R",v[,r]);  make a copy R of basering [ring r] with new vars v
- copyring("R"[,r]);     make an exact copy R of basering [ring r]
  defring("R",c,n,v,o);  define a ring R in specified char c, n vars v, ord o
  defrings(n[,p]);       define ring Sn in n vars, char 32003 [p], ord ds
  defringp(n[,p]);       define ring Pn in n vars, char 32003 [p], ord dp
  extendring("R",n,v,o); extend given ring by n vars v, ord o and name it R
- extendring1("R",n,v,o); similair to extendring but different ordering
  fetchall(R[,str]);     fetch all objects of ring R to basering
  imapall(R[,str]);      imap all objects of ring R to basering
  mapall(R,i[,str]);     map all objects of ring R via ideal i to basering
  ringtensor("R",s,t,..);create ring R, tensor product of rings s,t,...
- substitute(id,p,list); substitute in id i-th factor of p by i-th poly of list
- swapvars(id,p1,p2);    return id with variables p1 and p2 interchanged 
-          (parameters in square brackets [] are optional)
+           (parameters in square brackets [] are optional)
 
 LIB "inout.lib";
 LIB "general.lib";
@@ -173,34 +169,6 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc copyring (string newr,list #)
-USAGE:   copyring(newr[,r]);  newr=string, r=ring/qring
-CREATE:  create a new ring with name `newr` and make it the basering if r is
-         an existing ring [default: r=basering].
-         The new ring is a copy of r but with a new name R1 if, say, newr="R1"
-RETURN:  No return value
-NOTE:    This proc uses 'execute' or calls a procedure using 'execute'.
-         If you use it in your own proc, let the local names of your proc
-         start with @ (see the file HelpForProc)
-EXAMPLE: example copyring; shows an example
-{
-   if( size(#)==0 ) { def @r=basering; }
-   if( size(#)==1 ) { def @r=#[1]; }
-   string @o=ordstr(@r);
-   changeord(newr,@o,@r);
-   keepring(basering);
-   if (voice==2) { "// basering is now",newr; }
-   return();
-}
-example
-{  "EXAMPLE:"; echo = 2;
-   ring r=0,(x,y,u,v),(dp(2),ds);
-   copyring("R"); R;"";
-   copyring("R1",r); R1;
-   kill R,R1;
-}
-///////////////////////////////////////////////////////////////////////////////
-
 proc defring (string s1, string s2, int n, string s3, string s4)
 USAGE:   defring(s1,s2,n,s3,s4);  s1..s4=strings, n=integer
 CREATE:  Define a ring with name 's1', characteristic 's2', ordering 's4' and
@@ -300,82 +268,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc extendring (string na, int n, string va, string o, list #)
-USAGE:   extendring(na,n,va,o[,i,r]);  na,va,o=strings (name, new vars,
-         ordering of the new ring),  n,i=integers, r=ring
-CREATE:  Define a ring with name `na` which extends the ring r by adding n new
-         variables in front of [after, if i!=0] the old variables and make it
-         the basering [default: (i,r)=(0,basering)]
-         -- The characteristic is the characteristic of r
-         -- The new vars are derived from va. If va is a single letter, say
-            va="T", and if n<=26 then T and the following n-1 letters from
-            T..Z..T (resp. T(1..n) if n>26) are taken as additional variables.
-            If va is a single letter followed by (, say va="x(", the new
-            variables are x(1),...,x(n).
-            If va is a string that contains a comma (e.g. "x,z,u,w"), the
-            comma-separated symbols are taken as new variables
-         -- The ordering is the ordering given by `o` [any allowed ordstr]
-RETURN:  No return value
-NOTE:    This proc is useful for adding deformation parameters.
-         This proc uses 'execute' or calls a procedure using 'execute'.
-         If you use it in your own proc, let the local names of your proc
-         start with @ (see the file HelpForProc)
-EXAMPLE: example extendring; shows an example
-{
-//--------------- initialization and place c/C of ordering properly -----------
-   string @v,@newring;
-   int @i;
-   if( size(#)==0 ) { #[1]=0; def @r=basering; }
-   else
-   {
-     if( size(#)==1 ) { @i=#[1]; def @r=basering; }
-     if( size(#)==2 ) { @i=#[1]; def @r=#[2]; }
-   }
-//------------------------ prepare string of new ring -------------------------
-   @newring = "ring "+na+"=("+charstr(@r)+"),(";
-   if( find(va,",") != 0 )       
-      { @v = va; }
-   else
-   {
-      if( n>26 or va[2]=="(" ) 
-         { @v = va[1]+"(1.."+string(n)+")"; }
-      else                     
-         { @v = A_Z(va,n); }
-   }
-
-   if( @i==0 )
-   {
-      @v=@v+","+varstr(@r);
-   }
-   else
-   {
-      @v=varstr(@r)+","+@v;
-   }
-   @newring=@newring+@v+"),("+o+");";
-//---------------------------- execute and export -----------------------------
-   execute(@newring);
-   export(basering);
-   keepring(basering);
-   if (voice==2) { "// basering is now",basering; }
-   return();
-}
-example
-{ "EXAMPLE:"; echo = 2;
-   ring r=0,(x,y,z),ds;
-   show(r);"";
-   extendring("R0",2,"u","ds");
-   show(R0); "";
-   extendring("R1",2,"a,w","ds(2),dp");
-   show(R1); "";
-   extendring("R2",5,"b","dp");         
-   show(R2); "";
-   extendring("R3",4,"T()","c,dp",1,r);    
-   show(R3);"";
-   kill R0,R1,R2,R3;
-}
-///////////////////////////////////////////////////////////////////////////////
-
-proc extendring1 (string na, int n, string va, string o, list #)
-USAGE:   extendring1(na,n,va,o[iv,i,r]);  na,va,o=strings,
+USAGE:   extendring(na,n,va,o[iv,i,r]);  na,va,o=strings,
          n,i=integers, r=ring, iv=intvec of positive integers or iv=0
 CREATE:  Define a ring with name `na` which extends the ring r by adding n new
          variables in front of [after, if i!=0] the old variables and make it
@@ -385,9 +278,7 @@ CREATE:  Define a ring with name `na` which extends the ring r by adding n new
             va="T", and if n<=26 then T and the following n-1 letters from
             T..Z..T (resp. T(1..n) if n>26) are taken as additional variables.
             If va is a single letter followed by (, say va="x(", the new
-            variables are x(1),...,x(n).
-            If va is a string that contains a comma (e.g. "x,z,u,w"), the
-            comma-separated symbols are taken as new variables
+            variables are x(1),...,x(n)
          -- The ordering is the product ordering between the ordering of r and
             an ordering derived from `o` [and iv]
          -  If o contains a 'c' or a 'C' in front resp. at the end this is
@@ -396,8 +287,8 @@ CREATE:  Define a ring with name `na` which extends the ring r by adding n new
          -  If no intvec iv is given, or if iv=0, o may be any allowed ordstr,
             like "ds" or "dp(2),wp(1,2,3),Ds(2)" or "ds(a),dp(b),ls" if a and b
             are globally (!) defined integers and if a+b+1<=n
-            If, however, a and b are local to a proc calling extendring1, the
-            intvec iv must be used to let extendring1 know the values of a, b
+            If, however, a and b are local to a proc calling extendring, the
+            intvec iv must be used to let extendring know the values of a and b
          -  If an intvec iv !=0 is given, iv[1],iv[2],... is taken for the 1st,
             2nd,... block of o, if o contains no substring "w" or "W" i.e. no
             weighted ordering (in the above case o="ds,dp,ls" and iv=a,b).
@@ -412,7 +303,7 @@ NOTE:    This proc is useful for adding deformation parameters.
          This proc uses 'execute' or calls a procedure using 'execute'.
          If you use it in your own proc, let the local names of your proc
          start with @ (see the file HelpForProc)
-EXAMPLE: example extendring1; shows an example
+EXAMPLE: example extendring; shows an example
 {
 //--------------- initialization and place c/C of ordering properly -----------
    string @o1,@o2,@ro,@wstr,@v,@newring;
@@ -479,16 +370,8 @@ EXAMPLE: example extendring1; shows an example
    }
 //------------------------ prepare string of new ring -------------------------
    @newring = "ring "+na+"=("+charstr(@r)+"),(";
-   if( find(va,",") != 0 )       
-      { @v = va; }
-   else
-   {
-      if( n>26 or va[2]=="(" ) 
-         { @v = va[1]+"(1.."+string(n)+")"; }
-      else                     
-         { @v = A_Z(va,n); }
-   }
-
+   if( n>26 or va[2]=="(" ) { @v = va[1]+"(1.."+string(n)+")"; }
+   else                     { @v = A_Z(va,n); }
    if( @i==0 )
    {
       @v=@v+","+varstr(@r);
@@ -511,20 +394,15 @@ example
 { "EXAMPLE:"; echo = 2;
    ring r=0,(x,y,z),ds;
    show(r);"";
-   extendring1("S",2,"u","ds");
-   setring r;
-   show(S); "";
-   extendring1("R0",2,"a,w","ds");
-   show(R0); "";
    //no intvec given, no blocksize given: blocksize is derived from no of vars
    int t=5;
-   extendring1("R1",t,"a","dp");         //t global: "dp" -> "dp(5)"
+   extendring("R1",t,"a","dp");         //t global: "dp" -> "dp(5)"
    show(R1); "";
-   extendring1("R2",4,"T(","c,dp",1,r);    //"dp" -> "c,..,dp(4)"
+   extendring("R2",4,"T(","c,dp",1,r);    //"dp" -> "c,..,dp(4)"
    show(R2);"";
 
    //no intvec given, blocksize given: given blocksize is used
-   extendring1("R3",4,"T(","dp(2)",0,r);   // "dp(2)" -> "dp(2)"
+   extendring("R3",4,"T(","dp(2)",0,r);   // "dp(2)" -> "dp(2)"
    show(R3);"";
 
    //intvec given: weights and blocksize is derived from given intvec
@@ -533,12 +411,12 @@ example
    //the remaining variables, if intvec has too many components, the last
    //ones are ignored
    intvec v=3,2,3,4,1,3;
-   extendring1("R4",10,"A","ds,ws,Dp,dp",v,0,r);
+   extendring("R4",10,"A","ds,ws,Dp,dp",v,0,r);
          //v covers 3 blocks: v[1] (=3) : no of components of ws
          //next v[1] values (=v[2..4]) give weights
          //remaining components of v are used for the remaining blocks
    show(R4);
-   kill S,R0,R1,R2,R3,R4;
+   kill r,R1,R2,R3,R4;
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -763,88 +641,5 @@ example
    ringtensor("Q",s,qS,t,qT);
    type Q;
    kill R,Q,S,T;
-}
-///////////////////////////////////////////////////////////////////////////////
-
-proc substitute (id, vars, list #)
-USAGE:    substitute(id,vars,li); id = object in basering which can be mapped,
-          vars = ideal expression which must be a list of variables 
-          (not counting zeroes and costant factors), 
-          li = list of ideal expressions
-RETURN:   id, with i-th entry of vars substituted by i-th polynomial of the 
-          ideal (say, conli) obtained by concatenatin of the lists in li;
-          if conli has less polys than size(vars), the last element of conli 
-          substitutes the remaining variables in vars
-EXAMPLE:  example substitute; shows an example
-{ 
-   int ii,jj,k;
-   def P = basering;
-   int n = nvars(P);
-   ideal va = simplify(vars,3);
-   int sa = size(va);
-   ideal all = #[1..size(#)];
-   int na = ncols(all);
-   ideal m = maxideal(1);
-   for( jj=1; jj<=sa; jj++)
-   {
-      if( size(va[jj]) > 1) 
-      { 
-         "// object to be substituted must be a variable";
-         return();
-      }
-      for( ii=1; ii<=n; ii++ )
-      {
-         if( va[jj]/var(ii) != 0 )
-         {
-            if( jj <= na ) { m[ii] = all[jj]; }
-            else { m[ii] = all[na]; }
-         }
-      }
-   }
-   map phi = P,m;
-   return(phi(id));
-}
-example
-{ "EXAMPLE:"; echo=2;
-   ring r=0,(a,b,t,s,u,v,x,y),ds;
-   poly f=b+y+ax+sx+vy2+ux;
-   ideal vars = a,y,b;
-   ideal subs = t4,1,y+t;
-   // the following commands all define the substitution:
-   //        a -> t4, y -> 1, b -> y+t
-   substitute(f,vars,subs); 
-   substitute(f,vars,t4,1,y+t);
-   substitute(f,ideal(a)+y+b,t4,1,y+t); 
-   // substitute all variables in vars by 1: 
-   substitute(f,vars,1);
-   // substitute all variables by 1, except those in vars: 
-   substitute(f,substitute(maxideal(1),vars,0),1);
-}
-///////////////////////////////////////////////////////////////////////////////
-
-proc swapvars (id,poly p1,poly p2)
-USAGE:    swapvars(id,p1,p2); id = object in basering which can be mapped
-          p1,  p2 = variables which shall be interchanged
-RETURN:   id, with p1 and p2 interchanged
-EXAMPLE:  example swapvars; shows an example
-{
-   def bR = basering;
-   execute " ring @newR = ("+charstr(bR)+"),("+varstr(bR)+",@t),dp;";
-   def id = imap(bR,id);
-   poly p1 = imap(bR,p1);
-   poly p2 = imap(bR,p2);
-   id = substitute(id,p2,@t);
-   id = substitute(id,p1,p2);
-   id = substitute(id,@t,p1);
-   setring bR;
-   id = imap(@newR,id);
-   return(id);
-}
-}
-example
-{ "EXAMPLE:"; echo=2;
-   ring r;
-   poly f = x5+y3+z2;
-   swapvars(f,x,y);
 }
 ///////////////////////////////////////////////////////////////////////////////
