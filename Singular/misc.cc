@@ -355,7 +355,8 @@ void singular_help(char *str,BOOLEAN example)
   }
   /* --------- is it a proc ? --------------------------------*/
   idhdl h=idroot->get(s,myynest);
-  if ((h!=NULL) && (IDTYP(h)==PROC_CMD))
+  if ((h!=NULL) && (IDTYP(h)==PROC_CMD) &&
+      (strcmp(IDPROC(h)->libname, "standard.lib")!=0))
   {
     char *lib=iiGetLibName(IDPROC(h));
     Print("// proc %s ",s);
