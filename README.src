@@ -83,11 +83,10 @@ Singular programming language, and the Singular documentation) are
 distributed as Singular-1.0-share.tar.gz. See the file README.share
 for more information. 
 
-The source code of Singular can be obtained from
-	www.mathematik.uni-kl.de:/pub/Math/Singular/src
-Note that you need a password in order to obtain them. Please contact
-us at
+In general, Singular is only available as binary program. For
+exceptions, you may contact us at
         singular@mathematik.uni-kl.de
+
 The source is distributed in two versions:
   1. A full source distribution of Singular is contained in
      Singular-full-1.0.tar.gz.  This (gzip'ed and tar'ed) file

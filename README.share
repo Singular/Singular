@@ -4,33 +4,34 @@
 	  Authors: G.-M. Greuel, G. Pfister, H. Schoenemann
 		  (C) 1986-1997 All Rights Reserved
 
-      README FILE FOR THE EXECUTABLE SINGULAR PROGRAM DISTRIBUTION
-      ============================================================
+      README FILE FOR SINGULAR SHARED DATA DISTRIBUTION
+      =================================================
 
-IMPORTANT: Please see the COPYING.bin file contained in this directory
-for license information for the Singular program.
+IMPORTANT: Please see the COPYING.share file contained in this directory
+for license information for the Singular shared (i.e. architecture
+independent data).
 
-This directory contains 
+This directory contains the following subdirectories
+  'share/Singular'      -- contains Singular library files and compute tables
+  'share/Singular/docs' -- contains dvi files of singular documentation
+  'info'                -- contains Singular's info help file
+  	
+and the file
+  'COPYING.share' -- for licence and copying information information
 
-(1) binary versions of Singular for common hard- and software
-    platforms in the files Singular-1.0.<platform>.gz where
-    <platform> is, for example, 'linux', 'SunOS', etc.
+Note that this distribution does not contain the Singular
+binaries. Instead, it contains architecture-independent data (such as
+Singular's program libraries written in Singular's programming
+language). See below for information on how to obtain the Singular
+executable program.
 
-(2) The file Singular-1.0-share.tar.gz which contains the architecture
-    - independent files (such as libraries written in the Singular
-    programming language, and the Singular documentation). See the
-    file README.share contained in this tar file for more information.
+Installing the Singular executable program
+==========================================
 
-(3) the file COPYING.bin containing the copying and license
-    information.
-
-
-Installing the Singular binaries
-================================
 In order to use Singular, you 
 
-(1) need to obtain _all_ the three files mentioned above (i.e. obtaining the
-    binary, only, is not enough!)
+(1) need to obtain the suitable binary Singular program for your
+    architecture. 
 
 (2) Uncompress the binary and install it at an appropriate place in
     your executable path (e.g., /usr/local/bin)
