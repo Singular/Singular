@@ -87,33 +87,6 @@ ay Exp $";
 
 #else /* not __WIN32__ */
 
-/*
- * define here which programm to call for starting a remote shell
- * and the position of the -n parameter (before or after host ?)
- */
-#  ifdef hpux
-#     define RSH_CMD "/usr/bin/remsh"
-#     define RSH_N    2
-#  else
-#  ifdef linux
-#     define RSH_CMD "/usr/bin/rsh"
-#     define RSH_N    1
-#  else
-#  ifdef  mips
-#     define RSH_CMD "/usr/ucb/rsh"
-#     define RSH_N    1
-#  else
-#     define RSH_CMD "/usr/ucb/rsh"
-#     define RSH_N    1
-#  endif
-#  endif
-#  endif
-
-#  if RSH_N != 1
-#      define RSH_HOST 1
-#  else
-#      define RSH_HOST 2
-#  endif
 
 #include <unistd.h>
 
@@ -414,17 +387,20 @@ MP_Status_t open_tcp_launch_mode(link, argc, argv)
     if (gethostname(myhost, 64) == -1)
         return MP_SetError(link, MP_Failure);
 
-    /* NOTE: Ultrix doesn't like this order. It expects rsh host [-n] command. */
+    /* NOTE: Ultrix doesn't like this order. It expects rsh host [-n]
+       command. */
+    /* I tried on every platform I know using all the rsh commands
+       available, and
 
-    rsh_argv[0] = RSH_CMD;
-    rsh_argv[RSH_N] = "-n";
-    rsh_argv[RSH_HOST] = IMP_GetCmdlineArg(argc, argv, "-MPhost");
-    if (rsh_argv[RSH_HOST] == NULL) {
-        MP_LogEvent(link, MP_ERROR_EVENT,
-                    "MP_OpenLink: bad or missing -MPhost argument");
-        return MP_SetError(link, MP_Failure);
-    }
+       $rsh hostname -n command
 
+       worked everywhere */
+
+    rsh_argv[0] = MP_RSH_COMMAND;
+    rsh_argv[1] = IMP_GetCmdlineArg(argc, argv, "-MPhost");
+    rsh_argv[2] = "-n";
+    /* Let's not be too strict, and allow an empty -MPhost argument */
+    if (rsh_argv[1] == NULL) rsh_argv[1] = myhost;
     rsh_argv[3] = IMP_GetCmdlineArg(argc, argv, "-MPapplication");
     if (rsh_argv[3] == NULL) {
         MP_LogEvent(link, MP_ERROR_EVENT,
@@ -768,12 +744,15 @@ MP_Status_t open_tcp_connect_mode(link, argc, argv)
 
     tcp_rec->peerhost = NULL;
 
-    /* get the host and port number */
-    if ((host = IMP_GetCmdlineArg(argc, argv, "-MPhost")) == NULL
-        || (cport = IMP_GetCmdlineArg(argc, argv, "-MPport")) == NULL)
+    /* get the port number */
+    if (
+        (cport = IMP_GetCmdlineArg(argc, argv, "-MPport")) == NULL)
         return MP_SetError(link, MP_Failure);
 
     port = (short) strtol(cport, &ptr, 10);
+    if ((host = IMP_GetCmdlineArg(argc, argv, "-MPhost")) == NULL)
+      host = link->env->thishost;
+    
     if (ptr == cport || errno == ERANGE)
       return MP_SetError(link, MP_Failure);
 

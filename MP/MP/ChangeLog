@@ -1,3 +1,13 @@
+Mon Jun 30 17:46:17 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* if no -MPhost spec is given, use env->thishost as default
+
+	* got rid of RSH_N and
+	  RSH_HOST --- $rsh hostname -n command seems to work everywhere
+
+	* MP_TcpTransp.c (open_tcp_launch_mode): incoporated
+	  MP_RSH_COMMAND which is set by configure; 
+
 Wed Jun 25 09:04:25 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
 	* MP_Env.c: extern "C" wrapper for includes sys/stat.h 
