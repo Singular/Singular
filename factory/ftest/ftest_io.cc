@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftest_io.cc,v 1.2 1997-09-29 13:10:31 schmidt Exp $ */
+/* $Id: ftest_io.cc,v 1.3 1997-10-01 12:27:47 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -7,7 +7,9 @@
 //
 //}}}
 
+#include <ctype.h>
 #include <string.h>
+#include <stdlib.h>
 #include <iostream.h>
 #include <strstream.h>
 
@@ -19,17 +21,28 @@
 // - external functions.
 //
 
-//{{{ CanonicalForm ftestGetCanonicalForm ( const char * stringF )
+//{{{ CanonicalForm ftestGetCanonicalForm ( const char * canFormSpec )
 //{{{ docu
 //
-// ftestGetCanonicalForm() - read a canonical form from stringF,
+// ftestGetCanonicalForm() - read a canonical form from canFormSpec,
 //   return it.
 //
 //}}}
 CanonicalForm
-ftestGetCanonicalForm ( const char * stringF )
+ftestGetCanonicalForm ( const char * canFormSpec )
 {
-    CanonicalForm f;
+    // get string to read canonical form from
+    const char * stringF = canFormSpec;
+    stringF = ftestSkipBlancs( stringF );
+    if ( *stringF == '$' ) {
+	const char * tokenCursor = ftestSkipBlancs( stringF+1 );
+	// read canonical form from environment
+	stringF = getenv( tokenCursor );
+	if ( ! stringF )
+	    ftestError( CanFormSpecError,
+			"no such environment variable: `$%s'\n",
+			tokenCursor );
+    }
 
     // create terminated CanonicalForm
     int i = strlen( stringF );
@@ -48,6 +61,7 @@ ftestGetCanonicalForm ( const char * stringF )
     *stringCursor = '\0';
 
     // read f
+    CanonicalForm f;
     istrstream( terminatedStringF ) >> f;
 
     delete [] terminatedStringF;
@@ -65,22 +79,51 @@ ftestGetCanonicalForm ( const char * stringF )
 Variable
 ftestGetVariable ( const char * stringVariable )
 {
-    CanonicalForm vf;
+    Variable v;
+    stringVariable = ftestSkipBlancs( stringVariable );
 
-    // create terminated CanonicalForm
-    int i = strlen( stringVariable );
-    char * terminatedStringF = new char[i+2];
-    strcpy( terminatedStringF, stringVariable );
-    terminatedStringF[i] = ';';
-    terminatedStringF[i+1] = '\0';
+    if ( isalpha( *stringVariable ) )
+	v = Variable( *stringVariable );
+    else if ( isdigit( *stringVariable ) )
+	v = Variable();
+    else
+	ftestError( CommandlineError,
+		    "not a variable: `%s'\n", stringVariable );
 
-    // read vf
-    istrstream( terminatedStringF ) >> vf;
+    stringVariable = ftestSkipBlancs( stringVariable+1 );
+    if ( *stringVariable )
+	ftestError( CommandlineError,
+		    "extra characters after var spec: `%s'\n", stringVariable );
 
-    delete [] terminatedStringF;
+    return v;
+}
+//}}}
 
-    // return main variable
-    return vf.mvar();
+//{{{ int ftestGetint ( const char * stringInt )
+//{{{ docu
+//
+// ftestGetint() - read an integer from stringInt,
+//   return it.
+//
+//}}}
+int
+ftestGetint ( const char * stringInt )
+{
+    const char * tokenCursor;
+
+    int i = (int)strtol( stringInt, (char**)&tokenCursor, 0 );
+
+    // do error checks
+    if ( stringInt == tokenCursor )
+	ftestError( CommandlineError,
+		    "integer expected at `%s'\n", stringInt );
+
+    stringInt = ftestSkipBlancs( tokenCursor );
+    if ( *stringInt )
+	ftestError( CommandlineError,
+		    "extra characters after int spec: `%s'\n", stringInt );
+
+    return i;
 }
 //}}}
 
