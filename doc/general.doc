@@ -1,16 +1,19 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.48 1998-05-11 15:15:37 anne Exp $
+@comment $Id: general.doc,v 1.49 1998-05-12 09:08:00 schmidt Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
 @c with emacs (C-c C-e C-b).
-@c @setfilename general.info
-@c @node Top, General concepts
-@c @menu
-@c * General concepts::
-@c @end menu
-@c @node General concepts, Data types, Introduction, Top
-@c @chapter General concepts
+%**start
+\input texinfo.tex
+@setfilename general.info
+@node Top, General concepts
+@menu
+* General concepts::
+@end menu
+@node General concepts, Data types, Introduction, Top
+@chapter General concepts
+%**end
 
 @menu
 * Interactive use::
@@ -42,12 +45,11 @@
 @end menu
 
 @c --------------------------------------------------------------------------
-@c @node How to enter and exit -- command line options,General syntax,,Command Syntax
 @node How to enter and exit,SINGULAR prompt  , Interactive use, Interactive use
 @subsection How to enter and exit
 @cindex How to enter and exit
 
-@*To start @sc{Singular}, enter @code{Singular} at the system prompt.
+To start @sc{Singular}, enter @code{Singular} at the system prompt.
 @*You get a header which, among others, reports the version name and
 compilation date.
 Enter @code{help;} to get the online manual at the @sc{Singular} prompt
@@ -296,13 +298,13 @@ The synopsis of @sc{Singular} is
 options control the general behaviour of @sc{Singular}:
 @table @asis
 
-@item @code{-e},@code{--echo[=VAL]} 
+@item @code{-e}, @code{--echo[=VAL]} 
 Set value of variable @code{echo} to @code{VAL} (integer in the range 0
 .. 9). Without an argument, @code{echo} is set to 1, which echoes all
 input coming from a file. By default, the value of @code{echo} is 0. See
 also @ref{echo}.
 
-@item @code{-h},@code{--help} 
+@item @code{-h}, @code{--help} 
 Print a short help message and a one line description of each command 
 line option.
 
@@ -318,16 +320,16 @@ loaded and prior to executing the string specified by
 Do not load the library @code{standard.lib} on start-up. By default,
 this library is loaded on start-up. See also @ref{Startup sequence}.
 
-@item @code{-t},@code{--no-tty} 
+@item @code{-t}, @code{--no-tty} 
 Do not redefine the terminal characteristics (useful for batch
 processes, see @ref{Editing input}).  
 
-@item @code{-q},@code{--quiet}
+@item @code{-q}, @code{--quiet}
 Do not print start-up banner and warnings and redirect stderr (all error
 messages) to stdout (normal output channel). This option should be used
 if the output is redirected to a file.
 
-@item @code{-v},@code{--verbose}             
+@item @code{-v}, @code{--verbose}             
 Print extended information about the version and configuration of
 @sc{Singular}  (used optional parts, compilation date, start of random
 generator etc.). This information should be included if a user reports
@@ -339,14 +341,14 @@ the pseudo random generator and passing of commands and strings to
 @sc{Singular}:
 
 @table @asis
-@item @code{-c},@code{--execute=STRING} 
+@item @code{-c}, @code{--execute=STRING} 
 Execute @code{STRING} as (a sequence of) @sc{Singular} commands on
 start-up after the @code{.singularrc} file is executed, but prior to
 executing the files given on the command line, e.g.  @code{Singular -c
 "help all.lib; quit;"} shows the help for the library @code{all.lib} and
 exits.
 
-@item @code{-u},@code{--user-option=STRING}
+@item @code{-u}, @code{--user-option=STRING}
 Returns @code{STRING} on @code{system("--user-option")}. This is useful
 for passing arbitrary arguments (like filenames) from the command line
 to the @sc{Singular} interpreter (i.e. top-level of @sc{Singular}), e.g.
@@ -354,7 +356,7 @@ to the @sc{Singular} interpreter (i.e. top-level of @sc{Singular}), e.g.
 reads the file @code{xxx.dump} at startup and allows the user to start working
 with all the objects defined in the previous session.
 
-@item @code{-r},@code{--random=SEED}
+@item @code{-r}, @code{--random=SEED}
 Seed (i.e., set initial value of) pseudo random generator with integer
 @code{SEED}. If this option is not given, then the
 random generated is seeded with a time-based @code{SEED} (e.g., the
@@ -376,7 +378,7 @@ gives the time in seconds). By default, this value is 1.
 
 The last 3 options are of interest for the use with MP links:
 @table @asis
-@item @code{-b},@code{--batch} 
+@item @code{-b}, @code{--batch} 
 Run in MP batch mode. Opens a TCP/IP connection with host specified by
 @code{--MPhost} at the port specified by @code{--MPport}. Input is read
 from and output is written to this connection in the MP format. See also
@@ -1041,14 +1043,31 @@ a @strong{print command}:
 @cindex Special characters
 The following characters/operators have special meanings:
 @table @asis
-@item @code{!}
-synonymous to @code{not}
-@item @code{&&}
-synonymous to @code{and}
-@item @code{||}
-synonymous to @code{or}
-@item @code{<>},@code{!=}
-not equal: e.g. @code{if (i<>j)...}
+@item @code{=}
+assignment
+@item @code{(}, @code{)}
+in expressions, for indexed names and for argument lists
+@item @code{[}, @code{]}
+access operator for strings, integer vectors, ideals, matrices,
+polynomials, and lists.  Used to build vectors of polynomials.
+Examples: @code{s[3]}, @code{m[1,3]}, @code{i[1..3]},
+@code{[f,g+x,0,0,1]}.
+@item @code{+}
+addition
+@item @code{-}
+subtraction
+@item @code{*}
+multiplication
+@item @code{/}
+division of numbers (coefficients of polynomials) and polynomials
+@item @code{%}
+integer modulo
+@item @code{^} or @code{**}
+exponentiation
+@item @code{==}
+equal.  E.g. @code{if (i==j)...}
+@item @code{!=} or @code{<>}
+not equal.  E.g. @code{if (i<>j)...}
 @item @code{>=}
 bigger or equal
 @item @code{>}
@@ -1056,53 +1075,43 @@ bigger
 @item @code{<=}
 smaller or equal
 @item @code{<}
-smaller, but also used for file input (@ref{filecmd})
-@item @code{=}
-assignment: e.g. @code{int i=4711;}
-@item @code{==}
-equal: e.g. @code{if (i==j)...}
-@item  @code{[}, @code{]}
-indices in strings, integer vectors, ideals, matrices, polynomials and lists
-and to build (poly) vectors: e.g. @code{ s[3], m[1,3], i[1..3],[f,g+x,0,0,1]}
-@item  @code{(}, @code{)}
-in expressions, for indexed names and for argument lists
-@item  @code{+}
-addition
-@item  @code{-}
-subtraction
-@item  @code{*}
-multiplication
-@item  @code{/}
-division for numbers (coefficients of polynomials) and polynomials
-@item  @code{%}
-integer modulo
-@item  @code{^}, @code{**}
-power, exponentiation
-@item  @code{@@}
-is a letter
-@item  @code{#}
-the reserved name of a list of not specified parameters in procedures
-(see @ref{Procedures}).
-@item  @code{"}
-to start and end string constants
-@item  @code{`}
-to start and end name substitution
-@item  @code{?}
-is equivalent to @code{help}
-@item  @code{;}
-the separator for statements
-@item  @code{,}
-the separator for expression lists and function arguments
-@item  @code{//}
-makes the rest of the line a comment
-@item  @code{\}
-escape character for @code{"} within strings (see @ref{string expressions})
-@item  @code{..}
-construct an intvec from start and end (see @ref{intvec expressions})
-@item  @code{::}
-access identifiers within packages (complete name is package_name::identifier)
-@item  @code{$}
-ends @sc{Singular}
+smaller, but also used for file input.  @xref{filecmd}.
+@item @code{!}
+synonym for @code{not}
+@item @code{&&}
+synonym for @code{and}
+@item @code{||}
+synonym for @code{or}
+@item @code{"}
+delimiter for string constants
+@item @code{`}
+delimiter for name substitution
+@item @code{?}
+synonym for @code{help}
+@item @code{//}
+comment delimiter.  Comment extends to end of line.
+@item @code{;}
+statement separator
+@item @code{,}
+separator for expression lists and function arguments
+@item @code{\}
+escape character for @code{"} and @code{\} within strings.  @xref{string expressions}.
+@item @code{..}
+interval specifier for intvecs (see @ref{intvec expressions}).
+E.g. @code{1..3} which is equivalent to @code{1, 2, 3}.
+@item @code{::}
+access specifier within packages (complete name is package_name@code{::}identifier)
+@item @code{_}
+expression last printed.  @xref{Reuse of output}.
+@item @code{~}
+breakpoint in procedures.  @xref{Break points}.
+@item @code{#}
+list of parameters in procedures without explicit parameter list.
+@xref{Parameter list}.
+@item @code{@@}
+is a letter.  Its use in identifiers is discouraged.
+@item @code{$}
+exits @sc{Singular}
 @end table
 
 @c ------------------------------------------------------------
@@ -2189,20 +2198,20 @@ necessary.
 
 If you have written your own proc and, while calling that proc,
 @sc{Singular} does not come back to the prompt, you probably forgot
-a bracket or a @code{ @ "}. The easiest way to leave the proc
-is to type some brackets or @code{ @ " } and then @code{<RETURN>;} .
+a bracket or a @code{"}. The easiest way to leave the proc
+is to type some brackets or @code{"} and then @code{<RETURN>;} .
 
 @menu
-* TRACE::
-* Break points::
-* Printing of data::
-* libparse::
+* Tracing of procedures::       
+* Break points::                
+* Printing of data::            
+* libparse::                    
 @end menu
 
 @c ---------------------------------------
-@node tracing of procedures, Break points, Debugging tools, Debugging tools
-@subsection tracing of procedures
-@*Setting the @code{TRACE} variable to 1 (resp. 3) results in a listing of
+@node Tracing of procedures, Break points, Debugging tools, Debugging tools
+@subsection Tracing of procedures
+Setting the @code{TRACE} variable to 1 (resp. 3) results in a listing of
 the called procedures (resp. together with line numbers).
 If @code{TRACE} is set to 4, @code{Singular}
 displays each line before its interpretation and waits for the @code{<RETURN>}
@@ -2217,32 +2226,20 @@ See @ref{TRACE var}.
 @example
 @c example
   proc t1
-  {
-    int @i=2;
-    while (@i>0)
-    { @i=@i-1; }
-  }
+  @{
+    int i=2;
+    while (i>0)
+    @{ i=i-1; @}
+  @}
   TRACE=3;
   t1();
 @c example
-@c  proc t1
-@c  @{
-@c    int @@i=2;
-@c    while (@@i>0)
-@c    @{ @@i=@@i-1; @}
-@c  @}
-@c  TRACE=3;
-@c  t1();
-@c  @expansion{} @{9@}
-@c  @expansion{} entering t1 (level 0)
-@c  @expansion{} @{4@}@{5@}@{6@}@{5@}@{6@}@{8@}@{5@}@{6@}@{8@}@{5@}@{10@}
-@c  @expansion{} leaving  t1 (level 0)
 @end example
 
 @c ---------------------------------------
-@node Break points,Printing of data,tracing of procedures,Debugging tools
+@node Break points, Printing of data, Tracing of procedures, Debugging tools
 @subsection Break points
-@*A break point can be put into a proc by inserting the command @code{~}.
+A break point can be put into a proc by inserting the command @code{~}.
 If @code{Singular} reaches a break point it asks for lines of commands
 (linelength must be less than 80 characters)
 from the user. It returns to normal execution if given an empty line.
@@ -2251,9 +2248,9 @@ See @ref{~}.
 @example
   proc t
   @{
-    int @@i=2;
+    int i=2;
     ~;
-    return(@@i+1);
+    return(i+1);
   @}
   t();
   @expansion{} -- break point in t --
@@ -2269,7 +2266,7 @@ See @ref{~}.
 @c ---------------------------------------
 @node Printing of data,libparse,Break points,Debugging tools
 @subsection Printing of data
-@*The procedure @code{dbprint} is useful for optional output of data:
+The procedure @code{dbprint} is useful for optional output of data:
 it takes 2 arguments and prints the second argument, if the first
 argumet is positive, and does nothing otherwise.
 @menu
