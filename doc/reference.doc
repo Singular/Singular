@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.16 1998-04-29 13:52:29 anne Exp $
+@comment $Id: reference.doc,v 1.17 1998-04-30 13:19:16 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -1034,7 +1034,7 @@ none
 @item @strong{Purpose:}
 dumps (i.e. writes in one "message" or "block") the state of the Singular
 session (i.e., all defined variables and their values) to the specified
-link (which must be either an Ascii or MP link). 
+link (which must be either an ASCII or MP link). 
 @item @strong{Example:}
 @example
 @c example
@@ -1043,7 +1043,7 @@ link (which must be either an Ascii or MP link).
 @c example
 @end example
 @item @strong{Restrictions:}
-For Ascii links, integer matrices contained in lists are  dumped as
+For ASCII links, integer matrices contained in lists are  dumped as
 integer list elements (and not as integer matrices). Furthermore, links
 themselves are not dumped.
 @end table
@@ -1583,7 +1583,7 @@ See @ref{int expressions}; @ref{vector}.
 none
 @item @strong{Purpose:}
 reads the contents of the entire file/link and restores all variables
-from it. For Ascii links, @code{getdump} is equivalent to a
+from it. For ASCII links, @code{getdump} is equivalent to a
 @code{execute read (} link @code{);} command. For MP links,
 @code{getdump} should only be used on data which was previously
 @code{dump}'ed. 
@@ -3726,7 +3726,7 @@ See @ref{int expressions}; @ref{intmat expressions}.
 any
 @item @strong{Purpose:}
 reads data from a link.
-@*For Ascii links, the content of the entire
+@*For ASCII links, the content of the entire
 file is returned as one string.
 @*For MP links, one expression is read
 from the link, and returned after an evaluation. 
@@ -4327,7 +4327,7 @@ string is returned:
 @item @code{"name"}
 the name string given by the definition of the link (usually the filename)
 @item @code{"type"}
-returns @code{"Ascii"}, @code{"MPfile"}, @code{"MPtcp"} or @code{"DBM"}
+returns @code{"ASCII"}, @code{"MPfile"}, @code{"MPtcp"} or @code{"DBM"}
 @item @code{"open"}
 returns @code{"yes"} or @code{"no"}
 @item @code{"openread"}
@@ -4947,10 +4947,10 @@ See @ref{ideal expressions}; @ref{intvec expressions}; @ref{qhweight}.
 none
 @item @strong{Purpose:}
 writes data to a link. 
-@*If the link is of type @code{Ascii}, all expressions are converted to
+@*If the link is of type @code{ASCII}, all expressions are converted to
 strings  (and separated by a newline character) before they are
 written. As a consequence, only such values which can be converted to a
-string can be written to an  @code{Ascii} link. 
+string can be written to an  @code{ASCII} link. 
 @*For MP links,
 ring-dependent expressions are written together with a ring
 description. To prevent an evaluation of the expression before it is
