@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.71 2000-12-21 16:37:50 obachman Exp $ */
+/* $Id: kstd2.cc,v 1.72 2001-01-23 13:30:54 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -737,7 +737,7 @@ ideal kNF2 (ideal F,ideal Q,ideal q,kStrategy strat, int lazyReduce)
   ideal res;
 
   if (idIs0(q))
-    return idInit(1,q->rank);
+    return idInit(IDELEMS(q),q->rank);
   if ((idIs0(F))&&(Q==NULL))
     return idCopy(q); /*F=0*/
   strat->ak = idRankFreeModule(F);
