@@ -7,6 +7,7 @@
 	     UNIX INSTALLATION INSTRUCTIONS FOR SINGULAR
 	     ============================================
 
+
 To install Singular on a Unix platform, you need at least the
 following two files: 
 
@@ -21,6 +22,14 @@ where <x.y.z> is the version number of Singular (e.g., 1.2.0) and
 system for which Singular is compiled (e.g, ix86-Linux). 
 You can obtain these files from  
 ftp://www.mathematik.uni-kl.de/pub/Math/Singular/.
+
+IMPORTANT
+=========
+Please see the file COPYING contained in the distribution for license
+information on Singular. In particular, notice that we only grant you
+permission to use Singular, if you have registered yourself as a
+Singular user by sending email to <singular@mathematik.uni-kl.de> 
+with the subject line (or, mail body) `register'.
 
 TO INSTALL SINGULAR
 ===================
@@ -61,6 +70,7 @@ something like:
  ln -s `pwd`./<uname description>/bin/Singular-<x.y.z> /usr/local/bin/Singular
 See also the `TROUBLES' section below, if you run into any problems.
 
+
 TO INSTALL THE ON-LINE DOCUMENTATION
 =====================================
 Singular needs the `info' program for its on-line documentation. If
@@ -69,8 +79,10 @@ obtain it from
 ftp://www.mathematik.uni-kl.de/pub/Math/Singular/utils/
 by downloading the respective info-<uname description>.tar.gz file.
 
-If you have the `info' program on your system, no further actions To install, simply cd to the directory where you unpacked the other
-tar files and then unpack the info tar file.
+If you have the `info' program installed on your system, no further
+actions are required. Otherwise, to install, simply cd to the
+directory where you unpacked the other tar files and then unpack the
+info tar file.
 
   cd /usr/local/      # i.e., wherever you have unpacked Singular tar files
   gzip -dc info-<uname description>.tar.gz | tar -pxf -
