@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.92 2000-02-29 10:46:02 siebert Exp $ */
+/* $Id: ideals.cc,v 1.93 2000-03-07 15:49:13 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -921,16 +921,14 @@ void pShift (poly * p,int i)
       if (qp2 == *p)
       {
         pIter(*p);
-        qp2->next = NULL;
-        pDelete(&qp2);
+        pDelete1(&qp2);
         qp2 = *p;
         qp1 = *p;
       }
       else
       {
         qp2->next = qp1->next;
-        qp1->next = NULL;
-        pDelete(&qp1);
+        pDelete1(&qp1);
         qp1 = qp2->next;
       }
     }
