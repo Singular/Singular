@@ -1,38 +1,126 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: lieA.lib,v 1.5 2003-10-17 16:02:52 levandov Exp $";
+version="$Id: lieA.lib,v 1.6 2004-03-18 21:34:54 levandov Exp $";
 category="Plural: Lie Theory";
 info="
-LIBRARY:  lieA.lib      definitions of several enveloping algebras
+LIBRARY:  lieA.lib      definitions of important G-algebras
 AUTHORS:  Viktor Levandovskyy,     levandov@mathematik.uni-kl.de,
 @*        Oleksandr Khomenko,      Oleksandr.Khomenko@math.uni-freiburg.de,
-@*        Oleksander Motsak
+@*        Oleksandr Motsak,        motsak@mathematik.uni-kl.de
+
 
 PROCEDURES:
- A(n);                  returns U(A(n))=U(sl_{n+1})
- sl(n);                 returns U(sl_n)
- sl2();                 returns U(sl_2) in the {e,f,h} presentation
- g2();                  returns U(g_2) in the {x(i),y(i),Ha,Hb} presentation
- gl3();                 returns U(gl_3) in the {e_ij (1<i,j<3)} presentation
- Weyl(n);		returns n-th Weyl algebra in {x(i),D(i)} presentation
+ A (n[,p]);               returns U(A(n))=U(sl_{n+1}) in char p, if an integer p is given,
+ sl(n[,p]);               returns U(sl_n) in char p, if an integer p is given,
+ sl2([ p]);               returns U(sl_2) in the {e,f,h} presentation; in char p, if an integer p is given, 
+ g2 ([ p]);               returns U(g_2) in the {x(i),y(i),Ha,Hb} presentation; in char p, if an integer p is given,
+ gl3([ p]);               returns U(gl_3) in the {e_ij (1<i,j<3)} presentation; in char p, if an integer p is given,
 ";
+
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc sl2()
-"USAGE:   sl2()
+// functions for debug/logging 
+
+static proc mySetRing (string @baseName, list #)
+// set @@@_RING to description of current ring
+{
+  if (defined( @@@_RING_NAME ))
+  {
+    kill @@@_RING_NAME; 
+  };
+  
+  if (string(#) != "0")
+  {
+    string @@@_RING_NAME = @baseName + "_" + string(#);	
+  } else
+  {
+    string @@@_RING_NAME = @baseName;
+  };
+  export(@@@_RING_NAME);
+  
+  if (defined( @@@_RING ))
+  {
+    kill @@@_RING; 
+  };
+  
+  string @@@_RING = "" + @baseName +"(" + string(#) + ")";
+  export(@@@_RING);
+
+  if( defined(@@@_CHAR))
+  {
+    kill @@@_CHAR;
+  };
+  
+  int @@@_CHAR = char(basering);
+  export(@@@_CHAR);
+}
+
+static proc myGetRing ()
+// get desription of current ring
+{
+  if (defined( @@@_RING ))
+  {
+    return( @@@_RING );
+  };
+  
+  return( "No lieA.lib ring defined" );
+}
+
+static proc myGetRingName ()
+// get desription of current ring, only family
+{
+  if (defined( @@@_RING_NAME ))
+  {
+    return( @@@_RING_NAME );
+  };
+  
+  return( "No lieA.lib ring defined" );
+}
+
+static proc myGetRingChar ()
+// get desription of current ring, only family
+{
+  if (defined( @@@_CHAR ))
+  {
+    return( @@@_CHAR );
+  };
+  
+  return( char(basering) ); 
+}
+
+
+static proc myInt ( list # )
+// return 0 or int(#)
+{
+  int @p = 0;
+  if ( size(#) > 0 )
+  {
+    if ( typeof( #[1] ) == "int" )
+    {
+      @p = #[1];
+    }
+  }
+  return (@p);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+proc sl2(list #)
+"USAGE:   sl2([p]), p an optional integer (field characteristic)
 RETURN:  ring, corresponding to the U(sl_2) in (e,f,h) presentation
 NOTE:    you have to activate this ring with the "setring" command
 SEE ALSO: sl, g2, gl3
 EXAMPLE: example sl2; shows examples
 "{
-   ring rrr=0,(e,f,h),dp;
-   setring rrr;
-   matrix D[3][3]=0;   
+   int @p = myInt(#);
+   ring @@@rrr=@p,(e,f,h),dp;
+   matrix D[3][3]=0;
    D[1,2]=-h;
    D[1,3]=2*e;
    D[2,3]=-2*f;
-   system("PLURAL",1,D);
-   return(rrr);
+   ncalgebra(1,D);
+   mySetRing("sl2", #);
+   return(@@@rrr);
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -41,17 +129,16 @@ example
    a;
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
-proc sl(int n)
-"USAGE:   sl(n); n an integer, n>1
+
+proc sl(int n, list #)
+"USAGE:   sl(n,[p]); n an integer, n>1; p an optional integer (field characteristic)
 RETURN:  a ring, describing U(sl_n)
 NOTE:    You have to activate this ring with the "setring" command.
          The presentation of U(sl_n) is derived from the 
          standard representation of sl_n, positive
          resp. negative roots are denoted by x(i) resp. y(i),
          the Cartan elements are denoted by h(i).
-
 SEE ALSO: sl2
 EXAMPLE: example sl; shows examples
 "{
@@ -62,80 +149,83 @@ EXAMPLE: example sl; shows examples
   }
   if (n==2)
   {
-    def a=sl2();
-    return(a);
+    def @@@a=sl2(#);
+    mySetRing("sl", n, #);
+    return(@@@a);
   }
-  ring rr=0,(x(1..n*(n-1)/2),y(1..n*(n-1)/2),h(1..n-1)),dp;
+  
+  int @p = myInt(#);
+  ring @@@rr=@p,(x(1..n*(n-1)/2),y(1..n*(n-1)/2),h(1..n-1)),dp;
   intmat CNT[n][n]=0;
   matrix TMP[n][n]=0;
   int k,l=1,1;
   int buf=0;  
   list X,Y,H;
-
-  for(k=1;k<=n;k++)
+  for(k=1; k<=n; k++)
   {
-    for(l=k+1;l<=n;l++)
+    for(l=k+1; l<=n; l++)
     {
-      buf= (l-k-1)*(2*n-l+k)/2 + k; 
-      CNT[k,l]=buf;
-      TMP[k,l]=1;
-      X[buf]=TMP;
-      TMP=0;
-      CNT[l,k]=buf;
-      TMP[l,k]=1;
-      Y[buf]=TMP;
+      buf = (l-k-1)*(2*n-l+k)/2 + k; 
+      CNT[k,l] = buf;
+      TMP[k,l] = 1;
+      X[buf] = TMP;
+      TMP = 0;
+      CNT[l,k] = buf;
+      TMP[l,k] = 1;
+      Y[buf] = TMP;
       TMP=0;   
     }
   }
-
-  for(k=1;k<=n-1;k++)
+  
+  for(k=1; k<=n-1; k++)
   {
-   TMP[k,k]=1;
-   TMP[k+1,k+1]=-1;
-   H[k]=TMP;
-   TMP=0;
+    TMP[k,k]=1;
+    TMP[k+1,k+1]=-1;
+    H[k]=TMP;
+    TMP=0;
   }  
   int i,j=1,1;
   number p,q=0,0;
   list V=X+Y+H;
   int v=size(V);
   matrix D[v][v]=0;  
-  for(k=1;k<=v;k++)
+  for(k=1; k<=v; k++)
   {
-    for(l=k+1;l<=v;l++)
+    for(l=k+1; l<=v; l++)
     {
       TMP=V[l]*V[k]-V[k]*V[l];
-      for(i=1;i<=n;i++)
+      for(i=1; i<=n; i++)
       {
-        for(j=i+1;j<=n;j++)
+        for(j=i+1; j<=n; j++)
         {
           buf=(j-i-1)*(2*n-j+i)/2+i;
           if (TMP[i,j]!=0)
           {
-             D[k,l]=D[k,l]+leadcoef(TMP[i,j])*x(buf);
+	    D[k,l]=D[k,l]+leadcoef(TMP[i,j])*x(buf);
           }
           
           if (TMP[j,i]!=0)
           {          
-             D[k,l]=D[k,l]+leadcoef(TMP[j,i])*y(buf);
+	    D[k,l]=D[k,l]+leadcoef(TMP[j,i])*y(buf);
           }
         }
       } 
       i=1;
       while ((TMP[i,i]==0)&&(i<n)) {i++;}
-      for(j=i;j<=n-1;j++)
+      for(j=i; j<=n-1; j++)
       {
         p=leadcoef(TMP[j,j]);
         q=leadcoef(TMP[j+1,j+1]);
         D[k,l]=D[k,l]+p*h(j);
-//        if ((j!=n-1)&&((p+q)!=0)) {D[k,l]=D[k,l]+(p+q)*h(j+1);}
+	//        if ((j!=n-1)&&((p+q)!=0)) {D[k,l]=D[k,l]+(p+q)*h(j+1);}
         TMP[j+1,j+1]=TMP[j+1,j+1]+p; 
       }
-        
+      
     }
   }
-  system("PLURAL",1,D);
-  return(rr);
+  ncalgebra(1,D);
+  mySetRing("sl", n, #);  
+  return(@@@rr);
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -143,105 +233,109 @@ example
    setring a;
    a;
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 
-proc A(int n)
-"USAGE:   A(n); n an integer, n>1
+proc A(int n, list #)
+"USAGE:   A(n,[p]); n an integer, n>1; , p an optional integer (field characteristic)
 RETURN:  a ring, describing U(A(n))
-NOTE:    You have to activate this ring with the "setring" command.
+NOTE:    You have to activate this ring with the setring command.
          The presentation of U(A(n)) is derived from the 
          standard representation of sl(n+1), positive
          resp. negative roots are denoted by x(i) resp. y(i),
          the Cartan elements are denoted by h(i).
-
 SEE ALSO: sl2, g2, gl3
 EXAMPLE: example A; shows examples
-{
+"{
   if (n<1) 
   {
-    "Incorrect input";
+    Print("Incorrect input");
     return(0);
   }
-  def a=sl(n+1);
-  return(a);
+  def @@@a=sl(n+1, #);
+  mySetRing("A", n, #);
+  return(@@@a);
 }
 example
 { "EXAMPLE:"; echo = 2;
-   def a2=A(2);
+ def a2=A(2);
    setring a2;
    a2;
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 
+proc g2(list #)
 
-proc g2()
-"USAGE:   g2()
+"USAGE:   g2([p]), p an optional integer (field characteristic)
 RETURN:  ring, corresponding to the U(g_2) in (x(i),y(i),Ha,Hb) presentation
 NOTE:    you have to activate this ring with the "setring" command
 SEE ALSO: sl, gl3
 EXAMPLE: example g2; shows examples
 "{
-ring rrr=0,(x(1..6),y(1..6),Ha,Hb),dp;
-setring rrr;
-matrix D[14][14];
-D[1,2]=-x(3);
-D[1,3]=-2*x(4);
-D[1,4]=3*x(5);
-D[1,7]=-Ha;
-D[1,9]=3*y(2);
-D[1,10]=2*y(3);
-D[1,11]=-y(4);
-D[1,13]=2*x(1);
-D[1,14]=-x(1);
-D[2,5]=x(6);
-D[2,8]=-Hb;
-D[2,9]=-y(1);
-D[2,12]=-y(5);
-D[2,13]=-3*x(2);
-D[2,14]=2*x(2);
-D[3,4]=3*x(6);
-D[3,7]=3*x(2);
-D[3,8]=-x(1);
-D[3,9]=-Ha-3*Hb;
-D[3,10]=-2*y(1);
-D[3,12]=-y(4);
-D[3,13]=-x(3);
-D[3,14]=x(3);
-D[4,7]=2*x(3);
-D[4,9]=-2*x(1);
-D[4,10]=-2*Ha-3*Hb;
-D[4,11]=y(1);
-D[4,12]=y(3);
-D[4,13]=x(4);
-D[5,7]=-x(4);
-D[5,10]=x(1);
-D[5,11]=-Ha-Hb;
-D[5,12]=y(2);
-D[5,13]=3*x(5);
-D[5,14]=-x(5);
-D[6,8]=-x(5);
-D[6,9]=-x(4);
-D[6,10]=x(3);
-D[6,11]=x(2);
-D[6,12]=-Ha-2*Hb;
-D[6,14]=x(6);
-D[7,8]=y(3);
-D[7,9]=2*y(4);
-D[7,10]=-3*y(5);
-D[7,13]=-2*y(1);
-D[7,14]=y(1);
-D[8,11]=-y(6);
-D[8,13]=3*y(2);
-D[8,14]=-2*y(2);
-D[9,10]=-3*y(6);
-D[9,13]=y(3);
-D[9,14]=-y(3);
-D[10,13]=-y(4);
-D[11,13]=-3*y(5);
-D[11,14]=y(5);
-D[12,14]=-y(6);
-system("PLURAL",1,D);
-return(rrr);
+  int @p = myInt(#);
+  ring @@@rrr=@p,(x(1..6),y(1..6),Ha,Hb),dp;
+  setring @@@rrr;
+  matrix D[14][14];
+  D[1,2]=-x(3);
+  D[1,3]=-2*x(4);
+  D[1,4]=3*x(5);
+  D[1,7]=-Ha;
+  D[1,9]=3*y(2);
+  D[1,10]=2*y(3);
+  D[1,11]=-y(4);
+  D[1,13]=2*x(1);
+  D[1,14]=-x(1);
+  D[2,5]=x(6);
+  D[2,8]=-Hb;
+  D[2,9]=-y(1);
+  D[2,12]=-y(5);
+  D[2,13]=-3*x(2);
+  D[2,14]=2*x(2);
+  D[3,4]=3*x(6);
+  D[3,7]=3*x(2);
+  D[3,8]=-x(1);
+  D[3,9]=-Ha-3*Hb;
+  D[3,10]=-2*y(1);
+  D[3,12]=-y(4);
+  D[3,13]=-x(3);
+  D[3,14]=x(3);
+  D[4,7]=2*x(3);
+  D[4,9]=-2*x(1);
+  D[4,10]=-2*Ha-3*Hb;
+  D[4,11]=y(1);
+  D[4,12]=y(3);
+  D[4,13]=x(4);
+  D[5,7]=-x(4);
+  D[5,10]=x(1);
+  D[5,11]=-Ha-Hb;
+  D[5,12]=y(2);
+  D[5,13]=3*x(5);
+  D[5,14]=-x(5);
+  D[6,8]=-x(5);
+  D[6,9]=-x(4);
+  D[6,10]=x(3);
+  D[6,11]=x(2);
+  D[6,12]=-Ha-2*Hb;
+  D[6,14]=x(6);
+  D[7,8]=y(3);
+  D[7,9]=2*y(4);
+  D[7,10]=-3*y(5);
+  D[7,13]=-2*y(1);
+  D[7,14]=y(1);
+  D[8,11]=-y(6);
+  D[8,13]=3*y(2);
+  D[8,14]=-2*y(2);
+  D[9,10]=-3*y(6);
+  D[9,13]=y(3);
+  D[9,14]=-y(3);
+  D[10,13]=-y(4);
+  D[11,13]=-3*y(5);
+  D[11,14]=y(5);
+  D[12,14]=-y(6);
+  ncalgebra(1,D);
+  mySetRing("g2", #);
+  return(@@@rrr);
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -252,39 +346,41 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc gl3()
-"USAGE:   gl3()
+proc gl3(list #)
+"USAGE:   gl3([p]), p an optional integer (field characteristic)
 RETURN:  ring, corresponding to the U(gl_3) in the (e_ij (1<i,j<3)) presentation
 NOTE:    you have to activate this ring with the "setring" command
 SEE ALSO: sl, g2
 EXAMPLE: example gl3; shows examples
 "{
-ring rrr=0,(e11, e12, e13, e21, e22, e23, e31, e32, e33),dp;
-setring rrr;
-matrix D[9][9]=0;   
-D[1, 2]=-e12;
-D[1, 3]=-e13;
-D[1, 4]=e21;
-D[1, 7]=e31;
-D[2, 4]=e22-e11;
-D[2, 5]=-e12;
-D[2, 6]=-e13;
-D[2, 7]=e32;
-D[3, 4]=e23;
-D[3, 7]=e33-e11;
-D[3, 8]=-e12;
-D[3, 9]=-e13;
-D[4, 5]=e21;
-D[4, 8]=e31;
-D[5, 6]=-e23;
-D[5, 8]=e32;
-D[6, 7]=-e21;
-D[6, 8]=e33-e22;
-D[6, 9]=-e23;
-D[7, 9]=e31;
-D[8, 9]=e32;
-system("PLURAL",1,D);
-return(rrr);
+  int @p = myInt(#);
+  ring @@@rrr=@p,(e11, e12, e13, e21, e22, e23, e31, e32, e33),dp;
+  setring @@@rrr;
+  matrix D[9][9]=0;   
+  D[1, 2]=-e12;
+  D[1, 3]=-e13;
+  D[1, 4]=e21;
+  D[1, 7]=e31;
+  D[2, 4]=e22-e11;
+  D[2, 5]=-e12;
+  D[2, 6]=-e13;
+  D[2, 7]=e32;
+  D[3, 4]=e23;
+  D[3, 7]=e33-e11;
+  D[3, 8]=-e12;
+  D[3, 9]=-e13;
+  D[4, 5]=e21;
+  D[4, 8]=e31;
+  D[5, 6]=-e23;
+  D[5, 8]=e32;
+  D[6, 7]=-e21;
+  D[6, 8]=e33-e22;
+  D[6, 9]=-e23;
+  D[7, 9]=e31;
+  D[8, 9]=e32;
+  ncalgebra(1,D);
+  mySetRing("gl3", #);
+  return(@@@rrr);
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -292,36 +388,133 @@ example
    setring g;
    g;
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 
-proc Weyl(int n)
-"USAGE:   Weyl(n); n an integer, n>0
-RETURN:  a ring, describing n-th Weyl algebra over Q
-NOTE:    You have to activate this ring with the "setring" command.
-         The presentation of n-th Weyl algebra is classical:
-	 D(i)x(i)=x(i)D(i)+1
-SEE ALSO: sl2
-EXAMPLE: example Weyl; shows examples
-"{
-  if (n<1)
-  {
-    Print("Incorrect input");
-    return(0);
-  }
-  ring @rr=0,(x(1..n),D(1..n)),dp;
-  matrix @D[2*n][2*n];
-  int i=1; 
-  for (i=1;i<=n;i++)
-  {
-    @D[i,n+i]=1;
-  }
-  system("PLURAL",1,@D);
-  return(@rr);
+proc Qso3(list #)
+"USAGE:   Qso3([n]), n an optional integer
+RETURN:  ring, corresponding to the U'_q(so_3) in the presentation of Klimyk; 
+if n is specified, the quantum parameter Q will be specialized at the (2*n)-th root of unity
+NOTE:    you have to activate this ring with the "setring" command
+SEE ALSO: sl, Qsl3, g2, gl3
+EXAMPLE: example Qso3; shows examples
+"
+{
+  int @p = myInt(#);	
+  ring @@@r=(0,Q),(x,y,z),dp;
+  minpoly = RootOfUnity(2*p);
+  matrix C[3][3];
+  matrix D[3][3];
+  
+  C[1,2]=Q2;
+  C[1,3]=1/Q2;
+  C[2,3]=Q2;
+  
+  D[1,2]=-Q*z;
+  D[1,3]=1/Q*y;
+  D[2,3]=-Q*x;
+  
+  ncalgebra(C,D);
+  mySetRing("Qso3", #);
+  return(@@@r);
 }
-example
-{ "EXAMPLE:"; echo = 2;
-   def a=Weyl(3);
-   setring a;
-   a;
+	
+///////////////////////////////////////////////////////////////////////////////
+
+proc Qsl3(list #)
+"USAGE:   Qsl3([n]), n an optional integer
+RETURN:  ring, corresponding to the U_q(sl_3) as the factor algebra of
+V_q(sl3); if n is specified, the quantum parameter q will be specialized at the n-th root of unity
+NOTE:    you have to activate this ring with the "setring" command
+SEE ALSO: sl, Qso3, g2, gl3
+EXAMPLE: example Qso3; shows examples
+"
+{
+  int @p = myInt(#);
+  //   ring @@@rrr=(@p, q), (f12, f13, f23, k1, k2, l1, l2, e12, e13, e23), wp(7, 10, 11, 1, 1, 1, 1, 7, 10, 11);
+  
+  ring @@@rrr=(0, q), (f12, f13, f23, k1, k2, l1, l2, e12, e13, e23), wp(3, 5, 3, 1, 1, 1, 1, 1, 1, 1);
+  if (@p >1) 
+  {
+    minpoly = RootOfUnity(@p);
+  }
+  int @n = nvars(@@@rrr);
+  matrix C[@n][@n];
+  matrix D[@n][@n];
+  
+  int u,j; 
+  for(u=1; u<=@n; u++)
+  {
+    for(j=u; j<=@n; j++)
+    {
+      C[u,j]=1;
+      D[u,j]=0;
+    }
+  }
+  
+  // some constants
+  number q1 =    1/q;
+  number Q  = (q )^2;
+  number Q1 = (q1)^2;
+  //   number QQ = Q - Q1; // q2 - 1/(q2)
+  number QQ1= 1 / (Q - Q1);
+  
+  // relations:
+  C[1,2] = Q1;
+  C[2,3] = C[1,2];
+  C[8,9] = C[1,2];
+  C[9,10]= C[1,2];
+  C[1,3] = Q;
+  C[8,10]= C[1,3];
+  
+  D[1,3] = -q*(f13);
+  D[8,10]= -q*(e13);
+  // V_q(sl_3)
+  D[1,8] = QQ1 * ( (k1) ^ 2 - (l1) ^ 2 );
+  D[3,10]= QQ1 * ( (k2) ^ 2 - (l2) ^ 2 );
+  D[2,9] = -QQ1 * ( ((k1)^2)*((k2)^2) - ((l1)^2)*((l2)^2) );
+  D[2, 8] =   q * (f23) * ((k1)^2);
+  D[3, 9] =   q * ((k2)^2) * (e12);
+  D[1, 9] = -q1 * ((l1)^2) * (e23);
+  D[2, 10]= -q1 * (f12) * ((l2)^2);
+  // k1
+  C[ 4, 8 ]= Q1;
+  C[ 4, 9 ]= q1;
+  C[ 4, 10]= q;
+  // l1
+  C[ 6, 8 ]= Q;
+  C[ 6, 9 ]= q;
+  C[ 6, 10]= q1;
+  // k2
+  C[ 5, 8 ]= q;
+  C[ 5, 9 ]= q1;
+  C[ 5, 10]= Q1;
+  // l2
+  C[ 7, 8 ]= q1;
+  C[ 7, 9 ]= q;
+  C[ 7, 10]= Q;
+  // k1
+  C[ 1, 4 ]= Q1;
+  C[ 2, 4 ]= q1;
+  C[ 3, 4 ]= q;
+  // l1
+  C[ 1, 6 ]= Q;
+  C[ 2, 6 ]= q;
+  C[ 3, 6 ]= q1;
+  // k2
+  C[ 1, 5 ]= q;
+  C[ 2, 5 ]= q1;
+  C[ 3, 5 ]= Q1;
+  // l2
+  C[ 1, 7 ]= q1;
+  C[ 2, 7 ]= q;
+  C[ 3, 7 ]= Q;
+  ncalgebra(C,D); // the V_q(sl3) is done
+  ideal I = k1*l1-1,  k2*l2-1;
+  I = system("twostd",I);
+  qring @@qr = I;
+  mySetRing("Qsl3", #);
+  return(@@qr);
 }
+
 ///////////////////////////////////////////////////////////////////////////////
