@@ -1,6 +1,6 @@
 //GMG last modified: 04/25/2000
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: linalg.lib,v 1.35 2003-03-03 17:33:30 mschulze Exp $";
+version="$Id: linalg.lib,v 1.36 2004-06-28 14:14:03 Singular Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  linalg.lib  Algorithmic Linear Algebra
@@ -1468,13 +1468,14 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc spnf(list sp)
+proc spnf(list #)
 "USAGE:   spnf(list(a[,m])); ideal a, intvec m
 ASSUME:  ncols(a)==size(m)
 RETURN:  order a[i] with multiplicity m[i] lexicographically
 EXAMPLE: example spnf; shows examples
 "
 {
+  list sp=#;
   ideal a=sp[1];
   int n=ncols(a);
   intvec m;
