@@ -14,6 +14,14 @@
 
 #ifdef MP_HAVE_GMP_APREAL
 
+#ifdef  __GNU_MP_VERSION
+#if  __GNU_MP_VERSION > 2
+#define _mp_allocate_func      __gmp_allocate_func
+#define _mp_reallocate_func    __gmp_reallocate_func
+#define _mp_free_func          __gmp_free_func
+#endif
+#endif
+
 EXTERN void* (*_mp_allocate_func) (size_t size);
 EXTERN void* (*_mp_free_func) (void* ptr, size_t size);
 
