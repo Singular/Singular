@@ -120,7 +120,7 @@ static mapoly maFindBestggT(mapoly mp, mapoly & choice, mapoly & fp, mapoly & fq
 
   
 }
-mapoly maPoly_Optimize(mapoly mpoly, ring src_r){
+void maPoly_Optimize(mapoly mpoly, ring src_r){
   assume(mpoly!=NULL && mpoly->src!=NULL);
   mapoly iter = mpoly;
   mapoly choice;
@@ -146,5 +146,5 @@ mapoly maPoly_Optimize(mapoly mpoly, ring src_r){
     }
     iter=iter->next;
   }
-  return mpoly;
+
 }
