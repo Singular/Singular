@@ -1,8 +1,8 @@
-e// $Id: classify.lib,v 1.42 2000-05-12 12:25:41 Singular Exp $
+e// $Id: classify.lib,v 1.43 2000-12-04 13:48:16 Singular Exp $
 // KK, last modified: 04.04.1998
 ///////////////////////////////////////////////////////////////////////////////
 
-version  = "$Id: classify.lib,v 1.42 2000-05-12 12:25:41 Singular Exp $";
+version  = "$Id: classify.lib,v 1.43 2000-12-04 13:48:16 Singular Exp $";
 info="
 LIBRARY:  classify.lib  Procedures for the Arnold-Classifier of Singularities
 
@@ -131,79 +131,87 @@ example
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc Klassifiziere (poly f)
+static proc Klassifiziere (poly f)
 {
 //--------------------------- initialisation ----------------------------------
-    string s1;
-    int    n, cnt, corank_f, K, Mu;
-    list   v, cstn;
-    map    PhiG;
-    def ring_top = basering;
+  string s1;
+  int    n, cnt, corank_f, K, Mu;
+  list   v, cstn;
+  map    PhiG;
+  def ring_top = basering;
 
-    n = nvars(basering);    // Zahl der Variablen des aktuellen Rings.
-    PhiG = ring_top, maxideal(1);
-    cstn[4] = PhiG;
-    if( defined(@ringdisplay) == 0) {
-      string @ringdisplay;               // Define always 'ringdisplay' to be
-      export @ringdisplay;               // able to run 'Show(f)'
-    }
-    @ringdisplay = "setring RingB;";
-    if(defined(RingB)!=0) { kill RingB; }
-    execute ("ring RingB="+charstr(basering)+",("+A_Z("x", n)+"),(c,ds);");
-    export RingB;
-    setring ring_top;
+  n = nvars(basering);    // Zahl der Variablen des aktuellen Rings.
+  PhiG = ring_top, maxideal(1);
+  cstn[4] = PhiG;
+  if( defined(@ringdisplay) == 0)
+  {
+    string @ringdisplay;               // Define always 'ringdisplay' to be
+    export @ringdisplay;               // able to run 'Show(f)'
+  }
+  @ringdisplay = "setring RingB;";
+  if(defined(RingB)!=0) { kill RingB; }
+  execute ("ring RingB="+charstr(basering)+",("+A_Z("x", n)+"),(c,ds);");
+  export RingB;
+  setring ring_top;
 
 //---------------------- compute basciinvariants ------------------------------
-    if(jet(f,0) != 0 ) {
-      cstn[1] = corank(f); cstn[2]=-1; cstn[3]=1;
-      return(printresult(1, f, "a unit", cstn, -1));
-    }
+  if(jet(f,0) != 0 )
+  {
+    cstn[1] = corank(f); cstn[2]=-1; cstn[3]=1;
+    return(printresult(1, f, "a unit", cstn, -1));
+  }
 
-    debug_log(1, "Computing Basicinvariants of f ...");
-    K, Mu, corank_f = basicinvariants(f);
-    debug_log(0, "About the singularity :");
-    debug_log(0, "          Milnor number(f)   = "+string(Mu));
-    debug_log(0, "          Corank(f)          = "+string(corank_f));
-    debug_log(0, "          Determinacy       <= "+string(K));
-    cstn[1] = corank_f;
-    cstn[2] = Mu;
-    cstn[3] = K;
+  debug_log(1, "Computing Basicinvariants of f ...");
+  K, Mu, corank_f = basicinvariants(f);
+  debug_log(0, "About the singularity :");
+  debug_log(0, "          Milnor number(f)   = "+string(Mu));
+  debug_log(0, "          Corank(f)          = "+string(corank_f));
+  debug_log(0, "          Determinacy       <= "+string(K));
+  cstn[1] = corank_f;
+  cstn[2] = Mu;
+  cstn[3] = K;
 
-    if( Mu == 0) {
-      cstn[1]=1; cstn[3]=1;
-      return(printresult(1, f, "A[0]", cstn, 0)); }
+  if( Mu == 0)
+  {
+    cstn[1]=1; cstn[3]=1;
+    return(printresult(1, f, "A[0]", cstn, 0));
+  }
 
-    if(Mu<0) {
-      debug_log(0, "The Milnor number of the function is infinite.");
-      debug_log(0, "The singularity is not in Arnolds list.");
-      return(printresult(1, 1, "error!", cstn, -1));
-    }
+  if(Mu<0)
+  {
+    debug_log(0, "The Milnor number of the function is infinite.");
+    debug_log(0, "The singularity is not in Arnolds list.");
+    return(printresult(1, 1, "error!", cstn, -1));
+  }
 
-    f = jet(f, K);
-    v = HKclass(milnorcode(f));
-    if(v[2]>0) { debug_log(0, "Guessing type via Milnorcode: ", v[1]);}
-    else {
-      debug_log(0, "Hilbert polynomial not recognised. Milnor code = ",
-                milnorcode(f));
-    }
-    debug_log(0, "");
-    debug_log(0, "Computing normal form ...");
+  f = jet(f, K);
+  v = HKclass(milnorcode(f));
+  if(v[2]>0) { debug_log(0, "Guessing type via Milnorcode: ", v[1]);}
+  else
+  {
+    debug_log(0, "Hilbert polynomial not recognised. Milnor code = ",
+              milnorcode(f));
+  }
+  debug_log(0, "");
+  debug_log(0, "Computing normal form ...");
 
 //------------ step 1, classification according to corank(f) ------------------
-    if(corank_f == 0) {
-       return(printresult(2, f, "A["+string(Mu)+"]", cstn, 0)); }
-    if(corank_f == 1) {
-       return(printresult(2, f, "A["+string(Mu)+"]", cstn, 0)); }
-    cstn[4] = 0;
-    if(corank_f == 2) { return(Funktion1bis(f, cstn)); }
-    if(corank_f == 3) { return(Funktion1bis(f, cstn)); }
-    return(printresult(105, f, "NoClass", cstn, -1));
+  if(corank_f == 0)
+  {
+    return(printresult(2, f, "A["+string(Mu)+"]", cstn, 0));
+  }
+  if(corank_f == 1)
+  {
+    return(printresult(2, f, "A["+string(Mu)+"]", cstn, 0));
+  }
+  cstn[4] = 0;
+  if(corank_f == 2) { return(Funktion1bis(f, cstn)); }
+  if(corank_f == 3) { return(Funktion1bis(f, cstn)); }
+  return(printresult(105, f, "NoClass", cstn, -1));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc Funktion1bis (poly f, list cstn)
+static proc Funktion1bis (poly f, list cstn)
 {
 //---------------------------- initialisation ---------------------------------
    def ring_top=basering;
@@ -269,8 +277,7 @@ proc Funktion1bis (poly f, list cstn)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc Funktion3 (poly f, list cstn)
+static proc Funktion3 (poly f, list cstn)
 {
 //---------------------------- initialisation ---------------------------------
     poly f3 = jet(f, 3);
@@ -300,8 +307,7 @@ proc Funktion3 (poly f, list cstn)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc Funktion6 (poly f, list cstn)
+static proc Funktion6 (poly f, list cstn)
 { // Arnold's steps 6-12
 //---------------------------- initialisation ---------------------------------
     poly   f3, fk;
@@ -379,8 +385,7 @@ proc Funktion6 (poly f, list cstn)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc Funktion13 (poly f, list cstn)
+static proc Funktion13 (poly f, list cstn)
 {
 //---------------------------- initialisation ---------------------------------
     poly f4;
@@ -417,8 +422,7 @@ proc Funktion13 (poly f, list cstn)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc Funktion17 (poly f, list cstn)
+static proc Funktion17 (poly f, list cstn)
 { // Analog zu Fumktion 6, Kombination 17-24
 //---------------------------- initialisation ---------------------------------
     poly  fk, ft;
@@ -484,8 +488,7 @@ proc Funktion17 (poly f, list cstn)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc Funktion25 (poly f, list cstn)
+static proc Funktion25 (poly f, list cstn)
 { // Analog zu Fumktion 6, Kombination 25-46
 //---------------------------- initialisation ---------------------------------
     poly   fk, ft;
@@ -593,8 +596,7 @@ proc Funktion25 (poly f, list cstn)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc Funktion40 (poly f, list cstn, int k)
+static proc Funktion40 (poly f, list cstn, int k)
 {
 //---------------------------- initialisation ---------------------------------
     int    r, kr, rr, sr, oldDebug;
@@ -651,8 +653,7 @@ proc Funktion40 (poly f, list cstn, int k)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc Funktion50 (poly f, list cstn)
+static proc Funktion50 (poly f, list cstn)
 {
 //---------------------------- initialisation ---------------------------------
     poly  f3;
@@ -704,8 +705,7 @@ proc Funktion50 (poly f, list cstn)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc Funktion58 (poly fin, list cstn)
+static proc Funktion58 (poly fin, list cstn)
 {
 //---------------------------- initialisation ---------------------------------
     poly  f, f3, a, b, phi, b1, b2, b3, fa, fb, fc;
@@ -854,8 +854,7 @@ proc Funktion58 (poly fin, list cstn)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc Funktion59 (poly f, list cstn)
+static proc Funktion59 (poly f, list cstn)
 {
 //---------------------------- initialisation ---------------------------------
     poly   phi, fr, fk, alpha, beta, f_tmp;
@@ -932,8 +931,7 @@ proc Funktion59 (poly f, list cstn)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc Funktion66 (poly f, list cstn)
+static proc Funktion66 (poly f, list cstn)
 {
 //---------------------------- initialisation ---------------------------------
     int kx = 1; // Koordinate x
@@ -962,8 +960,7 @@ proc Funktion66 (poly f, list cstn)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc Funktion82 (poly f, list cstn)
+static proc Funktion82 (poly f, list cstn)
 {
 //---------------------------- initialisation ---------------------------------
     poly   f3, b1, b2, b3;
@@ -1057,8 +1054,7 @@ proc Funktion82 (poly f, list cstn)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc Isomorphie_s82_z (poly f, poly fk, int p)
+static proc Isomorphie_s82_z (poly f, poly fk, int p)
 {
 //---------------------------- initialisation ---------------------------------
     poly   Relation, a, b;
@@ -1085,8 +1081,7 @@ proc Isomorphie_s82_z (poly f, poly fk, int p)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc Isomorphie_s82_x (poly f, poly fk, int p)
+static proc Isomorphie_s82_x (poly f, poly fk, int p)
 {
 //---------------------------- initialisation ---------------------------------
     matrix Mat;
@@ -1114,8 +1109,7 @@ proc Isomorphie_s82_x (poly f, poly fk, int p)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc Funktion83 (poly f, list cstn)
+static proc Funktion83 (poly f, list cstn)
 {
 //---------------------------- initialisation ---------------------------------
     poly   fk, phi, a, b;
@@ -1201,8 +1195,7 @@ proc Funktion83 (poly f, list cstn)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc Funktion97 (poly f, list cstn)
+static proc Funktion97 (poly f, list cstn)
 {
 //---------------------------- initialisation ---------------------------------
     poly   f3, l1, l2, a, b, c, prod;
@@ -1318,8 +1311,7 @@ proc tschirnhaus (poly f, poly x)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc Isomorphie_s17 (poly f, poly fk, int k, int ct, list #)
+static proc Isomorphie_s17 (poly f, poly fk, int k, int ct, list #)
 {
 //---------------------------- initialisation ---------------------------------
     ideal  Jfsyz, JetId, bb;
@@ -1438,8 +1430,7 @@ proc Isomorphie_s17 (poly f, poly fk, int k, int ct, list #)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc printresult (int step, poly f, string typ, list cstn, int m)
+static proc printresult (int step, poly f, string typ, list cstn, int m)
 {
 //---------------------------- initialisation ---------------------------------
   int corank, Mu, K;
@@ -1447,13 +1438,16 @@ proc printresult (int step, poly f, string typ, list cstn, int m)
 
   corank, Mu, K = cstn[1..3];
   debug_log(0,"   Arnold step number "+string(step));
-  if( @DeBug >= 0 ) {
+  if( @DeBug >= 0 )
+  {
     "The singularity";
     "   "+Show(jet(f, K))+"";
-    if( typ != "error!" && typ != "NoClass" ) {
+    if( typ != "error!" && typ != "NoClass" )
+    {
       "is R-equivalent to "+typ+".";
     }
-    if ( typ == "NoClass" ) {
+    if ( typ == "NoClass" )
+    {
       "is not in Arnolds list.";
     }
 //    if(K>=0)  { "  det = "+string(K); }
@@ -1465,68 +1459,61 @@ proc printresult (int step, poly f, string typ, list cstn, int m)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc Funktion47 (poly f, list cstn)
+static proc Funktion47 (poly f, list cstn)
 {
-    int corank = cstn[1];
-    int Mu = cstn[2];
-    int K  = cstn[3];
-    string s = "The Singularity ";+Show(jet(f, K), corank, K);
-    string tp="";
-//    return(printresult(47, f, tp, cstn, -1));
+  int corank = cstn[1];
+  int Mu = cstn[2];
+  int K  = cstn[3];
+  string s = "The Singularity ";+Show(jet(f, K), corank, K);
+  string tp="";
+//  return(printresult(47, f, tp, cstn, -1));
 
-    s = s +" has 4-jet equal to zero. (F47), mu="+string(Mu);
+  s = s +" has 4-jet equal to zero. (F47), mu="+string(Mu);
 
-    s; // +"  ("+SG_Typ+")";
-    return(Show(f), tp, corank);
+  s; // +"  ("+SG_Typ+")";
+  return(Show(f), tp, corank);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc Funktion91 (poly f, list cstn, int k)
+static proc Funktion91 (poly f, list cstn, int k)
 {
-    string tp  = "U*[k,0]";
-    return(printresult(91, f, tp, cstn, -1));
+  string tp  = "U*[k,0]";
+  return(printresult(91, f, tp, cstn, -1));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc Funktion92 (poly f, list cstn, int k)
+static proc Funktion92 (poly f, list cstn, int k)
 {
-    string tp  = "UP[k]";
-    return(printresult(92, f, tp, cstn, -1));
+  string tp  = "UP[k]";
+  return(printresult(92, f, tp, cstn, -1));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc Funktion93 (poly f, list cstn, int k)
+static proc Funktion93 (poly f, list cstn, int k)
 {
-    string tp  = "UQ[k]";
-    return(printresult(93, f, tp, cstn, -1));
+  string tp  = "UQ[k]";
+  return(printresult(93, f, tp, cstn, -1));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc Funktion94 (poly f, list cstn, int k)
+static proc Funktion94 (poly f, list cstn, int k)
 {
-    string tp  = "UR[k]";
-    return(printresult(94, f, tp, cstn, -1));
+  string tp  = "UR[k]";
+  return(printresult(94, f, tp, cstn, -1));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc Funktion95 (poly f, list cstn, int k)
+static proc Funktion95 (poly f, list cstn, int k)
 {
-    string tp  = "US[k]";
-    return(printresult(95, f, tp, cstn, -1));
+  string tp  = "US[k]";
+  return(printresult(95, f, tp, cstn, -1));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc Funktion96 (poly f, list cstn, int k)
+static proc Funktion96 (poly f, list cstn, int k)
 {
-    string tp  = "UT[k]";
-    return(printresult(96, f, tp, cstn, -1));
+  string tp  = "UT[k]";
+  return(printresult(96, f, tp, cstn, -1));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1574,164 +1561,175 @@ example
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc Coeffs (list #)
+static proc Coeffs (list #)
 {
   matrix m=matrix(coeffs(#[1],#[2]), deg(#[1])+1, 1);
   return(m);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc Morse(poly f, int K, int corank, int ShowPhi)
+static proc Morse(poly f, int K, int corank, int ShowPhi)
 {
 //---------------------------- initialisation ---------------------------------
-    poly   fc, f2, a, P, Beta, fi;
-    ideal  Jfx, B;
-    int    n, i, j, k, Rang, Done;
-    matrix Mat;
-    map    Id, Psi, Phi, PhiG;
-    intvec Abb, RFlg;
-    list   v;
+  poly   fc, f2, a, P, Beta, fi;
+  ideal  Jfx, B;
+  int    n, i, j, k, Rang, Done;
+  matrix Mat;
+  map    Id, Psi, Phi, PhiG;
+  intvec Abb, RFlg;
+  list   v;
 
-    fi = f;
-    n = nvars(basering);
-    init_debug();
+  fi = f;
+  n = nvars(basering);
+  init_debug();
 
-    def ring_top=basering;
+  def ring_top=basering;
 
-    debug_log(3, "Spalte folgendes Polynom mit Bestimmtheit: ", string(K));
-    debug_log(3, Show(fi));
+  debug_log(3, "Spalte folgendes Polynom mit Bestimmtheit: ", string(K));
+  debug_log(3, Show(fi));
 
-    for( j=1; j<=n ; j++) { Abb[j] = 0; }
+  for( j=1; j<=n ; j++) { Abb[j] = 0; }
 
-    RFlg = GetRf(fi, n);
-    debug_log(2, "Reihenfolge fuer Vertauschungen:", RFlg );
-    PhiG=ring_top,maxideal(1);
+  RFlg = GetRf(fi, n);
+  debug_log(2, "Reihenfolge fuer Vertauschungen:", RFlg );
+  PhiG=ring_top,maxideal(1);
 
 //----------------- find quadratic term, if there is only one -----------------
-    B = maxideal(1);
-    if(corank == (n-1)) {
-      Done = 0;
-      f2   = jet(fi, 2);
-      j    = 1;
-      Jfx  = f2, diff(f2, x(j));
-      while(j<=n && (diff(f2, x(j))==0)) {
-        j   = j+1;
-        Jfx = f2, diff(f2, x(j));
-      }
-      Mat  = matrix(syz(Jfx));
-      Beta = 2*Mat[2,1]/Mat[1,1];
-      for( j=1; j<=n ; j=j+1) {
-        f2 = Coeff(Beta, x(RFlg[j]), x(RFlg[j]));
-        if(f2!=0) {
-          k = RFlg[j];
-          break;
-        }
-      }
-      for( j=1; j<=n ; j=j+1) {
-        f2 = Coeff(Beta, x(j), x(j));
-        if(j == k) { B[rvar(x(j))] = (2*f2*x(j)-Beta) / number(f2); }
-      }
-      Phi  =ring_top,B;
-      fi   = Phi(fi);
-      PhiG = Phi(PhiG);
+  B = maxideal(1);
+  if(corank == (n-1))
+  {
+    Done = 0;
+    f2   = jet(fi, 2);
+    j    = 1;
+    Jfx  = f2, diff(f2, x(j));
+    while(j<=n && (diff(f2, x(j))==0))
+    {
+      j++;
+      Jfx = f2, diff(f2, x(j));
     }
-    if( ShowPhi > 1) { PhiG; }
+    Mat  = matrix(syz(Jfx));
+    Beta = 2*Mat[2,1]/Mat[1,1];
+    for( j=1; j<=n ; j++)
+    {
+      f2 = Coeff(Beta, x(RFlg[j]), x(RFlg[j]));
+      if(f2!=0)
+      {
+        k = RFlg[j];
+        break;
+      }
+    }
+    for( j=1; j<=n ; j=j+1)
+    {
+      f2 = Coeff(Beta, x(j), x(j));
+      if(j == k) { B[rvar(x(j))] = (2*f2*x(j)-Beta) / number(f2); }
+    }
+    Phi  =ring_top,B;
+    fi   = Phi(fi);
+    PhiG = Phi(PhiG);
+  }
+  if( ShowPhi > 1) { PhiG; }
 
 //------------------------ compute spliting lemma -----------------------------
-    fc = fi;
-    i  = 1;              // Index fuer Variablen wird bearbeitet
-    while( i <= n) {
-      Phi=ring_top,maxideal(1);
-      debug_log(6, "Pruefe Variable x(" +string(RFlg[i]) + ")");
-      debug_log(6, "--------------------");
-      j  = i + 1;        // setze j fuer evtle Verschiebung
-      f2 = jet(fc,2);
-      debug_log(6, "Rechne 2-Jet =" , string(f2));
-      if( (f2 - subst(f2, x(RFlg[i]), 0)) == 0 ) { Abb[RFlg[i]] = 1; }
-      if( (f2 - subst(f2, x(RFlg[i]), 0)) != 0 ) {
-        while( (j<=n) || (i==n) ) {
-          debug_log(6, "Pruefe 2-Jet mit Wert : " + string(jet(fc,2)));
-          a = Coeff(jet(fc,2), x(RFlg[i]), x(RFlg[i])^2);
-          debug_log(6,"Koeffizient von x(" + string(RFlg[i]) + ")^2 ist:", a);
-          if( (a != 0) || (i==n) ) {
-            debug_log(6, "BREAK!!!!!!!!!!!!!!");
-            break;
-          }
-          debug_log(6,"Verschiebe evtl Variable x(",string(RFlg[j]),") um x(",
-                       string(RFlg[i]), ")");
+  fc = fi;
+  i  = 1;              // Index fuer Variablen wird bearbeitet
+  while( i <= n)
+  {
+    Phi=ring_top,maxideal(1);
+    debug_log(6, "Pruefe Variable x(" +string(RFlg[i]) + ")");
+    debug_log(6, "--------------------");
+    j  = i + 1;        // setze j fuer evtle Verschiebung
+    f2 = jet(fc,2);
+    debug_log(6, "Rechne 2-Jet =" , string(f2));
+    if( (f2 - subst(f2, x(RFlg[i]), 0)) == 0 ) { Abb[RFlg[i]] = 1; }
+    if( (f2 - subst(f2, x(RFlg[i]), 0)) != 0 )
+    {
+      while( (j<=n) || (i==n) )
+      {
+        debug_log(6, "Pruefe 2-Jet mit Wert : " + string(jet(fc,2)));
+        a = Coeff(jet(fc,2), x(RFlg[i]), x(RFlg[i])^2);
+        debug_log(6,"Koeffizient von x(" + string(RFlg[i]) + ")^2 ist:", a);
+        if( (a != 0) || (i==n) )
+	{
+          debug_log(6, "BREAK!!!!!!!!!!!!!!");
+          break;
+        }
+        debug_log(6,"Verschiebe evtl Variable x(",string(RFlg[j]),") um x(",
+                     string(RFlg[i]), ")");
+        B = maxideal(1);
+        for( k=1; k<=n ; k=k+1)
+	{
+          if(k==RFlg[j]) { B[rvar(x(k))] = x(k) + x(RFlg[i]); }
+        }
+        Phi = ring_top,B;
+        fc  = Phi(fi);
+        j++;
+      }               // Ende while( (j<=n) || (i==n) )
+
+      debug_log(6, "Moegliche Verschiebung fertig!");
+      PhiG = Phi(PhiG);
+      if( ShowPhi > 1) { "NachVersch.:"; Phi; }
+
+      if( (j<=n) || (i==n))
+      {
+        P = Coeff(fc, x(RFlg[i]), x(RFlg[i]));
+        debug_log(6, "Koeffizient von x("+string(RFlg[i])+") ist: ",
+                      string(P));
+        if(P != 0)
+	{
+          debug_log(6, "1 Koeffizient von x("+string(RFlg[i])+") ist: ",
+                       string(P));
+          debug_log(6, "a=" + string(a));
+          P = P / number (2 * a);
+          debug_log(6, "2 Koeffizient von x("+string(RFlg[i])+") ist: ",
+                       string(P));
           B = maxideal(1);
-          for( k=1; k<=n ; k=k+1) {
-            if(k==RFlg[j]) { B[rvar(x(k))] = x(k) + x(RFlg[i]); }
+          for( k=1; k<=n ; k=k+1) {if(k==RFlg[i]) {B[rvar(x(k))]=x(k)-P;}}
+          Phi =ring_top,B;
+          debug_log(6, "Quadratische-Ergaenzung durch:", Phi);
+          fi   = Phi(fc);
+          PhiG = Phi(PhiG);
+          fc   = jet(fi,K);
+          P    = Coeff(fc, x(RFlg[i]), x(RFlg[i]));
+          if( P != 0)
+	  {
+            fi = fc;
+            continue;
           }
-          Phi = ring_top,B;
-          fc  = Phi(fi);
-          j   = j + 1;
-        }               // Ende while( (j<=n) || (i==n) )
+        }     // Ende if(P != 0)
+              // Fertig mit Quadratischer-Ergaenzung
+      }               // Ende if( (j<=n) || (i==n))
+    }                 // Ende if( (f2 - subst(f2, x(RFlg[i]), 0)) != 0 )
 
-        debug_log(6, "Moegliche Verschiebung fertig!");
-        PhiG = Phi(PhiG);
-        if( ShowPhi > 1) { "NachVersch.:"; Phi; }
-
-        if( (j<=n) || (i==n)) {
-          P = Coeff(fc, x(RFlg[i]), x(RFlg[i]));
-          debug_log(6, "Koeffizient von x("+string(RFlg[i])+") ist: ",
-                        string(P));
-          if(P != 0) {
-            debug_log(6, "1 Koeffizient von x("+string(RFlg[i])+") ist: ",
-                         string(P));
-            debug_log(6, "a=" + string(a));
-            P = P / number (2 * a);
-            debug_log(6, "2 Koeffizient von x("+string(RFlg[i])+") ist: ",
-                         string(P));
-            B = maxideal(1);
-            for( k=1; k<=n ; k=k+1) {if(k==RFlg[i]) {B[rvar(x(k))]=x(k)-P;}}
-            Phi =ring_top,B;
-            debug_log(6, "Quadratische-Ergaenzung durch:", Phi);
-            fi   = Phi(fc);
-            PhiG = Phi(PhiG);
-            fc   = jet(fi,K);
-            P    = Coeff(fc, x(RFlg[i]), x(RFlg[i]));
-            if( P != 0) {
-              fi = fc;
-              continue;
-            }
-          }     // Ende if(P != 0)
-                // Fertig mit Quadratischer-Ergaenzung
-        }               // Ende if( (j<=n) || (i==n))
-      }                 // Ende if( (f2 - subst(f2, x(RFlg[i]), 0)) != 0 )
-
-      fi = fc;
-      i  = i + 1;
-      debug_log(6, "++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-    }
-    debug_log(6, "Ende  ---------------------------------------------------");
+    fi = fc;
+    i++;
+    debug_log(6, "++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+  }
+  debug_log(6, "Ende  ---------------------------------------------------");
 
 //--------------------------- collect results ---------------------------------
-    if( ShowPhi > 0 ) {
-      "Abbildung innerhalb des Morse-Lemmas:";
-      PhiG;
-      "Vergleich:";
-      "PhiG(f)= " + Show(jet(PhiG(f), K));
-      "fi     = " + Show(fi);
-    }
+  if( ShowPhi > 0 )
+  {
+    "Abbildung innerhalb des Morse-Lemmas:";
+    PhiG;
+    "Vergleich:";
+    "PhiG(f)= " + Show(jet(PhiG(f), K));
+    "fi     = " + Show(fi);
+  }
 
-    Rang = 0;
-    B    = maxideal(1);
-    for( i=1; i<=n ; i++) { if(Abb[i] != 1) { Rang ++; B[rvar(x(i))] = 0; } }
-    Phi  = ring_top,B;
-    PhiG = Phi(PhiG);
-    fi   = Phi(fi);
-    v    = fi, PhiG;
-    debug_log(2, "rank determined with Morse rg=", Rang);
-    debug_log(1, "Rest singularity f=",Show(fi));
-    return(v);
+  Rang = 0;
+  B    = maxideal(1);
+  for( i=1; i<=n ; i++) { if(Abb[i] != 1) { Rang ++; B[rvar(x(i))] = 0; } }
+  Phi  = ring_top,B;
+  PhiG = Phi(PhiG);
+  fi   = Phi(fi);
+  v    = fi, PhiG;
+  debug_log(2, "rank determined with Morse rg=", Rang);
+  debug_log(1, "Rest singularity f=",Show(fi));
+  return(v);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc Coeff(poly f, list #)
+static proc Coeff(poly f, list #)
 {
 //---------------------------- initialisation ---------------------------------
   poly   a, term;
@@ -1754,8 +1752,7 @@ proc Coeff(poly f, list #)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc ReOrder(poly f)
+static proc ReOrder(poly f)
 {
 //---------------------------- initialisation ---------------------------------
   poly  result;
@@ -1905,8 +1902,7 @@ example
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc Cubic (poly f)
+static proc Cubic (poly f)
 {
 //---------------------------- initialisation ---------------------------------
   poly  f3;
@@ -1950,8 +1946,7 @@ proc Cubic (poly f)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc parity  (int e)
+static proc parity  (int e)
 "USAGE:    parity()"
 {
   int r = e/2;
@@ -1960,8 +1955,7 @@ proc parity  (int e)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc HKclass (intvec sg)
+static proc HKclass (intvec sg)
 {
 //---------------------------- initialisation ---------------------------------
   int    cnt = 0;
@@ -1981,8 +1975,7 @@ proc HKclass (intvec sg)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc HKclass3 (intvec sg, string SG_Typ, int cnt)
+static proc HKclass3 (intvec sg, string SG_Typ, int cnt)
 {
   list v;
 
@@ -1992,8 +1985,7 @@ proc HKclass3 (intvec sg, string SG_Typ, int cnt)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc HKclass3_teil_1 (intvec sg, string SG_Typ, int cnt)
+static proc HKclass3_teil_1 (intvec sg, string SG_Typ, int cnt)
 {
   int  k, r, s;
   list v;
@@ -2029,8 +2021,7 @@ proc HKclass3_teil_1 (intvec sg, string SG_Typ, int cnt)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc HKclass5 (intvec sg, string SG_Typ, int cnt)
+static proc HKclass5 (intvec sg, string SG_Typ, int cnt)
 {
   list v;
 
@@ -2041,8 +2032,7 @@ proc HKclass5 (intvec sg, string SG_Typ, int cnt)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc HKclass5_teil_1 (intvec sg, string SG_Typ, int cnt)
+static proc HKclass5_teil_1 (intvec sg, string SG_Typ, int cnt)
 {
   int  k, r, s;
   list v;
@@ -2143,8 +2133,7 @@ proc HKclass5_teil_1 (intvec sg, string SG_Typ, int cnt)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc HKclass5_teil_2 (intvec sg, string SG_Typ, int cnt)
+static proc HKclass5_teil_2 (intvec sg, string SG_Typ, int cnt)
 {
   int k, r, s;
   list v;
@@ -2222,8 +2211,7 @@ proc HKclass5_teil_2 (intvec sg, string SG_Typ, int cnt)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc HKclass7 (intvec sg, string SG_Typ, int cnt)
+static proc HKclass7 (intvec sg, string SG_Typ, int cnt)
 {
   list v;
 
@@ -2233,8 +2221,7 @@ proc HKclass7 (intvec sg, string SG_Typ, int cnt)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc HKclass7_teil_1 (intvec sg, string SG_Typ, int cnt)
+static proc HKclass7_teil_1 (intvec sg, string SG_Typ, int cnt)
 {
   int k, r, s;
   list v;
@@ -2345,8 +2332,7 @@ example
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc Singularitaet (string typ,int k,int r,int s,poly a,poly b,poly c,poly d)
+static proc Singularitaet (string typ,int k,int r,int s,poly a,poly b,poly c,poly d)
 {
   list   v;
   string DBMPATH=system("getenv","DBMPATH");
@@ -2559,8 +2545,7 @@ example
   corank(f);
 }
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc Faktorisiere(poly f, poly fk, int pt, int k, intvec RFlg)
+static proc Faktorisiere(poly f, poly fk, int pt, int k, intvec RFlg)
 {
 //---------------------------- initialisation ---------------------------------
   poly   a, b, Relation;
@@ -2611,8 +2596,7 @@ proc Faktorisiere(poly f, poly fk, int pt, int k, intvec RFlg)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc Teile(poly f, poly fk)
+static proc Teile(poly f, poly fk)
 {
   ideal  Jfsyz = f, fk;
   poly   Relation;
@@ -2622,8 +2606,7 @@ proc Teile(poly f, poly fk)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc GetRf (poly fi, int n)
+static proc GetRf (poly fi, int n)
 "USAGE:    GetRf();"
 {
 //---------------------------- initialisation ---------------------------------
@@ -2651,8 +2634,7 @@ proc GetRf (poly fi, int n)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc Show(poly g)
+static proc Show(poly g)
 {
   string s;
   def ring_save=basering;
@@ -2665,8 +2647,7 @@ proc Show(poly g)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc checkring
+static proc checkring
 {
   int CH = char(basering);
   if(CH >= 2 && CH<=13) {
@@ -2678,8 +2659,7 @@ proc checkring
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc DecodeNormalFormString (string S_in)
+static proc DecodeNormalFormString (string S_in)
 "USAGE:    DecodeNormalFormString"
 {
 //---------------------------- initialisation ---------------------------------
