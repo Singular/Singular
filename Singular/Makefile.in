@@ -269,7 +269,7 @@ mpcheck: Singular ${testdir}/mpcheck ${testdir}/mpcheck.data
 
 factorycheck: Singular ${testdir}/comparecheck ${testdir}/fac_test.in \
 		${testdir}/fac_test.out
-	- SINGULARPATH=`pwd`/LIB; export SINGULARPATH; \
+	- @ SINGULARPATH=`pwd`/LIB; export SINGULARPATH; \
 	PATH=`pwd`:${PATH}; export PATH;\
 	${testdir}/comparecheck ${testdir}/fac_test.in ${testdir}/fac_test.out
 	
