@@ -1,3 +1,7 @@
+Tue Apr 10 15:24:49 CEST 2001 Hans Schoenemann <hannes@mathematik.uni-kl.de>
+several small bugs fixed (mostly memory leaks)
+changed copyright to GPL
+
 Tue Oct 28 14:46:08 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 New features in Factory, version 1.3b:
