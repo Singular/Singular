@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: doc2tex.pl,v 1.13 1999-07-22 07:21:31 wichmann Exp $
+# $Id: doc2tex.pl,v 1.14 1999-07-22 13:35:12 obachman Exp $
 ###################################################################
 #  Computer Algebra System SINGULAR
 #
@@ -9,12 +9,12 @@
 # @c example [error]
 #    -> the text till the next @c example is feed into Singular,
 #       the text is then substituted by
-#       @c computed example $example $doc_file:$line
+#       @c computed example $ex_prefix $doc_file:$line
 #       <text from the input>
 #       @expansion{} <corresponding output>
 #       ....
-#       @c end computed example $example $doc_file:$line
-#       reuse computed examples if ($reuse && -r $example.inc)
+#       @c end computed example $ex_prefix $doc_file:$line
+#       reuse computed examples if ($reuse && -r $ex_prefix.inc)
 #       cut absolute directory names from the loaded messages 
 #       substituted @,{ and } by @@, @{ resp. @}
 #       wrap around output lines  longer than $ex_length = 73;
@@ -63,8 +63,8 @@ $no_ex = 0;
 $no_fun = 0;
 $doc_subdir = "./d2t_singular";
 @include_dirs = (".", "../Singular/LIB");
-$doc_examples_db = "$doc_subdir/examples";
 $make = 0;
+$make_opts = " --no-print-directory";
 
 #
 # misc. defaults
@@ -109,7 +109,7 @@ while (@ARGV && $ARGV[0] =~ /^-/)
   if (/^-c(lean)?$/)     { $clean = 1; next;}
   if (/^-no_e(x)?$/)     { $no_ex = 1; next;}
   if (/^-no_fu(n)?$/)    { $no_fun = 1;next;}
-  if (/^-m(ake)?$/)      { $make = 1;next;}
+  if (/^-m(ake)?$/)      { $make =  shift(@ARGV);next;}
   if (/^-s(ubdir)?$/)    { $doc_subdir = shift(@ARGV); next;}
   if (/^-I$/)            { unshift(@include_dirs, shift(@ARGV)); next;}
   if (/^-v(erbose)?$/)   { $verbose = shift(@ARGV); next;}
@@ -117,6 +117,7 @@ while (@ARGV && $ARGV[0] =~ /^-/)
   Error("Unknown Option $_\n" .&Usage);
 }
 $verbose = ($verbose < 0 ? 0 : $verbose);
+$make_opts .= " -s" unless $verbose > 1;
 
 #
 # construct filenames
@@ -143,21 +144,17 @@ unless ($tex_file)
 open(DOC, "<$doc_file") 
   || Error("can't open $doc_file for reading: $!\n" . &Usage);
 open(TEX, ">$tex_file") || Error("can't open $tex_file for writing: $!\n");
-print "d2t: Generating $tex_file from $doc_file ...\n" if ($verbose > 1);
+print "(d2t $doc_file==>$tex_file" if ($verbose);
 if (-d $doc_subdir)
 {
-  print "d2t: Using $doc_subdir for intermediate files\n"  
-    if ($verbose > 1);
+  print "<subdir: $doc_subdir>"  if ($verbose > 1);
 }
 else
 {
   mkdir($doc_subdir, oct(755)) 
     || Error("can't create directory $doc_subdir: $!\n");
-  print "d2t: Created $doc_subdir for intermediate files\n"  
-    if ($verbose > 1);
+  print "(subdir: $doc_subdir)"  if ($verbose > 1);
 }
-
-# dbmopen(%EXAMPLES, $doc_examples_db, oct(755)) || die "$ERROR: can't open examples data base: $!\n";
 
 #######################################################################
 # 
@@ -172,7 +169,12 @@ while (<DOC>)
   if (/^\@c\s*ref\s*$/)     {&HandleRef; next;}
   if (/^\@c\s*lib\s+/)      {&HandleLib; next;}
   if (/^\@setfilename/)     {print TEX "\@setfilename $doc.hlp\n"; next;}
-			     
+
+  if (/^\@\w*section\s*(\w+)/ || /^\@\w*chapter\s*(\w+)/)
+  {
+    $section = lc(substr($1, 0, 6));
+  }
+  
   print TEX $_;
 
   if (/^\@bye$/)            {last;}
@@ -182,21 +184,19 @@ while (<DOC>)
 # wrap up
 #
 close(TEX);
-#dbmclose(%EXAMPLES);
-print "\nd2t: Finished generation of $tex_file \n" if ($verbose > 1);
-print "\n" if ($verbose == 1);
+print "==>$tex_file)\n" if ($verbose);
 
 
 ######################################################################
 # @c example [error]
 #    -> the text till the next @c example is feed into Singular,
 #       the text is then substituted by
-#       @c computed example $example $doc_file:$line
+#       @c computed example $ex_prefix $doc_file:$line
 #       <text from the input>
 #       @expansion{} <corresponding output>
 #       ....
-#       @c end computed example $example $doc_file:$line
-#       reuse computed examples if ($reuse && -r $example.inc)
+#       @c end computed example $ex_prefix $doc_file:$line
+#       reuse computed examples if ($reuse && -r $ex_prefix.inc)
 #       cut absolute directory names from the loaded messages 
 #       substituted @,{ and } by @@, @{ resp. @}
 #       wrap around output lines  longer than $ex_length = 73;
@@ -204,16 +204,29 @@ print "\n" if ($verbose == 1);
 #       unless 'error' is specified 
 sub HandleExample
 {
-  my($lline, $thisexample, $include, $error_ok);
+  my($inc_file, $ex_file, $lline, $thisexample, $error_ok, $cache);
   
   $lline = $line;
-  $example++;
+  $section = 'unknown' unless $section;
+  $ex_prefix = $section;
+  $ex_prefix .= "$examples{$section}" if $examples{$section};
+  $examples{$section}++;
 
   if ($no_ex)
   {
-    print "{$example}" if ($verbose);
-    print TEX "\@c skipped computation of example $example $doc_file:$lline \n";
+    print "{$ex_prefix}" if ($verbose);
+    print TEX "\@c skipped computation of example $ex_prefix $doc_file:$lline \n";
     
+  }
+  else
+  {
+    $inc_file = "$doc_subdir/$doc" . "_$ex_prefix.inc";
+    $ex_file = "$doc_subdir/$doc" . "_$ex_prefix.tst";
+    if (-r $inc_file && -r $ex_file && -s $inc_file && -s $ex_file)
+    {
+      $cache = 1;
+      open(TST, "<$ex_file") || ($cache = 0);
+    }
   }
 
   $thisexample = '';
@@ -231,9 +244,15 @@ sub HandleExample
     }
     else
     {
-      $thisexample .= $_ unless (/^\s*$/);
+      $thisexample .= $_;
+      if ($cache && $_ && $_ ne <TST>)
+      {
+	$cache = 0;
+	close(TST);
+      }
     }
   }
+  close(TST) if $cache;
   Error("no matching '\@c example' found for $doc_file:$lline\n")
     unless (/^\@c\s*example\s*$/);
 
@@ -241,20 +260,21 @@ sub HandleExample
   return if ($no_ex);
 
   # check whether it can be reused
-  if ($reuse && ($include = $EXAMPLES{$thisexample}))
+  if ($reuse && $cache)
   {
-    print "<$example>" if ($verbose);
-    print TEX "\@c reused example $example $doc_file:$lline \n";
+    print "<$ex_prefix>" if ($verbose);
+    print TEX "\@c reused example $ex_prefix $doc_file:$lline \n";
+    open(INC, "<$inc_file") || Error("can't open $inc_file for reading: $!\n");
+    while (<INC>){ print TEX $_;}
+    close(INC);
   }
   else
   {
-    print "($example" if ($verbose == 1);
-    my ($ex_file, $res_file, $inc_file);
-    $inc_file = "$doc_subdir/$doc"."_$example.inc";
-    $ex_file = "$doc_subdir/$doc"."_$example.tst";
-    $res_file = "$doc_subdir/$doc"."_$example.res";
+    print "($ex_prefix" if ($verbose == 1);
+    my ($res_file);
+    $res_file = "$doc_subdir/$doc" . "_$ex_prefix.res";
 
-    print TEX "\@c computed example $example $doc_file:$lline \n";
+    print TEX "\@c computed example $ex_prefix $doc_file:$lline \n";
 
     # run singular
     open(EX, ">$ex_file") || Error("can't open $ex_file for writing: $!\n");
@@ -267,13 +287,12 @@ sub HandleExample
     open(RES, "<$res_file") || Error("can't open $res_file for reading: $!\n");
     open(INC, ">$inc_file") || Error("can't open $inc_file for writing: $!\n");
 
-    $include = '';
     # get result, manipulate it and put it into inc file
     while (<RES>)
     {
       last if (/^$ex_file\s*([0-9]+)..\$/);
       # check for error
-      Error("while running example $example from $doc_file:$lline.\nCall: '$Singular $Singular_opts $ex_file > $res_file'\n")
+      Error("while running example $ex_prefix from $doc_file:$lline.\nCall: '$Singular $Singular_opts $ex_file > $res_file'\n")
 	if (/error occurred/ && ! $error_ok);
       # remove stuff from echo
       if (/^$ex_file\s*([0-9]+)../)
@@ -299,16 +318,14 @@ sub HandleExample
 	&protect_texi;
 	$_ = "\@expansion{} ".$_;
       }
-      $include .= $_;
       print INC $_;
+      print TEX $_;
     }
     close(RES);
     close(INC);
     unlink $ex_file, $res_file, $inc_file if ($clean);
-    $EXAMPLES{$thisexample} = $include;
   }
-  print TEX $include;
-  print TEX "\@c end example $example $doc_file:$lline\n";
+  print TEX "\@c end example $ex_prefix $doc_file:$lline\n";
 }
   
 ######################################################################
@@ -439,15 +456,8 @@ sub HandleLib
 
   if ($make)
   {
-    print "<lib $lib" if ($verbose);
-    if ($verbose <= 1)
-    {
-      System("make $tex_file > /dev/null") 
-    }
-    else
-    {
-      System("make $tex_file"); 
-    }
+    print "<lib $lib " if ($verbose);
+    System("make $make_opts VERBOSE=$verbose $tex_file"); 
   }
   
   # make sure file exists
@@ -455,9 +465,8 @@ sub HandleLib
   {
     if ($verbose)
     {
-      print "<lib $lib" unless $make;
-      print ":$proc" if $proc;
-      print ">";
+      print "<lib $lib " unless $make;
+      print "$proc>";
     }
   }
   else
@@ -545,7 +554,7 @@ sub Open
 sub System
 {
   local($call) = @_;
-  print "\nd2t system: $call\n" if ($verbose > 1);
+  print " d2t system:\n$call\n" if ($verbose > 1);
   Error("non-zero exit status of system call: '$call': $!\n")
     if (system($call));
 }
@@ -572,7 +581,7 @@ where options can be (abbreviated to shortest possible prefix):
   -output file  : use 'file' as output file
                           (default: input_file.tex)
   -clean        : delete intermediate files
-  -make         : use make to generate tex files for libraries
+  -make  cmd    : use cmd as make command to generate tex files for libraries
   -no_reuse     : don't reuse intermediate files
   -no_ex        : skip computation of examples 
   -no_fun       : don't include help for library functions
