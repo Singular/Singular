@@ -1,4 +1,4 @@
-version="$Id: brnoeth.lib,v 1.8 2001-01-16 13:48:22 Singular Exp $";
+version="$Id: brnoeth.lib,v 1.9 2001-01-16 14:46:01 lossen Exp $";
 info="
 LIBRARY:   brnoeth.lib  Brill-Noether Algorithm, Weierstrass-SG and AG-codes
 AUTHORS:   Jose Ignacio Farran Martin, ignfar@eis.uva.es
@@ -1248,6 +1248,7 @@ static proc place (intvec Pp,int sing,list CURVE)
         {
           Conductor[N]=local_conductor(iw[2],S(1));
         }
+        kill(iw);
         PtoPl[i]=N;
       }
       setring base_r;
@@ -1405,11 +1406,11 @@ static proc place (intvec Pp,int sing,list CURVE)
         N=N+1;
         intvec iw=ext_0,N_branches+1;
         Places[N]=iw;
-        kill(iw);
         if (sing==2)
         {
           Conductor[N]=local_conductor(iw[2],S(ext_0));
         }
+        kill(iw);
         PtoPl[i]=N;
         setring HNEring;
         update_CURVE[5][ext_0]=list();
@@ -1531,7 +1532,6 @@ static proc place (intvec Pp,int sing,list CURVE)
         N=N+1;
         intvec iw=ext2,N_branches+i;
         Places[N]=iw;
-        kill(iw);
         if (sing==1)
         {
           dq=delta2[i];
@@ -1545,6 +1545,7 @@ static proc place (intvec Pp,int sing,list CURVE)
         {
           Conductor[N]=local_conductor(iw[2],S(ext2));
         }
+        kill(iw);
         PtoPl[i]=N;
       }
       setring base_r;
@@ -1692,6 +1693,7 @@ static proc place (intvec Pp,int sing,list CURVE)
         {
           Conductor[N]=local_conductor(iw[2],S(ext_0));
         }
+        kill(iw);
         PtoPl[i]=N;
         setring HNEring;
         update_CURVE[5][ext_0]=list();
@@ -2517,7 +2519,7 @@ static proc interpolating_forms (intvec D,int n,list CURVE)
           conjM=Frobenius(conjM,1);
           localM=transpose(concat(transpose(localM),transpose(conjM)));
         }
-        localM=rowred(localM);
+        localM=gauss_row(localM);
         setring BR;
         totalM=transpose(concat(transpose(totalM),transpose(imap(SS,localM))));
         totalM=transpose(compress(transpose(totalM)));
@@ -2617,7 +2619,7 @@ static proc interpolating_forms (intvec D,int n,list CURVE)
           conjM=Frobenius(conjM,1);
           localM=transpose(concat(transpose(localM),transpose(conjM)));
         }
-        localM=rowred(localM);
+        localM=gauss_row(localM);
         setring BR;
         totalM=transpose(concat(transpose(totalM),transpose(imap(SS,localM))));
         totalM=transpose(compress(transpose(totalM)));
@@ -2700,7 +2702,7 @@ static proc interpolating_forms (intvec D,int n,list CURVE)
         conjM=Frobenius(conjM,1);
         localM=transpose(concat(transpose(localM),transpose(conjM)));
       }
-      localM=rowred(localM);
+      localM=gauss_row(localM);
       setring BR;
       totalM=transpose(concat(transpose(totalM),transpose(imap(SS,localM))));
       totalM=transpose(compress(transpose(totalM)));
@@ -3836,6 +3838,7 @@ static proc disj_divs (intvec H,intvec P,list EC)
       }
     }
   }
+  kill(auxIV,iw);
   return(1);
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -4153,6 +4156,7 @@ EXAMPLE:  example extcurve; shows an example
           }
         }
       }
+      kill(iw);
       kill(paux);
       POINTS=imap(S(1),POINTS)+POINTS;
       LOC_EQS=imap(S(1),LOC_EQS)+LOC_EQS;
@@ -4316,6 +4320,7 @@ EXAMPLE:  example prepSV; shows an example
   E[n+2]=GP;
   intvec IW=e,m+2-2*genusX;
   E[n+3]=IW;
+  kill(IW);
   return(E);
 }
 example
