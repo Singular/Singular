@@ -1,4 +1,4 @@
-dnl $Id: ftest_util.m4,v 1.8 1997-10-02 10:45:19 schmidt Exp $
+dnl $Id: ftest_util.m4,v 1.9 1997-10-15 13:50:01 schmidt Exp $
 dnl
 dnl ftest_util.m4 - m4 macros used by the factory test environment.
 dnl
@@ -51,7 +51,10 @@ define(`ftestUsage',``$2'')dnl
 #
 # ftestPreprocInit() - initial preprocessor directives.
 #
+# In addition, we change m4's comment character.
+#
 define(`ftestPreprocInit', `dnl
+changecom(`//')dnl
 `#include <unistd.h>
 
 #define TIMING
@@ -109,7 +112,9 @@ define(`_ftestOutType_'_qstripTWS(`$2'), `$1')dnl
 #
 define(`ftestInVar', `dnl
 define(`_ftestInType_'_qstripTWS(`$2'), `$1')dnl
-`$1 '_qstripTWS(`$2')`;
+ifelse(`$1', `int',
+  ``$1 '_qstripTWS(`$2')` = 0;'',
+  ``$1 '_qstripTWS(`$2')`;'')`
     bool ftestArgGiven$2= false'')
 
 #
@@ -170,12 +175,12 @@ define(`ftestRun', `dnl
 `ftestWriteSeed();			// save random generator seed
     if ( ftestAlarm )
 	alarm( ftestAlarm );		// set alarm
+    TIMING_START(ftestTimer);
     while ( ftestCircle > 0 ) {
-	TIMING_START(ftestTimer);
 	$1
-	TIMING_END(ftestTimer);
 	ftestCircle--;
-    }'')
+    };
+    TIMING_END(ftestTimer)'')
 
 #
 # ftestCheck() - run check.
@@ -203,9 +208,6 @@ ifelse(`$#', `0', ,
 define(`ftestOutput', `dnl
 `ftestPrintTimer( timing_ftestTimer_time );
     ftestPrintCheck( check )'_ftestOutput($@)')
-
-# set comment character
-changecom(`//');
 
 dnl switch on output again
 divert`'dnl
