@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feOpt.cc,v 1.7 1999-11-15 17:19:56 obachman Exp $ */
+/* $Id: feOpt.cc,v 1.8 1999-12-03 11:20:14 obachman Exp $ */
 /*
 * ABSTRACT: Implementation of option buisness
 */
@@ -246,6 +246,11 @@ feOptIndex feGetOptIndex(int optc)
     opt = opt + 1;
   }
   return FE_OPT_UNDEF;
+}
+
+void* feGetOptValue(feOptIndex opt)
+{
+  return feOptSpec[(int)opt].value;
 }
 
 ///////////////////////////////////////////////////////////////

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: cntrlc.cc,v 1.27 1999-11-15 17:19:52 obachman Exp $ */
+/* $Id: cntrlc.cc,v 1.28 1999-12-03 11:20:13 obachman Exp $ */
 /*
 * ABSTRACT - interupt handling
 */
@@ -18,6 +18,7 @@
 #include "febase.h"
 #include "cntrlc.h"
 #include "polys.h"
+#include "feOpt.h"
 #ifdef PAGE_TEST
 #include "page.h"
 #endif
@@ -341,10 +342,20 @@ void sigint_handler(int sig)
   loop
   {
     int cnt=0;
-    fprintf(stderr,"\n(last cmd:%d: `%s` in line\n>>%s<<)",
-      iiOp,Tok2Cmdname(iiOp),my_yylinebuf);
-    fputs("\nabort command(a), continue(c) or quit Singular(q) ?",stderr);fflush(stderr);
-    switch(fgetc(stdin))
+    int c;
+    fprintf(stderr,"// ** Interrupt at cmd:`%s` in line:'%s'\n",
+      Tok2Cmdname(iiOp),my_yylinebuf);
+    if (feGetOptValue(FE_OPT_EMACS) == NULL)
+    {
+      fputs("abort command(a), continue(c) or quit Singular(q) ?",stderr);fflush(stderr);
+      c = fgetc(stdin);
+    }
+    else
+    {
+      c = 'a';
+    }
+    
+    switch(c)
     {
 #if defined(MONOM_COUNT) || defined(DIV_COUNT)
               case 'e':
@@ -378,7 +389,7 @@ void sigint_handler(int sig)
       case 'a':
                 siCntrlc++;
       case 'c':
-                fgetc(stdin);
+                if (feGetOptValue(FE_OPT_EMACS) == NULL) fgetc(stdin);
                 signal(SIGINT ,(si_hdl_typ)sigint_handler);
                 return;
                 //siCntrlc ++;

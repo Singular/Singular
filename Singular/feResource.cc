@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feResource.cc,v 1.16 1999-11-15 17:19:57 obachman Exp $ */
+/* $Id: feResource.cc,v 1.17 1999-12-03 11:20:15 obachman Exp $ */
 /*
 * ABSTRACT: management of resources
 */
@@ -74,7 +74,6 @@ static feResourceConfig_s feResourceConfigs[20] =
   {"IdxFile",   'x',    feResFile,  "SINGULAR_IDX_FILE",    "%r/doc/singular.idx",  ""},
   {"HtmlDir",   'h',    feResDir,   "SINGULAR_HTML_DIR",    "%r/html",              ""},
   {"ManualUrl", 'u',    feResUrl,   "SINGULAR_URL",         "http://www.mathematik.uni-kl.de/~zca/Singular/Manual/"S_VERSION1,    ""},
-  {"EmacsDir",  'e',    feResDir,   "SINGULAR_EMACS_DIR",   "%r/emacs",             ""},
 #if !defined(macintosh)
   {"netscape",  'N',    feResBinary,"NETSCAPE",             "%b/netscape",          ""},
   {"info",      'I',    feResBinary,"INFO",                 "%b/info",              ""},
@@ -84,9 +83,12 @@ static feResourceConfig_s feResourceConfigs[20] =
 #endif // ! defined(macintosh)
 
 #ifdef ESINGULAR
-  {"emacs",    'E',    feResBinary, "EMACS",               "%b/emacs",              ""},
-  {"SingularEmacs",'M',feResBinary, "SINGULAR",             "%b/Singular",           ""},
-  {"EmacsLoad",'l',    feResFile,   "SINGULAR_EMACS_LOAD",  "%e/.emacs-singular",             ""},
+  {"emacs",    'E',    feResBinary, "ESINGULAR_EMACS",      "%b/emacs",              ""},
+  {"SingularEmacs",'M',feResBinary, "ESINGULAR_SINGULAR",             "%b/Singular",           ""},
+  {"EmacsLoad",'l',    feResFile,   "ESINGULAR_EMACS_LOAD",  "%e/.emacs-singular",             ""},
+  {"EmacsDir",  'e',    feResDir,   "ESINGULAR_EMACS_DIR",   "%r/emacs",             ""},
+#else
+  {"EmacsDir",  'e',    feResDir,   "SINGULAR_EMACS_DIR",   "%r/emacs",             ""},
 #endif
   {NULL, 0, feResUndef, NULL, NULL, NULL}, // must be the last record
 };

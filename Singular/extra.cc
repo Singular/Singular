@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.124 1999-12-01 13:22:51 Singular Exp $ */
+/* $Id: extra.cc,v 1.125 1999-12-03 11:20:14 obachman Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -481,7 +481,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
    {
      res->rtyp=STRING_CMD;
      res->data=(void *)mstrdup(
-       "Olaf Bachmann, Hubert Grassmann, Kai Krueger, Wolfgang Neumann, Thomas Nuessler, Wilfred Pohl, Jens Schmidt, Thomas Siebert, Ruediger Stobbe, Tim Wichmann");
+       "Olaf Bachmann, Hubert Grassmann, Kai Krueger, Wolfgang Neumann, Thomas Nuessler, Wilfred Pohl, Jens Schmidt, Thomas Siebert, Ruediger Stobbe, Moritz Wenk, Tim Wichmann");
      return FALSE;
    }
    else

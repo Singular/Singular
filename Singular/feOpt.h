@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feOpt.h,v 1.3 1999-11-15 17:19:56 obachman Exp $ */
+/* $Id: feOpt.h,v 1.4 1999-12-03 11:20:15 obachman Exp $ */
 /*
 * ABSTRACT: Declarations for working with Options
 */
@@ -14,12 +14,12 @@
 extern const char SHORT_OPTS_STRING[];
 #define LONG_OPTION_RETURN 13 
 
-// specifies format of options
+/* specifies format of options */
 extern struct fe_option feOptSpec[];
 
 #ifndef GENERATE_OPTION_INDEX
 
-// provides feOptIndex enum type for fast accesses to feOptSpec
+/* provides feOptIndex enum type for fast accesses to feOptSpec */
 #if ! defined(GENTABLE) && ! defined(GENERATE_DEPEND)
 #ifdef ESINGULAR
 #include "feOptES.inc"
@@ -29,6 +29,16 @@ extern struct fe_option feOptSpec[];
 #else
 typedef enum {FE_OPT_UNDEF}  feOptIndex;
 #endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void* feGetOptValue(feOptIndex opt);
+  
+
+#ifdef __cplusplus
+}
 
 inline void* feOptValue(feOptIndex opt)
 {
@@ -71,6 +81,8 @@ char* feSetOptValue(feOptIndex opt, char* optarg);
 
 void fePrintOptValues();
 
-#endif // ! GENERATE_OPTION_INDEX
+#endif /* __cplusplus */
 
-#endif //  FEOPTS_H
+#endif /* ! GENERATE_OPTION_INDEX */
+
+#endif /*  FEOPTS_H */
