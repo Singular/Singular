@@ -1,5 +1,5 @@
 /*
- * $Id: proc.cc,v 1.8 2000-03-22 10:23:57 krueger Exp $
+ * $Id: proc.cc,v 1.9 2000-03-28 07:15:13 krueger Exp $
  */
 
 #include <stdio.h>
@@ -127,12 +127,14 @@ void write_function_declaration(
 {
   int i;
   if(pi->paramcnt>0) {
+    fprintf(module->fmtfp, "#line %d \"%s\"\n", yylineno, module->filename);
     fprintf(module->fmtfp, "  leftv v = h, v_save;\n");
     fprintf(module->fmtfp, "  int tok = NONE, index = 0;\n");
     for (i=0;i<pi->paramcnt; i++)
       fprintf(module->fmtfp, 
               "  sleftv s%s; leftv %s = &s%s;\n", pi->param[i].varname,
               pi->param[i].varname, pi->param[i].varname);
+    fprintf(module->fmtfp, "#line %d \"%s\"\n", yylineno, module->filename);
     fprintf(module->fmtfp, "\n");
     pi->flags.declaration_done = 1;
   }
@@ -145,7 +147,9 @@ void write_function_typecheck(
   void *arg
   )
 {
+  fprintf(module->fmtfp, "#line %d \"%s\"\n", yylineno, module->filename);
   write_procedure_typecheck(module, pi, module->fmtfp);
+  fprintf(module->fmtfp, "#line %d \"%s\"\n", yylineno, module->filename);
   pi->flags.typecheck_done = 1;
 }
 
@@ -181,6 +185,7 @@ void write_function_return(
   }
   else  printf("CMD: return()\n");
 
+  fprintf(module->fmtfp, "#line %d \"%s\"\n", yylineno, module->filename);
   write_procedure_return(module, pi, module->fmtfp);
 }
 
@@ -195,6 +200,7 @@ void write_function_singularcmd(
   printf("\nWriting return-block\n");
   fprintf(module->fmtfp, "/* code for running singular commands */\n");
   fprintf(module->fmtfp, "/*\n");
+  fprintf(module->fmtfp, " * #line %d \"%s\"\n", yylineno, module->filename);
   fprintf(module->fmtfp, " *\n");
   fprintf(module->fmtfp, " * get idhdl for '%s'\n", arg);
   fprintf(module->fmtfp, " * building leftv of arguments\n");
@@ -331,9 +337,11 @@ void write_procedure_return(
   printf("### RETURN: '%s' '%s' '%d'\n", pi->return_val.name,
          pi->return_val.typname, pi->return_val.typ);
   if(pi->funcname == NULL) {
-    fprintf(fmtfp, "  res->rtyp = NONE;\n");
+    fprintf(fmtfp, "  res->rtyp = %s;\n", pi->return_val.typname);
     fprintf(fmtfp, "  res->data = NULL;\n");
-    fprintf(fmtfp, "  return TRUE;\n");
+    //fprintf(fmtfp, "  res->rtyp = NONE;\n");
+    //fprintf(fmtfp, "  res->data = NULL;\n");
+    fprintf(fmtfp, "  return FALSE;\n");
   }
   else
     switch( pi->return_val.typ) {
