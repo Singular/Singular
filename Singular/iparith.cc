@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.146 1999-04-29 11:38:44 Singular Exp $ */
+/* $Id: iparith.cc,v 1.147 1999-05-07 15:41:34 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2188,6 +2188,7 @@ struct sValCmd2 dArith2[]=
 ,{jjJET_ID,    JET_CMD,        IDEAL_CMD,      IDEAL_CMD,  INT_CMD PROFILER}
 ,{jjJET_P,     JET_CMD,        VECTOR_CMD,     VECTOR_CMD, INT_CMD PROFILER}
 ,{jjJET_ID,    JET_CMD,        MODUL_CMD,      MODUL_CMD,  INT_CMD PROFILER}
+,{jjJET_ID,    JET_CMD,        MATRIX_CMD,     MATRIX_CMD,  INT_CMD PROFILER}
 ,{jjKBASE2,    KBASE_CMD,      IDEAL_CMD,      IDEAL_CMD,  INT_CMD PROFILER}
 ,{jjKBASE2,    KBASE_CMD,      MODUL_CMD,      MODUL_CMD,  INT_CMD PROFILER}
 ,{atKILLATTR2, KILLATTR_CMD,   NONE,           IDHDL,      STRING_CMD PROFILER}

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.60 1999-05-03 12:26:59 Singular Exp $ */
+/* $Id: tesths.cc,v 1.61 1999-05-07 15:41:35 Singular Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -25,6 +25,7 @@
 #include "silink.h"
 #include "ipid.h"
 #include "timer.h"
+#include "sdb.h"
 #ifdef HAVE_FACTORY
 #define SI_DONT_HAVE_GLOBAL_VARS
 #include <factory.h>
@@ -511,13 +512,16 @@ int main(          /* main entry to Singular */
 , S_VERSION1,S_VERSION2);
   }
   else
-  if (!feBatch)
   {
+    sdb_flags = 0;
+    if (!feBatch)
+    {
 #ifdef __MWERKS__
-    memcpy(stderr,stdout,sizeof(FILE));
+      memcpy(stderr,stdout,sizeof(FILE));
 #else
-    dup2(1,2);
+      dup2(1,2);
 #endif
+    }
   }
   slStandardInit();
   dlInit(thisfile);

@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.106 1999-05-06 10:02:26 Singular Exp $
+@comment $Id: reference.doc,v 1.107 1999-05-07 15:41:40 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -950,15 +950,13 @@ the terms of a polynomial or a vector;
 @c example
 @end example
 @end table
-@menu
-* jet::
-* ord::
-* poly::
-* vector::
-@end menu
-@iftex
-See @ref{jet}; @ref{ord}; @ref{poly}; @ref{vector}.
-@end iftex
+@c ref
+See
+@ref{jet};
+@ref{ord};
+@ref{poly};
+@ref{vector}.
+@c ref
 @c ---------------------------------------
 @node degree, delete, deg, Functions
 @subsection degree
@@ -989,16 +987,14 @@ degree(i0);
 @expansion{} //multiplicity 314
 @end example
 @end table
-@menu
-* ideal::
-* std::
-* dim::
-* vdim::
-* mult::
-@end menu
-@iftex
-See @ref{ideal}; @ref{std}; @ref{dim}; @ref{vdim}; @ref{mult}.
-@end iftex
+@c ref
+See
+@ref{ideal};
+@ref{std};
+@ref{dim};
+@ref{vdim};
+@ref{mult}.
+@c ref
 @c ---------------------------------------
 @node delete, det, degree, Functions
 @subsection delete
@@ -1020,13 +1016,11 @@ deletes the element with the given index from a list (the input is not changed).
 @c example
 @end example
 @end table
-@menu
-* list::
-* insert::
-@end menu
-@iftex
-See @ref{list}; @ref{insert}.
-@end iftex
+@c ref
+See
+@ref{list};
+@ref{insert}.
+@c ref
 @c ---------------------------------------
 @node det, diff, delete, Functions
 @subsection det
@@ -1050,7 +1044,8 @@ returns the determinant of a square matrix.
 @end example
 @end table
 @c ref
-See @ref{intmat};
+See
+@ref{intmat};
 @ref{matrix};
 @ref{minor}.
 @c ref
@@ -1095,18 +1090,9 @@ ideal, producing a m x n matrix.
 @c example
 @end example
 @end table
-@menu
-* poly::
-* vector::
-* ideal::
-* module::
-* matrix::
-* contract::
-* jacob::
-* var::
-@end menu
-@iftex
-See @ref{poly};
+@c ref
+See
+@ref{poly};
 @ref{vector};
 @ref{ideal};
 @ref{module};
@@ -1114,7 +1100,7 @@ See @ref{poly};
 @ref{contract};
 @ref{jacob};
 @ref{var};
-@end iftex
+@c ref
 @c ---------------------------------------
 @node dim, dump, diff, Functions
 @subsection dim
@@ -1143,16 +1129,14 @@ module is the dimension of its annihilator ideal.
 @c example
 @end example
 @end table
-@menu
-* ideal::
-* std::
-* degree::
-* vdim::
-* mult::
-@end menu
-@iftex
-See @ref{ideal}; @ref{std}; @ref{degree}; @ref{vdim}; @ref{mult}.
-@end iftex
+@c ref
+See
+@ref{ideal};
+@ref{std};
+@ref{degree};
+@ref{vdim};
+@ref{mult}.
+@c ref
 @c ---------------------------------------
 @node dump, eliminate, dim, Functions
 @subsection dump
@@ -1187,14 +1171,12 @@ integer list elements (and not as integer matrices), and lists of list
 are dumped as one flatted list. Furthermore, links
 themselves are not dumped.
 @end table
-@menu
-* link::
-* getdump::
-* write::
-@end menu
-@iftex
-See @ref{getdump}; @ref{link}; @ref{write}.
-@end iftex
+@c ref
+See
+@ref{getdump};
+@ref{link};
+@ref{write}.
+@c ref
 @c ---------------------------------------
 @node eliminate, eval, dump, Functions
 @subsection eliminate

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.44 1999-05-07 10:11:08 siebert Exp $ */
+/* $Id: ideals.cc,v 1.45 1999-05-07 15:41:32 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -2921,8 +2921,11 @@ BOOLEAN idHomModule(ideal m, ideal Q, intvec **w)
 ideal idJet(ideal i,int d)
 {
   ideal r=idInit(IDELEMS(i),i->rank);
+  r->nrows = i-> nrows;
+  //r->ncols = i-> ncols;
+  //r->rank = i-> rank;
   int k;
-  for(k=0; k<IDELEMS(i); k++)
+  for(k=(i->nrows)*(i->ncols)-1;k>=0; k--)
   {
     r->m[k]=pJet(i->m[k],d);
   }
