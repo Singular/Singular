@@ -91,7 +91,8 @@ install: modgen
                 exit 1; \
 	fi
 	${BISON} -v -d -t -o mod_grammar.cc $<
-	mv mod_grammar.hh mod_grammar.h
+	#mv mod_grammar.hh mod_grammar.h
+	mv mod_grammar.cc.h mod_grammar.h
 
 pathnames.h:
 	echo "/*" > pathnames.h
