@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.6 1998-04-27 09:28:50 Singular Exp $
+@comment $Id: singular.doc,v 1.7 1998-04-27 15:52:04 krueger Exp $
 @comment this file contains the main structure of the manual
 @c ------------------------
 @comment %**start of header
@@ -65,7 +65,7 @@ q:quit, m:menu item, n:next node, p:previous node, u:up, g:goto node
 * General concepts::
 * Data types::
 * Commands::
-* Tricks and Pitfalls::
+* Tricks and pitfalls::
 * Examples::
 * Mathematical background::
 * SINGULAR libraries::
@@ -114,7 +114,7 @@ q:quit, m:menu item, n:next node, p:previous node, u:up, g:goto node
 * Evaluation of logical expressions::
 @end menu
 @c -------------------------------------------------------------------------
-@node Limitations,Integer division,,Tricks and Pitfalls
+@node Limitations,Integer division,,Tricks and pitfalls
 @section Limitations
 @cindex Limitations
 
@@ -145,7 +145,7 @@ displays only the first 20 characters
 @end table
 
 @c -------------------------------------------------------------------------
-@node Integer division,Monomials and Precedence,Limitations,Tricks and Pitfalls
+@node Integer division,Monomials and Precedence,Limitations,Tricks and pitfalls
 @section Integer division
 @cindex Integer division
 @cindex mod
@@ -169,7 +169,7 @@ To avoid confusion use the operand @code{div}.
 @c example
 @end example
 @c -------------------------------------------------------------------------
-@node Monomials and Precedence,Behaviour of continue,Integer division,Tricks and Pitfalls
+@node Monomials and Precedence,Behaviour of continue,Integer division,Tricks and pitfalls
 @section Monomials and Precedence
 @cindex Monomials and Precedence
 
@@ -182,7 +182,7 @@ The computation of a monomial has precedence over all operators:
 @c example
 @end example
 @c -------------------------------------------------------------------------
-@node Behaviour of continue,Evaluation of logical expressions,Monomials and Precedence,Tricks and Pitfalls
+@node Behaviour of continue,Evaluation of logical expressions,Monomials and Precedence,Tricks and pitfalls
 @section Behaviour of continue
 @cindex continue
 
@@ -191,7 +191,7 @@ Unlike the C-construct @code{continue}
 @code{continue} is mainly for internal use.
 
 @c -------------------------------------------------------------------------
-@node Evaluation of logical expressions,,Behaviour of continue,Tricks and Pitfalls
+@node Evaluation of logical expressions,,Behaviour of continue,Tricks and pitfalls
 @section Evaluation of logical expressions
 @cindex and
 @cindex or
@@ -217,7 +217,7 @@ example, determine the @code{(1 || b)} without evaluating @code{b}.
 @cindex Mathematical background
 @include math.tex
 @c ----------------------------------------------------------------------------
-@node SINGULAR libraries, Library function index, Examples, Top
+@node SINGULAR libraries, Library function index, Mathematical background, Top
 @chapter SINGULAR libraries
 @cindex SINGULAR libraries
 @cindex LIBs
