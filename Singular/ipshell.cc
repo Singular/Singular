@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.23 1998-07-30 12:46:16 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.24 1998-09-29 10:36:39 krueger Exp $ */
 /*
 * ABSTRACT:
 */
@@ -313,7 +313,7 @@ void list_cmd(int typ, const char* what, char *prefix,BOOLEAN iterate)
         list_cmd(0,IDID(h),"//      ",FALSE);
       }
 #ifdef HAVE_NAMESPACES
-      if (IDTYP(h)==PACKAGE_CMD)
+      if (IDTYP(h)==PACKAGE_CMD && really_all && strcmp(IDID(h), "Top"))
       {
         namespaceroot->push(IDPACKAGE(h), IDID(h));
         list_cmd(0,IDID(h),"//      ",FALSE);
@@ -695,10 +695,12 @@ void iiDebug()
   {
     iiDebugMarker=TRUE;
   }
-  //else if(strncmp(s,"cont;",5)==0)
-  //{
-  //  iiDebugMarker=TRUE;
-  //}
+#if MDEBUG
+  else if(strncmp(s,"cont;",5)==0)
+  {
+    iiDebugMarker=TRUE;
+  }
+#endif /* MDEBUG */
   else
   {
     strcat( s, "\n;~\n");
