@@ -1,6 +1,7 @@
 #ifndef TGB_H
 #define TGB_H
-
+//#define OM_CHECK 3
+//#define OM_TRACK 5
 #include "mod2.h"
 #include <omalloc.h>
 #include "p_polys.h"

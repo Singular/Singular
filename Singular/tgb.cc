@@ -1998,7 +1998,7 @@ void simple_gauss(tgb_matrix* mat){
     {
       mat->perm_rows(i,pn-1);
       pn--;
-      //if(i!=pn){i--;}
+      if(i!=pn){i--;}
     }
   }
   while(row<pn-1){
@@ -2062,6 +2062,7 @@ void simple_gauss(tgb_matrix* mat){
       {
 	mat->perm_rows(i,pn-1);
 	pn--;
+	if(i!=pn){i--;}
       }
     }
     row++;
@@ -2085,6 +2086,8 @@ static tgb_matrix* build_matrix(poly* p,int p_index,poly* done, int done_index, 
       assume(v!=-1);
       //v is ascending ordered, we need descending order
       v=done_index-1-v;
+      number nt=t->get(i,v);
+      nDelete(&nt);
       t->set(i,v,nCopy(p_i->coef));
       p_i=p_i->next;
     }
@@ -2703,22 +2706,29 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
   add_to_basis(I->m[0],-1,-1,c);
 
   assume(c->strat->sl==c->strat->Shdl->idelems()-1);
-
-  for (i=1;i<n;i++)//the 1 is wanted, because first element is added to basis
+  if(!(F4_mode))
   {
-    //     add_to_basis(I->m[i],-1,-1,c);
-    si=(sorted_pair_node*) omalloc(sizeof(sorted_pair_node));
-    si->i=-1;
-    si->j=-1;
-    si->expected_length=pLength(I->m[i]);
-    si->deg=pTotaldegree(I->m[i]);
-    si->lcm_of_lm=I->m[i];
+    for (i=1;i<n;i++)//the 1 is wanted, because first element is added to basis
+    {
+      //     add_to_basis(I->m[i],-1,-1,c);
+      si=(sorted_pair_node*) omalloc(sizeof(sorted_pair_node));
+      si->i=-1;
+      si->j=-1;
+      si->expected_length=pLength(I->m[i]);
+      si->deg=pTotaldegree(I->m[i]);
+      si->lcm_of_lm=I->m[i];
+      
+      //      c->apairs[n-1-i]=si;
+      c->apairs[n-i-1]=si;
+      ++(c->pair_top);
+    }
+  }
+  else
+  {
+     for (i=1;i<n;i++)//the 1 is wanted, because first element is added to basis
+       add_to_basis(I->m[i],-1,-1,c);
+  }
     
-//      c->apairs[n-1-i]=si;
-    c->apairs[n-i-1]=si;
-    ++(c->pair_top);
-   }
- 
 
   while(c->pair_top>=0)
   {
