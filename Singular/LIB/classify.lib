@@ -1,7 +1,7 @@
-// $Id: classify.lib,v 1.23 1998-05-05 11:55:20 krueger Exp $
+// $Id: classify.lib,v 1.24 1998-05-14 12:49:29 krueger Exp $
 ///////////////////////////////////////////////////////////////////////////////
 
-version  =	 "$Id: classify.lib,v 1.23 1998-05-05 11:55:20 krueger Exp $";
+version  =	 "$Id: classify.lib,v 1.24 1998-05-14 12:49:29 krueger Exp $";
 info="
 LIBRARY:  classify.lib  PROCEDURES FOR THE ARNOLD-CLASSIFIER OF SINGULARITIES  
 
@@ -66,8 +66,7 @@ NOTE:     type init_debug(n); (0 <= n <= 10) in order to get intermediate
           information, higher values of n give more information.
           The proc creates several global objects with names all starting
           with @, hence there should be no name conflicts 
-EXAMPLE:  example classify; shows an example
-"
+EXAMPLE:  example classify; shows an example"
 {
 //---------------------------- initialisation ---------------------------------
   poly   f_out;
@@ -1279,8 +1278,7 @@ proc Funktion97 (poly f, list cstn)
 
 ///////////////////////////////////////////////////////////////////////////////
 proc tschirnhaus (poly f, poly x)
-"USAGE:    tschirnhaus();
-"
+"USAGE:    tschirnhaus();"
 {
 //---------------------------- initialisation ---------------------------------
     poly   b;
@@ -1528,8 +1526,7 @@ proc morsesplit(poly f)
 USAGE:    morsesplit(f);        f=poly
 RETURN:   Normal form of f in M^3 after application of the splitting lemma
 COMPUTE:  apply the splitting lemma (generalized Morse lemma) to f
-EXAMPLE:  example morsesplit; shows an example
-"
+EXAMPLE:  example morsesplit; shows an example"
 {
 //---------------------------- initialisation ---------------------------------
   poly f_out;
@@ -1780,8 +1777,7 @@ RETURN:   Normal form of f in Arnold's list
 REMARK:   try to determine the normal form of f by invariants, mainly by
           computing the Hilbert function of the Milnor albegra,
           no coordinate change is needed (see also proc 'milnorcode').
-EXAMPLE:  example quickclass; shows an example
-"
+EXAMPLE:  example quickclass; shows an example"
 {
 //---------------------------- initialisation ---------------------------------
   string Typ;
@@ -1838,8 +1834,7 @@ proc milnorcode (poly f, list #)
 RETURN:   intvec, coding the Hilbert function of the e-th Milnor algebra
           of f, i.e. of basering/(jacob(f)^e) (default e=1), according
           to proc Hcode
-EXAMPLE:  example milnorcode; shows an example
-"
+EXAMPLE:  example milnorcode; shows an example"
 {
   int  e=1;
   if(size(#)==1) { e=#[1]; }
@@ -1861,8 +1856,7 @@ proc Hcode (intvec v)
 "USAGE:    Hcode(v); v=intvec
 RETURN:   intvec, coding v according to the number of successive
           repetitions of an entry
-EXAMPLE:  example Hcode; shows an example.
-"
+EXAMPLE:  example Hcode; shows an example."
 {
   int    col, len, i, cur, cnt, maxcoef, nlen;
   intvec hil1, hil2;
@@ -1949,8 +1943,7 @@ proc Cubic (poly f)
 ///////////////////////////////////////////////////////////////////////////////
 static
 proc parity  (int e)
-"USAGE:    parity()
-"
+"USAGE:    parity()"
 { 
   int r = e/2;
   if( 2*r == e ) { return(0); }
@@ -2283,8 +2276,7 @@ COMPUTE:  get the Singularity named by type t from the database.
           exists, please run the script MakeDBM first.
 RETURN:   Normal form and corank of the singularity named by type t and its
           index (indices) l
-EXAMPLE:  example singularity; shows an example
-"
+EXAMPLE:  example singularity; shows an example"
 {
   poly a1, a2, a3, a4, f;
   int k, r, s;
@@ -2381,8 +2373,7 @@ proc Singularitaet (string typ,int k,int r,int s,poly a,poly b,poly c,poly d)
 
 ///////////////////////////////////////////////////////////////////////////////
 proc RandomPolyK (int M, string Typ)
-"USAGE:    RandomPolyK(M, Typ)
-"
+"USAGE:    RandomPolyK(M, Typ)"
 {
 //---------------------------- initialisation ---------------------------------
   int    n, b, i, k, r, s, crk;
@@ -2444,8 +2435,7 @@ proc debug_log (int level, list #)
 COMPUTE:  print \"messages\" if level>=@DeBug.
           useful for user-defined trace messages.
 EXAMPLE:  example debug_log; shows an example
-SEE ALSO: init_debug();
-"
+SEE ALSO: init_debug();"
 { 
    int len = size(#);
 //   int printresult = printlevel - level +1;
@@ -2473,8 +2463,7 @@ COMPUTE:  Set the global variable @DeBug to level. The variable @DeBug is
           changes of @DeBug.
 NOTE:     The procedure init_debug(n); is usefull as trace-mode. n may
           range from 0 to 10, higher values of n give more information.
-EXAMPLE:  example init_debug; shows an example
-"
+EXAMPLE:  example init_debug; shows an example"
 { 
   int newDebug=0;
   if( defined(@DeBug) != 0 ) { newDebug = @DeBug; }
@@ -2524,8 +2513,7 @@ proc basicinvariants(poly f)
 COMPUTE:  Compute basic invariants of f: an upper bound d for the
           determinacy, the milnor number mu and the corank c of f
 RETURN:   intvec: d, mu, c
-EXAMPLE:  example basicinvariants; shows an example
-"
+EXAMPLE:  example basicinvariants; shows an example"
 { 
   intvec v;
   ideal Jfs = std(jacob(f));
@@ -2547,8 +2535,7 @@ proc corank(poly f)
 RETURN:   the corank of the Hessian matrix of f, of type int
 REMARK:   corank(f) is the number of variables occuring in the residual
           singulartity after applying 'morsesplit' to f
-EXAMPLE:  example corank; shows an example
-"
+EXAMPLE:  example corank; shows an example"
 {
   matrix M = jacob(jacob(jet(f,2)));
   int cr = nvars(basering) - size(module(transpose(bareiss(M))));
@@ -2626,8 +2613,7 @@ proc Teile(poly f, poly fk)
 ///////////////////////////////////////////////////////////////////////////////
 static
 proc GetRf (poly fi, int n)
-"USAGE:    GetRf();
-"
+"USAGE:    GetRf();"
 { 
 //---------------------------- initialisation ---------------------------------
   int    j, k, l1, l1w;
@@ -2683,8 +2669,7 @@ proc checkring
 ///////////////////////////////////////////////////////////////////////////////
 static
 proc DecodeNormalFormString (string S_in)
-"USAGE:    DecodeNormalFormString
-"
+"USAGE:    DecodeNormalFormString"
 {
 //---------------------------- initialisation ---------------------------------
   int    C_eq, a, b, i, t, k, r, s;
@@ -2795,8 +2780,7 @@ RETURN:   A_L(f): compute via 'milnorcode' the class of f and
           return the normal form of f found in the database.
           A_L(\"name\"): Get the normal form from the database for
           the singularity given by its name.
-EXAMPLE:  example A_L; shows an example
-"
+EXAMPLE:  example A_L; shows an example"
 { 
   // if trace/debug mode not set, do it!
   init_debug();
@@ -2823,8 +2807,7 @@ example
 proc normalform(string s_in)
 "USAGE:    normalform(s);  s=string
 RETURN:   Arnold's normal form of singularity with name s
-EXAMPLE:  example normalform; shows an example.
-"
+EXAMPLE:  example normalform; shows an example."
 { 
   string Typ;
   int    k, r, s, crk;
@@ -2855,8 +2838,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 proc swap 
 "USAGE:    swap(a,b);
-RETURN:   b,a if b,a is the input (any type)
-"
+RETURN:   b,a if b,a is the input (any type)"
 {
   return(#[2],#[1]); 
 }
@@ -2867,8 +2849,7 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 proc Setring(int c, string name)
-"USAGE:    
-"
+"USAGE:    "
 {
   string s="ring "+name+"=0,(x(1.."+ string(c) +")),(c,ds);";
   return(s);
@@ -2878,8 +2859,7 @@ proc Setring(int c, string name)
 proc internalfunctions
 "USAGE:   internalfunctions();
 RETURN:  nothing, display names of internal procedures of classify.lib
-EXAMPLE: no example
-"
+EXAMPLE: no example"
 { "   Internal functions for the classification using Arnold's method,";
  "   the function numbers correspond to numbers in Arnold's classifier:";
  "Klassifiziere(poly f);             determine the type of the singularity f

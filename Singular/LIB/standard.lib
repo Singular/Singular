@@ -1,7 +1,7 @@
-// $Id: standard.lib,v 1.8 1998-05-05 11:55:38 krueger Exp $
+// $Id: standard.lib,v 1.9 1998-05-14 12:49:28 krueger Exp $
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: standard.lib,v 1.8 1998-05-05 11:55:38 krueger Exp $";
+version="$Id: standard.lib,v 1.9 1998-05-14 12:49:28 krueger Exp $";
 info="
 LIBRARY: standard.lib	PROCEDURES WHICH ARE ALWAYS LOADED AT START-UP
 
@@ -17,8 +17,7 @@ RETURN:  stdfglm(i): standard basis of i in the basering, calculated via fglm
                      from ordering \"dp\" to the ordering of the basering.
          stdfglm(i,s): standard basis of i in the basering, calculated via
                      fglm from ordering s to the ordering of the basering.
-EXAMPLE: example stdfglm; shows an example
-"
+EXAMPLE: example stdfglm; shows an example"
 {
    string os;
    def dr= basering;
@@ -60,8 +59,7 @@ proc stdhilbert(ideal i,list #)
          stdhilbert(i,v); i homogeneous ideal, v intvec (the Hilbert function)
 RETURN:  stdhilbert(i): a standard basis of i (computing v internally)
          stdhilbert(i,v): standard basis of i, using the given Hilbert function
-EXAMPLE: example stdhilbert; shows an example
-"
+EXAMPLE: example stdhilbert; shows an example"
 {
    def R=basering;
 
