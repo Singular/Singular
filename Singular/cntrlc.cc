@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: cntrlc.cc,v 1.34 2000-09-18 09:18:53 obachman Exp $ */
+/* $Id: cntrlc.cc,v 1.35 2000-09-18 12:03:56 obachman Exp $ */
 /*
 * ABSTRACT - interupt handling
 */
@@ -468,6 +468,11 @@ int si_stop_stack_trace_x;
 #ifdef CALL_GDB
 static void debug (int method)
 {
+  if (feOptValue(FE_OPT_NO_TTY))
+  {
+    dReportError("Caught Signal 11");
+    return;
+  }
   int pid;
   char buf[16];
   char *args[4] = { "gdb", "Singularg", NULL, NULL };
