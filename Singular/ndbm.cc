@@ -4,7 +4,7 @@
 
 //**************************************************************************/
 //
-// $Id: ndbm.cc,v 1.2 1997-08-12 14:54:51 Singular Exp $
+// $Id: ndbm.cc,v 1.3 1997-08-12 17:14:41 Singular Exp $
 //
 //**************************************************************************/
 // 'ndbm.cc' containes all low-level functions to manipulate dbm-files
@@ -46,6 +46,9 @@ static char sccsid[] = "@(#)ndbm.c        5.3 (Berkeley) 3/9/86";
 #   include <sys/stat.h>
 #   include <sys/file.h>
 #   include <errno.h>
+#   include <stdlib.h>
+#   include <string.h>
+#   include <unistd.h>
 #endif /* macintosh */
 #include "ndbm.h"
 
@@ -156,7 +159,7 @@ err:
   return (item);
 }
 
-dbm_delete(register DBM *db, datum key)
+int dbm_delete(register DBM *db, datum key)
 {
   register i;
   datum item;
@@ -182,7 +185,7 @@ dbm_delete(register DBM *db, datum key)
   return (0);
 }
 
-dbm_store(register DBM *db, datum key, datum dat, int replace)
+int dbm_store(register DBM *db, datum key, datum dat, int replace)
 {
   register i;
   int ret;
@@ -325,7 +328,7 @@ dbm_access(register DBM *db, long hash)
 }
 
 static
-getbit(register DBM *db)
+int getbit(register DBM *db)
 {
   long bn;
   register b, i, n;
@@ -393,7 +396,7 @@ makdatum(char buf[PBLKSIZ], int n)
 }
 
 static
-finddatum(char buf[PBLKSIZ], datum item)
+int finddatum(char buf[PBLKSIZ], datum item)
 {
   register short *sp;
   register int i, n, j;
@@ -482,7 +485,7 @@ dcalchash(datum item)
  * Delete pairs of items (n & n+1).
  */
 static
-delitem(char buf[PBLKSIZ], int n)
+int delitem(char buf[PBLKSIZ], int n)
 {
   register short *sp, *sp1;
   register i1, i2;
@@ -513,7 +516,7 @@ delitem(char buf[PBLKSIZ], int n)
  * Add pairs of items (item & item1).
  */
 static
-additem(char buf[PBLKSIZ], datum item, datum item1)
+int additem(char buf[PBLKSIZ], datum item, datum item1)
 {
   register short *sp;
   register i1, i2;

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: silink.h,v 1.7 1997-04-09 12:20:09 Singular Exp $ */
+/* $Id: silink.h,v 1.8 1997-08-12 17:14:43 Singular Exp $ */
 /*
 * ABSTRACT: general interface to links
 */
@@ -72,6 +72,7 @@ BOOLEAN slWrite(si_link l, leftv v);
 BOOLEAN slDump(si_link l);
 BOOLEAN slGetDump(si_link l);
 char* slStatus(si_link l, char *request);
+char* slStatusAscii(si_link l, char* request);
 BOOLEAN slInit(si_link l, char *str);
 void slKill(si_link l);
 void slCleanUp(si_link l);

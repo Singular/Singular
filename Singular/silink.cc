@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: silink.cc,v 1.11 1997-04-29 12:02:23 Singular Exp $ */
+/* $Id: silink.cc,v 1.12 1997-08-12 17:14:43 Singular Exp $ */
 
 /*
 * ABSTRACT: general interface to links
@@ -158,8 +158,10 @@ BOOLEAN slOpen(si_link l, short flag)
          l->m->type, l->mode, l->name);
     return FALSE;
   }
-  else if (l->m->Open != NULL) res = l->m->Open(l, flag);
-  else res = TRUE;
+  else if (l->m->Open != NULL)
+    res = l->m->Open(l, flag);
+  else
+    res = TRUE;
 
   if (res)
     Werror("open: Error for link of type: %s, mode: %s, name: %s",
@@ -171,9 +173,12 @@ BOOLEAN slClose(si_link l)
 {
   BOOLEAN res;
 
-  if(! SI_LINK_OPEN_P(l)) return FALSE;
-  else if (l->m->Close != NULL) return res = l->m->Close(l);
-  else res = TRUE;
+  if(! SI_LINK_OPEN_P(l))
+    return FALSE;
+  else if (l->m->Close != NULL)
+    res = l->m->Close(l);
+  else
+    res = TRUE;
   
   if (res)
     Werror("close: Error for link of type: %s, mode: %s, name: %s",
@@ -208,7 +213,8 @@ leftv slRead(si_link l, leftv a)
   }
   
   // here comes the eval:
-  if (v != NULL) v->Eval();
+  if (v != NULL)
+    v->Eval();
   else
     Werror("read: Error for link of type %s, mode: %s, name: %s",
            l->m->type, l->mode, l->name);
@@ -226,8 +232,10 @@ BOOLEAN slWrite(si_link l, leftv v)
 
   if(SI_LINK_W_OPEN_P(l))
   { // now open w
-    if (l->m->Write != NULL) res = l->m->Write(l,v);
-    else res = TRUE;
+    if (l->m->Write != NULL)
+      res = l->m->Write(l,v);
+    else
+      res = TRUE;
 
     if (res)
       Werror("write: Error for link of type %s, mode: %s, name: %s",
@@ -253,8 +261,10 @@ BOOLEAN slDump(si_link l)
 
   if(SI_LINK_W_OPEN_P(l))
   { // now open w
-    if (l->m->Dump != NULL) res = l->m->Dump(l);
-    else res = TRUE;
+    if (l->m->Dump != NULL)
+      res = l->m->Dump(l);
+    else
+      res = TRUE;
 
     if (res)
       Werror("dump: Error for link of type %s, mode: %s, name: %s",
@@ -280,8 +290,10 @@ BOOLEAN slGetDump(si_link l)
 
   if(SI_LINK_R_OPEN_P(l))
   { // now open r
-    if (l->m->GetDump != NULL) res = l->m->GetDump(l);
-    else res = TRUE;
+    if (l->m->GetDump != NULL)
+      res = l->m->GetDump(l);
+    else
+      res = TRUE;
 
     if (res)
       Werror("getdump: Error for link of type %s, mode: %s, name: %s",
@@ -301,7 +313,7 @@ BOOLEAN slGetDump(si_link l)
 BOOLEAN slOpenAscii(si_link l, short flag)
 {
   char *mode;
-  if (flag == SI_LINK_OPEN)
+  if (flag & SI_LINK_OPEN)
   {
     if (l->mode[0] != '\0' && (strcmp(l->mode, "r") == 0))
       flag = SI_LINK_READ;
@@ -347,8 +359,10 @@ BOOLEAN slOpenAscii(si_link l, short flag)
       }
     }
     outfile=feFopen(filename,mode);
-    if (outfile!=NULL) l->data = (void *) outfile;
-    else return TRUE;
+    if (outfile!=NULL)
+      l->data = (void *) outfile;
+    else
+      return TRUE;
   }
 
   FreeL(l->mode);
@@ -377,7 +391,8 @@ leftv slReadAscii(si_link l)
     long len=ftell(fp);
     fseek(fp,0L,SEEK_SET);
     buf=(char *)AllocL((int)len+1);
-    if (BVERBOSE(V_READING)) Print("//Reading %d chars\n",len);
+    if (BVERBOSE(V_READING))
+      Print("//Reading %d chars\n",len);
     fread( buf, len, 1, fp);
     buf[len]='\0';
   }

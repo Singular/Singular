@@ -329,6 +329,7 @@ static BOOLEAN jjOP_IV_I(leftv res, leftv u, leftv v)
     case '+': (*aa) += bb; break;
     case '-': (*aa) -= bb; break;
     case '*': (*aa) *= bb; break;
+    case '/':
     case INTDIV: (*aa) /= bb; break;
     case '%': (*aa) %= bb; break;
   }

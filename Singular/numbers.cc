@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.6 1997-07-17 13:55:48 Singular Exp $ */
+/* $Id: numbers.cc,v 1.7 1997-08-12 17:14:42 Singular Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -35,7 +35,7 @@ number (*nPar)(int i);
 int    (*nParDeg)(number n);
 int    (*nSize)(number n);
 int    (*nInt)(number &n);
-numberfunc nMult, nSub, nAdd, nDiv, nIntDiv, nIntMod;
+numberfunc nMult, nSub, nAdd, nDiv, nIntDiv, nIntMod, nExactDiv;
 number (*nNeg)(number a);
 number (*nInvers)(number a);
 void   (*nNormalize)(number &a);
@@ -125,6 +125,7 @@ void nSetChar(int c, BOOLEAN complete, char ** param, int pars)
       nSub   = naSub;
       nMult  = naMult;
       nDiv   = naDiv;
+      nExactDiv= naDiv;
       nIntDiv= naIntDiv;
       nIntMod= npIntMod; /* dummy !! */
       nNeg   = naNeg;
@@ -168,6 +169,7 @@ void nSetChar(int c, BOOLEAN complete, char ** param, int pars)
       nSub   = nlSub;
       nMult  = nlMult;
       nDiv   = nlDiv;
+      nExactDiv= nlExactDiv;
       nIntDiv= nlIntDiv;
       nIntMod= nlIntMod;
       nNeg   = nlNeg;
@@ -212,6 +214,7 @@ void nSetChar(int c, BOOLEAN complete, char ** param, int pars)
       nSub   = npSub;
       nMult  = npMult;
       nDiv   = npDiv;
+      nExactDiv= npDiv;
       nIntDiv= npDiv;
       nIntMod= npIntMod;
       nNeg   = npNeg;
@@ -258,6 +261,7 @@ void nSetChar(int c, BOOLEAN complete, char ** param, int pars)
       nSub   = nfSub;
       nMult  = nfMult;
       nDiv   = nfDiv;
+      nExactDiv= nfDiv;
       nIntDiv= nfDiv;
       nIntMod= nfIntMod;
       nNeg   = nfNeg;
@@ -300,6 +304,7 @@ void nSetChar(int c, BOOLEAN complete, char ** param, int pars)
       nSub   = nrSub;
       nMult  = nrMult;
       nDiv   = nrDiv;
+      nExactDiv= nrDiv;
       nIntDiv= nrDiv;
       nIntMod= nrIntMod;
       nNeg   = nrNeg;

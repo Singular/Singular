@@ -1,3 +1,13 @@
+Tue Aug 12 19:08:20 MET DST 1997
+        * hannes: added nExactDiv to numbers
+        * hannes: corrected open bug in sing_dbm.cc (could only "r")
+                  simplified sing_dbm.cc (many tests already in silink.cc)
+                  added "mod" (as an alias to "%")
+                  updated singular.doc: div/mod
+                                        DBM: links
+        * hannes: ANSI-conversion in ndbm.cc
+          (added return types, include files)
+
 Fri Aug  8 14:54:28 1997  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
 	* Makefile.in ndbm.[cc,h]: Together with krueger: Added files

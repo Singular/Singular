@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.h,v 1.7 1997-08-08 12:59:24 obachman Exp $ */
+/* $Id: longrat.h,v 1.8 1997-08-12 17:14:40 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers
 */
@@ -75,6 +75,7 @@ number   nlAdd(number la, number li);
 number   nlSub(number la, number li);
 number   nlMult(number a, number b);
 number   nlDiv(number a, number b);
+number   nlExactDiv(number a, number b);
 number   nlIntDiv(number a, number b);
 number   nlIntMod(number a, number b);
 void     nlPower(number x, int exp, number *lu);

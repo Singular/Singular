@@ -1,4 +1,4 @@
-// $Id: prim_dec.lib,v 1.4 1997-08-12 14:01:09 Singular Exp $
+// $Id: prim_dec.lib,v 1.5 1997-08-12 17:14:45 Singular Exp $
 ///////////////////////////////////////////////////////
 // pseudoprimdec.lib
 // algorithms for primary decomposition based on
@@ -88,7 +88,7 @@ proc min_ass_prim_charsets (ideal PS, int cho)
     }
   if(system("version")>933)
   {
-    verbose(notWarnSB);
+    option(notWarnSB);
   }
   if(cho==0)
   {
@@ -336,7 +336,7 @@ proc prim_dec(ideal I, int choose)
    }
    if(system("version")>933)
    {
-      verbose(notWarnSB);
+      option(notWarnSB);
     }
   ideal H=1; // The intersection of the primary components
   list U;    // the leaves of the decomposition tree, i.e.,

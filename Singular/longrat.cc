@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.10 1997-08-08 12:59:22 obachman Exp $ */
+/* $Id: longrat.cc,v 1.11 1997-08-12 17:14:39 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -1217,6 +1217,64 @@ number nlMult (number a, number b)
           }
         }
       }
+    }
+  }
+#ifdef LDEBUG
+  nlTest(u);
+#endif
+  return u;
+}
+
+/*2
+* u := a / b in Z, if b | a (else undefined)
+*/
+number   nlExactDiv(number a, number b)
+{
+  if (b==INT_TO_SR(0))
+  {
+    WerrorS("div. by 0");
+    return INT_TO_SR(0);
+  }
+  number u;
+  if (SR_HDL(a) & SR_HDL(b) & SR_INT)
+  {
+    /* the small int -(1<<28) divided by -1 is the large int (1<<28)   */
+    if ((a==INT_TO_SR(-(1<<28)))&&(b==INT_TO_SR(-1)))
+    {
+      return nlRInit(1<<28);
+    }
+    int aa=SR_TO_INT(a);
+    int bb=SR_TO_INT(b);
+    return INT_TO_SR(aa/bb);
+  }
+  number bb=NULL;
+  if (SR_HDL(b) & SR_INT)
+  {
+    bb=nlRInit(SR_TO_INT(b));
+    b=bb;
+  }
+  u=(number)Alloc(sizeof(rnumber));
+#ifdef LDEBUG
+  u->debug=123456;
+#endif
+  mpz_init(&u->z);
+  /* u=a/b */
+  u->s = 3;
+  MPZ_EXACTDIV(&u->z,&a->z,&b->z);
+  if (bb!=NULL)
+  {
+    mpz_clear(&bb->z);
+    Free((ADDRESS)bb,sizeof(rnumber));
+  }
+  if (mpz_size1(&u->z)<=MP_SMALL)
+  {
+    int ui=(int)mpz_get_si(&u->z);
+    if ((((ui<<3)>>3)==ui)
+    && (mpz_cmp_si(&u->z,(long)ui)==0))
+    {
+      mpz_clear(&u->z);
+      Free((ADDRESS)u,sizeof(rnumber));
+      u=INT_TO_SR(ui);
     }
   }
 #ifdef LDEBUG
