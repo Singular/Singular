@@ -34,6 +34,7 @@ install_slibdir = ${install_prefix}/LIB
 @SET_MAKE@
 CC		= @CC@
 LD              = @LD@
+AR              = ar
 CXX		= @CXX@
 LEX		= @LEX@
 PERL		= @PERL@
@@ -73,16 +74,6 @@ endif
 MP_LIBS		= @MP_LIBS@
 DL_KERNEL	= @DL_KERNEL@
 
-ifdef LD_STATIC
-LDFLAGS  := ${STATIC_LDFLAGS} ${LDFLAGS} 
-SING_EXEC = Singular-static
-LIBS := ${MP_LIBS} ${LIBS} 
-DL_KERNEL =
-else
-LDFLAGS  := ${LD_DYN_FLAGS} ${LDFLAGS} 
-SING_EXEC = Singular
-endif
-
 # CXXFLAGS =  -g -Wall -Wno-unused
 # CFLAGS =  -g -Wall -Wno-unused
 ##
@@ -96,7 +87,7 @@ endif
 # normal C++ source files
 CXXSOURCES=algmap.cc clapconv.cc \
     clapsing.cc mminit.cc\
-    febase.cc feread.cc fehelp.cc feResource.cc feOpt.cc \
+    febase.cc feread.cc fehelp.cc feResource.cc \
     ffields.cc hdegree.cc hilb.cc hutil.cc \
     gring.cc gr_kstd2.cc\
     ideals.cc intvec.cc \
@@ -105,34 +96,34 @@ CXXSOURCES=algmap.cc clapconv.cc \
     longalg.cc longrat.cc longrat0.cc \
     maps.cc matpol.cc misc.cc gnumpfl.cc gnumpc.cc \
     modulop.cc mpr_complex.cc sparsmat.cc \
-    fglm.cc fglmzero.cc fglmvec.cc fglmgauss.cc fglmhom.cc fglmcomb.cc \
+    fglmzero.cc fglmvec.cc fglmgauss.cc fglmhom.cc fglmcomb.cc \
     numbers.cc polys.cc p_polys.cc polys0.cc polys1.cc polys-impl.cc \
     ring.cc shortfl.cc kspoly.cc \
     syz.cc syz0.cc syz1.cc syz2.cc syz3.cc\
-    timer.cc walk.cc weight.cc \
+    timer.cc weight.cc \
     GMPrat.cc multicnt.cc npolygon.cc semic.cc spectrum.cc splist.cc \
     mod_raw.cc sing_win.cc\
-    eigenval.cc pcv.cc units.cc kbuckets.cc sbuckets.cc\
+    eigenval.cc units.cc kbuckets.cc sbuckets.cc\
     mpr_inout.cc mpr_base.cc mpr_numeric.cc \
     prCopy.cc p_Mult_q.cc \
     pDebug.cc pInline2.cc pInline1.cc pInline0.cc \
     pShallowCopyDelete.cc 
 
 # stuff for dbm
-DBMSR_SOURCES =  ndbm.cc sing_dbm.cc
+DBMSR_SOURCES =  ndbm.cc
 
 # normal C source files
 CSOURCES=weight0.c fegetopt.c fereadl.c page.c dError.c mmstd.c 
 
 # C++ sources which are used if part of the kernel are dynamically linked
-DL_KERNEL_SOURCES=p_Procs_Dynamic.cc slInit_Dynamic.cc 
+DL_KERNEL_SOURCES=p_Procs_Dynamic.cc 
 
 # C++ sources which are used for dynamic libraries if part of the kernel is
 # dynamically linked
 DL_LIB_SOURCES=p_Procs_Lib.cc 
 
 # C++ sources which are used if no parts of the kernel are dynamically linked
-STATIC_SOURCES=p_Procs_Static.cc slInit_Static.cc 
+STATIC_SOURCES=p_Procs_Static.cc  
 
 # C++ sources for which both, shared and static object files are needed
 COMMON_SOURCES = $(DBMSR_SOURCES)
@@ -163,7 +154,7 @@ HEADERS=algmap.h hutil.h stairc.h ideals.h \
 	febase.h shortfl.h mpr_complex.h mpr_global.h \
 	page.h gring.h \
 	ffields.h khstd.h silink.h sparsmat.h gnumpfl.h gnumpc.h \
-	fglm.h kstd1.h modulop.h sing_dbm.h weight.h \
+	fglm.h kstd1.h modulop.h weight.h \
 	fglmgauss.h fglmvec.h \
 	kstdfac.h kmatrix.h\
 	kutil.h \
@@ -171,7 +162,7 @@ HEADERS=algmap.h hutil.h stairc.h ideals.h \
         GMPrat.h multicnt.h npolygon.h semic.h spectrum.h splist.h multicnt.h \
 	eigenval.h units.h mod_raw.h kbuckets.h sbuckets.h\
 	mpr_global.h mpr_inout.h mpr_base.h mpr_numeric.h \
-	feOpt.h fegetopt.h distrib.h walk.h \
+	fegetopt.h distrib.h \
 	prCopy.h prCopyMacros.h \
         p_MemAdd.h p_MemCopy.h p_MemCmp.h p_Numbers.h \
         pInline2.h pInline1.h pInline0.h mmalloc.h static.h\
@@ -241,25 +232,13 @@ p_Procs_Lib_%.dl_o : p_Procs_Lib.cc p_Procs_Dynamic.o
 	${CXX} ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} ${SFLAGS} -c $< -o $@
 
 
-all:	$(SING_EXEC)
+all:	libkernel.a libkernel-g.a $(DL_LIBS)
 
-Singular-static: version.h
-	sleep 1
-	echo "#define HAVE_STATIC" > static.h
-	${MAKE} LD_STATIC=1 S_EXT="-static" Singular-static
-	echo "#undef HAVE_STATIC" > static.h
-
-Singular${S_EXT}: mod2.h Makefile version.h ${OBJS} mmalloc.o \
-          tesths.cc claptmpl.o $(DL_LIBS)
-	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} \
-	  -o Singular${S_EXT} \
-	  tesths.cc claptmpl.o\
-	  ${OBJS} ${LDFLAGS} ${LIBS} -lomalloc_ndebug mmalloc.o
+libkernel.a: ${OBJS} mmalloc.o claptmpl.o
+	${AR} cr $@ $^
 
 %.static: version.h
 	${MAKE} DL_KERNEL=0 S_EXT=".static" $@
-
-cntrlc.o cntrlc.og : feOptES.inc feOptTS.inc feOpt.inc
 
 p_Procs_Lib.o: p_Procs_Lib.inc
 
@@ -272,32 +251,15 @@ version.h: ${SOURCES} ${HEADERS} Makefile.in mod2.h.in \
 
 # Hmm compiling with -fomit-frame-pointer resulted in access violation
 # under cygwin
-ESingular: fegetopt.o feResource.cc mod2.h feOpt.cc version.h emacs.cc \
-           feOptES.inc mmalloc.o
+ESingular: fegetopt.o feResource.cc mod2.h version.h emacs.cc \
+           mmalloc.o
 	${CXX} -O2 ${CPPFLAGS} ${DEFS} -DESINGULAR -o ESingular emacs.cc fegetopt.o \
 	${LDFLAGS} -lomalloc_ndebug mmalloc.o
 
-TSingular: fegetopt.o feResource.cc mod2.h feOpt.cc version.h emacs.cc \
-           feOptTS.inc mmalloc.o
+TSingular: fegetopt.o feResource.cc mod2.h version.h emacs.cc \
+           mmalloc.o
 	${CXX} -O2 ${CPPFLAGS} ${DEFS} -DTSINGULAR -o TSingular emacs.cc fegetopt.o \
 	${LDFLAGS}  -lomalloc_ndebug mmalloc.o
-
-feOpt.o: feOpt.inc feOptES.inc feOptTS.inc
-
-feOpt.inc: feOpt.cc mod2.h feOpt.h
-	$(CXX) ${CPPFLAGS} -DGENERATE_OPTION_INDEX feOpt.cc -o feOpt
-	./feOpt
-	/bin/rm -f feOpt feOpt.exe
-
-feOptES.inc: feOpt.cc mod2.h feOpt.h
-	$(CXX) ${CPPFLAGS} -DGENERATE_OPTION_INDEX  -DESINGULAR feOpt.cc -o feOpt
-	./feOpt
-	rm -f feOpt feOpt.exe
-
-feOptTS.inc: feOpt.cc mod2.h feOpt.h
-	$(CXX) ${CPPFLAGS} -DGENERATE_OPTION_INDEX  -DTSINGULAR feOpt.cc -o feOpt
-	./feOpt
-	rm -f feOpt feOpt.exe
 
 prCopy.o: prCopy.inc
 
@@ -556,19 +518,8 @@ claptmpl.og: claptmpl.cc mod2.h
 $(OBJG2) : %.og: %.c
 	$(CCG)  ${CFLAGSG} ${CPPFLAGS} ${DEFSG} -c $< -o $@
 
-Singularg${S_EXT}: $(OBJG)  mmalloc.og $(DL_LIBSG)\
-           claptmpl.og tesths.cc version.h 
-	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGSG} ${CPPFLAGS} ${DEFSG} -o Singularg${S_EXT} \
-	tesths.cc claptmpl.og $(OBJG) ${LDFLAGS} ${LIBS} -lomalloc mmalloc.og \
-	${LD_DYN_FLAGS} ${LD_LIBC}
-
-installg: Singularg
-	${MKINSTALLDIRS} ${bindir}
-	${INSTALL_PROGRAM} Singularg ${bindir}	
-
-ESingularg: fegetopt.og feResource.cc mod2.h feOpt.cc version.h emacs.cc \
-           feOptES.inc mmalloc.og
-	${CXXG} ${CXXFLAGSG} ${CPPFLAGS} -DESINGULAR -g ${DEFSG} -o ESingularg emacs.cc fegetopt.og ${LDFLAGS} ${LIBS} -lomalloc mmalloc.og
+libkernel-g.a: ${OBJG} mmalloc.og claptmpl.og
+	${AR} cr $@ $^
 
 ##
 ## compiler and linker options for profile version
