@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.cc,v 1.16 1997-08-29 14:52:50 schmidt Exp $ */
+/* $Id: canonicalform.cc,v 1.17 1997-09-10 15:39:05 schmidt Exp $ */
 
 #include <config.h>
 
@@ -1120,14 +1120,35 @@ CanonicalForm::operator[] ( int i ) const
     return value->coeff( i );
 }
 
+//{{{ int CanonicalForm::sign () const
+//{{{ docu
+//
+// sign() - return sign of CO.
+//
+// If CO is an integer or a rational number, the sign is defined
+// as usual.  If CO is an element of a prime power domain or in a
+// finite field and SW_SYMMETRIC_FF is on the sign of CO is the
+// sign of the symmetric representation of CO.  If CO is in GF(q)
+// or in a finite field and SW_SYMMETRIC_FF is off, the sign of
+// CO is zero iff CO is zero, otherwise the sign is one.
+//
+// If CO is a polynomial or in an extension of one of the base
+// domains, the sign of CO is the sign of its leading
+// coefficient.
+//
+// See also: InternalCF::sign() and derived classes, imm_sign(),
+// gf_sign()
+//
+//}}}
 int
-CanonicalForm::sign() const
+CanonicalForm::sign () const
 {
     if ( is_imm( value ) )
 	return imm_sign( value );
     else
 	return value->sign();
 }
+//}}}
 
 CanonicalForm
 power ( const CanonicalForm & f, int n )
