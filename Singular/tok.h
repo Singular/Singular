@@ -6,7 +6,7 @@
 /*
 * ABSTRACT: tokens, types for interpreter; general macros
 */
-/* $Id: tok.h,v 1.53 2002-02-04 13:14:26 Singular Exp $ */
+/* $Id: tok.h,v 1.54 2002-12-13 16:19:15 Singular Exp $ */
 
 #ifndef MYYSTYPE
 #include "structs.h"
@@ -35,6 +35,12 @@ inline int min(const int a, const int b)  { return (a<b) ? a : b; }
 #define max(A,B) ((A) > (B) ? (A) : (B))
 #define min(A,B) ((A) < (B) ? (A) : (B))
 #endif
+
+/* Define to use old mechanismen for saving currRing with procedures
+ * Does work with HAVE_NAMESPACES enabled
+ */
+#define USE_IILOCALRING 1
+
 
 /* the follwing defines for infix operators should not be changed: *
 *  grammar.y does not use the symbolic names                       *
