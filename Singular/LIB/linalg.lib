@@ -1,6 +1,6 @@
 //GMG last modified: 04/25/2000
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: linalg.lib,v 1.34 2003-02-19 15:56:54 Singular Exp $";
+version="$Id: linalg.lib,v 1.35 2003-03-03 17:33:30 mschulze Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  linalg.lib  Algorithmic Linear Algebra
@@ -25,12 +25,13 @@ PROCEDURES:
  U_D_O(A);            P*A=U*D*O, P,D,U,O=permutaion,diag,lower-,upper-triang
  pos_def(A,i);        test symmetric matrix for positive definiteness
  hessenberg(M);       Hessenberg form of M
- evnf(e[,m]);         eigenvalues normal form of (e[,m])
  eigenvals(M);        eigenvalues with multiplicities of M
  minipoly(M);         minimal polynomial of M
+ spnf(sp);            normal form of spectrum sp
+ spprint(sp);         print spectrum sp
  jordan(M);           Jordan data of M
  jordanbasis(M);      Jordan basis and weight filtration of M
- jordanmatrix(e,s,m); Jordan matrix with Jordan data (e,s,m)
+ jordanmatrix(jd);    Jordan matrix with Jordan data jd
  jordannf(M);         Jordan normal form of M
 ";
 
@@ -1301,7 +1302,7 @@ EXAMPLE: example hessenberg; shows examples
 {
   if(system("with","eigenval"))
   {
-   return(system("hessenberg",M));
+    return(system("hessenberg",M));
   }
 
   int n=ncols(M);
@@ -1333,79 +1334,6 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc evnf(ideal e,list #)
-"USAGE:   evnf(e[,m]); ideal e, intvec m
-ASSUME:  ncols(e)==size(m)
-RETURN:  order eigenvalues e with multiplicities m
-EXAMPLE: example evnf; shows examples
-"
-{
-  int n=ncols(e);
-  intvec m;
-  int i,j;
-  while(i<size(#))
-  {
-    i++;
-    if(typeof(#[i])=="intvec")
-    {
-      m=#[i];
-    }
-  }
-  if(m==0)
-  {
-    for(i=n;i>=1;i--)
-    {
-      m[i]=1;
-    }
-  }
-
-  int k;
-  ideal e0;
-  intvec m0;
-  number e1;
-  int m1;
-  for(i=n;i>=1;i--)
-  {
-    if(m[i]!=0)
-    {
-      for(j=i-1;j>=1;j--)
-      {
-        if(m[j]!=0)
-	{
-          if(number(e[i])>number(e[j]))
-          {
-            e1=number(e[i]);
-            e[i]=e[j];
-            e[j]=e1;
-            m1=m[i];
-            m[i]=m[j];
-            m[j]=m1;
-          }
-          if(number(e[i])==number(e[j]))
-          {
-            m[i]=m[i]+m[j];
-            m[j]=0;
-          }
-        }
-      }
-      k++;
-      e0[k]=e[i];
-      m0[k]=m[i];
-    }
-  }
-
-  list l;
-  if(k>0)
-  {
-    l=e0,m0;
-  }
-  return(l);
-}
-example
-{ "EXAMPLE:"; echo=2;
-}
-///////////////////////////////////////////////////////////////////////////////
-
 proc eigenvals(matrix M)
 "USAGE:   eigenvals(M); matrix M
 ASSUME:  eigenvalues of M in basefield
@@ -1422,7 +1350,7 @@ EXAMPLE: example eigenvals; shows examples
 {
   if(system("with","eigenval"))
   {
-   return(system("eigenvals",jet(M,0)));
+    return(system("eigenvals",jet(M,0)));
   }
 
   M=jet(hessenberg(M),0);
@@ -1473,7 +1401,7 @@ EXAMPLE: example eigenvals; shows examples
       }
     }
   }
-  return(evnf(e,m));
+  return(spnf(list(e,m)));
 }
 example
 { "EXAMPLE:"; echo=2;
@@ -1537,6 +1465,150 @@ example
   matrix M[3][3]=3,2,1,0,2,1,0,0,3;
   print(M);
   minipoly(M);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc spnf(list sp)
+"USAGE:   spnf(list(a[,m])); ideal a, intvec m
+ASSUME:  ncols(a)==size(m)
+RETURN:  order a[i] with multiplicity m[i] lexicographically
+EXAMPLE: example spnf; shows examples
+"
+{
+  ideal a=sp[1];
+  int n=ncols(a);
+  intvec m;
+  list V;
+  module v;
+  int i,j;
+  for(i=2;i<=size(sp);i++)
+  {
+    if(typeof(sp[i])=="intvec")
+    {
+      m=sp[i];
+    }
+    if(typeof(sp[i])=="module")
+    {
+      v=sp[i];
+      for(j=n;j>=1;j--)
+      {
+        V[j]=module(v[j]);
+      }
+    }
+    if(typeof(sp[i])=="list")
+    {
+      V=sp[i];
+    }
+  }
+  if(m==0)
+  {
+    for(i=n;i>=1;i--)
+    {
+      m[i]=1;
+    }
+  }
+
+  int k;
+  ideal a0;
+  intvec m0;
+  list V0;
+  number a1;
+  int m1;
+  for(i=n;i>=1;i--)
+  {
+    if(m[i]!=0)
+    {
+      for(j=i-1;j>=1;j--)
+      {
+        if(m[j]!=0)
+	{
+          if(number(a[i])>number(a[j]))
+          {
+            a1=number(a[i]);
+            a[i]=a[j];
+            a[j]=a1;
+            m1=m[i];
+            m[i]=m[j];
+            m[j]=m1;
+            if(size(V)>0)
+            {
+              v=V[i];
+              V[i]=V[j];
+              V[j]=v;
+            }
+          }
+          if(number(a[i])==number(a[j]))
+          {
+            m[i]=m[i]+m[j];
+            m[j]=0;
+            if(size(V)>0)
+            {
+              V[i]=V[i]+V[j];
+            }
+          }
+        }
+      }
+      k++;
+      a0[k]=a[i];
+      m0[k]=m[i];
+      if(size(V)>0)
+      {
+        V0[k]=V[i];
+      }
+    }
+  }
+
+  if(size(V0)>0)
+  {
+    n=size(V0);
+    module U=std(V0[n]);
+    for(i=n-1;i>=1;i--)
+    {
+      V0[i]=simplify(reduce(V0[i],U),1);
+      if(i>=2)
+      {
+        U=std(U+V0[i]);
+      }
+    }
+  }
+
+  if(k>0)
+  {
+    sp=a0,m0;
+    if(size(V0)>0)
+    {
+      sp[3]=V0;
+    }
+  }
+  return(sp);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring R=0,(x,y),ds;
+  list sp=list(ideal(-1/2,-3/10,-3/10,-1/10,-1/10,0,1/10,1/10,3/10,3/10,1/2));
+  spprint(spnf(sp));
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc spprint(list sp)
+"USAGE:   spprint(sp); list sp
+RETURN:  string s;  spectrum sp
+EXAMPLE: example spprint; shows examples
+"
+{
+  string s;
+  for(int i=1;i<size(sp[2]);i++)
+  {
+    s=s+"("+string(sp[1][i])+","+string(sp[2][i])+"),";
+  }
+  s=s+"("+string(sp[1][i])+","+string(sp[2][i])+")";
+  return(s);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring R=0,(x,y),ds;
+  list sp=list(ideal(-1/2,-3/10,-1/10,0,1/10,3/10,1/2),intvec(1,2,2,1,2,2,1));
+  spprint(sp);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -1735,8 +1807,8 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc jordanmatrix(ideal e,intvec s,intvec m)
-"USAGE:   jordanmatrix(e,s,m); ideal e, intvec s, intvec m
+proc jordanmatrix(list jd)
+"USAGE:   jordanmatrix(list(e,s,m)); ideal e, intvec s, intvec m
 ASSUME:  ncols(e)==size(s)==size(m)
 RETURN:
 @format
@@ -1745,6 +1817,9 @@ matrix J;  Jordan matrix with list(e,s,m)==jordan(J)
 EXAMPLE: example jordanmatrix; shows examples
 "
 {
+  ideal e=jd[1];
+  intvec s=jd[2];
+  intvec m=jd[3];
   if(ncols(e)!=size(s)||ncols(e)!=size(m))
   {
     ERROR("arguments of equal size expected");
@@ -1776,7 +1851,7 @@ example
   ideal e=ideal(2,3);
   intvec s=1,2;
   intvec m=1,1;
-  print(jordanmatrix(e,s,m));
+  print(jordanmatrix(list(e,s,m)));
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -1787,8 +1862,7 @@ RETURN:  matrix J; Jordan normal form of M
 EXAMPLE: example jordannf; shows examples
 "
 {
-  list l=jordan(M,#);
-  return(jordanmatrix(l[1],l[2],l[3]));
+  return(jordanmatrix(jordan(M,#)));
 }
 example
 { "EXAMPLE:"; echo=2;
