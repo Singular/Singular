@@ -1,9 +1,9 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.19 1998-04-27 16:08:44 Singular Exp $ */
+/* $Id: kutil.cc,v 1.20 1998-05-14 13:04:19 Singular Exp $ */
 /*
-* ABSTRACT: kernel: utils for std
+* ABSTRACT: kernel: utils for kStd
 */
 
 #include <stdlib.h>

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: maps.cc,v 1.9 1998-04-24 16:39:21 Singular Exp $ */
+/* $Id: maps.cc,v 1.10 1998-05-14 13:04:20 Singular Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */
@@ -239,7 +239,7 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id)
                                     id->m[i-sourcering->N],1,imagepvariables);
   }
   // we ignore here homogenity - may be changed later:
-  temp2 = std(temp1,NULL,isNotHomog,NULL);
+  temp2 = kStd(temp1,NULL,isNotHomog,NULL);
   idDelete(&temp1);
   for (i=0;i<IDELEMS(temp2);i++)
   {

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.24 1998-05-04 11:38:57 obachman Exp $ */
+/* $Id: ideals.cc,v 1.25 1998-05-14 13:04:13 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -605,11 +605,11 @@ ideal idMinBase (ideal h1)
   }
   pEnlargeSet(&(e->m),IDELEMS(e),15);
   IDELEMS(e) = 16;
-  h2 = std(h1,currQuotient,isNotHomog,NULL);
+  h2 = kStd(h1,currQuotient,isNotHomog,NULL);
   h3 = idMaxIdeal();
   h4=idMult(h2,h3);
   idDelete(&h3);
-  h3=std(h4,currQuotient,isNotHomog,NULL);
+  h3=kStd(h4,currQuotient,isNotHomog,NULL);
   k = IDELEMS(h3);
   while ((k > 0) && (h3->m[k-1] == NULL)) k--;
   j = -1;
@@ -1020,7 +1020,7 @@ ideal idSect (ideal h1,ideal h2)
     }
   }
   pSetSyzComp(length);
-  temp1 = std(temp,currQuotient,testHomog,&w,NULL,length);
+  temp1 = kStd(temp,currQuotient,testHomog,&w,NULL,length);
   if (w!=NULL) delete w;
   pSetSyzComp(0);
   idDelete(&temp);
@@ -1123,7 +1123,7 @@ ideal idMultSect(resolvente arg, int length)
     }
   }
   /* std computation --------------------------------------------*/
-  tempstd = std(bigmat,currQuotient,testHomog,&w,NULL,syzComp);
+  tempstd = kStd(bigmat,currQuotient,testHomog,&w,NULL,syzComp);
   if (w!=NULL) delete w;
   idDelete(&bigmat);
   pSetSyzComp(0);
@@ -1242,8 +1242,8 @@ ideal  idPrepare (ideal  h1,ideal  quot, tHomog h,
 #ifdef PDEBUG
   for(j=0;j<IDELEMS(h2);j++) pTest(h2->m[j]);
 #endif
-  h3=std(h2,quot,h,w,NULL,*syzcomp);
-  //h3->rank = h2->rank; done by std -> initBuchMora -> initS
+  h3=kStd(h2,quot,h,w,NULL,*syzcomp);
+  //h3->rank = h2->rank; done by kStd -> initBuchMora -> initS
   h3->rank-=*syzcomp;
   idDelete(&h2);
   if (orderChanged) pSetSyzComp(0);
@@ -1714,7 +1714,7 @@ ideal idQuot (ideal  h1, ideal h2, BOOLEAN h1IsSB)
       }
     }
   }
-  h3 = std(h4,currQuotient,(tHomog)FALSE,NULL,NULL,kmax-1);
+  h3 = kStd(h4,currQuotient,(tHomog)FALSE,NULL,NULL,kmax-1);
   pSetSyzComp(0);
   idDelete(&h4);
   for (i=0;i<IDELEMS(h3);i++)
@@ -1809,7 +1809,7 @@ ideal idQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb)
   }
   kkk = IDELEMS(h4);
   if (addOnlyOne && (!h1IsStb))
-    temph1 = std(h1,currQuotient,hom,&weights,NULL);
+    temph1 = kStd(h1,currQuotient,hom,&weights,NULL);
   else
     temph1 = h1;
   idTest(temph1);
@@ -1852,11 +1852,11 @@ ideal idQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb)
   hom = (tHomog)idHomModule(h4,currQuotient,&weights1);
   if (addOnlyOne)
   {
-    h3 = std(h4,currQuotient,hom,&weights1,NULL,kmax-1,IDELEMS(h4)-1);
+    h3 = kStd(h4,currQuotient,hom,&weights1,NULL,kmax-1,IDELEMS(h4)-1);
   }
   else
   {
-    h3 = std(h4,currQuotient,hom,&weights1,NULL,kmax-1);
+    h3 = kStd(h4,currQuotient,hom,&weights1,NULL,kmax-1);
   }
   idTest(h3);
   idDelete(&h4);
@@ -2153,8 +2153,8 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
   h = idInit(IDELEMS(h1),1);
   // fetch data from the old ring
   for (k=0;k<IDELEMS(h1);k++) h->m[k] = pFetchCopy(origR, h1->m[k]);
-  // compute std
-  hh = std(h,NULL,hom,&w,hilb);
+  // compute kStd
+  hh = kStd(h,NULL,hom,&w,hilb);
   idDelete(&h);
 
   // go back to the original ring
@@ -2797,7 +2797,7 @@ ideal idModulo (ideal h2,ideal h1)
     }
   }
   pSetSyzComp(length);
-  temp1 = std(temp,currQuotient,testHomog,&w,NULL,length);
+  temp1 = kStd(temp,currQuotient,testHomog,&w,NULL,length);
   pSetSyzComp(0);
   idDelete(&temp);
   if (w!=NULL) delete w;

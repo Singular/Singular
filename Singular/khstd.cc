@@ -1,9 +1,9 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: khstd.cc,v 1.5 1997-11-25 15:29:57 pohl Exp $ */
+/* $Id: khstd.cc,v 1.6 1998-05-14 13:04:15 Singular Exp $ */
 /*
-* ABSTRACT:utils for hilbert driven std
+* ABSTRACT:utils for hilbert driven kStd
 */
 
 #include "mod2.h"
@@ -24,7 +24,7 @@ void khCheck( ideal Q, intvec *w, intvec *hilb, int &eledeg, int &count,
               kStrategy strat)
   /* ideal S=strat->Shdl, poly p=strat->P.p */
 /*
-* compute the number eledeg of elements with a degree >= deg(p) going into std,
+* compute the number eledeg of elements with a degree >= deg(p) going into kStd,
 * p is already in S and for all further q going into S yields deg(q) >= deg(p),
 * the real computation is only done if the degree has changed,
 * then we have eledeg == 0 on this degree and we make:

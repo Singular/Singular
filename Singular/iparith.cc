@@ -1368,7 +1368,7 @@ static BOOLEAN jjEXTGCD_I(leftv res, leftv u, leftv v)
 #ifdef HAVE_FACTORY
 static BOOLEAN jjFACSTD2(leftv res, leftv v, leftv w)
 {
-  res->data=(void *)stdfac((ideal)v->Data(),NULL,testHomog,NULL,
+  res->data=(void *)kStdfac((ideal)v->Data(),NULL,testHomog,NULL,
            (ideal)w->Data());
   setFlag(res,FLAG_STD);
   return FALSE;
@@ -1788,7 +1788,7 @@ static BOOLEAN jjSTD_HILB(leftv res, leftv u, leftv v)
     w=ivCopy(w);
     hom=isHomog;
   }
-  result=std((ideal)(u->Data()),currQuotient,hom,&w,(intvec *)v->Data());
+  result=kStd((ideal)(u->Data()),currQuotient,hom,&w,(intvec *)v->Data());
   idSkipZeroes(result);
   res->data = (char *)result;
   setFlag(res,FLAG_STD);
@@ -1813,7 +1813,7 @@ static BOOLEAN jjSTD_1(leftv res, leftv u, leftv v)
   idDelete(&i0);
   BITSET save_test=test;
   test|=Sy_bit(OPT_SB_1);
-  result=std(i1,currQuotient,hom,&w);
+  result=kStd(i1,currQuotient,hom,&w);
   test=save_test;
   idDelete(&i1);
   idSkipZeroes(result);
@@ -2354,7 +2354,7 @@ static BOOLEAN jjGETDUMP(leftv res, leftv v)
 #ifdef HAVE_FACTORY
 static BOOLEAN jjFACSTD(leftv res, leftv v)
 {
-  res->data=(void *)stdfac((ideal)v->Data(),NULL,testHomog,NULL);
+  res->data=(void *)kStdfac((ideal)v->Data(),NULL,testHomog,NULL);
   setFlag(res,FLAG_STD);
   return FALSE;
 }
@@ -2704,7 +2704,7 @@ static BOOLEAN jjSTD(leftv res, leftv v)
   //if (hasFlag(v,FLAG_STD))
   //  result=stdred((ideal)v->Data(),currQuotient,hom,&w);
   //else
-    result=std((ideal)(v->Data()),currQuotient,hom,&w);
+    result=kStd((ideal)(v->Data()),currQuotient,hom,&w);
   idSkipZeroes(result);
   res->data = (char *)result;
   setFlag(res,FLAG_STD);

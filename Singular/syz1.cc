@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.27 1998-04-29 16:28:19 Singular Exp $ */
+/* $Id: syz1.cc,v 1.28 1998-05-14 13:04:21 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -1038,7 +1038,7 @@ static void syOrder(poly p,syStrategy syzstr,int index,
 /*3
 * reduces all pairs of degree deg in the module index
 * put the reduced generators to the resolvente which contains
-* the truncated std 
+* the truncated kStd 
 */
 static void syRedNextPairs(SSet nextPairs, syStrategy syzstr,
                int howmuch, int index)

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.20 1998-04-23 09:52:09 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.21 1998-05-14 13:04:16 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -772,7 +772,7 @@ void redMoraBest (LObject* h,kStrategy strat)
 /*2
 * reduces h with elements from T choosing first possible
 * element in T with respect to the given ecart
-* used for computing normal forms outside std
+* used for computing normal forms outside kStd
 */
 static poly redMoraNF (poly h,kStrategy strat)
 {
@@ -1823,7 +1823,7 @@ int kModDeg(poly p)
   if (i==0) return o;
   return o+(*kModW)[i-1];
 }
-ideal std(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
+ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
           int newIdeal)
 {
   ideal r;

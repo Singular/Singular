@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.9 1998-05-14 10:29:16 Singular Exp $
+@comment $Id: math.doc,v 1.10 1998-05-14 13:04:23 Singular Exp $
 @comment this file contains the mathematical background of Singular
 This chapter introduces some of the mathematical notions and definitions used
 throughout the manual. Most sections are only a collection of the
@@ -949,10 +949,12 @@ f in I iff NF(f,std(I)) = 0 for I in R resp. I in R^r.
 @section Syzygies and resolutions
 @cindex Syzygies and resolutions
 
+@subheading Syzygies
 Let I=@{g_1, ..., g_q@} in K[x]^r.@*
 The @strong{module of syzygies syz(I)} is
 ker (K[x]^q @expansion{} K[x]^r, sum w_i*e_i @expansion{} sum w_i*g_i).
 
+@subheading Free resolutions
 Let A=matrix(M), then a free resolution of
 @ifinfo
 M1=coker(A)=coker(A1)
@@ -998,6 +1000,39 @@ $A_1$,
 A1,
 @end ifinfo
 etc.
+
+@subheading Betti numbers
+@tex
+The graded {\bf Betti number} $b_{i,j}$ of $R^n/M$
+($M$ a homogeneous submodule of $R^n$) is the minimal number of
+generators in degree i+j of the j-th syzygy module (= module of
+relations) of $R^n/M$ (the 0-th (resp.1-st) syzygy module of $R^n/M$ is
+$R^n$ (resp. $M$)).
+@end tex
+@ifinfo
+The graded @strong{Betti number} b_(i,j) of R^n/M
+(M a homogeneous submodule of R^n) is the minimal number of
+generators in degree i+j of the j-th syzygy module (= module of
+relations) of R^n/M (the 0-th (resp.1-st) syzygy module of R^n/M is R^n
+(resp. M)).
+@end ifinfo
+
+@subheading Regularity
+@ifinfo
+Let (+) K[X]e(a,n) -> @dots{} -> (+) K[X]e(a,0) -> I -> 0
+@* be a minimal resolution with homogeneous maps of degree 0.
+The regularity is the smallest number s with the property deg( e(a,i)) <= s+i
+for all i.
+@end ifinfo
+@tex
+\noindent
+Let $0 \rightarrow\ \bigoplus_a K[x]e_{a,n}\ \rightarrow\ \dots
+  \rightarrow\ \bigoplus_a K[x]e_{a,0}\ \rightarrow\
+  I\ \rightarrow\ 0$
+be a minimal resolution of I considered with homogeneous maps of degree 0.
+The regularity is the smallest number $s$ with the property deg($e_{a,i})
+ \leq s+i$ for all $i$.
+@end tex
 @c ---------------------------------------------------------------------------
 @node Characteritic sets,References,Syzygies and resolutions,Mathematical background
 @section Characteritic sets
@@ -1079,6 +1114,8 @@ where I_i=@{ini(f), f in T_i @}.
 @section References
 @cindex References
 
+@table @bullet
+@item
 For a description of the basic algorithms, together with many examples
 and comparisons, cf. Grassmann, H.; Greuel, G.-M.; Martin, B.; Neumann,
 W.; Pfister, G.; Pohl, W.;
@@ -1091,9 +1128,23 @@ Sch\"onemann,
  H.; Siebert, T.:  On an
 implementation of standard bases and syzygies in  @sc{Singular},
 Proceedings of the Workshop  Computational Methods in Lie theory in AAECC (1995).
-
+@item
 For a mathematical background, in particular for general (global, local
 or mixed) orderings and resolutions, cf. Greuel, G.-M.; Pfister, G.:
 Advances and improvements in the theory of standard bases and
 syzygies, Arch. d. Math. 63(1995)
 
+@item
+W. Decker; G.-M. Greuel; G. Pfister: Primary decomposition: algorithms and
+comparisons.  Preprint, Univ. Kaiserslautern, 1998.
+To appear in: Greuel, G.-M.; Matzat, B. H.; Hiss, G. (Eds.),
+Algorithmic Algebra and Number Theory, Springer Verlag, Heidelberg, (1998). 
+
+@item
+W. Decker; G.-M. Greuel; G. Pfister; T. de Jong:
+The normalisation: a new algorithm,
+implementation and comparisons. Preprint, Univ. Kaiserslautern, 1998. 
+
+@item
+
+@end table

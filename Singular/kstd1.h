@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.h,v 1.4 1997-08-05 13:04:04 Singular Exp $ */
+/* $Id: kstd1.h,v 1.5 1998-05-14 13:04:17 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -22,7 +22,7 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce);
 poly kNF (ideal F, ideal Q, poly p,int syzComp=0, int lazyReduce=0);
 ideal kNF(ideal F, ideal Q, ideal p,int syzComp=0, int lazyReduce=0);
 
-ideal std(ideal F, ideal Q, tHomog h, intvec ** w,intvec *hilb=NULL,
+ideal kStd(ideal F, ideal Q, tHomog h, intvec ** w,intvec *hilb=NULL,
           int syzComp=0,int newIdeal=0);
 #ifdef STDTRACE
 lists TraceStd(leftv,int , ideal F, ideal Q, tHomog h, intvec ** w,intvec *hilb=NULL,
@@ -75,7 +75,7 @@ extern intvec * kModW;
 26 integer strategy
 27 stop at HC (finiteDeterminacyTest)
 28 minimizes directly during the mres command
-29 std + 1 new element
+29 kStd + 1 new element
 30 noRedSyz
 31 weight
 */

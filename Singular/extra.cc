@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.46 1998-05-11 13:19:58 obachman Exp $ */
+/* $Id: extra.cc,v 1.47 1998-05-14 13:04:12 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -411,7 +411,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
      if ((h->next!=NULL) &&(h->next->Typ()==IDEAL_CMD))
       {
         res->rtyp=IDEAL_CMD;
-        res->data=(void *)stdred((ideal)h->next->Data(),NULL,testHomog,NULL);
+        res->data=(void *)kStdred((ideal)h->next->Data(),NULL,testHomog,NULL);
         setFlag(res,FLAG_STD);
         return FALSE;
       }
