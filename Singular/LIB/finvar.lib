@@ -1,17 +1,15 @@
-// $Id: finvar.lib,v 1.18 1999-07-21 16:52:00 Singular Exp $
+// $Id: finvar.lib,v 1.19 1999-07-26 13:06:40 Singular Exp $
 // author: Agnes Eileen Heydtmann, email:agnes@math.uni-sb.de
 // last change: 98/11/05
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: finvar.lib,v 1.18 1999-07-21 16:52:00 Singular Exp $"
+version="$Id: finvar.lib,v 1.19 1999-07-26 13:06:40 Singular Exp $"
 info="
 LIBRARY:  finvar.lib       LIBRARY TO CALCULATE INVARIANT RINGS & MORE
+AUTHOR: Agnes E. Heydtmann, email: agnes@math.uni-sb.de
 
-OVERVIEW:
  A library for computing polynomial invariants of finite matrix groups and
  generators of related varieties. The algorithms are based on B. Sturmfels,
  G. Kemper and W. Decker et al..
-
-AUTHOR: Agnes E. Heydtmann, agnes@math.uni-sb.de
 
 MAIN PROCEDURES:
  invariant_ring()                  generators of the invariant ring (i.r.)
