@@ -3743,11 +3743,18 @@ static BOOLEAN jjJET_ID_IV(leftv res, leftv u, leftv v, leftv w)
 }
 static BOOLEAN jjPREIMAGE(leftv res, leftv u, leftv v, leftv w)
 {
-  idhdl h,rr;
+  idhdl h;
+  ring rr;
   map mapping;
 
-  rr=(idhdl)u->data;
-  if ((h=IDRING(rr)->idroot->get(v->name,myynest))!=NULL)
+  if ((v->name==NULL) || (w->name==NULL))
+  {
+    WerrorS("2. and 3. argument must have a name");
+    return TRUE;
+  }
+  rr=(ring)u->Data();
+  const char *ring_name=u->Name();
+  if ((h=rr->idroot->get(v->name,myynest))!=NULL)
   {
     if (h->typ==MAP_CMD)
     {
@@ -3765,14 +3772,14 @@ static BOOLEAN jjPREIMAGE(leftv res, leftv u, leftv v, leftv w)
   }
   else
   {
-    Werror("`%s` is not defined in `%s`",v->name,u->name);
+    Werror("`%s` is not defined in `%s`",v->name,ring_name);
     return TRUE;
   }
-  if ((h=IDRING(rr)->idroot->get(w->name,myynest))!=NULL)
+  if ((h=rr->idroot->get(w->name,myynest))!=NULL)
   {
     if (h->typ==IDEAL_CMD)
     {
-      res->data=(char *)maGetPreimage(IDRING(rr),mapping,IDIDEAL(h));
+      res->data=(char *)maGetPreimage(rr,mapping,IDIDEAL(h));
     }
     else
     {
@@ -3782,7 +3789,7 @@ static BOOLEAN jjPREIMAGE(leftv res, leftv u, leftv v, leftv w)
   }
   else
   {
-    Werror("`%s` is not defined in `%s`",w->name,u->name);
+    Werror("`%s` is not defined in `%s`",w->name,ring_name);
     return TRUE;
   }
   return FALSE;
@@ -4449,7 +4456,7 @@ static BOOLEAN jjEXPORTTO(leftv res, leftv v)
   }
   if(u->Typ()==PACKAGE_CMD)
   {
-    Print("export to package\n");
+    PrintS("export to package\n");
     while(v->next!=NULL)
     {
       nok = iiInternalExport(v->next, 0, u->data);
@@ -4465,10 +4472,10 @@ static BOOLEAN jjEXPORTTO(leftv res, leftv v)
 static BOOLEAN jjIMPORTFROM(leftv res, leftv v)
 {
   BOOLEAN nok=FALSE;
-  Print("jjIMPORT_FROM()\n");
+  PrintS("jjIMPORT_FROM()\n");
   if(v->rtyp==NSHDL)
   {
-    Print("Import from toplevel\n");
+    PrintS("Import from toplevel\n");
 //While-schleife!!!
     return FALSE;
   }
