@@ -5,7 +5,7 @@
 // written by Gert-Martin Greuel and Gerhard Pfister
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: normal.lib,v 1.10 1998-08-26 09:56:40 obachman Exp $";
+version="$Id: normal.lib,v 1.11 1999-03-15 12:07:19 Singular Exp $";
 info="
 LIBRARY: normal.lib: PROCEDURE FOR NORMALIZATION (I)
 
@@ -240,6 +240,7 @@ EXAMPLE: example HomJJ;  shows an example
     // }
   }
 //---------- Test: Hom(J,J) == R ?, if yes, go home ---------------------------
+
    rf = interred(reduce(f,f2));       // represents p*Hom(J,J)/p*R = Hom(J,J)/R
    if ( size(rf) == 0 )
    {
@@ -400,7 +401,7 @@ EXAMPLE: example HomJJ;  shows an example
    attrib(endid,"isRad",0);
   // export(endid);
   // export(endphi);
-	   if(y==1)
+   if(y==1)
    {
       "the new ring after reduction of the number of variables";
       "   ";
@@ -626,7 +627,7 @@ EXAMPLE: example normalizationPrimes; shows an example
    ideal J,SB,MB,KK;
    int depth,lauf,prdim;
    int ti=timer;
-   
+
    if(size(i)==0)
    {
       if(y==1)
@@ -1109,8 +1110,9 @@ EXAMPLE: example normalizationPrimes; shows an example
       {
          def lastR=RS[1];
          setring lastR;
+         map psi1=BAS,endphi;
          ideal KK=endid;
-         ideal PP=endphi;
+         ideal PP=psi1(ihp);
          export PP;
          export KK;
          setring BAS;
@@ -1123,6 +1125,7 @@ EXAMPLE: example normalizationPrimes; shows an example
       setring newR;
 
       map psi=BAS,endphi;
+
       list tluser=
              normalizationPrimes(endid,psi(ihp),simplify(psi(MJ)+endid,4));
             // normalizationPrimes(endid);
@@ -1211,7 +1214,7 @@ setring r1;
 KK;
 }
 
-proc substpart(ideal endid,ideal endphi, int homo, intvec rw) 
+proc substpart(ideal endid,ideal endphi, int homo, intvec rw)
 {
    def newRing=basering;
    int ii,jj;
@@ -1284,9 +1287,9 @@ proc substpart(ideal endid,ideal endphi, int homo, intvec rw)
       if ( rw1[ii]==1 ) { lastmap[ii] = T(q); q=q+1; }
       if ( rw1[ii]==0 ) { lastmap[ii] = 0; }
    }
-   map phi = newRing,lastmap;
-   ideal endid  = phi(endid);
-   ideal endphi = phi(endphi);
+   map phi1 = newRing,lastmap;
+   ideal endid  = phi1(endid);
+   ideal endphi = phi1(endphi);
    export(endid);
    export(endphi);
    list L = lastRing;
@@ -1485,3 +1488,4 @@ puv2-puw;
 
 
 */
+
