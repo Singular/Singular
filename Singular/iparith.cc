@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.306 2003-11-04 16:43:26 Singular Exp $ */
+/* $Id: iparith.cc,v 1.307 2003-12-16 14:55:34 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -258,6 +258,9 @@ cmdnames cmds[] =
   { "mstd",        0, MSTD_CMD ,          CMD_1},
   { "nameof",      0, NAMEOF_CMD ,        CMD_1},
   { "names",       0, NAMES_CMD ,         CMD_M},
+  #ifdef HAVE_PLURAL
+  { "ncalgebra",   0, NCALGEBRA_CMD ,     CMD_2},
+  #endif
   { "ncols",       0, COLS_CMD ,          CMD_1},
   { "not",         0, NOT ,               NOT},
   { "npars",       0, NPARS_CMD ,         CMD_1},
