@@ -2231,19 +2231,7 @@ fi
 
 echo $ac_n "checking whether to configure and build sgroup lib""... $ac_c" 1>&6
 echo "configure:2234: checking whether to configure and build sgroup lib" >&5
-if test "$enable_sgroup" != yes && test "$enable_sgroup" != no; then
-  if test "$with_sgroup" != no && test "$ac_sgroup_ok" != yes && \
-     test -d sgroup && \
-     (test "$ac_MP_ok" = yes || test "$enable_MP" = yes); then
-    enable_sgroup=yes
-    echo "$ac_t""yes" 1>&6
-    CONFIG_SUBDIRS="$CONFIG_SUBDIRS sgroup"
-    ac_configure_args="$ac_configure_args --enable-sgroup"
-  else
-    enable_sgroup=no
-    echo "$ac_t""no" 1>&6
-  fi
-elif  test "$enable_sgroup" = yes; then
+if test "$enable_sgroup" = yes; then
   if test ! -d sgroup; then
     echo "$ac_t""no" 1>&6
     { echo "configure: error: can not build sgroup without sgroup directory" 1>&2; exit 1; }
@@ -2262,7 +2250,7 @@ fi
 BUILD_SUBDIRS="$CONFIG_SUBDIRS"
 
 echo $ac_n "checking whether to build mpr and use mtrack""... $ac_c" 1>&6
-echo "configure:2266: checking whether to build mpr and use mtrack" >&5
+echo "configure:2254: checking whether to build mpr and use mtrack" >&5
 if test -d mpr && test "$ac_cv_singuname" = ix86-Linux && test "$enable_mtrack" != no; then
   echo "$ac_t""yes" 1>&6
   if test "$enable_mtrack" != yes; then
@@ -2277,7 +2265,7 @@ else
 fi
 
 echo $ac_n "checking whether to configure and build Singular""... $ac_c" 1>&6
-echo "configure:2281: checking whether to configure and build Singular" >&5
+echo "configure:2269: checking whether to configure and build Singular" >&5
 if test "$enable_Singular" != yes && test "$enable_Singular" != no; then
   if test "$with_Singular" != no && test -d Singular; then
     enable_Singular=yes
@@ -2303,7 +2291,7 @@ else
 fi
 
 echo $ac_n "checking whether to configure and build Texinfo""... $ac_c" 1>&6
-echo "configure:2307: checking whether to configure and build Texinfo" >&5
+echo "configure:2295: checking whether to configure and build Texinfo" >&5
 if test "$enable_Texinfo" != no && test -d Texinfo; then
   echo "$ac_t""yes" 1>&6
   enable_texinfo=yes
@@ -2325,7 +2313,7 @@ else
   # Extract the first word of "makeinfo", so it can be a program name with args.
 set dummy makeinfo; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:2329: checking for $ac_word" >&5
+echo "configure:2317: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_MAKEINFO'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -2355,7 +2343,7 @@ fi
   # Extract the first word of "texi2dvi", so it can be a program name with args.
 set dummy texi2dvi; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:2359: checking for $ac_word" >&5
+echo "configure:2347: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_TEXI2DVI'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -2385,7 +2373,7 @@ fi
   # Extract the first word of "texindex", so it can be a program name with args.
 set dummy texindex; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:2389: checking for $ac_word" >&5
+echo "configure:2377: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_TEXINDEX'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -2416,7 +2404,7 @@ fi
 
 
 echo $ac_n "checking whether to build Texi2html""... $ac_c" 1>&6
-echo "configure:2420: checking whether to build Texi2html" >&5
+echo "configure:2408: checking whether to build Texi2html" >&5
 if test "$enable_Texi2html" != no && test -d Texi2html; then
  echo "$ac_t""yes" 1>&6
  BUILD_SUBDIRS="$BUILD_SUBDIRS Texi2html"
@@ -2428,7 +2416,7 @@ else
 fi
 
 echo $ac_n "checking whether to build doc""... $ac_c" 1>&6
-echo "configure:2432: checking whether to build doc" >&5
+echo "configure:2420: checking whether to build doc" >&5
 if test "$enable_doc" != no && test -d doc; then
  echo "$ac_t""yes" 1>&6
  BUILD_SUBDIRS="$BUILD_SUBDIRS doc"
@@ -2442,7 +2430,7 @@ else
 fi
 
 echo $ac_n "checking whether to build emacs""... $ac_c" 1>&6
-echo "configure:2446: checking whether to build emacs" >&5
+echo "configure:2434: checking whether to build emacs" >&5
 if test "$enable_doc" = yes && test "$enable_emacs" != no && test -d emacs; then
  echo "$ac_t""yes" 1>&6
  BUILD_SUBDIRS="$BUILD_SUBDIRS emacs"
@@ -2454,7 +2442,7 @@ else
 fi
 
 echo $ac_n "checking which apint package to use""... $ac_c" 1>&6
-echo "configure:2458: checking which apint package to use" >&5
+echo "configure:2446: checking which apint package to use" >&5
 if test "$with_apint" = gmp; then
   if test "$ac_gmp_ok" = yes || test "$enable_gmp" = yes; then
     echo "$ac_t""gmp" 1>&6
@@ -2478,7 +2466,7 @@ else
 fi
 
 echo $ac_n "checking whether to use with MP""... $ac_c" 1>&6
-echo "configure:2482: checking whether to use with MP" >&5
+echo "configure:2470: checking whether to use with MP" >&5
 if test "$with_MP" = yes; then
   if test "$ac_MP_ok" = yes || test "$enable_MP" = yes; then
     echo "$ac_t""yes" 1>&6
@@ -2497,7 +2485,7 @@ else
 fi
 
 echo $ac_n "checking whether to use with factory""... $ac_c" 1>&6
-echo "configure:2501: checking whether to use with factory" >&5
+echo "configure:2489: checking whether to use with factory" >&5
 if test "$with_factory" = yes; then
   if test "$ac_factory_ok" = yes || test "$enable_factory" = yes; then
     echo "$ac_t""yes" 1>&6
@@ -2516,7 +2504,7 @@ else
 fi
   
 echo $ac_n "checking whether to use with libfac""... $ac_c" 1>&6
-echo "configure:2520: checking whether to use with libfac" >&5
+echo "configure:2508: checking whether to use with libfac" >&5
 if test "$with_libfac" = yes; then
   if test "$ac_libfac_ok" = yes || test "$enable_libfac" = yes; then
     echo "$ac_t""yes" 1>&6
@@ -2536,7 +2524,7 @@ fi
 
 
 echo $ac_n "checking whether to use with mtrack""... $ac_c" 1>&6
-echo "configure:2540: checking whether to use with mtrack" >&5
+echo "configure:2528: checking whether to use with mtrack" >&5
 if test "$with_mtrack" != no && test "$with_mtrack" != yes; then
   if test "$enable_mtrack" = yes; then
     with_mtrack=yes
@@ -2556,7 +2544,7 @@ fi
 
 
 echo $ac_n "checking whether to use with Singular""... $ac_c" 1>&6
-echo "configure:2560: checking whether to use with Singular" >&5
+echo "configure:2548: checking whether to use with Singular" >&5
 if test "$with_Singular" != no && test "$with_Singular" != yes; then
   if test "$enable_Singular" = yes; then
     with_Singular=yes
@@ -2616,7 +2604,7 @@ fi
   
 
 echo $ac_n "checking whether ${MAKE-make} sets \${MAKE}""... $ac_c" 1>&6
-echo "configure:2620: checking whether ${MAKE-make} sets \${MAKE}" >&5
+echo "configure:2608: checking whether ${MAKE-make} sets \${MAKE}" >&5
 set dummy ${MAKE-make}; ac_make=`echo "$2" | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_prog_make_${ac_make}_set'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
