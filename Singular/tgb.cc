@@ -1147,9 +1147,9 @@ static void go_on (calc_dat* c){
   //set limit of 1000 for multireductions, at the moment for
   //programming reasons
   int i=0;
-  red_object* buf=(red_object*) omalloc(100*sizeof(red_object));
+  red_object* buf=(red_object*) omalloc(PAR_N*sizeof(red_object));
   int curr_deg=-1;
-  while(i<100){
+  while(i<PAR_N){
     sorted_pair_node* s=top_pair(c);
     if (!s) break;
     if(curr_deg>=0){

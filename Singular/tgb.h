@@ -23,7 +23,7 @@
 //#define HEAD_BIN
 //#define HOMOGENEOUS_EXAMPLE
 #define REDTAIL_S
-
+#define PAR_N 1000
 //#define REDTAIL_PROT
 //#define QUICK_SPOLY_TEST
 struct sorted_pair_node{
