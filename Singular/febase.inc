@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.inc,v 1.11 1998-06-02 15:29:53 Singular Exp $ */
+/* $Id: febase.inc,v 1.12 1998-07-10 17:14:36 Singular Exp $ */
 /*
 * ABSTRACT: handling of 'voices'
 */
@@ -349,7 +349,7 @@ BOOLEAN exitVoice()
 }
 
 /*2
-* set prompt_char 
+* set prompt_char
 * only called with currentVoice->sw == BI_stdin
 */
 static void feShowPrompt(void)
@@ -359,7 +359,8 @@ static void feShowPrompt(void)
 #ifdef HAVE_TCL
     if (tclmode)
     {
-       PrintTCL('P',(prompt_char=='>')? 0 : 1,NULL);
+      fe_promptstr[0]=prompt_char;
+      PrintTCLS('P',fe_promptstr);
     }
     else
 #endif
@@ -463,7 +464,7 @@ int feReadLine(char* b, int l)
           (c==')')
           )
             break;
-        }          
+        }
         if (i>=l) break;
         currentVoice->fptr++;
         if(currentVoice->buffer[currentVoice->fptr]=='\0') break;
@@ -605,7 +606,11 @@ Voice * feInitStdin()
 {
   Voice *p = new Voice;
   p->files = stdin;
-  p->sw = isatty(STDIN_FILENO) ? BI_stdin : BI_file;
+  #ifdef HAVE_TCL
+  p->sw = (tclmode || isatty(STDIN_FILENO)) ? BI_stdin : BI_file;
+  #else
+  p->sw = (isatty(STDIN_FILENO)) ? BI_stdin : BI_file;
+  #endif
   p->filename   = mstrdup("STDIN");
   p->start_lineno   = 1;
   return p;
