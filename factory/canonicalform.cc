@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.cc,v 1.20 1997-10-10 10:40:17 schmidt Exp $ */
+/* $Id: canonicalform.cc,v 1.21 1997-10-16 15:32:55 schmidt Exp $ */
 
 #include <config.h>
 
@@ -408,6 +408,7 @@ CanonicalForm::LC ( const Variable & v ) const
 //
 // degree() returns the degree of CO in its main variable.
 // Elements in an algebraic extension are considered polynomials.
+//
 // degree( v ) returns the degree of CO with respect to v.
 // Elements in an algebraic extension are considered polynomials,
 // and v may be algebraic.
@@ -419,10 +420,16 @@ CanonicalForm::LC ( const Variable & v ) const
 int
 CanonicalForm::degree() const
 {
-    if ( isZero() )
-	return -1;
-    else  if ( is_imm( value ) )
-	return 0;
+    int what = is_imm( value );
+    if ( what )
+	if ( what == GFMARK && imm_iszero_gf( value ) )
+	    return -1;
+	else if ( what == FFMARK && imm_iszero_gf( value ) )
+	    return -1;
+	else if ( what == INTMARK && imm_iszero( value ) )
+	    return -1;
+	else
+	    return 0;
     else
 	return value->degree();
 }
@@ -430,10 +437,18 @@ CanonicalForm::degree() const
 int
 CanonicalForm::degree( const Variable & v ) const
 {
-    if ( isZero() )
-	return -1;
-    else  if ( is_imm( value ) || value->inBaseDomain() )
-	return 0;
+    int what = is_imm( value );
+    if ( what )
+	if ( what == GFMARK && imm_iszero_gf( value ) )
+	    return -1;
+	else if ( what == FFMARK && imm_iszero_gf( value ) )
+	    return -1;
+	else if ( what == INTMARK && imm_iszero( value ) )
+	    return -1;
+	else
+	    return 0;
+    else if ( value->inBaseDomain() )
+	return value->degree();
 
     Variable x = value->variable();
     if ( v == x )
@@ -457,19 +472,20 @@ CanonicalForm::degree( const Variable & v ) const
 //{{{ CanonicalForm CanonicalForm::tailcoeff (), int CanonicalForm::taildegree () const
 //{{{ docu
 //
-// tailcoeff(), taildegree() - return last coefficient and
+// tailcoeff(), taildegree() - return least coefficient and
 //   degree, resp.
 //
 // tailcoeff() returns the coefficient of the term with the least
-// degree in CO.  Elements in an algebraic extension are
+// degree in CO where CO is considered an univariate polynomial
+// in its main variable.  Elements in an algebraic extension are
 // considered coefficients.
 //
 // taildegree() returns -1 for the zero polynomial, 0 if CO is in
-// a base domain, the least degree of all terms occuring in CO
-// otherwise.  In contrast to tailcoeff(), elements in an
-// algebraic extension are considered polynomials, not
-// coefficients, and such may have a taildegree larger than
-// zero.
+// a base domain, otherwise the least degree of CO where CO is
+// considered a univariate polynomial in its main variable.  In
+// contrast to tailcoeff(), elements in an algebraic extension
+// are considered polynomials, not coefficients, and such may
+// have a taildegree larger than zero.
 //
 // See also: InternalCF::tailcoeff(), InternalCF::tailcoeff(),
 // InternalPoly::tailcoeff(), InternalPoly::taildegree,
@@ -488,10 +504,16 @@ CanonicalForm::tailcoeff () const
 int
 CanonicalForm::taildegree () const
 {
-    if ( isZero() )
-	return -1;
-    else  if ( is_imm( value ) )
-	return 0;
+    int what = is_imm( value );
+    if ( what )
+	if ( what == GFMARK && imm_iszero_gf( value ) )
+	    return -1;
+	else if ( what == FFMARK && imm_iszero_gf( value ) )
+	    return -1;
+	else if ( what == INTMARK && imm_iszero( value ) )
+	    return -1;
+	else
+	    return 0;
     else
 	return value->taildegree();
 }
@@ -502,8 +524,8 @@ CanonicalForm::taildegree () const
 //
 // level(), mvar() - return level and main variable of CO.
 //
-// level() returns the level of CO.  For a list of the levels,
-// see cf_defs.h.
+// level() returns the level of CO.  For a list of the levels and
+// their meanings, see cf_defs.h.
 //
 // mvar() returns the main variable of CO or Variable() if CO is
 // in a base domain.
@@ -525,7 +547,7 @@ CanonicalForm::level () const
 Variable
 CanonicalForm::mvar () const
 {
-    if ( is_imm( value ) || value->inBaseDomain() )
+    if ( is_imm( value ) )
 	return Variable();
     else
 	return value->variable();
@@ -561,14 +583,14 @@ CanonicalForm
 CanonicalForm::den () const
 {
     if ( is_imm( value ) )
-	return 1;
+	return CanonicalForm( 1 );
     else
 	return CanonicalForm( value->den() );
 }
 //}}}
 
 //{{{ assignment operators
-CanonicalForm&
+CanonicalForm &
 CanonicalForm::operator = ( const CanonicalForm & cf )
 {
     if ( this != &cf ) {
@@ -579,7 +601,7 @@ CanonicalForm::operator = ( const CanonicalForm & cf )
     return *this;
 }
 
-CanonicalForm&
+CanonicalForm &
 CanonicalForm::operator = ( const int cf )
 {
     if ( (! is_imm( value )) && value->deleteObject() )
@@ -588,7 +610,7 @@ CanonicalForm::operator = ( const int cf )
     return *this;
 }
 
-CanonicalForm&
+CanonicalForm &
 CanonicalForm::operator += ( const CanonicalForm & cf )
 {
     int what = is_imm( value );
@@ -630,7 +652,7 @@ CanonicalForm::operator += ( const CanonicalForm & cf )
     return *this;
 }
 
-CanonicalForm&
+CanonicalForm &
 CanonicalForm::operator -= ( const CanonicalForm & cf )
 {
     int what = is_imm( value );
@@ -672,7 +694,7 @@ CanonicalForm::operator -= ( const CanonicalForm & cf )
     return *this;
 }
 
-CanonicalForm&
+CanonicalForm &
 CanonicalForm::operator *= ( const CanonicalForm & cf )
 {
     int what = is_imm( value );
@@ -714,7 +736,7 @@ CanonicalForm::operator *= ( const CanonicalForm & cf )
     return *this;
 }
 
-CanonicalForm&
+CanonicalForm &
 CanonicalForm::operator /= ( const CanonicalForm & cf )
 {
     int what = is_imm( value );
@@ -756,7 +778,7 @@ CanonicalForm::operator /= ( const CanonicalForm & cf )
     return *this;
 }
 
-CanonicalForm&
+CanonicalForm &
 CanonicalForm::div ( const CanonicalForm & cf )
 {
     int what = is_imm( value );
@@ -798,8 +820,8 @@ CanonicalForm::div ( const CanonicalForm & cf )
     return *this;
 }
 
-CanonicalForm&
-CanonicalForm::operator %= ( const CanonicalForm& cf )
+CanonicalForm &
+CanonicalForm::operator %= ( const CanonicalForm & cf )
 {
     int what = is_imm( value );
     if ( what ) {
@@ -840,8 +862,8 @@ CanonicalForm::operator %= ( const CanonicalForm& cf )
     return *this;
 }
 
-CanonicalForm&
-CanonicalForm::mod( const CanonicalForm & cf )
+CanonicalForm &
+CanonicalForm::mod ( const CanonicalForm & cf )
 {
     int what = is_imm( value );
     if ( what ) {
@@ -883,11 +905,27 @@ CanonicalForm::mod( const CanonicalForm & cf )
 }
 //}}}
 
-//{{{ evaluation operators
+//{{{ CanonicalForm CanonicalForm::operator () ( f ), operator () ( f, v ) const
+//{{{ docu
+//
+// operator ()() - evaluation operator.
+//
+// Both operators return CO if CO is in a base domain.
+//
+// operator () ( f ) returns CO with f inserted for the main
+// variable.  Elements in an algebraic extension are considered
+// polynomials.
+//
+// operator () ( f, v ) returns CO with f inserted for v.
+// Elements in an algebraic extension are considered polynomials
+// and v may be an algebraic variable.
+//
+//}}}
+#ifndef NEWINS
 CanonicalForm
 CanonicalForm::operator () ( const CanonicalForm & f ) const
 {
-    if ( inBaseDomain() )
+    if ( is_imm( value ) || value->inBaseDomain() )
 	return *this;
     else {
 	CanonicalForm result = 0;
@@ -899,7 +937,30 @@ CanonicalForm::operator () ( const CanonicalForm & f ) const
 	return result;
     }
 }
+#else
+CanonicalForm
+CanonicalForm::operator () ( const CanonicalForm & f ) const
+{
+    if ( is_imm( value ) || value->inBaseDomain() )
+	return *this;
+    else {
+	CFIterator i = *this;
+	int lastExp = i.exp();
+	CanonicalForm result = i.coeff();
+	i++;
+	while ( i.hasTerms() ) {
+	    result *= power( f, lastExp - i.exp() );
+	    result += i.coeff();
+	    lastExp = i.exp();
+	    i++;
+	}
+	result *= power( f, lastExp );
+	return result;
+    }
+}
+#endif
 
+#ifndef NEWINS
 CanonicalForm
 CanonicalForm::operator () ( const CanonicalForm & f, const Variable & v ) const
 {
@@ -927,13 +988,73 @@ CanonicalForm::operator () ( const CanonicalForm & f, const Variable & v ) const
 	return result;
     }
 }
+#else
+CanonicalForm
+CanonicalForm::operator () ( const CanonicalForm & f, const Variable & v ) const
+{
+    if ( is_imm( value ) || value->inBaseDomain() )
+	return *this;
+
+    Variable x = value->variable();
+    if ( v > x )
+	return *this;
+    else  if ( v == x )
+	return (*this)( f );
+    else {
+	// v is less than main variable of f
+	CanonicalForm result = 0;
+	for ( CFIterator i = *this; i.hasTerms(); i++ )
+	    result += i.coeff()( f, v ) * power( x, i.exp() );
+	return result;
+    }
+}
+#endif
 //}}}
 
-//{{{ CanonicalForm CanonicalForm::operator[] ( int i ) const
+//{{{ CanonicalForm CanonicalForm::operator [] ( int i ) const
+//{{{ docu
+//
+// operator []() - return i'th coefficient from CO.
+//
+// Returns CO if CO is in a base domain and i equals zero.
+// Returns zero (from the current domain) if CO is in a base
+// domain and i is larger than zero.  Otherwise, returns the
+// coefficient to x^i in CO (if x denotes the main variable of
+// CO) or zero if CO does not contain x^i.  Elements in an
+// algebraic extension are considered polynomials.  i should be
+// larger or equal zero.
+//
+// Note: Never use a loop like
+//
+// for ( int i = degree( f ); i >= 0; i-- )
+//     foo( i, f[ i ] );
+//
+// This is much slower than
+//
+// for ( int i = degree( f ), CFIterator I = f; I.hasTerms(); I++ ) {
+//     // fill gap with zeroes
+//     for ( ; i > I.exp(); i-- )
+//         foo( i, 0 );
+//     // at this point, i == I.exp()
+//     foo( i, i.coeff() );
+//     i--;
+// }
+// // work through trailing zeroes
+// for ( ; i >= 0; i-- )
+//     foo( i, 0 );
+//
+//}}}
 CanonicalForm
-CanonicalForm::operator[] ( int i ) const
+CanonicalForm::operator [] ( int i ) const
 {
-    return value->coeff( i );
+    ASSERT( i >= 0, "index to operator [] less than zero" );
+    if ( is_imm( value ) )
+	if ( i == 0 )
+	    return *this;
+	else
+	    return CanonicalForm( 0 );
+    else
+	return value->coeff( i );
 }
 //}}}
 
@@ -956,7 +1077,7 @@ CanonicalForm
 CanonicalForm::deriv () const
 {
     if ( is_imm( value ) || value->inCoeffDomain() )
-	return 0;
+	return CanonicalForm( 0 );
     else {
 	CanonicalForm result = 0;
 	Variable x = value->variable();
@@ -972,11 +1093,11 @@ CanonicalForm::deriv ( const Variable & x ) const
 {
     ASSERT( x.level() > 0, "cannot derive with respect to algebraic variables" );
     if ( is_imm( value ) || value->inCoeffDomain() )
-	return 0;
+	return CanonicalForm( 0 );
 
     Variable y = value->variable();
     if ( x > y )
-	return 0;
+	return CanonicalForm( 0 );
     else if ( x == y )
 	return deriv();
     else {
@@ -1042,7 +1163,7 @@ CanonicalForm::sqrt () const
 	int n = imm2int( value );
 	ASSERT( n >= 0, "arg to sqrt() less than zero" );
 	if ( n == 0 || n == 1 )
-	    return CanonicalForm( CFFactory::basic( n ) );
+	    return CanonicalForm( n );
 	else {
 	    int x, y = n;
 	    do {
@@ -1051,7 +1172,7 @@ CanonicalForm::sqrt () const
 		// integer, but the result does
 		y = (unsigned int)(x + n/x)/2;
 	    } while ( y < x );
-	    return CanonicalForm( CFFactory::basic( x ) );
+	    return CanonicalForm( x );
 	}
     }
     else
