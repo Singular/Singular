@@ -1,0 +1,815 @@
+// $Id: mregular.lib,v 1.1 2000-08-03 16:24:42 greuel Exp $
+// IB/PG/GMG, last modified:  21.7.2000
+//////////////////////////////////////////////////////////////////////////////
+version = "$Id: mregular.lib,v 1.1 2000-08-03 16:24:42 greuel Exp $";
+
+info="
+LIBRARY: mregular.lib       PROCEDURES FOR THE CASTELNUOVO-MUMFORD REGULARITY
+AUTHORS: I.Bermejo, email: ibermejo@ull.es;
+         Ph.Gimenez, email: pgimenez@agt.uva.es
+         G.-M.Greuel, email: greuel@mathematik.uni-kl.de
+
+A library for computing the Castelnuovo-Mumford regularity of a subscheme of
+the projective n-space that DOES NOT require the computation of a minimal
+graded free resolution of the saturated ideal defining the subscheme.
+
+PROCEDURES:
+ reg_CM(id);         regularity of arith. C-M subscheme V(id_sat) of Pn
+ reg_curve(id,[,e]); regularity of projective curve V(id_sat) in Pn
+ reg_moncurve(li);   regularity of projective monomial curve defined by li
+
+REMARK:
+The procedures are based on two papers by Isabel Bermejo and Philippe Gimenez:
+'On Castelnuovo-Mumford regularity of projective curves'
+ Proc.Amer.Math.Soc. 128(5) (2000), and
+'Computing the Castelnuovo-Mumford regularity of some subschemes of Pn using
+ quotients of monomial ideals',
+ Proceedings of MEGA-2000, J. Pure Appl. Algebra (to appear).
+
+IMPORTANT:
+To use the first two procedures, the variables must be in Noether
+position, i.e. that the polynomial ring in the last variables must be a
+Noether normalization of basering/id.
+If it is not the case, you should compute a Noether normalization before,
+e.g. by using the procedure noetherNormal from algebra.lib.
+";
+//
+LIB "general.lib";
+LIB "elim.lib";
+LIB "sing.lib";
+LIB "poly.lib";
+//////////////////////////////////////////////////////////////////////////////
+//
+proc reg_CM (ideal i)
+"
+USAGE:   reg_CM (i); i ideal
+RETURN:  an integer, the Castelnuovo-Mumford regularity of i-sat.
+ASSUME:  i is a homogeneous ideal of the basering S=K[x(0)..x(n)] where
+         the field K is infinite, and S/i-sat is Cohen-Macaulay.
+         Assume that K[x(n-d),...,x(n)] is a Noether normalization of S/i-sat
+         where d=dim S/i -1.
+NOTE:    The output is reg(X)=reg(i-sat) where X is the arithmetically
+         Cohen-Macaulay subscheme of the projective n-space defined by i.
+         If printlevel > 0 (default = 0) additional information is displayed.
+         In particular, the value of the regularity of the Hilbert function of
+         S/i-sat is given.
+EXAMPLE: example reg_CM; shows some examples
+"
+{
+//--------------------------- initialisation ---------------------------------
+   int ii,H,h,d,time,si;
+   def r0 = basering;
+   int n = nvars(r0)-1;
+   string s = "ring r1 = ",charstr(r0),",x(0..n),dp;";
+   execute(s);
+   ideal i,j,I,K;
+   j = fetch(r0,i);
+//----- Checks saturated ideal, computes saturation if necessary,
+//      and computes the initial ideal of the i-sat w.r.t. dp-ordering
+   time=rtimer;
+   list l=sat(j,maxideal(1));
+   i=l[1]; si=l[2];
+   I=lead(i);
+   attrib(I,"isSB",1);
+   d=dim(I);
+   if ( d == -1 )
+   {
+   H=maxdeg1(quotient(lead(std(j)),maxideal(1)))+1;
+       "// WARNING from proc reg_CM from lib mregular.lib:
+// your ideal i of S is zero-dimensional!
+// The Castelnuovo-Mumford regularity of i coincides with the
+// regularity of the Hilbert function of S/i and its value is:";
+       return (H);
+   }
+//----- Check Noether position
+   ideal J=I;
+   for ( ii = n-d+1; ii <= n; ii++ )
+   {
+   J=subst(J,x(ii),0);
+   }
+   attrib(J,"isSB",1);
+   int dz=dim(J);
+   if ( dz != d )
+   {
+       "// WARNING from proc reg_CM from lib mregular.lib:
+// the variables are not in Noether position!";
+       return (-1);
+   }
+//----- Check Cohen-Macaulay property of S/i-sat
+   for ( ii = n-d+2; ii <= n+1; ii++ )
+   {
+   K=K+select(I,ii);
+   }
+   if ( size(K) != 0 )
+   {
+         "// WARNING from proc reg_CM from lib mregular.lib:
+// the ring basering/i-sat is NOT Cohen-Macaulay !!";
+         return (-1);
+   }
+// Now, compute the regularity!
+   s="ring r2 = ",charstr(r0),",x(0..n-d),dp;";
+   execute(s);
+   ideal I,qq;
+   I = imap(r1,I);
+   qq=quotient(I,maxideal(1));
+   H=maxdeg1(qq)+1; // The value of the regularity.
+   time=rtimer-time;
+// Additional information:
+   dbprint(printlevel-voice+2,
+"// Ideal i of S defining an arithm. Cohen-Macaulay subscheme X of P"+
+           string(n) + ":");
+   dbprint(printlevel-voice+2,
+"//   - dimension of X: "+string(d-1));
+   if ( si == 0 )
+   {
+   dbprint(printlevel-voice+2,"//   - i is saturated: YES");
+   }
+   else
+   {
+   dbprint(printlevel-voice+2,"//   - i is saturated: NO");
+   }
+   dbprint(printlevel-voice+2,
+"//   - regularity of the Hilbert function of S/i-sat: " + string(H-d));
+   dbprint(printlevel-voice+2,
+"//   - time for computing reg(X): " + string(time) + " sec.");
+   dbprint(printlevel-voice+2,
+"// Castelnuovo-Mumford regularity of X:");
+   return(H);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring s=0,x(0..5),dp;
+   ideal i=x(2)^2-x(4)*x(5),x(1)*x(2)-x(0)*x(5),x(0)*x(2)-x(1)*x(4),
+           x(1)^2-x(3)*x(5),x(0)*x(1)-x(2)*x(3),x(0)^2-x(3)*x(4);
+   reg_CM(i);
+// Additional information can be obtained as follows:
+   printlevel = 1;
+   reg_CM(i);
+}
+/*
+Out-commented examples:
+   ring r=0,(x,y,z,t),dp;
+   ideal j=x17y14-y31, x20y13, x60-y36z24-x20z20t20;
+   reg_CM(j);
+//
+// The polynomial ring in the last variables MUST be a Noether
+// Normalization of basering/ideal:
+   ring rr=0,(t,x,y,z),dp;
+   ideal j=imap(r,i);
+// The same ideal as before but with a different order of the var. in ring
+   reg_CM(j);
+//
+// When S/i-sat is not Cohen-Macaulay, one gets an error message:
+   ring r1=0,(x,y,z,t),dp;
+   ideal i=y4-t3z, x3t-y2z2, x3y2-t2z3, x6-tz5;
+   reg_CM(i);
+//
+// When i is zero-dimensional, one gets an error message but the regularity
+// of the ideal is computed:
+   reg_CM(maxideal(4));
+//
+   ring r2=0,(x,y,z,t,w),dp;
+   ideal i=xy-zw,x3-yw2,x2z-y2w,y3-xz2,-y2z3+xw4+tw4+w5,-yz4+x2w3+xtw3+xw4,
+     -z5+x2tw2+x2w3+yw4;
+   reg_CM(i);
+   ring r3=0,(x,y,z,t,w,u),dp;
+   ideal i=imap(r2,i);
+   reg_CM(i);
+//
+// Next example is the defining ideal of the 2nd. Veronesean of P3, a variety
+// in P8 which is arithmetically Cohen-Macaulay:
+   ring r4=0,(a,b,c,d,x(0..9)),dp;
+   ideal i= x(0)-ab,x(1)-ac,x(2)-ad,x(3)-bc,x(4)-bd,x(5)-cd,
+            x(6)-a2,x(7)-b2,x(8)-c2,x(9)-d2;
+   ideal ei=eliminate(i,abcd);
+   ring r5=0,x(0..9),dp;
+   ideal i=imap(r4,ei);
+   reg_CM(i);
+//
+// Now let's build a non saturated ideal defining the same subscheme:
+   ideal mi=intersect(i,maxideal(3));
+   size(mi);
+   reg_CM(mi);
+// The result is the same since both ideals define the same subscheme.
+//
+*/
+//////////////////////////////////////////////////////////////////////////////
+//
+proc reg_curve (ideal i, list #)
+"
+USAGE:   reg_curve (i[,e]); i ideal, e integer
+RETURN:  an integer, the Castelnuovo-Mumford regularity of i-sat.
+ASSUME:  i is a homogeneous ideal of the basering S=K[x(0)..x(n)] where
+         the field K is infinite, and it defines a projective curve C in
+         the projective n-space (dim(i)=2). We assume that K[x(n-1),x(n)]
+         is a Noether normalization of S/i-sat.
+         e=0: (default)
+              Uses a random choice of an element of K when it is necessary.
+              This is absolutly safe (if the element is bad, another random
+              choice will be done until a good element is found).
+         e=1: Substitutes the random choice of an element of K by a simple
+              transcendental field extension of K.
+NOTE:    The output is the integer reg(C)=reg(i-sat).
+         If printlevel > 0 (default = 0) additional information is displayed.
+         In particular, says if C is arithmetically Cohen-Macaulay or not,
+         determines in which step of a minimal graded free resolution of i-sat
+         the regularity of C is attained, and sometimes gives the value of the
+         regularity of the Hilbert function of S/i-sat (otherwise, an upper
+         bound is given).
+EXAMPLE: example reg_curve; shows some examples
+"
+{
+//--------------------------- initialisation ---------------------------------
+   int d,ii,jj,H,HR,e,dd,h,hh,hm,sK,ts,si,time,ran,rant;
+   def r0 = basering;
+   int n = nvars(r0)-1;
+   if ( size(#) > 0 )
+   {
+      e = #[1];
+   }
+   string s = "ring r1 = ",charstr(r0),",x(0..n),dp;";
+   execute(s);
+   ideal i,j,I,I0,J,K,II,q,qq,m;
+   i = fetch(r0,i);
+//----- Checks saturated ideal, computes saturation if necessary,
+//      and computes the initial ideal of the i-sat w.r.t. dp-ordering
+   time=rtimer;
+   list l=sat(i,maxideal(1));
+   i=l[1];si=l[2];
+   I=lead(i);
+   attrib(I,"isSB",1);
+   d=dim(I);
+//----- Check if the ideal defines a curve
+   if ( d != 2 )
+   {
+   "// WARNING from proc reg_curve from lib mregular.lib:
+// your ideal does not define a projective curve!";
+   return (-1);
+   }
+//----- Check Noether position
+   J=subst(I,x(n),0);
+   K=subst(J,x(n-1),0);
+   attrib(K,"isSB",1);
+   int dz=dim(K);
+   if ( dz != 2 )
+   {
+       "// WARNING from proc reg_curve from lib mregular.lib:
+// the variables are not in Noether position!";
+       return (-1);
+   }
+//--------- When S/i-sat is Cohen-Macaulay we can compute regularity:
+   K=select(I,n+1);
+   K=K+select(I,n);
+   sK=size(K);
+   s="ring r2 = ",charstr(r0),",x(0..n-2),dp;";
+   if (sK == 0)
+   {
+   execute(s);
+   ideal I,qq;
+   I = imap(r1,I);
+   qq=quotient(I,maxideal(1));
+   H=maxdeg1(qq)+1; // this is the value of the regularity.
+   time=rtimer-time;
+// Additional information:
+   dbprint(printlevel-voice+2,
+"// Ideal i of S defining a projective curve C in P" + string(n) + ":");
+   if ( si == 0 )
+   {
+   dbprint(printlevel-voice+2,"//   - i is saturated: YES");
+   }
+   else
+   {
+   dbprint(printlevel-voice+2,"//   - i is saturated: NO");
+   }
+   dbprint(printlevel-voice+2,
+"//   - C is arithm. Cohen-Macaulay: YES");
+   dbprint(printlevel-voice+2,
+"//   - reg(C) attained at the last step of a m.g.f.r. of i-sat: YES");
+   dbprint(printlevel-voice+2,
+"//   - regularity of the Hilbert function of S/i-sat: " + string(H-2));
+   dbprint(printlevel-voice+2,
+"//   - time for computing reg(C): " + string(time) + " sec.");
+   dbprint(printlevel-voice+2,
+"// Castelnuovo-Mumford regularity of C:");
+   return(H);
+   }
+//----- Not Cohen-Macaulay case:
+//----- First, determine the associated monomial ideal.
+   l=sat(I,maxideal(1));
+   ts=l[2];
+   if (ts != 0)
+   {
+     if (e != 0)
+     {
+     s= "ring r4 = (char(r0),a),x(0..n),dp;";
+     execute(s);
+     ideal i,I,j,m,K;
+     i=imap(r1,i);
+     m=nselect(maxideal(1),n+1);
+     m[n+1]=a*x(n-1);
+     map phi=r4,m;
+     j=phi(i);
+     I=lead(std(j));
+     K=normalize(I);
+     setring r1;
+     I=imap(r4,K);
+     }
+   else
+     {
+     rant=size(select(I,n+1));
+     while (rant != 0)
+       {
+       ran=random(-1000,1000);
+       m=nselect(maxideal(1),n+1);
+       m[n+1]=ran*x(n-1);
+       map phi=r1,m;
+       j=phi(i);
+       I=lead(std(j));
+       rant=size(select(I,n+1));
+       dbprint(printlevel-voice+2,"// (random choice of an element of K)");
+       }
+     }
+   }
+   else
+   {
+   I=subst(I,x(n),x(n-1));
+   }
+   I0 = subst(I,x(n-1),0);    // Generators of I which are x(n-1)-free;
+   K= select(I,n);            // The other generators;
+//--------------- Computation of H=H(E) --------------------
+   s="ring r2 = ",charstr(r0),",x(0..n-2),dp;";
+   execute(s);
+   ideal I0,qq,ki,mov;
+   I0 = imap(r1,I0);
+   qq=quotient(I0,maxideal(1));
+   H=maxdeg1(qq)+1;
+//------------ Computation of HR=H(R)+1 -----------------
+//First, order elements in K
+   s="ring r3 = ",charstr(r0),",(x(n-1),x(n),x(0..n-2)),lp;";
+   execute(s);
+   ideal K,KK,ki;
+   K=imap(r1,K);
+   KK=sort(K)[1];
+//The first step is different to avoid to compute quotient(I0,max) twice
+   ki=subst(KK[1],x(n-1),1);
+   dd=leadexp(KK[1])[1];
+   setring r2;
+   ki=imap(r3,ki);
+   attrib(ki,"isSB",1);
+   for    (jj=1; jj<= size(qq); jj++)
+       {
+       if ( reduce(qq[jj],ki)== 0 )
+          { hm=deg(qq[jj]);
+            if ( hm > hh)
+            { hh = hm; }
+          }
+       }
+   HR=hh+dd;
+//If K has more than 1 element, recursive steps to compute HR
+   setring r1;
+   if (size(K) != 1)
+   {
+   setring r2;
+   mov=I0+ki;
+   setring r3;
+   for (ii=2; ii<= size(KK); ii++)
+     {
+       ki=subst(KK[ii],x(n-1),1);
+       dd=leadexp(KK[ii])[1];
+       setring r2;
+       qq=quotient(mov,maxideal(1));
+       ki=imap(r3,ki);
+       attrib(ki,"isSB",1);
+       hh=0;
+       for    (jj=1; jj<= size(qq); jj++)
+       {
+           if ( reduce(qq[jj],ki)==0 )
+              { hm=deg(qq[jj]);
+                if ( hm > hh)
+                { hh = hm; }
+              }
+       }
+       hh=hh+dd;
+       if ( hh > HR )
+       { HR=hh; }
+       mov=mov+ki;
+       setring r3;
+     }
+   }
+//Now one has HR=H(R)+1 and H=H(E) and one can conclude:
+  time=rtimer-time;
+  if( HR > H )
+  {
+// Additional information:
+   dbprint(printlevel-voice+2,
+"// Ideal i of S defining a projective curve C in P" + string(n) + ":");
+   if ( si == 0 )
+   {
+   dbprint(printlevel-voice+2,"//   - i is saturated: YES");
+   }
+   else
+   {
+   dbprint(printlevel-voice+2,"//   - i is saturated: NO");
+   }
+   dbprint(printlevel-voice+2,
+"//   - C is arithm. Cohen-Macaulay: NO");
+   dbprint(printlevel-voice+2,
+"//   - reg(C) attained at the last step of a m.g.f.r. of i-sat: YES");
+   dbprint(printlevel-voice+2,
+"//   - regularity of the Hilbert function of S/i-sat: " + string(HR-1));
+   dbprint(printlevel-voice+2,
+"//   - time for computing reg(C): "+ string(time) + " sec.");
+   dbprint(printlevel-voice+2,
+"// Castelnuovo-Mumford regularity of C:");
+   return(HR);
+  }
+  if( HR < H )
+  {
+// Additional information:
+   dbprint(printlevel-voice+2,
+"// Ideal i of S defining a projective curve C in P" + string(n) + ":");
+   if ( si == 0 )
+   {
+   dbprint(printlevel-voice+2,"//   - i is saturated: YES");
+   }
+   else
+   {
+   dbprint(printlevel-voice+2,"//   - i is saturated: NO");
+   }
+   dbprint(printlevel-voice+2,
+"//   - C is arithm. Cohen-Macaulay: NO");
+   dbprint(printlevel-voice+2,
+"//   - reg(C) attained at the last step of a m.g.f.r. of i-sat: NO");
+   dbprint(printlevel-voice+2,
+"//   - reg(C) attained at the second last step of a m.g.f.r. of i-sat: YES");
+   dbprint(printlevel-voice+2,
+"//   - regularity of the Hilbert function of S/i-sat: strictly smaller than "
+           + string(H-1));
+   dbprint(printlevel-voice+2,
+"//   - time for computing reg(C): " + string(time) + " sec.");
+   dbprint(printlevel-voice+2,
+"// Castelnuovo-Mumford regularity of C:");
+   return(H);
+  }
+  if( HR == H )
+  {
+// Additional information:
+   dbprint(printlevel-voice+2,
+"// Ideal i of S defining a projective curve C in P" + string(n) + ":");
+   if ( si == 0 )
+   {
+   dbprint(printlevel-voice+2,"//   - i is saturated: YES");
+   }
+   else
+   {
+   dbprint(printlevel-voice+2,"//   - i is saturated: NO");
+   }
+   dbprint(printlevel-voice+2,
+"//   - C is arithm. Cohen-Macaulay: NO");
+   dbprint(printlevel-voice+2,
+"//   - reg(C) attained at the last step of a m.g.f.r. of i-sat: YES");
+   dbprint(printlevel-voice+2,
+"//   - reg(C) attained at the second last step of a m.g.f.r. of i-sat: YES");
+   dbprint(printlevel-voice+2,
+"//   - regularity of the Hilbert function of S/i-sat: " + string(HR-1));
+   dbprint(printlevel-voice+2,
+"//   - time for computing reg(C): " + string(time) + " sec.");
+   dbprint(printlevel-voice+2,
+"// Castelnuovo-Mumford regularity of C:");
+   return(HR);
+  }
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring s = 0,(x,y,z,t),dp;
+// 1st example is Ex.2.5 in [Bermejo-Gimenez], Proc.Amer.Math.Soc. 128(5):
+   ideal i  = x17y14-y31, x20y13, x60-y36z24-x20z20t20;
+   reg_curve(i);
+// 2nd example is Ex.2.9 in [Bermejo-Gimenez], Proc.Amer.Math.Soc. 128(5):
+   int k=43;
+   ideal j=x17y14-y31,x20y13,x60-y36z24-x20z20t20,y41*z^k-y40*z^(k+1);
+   reg_curve(j);
+// Additional information can be obtained as follows:
+   printlevel = 1;
+   reg_curve(j);
+}
+/*
+Out-commented examples:
+//
+// More examples are obtained changing the value of k in the previous example:
+   k=14;
+   j=x17y14-y31,x20y13,x60-y36z24-x20z20t20,y41*z^k-y40*z^(k+1);
+   reg_curve(j);
+   k=22;
+   j=x17y14-y31,x20y13,x60-y36z24-x20z20t20,y41*z^k-y40*z^(k+1);
+   reg_curve(j);
+   k=315;
+   j=x17y14-y31,x20y13,x60-y36z24-x20z20t20,y41*z^k-y40*z^(k+1);
+   reg_curve(j);
+// If the ideal does not define a curve, one gets an error message:
+   ring s1=0,(a,b,c,d,x(0..9)),dp;
+   ideal i= x(0)-ab,x(1)-ac,x(2)-ad,x(3)-bc,x(4)-bd,x(5)-cd,
+            x(6)-a2,x(7)-b2,x(8)-c2,x(9)-d2;
+   ideal ei=eliminate(i,abcd);
+   ring s2=0,x(0..9),dp;
+   ideal i=imap(s1,ei);
+   reg_curve(i);
+// Since this example is Cohen-Macaulay, use reg_CM instead of reg_curve.
+//
+// Be carefull!: the polynomial ring in the last variables MUST be a Noether
+// Normalization of basering/ideal:
+   ring s3=0,(t,x,y,z),dp;
+   ideal j=imap(s,j);
+   reg_curve(j);
+//
+// The following is example in Rk.2.10 in [Bermejo-Gimenez], ProcAMS 128(5):
+   setring s;
+   ideal h=x2-3xy+5xt,xy-3y2+5yt,xz-3yz,2xt-yt,y2-yz-2yt;
+   reg_curve(h);
+// The initial ideal is not saturated but the regularity of the subscheme
+// it defines is the regularity of the saturation and can be computed:
+   reg_curve(lead(std(h)));
+//
+// Here is an example where the computation of a m.g.f.r. of I costs a lot:
+   ring s4=0,(x,y,z,t,u,a,b),dp;
+   ideal i=u-b40,t-a40,x-a23b17,y-a22b18+ab39,z-a25b15;
+   ideal ei=eliminate(i,ab); // It takes a few seconds to compute the ideal
+   ring s5=0,(x,y,z,t,u),dp;
+   ideal i=imap(s4,ei);
+   reg_curve(i);   // This is very fast.
+// Now you can use mres(i,0) to compute a m.g.f.r. of the ideal!
+//
+// The computation of the m.g.f.r. of the following example did not succeed
+// using the command mres:
+   ring s6=0,(x(0..8),s,t),dp;
+   ideal i=x(0)-st24,x(1)-s2t23,x(2)-s3t22,x(3)-s9t16,x(4)-s11t14,x(5)-s18t7,
+           x(6)-s24t,x(7)-t25,x(8)-s25;
+   ideal ei=eliminate(i,st);
+   ring s7=0,x(0..8),dp;
+   ideal i=imap(s6,ei);
+   reg_curve(i);
+//
+*/
+//////////////////////////////////////////////////////////////////////////////
+//
+proc reg_moncurve (list #)
+"
+USAGE:   reg_moncurve (a0,...,an) ; ai integers with a0=0 < a1 < ... < an=:d
+RETURN:  an integer, the Castelnuovo-Mumford regularity of the projective
+         monomial curve C in Pn parametrically defined by:
+               x(0)=t^d , x(1)=s^(a1)t^(d-a1), ... , x(n)=s^d.
+ASSUME:  a0=0 < a1 < ... < an are integers and the base field is infinite.
+NOTE:    The defining ideal I(C) in S is determined using elimination.
+         The procedure reg_curve is improved in this case since one
+         knows beforehand that the dimension is 2, that the variables are
+         in Noether position, that I(C) is prime.
+         If printlevel > 0 (default = 0) additional information is displayed.
+         In particular, says if C is arithmetically Cohen-Macaulay or not,
+         determines in which step of a minimal graded free resolution of I(C)
+         the regularity is attained, and sometimes gives the value of the
+         regularity of the Hilbert function of S/I(C) (otherwise, an upper
+         bound is given).
+EXAMPLE: example reg_moncurve; shows some examples
+"
+{
+//--------------------------- initialisation ---------------------------------
+   int ii,jj,H,HR,dd,h,hh,hm,sK,time,ttime;
+   int n = size(#)-1;
+//------------------  Check assumptions on integers  -------------------------
+   if ( #[1] != 0 )
+   {"// WARNING from proc reg_moncurve from lib mregular.lib:
+// USAGE: your input must be a list of integers a0,a1,...,an such that
+// a0=0 < a1 < a2 < ... < an";
+      return(-1);
+   }
+   for ( ii=1; ii<= n; ii++ )
+   {
+      if ( #[ii] >= #[ii+1] )
+      {
+      "// WARNING from proc reg_moncurve from lib mregular.lib:
+// USAGE: your input must be a list of integers a0,a1,...,an such that
+// a0=0 < a1 < a2 < ... < an";
+      return(-1);
+      }
+   }
+   ring r4=0,(x(0..n),s,t),dp;
+   ideal param,m,i;
+   poly f(0..n);
+   for (ii=0;ii<=n;ii++)
+      {
+      f(ii)=s^(#[n+1]-#[ii+1])*t^(#[ii+1]);
+      param=param+f(ii);
+      }
+   m=subst(maxideal(1),s,0);
+   m=simplify(subst(m,t,0),2);
+   i=m-param;
+   ttime=rtimer;
+   i=eliminate(i,st);
+   ring r1=0,(x(1..n),x(0)),dp;
+   ideal i,I,I0,K;
+   i=imap(r4,i);
+   ttime=rtimer-ttime;
+   time=rtimer;
+   I=lead(std(i));
+   attrib(I,"isSB",1);
+   I0 = subst(I,x(n),0);
+   K= select(I,n);
+   sK=size(K);
+   ring r2=0,x(1..n-1),dp;
+   ideal I0,qq,ki,mov;
+   I0 = imap(r1,I0);
+   qq=quotient(I0,maxideal(1));
+   H=maxdeg1(qq)+1;
+//------------------ Cohen-Macaulay case ------------
+   if (sK == 0)
+   {
+   time=rtimer-time;
+// Additional information:
+   dbprint(printlevel-voice+2,
+"// Sequence of integers defining a monomial curve C in P" + string(n) + ":");
+   dbprint(printlevel-voice+2,
+"//   - time for computing ideal I(C) of S (elimination): "
+             + string(ttime) + " sec.");
+   dbprint(printlevel-voice+2,
+"//   - C is arithm. Cohen-Macaulay: YES");
+   dbprint(printlevel-voice+2,
+"//   - reg(C) attained at the last step of a m.g.f.r. of I(C): YES");
+   dbprint(printlevel-voice+2,
+"//   - regularity of the Hilbert function of S/I(C): " + string(H-2));
+   dbprint(printlevel-voice+2,
+"//   - time for computing reg(C): " + string(time) + " sec.");
+   dbprint(printlevel-voice+2,
+"// Castelnuovo-Mumford regularity of C:");
+   return(H);
+   }
+//------------ non Cohen-Macaulay case : computation of HR=H(R)+1 -------
+//First, order elements in K
+   ring r3=0,(x(n),x(0),x(1..n-1)),lp;
+   ideal K,KK,ki;
+   K=imap(r1,K);
+   KK=sort(K)[1];
+//The first step is different to avoid to compute quotient(I0,max) twice
+   ki=subst(KK[1],x(n),1);
+   dd=leadexp(KK[1])[1];
+   setring r2;
+   ki=imap(r3,ki);
+   attrib(ki,"isSB",1);
+   for    (jj=1; jj<= size(qq); jj++)
+       {
+       if ( reduce(qq[jj],ki)== 0 )
+          { hm=deg(qq[jj]);
+            if ( hm > hh)
+            { hh = hm; }
+          }
+       }
+   HR=hh+dd;
+//If K has more than 1 element, recursive steps to compute HR
+   setring r1;
+   if (size(K) != 1)
+   {
+   setring r2;
+   mov=I0+ki;
+   setring r3;
+   for (ii=2; ii<= size(KK); ii++)
+     {
+       ki=subst(KK[ii],x(n),1);
+       dd=leadexp(KK[ii])[1];
+       setring r2;
+       qq=quotient(mov,maxideal(1));
+       ki=imap(r3,ki);
+       attrib(ki,"isSB",1);
+       hh=0;
+       for    (jj=1; jj<= size(qq); jj++)
+       {
+           if ( reduce(qq[jj],ki)==0 )
+              { hm=deg(qq[jj]);
+                if ( hm > hh)
+                { hh = hm; }
+              }
+       }
+       hh=hh+dd;
+       if ( hh > HR )
+       { HR=hh; }
+       mov=mov+ki;
+       setring r3;
+     }
+   }
+//Now one has HR=H(R)+1 and H=H(E) and one can conclude:
+  time=rtimer-time;
+  if( HR > H )
+  {
+// Additional information:
+   dbprint(printlevel-voice+2,
+"// Sequence of integers defining a monomial curve C in P"+string(n)+":");
+   dbprint(printlevel-voice+2,
+"//   - time for computing ideal I(C) of S (elimination): "
+            + string(ttime) + " sec.");
+   dbprint(printlevel-voice+2,
+"//   - C is arithm. Cohen-Macaulay: NO");
+   dbprint(printlevel-voice+2,
+"//   - reg(C) attained at the last step of a m.g.f.r. of I(C): YES");
+   dbprint(printlevel-voice+2,
+"//   - regularity of the Hilbert function of S/I(C): " + string(HR-1));
+   dbprint(printlevel-voice+2,
+"//   - time for computing reg(C): "+ string(time) + " sec.");
+   dbprint(printlevel-voice+2,
+"// Castelnuovo-Mumford regularity of C:");
+   return(HR);
+  }
+  if( HR < H )
+  {
+// Additional information:
+   dbprint(printlevel-voice+2,
+"// Sequence of integers defining a monomial curve C in P"+string(n)+":");
+   dbprint(printlevel-voice+2,
+"//   - time for computing ideal I(C) of S (elimination): "
+        + string(ttime) + " sec.");
+   dbprint(printlevel-voice+2,
+"//   - C is arithm. Cohen-Macaulay: NO");
+   dbprint(printlevel-voice+2,
+"//   - reg(C) attained at the last step of a m.g.f.r. of I(C): NO");
+   dbprint(printlevel-voice+2,
+"//   - reg(C) attained at the second last step of a m.g.f.r. of I(C): YES");
+   dbprint(printlevel-voice+2,
+"//   - regularity of the Hilbert function of S/I(C): striclty smaller than "
+          + string(H-1));
+   dbprint(printlevel-voice+2,
+"//   - time for computing reg(C): " + string(time) + " sec.");
+   dbprint(printlevel-voice+2,
+"// Castelnuovo-Mumford regularity of C:");
+   return(H);
+  }
+  if( HR == H )
+  {
+// Additional information:
+   dbprint(printlevel-voice+2,
+"// Sequence of integers defining a monomial curve C in P"+string(n)+":");
+   dbprint(printlevel-voice+2,
+"//   - time for computing ideal I(C) of S (elimination): "
+          + string(ttime) + " sec.");
+   dbprint(printlevel-voice+2,
+"//   - C is arithm. Cohen-Macaulay: NO");
+   dbprint(printlevel-voice+2,
+"//   - reg(C) attained at the last step of a m.g.f.r. of I(C): YES");
+   dbprint(printlevel-voice+2,
+"//   - reg(C) attained at the second last step of a m.g.f.r. of I(C): YES");
+   dbprint(printlevel-voice+2,
+"//   - regularity of the Hilbert function of S/I(C): " + string(HR-1));
+   dbprint(printlevel-voice+2,
+"//   - time for computing reg(C): " + string(time) + " sec.");
+   dbprint(printlevel-voice+2,
+"// Castelnuovo-Mumford regularity of C:");
+   return(HR);
+  }
+}
+example
+{ "EXAMPLE:"; echo = 2;
+// The 1st example is the twisted cubic:
+   reg_moncurve(0,1,2,3);
+// The 2nd. example is the non arithm. Cohen-Macaulay monomial curve in P4
+// parametrized by: x(0)-s6,x(1)-s5t,x(2)-s3t3,x(3)-st5,x(4)-t6:
+   reg_moncurve(0,1,3,5,6);
+// Additional information can be obtained as follows:
+   printlevel = 1;
+   reg_moncurve(0,1,3,5,6);
+}
+/*
+Out-commented examples:
+//
+// The sequence of integers must be strictly increasing
+// and the first integer is 0:
+   reg_moncurve(1,4,6,9);
+   reg_moncurve(0,3,8,5,23);
+   reg_moncurve(0,4,7,7,9);
+//
+// A curve in P3 s.t. the regularity is attained at the last step:
+   reg_moncurve(0,2,12,15);
+//
+// A curve in P4 s.t. the regularity attained at the last but one
+// but NOT at the last step:
+   reg_moncurve(0,5,9,11,20);
+//
+// A curve in P8 s.t. the m.g.f.r. of the defining ideal could not be obtained
+// by the command mres:
+   reg_moncurve(0,1,2,3,9,11,18,24,25);
+//
+// A curve in P11 of degree 37:
+   reg_moncurve(0,1,2,7,16,17,25,27,28,30,36,37);
+// It takes some time to compute the eliminated ideal; the computation of
+// the regularity is then rather fast as one can check using proc_curve:
+   ring q=0,(s,t,x(0..11)),dp;
+   ideal i=x(0)-st36,x(1)-s2t35,x(2)-s7t30,x(3)-s16t21,x(4)-s17t20,x(5)-s25t12
+           x(6)-s27t10,x(7)-s28t9,x(8)-s30t7,x(9)-s36t,x(10)-s37,x(11)-t37;
+   ideal ei=eliminate(i,st);
+   ring qq=0,x(0..11),dp;
+   ideal i=imap(q,ei);
+   reg_curve(i,1);
+//
+// A curve in P14 of degree 55:
+   reg_moncurve(0,1,2,7,16,17,25,27,28,30,36,37,40,53,55);
+// In the last three examples, the m.g.f.r. could not be obtained using mres.
+//
+*/
+//
+//////////////////////////////////////////////////////////////////////////////
+//

@@ -1,10 +1,10 @@
-// $Id: latex.lib,v 1.10 1999-09-21 17:32:16 Singular Exp $
+// $Id: latex.lib,v 1.11 2000-08-03 16:24:41 greuel Exp $
 //                        1998/04/17
 // author : Christian Gorzel email: gorzelc@math.uni-muenster.de
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: latex.lib,v 1.10 1999-09-21 17:32:16 Singular Exp $";
+version="$Id: latex.lib,v 1.11 2000-08-03 16:24:41 greuel Exp $";
 info="
 LIBRARY: latex.lib    PROCEDURES FOR TYPESET OF SINGULAROBJECTS IN LATEX2E
 
@@ -137,7 +137,7 @@ example
   echo = 0;
   pause("the created files will be deleted after pressing <RETURN>");
   echo = 2;
-  system("sh","rm -i exp00?.*");
+  system("sh","rm exp00?.*");
 }
 ///////////////////////////////////////////////////////////////////////////////
 
