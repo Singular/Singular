@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: attrib.h,v 1.6 2000-08-14 12:55:54 obachman Exp $ */
+/* $Id: attrib.h,v 1.7 2004-06-16 12:18:12 Singular Exp $ */
 /*
 * ABSTRACT: attributes to leftv and idhdl
 */
@@ -33,6 +33,8 @@ class sattr
 
 void * atGet(idhdl root,char * name);
 void * atGet(leftv root,char * name);
+void * atGet(idhdl root,char * name, int t);
+void * atGet(leftv root,char * name, int t);
 void atSet(idhdl root,char * name,void * data,int typ);
 void atSet(leftv root,char * name,void * data,int typ);
 void atKillAll(idhdl root);

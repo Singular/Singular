@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: attrib.cc,v 1.21 2003-05-31 14:12:45 Singular Exp $ */
+/* $Id: attrib.cc,v 1.22 2004-06-16 12:18:13 Singular Exp $ */
 
 /*
 * ABSTRACT: attributes to leftv and idhdl
@@ -154,6 +154,29 @@ void * atGet(leftv root,char * name)
     return NULL;
 }
 
+void * atGet(idhdl root,char * name, int t)
+{
+  attr temp = root->attribute->get(name);
+  if ((temp!=NULL) && (temp->atyp==t))
+    return temp->data;
+  else
+    return NULL;
+}
+
+void * atGet(leftv root,char * name, int t)
+{
+  attr temp = root->attribute->get(name);
+  if ((temp==NULL) && (root->rtyp==IDHDL))
+  {
+    idhdl h=(idhdl)root->data;
+    temp=h->attribute->get(name);
+  }
+  if ((temp!=NULL) && (temp->atyp==t))
+    return temp->data;
+  else
+    return NULL;
+}
+
 void atSet(idhdl root,char * name,void * data,int typ)
 {
   if (root!=NULL)
@@ -259,6 +282,7 @@ void atKillAll(idhdl root)
 BOOLEAN atATTRIB1(leftv res,leftv a)
 {
   leftv v=a;
+  int t;
   if (a->e!=NULL)
   {
     v=a->LData();
@@ -270,6 +294,10 @@ BOOLEAN atATTRIB1(leftv res,leftv a)
     PrintS("attr:isSB, type int\n");
     if (at!=NULL) at->Print();
   }
+  else if (((t=v->Typ())==RING_CMD)||(t==QRING_CMD))
+  {
+    PrintS("attr:global, type int\n");
+  }
   else
   {
     if (at!=NULL) at->Print();
@@ -280,6 +308,7 @@ BOOLEAN atATTRIB1(leftv res,leftv a)
 BOOLEAN atATTRIB2(leftv res,leftv a,leftv b)
 {
   char *name=(char *)b->Data();
+  int t;
   leftv v=a;
   if (a->e!=NULL)
   {
@@ -295,6 +324,12 @@ BOOLEAN atATTRIB2(leftv res,leftv a,leftv b)
   {
     res->rtyp=INT_CMD;
     res->data=(void *)(((ideal)v->Data())->rank);
+  }
+  else if ((strcmp(name,"global")==0)
+  &&(((t=v->Typ())==RING_CMD)||(t==QRING_CMD)))
+  {
+    res->rtyp=INT_CMD;
+    res->data=(void *)(((ring)v->Data())->OrdSgn==1);
   }
   else
   {
@@ -315,6 +350,7 @@ BOOLEAN atATTRIB2(leftv res,leftv a,leftv b)
 BOOLEAN atATTRIB3(leftv res,leftv a,leftv b,leftv c)
 {
   idhdl h=(idhdl)a->data;
+  int t;
   leftv v=a;
   if (a->e!=NULL)
   {
@@ -351,6 +387,12 @@ BOOLEAN atATTRIB3(leftv res,leftv a,leftv b,leftv c)
     }
     ideal I=(ideal)v->Data();
     I->rank=max((int)I->rank,(int)c->Data());
+  }
+  else if ((strcmp(name,"global")==0)
+  &&(((t=v->Typ())==RING_CMD)||(t==QRING_CMD)))
+  {
+    WerrorS("can not set attribut `global`");
+    return TRUE;
   }
   else
   {
@@ -389,6 +431,11 @@ BOOLEAN atKILLATTR2(leftv res,leftv a,leftv b)
   {
     resetFlag(a,FLAG_STD);
     resetFlag((idhdl)a->data,FLAG_STD);
+  }
+  else if (strcmp(name,"global")==0)
+  {
+    WerrorS("can not set attribut `global`");
+    return TRUE;
   }
   else
   {
