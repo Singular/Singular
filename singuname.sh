@@ -168,7 +168,7 @@ then
         exit 1
     fi
 # itanium ########################################################
-elif (echo $uname_a | $egrep "itanium" > $devnull)
+elif (echo $uname_a | $egrep "ia64" > $devnull)
 then
     # IA64-HPUX: see HPUX
     prefix=IA64
