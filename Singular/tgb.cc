@@ -4691,6 +4691,8 @@ static void multi_reduction_lls_trick(red_object* los, int losl,calc_dat* c,find
     {
       c->S->m[pos_in_c]=clear_into;
       c->lengths[pos_in_c]=new_length;
+      if (c->T_deg_full)
+	c->T_deg_full[pos_in_c]=pTotaldegree_full(clear_into);
       c_S_element_changed_hook(pos_in_c,c);
     }
     c->strat->S[j]=clear_into;
