@@ -1,7 +1,7 @@
-// $Id: standard.lib,v 1.24 1998-06-18 18:15:20 Singular Exp $
+// $Id: standard.lib,v 1.25 1998-06-19 08:01:51 Singular Exp $
 //////////////////////////////////////////////////////////////////////////////
 
-version="$Id: standard.lib,v 1.24 1998-06-18 18:15:20 Singular Exp $";
+version="$Id: standard.lib,v 1.25 1998-06-19 08:01:51 Singular Exp $";
 info="
 LIBRARY: standard.lib   PROCEDURES WHICH ARE ALWAYS LOADED AT START-UP
 
@@ -9,7 +9,7 @@ LIBRARY: standard.lib   PROCEDURES WHICH ARE ALWAYS LOADED AT START-UP
  stdhilb(ideal)         standard basis of the ideal using the Hilbert function
  groebner(ideal/module) standard basis of ideal or module using a
                         heuristically choosen method
- quotient(any,any[,n])  a general quotient procedure calling several algorithms
+ quot(any,any[,n])  a general quotient procedure calling several algorithms
                   allows module/module, ideal/ideal, module/ideal and a
                   pre-definition of the algorithm by the parameter n
  quotient1(m1,m2) computes quotients by every vector of m2 and intersects them
@@ -459,8 +459,8 @@ proc res(list #)
    return(result);
 }
 
-proc quotient (m1,m2,list #)
-"USAGE:   quotient(m1, m2[, n]); m1, m2 two submodules of k^s,
+proc quot (m1,m2,list #)
+"USAGE:   quot(m1, m2[, n]); m1, m2 two submodules of k^s,
          n (optional) integer (1<= n <=5)
 RETURN:  the quotient of m1 and m2
 EXAMPLE: example quot; shows an example"
@@ -468,7 +468,7 @@ EXAMPLE: example quot; shows an example"
   if (((typeof(m1)!="ideal") and (typeof(m1)!="module"))
      or ((typeof(m2)!="ideal") and (typeof(m2)!="module")))
   {
-    "USAGE:   quotient(m1, m2[, n]); m1, m2 two submodules of k^s,";
+    "USAGE:   quot(m1, m2[, n]); m1, m2 two submodules of k^s,";
     "         n (optional) integer (1<= n <=5)";
     "RETURN:  the quotient of m1 and m2";
     "EXAMPLE: example quot; shows an example";
@@ -476,7 +476,7 @@ EXAMPLE: example quot; shows an example"
   }
   if (typeof(m1)!=typeof(m2))
   {
-    return(quot(m1,m2));
+    return(quotient(m1,m2));
   }
   if (size(#)>0)
   {
@@ -496,11 +496,11 @@ example
   ideal id1=maxideal(4);
   ideal id2=x2+xyz,y2-z3y,z3+y5xz;
   option(prot);
-  ideal id6=quot(id1,id2);
+  ideal id6=quotient(id1,id2);
   id6;
-  ideal id7=quotient(id1,id2,1);
+  ideal id7=quot(id1,id2,1);
   id7;
-  ideal id8=quotient(id1,id2,2);
+  ideal id8=quot(id1,id2,2);
   id8;
 }
 
@@ -508,7 +508,7 @@ static proc quot1 (module m1, module m2,int n)
 "USAGE:   quot1(m1, m2, n); m1, m2 two submodules of k^s,
          n integer (1<= n <=5)
 RETURN:  the quotient of m1 and m2
-EXAMPLE: example quot; shows an example"
+EXAMPLE: example quot1; shows an example"
 {
   if (n==1)
   {
@@ -553,7 +553,7 @@ example
   ideal id1=maxideal(4);
   ideal id2=x2+xyz,y2-z3y,z3+y5xz;
   option(prot);
-  ideal id6=quot(id1,id2);
+  ideal id6=quotient(id1,id2);
   id6;
   ideal id7=quot1(id1,id2,1);
   id7;
@@ -564,7 +564,7 @@ example
 static proc quotient0(module a,module b)
 {
   module mm=b+a;
-  resolution rs=system("LaScala",mm);
+  resolution rs=lres(mm,0);
   list I=list(rs);
   matrix M=I[2];
   matrix A[1][nrows(M)]=M[1..nrows(M),1];
@@ -579,10 +579,10 @@ RETURN:  the quotient of m1 and m2"
   a=std(a);
   module dummy;
   module B=NF(b,a)+dummy;
-  ideal re=quot(a,module(B[1]));
+  ideal re=quotient(a,module(B[1]));
   for(i=2;i<=size(B);i++)
   {
-     re=intersect1(re,quot(a,module(B[i])));
+     re=intersect1(re,quotient(a,module(B[i])));
   }
   return(re);
 }
@@ -594,7 +594,7 @@ RETURN:  the quotient of m1 and m2"
   module dummy;
   module bb=NF(b,a)+dummy;
   int i=size(bb);
-  ideal re=(quot(a,module(bb[i])));
+  ideal re=quotient(a,module(bb[i]));
   bb[i]=0;
   module temp;
   module temp1;
@@ -614,7 +614,7 @@ RETURN:  the quotient of m1 and m2"
     temp1 = matrix(temp1,1,mx)-matrix(lead(a),1,mx);
     temp1 = dummy+temp1;
     if (deg(temp1[1])<0) break;
-    re=(intersect1(re,quot(a,module(bb[i]))));
+    re=intersect1(re,quotient(a,module(bb[i])));
     bb[i]=0;
     i = i-1;
   }
@@ -638,7 +638,7 @@ RETURN:  the quotient of m1 and m2"
   {
      @b=@b+@t^(i-1)*@w^(j-i+1)*b[i];
   }
-  ideal re=quot(a,module(@b));
+  ideal re=quotient(a,module(@b));
   setring @newP;
   ideal re=imap(@newr,re);
   return(re);
@@ -662,7 +662,7 @@ RETURN:  the quotient of m1 and m2"
      @b=@b+@t^(i-1)*b[i];
   }
   @b=homog(@b,@w);
-  ideal re=quot(a,module(@b));
+  ideal re=quotient(a,module(@b));
   setring @newP;
   ideal re=imap(@newr,re);
   return(re);
