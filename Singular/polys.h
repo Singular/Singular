@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.25 1999-10-14 12:50:27 Singular Exp $ */
+/* $Id: polys.h,v 1.26 1999-10-15 16:07:10 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
 */
@@ -350,8 +350,8 @@ BOOLEAN pDBTest(poly p, char *f, int l);
 BOOLEAN pDBTest(poly p, memHeap tail_heap, char *f, int l);
 BOOLEAN pDBTest(poly p,  memHeap tail_heap, memHeap lm_heap, char *f, int l);
 #else
-#define pHeapTest(A,B)
-#define pTest(A)
-#define pDBTest(A,B,C)
+#define pHeapTest(A,B)  (TRUE)
+#define pTest(A)        (TRUE)
+#define pDBTest(A,B,C)  (TRUE)
 #endif
 #endif

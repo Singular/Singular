@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmcheck.c,v 1.11 1999-10-14 17:59:33 Singular Exp $ */
+/* $Id: mmcheck.c,v 1.12 1999-10-15 16:07:08 obachman Exp $ */
 
 /*
 * ABSTRACT: several checking routines to help debugging the memory subsystem
@@ -244,7 +244,6 @@ static int mmCheckSingleDBMCB ( DBMCB * what, int size , int flags)
   char * patptr;
   int i;
   int ok=1;
-
   if ( ((long)what % 4 ) != 0 )
   {
     fprintf( stderr, "warning: odd address\n" );
@@ -392,7 +391,10 @@ static int mmCheckSingleDBMCB ( DBMCB * what, int size , int flags)
   {
     return mmPrintDBMCB( what, "see above", 0 );
   }
-
+  if (mm_markCurrentUsage == 1)
+  {
+    what->flags |= MM_CURRENTLY_USEDFLAG;
+  }
   return 1;
 }
 
@@ -621,15 +623,18 @@ void mmMarkCurrentUsageStop()
 void mmPrintUnMarkedBlocks()
 {
   DBMCB* what = mm_theDBused.next;
+  int found = 0;
   while (what != NULL)
   {
     if (! (what->flags & MM_CURRENTLY_USEDFLAG))
     {
       mmPrintDBMCB(what, "unused", 0);
       what->flags |= MM_CURRENTLY_USEDFLAG;
+      found = 1;
     }
     what = what->next;
   }
+  if (found) fprintf(stderr, "\nFinished found\n");
 }
 
 void mmStartReferenceWatch()

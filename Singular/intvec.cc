@@ -1,11 +1,12 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: intvec.cc,v 1.13 1999-06-28 16:06:23 Singular Exp $ */
+/* $Id: intvec.cc,v 1.14 1999-10-15 16:07:06 obachman Exp $ */
 /*
 * ABSTRACT: class intvec: lists/vectors of integers
 */
-
+#ifndef INTVEC_CC
+#define INTVEC_CC
 #include "mod2.h"
 #include "tok.h"
 #include "febase.h"
@@ -538,3 +539,5 @@ intvec * ivSolveIntMat(intvec * imat)
   delete basesol;
   return result;
 }
+
+#endif

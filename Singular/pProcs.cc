@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: pProcs.cc,v 1.7 1999-10-14 14:27:26 obachman Exp $ */
+/* $Id: pProcs.cc,v 1.8 1999-10-15 16:07:09 obachman Exp $ */
 /*
 *  ABSTRACT -  Routines for primitive poly arithmetic
 */
@@ -48,7 +48,7 @@ poly p_Mult_n_General(poly p, number n)
   {
     number nc = pGetCoeff(p);
     pSetCoeff0(p, nMult(n, nc));
-//    nDelete(&nc);
+    nDelete(&nc);
     pIter(p);
   }
   return q;
@@ -185,8 +185,6 @@ poly  p_Mult_m_General(poly p,
       pNext(q) = AllocHeap(heap);
       q = pNext(q);
       pSetCoeff0(q, nMult(ln, pGetCoeff(p)));
-    
-      assume(pGetComp(m) == 0 || pGetComp(p) == 0);
       pMonAdd(q, p, m);
       p = pNext(p);
     }
@@ -197,7 +195,6 @@ poly  p_Mult_m_General(poly p,
     while (p != NULL)
     {
       r = AllocHeap(heap);
-      assume(pGetComp(m) == 0 || pGetComp(p) == 0);
       pMonAdd(r, p, m);
 
       if (pComp0(r, spNoether) == -1)
@@ -216,6 +213,8 @@ poly  p_Mult_m_General(poly p,
 
   return pNext(&rp);
 }
+
+// #define TRACK_MEMORY
 
 /***************************************************************
  *
@@ -236,6 +235,7 @@ poly p_Minus_m_Mult_q_General (poly p,
 {
 #ifdef TRACK_MEMORY
   mmMarkCurrentUsageState();
+  mmMarkCurrentUsageStop();
   poly ptemp = pCopy(p);
   pDelete(&p);
   p = ptemp;
@@ -345,11 +345,9 @@ poly p_Minus_m_Mult_q_General (poly p,
    
 #ifdef TRACK_MEMORY
    mmMarkCurrentUsageStart();
-   ptemp = pCopy(rp.next);
-   pDelete(&(rp.next));
-   rp.next = ptemp;
-   mmMarkCurrentUsageStop();
+   assume(pHeapTest(pNext(&rp), heap));
    mmPrintUnMarkedBlocks();
+   mmMarkCurrentUsageStop();
 #endif
    
   return pNext(&rp);

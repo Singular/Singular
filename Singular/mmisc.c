@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmisc.c,v 1.14 1999-10-14 14:27:20 obachman Exp $ */
+/* $Id: mmisc.c,v 1.15 1999-10-15 16:07:09 obachman Exp $ */
 
 /*
 * ABSTRACT:
@@ -13,6 +13,7 @@
 #include "mmpage.h"
 #include "febase.h"
 #include "distrib.h"
+#include "tok.h"
 
 #ifdef MTRACK
 #include "mmbt.h"
@@ -150,10 +151,20 @@ void mmDebugUnGetTemHeap(memHeap *heap_p, char* file, int line)
  
 void mmGarbageCollectHeaps(int strict)
 {
+  int show_mem = BVERBOSE(V_SHOW_MEM);
   int i;
   int s_strict = strict & 1;
   memSpecHeap s_heap;
   s_heap = mm_SpecHeaps;
+  
+  if (show_mem)
+  {
+    fprintf(stdout, "[%dk]:{%dk}gc", 
+            (mm_bytesValloc + mm_bytesMalloc + 1023)/1024,
+            (mmMemUsed()+1023)/1024);
+    fflush(stdout);
+    verbose &= ~Sy_bit(V_SHOW_MEM);
+  }
   while (s_heap != NULL)
   {
     mmGarbageCollectHeap(s_heap->heap, s_strict);
@@ -173,6 +184,14 @@ void mmGarbageCollectHeaps(int strict)
     mmGarbageCollectHeap(&mm_theList[i], s_strict);
   }
   if (strict & 2) mmReleaseFreePages();
+  if (show_mem)
+  {
+    fprintf(stdout, "[%dk]:{%dk}", 
+            (mm_bytesValloc + mm_bytesMalloc + 1023)/1024,
+            (mmMemUsed()+1023)/1024);
+    fflush(stdout);
+    verbose |= Sy_bit(V_SHOW_MEM);
+  }
 }
   
 size_t mmSizeL( void* adr )

@@ -1,10 +1,13 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: lists.cc,v 1.18 1999-10-14 14:27:14 obachman Exp $ */
+/* $Id: lists.cc,v 1.19 1999-10-15 16:07:08 obachman Exp $ */
 /*
 * ABSTRACT: handling of the list type
 */
+#ifndef LISTS_CC
+#define LISTS_CC
+
 #include "mod2.h"
 #include "tok.h"
 #include "febase.h"
@@ -399,3 +402,5 @@ char* lString(lists l, BOOLEAN typed, int dim)
   Free(slist, (l->nr+1) * sizeof(char*));
   return s;
 }
+
+#endif /* LISTS_CC */

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.34 1999-10-14 14:27:12 obachman Exp $ */
+/* $Id: kstd2.cc,v 1.35 1999-10-15 16:07:06 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -376,7 +376,6 @@ static void redHomog (LObject* h,kStrategy strat)
 
     // now we found one which is divisible
     ksReducePoly(h, &(strat->T[j]), strat->kNoether);
-
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG)
     {
@@ -964,11 +963,9 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       if (TEST_OPT_PROT) message(pFDeg(strat->P.p),&olddeg,&reduc,strat);
     }
     /* reduction of the element choosen from L */
-    kTest_Pref(strat);
     strat->red(&strat->P,strat);
     if (strat->P.p != NULL)
     {
-      kTest(strat);
       /* statistic */
       if (TEST_OPT_PROT) PrintS("s");
       /* enter P.p into s and L */
@@ -980,7 +977,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
             if ((!TEST_OPT_MINRES)||(strat->syzComp==0)||(!strat->homog))
             {
               strat->P.p = redtailBba(strat->P.p,pos-1,strat);
-              //if (strat->redTailChange)
+              // if (strat->redTailChange)
               pCleardenom(strat->P.p);
             }
           }
@@ -990,7 +987,6 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
             if ((!TEST_OPT_MINRES)||(strat->syzComp==0)||(!strat->homog))
             {
               strat->P.p = redtailBba(strat->P.p,pos-1,strat);
-              kTest(strat);
             }
           }
           if (TEST_OPT_DEBUG)
@@ -1022,7 +1018,6 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       }
       if (strat->P.lcm!=NULL) pFree1(strat->P.lcm);
       if (strat->sl>srmax) srmax = strat->sl;
-      kTest(strat);
     }
 #ifdef KDEBUG
     strat->P.lcm=NULL;

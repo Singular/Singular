@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.47 1999-10-14 17:59:34 Singular Exp $ */
+/* $Id: polys.cc,v 1.48 1999-10-15 16:07:09 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -1580,49 +1580,66 @@ void pNormalize(poly p)
   }
 }
 
+// splits p into polys with Exp(n) == 0 and Exp(n) != 0
+// Poly with Exp(n) != 0 is reversed
+static void pSplitAndReversePoly(poly p, int n, poly *non_zero, poly *zero)
+{
+  if (p == NULL)
+  {
+    *non_zero = NULL;
+    *zero = NULL;
+    return;
+  }
+  spolyrec sz;
+  poly z, n_z, next;
+  z = &sz;
+  n_z = NULL;
+
+  while(p != NULL)
+  {
+    next = pNext(p);
+    if (pGetExp(p, n) == 0)
+    {
+      pNext(z) = p;
+      pIter(z);
+    }
+    else
+    {
+      pNext(p) = n_z;
+      n_z = p;
+    }
+    p = next;
+  }
+  pNext(z) = NULL;
+  *zero = pNext(&sz);
+  *non_zero = n_z;
+  return;
+}
+  
 /*3
 * substitute the n-th variable by 1 in p
 * destroy p
 */
 static poly pSubst1 (poly p,int n)
 {
-  if (p == NULL) return NULL;
-  if (pNext(p) == NULL)
-  {
-    if (pGetExp(p, n) != 0)
-    {
-      pSetExp(p, n, 0);
-      pSetm(p);
-    }
-    return p;
-  }
+  poly qq,result = NULL;
+  poly zero, non_zero;
 
-  int l = pLength(p) - 1;
-  poly* monoms = (poly*) Alloc(l*sizeof(poly));
-  int i;
+  // reverse, so that add is likely to be linear
+  pSplitAndReversePoly(p, n, &non_zero, &zero);
 
-  for (i=0; i<l; i++)
+  while (non_zero != NULL)
   {
-    if (pGetExp(p, n) != 0)
-    {
-      pSetExp(p, n, 0);
-      pSetm(p);
-    }
-    monoms[i] = p;
-    pIter(p);
+    assume(pGetExp(non_zero, n) != 0);
+    qq = non_zero;
+    pIter(non_zero);
+    qq->next = NULL;
+    pSetExp(qq,n,0);
+    pSetm(qq);
+    result = pAdd(result,qq);
   }
-  if (pGetExp(p, n) != 0)
-  {
-    pSetExp(p, n, 0);
-    pSetm(p);
-  }
-  for (i = l-1; i >= 0; i--)
-  {
-    pNext(monoms[i]) = NULL;
-    p = pAdd(p, monoms[i]);
-  }
+  p = pAdd(result, zero);
   pTest(p);
-  Free(monoms, l*sizeof(poly));
   return p;
 }
 
@@ -1632,65 +1649,35 @@ static poly pSubst1 (poly p,int n)
 */
 static poly pSubst2 (poly p,int n, number e)
 {
-  number nn, nm;
-  int exp;
   assume( ! nIsZero(e) );
+  poly qq,result = NULL;
+  number nn, nm;
+  poly zero, non_zero;
 
-  if (p == NULL) return NULL;
-  if (pNext(p) == NULL)
-  {
-    exp = pGetExp(p, n);
-    if (exp != 0)
-    {
-      nPower(e, exp, &nn);
-      nm = nMult(nn, pGetCoeff(p));
-      pSetCoeff(p, nm);
-      nDelete(&nn);
-      pSetExp(p, n, 0);
-      pSetm(p);
-    }
-    return p;
-  }
+  // reverse, so that add is likely to be linear
+  pSplitAndReversePoly(p, n, &non_zero, &zero);
 
-  int l = pLength(p) - 1;
-  poly* monoms = (poly*) Alloc(l*sizeof(poly));
-  int i;
-
-  for (i=0; i<l; i++)
+  while (non_zero != NULL)
   {
-    exp = pGetExp(p, n);
-    if (exp != 0)
-    {
-      nPower(e, exp, &nn);
-      nm = nMult(nn, pGetCoeff(p));
-      pSetCoeff(p, nm);
-      nDelete(&nn);
-      pSetExp(p, n, 0);
-      pSetm(p);
-    }
-    monoms[i] = p;
-    pIter(p);
-  }
-  exp = pGetExp(p, n);
-  if (exp != 0)
-  {
-    nPower(e, exp, &nn);
-    nm = nMult(nn, pGetCoeff(p));
-    pSetCoeff(p, nm);
+    assume(pGetExp(non_zero, n) != 0);
+    qq = non_zero;
+    pIter(non_zero);
+    qq->next = NULL;
+    nPower(e, pGetExp(qq, n), &nn);
+    nm = nMult(nn, pGetCoeff(qq));
+    pSetCoeff(qq, nm);
     nDelete(&nn);
-    pSetExp(p, n, 0);
-    pSetm(p);
+    pSetExp(qq, n, 0);
+    pSetm(qq);
+    result = pAdd(result,qq);
   }
-  for (i = l-1; i >= 0; i--)
-  {
-    pNext(monoms[i]) = NULL;
-    p = pAdd(p, monoms[i]);
-  }
-  Free(monoms, l*sizeof(poly));
+  p = pAdd(result, zero);
   pTest(p);
   return p;
 }
 
+
+/* delete monoms whose n-th exponent is different from zero */
 poly pSubst0(poly p, int n)
 {
   spolyrec res;

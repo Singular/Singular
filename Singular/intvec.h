@@ -3,13 +3,19 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: intvec.h,v 1.8 1999-06-28 16:06:23 Singular Exp $ */
+/* $Id: intvec.h,v 1.9 1999-10-15 16:07:06 obachman Exp $ */
 /*
 * ABSTRACT: class intvec: lists/vectors of integers
 */
 #include <string.h>
 #include "mmemory.h"
 #include "febase.h"
+
+#ifdef MDEBUG 
+#define INLINE_THIS 
+#else
+#define INLINE_THIS inline
+#endif
 
 class intvec
 {
@@ -18,12 +24,8 @@ class intvec
     int row;
     int col;
   public:
-    intvec(int l=1)
-    {
-      v = (int *)Alloc0(sizeof(int)*l);
-      row = l;
-      col = 1;
-    }
+  INLINE_THIS intvec(int l = 1);
+  
     intvec(int s, int e);
     intvec(int r, int c, int init);
     intvec(intvec* iv);
@@ -89,5 +91,16 @@ void     ivTriangMat(intvec * imat, int srw, int col);
 int      ivFirstEmptyRow(intvec * imat);
 void     ivCancelContent(intvec * imat,int from=1);
 intvec * ivSolveIntMat(intvec * imat);
+
+#if ! defined(MDEBUG) || defined(INTVEC_CC)
+INLINE_THIS intvec::intvec(int l=1)
+{
+  v = (int *)Alloc0(sizeof(int)*l);
+  row = l;
+  col = 1;
+}
+#endif
+
+#undef INLINE_THIS
 
 #endif

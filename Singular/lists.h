@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: lists.h,v 1.10 1999-10-14 14:27:14 obachman Exp $ */
+/* $Id: lists.h,v 1.11 1999-10-15 16:07:08 obachman Exp $ */
 /*
 * ABSTRACT: handling of the list type
 */
@@ -15,6 +15,11 @@
 #include "lists.aso"
 #endif
 
+#ifdef MDEBUG 
+#define INLINE_THIS 
+#else
+#define INLINE_THIS inline
+#endif
 
 class slists
 {
@@ -36,12 +41,7 @@ class slists
         Free((ADDRESS)this, sizeof(slists));
       }
     }
-    inline void Init(int l=0)
-      { nr=l-1; m=(sleftv *)((l>0) ? Alloc0(l*sizeof(sleftv)): NULL);
-#ifdef HAVE_NAMESPACES_N
-        src_packhdl = namespaceroot->get(namespaceroot->name, 0, TRUE);
-#endif /* HAVE_NAMESPACES */
-      }
+  INLINE_THIS void Init(int l=0);
     int    nr; /* the number of elements in the list -1 */
                /* -1: empty list */
 #ifdef HAVE_NAMESPACES_N
@@ -63,4 +63,16 @@ char* lString(lists l, BOOLEAN typed = FALSE, int dim = 1);
 
 lists liMakeResolv(resolvente r, int length, int reallen, int typ0, intvec ** weights);
 resolvente liFindRes(lists L, int * len, int *typ0,intvec *** weights=NULL);
+
+#if ! defined(MDEBUG) || defined(LISTS_CC)
+INLINE_THIS void slists::Init(int l=0)
+      { nr=l-1; m=(sleftv *)((l>0) ? Alloc0(l*sizeof(sleftv)): NULL);
+#ifdef HAVE_NAMESPACES_N
+        src_packhdl = namespaceroot->get(namespaceroot->name, 0, TRUE);
+#endif /* HAVE_NAMESPACES */
+      }
+#endif
+
+#undef INLINE_THIS
+
 #endif
