@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.4 1998-04-27 12:01:42 Singular Exp $
+@comment $Id: types.doc,v 1.5 1998-04-27 13:39:53 Singular Exp $
 @comment this file contains the type definitions
 @menu
 * boolean::
@@ -203,12 +203,12 @@ a typecast to ideal.
 @menu
 * ideal::
 * ideal operations::
-* ideal functions::
+* ideal related functions::
 * implicit type conversions::
 * type casting::
 @end menu
 @iftex
-See @ref{ideal}; @ref{ideal operations}; @ref{ideal functions};
+See @ref{ideal}; @ref{ideal operations}; @ref{ideal related functions};
 @ref{implicit type conversions}; @ref{type casting}.
 @end iftex
 @c <--
@@ -333,7 +333,7 @@ vector space dimension of basering modulo ideal (see @ref{vdim})
 optimal weights (see @ref{weight})
 @end table
 Brackets may be used to access elements of ideals:
-@emph{ideal expression} @code{[} @emph{position} @code{]} is a generator of the ideal.
+@emph{ideal expressions} @code{[} @emph{position} @code{]} is a generator of the ideal.
 
 @c @strong{Example}
 @c @example
@@ -448,10 +448,10 @@ must be converted to the type number over a ring with characteristic 0.
 * implicit type conversions::
 * type casting::
 * int operations::
-* int functions::
+* int related functions::
 @end menu
 @iftex
-See @ref{implicit type conversions}; @ref{type casting}; @ref{int functions}.
+See @ref{implicit type conversions}; @ref{type casting}; @ref{int related functions}.
 @end iftex
 @c <--
 
@@ -605,7 +605,7 @@ A intmat expression is:
 @item
 a list of int expressions, intvec expressions and intmat expressions
 @item
-a function returning intmat (see @ref{intmat functions})
+a function returning intmat (see @ref{intmat related functions})
 @item
 intmat operations with int: @code{+}, @code{-}, @code{*}, @code{/}, @code{%}
 @item
@@ -959,7 +959,7 @@ number of entries (see @ref{size})
 free resolution of an ideal/module given by a standard base (see @ref{sres})
 @end table
 Brackets may be used to access elements of lists:
-@emph{list expression} @code{[} @emph{int expression} @code{]} is a list entry.
+@emph{list expressions} @code{[} @emph{int expressions} @code{]} is a list entry.
 
 @c @strong{Example}
 @c @example
@@ -1148,7 +1148,7 @@ transpose a matrix (see @ref{transpose})
 wedge product (see @ref{wedge})
 @end table
 Brackets may be used to access elements of matrices:
-@emph{matrix expression} @code{[} @emph{row}@code{,} @emph{column} @code{]} is a matrix entry.
+@emph{matrix expressions} @code{[} @emph{row}@code{,} @emph{column} @code{]} is a matrix entry.
 
 @c @strong{Example}
 @c @example
@@ -1569,7 +1569,7 @@ with the operations * and ^
 @item
 an identifier of type poly
 @item
-a function returning poly (see @ref{poly functions})
+a function returning poly (see @ref{poly related functions})
 @item
 an int expression (see @ref{implicit type conversions})
 @item
@@ -1590,12 +1590,12 @@ poly expressions combined by arithmetic operations +,-,*,/ or ^.
 * ring::
 * poly::
 * poly operations::
-* poly functions::
+* poly related functions::
 * implicit type conversions::
 * type casting::
 @end menu
 @iftex
-See @ref{ring}; @ref{poly}; @ref{poly operations}; @ref{poly functions};
+See @ref{ring}; @ref{poly}; @ref{poly operations}; @ref{poly related functions};
 @ref{implicit type conversions}; @ref{type casting}.
 @end iftex
 @c <--
@@ -1686,8 +1686,8 @@ trace of a matrix (see @ref{trace})
 the indicated variable of the ring (see @ref{var})
 @end table
 Brackets may be used to access elements of ideals and matrices:
-@emph{ideal expression} @code{[} @emph{position} @code{]} is a generator of the ideal,
-@emph{matrix expression} @code{[} @emph{row}@code{,} @emph{column} @code{]} is a matrix entry.
+@emph{ideal expressions} @code{[} @emph{position} @code{]} is a generator of the ideal,
+@emph{matrix expressions} @code{[} @emph{row}@code{,} @emph{column} @code{]} is a matrix entry.
 
 @c @strong{Example}
 @c @example
@@ -1899,9 +1899,9 @@ name of the n-th ring variable (see @ref{varstr})
 @end table
 @*
 Brackets may be used to access parts of a string:
-@emph{string expression} @code{[} @emph{position} @code{]} is a character of the string,
-@emph{string expression} @code{[} @emph{position}@code{,} @emph{length} @code{]} is a substring
-and @emph{string expression} @code{[} @emph{intvec} @code{]} ist a list of characters
+@emph{string expressions} @code{[} @emph{position} @code{]} is a character of the string,
+@emph{string expressions} @code{[} @emph{position}@code{,} @emph{length} @code{]} is a substring
+and @emph{string expressions} @code{[} @emph{intvec} @code{]} ist a list of characters
 from the string.
 
 @strong{Example}
@@ -2032,12 +2032,12 @@ combined by arithmetic operation @code{*}.
 * ring::
 * vector::
 * vector operations::
-* vector functions::
+* vector related functions::
 * implicit type conversions::
 * type casting::
 @end menu
 @iftex
-See @ref{ring}; @ref{vector}; @ref{vector operations}; @ref{vector functions};
+See @ref{ring}; @ref{vector}; @ref{vector operations}; @ref{vector related functions};
 @ref{implicit type conversions}; @ref{type casting}.
 @end iftex
 @c <--
