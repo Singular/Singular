@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftmpl_factor.h,v 1.4 1997-06-19 13:11:15 schmidt Exp $ */
+/* $Id: ftmpl_factor.h,v 1.5 1998-06-03 14:51:33 pohl Exp $ */
 
 #ifndef INCL_FACTOR_H
 #define INCL_FACTOR_H
@@ -30,11 +30,13 @@ public:
     Factor<T>& operator+= ( int i ) { _exp += i; return *this; }
     Factor<T>& operator*= ( int i ) { _exp *= i; return *this; }
     Factor<T>& operator*= ( const T & f ) { _factor *= f; return *this; }
-    friend int operator== ( const Factor<T>&, const Factor<T>& );
 #ifndef NOSTREAMIO
     void print ( ostream& ) const;
 #endif /* NOSTREAMIO */
 };
+
+template <class T> int
+operator== ( const Factor<T>&, const Factor<T>& );
 
 #ifndef NOSTREAMIO
 template <class T>
