@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_cf.cc,v 1.8 1997-10-10 10:49:53 schmidt Exp $ */
+/* $Id: int_cf.cc,v 1.9 1997-12-17 11:30:06 schmidt Exp $ */
 
 #include <config.h>
 
@@ -54,7 +54,10 @@ InternalCF::tailcoeff ()
 int
 InternalCF::taildegree ()
 {
-    return 0;
+    if ( isZero() )
+	return -1;
+    else
+	return 0;
 }
 //}}}
 
@@ -73,22 +76,12 @@ InternalCF::den ()
 }
 //}}}
 
-//{{{ int InternalCF::sign () const
-// docu: see CanonicalForm::sign()
-int
-InternalCF::sign () const
-{
-    ASSERT1( 0, "fatal error: not implemented for class %s", this->classname() );
-    return 0;
-}
-//}}}
-
 //{{{ InternalCF * InternalCF::sqrt ()
 // docu: see CanonicalForm::sqrt()
 InternalCF *
 InternalCF::sqrt ()
 {
-    ASSERT1( 0, "fatal error: not implemented for class %s", this->classname() );
+    ASSERT1( 0, "sqrt() not implemented for class %s", this->classname() );
     return 0;
 }
 //}}}
@@ -98,37 +91,33 @@ InternalCF::sqrt ()
 int
 InternalCF::ilog2 ()
 {
-    ASSERT1( 0, "fatal error: not implemented for class %s", this->classname() );
+    ASSERT1( 0, "ilog2() not implemented for class %s", this->classname() );
     return 0;
 }
 //}}}
 
+//{{{ CanonicalForm InternalCF::coeff ( int i )
+// docu: see CanonicalForm::operator []()
 CanonicalForm
 InternalCF::coeff ( int i )
 {
     if ( i == 0 )
 	return CanonicalForm( copyObject() );
     else
-	return 0;
+	return CanonicalForm( 0 );
 }
+//}}}
 
 int
 InternalCF::intval() const
 {
-    ASSERT1( 0, "illegal conversion: not implemented for class %s", this->classname() );
+    ASSERT1( 0, "intval() not implemented for class %s", this->classname() );
     return 0;
 }
 
 InternalCF*
 InternalCF::invert()
 {
-    ASSERT1( 0, "internal factory error: not implemented for class %s", this->classname() );
-    return 0;
-}
-
-int
-InternalCF::comparecoeff ( InternalCF* )
-{
-    ASSERT1( 0, "fatal error: not implemented for class %s", this->classname() );
+    ASSERT1( 0, "invert() not implemented for class %s", this->classname() );
     return 0;
 }
