@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.87 2002-07-23 16:39:15 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.88 2002-08-06 10:06:02 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -581,24 +581,24 @@ EXAMPLE:  example bernstein; shows examples
   intvec m;
 
   def A0,r,H,H0,k0=saturate();
-  e,m,A0,r=eigenval(A0,r,H,k0);
+  A,A0,r=tjet(A0,r,H,k0,0);
+  list l=minipoly(A);
+  e,m=l[1..2];
 
-  kill r;
-  ideal r;
-  for(int i,j=1,1;i<=ncols(e);i++)
+  for(int i=1;i<=ncols(e);i++)
   {
-    if(e[i]!=1)
+    e[i]=-e[i];
+    if(e[i]==-1)
     {
-      r[j]=-e[i];
-      j++;
+      m[i]=m[i]+1;
     }
   }
 
   setring(R);
-  ideal r=imap(G,r);
+  ideal e=imap(G,e);
   kill G,gmsmaxdeg;
 
-  return(r);
+  return(list(e,m));
 }
 example
 { "EXAMPLE:"; echo=2;
