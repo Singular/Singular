@@ -1,7 +1,7 @@
 #####################################################################
 ### 
 ### Makefile for Singular documentation 
-### $Id: Makefile.in,v 1.57 1999-12-14 17:14:41 obachman Exp $
+### $Id: Makefile.in,v 1.58 1999-12-14 17:15:27 obachman Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -263,6 +263,7 @@ install-sharedist: singular.hlp html singular.idx \
 	${MKINSTALLDIRS} ${install_htmldir} 
 	cp ${HTML_SUBDIR}/*.htm ${install_htmldir}
 	cp ${HTML_SUBDIR}/*.gif ${install_htmldir}
+	cp ${HTML_SUBDIR}/*.jpg ${install_htmldir}
 	chmod -R +rX ${install_htmldir}
 	${MKINSTALLDIRS} ${install_exdir}
 	cp -R examples ${install_prefix}
