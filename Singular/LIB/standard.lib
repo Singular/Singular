@@ -1,7 +1,7 @@
-// $Id: standard.lib,v 1.28 1999-04-19 13:20:02 obachman Exp $
+// $Id: standard.lib,v 1.29 1999-04-22 08:35:12 obachman Exp $
 //////////////////////////////////////////////////////////////////////////////
 
-version="$Id: standard.lib,v 1.28 1999-04-19 13:20:02 obachman Exp $";
+version="$Id: standard.lib,v 1.29 1999-04-22 08:35:12 obachman Exp $";
 info="
 LIBRARY: standard.lib   PROCEDURES WHICH ARE ALWAYS LOADED AT START-UP
 
@@ -734,6 +734,9 @@ PURPOSE:  sprintf performs output formatting. The first argument is a format
           returned as a string. The control string is simply text to be copied,
           except that the string may contain conversion specifications. Do
           'help print:' for a listing of valid conversion specifications.
+          As an addition to the conversions of 'print', the '%n' and '%2' 
+          conversion specification does not consume an additional argument,
+          but simply generates a newline character.
 NOTE:     If one of the additional arguments is a list, then it should be 
           enclosed once more into a list() command, since passing a list
           as an argument flattens the list by one level.
@@ -747,7 +750,7 @@ EXAMPLE : example sprintf; shows an example
   }
   int next, l, nnext;
   string ret;
-  list formats = "%l", "%s", "%2l", "%2s", "%t", "%;", "%p", "%b";
+  list formats = "%l", "%s", "%2l", "%2s", "%t", "%;", "%p", "%b", "%n", "%2";
   while (1)
   {
     if (size(#) <= 0)
@@ -776,12 +779,19 @@ EXAMPLE : example sprintf; shows an example
     {
       return (ret + fmt);
     }
-    ret = ret + fmt[1, next - 1] + print(#[1], formats[l]);
+    if (formats[l] != "%2" && formats[l] != "%n")
+    {
+      ret = ret + fmt[1, next - 1] + print(#[1], formats[l]);
+      # = delete(#, 1);
+    }
+    else
+    {
+      ret = ret + fmt[1, next - 1] + print("", "%2s");
+    }
     if (size(fmt) <= (next + size(formats[l]) - 1))
     {
       return (ret);
     }
-    # = delete(#, 1);
     fmt = fmt[next + size(formats[l]), size(fmt)-next-size(formats[l]) + 1];
   }
 }
@@ -791,10 +801,10 @@ example
   module m=[1,y],[0,x+z];
   intmat M=betti(mres(m,0));
   list l = r, m, M;
-  string s = sprintf("s:%s, l:%l", 1, 2); s;
-  s = sprintf("s:%s", l); s;
-  s = sprintf("s:%s", list(l)); s;
-  s = sprintf("2l:%2l", list(l)); s;
+  string s = sprintf("s:%s,%n l:%l", 1, 2); s;
+  s = sprintf("s:%n%s", l); s;
+  s = sprintf("s:%2%s", list(l)); s;
+  s = sprintf("2l:%n%2l", list(l)); s;
   s = sprintf("%p", list(l)); s;
   s = sprintf("%;", list(l)); s;
   s = sprintf("%b", M); s;
@@ -811,6 +821,9 @@ PURPOSE:  printf performs output formatting. The first argument is a format
           The control string is simply text to be copied, except that the 
           string may contain conversion specifications. 
           Do 'help print:' for a listing of valid conversion specifications.
+          As an addition to the conversions of 'print', the '%n' and '%2' 
+          conversion specification does not consume an additional argument,
+          but simply generates a newline character.
 
 NOTE:     If one of the additional arguments is a list, then it should be 
           enclosed once more into a list() command, since passing a list
@@ -848,6 +861,9 @@ PURPOSE:  fprintf performs output formatting. The second argument is a format
           The control string is simply text to be copied, except that the 
           string may contain conversion specifications. 
           Do 'help print:' for a listing of valid conversion specifications.
+          As an addition to the conversions of 'print', the '%n' and '%2' 
+          conversion specification does not consume an additional argument,
+          but simply generates a newline character.
 
 NOTE:     If one of the additional arguments is a list, then it should be 
           enclosed once more into a list() command, since passing a list
