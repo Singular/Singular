@@ -31,9 +31,8 @@ LIB "rinvar.lib";
 
 proc ModEqn(poly f, list #)
 "USAGE:   ModEqn(f [, opt]); poly f; int opt;
-PURPOSE: compute equations of the moduli space of semiquasihomogenos hyper-
-         surface singularity with principal part f w.r.t. right equivalence
-ASSUME:  f quasihomogenous polynomial with an isolated singularity at 0
+PURPOSE: compute equations of the moduli space of semiquasihomogenos hypersurface         singularity with principal part f w.r.t. right equivalence
+ASSUME:  f quasihomogeneous polynomial with an isolated singularity at 0
 RETURN:  polynomial ring, possibly a simple extension of the groundfield of
          the basering, containing the ideal 'modid'
          - 'modid' is the ideal of the moduli space  if opt is even (> 0).
@@ -168,7 +167,7 @@ dbprint(dbPrt, "
 // 'ModEqn' created a new ring.
 // To see the ring, type (if the name of the ring is R):
      show(R);
-// To access the ideal of the moduli space of semiquasihomogenous singularities
+// To access the ideal of the moduli space of semiquasihomogeneous singularities
 // with principal part f, type
      def R = ModEqn(f); setring R;  modid;
 // 'modid' is the ideal of the moduli space.
@@ -197,13 +196,13 @@ ASSUME:  'action' is linear, G must be finite if the Reynolds operator is
          needed (i.e., NullCone(G,action) returns some non-invariant polys)
 RETURN:   polynomial ring over a simple extension of the groundfield of the
           basering, containing the ideals 'id' and 'embedid'.
-          - 'id' contains the equations of the quotient if opt = 1,
-            if opt = 0, 2 'id' contains generators of the coordinate ring R
+          - 'id' contains the equations of the quotient, if opt = 1;
+            if opt = 0, 2, 'id' contains generators of the coordinate ring R
             of the quotient (Spec(R) is the quotient)
-          - 'embedid' = 0 if opt = 1,
-            if opt = 0, 2 it is the ideal defining the equivariant embedding
+          - 'embedid' = 0, if opt = 1;
+            if opt = 0, 2, it is the ideal defining the equivariant embedding
 OPTIONS: 1 compute equations of the quotient,
-         2 use a primary decomposition when computing the Reynolds operator
+         2 use a primary decomposition when computing the Reynolds operator @*
          To combine options, add their value, default: opt =3.
 EXAMPLE: example QuotientEquations; shows an example
 "
@@ -262,7 +261,7 @@ EXAMPLE: example QuotientEquations; shows an example
 proc UpperMonomials(poly f, list #)
 "USAGE:   UpperMonomials(poly f, [intvec w])
 PURPOSE: compute the upper monomials of the milnor algebra of f.
-ASSUME:  f is quasihomogenous (w.r.t. w)
+ASSUME:  f is quasihomogeneous (w.r.t. w)
 RETURN:  ideal
 EXAMPLE: example UpperMonomials; shows an example
 "
@@ -290,12 +289,12 @@ example
 proc ArnoldAction(poly f, list #)
 "USAGE:   ArnoldAction(f, [Gf, B]); poly f; list Gf, B;
          'Gf' is a list of two rings (coming from 'StabEqn')
-PURPOSE: compute the induced action of of the stabilizer G of f on T_, where
+PURPOSE: compute the induced action of the stabilizer G of f on T_, where
          T_ is given by the upper monomials B of the Milnor algebra of f.
-ASSUME:  f is quasihomogenous
+ASSUME:  f is quasihomogeneous
 RETURN:  polynomial ring over the same groundfield, containing the ideals
          'actionid' and 'stabid'.
-         - 'actionid' is the ideal defining the induced action of Gf on T_
+         - 'actionid' is the ideal defining the induced action of Gf on T_ @*
          - 'stabid' is the ideal of the stabilizer Gf in the new ring
 EXAMPLE: example ArnoldAction; shows an example
 "
@@ -391,7 +390,7 @@ dbprint(dbPrt, "
 // To see the ring, type (if the name of the ring is R):
      show(R);
 // To access the ideal of the stabilizer G of f and its group action,
-// where f is the quasihomogenous principal part, type
+// where f is the quasihomogeneous principal part, type
      def R = ArnoldAction(f); setring R;  stabid; actionid;
 // 'stabid' is the ideal of the group G and 'actionid' is the ideal defining
 // the group action of the group G on T_. Note: this action might be nonlinear
@@ -413,7 +412,7 @@ example
 proc StabOrder(list #)
 "USAGE:   StabOrder(f); poly f;
 PURPOSE: compute the order of the stabilizer group of f.
-ASSUME:  f quasihomogenous polynomial with an isolated singularity at 0
+ASSUME:  f quasihomogeneous polynomial with an isolated singularity at 0
 RETURN:  int
 GLOBAL: varSubsList
 "
@@ -433,9 +432,9 @@ GLOBAL: varSubsList
 proc StabEqn(poly f)
 "USAGE:   StabEqn(f); f polynomial
 PURPOSE: compute the equations of the isometry group of f.
-ASSUME:  f semiquasihomogenous polynomial with an isolated singularity at 0
+ASSUME:  f semiquasihomogeneous polynomial with an isolated singularity at 0
 RETURN:  list of two ring 'S1', 'S2'
-         - 'S1' contians the equations of the stabilizer (ideal 'stabid')
+         - 'S1' contians the equations of the stabilizer (ideal 'stabid') @*
          - 'S2' contains the action of the stabilizer (ideal 'actionid')
 EXAMPLE: example StabEqn; shows an example
 GLOBAL: varSubsList, contains the index j s.t. x(i) -> x(i)t(j) ...
@@ -472,9 +471,9 @@ proc StabEqnId(ideal data, intvec wt)
 "USAGE:   StabEqn(I, w); I ideal, w intvec
 PURPOSE: compute the equations of the isometry group of the ideal I
          each generator of I is fixed by the stabilizer.
-ASSUME:  I semiquasihomogenous ideal wrt 'w' with an isolated singularity at 0
+ASSUME:  I semiquasihomogeneous ideal wrt 'w' with an isolated singularity at 0
 RETURN:  list of two ring 'S1', 'S2'
-         - 'S1' contians the equations of the stabilizer (ideal 'stabid')
+         - 'S1' contians the equations of the stabilizer (ideal 'stabid') @*
          - 'S2' contains the action of the stabilizer (ideal 'actionid')
 EXAMPLE: example StabEqnId; shows an example
 GLOBAL: varSubsList, contains the index j s.t. t(i) -> t(i)t(j) ...
@@ -490,7 +489,7 @@ GLOBAL: varSubsList, contains the index j s.t. t(i) -> t(i)t(j) ...
 
   export(varSubsList);
   n = nvars(basering);
-  variables = StabVar(wt);    // possible quasihomogenous substitutions
+  variables = StabVar(wt);    // possible quasihomogeneous substitutions
   nrVars = 0;
   for(i = 1; i <= size(wt); i = i + 1) {
     nrVars = nrVars + size(variables[i]);
@@ -523,7 +522,7 @@ GLOBAL: varSubsList, contains the index j s.t. t(i) -> t(i)t(j) ...
   list ringList;          // all t(i)`s which do not appear in f1
   ideal data = simplify(imap(RSTB, data), 2);
 
-  // generate the quasihomogenous substitution map F
+  // generate the quasihomogeneous substitution map F
 
   nrVars = 0;
   offset = 0;
@@ -641,7 +640,7 @@ PURPOSE: compute the induced action of 'G_f' on T_, where f is the principal
          substituted by actionid[i], 'B' is a list of upper basis monomials
          for the milnor algebra of 'f', 'nrs' = number of variables for 'G_f'
          and 'nrt' = dimension of T_
-ASSUME:  f is quasihomogenous with an isolated singularity at 0,
+ASSUME:  f is quasihomogeneous with an isolated singularity at 0,
          s(1..r), t(1..m) are parameters of the basering
 RETURN:  poly
 EXAMPLE: example ArnoldAction; shows an example
@@ -1082,9 +1081,9 @@ GLOBAL:  'computedPowers'
 
 static proc StabVar(intvec wt)
 "USAGE:   StabVar(w); intvec w
-PURPOSE: compute the indicies for quasihomogenous substitutions of each
+PURPOSE: compute the indicies for quasihomogeneous substitutions of each
          variable.
-ASSUME:  f semiquasihomogenous polynomial with an isolated singularity at 0
+ASSUME:  f semiquasihomogeneous polynomial with an isolated singularity at 0
 RETURN:  list
          _[i]  list of combinations for var(i) (i must be appended
          to each comb)
@@ -1433,7 +1432,7 @@ static proc PSum(e)
 ///////////////////////////////////////////////////////////////////////////////
 
 proc Max(data)
-"USAGE:   Max(n, nr); intvec/list data
+"USAGE:   Max(data); intvec/list of integers data
 PURPOSE: find the maximal integer contained in 'data'
 RETURN:  list
 ASSUME:  'data' contians only integers and is not empty
@@ -1451,7 +1450,7 @@ ASSUME:  'data' contians only integers and is not empty
 ///////////////////////////////////////////////////////////////////////////////
 
 proc Min(data)
-"USAGE:   Min(n, nr); intvec/list data
+"USAGE:   Min(data); intvec/list of integers data
 PURPOSE: find the minimal integer contained in 'data'
 RETURN:  list
 ASSUME:  'data' contians only integers and is not empty
