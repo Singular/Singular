@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: pl2doc.pl,v 1.7 1999-07-30 10:37:04 obachman Exp $
+# $Id: pl2doc.pl,v 1.8 1999-08-03 16:35:37 obachman Exp $
 ###################################################################
 #  Computer Algebra System SINGULAR
 #
@@ -50,13 +50,16 @@ unless ($out_file)
 }
 open(LDOC, ">$out_file") || die"Error: can't open $out_file for writing: $!\n";
 print_doc_header(\*LDOC) if $doc;
+print LDOC "\@c ---content LibInfo---\n";
 print LDOC "\@c library version: $version\n";
 print LDOC "\@c library file: $library\n";
-
+print LDOC "\@cindex $lib.lib\n";
+print LDOC "\@cindex ${lib}_lib\n";
 undef @procs; # will be again defined by OutLibInfo
 $parsing = "info-string of lib $lib:";
 $ref = OutLibInfo(\*LDOC, $info, ! $no_fun);
 OutRef(\*LDOC, $ref) if $ref;
+print LDOC "\@c ---end content LibInfo---\n";
 
 ###################################################################
 # print  summary
@@ -143,7 +146,6 @@ exit(0);
 sub OutLibInfo
 {
   my ($FH, $info, $l_fun) = @_;
-  print $FH "\@c ---content LibInfo---\n";
   if ($info =~ /^\@/)
   {
     print $FH $info;
@@ -155,7 +157,6 @@ sub OutLibInfo
   my ($ref) = OutInfo($FH, $info, $l_fun);
 
   print $FH "\@end table\n" if $table_is_open;
-  print $FH "\@c ---end content LibInfo---\n";
   $table_is_open = 0;
   return $ref;
 }

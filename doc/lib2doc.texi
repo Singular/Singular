@@ -16,8 +16,8 @@ libraries.
 @strong{Important:} 
 @*To use @code{lib2doc}, you need 
 to have @code{perl} (version 5 or
-higher)  and @code{Singular} and @code{libparse} (version 1-3-4 or
-higher) installed on your system.
+higher), @code{texinfo} (version 3.12 or higher)  and @code{Singular}
+and @code{libparse} (version 1-3-4 or higher) installed on your system.
 
 To generate the documentation for a library, follow these steps:
 @enumerate

@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.75 1999-07-23 14:00:36 Singular Exp $
+@comment $Id: singular.doc,v 1.76 1999-08-03 16:35:38 obachman Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -206,7 +206,6 @@ command @code{LIB "all.lib";} for loading all libraries.
 @c ----------------------------------------------------------
 @node standard_lib, all_lib, SINGULAR libraries, SINGULAR libraries
 @section standard_lib
-@cindex standard_lib
 
 The library @code{standard.lib} provides extensions to the
 set of built-in commands and is automatically loaded
@@ -220,6 +219,7 @@ with the @code{--no-stdlib} command line option (see
 @node all_lib, algebra_lib, standard_lib, SINGULAR libraries
 @section all_lib
 @cindex all_lib
+@cindex all.lib
 
 The library @code{all.lib} provides a convenient way to load all
 libraries of the @sc{Singular} distribution.
@@ -234,127 +234,102 @@ LIB "all.lib";
 @c ---------------------------------------------------------
 @node algebra_lib, classify_lib, all_lib, SINGULAR libraries
 @section algebra_lib
-@cindex algebra_lib
 @c lib algebra.lib
 @c ---------------------------------------------------------
 @node classify_lib, deform_lib, algebra_lib, SINGULAR libraries
 @section classify_lib
-@cindex classify_lib
 @c lib classify.lib
 @c ----------------------------------------------------------
 @node deform_lib, elim_lib, classify_lib, SINGULAR libraries
 @section deform_lib
-@cindex deform_lib
 @c lib deform.lib
 @c ----------------------------------------------------------
 @node elim_lib, finvar_lib, deform_lib, SINGULAR libraries
 @section elim_lib
-@cindex elim_lib
 @c lib elim.lib
 @c ----------------------------------------------------------
 @node finvar_lib, general_lib, elim_lib, SINGULAR libraries
 @section finvar_lib
-@cindex finvar_lib
 @c lib finvar.lib
 @c ----------------------------------------------------------
 @node general_lib, graphics_lib, finvar_lib, SINGULAR libraries
 @section general_lib
-@cindex general_lib
 @c lib  general.lib
 @c ---------------------------------------------------------
 @node graphics_lib, hnoether_lib, general_lib, SINGULAR libraries
 @section graphics_lib
-@cindex graphics_lib
 @c lib graphics.lib no_ex
 @c ---------------------------------------------------------
 @node hnoether_lib, homolog_lib, graphics_lib, SINGULAR libraries
 @section hnoether_lib
-@cindex hnoether_lib
 @c lib hnoether.lib
 @c ----------------------------------------------------------
 @node homolog_lib, inout_lib, hnoether_lib, SINGULAR libraries
 @section homolog_lib
-@cindex homolog_lib
 @c lib homolog.lib
 @c ----------------------------------------------------------
 @node inout_lib, invar_lib, homolog_lib, SINGULAR libraries
 @section inout_lib
-@cindex inout_lib
 @c lib inout.lib
 @c ----------------------------------------------------------
 @node invar_lib, jordan_lib, inout_lib, SINGULAR libraries
 @section invar_lib
-@cindex invar_lib
 @c lib invar.lib
 @c ---------------------------------------------------------
 @node jordan_lib, latex_lib, invar_lib, SINGULAR libraries
 @section jordan_lib
-@cindex jordan_lib
 @c lib jordan.lib
 @c ---------------------------------------------------------
 @node latex_lib, matrix_lib, jordan_lib, SINGULAR libraries
 @section latex_lib
-@cindex latex_lib
 @c lib latex.lib no_ex
 @c ----------------------------------------------------------
 @node matrix_lib, mondromy_lib, latex_lib, SINGULAR libraries
 @section matrix_lib
-@cindex matrix_lib
 @c lib matrix.lib
 @c ---------------------------------------------------------
 @node mondromy_lib, normal_lib, matrix_lib, SINGULAR libraries
 @section mondromy_lib
-@cindex mondromy_lib
 @c lib mondromy.lib
 @c ---------------------------------------------------------
 @node normal_lib, poly_lib, mondromy_lib, SINGULAR libraries
 @section normal_lib
-@cindex normal_lib
 @c lib normal.lib
 @c ----------------------------------------------------------
 @node poly_lib, presolve_lib, normal_lib, SINGULAR libraries
 @section poly_lib
-@cindex poly_lib
 @c lib poly.lib
 @c ---------------------------------------------------------
 @node presolve_lib, primdec_lib, poly_lib, SINGULAR libraries
 @section presolve_lib
-@cindex presolve_lib
 @c lib presolve.lib
 @c ----------------------------------------------------------
 @node primdec_lib, primitiv_lib, presolve_lib, SINGULAR libraries
 @section primdec_lib
-@cindex primdec_lib
 @c lib primdec.lib
 @c ---------------------------------------------------------
 @node primitiv_lib, random_lib, primdec_lib, SINGULAR libraries
 @section primitiv_lib
-@cindex primitiv_lib
 @c lib primitiv.lib
 @c ----------------------------------------------------------
 @node random_lib, ring_lib, primitiv_lib, SINGULAR libraries
 @section random_lib
-@cindex random_lib
 @c lib random.lib
 @c ----------------------------------------------------------
 @node ring_lib, sing_lib, random_lib, SINGULAR libraries
 @section ring_lib
-@cindex ring_lib
 @c lib ring.lib
 @c ----------------------------------------------------------
 @node sing_lib, solve_lib, ring_lib, SINGULAR libraries
 @section sing_lib
-@cindex sing_lib
 @c lib sing.lib
 @c ---------------------------------------------------------
 @node solve_lib, spcurve_lib, sing_lib, SINGULAR libraries
 @section solve_lib
-@cindex solve_lib
 @c @c lib solve.lib no_ex
 @c ---------------------------------------------------------
 @node spcurve_lib, , solve_lib, SINGULAR libraries
 @section spcurve_lib
-@cindex spcurve_lib
 @c lib spcurve.lib
 
 @c ----------------------------------------------------------
@@ -368,6 +343,7 @@ LIB "all.lib";
 @c ----------------------------------------------------------
 @node Index, , Installation and Platform Specifics, Top
 @chapter Index
+@cindex Index
 @printindex cp
 @c ---------------------------------------------------------
 

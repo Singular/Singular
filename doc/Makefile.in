@@ -1,7 +1,7 @@
 #####################################################################
 ### 
 ### Makefile for Singular documentation 
-### $Id: Makefile.in,v 1.30 1999-07-28 11:36:31 obachman Exp $
+### $Id: Makefile.in,v 1.31 1999-08-03 16:35:37 obachman Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -202,7 +202,7 @@ ${IMAGES_HTML} : ${IMAGES_SRC}
 install: singular.hlp html/index.htm singular.idx
 	${MKINSTALLDIRS} ${infodir}
 	${INSTALL_DATA} singular.hlp ${infodir}
-	test -L ${htmldir} || (rm -rf ${htmldir}; ln -s `pwd`/${HTML_DIR} ${htmldir})
+	test -L ${htmldir} || (rm -rf ${htmldir}; ln -s `pwd`/${HTML_SUBDIR} ${htmldir})
 
 uninstall: 
 	rm -f ${infodir}/singular.hlp
