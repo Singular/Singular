@@ -1,6 +1,6 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.31 1999-08-11 12:51:59 wichmann Exp $
+;; $Id: singular.el,v 1.32 1999-08-16 11:10:10 obachman Exp $
 
 ;;; Commentary:
 
@@ -609,10 +609,10 @@ This function is called  at mode initialization time."
 
 (defun singular-menu-install-libraries ()
   "Updates the singular command menu with libraries.
-Go through the alist `singular-completion-library-list' and for 
+Go through the alist `singular-completion-lib-alist' and for 
 each entry add a new menu element in the submenu 
 (\"Commands\" \"libraries\")."		;" font-lock trick.
-  (let ((libs (sort singular-completion-library-list 
+  (let ((libs (sort singular-completion-lib-alist 
 		    (function (lambda (a b)
 				(string< (car b) (car a))))))
 	(last "other...")
@@ -2470,12 +2470,12 @@ an error unless optional argument NOERROR is not nil."
 ;;}}}
 
 ;;{{{ Filename, Command, and Help Completion
-(defvar singular-completion-cmd-list nil
+(defvar singular-completion-cmd-alist nil
   "An alist containing all Singular commands to complete.
 
 This variable is buffer-local.")
 
-(defvar singular-completion-hlp-list nil
+(defvar singular-completion-hlp-alist nil
   "An alist containg all Singular help topics to complete.
 
 This variable is buffer-local.")
@@ -2485,10 +2485,10 @@ This variable is buffer-local.")
 for Singular interactive mode.
 
 This function is called at mode initialization time."
-  (make-local-variable 'singular-completion-cmd-list)
-  (setq singular-completion-cmd-list nil)
-  (make-local-variable 'singular-completion-hlp-list)
-  (setq singular-completion-hlp-list nil))
+  (make-local-variable 'singular-completion-cmd-alist)
+  (setq singular-completion-cmd-alist nil)
+  (make-local-variable 'singular-completion-hlp-alist)
+  (setq singular-completion-hlp-alist nil))
 
 (defun singular-completion-do (pattern beg end completion-alist)
   "Try completion on string PATTERN using alist COMPLETION-ALIST.
@@ -2534,18 +2534,18 @@ Otherwise perform completion of Singular commands."
 				       "[ \t]*\\([\\?]\\|help \\)[ \t]*\\(.*\\)")
 			       end t))
 	  ;; then: help completion
-	  (if singular-completion-hlp-list
+	  (if singular-completion-hlp-alist
 	      (singular-completion-do (match-string 2) (match-beginning 2)
-				      end singular-completion-hlp-list)
+				      end singular-completion-hlp-alist)
 	    (message "Completion of Singular help topics disabled.")
 	    (ding))
 	;; else: command completion
 	(save-excursion
 	  (skip-chars-backward "a-zA-Z0-9")
 	  (setq beg (point)))
-	(if singular-completion-cmd-list
+	(if singular-completion-cmd-alist
 	    (singular-completion-do (buffer-substring beg end) beg
-				    end singular-completion-cmd-list)
+				    end singular-completion-cmd-alist)
 	  (message "Completion of Singular commands disabled.")
 	  (ding))))))
 ;;}}}
