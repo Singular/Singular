@@ -7,7 +7,7 @@
  *  Author:  obachman (Olaf Bachmann), hannes (Hannes Schoenemann),
  *           bricken (Michael Brickenstein) 
  *  Created: 01/02
- *  Version: $Id: fast_maps.h,v 1.4 2002-01-19 10:40:15 Singular Exp $
+ *  Version: $Id: fast_maps.h,v 1.5 2002-01-19 10:41:13 obachman Exp $
  *******************************************************************/
 
 /*******************************************************************************
@@ -51,19 +51,19 @@ public:
 **
 *S  definition of basic routines
 */
-void maMonomial_Out(mapoly monomial, ring src_r, ring dest_r);
-void maPoly_Out(mapoly mpoly, ring src_ring, ring dest_r);
+void maMonomial_Out(mapoly monomial, ring src_r, ring dest_r = NULL);
+void maPoly_Out(mapoly mpoly, ring src_ring, ring dest_r = NULL);
 
 // creates a new maMonomial
 // if bucket != NULL, a coeff with the bucket is created, as well
-mapoly maMonomial_Create(poly p, ring , sBucket_pt bucket);
+mapoly maMonomial_Create(poly p, ring , sBucket_pt bucket = NULL);
 // unconditionally destroys a maMonomial:
 // src: LmFree 
 // dest: p_Delete 
 // coeffs: delete list
-void maMonomial_Destroy(mapoly monomial, ring src_r, ring dest_r);
+void maMonomial_Destroy(mapoly monomial, ring src_r, ring dest_r = NULL);
 // decrements ref counter, if 0, calls Destroy
-inline mapoly maMonomial_Free(mapoly monomial, ring src_r, ring dest_r)
+inline mapoly maMonomial_Free(mapoly monomial, ring src_r, ring dest_r = NULL)
 {
   monomial->ref--;
   if (monomial->ref <= 0) 
@@ -72,7 +72,9 @@ inline mapoly maMonomial_Free(mapoly monomial, ring src_r, ring dest_r)
 }
 
 // inserts ("adds") monomial what into poly into
-mapoly maPoly_InsertMonomial(mapoly &into, mapoly what, ring src_r);
+mapoly maPoly_InsertMonomial(mapoly into, mapoly what, ring src_r);
+mapoly maPoly_InsertMonomial(mapoly into, poly p, ring src_r, sBucket_pt bucket = NULL)
+
 
 // optimizes mpoly for later evaluation
 mapoly maPoly_Optimize(mapoly mpoly, ring src_r);
