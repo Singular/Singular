@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.17 1998-02-18 11:38:26 siebert Exp $ */
+/* $Id: ideals.cc,v 1.18 1998-02-19 12:45:38 siebert Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -2196,86 +2196,13 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
   return h3;
 }
 
-/*2
-* compute all ar-minors of the matrix a
-*/
-ideal idMinors(matrix a, int ar)
-{
-  if(ar<=0)
-  {
-    Werror("%d-th minor ",ar);
-    return NULL;
-  }
-  int     i,j,k,size;
-  int *rowchoise,*colchoise;
-  BOOLEAN rowch,colch;
-  ideal result;
-  matrix tmp;
-  poly p;
-
-  i = binom(a->rows(),ar);
-  j = binom(a->cols(),ar);
-
-  rowchoise=(int *)Alloc(ar*sizeof(int));
-  colchoise=(int *)Alloc(ar*sizeof(int));
-  if ((i>512) || (j>512) || (i*j >512)) size=512;
-  else size=i*j;
-  result=idInit(size,1);
-  tmp=mpNew(ar,ar);
-  k = 0; /* the index in result*/
-  idInitChoise(ar,1,a->rows(),&rowch,rowchoise);
-  while (!rowch)
-  {
-    idInitChoise(ar,1,a->cols(),&colch,colchoise);
-    while (!colch)
-    {
-      for (i=1; i<=ar; i++)
-      {
-        for (j=1; j<=ar; j++)
-        {
-          MATELEM(tmp,i,j) = MATELEM(a,rowchoise[i-1],colchoise[j-1]);
-        }
-      }
-      p = mpDet(tmp);
-      if (p!=NULL)
-      {
-        if (k>=size)
-        {
-          pEnlargeSet(&result->m,size,32);
-          size += 32;
-        }
-        result->m[k] = p;
-        k++;
-      }
-      idGetNextChoise(ar,a->cols(),&colch,colchoise);
-    }
-    idGetNextChoise(ar,a->rows(),&rowch,rowchoise);
-  }
-  /*delete the matrix tmp*/
-  for (i=1; i<=ar; i++)
-  {
-    for (j=1; j<=ar; j++) MATELEM(tmp,i,j) = NULL;
-  }
-  idDelete((ideal*)&tmp);
-  if (k==0)
-  {
-    k=1;
-    result->m[0]=NULL;
-  }
-  Free((ADDRESS)rowchoise,ar*sizeof(int));
-  Free((ADDRESS)colchoise,ar*sizeof(int));
-  pEnlargeSet(&result->m,size,k-size);
-  IDELEMS(result) = k;
-  return (result);
-}
-
 /*3
 * produces recursively the ideal of all arxar-minors of a
 */
 static void idRecMin(matrix a,int ar,poly *barDiv,ideal result,
-              int * nextPlace, intvec * pfRows, intvec * iv)
+              int * nextPlace, int rowToChose=0)
 {
-Print("Level: %d\n",ar);
+//Print("Level: %d\n",ar);
 /*--- there is no non-zero minor coming from a------------*/
   if((ar<0) || (ar>min(a->ncols,a->nrows)-1))
   {
@@ -2283,9 +2210,8 @@ Print("Level: %d\n",ar);
   }
 
 /*--- initializing temporary structures-------------------*/
-  int i,j,r,c,newi,newp,k;
+  int i,j,r=rowToChose,c,newi,newp,k;
   poly p=NULL,pp;
-  BOOLEAN justChosen=FALSE;
 
   if (ar==0)
   {
@@ -2303,11 +2229,6 @@ Print("Level: %d\n",ar);
             IDELEMS(result) += 16;
           }
           MATELEM(a,i,j) = NULL;
-if ((*nextPlace==21) || (*nextPlace==37))
-{
-  Print("Hier sind sie!\n");
-}
-pWrite(p);
           result->m[*nextPlace] = p;
           (*nextPlace)++;
         }
@@ -2320,28 +2241,6 @@ pWrite(p);
   p = pCopy(*barDiv);   //we had to store barDiv for the remaining loops
   pp = pCopy(p);   //we had to store barDiv for the remaining loops
   matrix nextStep = mpOneStepBareiss(a,barDiv,&r,&c);
-/*--- we compute the row-index of the chosen row r -------*/
-  newi = 0;
-  while ((newi<iv->length()) && ((*iv)[newi]!=0)) newi++;
-  k = (*iv)[newi] = r;
-  for (j=newi-1;j>0;j--)
-  {
-    if (k>=(*iv)[j]) k++;
-  }
-  newp = 0;
-  while ((newp<pfRows->length()) && ((*pfRows)[newp]!=0)) 
-  {
-    if ((*pfRows)[newp]==k) 
-    {
-      justChosen = TRUE;
-Print("just chosen\n");
-      break;
-    }
-    newp++;
-  }
-  if (!justChosen) (*pfRows)[newp] = k;
-Print("Chosen: ");pfRows->show();PrintLn();
-Print("Deleted: ");iv->show();PrintLn();
 /*--- we read out the r-1 x c-1 matrix for the next step--*/
   if ((a->nrows-1)*(a->ncols-1)>0)
   {
@@ -2356,15 +2255,12 @@ Print("Deleted: ");iv->show();PrintLn();
     }
     idDelete((ideal*)&nextStep);
 /*--- we call the next Step------------------------------*/
-    idRecMin(next,ar-1,barDiv,result,nextPlace,pfRows,iv);
+    idRecMin(next,ar-1,barDiv,result,nextPlace);
     next = NULL;
   }
 /*--- now we have to take out the r-th row...------------*/
-Print("back for rows on Level: %d\n",ar);
-Print("The actual row was %d\n",k);
-Print("Chosen: ");pfRows->show();PrintLn();
-Print("Deleted: ");iv->show();PrintLn();
-  if (((a->nrows)>1) && (!justChosen))
+//Print("back for rows on Level: %d\n",ar);
+  if (((a->nrows)>1) && (rowToChose==0))
   {
     nextStep = mpNew(a->nrows-1,a->ncols);
     for (i=r-1;i>0;i--)
@@ -2382,13 +2278,11 @@ Print("Deleted: ");iv->show();PrintLn();
       }
     }
 /*--- and to perform the algorithm with the rest---------*/
-    idRecMin(nextStep,ar,&p,result,nextPlace,pfRows,iv);
+    idRecMin(nextStep,ar,&p,result,nextPlace);
     nextStep = NULL;
   }
 /*--- now we have to take out the c-th col...------------*/
-Print("back for cols on Level: %d\n",ar);
-Print("Chosen: ");pfRows->show();PrintLn();
-Print("Deleted: ");iv->show();PrintLn();
+//Print("back for cols on Level: %d\n",ar);
   if ((a->nrows)>1)
   {
     nextStep = mpNew(a->nrows,a->ncols-1);
@@ -2410,12 +2304,10 @@ Print("Deleted: ");iv->show();PrintLn();
     }
     idDelete((ideal*)&a);
 /*--- and to perform the algorithm with the rest---------*/
-    (*iv)[newi] = 0;
-    idRecMin(nextStep,ar,&p,result,nextPlace,pfRows,iv);
+    idRecMin(nextStep,ar,&p,result,nextPlace,r);
     nextStep = NULL;
   }
 /*--- deleting temporary structures and returns----------*/
-  if (!justChosen) (*pfRows)[newp] = 0;
   pDelete(barDiv);
   pDelete(&p);
   pDelete(&pp);
@@ -2426,7 +2318,7 @@ Print("Deleted: ");iv->show();PrintLn();
 * compute all ar-minors of the matrix a
 * the caller of idRecMin
 */
-ideal idMinors1(matrix a, int ar)
+ideal idMinors(matrix a, int ar)
 {
   if((ar<=0) || (ar>min(a->ncols,a->nrows)))
   {
@@ -2434,15 +2326,11 @@ ideal idMinors1(matrix a, int ar)
     return NULL;
   }
   int i=0;
-  intvec * iv=new intvec(a->nrows+1);
-  intvec * pv=new intvec(a->nrows+1);
   poly barDiv=NULL;
   ideal result=idInit(16,0);
 
-  idRecMin(mpCopy(a),ar-1,&barDiv,result,&i,pv,iv);
+  idRecMin(mpCopy(a),ar-1,&barDiv,result,&i);
   idSkipZeroes(result);
-  delete iv;
-  delete pv;
   return result;
 }
 

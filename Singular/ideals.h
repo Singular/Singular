@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.h,v 1.5 1998-02-19 08:08:47 siebert Exp $ */
+/* $Id: ideals.h,v 1.6 1998-02-19 12:45:40 siebert Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -97,8 +97,6 @@ ideal   idPower(ideal gid,int deg);
 ideal   idElimination (ideal h1,poly delVar, intvec *hilb=NULL);
 
 ideal   idMinors(matrix a, int ar);
-
-ideal   idMinors1(matrix a, int ar);
 
 ideal   idCompactify(ideal id);
 
