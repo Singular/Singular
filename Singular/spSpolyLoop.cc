@@ -136,6 +136,7 @@ spSpolyLoopProc spSetPSpolyLoop(ring r, int syzComp, int ak, BOOLEAN homog)
           #ifdef TEST_MAC_ORDER
           if (or==ringorder_dp)
           {
+            LoopVariablesW = pVariables1W;
             //if (homog)
             //  return spLoop_mac_2i_1_homog;
             //else
@@ -149,6 +150,7 @@ spSpolyLoopProc spSetPSpolyLoop(ring r, int syzComp, int ak, BOOLEAN homog)
           #ifdef TEST_MAC_ORDER
           if (or==ringorder_dp)
           {
+            LoopVariablesW = pVariables1W;
             //if (homog)
             //  return spLoop_mac_2i_homog;
             //else
@@ -227,6 +229,7 @@ spSpolyLoopProc spSetPSpolyLoop(ring r, int syzComp, int ak, BOOLEAN homog)
         {
             case ringorder_dp:
               #ifdef TEST_MAC_ORDER
+              LoopVariablesW = pVariables1W;
               if (r->order[1] == ringorder_C)
               {
                 if (pVariables1W == 1)
@@ -248,7 +251,6 @@ spSpolyLoopProc spSetPSpolyLoop(ring r, int syzComp, int ak, BOOLEAN homog)
               }
               else
               {
-                LoopVariablesW = pVariables1W;
                 if (pVariables1W == 1)
                   return (syzComp ?
                           spLoop_mac_1_Syz :
@@ -3068,6 +3070,9 @@ static void spPSpolyLoop_2i_1_homog(poly a1, poly a2, poly m,poly spNoether)
 */
 inline void bMultCopyX(poly p, poly m, poly n, number exp)
 {
+#ifdef PDEBUG
+  poly pp=n;
+#endif
   poly a = n;
   do
   {
@@ -3080,6 +3085,7 @@ inline void bMultCopyX(poly p, poly m, poly n, number exp)
   }
   while (p!=NULL);
   pNext(a) = NULL;
+  pTest(pp);
 }
 
 /*2
@@ -3575,6 +3581,7 @@ void spLoop_mac_2i(poly a1, poly a2, poly m,poly spNoether)
 }
 void spLoop_mac_2i_1(poly a1, poly a2, poly m,poly spNoether)
 {
+#if 0
   poly a, b, s;
   number tm = pGetCoeff(m);
   number tneg,tb;
@@ -3584,21 +3591,210 @@ void spLoop_mac_2i_1(poly a1, poly a2, poly m,poly spNoether)
   if (a2==NULL)
   {
     bMultCopyX(a1, m, m, tneg);
+    //spMultCopyX(a1, m, m, tneg,spNoether);
     return;
   }
   a = m;
   b = pNew();
   pCopyAddFast(b, a1, m);
 
-
   Top:
-  register long d;
 
   if (((pGetOrder(b)&(pGetOrder(a2))<0))) goto Top0;
-  //if (pGetOrder(a2)<0) goto Top0;
 
-  d = pGetOrder(b) - pGetOrder(a2);
-  NonZeroTestA(d, 1 /*pOrdSgn*/, goto NotEqual);
+  if (pGetOrder(b) > pGetOrder(a2))      { goto C_1; }
+  else if (pGetOrder(b) < pGetOrder(a2)) { goto C_M1; }
+
+  register long d;
+  register long d2;
+  _pMonCmp_2i_1(b, a2, LoopVariablesW, d,
+                NonZeroA(d, pLexSgn, goto myNotEqual ), goto myEqual);
+
+  myEqual:
+    d=0;
+    goto xyz;
+
+  myNotEqual:
+    if (d<0) d=1;
+    else d=1;
+  xyz:
+    {
+      d2=pComp0(b,a2);
+      if(d!=d2)
+        goto Top;
+    }
+
+
+
+  d=pComp0(b,a2);
+  if (d!=0) goto NotEqual;
+
+
+  Equal:
+    {
+      tb = npMultM(pGetCoeff(a1),tm);
+      if (!npEqualM(pGetCoeff(a2),tb))
+      {
+        pSetCoeff0(a2,npSubM(pGetCoeff(a2),tb));
+        a = pNext(a) = a2;
+        pIter(a2);
+      }
+      else
+      {
+        s = a2;
+        pIter(a2);
+        pFree1(s);
+      }
+      pIter(a1);
+      if (a1==NULL)
+      {
+        pFree1(b);
+        pNext(a) = a2;
+        return;
+      }
+      if (a2==NULL)
+      {
+        pFree1(b);
+        bMultCopyX(a1, m, a, tneg);
+        return;
+      }
+      pCopyAddFast(b, a1, m);
+    }
+    goto Top;
+
+  NotEqual:
+    if (d<0) goto C_M1;
+    // else goto C_1;
+
+  C_1:
+    {
+      pSetCoeff0(b,npMultM(pGetCoeff(a1),tneg));
+      a = pNext(a) = b;
+      pIter(a1);
+      if (a1!=NULL)
+      {
+        b = pNew();
+        pCopyAddFast(b, a1, m);
+      }
+      else
+      {
+        pNext(a) = a2;
+        return;
+      }
+    }
+    goto Top;
+
+  C_M1:
+    {
+      a = pNext(a) = a2;
+      pIter(a2);
+      if (a2==NULL)
+      {
+        pFree1(b);
+        bMultCopyX(a1, m, a, tneg);
+        return;
+      }
+    }
+    goto Top;
+
+  // below degree limit =================================================
+  Top0:
+  if (pGetOrder(b) > pGetOrder(a2))      { goto C_1_0; }
+  else if (pGetOrder(b) < pGetOrder(a2)) { goto C_M1_0; }
+
+
+  Equal0:
+    {
+      tb = npMultM(pGetCoeff(a1),tm);
+      if (!npEqualM(pGetCoeff(a2),tb))
+      {
+        pSetCoeff0(a2,npSubM(pGetCoeff(a2),tb));
+        a = pNext(a) = a2;
+        pIter(a2);
+      }
+      else
+      {
+        s = a2;
+        pIter(a2);
+        pFree1(s);
+      }
+      pIter(a1);
+      if (a1==NULL)
+      {
+        pFree1(b);
+        pNext(a) = a2;
+        return;
+      }
+      if (a2==NULL)
+      {
+        pFree1(b);
+        bMultCopyX(a1, m, a, tneg);
+        return;
+      }
+      pbCopyAddFast(b, a1, m);
+    }
+    goto Top0;
+
+  C_M1_0:  // b < a2
+    {
+      a = pNext(a) = a2;
+      pIter(a2);
+      if (a2==NULL)
+      {
+        pFree1(b);
+        bMultCopyX(a1, m, a, tneg);
+        return;
+      }
+    }
+    goto Top0;
+
+  C_1_0:  // b >a2
+    {
+      pSetCoeff0(b,npMultM(pGetCoeff(a1),tneg));
+      a = pNext(a) = b;
+      pIter(a1);
+      if (a1!=NULL)
+      {
+        b = pNew();
+        pbCopyAddFast(b, a1, m);
+      }
+      else
+      {
+        pNext(a) = a2;
+        return;
+      }
+    }
+  goto Top0;
+#endif
+/* ---------------------------------------------------------------- */
+  poly a, b, s;
+  number tm = pGetCoeff(m);
+  number tneg,tb;
+  int c;
+
+  tneg = npNegM(tm);
+  if (a2==NULL)
+  {
+    //bMultCopyX(a1, m, m, tneg);
+    spMultCopyX(a1, m, m, tneg,NULL);
+    pTest(pNext(m));
+    return;
+  }
+  a = m;
+  b = pNew();
+  pCopyAddFast(b, a1, m);
+
+  Top:
+  register long long d;
+
+
+  if (((pGetOrder(b)&(pGetOrder(a2))<0))) goto Top0;
+
+  //d = (long long)pGetOrder(b) - (long long)pGetOrder(a2);
+  //NonZeroTestA(d, 1 /*pOrdSgn*/, goto NotEqual);
+  if (pGetOrder(b) > pGetOrder(a2)) { d=1; goto NotEqual; }
+  else if (pGetOrder(b) < pGetOrder(a2)) { d=-1; goto NotEqual; }
+  else d=0;
   // now pGetOrder(b)==pGetOrder(a2):
   _pMonCmp_2i_1(b, a2, LoopVariablesW, d,
                  NonZeroA(d, pLexSgn, goto NotEqual ), goto Equal);
@@ -3622,12 +3818,15 @@ void spLoop_mac_2i_1(poly a1, poly a2, poly m,poly spNoether)
   {
     pFree1(b);
     pNext(a) = a2;
+    pTest(pNext(m));
     return;
   }
   if (a2==NULL)
   {
     pFree1(b);
-    bMultCopyX(a1, m, a, tneg);
+    //bMultCopyX(a1, m, a, tneg);
+    spMultCopyX(a1, m, a, tneg,NULL);
+    pTest(pNext(m));
     return;
   }
   pCopyAddFast(b, a1, m);
@@ -3641,7 +3840,9 @@ void spLoop_mac_2i_1(poly a1, poly a2, poly m,poly spNoether)
     if (a2==NULL)
     {
       pFree1(b);
-      bMultCopyX(a1, m, a, tneg);
+      //bMultCopyX(a1, m, a, tneg);
+      spMultCopyX(a1, m, a, tneg,NULL);
+    pTest(pNext(m));
       return;
     }
     goto Top;
@@ -3659,6 +3860,7 @@ void spLoop_mac_2i_1(poly a1, poly a2, poly m,poly spNoether)
   else
   {
     pNext(a) = a2;
+    pTest(pNext(m));
     return;
   }
   goto Top;
@@ -3666,9 +3868,84 @@ void spLoop_mac_2i_1(poly a1, poly a2, poly m,poly spNoether)
 
   // below degree limit =================================================
   Top0:
+  if (pGetOrder(b) > pGetOrder(a2))      { goto C_1_0; }
+  else if (pGetOrder(b) < pGetOrder(a2)) { goto C_M1_0; }
 
-  d = pGetOrder(b) - pGetOrder(a2);
-  NonZeroTestA(d, 1 /*pOrdSgn*/, goto NotEqual0);
+
+  Equal0:
+    {
+      tb = npMultM(pGetCoeff(a1),tm);
+      if (!npEqualM(pGetCoeff(a2),tb))
+      {
+        pSetCoeff0(a2,npSubM(pGetCoeff(a2),tb));
+        a = pNext(a) = a2;
+        pIter(a2);
+      }
+      else
+      {
+        s = a2;
+        pIter(a2);
+        pFree1(s);
+      }
+      pIter(a1);
+      if (a1==NULL)
+      {
+        pFree1(b);
+        pNext(a) = a2;
+        return;
+      }
+      if (a2==NULL)
+      {
+        pFree1(b);
+        bMultCopyX(a1, m, a, tneg);
+        return;
+      }
+      pbCopyAddFast0(b, a1, m);
+    }
+    goto Top0;
+
+  C_M1_0:  // b < a2
+    {
+      a = pNext(a) = a2;
+      pIter(a2);
+      if (a2==NULL)
+      {
+        pFree1(b);
+        bMultCopyX(a1, m, a, tneg);
+        return;
+      }
+    }
+    goto Top0;
+
+  C_1_0:  // b >a2
+    {
+      pSetCoeff0(b,npMultM(pGetCoeff(a1),tneg));
+      a = pNext(a) = b;
+      pIter(a1);
+      if (a1!=NULL)
+      {
+        b = pNew();
+        pbCopyAddFast0(b, a1, m);
+      }
+      else
+      {
+        pNext(a) = a2;
+        return;
+      }
+    }
+  goto Top0;
+#if 0
+  // below degree limit =================================================
+  Top0:
+
+  pTest(b);
+  pTest(a2);
+
+  //d = pGetOrder(b) - pGetOrder(a2);
+  //NonZeroTestA(d, 1 /*pOrdSgn*/, goto NotEqual0);
+  if (((int)pGetOrder(b)) > ((int)pGetOrder(a2))) { d=1; goto NotEqual0; }
+  else if (((int)pGetOrder(b)) < ((int)pGetOrder(a2))) { d=-1; goto NotEqual0; }
+  else d=0;
   // now pGetOrder(b)==pGetOrder(a2):
 
   Equal0:
@@ -3690,12 +3967,15 @@ void spLoop_mac_2i_1(poly a1, poly a2, poly m,poly spNoether)
   {
     pFree1(b);
     pNext(a) = a2;
+    pTest(pNext(m));
     return;
   }
   if (a2==NULL)
   {
     pFree1(b);
-    bMultCopyX0(a1, m, a, tneg);
+    //bMultCopyX0(a1, m, a, tneg);
+    spMultCopyX(a1, m, a, tneg,NULL);
+    pTest(pNext(m));
     return;
   }
   pbCopyAddFast0(b, a1, m);
@@ -3709,7 +3989,10 @@ void spLoop_mac_2i_1(poly a1, poly a2, poly m,poly spNoether)
     if (a2==NULL)
     {
       pFree1(b);
+    pTest(pNext(m));
       bMultCopyX0(a1, m, a, tneg);
+      //spMultCopyX(a1, m, a, tneg,NULL);
+    pTest(pNext(m));
       return;
     }
     goto Top0;
@@ -3730,6 +4013,7 @@ void spLoop_mac_2i_1(poly a1, poly a2, poly m,poly spNoether)
     return;
   }
   goto Top0;
+#endif
 }
 static void spLoop_mac_1_c(poly p1, poly p2, poly m, poly spNoether)
 {

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.15 1998-01-24 17:22:06 Singular Exp $ */
+/* $Id: polys-impl.h,v 1.16 1998-01-27 18:51:21 Singular Exp $ */
 
 /***************************************************************
  *
@@ -275,7 +275,11 @@ extern void pGetVarIndicies(ring r,
 #define _pSetCoeff(p,n)     {nDelete(&((p)->coef));(p)->coef=n;}
 #define _pSetCoeff0(p,n)    (p)->coef=n
 
+#ifndef TEST_MAC_DEBUG
 #define _pGetOrder(p)       ((p)->Order)
+#else
+#define _pGetOrder(p)       ((p)->MOrder)
+#endif
 
 #if defined(PDEBUG) && PDEBUG != 0
 extern Exponent_t pPDSetExp(poly p, int v, Exponent_t e, char* f, int l);
@@ -347,7 +351,7 @@ inline Exponent_t _pGetExpDiff(poly p1, poly p2, int i)
  * Storage Managament Routines
  *
  ***************************************************************/
-#ifdef MDEBUG
+#ifdef PDEBUG
 
 poly    pDBNew(char *f, int l);
 poly    pDBInit(char * f,int l);
@@ -389,23 +393,35 @@ while(0)
 #define _pFetchCopy(r,p)    pOrdPolyInsertSetm(pCopy(p))
 #endif
 
-#else // ! MDEBUG
+#else // ! PDEBUG
 
+#ifdef MDEBUG
+#define _pNew()         (poly) mmDBAllocSpecialized(__FILE__,__LINE__)
+#else
 #define _pNew()         (poly) mmAllocSpecialized()
+#endif
 // #define _pNew() _pInit()
 
 #include <string.h>
 
 inline poly    _pInit(void)
 {
+#ifdef MDEBUG
+  poly p=(poly)mmDBAllocSpecialized(__FILE__,__LINE__);
+#else
   poly p=(poly)mmAllocSpecialized();
+#endif
   memset(p,0, pMonomSize);
   return p;
 }
 
 extern void    _pDelete(poly * a);
 extern void    _pDelete1(poly * a);
+#ifdef MDEBUG
+#define _pFree1(a)       mmDBFreeSpecialized((ADDRESS)a,__FILE__,__LINE__)
+#else
 #define _pFree1(a)       mmFreeSpecialized((ADDRESS)a)
+#endif
 
 extern poly    _pCopy(poly a);
 extern poly    _pCopy1(poly a);
@@ -417,7 +433,7 @@ extern poly    _pFetchCopy(ring r,poly a);
 #define _pFetchCopy(r,p)  pOrdPolyInsertSetm(pCopy(p))
 #endif
 
-#endif // MDEBUG
+#endif // PDEBUG
 
 #define _pCopy2(p1, p2)     memcpyW(p1, p2, pMonomSizeW)
 
@@ -516,7 +532,7 @@ inline void __pCopyAddFast(poly p1, poly p2, poly p3)
   const Exponent_t* s2 = (Exponent_t*) &(p2->exp[pVarLowIndex]);
   const Exponent_t* s3 = (Exponent_t*) &(p3->exp[pVarLowIndex]);
   const Exponent_t* const ub = s3 + pVariables;
-// need to zero the "fill in" slots (i.e., empty exponents)  
+// need to zero the "fill in" slots (i.e., empty exponents)
 #ifdef  WORDS_BIGENDIAN
   *((unsigned long *) ((unsigned long*) p1) + pMonomSizeW -1) = 0;
 #else
@@ -900,6 +916,16 @@ DECLARE(void, _bSetm0(poly p))
       ep--;
       ip+=bHighdeg_1+(*ep);
     }
+#if 0
+    int *ip=bBinomials+_pGetExp(p,1);
+    loop
+    {
+      ord += (*ip);
+      if (i==pVariables) break;
+      i++;
+      ip+=bHighdeg_1+_pGetExp(p,i);
+    }
+#endif
   }
   else
   {
@@ -914,6 +940,16 @@ DECLARE(void, _bSetm0(poly p))
       ep++;
       ip+=bHighdeg_1+(*ep);
     }
+#if 0
+    int *ip=bBinomials+_pGetExp(p,1);
+    loop
+    {
+      ord += (*ip);
+      if (i==pVariables) break;
+      i++;
+      ip+=bHighdeg_1+_pGetExp(p,i);
+    }
+#endif
   }
   p->Order=ord;
 }

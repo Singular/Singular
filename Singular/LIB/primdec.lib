@@ -1,4 +1,4 @@
-// $Id: primdec.lib,v 1.7 1997-11-18 16:13:00 Singular Exp $
+// $Id: primdec.lib,v 1.8 1998-01-27 18:51:23 Singular Exp $
 ///////////////////////////////////////////////////////
 // primdec.lib
 // algorithms for primary decomposition based on
@@ -2075,8 +2075,8 @@ EXAMPLE: example decomp; shows an example
      else
      {
        list uprimary;
-       uprimary[1]=ideal(1);
        uprimary[2]=ideal(1);
+       uprimary[1]=ideal(1);
      }
 
      //we need the intersection of the ideals in the list quprimary with the
@@ -2194,8 +2194,8 @@ EXAMPLE: example decomp; shows an example
   if((size(quprimary)==0)&&(@wr>0))
   {
      @j=ideal(1);
-     quprimary[1]=ideal(1);
      quprimary[2]=ideal(1);
+     quprimary[1]=ideal(1);
   }
 
   //---------------------------------------------------------------

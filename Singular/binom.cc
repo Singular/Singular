@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: binom.cc,v 1.10 1998-01-24 17:22:04 Singular Exp $ */
+/* $Id: binom.cc,v 1.11 1998-01-27 18:51:17 Singular Exp $ */
 
 /*
 * ABSTRACT - set order (=number of monomial) for dp
@@ -130,17 +130,17 @@ int bComp1dpc(poly p1, poly p2)
 #else
   int o1=p1->Order, o2=p2->Order;
 #endif
-  register long d=o1-o2;
 
-   if (d!=0)
+   if (o1!=o2)
    {
-     if(d>0) return 1;
+     if(o1>o2) return 1;
      else    return -1;
    }
 
   /* now o1==o2: */
   if (o1>0)
   {
+    register long d;
     if (pVariablesW >2 )
     {
       if (pVariablesW & 1)

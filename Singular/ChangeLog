@@ -1,3 +1,7 @@
+Tue Jan 27 19:45:19 MET 1998 hannes
+   *  bug fixes for TEST_MAC_ORDER (binom.* polys-impl.h, spSpolyLoop.cc)
+      (binom.* poly-impl.* spSpolyLoop.cc)
+
 Mon Jan 26 18:40:43 MET 1998 hannes
    * changes in iparith.cc for define: PROC_BUG
      useful, if c++ cannot type cast proc variables
