@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sparsmat.cc,v 1.8 1999-06-10 09:01:17 pohl Exp $ */
+/* $Id: sparsmat.cc,v 1.9 1999-06-22 11:24:02 pohl Exp $ */
 
 /*
 * ABSTRACT: operations with sparse matrices (bareiss, ...)
@@ -18,6 +18,7 @@
 #include "ipid.h"
 #include "ideals.h"
 #include "numbers.h"
+#include "longrat.h"
 #include "sparsmat.h"
 
 /* ----------------- macros ------------------ */
@@ -57,8 +58,10 @@ static void smFindRef(poly *, poly *, poly);
 static void smElemDelete(smpoly *);
 static smpoly smElemCopy(smpoly);
 static float smPolyWeight(smpoly);
-static smpoly smPoly2Smpoly(poly p);
-static poly smSmpoly2Poly(smpoly a);
+static smpoly smPoly2Smpoly(poly);
+static poly smSmpoly2Poly(smpoly);
+static BOOLEAN smHaveDenom(poly);
+static number smCleardenom(ideal);
 
 /* class for sparse matrix:
 *      3 parts of matrix during the algorithm
@@ -88,7 +91,8 @@ private:
   int tored;           // border for rows to reduce
   int inred;           // unreducable part
   int rpiv, cpiv;      // position of the pivot
-  unsigned short *perm;// permutation of rows
+  int normalize;       // Normalization flag
+  EXPONENT_TYPE *perm; // permutation of rows
   float wpoints;       // weight of all points
   float *wrw, *wcl;    // weights of rows and columns
   smpoly * m_act;      // unreduced columns
@@ -119,6 +123,8 @@ private:
   void smPivDel();
   void smSign();
   void smInitPerm();
+  int smCheckNormalize();
+  void smNormalize();
 public:
   sparse_mat(ideal);
   ~sparse_mat();
@@ -188,12 +194,15 @@ poly smCallDet(ideal I)
     Werror("det of %d x %d module (matrix)",r,I->ncols);
     return NULL;
   }
+  number diag,h=nInit(1);
   poly res,save;
   ring origR;
   sip_sring tmpR;
+  sparse_mat *det;
   ideal II=smRingCopy(I,&origR,tmpR);
-  sparse_mat *det = new sparse_mat(II);
 
+  diag = smCleardenom(II);
+  det = new sparse_mat(II);
   idDelete(&II);
   if (det->smGetAct() == NULL)
   {
@@ -213,6 +222,13 @@ poly smCallDet(ideal I)
     pDelete(&save);
     smRingClean(origR,tmpR);
   }
+  if (nEqual(diag,h) == FALSE)
+  {
+    pMultN(res,diag);
+    pNormalize(res);
+  }
+  nDelete(&diag);
+  nDelete(&h);
   return res;
 }
 
@@ -311,7 +327,7 @@ sparse_mat::sparse_mat(ideal smat)
   crd = 0;
   tored = nrows; // without border
   i = tored+1;
-  perm = (unsigned short *)Alloc(sizeof(unsigned short)*(i+1));
+  perm = (EXPONENT_TYPE *)Alloc(sizeof(EXPONENT_TYPE)*(i+1));
   perm[i] = 0;
   m_row = (smpoly *)Alloc0(sizeof(smpoly)*i);
   wrw = (float *)Alloc(sizeof(float)*i);
@@ -348,7 +364,7 @@ sparse_mat::~sparse_mat()
   i = nrows+1;
   Free((ADDRESS)wrw, sizeof(float)*i);
   Free((ADDRESS)m_row, sizeof(smpoly)*i);
-  Free((ADDRESS)perm, sizeof(unsigned short)*(i+1));
+  Free((ADDRESS)perm, sizeof(EXPONENT_TYPE)*(i+1));
 }
 
 /*
@@ -395,6 +411,7 @@ poly sparse_mat::smDet()
     Free((void *)m_act[1], sizeof(smprec));
     return res;
   }
+  normalize = 0;
   this->smInitPerm();
   this->smPivot();
   this->smSign();
@@ -519,6 +536,8 @@ void sparse_mat::smNewBareiss(int x, int y)
     this->smCopToRes();
     return;
   }
+  normalize = this->smCheckNormalize();
+  if (normalize) this->smNormalize();
   this->smPivot();
   this->smSelectPR();
   this->sm1Elim();
@@ -537,6 +556,7 @@ void sparse_mat::smNewBareiss(int x, int y)
   }
   loop
   {
+    if (normalize) this->smNormalize();
     this->smNewPivot();
     this->smSelectPR();
     this->smMultCol();
@@ -1415,6 +1435,7 @@ void sparse_mat::smMultCol()
       pDelete(&a->m);
       if (f) SM_DIV(ha, m_res[f]->m);
       a->m = ha;
+      if (normalize) pNormalize(a->m);
     }
     a = a->n;
   }
@@ -1443,6 +1464,47 @@ void sparse_mat::smFinalMult()
         if (f) SM_DIV(ha, m_res[f]->m);
         a->m = ha;
       }
+      if (normalize) pNormalize(a->m);
+      a = a->n;
+    } while (a != NULL);
+  }
+}
+
+/*
+* check for denominators
+*/
+int sparse_mat::smCheckNormalize()
+{
+  int i;
+  smpoly a;
+
+  for (i=act; i; i--)
+  {
+    a = m_act[i];
+    do
+    {
+      if(smHaveDenom(a->m)) return 1;
+      a = a->n;
+    } while (a != NULL);
+  }
+  return 0;
+}
+
+/*
+* normalize 
+*/
+void sparse_mat::smNormalize()
+{
+  smpoly a;
+  int i;
+  int e = crd;
+
+  for (i=act; i; i--)
+  {
+    a = m_act[i];
+    do
+    {
+      if (e == a->e) pNormalize(a->m);
       a = a->n;
     } while (a != NULL);
   }
@@ -1462,6 +1524,7 @@ poly sparse_mat::smMultPoly(smpoly a)
     h = SM_MULT(h, m_res[crd]->m, m_res[f]->m);
     if (f) SM_DIV(h, m_res[f]->m);
     a->m = h;
+    if (normalize) pNormalize(a->m);
     a->f = smPolyWeight(a);
     return r;
   }
@@ -2134,5 +2197,54 @@ static float smPolyWeight(smpoly a)
     while (p);
     return res+(float)i;
   }
+}
+
+static BOOLEAN smHaveDenom(poly a)
+{
+  BOOLEAN sw;
+  number x,o=nInit(1);
+
+  while (a != NULL)
+  {
+    x = nGetDenom(pGetCoeff(a));
+    sw = nEqual(x,o);
+    nDelete(&x);
+    if (!sw)
+    {
+      nDelete(&o);
+      return TRUE;
+    }
+    pIter(a);
+  }
+  nDelete(&o);
+  return FALSE;
+}
+
+static number smCleardenom(ideal id)
+{
+  poly a;
+  number x,y,res=nInit(1);
+  BOOLEAN sw=FALSE;
+
+  for (int i=0; i<IDELEMS(id); i++)
+  {
+    a = id->m[i];
+    sw = smHaveDenom(a);
+    if (sw) break;
+  }
+  if (!sw) return res;
+  for (int i=0; i<IDELEMS(id); i++)
+  {
+    a = id->m[i];
+    x = nCopy(pGetCoeff(a));
+    pCleardenom(a);
+    y = nDiv(x,pGetCoeff(a));
+    nDelete(&x);
+    x = nMult(res,y);
+    nNormalize(x);
+    nDelete(&res);
+    res = x;
+  }
+  return res;
 }
 
