@@ -1,11 +1,15 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: ftmpl_matrix.h,v 1.3 1997-04-15 10:13:42 schmidt Exp $
+// $Id: ftmpl_matrix.h,v 1.4 1997-04-18 16:42:01 schmidt Exp $
 
 #ifndef INCL_MATRIX_H
 #define INCL_MATRIX_H
 
 /*
  * $Log: not supported by cvs2svn $
+ * Revision 1.3  1997/04/15 10:13:42  schmidt
+ * #include <config.h> added
+ * the header config.h will be included be makeheader
+ *
  * Revision 1.2  1997/03/27 10:34:15  schmidt
  * stream-io wrapped by NOSTREAMIO
  *
@@ -33,6 +37,7 @@ private:
 #ifndef NOSTREAMIO
     void printrow ( ostream & s, int i ) const;
 #endif /* NOSTREAMIO */
+    typedef T* T_ptr;
 public:
     Matrix() : NR(0), NC(0), elems(0) {}
     Matrix( int nr, int nc );
