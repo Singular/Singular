@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmemory.h,v 1.4 1997-12-03 16:58:53 obachman Exp $ */
+/* $Id: mmemory.h,v 1.5 1998-01-16 12:40:02 obachman Exp $ */
 /*
 * ABSTRACT
 */
@@ -16,7 +16,8 @@ extern "C" {
 
 #include "mod2.h"
   
-#ifdef DO_DEEP_PROFILE                                                  
+#ifdef DO_DEEP_PROFILE
+extern void _memcpyW(void* p1, void* p2, long l);
 #define  memcpyW(p1, p2, l) _memcpyW((void*) p1, (void*) p2, (long) l)  
 #else                                                                   
 #define memcpyW(p1, p2, l)                      \
