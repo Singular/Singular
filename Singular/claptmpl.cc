@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: claptmpl.cc,v 1.5 1997-05-05 13:40:04 obachman Exp $
+// $Id: claptmpl.cc,v 1.6 1997-05-13 10:08:53 obachman Exp $
 /*
 * ABSTRACT - instantiation of all templates
 */
@@ -53,8 +53,51 @@ template int tmin ( const int&, const int& );
 // place here your own template stuff, not instantiated by factory
 
 #ifdef HAVE_LIBFAC_P
-#include <templates/tmpl_inst.h>
-#include <templates/class.cc>
+#include <factor.h>
+
+// class.h:
+template <class T>
+class Substitution {
+private:
+    T _factor;
+    T _exp;
+public:
+    Substitution() : _factor(1), _exp(0) {}
+    Substitution( const Substitution<T> & f ) : _factor(f._factor), _exp(f._exp) {}
+    Substitution( const T & f, const T & e ) : _factor(f), _exp(e) {}
+    Substitution( const T & f ) : _factor(f), _exp(1) {}
+    ~Substitution() {}
+    Substitution<T>& operator= ( const Substitution<T>& );
+    Substitution<T>& operator= ( const T& );
+    T factor() const { return _factor; }
+    T exp() const { return _exp; }
+    friend int operator== ( const Substitution<T>&, const Substitution<T>& );
+};
+
+// class.cc
+template <class T>
+Substitution<T>& Substitution<T>::operator= ( const Substitution<T>& f )
+{
+    if ( this != &f ) {
+	_factor = f._factor;
+	_exp = f._exp;
+    }
+    return *this;
+}
+
+template <class T>
+Substitution<T>& Substitution<T>::operator= ( const T & f )
+{
+    _factor = f;
+    _exp = 1;
+    return *this;
+}
+
+template <class T>
+int operator== ( const Substitution<T> &f1, const Substitution<T> &f2 )
+{
+    return (f1.exp() == f2.exp()) && (f1.factor() == f2.factor());
+}
 
 template class List<int>;
 template class ListIterator<int>;
@@ -65,6 +108,7 @@ template class ListIterator<IntList>;
 template class Substitution<CanonicalForm>;
 template class Array<Variable>;
 template class Array<int>;
+typedef Substitution<CanonicalForm> SForm ;
 template class List<SForm>;
 template class ListIterator<SForm>;
 template class List<Variable>;

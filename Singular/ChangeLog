@@ -1,3 +1,12 @@
+Tue May 13 11:32:41 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* claptmpl.cc: changed template initializiation of libfac, so that
+	  class.cc and tmpl_inst.h does not need to be included
+
+Mon May 12 16:48:14 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* misc.cc: Added / to Help_File and Info_File
+
 Tue May  6 08:29:57 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
 	* added factorycheck target in Makefile.in

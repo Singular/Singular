@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: misc.cc,v 1.11 1997-05-06 17:10:59 Singular Exp $ */
+/* $Id: misc.cc,v 1.12 1997-05-13 10:08:54 obachman Exp $ */
 /*
 * ABSTRACT:
 */
@@ -179,8 +179,8 @@ int siRand()
 #define HELP_NOT_OPEN  1
 #define HELP_NOT_FOUND 2
 #ifndef macintosh
-#define Index_File     SINGULAR_INFODIR "singular.hlp"
-#define Help_File      SINGULAR_INFODIR "singular.hlp"
+#define Index_File     SINGULAR_INFODIR "/singular.hlp"
+#define Help_File      SINGULAR_INFODIR "/singular.hlp"
 #else
 #define Index_File     "singular.hlp"
 #define Help_File      "singular.hlp"
