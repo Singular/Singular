@@ -1,7 +1,7 @@
 /* Copyright 1997 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// static char * rcsid = "$Id: helpstuff.cc,v 1.3 1997-09-12 07:19:56 Singular Exp $";
+// static char * rcsid = "$Id: helpstuff.cc,v 1.4 2001-06-19 15:29:04 Singular Exp $";
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -10,7 +10,7 @@
 // some CC's need this:
 #include "helpstuff.h"
 
-bool 
+bool
 mydivremt ( const CanonicalForm& f, const CanonicalForm& g, CanonicalForm& a, CanonicalForm& b ){
   bool retvalue;
   CanonicalForm aa,bb;
@@ -50,7 +50,7 @@ myappend( const CFFList & Inputlist, const CFFactor & TheFactor){
     copy = i.getItem();
     if ( copy.factor() == TheFactor.factor() )
       exp += copy.exp();
-    else 
+    else
       Outputlist.append(copy);
   }
   Outputlist.append( CFFactor(TheFactor.factor(), exp + TheFactor.exp()));
@@ -73,7 +73,7 @@ myUnion(const CFFList & Inputlist1,const CFFList & Inputlist2){
 int
 Powerup( const int base , const int exp){
   int retvalue=1;
-  if ( exp == 0 )  return retvalue ; 
+  if ( exp == 0 )  return retvalue ;
   else for ( int i=1 ; i <= exp; i++ ) retvalue *= base ;
 
   return retvalue;
@@ -89,9 +89,9 @@ Powerup( const int base , const int exp){
 // x_1, .. x_(level(f)-1); e.g. x_1*x_2 == 0 mod I^2 .       //
 // modpower: the real work is done here; called by mod_power //
 ///////////////////////////////////////////////////////////////
-static void 
-modpower( const CanonicalForm & f, int k , int td, 
-	  const CanonicalForm & t, CanonicalForm & result){
+static void
+modpower( const CanonicalForm & f, int k , int td,
+          const CanonicalForm & t, CanonicalForm & result){
 
   if ( td >= k ) return;
   if ( getNumVars(f) == 0 ) result += f*t;
@@ -102,7 +102,7 @@ modpower( const CanonicalForm & f, int k , int td,
   }
 }
 
-CanonicalForm 
+CanonicalForm
 mod_power( const CanonicalForm & f, int k, int levelU){
   CanonicalForm result,dummy;
   Variable x(levelU);
@@ -127,7 +127,7 @@ mod_power( const CanonicalForm & f, int k, int levelU){
 ///////////////////////////////////////////////////////////////
 // Return the deg of F in the Variables x_1,..,x_(levelF-1)  //
 ///////////////////////////////////////////////////////////////
-int 
+int
 subvardegree( const CanonicalForm & F, int levelF ){
   int n=0,m=degree(F,levelF),newn=0;
 
@@ -141,7 +141,7 @@ subvardegree( const CanonicalForm & F, int levelF ){
 ///////////////////////////////////////////////////////////////
 // Change poly:  x_i <- x_i +- a_i    for i= 1,..,level(f)-1 //
 ///////////////////////////////////////////////////////////////
-CanonicalForm 
+CanonicalForm
 change_poly( const CanonicalForm & f , const SFormList & Substitutionlist ,int directionback ){
   CanonicalForm F=f,g,k;
   int level_i;
@@ -152,17 +152,19 @@ change_poly( const CanonicalForm & f , const SFormList & Substitutionlist ,int d
   //                    i.getItem().exp()     -> gives a_i
   // ==> g = x_i ; k = a_i
     level_i=level(i.getItem().factor());
-    g = power( 
-		       Variable(level_i),1
-		       ); 
+    g = power(
+                       Variable(level_i),1
+                       );
     k= i.getItem().exp();
-    if ( directionback ){
+    if ( directionback )
+    {
       if ( degree(F, level_i) != 0 )
-	F=F(g-k, level(i.getItem().factor())); // x_i <-- x_i - a_i
+        F=F(g-k, level_i /*level(i.getItem().factor())*/); // x_i <-- x_i - a_i
     }
-    else{
+    else
+    {
       if ( degree(F, level_i) != 0 )
-	F=F(g+k, level(i.getItem().factor())); // x_i <-- x_i +a_i
+        F=F(g+k, level_i /*level(i.getItem().factor())*/); // x_i <-- x_i +a_i
     }
   }
 
@@ -172,6 +174,9 @@ change_poly( const CanonicalForm & f , const SFormList & Substitutionlist ,int d
 ////////////////////////////////////////////////////////////
 /*
 $Log: not supported by cvs2svn $
+Revision 1.3  1997/09/12 07:19:56  Singular
+* hannes/michael: libfac-0.3.0
+
 Revision 1.3  1997/04/25 22:20:45  michael
 Version for libfac-0.2.1
 
