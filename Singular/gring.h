@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gring.h,v 1.17 2003-01-29 19:13:36 levandov Exp $ */
+/* $Id: gring.h,v 1.18 2003-02-26 15:40:51 levandov Exp $ */
 /*
 * ABSTRACT additional defines etc for --with-plural
 */
@@ -23,11 +23,12 @@ poly nc_mm_Mult_p(const poly m, poly p, const ring r);
 poly nc_mm_Mult_nn (Exponent_t *F, Exponent_t *G, const ring r); 
 poly nc_mm_Mult_uu (Exponent_t *F,int jG,int bG, const ring r);
 
-#define nc_uu_Mult_ww nc_uu_Mult_ww_vert
-poly nc_uu_Mult_ww_vert (int i, int a, int j, int b, const ring r);
-poly nc_uu_Mult_ww_horvert (int i, int a, int j, int b, const ring r);
-poly nc_uu_Mult_ww_hvdiag (int i, int a, int j, int b, const ring r);
-
+/* #define nc_uu_Mult_ww nc_uu_Mult_ww_vert */
+poly nc_uu_Mult_ww (int i, int a, int j, int b, const ring r);
+/* poly nc_uu_Mult_ww_vert (int i, int a, int j, int b, const ring r); */
+/* poly nc_uu_Mult_ww_horvert (int i, int a, int j, int b, const ring r); */
+/* poly nc_uu_Mult_ww_hvdiag (int i, int a, int j, int b, const ring r); */
+/* not written yet */
 
 poly _nc_p_Mult_q(poly p, poly q, const int copy, const ring r);
 

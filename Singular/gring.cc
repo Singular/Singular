@@ -6,7 +6,7 @@
  *  Purpose: p_Mult family of procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.23 2003-01-30 21:41:01 levandov Exp $
+ *  Version: $Id: gring.cc,v 1.24 2003-02-26 15:40:51 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -89,8 +89,10 @@ poly  nc_p_Mult_mm(poly p, const poly m, const ring r)
   while (p!=NULL)
   {
     v=p_Head(p,r);
+#ifdef PDEBUG
     p_Test(v,r);
     p_Test(p,r);
+#endif
 
     expP=p_GetComp(v,r);
     if (expP==0)
@@ -127,7 +129,9 @@ poly  nc_p_Mult_mm(poly p, const poly m, const ring r)
   freeT(M,r->N);
   int len=pLength(out);
   sBucketDestroyAdd(bu_out, &out, &len);
+#ifdef PDEBUG
   p_Test(out,r);
+#endif
   return(out);
 }
 
@@ -162,9 +166,10 @@ poly nc_mm_Mult_p(const poly m, poly p, const ring r)
   while (p!=NULL)
   {
     v=p_Head(p,r);
+#ifdef PDEBUG
     p_Test(v,r);
     p_Test(p,r);
-
+#endif
     expP=p_GetComp(v,r);
     if (expP==0)
     {
@@ -199,7 +204,9 @@ poly nc_mm_Mult_p(const poly m, poly p, const ring r)
   freeT(M,r->N);
   int len=pLength(out);
   sBucketDestroyAdd(bu_out, &out, &len );
+#ifdef PDEBUG
   p_Test(out,r);
+#endif
   return(out);
 }
 
@@ -327,7 +334,9 @@ poly nc_mm_Mult_nn(Exponent_t *F0, Exponent_t *G0, const ring r)
      {
        p_SetExpV(Pn,On,r);
        p_Setm(Pn,r);
+#ifdef PDEBUG
        p_Test(Pn,r);
+#endif
 
 //       if (pNext(D)==0)
 // is D a monomial? could be postponed higher
@@ -365,7 +374,9 @@ poly nc_mm_Mult_nn(Exponent_t *F0, Exponent_t *G0, const ring r)
   U[0]=0;
   p_SetExpV(Rout,U,r);
   p_Setm(Rout,r);  /* use again this name Rout */
+#ifdef PDEBUG
   p_Test(Rout,r);
+#endif
   p_SetCoeff(Rout,c[cnt-1],r);
   out=p_Add_q(out,Rout,r);
   freeT(U,r->N);
@@ -376,7 +387,9 @@ poly nc_mm_Mult_nn(Exponent_t *F0, Exponent_t *G0, const ring r)
     Prv[0]=0;
     p_SetExpV(Rout,Prv,r);
     p_Setm(Rout,r);
+#ifdef PDEBUG
     p_Test(Rout,r);
+#endif
     out=nc_mm_Mult_p(Rout,out,r); /* getting the final result */
     freeT(Prv,r->N);
     p_Delete(&Rout,r);
@@ -455,7 +468,9 @@ poly nc_mm_Mult_uu(Exponent_t *F,int jG,int bG, const ring r)
        Prv[0]=0;
        p_SetExpV(Rout,Prv,r);
        p_Setm(Rout,r);
+#ifdef PDEBUG
        p_Test(Rout,r);
+#endif
        freeT(Prv,r->N);
        out=nc_mm_Mult_p(Rout,out,r); /* getting the final result */
     }
@@ -529,15 +544,18 @@ poly nc_mm_Mult_uu(Exponent_t *F,int jG,int bG, const ring r)
          p_Setm(Pn,r);
          Rout=nc_p_Mult_mm(D,Pn,r);
        }
+#ifdef PDEBUG
        p_Test(Pp,r);
+#endif
        p_Delete(&Pn,r);
      }
      else                     /* first step */
      {
        Rout=nc_mm_Mult_p(Pp,D,r);
      }
-
+#ifdef PDEBUG
      p_Test(Pp,r);
+#endif
      p_Delete(&Pp,r);
      num=n_Mult(c[cnt+1],c[cnt],r);
      n_Delete(&c[cnt],r);
@@ -581,84 +599,17 @@ poly nc_mm_Mult_uu(Exponent_t *F,int jG,int bG, const ring r)
 
 poly nc_uu_Mult_ww_vert (int i, int a, int j, int b, const ring r)
 {
-  poly out=pOne();
-  number tmp_number=NULL;
+  int k,m;
+  matrix cMT=r->nc->MT[UPMATELEM(j,i,r->N)];         /* cMT=current MT */
 
-  /* Now check zero exeptions, commutativity and should we do something at all?  */
-  if (i==j)
-  {
-    p_SetExp(out,j,a+b,r);
-  }
-  else
-  {
-    p_SetExp(out,j,b,r);
-    p_SetExp(out,i,a,r);
-  }
-  p_Setm(out,r);
-  if ((a==0)||(b==0)||(i<=j)) return(out);/* zero exeptions and usual case */
-
-  if (MATELEM(r->nc->COM,j,i)!=NULL)
-    /* commutative or quasicommutative case */
-  {
-    if (r->cf->nIsOne(p_GetCoeff(MATELEM(r->nc->COM,j,i),r))) /* commutative case */
-    {
-      return(out);
-    }
-    else
-    {
-      tmp_number=p_GetCoeff(MATELEM(r->nc->COM,j,i),r); /* quasicommutative case */
-      nPower(tmp_number,a*b,&tmp_number);
-      p_SetCoeff(out,tmp_number,r);
-      return(out);
-    }
-  }/* end_of commutative or quasicommutative case */
-
-  /* we are here if  i>j and variables do not commute or quasicommute */
-  /* in fact, now a>=1 and b>=1; and j<i */
-  /* now check wether the polynom is alredy computed */
-  int vik = UPMATELEM(j,i,r->N);
-  matrix cMT=r->nc->MT[vik];
-  int cMTsize=r->nc->MTsize[vik];
-  p_Delete(&out,r);
-
-  if (((a<cMTsize)&&(b<cMTsize))&&(MATELEM(cMT,a,b)!=NULL))
-  {
-    out = nc_p_CopyGet(MATELEM(cMT,a,b),r);
-    //   out=p_Copy(MATELEM(cMT,a,b),r);
-    return (out);
-  }
-
-  int newcMTsize=0;
-  int k,l,m;
-
-  if (a>=b) {newcMTsize=a;} else {newcMTsize=b;}
-  if (newcMTsize>cMTsize)
-  {
-     newcMTsize = newcMTsize+cMTsize;
-     matrix tmp = mpNew(newcMTsize,newcMTsize);
-     l=UPMATELEM(j,i,r->N);
-     for (k=1;k<=cMTsize;k++)
-     {
-        for (m=1;m<=cMTsize;m++)
-        {
-	  MATELEM(tmp,k,m) = nc_p_CopyPut(MATELEM(r->nc->MT[l],k,m),r);
-	  //	  MATELEM(tmp,k,m) = MATELEM(r->nc->MT[l],k,m);
-	  //           omCheckAddr(tmp->m);
-	  //	  MATELEM(r->nc->MT[l],k,m)=NULL;
-	  p_Delete(&MATELEM(r->nc->MT[l],k,m),r);
-	  //           omCheckAddr(r->nc->MT[UPMATELEM(j,i,r->N)]->m);
-        }
-     }
-     id_Delete((ideal *)&(r->nc->MT[l]),r->nc->basering);
-     r->nc->MT[l] = tmp;
-     r->nc->MTsize[l] = newcMTsize;
-  }  /* The update of multiplication matrix is finished */
-
-  cMT=r->nc->MT[UPMATELEM(j,i,r->N)];         /* cMT=current MT */
-
-  poly x=pOne();p_SetExp(x,j,1,r);p_Setm(x,r);p_Test(x,r);/* var(j); */
-  poly y=pOne();p_SetExp(y,i,1,r);p_Setm(y,r);p_Test(y,r);/*var(i);  for convenience */
-
+  poly x=pOne();p_SetExp(x,j,1,r);p_Setm(x,r);
+/* var(j); */
+  poly y=pOne();p_SetExp(y,i,1,r);p_Setm(y,r);
+/*var(i);  for convenience */
+#ifdef PDEBUG
+  p_Test(x,r);
+  p_Test(y,r);
+#endif
   poly t=NULL;
 /* ------------ Main Cycles ----------------------------*/
 
@@ -703,11 +654,11 @@ poly nc_uu_Mult_ww_vert (int i, int a, int j, int b, const ring r)
   return(t);     
 }
 
-poly nc_uu_Mult_ww_horvert (int i, int a, int j, int b, const ring r)
+poly nc_uu_Mult_ww (int i, int a, int j, int b, const ring r)
   /* (x_i)^a times (x_j)^b */
   /* x_i = y,  x_j = x ! */
 {
-  /* Check zero exeptions, (q-)commutativity and should we do something at all?  */
+  /* Check zero exceptions, (q-)commutativity and is there something to do? */
   assume(a!=0);
   assume(b!=0);
   poly out=pOne();
@@ -797,12 +748,26 @@ poly nc_uu_Mult_ww_horvert (int i, int a, int j, int b, const ring r)
     r->nc->MT[UPMATELEM(j,i,r->N)] = tmp;
     tmp=NULL;
     r->nc->MTsize[UPMATELEM(j,i,r->N)] = newcMTsize;
-  }  /* The update of multiplication matrix is finished */
+  }  
+  /* The update of multiplication matrix is finished */
+    pDelete(&out);
+    out = nc_uu_Mult_ww_vert(i, a, j, b, r);
+    //    out = nc_uu_Mult_ww_horvert(i, a, j, b, r);
+    return(out);
+}
 
+poly nc_uu_Mult_ww_horvert (int i, int a, int j, int b, const ring r)
+
+{
+  int k,m;
   matrix cMT=r->nc->MT[UPMATELEM(j,i,r->N)];         /* cMT=current MT */
 
-  poly x=pOne();p_SetExp(x,j,1,r);p_Setm(x,r);p_Test(x,r); /* var(j); */
-  poly y=pOne();p_SetExp(y,i,1,r);p_Setm(y,r);p_Test(y,r); /*var(i);  for convenience */
+  poly x=pOne();p_SetExp(x,j,1,r);p_Setm(x,r);/* var(j); */
+  poly y=pOne();p_SetExp(y,i,1,r);p_Setm(y,r); /*var(i);  for convenience */
+#ifdef PDEBUG
+  p_Test(x,r); 
+  p_Test(y,r);
+#endif
 
   poly t=NULL;
 
@@ -977,7 +942,7 @@ poly nc_uu_Mult_ww_horvert (int i, int a, int j, int b, const ring r)
   p_Delete(&x,r);
   p_Delete(&y,r);
   t=p_Copy(MATELEM(cMT,a,b),r);
-  return(t);  /* as the last computed element was cMT[a,b] */
+  return(t);  /* since the last computed element was cMT[a,b] */
 }
 
 
@@ -999,7 +964,9 @@ poly nc_spGSpolyRed(poly p1, poly p2,poly spNoether, const ring r)
   poly m=pOne();
   p_ExpVectorDiff(m,p2,p1,r);
   p_Setm(m,r);
+#ifdef PDEBUG
   p_Test(m,r);
+#endif
   /* pSetComp(m,r)=0? */
   poly N=nc_mm_Mult_p(m,p_Head(p1,r),r);
   number C=n_Copy(p_GetCoeff(N,r),r);
@@ -1052,15 +1019,21 @@ poly nc_spGSpolyCreate(poly p1, poly p2,poly spNoether, const ring r)
   poly m2=pOne();
   pLcm(p1,p2,pL);
   p_Setm(pL,r);
+#ifdef PDEBUG
   p_Test(pL,r);
+#endif
   p_ExpVectorDiff(m1,pL,p1,r);
   p_SetComp(m1,0,r);
   p_Setm(m1,r);
+#ifdef PDEBUG
   p_Test(m1,r);
+#endif
   p_ExpVectorDiff(m2,pL,p2,r);
   p_SetComp(m2,0,r);
   p_Setm(m2,r);
+#ifdef PDEBUG
   p_Test(m2,r);
+#endif
   p_Delete(&pL,r);
   /* zero exponents ! */
   poly M1=nc_mm_Mult_p(m1,p_Head(p1,r),r);
@@ -1095,7 +1068,9 @@ poly nc_spGSpolyCreate(poly p1, poly p2,poly spNoether, const ring r)
   //  n_Delete(&C1,r);
   //  n_Delete(&C2,r);
   n_Delete(&MinusOne,r);
+#ifdef PDEBUG
   p_Test(M2,r);
+#endif
   return(M2);
 }
 
@@ -1113,7 +1088,9 @@ void nc_spGSpolyRedTail(poly p1, poly q, poly q2, poly spNoether, const ring r)
   p_ExpVectorDiff(m,Q,p1,r);
   p_SetComp(m,0,r);
   p_Setm(m,r);
+#ifdef PDEBUG
   p_Test(m,r);
+#endif
   /* pSetComp(m,r)=0? */
   poly M=nc_mm_Mult_p(m,p_Copy(p1,r),r);
   number C=p_GetCoeff(M,r);
@@ -1149,7 +1126,9 @@ poly nc_spShort(poly p1, poly p2, const ring r)
   poly m=pOne();
   pLcm(p1,p2,m);
   p_Setm(m,r);
+#ifdef PDEBUG
   p_Test(m,r);
+#endif
   return(m);
 }
 
@@ -1161,7 +1140,9 @@ void nc_kBucketPolyRed(kBucket_pt b, poly p, number *c)
   poly m=pOne();
   pExpVectorDiff(m,kBucketGetLm(b),p);
   pSetm(m);
+#ifdef PDEBUG
   pTest(m);
+#endif
   poly pp=nc_mm_Mult_p(m,pCopy(p),currRing);
   pDelete(&m);
   number n=nCopy(pGetCoeff(pp));
@@ -1191,7 +1172,9 @@ void nc_PolyPolyRed(poly &b, poly p, number *c)
   poly m=pOne();
   pExpVectorDiff(m,pHead(b),p);
   pSetm(m);
+#ifdef PDEBUG
   pTest(m);
+#endif
   poly pp=nc_mm_Mult_p(m,pCopy(p),currRing);
   pDelete(&m);
   number n=nCopy(pGetCoeff(pp));
@@ -1290,7 +1273,9 @@ poly nc_mm_Bracket_nn(poly m1, poly m2)
               nTmp=nSub(pGetCoeff(bres),nTmp);
               pSetCoeff(bres,nTmp); /* only lc ! */
             }
+#ifdef PDEBUG
             pTest(bres);
+#endif
             if (i>j)  bres=p_Mult_nn(bres, MinusOne,currRing);
           }
           if (bres!=NULL)
@@ -1483,6 +1468,7 @@ matrix nc_PrintMat(int a, int b, ring r, int metric)
 }
 
 void ncKill(ring r)
+  /* kills the nc extension of ring r */
 {
   int i,j;
   for(i=1;i<r->N;i++)
