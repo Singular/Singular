@@ -6,7 +6,7 @@
  *  Purpose: implementation of std related inline routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: kInline.cc,v 1.23 2000-12-31 15:14:32 obachman Exp $
+ *  Version: $Id: kInline.cc,v 1.24 2001-02-09 17:26:00 obachman Exp $
  *******************************************************************/
 #ifndef KINLINE_CC
 #define KINLINE_CC
@@ -419,6 +419,13 @@ KINLINE void sLObject::Clear()
 {
   sTObject::Clear();
   sev = 0;
+}
+// Initialization
+KINLINE void sLObject::Delete()
+{
+  sTObject::Delete();
+  if (bucket != NULL)
+    kBucketDeleteAndDestroy(&bucket);
 }
 
 KINLINE void sLObject::Init(ring r)

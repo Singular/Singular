@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.55 2001-01-18 16:21:16 Singular Exp $ */
+/* $Id: kutil.h,v 1.56 2001-02-09 17:26:00 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -144,6 +144,8 @@ public:
   KINLINE sLObject(poly p, ring tailRing = currRing);
   KINLINE sLObject(poly p, ring c_r, ring tailRing);
 
+  // Frees the polys of L
+  KINLINE void Delete();
   KINLINE void Clear();
 
   // Iterations
