@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.204 2003-05-31 14:14:01 Singular Exp $ */
+/* $Id: ring.cc,v 1.205 2003-07-04 14:39:32 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -598,7 +598,18 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   }
 
   /* names and number of variables-------------------------------------*/
-  R->N = rv->listLength();
+  {
+    int l=rv->listLength();
+#if SIZEOF_SHORT == 2
+#define MAX_SHORT 0x7fff
+#endif
+    if (l>MAX_SHORT)
+    {
+      Werror("too many ring variables(%d), max is %d",l,MAX_SHORT);
+       goto rInitError;
+    }
+    R->N = l; /*rv->listLength();*/
+  }
   R->names   = (char **)omAlloc0(R->N * sizeof(char_ptr));
   if (rSleftvList2StringArray(rv, R->names))
   {
@@ -802,7 +813,7 @@ void rWrite(ring r)
     {
       for (int j = i+1; j<=r->N; j++)
       {
-	nl=nIsOne(p_GetCoeff(MATELEM(r->nc->C,i,j),r));
+        nl=nIsOne(p_GetCoeff(MATELEM(r->nc->C,i,j),r));
         if ((MATELEM(r->nc->D,i,j)!=NULL)||(!nl))
         {
           Print("\n//    %s%s=",r->names[j-1],r->names[i-1]);
@@ -1187,7 +1198,7 @@ int  rIsExtension(ring r)
 int  rIsExtension()
 {
   return rIsExtension( currRing );
-} 
+}
 
 int rChar(ring r)
 {
