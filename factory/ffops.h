@@ -1,15 +1,22 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: ffops.h,v 1.1 1996-06-18 06:57:00 stobbe Exp $
+// $Id: ffops.h,v 1.2 1997-04-08 16:05:06 schmidt Exp $
 
 #ifndef INCL_FFOPS_H
 #define INCL_FFOPS_H
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.1  1996/06/18 06:57:00  stobbe
+"Now the functionality to handle prime numbers that are bigger than 2^15.
+This results in various changes and some new functions.
+"
+
 Revision 1.0  1996/05/17 10:59:40  stobbe
 Initial revision
 
 */
+
+#include <config.h>
 
 #include "cf_globals.h"
 #include "cf_switches.h"
@@ -92,7 +99,7 @@ inline int ff_inv ( const int a )
 	else
 	    return ff_newinv( a );
     }
-    
+
 }
 
 inline int ff_div ( const int a, const int b )

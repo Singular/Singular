@@ -1,11 +1,20 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: gf_tabutil.cc,v 1.0 1996-05-17 10:59:46 stobbe Exp $
+// $Id: gf_tabutil.cc,v 1.1 1997-04-08 16:08:07 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.1  1997/04/08 16:05:50  schmidt
+#include <config.h> added
+
+Revision 1.0  1996/05/17 10:59:46  stobbe
+Initial revision
+
 */
 
+#include <config.h>
+
 #include "assert.h"
+
 #include "cf_defs.h"
 #include "gf_tabutil.h"
 
@@ -54,4 +63,3 @@ int convertback62 ( char * p, int n )
 	r = r * 62 + convback62( p[j] );
     return r;
 }
-
