@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.55 2001-01-20 11:39:13 Singular Exp $ */
+/* $Id: longalg.cc,v 1.56 2001-01-20 11:55:32 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -24,12 +24,6 @@
 #include "clapsing.h"
 #endif
 #include "longalg.h"
-
-#define  FEHLER1 1
-#define  FEHLER2 1
-#define  FEHLER3 1
-
-//#define NEWLONGALG
 
 naIdeal naI=NULL;
 
@@ -159,9 +153,6 @@ void naSetChar(int i, ring r)
 
 /*============= procedure for polynomials: napXXXX =======================*/
 
-#ifndef LONGALGNEW
-#define napSetCoeff(p,n) {nacDelete(&((p)->ko),currRing);(p)->ko=n;}
-#endif /* not LONGALGNEW */
 
 
 #ifdef LDEBUG
@@ -171,9 +162,6 @@ static void napTest(napoly p)
   {
     if (naIsChar0)
       nlDBTest(napGetCoeff(p), "", 0);
-#ifndef LONGALGNEW
-    omCheckAddrSize(p, napMonomSize);
-#endif /* LONGALGNEW */
     napIter(p);
   }
 }
@@ -202,6 +190,7 @@ static napoly napInit(int i)
 }
 #define napMultCopy(p,q)  napMult(napCopy(p),napCopy(q))
 #define napIsConstant(p)  (napDeg(p)==0)
+#define napSetCoeff(p,n) {nacDelete(&((p)->ko),currRing);(p)->ko=n;}
 #else /* LONGALGNEW */
 #define napInit(i)       (napoly)p_ISet(i,currRing->algring)
 #define napSetCoeff(p,n) {nacDelete(&napGetCoeff(p),currRing);napGetCoeff(p)=n;}
@@ -945,8 +934,7 @@ static int napExp(napoly a, napoly b)
   return m;
 }
 
-#if FEHLER2
-/*meins
+/*
 * finds the smallest i-th exponent in a and b
 * used to find it in a fraction
 */
@@ -976,7 +964,6 @@ static int napExpi(int i, napoly a, napoly b)
   while (b != NULL);
   return m;
 }
-#endif
 
 static void napContent(napoly ph)
 {
@@ -1415,7 +1402,6 @@ number naAdd(number la, number lb)
   omCheckAddrSize(a,sizeof(rnumber));
   omCheckAddrSize(b,sizeof(rnumber));
   lu = (lnumber)omAllocBin(rnumber_bin);
-#ifndef NEWLONGALG
   if (b->n!=NULL) x = napMultCopy(a->z, b->n);
   else            x = napCopy(a->z);
   if (a->n!=NULL) y = napMultCopy(b->z, a->n);
@@ -1455,60 +1441,8 @@ number naAdd(number la, number lb)
      lu=(lnumber)luu;
   }
 #endif /* LONGALGNEW */
-  return (number)lu;
-#else
-  if (a->n==NULL)
-  {
-    if (b->n==NULL)
-    {
-      lu->z = napAdd(napCopy(a->z), napCopy(b->z));
-      if (lu->z==NULL) goto naAdd_zero;
-      lu->n = NULL;
-    }
-    else
-    {
-      lu->z = napAdd(napMultCopy(a->z,b->n), napCopy(b->z));
-      if (lu->z==NULL) goto naAdd_zero;
-      lu->n = napCopy(b->z);
-    }
-    lu->s = 0;
-  }
-  else
-  {
-    if (b->n==NULL)
-    {
-      lu->z = napAdd(napCopy(a->z),napMultCopy(b->z,a->n));
-      if (lu->z==NULL) goto naAdd_zero;
-      lu->n = napCopy(a->z);
-      lu->n = NULL;
-    }
-    else
-    {
-      napoly x=napGcd(a->n, b->n);
-      napoly xa=NULL; napoly xb=NULL;
-      singclap_algdividecontent(napCopy(a->n),napCopy(b->n),xa,xb);
-      if (xa==NULL) xa=napCopy(a->n);
-      if (xb==NULL) xb=napCopy(b->n);
-      //StringSetS("a->n:");napWrite(a->n);
-      //StringAppendS(", b->n:");napWrite(b->n);
-      //StringAppendS(" xa:"); napWrite(xa);
-      //StringAppendS(" xb:"); napWrite(xb);
-      //PrintS(StringAppendS("\n"));
-      // now: g=gcd(a->n,b->n), xa=a->n/g, xb=b->n/b;
-      lu->z = napAdd(napMult(napCopy(a->z),xb), napMult(napCopy(b->z),napCopy(xa)));
-      if (lu->z==NULL) {napDelete (&xa); goto naAdd_zero;}
-      lu->n = napMult(xa,napCopy(b->n));
-    }
-    lu->s = 0;
-  }
-#endif /* LONGALGNEW */
   naTest((number)lu);
   return (number)lu;
-#ifdef NEWLONGALG
-naAdd_zero:
-  omFreeBin((ADDRESS)lu,  rnumber_bin);
-  return NULL;
-#endif
 }
 
 /*2
@@ -1519,7 +1453,6 @@ number naSub(number la, number lb)
   lnumber lu;
 
   if (lb==NULL) return naCopy(la);
-#ifndef NEWLONGALG
   if (la==NULL)
   {
     lu = (lnumber)naCopy(lb);
@@ -1575,15 +1508,6 @@ number naSub(number la, number lb)
 #endif /* LONGALGNEW */
   naTest((number)lu);
   return (number)lu;
-#ifdef LONGALGNEW
-#else
-  lnumber lbb = (lnumber)naCopy(lb);
-  lbb->z = napNeg(lbb->z);
-  number res=naAdd(la,(number)lbb);
-  naDelete((number *)&lbb,currRing);
-  return res;
-#endif
-#endif /* LONGALGNEW */
 }
 
 /*2
@@ -1632,7 +1556,6 @@ number naMult(number la, number lb)
     if ((x!=NULL) && (napGetExp(x,1) >= napGetExp(naMinimalPoly,1)))
       x = napRemainder(x, naMinimalPoly);
   }
-#if FEHLER1
   if (naI!=NULL)
   {
     lo->z = napRedp (lo->z);
@@ -1645,7 +1568,6 @@ number naMult(number la, number lb)
         x = napTailred (x);
     }
   }
-#endif
   if ((x!=NULL) && (napIsConstant(x)) && nacIsOne(napGetCoeff(x)))
     napDelete(&x);
   lo->n = x;
@@ -1743,7 +1665,6 @@ number naDiv(number la, number lb)
     if (napGetExp(x,1) >= napGetExp(naMinimalPoly,1))
       x = napRemainder(x, naMinimalPoly);
   }
-#if FEHLER1
   if (naI!=NULL)
   {
     lo->z = napRedp (lo->z);
@@ -1756,7 +1677,6 @@ number naDiv(number la, number lb)
         x = napTailred (x);
     }
   }
-#endif
   if ((napIsConstant(x)) && nacIsOne(napGetCoeff(x)))
     napDelete(&x);
   lo->s = 0;
@@ -1939,14 +1859,12 @@ char  *naRead(char *s, number *p)
   if ((naMinimalPoly!=NULL)
   && (napGetExp(x,1) >= napGetExp(naMinimalPoly,1)))
     a->z = napRemainder(x, naMinimalPoly);
-#if FEHLER3
   else if (naI!=NULL)
   {
     a->z = napRedp(x);
     if (a->z != NULL)
       a->z = napTailred (a->z);
   }
-#endif
   else
     a->z = x;
   if(a->z==NULL)
@@ -2221,7 +2139,6 @@ void naNormalize(number &pp)
     }
     y = p->n;
   }
-#if FEHLER1
   if (naMinimalPoly == NULL)
   {
     int i;
@@ -2245,7 +2162,6 @@ void naNormalize(number &pp)
       }
     }
   }
-#endif
   if (napIsConstant(y)) /* i.e. => simplify to (1/c)*z / monom */
   {
     if (nacIsOne(napGetCoeff(y)))
