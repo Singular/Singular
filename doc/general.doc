@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.53 1998-05-12 15:18:29 obachman Exp $
+@comment $Id: general.doc,v 1.54 1998-05-12 16:06:13 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -2109,8 +2109,8 @@ It is common practice to simply define the version string to be
 
 @c ---------------------------------------
 @node A syntax example, ,version, Libraries
-@subsection a syntax example
-@cindex a syntax example
+@subsection A syntax example
+@cindex syntax example
 @cindex template
 
 Although there are very few enforced rules on the format of a library,
@@ -2223,7 +2223,8 @@ key being pressed.
 @iftex
 See @ref{TRACE var}.
 @end iftex
-@*@strong{Example:}
+
+@strong{Example:}
 @example
 @c example
   proc t1
@@ -2245,7 +2246,8 @@ If @code{Singular} reaches a break point it asks for lines of commands
 (linelength must be less than 80 characters)
 from the user. It returns to normal execution if given an empty line.
 See @ref{~}.
-@*@strong{Example:}
+
+@strong{Example:}
 @example
   proc t
   @{
@@ -2398,7 +2400,8 @@ storage or communcation with other programs. The data is written in
 plain ASCII format. Reading from an ASCII link returns a string -
 conversion into other data is up to the user. This can be done, for
 example, using the command @code{execute} (see @ref{execute}).
-@*@strong{Example:}
+
+@strong{Example:}
 @example
 @c example
 // (over)write file test.ascii, link is specified as string
@@ -2420,7 +2423,8 @@ fast compared to ASCII links. All data (including such data that can not
 be converted to a string) can be written to an MPfile link. Reading from
 an MP link returns the written expression(s) (i.e., not a string, in
 general).  
-@*@strong{Example:}
+
+@strong{Example:}
 @example
 @c example
 ring r;
@@ -2441,7 +2445,8 @@ data is communicated with other processes (e.g., @sc{Singular}
 processes) which may run on the same or on different computers.
 Data exchange is accomplished using TCP/IP links
 in the binary MP format. 
-@*@strong{Example:}
+
+@strong{Example:}
 @example
 @c example
 ring r; 
@@ -2463,7 +2468,8 @@ data is stored in and accessed from a data base. Writing is accomplished
 by a key- and a value string and associates teh value with the key in
 the specfied data base. Reading is accomplished w.r.t. a key
 (string), whose associated value (string) is returned.
-@*@strong{Example:}
+
+@strong{Example:}
 @example
 @c example
 ring r;
@@ -2484,7 +2490,8 @@ Besides the usual I/O commands @code{write} (see @ref{write}) and
 also the commands @code{dump} (see @ref{dump}) and @code{getdump} (see
 @ref{getdump}) (except for DBM links) which store (resp. retrieve) the
 content of an entire @sc{Singular} session to (resp. from) a link. 
-@*@strong{Example:}
+
+@strong{Example:}
 @example
 @c example
 ring r; poly p = x+y;
@@ -2500,7 +2507,8 @@ cases (except for MPtcp links), links do not need to be explicitely
 opened (see @ref{open}) or closed (see @ref{close}) before (resp. after)
 they are used. Furthermore, links have various properties which can be
 checked for using the @code{status} (see @ref{status}) command. 
-@*@strong{Example:}
+
+@strong{Example:}
 @example
 @c example
 link l = "MPtcp:fork";

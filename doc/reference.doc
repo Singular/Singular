@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.40 1998-05-12 14:50:38 schmidt Exp $
+@comment $Id: reference.doc,v 1.41 1998-05-12 16:06:16 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -669,6 +669,25 @@ _[i,j] = z^0*M[(i-1)*d+1,j] + z^1*M[(i-1)*d+2,j] + ... + z^(d-1)*M[i*d,j]
   print(M);
   ideal i=f,xyz+z^10*y^7;
   print(coeffs(i,y));
+@c example
+@end example
+@item @strong{Syntax:}
+@*@code{coeffs (} ideal_expression@code{,} ideal_expression@code{,} poly_expression @code{)}
+@*@code{coeffs (} module_expression@code{,} module_expression@code{,} poly_expression @code{)}
+@item @strong{Type:}
+matrix
+@item @strong{Purpose:}
+let the first argument be M,
+the second argument  be K (a set of monomials in P),
+the third argument be the product P of variables to consider.
+Then @code{coeffs(M,K,P)} returns a matrix A of coefficients with K*A=M
+such that the entries of A does not contain any variable from P.
+@item @strong{Example:}
+@example
+@c example
+  ring r=32003,(x,y,z),dp;
+  ideal M=x2z+y3,xy;
+  print(coeffs(M,ideal(x2,xy,y2),xy));
 @c example
 @end example
 @end table

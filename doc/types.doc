@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.35 1998-05-12 15:18:30 obachman Exp $
+@comment $Id: types.doc,v 1.36 1998-05-12 16:06:18 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -2438,7 +2438,8 @@ free resolution of a standard basis (see @ref{sres})
 
 Rings are used to describe properties of polynomials, ideals etc.
 Almost all computations in @sc{Singular} require a basering.
-See @ref{Rings and orderings}.
+For a detailed description of the concept of rings see
+@ref{Rings and orderings}.
 
 @menu
 * ring declarations::
