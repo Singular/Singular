@@ -1,4 +1,4 @@
-// $Id: primdec.lib,v 1.76 2000-06-05 11:22:47 pfister Exp $
+// $Id: primdec.lib,v 1.77 2000-06-07 09:43:23 pfister Exp $
 ///////////////////////////////////////////////////////////////////////////////
 // primdec.lib                                                               //
 // algorithms for primary decomposition based on                             //
@@ -10,7 +10,7 @@
 // written by Wolfram Decker and Hans Schoenemann                            //
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: primdec.lib,v 1.76 2000-06-05 11:22:47 pfister Exp $";
+version="$Id: primdec.lib,v 1.77 2000-06-07 09:43:23 pfister Exp $";
 info="
 LIBRARY: primdec.lib   PROCEDURES FOR PRIMARY DECOMPOSITION
 AUTHORS:  Gerhard Pfister, email: pfister@mathematik.uni-kl.de (GTZ)
@@ -2947,6 +2947,12 @@ proc radicalKL (list m,ideal ser,list #)
 
    if (jdim==0)
    {
+      if((npars(basering)>0)&&(char(basering)>0)&&(char(basering)<=181))
+      {
+         "        !  Warning  !  ";
+         "    The field is not perfect.";
+         "    The result may be wrong.";
+      }
       @j1=finduni(@j);
       for(@k=1;@k<=size(@j1);@k++)
       {
@@ -3178,7 +3184,8 @@ proc radicalEHV(ideal i,ideal re,list #)
       return(re);
    }
    int cod=nvars(basering)-dim(m[1]);
-   if((nvars(basering)<=5)&&(size(m[2])<=5))
+   if((nvars(basering)<=5)&&(size(m[2])<=5)
+       &&((char(basering)==0)||(char(basering)>181)))
    {
       if(cod==size(m[2]))
       {
@@ -4540,7 +4547,7 @@ EXAMPLE: example radical; shows an example
    int s=size(pr);
    if(s==1)
    {
-     i=radicalEHV(i,ideal(1),il);
+     i=radicalEHV(pr[1],ideal(1),il);
      return(phi(i));
    }
    intvec pos;
@@ -4727,7 +4734,8 @@ proc zerodec(ideal I)
    poly charpol=det(n-T*E);
    if(charpol[size(charpol)]!=0)
    {
-     list fac=factorize(charpol);
+     list fac=factor(charpol);
+     testFactor(fac,charpol);
      int f=size(fac[1]);
      setring R;
      if(f==2)
@@ -4738,9 +4746,9 @@ proc zerodec(ideal I)
      map psi=P,p;
      list rfac=psi(fac);
      option(redSB);
-     for(j=2;j<=f;j++)
+     for(j=1;j<=f;j++)
      {
-        re[j-1]=interred(I+ideal(rfac[1][j]^rfac[2][j])); 
+        re[j]=interred(I+ideal(rfac[1][j]^rfac[2][j])); 
      }
      option(noredSB);
      return(re);
