@@ -3,7 +3,7 @@
  *  Purpose: declaration of statistics related stuff
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omStats.h,v 1.3 2000-08-14 12:26:49 obachman Exp $
+ *  Version: $Id: omStats.h,v 1.4 2001-04-30 09:02:11 Singular Exp $
  *******************************************************************/
 #ifndef OM_STATS_H
 #define OM_STATS_H
@@ -16,10 +16,10 @@ struct omInfo_s
   long CurrentBytesSbrk;    /* set in omUpdateInfo(), needs omInintInfo() */
   long MaxBytesMmap;        /* set in omUpdateInfo(), not very accurate */
   long CurrentBytesMmap;    /* set in omUpdateInfo(), not very accurate */
-  long UsedBytes;           /* set in omUpdateInfo() */ 
-  long AvailBytes;          /* set in omUpdateInfo() */ 
-  long UsedBytesMalloc;     /* set in omUpdateInfo(), needs malloc support */ 
-  long AvailBytesMalloc;    /* set in omUpdateInfo(), needs malloc support */ 
+  long UsedBytes;           /* set in omUpdateInfo() */
+  long AvailBytes;          /* set in omUpdateInfo() */
+  long UsedBytesMalloc;     /* set in omUpdateInfo(), needs malloc support */
+  long AvailBytesMalloc;    /* set in omUpdateInfo(), needs malloc support */
   long MaxBytesFromMalloc;      /* always kept up-to-date */
   long CurrentBytesFromMalloc;  /* always kept up-to-date */
   long MaxBytesFromValloc;      /* always kept up-to-date */
@@ -50,4 +50,3 @@ extern void omPrintInfo(FILE* fd);
 extern unsigned long om_SbrkInit;
 /*ENDPRIVATE*/
 #endif /* OM_STATS_H */
-

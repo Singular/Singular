@@ -1,9 +1,9 @@
 /*******************************************************************
  *  File:    dlmalloc.h
- *  Purpose: declarations for dlmalloc 
- *  This was obtained by taking cutting out the beginning of malloc.c 
+ *  Purpose: declarations for dlmalloc
+ *  This was obtained by taking cutting out the beginning of malloc.c
  *
- *  Version: $Id: dlmalloc.h,v 1.7 2001-04-05 10:27:00 Singular Exp $
+ *  Version: $Id: dlmalloc.h,v 1.8 2001-04-30 09:01:58 Singular Exp $
  *******************************************************************/
 #ifndef DL_MALLOC_H
 #define DL_MALLOC_H
@@ -33,13 +33,13 @@
 /* Statistics */
 extern unsigned long mmapped_mem;
 extern unsigned long max_mmapped_mem;
-extern unsigned long max_total_mem; 
-extern unsigned long max_sbrked_mem; 
+extern unsigned long max_total_mem;
+extern unsigned long max_sbrked_mem;
 extern struct mallinfo current_mallinfo;
 extern void malloc_update_mallinfo();
 
 #define OM_MALLOC_UPDATE_INFO           malloc_update_mallinfo()
-#define OM_MALLOC_USED_BYTES            current_mallinfo.uordblks + mmapped_mem           
+#define OM_MALLOC_USED_BYTES            current_mallinfo.uordblks + mmapped_mem
 #define OM_MALLOC_AVAIL_BYTES           current_mallinfo.fordblks
 #define OM_MALLOC_CURRENT_BYTES_MMAP    mmapped_mem
 #define OM_MALLOC_MAX_BYTES_MMAP        max_mmapped_mem
@@ -50,13 +50,13 @@ extern void malloc_update_mallinfo();
 
 /* ---------- To make a malloc.h, start cutting here ------------ */
 
-/* 
-  A version of malloc/free/realloc written by Doug Lea and released to the 
+/*
+  A version of malloc/free/realloc written by Doug Lea and released to the
   public domain.  Send questions/comments/complaints/performance data
   to dl@cs.oswego.edu
 
 * VERSION 2.6.5  Wed Jun 17 15:55:16 1998  Doug Lea  (dl at gee)
-  
+
    Note: There may be an updated version of this malloc obtainable at
            ftp://g.oswego.edu/pub/misc/malloc.c
          Check before installing!
@@ -71,8 +71,8 @@ extern void malloc_update_mallinfo();
   This is not the fastest, most space-conserving, most portable, or
   most tunable malloc ever written. However it is among the fastest
   while also being among the most space-conserving, portable and tunable.
-  Consistent balance across these factors results in a good general-purpose 
-  allocator. For a high-level description, see 
+  Consistent balance across these factors results in a good general-purpose
+  allocator. For a high-level description, see
      http://g.oswego.edu/dl/html/malloc.html
 
 * Synopsis of public routines
@@ -108,7 +108,7 @@ extern void malloc_update_mallinfo();
   cfree(Void_t* p);
      Equivalent to free(p).
   malloc_trim(size_t pad);
-     Release all but pad bytes of freed top-most memory back 
+     Release all but pad bytes of freed top-most memory back
      to the system. Return 1 if successful, else 0.
   malloc_usable_size(Void_t* p);
      Report the number usable allocated bytes associated with allocated
@@ -134,17 +134,17 @@ extern void malloc_update_mallinfo();
        changes supporting this.
 
   Assumed size_t  representation:       4 or 8 bytes
-       Note that size_t is allowed to be 4 bytes even if pointers are 8.        
+       Note that size_t is allowed to be 4 bytes even if pointers are 8.
 
   Minimum overhead per allocated chunk: 4 or 8 bytes
        Each malloced chunk has a hidden overhead of 4 bytes holding size
-       and status information.  
+       and status information.
 
   Minimum allocated size: 4-byte ptrs:  16 bytes    (including 4 overhead)
                           8-byte ptrs:  24/32 bytes (including, 4/8 overhead)
-                                     
+
        When a chunk is freed, 12 (for 4byte ptrs) or 20 (for 8 byte
-       ptrs but 4 byte size) or 24 (for 8/8) additional bytes are 
+       ptrs but 4 byte size) or 24 (for 8/8) additional bytes are
        needed; 4 (8) for a trailing size field
        and 8 (16) bytes for free list pointers. Thus, the minimum
        allocatable size is 16/24/32 bytes.
@@ -159,7 +159,7 @@ extern void malloc_update_mallinfo();
        represent chunk sizes. `Possibly signed' is due to the fact
        that `size_t' may be defined on a system as either a signed or
        an unsigned type. To be conservative, values that would appear
-       as negative numbers are avoided.  
+       as negative numbers are avoided.
        Requests for sizes with a negative sign bit will return a
        minimum-sized chunk.
 
@@ -167,7 +167,7 @@ extern void malloc_update_mallinfo();
 
        Alignnment demands, plus the minimum allocatable size restriction
        make the normal worst-case wastage 15 bytes (i.e., up to 15
-       more bytes will be allocated than were requested in malloc), with 
+       more bytes will be allocated than were requested in malloc), with
        two exceptions:
          1. Because requests for zero bytes allocate non-zero space,
             the worst case wastage for a request of zero bytes is 24 bytes.
@@ -203,37 +203,37 @@ extern void malloc_update_mallinfo();
      Nonzero if using ANSI-standard C compiler, a C++ compiler, or
      a C compiler sufficiently close to ANSI to get away with it.
   DEBUG                    (default: NOT defined)
-     Define to enable debugging. Adds fairly extensive assertion-based 
+     Define to enable debugging. Adds fairly extensive assertion-based
      checking to help track down memory errors, but noticeably slows down
      execution.
-  REALLOC_ZERO_BYTES_FREES (default: NOT defined) 
+  REALLOC_ZERO_BYTES_FREES (default: NOT defined)
      Define this if you think that realloc(p, 0) should be equivalent
      to free(p). Otherwise, since malloc returns a unique pointer for
      malloc(0), so does realloc(p, 0).
   HAVE_MEMCPY               (default: defined)
-     Define if you are not otherwise using ANSI STD C, but still 
+     Define if you are not otherwise using ANSI STD C, but still
      have memcpy and memset in your C library and want to use them.
      Otherwise, simple internal versions are supplied.
   USE_MEMCPY               (default: 1 if HAVE_MEMCPY is defined, 0 otherwise)
      Define as 1 if you want the C library versions of memset and
-     memcpy called in realloc and calloc (otherwise macro versions are used). 
+     memcpy called in realloc and calloc (otherwise macro versions are used).
      At least on some platforms, the simple macro versions usually
      outperform libc versions.
   HAVE_MMAP                 (default: defined as 1)
      Define to non-zero to optionally make malloc() use mmap() to
-     allocate very large blocks.  
+     allocate very large blocks.
   HAVE_MREMAP                 (default: defined as 0 unless Linux libc set)
      Define to non-zero to optionally make realloc() use mremap() to
-     reallocate very large blocks.  
+     reallocate very large blocks.
   malloc_getpagesize        (default: derived from system #includes)
      Either a constant or routine call returning the system page size.
-  HAVE_USR_INCLUDE_MALLOC_H (default: NOT defined) 
+  HAVE_USR_INCLUDE_MALLOC_H (default: NOT defined)
      Optionally define if you are on a system with a /usr/include/malloc.h
      that declares struct mallinfo. It is not at all necessary to
      define this even if you do, but will ensure consistency.
   INTERNAL_SIZE_T           (default: size_t)
-     Define to a 32-bit type (probably `unsigned int') if you are on a 
-     64-bit machine, yet do not want or need to allow malloc requests of 
+     Define to a 32-bit type (probably `unsigned int') if you are on a
+     64-bit machine, yet do not want or need to allow malloc requests of
      greater than 2^31 to be handled. This saves space, especially for
      very small chunks.
   INTERNAL_LINUX_C_LIB      (default: NOT defined)
@@ -254,9 +254,9 @@ extern void malloc_update_mallinfo();
      True (1) if the routine mapped to MORECORE zeroes out memory (which
      holds for sbrk).
   DEFAULT_TRIM_THRESHOLD
-  DEFAULT_TOP_PAD       
+  DEFAULT_TOP_PAD
   DEFAULT_MMAP_THRESHOLD
-  DEFAULT_MMAP_MAX      
+  DEFAULT_MMAP_MAX
      Default values of tunable parameters (described in detail below)
      controlling interaction with host system routines (sbrk, mmap, etc).
      These values may also be changed dynamically via mallopt(). The
@@ -327,13 +327,13 @@ extern "C" {
     course of computing the summmaries. (By nature, mmapped regions
     cannot be checked very much automatically.)
 
-    Setting DEBUG may also be helpful if you are trying to modify 
-    this code. The assertions in the check routines spell out in more 
+    Setting DEBUG may also be helpful if you are trying to modify
+    this code. The assertions in the check routines spell out in more
     detail the assumptions and invariants underlying the algorithms.
 
 */
 
-#if DEBUG 
+#if DEBUG
 #include <assert.h>
 #else
 #define assert(x) ((void)0)
@@ -357,14 +357,14 @@ extern "C" {
   REALLOC_ZERO_BYTES_FREES should be set if a call to
   realloc with zero bytes should be the same as a call to free.
   Some people think it should. Otherwise, since this malloc
-  returns a unique pointer for malloc(0), so does realloc(p, 0). 
+  returns a unique pointer for malloc(0), so does realloc(p, 0).
 */
 
 
 /*   #define REALLOC_ZERO_BYTES_FREES */
 
 
-/* 
+/*
   WIN32 causes an emulation of sbrk to be compiled in
   mmap-based options are not currently supported in WIN32.
 */
@@ -385,11 +385,11 @@ extern "C" {
   USE_MEMCPY should be defined as 1 if you actually want to
   have memset and memcpy called. People report that the macro
   versions are often enough faster than libc versions on many
-  systems that it is better to use them. 
+  systems that it is better to use them.
 
 */
 
-#define HAVE_MEMCPY 
+#define HAVE_MEMCPY
 
 #ifndef USE_MEMCPY
 #ifdef HAVE_MEMCPY
@@ -399,7 +399,7 @@ extern "C" {
 #endif
 #endif
 
-#if (__STD_C || defined(HAVE_MEMCPY)) 
+#if (__STD_C || defined(HAVE_MEMCPY))
 
 #if __STD_C
 void* memset(void*, int, size_t);
@@ -532,9 +532,9 @@ do {                                                                          \
 /*
   Access to system page size. To the extent possible, this malloc
   manages memory from the system in page-size units.
-  
-  The following mechanics for getpagesize were adapted from 
-  bsd/gnu getpagesize.h 
+
+  The following mechanics for getpagesize were adapted from
+  bsd/gnu getpagesize.h
 */
 
 #ifndef LACKS_UNISTD_H
@@ -564,7 +564,7 @@ do {                                                                          \
 #          else
 #            define malloc_getpagesize (NBPG * CLSIZE)
 #          endif
-#        else 
+#        else
 #          ifdef NBPC
 #            define malloc_getpagesize NBPC
 #          else
@@ -574,9 +574,9 @@ do {                                                                          \
 #              define malloc_getpagesize (4096) /* just guess */
 #            endif
 #          endif
-#        endif 
+#        endif
 #      endif
-#    endif 
+#    endif
 #  endif
 #endif
 
@@ -652,7 +652,7 @@ struct mallinfo {
 #endif
 
 /*
-    M_TRIM_THRESHOLD is the maximum amount of unused top-most memory 
+    M_TRIM_THRESHOLD is the maximum amount of unused top-most memory
       to keep before releasing via malloc_trim in free().
 
       Automatic trimming is mainly useful in long-lived programs.
@@ -660,7 +660,7 @@ struct mallinfo {
       sometimes be wasteful (in cases where programs immediately
       afterward allocate more large chunks) the value should be high
       enough so that your overall system performance would improve by
-      releasing.  
+      releasing.
 
       The trim threshold and the mmap control parameters (see below)
       can be traded off with one another. Trimming and mmapping are
@@ -670,7 +670,7 @@ struct mallinfo {
       minimum. For example, in one test suite of sessions measuring
       the XF86 X server on Linux, using a trim threshold of 128K and a
       mmap threshold of 192K led to near-minimal long term resource
-      consumption.  
+      consumption.
 
       If you are using this malloc in a long-lived program, it should
       pay to experiment with these values.  As a rough guide, you
@@ -706,7 +706,7 @@ struct mallinfo {
 #endif
 
 /*
-    M_TOP_PAD is the amount of extra `padding' space to allocate or 
+    M_TOP_PAD is the amount of extra `padding' space to allocate or
       retain whenever sbrk is called. It is used in two ways internally:
 
       * When sbrk is called to extend the top of the arena to satisfy
@@ -716,19 +716,19 @@ struct mallinfo {
       * When malloc_trim is called automatically from free(),
         it is used as the `pad' argument.
 
-      In both cases, the actual amount of padding is rounded 
+      In both cases, the actual amount of padding is rounded
       so that the end of the arena is always a system page boundary.
 
       The main reason for using padding is to avoid calling sbrk so
       often. Having even a small pad greatly reduces the likelihood
       that nearly every malloc request during program start-up (or
       after trimming) will invoke sbrk, which needlessly wastes
-      time. 
+      time.
 
       Automatic rounding-up to page-size units is normally sufficient
       to avoid measurable overhead, so the default is 0.  However, in
       systems where sbrk is relatively slow, it can pay to increase
-      this value, at the expense of carrying around more memory than 
+      this value, at the expense of carrying around more memory than
       the program needs.
 
 */
@@ -740,9 +740,9 @@ struct mallinfo {
 
 /*
 
-    M_MMAP_THRESHOLD is the request size threshold for using mmap() 
-      to service a request. Requests of at least this size that cannot 
-      be allocated using already-existing space will be serviced via mmap.  
+    M_MMAP_THRESHOLD is the request size threshold for using mmap()
+      to service a request. Requests of at least this size that cannot
+      be allocated using already-existing space will be serviced via mmap.
       (If enough normal freed space already exists it is used instead.)
 
       Using mmap segregates relatively large chunks of memory so that
@@ -761,7 +761,7 @@ struct mallinfo {
       However, it has the disadvantages that:
 
          1. The space cannot be reclaimed, consolidated, and then
-            used to service later requests, as happens with normal chunks. 
+            used to service later requests, as happens with normal chunks.
          2. It can lead to more wastage because of mmap page alignment
             requirements
          3. It causes malloc performance to be more dependent on host
@@ -771,7 +771,7 @@ struct mallinfo {
             malloc steps is faster than going through a system's mmap.
 
       All together, these considerations should lead you to use mmap
-      only for relatively large requests.  
+      only for relatively large requests.
 
 
 */
@@ -787,7 +787,7 @@ struct mallinfo {
 #endif
 
 /*
-    M_MMAP_MAX is the maximum number of requests to simultaneously 
+    M_MMAP_MAX is the maximum number of requests to simultaneously
       service using mmap. This parameter exists because:
 
          1. Some systems have a limited number of internal tables for
@@ -808,7 +808,7 @@ struct mallinfo {
 
 
 
-/* 
+/*
 
   Special defines for linux libc
 
@@ -840,7 +840,7 @@ Void_t *(*__morecore)() = __default_morecore_init;
 
 #define MORECORE (*__morecore)
 #define MORECORE_FAILURE 0
-#define MORECORE_CLEARS 1 
+#define MORECORE_CLEARS 1
 
 #else /* INTERNAL_LINUX_C_LIB */
 

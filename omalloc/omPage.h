@@ -3,7 +3,7 @@
  *  Purpose: declaration of routines for primitve page managment
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omPage.h,v 1.7 2000-10-27 15:28:52 obachman Exp $
+ *  Version: $Id: omPage.h,v 1.8 2001-04-30 09:02:10 Singular Exp $
  *******************************************************************/
 #ifndef OM_PAGE_H
 #define OM_PAGE_H
@@ -11,7 +11,7 @@
 /***********************************************************************
  *
  * Identifying whether an address is a BinAddr or LargeAddr:
- * For this to work, omRegisterBinAddr or omRegisterLargeAddr must be called 
+ * For this to work, omRegisterBinAddr or omRegisterLargeAddr must be called
  * with every address gotten from an external malloc  routine
  */
 

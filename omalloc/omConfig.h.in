@@ -1,10 +1,10 @@
 /* -*-c++-*- */
 /*******************************************************************
  *  File:    omConfig.h.in
- *  Purpose: configuration for omalloc  
+ *  Purpose: configuration for omalloc
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omConfig.h.in,v 1.8 2001-02-01 21:19:10 obachman Exp $
+ *  Version: $Id: omConfig.h.in,v 1.9 2001-04-30 09:02:03 Singular Exp $
  *******************************************************************/
 #ifndef OM_CONFIG_H
 #define OM_CONFIG_H
@@ -169,8 +169,8 @@
 #ifndef OM_INTERNAL_DEBUG
 #undef OM_INTERNAL_DEBUG
 #endif
-/* define to -1/0/1/2/3 if you want omalloc to provide 
-   "underlying malloc"/no/normal/debug ANSI-C conforming  
+/* define to -1/0/1/2/3 if you want omalloc to provide
+   "underlying malloc"/no/normal/debug ANSI-C conforming
    malloc/calloc/realloc/free funcs */
 #ifndef OM_PROVIDE_MALLOC
 #define OM_PROVIDE_MALLOC 0

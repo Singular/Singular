@@ -3,7 +3,7 @@
  *  Purpose: definitions of routines for working with bins
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omBin.c,v 1.6 2000-12-12 15:26:15 obachman Exp $
+ *  Version: $Id: omBin.c,v 1.7 2001-04-30 09:02:02 Singular Exp $
  *******************************************************************/
 
 #include "om_Alloc.h"
@@ -39,15 +39,15 @@ omBin _omGetSpecBin(size_t size, int align, int track)
   }
 #else
   align = 0;
-#endif  
-  
+#endif
+
   if (size > SIZEOF_OM_BIN_PAGE)
   {
     /* need page header */
-    max_blocks = - (long) 
+    max_blocks = - (long)
       ((size+(SIZEOF_SYSTEM_PAGE-SIZEOF_OM_BIN_PAGE))+SIZEOF_SYSTEM_PAGE-1)
       / SIZEOF_SYSTEM_PAGE;
-    sizeW = ((-max_blocks*SIZEOF_SYSTEM_PAGE) - 
+    sizeW = ((-max_blocks*SIZEOF_SYSTEM_PAGE) -
              (SIZEOF_SYSTEM_PAGE - SIZEOF_OM_BIN_PAGE)) / SIZEOF_LONG;
     om_new_specBin = om_LargeBin;
   }
@@ -63,7 +63,7 @@ omBin _omGetSpecBin(size_t size, int align, int track)
     else
 #endif
       sizeW = ((size + sizeW) & ~ (SIZEOF_OM_ALIGNMENT - 1));
-    
+
     omAssume(sizeW >= size);
     omAssume(max_blocks*sizeW <= SIZEOF_OM_BIN_PAGE);
     omAssume((max_blocks+1)*sizeW > SIZEOF_OM_BIN_PAGE ||
@@ -86,7 +86,7 @@ omBin _omGetSpecBin(size_t size, int align, int track)
       om_new_specBin = omSmallSize2TrackBin( size );
     }
 #endif
-    else 
+    else
     {
       om_new_specBin = omSmallSize2Bin( size );
     }
@@ -103,10 +103,10 @@ omBin _omGetSpecBin(size_t size, int align, int track)
 #endif
       s_bin = omFindInSortedGList(om_SpecBin, next, max_blocks, max_blocks);
 
-    if (s_bin != NULL) 
+    if (s_bin != NULL)
     {
       (s_bin->ref)++;
-      omAssume(s_bin->bin != NULL && 
+      omAssume(s_bin->bin != NULL &&
              s_bin->bin->max_blocks == s_bin->max_blocks &&
              s_bin->bin->sizeW == sizeW);
       return s_bin->bin;
@@ -143,9 +143,9 @@ void _omUnGetSpecBin(omBin *bin_p, int force)
   omBin bin = *bin_p;
   if (! omIsStaticBin(bin))
   {
-#ifdef OM_HAVE_TRACK 
+#ifdef OM_HAVE_TRACK
     int track_bin = 0;
-#endif 
+#endif
     omSpecBin s_bin;
 
 #ifdef OM_HAVE_TRACK
@@ -155,7 +155,7 @@ void _omUnGetSpecBin(omBin *bin_p, int force)
     else
 #endif
         s_bin = omFindInSortedGList(om_SpecBin, next, max_blocks, bin->max_blocks);
-        
+
     omAssume(s_bin != NULL && bin == s_bin->bin);
     if (s_bin != NULL)
     {
@@ -163,7 +163,7 @@ void _omUnGetSpecBin(omBin *bin_p, int force)
       if (s_bin->ref == 0 || force)
       {
 #ifdef OM_HAVE_TRACK
-        if (! track_bin) 
+        if (! track_bin)
 #endif
           omFreeKeptAddrFromBin(s_bin->bin);
         if(s_bin->bin->last_page == NULL || force)
@@ -237,12 +237,12 @@ void omSetStickyBinTag(omBin bin, unsigned long sticky_tag)
 {
   omBin s_bin;
   s_bin = omGetStickyBin(bin, sticky_tag);
-  
+
   if (s_bin != bin)
   {
     omBinPage tc, tl;
     unsigned long ts;
-    
+
     if (s_bin == NULL) s_bin = omCreateStickyBin(bin, sticky_tag);
     ts = bin->sticky;
     tl = bin->last_page;
@@ -268,8 +268,8 @@ static void omMergeStickyPages(omBin to_bin, omBin from_bin)
 #ifdef HAVE_OM_ASSUME
   int length = omGListLength(to_bin->last_page, prev) +
     omGListLength(from_bin->last_page, prev);
-#endif  
-  
+#endif
+
   omBinPage page = from_bin->last_page;
   omAssume(to_bin->sizeW == from_bin->sizeW);
   omAssume(to_bin != from_bin);
@@ -290,8 +290,8 @@ static void omMergeStickyPages(omBin to_bin, omBin from_bin)
     to_bin->current_page = from_bin->current_page;
     return;
   }
-  
-  omAssume(to_bin->current_page != om_ZeroPage && 
+
+  omAssume(to_bin->current_page != om_ZeroPage &&
            to_bin->current_page != NULL);
 
   if (to_bin->current_page->current != NULL)
@@ -308,18 +308,18 @@ static void omMergeStickyPages(omBin to_bin, omBin from_bin)
   else
   {
     /* need to reset this here, since new current_page is going to be
-       from_bin->current_page, and only for current_page may we have 
+       from_bin->current_page, and only for current_page may we have
        used_blocks != 0 && current == NULL */
     to_bin->current_page->used_blocks = 0;
   }
-  
 
-  omAssume(to_bin->current_page != NULL && 
+
+  omAssume(to_bin->current_page != NULL &&
            to_bin->current_page->current == NULL &&
            to_bin->current_page->used_blocks == 0);
 
   from_bin->last_page->next = to_bin->current_page->next;
-  if (to_bin->current_page->next != NULL) 
+  if (to_bin->current_page->next != NULL)
     to_bin->current_page->next->prev =  from_bin->last_page;
   else
   {
@@ -329,7 +329,7 @@ static void omMergeStickyPages(omBin to_bin, omBin from_bin)
   to_bin->current_page->next = page;
   page->prev = to_bin->current_page;
   to_bin->current_page = from_bin->current_page;
-  
+
 #ifdef HAVE_OM_ASSUME
   omAssume(omGListLength(to_bin->last_page, prev) == length);
 #endif
@@ -345,7 +345,7 @@ void omDeleteStickyBinTag(omBin bin, unsigned long sticky)
     omAssume(0);
     return;
   }
-  
+
   sticky_bin = omGetStickyBin(bin, sticky);
   if (sticky_bin != NULL)
   {
@@ -354,7 +354,7 @@ void omDeleteStickyBinTag(omBin bin, unsigned long sticky)
 
     omMergeStickyPages(no_sticky_bin, sticky_bin);
 
-    if (bin == sticky_bin) 
+    if (bin == sticky_bin)
     {
       sticky_bin = no_sticky_bin;
       omSetStickyBinTag(bin, 0);
@@ -396,7 +396,7 @@ omBin omGetStickyBinOfBin(omBin bin)
 
 void omMergeStickyBinIntoBin(omBin sticky_bin, omBin into_bin)
 {
-  if (! omIsOnGList(om_StickyBins, next, sticky_bin) || 
+  if (! omIsOnGList(om_StickyBins, next, sticky_bin) ||
       !sticky_bin->sticky ||
       sticky_bin->max_blocks != into_bin->max_blocks ||
       sticky_bin == into_bin ||
@@ -404,11 +404,11 @@ void omMergeStickyBinIntoBin(omBin sticky_bin, omBin into_bin)
       omIsStickyBin(into_bin))
   {
 #ifndef OM_NDEBUG
-    omReportError(omError_StickyBin, omError_NoError, OM_FLR, 
+    omReportError(omError_StickyBin, omError_NoError, OM_FLR,
                   (! omIsOnGList(om_StickyBins, next, sticky_bin)  ? "unknown sticky_bin" :
-                   (!sticky_bin->sticky ? "sticky_bin is not sticky" : 
+                   (!sticky_bin->sticky ? "sticky_bin is not sticky" :
                     (sticky_bin->max_blocks != into_bin->max_blocks ? "sticky_bin and into_bin have different block sizes" :
-                     (sticky_bin == into_bin ? "sticky_bin == into_bin" : 
+                     (sticky_bin == into_bin ? "sticky_bin == into_bin" :
                       (!omIsKnownTopBin(into_bin, 1) ? "unknown into_bin" :
                        (omIsStickyBin(into_bin) ? "into_bin is sticky" :
                         "unknown sticky_bin error")))))));
@@ -429,9 +429,9 @@ void omMergeStickyBinIntoBin(omBin sticky_bin, omBin into_bin)
   omFreeSize(sticky_bin, sizeof(omBin_t));
 #if defined(OM_INTERNAL_DEBUG) && !defined(OM_NDEBUG)
   omTestBin(into_bin, 2);
-#endif  
+#endif
 }
- 
+
 /*****************************************************************
 *
 * AllBin business
@@ -443,16 +443,16 @@ int omIsKnownTopBin(omBin bin, int normal_bin)
   omBin to_check;
   omSpecBin s_bin;
   int i;
-  
+
   omAssume(normal_bin == 1 || normal_bin == 0);
-  
+
 #ifdef OM_HAVE_TRACK
-  if (! normal_bin) 
+  if (! normal_bin)
   {
     to_check = om_StaticTrackBin;
     s_bin = om_SpecTrackBin;
   }
-  else 
+  else
 #endif
   {
     omAssume(normal_bin);
@@ -462,10 +462,10 @@ int omIsKnownTopBin(omBin bin, int normal_bin)
 
   for (i=0; i<= OM_MAX_BIN_INDEX; i++)
   {
-    if (bin == &(to_check[i])) 
+    if (bin == &(to_check[i]))
       return 1;
   }
-  
+
   while (s_bin != NULL)
   {
     if (bin == s_bin->bin) return 1;
@@ -494,13 +494,13 @@ unsigned long omGetNewStickyAllBinTag()
     if (new_sticky > sticky) sticky = new_sticky;
   }
   s_bin = om_SpecBin;
-  while (s_bin != NULL) 
+  while (s_bin != NULL)
   {
     new_sticky = omGetMaxStickyBinTag(s_bin->bin);
     if (new_sticky > sticky) sticky = new_sticky;
     s_bin = s_bin->next;
   }
-  if (sticky < BIT_SIZEOF_LONG - 2) 
+  if (sticky < BIT_SIZEOF_LONG - 2)
   {
     sticky++;
     for (i=0; i<=OM_MAX_BIN_INDEX; i++)
@@ -508,7 +508,7 @@ unsigned long omGetNewStickyAllBinTag()
       omCreateStickyBin(&(om_StaticBin[i]), sticky);
     }
     s_bin = om_SpecBin;
-    while (s_bin != NULL) 
+    while (s_bin != NULL)
     {
       omCreateStickyBin(s_bin->bin, sticky);
       s_bin = s_bin->next;
@@ -526,7 +526,7 @@ unsigned long omGetNewStickyAllBinTag()
         omCreateStickyBin(bin, BIT_SIZEOF_LONG -1);
     }
     s_bin = om_SpecBin;
-    while (s_bin != NULL) 
+    while (s_bin != NULL)
     {
       if (omGetStickyBin(s_bin->bin, BIT_SIZEOF_LONG -1) == NULL)
         omCreateStickyBin(s_bin->bin, BIT_SIZEOF_LONG -1);
@@ -544,7 +544,7 @@ void omSetStickyAllBinTag(unsigned long sticky)
   {
     omSetStickyBinTag(&(om_StaticBin[i]), sticky);
   }
-  while (s_bin != NULL) 
+  while (s_bin != NULL)
   {
     omSetStickyBinTag(s_bin->bin, sticky);
     s_bin = s_bin->next;
@@ -559,7 +559,7 @@ void omUnSetStickyAllBinTag(unsigned long sticky)
   {
     omUnSetStickyBinTag(&(om_StaticBin[i]), sticky);
   }
-  while (s_bin != NULL) 
+  while (s_bin != NULL)
   {
     omUnSetStickyBinTag(s_bin->bin, sticky);
     s_bin = s_bin->next;
@@ -574,7 +574,7 @@ void omDeleteStickyAllBinTag(unsigned long sticky)
   {
     omDeleteStickyBinTag(&(om_StaticBin[i]), sticky);
   }
-  while (s_bin != NULL) 
+  while (s_bin != NULL)
   {
     omDeleteStickyBinTag(s_bin->bin, sticky);
     s_bin = s_bin->next;
@@ -585,12 +585,12 @@ void omDeleteStickyAllBinTag(unsigned long sticky)
 void omPrintMissing(omBin bin)
 {
   omBinPage page = bin->last_page;
-  
+
   while (page != NULL)
   {
     void* addr = (void*) page + SIZEOF_OM_BIN_PAGE_HEADER;
     int i;
-    
+
     for (i=0; i<bin->max_blocks; i++)
     {
       if (! omIsOnList(page->current, addr))
@@ -607,22 +607,22 @@ void omPrintMissing(omBin bin)
  * Statistics
  *
  *****************************************************************/
-static void omGetBinStat(omBin bin, int *pages_p, int *used_blocks_p, 
+static void omGetBinStat(omBin bin, int *pages_p, int *used_blocks_p,
                           int *free_blocks_p)
 {
   int pages = 0, used_blocks = 0, free_blocks = 0;
   int where = 1;
-  
+
   omBinPage page = bin->last_page;
   while (page != NULL)
   {
-    pages++; if (where == 1) 
+    pages++; if (where == 1)
     {
       used_blocks += omGetUsedBlocksOfPage(page) + 1;
       if (bin->max_blocks > 0)
         free_blocks += bin->max_blocks - omGetUsedBlocksOfPage(page) -1;
     }
-    else 
+    else
     {
       if (bin->max_blocks > 1)
         used_blocks += bin->max_blocks;
@@ -637,12 +637,12 @@ static void omGetBinStat(omBin bin, int *pages_p, int *used_blocks_p,
   *free_blocks_p = free_blocks;
 }
 
-static void omGetTotalBinStat(omBin bin, int *pages_p, int *used_blocks_p, 
+static void omGetTotalBinStat(omBin bin, int *pages_p, int *used_blocks_p,
                                int *free_blocks_p)
 {
   int t_pages = 0, t_used_blocks = 0, t_free_blocks = 0;
   int pages = 0, used_blocks = 0, free_blocks = 0;
- 
+
   while (bin != NULL)
   {
     omGetBinStat(bin, &pages, &used_blocks, &free_blocks);
@@ -651,7 +651,7 @@ static void omGetTotalBinStat(omBin bin, int *pages_p, int *used_blocks_p,
     t_free_blocks += free_blocks;
     if (!omIsStickyBin(bin))
       bin = bin->next;
-    else 
+    else
       bin = NULL;
   }
   *pages_p = t_pages;
@@ -667,8 +667,8 @@ static void omPrintBinStat(FILE * fd, omBin bin, int track, int* pages, int* use
   }
   else
   {
-    fprintf(fd, "%s%ld\t%ld\t", (omIsStaticNormalBin(bin) ? " " : 
-                                (omIsStickyBin(bin) ? "S" : 
+    fprintf(fd, "%s%ld\t%ld\t", (omIsStaticNormalBin(bin) ? " " :
+                                (omIsStickyBin(bin) ? "S" :
                                  (omIsTrackBin(bin) ? "T" : "*"))),
             bin->sizeW, bin->max_blocks);
   }
@@ -680,7 +680,7 @@ static void omPrintBinStat(FILE * fd, omBin bin, int track, int* pages, int* use
     while (bin != NULL)
     {
       omGetBinStat(bin, &s_pages, &s_used_blocks, &s_free_blocks);
-      fprintf(fd, " \t \t%d\t%d\t%d\t%d\n", s_pages, s_free_blocks, s_used_blocks, 
+      fprintf(fd, " \t \t%d\t%d\t%d\t%d\n", s_pages, s_free_blocks, s_used_blocks,
               (int) bin->sticky);
       bin = bin->next;
       *pages += s_pages;
@@ -689,14 +689,14 @@ static void omPrintBinStat(FILE * fd, omBin bin, int track, int* pages, int* use
     }
   }
 }
-  
+
 void omPrintBinStats(FILE* fd)
 {
   int i = OM_MAX_BIN_INDEX, pages=0, used_blocks=0, free_blocks=0;
   int pages_p, used_blocks_p, free_blocks_p;
   omSpecBin s_bin = om_SpecBin;
   omBin sticky;
-  
+
   fprintf(fd, " SizeW\tBlocks\tUPages\tFBlocks\tUBlocks\tSticky\n");
   fflush(fd);
   while (s_bin != NULL || i >= 0)
@@ -708,14 +708,14 @@ void omPrintBinStats(FILE* fd)
        used_blocks += used_blocks_p;
        free_blocks += free_blocks_p;
 #ifdef OM_HAVE_TRACK
-       if (om_StaticTrackBin[i].current_page != om_ZeroPage) 
+       if (om_StaticTrackBin[i].current_page != om_ZeroPage)
        {
          omPrintBinStat(fd, &om_StaticTrackBin[i], 1, &pages_p, &used_blocks_p, &free_blocks_p);
          pages += pages_p;
          used_blocks += used_blocks_p;
          free_blocks += free_blocks_p;
        }
-#endif       
+#endif
        i--;
     }
     else
@@ -750,7 +750,7 @@ void omPrintBinStats(FILE* fd)
   fprintf(fd, "----------------------------------------\n");
   fprintf(fd, "      \t      \t%d\t%d\t%d\n", pages, free_blocks, used_blocks);
 }
- 
+
 static  int omGetUsedBytesOfBin(omBin bin)
 {
   int pages = 0, used_blocks = 0, free_blocks = 0;
@@ -764,7 +764,7 @@ size_t omGetUsedBinBytes()
   omSpecBin s_bin = om_SpecBin;
   size_t used = 0;
   omBin sticky;
-  
+
   for (; i>=0; i--)
   {
     used += omGetUsedBytesOfBin(&om_StaticBin[i]);
@@ -795,4 +795,3 @@ size_t omGetUsedBinBytes()
   }
   return used;
 }
-

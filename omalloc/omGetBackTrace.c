@@ -3,7 +3,7 @@
  *  Purpose: routines for getting Backtraces of stack
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omGetBackTrace.c,v 1.3 2000-08-14 12:26:45 obachman Exp $
+ *  Version: $Id: omGetBackTrace.c,v 1.4 2001-04-30 09:02:06 Singular Exp $
  *******************************************************************/
 #ifndef OM_NDEBUG
 
@@ -13,7 +13,7 @@ static void* om_this_main_frame_addr = 0;
 
 void omInitGetBackTrace()
 {
-  if (__builtin_frame_address(0) != 0 && 
+  if (__builtin_frame_address(0) != 0 &&
       __builtin_frame_address(1) > __builtin_frame_address(0))
     om_this_main_frame_addr = __builtin_frame_address(1);
 }
@@ -35,16 +35,16 @@ case j:                                                         \
   }                                                             \
   else break;                                                   \
 }
-    
+
 int omGetBackTrace(void** bt, int start, int max)
 {
   int i = 0;
   void* this_frame = __builtin_frame_address(0);
   void* f_addr;
   void* r_addr;
-  
+
   start++;
-  
+
   switch(start)
   {
     OM_GET_BACK_TRACE(1)

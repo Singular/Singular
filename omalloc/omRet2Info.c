@@ -3,7 +3,7 @@
  *  Purpose: translation of return addr to RetInfo
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omRet2Info.c,v 1.13 2001-01-27 17:03:41 obachman Exp $
+ *  Version: $Id: omRet2Info.c,v 1.14 2001-04-30 09:02:10 Singular Exp $
  *******************************************************************/
 #include <stdio.h>
 #include <string.h>
@@ -60,14 +60,14 @@ int omBackTrace_2_RetInfo(void** bt, omRetInfo info, int max)
     i++;
   }
   if (j == 0) return 0;
-  
+
 #if defined(HAVE_POPEN) && defined(OM_PROG_ADDR2LINE)
   if (*om_this_prog != '\0')
   {
     char command[2*MAXPATHLEN + 15 + OM_MAX_BACKTRACE_DEPTH*(2*SIZEOF_VOIDP + 4)];
     FILE *pipe;
     int l;
-    l = sprintf(command, "%s -s -C -f -e %s", 
+    l = sprintf(command, "%s -s -C -f -e %s",
                 OM_PROG_ADDR2LINE, om_this_prog);
     i=0;
     while (i<j)
@@ -83,7 +83,7 @@ int omBackTrace_2_RetInfo(void** bt, omRetInfo info, int max)
 FunctionName
 File:Line
         */
-      while ((filled < j) && 
+      while ((filled < j) &&
              (fscanf(pipe, "%200[^\n]\n%200[^:]:%d\n", info[filled].func, info[filled].file, &(info[filled].line)) == 3))
       {
         if (*info[filled].func != '?' && *info[filled].file != '?' && info[filled].line > 0)
@@ -92,7 +92,7 @@ File:Line
       pclose(pipe);
     }
   }
-#endif  
+#endif
   return filled;
 }
 
@@ -112,7 +112,7 @@ int omPrintRetInfo(omRetInfo info, int max, FILE* fd, const char* fmt)
         else if (fmt[l] == 'f') fprintf(fd, "%-20s", (*info[i].file != '\0' ? info[i].file : "??"));
         else if (fmt[l] == 'F') fprintf(fd, "%-20s", (*info[i].func != '\0' ? info[i].func : "??"));
         else if (fmt[l] == 'l') fprintf(fd, "%d", info[i].line);
-        else if (fmt[l] == 'N') 
+        else if (fmt[l] == 'N')
         {
           if (*info[i].func != '\0')
           {
@@ -124,7 +124,7 @@ int omPrintRetInfo(omRetInfo info, int max, FILE* fd, const char* fmt)
           else
             fprintf(fd, "%-20s", "??");
         }
-        else if (fmt[l] == 'L') 
+        else if (fmt[l] == 'L')
         {
           int n = fprintf(fd, "%s:%d", (*info[i].func != '\0' ? info[i].file : "??"), info[i].line);
           if (n < 20) fprintf(fd, "%*s", 20-n, " ");
@@ -150,16 +150,16 @@ int omPrintRetInfo(omRetInfo info, int max, FILE* fd, const char* fmt)
 int omPrintBackTrace(void** bt, int max, FILE* fd)
 {
   int i;
-  
+
   omRetInfo_t info[OM_MAX_BACKTRACE_DEPTH];
   if (max > OM_MAX_BACKTRACE_DEPTH) max = OM_MAX_BACKTRACE_DEPTH;
-  
+
   i = omBackTrace_2_RetInfo(bt, info, max);
 #ifdef OM_PRINT_RETURN_ADDRESS
   return omPrintRetInfo(info, i, fd, "  #%i at %L in %N ra=%p\n");
 #else
   return omPrintRetInfo(info, i, fd, "  #%i at %L in %N\n");
-#endif  
+#endif
 }
 
 int omPrintCurrentBackTraceMax(FILE* fd, int max)
@@ -174,14 +174,14 @@ int omPrintCurrentBackTraceMax(FILE* fd, int max)
 }
 
 /*************************************************************
- *                                                              
+ *
  * Various Filters
  *
  *************************************************************/
 int omFilterRetInfo_i(omRetInfo info, int max, int i)
 {
   int j=0, k=i;
-  
+
   while (k < max)
   {
     info[j] = info[k];
@@ -192,15 +192,15 @@ int omFilterRetInfo_i(omRetInfo info, int max, int i)
 }
 
 /*************************************************************
- *                                                              
- * Low level routines 
+ *
+ * Low level routines
  *
  *************************************************************/
 
 int _omPrintBackTrace(void** bt, int max, FILE* fd , OM_FLR_DECL)
 {
   int i = 0;
-  
+
   omRetInfo_t info[OM_MAX_BACKTRACE_DEPTH];
   if (max > OM_MAX_BACKTRACE_DEPTH) max = OM_MAX_BACKTRACE_DEPTH;
   if (bt != NULL)
@@ -217,7 +217,7 @@ int _omPrintBackTrace(void** bt, int max, FILE* fd , OM_FLR_DECL)
   }
 #ifdef OM_TRACK_RETURN
   if (i == 0)
-    i = omBackTrace_2_RetInfo(&r,info, 1);
+    i = omBackTrace_2_RetInfo(((void*)&r),info, 1);
 #endif
 #ifndef OM_INTERNAL_DEBUG
   if (i > 1)
@@ -238,7 +238,7 @@ int _omPrintBackTrace(void** bt, int max, FILE* fd , OM_FLR_DECL)
       strcpy(info[0].file, f);
       info[0].line = l;
     }
-#endif  
+#endif
   }
   if (i == 0)
   {
@@ -267,18 +267,8 @@ int _omPrintCurrentBackTrace(FILE* fd , OM_FLR_DECL)
 {
   int i;
   void* bt[OM_MAX_BACKTRACE_DEPTH];
-  
+
   i = omGetBackTrace(bt, 1, OM_MAX_BACKTRACE_DEPTH);
   return _omPrintBackTrace(bt, i, fd , OM_FLR_VAL);
 }
-
 #endif /* ! OM_NDEBUG */
-  
-  
-
-
-    
-    
-      
-    
-

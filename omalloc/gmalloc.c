@@ -1,8 +1,8 @@
 /*******************************************************************
  *  File:    gmalloc.c
- *  Purpose: implementation of malloc and friends from libc of 
+ *  Purpose: implementation of malloc and friends from libc of
  *           Linux kernel version 5
- *  Version: $Id: gmalloc.c,v 1.5 2001-03-22 22:39:07 Singular Exp $
+ *  Version: $Id: gmalloc.c,v 1.6 2001-04-30 09:01:59 Singular Exp $
  *******************************************************************/
 #include "omMalloc.h"
 
@@ -466,11 +466,11 @@ align (size)
 {
   __ptr_t result;
   unsigned long int adj;
- 
+
   /* 9/99 obachman@mathematik.uni-kl.de: prevent calling morecore
      with negative arguments here */
   if ((ptrdiff_t) size < 0) return NULL;
-  
+
   result = (*__morecore) (size);
   adj = (unsigned long int) ((unsigned long int) ((char *) result -
                                                   (char *) NULL)) % BLOCKSIZE;
@@ -1405,4 +1405,3 @@ memalign (alignment, size)
 
   return result;
 }
-

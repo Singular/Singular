@@ -3,14 +3,14 @@
  *  Purpose: declaration of routines for operations on linked lists
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omList.h,v 1.5 2000-09-25 12:27:43 obachman Exp $
+ *  Version: $Id: omList.h,v 1.6 2001-04-30 09:02:08 Singular Exp $
  *******************************************************************/
 
 #ifndef OM_LIST_H
 #define OM_LIST_H
 
 #define OM_LIST_OFFSET(ptr, name_of_offset_field) \
-  (ptr != NULL ? ((void*) &(ptr->name_of_offset_field)) - ((void*) ptr) : 0)
+  (ptr != NULL ? ((char*) &(ptr->name_of_offset_field)) - ((char*) ptr) : 0)
 
 /********************************************************************
  *
@@ -30,23 +30,23 @@ void* _omListHasCycle(void* list, int next);
 void* _omIsOnList(void* list, int next, void* addr);
 /* Removes addr from list, if contained in it and returns new list */
 void* _omRemoveFromList(void* list, int next, void* addr);
-/* 
- * The following cast list->long_field to a pointer to  unsigned long 
+/*
+ * The following cast list->long_field to a pointer to  unsigned long
  */
 /* Find element with that value in list and return it, if found (else NULL) */
-void* _omFindInList(void* list, int next, int long_field, 
+void* _omFindInList(void* list, int next, int long_field,
                     unsigned long what);
-/* 
+/*
  * The following assume that list is ordered increasingly w.r.t. long_field
  */
 /* Finds element in sorted list */
-void* _omFindInSortedList(void* list, int next, int long_field, 
+void* _omFindInSortedList(void* list, int next, int long_field,
                           unsigned long what);
 /* Remove element with that value from list and return new list */
 void* _omRemoveFromSortedList(void* list,int next,int long_field,
                                   void* addr);
 /* Inserts addr at the right place, returns list assumes addr != NULL */
-void* _omInsertInSortedList(void* list, int next, int long_field, 
+void* _omInsertInSortedList(void* list, int next, int long_field,
                             void* addr);
 #ifndef OM_NDEBUG
 /* Check whether list is ok, i.e. whether addr of lists are aligned and in valid range */

@@ -3,7 +3,7 @@
  *  Purpose: alloc function to be included in omMain.c
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omtTestAlloc.c,v 1.9 2000-10-27 15:28:53 obachman Exp $
+ *  Version: $Id: omtTestAlloc.c,v 1.10 2001-04-30 09:02:14 Singular Exp $
  *******************************************************************/
 #include "omtTest.h"
 
@@ -53,13 +53,13 @@ void omtTestAlloc(omMemCell cell, unsigned long spec)
       else
         bin = omSmallSize2Bin(size);
     }
-    
+
     if (IS_STICKY_BIN(spec))
     {
       orig_bin = bin;
       bin = omtGetStickyBin(bin);
     }
-    
+
     if (IS_INLINE(spec))
     {
       if (IS_ZERO(spec))
@@ -162,7 +162,7 @@ void omtTestFree(omMemCell cell)
     else
       omFree(addr);
   }
-  
+
   if (bin != NULL && IS_SPEC_BIN(spec))
   {
     if (orig_bin != NULL)
@@ -190,10 +190,10 @@ void omtTestRealloc(omMemCell cell, unsigned long new_spec)
   size_t new_size = GET_SIZE(new_spec);
   size_t real_old_size = omSizeOfAddr(old_addr);
   size_t min_size;
-  
+
   omtTestDebug(cell);
 
-  if (old_bin != NULL && IS_FREE_BIN(old_spec) && 
+  if (old_bin != NULL && IS_FREE_BIN(old_spec) &&
       IS_BIN(new_spec) && ((new_size <= OM_MAX_BLOCK_SIZE) || IS_SPEC_BIN(new_spec)))
   {
     if (IS_SPEC_BIN(new_spec))
@@ -201,7 +201,7 @@ void omtTestRealloc(omMemCell cell, unsigned long new_spec)
       if (IS_ALIGNED(new_spec))
         new_bin = omGetAlignedSpecBin(new_size);
       else
-        new_bin = omGetSpecBin(new_size); 
+        new_bin = omGetSpecBin(new_size);
     }
     else
     {
@@ -209,14 +209,14 @@ void omtTestRealloc(omMemCell cell, unsigned long new_spec)
         new_bin = omSmallSize2AlignedBin(new_size);
       else
         new_bin = omSmallSize2Bin(new_size);
-    } 
+    }
 
     if (IS_STICKY_BIN(new_spec))
     {
       new_orig_bin = new_bin;
       new_bin = omtGetStickyBin(new_bin);
     }
-        
+
     if (IS_INLINE(new_spec))
     {
       if (IS_ZERO(new_spec)) new_addr = omRealloc0Bin(old_addr, old_bin, new_bin);
@@ -236,7 +236,7 @@ void omtTestRealloc(omMemCell cell, unsigned long new_spec)
       {
         if (IS_ZERO(new_spec))
         {
-          if (IS_ALIGNED(new_spec)) 
+          if (IS_ALIGNED(new_spec))
           {
             if (IS_SLOPPY(new_spec))
               new_addr = omrealloc0Size(old_addr, old_size, new_size);
@@ -248,7 +248,7 @@ void omtTestRealloc(omMemCell cell, unsigned long new_spec)
         }
         else
         {
-          if (IS_ALIGNED(new_spec)) 
+          if (IS_ALIGNED(new_spec))
           {
             if (IS_SLOPPY(new_spec))
               new_addr = omreallocSize(old_addr, old_size, new_size);
@@ -278,7 +278,7 @@ void omtTestRealloc(omMemCell cell, unsigned long new_spec)
       {
         if (IS_ZERO(new_spec))
         {
-          if (IS_ALIGNED(new_spec)) 
+          if (IS_ALIGNED(new_spec))
           {
             if (IS_SLOPPY(new_spec))
               new_addr = omrealloc0(old_addr, new_size);
@@ -289,7 +289,7 @@ void omtTestRealloc(omMemCell cell, unsigned long new_spec)
         }
         else
         {
-          if (IS_ALIGNED(new_spec)) 
+          if (IS_ALIGNED(new_spec))
           {
             if (IS_SLOPPY(new_spec))
               new_addr = omrealloc(old_addr, new_size);
@@ -315,7 +315,7 @@ void omtTestRealloc(omMemCell cell, unsigned long new_spec)
     }
   }
 
-  if (old_bin != NULL && IS_SPEC_BIN(old_spec)) 
+  if (old_bin != NULL && IS_SPEC_BIN(old_spec))
   {
     if (old_orig_bin != NULL)
       omUnGetSpecBin(&old_orig_bin);
@@ -326,7 +326,7 @@ void omtTestRealloc(omMemCell cell, unsigned long new_spec)
   new_size = omSizeOfAddr(new_addr);
   old_size = real_old_size;
   min_size = (new_size < old_size ? new_size : old_size);
-  
+
   if (IS_ZERO(old_spec) && IS_ZERO(new_spec))
     TestAddrContent(new_addr, 0, new_size);
   else
@@ -348,7 +348,7 @@ void omtTestRealloc(omMemCell cell, unsigned long new_spec)
 void omtTestDup(omMemCell cell, unsigned long spec)
 {
   omtTestDebug(cell);
-  
+
   if (DO_STRDUP(spec))
   {
     size_t size = omSizeOfAddr(cell->addr);
@@ -371,5 +371,3 @@ void omtTestDup(omMemCell cell, unsigned long spec)
     omFree(new_addr);
   }
 }
-
-    

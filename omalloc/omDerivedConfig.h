@@ -3,7 +3,7 @@
  *  Purpose: configuration which are derived from omConfig.h
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omDerivedConfig.h,v 1.4 2000-08-16 12:06:10 obachman Exp $
+ *  Version: $Id: omDerivedConfig.h,v 1.5 2001-04-30 09:02:05 Singular Exp $
  *******************************************************************/
 #ifndef OM_DERIVED_CONFIG_H
 #define OM_DERIVED_CONFIG_H
@@ -42,7 +42,7 @@
 #ifdef OM_ALIGN_8
 #define SIZEOF_OM_ALIGNMENT 8
 #define SIZEOF_OM_ALIGNMENT_1 7
-#define LOG_SIZEOF_OM_ALIGNMENT 3 
+#define LOG_SIZEOF_OM_ALIGNMENT 3
 #define SIZEOF_STRICT_ALIGNMENT 8
 #else
 #define SIZEOF_OM_ALIGNMENT 4
@@ -73,7 +73,7 @@
 
 /* define to enable assume */
 #ifndef HAVE_OM_ASSUME
-#if defined(OM_INTERNAL_DEBUG) 
+#if defined(OM_INTERNAL_DEBUG)
 #define HAVE_OM_ASSUME
 #endif
 #endif
@@ -102,7 +102,7 @@
 #define OM_FL           __FILE__,__LINE__
 #define OM_FL_KOMMA     ,
 #else
-#define OM_FL_DECL 
+#define OM_FL_DECL
 #define OM_FL_VAL
 #define OM_FL
 #define OM_FL_KOMMA
@@ -121,14 +121,14 @@
 #define OM_CTFL         OM_CHECK,OM_TRACK OM_FL_KOMMA OM_FL
 
 #ifdef OM_TRACK_RETURN
-#define OM_FLR_DECL         OM_FL_DECL OM_FL_KOMMA void* r
+#define OM_FLR_DECL         OM_FL_DECL OM_FL_KOMMA const void* r
 #define OM_FLR_VAL          OM_FL_VAL OM_FL_KOMMA r
 #define OM_FLR              OM_FL OM_FL_KOMMA 0
 #define OM_R_DEF            void* r; GET_RET_ADDR(r)
 #ifdef OM_TRACK_FILE_LINE
 #define OM_FLR_ARG(f,l,r)   f,l,r
 #else
-#define OM_FLR_ARG(f,l,r)   r      
+#define OM_FLR_ARG(f,l,r)   r
 #endif
 
 #else

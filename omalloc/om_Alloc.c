@@ -3,16 +3,16 @@
  *  Purpose: implementation of main omalloc functions
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: om_Alloc.c,v 1.1 2000-12-14 17:24:31 obachman Exp $
+ *  Version: $Id: om_Alloc.c,v 1.2 2001-04-30 09:02:12 Singular Exp $
  *******************************************************************/
 #ifndef OM_ALLOC_C
 #define OM_ALLOC_C
 
 #include "om_Alloc.h"
 /*******************************************************************
- *  
+ *
  *  global variables
- *  
+ *
  *******************************************************************/
 
 omBinPage_t om_ZeroPage[] = {{0, NULL, NULL, NULL, NULL}};
@@ -22,9 +22,9 @@ omSpecBin om_SpecBin = NULL;
 
 
 /*******************************************************************
- *  
+ *
  *  Local stuff
- *  
+ *
  *******************************************************************/
 
 /* Get new page and initialize */
@@ -41,7 +41,7 @@ static omBinPage omAllocNewBinPage(omBin bin)
 
   omSetTopBinAndStickyOfPage(newpage, bin, bin->sticky);
   newpage->used_blocks = -1;
-  newpage->current = (void*) (((void*)newpage) + SIZEOF_OM_BIN_PAGE_HEADER);
+  newpage->current = (void*) (((char*)newpage) + SIZEOF_OM_BIN_PAGE_HEADER);
   tmp = newpage->current;
   while (i < bin->max_blocks)
   {
@@ -49,7 +49,7 @@ static omBinPage omAllocNewBinPage(omBin bin)
     i++;
   }
   *((void**)tmp) = NULL;
-  omAssume(omListLength(newpage->current) ==  
+  omAssume(omListLength(newpage->current) ==
            (bin->max_blocks > 1 ? bin->max_blocks : 1));
   return newpage;
 }
@@ -57,9 +57,9 @@ static omBinPage omAllocNewBinPage(omBin bin)
 /* primitives for handling of list of pages */
 OM_INLINE_LOCAL void omTakeOutBinPage(omBinPage page, omBin bin)
 {
-  if (bin->current_page == page) 
+  if (bin->current_page == page)
   {
-    if (page->next == NULL) 
+    if (page->next == NULL)
     {
       if (page->prev == NULL)
       {
@@ -99,7 +99,7 @@ OM_INLINE_LOCAL void omInsertBinPage(omBinPage after, omBinPage page, omBin bin)
   else
   {
     omAssume(after != NULL && bin->last_page != NULL);
-    if (after == bin->last_page) 
+    if (after == bin->last_page)
     {
       bin->last_page = page;
     }
@@ -120,7 +120,7 @@ void* omAllocBinFromFullPage(omBin bin)
   void* addr;
   omBinPage newpage;
   omAssume(bin->current_page->current == NULL);
-  
+
   if (bin->current_page != om_ZeroPage)
   {
     omAssume(bin->last_page != NULL);
@@ -128,7 +128,7 @@ void* omAllocBinFromFullPage(omBin bin)
        so that tracking works */
 #ifdef OM_HAVE_TRACK
     bin->current_page->used_blocks &= (((unsigned long) 1) << (BIT_SIZEOF_LONG -1));
-#else    
+#else
     bin->current_page->used_blocks = 0;
 #endif
   }
@@ -144,24 +144,24 @@ void* omAllocBinFromFullPage(omBin bin)
     newpage = omAllocNewBinPage(bin);
     omInsertBinPage(bin->current_page, newpage, bin);
   }
-    
+
   bin->current_page = newpage;
-  omAssume(newpage != NULL && newpage != om_ZeroPage && 
+  omAssume(newpage != NULL && newpage != om_ZeroPage &&
            newpage->current != NULL);
   __omTypeAllocFromNonEmptyPage(void*, addr, newpage);
   return addr;
 }
 
 
-/* page->used_blocks <= 0, so, either free page or reallocate to 
+/* page->used_blocks <= 0, so, either free page or reallocate to
    the right of current_page */
 /*
- * Now: there are three different strategies here, on what to do with 
+ * Now: there are three different strategies here, on what to do with
  * pages which were full and now have a free block:
  * 1.) Insert at the end (default)
  * 2.) Insert after current_page  => #define PAGE_AFTER_CURRENT
  * 3.) Let it be new current_page => #define PAGE_BEFORE_CURRENT
- * Still need to try out which is best 
+ * Still need to try out which is best
  */
 void  omFreeToPageFault(omBinPage page, void* addr)
 {
@@ -169,13 +169,13 @@ void  omFreeToPageFault(omBinPage page, void* addr)
   omAssume(page->used_blocks <= 0);
 
 #ifdef OM_HAVE_TRACK
-  if (page->used_blocks < 0) 
+  if (page->used_blocks < 0)
   {
     omFreeTrackAddr(addr);
     return;
   }
 #endif
-    
+
   bin = omGetBinOfPage(page);
   if (page->current != NULL || bin->max_blocks <= 1)
   {
@@ -188,7 +188,7 @@ void  omFreeToPageFault(omBinPage page, void* addr)
       omFreeBinPages(page, - bin->max_blocks);
 #ifdef OM_HAVE_TRACK
     om_JustFreedPage = page;
-#endif    
+#endif
   }
   else
   {
@@ -215,9 +215,9 @@ void  omFreeToPageFault(omBinPage page, void* addr)
 }
 
 /*******************************************************************
- *  
+ *
  *  DoRealloc
- *  
+ *
  *******************************************************************/
 #ifdef OM_ALIGNMNET_NEEDS_WORK
 #define DO_ZERO(flag) (flag & 1)
@@ -228,7 +228,7 @@ void  omFreeToPageFault(omBinPage page, void* addr)
 void* omDoRealloc(void* old_addr, size_t new_size, int flag)
 {
   void* new_addr;
-  
+
   if (!omIsBinPageAddr(old_addr) && new_size > OM_MAX_BLOCK_SIZE)
   {
     if (DO_ZERO(flag))
@@ -240,27 +240,26 @@ void* omDoRealloc(void* old_addr, size_t new_size, int flag)
   {
     size_t old_size = omSizeOfAddr(old_addr);
     size_t min_size;
-    
+
     omAssume(OM_IS_ALIGNED(old_addr));
-    
+
 #ifdef OM_ALIGNMENT_NEEDS_WORK
     if (flag & 2)
       __omTypeAllocAligned(void*, new_addr, new_size);
     else
 #endif
       __omTypeAlloc(void*, new_addr, new_size);
-    
+
     new_size = omSizeOfAddr(new_addr);
     min_size = (old_size < new_size ? old_size : new_size);
     omMemcpyW(new_addr, old_addr, min_size >> LOG_SIZEOF_LONG);
-    
+
     if (DO_ZERO(flag) && (new_size > old_size))
-      omMemsetW((void*) new_addr + min_size, 0, (new_size - old_size) >> LOG_SIZEOF_LONG);
-  
+      omMemsetW((char*) new_addr + min_size, 0, (new_size - old_size) >> LOG_SIZEOF_LONG);
+
     __omFreeSize(old_addr, old_size);
 
     return new_addr;
   }
 }
-
 #endif /* OM_ALLOC_C */

@@ -3,7 +3,7 @@
  *  Purpose: declaration of options for omalloc
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omOpts.h,v 1.5 2000-09-25 12:27:43 obachman Exp $
+ *  Version: $Id: omOpts.h,v 1.6 2001-04-30 09:02:09 Singular Exp $
  *******************************************************************/
 #ifndef OM_OPTS_H
 #define OM_OPTS_H
@@ -26,4 +26,3 @@ struct omOpts_s
 extern omOpts_t om_Opts;
 
 #endif /* OM_OPTS_H */
-

@@ -1,9 +1,9 @@
 /*******************************************************************
  *  File:    omGetPageSize.h
- *  Purpose: figure out how to get the pagesize 
+ *  Purpose: figure out how to get the pagesize
  *  This is adapted from dlmalloc's mechanisms which in fact derived it from
- *  bsd/gnu getpagesize.h 
- *  Version: $Id: omGetPageSize.h,v 1.3 2000-08-14 12:26:45 obachman Exp $
+ *  bsd/gnu getpagesize.h
+ *  Version: $Id: omGetPageSize.h,v 1.4 2001-04-30 09:02:07 Singular Exp $
  *******************************************************************/
 #include <unistd.h>
 
@@ -30,7 +30,7 @@
 #          else
 #            define omalloc_getpagesize (NBPG * CLSIZE)
 #          endif
-#        else 
+#        else
 #          ifdef NBPC
 #            define omalloc_getpagesize NBPC
 #          else
@@ -40,11 +40,8 @@
 #              define omalloc_getpagesize (4096) /* just guess */
 #            endif
 #          endif
-#        endif 
+#        endif
 #      endif
-#    endif 
+#    endif
 #  endif
 #endif
-
-
-

@@ -3,7 +3,7 @@
  *  Purpose: declaration of routines for primitve BinPage managment
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omBinPage.h,v 1.4 2000-10-27 15:28:51 obachman Exp $
+ *  Version: $Id: omBinPage.h,v 1.5 2001-04-30 09:02:03 Singular Exp $
  *******************************************************************/
 #ifndef OM_BIN_PAGE_H
 #define OM_BIN_PAGE_H
@@ -18,7 +18,7 @@
   (((long) (addr) & (SIZEOF_SYSTEM_PAGE -1)) == 0)
 
 #define omGetPageOfAddr(addr) \
-  ((void*) ((long) (addr) & ~(SIZEOF_SYSTEM_PAGE -1)))
+  ((void*) (((long)addr) & ~(SIZEOF_SYSTEM_PAGE -1)))
 
 #define omGetBinPageOfAddr(addr) \
   ((omBinPage) ((long) (addr) & ~(SIZEOF_SYSTEM_PAGE -1)))
@@ -78,9 +78,9 @@ extern unsigned long *om_BinPageIndicies;
 
 /*BEGINPRIVATE*/
 /*******************************************************************
- *  
+ *
  * Alloc/Free of BinPages
- *  
+ *
  *******************************************************************/
 extern omBinPage omAllocBinPages(int how_many);
 extern omBinPage omAllocBinPage();
@@ -90,4 +90,3 @@ extern void omFreeBinPages(omBinPage page, int how_many);
 /*ENDPRIVATE*/
 
 #endif /* OM_BIN_PAGE_H */
-

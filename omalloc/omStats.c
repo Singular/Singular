@@ -3,7 +3,7 @@
  *  Purpose: definitions of stats related stuff
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omStats.c,v 1.6 2000-12-12 15:26:18 obachman Exp $
+ *  Version: $Id: omStats.c,v 1.7 2001-04-30 09:02:11 Singular Exp $
  *******************************************************************/
 #include <unistd.h>
 #define OM_NO_MALLOC_MACROS
@@ -27,13 +27,13 @@ void omUpdateInfo()
 {
 #ifdef OM_MALLOC_UPDATE_INFO
   OM_MALLOC_UPDATE_INFO;
-#endif  
+#endif
 
   /* this can happen, since sizes are added as requested, and
      subtracted as the real size of the memory */
   if (om_Info.CurrentBytesFromMalloc < 0)
     om_Info.CurrentBytesFromMalloc = 0;
-  
+
   om_Info.UsedBytesFromValloc = omGetUsedBinBytes();
   om_Info.AvailBytesFromValloc = om_Info.CurrentBytesFromValloc - om_Info.UsedBytesFromValloc;
 
@@ -45,7 +45,7 @@ void omUpdateInfo()
 #ifdef OM_MALLOC_AVAIL_BYTES
   om_Info.AvailBytesMalloc = OM_MALLOC_AVAIL_BYTES;
 #endif
-  
+
   om_Info.UsedBytes = om_Info.UsedBytesMalloc + om_Info.UsedBytesFromValloc;
   om_Info.AvailBytes = om_Info.AvailBytesMalloc + om_Info.AvailBytesFromValloc;
 
@@ -61,7 +61,7 @@ void omUpdateInfo()
 #endif
 
 #ifndef OM_MALLOC_CURRENT_BYTES_SBRK
-#ifdef HAVE_SBRK  
+#ifdef HAVE_SBRK
   if (om_SbrkInit)
   {
     om_Info.CurrentBytesSbrk = (unsigned long) sbrk(0) - om_SbrkInit;
@@ -78,16 +78,16 @@ void omUpdateInfo()
 #ifdef OM_MALLOC_MAX_BYTES_SBRK
   om_Info.MaxBytesSbrk = OM_MALLOC_MAX_BYTES_SBRK;
 #else
-    if (om_Info.CurrentBytesSbrk > om_Info.MaxBytesSbrk) 
+    if (om_Info.CurrentBytesSbrk > om_Info.MaxBytesSbrk)
       om_Info.MaxBytesSbrk = om_Info.CurrentBytesSbrk;
-#endif  
+#endif
 #endif
 
 #ifdef OM_MALLOC_CURRENT_BYTES_SYSTEM
   om_Info.CurrentBytesSystem = OM_MALLOC_CURRENT_BYTES_SYSTEM;
 #else
-  om_Info.CurrentBytesSystem = 
-    (om_Info.CurrentBytesSbrk > om_Info.UsedBytesMalloc ? 
+  om_Info.CurrentBytesSystem =
+    (om_Info.CurrentBytesSbrk > om_Info.UsedBytesMalloc ?
      om_Info.CurrentBytesSbrk : om_Info.UsedBytesMalloc);
 #endif
 #ifdef OM_HAVE_VALLOC_MMAP
@@ -98,13 +98,13 @@ void omUpdateInfo()
 #ifdef OM_MALLOC_MAX_BYTES_SYSTEM
   om_Info.MaxBytesSystem = OM_MALLOC_MAX_BYTES_SYSTEM;
 #else
-  om_Info.MaxBytesSystem = 
-    (om_Info.MaxBytesSbrk + om_Info.MaxBytesMmap > 
+  om_Info.MaxBytesSystem =
+    (om_Info.MaxBytesSbrk + om_Info.MaxBytesMmap >
      om_Info.MaxBytesFromMalloc + om_Info.MaxBytesFromValloc ?
      om_Info.MaxBytesSbrk + om_Info.MaxBytesMmap :
      om_Info.MaxBytesFromMalloc + om_Info.MaxBytesFromValloc);
 #endif
-#endif  
+#endif
 }
 
 omInfo_t omGetInfo()

@@ -4,7 +4,7 @@
  *           -- the real version
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omalloc.c,v 1.6 2001-01-27 17:03:41 obachman Exp $
+ *  Version: $Id: omalloc.c,v 1.7 2001-04-30 09:02:12 Singular Exp $
  *******************************************************************/
 
 #include <stdlib.h>
@@ -26,18 +26,18 @@ void* calloc(size_t nmemb, size_t size)
   void* addr;
   if (size == 0) size = 1;
   if (nmemb == 0) nmemb = 1;
-  
+
   size = size*nmemb;
   omTypeAlloc0Aligned(void*, addr, size);
   OM_MARK_AS_STATIC(addr);
   return addr;
 }
-  
+
 void* malloc(size_t size)
 {
   void* addr;
   if (size == 0) size = 1;
-  
+
   omTypeAllocAligned(void*, addr, size);
   OM_MARK_AS_STATIC(addr);
   return addr;
@@ -75,7 +75,7 @@ void* realloc(void* old_addr, size_t new_size)
     OM_MARK_AS_STATIC(new_addr);
     return new_addr;
   }
-  else 
+  else
   {
     free(old_addr);
     return malloc(new_size);
@@ -112,11 +112,10 @@ void* reallocSize(void* old_addr, size_t old_size, size_t new_size)
     OM_MARK_AS_STATIC(new_addr);
     return new_addr;
   }
-  else 
+  else
   {
     freeSize(old_addr, old_size);
     return malloc(new_size);
   }
 }
-
 #endif

@@ -3,7 +3,7 @@
  *  Purpose: implementing valloc via mmap
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omMmap.c,v 1.5 2001-01-27 17:03:40 obachman Exp $
+ *  Version: $Id: omMmap.c,v 1.6 2001-04-30 09:02:09 Singular Exp $
  *******************************************************************/
 #include <unistd.h>
 #include <fcntl.h>
@@ -29,14 +29,14 @@ static void* omVallocMmap(size_t size)
   addr = mmap(0, size, PROT_READ|PROT_WRITE, MAP_PRIVATE, -1, 0);
 #endif
 #else /* !MAP_ANONYMOUS */
-  if (fd < 0) 
+  if (fd < 0)
   {
     fd = open("/dev/zero", O_RDWR);
     if (fd < 0) return NULL;
   }
   addr = mmap(0, size, PROT_READ|PROT_WRITE, MAP_PRIVATE, fd, 0);
 #endif
-  
+
   if (addr == (void*) -1) return NULL;
   return addr;
 }
@@ -45,5 +45,3 @@ static int omVfreeMmap(void* addr, size_t size)
 {
   return munmap(addr, size);
 }
-
-

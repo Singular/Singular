@@ -3,7 +3,7 @@
  *  Purpose: implementation of main lowl-level alloc functions
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omAllocSystem.c,v 1.8 2001-03-22 22:39:08 Singular Exp $
+ *  Version: $Id: omAllocSystem.c,v 1.9 2001-04-30 09:02:01 Singular Exp $
  *******************************************************************/
 #ifndef OM_ALLOC_SYSTEM_C
 #define OM_ALLOC_SYSTEM_C
@@ -26,46 +26,46 @@
 #define OM_FREE_TO_SYSTEM       OM_MALLOC_FREE
 
 /*******************************************************************
- *  
+ *
  *  AllocLarge/FreeLarge if malloc can not return sizeof(addr)
- *  
+ *
  *******************************************************************/
 /* allocation of large addr */
-#if defined(OM_MALLOC_PROVIDES_SIZEOF_ADDR) 
+#if defined(OM_MALLOC_PROVIDES_SIZEOF_ADDR)
 #define _omSizeOfLargeAddr(addr) (OM_MALLOC_SIZEOF_ADDR(addr) & (~SIZEOF_OM_ALIGNMENT_1))
 #else
 void* omAllocLarge(size_t size)
 {
-  void* addr;
+  char* addr;
   size = OM_ALIGN_SIZE(size);
   addr = omAllocFromSystem(size + SIZEOF_STRICT_ALIGNMENT);
   *((size_t*) addr) = size;
-  return addr + SIZEOF_STRICT_ALIGNMENT;
+  return (void *)(addr + SIZEOF_STRICT_ALIGNMENT);
 }
 
 void* omReallocLarge(void* old_addr, size_t new_size)
 {
-  void* _old_addr;
-  void* new_addr;
-  
+  char* _old_addr;
+  char* new_addr;
+
   omAssume(omIsLargeAddr(old_addr));
-  
+
   new_size = OM_ALIGN_SIZE(new_size);
-  _old_addr = old_addr - SIZEOF_STRICT_ALIGNMENT;
-  new_addr = omReallocSizeFromSystem(_old_addr, 
-                                     *((size_t*) _old_addr) + SIZEOF_STRICT_ALIGNMENT, 
+  _old_addr = (char *)old_addr - SIZEOF_STRICT_ALIGNMENT;
+  new_addr = omReallocSizeFromSystem(_old_addr,
+                                     *((size_t*) _old_addr) + SIZEOF_STRICT_ALIGNMENT,
                                      new_size + SIZEOF_STRICT_ALIGNMENT);
   *((size_t*) new_addr) = new_size;
-  return new_addr + SIZEOF_STRICT_ALIGNMENT;
+  return (void *)(new_addr + SIZEOF_STRICT_ALIGNMENT);
 }
 
 void omFreeLarge(void* addr)
 {
-  void* _addr = addr - SIZEOF_STRICT_ALIGNMENT;
+  char* _addr = (char *)addr - SIZEOF_STRICT_ALIGNMENT;
   omFreeSizeToSystem(_addr, *((size_t*) _addr) + SIZEOF_STRICT_ALIGNMENT);
 }
 
-#define _omSizeOfLargeAddr(addr)  (*((size_t*) ((void*) addr - SIZEOF_STRICT_ALIGNMENT)))
+#define _omSizeOfLargeAddr(addr)  (*((size_t*) ((char*) addr - SIZEOF_STRICT_ALIGNMENT)))
 #endif /* OM_MALLOC_PROVIDES_SIZEOF_ADDR */
 
 void* omAlloc0Large(size_t size)
@@ -79,52 +79,52 @@ void* omAlloc0Large(size_t size)
 void* omRealloc0Large(void* old_addr, size_t new_size)
 {
   size_t old_size;
-  void* new_addr;
-  
+  char* new_addr;
+
   omAssume(!omIsBinPageAddr(old_addr));
 
   old_size = omSizeOfLargeAddr(old_addr);
-  
+
   new_addr = omReallocLarge(old_addr, new_size);
   new_size = omSizeOfLargeAddr(new_addr);
   if (new_size > old_size)
     memset(new_addr + old_size, 0, new_size - old_size);
-  return new_addr;
-}
-  
-size_t omSizeOfLargeAddr(void* addr)
-{
-  return _omSizeOfLargeAddr(addr);
+  return (void *)new_addr;
 }
 
-size_t omSizeOfAddr(void* addr)
+size_t omSizeOfLargeAddr(void* addr)
 {
-  
+  return _omSizeOfLargeAddr((char *)addr);
+}
+
+size_t omSizeOfAddr(const void* addr)
+{
+
   return (omIsBinPageAddr(addr) ?
 #ifdef OM_HAVE_TRACK
-          (omIsBinAddrTrackAddr(addr) ? omOutSizeOfTrackAddr(addr) : omSizeOfBinAddr(addr)) :
+          (omIsBinAddrTrackAddr(addr) ? omOutSizeOfTrackAddr((char *)addr) : omSizeOfBinAddr(addr)) :
 #else
-          omSizeOfBinAddr(addr) : 
+          omSizeOfBinAddr(addr) :
 #endif
-          omSizeOfLargeAddr(addr));
+          omSizeOfLargeAddr((char *)addr));
 }
 
 size_t omSizeWOfAddr(void* addr)
 {
-  
+
   return (omIsBinPageAddr(addr) ?
 #ifdef OM_HAVE_TRACK
           (omIsBinAddrTrackAddr(addr) ? omOutSizeOfTrackAddr(addr) >> LOG_SIZEOF_LONG : omSizeWOfBinAddr(addr)) :
 #else
-          omSizeWOfBinAddr(addr) : 
+          omSizeWOfBinAddr(addr) :
 #endif
           omSizeOfLargeAddr(addr) >> LOG_SIZEOF_LONG);
 }
 
 /*******************************************************************
- *  
+ *
  *  Valloc
- *  
+ *
  *******************************************************************/
 #ifdef OM_HAVE_VALLOC_MMAP
 
@@ -137,14 +137,14 @@ size_t omSizeWOfAddr(void* addr)
 #define OM_VALLOC_FROM_SYSTEM OM_MALLOC_VALLOC
 #define OM_VFREE_TO_SYSTEM    OM_MALLOC_VFREE
 
-#else 
+#else
 
 #define OM_VALLOC_FROM_SYSTEM   omEmulateValloc
 #define OM_VFREE_TO_SYSTEM      omEmulateVfree
 
 #define OM_ALIGN_PAGE(addr) ( ((long)addr + (SIZEOF_SYSTEM_PAGE -1)) & ~(SIZEOF_SYSTEM_PAGE - 1))
 /* now we implement an emulation */
-void* omEmulateValloc(size_t size) 
+void* omEmulateValloc(size_t size)
 {
   void* addr;
   size_t padding = SIZEOF_VOIDP;
@@ -175,9 +175,9 @@ void omEmulateVfree(void* addr, size_t size)
 #endif /* OM_HAVE_VALLOC_MMAP */
 
 /*******************************************************************
- *  
+ *
  *  System-level Alloc/Free
- *  
+ *
  *******************************************************************/
 void* omAllocFromSystem(size_t size)
 {
@@ -200,7 +200,7 @@ void* omAllocFromSystem(size_t size)
     om_MaxAddr = ((unsigned long) ptr) + size;
   if (((unsigned long) ptr) < om_MinAddr)
     om_MinAddr = ((unsigned long) ptr);
-#endif  
+#endif
 
   om_Info.CurrentBytesFromMalloc += size;
   if (om_Info.CurrentBytesFromMalloc > om_Info.MaxBytesFromMalloc)
@@ -209,12 +209,12 @@ void* omAllocFromSystem(size_t size)
 #if defined(OM_HAVE_VALLOC_MMAP) && defined(OM_MALLOC_MAX_BYTES_SYSTEM)
     if (om_Info.CurrentBytesFromValloc + OM_MALLOC_MAX_BYTES_SYSTEM > om_Info.MaxBytesSystem)
       om_Info.MaxBytesSystem = om_Info.CurrentBytesFromValloc + OM_MALLOC_MAX_BYTES_SYSTEM;
-#endif 
+#endif
 #if defined(HAVE_SBRK) && !defined(OM_MALLOC_MAX_BYTES_SBRK)
     if (! om_SbrkInit) om_SbrkInit = (unsigned long) sbrk(0) - size;
-    if (om_Info.MaxBytesFromMalloc 
+    if (om_Info.MaxBytesFromMalloc
 #ifndef OM_HAVE_VALLOC_MMAP
-        + om_Info.CurrentBytesFromValloc 
+        + om_Info.CurrentBytesFromValloc
 #endif
         > om_Info.MaxBytesSbrk)
     {
@@ -240,9 +240,9 @@ void* omReallocSizeFromSystem(void* addr, size_t oldsize, size_t newsize)
   {
     OM_MEMORY_LOW_HOOK();
     /* Can do a realloc again: manpage reads:
-       "If realloc() fails the original block is left untouched - 
+       "If realloc() fails the original block is left untouched -
        it is not freed or moved." */
-    res = OM_REALLOC_FROM_SYSTEM(addr, newsize); 
+    res = OM_REALLOC_FROM_SYSTEM(addr, newsize);
     if (res == NULL)
     {
       OM_OUT_OF_MEMORY_HOOK();
@@ -257,10 +257,10 @@ void* omReallocSizeFromSystem(void* addr, size_t oldsize, size_t newsize)
     om_MaxAddr = ((unsigned long) res) + newsize;
   if (((unsigned long) res) < om_MinAddr)
     om_MinAddr = ((unsigned long) res);
-#endif  
+#endif
 
   om_Info.CurrentBytesFromMalloc += (long) newsize - (long) oldsize;
-    
+
 
   if (om_Info.CurrentBytesFromMalloc > om_Info.MaxBytesFromMalloc)
   {
@@ -268,11 +268,11 @@ void* omReallocSizeFromSystem(void* addr, size_t oldsize, size_t newsize)
 #if defined(OM_HAVE_VALLOC_MMAP) && defined(OM_MALLOC_MAX_BYTES_SYSTEM)
     if (om_Info.CurrentBytesFromValloc + OM_MALLOC_MAX_BYTES_SYSTEM > om_Info.MaxBytesSystem)
       om_Info.MaxBytesSystem = om_Info.CurrentBytesFromValloc + OM_MALLOC_MAX_BYTES_SYSTEM;
-#endif 
+#endif
 #if defined(HAVE_SBRK) && !defined(OM_MALLOC_MAX_BYTES_SBRK)
-    if (om_Info.MaxBytesFromMalloc 
+    if (om_Info.MaxBytesFromMalloc
 #ifndef OM_HAVE_VALLOC_MMAP
-        + om_Info.CurrentBytesFromValloc 
+        + om_Info.CurrentBytesFromValloc
 #endif
         > om_Info.MaxBytesSbrk)
     {
@@ -289,7 +289,7 @@ void omFreeToSystem(void* addr)
 {
   omFreeSizeToSystem(addr, omSizeOfAddr(addr));
 }
- 
+
 void omFreeSizeToSystem(void* addr, size_t size)
 {
   OM_FREE_TO_SYSTEM( addr );
@@ -322,7 +322,7 @@ void* _omVallocFromSystem(size_t size, int fail)
     om_MaxAddr = ((unsigned long) page) + size;
   if (((unsigned long) page) < om_MinAddr)
     om_MinAddr = ((unsigned long) page);
-#endif  
+#endif
 
   omAssume(omIsAddrPageAligned(page));
   om_Info.CurrentBytesFromValloc += size;
@@ -338,7 +338,7 @@ void* _omVallocFromSystem(size_t size, int fail)
     if (om_Info.CurrentBytesFromMalloc + om_Info.CurrentBytesFromValloc > om_Info.MaxBytesSbrk)
     {
       om_Info.MaxBytesSbrk = (unsigned long) sbrk(0) - om_SbrkInit;
-      omAssume(om_Info.MaxBytesSbrk >= om_Info.CurrentBytesFromMalloc 
+      omAssume(om_Info.MaxBytesSbrk >= om_Info.CurrentBytesFromMalloc
                + om_Info.CurrentBytesFromValloc);
     }
 #endif

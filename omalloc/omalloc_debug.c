@@ -4,7 +4,7 @@
  *           -- debug versions
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omalloc_debug.c,v 1.3 2000-08-14 12:26:51 obachman Exp $
+ *  Version: $Id: omalloc_debug.c,v 1.4 2001-04-30 09:02:13 Singular Exp $
  *******************************************************************/
 #include "omDefaultConfig.h"
 
@@ -17,4 +17,3 @@
 #endif
 
 #include "omalloc.c"
-

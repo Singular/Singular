@@ -3,7 +3,7 @@
  *  Purpose: routine which determines absolute pathname of executable
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omFindExec.c,v 1.9 2001-02-23 15:24:44 obachman Exp $
+ *  Version: $Id: omFindExec.c,v 1.10 2001-04-30 09:02:06 Singular Exp $
  *******************************************************************/
 
 #ifdef HAVE_CONFIG_H
@@ -127,7 +127,7 @@ static char * omFindExec_link (const char *name, char* executable)
 
         if (tbuf[strlen(tbuf)-1] != '/') strcat(tbuf, "/");
         strcat (tbuf, name);
-        
+
         /* If we can execute the named file, then return it. */
         if (! access (tbuf, X_OK))
         {
@@ -159,7 +159,7 @@ static int my_readlink(const char* name, char* buf, size_t bufsize)
 {
   char buf2[MAXPATHLEN];
   int ret;
-  
+
   if ((ret = readlink(name, buf2, bufsize)) > 0)
   {
     buf2[ret] = 0;
@@ -186,18 +186,18 @@ static int my_readlink(const char* name, char* buf, size_t bufsize)
 }
 
 #define MAX_LINK_LEVEL 10
-/* similar to readlink (cf. man readlink), except that symbolic links are 
+/* similar to readlink (cf. man readlink), except that symbolic links are
    followed up to MAX_LINK_LEVEL
 */
 static int full_readlink(const char* name, char* buf, size_t bufsize)
 {
   int ret;
-  
+
   if ((ret=my_readlink(name, buf, bufsize)) > 0)
   {
     char buf2[MAXPATHLEN];
     int ret2, i = 0;
-    
+
     do
     {
       buf[ret] = '\0';
@@ -217,13 +217,13 @@ static int full_readlink(const char* name, char* buf, size_t bufsize)
   }
   return -1;
 }
-  
+
 #ifdef WINNT
 char * _omFindExec (const char *name, char* exec);
 /* for windows, serch first for .exe */
 char* omFindExec(const char *name, char* exec)
 {
-  
+
   if (strstr(name, ".exe") == NULL)
   {
     char buf[MAXPATHLEN];
@@ -282,5 +282,3 @@ char* omFindExec (const char *name, char* exec)
 }
 
 #endif /* ! defined(__MWERKS__) && defined(HAVE_UNISTD_H) && defined(STDC_HEADERS) */
-
-

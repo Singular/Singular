@@ -3,7 +3,7 @@
  *  Purpose: declaration of routines related to Bins
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omBin.h,v 1.4 2000-10-04 13:12:29 obachman Exp $
+ *  Version: $Id: omBin.h,v 1.5 2001-04-30 09:02:02 Singular Exp $
  *******************************************************************/
 #ifndef OM_BIN_H
 #define OM_BIN_H
@@ -61,4 +61,3 @@ int omIsKnownTopBin(omBin bin, int normal_bin);
 /*ENDPRIVATE*/
 
 #endif /* OM_BIN_H */
-

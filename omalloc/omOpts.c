@@ -3,13 +3,13 @@
  *  Purpose: definitions of stats related stuff
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omOpts.c,v 1.6 2000-12-12 15:26:17 obachman Exp $
+ *  Version: $Id: omOpts.c,v 1.7 2001-04-30 09:02:09 Singular Exp $
  *******************************************************************/
 
 #include "om_Alloc.h"
 #include "omDefaultConfig.h"
 
-omOpts_t om_Opts = 
+omOpts_t om_Opts =
 {
   OM_DEFAULT_MIN_TRACK,
   OM_DEFAULT_MIN_CHECK,
@@ -23,7 +23,3 @@ omOpts_t om_Opts =
   OM_DEFAULT_MEMORY_LOW_FUNC,
   OM_DEFAULT_ERROR_HOOK
 };
-
-
-
-

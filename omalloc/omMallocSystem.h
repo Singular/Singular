@@ -3,7 +3,7 @@
  *  Purpose: declaration of macros for malloc to be used from the system
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omMallocSystem.h,v 1.3 2000-08-14 12:26:47 obachman Exp $
+ *  Version: $Id: omMallocSystem.h,v 1.4 2001-04-30 09:02:08 Singular Exp $
  *******************************************************************/
 #ifndef OM_MALLOC_SYSTEM_H
 #define OM_MALLOC_SYSTEM_H
@@ -16,4 +16,3 @@
 #define OM_MALLOC_VFREE(addr, size) OM_MALLOC_FREE(addr)
 
 #endif /* OM_MALLOC_SYSTEM_H */
-

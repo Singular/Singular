@@ -3,7 +3,7 @@
  *  Purpose: implementation of main omTest functions
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 7/00
- *  Version: $Id: omDebug.c,v 1.14 2001-03-22 22:39:09 Singular Exp $
+ *  Version: $Id: omDebug.c,v 1.15 2001-04-30 09:02:03 Singular Exp $
  *******************************************************************/
 #include <mylimits.h>
 #include <string.h>
@@ -14,15 +14,15 @@
 
 #ifndef OM_NDEBUG
 /*******************************************************************
- *  
+ *
  * Declarations
- *  
+ *
  *******************************************************************/
 
 static void* __omDebugAlloc(void* size_bin, omTrackFlags_t  flags, char track, OM_FLR_DECL);
 static void* __omDebugRealloc(void* old_addr, void* old_size_bin, void* new_size_bin,
-                              omError_t old_status, omTrackFlags_t  old_flags, 
-                              omTrackFlags_t  new_flags, 
+                              omError_t old_status, omTrackFlags_t  old_flags,
+                              omTrackFlags_t  new_flags,
                               char track, OM_FLR_DECL);
 static void __omDebugFree(void* addr, void* size_bin, omTrackFlags_t  flags, OM_FLR_DECL);
 
@@ -33,9 +33,9 @@ void* om_AlwaysKeptAddrs = NULL;
 
 
 /*******************************************************************
- *  
+ *
  * Test routines
- *  
+ *
  *******************************************************************/
 #define OM_CLFL check_level OM_FL_KOMMA OM_FL
 omError_t omTestAddrBin(void* addr, omBin bin, int check_level)
@@ -103,10 +103,10 @@ omError_t omTestMemory(int check_level)
 #define MIN(a,b) (a < b ? a : b)
 
 /*******************************************************************
- *  
+ *
  * First level _omDebug alloc/free routines: call respective checks and dispatch
  * to routines which do the actual work
- *  
+ *
  *******************************************************************/
 void* _omDebugAlloc(void* size_bin, omTrackFlags_t flags, OM_CTFL_DECL)
 {
@@ -136,7 +136,7 @@ void* _omDebugAlloc(void* size_bin, omTrackFlags_t flags, OM_CTFL_DECL)
   }
 
   addr = __omDebugAlloc(size_bin, flags, track, OM_FLR_VAL);
-  
+
 #ifdef OM_INTERNAL_DEBUG
   (void) _omCheckAddr(addr, size_bin,flags|OM_FUSED,check, omError_InternalBug, OM_FLR);
 #endif
@@ -155,21 +155,21 @@ void* _omDebugRealloc(void* old_addr, void* old_size_bin, void* new_size_bin,
   track = MAX(track, om_Opts.MinTrack);
   check = MIN(check, om_Opts.MaxCheck);
   track = MIN(track, om_Opts.MaxTrack);
-  
+
   if (check)
   {
     status = _omCheckAddr(old_addr, old_size_bin, old_flags|OM_FUSED, check, omError_NoError, OM_FLR_VAL);
 
     if (status == omError_NoError && check > 1 && new_flags & OM_FBIN)
       status = omDoCheckBin((omBin)new_size_bin, 1, check-1, omError_MemoryCorrupted, OM_FLR_VAL);
-    
+
     if (new_size_bin == NULL && !(new_flags & OM_FSLOPPY))
     {
       omReportError(omError_NullSizeAlloc, omError_NoError, OM_FLR_VAL, "");
       new_size_bin = (void*) 1;
     }
   }
-  
+
   new_addr = __omDebugRealloc(old_addr, old_size_bin, new_size_bin,
                               status, old_flags, new_flags, track, OM_FLR_VAL);
 #ifdef OM_INTERNAL_DEBUG
@@ -188,13 +188,13 @@ void _omDebugFree(void* addr, void* size_bin,
   check = MIN(check, om_Opts.MaxCheck);
 
   if (check && _omCheckAddr(addr, size_bin, flags|OM_FUSED, check, omError_NoError, OM_FLR_VAL)) return;
-  
+
   __omDebugFree(addr,size_bin,flags, OM_FLR_VAL);
-  
+
 #ifdef OM_INTERNAL_DEBUG
   if (flags & OM_FBIN)
     (void) _omCheckBin((omBin)size_bin, 1, check-1,omError_InternalBug, OM_FLR);
-  else 
+  else
     (void) _omCheckMemory(check-2,omError_InternalBug,OM_FLR);
 #endif
 }
@@ -237,7 +237,7 @@ char* _omDebugStrDup(const char* addr, OM_TFL_DECL)
 
   if (addr == NULL)
   {
-    omReportAddrError(omError_NotString, omError_NoError, addr, 0, 0, OM_FLR_VAL, "NULL String");
+    omReportAddrError(omError_NotString, omError_NoError, (char *)addr, 0, 0, OM_FLR_VAL, "NULL String");
     return NULL;
   }
   track = MAX(track, om_Opts.MinTrack);
@@ -262,8 +262,8 @@ char* _omDebugStrDup(const char* addr, OM_TFL_DECL)
     omReportAddrError(omError_NotString, omError_NoError, addr, 0, 0, OM_FLR_VAL, "Not 0 terminated");
     i = size-1;
   }
-#endif 
-  ret = __omDebugAlloc((void*)i+1, OM_FSIZE, track, OM_FLR_VAL);
+#endif
+  ret = __omDebugAlloc((char*)i+1, OM_FSIZE, track, OM_FLR_VAL);
   memcpy(ret, addr, i);
   ret[i] = '\0';
 
@@ -278,7 +278,7 @@ omError_t _omDebugAddr(void* addr, void* bin_size, omTrackFlags_t flags, OM_CFL_
   OM_R_DEF;
   check = MAX(check,om_Opts.MinCheck);
   check = MIN(check,om_Opts.MaxCheck);
-  return _omCheckAddr(addr, bin_size, 
+  return _omCheckAddr(addr, bin_size,
                       OM_FUSED|flags,check,omError_NoError,OM_FLR_VAL);
 }
 omError_t _omDebugMemory(OM_CFL_DECL)
@@ -293,17 +293,17 @@ omError_t _omDebugBin(omBin bin, OM_CFL_DECL)
   OM_R_DEF;
   return _omCheckBin(bin, 1, MAX(check, om_Opts.MinCheck), omError_NoError,OM_FLR_VAL);
 }
-  
+
 /*******************************************************************
- *  
+ *
  * Second level _omDebug alloc/free routines: do the actual work
- *  
+ *
  *******************************************************************/
 static void* __omDebugAlloc(void* size_bin, omTrackFlags_t flags, char track, OM_FLR_DECL)
 {
   void* o_addr;
   size_t o_size = (flags & OM_FBIN ? ((omBin)size_bin)->sizeW << LOG_SIZEOF_LONG : (size_bin != NULL ? (size_t) size_bin: 1));
-  
+
 #ifdef OM_HAVE_TRACK
   if (track > 0)
   {
@@ -343,21 +343,21 @@ static void* __omDebugAlloc(void* size_bin, omTrackFlags_t flags, char track, OM
       }
     }
   }
-  
+
   return o_addr;
 }
 
 static void* __omDebugRealloc(void* old_addr, void* old_size_bin, void* new_size_bin,
-                              omError_t old_status, omTrackFlags_t  old_flags, omTrackFlags_t  new_flags, 
+                              omError_t old_status, omTrackFlags_t  old_flags, omTrackFlags_t  new_flags,
                               char track, OM_FLR_DECL)
 {
   void* new_addr;
   size_t old_size = (old_flags & OM_FSIZE ? (size_t) old_size_bin :
                      (omSizeOfAddr(old_addr)));
   size_t new_size;
-                 
+
   omAssume(new_flags & OM_FSIZE || new_flags & OM_FBIN);
-  
+
   if (old_addr == NULL || ((old_flags & OM_FSIZE) && old_size_bin == NULL))
   {
     new_addr = __omDebugAlloc(new_size_bin, new_flags, track, OM_FLR_VAL);
@@ -368,20 +368,21 @@ static void* __omDebugRealloc(void* old_addr, void* old_size_bin, void* new_size
     new_addr = __omDebugAlloc(new_size_bin, new_flags, track, OM_FLR_VAL);
     new_size =  omSizeOfAddr(new_addr);
     old_size = omSizeOfAddr(old_addr);
-    
+
     memcpy(new_addr, old_addr, (old_size < new_size ? old_size : new_size));
-    
-    if ((new_flags & OM_FZERO) && new_size > old_size) 
-      memset(new_addr + old_size, 0, new_size - old_size);
-    if (old_status == omError_NoError) __omDebugFree(old_addr, old_size_bin, old_flags, OM_FLR_VAL);
+
+    if ((new_flags & OM_FZERO) && new_size > old_size)
+      memset((char *)new_addr + old_size, 0, new_size - old_size);
+    if (old_status == omError_NoError)
+      __omDebugFree(old_addr, old_size_bin, old_flags, OM_FLR_VAL);
   }
   else
   {
-    if (new_flags & OM_FBIN) 
+    if (new_flags & OM_FBIN)
     {
       omBin new_bin = (omBin) new_size_bin;
       omBin old_bin = (omBin) old_size_bin;
-      
+
       omAssume(old_flags & OM_FBIN);
       if (new_flags & OM_FZERO)
         __omTypeRealloc0Bin(old_addr, old_bin, void*, new_addr, new_bin);
@@ -393,11 +394,11 @@ static void* __omDebugRealloc(void* old_addr, void* old_size_bin, void* new_size
       new_size = (size_t) new_size_bin;
       if (new_size == 0) new_size = 1;
       omAssume(!(new_flags & OM_FBIN) && !(old_flags & OM_FBIN));
-      
+
       if (old_flags & OM_FSIZE)
       {
         size_t old_size = (size_t) old_size_bin;
-        
+
         if (new_flags & OM_FZERO)
         {
 #ifdef OM_ALIGNMENT_NEEDS_WORK
@@ -462,7 +463,7 @@ static omBin omGetOrigSpecBinOfAddr(void* addr)
 static void __omDebugFree(void* addr, void* size_bin, omTrackFlags_t flags, OM_FLR_DECL)
 {
   omBin bin = NULL;
-  
+
   if (addr == NULL || ((flags & OM_FSIZE) && size_bin == NULL)) return;
   if (om_Opts.Keep > 0)
   {
@@ -471,7 +472,7 @@ static void __omDebugFree(void* addr, void* size_bin, omTrackFlags_t flags, OM_F
       addr = omMarkAsFreeTrackAddr(addr, 1, &flags, OM_FLR_VAL);
 #endif
     bin = omGetOrigSpecBinOfAddr(addr);
-    if (bin != NULL) 
+    if (bin != NULL)
     {
       omSpecBin s_bin = omFindInGList(om_SpecBin, next, bin, (unsigned long) bin);
       omAssume(s_bin != NULL);
@@ -502,10 +503,10 @@ static void __omDebugFree(void* addr, void* size_bin, omTrackFlags_t flags, OM_F
       om_KeptAddr = addr;
       *((void**) om_LastKeptAddr) = NULL;
     }
-    
+
     if (om_NumberOfKeptAddrs > om_Opts.Keep)
     {
-      omError_t status = omDoCheckAddr(om_KeptAddr, NULL, OM_FKEPT, om_Opts.MinCheck,  
+      omError_t status = omDoCheckAddr(om_KeptAddr, NULL, OM_FKEPT, om_Opts.MinCheck,
                                        omError_MemoryCorrupted, OM_FLR_VAL);
       addr = om_KeptAddr;
       om_KeptAddr = *((void**) addr);
@@ -525,7 +526,7 @@ static void __omDebugFree(void* addr, void* size_bin, omTrackFlags_t flags, OM_F
     omFreeTrackAddr(addr);
   }
   else
-#endif   
+#endif
     if (om_Opts.Keep <= 0 && ((flags & OM_FBIN) || (flags & OM_FBINADDR)))
       __omFreeBinAddr(addr);
     else if (om_Opts.Keep <= 0 && (flags & OM_FSIZE))
@@ -542,7 +543,7 @@ void omFreeKeptAddrFromBin(omBin bin)
   void* prev_addr = NULL;
   void* next_addr;
   omTrackFlags_t flags;
-  
+
   while (addr != NULL)
   {
     next_addr = *((void**) addr);
@@ -556,13 +557,13 @@ void omFreeKeptAddrFromBin(omBin bin)
         om_LastKeptAddr = prev_addr;
       om_NumberOfKeptAddrs--;
 #ifdef OM_HAVE_TRACK
-      if (omIsTrackAddr(addr)) 
+      if (omIsTrackAddr(addr))
       {
         omMarkAsFreeTrackAddr(addr, 0, &flags, OM_FLR);
         omFreeTrackAddr(addr);
       }
     else
-#endif    
+#endif
       __omFree(addr);
       addr = next_addr;
     }
@@ -572,26 +573,26 @@ void omFreeKeptAddrFromBin(omBin bin)
       addr = next_addr;
     }
   }
-  
+
   addr = om_AlwaysKeptAddrs;
   prev_addr = NULL;
   while (addr != NULL)
   {
     next_addr = *((void**) addr);
     if (omIsBinPageAddr(addr) && omGetTopBinOfAddr(addr) == bin)
-    { 
+    {
       if (prev_addr != NULL)
         *((void**) prev_addr) = next_addr;
       else
         om_AlwaysKeptAddrs = next_addr;
 #ifdef OM_HAVE_TRACK
-      if (omIsTrackAddr(addr)) 
+      if (omIsTrackAddr(addr))
       {
         omMarkAsFreeTrackAddr(addr, 0, &flags, OM_FLR);
         omFreeTrackAddr(addr);
       }
     else
-#endif    
+#endif
       __omFree(addr);
       addr = next_addr;
     }
@@ -602,7 +603,7 @@ void omFreeKeptAddrFromBin(omBin bin)
     }
   }
 }
-  
+
 void omFreeKeptAddr()
 {
   void* next;
@@ -612,25 +613,25 @@ void omFreeKeptAddr()
 
   if (om_LastKeptAddr != NULL)
     *((void**) om_LastKeptAddr) = om_AlwaysKeptAddrs;
-  
+
   om_NumberOfKeptAddrs = 0;
   om_LastKeptAddr = NULL;
   om_AlwaysKeptAddrs = NULL;
   om_KeptAddr = NULL;
-  
+
   while (addr != NULL)
   {
     next = *((void**)addr);
     bin = omGetOrigSpecBinOfAddr(addr);
 
 #ifdef OM_HAVE_TRACK
-    if (omIsTrackAddr(addr)) 
+    if (omIsTrackAddr(addr))
     {
       omMarkAsFreeTrackAddr(addr, 0, &flags, OM_FLR);
       omFreeTrackAddr(addr);
     }
     else
-#endif    
+#endif
       __omFree(addr);
 
     addr = next;

@@ -3,7 +3,7 @@
  *  Purpose: implementation of main omDebug functions
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omDebugTrack.c,v 1.13 2001-03-22 22:39:10 Singular Exp $
+ *  Version: $Id: omDebugTrack.c,v 1.14 2001-04-30 09:02:04 Singular Exp $
  *******************************************************************/
 #include <mylimits.h>
 #include <string.h>
@@ -15,9 +15,9 @@
 #include "om_Alloc.h"
 
 /*******************************************************************
- *  
+ *
  * Declarations
- *  
+ *
  *******************************************************************/
 omBinPage om_JustFreedPage = NULL;
 omSpecBin om_SpecTrackBin = NULL;
@@ -26,7 +26,7 @@ omSpecBin om_SpecTrackBin = NULL;
 #ifndef OM_MIN_SIZEOF_FRONT_PATTERN
 #define OM_MIN_SIZEOF_FRONT_PATTERN (OM_MIN_SIZEWOF_FRONT_PATTERN*SIZEOF_STRICT_ALIGNMENT)
 #endif
-/* number of bytes for padding after addr: needs to be a multiple of OM_SIZEOF_STRICT_ALIGNMENT */ 
+/* number of bytes for padding after addr: needs to be a multiple of OM_SIZEOF_STRICT_ALIGNMENT */
 #ifndef OM_MIN_SIZEOF_BACK_PATTERN
 #define OM_MIN_SIZEOF_BACK_PATTERN (OM_MIN_SIZEWOF_BACK_PATTERN*SIZEOF_STRICT_ALIGNMENT)
 #endif
@@ -39,18 +39,18 @@ struct omTrackAddr_s
   void*             next;   /* reserved for page->current queue */
   char              track;  /* > 0; determines size of header */
   omTrackFlags_t    flags;
-    #ifdef OM_TRACK_FILE_LINE     
-  short             alloc_line; 
+    #ifdef OM_TRACK_FILE_LINE
+  short             alloc_line;
   const char*       alloc_file;
     #endif
     #ifdef OM_TRACK_RETURN
-  const void*       alloc_r;
+  const char*       alloc_r;
     #endif
     #ifdef OM_TRACK_BACKTRACE
       #define OM_TRACK_ADDR_MEM_1 alloc_frames
 
   /* track > 1 */
-  void*             alloc_frames[OM_MAX_KEPT_FRAMES];
+  char*             alloc_frames[OM_MAX_KEPT_FRAMES];
     #else
       #define OM_TRACK_ADDR_MEM_1 bin_size
     #endif
@@ -61,7 +61,7 @@ struct omTrackAddr_s
     #ifdef OM_TRACK_CUSTOM
   void*             custom;
     #endif
-    #ifdef OM_TRACK_FILE_LINE 
+    #ifdef OM_TRACK_FILE_LINE
       #define OM_TRACK_ADDR_MEM_3 free_line
 
   /* track > 3 */
@@ -69,7 +69,7 @@ struct omTrackAddr_s
   const char*       free_file;
     #endif
     #ifdef OM_TRACK_RETURN
-       #ifndef OM_TRACK_ADDR_MEM_3 
+       #ifndef OM_TRACK_ADDR_MEM_3
        #define OM_TRACK_ADDR_MEM_3 free_r
        #endif
   const void*       free_r;
@@ -82,7 +82,7 @@ struct omTrackAddr_s
     #endif
 };
 
-static omError_t omDoCheckTrackAddr(omTrackAddr d_addr, void* addr, void* bin_size, omTrackFlags_t flags, char level, 
+static omError_t omDoCheckTrackAddr(omTrackAddr d_addr, void* addr, void* bin_size, omTrackFlags_t flags, char level,
                                     omError_t report_error, OM_FLR_DECL);
 static int omCheckFlags(omTrackFlags_t flag);
 static int omCheckPattern(char* s, char p, size_t size);
@@ -90,18 +90,18 @@ static int omCheckPattern(char* s, char p, size_t size);
 #define OM_TRACK_MAX 5
 static struct omTrackAddr_s track_addr; /* this is only needed to determine OM_SIZEOF_TRACK_ADDR(i) */
 #if 0
-#define OM_SIZEOF_TRACK_ADDR_1  OM_STRICT_ALIGN_SIZE(((void*)&track_addr.alloc_frames-(void*)&track_addr))
-#define OM_SIZEOF_TRACK_ADDR_2  OM_STRICT_ALIGN_SIZE(((void*)&track_addr.bin_size-(void*)&track_addr))
-#define OM_SIZEOF_TRACK_ADDR_3  OM_STRICT_ALIGN_SIZE(((void*)&track_addr.free_line-(void*)&track_addr)+OM_MIN_SIZEOF_FRONT_PATTERN)
-#define OM_SIZEOF_TRACK_ADDR_4  OM_STRICT_ALIGN_SIZE(((void*)&track_addr.free_frames-(void*)&track_addr)+OM_MIN_SIZEOF_FRONT_PATTERN)
+#define OM_SIZEOF_TRACK_ADDR_1  OM_STRICT_ALIGN_SIZE(((char*)&track_addr.alloc_frames-(char*)&track_addr))
+#define OM_SIZEOF_TRACK_ADDR_2  OM_STRICT_ALIGN_SIZE(((char*)&track_addr.bin_size-(char*)&track_addr))
+#define OM_SIZEOF_TRACK_ADDR_3  OM_STRICT_ALIGN_SIZE(((char*)&track_addr.free_line-(char*)&track_addr)+OM_MIN_SIZEOF_FRONT_PATTERN)
+#define OM_SIZEOF_TRACK_ADDR_4  OM_STRICT_ALIGN_SIZE(((char*)&track_addr.free_frames-(char*)&track_addr)+OM_MIN_SIZEOF_FRONT_PATTERN)
 #define OM_SIZEOF_TRACK_ADDR_5  OM_STRICT_ALIGN_SIZE(sizeof(struct omTrackAddr_s)+OM_MIN_SIZEOF_FRONT_PATTERN)
 #endif
 
-#define OM_SIZEOF_TRACK_ADDR_1  OM_STRICT_ALIGN_SIZE(((void*)&track_addr.OM_TRACK_ADDR_MEM_1-(void*)&track_addr))
-#define OM_SIZEOF_TRACK_ADDR_2  OM_STRICT_ALIGN_SIZE(((void*)&track_addr.OM_TRACK_ADDR_MEM_2-(void*)&track_addr))
-#define OM_SIZEOF_TRACK_ADDR_3  OM_STRICT_ALIGN_SIZE(((void*)&track_addr.OM_TRACK_ADDR_MEM_3-(void*)&track_addr)+OM_MIN_SIZEOF_FRONT_PATTERN)
+#define OM_SIZEOF_TRACK_ADDR_1  OM_STRICT_ALIGN_SIZE(((char*)&track_addr.OM_TRACK_ADDR_MEM_1-(char*)&track_addr))
+#define OM_SIZEOF_TRACK_ADDR_2  OM_STRICT_ALIGN_SIZE(((char*)&track_addr.OM_TRACK_ADDR_MEM_2-(char*)&track_addr))
+#define OM_SIZEOF_TRACK_ADDR_3  OM_STRICT_ALIGN_SIZE(((char*)&track_addr.OM_TRACK_ADDR_MEM_3-(char*)&track_addr)+OM_MIN_SIZEOF_FRONT_PATTERN)
 #ifdef OM_TRACK_ADDR_MEM_4
-#define OM_SIZEOF_TRACK_ADDR_4  OM_STRICT_ALIGN_SIZE(((void*)&track_addr.OM_TRACK_ADDR_MEM_4-(void*)&track_addr)+OM_MIN_SIZEOF_FRONT_PATTERN)
+#define OM_SIZEOF_TRACK_ADDR_4  OM_STRICT_ALIGN_SIZE(((char*)&track_addr.OM_TRACK_ADDR_MEM_4-(char*)&track_addr)+OM_MIN_SIZEOF_FRONT_PATTERN)
 #else
 #define OM_SIZEOF_TRACK_ADDR_4 OM_SIZEOF_TRACK_ADDR_5
 #endif
@@ -130,11 +130,11 @@ OM_INLINE_LOCAL omTrackAddr omOutAddr_2_TrackAddr(void* addr);
 #define _omTrackAddr_2_FrontPattern(d_addr) \
           ((void*)((unsigned long)d_addr + omTrackAddr_2_SizeOfTrackAddrHeader(d_addr) - OM_MIN_SIZEOF_FRONT_PATTERN))
 #define _omTrackAddr_2_SizeOfFrontPattern(d_addr) \
-  ((void*) omTrackAddr_2_OutAddr(d_addr) - (void*) omTrackAddr_2_FrontPattern(d_addr)) 
+  ((char*) omTrackAddr_2_OutAddr(d_addr) - (char*) omTrackAddr_2_FrontPattern(d_addr))
 #define _omTrackAddr_2_BackPattern(d_addr) \
-  ((void*) ((unsigned long)d_addr + omTrackAddr_2_SizeOfTrackAddrHeader(d_addr) + _omTrack3Addr_2_OutSize(d_addr)))
+  ((char*) ((unsigned long)d_addr + omTrackAddr_2_SizeOfTrackAddrHeader(d_addr) + _omTrack3Addr_2_OutSize(d_addr)))
 #define _omTrackAddr_2_SizeOfBackPattern(d_addr) \
-  ((void*) d_addr + omSizeOfBinAddr(d_addr) - omTrackAddr_2_BackPattern(d_addr))
+  ((char*) d_addr + omSizeOfBinAddr(d_addr) - omTrackAddr_2_BackPattern(d_addr))
 #define omTrackAddr_2_OutAddr(d_addr) ((void*)((unsigned long)d_addr + omTrackAddr_2_SizeOfTrackAddrHeader(d_addr)))
 
 
@@ -142,7 +142,7 @@ OM_INLINE_LOCAL omTrackAddr omOutAddr_2_TrackAddr(void* addr);
 static size_t omTrackAddr_2_SizeOfTrackAddrHeader(omTrackAddr d_addr)
 {
   size_t size;
-  omAssume(omIsTrackAddr(d_addr) && omOutAddr_2_TrackAddr(d_addr) == d_addr && 
+  omAssume(omIsTrackAddr(d_addr) && omOutAddr_2_TrackAddr(d_addr) == d_addr &&
            d_addr->track > 0 && d_addr->track <= 5);
   size = _omTrackAddr_2_SizeOfTrackAddrHeader(d_addr);
   return size;
@@ -150,7 +150,7 @@ static size_t omTrackAddr_2_SizeOfTrackAddrHeader(omTrackAddr d_addr)
 static void* omTrackAddr_2_FrontPattern(omTrackAddr d_addr)
 {
   void* addr;
-  omAssume(omIsTrackAddr(d_addr) && omOutAddr_2_TrackAddr(d_addr) == d_addr && 
+  omAssume(omIsTrackAddr(d_addr) && omOutAddr_2_TrackAddr(d_addr) == d_addr &&
            d_addr->track > 2 && d_addr->track <= 5);
   addr = _omTrackAddr_2_FrontPattern(d_addr);
   return addr;
@@ -158,17 +158,17 @@ static void* omTrackAddr_2_FrontPattern(omTrackAddr d_addr)
 static size_t omTrackAddr_2_SizeOfFrontPattern(omTrackAddr d_addr)
 {
   size_t size;
-  omAssume(omIsTrackAddr(d_addr) && omOutAddr_2_TrackAddr(d_addr) == d_addr && 
+  omAssume(omIsTrackAddr(d_addr) && omOutAddr_2_TrackAddr(d_addr) == d_addr &&
            d_addr->track > 2 && d_addr->track <= 5);
   omAssume((unsigned long) omTrackAddr_2_OutAddr(d_addr) > (unsigned long) omTrackAddr_2_FrontPattern(d_addr));
   size = _omTrackAddr_2_SizeOfFrontPattern(d_addr);
   omAssume(size > 0);
   return size;
 }
-static void* omTrackAddr_2_BackPattern(omTrackAddr d_addr)
+static char* omTrackAddr_2_BackPattern(omTrackAddr d_addr)
 {
-  void* addr;
-  omAssume(omIsTrackAddr(d_addr) && omOutAddr_2_TrackAddr(d_addr) == d_addr && 
+  char* addr;
+  omAssume(omIsTrackAddr(d_addr) && omOutAddr_2_TrackAddr(d_addr) == d_addr &&
            d_addr->track > 2 && d_addr->track <= 5);
   addr = _omTrackAddr_2_BackPattern(d_addr);
   omAssume(OM_ALIGN_SIZE((unsigned long) addr) == (unsigned long) addr);
@@ -177,7 +177,7 @@ static void* omTrackAddr_2_BackPattern(omTrackAddr d_addr)
 static size_t omTrackAddr_2_SizeOfBackPattern(omTrackAddr d_addr)
 {
   size_t size;
-  omAssume(omIsTrackAddr(d_addr) && omOutAddr_2_TrackAddr(d_addr) == d_addr && 
+  omAssume(omIsTrackAddr(d_addr) && omOutAddr_2_TrackAddr(d_addr) == d_addr &&
            d_addr->track > 2 && d_addr->track <= 5);
   size = _omTrackAddr_2_SizeOfBackPattern(d_addr);
   omAssume(size > 0 && OM_ALIGN_SIZE(size) == size);
@@ -186,20 +186,20 @@ static size_t omTrackAddr_2_SizeOfBackPattern(omTrackAddr d_addr)
 static size_t omTrack3Addr_2_OutSize(omTrackAddr d_addr)
 {
   size_t size;
-  omAssume(omIsTrackAddr(d_addr) && omOutAddr_2_TrackAddr(d_addr) == d_addr && 
+  omAssume(omIsTrackAddr(d_addr) && omOutAddr_2_TrackAddr(d_addr) == d_addr &&
            d_addr->track > 2 && d_addr->track <= 5);
   omAssume(d_addr->flags > 0 && d_addr->flags < OM_FMAX &&
            ! ((d_addr->flags & OM_FBIN) && (d_addr->flags & OM_FSIZE)));
-  
+
   size = _omTrack3Addr_2_OutSize(d_addr);
   return size;
 }
 static size_t omTrackAddr_2_OutSize(omTrackAddr d_addr)
 {
   size_t size;
-  omAssume(omIsTrackAddr(d_addr) && omOutAddr_2_TrackAddr(d_addr) == d_addr && 
+  omAssume(omIsTrackAddr(d_addr) && omOutAddr_2_TrackAddr(d_addr) == d_addr &&
            d_addr->track > 0 && d_addr->track <= 5);
-  
+
   size = _omTrackAddr_2_OutSize(d_addr);
   return size;
 }
@@ -224,7 +224,7 @@ static size_t omOutSize_2_TrackAddrSize(size_t size, char track)
 OM_INLINE_LOCAL omTrackAddr omOutAddr_2_TrackAddr(void* addr)
 {
   omTrackAddr d_addr;
-  void* page = omGetPageOfAddr(addr);
+  char* page = omGetPageOfAddr(addr);
   size_t size = omGetTopBinOfPage((omBinPage) page)->sizeW << LOG_SIZEOF_LONG;
 
   omAssume(omIsBinPageAddr(addr));
@@ -233,7 +233,7 @@ OM_INLINE_LOCAL omTrackAddr omOutAddr_2_TrackAddr(void* addr)
   d_addr = (omTrackAddr) ((unsigned long) page + (unsigned long) ((((unsigned long)addr - (unsigned long)page) / size)*size));
   return d_addr;
 }
- 
+
 size_t omOutSizeOfTrackAddr(void* addr)
 {
   omTrackAddr d_addr = omOutAddr_2_TrackAddr(addr);
@@ -243,7 +243,7 @@ size_t omOutSizeOfTrackAddr(void* addr)
 
 void* omAddr_2_OutAddr(void* addr)
 {
-  if (omIsTrackAddr(addr)) 
+  if (omIsTrackAddr(addr))
   {
     return omTrackAddr_2_OutAddr(omOutAddr_2_TrackAddr(addr));
   }
@@ -254,53 +254,53 @@ void* omAddr_2_OutAddr(void* addr)
 }
 
 /*******************************************************************
- *  
- * Low level allocation/free routines: do the actual work, 
+ *
+ * Low level allocation/free routines: do the actual work,
  * no checks/tests, assume that everything in
  * environment is ok
- *  
+ *
  *******************************************************************/
 
 static omTrackAddr _omAllocTrackAddr(size_t d_size)
 {
   omTrackAddr d_addr;
   omBin bin;
-  
+
   if (d_size <= OM_MAX_BLOCK_SIZE)
     bin = omSmallSize2TrackBin(d_size);
   else
     bin = omGetSpecTrackBin(d_size);
-  
+
   __omTypeAllocBin(omTrackAddr, d_addr, bin);
-  
+
   omAssume(bin->current_page == omGetPageOfAddr(d_addr));
 
   omSetTrackOfUsedBlocks(bin->current_page->used_blocks);
-  
+
   return d_addr;
 }
-void* omAllocTrackAddr(void* bin_size, 
+void* omAllocTrackAddr(void* bin_size,
                        omTrackFlags_t flags, char track, OM_FLR_DECL)
 {
   void* o_addr;
-  size_t o_size = (flags & OM_FBIN ? ((omBin)bin_size)->sizeW << LOG_SIZEOF_LONG : 
+  size_t o_size = (flags & OM_FBIN ? ((omBin)bin_size)->sizeW << LOG_SIZEOF_LONG :
                    (bin_size != NULL ? OM_ALIGN_SIZE((size_t) bin_size) : OM_ALIGN_SIZE(1)));
   omTrackAddr d_addr;
   size_t d_size;
   if (track <= 0) track = 1;
   if (track >  5) track = 5;
-  
+
   if ((flags & OM_FBIN) && !omIsStaticNormalBin((omBin)bin_size))
     /* Need to set track >= 3 such that bin_size is kept: Needed
        for om_KeptAddr */
     track = (track > 3 ? track : 3);
   d_size = omOutSize_2_TrackAddrSize(o_size, track);
-    
+
   d_addr = _omAllocTrackAddr(d_size);
   d_addr->next = (void*)-1;
   d_addr->track = track;
   d_addr->flags = flags | OM_FUSED;
-  if (om_Opts.MarkAsStatic) 
+  if (om_Opts.MarkAsStatic)
     d_addr->flags |= OM_FSTATIC;
 
 #ifdef OM_TRACK_FILE_LINE
@@ -309,12 +309,12 @@ void* omAllocTrackAddr(void* bin_size,
 #endif
 #ifdef OM_TRACK_RETURN
   d_addr->alloc_r = r;
-#endif  
-    
+#endif
+
   o_addr = omTrackAddr_2_OutAddr(d_addr);
   if (track > 1)
   {
-#ifdef OM_INTERNAL_DEBUG 
+#ifdef OM_INTERNAL_DEBUG
 #define FROM_FRAMES 0
 #else
 #define FROM_FRAMES 2
@@ -322,8 +322,8 @@ void* omAllocTrackAddr(void* bin_size,
 
 #ifdef OM_TRACK_BACKTRACE
     omGetBackTrace(d_addr->alloc_frames,  FROM_FRAMES, OM_MAX_KEPT_FRAMES);
-#endif  
-      
+#endif
+
     if (track > 2)
     {
       if (flags & OM_FBIN && ((omBin) bin_size)->sticky)
@@ -351,9 +351,9 @@ void* omAllocTrackAddr(void* bin_size,
 #endif
 #ifdef OM_TRACK_RETURN
         d_addr->free_r = (void*) -1;
-#endif        
+#endif
 
-#ifdef OM_TRACK_BACKTRACE          
+#ifdef OM_TRACK_BACKTRACE
         if (track > 4)
           memset(&d_addr->free_frames, 0, OM_MAX_KEPT_FRAMES*SIZEOF_VOIDP);
 #endif
@@ -369,7 +369,7 @@ void* omMarkAsFreeTrackAddr(void* addr, int keep, omTrackFlags_t *flags, OM_FLR_
 {
   omTrackAddr d_addr = omOutAddr_2_TrackAddr(addr);
   omAssume(omIsTrackAddr(addr));
-    
+
   d_addr->next = (void*) -1;
   if (d_addr->track > 2)
   {
@@ -384,12 +384,12 @@ void* omMarkAsFreeTrackAddr(void* addr, int keep, omTrackFlags_t *flags, OM_FLR_
 #endif
 #ifdef OM_TRACK_RETURN
         d_addr->free_r = r;
-#endif        
-        
-#ifdef OM_TRACK_BACKTRACE     
+#endif
+
+#ifdef OM_TRACK_BACKTRACE
         if (d_addr->track > 4)
           omGetBackTrace(d_addr->free_frames,  FROM_FRAMES, OM_MAX_KEPT_FRAMES);
-#endif  
+#endif
       }
     }
     else
@@ -401,7 +401,7 @@ void* omMarkAsFreeTrackAddr(void* addr, int keep, omTrackFlags_t *flags, OM_FLR_
   d_addr->flags &= ~OM_FUSED;
   if (keep) d_addr->flags |= OM_FKEPT;
   else d_addr->flags &= ~OM_FKEPT;
-  
+
   return(void*) d_addr;
 }
 
@@ -409,20 +409,20 @@ void omFreeTrackAddr(void* d_addr)
 {
   omBinPage page;
   omBin bin;
-  
+
   omAssume(omIsBinPageAddr(d_addr));
   omAssume(d_addr != NULL && omIsTrackAddr(d_addr));
   d_addr = omOutAddr_2_TrackAddr(d_addr);
-  
+
   page = omGetBinPageOfAddr((void*) d_addr);
   bin = omGetTopBinOfPage(page);
-  /* Ok, here is how it works: 
+  /* Ok, here is how it works:
     1. we unset the first bit of used_blocks
        ==> used_blocks >= 0
-    2. we do a normal free 
+    2. we do a normal free
     3. if page of addr was freed, then om_JustFreedPage
           is != NULL ==> nothing to be done by us
-       else 
+       else
           page is still active ==> reset first bit of used_blocks
   */
 
@@ -443,13 +443,13 @@ void omFreeTrackAddr(void* d_addr)
 }
 
 /*******************************************************************
- *  
+ *
  * Checking a Track Addr
- * 
- *  
+ *
+ *
  *******************************************************************/
 
-omError_t omCheckTrackAddr(void* addr, void* bin_size, omTrackFlags_t flags, char level, 
+omError_t omCheckTrackAddr(void* addr, void* bin_size, omTrackFlags_t flags, char level,
                            omError_t report, OM_FLR_DECL)
 {
   omTrackAddr d_addr = omOutAddr_2_TrackAddr(addr);
@@ -459,19 +459,19 @@ omError_t omCheckTrackAddr(void* addr, void* bin_size, omTrackFlags_t flags, cha
   omAddrCheckReturnCorrupted(d_addr->track < 1 || d_addr->track > OM_TRACK_MAX);
   omAddrCheckReturnError((flags & OM_FUSED) && omTrackAddr_2_OutAddr(d_addr) != addr, omError_FalseAddrOrMemoryCorrupted);
 
-  omCheckReturn(omDoCheckBinAddr(d_addr, 0, (flags & OM_FUSED ? OM_FUSED : (flags & OM_FKEPT ? OM_FKEPT: 0)), 
+  omCheckReturn(omDoCheckBinAddr(d_addr, 0, (flags & OM_FUSED ? OM_FUSED : (flags & OM_FKEPT ? OM_FKEPT: 0)),
                                  level, report, OM_FLR_VAL));
   return omDoCheckTrackAddr(d_addr, addr, bin_size, flags, level, report, OM_FLR_VAL);
 }
 
 
-static omError_t omDoCheckTrackAddr(omTrackAddr d_addr, void* addr, void* bin_size, omTrackFlags_t flags, char level, 
-                                    omError_t report, OM_FLR_DECL)  
+static omError_t omDoCheckTrackAddr(omTrackAddr d_addr, void* addr, void* bin_size, omTrackFlags_t flags, char level,
+                                    omError_t report, OM_FLR_DECL)
 {
   if (flags & OM_FUSED)
     omAddrCheckReturnError(d_addr->next != ((void*) -1), omError_FreedAddrOrMemoryCorrupted);
   else
-    omAddrCheckReturnError(d_addr->next != NULL && omCheckPtr(d_addr->next, omError_MaxError, OM_FLR_VAL), 
+    omAddrCheckReturnError(d_addr->next != NULL && omCheckPtr(d_addr->next, omError_MaxError, OM_FLR_VAL),
                            omError_FreedAddrOrMemoryCorrupted);
   omAddrCheckReturnCorrupted(omCheckFlags(d_addr->flags));
 
@@ -480,7 +480,7 @@ static omError_t omDoCheckTrackAddr(omTrackAddr d_addr, void* addr, void* bin_si
 
   if (flags & OM_FBINADDR && flags & OM_FSIZE)
     omAddrCheckReturnError(omTrackAddr_2_OutSize(d_addr) != (size_t) bin_size, omError_WrongSize);
-  
+
   if (d_addr->track > 2)
   {
     if (d_addr->flags & OM_FBIN)
@@ -490,18 +490,18 @@ static omError_t omDoCheckTrackAddr(omTrackAddr d_addr, void* addr, void* bin_si
     else
     {
       omAssume(d_addr->flags & OM_FSIZE);
-        
+
       omAddrCheckReturnCorrupted(!OM_IS_ALIGNED(d_addr->bin_size));
       omAddrCheckReturnCorrupted((size_t) d_addr->bin_size >
-                                 omSizeOfBinAddr(d_addr) 
+                                 omSizeOfBinAddr(d_addr)
                                  - omTrackAddr_2_SizeOfTrackAddrHeader(d_addr)
                                  - OM_MIN_SIZEOF_BACK_PATTERN);
       /* Hmm .. here I'd love to have a stricter bound */
       omAddrCheckReturnCorrupted((size_t) d_addr->bin_size < SIZEOF_OM_ALIGNMENT);
     }
-      
+
     omAddrCheckReturnError((flags & OM_FBINADDR) && !((d_addr->flags & OM_FBIN) || ((size_t) d_addr->bin_size <= OM_MAX_BLOCK_SIZE)), omError_NotBinAddr);
-     
+
     if (flags & OM_FBIN)
     {
       if (d_addr->flags & OM_FBIN)
@@ -520,7 +520,7 @@ static omError_t omDoCheckTrackAddr(omTrackAddr d_addr, void* addr, void* bin_si
         omAddrCheckReturnError((size_t) d_addr->bin_size < (size_t) bin_size, omError_WrongSize);
       }
     }
-  
+
     omAddrCheckReturnError(omCheckPattern(omTrackAddr_2_FrontPattern(d_addr), OM_FRONT_PATTERN,omTrackAddr_2_SizeOfFrontPattern(d_addr)),omError_FrontPattern);
     omAddrCheckReturnError(omCheckPattern(omTrackAddr_2_BackPattern(d_addr), OM_BACK_PATTERN,omTrackAddr_2_SizeOfBackPattern(d_addr)),omError_BackPattern);
     if (! (d_addr->flags & OM_FUSED))
@@ -542,7 +542,7 @@ static omError_t omDoCheckTrackAddr(omTrackAddr d_addr, void* addr, void* bin_si
 #endif
 #ifdef OM_TRACK_RETURN
       omAddrCheckReturnCorrupted(d_addr->flags & OM_FUSED && d_addr->free_r != (void*) -1);
-#endif        
+#endif
     }
   }
   else
@@ -554,7 +554,9 @@ static omError_t omDoCheckTrackAddr(omTrackAddr d_addr, void* addr, void* bin_si
       omAddrCheckReturnError(!omIsKnownTopBin((omBin) bin_size, 1), omError_UnknownBin);
       omAddrCheckReturnError(size < (((omBin)bin_size)->sizeW<<LOG_SIZEOF_LONG), omError_WrongBin);
     }
-    else if (flags & OM_FSIZE && (!(flags & OM_FSLOPPY)  || bin_size > 0))
+    else if (flags & OM_FSIZE
+    && (!(flags & OM_FSLOPPY)
+    || (size_t)bin_size > 0))
     {
       omAddrCheckReturnError(omTrackAddr_2_OutSize(d_addr) < (size_t) bin_size, omError_WrongSize);
     }
@@ -566,7 +568,7 @@ static omError_t omDoCheckTrackAddr(omTrackAddr d_addr, void* addr, void* bin_si
   }
   return omError_NoError;
 }
-      
+
 static int omCheckFlags(omTrackFlags_t flag)
 {
   if (flag > OM_FMAX) return 1;
@@ -580,7 +582,7 @@ static int omCheckPattern(char* s, char p, size_t size)
   int i;
   for (i=0; i<size; i++)
   {
-    if (s[i] != p) 
+    if (s[i] != p)
       return 1;
   }
   return 0;
@@ -599,23 +601,23 @@ void omPrintTrackAddrInfo(FILE* fd, void* addr, int max_frames)
   omTrackAddr d_addr = omOutAddr_2_TrackAddr(addr);
   omAssume(d_addr->track > 0);
   if (max_frames <= 0) return;
-  
+
   if (max_frames > OM_MAX_KEPT_FRAMES) max_frames = OM_MAX_KEPT_FRAMES;
-  
+
   fprintf(fd, " allocated at ");
-  if (! _omPrintBackTrace(OM_ALLOC_FRAMES(d_addr), 
-                          (d_addr->track > 1 ? max_frames : 0), 
-                          fd, 
+  if (! _omPrintBackTrace(OM_ALLOC_FRAMES(d_addr),
+                          (d_addr->track > 1 ? max_frames : 0),
+                          fd,
                           OM_FLR_ARG(d_addr->alloc_file, d_addr->alloc_line, d_addr->alloc_r)))
     fprintf(fd," ??");
-  if (d_addr->track > 1) 
+  if (d_addr->track > 1)
   {
     if (d_addr->track > 3 && ! (d_addr->flags & OM_FUSED))
     {
       fprintf(fd, "\n freed at ");
-      if (! _omPrintBackTrace(OM_FREE_FRAMES(d_addr), 
-                          (d_addr->track > 4 ? max_frames : 0), 
-                          fd, 
+      if (! _omPrintBackTrace(OM_FREE_FRAMES(d_addr),
+                          (d_addr->track > 4 ? max_frames : 0),
+                          fd,
                           OM_FLR_ARG(d_addr->free_file, d_addr->free_line, d_addr->free_r)))
         fprintf(fd," ??");
     }
@@ -625,9 +627,9 @@ void omPrintTrackAddrInfo(FILE* fd, void* addr, int max_frames)
 }
 
 /*******************************************************************
- *  
+ *
  * Misc routines for marking, etc.
- *  
+ *
  *******************************************************************/
 int omIsStaticTrackAddr(void* addr)
 {
@@ -641,7 +643,7 @@ omBin omGetOrigSpecBinOfTrackAddr(void* addr)
 {
   omTrackAddr d_addr = omOutAddr_2_TrackAddr(addr);
   omAssume(omIsTrackAddr(addr));
-  
+
   if (d_addr->track > 2 && (d_addr->flags & OM_FBIN))
   {
     omBin bin = (omBin) d_addr->bin_size;
@@ -697,7 +699,7 @@ void omSetCustomOfTrackAddr(void* addr, void* value)
 {
   omTrackAddr d_addr = omOutAddr_2_TrackAddr(addr);
   omAssume(omIsTrackAddr(addr));
-  
+
   if (d_addr->track > 2)
   {
     d_addr->custom = value;
@@ -708,7 +710,7 @@ void* omGetCustomOfTrackAddr(void* addr)
 {
   omTrackAddr d_addr = omOutAddr_2_TrackAddr(addr);
   omAssume(omIsTrackAddr(addr));
-  
+
   if (d_addr->track > 2)
   {
     return d_addr->custom;
@@ -737,23 +739,22 @@ int omIsInKeptAddrList(void* addr)
   if (omIsTrackAddr(addr))
     addr = omOutAddr_2_TrackAddr(addr);
 #endif
-  
+
   if (om_LastKeptAddr != NULL)
     *((void**) om_LastKeptAddr) = om_AlwaysKeptAddrs;
-  
+
   while (ptr != NULL)
   {
-    if (ptr == addr) 
+    if (ptr == addr)
     {
       ret = 1; break;
     }
     ptr = *((void**) ptr);
   }
-  
+
   if (om_LastKeptAddr != NULL)
     *((void**) om_LastKeptAddr) = NULL;
-  
+
   return ret;
 }
-
 #endif /*!OM_NDEBUG*/

@@ -1,10 +1,10 @@
 /* -*-c++-*- */
 /*******************************************************************
  *  File:    mylimits.h
- *  Purpose: limits.h configuration for omalloc  
+ *  Purpose: limits.h configuration for omalloc
  *  Author:  hannes (Hans Schoenemann)
  *  Created: 03/01
- *  Version: $Id: mylimits.h.in,v 1.4 2001-04-06 07:42:21 Singular Exp $
+ *  Version: $Id: mylimits.h.in,v 1.5 2001-04-30 09:01:59 Singular Exp $
  *******************************************************************/
 #ifndef MYLIMITS_H
 #ifndef sgi

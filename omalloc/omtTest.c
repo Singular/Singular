@@ -12,8 +12,8 @@ int missed_errors = 0;
 int used_regions = 0;
 int seed;
 
-#if defined (__hpux) || defined (__alpha)  || defined (__svr4__) || defined (__SVR4) 
-/* SF1 cosimo.medicis.polytechnique.fr V4.0 1229 alpha works */ 
+#if defined (__hpux) || defined (__alpha)  || defined (__svr4__) || defined (__SVR4)
+/* SF1 cosimo.medicis.polytechnique.fr V4.0 1229 alpha works */
 #if defined (__hpux) || defined (__svr4__) || defined (__SVR4)
 /* HPUX lacks random().  DEC OSF/1 1.2 random() returns a double.  */
 long mrand48 ();
@@ -35,7 +35,7 @@ void omtTestDebug(omMemCell cell)
 {
   size_t size = GET_SIZE(cell->spec);
   size_t is_size;
-  
+
   if (om_ErrorStatus != omError_NoError) return;
   if (cell->bin != NULL)
   {
@@ -52,7 +52,7 @@ void omtTestDebug(omMemCell cell)
       omDebugAddrSize(cell->addr, size);
   }
   if (om_ErrorStatus != omError_NoError) return;
-  
+
   if (!OM_IS_ALIGNED(cell->addr))
   {
     omReportError(omError_Unknown, omError_NoError, OM_FLR,
@@ -66,7 +66,7 @@ void omtTestDebug(omMemCell cell)
                   "addr:%p is not strict unaligned", cell->addr);
     return;
   }
-  
+
   is_size = omSizeOfAddr(cell->addr);
   if (!OM_IS_ALIGNED(is_size))
   {
@@ -87,7 +87,7 @@ void omtTestDebug(omMemCell cell)
                   "is_sizeW==%u < sizeW==%u", is_size >> LOG_SIZEOF_LONG, omSizeWOfAddr(cell->addr));
     return;
   }
-    
+
   TestAddrContent(cell->addr, (IS_ZERO(cell->spec) ? 0 : cell->spec), is_size);
 }
 
@@ -95,7 +95,7 @@ void TestAddrContentEqual(void* s1, void* s2, size_t size)
 {
   int i;
   size_t sizeW = OM_ALIGN_SIZE(size) >> LOG_SIZEOF_LONG;
-  
+
   for (i=0; i<sizeW; i++)
   {
     if (((unsigned long*)s1)[i] != ((unsigned long*)s2)[i])
@@ -111,19 +111,19 @@ void TestAddrContent(void* addr, unsigned long value, size_t size)
 {
   size_t sizeW = OM_ALIGN_SIZE(size) >> LOG_SIZEOF_LONG;
   int i;
-  
+
   if (!OM_IS_ALIGNED(addr))
   {
-    omReportError(omError_Unknown, omError_NoError, OM_FLR, 
+    omReportError(omError_Unknown, omError_NoError, OM_FLR,
                   "addr %p unaligned", addr);
     return;
   }
-  
+
   for (i=0; i<sizeW; i++)
   {
     if (((unsigned long*)addr)[i] != value)
     {
-      omReportError(omError_Unknown, omError_NoError, OM_FLR, 
+      omReportError(omError_Unknown, omError_NoError, OM_FLR,
                     "word %d modified: is %u should be %u", i, ((unsigned long*)addr)[i], value);
       return;
     }
@@ -136,13 +136,13 @@ void InitCellAddrContent(omMemCell cell)
   size_t sizeW = omSizeWOfAddr(cell->addr);
   omMemsetW(cell->addr, (IS_ZERO(cell->spec) ? 0 : cell->spec), sizeW);
 }
-  
+
 void omCheckCells(int n, int level, omMemCell_t* cells)
 {
 #if END_CHECK_LEVEL > 0
   int l = om_Opts.MinCheck;
   int i;
-  
+
   omTestMemory(level);
   om_Opts.MinCheck = 1;
   for (i=0; i<n; i++)
@@ -153,7 +153,7 @@ void omCheckCells(int n, int level, omMemCell_t* cells)
       errors++;
       om_ErrorStatus = omError_NoError;
     }
-    if ((i % 10000) == 0) 
+    if ((i % 10000) == 0)
     {
       printf(".");
       fflush(stdout);
@@ -191,7 +191,7 @@ void TestAlloc(omMemCell cell, unsigned long spec)
       om_Opts.MinTrack = GET_TRACK(spec);
     else
       om_Opts.MinTrack = 0;
-   
+
     if (DO_KEEP(spec))
       omtTestAllocKeep(cell, spec);
     else
@@ -214,7 +214,7 @@ void TestRealloc(omMemCell cell, unsigned long spec)
       om_Opts.MinTrack = GET_TRACK(spec);
     else
       om_Opts.MinTrack = 0;
-    
+
     if (DO_KEEP(spec))
       omtTestReallocKeep(cell, spec);
     else
@@ -237,7 +237,7 @@ void TestDup(omMemCell cell, unsigned long spec)
       om_Opts.MinTrack = GET_TRACK(spec);
     else
       om_Opts.MinTrack = 0;
-    
+
     if (DO_KEEP(spec))
       omtTestDupKeep(cell, spec);
     else
@@ -288,7 +288,7 @@ void omtMergeStickyBins(omMemCell cell, int n)
 {
   int i;
   omBin bin;
-  
+
   for (i=0; i<n; i++)
   {
     if (cell[i].orig_bin != NULL)
@@ -300,7 +300,7 @@ void omtMergeStickyBins(omMemCell cell, int n)
       cell[i].orig_bin = NULL;
     }
   }
-  
+
   bin = om_StickyBins;
   while (bin != NULL)
   {
@@ -318,12 +318,12 @@ void omtMergeStickyBins(omMemCell cell, int n)
   }
 }
 
-  
+
 void my_exit()
 {
   printf("\nomtTest Summary: ");
   if (errors || missed_errors || used_regions)
-  {   
+  {
     printf("***FAILED***errors:%d, missed_errors:%d, used_regions:%d, seed=%d\n", errors, missed_errors, used_regions, seed);
     if (errors) exit(errors);
     if (missed_errors) exit(missed_errors);
@@ -347,21 +347,21 @@ int main(int argc, char* argv[])
   int last_kept_freed = 0;
   om_Opts.MinCheck = CHECK_LEVEL;
   om_Opts.Keep = KEEP_ADDR;
-  
+
   seed = time(NULL);
-  
+
   omInitRet_2_Info(argv[0]);
   omInitGetBackTrace();
   omInitInfo();
   om_Opts.PagesPerRegion = PAGES_PER_REGION;
-  
+
   if (argc > 1) sscanf(argv[1], "%d", &error_test);
   if (argc > 2) sscanf(argv[2], "%d", &seed);
   srandom(seed);
 
   if (argc > 3) sscanf(argv[3], "%d", &n);
   if (argc > 4) sscanf(argv[4], "%d", &decr);
-  
+
   if (decr < 2) decr = 2;
   printf("seed == %d\n", seed);
   fflush(stdout);
@@ -390,7 +390,7 @@ int main(int argc, char* argv[])
       if (error_test && errors == 0)
       {
         missed_errors = omtTestErrors();
-        if (missed_errors < 0) 
+        if (missed_errors < 0)
         {
           my_exit();
         }
@@ -406,7 +406,7 @@ int main(int argc, char* argv[])
       omtMergeStickyBins(cells, -1);
       omPrintStats(stdout);
       omPrintInfo(stdout);
-      if (om_Info.CurrentRegionsAlloc > 0) 
+      if (om_Info.CurrentRegionsAlloc > 0)
       {
         omPrintBinStats(stdout);
         used_regions += om_Info.CurrentRegionsAlloc;
@@ -428,7 +428,7 @@ int main(int argc, char* argv[])
     myfflush(stdout);
     if (DO_FREE(spec))
     {
-      if (i != 0) 
+      if (i != 0)
       {
         myprintf(" FREE");
         j = spec % i;
@@ -440,7 +440,7 @@ int main(int argc, char* argv[])
     }
     else if (DO_REALLOC(spec))
     {
-      if (i != 0) 
+      if (i != 0)
       {
         myprintf(" REALLOC");
         j = spec % i;
@@ -493,5 +493,3 @@ int main(int argc, char* argv[])
   }
   return 0;
 }
-      
-        

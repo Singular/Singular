@@ -1,18 +1,18 @@
 /*******************************************************************
  *  File:    omAllocPrivate.h
- *  Purpose: declaration of "private" (but visible to the outside) 
+ *  Purpose: declaration of "private" (but visible to the outside)
  *           routines for omalloc
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omAllocPrivate.h,v 1.5 2000-10-04 13:12:28 obachman Exp $
+ *  Version: $Id: omAllocPrivate.h,v 1.6 2001-04-30 09:02:01 Singular Exp $
  *******************************************************************/
 #ifndef OM_ALLOC_PRIVATE_H
 #define OM_ALLOC_PRIVATE_H
 
 /*******************************************************************
- *  
+ *
  *  Definitions of structures we work with
- *  
+ *
  *******************************************************************/
 /* Need to define it here, has to be known to macros */
 struct omBinPage_s
@@ -21,17 +21,17 @@ struct omBinPage_s
   void*         current;        /* pointer to current freelist */
   omBinPage     next;           /* next/prev pointer of pages */
   omBinPage     prev;
-  void*         bin_sticky;     /* bin this page belongs to with 
+  void*         bin_sticky;     /* bin this page belongs to with
                                    sticky tag of page hidden in ptr */
   omBinPageRegion region;       /* BinPageRegion of this page */
 };
 
 /* Change this appropriately, if you change omBinPage                 */
 /* However, make sure that omBinPage is a multiple of SIZEOF_MAX_TYPE */
-#define SIZEOF_OM_BIN_PAGE_HEADER (5*SIZEOF_VOIDP + SIZEOF_LONG) 
+#define SIZEOF_OM_BIN_PAGE_HEADER (5*SIZEOF_VOIDP + SIZEOF_LONG)
 #define SIZEOF_OM_BIN_PAGE (SIZEOF_SYSTEM_PAGE - SIZEOF_OM_BIN_PAGE_HEADER)
 
-/* keep all members of omBin_s a sizeof(long) type, 
+/* keep all members of omBin_s a sizeof(long) type,
    otherwise list operations will fail */
 struct omBin_s
 {
@@ -39,7 +39,7 @@ struct omBin_s
   omBinPage     last_page;      /* pointer to last page of freelist */
   omBin         next;           /* sticky bins of the same size */
   size_t        sizeW;          /* size in words */
-  long          max_blocks;     /* if > 0   # blocks in one page, 
+  long          max_blocks;     /* if > 0   # blocks in one page,
                                    if < 0   # pages for one block */
   unsigned long sticky;         /* sticky tag */
 };
@@ -58,9 +58,9 @@ extern  omBinPage_t om_ZeroPage[];
 extern  omBin       om_Size2Bin[];
 
 /*******************************************************************
- *  
+ *
  *  Working with pages/bins
- *  
+ *
  *******************************************************************/
 #define omGetTopBinOfPage(page) \
   ((omBin) ( ((unsigned long) ((page)->bin_sticky)) & ~(SIZEOF_VOIDP - 1)))
@@ -87,9 +87,9 @@ extern omBin om_Size2AlignedBin[];
 #endif
 
 /*******************************************************************
- *  
+ *
  *  SizeOfAddr
- *  
+ *
  *******************************************************************/
 #ifdef OM_INTERNAL_DEBUG
 size_t omSizeOfBinAddr(void* addr);
@@ -101,9 +101,9 @@ size_t omSizeOfBinAddr(void* addr);
 #define omSizeWOfBinAddr(addr) ((omGetTopBinOfAddr(addr))->sizeW)
 
 /*******************************************************************
- *  
+ *
  *  lowest level alloc/free macros
- *  
+ *
  *******************************************************************/
 extern void* omAllocBinFromFullPage(omBin bin);
 extern void  omFreeToPageFault(omBinPage page, void* addr);
@@ -278,7 +278,7 @@ while (0)
 #define __omTypeAllocAligned    __omTypeAlloc
 #define __omTypeAlloc0Aligned   __omTypeAlloc0
 #endif /* OM_ALIGNMENT_NEEDS_WORK */
-      
+
 #define __omFreeSize(addr, size)                            \
 do                                                          \
 {                                                           \

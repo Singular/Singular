@@ -5,7 +5,7 @@
  *           and end with the Func suffix.
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omAllocFunc.h,v 1.3 2001-04-05 10:51:43 Singular Exp $
+ *  Version: $Id: omAllocFunc.h,v 1.4 2001-04-30 09:02:01 Singular Exp $
  *******************************************************************/
 
 void* omCallocFunc(size_t nmemb, size_t size);
@@ -21,4 +21,3 @@ void* omReallocFunc(void* old_addr, size_t new_size);
 char* omStrdupFunc(const char* addr);
 void* omReallocSizeFunc(void* old_addr, size_t old_size, size_t new_size);
 void omFreeSizeFunc(void* addr, size_t size);
-

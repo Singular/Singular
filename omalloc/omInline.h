@@ -4,12 +4,13 @@
  *           be inlined
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omInline.h,v 1.7 2001-02-23 15:24:44 obachman Exp $
+ *  Version: $Id: omInline.h,v 1.8 2001-04-30 09:02:07 Singular Exp $
  *******************************************************************/
 #if defined(OM_INLINE) || defined(OM_ALLOC_C)
 
 #ifndef OM_INLINE_H
 #define OM_INLINE_H
+#include <string.h>
 
 OM_INLINE_IMPL omBin omGetBinOfPage(omBinPage page)
 {
@@ -18,7 +19,7 @@ OM_INLINE_IMPL omBin omGetBinOfPage(omBinPage page)
 
   if (! omIsStickyBin(bin))
   {
-    while (bin->sticky != sticky && bin->next != NULL) 
+    while (bin->sticky != sticky && bin->next != NULL)
     {
       bin = bin->next;
     }
@@ -26,7 +27,7 @@ OM_INLINE_IMPL omBin omGetBinOfPage(omBinPage page)
   return bin;
 }
 
-OM_INLINE_IMPL int _omIsBinPageAddr(void* addr)
+OM_INLINE_IMPL int _omIsBinPageAddr(const void* addr)
 {
   unsigned long index = omGetPageIndexOfAddr(addr);
   if (index >= om_MinBinPageIndex && index <= om_MaxBinPageIndex)
@@ -51,17 +52,17 @@ OM_INLINE_IMPL void* _omAlloc0Bin(omBin bin)
 }
 OM_INLINE_IMPL void* _omReallocBin(void* addr, omBin old_bin, omBin new_bin)
 {
-  void* new_addr; 
+  void* new_addr;
   __omTypeReallocBin(addr, old_bin, void*, new_addr, new_bin);
   return new_addr;
 }
 OM_INLINE_IMPL void* _omRealloc0Bin(void* addr, omBin old_bin, omBin new_bin)
 {
-  void* new_addr; 
+  void* new_addr;
   __omTypeRealloc0Bin(addr, old_bin, void*, new_addr, new_bin);
   return new_addr;
 }
-  
+
 
 OM_INLINE_IMPL void* _omAlloc(size_t size)
 {
@@ -153,7 +154,7 @@ OM_INLINE_IMPL char* _omStrDup(const char* s)
 {
   void* r;
   size_t i=0;
-  
+
   while (s[i]) i++;
   i++;
   __omTypeAlloc(void*, r, i);
@@ -198,7 +199,7 @@ OM_INLINE_IMPL void* _omalloc0(size_t size)
 OM_INLINE_IMPL void* _omreallocSize(void* addr, size_t old_size, size_t new_size)
 {
   void* new_addr;
-  
+
   if (!new_size) new_size = 1;
   if (addr != NULL)
   {
@@ -210,11 +211,11 @@ OM_INLINE_IMPL void* _omreallocSize(void* addr, size_t old_size, size_t new_size
   }
   return new_addr;
 }
-  
+
 OM_INLINE_IMPL void* _omrealloc0Size(void* addr, size_t old_size, size_t new_size)
 {
   void* new_addr;
-  
+
   if (!new_size) new_size = 1;
   if (addr != NULL && old_size > 0)
   {
@@ -226,11 +227,11 @@ OM_INLINE_IMPL void* _omrealloc0Size(void* addr, size_t old_size, size_t new_siz
   }
   return new_addr;
 }
-  
+
 OM_INLINE_IMPL void* _omrealloc(void* addr, size_t size)
 {
   void* new_addr;
-  
+
   if (!size) size = 1;
   if (addr != NULL)
   {
@@ -242,11 +243,11 @@ OM_INLINE_IMPL void* _omrealloc(void* addr, size_t size)
   }
   return new_addr;
 }
-  
+
 OM_INLINE_IMPL void* _omrealloc0(void* addr, size_t size)
 {
   void* new_addr;
-  
+
   if (!size) size = 1;
   if (addr != NULL)
   {
@@ -261,4 +262,3 @@ OM_INLINE_IMPL void* _omrealloc0(void* addr, size_t size)
 #endif /* OM_INLINE_H */
 
 #endif /* defined(OM_INLINE) || defined(OM_ALLOC_C) */
-

@@ -4,13 +4,13 @@
  *           be inlined
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omInlineDecl.h,v 1.3 2000-08-14 12:26:46 obachman Exp $
+ *  Version: $Id: omInlineDecl.h,v 1.4 2001-04-30 09:02:08 Singular Exp $
  *******************************************************************/
 #ifndef OM_INLINE_DECL_H
 #define OM_INLINE_DECL_H
 
 OM_INLINE_DECL omBin omGetBinOfPage(omBinPage page);
-OM_INLINE_DECL int _omIsBinPageAddr(void* addr);
+OM_INLINE_DECL int _omIsBinPageAddr(const void* addr);
 
 OM_INLINE_DECL void* _omAllocBin(omBin bin);
 OM_INLINE_DECL void* _omAlloc0Bin(omBin bin);
@@ -45,5 +45,3 @@ OM_INLINE_DECL void* _omMemDupAligned(void* addr);
 #endif
 
 #endif /* OM_INLINE_DECL_H */
-
-

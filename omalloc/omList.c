@@ -3,7 +3,7 @@
  *  Purpose: implementation of routines for operations on linked lists
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omList.c,v 1.7 2000-12-12 15:26:17 obachman Exp $
+ *  Version: $Id: omList.c,v 1.8 2001-04-30 09:02:08 Singular Exp $
  *******************************************************************/
 #include "omConfig.h"
 
@@ -11,7 +11,7 @@
 #define NULL ((void*) 0)
 #endif
 
-#define _VALUE(list, offset) *((void**) (list + offset))
+#define _VALUE(list, offset) *((void**) ((char *)list + offset))
 #define VALUE(list, offset) (unsigned long) _VALUE(list, offset)
 #define NEXT(list) _VALUE(list, next)
 #define ITER(list) list = NEXT(list)
@@ -106,12 +106,12 @@ void* _omFindInList(void* list, int next, int long_field, unsigned long what)
   return NULL;
 }
 
-void* _omFindInSortedList(void* list, int next, int long_field, 
+void* _omFindInSortedList(void* list, int next, int long_field,
                           unsigned long what)
 {
   while (list != NULL)
   {
-    if (VALUE(list, long_field) >= what) 
+    if (VALUE(list, long_field) >= what)
     {
       if (VALUE(list, long_field) == what) return list;
       return NULL;
@@ -131,7 +131,7 @@ void* _omRemoveFromSortedList(void* list, int next, int long_field, void* addr)
   nlist = NEXT(list);
   if (list == addr) return nlist;
   if (VALUE(list, long_field) > what) return list;
-  
+
   olist = list;
   while (nlist != NULL && nlist != addr)
   {
@@ -147,7 +147,7 @@ void* _omRemoveFromSortedList(void* list, int next, int long_field, void* addr)
 void* _omInsertInSortedList(void* list, int next, int long_field, void* addr)
 {
   unsigned long what = VALUE(addr, long_field);
-  
+
   if (list == NULL || what <= VALUE(list, long_field))
   {
     NEXT(addr) = list;
@@ -157,7 +157,7 @@ void* _omInsertInSortedList(void* list, int next, int long_field, void* addr)
   {
     void* prev = list;
     void* curr = NEXT(list);
-    
+
     while (curr != NULL && VALUE(curr, long_field) < what)
     {
       prev = curr;
@@ -177,7 +177,7 @@ void* _omInsertInSortedList(void* list, int next, int long_field, void* addr)
 omError_t _omCheckList(void* list, int next, int level, omError_t report, OM_FLR_DECL)
 {
   if (level < 1) return omError_NoError;
-  
+
   if (level == 1)
   {
     while (list != NULL)
@@ -203,7 +203,7 @@ omError_t _omCheckList(void* list, int next, int level, omError_t report, OM_FLR
         i++;
         ITER(l2);
       }
-      if (i != l) 
+      if (i != l)
         return omReportError(omError_ListCycleError, report, OM_FLR_VAL, "");
       ITER(l1);
       l++;
@@ -215,16 +215,16 @@ omError_t _omCheckList(void* list, int next, int level, omError_t report, OM_FLR
 omError_t _omCheckSortedList(void* list, int next, int long_field, int level, omError_t report, OM_FLR_DECL)
 {
   void* prev = NULL;
-  
+
   if (level <= 1) return omError_NoError;
-  
+
   if (level == 1)
   {
     while (list != NULL)
     {
       omCheckReturn(omCheckPtr(list, report, OM_FLR_VAL));
       if (prev != NULL && VALUE(prev, long_field) > VALUE(list, long_field))
-        return omReportError(omError_SortedListError, report, OM_FLR_VAL, 
+        return omReportError(omError_SortedListError, report, OM_FLR_VAL,
                              "%d > %d", VALUE(prev, long_field), VALUE(list, long_field));
       prev = list;
       ITER(list);
@@ -240,7 +240,7 @@ omError_t _omCheckSortedList(void* list, int next, int long_field, int level, om
     {
       omCheckReturn(omCheckPtr(l1, report, OM_FLR_VAL));
       if (prev != NULL && VALUE(prev, long_field) > VALUE(l1, long_field))
-        return omReportError(omError_SortedListError, report, OM_FLR_VAL, 
+        return omReportError(omError_SortedListError, report, OM_FLR_VAL,
                              "%d > %d", VALUE(prev, long_field), VALUE(l1, long_field));
       i = 0;
       l2 = list;
@@ -258,5 +258,3 @@ omError_t _omCheckSortedList(void* list, int next, int long_field, int level, om
   return omError_NoError;
 }
 #endif
-
-

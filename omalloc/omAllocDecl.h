@@ -3,7 +3,7 @@
  *  Purpose: declaration of Alloc routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omAllocDecl.h,v 1.7 2000-09-18 09:12:13 obachman Exp $
+ *  Version: $Id: omAllocDecl.h,v 1.8 2001-04-30 09:02:00 Singular Exp $
  *******************************************************************/
 #ifndef OM_ALLOC_DECL_H
 #define OM_ALLOC_DECL_H
@@ -28,7 +28,7 @@
 #ifndef OM_CHECK
 #define OM_CHECK    0
 #endif
-#ifndef OM_TRACK 
+#ifndef OM_TRACK
 #define OM_TRACK    0
 #endif
 
@@ -84,7 +84,7 @@
 #define omStrDup(s)                             _omDebugStrDup(s,OM_TFL)
 #define omMemDup(addr)                          _omDebugMemDup(addr,_OM_FKEEP,OM_CTFL)
 
-#define omDebugBinAddr(addr)                 _omDebugAddr(addr,NULL,OM_FBINADDR,OM_CFL) 
+#define omDebugBinAddr(addr)                 _omDebugAddr(addr,NULL,OM_FBINADDR,OM_CFL)
 #define omDebugAddrBin(addr, bin)            _omDebugAddr(addr,bin,OM_FBIN,OM_CFL)
 #define omDebugBinAddrSize(addr, size)       _omDebugAddr(addr,(void*)(size),OM_FBINADDR|OM_FSIZE,OM_CFL)
 #define omDebugAddrSize(addr,size)           _omDebugAddr(addr,(void*)(size),OM_FSIZE,OM_CFL)
@@ -97,15 +97,15 @@
 
 #if OM_CHECK > 0
 #define omCheckBinAddr      omDebugBinAddr
-#define omCheckAddrBin      omDebugAddrBin  
-#define omCheckBinAddrSize  omDebugBinAddrSize 
-#define omCheckAddrSize     omDebugAddrSize  
-#define omCheckAddr         omDebugAddr      
-#define omcheckAddrSize     omdebugAddrSize  
-#define omcheckAddr         omdebugAddr      
-#define omCheckBin          omDebugBin       
-#define omCheckMemory       omDebugMemory    
-#define omCheckIf           omDebugIf        
+#define omCheckAddrBin      omDebugAddrBin
+#define omCheckBinAddrSize  omDebugBinAddrSize
+#define omCheckAddrSize     omDebugAddrSize
+#define omCheckAddr         omDebugAddr
+#define omcheckAddrSize     omdebugAddrSize
+#define omcheckAddr         omdebugAddr
+#define omCheckBin          omDebugBin
+#define omCheckMemory       omDebugMemory
+#define omCheckIf           omDebugIf
 #endif /* OM_CHECK > 0 */
 
 
@@ -137,15 +137,15 @@
 
 #if OM_CHECK > 0
 #define omCheckBinAddrAligned    omDebugBinAddrAligned
-#define omCheckAddrAlignedBin    omDebugAddrAlignedBin    
-#define omCheckAddrAlignedSize   omDebugAddrAlignedSize  
-#define omCheckAddrAligned       omDebugAddrAligned      
-#define omcheckAddrAlignedSize   omdebugAddrAlignedSize  
-#define omcheckAddrAligned       omdebugAddrAligned      
+#define omCheckAddrAlignedBin    omDebugAddrAlignedBin
+#define omCheckAddrAlignedSize   omDebugAddrAlignedSize
+#define omCheckAddrAligned       omDebugAddrAligned
+#define omcheckAddrAlignedSize   omdebugAddrAlignedSize
+#define omcheckAddrAligned       omdebugAddrAligned
 #endif
 #endif /* OM_ALIGNMENT_NEEDS_WORK */
 
-#elif !defined(OM_EMULATE_OMALLOC) 
+#elif !defined(OM_EMULATE_OMALLOC)
 /*******************************************************************
  *
  * Alloc/Free -- the real thing
@@ -235,47 +235,47 @@ extern void* omEmulateRealloc0(void* o_addr, size_t n_size);
 #define omAllocBin(bin)                         OM_MALLOC_MALLOC(bin->sizeW << LOG_SIZEOF_LONG)
 #define omAlloc0Bin(bin)                        omEmulateAlloc0(bin->sizeW << LOG_SIZEOF_LONG)
 
-#define omTypeAlloc(type,addr,size)             addr=(type) OM_MALLOC_MALLOC(size) 
-#define omTypeAlloc0(type,addr,size)            addr=(type) omEmulateAlloc0(size) 
-#define omAlloc(size)                           OM_MALLOC_MALLOC(size)             
-#define omAlloc0(size)                          omEmulateAlloc0(size)             
+#define omTypeAlloc(type,addr,size)             addr=(type) OM_MALLOC_MALLOC(size)
+#define omTypeAlloc0(type,addr,size)            addr=(type) omEmulateAlloc0(size)
+#define omAlloc(size)                           OM_MALLOC_MALLOC(size)
+#define omAlloc0(size)                          omEmulateAlloc0(size)
 
-#define omTypeReallocBin(o_addr,o_bin,type,addr,bin)            addr=(type)OM_MALLOC_REALLOC(o_addr,bin->sizeW << LOG_SIZEOF_LONG)                    
-#define omTypeRealloc0Bin(o_addr,o_bin,type,addr,bin)           addr=(type)omEmulateRealloc0Size(o_addr,o_bin->sizeW << LOG_SIZEOF_LONG,bin->sizeW << LOG_SIZEOF_LONG) 
-#define omReallocBin(o_addr,o_bin,bin)                          OM_MALLOC_REALLOC(o_addr,bin->sizeW << LOG_SIZEOF_LONG)                               
-#define omRealloc0Bin(o_addr,o_bin,bin)                         omEmulateRealloc0Size(o_addr,o_bin->sizeW << LOG_SIZEOF_LONG,bin->sizeW << LOG_SIZEOF_LONG)            
-                                                                
-#define omTypeReallocSize(o_addr,o_size,type,addr,size)         addr=(type)OM_MALLOC_REALLOC(o_addr,size)                    
-#define omTypeRealloc0Size(o_addr,o_size,type,addr,size)        addr=(type)omEmulateRealloc0Size(o_addr,o_size,size) 
-#define omReallocSize(addr,o_size,size)                         OM_MALLOC_REALLOC(addr,size)                               
-#define omRealloc0Size(addr,o_size,size)                        omEmulateRealloc0Size(addr,o_size,size)            
-                                                                
-#define omTypeRealloc(o_addr,type,addr,size)                    addr=(type)OM_MALLOC_REALLOC(o_addr,size)            
-#define omTypeRealloc0(o_addr,type,addr,size)                   addr=(type)omEmulateRealloc0(o_addr,size) 
-#define omRealloc(addr,size)                                    OM_MALLOC_REALLOC(addr,size)                       
-#define omRealloc0(addr,size)                                   omEmulateRealloc0(addr,size)            
-                                                                
+#define omTypeReallocBin(o_addr,o_bin,type,addr,bin)            addr=(type)OM_MALLOC_REALLOC(o_addr,bin->sizeW << LOG_SIZEOF_LONG)
+#define omTypeRealloc0Bin(o_addr,o_bin,type,addr,bin)           addr=(type)omEmulateRealloc0Size(o_addr,o_bin->sizeW << LOG_SIZEOF_LONG,bin->sizeW << LOG_SIZEOF_LONG)
+#define omReallocBin(o_addr,o_bin,bin)                          OM_MALLOC_REALLOC(o_addr,bin->sizeW << LOG_SIZEOF_LONG)
+#define omRealloc0Bin(o_addr,o_bin,bin)                         omEmulateRealloc0Size(o_addr,o_bin->sizeW << LOG_SIZEOF_LONG,bin->sizeW << LOG_SIZEOF_LONG)
+
+#define omTypeReallocSize(o_addr,o_size,type,addr,size)         addr=(type)OM_MALLOC_REALLOC(o_addr,size)
+#define omTypeRealloc0Size(o_addr,o_size,type,addr,size)        addr=(type)omEmulateRealloc0Size(o_addr,o_size,size)
+#define omReallocSize(addr,o_size,size)                         OM_MALLOC_REALLOC(addr,size)
+#define omRealloc0Size(addr,o_size,size)                        omEmulateRealloc0Size(addr,o_size,size)
+
+#define omTypeRealloc(o_addr,type,addr,size)                    addr=(type)OM_MALLOC_REALLOC(o_addr,size)
+#define omTypeRealloc0(o_addr,type,addr,size)                   addr=(type)omEmulateRealloc0(o_addr,size)
+#define omRealloc(addr,size)                                    OM_MALLOC_REALLOC(addr,size)
+#define omRealloc0(addr,size)                                   omEmulateRealloc0(addr,size)
+
 #define omFreeBin(addr,bin)     OM_MALLOC_FREE(addr)
-#define omFreeSize(addr,size)   OM_MALLOC_FREE(addr)      
-#define omFree(addr)            OM_MALLOC_FREE(addr)            
+#define omFreeSize(addr,size)   OM_MALLOC_FREE(addr)
+#define omFree(addr)            OM_MALLOC_FREE(addr)
 #endif /* ! debug && ! the real thing */
 
 
 /* define alignment stuff, if necessary */
-#if !defined(omTypeAllocAligned) 
+#if !defined(omTypeAllocAligned)
 #define omTypeAllocAligned      omTypeAlloc
 #define omTypeAlloc0Aligned     omTypeAlloc0
 #define omAllocAligned          omAlloc
 #define omAlloc0Aligned         omAlloc0
 
-#define omTypeReallocAlignedSize     omTypeReallocSize  
-#define omTypeRealloc0AlignedSize    omTypeRealloc0Size 
-#define omReallocAlignedSize         omReallocSize      
-#define omRealloc0AlignedSize        omRealloc0Size     
-                                                        
-#define omTypeReallocAligned         omTypeRealloc      
-#define omTypeRealloc0Aligned        omTypeRealloc0     
-#define omReallocAligned             omRealloc          
+#define omTypeReallocAlignedSize     omTypeReallocSize
+#define omTypeRealloc0AlignedSize    omTypeRealloc0Size
+#define omReallocAlignedSize         omReallocSize
+#define omRealloc0AlignedSize        omRealloc0Size
+
+#define omTypeReallocAligned         omTypeRealloc
+#define omTypeRealloc0Aligned        omTypeRealloc0
+#define omReallocAligned             omRealloc
 #define omRealloc0Aligned            omRealloc0
 
 #define omMemDupAligned     omMemDup
@@ -283,34 +283,34 @@ extern void* omEmulateRealloc0(void* o_addr, size_t n_size);
 
 #if !defined(omDebugAddrAlignedBin)
 #define omDebugBinAddrAligned   omDebugBinAddr
-#define omDebugAddrAlignedBin   omDebugAddrBin           
-#define omDebugAddrAlignedSize  omDebugAddrSize          
-#define omDebugAddrAligned      omDebugAddr                   
-#define omdebugAddrAlignedSize  omdebugAddrSize          
-#define omdebugAddrAligned      omdebugAddr 
+#define omDebugAddrAlignedBin   omDebugAddrBin
+#define omDebugAddrAlignedSize  omDebugAddrSize
+#define omDebugAddrAligned      omDebugAddr
+#define omdebugAddrAlignedSize  omdebugAddrSize
+#define omdebugAddrAligned      omdebugAddr
 #endif /* !defined(omDebugAddrAlignedBin) */
 
 #if !defined(omCheckAddrAlignedBin)
 #define omCheckBinAddrAligned   omCheckBinAddr
-#define omCheckAddrAlignedBin   omCheckAddrBin           
-#define omCheckAddrAlignedSize  omCheckAddrSize          
-#define omCheckAddrAligned      omCheckAddr                   
-#define omcheckAddrAlignedSize  omcheckAddrSize          
-#define omcheckAddrAligned      omcheckAddr 
+#define omCheckAddrAlignedBin   omCheckAddrBin
+#define omCheckAddrAlignedSize  omCheckAddrSize
+#define omCheckAddrAligned      omCheckAddr
+#define omcheckAddrAlignedSize  omcheckAddrSize
+#define omcheckAddrAligned      omcheckAddr
 #endif /* !defined(omCheckAddrAlignedBin) */
- 
+
 /* define debug stuff, if necessary */
 #if !defined(omDebugAddrBin)
 #define omDebugIf(cond, test)                    ((void) 0)
 #define omDebugBinAddr(addr)                     ((void) 0)
 #define omDebugAddrBin(addr,bin)                 ((void) 0)
-#define omDebugBinAddrSize(addr,size)            ((void) 0)                       
-#define omDebugAddrSize(addr,size)               ((void) 0)                       
-#define omDebugAddr(addr)                        ((void) 0)                               
-#define omdebugAddrSize(addr,size)               ((void) 0)                       
-#define omdebugAddr(addr)                        ((void) 0)                               
-#define omDebugBin(bin)                          ((void) 0)                               
-#define omDebugMemory()                          ((void) 0) 
+#define omDebugBinAddrSize(addr,size)            ((void) 0)
+#define omDebugAddrSize(addr,size)               ((void) 0)
+#define omDebugAddr(addr)                        ((void) 0)
+#define omdebugAddrSize(addr,size)               ((void) 0)
+#define omdebugAddr(addr)                        ((void) 0)
+#define omDebugBin(bin)                          ((void) 0)
+#define omDebugMemory()                          ((void) 0)
 #endif /* !defined(omDebugAddrBin) */
 
 /* define check stuff, if necessary */
@@ -318,13 +318,13 @@ extern void* omEmulateRealloc0(void* o_addr, size_t n_size);
 #define omCheckIf(cond, test)                    ((void) 0)
 #define omCheckBinAddr(addr)                     ((void) 0)
 #define omCheckAddrBin(addr,bin)                 ((void) 0)
-#define omCheckBinAddrSize(addr,size)            ((void) 0)                       
-#define omCheckAddrSize(addr,size)               ((void) 0)                       
-#define omCheckAddr(addr)                        ((void) 0)                               
-#define omcheckAddrSize(addr,size)               ((void) 0)                       
-#define omcheckAddr(addr)                        ((void) 0)                               
-#define omCheckBin(bin)                          ((void) 0)                               
-#define omCheckMemory()                          ((void) 0)                               
+#define omCheckBinAddrSize(addr,size)            ((void) 0)
+#define omCheckAddrSize(addr,size)               ((void) 0)
+#define omCheckAddr(addr)                        ((void) 0)
+#define omcheckAddrSize(addr,size)               ((void) 0)
+#define omcheckAddr(addr)                        ((void) 0)
+#define omCheckBin(bin)                          ((void) 0)
+#define omCheckMemory()                          ((void) 0)
 #endif /* !defined(omCheckAddrBin) */
 
 
@@ -350,21 +350,20 @@ omError_t omTestMemory(int check_level);
 
 #define omTestIf(cond, test)                      ((void) 0)
 #define omTestAddrBin(addr,bin,l)                 ((void) 0)
-#define omTestBinAddr(addr,l)                     ((void) 0)                               
-#define omTestBinAddrSize(addr,size,l)            ((void) 0)                       
-#define omTestAddrSize(addr,size,l)               ((void) 0)                       
-#define omTestAddr(addr,l)                        ((void) 0)                               
-#define omtestAddrSize(addr,size,l)               ((void) 0)                       
-#define omtestAddr(addr,l)                        ((void) 0)                               
+#define omTestBinAddr(addr,l)                     ((void) 0)
+#define omTestBinAddrSize(addr,size,l)            ((void) 0)
+#define omTestAddrSize(addr,size,l)               ((void) 0)
+#define omTestAddr(addr,l)                        ((void) 0)
+#define omtestAddrSize(addr,size,l)               ((void) 0)
+#define omtestAddr(addr,l)                        ((void) 0)
 #define omTestAddrAlignedBin(addr,bin,l)                 ((void) 0)
-#define omTestAddrAlignedSize(addr,size,l)               ((void) 0)                       
-#define omTestAddrAligned(addr,l)                        ((void) 0) 
-#define omtestAddrAlignedSize(addr,size,l)               ((void) 0)  
+#define omTestAddrAlignedSize(addr,size,l)               ((void) 0)
+#define omTestAddrAligned(addr,l)                        ((void) 0)
+#define omtestAddrAlignedSize(addr,size,l)               ((void) 0)
 #define omtestAddrAligned(addr,l)                        ((void) 0)
-#define omTestBin(bin,l)                          ((void) 0)                               
-#define omTestMemory(l)                           ((void) 0)                               
+#define omTestBin(bin,l)                          ((void) 0)
+#define omTestMemory(l)                           ((void) 0)
 
 #endif
 
 #endif /* OM_ALLOC_DECL_H */
-

@@ -8,7 +8,7 @@
 #define KEEP_LEVEL    20
 // #define KEEP_LEVEL    0
 
-// #define MAX_CELLS  500000   
+// #define MAX_CELLS  500000
 // #define MAX_CELLS     100000
 #define MAX_CELLS     100000
 #define KEEP_ADDR     100

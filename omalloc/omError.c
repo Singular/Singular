@@ -1,9 +1,9 @@
 /*******************************************************************
  *  File:    omError.c
- *  Purpose: implementation of Error handling routines 
+ *  Purpose: implementation of Error handling routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omError.c,v 1.8 2000-12-12 15:26:17 obachman Exp $
+ *  Version: $Id: omError.c,v 1.9 2001-04-30 09:02:05 Singular Exp $
  *******************************************************************/
 
 #include <stdarg.h>
@@ -46,7 +46,7 @@ static struct omErrorString_s om_ErrorStrings[] =
   {omError_FreePattern,                 "omError_FreePattern",                 "written into freed memory"},
   {omError_NotString,                   "omError_NotString",                   "string not null terminated"},
   {omError_StickyBin,                   "omError_StickyBin",                   "wrong handling of sticky bins"},
-  
+
   {omError_MaxError, NULL} /* this needs to be the last entry */
 };
 
@@ -76,11 +76,11 @@ const char* omError2Serror(omError_t error)
 int om_CallErrorHook = 1;
 #endif
 
-omError_t omReportError(omError_t error, omError_t report_error, OM_FLR_DECL,  
+omError_t omReportError(omError_t error, omError_t report_error, OM_FLR_DECL,
                         const char* fmt, ...)
 {
   int max_check, max_track;
-  
+
   if (report_error == omError_MaxError) return error;
   /* reset MaxTrack and MaxCheck to prevent infinite loop, in case
      printf allocates memory */
@@ -88,14 +88,14 @@ omError_t omReportError(omError_t error, omError_t report_error, OM_FLR_DECL,
   max_track = om_Opts.MaxTrack;
   om_Opts.MaxCheck = 0;
   om_Opts.MaxTrack = 0;
-  
+
   om_InternalErrorStatus = error;
   om_ErrorStatus = (report_error == omError_NoError ? error : report_error);
 
   if (om_Opts.HowToReportErrors && om_ErrorStatus != omError_NoError)
   {
     fprintf(stderr, "***%s: %s", omError2Serror(om_ErrorStatus), omError2String(om_ErrorStatus));
-    
+
 #ifdef OM_INTERNAL_DEBUG
     if (om_ErrorStatus != error)
       fprintf(stderr, "\n___%s: %s", omError2Serror(error), omError2String(error));
@@ -114,7 +114,7 @@ omError_t omReportError(omError_t error, omError_t report_error, OM_FLR_DECL,
     {
 #ifndef OM_NDEBUG
       fprintf(stderr, "\n occured at: ");
-      if (! _omPrintCurrentBackTrace(stderr, OM_FLR_VAL)) 
+      if (! _omPrintCurrentBackTrace(stderr, OM_FLR_VAL))
         fprintf(stderr, " ??");
 #endif
     }
@@ -123,7 +123,7 @@ omError_t omReportError(omError_t error, omError_t report_error, OM_FLR_DECL,
   }
   if (om_CallErrorHook)
     om_Opts.ErrorHook();
-  
+
   om_Opts.MaxCheck = max_check;
   om_Opts.MaxTrack = max_track;
   return error;
@@ -133,26 +133,3 @@ omError_t omReportError(omError_t error, omError_t report_error, OM_FLR_DECL,
 /* this is a dummy function and used as default for om_Opts.ErrorHook */
 extern void omErrorBreak()
 {}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                

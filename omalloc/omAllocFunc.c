@@ -5,7 +5,7 @@
  *           and end with the Func suffix.
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omAllocFunc.c,v 1.1 2001-01-27 17:03:40 obachman Exp $
+ *  Version: $Id: omAllocFunc.c,v 1.2 2001-04-30 09:02:00 Singular Exp $
  *******************************************************************/
 
 #define malloc      omMallocFunc
@@ -20,5 +20,3 @@
 
 #define OMALLOC_FUNC
 #include "omalloc.c"
-
-

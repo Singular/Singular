@@ -18,13 +18,13 @@ omMemCell omFindCell(struct LongSpec spec)
   for (i=0; i<MAX_CELLS; i++)
   {
     if ((cells[i].addr != NULL) &&
-        (spec.MinTrack == 0 || (DO_CHECK(cells[i].spec) && 
-                                DO_TRACK(cells[i].spec) && 
-                                GET_TRACK(cells[i].spec) >= spec.MinTrack)) && 
+        (spec.MinTrack == 0 || (DO_CHECK(cells[i].spec) &&
+                                DO_TRACK(cells[i].spec) &&
+                                GET_TRACK(cells[i].spec) >= spec.MinTrack)) &&
         (spec.MinSize == 0  || GET_SIZE(cells[i].spec) >= spec.MinSize) &&
         (spec.MaxSize == 0  || GET_SIZE(cells[i].spec) <= spec.MaxSize) &&
         (spec.NotIsBin == 0 || cells[i].bin == NULL) &&
-        (spec.NotZero == 0  || !IS_ZERO(cells[i].spec)) && 
+        (spec.NotZero == 0  || !IS_ZERO(cells[i].spec)) &&
         (spec.NoTrack == 0  || !DO_CHECK(cells[i].spec) || !DO_TRACK(cells[i].spec)))
     {
       return &cells[i];
@@ -41,7 +41,7 @@ int omtTestErrors()
   struct LongSpec spec;
   int missed = 0, alloc;
   omMemCell cell = NULL;
-  
+
   printf("omtTestErrors: Start\n");
   om_Opts.MinCheck = 2;
   for (error = omError_MemoryCorrupted; error < omError_MaxError; error++)
@@ -54,7 +54,7 @@ int omtTestErrors()
     alloc = 0;
     switch (error)
     {
-        case omError_MemoryCorrupted: 
+        case omError_MemoryCorrupted:
         {
           spec.MaxSize = OM_MAX_BLOCK_SIZE;
           cell = omFindCell(spec);
@@ -71,19 +71,19 @@ int omtTestErrors()
           break;
         }
 
-        case omError_NullAddr: 
+        case omError_NullAddr:
         {
           omDebugAddr(NULL);
           break;
         }
 
-        case omError_InvalidRangeAddr: 
+        case omError_InvalidRangeAddr:
         {
           omDebugAddr((void*) om_MaxAddr);
           break;
         }
 
-        case omError_FalseAddr: 
+        case omError_FalseAddr:
         {
           spec.MinSize = 8;
           spec.MaxSize = OM_MAX_BLOCK_SIZE;
@@ -97,8 +97,8 @@ int omtTestErrors()
           break;
         }
 
-        case omError_FalseAddrOrMemoryCorrupted: 
-        {   
+        case omError_FalseAddrOrMemoryCorrupted:
+        {
           spec.MinSize = 8;
           spec.MinTrack = 3;
           cell = omFindCell(spec);
@@ -110,7 +110,7 @@ int omtTestErrors()
           break;
         }
 
-        case omError_WrongSize: 
+        case omError_WrongSize:
         {
           spec.MaxSize = OM_MAX_BLOCK_SIZE;
           cell = omFindCell(spec);
@@ -126,7 +126,7 @@ int omtTestErrors()
               spec.MinSize = 2;
               cell = omFindCell(spec);
               if (cell != NULL)
-              {   
+              {
                 omDebugAddrSize(cell->addr, GET_SIZE(cell->spec) + SIZEOF_OM_ALIGNMENT);
                 if (om_ErrorStatus != omError_NoError)
                 {
@@ -138,7 +138,7 @@ int omtTestErrors()
                   if (cell != NULL)
                     omDebugBinAddrSize(cell->addr, GET_SIZE(cell->spec) - 1);
                   else printf("cell not found");
-                } 
+                }
               }
               else printf("cell not found\n");
             }
@@ -147,7 +147,7 @@ int omtTestErrors()
           break;
         }
 
-        case omError_FreedAddr: 
+        case omError_FreedAddr:
         {
 #if KEEP_LEVEL > 0
           void* addr = om_AlwaysKeptAddrs;
@@ -173,7 +173,7 @@ int omtTestErrors()
                }
             }
           }
-          if (addr == NULL) 
+          if (addr == NULL)
           {
             printf("addr not found\n");
             break;
@@ -195,7 +195,7 @@ int omtTestErrors()
           break;
         }
 
-        case omError_FreedAddrOrMemoryCorrupted: 
+        case omError_FreedAddrOrMemoryCorrupted:
         {
           spec.MaxSize = OM_MAX_BLOCK_SIZE;
           spec.NoTrack = 1;
@@ -214,7 +214,7 @@ int omtTestErrors()
           break;
         }
 
-        case omError_WrongBin: 
+        case omError_WrongBin:
         {
           spec.MaxSize = 32;
           spec.NoTrack = 1;
@@ -227,7 +227,7 @@ int omtTestErrors()
           break;
         }
 
-        case omError_UnknownBin: 
+        case omError_UnknownBin:
         {
           spec.MaxSize = OM_MAX_BLOCK_SIZE;
           cell = omFindCell(spec);
@@ -252,7 +252,7 @@ int omtTestErrors()
           break;
         }
 
-        case omError_UnalignedAddr: 
+        case omError_UnalignedAddr:
         {
           cell = omFindCell(spec);
           if (cell != NULL)
@@ -263,7 +263,7 @@ int omtTestErrors()
           break;
         }
 
-        case omError_NullSizeAlloc: 
+        case omError_NullSizeAlloc:
         {
           void* addr = omAlloc(0);
           addr = omRealloc(addr, 0);
@@ -271,7 +271,7 @@ int omtTestErrors()
           break;
         }
 
-        case omError_ListCycleError: 
+        case omError_ListCycleError:
         {
           void* last = omListLast(om_SpecBin);
           if (last != NULL)
@@ -283,7 +283,7 @@ int omtTestErrors()
           break;
         }
 
-        case omError_SortedListError: 
+        case omError_SortedListError:
         {
           if (om_SpecBin != NULL && om_SpecBin->next != NULL)
           {
@@ -295,7 +295,7 @@ int omtTestErrors()
           break;
         }
 
-        case omError_KeptAddrListCorrupted: 
+        case omError_KeptAddrListCorrupted:
         {
           if (om_KeptAddr != NULL)
           {
@@ -310,7 +310,7 @@ int omtTestErrors()
           break;
         }
 
-        case omError_FreePattern: 
+        case omError_FreePattern:
         {
           if (om_Opts.Keep > 0)
           {
@@ -334,7 +334,7 @@ int omtTestErrors()
           break;
         }
 
-        case omError_BackPattern: 
+        case omError_BackPattern:
         {
           spec.MinTrack = 3;
           spec.NotIsBin = 1;
@@ -351,7 +351,7 @@ int omtTestErrors()
           break;
         }
 
-        case omError_FrontPattern: 
+        case omError_FrontPattern:
         {
           spec.MinTrack=3;
           cell = omFindCell(spec);
@@ -361,7 +361,7 @@ int omtTestErrors()
             void* value = *((void**) addr);
             *((void**) addr) = value -1;
             omDebugAddr(cell->addr);
-            *((void**) addr) = value; 
+            *((void**) addr) = value;
           }
           else printf("cell not found\n");
           break;
@@ -370,7 +370,7 @@ int omtTestErrors()
         case omError_NotString:
         {
 /* can only test for NULL string */
-#if 0 
+#if 0
           spec.MaxSize = OM_MAX_BLOCK_SIZE;
           cell = omFindCell(spec);
           if (cell != NULL)
@@ -395,7 +395,7 @@ int omtTestErrors()
           omMergeStickyBinIntoBin(NULL, NULL);
           break;
         }
-          
+
         default:
           printf("No Error test implemented\n");
     }
@@ -432,7 +432,5 @@ int omtTestErrors()
   return missed;
 #else
   return 0;
-#endif  
+#endif
 }
-
-  

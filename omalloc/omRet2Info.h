@@ -3,7 +3,7 @@
  *  Purpose: translation of return addr to RetInfo
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omRet2Info.h,v 1.7 2000-11-03 15:47:25 obachman Exp $
+ *  Version: $Id: omRet2Info.h,v 1.8 2001-04-30 09:02:10 Singular Exp $
  *******************************************************************/
 #ifndef OM_RET_2_INFO_H
 #define OM_RET_2_INFO_H
@@ -17,19 +17,19 @@ struct omRetInfo_s
   int   line;
 };
 
-/* print to fd array of max RetInfo's and use fmt as format string for one RetInfo. 
+/* print to fd array of max RetInfo's and use fmt as format string for one RetInfo.
    The following conversions are recognized:
     %i -- number of return addr
     %p -- address (in hex)
     %F -- function name with arguments (for C++, only)
-    %N -- funtion name without arguments 
+    %N -- funtion name without arguments
     %f -- file
     %l -- line
     %L -- file:line
    return how many lines were printed */
 #ifndef OM_NDEBUG
 int omPrintRetInfo(omRetInfo info, int max, FILE *fd, const char* fmt);
-/* translate array of max BackTrace addresses into array of max RetInfos 
+/* translate array of max BackTrace addresses into array of max RetInfos
    return how many were translated */
 int omBackTrace_2_RetInfo(void** bt, omRetInfo info, int max);
 

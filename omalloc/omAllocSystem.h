@@ -4,12 +4,12 @@
  *           and page management
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omAllocSystem.h,v 1.3 2000-08-14 12:26:40 obachman Exp $
+ *  Version: $Id: omAllocSystem.h,v 1.4 2001-04-30 09:02:02 Singular Exp $
  *******************************************************************/
 #ifndef OM_ALLOC_SYSTEM_H
 #define OM_ALLOC_SYSTEM_H
 
-size_t omSizeOfAddr(void* addr);
+size_t omSizeOfAddr(const void* addr);
 size_t omSizeWOfAddr(void* addr);
 
 size_t omSizeOfLargeAddr(void* addr);

@@ -3,7 +3,7 @@
  *  Purpose: declaration of structs and typedefs of omalloc
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omStructs.h,v 1.3 2000-08-14 12:26:50 obachman Exp $
+ *  Version: $Id: omStructs.h,v 1.4 2001-04-30 09:02:11 Singular Exp $
  *******************************************************************/
 #ifndef OM_STRUCTS_H
 #define OM_STRUCTS_H
@@ -35,4 +35,3 @@ typedef struct omRetInfo_s omRetInfo_t;
 typedef omRetInfo_t*        omRetInfo;
 
 #endif /* OM_STRUCTS_H */
-

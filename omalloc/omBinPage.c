@@ -3,16 +3,16 @@
  *  Purpose: implementation of routines for primitve BinPage managment
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omBinPage.c,v 1.7 2001-03-22 22:39:09 Singular Exp $
+ *  Version: $Id: omBinPage.c,v 1.8 2001-04-30 09:02:02 Singular Exp $
  *******************************************************************/
 #include <mylimits.h>
 #include "om_Alloc.h"
 #include "omDefaultConfig.h"
 
 /*******************************************************************
- *  
- * Local declarations  
- *  
+ *
+ * Local declarations
+ *
  *******************************************************************/
 
 /* define if you want to keep regions approximately in order */
@@ -23,9 +23,9 @@ struct omBinPageRegion_s
   void* current;        /* linked list of free pages */
   omBinPageRegion next; /* nex/prev pointer in ring of regions */
   omBinPageRegion prev;
-  void* init_addr;      /* pointer portion of inital chunk which is still free */
-  void* addr;         /* addr returned by alloc */
-  int   init_pages;   /* number of pages still available in init_chunk */  
+  char* init_addr;      /* pointer portion of inital chunk which is still free */
+  char* addr;         /* addr returned by alloc */
+  int   init_pages;   /* number of pages still available in init_chunk */
   int   used_pages;     /* number of used pages */
   int pages;          /* total size of region */
 };
@@ -48,14 +48,14 @@ static void omUnregisterBinPages(void* low_addr, int pages);
 OM_INLINE_LOCAL void omTakeOutRegion(omBinPageRegion region)
 {
   omAssume(region != NULL);
-  
+
   if (region->prev != NULL)
   {
     omAssume(region->prev != region && region->prev != region->next);
     region->prev->next = region->next;
   }
-  
-  if (region->next != NULL) 
+
+  if (region->next != NULL)
   {
     omAssume(region->next != region && region->prev != region->next);
     region->next->prev = region->prev;
@@ -84,12 +84,12 @@ OM_INLINE_LOCAL void omInsertRegionBefore(omBinPageRegion insert, omBinPageRegio
   if (insert->prev != NULL)
     insert->prev->next = insert;
 }
-    
+
 
 /*******************************************************************
- *  
+ *
  * Alloc/Free of BinPages
- *  
+ *
  *******************************************************************/
 #define NEXT_PAGE(page) *((void**) page)
 #define OM_IS_EMPTY_REGION(region) ((region)->current == NULL && (region->init_addr == NULL))
@@ -111,9 +111,9 @@ omBinPage omAllocBinPage()
     }
     if (om_CurrentBinPageRegion->init_pages)
     {
-      bin_page = om_CurrentBinPageRegion->init_addr;
+      bin_page = (omBinPage)om_CurrentBinPageRegion->init_addr;
       om_CurrentBinPageRegion->init_pages--;
-      if (om_CurrentBinPageRegion->init_pages) 
+      if (om_CurrentBinPageRegion->init_pages)
         om_CurrentBinPageRegion->init_addr += SIZEOF_SYSTEM_PAGE;
       else
         om_CurrentBinPageRegion->init_addr = NULL;
@@ -132,16 +132,16 @@ omBinPage omAllocBinPage()
     }
   }
   while (1);
-        
+
   Found:
   bin_page->region = om_CurrentBinPageRegion;
   om_CurrentBinPageRegion->used_pages++;
-  
+
   om_Info.UsedPages++;
   om_Info.AvailPages--;
   if (om_Info.UsedPages > om_Info.MaxPages)
     om_Info.MaxPages = om_Info.UsedPages;
-  
+
   OM_ALLOC_BINPAGE_HOOK;
   return bin_page;
 }
@@ -159,9 +159,9 @@ omBinPage omAllocBinPages(int how_many)
   {
     if (region->init_pages >= how_many)
     {
-      bin_page = region->init_addr;
+      bin_page = (omBinPage)region->init_addr;
       region->init_pages -= how_many;
-      if (region->init_pages) 
+      if (region->init_pages)
         region->init_addr += how_many*SIZEOF_SYSTEM_PAGE;
       else
         region->init_addr = NULL;
@@ -184,7 +184,7 @@ omBinPage omAllocBinPages(int how_many)
     }
   }
   while (1);
-        
+
   Found:
   bin_page->region = region;
   region->used_pages += how_many;
@@ -202,7 +202,7 @@ omBinPage omAllocBinPages(int how_many)
   OM_ALLOC_BINPAGE_HOOK;
   return bin_page;
 }
-  
+
 void omFreeBinPages(omBinPage bin_page, int how_many)
 {
   omBinPageRegion region = bin_page->region;
@@ -210,9 +210,9 @@ void omFreeBinPages(omBinPage bin_page, int how_many)
   region->used_pages -= how_many;
   if (region->used_pages == 0)
   {
-    if (region == om_CurrentBinPageRegion) 
+    if (region == om_CurrentBinPageRegion)
     {
-      if (region->next != NULL) 
+      if (region->next != NULL)
         om_CurrentBinPageRegion = region->next;
       else
         om_CurrentBinPageRegion = region->prev;
@@ -230,8 +230,8 @@ void omFreeBinPages(omBinPage bin_page, int how_many)
     if (how_many > 1)
     {
       int i = how_many;
-      void* page = bin_page;
-      
+      char* page = (char *)bin_page;
+
       while (i > 1)
       {
         NEXT_PAGE(page) = page + SIZEOF_SYSTEM_PAGE;
@@ -250,11 +250,11 @@ void omFreeBinPages(omBinPage bin_page, int how_many)
   om_Info.UsedPages -= how_many;
   OM_FREE_BINPAGE_HOOK;
 }
-  
+
 static void* omTakeOutConsecutivePages(omBinPageRegion region, int pages)
 {
   void* current;
-  void* iter;
+  char* iter;
   void* prev = NULL;
   void* bin_page;
   int found;
@@ -263,7 +263,7 @@ static void* omTakeOutConsecutivePages(omBinPageRegion region, int pages)
   {
     found = 1;
     iter = current;
-    while (NEXT_PAGE(iter) == iter + SIZEOF_SYSTEM_PAGE)
+    while (NEXT_PAGE(iter) == (iter + SIZEOF_SYSTEM_PAGE))
     {
       iter = NEXT_PAGE(iter);
       /* handle pathological case that iter + SIZEOF_SYSTEM_PAGE == 0 */
@@ -297,15 +297,15 @@ static omBinPageRegion omAllocNewBinPagesRegion(int min_pages)
   void* addr;
   int pages = (min_pages>om_Opts.PagesPerRegion ? min_pages : om_Opts.PagesPerRegion);
   size_t size = pages*SIZEOF_SYSTEM_PAGE;
-  
+
   addr = _omVallocFromSystem(size, 1);
-  if (addr == NULL) 
+  if (addr == NULL)
   {
     pages = min_pages;
     size = min_pages*SIZEOF_SYSTEM_PAGE;
     addr = omVallocFromSystem(size);
   }
-  
+
   omRegisterBinPages(addr, pages);
   region->addr = addr;
   region->pages = pages;
@@ -339,9 +339,9 @@ static void omFreeBinPagesRegion(omBinPageRegion region)
 }
 
 /*******************************************************************
- *  
+ *
  * BinPage registration
- *  
+ *
  *******************************************************************/
 
 static void omBinPageIndexFault(unsigned long low_index, unsigned long high_index)
@@ -350,7 +350,7 @@ static void omBinPageIndexFault(unsigned long low_index, unsigned long high_inde
   long i;
   omAssume(low_index <= high_index &&
            (high_index > om_MaxBinPageIndex || low_index < om_MinBinPageIndex));
-  
+
   if (om_BinPageIndicies == NULL)
   {
     om_BinPageIndicies = (unsigned long*) omAllocFromSystem((index_diff + 1)*SIZEOF_LONG);
@@ -361,8 +361,8 @@ static void omBinPageIndexFault(unsigned long low_index, unsigned long high_inde
   else
   {
     unsigned long old_length = om_MaxBinPageIndex - om_MinBinPageIndex + 1;
-    unsigned long new_length = (low_index < om_MinBinPageIndex ? 
-                                om_MaxBinPageIndex - low_index : 
+    unsigned long new_length = (low_index < om_MinBinPageIndex ?
+                                om_MaxBinPageIndex - low_index :
                                 high_index - om_MinBinPageIndex) + 1;
     om_BinPageIndicies  = (unsigned long*) omReallocSizeFromSystem(om_BinPageIndicies, old_length*SIZEOF_LONG,
                                                                    new_length*SIZEOF_LONG);
@@ -384,10 +384,10 @@ static void omBinPageIndexFault(unsigned long low_index, unsigned long high_inde
 static void omRegisterBinPages(void* low_addr, int pages)
 {
   unsigned long low_index = omGetPageIndexOfAddr(low_addr);
-  void* high_addr = low_addr + (pages-1)*SIZEOF_SYSTEM_PAGE;
+  char* high_addr = (char *)low_addr + (pages-1)*SIZEOF_SYSTEM_PAGE;
   unsigned long high_index = omGetPageIndexOfAddr(high_addr);
   unsigned long shift;
-   
+
   if (low_index < om_MinBinPageIndex || high_index > om_MaxBinPageIndex)
     omBinPageIndexFault(low_index, high_index);
 
@@ -431,10 +431,10 @@ static void omRegisterBinPages(void* low_addr, int pages)
 static void omUnregisterBinPages(void* low_addr, int pages)
 {
   unsigned long low_index = omGetPageIndexOfAddr(low_addr);
-  void* high_addr = low_addr + (pages-1)*SIZEOF_SYSTEM_PAGE;
+  char* high_addr = (char *)low_addr + (pages-1)*SIZEOF_SYSTEM_PAGE;
   unsigned long high_index = omGetPageIndexOfAddr(high_addr);
   unsigned long shift;
-  
+
   shift = omGetPageShiftOfAddr(low_addr);
   if (low_index < high_index)
   {
@@ -471,7 +471,7 @@ static void omUnregisterBinPages(void* low_addr, int pages)
      om_BinPageIndicies[low_index-om_MinBinPageIndex] &= ~(((unsigned long) 1) << shift);
   }
 }
-   
+
 /***********************************************************************
  *
  * checking routines
@@ -483,7 +483,7 @@ static void omUnregisterBinPages(void* low_addr, int pages)
 int omIsKnownMemoryRegion(omBinPageRegion region)
 {
   omBinPageRegion iter = om_CurrentBinPageRegion;
-  
+
   if (region == NULL || iter == NULL) return 0;
   iter = omGListLast(om_CurrentBinPageRegion, prev);
   do
@@ -494,30 +494,30 @@ int omIsKnownMemoryRegion(omBinPageRegion region)
   while (iter != NULL);
   return 0;
 }
-  
+
 
 omError_t omCheckBinPageRegion(omBinPageRegion region, int level, omError_t report, OM_FLR_DECL)
 {
   if (level <= 0) return omError_NoError;
-  
+
   omCheckReturn(omCheckPtr(region, report, OM_FLR_VAL));
   omCheckReturnCorrupted(! omIsKnownMemoryRegion(region));
   omCheckReturnCorrupted(! omIsAddrPageAligned(region->addr) || ! omIsAddrPageAligned(region->current));
   omCheckReturnCorrupted(region->used_pages < 0);
   omCheckReturnCorrupted(region->init_pages < 0 || region->init_pages > region->pages);
-  
+
   if (region->init_pages)
   {
     omCheckReturnCorrupted(! omIsAddrPageAligned(region->init_addr));
-    omCheckReturnCorrupted(! (region->init_addr >= region->addr 
+    omCheckReturnCorrupted(! (region->init_addr >= region->addr
                               && region->init_addr <= region->addr + (region->pages -1)*SIZEOF_SYSTEM_PAGE));
-    omCheckReturnCorrupted(region->init_addr != 
+    omCheckReturnCorrupted(region->init_addr !=
                            region->addr + (region->pages - region->init_pages)*SIZEOF_SYSTEM_PAGE);
   }
-   
+
   omCheckReturn(omCheckList(region->current, level, report, OM_FLR_VAL));
   omCheckReturnCorrupted(region->current == NULL && region->used_pages + region->init_pages != region->pages);
-  omCheckReturnCorrupted(level > 1 && 
+  omCheckReturnCorrupted(level > 1 &&
                          omListLength(region->current)+region->used_pages+region->init_pages != region->pages);
   return omError_NoError;
 }
@@ -539,14 +539,14 @@ omError_t omCheckBinPageRegions(int level, omError_t report, OM_FLR_DECL)
   {
     omBinPageRegion prev_last = (omBinPageRegion) omGListLast(om_CurrentBinPageRegion, prev);
     omBinPageRegion next_last = (omBinPageRegion) omGListLast(om_CurrentBinPageRegion, next);
-    
+
     omCheckReturn(omCheckGList(iter, next, level, report, OM_FLR_VAL));
     omCheckReturn(omCheckGList(iter, prev, level, report, OM_FLR_VAL));
 
     omCheckReturnCorrupted(omGListLength(prev_last, next)
-                          != 
+                          !=
                           omGListLength(next_last, prev));
-    
+
     omCheckReturn(omCheckBinPageRegion(om_CurrentBinPageRegion, level - 1, report, OM_FLR_VAL));
 
     iter = om_CurrentBinPageRegion->next;
@@ -572,12 +572,13 @@ omError_t omCheckBinPageRegions(int level, omError_t report, OM_FLR_DECL)
 omBinPageRegion omFindRegionOfAddr(void* addr)
 {
   omBinPageRegion region = om_CurrentBinPageRegion;
-  
+
   if (region == NULL) return 0;
   region = omGListLast(region, prev);
   do
   {
-    if (addr >= region->addr && addr < region->addr + (region->pages)*SIZEOF_SYSTEM_PAGE)
+    if ((char *)addr >= region->addr
+    && (char *)addr < region->addr + (region->pages)*SIZEOF_SYSTEM_PAGE)
       return region;
     region = region->next;
   }
@@ -587,12 +588,13 @@ omBinPageRegion omFindRegionOfAddr(void* addr)
 
 int omIsAddrOnFreeBinPage(void* addr)
 {
+  char *c_addr=(char *)addr;
   omBinPageRegion region = om_CurrentBinPageRegion;
-  
+
   if (region == NULL) return 0;
   do
   {
-    if (addr > region->addr && addr < region->addr + (region->pages)*SIZEOF_SYSTEM_PAGE)
+    if (c_addr > region->addr && c_addr < region->addr + (region->pages)*SIZEOF_SYSTEM_PAGE)
     {
       if (omIsOnList(region->current, omGetPageOfAddr(addr))) return 1;
       return 0;
@@ -602,5 +604,5 @@ int omIsAddrOnFreeBinPage(void* addr)
   while (region != NULL);
   return 0;
 }
-  
+
 #endif /* ! OM_NDEBUG */

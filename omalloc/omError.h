@@ -3,16 +3,16 @@
  *  Purpose: Error handling of omalloc
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omError.h,v 1.7 2000-10-04 13:12:30 obachman Exp $
+ *  Version: $Id: omError.h,v 1.8 2001-04-30 09:02:06 Singular Exp $
  *******************************************************************/
 #ifndef OM_ERROR_H
 #define OM_ERROR_H
 
 #include <stdio.h>
 /*******************************************************************
- *  
+ *
  *  error codes
- *  
+ *
  *******************************************************************/
 enum omError_e
 {
@@ -52,7 +52,7 @@ extern omError_t om_InternalErrorStatus;
 const char* omError2String(omError_t error);
 /* returns error as string */
 const char* omError2Serror(omError_t error);
-extern omError_t omReportError(omError_t error, omError_t report_error, OM_FLR_DECL,  
+extern omError_t omReportError(omError_t error, omError_t report_error, OM_FLR_DECL,
                                const char* fmt, ...);
 
 /* this is a dummy function and used as default for om_Opts.ErrorHook */

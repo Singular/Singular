@@ -3,23 +3,23 @@
  *  Purpose: default declaration of of configurable stuff
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omDefaultConfig.h,v 1.7 2001-03-22 22:39:10 Singular Exp $
+ *  Version: $Id: omDefaultConfig.h,v 1.8 2001-04-30 09:02:05 Singular Exp $
  *******************************************************************/
 
 /********************************************************************
   If you want to make changes to any of these defines, create a file,
-  say, MyOmConfig.h, define your particular stuff there, and run configure with 
+  say, MyOmConfig.h, define your particular stuff there, and run configure with
   --external-config-h=MyOmConfig.h.
 
   If you also need to implement something, then implement it in, say,
   MyOmConfig.c, and run configure with
   --external-config-h=MyOmConfig.h --external-config-c=MyOmConfig.c
 
-  For omTest to link, you need to make sure that your implementation can also be 
-  used when not linked with your application. I.e. you should also provide a 
+  For omTest to link, you need to make sure that your implementation can also be
+  used when not linked with your application. I.e. you should also provide a
   stand-alone implementation if OM_STANDALONE is defined.
 
-  Notice that some of these parameters can also be set at run-time, using 
+  Notice that some of these parameters can also be set at run-time, using
   the global om_Opts struct.
 ********************************************************************/
 #include <mylimits.h>
@@ -54,30 +54,30 @@
 #define OM_DEFAULT_MAX_CHECK 10
 #endif
 
-/* If this is greater than 0, then the omDebugFree omDebugRealloc delay freeing memory 
-   by that many blocks: Initalizes omOpts.Keep 
+/* If this is greater than 0, then the omDebugFree omDebugRealloc delay freeing memory
+   by that many blocks: Initalizes omOpts.Keep
    Setting this to LONG_MAX never frees memory */
 #ifndef OM_DEFAULT_KEEP
 #define OM_DEFAULT_KEEP 100
 #endif
 
-/* If this is set to 
+/* If this is set to
    0: errors are not reported, only the global variable om_ErrorStatus is set
-   1: short error description, i.e. omError2String(om_ErrorStatus), is reported to stderr 
+   1: short error description, i.e. omError2String(om_ErrorStatus), is reported to stderr
    2: backtrace of current stack is printed to stderr
    3: more detailed error description is printed -- this might not make too much sense if
       you are not familiar with omalloc
    Initializes om_Opts.HowToReprotErrors
 */
 #ifndef OM_DEFAULT_HOW_TO_REPORT_ERRORS
-#if defined(OM_INTERNAL_DEBUG) 
+#if defined(OM_INTERNAL_DEBUG)
 #define OM_DEFAULT_HOW_TO_REPORT_ERRORS 3
 #else
 #define OM_DEFAULT_HOW_TO_REPORT_ERRORS 2
 #endif
 #endif
 
-/* if this is set, then all memory allocated with track >= 1 is marked as 
+/* if this is set, then all memory allocated with track >= 1 is marked as
    static, i.e. it is not mention in omPrintUsedAddrs */
 #ifndef OM_DEFAULT_MARK_AS_STATIC
 #define OM_DEFAULT_MARK_AS_STATIC 0
@@ -110,7 +110,7 @@ do                                                          \
 }                                                           \
 while (0)
 #endif
-  
+
 /* This is called whenever no more memory could be obtained from the system.
    It should trigger the release of as much memory by the application as possible */
 #ifndef OM_DEFAULT_MEMORY_LOW_FUNC
@@ -136,13 +136,13 @@ while(0)
 #endif
 
 /********************************************************************
- * 
+ *
  * The following can NOT be set at run time
  *
  ********************************************************************/
-/* The following hooks are called after the respective 
-   system routine was called, and the Stats struct was updated 
-   Not settable at run-time (makes no sense for thise to be functions, for they would 
+/* The following hooks are called after the respective
+   system routine was called, and the Stats struct was updated
+   Not settable at run-time (makes no sense for thise to be functions, for they would
    be called each time the underlying malloc/valloc is called !) */
 #ifndef OM_MALLOC_HOOK
 #define OM_MALLOC_HOOK(size) ((void)0)
@@ -166,8 +166,8 @@ while(0)
 #define OM_FREE_BINPAGE_HOOK ((void)0)
 #endif
 
-/* 
- * Some stuff related to tracking of addresses 
+/*
+ * Some stuff related to tracking of addresses
  */
 
 /* minimal number of WORDS for padding before addr: needs to > 0: only relevant for track >= 3 */
@@ -182,7 +182,7 @@ while(0)
 
 /* maximal number of stack frames kept for stack at the allocation time of addr (track >= 2)
    and free time of addr (track >= 5) */
-#ifndef OM_MAX_KEPT_FRAMES 
+#ifndef OM_MAX_KEPT_FRAMES
 #define OM_MAX_KEPT_FRAMES 5
 #endif
 
@@ -197,9 +197,6 @@ while(0)
 #ifndef OM_BACK_PATTERN
 #define OM_BACK_PATTERN    0xfc
 #endif
-#ifndef OM_FREE_PATTERN 
+#ifndef OM_FREE_PATTERN
 #define OM_FREE_PATTERN    0xfb
 #endif
-
-
-

@@ -3,7 +3,7 @@
  *  Purpose: implementation of emulated omalloc routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omAllocEmulate.c,v 1.3 2000-08-14 12:26:39 obachman Exp $
+ *  Version: $Id: omAllocEmulate.c,v 1.4 2001-04-30 09:02:00 Singular Exp $
  *******************************************************************/
 #include <stdlib.h>
 
@@ -19,9 +19,9 @@ void* omEmulateAlloc0(size_t size)
 void* omEmulateRealloc0Size(void* o_addr, size_t o_size, size_t n_size)
 {
   void* addr = OM_MALLOC_REALLOC(o_addr, n_size);
-  
+
   if (n_size > o_size)
-    memset(addr + o_size, 0, n_size - o_size);
+    memset((char *)addr + o_size, 0, n_size - o_size);
 
   return addr;
 }
@@ -30,11 +30,11 @@ void* omEmulateRealloc0(void* o_addr, size_t n_size)
 {
 #ifdef OM_MALLOC_SIZEOF_ADDR
   size_t o_size = OM_MALLOC_SIZEOF_ADDR(o_addr);
-#endif  
+#endif
   void* addr = OM_MALLOC_REALLOC(o_addr, n_size);
-#ifdef OM_MALLOC_SIZEOF_ADDR  
+#ifdef OM_MALLOC_SIZEOF_ADDR
   if (n_size > o_size)
-    memset(addr + o_size, 0, n_size - o_size);
+    memset((char *)addr + o_size, 0, n_size - o_size);
 #endif
   return addr;
 }

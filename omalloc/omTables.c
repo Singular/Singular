@@ -3,7 +3,7 @@
  *  Purpose: program which generates omTables.inc
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omTables.c,v 1.6 2000-10-27 15:28:52 obachman Exp $
+ *  Version: $Id: omTables.c,v 1.7 2001-04-30 09:02:11 Singular Exp $
  *******************************************************************/
 
 #ifndef MH_TABLE_C
@@ -34,11 +34,11 @@
 /* Specify sizes of static bins */
 #ifdef OM_ALIGN_8
 
-size_t om_BinSize [SIZEOF_OM_BIN_PAGE / MIN_BIN_BLOCKS] = 
+size_t om_BinSize [SIZEOF_OM_BIN_PAGE / MIN_BIN_BLOCKS] =
 {   8,  16,  24,  32,
     40,  48,  56,  64, 72,
     80,  96, 112, 128, 144,
-    160, 192, 224, 
+    160, 192, 224,
     ((SIZEOF_OM_BIN_PAGE / (MIN_BIN_BLOCKS + INCR_FACTOR*9)) / 8)*8,
     ((SIZEOF_OM_BIN_PAGE / (MIN_BIN_BLOCKS + INCR_FACTOR*6)) / 8)*8,
     ((SIZEOF_OM_BIN_PAGE / (MIN_BIN_BLOCKS + INCR_FACTOR*4)) / 8)*8,
@@ -48,12 +48,12 @@ size_t om_BinSize [SIZEOF_OM_BIN_PAGE / MIN_BIN_BLOCKS] =
 
 #else /* ! OM_ALIGN_8 */
 
-size_t om_BinSize [SIZEOF_OM_BIN_PAGE / MIN_BIN_BLOCKS] = 
+size_t om_BinSize [SIZEOF_OM_BIN_PAGE / MIN_BIN_BLOCKS] =
 {   8,  12,  16,  20,
     24,  28,  32,
     40,  48,  56,  64,
     80,  96, 112, 128,
-    160, 192, 224, 
+    160, 192, 224,
     ((SIZEOF_OM_BIN_PAGE / (MIN_BIN_BLOCKS + INCR_FACTOR*9)) / SIZEOF_STRICT_ALIGNMENT)*SIZEOF_STRICT_ALIGNMENT,
     ((SIZEOF_OM_BIN_PAGE / (MIN_BIN_BLOCKS + INCR_FACTOR*6)) / SIZEOF_STRICT_ALIGNMENT)*SIZEOF_STRICT_ALIGNMENT,
     ((SIZEOF_OM_BIN_PAGE / (MIN_BIN_BLOCKS + INCR_FACTOR*4)) / SIZEOF_STRICT_ALIGNMENT)*SIZEOF_STRICT_ALIGNMENT,
@@ -112,12 +112,12 @@ void OutputStaticBin(size_t *binSize, int max_bin_index, int track)
 
   for (i=0;  i< max_bin_index; i++)
   {
-    printf("{om_ZeroPage, NULL, NULL, %ld, %ld, 0},\n", 
-           binSize[i] / SIZEOF_LONG, 
+    printf("{om_ZeroPage, NULL, NULL, %ld, %ld, 0},\n",
+           binSize[i] / SIZEOF_LONG,
            SIZEOF_OM_BIN_PAGE/binSize[i]);
   }
-  printf("{om_ZeroPage, NULL, NULL, %ld, %ld, 0}\n};\n\n", 
-         binSize[i] / SIZEOF_LONG, 
+  printf("{om_ZeroPage, NULL, NULL, %ld, %ld, 0}\n};\n\n",
+         binSize[i] / SIZEOF_LONG,
          SIZEOF_OM_BIN_PAGE/binSize[i]);
 }
 
@@ -137,11 +137,11 @@ int GetMaxBlockThreshold()
 void CreateDenseBins()
 {
   size_t size, align_size = SIZEOF_OM_ALIGNMENT;
-  int i = 1; 
+  int i = 1;
 #ifdef OM_ALIGNMENT_NEEDS_WORK
   int n = GetMaxBlockThreshold();
 #endif
-  
+
   size = align_size;
   om_BinSize[0] = align_size;
   i = 1;
@@ -154,9 +154,9 @@ void CreateDenseBins()
       align_size = SIZEOF_STRICT_ALIGNMENT;
       size= OM_STRICT_ALIGN_SIZE(size);
     }
-#endif    
+#endif
     om_BinSize[i] = size;
-    if ((SIZEOF_OM_BIN_PAGE / (size + align_size)) < (SIZEOF_OM_BIN_PAGE /size)) 
+    if ((SIZEOF_OM_BIN_PAGE / (size + align_size)) < (SIZEOF_OM_BIN_PAGE /size))
     {
       i++;
     }
@@ -169,7 +169,7 @@ int main(int argc, char* argv[])
   /* determine max_bin_index */
 #ifdef OM_HAVE_DENSE_BIN_DISTRIBUTION
   CreateDenseBins();
-#endif  
+#endif
   for(;;)
   {
     max_bin_index++;
@@ -178,22 +178,22 @@ int main(int argc, char* argv[])
   if (argc > 1)
   {
     /* output what goes into omTables.h */
-  printf("
-#ifndef OM_TABLES_H
-#define OM_TABLES_H
-#define OM_MAX_BLOCK_SIZE %d
-#define OM_MAX_BIN_INDEX %d
-#define OM_SIZEOF_UNIQUE_MAX_BLOCK_THRESHOLD %d
-#endif /* OM_TABLES_H */
-",  OM_MAX_BLOCK_SIZE, max_bin_index, GetMaxBlockThreshold());
+  printf(
+"#ifndef OM_TABLES_H\n"
+"#define OM_TABLES_H\n"
+"#define OM_MAX_BLOCK_SIZE %d\n"
+"#define OM_MAX_BIN_INDEX %d\n"
+"#define OM_SIZEOF_UNIQUE_MAX_BLOCK_THRESHOLD %d\n"
+"#endif /* OM_TABLES_H */\n"
+,  OM_MAX_BLOCK_SIZE, max_bin_index, GetMaxBlockThreshold());
   return 0;
   }
-  
-  printf("
-#ifndef OM_TABLES_INC
-#define OM_TABLES_INC
-");
-  
+
+  printf(
+"#ifndef OM_TABLES_INC\n"
+"#define OM_TABLES_INC\n"
+);
+
   /* Output om_StaticBin */
   OutputStaticBin(om_BinSize, max_bin_index, 0);
   /* Output om_Size2Bin */
@@ -202,7 +202,7 @@ int main(int argc, char* argv[])
 #ifdef OM_ALIGNMENT_NEEDS_WORK
   OutputSize2AlignedBin(om_BinSize, OM_MAX_BLOCK_SIZE, 0);
 #endif
-  
+
   printf("\n#ifdef OM_HAVE_TRACK\n");
   /* Output om_StaticBin */
   OutputStaticBin(om_BinSize, max_bin_index, 1);
@@ -217,6 +217,4 @@ int main(int argc, char* argv[])
   printf("\n#endif /* OM_TABLES_INC */\n");
   return 0;
 }
-
 #endif /* MH_TABLES_C */
-
