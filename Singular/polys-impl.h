@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.9 1998-01-14 14:55:44 obachman Exp $ */
+/* $Id: polys-impl.h,v 1.10 1998-01-14 19:21:10 obachman Exp $ */
 
 /***************************************************************
  *
@@ -71,7 +71,7 @@ struct  spolyrec
  ***************************************************************/
 #define COMP_FAST
 // #define COMP_DEBUG
-// #define COMP_NO_EXP_VECTOR_OPS
+#define COMP_NO_EXP_VECTOR_OPS
 #define COMP_TRADITIONAL
 
 #if defined(COMP_NO_EXP_VECTOR_OPS) && ! defined(COMP_FAST)
@@ -458,6 +458,7 @@ inline void _pMonAddFast(poly p1, poly p2)
   int i = pVariables1W;
   unsigned long* s1 = (unsigned long*) &(p1->exp[0]);
   const unsigned long* s2 = (unsigned long*) &(p2->exp[0]);
+  // set comp of p2 temporarily to 0, so that nothing is added to comp of p1
   _pSetComp(p2, 0);
 #else
   int i = pVariables;
@@ -473,10 +474,9 @@ inline void _pMonAddFast(poly p1, poly p2)
     s1++;
     s2++;
   }
-#ifndef COMP_NO_EXP_VECTOR_OPS    
+#ifndef COMP_NO_EXP_VECTOR_OPS
+  // reset comp of p2
   _pSetComp(p2, c2);
-#else
-  _pSetComp(p1, _pGetComp(p2));
 #endif  
   _pGetOrder(p1) += _pGetOrder(p2);
 }
@@ -505,9 +505,9 @@ inline void __pCopyAddFast(poly p1, poly p2, poly p3)
   const Exponent_t* const ub = s3 + pVariables;
 // need to zero the "fill in" slots (i.e., empty exponents)  
 #ifdef  WORDS_BIG_ENDIAN
-  *((unsigned long*) s1 + pMonomSize -1) = 0;
+  *((unsigned long*) p1 + pMonomSize -1) = 0;
 #else
-  *((unsigned long *) s1->exp) = 0;
+  *((unsigned long *) p1->exp) = 0;
 #endif  
 #endif  
   
@@ -519,6 +519,8 @@ inline void __pCopyAddFast(poly p1, poly p2, poly p3)
     s1++;
     s2++;
   }
+  // we first are supposed to do a copy from p2 to p1 -- therefore,
+  // component of p1 is set to comp of p2
   _pSetComp(p1, _pGetComp(p2));
   _pGetOrder(p1) = _pGetOrder(p2) + _pGetOrder(p3);
 }
@@ -547,9 +549,9 @@ inline void __pCopyAddFast1(poly p1, poly p2, poly p3)
   const Exponent_t* s3 = (Exponent_t*) &(p3->exp[pVarLowIndex]);
   const Exponent_t* const ub = s3 + pVariables;
 #ifdef  WORDS_BIG_ENDIAN
-  *((unsigned long*) s1 + pMonomSize -1) = 0;
+  *((unsigned long*) p1 + pMonomSize -1) = 0;
 #else
-  *((unsigned long *) s1->exp) = 0;
+  *((unsigned long *) p1->exp) = 0;
 #endif  
 #endif  
 
