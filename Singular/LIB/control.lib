@@ -1,4 +1,4 @@
-version="$Id: control.lib,v 1.21 2005-02-18 17:38:45 levandov Exp $";
+version="$Id: control.lib,v 1.22 2005-02-25 10:45:27 levandov Exp $";
 category="Applications";
 info="
 LIBRARY:  control.lib Procedures for System and Control Theory 
@@ -12,46 +12,39 @@ and V. Levandovskyy), Uni Kaiserslautern
 NOTE: This library provides algebraic analysis tools for System and Control Theory
 
 PROCEDURES:
-control(module R);            analysis of controllability-related properties of R,
-autonom(module R);            analysis of autonomy-related properties of R (using Ext modules),
-autonom2(module R);           analysis of autonomy-related properties of R (using dimension),
-
-LeftKernel(module R);         a left kernel of R,
-RightKernel(module R);        a right kernel of R,
-LeftInverse(module R)         a left inverse of matrix (module),
-
-smith(module M);              a Smith form of a module M,
-
-genericity(module M);         analysis of the genericity of parameters,
-
-canonize(list L);             Groebnerification for modules in the output of control/autonomy procs. 
+control  (R);           analysis of controllability-related properties of R,
+autonom  (R);           analysis of autonomy-related properties of R (using Ext modules),
+autonom2 (R);           analysis of autonomy-related properties of R (using dimension),
+LeftKernel  (R);        a left kernel of R,
+RightKernel (R);        a right kernel of R,
+LeftInverse (R)         a left inverse of R,
+smith (M);              a Smith form of a module M,
+genericity (M);         analysis of the genericity of parameters,
+canonize (L);           Groebnerification for modules in the output of control/autonomy procs. 
 
 AUXILIARY PROCEDURES:
-declare(string NameOfRing, Variables[,string  Parameters, Ordering]);     defines the ring, optional parametes are strings of parameters and ordering,
-view();                      Well-formatted output of lists, modules and matrices
+declare(NameOfRing,Variables [,Parameters, Ordering]);    define the ring easily
+view();                      well-formatted output of lists, modules and matrices
 
 NOTE (EXAMPLES): In order to use examples below, execute the commands
 @* def A = exAntenna(); setring A; 
-@* Thus A will become a basering from the example with the predefined module R (transposed), corresponding to the system. 
-After that you can just type in 
+@* Thus A will become a basering from the example with the predefined module R (transposed), corresponding to the system. After that you can just type in 
 @* control(R); //respectively autonom(R); 
 and check the result.
 
 
 EXAMPLES (AUTONOMY):
-
 exCauchy();                  example of 1-dimensional Cauchy equation,
 exCauchy2();                 example of 2-dimensional Cauchy equation,
 exZerz();                    example from the lecture of Eva Zerz,
 
 EXAMPLES (CONTROLLABILITY):
-
 ex1();                       example of noncontrollable system,   
 ex2();                       example of controllable system ,
 exAntenna();                 Antenna,
 exEinstein();                Einstein equations,
 exFlexibleRod();             Flexible Rod,
-exTwoPendula();              Two Pendula,
+exTwoPendula();              Two Pendula mounted on a cart,
 exWindTunnel();              Wind Tunnel. 
 ";
 
@@ -87,11 +80,11 @@ PURPOSE: save previous options and set customized options
 }
 proc declare(string NameOfRing, string Variables, list #)
 "USAGE: declare(NameOfRing, Variables,[Parameters, Ordering]);
-          NameOfRing:  string with name of ring,
-	  Variables:   string with names of variables separated by commas(e.g. "x,y,z"),
-	  [Parameters, Ordering]: optional, strings:
-	    Parameters: string of parameters in the ring separated by commas(e.g. "a,b,c"),
-	    Ordering:   string with name of ordering(by default the ordering "dp,C" is used)
+@*          NameOfRing:  string with name of ring,
+@*	    Variables:   string with names of variables separated by commas(e.g. \"x,y,z\"),
+@*	    Parameters: string of parameters in the ring separated by commas(e.g. \"a,b,c\"),
+@*	    Ordering:   string with name of ordering (by default, the ordering \"dp,C\" is used)
+PURPOSE: define the ring easily
 RETURN:  no return value
 EXAMPLE:  example declare; shows an example 
 "
@@ -182,6 +175,7 @@ NOTE:  in case of other types( not 'module', 'matrix', 'list') works just as sta
 EXAMPLE:  example view; shows an example
 "
 {
+  // to be replaced with something more feasible
   if ( (typeof(M)=="module")||(typeof(M)=="matrix") )
   {
   int @R=nrows(M);
@@ -253,9 +247,10 @@ example
 //--------------------------------------------------------------------------
 proc RightKernel(matrix M)
 "USAGE:  RightKernel(M);   M a matrix
-RETURN:  right kernel of matrix M, i.e., the module of all elements v such that Mv=0
+PURPOSE: computes the right kernel of matrix M (a module of all elements v such that Mv=0)
+RETURN:  module
 NOTE:    in the noncommutative case RightKernel is a right module
-EXAMPLE:  example RightKernel; shows an example
+EXAMPLE: example RightKernel; shows an example
 "
 { 
   return(modulo(M,std(0)));
@@ -273,7 +268,8 @@ example
 //-------------------------------------------------------------------------
 proc LeftKernel(matrix M)
 "USAGE:  LeftKernel(M);   M a matrix
-RETURN:  left kernel of matrix M, i.e. the module of all elements v such that vM=0
+PURPOSE: computes left kernel of matrix M (a module of all elements v such that vM=0)
+RETURN:  module
 EXAMPLE:  example LeftKernel; shows an example
 "
 {
@@ -292,7 +288,8 @@ example
 //------------------------------------------------------------------------
 proc LeftInverse(module M)
 "USAGE:  LeftInverse(M);  M a module
-RETURN:  matrix L such that LM == Id;
+PURPOSE: computes such a matrix L, that LM == Id;
+RETURN:  module
 EXAMPLE: example LeftInverse; shows an example
 NOTE: exists only in the case when Id \subseteq M!
 "
@@ -349,9 +346,33 @@ example
 };
 //-----------------------------------------------------------------------
 proc RightInverse(module R)
+"USAGE:  RightInverse(M);  M a module
+PURPOSE: computes such a matrix L, that ML == Id;
+RETURN:  module
+EXAMPLE: example RightInverse; shows an example
+NOTE: exists only in the case when Id \subseteq M!
+"
 {
   return(transpose(LeftInverse(transpose(R))));
 }
+example
+{ // trivial example:
+"EXAMPLE:";echo =2;
+  ring r = 0,(x,z),dp;
+  matrix M[1][2] = 1,x2+z;
+  print(M);
+  print( RightInverse(M) );  
+  kill r;
+  // derived from the exTwoPendula
+  ring r=(0,m1,m2,M,g,L1,L2),Dt,dp;
+  matrix U[1][3];
+  U[1,1]=(-L2)*Dt^4+(g)*Dt^2;
+  U[1,2]=(-L1)*Dt^4+(g)*Dt^2;
+  U[1,3]=(L1*L2)*Dt^4+(-g*L1-g*L2)*Dt^2+(g^2);
+  module M = module(U);
+  module L = RightInverse(M);
+  print(L);
+};
 //-----------------------------------------------------------------------
 static proc dim_Our(module R)
 {
@@ -419,7 +440,7 @@ static proc control_output(int i, int NVars, module R, module Ext_1, list Gen)
 //static proc control_output(int i, int NVars, module R, module Ext_1) 
 "USAGE:  control_output(i, NVars, R, Ext_1), where
            i:  integer, number of first nonzero Ext or 
-	       just number of variables in a base ring + 1 in case that all the Exts are zero,
+             just a number of variables in a base ring + 1 in case that all the Exts are zero,
 	   NVars:  integer, number of variables in a base ring,
 	   R:  module R (cokernel representation),
 	   Ext_1:  module, the first Ext(its cokernel representation)      
@@ -502,8 +523,9 @@ NOTE:  this procedure is used in 'control' procedure
 //-------------------------------------------------------------------------
 
 proc control(module R)
-"USAGE:  control(R); R a module (R is the matrix of the system of equations which is to be investigated)
-RETURN:  list of all the properties concerning controllability of the system (behavior) represented by the  matrix R
+"USAGE:  control(R);  R a module (R is the matrix of the system of equations to be investigated)
+PURPOSE: compute the list of all the properties concerning controllability of the system (behavior), represented by the matrix R
+RETURN:  list
 EXAMPLE:  example control; shows an example
 "
 {
@@ -545,8 +567,9 @@ example
 };
 //------------------------------------------------------------------------------------------
 proc control2(module R)
-"USAGE:  control2(R); R a module (R is the matrix of the system of equations which is to be investigated)
-RETURN:  list of all the properties concerning controllability of the system (behavior) represented by the  matrix R
+"USAGE:  control2(R); R a module (R is the matrix of the system of equations to be investigated)
+PURPOSE: computes list of all the properties concerning controllability of the system (behavior), represented by the  matrix R
+RETURN: list
 EXAMPLE:  example control; shows an example
 NOTE: same as control(R); but using dimensions
 "
@@ -656,8 +679,9 @@ NOTE:  this procedure is used in 'autonom' procedure
 //--------------------------------------------------------------------------
 proc autonom2(module R)
 "USAGE:  autonom2(R);   R a module (R is a matrix of the system of equations which is to be investigated)
-RETURN:  list of all the properties concerning autonomy of the system (behavior) represented by the matrix R
-NOTE:  this procedure is an analogue to 'autonom' using dimension calculations
+PURPOSE: computes the list of all the properties concerning autonomy of the system (behavior), represented by the matrix R
+RETURN: list
+NOTE:  this procedure is analogous to 'autonom' but uses dimension calculations
 EXAMPLE:  example autonom2; shows an example
 "
 { 
@@ -871,12 +895,19 @@ proc exWindTunnel()
 
 proc genericity(matrix M)
 "USAGE:  genericity(M), M is a module/matrix
-RETURN:  list of strings with expressions, which have been assumed to be non-zero in the process of computing the Groebner basis
+PURPOSE: determine parametric expressions which have been assumed to be non-zero in the process of computing the Groebner basis
+RETURN:  list (of strings)
 NOTE: we strongly recommend to switch on the redSB and redTail options; 
-the procedure is effective with the lift procedure for modules with parameters
+@*    the procedure is effective with the lift procedure for modules with parameters
 EXAMPLE:  example genericity; shows an example
 "
 {
+  // returns nothing, if there are no parameters!
+  if (npars(basering)==0)
+  {
+    return("");
+  }
+  int plevel = printlevel-voice+2;
   // M is a matrix over a ring with params and vars;
   ideal I = ideal(M); // a list of entries
   I = simplify(I,2); // delete 0's
@@ -889,6 +920,8 @@ EXAMPLE:  example genericity; shows an example
   int  cl=1;
   intvec ZeroVec; ZeroVec[nvars(basering)] = 0;
   intvec W;
+  ideal Numero, Denomiro;
+  int cNu=0; int cDe=0;
   for (i=1; i<=s; i++)
   {
     // remove contents and add them as polys
@@ -897,10 +930,15 @@ EXAMPLE:  example genericity; shows an example
     if (W == ZeroVec) // i.e. just a coef
     {
       num    = denominator(leadcoef(p)); // from poly.lib
-      p      = p*num;
-      NM[cl] = p;
+      NM[cl] = numerator(leadcoef(p));
+      dbprint(p,"numerator:");
+      dbprint(p, string(NM[cl]));
+      cNu++; Numero[cNu]= NM[cl];
       cl++;
-      NM[cl] = num;
+      NM[cl] = num; // denominator
+      dbprint(p,"denominator:");
+      dbprint(p, string(NM[cl]));
+      cDe++; Denomiro[cDe]= NM[cl];
       cl++;
       p = p - lead(p); // for the next cycle
     }      
@@ -909,13 +947,22 @@ EXAMPLE:  example genericity; shows an example
       num = content(p);
       p   = p/num;
       NM[cl] = denominator(num);
+      dbprint(p,"content denominator:");
+      dbprint(p, string(NM[cl]));
+      cNu++; Numero[cNu]= NM[cl];
       cl++;
       NM[cl] = numerator(num);
+      dbprint(p,"content numerator:");
+      dbprint(p, string(NM[cl]));
+      cDe++; Denomiro[cDe]= NM[cl];
       cl++;
     }
+    // it seems that the next elements will not have real influence
     while( p != 0)
     {
-      NM[cl] = leadcoef(p); // should be all integer
+      NM[cl] = leadcoef(p); // should be all integer, i.e. non-rational
+      dbprint(p,"coef:");
+      dbprint(p, string(NM[cl]));
       cl++;
       p = p - lead(p);
     }
@@ -943,7 +990,7 @@ EXAMPLE:  example genericity; shows an example
       F  = factorize(NM[i],1); //non-constant factors only
       cf = 1;
       // factorize every polynomial
-      // throw away every non-monomial
+      // throw away every monomial from factorization (also constants from above ring)
       for (j=1; j<=size(F);j++)
       {
 	q = F[j]-lead(F[j]);
@@ -956,7 +1003,7 @@ EXAMPLE:  example genericity; shows an example
     }
   }
   // return the result [in string-format]
-  @L = simplify(@L,2+4); // skip zeroes and double entries
+  @L = simplify(@L,2+4+8); // skip zeroes, doubled and entries, diff. by a constant
   list SL;
   for (j=1; j<=size(@L);j++)
   {
@@ -988,9 +1035,9 @@ example
 
 proc canonize(list L)
 "USAGE:  canonize(L), L a list
+PURPOSE: modules in the list are canonized by computing their reduced minimal (= unique in the given ordering) Groebner bases
+RETURN:  list 
 ASSUME:  L is the output of control/autonomy procedures
-RETURN:  a canonized list, where modules are canonized by computing
-their reduced minimal (= unique in the given ordering) Groebner bases
 EXAMPLE:  example canonize; shows an example
 "
 {
@@ -1082,7 +1129,7 @@ static proc smdeg(matrix N)
     }
   }
 }
-
+//---------------------------------------------------------------
 static proc NoNon0Pol(vector v)
 // returns 1, if there is only one non-zero element in v and 0 else
 {
@@ -1101,15 +1148,15 @@ static proc NoNon0Pol(vector v)
   }
   return(i);
 }
-
-
+//---------------------------------------------------------------
 proc smith( module M )
 "USAGE: smith(M), M a module or a matrix,
+PURPOSE: computes the Smith form of a matrix
 RETURN: a list of length 4 with the following entries:
-[1]: The Smith-Form S of M, 
-[2]: the rank of M, 
-[3]: a unimodular matrix U,
-[4]: a unimodular matrix V, 
+@*      [1]: The Smith-Form S of M, 
+@*      [2]: the rank of M, 
+@*      [3]: a unimodular matrix U,
+@*      [4]: a unimodular matrix V, 
 such that U*M*V=S. An empty list is returned when no Smith Form exists. 
 NOTE: The Smith form only exists over PIDs (principal ideal domains).
 "
@@ -1254,4 +1301,52 @@ example
   print(B2);
   B2=normalize(std(B2));
   print(B2);
+}
+//---------------------------------------------------------------
+proc list_tex(list L, string name, link l)
+"USAGE: control_tex(l), where l is a list
+PURPOSE:        writes the content of list L in a tex-file 'name'
+RETURN: nothing
+"
+{
+  if(size(L)==0)
+    {
+    }
+  else
+    {
+      string t;
+      for (int i=1;i<=size(L);i++)
+	{
+	  while(1)
+	    {
+	      if(typeof(L[i])=="string")
+		{
+		  t=L[i];
+		  write(l,t,"\\par");
+		  break;
+		}
+	      if(typeof(L[i])=="module")
+		{
+		  texobj(s,matrix(L[i]));
+		  break;
+		}
+	      texobj(s,L[i]);
+	      write(l,"\\par");
+	      break;
+	    }
+	}
+    }
+}
+//---------------------------------------------------------------
+proc verbatim_tex(string s, link l)
+"USAGE: verbatim_tex(s,l), where s is a string and l a link
+PURPOSE: writes the content of s in verbatim-environment in the file
+	 specified by link
+RETURN: nothing
+"
+{
+  write(l,"\\begin{verbatim}");
+  write(l,s);
+  write(l,"\\end{verbatim}");
+  write(l,"\\par");
 }
