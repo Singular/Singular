@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: pdata.doc,v 1.4 1998-05-19 16:00:11 wichmann Exp $
+@comment $Id: pdata.doc,v 1.5 1998-05-19 16:10:38 Singular Exp $
 @comment this file contains the "Polynomial data" appendix.
 
 @c The following directives are necessary for proper compilation
@@ -254,12 +254,12 @@ $x_i$), local orderings satisfy $1 > x_i$ for each variable.   If some variables
 call it a mixed ordering.   Local or mixed orderings are not wellorderings.
 
 If $K$ is the groundfield, $x = (x_1, \ldots, x_n)$ the
-variables and $<$ a monomial ordering, then {\bf Loc K}$[x]$ denotes the
+variables and $<$ a monomial ordering, then Loc K$[x]$ denotes the
 localization of $K[x]$ with respect to the multiplicatively closed set $\{1 +
 g \mid g = 0$ or $g \in K[x]\backslash \{0\}$ and $L(g) < 1\}$.   $L(g)$
 denotes the leading monomial of $g$, i.e.\ the biggest monomial of $g$ with
 respect to $<$.   The result of any computation which uses standard basis
-computations has to be interpreted in {\bf Loc K}$[x]$.
+computations has to be interpreted in Loc K$[x]$.
 @end tex
 @ifinfo
 Global orderings are wellorderings (i.e.1 < x_i for each variable
@@ -401,7 +401,7 @@ Ws,  we have
 Loc K[x] = K[x]_(x),
 @end ifinfo
 @tex
-$Loc\, K[x] = K[x]_{(x)}$,
+Loc K[$x$] = K[$x$]$_{(x)}$,
 @end tex
  the localization of K[x] at the
 maximal ideal
@@ -545,7 +545,7 @@ vector of
 Loc K[x]^r
 @end ifinfo
 @tex
-\ $Loc K[x]^r$\
+\ Loc K[x]$^r$\
 @end tex
 or (which is the default in @sc{Singular}) to give priority
 to the coefficients.
