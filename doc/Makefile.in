@@ -48,6 +48,15 @@ info: singular.hlp
 singular.hlp: ${SINGULAR_OBJS} ${TEX_FILES} Makefile
 	- ${MAKEINFO} --no-split singular.tex
 
+html: ${SINGULAR_OBJS} ${TEX_FILES} Makefile
+	if [ ! -d html ]; then
+		mkdir html
+	fi
+	(cd html; \
+	../texi2html -I .. -menu -expandinfo -number -split_chapter -verbose ../singular.tex;\
+	)
+	touch html-done
+
 dvi: singular.dvi tutor.dvi usercard.dvi
 
 ps: dvi
