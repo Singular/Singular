@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_ezgcd.cc,v 1.6 1997-06-20 10:45:16 schmidt Exp $ */
+/* $Id: fac_ezgcd.cc,v 1.7 1997-06-30 15:26:31 schmidt Exp $ */
 
 #include <config.h>
 
@@ -7,7 +7,11 @@
 #include "debug.h"
 
 #include "cf_defs.h"
+#ifdef macintosh
+#include <::templates:ftmpl_functions.h>
+#else
 #include "templates/ftmpl_functions.h"
+#endif
 #include "canonicalform.h"
 #include "fac_util.h"
 #include "cf_reval.h"
