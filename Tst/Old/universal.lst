@@ -45,7 +45,7 @@ prim
 qrin
 rang
 ; BUG re
-; BUG regul 
+; BUG regul
 ringdef
 row
 rvari
@@ -164,7 +164,7 @@ redtail
 string
 namof
 koszul
-; BUG res 
+; BUG res
 ; CORE sres
 syzygies
 varlist
@@ -253,7 +253,7 @@ m81si
 m82si
 m83si
 m84si
-m85si 
+m85si
 m86si
 m88si
 m89si
