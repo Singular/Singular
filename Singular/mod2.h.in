@@ -188,6 +188,7 @@ extern int pShortOut;
  * -- only significant for for compiling without -DNDEBUG
  * -- you better know what your are doing, if you touch this
  ******************************************************************/
+#define buildin_rand 1
 #ifndef NDEBUG 
 
 /* define MDEBUG 0 for checking Alloc/Free */
