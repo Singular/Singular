@@ -1,7 +1,7 @@
 #####################################################################
 ### 
 ### Makefile for Singular documentation 
-### $Id: Makefile.in,v 1.55 1999-12-14 15:58:50 obachman Exp $
+### $Id: Makefile.in,v 1.56 1999-12-14 17:03:59 obachman Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -254,6 +254,7 @@ uninstall:
 	rm -f ${infodir}/singular.hlp
 	- rmdir ${infodir}
 
+#stupid HP's don't allow copy with many arguments
 install-sharedist: singular.hlp html/index.htm singular.idx \
                    ${STANDALONE_HTML_FILES} ${STANDALONE_TXT_FILES}
 	${MKINSTALLDIRS} ${install_prefix}
@@ -266,6 +267,8 @@ install-sharedist: singular.hlp html/index.htm singular.idx \
 	chmod -R +rX ${install_htmldir}
 	${MKINSTALLDIRS} ${install_exdir}
 	cp -R examples ${install_prefix}
+	/bin/rm -f ${install_prefix}/examples/*.res
+	/bin/rm -f ${install_prefix}/examples/*.inc
 	chmod -R +rX ${install_prefix}/
 	${MKINSTALLDIRS} ${install_docdir}
 	${INSTALL_DATA} singular.idx ${install_docdir}
@@ -319,7 +322,7 @@ mostlyclean:
 
 distclean: clean
 	/bin/rm -f Makefile
-	/bin/rm -f ${HTML_SUBDIR} 
+	/bin/rm -rf ${HTML_SUBDIR} 
 
 maintainer-clean: distclean
 
