@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-static char * rcsid = "$Id: csutil.cc,v 1.5 2001-06-21 14:57:04 Singular Exp $";
+static char * rcsid = "$Id: csutil.cc,v 1.6 2002-01-21 09:11:07 Singular Exp $";
 /////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -316,16 +316,20 @@ nopower( const CanonicalForm & init ){
 // remove the content of polys in PS; add the removed content to
 // Remembern.FS2 ( the set of removed factors )
 CFList
-removecontent ( const CFList & PS, PremForm & Remembern ){
+removecontent ( const CFList & PS, PremForm & Remembern )
+{
+  CFListIterator i=PS;
+  if ((!i.hasItem()) || ( cls(PS.getFirst()) == 0 )) return PS;
+
   CFList output;
   CanonicalForm cc,elem;
 
-  if ( cls(PS.getFirst()) == 0 ) return PS;
-
-  for (CFListIterator i=PS; i.hasItem(); i++){
+  for (; i.hasItem(); i++)
+  {
     elem = i.getItem();
     cc = content(elem, elem.mvar());
-    if ( cls(cc) > 0 ) {
+    if ( cls(cc) > 0 )
+    {
       output.append(elem/cc);
       Remembern.FS2 = Union(CFList(cc), Remembern.FS2);
     }
@@ -648,6 +652,9 @@ Minus( const ListCFList & a, const ListCFList & b){
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.5  2001/06/21 14:57:04  Singular
+*hannes/GP: Factorize, newfactoras, ...
+
 Revision 1.4  1998/03/12 12:34:35  schmidt
         * charset/csutil.cc, charset/alg_factor.cc: all references to
           `common_den()' replaced by `bCommonDen()'
