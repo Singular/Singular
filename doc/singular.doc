@@ -1,5 +1,6 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.9 1998-04-28 12:19:42 schmidt Exp $
+@c * wichmann: + Changed "Precedence" to "precedence".
+@comment $Id: singular.doc,v 1.10 1998-04-30 09:35:14 Singular Exp $
 @comment this file contains the main structure of the manual
 @c ------------------------
 @comment %**start of header
@@ -110,7 +111,7 @@ q:quit, m:menu item, n:next node, p:previous node, u:up, g:goto node
 @menu
 * Limitations::
 * Integer division::
-* Monomials and Precedence::
+* Monomials and precedence::
 * Behaviour of continue::
 * Evaluation of logical expressions::
 @end menu
@@ -146,7 +147,7 @@ displays only the first 20 characters
 @end table
 
 @c -------------------------------------------------------------------------
-@node Integer division,Monomials and Precedence,Limitations,Tricks and pitfalls
+@node Integer division,Monomials and precedence,Limitations,Tricks and pitfalls
 @section Integer division
 @cindex Integer division
 @cindex mod
@@ -170,9 +171,9 @@ To avoid confusion use the operand @code{div}.
 @c example
 @end example
 @c -------------------------------------------------------------------------
-@node Monomials and Precedence,Behaviour of continue,Integer division,Tricks and pitfalls
-@section Monomials and Precedence
-@cindex Monomials and Precedence
+@node Monomials and precedence,Behaviour of continue,Integer division,Tricks and pitfalls
+@section Monomials and precedence
+@cindex Monomials and precedence
 
 The computation of a monomial has precedence over all operators:
 @example
@@ -183,7 +184,7 @@ The computation of a monomial has precedence over all operators:
 @c example
 @end example
 @c -------------------------------------------------------------------------
-@node Behaviour of continue,Evaluation of logical expressions,Monomials and Precedence,Tricks and pitfalls
+@node Behaviour of continue,Evaluation of logical expressions,Monomials and precedence,Tricks and pitfalls
 @section Behaviour of continue
 @cindex continue
 
