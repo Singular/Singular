@@ -1,4 +1,11 @@
-Thu May  7 19:49:34 MET DST 1998 hannes
+1998-05-08  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
+
+	* extra.cc (jjSYSTEM): put all undocumented system calls into
+	#ifdef HAVE_EXTENDED_SYSTEM which is _not_ defined by default
+
+	* exteded system("random") to always return the seed of the random 
+	generator
+vThu May  7 19:49:34 MET DST 1998 hannes
         * added syntax rule "proc <name> <arglist> <string> <body>"
 	* speedup for feReadLine
 Thu Apr 30 19:16:45 MET DST 1998 hannes
