@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_generator.cc,v 1.2 1997-06-19 12:27:05 schmidt Exp $ */
+/* $Id: cf_generator.cc,v 1.3 2004-12-10 10:14:45 Singular Exp $ */
 
 #include <config.h>
 
@@ -83,23 +83,49 @@ AlgExtGenerator::AlgExtGenerator( const Variable & a )
     ASSERT( getCharacteristic() > 0, "not a finite field" );
     algext = a;
     n = degree( getMipo( a ) );
-    gens = new CFGenerator * [n];
+    if ( getGFDegree() > 1 )
+    {
+      gensg = new GFGenerator * [n];
+      for ( int i = 0; i < n; i++ )
+        gensg[i] = new GFGenerator();
+    }
+    else
+    {
+      gensf = new FFGenerator * [n];
+      for ( int i = 0; i < n; i++ )
+        gensf[i] = new FFGenerator();
+    }
     nomoreitems = false;
-    for ( int i = 0; i < n; i++ )
-	gens[i] = CFGenFactory::generate();
 }
 
 AlgExtGenerator::~AlgExtGenerator()
 {
-    for ( int i = 0; i < n; i++ )
-	delete gens[i];
-    delete [] gens;
+    if ( getGFDegree() > 1 )
+    {
+      for ( int i = 0; i < n; i++ )
+        delete gensg[i];
+      delete [] gensg;
+    }
+    else
+    {
+      for ( int i = 0; i < n; i++ )
+        delete gensf[i];
+      delete [] gensf;
+    }
 }
 
 void AlgExtGenerator::reset()
 {
-    for ( int i = 0; i < n; i++ )
-	gens[i]->reset();
+    if ( getGFDegree() > 1 )
+    {
+      for ( int i = 0; i < n; i++ )
+        gensg[i]->reset();
+    }
+    else
+    {
+      for ( int i = 0; i < n; i++ )
+        gensf[i]->reset();
+    }
     nomoreitems = false;
 }
 
@@ -107,8 +133,16 @@ CanonicalForm AlgExtGenerator::item() const
 {
     ASSERT( ! nomoreitems, "no more items" );
     CanonicalForm result = 0;
-    for ( int i = 0; i < n; i++ )
-	result += power( algext, i ) * gens[i]->item();
+    if ( getGFDegree() > 1 )
+    {
+      for ( int i = 0; i < n; i++ )
+	    result += power( algext, i ) * gensg[i]->item();
+    }
+    else
+    {
+      for ( int i = 0; i < n; i++ )
+	    result += power( algext, i ) * gensf[i]->item();
+    }
     return result;
 }
 
@@ -117,14 +151,33 @@ void AlgExtGenerator::next()
     ASSERT( ! nomoreitems, "no more items" );
     int i = 0;
     bool stop = false;
-    while ( ! stop && i < n ) {
-	gens[i]->next();
-	if ( ! gens[i]->hasItems() ) {
-	    gens[i]->reset();
-	    i++;
-	}
-	else
-	    stop = true;
+    if ( getGFDegree() > 1 )
+    {
+      while ( ! stop && i < n )
+      {
+    	gensg[i]->next();
+	    if ( ! gensg[i]->hasItems() )
+        {
+	      gensg[i]->reset();
+	      i++;
+	    }
+	    else
+	      stop = true;
+      }
+    }
+    else
+    {
+      while ( ! stop && i < n )
+      {
+    	gensf[i]->next();
+	    if ( ! gensf[i]->hasItems() )
+        {
+	      gensf[i]->reset();
+	      i++;
+	    }
+	    else
+	      stop = true;
+      }
     }
     if ( ! stop )
 	nomoreitems = true;

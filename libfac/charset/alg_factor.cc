@@ -2,7 +2,7 @@
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
 ////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: alg_factor.cc,v 1.12 2003-02-18 11:09:25 Singular Exp $";
+static char * rcsid = "$Id: alg_factor.cc,v 1.13 2004-12-10 10:15:05 Singular Exp $";
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -224,6 +224,71 @@ sqrf_norm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
     }
   }
 }
+static void
+sqrf_agnorm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
+           AlgExtGenerator & myrandom, CanonicalForm & s,  CanonicalForm & g,
+           CanonicalForm & R){
+  Variable y=PPalpha.mvar(),vf=f.mvar();
+  CanonicalForm temp, Palpha=PPalpha, t;
+  int sqfreetest=0;
+  CFFList testlist;
+  CFFListIterator i;
+
+  DEBOUTLN(cout, "sqrf_norm_sub:      f= ", f);
+  DEBOUTLN(cout, "sqrf_norm_sub: Palpha= ", Palpha);
+  myrandom.reset();   s=f.mvar()-myrandom.item()*Palpha.mvar();   g=f;
+  R= CanonicalForm(0);
+  DEBOUTLN(cout, "sqrf_norm_sub: myrandom s= ", s);
+
+  // Norm, resultante taken with respect to y
+  while ( !sqfreetest ){
+    DEBOUTLN(cout, "sqrf_norm_sub: Palpha= ", Palpha);
+    R = resultante(Palpha, g, y); R= R* bCommonDen(R);
+    DEBOUTLN(cout, "sqrf_norm_sub: R= ", R);
+    // sqfree check ; R is a polynomial in K[x]
+    if ( getCharacteristic() == 0 )
+    {
+      temp= gcd(R, R.deriv(vf));
+      DEBOUTLN(cout, "sqrf_norm_sub: temp= ", temp);
+      if (degree(temp,vf) != 0 || temp == temp.genZero() ){ sqfreetest= 0; }
+      else { sqfreetest= 1; }
+      DEBOUTLN(cout, "sqrf_norm_sub: sqfreetest= ", sqfreetest);
+    }
+    else{
+      DEBOUTMSG(cout, "Starting SqrFreeTest(R)!");
+      // Look at SqrFreeTest!
+      // (z+a^5+w)^4 with z<w<a should not give sqfreetest=1 !
+      // for now we use this workaround with Factorize...
+      // ...but it should go away soon!!!!
+      Variable X;
+      if (getAlgVar(R,X))
+      {
+        if (R.isUnivariate())
+          testlist=factorize( R, X );
+        else
+          testlist= Factorize(R, X, 0);
+      }
+      else
+        testlist= Factorize(R);
+      DEBOUTLN(cout, "testlist= ", testlist);
+      testlist.removeFirst();
+      sqfreetest=1;
+      for ( i=testlist; i.hasItem(); i++)
+        if ( i.getItem().exp() > 1 && degree(i.getItem().factor(), R.mvar()) > 0) { sqfreetest=0; break; }
+      DEBOUTLN(cout, "SqrFreeTest(R)= ", sqfreetest);
+    }
+    if ( ! sqfreetest ){
+      myrandom.next();
+      DEBOUTLN(cout, "sqrf_norm_sub generated new myrandom item: ", myrandom.item());
+      if ( getCharacteristic() == 0 ) t= CanonicalForm(mapinto(myrandom.item()));
+      else t= CanonicalForm(myrandom.item());
+      s= f.mvar()+t*Palpha.mvar(); // s defines backsubstitution
+      DEBOUTLN(cout, "sqrf_norm_sub: testing s= ", s);
+      g= f(f.mvar()-t*Palpha.mvar(), f.mvar());
+      DEBOUTLN(cout, "             gives g= ", g);
+    }
+  }
+}
 
 static void
 sqrf_norm( const CanonicalForm & f, const CanonicalForm & PPalpha,
@@ -245,7 +310,7 @@ sqrf_norm( const CanonicalForm & f, const CanonicalForm & PPalpha,
   else if ( degree(Extension) > 0 ){ // working over Extensions
     DEBOUTLN(cout, "sqrf_norm: degree of extension is ", degree(Extension));
     AlgExtGenerator myrandom(Extension);
-    sqrf_norm_sub(f,PPalpha, myrandom, s,g,R);
+    sqrf_agnorm_sub(f,PPalpha, myrandom, s,g,R);
   }
   else{
     FFGenerator myrandom;
@@ -743,6 +808,9 @@ newcfactor(const CanonicalForm & f, const CFList & as, int success ){
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.12  2003/02/18 11:09:25  Singular
+* hannes: alg_gcd(f,f'=0) get a special handling
+
 Revision 1.11  2002/10/24 17:22:21  Singular
 * hannes: factoring in alg.ext., alg_gcd, NTL stuff
 

@@ -1,6 +1,6 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: Factor.cc,v 1.16 2003-05-28 11:52:52 Singular Exp $ ";
+static char * rcsid = "$Id: Factor.cc,v 1.17 2004-12-10 10:15:06 Singular Exp $ ";
 static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) michael@math.uni-sb.de \nPlease include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -348,7 +348,27 @@ various_tests( const CanonicalForm & g, int deg, int vars_left){
 // Extension given by Extgenerator.
 ///////////////////////////////////////////////////////////////
 static int
-specialize_variable( CanonicalForm & f, int deg, SFormList & Substitutionlist, int nr_of_variable, int former_nr_of_variables, CFGenerator & Extgenerator ){
+specialize_variable( CanonicalForm & f, int deg, SFormList & Substitutionlist, int nr_of_variable,
+                     int former_nr_of_variables, CFGenerator & Extgenerator ){
+  CanonicalForm g;
+  Variable x(nr_of_variable);
+
+  DEBOUTLN(cout, "specialize_variable: called with: ", f);
+  for ( Extgenerator.reset(); Extgenerator.hasItems(); Extgenerator.next() ){
+    DEBOUTLN(cout, "  specialize_variable: trying:  ", Extgenerator.item());
+    g= f( Extgenerator.item(), x );
+    DEBOUTLN(cout, "  specialize_variable: resulting g= ", g);
+    if ( various_tests(g,deg,former_nr_of_variables - nr_of_variable ) ){
+      Substitutionlist.insert(SForm(x,Extgenerator.item())); // append (Var,value) pair
+      f= g;
+      return 1;
+    }
+  }
+  return 0;
+}
+static int
+specialize_agvariable( CanonicalForm & f, int deg, SFormList & Substitutionlist, int nr_of_variable,
+                     int former_nr_of_variables, AlgExtGenerator & Extgenerator ){
   CanonicalForm g;
   Variable x(nr_of_variable);
 
@@ -417,7 +437,7 @@ try_specializePoly(const CanonicalForm & f, const Variable & Extension, int deg,
     for ( int k=i ; k<j ; k++ ){ // try to find specialization for all
                                  // variables (# = k ) beginning with the
                                  // starting value i
-      ok= specialize_variable( ff, deg, Substitutionlist, k, j, g );
+      ok= specialize_agvariable( ff, deg, Substitutionlist, k, j, g );
       if ( ! ok ) return 0; // we failed
     }
   }
@@ -1076,6 +1096,9 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.16  2003/05/28 11:52:52  Singular
+*pfister/hannes: newfactoras, alg_gcd, divide (see bug_33)
+
 Revision 1.15  2003/02/14 15:51:15  Singular
 * hannes: bugfix
           could not factorize x2+xy+y2 in Fp(a)[x,y], a2+a+1=0
