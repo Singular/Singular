@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.88 2002-06-17 16:27:45 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.89 2002-07-02 13:27:31 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1305,7 +1305,7 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
   strat->enterS = enterSMoraNF;
   /*- set T -*/
   strat->tl = -1;
-  strat->tmax = setmax;
+  strat->tmax = setmaxT;
   strat->T = initT();
   strat->R = initR();
   strat->sevT = initsevT();
@@ -1423,7 +1423,7 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
   strat->enterS = enterSMoraNF;
   /*- set T -*/
   strat->tl = -1;
-  strat->tmax = setmax;
+  strat->tmax = setmaxT;
   strat->T = initT();
   strat->R = initR();
   strat->sevT = initsevT();
@@ -1907,7 +1907,7 @@ ideal kInterRed (ideal F, ideal Q)
   strat->initEcart   = initEcartNormal;
   strat->sl   = -1;
   strat->tl          = -1;
-  strat->tmax        = setmax;
+  strat->tmax        = setmaxT;
   strat->T           = initT();
   strat->R           = initR();
   strat->sevT        = initsevT();
