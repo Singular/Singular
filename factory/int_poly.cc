@@ -1,8 +1,11 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: int_poly.cc,v 1.0 1996-05-17 10:59:46 stobbe Exp $
+// $Id: int_poly.cc,v 1.1 1996-05-23 09:33:05 stobbe Exp $
 
 /*
 $Log: not supported by cvs2svn $
+// Revision 1.0  1996/05/17  10:59:46  stobbe
+// Initial revision
+//
 */
 
 #include <string.h>
@@ -828,7 +831,7 @@ InternalCF*
 InternalPoly::modulocoeff( InternalCF* cc, bool invert )
 {
     CanonicalForm c( is_imm(cc) ? cc : cc->copyObject() );
-    if ( ! invert ) {
+    if ( invert ) {
 	if ( deleteObject() ) delete this;
 	return c.getval();
     }
