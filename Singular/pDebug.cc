@@ -6,7 +6,7 @@
  *  Purpose: implementation of debug related poly routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pDebug.cc,v 1.11 2000-10-30 13:40:20 obachman Exp $
+ *  Version: $Id: pDebug.cc,v 1.12 2000-11-03 14:50:19 obachman Exp $
  *******************************************************************/
 
 #ifndef PDEBUG_CC
@@ -14,8 +14,13 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+
 #include "mod2.h"
 #ifdef PDEBUG
+
+// do the following to always enforce checking of pSetm
+// #undef PDEBUG
+// #define PDEBUG 2
 
 #include "p_polys.h"
 #include "febase.h"
@@ -23,14 +28,17 @@
 #include "ring.h"
 #include "numbers.h"
 
-
 /***************************************************************
  *
  * Error reporting
  *
  ***************************************************************/
+// avoid recursive calls
+static BOOLEAN d_poly_error_reporting = FALSE;
 BOOLEAN dPolyReportError(poly p, ring r, const char* fmt, ...)
 {
+  if (d_poly_error_reporting) return FALSE;
+  d_poly_error_reporting = TRUE;
   va_list ap;
   va_start(ap, fmt);
   
@@ -52,6 +60,7 @@ BOOLEAN dPolyReportError(poly p, ring r, const char* fmt, ...)
     }
   }
   dErrorBreak();
+  d_poly_error_reporting = FALSE;
   return FALSE;
 }
 
@@ -67,7 +76,12 @@ BOOLEAN p_LmCheckIsFromRing(poly p, ring r)
     void* custom = omGetCustomOfAddr(p);
     if (custom != NULL)
     {
-      pPolyAssumeReturnMsg(custom == r || rEqual((ring) custom, r, FALSE), 
+      pPolyAssumeReturnMsg(custom == r ||
+                           // be more sloppy for qrings
+                           (r->qideal != NULL && 
+                            omIsBinPageAddr(p) && 
+                            omSizeWOfAddr(p)==r->PolyBin->sizeW) ||
+                           rEqual((ring) custom, r, FALSE),
                            "monomial not from specified ring");
       return TRUE;
     }
@@ -183,6 +197,7 @@ static poly p_DebugInit(poly p, ring dest_ring, ring src_ring)
 
 BOOLEAN _p_Test(poly p, ring r, int level)
 {
+  if (PDEBUG > level) level = PDEBUG;
   if (level < 0 || p == NULL) return TRUE;
   
   poly p_prev = NULL;
@@ -277,6 +292,7 @@ BOOLEAN _p_LmTest(poly p, ring r, int level)
 
 BOOLEAN _pp_Test(poly p, ring lmRing, ring tailRing, int level)
 {
+  if (PDEBUG > level) level = PDEBUG;
   if (level < 0 || p == NULL) return TRUE;
   if (pNext(p) == NULL || lmRing == tailRing) return _p_Test(p, lmRing, level);
 

@@ -6,7 +6,7 @@
  *  Purpose: implementation of primitive procs for polys
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Procs.cc,v 1.18 2000-10-30 16:54:56 obachman Exp $
+ *  Version: $Id: p_Procs.cc,v 1.19 2000-11-03 14:50:21 obachman Exp $
  *******************************************************************/
 #include <string.h>
 
@@ -180,6 +180,7 @@ typedef enum p_Proc
   p_Minus_mm_Mult_qq_Proc,
   p_Neg_Proc,
   pp_Mult_Coeff_mm_DivSelect_Proc,
+  p_Merge_q_Proc,
   p_Unknown_Proc
 };
 
@@ -269,6 +270,7 @@ char* p_ProcEnum_2_String(p_Proc proc)
       case p_Minus_mm_Mult_qq_Proc: return "p_Minus_mm_Mult_qq_Proc";
       case p_Neg_Proc: return "p_Neg_Proc";
       case pp_Mult_Coeff_mm_DivSelect_Proc: return "pp_Mult_Coeff_mm_DivSelect_Proc";
+      case p_Merge_q_Proc: return "p_Merge_q_Proc";
       case p_Unknown_Proc: return "p_Unknown_Proc";
   }
   return "NoProc_2_String";
@@ -332,7 +334,7 @@ static inline p_Ord ZeroOrd_2_NonZeroOrd(p_Ord ord, int strict)
  * choosen
  * 
  *******************************************************************/
-static inline void FastP_ProcsFilter(p_Field &field, p_Length &length, p_Ord &ord)
+static inline void FastP_ProcsFilter(p_Field &field, p_Length &length, p_Ord &ord, const proc)
 {
   if (HAVE_FAST_P_PROCS >= 5) return;
   
@@ -340,14 +342,16 @@ static inline void FastP_ProcsFilter(p_Field &field, p_Length &length, p_Ord &or
     field = FieldGeneral;
   
   if ((HAVE_FAST_P_PROCS == 0) ||
-      (HAVE_FAST_P_PROCS <= 4 && field != FieldZp && field != FieldQ))
+      (HAVE_FAST_P_PROCS <= 4 && field != FieldZp && field != FieldQ &&
+       proc != p_Merge_q_Proc))
   {
     field = FieldGeneral;
     length = LengthGeneral;
     ord = OrdGeneral;
     return;
   }
-  if (HAVE_FAST_P_PROCS == 1 || (HAVE_FAST_P_PROCS == 4 && field != FieldZp))
+  if (HAVE_FAST_P_PROCS == 1 || 
+      (HAVE_FAST_P_PROCS == 4 && field != FieldZp && proc != p_Merge_q_Proc))
     ord = OrdGeneral;
 }
 
@@ -416,6 +420,7 @@ static inline void FastProcFilter(p_Proc proc, p_Field &field, p_Length &length,
   switch(proc)
   {
       case p_Add_q_Proc:
+      case p_Merge_q_Proc:
         p_Add_q__Filter(length, ord);
         break;
         
@@ -430,7 +435,7 @@ static inline void FastProcFilter(p_Proc proc, p_Field &field, p_Length &length,
   FastOrdFilter(ord);
   FastLengthFilter(length);
   FastFieldFilter(field);
-  FastP_ProcsFilter(field, length, ord);
+  FastP_ProcsFilter(field, length, ord, proc);
 }
 
 // returns 1 if combination of field/length/ord is invalid
@@ -458,6 +463,11 @@ static inline int IsValidSpec(p_Field field, p_Length length, p_Ord ord)
 }
 
  
+static inline int index(p_Length length, p_Ord ord)
+{
+  return length*OrdUnknown + ord;
+}
+
 static inline int index(p_Field field, p_Length length)
 {
   return field*LengthUnknown + length;
@@ -490,6 +500,9 @@ static inline int index(p_Proc proc, p_Field field, p_Length length, p_Ord ord)
       case p_Add_q_Proc:
       case p_Minus_mm_Mult_qq_Proc:
         return index(field, length, ord);
+        
+      case p_Merge_q_Proc:
+        return index(length, ord);
         
       default:
         assume(0);
@@ -641,6 +654,7 @@ void p_SetProcs(ring r, p_Procs_s* p_Procs)
     (p_Procs->p_Add_q != NULL) &&
     (p_Procs->p_Neg != NULL) &&
     (p_Procs->pp_Mult_Coeff_mm_DivSelect != NULL) &&
+    (p_Procs->p_Merge_q != NULL) &&
     (p_Procs->p_Minus_mm_Mult_qq != NULL));
 }
 
@@ -766,12 +780,6 @@ void AddProc(const char* s_what, p_Proc proc, p_Field field, p_Length length, p_
   else
     printf("#define DECLARE_ORDSGN(what) what\n");
 
-  // define pp_Mult_mm, for p_Minus_mm_Mult_qq
-  if (strcmp(s_what, "p_Minus_mm_Mult_qq") == 0)
-  {
-    printf("#undef pp_Mult_mm\n");
-    printf("#define pp_Mult_mm pp_Mult_mm__%s_%s_OrdGeneral\n", s_field, s_length);
-  }
   printf("#undef %s\n#define %s %s\n", s_what, s_what, s_full_proc_name);
   printf("#include \"%s__Template.cc\"\n", s_what);
   printf("#undef %s\n#undef pp_Mult_mm\n", s_what);
@@ -914,7 +922,5 @@ static void SetProcs(p_Field field, p_Length length, p_Ord ord)
   SetProc(p_Minus_mm_Mult_qq, field, length, ord);
   SetProc(p_Neg, field, LengthGeneral, OrdGeneral);
   SetProc(pp_Mult_Coeff_mm_DivSelect, field, length, OrdGeneral);
+  SetProc(p_Merge_q, FieldGeneral, length, ord);
 }
-
-
-

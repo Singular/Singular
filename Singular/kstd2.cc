@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.56 2000-10-30 13:40:18 obachman Exp $ */
+/* $Id: kstd2.cc,v 1.57 2000-11-03 14:50:17 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -50,7 +50,8 @@ static poly kFromInput(poly p,kStrategy strat)
 
 // return -1 if no divisor is found
 //        number of first divisor, otherwise
-static int kFindDivisibleByInT(const TSet &T, int tl, const LObject* L)
+static int kFindDivisibleByInT(const TSet &T, const unsigned long* sevT,
+                               const int tl, const LObject* L)
 {
   unsigned long not_sev = ~L->sev;
   int j = 0;
@@ -66,11 +67,11 @@ static int kFindDivisibleByInT(const TSet &T, int tl, const LObject* L)
     {
       if (j > tl) return -1;
 #if defined(PDEBUG) || defined(PDIV_DEBUG)
-      if (p_LmShortDivisibleBy(T[j].p, T[j].sev,
+      if (p_LmShortDivisibleBy(T[j].p, sevT[j],
                                p, not_sev, r))
         return j;
 #else
-      if (!(T[j].sev & not_sev) &&
+      if (!(sevT[j] & not_sev) &&
           p_LmDivisibleBy(T[j].p, p, r))
         return j;
 #endif
@@ -83,11 +84,11 @@ static int kFindDivisibleByInT(const TSet &T, int tl, const LObject* L)
     {
       if (j > tl) return -1;
 #if defined(PDEBUG) || defined(PDIV_DEBUG)
-      if (p_LmShortDivisibleBy(T[j].t_p, T[j].sev,
+      if (p_LmShortDivisibleBy(T[j].t_p, sevT[j],
                                p, not_sev, r))
         return j;
 #else
-      if (!(T[j].sev & not_sev) &&
+      if (!(sevT[j] & not_sev) &&
           p_LmDivisibleBy(T[j].t_p, p, r))
         return j;
 #endif
@@ -141,7 +142,7 @@ static int redHomog (LObject* h,kStrategy strat)
   {
     // find a poly with which we can reduce
     h->SetShortExpVector();
-    j = kFindDivisibleByInT(strat->T, strat->tl, h);
+    j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h);
     if (j < 0) return 1;
     
     // now we found one which is divisible -- reduce it
@@ -182,7 +183,7 @@ static int redLazy (LObject* h,kStrategy strat)
   h->SetShortExpVector();
   while (1)
   {
-    j = kFindDivisibleByInT(strat->T, strat->tl, h);
+    j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h);
     if (j < 0) return 1;
 
 #ifdef KDEBUG
@@ -263,7 +264,7 @@ static int redHoney (LObject* h, kStrategy strat)
   not_sev = ~ h->sev;
   loop
   {
-    j = kFindDivisibleByInT(strat->T, strat->tl, h);
+    j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h);
     if (j < 0) return 1;
 
     pi = strat->T[j].p;
@@ -283,7 +284,7 @@ static int redHoney (LObject* h, kStrategy strat)
       if ((!TEST_OPT_REDBEST) && (ei <= (*h).ecart))
         break;
       if ((strat->T[i].ecart < ei) && 
-          p_LmShortDivisibleBy(strat->T[i].GetLmTailRing(), strat->T[i].sev, 
+          p_LmShortDivisibleBy(strat->T[i].GetLmTailRing(), strat->sevT[i], 
                                h_p, not_sev, strat->tailRing))
       {
         /*
@@ -408,48 +409,6 @@ static int redHoney (LObject* h, kStrategy strat)
   }
 }
 
-
-#ifdef HAVE_REDTAIL_WITH_T
-poly redtailBba (LObject* L, int pos, kStrategy strat)
-{
-  poly h, hn;
-  int j;
-  unsigned long not_sev;
-  strat->redTailChange=FALSE;
-  poly p = L->p;
-
-  if (strat->noTailReduction) return p;
-  h = p;
-  hn = pNext(h);
-  LObject Red(currRing, strat->tailRing);
-  while (hn != NULL)
-  {
-    Red.Set(hn, strat->tailRing);
-    Red.SetShortExpVector();
-    j = kFindDivisibleByInT(strat->T, pos-1, &Red);
-    if (j >= 0)
-    {
-      strat->redTailChange=TRUE;
-      if (! ksReducePolyTail(L, &(strat->T[j]), h, strat->kNoether))
-      {
-        kStratChangeTailRing(strat,
-                             rModifyRing(currRing, strat->homog, ! strat->ak,
-                                         strat->tailRing->bitmask << 1));
-        if (L->tailRing != strat->tailRing)
-          L->ShallowCopyDelete(strat->tailRing, 
-                               pGetShallowCopyDeleteProc(L->tailRing,
-                                                         strat->tailRing));
-        return redtailBba(L, pos, strat);
-      }
-      // nothing should have been created in red
-      assume(Red.t_p == NULL || Red.p == NULL);
-    }
-    h = hn;
-    pIter(hn);
-  }
-  return p;
-}
-#endif // HAVE_REDTAIL_WITH_T
 
 #ifdef HAVE_RED_BEST
 /*2
@@ -770,7 +729,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
           strat->P.pCleardenom();
           if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
           {
-            strat->P.p = redtailBba(strat->P.p,pos-1,strat);
+            strat->P.p = redtailBba(&(strat->P),pos-1,strat);
             if (strat->redTailChange)  strat->P.pLength = 0;
             strat->P.pCleardenom();
           }
@@ -780,7 +739,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
           strat->P.pNorm();
           if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
           {
-            strat->P.p = redtailBba(strat->P.p,pos-1,strat);
+            strat->P.p = redtailBba(&(strat->P),pos-1,strat);
             if (strat->redTailChange)  strat->P.pLength = 0;
           }
         }
@@ -803,11 +762,10 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         }
 
         // put stuff into T-Set
-        enterTBba(strat->P, strat->posInT(strat->T,strat->tl,strat->P), 
-                  strat);
+        enterT(strat->P, strat);
         enterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat);
         // posInS only depends on the leading term
-        strat->enterS(strat->P, pos, strat);
+        strat->enterS(strat->P, pos, strat, strat->tl);
         if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
       }
       if (strat->P.lcm!=NULL) pLmFree(strat->P.lcm);

@@ -43,8 +43,8 @@ while (0)
 
 #undef PR_SORT_POLY
 #if PR_NO_SORT > 0
-#define PR_SORT_POLY(p, r) ((void)0)
+#define PR_SORT_POLY(p, d_r, s_r) ((void)0)
 #else
-#define PR_SORT_POLY(p, r) p = prSortR(p, r, TRUE)
+#define PR_SORT_POLY(p, d_r, s_r) p = prSortR(p, d_r, d_r->OrdSgn == s_r->OrdSgn)
 #endif
 

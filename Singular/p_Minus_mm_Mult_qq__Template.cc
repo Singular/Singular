@@ -6,7 +6,7 @@
  *  Purpose: template for p_Minus_m_Mult_q
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Minus_mm_Mult_qq__Template.cc,v 1.5 2000-10-30 16:54:55 obachman Exp $
+ *  Version: $Id: p_Minus_mm_Mult_qq__Template.cc,v 1.6 2000-11-03 14:50:21 obachman Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -114,7 +114,7 @@ poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int& Shorter, const poly spNoeth
   else  // append (- m*q) to result
   {
     pSetCoeff0(m, tneg);
-    pNext(a) = pp_Mult_mm(q, m, spNoether, r);
+    pNext(a) = r->p_Procs->pp_Mult_mm(q, m, spNoether, r);
     pSetCoeff0(m, tm);
   }
    

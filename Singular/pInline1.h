@@ -6,14 +6,14 @@
  *  Purpose: implementation of poly procs which iter over ExpVector
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline1.h,v 1.12 2000-10-30 16:54:54 obachman Exp $
+ *  Version: $Id: pInline1.h,v 1.13 2000-11-03 14:50:19 obachman Exp $
  *******************************************************************/
 #ifndef PINLINE1_H
 #define PINLINE1_H
 
 #ifndef PDIV_DEBUG
 // define to enable debugging/statistics of pLmShortDivisibleBy
-#undef PDIV_DEBUG
+// #define PDIV_DEBUG
 #endif
 #include <limits.h>
 #include "p_MemCmp.h"
@@ -62,12 +62,42 @@ BOOLEAN p_DebugLmDivisibleByNoComp(poly a, poly b, ring r);
  * Allocation/Initalization/Deletion 
  *
  ***************************************************************/
+// adjustments for negative weights
+PINLINE1 void p_MemAdd_NegWeightAdjust(poly p, ring r)
+{
+  if (r->NegWeightL_Offset != NULL)
+  {
+    for (int i=0; i<r->NegWeightL_Size; i++)
+    {
+      p->exp[r->NegWeightL_Offset[i]] -= POLY_NEGWEIGHT_OFFSET;
+    }
+  }
+}
+PINLINE1 void p_MemSub_NegWeightAdjust(poly p, ring r)
+{
+  if (r->NegWeightL_Offset != NULL)
+  {
+    for (int i=0; i<r->NegWeightL_Size; i++)
+    {
+      p->exp[r->NegWeightL_Offset[i]] += POLY_NEGWEIGHT_OFFSET;
+    }
+  }
+}
+// ExpVextor(d_p) = ExpVector(s_p)
+PINLINE1 void p_ExpVectorCopy(poly d_p, poly s_p, ring r)
+{
+  p_LmCheckPolyRing1(d_p, r);
+  p_LmCheckPolyRing1(s_p, r);
+  p_MemCopy_LengthGeneral(d_p->exp, s_p->exp, r->ExpL_Size);
+}
+
 PINLINE1 poly p_Init(ring r, omBin bin)
 {
   p_CheckRing1(r);
   pAssume1(bin != NULL && r->PolyBin->sizeW == bin->sizeW);
   poly p;
   omTypeAlloc0Bin(poly, p, bin);
+  p_MemAdd_NegWeightAdjust(p, r);
   p_SetRingOfPoly(p, r);
   return p;
 }
@@ -139,34 +169,6 @@ PINLINE1 poly p_LmShallowCopyDelete(poly p, const ring r, omBin bin)
  * Operation on ExpVectors
  *
  ***************************************************************/
-// adjustments for negative weights
-PINLINE1 void p_MemAdd_NegWeightAdjust(poly p, ring r)
-{
-  if (r->NegWeightL_Offset != NULL)
-  {
-    for (int i=0; i<r->NegWeightL_Size; i++)
-    {
-      p->exp[r->NegWeightL_Offset[i]] -= POLY_NEGWEIGHT_OFFSET;
-    }
-  }
-}
-PINLINE1 void p_MemSub_NegWeightAdjust(poly p, ring r)
-{
-  if (r->NegWeightL_Offset != NULL)
-  {
-    for (int i=0; i<r->NegWeightL_Size; i++)
-    {
-      p->exp[r->NegWeightL_Offset[i]] += POLY_NEGWEIGHT_OFFSET;
-    }
-  }
-}
-// ExpVextor(d_p) = ExpVector(s_p)
-PINLINE1 void p_ExpVectorCopy(poly d_p, poly s_p, ring r)
-{
-  p_LmCheckPolyRing1(d_p, r);
-  p_LmCheckPolyRing1(s_p, r);
-  p_MemCopy_LengthGeneral(d_p->exp, s_p->exp, r->ExpL_Size);
-}
 // ExpVector(p1) += ExpVector(p2)
 PINLINE1 void p_ExpVectorAdd(poly p1, poly p2, ring r)
 {

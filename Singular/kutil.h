@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.39 2000-10-30 13:40:20 obachman Exp $ */
+/* $Id: kutil.h,v 1.40 2000-11-03 14:50:19 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -19,6 +19,7 @@
 
 #define setmax 16
 
+// #define HAVE_REDTAIL_WITH_T 
 #undef NO_KINLINE
 #if !defined(KDEBUG) && !defined(NO_INLINE)
 #define KINLINE inline
@@ -35,9 +36,8 @@ public:
   poly p;       // Lm(p) \in currRing Tail(p) \in tailRing
   poly t_p;     // t_p \in tailRing
   ring tailRing;
-  int ecart, length, pLength;
+  int ecart, length, pLength, r;
   poly max; // p_MaxExp(pNext(p))
-  unsigned long sev;
   
 
   // initialization
@@ -66,8 +66,6 @@ public:
 
   // makes sure that T.p exists
   KINLINE void SetLmCurrRing();
-  // sets sev
-  KINLINE void SetShortExpVector();
 
   // Iterations
   KINLINE void LmDeleteAndIter();
@@ -94,10 +92,12 @@ class sLObject : public sTObject
 {
 
 public:
+  unsigned long sev;
   poly  p1,p2; /*- the pair p comes from -*/
   
   poly  lcm;   /*- the lcm of p1,p2 -*/
   kBucket_pt bucket;
+  int   r1, r2;
 
   // initialization
   KINLINE void Init(ring tailRing = currRing);
@@ -117,6 +117,11 @@ public:
 
   KINLINE void ShallowCopyDelete(ring new_tailRing,  
                                  pShallowCopyDeleteProc p_shallow_copy_delete);
+  // sets sev
+  KINLINE void SetShortExpVector();
+
+  // enable assignment from TObject
+  KINLINE sLObject& operator=(const sTObject&);
 };
 
 typedef class sTObject TObject;
@@ -137,7 +142,7 @@ public:
   int (*posInT)(const TSet T,const int tl,const LObject &h);
   int (*posInL)(const LSet set, const int length,
                 const LObject &L,const kStrategy strat);
-  void (*enterS)(LObject h, int pos,kStrategy strat);
+  void (*enterS)(LObject h, int pos,kStrategy strat, int atR = -1);
   void (*initEcartPair)(LObject * h, poly f, poly g, int ecartF, int ecartG);
   int (*posInLOld)(const LSet Ls,const int Ll,
                    const LObject &Lo,const kStrategy strat);
@@ -149,6 +154,7 @@ public:
   intset ecartS;
   intset fromQ;
   unsigned long* sevS;
+  unsigned long* sevT;
   TSet T;
   LSet L;
   LSet    B;
@@ -190,6 +196,11 @@ public:
   char    news;
   char    newt;/*used for messageSets*/
 
+  // pointers to Tobjects R[i] is ith Tobject which is generated
+  TObject**  R; 
+  // S_2_R[i] yields Tobject which corresponds to S[i]
+  int*      S_2_R; 
+  
   KINLINE skStrategy();
   KINLINE ~skStrategy();
 };
@@ -200,6 +211,7 @@ void cleanT (kStrategy strat);
 LSet initL ();
 void deleteInL(LSet set, int *length, int j,kStrategy strat);
 void enterL (LSet *set,int *length, int *LSetmax, LObject p,int at);
+void enterSBba (LObject p,int atS,kStrategy strat, int atR = -1);
 void initEcartPairBba (LObject* Lp,poly f,poly g,int ecartF,int ecartG);
 void initEcartPairMora (LObject* Lp,poly f,poly g,int ecartF,int ecartG);
 int posInS (polyset set,int length,poly p);
@@ -224,7 +236,6 @@ int posInL17 (const LSet set, const int length,
              const LObject &L,const kStrategy strat);
 KINLINE poly redtailBba (poly p,int pos,kStrategy strat);
 poly redtailBba (LObject *L, int pos,kStrategy strat);
-poly redtailSyz (poly p,int pos,kStrategy strat);
 poly redtail (poly p,int pos,kStrategy strat);
 void enterpairs (poly h, int k, int ec, int pos,kStrategy strat);
 void entersets (LObject h);
@@ -242,9 +253,7 @@ void initEcartBBA (LObject* h);
 void initS (ideal F, ideal Q,kStrategy strat);
 void initSL (ideal F, ideal Q,kStrategy strat);
 void updateS(BOOLEAN toT,kStrategy strat);
-void enterSBba (LObject p, int pos,kStrategy strat);
-void enterT (LObject p,kStrategy strat);
-void enterTBba (LObject p, int pos,kStrategy strat);
+void enterT (LObject p,kStrategy strat, int atT = -1);
 void cancelunit (LObject* p);
 void HEckeTest (poly pp,kStrategy strat);
 void redtailS (poly* h,int maxIndex);
@@ -267,6 +276,8 @@ BOOLEAN newHEdge(polyset S, int ak,kStrategy strat);
  ***************************************************************/
 
 KINLINE TSet initT ();
+KINLINE TObject** initR();
+KINLINE unsigned long* initsevT();
 KINLINE poly k_LmInit_currRing_2_tailRing(poly p, ring tailRing, omBin bin);
 KINLINE poly k_LmInit_tailRing_2_currRing(poly p, ring tailRing, omBin bin);
 KINLINE poly k_LmShallowCopyDelete_currRing_2_tailRing(poly p, ring tailRing, omBin bin);

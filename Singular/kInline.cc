@@ -6,7 +6,7 @@
  *  Purpose: implementation of std related inline routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: kInline.cc,v 1.11 2000-10-30 13:40:17 obachman Exp $
+ *  Version: $Id: kInline.cc,v 1.12 2000-11-03 14:50:16 obachman Exp $
  *******************************************************************/
 #ifndef KINLINE_CC
 #define KINLINE_CC
@@ -62,6 +62,16 @@ KINLINE TSet initT ()
     T[i].tailRing = currRing;
   }
   return T;
+}
+
+KINLINE TObject** initR()
+{
+  return (TObject**) omAlloc0(setmax*sizeof(TObject*));
+}
+
+KINLINE unsigned long* initsevT()
+{
+  return (unsigned long*) omAlloc0(setmax*sizeof(unsigned long));
 }
 
 // initialization
@@ -208,17 +218,6 @@ KINLINE void sTObject::SetLmCurrRing()
     p = k_LmInit_tailRing_2_currRing(t_p, tailRing);
 }
 
-KINLINE void sTObject::SetShortExpVector()
-{
-  if (t_p != NULL)
-  {
-    sev = p_GetShortExpVector(t_p, tailRing);
-  }
-  else 
-  {
-    sev = p_GetShortExpVector(p, currRing);
-  }
-}
     
 // Iterations
 KINLINE void sTObject::LmDeleteAndIter()
@@ -452,6 +451,26 @@ sLObject::ShallowCopyDelete(ring new_tailRing,
   sTObject::ShallowCopyDelete(new_tailRing, 
                               new_tailRing->PolyBin,p_shallow_copy_delete);
 }
+
+KINLINE void sLObject::SetShortExpVector()
+{
+  if (t_p != NULL)
+  {
+    sev = p_GetShortExpVector(t_p, tailRing);
+  }
+  else 
+  {
+    sev = p_GetShortExpVector(p, currRing);
+  }
+}
+
+KINLINE sLObject& sLObject::operator=(const sTObject& t)
+{
+  memset(this, 0, sizeof(*this));
+  memcpy(this, &t, sizeof(sTObject));
+  return *this;
+}
+
 
 /***************************************************************
  *

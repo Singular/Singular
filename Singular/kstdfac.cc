@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstdfac.cc,v 1.44 2000-10-23 12:02:14 obachman Exp $ */
+/* $Id: kstdfac.cc,v 1.45 2000-11-03 14:50:18 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
@@ -36,9 +36,11 @@ static void copyT (kStrategy o,kStrategy n)
   int i,j;
   poly  p;
   TSet t=(TSet)omAlloc0(o->tmax*sizeof(TObject));
+  TObject** r = (TObject**)omAlloc0(o->tmax*sizeof(TObject*));
 
   for (j=0; j<=o->tl; j++)
   {
+    r[t[j].r] = &t[j];
     t[j] = o->T[j];
     p = o->T[j].p;
     i = -1;
@@ -59,6 +61,7 @@ static void copyT (kStrategy o,kStrategy n)
     t[j].t_p = NULL;
   }
   n->T=t;
+  n->R=r;
 }
 
 /*3
@@ -164,6 +167,10 @@ kStrategy kStratCopy(kStrategy o)
   memcpy(s->ecartS,o->ecartS,IDELEMS(o->Shdl)*sizeof(int));
   s->sevS=(unsigned long *)omAlloc(IDELEMS(o->Shdl)*sizeof(unsigned long));
   memcpy(s->sevS,o->sevS,IDELEMS(o->Shdl)*sizeof(unsigned long));
+  s->S_2_R=(int*)omAlloc(IDELEMS(o->Shdl)*sizeof(int));
+  memcpy(s->S_2_R,o->S_2_R,IDELEMS(o->Shdl)*sizeof(int));
+  s->sevT=(unsigned long *)omAlloc(o->tmax*sizeof(unsigned long));
+  memcpy(s->sevT,o->sevT,IDELEMS(o->Shdl)*sizeof(unsigned long));
   if(o->fromQ!=NULL)
   {
     s->fromQ=(int *)omAlloc(IDELEMS(o->Shdl)*sizeof(int));
@@ -319,7 +326,7 @@ static void completeReduceFac (kStrategy strat, lists FL)
       }
       enterpairs(n->P.p,n->sl,n->P.ecart,pos,n);
       n->enterS(n->P,pos,n);
-      enterTBba(n->P,n->posInT(n->T,n->tl,n->P),n);
+      enterT(n->P,n);
 
       /* construct D */
       if (IDELEMS(fac)>1)
@@ -608,7 +615,7 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
         enterpairs(n->P.p,n->sl,n->P.ecart,pos,n);
         n->enterS(n->P,pos,n);
         if (n->sl>srmax) srmax = n->sl;
-        enterTBba(n->P,n->posInT(n->T,n->tl,n->P),n);
+        enterT(n->P,n);
 
         /* construct D */
         if (IDELEMS(fac)>1)

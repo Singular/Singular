@@ -7,7 +7,7 @@
  *           currRing
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
- *  Version: $Id: p_polys.h,v 1.11 2000-10-30 16:54:56 obachman Exp $
+ *  Version: $Id: p_polys.h,v 1.12 2000-11-03 14:50:22 obachman Exp $
  *******************************************************************/
 #ifndef P_POLYS_H
 #define P_POLYS_H
@@ -276,6 +276,9 @@ PINLINE2 poly pp_Mult_qq(poly p, poly q, const ring r);
 
 // returns p*Coeff(m) for such monomials pm of p, for which m is divisble by pm
 PINLINE2 poly pp_Mult_Coeff_mm_DivSelect(poly p, const poly m, const ring r);
+
+// returns merged p and q, assumes p and q have no monomials which are equal
+PINLINE2 poly p_Merge_q(poly p, poly c, const ring r);
 
 /***************************************************************
  *

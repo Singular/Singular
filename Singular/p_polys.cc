@@ -6,7 +6,7 @@
  *  Purpose: implementation of currRing independent poly procedures
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_polys.cc,v 1.6 2000-10-30 13:40:23 obachman Exp $
+ *  Version: $Id: p_polys.cc,v 1.7 2000-11-03 14:50:22 obachman Exp $
  *******************************************************************/
 
 #include "mod2.h"
@@ -171,7 +171,7 @@ p_SetmProc p_GetSetmProc(ring r)
 long pDeg(poly a, ring r)
 {
   p_LmCheckPolyRing(a, r);
-  pAssume(p_GetOrder(a, r) == pWTotaldegree(a, r));
+  assume(p_GetOrder(a, r) == pWTotaldegree(a, r));
   return p_GetOrder(a, r);
 }
 
@@ -309,6 +309,7 @@ long pLDeg0(poly p,int *l, ring r)
 * and the degree of the monomial with maximal degree: the last one
 * but search in all components before syzcomp
 */
+#if 0
 long pLDeg0c(poly p,int *l, ring r)
 {
   p_CheckPolyRing(p, r);
@@ -339,6 +340,39 @@ long pLDeg0c(poly p,int *l, ring r)
   *l=ll;
   return o;
 }
+#else
+long pLDeg0c(poly p,int *l, ring r)
+{
+  p_CheckPolyRing(p, r);
+  long o;
+  int ll=1;
+
+  if (! rIsSyzIndexRing(r))
+  {
+    while (pNext(p) != NULL) 
+    {
+      pIter(p);
+      ll++;
+    }
+    o = pFDeg(p, r);
+  }
+  else
+  {
+    int curr_limit = rGetCurrSyzLimit(r);
+    poly pp = p;
+    while ((p=pNext(p))!=NULL)
+    {
+      if (p_GetComp(p, r)<=curr_limit/*syzComp*/)
+        ll++;
+      else break;
+      pp = p;
+    }
+    o = pFDeg(pp, r);
+  }
+  *l=ll;
+  return o;
+}
+#endif
 
 /*2
 * compute the length of a polynomial (in l)

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: prCopyTemplate.cc,v 1.3 2000-09-14 13:04:41 obachman Exp $ */
+/* $Id: prCopyTemplate.cc,v 1.4 2000-11-03 14:50:23 obachman Exp $ */
 /*
 * ABSTRACT - templates for pr routines
 */
@@ -27,7 +27,7 @@ static poly PR_NAME
   }
   pNext(dest) = NULL;
   dest = pNext(&dest_s);
-  PR_SORT_POLY(dest, r_dest);
+  PR_SORT_POLY(dest, r_dest, r_src);
   p_Test(dest, r_dest);
   return dest;
 }

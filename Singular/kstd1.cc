@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.58 2000-10-30 13:40:18 obachman Exp $ */
+/* $Id: kstd1.cc,v 1.59 2000-11-03 14:50:17 obachman Exp $ */
 /*
 * ABSTRACT:
 */
@@ -162,7 +162,7 @@ int redEcart19 (LObject* h,kStrategy strat)
     {
       return 1;
     }
-    if (pLmShortDivisibleBy(strat->T[j].p, strat->T[j].sev, (*h).p, not_sev))
+    if (pLmShortDivisibleBy(strat->T[j].p, strat->sevT[j], (*h).p, not_sev))
     {
       //if (strat->interpt) test_int_std(strat->kIdeal);
       /*- compute the s-polynomial -*/
@@ -288,7 +288,7 @@ int redEcart (LObject* h,kStrategy strat)
     {
       return 1;
     }
-    if (pLmShortDivisibleBy(strat->T[j].p, strat->T[j].sev, (*h).p, not_sev))
+    if (pLmShortDivisibleBy(strat->T[j].p, strat->sevT[j], (*h).p, not_sev))
     {
       //if (strat->interpt) test_int_std(strat->kIdeal);
       /*- compute the s-polynomial -*/
@@ -309,7 +309,7 @@ int redEcart (LObject* h,kStrategy strat)
         if ((((strat->T[i]).ecart < ei)
           || (((strat->T[i]).ecart == ei)
           && ((strat->T[i]).length < li)))
-          && pLmShortDivisibleBy(strat->T[i].p, strat->T[i].sev,
+          && pLmShortDivisibleBy(strat->T[i].p, strat->sevT[i],
                                (*h).p, not_sev))
         {
           /*
@@ -448,7 +448,7 @@ int redFirst (LObject* h,kStrategy strat)
       assume(h->sev == pGetShortExpVector(h->p));
       return 1;
     }
-    if (pLmShortDivisibleBy(strat->T[j].p, strat->T[j].sev, (*h).p, not_sev))
+    if (pLmShortDivisibleBy(strat->T[j].p, strat->sevT[j], (*h).p, not_sev))
     {
       //if (strat->interpt) test_int_std(strat->kIdeal);
       /*
@@ -556,7 +556,7 @@ int redMoraBest (LObject* h,kStrategy strat)
     {
       return 1;
     }
-    if (pLmShortDivisibleBy(strat->T[j].p, strat->T[j].sev, (*h).p, not_sev))
+    if (pLmShortDivisibleBy(strat->T[j].p, strat->sevT[j], (*h).p, not_sev))
     {
       //if (strat->interpt) test_int_std(strat->kIdeal);
       /*- compute the s-polynomial -*/
@@ -576,7 +576,7 @@ int redMoraBest (LObject* h,kStrategy strat)
         if (((strat->T[i].ecart < ei)
           || ((strat->T[i].ecart == ei)
         && (strat->T[i].length < li)))
-            && pLmShortDivisibleBy(strat->T[i].p, strat->T[i].sev,
+            && pLmShortDivisibleBy(strat->T[i].p, strat->sevT[i],
                                  (*h).p, not_sev))
         {
           /*
@@ -716,7 +716,7 @@ static poly redMoraNF (poly h,kStrategy strat, int flag)
       if (kModDeg(H.p)>Kstd1_deg) pDeleteLm(&H.p);
       if (H.p==NULL) return NULL;
     }
-    if (pLmShortDivisibleBy(strat->T[j].p, strat->T[j].sev, H.p, not_sev))
+    if (pLmShortDivisibleBy(strat->T[j].p, strat->sevT[j], H.p, not_sev))
     {
       //if (strat->interpt) test_int_std(strat->kIdeal);
       /*- remember the found T-poly -*/
@@ -737,7 +737,7 @@ static poly redMoraNF (poly h,kStrategy strat, int flag)
         if (((strat->T[j].ecart < ei)
           || ((strat->T[j].ecart == ei)
         && (strat->T[j].length < li)))
-        && pLmShortDivisibleBy(strat->T[j].p,strat->T[j].sev, H.p, not_sev))
+        && pLmShortDivisibleBy(strat->T[j].p,strat->sevT[j], H.p, not_sev))
         {
           /*
           * the polynomial to reduce with is now;
@@ -821,12 +821,15 @@ void reorderT(kStrategy strat)
 {
   int i,j,at;
   TObject p;
+  unsigned long sev;
+  
 
   for (i=1; i<=strat->tl; i++)
   {
     if (strat->T[i-1].length > strat->T[i].length)
     {
       p = strat->T[i];
+      sev = strat->sevT[i];
       at = i-1;
       loop
       {
@@ -837,8 +840,12 @@ void reorderT(kStrategy strat)
       for (j = i-1; j>at; j--)
       {
         strat->T[j+1]=strat->T[j];
+        strat->sevT[j+1]=strat->sevT[j];
+        strat->R[strat->T[j+1].r] = &(strat->T[j+1]);
       }
       strat->T[at+1]=p;
+      strat->sevT[at+1] = sev;
+      strat->R[p.r] = &(strat->T[at+1]);
     }
   }
 }
@@ -1028,15 +1035,12 @@ void updateT(kStrategy strat)
 
   while (i <= strat->tl)
   {
-    deleteHCs(&strat->T[i],strat);
+    p = strat->T[i];
+    deleteHCs(&p,strat);
     /*- tries to cancel a unit: -*/
-    p.p = strat->T[i].p;
-    p.ecart = strat->T[i].ecart;
-    p.length = strat->T[i].length;
     cancelunit(&p);
-    strat->T[i].p = p.p;
-    strat->T[i].ecart = p.ecart;
-    strat->T[i].length = p.length;
+    if (p.p != strat->T[i].p) strat->sevT[i] = pGetShortExpVector(p.p);
+    strat->T[i] = p;
     i++;
   }
 }
@@ -1088,52 +1092,10 @@ void firstUpdate(kStrategy strat)
 *    and cancels units if possible
 *  - reorders s,L
 */
-void enterSMora (LObject p,int atS,kStrategy strat)
+void enterSMora (LObject p,int atS,kStrategy strat, int atR = -1)
 {
   int i;
-
-  strat->news = TRUE;
-  /*- puts p to the standardbasis s at position atS -*/
-  if (strat->sl == IDELEMS(strat->Shdl)-1)
-  {
-    pEnlargeSet(&strat->S,IDELEMS(strat->Shdl),setmax);
-    strat->sevS = (unsigned long*) omRealloc0Size(strat->sevS,
-                                    IDELEMS(strat->Shdl)*sizeof(unsigned long),
-                                    (IDELEMS(strat->Shdl)+setmax)
-                                           *sizeof(unsigned long));
-    strat->ecartS = (intset) omReallocSize(strat->ecartS,
-                                     IDELEMS(strat->Shdl)*sizeof(int),
-                                     (IDELEMS(strat->Shdl)+setmax)*sizeof(int));
-    if (strat->fromQ)
-    {
-      strat->fromQ = (intset)omReallocSize(strat->fromQ,
-                                    IDELEMS(strat->Shdl)*sizeof(int),
-                                    (IDELEMS(strat->Shdl)+setmax)*sizeof(int));
-    }
-    IDELEMS(strat->Shdl) += setmax;
-    strat->Shdl->m=strat->S;
-  }
-  for (i=strat->sl+1; i>atS; i--)
-  {
-    strat->S[i] = strat->S[i-1];
-    strat->ecartS[i] = strat->ecartS[i-1];
-    strat->sevS[i] = strat->sevS[i-1];
-  }
-  if (strat->fromQ)
-  {
-    for (i=strat->sl+1; i>=atS+1; i--)
-    {
-      strat->fromQ[i] = strat->fromQ[i-1];
-    }
-    strat->fromQ[atS]=0;
-  }
-  /*- save result -*/
-  strat->S[atS] = p.p;
-  strat->ecartS[atS] = p.ecart;
-  if (p.sev == 0) p.sev = pGetShortExpVector(p.p);
-  else assume(p.sev == pGetShortExpVector(p.p));
-  strat->sevS[atS] = p.sev;
-  strat->sl++;
+  enterSBba(p, atS, strat, atR);
   if (TEST_OPT_DEBUG)
   {
     Print("new s%d:",atS);
@@ -1181,42 +1143,18 @@ void enterSMora (LObject p,int atS,kStrategy strat)
 *  if TRUE
 *  - computes noether
 */
-void enterSMoraNF (LObject p, int atS,kStrategy strat)
+void enterSMoraNF (LObject p, int atS,kStrategy strat, int atR = -1)
 {
   int i;
-
-  /*- puts p to the standardbasis s at position at -*/
-  if (strat->sl == IDELEMS(strat->Shdl)-1)
-  {
-    pEnlargeSet(&strat->S,IDELEMS(strat->Shdl),setmax);
-    strat->sevS = (unsigned long*) omRealloc0Size(strat->sevS,
-                                    IDELEMS(strat->Shdl)*sizeof(unsigned long),
-                                    (IDELEMS(strat->Shdl)+setmax)
-                                           *sizeof(unsigned long));
-    strat->ecartS=(intset)omReallocSize(strat->ecartS,
-                                  IDELEMS(strat->Shdl)*sizeof(intset),
-                                  (IDELEMS(strat->Shdl)+setmax)*sizeof(intset));
-    IDELEMS(strat->Shdl) += setmax;
-    strat->Shdl->m=strat->S;
-  }
-  for (i=strat->sl+1; i>atS; i--)
-  {
-    strat->S[i] = strat->S[i-1];
-    strat->ecartS[i] = strat->ecartS[i-1];
-    strat->sevS[i] = strat->sevS[i-1];
-  }
-  strat->S[atS] = p.p;/*- save result -*/
-  strat->ecartS[atS] = p.ecart;
-  if (p.sev == 0) p.sev = pGetShortExpVector(p.p);
-  else assume(p.sev == pGetShortExpVector(p.p));
-  strat->sevS[atS] = p.sev;
-  strat->sl++;
+  
+  enterSBba(p, atS, strat, atR);
   if ((!strat->kHEdgeFound) || (strat->kNoether!=NULL)) HEckeTest(p.p,strat);
   if (strat->kHEdgeFound)
     newHEdge(strat->S,strat->ak,strat);
   else if (strat->kNoether!=NULL)
     strat->kHEdgeFound = TRUE;
 }
+
 
 void initMora(ideal F,kStrategy strat)
 {
@@ -1318,6 +1256,7 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   /*- compute-------------------------------------------*/
   while (strat->Ll >= 0)
   {
+    kTest_TS(strat);
     if (lrmax< strat->Ll) lrmax=strat->Ll; /*stat*/
     //test_int_std(strat->kIdeal);
     if (TEST_OPT_DEBUG) messageSets(strat);
@@ -1356,7 +1295,7 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         strat->P.length = pLength(strat->P.p);
     }
     {
-      if (TEST_OPT_PROT) message(strat->P.ecart+pFDeg(strat->P.p),&olddeg,&reduc,strat);
+      if (TEST_OPT_PROT) message(strat->P.ecart+(strat->P.p == NULL ? 0 : pFDeg(strat->P.p)),&olddeg,&reduc,strat);
       strat->red(&strat->P,strat);/*- reduction of the element choosen from L -*/
     }
     if (strat->P.p != NULL)
@@ -1392,10 +1331,11 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
               {
                 pos = posInS(strat->S,strat->sl,strat->P.p);
               }
-              strat->enterS(strat->P,pos,strat);
+              strat->enterS(strat->P,pos,strat, strat->tl);
             }
             if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
           }
+          kTest_TS(strat);
           if (strat->P.lcm!=NULL) pLmFree(strat->P.lcm);
           strat->P.lcm=NULL;
 #ifdef KDEBUG
@@ -1491,6 +1431,8 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
   strat->tl = -1;
   strat->tmax = setmax;
   strat->T = initT();
+  strat->R = initR();
+  strat->sevT = initsevT();
   /*- set S -*/
   strat->sl = -1;
   /*- init local data struct.-------------------------- -*/
@@ -1588,6 +1530,8 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
   strat->tl = -1;
   strat->tmax = setmax;
   strat->T = initT();
+  strat->R = initR();
+  strat->sevT = initsevT();
   /*- set S -*/
   strat->sl = -1;
   /*- init local data struct.-------------------------- -*/
@@ -1965,6 +1909,8 @@ ideal kInterRed (ideal F, ideal Q)
   strat->tl          = -1;
   strat->tmax        = setmax;
   strat->T           = initT();
+  strat->R           = initR();
+  strat->sevT        = initsevT();
   if (pOrdSgn == -1)   strat->honey = TRUE;
   initS(F,Q,strat);
   if (TEST_OPT_REDSB)

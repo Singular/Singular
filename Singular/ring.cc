@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.135 2000-10-30 13:40:26 obachman Exp $ */
+/* $Id: ring.cc,v 1.136 2000-11-03 14:50:24 obachman Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -845,11 +845,8 @@ void rKill(ring r)
     }
     else if (r->qideal!=NULL)
     {
-      ring savecurrRing = currRing;
-      rChangeCurrRing((ring)r,FALSE);
-      idDelete(&r->qideal);
-      r->qideal=NULL;
-      rChangeCurrRing(savecurrRing,TRUE);
+      id_Delete(&r->qideal, r);
+      r->qideal = NULL;
     }
     int i=1;
     int j;
@@ -3019,11 +3016,6 @@ BOOLEAN rComplete(ring r, int force)
   r->p_Setm = p_GetSetmProc(r);
 
   // ----------------------------
-  // p_Procs
-  r->p_Procs = (p_Procs_s*)omAlloc(sizeof(p_Procs_s));
-  p_SetProcs(r, r->p_Procs);
-
-  // ----------------------------
   // set VarL_*
   rSetVarL(r);
 
@@ -3034,6 +3026,12 @@ BOOLEAN rComplete(ring r, int force)
   // ----------------------------
   // set NegWeightL*
   rSetNegWeight(r);
+
+  // ----------------------------
+  // p_Procs: call AFTER NegWeightL 
+  r->p_Procs = (p_Procs_s*)omAlloc(sizeof(p_Procs_s));
+  p_SetProcs(r, r->p_Procs);
+
   return FALSE;
 }
 

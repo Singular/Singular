@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: prCopy.cc,v 1.8 2000-09-25 12:26:36 obachman Exp $ */
+/* $Id: prCopy.cc,v 1.9 2000-11-03 14:50:23 obachman Exp $ */
 /*
 * ABSTRACT - implementation of functions for Copy/Move/Delete for Polys
 */
@@ -14,62 +14,103 @@
 #include "ring.h"
 #include "ideals.h"
 
+// define to 0 to never revert, 
+//           1 to always revert
+// undef if revert as given by parameter
+// #define REVERT 0
 
-/////////////////////////////////////////////////////////////////////////
-// prSort prMerge
-
-poly prMergeR(poly p1, poly p2, ring r)
+// a sorting of polys based on buckets
+class pBucketPoly
 {
-  if (p1 == NULL) return p2;
-  if (p2 == NULL) return p1;
-  
-  spolyrec rp;
-  poly p = &rp;
-  p_Test(p1, r);
-  p_Test(p2, r);
-  
-  Top:
-  p_LmCmpAction(p1, p2, r, goto Equal, goto Greater, goto Smaller);
-  
-  Equal:
-  // should never get here
-  assume(0);
+public:
+  poly p;
+  long length;
+  long max_length;
+};
 
-  Greater:
-  pNext(p) = p1;
-  if (pNext(p1) != NULL)
-  {
-    pIter(p);
-    pIter(p1);
-    goto Top;
-  }
-  pNext(p1) = p2;
-  goto Finish;
+static inline poly p_BucketSort(poly p, const ring r)
+{
+#if PDEBUG > 0
+  long l_orig = pLength(p);
+#endif
   
-  Smaller:
-  pNext(p) = p2;
-  if (pNext(p2) != NULL)
+  long max_length = 1;
+  long i;
+  long l_p;
+  pBucketPoly buckets[BIT_SIZEOF_LONG - 3];
+  poly q;
+
+  buckets[0].p = p;
+  buckets[0].length = 1;
+  buckets[0].max_length = 2;
+  q = pNext(p);
+  pNext(buckets[0].p) = NULL;
+
+  while (q != NULL)
   {
-    pIter(p);
-    pIter(p2);
-    goto Top;
+    p = q;
+    pIter(q);
+    pNext(p) = NULL;
+    i = 0;
+    l_p = 1;
+    while (1)
+    {
+      if (buckets[i].p == NULL)
+      {
+        buckets[i].p = p;
+        buckets[i].length = l_p;
+        break;
+      }
+      buckets[i].p = p_Merge_q(buckets[i].p, p, r);
+      buckets[i].length += l_p;
+      if (buckets[i].length <= buckets[i].max_length)
+        break;
+      p = buckets[i].p;
+      l_p = buckets[i].length;
+      buckets[i].p = NULL;
+      buckets[i].length = 0;
+      i++;
+      if (i == max_length)
+      {
+        buckets[i].p = p;
+        buckets[i].length = l_p;
+        buckets[i].max_length = 1 << (i + 1);
+        max_length = i+1;
+        break;
+      }
+    }
   }
-  pNext(p2) = p1;
-  goto Finish;
   
-  Finish:
-  p_Test(pNext(&rp), r);
-  return pNext(&rp);
+  i = 0;
+  while (buckets[i].p == NULL) i++;
+  p = buckets[i].p;
+  for (i++; i<max_length; i++)
+  {
+    if (buckets[i].p != NULL)
+      p = p_Merge_q(buckets[i].p, p, r);
+  }
+
+  p_Test(p, r);
+#if PDEBUG > 0
+  assume(l_orig == pLength(p));
+#endif
+  return p;
 }
-  
+
 // Sorts poly, reverts it first -- this way, almost sorted polys's
 // don't have n^2 sorting property
 poly prSortR(poly p, ring r, BOOLEAN revert)
 {
   if (p == NULL) return NULL;
   poly qq, result = NULL;
-  int *lp = NULL, lq = 0;
-  
+
+#ifdef REVERT  
+#if REVERT == 1
+  revert = 1;
+#elif REVERT == 0
+  revert = 0;
+#endif
+#endif
   if (revert)
   {
     // there must be a bug here: consider m1->m2
@@ -82,19 +123,8 @@ poly prSortR(poly p, ring r, BOOLEAN revert)
     }
     p = result;
   }
-  
-  result = p;
-  pIter(p);
-  pNext(result) = NULL;
-  while (p != NULL)
-  {
-    qq = p;
-    pIter(p);
-    qq->next = NULL;
-    result = prMergeR(result, qq, r);
-  }
-  p_Test(result, r);
-  return result;
+
+  return p_BucketSort(p, r);
 }
 
 static inline void 

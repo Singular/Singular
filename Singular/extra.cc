@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.148 2000-10-30 13:40:16 obachman Exp $ */
+/* $Id: extra.cc,v 1.149 2000-11-03 14:50:15 obachman Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -623,21 +623,13 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 #endif
 #include "mpsr.h"
 
+   
 static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 {
   if(h->Typ() == STRING_CMD)
   {
     char *sys_cmd=(char *)(h->Data());
     h=h->next;
-    if(strcmp(sys_cmd,"e")==0)
-    {
-      res->rtyp = POLY_CMD;
-      res->data = p_GetMaxExpP((poly)h->Data(), currRing);
-      printf("MaxExp: %d QuerSum: %d\n",
-             p_GetMaxExp((poly)h->Data(), currRing),
-             p_ExpVectorQuerSum((poly)h->Data(), currRing));
-      return FALSE;
-    }
 #ifdef RDEBUG
 /*==================== poly debug ==================================*/
     if(strcmp(sys_cmd,"p")==0)

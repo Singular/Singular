@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.60 2000-10-23 16:32:28 obachman Exp $ */
+/* $Id: polys-impl.h,v 1.61 2000-11-03 14:50:22 obachman Exp $ */
 
 /***************************************************************
  *
@@ -135,7 +135,7 @@ do                                                              \
 {                                                               \
   if (! (cond))                                                 \
   {                                                             \
-    dPolyReportError(p, r, "pPolyAssume violation of: %s\n ",    \
+    dPolyReportError(p, r, "pPolyAssume violation of: %s",    \
                  #cond);                                        \
   }                                                             \
 }                                                               \

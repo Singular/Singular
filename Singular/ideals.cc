@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.111 2000-10-26 11:58:34 Singular Exp $ */
+/* $Id: ideals.cc,v 1.112 2000-11-03 14:50:15 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -97,11 +97,7 @@ ideal idMaxIdeal (void)
 /*2
 * deletes an ideal/matrix
 */
-#ifdef PDEBUG
-void idDBDelete (ideal* h, char *f, int l)
-#else
-void idDelete (ideal * h)
-#endif
+void id_Delete (ideal * h, ring r)
 {
   int j,elems;
   if (*h == NULL)
@@ -111,7 +107,7 @@ void idDelete (ideal * h)
   {
     do
     {
-      pDelete(&((*h)->m[--j]));
+      p_Delete(&((*h)->m[--j]), r);
     }
     while (j>0);
     omFreeSize((ADDRESS)((*h)->m),sizeof(poly)*elems);
