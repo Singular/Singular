@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which iter over ExpVector
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline1.h,v 1.13 2000-11-03 14:50:19 obachman Exp $
+ *  Version: $Id: pInline1.h,v 1.14 2000-12-05 13:01:11 obachman Exp $
  *******************************************************************/
 #ifndef PINLINE1_H
 #define PINLINE1_H
@@ -98,7 +98,7 @@ PINLINE1 poly p_Init(ring r, omBin bin)
   poly p;
   omTypeAlloc0Bin(poly, p, bin);
   p_MemAdd_NegWeightAdjust(p, r);
-  p_SetRingOfPoly(p, r);
+  p_SetRingOfLm(p, r);
   return p;
 }
 PINLINE1 poly p_Init(ring r)
@@ -111,7 +111,7 @@ PINLINE1 poly p_LmInit(poly p, ring r)
   p_LmCheckPolyRing1(p, r);
   poly np;
   omTypeAllocBin(poly, np, r->PolyBin);
-  p_SetRingOfPoly(np, r);
+  p_SetRingOfLm(np, r);
   p_ExpVectorCopy(np, p, r);
   _pNext(np) = NULL;
   _pSetCoeff0(np, NULL);
@@ -145,7 +145,7 @@ PINLINE1 poly p_Head(poly p, ring r)
   p_LmCheckPolyRing1(p, r);
   poly np;
   omTypeAllocBin(poly, np, r->PolyBin);
-  p_SetRingOfPoly(np, r);
+  p_SetRingOfLm(np, r);
   p_ExpVectorCopy(np, p, r);
   _pNext(np) = NULL;
   _pSetCoeff0(np, n_Copy(_pGetCoeff(p), r));

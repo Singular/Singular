@@ -6,7 +6,7 @@
  *  Purpose: template for setting the Lm of a bucket
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_kBucketSetLm__Template.cc,v 1.1 2000-11-28 11:50:56 obachman Exp $
+ *  Version: $Id: p_kBucketSetLm__Template.cc,v 1.2 2000-12-05 13:01:11 obachman Exp $
  *******************************************************************/
 
 void p_kBucketSetLm(kBucket_pt bucket)
@@ -28,12 +28,18 @@ void p_kBucketSetLm(kBucket_pt bucket)
       if (bucket->buckets[i] != NULL)
       {
         p =  bucket->buckets[j];
-        if (j == 0) goto Greater;
+        if (j == 0)
+        {
+          if (p != NULL) goto Greater;
+          j = i;
+          goto Continue;
+        }
+        assume(p != NULL);
         p_MemCmp(bucket->buckets[i]->exp, p->exp, length, ordsgn, goto Equal, goto Greater, goto Continue);
 
         Greater:
         {
-          if (j > 0 && p != NULL && n_IsZero(pGetCoeff(p), r))
+          if (n_IsZero(pGetCoeff(p), r))
           {
             n_Delete(&pGetCoeff(p), r);
             pIter(bucket->buckets[j]);

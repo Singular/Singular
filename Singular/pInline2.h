@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which are of constant time
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline2.h,v 1.21 2000-12-05 12:14:32 obachman Exp $
+ *  Version: $Id: pInline2.h,v 1.22 2000-12-05 13:01:11 obachman Exp $
  *******************************************************************/
 #ifndef PINLINE2_H
 #define PINLINE2_H
@@ -215,7 +215,7 @@ PINLINE2 poly p_New(ring r, omBin bin)
   pAssume2(bin != NULL && r->PolyBin->sizeW == bin->sizeW);
   poly p;
   omTypeAllocBin(poly, p, bin);
-  p_SetRingOfPoly(p, r);
+  p_SetRingOfLm(p, r);
   return p;
 }
 
