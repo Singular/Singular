@@ -1,6 +1,6 @@
 //GMG last modified: 04/25/2000
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: linalg.lib,v 1.15 2001-07-30 16:38:12 mschulze Exp $";
+version="$Id: linalg.lib,v 1.16 2001-08-01 13:02:20 mschulze Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  linalg.lib        Algorithmic Linear Algebra
@@ -1444,16 +1444,15 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc jordan(matrix M,list #)
+proc jordan(matrix M)
 "USAGE:   jordan(M); matrix M
 ASSUME:  M constant square matrix, eigenvalues of M in coefficient field
 RETURN:
 @format
 list l:
-  ideal l[1]: eigenvalues of M
-  list l[2]:
-    intvec l[2][i]:
-      int l[2][i][j]: size of Jordan block j of M with eigenvalue l[1][i]
+  ideal l[1]: eigenvalues of M in increasing order
+  intvec l[2]: corresponding Jordan block sizes
+  intvec l[3]: corresponding multiplicities 
 @end format
 EXAMPLE: example jordan; shows examples
 "
@@ -1470,12 +1469,13 @@ EXAMPLE: example jordan; shows examples
   M=jet(M,0);
 
   list l=eigenval(M);
-  def e,m=l[1..2];
+  def e0,m0=l[1..2];
+  kill l;
 
   int i;
-  for(i=1;i<=ncols(e);i++)
+  for(i=1;i<=ncols(e0);i++)
   {
-    if(deg(e[i]>0))
+    if(deg(e0[i]>0))
     {
       ERROR("eigenvalues in coefficient field expected");
       return(list());
@@ -1483,40 +1483,46 @@ EXAMPLE: example jordan; shows examples
   }
 
   int j,k;
-  matrix N,NN;
+  matrix N0,N1;
   module K0;
   list K;
-  intvec b0;
-  list b;
+  ideal e;
+  intvec s,m;
 
-  for(i=ncols(e);i>0;i--)
+  for(i=1;i<=ncols(e0);i++)
   {
-    N=M-e[i]*freemodule(ncols(M));
+    N0=M-e0[i]*freemodule(ncols(M));
 
+    N1=N0;
     K0=0;
-    NN=N;
     K=module();
-    while(size(K0)<m[i])
+    while(size(K0)<m0[i])
     {
-      K0=syz(NN);
+      K0=syz(N1);
       K=K+list(K0);
-      NN=NN*N;
+      N1=N1*N0;
     }
 
-    b0=0;
-    b0[size(K[2])]=0;
-    for(j=size(K);j>1;j--)
+    for(j=2;j<size(K);j++)
     {
-      for(k=size(b0);k>size(b0)+size(K[j-1])-size(K[j]);k--)
+      if(2*size(K[j])-size(K[j-1])-size(K[j+1])>0)
       {
-        b0[k]=b0[k]+1;
+        k++;
+        e[k]=e0[i];
+        s[k]=j-1;
+        m[k]=2*size(K[j])-size(K[j-1])-size(K[j+1]);
       }
     }
-    b=list(b0)+b;
+    if(size(K[j])-size(K[j-1])>0)
+    {
+      k++;
+      e[k]=e0[i];
+      s[k]=j-1;
+      m[k]=size(K[j])-size(K[j-1]);
+    }
   }
 
-  l[2]=b;
-  return(l);
+  return(list(e,s,m));
 }
 example
 { "EXAMPLE:"; echo=2;
@@ -1530,7 +1536,12 @@ example
 proc jordanbasis(matrix M)
 "USAGE:   jordanbasis(M); matrix M
 ASSUME:  M constant square matrix, eigenvalues of M in coefficient field
-RETURN:  matrix U with inverse(U)*M*U in Jordan normal form
+RETURN:
+@format
+list l:
+  module l[1]: inverse(l[1])*M*l[1] has Jordan normal form
+  intvec l[2]: weight filtration indices of l[1] with center 0
+@end format
 EXAMPLE: example jordanbasis; shows examples
 "
 {
@@ -1565,14 +1576,15 @@ EXAMPLE: example jordanbasis; shows examples
   list K;
   matrix u[ncols(M)][1];
   module U;
+  intvec w;
 
-  for(i=ncols(e);i>0;i--)
+  for(i=ncols(e);i>=1;i--)
   {
     N0=M-e[i]*freemodule(ncols(M));
 
-    K0=0;
     N1=N0;
-    K=module();
+    K0=0;
+    K=list();
     while(size(K0)<m[i])
     {
       K0=syz(N1);
@@ -1581,7 +1593,7 @@ EXAMPLE: example jordanbasis; shows examples
     }
 
     K1=0;
-    for(j=2;j<size(K);j++)
+    for(j=1;j<size(K);j++)
     {
       K0=K[j];
       K[j]=interred(reduce(K[j],std(K1+module(N0*K[j+1]))));
@@ -1589,83 +1601,64 @@ EXAMPLE: example jordanbasis; shows examples
     }
     K[j]=interred(reduce(K[j],std(K1)));
 
-    for(j=size(K);j>1;j--)
+    for(l=size(K);l>=1;l--)
     {
-      for(k=size(K[j]);k>0;k--)
+      for(k=size(K[l]);k>0;k--)
       {
-        u=K[j][k];
-        for(l=j;l>0;l--)
+        u=K[l][k];
+        for(j=l;j>=1;j--)
         {
           U=module(u)+U;
+          w=2*j-l-1,w;
           u=N0*u;
         }
       }
     }
   }
-
-  return(U);
+  w=w[1..size(w)-1];
+  return(list(U,w));
 }
 example
 { "EXAMPLE:"; echo=2;
   ring R=0,x,dp;
   matrix M[3][3]=3,2,1,0,2,1,0,0,3;
   print(M);
-  matrix U=jordanbasis(M);
-  print(U);
-  print(inverse(U)*M*U);
+  list l=jordanbasis(M);
+  print(l[1]);
+  print(l[2]);
+  print(inverse(l[1])*M*l[1]);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc jordanmatrix(ideal e,list b)
-"USAGE:   jordanmatrix(e,b); ideal e, list b
-RETURN:  matrix J in Jordan normal form 
-         with eigenvalues e and Jordan block sizes b
+proc jordanmatrix(ideal e,intvec s,intvec m)
+"USAGE:   jordanmatrix(e,s,m); ideal e, intvec s, intvec m
+RETURN:
+@format
+matrix J: Jordan normal form with eigenvalues e and Jordan block sizes s
+          with multiplicities m
+@end format
 EXAMPLE: example jordanmatrix; shows examples
 "
 {
-  if(ncols(e)!=size(b))
+  if(ncols(e)!=size(s)||size(e)!=size(m))
   {
     ERROR("arguments of equal size expected");
   }
 
-  int i,j,k,n;
-  for(i=ncols(e);i>=1;i--)
-  {
-    if(typeof(b[i])!="intvec")
-    {
-      ERROR("second argument of type list of intvec expected");
-    }
-    else
-    {
-      for(j=size(b[i]);j>=1;j--)
-      {
-        k=b[i][j];
-        if(k>0)
-        {
-          n=n+k;
-        }
-      }
-    }
-  }
+  int i,j,k,l;
+  int n=int((transpose(matrix(s))*matrix(m))[1,1]);
   matrix J[n][n];
-
-  int l=1;
-  for(i=1;i<=ncols(e);i++)
+  for(k=1;k<=ncols(e);k++)
   {
-    for(j=1;j<=size(b[i]);j++)
+    for(l=1;l<=m[k];l++)
     {
-      k=b[i][j];
-      if(k>0)
+      j++;
+      J[j,j]=e[k];
+      for(i=s[k];i>=2;i--)
       {
-        while(k>=2)
-        {
-          J[l,l]=e[i];
-          J[l,l+1]=1;
-          k--;
-          l++;
-        }
-        J[l,l]=e[i];
-        l++;
+        J[j,j+1]=1;
+        j++;
+        J[j,j]=e[k];
       }
     }
   }
@@ -1676,8 +1669,9 @@ example
 { "EXAMPLE:"; echo=2;
   ring R=0,x,dp;
   ideal e=ideal(2,3);
-  list b=list(intvec(1),intvec(2));
-  print(jordanmatrix(e,b));
+  intvec s=1,2;
+  intvec m=1,1;
+  print(jordanmatrix(e,s,m));
 }
 ///////////////////////////////////////////////////////////////////////////////
 
