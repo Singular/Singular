@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: stairc.h,v 1.5 1997-11-25 15:28:17 pohl Exp $ */
+/* $Id: stairc.h,v 1.6 1998-12-15 09:58:45 pohl Exp $ */
 /*
 * ABSTRACT
 */
@@ -21,7 +21,8 @@ void scDegree(ideal  s,ideal Q=NULL);
 
 ideal scKBase(int deg, ideal  s, ideal Q=NULL);
 
-intvec * hHstdSeries(ideal S, intvec *modulweight, ideal Q=NULL);
+intvec * hHstdSeries(ideal S, intvec *modulweight, intvec *wdegree,
+                     ideal Q=NULL);
 intvec * hFirstSeries(ideal S, intvec *modulweight, ideal Q=NULL);
 intvec * hSecondSeries(intvec *hseries1);
 

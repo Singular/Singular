@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hilb.cc,v 1.8 1998-12-08 10:55:27 pohl Exp $ */
+/* $Id: hilb.cc,v 1.9 1998-12-15 09:58:46 pohl Exp $ */
 /*
 *  ABSTRACT -  Hilbert series
 */
@@ -188,8 +188,26 @@ static void hHilbStep(scmon pure, scfmon stc, int Nstc, varset var,
 /*
 *basic routines
 */
+static void hWDegree(intvec *wdegree)
+{
+  int i, k;
+  Exponent_t x;
 
-static intvec * hSeries(ideal S, intvec *modulweight, ideal Q, int notstc)
+  for (i=pVariables; i; i--)
+  {
+    x = (*wdegree)[i-1];
+    if (x != 1)
+    {
+      for (k=hNexist-1; k>=0; k--)
+      {
+        hexist[k][i] *= x;
+      }
+    }
+  }
+}
+
+static intvec * hSeries(ideal S, intvec *modulweight,
+                int notstc, intvec *wdegree, ideal Q)
 {
   intvec *work, *hseries1=NULL;
   Exponent_t  mc;
@@ -203,7 +221,10 @@ static intvec * hSeries(ideal S, intvec *modulweight, ideal Q, int notstc)
     (*hseries1)[1]=0;
     return hseries1;
   }
-  hWeight();
+  if (wdegree == NULL)
+    hWeight();
+  else
+    hWDegree(wdegree);
   p0 = (int *)Alloc(sizeof(int));
   *p0 = 1;
   hwork = (scfmon)Alloc(hNexist * sizeof(scmon));
@@ -335,14 +356,14 @@ static intvec * hSeries(ideal S, intvec *modulweight, ideal Q, int notstc)
 }
 
 
-intvec * hHstdSeries(ideal S, intvec *modulweight, ideal Q)
+intvec * hHstdSeries(ideal S, intvec *modulweight, intvec *wdegree, ideal Q)
 {
-  return hSeries(S, modulweight, Q, 0);
+  return hSeries(S, modulweight, 0, wdegree, Q);
 }
 
 intvec * hFirstSeries(ideal S, intvec *modulweight, ideal Q)
 {
-  return hSeries(S, modulweight, Q, 1);
+  return hSeries(S, modulweight, 1, NULL, Q);
 }
 
 intvec * hSecondSeries(intvec *hseries1)
