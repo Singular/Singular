@@ -1921,6 +1921,7 @@ EXTERN MP_Status_t MP_TbSetTerm _ANSI_ARGS_((MP_Link_pt link, term *t));
  ***************************************************************************/
 #define MP_CmtNumberRational           1
 #define MP_CmtNumberInteger             2
+#define MP_CmtNumberComplex             3
 
 
 /***************************************************************************
@@ -2084,6 +2085,21 @@ EXTERN MP_Status_t MP_TbSetTerm _ANSI_ARGS_((MP_Link_pt link, term *t));
  * (Common) Constants
  *
  ***************************************************************************/
+#define MP_CcPolyOrdering_Unknown       0 
+#define MP_CcPolyOrdering_Vector        1 /* a */
+#define MP_CcPolyOrdering_Matrix        2 /* M */
+#define MP_CcPolyOrdering_IncComp       3 /* c */
+#define MP_CcPolyOrdering_DecComp       4 /* C */
+#define MP_CcPolyOrdering_Lex           5 /* lp */
+#define MP_CcPolyOrdering_DegRevLex     6 /* dp */
+#define MP_CcPolyOrdering_DegLex        7 /* Dp */
+#define MP_CcPolyOrdering_NegLex        8 /* ls */
+#define MP_CcPolyOrdering_NegDegRevLex  9 /* ds */
+#define MP_CcPolyOrdering_NegDegLex     10 /* Ds */
+#define MP_CcPolyOrdering_NegRevLex     11
+#define MP_CcPolyOrdering_RevLex        12
+
+#if 0 /* Here is what it used to be */
 #define MP_CcPolyOrdering_No    0
 #define MP_CcPolyOrdering_a     1
 #define MP_CcPolyOrdering_c     2
@@ -2099,7 +2115,7 @@ EXTERN MP_Status_t MP_TbSetTerm _ANSI_ARGS_((MP_Link_pt link, term *t));
 #define MP_CcPolyOrdering_ws    12
 #define MP_CcPolyOrdering_Ws    13
 #define MP_CcPolyOrdering_Unspec 14
-
+#endif
 
 
 /***************************************************************************

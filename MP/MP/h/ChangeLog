@@ -1,3 +1,7 @@
+1998-11-09  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
+
+	* MP_NumberDict.h: small changes
+
 Sat Jun 28 15:24:44 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
 	* MP_ProtoDict.h: Added MP_CmtProto_2_MPType(cmt)
