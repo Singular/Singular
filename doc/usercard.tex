@@ -1,4 +1,4 @@
-% $Id: usercard.tex,v 1.5 1998-06-18 15:46:17 schmidt Exp $
+% $Id: usercard.tex,v 1.6 1998-06-18 20:27:38 schmidt Exp $
 
 %
 % usercard.tex - Singular user quick reference card.
@@ -59,10 +59,11 @@ BS\rmslash\ctl d&		remove character on the left/right of cursor\cr
 \endsec
 
 \sec Names and objects()
+\sectext
+Names (= identifiers) have to be declared before they are used:\cr
+\entryskip
 \longentry {\it type\/} {\it name\/} \opt{= {\it expression\/}};&
-				declare variable {\it name}.  All names (=
-				identifiers) have to be declared before
-				they are used.\cr
+				declare variable {\it name}\cr
 kill({\it name\/})&		delete variable {\it name}\cr
 \entryskip
 \sectext
@@ -368,20 +369,20 @@ $$
 \noalign{\vskip -9pt} % dirty trick, gobbles the trailing \strut from \sectext
 \entryskip
 \longentry fetch({\it ringname}, {\it name\/})&
-				map object {\it name\/} from ring {\it
-				ringname\/} to current base\-ring.  The rings
-				have to be ``almost'' identical.\cr
+				map from ring {\it ringname\/} to current
+				base\-ring.  The rings have to be identical up
+				to names of ring variables\cr
 \longentry imap({\it ringname}, {\it name\/})&
-				map object {\it name\/} from subring {\it
-				ringname\/} to current basering\cr
+				map from subring {\it ringname\/} to current
+				basering\cr
 \longentry subst({\it expression}, {\it ringvar}, {\it monomial\/})&
 				substitute {\it ringvar\/} by {\it monomial\/}
 				in {\it expression}\cr
 \endsec
 
 \sec Miscellany(1.5cm)
-\longentry setring({\it name\/})&
-				make {\it name\/} the current basering\cr
+\longentry setring({\it ringname\/})&
+				make {\it ringname\/} the current basering\cr
 \subsec{Data on polynomials}
 \longentry ord({\it poly\/\alt vector\/})&
 				return (weighted) degree of initial term\cr
@@ -394,33 +395,34 @@ size({\it string\/\alt intvec\/\alt list\/})&
 				return (1) number of non-zero generators;
 				(2) number of monomials; (3) length\cr
 \longentry lead({\it expression\/})&
-				return initial term(s) of {\it expression}\cr
+				return initial term(s)\cr
 \subsec{Operations on polynomials}
 \longentry gcd({\it $\hbox{poly}_1$}, {\it $\hbox{poly}_2$\/})&
-				return greatest common divisor of {\it
-				$\hbox{poly}_1$\/} and {\it $\hbox{poly}_2$}\cr
+				return greatest common divisor\cr
 \longentry factorize({\it poly\/}\opt{, {\it int\/}})&
-				return irreducible factors of {\it poly}.  A
-				constant factor and multiplicities are returned
-				in dependency on {\it int}.\cr
+				return irreducible factors.  Return constant
+				factor and multiplicities in dependency on {\it
+				int}.\cr
 \endsec
 
 \sec Differentiation and jets(1.5cm)
 \longentry
 diff({\it expression}, {\it ringvar\/})\par
 diff({\it $\hbox{ideal}_1$}, {\it $\hbox{ideal}_2$\/})&
-				(1) return partial deriv.\ of {\it expression\/}
-				by {\it ringvar\/}; (2) differentiate each elt.\
-				of {\it $\hbox{ideal}_2$\/} by the differential
-				operators corresponding to the elements of {\it
+				(1) return partial derivation by {\it
+				ringvar\/}; (2) differentiate each elt.\ of {\it
+				$\hbox{ideal}_2$\/} by the differential
+				operators corres\-pon\-ding to the elements of {\it
 				$\hbox{ideal}_1$}\cr
 \longentry jacob({\it poly\/\alt ideal\/})&
-				return the jacobi ideal or matrix, resp.\cr
+				return jacobi ideal or matrix, resp.\cr
 \longentry jet({\it expression}, {\it int\/}\opt{, {\it intvec\/}})&
-				return the {\it int\/}-jet of {\it expression}.
+				return {\it int\/}-jet of {\it expression}.
 				Return weighted {\it int\/}-jet if {\it
 				intvec\/} is specifified.\cr
 \endsec
+
+\eject
 
 \sec Standard bases(1.5cm)
 \longentry groebner({\it ideal\/\alt module\/}\opt{, {\it int\/}})&
@@ -434,7 +436,7 @@ diff({\it $\hbox{ideal}_1$}, {\it $\hbox{ideal}_2$\/})&
 				for Hilbert-driven computation.\cr
 \longentry stdfglm({\it ideal\/}\opt{, {\it string\/}})&
 				use FGLM algorithm to compute a SB from a SB
-				w.r.t.\ a ``simple'' ordering {\it string\/}
+				w.r.t.\ the ``simpler'' ordering {\it string\/}
 				(de\-faults to {\tt dp})\cr
 \longentry stdhilb({\it ideal\/}\opt{, {\it intvec\/}})&
 				use Hilbert-driven algorithm to compute a SB.
@@ -450,10 +452,51 @@ diff({\it $\hbox{ideal}_1$}, {\it $\hbox{ideal}_2$\/})&
 				reduction if {\it int\/} equals one.\cr
 \endsec
 
-\sec Invariants of ideals and modules(1.5cm)
+\sec Computation of invariants(1.5cm)
+\sectext
+Most of the results are meaningful only if the input ideal or module is
+represented by a standard basis.\cr
+\longentry degree({\it ideal\/\alt module\/})&
+				display (Krull) dimension, codimension and
+				multiplicity\cr
+\longentry dim({\it ideal\/\alt module\/})&
+				return (Krull) dimension\cr
 \longentry hilb({\it ideal\/\alt module\/}\opt{, {\it int\/}})&
 				display first and second Hilbert series with one
-				argument.\cr
+				argument.  Return {\it int}-th Hilber series
+				otherwise (${\it \hbox{int}} = 1,2$).\cr
+\longentry mult({\it ideal\/\alt module\/})&
+				return multiplicity\cr
+\longentry vdim({\it ideal\/\alt module\/})&
+				return vector space dimension of current
+				basering modulo {\it ideal\/} or {\it module},
+				resp.\cr
+\endsec
+
+\sec Resolutions(1.5cm)
+\sectext
+An integer argument {\it length\/} in the following descriptions specifies the
+length of the resolution to compute.  If {\it length\/} equals zero, the whole
+resolution is computed.\cr
+\longentry res({\it ideal\/\alt module}, {\it length\/}\opt{, {\it int\/}})&
+				compute a free resolution (FR) of {\it ideal\/}
+				resp.\ {\it module\/} using a heuristically
+				chosen method.  Compute a minimal resolution if
+				a third argument is given.\cr
+\longentry mres({\it ideal\/\alt module}, {\it length\/})&
+				compute a minimal FR using the standard basis
+				method\cr
+\longentry lres({\it ideal\/\alt module}, {\it length\/})&
+				compute a FR using LaSacala's method\cr
+\longentry sres({\it ideal\/\alt module}, {\it length\/})&
+				compute a FR using Schreyer's method\cr
+\longentry syz({\it ideal\/\alt module\/})&
+				compute the first syzygy\cr
+\longentry minres({\it resolution\/\alt list\/})&
+				minimize a free resolution\cr
+\longentry betty({\it resolution\/\alt list\/})&
+				compute the graded Betti numbers of a module
+				represented by a resolution\cr
 \endsec
 
 \bye
