@@ -2302,56 +2302,35 @@ static void go_on_F4 (calc_dat* c){
   }
   m=(poly*) omalloc(m_size*sizeof(poly));
   //q=(poly*) omalloc(m_size*sizeof(poly));
-#ifdef TGB_DEBUG
+
   
-  for(i=0;i<done_index;i++)
-  {
-    
-    pTest(done[i]);
-  }
-#endif
-  
-  assume(done_index==0);
+
   for(i=0;i<p_index;i++)
   {
-     assume(done_index==0);
+
     poly p_i=p[i];
-     assume(done_index==0);
+
     pTest(p[i]);
-     assume(done_index==0);
+
     while(p_i)
     {
-       assume(done_index==0);
+
       m[m_index]=pLmInit(p_i);
-      assume(done_index==0);
+
       pSetCoeff(m[m_index],nInit(1));
-       assume(done_index==0);
+
        p_i=p_i->next;
-        assume(done_index==0);
+
       m_index++;
-       assume(done_index==0);
+
     }
   }
-#ifdef TGB_DEBUG
-      
-      for(i=0;i<done_index;i++)
-      {
-	
-	pTest(done[i]);
-      }
-#endif
+
   int q_size=m_index;
   poly* q=(poly*) omalloc(q_size*sizeof(poly));
   int q_index=0;
   //next Step additional reductors
-  #ifdef TGB_DEBUG
-      
-      for(i=0;i<done_index;i++)
-      {
-	
-	pTest(done[i]);
-      }
-#endif
+
   while(m_index>0)
   {
 #ifdef TGB_DEBUG
@@ -2771,7 +2750,7 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
     omfree(c->F_minus->p);
     c->F_minus->p=NULL;
     poly_array_list* old=c->F_minus;
-    c->F=c->F->next;
+    c->F_minus=c->F_minus->next;
     omfree(old);
   }
   for(int z=0;z<c->n;z++){
