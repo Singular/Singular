@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.101 2002-12-13 16:20:06 Singular Exp $ */
+/* $Id: iplib.cc,v 1.102 2002-12-19 11:22:52 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -378,10 +378,12 @@ static void iiCheckNest()
                                    iiRETURNEXPR_len*sizeof(sleftv),
                                    (iiRETURNEXPR_len+16)*sizeof(sleftv));
     omMarkAsStaticAddr(iiRETURNEXPR);
+    memset(&(iiRETURNEXPR[iiRETURNEXPR_len]),0,16*sizeof(sleftv));
 #ifdef USE_IILOCALRING
     iiLocalRing=(ring *)omreallocSize(iiLocalRing,
                                    iiRETURNEXPR_len*sizeof(ring),
                                    (iiRETURNEXPR_len+16)*sizeof(ring));
+    memset(&(iiLocalRing[iiRETURNEXPR_len]),0,16*sizeof(ring));
 #endif
     iiRETURNEXPR_len+=16;
   }
@@ -429,14 +431,14 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
                  if ((pi->pack!=NULL)&&(currPack!=pi->pack))
                  {
                    currPack=pi->pack;
-		   iiCheckPack(currPack);
+                   iiCheckPack(currPack);
                    currPackHdl=packFindHdl(currPack);
                    //Print("set pack=%s\n",IDID(currPackHdl));
                  }
                  else if ((pack!=NULL)&&(currPack!=pack))
                  {
                    currPack=pack;
-		   iiCheckPack(currPack);
+                   iiCheckPack(currPack);
                    currPackHdl=packFindHdl(currPack);
                    //Print("set pack=%s\n",IDID(currPackHdl));
                  }

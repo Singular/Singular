@@ -1,8 +1,8 @@
-// $Id: deform.lib,v 1.25 2001-02-06 11:30:28 anne Exp $
+// $Id: deform.lib,v 1.26 2002-12-19 11:22:53 Singular Exp $
 // author: Bernd Martin email: martin@math.tu-cottbus.de
 //(bm, last modified 4/98)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: deform.lib,v 1.25 2001-02-06 11:30:28 anne Exp $";
+version="$Id: deform.lib,v 1.26 2002-12-19 11:22:53 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  deform.lib    Miniversal Deformation of Singularities and Modules
@@ -876,7 +876,7 @@ Sub-proc: return martix ord(a_ij) with respect to weight_vec, or
   }
  setring br;
   if(system("with","Namespaces")) { kill Ring::nr; }
-  kill nr;
+  else { kill nr;}
   return(degA);
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -936,7 +936,7 @@ Sub-procedure: Computing relative (with respect to flatten(Fo)) weight_vec
    if (l==0) {
      setring br;
      if(system("with","Namespaces")) { kill Ring::nr; }
-     kill nr;
+     else { kill nr;}
      return(l);
    }
    dv = attrib(A,"isHomog");
@@ -945,7 +945,7 @@ Sub-procedure: Computing relative (with respect to flatten(Fo)) weight_vec
    dv = dv-l;
  setring br;
    if(system("with","Namespaces")) { kill Ring::nr; }
-   kill nr;
+   else { kill nr;}
    return(dv);
 }
 ///////////////////////////////////////////////////////////////////////////////
