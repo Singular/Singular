@@ -1,11 +1,11 @@
 /*
- * $Id: locals.h,v 1.2 1999-03-17 13:06:21 krueger Exp $
+ * $Id: locals.h,v 1.3 2001-05-23 20:15:58 anne Exp $
  */
 
 #include <mod2.h>
 #include <tok.h>
 #include <ipid.h>
-#include <mmemory.h>
+//#include <mmemory.h>
 #include <febase.h>
 #include <subexpr.h>
 //#include <utils.h>
