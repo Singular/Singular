@@ -75,4 +75,7 @@ esStratum(F);
 
 isEquising(F);
 
+example esStratum;
+example isEquising;
+
 tst_status(1);$
