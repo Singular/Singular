@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.26 1998-05-06 09:34:05 Singular Exp $
+@comment $Id: general.doc,v 1.27 1998-05-06 11:56:18 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -199,13 +199,9 @@ kill the whole line
 save the current line to the history and
 send it to the @sc{Singular} parser for interpretation
 @end table
-<<<<<<< general.doc
 @* @strong{Remarks:}
 @* There is a history of the last 32 unique lines.
-=======
-@* @strong{Remark:}
 @c @* There is a history of the last 32 unique lines.
->>>>>>> 1.23
 @* This section does not apply to the MPW-Macintosh version of
 @sc{Singular}.
 @* This section describes only a subset of the key bindings of
