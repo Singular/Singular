@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.cc,v 1.13 1998-05-19 17:11:07 pohl Exp $ */
+/* $Id: matpol.cc,v 1.14 1998-07-15 14:40:29 pohl Exp $ */
 
 /*
 * ABSTRACT:
@@ -338,8 +338,10 @@ class mp_permmatrix
 };
 
 /*2
-*  caller of 'Bareiss' algorithm
-*  return an list of ...
+*  caller of 'Bareiss' algorithm,
+*  return an list of a matrix and an intvec:
+*    the matrix is lower triangular and the result,
+*    the intvec is the performed permutation of columns.
 */
 lists mpBareiss (matrix a, BOOLEAN sw)
 {
@@ -407,6 +409,45 @@ matrix mpOneStepBareiss (matrix a, poly *H, int *r, int *c)
   Bareiss->mpSaveArray();
   delete Bareiss;
   return re;
+}
+
+/*2
+*returns the determinant of the matrix m;
+*uses Bareiss algorithm
+*/
+poly mpDetBareiss (matrix a)
+{
+  int s;
+  poly div, res;
+  if (MATROWS(a) != MATCOLS(a))
+  {
+    Werror("det of %d x %d matrix",MATROWS(a),MATCOLS(a));
+    return NULL;
+  }
+  matrix c = mpCopy(a);
+  mp_permmatrix *Bareiss = new mp_permmatrix(c);
+  row_col_weight w(Bareiss->mpGetRdim(), Bareiss->mpGetCdim());
+
+  /* Bareiss */
+  div = NULL;
+  while(Bareiss->mpPivotBareiss(&w))
+  {
+    Bareiss->mpElimBareiss(div);
+    div = Bareiss->mpGetElem(Bareiss->mpGetRdim(), Bareiss->mpGetCdim());
+  }
+  Bareiss->mpRowReorder();
+  Bareiss->mpColReorder();
+  Bareiss->mpSaveArray();
+  s = Bareiss->mpGetSign();
+  delete Bareiss;
+
+  /* result */
+  res = MATELEM(c,1,1);
+  MATELEM(c,1,1) = NULL;
+  idDelete((ideal *)&c);
+  if (s < 0)
+    res = pNeg(res);
+  return res;
 }
 
 /*2

@@ -2318,7 +2318,14 @@ static BOOLEAN jjDET(leftv res, leftv v)
     return FALSE;
   }
 nonconst:
-  res->data = (char *)mpDet(m);
+//  res->data = (char *)mpDet(m);
+  poly p1 = mpDet(m), p2 = mpDetBareiss(m);
+  p2 = pSub(pCopy(p1),p2);
+  if (p2 != NULL)
+  {
+    WerrorS("error in mpDetBareiss\n");
+  }
+  res ->data = (char *)p1;
   return FALSE;
 }
 static BOOLEAN jjDET_I(leftv res, leftv v)
@@ -4318,6 +4325,7 @@ static BOOLEAN jjTEST(leftv res, leftv v)
   return FALSE;
 }
 
+#ifndef __MWERKS__
 static BOOLEAN jjSTATUS_M(leftv res, leftv v)
 {
   if ((v->Typ() != LINK_CMD) ||
@@ -4349,7 +4357,7 @@ static BOOLEAN jjSTATUS_M(leftv res, leftv v)
 #endif
   return FALSE;
 }
-
+#endif
 
 /*=================== operations with many arg.: table =================*/
 /* number_of_args:  -1: any, -2: any >0, .. */
@@ -4381,7 +4389,9 @@ struct sValCmdM dArithM[]=
 ,{iiWRITE,     WRITE_CMD,       NONE,               -2 }
 ,{jjCALL2ARG,  STATUS_CMD,      STRING_CMD,          2 }
 ,{jjCALL3ARG,  STATUS_CMD,      INT_CMD,             3 }
+#ifndef __MWERKS__
 ,{jjSTATUS_M,  STATUS_CMD,      INT_CMD,             4 }
+#endif
 ,{NULL,        0,               0,                  0  }
 };
 #ifdef MDEBUG
