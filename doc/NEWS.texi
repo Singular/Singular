@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.27 2000-12-20 16:40:57 Singular Exp $
+@comment $Id: NEWS.texi,v 1.28 2001-02-02 17:52:08 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -20,20 +20,19 @@
 @end macro
 @end ifset
 
-The current version @value{VERSION} is an alpha-release of the upcoming
-new release version 2-0 (should be there in the fall of 
-2000). Items labeled with "TBC" in this news file are features which
-still have to be implemented and/or documented.
+The current version @value{VERSION} is the first release of the new 
+release series version 2-0.
+It contains a lot of new internal improvements, rewrites, new procedures etc.
 
 Although there are no known bugs, it is to be
-expected that the current version @value{VERSION} is not as stable as
-the 1.2 version(s), since major changes were done to the @sc{Singular}
+expected that the current version @value{VERSION} has some bugs in the 
+code sections, since major changes were done to the @sc{Singular}
 kernel. Therefore, it is important to us, that users try out this new
 version.
 
-Furthermore, the current version is generally not yet as fast as version
-1.2. But this is going to change dramatically in the upcoming release
-version(s).
+The current version is generally much faster as version
+1.2 - because of new, better algorithms and impproved
+polynomial operations.
 
 Thank you very much for your support!
 
@@ -59,8 +58,8 @@ language
 Provide on-line examples for all kernel and library commands.
 @item file/directory layout of distribution
 @code{Singular/<version>/}
-@item http://singular.uni-kl.de ftp://singular.uni-kl.de
-TBC: New WWW and FTP home-site of @sc{Singular}
+@item http://www.singular.uni-kl.de
+New WWW home-site of @sc{Singular}
 @end table
 
 @heading Extensions of the ring concept
@@ -69,23 +68,20 @@ TBC: New WWW and FTP home-site of @sc{Singular}
 @item new coefficient domains: arbitrary long real and complex numbers
 The current syntax is going to change slightly in the final version 2.0.
 @item no restriction on number of ring variables
-@item TBC: DegBound on exponent values
-@item TBC: parameters over real/complex
-@item TBC: declaration with "ring of ring".
-@item
+@item no restriction on number of parameters
+@c @item TBC: DegBound on exponent values
+@c @item TBC: parameters over real/complex
+@c @item TBC: declaration with "ring of ring".
 @end table
 
 @heading New @sc{Singular} libraries
 
+Reorganisation of libraries into "Categories".
 @table @asis
 @item @nref{intprog_lib} procedures for computing toric ideals
-TODO: better docu, tests, proper incooperation
 @item @nref{toric_lib} procedures for Integer Programming using Groebner bases
-TODO: better docu, tests, proper incooperation
 @item @code{spectrum.lib} procedures for computing spectra
-TODO: docu, tests, proper incooperation
 @item @nref{mregular_lib}  procedures for computing the Castelnuovo-Mumford regularity
-TODO: docu, tests
 @item @nref{mondromy_lib}
 procedures for computing the monodromy of a singularity
 @item @nref{spcurve_lib}
@@ -165,21 +161,23 @@ optional third argument (a matrix name), which, if given, stores the
 new implementation after Lie-Saunders, much faster
 @item @nref{example}
 run example for all kernel commands.
-@item @nref{fetch}
-TBC
+@c @item @nref{fetch}
 @item @nref{print}
 Finer-grained control for formatted output.
 @item @code{pause}
 can be called with argument, must be called with parenthesis.
-@item TBC
 @end table
 
 @heading Changes in @sc{Singular} libraries
+Many procedures got into different libraries,
+documentation of libraries improved,
+some libraries renamed:
 @table @asis
 @item @nref{ainvar_lib}
 renamed @code{invar.lib} to @code{ainvar.lib}
+(see also @code{rinvar.lib}, @code{finvar.lib}).
 @item @nref{deform_lib}
-renamed procedures @code{Y1, T2, T12} to @code{T_1, T_2, T_12}.
+renamed procedures @code{T1, T2, T12} to @code{T_1, T_2, T_12}.
 @item @nref{poly_lib}
 new procedures numerator/denominator
 @end table
@@ -202,21 +200,22 @@ dynamically at run-time. If not found, @code{readline} is emulated.
 @heading Internal Changes
 @table @asis
 @item new data structures for monomials and polynomials
-Makes polynomial arithmetic significantly faster. Especially for block -
-or weighted orderings. TBC: Faster polynomial arithmetic for orderings
-(like dp, or lp). TBC: Bucket representation of polynomials in std; TBC:
-DegBound during std computations.
+Makes polynomial arithmetic significantly faster: Especially for block -
+or weighted orderings.
+Bucket representation of polynomials in std;
+Ring change during std, res and bareiss computations
+(resulting in more speed and less sapce consumption).
 @item new memory management
 Results is less memory usage, faster memory allocation/free, less
 fragmentation, much better locality of reference.
 @end table
 
-@heading TBC
+@heading Porting
 
 @itemize @bullet
 @item 
-@code{libreadline} for other architectures than ix86-libc5, 
+@code{libreadline} works only with ix86-libc5, 
 ix86-libc6,HPUX_9,HPUX_10
-@item
-@code{example} on examples from libraries
+@item Singular is available for ix86-libc5, ix86-libc6, HPUX_9, HPUX_10,
+SunOS-4, SunOS-5, ...
 @end itemize
