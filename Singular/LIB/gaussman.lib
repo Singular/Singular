@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.21 2001-01-07 15:21:09 greuel Exp $";
+version="$Id: gaussman.lib,v 1.22 2001-01-09 16:16:14 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -147,9 +147,9 @@ ASSUME:   basering has local ordering, f has isolated singularity at 0
 RETURN:
 @format
           if mode=0:
-             matrix M: exp(-2*pi*i*M) is a monodromy matrix of f
+            matrix M: exp(-2*pi*i*M) is a monodromy matrix of f
           if mode=1:
-             ideal e: exp(-2*pi*i*e) is the spectrum of the monodromy of f
+            ideal e: exp(-2*pi*i*e) is the spectrum of the monodromy of f
 @end format
 SEE ALSO: monodromy.lib, jordan.lib
 KEYWORDS: singularities; Gauss-Manin connection; monodromy;
@@ -370,23 +370,23 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc vfiltration(poly f,list #)
-"USAGE:    vfiltration(f[,mode]); poly f, int mode[default=1]
-ASSUME:   local ordering, f isolated singularity at 0
-RETURN:   list l:
-@format           
+"USAGE:    vfiltration(f[,mode]); poly f, int mode[=1]
+ASSUME:   basering has local ordering, f has isolated singularity at 0
+RETURN:
+@format
           list l:
           if mode=0 or mode=1:
-            l[1]: ideal, spectral numbers in increasing order
-            l[2]: intvec
-                  l[2][i]: int, multiplicity of spectral number l[1][i]
-          if mode=1 :
-            l[3]: list
-                  l[3][i]: module, vector space basis of l[1][i]-th graded 
-                           part of the V-filtration on H''/H' in terms of l[4]
-            l[4]: ideal, monomial vector space basis of H''/H'
-            l[5]: ideal, standard basis of Jacobian ideal
-          @end format
-NOTE:     H' and H'' denote Brieskorn lattices
+            ideal l[1]: spectral numbers in increasing order
+            intvec l[2]:
+              int l[2][i]: multiplicity of spectral number l[1][i]
+          if mode=1:
+            list l[3]:
+              module l[3][i]: vector space basis of l[1][i]-th graded part
+                              of the V-filtration on H''/H' in terms of l[4]
+            ideal l[4]: monomial vector space basis of H''/H'
+            ideal l[5]: standard basis of the Jacobian ideal
+@end format
+NOTE:     H' and H'' denote the Brieskorn lattices
 SEE ALSO: spectrum.lib
 KEYWORDS: singularities; Gauss-Manin connection; spectrum;
           Brieskorn lattice; Hodge filtration; V-filtration;
@@ -748,21 +748,21 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc vfiltjacalg(list l)
-"USAGE:   vfiltjacalg(vfiltration(f));
-ASSUME:  local ordering, f isolated singularity at 0
-RETURN:  
-@format  
+"USAGE:   vfiltjacalg(vfiltration(f)); poly f
+ASSUME:  basering has local ordering, f has isolated singularity at 0
+RETURN:
+@format
          list l:
-           l[1]: ideal, spectral numbers of the V-filtration on the 
-                 Jacobian algebra in increasing order
-           l[2]: intvec
-               l[2][i]: int, multiplicity of spectral number l[1][i]
-           l[3]: list
-               l[3][i]: module, vector space basis of l[1][i]-th graded part 
-                        of the V-filtration on the Jacobian algebra in terms
-                        of l[4]
-           l[4]: ideal, monomial vector space basis of the Jacobian algebra
-           l[5]: ideal, standard basis of Jacobian ideal
+           ideal l[1]: spectral numbers of the V-filtration
+                       on the Jacobian algebra in increasing order
+           intvec l[2]:
+             int l[2][i]: multiplicity of spectral number l[1][i]
+           list l[3]:
+             module l[3][i]: vector space basis of the l[1][i]-th graded part 
+                             of the V-filtration on the Jacobian algebra
+                             in terms of l[4]
+           ideal l[4]: monomial vector space basis of the Jacobian algebra
+           ideal l[5]: standard basis of the Jacobian ideal
 @end format
 EXAMPLE: example vfiltjacalg; shows an example
 "
