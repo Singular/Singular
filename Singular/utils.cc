@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include "getopt.h"
 #include "utils.h"
 #define __GNU_LIBRARY__
 #include "getopt.h"
