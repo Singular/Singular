@@ -1,6 +1,92 @@
+Wed May 20 11:00:12 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* sample.lib (info): version string added
+
+	* general.doc (Procedure definition): fixes fixed
+	  (libparse): fixes fixed
+
+	* reference.doc (koszul): overfull hbox fix and other fixes
+	* copyright.tex (Preface): overfull hbox fix
+	* general.doc (LIB command): overfull hbox fix
+
+	* general.doc (Procedure definition): example of an interactive
+	  procedure definition replaced by something more appropriate
+
+	* types.doc (qring declaration): updated from `general.doc',
+	  chapter `General syntax of a ring declaration'
+	  (ring declarations): updated from `general.doc', chapter
+	  `General syntax of a ring declaration'
+
+	* general.doc (Rings and orderings): doc fix
+	  (General syntax of a ring declaration): example from `qring
+	  declaration' added
+
+	* general.doc (Examples of ring declarations): `qring' example
+	  added
+	  (General syntax of a ring declaration): `qring' syntax added
+	  (Names): text on name substitution added
+	  (Input and output): text on monitoring added
+	  (Rings and orderings): doc fix
+
+	* singular.doc (Miscellaneous oddities): bug fixes in the qring
+	  item
+
+	* types.doc (qring declaration): text duplicated to `general.doc'
+
+Tue May 19 08:58:04 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* general.doc (Names): doc fix
+	  (General command syntax): multiple declarations added
+	  (Input and output): some more fixes fixed
+
+	* general.doc (Input and output): fixes fixed
+
+	* start.doc, general.doc (In- and Output): section renamed to
+	  `Input and Output' and moved before `Procedures'.  All
+	  references and nodes changed.
+	  (How to use this manual): doc fix
+
+	* general.doc (Term orderings): fixes fixed
+	  (Implemented algorithms): fixes fixed
+	  (The SINGULAR language): fixes fixed
+	  (General command syntax): fixes fixed
+	  (Special characters): fixes fixed
+	  (Names): fixes fixed
+	  (Objects): fixes fixed
+	  (Type conversion and casting): fixes fixed
+
+	* general.doc (Interactive use): minor fixes
+	  (Rings and orderings): fixes fixed
+	  (General syntax of a ring declaration): fixes fixed
+	  (Examples of ring declarations): fixes fixed
+	  (Term orderings): 
+
+	* general.doc (Interrupting SINGULAR, Editing input): fixes fixed
+	  (Command line options): fixes fixed
+	  (How to enter and exit, The SINGULAR prompt): fixes fixed
+	  (Startup sequence, The online help system): fixes fixed
+
+	* general.doc, reference.doc: `Commandline' and `command-line'
+	  globally replaced by `command line'
+
 Tue May 19 16:30:34 MET DST 1998 hannes
 	* new appendix: Polynomial data (pdata.doc)
 	  introduced, moved "monomial orderings" to it
+
+Mon May 18 14:49:39 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* reference.doc: fixes fixed
+	  more fixes fixed
+
+	* STYLEGUIDE: some new guide-lines added
+	  doc fix
+
+	* texinfo.tex: new file
+	  (tex): bug fix.  @tex does not insert extra space any longer.
+
+	* copyright.tex (Preface): used `@url' and `@email' to mark URL's
+	  and email addresses
+
 Fri May 15 09:00:30 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* general.doc (Objects): section reviewed
