@@ -12,20 +12,10 @@
 
 #include "mod2.h"
 
-#if ! defined(MSDOS) && ! defined(__MWERKS__) && \
-    defined(HAVE_SYS_TYPES_H) && defined(HAVE_PWD_H)&&defined(HAVE_SYS_PARAM_H)
+#if ! defined(MSDOS) && ! defined(__MWERKS__) 
 
-#include <sys/types.h>
 #include <unistd.h> /* always defiend */
-#include <pwd.h>
-
 #include <stdlib.h>
-#include <sys/stat.h>
-
-#ifdef HAVE_SYS_FILE_H
-# include <sys/file.h> /* can live without it */
-#endif
-#include <sys/param.h>
 #include <strings.h>
 
 #include "mmemory.h"
