@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which iter over ExpVector
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline1.h,v 1.1.1.1 2003-10-06 12:15:52 Singular Exp $
+ *  Version: $Id: pInline1.h,v 1.2 2004-07-29 14:56:39 Singular Exp $
  *******************************************************************/
 #ifndef PINLINE1_H
 #define PINLINE1_H
@@ -230,7 +230,7 @@ PINLINE1 void p_ExpVectorSum(poly pr, poly p1, poly p2, ring r)
 #endif
 
   p_MemSum_LengthGeneral(pr->exp, p1->exp, p2->exp, r->ExpL_Size);
-  p_MemAdd_NegWeightAdjust(p1, r);
+  p_MemAdd_NegWeightAdjust(pr, r);
 }
 // ExpVector(pr) = ExpVector(p1) - ExpVector(p2)
 PINLINE1 void p_ExpVectorDiff(poly pr, poly p1, poly p2, ring r)
@@ -245,7 +245,7 @@ PINLINE1 void p_ExpVectorDiff(poly pr, poly p1, poly p2, ring r)
 #endif
 
   p_MemDiff_LengthGeneral(pr->exp, p1->exp, p2->exp, r->ExpL_Size);
-  p_MemSub_NegWeightAdjust(p1, r);
+  p_MemSub_NegWeightAdjust(pr, r);
 }
 
 PINLINE1 BOOLEAN p_ExpVectorEqual(poly p1, poly p2, ring r)
