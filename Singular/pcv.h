@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: pcv.h,v 1.5 1998-11-24 15:12:27 mschulze Exp $ */
+/* $Id: pcv.h,v 1.6 1998-11-25 10:27:49 mschulze Exp $ */
 /*
 * ABSTRACT: conversion between polys and coeff vectors
 */
@@ -15,6 +15,8 @@ int pcvOrd(matrix m);
 BOOLEAN pcvOrd(leftv res,leftv h);
 void pcvInit(int d);
 void pcvClean();
+int pcvM2n(poly m);
+poly pcvN2m(int n);
 poly pcvP2cv(poly p,int d0,int d1);
 poly pcvCv2p(poly cv,int d0,int d1);
 lists pcvP2cv(lists pl,int d0,int d1);
