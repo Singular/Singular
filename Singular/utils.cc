@@ -10,28 +10,45 @@ extern int optind, opterr, optopt;
 extern int lpverbose, check;
 extern int found_version, found_info, found_oldhelp, found_proc_in_proc;
 warning_info = 0, warning_version = 0;
+
+static usage(char *progname)
+{
+  printf("libparse: a syntax-checker for Singular Libraries.\n");
+  printf("USAGE: %s [options] singular-library\n", progname);
+  printf("Options:\n");
+  printf("   -f <singular library> : checks\n");
+  printf("   -d [digit]            : digit=1,..,4 increases the verbosity of the checks\n");
+  printf("   -s                    : \n");
+  printf("   -h                    : print this message\n");
+  exit(1);
+}
+  
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 void main_init(int argc, char *argv[])
 {
   char c, *file=NULL;
 
-  while((c=getopt(argc, argv, "d:sf:"))>=0) {
-    switch(c)
-      {
-      case 'd':
-	lpverbose = 1;
-	if(isdigit(argv[optind-1][0])) sscanf(optarg, "%d", &lpverbose);
-	else optind--;
-	break;
-      case 'f': file = argv[optind-1];
-	break;
-      case 's':
-	check++;
-	break;
-      case -1 : printf("no such option:%s\n", argv[optind]);
-	break;
-      default: printf("no such option.%x, %c %s\n", c&0xff, c, argv[optind]);
-      }
+  while((c=getopt(argc, argv, "hd:sf:"))>=0) {
+    switch(c) {
+        case 'd':
+          lpverbose = 1;
+          if(isdigit(argv[optind-1][0])) sscanf(optarg, "%d", &lpverbose);
+          else optind--;
+          break;
+        case 'f': file = argv[optind-1];
+          break;
+        case 's':
+          check++;
+          break;
+        case 'h' :
+          usage(argv[0]);
+          break;
+        case -1 : printf("no such option:%s\n", argv[optind]);
+          usage(argv[0]);
+          break;
+        default: printf("no such option.%x, %c %s\n", c&0xff, c, argv[optind]);
+          usage(argv[0]);
+    }
   }
   if(file!=NULL) {
     yylpin = fopen( file, "rb" );
@@ -42,6 +59,10 @@ void main_init(int argc, char *argv[])
       if(yylpin!=NULL) printf("Checking library '%s'\n", argv[optind]);
       else optind++;
     }
+  }
+  if(yylpin == NULL) {
+    printf("No library found to parse.\n");
+    usage(argv[0]);
   }
 }
 
