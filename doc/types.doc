@@ -1,7 +1,6 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.49 1998-05-18 15:17:29 Singular Exp $
+@comment $Id: types.doc,v 1.50 1998-05-18 15:27:34 wichmann Exp $
 @comment this file contains the type definitions
-@c * wichmann: + typographical changes.
 
 @c The following directives are necessary for proper compilation
 @c with emacs (C-c C-e C-r).  Please keep it as it is.  Since it
@@ -295,7 +294,7 @@ find univariate polynomials in a zero dimensional ideal (see @ref{finduni})
 @item homog
 homogenization with respect to a variable (see @ref{homog})
 @item hilb
-Hilbert function of a standardbasis (see @ref{hilb})
+Hilbert function of a standard basis (see @ref{hilb})
 @item indepSet
 a maximal set of independent variables of an ideal (see @ref{indepSet})
 @item interred
@@ -307,7 +306,7 @@ ideal of all partial derivatives resp. jacobian matrix (see @ref{jacob})
 @item jet
 k-jet: Taylor series up to a given order (see @ref{jet})
 @item kbase
-vector space basis of basering modulo standardbasis (see @ref{kbase})
+vector space basis of basering modulo standard basis (see @ref{kbase})
 @item koszul
 Koszul matrix (see @ref{koszul})
 @item lead
@@ -315,7 +314,7 @@ leading terms of a set of generators (see @ref{lead})
 @item lift
 lift-matrix (see @ref{lift})
 @item liftstd
-standardbasis and transformation matrix computation (see @ref{liftstd})
+standard basis and transformation matrix computation (see @ref{liftstd})
 @item lres
 minimal resolution (see @ref{lres})
 @item maxideal
@@ -350,7 +349,7 @@ quasihomogeneous weights of an ideal (see @ref{qhweight})
 @item quotient
 ideal quotient (see @ref{quotient})
 @item reduce
-normalform with respect to a standardbasis (see @ref{reduce})
+normalform with respect to a standard basis (see @ref{reduce})
 @item res
 minimal free resolution of an ideal resp. module but not changing the given ideal resp. module
 (see @ref{res})
@@ -363,11 +362,11 @@ permutation for sorting ideals/modules (see @ref{sortvec})
 @item sres
 free resolution of a standard basis (see @ref{sres})
 @item std
-standardbasis computation (see @ref{std})
+standard basis computation (see @ref{std})
 @item stdfglm
 standard basis computation with fglm technique (see @ref{stdfglm})
 @item stdhilb
-Hilbert driven standardbasis computation (see @ref{stdhilb} 
+Hilbert driven standard basis computation (see @ref{stdhilb} 
 @item subst
 substitute a ring variable (see @ref{subst})
 @item syz
@@ -1199,7 +1198,7 @@ the example below.
 
 Note that the filename may contain a path. An ASCII link can be used
 either for reading or for writing, but not for both at the same time. A
-@code{close} command must be used before a change of i/o
+@code{close} command must be used before a change of I/O
 direction. Types without a conversion to @code{string} cannot be
 written.
 
@@ -1289,7 +1288,7 @@ link. If the first command is @code{write}, the mode is set to @code{a}
 
 Note that the filename may contain a path. An MP file link can be used
 either for reading or for writing, but not for both at the same time. A
-@code{close} command must be used before a change of i/o direction.
+@code{close} command must be used before a change of I/O direction.
 
 @strong{Example:}
 @example
@@ -1998,7 +1997,7 @@ Koszul matrix (see @ref{koszul})
 @item lift
 lift-matrix (see @ref{lift})
 @item liftstd
-standardbasis and transformation matrix computation (see @ref{liftstd})
+standard basis and transformation matrix computation (see @ref{liftstd})
 @item minor
 set of minors of a matrix (see @ref{minor})
 @item ncols
@@ -2192,7 +2191,7 @@ elimination of variables (see @ref{eliminate})
 @item freemodule
 the free module of given rank (see @ref{freemodule})
 @item hilb
-Hilbert function of a standardbasis (see @ref{hilb})
+Hilbert function of a standard basis (see @ref{hilb})
 @item homog
 homogenization with respect to a variable (see @ref{homog})
 @item interred
@@ -2202,14 +2201,14 @@ module intersection (see @ref{intersect})
 @item jet
 k-jet: Taylor series up to a given order (see @ref{jet})
 @item kbase
-vector space basis of free module over the basering modulo standardbasis
+vector space basis of free module over the basering modulo standard basis
 (see @ref{kbase}) 
 @item lead
 initial module (see @ref{lead})
 @item lift
 lift-matrix (see @ref{lift})
 @item liftstd
-standardbasis and transformation matrix computation (see @ref{liftstd})
+standard basis and transformation matrix computation (see @ref{liftstd})
 @item lres
 minimal resolution (see @ref{lres})
 @item minbase
@@ -2242,7 +2241,7 @@ quasihomogeneous weights of an ideal resp. module (see @ref{qhweight})
 @item quotient
 ideal quotient (see @ref{quotient})
 @item reduce
-normalform with respect to a standardbasis (see @ref{reduce})
+normalform with respect to a standard basis (see @ref{reduce})
 @item res
 minimal free resolution of an ideal resp. module but not changing the given ideal resp. module
 (see @ref{res})
@@ -2255,7 +2254,7 @@ permutation for sorting ideals/modules (see @ref{sortvec})
 @item sres
 free resolution of a standard basis (see @ref{sres})
 @item std
-standardbasis computation (see @ref{std}, @ref{liftstd})
+standard basis computation (see @ref{std}, @ref{liftstd})
 @item subst
 substitute a ring variable (see @ref{subst})
 @item syz
