@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.43 1999-05-06 16:56:16 Singular Exp $ */
+/* $Id: ideals.cc,v 1.44 1999-05-07 10:11:08 siebert Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -467,18 +467,14 @@ intvec *idSort(ideal id,BOOLEAN nolex)
         if (diff==0) notFound=FALSE; /*hs*/
       }
       if (newpos<0) newpos = 0;
-      if (newpos>=actpos)
+      if (newpos>actpos) newpos = actpos;
+      while ((newpos<actpos) && (pComp0(id->m[i],id->m[(*result)[newpos]])==0))
+        newpos++;
+      for (j=actpos;j>newpos;j--)
       {
-        (*result)[actpos] = i;
+        (*result)[j] = (*result)[j-1];
       }
-      else
-      {
-        for (j=actpos;j>newpos;j--)
-        {
-          (*result)[j] = (*result)[j-1];
-        }
-        (*result)[newpos] = i;
-      }
+      (*result)[newpos] = i;
       actpos++;
     }
   }
