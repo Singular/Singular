@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.196 2000-12-08 15:51:24 obachman Exp $
+@comment $Id: reference.doc,v 1.197 2000-12-13 17:59:55 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -101,6 +101,7 @@ brackets are allowed.
 * homog::
 * hres::
 * imap::
+* impart::
 * indepSet::
 * insert::
 * interred::
@@ -159,6 +160,7 @@ brackets are allowed.
 * read::
 * reduce::
 * regularity::
+* repart::
 * res::
 * reservedName::
 * resultant::
@@ -2291,7 +2293,7 @@ See
 @ref{sres}.
 @c ref
 @c ---------------------------------------
-@node imap, indepSet, hres, Functions
+@node imap, impart, hres, Functions
 @subsection imap
 @cindex imap
 
@@ -2332,7 +2334,32 @@ See
 @ref{ring}.
 @c ref
 @c ---------------------------------------
-@node indepSet, insert, imap, Functions
+@node impart, indepSet, imap, Functions
+@subsection impart
+@cindex impart
+
+@table @code
+@item @strong{Syntax:}
+@code{impart (} number_expression @code{)}
+@item @strong{Type:}
+number
+@item @strong{Purpose:}
+returns the imaginary part of a number from a complex ground field,
+@*returns 0 otherwise.
+@item @strong{Example:}
+@smallexample
+@c example
+  ring r = (complex,i),x,dp;
+  impart(1+2*i);
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{repart}.
+@c ref
+@c ---------------------------------------
+@node indepSet, insert, impart, Functions
 @subsection indepSet
 @cindex indepSet
 
@@ -4973,7 +5000,7 @@ See
 @ref{std}.
 @c ref
 @c ---------------------------------------
-@node regularity, res, reduce, Functions
+@node regularity, repart, reduce, Functions
 @subsection regularity
 @cindex regularity
 @table @code
@@ -5033,7 +5060,32 @@ See
 @ref{option}.
 @c ref
 @c ---------------------------------------
-@node  res, reservedName, regularity, Functions
+@node repart, res, regularity, Functions
+@subsection repart
+@cindex repart
+
+@table @code
+@item @strong{Syntax:}
+@code{repart (} number_expression @code{)}
+@item @strong{Type:}
+number
+@item @strong{Purpose:}
+returns the real part of a number from a complex ground field,
+@*returns its argument otherwise.
+@item @strong{Example:}
+@smallexample
+@c example
+  ring r = (complex,i),x,dp;
+  repart(1+2*i);
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{impart}.
+@c ref
+@c ---------------------------------------
+@node  res, reservedName, repart, Functions
 @subsection res
 @cindex res
 @c lib standard.lib:res lib_fun lib_ex subsection
