@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.22 1997-09-09 09:15:02 Singular Exp $ */
+/* $Id: febase.cc,v 1.23 1997-11-18 16:30:52 Singular Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -268,6 +268,7 @@ void PrintTCLS(char c, char *s)
 #endif
 }
 
+extern "C" {
 void WerrorS(char *s)
 {
 #ifdef HAVE_MPSR
@@ -319,7 +320,6 @@ void WerrorS(char *s)
   errorreported = TRUE;
 }
 
-extern "C" {
 void Werror(char *fmt, ...)
 {
   va_list ap;

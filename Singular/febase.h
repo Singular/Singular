@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.4 1997-04-30 17:44:36 Singular Exp $ */
+/* $Id: febase.h,v 1.5 1997-11-18 16:30:57 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -37,6 +37,7 @@ extern "C" {
 #endif
 
 void   Werror(char *fmt, ...);
+void   WerrorS(char *s);
 
 #ifdef __cplusplus
 }
@@ -78,7 +79,6 @@ char * StringSetS(char* s);
 const  char * VoiceName();
 const  char * VoiceName(int v);
 int    VoiceType();
-void   WerrorS(char *s);
 void   WarnS(char *s);
 void   Warn(char *fmt, ...);
 int    contBuffer(int typ);
