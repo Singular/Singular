@@ -1,9 +1,9 @@
-// $Id: inout.lib,v 1.10 1999-07-07 14:39:08 obachman Exp $
+// $Id: inout.lib,v 1.11 1999-07-28 18:08:07 Singular Exp $
 // system("random",787422842);
 // (GMG/BM, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: inout.lib,v 1.10 1999-07-07 14:39:08 obachman Exp $";
+version="$Id: inout.lib,v 1.11 1999-07-28 18:08:07 Singular Exp $";
 info="
 LIBRARY:  inout.lib     PROCEDURES FOR MANIPULATING IN- AND OUTPUT
 
@@ -18,7 +18,7 @@ PROCEDURES:
  split(string,n);       split given string into lines of length n
  tab(n);                string of n space tabs
  writelist(fil,nam,L);  write the list L into a file `fil` and call it `nam`
- pause([prompt])        stop the computation until user input
+ pause([prompt]);       stop the computation until user input
            (parameters in square brackets [] are optional)
 ";
 
