@@ -7,7 +7,7 @@ proc mrows
     @rc = @rc + "m[" + string(#[2]) + "," + string(@i) + "],";
   }
   @rc = @rc[1,size(@rc)-1] + ";";
-  execute("return (@rc);");
+  return (@rc);
 }
 ring r= 32003,(x,y,z),lp;
 matrix m[3][3] = 0;
