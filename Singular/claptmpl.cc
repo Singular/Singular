@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: claptmpl.cc,v 1.16 1998-06-30 08:38:01 pohl Exp $
+// $Id: claptmpl.cc,v 1.17 1998-06-30 16:30:05 schmidt Exp $
 /*
 * ABSTRACT - instantiation of all templates
 */
@@ -55,6 +55,9 @@
 
       template CanonicalForm tmax ( const CanonicalForm&, const CanonicalForm& );
       template CanonicalForm tmin ( const CanonicalForm&, const CanonicalForm& );
+
+      template Variable tmax ( const Variable&, const Variable& );
+      template Variable tmin ( const Variable&, const Variable& );
 
       template int tmax ( const int&, const int& );
       template int tmin ( const int&, const int& );
