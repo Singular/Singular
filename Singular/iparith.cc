@@ -1644,7 +1644,7 @@ static BOOLEAN jjPARSTR2(leftv res, leftv u, leftv v)
 static BOOLEAN jjQUOT(leftv res, leftv u, leftv v)
 {
   res->data = (char *)idQuot((ideal)u->Data(),(ideal)v->Data(),
-    hasFlag(u,FLAG_STD));
+    hasFlag(u,FLAG_STD),u->Typ()==v->Typ());
   idDelMultiples((ideal)(res->data));
   return FALSE;
 }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.32 1998-05-28 16:50:47 Singular Exp $ */
+/* $Id: ideals.cc,v 1.33 1998-07-01 13:27:15 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1705,7 +1705,7 @@ ideal  idLift (ideal  mod,ideal submod)
 *computes the quotient of h1,h2
 */
 #ifdef OLD_QUOT
-ideal idQuot (ideal  h1, ideal h2, BOOLEAN h1IsSB)
+ideal idQuot (ideal  h1, ideal h2, BOOLEAN h1IsSB, BOOLEAN resultIsIdeal)
 {
   int i,j = 0,l,ll,k,kkk,k1,k2,kmax;
   ideal h3,h4;
@@ -1798,21 +1798,13 @@ ideal idQuot (ideal  h1, ideal h2, BOOLEAN h1IsSB)
   return h4;
 }
 #else
-ideal idQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb)
+ideal idQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN resultIsIdeal)
 {
-  int i,j = 0,l,ll,k,kkk,k1,k2,kmax;
-  intvec * weights,* weights1;
-  ideal h3,h4,temph1;
-  poly     p,q = NULL;
-  BOOLEAN  resultIsIdeal = FALSE,addOnlyOne=TRUE;
-  tHomog   hom=isNotHomog;
-  BITSET old_test=test;
-
-  k1 = lengthFreeModule(h1);
-  k2 = lengthFreeModule(h2);
+  // first check for special case h1:(0)
+  ideal h3;
   if (idIs0(h2))
   {
-    if (k1==0)
+    if (resultIsIdeal)
     {
       h3 = idInit(1,1);
       h3->m[0] = pOne();
@@ -1821,16 +1813,29 @@ ideal idQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb)
       h3 = idFreeModule(h1->rank);
     return h3;
   }
+
+  // the usual part:
+  intvec * weights,* weights1;
+  ideal h4,temph1;
+  BITSET old_test=test;
+  poly     p,q = NULL;
+  int i,l,ll,k,kkk,kmax;
+  int j = 0;
+  int k1 = lengthFreeModule(h1);
+  int k2 = lengthFreeModule(h2);
+  BOOLEAN  addOnlyOne=TRUE;
+  tHomog   hom=isNotHomog;
+
   k=max(k1,k2);
   if (k==0)
   {
     k = 1;
-    resultIsIdeal=TRUE;
+    //resultIsIdeal=TRUE;
   }
-  else if ((k1>0)&&(k2>0))
-  {
-    resultIsIdeal=TRUE;
-  }
+  //else if ((k1>0)&&(k2>0))
+  //{
+  //  resultIsIdeal=TRUE;
+  //}
   hom = (tHomog)idHomModule(h1,currQuotient,&weights) ;
   h4 = idInit(1,1);
   for (i=0; i<IDELEMS(h2); i++)

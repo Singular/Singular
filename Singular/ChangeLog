@@ -1,3 +1,6 @@
+Wed Jul  1 15:25:23 MET DST 1998 hannes:
+* fixed bug with quotient: M:module(0) returns (1), not ([1])
+
 Fri Jun 19 10:01:59 MET DST 1998 hannes
 * hannes: changed back: quot is now from standard.lib,
                         quotient the C-version

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.h,v 1.7 1998-05-19 09:02:35 obachman Exp $ */
+/* $Id: ideals.h,v 1.8 1998-07-01 13:27:16 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -91,7 +91,8 @@ ideal   idLiftNonStB (ideal  mod, ideal submod);
 
 intvec * idMWLift(ideal mod,intvec * weights);
 
-ideal   idQuot (ideal h1,ideal h2,BOOLEAN h1IsStb=FALSE);
+ideal   idQuot (ideal h1,ideal h2,
+                BOOLEAN h1IsStb=FALSE, BOOLEAN resultIsIdeal=FALSE);
 
 ideal   idPower(ideal gid,int deg);
 
