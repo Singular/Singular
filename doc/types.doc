@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.87 1999-07-02 09:29:29 obachman Exp $
+@comment $Id: types.doc,v 1.88 1999-07-02 12:38:19 obachman Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -3351,6 +3351,7 @@ name of the n-th ring variable (see @ref{varstr})
 @node string, vector, ring, Data types
 @section string
 @cindex string
+@cindex newline
 
 Variables of type @code{string} are used for output (almost every type
 can be "converted" to @code{string}) and for creating new
