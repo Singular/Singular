@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.97 1999-08-03 16:33:39 obachman Exp $ */
+/* $Id: extra.cc,v 1.98 1999-08-04 15:38:24 obachman Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -229,6 +229,16 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       return TRUE;
     }
     else
+/*==================== browsers ==================================*/
+    if (strcmp(sys_cmd,"browsers")==0)
+    {
+      res->rtyp = STRING_CMD;
+      char* b = StringSetS("");
+      feStringAppendBrowsers(1);
+      res->data = mstrdup(b);
+      return FALSE;
+    }
+    else
 /*==================== pid ==================================*/
     if (strcmp(sys_cmd,"pid")==0)
     {
@@ -282,7 +292,6 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     #endif
     #endif
 /*==================== Singular ==================================*/
-#ifndef __MWERKS__
     if (strcmp(sys_cmd, "Singular") == 0)
     {
       res->rtyp=STRING_CMD;
@@ -294,7 +303,6 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       return FALSE;
     }
     else
-#endif
 /*==================== options ==================================*/
     if (strstr(sys_cmd, "--") == sys_cmd)
     {
@@ -307,7 +315,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         {
           if (h->Typ() == STRING_CMD)
           {
-            if (strcmp(feHelpBrowser((char*) h->Data()), 
+            if (strcmp(feHelpBrowser((char*) h->Data(), 1), 
                        (char*) h->Data()) != 0)
             {
               Werror("Can not set HelpBrowser to '%s'", (char*) h->Data());
@@ -332,7 +340,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         if ((unsigned int) val > 1)
         {
           res->rtyp=STRING_CMD;
-          res->data = (void*) mstrdup( val );
+          if (strcmp(sys_cmd, "--browser") == 0 && 
+              (val == NULL || *val == '\0'))
+            res->data = (void*) mstrdup(feHelpBrowser());
+          else
+            res->data = (void*) mstrdup( val );
         }
         else
         {

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.65 1999-08-03 17:28:11 obachman Exp $ */
+/* $Id: tesths.cc,v 1.66 1999-08-04 15:38:27 obachman Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -79,7 +79,6 @@ static struct option longopts[] =
   {LON_TCLMODE,           0,  0,  'x'},
 #endif
   {LON_BROWSER,           1,  0,  LONG_OPTION_RETURN},
-  {LON_EMACS,             0,  0,  LONG_OPTION_RETURN},
   {LON_NO_STDLIB,         0,  0,  LONG_OPTION_RETURN},
   {LON_NO_RC,             0,  0,  LONG_OPTION_RETURN},
   {LON_NO_WARN,           0,  0,  LONG_OPTION_RETURN},
@@ -91,6 +90,7 @@ static struct option longopts[] =
 #endif
   {LON_TICKS_PER_SEC,     1,  0,  LONG_OPTION_RETURN},
 // undocumented options
+  {LON_EMACS,             0,  0,  LONG_OPTION_RETURN},
 #ifdef HAVE_MPSR
   {LON_MP_TRANSP,         1,  0,  LONG_OPTION_RETURN},
   {LON_MP_MODE,           1,  0,  LONG_OPTION_RETURN},
@@ -104,6 +104,7 @@ static struct option longopts[] =
 struct sing_option
 {
   const char*   name;    // as in option
+
   const char*   arg_name;// name of argument, if has_arg > 0
   const char*   help;    // (short) help string
   char*         val;     // (default) value of option: 0: not set 1:set
@@ -111,13 +112,13 @@ struct sing_option
 };
 
 // mention only documented options here
+// or let help string start with // then option is like undocumented 
 static struct sing_option sing_longopts[] =
 {
 #ifdef HAVE_MPSR
   {LON_BATCH,       0,          "Run in MP batch mode",                                 0},
 #endif
   {LON_BROWSER,     "BROWSER",  "Display help in BROWSER ([x,tk]info, netscape)",       ""},
-  {LON_EMACS,       0,          "Support singular-emacs mode",                          0},
   {LON_HELP,        0,          "Print help message and exit",                          0},
   {LON_QUIET,       0,          "Do not print start-up banner and library load messages", 0},
   {LON_SDB,         0,          "Enable sdb debugger (experimental)",            0},
@@ -140,6 +141,8 @@ static struct sing_option sing_longopts[] =
   {LON_MP_HOST,     "HOST",     "Use HOST for MP connections",                          ""},
 #endif
   {LON_TICKS_PER_SEC, "TICKS",    "Sets unit of timer to TICKS per second",             "1"},
+  // option whose help should not clutter up the normal help stuff
+  {LON_EMACS,       0,          "// Support singular-emacs mode",                          0},
   { 0, 0, 0, 0 }
 };
 
@@ -187,7 +190,11 @@ static void mainHelp(const char* name)
   while (longopts[i].name != 0)
   {
     sopt = mainGetSingOption(longopts[i].name);
-    if (sopt != NULL)
+    if (sopt != NULL && sopt->help != NULL
+#ifdef NDEBUG
+        && *(sopt->help) != '/'
+#endif  
+        )
     {
       if (longopts[i].has_arg > 0)
       {

@@ -516,7 +516,7 @@ char * showOption()
 
 char * versionString()
 {
-  StringSetS("\t");
+  char* str = StringSetS("\t");
 #ifdef HAVE_FACTORY
               StringAppend("factory(%s),", factoryVersion);
 #endif
@@ -588,5 +588,6 @@ char * versionString()
               StringAppend("random=%d\n",siRandomStart);
 
               feStringAppendResources();
-              return StringAppend("HelpBrowser: %s", feHelpBrowser());
+              feStringAppendBrowsers(0);
+              return str;
 }

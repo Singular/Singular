@@ -37,7 +37,7 @@ typedef struct
 typedef  heEntry_s * heEntry;
 
 typedef void (*heBrowserHelpProc)(heEntry hentry);
-typedef BOOLEAN (*heBrowserInitProc)();
+typedef BOOLEAN (*heBrowserInitProc)(int warn);
 
 typedef struct
 {
@@ -61,15 +61,15 @@ static void heBrowserHelp(heEntry hentry);
 static long heKeyChksum(char* key);
 
 // browser functions
-static BOOLEAN heInfoInit();    static void heInfoHelp(heEntry hentry);
+static BOOLEAN heInfoInit(int);    static void heInfoHelp(heEntry hentry);
 #if ! defined(WINNT) && ! defined(macintosh)
-static BOOLEAN heNetscapeInit();static void heNetscapeHelp(heEntry hentry);
-static BOOLEAN heXinfoInit();   static void heXinfoHelp(heEntry hentry);
-static BOOLEAN heTkinfoInit();  static void heTkinfoHelp(heEntry hentry);
+static BOOLEAN heNetscapeInit(int);static void heNetscapeHelp(heEntry hentry);
+static BOOLEAN heXinfoInit(int);   static void heXinfoHelp(heEntry hentry);
+static BOOLEAN heTkinfoInit(int);  static void heTkinfoHelp(heEntry hentry);
 #endif
-static BOOLEAN heBuildinInit(); static void heBuildinHelp(heEntry hentry);
-static BOOLEAN heDummyInit();   static void heDummyHelp(heEntry hentry);
-static BOOLEAN heEmacsInit();   static void heEmacsHelp(heEntry hentry);
+static BOOLEAN heBuiltinInit(int); static void heBuiltinHelp(heEntry hentry);
+static BOOLEAN heDummyInit(int);   static void heDummyHelp(heEntry hentry);
+static BOOLEAN heEmacsInit(int);   static void heEmacsHelp(heEntry hentry);
 
 static heBrowser heCurrentHelpBrowser = NULL;
 
@@ -82,13 +82,13 @@ static heBrowser heCurrentHelpBrowser = NULL;
 // order is improtant -- first possible help is choosen
 static heBrowser_s heHelpBrowsers[] =
 {
-  { "info",     heInfoInit,     heInfoHelp},
 #if ! defined(WINNT) && ! defined(macintosh)
   { "netscape", heNetscapeInit, heNetscapeHelp},
-  { "xinfo",    heXinfoInit,    heXinfoHelp},
   { "tkinfo",   heTkinfoInit,   heTkinfoHelp},
+  { "xinfo",    heXinfoInit,    heXinfoHelp},
 #endif
-  { "buildin",  heBuildinInit,  heBuildinHelp},
+  { "info",     heInfoInit,     heInfoHelp},
+  { "builtin",  heBuiltinInit,  heBuiltinHelp},
   { "dummy",    heDummyInit,    heDummyHelp},
   { "emacs",    heEmacsInit,    heEmacsHelp},
   { NULL, NULL, NULL} // must be the last record
@@ -177,14 +177,15 @@ void feHelp(char *str)
   heBrowserHelp(&hentry);
 }
 
-char* feHelpBrowser(char* which)
+char* feHelpBrowser(char* which, int warn)
 {
   int i = 0;
   extern void mainSetSingOptionValue(const char* name, char* value);
   char* mainGetSingOptionValue(const char* name);
 
   // if no argument, see what we have as value to the option
-  if (which == NULL || *which == '\0') which = mainGetSingOptionValue("browser");
+  if (which == NULL || *which == '\0') 
+    which = mainGetSingOptionValue("browser");
   
   // if no argument, choose first available help browser
   if (which == NULL || *which == '\0')
@@ -194,7 +195,7 @@ char* feHelpBrowser(char* which)
     
     while (heHelpBrowsers[i].browser != NULL)
     {
-      if (heHelpBrowsers[i].init_proc()) 
+      if (heHelpBrowsers[i].init_proc(0)) 
       {
         heCurrentHelpBrowser = &(heHelpBrowsers[i]);
         return heCurrentHelpBrowser->browser;
@@ -212,12 +213,12 @@ char* feHelpBrowser(char* which)
   
   if (heHelpBrowsers[i].browser == NULL) 
   {
-    Warn("No help browser '%s' available", which);
+    if (warn) Warn("No help browser '%s' available", which);
   }
   else
   {
     // see whether we can init it
-    if (heHelpBrowsers[i].init_proc())
+    if (heHelpBrowsers[i].init_proc(warn))
     {
       heCurrentHelpBrowser = &(heHelpBrowsers[i]);
       goto Finish;
@@ -231,19 +232,47 @@ char* feHelpBrowser(char* which)
     mainSetSingOptionValue("browser", "");
     feHelpBrowser();
     assume(heCurrentHelpBrowser != NULL);
-    Warn("Setting help browser to '%s'", heCurrentHelpBrowser->browser);
+    if (warn) 
+      Warn("Setting help browser to '%s'", heCurrentHelpBrowser->browser);
     return heCurrentHelpBrowser->browser;
   }
   else
   {
     // or, leave as is
-    Warn("Help browser stays at '%s'",  heCurrentHelpBrowser->browser);
+    if (warn) 
+      Warn("Help browser stays at '%s'",  heCurrentHelpBrowser->browser);
   }
 
   Finish:
   mainSetSingOptionValue("browser", heCurrentHelpBrowser->browser);
   return heCurrentHelpBrowser->browser;
 }
+
+void feStringAppendBrowsers(int warn)
+{
+  int i;
+  
+  if (warn)
+  {
+    i = 0;
+    while (heHelpBrowsers[i].browser != NULL)
+    {
+      heHelpBrowsers[i].init_proc(warn);
+      i++;
+    }
+  }
+  StringAppendS("Available HelpBrowsers: ");
+  
+  i = 0;
+  while (heHelpBrowsers[i].browser != NULL)
+  {
+    if (heHelpBrowsers[i].init_proc(0)) 
+      StringAppend("%s, ", heHelpBrowsers[i].browser);
+    i++;
+  }
+  StringAppend("\nCurrent HelpBrowser: %s ", feHelpBrowser());
+}
+  
 
 /*****************************************************************
  *
@@ -447,7 +476,7 @@ static BOOLEAN strmatch(char* s, char* re)
   return TRUE;
 }
 
-// similar to heKey2Entry, excpet that
+// similar to heKey2Entry, except that
 // key is taken as regexp (see above)
 // and number of matches is returned
 // if number of matches > 0, then hentry contains entry for first match
@@ -617,23 +646,26 @@ static void heBrowserHelp(heEntry hentry)
     return;
   
   if (heCurrentHelpBrowser == NULL) feHelpBrowser();
-
   assume(heCurrentHelpBrowser != NULL);
+  Warn("Displaying help in browser '%s'.", heCurrentHelpBrowser->browser);
+  Warn("Use 'system(\"--browser\", \"<browser>\");' to change browser");
+  Warn("Use 'system(\"browsers\");'                 for available browsers");
   heCurrentHelpBrowser->help_proc(hentry);
 }
 
 #define MAX_SYSCMD_LEN MAXPATHLEN*2
 // browser functions
-static BOOLEAN heInfoInit()
+static BOOLEAN heInfoInit(int warn)
 {
-  if (feResource('i') == NULL)
+  if (feResource('i', warn) == NULL)
   {
-    WarnS("'info' help browser not available: no InfoFile");
+    if (warn) WarnS("'info' help browser not available: no InfoFile");
     return FALSE;
   }
   if (feResource('I') == NULL)
   {
-    WarnS("'info' help browser not available: no 'info' program found");
+    if (warn) 
+      WarnS("'info' help browser not available: no 'info' program found");
     return FALSE;
   }
   return TRUE;
@@ -657,24 +689,24 @@ static void heInfoHelp(heEntry hentry)
 }
 
 #if ! defined(WINNT) && ! defined(macintosh)
-static BOOLEAN heNetscapeInit()
+static BOOLEAN heNetscapeInit(int warn)
 {
-  if (feResource("netscape" == NULL))
+  if (feResource("netscape", warn) == NULL)
   {
-    WarnS("'netscape' help browser not available: no 'netscape' program found");
+    if (warn) WarnS("'netscape' help browser not available: no 'netscape' program found");
     return FALSE;
   }
   if (getenv("DISPLAY") == NULL)
   {
-    WarnS("'netscape' help browser not available:");
-    WarnS("Environment variable DISPLAY not set");
+    if (warn) WarnS("'netscape' help browser not available:");
+    if (warn) WarnS("Environment variable DISPLAY not set");
     return FALSE;
   }
   
-  if (feResource("HtmlDir") == NULL)
+  if (feResource("HtmlDir", warn) == NULL)
   {
-    WarnS("no local HtmlDir found");
-    Warn("using %s instead", feResource("ManualUrl"));
+    if (warn) WarnS("no local HtmlDir found");
+    if (warn) Warn("using %s instead", feResource("ManualUrl", warn));
   }
   return TRUE;
 }
@@ -714,27 +746,27 @@ static void heNetscapeHelp(heEntry hentry)
   }
 }
 
-static BOOLEAN heXinfoInit()
+static BOOLEAN heXinfoInit(int warn)
 {
   if (getenv("DISPLAY") == NULL)
   {
-    WarnS("'xinfo' help browser not available:");
-    WarnS("Environment variable DISPLAY not set");
+    if (warn) WarnS("'xinfo' help browser not available:");
+    if (warn) WarnS("Environment variable DISPLAY not set");
     return FALSE;
   }
-  if (feResource('i') == NULL)
+  if (feResource('i', warn) == NULL)
   {
-    WarnS("'xinfo' help browser not available: no InfoFile");
+    if (warn) WarnS("'xinfo' help browser not available: no InfoFile");
     return FALSE;
   }
-  if (feResource('I') == NULL)
+  if (feResource('I', warn) == NULL)
   {
-    WarnS("'xinfo' help browser not available: no 'info' program found");
+    if (warn) WarnS("'xinfo' help browser not available: no 'info' program found");
     return FALSE;
   }
-  if (feResource('X') == NULL)
+  if (feResource('X', warn) == NULL)
   {
-    WarnS("'xinfo' help browser not available: no 'xterm' program found");
+    if (warn) WarnS("'xinfo' help browser not available: no 'xterm' program found");
     return FALSE;
   }
   return TRUE;
@@ -758,22 +790,22 @@ static void heXinfoHelp(heEntry hentry)
   system(sys);
 }
 
-static BOOLEAN heTkinfoInit()
+static BOOLEAN heTkinfoInit(int warn)
 {
   if (getenv("DISPLAY") == NULL)
   {
-    WarnS("'tkinfo' help browser not available:");
-    WarnS("Environment variable DISPLAY not set");
+    if (warn) WarnS("'tkinfo' help browser not available:");
+    if (warn) WarnS("Environment variable DISPLAY not set");
     return FALSE;
   }
-  if (feResource('i') == NULL)
+  if (feResource('i', warn) == NULL)
   {
-    WarnS("'tkinfo' help browser not available: no InfoFile");
+    if (warn) WarnS("'tkinfo' help browser not available: no InfoFile");
     return FALSE;
   }
-  if (feResource('T') == NULL)
+  if (feResource('T', warn) == NULL)
   {
-    WarnS("'tkinfo' help browser not available: no 'tkinfo' program found");
+    if (warn) WarnS("'tkinfo' help browser not available: no 'tkinfo' program found");
     return FALSE;
   }
   return TRUE;
@@ -795,7 +827,7 @@ static void heTkinfoHelp(heEntry hentry)
 }
 #endif // ! defined(WINNT) && ! defined(macintosh)
 
-static BOOLEAN heDummyInit()
+static BOOLEAN heDummyInit(int warn)
 {
   return TRUE;
 }
@@ -806,7 +838,7 @@ static void heDummyHelp(heEntry hentry)
   Werror("Make sure file singular.hlp is found");
 }
 
-static BOOLEAN heEmacsInit()
+static BOOLEAN heEmacsInit(int warn)
 {
   return TRUE;
 }
@@ -818,17 +850,17 @@ static void heEmacsHelp(heEntry hentry)
   Warn("to enter the Singular online help.");
   Warn("For more information on singular-mode under Emacs, type C-h m");
 }
-static BOOLEAN heBuildinInit()
+static BOOLEAN heBuiltinInit(int warn)
 {
-  if (feResource('i') == NULL)
+  if (feResource('i', warn) == NULL)
   {
-    WarnS("'buildin' help browser not available: no InfoFile");
+    if (warn) WarnS("'builtin' help browser not available: no InfoFile");
     return FALSE;
   }
   return TRUE;
 }
 static int singular_manual(char *str);
-static void heBuildinHelp(heEntry hentry)
+static void heBuiltinHelp(heEntry hentry)
 {
   char* node = mstrdup(hentry != NULL && *(hentry->node) != '\0' ? 
                        hentry->node : "Top");
@@ -838,7 +870,7 @@ static void heBuildinHelp(heEntry hentry)
 
   
 /* ========================================================================== */
-// old, stupid buildin_help
+// old, stupid builtin_help
 // This could be implemented much more clever, but I'm too lazy to do this now
 //
 #define HELP_OK        0

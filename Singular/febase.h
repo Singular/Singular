@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.32 1999-08-03 16:33:41 obachman Exp $ */
+/* $Id: febase.h,v 1.33 1999-08-04 15:38:26 obachman Exp $ */
 /*
 * ABSTRACT: basic i/o
 */
@@ -136,8 +136,8 @@ char* feResource(const char* key, int warn = -1);
 // This needs to be called before the first call to feResource
 // Initializes Resources, SearchPath, and extends PATH
 void feInitResources(char* argv0);
-// Prints resources int string with StringAppend, etc
-void feStringAppendResources();
+// Prints resources into string with StringAppend, etc
+void feStringAppendResources(int warn = -1);
 
 /*****************************************************************
  *
@@ -153,7 +153,9 @@ void feHelp(char* str = NULL);
 //            if not, choose first available browser
 // return string identifying current browser
 // keeps OptionValue("browser") up-to-date
-char* feHelpBrowser(char* browser = NULL);
+// Optional warn argument is as in feResource
+char* feHelpBrowser(char* browser = NULL, int warn = -1);
+void feStringAppendBrowsers(int warn = -1);
 
 FILE *  feFopen(char *path, char *mode, char *where=NULL, int useWerror=FALSE);
 #ifndef __MWERKS__

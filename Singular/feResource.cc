@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feResource.cc,v 1.1 1999-08-03 16:34:41 obachman Exp $ */
+/* $Id: feResource.cc,v 1.2 1999-08-04 15:38:25 obachman Exp $ */
 /*
 * ABSTRACT: management of resources
 */
@@ -71,11 +71,13 @@ static feResourceConfig_s feResourceConfigs[20] =
   {"HtmlDir",   'h',    feResDir,   "SINGULAR_HTML_DIR",    "%r/html",              ""},
   {"ManualUrl", 'u',    feResUrl,   "SINGULAR_URL",         "http://www.mathematik.uni-kl.de/~zca/Singular/Manual/"S_VERSION1,    ""},
   {"EmacsDir",  'e',    feResDir,   "SINGULAR_EMACS_DIR",   "%r/emacs",             ""},
+#if !defined(WINNT) && ! defined(macintosh)
   {"netscape",  'N',    feResBinary,"NETSCAPE",             "%b/netscape",          ""},
   {"info",      'I',    feResBinary,"INFO",                 "%b/info",              ""},
   {"tkinfo",    'T',    feResBinary,"TKINFO",               "%b/tkinfo",            ""},
   {"xterm",     'X',    feResBinary,"XTERM",                "%b/xterm",             ""},
   {"Path",      'p',    feResPath,  NULL,                   "%b;$PATH",         ""},
+#endif // !defined(WINNT) && ! defined(macintosh)
   {NULL, 0, feResUndef, NULL, NULL, NULL}, // must be the last record
 };
 
@@ -631,13 +633,13 @@ static char* feSprintf(char* s, const char* fmt)
   return s_in;
 }
     
-void feStringAppendResources()
+void feStringAppendResources(int warn)
 {
   int i = 0;
   while (feResourceConfigs[i].key != NULL)
   {
     StringAppend("%-10s:\t%s\n", feResourceConfigs[i].key, 
-                 feResource(feResourceConfigs[i].key));
+                 feResource(feResourceConfigs[i].key, warn));
     i++;
   }
 }
