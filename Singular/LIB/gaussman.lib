@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.28 2001-01-19 14:59:03 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.29 2001-01-23 16:10:23 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -110,34 +110,30 @@ static proc expand(matrix M,matrix U,int n)
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc redNF(module M,module N,list #)
+static proc rednf(module M,module N,list #)
 {
   matrix U=freemodule(ncols(M));
   if(size(#)>0)
   {
-    if(typeof(#[1])=="matrix")
-    {
-      U=#[1];
-    }
+    U=#[1];
   }
-
   for(int i=ncols(M);i>=1;i--)
   {
     M[i]=M[i]/lead(U[i,i]);
     U[i,i]=U[i,i]/lead(U[i,i]);
   }
   N=std(N);
-  module redNFM=matrix(0,nrows(M),ncols(M));
-  dbprint(printlevel-voice+2,"//gaussman::redNF: reduce");
-  module weakNFM=reduce(M,N);
-  while(size(weakNFM)>0)
+  module M0=matrix(0,nrows(M),ncols(M));
+  dbprint(printlevel-voice+2,"//gaussman::rednf: reduce");
+  module M1=reduce(M,N);
+  while(size(M1)>0)
   {
-    redNFM=matrix(redNFM)+matrix(lead(weakNFM));
-    M=matrix(M)-matrix(lead(weakNFM))*U;
-    dbprint(printlevel-voice+2,"//gaussman::redNF: reduce");
-    weakNFM=reduce(M,N);
+    M0=matrix(M0)+matrix(lead(M1));
+    M=matrix(M)-matrix(lead(M1))*U;
+    dbprint(printlevel-voice+2,"//gaussman::rednf: reduce");
+    M1=reduce(M,N);
   }
-  return(redNFM);
+  return(M0);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -208,7 +204,7 @@ EXAMPLE:  example monodromy; shows an example
     dbprint(printlevel-voice+2,"//gaussman::monodromy: k="+string(k));
 
     dbprint(printlevel-voice+2,"//gaussman::monodromy: compute C");
-    C=coeffs(redNF(w,sJ,U),m);
+    C=coeffs(rednf(w,sJ,U),m);
     A0=A0+C*var(1)^k;
 
     if(sdH>0)
@@ -460,7 +456,7 @@ EXAMPLE:  example vfiltration; shows an example
     dbprint(printlevel-voice+2,"//gaussman::vfiltration: k="+string(k));
 
     dbprint(printlevel-voice+2,"//gaussman::vfiltration: compute C");
-    C=coeffs(redNF(w,sJ,U),m);
+    C=coeffs(rednf(w,sJ,U),m);
     A=A+C*var(1)^k;
 
     if(sdH>0)
@@ -656,6 +652,7 @@ EXAMPLE:  example vfiltration; shows an example
     dbprint(printlevel-voice+2,
       "//gaussman::vfiltration: symmetry index found");
     j=k;
+
     if(number(eM[i])-1==number(n-1)/2)
     {
       Me=freemodule(mu*N);
@@ -799,7 +796,7 @@ EXAMPLE: example vfiltjacalg; shows an example
   list M;
   for(i=ncols(m);i>=1;i--)
   {
-    M[i]=lift(V,coeffs(redNF(m[i]*m,sJ),m)*V);
+    M[i]=lift(V,coeffs(rednf(m[i]*m,sJ),m)*V);
   }
 
   int i0,j0,i1,j1;
