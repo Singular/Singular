@@ -1,10 +1,10 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gkdim.lib,v 1.3 2004-06-01 13:53:35 levandov Exp $";
+version="$Id: gkdim.lib,v 1.4 2004-08-13 12:39:35 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: GKdim.lib     Procedures for calculating the Gelfand-Kirillov dimension
-AUTHORS: Lobillo, F.J., email: jlobillo@ugr.es
-@*	 Rabelo, C., email: crabelo@ugr.es
+AUTHORS: Lobillo, F.J.,     jlobillo@ugr.es
+@*	 Rabelo, C.,        crabelo@ugr.es
 
 SUPPORT: Metodos algebraicos y efectivos en grupos cuanticos, BFM2001-3141, MCYT, Jose Gomez-Torrecillas (Main researcher).
 

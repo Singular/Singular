@@ -1,10 +1,10 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: qmatrix.lib,v 1.5 2004-08-05 12:25:23 levandov Exp $";
+version="$Id: qmatrix.lib,v 1.6 2004-08-13 12:39:36 levandov Exp $";
 category="Noncommutative";
 info="
-LIBRARY: qmatrix.lib     Quantum matrices, quantum minors and symmetric groups.
-AUTHORS: Lobillo, F.J., email: jlobillo@ugr.es
-@*	 Rabelo, C., email: crabelo@ugr.es
+LIBRARY: qmatrix.lib     Quantum matrices, quantum minors and symmetric groups
+AUTHORS: Lobillo, F.J.,  jlobillo@ugr.es
+@*	 Rabelo, C.,     crabelo@ugr.es
 
 SUPPORT: Metodos algebraicos y efectivos en grupos cuanticos, BFM2001-3141, MCYT, Jose Gomez-Torrecillas (Main researcher).
 

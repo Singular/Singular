@@ -1,11 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: nctools.lib,v 1.7 2004-08-05 15:59:55 Singular Exp $";
+version="$Id: nctools.lib,v 1.8 2004-08-13 12:39:36 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: nctools.lib     General tools for noncommutative algebras
 AUTHORS:   Levandovskyy V.,     levandov@mathematik.uni-kl.de,
-@*         Lobillo, F.J.,    jlobillo@ugr.es,
-@*	   Rabelo, C.,      crabelo@ugr.es.
+@*         Lobillo, F.J.,       jlobillo@ugr.es,
+@*	   Rabelo, C.,          crabelo@ugr.es.
 
 SUPPORT: DFG (Deutsche Forschungsgesellschaft) and Metodos algebraicos y efectivos en grupos cuanticos, BFM2001-3141, MCYT, Jose Gomez-Torrecillas (Main researcher).
 
