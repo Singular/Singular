@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_switches.cc,v 1.3 1997-07-22 13:57:49 schmidt Exp $ */
+/* $Id: cf_switches.cc,v 1.4 1997-09-08 10:39:46 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -13,7 +13,7 @@
 
 #include "cf_switches.h"
 
-//{{{ CFSwitches::CFSwitches()
+//{{{ CFSwitches::CFSwitches ()
 //{{{ docu
 //
 // CFSwitches::CFSwitches() - default constructor.
@@ -21,7 +21,7 @@
 // Turns all switches off.
 //
 //}}}
-CFSwitches::CFSwitches()
+CFSwitches::CFSwitches ()
 {
     for ( int i = 0; i < CFSwitchesMax; i++ )
 	switches[i] = false;
