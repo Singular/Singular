@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.31 1998-05-06 12:40:49 schmidt Exp $
+@comment $Id: general.doc,v 1.32 1998-05-06 14:02:13 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -1583,7 +1583,7 @@ which may be provided in a library file.
 * Procedures::
 * Proc in a library::
 * Examples::
-* block::
+* Control structures::
 * return::
 @end menu
 
@@ -2079,10 +2079,10 @@ define the version number for the library. It isdisplayed when the
 library is loaded.
 @item @strong{Example:}
 @example
-  version="$Id: general.doc,v 1.31 1998-05-06 12:40:49 schmidt Exp $";
+  version="$Id: general.doc,v 1.32 1998-05-06 14:02:13 Singular Exp $";
 @end example
 @item @strong{Note:}
-It is common practice to simply define the version string to be "$Id: general.doc,v 1.31 1998-05-06 12:40:49 schmidt Exp $"
+It is common practice to simply define the version string to be "$Id: general.doc,v 1.32 1998-05-06 14:02:13 Singular Exp $"
 and let a version control system expand it.
 @end table
 
@@ -2099,11 +2099,11 @@ best.
 
 @c @table @code
 @example
-  // $Id: general.doc,v 1.31 1998-05-06 12:40:49 schmidt Exp $
+  // $Id: general.doc,v 1.32 1998-05-06 14:02:13 Singular Exp $
   //
   //
   ///////////////////////////////////////////////////////////////////////////
-  version="$Id: general.doc,v 1.31 1998-05-06 12:40:49 schmidt Exp $;
+  version="$Id: general.doc,v 1.32 1998-05-06 14:02:13 Singular Exp $;
   info="
          LIBRARY: template.lib
 

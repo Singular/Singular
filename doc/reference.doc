@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.28 1998-05-06 12:52:47 schmidt Exp $
+@comment $Id: reference.doc,v 1.29 1998-05-06 14:02:15 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -5111,10 +5111,10 @@ leaves the innermost block of a for- or a while-construct.
 @menu
 * for::
 * while::
-* block::
+* Control structures::
 @end menu
 @iftex
-See @ref{block}; @ref{while}; @ref{for}.
+See @ref{Control structures}; @ref{while}; @ref{for}.
 @end iftex
 @c ---------------------------------------
 @node continue, else, break, Control structures
@@ -5148,10 +5148,10 @@ Unlike the C-construct it @strong{does not execute the increment statement}
 @end table
 @menu
 * for::
-* block::
+* Control structures::
 @end menu
 @iftex
-See @ref{block}; @ref{block}.
+See @ref{Control structures}; @ref{for}.
 @end iftex
 @c ---------------------------------------
 @node else, export, continue, Control structures
@@ -5178,10 +5178,10 @@ conditional execution of a block, only valid after an `if`.
 @end table
 @menu
 * if::
-* block::
+* Control structures::
 @end menu
 @iftex
-See @ref{if}; @ref{block}.
+See @ref{if}; @ref{Control structures}.
 @end iftex
 @c ---------------------------------------
 @node export, for, else, Control structures
@@ -5243,14 +5243,14 @@ iterate is executed and boolean_expression is evaluated.
 @end example
 @end table
 @menu
-* block::
+* Control structures::
 * boolean expressions::
 * while::
 * if::
 * break::
 @end menu
 @iftex
-See @ref{block}; @ref{boolean expressions}; @ref{while}; @ref{if};
+See @ref{Control structures}; @ref{boolean expressions}; @ref{while}; @ref{if};
 @ref{break}; @ref{continue}.
 @end iftex
 @c ---------------------------------------
@@ -5283,11 +5283,11 @@ conditional execution of a block.
 @end example
 @end table
 @menu
-* block::
+* Control structures::
 * boolean expressions::
 @end menu
 @iftex
-See @ref{block}; @ref{boolean expressions}.
+See @ref{Control structures}; @ref{boolean expressions}.
 @end iftex
 @c ---------------------------------------
 @node keepring, quit, if, Control structures
@@ -5395,12 +5395,11 @@ repetitive, conditional execution of block.
 @end table
 @menu
 * boolean expressions::
-* for::
-* while::
+* Control structures::
 * break::
 @end menu
 @iftex
-See @ref{block}; @ref{boolean expressions}; @ref{break}.
+See @ref{Control structures}; @ref{boolean expressions}; @ref{break}.
 @end iftex
 
 

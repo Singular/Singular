@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.15 1998-05-05 15:29:28 obachman Exp $
+@comment $Id: singular.doc,v 1.16 1998-05-06 14:02:18 Singular Exp $
 @comment this file contains the main structure of the manual
 @c ------------------------
 @comment %**start of header
@@ -181,7 +181,7 @@ An assignment expression does not have a result, i.e., does not have an rvalue. 
 @*@code{s, i = "Hello", 2;}
 
 @c ---------------------------------------
-@node no left-to-right evaluation of logical expressions, no case/switch statement, no rvalue of assignments, Major differences to the C programming language
+@node Evaluation of logical expressions, no case/switch statement, no rvalue of assignments, Major differences to the C programming language
 @subsection Evaluation of logical expressions
 @cindex and
 @cindex or
