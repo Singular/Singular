@@ -223,7 +223,7 @@ SLIB0 = COPYING \
         surf.lib     toric.lib     triang.lib    zeroset.lib    help.cnf 
  
 
-PLIBS = center.lib ncall.lib ncalg.lib ncdecomp.lib nctools.lib gkdim.lib qmatrix.lib
+PLIBS = center.lib gkdim.lib involution.lib ncall.lib ncalg.lib ncdecomp.lib nctools.lib qmatrix.lib
 
 ifdef HAVE_PLURAL
 SLIBS = ${SLIB0} ${PLIBS}
@@ -470,6 +470,10 @@ install-bindist: $(HEADERS) $(SOURCES) Makefile depend
 	-${INSTALL_PROGRAM} *.so ${install_bindir}
 	${INSTALL_PROGRAM} -s  libparse ${RUN_SINGULARS} ESingular TSingular ${DL_LIBS} ${install_bindir}
 	echo "#undef MAKE_DISTRIBUTION " > distrib.h
+
+install-bindist-plural: install-bindist
+
+install-sharedist-plural: install-sharedist
 
 install-sharedist: ${SLIBS_FILES} LIB/gftables
 	${MKINSTALLDIRS} ${install_slibdir}
