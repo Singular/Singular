@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Id: ffields.cc,v 1.3 1997-03-24 14:24:39 Singular Exp $";
+static char rcsid[] = "$Id: ffields.cc,v 1.4 1997-03-26 16:31:48 obachman Exp $";
 /*
 * ABSTRACT: finite fields with a none-prime number of elements (via tables)
 */
@@ -466,7 +466,7 @@ void nfSetChar(int c, char **param)
     else     nfCharQ = -c;
     char buf[80];
     sprintf(buf,"gftables/%d",nfCharQ);
-    FILE * fp = feFopen(buf,"r",NULL,TRUE);
+    FILE * fp = feFopen(buf,"r",NULL,FALSE);
     if (fp==NULL)
     {
       sprintf(buf,"../gftables/%d",nfCharQ);
