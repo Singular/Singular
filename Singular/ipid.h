@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.h,v 1.32 2002-01-10 12:33:20 Singular Exp $ */
+/* $Id: ipid.h,v 1.33 2002-01-23 13:09:48 Singular Exp $ */
 /*
 * ABSTRACT: identfier handling
 */
@@ -36,10 +36,12 @@ inline package paCopy(package pack)
   return pack;
 }
 
+#ifndef HAVE_NAMESPACES
 inline void paKill(package pack)
 {
   pack->ref--;
 }
+#endif
 
 union uutypes;
 

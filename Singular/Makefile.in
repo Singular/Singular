@@ -116,7 +116,7 @@ CXXSOURCES=grammar.cc scanner.cc algmap.cc attrib.cc clapconv.cc \
     mpr_inout.cc mpr_base.cc mpr_numeric.cc \
     prCopy.cc p_Mult_q.cc \
     pDebug.cc pInline2.cc pInline1.cc pInline0.cc \
-    pShallowCopyDelete.cc  cntrlc.cc misc.cc
+    pShallowCopyDelete.cc fast_maps.cc cntrlc.cc misc.cc
 
 # stuff for MP
 MPSR_SOURCES = mpsr_Put.cc mpsr_PutPoly.cc mpsr_GetPoly.cc mpsr_sl.cc\
@@ -166,7 +166,7 @@ HEADERS=algmap.h hutil.h lists.h stairc.h attrib.h ideals.h \
 	subexpr.h clapsing.h ipid.h matpol.h polys.h p_polys.h syz.h \
 	cntrlc.h ipprint.h ring.h timer.h sdb.h dError.h \
 	febase.h ipshell.h shortfl.h tok.h mpr_complex.h mpr_global.h \
-	page.h gring.h \
+	page.h gring.h fast_maps.h \
 	ffields.h khstd.h silink.h sparsmat.h gnumpfl.h gnumpc.h \
 	fglm.h kstd1.h modulop.h sing_dbm.h weight.h \
 	fglmgauss.h fglmvec.h mpsr.h mpsr_sl.h\
