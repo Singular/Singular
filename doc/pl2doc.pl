@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: pl2doc.pl,v 1.8 1999-08-03 16:35:37 obachman Exp $
+# $Id: pl2doc.pl,v 1.9 1999-08-19 15:23:22 obachman Exp $
 ###################################################################
 #  Computer Algebra System SINGULAR
 #
@@ -103,7 +103,8 @@ unless ($no_fun)
       print LDOC "\@end table\n";
     }
     # print example
-    if ($ex = &CleanUpExample($lib, $example{$procs[$i]}))
+    if ($example{$procs[$i]} && 
+	($ex = &CleanUpExample($lib, $example{$procs[$i]})))
     {
       print LDOC "\@strong{Example:}\n";
       print LDOC "\@smallexample\n\@c example\n";
@@ -479,7 +480,7 @@ sub CleanUpExample
     $mexample .= "$line\n";
   }
   $example = $mexample;
-  
+  $example = undef unless $example =~ /\w/;
   # prepend LIB command
   $example = "LIB \"$lib.lib\";\n".$example 
     if ($example && $lib ne "standard");
