@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmbt.c,v 1.18 1999-10-25 16:09:35 Singular Exp $ */
+/* $Id: mmbt.c,v 1.19 1999-10-25 16:13:19 Singular Exp $ */
 /*
 * ABSTRACT: backtrace: part of memory subsystem (for linux/elf)
 * needed programs: - mprpc to set the variable MPRPC
@@ -85,9 +85,9 @@ int mmTrackInit ()
           {
             if(strstr(buf," _start\n")!=NULL)
             {
-              sscanf(buf,"%x",&mm_lowpc);
+              sscanf(buf,"%lx",&mm_lowpc);
               fgets(buf,sizeof(buf),nm);
-              sscanf(buf,"%x",&mm_highpc);
+              sscanf(buf,"%lx",&mm_highpc);
               mm_highpc--;
               break;
             }
