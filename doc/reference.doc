@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.26 1998-05-06 11:59:03 Singular Exp $
+@comment $Id: reference.doc,v 1.27 1998-05-06 12:33:22 wichmann Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -1990,13 +1990,13 @@ the result will be a standard basis.
 @menu
 * ideal expressions::
 * module expressions::
-* expression list::
+* Data types::
 * option::
 @end menu
 @iftex
 See @ref{ideal expressions};
 @ref{module expressions};
-@ref{expression list};
+@ref{Data types};
 @ref{option}.
 @end iftex
 @c ---------------------------------------
@@ -4779,10 +4779,10 @@ lists the [name, level, type and] value of a variable.
 @end example
 @end table
 @menu
-* Expressions::
+* Data types::
 @end menu
 @iftex
-See @ref{Expressions}.
+See @ref{Data types}.
 @end iftex
 @c ---------------------------------------
 @node typeof, var, type, Functions
@@ -4829,10 +4829,10 @@ future extensions}@code{,
 @end example
 @end table
 @menu
-* Expressions::
+* Data types::
 @end menu
 @iftex
-See @ref{Expressions}.
+See @ref{Data types}.
 @end iftex
 @c ---------------------------------------
 @node var, varstr, typeof, Functions
@@ -5060,14 +5060,13 @@ specified by the string from the data base.
 @menu
 * read::
 * link::
-* Expressions::
-* expression list::
+* Data types::
 * quote::
 * eval::
 * dump::
 @end menu
 @iftex
-See @ref{read}, @ref{link}, @ref{Expressions}; @ref{expression list};
+See @ref{read}, @ref{link}, @ref{Data types};
 @ref{quote}; @ref{eval}; @ref{dump}.
 @end iftex
 
@@ -5112,10 +5111,10 @@ leaves the innermost block of a for- or a while-construct.
 @menu
 * for::
 * while::
-* Control structures::
+* block::
 @end menu
 @iftex
-See @ref{Control structures}; @ref{while}; @ref{for}.
+See @ref{block}; @ref{while}; @ref{for}.
 @end iftex
 @c ---------------------------------------
 @node continue, else, break, Control structures
@@ -5149,10 +5148,10 @@ Unlike the C-construct it @strong{does not execute the increment statement}
 @end table
 @menu
 * for::
-* Control structures::
+* block::
 @end menu
 @iftex
-See @ref{Control structures}; @ref{for}.
+See @ref{block}; @ref{block}.
 @end iftex
 @c ---------------------------------------
 @node else, export, continue, Control structures
@@ -5179,10 +5178,10 @@ conditional execution of a block, only valid after an `if`.
 @end table
 @menu
 * if::
-* Control structures::
+* block::
 @end menu
 @iftex
-See @ref{if}; @ref{Control structures}.
+See @ref{if}; @ref{block}.
 @end iftex
 @c ---------------------------------------
 @node export, for, else, Control structures
@@ -5244,14 +5243,14 @@ iterate is executed and boolean_expression is evaluated.
 @end example
 @end table
 @menu
-* Control structures::
+* block::
 * boolean expressions::
 * while::
 * if::
 * break::
 @end menu
 @iftex
-See @ref{Control structures}; @ref{boolean expressions}; @ref{while}; @ref{if};
+See @ref{block}; @ref{boolean expressions}; @ref{while}; @ref{if};
 @ref{break}; @ref{continue}.
 @end iftex
 @c ---------------------------------------
@@ -5284,11 +5283,11 @@ conditional execution of a block.
 @end example
 @end table
 @menu
-* Control structures::
+* block::
 * boolean expressions::
 @end menu
 @iftex
-See @ref{Control structures}; @ref{boolean expressions}.
+See @ref{block}; @ref{boolean expressions}.
 @end iftex
 @c ---------------------------------------
 @node keepring, quit, if, Control structures
@@ -5360,11 +5359,11 @@ returns the result(s) of a procedure.
 @end example
 @end table
 @menu
-* Expressions::
+* Data types::
 * proc::
 @end menu
 @iftex
-See @ref{Expressions}; @ref{proc}.
+See @ref{Data types}; @ref{proc}.
 @end iftex
 @c ---------------------------------------
 @node while,  , return, Control structures
@@ -5401,7 +5400,7 @@ repetitive, conditional execution of block.
 * break::
 @end menu
 @iftex
-See @ref{Control structures}; @ref{boolean expressions}; @ref{break}.
+See @ref{block}; @ref{boolean expressions}; @ref{break}.
 @end iftex
 
 
