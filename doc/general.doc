@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.94 1998-05-20 09:39:04 schmidt Exp $
+@comment $Id: general.doc,v 1.95 1998-05-20 10:55:41 schmidt Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -421,7 +421,7 @@ The coefficient field of the rings may be
 
 @enumerate
 @item
-the field of rational numbers Q,
+the field of rational numbers @math{Q},
 @item
 @tex
 finite fields $Z/p$, $p$ a prime $\le 32003$,
@@ -437,9 +437,9 @@ finite fields $\hbox{GF}(p^n)$ with $p^n$ elements, $p$ a prime, $p^n \le 2^{15}
 finite fields GF(p^n) with p^n elements, p a prime, p^n <= 2^15,
 @end ifinfo
 @item
-transcendental extension of Q or Z/p,
+transcendental extension of @math{Q} or @math{Z/p},
 @item
-simple algebraic extension of Q or Z/p,
+simple algebraic extension of @math{Q} or @math{Z/p},
 @item
 the field of real numbers represented by simple precision floating point
 numbers.
@@ -616,6 +616,7 @@ qring r = std(maxideal(2));
 @item Purpose:
 declares a ring and sets it as the actual basering.
 @end table
+
 The coefficient_field is given by one of the following:
 @enumerate
 @item
@@ -686,12 +687,12 @@ weight vector given as an intvec_expression in parentheses.
 For the definition of the orderings, see @ref{Term orderings},
 @ref{Mathematical background}.
 
-@c ------------------------------------------------------------
-@c   End of duplicate piece of text.
-@c ------------------------------------------------------------
 If one of coefficient_field, names_of_ring_variables, and ordering
 consists of only one entry, the parentheses around this entry may be
 omitted.
+@c ------------------------------------------------------------
+@c   End of duplicate piece of text.
+@c ------------------------------------------------------------
 
 @subsubheading Quotient rings
 @c ------------------------------------------------------------
@@ -709,6 +710,7 @@ none
 declares a quotient ring as the basering modulo ideal_expression.  Sets
 it as current basering.
 @end table
+
 ideal_expression has to be represented by a standard basis.
 
 The most convenient way to map objects from a ring to its quotient ring
@@ -719,6 +721,19 @@ given representative of a polynomial, say, @code{p}.  I.e., it usually
 does not reduce @code{p} w.r.t. the quotient ideal.  This is only done
 during standard bases computations or by an explicite reduction using
 the command @code{reduce(p, std(0))} (@pxref{reduce}).
+
+@strong{Example:}
+@example
+@c example
+  ring r=32003,(x,y),dp;
+  poly f=x3+yx2+3y+4;
+  qring q=std(maxideal(2));
+  basering;
+  poly g=fetch(r, f);
+  g;
+  reduce(g,std(0));
+@c example
+@end example
 
 @c ------------------------------------------------------------
 @c   End of duplicate piece of text.
