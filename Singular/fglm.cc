@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglm.cc,v 1.24 2000-12-15 18:49:28 Singular Exp $
+// $Id: fglm.cc,v 1.25 2001-01-12 13:47:09 Singular Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -331,7 +331,7 @@ fglmQuotProc( leftv result, leftv first, leftv second )
     FglmState state = FglmOk;
 
     //    STICKYPROT("quotstart\n");
-    ideal sourceIdeal = IDIDEAL( (idhdl)first->data );
+    ideal sourceIdeal = (ideal)first->Data();
     poly quot = (poly)second->Data();
     ideal destIdeal = NULL;
 
