@@ -26,11 +26,6 @@
 #include "p_Procs.h"
 #include "kversion.h"
 
-#include "static.h"
-#ifdef HAVE_STATIC
-#undef HAVE_DYN_RL
-#endif
-
 #define SI_DONT_HAVE_GLOBAL_VARS
 
 //#ifdef HAVE_LIBPARSER
