@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_Tok.cc,v 1.7 1997-04-08 08:43:26 obachman Exp $ */
+/* $Id: mpsr_Tok.cc,v 1.8 1997-05-02 22:09:29 obachman Exp $ */
 
 /***************************************************************
  *
@@ -25,11 +25,6 @@
 
 #include "mpsr.h"
 #include "mpsr_Tok.h"
-
-#include"MP_BasicDict.h"
-#include"MP_MatrixDict.h"
-#include"MP_PolyDict.h"
-#include"MP_NumberDict.h"
 
 
 #define MAX_COP 256 // there may be at most 256 cops

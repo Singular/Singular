@@ -51,6 +51,7 @@ if test "${CFLAGS+set}" != set; then
 fi
 
 AC_PROG_CC
+AC_PROG_CPP
 AC_PROG_CXX
 AC_SET_MAKE
 
@@ -148,8 +149,8 @@ if test "$with_readline" != no; then
   AC_CHECK_LIB(ncurses,tgetent,,\
    AC_CHECK_LIB(curses,tgetent,,\
    AC_CHECK_LIB(termcap,tgetent)))
-   AC_CHECK_LIB(readline, rl_abort)
-   if test "$ac_cv_lib_readline_rl_abort" = yes; then
+  AC_CHECK_LIB(readline, rl_abort)
+  if test "$ac_cv_lib_readline_rl_abort" = yes; then
      AC_CHECK_HEADERS(readline/readline.h readline/history.h sys/file.h,ac_readline_ok=yes,ac_readline_ok=no; break)
    fi
    if test "$ac_readline_ok" = yes; then
@@ -186,7 +187,7 @@ NEED_LIBS=$LIBS
 dnl Check gmp
 if test "$with_gmp" != no; then
   AC_CHECK_LIB(gmp, mpz_init)
-  AC_CHECK_HEADERS(gmp.h)
+  AC_CHECK_HEADER(gmp.h)
   if test "$ac_cv_lib_gmp_mpz_init" = yes && \
    test "$ac_cv_header_gmp_h" = yes; then
     AC_DEFINE(HAVE_GMP)
@@ -208,11 +209,14 @@ if test "$with_MP" != no; then
     AC_MSG_WARN(building without MP: can not use MP without gmp)
   else
     if test "$ac_cv_lib_gmp_mpz_init"=yes; then
-      AC_CHECK_LIB(MPT, MPT_GetTree,,,-lMP)
+      AC_CHECK_LIB(MP, MP_OpenLink)
+      AC_CHECK_LIB(MPT, MPT_GetTree)
     fi
-    AC_CHECK_HEADERS(MP.h)
+    AC_CHECK_HEADERS(MP.h MPT.h)
     if test "$ac_cv_lib_MPT_MPT_GetTree" = yes && \
-     test "$ac_cv_header_MP_h"=yes; then
+     test "$ac_cv_header_MP_h" = yes && \
+     test "$ac_cv_lib_MP_MP_OpenLink" = yes && \
+     test "$ac_cv_header_MPT_h" = yes; then
       AC_DEFINE(HAVE_MPSR)
       NEED_LIBS="-lMPT -lMP ${NEED_LIBS}"
     elif test "$enable_MP" = yes; then
@@ -387,6 +391,5 @@ if test ${GCC} = yes; then
   CFLAGS="-O3 -w -fomit-frame-pointer"
 fi
 
-AC_SUBST(ac_configure_args)
-
-AC_OUTPUT(Makefile doc/Makefile)
+AC_OUTPUT(Makefile doc/Makefile, \
+ if test "$CONFIG_HEADERS"; then echo timestamp > stamp-h; fi)

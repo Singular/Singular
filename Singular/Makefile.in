@@ -12,7 +12,6 @@ SHELL		= /bin/sh
 SINGULAR_MAJOR_VERSION	= @SINGULAR_MAJOR_VERSION@
 SINGULAR_MINOR_VERSION	= @SINGULAR_MINOR_VERSION@
 DIST_NAME	= Singular-${SINGULAR_MAJOR_VERSION}.${SINGULAR_MINOR_VERSION}
-CONFIGURE_INPUT = @ac_configure_args@
 
 ## 
 ## various paths
@@ -147,7 +146,8 @@ OBJS=grammar.o scanner.o matpol.o binom.o\
 
 all:	Singular
 
-Singular: mod2.h version.h scanner.cc ${OBJS} iparith.o mpsr_Tok.o tesths.cc
+Singular: mod2.h Makefile version.h scanner.cc ${OBJS} iparith.o \
+						mpsr_Tok.o tesths.cc
 	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${DEFS} -o Singular \
 	tesths.cc iparith.o mpsr_Tok.o ${OBJS} ${LDFLAGS} ${LIBS}
 
@@ -165,18 +165,22 @@ iparith.inc : iparith.cc ipconv.cc tok.h mpsr_Tok.cc grammar.h
 version.h: ${SOURCES} ${HEADERS} Makefile.in mod2.h.in configure.in
 	echo "#define SINGULAR_VERSION_ID " `date '+%y%m%d%H'` >version.h
 
-mod2.h: config.status config.cache mod2.h.in Makefile.in
-	./config.status
-	touch -r mod2.h  config.status config.cache configure \
-		 configure.in Makefile.in
+mod2.h: stamp-h
 
-config.status config.cache : configure
-	./configure ${CONFIGURE_INPUT} --no-create
-	touch -r configure config.status config.cache
+stamp-h : config.status mod2.h.in 
+	CONFIG_FILES= CONFIG_HEADERS=mod2.h ./config.status
+
+Makefile: Makefile.in config.status 
+	CONFIG_FILES="Makefile" CONFIG_HEADERS= ./config.status
+
+doc/Makefile: doc/Makefile.in config.status
+	CONFIG_FILES="doc/Makefile" CONFIG_HEADERS= ./config.status
+
+config.status: configure
+	./config.status --recheck
 
 configure: configure.in
-	autoconf configure.in > configure
-	chmod a+x configure
+	autoconf 
 
 ##
 ## install targets
@@ -223,7 +227,7 @@ clean:
 	cd ${docdir}; ${MAKE} clean
 
 distclean: clean
-	-rm -rf depend *.inc ${DIST_NAME} ${testdir}/out
+	-rm -rf depend *.inc ${DIST_NAME} ${testdir}/out stamp-h
 	-rm mod2.h Makefile TAGS* config.status config.cache config.log
 	cd ${docdir}; ${MAKE} clean
 
@@ -232,7 +236,6 @@ maintainer-clean: distclean
 	@echo "Rebuilding the deleted files requires flex (version 2.3) "
 	@echo "bison and autoconf"
 	-rm configure scanner.cc grammar.h grammar.cc
-	cd ${docdir}; ${MAKE} distclean
 
 info dvi ps html:
 	cd ${docdir}; ${MAKE} $@

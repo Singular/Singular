@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_PutPoly.cc,v 1.5 1997-04-10 13:08:39 obachman Exp $ */
+/* $Id: mpsr_PutPoly.cc,v 1.6 1997-05-02 22:09:29 obachman Exp $ */
 
 /***************************************************************
  *
@@ -373,7 +373,7 @@ static mpsr_Status_t PutProtoTypeAnnot(MP_Link_pt link, ring r,
     // rational numbers
     mp_failr(MP_PutCommonMetaTypePacket(link,
                                         MP_NumberDict,
-                                        MP_CmtNumberMP_Rational,
+                                        MP_CmtNumberRational,
                                         1));
     // are always normalized (and made that way, if necessary)
     mp_failr(MP_PutAnnotationPacket(link,

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_Put.h,v 1.3 1997-04-10 13:08:38 obachman Exp $ */
+/* $Id: mpsr_Put.h,v 1.4 1997-05-02 22:09:28 obachman Exp $ */
 /***************************************************************
  *
  * File:       mpsr_Put.h
@@ -25,14 +25,6 @@
 #include"febase.h"
 #include"tok.h"
 #include"ipid.h"
-
-#include"MP_BasicDict.h"
-#include"MP_MatrixDict.h"
-#include"MP_PolyDict.h"
-#include"MP_NumberDict.h"
-#include"MP_ProtoDict.h"
-#include"MP_MpDict.h"
-
 
 /***************************************************************
  * 1.) Some handy macros

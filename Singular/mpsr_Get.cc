@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_Get.cc,v 1.9 1997-04-18 11:24:58 obachman Exp $ */
+/* $Id: mpsr_Get.cc,v 1.10 1997-05-02 22:09:27 obachman Exp $ */
 /***************************************************************
  *
  * File:       mpsr_Get.cc
@@ -29,12 +29,6 @@
 #include "matpol.h"
 #include "lists.h"
 #include "sing_mp.h"
-
-#include "MP_MatrixDict.h"
-#include "MP_PolyDict.h"
-#include "MP_BasicDict.h"
-#include "MP_ProtoDict.h"
-#include "MP_MpDict.h"
 
 #include <limits.h>
 

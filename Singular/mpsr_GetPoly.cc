@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_GetPoly.cc,v 1.5 1997-04-10 13:08:37 obachman Exp $ */
+/* $Id: mpsr_GetPoly.cc,v 1.6 1997-05-02 22:09:27 obachman Exp $ */
 
 /***************************************************************
  *
@@ -32,12 +32,6 @@
 #include "modulop.h"
 
 #include "mpsr_Tok.h"
-#include "MP_BasicDict.h"
-#include "MP_PolyDict.h"
-#include "MP_MatrixDict.h"
-#include "MP_NumberDict.h"
-#include "MP_ProtoDict.h"
-
 
 #ifdef PARI_BIGINT_TEST
 #include "MP_PariBigInt.h"
@@ -638,7 +632,7 @@ static mpsr_Status_t GetProtoTypeAnnot(MPT_Node_pt node, ring r, BOOLEAN mv,
   if (node->type == MP_CommonMetaType)
   {
     // char 0
-    if (MP_COMMON_T(node->nvalue) == MP_CmtNumberMP_Rational &&
+    if (MP_COMMON_T(node->nvalue) == MP_CmtNumberRational &&
         node->dict == MP_NumberDict)
     {
       r->ch = 0;
