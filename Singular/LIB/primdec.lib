@@ -1,4 +1,4 @@
-// $Id: primdec.lib,v 1.34 1999-06-09 10:48:03 Singular Exp $
+// $Id: primdec.lib,v 1.35 1999-06-09 12:04:24 Singular Exp $
 ////////////////////////////////////////////////////////////////////////////////
 // primdec.lib                                                                //
 // algorithms for primary decomposition based on                              //
@@ -10,7 +10,7 @@
 // written by Wolfram Decker and Hans Schoenemann                             //
 ////////////////////////////////////////////////////////////////////////////////
 
-version="$Id: primdec.lib,v 1.34 1999-06-09 10:48:03 Singular Exp $";
+version="$Id: primdec.lib,v 1.35 1999-06-09 12:04:24 Singular Exp $";
 info="
 LIBRARY: primdec.lib: PROCEDURE FOR PRIMARY DECOMPOSITION
 
@@ -4102,15 +4102,15 @@ NOTE:    implemented for characteristic 0, works also in char k >> 0,
 EXAMPLE: example primdecSY; shows an example
 "
 {
-   return(prim_dec(i,1));
+   return(min_ass_prim_charsets(i,1));
 }
 example
 { "EXAMPLE:";  echo = 2;
-   ring  r = 32003,(x,y,z),lp;
+   ring  r = 32003,(x,y,z),dp;
    poly  p = z2+1;
    poly  q = z4+2;
    ideal i = p^2*q^3,(y-z3)^3,(x-yz+z4)^4;
-   list pr= primdecSY(i);
+   list pr= minAssChar(i);
    pr;
 }
 ///////////////////////////////////////////////////////////////////////////////
