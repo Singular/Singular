@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.158 2001-02-08 13:12:58 Singular Exp $ */
+/* $Id: extra.cc,v 1.159 2001-02-15 14:04:31 levandov Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -69,6 +69,13 @@ extern "C"
 
 #ifdef HAVE_PLURAL
 #include "gring.h"
+#endif
+
+#ifdef ix86_Win /* only for the DLLTest */
+#include "WinDllTest.h"
+#ifdef HAVE_DL
+#include "mod_raw.h"
+#endif
 #endif
 
 // Define to enable many more system commands
@@ -1264,7 +1271,37 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 #endif
-
+#ifdef ix86_Win
+/*==================== DLL =================*/
+/* testing the DLL functionality under Win32 */
+    if (strcmp(sys_cmd, "DLL") == 0)
+    {
+      typedef void  (*Void_Func)();
+      typedef int  (*Int_Func)(int);
+      void *hh=dynl_open("WinDllTest.dll");
+      if ((h!=NULL) && (h->Typ()==INT_CMD))
+      {
+	int (*f)(int);
+        if (hh!=NULL)
+	  {
+	    int (*f)(int);
+	    f=(Int_Func)dynl_sym(hh,"PlusDll");
+	    int i=10;
+	    if (f!=NULL) printf("%d\n",f(i));
+	    else PrintS("cannot find PlusDll\n");
+	  }
+      }
+      else
+	{	
+	  void (*f)();
+	  f= (Void_Func)dynl_sym(hh,"TestDll");
+	  if (f!=NULL) f();
+	  else PrintS("cannot find TestDll\n");
+	}
+      return FALSE;
+    }
+    else
+#endif
 /*==================== Error =================*/
       Werror( "system(\"%s\",...) %s", sys_cmd, feNotImplemented );
   }
