@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.h,v 1.11 1999-11-15 17:20:15 obachman Exp $ */
+/* $Id: kstd1.h,v 1.12 2000-03-31 13:45:04 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -71,6 +71,7 @@ extern intvec * kModW;
 25 no redTail(p)/redTail(s)
 26 integer strategy
 27 stop at HC (finiteDeterminacyTest)
+28 infRedTail: ignore ecart in local redTail-calls
 29 kStd + 1 new element
 30 noRedSyz
 31 weight

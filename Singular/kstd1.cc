@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.48 2000-02-02 14:27:46 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.49 2000-03-31 13:44:50 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -27,29 +27,53 @@
 //#include "ipprint.h"
 
 /* the list of all options which give a warning by test */
-BITSET kOptions=Sy_bit(0)|Sy_bit(1)|Sy_bit(3)|Sy_bit(4)|Sy_bit(5)
-                |Sy_bit(8)|Sy_bit(10)|Sy_bit(21)
-                |Sy_bit(OPT_INTSTRATEGY)
-                |Sy_bit(30)|Sy_bit(31);
+BITSET kOptions=Sy_bit(OPT_PROT)           /*  0 */
+                |Sy_bit(OPT_REDSB)         /*  1 */
+                |Sy_bit(OPT_NOT_SUGAR)     /*  3 */
+                |Sy_bit(OPT_INTERRUPT)     /*  4 */
+                |Sy_bit(OPT_SUGARCRIT)     /*  5 */
+                |Sy_bit(OPT_MOREPAIRS)     /*  8 */
+                |Sy_bit(OPT_FASTHC)        /* 10 */
+                |Sy_bit(OPT_KEEPVARS)      /* 21 */
+                |Sy_bit(OPT_INTSTRATEGY)   /* 26 */
+                |Sy_bit(OPT_INFREDTAIL)    /* 28 */
+                |Sy_bit(OPT_NOTREGULARITY) /* 30 */
+                |Sy_bit(OPT_WEIGHTM);      /* 31 */
 
 /* the list of all options which may be used by option and test */
-BITSET validOpts=Sy_bit(0)|Sy_bit(1)|Sy_bit(2)|Sy_bit(3)
-             |Sy_bit(4)|Sy_bit(5)|Sy_bit(6)|Sy_bit(7)
-             |Sy_bit(8)|Sy_bit(9)|Sy_bit(10)
-             |Sy_bit(11)|Sy_bit(12)|Sy_bit(13)|Sy_bit(14)|Sy_bit(15)
-             |Sy_bit(16)|Sy_bit(17)|Sy_bit(18)|Sy_bit(19)|Sy_bit(20)
-             |Sy_bit(21)
-             |Sy_bit(22)
-             /*|Sy_bit(23)*/
-             /*|Sy_bit(24)*/
-             |Sy_bit(OPT_REDTAIL)
-             |Sy_bit(OPT_INTSTRATEGY)|Sy_bit(27)|Sy_bit(28)
-             |Sy_bit(29)
-             |Sy_bit(30)|Sy_bit(31);
+BITSET validOpts=Sy_bit(0)
+                |Sy_bit(1)
+                |Sy_bit(2)
+                |Sy_bit(3)
+                |Sy_bit(4)
+                |Sy_bit(5)
+                |Sy_bit(6)
+                |Sy_bit(7)
+                |Sy_bit(8)
+                |Sy_bit(9)
+                |Sy_bit(10)
+                |Sy_bit(11)
+                |Sy_bit(12)
+                |Sy_bit(13)
+                |Sy_bit(14)
+                |Sy_bit(15)
+                |Sy_bit(16)
+                |Sy_bit(17)
+                |Sy_bit(18)
+                |Sy_bit(19)
+                |Sy_bit(20)
+                |Sy_bit(21)
+                |Sy_bit(22)
+                /*|Sy_bit(23)*/
+                /*|Sy_bit(24)*/
+                |Sy_bit(OPT_REDTAIL)
+                |Sy_bit(OPT_INTSTRATEGY)
+                |Sy_bit(27)
+                |Sy_bit(28)
+                |Sy_bit(29)
+                |Sy_bit(30)
+                |Sy_bit(31);
 
-//static int (*posInLOld)(LSet L,int Ll, LObject l,kStrategy strat);
-//static int  lastAxis=0;
-//static BOOLEAN update=TRUE;
 //static BOOLEAN posInLOldFlag;
            /*FALSE, if posInL == posInL10*/
 
@@ -218,7 +242,7 @@ int redEcart19 (LObject* h,kStrategy strat)
           {
             i--;
             if (i<0) return 1;
-          } while (!pShortDivisibleBy(strat->S[i], strat->sevS[i], 
+          } while (!pShortDivisibleBy(strat->S[i], strat->sevS[i],
                                       (*h).p, not_sev));
           enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
           if (TEST_OPT_DEBUG) Print(" degree jumped; ->L%d\n",at);
@@ -377,7 +401,7 @@ int redEcart (LObject* h,kStrategy strat)
           {
             i--;
             if (i<0) return 1;
-          } while (!pShortDivisibleBy(strat->S[i], strat->sevS[i], 
+          } while (!pShortDivisibleBy(strat->S[i], strat->sevS[i],
                                       (*h).p, not_sev));
           enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
           if (TEST_OPT_DEBUG) Print(" degree jumped; ->L%d\n",at);
@@ -485,7 +509,7 @@ int redFirst (LObject* h,kStrategy strat)
           {
             i--;
             if (i<0) return 1;
-          } while (!pShortDivisibleBy(strat->S[i],strat->sevS[i], 
+          } while (!pShortDivisibleBy(strat->S[i],strat->sevS[i],
                                       (*h).p, not_sev));
           enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
           if (TEST_OPT_DEBUG) Print(" degree jumped; ->L%d\n",at);
@@ -551,7 +575,7 @@ int redMoraBest (LObject* h,kStrategy strat)
         if (((strat->T[i].ecart < ei)
           || ((strat->T[i].ecart == ei)
         && (strat->T[i].length < li)))
-            && pShortDivisibleBy(strat->T[i].p, strat->T[i].sev, 
+            && pShortDivisibleBy(strat->T[i].p, strat->T[i].sev,
                                  (*h).p, not_sev))
         {
           /*
@@ -642,7 +666,7 @@ int redMoraBest (LObject* h,kStrategy strat)
           {
             i--;
             if (i<0) return 1;
-          } while (!pShortDivisibleBy(strat->S[i],strat->sevS[i], 
+          } while (!pShortDivisibleBy(strat->S[i],strat->sevS[i],
                                       (*h).p, not_sev));
           enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
           if (TEST_OPT_DEBUG) Print(" degree jumped; ->L%d\n",at);
@@ -978,9 +1002,8 @@ void updateLHC(kStrategy strat)
         strat->L[i].p = ksOldCreateSpoly(strat->L[i].p1,
                                          strat->L[i].p2,
                                          strat->kNoether);
-        
-                                      
-        strat->L[i].ecart = pLDeg(strat->L[i].p,&strat->L[i].length)-pFDeg(strat->L[i].p);
+        strat->L[i].ecart = pLDeg(strat->L[i].p,&strat->L[i].length)
+                           -pFDeg(strat->L[i].p);
       }
     }
     else
@@ -1207,7 +1230,7 @@ void initMora(ideal F,kStrategy strat)
   strat->kHEdgeFound = ppNoether != NULL;
   if ( strat->kHEdgeFound )
      strat->kNoether = pCopy(ppNoether);
-  if (BTEST1(20))
+  if (TEST_OPT_REDBEST)
     strat->red = redMoraBest;/*- look for the best in T -*/
   else if (strat->kHEdgeFound || strat->homog)
     strat->red = redFirst;  /*take the first possible in T*/
