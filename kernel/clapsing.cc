@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.3 2004-12-15 17:45:10 Singular Exp $
+// $Id: clapsing.cc,v 1.4 2005-01-27 16:41:12 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -274,6 +274,20 @@ poly singclap_gcd ( poly f, poly g )
   return res;
 }
 
+/*2 find the maximal exponent of var(i) in poly p*/
+int pGetExp_Var(poly p, int i)
+{
+  int m=0;
+  int mm;
+  while (p!=NULL)
+  {
+    mm=pGetExp(p,i);
+    if (mm>m) m=mm;
+    pIter(p);
+  }
+  return m;
+}
+
 poly singclap_resultant ( poly f, poly g , poly x)
 {
   int i=pIsPurePower(x);
@@ -314,8 +328,35 @@ poly singclap_resultant ( poly f, poly g , poly x)
     else
     {
       Variable X(i+rPar(currRing));
+      number nf,ng;
+      pCleardenom_n(f,nf);pCleardenom_n(g,ng);
+      int ef,eg;
+      ef=pGetExp_Var(f,i);
+      eg=pGetExp_Var(g,i);
       CanonicalForm F( convSingTrPClapP( f ) ), G( convSingTrPClapP( g ) );
       res= convClapPSingTrP( resultant( F, G, X ) );
+      if ((nf!=NULL)&&(!nIsOne(nf))&&(!nIsZero(nf)))
+      {
+        number n=nInvers(nf);
+        while(eg>0)
+        {
+          res=pMult_nn(res,n);
+          eg--;
+        }
+        nDelete(&n);
+      }
+      nDelete(&nf);
+      if ((ng!=NULL)&&(!nIsOne(ng))&&(!nIsZero(ng)))
+      {
+        number n=nInvers(ng);
+        while(ef>0)
+        {
+          res=pMult_nn(res,n);
+          ef--;
+        }
+        nDelete(&n);
+      }
+      nDelete(&ng);
     }
     Off(SW_RATIONAL);
     return res;
