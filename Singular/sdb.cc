@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sdb.cc,v 1.9 1999-06-10 15:14:03 Singular Exp $ */
+/* $Id: sdb.cc,v 1.10 1999-08-20 16:06:48 Singular Exp $ */
 /*
 * ABSTRACT: Singular debugger
 */
@@ -15,6 +15,11 @@
 #include "ipshell.h"
 #include "ipid.h"
 #include "sdb.h"
+
+// We use 8 breakpoints - corresponding to a bit in a char variable in procinfo
+// bit 1..7 force a breakpoint, if lineno==sdb_lines[i-1],
+//                         (for displaying only: file sdb_files[i-1])
+// bit 0 force a breakpoint in every line (used for 'n')
 
 int sdb_lines[]={-1,-1,-1,-1,-1,-1,-1,-1};
 char * sdb_files[6];
@@ -32,6 +37,68 @@ int sdb_checkline(char f)
     if (ff==0) return 0;
   }
   return 0;
+}
+
+static char *sdb_find_arg(char *p)
+{
+  p++;
+  while (*p==' ') p++;
+  char *pp=p;
+  while (*pp>' ') pp++;
+  *pp='\0';
+  return p;
+}
+
+void sdb_show_bp()
+{
+  for(int i=0; i<7;i++)
+    if (sdb_lines[i]!= -1)
+      Print("Breakpoint %d: %s::%d\n",i+1,sdb_files[i],sdb_lines[i]);
+}
+
+BOOLEAN sdb_set_breakpoint(const char *pp, int given_lineno)
+{
+  idhdl h=ggetid(pp,TRUE);
+  if ((h==NULL)||(IDTYP(h)!=PROC_CMD))
+  {
+    PrintS(" not found\n");
+    return TRUE;
+  }
+  else
+  {
+    procinfov p=(procinfov)IDDATA(h);
+    #ifdef HAVE_DYNAMIC_LOADING
+    if (p->language!=LANG_SINGULAR)
+    {
+      PrintS("is not a Singular procedure\n");
+      return TRUE;
+    }
+    #endif
+    int lineno;
+    if (given_lineno >0) lineno=given_lineno;
+    else                 lineno=p->data.s.body_lineno;
+    int i;
+    if (given_lineno== -1)
+    {
+      i=p->trace_flag;
+      p->trace_flag &=1;
+      Print("breakpoints in %s deleted(%#x)\n",p->procname,i &255);
+      return FALSE;
+    }
+    i=0;
+    while((i<7) && (sdb_lines[i]!=-1)) i++;
+    if (sdb_lines[i]!= -1)
+    {
+      PrintS("too many breakpoints set, max is 7\n");
+      return TRUE;
+    }
+    sdb_lines[i]=lineno;
+    sdb_files[i]=p->libname;
+    i++;
+    p->trace_flag|=(1<<i);
+    Print("breakpoint %d, at line %d in %s\n",i,lineno,p->procname);
+    return FALSE;
+  }
 }
 
 void sdb_edit(procinfo *pi)
@@ -123,16 +190,6 @@ void sdb_edit(procinfo *pi)
   FreeL(filename);
 }
 
-static char *sdb_find_arg(char *p)
-{
-  p++;
-  while (*p==' ') p++;
-  char *pp=p;
-  while (*pp>' ') pp++;
-  *pp='\0';
-  return p;
-}
-
 static char sdb_lastcmd='c';
 
 void sdb(Voice * currentVoice, const char * currLine, int len)
@@ -171,8 +228,10 @@ void sdb(Voice * currentVoice, const char * currLine, int len)
         {
           PrintS(
           "b - print backtrace of calling stack\n"
+          "B <proc> [<line>] - define breakpoint\n"
           "c - continue\n"
           "d - delete current breakpoint\n"
+          "D - show all preakpoints\n"
           "e - edit the current procedure (current call will be aborted)\n"
           "h,? - display this help screen\n"
           "n - execute current line, break at next line\n"
@@ -198,6 +257,9 @@ void sdb(Voice * currentVoice, const char * currLine, int len)
           }
           break;
         }
+        case 'D':
+          sdb_show_bp();
+          break;
         case 'n':
           currentVoice->pi->trace_flag|= 1;
           return;
@@ -210,10 +272,10 @@ void sdb(Voice * currentVoice, const char * currLine, int len)
         case 'p':
         {
           p=sdb_find_arg(p);
-          Print("request `%s`",p);
+          Print("variable `%s`",p);
           idhdl h=ggetid(p,TRUE);
           if (h==NULL)
-            PrintS("NULL\n");
+            PrintS(" not found\n");
           else
           {
             sleftv tmp;
@@ -228,6 +290,13 @@ void sdb(Voice * currentVoice, const char * currLine, int len)
         case 'b':
           VoiceBackTrack();
           break;
+        case 'B':
+        {
+          p=sdb_find_arg(p);
+          Print("procedure `%s` ",p);
+          sdb_set_breakpoint(p);
+          break;
+        }
         case 'q':
         {
           p=sdb_find_arg(p);

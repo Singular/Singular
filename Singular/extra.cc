@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.102 1999-08-17 09:25:45 Singular Exp $ */
+/* $Id: extra.cc,v 1.103 1999-08-20 16:06:49 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -48,7 +48,6 @@
 #include "kstd1.h"
 #include "syz.h"
 #include "sdb.h"
-#include "version.h"
 
 // Define to enable many more system commands
 #ifndef MAKE_DISTRIBUTION
@@ -953,49 +952,25 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 /*==================== sdb-debugger =================*/
     if (strcmp(sys_cmd, "breakpoint") == 0)
     {
-      if ((h!=NULL) && (h->Typ()==PROC_CMD))
+      if (h==NULL)
       {
-        procinfov p=(procinfov)h->Data();
-        if (p->language!=LANG_SINGULAR)
-        {
-          WerrorS("set breakpoints only in Singular procedures");
-          return TRUE;
-        }
-        int lineno=p->data.s.body_lineno;
+       sdb_show_bp();
+       return FALSE;
+      }
+      else if (h->Typ()==PROC_CMD)
+      {
+        int lineno=0;
         if ((h->next!=NULL) && (h->next->Typ()==INT_CMD))
         {
           lineno=(int)h->next->Data();
         }
-        int i;
-        if (lineno== -1)
-        {
-          i=p->trace_flag;
-          p->trace_flag &=1;
-          Print("breakpoints in %s deleted(%#x)\n",p->procname,i &255);
-          return FALSE;
-        }
-        i=0;
-        while((i<7) && (sdb_lines[i]!=-1)) i++;
-        if (sdb_lines[i]!= -1)
-        {
-          PrintS("too many breakpoints set, max is 7\n");
-          return FALSE;
-        }
-        else
-        {
-          sdb_lines[i]=lineno;
-          sdb_files[i]=p->libname;
-          i++;
-          Print("breakpoint %d, at line %d in %s\n",i,lineno,p->procname);
-          p->trace_flag|=(1<<i);
-        }
+        return sdb_set_breakpoint(h->Name(),lineno);
       }
       else
       {
-        WerrorS("system(\"breakpoint\",`proc`,`int`) expected");
+        WerrorS("system(\"breakpoint\",`proc`[,`int`]) expected");
         return TRUE;
       }
-      return FALSE;
     }
     else
 /*==================== sdb_flags =================*/

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sdb.h,v 1.4 1999-05-06 16:53:25 Singular Exp $ */
+/* $Id: sdb.h,v 1.5 1999-08-20 16:06:49 Singular Exp $ */
 /*
 * ABSTRACT: Singular debugger
 */
@@ -16,6 +16,8 @@ extern char * sdb_files[];
 extern int    sdb_flags;
 
 void sdb_edit(procinfo *pi);
+void sdb_show_bp();
+BOOLEAN sdb_set_breakpoint(const char *p, int lineno=0);
 void sdb(Voice * currentVoice, const char * currLine, int len);
 #endif
 
