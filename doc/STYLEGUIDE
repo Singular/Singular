@@ -1,3 +1,48 @@
+* texinfo *
+===========
+
++ nach einer @table muss eine Leerzeile kommen, sonst steht im info-File
+  die nachfolgende Zeile in der letzten Tabellenzeile mit drin.
+
++ Das Argument von @cindex, @chapter, @section und @subsection darf
+  nicht in geschweiften Klammern stehen, auch wenn es Leerzeichen
+  enthaelt. (Das Argument geht bis zum Ende der Zeile.)
+    @cindex Procedures
+    @section Getting started
+
++ Taucht ein Punkt innerhalb eines Satzes auf (z.B. als Ende einer 
+  Abkuerzung), so sollte darauf ein @: folgen. Sonst erscheint im 
+  Ausdruch ein zu grosser Abstand zum nachfolgenden Wort:
+    compute w.r.t.@: a wellordering
+    a Groebner resp.@: standard basis
+
++ Die Zeichen @ und { und } muessen in texinfo mit @ "gequoted"
+  werden (nicht mit Backslash!). 
+  Der Backslash muss nicht gequoted werden:
+    @  muss als  @@  geschrieben werden
+    {  muss als  @{  geschrieben werden
+    }  muss als  @}  geschrieben werden
+    \  wird als  \   geschrieben
+  ACHTUNG: Dies gilt natuerlich nicht in Beispielen, die von doc2tex
+  gelesen und in Singular verarbeitet werden! Dort duerfen die Zeichen
+  nicht gequoted werden, das macht doc2tex alleine. Dies gilt insbesondere
+  auch fuer Dateien, die ueber @c include eingelesen werden.
+
++ Bei Aenderung von @node-Namen daran denken, dass der entsprechende Name 
+  auch im vorherigen und naechsten @node geaendert werden muss. 
+  Bei Aenderung von (Sub)sections daran denken, die Menues auf den neuen
+  Stand zu bringen. 
+  Fehlerhafte @node- und @menu-Strukturen sieht man, wenn man singular.hlp
+  erzeugt.
+
++ bislang wurde von texinfo nach einem @tex Kommando zu viel space 
+  eingesetzt. Der Fehler ist im texinfo behoben. Man kann nun also auch
+  mitten in einem Satz auf @tex umschalten, ohne etwas wie \noindent
+  einsetzen zu muessen.
+
+* Notationen *
+==============
+
 + Schreibweise von Singular:
     im Text: @sc{Singular}
     in Singular-Kommentaren von Singular-Beispielen: SINGULAR
@@ -10,11 +55,9 @@
 + Singular-Typen werden NICHT im Style @code geschrieben:
     int, intmat
 
-+ Das Argument von @cindex, @chapter, @section und @subsection darf
-  nicht in geschweiften Klammern stehen, auch wenn es Leerzeichen
-  enthaelt. (Das Argument geht bis zum Ende der Zeile.)
-    @cindex Procedures
-    @section Getting started
++ Tasten, die man druecken muss, werden im Style @code geschrieben.
+  Die Control-Taste wird als CTRL abgekuerzt:
+    @code{CTRL-A}
 
 + Gross/Kleinschreibung von Ueberschriften: Das erste Wort wird gross
   geschrieben, alle anderen klein. Ausnahme: Wenn das erste Wort ein
@@ -24,19 +67,72 @@
     int related functions
     TRACE
 
-+ Die Zeichen @ und { und } muessen in texinfo mit @ "gequoted"
-  werden (nicht mit Backslash!). 
-  Der Backslash muss nicht gequoted werden:
-    @  muss als  @@  geschrieben werden
-    {  muss als  @{  geschrieben werden
-    }  muss als  @}  geschrieben werden
-    \  wird als  \   geschrieben
++ Die Funktionsweise von Funktionen (vor allem im Kapitel "Functions")
+  wird in der dritten Person beschrieben. Statt "will be" wird "is"
+  verwendet:
+    vdim: returns the vector space dimension ....
+    the result is a standard basis (statt will be a standard basis)
 
-+ Tasten, die man druecken muss, werden im Style @code geschrieben.
-  Die Control-Taste wird als CTRL abgekuerzt:
-    @code{CTRL-A}
+* Schreibweisen *
+=================
 
-+ der basering heisst "basering" und nicht "base ring".
++ "standard basis" statt "standardbasis"
+
++ "basering" statt "base ring"
+
++ "Groebner" (ohne Umlaut)
+
++ "I/O" statt "i/o"
+  
++ Meistens verwenden wir den Begriff "monomial ordering".
+
++ Konstrukte wie "the ideal/module is..." vermeiden. Stattdessen etwa
+  "the ideal resp.@: module is..." schreiben.
+
++ Zum Englischen (Dank an Olaf und Christian):
+  "i.e.", "e.g.", "for example", "that is" usw. werden immer in Kommas
+  eingebettet:
+    @sc{Singular}, for example, has the ...
+  Nach einem Doppelpunkt schreiben wir klein weiter:
+    Purpose: computes the dimension.
+
+* Singular Beispiele und libraries *
+====================================
+
++ Die Kommandozeilen in einem Beispiel beginnen mit zwei Leerzeichen:
+@example
+  ring r;
+  ideal i=x,y;
+@end example
+
++ Ist der Kommentar zu einem Kommando in einem Beispiel, das von Singular
+  gerechnet werden soll, laenger als eine Zeile, muss das Kommando in der 
+  untersten Zeile des Kommentars stehen (sonst wird in spaeter die 
+  Singular-Ausgabe zwischen den Kommentar und das Kommando geschoben):
+  @example
+  @c example
+    ring r;
+                   // the following option leads to some usefule output     
+    option(prot);  // during the Groebner basis computation.
+  @c example
+  @end example
+
++ Bei Beispielen, die nicht wirklich von doc2tex gerechnet, muss nach dem
+  @expansion ein Leerzeichen kommen:
+  @example
+    int i=3; i;
+    @expansion{} 3
+  @end example
+
++ Beim Schreiben von Singular-Beispielen (insbesondere von
+  Kommentaren) bitte darauf achten, dass die Zeilen nicht zu breit
+  werden. (Sonst bekommt man "overfull hbox"-Meldungen um die Ohren
+  geschmissen.)
+
++ Hilfe-Texte in Libraries: keine TAB's verwenden
+
+* Cross-Referenzen *
+====================
 
 + mit der neuen Version von doc2tex kann (soll) man Cross-Referenzen
   wie folgt schreiben:
@@ -53,28 +149,16 @@
   uebersichtlicher.  Ausserdem kann man die Referenzen dann
   leichter im Editor handhaben (loeschen, alphabetisch
   sortieren).
-  Die Referenzen bitte alphabetisch sortieren.
+  Die Referenzen bitte alphabetisch sortieren und mit einem Semikolon
+  trennen.
 
-+ Referenzen immer mit einem Komma oder Punkt abschliessen (z.B.
-  @xref{foo}, for a description of foo.
++ Referenzen immer mit einem Komma oder Punkt abschliessen:
+    @xref{foo}, for a description of foo.
 
 + Eher @xref als @ref verwenden, da @ref im Info-file nicht so toll
   aussieht.  Folgendes ist aber ok:
     blah blah blah (@ref{blahblahblah}).
-
-+ Beim Schreiben von Singular-Beispielen (insbesondere von
-  Kommentaren) bitte darauf achten, dass die Zeilen nicht zu breit
-  werden. (Sonst bekommt man "overfull hbox"-Meldungen um die Ohren
-  geschmissen.)
-
-+ Zum Englischen (Dank an Olaf):
-  "i.e.", "e.g.", "for example", "that is" usw. werden immer in Kommas
-  eingebettet:
-    @sc{Singular}, for example, has the ...
-  Nach einem Doppelpunkt schreiben wir klein weiter:
-    Purpose: computes the dimension.
-
-* Hilfe-Texte in Libraries: keine TAB's verwenden
+  
 ------------------------------------------------------------
-$Id: STYLEGUIDE,v 1.3 1998-05-15 12:00:41 schmidt Exp $
+$Id: STYLEGUIDE,v 1.4 1998-05-18 12:53:39 wichmann Exp $
 ------------------------------------------------------------
