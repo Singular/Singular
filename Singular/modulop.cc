@@ -1,0 +1,351 @@
+/****************************************
+*  Computer Algebra System SINGULAR     *
+****************************************/
+static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/modulop.cc,v 1.1.1.1 1997-03-19 13:18:49 obachman Exp $";
+/* $Log: not supported by cvs2svn $
+*/
+
+/*
+* ABSTRACT:
+*/
+
+#include <limits.h>
+#include <string.h>
+#include "mod2.h"
+#include "tok.h"
+#include "febase.h"
+#include "mmemory.h"
+#include "numbers.h"
+#include "longrat.h"
+#include "modulop.h"
+
+int npPrimeM=0;
+int npGen=0;
+int npPminus1M=0;
+int npMapPrime;
+
+CARDINAL *npExpTable=NULL;
+CARDINAL *npLogTable=NULL;
+
+BOOLEAN npGreaterZero (number k)
+{
+  int h = (int) k;
+  return (h <= (npPrimeM>>1));
+}
+
+number npMult (number a,number b)
+{
+  if (((int)a == 0) || ((int)b == 0))
+    return (number)0;
+  else
+  {
+    return npMultM(a,b);
+  }
+}
+
+/*2
+* create a number from int
+*/
+number npInit (int i)
+{
+  while (i <  0)        i += npPrimeM;
+  while (i >= npPrimeM) i -= npPrimeM;
+  return (number)i;
+}
+
+/*2
+* convert a number to int (-p/2 .. p/2)
+*/
+int npInt(number &n)
+{
+  if ((int)n > (npPrimeM >>1)) return ((int)n -npPrimeM);
+  else                     return (int)n;
+}
+
+number npCopy (number  k1)
+{
+  return k1;
+}
+
+number npAdd (number a, number b)
+{
+  int ka = (int)a + (int)b;
+  if (ka >= npPrimeM) ka -= npPrimeM;
+  return (number)ka;
+}
+
+number npSub (number a, number b)
+{
+//  int ka = (int)a - (int)b;
+//  if (ka < 0)  ka += npPrimeM;
+//  *(int *)c = ka;
+  return npSubM(a,b);
+}
+
+BOOLEAN npIsZero (number  a)
+{
+  return 0 == (int)a;
+}
+
+BOOLEAN npIsOne (number a)
+{
+  return 1 == (int)a;
+}
+
+BOOLEAN npIsMOne (number a)
+{
+  return npPminus1M == (int)a;
+}
+
+number npDiv (number a,number b)
+{
+#ifdef LDEBUG
+  if ((int)a==0)
+    return (number)0;
+  else if ((int)b==0)
+  {
+    Werror("div by 0");
+    return (number)0;
+  }
+#else
+  if (((int)a==0) || ((int)b==0))
+    return (number)0;
+#endif
+  else
+  {
+    int s = npLogTable[(int)a] - npLogTable[(int)b];
+    if (s < 0)
+      s += npPminus1M;
+    return (number)npExpTable[s];
+  }
+}
+
+number  npInvers (number c)
+{
+  if ((int)c==0)
+  {
+    Werror("1/0");
+    return (number)0;
+  }
+  return (number)npExpTable[npPminus1M - npLogTable[(int)c]];
+}
+
+number npNeg (number c)
+{
+//  *(int *)c = npPrimeM-*(int *)c;
+  return npNegM(c);
+}
+
+BOOLEAN npGreater (number a,number b)
+{
+  return (int)a != (int)b;
+}
+
+BOOLEAN npEqual (number a,number b)
+{
+//  return (int)a == (int)b;
+  return npEqualM(a,b);
+}
+
+void npWrite (number &a)
+{
+  if ((int)a > (npPrimeM >>1)) StringAppend("-%d",npPrimeM-((int)a));
+  else                     StringAppend("%d",(int)a);
+}
+
+void npPower (number a, int i, number * result)
+{
+  if (i==0)
+  {
+    //npInit(1,result);
+    *(int *)result = 1;
+  }
+  else if (i==1)
+  {
+    //*result = npCopy(a);
+    *result = a;
+  }
+  else
+  {
+    npPower(a,i-1,result);
+    *result = npMultM(a,*result);
+  }
+}
+
+char* npEati(char *s, int *i)
+{
+
+  if (((*s) >= '0') && ((*s) <= '9'))
+  {
+    (*i) = 0;
+    do
+    {
+      (*i) *= 10;
+      (*i) += *s++ - '0';
+      if ((*i) >= (INT_MAX / 10)) (*i) = (*i) % npPrimeM;
+    }
+    while (((*s) >= '0') && ((*s) <= '9'));
+    if ((*i) >= npPrimeM) (*i) = (*i) % npPrimeM;
+  }
+  else (*i) = 1;
+  return s;
+}
+
+char * npRead (char *s, number *a)
+{
+  int z;
+  int n=1;
+
+  s = npEati(s, &z);
+  if ((*s) == '/')
+  {
+    s++;
+    s = npEati(s, &n);
+  }
+  *a = npDiv((number)z,(number)n);
+  return s;
+}
+
+/*2
+* the last used charcteristic
+*/
+//int npGetChar()
+//{
+//  return npPrimeM;
+//}
+
+/*2
+* set the charcteristic (allocate and init tables)
+*/
+
+void npSetChar(int c)
+{
+  int i, w;
+
+  if (c==npPrimeM) return;
+#ifdef TEST
+  if ((c==-npPrimeM) || ((c^1)==0))
+  {
+    Print("internal error: %d as np\n",c);
+    return;
+  }
+  // should never happen:if ((c^1)==0) return;
+#endif
+  if (npPrimeM > 1)
+  {
+    Free( (ADDRESS)npExpTable,npPrimeM*sizeof(CARDINAL) );
+    Free( (ADDRESS)npLogTable,npPrimeM*sizeof(CARDINAL) );
+    npExpTable=NULL;
+    npLogTable=NULL;
+  }
+  if ((c>1) || (c<(-1)))
+  {
+    if (c>1) npPrimeM = c;
+    else     npPrimeM = -c;
+    npPminus1M = npPrimeM - 1;
+    npExpTable= (CARDINAL *)Alloc( npPrimeM*sizeof(CARDINAL) );
+    npLogTable= (CARDINAL *)Alloc( npPrimeM*sizeof(CARDINAL) );
+    npExpTable[0] = 1;
+    npLogTable[1] = 0;
+    if (npPrimeM > 2)
+    {
+      w = 1;
+      loop
+      {
+        npLogTable[1] = 0;
+        w++;
+        i = 0;
+        loop
+        {
+          i++;
+          npExpTable[i] = (int)(((long)w * (long)npExpTable[i-1]) % npPrimeM);
+          npLogTable[npExpTable[i]] = i;
+          if (/*(i == npPrimeM - 1 ) ||*/ (npExpTable[i] == 1))
+            break;
+        }
+        if (i == npPrimeM - 1)
+          break;
+      }
+    }
+    else
+    {
+      npExpTable[1] = 1;
+    }
+  }
+  else
+    npPrimeM=0;
+ npGen=w;
+}
+
+
+#ifdef LDEBUG
+BOOLEAN npDBTest (number a, char *f, int l)
+{
+  if (((int)a<0) || ((int)a>npPrimeM))
+  {
+    return FALSE;
+  }
+  return TRUE;
+}
+#endif
+
+number npMap0(number from)
+{
+  return npInit(nlModP(from,npPrimeM));
+}
+
+number npMapP(number from)
+{
+  int i = (int)from;
+  if (i>npMapPrime/2)
+  {
+    i-=npMapPrime;
+    while (i < 0) i+=npPrimeM;
+  }
+  i%=npPrimeM;
+  return (number)i;
+}
+
+BOOLEAN npSetMap(int c, char ** par, int nop, number minpol)
+{
+  if (c == 0)
+  {
+    nMap = npMap0;   /*Q -> Z/p*/
+    return TRUE;
+  }
+  if (c == npPrimeM)
+  {
+    nMap = npCopy;  /* Z/p -> Z/p*/
+    return TRUE;
+  }
+  if (c>1)
+  {
+    if (par==NULL)
+    {
+      npMapPrime=c;
+      nMap = npMapP; /* Z/p' -> Z/p */
+      return TRUE;
+    }
+    else
+    {
+      return FALSE;   /* GF(q) ->Z/p */
+    }
+  }
+  if (c<0)
+  {
+    return FALSE;   /* Z/p'(a) -> Z/p*/
+  }
+  if (c==1)
+  {
+    return FALSE;   /* Q(a) -> Z/p */
+  }
+  return FALSE;      /* default */
+}
+
+/*2
+* dummy modulus: return 0
+*/
+number npIntMod(number a, number b)
+{
+  return (number)0;
+}

@@ -1,0 +1,593 @@
+/***************************************************************
+ *
+ * File:       mpsr_Put.cc
+ * Purpose:    main put routines for MP connection to Singular
+ * Author:     Olaf Bachmann (10/95)
+ *
+ * Change History (most recent first):
+ *  o 1/97 obachman
+ *    Updated putting routines to MP and MPP v1.1 
+ *
+ ***************************************************************/
+#include "mod2.h"
+
+#ifdef HAVE_MPSR
+
+#include "mpsr_Put.h"
+#include "mpsr_Tok.h"
+#include "intvec.h"
+#include "lists.h"
+#include "numbers.h"
+#include "polys.h"
+#include "sing_mp.h"
+#include "ring.h"
+
+/***************************************************************
+ *
+ * There are 4 different layers on which things are put:
+ * 1.) Singular Top-level Data (chains of leftv's) == MP message
+ * 2.) Single leftv's
+ * 3.) Plain Singular data (different Singular data types)
+ * 4.) Primitive polynomial Data
+ *
+ ***************************************************************/
+
+/***************************************************************
+ * 1.) Routines for Top-level Data
+ *
+ ***************************************************************/
+// this puts everything it finds in a leftv on the MP-link in form of
+// a message; Each leftv is sent as one MP Tree. The leftvs in a chain
+// of leftv's (i.e. for v->next != NULL) are sent as separate MP Trees
+// within the same MP message
+mpsr_Status_t mpsr_PutMsg(MP_Link_pt l, leftv v)
+{
+  mpsr_Status_t status = mpsr_Success;
+
+  MP_ResetLink(l);
+  while (v != NULL && status == mpsr_Success)
+  {
+    status = mpsr_PutLeftv(l, v, currRing);
+    v = v->next;
+  }
+  MP_EndMsg(l);
+
+  return status;
+}
+
+
+/***************************************************************
+ * Second-level data routines
+ * All the mpsr_Put*Leftv functions are defined as inline's in the header
+ *
+ ***************************************************************/
+
+// This already depends on the ring
+mpsr_Status_t mpsr_PutLeftv(MP_Link_pt link, leftv v, ring cring)
+{
+  idtyp type = v->Typ();
+
+  switch(type)
+  {
+    // first, all the ring-independent types
+      case INT_CMD:
+        return mpsr_PutIntLeftv(link,v);
+
+      case INTVEC_CMD:
+        return mpsr_PutIntVecLeftv(link, v);
+
+      case INTMAT_CMD:
+        return mpsr_PutIntMatLeftv(link, v);
+
+      case STRING_CMD:
+        return mpsr_PutStringLeftv(link, v);
+
+      case RING_CMD:
+        return mpsr_PutRingLeftv(link, v);
+
+      case QRING_CMD:
+        return mpsr_PutQRingLeftv(link, v);
+
+      case PROC_CMD:
+        return mpsr_PutProcLeftv(link, v);
+
+      case DEF_CMD:
+        return mpsr_PutDefLeftv(link, v);
+
+    // now potentially ring-dependent types
+      case LIST_CMD:
+        return mpsr_PutListLeftv(link,v, cring);
+
+      case COMMAND:
+        return mpsr_PutCommandLeftv(link,v, cring);
+
+      case NUMBER_CMD:
+        return mpsr_PutNumberLeftv(link,v, cring);
+
+      case POLY_CMD:
+        return mpsr_PutPolyLeftv(link, v, cring);
+
+      case IDEAL_CMD:
+        return mpsr_PutIdealLeftv(link, v, cring);
+
+      case VECTOR_CMD:
+        return mpsr_PutVectorLeftv(link, v, cring);
+
+      case MODUL_CMD:
+        return mpsr_PutModuleLeftv(link, v, cring);
+
+      case MATRIX_CMD:
+        return mpsr_PutMatrixLeftv(link,v, cring);
+
+      case MAP_CMD:
+        return mpsr_PutMapLeftv(link, v, cring);
+
+      default:
+        return mpsr_SetError(mpsr_UnknownLeftvType);
+  }
+}
+
+/***************************************************************
+ * the Third-level data routines which are ring-independent
+ *
+ ***************************************************************/
+mpsr_Status_t mpsr_PutIntVec(MP_Link_pt link, intvec *iv)
+{
+  int length = iv->length();
+  
+  // Put the Vector Operator 
+  mp_failr(MP_PutCommonOperatorPacket(link,
+                                   MP_CopMatrixDenseVector,
+                                   MP_MatrixDict,
+                                   1,
+                                   length));
+  // Prototype Annot 
+  mp_failr(MP_PutAnnotationPacket(link,
+                                  MP_AnnotProtoPrototype,
+                                  MP_ProtoDict,
+                                  MP_AnnotReqValNode));
+  // Together with the CommonMetaPacket specifying that each element of
+  // the vector is an Sint32 
+  mp_failr(MP_PutCommonMetaPacket(link, MP_CmtProtoSint32,
+                                  MP_ProtoDict, 0));
+  
+  // Now we finally put the data 
+  mp_return(IMP_PutSint32Vector(link, (MP_Sint32_t *) iv->ivGetVec(),
+                                length));
+}
+
+mpsr_Status_t mpsr_PutIntMat(MP_Link_pt link, intvec *iv)
+{
+  int r = iv->rows(), c = iv->cols(), length = r*c;
+
+  // First, we put the Matrix operator 
+  mp_failr(MP_PutCommonOperatorPacket(link,
+                                   MP_CopMatrixDenseMatrix,
+                                   MP_MatrixDict,
+                                   2,
+                                   length));
+  // Put the two annotations 
+  // First, the prototype annot 
+  mp_failr(MP_PutAnnotationPacket(link,
+                               MP_AnnotProtoPrototype,
+                               MP_ProtoDict,
+                               MP_AnnotReqValNode));
+  mp_failr(MP_PutCommonMetaPacket(link, MP_CmtProtoSint32, MP_ProtoDict, 0));
+  // And second, the dimension annot 
+  mp_failr(MP_PutAnnotationPacket(link,
+                               MP_AnnotMatrixDimension,
+                               MP_MatrixDict,
+                               MP_AnnotReqValNode));
+  // which specifies the dimesnion of the matrix
+  mp_failr(MP_PutCommonOperatorPacket(link,
+                                   MP_CopBasicList,
+                                   MP_BasicDict,
+                                   0, 2));
+  mp_failr(MP_PutUint32Packet(link, (MP_Uint32_t) r, 0));
+  mp_failr(MP_PutUint32Packet(link, (MP_Uint32_t) c, 0));
+
+  // And finally, we put the elments 
+  mp_return(IMP_PutSint32Vector(link, (MP_Sint32_t *) iv->ivGetVec(),
+                                length));
+}
+
+mpsr_Status_t mpsr_PutRing(MP_Link_pt link, ring cring)
+{
+  mp_failr(MP_PutCommonOperatorPacket(link,
+                                   MP_CopPolyRing,
+                                   MP_PolyDict,
+                                   mpsr_GetNumOfRingAnnots(cring, 1),
+                                   0));
+  return mpsr_PutRingAnnots(link, cring, 1);
+}
+
+mpsr_Status_t mpsr_PutProc(MP_Link_pt link, char* pname, char *proc)
+{
+  MP_DictTag_t dict;
+  MP_Common_t  cop;
+
+  failr(mpsr_tok2mp('=', &dict, &cop));
+  
+  // A Singular- procedure is sent as a cop with the string as arg
+  mp_failr(MP_PutCommonOperatorPacket(link,
+                                   cop,
+                                   dict,
+                                   0,
+                                   2));
+  mp_failr(MP_PutIdentifierPacket(link, pname, MP_BasicDict, 1));
+  mp_failr(MP_PutAnnotationPacket(link, MP_AnnotSingularProcDef,
+                                  MP_SingularDict, 0));
+  mp_return(MP_PutStringPacket(link, proc, 0));
+}
+
+
+/***************************************************************
+ * the Third-level data routines which are ring-dependent
+ *
+ ***************************************************************/
+
+inline mpsr_Status_t PutLeftvChain(MP_Link_pt link, leftv lv, ring r)
+{
+  while (lv != NULL)
+  {
+    failr(mpsr_PutLeftv(link, lv, r));
+    lv = lv->next;
+  }
+  return mpsr_Success;
+}
+
+mpsr_Status_t mpsr_PutList(MP_Link_pt link, lists l, ring cring)
+{
+  int i, nl = l->nr + 1;
+
+  mp_failr(MP_PutCommonOperatorPacket(link,
+                                   MP_CopBasicList,
+                                   MP_BasicDict,
+                                   0,
+                                   nl));
+  for (i=0; i<nl; i++)
+    failr(mpsr_PutLeftv(link, &(l->m[i]), cring));
+
+  return mpsr_Success;
+}
+
+mpsr_Status_t mpsr_PutCopCommand(MP_Link_pt link,  command cmd, ring cring)
+{
+  MP_Common_t cop;
+  MP_DictTag_t dict;
+  MP_NumChild_t nc = cmd->argc;
+  leftv l;
+
+  // First, we get the command cop -- at the moment, everything should be
+  // a MP cop
+  failr(mpsr_tok2mp(cmd->op, &dict, &cop));
+
+  // and put the common operator
+  mp_failr(MP_PutCommonOperatorPacket(link, cop, dict, 0, nc));
+
+  // now we Put the arguments
+  if (nc > 0)
+  {
+    if (nc <= 3)
+    {
+      failr(mpsr_PutLeftv(link, &(cmd->arg1), cring));
+      if (nc >1)
+      {
+        failr(mpsr_PutLeftv(link, &(cmd->arg2), cring));
+        if (nc == 3) return mpsr_PutLeftv(link, &(cmd->arg3), cring);
+        else return mpsr_Success;
+      }
+      else return mpsr_Success;
+    }
+    else
+      return PutLeftvChain(link, &(cmd->arg1), cring);
+  }
+  return mpsr_Success;
+}
+
+mpsr_Status_t mpsr_PutOpCommand(MP_Link_pt link,  command cmd, ring cring)
+{
+  mp_failr(MP_PutOperatorPacket(link,
+                             (char *) (cmd->arg1.Data()),
+                             MP_SingularDict,
+                             0,
+                             (cmd->argc <= 1 ? 0 :(cmd->arg2).listLength())));
+  if (cmd->argc > 1)
+    return PutLeftvChain(link, &(cmd->arg2), cring);
+  else
+    return mpsr_Success;
+}
+
+// Numbers are put as polys with one monomial and all exponents zero
+mpsr_Status_t mpsr_PutNumber(MP_Link_pt link,  number n, ring cring)
+{
+  ring rr = NULL;
+  poly p = NULL;
+  mpsr_Status_t r;
+
+  if (currRing != cring)
+  {
+    rr = currRing;
+    mpsr_SetCurrRing(cring, TRUE);
+  }
+  
+  if (!nIsZero(n))
+  {
+    p = pOne();
+    pSetCoeff(p, nCopy(n));
+  }
+  r = mpsr_PutPoly(link, p, cring);
+  pDelete(&p);
+
+  if (rr != NULL) mpsr_SetCurrRing(rr, TRUE);
+  
+  return r;
+}
+
+mpsr_Status_t mpsr_PutPoly(MP_Link_pt link, poly p, ring cring)
+{
+  mp_failr(MP_PutCommonOperatorPacket(link,
+                                   MP_CopPolyDenseDistPoly,
+                                   MP_PolyDict,
+                                   mpsr_GetNumOfRingAnnots(cring, 0),
+                                   pLength(p)));
+  failr(mpsr_PutRingAnnots(link, cring, 0));
+  return mpsr_PutPolyData(link, p, cring);
+}
+
+
+mpsr_Status_t mpsr_PutPolyVector(MP_Link_pt link, poly p, ring cring)
+{
+  mp_failr(MP_PutCommonOperatorPacket(link,
+                                   MP_CopPolyDenseDistPoly,
+                                   MP_PolyDict,
+                                   mpsr_GetNumOfRingAnnots(cring,1),
+                                   pLength(p)));
+  failr(mpsr_PutRingAnnots(link, cring, 1));
+  return mpsr_PutPolyVectorData(link, p, cring);
+}
+
+
+mpsr_Status_t mpsr_PutIdeal(MP_Link_pt link, ideal id, ring cring)
+{
+  int i, idn = IDELEMS(id);
+
+  mp_failr(MP_PutCommonOperatorPacket(link,
+                                   MP_CopPolyIdeal,
+                                   MP_PolyDict,
+                                   1,
+                                   idn));
+  mp_failr(MP_PutAnnotationPacket(link,
+                               MP_AnnotProtoPrototype,
+                               MP_ProtoDict,
+                               MP_AnnotReqValNode));
+  mp_failr(MP_PutCommonMetaOperatorPacket(link,
+                                       MP_CopPolyDenseDistPoly,
+                                       MP_PolyDict,
+                                       mpsr_GetNumOfRingAnnots(cring, 0),
+                                       0));
+  failr(mpsr_PutRingAnnots(link, cring, 0));
+
+  for (i=0; i < idn; i++)
+  {
+    IMP_PutUint32(link, pLength(id->m[i]));
+    failr(mpsr_PutPolyData(link, id->m[i], cring));
+  }
+  return mpsr_Success;
+}
+
+mpsr_Status_t mpsr_PutModule(MP_Link_pt link, ideal id, ring cring)
+{
+  int i, idn = IDELEMS(id);
+
+  mp_failr(MP_PutCommonOperatorPacket(link,
+                                   MP_CopPolyModule,
+                                   MP_PolyDict,
+                                   1,
+                                   idn));
+  mp_failr(MP_PutAnnotationPacket(link,
+                               MP_AnnotProtoPrototype,
+                               MP_ProtoDict,
+                               MP_AnnotReqValNode));
+  mp_failr(MP_PutCommonMetaOperatorPacket(link,
+                                       MP_CopPolyDenseDistPoly,
+                                       MP_PolyDict,
+                                       mpsr_GetNumOfRingAnnots(cring, 1),
+                                       0));
+  failr(mpsr_PutRingAnnots(link, cring, 1));
+
+  for (i=0; i < idn; i++)
+  {
+    IMP_PutUint32(link, pLength(id->m[i]));
+    failr(mpsr_PutPolyVectorData(link, id->m[i], cring));
+  }
+  return mpsr_Success;
+}
+
+mpsr_Status_t mpsr_PutMatrix(MP_Link_pt link, ideal id, ring cring)
+{
+  int nrows = id->nrows, ncols = id->ncols;
+  MP_Uint32_t n = nrows*ncols, i;
+
+  // First, we put the Matrix operator 
+  mp_failr(MP_PutCommonOperatorPacket(link,
+                                   MP_CopMatrixDenseMatrix,
+                                   MP_MatrixDict,
+                                   2,
+                                   n));
+  // Put the two annotations 
+  // First, the prototype annot 
+  mp_failr(MP_PutAnnotationPacket(link,
+                               MP_AnnotProtoPrototype,
+                               MP_ProtoDict,
+                               MP_AnnotReqValNode));
+  mp_failr(MP_PutCommonMetaOperatorPacket(link,
+                                       MP_CopPolyDenseDistPoly,
+                                       MP_PolyDict,
+                                       mpsr_GetNumOfRingAnnots(cring, 0),
+                                       0));
+  failr(mpsr_PutRingAnnots(link, cring, 0));
+
+  // second, the matrix dim annot
+  mp_failr(MP_PutAnnotationPacket(link,
+                               MP_AnnotMatrixDimension,
+                               MP_MatrixDict,
+                               MP_AnnotReqValNode));
+  // which specifies the dimesnion of the matrix
+  mp_failr(MP_PutCommonOperatorPacket(link,
+                                   MP_CopBasicList,
+                                   MP_BasicDict,
+                                   0, 2));
+  mp_failr(MP_PutUint32Packet(link, (MP_Uint32_t) nrows, 0));
+  mp_failr(MP_PutUint32Packet(link, (MP_Uint32_t) ncols, 0));
+
+  // And finally, we put the elments 
+  for (i=0; i < n; i++)
+  {
+    IMP_PutUint32(link, pLength(id->m[i]));
+    failr(mpsr_PutPolyData(link, id->m[i], cring));
+  }
+  return mpsr_Success;
+}
+
+
+// We communicate a map as an operator having three arguments: A ring,
+// its name and an ideal
+mpsr_Status_t mpsr_PutMap(MP_Link_pt link, map m, ring cring)
+{
+  MP_Uint32_t i, idn = IDELEMS((ideal) m);
+  MP_DictTag_t dict;
+  MP_Common_t cop;
+
+  failr(mpsr_tok2mp(MAP_CMD, &dict, &cop));
+
+  mp_failr(MP_PutCommonOperatorPacket(link,
+                                   cop,
+                                   dict,
+                                   0,
+                                   3));
+  // First, is the ring
+  failr(mpsr_PutRingLeftv(link, (leftv) idroot->get(m->preimage, 1)));
+
+  // Second, the name of the ring
+  mp_failr(MP_PutStringPacket(link, m->preimage,0));
+  
+  // and third, the ideal --
+  // supposing that we can cast a map to an ideal
+  return mpsr_PutIdeal(link, (ideal) m, cring);
+}
+
+
+/***************************************************************
+ *  
+ * A routine which dumps the content of Singular to a file
+ *
+ ***************************************************************/
+BOOLEAN mpsr_PutDump(char *fn)
+{
+  MP_Link_pt link = OpenMPFile(fn, 0);
+  BOOLEAN status;
+
+  if (link == NULL) return FALSE;
+  else status = mpsr_PutDump(link);
+
+  MP_CloseLink(link);
+  return status;
+}
+
+
+BOOLEAN mpsr_PutDump(MP_Link_pt link)
+{
+  idhdl h = idroot, h2 = NULL, rh = currRingHdl;
+  ring r;
+  sip_command cmd;
+  leftv lv;
+
+  mpsr_ClearError();
+  memset(&(cmd), 0, sizeof(sip_command));
+  cmd.argc = 2;
+  cmd.op = '=';
+  cmd.arg1.rtyp = DEF_CMD;
+  lv = mpsr_InitLeftv(COMMAND, (void *) &cmd);
+  
+  MP_ResetLink(link);
+  while (h != NULL && h2 == NULL)
+  {
+    if (IDTYP(h) == PROC_CMD)
+    {
+      failr(mpsr_PutLeftv(link, (leftv) h, NULL));
+#ifdef MPSR_DEBUG
+      Print("Dumped Proc %s\n", IDID(h));
+#endif
+    }
+    else
+    {
+      cmd.arg1.name = IDID(h);
+      memcpy(&(cmd.arg2), h, sizeof(sleftv));
+      if (mpsr_PutLeftv(link, lv , currRing) != mpsr_Success) break;
+#ifdef MPSR_DEBUG
+      Print("Dumped %s\n", IDID(h));
+#endif
+      if (IDTYP(h) == RING_CMD || IDTYP(h) == QRING_CMD)
+      {
+        // we don't really need to do that, it's only for convenience
+        // for putting numbers
+        rSetHdl(h, TRUE);
+        r = IDRING(h);
+        h2 = r->idroot;
+        while (h2 != NULL)
+        {
+          cmd.arg1.name = IDID(h2);
+          memcpy(&(cmd.arg2), h2, sizeof(sleftv));
+          if (mpsr_PutLeftv(link, lv, r) != mpsr_Success) break;
+#ifdef MPSR_DEBUG
+      Print("Dumped %s\n", IDID(h2));
+#endif
+          h2 = h2->next;
+        }
+      }
+    }
+    
+    h = h->next;
+  }
+  MP_EndMsg(link);
+  Free(lv, sizeof(sleftv));
+  if (rh != NULL && rh != currRingHdl) rSetHdl(rh, TRUE);
+  
+  if (h == NULL && h2 == NULL)
+    return TRUE;
+  else
+  {
+    mpsr_PrintError();
+    return FALSE;
+  }
+}
+  
+BOOLEAN mpsr_PutDump(leftv h)
+{
+  if (h == NULL)
+  {
+    Print("Using file %s for dump\n", MPSR_DEFAULT_DUMP_FILE);
+    return mpsr_PutDump(MPSR_DEFAULT_DUMP_FILE);
+  }
+  else if (h->Typ() == STRING_CMD)
+  {
+    return mpsr_PutDump((char *) h->Data());
+  }
+  else if (h->Typ() == LINK_CMD)
+  {
+    si_link l = (si_link) h->Data();
+    if (SI_LINK_W_OPEN_P(l) && mpsr_IsMPLink(l))
+      return mpsr_PutDump((MP_Link_pt) l->data);
+    else
+      Werror("Can only dump data to an already opened MP link");
+  }
+  else
+  {
+    Werror("Need string or opened MP Link");
+  }
+  return FALSE;
+}
+#endif // HAVE_MPSR
+
+

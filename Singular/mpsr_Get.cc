@@ -1,0 +1,864 @@
+/***************************************************************
+ *
+ * File:       mpsr_Get.cc
+ * Purpose:    definition of the main Get routine(s)
+ * Author:     Olaf Bachmann (10/95)
+ *
+ * Change History (most recent first):
+ *
+ ***************************************************************/
+
+#include "mod2.h"
+
+#ifdef HAVE_MPSR
+
+
+#include"mpsr_Get.h"
+#include"mpsr_Tok.h"
+
+#include "tok.h"
+#include "longrat.h"
+#include "ring.h"
+#include "intvec.h"
+#include "ideals.h"
+#include "matpol.h"
+#include "lists.h"
+#include "sing_mp.h"
+
+#include "MP_MatrixDict.h"
+#include "MP_PolyDict.h"
+#include "MP_BasicDict.h"
+#include "MP_ProtoDict.h"
+
+#include <limits.h>
+
+
+/***************************************************************
+ *
+ * prototypes
+ *
+ ***************************************************************/
+static mpsr_Status_t GetIntVecLeftv(MP_Link_pt link, MPT_Node_pt node,
+                                  mpsr_leftv mlv);
+static mpsr_Status_t GetIntMatLeftv(MP_Link_pt link, MPT_Node_pt node,
+                                  mpsr_leftv mlv);
+static mpsr_Status_t GetRingLeftv(MP_Link_pt link, MPT_Node_pt node,
+                                mpsr_leftv mlv);
+static mpsr_Status_t GetPolyLeftv(MP_Link_pt link, MPT_Node_pt node,
+                                mpsr_leftv mlv);
+static mpsr_Status_t GetPolyVectorLeftv(MP_Link_pt link, MPT_Node_pt node,
+                                      mpsr_leftv mlv);
+static mpsr_Status_t GetIdealLeftv(MP_Link_pt link, MPT_Node_pt node,
+                                 mpsr_leftv mlv);
+static mpsr_Status_t GetModuleLeftv(MP_Link_pt link, MPT_Node_pt node,
+                                  mpsr_leftv mlv);
+static mpsr_Status_t GetMatrixLeftv(MP_Link_pt link, MPT_Node_pt node,
+                                  mpsr_leftv mlv);
+static mpsr_Status_t GetMapLeftv(MP_Link_pt link, MPT_Node_pt node,
+                               mpsr_leftv mlv);
+static mpsr_Status_t GetCopCommandLeftv(MP_Link_pt link, MPT_Node_pt node,
+                                      mpsr_leftv mlv, short quote);
+
+/***************************************************************
+ *
+ * Inlines 
+ *
+ ***************************************************************/
+
+// 
+// Predicates which examine nodes for primitive Singular types
+// 
+#define fr(cond)    if (! (cond)) return FALSE
+
+inline BOOLEAN IsIntVecNode(MPT_Node_pt node)
+{
+  fr(NodeCheck(node, MP_MatrixDict, MP_CopMatrixDenseVector));
+
+  MPT_Tree_pt tree = MPT_GetProtoTypespec(node);
+  return tree != NULL && NodeCheck(tree->node, MP_CommonMetaType,
+                                   MP_ProtoDict, MP_CmtProtoSint32);
+}
+
+inline BOOLEAN IsIntMatNode(MPT_Node_pt node)
+{
+  fr(NodeCheck(node, MP_MatrixDict, MP_CopMatrixDenseMatrix));
+
+  MPT_Tree_pt tree = MPT_GetProtoTypespec(node);
+  return tree != NULL && NodeCheck(tree->node, MP_CommonMetaType,
+                                   MP_ProtoDict, MP_CmtProtoSint32);
+}
+
+inline BOOLEAN IsRingNode(MPT_Node_pt node, ring &r)
+{
+  BOOLEAN mv;
+  return
+    NodeCheck(node, MP_PolyDict, MP_CopPolyRing) &&
+    mpsr_GetRingAnnots(node, r, mv) == MP_Success;
+}
+
+inline BOOLEAN IsPolyNode(MPT_Node_pt node, ring &r)
+{
+  BOOLEAN mv;
+  
+  //for the timne being, we only accept DDP's
+  return
+    NodeCheck(node, MP_PolyDict, MP_CopPolyDenseDistPoly) &&
+    MPT_FindAnnot(node, MP_PolyDict, MP_AnnotPolyModuleVector) == NULL &&
+    mpsr_GetRingAnnots(node, r, mv) == MP_Success;
+}
+
+inline BOOLEAN IsPolyVectorNode(MPT_Node_pt node, ring &r)
+{
+  BOOLEAN mv;
+  
+  //for the timne being, we only accept DDP's
+  return
+    NodeCheck(node, MP_PolyDict, MP_CopPolyDenseDistPoly) &&
+    MPT_FindAnnot(node, MP_PolyDict, MP_AnnotPolyModuleVector) != NULL &&
+    mpsr_GetRingAnnots(node, r, mv) == MP_Success;
+}
+
+inline BOOLEAN IsIdealNode(MPT_Node_pt node, ring &r)
+{
+  fr(NodeCheck(node, MP_PolyDict, MP_CopPolyIdeal));
+  MPT_Tree_pt tree = MPT_GetProtoTypespec(node);
+  fr(tree != NULL);
+  node = tree->node;
+  return
+    node->type == MP_CommonMetaOperatorType &&
+    node->numchild == 0 &&
+    IsPolyNode(node, r);
+}
+
+inline BOOLEAN IsModuleNode(MPT_Node_pt node, ring &r)
+{
+  fr(NodeCheck(node, MP_PolyDict, MP_CopPolyModule));
+  MPT_Tree_pt tree = MPT_GetProtoTypespec(node);
+  fr(tree != NULL);
+  node = tree->node;
+  return
+    node->type == MP_CommonMetaOperatorType &&
+    node->numchild == 0 &&
+    IsPolyVectorNode(node, r);
+}
+
+inline BOOLEAN IsMatrixNode(MPT_Node_pt node, ring &r)
+{
+  fr(NodeCheck(node, MP_MatrixDict, MP_CopMatrixDenseMatrix));
+  MPT_Tree_pt tree = MPT_GetProtoTypespec(node);
+  fr(tree != NULL);
+  node = tree->node;
+  return
+    node->type == MP_CommonMetaOperatorType &&
+    node->numchild == 0 &&
+    IsPolyNode(node, r);
+}
+
+//
+// Init*Leftv functions
+//
+inline void InitIntLeftv(mpsr_leftv mlv, int i)
+{
+  mlv->lv = mpsr_InitLeftv(INT_CMD, (void *) i);
+}
+
+inline void InitApIntLeftv(mpsr_leftv mlv, mpz_ptr apint)
+{
+  number n = (number) Alloc(sizeof(rnumber));
+
+  mlv->r = mpsr_rDefault(0);
+  n->s = 3;
+  memcpy(&(n->z), apint, sizeof(MP_INT));
+  Free(apint, sizeof(MP_INT));
+  mlv->lv = mpsr_InitLeftv(NUMBER_CMD, n);
+}
+
+inline void InitReal32Leftv(mpsr_leftv mlv, MPT_Arg_t r32)
+{
+  number n = (number) r32;
+//  n = Real32_2_Number(r32);
+
+  mlv->r = mpsr_rDefault(-1);
+  mlv->lv = mpsr_InitLeftv(NUMBER_CMD, n);
+}
+  
+inline void InitIdentifierLeftv(mpsr_leftv mlv, char *name, short quote)
+{
+  int pos;
+  
+  if (quote <= 0)
+  {
+    idhdl h = mpsr_FindIdhdl(name, mlv->r);
+
+    if (h != NULL)
+    {
+      mlv->lv = mpsr_InitLeftv(IDTYP(h), (void *) IDDATA(h));
+    }
+    else
+    {
+      poly p;
+      
+      pos = mpsr_rDefault(0, name, mlv->r);
+      mpsr_SetCurrRing(mlv->r, FALSE);
+      p = pOne();
+      p->exp[pos+1] = 1;
+      mlv->lv = mpsr_InitLeftv(POLY_CMD, (void *) p);
+    }
+    FreeL(name);
+  }
+  else
+  {
+    mlv->lv = mpsr_InitLeftv(DEF_CMD, NULL);
+    mlv->lv->name = name;
+  }
+}
+
+/* primitive mpsr_Get*Leftv functions */
+
+inline mpsr_Status_t mpsr_GetIntLeftv(MPT_Node_pt node, mpsr_leftv mlv)
+{
+  mpsr_assume(MP_IsFixedIntegerType(node->type));
+  mlv->lv = mpsr_InitLeftv(INT_CMD, node->nvalue);
+  return mpsr_Success;
+}
+
+inline mpsr_Status_t mpsr_GetReal32Leftv(MPT_Node_pt node, mpsr_leftv mlv) 
+{
+  mpsr_assume(node->type == MP_Real32Type);
+  InitReal32Leftv(mlv, node->nvalue);
+  return mpsr_Success;
+}
+
+inline mpsr_Status_t mpsr_GetApIntLeftv(MPT_Node_pt node, mpsr_leftv mlv)
+{
+  InitApIntLeftv(mlv, (mpz_ptr)  node->nvalue);
+  node->nvalue = NULL;
+  return mpsr_Success;
+}
+
+inline mpsr_Status_t mpsr_GetIdentifierLeftv(MPT_Node_pt node, mpsr_leftv mlv,
+                                             short quote)
+{
+  mpsr_assume(MP_IsIdType(node->type));
+  char *id;
+  MPT_Annot_pt proc_annot = MPT_FindAnnot(node, MP_SingularDict,
+                                          MP_AnnotSingularProcDef);
+
+  if (node->type == MP_CommonGreekIdentifierType ||
+      node->type == MP_CommonGreekIdentifierType)
+  {
+    id  = (char *) AllocL(2*sizeof(char));
+    id[1] = '\0';
+    id[0] = MP_UINT8_T(node->nvalue);
+  }
+  else
+  {
+    id = MP_STRING_T(node->nvalue);
+    node->nvalue = NULL;
+  }
+  
+  InitIdentifierLeftv(mlv, id, quote);
+
+  if (proc_annot != NULL)
+    mlv->lv->rtyp = PROC_CMD;
+    
+  return mpsr_Success;
+}
+
+inline mpsr_Status_t mpsr_GetStringLeftv(MPT_Node_pt node, mpsr_leftv mlv)
+{
+  mpsr_assume(node->type == MP_StringType);
+  mlv->lv = mpsr_InitLeftv(STRING_CMD, MP_STRING_T(node->nvalue));
+  node->nvalue = NULL;
+  return mpsr_Success;
+}
+
+/***************************************************************
+ *
+ * The top-level routine for getting a message
+ *
+ ***************************************************************/
+mpsr_Status_t mpsr_GetMsg(MP_Link_pt link, leftv &lv)
+{
+  mpsr_sleftv mlv, mlv1;
+  mpsr_Status_t status = mpsr_Success;
+
+  MP_SkipMsg(link);
+  
+  if (! MP_TestEofMsg(link))
+    status = mpsr_GetLeftv(link, &mlv, 0);
+  else
+  {
+    lv = mpsr_InitLeftv(NONE, NULL);
+    return mpsr_Success;
+  }
+  
+
+  // handle more than one leftv (ie. chains of leftv's)
+  while (status == mpsr_Success && ! MP_TestEofMsg(link))
+  {
+    // Get next leftv
+    status = mpsr_GetLeftv(link, &mlv1, 0);
+    if (status == mpsr_Success)
+      status = mpsr_MergeLeftv(&mlv, &mlv1);
+  }
+
+  if (status == mpsr_Success)
+  {
+    // Now mlv is our leftv -- check whether r has an ordering set
+    if (mlv.r != NULL && mlv.r->order[0] == ringorder_unspec)
+    {
+      ring r = rCopy(mlv.r);
+      r->order[0] = ringorder_lp;
+      mpsr_rSetOrdSgn(r);
+      mpsr_MapLeftv(mlv.lv, mlv.r, r);
+      rKill(mlv.r);
+      mlv.r = r;
+    }
+    mpsr_SetCurrRingHdl(mlv.r);
+
+    lv = mlv.lv;
+  }
+  else lv = NULL;
+  
+  return status;
+}
+
+/***************************************************************
+ *
+ * Top-level routine for getting a mpsr_leftv
+ *
+ ***************************************************************/
+
+// if quote > 0, then identifiers are not tried to be resolved, or
+// converted into a ring variable
+mpsr_Status_t mpsr_GetLeftv(MP_Link_pt link, mpsr_leftv mlv, short quote)
+{
+  MPT_Node_pt node = NULL;
+  MP_NodeType_t type;
+  mlv->r = NULL;
+  mlv->lv = NULL;
+
+  mpt_failr(MPT_GetNode(link, &node));
+
+  type = node->type;
+
+  if (MP_IsFixedIntegerType(type))
+    failr(mpsr_GetIntLeftv(node, mlv));
+  else if (MP_IsIdType(type))
+    failr(mpsr_GetIdentifierLeftv(node, mlv, quote));
+  else
+  {
+    switch (node->type)
+    {
+        case MP_ApIntType:
+          failr(mpsr_GetApIntLeftv(node, mlv));
+          break;        
+
+        case MP_StringType:
+          failr(mpsr_GetStringLeftv(node, mlv));
+          break;        
+
+        case MP_Real32Type:
+          failr(mpsr_GetReal32Leftv(node, mlv));
+          break;        
+        
+        case MP_CommonOperatorType:
+          failr(mpsr_GetCommonOperatorLeftv(link, node, mlv, quote));
+          break;        
+
+        case MP_OperatorType:
+          failr(mpsr_GetOperatorLeftv(link, node, mlv, quote));
+          break;        
+
+        default:
+          MPT_DeleteNode(node);
+          return mpsr_SetError(mpsr_UnknownMPNodeType);
+    }
+  }
+  
+  // everything was ok
+  MPT_DeleteNode(node);
+  return mpsr_Success;
+}
+
+/***************************************************************
+ *
+ * mpsr_Get*Leftv
+ *
+ ***************************************************************/
+mpsr_Status_t mpsr_GetCommonOperatorLeftv(MP_Link_pt link,
+                                        MPT_Node_pt node,
+                                        mpsr_leftv mlv,
+                                        short quote)
+{
+  mpsr_assume(node->type == MP_CommonOperatorType);
+
+  // Check for Singular data types
+  // IntVec
+  if (IsIntVecNode(node))
+    return GetIntVecLeftv(link, node, mlv);
+  // IntMat
+  else if (IsIntMatNode(node))
+    return GetIntMatLeftv(link, node, mlv);
+  // Ring
+  else if (IsRingNode(node, mlv->r))
+    return GetRingLeftv(link, node, mlv);
+  // Poly 
+  else if (IsPolyNode(node, mlv->r))
+    return GetPolyLeftv(link, node, mlv);
+  // PolyVector
+  else if (IsPolyVectorNode(node, mlv->r))
+    return GetPolyVectorLeftv(link, node, mlv);
+  // Ideal
+  else if (IsIdealNode(node, mlv->r))
+    return GetIdealLeftv(link, node, mlv);
+  // Module
+  else if (IsModuleNode(node, mlv->r))
+    return GetModuleLeftv(link, node, mlv);
+  // Matrix
+  else if (IsMatrixNode(node, mlv->r))
+    return GetMatrixLeftv(link, node, mlv);
+  // Map 
+  else
+    // now it should be a command (which handles Proc, Map and List
+    // seperately)
+    return GetCopCommandLeftv(link, node, mlv, quote);
+}
+
+mpsr_Status_t mpsr_GetOperatorLeftv(MP_Link_pt link,
+                                  MPT_Node_pt node,
+                                  mpsr_leftv mlv,
+                                  short quote)
+{
+  mpsr_assume(node->type == MP_CommonOperatorType);
+  MP_NumChild_t nc = node->numchild, i;
+  mpsr_sleftv smlv1, *mlv1 = &smlv1;
+  
+
+  if (MPT_GetProtoTypespec(node) != NULL)
+    return mpsr_SetError(mpsr_CanNotHandlePrototype);
+
+  if (nc > 0)
+  {
+    failr(mpsr_GetLeftv(link, mlv, quote));
+    for (i=0; i<nc; i++)
+    {
+      failr(mpsr_GetLeftv(link, mlv1, quote));
+      failr(mpsr_MergeLeftv(mlv, mlv1));
+    }
+  }
+  
+  command cmd = (command) Alloc0(sizeof(sip_command));
+  cmd->op = PROC_CMD;
+  cmd->arg1.rtyp = STRING_CMD;
+  cmd->arg1.data = (void *) mstrdup(MP_STRING_T(node->nvalue));
+
+  if (node->numchild > 0)
+  {
+    cmd->argc = 2;
+    memcpy(&(cmd->arg2), mlv->lv, sizeof(sleftv));
+    Free(mlv->lv, sizeof(sleftv));
+  }
+  else cmd->argc = 1;
+
+  mlv->lv = mpsr_InitLeftv(COMMAND, (void *) cmd);
+  return mpsr_Success;
+}
+  
+/***************************************************************
+ *
+ * Get*Leftv routines
+ *
+ ***************************************************************/
+//
+// Get*Leftv routines
+//
+static mpsr_Status_t GetIntVecLeftv(MP_Link_pt link, MPT_Node_pt node,
+                                  mpsr_leftv mlv)
+{
+  intvec *iv = new intvec(node->numchild);
+  int *v = iv->ivGetVec();
+
+  mp_failr(IMP_GetSint32Vector(link, &v, node->numchild));
+  mlv->lv = mpsr_InitLeftv(INTVEC_CMD, (void *) iv);
+  return mpsr_Success;
+}
+
+static mpsr_Status_t GetIntMatLeftv(MP_Link_pt link, MPT_Node_pt node,
+                                  mpsr_leftv mlv)
+{
+  intvec *iv;
+  int row = node->numchild, col = 1, *v;
+  MPT_Annot_pt annot = MPT_FindAnnot(node, MP_MatrixDict,
+                                     MP_AnnotMatrixDimension);
+  if (annot != NULL &&
+      annot->value != NULL &&
+      annot->value->node->numchild == 2 &&
+      NodeCheck(annot->value->node, MP_CommonOperatorType, MP_BasicDict,
+                MP_CopBasicList))
+  {
+    MPT_Tree_pt *tarray = (MPT_Tree_pt *) annot->value->args;
+    if (tarray[0]->node->type == MP_Uint32Type &&
+        tarray[1]->node->type == MP_Uint32Type)
+    {
+      row = MP_UINT32_T(tarray[0]->node->nvalue);
+      col = MP_UINT32_T(tarray[1]->node->nvalue);
+    }
+  }
+
+  iv = new intvec(row, col, 0);
+  v = iv->ivGetVec();
+  mp_failr(IMP_GetSint32Vector(link, &v, node->numchild));
+  mlv->lv = mpsr_InitLeftv(INTMAT_CMD, (void *) iv);
+  return mpsr_Success;
+}  
+
+static mpsr_Status_t GetRingLeftv(MP_Link_pt link, MPT_Node_pt node,
+                                mpsr_leftv mlv)
+{
+  mpsr_assume(mlv->r != NULL);
+
+  if (node->numchild != 0) mpt_failr(MPT_SkipArgs(link, node));
+
+  mlv->lv = mpsr_InitLeftv(((mlv->r->qideal != NULL) ? (short) QRING_CMD :
+                            (short) RING_CMD),
+                           (void *) mlv->r);
+  mlv->r = NULL;
+  return mpsr_Success;
+}
+
+static mpsr_Status_t GetPolyLeftv(MP_Link_pt link, MPT_Node_pt node,
+                                mpsr_leftv mlv)
+{
+  poly p;
+
+  mpsr_assume(mlv->r != NULL);
+  
+  failr(mpsr_GetPoly(link, p, node->numchild, mlv->r));
+  mlv->lv = mpsr_InitLeftv(POLY_CMD, (void *) p);
+  return mpsr_Success;
+}
+
+static mpsr_Status_t GetPolyVectorLeftv(MP_Link_pt link, MPT_Node_pt node,
+                                      mpsr_leftv mlv)
+{
+  poly p;
+
+  mpsr_assume(mlv->r != NULL);
+  
+  failr(mpsr_GetPolyVector(link, p, node->numchild, mlv->r));
+  mlv->lv = mpsr_InitLeftv(VECTOR_CMD, (void *) p);
+  return mpsr_Success;
+}
+
+static mpsr_Status_t GetIdealLeftv(MP_Link_pt link, MPT_Node_pt node,
+                                 mpsr_leftv mlv)
+{
+  MP_NumChild_t nc = node->numchild, i;
+  ring r = mlv->r;
+  MP_Uint32_t nmon;
+
+  mpsr_assume(r != NULL);
+  ideal id = idInit(nc,1);
+  for (i=0; i<nc; i++)
+  {
+    mp_failr(IMP_GetUint32(link, &nmon));
+    failr(mpsr_GetPoly(link, id->m[i], nmon, r));
+  }
+  
+  mlv->lv = mpsr_InitLeftv(IDEAL_CMD, (void *) id);
+  return mpsr_Success;
+}
+
+static mpsr_Status_t GetModuleLeftv(MP_Link_pt link, MPT_Node_pt node,
+                                  mpsr_leftv mlv)
+{
+  MP_NumChild_t nc = node->numchild, i;
+  ring r = mlv->r;
+  MP_Uint32_t nmon;
+
+  mpsr_assume(r != NULL);
+  ideal id = idInit(nc,1);
+  for (i=0; i<nc; i++)
+  {
+    mp_failr(IMP_GetUint32(link, &nmon));
+    failr(mpsr_GetPolyVector(link, id->m[i], nmon, r));
+  }
+
+  mlv->lv = mpsr_InitLeftv(MODUL_CMD, (void *) id);
+  return mpsr_Success;
+}
+
+static mpsr_Status_t GetMatrixLeftv(MP_Link_pt link, MPT_Node_pt node,
+                                  mpsr_leftv mlv)
+{
+  MP_NumChild_t nc = node->numchild, row = nc, col = 1, i;
+  matrix mp;
+  MP_Uint32_t nmon;
+  MPT_Annot_pt annot = MPT_FindAnnot(node, MP_MatrixDict,
+                                     MP_AnnotMatrixDimension);
+  if (annot != NULL &&
+      annot->value != NULL &&
+      annot->value->node->numchild == 2 &&
+      NodeCheck(annot->value->node, MP_CommonOperatorType, MP_BasicDict,
+               MP_CopBasicList))
+  {
+    MPT_Tree_pt *tarray = (MPT_Tree_pt *) annot->value->args;
+    if (tarray[0]->node->type == MP_Uint32Type &&
+        tarray[1]->node->type == MP_Uint32Type)
+    {
+      row = MP_UINT32_T(tarray[0]->node->nvalue);
+      col = MP_UINT32_T(tarray[1]->node->nvalue);
+    }
+  }
+
+  mpsr_assume(mlv->r != NULL);
+  mp = mpNew(row, col);
+  for (i=0; i<nc; i++)
+  {
+    mp_failr(IMP_GetUint32(link, &nmon));
+    failr(mpsr_GetPoly(link, mp->m[i], nmon, mlv->r));
+  }
+
+  mlv->lv = mpsr_InitLeftv(MATRIX_CMD, (void *) mp);
+  return mpsr_Success;
+}
+
+static mpsr_Status_t GetMapLeftv(MP_Link_pt link, MPT_Node_pt node,
+                               mpsr_leftv mlv)
+{
+  mpsr_sleftv smlv1, smlv2, *mlv1 = &smlv1, *mlv2 = &smlv2;
+
+  if (node->numchild != 3)
+    return mpsr_SetError(mpsr_WrongNumofArgs);
+  
+  failr(mpsr_GetLeftv(link, mlv, 0));
+  failr(mpsr_GetLeftv(link, mlv1, 0));
+  failr(mpsr_GetLeftv(link, mlv2, 0));
+
+  if (mlv->lv->rtyp != RING_CMD ||
+      mlv1->lv->rtyp != STRING_CMD ||
+      mlv2->lv->rtyp != IDEAL_CMD)
+    return mpsr_SetError(mpsr_WrongArgumentType);
+
+  ring r = (ring) mlv->lv->data, r2;
+  char *name = (char *) mlv1->lv->data;
+  ideal id = (ideal) mlv2->lv->data;
+
+  idhdl h = mpsr_FindIdhdl(name, r2);
+  if (h == NULL || IDTYP(h) != RING_CMD || ! mpsr_RingEqual(IDRING(h), r))
+  {
+    h = mpsr_InitIdhdl(RING_CMD, r, name);
+    h->next = idroot;
+    idroot = h;
+  }
+
+  map m = (map) Alloc0(sizeof(sip_smap));
+  m->preimage = mstrdup(name);
+  m->m = id->m;
+  m->nrows = id->nrows;
+  m->ncols = id->ncols;
+
+  Free(mlv->lv, sizeof(sleftv));
+
+  FreeL(mlv1->lv->data);
+  Free(mlv1->lv, sizeof(sleftv));
+  
+  Free(id, sizeof(sip_sideal));
+  Free(mlv2->lv, sizeof(sleftv));
+
+  mlv->r = mlv2->r;
+  mlv->lv = mpsr_InitLeftv(MAP_CMD, (void *) m);
+
+  return mpsr_Success;
+}
+
+  
+static mpsr_Status_t GetCopCommandLeftv(MP_Link_pt link, MPT_Node_pt node,
+                                      mpsr_leftv mlv, short quote)
+{
+  short tok;
+  MP_NumChild_t nc = node->numchild, i;
+  mpsr_sleftv smlv1, *mlv1 = &smlv1;
+  
+  
+  failr(mpsr_mp2tok(node->dict, MP_COMMON_T(node->nvalue), &tok));
+
+  if (MPT_GetProtoTypespec(node) != NULL)
+    return mpsr_SetError(mpsr_CanNotHandlePrototype);
+
+  if (tok == MAP_CMD) return GetMapLeftv(link, node, mlv);
+  
+  if (nc > 0)
+  {
+    if (tok == '=') failr(mpsr_GetLeftv(link, mlv, quote + 1));
+    else failr(mpsr_GetLeftv(link, mlv, quote));
+  }
+
+  for (i=1; i<nc; i++)
+  {
+    failr(mpsr_GetLeftv(link, mlv1, quote));
+    failr(mpsr_MergeLeftv(mlv, mlv1));
+  }
+
+  command cmd = (command) Alloc0(sizeof(sip_command));
+  cmd->op = tok;
+  cmd->argc = nc;
+
+  if (nc >= 1)
+  {
+    memcpy(&(cmd->arg1), mlv->lv, sizeof(sleftv));
+    if (nc <= 3)
+    {
+      (cmd->arg1).next = NULL;
+      if (nc >= 2)
+      {
+        memcpy(&(cmd->arg2), mlv->lv->next, sizeof(sleftv));
+        (cmd->arg2).next = NULL;
+
+        if (nc == 3)
+        {
+          memcpy(&(cmd->arg3), mlv->lv->next->next, sizeof(sleftv));
+          Free(mlv->lv->next->next, sizeof(sleftv));
+        }
+        Free(mlv->lv->next, sizeof(sleftv));
+      }
+    }
+    Free(mlv->lv, sizeof(sleftv));
+  }
+  else
+  {
+    // Here we work around a Singular bug: It can not handle lists of 0 args
+    // so we construct them explicitely
+    if (tok == LIST_CMD)
+    {
+      lists l = (lists) Alloc(sizeof(slists));
+      l->Init(0);
+      mlv->lv = mpsr_InitLeftv(LIST_CMD, (void *) l);
+      return mpsr_Success;
+    }
+  }
+
+  mlv->lv = mpsr_InitLeftv(COMMAND, (void *) cmd);
+  return mpsr_Success;
+}
+
+/***************************************************************
+ *
+ * The routine for Getting External Data
+ *
+ ***************************************************************/
+
+// this is all the data we want to have in directly when MPT_GetTree
+// is called, i.e. when the value of annots is read
+MPT_Status_t mpsr_GetExternalData(MP_Link_pt link,
+                                  MPT_Arg_t *odata,
+                                  MPT_Node_pt node)
+{
+  *odata = NULL;
+  
+  if (node->type == MP_CommonOperatorType)
+  {
+    mpsr_sleftv mlv;
+    mpsr_Status_t status;
+
+    // we would like to get polys and ideals directly
+    if (IsPolyNode(node, mlv.r))
+      status = GetPolyLeftv(link, node, &mlv);
+    // Ideal
+    else if (IsIdealNode(node, mlv.r))
+      status = GetIdealLeftv(link, node, &mlv);
+    else
+      return MPT_NotExternalData;
+
+    if (status == mpsr_Success)
+    {
+      mpsr_leftv mmlv = (mpsr_leftv) Alloc0(sizeof(mpsr_sleftv));
+      memcpy(mmlv, &mlv, sizeof(mpsr_sleftv));
+      *odata = (MPT_ExternalData_t) mmlv;
+      return MPT_Success;
+    }
+    else
+      return MPT_Failure;
+  }
+  else
+    return MPT_NotExternalData;
+}
+
+    
+/***************************************************************
+ *  
+ * A routine which get the previous dump of Singular
+ *
+ ***************************************************************/
+BOOLEAN mpsr_GetDump(char *fn)
+{
+  MP_Link_pt link = OpenMPFile(fn, 1);
+  BOOLEAN status;
+
+  if (link == NULL) return FALSE;
+  else status = mpsr_GetDump(link);
+
+  MP_CloseLink(link);
+  return status;
+}
+
+BOOLEAN mpsr_GetDump(MP_Link_pt link)
+{
+  mpsr_sleftv mlv;
+  mpsr_Status_t status = mpsr_Success;
+
+  MP_SkipMsg(link);
+  while ((! MP_TestEofMsg(link)) && (status == mpsr_Success))
+  {
+    status=mpsr_GetLeftv(link, &mlv, 0);
+
+    if (status == mpsr_Success)
+    {
+#ifdef MPSR_DEBUG
+      command cmd = (command) mlv.lv->data;
+      Print("Dump got %s", cmd->arg1.name);
+#endif      
+      mpsr_SetCurrRingHdl(mlv.r);
+      if (mlv.lv != NULL)
+      {
+        mlv.lv->Eval();
+        mlv.lv->CleanUp();
+        Free(mlv.lv, sizeof(sleftv));
+      }
+    }
+    else
+      mpsr_PrintError(status);
+  }
+
+
+  return (status == mpsr_Success);
+}
+
+BOOLEAN mpsr_GetDump(leftv h)
+{
+  if (h == NULL)
+  {
+    Print("Using file %s to get dump\n", MPSR_DEFAULT_DUMP_FILE);
+    return mpsr_GetDump(MPSR_DEFAULT_DUMP_FILE);
+  }
+  else if (h->Typ() == STRING_CMD)
+  {
+    return mpsr_GetDump((char *) h->Data());
+  }
+  else if (h->Typ() == LINK_CMD)
+  {
+    si_link l = (si_link) h->Data();
+    if (SI_LINK_R_OPEN_P(l) && mpsr_IsMPLink(l))
+      return mpsr_GetDump((MP_Link_pt) l->data);
+    else
+      Werror("Can only get dump data from an already opened MP link");
+  }
+  else
+  {
+    Werror("Need string or opened MP Link");
+  }
+  return FALSE;
+}
+#endif

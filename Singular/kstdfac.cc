@@ -1,0 +1,768 @@
+/****************************************
+*  Computer Algebra System SINGULAR     *
+****************************************/
+static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/kstdfac.cc,v 1.1.1.1 1997-03-19 13:18:48 obachman Exp $";
+/* $Log: not supported by cvs2svn $
+*/
+/*
+*  ABSTRACT -  Kernel: factorizing alg. of Buchberger
+*/
+
+#include "mod2.h"
+#include "tok.h"
+#include "mmemory.h"
+#include "polys.h"
+#include "ideals.h"
+#include "febase.h"
+#include "kutil.h"
+#include "kstd1.h"
+#include "kstd2.h"
+#include "khstd.h"
+#include "spolys.h"
+#include "cntrlc.h"
+#include "weight.h"
+#include "ipid.h"
+#include "ipshell.h"
+#include "intvec.h"
+#ifdef HAVE_LIBFACTORY
+#include "clapsing.h"
+#endif
+#include "lists.h"
+#include "ideals.h"
+#include "timer.h"
+#include "kstdfac.h"
+
+#ifdef HAVE_LIBFACTORY
+/*3
+* copy o->T to n->T, assumes that n->S is already copied
+*/
+static void copyT (kStrategy o,kStrategy n)
+{
+  int i,j;
+  poly  p;
+  TSet t=(TSet)Alloc(o->tmax*sizeof(TObject));
+
+  for (j=0; j<=o->tl; j++)
+  {
+    p = o->T[j].p;
+    i = -1;
+    loop
+    {
+      i++;
+      if (i>o->sl)
+      {
+        t[j].p=pCopy(p);
+        t[j].ecart=o->T[j].ecart;
+        t[j].length=o->T[j].length;
+        break;
+      }
+      if (p == o->S[i])
+      {
+        t[j].p=n->S[i];
+        t[j].ecart=o->T[j].ecart;
+        t[j].length=o->T[j].length;
+        break;
+      }
+    }
+  }
+  n->T=t;
+}
+
+/*3
+* copy o->L to n->L, assumes that n->T,n->tail is already copied
+*/
+static void copyL (kStrategy o,kStrategy n)
+{
+  int i,j;
+  poly  p;
+  LSet l=(LSet)Alloc(o->Lmax*sizeof(LObject));
+
+  for (j=0; j<=o->Ll; j++)
+  {
+    if (o->L[j].p->next!=o->tail)
+      l[j].p=pCopy(o->L[j].p);
+    else
+    {
+      l[j].p=pHead(o->L[j].p);
+      l[j].p->next=n->tail;
+    }
+    if (o->L[j].lcm!=NULL)
+      l[j].lcm=pCopy1(o->L[j].lcm);
+    else
+      l[j].lcm=NULL;
+    l[j].ecart=o->L[j].ecart;
+    l[j].length=o->L[j].length;
+    l[j].p1=NULL;
+    l[j].p2=NULL;
+
+    p = o->L[j].p1;
+    i = -1;
+    loop
+    {
+      if(p==NULL) break;
+      i++;
+      if(i>o->tl)
+      {
+        Print("poly p1 not found in T:");wrp(p);PrintLn();
+        l[j].p1=pCopy(p);
+        break;
+      }
+      if (p == o->T[i].p)
+      {
+        l[j].p1=n->T[i].p;
+        break;
+      }
+    }
+
+    p = o->L[j].p2;
+    i = -1;
+    loop
+    {
+      if(p==NULL) break;
+      i++;
+      if(i>o->tl)
+      {
+        Print("poly p2 not found in T:");wrp(p);PrintLn();
+        l[j].p2=pCopy(p);
+        break;
+      }
+      if (p == o->T[i].p)
+      {
+        l[j].p2=n->T[i].p;
+        break;
+      }
+    }
+  }
+  n->L=l;
+}
+
+kStrategy kStratCopy(kStrategy o)
+{
+  kStrategy s=(kStrategy)Alloc0(sizeof(skStrategy));
+  s->next=NULL;
+  s->red=o->red;
+  s->initEcart=o->initEcart;
+  s->posInT=o->posInT;
+  s->posInL=o->posInL;
+  s->enterS=o->enterS;
+  s->initEcartPair=o->initEcartPair;
+  s->posInLOld=o->posInLOld;
+  s->pOldFDeg=o->pOldFDeg;
+  s->Shdl=idCopy(o->Shdl);
+  s->S=s->Shdl->m;
+  if (o->D!=NULL) s->D=idCopy(o->D);
+  else            s->D=NULL;
+  s->ecartS=(int *)Alloc(IDELEMS(o->Shdl)*sizeof(int));
+  memcpy(s->ecartS,o->ecartS,IDELEMS(o->Shdl)*sizeof(int));
+  if(o->fromQ!=NULL)
+  {
+    s->fromQ=(int *)Alloc(IDELEMS(o->Shdl)*sizeof(int));
+    memcpy(s->fromQ,o->fromQ,IDELEMS(o->Shdl)*sizeof(int));
+  }
+  else
+    s->fromQ=NULL;
+  copyT(o,s);//s->T=...
+  s->tail=pInit();
+  copyL(o,s);//s->L=...
+  s->B=initL();
+  s->kHEdge=pCopy(o->kHEdge);
+  s->kNoether=pCopy(o->kNoether);
+  if (o->NotUsedAxis!=NULL)
+  {
+    s->NotUsedAxis=(BOOLEAN *)Alloc(currRing->N*sizeof(BOOLEAN));
+    memcpy(s->NotUsedAxis,o->NotUsedAxis,currRing->N*sizeof(BOOLEAN));
+  }
+  s->kIdeal=NULL;
+  s->P=s->L[s->Ll+1];
+  s->update=o->update;
+  s->posInLOldFlag=o->posInLOldFlag;
+  if (o->kModW!=NULL)
+    s->kModW=ivCopy(o->kModW);
+  else
+    s->kModW=NULL;
+  s->pairtest=NULL;
+  s->sl=o->sl;
+  s->mu=o->mu;
+  s->tl=o->tl;
+  s->tmax=o->tmax;
+  s->Ll=o->Ll;
+  s->Lmax=o->Lmax;
+  s->Bl=-1;
+  s->Bmax=setmax;
+  s->ak=o->ak;
+  s->syzComp=o->syzComp;
+  s->LazyPass=o->LazyPass;
+  s->LazyDegree=o->LazyDegree;
+  s->HCord=o->HCord;
+  s->lastAxis=o->lastAxis;
+  s->interpt=o->interpt;
+  s->homog=o->homog;
+  s->news=o->news;
+  s->newt=o->newt;
+  s->kHEdgeFound=o->kHEdgeFound;
+  s->honey=o->honey;
+  s->sugarCrit=o->sugarCrit;
+  s->Gebauer=o->Gebauer;
+  s->noTailReduction=o->noTailReduction;
+  s->fromT=o->fromT;
+  s->noetherSet=o->noetherSet;
+  return s;
+}
+
+static void completeReduceFac (kStrategy strat, lists FL)
+{
+  int si;
+
+  strat->noTailReduction = FALSE;
+  if (TEST_OPT_PROT)
+  {
+    PrintLn();
+    if (timerv) writeTime("standard base computed:");
+  }
+  if (TEST_OPT_PROT)
+  {
+    Print("(S:%d)",strat->sl);mflush();
+  }
+  for (si=strat->sl; si>0; si--)
+  {
+    if (strat->interpt) test_int_std(strat->kIdeal);
+    strat->S[si] = redtailBba(strat->S[si],si-1,strat);
+    if (TEST_OPT_INTSTRATEGY)
+    {
+      pCleardenom(strat->S[si]);
+    }
+    if (TEST_OPT_PROT)
+    {
+      PrintS("-");mflush();
+    }
+    int facdeg=pFDeg(strat->S[si]);
+    ideal fac=singclap_factorize(strat->S[si],NULL,1);
+#ifndef HAVE_LIBFAC_P
+    if (fac==NULL)
+    {
+      fac=idInit(1,1);
+      fac->m[0]=pCopy(strat->S[si]);
+    }
+#endif
+
+    if ((IDELEMS(fac)==1)&&(facdeg==pFDeg(fac->m[0])))
+    {
+      idDelete(&fac);
+      continue;
+    }
+    if (TEST_OPT_DEBUG)
+    {
+      wrp(strat->S[si]);
+      Print(" (=S[%d]) -> %d factors\n",si,IDELEMS(fac));
+    }
+    ideal fac_copy=idInit(IDELEMS(fac),1);
+    deleteInS(si,strat);
+    int i;
+    for(i=IDELEMS(fac)-1;i>=0;i--)
+    {
+      kStrategy n=strat;
+      if (i>=1)
+      {
+        n=kStratCopy(strat);
+        n->next=strat->next;
+        strat->next=n;
+      }
+      memset(&n->P,0,sizeof(n->P));
+
+      n->P.p=fac->m[i];
+      n->initEcart(&n->P);
+
+      /* enter P.p into s and L */
+      int pos;
+      if (n->sl==-1) pos=0;
+      else pos=posInS(n->S,n->sl,n->P.p);
+      if (TEST_OPT_INTSTRATEGY)
+      {
+        if (!TEST_OPT_MINRES||(n->syzComp==0)||(!n->homog))
+        {
+          n->P.p = redtailBba(n->P.p,pos-1,n);
+          pCleardenom(n->P.p);
+        }
+      }
+      else
+      {
+        pNorm(n->P.p);
+        if (!TEST_OPT_MINRES||(n->syzComp==0)||(!n->homog))
+        {
+          n->P.p = redtailBba(n->P.p,pos-1,n);
+        }
+      }
+      if (TEST_OPT_DEBUG)
+      {
+        PrintS("new s:");
+        wrp(n->P.p);
+        PrintLn();
+      }
+      enterpairs(n->P.p,n->sl,n->P.ecart,pos,n);
+      n->enterS(n->P,pos,n);
+
+      /* enter P.p into T */
+      if ((IDELEMS(fac)>1)||(facdeg!=pFDeg(fac->m[0])))
+      {
+        int pos=n->posInT(n->T,n->tl,n->P);
+        enterTBba(n->P,pos,n);
+      }
+
+      /* construct D */
+      if (IDELEMS(fac)>1)
+      {
+        idTest(fac_copy);
+        idTest(n->D);
+        if (n->D==NULL)
+        {
+          n->D=idCopy(fac_copy);
+          idSkipZeroes(n->D);
+        }
+        else
+        {
+          ideal r=idAdd(n->D,fac_copy);
+          idDelete(&n->D);
+          n->D=r;
+        }
+        idTest(n->D);
+        if (TEST_OPT_DEBUG)
+        {
+          PrintS("new D:\n");
+          iiWriteMatrix((matrix)n->D,"D",1,0);
+          PrintLn();
+        }
+        idTest(n->D);
+      }
+
+      idTest(fac_copy);
+
+      fac_copy->m[i]=pCopy(fac->m[i]);
+      fac->m[i]=NULL;
+
+      idTest(fac_copy);
+
+      /* check for empty sets */
+      if (n->D!=NULL)
+      {
+        int j=IDELEMS(n->D)-1;
+        while(j>=0)
+        {
+          if (n->D->m[j]!=NULL)
+          {
+            poly r=kNF(n->Shdl,NULL,n->D->m[j],0,TRUE);
+            if (r==NULL)
+            {
+              if (TEST_OPT_DEBUG)
+              {
+                PrintS("empty set because:");
+                wrp(n->D->m[j]);
+                PrintLn();
+                messageSets(n);
+              }
+              while (n->Ll >= 0) deleteInL(n->L,&n->Ll,n->Ll,n);
+              while (n->tl >= 0) { pDelete(&n->T[n->tl].p); n->tl--; }
+              memset(n->Shdl->m,0,IDELEMS(n->Shdl)*sizeof(poly));
+              n->sl=-1;
+              if (strat==n) si=-1;
+              break;
+            }
+            else
+            {
+              pDelete(&n->D->m[j]);
+              n->D->m[j]=r;
+            }
+          }
+          j--;
+        }
+      }
+      /* check for empty sets */
+      {
+        int j=FL->nr;
+        while (j>=0)
+        {
+          if ((n->sl>=0)&&(n->S[0]!=NULL))
+          {
+            ideal r=kNF(n->Shdl,NULL,(ideal)FL->m[j].Data(),0,TRUE);
+            if (idIs0(r))
+            {
+              if (TEST_OPT_DEBUG)
+              {
+                Print("empty set because:L[%d]\n",j);
+              }
+              while (n->Ll >= 0) deleteInL(n->L,&n->Ll,n->Ll,n);
+              while (n->tl >= 0) { pDelete(&n->T[n->tl].p); n->tl--; }
+              memset(n->Shdl->m,0,IDELEMS(n->Shdl)*sizeof(poly));
+              n->sl=-1;
+              if (strat==n) si=-1;
+              idDelete(&r);
+              break;
+            }
+            idDelete(&r);
+          }
+          j--;
+        }
+      }
+    } /* for */
+    for(i=0;i<IDELEMS(fac);i++) fac->m[i]=NULL;
+    idDelete(&fac);
+    idDelete(&fac_copy);
+    if ((strat->Ll>=0) && (strat->sl>=0)) break;
+    else si=strat->sl+1;
+  }
+}
+
+ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
+{
+  int   srmax,lrmax;
+  int   olddeg,reduc;
+
+  srmax = strat->sl;
+  reduc = olddeg = lrmax = 0;
+  /* compute------------------------------------------------------- */
+  if ((strat->Ll==-1) && (strat->sl>=0))
+  {
+    if (TEST_OPT_REDSB) completeReduceFac(strat,FL);
+  }
+  while (strat->Ll >= 0)
+  {
+    if (strat->Ll > lrmax) lrmax =strat->Ll;/*stat.*/
+    if (TEST_OPT_DEBUG) messageSets(strat);
+    test_int_std(strat->kIdeal);
+    if (strat->Ll== 0) strat->interpt=TRUE;
+    if (TEST_OPT_DEGBOUND
+    && ((strat->honey && (strat->L[strat->Ll].ecart+pFDeg(strat->L[strat->Ll].p)>Kstd1_deg))
+       || ((!strat->honey) && (pFDeg(strat->L[strat->Ll].p)>Kstd1_deg))))
+    {
+      /*
+      *stops computation if
+      * 24 IN test and the degree +ecart of L[strat->Ll] is bigger then
+      *a predefined number Kstd1_deg
+      */
+      while (strat->Ll >= 0) deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
+      break;
+    }
+    /* picks the last element from the lazyset L */
+    strat->P = strat->L[strat->Ll];
+    strat->Ll--;
+    kTest(strat);
+    if (pNext(strat->P.p) == strat->tail)
+    {
+      /* deletes the short spoly and computes */
+      pFree1(strat->P.p);
+      /* the real one */
+      strat->P.p = spSpolyCreate(strat->P.p1,strat->P.p2,strat->kNoether);
+    }
+    if (strat->honey)
+    {
+      if (TEST_OPT_PROT) message(strat->P.ecart+pFDeg(strat->P.p),&olddeg,&reduc,strat);
+    }
+    else
+    {
+      if (TEST_OPT_PROT) message(pFDeg(strat->P.p),&olddeg,&reduc,strat);
+    }
+    /* reduction of the element choosen from L */
+    strat->red(&strat->P,strat);
+    if (strat->P.p != NULL)
+    {
+      int facdeg=pFDeg(strat->P.p);
+      /* statistic */
+      if (TEST_OPT_PROT) PrintS("s");
+
+      ideal fac=singclap_factorize(strat->P.p,NULL,1);
+#ifndef HAVE_LIBFAC_P
+      if (fac==NULL)
+      {
+        fac=idInit(1,1);
+        fac->m[0]=pCopy(strat->P.p);
+      }
+#endif
+      ideal fac_copy=idInit(IDELEMS(fac),1);
+
+      if (TEST_OPT_DEBUG)
+      {
+        Print("-> %d factors\n",IDELEMS(fac));
+      }
+      if ((IDELEMS(fac)==1)&&(facdeg==pFDeg(fac->m[0])))
+      {
+        pDelete(&(fac->m[0]));
+        fac->m[0]=strat->P.p;
+      }
+      if (strat->P.lcm!=NULL) pFree1(strat->P.lcm);
+      int i;
+      for(i=IDELEMS(fac)-1;i>=0;i--)
+      {
+        kStrategy n=strat;
+        if (i>=1)
+        {
+          n=kStratCopy(strat);
+          n->next=strat->next;
+          strat->next=n;
+        }
+        memset(&n->P,0,sizeof(n->P));
+
+        n->P.p=fac->m[i];
+        n->initEcart(&n->P);
+
+        /* enter P.p into s and L */
+        int pos;
+        if (n->sl==-1) pos=0;
+        else pos=posInS(n->S,n->sl,n->P.p);
+        if (TEST_OPT_INTSTRATEGY)
+        {
+          if (!TEST_OPT_MINRES||(n->syzComp==0)||(!n->homog))
+          {
+            n->P.p = redtailBba(n->P.p,pos-1,n);
+            pCleardenom(n->P.p);
+          }
+        }
+        else
+        {
+          pNorm(n->P.p);
+          if (!TEST_OPT_MINRES||(n->syzComp==0)||(!n->homog))
+          {
+            n->P.p = redtailBba(n->P.p,pos-1,n);
+          }
+        }
+        if (TEST_OPT_DEBUG)
+        {
+          PrintS("new s:");
+          wrp(n->P.p);
+          PrintLn();
+        }
+        enterpairs(n->P.p,n->sl,n->P.ecart,pos,n);
+        n->enterS(n->P,pos,n);
+        if (n->sl>srmax) srmax = n->sl;
+
+        /* enter P.p into T */
+        if ((IDELEMS(fac)>1)||(facdeg!=pFDeg(fac->m[0])))
+        {
+          int pos=n->posInT(n->T,n->tl,n->P);
+          enterTBba(n->P,pos,n);
+        }
+
+        /* construct D */
+        if (IDELEMS(fac)>1)
+        {
+          idTest(fac_copy);
+          idTest(n->D);
+          if (n->D==NULL)
+          {
+            n->D=idCopy(fac_copy);
+            idSkipZeroes(n->D);
+          }
+          else
+          {
+            ideal r=idAdd(n->D,fac_copy);
+            idDelete(&n->D);
+            n->D=r;
+          }
+          idTest(n->D);
+          if (TEST_OPT_DEBUG)
+          {
+            PrintS("new D:\n");
+            iiWriteMatrix((matrix)n->D,"D",1,0);
+            PrintLn();
+          }
+          idTest(n->D);
+        }
+
+        idTest(fac_copy);
+
+        fac_copy->m[i]=pCopy(fac->m[i]);
+        fac->m[i]=NULL;
+
+        idTest(fac_copy);
+
+        /* check for empty sets */
+        if (n->D!=NULL)
+        {
+          int j=IDELEMS(n->D)-1;
+          while(j>=0)
+          {
+            if (n->D->m[j]!=NULL)
+            {
+              poly r=kNF(n->Shdl,NULL,n->D->m[j],0,TRUE);
+              if (r==NULL)
+              {
+                if (TEST_OPT_DEBUG)
+                {
+                  PrintS("empty set because:");
+                  wrp(n->D->m[j]);
+                  PrintLn();
+                  messageSets(n);
+                }
+                while (n->Ll >= 0) deleteInL(n->L,&n->Ll,n->Ll,n);
+                while (n->tl >= 0) { pDelete(&n->T[n->tl].p); n->tl--; }
+                memset(n->Shdl->m,0,IDELEMS(n->Shdl)*sizeof(poly));
+                n->sl=-1;
+                break;
+              }
+              else
+              {
+                pDelete(&n->D->m[j]);
+                n->D->m[j]=r;
+              }
+            }
+            j--;
+          }
+        }
+        /* check for empty sets */
+        {
+          int j=FL->nr;
+          while (j>=0)
+          {
+            if ((n->sl>=0)&&(n->S[0]!=NULL))
+            {
+              ideal r=kNF(n->Shdl,NULL,(ideal)FL->m[j].Data(),0,TRUE);
+              if (idIs0(r))
+              {
+                if (TEST_OPT_DEBUG)
+                {
+                  Print("empty set because:L[%d]\n",j);
+                }
+                while (n->Ll >= 0) deleteInL(n->L,&n->Ll,n->Ll,n);
+                while (n->tl >= 0) { pDelete(&n->T[n->tl].p); n->tl--; }
+                memset(n->Shdl->m,0,IDELEMS(n->Shdl)*sizeof(poly));
+                n->sl=-1;
+                idDelete(&r);
+                break;
+              }
+              idDelete(&r);
+            }
+            j--;
+          }
+        }
+      } /* for */
+      for(i=0;i<IDELEMS(fac);i++) fac->m[i]=NULL;
+      idDelete(&fac);
+      idDelete(&fac_copy);
+    }
+#ifdef KDEBUG
+    strat->P.lcm=NULL;
+#endif
+    if ((strat->Ll==-1) && (strat->sl>=0))
+    {
+      if (TEST_OPT_REDSB) completeReduceFac(strat,FL);
+    }
+    kTest(strat);
+  }
+  if (TEST_OPT_DEBUG) messageSets(strat);
+  /* complete reduction of the standard basis--------- */
+  /* release temp data-------------------------------- */
+  exitBuchMora(strat);
+  if (TEST_OPT_WEIGHTM)
+  {
+    pFDeg=pFDegOld;
+    pLDeg=pLDegOld;
+    if (ecartWeights)
+    {
+      Free((ADDRESS)ecartWeights,(pVariables+1)*sizeof(short));
+      ecartWeights=NULL;
+    }
+  }
+  if (TEST_OPT_PROT) messageStat(srmax,lrmax,0,strat);
+  if (Q!=NULL) updateResult(strat->Shdl,Q,strat);
+  return (strat->Shdl);
+}
+#endif
+
+lists stdfac(ideal F, ideal Q, tHomog h,intvec ** w,ideal D)
+{
+#ifdef HAVE_LIBFACTORY
+  ideal r;
+  BOOLEAN b=pLexOrder,toReset=FALSE;
+  BOOLEAN delete_w=(w==NULL);
+  kStrategy strat=(kStrategy)Alloc0(sizeof(skStrategy));
+  kStrategy orgstrat=strat;
+  lists L=(lists)Alloc(sizeof(slists)); L->Init(0);
+  sleftv v; memset(&v,0,sizeof(v));
+
+  if (currRing->ch==0) strat->LazyPass=2;
+  else                 strat->LazyPass=20;
+  strat->LazyDegree = 1;
+  if ((h==testHomog))
+  {
+    if (idRankFreeModule(F)==0)
+    {
+      h = (tHomog)idHomIdeal(F,Q);
+      w=NULL;
+    }
+    else
+      h = (tHomog)idHomModule(F,Q,w);
+  }
+  if (h==isHomog)
+  {
+    if ((w!=NULL) && (*w!=NULL))
+    {
+      kModW = *w;
+      pOldFDeg = pFDeg;
+      pFDeg = kModDeg;
+      toReset = TRUE;
+    }
+    pLexOrder = TRUE;
+    strat->LazyPass*=2;
+  }
+  strat->homog=h;
+  spSet(currRing);
+  initBuchMoraCrit(strat); /*set Gebauer, honey, sugarCrit*/
+  initBuchMoraPos(strat);
+  initBba(F,strat);
+  initBuchMora(F, Q,strat);
+  if (D!=NULL)
+  {
+    strat->D=idCopy(D);
+  }
+// Ende der Initalisierung
+  while (strat!=NULL)
+  {
+    if (TEST_OPT_DEBUG)
+      PrintS("====================================\n");
+    if (w!=NULL)
+      r=bbafac(F,Q,*w,strat,L);
+    else
+      r=bbafac(F,Q,NULL,strat,L);
+#ifdef KDEBUG
+    int i;
+    for (i=0; i<IDELEMS(r); i++) pTest(r->m[i]);
+#endif
+    idSkipZeroes(r);
+    // Testausgabe:
+    //if (!idIs0(r))
+    //{
+    //  PrintS("===================================================\n");
+    //  iiWriteMatrix((matrix)r,"S",1,0);
+    //  PrintS("\n===================================================\n");
+    //}
+    //else
+    //{
+    //  PrintS("=========empty============================\n");
+    //}
+    strat=strat->next;
+    if(!idIs0(r))
+    {
+      v.rtyp=IDEAL_CMD;
+      v.data=(void *)r;
+      lists LL=lInsert0(L,&v,0);
+      L=LL;
+    }
+  }
+// Ende: aufraeumen
+  if (toReset)
+  {
+    kModW = NULL;
+    pFDeg = pOldFDeg;
+  }
+  pLexOrder = b;
+  strat=orgstrat;
+  while (strat!=NULL)
+  {
+    orgstrat=strat->next;
+    Free((ADDRESS)strat,sizeof(skStrategy));
+    strat=orgstrat;
+  }
+  if ((delete_w)&&(w!=NULL)&&(*w!=NULL)) delete *w;
+  return L;
+#else
+  return NULL;
+#endif
+}
