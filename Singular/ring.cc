@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.45 1999-03-11 15:58:09 Singular Exp $ */
+/* $Id: ring.cc,v 1.46 1999-03-15 12:23:41 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -1671,7 +1671,6 @@ int rSum(ring r1, ring r2, ring &sum)
     tmpR.block0=(int*)Alloc0(b*sizeof(int));
     tmpR.block1=(int*)Alloc0(b*sizeof(int));
     tmpR.wvhdl=(short**)Alloc0(b*sizeof(short*));
-    /* weights not implemented yet ...*/
     if (rb!=NULL)
     {
       for (i=0;i<b;i++)
@@ -1689,6 +1688,12 @@ int rSum(ring r1, ring r2, ring &sum)
         tmpR.order[i]=r1->order[i];
         tmpR.block0[i]=r1->block0[i];
         tmpR.block1[i]=r1->block1[i];
+        if (r1->wvhdl[i]!=NULL)
+        {
+          int l=mmSizeL(r1->wvhdl[i]);
+          tmpR.wvhdl[i]=(short *)AllocL(l);
+          memcpy(tmpR.wvhdl[i],r1->wvhdl[i],l);
+        }
       }
       j=i;
       i--;
@@ -1706,6 +1711,12 @@ int rSum(ring r1, ring r2, ring &sum)
           tmpR.order[j]=r2->order[i];
           tmpR.block0[j]=r2->block0[i]+r1->N;
           tmpR.block1[j]=r2->block1[i]+r1->N;
+          if (r2->wvhdl[i]!=NULL)
+          {
+            int l=mmSizeL(r2->wvhdl[i]);
+            tmpR.wvhdl[i]=(short *)AllocL(l);
+            memcpy(tmpR.wvhdl[i],r2->wvhdl[i],l);
+          }
         }
       }
       if((r1->OrdSgn==-1)||(r2->OrdSgn==-1))
@@ -1721,12 +1732,17 @@ int rSum(ring r1, ring r2, ring &sum)
     tmpR.block0=(int*)Alloc0(b*sizeof(int));
     tmpR.block1=(int*)Alloc0(b*sizeof(int));
     tmpR.wvhdl=(short**)Alloc0(b*sizeof(short*));
-    /* weights not implemented yet ...*/
     for (i=0;i<b;i++)
     {
       tmpR.order[i]=r1->order[i];
       tmpR.block0[i]=r1->block0[i];
       tmpR.block1[i]=r1->block1[i];
+      if (r1->wvhdl[i]!=NULL)
+      {
+        int l=mmSizeL(r1->wvhdl[i]);
+        tmpR.wvhdl[i]=(short *)AllocL(l);
+        memcpy(tmpR.wvhdl[i],r1->wvhdl[i],l);
+      }
     }
     tmpR.OrdSgn=r1->OrdSgn;
   }
