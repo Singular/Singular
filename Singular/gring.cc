@@ -6,7 +6,7 @@
  *  Purpose: p_Mult family of procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.14 2002-06-06 16:02:10 levandov Exp $
+ *  Version: $Id: gring.cc,v 1.15 2002-07-12 13:48:28 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -18,6 +18,7 @@
 #include "ideals.h"
 #include "matpol.h"
 #include "kbuckets.h"
+#include "kstd1.h"
 
 /* global nc_macros : */
 #define freeT(A,v) omFreeSize((ADDRESS)A,(v+1)*sizeof(Exponent_t))
@@ -115,8 +116,9 @@ poly  nc_p_Mult_mm(poly p, const poly m, const ring r)
     
     p_GetExpV(v,P,r);
     cP=p_GetCoeff(v,r);
-    v= nc_mm_Mult_nn(P,M,r);
     cOut=n_Mult(cP,cM,r);
+    p_Delete(&v,r);
+    v= nc_mm_Mult_nn(P,M,r);
     v=p_Mult_nn(v,cOut,r);
     p_SetCompP(v,expOut,r);
     out = p_Add_q(out,v,r);
@@ -185,12 +187,12 @@ poly nc_mm_Mult_p(const poly m, poly p, const ring r)
         expOut=0;
       }
     }
-    
     p_GetExpV(v,P,r);
     cP=p_GetCoeff(v,r);
-    v= nc_mm_Mult_nn(M,P,r);
     cOut=n_Mult(cP,cM,r);
-    v=p_Mult_nn(v,cOut,r);
+    p_Delete(&v,r);
+    v= nc_mm_Mult_nn(M,P,r);
+    v = p_Mult_nn(v,cOut,r);
     p_SetCompP(v,expOut,r);
     out = p_Add_q(out,v,r);
     p_DeleteLm(&p,r);
@@ -616,6 +618,7 @@ poly nc_uu_Mult_ww (int i, int a, int j, int b, const ring r)
   int vik = UPMATELEM(j,i,r->N);
   matrix cMT=r->nc->MT[vik];
   int cMTsize=r->nc->MTsize[vik];
+  p_Delete(&out,r);
 
   if (((a<cMTsize)&&(b<cMTsize))&&(MATELEM(cMT,a,b)!=NULL))
   {
@@ -629,7 +632,6 @@ poly nc_uu_Mult_ww (int i, int a, int j, int b, const ring r)
       
   int newcMTsize=0;
   int k,m;
-  p_Delete(&out,r);
 
   if (a>=b) {newcMTsize=a;} else {newcMTsize=b;}
   if (newcMTsize>cMTsize)
@@ -927,9 +929,8 @@ poly nc_mm_Bracket_nn(poly m1, poly m2)
   poly res=NULL;
   poly ares=NULL;
   poly bres=NULL;
-  poly tmp=pOne();
-  poly prefix=pOne();
-  poly suffix=pOne();
+  poly prefix=NULL;
+  poly suffix=NULL;
   int nMin,nMax;
   number nTmp=NULL;
   number MinusOne=nInit(-1);
@@ -1018,6 +1019,74 @@ poly nc_mm_Bracket_nn(poly m1, poly m2)
   freeT(PREFIX, currRing->N);
   freeT(SUFFIX, currRing->N);
   return(res);
+}
+
+ideal twostd(ideal I)
+{
+  int i; 
+  int j; 
+  int s; 
+  int flag;
+  poly p=NULL;
+  poly q=NULL;
+  ideal J=kStd(I, NULL, testHomog,NULL,NULL,0,0,NULL);
+  idSkipZeroes(J);
+  ideal K=NULL;
+  poly varj=NULL;
+  ideal Q=NULL;
+  ideal id_tmp=NULL;
+
+  loop
+  {
+    flag=0;
+    K=NULL;
+    s=idElem(J);
+    for (i=0;i<=s-1;i++)
+    {
+      p=J->m[i];
+      for (j=1;j<=currRing->N;j++)
+      {   
+	varj=pOne();
+	pSetExp(varj,j,1);
+	pSetm(varj);
+        q=nc_p_Mult_mm(pCopy(p),varj,currRing); 
+	pDelete(&varj);
+	q=nc_spGSpolyRed(p,q,NULL,currRing);
+	q = kNF(J,NULL,q,0,0);
+        if (q!=NULL)
+        {
+	  if (pIsConstant(q))
+	  {
+	    Q=idInit(1,1);
+	    Q->m[0]=pOne();
+	    idDelete(&J);
+	    pDelete(&q);
+	    if (K!=NULL) idDelete(&K);
+	    return(Q);
+	  }
+          flag=1;
+	  Q=idInit(1,1);
+	  Q->m[0]=q;
+	  id_tmp=idSimpleAdd(K,Q);
+	  idDelete(&K);
+	  K=id_tmp;
+	  idDelete(&Q);	  
+        }    
+      }
+    }
+    if (flag==0) 
+      /* i.e. all elements are two-sided */
+    {
+      idDelete(&K);
+      return(J); 
+    }
+    id_tmp=idAdd(J,K);
+    idDelete(&K);
+    idDelete(&J);
+    J=kStd(id_tmp,NULL,testHomog,NULL,NULL,0,0,NULL);
+    idDelete(&id_tmp);
+    idSkipZeroes(J);
+  }
 }
 
 #endif

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gr_kstd2.cc,v 1.8 2002-06-11 14:57:41 levandov Exp $ */
+/* $Id: gr_kstd2.cc,v 1.9 2002-07-12 13:48:28 levandov Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -95,7 +95,8 @@ int redGrFirst (LObject* h,kStrategy strat)
       }
       /*computes the ecart*/
       d = pLDeg((*h).p,&((*h).length));
-      (*h).ecart = d-pFDeg((*h).p);
+      (*h).FDeg=pFDeg((*h).p);
+      (*h).ecart = d-(*h).FDeg; /*pFDeg((*h).p);*/
       if ((strat->syzComp!=0) && !strat->honey)
       {
         if ((strat->syzComp>0) && (pMinComp((*h).p) > strat->syzComp))
@@ -111,25 +112,25 @@ int redGrFirst (LObject* h,kStrategy strat)
       *-if the degree jumps
       *-if the number of pre-defined reductions jumps
       */
-      // if ((strat->Ll >= 0)
-//       && ((d >= reddeg) || (pass > strat->LazyPass))
-//       && !strat->homog)
-//       {
-//         at = strat->posInL(strat->L,strat->Ll,*h,strat);
-//         if (at <= strat->Ll)
-//         {
-//           i=strat->sl+1;
-//           do
-//           {
-//             i--;
-//             if (i<0) return;
-//           } while (!pDivisibleBy(strat->S[i],(*h).p));
-//           enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
-//           if (TEST_OPT_DEBUG) Print(" degree jumped; ->L%d\n",at);
-//           (*h).p = NULL;
-//           return;
-//         }
-//       }
+      if ((strat->Ll >= 0)
+      && ((d >= reddeg) || (pass > strat->LazyPass))
+      && !strat->homog)
+      {
+        at = strat->posInL(strat->L,strat->Ll,h,strat);
+        if (at <= strat->Ll)
+        {
+          i=strat->sl+1;
+          do
+          {
+            i--;
+            if (i<0) return 0;
+          } while (!pDivisibleBy(strat->S[i],(*h).p));
+          enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
+          if (TEST_OPT_DEBUG) Print(" degree jumped; ->L%d\n",at);
+          (*h).p = NULL;
+          return 0;
+        }
+      }
       if ((TEST_OPT_PROT) && (strat->Ll < 0) && (d >= reddeg))
       {
         reddeg = d+1;

@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.188 2002-06-11 14:57:06 levandov Exp $ */
+/* $Id: extra.cc,v 1.189 2002-07-12 13:48:26 levandov Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -1314,6 +1314,20 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 #ifdef HAVE_PLURAL
+/*==================== twostd  =================*/
+      if (strcmp(sys_cmd, "twostd") == 0)
+      {
+	ideal I;
+	if ((h!=NULL) && (h->Typ()==IDEAL_CMD))
+	{
+	  I=(ideal)h->CopyD();
+	  res->rtyp=IDEAL_CMD;
+	  if (rIsPluralRing(currRing)) res->data=twostd(I);
+	  else res->data=I;  
+	}
+	else return TRUE;
+	return FALSE;
+      }
 /*==================== lie bracket =================*/
     if (strcmp(sys_cmd, "bracket") == 0)
     {

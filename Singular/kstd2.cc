@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.82 2002-06-11 16:48:10 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.83 2002-07-12 13:48:29 levandov Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -426,7 +426,11 @@ static poly redNF (poly h,kStrategy strat)
         nDelete(&coef);
       }
       h = kBucketGetLm(P.bucket);
-      if (h==NULL) return NULL;
+      if (h==NULL)
+      {
+        kBucketDestroy(&P.bucket);
+        return NULL;
+      }
       P.p=h;
       P.t_p=NULL;
       P.SetShortExpVector();
