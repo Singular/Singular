@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: INSTALL_unix.texi,v 1.16 2001-08-27 14:40:02 Singular Exp $
+@comment $Id: INSTALL_unix.texi,v 1.17 2002-03-08 15:25:20 mschulze Exp $
 @c FILE: INSTALL_unix.texi
 @c PURPOSE: Installation instruction for Singular on  Unix
 @c
@@ -50,22 +50,7 @@ You can obtain these (and other) archives from
 @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular}.
 @end display
 
-@ifclear singularmanual
-@strong{Important:} Please see
-@ifhtml
-@uref{COPYING.html, COPYING}
-@end ifhtml
-@ifnothtml
-the file COPYING contained in the distribution
-@end ifnothtml
-for license information on @sc{Singular}. Please register yourself as a
-@sc{Singular} user by using the registration form on the @sc{Singular}
-homepage @uref{http://www.singular.uni-kl.de}.
-If for some reason you cannot access the registration form, you can also
-register by sending an email to @email{singular@@mathematik.uni-kl.de}
-with subject line @code{register} and body containing the following data:
-your name, email address, organisation, country and platform(s).
-@end ifclear
+@include register.texi
 
 @heading To install SINGULAR
 
@@ -337,18 +322,7 @@ with the @code{-v} option, and a description of your machine (issue the
 command @code{uname -a} on your shell) in your report.
 @end itemize
 
-
-@heading More information about @sc{Singular}: Comments, Questions, Bug Reports
-More and up-to-date information about @sc{Singular} is always available
-from
-@display
-@uref{http://www.singular.uni-kl.de}.
-@end display
-We very much welcome any comments, questions, and bug reports. Please
-contact us at
-@display
-@email{singular@@mathematik.uni-kl.de}.
-@end display
+@include info.texti
 
 @ifclear singularmanual
 GOOD LUCK and ENJOY!
