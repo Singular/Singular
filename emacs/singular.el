@@ -1,6 +1,6 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.44 1999-09-17 08:32:27 obachman Exp $
+;; $Id: singular.el,v 1.45 1999-09-17 11:14:13 wichmann Exp $
 
 ;;; Commentary:
 
@@ -661,6 +661,9 @@ Sets the submenu (\"Commands\" \"Libraries\") to the value of
       ["Fold/Unfold At Point" singular-folding-toggle-fold-at-point-or-all t]
       ["Fold All Output" singular-folding-fold-all-output t]
       ["Unfold All Output" singular-folding-unfold-all-output t]
+      "---"
+      ["Truncate Lines" singular-toggle-truncate-lines
+       :style toggle :selected truncate-lines]
       "--"
       (append
        '("Libraries")
@@ -670,9 +673,6 @@ Sets the submenu (\"Commands\" \"Libraries\") to the value of
       ["Load Demo..." singular-demo-load (or singular-demo-exit-on-load
 					     (not singular-demo-mode))]
       ["Exit Demo" singular-demo-exit singular-demo-mode]
-      "---"
-      ["Truncate Lines" singular-toggle-truncate-lines
-       :style toggle :selected truncate-lines]
       )))
 
 (or singular-interactive-mode-menu-1
@@ -1014,6 +1014,10 @@ the user, otherwise it is expanded using `expand-file-name'."
 	 (process (singular-process)))
     (singular-input-filter process string)
     (singular-send-string process string)))
+
+(defvar singular-load-library-history nil
+  "History list for loading of singular libraries.
+Is used by `singular-load-library'.")
 
 (defun singular-load-library (nonstdlib &optional file)
   "Read a Singular library (via 'LIB \"FILE\";').
