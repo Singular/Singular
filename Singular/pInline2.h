@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which are of constant time
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline2.h,v 1.1 2000-09-12 16:01:05 obachman Exp $
+ *  Version: $Id: pInline2.h,v 1.2 2000-09-13 10:57:34 Singular Exp $
  *******************************************************************/
 #ifndef PINLINE2_H
 #define PINLINE2_H
@@ -84,6 +84,8 @@ PINLINE2 unsigned long p_SubComp(poly p, unsigned long v, ring r)
 }
 
 // exponent
+// r->VarOffset encodes the position in p->exp (lower 24 bits)
+// and number of bits to shift to the right in the upper 8 bits
 PINLINE2 Exponent_t p_GetExp(poly p, int v, ring r)
 {
   p_CheckPolyRing(p, r);
@@ -163,7 +165,7 @@ PINLINE2 Exponent_t p_GetExpDiff(poly p1, poly p2, int i, ring r)
 
 /***************************************************************
  *
- * Allocation/Initalization/Deletion 
+ * Allocation/Initalization/Deletion
  *
  ***************************************************************/
 PINLINE2 poly p_New(ring r)
@@ -299,7 +301,7 @@ PINLINE2 poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, const ring r)
   assume(r != NULL && r->p_Procs != NULL);
   return r->p_Procs->p_Minus_mm_Mult_qq(p, m, q, shorter, NULL, r);
 }
-PINLINE2 poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int &lp, int lq, 
+PINLINE2 poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int &lp, int lq,
                                  poly spNoether, const ring r)
 {
   int shorter;
@@ -307,7 +309,7 @@ PINLINE2 poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int &lp, int lq,
   lp = (lp + lq) - shorter;
   return res;
 }
-  
+
 // returns -p, destroys p
 PINLINE2 poly p_Neg(poly p, const ring r)
 {
@@ -319,7 +321,7 @@ extern poly  _p_Mult_q(poly p, poly q, const int copy, const ring r);
 // returns p*q, destroys p and q
 PINLINE2 poly p_Mult_q(poly p, poly q, const ring r)
 {
-  if (p == NULL) 
+  if (p == NULL)
   {
     r->p_Procs->p_Delete(&q, r);
     return NULL;
@@ -332,19 +334,19 @@ PINLINE2 poly p_Mult_q(poly p, poly q, const ring r)
 
   if (pNext(p) == NULL)
   {
-    
+
     q = r->p_Procs->p_Mult_mm(q, p, r);
     r->p_Procs->p_Delete(&p, r);
     return q;
   }
-  
+
   if (pNext(q) == NULL)
   {
     p = r->p_Procs->p_Mult_mm(p, q, r);
     r->p_Procs->p_Delete(&q, r);
     return p;
   }
-  
+
   return _p_Mult_q(p, q, 0, r);
 }
 
@@ -356,14 +358,14 @@ PINLINE2 poly pp_Mult_qq(poly p, poly q, const ring r)
 
   if (pNext(p) == NULL)
     return r->p_Procs->pp_Mult_mm(q, p, NULL, r);
-  
+
   if (pNext(q) == NULL)
     return r->p_Procs->pp_Mult_mm(p, q, NULL, r);
 
   poly qq = q;
   if (p == q)
     qq = p_Copy(q, r);
-    
+
   poly res = _p_Mult_q(p, qq, 1, r);
   if (qq != q)
     p_Delete(&qq, r);
@@ -380,7 +382,7 @@ PINLINE2 poly p_Plus_mm_Mult_qq(poly p, poly m, poly q, const ring r)
   number n_neg = p_nCopy(n_old, r);
   n_neg = p_nNeg(n_neg, r);
   pSetCoeff0(m, n_neg);
-  
+
   res = r->p_Procs->p_Minus_mm_Mult_qq(p, m, q, shorter, NULL, r);
   pSetCoeff0(m, n_old);
   p_nDelete(&n_neg, r);

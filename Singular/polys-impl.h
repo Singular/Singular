@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.51 2000-09-12 16:01:10 obachman Exp $ */
+/* $Id: polys-impl.h,v 1.52 2000-09-13 10:57:34 Singular Exp $ */
 
 /***************************************************************
  *
@@ -53,10 +53,10 @@ struct  spolyrec
  *
  ***************************************************************/
 // determines inlining of poly procs which iter through polys
-#if defined(DO_PINLINE0) && !defined(PDEBUG) 
+#if defined(DO_PINLINE0) && !defined(PDEBUG)
 #define PINLINE0 static inline
 #else
-#define PINLINE0 
+#define PINLINE0
 #endif
 
 // determines inlining of poly procs which iter over ExpVector
@@ -145,13 +145,13 @@ PINLINE3 void p_CheckRing(ring r)
 #define p_SetRingOfPoly(p, r) ((void)0)
 #endif
 
-#if PDEBUG > 0 
+#if PDEBUG > 0
 #define passume1 assume
 #else
 #define passume1(x) ((void)0)
 #endif
 
-#if PDEBUG > 1 
+#if PDEBUG > 1
 #define passume2 assume
 #else
 #define passume2(x) ((void)0)
