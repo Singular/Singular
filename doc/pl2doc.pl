@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: pl2doc.pl,v 1.4 1999-07-23 13:58:34 obachman Exp $
+# $Id: pl2doc.pl,v 1.5 1999-07-23 16:07:36 obachman Exp $
 ###################################################################
 #  Computer Algebra System SINGULAR
 #
@@ -21,7 +21,9 @@ while (@ARGV && $ARGV[0] =~ /^-/)
   if (/^-o$/)    { $out_file = shift(@ARGV); next;}
   if (/^-db$/) { $db_file = shift(@ARGV); next;}
   if (/^-no_fun$/)    { $no_fun = 1;next;}
+  if (/^-doc$/)       { $doc = 1; next;}
   if (/^-h(elp)?$/)   { print $Usage; exit;}
+  
   die "Error: Unknown option: $_:$Usage\n";
 }
 
@@ -45,13 +47,13 @@ unless ($out_file)
   $out_file .= ".doc";
 }
 open(LDOC, ">$out_file") || die"Error: can't open $out_file for writing: $!\n";
+print_doc_header(\*LDOC) if $doc;
 print LDOC "\@c library version: $version\n";
 print LDOC "\@c library file: $library\n";
 
 undef @procs; # will be again defined by OutLibInfo
 $ref = OutLibInfo(\*LDOC, $info, ! $no_fun);
 OutRef(\*LDOC, $ref) if $ref;
-
 
 ###################################################################
 # print  summary
@@ -110,6 +112,16 @@ unless ($no_fun)
 # 
 # und Tschuess
 #
+if ($doc)
+{
+ print LDOC <<EOT;
+\@example 
+--------------END OF PART WHICH WILL BE INCLUDED IN MANUAL-------------------
+\@end example
+\@bye
+EOT
+}
+  
 close(LDOC);
 exit(0);
 
@@ -386,3 +398,48 @@ sub CleanUpExample
   return $example;
 }
 
+sub print_doc_header
+{
+  my $fh = shift;
+  ($hlp_file = $out_file) =~ s/doc$/hlp/;
+  print $fh <<EOT;
+\\input texinfo   \@c -*-texinfo-*-
+\@c %**start of header
+\@setfilename $hlp_file
+\@settitle Formatted manual of $library
+\@c %**end of header
+
+\@ifinfo
+This file documents contains the formatted documentation of $library
+\@end ifinfo
+
+\@titlepage
+\@title Formatted manual of $library
+\@end titlepage
+
+\@node Top, , , (dir)
+
+\@ifnottex
+This file contains the formatted documentation of $library
+\@end ifnottex
+
+\@menu
+* Singular libraries::
+\@end menu
+
+\@node Singular libraries,,,Top
+\@comment node-name,next, previous, up
+\@chapter Singular libraries
+
+\@menu
+* ${lib}_lib::  
+\@end menu
+  
+\@node ${lib}_lib,,,Singular libraries
+\@section ${lib}_lib
+
+\@example 
+--------------BEGIN OF PART WHICH IS INCLUDED IN MANUAL-------------------
+\@end example
+EOT
+}
