@@ -204,6 +204,7 @@ if test "$with_gmp" != no; then
 fi
 
 dnl Check MP
+WITH_MP=no
 if test "$with_MP" != no; then
   if test "$ac_gmp_ok" != yes; then
     AC_MSG_WARN(building without MP: can not use MP without gmp)
@@ -219,20 +220,21 @@ if test "$with_MP" != no; then
      test "$ac_cv_header_MPT_h" = yes; then
       AC_DEFINE(HAVE_MPSR)
       NEED_LIBS="-lMPT -lMP ${NEED_LIBS}"
-      HAVE_MPSR=HAVE_MP
+      WITH_MP=yes
     elif test "$enable_MP" = yes; then
       AC_DEFINE(HAVE_MPSR)
       NEED_LIBS="-lMPT -lMP ${NEED_LIBS}"
-      HAVE_MPSR=HAVE_MP
+      WITH_MP=yes
       AC_MSG_WARN(install MP before making Singular or configure --without-MP)
     else
       AC_MSG_WARN(building without MP: disabling MP links)
     fi
   fi
 fi
-AC_SUBST(HAVE_MPSR)
+AC_SUBST(WITH_MP)
 
 dnl Check factory
+WITH_FACTORY=no
 if test "$with_factory" != no; then
   if test "$ac_gmp_ok" != yes; then
     AC_MSG_WARN(building without factory: can not use factory without gmp) 
@@ -245,19 +247,21 @@ if test "$with_factory" != no; then
      test "$ac_cv_header_factory_h" = yes; then
       AC_DEFINE(HAVE_FACTORY)
       NEED_LIBS="-lsingcf ${NEED_LIBS}"
-      ac_factory_ok=yes
+      WITH_FACTORY=yes
     elif test "$enable_factory" = yes; then
       NEED_LIBS="-lsingcf ${NEED_LIBS}"
       AC_DEFINE(HAVE_FACTORY)
-      ac_factory_ok=yes
+      WITH_FACTORY=yes
       AC_MSG_WARN(install factory before making Singular or configure --without-factory)
     else
       AC_MSG_WARN(building without factory: disabling poly factorization)
     fi
   fi
 fi
+AC_SUBST(WITH_FACTORY)
 
 dnl Check libfac
+WITH_LIBFAC=no
 if test "$with_libfac" != no; then
   if test "$ac_factory_ok" != yes; then
     AC_MSG_WARN(building without libfac: can not use libfac without factory) 
@@ -270,15 +274,18 @@ if test "$with_libfac" != no; then
      test "$ac_cv_header_factor_h" = yes; then
       NEED_LIBS="-lsingfac ${NEED_LIBS}"
       AC_DEFINE(HAVE_LIBFAC_P)
+      WITH_LIBFAC=yes
     elif test "$enable_libfac" = yes; then
       NEED_LIBS="-lsingfac ${NEED_LIBS}"
       AC_DEFINE(HAVE_LIBFAC_P)
+      WITH_LIBFAC=yes
       AC_MSG_WARN(install libfac before making Singular or configure --without-libfac)
     else
       AC_MSG_WARN(building without libfac: disabling char series)
     fi
   fi
 fi
+AC_SUBST(WITH_LIBFAC)
 
 AC_SUBST(NEED_LIBS)
 
