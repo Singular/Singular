@@ -231,7 +231,7 @@ p_Procs_Lib_%.dl_o : p_Procs_Lib.cc p_Procs_Dynamic.o
 	${CXX} ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} ${SFLAGS} -c $< -o $@
 
 
-all:	libkernel.a libkernel-g.a ${DL_LIBS}
+all:	libkernel.a libkernel-g.a ${DL_LIBS} ${DL_LIBSG}
 
 
 
@@ -285,8 +285,8 @@ install: all installbin
 
 installbin: ${DL_LIBS}
 	${MKINSTALLDIRS} ${bindir}
-	${INSTALL_PROGRAM} ${DL_LIBS} ${bindir}
-	${INSTALL_PROGRAM} ${DL_LIBS} ../Singular
+	${INSTALL_PROGRAM} ${DL_LIBS} ${DL_LIBSG} ${bindir}
+	${INSTALL_PROGRAM} ${DL_LIBS} ${DL_LIBSG} ../Singular
 
 ##
 ## clean targest
