@@ -1,6 +1,6 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.35 1999-08-24 07:12:08 wichmann Exp $
+;; $Id: singular.el,v 1.36 1999-08-30 19:07:22 wichmann Exp $
 
 ;;; Commentary:
 
@@ -66,11 +66,22 @@
 ;;   so you do not have to care about that yourself.  If you do not want an
 ;;   error specify non-nil argument NO-ERROR.  But use them anyway.
 ;; - we assume that the buffer is *not* read-only
+;; - use `=' instead of `eq' when comparing buffer locations.  Even if you
+;;   are sure that both operands are integers.
 
 ;;}}}
 
 ;;{{{ Code common to both modes
 ;;{{{ Customizing
+(defgroup singular nil
+  "Emacs interface to Singular.
+By now, the Emacs interface to Singular consists of Singular interactive
+mode only.  Singular interactive mode provides a convenient front end to
+interactive Singular sessions running inside Emacs.
+In far future maybe there will be a mode for editing Singular source code
+such as libraries or procedures."
+  :group 'external)
+
 (defgroup singular-faces nil
   "Faces in Singular mode and Singular interactive mode."
   :group 'faces
@@ -228,6 +239,10 @@ Emacs."
 ;;   possible only at a "Singular-global" level.  That is, for all buffers
 ;;   currently having Singular interactive mode as major mode.  The function
 ;;   `singular-map-buffer' helps to do such customization.
+;; - Important note: Customizable variables are not automatically marked as
+;;   user options.  This has to be done as usual by marking them with a '*'
+;;   as first character of the documentation string.  Without that, the
+;;   variables are not accessible to, for example, `set-variable'.
 ;;
 ;; Some common customizing patterns:
 ;;
@@ -259,7 +274,8 @@ Emacs."
 ;;   own variable `singular-simple-sec-clear-type').
 
 (defgroup singular-interactive nil
-  "Running Singular with Emacs or XEmacs as front end."
+  "Running interactive Singular sessions inside Emacs."
+  :group 'singular
   :group 'processes)
 
 (defgroup singular-sections-and-foldings nil
@@ -475,111 +491,112 @@ For Emacs, this function is called  at mode initialization time."
     (set-keymap-name singular-interactive-mode-map
 		     'singular-interactive-mode-map)))
 
-  ;; define keys
+  ;; global settings
+  (define-key help-map [?\C-s]                            'singular-help)
+
+  ;; settings for `singular-interactive-map'
+  (substitute-key-definition 'beginning-of-line 'singular-beginning-of-line
+			     singular-interactive-mode-map global-map)
+
   (define-key singular-interactive-mode-map "\t"        'singular-dynamic-complete)
-  (define-key singular-interactive-mode-map [?\C-m]	'singular-send-or-copy-input)
-  (define-key singular-interactive-mode-map [?\M-r]	'comint-previous-matching-input)
-  (define-key singular-interactive-mode-map [?\M-s]	'comint-next-matching-input)
+  (define-key singular-interactive-mode-map [?\C-m]	  'singular-send-or-copy-input)
+  (define-key singular-interactive-mode-map [?\C-l]       'singular-recenter)
+
+  ;; Comint functions
+  (define-key singular-interactive-mode-map [?\M-r]	  'comint-previous-matching-input)
+  (define-key singular-interactive-mode-map [?\M-s]	  'comint-next-matching-input)
 
   ;; C-c prefix
+  (define-key singular-interactive-mode-map [?\C-c ?\C-t] 'singular-toggle-truncate-lines)
+
   (define-key singular-interactive-mode-map [?\C-c ?\C-f] 'singular-folding-toggle-fold-at-point-or-all)
   (define-key singular-interactive-mode-map [?\C-c ?\C-o] 'singular-folding-toggle-fold-latest-output)
-  (define-key singular-interactive-mode-map [?\C-c ?\C-l] 'singular-recenter))
+  (define-key singular-interactive-mode-map [?\C-c ?\C-w] 'singular-section-kill)
 
-(defcustom singular-history-keys '(meta)
-  "Keys to use for history access.
-Should be a list describing which keys or key combinations to use for
-history access in Singular interactive mode.  Valid entries are `control',
-`cursor', and `meta'.
+  (define-key singular-interactive-mode-map [?\C-c ?\C-d] 'singular-demo-load)
+  (define-key singular-interactive-mode-map [?\C-c ?\C-l] 'singular-load-library)
+  (define-key singular-interactive-mode-map [?\C-c <]	  'singular-load-file)
 
-For more information one should refer to the documentation of
-`singular-history-keys'.
+  (define-key singular-interactive-mode-map [?\C-c ?\C-r] 'singular-restart)
+  (define-key singular-interactive-mode-map [?\C-c $]	  'singular-exit-singular))
 
-Changing this variable has an immediate effect only if one uses
-\\[customize] to do so."
-  :type '(set (const :tag "Cursor keys" cursor)
-	      (const :tag "C-p, C-n" control)
-	      (const :tag "M-p, M-n" meta))
-  :initialize 'custom-initialize-default
-  :set (function
-	(lambda (var value)
-	  (singular-history-cursor-keys-set value singular-cursor-keys)
-	  (set-default var value)))
-  :group 'singular-interactive-miscellaneous)
+(defun singular-cursor-key-model-set (key-model)
+  "Set keys according to KEY-MODEL.
+KEY-MODEL should be one of the valid values of `singular-cursor-key-model'."
+  ;; convert symbols to list
+  (cond ((eq key-model 'emacs)
+	 (setq key-model '(cursor cursor history)))
+	((eq key-model 'terminal)
+	 (setq key-model '(history history cursor))))
 
-(defcustom singular-cursor-keys '(control cursor)
-  "Keys to use for cursor movement.
-Should be a list describing which keys or key combinations to use for
-cursor movement in Singular interactive mode.  Valid entries are `control',
-`cursor', and `meta'.
+  ;; work through list
+  (mapcar (function (lambda (spec)
+		      (let ((key-description (nth 0 spec))
+			    (prev-key (nth 1 spec))
+			    (next-key (nth 2 spec)))
+			(cond ((eq key-description 'cursor)
+			       (define-key singular-interactive-mode-map prev-key 'previous-line)
+			       (define-key singular-interactive-mode-map next-key 'next-line))
+			      ((eq key-description 'history)
+			       (define-key singular-interactive-mode-map prev-key 'comint-previous-input)
+			       (define-key singular-interactive-mode-map next-key 'comint-next-input))
+			      (t
+			       (define-key singular-interactive-mode-map prev-key nil)
+			       (define-key singular-interactive-mode-map next-key nil))))))
+			      
+	  ;; here is where list position are mapped to keys
+	  (list (list (nth 0 key-model) [up] [down])
+		(list (nth 1 key-model) [?\C-p] [?\C-n])
+		(list (nth 2 key-model) [?\M-p] [?\M-n]))))
 
-An experienced Emacs user would prefer setting `singular-cursor-keys' to
-`(control cursor)' and `singular-history-keys' to `(meta)'.  This means
-that C-p, C-n, and the cursor keys move the cursor, whereas M-p and M-n
-scroll through the history of Singular commands.
+(defcustom singular-cursor-key-model 'emacs
+  "*Keys to use for cursor movement and history access, respectively.
+An experienced Emacs user would prefer setting `singular-cursor-key-model'
+to `emacs'.  This means that C-p, C-n, and the cursor keys move the cursor,
+whereas M-p and M-n scroll through the history of Singular commands.
 
 On the other hand, an user used to running Singular in a, say, xterm, would
-prefer the other way round: Setting the variable `singular-history-keys' to
-`(control cursor)' and `singular-cursor-keys' to `(meta)'.
+prefer setting `singular-cursor-key-model' to `terminal'.  This means that
+C-p, C-n, and the cursor keys scroll through the history of Singular
+commands, whereas M-p and M-n move the cursor.
 
-Keys which are not mentioned in both lists are not modified from their
-standard settings.  Naturally, the lists `singular-cursor-keys' and
-`singular-history-keys' should be disjunct.
+For those who do not like neither standard setting, there is the
+possibility to set this variable to a list of three elements where
+- the first element specifies the key bindings for the cursor keys,
+- the second element specifies the key bindings for C-p and C-n, and
+- the third element specifies the key bindings for M-p and M-n.
+Each list element should be one of
+- `cursor', meaning that the corresponding keys are bound to cursor movement,
+- `history', meaning that the corresponding keys are bound to history access,
+  or
+- nil, meaning that the corresponding keys are not bound at all.
 
 Changing this variable has an immediate effect only if one uses
 \\[customize] to do so."
-  :type '(set (const :tag "Cursor keys" cursor)
-	      (const :tag "C-p, C-n" control)
-	      (const :tag "M-p, M-n" meta))
-  :initialize 'custom-initialize-default
+  :type '(choice (const :tag "Emacs-like" emacs)
+		 (const :tag "Terminal-like" terminal)
+		 (list :tag "User-defined"
+		      (choice :format "Cursor keys: %[Value Menu%] %v"
+			      :value cursor
+			      (const :tag "Cursor movement" cursor)
+			      (const :tag "History access" history)
+			      (const :tag "No binding" nil))
+		      (choice :format "C-p, C-n:    %[Value Menu%] %v"
+			      :value cursor
+			      (const :tag "Cursor movement" cursor)
+			      (const :tag "History access" history)
+			      (const :tag "No binding" nil))
+		      (choice :format "M-p, M-n:    %[Value Menu%] %v"
+			      :value history
+			      (const :tag "Cursor movement" cursor)
+			      (const :tag "History access" history)
+			      (const :tag "No binding" nil))))
+  :initialize 'custom-initialize-reset
   :set (function
 	(lambda (var value)
-	  (singular-history-cursor-keys-set singular-history-keys value)
+	  (singular-cursor-key-model-set value)
 	  (set-default var value)))
   :group 'singular-interactive-miscellaneous)
-
-(defun singular-history-cursor-key-set (key function-spec)
-  "Set keys corresponding to KEY and according to FUNCTION-SPEC.
-FUNCTION-SPEC should be a cons cell of the format (PREV-FUNC . NEXT-FUNC)."
-  (cond
-   ((eq key 'control)
-    (define-key singular-interactive-mode-map [?\C-p]	(car function-spec))
-    (define-key singular-interactive-mode-map [?\C-n]	(cdr function-spec)))
-   ((eq key 'meta)
-    (define-key singular-interactive-mode-map [?\M-p]	(car function-spec))
-    (define-key singular-interactive-mode-map [?\M-n]	(cdr function-spec)))
-   ((eq key 'cursor)
-    (define-key singular-interactive-mode-map [up]	(car function-spec))
-    (define-key singular-interactive-mode-map [down]	(cdr function-spec)))))
-
-(defun singular-history-cursor-keys-set (history-keys cursor-keys)
-  "Set the keys according to HISTORY-KEYS and CURSOR-KEYS.
-Checks whether HISTORY-KEYS and CURSOR-KEYS are disjunct.  Throws an error
-if not."
-  ;; do the check first
-  (if (memq nil (mapcar (function (lambda (elt) (not (memq elt history-keys))))
-			cursor-keys))
-      (error "History keys and cursor keys are not disjunct (see `singular-cursor-keys')"))
-
-  ;; remove old bindings first
-  (singular-history-cursor-key-set 'cursor '(nil . nil))
-  (singular-history-cursor-key-set 'control '(nil . nil))
-  (singular-history-cursor-key-set 'meta '(nil . nil))
-
-  ;; set new bindings
-  (mapcar (function
-	   (lambda (key)
-	     (singular-history-cursor-key-set key '(comint-previous-input . comint-next-input))))
-	  history-keys)
-  (mapcar (function
-	   (lambda (key)
-	     (singular-history-cursor-key-set key '(previous-line . next-line))))
-	  cursor-keys))
-
-;; static initialization.  Deferred to this point since at the time where
-;; the defcustoms are defined not all necessary functions and variables are
-;; available.
-(singular-history-cursor-keys-set singular-history-keys singular-cursor-keys)
 
 (defun singular-interactive-mode-map-init ()
   "Initialize key map for Singular interactive mode.
@@ -693,91 +710,108 @@ This function is called  at mode initialization time."
   (easy-menu-add singular-interactive-mode-menu-2))
 ;;}}}
 
-;;{{{ Skipping and stripping prompts and newlines and other things
+;;{{{ Skipping and stripping prompts and whitespace and other things
 
 ;; Note:
 ;;
-;; All of these functions modify the match data!
+;; Most of these functions handle prompt recognition, prompt skipping,
+;; prompt stripping, and so on.  It turned out that it would be very
+;; inefficient to use one generic regular expression to do so.  Hence, we
+;; decided to hardcode the prompt skipping and stripping in an API.  If one
+;; decides to use some other prompt the whole API has to be changed.
+;; Hopefully, the Singular prompt does not change in near future ...
+;;
+;; In addition to the API, the Comint mode variable `comint-mode-regexp' is
+;; set on initialization of Singular interactive mode.  Singular
+;; interactive mode seems to do quite well without that, but for safety the
+;; variable is set nonetheless.
 
-(defun singular-strip-white-space (string &optional trailing leading)
-  "Strip off trailing or leading white-space from STRING.
-Strips off trailing white-space if optional argument TRAILING is
-non-nil.
-Strips off leading white-space if optional argument LEADING is
-non-nil."
-  (let ((beg 0)
-	(end (length string)))
+(defsubst singular-prompt-skip-forward ()
+  "Skip forward over prompts."
+  (if (looking-at "\\([>.] \\)+")
+      (goto-char (match-end 0))))
+
+(defsubst singular-prompt-skip-backward ()
+  "Skip backward over prompts."
+  ;; is that really the simplest and fastest method?  The problem is that
+  ;; `re-search-backward' is not greedy so on an regexp as "\\([>.] \\)+"
+  ;; it stops right after the first occurence of the sub-expression.
+  ;; Anyway, the `(- (point) 2)' expression is OK, even at bob.
+  (while (re-search-backward "[>.] " (- (point) 2) t)))
+
+(defun singular-prompt-remove-string (string)
+  "Remove all prompts from STRING."
+  (while (string-match "^\\([>.] \\)+" string)
+    (setq string (replace-match "" t t string)))
+  string)
+
+(defun singular-prompt-remove-region (beg end)
+  "Remove all superfluous prompts from region between BEG and END.
+Removes only sequences of prompts that start at beginning of line.  Removes
+all but the last prompt of a sequence if that sequence ends at END,
+otherwise removes all prompts.
+The region between BEG and END should be accessible.  BEG should be less
+than or equal to END.
+Leaves point at the position of the last sequence of prompts which has been
+deleted or at BEG if nothing has been deleted."
+  ;; we cannot exclude this case, I think
+  (if (/= beg end)
+      ;; that's a nice trick to keep the last prompt if it ends at END: we
+      ;; set `(1- END)' as search limit.  Since BEG /= END there can be no
+      ;; problems with the `1-'.
+      (let ((end (copy-marker (1- end))))
+	(goto-char beg)
+	(while (re-search-forward "^\\([>.] \\)+" end t)
+	  (delete-region (match-beginning 0) (match-end 0)))
+	(set-marker end nil))))
+
+(defun singular-prompt-remove-filter (beg end simple-sec-start)
+  "Remove all superfluous prompts from text inserted into buffer."
+  (cond (;; if a new simple section has been created remove all
+	 ;; prompts from that simple section
+	 simple-sec-start
+	 (singular-prompt-remove-region simple-sec-start end))
+	(;; if no simple section has been created check whether maybe the
+	 ;; region between beg and end consists of prompts only.  This in
+	 ;; case that the user issued a command that did not output any
+	 ;; text.
+	 (and (goto-char beg)
+	      (re-search-forward "\\([>.] \\)+" end t)
+	      (= (match-end 0) end))
+	 (singular-prompt-remove-region (progn (beginning-of-line) (point))
+					end))))
+
+(defun singular-white-space-strip (string &optional trailing leading)
+  "Strip off trailing or leading whitespace from STRING.
+Strips off trailing whitespace if optional argument TRAILING is non-nil.
+Strips off leading whitespace if optional argument LEADING is non-nil."
+  (let (beg end)
     (and leading
-	 (string-match "\\`\\s-*" string)
+	 (string-match "\\`[ \t\n\r\f]+" string)
 	 (setq beg (match-end 0)))
     (and trailing
-	 (string-match "\\s-*\\'" string beg)
+	 (string-match "[ \t\n\r\f]+\\'" string)
 	 (setq end (match-beginning 0)))
-    (substring string beg end)))
+    (if (or beg end)
+	(substring string (or beg 0) (or end (length string)))
+      string)))
 
-(defconst singular-extended-prompt-regexp "\\([?>.] \\)"
-  "Matches one Singular prompt.
-Should not be anchored neither to start nor to end!")
-
-(defconst singular-strip-leading-prompt-regexp
-  (concat "\\`" singular-extended-prompt-regexp "+")
-  "Matches Singular prompt anchored to string start.")
-
-(defun singular-strip-leading-prompt (string)
-  "Strip leading prompts from STRING.
-May or may not return STRING or a modified copy of it."
-  (if (string-match singular-strip-leading-prompt-regexp string)
-      (substring string (match-end 0))
-    string))
-
-(defconst singular-remove-prompt-regexp
-  (concat "^" singular-extended-prompt-regexp
-	  "*" singular-extended-prompt-regexp)
-  "Matches a non-empty sequence of prompts at start of a line.")
-
-(defun singular-remove-prompt (beg end)
-  "Remove all superfluous prompts from region between BEG and END.
-Removes all but the last prompt of a sequence if that sequence ends at
-END.
-The region between BEG and END should be accessible.
-Leaves point after the last prompt found."
-  (let ((end (copy-marker end))
-	prompt-end)
-    (goto-char beg)
-    (while (and (setq prompt-end
-		      (re-search-forward singular-remove-prompt-regexp end t))
-		(not (= end prompt-end)))
-      (delete-region (match-beginning 0) prompt-end))
-
-    ;; check for trailing prompt
-    (if prompt-end
-	(delete-region (match-beginning 0)  (match-beginning 2)))
-    (set-marker end nil)))
-
-(defconst singular-skip-prompt-forward-regexp
-  (concat singular-extended-prompt-regexp "*")
-  "Matches an arbitary sequence of Singular prompts.")
-
-(defun singular-prompt-skip-forward ()
-  "Skip forward over prompts."
-  (looking-at singular-skip-prompt-forward-regexp)
-  (goto-char (match-end 0)))
-
-(defun singular-skip-prompt-backward ()
-  "Skip backward over prompts."
-  (while (re-search-backward singular-extended-prompt-regexp (- (point) 2) t)))
-
-(defun singular-remove-prompt-filter (beg end simple-sec-start)
-  "Strip prompts from last simple section."
-  (if simple-sec-start (singular-remove-prompt simple-sec-start end)))
-
-(defvar singular-prompt-regexp "^> "
+(defconst singular-comint-prompt-regexp "^\\([>.] \\)+"
   "Regexp to match prompt patterns in Singular.
-Should not match the continuation prompt \(`.'), only the regular
-prompt \(`>').
+This variable is used to initialize `comint-prompt-regexp' when Singular
+interactive mode starts up.  It is not used in Singular interactive mode
+itself!  One should refer to the source code for more information on how to
+adapt Singular interactive mode to some other prompt.")
 
-This variable is used to initialize `comint-prompt-regexp' when
-Singular interactive mode starts up.")
+(defun singular-prompt-init ()
+  "Initialize prompt skipping and stripping for Singular interactive mode.
+
+This function is called at mode initialization time."
+  ;; remove superfluous prompts in singular output
+  (add-hook 'singular-post-output-filter-functions 'singular-prompt-remove-filter nil t)
+
+  ;; some relict from Comint mode
+  (setq comint-prompt-regexp singular-comint-prompt-regexp))
 ;;}}}
 
 ;;{{{ Miscellaneous
@@ -832,6 +866,33 @@ Does not return a difference larger than 2^17 seconds."
   (let ((high-difference (min 1 (- (car new-time-stamp) (car old-time-stamp))))
 	(low-difference (- (cadr new-time-stamp) (cadr old-time-stamp))))
     (+ (* high-difference 131072) low-difference)))
+
+(defun singular-error (&rest message-args)
+  "Apply `message' on MESSAGE-ARGS and do a `ding'.
+This function should be used instead of `error' in hooks where calling
+`error' is not a good idea."
+  (apply 'message message-args)
+  (ding))
+
+(defun singular-pop-to-buffer (same-window &rest pop-to-buffer-args)
+  "Pop to buffer in same or other window.
+Pops to buffer in same window if SAME-WINDOW equals t.  Pops to buffer in
+other window if SAME-WINDOW equals nil.  If SAME-WINDOW equals neither t
+nor nil the default behaviour of `pop-to-buffer' is used.  The rest of the
+arguments is passed unchanged to `pop-to-buffer'."
+  (let ((same-window-buffer-names
+	 (cond
+	  ((null same-window)
+	   nil)
+	  ((eq same-window t)
+	   (let* ((buffer-or-name (car pop-to-buffer-args))
+		  (buffer-name (if (bufferp buffer-or-name)
+				   (buffer-name buffer-or-name)
+				 buffer-or-name)))
+	     (list buffer-name)))
+	  (t
+	   same-window-buffer-names))))
+    (apply 'pop-to-buffer pop-to-buffer-args)))
 ;;}}}
 
 ;;{{{ Miscellaneous interactive
@@ -862,7 +923,10 @@ Repositions window and point after toggling `truncate-lines'."
   (interactive)
   (setq truncate-lines (not truncate-lines))
   ;; reposition so that user does not get confused
-  (singular-reposition-point-and-window))
+  (singular-reposition-point-and-window)
+  ;; avoid calling `recenter' since it changes window layout more than
+  ;; necessary
+  (redraw-frame (selected-frame)))
 
 ;; this is not a buffer-local variable even if at first glance it seems
 ;; that it should be one.  But if one changes buffer the contents of this
@@ -922,6 +986,13 @@ Moves point to leftmost visible column."
   (if (eq (current-column) 0)
       (singular-prompt-skip-forward)))
 
+(defun singular-beginning-of-line  (arg)
+  "Move point to the beginning of line, then skip past prompt, if any.
+If prefix argument is given the prompt is not skipped."
+  (interactive "P")
+  (beginning-of-line)
+  (if (not arg) (singular-prompt-skip-forward)))
+
 (defun singular-load-file (file &optional noexpand)
   "Read a file into Singular (via '< \"FILE\";').
 If optional argument NOEXPAND is non-nil, FILE is left as it is entered by
@@ -933,42 +1004,28 @@ the user, otherwise it is expanded using `expand-file-name'."
     (singular-input-filter process string)
     (singular-send-string process string)))
 
-(defvar singular-load-library-history nil)
-
-(defun singular-load-library (nonstdlib &optional file)
-  "Read a Singular library (via 'LIB \"FILE\";')."
-  (interactive "P")
-  (let ((string (or file
-		    (if nonstdlib
-			(read-file-name "Library file: ")
-		      (completing-read "Library: " singular-help-topics-alist 
-				       nil nil nil 'singular-load-library-history))))
-	(process (singular-process)))
-    (setq string (concat "LIB \"" string "\";"))
+(defun singular-load-library (file &optional noexpand)
+  "Read a Singular library (via 'LIB \"FILE\";').
+If optional argument NOEXPAND is non-nil, FILE is left as it is entered by
+the user, otherwise it is expanded using `expand-file-name'."
+  (interactive "fLoad Library: ")
+  (let* ((filename (if noexpand file (expand-file-name file)))
+	 (string (concat "LIB \"" filename "\";"))
+	 (process (singular-process)))
     (singular-input-filter process string)
     (singular-send-string process string)))
-
-(defun singular-exit-singular ()
-  "Exit Singular and kill Singular buffer.
-Sends string \"quit;\" to Singular process."
-  (interactive)
-  (let ((string "quit;")
-	(process (singular-process)))
-    (singular-input-filter process string)
-    (singular-send-string process string))
-  (kill-buffer (current-buffer)))
 ;;}}}
 
 ;;{{{ History
 (defcustom singular-history-ignoredups t
-  "If non-nil, do not add input matching the last on the input history."
+  "*If non-nil, do not add input matching the last on the input history."
   :type 'boolean
   :initialize 'custom-initialize-default
   :group 'singular-interactive-miscellaneous)
 
 ;; this variable is used to set Comint's `comint-input-ring-size'
 (defcustom singular-history-size 64
-  "Size of the input history.
+  "*Size of the input history.
 
 Changing this variable has no immediate effect even if one uses
 \\[customize] to do so.  The new value will be used only in new Singular
@@ -978,7 +1035,7 @@ interactive mode buffers."
   :group 'singular-interactive-miscellaneous)
 
 (defcustom singular-history-filter-regexp "\\`\\(..?\\|\\s *\\)\\'"
-  "Regular expression to filter strings *not* to insert in the input history.
+  "*Regular expression to filter strings *not* to insert in the input history.
 By default, input consisting of less than three characters and input
 consisting of white-space only is not inserted into the input history."
   :type 'regexp
@@ -986,7 +1043,7 @@ consisting of white-space only is not inserted into the input history."
   :group 'singular-interactive-miscellaneous)
 
 (defcustom singular-history-explicit-file-name nil
-  "If non-nil, use this as file name to load and save the input history.
+  "*If non-nil, use this as file name to load and save the input history.
 If this variable equals nil, the `SINGULARHIST' environment variable is
 used to determine the file name.
 One should note that the input history is saved to file only on regular
@@ -1025,8 +1082,6 @@ process terminates regularly."
 (defun singular-history-insert (input)
   "Insert string INPUT into the input history if necessary."
   (if (and (not (string-match singular-history-filter-regexp input))
-	   (or singular-demo-insert-into-history
-	       (not singular-demo-mode))
 	   (or (not singular-history-ignoredups)
 	       (not (ring-p comint-input-ring))
 	       (ring-empty-p comint-input-ring)
@@ -1575,6 +1630,10 @@ Narrowing has no effect on this function."
 ;;   additional start and end points being returned.  One should note that
 ;;   by restricting sections one may get empty sections, that is, sections
 ;;   for which the additional start and end point are equal.
+;; - In many cases it is not desirable that the user operates on sections
+;;   which are not completely accessible.  To check that a section is
+;;   completely accessible the `singular-section-check' function should be
+;;   used.
 ;; - Sections are independent from implementation dependencies.  There are
 ;;   no different versions of the functions for Emacs and XEmacs.
 ;; - Whenever possible, one should not access simple section directly.
@@ -1864,20 +1923,29 @@ number of sections actually processed."
 ;;}}}
 
 ;;{{{ Section miscellaneous
-(defun singular-input-section-to-string (section &optional end raw)
-  "Get content of input section SECTION as string.
-Returns text between start of SECTION and END if optional argument END is
-non-nil, otherwise text between start and end of SECTION.  END should be a
-position inside SECTION.
-Strips leading prompts and trailing white space unless optional argument
-RAW is non-nil."
+(defun singular-section-check (section &optional no-error)
+  "Check whether SECTION is completely accessible and return t if so.
+If otherwise SECTION is restricted either in part or as a whole, this
+function fails with an error or returns nil if optional argument NO-ERROR
+is non-nil."
+  (cond ((and (>= (singular-section-start section) (point-min))
+	      (<= (singular-section-end section) (point-max))) t)
+	(no-error nil)
+	(t (error "section is restricted either in part or as a whole"))))
+
+(defun singular-section-to-string (section &optional raw)
+  "Get contents of SECTION as a string.
+Returns text between start and end of SECTION.
+Removes prompts from section contents unless optional argument RAW is
+non-nil.
+Narrowing has no effect on this function."
   (save-restriction
     (widen)
     (let ((string (buffer-substring (singular-section-start section)
-				    (or end (singular-section-end section)))))
+				    (singular-section-end section))))
       (if raw
 	  string
-	(singular-strip-leading-prompt (singular-strip-white-space string t))))))
+	(singular-prompt-remove-string string)))))
 ;;}}}
 
 ;;{{{ Section miscellaneous interactive
@@ -1916,6 +1984,22 @@ With argument, do this that many times.  With N less than zero, call
   (if (< n 0)
       (singular-section-backward (- n))
     (singular-keep-region-active)))
+
+(defun singular-section-kill (section &optional raw no-error)
+  "Kill SECTION.
+Puts the contents of SECTION into the kill ring.  Removes prompts from
+contents unless optional argument RAW is non-nil.
+If called interactively, kills section point currently is in.  Does a raw
+section kill if called with a prefix argument, otherwise strips prompts.
+Does not kill sections that are restricted either in part or as a whole.
+Rather fails with an error in such cases or silently fails if optional
+argument NO-ERROR is non-nil."
+  (interactive (list (singular-section-at (point))
+		     current-prefix-arg nil))
+  (when (singular-section-check section no-error)
+    (kill-new (singular-section-to-string section raw))
+    (delete-region (singular-section-start section)
+		   (singular-section-end section))))
 ;;}}}
 
 ;;{{{ Folding sections for both Emacs and XEmacs
@@ -1993,13 +2077,11 @@ This is for safety only: In both cases the result may be confusing to the
 user."
   (let* ((start (singular-section-start section))
 	 (end (singular-section-end section)))
-    (cond ((or (< start (point-min))
-	       (> end (point-max)))
-	   (unless no-error
-	     (error "Folding not possible: section is restricted in part or as a whole")))
+    (cond ((not (singular-section-check section no-error))
+	   nil)
 	  ((not (eq (char-before end) ?\n))
 	   (unless no-error
-	     (error "Folding not possible: section does not end in newline")))
+	     (error "Section does not end in a newline")))
 	  ((not (singular-folding-foldedp section))
 	   ;; fold but only if not already folded
 	   (singular-folding-fold-internal section)))))
@@ -2008,17 +2090,15 @@ user."
   "Unfold section SECTION if it is not already unfolded.
 Does not unfold sections that are restricted either in part or as a whole.
 Rather fails with an error in such cases or silently fails if optional
-argument NO-ERROR is non-nil.  This is for safety only: The result may be
-confusing to the user.
+argument NO-ERROR is non-nil.
+This is for safety only: The result may be confusing to the user.
 If optional argument INVISIBILITY-OVERLAY-OR_EXTENT is non-nil it should be
 the invisibility overlay or extent, respectively, of the section to
 unfold."
   (let* ((start (singular-section-start section))
 	 (end (singular-section-end section)))
-    (cond ((or (< start (point-min))
-	       (> end (point-max)))
-	   (unless no-error
-	     (error "Unfolding not possible: section is restricted in part or as a whole")))
+    (cond ((not (singular-section-check section no-error))
+	   nil)
 	  ((or invisibility-overlay-or-extent
 	       (setq invisibility-overlay-or-extent (singular-folding-foldedp section)))
 	   ;; unfold but only if not already unfolded
@@ -2231,21 +2311,63 @@ Narrowing has no effect on this function."
 ;; Note:
 ;;
 ;; Catching user's help commands to Singular and translating them to calls
-;; to `info' is quite a difficult task due to the asynchronous
+;; to `info' is quite a difficult task due to the asynchronous nature of
 ;; communication with Singular.  We use an heuristic approach which should
 ;; work in most cases:
+;;
+;; - `singular-help-pre-input-filter' scans user's input for help commands.
+;;   If user issues a help command the filter sets a time stamp and passes
+;;   the input unchanged to Singular.
+;; - Singular receives the help command and barfs that it could not process
+;;   it.  We call that error message "Singular's response".  That response
+;;   in particular contains the help topic the user requested.  If the
+;;   response for some reasons is not recognized and filtered in the later
+;;   steps the user gets some reasonable response on her command that way.
+;; - `singular-help-pre-output-filter' on each output from Singular checks
+;;   (using the time stamp set by `singular-help-pre-input-filter') whether
+;;   the user issued a help command at most one second ago.  If so,
+;;   `singular-help-pre-output-filter' starts checking Singular's output
+;;   for the response on the help command.  If it finds one it remembers
+;;   the help topic in `singular-help-topic' and removes the response from
+;;   Singular's output.
+;;   There is some extra magic built into the filter to handle responses
+;;   from Singular which are received by emacs not in one string but in
+;;   more than one piece (we call that pending output).
+;; - As the last step step of this procedure, `singular-post-output-filter'
+;;   fires up an Info buffer using `singular-help' if the variable
+;;   `singular-help-topic' is non-nil.  This step is separated from the
+;;   previous one since joining both leads to some trouble in point
+;;   management.  This is mainly due to the fact that `singular-help' opens
+;;   a new window.
+;;
+;; To show some online help, the online help manual has to be available, of
+;; course.  There is a number of possibilites for the user to set the file
+;; name of the manual explicitly, as described in the documentation string
+;; to `singular-help'.  But in general the file name should be recognized
+;; automatically by Singular interactive mode.  For that to work, Singular
+;; prints the file name when it comes up and option `--emacs' is specified.
+;; This is recognized by `singular-scan-header-pre-output-filter' which
+;; sets the variable `singular-help-file-name' accordingly.  For more
+;; information one should refer to the `Header scanning ...' folding.
+;;
+;; Another variable which needs to be set for proper operation is
+;; `singular-help-topics-alist' for completion of help topics and for
+;; recognition of help topics around point.  It is no error for this
+;; variable not to be set: simply the features do not work then.
 
+;; this `require' is necessary since we use functions from the Info package
+;; which are not declared as `autoload'
 (require 'info)
 
 (defcustom singular-help-same-window 'default
-  "Specifies how to open the window for Singular online help.
-If this variable equals `default', the standard Emacs behaviour to open the
-Info buffer is adopted (which very much depends on the settings of
-`same-window-buffer-names').
-If this variable is non-nil, Singular online help comes up in the selected
+  "*Specifies how to open the window for Singular online help.
+If this variable equals t, Singular online help comes up in the selected
 window.
 If this variable equals nil, Singular online help comes up in another
-window."
+window.
+If this variable equals neither t nor nil, the standard Emacs behaviour to
+open the Info buffer is adopted (which very much depends on the settings of
+`same-window-buffer-names')."
   :initialize 'custom-initialize-default
   :type '(choice (const :tag "This window" t)
 		 (const :tag "Other window" nil)
@@ -2253,143 +2375,176 @@ window."
   :group 'singular-interactive-miscellaneous)
 
 (defcustom singular-help-explicit-file-name nil
-  "Specifies the file name of the Singular online manual.
-If non-nil, this variable overrides all other possible ways to determine
-the file name of the Singular online manual.
-For more information one should refer to the `singular-help' function."
+  "*Specifies the file name of the Singular online manual.
+If non-nil, used as file name of the Singular online manual.
+
+This variable should be customized only if all other attempts of Singular
+interactive mode fail to determine the file name of the Singular online
+manual.  For more information one should refer to the `singular-help'
+function."
   :initialize 'custom-initialize-default
-  :type 'file
+  :type '(choice (const nil) file)
   :group 'singular-interactive-miscellaneous)
 
 (defvar singular-help-file-name nil
-  "File name of the Singular help file.
-This variable gets initialized in `singular-scan-header-init' and is set
-usually automatically by `singular-scan-header-pre-output-filter'. If set
-before evaluation of singular.el, the header of the first Singular will not
-be scanned for the help file name.
+  "File name of the Singular online manual.
+This variable should not be modified by the user.
 
 This variable is buffer-local.")
 
-(defvar singular-help-time-stamp 0
-  "A time stamp set by `singular-help-pre-input-hook'.
-This time stamp is set to `(current-time)' when the user issues a help
-command.  To be true, not the whole time stamp is stored, only the less
-significant half.
+(defconst singular-help-fall-back-file-name "singular.hlp"
+  "Fall-back file name of the Singular online manual.
+This variable is used if the file name of the Singular online manual cannot
+be determined otherwise.")
+
+(defvar singular-help-time-stamp '(0 0)
+  "The time stamp that is set when the user issues a help command.
 
 This variable is buffer-local.")
 
 (defvar singular-help-response-pending nil
-  "If non-nil, Singulars response has not been completely received.
+  "If non-nil, Singular's response has not been completely received.
 
 This variable is buffer-local.")
 
 (defvar singular-help-topic nil
-  "If non-nil, contains help topic to dhow in post output filter.
+  "If non-nil, contains help topic to show in post output filter.
 
 This variable is buffer-local.")
 
-(defconst singular-help-command-regexp "^\\s-*shelp\\>"
+(defconst singular-help-command-regexp "^\\s-*\\(help\\|\?\\)"
   "Regular expression to match Singular help commands.")
 
 (defconst singular-help-response-line-1
-  "^Your help command could not be executed.  Use\n"
-  "Regular expression that matches the first line of Singulars response.")
+  "^// \\*\\* Your help command could not be executed\\. Use\n"
+  "Regular expression that matches the first line of Singular's response.")
 
 (defconst singular-help-response-line-2
-  "^C-h C-s \\(.*\\)\n")
+  "^// \\*\\* C-h C-s \\(.*\\)\n"
+  "Regular expression that matches the second line of Singular's response.
+First subexpression matches help topic.")
 
 (defconst singular-help-response-line-3
-  "^to enter the Singular online help\.  For general\n"
-  "Regular expression that matches the first line of Singulars response.")
+  "^// \\*\\* to enter the Singular online help\\. For general\n"
+  "Regular expression that matches the third line of Singular's response.")
 
 (defconst singular-help-response-line-4
-  "^information on Singular running on Emacs, type C-h m\.\n"
-  "Regular expression that matches the first line of Singulars response.")
+  "^// \\*\\* information on Singular running under Emacs, type C-h m\\.\n"
+  "Regular expression that matches the fourth line of Singular's response.")
 
 (defun singular-help-pre-input-filter (input)
   "Check user's input for help commands.
-Sets time stamp if one is found."
+Sets time stamp if one is found.  Passes user's input on to Singular
+unchanged."
   (if (string-match singular-help-command-regexp input)
-      (setq singular-help-time-stamp (cadr (current-time))))
+      (setq singular-help-time-stamp (current-time)))
   ;; return nil so that input passes unchanged
   nil)
 
 (defun singular-help-pre-output-filter (output)
   "Check for Singular's response on a help command.
-Removes it and fires up `(info)' to handle the help command."
+Removes it and sets `singular-help-topic' accordingly."
   ;; check first
-  ;; - whether a help statement has been issued less than one second ago, or
+  ;; - whether a help statement has been issued at most one second ago, or
   ;; - whether there is a pending response.
-  ;;
   ;; Only if one of these conditions is met we go on and check text for a
   ;; response on a help command.  Checking uncoditionally every piece of
   ;; output would be far too expensive.
-  ;;
   ;; If check fails nil is returned, what is exactly what we need for the
   ;; filter.
-  (if (or (= (cadr (current-time)) singular-help-time-stamp)
+  (if (or (= (cadr (current-time)) (cadr singular-help-time-stamp))
 	  singular-help-response-pending)
       ;; if response is pending for more than five seconds, give up
       (if (and singular-help-response-pending
 	       (> (singular-time-stamp-difference (current-time) singular-help-time-stamp) 5))
 	  ;; this command returns nil, what is exactly what we need for the filter
 	  (setq singular-help-response-pending nil)
-	  ;; go through output, removing the response.  If there is a
-	  ;; pending response we nevertheless check for all lines, not only
-	  ;; for the pending one.  At last, pending responses should not
-	  ;; occur to often.
-	  (when (string-match singular-help-response-line-1 output)
-	    (setq output (replace-match "" t t output))
-	    (setq singular-help-response-pending t))
-	  (when (string-match singular-help-response-line-2 output)
-	    ;; after all, we found what we are looking for
-	    (setq singular-help-topic (substring output (match-beginning 1) (match-end 1)))
-	    (setq output (replace-match "" t t output))
-	    (setq singular-help-response-pending t))
-	  (when (string-match singular-help-response-line-3 output)
-	    (setq output (replace-match "" t t output))
-	    (setq singular-help-response-pending t))
-	  (when (string-match singular-help-response-line-4 output)
-	    (setq output (replace-match "" t t output))
-	    ;; we completely removed the help from output!
-	    (setq singular-help-response-pending nil))
+	;; go through output, removing the response.  If there is a
+	;; pending response we nevertheless check for all lines, not only
+	;; for the pending one.  At last, pending responses should not
+	;; occur to often.
+	(when (string-match singular-help-response-line-1 output)
+	  (setq output (replace-match "" t t output))
+	  (setq singular-help-response-pending t))
+	(when (string-match singular-help-response-line-2 output)
+	  ;; after all, we found what we are looking for
+	  (setq singular-help-topic (substring output (match-beginning 1) (match-end 1)))
+	  (setq output (replace-match "" t t output))
+	  (setq singular-help-response-pending t))
+	(when (string-match singular-help-response-line-3 output)
+	  (setq output (replace-match "" t t output))
+	  (setq singular-help-response-pending t))
+	(when (string-match singular-help-response-line-4 output)
+	  (setq output (replace-match "" t t output))
+	  ;; we completely removed the help from output!
+	  (setq singular-help-response-pending nil))
 
-	  ;; return modified OUTPUT
-	  output)))
+	;; return modified OUTPUT
+	output)))
 
 (defun singular-help-post-output-filter (&rest ignore)
+  "Call `singular-help' if `singular-help-topic' is non-nil."
   (when singular-help-topic
     (save-excursion (singular-help singular-help-topic))
     (setq singular-help-topic nil)))
 
+(defvar singular-help-topic-history nil
+  "History of help topics used as arguments to `singular-help'.")
+
 (defun singular-help (&optional help-topic)
-  "Show help on HELP-TOPIC in Singular online manual."
-  
-  (interactive "s")
+  "Show help on HELP-TOPIC in Singular online manual.
 
-  ;; check for empty help topic and convert it to top node
-  (if (or (null help-topic) (string= help-topic ""))
-      (setq help-topic "Top"))
+The file name of the Singular online manual is determined in the following
+manner:
+o if the \(customizable) variable `singular-help-explicit-file-name' is
+  non-nil, it is used as file name;
+o otherwise, if the variable `singular-help-file-name' is non-nil, is is
+  used as file name.  This variable should be set by Singular interactive
+  mode itself, but there may be instances where this fails.  Anyway, it
+  should be not set by the user.
+o otherwise, if the environment variable SINGULAR_INFO_FILE is set, it is
+  used as file name;
+o otherwise, the constant `singular-help-fall-back-file-name' is used
+  as file name."
+  (interactive
+   (list (completing-read "Help topic: " singular-help-topics-alist
+			  nil nil nil 'singular-help-topic-history)))
 
-  (let ((same-window-buffer-names
-	 (cond
-	  ((null singular-help-same-window)
-	   nil)
-	  ((eq singular-help-same-window 'default)
-	   same-window-buffer-names)
-	  (t
-	   '("*info*"))))
-	(node-name (concat "(" (or singular-help-explicit-file-name
-				   singular-help-file-name)
-			   ")" help-topic)))
-    (pop-to-buffer "*info*")
-    (Info-goto-node node-name)))
-    
+  ;; get help file and topic
+  (let ((help-topic (if (or (null help-topic) (string= help-topic ""))
+			"Top"
+		      help-topic))
+	(help-file-name (or singular-help-explicit-file-name
+			    singular-help-file-name
+			    (getenv "SINGULAR_INFO_FILE")
+			    singular-help-fall-back-file-name)))
+
+    ;; last not least, pop to Info buffer and jump to desired node
+    (singular-pop-to-buffer singular-help-same-window "*info*")
+
+    ;; catch errors when jumping to node
+    (condition-case signal
+	(Info-find-node help-file-name help-topic)
+      (error
+       (let ((error-message (cadr signal)))
+	 (cond ((and (stringp error-message)
+		     (string-match "Info file .* does not exist" error-message))
+		(Info-directory))
+	       ;; assume that node has not been found but file has
+	       (t
+		(Info-find-node help-file-name "Top")))
+
+	 ;; if we have been called interactively we pass the error down,
+	 ;; otherwise we only print a message
+	 (if (interactive-p)
+	     (signal (car signal) (cdr signal))
+	   (singular-error "Error: %s" error-message)))))))
 
 (defun singular-help-init ()
   "Initialize online help support for Singular interactive mode.
 
 This function is called at mode initialization time."
+  (make-local-variable 'singular-help-file-name)
   (make-local-variable 'singular-help-time-stamp)
   (make-local-variable 'singular-help-response-pending)
   (make-local-variable 'singular-help-topic)
@@ -2702,41 +2857,50 @@ This function is called at mode initialization time."
 ;;}}}
 
 ;;{{{ Demo mode
+
+;; Note:
+;;
+;; For documentation on Singular demo mode one should refer to the doc
+;; string of `singular-demo-load'.
+;; Singular demo mode should have been implemented as a minor mode but it
+;; did not seem worth it.
+
 (defcustom singular-demo-chunk-regexp "\\(\n\\s *\n\\)"
-  "Regular expressions to recognize separate chunks of a demo file.
-If there is a subexpression specified its contents is removed when the
-chunk is displayed.
+  "*Regular expressions to recognize chunks of a demo file.
+If there is a subexpression specified its contents is removed after the
+chunk has been displayed.
 The default value is \"\\\\(\\n\\\\s *\\n\\\\)\" which means that chunks are
-separated by a blank line which is removed when the chunks are displayed."
+separated by one blank line which is removed after the chunks have been
+displayed."
   :type 'regexp
+  :initialize 'custom-initialize-default
   :group 'singular-demo-mode)
 
-(defcustom singular-demo-insert-into-history nil
-  "If non-nil, insert input into history even while demo mode is on.
-Otherwise, demo chunks and other commands executed during demo mode are not
-inserted into the history."
+(defcustom singular-demo-print-messages t
+  "*If non-nil, print message on how to continue demo mode."
   :type 'boolean
+  :initialize 'custom-initialize-default
   :group 'singular-demo-mode)
 
-(defcustom singular-demo-print-messages nil
-  "If non-nil, print message on how to continue demo mode."
-  :type 'boolean
-  :group 'singular-demo-mode)
-
-(defcustom singular-demo-exit-on-load nil
-  "If non-nil, a running demo is automatically discarded when a new one is loaded.
+(defcustom singular-demo-exit-on-load t
+  "*If non-nil, an active demo is automatically discarded when a new one is loaded.
 Otherwise, the load is aborted with an error."
   :type 'boolean
+  :initialize 'custom-initialize-default
   :group 'singular-demo-mode)
 
 (defcustom singular-demo-load-directory nil
-  "Directory where demo files reside.
+  "*Directory where demo files usually reside.
 If non-nil, this directory is offered as a starting point to search for
-demo files when `singular-demo-load' is called interactively.
-If this variable equals nil whatever Emacs offers is used as starting
-point.  In general, this is the directory where Singular has been started
-in."
+demo files when `singular-demo-load' is called interactively for the first
+time.  (In further calls, `singular-demo-load' offers the directory where
+the last demo file has been loaded from as starting point).
+
+If this variable equals nil whatever Emacs offers by default is used as
+first-time starting point.  In general, this is the directory where
+Singular has been started in."
   :type '(choice (const nil) (file))
+  :initialize 'custom-initialize-default
   :group 'singular-demo-mode)
 
 (defvar singular-demo-mode nil
@@ -2754,27 +2918,82 @@ This variable is buffer-local.")
 
 This variable is buffer-local.")
 
+(defvar singular-demo-last-directory nil
+  "If non-nil, directory from which the last demo file has been loaded.
+
+This variable is buffer-local.")
+
 (defun singular-demo-load (demo-file)
   "Load demo file DEMO-FILE and enter Singular demo mode.
-NOT READY."
+
+The Singular demo mode allows to step conveniently through a prepared demo
+file.  The contents of the demo file is made visible and executed in
+portions called chunks.  How the chunks have to be marked in the demo file
+is described below.
+
+After loading the demo file with this function, \\[singular-send-or-copy-input] displays the first
+chunk of the demo file at the Singular prompt.  This chunk may be modified
+\(or even deleted) and then sent to Singular entering \\[singular-send-or-copy-input] as any command
+would have been sent to Singular.  The next time \\[singular-send-or-copy-input] is entered, the next
+chunk of the demo file is displayed, and so on.
+
+One may interrupt this sequence and enter commands at the Singular input
+prompt as usual.  As soon as \\[singular-send-or-copy-input] is entered directly after the input
+prompt, the next chunk of the demo file is displayed.  Here is the exact
+algorithm how this magic works: If point is located at the very end of the
+buffer *and* immediately after Singular's last input prompt, the next chunk
+of the demo file is displayed.  In particular, if there is any text after
+the last input prompt that text is sent to Singular as usual and no new
+chunks are displayed.
+
+After displaying the last chunk of DEMO-FILE, Singular demo mode
+automatically terminates and normal operation is resumed.  To prematurely
+exit Singular demo mode \\[singular-demo-exit] may be used.
+
+DEMO-FILE should consist of regular Singular commands.  Portions of text
+separated by a blank line are taken to be the chunks of the demo file.
+
+There is a number of variables to configure Singular demo mode.  Refer to
+the `singular-demo-mode' customization group for more information.
+
+Important note: The unprocessed contents of DEMO-FILE is hidden using
+buffer narrowing.  Emacs gets terribly confused when during demo mode the
+buffer is either narrowed to some other region or if the buffer is widened.
+The safest thing to do if that happens by accident is to explicitly exit
+the demo by means of \\[singular-demo-exit] and to try to resume somehow
+normal operation.
+
+`singular-demo-load' runs the functions on `singular-demo-mode-enter-hook'
+just after demo mode has been entered.  The functions on
+`singular-demo-mode-exit-hook' are executed after Singular demo mode has
+been exited, either prematurely or due to the end of the demo file.
+However, it its important to note that in the latter case the last chunk of
+the demo file is still waiting to be sent to Singular."
   (interactive
    (list
-    (cond
-     ;; Emacs
-     ((eq singular-emacs-flavor 'emacs)
-      (read-file-name "Load demo file: "
-		      singular-demo-load-directory
-		      nil t))
-     ;; XEmacs
-     (t
-      ;; there are some problems with the window being popped up when this
-      ;; function is called from a menu.  It does not display the contents
-      ;; of `singular-demo-load-directory' but of `default-directory'.
-      (let ((default-directory (or singular-demo-load-directory
-				   default-directory)))
-	(read-file-name "Load demo file: "
-			singular-demo-load-directory
-			nil t))))))
+    (let ((demo-file-name
+	   (cond
+	    ;; Emacs
+	    ((eq singular-emacs-flavor 'emacs)
+	     (read-file-name "Load demo file: "
+			     (or singular-demo-last-directory
+				 singular-demo-load-directory)
+			     nil t))
+	    ;; XEmacs
+	    (t
+	     ;; there are some problems with the window being popped up when this
+	     ;; function is called from a menu.  It does not display the contents
+	     ;; of `singular-demo-load-directory' but of `default-directory'.
+	     (let ((default-directory (or singular-demo-last-directory
+					  singular-demo-load-directory
+					  default-directory)))
+	       (read-file-name "Load demo file: "
+			       (or singular-demo-last-directory
+				   singular-demo-load-directory)
+			       nil t))))))
+      
+      (setq singular-demo-last-directory (file-name-directory demo-file-name))
+      demo-file-name)))
 
   ;; check for running demo
   (if singular-demo-mode
@@ -2843,7 +3062,7 @@ the hooks on `singular-demo-mode-exit-hook'."
   "Prematurely exit Singular demo mode.
 Cleans up everything that is left from the demo.
 Runs the hooks on `singular-demo-mode-exit-hook'.
-Does nothing when Singular demo mode is turned off."
+Does nothing when Singular demo mode is not active."
   (interactive)
   (when singular-demo-mode
     ;; clean up hidden rest of demo file
@@ -2859,7 +3078,7 @@ Does nothing when Singular demo mode is turned off."
 
 (defun singular-demo-show-next-chunk ()
   "Show next chunk of demo file at input prompt.
-Assumes that Singular demo mode is on.
+Assumes that Singular demo mode is active.
 Moves point to end of buffer and widenes the buffer such that the next
 chunk of the demo file becomes visible.
 Finds and removes chunk separators as specified by
@@ -2878,7 +3097,7 @@ Leaves demo mode after showing last chunk.  In that case runs hooks on
 	    ;; `(skip-syntax-backward "-")' since newline is has no white
 	    ;; space syntax.  The solution down below should suffice in
 	    ;; almost all cases ...
-	    (skip-chars-backward " \t\n\r")
+	    (skip-chars-backward " \t\n\r\f")
 	    (delete-region (point) singular-demo-end)
 	    (singular-demo-exit-internal)))
 
@@ -2896,7 +3115,8 @@ This function is called  at mode initialization time."
   (make-local-variable 'singular-demo-mode-end)
   (if (not (and (boundp 'singular-demo-end)
 		singular-demo-end))
-      (setq singular-demo-end (make-marker))))
+      (setq singular-demo-end (make-marker)))
+  (make-local-variable 'singular-demo-last-directory))
 ;;}}}
       
 ;;{{{ Some lengthy notes on input and output
@@ -2927,7 +3147,7 @@ current output section defined, throws an error otherwise."
 			      (save-restriction
 				(widen)
 				(goto-char (singular-process-mark))
-				(singular-skip-prompt-backward)
+				(singular-prompt-skip-backward)
 				(and (bolp) (point))))))
     (cond ((and current-output-start current-output-end)
 	   (singular-section-create (singular-simple-sec-at current-output-start) 'output
@@ -3111,16 +3331,30 @@ notes on input and output\" in singular.el."
 	    (goto-char old-point)
 	    (set-marker old-point nil)
 	    (set-buffer old-buffer))))))
-	    
+;;}}}
+
+;;{{{ Sending input interactive
+(defcustom singular-move-on-send 'eob
+  "*Where to move point to before sending input to Singular.
+Should be one of:
+`eob' which means to move point to end of buffer,
+`eol' which means to move point to end of line, or
+ nil  which means to not move point at all."
+  :type '(choice (const :tag "End of buffer" eob)
+		 (const :tag "End of line" eol)
+		 (const :tag "Do not move" nil))
+  :initialize 'custom-initialize-default
+  :group 'singular-interactive-miscellaneous)
+
 (defun singular-get-old-input (get-section)
-  "Retrieve old input.
-Retrivies from beginning of current section to point if GET-SECTION is
-non-nil, otherwise on a per-line base."
+  "Get and return old input.
+Retrivies on a per-section base if GET-SECTION is non-nil, otherwise on a
+per-line base."
   (if get-section
       ;; get input from input section
       (let ((section (singular-section-at (point))))
 	(if (eq (singular-section-type section) 'input)
-	    (setq old-input (singular-input-section-to-string section (point)))
+	    (singular-white-space-strip (singular-section-to-string section) t)
 	  (error "Not on an input section")))
     ;; get input from line
     (save-excursion
@@ -3130,42 +3364,67 @@ non-nil, otherwise on a per-line base."
 	(end-of-line)
 	(buffer-substring old-point (point))))))
 
-(defun singular-send-or-copy-input (send-full-section)
-  "Send input from current buffer to associated process.
-NOT READY[old input copying, demo mode,
-	  eol-on-send, history, SEND-FULL-SECTION]!"
+(defun singular-send-or-copy-input (get-section)
+  "Send input to Singular.
+
+The behavior of this function very much depends on the current position of
+point relative to the process mark, that is, the position, where Singular
+expects next input.
+
+If point is located before process mark, old input is copied to the process
+mark.  With prefix argument, the whole input section point currently is in
+is copied, without prefix argument only the current line.  One should note
+that the input is *not* sent to Singular, it is only copied to the process
+mark.  Another time entering \\[singular-send-or-copy-input] sends it to Singular.
+
+If point is located after process mark, point is moved as determined by the
+`singular-move-on-send' variable: either it is moved to the end of the
+current line, or to the end of the buffer, or it is not moved at all.  The
+default is to move point to the end of the buffer which most closely
+resembles regular terminal behaviour.  At last, the text of the region
+between process mark and point is sent to Singular.
+
+Any input to Singular is stored in an input history where it may be
+retrieved with \\[comint-previous-input] or \\[comint-next-input], respectively.  For more information on the input
+history one should refer to the documentation of
+`singular-interactive-mode'.
+
+If Singular demo mode is active and point is at process mark and if that
+position is at the end of the buffer the next chunk of the demo file is
+displayed.  One should refer to the documentation of `singular-demo-load'
+for more information on Singular demo mode.
+
+The Singular process should be running."
   (interactive "P")
-
-  (let ((process (get-buffer-process (current-buffer)))
-	pmark)
-    ;; some checks and initializations
-    (or process (error "Current buffer has no process"))
-    (setq pmark (marker-position (process-mark process)))
-
+  (let ((process (singular-process))
+	(pmark (singular-process-mark)))
     (cond
      (;; check for demo mode and show next chunk if necessary
       (and singular-demo-mode
-	  (eq (point) pmark)
-	  (eq pmark (point-max)))
+	   (= (point) pmark)
+	   (= pmark (point-max)))
       (singular-demo-show-next-chunk))
 
      (;; get old input
       (< (point) pmark)
-      (let ((old-input (singular-get-old-input send-full-section)))
+      (let ((old-input (singular-get-old-input get-section)))
 	(goto-char pmark)
 	(insert old-input)))
 
-     (;; send input from pmark to point after doing history expansion
+     (;; send input from pmark to point
       t
-      ;; I don't know if this is the right point to insert the message
-      ;; print message if demo mode is active
+      ;; print message if demo mode is active.  We print it before we do
+      ;; anything else so that the message will not hide any further
+      ;; (error) messages.
       (and singular-demo-mode
 	   singular-demo-print-messages
 	   (message "Hit RET to continue demo"))
 
-      ;; go to desired position.  NOT READY.
-      ;(if singular-eol-on-send (end-of-line))
-      ;(if send-full-section (goto-char (point-max)))
+      ;; go to desired position
+      (cond ((eq singular-move-on-send 'eol)
+	     (end-of-line))
+	    ((eq singular-move-on-send 'eob)
+	     (goto-char (point-max))))
 
       (let* ((input (buffer-substring pmark (point))))
 	;; insert string into history
@@ -3313,12 +3572,29 @@ notes on input and output\" in singular.el."
   "Major mode for interacting with Singular.
 
 NOT READY [how to send input]!
+NOT READY [in particular: input history!]
 
 NOT READY [multiple Singulars]!
 
 \\{singular-interactive-mode-map}
-Customization: Entry to this mode runs the hooks on `comint-mode-hook'
-and `singular-interactive-mode-hook' \(in that order).
+
+
+For \"backward compatibility\" with the terminal version of Singular there
+is some extra magic built into Singular interactive mode which catches help
+commands issued at the command prompt and executes this function instead.
+However, this magic is really not too magic and easily may be fooled.  If
+this magic if fooled Singular prints some error message starting like this:
+
+// ** Your help command could not be executed. ...
+
+However, the most common case should be recognized: If one issues a help
+command to a non-busy Singular, where the help command comes on one line
+and is properly terminated with a semicolon.  Like that:
+
+help ring;
+
+Customization: Entry to this mode runs the hooks on
+`singular-interactive-mode-hook'.
 
 NOT READY [much more to come.  See shell.el.]!"
   (interactive)
@@ -3329,48 +3605,46 @@ NOT READY [much more to come.  See shell.el.]!"
 
   ;; run comint mode and do basic mode setup
   (let (comint-mode-hook)
-    (comint-mode)
-    (singular-comint-init))
+    (comint-mode))
   (setq major-mode 'singular-interactive-mode)
   (setq mode-name "Singular Interaction")
 
-  ;; key bindings, syntax tables and menus
-  (singular-interactive-mode-map-init)
-  (singular-mode-syntax-table-init)
-  (singular-interactive-mode-menu-init)
-
+  ;; some other initialization found in no folding
   (setq comment-start "// ")
   (setq comment-start-skip "// *")
   (setq comment-end "")
 
-;  (singular-prompt-init)
-
-  (singular-exec-init)
-
-  ;; initialize singular demo mode, input and output filters
-  (singular-demo-mode-init)
+  ;; initialize singular input and output filters.  This should be done
+  ;; first as the filters are accessed in the following initialization
+  ;; functions.  NOT READY [should be moved to the respective foldings]
   (make-local-variable 'singular-pre-input-filter-functions)
   (make-local-hook 'singular-post-input-filter-functions)
   (make-local-variable 'singular-pre-output-filter-functions)
   (make-local-hook 'singular-post-output-filter-functions)
 
-  ;; folding sections
+  ;; initialize foldings
+  (singular-interactive-mode-map-init)
+  (singular-mode-syntax-table-init)
+  (singular-interactive-mode-menu-init)
+  (singular-demo-mode-init)
   (singular-folding-init)
-
-  ;; debugging filters
-  (singular-debug 'interactive-filter (singular-debug-filter-init))
-
   (singular-help-init)
+  (singular-prompt-init)
 
   ;; other input or output filters
   (add-hook 'singular-post-output-filter-functions
 	    'singular-remove-prompt-filter nil t)
 
-  ;; Emacs Font Lock mode initialization
+  ;; Font Lock mode initialization for Emacs.  For XEmacs, it is done at
+  ;; singular.el loading time.
   (cond
    ;; Emacs
    ((eq singular-emacs-flavor 'emacs)
     (singular-interactive-font-lock-init)))
+
+  ;; debugging filter initialization
+  (singular-debug 'interactive-filter
+   (singular-debug-filter-init))
 
   (run-hooks 'singular-interactive-mode-hook))
 ;;}}}
@@ -3560,26 +3834,6 @@ Returns BUFFER."
 ;; started, but only when a new buffer is created.  This behaviour seems
 ;; more intuitive w.r.t. local variables and hooks.
 
-; This was the old documatation of `singular'
-;   "Run an inferior Singular process, with I/O through an Emacs buffer.
-
-; NOT READY [arguments, default values, and interactive use]!
-
-; If buffer exists but Singular is not running, starts new Singular.
-; If buffer exists and Singular is running, just switches to buffer.
-; If a file `~/.emacs_singularrc' exists, it is given as initial input.
-; Note that this may lose due to a timing error if Singular discards
-; input when it starts up.
-
-; If a new buffer is created it is put in Singular interactive mode,
-; giving commands for sending input and handling ouput of Singular.  See
-; `singular-interactive-mode'.
-
-; Every time `singular' starts a new Singular process it runs the hooks
-; on `singular-exec-hook'.
-
-; Type \\[describe-mode] in the Singular buffer for a list of commands."
-
 (defun singular-internal (executable directory switches name)
   "Run an inferior Singular process, with I/O through an Emacs buffer.
 
@@ -3614,7 +3868,7 @@ Sets singular-*-last values."
     
     ;; pop to buffer
     (singular-debug 'interactive (message "Calling `pop-to-buffer'"))
-    (pop-to-buffer buffer t))
+    (singular-pop-to-buffer singular-same-window buffer)))
 
   ;; Set buffer local singular-*-last-values
   (setq singular-executable-last executable)
@@ -3713,8 +3967,15 @@ buffer name and the command line switches, and starts Singular."
 
     (singular-internal executable directory switches name)))
 
-;; for convenience only
-(defalias 'Singular 'singular)
+(defun singular-exit-singular ()
+  "Exit Singular and kill Singular buffer.
+Sends string \"quit;\" to Singular process."
+  (interactive)
+  (let ((string "quit;")
+	(process (singular-process)))
+    (singular-input-filter process string)
+    (singular-send-string process string))
+  (kill-buffer (current-buffer)))
 ;;}}}
 ;;}}}
 
