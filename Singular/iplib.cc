@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.15 1998-04-06 16:27:17 krueger Exp $ */
+/* $Id: iplib.cc,v 1.16 1998-04-07 17:53:31 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -752,13 +752,16 @@ void piShowProcList()
         sprintf(name, "%s -> %s", IDID(h), proc->procname);
         Print( "%-15s  %20s ", proc->libname, name);
         FreeL(name);
-      } else Print( "%-15s  %20s ", proc->libname, proc->procname);
+      }
+      else
+        Print( "%-15s  %20s ", proc->libname, proc->procname);
       if(proc->language==LANG_SINGULAR)
         Print("line %4d,%-5ld  %4d,%-5ld  %4d,%-5ld\n",
               proc->data.s.proc_lineno, proc->data.s.proc_start,
               proc->data.s.body_lineno, proc->data.s.body_start,
               proc->data.s.example_lineno, proc->data.s.example_start);
-      else if(proc->language==LANG_C) Print("type: object\n");
+      else if(proc->language==LANG_C)
+        Print("type: object\n");
 
     }
   }
