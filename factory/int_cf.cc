@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_cf.cc,v 1.4 1997-07-16 10:18:04 schmidt Exp $ */
+/* $Id: int_cf.cc,v 1.5 1997-09-10 15:39:52 schmidt Exp $ */
 
 #include <config.h>
 
@@ -59,11 +59,15 @@ InternalCF::intval() const
     return 0;
 }
 
+//{{{ int InternalCF::sign () const
+// docu: see CanonicalForm::sign()
 int
-InternalCF::sign() const
+InternalCF::sign () const
 {
-    return 1;
+    ASSERT1( 0, "fatal error: not implemented for class %s", this->classname() );
+    return 0;
 }
+//}}}
 
 InternalCF*
 InternalCF::invert()
