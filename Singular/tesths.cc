@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.63 1999-08-03 16:33:44 obachman Exp $ */
+/* $Id: tesths.cc,v 1.64 1999-08-03 17:03:29 obachman Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -36,6 +36,7 @@
 #define LON_BATCH           "batch"
 #define LON_BROWSER         "browser"
 #define LON_EXECUTE         "execute"
+#define LON_EMACS           "emacs"
 #define LON_ECHO            "echo"
 #define LON_HELP            "help"
 #define LON_RANDOM          "random"
@@ -78,6 +79,7 @@ static struct option longopts[] =
   {LON_TCLMODE,           0,  0,  'x'},
 #endif
   {LON_BROWSER,           1,  0,  LONG_OPTION_RETURN},
+  {LON_EMACS,             0,  0,  LONG_OPTION_RETURN},
   {LON_NO_STDLIB,         0,  0,  LONG_OPTION_RETURN},
   {LON_NO_RC,             0,  0,  LONG_OPTION_RETURN},
   {LON_NO_WARN,           0,  0,  LONG_OPTION_RETURN},
@@ -115,6 +117,7 @@ static struct sing_option sing_longopts[] =
   {LON_BATCH,       0,          "Run in MP batch mode",                                 0},
 #endif
   {LON_BROWSER,     "BROWSER",  "Display help in BROWSER ([x,tk]info, netscape)",       ""},
+  {LON_EMACS,       0,          "Support singular-emacs mode",                          0},
   {LON_HELP,        0,          "Print help message and exit",                          0},
   {LON_QUIET,       0,          "Do not print start-up banner and library load messages", 0},
   {LON_SDB,         0,          "Enable sdb debugger (experimental)",            0},
@@ -420,6 +423,10 @@ int main(          /* main entry to Singular */
           {
             mainSetSingOptionValue(LON_BROWSER, optarg);
           }
+          else if (strcmp(longopts[option_index].name, LON_EMACS) == 0)
+          {
+            mainSetSingOptionValue(LON_EMACS, (char*) 1);
+          }
           else if (strcmp(longopts[option_index].name, LON_NO_RC) == 0)
           {
             load_rc = FALSE;
@@ -601,6 +608,12 @@ int main(          /* main entry to Singular */
     }
   }
 
+  if (mainGetSingOptionValue(LON_EMACS))
+  {
+    Warn("EmacsDir: %s", feResource("EmacsDir"));
+    Warn("InfoFile: %s", feResource("InfoFile"));
+    feHelpBrowser("emacs");
+  }
   /* start shell */
   if (feBatch)
   {

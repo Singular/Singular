@@ -808,11 +808,6 @@ static void heDummyHelp(heEntry hentry)
 
 static BOOLEAN heEmacsInit()
 {
-  if (feResource('i') == NULL)
-  {
-    WarnS("'emacs' help browser not available: no InfoFile");
-    return FALSE;
-  }
   return TRUE;
 }
 static void heEmacsHelp(heEntry hentry)
