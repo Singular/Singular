@@ -35,9 +35,9 @@ test "x$prefix" = xNONE && prefix=${ac_default_prefix}; \
 
 # expand exec_prefix
 if test "x$exec_prefix" = xNONE; then
-  if test -x "singuname.sh"; then
-    if (singuname.sh >/dev/null 2>&1) then
-	exec_prefix=${prefix}/`singuname.sh`
+  if test -r "singuname.sh"; then
+    if (/bin/sh singuname.sh >/dev/null 2>&1) then
+	exec_prefix=${prefix}/`/bin/sh singuname.sh`
         ac_configure_args="$ac_configure_args --exec_prefix=${exec_prefix}"
     else
       AC_MSG_ERROR(Unknown architecture: Check singuname.sh)

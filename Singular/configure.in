@@ -130,9 +130,9 @@ fi
 # expand exec_prefix
 if test "x$exec_prefix" = xNONE; then
   if test -x "singuname.sh"; then
-    singuname="singuname.sh"
+    singuname="/bin/sh singuname.sh"
   elif test -x "../singuname.sh"; then
-    singuname="../singuname.sh"
+    singuname="/bin/sh ../singuname.sh"
   else
     AC_MSG_WARN(did not find singuname.sh use uname, instead)
     singuname="uname"
