@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sparsmat.cc,v 1.2 1999-02-24 13:25:19 pohl Exp $ */
+/* $Id: sparsmat.cc,v 1.3 1999-03-03 16:58:09 Singular Exp $ */
 
 /*
 * ABSTRACT: operations with sparse matrices (bareiss, ...)
@@ -186,13 +186,12 @@ lists smCallNewBareiss(ideal I, int x, int y)
     II=idCopy(I);
   }
   sparse_mat *bareiss = new sparse_mat(II);
+  ideal mm=II;
   intvec *v;
   ideal m;
 
-  idDelete(&II);
   if (bareiss->smGetAct() == NULL)
   {
-    Free((ADDRESS)res, sizeof(slists));
     if (origR!=NULL)
     {
       rChangeCurrRing(origR,TRUE);
@@ -201,31 +200,33 @@ lists smCallNewBareiss(ideal I, int x, int y)
       Free((ADDRESS)tmpR.block0,3*sizeof(int));
       Free((ADDRESS)tmpR.block1,3*sizeof(int));
     }
-    return NULL;
-  }
-  bareiss->smNewBareiss(x, y);
-  m = bareiss->smRes2Mod();
-  v = new intvec(bareiss->smGetRed());
-  bareiss->smToIntvec(v);
-  delete bareiss;
-  ideal mm;
-  if (origR!=NULL)
-  {
-    rChangeCurrRing(origR,TRUE);
-    mm=idInit(IDELEMS(m),m->rank);
-    int k;
-    for (k=0;k<IDELEMS(m);k++) mm->m[k] = pFetchCopy(origR, m->m[k]);
-    rChangeCurrRing(&tmpR,FALSE);
-    idDelete(&m);
-    rChangeCurrRing(origR,TRUE);
-    rUnComplete(&tmpR);
-    Free((ADDRESS)tmpR.order,3*sizeof(int));
-    Free((ADDRESS)tmpR.block0,3*sizeof(int));
-    Free((ADDRESS)tmpR.block1,3*sizeof(int));
   }
   else
   {
-    mm=m;
+    idDelete(&II);
+    bareiss->smNewBareiss(x, y);
+    m = bareiss->smRes2Mod();
+    v = new intvec(bareiss->smGetRed());
+    bareiss->smToIntvec(v);
+    delete bareiss;
+    if (origR!=NULL)
+    {
+      rChangeCurrRing(origR,TRUE);
+      mm=idInit(IDELEMS(m),m->rank);
+      int k;
+      for (k=0;k<IDELEMS(m);k++) mm->m[k] = pFetchCopy(origR, m->m[k]);
+      rChangeCurrRing(&tmpR,FALSE);
+      idDelete(&m);
+      rChangeCurrRing(origR,TRUE);
+      rUnComplete(&tmpR);
+      Free((ADDRESS)tmpR.order,3*sizeof(int));
+      Free((ADDRESS)tmpR.block0,3*sizeof(int));
+      Free((ADDRESS)tmpR.block1,3*sizeof(int));
+    }
+    else
+    {
+      mm=m;
+    }
   }
   res->Init(2);
   res->m[0].rtyp=MODUL_CMD;
@@ -248,7 +249,6 @@ sparse_mat::sparse_mat(ideal smat)
   if (nrows <= 0)
   {
     m_act = NULL;
-    WerrorS("module expected");
     return;
   }
   sign = 1;
