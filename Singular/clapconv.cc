@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapconv.cc,v 1.23 2000-05-31 10:33:19 pfister Exp $
+// $Id: clapconv.cc,v 1.24 2000-06-02 07:46:57 Singular Exp $
 /*
 * ABSTRACT: convert data between Singular and factory
 */
@@ -318,7 +318,7 @@ CanonicalForm convSingAPClapAP ( poly p , const Variable & a)
     for ( int i = 1; i <= n; i++ )
     {
       if ( (e = pGetExp( p, i )) != 0 )
-        term *= power( Variable( i ), e );
+        term *= power( Variable( i+1 ), e );
     }
     result += term;
     p = pNext( p );
@@ -328,7 +328,7 @@ CanonicalForm convSingAPClapAP ( poly p , const Variable & a)
 
 poly convClapAPSingAP ( const CanonicalForm & f )
 {
-  int n = pVariables+1+rPar(currRing);
+  int n = pVariables+1+1 /* =rPar(currRing)*/;
   /* ASSERT( level( f ) <= pVariables, "illegal number of variables" ); */
   int * exp = new int[n];
   // for ( int i = 0; i < n; i++ ) exp[i] = 0;
@@ -347,12 +347,13 @@ convRecAP ( const CanonicalForm & f, int * exp, poly & result )
   if ( ! f.inCoeffDomain() )
   {
     int l = f.level();
+    if (l==1) PrintS("f.inCoeffDomain()=FALSE and level=1 ?\n");
     for ( CFIterator i = f; i.hasTerms(); i++ )
     {
-      exp[l] = i.exp();
+      exp[l-1] = i.exp();
       convRecAP( i.coeff(), exp, result );
     }
-    exp[l] = 0;
+    exp[l-1] = 0;
   }
   else
   {
