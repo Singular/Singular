@@ -6,7 +6,7 @@
  *  Purpose: implementation of std related inline routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: kInline.cc,v 1.7 2000-10-23 12:02:12 obachman Exp $
+ *  Version: $Id: kInline.cc,v 1.8 2000-10-23 16:32:23 obachman Exp $
  *******************************************************************/
 #ifndef KINLINE_CC
 #define KINLINE_CC
@@ -19,6 +19,8 @@
 #include "omalloc.h"
 
 #define HAVE_TAIL_BIN
+// Hmm ... this I don't understand:
+// with HAVE_LM_BIN, cyclic_7 is appr. 10% slower (on Intel)
 // #define HAVE_LM_BIN
 
 KINLINE skStrategy::skStrategy()
@@ -40,8 +42,10 @@ KINLINE skStrategy::~skStrategy()
     omMergeStickyBinIntoBin(lmBin, currRing->PolyBin);
   if (tailBin != NULL)
     omMergeStickyBinIntoBin(tailBin, 
-                            (tailRing!= NULL ? tailRing->PolyBin:
+                            (tailRing != NULL ? tailRing->PolyBin:
                              currRing->PolyBin));
+  if (currRing != tailRing)
+    rKillModifiedRing(tailRing);
 }
   
 /***************************************************************

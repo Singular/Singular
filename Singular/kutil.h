@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.35 2000-10-23 12:02:15 obachman Exp $ */
+/* $Id: kutil.h,v 1.36 2000-10-23 16:32:25 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -331,7 +331,6 @@ KINLINE poly ksOldSpolyRed(poly p1, poly p2, poly spNoether = NULL);
 KINLINE poly ksOldSpolyRedNew(poly p1, poly p2, poly spNoether = NULL);
 KINLINE poly ksOldCreateSpoly(poly p1, poly p2, poly spNoether = NULL, ring r = currRing);
 KINLINE void ksOldSpolyTail(poly p1, poly q, poly q2, poly spNoether, ring r = currRing);
-
 
 #include "kInline.cc"
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hutil.cc,v 1.16 2000-09-18 09:19:01 obachman Exp $ */
+/* $Id: hutil.cc,v 1.17 2000-10-23 16:32:22 obachman Exp $ */
 /*
 * ABSTRACT: Utilities for staircase operations
 */
@@ -23,7 +23,7 @@ Exponent_t hisModule;
 monf stcmem, radmem;
 
 // Making a global "security" copy of the allocated exponent vectors
-// is a dirty fix for cerrect memory disallocation: It would be
+// is a dirty fix for correct memory disallocation: It would be
 // better, if either the fields of heist are never touched
 // (i.e. changed) except in hInit, or, if hInit would return the
 // "security" copy as well. But then, all the relevant data is held in

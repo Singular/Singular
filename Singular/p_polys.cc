@@ -6,7 +6,7 @@
  *  Purpose: implementation of currRing independent poly procedures
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_polys.cc,v 1.3 2000-10-23 15:53:12 Singular Exp $
+ *  Version: $Id: p_polys.cc,v 1.4 2000-10-23 16:32:27 obachman Exp $
  *******************************************************************/
 
 #include "mod2.h"
@@ -18,6 +18,7 @@
 // complete the fields of the monomials
 void p_Setm(poly p, ring r)
 {
+  p_LmCheckPolyRing(p, r);
   int pos=0;
   if (r->typ!=NULL)
   {
@@ -106,6 +107,7 @@ void p_Setm(poly p, ring r)
 */
 int pDeg(poly a, ring r)
 {
+  p_LmCheckPolyRing(a, r);
   return p_GetOrder(a, r);
 }
 
@@ -117,6 +119,7 @@ int pDeg(poly a, ring r)
 */
 int pTotaldegree(poly p, ring r)
 {
+  p_LmCheckPolyRing(p, r);
   return (int) p_ExpVectorQuerSum(p, r);
 }
 
@@ -127,7 +130,7 @@ int pTotaldegree(poly p, ring r)
 */
 int pWTotaldegree(poly p, ring r)
 {
-  assume(p != NULL);
+  p_LmCheckPolyRing(p, r);
   int i, k;
   int j =0;
 
@@ -171,15 +174,7 @@ int pWTotaldegree(poly p, ring r)
   }
   return  j;
 }
-int pWDegree(poly p, ring r)
-{
-  int i, k;
-  int j =0;
 
-  for(i=1;i<=r->N;i++)
-    j+=p_GetExp(p,i, r)*pWeight(i, r);
-  return j;
-}
 int pWeight(int i, ring r)
 {
   if ((r->firstwv==NULL) || (i>r->firstBlockEnds))
@@ -187,6 +182,17 @@ int pWeight(int i, ring r)
     return 1;
   }
   return r->firstwv[i-1];
+}
+
+int pWDegree(poly p, ring r)
+{
+  p_LmCheckPolyRing(p, r);
+  int i, k;
+  int j =0;
+
+  for(i=1;i<=r->N;i++)
+    j+=p_GetExp(p,i, r)*pWeight(i, r);
+  return j;
 }
 
 
@@ -200,6 +206,7 @@ int pWeight(int i, ring r)
 */
 int pLDeg0(poly p,int *l, ring r)
 {
+  p_CheckPolyRing(p, r);
   Exponent_t k= p_GetComp(p, r);
   int ll=1;
 
@@ -219,6 +226,7 @@ int pLDeg0(poly p,int *l, ring r)
 */
 int pLDeg0c(poly p,int *l, ring r)
 {
+  p_CheckPolyRing(p, r);
   int o=pFDeg(p, r);
   int ll=1;
 
@@ -255,6 +263,7 @@ int pLDeg0c(poly p,int *l, ring r)
 */
 int pLDegb(poly p,int *l, ring r)
 {
+  p_CheckPolyRing(p, r);
   Exponent_t k= p_GetComp(p, r);
   int o = pFDeg(p, r);
   int ll=1;
@@ -274,6 +283,7 @@ int pLDegb(poly p,int *l, ring r)
 */
 int pLDeg1(poly p,int *l, ring r)
 {
+  p_CheckPolyRing(p, r);
   Exponent_t k= p_GetComp(p, r);
   int ll=1;
   int  t,max;
@@ -297,6 +307,7 @@ int pLDeg1(poly p,int *l, ring r)
 */
 int pLDeg1c(poly p,int *l, ring r)
 {
+  p_CheckPolyRing(p, r);
   int ll=1;
   int  t,max;
 

@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which iter over ExpVector
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline1.h,v 1.7 2000-10-19 15:00:18 obachman Exp $
+ *  Version: $Id: pInline1.h,v 1.8 2000-10-23 16:32:25 obachman Exp $
  *******************************************************************/
 #ifndef PINLINE1_H
 #define PINLINE1_H
@@ -79,7 +79,7 @@ PINLINE1 poly p_Init(ring r)
 
 PINLINE1 poly p_LmInit(poly p, ring r)
 {
-  p_CheckPolyRing1(p, r);
+  p_LmCheckPolyRing1(p, r);
   poly np;
   omTypeAllocBin(poly, np, r->PolyBin);
   p_SetRingOfPoly(np, r);
@@ -95,7 +95,7 @@ PINLINE1 poly p_LmInit(poly s_p, ring s_r, ring d_r)
 }
 PINLINE1 poly p_LmInit(poly s_p, ring s_r, ring d_r, omBin d_bin)
 {
-  p_CheckPolyRing1(s_p, s_r);
+  p_LmCheckPolyRing1(s_p, s_r);
   p_CheckRing(d_r);
   pAssume1(d_r->N <= s_r->N);
   poly d_p = p_Init(d_r, d_bin);
@@ -113,7 +113,7 @@ PINLINE1 poly p_LmInit(poly s_p, ring s_r, ring d_r, omBin d_bin)
 PINLINE1 poly p_Head(poly p, ring r)
 {
   if (p == NULL) return NULL;
-  p_CheckPolyRing1(p, r);
+  p_LmCheckPolyRing1(p, r);
   poly np;
   omTypeAllocBin(poly, np, r->PolyBin);
   p_SetRingOfPoly(np, r);
@@ -125,7 +125,7 @@ PINLINE1 poly p_Head(poly p, ring r)
 
 PINLINE1 poly p_LmShallowCopyDelete(poly p, const ring r, omBin bin)
 {
-  p_CheckPolyRing1(p, r);
+  p_LmCheckPolyRing1(p, r);
   pAssume1(bin->sizeW == r->PolyBin->sizeW);
   poly new_p = p_New(r);
   p_MemCopy_LengthGeneral(new_p->exp, p->exp, r->ExpLSize);
@@ -143,15 +143,15 @@ PINLINE1 poly p_LmShallowCopyDelete(poly p, const ring r, omBin bin)
 // ExpVextor(d_p) = ExpVector(s_p)
 PINLINE1 void p_ExpVectorCopy(poly d_p, poly s_p, ring r)
 {
-  p_CheckPolyRing1(d_p, r);
-  p_CheckPolyRing1(s_p, r);
+  p_LmCheckPolyRing1(d_p, r);
+  p_LmCheckPolyRing1(s_p, r);
   p_MemCopy_LengthGeneral(d_p->exp, s_p->exp, r->ExpLSize);
 }
 // ExpVector(p1) += ExpVector(p2)
 PINLINE1 void p_ExpVectorAdd(poly p1, poly p2, ring r)
 {
-  p_CheckPolyRing1(p1, r);
-  p_CheckPolyRing1(p2, r);
+  p_LmCheckPolyRing1(p1, r);
+  p_LmCheckPolyRing1(p2, r);
 #if PDEBUG >= 1
   for (int i=1; i<=r->N; i++)
     pAssume1((unsigned long) (p_GetExp(p1, i, r) + p_GetExp(p2, i, r)) <= r->bitmask);
@@ -163,8 +163,8 @@ PINLINE1 void p_ExpVectorAdd(poly p1, poly p2, ring r)
 // ExpVector(p1) -= ExpVector(p2)
 PINLINE1 void p_ExpVectorSub(poly p1, poly p2, ring r)
 {
-  p_CheckPolyRing1(p1, r);
-  p_CheckPolyRing1(p2, r);
+  p_LmCheckPolyRing1(p1, r);
+  p_LmCheckPolyRing1(p2, r);
 #if PDEBUG >= 1
   for (int i=1; i<=r->N; i++)
     pAssume1(p_GetExp(p1, i, r) >= p_GetExp(p2, i, r));
@@ -177,9 +177,9 @@ PINLINE1 void p_ExpVectorSub(poly p1, poly p2, ring r)
 // ExpVector(p1) += ExpVector(p2) - ExpVector(p3)
 PINLINE1 void p_ExpVectorAddSub(poly p1, poly p2, poly p3, ring r)
 {
-  p_CheckPolyRing1(p1, r);
-  p_CheckPolyRing1(p2, r);
-  p_CheckPolyRing1(p3, r);
+  p_LmCheckPolyRing1(p1, r);
+  p_LmCheckPolyRing1(p2, r);
+  p_LmCheckPolyRing1(p3, r);
 #if PDEBUG >= 1
   for (int i=1; i<=r->N; i++)
     pAssume1(p_GetExp(p1, i, r) + p_GetExp(p2, i, r) >= p_GetExp(p3, i, r));
@@ -193,9 +193,9 @@ PINLINE1 void p_ExpVectorAddSub(poly p1, poly p2, poly p3, ring r)
 // ExpVector(pr) = ExpVector(p1) + ExpVector(p2)
 PINLINE1 void p_ExpVectorSum(poly pr, poly p1, poly p2, ring r)
 {
-  p_CheckPolyRing1(p1, r);
-  p_CheckPolyRing1(p2, r);
-  p_CheckPolyRing1(pr, r);
+  p_LmCheckPolyRing1(p1, r);
+  p_LmCheckPolyRing1(p2, r);
+  p_LmCheckPolyRing1(pr, r);
 #if PDEBUG >= 1
   for (int i=1; i<=r->N; i++)
     pAssume1((unsigned long) (p_GetExp(p1, i, r) + p_GetExp(p2, i, r)) <= r->bitmask);
@@ -207,9 +207,9 @@ PINLINE1 void p_ExpVectorSum(poly pr, poly p1, poly p2, ring r)
 // ExpVector(pr) = ExpVector(p1) - ExpVector(p2)
 PINLINE1 void p_ExpVectorDiff(poly pr, poly p1, poly p2, ring r)
 {
-  p_CheckPolyRing1(p1, r);
-  p_CheckPolyRing1(p2, r);
-  p_CheckPolyRing1(pr, r);
+  p_LmCheckPolyRing1(p1, r);
+  p_LmCheckPolyRing1(p2, r);
+  p_LmCheckPolyRing1(pr, r);
 #if PDEBUG >= 2
   for (int i=1; i<=r->N; i++)
     pAssume1(p_GetExp(p1, i, r) >= p_GetExp(p2, i, r));
@@ -221,8 +221,8 @@ PINLINE1 void p_ExpVectorDiff(poly pr, poly p1, poly p2, ring r)
 
 PINLINE1 BOOLEAN p_ExpVectorEqual(poly p1, poly p2, ring r)
 {
-  p_CheckPolyRing1(p1, r);
-  p_CheckPolyRing1(p2, r);
+  p_LmCheckPolyRing1(p1, r);
+  p_LmCheckPolyRing1(p2, r);
  
   int i = r->ExpLSize;
   unsigned long *ep = p1->exp;
@@ -239,7 +239,7 @@ PINLINE1 BOOLEAN p_ExpVectorEqual(poly p1, poly p2, ring r)
 
 PINLINE1 unsigned long p_ExpVectorQuerSum(poly p, ring r)
 {
-  p_CheckPolyRing1(p, r);
+  p_LmCheckPolyRing1(p, r);
   unsigned long s = 0;
   unsigned long i = r->N;
   
@@ -254,7 +254,7 @@ PINLINE1 unsigned long p_ExpVectorQuerSum(poly p, ring r)
 
 PINLINE1 void p_GetExpV(poly p, Exponent_t *ev, ring r)
 {
-  p_CheckPolyRing1(p, r);
+  p_LmCheckPolyRing1(p, r);
   for (int j = r->N; j; j--)
       ev[j] = p_GetExp(p, j, r);
 
@@ -262,7 +262,7 @@ PINLINE1 void p_GetExpV(poly p, Exponent_t *ev, ring r)
 }
 PINLINE1 void p_SetExpV(poly p, Exponent_t *ev, ring r)
 {
-  p_CheckPolyRing1(p, r);
+  p_LmCheckPolyRing1(p, r);
   for (int j = r->N; j; j--)
       p_SetExp(p, j, ev[j], r);
 
@@ -277,8 +277,8 @@ PINLINE1 void p_SetExpV(poly p, Exponent_t *ev, ring r)
  ***************************************************************/
 PINLINE1 int p_LmCmp(poly p, poly q, ring r)
 {
-  p_CheckPolyRing1(p, r);
-  p_CheckPolyRing1(q, r);
+  p_LmCheckPolyRing1(p, r);
+  p_LmCheckPolyRing1(q, r);
 
   p_MemCmp_LengthGeneral_OrdGeneral(p->exp, q->exp, r->pCompLSize, r->ordsgn, 
                                     return 0, return 1, return -1);
@@ -369,22 +369,22 @@ static inline BOOLEAN _p_LmDivisibleBy(poly a, ring r_a, poly b, ring r_b)
 }
 PINLINE1 BOOLEAN p_LmDivisibleByNoComp(poly a, poly b, ring r)
 {
-  p_CheckPolyRing1(a, r);
-  p_CheckPolyRing1(b, r);
+  p_LmCheckPolyRing1(a, r);
+  p_LmCheckPolyRing1(b, r);
   return _p_LmDivisibleByNoComp(a, b, r);
 }
 PINLINE1 BOOLEAN p_LmDivisibleBy(poly a, poly b, ring r)
 {
-  p_CheckPolyRing1(b, r);
-  pIfThen1(a != NULL, p_CheckPolyRing1(b, r));
+  p_LmCheckPolyRing1(b, r);
+  pIfThen1(a != NULL, p_LmCheckPolyRing1(b, r));
   if (p_GetComp(a, r) == 0 || p_GetComp(a,r) == p_GetComp(b,r))
     return _p_LmDivisibleByNoComp(a, b, r);
   return FALSE;
 }
 PINLINE1 BOOLEAN p_DivisibleBy(poly a, poly b, ring r)
 {
-  pIfThen1(b!=NULL, p_CheckPolyRing1(b, r));
-  pIfThen1(a!=NULL, p_CheckPolyRing1(a, r));
+  pIfThen1(b!=NULL, p_LmCheckPolyRing1(b, r));
+  pIfThen1(a!=NULL, p_LmCheckPolyRing1(a, r));
   
   if (a != NULL && (p_GetComp(a, r) == 0 || p_GetComp(a,r) == p_GetComp(b,r)))
     return _p_LmDivisibleByNoComp(a,b,r);
@@ -392,22 +392,22 @@ PINLINE1 BOOLEAN p_DivisibleBy(poly a, poly b, ring r)
 }
 PINLINE1 BOOLEAN p_DivisibleBy(poly a, ring r_a, poly b, ring r_b)
 {
-  pIfThen1(b!=NULL, p_CheckPolyRing1(b, r_b));
-  pIfThen1(a!=NULL, p_CheckPolyRing1(a, r_a));
+  pIfThen1(b!=NULL, p_LmCheckPolyRing1(b, r_b));
+  pIfThen1(a!=NULL, p_LmCheckPolyRing1(a, r_a));
   if (a != NULL) return _p_LmDivisibleBy(a, r_a, b, r_b);
   return FALSE;
 }
 PINLINE1 BOOLEAN p_LmDivisibleBy(poly a, ring r_a, poly b, ring r_b)
 {
-  p_CheckPolyRing(a, r_a);
-  p_CheckPolyRing(b, r_b);
+  p_LmCheckPolyRing(a, r_a);
+  p_LmCheckPolyRing(b, r_b);
   return _p_LmDivisibleBy(a, r_a, b, r_b);
 }
 PINLINE1 BOOLEAN p_LmShortDivisibleBy(poly a, unsigned long sev_a, 
                                     poly b, unsigned long not_sev_b, ring r)
 {
-  p_CheckPolyRing1(a, r);
-  p_CheckPolyRing1(b, r);
+  p_LmCheckPolyRing1(a, r);
+  p_LmCheckPolyRing1(b, r);
 #ifndef PDIV_DEBUG
   _pPolyAssume2(p_GetShortExpVector(a, r) == sev_a, a, r);
   _pPolyAssume2(p_GetShortExpVector(b, r) == ~ not_sev_b, b, r);
@@ -426,8 +426,8 @@ PINLINE1 BOOLEAN p_LmShortDivisibleBy(poly a, unsigned long sev_a,
 PINLINE1 BOOLEAN p_LmShortDivisibleBy(poly a, unsigned long sev_a, ring r_a,
                                     poly b, unsigned long not_sev_b, ring r_b)
 {
-  p_CheckPolyRing1(a, r_a);
-  p_CheckPolyRing1(b, r_b);
+  p_LmCheckPolyRing1(a, r_a);
+  p_LmCheckPolyRing1(b, r_b);
 #ifndef PDIV_DEBUG
   _pPolyAssume2(p_GetShortExpVector(a, r_a) == sev_a, a, r_a);
   _pPolyAssume2(p_GetShortExpVector(b, r_b) == ~ not_sev_b, b, r_b);

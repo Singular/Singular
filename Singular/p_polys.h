@@ -7,7 +7,7 @@
  *           currRing
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
- *  Version: $Id: p_polys.h,v 1.6 2000-10-23 12:02:16 obachman Exp $
+ *  Version: $Id: p_polys.h,v 1.7 2000-10-23 16:32:27 obachman Exp $
  *******************************************************************/
 #ifndef P_POLYS_H
 #define P_POLYS_H
@@ -314,9 +314,13 @@ BOOLEAN pHaveCommonMonoms(poly p, poly q);
 // p_Check* routines return TRUE if everything is ok,
 // else, they report error message and return false
 
-// check if poly p is from ring r
+// check if Lm(p) is from ring r
+BOOLEAN p_LmCheckIsFromRing(poly p, ring r);
+// check if Lm(p) != NULL, r != NULL and initialized && Lm(p) is from r 
+BOOLEAN p_LmCheckPolyRing(poly p, ring r);
+// check if all monoms of p are from ring r
 BOOLEAN p_CheckIsFromRing(poly p, ring r);
-// check if p != NULL, r != NULL and initialized && p is from r 
+// check r != NULL and initialized && all monoms of p are from r
 BOOLEAN p_CheckPolyRing(poly p, ring r);
 // check if r != NULL and initialized
 BOOLEAN p_CheckRing(ring r);
@@ -333,9 +337,10 @@ BOOLEAN _pp_Test(poly p, ring lmRing, ring tailRing, int level);
 
 #else // ! PDEBUG
 
-
 #define pIsMonomOf(p, q)        (TRUE)
 #define pHaveCommonMonoms(p, q) (TRUE)
+#define p_LmCheckIsFromRing(p,r)  ((void)0)
+#define p_LmCheckPolyRing(p,r)    ((void)0)
 #define p_CheckIsFromRing(p,r)  ((void)0)
 #define p_CheckPolyRing(p,r)    ((void)0)
 #define p_CheckRing(r)          ((void)0)

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.59 2000-10-23 15:21:14 Singular Exp $ */
+/* $Id: polys-impl.h,v 1.60 2000-10-23 16:32:28 obachman Exp $ */
 
 /***************************************************************
  *
@@ -181,7 +181,7 @@ while (0)
 #define pAssumeReturn1       pAssumeReturn
 #define pPolyAssumeReturn1   pPolyAssumeReturn
 #define _pPolyAssumeReturn1  _pPolyAssumeReturn
-#define p_CheckPolyRing1    p_CheckPolyRing
+#define p_LmCheckPolyRing1    p_LmCheckPolyRing
 #define p_CheckRing1        p_CheckRing
 #define pIfThen1          pIfThen
 #else
@@ -191,7 +191,7 @@ while (0)
 #define pAssumeReturn1(cond)         ((void)0)
 #define pPolyAssumeReturn1(cond)     ((void)0)
 #define _pPolyAssumeReturn1(cond,p,r)((void)0)
-#define p_CheckPolyRing1(p,r)       ((void)0)
+#define p_LmCheckPolyRing1(p,r)       ((void)0)
 #define p_CheckRing1(r)             ((void)0)
 #define pIfThen1(cond, check)     ((void)0)
 #endif // PDEBUG >= 1
@@ -203,7 +203,7 @@ while (0)
 #define pAssumeReturn2       pAssumeReturn
 #define pPolyAssumeReturn2   pPolyAssumeReturn
 #define _pPolyAssumeReturn2  _pPolyAssumeReturn
-#define p_CheckPolyRing2    p_CheckPolyRing
+#define p_LmCheckPolyRing2    p_LmCheckPolyRing
 #define p_CheckRing2        p_CheckRing
 #define pIfThen2          pIfThen
 #else
@@ -213,7 +213,7 @@ while (0)
 #define pAssumeReturn2(cond)         ((void)0)
 #define pPolyAssumeReturn2(cond)     ((void)0)
 #define _pPolyAssumeReturn2(cond,p,r)((void)0)
-#define p_CheckPolyRing2(p,r)       ((void)0)
+#define p_LmCheckPolyRing2(p,r)       ((void)0)
 #define p_CheckRing2(r)             ((void)0)
 #define pIfThen2(cond, check)     ((void)0)
 #endif // PDEBUG >= 2

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.125 2000-10-23 15:53:12 Singular Exp $ */
+/* $Id: ring.cc,v 1.126 2000-10-23 16:32:28 obachman Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -2564,12 +2564,14 @@ static void rSetDegStuff(ring r)
   int* order = r->order;
   int* block0 = r->block0;
   int* block1 = r->block1;
-
+  int** wvhdl = r->wvhdl;
+  
   if (order[0]==ringorder_S ||order[0]==ringorder_s)
   {
     order++;
     block0++;
     block1++;
+    wvhdl++;
   }
   r->LexOrder = FALSE;
   r->MixedOrder = FALSE;
@@ -2601,6 +2603,7 @@ static void rSetDegStuff(ring r)
         order[0] == ringorder_ws || order[0] == ringorder_Ws)
       r->pFDeg = pWTotaldegree;
     r->firstBlockEnds=block1[0];
+    r->firstwv = wvhdl[0];
   }
   /*======== ordering type is (c,_) =========================*/
   else if (((order[0]==ringorder_c)
@@ -2620,6 +2623,7 @@ static void rSetDegStuff(ring r)
       r->pLDeg = pLDeg1c;
     }
     r->firstBlockEnds=block1[1];
+    r->firstwv = wvhdl[1];
     if (order[1] == ringorder_wp || order[1] == ringorder_Wp ||
         order[1] == ringorder_ws || order[1] == ringorder_Ws)
       r->pFDeg = pWTotaldegree;
@@ -2631,11 +2635,13 @@ static void rSetDegStuff(ring r)
     {
       if(block1[1]!=r->N) r->LexOrder=TRUE;
       r->firstBlockEnds=block1[1];
+      r->firstwv = wvhdl[1];
     }
     else
     {
       if(block1[0]!=r->N) r->LexOrder=TRUE;
       r->firstBlockEnds=block1[0];
+      r->firstwv = wvhdl[0];
     }
     /*the number of orderings:*/
     int i = 0;

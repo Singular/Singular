@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.67 2000-10-23 12:02:14 obachman Exp $ */
+/* $Id: kutil.cc,v 1.68 2000-10-23 16:32:24 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -25,7 +25,7 @@
 #include "subexpr.h"
 #include "kstd1.h"
 #include "kutil.h"
-
+#include "pShallowCopyDelete.h"
 
 static poly redMora (poly h,int maxIndex,kStrategy strat);
 static poly redBba (poly h,int maxIndex,kStrategy strat);
@@ -206,7 +206,13 @@ void cleanT (kStrategy strat)
 {
   int i,j;
   poly  p;
+  assume(currRing == strat->tailRing || strat->tailRing != NULL);
 
+  pShallowCopyDeleteProc p_shallow_copy_delete = 
+    (strat->tailRing != currRing ? 
+     pGetShallowCopyDeleteProc(strat->tailRing, currRing) :
+     NULL);
+    
   for (j=0; j<=strat->tl; j++)
   {
     p = strat->T[j].p;
@@ -217,11 +223,24 @@ void cleanT (kStrategy strat)
       i++;
       if (i>strat->sl)
       {
-        pDelete(&p);
+        if (strat->T[j].t_p != NULL)
+        {
+          p_Delete(&(strat->T[j].t_p), strat->tailRing);
+          p_LmFree(p, currRing);
+        }
+        else
+          pDelete(&p);
         break;
       }
       if (p == strat->S[i])
       {
+        if (strat->T[j].t_p != NULL)
+        {
+          assume(p_shallow_copy_delete != NULL);
+          pNext(p) = p_shallow_copy_delete(pNext(p),strat->tailRing,currRing, 
+                                           currRing->PolyBin);
+          p_LmFree(strat->T[j].t_p, strat->tailRing);
+        }
         break;
       }
     }
@@ -615,7 +634,8 @@ void enterL (LSet *set,int *length, int *LSetmax, LObject p,int at)
 */
 void initEcartNormal (LObject* h)
 {
-  h->ecart = pLDeg(h->p,&(h->length))-pFDeg(h->p);
+  poly h_p = h->GetLmTailRing();
+  h->ecart = pLDeg(h_p,&(h->length), h->tailRing)-pFDeg(h_p, h->tailRing);
 }
 
 void initEcartBBA (LObject* h)
@@ -3673,21 +3693,141 @@ BOOLEAN newHEdge(polyset S, int ak,kStrategy strat)
   return FALSE;
 }
 
-rOrderType_t spGetOrderType(ring r, int modrank, int syzcomp)
-{
-  if (syzcomp > 0)
-    return rOrderType_Syz;
-  else
-  {
-    rOrderType_t rot = rGetOrderType(r);
 
-    if ((rot == rOrderType_CompExp || rot == rOrderType_ExpComp) &&
-        (modrank == 0))
-      return rOrderType_Exp;
-    else
-      return rot;
+/***************************************************************
+ *
+ * Routines related to ring changes during std computations
+ * UNFINISHED !!!
+ ***************************************************************/
+#define  kBucketShallowCopyDelete(p, r, b, proc) ((void)0)
+
+void kStratChangeTailRing(kStrategy strat, ring new_tailRing)
+{
+  kTest_TS(strat);
+  assume(new_tailRing != strat->tailRing);
+  pShallowCopyDeleteProc p_shallow_copy_delete 
+    = pGetShallowCopyDeleteProc(strat->tailRing, new_tailRing);
+  
+  omBin new_tailBin = omGetStickyBinOfBin(new_tailRing->PolyBin);
+  
+  int i;
+  for (i=0; i<=strat->tl; i++)
+  {
+    strat->T[i].t_p = p_shallow_copy_delete(strat->T[i].t_p, strat->tailRing,
+                                            new_tailRing, new_tailBin);
+    assume(strat->T[i].p != NULL);
+    pNext(strat->T[i].p) = pNext(strat->T[i].t_p);
   }
+  for (i=0; i<=strat->sl; i++)
+  {
+    if (strat->L[i].bucket == NULL)
+    {
+      strat->L[i].t_p = p_shallow_copy_delete(strat->L[i].t_p, strat->tailRing,
+                                              new_tailRing, new_tailBin);
+      assume(strat->L[i].p != NULL);
+      pNext(strat->L[i].p) = pNext(strat->L[i].t_p);
+    }
+    else
+    {
+      kBucketShallowCopyDelete(strat->L[i].bucket, new_tailRing, new_tailBin,
+                               p_shallow_copy_delete );
+    }
+  }
+  if (strat->P.t_p != NULL)
+  {
+    if (strat->P.bucket == NULL)
+    {
+      strat->P.t_p = p_shallow_copy_delete(strat->P.t_p, strat->tailRing,
+                                              new_tailRing, new_tailBin);
+      if (strat->P.p != NULL)
+        pNext(strat->P.p) = pNext(strat->P.t_p);
+    }
+    else
+    {
+      kBucketShallowCopyDelete(strat->P.bucket, new_tailRing, new_tailBin,
+                               p_shallow_copy_delete );
+    }
+  }
+  
+  omMergeStickyBinIntoBin(strat->tailBin, strat->tailRing->PolyBin);
+  rKillModifiedRing(strat->tailRing);
+  
+  strat->tailRing = new_tailRing;
+  strat->tailBin = new_tailBin;
+  kTest_TS(strat);
 }
 
+void kStratFirstChangeTailRing(kStrategy strat, ring new_tailRing)
+{
+  kTest_TS(strat);
+  assume(new_tailRing != strat->tailRing && strat->tailRing == currRing);
+  pShallowCopyDeleteProc p_shallow_copy_delete 
+    = pGetShallowCopyDeleteProc(currRing, new_tailRing);
+  
+  omBin new_tailBin = omGetStickyBinOfBin(new_tailRing->PolyBin);
+  
+  int i;
+  // strat->tl should be -1, but ok, let's be general
+  for (i=0; i<=strat->tl; i++)
+  {
+    assume(strat->T[i].p != NULL);
+    strat->T[i].t_p = k_LmInit_currRing_2_tailRing(strat->T[i].p, 
+                                                   new_tailRing,
+                                                   new_tailBin);
+    if (pNext(strat->T[i].p))
+    {
+      pNext(strat->T[i].t_p) 
+        = p_shallow_copy_delete(pNext(strat->T[i].t_p), currRing,
+                                new_tailRing, new_tailBin);
+      pNext(strat->T[i].p) = pNext(strat->T[i].t_p);
+    }
+  }
+  for (i=0; i<=strat->sl; i++)
+  {
+    // all buckets should be NULL as well
+    if (strat->L[i].bucket == NULL)
+    {
+      assume(strat->L[i].p != NULL);
+      strat->L[i].t_p = k_LmInit_currRing_2_tailRing(strat->L[i].p, 
+                                                     new_tailRing,
+                                                     new_tailBin);
+      if (pNext(strat->L[i].p))
+      {
+        pNext(strat->L[i].t_p) 
+          = p_shallow_copy_delete(pNext(strat->L[i].t_p), currRing,
+                                  new_tailRing, new_tailBin);
+        pNext(strat->L[i].p) = pNext(strat->L[i].t_p);
+      }
+    }
+    else
+    {
+      kBucketShallowCopyDelete(strat->L[i].bucket, new_tailRing, new_tailBin,
+                               p_shallow_copy_delete );
+    }
+  }
+  if (strat->P.t_p != NULL)
+  {
+    if (strat->P.bucket == NULL)
+    {
+      strat->P.t_p = p_shallow_copy_delete(strat->P.t_p, currRing,
+                                              new_tailRing, new_tailBin);
+      if (strat->P.p != NULL)
+        pNext(strat->P.p) = pNext(strat->P.t_p);
+    }
+    else
+    {
+      kBucketShallowCopyDelete(strat->P.bucket, new_tailRing, new_tailBin,
+                               p_shallow_copy_delete );
+    }
+  }
+  
+  omMergeStickyBinIntoBin(strat->tailBin, currRing->PolyBin);
+  rKillModifiedRing(strat->tailRing);
+  
+  strat->tailRing = new_tailRing;
+  strat->tailBin = new_tailBin;
+  kTest_TS(strat);
+}
+  
 
 #endif // KUTIL_CC

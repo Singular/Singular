@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.52 2000-10-23 12:02:13 obachman Exp $ */
+/* $Id: kstd2.cc,v 1.53 2000-10-23 16:32:23 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -227,10 +227,12 @@ static int redHoney (LObject* h, kStrategy strat)
   poly pi;
   int i,j,at,reddeg,d,pass,ei, ii, h_d;
   unsigned long not_sev;
+  poly h_p = h->GetLmTailRing();
+  ring tailRing = strat->tailRing;
 
   pass = j = 0;
-  d = reddeg = pFDeg((*h).p)+(*h).ecart;
-  h->sev = pGetShortExpVector(h->p);
+  d = reddeg = pFDeg(h_p, tailRing) + h->ecart;
+  h->sev = p_GetShortExpVector(h_p, tailRing);
   not_sev = ~ h->sev;
   loop
   {
@@ -254,8 +256,8 @@ static int redHoney (LObject* h, kStrategy strat)
       if ((!TEST_OPT_REDBEST) && (ei <= (*h).ecart))
         break;
       if ((strat->T[i].ecart < ei) && 
-          pLmShortDivisibleBy(strat->T[i].p, strat->T[i].sev,
-                            h->p, not_sev))
+          p_LmShortDivisibleBy(strat->T[i].GetLmTailRing(), strat->T[i].sev, 
+                              h_p, not_sev, tailRing))
       {
         /*
          * the polynomial to reduce with is now;
@@ -271,6 +273,7 @@ static int redHoney (LObject* h, kStrategy strat)
      */
     if ((pass!=0) && (ei > (*h).ecart))
     {
+      h->SetLmCurrRing();
       /*
        * It is not possible to reduce h with smaller ecart;
        * if possible h goes to the lazy-set L,i.e
@@ -295,6 +298,7 @@ static int redHoney (LObject* h, kStrategy strat)
       {
         /*put the polynomial also in the pair set*/
         strat->fromT = TRUE;
+        h->GetP();
         if (!TEST_OPT_INTSTRATEGY) pNorm((*h).p);
         enterpairs((*h).p,strat->sl,(*h).ecart,0,strat);
       }
@@ -311,9 +315,11 @@ static int redHoney (LObject* h, kStrategy strat)
     if (strat->fromT)
     {
       strat->fromT=FALSE;
-      h->p = pCopy(h->p);
+      h->p = p_Copy(h->p, currRing, tailRing);
     }
+
     ksReducePoly(h, &(strat->T[ii]), strat->kNoether);
+
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG)
     {
@@ -322,7 +328,9 @@ static int redHoney (LObject* h, kStrategy strat)
       PrintLn();
     }
 #endif
-    if ((*h).p == NULL)
+
+    h_p = h->GetLmTailRing();
+    if (h_p == NULL)
     {
       if (h->lcm!=NULL) pLmFree((*h).lcm);
 #ifdef KDEBUG
@@ -330,9 +338,9 @@ static int redHoney (LObject* h, kStrategy strat)
 #endif
       return 0;
     }
-    h->sev = pGetShortExpVector(h->p);
+    h->sev = p_GetShortExpVector(h_p, tailRing);
     not_sev = ~ h->sev;
-    h_d = pFDeg(h->p);
+    h_d = pFDeg(h_p, tailRing);
     /* compute the ecart */
     if (ei <= (*h).ecart)
       (*h).ecart = d-h_d;
@@ -348,6 +356,7 @@ static int redHoney (LObject* h, kStrategy strat)
     d = h_d +(*h).ecart;
     if ((strat->Ll >= 0) && ((d > reddeg) || (pass > strat->LazyPass)))
     {
+      h->SetLmCurrRing();
       at = strat->posInL(strat->L,strat->Ll,*h,strat);
       if (at <= strat->Ll)
       {

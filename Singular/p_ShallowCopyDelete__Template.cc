@@ -6,7 +6,7 @@
  *  Purpose: template for p_ShallowCopyDelete
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_ShallowCopyDelete__Template.cc,v 1.3 2000-09-18 09:19:28 obachman Exp $
+ *  Version: $Id: p_ShallowCopyDelete__Template.cc,v 1.4 2000-10-23 16:32:27 obachman Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -26,7 +26,7 @@ poly p_ShallowCopyDelete(poly s_p, const ring r, omBin d_bin)
 
   while (s_p != NULL)
   {
-    p_AllocBin( d_p->next, d_bin, r);
+    p_AllocBin(d_p->next, d_bin, r);
     pIter(d_p);
     pSetCoeff0(d_p, pGetCoeff(s_p));
     h = s_p;

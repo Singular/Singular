@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kspoly.cc,v 1.13 2000-10-19 15:00:14 obachman Exp $ */
+/* $Id: kspoly.cc,v 1.14 2000-10-23 16:32:23 obachman Exp $ */
 /*
 *  ABSTRACT -  Routines for Spoly creation and reductions
 */
@@ -39,6 +39,7 @@ void ksReducePoly(LObject* PR,
   poly p1 = PR->GetLm(tailRing);
   poly p2 = PW->GetLm(tailRing);
   poly t2 = pNext(p2), lm = p1;
+  assume(p1 != NULL && p2 != NULL);
   p_CheckPolyRing(p1, tailRing);
   p_CheckPolyRing(p2, tailRing);
 

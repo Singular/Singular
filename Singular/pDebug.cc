@@ -6,7 +6,7 @@
  *  Purpose: implementation of debug related poly routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pDebug.cc,v 1.8 2000-10-23 12:02:16 obachman Exp $
+ *  Version: $Id: pDebug.cc,v 1.9 2000-10-23 16:32:25 obachman Exp $
  *******************************************************************/
 
 #ifndef PDEBUG_CC
@@ -60,7 +60,7 @@ BOOLEAN dPolyReportError(poly p, ring r, const char* fmt, ...)
  * checking for ring stuff
  *
  ***************************************************************/
-BOOLEAN p_CheckIsFromRing(poly p, ring r)
+BOOLEAN p_LmCheckIsFromRing(poly p, ring r)
 {
   if (p != NULL)
   {
@@ -81,11 +81,27 @@ BOOLEAN p_CheckIsFromRing(poly p, ring r)
   return TRUE;
 }
 
+BOOLEAN p_CheckIsFromRing(poly p, ring r)
+{
+  while (p!=NULL)
+  {
+    pFalseReturn(p_LmCheckIsFromRing(p, r));
+    pIter(p);
+  }
+  return TRUE;
+}
+
 BOOLEAN p_CheckPolyRing(poly p, ring r)
 {
   pAssumeReturn(r != NULL && r->PolyBin != NULL);
-  pAssumeReturn(p != NULL);
   return p_CheckIsFromRing(p, r);
+}
+
+BOOLEAN p_LmCheckPolyRing(poly p, ring r)
+{
+  pAssumeReturn(r != NULL && r->PolyBin != NULL);
+  pAssumeReturn(p != NULL);
+  return p_LmCheckIsFromRing(p, r);
 }
 BOOLEAN p_CheckRing(ring r)
 {
@@ -184,7 +200,7 @@ BOOLEAN _p_Test(poly p, ring r, int level)
   while (p != NULL)
   {
     // ring check
-    pFalseReturn(p_CheckPolyRing(p, r));
+    pFalseReturn(p_LmCheckIsFromRing(p, r));
     // omAddr check
     pPolyAssumeReturnMsg(omTestBinAddrSize(p, (r->PolyBin->sizeW)*SIZEOF_LONG, 1) 
                      == omError_NoError, "memory error");

@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which are of constant time
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline2.h,v 1.9 2000-10-23 15:21:13 Singular Exp $
+ *  Version: $Id: pInline2.h,v 1.10 2000-10-23 16:32:25 obachman Exp $
  *******************************************************************/
 #ifndef PINLINE2_H
 #define PINLINE2_H
@@ -29,7 +29,7 @@
 
 PINLINE2 number p_SetCoeff(poly p, number n, ring r)
 {
-  p_CheckPolyRing2(p, r);
+  p_LmCheckPolyRing2(p, r);
   n_Delete(&(p->coef), r);
   (p)->coef=n;
   return n;
@@ -38,7 +38,7 @@ PINLINE2 number p_SetCoeff(poly p, number n, ring r)
 // order
 PINLINE2 Order_t p_GetOrder(poly p, ring r)
 {
-  p_CheckPolyRing2(p, r);
+  p_LmCheckPolyRing2(p, r);
   int i=0;
   loop
   {
@@ -61,7 +61,7 @@ PINLINE2 Order_t p_GetOrder(poly p, ring r)
 
 PINLINE2 Order_t p_SetOrder(poly p, long o, ring r)
 {
-  p_CheckPolyRing2(p, r);
+  p_LmCheckPolyRing2(p, r);
   pAssume2(o >= 0);
   int i=0;
   loop
@@ -87,33 +87,33 @@ PINLINE2 Order_t p_SetOrder(poly p, long o, ring r)
 // component
 PINLINE2  unsigned long p_SetComp(poly p, unsigned long c, ring r)
 {
-  p_CheckPolyRing2(p, r);
+  p_LmCheckPolyRing2(p, r);
   pAssume2(rRing_has_Comp(r));
   __p_GetComp(p,r) = c;
   return c;
 }
 PINLINE2 unsigned long p_IncrComp(poly p, ring r)
 {
-  p_CheckPolyRing2(p, r);
+  p_LmCheckPolyRing2(p, r);
   pAssume2(rRing_has_Comp(r));
   return ++(__p_GetComp(p,r));
 }
 PINLINE2 unsigned long p_DecrComp(poly p, ring r)
 {
-  p_CheckPolyRing2(p, r);
+  p_LmCheckPolyRing2(p, r);
   pAssume2(rRing_has_Comp(r));
   pPolyAssume2(__p_GetComp(p,r) > 0);
   return --(__p_GetComp(p,r));
 }
 PINLINE2 unsigned long p_AddComp(poly p, unsigned long v, ring r)
 {
-  p_CheckPolyRing2(p, r);
+  p_LmCheckPolyRing2(p, r);
   pAssume2(rRing_has_Comp(r));
   return __p_GetComp(p,r) += v;
 }
 PINLINE2 unsigned long p_SubComp(poly p, unsigned long v, ring r)
 {
-  p_CheckPolyRing2(p, r);
+  p_LmCheckPolyRing2(p, r);
   pAssume2(rRing_has_Comp(r));
   pPolyAssume2(__p_GetComp(p,r) >= v);
   return __p_GetComp(p,r) -= v;
@@ -124,14 +124,14 @@ PINLINE2 unsigned long p_SubComp(poly p, unsigned long v, ring r)
 // and number of bits to shift to the right in the upper 8 bits
 PINLINE2 Exponent_t p_GetExp(poly p, int v, ring r)
 {
-  p_CheckPolyRing2(p, r);
+  p_LmCheckPolyRing2(p, r);
   pAssume2(v > 0 && v <= r->N);
   return (p->exp[(r->VarOffset[v] & 0xffffff)] >> (r->VarOffset[v] >> 24))
           & r->bitmask;
 }
 PINLINE2 Exponent_t p_SetExp(poly p, int v, int e, ring r)
 {
-  p_CheckPolyRing2(p, r);
+  p_LmCheckPolyRing2(p, r);
   pAssume2(v>0 && v <= r->N);
   pAssume2(e>=0);
   pAssume2((unsigned int) e<=r->bitmask);
@@ -151,14 +151,14 @@ PINLINE2 Exponent_t p_SetExp(poly p, int v, int e, ring r)
 // the following should be implemented more efficiently
 PINLINE2  Exponent_t p_IncrExp(poly p, int v, ring r)
 {
-  p_CheckPolyRing2(p, r);
+  p_LmCheckPolyRing2(p, r);
   Exponent_t e = p_GetExp(p,v,r);
   e++;
   return p_SetExp(p,v,e,r);
 }
 PINLINE2  Exponent_t p_DecrExp(poly p, int v, ring r)
 {
-  p_CheckPolyRing2(p, r);
+  p_LmCheckPolyRing2(p, r);
   Exponent_t e = p_GetExp(p,v,r);
   pAssume2(e > 0);
   e--;
@@ -166,14 +166,14 @@ PINLINE2  Exponent_t p_DecrExp(poly p, int v, ring r)
 }
 PINLINE2  Exponent_t p_AddExp(poly p, int v, Exponent_t ee, ring r)
 {
-  p_CheckPolyRing2(p, r);
+  p_LmCheckPolyRing2(p, r);
   Exponent_t e = p_GetExp(p,v,r);
   e += ee;
   return p_SetExp(p,v,e,r);
 }
 PINLINE2  Exponent_t p_SubExp(poly p, int v, Exponent_t ee, ring r)
 {
-  p_CheckPolyRing2(p, r);
+  p_LmCheckPolyRing2(p, r);
   Exponent_t e = p_GetExp(p,v,r);
   pAssume2(e >= ee);
   e -= ee;
@@ -181,7 +181,7 @@ PINLINE2  Exponent_t p_SubExp(poly p, int v, Exponent_t ee, ring r)
 }
 PINLINE2  Exponent_t p_MultExp(poly p, int v, Exponent_t ee, ring r)
 {
-  p_CheckPolyRing2(p, r);
+  p_LmCheckPolyRing2(p, r);
   Exponent_t e = p_GetExp(p,v,r);
   e *= ee;
   return p_SetExp(p,v,e,r);
@@ -189,8 +189,8 @@ PINLINE2  Exponent_t p_MultExp(poly p, int v, Exponent_t ee, ring r)
 
 PINLINE2 Exponent_t p_GetExpSum(poly p1, poly p2, int i, ring r)
 {
-  p_CheckPolyRing2(p1, r);
-  p_CheckPolyRing2(p2, r);
+  p_LmCheckPolyRing2(p1, r);
+  p_LmCheckPolyRing2(p2, r);
   return p_GetExp(p1,i,r) + p_GetExp(p2,i,r);
 }
 PINLINE2 Exponent_t p_GetExpDiff(poly p1, poly p2, int i, ring r)
@@ -221,7 +221,7 @@ PINLINE2 poly p_New(ring r)
 
 PINLINE2 void p_DeleteLm(poly *p, ring r)
 {
-  pIfThen2(*p != NULL, p_CheckPolyRing2(*p, r));
+  pIfThen2(*p != NULL, p_LmCheckPolyRing2(*p, r));
   poly h = *p;
   if (h != NULL)
   {
@@ -232,7 +232,7 @@ PINLINE2 void p_DeleteLm(poly *p, ring r)
 }
 PINLINE2 void p_DeleteLm(poly p, ring r)
 {
-  pIfThen2(p != NULL, p_CheckPolyRing2(p, r));
+  pIfThen2(p != NULL, p_LmCheckPolyRing2(p, r));
   if (p != NULL)
   {
     n_Delete(&_pGetCoeff(p), r);
@@ -241,32 +241,32 @@ PINLINE2 void p_DeleteLm(poly p, ring r)
 }
 PINLINE2 void p_LmFree(poly p, ring r)
 {
-  p_CheckPolyRing2(p, r);
+  p_LmCheckPolyRing2(p, r);
   omFreeBinAddr(p);
 }
 PINLINE2 void p_LmFree(poly *p, ring r)
 {
-  p_CheckPolyRing2(*p, r);
+  p_LmCheckPolyRing2(*p, r);
   poly h = *p;
   *p = pNext(h);
   omFreeBinAddr(h);
 }
 PINLINE2 poly p_LmFreeAndNext(poly p, ring r)
 {
-  p_CheckPolyRing2(p, r);
+  p_LmCheckPolyRing2(p, r);
   poly pnext = pNext(p);
   omFreeBinAddr(p);
   return pnext;
 }
 PINLINE2 void p_LmDelete(poly p, ring r)
 {
-  p_CheckPolyRing2(p, r);
+  p_LmCheckPolyRing2(p, r);
   n_Delete(&_pGetCoeff(p), r);
   omFreeBinAddr(p);
 }
 PINLINE2 void p_LmDelete(poly *p, ring r)
 {
-  p_CheckPolyRing2(*p, r);
+  p_LmCheckPolyRing2(*p, r);
   poly h = *p;
   *p = pNext(h);
   n_Delete(&pGetCoeff(h), r);
@@ -274,7 +274,7 @@ PINLINE2 void p_LmDelete(poly *p, ring r)
 }
 PINLINE2 poly p_LmDeleteAndNext(poly p, ring r)
 {
-  p_CheckPolyRing2(p, r);
+  p_LmCheckPolyRing2(p, r);
   poly pnext = _pNext(p);
   n_Delete(&_pGetCoeff(p), r);
   omFreeBinAddr(p);
@@ -347,7 +347,7 @@ PINLINE2 void p_Delete(poly *p,  const ring lmRing, const ring tailRing)
 
 PINLINE2 poly p_ShallowCopyDelete(poly p, const ring r, omBin bin)
 {
-  p_CheckPolyRing2(p, r);
+  p_LmCheckPolyRing2(p, r);
   pAssume2(r->PolyBin->sizeW == bin->sizeW);
   return r->p_Procs->p_ShallowCopyDelete(p, r, bin);
 }
