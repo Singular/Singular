@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.119 2003-02-18 16:12:17 Singular Exp $
+@comment $Id: types.doc,v 1.120 2003-05-20 11:58:11 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -3060,7 +3060,7 @@ negation or subtraction
 multiplication
 
 @item @code{/}
-division by a monomial, non divisible terms yield 0
+division by a polynomial, ignoring the rest
 
 @item @code{^}, @code{**}
 power by an integer
