@@ -1,0 +1,38 @@
+Die allgemeine Datei-Struktur des Handbuchs:
+
+* singular.doc : 
+    Die grobe Struktur das Handbuches und einige kleine Kapitel (z.B. Preface)
+
+* copyright.tex:
+    Copyright-Notice
+
+* start.doc:
+    Kapitel 2 (Introduction)
+
+* general.doc:
+    Kapitel 3 (General concepts)
+
+* libraries.doc:
+    Kapitel 3.4 (Libraries), 3.5 (Procedures) und 3.6 (Debugging tools)
+    (wird evtl. mit general.doc zusammengefuehrt)
+
+* types.doc:
+    Kapitel 4 (Data types)
+
+* reference.doc
+    Kapitel 5 (Functions and system variables)
+
+* examples.doc
+    Kapitel 7 (Examples)
+
+* math.doc
+    Kapitel 8 (Mathematical background)
+
+In den Dateien old_***.doc stehen die Abschnitte, die noch nicht (vollstaendig)
+in die neuen Version gewandert sind. Von hier aus kann man also mit 
+"cut and paste" Texte in das neue Handbuch schieben - sie sollten dann
+aus den old_* -Dateien gestrichen werden.
+
+------------------------------------------------------------
+$Id: README,v 1.1 1998-04-30 07:00:48 Singular Exp $
+------------------------------------------------------------
