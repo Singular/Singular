@@ -1,3 +1,7 @@
+Fri Aug 13 13:20:01 MET DST 1999 hannes
+* made fe_fgets_stdin an function pointer instead of a macro
+  ( febase.cc febase.h feread.cc misc.cc sing_mp.cc tesths.cc)
+
 Thu Aug 12 12:57:49 MET DST 1999 hannes
 * integrated "spectrum" by Stefan Endrass, inactive by default
   (Makefile.in claptmpl.cc feResource.cc iparith.cc mod2.h.in

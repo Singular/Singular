@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.34 1999-08-06 14:06:38 obachman Exp $ */
+/* $Id: febase.h,v 1.35 1999-08-13 11:21:43 Singular Exp $ */
 /*
 * ABSTRACT: basic i/o
 */
@@ -66,8 +66,6 @@ extern const char feNotImplemented[];
 extern BOOLEAN tclmode;
 #endif
 extern BOOLEAN errorreported;
-extern BOOLEAN fe_use_fgets;
-extern BOOLEAN feBatch;
 extern BOOLEAN feProt;
 extern BOOLEAN feWarn;
 extern BOOLEAN feOut;
@@ -172,8 +170,8 @@ inline void PrintTCL(const char c, int l,const char *s)
 }
 #else
 #define PrintTCL(A,B,C) Print("TCL-Err:%s",C)
-#endif
-#endif
+#endif /* HAVE_TCL */
+#endif /* __MWERKS__ */
 
 char *  StringAppend(char *fmt, ...);
 char *  StringAppendS(char *s);
@@ -228,22 +226,30 @@ extern Voice  *currentVoice;
 Voice * feInitStdin();
 
 /* feread.cc: */
-#ifdef HAVE_FEREAD
-  //void fe_set_input_mode (void);
-  //void fe_temp_set (void);
-  //void fe_temp_reset (void);
-  char * fe_fgets_stdin(char *pr,char *s, int size);
-#else
-  #ifdef HAVE_READLINE
-    void fe_set_input_mode (void);
-    void fe_reset_input_mode (void);
-    char * fe_fgets_stdin_rl(char *pr,char *s, int size);
-    #define fe_fgets_stdin(p,A,B) fe_fgets_stdin_rl(p,A,B)
-  #else
-    #define fe_fgets_stdin(p,A,B) fgets(A,B,stdin)
+
+/* the interface for reading: */
+extern  char * (*fe_fgets_stdin)(char *pr,char *s, int size);
+
+/* possible implementations: */
+
+  /* readline, linked in: */
+  char * fe_fgets_stdin_rl(char *pr,char *s, int size);
+
+  /* emulated readline: */
+  char * fe_fgets_stdin_emu(char *pr,char *s, int size);
+
+  /* fgets: */
+  char * fe_fgets(char *pr,char *s, int size);
+ 
+  #ifdef HAVE_TCL
+  /* tcl: */
+  char * fe_fgets_tcl(char *pr,char *s, int size);
   #endif
-#endif
-#endif /* ifndef __MWERKS__ */
+
+  /* dummy (for batch mode): */
+  char * fe_fgets_dummy(char *pr,char *s, int size);
+
+#endif /* c++ only */
 
 /* everything in between calls to these procedures is printed into a string
  * which is returned by SprintEnd()

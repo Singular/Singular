@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sing_mp.cc,v 1.25 1999-08-03 16:33:44 obachman Exp $ */
+/* $Id: sing_mp.cc,v 1.26 1999-08-13 11:21:44 Singular Exp $ */
 
 /*
 * ABSTRACT: interface to MP links
@@ -275,7 +275,7 @@ static MP_Link_pt slOpenMPFork(si_link l, int n_argc, char **n_argv)
       MP_SET_LINK_OPTIONS(link);
       SI_LINK_SET_RW_OPEN_P(l);
       l->data = (void *) link;
-      feBatch=TRUE;
+      fe_fgets_stdin=fe_fgets_dummy;
       _exit(Batch_ReadEval(slCopy(l)));
     }
   }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.78 1999-08-05 11:28:02 obachman Exp $ */
+/* $Id: febase.cc,v 1.79 1999-08-13 11:21:42 Singular Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -59,7 +59,6 @@ BITSET  verbose = 1
 /*                  | Sy_bit(V_DEBUG_MEM) */
 ;}
 BOOLEAN errorreported = FALSE;
-BOOLEAN feBatch = FALSE;
 char *  feErrors=NULL;
 int     feErrorsLen=0;
 BOOLEAN feWarn = TRUE;
@@ -260,7 +259,7 @@ extern "C" {
 void WerrorS(const char *s)
 {
 #ifdef HAVE_MPSR
-  if (feBatch)
+  if (fe_fgets_stdin==fe_fgets_dummy)
   {
     if (feErrors==NULL)
     {

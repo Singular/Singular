@@ -113,13 +113,13 @@ void m2_end(short i)
     #ifndef macintosh
       #ifdef HAVE_FEREAD
         #ifdef HAVE_ATEXIT
-          fe_reset_input_mode();
+          //fe_reset_input_mode();
         #else
-          fe_reset_input_mode(0,NULL);
+          //fe_reset_input_mode(0,NULL);
         #endif
       #else
         #ifdef HAVE_READLINE
-          fe_reset_input_mode();
+          //fe_reset_input_mode();
         #endif
       #endif
     #endif

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feread.cc,v 1.20 1998-10-29 13:15:14 Singular Exp $ */
+/* $Id: feread.cc,v 1.21 1999-08-13 11:21:43 Singular Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -16,6 +16,9 @@
 #endif
 
 
+static char * fe_fgets_stdin_init(char *pr,char *s, int size);
+char * (*fe_fgets_stdin)(char *pr,char *s, int size)
+ = fe_fgets_stdin_init;
 #if defined(HAVE_READLINE) && !defined(HAVE_FEREAD)
 #include <unistd.h>
 #include <stdio.h>
@@ -51,7 +54,7 @@ extern "C" {
 
 #include "ipshell.h"
 
-BOOLEAN fe_use_fgets=FALSE;
+char * fe_fgets_stdin_rl(char *pr,char *s, int size);
 
 
 /* Tell the GNU Readline library how to complete.  We want to try to complete
@@ -111,68 +114,18 @@ char ** singular_completion (char *text, int start, int end)
   return m;
 }
 
-void fe_set_input_mode(void)
-{
-  /* Allow conditional parsing of the ~/.inputrc file. */
-  rl_readline_name = "Singular";
-  /* Tell the completer that we want a crack first. */
-  rl_attempted_completion_function = (CPPFunction *)singular_completion;
-
-  if(!fe_use_fgets)
-  {
-
-    /* set the output stream */
-    if(!isatty(STDOUT_FILENO))
-    {
-      #ifdef atarist
-        rl_outstream = fopen( "/dev/tty", "w" );
-      #else
-        rl_outstream = fopen( ttyname(fileno(stdin)), "w" );
-      #endif
-    }
-
-    /* try to read a history */
-    using_history();
-    char *p = getenv("SINGULARHIST");
-    if (p != NULL)
-    {
-      read_history (p);
-    }
-  }
-}
-
 void fe_reset_input_mode (void)
 {
   char *p = getenv("SINGULARHIST");
   if (p != NULL)
   {
-    if(!feBatch && !fe_use_fgets && (history_total_bytes()!=0))
+    if(history_total_bytes()!=0)
       write_history (p);
   }
 }
 
 char * fe_fgets_stdin_rl(char *pr,char *s, int size)
 {
-  if (feBatch)
-    return NULL;
-  if(fe_use_fgets)
-  {
-    #ifdef HAVE_TCL
-    if (tclmode)
-    {
-      if(currRing!=NULL) PrintTCLS('P',pr);
-      else               PrintTCLS('U',pr);
-    }
-    else
-    #endif
-    if (BVERBOSE(V_PROMPT))
-    {
-      PrintS(pr);
-    }
-    mflush();
-    return fgets(s,size,stdin);
-  }
-
   if (!BVERBOSE(V_PROMPT))
   {
     pr="";
@@ -210,35 +163,75 @@ char * fe_fgets_stdin_rl(char *pr,char *s, int size)
 extern "C" {
 char * fe_fgets_stdin_fe(char *pr,char *s, int size);
 }
-char * fe_fgets_stdin(char *pr,char *s, int size)
+char * fe_fgets_stdin_emu(char *pr,char *s, int size)
 {
-  if (feBatch)
-    return NULL;
-  if(fe_use_fgets)
-  {
-    #ifdef HAVE_TCL
-    if (tclmode)
-    {
-      if(currRing!=NULL) PrintTCLS('P',pr);
-      else               PrintTCLS('U',pr);
-    }
-    else
-    #endif
-    if (BVERBOSE(V_PROMPT))
-    {
-      PrintS(pr);
-    }
-    mflush();
-    return fgets(s,size,stdin);
-  }
-
   if (!BVERBOSE(V_PROMPT))
   {
     pr="";
   }
   mflush();
-
-
   return fe_fgets_stdin_fe(pr,s,size);
 }
 #endif
+
+static char * fe_fgets_stdin_init(char *pr,char *s, int size)
+{
+#if defined(HAVE_READLINE) && !defined(HAVE_FEREAD)
+  /* Allow conditional parsing of the ~/.inputrc file. */
+  rl_readline_name = "Singular";
+  /* Tell the completer that we want a crack first. */
+  rl_attempted_completion_function = (CPPFunction *)singular_completion;
+
+  /* set the output stream */
+  if(!isatty(STDOUT_FILENO))
+  {
+    #ifdef atarist
+      rl_outstream = fopen( "/dev/tty", "w" );
+    #else
+      rl_outstream = fopen( ttyname(fileno(stdin)), "w" );
+    #endif
+  }
+
+  /* try to read a history */
+  using_history();
+  char *p = getenv("SINGULARHIST");
+  if (p != NULL)
+  {
+    read_history (p);
+  }
+  fe_fgets_stdin=fe_fgets_stdin_rl;
+  return(fe_fgets_stdin_rl(pr,s,size));
+#endif
+#if !defined(HAVE_READLINE) && defined(HAVE_FEREAD)
+  fe_fgets_stdin=fe_fgets_stdin_emu;
+  return(fe_fgets_stdin_emu(pr,s,size));
+#endif
+}
+
+/* fgets: */
+char * fe_fgets(char *pr,char *s, int size)
+{
+  if (BVERBOSE(V_PROMPT))
+  {
+    fprintf(stdout,pr);
+  }
+  mflush();
+  return fgets(s,size,stdin);
+}
+
+#ifdef HAVE_TCL
+/* tcl: */
+char * fe_fgets_tcl(char *pr,char *s, int size)
+{
+  if(currRing!=NULL) PrintTCLS('P',pr);
+  else               PrintTCLS('U',pr);
+  mflush();
+  return fgets(s,size,stdin);
+}
+#endif
+
+/* dummy (for batch mode): */
+char * fe_fgets_dummy(char *pr,char *s, int size)
+{
+  return NULL;
+}

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.67 1999-08-06 14:06:41 obachman Exp $ */
+/* $Id: tesths.cc,v 1.68 1999-08-13 11:21:44 Singular Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -112,7 +112,7 @@ struct sing_option
 };
 
 // mention only documented options here
-// or let help string start with // then option is like undocumented 
+// or let help string start with // then option is like undocumented
 static struct sing_option sing_longopts[] =
 {
 #ifdef HAVE_MPSR
@@ -193,7 +193,7 @@ static void mainHelp(const char* name)
     if (sopt != NULL && sopt->help != NULL
 #ifdef NDEBUG
         && *(sopt->help) != '/'
-#endif  
+#endif
         )
     {
       if (longopts[i].has_arg > 0)
@@ -314,7 +314,7 @@ int main(          /* main entry to Singular */
 
         case 'b':
 #ifdef HAVE_MPSR
-          feBatch=TRUE;
+          fe_fgets_stdin=fe_fgets_dummy;
           mainSetSingOptionValue(LON_BATCH, (char*) 1);
           break;
 #else
@@ -333,14 +333,14 @@ int main(          /* main entry to Singular */
 
         case 't':
 #if defined(HAVE_FEREAD) || defined(HAVE_READLINE)
-          fe_use_fgets=TRUE;
+          fe_fgets_stdin=fe_fgets;
 #endif
           mainSetSingOptionValue(LON_NO_TTY, (char*) 1);
           break;
 
         case 'd':
-	  sdb_flags = 1;
-	  break;
+          sdb_flags = 1;
+          break;
 
         case 'v':
           printf("Singular for %s version %s  (%d)  %s %s\n",
@@ -355,6 +355,7 @@ int main(          /* main entry to Singular */
         case 'x':
 #ifdef HAVE_TCL
           tclmode = TRUE;
+          fe_fgets_stdin=fe_fgets_tcl;
           mainSetSingOptionValue(LON_TCLMODE, (char*) 1);
           verbose|=Sy_bit(V_SHOW_MEM);
           break;
@@ -435,11 +436,10 @@ int main(          /* main entry to Singular */
             mainSetSingOptionValue(LON_EMACS, (char*) 1);
             // print EmacsDir and InfoFile so that Emacs
             // mode can pcik it up
-            Warn("EmacsDir: %s", (feResource("EmacsDir") != NULL ? 
-                                  feResource("EmacsDir") : ""));
-            Warn("InfoFile: %s", (feResource("InfoFile") != NULL ? 
-                                  feResource("InfoFile") : ""));
-            
+            Warn("EmacsDir: %s", (feResource('e' /*"EmacsDir"*/) != NULL ?
+                                  feResource('e' /*"EmacsDir"*/) : ""));
+            Warn("InfoFile: %s", (feResource('i' /*"InfoFile"*/) != NULL ?
+                                  feResource('i' /*"InfoFile"*/) : ""));
           }
           else if (strcmp(longopts[option_index].name, LON_NO_RC) == 0)
           {
@@ -521,7 +521,7 @@ int main(          /* main entry to Singular */
     IDPACKAGE(h)->language = LANG_TOP;
 #endif /* HAVE_NAMESPACES */
   }
-  if (BVERBOSE(0) && !feBatch)
+  if (BVERBOSE(0))
   {
     printf(
 "                     SINGULAR                             /"
@@ -541,14 +541,11 @@ int main(          /* main entry to Singular */
   else
   {
     sdb_flags = 0;
-    if (!feBatch)
-    {
 #ifdef __MWERKS__
-      memcpy(stderr,stdout,sizeof(FILE));
+    memcpy(stderr,stdout,sizeof(FILE));
 #else
-      dup2(1,2);
+    dup2(1,2);
 #endif
-    }
   }
   slStandardInit();
   dlInit(thisfile);
@@ -566,11 +563,6 @@ int main(          /* main entry to Singular */
   }
   errorreported = 0;
   mmMarkInitDBMCB();
-#ifndef macintosh
-#if defined(HAVE_READLINE)
-  fe_set_input_mode();
-#endif
-#endif
   setjmp(si_start_jmpbuf);
 
   // Now, put things on the stack of stuff to do
@@ -623,7 +615,7 @@ int main(          /* main entry to Singular */
   }
 
   /* start shell */
-  if (feBatch)
+  if (fe_fgets_stdin==fe_fgets_dummy)
   {
 #ifdef HAVE_MPSR
     extern int Batch_do(const char* port, const char* host);
