@@ -443,7 +443,7 @@ fi
 
 AC_MSG_CHECKING(which remote shell command to use)
 for mp_rsh in $ac_rsh_programs; do
-    if $mp_rsh `hostname` -n uname >& /dev/null; then
+    if $mp_rsh `hostname` -n uname \>\& /dev/null; then
       mp_rsh_found=$mp_rsh
       break;
     else
