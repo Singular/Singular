@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.25 1998-10-29 13:27:55 Singular Exp $ */
+/* $Id: ipid.cc,v 1.26 1998-11-19 14:04:35 krueger Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -717,7 +717,10 @@ void paCleanUp(package pack)
   {
     if( pack->language == LANG_C)
     {
-      Print("//dclose(%s)\n",pack->libname);
+      Print("//dlclose(%s)\n",pack->libname);
+#ifdef HAVE_DYNAMIC_LOADING
+      dlclose(pack->handle);
+#endif /* HAVE_DYNAMIC_LOADING */
     }
     FreeL((ADDRESS)pack->libname);
     memset((void *) pack, 0, sizeof(package));

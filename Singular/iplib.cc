@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.40 1998-11-05 17:52:53 Singular Exp $ */
+/* $Id: iplib.cc,v 1.41 1998-11-19 14:04:36 krueger Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <string.h>
 //#include <ctype.h>
+#include <sys/stat.h>
 
 #include "mod2.h"
 #include "tok.h"
@@ -20,6 +21,7 @@
 #include "subexpr.h"
 #include "ipshell.h"
 #include "lists.h"
+
 #ifdef HAVE_LIBPARSER
 #  include "libparse.h"
 #else /* HAVE_LIBPARSER */
@@ -28,6 +30,10 @@
                                     BOOLEAN pstatic = FALSE);
 #endif /* HAVE_LIBPARSER */
 #define NS_LRING namespaceroot->next->currRing
+
+#ifdef HAVE_DYNAMIC_LOADING
+#  include <dlfcn.h>
+#endif /* HAVE_DYNAMIC_LOADING */
 
 char *iiConvName(char *p);
 #ifdef HAVE_LIBPARSER
@@ -39,6 +45,7 @@ extern char *yylp_errlist[];
 void print_init();
 libstackv library_stack;
 #endif
+
 
 /*2
 * find the library of an proc:
@@ -973,10 +980,9 @@ int iiAddCproc(char *libname, char *procname, BOOLEAN pstatic,
   procinfov pi;
   idhdl h;
 
-  h = enterid(mstrdup(procname),0, PROC_CMD, &IDROOT, FALSE);
+  h = enterid(mstrdup(procname),0, PROC_CMD, &IDROOT, TRUE);
   if ( h!= NULL )
   {
-    Print("register binary proc: %s::%s\n", libname, procname);
     pi = IDPROC(h);
     pi->libname = mstrdup(libname);
     pi->procname = mstrdup(procname);
@@ -991,6 +997,70 @@ int iiAddCproc(char *libname, char *procname, BOOLEAN pstatic,
     PrintS("iiAddCproc: failed.\n");
   }
   return(0);
+}
+
+/*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN tellerror)
+{
+  int iiAddCproc(char *libname, char *procname, BOOLEAN pstatic,
+                 BOOLEAN(*func)(leftv res, leftv v));
+  int (*fktn)(int(*iiAddCproc)(char *libname, char *procname,
+                               BOOLEAN pstatic,
+                               BOOLEAN(*func)(leftv res, leftv v)));
+  idhdl pl;
+  char *plib = iiConvName(newlib);
+  BOOLEAN RET=TRUE;
+  int token;
+  char FullName[256];
+  
+  if( *fullname != '/' &&  *fullname != '.' )
+    sprintf(FullName, "./%s", newlib);
+  else strcpy(FullName, fullname);
+  
+
+  if(IsCmd(plib, &token))
+  {
+    Werror("'%s' is resered identifier\n", plib);
+    goto load_modules_end;
+  }
+
+  pl = namespaceroot->get(plib,0, TRUE);
+  if (pl==NULL)
+  {
+    pl = enterid( mstrdup(plib),0, PACKAGE_CMD,
+                  &NSROOT(namespaceroot->root), TRUE );
+    IDPACKAGE(pl)->language = LANG_C;
+    IDPACKAGE(pl)->libname=mstrdup(newlib);
+  }
+  else
+  {
+    if(IDTYP(pl)!=PACKAGE_CMD)
+    {
+      Warn("not of typ package.");
+      goto load_modules_end; 
+    }
+  }
+  namespaceroot->push(IDPACKAGE(pl), IDID(pl));
+
+  if((IDPACKAGE(pl)->handle=dlopen(FullName, RTLD_GLOBAL))==(void *)NULL)
+  {
+    WerrorS("dlopen failed");
+    Werror("%s not found", newlib);
+    goto load_modules_end; 
+  }
+  else
+  {
+    fktn = dlsym(IDPACKAGE(pl)->handle, "mod_init");
+    if( fktn!= NULL) (*fktn)(iiAddCproc);
+    else Werror("mod_init: %s\n", dlerror());
+    if (BVERBOSE(V_LOAD_LIB)) Print( "// ** loaded %s \n", fullname);
+  }
+  RET=FALSE;
+
+  load_modules_end:
+  namespaceroot->pop();
+  return RET;
+  
 }
 #endif /* HAVE_DYNAMIC_LOADING */
 
@@ -1040,7 +1110,8 @@ void piShowProcList()
   Print( "%-15s  %20s      %s,%s  %s,%s   %s,%s\n", "Library", "function",
          "line", "start", "line", "body", "line", "example");
 #ifdef HAVE_NAMESPACES
-  for(pl = IDROOT; pl != NULL; pl = IDNEXT(pl)) {
+//  for(pl = IDROOT; pl != NULL; pl = IDNEXT(pl)) {
+    for(pl = NSROOT(namespaceroot->root); pl != NULL; pl = IDNEXT(pl)) {
     if(IDTYP(pl) == PACKAGE_CMD) {
       for(h = IDPACKAGE(pl)->idroot; h != NULL; h = IDNEXT(h))
 #else /* HAVE_NAMESPACES */
@@ -1124,4 +1195,48 @@ libstackv libstack::pop(char *p)
 }
 
 #endif /* HAVE_LIBPARSER */
+/*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+#ifndef HOWMANY
+# define HOWMANY 8192           /* how much of the file to look at */
+#endif
+
+lib_types type_of_LIB(char *newlib, char *libnamebuf)
+{
+  unsigned char	buf[HOWMANY+1];	/* one extra for terminating '\0' */
+  struct stat sb;
+  int nbytes = 0;
+  int ret;
+  lib_types LT=LT_NONE;
+
+  FILE * fp = feFopen( newlib, "r", libnamebuf, FALSE );
+  ret = stat(libnamebuf, &sb);
+  
+  if (fp==NULL)
+  {
+    return LT;
+  }
+  if((sb.st_mode & S_IFMT) != S_IFREG) {
+    goto lib_type_end;
+  }
+  if ((nbytes = fread((char *)buf, sizeof(char), HOWMANY, fp)) == -1) {
+    goto lib_type_end;
+    /*NOTREACHED*/
+  }
+  if (nbytes == 0)
+    goto lib_type_end;
+  else {
+    buf[nbytes++] = '\0';	/* null-terminate it */
+  }
+  if( (strncmp(buf, "\177ELF\01\01\01", 7)==0) && buf[16]=='\03') {
+    LT = LT_ELF;
+    FreeL(newlib);
+    newlib = mstrdup(libnamebuf);
+    goto lib_type_end;
+  }
+  if(isprint(buf[0])) { LT = LT_SINGULAR; goto lib_type_end; }
+  
+  lib_type_end:
+  close(fp);
+  return LT;
+}
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/

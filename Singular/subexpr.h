@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: subexpr.h,v 1.11 1998-10-22 12:26:09 krueger Exp $ */
+/* $Id: subexpr.h,v 1.12 1998-11-19 14:04:38 krueger Exp $ */
 /*
 * ABSTRACT: handling of leftv
 */
@@ -168,4 +168,7 @@ class libstack
   inline char *get() { return(libname); }
 };
 #endif /* HAVE_LIBPARSER */
+
+typedef enum { LT_NONE, LT_SINGULAR, LT_ELF} lib_types;
+lib_types type_of_LIB(char *newlib, char *fullname);
 #endif

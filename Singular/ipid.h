@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.h,v 1.20 1998-11-04 15:55:30 obachman Exp $ */
+/* $Id: ipid.h,v 1.21 1998-11-19 14:04:35 krueger Exp $ */
 /*
 * ABSTRACT: identfier handling
 */
@@ -78,6 +78,7 @@ struct sip_package
   char          *libname;
   short         ref;
   language_defs language;
+  void          *handle;
 };
 
 inline package paCopy(package pack)

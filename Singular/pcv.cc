@@ -1,12 +1,15 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: pcv.cc,v 1.5 1998-11-18 14:12:24 mschulze Exp $ */
+/* $Id: pcv.cc,v 1.6 1998-11-19 14:04:39 krueger Exp $ */
 /*
 * ABSTRACT: conversion between polys and coeff vectors
 */
 
 #include "mod2.h"
+
+/* compile as module if DYNAMIC_LOADING is enabled */
+#ifndef HAVE_DYNAMIC_LOADING
 #include "tok.h"
 #include "ipid.h"
 #include "numbers.h"
@@ -519,3 +522,4 @@ BOOLEAN iiPcvOrd(leftv res, leftv h)
   WerrorS("<poly>[,<intvec>] expected");
   return TRUE;
 }
+#endif /* not HAVE_DYNAMIC_LOADING */

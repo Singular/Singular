@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.75 1998-11-13 12:20:58 obachman Exp $ */
+/* $Id: extra.cc,v 1.76 1998-11-19 14:04:31 krueger Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -70,9 +70,17 @@
 #include <dlfcn.h>
 #endif /* HAVE_DYNAMIC_LOADING */
 
+/*
+ *   New function/system-calls that will be included as dynamic module
+ * should be inserted here.
+ * - without HAVE_DYNAMIC_LOADING: these functions comes as system("....");
+ * - with    HAVE_DYNAMIC_LOADING: these functions are loaded as module.
+ */
+#ifndef HAVE_DYNAMIC_LOADING
 #ifdef HAVE_PCV
 #include "pcv.h"
 #endif
+#endif /* not HAVE_DYNAMIC_LOADING */
 
 // see clapsing.cc for a description of the `FACTORY_*' options
 
@@ -400,6 +408,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     char *sys_cmd=(char *)(h->Data());
     h=h->next;
 /*==================== pcv ==================================*/
+#ifndef HAVE_DYNAMIC_LOADING
 #ifdef HAVE_PCV
     if(strcmp(sys_cmd,"pcvConv")==0)
     {
@@ -419,6 +428,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 #endif
+#endif /* not HAVE_DYNAMIC_LOADING */
 /*==================== naIdeal ==================================*/
     if(strcmp(sys_cmd,"naIdeal")==0)
     {
@@ -710,21 +720,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 #ifdef HAVE_NAMESPACES
-/*==================== lib ==================================*/
-    if(strcmp(sys_cmd,"nn")==0)
-    {
-      if ((h!=NULL) && (h->Typ()==STRING_CMD))
-      {
-        idhdl pck = NULL, id = NULL;
-        iiname2hdl(h->Data(), &pck, &id);
-        if(pck != NULL) Print("Pack: '%s'\n", pck->id);
-        if(id != NULL)  Print("Rec : '%s'\n", id->id);
-        return FALSE;
-      }
-      else
-        Warn("`%s` not found",(char*)h->Data());
-    }
-    else
 /*==================== nspush ===================================*/
     if(strcmp(sys_cmd,"nspush")==0)
     {
@@ -764,39 +759,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       return FALSE;
     }
     else
-#ifdef HAVE_DYNAMIC_LOADING
-/*==================== load ==================================*/
-    if(strcmp(sys_cmd,"load")==0)
-    {
-      if ((h!=NULL) && (h->Typ()==STRING_CMD)) {
-        int iiAddCproc(char *libname, char *procname, BOOLEAN pstatic,
-                       BOOLEAN(*func)(leftv res, leftv v));
-        int (*fktn)(int(*iiAddCproc)(char *libname, char *procname,
-                                     BOOLEAN pstatic,
-                                     BOOLEAN(*func)(leftv res, leftv v)));
-        void *vp;
-        res->rtyp=STRING_CMD;
-
-        fprintf(stderr, "Loading %s\n", h->Data());
-        res->data=(void *)mstrdup("");
-        if((vp=dlopen(h->next->Data(),RTLD_LAZY))==(void *)NULL)
-        {
-          WerrorS("dlopen failed");
-          Werror("%s not found", h->Data());
-        }
-        else
-        {
-          fktn = dlsym(vp, "mod_init");
-          if( fktn!= NULL) (*fktn)(iiAddCproc);
-          else Werror("mod_init: %s\n", dlerror());
-          piShowProcList();
-        }
-        return FALSE;
-      }
-      else WerrorS("string expected");
-    }
-    else
-#endif /* HAVE_DYNAMIC_LOADING */
 /* ==================== newton ================================*/
 #ifdef HAVE_NEWTON
     if(strcmp(sys_cmd,"newton")==0)

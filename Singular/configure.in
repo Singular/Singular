@@ -417,14 +417,17 @@ AC_ARG_WITH(
   dbm,
   [  --without-dbm           do not use dbm (no DBM links)])
 AC_ARG_WITH(
-  dld,
-  [  --without-dld           do not use dld (no dynamic linking)])
-AC_ARG_WITH(
   factory,
   [  --without-factory       do not use factory (no poly factorization)])
 AC_ARG_WITH(
   libfac,
   [  --without-libfac        do not use libfac (no primary decompositions)])
+AC_ARG_WITH(
+  namespaces,
+  [  --with-namespaces       do compile namespace support])
+AC_ARG_WITH(
+  dl,
+  [  --with-dl               do use dl (no dynamic linking)])
 AC_ARG_WITH(apint, 
   [  --with-apint=PACKAGE    use PACKAGE for arbitary integer arithmetic
                              where PACKAGE can be gmp, smallgmp])
@@ -530,10 +533,10 @@ else
 fi
 
 #   
-# dld
-if test "$with_dld" = yes; then
-  AC_CHECK_LIB(dld, dld_init,\
-   AC_MSG_WARN(building without dld: disabling dynamic linking))
+# dl
+if test "$with_dl" = yes; then
+  AC_CHECK_LIB(dl, dl_init,\
+   AC_MSG_WARN(building without dl: disabling dynamic linking))
 fi
 
 NEED_LIBS=$LIBS
@@ -693,6 +696,23 @@ if test "$with_dbm" != no; then
   AC_MSG_RESULT(yes)
 else
   AC_MSG_RESULT(no)
+fi
+
+AC_MSG_CHECKING(whether to have namespaces links)
+if test "$with_namespaces" != yes; then
+  AC_MSG_RESULT(no)
+else
+  AC_DEFINE(HAVE_NAMESPACES) 
+  AC_MSG_RESULT(yes)
+fi
+
+AC_MSG_CHECKING(whether to have dynamic loading links)
+if test "$with_dl" != yes; then
+  AC_MSG_RESULT(no)
+else
+  AC_DEFINE(HAVE_DYNAMIC_LOADING) 
+  LDFLAGS="${LDFLAGS} -rdynamic -ldl"
+  AC_MSG_RESULT(yes)
 fi
 
 dnl

@@ -2920,7 +2920,34 @@ static BOOLEAN jjVDIM(leftv res, leftv v)
 
 static BOOLEAN jjLOAD(leftv res, leftv v)
 {
-  return(iiLibCmd((char *)v->CopyD(), FALSE));
+  char * s=mstrdup((char *)v->Data());
+  char libnamebuf[256];
+  lib_types LT = type_of_LIB(s, libnamebuf);
+  BOOLEAN result = TRUE;
+#ifdef HAVE_DYNAMIC_LOADING
+  extern BOOLEAN load_modules(char *newlib, char *fullpath, BOOLEAN tellerror);
+#endif /* HAVE_DYNAMIC_LOADING */
+  
+  switch(LT) {
+      default:
+      case LT_NONE:
+        Werror("%s: unknown type", s);
+        break;
+
+      case LT_SINGULAR:
+        result = iiLibCmd(s, FALSE);
+        break;
+ 
+      case LT_ELF:
+#ifdef HAVE_DYNAMIC_LOADING
+        result = load_modules(s, libnamebuf, FALSE);
+#else /* HAVE_DYNAMIC_LOADING */
+        Print("Dynamic modules are not supported by this version of Singular");
+#endif /* HAVE_DYNAMIC_LOADING */
+        break;
+        
+  }
+  return result;
 }
 
 /*=================== operations with 1 arg.: table =================*/
