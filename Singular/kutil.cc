@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.88 2000-12-20 11:15:45 obachman Exp $ */
+/* $Id: kutil.cc,v 1.89 2000-12-20 13:38:21 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -2643,7 +2643,7 @@ poly redtail (LObject* L, int pos, kStrategy strat)
   TObject  With_s(strat->tailRing);
   h = p;
   hn = pNext(h);
-  long op = pFDeg(hn, strat->tailRing);
+  long op = strat->tailRing->pFDeg(hn, strat->tailRing);
   long e;
   int l;
   BOOLEAN save_HE=strat->kHEdgeFound;
@@ -2652,7 +2652,7 @@ poly redtail (LObject* L, int pos, kStrategy strat)
 
   while(hn != NULL)
   {
-    op = pFDeg(hn, strat->tailRing);
+    op = strat->tailRing->pFDeg(hn, strat->tailRing);
     if ((Kstd1_deg>0)&&(op>Kstd1_deg)) goto all_done;
     e = pLDeg(hn, &l, strat->tailRing) - op;
     while (1)
@@ -2678,7 +2678,7 @@ poly redtail (LObject* L, int pos, kStrategy strat)
       }
       hn = pNext(h);
       if (hn == NULL) goto all_done;
-      op = pFDeg(hn, strat->tailRing);
+      op = strat->tailRing->pFDeg(hn, strat->tailRing);
       if ((Kstd1_deg>0)&&(op>Kstd1_deg)) goto all_done;
       e = pLDeg(hn, &l) - op;
     }
