@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.cc,v 1.18 1999-08-19 16:28:14 Singular Exp $ */
+/* $Id: syz.cc,v 1.19 1999-08-19 16:57:11 Singular Exp $ */
 
 /*
 * ABSTRACT: resolutions
@@ -348,6 +348,7 @@ static void syMinStep1(resolvente res, int length)
     have_del = NULL;
     index++;
   }
+  if (TEST_OPT_PROT) PrintLn();
   syKillEmptyEntres(res,length);
 }
 
