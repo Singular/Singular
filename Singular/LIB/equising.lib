@@ -1,18 +1,17 @@
-version="$Id: equising.lib,v 1.5 2000-12-22 13:44:24 greuel Exp $";
+version="$Id: equising.lib,v 1.6 2001-01-31 15:36:02 lossen Exp $";
 category="Singularities";
 info="
 LIBRARY:  equising.lib  Equisingularity Stratum of a Family of Plane Curves
-AUTHOR:   Andrea Mindnich, e-mail:mindnich@mathematik.uni-kl.de
+AUTHOR:   Andrea Mindnich, mindnich@mathematik.uni-kl.de
 
 PROCEDURES:
- esStratum   computes the equisingularity stratum of a deformation
- isEquising  tests, whether a given deformation is equisingular
-"
+ esStratum(F[,m]);   computes the equisingularity stratum of a deformation
+ isEquising(F[,m]);  tests, whether a given deformation is equisingular
+";
 
 LIB "poly.lib";
 LIB "elim.lib";
 LIB "hnoether.lib";
-
 ///////////////////////////////////////////////////////////////////////////////
 // COMPUTES  a weight vector. x and y get weight 1 and all other
 //           variables get weight 0.
@@ -1159,7 +1158,7 @@ static proc equisingTest (poly p_F, intvec multSeq, int maxStep)
 ///////////////////////////////////////////////////////////////////////////////
 
 proc isEquising (poly p_F, list #)
-"USAGE:   esStratum(F[,m]); F a polynomial, m an integer
+"USAGE:   isEquising(F[,m]); F a polynomial, m an integer
 ASSUME:  F defines a deformation of an irreducible bivariate polynomial f
          and that char(basering) does not divide mult(f).
          If nv is the number of variables of the basering, then the first nv-2

@@ -1,12 +1,13 @@
 // (anne, last modified 31.5.99)
 /////////////////////////////////////////////////////////////////////////////
-version="$Id: spcurve.lib,v 1.13 2000-12-22 14:49:25 greuel Exp $";
+version="$Id: spcurve.lib,v 1.14 2001-01-31 15:36:02 lossen Exp $";
 category="Singularities";
 info="
 LIBRARY: spcurve.lib    Deformations and Invariants of CM-codim 2 Singularities
 AUTHOR:  Anne Fruehbis-Krueger, anne@mathematik.uni-kl.de
 last modified: 31.5.99
 
+PROCEDURES:
  isCMcod2(i);            presentation matrix of the ideal i, if i is CM
  CMtype(i);              Cohen-Macaulay type of the ideal i
  matrixT1(M,n);          1st order deformation T1 in matrix description
