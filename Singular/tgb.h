@@ -36,7 +36,8 @@ struct sorted_pair_node{
   poly lcm_of_lm;
 };
 
-
+ideal t_rep_gb(ring r,ideal arg_I, ideal arg_debug_Ideal=NULL);
+static ideal debug_Ideal;
 /** 
     reduction_accumulators are objects which are shared by several sums
  **/
@@ -137,7 +138,7 @@ static void shorten_tails(calc_dat* c, poly monom);
 static void replace_pair(int & i, int & j, calc_dat* c);
 static sorted_pair_node** add_to_basis(poly h, int i, int j,calc_dat* c, int* ip=NULL);
 static void do_this_spoly_stuff(int i,int j,calc_dat* c);
-ideal t_rep_gb(ring r,ideal arg_I);
+//ideal t_rep_gb(ring r,ideal arg_I);
 static BOOLEAN has_t_rep(const int & arg_i, const int & arg_j, calc_dat* state);
 static int* make_connections(int from, poly bound, calc_dat* c);
 static int* make_connections(int from, int to, poly bound, calc_dat* c);
