@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: nctools.lib,v 1.8 2004-08-13 12:39:36 levandov Exp $";
+version="$Id: nctools.lib,v 1.9 2004-12-14 20:50:49 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: nctools.lib     General tools for noncommutative algebras
@@ -25,6 +25,7 @@ AUXILIARY PROCEDURES:
 Newton(f);  		Newton diagram of a polynomial f,
 NCRelations(r);		Recovers the non-commutative relations of a G-algebra,
 IsCentral(p,[v]);       Check for the commutativity of polynomial p with the G-algebra,
+Is_NC();                Checks whether basering is noncommutative,
 UpOneMatrix(N);         Returns NxN matrix with 1's in the whole upper triagle,
 
 ALIAS PROCEDURES:
@@ -906,6 +907,43 @@ example
    def a = CreateWeyl(3);
    setring a;
    a;
+}
+
+//////////////////////////////////////////////////////////////////////
+
+proc Is_NC()
+"USAGE:   Is_NC();
+RETURN:   1, if basering is noncommutative; 0 otherwise.
+EXAMPLE: example Is_NC; shows examples
+"{
+  string rname=nameof(basering);
+  if ( rname == "basering") // i.e. no ring has been set yet
+  {
+    "You have to call the procedure from the ring";
+    return();
+  }
+  int n = nvars(basering);
+  int i,j;
+  poly p;
+  for (i=1; i<n; i++)
+  {
+    for (j=i+1; j<=n; j++)
+    {
+      p = var(j)*var(i) - var(i)*var(j);
+      if (p!=0) { return(1);}
+    }
+  }
+  return(0);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   def a = CreateWeyl(2);
+   setring a;
+   Is_NC();
+   kill a;
+   ring r = 17,(x(1..7)),dp;
+   Is_NC();
+   kill r;
 }
 
 //////////////////////////////////////////////////////////////////////
