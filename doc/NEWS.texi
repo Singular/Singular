@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.25 2000-12-15 16:20:47 Singular Exp $
+@comment $Id: NEWS.texi,v 1.26 2000-12-19 15:49:19 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -101,10 +101,15 @@ Rees Algebra and integral closure of an ideal
 @item @nref{brnoeth_lib}
 Brill-Noether algorithm, Weierstrass semigroups and AG codes
 @c @item @nref{stratify_lib}
+@c Algorithmic stratification by the Greuel-Pfister algorithm
 @item @nref{paramet_lib}
+parametrization of curves
 @item @nref{rinvar_lib}
+Invariant rings of reductive groups
 @item @nref{zeroset_lib}
+Procedures for roots and factorization
 @item @nref{qhmoduli_lib}
+Moduli spaces of sqh-singularities
 @end table
 
 @heading New @sc{Singular} functions
