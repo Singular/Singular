@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: INSTALL_rpm.texi,v 1.8 2002-03-27 17:38:18 keilen Exp $
+@comment $Id: INSTALL_rpm.texi,v 1.9 2002-04-18 08:11:12 mschulze Exp $
 @c FILE: INSTALL_rpm.texi
 @c PURPOSE: Installation instruction for Singular on RPM based Linux systems
 @c
@@ -107,7 +107,7 @@ in a command shell.
 @item
 To install the @sc{Singular} shared @sc{rpm} package, type
 @smallexample
-rpm -ivh Singular-shared-@value{RPM_VERSION}-1.noarch.rpm
+rpm -ivh Singular-share-@value{RPM_VERSION}-1.noarch.rpm
 @end smallexample
 in a command shell.
 @item
