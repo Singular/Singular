@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: imm.h,v 1.7 1997-11-19 11:37:29 schmidt Exp $ */
+/* $Id: imm.h,v 1.8 1997-11-20 15:25:05 schmidt Exp $ */
 
 #ifndef INCL_IMM_H
 #define INCL_IMM_H
@@ -33,44 +33,6 @@ const long long int MAXIMMEDIATELL = 268435454;
 const long long int MINIMMEDIATELL = -268435454LL;
 const long long int MAXIMMEDIATELL = 268435454LL;
 #endif
-
-//{{{ predicates
-inline int is_imm ( const InternalCF * const ptr )
-{
-    // returns 0 if ptr is not immediate
-    return ( (int)ptr & 3 );
-}
-
-inline int imm_iszero ( const InternalCF * const ptr )
-{
-    return imm2int( ptr ) == 0;
-}
-
-inline int imm_isone ( const InternalCF * const ptr )
-{
-    return imm2int( ptr ) == 1;
-}
-
-inline int imm_iszero_p ( const InternalCF * const ptr )
-{
-    return imm2int( ptr ) == 0;
-}
-
-inline int imm_isone_p ( const InternalCF * const ptr )
-{
-    return imm2int( ptr ) == 1;
-}
-
-inline int imm_iszero_gf ( const InternalCF * const ptr )
-{
-    return gf_iszero( imm2int( ptr ) );
-}
-
-inline int imm_isone_gf ( const InternalCF * const ptr )
-{
-    return gf_isone( imm2int( ptr ) );
-}
-//}}}
 
 //{{{ conversion functions
 #ifdef HAS_ARITHMETIC_SHIFT
@@ -115,7 +77,47 @@ inline InternalCF * int2imm_gf ( int i )
 {
     return (InternalCF*)((i << 2) | GFMARK );
 }
+//}}}
 
+//{{{ predicates
+inline int is_imm ( const InternalCF * const ptr )
+{
+    // returns 0 if ptr is not immediate
+    return ( (int)ptr & 3 );
+}
+
+inline int imm_iszero ( const InternalCF * const ptr )
+{
+    return imm2int( ptr ) == 0;
+}
+
+inline int imm_isone ( const InternalCF * const ptr )
+{
+    return imm2int( ptr ) == 1;
+}
+
+inline int imm_iszero_p ( const InternalCF * const ptr )
+{
+    return imm2int( ptr ) == 0;
+}
+
+inline int imm_isone_p ( const InternalCF * const ptr )
+{
+    return imm2int( ptr ) == 1;
+}
+
+inline int imm_iszero_gf ( const InternalCF * const ptr )
+{
+    return gf_iszero( imm2int( ptr ) );
+}
+
+inline int imm_isone_gf ( const InternalCF * const ptr )
+{
+    return gf_isone( imm2int( ptr ) );
+}
+//}}}
+
+//{{{ conversion functions
 inline int imm_intval ( const InternalCF* const op )
 {
     if ( is_imm( op ) == FFMARK )
@@ -141,11 +143,10 @@ inline int imm_intval ( const InternalCF* const op )
 // imm_sign() - return sign of immediate object.
 //
 // If CO is an immediate integer, the sign is defined as usual.
-// If CO is an element of a finite field and SW_SYMMETRIC_FF is
-// on the sign of CO is the sign of the symmetric representation
-// of CO.  If CO is in GF(q) or in a finite field and
-// SW_SYMMETRIC_FF is off, the sign of CO is zero iff CO is zero,
-// otherwise the sign is one.
+// If CO is an element of FF(p) and SW_SYMMETRIC_FF is on the
+// sign of CO is the sign of the symmetric representation of CO.
+// If CO is in GF(q) or in FF(p) and SW_SYMMETRIC_FF is off, the
+// sign of CO is zero iff CO is zero, otherwise the sign is one.
 //
 // See alse: CanonicalForm::sign(), gf_sign()
 //
