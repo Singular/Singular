@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.154 2001-02-01 13:23:12 mschulze Exp $ */
+/* $Id: extra.cc,v 1.155 2001-02-01 21:19:53 obachman Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -86,7 +86,9 @@ extern "C"
 #include "silink.h"
 #include "walk.h"
 
+#ifdef HAVE_RDNF
 #include "rednf.h"
+#endif
 
 /*
  *   New function/system-calls that will be included as dynamic module
@@ -501,6 +503,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
 #endif
+#ifdef HAVE_REDNF
 /*==================== rednf ==================================*/
     if(strcmp(sys_cmd,"invunit")==0)
     {
@@ -517,6 +520,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       return rednf(res,h);
     }
     else
+#endif
 /*==================== pcv ==================================*/
 #ifndef HAVE_DYNAMIC_LOADING
 #ifdef HAVE_PCV

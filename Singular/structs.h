@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.55 2001-01-30 13:37:02 Singular Exp $ */
+/* $Id: structs.h,v 1.56 2001-02-01 21:19:54 obachman Exp $ */
 /*
 * ABSTRACT
 */
@@ -142,7 +142,7 @@ typedef struct s_si_link_extension *si_link_extension;
 #ifndef LONGALGNEW
 typedef struct reca *      napoly;
 #else /* LONGALGNEW */
-typedef struct polyrec *   napoly;
+typedef polyrec *   napoly;
 #endif /* LONGALGNEW */
 
 #ifdef __cplusplus
