@@ -250,11 +250,13 @@ libparse.cc: libparse.l
 # under cygwin
 ESingular: fegetopt.o feResource.cc mod2.h feOpt.cc version.h emacs.cc \
            feOptES.inc
-	${CXX} -O ${DEFS} -DESINGULAR -o ESingular emacs.cc fegetopt.o 
+	${CXX} -O ${DEFS} -DESINGULAR -o ESingular emacs.cc fegetopt.o \
+	${LDFLAGS} ${LIBS} ${LD_LIBC}
 
 TSingular: fegetopt.o feResource.cc mod2.h feOpt.cc version.h emacs.cc \
            feOptTS.inc
-	${CXX} -O ${DEFS} -DTSINGULAR -o TSingular emacs.cc fegetopt.o 
+	${CXX} -O ${DEFS} -DTSINGULAR -o TSingular emacs.cc fegetopt.o \
+	${LDFLAGS} ${LIBS} ${LD_LIBC}
 
 feOpt.h: feOpt.inc feOptES.inc feOptTS.inc
 
