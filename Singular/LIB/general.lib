@@ -1,7 +1,7 @@
 //GMG, last modified 18.6.99
 //anne, added deleteSublist and watchdog 12.12.2000
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: general.lib,v 1.40 2001-08-27 14:47:50 Singular Exp $";
+version="$Id: general.lib,v 1.41 2001-11-05 16:05:48 pfister Exp $";
 category="General purpose";
 info="
 LIBRARY:  general.lib   Elementary Computations of General Type
@@ -23,10 +23,14 @@ PROCEDURES:
  sum(vector/id/..[,v]); add components of vector/ideal/...[with indices v]
  watchdog(i,cmd);       only wait for result of command cmd for i seconds
  which(command);        search for command and return absolute path, if found
+ primecoeffs(J[,q]);    primefactors <= min(p,32003) of coeffs of J 
+ primefactors(n [,p]);  primefactors <= min(p,32003) of n
            (parameters in square brackets [] are optional)
 ";
 
 LIB "inout.lib";
+LIB "poly.lib";
+LIB "matrix.lib";
 ///////////////////////////////////////////////////////////////////////////////
 
 proc A_Z (string s,int n)
@@ -1209,4 +1213,265 @@ example
    l=deleteSublist(v,l);
    l;
 }
+///////////////////////////////////////////////////////////////////////////////
+proc primefactors (n, list #)
+"USAGE:   primefactors(n [,p]); n = int or number, p = integer
+COMPUTE: primefactors <= min(p,32003) of n (default p = 32003)
+RETURN:  a list, say l, 
+         l[1] : primefactors <= min(p,32003) of n 
+         l[2] : l[2][i] = multiplicity of l[1][i]
+         l[3] : remaining factor ( n=product{ (l[1][i]^l[2][i])*l[3]} )
+                type(l[3])=typeof(n)
+NOTE:    If n is a long integer (of type number) then the procedure
+         finds primefactors <= min(p,32003) but n may be larger as
+         2147483647 (max. integer representation)
+WARNING: the procedure works for small integers only, just by testing all
+         primes (not to be considerd as serious prime factorization!)
+EXAMPLE: example primefactors; shows an example
+"
+{
+   int ii,jj,z,p,num,w3,q;
+   intvec w1,w2,v;
+   list l;
+   if (size(#) == 0) 
+   {
+      p=32003; 
+   }
+   else 
+   {
+     if( typeof(#[1]) != "int")
+     {
+       ERROR("2nd parameter must be of type int"+newline);
+     }
+     p=#[1];
+   }
+   if( n<0) { n=-n;};
+
+// ----------------- case: 1st parameter is a number --------------------   
+   if (typeof(n) =="number")
+   {
+     kill w3;
+     number w3;
+     if( n > 2147483647 )           //2147483647 max. integer representation
+     {
+        v = primes(2,p);
+        number m;
+        for( ii=1; ii<=size(v); ii++)
+        { 
+          jj=0;
+          while(1)
+          { 
+            q  = v[ii];
+            jj = jj+1;             
+            m  = n/q;                  //divide n as often as possible
+            if (denominator(m)!=1) { break;  }
+            n=m;
+          }
+          if( jj>1 ) 
+          {
+             w1 = w1,v[ii];          //primes
+             w2 = w2,jj-1;           //powers
+          }
+          if( n <= 2147483647 ) { break;  }
+        }
+     }
+
+     if( n >  2147483647 )            //n is still too big
+     {
+       if( size(w1) >1 )               //at least 1 primefactor was found
+       {
+         w1 = w1[2..size(w1)];
+         w2 = w2[2..size(w2)];
+       } 
+       else                           //no primefactor was found
+       {
+         w1 = 1; w2 = 1;
+       }     
+       l  = w1,w2,n;
+       return(l);
+     }
+
+     if( n <= 2147483647 )          //n is in inter range
+     {
+       num = int(n);
+       kill n;
+       int n = num;
+     }
+   }
+   
+// --------------------------- trivial cases --------------------
+   if( n==0 ) 
+   {  
+     w1=1; w2=1; w3=0; l=w1,w2,w3;
+     return(l);
+   }
+   
+   if( n==1 ) 
+   {   
+       w3=1;
+       if( size(w1) >1 )               //at least 1 primefactor was found
+       {
+         w1 = w1[2..size(w1)];
+         w2 = w2[2..size(w2)];
+       } 
+       else                           //no primefactor was found
+       {
+         w1 = 1; w2 = 1;
+       }     
+      l=w1,w2,w3;
+      return(l);
+   }
+   if ( prime(n)==n )         //note: prime(n) <= 32003 in Singular
+   {                          //case n is a prime
+      if (p > n)
+      {  
+        w1=w1,n; w2=w2,1; w3=1;
+        w1 = w1[2..size(w1)];
+        w2 = w2[2..size(w2)];
+        l=w1,w2,w3;
+        return(l);
+      }
+      else
+      {
+        w3=n;
+        if( size(w1) >1 )               //at least 1 primefactor was found
+        {
+           w1 = w1[2..size(w1)];
+           w2 = w2[2..size(w2)];
+         } 
+         else                           //no primefactor was found
+         {
+           w1 = 1; w2 = 1;
+         }     
+         l=w1,w2,w3;
+        return(l);
+      }      
+   }
+   else 
+   {
+      if ( p >= n)
+      {
+         v = primes(q,n div 2 + 1);
+      }
+      else
+      {
+         v = primes(q,p);
+      }
+//------------- search for primfactors <= last entry of v ------------    
+      for(ii=1; ii<=size(v); ii++)
+      {
+         z=0;
+         while( (n mod v[ii]) == 0 )
+         {  
+            z=z+1;
+            n = n div v[ii];
+         }
+         if (z!=0)
+         { 
+            w1 = w1,v[ii];        //primes
+            w2 = w2,z;            //multiplicities
+         }
+      }
+   }
+//--------------- case:at least 1 primefactor was found ---------------
+   if( size(w1) >1 )               //at least 1 primefactor was found
+   {
+      w1 = w1[2..size(w1)];
+      w2 = w2[2..size(w2)];
+   } 
+   else                           //no primefactor was found
+   {
+     w1 = 1; w2 = 1;
+   } 
+   w3 = n;
+   l  = w1,w2,w3;
+   return(l);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   primefactors(7*8*121);
+   ring r = 0,x,dp;
+   primefactors(123456789100);
+}  
+
+///////////////////////////////////////////////////////////////////////////////
+proc primecoeffs(J, list #)
+"USAGE:   primecoeffs(J[,q]); J any type which can be converted to a matrix
+         e.g. ideal, matrix, vector, module, int, intvec
+         q = intger
+COMPUTE: primefactors <= min(p,32003) of coeffs of J (default p = 32003)
+RETURN:  a list, say l, of two intvectors:
+         l[1] : the different primefactors of all coefficients of J
+         l[2] : the different remaining factors
+NOTE:    the procedure works for small integers only, just by testing all
+         primes (not to be considerd as serious prime factorization!)
+EXAMPLE: example primecoeffs; shows an example
+"
+{
+   int q,ii,n,mark;;
+   if (size(#) == 0) 
+   {
+      q=32003; 
+   }
+   else 
+   {
+     if( typeof(#[1]) != "int")
+     {
+       ERROR("2nd parameter must be of type int"+newline);
+     }
+     q=#[1];
+   }
+
+   if (defined(basering) == 0)
+   {
+     mark=1;
+     ring r = 0,x,dp;
+   }
+   def I = ideal(matrix(J));
+   poly p = product(maxideal(1));
+   matrix Coef=coef(I[1],p); 
+   ideal id, jd, rest;
+   intvec v,re;
+   list result,l;
+   for(ii=2; ii<=ncols(I); ii++)
+   {
+     Coef=concat(Coef,coef(I[ii],p));
+   }
+   id = Coef[2,1..ncols(Coef)];
+   id = simplify(id,6);
+   for (ii=1; ii<=size(id); ii++)  
+   {   
+     l = primefactors(number(id[ii]),q);     
+     jd = jd,l[1];
+     rest = rest,l[3];
+   } 
+   jd = simplify(jd,6);
+   for (ii=1; ii<=size(jd); ii++)  
+   { 
+     v[ii]=int(jd[ii]);
+   }
+   v = sort(v)[1];
+   rest = simplify(rest,6);
+   id = sort(id)[1];
+   if (mark)
+   {
+     for (ii=1; ii<=size(rest); ii++)
+     {
+       re[ii] = int(rest[ii]);
+     }
+     result = v,re;
+   }
+   else
+   {
+      result = v,rest; 
+   }
+   return(result);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   primecoeffs(intvec(7*8*121,7*8));"";
+   ring r = 0,(b,c,t),dp;
+   ideal I = -13b6c3t+4b5c4t,-10b4c2t-5b4ct2;
+   primecoeffs(I);
+}  
 ///////////////////////////////////////////////////////////////////////////////

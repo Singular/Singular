@@ -1,6 +1,6 @@
 //last change: 13.02.2001 (Eric Westenberger)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: presolve.lib,v 1.18 2001-08-27 14:47:57 Singular Exp $";
+version="$Id: presolve.lib,v 1.19 2001-11-05 16:06:29 pfister Exp $";
 category="Symbolic-numerical solving";
 info="
 LIBRARY:  presolve.lib     Pre-Solving of Polynomial Equations
@@ -20,7 +20,11 @@ PROCEDURES:
  sortandmap(id,s1,s2);  map to new basering with vars sorted w.r.t. complexity
  sortvars(id[n1,p1..]); sort vars w.r.t. complexity in id [different blocks]
  valvars(id[..]);       valuation of vars w.r.t. to their complexity in id
-           (parameters in square brackets [] are optional)
+ idealsSimplify(id);    ideal I = eliminate(Id,m) m is a product of variables
+                       which are only linearly involved in the generators of id
+ idealSplit(id,tF,fS);  a list of ideals such that their intersection 
+                        has the same radical as id
+                       ( parameters in square brackets [] are optional)
 ";
 
 LIB "inout.lib";
@@ -1165,6 +1169,163 @@ example
    valvars (i,0,xyz);
 }
 ///////////////////////////////////////////////////////////////////////////////
+proc idealSplit(ideal I,list #)
+"USAGE:  idealSplit(id,timeF,timeS);  id ideal and optioonal 
+         timeF ,timeS integers to bound the time which can be used
+         for factorization resp. standard basis computation
+RETURN:  a list of ideals such that their intersection 
+         has the same radical as id
+EXAMPLE: example idealSplit; shows an example
+"
+{
+   option(redSB);
+   int j,k,e;
+   int i=1;
+   int l=attrib(I,"isSB");
+   ideal J;
+   int timeF;
+   int timeS;
+   list re,fac,te;
+
+   if(size(#)==1)
+   {
+     if(typeof(#[1])=="ideal")
+     {
+        re=#;
+     }
+     else
+     {
+       timeF=#[1];
+     }
+   }
+   if(size(#)==2)
+   {
+     if(typeof(#[1])=="list")
+     {
+        re=#[1];
+        timeF=#[2];
+     }
+     else
+     {
+       timeF=#[1];
+       timeS=#[2];
+     }
+   }
+   if(size(#)==3){re=#[1];timeF=#[2];timeS=#[3];}
+
+   fac=timeFactorize(I[1],timeF);
+
+   while((size(fac[1])==2)&&(i<size(I)))
+   { 
+      i++; 
+      fac=timeFactorize(I[i],timeF);
+   }
+   if(size(fac[1])>2)
+   {
+      for(j=2;j<=size(fac[1]);j++)
+      {
+         I[i]=fac[1][j];
+         attrib(I,"isSB",1);
+         e=1;
+         k=0;
+         while(k<size(re))
+         {
+            k++;
+            if(size(reduce(re[k],I))==0){e=0;break;}
+            attrib(re[k],"isSB",1);
+            if(size(reduce(I,re[k]))==0){re=delete(re,k);k--;}
+         }
+         if(e)
+         {
+            if(l)
+            {
+               J=I;
+               J[i]=0;
+               J=simplify(J,2);
+               attrib(J,"isSB",1);
+               re=idealSplit(std(J,fac[1][j]),re,timeF,timeS);
+            }
+            else
+            {
+               re=idealSplit(timeStd(I,timeS),re,timeF,timeS);
+            }
+         }
+      } 
+      return(re); 
+   }
+   J=timeStd(I,timeS);
+   attrib(I,"isSB",1);
+   if(size(reduce(J,I))==0){return(re+list(I));}
+   return(re+idealSplit(J,re,timeF,timeS));
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r=32003,(b,s,t,u,v,w,x,y,z),dp;
+   ideal i=
+   bv+su,
+   bw+tu,
+   sw+tv,
+   by+sx,
+   bz+tx,
+   sz+ty,
+   uy+vx,
+   uz+wx,
+   vz+wy,
+   bvz;
+   idealSplit(i);
+}
+///////////////////////////////////////////////////////////////////////////////
+proc idealSimplify(ideal J,list #)
+"USAGE:  idealSimplify(id);  id ideal
+RETURN:  ideal I = eliminate(Id,m) m is a product of variables
+         which are only linearly involved in the generators of id
+EXAMPLE: example idealSimplify; shows an example
+"
+{
+   ideal I=J;
+   if(size(#)!=0){I=#[1];}
+   def R=basering;
+   matrix M=jacob(I);
+   ideal ma=maxideal(1);
+   int i,j,k;
+   map phi;
+
+   for(i=1;i<=nrows(M);i++)
+   {
+      for(j=1;j<=ncols(M);j++)
+      {       
+         if(deg(M[i,j])==0)
+         {
+            ma[j]=(-1/M[i,j])*(I[i]-M[i,j]*var(j));
+            phi=R,ma;
+            I=phi(I);
+            J=phi(J);
+            for(k=1;k<=ncols(I);k++){I[k]=cleardenom(I[k]);}
+            M=jacob(I);
+         }
+      }
+   }
+   J=simplify(J,2);
+   for(i=1;i<=size(J);i++){J[i]=cleardenom(J[i]);}
+   return(J);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r=0,(x,y,z,w,t),dp;
+   ideal i=
+   t,
+   x3+y2+2z,
+   x2+3y,
+   x2+y2+z2,
+   w2+z;
+   ideal j=idealSimplify(i);
+   ideal k=eliminate(i,zyt);
+   reduce(k,std(j));
+   reduce(j,std(k));
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 /*
 
  ring s=31991,(e,f,x,y,z,t,u,v,w,a,b,c,d),dp;
