@@ -253,16 +253,18 @@ dnl
 if test "${with_lex+set}" != set; then
   AC_MSG_CHECKING(for flex)
   changequote(<<,>>)dnl
+  cmd="egrep [2-9]\.[5-9]"
+  changequote([,])dnl
   AC_CACHE_VAL(ac_cv_prog_flex,
   if (flex --version >/dev/null 2>&1)
-  then
-    if (flex --version | egrep "[2-9]\.[5-9]" >/dev/null 2>&1)
     then
-      ac_cv_prog_flex=flex
+    if (flex --version | $cmd >/dev/null 2>&1 )
+    then
+	ac_cv_prog_flex=flex
     fi
   fi
   )
-  changequote([,])dnl
+  dnl changequote([,])dnl
   if test "${ac_cv_prog_flex+set}" = set; then
     AC_MSG_RESULT(flex)
     LEX=flex
@@ -362,14 +364,16 @@ AC_HEADER_STDC
 AC_CHECK_HEADERS(limits.h unistd.h,,
   AC_MSG_ERROR(Can not compile without limits.h unistd.h))
 
-AC_CHECK_HEADERS(sys/file.h sys/ioctl.h sys/time.h sys/times.h sys/types.h sys/stat.h fcntl.h sys/param.h pwd.h asm/sigcontext.h pwd.h termcap.h termios.h term.h readline/readline.h)
+AC_CHECK_HEADERS(sys/file.h sys/ioctl.h sys/time.h sys/times.h sys/types.h \
+ sys/stat.h fcntl.h sys/param.h pwd.h asm/sigcontext.h pwd.h termcap.h \
+ termios.h term.h readline/readline.h)
 
 # typedefs, structures
 AC_C_CONST
 AC_C_INLINE
 AC_TYPE_SIZE_T
-AC_HEADER_TIME
 AC_STRUCT_TM
+AC_HEADER_TIME
 
 # library functions.
 AC_FUNC_ALLOCA
@@ -378,7 +382,8 @@ AC_FUNC_MMAP
 AC_TYPE_SIGNAL
 AC_FUNC_VPRINTF
 AC_SEARCH_LIBS(setenv, bsd)
-AC_CHECK_FUNCS(gettimeofday atexit bcopy getcwd getwd vsnprintf readlink sleep usleep getpwnam popen setenv)
+AC_CHECK_FUNCS(gettimeofday atexit bcopy getcwd getwd vsnprintf readlink \
+ sleep usleep getpwnam popen setenv)
 
 
 dnl llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
@@ -646,7 +651,8 @@ AC_CHECK_LIB(omalloc, omTestAddr)
 AC_CHECK_LIB(omalloc_ndebug, main)
 AC_CHECK_LIB(ntl,main)
 
-AC_CHECK_HEADERS(gmp.h smallgmp.h MP.h  MPT.h factory.h factor.h omalloc.h omalloc.c)
+AC_CHECK_HEADERS(gmp.h smallgmp.h MP.h  MPT.h factory.h factor.h omalloc.h \
+ omalloc.c)
 
 if test "$ac_cv_lib_gmp_main" = yes && \
  test "$ac_cv_header_gmp_h" = yes; then
