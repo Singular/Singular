@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz2.cc,v 1.10 1999-11-19 16:42:43 obachman Exp $ */
+/* $Id: syz2.cc,v 1.11 1999-11-20 10:17:24 siebert Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -971,7 +971,10 @@ syStrategy syHilb(ideal arg,int * length)
   temp = idInit(IDELEMS(arg),arg->rank);
   for (i=0;i<IDELEMS(arg);i++)
   {
-    temp->m[i] = prCopyR( arg->m[i], origR);
+    if (origR != syzstr->syRing)
+      temp->m[i] = prCopyR( arg->m[i], origR);
+    else
+      temp->m[i] = pCopy( arg->m[i]);
     if (temp->m[i]!=NULL)
     {
       j = pTotaldegree(temp->m[i]);
@@ -1061,7 +1064,10 @@ crit_fails = 0;
   if (temp!=NULL) idDelete(&temp);
   kBucketDestroy(&(syzstr->bucket));
   kBucketDestroy(&(syzstr->syz_bucket));
-  rChangeCurrRing(origR,TRUE);
+  if (origR != syzstr->syRing)  
+    rChangeCurrRing(origR,TRUE);
+  else
+    currRing =  origR;
   if (TEST_OPT_PROT) PrintLn();
   return syzstr;
 }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.89 1999-11-19 16:42:41 obachman Exp $ */
+/* $Id: ring.cc,v 1.90 1999-11-20 10:17:24 siebert Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -3413,15 +3413,11 @@ static ring rCurrRingAssure_Global(rRingOrder_t b1, rRingOrder_t b2)
   assume(b1 == ringorder_c || b1 == ringorder_C ||
          b2 == ringorder_c || b2 == ringorder_C ||
          b2 == ringorder_S);
-
-#if THOMAS_HAS_FIXED_ALLRES
-  if (r_blocks == 3 && 
-      currRing->order[0] == b1 && 
-      currRing->order[1] == b2 &&
-      currRing->order[2] == 0)
+  if ((r_blocks == 3) && 
+      (currRing->order[0] == b1) && 
+      (currRing->order[1] == b2) &&
+      (currRing->order[2] == 0))
     return currRing;
-#endif
-
   ring res = rCopy0(currRing, TRUE, FALSE);
   res->order = (int*)Alloc0(3*sizeof(int));
   res->block0 = (int*)Alloc0(3*sizeof(int));

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.49 1999-11-16 12:39:31 obachman Exp $ */
+/* $Id: syz1.cc,v 1.50 1999-11-20 10:17:23 siebert Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -1643,7 +1643,7 @@ void syKillComputation(syStrategy syzstr)
     }
     ring origR = currRing;
 
-    if (syzstr->syRing != NULL)
+    if ((syzstr->syRing != NULL) && (syzstr->syRing != origR))
       rChangeCurrRing(syzstr->syRing, FALSE);
 
     if (syzstr->resPairs!=NULL)
@@ -1724,7 +1724,7 @@ void syKillComputation(syStrategy syzstr)
       delete syzstr->betti;
     if (syzstr->resolution!=NULL)
       delete syzstr->resolution;
-    if (syzstr->syRing != NULL)
+    if ((syzstr->syRing != NULL) && (syzstr->syRing != origR))
     {
       rChangeCurrRing(origR, FALSE);
       rKill(syzstr->syRing);
@@ -2738,7 +2738,8 @@ syStrategy syLaScala3(ideal arg,int * length)
   }
   if (temp!=NULL) idDelete(&temp);
   kBucketDestroy(&(syzstr->bucket));
-  rChangeCurrRing(origR,TRUE);
+  if (origR != syzstr->syRing)
+    rChangeCurrRing(origR,TRUE);
   pDelete1(&redpol);
   if (TEST_OPT_PROT) PrintLn();
   return syzstr;
