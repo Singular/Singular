@@ -242,6 +242,10 @@ void sleftv::CleanUp()
     FreeL((ADDRESS)name);
   }
   name=NULL;
+#ifdef HAVE_NAMESPACES
+  packhdl = NULL;
+  req_packhdl = NULL;
+#endif /* HAVE_NAMESPACES */
   if (data!=NULL)
   {
     switch (rtyp)
@@ -1048,6 +1052,12 @@ void syMake(leftv v,char * id)
   }
 #endif
   memset(v,0,sizeof(sleftv));
+#ifdef HAVE_NAMESPACES
+  v->packhdl = NULL;
+  if(packhdl != NULL)
+    v->req_packhdl = packhdl;
+  else v->req_packhdl = namespaceroot->get(namespaceroot->name, 0, TRUE);
+#endif /* HAVE_NAMESPACES */
 #ifdef SIQ
   if (siq<=0)
 #endif
@@ -1072,7 +1082,23 @@ void syMake(leftv v,char * id)
           return; /* undefined */
         }
       }
+#ifdef HAVE_NAMESPACES
+      if (strcmp(id,"Current")==0)
+      {
+        h = namespaceroot->get(namespaceroot->name,0, TRUE);
+        if (id!=IDID(h)) FreeL((ADDRESS)id);
+        v->rtyp = IDHDL;
+        v->data = (char *)h;
+        v->flag = IDFLAG(h);
+        v->name = IDID(h);
+        v->attribute=IDATTR(h);
+        return;
+      }
+      h=ggetid(id, packhdl==NULL ? FALSE : TRUE, &(v->packhdl));
+      //if(h==NULL) Print("syMake: h is null\n");
+#else /* HAVE_NAMESPACES */
       h=ggetid(id);
+#endif /* HAVE_NAMESPACES */
       /* 3) existing identifier, local */
       if ((h!=NULL) && (IDLEV(h)==myynest))
       {
@@ -1347,3 +1373,21 @@ int sleftv::Eval()
   return nok;
 }
 
+
+char *iiSleftv2name(leftv v)
+{
+#ifdef HAVE_NAMESPACES
+  char *name;
+  if(v->packhdl != NULL) {
+    name = (char *)AllocL(strlen(v->name) + strlen(IDID(v->packhdl)) + 3);
+    sprintf(name, "%s::%s", IDID(v->packhdl), v->name);
+    return(name);
+  }
+  else
+  {
+    return(v->name);
+  }
+#else /* HAVE_NAMESPACES */
+  return(v->name);
+#endif /* HAVE_NAMESPACES */
+}

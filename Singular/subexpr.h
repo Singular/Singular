@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: subexpr.h,v 1.8 1998-08-27 12:03:49 obachman Exp $ */
+/* $Id: subexpr.h,v 1.9 1998-09-29 10:39:11 krueger Exp $ */
 /*
 * ABSTRACT: handling of leftv
 */
@@ -22,6 +22,7 @@ typedef sSubexpr * Subexpr;
 
 extern const char sNoName[];
 extern BOOLEAN siq;
+extern char *iiSleftv2name(leftv v);
 
 class sleftv;
 typedef sleftv * leftv;
@@ -49,6 +50,11 @@ class sleftv
                   * ....
                   */
     Subexpr e;    /* holds the indices for indexed values */
+#ifdef HAVE_NAMESPACES
+    idhdl       packhdl;
+    idhdl       req_packhdl;
+#define IDSROOT(a) (IDPACKAGE(((sleftv)a).packhdl)->idroot)
+#endif /* HAVE_NAMESPACES */
     inline void Init() { memset(this,0,sizeof(*this)); }
     void Set(int val);
     void Print(leftv store=NULL,int spaces=0);
@@ -61,6 +67,11 @@ class sleftv
     inline const char * Name()
     {
       if ((name!=NULL) && (e==NULL)) return name;
+      else return sNoName;
+    }
+    inline const char * Fullname()
+    {
+      if ((name!=NULL) && (e==NULL)) return(iiSleftv2name(this));
       else return sNoName;
     }
     int  Typ();
