@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_algorithm.cc,v 1.4 1997-10-09 14:40:12 schmidt Exp $ */
+/* $Id: cf_algorithm.cc,v 1.5 1997-10-09 14:48:19 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -12,7 +12,8 @@
 // Compare these functions to the functions in cf_ops.cc, which are
 // structural algorithms.
 //
-// Used by: cf_gcd.cc, cf_resultant.cc
+// Used by: cf_gcd.cc, cf_resultant.cc, fac_distrib.cc,
+//   fac_ezgcd.cc, sm_sparsemod.cc
 //
 //}}}
 
