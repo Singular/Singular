@@ -1,8 +1,8 @@
-			 Singular version 1.0
+			 Singular version 1.1
 		     University of Kaiserslautern
      Department of Mathematics        Centre for Computer Algebra
 	  Authors: G.-M. Greuel, G. Pfister, H. Schoenemann
-		  (C) 1986-1997 All Rights Reserved
+		  (C) 1986-1998 All Rights Reserved
 
       README FILE FOR SINGULAR SHARED DATA DISTRIBUTION
       =================================================
@@ -36,7 +36,7 @@ In order to use Singular, you
 (2) Uncompress the binary and install it at an appropriate place in
     your executable path (e.g., /usr/local/bin)
 
-(3) Unpack Singular-1.0-share.tar.gz 
+(3) Unpack Singular-1.1-share.tar.gz 
     (a) in the directory /usr/local/, or
     (b) in another directory, say, $HOME/Singular, and set the environment
         variable SINGULARPATH to the subdirectory
@@ -96,16 +96,16 @@ of Singular are:
 
 Acknowledgments
 ================
-Singular 1.0 is linked with the following libraries: 
+Singular 1.1 is linked with the following libraries: 
   readline--  The Gnu readline library (v. 2.0) 
 	      (C) Free Software Foundation
   gmp	  --  The Gnu Multiple precision library (v: 2.0.2) distribution
               (C) Free Software Foundation
   MP      --  The Multi Protocol library (v: 1.1.2) distribution
               (C) Gray/Kajler/Wang; Kent State University
-  factory --  The factory library (v: 1.2c) for polynomial factorization
+  factory --  The factory library (v: 1.3a) for polynomial factorization
 	      (C) Greuel/Stobbe U of Kaiserslautern
-  libfac  --  The libfac library (v: 0.2.1) for characteristic set computations
+  libfac  --  The libfac library (v: 0.3.0) for characteristic set computations
               (C) Mesollen U of Saarbruecken
 We would like to thank all authors of these who contributed these
 libraries. 
@@ -118,7 +118,7 @@ from
 	     www.mathematik.uni-kl.de:/pub/Math/Singular
 
 Binary versions of Singular for common hard- and software
-platforms are contained in the files bin/Singular-1.0.<platform>.gz where
+platforms are contained in the files bin/Singular-1.1.<platform>.gz where
 <platform> is, for example, 'linux', 'SunOS', etc.  
 
 In general, Singular is only available as binary program. For
@@ -127,16 +127,16 @@ exceptions, you may contact us at
 
 Architecture - independent files (such as libraries written in the
 Singular programming language, and the Singular documentation) are
-distributed as Singular-1.0-share.tar.gz. See the file README.share
+distributed as Singular-1.1-share.tar.gz. See the file README.share
 for more information. 
 
 Documentation to Singular is distributed as:
-Singular-1.0.dvi.gz	 - Reference manual in dvi format
+Singular-1.1.dvi.gz	 - Reference manual in dvi format
 Tutorial.dvi.gz		 - Singular tutorial in dvi format
-Singular-1.0.ps.gz	 - Reference manual in postscript format
+Singular-1.1.ps.gz	 - Reference manual in postscript format
 Tutorial.dvi.gz		 - Singular tutorial in postscript format
 singular.hlp.gz		 - Reference manual in Info format
-Singular-1.0.html.tar.gz - Reference manual in html format
+Singular-1.1.html.tar.gz - Reference manual in html format
 
 The GMP library and the readline library are available at
 ftp.gnu.ai.mit.edu or its mirrors.
