@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.88 2001-03-22 19:11:03 Singular Exp $ */
+/* $Id: grammar.y,v 1.89 2001-03-23 18:27:40 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -1369,7 +1369,10 @@ ringcmd:
 scriptcmd:
          SYSVAR stringexpr
           {
-            if (($1!=LIB_CMD)||(iiLibCmd($2))) YYERROR;
+          #ifndef HAVE_NAMESPACES
+            if (($1!=LIB_CMD)||(iiLibCmd($2)))
+          #endif  
+            YYERROR;
           }
         ;
 
