@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: spolys0.cc,v 1.12 1998-06-12 17:41:39 obachman Exp $ */
+/* $Id: spolys0.cc,v 1.13 1998-11-11 14:44:27 Singular Exp $ */
 
 /*
 * ABSTRACT - s-polynomials and reduction in general
@@ -701,7 +701,7 @@ poly spGSpolyCreate(poly p1, poly p2,poly spNoether,
 *   1. the coefficient is 0 (nNew)
 *   2. pNext is undefined
 */
-static void bbb() { int i=0; }
+//static void bbb() { int i=0; }
 poly spGSpolyShortBba(poly p1, poly p2)
 {
   poly a1 = pNext(p1), a2 = pNext(p2);
