@@ -451,6 +451,12 @@ else
   AC_MSG_RESULT(no)
 fi
 
+# need MP code to be compiled with -fPIC, should not hurt anybody else
+if test "$enable_MP" = yes && test "${with_extra_cflags+set}" != set; then
+ac_configure_args="$ac_configure_args --with-extra_cflags=-fPIC"
+fi
+
+
 AC_MSG_CHECKING(whether to configure and build factory lib)
 if test "$enable_factory" != yes && test "$enable_factory" != no; then
   if test "$with_factory" != no && test "$ac_factory_ok" != yes && \
