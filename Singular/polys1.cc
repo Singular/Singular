@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.21 1999-04-29 11:38:55 Singular Exp $ */
+/* $Id: polys1.cc,v 1.22 1999-05-26 14:16:50 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -998,6 +998,7 @@ poly pOrdPolyInsertSetm(poly p)
 {
   poly qq,result = NULL;
 
+#if 0
   while (p != NULL)
   {
     qq = p;
@@ -1007,6 +1008,26 @@ poly pOrdPolyInsertSetm(poly p)
     result = pAdd(result,qq);
     pTest(result);
   }
+#else
+  while (p != NULL)
+  {
+    qq = p;
+    pIter(p);
+    qq->next = result;
+    result = qq;
+    pSetm(qq);
+  }
+  p = result;
+  result = NULL;
+  while (p != NULL)
+  {
+    qq = p;
+    pIter(p);
+    qq->next = NULL;
+    result = pAdd(result, qq);
+  }
+  pTest(result);
+#endif
   return result;
 }
 
@@ -1072,19 +1093,28 @@ poly pPermPoly (poly p, int * perm, ring oldRing,
       pSetm(qq);
       pTest(qq);
       pTest(aq);
-      if (aq!=NULL)
-      {
-        qq=pMult(aq,qq);
-        aq=NULL;
-      }
-      result = pAdd(result,qq);
-      pTest(result);
+      if (aq!=NULL) qq=pMult(aq,qq);
+      aq = qq;
+      while (pNext(aq) != NULL) pIter(aq);
+      pNext(aq) = result;
+      aq = NULL;
+      result = qq;
     }
     else if (aq!=NULL)
     {
       pDelete(&aq);
     }
   }
+  p = result;
+  result = NULL;
+  while (p != NULL)
+  {
+    qq = p;
+    pIter(p);
+    qq->next = NULL;
+    result = pAdd(result, qq);
+  }
+  pTest(result);
   return result;
 }
 
