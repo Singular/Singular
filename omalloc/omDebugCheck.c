@@ -3,7 +3,7 @@
  *  Purpose: implementation of omCheck functions
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omDebugCheck.c,v 1.6 2000-09-18 09:12:14 obachman Exp $
+ *  Version: $Id: omDebugCheck.c,v 1.7 2000-09-20 11:52:31 obachman Exp $
  *******************************************************************/
 #include <limits.h>
 #include <stdarg.h>
@@ -165,29 +165,6 @@ omError_t omDoCheckAddr(void* addr, void* bin_size, omTrackFlags_t flags, char l
   }
 }
 
-int omIsInKeptAddrList(void* addr)
-{
-  void* ptr = om_KeptAddr;
-  int ret = 0;
-  
-  if (om_LastKeptAddr != NULL)
-    *((void**) om_LastKeptAddr) = om_AlwaysKeptAddrs;
-  
-  while (ptr != NULL)
-  {
-    if (ptr == addr) {ret = 1; break;}
-    if ((unsigned long) addr > (unsigned long)ptr && 
-        (unsigned long) addr < (unsigned long)ptr + 
-        (omIsBinPageAddr(ptr) ? omSizeOfBinAddr(addr) : omSizeOfLargeAddr(ptr)))
-    {ret = 1; break;}
-    ptr = *((void**) ptr);
-  }
-  
-  if (om_LastKeptAddr != NULL)
-    *((void**) om_LastKeptAddr) = NULL;
-  
-  return ret;
-}
 
 
 static omError_t omDoCheckLargeAddr(void* addr, void* bin_size, omTrackFlags_t flags, char level, 
