@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.57 1999-07-08 13:38:44 Singular Exp $ */
+/* $Id: ring.cc,v 1.58 1999-07-08 17:16:29 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -564,7 +564,7 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
   R->ch = ch;
   if (ch == -1)
   {
-    R->ch_flags= float_len;
+    R->ch_flags= min(float_len,32767);
   }
 
   /* parameter -------------------------------------------------------*/
