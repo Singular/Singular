@@ -5,7 +5,7 @@
 // written by Gert-Martin Greuel and Gerhard Pfister
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: normal.lib,v 1.13 1999-06-07 17:01:26 greuel Exp $";
+version="$Id: normal.lib,v 1.14 1999-06-08 11:15:58 Singular Exp $";
 info="
 LIBRARY: normal.lib     PROCEDURES FOR NORMALIZATION
 
@@ -959,8 +959,9 @@ EXAMPLE: example normalizationPrimes; shows an example
          export norid;
          export normap;
          result=newR7;
-     def R = nor[1]; setring R;     //make the 1-st ring the basering
-     norid; normap;                 //data of the normalization)
+         // the following 2 lines don't work : nor is not defined
+         //def R = nor[1]; setring R;     //make the 1-st ring the basering
+         //norid; normap;                 //data of the normalization)
          setring BAS;
          return(result);
 
