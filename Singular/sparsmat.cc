@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sparsmat.cc,v 1.24 2000-02-07 17:23:16 Singular Exp $ */
+/* $Id: sparsmat.cc,v 1.25 2000-02-09 08:15:09 pohl Exp $ */
 
 /*
 * ABSTRACT: operations with sparse matrices (bareiss, ...)
@@ -23,18 +23,6 @@
 #include "sparsmat.h"
 #include "prCopy.h"
 
-/* ----------------- macros ------------------ */
-#ifdef HAVE_SHIFTED_EXPONENTS
-#define OLD_DIV 1
-#endif
-
-#ifdef OLD_DIV
-#define SM_MULT(A,B,C) smMult(A,B)
-#define SM_DIV smPolyDiv
-#else
-#define SM_MULT smMultDiv
-#define SM_DIV smSpecialPolyDiv
-#endif
 /* ----------------- general definitions ------------------ */
 /* in structs.h
 typedef struct smprec sm_prec;

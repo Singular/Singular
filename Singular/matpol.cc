@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.cc,v 1.31 1999-12-20 12:50:21 Singular Exp $ */
+/* $Id: matpol.cc,v 1.32 2000-02-09 08:15:02 pohl Exp $ */
 
 /*
 * ABSTRACT:
@@ -1104,20 +1104,20 @@ void mp_permmatrix::mpElimBareiss(poly div)
         jj = qcol[j];
         if (ap[jj] != NULL)
         {
-          q2 = smMultDiv(ap[jj], elim, div);
+          q2 = SM_MULT(ap[jj], elim, div);
           if (a[jj] != NULL)
           {
-            q1 = smMultDiv(a[jj], piv, div);
+            q1 = SM_MULT(a[jj], piv, div);
             pDelete(&a[jj]);
             q2 = pAdd(q2, q1);
           }
         }
         else if (a[jj] != NULL)
         {
-          q2 = smMultDiv(a[jj], piv, div);
+          q2 = SM_MULT(a[jj], piv, div);
         }
         if ((q2!=NULL) && div)
-          smSpecialPolyDiv(q2, div);
+          SM_DIV(q2, div);
         a[jj] = q2;
       }
       pDelete(&a[qcol[s_n]]);
@@ -1129,10 +1129,10 @@ void mp_permmatrix::mpElimBareiss(poly div)
         jj = qcol[j];
         if (a[jj] != NULL)
         {
-          q2 = smMultDiv(a[jj], piv, div);
+          q2 = SM_MULT(a[jj], piv, div);
           pDelete(&a[jj]);
           if (div)
-            smSpecialPolyDiv(q2, div);
+            SM_DIV(q2, div);
           a[jj] = q2;
         }
       }
@@ -1849,19 +1849,19 @@ static void mpElimBar(matrix a0, matrix re, poly div, int lr, int lc)
         q1 = NULL;
         if (a[j] != NULL)
         {
-          q1 = smMultDiv(a[j], piv, div);
+          q1 = SM_MULT(a[j], piv, div);
           if (ap[j] != NULL)
           {
-            q2 = smMultDiv(ap[j], elim, div);
+            q2 = SM_MULT(ap[j], elim, div);
             q1 = pAdd(q1,q2);
           }
         }
         else if (ap[j] != NULL)
-          q1 = smMultDiv(ap[j], elim, div);
+          q1 = SM_MULT(ap[j], elim, div);
         if (q1 != NULL)
         {
           if (div)
-            smSpecialPolyDiv(q1, div);
+            SM_DIV(q1, div);
           q[j] = q1;
         }
       }
@@ -1872,9 +1872,9 @@ static void mpElimBar(matrix a0, matrix re, poly div, int lr, int lc)
       {
         if (a[j] != NULL)
         {
-          q1 = smMultDiv(a[j], piv, div);
+          q1 = SM_MULT(a[j], piv, div);
           if (div)
-            smSpecialPolyDiv(q1, div);
+            SM_DIV(q1, div);
           q[j] = q1;
         }
       }
