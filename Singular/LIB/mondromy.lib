@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: mondromy.lib,v 1.22 2001-01-16 10:41:13 Singular Exp $";
+version="$Id: mondromy.lib,v 1.23 2002-01-10 12:28:37 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  mondromy.lib  Monodromy of an Isolated Hypersurface Singularity
@@ -68,7 +68,7 @@ static proc pcvbasis(int i0,int i1)
 
 static proc pcvinit()
 {
-  if(system("with","DynamicLoading"))
+  if(0 ) //system("with","DynamicLoading"))
   {
     pcvladdl=Pcv::LAddL;
     pcvpmull=Pcv::PMulL;
