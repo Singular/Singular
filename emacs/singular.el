@@ -1,6 +1,6 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.41 1999-09-14 20:18:15 wichmann Exp $
+;; $Id: singular.el,v 1.42 1999-09-14 21:00:59 wichmann Exp $
 
 ;;; Commentary:
 
@@ -3797,13 +3797,6 @@ This function is called at mode initialization time."
   (set (make-local-variable 'singular-exit-cleanup-done) 
        nil))
 
-(defvar singular-exit-insert-killed-marker nil 
-  "Switch indicating if text should be inserted on process finishing.
-If t, `singular-exit-sentinel' inserts a string at the process mark
-indicating that the Singular process was killed.
-
-This variable is buffer-local.")
-
 (defvar singular-exit-cleanup-done nil
   "Switch indicating if cleanup after Singular exit is already done.
 Initial value is nil. Is set to t by `singular-exit-cleanup' and to nil by
@@ -3831,33 +3824,33 @@ This function is called by `singular-interrupt-singular' or by
 
 (defun singular-exit-sentinel (process message)
   "Clean up after termination of Singular.
-Calls `singular-exit-cleanup' if `singular-exit-cleanup-done' is nil.
-If `singular-exit-insert-killed-marker' is non-nil, inserts a string at the
-process mark indicating that the process was killed."
+Calls `singular-exit-cleanup' if `singular-exit-cleanup-done' is nil."
   (save-excursion
     (singular-debug 'interactive
 		    (message "Sentinel: %s" (substring message 0 -1)))
 
+    (singular-debug 'interactive
+		    (message "Sentinel: proc= %s, mark= %s" process (process-mark process)))
     (if (string-match "finished\\|exited\\|killed" message)
 	(let ((process-buffer (process-buffer process)))
-	  (when (and process-buffer
-		     (buffer-name process-buffer)
-		     (set-buffer process-buffer))
-	    (when singular-exit-insert-killed-marker
-	      (goto-char (process-mark process))
-	      (insert "// ** Singular process killed **\n")
-	      (setq singular-exit-insert-killed-marker nil))
-	    (unless singular-exit-cleanup-done
-	      (singular-exit-cleanup)))))
+	  (if (and (not singular-exit-cleanup-done)
+		   process-buffer
+		   (buffer-name process-buffer)
+		   (set-buffer process-buffer))
+	      (singular-exit-cleanup))))
     (setq singular-exit-cleanup-done nil)))
 
 (defun singular-interrupt-singular ()
   "Delete the Singular process running in the current buffer.
-Calls `singular-exit-cleanup' and deletes the Singular process."
-  (let ((process (singular-process)))
+Calls `singular-exit-cleanup' and deletes the Singular process.
+Inserts a string indicating that the Singular process is killed."
+  (let* ((process (singular-process))
+	 (mark (marker-position (process-mark process))))
     (singular-exit-cleanup)
-    (setq singular-exit-insert-killed-marker t)
-    (delete-process process)))
+    (delete-process process)
+    (save-excursion
+      (goto-char mark)
+      (insert "// ** Singular process killed **\n"))))
 
 (defun singular-exec (buffer name executable start-file switches)
   "Start a new Singular process NAME in BUFFER, running EXECUTABLE.
