@@ -1,0 +1,11 @@
+Status Output of tst_status.out
+init >> USER    :wenk
+init >> HOSTNAME:oxmox
+init >> uname -a:Linux oxmox 2.0.36 #8 Fri Feb 26 17:46:54 CET 1999 i586 unknown
+init >> date    :Sun Nov 14 22:07:25 CET 1999
+init >> version :1304
+init >> ticks   :100
+1 >> tst_memory_0 :: oxmox:4365848
+1 >> tst_memory_1 :: oxmox:4549776
+1 >> tst_memory_2 :: oxmox:4485120
+1 >> tst_timer_1 :: oxmox:1022
