@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr.h,v 1.5 1997-04-10 13:08:35 obachman Exp $ */
+/* $Id: mpsr.h,v 1.6 1997-07-11 11:10:08 obachman Exp $ */
 /***************************************************************
  *
  * File:       mpsr.h
@@ -115,7 +115,7 @@ inline void mpsr_SetCurrRing(ring rg, BOOLEAN complete)
  *
  ***************************************************************/
 
-// 129 is application specific Dictionary
+// is application specific Dictionary
 #define MP_SingularDict 129
 // remove this, once the Galois field stuff is done properly
 #define MP_AnnotSingularGalois  1

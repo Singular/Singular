@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.9 1997-04-30 15:25:33 Singular Exp $ */
+/* $Id: ring.cc,v 1.10 1997-07-11 11:10:09 obachman Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -1372,14 +1372,18 @@ int rSum(ring r1, ring r2, ring &sum)
   /* variable names ========================================================*/
   int i,j,k;
   int l=r1->N+r2->N;
-  char **names=(char **)Alloc(l*sizeof(char*));
+  char **names=(char **)Alloc0(l*sizeof(char*));
   k=0;
-  for (i=0;i<r1->N;i++) /* check, if the variables from r1 are not
-                         * parameters of r2 */
+
+  // collect all varnames from r1, except those which are parameters
+  // of r2, or those which are the empty string
+  for (i=0;i<r1->N;i++)
   {
     BOOLEAN b=TRUE;
-    if ((r2->parameter!=NULL)
-    && (strlen(r1->names[i])==1))
+
+    if (*(r1->names[i]) == '\0')
+      b = FALSE;
+    else if ((r2->parameter!=NULL) && (strlen(r1->names[i])==1))
     {
       for(j=0;j<r2->P;j++)
       {
@@ -1390,6 +1394,7 @@ int rSum(ring r1, ring r2, ring &sum)
         }
       }
     }
+
     if (b)
     {
       //Print("name : %d: %s\n",k,r1->names[i]);
@@ -1399,13 +1404,15 @@ int rSum(ring r1, ring r2, ring &sum)
     //else
     //  Print("no name (par1) %s\n",r1->names[i]);
   }
-  /* check the variables of r2:
-  *  should not be variables of r1 and not parameters of r1*/
+  // Add variables from r2, except those which are parameters of r1
+  // those which are empty strings, and those which equal a var of r1
   for(i=0;i<r2->N;i++)
   {
     BOOLEAN b=TRUE;
-    if ((r1->parameter!=NULL)
-    && (strlen(r2->names[i])==1))
+
+    if (*(r2->names[i]) == '\0')
+      b = FALSE;
+    else if ((r1->parameter!=NULL) && (strlen(r2->names[i])==1))
     {
       for(j=0;j<r1->P;j++)
       {
@@ -1416,6 +1423,7 @@ int rSum(ring r1, ring r2, ring &sum)
         }
       }
     }
+
     if (b)
     {
       for(j=0;j<r1->N;j++)
@@ -1437,6 +1445,12 @@ int rSum(ring r1, ring r2, ring &sum)
     }
     //else
     //  Print("no name (par): %s\n",r2->names[i]);
+  }
+  // check whether we found any vars at all
+  if (k == 0)
+  {
+    names[k]=mstrdup("");
+    k=1;
   }
   tmpR.N=k;
   tmpR.names=names;
