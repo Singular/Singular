@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: units.cc,v 1.8 2001-02-27 18:05:16 mschulze Exp $ */
+/* $Id: units.cc,v 1.9 2001-03-05 16:44:15 mschulze Exp $ */
 /*
 * ABSTRACT: procedures to compute with units
 */
@@ -33,8 +33,8 @@ ideal redNF(ideal N,ideal M,matrix U=NULL,int d=-1,intvec *w=NULL)
     }
   }
   ideal M0=idInit(IDELEMS(M),M->rank);
-  ideal M1=kNF(N,currQuotient,M,0,2);
-  while(idElem(M1)>0&&(d==-1||idMinDegW(M1,w)<=d))
+  ideal M1=kNF(N,currQuotient,M);
+  while(idElem(M1)>0&&(d==-1||idMinDeg(M1,w)<=d))
   {
     for(int i=IDELEMS(M)-1;i>=0;i--)
     {
@@ -46,7 +46,7 @@ ideal redNF(ideal N,ideal M,matrix U=NULL,int d=-1,intvec *w=NULL)
         M->m[i]=pSub(M->m[i],pHead(pCopy(M1->m[i])));
     }
     idDelete(&M1);
-    M1=kNF(N,currQuotient,M,0,2);
+    M1=kNF(N,currQuotient,M);
   }
   idDelete(&M1);
   idDelete(&N);
