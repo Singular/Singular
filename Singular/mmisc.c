@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmisc.c,v 1.17 1999-10-19 14:03:50 obachman Exp $ */
+/* $Id: mmisc.c,v 1.18 1999-10-19 14:55:39 obachman Exp $ */
 
 /*
 * ABSTRACT:
@@ -148,7 +148,7 @@ void mmDebugUnGetTemHeap(memHeap *heap_p, char* file, int line)
   FreeSizeOf(s_heap, ip_memSpecHeap);
 }
 
- 
+#ifndef HAVE_AUTOMATIC_GC 
 void mmGarbageCollectHeaps(int strict)
 {
 #ifdef NDEBUG
@@ -196,6 +196,7 @@ void mmGarbageCollectHeaps(int strict)
   }
 #endif
 }
+#endif
   
 size_t mmSizeL( void* adr )
 {
@@ -218,6 +219,7 @@ int mmMemUsed( void )
   int i;
   memSpecHeap s_heap;
 
+#ifndef HAVE_AUTOMATIC_GC
   for (i=0; mmGetSize(i) <= MAX_BLOCK_SIZE; i++)
     bytesfree += mmListLength(mm_theList[i].current)*mm_theList[i].size;
 
@@ -233,6 +235,7 @@ int mmMemUsed( void )
     bytesfree += mmListLength(s_heap->heap->current) * s_heap->heap->size;
     s_heap = s_heap->next;
   }
+#endif
   return
     mm_bytesMalloc + mm_bytesValloc 
      - bytesfree - mmGetNumberOfFreePages()*SIZE_OF_PAGE;
@@ -281,6 +284,7 @@ extern memHeap mm_specHeap;
 
 static void mmPrintHeapStat(memHeap heap, int i)
 {
+#ifndef HAVE_AUTOMATIC_GC
   long l,a;
   if (i >= 0) printf("%d", i);
   else if (i== -1) printf("S");
@@ -316,6 +320,7 @@ static void mmPrintHeapStat(memHeap heap, int i)
   else if (mm_specHeap != NULL && mm_specHeap->size == heap->size)
     printf(" +");
   printf("\n");
+#endif
   fflush(stdout);
 }
       

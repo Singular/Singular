@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmalloc.c,v 1.17 1999-10-18 11:19:29 obachman Exp $ */
+/* $Id: mmalloc.c,v 1.18 1999-10-19 14:55:38 obachman Exp $ */
 
 /*
 * ABSTRACT: implementation of alloc/free routines
@@ -636,7 +636,7 @@ void mmFreeToSystem(void* addr, size_t size)
   if (BVERBOSE(V_SHOW_MEM)) mmCheckPrint();
 }
 
-void* mmAllocPageFromSystem()
+void* mmVallocFromSystem(size_t size)
 {
   void* page = PALLOC(SIZE_OF_PAGE);
   if (page == NULL)
@@ -656,10 +656,10 @@ void* mmAllocPageFromSystem()
   return page;
 }
 
-void mmFreePageToSystem(void* page)
+void mmVfreeToSystem(void* page, size_t size)
 {
   PFREE(page);
-  mm_bytesValloc -= SIZE_OF_PAGE;
+  mm_bytesValloc -= size;
   if (BVERBOSE(V_SHOW_MEM)) mmCheckPrint();
 }
   

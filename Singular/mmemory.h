@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmemory.h,v 1.25 1999-10-18 11:19:29 obachman Exp $ */
+/* $Id: mmemory.h,v 1.26 1999-10-19 14:55:39 obachman Exp $ */
 /*
 * ABSTRACT
 */
@@ -209,12 +209,18 @@ extern void mmUnGetTempHeap(memHeap *heap_p);
 extern void mmUnGetTempHeap(memHeap *heap);
 #endif /* HEAP_DEBUG */
 
+// #define HAVE_AUTOMATIC_GC
+#ifndef HAVE_AUTOMATIC_GC
 /* removes chunks in freelist which fill one page */
 /* if strict & 1, does it even if free ptr  has not changed w.r.t. last gc */
 /* if strict & 2, also releases free pages */
 /* if strict & 4, gc also of temp heaps */
 extern void mmGarbageCollectHeaps(int strict);
 extern void mmGarbageCollectHeap(memHeap heap, int strict);
+#else
+#define  mmGarbageCollectHeaps(s) 
+#define  mmGarbageCollectHeap(h, s)
+#endif /* HAVE_AUTOMATIC_GC */
 
 /* Returns a heap of the given size */
 extern memHeap mmGetSpecHeap( size_t );
@@ -223,8 +229,6 @@ extern void mmUnGetSpecHeap(memHeap *heap);
   
 /* Merges what is free in Heap "what" into free list of heap "into" */
 extern void mmMergeHeap(memHeap into, memHeap what);
-/* Removes addr from freelist of heap, provided it finds it there */
-extern void mmRemoveFromCurrentHeap(memHeap heap, void* addr);
 
 /**********************************
  *
@@ -236,6 +240,7 @@ extern void mmRemoveFromCurrentHeap(memHeap heap, void* addr);
 #define mmFreeHeap(addr, heap) _mmFreeHeap(addr, heap)
 #define mmCheckHeap(heap)           1
 #define mmCheckHeapAddr(addr, heap) 1
+
 #else
 /* 
  * define HEAP_DEBUG  and/or set mm_HEAP_DEBUG to 
@@ -270,6 +275,23 @@ int mmDebugCheckHeapAddr(void* addr, memHeap heap, int flag,
  *
  **********************************/
 /* Need to define it here, has to be known to macros */
+
+/* array of static heaps */
+extern struct sip_memHeap mm_theList[];
+extern memHeapPage mmAllocNewHeapPage(memHeap heap);
+
+#ifndef  HAVE_AUTOMATIC_GC
+struct sip_memHeapPage 
+{
+  memHeapPage next;
+  long counter;
+};
+
+/* Change this appropriately, if you change sip_memHeapPage           */
+/* However, make sure that sizeof(sip_memHeapPage) is a multiple of 8 */
+#define SIZE_OF_HEAP_PAGE_HEADER (SIZEOF_VOIDP + SIZEOF_LONG) 
+#define SIZE_OF_HEAP_PAGE (SIZE_OF_PAGE - SIZE_OF_HEAP_PAGE_HEADER)
+
 struct sip_memHeap 
 {
   void*         current; /* Freelist pointer */
@@ -278,10 +300,6 @@ struct sip_memHeap
   long          size;    /* Size of heap chunks */
 };
 
-/* array of static heaps */
-extern struct sip_memHeap mm_theList[];
-
-extern void mmAllocNewHeapPage(memHeap heap);
 /* Allocates memory block from a heap */
 #define _mmAllocHeap(what, heap)                            \
 do                                                          \
@@ -302,6 +320,79 @@ do                                              \
   (_heap)->current = (void*) addr;              \
 }                                               \
 while (0)
+
+#else /* HAVE_AUTOMATIC_GC */
+
+struct sip_memHeapPage
+{
+  long          used_blocks;    /* number of used blocks of this page */
+  void*         current;        /* pointer to current freelist */
+  memHeapPage   next;           /* next/prev pointer of pages */
+  memHeapPage   prev;
+};
+
+/* Change this appropriately, if you change sip_memHeapPage           */
+/* However, make sure that sizeof(sip_memHeapPage) is a multiple of 8 */
+#define SIZE_OF_HEAP_PAGE_HEADER (3*SIZEOF_VOIDP + SIZEOF_LONG) 
+#define SIZE_OF_HEAP_PAGE (SIZE_OF_PAGE - SIZE_OF_HEAP_PAGE_HEADER)
+
+struct sip_memHeap
+{
+  memHeapPage current_page;   /* pointer to page of current freelist */
+  memHeapPage first_free;
+  memHeapPage last_free;
+  long size;           /* size of blocks */
+};
+
+extern memHeapPage  mmGetNewCurrentPage(memHeap heap);
+extern void mmRearrangeHeapPages(memHeapPage page, memHeap heap);
+extern struct sip_memHeapPage mmZeroPage[];
+#ifndef mmGetPageOfAddr
+#define mmGetPageOfAddr(addr) \
+  ((void*) ((long) (addr) & ~(SIZE_OF_SYSTEM_PAGE -1)))
+#endif
+
+#define _mmAllocHeap(what, heap)                                    \
+do                                                                  \
+{                                                                   \
+  register memHeapPage _page = (heap)->current_page;                \
+  if (_page->current == NULL) _page = mmGetNewCurrentPage(heap);    \
+  (_page->used_blocks)++;                                           \
+  what = (void *)((_page)->current);                                \
+  (_page)->current =  *((void**)(_page)->current);                  \
+}                                                                   \
+while (0)
+
+#ifdef GC_KEEP_SORTED
+#define _mmFreeHeap(addr, heap)                         \
+do                                                      \
+{                                                       \
+  register memHeapPage _page = mmGetPageOfAddr(addr);   \
+  _page->used_blocks--;                                 \
+  if (_page->used_blocks < _page->next->used_blocks)    \
+    mmRearrangeHeapPages(_page, heap);                  \
+  *((void**) addr) = _page->current;                    \
+  _page->current = addr;                                \
+}                                                       \
+while (0)
+#else
+#define _mmFreeHeap(addr, heap)                         \
+do                                                      \
+{                                                       \
+  register memHeapPage _page = mmGetPageOfAddr(addr);   \
+  _page->used_blocks--;                                 \
+  if (_page->used_blocks == 0)                          \
+    mmRearrangeHeapPages(_page, heap,addr);             \
+  else                                                  \
+  {                                                     \
+    *((void**) addr) = _page->current;                  \
+    _page->current = addr;                              \
+  }                                                     \
+}                                                       \
+while (0)
+#endif
+
+#endif /* ! HAVE_AUTOMATIC_GC */
 
 #define MM_HEAP_ADDR_UNKNOWN_FLAG 0  
 #define MM_HEAP_ADDR_USED_FLAG   1

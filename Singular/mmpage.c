@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmpage.c,v 1.3 1999-10-14 14:27:20 obachman Exp $ */
+/* $Id: mmpage.c,v 1.4 1999-10-19 14:55:40 obachman Exp $ */
 
 /*
 * ABSTRACT:
@@ -37,7 +37,7 @@ void* mmGetPage()
   }
   else
 #endif
-    return mmAllocPageFromSystem();
+    return mmVallocFromSystem(SIZE_OF_PAGE);
 }
 
 void mmFreePage(void* page)
@@ -56,7 +56,7 @@ void mmReleaseFreePages()
   while (mm_FreePages != NULL)
   {
     next = *((void**)mm_FreePages);
-    mmFreePageToSystem(mm_FreePages);
+    mmVfreeToSystem(mm_FreePages, SIZE_OF_PAGE);
     mm_FreePages = next;
   }
   mm_NumberOfFreePages = 0;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz2.cc,v 1.3 1999-10-19 12:42:50 obachman Exp $ */
+/* $Id: syz2.cc,v 1.4 1999-10-19 14:55:41 obachman Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -750,7 +750,7 @@ Print("syz: ");pWrite(redset[j].syz);
             currShiftedComponents = syzstr->ShiftedComponents[index-1];
             rChangeSComps(currcomponents,
                           currShiftedComponents,
-                          IDELEMS(syzstr->res[index]));
+                          IDELEMS(syzstr->res[index-1]));
             number up = kBucketPolyRed(syzstr->bucket,redset[j].p,
                          redset[j].length, NULL);
             nDelete(&up);
@@ -770,9 +770,17 @@ PrintLn();
         }
         kBucketClear(syzstr->bucket,&tso.p,&tso.length);
         currcomponents = syzstr->truecomponents[index];
+        currShiftedComponents = syzstr->ShiftedComponents[index];
+        rChangeSComps(currcomponents,
+                      currShiftedComponents,
+                      IDELEMS(syzstr->res[index]));
         int il;
         kBucketClear(syzstr->syz_bucket,&tso.syz,&il);
         currcomponents = syzstr->truecomponents[index-1];
+        currShiftedComponents = syzstr->ShiftedComponents[index-1];
+        rChangeSComps(currcomponents,
+                      currShiftedComponents,
+                      IDELEMS(syzstr->res[index-1]));
       }
 #ifdef SHOW_PROT
 Print("erhalte Paar mit: \n");
@@ -1147,7 +1155,7 @@ syStrategy syHilb(ideal arg,int * length)
   temp = idInit(IDELEMS(arg),arg->rank);
   for (i=0;i<IDELEMS(arg);i++)
   {
-    temp->m[i] = pOrdPolyInsertSetm(pCopy(arg->m[i]));
+    temp->m[i] = pFetchCopy(origR, arg->m[i]);
     if (temp->m[i]!=NULL)
     {
       j = pTotaldegree(temp->m[i]);
@@ -1248,12 +1256,6 @@ crit_fails = 0;
   {
     pSetm=oldSetm;
     pComp0=oldComp0;
-  }
-  if (ord!=NULL)
-  {
-    Free((ADDRESS)ord,3*sizeof(int));
-    Free((ADDRESS)b0,3*sizeof(int));
-    Free((ADDRESS)b1,3*sizeof(int));
   }
   if (TEST_OPT_PROT) PrintLn();
   return syzstr;

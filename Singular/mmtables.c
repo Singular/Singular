@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmtables.c,v 1.4 1999-10-18 11:19:30 obachman Exp $ */
+/* $Id: mmtables.c,v 1.5 1999-10-19 14:55:40 obachman Exp $ */
 
 /*
 * ABSTRACT:
@@ -312,12 +312,32 @@ void OutputTheListTable(const size_t *mm_mcbSizes)
   printf("struct sip_memHeap mm_theList[] = {\n");
   printf("#ifndef MDEBUG\n");
   for (i=0;  mm_mcbSizes[i] < MAX_BLOCK_SIZE; i++)
+  {
+#ifndef HAVE_AUTOMATIC_GC
     printf("{NULL, NULL, NULL, %d},\n", mm_mcbSizes[i]);
-  printf("{NULL, NULL, NULL, %d}\n};\n", mm_mcbSizes[i]);
+#else
+    printf("{mmZeroPage, %d},\n", mm_mcbSizes[i]);
+#endif
+  }
+#ifndef HAVE_AUTOMATIC_GC
+    printf("{NULL, NULL, NULL, %d}\n};\n", mm_mcbSizes[i]);
+#else
+    printf("{mmZeroPage, %d}\n};\n", mm_mcbSizes[i]);
+#endif
   printf("#else /* MDEBUG */\n");
   for (i=0; mm_mcbSizes[i] < MAX_BLOCK_SIZE; i++)
+  {
+#ifndef HAVE_AUTOMATIC_GC
     printf("{NULL, NULL, NULL, %d},\n", RealSizeFromSize(mm_mcbSizes[i]));
+#else
+    printf("{mmZeroPage, %d},\n",RealSizeFromSize(mm_mcbSizes[i]));
+#endif
+  }
+#ifndef HAVE_AUTOMATIC_GC
   printf("{NULL, NULL, NULL, %d}\n};\n", RealSizeFromSize(mm_mcbSizes[i]));
+#else
+  printf("{mmZeroPage, %d}\n};\n",RealSizeFromSize(mm_mcbSizes[i]));
+#endif
   printf("#endif /* ! MDEBUG */\n");
 }
  
@@ -350,6 +370,9 @@ int main()
 #include \"mmemory.h\"
 #include \"mmprivate.h\"
 ");
+#ifdef HAVE_AUTOMATIC_GC
+  printf("struct sip_memHeapPage mmZeroPage[] = {{0, NULL, NULL, NULL}};\n");
+#endif
   printf("#ifdef ALIGN_8\n");
   OutputIndexTable(mm_IndiciesAlign8);
   OutputSizeTable(mm_mcbSizesAlign8);

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmprivate.h,v 1.13 1999-10-14 14:27:21 obachman Exp $ */
+/* $Id: mmprivate.h,v 1.14 1999-10-19 14:55:40 obachman Exp $ */
 /*
 * ABSTRACT
 */
@@ -73,7 +73,7 @@ extern void * mm_minAddr;
 #define MM_REFERENCEFLAG 32
 
 void mmPrintFL( const char* fname, const int lineno );
-void mmDBInitNewHeapPage(memHeap heap);
+void mmDBInitNewHeapPage(memHeap heap, memHeapPage page);
 int mmCheckDBMCB ( DBMCB * what, int size , int flags);
 void mmFillDBMCB(DBMCB* what, size_t size, memHeap heap,
                  int flags, char* fname, int lineno);
@@ -94,8 +94,8 @@ void* mmMallocFromSystem(size_t size);
 void* mmReallocFromSystem(void* addr, size_t new_size, size_t old_size);
 void  mmFreeToSystem(void* addr, size_t size);
 
-void* mmAllocPageFromSystem();
-void  mmFreePageToSystem(void* page);
+void* mmVallocFromSystem(size_t size);
+void  mmVfreeToSystem(void* page, size_t size);
 
 extern int mm_bytesMalloc;
 extern int mm_bytesValloc;
@@ -113,17 +113,6 @@ void mmCheckPrint( void );
  * Low-level heap routines
  *
  **********************************************************************/
-struct sip_memHeapPage 
-{
-  memHeapPage next;
-  long counter;
-};
-
-/* Change this appropriately, if you change sip_memHeapPage           */
-/* However, make sure that sizeof(sip_memHeapPage) is a multiple of 8 */
-#define SIZE_OF_HEAP_PAGE_HEADER (SIZEOF_VOIDP + SIZEOF_LONG) 
-#define SIZE_OF_HEAP_PAGE (SIZE_OF_PAGE - SIZE_OF_HEAP_PAGE_HEADER)
-
 /* size of max cunk of memory which is treated by "normal" (static) heaps */
 #define MAX_BLOCK_SIZE  (((SIZE_OF_HEAP_PAGE) / 16)*4)
 
@@ -136,25 +125,7 @@ struct sip_memHeapPage
 #endif
 
 #define mmGetHeapPageOfAddr(addr) (memHeapPage) mmGetPageOfAddr(addr)
-#define mmIncrHeapPageCounterOfAddr(addr)       \
-do                                              \
-{                                               \
-  register memHeapPage page = mmGetHeapPageOfAddr(addr); \
-  (page->counter)++;                            \
-}                                               \
-while (0)
 
-extern void mmRemoveHeapBlocksOfPage(memHeap heap, memHeapPage hpage);
-#define mmDecrCurrentHeapPageCounter(heap)                          \
-do                                                                  \
-{                                                                   \
-  register memHeapPage page = mmGetHeapPageOfAddr((heap)->current); \
-  if (--(page->counter) == 0) mmRemoveHeapBlocksOfPage(heap, page); \
-}                                                                   \
-while (0)
-
-/* Initializes Heap */
-extern void mmInitHeap(memHeap heap, size_t size);
 /* creates and initializes heap */
 extern memHeap mmCreateHeap(size_t size);
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmcheck.c,v 1.12 1999-10-15 16:07:08 obachman Exp $ */
+/* $Id: mmcheck.c,v 1.13 1999-10-19 14:55:38 obachman Exp $ */
 
 /*
 * ABSTRACT: several checking routines to help debugging the memory subsystem
@@ -71,8 +71,10 @@ void mmTakeOutDBMCB ( pDBMCB what )
     what->next->prev = what->prev;
 }
 
+#ifndef HAVE_AUTOMATIC_GC
 void mmDBSetHeapsOfBlocks(memHeap fromheap, memHeap toheap)
 {
+
   memHeapPage pages = fromheap->pages;
   int nblocks = SIZE_OF_HEAP_PAGE / toheap->size;
   int i;
@@ -90,10 +92,16 @@ void mmDBSetHeapsOfBlocks(memHeap fromheap, memHeap toheap)
     pages = pages->next;
   }
 }
+#endif
 
-void mmDBInitNewHeapPage(memHeap heap)
+void mmDBInitNewHeapPage(memHeap heap, memHeapPage page)
 {
+#ifndef HAVE_AUTOMATIC_GC
   DBMCB* what = (DBMCB*) heap->current;
+#else
+  DBMCB* what =  (DBMCB*) page->current;
+#endif
+  
   DBMCB* prev = NULL;
   size_t size = SizeFromRealSize(heap->size);
 
@@ -341,7 +349,6 @@ static int mmCheckSingleDBMCB ( DBMCB * what, int size , int flags)
   {
     if (flags & MM_USEDFLAG)
     {
-      mmRemoveFromCurrentHeap(what->heap, what);
       mmMoveDBMCB(&mm_theDBfree, &mm_theDBused, what);
       what->flags |= MM_USEDFLAG;
       return mmPrintDBMCB( what, "block has been freed but still in use (fixed)", 0 );
