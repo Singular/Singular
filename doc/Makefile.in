@@ -189,8 +189,8 @@ images/%.xbm : images/%.xbm.uu
 	uudecode $< -o $@
 
 ${IMAGES_HTML} : ${IMAGES_SRC}
-	test -d ${HTMLDIR} || mkdir ${HTMLDIR}
-	cp ${IMAGES_SRC} ${HTML_DIR}
+	test -d ${HTML_SUBDIR} || mkdir ${HTML_SUBDIR}
+	cp ${IMAGES_SRC} ${HTML_SUBDIR}
 
 
 

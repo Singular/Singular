@@ -84,8 +84,6 @@ AC_CHECK_PROG(TEXI2HTML, texi2html, texi2html)
 fi
 if test "$ac_cv_prog_LATEX2HTML" = latex2html; then
   TEXI2HTML_OPTS="-l2h"
-else
- TEXI2HTML_OPTS="-expand info" 
 fi
 AC_SUBST(TEXI2HTML_OPTS)
 
