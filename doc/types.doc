@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.117 2001-08-27 16:25:48 Singular Exp $
+@comment $Id: types.doc,v 1.118 2002-01-16 13:58:46 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -2274,6 +2274,9 @@ a diagonal matrix
 @item @code{*}
 multiplication with matrix or poly; the poly is converted into a
 diagonal matrix
+
+@item @code{/}
+division by poly
 
 @item @code{==}, @code{<>}, @code{!=}
 comparison
