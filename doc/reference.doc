@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.164 1999-11-29 12:56:09 obachman Exp $
+@comment $Id: reference.doc,v 1.165 1999-11-29 14:46:00 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -5166,7 +5166,7 @@ See
 @ref{nrows}.
 @c ref
 @c ---------------------------------------
-@node sortvec, spectrum, size, Functions
+@node sortvec, sprintf, size, Functions
 @subsection sortvec
 @cindex sortvec
 @table @code
@@ -5199,51 +5199,7 @@ See
 @ref{general_lib}.
 @c ref
 @c ---------------------------------------
-@node spectrum, sprintf, sortvec, Functions
-@subsection spectrum
-@cindex spectrum
-@table @code
-@item @strong{Syntax:}
-@code{spectrum (} poly_expression @code{)}
-@*@code{spectrum (} poly_expression, int_expression @code{)}
-@item @strong{Type:}
-list
-@item @strong{Purpose:}
-computes the spectrum of an isolated hypersurface singularity given by 
-the poly_expression f.
-Requires that the principal part of f is C-nondegenerate.@*
-This routine will do some tests to detect a degenerate principal part.@*
-The return list contains
-  @enumerate
-  @item
-  the Milnor number
-  @item
-  the geometric genus
-  @item
-  an intvec a
-  @item
-  an intvec b
-  @item
-  an intvec m
-  @end enumerate
-The spectrum numbers are a[i]/b[i], appearing with multiplicity m[i].
-@item @strong{Note:}
-This command will become part of a library in future versions of @sc{Singular}.
-@item @strong{Example:}
-@smallexample
-@c STILL BROKEN example
-  ring r=0,(x,y,z),ds;
-  poly f=x^7+y^7+z^7;
-  list s1=spectrum(f);
-  s1;
-@c STILL BROKEN example
-@end smallexample
-@end table
-@c @c ref
-@c See
-@c @c ref
-@c ---------------------------------------
-@node sprintf, sres, spectrum, Functions
+@node sprintf, sres, sortvec, Functions
 @subsection sprintf
 @cindex sprintf
 @c lib standard.lib:sprintf lib_fun lib_ex subsection
@@ -6174,6 +6130,7 @@ See
 @end ifinfo
 @menu
 * break::
+* breakpoint::
 * continue::
 * else::
 * export::
@@ -6218,7 +6175,7 @@ if ( i>j )
 @end table
 
 @c ---------------------------------------
-@node break, continue, Control structures, Control structures
+@node break, breakpoint, Control structures, Control structures
 @subsection break
 @cindex break
 @table @code
@@ -6243,6 +6200,34 @@ See
 @ref{Control structures};
 @ref{for};
 @ref{while}.
+@c ref
+@c ---------------------------------------
+@node breakpoint, continue, break, Control structures
+@subsection breakpoint
+@cindex breakpoint
+@table @code
+@item @strong{Syntax:}
+@code{breakpoint(} proc_name @code{);}
+@*@code{breakpoint(} proc_name@code{,} line_no @code{);}
+@item @strong{Purpose:}
+sets a breakpoint at the beginning of the specified procedure or 
+at the given line.
+@strong{Note:} Line number 1 is the first line of a libary (for
+procedures from libraries) resp. the line with the @code{@{}.
+@*A line number of -1 removes all breakpoint from that procedure.
+@item @strong{Example:}
+@smallexample
+@c example
+breakpoint(groebner);
+breakpoint(groebner, 176);
+breakpoint(groebner, -1);
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{~};
+@ref{Source code debugger}.
 @c ref
 @c ---------------------------------------
 @node continue, else, break, Control structures

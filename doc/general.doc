@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.158 1999-11-29 12:56:08 obachman Exp $
+@comment $Id: general.doc,v 1.159 1999-11-29 14:45:57 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -3614,13 +3614,12 @@ error message. The commands @code{q 1} and @code{q 2} are equivalent in this
 case.
 
 @subsubsection SDB breakpoints in procedures
-@cindex breakpoint
+@cindex SDB breakpoint
+@cindex SDB debugger
 Up to seven SDB breakpoints can be set.
-To set a breakpoint at the procedure proc_name use
-@code{breakpoint(} proc_name @code{);}.
-@*To set a breakpoint at line line_no in the procedure proc_name use
-@code{breakpoint(} proc_name@code{,} line_no @code{);}.
-@*These breakpoints can be cleared with the command @code{d} breakpoint_no
+To set a breakpoint at a procedure use
+@code{breakpoint}. (See @ref{breakpoint}).
+@*These breakpoints can be cleared with the command @code{d breakpoint_no}
 from within the debugger or with
 @code{breakpoint(} proc_name @code{,-1);}.
 @c ---------------------------------------
