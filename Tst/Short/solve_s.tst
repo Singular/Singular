@@ -3,7 +3,7 @@
 
 LIB "tst.lib";
 tst_init();
-tst_ignore("CVS ID $Id: solve_s.tst,v 1.2 1999-11-18 16:38:36 obachman Exp $");
+tst_ignore("CVS ID $Id: solve_s.tst,v 1.3 2003-07-18 16:58:39 Singular Exp $");
 
 LIB "solve.lib";
 
@@ -77,6 +77,8 @@ poly ip= interpolate( p,v,3 );
 ip;
 
 ////////////////////////////
+
+example simplexOut;
 
 tst_status(1);$
 
