@@ -3,7 +3,7 @@
  *  Purpose: declarations for dlmalloc 
  *  This was obtained by taking cutting out the beginning of malloc.c 
  *
- *  Version: $Id: dlmalloc.h,v 1.3 2000-08-14 12:26:36 obachman Exp $
+ *  Version: $Id: dlmalloc.h,v 1.4 2000-08-14 12:36:59 obachman Exp $
  *******************************************************************/
 #ifndef DL_MALLOC_H
 #define DL_MALLOC_H
@@ -21,6 +21,7 @@
 #define OM_MALLOC_VALLOC   vALLOc
 #define OM_MALLOC_VFREE(addr, size) OM_MALLOC_FREE(addr)
 #define OM_MALLOC_SIZEOF_ADDR(addr) malloc_usable_size(addr)
+#define cfree cFREe
 
 /* Statistics */
 extern unsigned long mmapped_mem;

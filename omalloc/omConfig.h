@@ -5,7 +5,7 @@
  *  Purpose: configuration for omalloc  
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omConfig.h,v 1.1 2000-08-14 12:18:27 obachman Exp $
+ *  Version: $Id: omConfig.h,v 1.2 2000-08-14 12:37:00 obachman Exp $
  *******************************************************************/
 #ifndef OM_CONFIG_H
 #define OM_CONFIG_H
@@ -16,7 +16,7 @@
 /* define if you provide an external config file to be included
    by omDefaultConfig.h */
 #ifndef OM_HAVE_EXTERNAL_CONFIG_H
-#define OM_HAVE_EXTERNAL_CONFIG_H
+/* #undef OM_HAVE_EXTERNAL_CONFIG_H */
 #endif
 /* define if you can inline */
 #ifndef OM_INLINE
