@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: doc2tex.pl,v 1.25 2000-04-27 10:07:20 obachman Exp $
+# $Id: doc2tex.pl,v 1.26 2000-12-21 15:15:36 obachman Exp $
 ###################################################################
 #  Computer Algebra System SINGULAR
 #
@@ -199,7 +199,12 @@ while (<DOC>)
       $section = "unknown";
     }
   }
-  
+
+  # handle math
+  $in_info = 1 if /^\@ifinfo/;
+  $in_info = 0 if /^\@end\s*ifinfo/;
+  s[\@math\{(.*?)\}][&HandleMath($1)]eg unless $in_info;
+
   print TEX $_;
 
   if (! $printed_header && /^\@c/) 
@@ -220,6 +225,19 @@ EOT
 close(TEX);
 print "==>$tex_file)\n" if ($verbose);
 
+sub HandleMath
+{
+  my $what = shift;
+  return <<EOT;
+
+\@ifinfo
+\@math{$what}
+\@end ifinfo
+\@tex
+\$$what\$
+\@end tex
+EOT
+}
 
 ######################################################################
 # @c example [error] [no_comp] [unix_only]
