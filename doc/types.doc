@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.46 1998-05-14 21:03:57 wichmann Exp $
+@comment $Id: types.doc,v 1.47 1998-05-15 11:59:55 schmidt Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -26,20 +26,32 @@
 This chapter explains all data types of @sc{Singular} in
 alphabetical order. For every type, there is a description of the
 declaration syntax as well as information about how to build expressions
-of certain types. A list of expressions (in the following referred to as
-expression_list) in @sc{Singular} is any comma separated list of
-expressions.
+of certain types.
+
+A list of expressions (in the following referred to as expression_list)
+in @sc{Singular} is any comma separated list of expressions.
 
 The general syntax of a declaration is:
+@c ------------------------------------------------------------
+@c   This piece of text exists in the file types.doc, 
+@c   chapter "Data types", general.doc, chapter "Names" and
+@c   chapter "General command syntax".
+@c   If you change something here, change it there, too!
+@c ------------------------------------------------------------
 @enumerate
 @item type name @code{=} expression @code{;}
-@*Declares a variable with the given name of the given type and assigns
-the expression as initial value to it.
+@* declares a variable with the given name of the given type and assigns
+the expression as initial value to it.  Expression is any expression of
+the specified type or one that can be converted to that type.
+@xref{Type conversion and casting}).
 
 @item type name @code{;}
-@*Declares a variable with the given name of the given type and assigns
+@* declares a variable with the given name of the given type and assigns
 the default value of the specific type to it.
 @end enumerate
+@c ------------------------------------------------------------
+@c   End of duplicate piece of text.
+@c ------------------------------------------------------------
 
 @table @strong
 @item Example:
