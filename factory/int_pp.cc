@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_pp.cc,v 1.5 1997-09-10 15:42:36 schmidt Exp $ */
+/* $Id: int_pp.cc,v 1.6 1997-10-10 10:57:48 schmidt Exp $ */
 
 #include <config.h>
 
@@ -268,19 +268,22 @@ InternalCF* InternalPrimePower::divsame( InternalCF * c )
     }
 }
 
-InternalCF* InternalPrimePower::modulosame( InternalCF * c )
+InternalCF *
+InternalPrimePower::modulosame ( InternalCF * )
 {
     if ( deleteObject() ) delete this;
     return CFFactory::basic( 0 );
 }
 
-InternalCF* InternalPrimePower::modsame( InternalCF * c )
+InternalCF *
+InternalPrimePower::modsame ( InternalCF * )
 {
     if ( deleteObject() ) delete this;
     return CFFactory::basic( 0 );
 }
 
-void InternalPrimePower::divremsame( InternalCF * c, InternalCF*& quot, InternalCF*& rem )
+void
+InternalPrimePower::divremsame ( InternalCF * c, InternalCF * & quot, InternalCF * & rem )
 {
     if ( c == this ) {
 	quot = CFFactory::basic( 1 );
@@ -301,77 +304,90 @@ void InternalPrimePower::divremsame( InternalCF * c, InternalCF*& quot, Internal
     }
 }
 
-bool InternalPrimePower::divremsamet( InternalCF* c, InternalCF*& quot, InternalCF*& rem )
+bool
+InternalPrimePower::divremsamet ( InternalCF * c, InternalCF * & quot, InternalCF * & rem )
 {
     divremsame( c, quot, rem );
     return true;
 }
 
-int InternalPrimePower::comparecoeff( InternalCF* c )
+int
+InternalPrimePower::comparecoeff ( InternalCF * )
 {
     ASSERT( 0, "this function should never be called" );
     return 0;
 }
 
-InternalCF* InternalPrimePower::addcoeff( InternalCF* c )
+InternalCF *
+InternalPrimePower::addcoeff ( InternalCF * )
 {
     ASSERT( 0, "this function should never be called" );
     return this;
 }
 
-InternalCF* InternalPrimePower::subcoeff( InternalCF* c, bool negate )
+InternalCF *
+InternalPrimePower::subcoeff ( InternalCF *, bool )
 {
     ASSERT( 0, "this function should never be called" );
     return this;
 }
 
-InternalCF* InternalPrimePower::mulcoeff( InternalCF* c )
+InternalCF *
+InternalPrimePower::mulcoeff ( InternalCF * )
 {
     ASSERT( 0, "this function should never be called" );
     return this;
 }
 
-InternalCF* InternalPrimePower::dividecoeff( InternalCF* c, bool invert )
+InternalCF *
+InternalPrimePower::dividecoeff ( InternalCF *, bool )
 {
     ASSERT( 0, "this function should never be called" );
     return this;
 }
 
-InternalCF* InternalPrimePower::divcoeff( InternalCF* c, bool invert )
+InternalCF *
+InternalPrimePower::divcoeff ( InternalCF *, bool )
 {
     ASSERT( 0, "this function should never be called" );
     return this;
 }
 
-InternalCF* InternalPrimePower::modcoeff( InternalCF* c, bool invert )
+InternalCF *
+InternalPrimePower::modcoeff ( InternalCF *, bool )
 {
     ASSERT( 0, "this function should never be called" );
     return this;
 }
 
-InternalCF* InternalPrimePower::modulocoeff( InternalCF* c, bool invert )
+InternalCF *
+InternalPrimePower::modulocoeff ( InternalCF *, bool )
 {
     ASSERT( 0, "this function should never be called" );
     return this;
 }
 
-void InternalPrimePower::divremcoeff( InternalCF* c, InternalCF*& quot, InternalCF*& rem, bool invert )
+void
+InternalPrimePower::divremcoeff ( InternalCF *, InternalCF * &, InternalCF * &, bool )
 {
     ASSERT( 0, "this function should never be called" );
 }
 
-bool InternalPrimePower::divremcoefft( InternalCF* c, InternalCF*& quot, InternalCF*& rem, bool invert )
+bool
+InternalPrimePower::divremcoefft ( InternalCF *, InternalCF * &, InternalCF * &, bool )
 {
     ASSERT( 0, "this function should never be called" );
     return true;
 }
 
-int InternalPrimePower::intval() const
+int
+InternalPrimePower::intval () const
 {
   return (int)mpz_get_si( &thempi );
 }
 
-int InternalPrimePower::intmod( int p ) const
+int
+InternalPrimePower::intmod( int p ) const
 {
   return (int)mpz_mmod_ui( 0, &thempi, (unsigned long)p );
 }
