@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.51 1999-11-25 13:12:27 siebert Exp $ */
+/* $Id: syz1.cc,v 1.52 2000-01-28 12:37:56 siebert Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -2539,13 +2539,10 @@ static resolvente syReadOutMinimalRes(syStrategy syzstr,
   ideal rs;
   SSet sPairs;
   int * ord,*b0,*b1;
-  pSetmProc oldSetm=pSetm;
-  pCompProc oldComp0=pComp0;
 
   assume(syzstr->syRing != NULL);
   rChangeCurrRing(syzstr->syRing, TRUE);
 //Print("laeufts ");
-  pComp0 = syzcomp2dpc;
   syzstr->bucket = kBucketCreate();
   for (index=syzstr->length-1;index>0;index--)
   {
@@ -2596,11 +2593,6 @@ static resolvente syReadOutMinimalRes(syStrategy syzstr,
     rChangeCurrRing(origR,TRUE);
     // Thomas: now make sure that all data which you need is pFetchCopied
     // maybe incoporate it into syReorder ??
-  }
-  else
-  {
-    pSetm=oldSetm;
-    pComp0=oldComp0;
   }
   tres = syReorder(tres,syzstr->length,syzstr,FALSE,syzstr->res);
   syKillEmptyEntres(tres,syzstr->length);
@@ -2661,8 +2653,6 @@ syStrategy syLaScala3(ideal arg,int * length)
     syzstr->minres[0] = idInit(1,arg->rank);
     return syzstr;
   }
-  pSetmProc oldSetm=pSetm;
-  pCompProc oldComp0=pComp0;
 
   //crit = 0;
   //euler = -1;
@@ -2682,7 +2672,6 @@ syStrategy syLaScala3(ideal arg,int * length)
     currcomponents[i] = i;
   }
   rChangeSComps(currcomponents, currShiftedComponents, arg->rank);
-  pComp0 = syzcomp2dpc;
 /*--- initializes the data structures---------------*/
   syzstr->Tl = NewIntvec1(*length);
   temp = idInit(IDELEMS(arg),arg->rank);

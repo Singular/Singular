@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.86 2000-01-28 09:45:56 Singular Exp $ */
+/* $Id: ideals.cc,v 1.87 2000-01-28 12:37:28 siebert Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -385,8 +385,9 @@ void idDBTest(ideal h1,char *f,int l)
 /*3
 * for idSort: compare a and b revlex inclusive module comp.
 */
-static int pComp_RevLex(poly a, poly b)
+static int pComp_RevLex(poly a, poly b,BOOLEAN nolex)
 {
+ if (nolex) return pComp0(a,b);
  int l=pVariables;
  while ((l>0) && (pGetExp(a,l)==pGetExp(b,l))) l--;
  if (l==0)
@@ -411,10 +412,6 @@ intvec *idSort(ideal id,BOOLEAN nolex)
   int diff, olddiff, lastcomp, newcomp;
   BOOLEAN notFound;
 
-  pCompProc oldComp=pComp0;
-
-  if (!nolex) pComp0=pComp_RevLex;
-
   for (i=0;i<IDELEMS(id);i++)
   {
     if (id->m[i]!=NULL)
@@ -438,7 +435,7 @@ intvec *idSort(ideal id,BOOLEAN nolex)
       }
       while ((newpos>=0) && (newpos<actpos) && (notFound))
       {
-        newcomp = pComp0(id->m[i],id->m[(*result)[newpos]]);
+        newcomp = pComp_RevLex(id->m[i],id->m[(*result)[newpos]],nolex);
         olddiff = diff;
         if (diff>1)
         {
@@ -485,7 +482,7 @@ intvec *idSort(ideal id,BOOLEAN nolex)
       }
       if (newpos<0) newpos = 0;
       if (newpos>actpos) newpos = actpos;
-      while ((newpos<actpos) && (pComp0(id->m[i],id->m[(*result)[newpos]])==0))
+      while ((newpos<actpos) && (pComp_RevLex(id->m[i],id->m[(*result)[newpos]],nolex)==0))
         newpos++;
       for (j=actpos;j>newpos;j--)
       {
@@ -496,7 +493,6 @@ intvec *idSort(ideal id,BOOLEAN nolex)
     }
   }
   for (j=0;j<actpos;j++) (*result)[j]++;
-  pComp0=oldComp;
   return result;
 }
 

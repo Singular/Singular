@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz2.cc,v 1.11 1999-11-20 10:17:24 siebert Exp $ */
+/* $Id: syz2.cc,v 1.12 2000-01-28 12:41:52 siebert Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -939,8 +939,6 @@ syStrategy syHilb(ideal arg,int * length)
   ideal temp=NULL;
   SSet nextPairs;
   ring origR = currRing;
-  pSetmProc oldSetm=pSetm;
-  pCompProc oldComp0=pComp0;
   syStrategy syzstr=(syStrategy)Alloc0SizeOf(ssyStrategy);
 
   if ((idIs0(arg)) || (idRankFreeModule(arg)>0))
