@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmisc.c,v 1.11 1999-09-27 14:41:52 obachman Exp $ */
+/* $Id: mmisc.c,v 1.12 1999-09-29 17:03:35 obachman Exp $ */
 
 /*
 * ABSTRACT:
@@ -164,8 +164,8 @@ void mmTestList (int all)
   {
     if ((all & MM_PRINT_ALL_ADDR) || what->init == 0)
     {
-      fprintf( stderr, "%d bytes at %p in: %s:%d",
-               (int)what->size, what, what->fname, what->lineno);
+      fprintf( stderr, "%d bytes at %p allocated in: %s:%d",
+               (int)what->size, what, what->allocated_fname, what->allocated_lineno);
 #ifdef MTRACK
       mmDBPrintStack(what, all);
 #else

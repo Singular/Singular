@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmprivate.h,v 1.10 1999-06-30 15:42:13 Singular Exp $ */
+/* $Id: mmprivate.h,v 1.11 1999-09-29 17:03:36 obachman Exp $ */
 /*
 * ABSTRACT
 */
@@ -33,13 +33,16 @@ typedef struct DBMCB
   void* _nnext;
   struct DBMCB * next;
   struct DBMCB * prev;
-  char * fname;
+  char * allocated_fname;
+  char * freed_fname;
 #ifdef MTRACK
-  unsigned long bt_stack[BT_MAXSTACK];
+  unsigned long bt_allocated_stack[BT_MAXSTACK];
+  unsigned long bt_freed_stack[BT_MAXSTACK];
 #endif
   int init;
   size_t size;
-  int lineno;
+  int allocated_lineno;
+  int freed_lineno;
   int flags;
   memHeap heap;
   char front_pattern[MM_NUMBER_OF_FRONT_PATTERNS];

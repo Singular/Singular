@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmbt.c,v 1.10 1999-09-29 15:16:44 obachman Exp $ */
+/* $Id: mmbt.c,v 1.11 1999-09-29 17:03:35 obachman Exp $ */
 /*
 * ABSTRACT: backtrace: part of memory subsystem (for linux/elf)
 * needed programs: - mprpc to set the variable MPRPC
@@ -163,14 +163,22 @@ void mmPrintStack(unsigned long *stack, int all)
   mmPrintStackFrames(stack, 0, BT_MAXSTACK, all);
 }
 
+void mmDBPrintThisStack(void* memblock, int all, int free)
+{
+  if (free)
+    mmPrintStackFrames(((DBMCB*) memblock)->bt_freed_stack, 0, BT_MAXSTACK, all);
+  else
+    mmPrintStackFrames(((DBMCB*) memblock)->bt_allocated_stack, 0, BT_MAXSTACK, all);
+}
+    
 void mmDBPrintStack(void* memblock, int all)
 {
-  mmPrintStackFrames(((DBMCB*) memblock)->bt_stack, 0, BT_MAXSTACK, all);
+  mmPrintStackFrames(((DBMCB*) memblock)->bt_allocated_stack, 0, BT_MAXSTACK, all);
 }
 
 void mmDBPrintStackFrames(void* memblock, int start, int end)
 {
-  mmPrintStackFrames(((DBMCB*) memblock)->bt_stack, start, end, 
+  mmPrintStackFrames(((DBMCB*) memblock)->bt_allocated_stack, start, end, 
                      MM_PRINT_ALL_STACK);
 }
 

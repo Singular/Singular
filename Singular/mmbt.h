@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmbt.h,v 1.3 1999-03-19 17:42:29 obachman Exp $ */
+/* $Id: mmbt.h,v 1.4 1999-09-29 17:03:35 obachman Exp $ */
 /*
 * ABSTRACT: backtrace: part of memory subsystem (for linux/elf)
 * needed programs: - mprpc to set the variable MPRPC
@@ -29,7 +29,7 @@ void mmPrintStack(unsigned long *stack, int mm);
 void mmDBPrintStack(void* memblock, int mm);
 void mmDBPrintStackFrames(void* memblock, int start, int end);
 void mmPrintStackFrames(unsigned long *bt_stack, int start, int end, int mm); 
-
+void mmDBPrintThisStack(void* memblock, int all, int free);
 #endif /* linux, i386 */
 #endif /* not optimize */
 #endif /* MTRACK */

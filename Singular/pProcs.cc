@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: pProcs.cc,v 1.1 1999-09-29 10:59:35 obachman Exp $ */
+/* $Id: pProcs.cc,v 1.2 1999-09-29 17:03:36 obachman Exp $ */
 /*
 *  ABSTRACT -  Routines for primitive poly arithmetic
 */
@@ -169,7 +169,7 @@ poly  p_Mult_m_General(poly p,
 {
   assume(heap != NULL && heap != MM_UNKNOWN_HEAP);
   assume(pHeapTest(p, MM_UNKNOWN_HEAP));
-  assume(pHeapTest(m, MM_UNKNOWN_HEAP));
+//  assume(pHeapTest(m, MM_UNKNOWN_HEAP));
   
   if (p == NULL) return NULL;
   spolyrec rp;
@@ -235,7 +235,7 @@ poly p_Minus_m_Mult_q_General (poly p,
 {
   assume(heap != NULL && heap != MM_UNKNOWN_HEAP);
   assume(pHeapTest(p, heap));
-  assume(pHeapTest(m, MM_UNKNOWN_HEAP));
+//  assume(pHeapTest(m, MM_UNKNOWN_HEAP));
   assume(pHeapTest(q, MM_UNKNOWN_HEAP));
   assume(lp == NULL || (pLength(p) == *lp && pLength(q) == lq));
 
@@ -277,7 +277,7 @@ poly p_Minus_m_Mult_q_General (poly p,
     tc = pGetCoeff(p);
     if (!nEqual(tc, tb))
     {
-      lp--;
+      l--;
       tc = nSub(tc, tb);
       nDelete(&(pGetCoeff(p)));
       pSetCoeff0(p,tc); // adjust coeff of p
@@ -286,7 +286,7 @@ poly p_Minus_m_Mult_q_General (poly p,
     }
     else
     { // coeffs are equal, so their difference is 0: 
-      lp -= 2;
+      l -= 2;
       nDelete(&tc);
       pFree1AndAdvance(p, heap);
     }
@@ -343,114 +343,3 @@ poly p_Minus_m_Mult_q_General (poly p,
    return pNext(&rp);
 } 
 
-
-/***************************************************************
- *
- * fast poly proc business
- *
- ***************************************************************/
-
-#if 0
-#define NonZeroA(d, multiplier, actionE)        \
-{                                               \
-  d ^= multiplier;                              \
-  actionE;                                      \
-}                                               \
-
-#define NonZeroTestA(d, multiplier, actionE)    \
-do                                              \
-{                                               \
-  if (d)                                        \
-  {                                             \
-    d ^= multiplier;                            \
-    actionE;                                    \
-  }                                             \
-}                                               \
-while(0)
-
-
-void kbSetPolyProcs(kbPolyProcs_pt pprocs,
-                    ring r, rOrderType_t rot, BOOLEAN homog)
-{
-  assume(pprocs != NULL);
-#ifdef FAST_POLY_PROCS
-  Characteristics ch = chGEN;
-  OrderingTypes ot = otGEN;
-  Homogs hom = homGEN;
-  NumWords nw = nwGEN;
-  int Variables1W;
-
-  // set characterisic
-  if (r->ch > 1) ch = chMODP;
-  
-  // set Ordering Type
-  switch (rot)
-  {   
-      case rOrderType_Exp:
-        ot = otEXP;
-        break;
-    
-      case rOrderType_CompExp:
-        ot = otCOMPEXP;
-        break;
-    
-      case rOrderType_ExpComp:
-        ot = otEXPCOMP;
-        break;
-
-      case rOrderType_Syz2dpc:
-        ot = otSYZDPC;
-        break;
-        
-      case rOrderType_ExpNoComp:
-        ot = otExpNoComp;
-        
-      default:
-        ot = otGEN;
-        break;
-  }
-  
-  // set homogenous
-  if (homog) hom = homYES;
-  
-  // set NumWords
-  if ((((r->N+1)*sizeof(Exponent_t)) % sizeof(void*)) == 0)
-    Variables1W = (r->N+1)*sizeof(Exponent_t) / sizeof(void*);
-  else
-    Variables1W = ((r->N+1)*sizeof(Exponent_t) / sizeof(void*)) + 1;
-  if (Variables1W > 2)
-  {
-    if (Variables1W & 1) nw = nwODD;
-    else nw = nwEVEN;
-  }
-  else 
-  {
-    if (Variables1W == 2) nw = nwTWO;
-    else nw = nwONE;
-  }
-  
-  // Get the nPoly Procs 
-  pprocs->p_Add_q = Getkb_p_Add_q(ch, ot, hom, nw);
-  if (pprocs->p_Add_q == NULL)
-    pprocs->p_Add_q = kb_p_Add_q_General;
-
-  pprocs->p_Mult_m = Getkb_p_Mult_m(ch, ot, hom, nw);
-  if (pprocs->p_Mult_m == NULL)
-    pprocs->p_Mult_m = kb_p_Mult_m_General;
-
-  pprocs->p_Minus_m_Mult_q = Getkb_p_Minus_m_Mult_q(ch, ot, hom, nw);
-  if (pprocs->p_Minus_m_Mult_q == NULL)
-    pprocs->p_Minus_m_Mult_q = kb_p_Minus_m_Mult_q_General;
-
-  pprocs->n_Mult_p = Getkb_n_Mult_p(ch, ot, hom, nw);
-  if (pprocs->n_Mult_p == NULL)
-    pprocs->n_Mult_p = kb_n_Mult_p_General;
-#else // FAST_POLYPROCS
-  pprocs->p_Add_q = kb_p_Add_q_General;
-  pprocs->p_Mult_m = kb_p_Mult_m_General;
-  pprocs->p_Minus_m_Mult_q = kb_p_Minus_m_Mult_q_General;
-  pprocs->n_Mult_p = kb_n_Mult_p_General;
-#endif  
-}
-
-#endif

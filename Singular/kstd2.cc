@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.30 1999-09-29 10:59:30 obachman Exp $ */
+/* $Id: kstd2.cc,v 1.31 1999-09-29 17:03:33 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -365,6 +365,7 @@ static void redHomog (LObject* h,kStrategy strat)
     // now we found one which is divisible
     ksReducePoly(h, &(strat->T[j]),
                  strat->kNoether);
+    kTest(strat);
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG)
     {

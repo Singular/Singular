@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmcheck.c,v 1.7 1999-06-30 14:54:11 Singular Exp $ */
+/* $Id: mmcheck.c,v 1.8 1999-09-29 17:03:35 obachman Exp $ */
 
 /*
 * ABSTRACT:
@@ -102,6 +102,7 @@ void mmDBInitNewHeapPage(memHeap heap)
 
   while (what != NULL)
   {
+    memset(what, 0, sizeof(DBMCB));
     mmFillDBMCB(what, size, heap, MM_FREEFLAG, __FILE__, __LINE__);
     mmMoveDBMCBInto(&mm_theDBfree, what);
     prev = what;
@@ -115,15 +116,25 @@ void mmDBInitNewHeapPage(memHeap heap)
 static int mmPrintDBMCB ( DBMCB * what, char* msg , int given_size)
 {
   (void)fprintf( stderr, "warning: %s\n", msg );
-  (void)fprintf( stderr, "block %lx %s in: %s:%d",
+  (void)fprintf( stderr, "block %lx allocated in: %s:%d",
                  (long)&(what->data),
-                 (what->flags & MM_FREEFLAG ? "freed" : "allocated" ),
-                 what->fname, what->lineno );
+                 what->allocated_fname, what->freed_lineno );
 #ifdef MTRACK
-  mmDBPrintStack(what, MM_PRINT_ALL_STACK);
-#else
-  fprintf( stderr,"\n");
+  mmDBPrintThisStack(what, MM_PRINT_ALL_STACK, 0);
 #endif
+
+  if ((what->flags & MM_FREEFLAG) && what->freed_fname != NULL)
+  {
+    (void)fprintf( stderr, " freed in: %s:%d",
+                   what->freed_fname, what->freed_lineno );
+#ifdef MTRACK
+    mmDBPrintThisStack(what, MM_PRINT_ALL_STACK, 0);
+#endif
+  }
+#ifndef MTRACK
+  fprintf(stderr, "\n");
+#endif
+    
   if (strcmp(msg,"size")==0)
     (void)fprintf( stderr, "size is: %d, but check said %d \n",
       (int)what->size, given_size );
@@ -140,7 +151,7 @@ void mmPrintUsedList( )
   while (what!=NULL)
   {
     (void)fprintf( stderr, "%d bytes at %p in: %s:%d\n",
-      (int)what->size, what, what->fname, what->lineno);
+      (int)what->size, what, what->allocated_fname, what->allocated_lineno);
     what=what->next;
   }
 }
@@ -168,8 +179,17 @@ void mmFillDBMCB(DBMCB* what, size_t size, memHeap heap,
 
   what->heap = heap;
   what->size = size;
-  what->fname = fname;
-  what->lineno = lineno;
+  if ((what->flags & MM_USEDFLAG) && (flags && MM_FREEFLAG))
+  {
+    what->freed_fname = fname;
+    what->freed_lineno = lineno;
+  }
+  else
+  { 
+    what->allocated_fname = fname;
+    what->allocated_lineno = lineno;
+  }
+  
   what->flags = flags;
   what->init = 0;
 
@@ -239,24 +259,48 @@ static int mmCheckSingleDBMCB ( DBMCB * what, int size , int flags)
     return 0;
   }
 
-  if ( ((long)what->fname<1000)
+  if ( ((long)what->allocated_fname<1000)
   #ifdef unix
-       ||((long)what->fname>(long)&(_end))
+       ||((long)what->allocated_fname>(long)&(_end))
   #endif
   )
   { /* fname should be in the text segment */
-    fprintf(stderr, "warning: fname (%lx) out of range\n", (long)what->fname );
+    fprintf(stderr, "warning: allocated_fname (%lx) out of range\n", (long)what->allocated_fname );
     assume(0);
-    what->fname="???";
+    what->allocated_fname="???";
     ok=0;
   }
-  if ( (what->lineno< -9999) ||(what->lineno>9999) )
+  if ( (what->allocated_lineno< -9999) ||(what->allocated_lineno>9999) )
   {
-    fprintf( stderr, "warning: lineno %d out of range\n",what->lineno );
+    fprintf( stderr, "warning: allocated_lineno %d out of range\n",what->allocated_lineno );
     assume(0);
-    what->lineno=0;
+    what->allocated_lineno=0;
     ok=0;
   }
+
+  if ((what->flags & MM_FREEFLAG) && what->freed_fname != NULL)
+  {
+    if ( ((long)what->freed_fname<1000)
+#ifdef unix
+         ||((long)what->freed_fname>(long)&(_end))
+#endif
+         )
+    { /* fname should be in the text segment */
+      fprintf(stderr, "warning: freed_fname (%lx) out of range\n", (long)what->freed_fname );
+      assume(0);
+      what->freed_fname="???";
+      ok=0;
+    }
+    if ( (what->freed_lineno< -9999) ||(what->freed_lineno>9999) )
+    {
+      fprintf( stderr, "warning: freed_lineno %d out of range\n",what->freed_lineno );
+      assume(0);
+      what->freed_lineno=0;
+      ok=0;
+    }
+  }
+  
+
   #ifdef unix
   if ( (what->next!=NULL)
        && (((long)what->next>(long)mm_maxAddr)

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmalloc.c,v 1.14 1999-03-19 17:42:27 obachman Exp $ */
+/* $Id: mmalloc.c,v 1.15 1999-09-29 17:03:34 obachman Exp $ */
 
 /*
 * ABSTRACT:
@@ -188,7 +188,7 @@ static void * mmDBAllocHeapS(memHeap heap, size_t size,
 #endif  
 
 #ifdef MTRACK
-  mmTrack(result->bt_stack);
+  mmTrack(result->bt_allocated_stack);
 #endif
 
   if (! mmCheckDBMCB(result, SizeFromRealSize(mmGetHeapBlockSize(heap)),
@@ -228,7 +228,7 @@ static void mmDBFreeHeapS(void* addr, memHeap heap, size_t size,
               heap, MM_FREEFLAG, fname, lineno);
 
 #ifdef MTRACK
-  mmTrack(what->bt_stack);
+  mmTrack(what->bt_freed_stack);
 #endif  
 }
 
@@ -285,7 +285,7 @@ void * mmDBAllocBlock( size_t size,  char * fname, int lineno)
       mmFillDBMCB(result, size, NULL, MM_USEDFLAG, fname, lineno);
   
       #ifdef MTRACK
-      mmTrack(result->bt_stack);
+      mmTrack(result->bt_allocated_stack);
       #endif
       
       return (void*) &(result->data);
