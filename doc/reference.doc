@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.110 1999-05-25 07:35:38 krueger Exp $
+@comment $Id: reference.doc,v 1.111 1999-05-29 11:57:03 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -5959,7 +5959,6 @@ library @code{standard.lib} is automatically loaded at start-up time.
   listvar();
 @c example
 @end example
-@end table
 @c ref
 See
 @ref{Command line options};
