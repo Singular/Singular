@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.46 2003-01-09 16:43:39 Singular Exp $ */
+/* $Id: longrat.cc,v 1.47 2003-01-09 17:04:32 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -181,11 +181,6 @@ BOOLEAN nlDBTest(number a, char *f,int l)
     if (mpz_cmp_si(&a->n,(long)1)==0)
     {
       Print("!!longrat:integer as rational in %s:%d\n",f,l);
-      if (a->ref==1)
-      {
-        mpz_clear(&a->n);
-        a->s=3;
-      }
       return FALSE;
     }
     else if (mpz_isNeg(&a->n))
