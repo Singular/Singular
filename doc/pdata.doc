@@ -1,3 +1,25 @@
+@comment -*-texinfo-*-
+@comment $Id: pdata.doc,v 1.2 1998-05-19 15:41:58 wichmann Exp $
+@comment this file contains the "Polynomial data" appendix.
+
+@c The following directives are necessary for proper compilation
+@c with emacs (C-c C-e C-r).  Please keep it as it is.  Since it
+@c is wrapped in `@ignore' and `@end ignore' it does not harm `tex' or
+@c `makeinfo' but is a great help in editing this file (emacs
+@c ignores the `@ignore').
+@ignore
+%**start
+\input texinfo.tex
+@setfilename pdata.info
+@node Top, Polynomial data
+@menu
+* Polynomial data::
+@end menu
+@node Polynomial data, Examples, Mathematical background, Top
+@chapter Polynomial data
+%**end
+@end ignore
+
 @c -----------------------------------------------------------------
 @node Representation of mathematical objects,Monomial orderings,,Polynomial data
 @section Representation of mathematical objects
