@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_complex.cc,v 1.14 1999-07-08 17:17:23 Singular Exp $ */
+/* $Id: mpr_complex.cc,v 1.15 1999-07-28 08:22:15 wenk Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - real floating-point numbers using gmp
@@ -249,6 +249,62 @@ gmp_float numberToFloat( number num )
   {
     WerrorS("Ground field not implemented!");
   }
+
+  return r;
+}
+
+gmp_float numberFieldToFloat( number num, int k )
+{
+  gmp_float r;
+
+  switch (k) 
+  {
+  case QTOF:
+    if ( num != NULL )
+    {
+      if (SR_HDL(num) & SR_INT)
+      {
+        r= SR_TO_INT(num);
+      }
+      else
+      {
+        if ( num->s == 0 )
+        {
+          nlNormalize( num );
+        }
+        if (SR_HDL(num) & SR_INT)
+        {
+          r= SR_TO_INT(num);
+        }
+        else
+        {
+          if ( num->s != 3 )
+          {
+            r= &num->z;
+            r/= (gmp_float)&num->n;
+          }
+          else
+          {
+            r= &num->z;
+          }
+        }
+      }
+    }
+    else
+    {
+      r= 0.0;
+    }
+    break;
+  case RTOF:
+    r= *(gmp_float*)num;
+    break;
+  case CTOF:
+    WerrorS("Can not map from field C to field R!");
+    break;
+  case ZTOF:
+  default:
+    WerrorS("Ground field not implemented!");
+  } // switch
 
   return r;
 }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_base.cc,v 1.7 1999-07-08 10:18:10 wenk Exp $ */
+/* $Id: mpr_base.cc,v 1.8 1999-07-28 08:22:15 wenk Exp $ */
 
 /*
  * ABSTRACT - multipolynomial resultants - resultant matrices
@@ -27,7 +27,6 @@
 #include "clapsing.h"
 #include "sparsmat.h"
 
-#include <time.h>
 #include <math.h>
 #include "mpr_global.h"
 #include "mpr_base.h"
@@ -46,13 +45,13 @@ extern void nPrint(number n);  // for debugging output
 //#define mprTEST
 //#define mprMINKSUM
 
-#define MAXPOINTS      1000
+#define MAXPOINTS      10000
 #define MAXINITELEMS   256
-#define LIFT_COOR      100000000
-#define SCALEDOWN      100000.0
-#define MAXSEED        1024 //512
+#define LIFT_COOR      50000   // siRand() % LIFT_COOR gives random lift value
+#define SCALEDOWN      100.0  // lift value scale down for linear program
 #define MINVDIST       0.0
-#define RVMULT         0.00005 // 0.000000005
+#define RVMULT         0.0001 // multiplicator for random shift vector
+#define MAXRVVAL       50000
 #define MAXVARS        100
 //<-
 
@@ -250,8 +249,6 @@ private:
    * returns false, if more mem was allocated, else true
    */
   inline bool checkMem();
-
-  int seed;
 };
 //<-
 
@@ -684,10 +681,6 @@ void pointSet::lift( int l[] )
   int i, j;
   int sum;
 
-  time_t *tp = NULL;
-  seed = ((int)time(tp) % MAXSEED) + index; // secs since 1/1/70 ->[1,MAXSEED]
-  //seed= 100+index;
-
   dim++;
 
   if ( l==NULL )
@@ -710,7 +703,7 @@ void pointSet::lift( int l[] )
     points[j]->point[dim]= sum;
   }
 
-#ifdef mprDEBUG_ALL
+#ifdef mprDEBUG_PROT
   Print(" lift vector: ");
   for ( j=1; j < dim; j++ ) Print(" %d ",l[j] );
   PrintLn();
@@ -1338,7 +1331,7 @@ int resMatrixSparse::RC( pointSet **pQ, pointSet *E, int vert, mprfloat shift[] 
   // count
   if ( (*E)[vert]->rc.set == linPolyS ) numSet0++;
 
-#ifdef mprDEBUG_PROT
+#ifdef mprDEBUG_ALL
   Print("\n Point E[%d] was <",vert);print_exp((*E)[vert],E->dim-1);Print(">, bucket={");
   for ( j= 0; j < E->dim; j++ )
   {
@@ -1455,11 +1448,18 @@ void resMatrixSparse::randomVector( const int dim, mprfloat shift[] )
 {
   int i,j;
   i= 1;
-  time_t *tp = NULL;
-
+  /*
+  shift[1]= (mprfloat) (RVMULT*(siRand()%MAXRVVAL)/(mprfloat)MAXRVVAL);
+  i++;
   while ( i <= dim )
   {
-    shift[i]= (mprfloat) (RVMULT*siRand()/(MAX_INT_VAL+1.0));
+    shift[i]=shift[1];
+    i++;
+  }
+  */
+  while ( i <= dim )
+  {
+    shift[i]= (mprfloat) (RVMULT*(siRand()%MAXRVVAL)/(mprfloat)MAXRVVAL);
     i++;
     for ( j= 1; j < i-1; j++ )
     {
@@ -1470,6 +1470,7 @@ void resMatrixSparse::randomVector( const int dim, mprfloat shift[] )
       }
     }
   }
+
 }
 
 pointSet * resMatrixSparse::minkSumTwo( pointSet *Q1, pointSet *Q2, int dim )
@@ -1597,7 +1598,7 @@ resMatrixSparse::resMatrixSparse( const ideal _gls, const int special )
   E= mpa.getInnerPoints( Qi, shift );
 #endif
 
-#ifdef mprDEBUG_PROT
+#ifdef mprDEBUG_ALL
 #ifdef mprMINKSUM
   Print("(MinkSum)");
 #endif
@@ -1657,7 +1658,7 @@ resMatrixSparse::resMatrixSparse( const ideal _gls, const int special )
   E->unlift();
   E->sort();
 
-#ifdef mprDEBUG_PROT
+#ifdef mprDEBUG_ALL
   Print(" points with a[ij] (%d):\n",E->num);
   for ( pnt= 1; pnt <= E->num; pnt++ )
   {
@@ -2614,7 +2615,7 @@ const number resMatrixDense::getSubDet()
 //-------------- uResultant ---------------------------------------------------
 //-----------------------------------------------------------------------------
 
-#define MAXEVPOINT 1.0e+6
+#define MAXEVPOINT 1000000 // 0x7fffffff
 
 //-> unsigned long over(unsigned long n,unsigned long d)
 // Calculates (n+d \over d) using gmp functionality
@@ -2930,7 +2931,7 @@ rootContainer ** uResultant::interpolateDenseSP( BOOLEAN matchUp, const number s
         }
         else if ( i <= uvar + 2 )
         {
-          pevpoint[i]=nInit(IsPrime(1+(int) (MAXEVPOINT*siRand()/(MAX_INT_VAL+1.0))));
+          pevpoint[i]=nInit(1+(siRand() % MAXEVPOINT));
           //pevpoint[i]=nInit(383);
         }
         else
@@ -3050,7 +3051,7 @@ rootContainer ** uResultant::specializeInU( BOOLEAN matchUp, const number subDet
         nDelete( &pevpoint[i] );
         if ( i <= uvar + 2 )
         {
-          pevpoint[i]=nInit(IsPrime(1+(int) (MAXEVPOINT*siRand()/(MAX_INT_VAL+1.0))));
+          pevpoint[i]=nInit(1+(siRand() % MAXEVPOINT));
           //pevpoint[i]=nInit(383);
         } else pevpoint[i]=nInit(0);
         mprPROTNnl(" ",pevpoint[i]);
@@ -3072,6 +3073,9 @@ rootContainer ** uResultant::specializeInU( BOOLEAN matchUp, const number subDet
 
     number *ncpoly= (number *)Alloc( (tdg+1) * sizeof(number) );
 
+#ifdef MPR_TIMING
+       BOOLEAN masi=true;
+#endif
     piter= pures;
     for ( i= tdg; i >= 0; i-- )
     {
@@ -3080,6 +3084,9 @@ rootContainer ** uResultant::specializeInU( BOOLEAN matchUp, const number subDet
       {
         ncpoly[i]= nCopy( pGetCoeff( piter ) );
         pIter( piter );
+#ifdef MPR_TIMING
+       masi=false;
+#endif
       }
       else
       {
@@ -3087,6 +3094,10 @@ rootContainer ** uResultant::specializeInU( BOOLEAN matchUp, const number subDet
       }
       mprPROTNnl("", ncpoly[i] );
     }
+
+#ifdef MPR_TIMING
+     if ( masi ) Print("MASI MASI MASI\n");
+#endif
 
     mprSTICKYPROT(ST_BASE_EV); // .
 

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_complex.h,v 1.6 1999-06-28 16:06:26 Singular Exp $ */
+/* $Id: mpr_complex.h,v 1.7 1999-07-28 08:22:16 wenk Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - real floating-point numbers using gmp
@@ -19,6 +19,11 @@ extern "C" {
 #include "numbers.h"
 #include "ring.h"
 #include "mpr_global.h"
+
+#define ZTOF 1
+#define QTOF 2
+#define RTOF 3
+#define CTOF 4
 
 #define DEFPREC        20         // minimum number of digits (output operations)
 
@@ -264,6 +269,7 @@ gmp_float exp( const gmp_float & );
 gmp_float max( const gmp_float &, const gmp_float & );
 
 gmp_float numberToFloat( number num );
+gmp_float numberFieldToFloat( number num, int k );
 char *floatToStr( const gmp_float & r, const unsigned int oprec );
 //<-
 
@@ -318,6 +324,7 @@ public:
   inline friend bool operator == ( const gmp_complex & a, const gmp_complex & b );
 
   inline gmp_complex & operator = ( const gmp_complex & a );
+  inline gmp_complex & operator = ( const gmp_float & f );
 
   // access to real and imaginary part
   inline gmp_float real() const { return r; }
@@ -360,6 +367,14 @@ inline gmp_complex & gmp_complex::operator = ( const gmp_complex & a )
   return *this;
 }
 
+// <gmp_complex> = <gmp_complex>
+inline gmp_complex & gmp_complex::operator = ( const gmp_float & f )
+{
+  r= f;
+  i= (long int)0;
+  return *this;
+}
+
 // Returns absolute value of a gmp_complex number
 //
 inline gmp_float abs( const gmp_complex & c )
@@ -369,7 +384,7 @@ inline gmp_float abs( const gmp_complex & c )
 
 gmp_complex sqrt( const gmp_complex & x );
 
-inline gmp_complex numberToGmp_Complex( number num )
+inline gmp_complex numberToComplex( number num )
 {
   if (rField_is_long_C()) {
     return *(gmp_complex*)num;

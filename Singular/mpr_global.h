@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_global.h,v 1.5 1999-07-02 16:14:41 wenk Exp $ */
+/* $Id: mpr_global.h,v 1.6 1999-07-28 08:22:16 wenk Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants -
@@ -11,7 +11,7 @@
 */
 
 // to get detailed timigs, define MPR_TIMING
-//#define MPR_TIMING
+#define MPR_TIMING
 
 // Set to double or long double. double is recomended.
 // Sets the global floating point type used in mpr_numeric.cc.

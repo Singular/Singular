@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpc.cc,v 1.6 1999-07-02 16:43:18 wenk Exp $ */
+/* $Id: gnumpc.cc,v 1.7 1999-07-28 08:22:13 wenk Exp $ */
 /*
 * ABSTRACT: computations with GMP complex floating-point numbers
 *
@@ -22,46 +22,39 @@
 
 extern size_t gmp_output_digits;
 
-//static int ngcPrimeM;
-//static number ngcMapP(number from)
-//{
-//number to;
-//int save=npPrimeM;
-//npPrimeM=ngcPrimeM;
-//to = ngcInit(npInt(from));
-//npPrimeM=save;
-//return to;
-//}
-//static number ngcMapQ(number from)
-//{
-//gmp_float *res= new gmp_complex();
-//*res= numberToFloat(from);
-//return (number)res;
-//}
+
+static number ngcMapQ(number from)
+{
+  gmp_complex *res= new gmp_complex();
+  if ( from != NULL )
+  {
+    *res= numberFieldToFloat(from,QTOF);
+  }
+  return (number)res;
+}
 
 BOOLEAN ngcSetMap(int c, char ** par, int nop, number minpol)
 {
-//  if (c == 0)
-//  {                      /* Q -> R      */
-//    nMap = ngcMapQ;
-//    return TRUE;
-//  }
-//  if (c>1)
-//  {
-//    if (par==NULL)
-//    {                    /* Z/p -> R    */
-//      nMap = ngcMapP;
-//      return TRUE;
-//    }
-//    else
-//    {                    /* GF(q) -> R  */
-//      return FALSE;
-//    }
-//  }
-//  else if (c<0)
-//     return FALSE;       /* Z/p(a) -> R */
-//  else if (c==1)
-//     return FALSE;       /* Q(a) -> R   */
+  if (c == 0)
+  {                      /* Q -> C      */
+    nMap = ngcMapQ;
+    return TRUE;
+  }
+  if (c>1)
+  {
+    if (par==NULL)
+    {                    /* Z/p -> C    */
+      return FALSE;
+    }
+    else
+    {                    /* GF(q) -> C  */
+      return FALSE;
+    }
+  }
+  else if (c<0)
+     return FALSE;       /* Z/p(a) -> C */
+  else if (c==1)
+     return FALSE;       /* Q(a) -> C   */
   return FALSE;
 }
 

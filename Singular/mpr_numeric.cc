@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpr_numeric.cc,v 1.3 1999-06-29 09:03:46 wenk Exp $ */
+/* $Id: mpr_numeric.cc,v 1.4 1999-07-28 08:22:17 wenk Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - numeric stuff
@@ -404,7 +404,7 @@ gmp_complex & rootContainer::evPointCoord( const int i )
     if ( ievpoint[i] != NULL )
     {
       gmp_complex *tmp= new gmp_complex();
-      *tmp= numberToGmp_Complex(ievpoint[i]);
+      *tmp= numberToComplex(ievpoint[i]);
       return *tmp;
     }
     else
@@ -454,7 +454,7 @@ bool rootContainer::solver( const int polishmode )
   for ( i=0; i <= tdg; i++ )
   {
     ad[i]= new gmp_complex();
-    if ( coeffs[i] ) *ad[i] = numberToGmp_Complex( coeffs[i] );
+    if ( coeffs[i] ) *ad[i] = numberToComplex( coeffs[i] );
   }
 
   // now solve
