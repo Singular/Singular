@@ -1,5 +1,5 @@
 # @configure_input@
-# $Id: GNUmakefile.in,v 1.36 1998-06-30 14:39:16 schmidt Exp $
+# $Id: GNUmakefile.in,v 1.37 1998-07-07 16:35:18 schmidt Exp $
 
 #
 # GNUmakefile.in - used by `configure' to create `GNUmakefile', the
@@ -317,6 +317,7 @@ ftestm4src :=	$(ftestm4develsrc) \
 		degree.m4 \
 		deriv.m4 \
 		divides.m4 \
+		extgcd.m4 \
 		factorize.m4 \
 		fbinops.m4 \
 		feval.m4 \
