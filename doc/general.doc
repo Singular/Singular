@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.8 1998-04-28 10:55:45 krueger Exp $
+@comment $Id: general.doc,v 1.9 1998-04-28 12:03:54 krueger Exp $
 @comment this file contains the general information about Singular
 
 @menu
@@ -327,18 +327,239 @@ seconds.By default, this value is 1.
 * Term orderings::              
 @end menu
 
+@c ---------------------------------------------------------------------------
 @node Available rings, General syntax of a ring definition, Rings and orderings, Rings and orderings
 @subsection Available rings
 @cindex Available rings
+The most basic (and most complicated) object in @sc{Singular}
+is a @code{ring} (and @code{qring}). Each object of type
+@code{poly},
+@code{ideal},
+@code{vector},
+@code{module},
+@code{map},
+@code{matrix},
+@code{number}
+belongs to a specific ring.
+Also @code{list}, if one of the objects belong to a ring.
+These objects are local to the ring, hence their names can be used for other
+objects in other rings. Objects from one ring can be mapped to another
+ring with an object of type @code{map}
+(or with the commands @code{fetch} or @code{imap}).
+The rings which are available in @sc{Singular} are described in
+@ref{Baserings and ground fields}. They are all algebras over the ground
+field. Hence, in oder to compute in one of the ground fields,
+one has to define a ring (with at least one variable and a monomial
+ordering).
 
+The other types do not belong to a ring and can be accessed within every ring.
+
+@c ---------------------------------------------------------------------------
 @node General syntax of a ring definition, Term orderings, Available rings, Rings and orderings
 @subsection General syntax of a ring definition
 @cindex General syntax of a ring definition
 
+@strong{OldTitle:}@ section Baserings and ground fields
+
+Almost all computations in @sc{Singular} require a basering which may be a
+@itemize @bullet
+@item
+polynomial ring
+@item
+series ring, i.e a localization of a polynomial ring
+@item
+factor ring by an ideal of one of the above
+@item
+tensor products of one of the above
+@item
+exterior algebra
+@item
+tensor product of one of the above rings with an exterior  algebra
+@item
+Weyl algebra
+@end itemize
+(the last three algebras require a special compiled version with DRING resp. SRING)
+
+The ground field of these algebras may be
+@itemize @bullet
+@item
+the rational numbers Q (char 0)
+@item
+a finite field Z/p, p a prime <= 32003 (char p)
+@item
+@tex
+a finite field with $q=p^n$ elements ($p^n<=\le 2^{15}$)
+@end tex
+@ifinfo
+a finite field with q=p^n elements (p^n<=2^15)
+@end ifinfo
+@item
+transcendental extension K(A,B,C,...), K=Q or Z/p
+@item
+algebraic extension K[Z]/MinPol, K=Q or Z/p
+@item
+floating point real numbers with simple precision (real)
+@end itemize
+
+@c ---------------------------------------------------------------------------
 @node Term orderings, ,General syntax of a ring definition, Rings and orderings
 @subsection Term orderings
 @cindex Term orderings
 
+The most important term orderings or monomial orderings in @sc{Singular} are:
+@*global or p-orderings: @code{lp, dp, wp, Dp, Wp} refer to a polynomial ring,
+@*local or s-orderings: @code{ls, ds, ws, Ds, Ws} refer to a series ring,
+@*matrix orderings: allow to create any ordering by a matrix,
+@*product (or block) orderings of the above.
+
+Given such an ordering say, ord, the ring r created by
+@*@center @code{ring r = p,x(1..n),ord;}
+@*
+@tex
+is by definition Loc K$[x_1,...,x_n]$, where K=Z/p and Loc denotes
+localization with respect to the muliplicatively closed set
+$$\{ 1+f | lead(f) < 1 \}.$$
+Here lead means the leading monomial with respect to ord, 1
+is the constant monomial 1 and $>$ means bigger with respect to
+ord. For global orderings, $x_i > 1$, hence Loc K$[x_1,...,x_n]$ =
+K$[x_1,...,x_n]$, for local orderings, $x_i < 1$, hence LocK$[x_1,...,x_n]$ =
+Loc$_{(x)}$K[$x_1,...,x_n$] (= localization of K[$x_1,...,x_n$] with
+respect to the maximal ideal $(x_1,...,x_n)$).
+A product ordering which is for example
+of the form (s-ordering(k),p-ordering(l)), n=k+l, (the variables
+$x1,...,xk$ being s-ordered, $x_{k+1},...,x_n$ p-ordered) creates
+           Loc$_(x)$K[$x_1,...,x_k] \otimes $K[$x_{k+1},...,x_n$].
+Many other rings between the polynomial ring and the power
+series ring are realized by the choice of an ordering.
+@end tex
+@ifinfo
+is by definition Loc K[x(1),...,x(n)], where K=Z/p and Loc denotes
+localization with respect to the muliplicatively closed set
+@*@center @{ 1+f | lead(f) < 1 @}.
+@*Here lead means the leading monomial with respect to ord, 1
+is the constant monomial 1 and > means bigger with respect to
+ord. For global orderings, x(i) > 1, hence Loc K[x(1),...,x(n)] =
+K[x(1),...,x(n)], for local orderings, x(i) < 1, hence LocK[x(1),...,x(n)] =
+Loc_(x)K[x(1),...,x(n)] (= localization of K[x(1),...,x(n)] with respect to the
+maximal ideal (x(1),...,x(n))). A product ordering which is for example
+of the form (s-ordering(k),p-ordering(l)), n=k+l, (the variables
+x(1),...,x(k) being s-ordered, x(k+1),...,x(n) p-ordered) creates
+           Loc_(x)K[x(1),...,x(k)] tensor K[x(k+1),...,x(n)].
+Many other rings between the polynomial ring and the power
+series ring are realized by the choice of an ordering.
+@end ifinfo
+
+The great variety of differnt orderings and their efficient
+implementation makes @sc{Singular} a powerful tool for many different tasks
+in Algebraic Geometry, Algebra and Singularity theory.
+
+On the other hand it requires careful thinking about the 'correct'
+ordering for a specific task. Even if the rings are the same,
+the result of a standard basis computation depends on the
+ordering. For instance, the commands dim, mult, degree, hilb,
+etc. compute the dimension, multiplicity, etc. of the ideal
+generated by the leading terms of the given generators. In
+many cases of interest, e.g. if a degree-ordering is choosen
+and if the generators are a standard basis, the computed
+result will be the corresponding invariant of the ideal itself.
+Nevertheless, it remains the task of the user to give a correct
+interpretation of the result.
+
+A standard mistake is to interprete degree(i) or mult(i) for an
+inhomogeneous ideal i as the degree of the homogenisation or
+as something like the 'degree of the affine part'. For the
+ordering dp (degree reverse lexicographical) the converse is
+true: if i is given by a standard basis, mult(i) is the degree
+of the homogeneous ideal obtained by homogenisation of i and
+then putting the homogenizing variable to 0, hence it is the
+degree of the part at infinity.
+(Check this by looking at the initial ideal.)
+
+@iftex
+--------------------------------------------------------------------------
+@end iftex
+
+@tex
+A monomial ordering (term ordering) on $K[x_1, \ldots, x_n]$ is
+a total ordering $<$ on the
+set of monomials (power products) $\{x^\alpha|\alpha \in \bf{N}^n\}$
+which is compatible with the
+natural semigroup structure, i.e.\ $x^\alpha < x^\beta$ implies $x^\gamma
+x^\alpha < x^\gamma x^\beta$ for any $\gamma \in \bf{N}^n$.
+We do not require
+$<$ to be  a wellordering.
+@end tex
+@ifinfo
+A monomial ordering (term ordering) on $[x_1, ..., x_n] is
+a total ordering < on the
+set of monomials (power products) @{x^a | a in N^n@}
+which is compatible with the
+natural semigroup structure, i.e. x^a < x^b implies x^c*x^a < x^c*x^b for any
+c in N^n.
+We do not require
+< to be  a wellordering.
+@end ifinfo
+See the literature cited in @ref{Introduction}, (section 'Background').
+
+@sc{Singular} offers the following monomial orderings which are implemented
+in an effective way:
+@menu
+* global orderings:: lp, dp, wp, Dp, Wp.
+* local orderings:: ls, ds, ws, Ds, Ws.
+* module orderings:: c, C.
+* matrix orderings:: M.
+* product orderings::
+* extra weight vector:: a.
+@end menu
+@iftex
+@itemize @bullet
+@item
+global orderings or p-orderings: @code{lp, dp, Dp, wp, Wp} (p refers to polynomial ring)
+@item
+local orderings or s-orderings: @code{ls, ds, Ds, ws, Ws} (s refers to series ring)
+@item
+module orderings @code{c, C} (ordering of the components of a vector)
+@item
+matrix orderings @code{M} (may be used to define any allowed ordering)
+@item
+any of the above orderings may be combined to yield product or
+block orderings.
+@item
+ordering @code{a} (inserting an extra weight vector)
+@end itemize
+@end iftex
+
+@tex
+Global orderings are wellorderings (i.e.\ $1 < x_i$ for each variable
+$x_i$), local orderings satisfy $1 > x_i$ for each variable.   If some variables are ordered globally and others locally we
+call it a mixed ordering.   Local or mixed orderings are not wellorderings.
+
+If $K$ is the groundfield, $x = (x_1, \ldots, x_n)$ the
+variables and $<$ a monomial ordering, then {\bf Loc K}$[x]$ denotes the
+localization of $K[x]$ with respect to the multiplicatively closed set $\{1 +
+g \mid g = 0$ or $g \in K[x]\backslash \{0\}$ and $L(g) < 1\}$.   $L(g)$
+denotes the leading monomial of $g$, i.e.\ the biggest monomial of $g$ with
+respect to $<$.   The result of any computation which uses standard basis
+computations has to be interpreted in {\bf Loc K}$[x]$ (like @code{std, syz, res,
+mres, sres, mult, degree, dim, hilb, mstd}, etc.).
+@end tex
+@ifinfo
+Global orderings are wellorderings (i.e.1 < x_i for each variable
+x_i), local orderings satisfy 1 > x_i for each variable.
+If some variables are ordered globally and others locally we
+call it a mixed ordering.   Local or mixed orderings are not wellorderings.
+
+If K is the groundfield, x = (x_1, @dots{}, x_n) the
+variables and < a monomial ordering, then Loc K[x] denotes the
+localization of K[x] with respect to the multiplicatively closed set @{1 +
+g | g = 0 or g in K[x]\@{0@} and L(g) < 1@}.   L(g)
+denotes the leading monomial of g, i.e. the biggest monomial of g with
+respect to <.   The result of any computation which uses standard basis
+computations has to be interpreted in Loc K[x] (like @code{std, syz, res,
+mres, sres, mult, degree, dim, hilb, mstd}, etc.).
+@end ifinfo
+
+@c ---------------------------------------------------------------------------
 @c ---------------------------------------------------------------------------
 @node The SINGULAR language, Procedures, Rings and orderings, General concepts
 @section The SINGULAR language
@@ -368,6 +589,29 @@ seconds.By default, this value is 1.
 @node Controll structures, , Special characters,The SINGULAR language 
 @subsection Controll structures
 @cindex Controll structures
+
+@c ---------------------------------------------------------------------------
+@*----------------------------------------------------------------------------
+@*@strong{Wohin damit????}
+Procedures are user-defined functions containing sequences of @sc{Singular}
+commands. Several procedures can be stored in a file which is then
+called a library. Procedures and libraries have to comply with special
+syntax-rules described in this chapter. 
+
+The @sc{Singular} distribution contains sevaral libraries. 
+@c @ifset singularmanual
+(See @ref{SINGULAR libraries} for a complete list of available libraries.)
+@c @end ifset
+Further libraries are in preparation.
+The user may add other procedures/libraries.
+@c @ifset singularmanual
+@c (see @ref{procedures}; @ref{Procedures and LIB}).
+@c @end ifset
+@ifclear singularmanual
+(see 'procedures'; 'Procedures and LIB' of the @sc{Singular Reference Manual}).
+@end ifclear
+@*----------------------------------------------------------------------------
+
 
 @c ---------------------------------------------------------------------------
 @include libraries.tex
