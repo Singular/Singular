@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpc.cc,v 1.7 1999-07-28 08:22:13 wenk Exp $ */
+/* $Id: gnumpc.cc,v 1.8 1999-09-03 15:06:41 Singular Exp $ */
 /*
 * ABSTRACT: computations with GMP complex floating-point numbers
 *
@@ -35,6 +35,15 @@ static number ngcMapQ(number from)
 
 BOOLEAN ngcSetMap(int c, char ** par, int nop, number minpol)
 {
+  if (c == -1)   /* R or long R or long C */
+  {
+    if (nop==1) /* long C */
+    {
+      nMap=ngcCopy;
+      return TRUE;
+    }
+    return FALSE;
+  }
   if (c == 0)
   {                      /* Q -> C      */
     nMap = ngcMapQ;
@@ -244,7 +253,7 @@ void ngcPower ( number x, int exp, number * u )
   if ( exp == 0 )
   {
     gmp_complex* n = new gmp_complex(1);
-    *u=(number)n; 
+    *u=(number)n;
     return;
   }
   if ( exp == 1 )
@@ -253,13 +262,13 @@ void ngcPower ( number x, int exp, number * u )
     if ( x == NULL )
     {
       gmp_complex* n = new gmp_complex();
-      *u=(number)n; 
+      *u=(number)n;
     }
     else
     {
       gmp_complex* n = new gmp_complex();
       *n= *(gmp_complex*)x;
-      *u=(number)n; 
+      *u=(number)n;
     }
     return;
   }
@@ -277,14 +286,14 @@ BOOLEAN ngcIsZero (number a)
 }
 
 /*2
-* za >= 0 ? 
+* za >= 0 ?
 */
 BOOLEAN ngcGreaterZero (number a)
 {
   if ( a == NULL ) return TRUE;
-  if ( ! ((gmp_complex*)a)->imag().isZero() ) 
+  if ( ! ((gmp_complex*)a)->imag().isZero() )
     return ( abs( *(gmp_complex*)a).sign() >= 0 );
-  else 
+  else
     return ( ((gmp_complex*)a)->real().sign() >= 0 );
 }
 
@@ -360,7 +369,7 @@ char * ngcRead (char * s, number * a)
     gmp_complex *aa=new gmp_complex((long)0,(long)1);
     *a=(number)aa;
   }
-  else 
+  else
   {
     *a=(number) new gmp_complex((long)1);
   }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpfl.cc,v 1.9 1999-07-28 08:22:14 wenk Exp $ */
+/* $Id: gnumpfl.cc,v 1.10 1999-09-03 15:06:42 Singular Exp $ */
 /*
 * ABSTRACT: computations with GMP floating-point numbers
 *
@@ -59,6 +59,10 @@ BOOLEAN ngfSetMap(int c, char ** par, int nop, number minpol)
     {                    /* GF(q) -> R  */
       return FALSE;
     }
+  }
+  else if (c== -1)      /* R, long R or long C */
+  {
+    return FALSE;
   }
   else if (c<0)
      return FALSE;       /* Z/p(a) -> R */
