@@ -92,7 +92,7 @@ doc2tex: doc2tex.c
 	$(CC) doc2tex.c -o doc2tex
 
 # targets concerned with maintenance
-install: 
+install: singular.hlp
 	${MKINSTALLDIRS} ${infodir}
 	${INSTALL_DATA} singular.hlp ${infodir}
 
