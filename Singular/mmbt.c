@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmbt.c,v 1.9 1999-09-01 13:13:24 Singular Exp $ */
+/* $Id: mmbt.c,v 1.10 1999-09-29 15:16:44 obachman Exp $ */
 /*
 * ABSTRACT: backtrace: part of memory subsystem (for linux/elf)
 * needed programs: - mprpc to set the variable MPRPC
@@ -13,7 +13,7 @@
 
 /* for simplicity: a fixed size array (currently used: 4437 entries (98111016))
 */
-#define MAX_PROCS_BT 5000
+#define MAX_PROCS_BT 6000
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -70,7 +70,7 @@ void mmTrack (unsigned long *bt_stack)
   if (mm_lowpc==0) mmTrackInit();
 
   while ((fp!=NULL) && ((unsigned long)fp>4095)  
-  && ((unsigned long)fp < ((unsigned long)0x800000))
+/*  && ((unsigned long)fp < ((unsigned long)0x80000000)) */
   && *fp && (pc = getpc (fp)) 
   && !entrypc (pc) && (i<BT_MAXSTACK))
   {
@@ -89,19 +89,25 @@ struct
   char *name;
 } p2n[MAX_PROCS_BT];
 
+extern char* feResource(char what);
 static int mm_p2n_max = -1;
 void mmP2cNameInit()
 {
   FILE *f;
   int i,j;
   char n[128];
-  system("./mprnm -p Singularg >nm.log");
+  char s[1000];
+  sprintf(s, "./mprnm -p %s >nm.log", "Singularg");
+  system(s);
   f=fopen("nm.log","r");
   i=0;
   loop
   {
     j=fscanf(f,"%d %s\n",(int *)&p2n[i].p,n);
-    if (j!=2) break;
+    if (j!=2) 
+    {
+      break;
+    }
     if (strcmp(n, "___crt_dummy__") != 0 && strcmp(n, "_start") != 0)
     {
       p2n[i].name=strdup(n);
@@ -109,7 +115,7 @@ void mmP2cNameInit()
     }
   }
   fclose(f);
-  unlink("nm.log");
+//  unlink("nm.log");
   p2n[i].name="??";
   p2n[i].p=~1;
   mm_p2n_max=i;
@@ -177,7 +183,7 @@ void mmPrintStackFrames(unsigned long *bt_stack, int start, int end, int mm)
   {
     char *s;
     s=mmP2cName(bt_stack[i]); 
-    if (s!=NULL)
+    if (s!=NULL && strcmp(s, "??"))
     {
       if ((mm & MM_PRINT_ALL_STACK) || strncmp(s, "mm", 2) !=0)
         fprintf( stderr,":%s",s);
