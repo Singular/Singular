@@ -1,8 +1,8 @@
-// $Id: tst.lib,v 1.8 1998-06-12 17:41:42 obachman Exp $
-//(obachman, last modified 2/13/98)
+// $Id: tst.lib,v 1.9 1998-06-30 14:48:21 obachman Exp $
+//(obachman, last modified 6/30/98)
 /////////////////////////////////////////////////////////////////////////////
 
-version="$Id: tst.lib,v 1.8 1998-06-12 17:41:42 obachman Exp $";
+version="$Id: tst.lib,v 1.9 1998-06-30 14:48:21 obachman Exp $";
 info="
 LIBRARY:  tst.lib      PROCEDURES FOR RUNNING AUTOMATIC TST TESTS
 
@@ -12,6 +12,7 @@ LIBRARY:  tst.lib      PROCEDURES FOR RUNNING AUTOMATIC TST TESTS
                                    prepending prefix \"// ignore:\"
  tst_init()             writes some identification data to stdout
                         with tst_ignore
+ tst_status([any])      writes status info to stdout with tst_ignore()
  tst_groebnerTest(ideal i)  
                         tests groebner command 
  tst_stdEqual(ideal i1, ideal i2) 
@@ -31,7 +32,7 @@ EXAMPLE:  example tst_system; shows examples"
   s = s + " 1>" + tmpfile + " 2>&1";
   errno = system("sh", s);
   s = read(tmpfile);
-  errno = system("sh", "rm " + tmpfile);
+  errno = system("sh", "rm -f " + tmpfile);
   return (s);
 }
 example
@@ -45,14 +46,14 @@ example
 proc tst_ignore
 "USAGE:    tst_ignore(any,[keyword], [link])
             any     -- valid argument to string()
-            keyword -- one of \"time\" or \"memory\"
+            keyword -- an arbitrary string 
             link    -- a link which can be written to
 RETURN:   none; writes string(any) to link (or stdout, if no link given),
-          prepending prefix \"// ignore:\", or \"// ignore: time:\",
-          \"//ignore: memory:\"  if called with the respective keywords;
-          should be used in tst files to output system dependent data
-          (like date, pathnames) { and timings With the keyword \"time\",
-          resp. memory usage with the keyword \"memory\"
+          prepending prefix \"// ignore:\", or 
+                            \"// ignore:keyword hostname:\",
+                            if keyword was given.
+          Should be used in tst files to output system dependent data
+          (like date, pathnames).
 EXAMPLE:  example tst_ignore; shows examples
 "
 {
@@ -94,22 +95,12 @@ EXAMPLE:  example tst_ignore; shows examples
     "Usage: tst_ignore (any,[keyword], [link]);";
     return();
   }
-  if (keyword == "time" || keyword == "memory")
-  {
-    keyword = keyword + ": ";
-  }
-  else
-  {
-    if (keyword != "")
-    {
-      "Warning tst_ignore: keyword should be \"time\" or \"memory\"";
-    }
-  }
 
   if (status(outlink, "open", "no"))
   {
     open(outlink);
   }
+
   if (status(outlink, "write", "not ready"))
   {
     "Error tst_ignore: Can not write to link";
@@ -119,7 +110,21 @@ EXAMPLE:  example tst_ignore; shows examples
   }
 
   // ready -- do the actual work
-  write(outlink, "// ignore: " + keyword + s);
+  if (keyword != "")
+  {
+    if (! defined(tst_hostname))
+    {
+      string tst_hostname = tst_system("hostname");
+      tst_hostname = tst_hostname[1..size(tst_hostname)-1];
+      export tst_hostname;
+    }
+
+    write(outlink, "// ignore:" + keyword + " " + tst_hostname + ":" + s);
+  }
+  else
+  {
+    write(outlink, "// ignore: " + s);
+  }
 }
 example
 {
@@ -134,6 +139,45 @@ example
   tst_ignore(memory(1), "memory");
 }
 
+proc tst_status (list #)
+"USAGE:   tst_status([any])
+RETURN:   none; writes to stdout the current memory usage and used time
+          since last call to tst_status(), if no argument is given, or, 
+          since start-up of Singular, if an argument is given.
+NOTE:     Should be used regularly within tst files to enable automatic 
+          tracking of memory and time performance.
+EXAMPLE: example tst_status; shows example
+"
+{
+  tst_ignore(memory(0), "tst_memory_0");
+  tst_ignore(memory(1), "tst_memory_1");
+  tst_ignore(memory(2), "tst_memory_2");
+  if (size(#) > 0)
+  {
+    tst_ignore(timer, "tst_timer_1");
+  }
+  else
+  {
+    if (! defined(tst_timer))
+    {
+      int tst_timer = 0;
+      export tst_timer;
+    }
+    tst_ignore(timer - tst_timer, "tst_timer");
+    tst_timer = timer;
+  }
+}
+example
+{
+  "EXAMPLE";  echo = 2;
+  tst_status();
+  ring r;
+  poly p = (x+y+z)^40;
+  tst_status();
+  tst_status(1);
+}
+
+  
 proc tst_init
 "USAGE:   tst_init()
 RETURN:  none; writes some identification data to stdout;
@@ -141,11 +185,25 @@ RETURN:  none; writes some identification data to stdout;
 EXAMPLE: example tst_init; shows example
 "
 {
+  if (! defined(tst_hostname))
+  {
+    string tst_hostname = tst_system("hostname");
+    tst_hostname = tst_hostname[1..size(tst_hostname)-1];
+    export tst_hostname;
+  }
   tst_ignore("USER    : " + system("getenv", "USER"));
-  tst_ignore("HOSTNAME: " + system("getenv", "HOST"));
+  tst_ignore("HOSTNAME: " + tst_hostname);
   tst_ignore("uname -a: " + tst_system("uname -a"));
   tst_ignore("date    : " + tst_system("date"));
   tst_ignore("version : " + string(system("version")));
+  tst_ignore("ticks   : " + system("--ticks-per-sec"));
+  if (! defined(tst_timer))
+  {
+    int tst_timer;
+    export tst_timer;
+  }
+  
+  tst_status();
 }
 example
 {

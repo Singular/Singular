@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.29 1998-06-29 13:16:37 pohl Exp $ */
+/* $Id: syz1.cc,v 1.30 1998-06-30 14:48:20 obachman Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -503,7 +503,7 @@ static inline poly syAdd(poly m1,poly m2)
   }
   else
   {
-    poly p,result=p=pNew();
+    poly p,result=p=pInit();
     number n;
     loop
     {
