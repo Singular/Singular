@@ -255,6 +255,8 @@ AC_ARG_ENABLE(mtrack, \
  [    mtrack               utility to track unused memory])
 AC_ARG_ENABLE(Singular, \
  [    Singular             CAS for Polynomial Computations])
+AC_ARG_ENABLE(IntegerProgramming, \
+ [    IntegerProgramming   IntegerProgramming])
 AC_ARG_ENABLE(Texinfo, \
  [    Texinfo              Texinfo for info, texi2dvi, makeinfo])
 AC_ARG_ENABLE(Texi2html, \
@@ -519,6 +521,21 @@ else
   AC_MSG_RESULT(no)
 fi
 
+
+# test if IntegerProgramming should be built:
+
+AC_MSG_CHECKING(whether to build IntegerProgramming)
+if test "$enable_IntegerProgramming" != no && test -d "IntegerProgramming"; then
+   BUILD_SUBDIRS="$BUILD_SUBDIRS IntegerProgramming"
+   AC_MSG_RESULT(yes)
+   if test "$enable_IntegerProgramming" != yes; then
+     ac_configure_args="$ac_configure_args --enable-IntegerProgramming"
+   fi
+else
+   AC_MSG_RESULT(no)
+fi
+
+
 AC_MSG_CHECKING(whether to configure and build Texinfo)
 if test "$enable_Texinfo" != no && test -d Texinfo; then
   AC_MSG_RESULT(yes)
@@ -526,7 +543,7 @@ if test "$enable_Texinfo" != no && test -d Texinfo; then
   CONFIG_SUBDIRS="$CONFIG_SUBDIRS Texinfo"
   BUILD_SUBDIRS="$BUILD_SUBDIRS Texinfo"	
   TEXI2DVI=${bindir}/texi2dvi
-  MAKEINFO="${bindir}/makeinfo --force"
+  MAKEINFO="${bindir}/makeinfo"
   TEXINDEX=${bindir}/texindex
   AC_SUBST(TEXI2DVI)
   AC_SUBST(MAKEINFO)
@@ -542,12 +559,6 @@ else
   AC_CHECK_PROG(TEXI2DVI, texi2dvi, texi2dvi, ${pwd}/warn_not_found.sh texi2dvi)
   AC_CHECK_PROG(TEXINDEX, texindex, texindex, ${pwd}/warn_not_found.sh texindex)
 fi  
-
-# test if IntegerProgramming should be built:
-
-if test -d "IntegerProgramming"; then
-   BUILD_SUBDIRS="$BUILD_SUBDIRS IntegerProgramming"
-fi
 
 AC_MSG_CHECKING(whether to configure and build Texi2html)
 if test "$enable_Texi2html" != no && test -d Texi2html; then
