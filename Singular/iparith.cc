@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.252 2001-01-31 18:04:50 Singular Exp $ */
+/* $Id: iparith.cc,v 1.253 2001-02-06 13:16:20 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -4978,7 +4978,7 @@ static BOOLEAN jjTEST(leftv res, leftv v)
 }
 
 #ifndef __MWERKS__
-#if defined(__alpha)
+#if defined(__alpha) && !defined(linux)
 extern "C"
 {
   void usleep(unsigned long usec);
