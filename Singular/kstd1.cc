@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.84 2001-08-27 14:47:04 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.85 2001-08-28 11:49:48 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1572,8 +1572,7 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
     pSetDegProcs(kHomModDeg);
     toReset = TRUE;
   }
-  if ((h==testHomog)
-  )
+  if (h==testHomog)
   {
     if (strat->ak == 0)
     {

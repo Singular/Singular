@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.102 2001-08-27 14:47:06 Singular Exp $ */
+/* $Id: kutil.cc,v 1.103 2001-08-28 11:49:49 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -1132,30 +1132,33 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR 
 */
 void enterOnePairSpecial (int i,poly p,int ecart,kStrategy strat, int atR = -1)
 {
+  //PrintS("try ");wrp(strat->S[i]);PrintS(" and ");wrp(p);PrintLn();
+  if(pHasNotCF(p,strat->S[i]))
+  {
+    //PrintS("prod-crit\n");
+    strat->cp++;
+    return;
+  }
+
   int      l,j,compare;
   LObject  Lp;
 
   Lp.lcm = pInit();
   pLcm(p,strat->S[i],Lp.lcm);
   pSetm(Lp.lcm);
-  if(pHasNotCF(p,strat->S[i]))
-  {
-    strat->cp++;
-    pLmFree(Lp.lcm);
-    Lp.lcm=NULL;
-    return;
-  }
   for(j = strat->Ll;j>=0;j--)
   {
     compare=pDivComp(strat->L[j].lcm,Lp.lcm);
     if ((compare==1) || (pLmEqual(strat->L[j].lcm,Lp.lcm)))
     {
+      //PrintS("c3-crit\n");
       strat->c3++;
       pLmFree(Lp.lcm);
       return;
     }
     else if (compare ==-1)
     {
+      //Print("c3-crit with L[%d]\n",j);
       deleteInL(strat->L,&strat->Ll,j,strat);
       strat->c3++;
     }
@@ -1169,7 +1172,7 @@ void enterOnePairSpecial (int i,poly p,int ecart,kStrategy strat, int atR = -1)
   }
   else
   {
-    /*- the pair (S[i],p) enters B -*/
+    /*- the pair (S[i],p) enters L -*/
     Lp.p1 = strat->S[i];
     Lp.p2 = p;
     if (atR >= 0)
@@ -1184,6 +1187,7 @@ void enterOnePairSpecial (int i,poly p,int ecart,kStrategy strat, int atR = -1)
       nDelete(&(Lp.p->coef));
     }
     l = strat->posInL(strat->L,strat->Ll,&Lp,strat);
+    //Print("-> L[%d]\n",l);
     enterL(&strat->L,&strat->Ll,&strat->Lmax,Lp,l);
   }
 }
@@ -2821,7 +2825,7 @@ void message (int i,int* reduc,int* olddeg,kStrategy strat, int red_result)
       PrintS("-");
     else if (red_result < 0)
       PrintS(".");
-    if ((red_result > 0) || ((strat->Ll % 100)==99))
+    else
     {
       if (strat->Ll != *reduc && strat->Ll > 0)
       {
@@ -3097,7 +3101,7 @@ void initSL (ideal F, ideal Q,kStrategy strat)
 
 
 /*2
-*construct the set s from F u {P}
+*construct the set s from F and {P}
 */
 void initSSpecial (ideal F, ideal Q, ideal P,kStrategy strat)
 {
