@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.14 1997-09-18 14:08:18 Singular Exp $
+// $Id: clapsing.cc,v 1.15 1997-10-15 16:40:06 hannes Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -450,7 +450,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
   }
   {
     // the first factor should be a constant
-    if ( getNumVars(L.getFirst().factor()) != 0 )
+    if ( ! L.getFirst().factor().inCoeffDomain() )
       L.insert(CFFactor(1,1));
     // convert into ideal
     int n = L.length();
