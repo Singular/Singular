@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.10 2005-03-08 14:45:33 Singular Exp $ */
+/* $Id: polys1.cc,v 1.11 2005-03-17 14:36:30 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -704,7 +704,7 @@ number pInitContent_a(poly ph)
 {
   number d=pGetCoeff(ph);
   int s=naParDeg(d);
-  if (s /* naParDeg(d)*/ ==0) return naCopy(d);
+  if (s /* naParDeg(d)*/ <=1) return naCopy(d);
   int s2=-1;
   number d2;
   int ss;
@@ -722,7 +722,7 @@ number pInitContent_a(poly ph)
       d2=d;
       s=ss;
       d=pGetCoeff(ph);
-      if (s2==0) break;
+      if (s2<=1) break;
     }
   }
   return naGcd(d,d2,currRing);
