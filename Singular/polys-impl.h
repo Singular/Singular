@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.1 1997-12-03 16:58:57 obachman Exp $ */
+/* $Id: polys-impl.h,v 1.2 1997-12-03 17:05:49 obachman Exp $ */
 
 /***************************************************************
  *
@@ -65,7 +65,7 @@ struct  spolyrec
      comparison with traditional comparison
 
  ***************************************************************/
-#define COMP_FAST
+// #define COMP_FAST
 #define COMP_TRADITIONAL
 
 #if defined(COMP_FAST) && ! defined(NDEBUG)
