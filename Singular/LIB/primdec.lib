@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: primdec.lib,v 1.95 2001-02-05 12:01:38 lossen Exp $";
+version="$Id: primdec.lib,v 1.96 2001-02-15 17:19:34 lossen Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -2871,13 +2871,12 @@ static proc zeroRad(ideal I,list #)
       if(l[i][2]>k){k=l[i][2];}  //computation of the maximal k
    }
 
-   if(k==0){return(I+F);}        //the separable case
+   if((k==0)||(m==0)){return(interred(I+F));}        //the separable case
 
    for(i=1;i<=n;i++)             //consider all polynomials over
    {                             //Fp(t(1)^(p^-k),...,t(m)^(p^-k))
       F[i]=powerCoeffs(F[i],k-l[i][2]);
    }
-
    string cR="ring @R="+string(p)+",("+parstr(R)+","+varstr(R)+"),dp;";
    execute(cR);
    ideal F=imap(R,F);
