@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.48 1998-05-15 12:10:07 wichmann Exp $
+@comment $Id: types.doc,v 1.49 1998-05-18 15:17:29 Singular Exp $
 @comment this file contains the type definitions
 @c * wichmann: + typographical changes.
 
@@ -366,8 +366,8 @@ free resolution of a standard basis (see @ref{sres})
 standardbasis computation (see @ref{std})
 @item stdfglm
 standard basis computation with fglm technique (see @ref{stdfglm})
-@item stdhilbert
-Hilbert driven standardbasis computation (see @ref{stdhilbert} 
+@item stdhilb
+Hilbert driven standardbasis computation (see @ref{stdhilb} 
 @item subst
 substitute a ring variable (see @ref{subst})
 @item syz
@@ -1011,9 +1011,9 @@ returns quasihgomogeneous weights (see @ref{qhweight})
 length of the intvec (see @ref{size})
 @item sortvec
 permutation for sorting ideals/modules (see @ref{sortvec})
-@item stdhilbert 
+@item stdhilb 
 Hilbert series for Hilbert driven standard basis computation (see
-@ref{stdhilbert})
+@ref{stdhilb})
 @item transpose
 transpose of an intvec, returns an intmat (see @ref{transpose})
 @item weight
