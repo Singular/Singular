@@ -1,0 +1,45 @@
+Mon Sep 29 14:58:09 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* ftest_util.cc (ftestError): does not print any result output in
+	  error case any more
+
+	* ftest_util.cc (ftestPrintFlag): new external variable.
+	  Declarations adapted.
+	* ftest_io.cc (ftestPrintResult( .., CF ), ftestPrintResult( ..,
+	  int )): use new output format now
+
+	* ftest_io.cc (ftestPrintResult( .., CF ), ftestPrintResult( ..,
+	  int )): functions ftestPrintCanonicalForm() and ftestPrintInt()
+	  renamed to ftestPrintResult.  All callers changed.  Decarations
+	  adapted.
+
+	* ftest_util.m4 (ftestArgGiven): new macro
+	  (ftestInVar, ftestGetInVar): support added for macro
+	  ftestArgGiven()
+
+	* ftest_util.m4 (ftestOutput): supports multiple (or no) output
+	  variables now
+
+	* resultant.m4: doc fix
+
+	* totaldegree.m4: new file
+
+	* gcd.m4 (main): call to ftestOutput() rewritten to new format
+
+Fri Sep 26 11:50:21 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* ftest_util.cc (ftestError): does not print result in case of an
+	  error any longer
+
+Thu Sep 25 09:56:29 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* ftest_util.cc (ftestParseOutputType): option `-a' includes `-e'
+	  now
+
+	* ftest_util.cc (ftestGetOpts): lookups for environment variable
+	  `FTEST_ALARM' and `FTEST_CIRCLE' added
+
+	* ftest_util.cc (ftestConcatEnv): lookups for environment variables
+	  `FTEST_SWITCHES', `FTEST_CHAR', `FTEST_VARS', `FTEST_SEED'
+	  removed
+	  (ftestStrLen, ftestStrCat): are superfluous now
