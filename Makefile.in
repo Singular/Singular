@@ -144,7 +144,7 @@ sharedist: ${SINGULAR}
 	cat README.general | sed -e "s/<x.y.z>/${S_VERSION}/" > \
                              ${TMPDIR}/Singular/README.general
 	cp COPYING ${TMPDIR}/Singular
-	cd ${TMPDIR}; \
+	cd ${TMPDIR}; chmod -R a+rX *; \
            tar -cf sing.tar Singular info; \
            gzip sing.tar
 	cp ${TMPDIR}/sing.tar.gz ${SHAREDIST_NAME}.tar.gz
@@ -171,7 +171,7 @@ bindist: ${SINGULAR}
                              ${TMPDIR}/Singular/README.general
 	cat INSTALL | sed -e "s/<x.y.z>/${S_VERSION}/" > \
                       ${TMPDIR}/Singular/INSTALL
-	cd ${TMPDIR}; \
+	cd ${TMPDIR}; chmod -R a+rX *;\
            tar cf ${BINDIST_NAME}.tar ${SINGUNAME} Singular; \
            gzip ${BINDIST_NAME}.tar
 	cp ${TMPDIR}/${BINDIST_NAME}.tar.gz .
@@ -193,7 +193,7 @@ static-bindist: ${SINGULAR}
                              ${TMPDIR}/Singular/README.general
 	cat INSTALL | sed -e "s/<x.y.z>/${S_VERSION}/" > \
                       ${TMPDIR}/Singular/INSTALL
-	cd ${TMPDIR}; \
+	cd ${TMPDIR}; chmod -R a+rX *;\
            tar cf ${BINDIST_NAME}-static.tar ${SINGUNAME} Singular;\
            gzip ${BINDIST_NAME}-static.tar
 	cp ${TMPDIR}/${BINDIST_NAME}-static.tar.gz .
@@ -234,7 +234,7 @@ windist: ${WIN_SHAREDIST_NAME}.tar.gz ${SINGULAR}
                          ${TMPDIR}/Singular/INSTALL
 	cat README.win | sed -e "s/<x.y.z>/${S_VERSION}/" > \
                          ${TMPDIR}/Singular/README
-	cd ${TMPDIR}; \
+	cd ${TMPDIR}; chmod -R a+rX *;\
            ${ZIP} -r sing Singular 
 	cp ${TMPDIR}/sing.zip Singular-${S_VERSION}-${SINGUNAME}.zip 
 	rm -rf ${TMPDIR}

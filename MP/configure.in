@@ -422,10 +422,6 @@ if test "${with_rsh+set}" = set; then
 fi
 
 
-AC_CHECK_PROG(mp_ssh, ssh, ssh, no)
-if test "$ac_cv_prog_mp_ssh" = ssh; then
-   ac_rsh_programs="$ac_rsh_programs ssh"
-fi
 
 AC_CHECK_PROG(mp_rsh, rsh, rsh, no)
 if test "$ac_cv_prog_mp_rsh" = rsh; then
@@ -435,6 +431,11 @@ fi
 AC_CHECK_PROG(mp_remsh, remsh, remsh, no)
 if test "$ac_cv_prog_mp_remsh" = remsh; then
    ac_rsh_programs="$ac_rsh_programs remsh"
+fi
+
+AC_CHECK_PROG(mp_ssh, ssh, ssh, no)
+if test "$ac_cv_prog_mp_ssh" = ssh; then
+   ac_rsh_programs="$ac_rsh_programs ssh"
 fi
 
 AC_MSG_CHECKING(which remote shell command to use)

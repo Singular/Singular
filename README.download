@@ -1,23 +1,22 @@
 WELCOME TO THE HOME FTP SITE OF SINGULAR -- A COMPUTER ALGEBRA SYSTEM FOR
 		       POLYNOMIAL COMPUTATIONS
 		
-Announcing Singular version 1.2.0:
+Announcing Singular version 1.2.1:
 ==================================
-Singular 1.2.0 is now available. It is a major upgrade from all previous 
-versions of Singular, and you should definitely consider upgrading
-your current Singular version.
+Singular 1.2.1 is now available. It is a minor upgrade from Singular
+version 1.2.0 and contains mainly bug fixes. 
 
 This directory cointains:
 =========================
-Singular-1.2.0-share.tar.gz	             
+Singular-1.2.1-share.tar.gz	             
         -- shared data of newest Singular distribution for Unix platforms
-Singular-1.2.0-<uname description>.tar.gz  
+Singular-1.2.1-<uname description>.tar.gz  
         -- newest Singular executables for Unix platforms
-Singular-1-2-0-ix86-Win.zip
+Singular-1-2-1-ix86-Win.zip
         -- complete Singular distribution for Windows 95/NT 
-Singular-1.2.0.ppc.sea.hqx.gz
+Singular-1-2-1.ppc.sea.hqx.gz
         -- complete Singular distribution for Macintosh PowerPC
-Singular-1.2.0.68k.sea.hqx.gz
+Singular-1-2-1.68k.sea.hqx.gz
         -- complete Singular distribution for Macintosh 68K computers
 COPYING			Licence information on Singular
 README.general          General information on Singular
@@ -26,11 +25,17 @@ doc/			Directory containing Singular documentation
 Attic/			Directory containing old versions of Singular
 
 
+Not that (starting from Singular version 1.2.0 on) different versions
+of Singular can peaceable coexist within the same directory
+structure. That is, if you had previously downloaded Singular version
+1.2.0, you  can simply unpack version 1.2.1 at the same place.
+
+
 To download Singular for Unix platforms:
 ========================================
 You need at least the following two files: 
-      Singular-1.2.0-share.tar.gz 
-      Singular-1.2.0-<uname description>.tar.gz
+      Singular-1.2.1-share.tar.gz 
+      Singular-1.2.1-<uname description>.tar.gz
 where <uname description> is a description of the processor and operating
 system for which Singular is compiled (e.g, ix86-Linux). Please
 contact us if you can not find an appropriate architecture-dependent
@@ -41,8 +46,8 @@ and then unpack the architecture independent tar file, followed by
 the architecture-dependent files for those architectures you use:
 
   cd /usr/local/	# or wherever you install 3rd-party software
-  gzip -dc Singular-1.2.0-share.tar.gz | tar -pxf -
-  gzip -dc Singular-1.2.0-<uname description>.tar.gz | tar -pxf -
+  gzip -dc Singular-1.2.1-share.tar.gz | tar -pxf -
+  gzip -dc Singular-1.2.1-<uname description>.tar.gz | tar -pxf -
 
 You may replace `/usr/local/' with what you like, but refer to the
 INSTALL file which is contained in the architecture-dependent tar file
@@ -68,8 +73,14 @@ file contained in the archive.
 
 To download Singular for the Macintosh:
 =======================================
-Sorry, the Macintosh distribution is not yet ready. However, it will
-available at July 1, at the latest.
+Download the file Singular-<x-y-z>-<target>-MPW.sea.hqx. Expand the
+downloaded file using a standard Expander (like Compact Pro or StuffIt)
+to obtain the corresponding self-extracting
+Singular-<x-y-z>-<target>-MPW.sea file.  Click on the self-extracting
+Singular-1-2-1-<target>-MPW.sea file. This  will create a folder
+named "Singular" which contains the file 'INSTALL'. Follow the
+instructions contained in this file for further installation
+instructions.
 
 
 More information about Singular: Comments, Questions, Bug Reports

@@ -3319,43 +3319,11 @@ fi
 fi
 
 
-# Extract the first word of "ssh", so it can be a program name with args.
-set dummy ssh; ac_word=$2
-echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:3326: checking for $ac_word" >&5
-if eval "test \"`echo '$''{'ac_cv_prog_mp_ssh'+set}'`\" = set"; then
-  echo $ac_n "(cached) $ac_c" 1>&6
-else
-  if test -n "$mp_ssh"; then
-  ac_cv_prog_mp_ssh="$mp_ssh" # Let the user override the test.
-else
-  IFS="${IFS= 	}"; ac_save_ifs="$IFS"; IFS="${IFS}:"
-  for ac_dir in $PATH; do
-    test -z "$ac_dir" && ac_dir=.
-    if test -f $ac_dir/$ac_word; then
-      ac_cv_prog_mp_ssh="ssh"
-      break
-    fi
-  done
-  IFS="$ac_save_ifs"
-  test -z "$ac_cv_prog_mp_ssh" && ac_cv_prog_mp_ssh="no"
-fi
-fi
-mp_ssh="$ac_cv_prog_mp_ssh"
-if test -n "$mp_ssh"; then
-  echo "$ac_t""$mp_ssh" 1>&6
-else
-  echo "$ac_t""no" 1>&6
-fi
-
-if test "$ac_cv_prog_mp_ssh" = ssh; then
-   ac_rsh_programs="$ac_rsh_programs ssh"
-fi
 
 # Extract the first word of "rsh", so it can be a program name with args.
 set dummy rsh; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:3359: checking for $ac_word" >&5
+echo "configure:3327: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_mp_rsh'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -3388,7 +3356,7 @@ fi
 # Extract the first word of "remsh", so it can be a program name with args.
 set dummy remsh; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:3392: checking for $ac_word" >&5
+echo "configure:3360: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_mp_remsh'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -3418,8 +3386,41 @@ if test "$ac_cv_prog_mp_remsh" = remsh; then
    ac_rsh_programs="$ac_rsh_programs remsh"
 fi
 
+# Extract the first word of "ssh", so it can be a program name with args.
+set dummy ssh; ac_word=$2
+echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
+echo "configure:3393: checking for $ac_word" >&5
+if eval "test \"`echo '$''{'ac_cv_prog_mp_ssh'+set}'`\" = set"; then
+  echo $ac_n "(cached) $ac_c" 1>&6
+else
+  if test -n "$mp_ssh"; then
+  ac_cv_prog_mp_ssh="$mp_ssh" # Let the user override the test.
+else
+  IFS="${IFS= 	}"; ac_save_ifs="$IFS"; IFS="${IFS}:"
+  for ac_dir in $PATH; do
+    test -z "$ac_dir" && ac_dir=.
+    if test -f $ac_dir/$ac_word; then
+      ac_cv_prog_mp_ssh="ssh"
+      break
+    fi
+  done
+  IFS="$ac_save_ifs"
+  test -z "$ac_cv_prog_mp_ssh" && ac_cv_prog_mp_ssh="no"
+fi
+fi
+mp_ssh="$ac_cv_prog_mp_ssh"
+if test -n "$mp_ssh"; then
+  echo "$ac_t""$mp_ssh" 1>&6
+else
+  echo "$ac_t""no" 1>&6
+fi
+
+if test "$ac_cv_prog_mp_ssh" = ssh; then
+   ac_rsh_programs="$ac_rsh_programs ssh"
+fi
+
 echo $ac_n "checking which remote shell command to use""... $ac_c" 1>&6
-echo "configure:3423: checking which remote shell command to use" >&5
+echo "configure:3424: checking which remote shell command to use" >&5
 for mp_rsh in $ac_rsh_programs; do
     if $mp_rsh `hostname` -n uname \>\& /dev/null; then
       mp_rsh_found=$mp_rsh
@@ -3439,14 +3440,14 @@ EOF
 fi
 
 echo $ac_n "checking whether byte ordering is bigendian""... $ac_c" 1>&6
-echo "configure:3443: checking whether byte ordering is bigendian" >&5
+echo "configure:3444: checking whether byte ordering is bigendian" >&5
 if eval "test \"`echo '$''{'ac_cv_c_bigendian'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   ac_cv_c_bigendian=unknown
 # See if sys/param.h defines the BYTE_ORDER macro.
 cat > conftest.$ac_ext <<EOF
-#line 3450 "configure"
+#line 3451 "configure"
 #include "confdefs.h"
 #include <sys/types.h>
 #include <sys/param.h>
@@ -3457,11 +3458,11 @@ int main() {
 #endif
 ; return 0; }
 EOF
-if { (eval echo configure:3461: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:3462: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   # It does; now see whether it defined to BIG_ENDIAN or not.
 cat > conftest.$ac_ext <<EOF
-#line 3465 "configure"
+#line 3466 "configure"
 #include "confdefs.h"
 #include <sys/types.h>
 #include <sys/param.h>
@@ -3472,7 +3473,7 @@ int main() {
 #endif
 ; return 0; }
 EOF
-if { (eval echo configure:3476: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:3477: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   ac_cv_c_bigendian=yes
 else
@@ -3492,7 +3493,7 @@ if test "$cross_compiling" = yes; then
     { echo "configure: error: can not run test program while cross compiling" 1>&2; exit 1; }
 else
   cat > conftest.$ac_ext <<EOF
-#line 3496 "configure"
+#line 3497 "configure"
 #include "confdefs.h"
 main () {
   /* Are we little or big endian?  From Harbison&Steele.  */
@@ -3505,7 +3506,7 @@ main () {
   exit (u.c[sizeof (long) - 1] == 1);
 }
 EOF
-if { (eval echo configure:3509: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest && (./conftest; exit) 2>/dev/null
+if { (eval echo configure:3510: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest && (./conftest; exit) 2>/dev/null
 then
   ac_cv_c_bigendian=no
 else
@@ -3529,12 +3530,12 @@ EOF
 fi
 
 echo $ac_n "checking for working const""... $ac_c" 1>&6
-echo "configure:3533: checking for working const" >&5
+echo "configure:3534: checking for working const" >&5
 if eval "test \"`echo '$''{'ac_cv_c_const'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 3538 "configure"
+#line 3539 "configure"
 #include "confdefs.h"
 
 int main() {
@@ -3583,7 +3584,7 @@ ccp = (char const *const *) p;
 
 ; return 0; }
 EOF
-if { (eval echo configure:3587: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:3588: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   ac_cv_c_const=yes
 else
@@ -3604,12 +3605,12 @@ EOF
 fi
 
 echo $ac_n "checking for size_t""... $ac_c" 1>&6
-echo "configure:3608: checking for size_t" >&5
+echo "configure:3609: checking for size_t" >&5
 if eval "test \"`echo '$''{'ac_cv_type_size_t'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 3613 "configure"
+#line 3614 "configure"
 #include "confdefs.h"
 #include <sys/types.h>
 #if STDC_HEADERS
@@ -3637,12 +3638,12 @@ EOF
 fi
 
 echo $ac_n "checking whether time.h and sys/time.h may both be included""... $ac_c" 1>&6
-echo "configure:3641: checking whether time.h and sys/time.h may both be included" >&5
+echo "configure:3642: checking whether time.h and sys/time.h may both be included" >&5
 if eval "test \"`echo '$''{'ac_cv_header_time'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 3646 "configure"
+#line 3647 "configure"
 #include "confdefs.h"
 #include <sys/types.h>
 #include <sys/time.h>
@@ -3651,7 +3652,7 @@ int main() {
 struct tm *tp;
 ; return 0; }
 EOF
-if { (eval echo configure:3655: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:3656: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   ac_cv_header_time=yes
 else
@@ -3673,7 +3674,7 @@ fi
 
 
 echo $ac_n "checking size of long""... $ac_c" 1>&6
-echo "configure:3677: checking size of long" >&5
+echo "configure:3678: checking size of long" >&5
 if eval "test \"`echo '$''{'ac_cv_sizeof_long'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -3681,7 +3682,7 @@ else
   ac_cv_sizeof_long=4
 else
   cat > conftest.$ac_ext <<EOF
-#line 3685 "configure"
+#line 3686 "configure"
 #include "confdefs.h"
 #include <stdio.h>
 main()
@@ -3692,7 +3693,7 @@ main()
   exit(0);
 }
 EOF
-if { (eval echo configure:3696: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest && (./conftest; exit) 2>/dev/null
+if { (eval echo configure:3697: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest && (./conftest; exit) 2>/dev/null
 then
   ac_cv_sizeof_long=`cat conftestval`
 else
@@ -3891,9 +3892,9 @@ s%@BUILD_SUBDIRS@%$BUILD_SUBDIRS%g
 s%@CONFIG_SUBDIRS@%$CONFIG_SUBDIRS%g
 s%@NEED_LIBS@%$NEED_LIBS%g
 s%@with_rsh@%$with_rsh%g
-s%@mp_ssh@%$mp_ssh%g
 s%@mp_rsh@%$mp_rsh%g
 s%@mp_remsh@%$mp_remsh%g
+s%@mp_ssh@%$mp_ssh%g
 s%@CLEAN@%$CLEAN%g
 s%@subdirs@%$subdirs%g
 
