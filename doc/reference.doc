@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.128 1999-07-23 13:28:38 Singular Exp $
+@comment $Id: reference.doc,v 1.129 1999-07-23 15:07:06 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -5879,7 +5879,6 @@ listvar();
 @expansion{} // m                    [0]  intmat 1 x 1
 @expansion{} // i                    [0]  int 0
 @end smallexample
-@end ifclear
 @end table
 
 @ifset namespaces
@@ -5889,7 +5888,6 @@ See
 @c ref
 @end ifset
 @ifclear namespaces
-
 @c ref
 See
 @ref{keepring}.
