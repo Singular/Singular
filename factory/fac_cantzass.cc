@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_cantzass.cc,v 1.4 1997-12-08 18:24:28 schmidt Exp $ */
+/* $Id: fac_cantzass.cc,v 1.5 1998-05-11 09:37:40 schmidt Exp $ */
 
 #include <config.h>
 
@@ -155,12 +155,17 @@ CFFList CantorZassenhausFactorFFGF( const CanonicalForm & g, int s, int q, const
     else while ( 1 ) {
 	b = randomPoly( d, x, gen );
 	f1 = gcd( b, f );
-	if ( (d1 = f1.degree(x)) > 0 && d1 < d )
-	    return Union( CantorZassenhausFactorFFGF( f1, s, q, gen ), CantorZassenhausFactorFFGF( f/f1, s, q, gen ) );
-	else {
+	if ( (d1 = f1.degree(x)) > 0 && d1 < d ) {
+	    CFFList firstFactor = CantorZassenhausFactorFFGF( f1, s, q, gen );
+	    CFFList secondFactor = CantorZassenhausFactorFFGF( f/f1, s, q, gen );
+	    return Union( firstFactor, secondFactor );
+	} else {
 	    f1 = gcd( f, powerMod2( b, q, s, f ) - 1 );
-	    if ( (d1 = f1.degree(x)) > 0 && d1 < d )
-		return Union( CantorZassenhausFactorFFGF( f1, s, q, gen ), CantorZassenhausFactorFFGF( f/f1, s, q, gen ) );
+	    if ( (d1 = f1.degree(x)) > 0 && d1 < d ) {
+		CFFList firstFactor = CantorZassenhausFactorFFGF( f1, s, q, gen );
+		CFFList secondFactor = CantorZassenhausFactorFFGF( f/f1, s, q, gen );
+		return Union( firstFactor, secondFactor );
+	    }
 	}
     }
 }
@@ -177,12 +182,17 @@ CFFList CantorZassenhausFactorExt( const CanonicalForm & g, int s, MP_INT * q, c
     else while ( 1 ) {
 	b = randomPoly( d, x, gen );
 	f1 = gcd( b, f );
-	if ( (d1 = f1.degree(x)) > 0 && d1 < d )
-	    return Union( CantorZassenhausFactorExt( f1, s, q, gen ), CantorZassenhausFactorExt( f/f1, s, q, gen ) );
-	else {
+	if ( (d1 = f1.degree(x)) > 0 && d1 < d ) {
+	    CFFList firstFactor = CantorZassenhausFactorExt( f1, s, q, gen );
+	    CFFList secondFactor = CantorZassenhausFactorExt( f/f1, s, q, gen );
+	    return Union( firstFactor, secondFactor );
+	} else {
 	    f1 = gcd( f, powerMod2( b, q, s, f ) - 1 );
-	    if ( (d1 = f1.degree(x)) > 0 && d1 < d )
-		return Union( CantorZassenhausFactorExt( f1, s, q, gen ), CantorZassenhausFactorExt( f/f1, s, q, gen ) );
+	    if ( (d1 = f1.degree(x)) > 0 && d1 < d ) {
+		CFFList firstFactor = CantorZassenhausFactorExt( f1, s, q, gen );
+		CFFList secondFactor = CantorZassenhausFactorExt( f/f1, s, q, gen );
+		return Union( firstFactor, secondFactor );
+	    }
 	}
     }
 }
