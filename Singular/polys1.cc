@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.36 2000-04-11 15:01:58 Singular Exp $ */
+/* $Id: polys1.cc,v 1.37 2000-05-05 09:46:57 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -1431,6 +1431,12 @@ BOOLEAN pComparePolys(poly p1,poly p2)
   number n,nn;
   int i;
 
+  if (!pEqual(p1,p2)) //compare leading mons
+      return FALSE;
+  if ((pNext(p1)==NULL) && (pNext(p2)!=NULL))
+     return FALSE;
+  if ((pNext(p2)==NULL) && (pNext(p1)!=NULL))
+     return FALSE;
   if (pLength(p1) != pLength(p2))
     return FALSE;
   n=nDiv(pGetCoeff(p1),pGetCoeff(p2));
