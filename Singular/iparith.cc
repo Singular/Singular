@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.259 2001-03-05 16:43:14 mschulze Exp $ */
+/* $Id: iparith.cc,v 1.260 2001-03-05 18:25:47 mschulze Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -4162,7 +4162,7 @@ static BOOLEAN jjJET_P_P(leftv res, leftv u, leftv v, leftv w)
 {
   if (!pIsUnit((poly)v->Data()))
   {
-    WerrorS("2rd argument must be a unit");
+    WerrorS("2nd argument must be a unit");
     return TRUE;
   }
   res->data = (char *)pSeries((int)w->Data(),(poly)u->CopyD(),(poly)v->CopyD());
@@ -4178,7 +4178,7 @@ static BOOLEAN jjJET_ID_M(leftv res, leftv u, leftv v, leftv w)
 {
   if (!mpIsDiagUnit((matrix)v->Data()))
   {
-    WerrorS("2rd argument must be a diagonal matrix of units");
+    WerrorS("2nd argument must be a diagonal matrix of units");
     return TRUE;
   }
   res->data = (char *)idSeries((int)w->Data(),(ideal)u->CopyD(),
@@ -4425,8 +4425,8 @@ static BOOLEAN jjLIFT3(leftv res, leftv u, leftv v, leftv w)
 }
 static BOOLEAN jjREDUCE3_CP(leftv res, leftv u, leftv v, leftv w)
 {
-  assumeStdFlag(v);
-  if (!idIsZeroDim((ideal)v->Data()))
+  assumeStdFlag(w);
+  if (!idIsZeroDim((ideal)w->Data()))
   {
     Werror("`%s` must be 0-dimensional",v->Name());
     return TRUE;
@@ -4437,8 +4437,8 @@ static BOOLEAN jjREDUCE3_CP(leftv res, leftv u, leftv v, leftv w)
 }
 static BOOLEAN jjREDUCE3_CID(leftv res, leftv u, leftv v, leftv w)
 {
-  assumeStdFlag(v);
-  if (!idIsZeroDim((ideal)v->Data()))
+  assumeStdFlag(w);
+  if (!idIsZeroDim((ideal)w->Data()))
   {
     Werror("`%s` must be 0-dimensional",v->Name());
     return TRUE;
@@ -5016,9 +5016,10 @@ static BOOLEAN jjREDUCE4(leftv res, leftv u)
   if((u1->Typ()==IDEAL_CMD)&&(u2->Typ()==MATRIX_CMD)&&(u3->Typ()==IDEAL_CMD)&&
      (u4->Typ()==INT_CMD))
   {
+    assumeStdFlag(u3);
     if(!mpIsDiagUnit((matrix)u2->Data()))
     {
-      Werror("2rd argument must be a diagonal matrix of units");
+      Werror("2nd argument must be a diagonal matrix of units");
       return TRUE;
     }
     res->rtyp=IDEAL_CMD;
@@ -5030,9 +5031,10 @@ static BOOLEAN jjREDUCE4(leftv res, leftv u)
   if((u1->Typ()==POLY_CMD)&&(u2->Typ()==POLY_CMD)&&(u3->Typ()==IDEAL_CMD)&&
      (u4->Typ()==INT_CMD))
   {
+    assumeStdFlag(u3);
     if(!pIsUnit((poly)u2->Data()))
     {
-      Werror("2rd argument must be a unit");
+      Werror("2nd argument must be a unit");
       return TRUE;
     }
     res->rtyp=POLY_CMD;
@@ -5056,9 +5058,10 @@ static BOOLEAN jjREDUCE5(leftv res, leftv u)
   if((u1->Typ()==IDEAL_CMD)&&(u2->Typ()==MATRIX_CMD)&&(u3->Typ()==IDEAL_CMD)&&
      (u4->Typ()==INT_CMD)&&(u5->Typ()==INTVEC_CMD))
   {
+    assumeStdFlag(u3);
     if(!mpIsDiagUnit((matrix)u2->Data()))
     {
-      Werror("2rd argument must be a diagonal matrix of units");
+      Werror("2nd argument must be a diagonal matrix of units");
       return TRUE;
     }
     res->rtyp=IDEAL_CMD;
@@ -5071,9 +5074,10 @@ static BOOLEAN jjREDUCE5(leftv res, leftv u)
   if((u1->Typ()==POLY_CMD)&&(u2->Typ()==POLY_CMD)&&(u3->Typ()==IDEAL_CMD)&&
      (u4->Typ()==INT_CMD)&&(u5->Typ()==INTVEC_CMD))
   {
+    assumeStdFlag(u3);
     if(!pIsUnit((poly)u2->Data()))
     {
-      Werror("2rd argument must be a unit");
+      Werror("2nd argument must be a unit");
       return TRUE;
     }
     res->rtyp=POLY_CMD;
