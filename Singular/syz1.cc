@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.2 1997-04-04 12:32:53 Singular Exp $ */
+/* $Id: syz1.cc,v 1.3 1997-04-08 15:33:46 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -1330,7 +1330,8 @@ static void syRedGenerOfCurrDeg(SRes resPairs,resolvente res,resolvente orderedR
         {
           //Print("r");
           (resPairs[index-1])[i].syz = 
-            spSpolyRed(res[index]->m[j],(resPairs[index-1])[i].syz,NULL);
+            //spSpolyRed(res[index]->m[j],(resPairs[index-1])[i].syz,NULL);
+            spSpolyRed((resPairs[index-1])[i].syz,res[index]->m[j],NULL);
           j = k-1;
         }
         else
