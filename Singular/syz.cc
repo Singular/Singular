@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.cc,v 1.4 1997-04-12 16:04:47 Singular Exp $ */
+/* $Id: syz.cc,v 1.5 1997-07-29 13:07:44 siebert Exp $ */
 
 /*
 * ABSTRACT: resolutions
@@ -85,7 +85,8 @@ static void syDeleteAbove(ideal up, int k)
 *minimizes the module mod and cancel superfluous syzygies
 *from syz
 */
-static void syMinStep(ideal mod,ideal syz,BOOLEAN final=FALSE,ideal up=NULL)
+static void syMinStep(ideal mod,ideal syz,BOOLEAN final=FALSE,ideal up=NULL,
+                      tHomog h=isNotHomog)
 {
   ideal deg0;
   poly Unit1,Unit2,actWith;
@@ -93,7 +94,7 @@ static void syMinStep(ideal mod,ideal syz,BOOLEAN final=FALSE,ideal up=NULL)
   BOOLEAN searchUnit,existsUnit;
 
   if (TEST_OPT_PROT) Print("m");
-  if (final)
+  if ((final) && (h==isHomog))
   /*minim is TRUE, we are in the module: maxlength, maxlength <>0*/
   {
     deg0=idJet(syz,0);
@@ -331,7 +332,7 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
     syzIndex++;
     if (TEST_OPT_PROT) Print("[%d]\n",syzIndex);
     if ((minim)||(syzIndex>1))
-      syMinStep(res[syzIndex-1],res[syzIndex],!completeMinim);
+      syMinStep(res[syzIndex-1],res[syzIndex],!completeMinim,NULL,hom);
     if (!completeMinim)
     /*minim is TRUE, we are in the module: maxlength, maxlength <>0*/
     {
