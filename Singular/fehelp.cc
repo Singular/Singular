@@ -3,7 +3,7 @@
 ****************************************/
 /*
 * ABSTRACT: help system
-* versin $Id: fehelp.cc,v 1.38 2003-05-31 14:13:06 Singular Exp $
+* versin $Id: fehelp.cc,v 1.39 2004-09-13 15:41:33 Singular Exp $
 */
 
 #include <string.h>
@@ -29,7 +29,7 @@
  * Declarations: Data  structures
  *
  *****************************************************************/
-#define MAX_HE_ENTRY_LENGTH 60
+#define MAX_HE_ENTRY_LENGTH 160
 typedef struct
 {
   char key[MAX_HE_ENTRY_LENGTH];
@@ -606,9 +606,15 @@ static int heReKey2Entry (char* filename, char* key, heEntry hentry)
   if (filename == NULL || key == NULL)  return 0;
   fd = fopen(filename, "r");
   if (fd == NULL) return 0;
+  memset(index_key,0,MAX_HE_ENTRY_LENGTH);
   while (fscanf(fd, "%[^\t]\t%*[^\n]\n", index_key) == 1)
   {
-    if (strmatch(index_key, key))
+    if (index_key[MAX_HE_ENTRY_LENGTH]!='\0')
+    {
+      WerrorS("index file corrupt");
+      break;
+    }
+    else if (strmatch(index_key, key))
     {
       i++;
       if (i == 1)
