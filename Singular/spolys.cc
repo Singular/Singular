@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: spolys.cc,v 1.20 1999-05-10 15:10:56 Singular Exp $ */
+/* $Id: spolys.cc,v 1.21 1999-08-10 15:19:53 Singular Exp $ */
 
 /*
 * ABSTRACT - s-polynomials and reduction for char p
@@ -35,7 +35,7 @@ void (*spSpolyTail)(poly p1, poly q, poly q2, poly spNoether,
                     spSpolyLoopProc spSpolyLoop);
 poly (*spSpolyRedNew)(poly p1, poly p2,poly spNoether,
                       spSpolyLoopProc spSpolyLoop);
-poly (*spSpolyCreate)(poly p1, poly p2,poly spNoether, 
+poly (*spSpolyCreate)(poly p1, poly p2,poly spNoether,
                       spSpolyLoopProc SpolyLoop);
 poly (*spSpolyShortBba)(poly p1, poly p2);
 
@@ -256,7 +256,7 @@ void spMultCopyX(poly p, poly m, poly n, number exp, poly spNoether)
 * reduction of p2 with p1
 * do not destroy p1, but p2
 */
-static poly spPSpolyRed(poly p1, poly p2,poly spNoether, 
+static poly spPSpolyRed(poly p1, poly p2,poly spNoether,
                         spSpolyLoopProc SpolyLoop)
 {
   poly a1 = pNext(p1), a2 = pNext(p2);
@@ -350,7 +350,7 @@ static poly spPSpolyRedNew(poly p1, poly p2,poly spNoether,
 * creates the S-polynomial of p1 and p2
 * do not destroy p1 and p2
 */
-static poly spPSpolyCreate(poly p1, poly p2,poly spNoether, 
+static poly spPSpolyCreate(poly p1, poly p2,poly spNoether,
                            spSpolyLoopProc SpolyLoop)
 {
   poly a1 = pNext(p1), a2 = pNext(p2);
@@ -793,8 +793,9 @@ poly spDSpolyCreate(poly p1,poly p2,poly spNoether, spSpolyLoopProc dummy)
 
 void spSet(ring r)
 {
-  if ((TEST_OPT_INTSTRATEGY   /* Q, Q(a), Fp(a) */
-  || (rField_is_R()) || (rField_is_long_R()) || (rField_is_long_C()))
+  if ((rField_is_Q())
+  || (rField_is_Extension()) /* Q(a), Fp(a) */
+  || (rField_is_numeric()) /* R, long R, long C*/
 #ifdef SRING
   && (pSRING==0)
 #endif
