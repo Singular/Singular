@@ -177,7 +177,7 @@ char *strstr(const char *haystack, const char *needle);
 #define memcpy4 memcpy
 
 /* define OLD_RES for res/sres/mres(i,j,k) */
-#undef OLD_RES
+#define OLD_RES
 
 /* the maximal ascii length of an int number + 1 = 11 for 32 bit int */
 #define MAX_INT_LEN 11
