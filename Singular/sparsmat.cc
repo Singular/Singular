@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sparsmat.cc,v 1.22 1999-12-20 08:46:14 pohl Exp $ */
+/* $Id: sparsmat.cc,v 1.23 2000-02-02 18:03:21 Singular Exp $ */
 
 /*
 * ABSTRACT: operations with sparse matrices (bareiss, ...)
@@ -46,7 +46,6 @@ struct smprec{
 */
 /* declare internal 'C' stuff */
 static void smExactPolyDiv(poly, poly);
-static BOOLEAN smIsScalar(const poly);
 static BOOLEAN smIsNegQuot(poly, const poly, const poly);
 static poly smEMult(poly, const poly);
 static BOOLEAN smCheckLead(const poly, const poly);
@@ -1753,7 +1752,7 @@ poly smMult(poly a, poly b)
   }
   if (pNext(b) == NULL)
   {
-    if (smIsScalar(b))
+    if (pIsConstantComp(b))
       return pMultCopyN(a, pGetCoeff(b));
     else
       return smEMult(a, b);
@@ -1784,7 +1783,7 @@ void smPolyDiv(poly a, poly b)
   {
     do
     {
-      if (!smIsScalar(b))
+      if (!pIsConstantComp(b))
       {
         for (i=pVariables; i; i--)
           pSubExp(a,i,pGetExp(b,i));
@@ -1840,11 +1839,11 @@ poly smMultDiv(poly a, poly b, const poly c)
     a = b;
     b = r;
   }
-  if ((c == NULL) || smIsScalar(c))
+  if ((c == NULL) || pIsConstantComp(c))
   {
     if (pNext(b) == NULL)
     {
-      if (smIsScalar(b))
+      if (pIsConstantComp(b))
         return pMultCopyN(a, pGetCoeff(b));
       else
         return smEMult(a, b);
@@ -1957,17 +1956,6 @@ static void smExactPolyDiv(poly a, poly b)
     a = pNext(a) = pAdd(pNext(a), h);
   } while (a!=NULL);
   pFree1(e);
-}
-
-static BOOLEAN smIsScalar(const poly Term)
-{
-  int i;
-
-  for (i=pVariables; i; i--)
-  {
-    if (pGetExp(Term,i)) return FALSE;
-  }
-  return TRUE;
 }
 
 static BOOLEAN smIsNegQuot(poly a, const poly b, const poly c)
