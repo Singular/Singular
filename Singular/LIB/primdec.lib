@@ -1,4 +1,4 @@
-// $Id: primdec.lib,v 1.53 2000-01-26 11:43:17 obachman Exp $
+// $Id: primdec.lib,v 1.54 2000-03-29 15:26:52 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
 // primdec.lib                                                               //
 // algorithms for primary decomposition based on                             //
@@ -10,7 +10,7 @@
 // written by Wolfram Decker and Hans Schoenemann                            //
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: primdec.lib,v 1.53 2000-01-26 11:43:17 obachman Exp $";
+version="$Id: primdec.lib,v 1.54 2000-03-29 15:26:52 Singular Exp $";
 info="
 LIBRARY: primdec.lib   PROCEDURES FOR PRIMARY DECOMPOSITION
 AUTHORS:  Gerhard Pfister, email: pfister@mathematik.uni-kl.de (GTZ)
@@ -3296,7 +3296,7 @@ proc prim_dec(ideal I, int choose)
    if(system("version")>933)
    {
       option(notWarnSB);
-    }
+   }
   ideal H=1; // The intersection of the primary components
   list U;    // the leaves of the decomposition tree, i.e.,
              // pairs consisting of a primary component of I
@@ -3324,6 +3324,10 @@ proc prim_dec(ideal I, int choose)
                 //    if the vertex is of type 3, or
                 //    the empty list otherwise
   ideal SI=std(I);
+  if(SI[1]==1)  // primdecSY(ideal(1))
+  {
+    return(list());
+  }
   int ncolsSI=ncols(SI);
   int ncolsH=1;
   W[1]=list(I,1,0,poly(1),ideal(0),list()); // The root of the tree
