@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.66 1999-10-20 11:52:00 obachman Exp $ */
+/* $Id: ideals.cc,v 1.67 1999-10-20 13:30:00 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1554,7 +1554,8 @@ ideal idLiftStd (ideal  h1,ideal  quot, matrix* ma, tHomog h)
   idSkipZeroes(s_h3);
   j = IDELEMS(s_h1);
   if (s_quot!=NULL) idDelete(&s_quot);
-
+  idDelete(&s_h1);
+  
   if (syz_ring!=orig_ring)
     rChangeCurrRing(orig_ring,TRUE);
   pSetSyzComp(0);

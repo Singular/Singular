@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz2.cc,v 1.5 1999-10-19 17:19:38 obachman Exp $ */
+/* $Id: syz2.cc,v 1.6 1999-10-20 13:30:02 obachman Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -1176,6 +1176,7 @@ syStrategy syHilb(ideal arg,int * length)
   syzstr->Howmuch = (int**)Alloc0((*length+1)*sizeof(int*));
   syzstr->Firstelem = (int**)Alloc0((*length+1)*sizeof(int*));
   syzstr->hilb_coeffs = (intvec**)Alloc0((*length+1)*sizeof(intvec*));
+  syzstr->sev = (unsigned long **)Alloc0((*length+1)*sizeof(unsigned long*));
   syzstr->bucket = kBucketCreate();
   syzstr->syz_bucket = kBucketCreate();
   startdeg = actdeg;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.181 1999-10-20 07:35:50 siebert Exp $ */
+/* $Id: iparith.cc,v 1.182 1999-10-20 13:30:01 obachman Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1747,7 +1747,7 @@ static BOOLEAN jjLIFTSTD(leftv res, leftv u, leftv v)
   if ((v->rtyp!=IDHDL)||(v->e!=NULL)) return TRUE;
   idhdl h=(idhdl)v->data;
   // CopyD for IDEAL_CMD and MODUL_CMD are identical:
-  res->data = (char *)idLiftStd((ideal)u->CopyD(IDEAL_CMD), currQuotient,
+  res->data = (char *)idLiftStd((ideal)u->Data(), currQuotient,
               &(h->data.umatrix),testHomog);
   setFlag(res,FLAG_STD);
   return FALSE;

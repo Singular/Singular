@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.35 1999-10-14 14:27:08 obachman Exp $ */
+/* $Id: ipid.cc,v 1.36 1999-10-20 13:30:02 obachman Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -725,7 +725,7 @@ BOOLEAN piKill(procinfov pi)
   Voice *p=currentVoice;
   while (p!=NULL)
   {
-    if (p->pi==pi)
+    if (p->pi==pi && pi->ref <= 1)
     {
       Warn("`%s` in use, can not be killed",pi->procname);
       return TRUE;
