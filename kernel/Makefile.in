@@ -174,10 +174,6 @@ DISTFILES=${SOURCES} ${HEADERS} ${ESOURCES} \
 
 OBJS := $(CXXSOURCES:.cc=.o) $(CSOURCES:.c=.o)
 
-ifeq ($(SINGUNAME),ix86-Win)
-OBJS := $(OBJS) Singular_res.o
-endif
-
 P_PROCS_MODULES = FieldZp FieldIndep FieldQ FieldGeneral
 
 ifeq ($(DL_KERNEL),1)
