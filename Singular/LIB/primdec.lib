@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: primdec.lib,v 1.90 2001-01-11 13:24:34 pfister Exp $";
+version="$Id: primdec.lib,v 1.91 2001-01-11 15:52:32 pfister Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -81,7 +81,7 @@ NOTE:    result is a std basis in the basering
 EXAMPLE: example sat2; shows an example
 "
 {
-   intvec op = option(get);   int @k,@i;
+   int @k,@i;
    def @P= basering;
    if(ordstr(basering)[1,2]!="dp")
    {
@@ -108,14 +108,14 @@ EXAMPLE: example sat2; shows an example
    if(deg(fac[1])>0)
    {
       ideal iold;
-
       for(@i=1;@i<=size(fac);@i++)
       {
         @f=@f*fac[@i];
-      }
-      option(returnSB);
-      while(specialIdealsEqual(iold,inew)==0 )
-      {
+     }
+     intvec op = option(get);
+     option(returnSB);
+     while(specialIdealsEqual(iold,inew)==0 )
+     {
          iold=inew;
          if(deg(iold[size(iold)])!=1)
          {
@@ -145,7 +145,6 @@ EXAMPLE: example sat2; shows an example
 
 static proc minSat(ideal inew, ideal h)
 {
-   intvec op = option(get);
    int i,k;
    poly f=1;
    ideal iold,fac;
@@ -173,6 +172,7 @@ static proc minSat(ideal inew, ideal h)
    quotM[2]=fac;
    quotM[3]=f;
    f=1;
+   intvec op = option(get);
    option(returnSB);
    while(specialIdealsEqual(iold,quotM[1])==0)
    {
@@ -1486,7 +1486,7 @@ RETURN:  list = the minimal associated prime ideals of i
 EXAMPLE: example minAssPrimes; shows an example
 "
 {
-   intvec op = option(get);
+   intvec op;
    def @P=basering;
    list qr=simplifyIdeal(i);
    map phi=@P,qr[2];
@@ -1512,8 +1512,10 @@ EXAMPLE: example minAssPrimes; shows an example
    }
    list @res,empty;
    ideal ser;
+   op=option(get);
    option(redSB);
    list @pr=facstd(i);
+   option(set,op);
    if(size(@pr)==1)
    {
       attrib(@pr[1],"isSB",1);
@@ -1530,14 +1532,16 @@ EXAMPLE: example minAssPrimes; shows an example
          execute ("ring gnir1 = ("+charstr(basering)+"),
                               ("+varstr(basering)+"),(C,lp);");
          ideal i=fetch(@P,i);
+         op=option(get);
+         option(redSB);
+
          list @pr=facstd(i);
-        // ideal ser;
+         option(set,op);
          setring gnir;
          @pr=fetch(gnir1,@pr);
          kill gnir1;
       }
    }
-    option(set,op);
    int j,k,odim,ndim,count;
    attrib(@pr[1],"isSB",1);
    if(#[1]==77)
@@ -1701,7 +1705,7 @@ EXAMPLE:example equidim; shows an example
       "// Not implemented for this ordering, please change to global ordering."
       );
   }
-  intvec op = option(get);  
+  intvec op ;  
   def  P = basering;
   list eq;
   intvec w;
@@ -1768,6 +1772,7 @@ EXAMPLE:example equidim; shows an example
     kill gnir;
     return(eq);
   }
+  op=option(get);
   option(returnSB);  
   j=quotient(j,k);
   option(set,op);
@@ -1921,7 +1926,7 @@ NOTE:    Algorithm of Gianni, Traeger, Zacharias
 EXAMPLE: example decomp; shows an example
 "
 {
-  intvec op=option(get);
+  intvec op;
   def  @P = basering;
   list primary,indep,ltras;
   intvec @vh,isat,@w;
@@ -1998,6 +2003,7 @@ EXAMPLE: example decomp; shows an example
   //----------------------------------------------------------------
 
   execute("ring gnir = ("+charstr(basering)+"),("+varstr(basering)+"),(C,lp);");
+  op=option(get);
   option(redSB);
 
   ideal ser=fetch(@P,ser);
@@ -2136,6 +2142,7 @@ EXAMPLE: example decomp; shows an example
  //------------------------------------------------------------------
   if (dim(@j)==0)
   {
+    op=option(get);
     option(redSB);
     list gprimary= zero_decomp(@j,ser,@wr);
     option(set,op);
@@ -2223,7 +2230,6 @@ EXAMPLE: example decomp; shows an example
   {
      isat=0;
      @n2=0;
-     option(redSB);
      if((indep[@m][1]==varstr(basering))&&(@m==1))
      //this is the good case, nothing to do, just to have the same notations
      //change the ring
@@ -2241,6 +2247,8 @@ EXAMPLE: example decomp; shows an example
         execute("ring gnir1 = ("+charstr(basering)+"),("+indep[@m][1]+"),("
                               +indep[@m][2]+");");
         execute("map phi=gnir,"+@va+";");
+        op=option(get);
+        option(redSB);
         if(homo==1)
         {
            ideal @j=std(phi(@j),@hilb,@w);
@@ -2251,8 +2259,8 @@ EXAMPLE: example decomp; shows an example
         }
         ideal ser=phi(ser);
 
+        option(set,op);
      }
-     option(set,op);
      if((deg(@j[1])==0)||(dim(@j)<jdim))
      {
        setring gnir;
@@ -2308,6 +2316,7 @@ EXAMPLE: example decomp; shows an example
            @h[@n]=leadcoef(@j[@n]);
         }
         //the primary decomposition of j*K(var(nnp+1),..,var(nva))[..the rest..]
+        op=option(get);
         option(redSB);
         list uprimary= zero_decomp(@j,ser,@wr);
         option(set,op);
@@ -2490,7 +2499,6 @@ EXAMPLE: example decomp; shows an example
          // {
            isat=0;
            @n2=0;
-           option(redSB);
 
            if(restindep[@m][1]==varstr(basering))
            //the good case, nothing to do, just to have the same notations
@@ -2507,6 +2515,8 @@ EXAMPLE: example decomp; shows an example
               execute("ring gnir1 = ("+charstr(basering)+"),("+
                       restindep[@m][1]+"),(" +restindep[@m][2]+");");
               execute("map phi=gnir,"+@va+";");
+              op=option(get);
+              option(redSB);
               if(homo==1)
               {
                  ideal @j=std(phi(jkeep),keephilb,@w);
@@ -2516,8 +2526,8 @@ EXAMPLE: example decomp; shows an example
                 ideal @j=groebner(phi(jkeep));
               }
               ideal ser=phi(ser);
+              option(set,op);
            }
-           option(set,op);
 
            for (lauf=1;lauf<=size(@j);lauf++)
            {
@@ -2570,7 +2580,7 @@ EXAMPLE: example decomp; shows an example
               @h[@n]=leadcoef(@j[@n]);
            }
            //the primary decomposition of j*K(var(nnp+1),..,var(nva))[..rest..]
-
+           op=option(redSB);
            option(redSB);
            list uprimary= zero_decomp(@j,ser,@wr);
            option(set,op);
@@ -3341,7 +3351,7 @@ static proc min_ass_prim_charsets (ideal PS, int cho)
 
 static proc min_ass_prim_charsets0 (ideal PS)
 {
-  intvec op=option(get);
+  intvec op;
   matrix m=char_series(PS);  // We compute an irreducible
                              // characteristic series
   int i,j,k;
@@ -3370,6 +3380,7 @@ static proc min_ass_prim_charsets0 (ideal PS)
        k=0;
        while(k<=sizeII)                  // successive saturation
        {
+         op=option(get);
          option(returnSB);
          II=quotient(JS,I[j]);
          option(set,op);
@@ -3435,7 +3446,7 @@ static proc min_ass_prim_charsets0 (ideal PS)
 
 static proc min_ass_prim_charsets1 (ideal PS)
 {
-  intvec op=option(get);
+  intvec op;
   def oldring=basering;
   string n=system("neworder",PS);
   execute("ring r=("+charstr(oldring)+"),("+n+"),dp;");
@@ -3481,6 +3492,7 @@ static proc min_ass_prim_charsets1 (ideal PS)
        k=0;
        while(k<=sizeII)                  // successive iteration
        {
+         op=option(get);
          option(returnSB);
          II=quotient(JS,I[j]);
          option(set,op);
@@ -4196,7 +4208,7 @@ static proc minsat_ppd(ideal SI, ideal fac)
 
 static proc minquot(list tsil)
 {
-   intvec op=option(get);
+   intvec op;
    int i,j,k,action;
    ideal verg;
    list l;
@@ -4208,6 +4220,7 @@ static proc minquot(list tsil)
 //std
 //   ideal star=quotient(laedi,f);
 //   star=std(star);
+   op=option(get);
    option(returnSB);
    ideal star=quotient(laedi,f);
    option(set,op);
@@ -4236,6 +4249,7 @@ static proc minquot(list tsil)
 //std
 //         verg=quotient(laedi,g);
 //         verg=std(verg);
+         op=option(get);
          option(returnSB);
          verg=quotient(laedi,g);
          option(set,op);
