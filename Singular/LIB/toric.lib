@@ -1,4 +1,4 @@
-// version="$Id: toric.lib,v 1.4 2000-07-28 13:32:43 theis Exp $";
+// version="$Id: toric.lib,v 1.5 2000-08-03 14:27:58 theis Exp $";
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -228,7 +228,7 @@ static proc toric_ideal_1(intmat A, string alg)
 
   int dummy;
   int process=system("pid");
-  string matrixfile="./temp_MATRIX"+string(process);	
+  string matrixfile="temp_MATRIX"+string(process);	
   link MATRIX=":w "+matrixfile;
   open(MATRIX);
 
@@ -570,7 +570,7 @@ static proc toric_ideal_2(intmat A, string alg, intvec prsv)
 
   int dummy;
   int process=system("pid");
-  string matrixfile="./temp_MATRIX"+string(process);	
+  string matrixfile="temp_MATRIX"+string(process);	
   link MATRIX=":w "+matrixfile;
   open(MATRIX);
 
@@ -722,16 +722,16 @@ ring r=0,(x,y,z),dp;
 intmat A[2][3]=1,1,0,0,1,1;
 A;
 
-// ideal I=toric_ideal(A,"du");
-// I;
+ideal I=toric_ideal(A,"du");
+I;
  
-// I=toric_ideal(A,"blr");
-// I;
+I=toric_ideal(A,"blr");
+I;
  
 // call with three arguments
 intvec prsv=1,2,1;
-// I=toric_ideal(A,"blr",prsv);
-// I;
+I=toric_ideal(A,"blr",prsv);
+I;
  
 }
 
@@ -941,7 +941,7 @@ SEE ALSO: toric_ideal, toric_lib, ip_lib, toric ideals
  
   int dummy;
   int process=system("pid");
-  string groebnerfile="./temp_GROEBNER"+string(process);	
+  string groebnerfile="temp_GROEBNER"+string(process);	
   link GROEBNER=":w "+groebnerfile;
   open(GROEBNER);
 
@@ -1001,7 +1001,7 @@ SEE ALSO: toric_ideal, toric_lib, ip_lib, toric ideals
   
   // create second temporary file
 
-  string newcostfile="./temp_NEW_COST"+string(process);	
+  string newcostfile="temp_NEW_COST"+string(process);	
   link NEW_COST=":w "+newcostfile;
   open(NEW_COST);
 
@@ -1087,22 +1087,22 @@ ring r=0,(x,y,z),wp(3,2,1);
 
 // call with toric ideal (of the matrix A=(1,1,1))
 ideal I=x-y,x-z;
-//ideal J=toric_std(I);
-//J;
+ideal J=toric_std(I);
+J;
  
 // call with the same ideal, but badly chosen generators:
 // 1) not only binomials 
 I=x-y,2x-y-z;
-//J=toric_std(I);
+J=toric_std(I);
 // 2) binomials whose monomials are not relatively prime
 I=x-y,xy-yz,y-z;
-//J=toric_std(I);
-//J;
+J=toric_std(I);
+J;
  
 // call with a non-toric ideal that seems to be toric
 I=x-yz,xy-z;
-//J=toric_std(I);
-//J;
+J=toric_std(I);
+J;
 // comparison with real standard basis and saturation 
 ideal H=std(I);
 H;
