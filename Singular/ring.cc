@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.67 1999-09-29 17:19:04 Singular Exp $ */
+/* $Id: ring.cc,v 1.68 1999-09-29 17:20:14 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -2045,7 +2045,7 @@ BOOLEAN rDBTest(ring r, char* fn, int l)
 }
 #endif
 
-#ifdef HAVE_SHIFTED_COMPONENTS
+#ifdef HAVE_SHIFTED_EXPONENTS
 static void rO_Align(int &place, int &bit_place)
 {
   // increment place to the next aligned one
@@ -2340,19 +2340,19 @@ BOOLEAN rComplete(ring r, int force)
 
       case ringorder_lp:
         rO_LexVars(j, r->block0[i],r->block1[i], prev_ordsgn,tmp_ordsgn,v,
-	           bits);
+                   bits);
         break;
 
       case ringorder_ls:
         rO_LexVars_neg(j, r->block0[i],r->block1[i], prev_ordsgn,tmp_ordsgn,v,
-	               bits);
+                       bits);
         break;
 
       case ringorder_dp:
         if (r->block0[i]==r->block1[i])
         {
           rO_LexVars(j, r->block0[i],r->block1[i], prev_ordsgn,tmp_ordsgn,v,
-	             bits);
+                     bits);
         }
         else
         {
@@ -2368,7 +2368,7 @@ BOOLEAN rComplete(ring r, int force)
         if (r->block0[i]==r->block1[i])
         {
           rO_LexVars(j, r->block0[i],r->block1[i], prev_ordsgn,tmp_ordsgn,v,
-	             bits);
+                     bits);
         }
         else
         {
@@ -2376,7 +2376,7 @@ BOOLEAN rComplete(ring r, int force)
           r->pVarLowIndex=j;
           typ_i++;
           rO_LexVars(j, r->block0[i],r->block1[i]-1, prev_ordsgn,tmp_ordsgn,v,
-	             bits);
+                     bits);
         }
         break;
 
@@ -2384,7 +2384,7 @@ BOOLEAN rComplete(ring r, int force)
         if (r->block0[i]==r->block1[i])
         {
           rO_LexVars_neg(j, r->block0[i],r->block1[i],prev_ordsgn,tmp_ordsgn,v,
-	                 bits);
+                         bits);
         }
         else
         {
@@ -2400,7 +2400,7 @@ BOOLEAN rComplete(ring r, int force)
         if (r->block0[i]==r->block1[i])
         {
           rO_LexVars_neg(j, r->block0[i],r->block1[i],prev_ordsgn,tmp_ordsgn,v,
-	                 bits);
+                         bits);
         }
         else
         {
@@ -2408,7 +2408,7 @@ BOOLEAN rComplete(ring r, int force)
           r->pVarLowIndex=j;
           typ_i++;
           rO_LexVars(j, r->block0[i],r->block1[i]-1, prev_ordsgn,tmp_ordsgn,v,
-	             bits);
+                     bits);
         }
         break;
 
@@ -2419,7 +2419,7 @@ BOOLEAN rComplete(ring r, int force)
         typ_i++;
         if (r->block1[i]!=r->block0[i])
           rO_LexVars_neg(j, r->block1[i],r->block0[i]+1, prev_ordsgn,tmp_ordsgn,
-	                 v,bits);
+                         v,bits);
         break;
 
       case ringorder_Wp:
@@ -2429,7 +2429,7 @@ BOOLEAN rComplete(ring r, int force)
         typ_i++;
         if (r->block1[i]!=r->block0[i])
           rO_LexVars(j, r->block0[i],r->block1[i]-1, prev_ordsgn,tmp_ordsgn,v,
-	             bits);
+                     bits);
         break;
 
       case ringorder_ws:
@@ -2439,7 +2439,7 @@ BOOLEAN rComplete(ring r, int force)
         typ_i++;
         if (r->block1[i]!=r->block0[i])
           rO_LexVars_neg(j, r->block1[i],r->block0[i]+1, prev_ordsgn,tmp_ordsgn,
-	                 v,bits);
+                         v,bits);
         break;
 
       case ringorder_Ws:
@@ -2449,7 +2449,7 @@ BOOLEAN rComplete(ring r, int force)
         typ_i++;
         if (r->block1[i]!=r->block0[i])
           rO_LexVars(j, r->block0[i],r->block1[i]-1, prev_ordsgn,tmp_ordsgn,v,
-	             bits);
+                     bits);
         break;
 
       case ringorder_S:
