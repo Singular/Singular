@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feread.cc,v 1.38 2000-09-18 09:18:56 obachman Exp $ */
+/* $Id: feread.cc,v 1.39 2000-09-25 14:46:55 obachman Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -206,6 +206,10 @@ char * fe_fgets_stdin_emu(char *pr,char *s, int size)
 #include "mod_raw.h"
 
 extern "C" {
+  typedef char* (*String_Func)();
+  typedef void  (*Void_Func)();
+  typedef int  (*Int_Func)();
+  typedef char** (*CharStarStar_Func)();
   char *(*fe_filename_completion_function)(); /* 3 */
   char *(* fe_readline) ();                   /* 4 */
   void (*fe_add_history) ();                  /* 5 */
@@ -240,31 +244,31 @@ static int fe_init_dyn_rl()
     #endif
     if (fe_rl_hdl==NULL) { return 1;}
 
-    fe_filename_completion_function=
-      dynl_sym(fe_rl_hdl,"filename_completion_function");
+    fe_filename_completion_function= (String_Func)
+      dynl_sym(fe_rl_hdl, "filename_completion_function");
     if (fe_filename_completion_function==NULL) { res=3; break; }
-    fe_readline=dynl_sym(fe_rl_hdl,"readline");
+    fe_readline=(String_Func)dynl_sym(fe_rl_hdl,"readline");
     if (fe_readline==NULL) { res=4; break; }
-    fe_add_history=dynl_sym(fe_rl_hdl,"add_history");
+    fe_add_history=(Void_Func)dynl_sym(fe_rl_hdl,"add_history");
     if (fe_add_history==NULL) { res=5; break; }
-    fe_rl_readline_name=dynl_sym(fe_rl_hdl,"rl_readline_name");
+    fe_rl_readline_name=(char**)dynl_sym(fe_rl_hdl,"rl_readline_name");
     if (fe_rl_readline_name==NULL) { res=6; break; }
-    fe_rl_line_buffer=dynl_sym(fe_rl_hdl,"rl_line_buffer");
+    fe_rl_line_buffer=(char**)dynl_sym(fe_rl_hdl,"rl_line_buffer");
     if (fe_rl_line_buffer==NULL) { res=7; break; }
-    fe_completion_matches=dynl_sym(fe_rl_hdl,"completion_matches");
+    fe_completion_matches=(CharStarStar_Func)dynl_sym(fe_rl_hdl,"completion_matches");
     if (fe_completion_matches==NULL) { res=8; break; }
     fe_rl_attempted_completion_function=
-      dynl_sym(fe_rl_hdl,"rl_attempted_completion_function");
+      (CPPFunction**) dynl_sym(fe_rl_hdl,"rl_attempted_completion_function");
     if (fe_rl_attempted_completion_function==NULL) { res=9; break; }
-    fe_rl_outstream=dynl_sym(fe_rl_hdl,"rl_outstream");
+    fe_rl_outstream=(FILE**)dynl_sym(fe_rl_hdl,"rl_outstream");
     if (fe_rl_outstream==NULL) { res=10; break; }
-    fe_write_history=dynl_sym(fe_rl_hdl,"write_history");
+    fe_write_history=(Int_Func)dynl_sym(fe_rl_hdl,"write_history");
     if (fe_write_history==NULL) { res=11; break; }
-    fe_history_total_bytes=dynl_sym(fe_rl_hdl,"history_total_bytes");
+    fe_history_total_bytes=(Int_Func)dynl_sym(fe_rl_hdl,"history_total_bytes");
     if (fe_history_total_bytes==NULL) { res=12; break; }
-    fe_using_history=dynl_sym(fe_rl_hdl,"using_history");
+    fe_using_history=(Void_Func)dynl_sym(fe_rl_hdl,"using_history");
     if (fe_using_history==NULL) { res=13; break; }
-    fe_read_history=dynl_sym(fe_rl_hdl,"read_history");
+    fe_read_history=(Int_Func)dynl_sym(fe_rl_hdl,"read_history");
     if (fe_read_history==NULL) { res=14; break; }
     return 0;
   }
