@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.103 1998-06-08 08:48:48 Singular Exp $
+@comment $Id: general.doc,v 1.104 1998-06-19 13:33:52 obachman Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -1795,24 +1795,21 @@ data bases).
 @node Procedures, Libraries, Input and output, General concepts
 @section Procedures
 @cindex Procedures
-Procedures contain sequences of @sc{Singular} commands in a special format.
-They are used to extend the set of commands with user defined commands.
-Procedures are defined by either typing them in on the command line or by
-loading them from a file. If a procedure is defined in a file which complies
-with the syntax rules for libraries, this file may be loaded with the
-@code{LIB} command and the procedure may have additional sections (cf.
-@ref{Procedure definition}).
-Procedures are invoked like a normal built-in command, i.e. by typing their
-name followed by the list of arguments
-in parentheses. The invocation then executes
-the sequence of commands stored in the specified procedure.
+
+Procedures contain sequences of @sc{Singular}.  They are used to extend
+the set of commands with user defined commands.  Procedures are defined
+by either typing them in on the command line or by loading them from a
+so-called library file with the @ref{LIB} command.  Procedures are
+invoked like normal built-in commands, i.e., by typing their name
+followed by the list of arguments in parentheses. The invocation then
+executes the sequence of commands stored in the specified procedure. All 
+defined procedures can be displayed by the command @code{listvar(proc);}.
 
 @menu
 * Procedure definition::
 * Names in procedures::
 * Parameter list::
 * Procedure commands::
-* Loading of procedure files::
 @end menu
 @c -------------------------------------------------
 @node Procedure definition, Names in procedures, Procedures, Procedures
@@ -1850,33 +1847,30 @@ which is executed by @code{example proc_name;}.
 @* The help_text, the parameter_list, and the example section are optional.
 The default for a parameter_list is @code{(list #)}, see @ref{Parameter list}.
 The help and example sections are ignored if the procedure is defined
-interactively, i.e. if it was not loaded from a file by a @code{LIB} command.
-@* Specifying static in front of the proc-definition (in a library file)
-makes this procedure local to the library, i.e. accessible only for the other
+interactively, i.e., if it was not loaded from a file by a @ref{LIB} command.
+@* Specifying @code{static} in front of the proc-definition (in a library file)
+makes this procedure local to the library, i.e., accessible only for the other
 procedures in the same library, but not for the users. So there is no
 reason anymore to define a procedure within another one (it just makes
 debugging harder).
 @end table
 
-@menu
-* LIB::
-* Libraries::
-* Procedures::
-* Examples::
-* Control structures::
-* return::
-@end menu
-
 @subsubheading Example of an interactive procedure definition
 @example
 @c example
-  ring r1 = 0,(x,y,z),dp;
-  poly f =  x3+y3+(x-y)*x2y2+z2;
-  proc Milnor(poly h)
+  proc milnor_number (poly p)
   {
-    return(vdim(std(jacob(h))));
+    ideal i= std(jacob(p));
+    int m_nr=vdim(i);
+    if (m_nr<0)
+    {
+      "// not an isolated singularity";
+    }
+    return(m_nr);         // the value of m_nr is returned
   }
-  Milnor(f);
+  ring r1=0,(x,y,z),ds;
+  poly p=x^2+y^2+z^5;
+  milnor_number(p);
 @c example
 @end example
 
@@ -1899,17 +1893,11 @@ Now, we load the library and execute the procedures defined there:
 @c example
 @end example
 
-A convenient and recommended way to define procedures is to prepare a
-file and read this file with the @code{LIB} command.  The differences
-between procedures from libraries and other procedures are that the help
-and example part are ignored in interactive definitions and that static
-can only be specified in libraries.
-
-@subsubheading Guidelines for the help section of a procedure
+@subsubheading Guidelines for the help section of a procedure 
 The help text of a procedure should contain information about the usage,
 purpose, return values and generated objects. Particular assumptions or
-limitations should be listed. If global objects are generated, this should
-be mentioned, too.
+limitations should be listed. It should also be mentioned if global
+objects are generated or manipulated.
 
 The libraries contained in the @sc{Singular} distribution use the following
 format for the help text:
@@ -1917,7 +1905,7 @@ format for the help text:
 USAGE:    <proc_name>(<parameters>);   <explanation of parameters>
 [CREATE:  <description of created objects which are not returned>]
 RETURN:   <description of the purpose and return value>
-[NOTE:    <paritcular assumptions or limitations, hints>]
+[NOTE:    <paritcular assumptions or limitations, details>]
 EXAMPLE:  example <proc_name>; shows an example
 @end example
 
@@ -1928,9 +1916,9 @@ EXAMPLE:  example <proc_name>; shows an example
 @cindex local names
 
 All variables are local to the procedure they are defined in.
-These names cannot interfere with names in other
-procedures and are automatically deleted after having executed
-the proc.
+Locally defined variables cannot interfere with names in other
+procedures and are automatically deleted after leaving
+the procedure.
 Names can be made global by @code{export} (see @ref{export}).
 These global names are not deleted automatically.
 Ring dependent variables are stored together with the ring and deleted
@@ -1941,28 +1929,24 @@ is said to have nesting level 1, if it is local to a procedure that was
 called interactively, nesting level 2, if is local to a procedure that
 was called by a procedure of nesting level 1 etc. @code{listvar()} also
 displays the nesting level, nesting level 0 is used for global objects
-(See @ref{listvar}). A ring may be 'moved up' by one nesting level
+(see @ref{listvar}). A ring may be 'moved up' by one nesting level
 with @code{keepring} (see @ref{keepring}). All variables living in that
 ring are moved together with that ring.
 
 @example
+@c example
 proc xxx
-@{
+{
   int k=4;        //defines a local variable k
   int result=k+2;
   export result;  //defines the global variable "result".
-@}
+}
+xxx();
+listvar(all);
+@c example
 @end example
-
-Typing @code{listvar(all);} after having executed a procedure shows that
-the variable @code{result} is still there while @code{k} has been
-deleted.
-
-Often a procedure is started while a basering is active. The procedure then
-works in this basering without knowing its name. Therefore a name has to be
-assigned to the basering before executing e.g. map commands. This is done by
-the assignment @code{def r=basering;}, writing @code{ring r=basering;} leads
-to an error.
+Note that the variable @code{result} became a global variable after the
+execution of @code{xxx}.
 
 @c ---------------------------------------
 @node Parameter list, Procedure commands, Names in procedures, Procedures
@@ -2031,91 +2015,15 @@ proc x7 (ring r)
 @end table
 
 @c --------------------------------------- ----------
-@node Procedure commands, Loading of procedure files, Parameter list, Procedures
+@node Procedure commands, , Parameter list, Procedures
 @subsection Procedure commands
 @cindex Procedure commands
-@menu
-* export::
-* keepring::
-* return::
-@end menu
-@iftex
-@table @code
-@item export
-see @ref{export}
-@item keepring
-see @ref{keepring}
-@item return
-see @ref{return}
-@end table
-@end iftex
-
-
-@c ---------------------------------------
-@node Loading of procedure files,  , Procedure commands, Procedures
-@subsection Loading of procedure files
-@cindex LIB
-@cindex Loading of procedure files
-Files containing @sc{Singular} procedures may be loaded in two ways
-(the whole library is loaded, the quotes "" are necessary):
-@*@code{< "file_name";}       (if the library does not contain info 
-and version string) @*@code{LIB "file_name";}
-
-To list all loaded procedures resp. libraries, type
-@code{listvar(proc);} resp.
-@code{LIB;}
-
-To remove a procedure type
-@code{kill proc_name;}
-
-If the library contains neither an info string nor a version string
-it can be loaded by @code{<"..."} because it contains valid @sc{Singular}
-commands. With @code{<} the whole file is read by @sc{Singular} and the
-body of the procedures is stored in the main memory. Help and example
-sections of the procedures are ignored. Any other text in the file is
-executed. Problems may occur if one of the commands in the file is a
-procedure call. These problems do not occur if all procedures are called
-with the LIB command. Because of these limitations and problems the use of
-@code{<} is @strong{discouraged}.
-
-
-@menu
-* LIB command::
-@end menu
-
-@c ----------------------------------
-@node LIB command, , Loading of procedure files, Loading of procedure files
-@cindex LIB
-@table @code
-@item @strong{Syntax:}
-@code{LIB} string_expression@code{;}
-@item @strong{Purpose:}
-reads a library of procedures (proc) from a file. If the given
-filename does not start with @kbd{.} or @kbd{/}, the following directories are
-searched for the file: the current directory,
-the directories given in the environment variable
-@code{SINGULARPATH}@footnote{@code{SPATH} on MS-DOS}.
-Only procedure names of the library are loaded, the body of the proc
-is read during the first call of this proc. This minimizes
-the memory consumption by unused procedures.
-@item @strong{Example:}
-@example
-LIB "general.lib";
-// the names of the procedures in the
-// library "general.lib" are now known to SINGULAR
-@end example
-@end table
-@menu
-* LIB in a library::
-* string expressions::
-* proc::
-* Libraries::
-* SINGULAR libraries:: all standard libraries.
-@end menu
-@iftex
-See @ref{LIB in a library}; @ref{proc}; @ref{Libraries};
-@ref{string expressions}; @ref{SINGULAR libraries}.
-@end iftex
+@c ref
+See
+@ref{export};
+@ref{keepring};
+@ref{return}.
+@c ref
 
 @c ----------------------------------------------------------------------
 @c ----------------------------------------------------------------------
@@ -2129,28 +2037,87 @@ information about the library is displayed by the command
 like the built-in @sc{Singular} functions. To have the full functionality
 of a built-in function (like checking of the type of parameters, automatic
 loading of necessary other libraries, help pages etc.), libraries have to
-comply with the syntax rules described below. The default location for
-library files is @code{/usr/local/Singular/LIB};
-or can be given by the environment variable
-@code{SINGULARPATH}@footnote{@code{SPATH} on MS-DOS}. Users, who do not
-intend to write their own libraries, may skip paragraphs @ref{Format of a
-library} to @ref{A syntax example} without loosing any relevant information.
+comply with the syntax rules described below. 
 
 @menu
+* Loading of a library::
 * Format of a library::
-* LIB in a library::
-* info::
-* version::
-* A syntax example::
+* Guidelines for writing a library::
 @end menu
+@c ---------------------------------------
+@node Loading of a library, Format of a library,, Libraries
+Libraries can only be loaded with the @code{LIB} command:
+@c ------------------------------------------------------------
+@c   This piece of text exists also in the file reference.doc,
+@c   chapter "LIB".
+@c   If you change something here, change it there, too!
+@c ------------------------------------------------------------
+@table @code
+@item @strong{Syntax:}
+@code{LIB} string_expression@code{;}
+@item @strong{Type:}
+none
+@item @strong{Purpose:}
+reads a library of procedures from a file. If the given filename does
+not start with @kbd{.} or @kbd{/}, the following directories are
+searched for (in that order): the current directory, the directories given in
+the environment variable @code{SINGULARPATH}, some default directories
+relative to the location of the @sc{Singular} executable program, and
+finally some default absolute directories. You can view the search path
+which @sc{Singular} uses to locate its libraries, by starting up
+@sc{Singular} with the option @code{-v}, or by issuing the command
+@code{system("with");"}.
+
+Only the names of the procedures in the library are loaded, the body of
+the procedures is read during the first call of this procedure. This minimizes
+memory consumption by unused procedures.  When @sc{Singular} is started
+with the @code{-q} or @code{--quiet} option, no message about the
+loading of a library is displayed.  More exactly, option @code{-q} (and
+likewise @code{--quiet}) unsets option @code{loadLib} to inhibit
+monitoring of library loading (@pxref{option}).
+
+Unless  @sc{Singular} is started with the @code{--no-stdlib} option, the
+library @code{standard.lib} is automatically loaded at start-up time.
+
+All loaded libraries are displayed by the @code{LIB} command without
+arguments:
+@item @strong{Syntax:}
+@code{LIB;}
+@item @strong{Type:}
+string
+@item @strong{Purpose:}
+shows all loaded libraries.
+@item @strong{Example:}
+@example
+@c example
+  option(loadLib); // show loading of libraries; 
+                   // standard.lib is loaded
+  LIB;
+                   // the names of the procedures of inout.lib
+  LIB "inout.lib"; // are now known to Singular
+  LIB;
+@c example
+@end example
+@end table
+ 
+@c ref
+See
+@ref{Command line options};
+@ref{Procedures and libraries};
+@ref{SINGULAR libraries};
+@ref{proc};
+@ref{standard_lib};
+@ref{string};
+@ref{system}.
+@c ref
 
 @c ---------------------------------------
-@c @node Format of a library, LIB in a library, Libraries, Libraries
-@node Format of a library, LIB in a library, Libraries, Libraries
+@node Format of a library, Guidelines for writing a library, Loading of a library, Libraries
 @subsection Format of a library
 @cindex Format of a library
 
-A library file can contain comments, @code{LIB} commands, @code{proc} commands
+A library file can contain comments, an info- and version-string
+definition, @code{LIB} commands, @code{proc} commands
 and @code{proc} commands with @code{example} and @code{help} sections,
 i.e. the following keywords are allowed:
 @code{info},
@@ -2161,62 +2128,10 @@ i.e. the following keywords are allowed:
 @code{[static] proc}.
 Anything else is not recognized by the parser of @sc{Singular} and leads
 to an error message while loading the library.
-If an error occurs, loading is aborted and an error message is returned,
+If an error occurs, loading is aborted and an error message is displayed,
 specifying the type of error and the line where it was detected.
 
-@table @code
-@item @strong{Example of a library file:}
-@example
-@c include sample_lib0.lib
-@c example
-  LIB"sample_lib0.lib";     // load sample_lib0.lib
-  help sample_lib0.lib;     // view its info string
-
-  proc tt1=dummy1;          // assign new names to
-  kill dummy1;              // the procedures
-  proc tt2=dummy2;
-  kill dummy2;
-
-  listvar(proc);            // list all available procs
-  tt1;                      // show information about tt1
-  string(tt1);              // show the string tt1
-  tt2(tt1,2,3);             // use tt2 and tt1
-@c example
-@end example
-@end table
-
-@table @code
-@item @strong{Unrecognized character in a library:}
-@example
-@c include bad_lib0.lib
-@c example
-  LIB"bad_lib0.lib";
-@c example
-@end example
-@end table
-
-@c ---------------------------------------
-@node LIB in a library, info, Format of a library, Libraries
-@subsection LIB in a library
-@cindex LIB in a library
-@cindex LIB
-@table @code
-@item @strong{Syntax:}
-@code{LIB} string_constant @code{;}
-@item @strong{Purpose:}
-Loads the given library, if it is not already loaded. Makes the procedures
-of that given library available to @code{Singular}.
-If a library uses procedures from other libraries, theses should be
-called by such a @code{LIB} command.
-@item @strong{Example:}
-@example
-LIB "matrix.lib";
-@end example
-@end table
-
-@c ---------------------------------------
-@node info, version, LIB in a library, Libraries
-@subsection info
+The info- and version-string are defined as follwos:
 @cindex  info in a library
 @table @code
 @item @strong{Syntax:}
@@ -2239,9 +2154,6 @@ as a listing of all procedures available to the users (with a one line
 description of each procedure).
 @end table
 
-@c ---------------------------------------
-@node version, A syntax example, info, Libraries
-@subsection version
 @cindex  version in a library
 @table @code
 @item @strong{Syntax:}
@@ -2265,89 +2177,59 @@ It is common practice to simply define the version string to be
 @code{d:$"} and let a version control system expand it.
 @end table
 
+
 @c ---------------------------------------
-@node A syntax example, ,version, Libraries
-@subsection A syntax example
-@cindex syntax example
-@cindex template
+@node Guidelines for writing a library, , Format of a library, Libraries
+@subsection Guidelines for writing a library
 
-Although there are very few enforced rules on the format of a library,
-it is recommended that certain guidelines should be followed (which will
-make debugging and understanding easier). An example probably explains
-it best.
+Although there are very few enforced rules on how libraries are written
+(e.g., on whether or where the info- and version-string are defined), it 
+is recommended that certain guidelines should be followed so that 
+debugging and understanding are made easier.
 
-@c @table @code
-@example
-// $I@comment
-@comment !! Do not erase the @comment at the end of the previous line !!
-@comment !! It prevents cvs to substitue the id string                !!
-d: template.lib,v 1.2 1998/05/07 08:19:32 singular Exp $
-//
-//
-///////////////////////////////////////////////////////////////////////////
-version="$I@comment
-@comment !! Do not erase the @comment at the end of the previous line !!
-@comment !! It prevents cvs to substitue the id string                !!
-d: template.lib,v 1.2 1998/05/07 08:19:32 singular Exp $;
-info="
-       LIBRARY: template.lib
+@enumerate
+@item 
+The info- and version-string should appear at the beginning of the
+library, before procedure definitions.
 
-   This is just an example of a library aimed at illustrating how
-   a library should look like
-
- Author: The Singular Team <singular@@mathematik.uni-kl.de>
- last modified: 19.04.1998
-
- dummy1(p,i,j);   example procedure accessible for the user.
-";
-
-///////////////////////////////////////////////////////////////////////////
-// load other libraries that are required.
-
-LIB "general.lib";
-
-///////////////////////////////////////////////////////////////////////////
-// section of public procedures
-proc dummy1(proc p,
-          int i,
-          int j)
-"USAGE:   dummy1(p, i,j); p proc, i,j int
-RETURN:  returns the result of p(i,j)
-EXMAPLE: example dummy1; shows examples"
-      @{ return(p(j,k)); @}
-example
-@{ "EXAMPLE:"; echo=2;
-  dummy1(dummy2, 2, 3);
-@}
-
-///////////////////////////////////////////////////////////////////////////
-// Section of internal functions
-//
-static
-proc dummy2(int j, int k)
-@{ return(string(j)+\"+\"+string(k)+\"=\"+string(j+k)); @}
-
-///////////////////////////////////////////////////////////////////////////
-@end example
-
-The libraries contained in the @sc{Singular} distribution follow additional
-guidelines for the info string. These can be summarized in the following
-synopsis:
+@item 
+The info-string should have the following format:
 @example
 info="
       LIBRARY: <library_name> <one line description of the content>
+      AUTHOR:  <name, affiliation, and email address of author>
+      last modified: < date of last modification>
 
       <procedure1>;     <one line description of the purpose>
       .
       .
       <procedureN>;     <one line description of the purpose>";
 @end example
-The purpose of these one line descriptions is not to give a short help
+The purpose of the one line procedure descriptions is not to give a short help
 for the procedure, but to help the user decide what procedure might be
-the right one for the job. Details can then be found in the help of
-each procedure. Therefore parameters may be omitted or abbreviated if
+the right one for the job. Details can then be found in the help section 
+of each procedure. Therefore parameters may be omitted or abbreviated if
 necessary.
 
+@item
+Each procedure which is not declared @code{static} should have a 
+help and example section as explained in @ref{Procedure definition}.
+
+@item 
+Each procedure which should not be accessible by users should be
+declared @code{static}.
+
+@item 
+No procedures should be defined within the body of another procedure.
+
+@item 
+Executing procedures defined in a library should not result in any
+message displays, by default (please, shut up, by default). That is, only if
+special options or variable values are set, should a procedure display
+progress, debugging or any other information. A good way to accomplish
+this is the usage of the @ref{dbprint} command.
+
+@end enumerate
 @c @end table
 
 @c ----------------------------------------------------------------------
@@ -2416,7 +2298,7 @@ proc t
 t();
 @expansion{} -- break point in t --
 @expansion{} -- 0: called    from STDIN --
-@@i;
+i;
 @expansion{} 2
 @expansion{} -- break point in t --
 
@@ -2444,17 +2326,18 @@ See @ref{dbprint}; @ref{voice}.
 @cindex libparse
 
 @code{libparse} is a stand-alone program contained in the @sc{Singular}
-package,
-which cannot be called inside of @sc{Singular}. It is a debugging tool for
-libraries which performs exactly the same checks as the LIB command in
-@sc{Singular}, but generates more output during parsing.
-On a Unix platform it is executed
-by the command @code{libparse} lib_name at the shell-prompt. It is useful,
-if an error occurs while loading the library, but the whole block around the
-line specified seems to be correct. In these situations the real error might
+distribution (at the palce where the @sc{Singular} executable program
+resides), which cannot be called inside of @sc{Singular}. It is a
+debugging tool for libraries which performs exactly the same checks as
+the @code{LIB} command in @sc{Singular}, but generates more output during
+parsing.  @code{libparse} is usefulif an error
+occurs while loading the library, but the whole block around the line
+specified seems to be correct. In these situations the real error might
 be hundreds of lines earlier in the library.
 
-Command line options:
+@strong{Usage:}
+@*@code{libparse [options] singular-library}
+@strong{Pptions:}
 @table @asis
 @item @code{-d} Debuglevel
 increases the amount of output during parsing, where Debuglevel is an integer

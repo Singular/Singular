@@ -88,7 +88,7 @@ html: ${MANUAL_FILES}
 	test -d html/images || mkdir html/images
 	for img in ${IMAGES}; \
 	do \
-		echo $${img}; \
+		echo uudecode images/$${img}.uu; \
 		uudecode images/$${img}.uu; \
 	done
 	touch html

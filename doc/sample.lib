@@ -1,11 +1,4 @@
-version="0.0.0";
-info="LIBRARY: sample.lib
-
-      sample library for static and global procedures
-";
-//
 // Example of a user accessible procedure
-//
 proc tab (int n)
 "USAGE:    tab(n);  (n integer)
 RETURNS:  string of n space tabs
@@ -14,12 +7,10 @@ EXAMPLE:  example tab; shows an example
 example
 {
   "EXAMPLE:"; echo=2;
-  for(int n=0; n<=5; n=n+1)
-  { tab(5-n)+"*"+tab(n)+"+"+tab(n)+"*"; }
+  for(int n=0; n<=4; n=n+1)
+  { tab(4-n)+"*"+tab(n)+"+"+tab(n)+"*"; }
 }
 
-//
 // Example of a static procedure
-//
 static proc internal_tab(int n)
 { return(" "[1,n]); }
