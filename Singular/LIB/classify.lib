@@ -1,44 +1,20 @@
 //=============================================================================
-// $Id: classify.lib,v 1.2 1995-02-04 19:40:47 krueger Exp $
+// $Id: classify.lib,v 1.3 1995-02-08 16:15:46 krueger Exp $
+//
+// Please send bugs and comments to krueger@mathematik.uni-kl.de
 //
 //=============================================================================
-// Library-loader.
-//
-proc Lib_lib_Classify
-{
-  if(defined(SLib_lib_Classify) == 1) { return(); }
-  string SLib_lib_Classify="$Id: classify.lib,v 1.2 1995-02-04 19:40:47 krueger Exp $";
-  verbose (noloadLib);
-  string @Required="lib0,lib1,lib_Classify";
-  @Required=@Required+",lib_Setring,lib_ReOrder,lib_RandomPoly,lib_Morse";
-  @Required=@Required+",lib_tools,lib_Kclass,lib_Ausgaben,lib_WorkOn";
-  @Required=@Required+",lib_HKclass";
-  int @len = size(@Required);
-  int @i;
-  int @k;
-  int @j;
-  string @s;
-  string @s1;
-
-  for(@i=1;@i<@len;@i=@i+@k) {
-    @s = @Required[@i..@len];
-    @k = find(@s, ",");
-    if(@k>0) { 
-      @s = @Required[@i,@k-1];
-    }
-    else {
-      @k = size(@s);
-    }
-    @s1 = "@j = defined(SLib_"+@s+");";
-    execute @s1;
-    if( @j == 0) {
-      @s1 = "LIB \""+@s+"\";";
-      execute @s1;
-      @s1 = "Lib_"+@s+"();";
-      execute @s1;
-    }
-  }
-}
+LIB "lib0";
+LIB "lib1";
+LIB "lib_Setring";
+LIB "lib_ReOrder";
+LIB "lib_RandomPoly";
+LIB "lib_Morse";
+LIB "lib_tools";
+LIB "lib_Kclass";
+LIB "lib_Ausgaben";
+LIB "lib_WorkOn";
+LIB "lib_HKclass";
 
 //=============================================================================
 //
@@ -70,15 +46,6 @@ proc ShowLibs
     }
   }
 }
-proc Lib_lib0
-{
-  string SLib_lib0="lib0 - Ohne";
-}
-proc Lib_lib1
-{
-  string SLib_lib1="lib1 - Ohne";
-}
-
 
 //=============================================================================
 // TopLevel Funktion of the Arnold-Classifier.
@@ -90,34 +57,51 @@ proc Classify
     " USAGE:   Classify(<poly>)";
     " RETURN:  Normal-Form of <poly>";
     " NOTE:    Tells the typ of f";
-    " EXAMPLE: ring r;";
-    "          //int DeBug=1 / 6 / 11;
-    "          poly g=Classify(f);";
+    " EXAMPLE: ring r; ";
+    "          int DeBug=1 / 3 / 6 / 11; ";
+    "          poly g=Classify(f); ";
+    "";
+    " REMARK:  This version of Classify is only pre-alpha.";
+    "          Please reports bugs and comments to: ";
+    "          \"Kai Krueger\" <krueger@mathematik.uni-kl.de>";
+    "";
+    "          int DeBug=1; is usefull as trace-mode. For more informations";
+    "          increace the value of \'DeBug\'";
 //=============================================================================
-    return(#1);
+    return();
   }
   if( typeof(#1) != "poly") {
     "Classify: argv(1) must be poly";
     return(#1);
   }
-  Lib_lib_Classify();
   int @show_nf = 1;    // return Normal-form if set to '1'
 
   poly @f_in = #1;
   int @n = nvars(basering);
+
+  // Save the name of initial ring
   string @RingInput = "setring " + nameof(basering) + ";";
   string @tmp = "map @Conv=" + nameof(basering) + ",";
   int @i;
 
+  // if trace/debug mode not set, do it!
+  if( defined(DeBug) == 0) { int DeBug = 0; }
+  if(system("version")>=91) { global DeBug; }
+
+  // define new ring
   if( defined(Rtop) == 1) { kill Rtop; }
   execute Setring(@n, "Rtop");
   @tmp = @tmp + string(maxideal(1)) + ";";
   execute @tmp;
-  execute RingInput;
+  if(system("version")>=91) { global Rtop; }
+
+  execute @RingInput;
   map ShowPoly=Rtop,maxideal(1);
+  if(system("version")>=91) { global ShowPoly; }
   setring Rtop;
   init();
   string RingDisplay = @RingInput;
+  if(system("version")>=91) { global RingDisplay; }
 
   string @s1;
   string @s2;
