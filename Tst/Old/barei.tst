@@ -2,18 +2,23 @@
 // test script for bareiss command
 //
 pagelength = 10000;
-ring r = 32003,(x,y,z),dp;
+ring r = 0,(x,y,z),dp;
 r;
 matrix m1[3][3]=x,2,3,2,3x,4,1,3,2x;
 m1;
 list mm1=bareiss(m1);
 mm1;
-poly pdet=mm1[1][1,1];
-if(leadcoef(pdet)<0)
+vector vdet=mm1[1][3];
+poly pdet=det(m1);
+if(leadcoef(pdet)!=leadcoef(vdet))
 {
-  pdet=(-1)*pdet;
+  vdet+pdet*gen(3);
 }
-pdet-det(m1);
+else
+{
+  "error";
+  vdet-pdet*gen(3);
+}
 "------------------------------------";
 //
 matrix m2[5][6]=0,2,1,-3,12,-9,1,2,5,3,6,-1,2,4,10,6,12,-2,-3,2,1;
@@ -40,25 +45,38 @@ matrix m4[3][3]=s1,0,s3,1,s5,0,s7,s8,s9;
 m4;
 list mm4=bareiss(m4);
 mm4;
+vector vdet=mm4[1][3];
+poly pdet=det(m4);
+if(leadcoef(pdet)!=leadcoef(vdet))
+{
+  vdet+pdet*gen(3);
+}
+else
+{
+  "error";
+  vdet-pdet*gen(3);
+}
 "---------------------------------------";
 //
 matrix m5[3][2]=s8,s7,s9,s6,s5,0;
-list mm5=bareiss(m5);
+module mm=m5;
+list mm5=bareiss(mm);
 print(mm5[1]);
+kill r;
 "-------------------------------------";
 ring r1=0,(x(1..9)),(dp);
 matrix m6[3][3]=maxideal(1);
 list mm6=bareiss(m6);
 print(mm6[1]);
-poly p1=mm6[1][1,1];
+vector p1=mm6[1][3];
 poly p2=det(m6);
 if(leadcoef(p1)!=leadcoef(p2))
 {
-  p1+p2;
+  p1+p2*gen(3);
 }
 else
 {
-  p1-p2;
+  p1-p2*gen(3);
 }
 "--------------------------------------";
 ring r2=0,(x(1..12)),ds;
@@ -75,8 +93,7 @@ print(mm8[1]);
 matrix m9[4][4]=maxideal(2);
 print(m9);
 list mm9=bareiss(m9);
-print(mm9[1]);
-mm9[1][1,1];
+mm9;
 "------------------------------------";
 matrix m11[5][5]=maxideal(1),maxideal(1);
 print(m11);
