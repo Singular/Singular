@@ -1,8 +1,11 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fac_iterfor.cc,v 1.0 1996-05-17 10:59:45 stobbe Exp $
+// $Id: fac_iterfor.cc,v 1.1 1996-07-08 08:18:49 stobbe Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.0  1996/05/17 10:59:45  stobbe
+Initial revision
+
 */
 
 #include "assert.h"
@@ -20,19 +23,19 @@ IteratedFor::fill ( int from, int max )
     index[N] = max;
 }
 
-IteratedFor::IteratedFor( int n, int max ) : MAX( max ), N( n ), last( false )
+IteratedFor::IteratedFor( int from, int to, int max ) : MAX( max ), FROM( from ), TO( to ), N( TO-FROM ), last( false )
 {
-    ASSERT( n > 1 && max >= 0, "illegal iterated for" );
-    index = new int[n+1];
-    imax = new int[n+1];
-    fill( 2, max );
+    ASSERT( n >= 0 && max >= 0, "illegal iterated for" );
+    index = new int[N+1];
+    imax = new int[N+1];
+    fill( 0, max );
 }
 
-IteratedFor::IteratedFor( const IteratedFor & I ) : MAX( I.MAX ), N( I.N ), last( I.last )
+IteratedFor::IteratedFor( const IteratedFor & I ) : MAX( I.MAX ), FROM( I.FROM ), TO( I.TO ), N( I.N ), last( I.last )
 {
     index = new int[N+1];
     imax = new int[N+1];
-    for ( int i = 2; i<= N; i++ ) {
+    for ( int i = 0; i <= N; i++ ) {
 	index[i] = I.index[i];
 	imax[i] = I.imax[i];
     }
@@ -55,9 +58,11 @@ IteratedFor::operator= ( const IteratedFor & I )
 	    index = new int[N+1];
 	    imax = new int[N+1];
 	}
+	FROM = I.FROM;
+	TO = I.TO;
 	MAX = I.MAX;
 	last = I.last;
-	for ( int i = 2; i<= N; i++ ) {
+	for ( int i = 0; i<= N; i++ ) {
 	    index[i] = I.index[i];
 	    imax[i] = I.imax[i];
 	}
@@ -69,7 +74,7 @@ void
 IteratedFor::nextiteration()
 {
     ASSERT( ! last, "no more iterations" );
-    if ( index[2] == MAX )
+    if ( index[0] == MAX )
 	last = true;
     else {
 	if ( index[N-1] != imax[N-1] ) {
@@ -78,7 +83,7 @@ IteratedFor::nextiteration()
 	}
 	else {
 	    int i = N-1, m = index[N];
-	    while ( i > 1 && index[i] == imax[i] ) {
+	    while ( i > 0 && index[i] == imax[i] ) {
 		m += imax[i];
 		i--;
 	    }
@@ -91,14 +96,14 @@ IteratedFor::nextiteration()
 int
 IteratedFor::operator[] ( int i ) const
 {
-    ASSERT( i >= 2 && i <= N, "illegal index" );
-    return index[i];
+    ASSERT( i >= FROM && i <= TO, "illegal index" );
+    return index[i-FROM];
 }
 
 ostream& operator<< ( ostream& os, const IteratedFor & I )
 {
-    os << "( " << I[2];
-    for ( int i = 3; i <= I.n(); i++ )
+    os << "( " << I[I.from()];
+    for ( int i = I.from()+1; i <= I.to(); i++ )
 	os << ", " << I[i];
     os << " )";
     return os;
