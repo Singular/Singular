@@ -77,7 +77,7 @@ AC_AIX
 AC_CHECK_PROGS(PERL, perl5 perl)
 AC_CHECK_PROG(LATEX2HTML, latex2html, latex2html)
 AC_PROG_LN_S
-if test -x Texi2html/texi2html; then
+if test -d Texi2html; then
 if test -r ${T2H_HOME}/texi2html.init; then
 TEXI2HTML=`pwd`/Texi2html/texi2html.pl
 else

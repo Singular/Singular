@@ -973,7 +973,7 @@ else
   echo "$ac_t""no" 1>&6
 fi
 
-if test -x Texi2html/texi2html; then
+if test -d Texi2html; then
 if test -r ${T2H_HOME}/texi2html.init; then
 TEXI2HTML=`pwd`/Texi2html/texi2html.pl
 else
