@@ -1621,6 +1621,7 @@ static BOOLEAN redNF2_n_steps (redNF_inf* obj,calc_dat* c, int n)
             //LEAVE
             deleteInS(j,c->strat);
             add_to_reductors(c,sec_copy,pLength(sec_copy));
+	    pDelete(&p);
           }
           else {
 //shorten_tails may alter position (not the length, even not by recursion in GLOBAL case)
@@ -1995,10 +1996,12 @@ static BOOLEAN compute(calc_dat* c){
           else
           {
             c->misses_series=0;
+	    if(c->is_char0)
+	      pContent(hr);
 #ifdef HEAD_BIN
             hr=p_MoveHead(hr,c->HeadBin);
 #endif
-
+	    
             add_to_basis(hr, c->work_on[i].i,c->work_on[i].j,c);
 
           }
