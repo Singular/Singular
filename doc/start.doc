@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: start.doc,v 1.13 1998-05-18 16:11:42 wichmann Exp $
+@comment $Id: start.doc,v 1.14 1998-05-18 19:11:39 wichmann Exp $
 @comment this file contains the "Introduction" chapter.
 
 @c The following directives are necessary for proper compilation
@@ -60,13 +60,13 @@ available to and be easily incorporated into other programs.
 
 @sc{Singular}'s development started in 1984 with an implementation of
 Mora's Tangent Cone algorithms in Modula-2 on an Atari computer (K.P.
-Neuendorf, G. Pfister, H.@:
+Neuendorf, G. Pfister,
+@ifinfo
+H.@: Schoenemann; Humboldt-Universitaet
+@end ifinfo
 @tex
 Sch\"onemann; Humboldt-Universit\"at
 @end tex
-@ifinfo
-Schoenemann; Humboldt-Universitaet
-@end ifinfo
 zu Berlin).  The need for a new system arose from the investigation of
 mathematical problems coming from singularity theory which none of the
 existing systems was able to compute.
