@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.13 1997-09-18 14:08:20 Singular Exp $ */
+/* $Id: longrat.cc,v 1.14 1997-11-27 08:36:06 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -232,6 +232,9 @@ static inline number nlRInit (int i)
   number z=(number)mmDBAllocBlock(sizeof(rnumber),"longrat.cc",n);
 #else
   number z=(number)Alloc(sizeof(rnumber));
+#endif
+#ifdef LDEBUG
+  z->debug=123456;
 #endif
   mpz_init_set_si(&z->z,(long)i);
   z->s = 3;
@@ -1335,6 +1338,14 @@ number nlIntDiv (number a, number b)
   }
   if (SR_HDL(a) & SR_INT)
   {
+    /* the small int -(1<<28) divided by 2^28 is 1   */
+    if (a==INT_TO_SR(-(1<<28)))
+    {
+      if(mpz_cmp_si(&b->z,(long)(1<<28))==0)
+      {
+        return INT_TO_SR(-1);
+      }
+    }
     /* a is a small and b is a large int: -> 0 */
     return INT_TO_SR(0);
   }
@@ -1717,6 +1728,10 @@ BOOLEAN nlIsZero (number a)
 #ifdef LDEBUG
   nlTest(a);
 #endif
+  //if (a==INT_TO_SR(0)) return TRUE;
+  //if (SR_HDL(a) & SR_INT) return FALSE;
+  //number aa=nlCopy(a);
+  //nlNormalize(aa);
   return (a==INT_TO_SR(0));
 }
 
