@@ -3,11 +3,12 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmemory.h,v 1.6 1998-04-24 16:39:22 Singular Exp $ */
+/* $Id: mmemory.h,v 1.7 1998-04-27 09:37:31 pohl Exp $ */
 /*
 * ABSTRACT
 */
 #include <stdlib.h>
+#include <string.h>
 #include "structs.h"
 
 #ifdef __cplusplus
