@@ -488,6 +488,9 @@ dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl Check for known subdirs
 dnl
 SUBDIRS=""
+if test -d doc; then
+  SUBDIRS="$SUBDIRS doc"
+fi
 if test -d smallgmp; then
   SUBDIRS="$SUBDIRS smallgmp"
 fi
