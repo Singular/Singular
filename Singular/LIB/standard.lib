@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: standard.lib,v 1.52 2000-12-22 14:52:32 greuel Exp $";
+version="$Id: standard.lib,v 1.53 2001-01-12 19:52:48 lossen Exp $";
 category="Miscellaneous";
 info="
 LIBRARY: standard.lib   Procedures which are always loaded at Start-up
@@ -65,8 +65,8 @@ example
 /////////////////////////////////////////////////////////////////////////////
 
 proc stdhilb(ideal i,list #)
-"SYNTAX:  stdhilb(ideal_expression);
-         stdhilb(ideal_expression, intvec_expression);
+"SYNTAX: stdhilb ( ideal_expression )
+         stdhilb ( ideal_expression, intvec_expression )
 TYPE:    ideal
 PURPOSE: computes the standard basis of the homogeneous ideal in the basering,
          calculated via a Hilbert driven standard basis computation.
@@ -126,9 +126,9 @@ EXAMPLE: example stdhilb;  shows an example"
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring  r = 0,(x,y,z),lp;
-   ideal i = y3+x2, x2y+x2, x3-x2, z4-x2-y;
-   ideal i1= stdhilb(i); i1;
+   ring  r=0,(x,y,z),lp;
+   ideal i=y3+x2,x2y+x2,x3-x2,z4-x2-y;
+   ideal i1=stdhilb(i); i1;
    // is in this case equivalent to:
    intvec v=1,0,0,-3,0,1,0,3,-1,-1;
    ideal i2=stdhilb(i,v);
@@ -136,25 +136,24 @@ example
 //////////////////////////////////////////////////////////////////////////
 
 proc groebner(def i, list #)
-"SYNTAX:  groebner(ideal_expression);
-         groebner(module_expression);
-         groebner(ideal_expression, int_expression);
-         groebner(module_expression, int_expression);
+"SYNTAX: groebner ( ideal_expression )
+         groebner ( module_expression )
+         groebner ( ideal_expression, int_expression )
+         groebner ( module_expression, int_expression )
 TYPE:    type of the first argument
-PURPOSE: computes the standard basis of the first argument i
-         (ideal or module) by a heuristically chosen method:
-         If the ordering of the current ring is a local ordering, or
-         if it is a non-block ordering and the current ring has no
-         parameters, then std(i) is returned.
-         Otherwise, i is mapped into a ring with no parameters and
-         ordering dp, where its Hilbert series is computed. This is
-         followed by a Hilbert-series based std computation in the
-         original ring.
-NOTE: If a 2nd argument 'wait' is given, then the computation proceeds
-      at most 'wait' seconds. That is, if no result could be computed in
-      'wait' seconds, then the computation is interrupted, 0 is returned,
+PURPOSE: computes the standard basis of the first argument @code{I}
+         (ideal or module), by a heuristically chosen method: if the 
+         ordering of the current ring is a local ordering, or if it is a 
+         non-block ordering and the current ring has no parameters, then 
+         @code{std(I)} is returned. Otherwise, @code{I} is mapped into a 
+         ring with no parameters and ordering dp, where its Hilbert series 
+         is computed. This is followed by a Hilbert-series based std 
+         computation in the original ring.
+NOTE: If a 2nd argument @code{wait} is given, then the computation proceeds
+      at most @code{wait} seconds. That is, if no result could be computed in
+      @code{wait} seconds, then the computation is interrupted, 0 is returned,
       a warning message is displayed, and the global variable
-      'groebner_error' is defined.
+      @code{groebner_error} is defined.
 SEE ALSO: stdhilb, stdfglm, std
 KEYWORDS: time limit on computations; MP, groebner basis computations
 EXAMPLE: example groebner;  shows an example"
@@ -407,17 +406,17 @@ EXAMPLE: example groebner;  shows an example"
   return (i);
 }
 example
-{ "EXAMPLE: "; echo = 2;
-  ring r = 0, (a,b,c,d), lp;
+{ "EXAMPLE: "; echo=2;
+  ring r=0,(a,b,c,d),lp;
   option(prot);
-  ideal i = a+b+c+d, ab+ad+bc+cd, abc+abd+acd+bcd, abcd-1; // cyclic 4
+  ideal i=a+b+c+d,ab+ad+bc+cd,abc+abd+acd+bcd,abcd-1; // cyclic 4
   groebner(i);
-  ring rp = (0, a, b), (c,d), lp;
-  ideal i = imap(r, i);
-  ideal j = groebner(i);
+  ring rp=(0,a,b),(c,d), lp;
+  ideal i=imap(r,i);
+  ideal j=groebner(i);
   option(noprot);
-  j; simplify(j, 1); std(i);
-  if (system("with", "MP")) {groebner(i, 0);}
+  j; simplify(j,1); std(i);
+  if (system("with","MP")) {groebner(i,0);}
   defined(groebner_error);
 }
 //////////////////////////////////////////////////////////////////////////
@@ -445,17 +444,19 @@ following methods:
 @item @strong{quotient rings:}
 @code{nres} (classical method using syzygies) , see @ref{nres}.
 
-@item @strong{homogenous ideals and k == 0:}
+@item @strong{homogeneous ideals and k=0:}
 @code{lres} (La'Scala's method), see @ref{lres}.
 
-@item @strong{not minimized resolution,  and, homogenous input with k != 0 or local rings:}
+@item @strong{not minimized resolution and (homogeneous input with k<>0 
+or local rings):}
 @code{sres} (Schreyer's method), see @ref{sres}.
 
 @item @strong{all other inputs:}
 @code{mres} (classical method), see @ref{mres}.
 @end table
 @item @strong{Note:}
-Accessing single elements of a resolution may require that some partial computations have to be finished and may therefor take some time.
+Accessing single elements of a resolution may require that some partial
+computations have to be finished and may therefore take some time.
 @end table
 @c ref
 See also
@@ -574,33 +575,33 @@ See also
 example
 {"EXAMPLE:"; echo = 2;
   ring r=0,(x,y,z),dp;
-  ideal i=xz,yz,x^3-y^3;
-  def l=res(i,0); // homogenous ideal: uses lres
-  l;              // resolution is not yet minimized
+  ideal i=xz,yz,x3-y3;
+  def l=res(i,0); // homogeneous ideal: uses lres
+  l;
   print(betti(l), "betti"); // input to betti may be of type resolution
   l[2];         // element access may take some time
-  i=i, x+1;
-  l=res(i,0);   // inhomogenous ideal: uses mres
-  l;            // resolution is not yet minimized
+  i=i,x+1;
+  l=res(i,0);   // inhomogeneous ideal: uses mres
+  l;
   ring rs=0,(x,y,z),ds;
-  ideal i = imap(r, i);
+  ideal i=imap(r,i);
   def l=res(i,0); // local ring not minimized: uses sres
-  l;              // resolution is minimized
+  l;
   res(i,0,0);     // local ring and minimized: uses mres
 }
 /////////////////////////////////////////////////////////////////////////
 
 proc quot (m1,m2,list #)
-"SYNTAX: quot(module_expression, module_expression);
-         @*quot(module_expression, module_expression, int_expression);
-         @*quot(ideal_expression, ideal_expression);
-         @*quot(ideal_expression, ideal_expression, int_expression);
+"SYNTAX: @code{quot} ( module_expression, module_expression )
+         @*@code{quot} ( module_expression, module_expression, int_expression )
+         @*@code{quot} ( ideal_expression, ideal_expression )
+         @*@code{quot} ( ideal_expression, ideal_expression, int_expression )
 TYPE:    ideal
-SYNTAX:  quot(module_expression, ideal_expression);
+SYNTAX:  @code{quot} ( module_expression, ideal_expression )
 TYPE:    module
-PURPOSE: computes the quotient of the first and the 2nd argument
-         If a 3rd argumnt 'n' is given the n-th method is used
-         (1 <= n <= 5).
+PURPOSE: computes the quotient of the first and the 2nd argument.
+         If a 3rd argument 'n' is given the n-th method is used
+         (n=1...5).
 SEE ALSO: quotient
 EXAMPLE: example quot; shows an example"
 {
@@ -635,12 +636,12 @@ example
   ideal id1=maxideal(4);
   ideal id2=x2+xyz,y2-z3y,z3+y5xz;
   option(prot);
-  ideal id6=quotient(id1,id2);
-  id6;
-  ideal id7=quot(id1,id2,1);
-  id7;
-  ideal id8=quot(id1,id2,2);
-  id8;
+  ideal id3=quotient(id1,id2);
+  id3;
+  ideal id4=quot(id1,id2,1);
+  id4;
+  ideal id5=quot(id1,id2,2);
+  id5;
 }
 
 static proc quot1 (module m1, module m2,int n)
@@ -846,20 +847,22 @@ static proc intersect1(ideal i,ideal j)
 /// sprintf, fprintf printf
 ///
 proc sprintf(string fmt, list #)
-"USAGE:    sprintf(fmt, ...) fmt string
+"SYNTAX:  @code{sprintf} ( string_expression [, any_expressions] )
 RETURN:   string
-PURPOSE:  sprintf performs output formatting. The first argument is a format
-          control string. Additional arguments may be required, depending on
-          the contents of the control string. A series of output characters is
-          generated as directed by the control string; these characters are
-          returned as a string. The control string is simply text to be copied,
-          except that the string may contain conversion specifications. Do
-          'help print:' for a listing of valid conversion specifications.
-          As an addition to the conversions of 'print', the '%n' and '%2'
-          conversion specification does not consume an additional argument,
-          but simply generates a newline character.
+PURPOSE:  @code{sprintf(fmt,...);} performs output formatting. The first 
+          argument is a format control string. Additional arguments may be 
+          required, depending on the content of the control string. A series 
+          of output characters is generated as directed by the control string;
+          these characters are returned as a string. @*
+          The control string @code{fmt} is simply text to be copied,
+          except that the string may contain conversion specifications.@*
+          Do @code{help print;} for a listing of valid conversion 
+          specifications. As an addition to the conversions of @code{print}, 
+          the @code{%n} and @code{%2} conversion specification does not 
+          consume an additional argument, but simply generates a newline 
+          character.
 NOTE:     If one of the additional arguments is a list, then it should be
-          enclosed once more into a list() command, since passing a list
+          enclosed once more into a @code{list()} command, since passing a list
           as an argument flattens the list by one level.
 SEE ALSO: fprintf, printf, print, string
 EXAMPLE : example sprintf; shows an example
@@ -933,23 +936,23 @@ example
 }
 
 proc printf(string fmt, list #)
-"USAGE:    printf(fmt, ...) fmt string
+"SYNTAX:  @code{printf} ( string_expression [, any_expressions] )
 RETURN:   none
-PURPOSE:  printf performs output formatting. The first argument is a format
-          control string. Additional arguments may be required, depending on
-          the contents of the control string. A series of output characters is
-          generated as directed by the control string; these characters are
-          displayed (i.e. printed to standard out).
-          The control string is simply text to be copied, except that the
-          string may contain conversion specifications.
-          Do 'help print:' for a listing of valid conversion specifications.
-          As an addition to the conversions of 'print', the '%n' and '%2'
-          conversion specification does not consume an additional argument,
-          but simply generates a newline character.
-
+PURPOSE:  @code{printf(fmt,...);} performs output formatting. The first 
+          argument is a format control string. Additional arguments may be 
+          required, depending on the content of the control string. A series 
+          of output characters is generated as directed by the control string;
+          these characters are displayed (i.e., printed to standard out). @*
+          The control string @code{fmt} is simply text to be copied, except 
+          that the string may contain conversion specifications. @*
+          Do @code{help print;} for a listing of valid conversion 
+          specifications. As an addition to the conversions of @code{print}, 
+          the @code{%n} and @code{%2} conversion specification does not 
+          consume an additional argument, but simply generates a newline 
+          character.
 NOTE:     If one of the additional arguments is a list, then it should be
-          enclosed once more into a list() command, since passing a list
-          as an argument flattens the list by one level.
+          enclosed once more into a @code{list()} command, since passing a 
+          list as an argument flattens the list by one level.
 SEE ALSO: sprintf, fprintf, print, string
 EXAMPLE : example printf; shows an example
 "
@@ -961,35 +964,37 @@ example
   ring r=0,(x,y,z),dp;
   module m=[1,y],[0,x+z];
   intmat M=betti(mres(m,0));
-  list l = r, m, M;
-  printf("s:%s, l:%l", 1, 2);
-  printf("s:%s", l);
-  printf("s:%s", list(l));
-  printf("2l:%2l", list(l));
-  printf("%p", list(l));
-  printf("%;", list(l));
-  printf("%b", M);
+  list l=r,m,M;
+  printf("s:%s,l:%l",1,2);
+  printf("s:%s",l);
+  printf("s:%s",list(l));
+  printf("2l:%2l",list(l));
+  printf("%p",list(l));
+  printf("%;",list(l));
+  printf("%b",M);
 }
 
 
 proc fprintf(link l, string fmt, list #)
-"USAGE:    fprintf(l, fmt, ...) l link; fmt string
+"SYNTAX:  @code{fprintf} ( link_expression, string_expression [, 
+          any_expressions] )
 RETURN:   none
-PURPOSE:  fprintf performs output formatting. The second argument is a format
-          control string. Additional arguments may be required, depending on
-          the contents of the control string. A series of output characters is
-          generated as directed by the control string; these characters are
+PURPOSE:  @code{fprintf(l,fmt,...);} performs output formatting. 
+          The second argument is a format control string. Additional 
+          arguments may be required, depending on the content of the 
+          control string. A series of output characters is generated as 
+          directed by the control string; these characters are
           written to the link l.
-          The control string is simply text to be copied, except that the
-          string may contain conversion specifications.
-          Do 'help print:' for a listing of valid conversion specifications.
-          As an addition to the conversions of 'print', the '%n' and '%2'
-          conversion specification does not consume an additional argument,
-          but simply generates a newline character.
-
+          The control string @code{fmt} is simply text to be copied, except 
+          that the string may contain conversion specifications.@*
+          Do @code{help print;} for a listing of valid conversion 
+          specifications. As an addition to the conversions of @code{print}, 
+          the @code{%n} and @code{%2} conversion specification does not 
+          consume an additional argument, but simply generates a newline 
+          character.
 NOTE:     If one of the additional arguments is a list, then it should be
-          enclosed once more into a list() command, since passing a list
-          as an argument flattens the list by one level.
+          enclosed once more into a @code{list()} command, since passing 
+          a list as an argument flattens the list by one level.
 SEE ALSO: sprintf, printf, print, string
 EXAMPLE : example fprintf; shows an example
 "
@@ -1001,15 +1006,15 @@ example
   ring r=0,(x,y,z),dp;
   module m=[1,y],[0,x+z];
   intmat M=betti(mres(m,0));
-  list l = r, m, M;
-  link li = ""; // link to stdout
-  fprintf(li, "s:%s, l:%l", 1, 2);
-  fprintf(li, "s:%s", l);
-  fprintf(li, "s:%s", list(l));
-  fprintf(li, "2l:%2l", list(l));
-  fprintf(li, "%p", list(l));
-  fprintf(li, "%;", list(l));
-  fprintf(li, "%b", M);
+  list l=r,m,M;
+  link li="";   // link to stdout
+  fprintf(li,"s:%s,l:%l",1,2);
+  fprintf(li,"s:%s",l);
+  fprintf(li,"s:%s",list(l));
+  fprintf(li,"2l:%2l",list(l));
+  fprintf(li,"%p",list(l));
+  fprintf(li,"%;",list(l));
+  fprintf(li,"%b",M);
 }
 
 /*
