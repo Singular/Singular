@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: timer.cc,v 1.8 1997-04-25 18:35:11 obachman Exp $ */
+/* $Id: timer.cc,v 1.9 1997-08-14 16:52:59 obachman Exp $ */
 
 /*
 *  ABSTRACT - get the computing time
@@ -197,7 +197,7 @@ void writeRTime(void* v)
 }
 #endif
 
-#else
+#else /* #defined MSDOS */
 
 /*tested on MSDOS-GCC, Macintosh*/
 #include <time.h>
@@ -205,7 +205,6 @@ void writeRTime(void* v)
 #include <math.h>
 #include <float.h>
 
-#include "mod2.h"
 #include "timer.h"
 #include "febase.h"
 
@@ -252,4 +251,4 @@ void writeTime(void* v)
   if (f > mintime)
     Print("//%s %.1f sec\n" ,v ,f);
 }
-#endif
+#endif /* MSDOS */

@@ -62,13 +62,31 @@ if test "${CFLAGS+set}" != set; then
   ac_cflags_set=no
 fi
 
+# check whether CXX was set by user as env variable
+if test "${CXX+set}" != set; then
+  ac_cxx_set=no
+else
+  ac_cxx_set=yes
+fi
+
 AC_PROG_CC
 AC_PROG_CPP
 AC_PROG_CXX
 AC_SET_MAKE
+AC_C_CROSS
 
-dnl we prefer using gcc for compiling C++ files
-if test ${GXX} = yes; then
+if test "$ac_cv_c_cross" = yes && test "$target" = "i386-unknown-msdos"; then
+  ac_c_cross_dos=yes
+  DOS_CROSS=yes
+else
+  ac_c_cross_dos=no
+  DOS_CROSS=no
+fi
+AC_SUBST(DOS_CROSS)
+
+dnl we prefer using gcc for compiling C++ files, provided the user did
+dnl not overwrite it explicitely
+if test ${GXX} = yes && test "${ac_cxx_set}" = no; then
   CXX=gcc
 fi  
 
@@ -392,7 +410,13 @@ AC_CACHE_VAL(ac_cv_shift, AC_TRY_RUN(
   [ int main() { if (-2 >> 1 == -1) exit(0); else exit(1); } ],
    ac_cv_shift=yes,
    ac_cv_shift=no,
-   1))
+   if test "$ac_c_cross_dos" = yes; then 
+     ac_cv_shift=yes; 
+   else 
+     AC_MSG_RESULT(no)
+     AC_MSG_ERROR(cross compilation without default value)
+   fi))
+
 if test "$ac_cv_shift" = yes; then   
   AC_MSG_RESULT(yes)
 else
@@ -407,7 +431,12 @@ AC_CACHE_VAL(ac_cv_sizeof_int_equals_four, AC_TRY_RUN(
 [ int main() {if (sizeof(int) == 4)  exit(0); else exit(1); } ],
   ac_cv_sizeof_int_equals_four=yes,
   ac_cv_sizeof_int_equals_four=no,
-  1))
+  if test "$ac_c_cross_dos" = yes; then 
+     ac_cv_sizeof_int_equals_four=yes; 
+   else 
+     AC_MSG_RESULT(no)
+     AC_MSG_ERROR(cross compilation without default value)
+   fi))
 
 if test "$ac_cv_sizeof_int_equals_four" = yes; then
   AC_MSG_RESULT(yes)
@@ -422,7 +451,12 @@ AC_CACHE_VAL(ac_cv_sizeof_long_equals_voidp, AC_TRY_RUN(
   [ int main() {if (sizeof(long) == sizeof(void*))  exit(0); else exit(1); }],
     ac_cv_sizeof_long_equals_voidp=yes,
     ac_cv_sizeof_long_equals_voidp=no,
-    1))
+    if test "$ac_c_cross_dos" = yes; then 
+      ac_cv_sizeof_long_equals_voidp=yes; 
+    else 
+      AC_MSG_RESULT(no)
+	AC_MSG_ERROR(cross compilation without default value)
+    fi))
 if test "$ac_cv_sizeof_long_equals_voidp" = yes; then
   AC_MSG_RESULT(yes)
 else
@@ -437,7 +471,7 @@ AC_CACHE_VAL(ac_cv_returns_n_of_chars, AC_TRY_RUN(
  main() { char *str=(char*)malloc(20); if (((int) sprintf(str,"123456789")) == 9) exit(0); else exit(1); }],
    ac_cv_returns_n_of_chars=yes,
    ac_cv_returns_n_of_chars=no,
-   1))
+   ac_cv_returns_n_of_chars=no))
 if test "$ac_cv_returns_n_of_chars" = yes; then
   AC_MSG_RESULT(yes)
 else
@@ -489,3 +523,7 @@ fi
 
 AC_OUTPUT(Makefile doc/Makefile, \
  if test "$CONFIG_HEADERS"; then echo timestamp > stamp-h; fi)
+
+
+
+

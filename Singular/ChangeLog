@@ -1,3 +1,9 @@
+Thu Aug 14 18:04:04 1997  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
+	and anne
+
+	* Makefile.in, mod2.h.in, configure.in: cleaned up for dos
+	  cross-compilation 
+
 Tue Aug 12 19:08:20 MET DST 1997
         * hannes: added nExactDiv to numbers
         * hannes: corrected open bug in sing_dbm.cc (could only "r")

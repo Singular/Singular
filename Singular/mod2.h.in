@@ -121,8 +121,10 @@ char *strstr(const char *haystack, const char *needle);
 
 /* Undefine to disable real time measurments  */
 #ifdef HAVE_GETTIMEOFDAY
-#ifndef macintosh
+#if ! defined(macintosh) && ! defined(MSDOS)
 #define HAVE_RTIMER
+#else
+#undef HAVE_RTIMER
 #endif
 #endif
 
