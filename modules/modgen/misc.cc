@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: misc.cc,v 1.20 2003-06-09 09:52:10 krueger Exp $ */
+/* $Id: misc.cc,v 1.21 2003-06-11 10:17:40 anne Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -27,7 +27,7 @@
 #define SYSTYP_HPUX9  2
 #define SYSTYP_HPUX10 3
 
-#if 0
+#if 1
 #  define logx printf
 #else
 #  define logx
@@ -156,7 +156,11 @@ int IsCmd(char *n, int & tok)
   
   if( (cmds[i].toktype==ROOT_DECL) ||
       (cmds[i].toktype==ROOT_DECL_LIST) ||
-      (cmds[i].toktype==RING_DECL))// ||
+      (cmds[i].toktype==RING_DECL) ||
+      (cmds[i].toktype==IDEAL_CMD) ||
+      (cmds[i].toktype==INTMAT_CMD) ||
+      (cmds[i].toktype==MODUL_CMD) ||
+      (cmds[i].toktype==MATRIX_CMD))// ||
 //      ((cmds[i].toktype>=DRING_CMD) && (cmds[i].toktype<=VECTOR_CMD))) 
     return cmds[i].toktype;
   return 0;
