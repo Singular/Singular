@@ -3,7 +3,7 @@ tst_init();
 
 LIB"primdec.lib";
 
-printlevel =1;
+printlevel =0;
 
 // 1. Beispiel
 example zerodec;
