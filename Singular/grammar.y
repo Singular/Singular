@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.50 1998-10-21 10:25:27 krueger Exp $ */
+/* $Id: grammar.y,v 1.51 1998-10-22 13:11:11 krueger Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -1180,7 +1180,7 @@ listcmd:
             if($3.Typ() == PACKAGE_CMD) {
               namespaceroot->push( IDPACKAGE((idhdl)$3.data),
                                    ((sleftv)$3).name);
-              list_cmd(-1,NULL,"// ",TRUE);
+              list_cmd(-2,NULL,"// ",TRUE);
               namespaceroot->pop();
             }
             else

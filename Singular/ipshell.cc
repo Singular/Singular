@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.27 1998-10-22 12:26:11 krueger Exp $ */
+/* $Id: ipshell.cc,v 1.28 1998-10-22 13:11:12 krueger Exp $ */
 /*
 * ABSTRACT:
 */
@@ -108,8 +108,8 @@ static void list1(char* s, idhdl h,BOOLEAN c, BOOLEAN fullname)
   int l;
   char buf2[128];
 
-  if(fullname) sprintf(buf2, "%s::%s\0", "", IDID(h));
-  else sprintf(buf2, "%s\0", IDID(h));
+  if(fullname) sprintf(buf2, "%s::%s", "", IDID(h));
+  else sprintf(buf2, "%s", IDID(h));
 
   Print("%s%-20.20s [%d]  ",s,buf2,IDLEV(h));
   if (h == currRingHdl) PrintS("*");
@@ -311,11 +311,11 @@ void killlocals(int v)
 void list_cmd(int typ, const char* what, char *prefix,BOOLEAN iterate, BOOLEAN fullname)
 {
   idhdl h,start;
-  BOOLEAN all = typ==-1;
+  BOOLEAN all = typ<0;
   BOOLEAN really_all=FALSE;
   BOOLEAN do_packages=FALSE;
   
-  if ( typ < 0 ) do_packages=TRUE;
+  if ( typ == -1 ) do_packages=TRUE;
   if ( typ==0 )
   {
     if (strcmp(what,"all")==0)
@@ -390,9 +390,9 @@ void list_cmd(int typ, const char* what, char *prefix,BOOLEAN iterate, BOOLEAN f
   }
 #ifdef HAVE_NAMESPACES
   if(!namespaceroot->isroot && do_packages) {
-    //namespaceroot->push(namespaceroot->root->pack, "Top", myynest);
+    namespaceroot->push(namespaceroot->root->pack, "Top", myynest);
     list_cmd(PACKAGE_CMD,"Top","// ",FALSE, TRUE);
-    //namespaceroot->pop();
+    namespaceroot->pop();
   }
 #endif /* HAVE_NAMESPACES */
 }
