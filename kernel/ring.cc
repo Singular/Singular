@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.24 2004-10-15 17:40:30 Singular Exp $ */
+/* $Id: ring.cc,v 1.25 2004-10-18 18:57:07 levandov Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -3543,9 +3543,10 @@ static void rOppWeight(int *w, int l)
 ring rOpposite(ring src)
   /* creates an opposite algebra of R */
   /* that is R^opp, where f (*^opp) g = g*f  */
+  /* ignores the case of qring -> done in iparith.cc */
 {
   ring save = currRing;  
-  ring    r = rCopy0(src);
+  ring    r = rCopy0(src,TRUE); /* TRUE for copy the qideal */
   // change vars v1..vN -> vN..v1
   int i;
   int i2 = (rVar(r)-1)/2;
@@ -3798,6 +3799,13 @@ ring rOpposite(ring src)
     WarnS("Error initializing multiplication!");
   r->nc->IsSkewConstant =   src->nc->IsSkewConstant;
   omFreeSize((ADDRESS)perm,(rVar(r)+1)*sizeof(int));
+  /* now oppose the qideal for qrings */
+//   if (r->qideal != NULL)
+//   {
+//     idDelete(&(r->qideal));
+//     r->qideal = idOppose(src, qideal);
+//   }
+//   rTest(r);
   rChangeCurrRing(save);
   }
 #endif
@@ -3810,8 +3818,31 @@ ring rEnvelope(ring R)
 {
   ring Ropp = rOpposite(R);
   ring Renv = NULL;
-  int stat = rSum(R, Ropp, Renv);
+  int stat = rSum(R, Ropp, Renv); /* should ignore qideals */
   if ( stat <=0 )
     WarnS("Error in rEnvelope at rSum");
+  /* now create the qideal for qrings */
+//   if (R->qideal != NULL)
+//   {
+//     ring save = currRing;
+//     rChangeCurrRing(Ropp);
+//     ideal Q = idCopy(R->qideal);
+//     ideal Qop = idOppose(R,Q);
+//     rChangeCurrRing(Renv);
+//     ideal Qenv = idInit(Q->ncols+Qop->ncols,1);
+//     int i;
+//     for (i=0; i<= Q->ncols; i++)
+//     {
+//       Qenv->m[i] = maIMap(R,Q->m[i]);
+//     }
+//     for (i=0; i<= Qop->ncols; i++)
+//     {
+//       Qenv->m[Q->ncols+i] = maIMap(Ropp,Qop->m[i]);
+//     }
+//     /* should we run twostd on the result? */
+//     Renv->qideal = Qenv;
+//     rChangeCurrRing(save);
+//   }
+  rTest(Renv);
   return Renv;
 }

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gring.h,v 1.8 2004-08-27 12:20:02 Singular Exp $ */
+/* $Id: gring.h,v 1.9 2004-10-18 18:57:06 levandov Exp $ */
 /*
 * ABSTRACT additional defines etc for --with-plural
 */
@@ -18,6 +18,7 @@
 /* the part, related to the interface */ 
 BOOLEAN nc_CallPlural(matrix CC, matrix DD, poly CN, poly DN, ring r);
 BOOLEAN nc_InitMultiplication(ring r);
+BOOLEAN rIsLikeOpposite(ring rBase, ring rCandidate);
 
 ring nc_rCreateNCcomm(ring r);
 void ncKill(ring r);
@@ -83,7 +84,8 @@ matrix nc_PrintMat(int a, int b, ring r, int metric);
 int nc_CheckSubalgebra(poly PolyVar, ring r);
 
 poly p_CopyEmbed(poly p, ring srcRing, int shift, int par_shift);
-poly p_Oppose(ring Rop, poly p);
+poly pOppose(ring Rop, poly p);
+ideal idOppose(ring Rop, ideal I);
 
 #else
 /* dummy definition to make gcc happy */

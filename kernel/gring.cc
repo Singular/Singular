@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.15 2004-10-13 10:50:37 levandov Exp $
+ *  Version: $Id: gring.cc,v 1.16 2004-10-18 18:57:06 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -2304,27 +2304,73 @@ poly p_CopyEmbed(poly p, ring srcRing, int shift, int par_shift)
   return(q);
 }
 
-poly p_Oppose(ring Rop, poly p)
+poly pOppose(ring Rop, poly p)
+  /* opposes a vector p from Rop to currRing */
 {
-  /* TODO check Rop == rOpposite(currRing) */
-  /* the same basefield, same number of variables */
-
   /* the simplest case:*/
-  if (Rop==currRing) return pCopy(p); // ok
-  nMapFunc nMap=nSetMap(Rop);
-  int *perm=(int *)omAlloc0((Rop->N+1)*sizeof(int));
-  /* we know perm exactly */
-  int i;
-  for(i=1; i<=Rop->N; i++)
+  if (  Rop == currRing )  return(pCopy(p));
+  /* check Rop == rOpposite(currRing) */
+  if ( !rIsLikeOpposite(currRing, Rop) )
   {
-    perm[i] = Rop->N+1-i;
+    WarnS("an opposite ring should be used");
+    return NULL;
   }
-  /*  int *par_perm=NULL; */
-  poly res = pPermPoly(p, perm, Rop, nMap);
+  /* nMapFunc nMap = nSetMap(Rop);*/
+  /* since we know that basefields coinside! */
+  int *perm=(int *)omAlloc0((Rop->N+1)*sizeof(int));
+  if (!p_IsConstantPoly(p, Rop))
+  {
+    /* we know perm exactly */
+    int i;
+    for(i=1; i<=Rop->N; i++)
+    {
+      perm[i] = Rop->N+1-i;
+    }
+  }
+  poly res = pPermPoly(p, perm, Rop, nCopy);
   omFreeSize((ADDRESS)perm,(Rop->N+1)*sizeof(int));
-  //omFreeSize((ADDRESS)par_perm,rPar(r)*sizeof(int));
   return res;
 }
 
+ideal idOppose(ring Rop, ideal I)
+  /* opposes a module I from Rop to currRing */
+{
+  /* the simplest case:*/
+  if ( Rop == currRing ) return idCopy(I);
+  /* check Rop == rOpposite(currRing) */
+  if (!rIsLikeOpposite(currRing, Rop))
+  {
+    WarnS("an opposite ring should be used");
+    return NULL;
+  }
+  int i;
+  ideal idOp = idInit(I->ncols, I->rank);
+  for (i=0; i< (I->ncols)*(I->nrows); i++)
+  { 
+    idOp->m[i] = pOppose(Rop,I->m[i]); 
+  }
+  idTest(idOp);
+  return idOp;
+}
+
+BOOLEAN rIsLikeOpposite(ring rBase, ring rCandidate)
+  /* checks whether rings rBase and rCandidate */
+  /* could be opposite to each other */
+  /* returns TRUE if it is so */
+{
+  /* the same basefield */
+  int diagnose = TRUE;
+  ring save = currRing;
+  rChangeCurrRing(rBase);
+  nMapFunc nMap = nSetMap(rCandidate);
+  if (nMap != nCopy) diagnose = FALSE;
+  rChangeCurrRing(save);
+  /* same number of variables */
+  if (rBase->N != rCandidate->N) diagnose = FALSE;
+  /* nc and comm ring */
+  if ( rIsPluralRing(rBase) != rIsPluralRing(rCandidate) ) diagnose = FALSE;
+  /* TODO: varnames are e->E etc */
+  return diagnose;
+}
 
 #endif
