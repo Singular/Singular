@@ -36,7 +36,7 @@ then
 # Intel ########################################################
 elif (echo $uname_a | $egrep "i[3,4,5,6]86" > $devnull)
 then
-    prefix=Intel
+    prefix=ix86
     # Win ################
     if (echo $uname_a | $egrep "CYGWIN" > $devnull)
     then
