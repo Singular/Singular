@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.38 1998-04-21 10:43:22 schmidt Exp $ */
+/* $Id: extra.cc,v 1.39 1998-04-23 09:50:23 schmidt Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -72,7 +72,6 @@
 #endif
 
 #ifdef FACTORY_GCD_TIMING
-#define FACTORY_GCD_TEST
 #define TIMING
 #include "timing.h"
 TIMING_DEFINE_PRINTPROTO( contentTimer );
