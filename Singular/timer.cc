@@ -1,10 +1,12 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Id: timer.cc,v 1.2 1997-03-24 14:26:05 Singular Exp $";
+static char rcsid[] = "$Id: timer.cc,v 1.3 1997-03-27 20:26:04 obachman Exp $";
 /*
 *  ABSTRACT - get the computing time
 */
+
+#include "mod2.h"
 
 //the mpw timer is quite the same as the dos timer:
 #ifdef macintosh
@@ -12,6 +14,24 @@ static char rcsid[] = "$Id: timer.cc,v 1.2 1997-03-24 14:26:05 Singular Exp $";
 #endif
 
 int        timerv = 0;
+#ifdef TIME_SEC
+static double timer_resolution = 1.0;
+#else
+static double timer_resolution = 10.0;
+#endif
+
+static double mintime = 0.5;
+
+void SetTimerResolution(int res)
+{
+  timer_resolution = (double) res;
+}
+
+void SetMinDisplayTime(double mtime)
+{
+  mintime = mtime;
+}
+
 
 #ifndef MSDOS
 
@@ -42,10 +62,8 @@ int        timerv = 0;
 #endif
 #endif
 
-#include "mod2.h"
 #include "timer.h"
 #include "febase.h"
-#define HALF_SEC 30
 /*3
 * the start time of the timer
 */
@@ -82,17 +100,13 @@ int getTimer()
   times(&t_rec);
   curr = t_rec.tms_utime - siStartTime;
 
-#ifdef TIME_SEC
-  double f =  ((double)curr)/ (double)HZ;
+  double f =  ((double)curr) * timer_resolution / (double)HZ;
   return (int)(f+0.5);
-#else
-  return (int)curr;
-#endif
 }
 
 /*2
 * stops timer, writes string s and the time since last call of startTimer
-* if this time is > 0.5 sec
+* if this time is > mintime sec
 */
 void writeTime(void* v)
 {
@@ -100,11 +114,76 @@ void writeTime(void* v)
 
   times(&t_rec);
   curr = t_rec.tms_utime - startl;
-  if (curr < (clock_t)HALF_SEC) return;
 
-  double f =  ((double)curr)/ (double)HZ;
-  Print("//%s %.2f sec\n" ,v ,f);
+  double f =  ((double)curr) / (double)HZ;
+  if (f > mintime)
+    Print("//%s %.2f sec\n" ,v ,f);
 }
+
+#ifdef HAVE_RTIMER
+#include <sys/time.h>
+/*0 Real timer implementation*/
+int rtimerv = 0;
+static struct timeval  startRl;
+static struct timeval  siStartRTime;
+static struct timezone tzp;
+void initRTimer()
+{
+  gettimeofday(&startRl, &tzp);
+}
+
+void startRTimer()
+{
+  gettimeofday(&siStartRTime, &tzp);
+}
+
+/*2
+* returns the time since a fixed point in resolutions
+*/
+int getRTimer()
+{
+  struct timeval now;
+  
+  gettimeofday(&now, &tzp);
+
+  if (startRl.tv_usec > now.tv_usec)
+  {
+    now.tv_usec += 1000000;
+    now.tv_sec --;
+  }
+  
+  double f =((double)  (now.tv_sec - startRl.tv_sec))*timer_resolution +
+    ((double) (now.tv_usec - startRl.tv_usec))*timer_resolution /
+    (double) 1000000;
+  
+  return (int)(f+0.5);
+}
+
+/*2
+* stops timer, writes string s and the time since last call of startTimer
+* if this time is > mintime
+*/
+void writeRTime(void* v)
+{
+  struct timeval now;
+
+  gettimeofday(&now, &tzp);
+
+  if (siStartRTime.tv_usec > now.tv_usec)
+  {
+    now.tv_usec += 1000000;
+    now.tv_sec --;
+  }
+  
+  double f =((double)  (now.tv_sec - siStartRTime.tv_sec)) +
+    ((double) (now.tv_usec - siStartRTime.tv_usec)) /
+    (double) 1000000;
+
+  if (f > mintime)
+   Print("//%s %.2f sec \n" ,v ,f); 
+}
+#endif
+
 #else
 
 /*tested on MSDOS-GCC, Macintosh*/
@@ -146,12 +225,8 @@ void startTimer()
 int getTimer()
 {
   clock_t curr = clock() - siStartTime;
-#ifdef TIME_SEC
-  double f =  ((double)curr)/ (double)CLOCKS_PER_SEC;
+  double f =  ((double)curr)*timer_resolution/ (double)CLOCKS_PER_SEC;
   return (int)(f+0.5);
-#else
-  return (int)curr;
-#endif
 }
 /*2
 * stops timer, writes string s and the time since last call of startTimer
@@ -160,9 +235,8 @@ int getTimer()
 void writeTime(void* v)
 {
   clock_t curr = clock() - startl;
-  if (curr < (clock_t)CLOCKS_PER_SEC) return;
-
   double f =  ((double)curr) / CLOCKS_PER_SEC;
-  Print("//%s %.1f sec\n" ,v ,f);
+  if (f > mintime)
+    Print("//%s %.1f sec\n" ,v ,f);
 }
 #endif

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Id: tesths.cc,v 1.3 1997-03-26 17:07:28 Singular Exp $";
+static char rcsid[] = "$Id: tesths.cc,v 1.4 1997-03-27 20:26:04 obachman Exp $";
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
 */
@@ -26,6 +26,7 @@ static char rcsid[] = "$Id: tesths.cc,v 1.3 1997-03-26 17:07:28 Singular Exp $";
 #include "mmemory.h"
 #include "version.h"
 #include "silink.h"
+#include "timer.h"
 
 /*0 implementation*/
 
@@ -55,106 +56,153 @@ int main(          /* main entry to Singular */
   /*. process parameters */
   for (;(argc > 1) && (!feBatch); --argc, ++argv)
   {
-    if ((argv[1][0] != '-') ||(argv[1][1] == '-'))
-      break;
-    for (i=1;argv[1][i]!='\0';i++)
+    if (strcmp(argv[1], "-m") == 0)
     {
-      switch (argv[1][i])
       {
-        case 'V':
-        case 'v':{
-                  printf("Singular %s%c %s(%d) %s %s\n",
-                          S_VERSION1,(VERSION%10)+'a',S_VERSION2,
-                          S_SUBVERSION,__DATE__,__TIME__);
-                  printf("with ");
+        if (argc > 2)
+        {
+          char* ptr = NULL;
+          double mintime = strtod(argv[2], &ptr);
+          if (errno != ERANGE && ptr != argv[2])
+          {
+            argc--;
+            argv++;
+            SetMinDisplayTime(mintime);
+          }
+          else
+            printf("Can not convert %s to a float\n", argv[2]);
+        }
+        else
+        {
+          printf("Need a float to set mintime");
+        }
+      }
+    }
+    else if (strcmp(argv[1], "-d") == 0)
+    {
+      if (argc > 2)
+      {
+        char* ptr = NULL;
+        long res = strtol(argv[2], &ptr, 10);
+        if (errno != ERANGE && ptr != argv[2])
+        {
+          argc--;
+          argv++;
+          SetTimerResolution(res);
+        }
+        else
+          printf("Can not convert %s to an integer\n", argv[2]);
+      }
+      else
+      {
+        printf("Need an integer to set timer resolution");
+      }
+    }
+    else
+    {
+    
+      if ((argv[1][0] != '-') ||(argv[1][1] == '-'))
+        break;
+      for (i=1;argv[1][i]!='\0';i++)
+      {
+        switch (argv[1][i])
+        {
+            case 'V':
+            case 'v':{
+              printf("Singular %s%c %s(%d) %s %s\n",
+                     S_VERSION1,(VERSION%10)+'a',S_VERSION2,
+                     S_SUBVERSION,__DATE__,__TIME__);
+              printf("with ");
 #ifdef HAVE_LIBFACTORY
-                  printf("factory,");
+              printf("factory,");
 #endif
 #ifdef HAVE_LIBFACTORY
-                  printf("fac(p),");
+              printf("fac(p),");
 #endif
 #ifdef SRING
-                  printf("super algebra,");
+              printf("super algebra,");
 #endif
 #ifdef DRING
-                  printf("Weyl algebra,");
+              printf("Weyl algebra,");
 #endif
 #ifdef HAVE_GMP
-                  printf("GMP,");
+              printf("GMP,");
 #endif
 #ifdef HAVE_DBM
-                  printf("DBM,");
+              printf("DBM,");
 #endif
 #ifdef HAVE_MPSR
-                  printf("MP,");
+              printf("MP,");
 #endif
 #ifdef HAVE_READLINE
-                  printf("RL,");
+              printf("RL,");
 #endif
 #ifdef HAVE_FEREAD
-                  printf("SRL,");
+              printf("SRL,");
 #endif
 #ifdef TEST
-                  printf("TESTs,");
+              printf("TESTs,");
 #endif
 #if YYDEBUG
-                  printf("YYDEBUG,");
+              printf("YYDEBUG,");
 #endif
 #ifdef MDEBUG
-                  printf("MDEBUG=%d,",MDEBUG);
+              printf("MDEBUG=%d,",MDEBUG);
 #endif
 #ifndef __OPTIMIZE__
-                  printf("-g,");
+              printf("-g,");
 #endif
-                  printf("random=%d\n",siRandomStart);
+              printf("random=%d\n",siRandomStart);
 #ifdef MSDOS
-                  char *p=getenv("SPATH");
+              char *p=getenv("SPATH");
 #else
-                  char *p=getenv("SingularPath");
+              char *p=getenv("SingularPath");
 #endif
-                  if (p!=NULL)
-                    printf("search path:%s\n\n",p);
-                  else
-                    printf("standard search path:/usr/local/Singular\n\n");
-                  break;
-                 }
-        case 'e': if ((argv[1][i+1]>'0') && (argv[1][i+1]<='9'))
-                  {
-                    i++;
-                    si_echo = (int)(argv[1][i] - '0');
-                  }
-                  else si_echo = 2;
-                  break;
-        case 'r': siRandomStart = 0;
-                  while((argv[1][i+1]>='0') && (argv[1][i+1]<='9'))
-                  {
-                    i++;
-                    siRandomStart = siRandomStart*10+(int)(argv[1][i] - '0');
-                  }
+              if (p!=NULL)
+                printf("search path:%s\n\n",p);
+              else
+                printf("standard search path:/usr/local/Singular\n\n");
+              break;
+            }
+            case 'e': if ((argv[1][i+1]>'0') && (argv[1][i+1]<='9'))
+            {
+              i++;
+              si_echo = (int)(argv[1][i] - '0');
+            }
+            else si_echo = 2;
+            break;
+            case 'r': siRandomStart = 0;
+              while((argv[1][i+1]>='0') && (argv[1][i+1]<='9'))
+              {
+                i++;
+                siRandomStart = siRandomStart*10+(int)(argv[1][i] - '0');
+              }
 #ifdef buildin_rand
-                  siSeed=siRandomStart;
+              siSeed=siRandomStart;
 #else
-                  srand((unsigned int)siRandomStart);
+              srand((unsigned int)siRandomStart);
 #endif
-                  break;
-        case 'x': tclmode=TRUE;
-                  break;
+              break;
+            case 'x': tclmode=TRUE;
+              break;
 #ifdef HAVE_MPSR
-        case 'b': feBatch=TRUE;
+            case 'b': feBatch=TRUE;
 #endif
-        case 'q': verbose &= ~(Sy_bit(0)|Sy_bit(V_LOAD_LIB));
-                  break;
-        case 't':
-                  #ifdef HAVE_FEREAD
-                  fe_use_fgets=TRUE;
-                  #endif
-                  break;
-        default : printf("Unknown option -%c\n",argv[1][i]);
-        printf("Usage: %s [-bteqvx] [file]\n",thisfile);
-        exit(1);
+            case 'q': verbose &= ~(Sy_bit(0)|Sy_bit(V_LOAD_LIB));
+              break;
+            case 't':
+#ifdef HAVE_FEREAD
+              fe_use_fgets=TRUE;
+#endif
+              break;
+            default : printf("Unknown option -%c\n",argv[1][i]);
+              printf("Usage: %s [-bteqvx] [file]\n",thisfile);
+              exit(1);
+        }
       }
     }
   }
+  
 
   /*. say hello */
   if (BVERBOSE(0))

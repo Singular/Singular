@@ -1,8 +1,13 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/subexpr.cc,v 1.8 1997-03-27 12:42:50 Singular Exp $";
+static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/subexpr.cc,v 1.9 1997-03-27 20:26:03 obachman Exp $";
 /* $Log: not supported by cvs2svn $
+// Revision 1.8  1997/03/27  12:42:50  Singular
+// * hannes: added rString, sleftv->String for RING_CMD, QRING_CMD,
+//             string(ring), string(qring) in iparith.cc
+//             TEST_OPT_PROT for hilbert driven std
+//
 // Revision 1.7  1997/03/26  17:07:27  Singular
 // * hannes/wichmann: added fglm
 //
@@ -317,6 +322,9 @@ void sleftv::CleanUp()
       case VPRINTLEVEL:
       case VCOLMAX:
       case VTIMER:
+#ifdef HAVE_RTIMER
+        case VRTIMER:
+#endif          
       case VOICE:
       case VMAXDEG:
       case VMAXMULT:
@@ -351,6 +359,9 @@ void sleftv::CleanUp()
       case VPRINTLEVEL:
       case VCOLMAX:
       case VTIMER:
+#ifdef HAVE_RTIMER
+        case VRTIMER:
+#endif          
       case VOICE:
       case VMAXDEG:
       case VMAXMULT:
@@ -707,6 +718,9 @@ int  sleftv::Typ()
       case VPRINTLEVEL:
       case VCOLMAX:
       case VTIMER:
+#ifdef HAVE_RTIMER
+        case VRTIMER:
+#endif          
       case VOICE:
       case VMAXDEG:
       case VMAXMULT:
@@ -815,6 +829,9 @@ void * sleftv::Data()
       case VPRINTLEVEL:return (void *)printlevel;
       case VCOLMAX:    return (void *)colmax;
       case VTIMER:     return (void *)getTimer();
+#ifdef HAVE_RTIMER
+      case VRTIMER:    return (void *)getRTimer();
+#endif
       case VOICE:      return (void *)(myynest+1);
       case VMAXDEG:    return (void *)Kstd1_deg;
       case VMAXMULT:   return (void *)Kstd1_mu;
