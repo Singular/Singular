@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstdfac.cc,v 1.7 1997-11-05 14:18:03 Singular Exp $ */
+/* $Id: kstdfac.cc,v 1.8 1997-11-05 14:19:14 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
@@ -367,8 +367,7 @@ static void completeReduceFac (kStrategy strat, lists FL)
             }
             else
             {
-              pDelete(&n->D->m[j]);
-              n->D->m[j]=r;
+              pDelete(&r);
             }
           }
           j--;
@@ -598,8 +597,6 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
               }
               else
               {
-                //pDelete(&n->D->m[j]);
-                //n->D->m[j]=r;
                 pDelete(&r);
               }
             }
