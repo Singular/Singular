@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: normal.lib,v 1.31 2001-01-16 13:48:34 Singular Exp $";
+version="$Id: normal.lib,v 1.32 2001-02-15 17:23:50 lossen Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  normal.lib     Normalization of Affine Rings
@@ -227,7 +227,7 @@ EXAMPLE: example HomJJ;  shows an example
       pause();
       newline;
    }
-//---------- Hom(J,J) != R: create new ring and map form old ring -------------
+//---------- Hom(J,J) != R: create new ring and map from old ring -------------
 // the ring newR1/SBid+syzf will be isomorphic to Hom(J,J) as R-module
 
    f = p,rf;          // generates pJ:J mod(p), i.e. p*Hom(J,J)/p*R as R-module
