@@ -1785,7 +1785,7 @@ if test "$with_factory" != no; then
   else
     if test "$ac_cv_lib_gmp_mpz_init"=yes;then
       echo $ac_n "checking for -lsingcf""... $ac_c" 1>&6
-ac_lib_var=`echo singcf_initCanonicalForm | tr '.-/+' '___p'`
+ac_lib_var=`echo singcf_atof | tr '.-/+' '___p'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -1795,11 +1795,11 @@ cat > conftest.$ac_ext <<EOF
 #line 1796 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
-char initCanonicalForm();
+char atof();
 
 int main() { return 0; }
 int t() {
-initCanonicalForm()
+atof()
 ; return 0; }
 EOF
 if { (eval echo configure:1806: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }; then
@@ -1864,7 +1864,7 @@ else
 fi
 done
 
-    if test "$ac_cv_lib_singcf_initCanonicalForm" = yes && \
+    if test "$ac_cv_lib_singcf_atof" = yes && \
      test "$ac_cv_header_factory_h" = yes; then
       cat >> confdefs.h <<\EOF
 #define HAVE_FACTORY 1
@@ -1890,23 +1890,23 @@ if test "$with_libfac" != no; then
   if test "$ac_factory_ok" != yes; then
     echo "configure: warning: building without libfac: can not use libfac without factory" 1>&2 
   else
-    if test "$ac_cv_lib_singcf_initCanonicalForm" = yes; then
-      echo $ac_n "checking for -lsinglibfac""... $ac_c" 1>&6
-ac_lib_var=`echo singlibfac_IrrCharSeries | tr '.-/+' '___p'`
+    if test "$ac_cv_lib_singcf_atof" = yes; then
+      echo $ac_n "checking for -lsingfac""... $ac_c" 1>&6
+ac_lib_var=`echo singfac_atof | tr '.-/+' '___p'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   ac_save_LIBS="$LIBS"
-LIBS="-lsinglibfac  $LIBS"
+LIBS="-lsingfac  $LIBS"
 cat > conftest.$ac_ext <<EOF
 #line 1903 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
-char IrrCharSeries();
+char atof();
 
 int main() { return 0; }
 int t() {
-IrrCharSeries()
+atof()
 ; return 0; }
 EOF
 if { (eval echo configure:1913: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }; then
@@ -1922,12 +1922,12 @@ LIBS="$ac_save_LIBS"
 fi
 if eval "test \"`echo '$ac_cv_lib_'$ac_lib_var`\" = yes"; then
   echo "$ac_t""yes" 1>&6
-    ac_tr_lib=HAVE_LIB`echo singlibfac | tr 'abcdefghijklmnopqrstuvwxyz' 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'`
+    ac_tr_lib=HAVE_LIB`echo singfac | tr 'abcdefghijklmnopqrstuvwxyz' 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'`
   cat >> confdefs.h <<EOF
 #define $ac_tr_lib 1
 EOF
 
-  LIBS="-lsinglibfac $LIBS"
+  LIBS="-lsingfac $LIBS"
 
 else
   echo "$ac_t""no" 1>&6
@@ -1971,15 +1971,15 @@ else
 fi
 done
 
-    if test "$ac_cv_lib_singlibfac_IrrCharSeries" = yes && \
+    if test "$ac_cv_lib_singfac_atof" = yes && \
      test "$ac_cv_header_factor_h" = yes; then
-      NEED_LIBS="-lsinglibfac ${NEED_LIBS}"
+      NEED_LIBS="-lsingfac ${NEED_LIBS}"
       cat >> confdefs.h <<\EOF
 #define HAVE_LIBFAC_P 1
 EOF
 
     elif test "$enable_libfac" = yes; then
-      NEED_LIBS="-lsinglibfac ${NEED_LIBS}"
+      NEED_LIBS="-lsingfac ${NEED_LIBS}"
       cat >> confdefs.h <<\EOF
 #define HAVE_LIBFAC_P 1
 EOF

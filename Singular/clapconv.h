@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapconv.h,v 1.3 1997-04-09 12:19:39 Singular Exp $
+// $Id: clapconv.h,v 1.4 1997-05-05 13:40:02 obachman Exp $
 /*
 * ABSTRACT: convert data between Singular and factory
 */
@@ -14,7 +14,7 @@
 #include "mod2.h"
 #include "structs.h"
 #include "longalg.h"
-#include <singfactory.h>
+#include <factory.h>
 
 alg convClapPSingTr ( const CanonicalForm & f );
 CanonicalForm convSingTrClapP( alg p );

@@ -1,3 +1,9 @@
+Mon May  5 10:31:15 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* #include "factory" instead of include "singfactory"
+
+	* mod2.h.in: define buildin_gmp, if HAVE_GMP and macintosh
+
 Sun May  4 11:14:44 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
 	* Added make target mpcheck; Update INSTALL file

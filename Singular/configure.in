@@ -238,10 +238,10 @@ if test "$with_factory" != no; then
     AC_MSG_WARN(building without factory: can not use factory without gmp) 
   else
     if test "$ac_cv_lib_gmp_mpz_init"=yes;then
-      AC_CHECK_LIB(singcf,initCanonicalForm)
+      AC_CHECK_LIB(singcf,atof)
     fi
     AC_CHECK_HEADERS(factory.h)
-    if test "$ac_cv_lib_singcf_initCanonicalForm" = yes && \
+    if test "$ac_cv_lib_singcf_atof" = yes && \
      test "$ac_cv_header_factory_h" = yes; then
       AC_DEFINE(HAVE_FACTORY)
       NEED_LIBS="-lsingcf ${NEED_LIBS}"
@@ -262,16 +262,16 @@ if test "$with_libfac" != no; then
   if test "$ac_factory_ok" != yes; then
     AC_MSG_WARN(building without libfac: can not use libfac without factory) 
   else
-    if test "$ac_cv_lib_singcf_initCanonicalForm" = yes; then
-      AC_CHECK_LIB(singlibfac,IrrCharSeries)
+    if test "$ac_cv_lib_singcf_atof" = yes; then
+      AC_CHECK_LIB(singfac,atof)
     fi
     AC_CHECK_HEADERS(factor.h)
-    if test "$ac_cv_lib_singlibfac_IrrCharSeries" = yes && \
+    if test "$ac_cv_lib_singfac_atof" = yes && \
      test "$ac_cv_header_factor_h" = yes; then
-      NEED_LIBS="-lsinglibfac ${NEED_LIBS}"
+      NEED_LIBS="-lsingfac ${NEED_LIBS}"
       AC_DEFINE(HAVE_LIBFAC_P)
     elif test "$enable_libfac" = yes; then
-      NEED_LIBS="-lsinglibfac ${NEED_LIBS}"
+      NEED_LIBS="-lsingfac ${NEED_LIBS}"
       AC_DEFINE(HAVE_LIBFAC_P)
       AC_MSG_WARN(install libfac before making Singular or configure --without-libfac)
     else

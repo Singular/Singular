@@ -110,7 +110,9 @@ char *strstr(const char *haystack, const char *needle);
 
 /* Undefine to disable real time measurments  */
 #ifdef HAVE_GETTIMEOFDAY
+#ifndef macintosh
 #define HAVE_RTIMER
+#endif
 #endif
 
 #if SIZEOF_VOIDP == 8
@@ -133,6 +135,9 @@ char *strstr(const char *haystack, const char *needle);
 #ifdef macintosh
 #ifndef buildin_help
 #define buildin_help 1
+#endif
+#ifdef HAVE_GMP
+#define buildin_gmp 1
 #endif
 #endif
 

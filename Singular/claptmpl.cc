@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: claptmpl.cc,v 1.4 1997-04-25 15:03:53 obachman Exp $
+// $Id: claptmpl.cc,v 1.5 1997-05-05 13:40:04 obachman Exp $
 /*
 * ABSTRACT - instantiation of all templates
 */
@@ -11,7 +11,7 @@
 
 #ifdef HAVE_FACTORY
 #define SINGULAR 1
-#include <singfactory.h>
+#include <factory.h>
 #endif
 
 #if defined(HAVE_FACTORY) || defined(HAVE_FGLM)
@@ -53,8 +53,8 @@ template int tmin ( const int&, const int& );
 // place here your own template stuff, not instantiated by factory
 
 #ifdef HAVE_LIBFAC_P
-#include <tmpl_inst.h>
-#include <class.cc>
+#include <templates/tmpl_inst.h>
+#include <templates/class.cc>
 
 template class List<int>;
 template class ListIterator<int>;
