@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz0.cc,v 1.13 1998-01-17 18:08:01 Singular Exp $ */
+/* $Id: syz0.cc,v 1.14 1998-03-04 15:14:54 obachman Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -736,7 +736,7 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
   ring origR = currRing;
   sip_sring tmpR;
 
-#ifndef COMP_FAST  
+#ifdef THROW_IT_AWAY_EVENTUALLY
   if((hom==isHomog)
   &&(maxlength==pVariables-1)
   &&(currQuotient==NULL)
