@@ -1,0 +1,11 @@
+Status Output of tst_status.out
+init >> USER    :obachman
+init >> HOSTNAME:topgun
+init >> uname -a:Linux topgun 2.2.5 #15 Thu Sep 2 18:37:32 CEST 1999 i586 unknown
+init >> date    :Tue Oct 19 18:34:10 CEST 1999
+init >> version :1305
+init >> ticks   :100
+1 >> tst_memory_0 :: topgun:6626463
+1 >> tst_memory_1 :: topgun:6993783
+1 >> tst_memory_2 :: topgun:6946816
+1 >> tst_timer_1 :: topgun:924
