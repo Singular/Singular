@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.82 1998-05-18 20:28:58 wichmann Exp $
+@comment $Id: general.doc,v 1.83 1998-05-19 07:51:02 schmidt Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -38,13 +38,26 @@
 @section Interactive use
 @cindex Interactive use
 
+In this section, all aspects of interactive use are discussed.  This
+includes how to enter and exit @sc{Singular}, how to interpret its
+prompt, how to get the online help, and so on.
+
+There are a few important notes which one should not forget:
+@itemize @bullet
+@item
+every command has to be terminated by a @code{;} (semicolon) followed
+by a @code{RETURN}
+@item
+the online help is accessible by means of the @code{help} function
+@end itemize
+
 @menu
 * How to enter and exit::
 * The SINGULAR prompt::
 * The online help system::
 * Interrupting SINGULAR::
 * Editing input::
-* Commandline options::
+* Command line options::
 * Startup sequence::
 @end menu
 
@@ -53,22 +66,19 @@
 @subsection How to enter and exit
 @cindex How to enter and exit
 
-To start @sc{Singular}, enter @code{Singular} at the system prompt. The
-@sc{Singular} banner appears which, among others, reports the version name and
-compilation date.  Enter @code{help;} to get the online manual at the
-@sc{Singular} prompt @code{>}.  Commands always need to be terminated by
-a @code{;} (semicolon) and @code{<ENTER>}. (No @code{;} is necessary after
-a @code{@{}. To exit
-@sc{Singular} type @code{quit;}, @code{exit;} or @code{$}.
+To start @sc{Singular}, enter @code{Singular} at the system prompt. The 
+@sc{Singular} banner appears which, among others, reports the version and
+compilation date.
 
-@sc{Singular} may also be started with command-line options and with
+To exit @sc{Singular} type @code{quit;}, @code{exit;} or @code{$}.
+
+@sc{Singular} may also be started with command line options and with
 filenames as arguments. More generally, the synopsis of @sc{Singular} is
 @example
 Singular  [options] [file1 [file2 ...]]
 @end example
-@c ref
-@xref{Commandline options}, @xref{Startup sequence}.
-@c ref
+
+@xref{Command line options}, @ref{Startup sequence}.
 
 
 @c --------------------------------------------------------------------------
@@ -76,13 +86,20 @@ Singular  [options] [file1 [file2 ...]]
 @subsection The SINGULAR prompt
 @cindex prompt
 @cindex error recovery
-The @sc{Singular} prompt @code{>} asks the user for input of a command, while
-the prompt @code{.}  asks the user for input of missing parts of a command
-(remember the semicolon @code{;} at the end of every command).  If the input is
-erroneous @sc{Singular} may miss the semicolon (it may be missed because
-@sc{Singular} needs first a @code{"} or @code{@}}).  On the other hand
-additional @code{;} do not harm @sc{Singular} since extra semicolons are
-interpreted as empty statements.
+The @sc{Singular} prompt @code{>} (larger than) asks the user for input
+of commands.  The ``continuation'' prompt @code{.} (period) asks the
+user for input of missing parts of a command (remember the semicolon
+@code{;} at the end of every command).
+
+@sc{Singular} does not interpret the semicolon as the end of a command
+if it occures inside a string.  Also, @sc{Singular} waits for blocks
+(sequences of commands enclosed in curly brackets) to close before
+prompting with @code{>} for more commands.  Thus, if @sc{Singular} does
+not respond with its regular prompt after typing a semicolon it may wait
+for a @code{"} or a @code{@}} first.
+
+Additional @code{;} will not harm @sc{Singular} since extra semicolons
+are interpreted as empty statements.
 
 @c --------------------------------------------------------------------------
 @node The online help system,Interrupting SINGULAR, The SINGULAR prompt,Interactive use
@@ -93,14 +110,14 @@ As online help system the program @code{info} (Gnu @code{texinfo} package)
 is used.
 @xref{Top, An Introduction to Info, Getting started, info, The Info Manual}.
 
-The whole manual is decomposed into "nodes" of information, closely related
+The whole manual is decomposed into ``nodes'' of information, closely related
 to the division of the printed manual into sections and subsections.
 A node contains text describing a specific topic at a specific level of
-detail. The top line of a node is its "header".  This node's header
+detail. The top line of a node is its ``header''.  This node's header
 (the upper most line) tells the name of this node (@code{Node:}),
 the name of the next node (@code{Next:}),
 the name of the previous node (@code{Prev:}),
-and the name of an "Up" node (@code{Up:}).
+and the name of an ``Up'' node (@code{Up:}).
 
 To move within info, type commands consisting of single characters.  Do
 not type @code{RETURN}.  Do not use cursor keys, either. Using some of
@@ -112,11 +129,11 @@ The most important commands are:
 @item q
 leave info
 @item n
-go to the "next" node
+go to the ``next'' node
 @item p
-go to the "previous" node
+go to the ``previous'' node
 @item u
-go to the "up" node
+go to the ``up'' node
 @item m
 pick a menu item specified by name. Reads name of menu entry
 @item TAB
@@ -153,9 +170,10 @@ pick last subtopic from a menu
 @subsection Interrupting SINGULAR
 @cindex Interrupting SINGULAR
 
-Typing @code{CTRL-C} (control C) interrupts @sc{Singular} (system dependend).
-@sc{Singular} prints the current command and the current line.
-The following choices are available:
+On Unix-like operating systems and on Windows NT, typing @code{CTRL-C}
+interrupts @sc{Singular}.  @sc{Singular} prints the current command and
+the current line and prompts for further action.  The following choices
+are available:
 @table @code
 @item a
 returns to the toplevel after finishing the current command
@@ -166,108 +184,95 @@ quits  @sc{Singular}
 @end table
 
 @c --------------------------------------------------------------------------
-@node Editing input,Commandline options,Interrupting SINGULAR,Interactive use
+@node Editing input,Command line options,Interrupting SINGULAR,Interactive use
 @subsection Editing input
 @cindex Editing input
 
 On Unix-like operating systems, @sc{Singular} maintains a history of the
-last lines of input, stored in a file named .singularrc. The following
-keys can be used for editing
-the input and retrieving previous input lines (@code{CTRL} denotes the
-control key):
+last lines of input.  The history is stored in a file named
+@code{.singular_hist} in the current working directory.  Thus it is
+possible to reuse input from a former @sc{Singular} session.
+
+This section describes only a subset of the key bindings of
+@sc{Singular} binaries built with the GNU Readline library.
+@xref{Command Line Editing, GNU Readline Library, Command Line Editing,
+readline, The GNU Readline Library Manual}, for more information.
+
+The following keys can be used for editing the input and retrieving
+previous input lines:
 @table @code
+@item TAB
+provides command line completion for function names and file names
 @item CTRL-B
-move cursor left
+moves cursor left
 @item CTRL-F
-move cursor right
+moves cursor right
 @item CTRL-A
-move cursor to beginning of line
+moves cursor to beginning of line
 @item CTRL-E
-move cursor to end of line
+moves cursor to end of line
 @item CTRL-D
-delete character under cursor
-(or return @kbd{EOF}, if the current line is empty and quit @sc{Singular})
+deletes character under cursor
+@* Warning: on an empty line, @code{CTRL-D} evaluates to @code{EOF},
+which immediately terminates @sc{Singular}.
 @item BACKSPACE
 @itemx DELETE
 @itemx CTRL-H
-delete character before cursor
+deletes character before cursor
 @item CTRL-K
-kill from cursor to end of line
+kills from cursor to end of line
 @item CTRL-U
-kill from cursor to beginning of line
+kills from cursor to beginning of line
 @item CTRL-N
-save current line on history and get next line
+saves current line on history and get next line
 @item CTRL-P
-save current line on history and get previous line
+saves current line on history and get previous line
 @item RETURN
-save the current line to the history and
-send it to the @sc{Singular} parser for interpretation
+saves the current line to the history and
+sends it to the @sc{Singular} parser for interpretation
 @end table
 
-On Windows-NT, the cursor keys may be used to edit the commandline and
+On Windows NT, the cursor keys may be used to edit the command line and
 to retrieve previous input.
 
-This section describes only a subset of the key bindings of @sc{Singular}
-binaries built with the GNU Readline library.  @xref{Command Line Editing, GNU
-Readline Library, Command Line Editing, readline, The GNU Readline Library
-Manual}.
-
-The most recently printed expression is available
-under the special name @code{_}, e.g.
-@example
-@c example
-  ring r;
-  ideal i=x2+y3,y3+z4;
-  std(i);
-  ideal k=_;
-  k*k+x;
-  size(_[3]);
-@c example
-@end example
-
-
 @c --------------------------------------------------------------------------
-@node Commandline options, Startup sequence, Editing input, Interactive use
-@subsection Commandline options
-@cindex Commandline options
+@node Command line options, Startup sequence, Editing input, Interactive use
+@subsection Command line options
+@cindex Command line options
 
 The synopsis of @sc{Singular} is
-
-@*@code{  Singular  [options] [file1 [file2 ...]] }
-
-@*Options can be given in both, their long and short format. The following
+@example
+Singular  [options] [file1 [file2 ...]]
+@end example
+Options can be given in both, their long and short format. The following
 options control the general behaviour of @sc{Singular}:
 @table @asis
 
 @item @code{-e}, @code{--echo[=VAL]}
-Set value of variable @code{echo} to @code{VAL} (integer in the range 0
-.. 9). Without an argument, @code{echo} is set to 1, which echoes all
-input coming from a file. By default, the value of @code{echo} is 0. See
-also @ref{echo}.
+Set value of variable @code{echo} to @code{VAL} (integer in the range
+0, @dots, 9). Without an argument, @code{echo} is set to 1, which echoes
+all input coming from a file. By default, the value of @code{echo} is
+0. @xref{echo}.
 
 @item @code{-h}, @code{--help}
-Print a one line description of each command  line option and exit.
+Print a one-line description of each command line option and exit.
 
 @item @code{--no-rc}
-Do not execute the @code{.singularrc} file on start-up. By default,
-@sc{Singular} searches first in the current directory and then in the
-home directory of the user for a file named @code{.singularrc}. If it is
-found, then it is executed after the library @code{standard.lib} is
-loaded and prior to executing the string specified by
-@code{--user-option}. See also @ref{Startup sequence}.
+Do not execute the @code{.singularrc} file on start-up.  By default,
+this file is executed on start-up.  @xref{Startup sequence}.
 
 @item @code{--no-stdlib}
 Do not load the library @code{standard.lib} on start-up. By default,
-this library is loaded on start-up. See also @ref{Startup sequence}.
+this library is loaded on start-up.  @xref{Startup sequence}.
 
 @item @code{-t}, @code{--no-tty}
-Do not redefine the terminal characteristics (useful for batch
-processes, see @ref{Editing input}).
+Do not redefine the terminal characteristics.  This option should be
+used for batch processes.
 
 @item @code{-q}, @code{--quiet}
-Do not print start-up banner and warnings and redirect stderr (all error
-messages) to stdout (normal output channel). This option should be used
-if the output is redirected to a file.
+Do not print the start-up banner and warnings and redirect @code{stderr}
+(all error messages) to @code{stdout} (normal output channel).  This
+option should be used if @sc{Singular}'s output is redirected to a file.
 
 @item @code{-v}, @code{--verbose}
 Print extended information about the version and configuration of
@@ -277,78 +282,76 @@ an error to the authors.
 @end table
 
 The following command line options allow manipulations of the timer and
-the pseudo random generator and passing of commands and strings to
-@sc{Singular}:
+the pseudo random generator and enables passing of commands and strings
+to @sc{Singular}:
 
 @table @asis
 @item @code{-c}, @code{--execute=STRING}
 Execute @code{STRING} as (a sequence of) @sc{Singular} commands on
 start-up after the @code{.singularrc} file is executed, but prior to
-executing the files given on the command line, e.g.  @code{Singular -c
+executing the files given on the command line.  E.g., @code{Singular -c
 "help all.lib; quit;"} shows the help for the library @code{all.lib} and
 exits.
 
-@item @code{-u}, @code{--user-option=STRING} Returns @code{STRING} on
-@code{system("--user-option")}. This is useful for passing arbitrary
-arguments (like filenames) from the command line to the @sc{Singular}
-interpreter (i.e., to the top-level of @sc{Singular}), e.g.,
-@code{Singular -u "xxx.dump" -c 'getdump(system("--user-option"))'}
-reads the file @code{xxx.dump} at startup and allows the user to start
-working with all the objects defined in the previous session.
+@item @code{-u}, @code{--user-option=STRING}
+Returns @code{STRING} on @code{system("--user-option")}. This is useful
+for passing arbitrary arguments from the command line to the
+@sc{Singular} interpreter.  E.g., @code{Singular -u "xxx.dump" -c
+'getdump(system("--user-option"))'} reads the file @code{xxx.dump} at
+startup and allows the user to start working with all the objects
+defined in a previous session.
 
 @item @code{-r}, @code{--random=SEED}
-Seed (i.e., set initial value of) pseudo random generator with integer
-@code{SEED}. If this option is not given, then the
-random generated is seeded with a time-based @code{SEED} (e.g., the
-number of seconds since January, 1, 1970, on Unix systems).
+Seed (i.e., set the initial value of) the pseudo random generator with
+integer @code{SEED}.  If this option is not given, then the random
+generated is seeded with a time-based @code{SEED} (e.g., the number of
+seconds since January, 1, 1970, on Unix-like operating systems).
 
 @item @code{--min-time=SECS}
-If the @code{timer} (resp.  @code{rtimer}) variables is set, do only
-report times larger than @code{SECS} seconds (@code{SECS} needs to be a
-floating point number greater than 0). By default, this value is set to
-0.5 (i.e., half a second), e.g., the option @code{--min-time=0.01} forces
-Singular to report all times larger than 1/100 of a second.
+If the @code{timer} (resp.  @code{rtimer}) variable is set, report only
+times larger than @code{SECS} seconds (@code{SECS} needs to be a
+floating point number greater than 0).  By default, this value is set to
+0.5 (i.e., half a second).  E.g., the option @code{--min-time=0.01}
+forces @sc{Singular} to report all times larger than 1/100 of a second.
 
 @item @code{--ticks-per-sec=TICKS}
-Sets unit of timer to @code{TICKS} per second (i.e. the value reported
-by the @code{timer} and @code{rtimer} variable divided by @code{TICKS}
-gives the time in seconds). By default, this value is 1.
+Set unit of timer to @code{TICKS} ticks per second (i.e., the value
+reported by the @code{timer} and @code{rtimer} variable divided by
+@code{TICKS} gives the time in seconds).  By default, this value is 1.
 
 @end table
 
-The last 3 options are of interest for the use with MP links:
+The last three options are of interest for the use with MP links:
 @table @asis
 @item @code{-b}, @code{--batch}
 Run in MP batch mode. Opens a TCP/IP connection with host specified by
 @code{--MPhost} at the port specified by @code{--MPport}. Input is read
-from and output is written to this connection in the MP format. See also
-@ref{MPtcp links}.
+from and output is written to this connection in the MP format.
+@xref{MPtcp links}.
 
 @item @code{--MPport=PORT}
 Use @code{PORT} as default port number for MP connections (whenever not
 further specified). This option is mandatory when the @code{--batch}
-option is given. See also @ref{MPtcp links}.
+option is given.  @xref{MPtcp links}.
 
 @item @code{--MPhost=HOST}
 Use @code{HOST} as default host for MP connections (whenever not
-further specified) . This option is mandatory when the @code{--batch}
-option is given. See also @ref{MPtcp links}.
+further specified).  This option is mandatory when the @code{--batch}
+option is given.  @xref{MPtcp links}.
 
 @end table
 The value of options given to @sc{Singular} (resp. their default values,
 if an option was not given), can be checked with the command
-@code{system(LongOptionNameString)}. See also @ref{system}.
-
-@strong{Example:}
+@code{system("} long_option_name_string @code{")}.  @xref{system}.
 @example
 @c example
-  system("--quiet");    // if "quiet" 1, otherwise 0
+  system("--quiet");    // if ``quiet'' 1, otherwise 0
   system("--min-time"); // minimal reported time
 @c example
 @end example
 @c --------------------------------------------------------------------------
 
-@node Startup sequence, , Commandline options, Interactive use
+@node Startup sequence, , Command line options, Interactive use
 @subsection Startup sequence
 @cindex Startup sequence
 
@@ -397,7 +400,7 @@ a tensor products of one of the above
 @end enumerate
 
 The rings are realized by choosing an appropriate global or local
-ordering. @xref{Term orderings} and @ref{Mathematical background}.
+ordering. @xref{Term orderings}, @ref{Mathematical background}. 
 
 The coefficient field of these rings may be
 
@@ -816,14 +819,14 @@ another ordering is known (implements the so-called FGLM
 and the options, see @ref{option})
 @item stdfglm
 @ref{stdfglm}
-@*computes the Groebner basis in a ring with a "difficult" ordering
-(i.e. lexicographical, ...) via @code{std} w.r.t. a "simple" ordering and
+@*computes the Groebner basis in a ring with a ``difficult'' ordering
+(i.e. lexicographical, ...) via @code{std} w.r.t. a ``simple'' ordering and
 @code{fglm}
 @*The given ideal must be zero-dimensional.
 @item stdhilb
 @ref{stdhilb}@*
-computes the Groebner basis in a ring with a "difficult" ordering
-(i.e. lexicographical, ...) via @code{std} w.r.t. a "simple" ordering and
+computes the Groebner basis in a ring with a ``difficult'' ordering
+(i.e. lexicographical, ...) via @code{std} w.r.t. a ``simple'' ordering and
 a @code{std} computation guided by the hilbert series
 (see @ref{hilb}, @ref{std})
 @end table
@@ -1235,6 +1238,20 @@ results:
   xxx;
 @c example
 @end example
+
+The most recently printed expression is available
+under the special name @code{_}, e.g.,
+@example
+@c example
+  ring r;
+  ideal i=x2+y3,y3+z4;
+  std(i);
+  ideal k=_;
+  k*k+x;
+  size(_[3]);
+@c example
+@end example
+
 
 @c ------------------------------------------------------------
 @node Objects, Type conversion and casting, Names, The SINGULAR language
