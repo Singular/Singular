@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.31 2001-02-06 17:27:02 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.32 2001-02-08 08:09:33 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -14,8 +14,7 @@ PROCEDURES:
  monodromy(f[,...]);    monodromy matrix of f, spectrum of monodromy of f
  vfiltration(f[,...]);  V-filtration of f on H''/H', singularity spectrum of f
  vfiltjacalg(...);      V-filtration on Jacobian algebra
- gamma(...);            Hertling's gamma invariant
- gamma4(...);           Hertling's gamma4 invariant
+ gamma(...);            C. Hertling's gamma invariant
 
 SEE ALSO: mondromy_lib, spectrum_lib
 
@@ -858,7 +857,7 @@ example
 proc gamma(list l)
 "USAGE:   gamma(vfiltration(f,0)); poly f
 ASSUME:  basering has local ordering, f has isolated singularity at 0
-RETURN:  number g: Hertling's gamma invariant
+RETURN:  number g: C. Hertling's gamma invariant
 EXAMPLE: example gamma; shows an example
 "
 {
@@ -885,37 +884,6 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc gamma4(list l)
-"USAGE:   gamma4(vfiltration(f,0)); poly f
-ASSUME:  basering has local ordering, f has isolated singularity at 0
-RETURN:  number g4: Hertling's gamma4 invariant
-EXAMPLE: example gamma4; shows an example
-"
-{
-  ideal s=l[1];
-  intvec d=l[2];
-  int n=nvars(basering)-1;
-  number g4=0;
-  int i,j;
-  for(i=1;i<=ncols(s);i++)
-  {
-    for(j=1;j<=d[i];j++)
-    {
-      g4=g4+(number(s[i])-number(n-1)/2)^4;
-    }
-  }
-  g4=g4-(number(s[ncols(s)]-s[1])/12-1/30)*
-    (sum(d)*number(s[ncols(s)]-s[1])/4-24*gamma(l));
- return(g4);
-}
-example
-{ "EXAMPLE:"; echo=2;
-  ring R=0,(x,y),ds;
-  poly f=x5+x2y2+y5;
-  gamma4(vfiltration(f,0));
-}
-///////////////////////////////////////////////////////////////////////////////
-
 proc tst_gaussm(poly f)
 {
   echo=2;
@@ -926,6 +894,5 @@ proc tst_gaussm(poly f)
   l;
   vfiltjacalg(l);
   gamma(l);
-  gamma4(l);
 }
 ///////////////////////////////////////////////////////////////////////////////
