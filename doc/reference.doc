@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.43 1998-05-13 08:09:41 Singular Exp $
+@comment $Id: reference.doc,v 1.44 1998-05-13 12:45:18 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -398,6 +398,7 @@ ideal with respect to the current variable ordering.
 @*See Shang-Ching Chou, Mechanical Geometry Theorem Proving (D. Reidel Publishing Company, 1988)
 or Dongming Wang, Characteristic Sets and Zero Structure of Polynomial Sets
 (Lecture Notes, RISC-Linz, Johannes Kepler University, 1989).
+@*One applicatation is the decomposition of the zero set.
 @item @strong{Example:}
 @example
 @c example

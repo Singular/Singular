@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.7 1998-05-11 10:00:26 Singular Exp $
+@comment $Id: math.doc,v 1.8 1998-05-13 12:45:17 Singular Exp $
 @comment this file contains the mathematical background of Singular
 
 @menu
@@ -808,8 +808,8 @@ y(1..m)$
  be two ordered sets of variables,
 @ifinfo
 <_1 a monomial
-ordering on Loc K[x] and <_2 a monomial ordering on Loc K[y].   The product
-ordering (or block ordering) < = (<_1,<_2) on Loc K[x,y] is the following:
+ordering on K[x] and <_2 a monomial ordering on K[y].   The product
+ordering (or block ordering) < = (<_1,<_2) on K[x,y] is the following:
 @*x^a y^b < x^A y^B <==>
 @*x^a <_1 x^A
 @*or
@@ -818,8 +818,8 @@ ordering (or block ordering) < = (<_1,<_2) on Loc K[x,y] is the following:
 @iftex
 @tex
 $<_1$ a monomial
-ordering on $Loc K[x]$ and $<_2$ a monomial ordering on $Loc K[y]$.   The product
-ordering (or block ordering) $<\ := (<_1,<_2)$ on $Loc K[x,y]$ is the following:
+ordering on $K[x]$ and $<_2$ a monomial ordering on $K[y]$.   The product
+ordering (or block ordering) $<\ := (<_1,<_2)$ on $K[x,y]$ is the following:
 @end tex
 @*@tex
 \quad \quad $x^a y^b < x^A y^B \Leftrightarrow x^a <_1 x^A$
@@ -1010,9 +1010,10 @@ $k \leq n$ then $lvar(f)=x_k$, moreover let $ini(f):=a_k(x_1,...,x_{k-1})$.
 A set $T=\{f_1,...,f_r\} \subset R$ is called triangular if $lvar(f_1)<...<lvar(f_r)$.
 The pseudoremainder $r=prem(g,f)$ of $g$ with respect to $f$ is defined by
 $ini(f)^a*g=q*f+r$ with the property $deg_{lvar(f)}(r)<deg_{lvar(f)}(f)$,
-a minimal.
+$a$ minimal.
 
-(T,U) is called a triangular system, if T is a triangular set such that ini(T)
+(T,U) is called a triangular system, if U$\subset$T and
+if T is a triangular set such that ini(T)
 does not vanish on $Zero(T) \setminus Zero(U)
 ( =:Zero(T\setminus U))$.
 
@@ -1021,12 +1022,12 @@ the property:
 $$   lvar(d_i)<lvar(f_i) $$
 $$   lvar(f_i')=lvar(f_i'')=lvar(f_i)$$
 $$   0 \not\in prem(\{ d_i, ini(f_i'), ini(f_i'')\},\{ f_1,...,f_(i-1)\})$$
-such that $prem(d_i*f_i-f_i'*f_i'',\{f_1,...,f_(i-1)\})=0$.
+such that $prem(d_i*f_i-f_i'*f_i'',\{f_1,...,f_{(i-1)}\})=0$.
 
 (T,U) is irreducible if T is irreducible.
 
 Let $G=\{g_1,...,g_s\}$ then there are irreducible triangular sets $T_1,...,T_l$
-such that $Zero(G)=\bigcup(i=1..l: Zero(T_i\setminus I_i))$
+such that $Zero(G)=\bigcup_{i=1..l}(Zero(T_i\setminus I_i))$
 where $I_i=\{ini(f), f \in T_i \}$.
 @end tex
 @ifinfo
@@ -1038,10 +1039,11 @@ k<=n then lvar(f)=x_k, moreover let ini(f):=a_k(x_1,...,x_(k-1)).
 
 A set T=@{f_1,...,f_r@} in R is called triangular if lvar(f_1)<...<lvar(f_r).
 The pseudoremainder r=prem(g,f) of g with respect to f is defined by
-ini(f)^a*g=q*f+r with the property deg_(lvar(f))(r)<deg_(lvar(f))(f),s
-a minimal.
+ini(f)^a*g=q*f+r with the property deg_(lvar(f))(r)<deg_(lvar(f))(f),
+@code{a} minimal.
 
-(T,U) is called a triangular system, if T is a triangular set such that ini(T)
+(T,U) is called a triangular system, if U is a subset of T and
+if T is a triangular set such that ini(T)
 does not vanish on the zero set of T \ zero set of U
 ( =:Zero(T\U)).
 

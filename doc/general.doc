@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.62 1998-05-13 11:41:22 Singular Exp $
+@comment $Id: general.doc,v 1.63 1998-05-13 12:45:15 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -709,9 +709,10 @@ $$\{ 1+f | lead(f) < 1 \}.$$
 Here lead means the leading monomial with respect to ord, 1
 is the constant monomial 1 and $>$ means bigger with respect to
 ord. For global orderings, $x_i > 1$, hence Loc K$[x_1,...,x_n]$ =
-K$[x_1,...,x_n]$, for local orderings, $x_i < 1$, hence LocK$[x_1,...,x_n]$ =
-Loc$_{(x)}$K[$x_1,...,x_n$] (= localization of K[$x_1,...,x_n$] with
+K$[x_1,...,x_n]$, for local orderings, $x_i < 1$, hence Loc K$[x_1,...,x_n]$ =
+$K[$x_1,...,x_n$]$_{(x)}$ (the localization of K[$x_1,...,x_n$] with
 respect to the maximal ideal $(x_1,...,x_n)$).
+In general we have K[$x_1,...,x_n$]$ \subseteq $Loc K[$x_1,...,x_n$]$ \subseteq $ K[$x_1,...,x_n$]$_{(x)}$.
 A product ordering which is for example
 of the form (s-ordering(k),p-ordering(l)), n=k+l, (the variables
 $x1,...,xk$ being s-ordered, $x_{k+1},...,x_n$ p-ordered) creates
@@ -726,9 +727,12 @@ localization with respect to the muliplicatively closed set
 @*Here lead means the leading monomial with respect to ord, 1
 is the constant monomial 1 and > means bigger with respect to
 ord. For global orderings, x(i) > 1, hence Loc K[x(1),...,x(n)] =
-K[x(1),...,x(n)], for local orderings, x(i) < 1, hence LocK[x(1),...,x(n)] =
-Loc_(x)K[x(1),...,x(n)] (= localization of K[x(1),...,x(n)] with respect to the
-maximal ideal (x(1),...,x(n))). A product ordering which is for example
+K[x(1),...,x(n)], for local orderings, x(i) < 1, hence Loc K[x(1),...,x(n)] =
+K[x(1),...,x(n)]_(x) (the localization of K[x(1),...,x(n)] with respect to the
+maximal ideal (x(1),...,x(n))).
+In general we have K[x_1,...,x_n] is in Loc K[x_1,...,x_n],
+which is in K[x_1,...,x_n]_(x).
+A product ordering which is for example
 of the form (s-ordering(k),p-ordering(l)), n=k+l, (the variables
 x(1),...,x(k) being s-ordered, x(k+1),...,x(n) p-ordered) creates
            Loc_(x)K[x(1),...,x(k)] tensor K[x(k+1),...,x(n)].
@@ -737,8 +741,8 @@ series ring are realized by the choice of an ordering.
 @end ifinfo
 
 The great variety of differnt orderings and their efficient
-implementation makes @sc{Singular} a powerful tool for many different tasks
-in Algebraic Geometry, Algebra and Singularity theory.
+implementation makes @sc{Singular} a powerful tool for many different tasks,
+in particular in Algebraic Geometry, Algebra and Singularity theory.
 
 On the other hand it requires careful thinking about the 'correct'
 ordering for a specific task. Even if the rings are the same,
@@ -845,11 +849,16 @@ mres, sres, mult, degree, dim, hilb, mstd}, etc.).
 
 The basic algorithm in @sc{Singular} is a general standard basis algorithm for
 any monomial ordering which is compatible with the natural semigroup
-structure of the exponents. This includes wellorderings (Buchberger algorithm)
+structure of the exponents. This includes wellorderings
+(Buchberger algorithm to compute a Groebner basis)
 and tangent cone orderings (Mora algorithm) as special cases.
 
 Nonetheless, there are a lot of other important algorithms:
 @itemize @bullet
+
+@item
+Algorithms to compute standard operations on ideals and modules:
+intersection, ideal quotient, elimination, etc.
 
 @item
 Different syzygy algorithms, free resolutions (@code{sres, res, mres}) for computation of free resolutions
@@ -1107,8 +1116,9 @@ subtraction
 multiplication
 @item @code{/}
 division of numbers (coefficients of polynomials) and polynomials
+(but see also @ref{div})
 @item @code{%}
-integer modulo
+integer modulo (see also @ref{mod})
 @item @code{^} or @code{**}
 exponentiation
 @item @code{==}
