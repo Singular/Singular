@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C -*- */
-/* $Id: config.h.in,v 1.10 2000-09-04 13:31:26 obachman Exp $ */
+/* $Id: config.h.in,v 1.11 2002-07-30 15:21:48 Singular Exp $ */
 
 #ifndef INCL_CONFIG_H
 #define INCL_CONFIG_H
@@ -81,6 +81,8 @@ typedef _Int_64* INT64;
 #else
 #define INT64 long long int
 #endif
+
+#undef HAVE_NTL
 
 /************** END OF CONFIGURABLE SECTION **************/
 
