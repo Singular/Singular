@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.217 2003-03-31 12:29:03 Singular Exp $
+@comment $Id: reference.doc,v 1.218 2003-04-16 11:55:57 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -5156,6 +5156,7 @@ the computation unless @code{option(notRegularity);} is given.
   jj=nres(j,0);
   regularity(jj);
   jj=minres(jj);
+  regularity(jj);
 @c example
 @end smallexample
 @end table
