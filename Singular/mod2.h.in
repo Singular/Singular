@@ -90,7 +90,7 @@
 #undef DRING
 /* Define to enable working in exterior algebras */
 #undef SRING
-/* Undefine to disable Gerhard's fast and dirty std computations */
+/* Undefine to disable Gerhard's and Wilfried's fast and dirty std computations */
 #define FAST_AND_DIRTY
 /* works around a quirk in the generation of parser tables */
 #define INIT_BUG

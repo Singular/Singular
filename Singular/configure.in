@@ -59,11 +59,15 @@ if test ${GXX} = yes; then
 fi  
 
 dnl and add to -I to CPPFLAGS and and -Lto LDFLAGS, just to be sure
-if test "x$libdir" = '${prefix}/lib'; then
-  if test "x$prefix" = xNONE; then
-    LDFLAGS="-L${ac_default_prefix}/lib ${LDFLAGS}"
+if test "x$libdir" = '${exec_prefix}/lib'; then
+  if test "x$exec_prefix" = xNONE; then
+    if test "x$prefix" = xNONE; then
+      LDFLAGS="-L${ac_default_prefix}/lib ${LDFLAGS}"
+    else
+      LDFLAGS="-L${prefix}/lib ${LDFLAGS}"
+    fi
   else
-    LDFLAGS="-L${prefix}/lib ${LDFLAGS}"
+    LDFLAGS="-L${exec_prefix}/lib ${LDFLAGS}"
   fi
 else
   LDFLAGS="-L${libdir} ${LDFLAGS}"
@@ -133,14 +137,8 @@ dnl and headers were not found under the condition that the respective
 dnl  --enable argument was given
 dnl
   
-LIBS="-lm $LIBS"
-
-dnl Check -lbsd
-AC_CHECK_LIB(
-  bsd,
-  bzero,
-  LIBS="-lbsd $LIBS"
-)
+AC_CHECK_LIB(m, atof)
+AC_CHECK_LIB(bsd, socket)
 
 dnl Check -lreadline
 if test "$with_readline" != no; then
@@ -168,7 +166,7 @@ if test "$with_dbm" != no; then
     dbminit,
     AC_DEFINE(HAVE_DBM) LIBS="-ldbm $LIBS",
     AC_CHECK_LIB(
-      gbm,
+      gdbm,
       dbminit,
       AC_DEFINE(HAVE_DBM) LIBS="-lgdbm $LIBS",
       AC_MSG_WARN(building without dbm: disabling DBM links)))

@@ -21,8 +21,10 @@ srcdir		= @srcdir@
 prefix 		= @prefix@
 exec_prefix 	= @exec_prefix@
 libdir 		= @libdir@
-bindir		= @bindir@          # program executable goes here
-singulardatadir = @singulardatadir@ # Singular libs go here
+# program executable goes here
+bindir		= @bindir@
+# Singular libs go here
+singulardatadir = @singulardatadir@
 includedir	= @includedir@
 
 ## 
@@ -36,6 +38,7 @@ INSTALL_PROGRAM = @INSTALL_PROGRAM@
 MKINSTALLDIRS   = @MKINSTALLDIRS@
 BISON		= bison
 LEX		= flex
+@SET_MAKE@
 
 ##
 ## compiler and linker options
@@ -164,11 +167,12 @@ version.h: ${SOURCES} ${HEADERS} Makefile.in mod2.h.in configure.in
 
 mod2.h: config.status config.cache mod2.h.in Makefile.in
 	./config.status
-	touch -r mod2.h configure configure.in Makefile Makefile.in
+	touch -r mod2.h  config.status config.cache configure \
+		 configure.in Makefile.in
 
 config.status config.cache : configure
 	./configure ${CONFIGURE_INPUT} --no-create
-	touch -r configure config.cache config.status
+	touch -r configure config.status config.cache
 
 configure: configure.in
 	autoconf configure.in > configure
