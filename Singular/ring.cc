@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.26 1998-06-13 12:44:47 krueger Exp $ */
+/* $Id: ring.cc,v 1.27 1998-06-15 08:07:56 krueger Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -933,7 +933,13 @@ void rKill(idhdl h)
 
 idhdl rFindHdl(ring r, idhdl n)
 {
+#ifdef HAVE_NAMESPACES
+  idhdl h;
+  if(namespaceroot->isroot) h = IDROOT;
+  else h = NSROOT(namespaceroot->next);
+#else
   idhdl h=IDROOT;
+#endif
   while (h!=NULL)
   {
     if (((IDTYP(h)==RING_CMD)||(IDTYP(h)==QRING_CMD))

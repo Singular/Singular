@@ -353,8 +353,27 @@ void singular_help(char *str,BOOLEAN example)
     *ss='\0';
     ss--;
   }
+#ifdef HAVE_NAMESPACES
+  char *p1 = AllocL(strlen(s)), *p2 = AllocL(strlen(s));
+  *p1='\0';
+  *p2='\0';
+  sscanf(s, "%[^:]::%s", p1, p2);
+  idhdl h, ns;
+  if(*p2) {
+    printf("singular_help:(%s, %s)\n", p1, p2);
+    ns = namespaceroot->get(p1,0);
+    namespaceroot->push(IDPACKAGE(ns), IDID(ns));
+    h=namespaceroot->get(p2,myynest);
+    namespaceroot->pop();
+  } else {
+    h=namespaceroot->get(p1,myynest);
+  }
+  FreeL(p1);
+  FreeL(p2);
+#else /* HAVE_NAMESPACES */
   /* --------- is it a proc ? --------------------------------*/
   idhdl h=idroot->get(s,myynest);
+#endif /* HAVE_NAMESPACES */
   if ((h!=NULL) && (IDTYP(h)==PROC_CMD) &&
       (strcmp(IDPROC(h)->libname, "standard.lib")!=0))
   {
@@ -399,7 +418,11 @@ void singular_help(char *str,BOOLEAN example)
       lib_style_types lib_style; // = OLD_LIBSTYLE;
 
       yylpin = fp;
+#  ifdef HAVE_NAMESPACES
+      yylplex(str, libnamebuf, &lib_style, IDROOT, GET_INFO);
+#  else /* HAVE_NAMESPACES */
       yylplex(str, libnamebuf, &lib_style, GET_INFO);
+#  endif /* HAVE_NAMESPACES */
       reinit_yylp();
       if(lib_style == OLD_LIBSTYLE)
       {
