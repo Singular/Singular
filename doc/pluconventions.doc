@@ -1,0 +1,80 @@
+@ifclear singularmanual
+see also @code{vector} in @sc{Singular} manual.
+@end ifclear
+@comment -*-texinfo-*-
+@comment $Id: pluconventions.doc,v 1.1 2003-03-06 11:43:39 levandov Exp $
+@comment this file contains the type definitions
+
+@c The following directives are necessary for proper compilation
+@c with emacs (C-c C-e C-r).  Please keep it as it is.  Since it
+@c is wrapped in `@ignore' and `@end ignore' it does not harm `tex' or
+@c `makeinfo' but is a great help in editing this file (emacs
+@c ignores the conditionals).
+
+@ignore
+%**start
+\input texinfo.tex
+@setfilename plureference.info
+@settitele PLURAL
+@node Top, PLURAL conventions, (dir), (dir)
+@menu
+* PLURAL conventions ::
+@end menu
+@node PLURAL conventions,  , Top, Top
+@chapter PLURAL conventions
+%**end
+@end ignore
+
+
+@c @c -----------------------------
+@c @menu
+@c * *-multiplication@value{PSUFFIX}::
+@c * factor@value{PSUFFIX}::
+@c * ideals@value{PSUFFIX}::
+@c * modules@value{PSUFFIX}::
+@c * ordering@value{PSUFFIX}::
+@c * qring@value{PSUFFIX}::
+@c @end menu
+
+@c ----------------------------------------------- 
+@table @strong
+@item *-multiplication@value{PSUFFIX}
+@itemize 
+
+in the non-commutative case:
+one should use @code{y*x} for the multiplication while @code{yx} is interpreted as
+commutative expression.
+ 
+
+@end itemize
+
+
+
+
+@item   @code{ideal}@value{PSUFFIX}
+@itemize
+                        
+Under an @code{ideal} @sc{Plural} understands a @strong{left} ideal.
+For more information see @ref{ideal@value{PSUFFIX}}. For the operations
+with two-sided ideals see @ref{twostd}. 
+@end itemize
+
+@item @code{module}@value{PSUFFIX}
+@itemize
+Under a @code{module} @sc{Plural} understands a @strong{left} submodule of a free module of a finite rank.
+For more information see @ref{module@value{PSUFFIX}}. 
+@end itemize
+
+@item ordering@value{PSUFFIX}
+@itemize
+@sc{Plural} works with @strong{global} orderings  only.  
+@end itemize
+
+@item @code{qring}@value{PSUFFIX}
+
+@itemize
+In @sc{Plural} it is only possible to build fuctor-algebras modulo @strong{two-sided} ideals. 
+@end itemize 
+
+
+@end table   
