@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.108 1998-07-14 16:26:18 Singular Exp $
+@comment $Id: general.doc,v 1.109 1998-10-26 15:05:36 obachman Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -276,12 +276,19 @@ this file is executed on start-up.  @xref{Startup sequence}.
 Do not load the library @code{standard.lib} on start-up. By default,
 this library is loaded on start-up.  @xref{Startup sequence}.
 
+@item @code{--no-warn}
+Do not display warning messages.
+
+@item @code{--no-out}
+Suppress display of all ouput. 
+
 @item @code{-t}, @code{--no-tty}
 Do not redefine the terminal characteristics.  This option should be
 used for batch processes.
 
 @item @code{-q}, @code{--quiet}
-Do not print the start-up banner and warnings and redirect @code{stderr}
+Do not print the start-up banner and messages when loading
+libraries. Furthermore, redirect @code{stderr}
 (all error messages) to @code{stdout} (normal output channel).  This
 option should be used if @sc{Singular}'s output is redirected to a file.
 
@@ -451,7 +458,7 @@ the commands @code{setring} and @code{keepring}.  @xref{keepring};
 @ref{setring}.
 
 Objects of ring dependent types are local to a ring. To access them
-after a change of the basering they have to be mapped using maps or by
+after a change of the basering they have to be mapped using @code{map} or by
 the functions @code{imap} or @code{fetch}.  @xref{Objects}; @ref{fetch};
 @ref{imap}; @ref{map}.
 
@@ -852,8 +859,8 @@ block orderings preceding the component ordering have higher precedence,
 all monomial block orderings following after it have lower precedence.
 @end enumerate
 
-For a mathematical description of these orderings, see @ref{Mathematical
-background}.
+For a mathematical description of these orderings, see 
+@ref{Polynomial data}.
 
 @c ---------------------------------------------------------------------------
 @node Implemented algorithms, The SINGULAR language, Rings and orderings, General concepts
@@ -886,18 +893,19 @@ Algorithms for univariate and multivariate polynomial factorization,
 resultant and gcd computations.
 @end itemize
 
-@subsubheading Commands to compute standard bases
+@unnumberedsubsec Commands to compute standard bases
 @table @code
 @item facstd
 @ref{facstd}
 @*computes a list of Groebner bases via the Factorizing Groebner Basis
-Algorithm.
+Algorithm, i.e. has the same radical as the original ideal. It need not
+be a Groebner basis of the given ideal.
 
 The intersection of the zero sets is the zero set of the given ideal.
 @item fglm
 @ref{fglm}
 @*computes a Groebner basis provided that a reduced Groebner basis
-w.r.t.@: another ordering is known.
+w.r.t.@: another ordering is given.
 
 Implements the so-called FGLM (Faugere, Gianni, Lazard, Mora) algorithm.
 The given ideal must be zero-dimensional.
@@ -928,7 +936,9 @@ computes a Groebner basis in a ring with a ``difficult'' ordering
 and a @code{std} computation guided by the Hilbert series.
 @end table
 
-@subsubheading Further processing of standard bases
+@unnumberedsubsec Further processing of standard bases
+The next commands require the input to be a standard basis.
+
 @table @code
 @item degree
 @ref{degree}
@@ -963,41 +973,40 @@ computes the vector space dimension of a ring (resp.@: free module)
 modulo an ideal (resp.@: module).
 @end table
 
-@subsubheading Commands to compute resolutions
+@unnumberedsubsec Commands to compute resolutions
 @table @code
-@item minres
-@ref{minres}@*
-minimizes a free resolution of an ideal or module.
-@item lres
-@ref{lres}@*
-computes a free resolution of an ideal or module with LaScala's
-method.
-
-The input needs to be homogeneous.
-@item mres
-@ref{mres}@*
-computes a minimal free resolution of an ideal or module with the Szyzygy
-method.
 @item res
 @ref{res}@*
 computes a free resolution of an ideal or module using a heuristically
 chosen method.
-
 This is the prefered method to compute free resolutions of ideals or
 modules.
+@item lres
+@ref{lres}@*
+computes a free resolution of an ideal or module with LaScala's
+method. The input needs to be homogeneous.
+@item mres
+@ref{mres}@*
+computes a minimal free resolution of an ideal or module with the Szyzygy
+method.
 @item sres
 @ref{sres}@*
 computes a free resolution of an ideal or module with Schreyer's
-method.
-
-The input has to be a standard basis.
+method. The input has to be a standard basis.
+@item nres
+@ref{nres}@*
+computes a free resolution of an ideal or module with the standard basis
+method. 
+@item minres
+@ref{minres}@*
+minimizes a free resolution of an ideal or module.
 @item syz
 @ref{syz}@*
 computes the first Szyzygy (i.e., the module of relations of the
 given generators).
 @end table
 
-@subsubheading Further processing of resolutions
+@unnumberedsubsec Further processing of resolutions
 @table @code
 @item betti
 @ref{betti}@*
@@ -1007,7 +1016,7 @@ computes the graded Betti numbers of a module from a free resolution.
 minimizes a free resolution of an ideal or module.
 @end table
 
-@subsubheading Processing of polynomials
+@unnumberedsubsec Processing of polynomials
 @table @code
 @item char_series
 @ref{char_series}@*
@@ -1053,7 +1062,7 @@ Multivariate polynomials are considered univariate polynomials in a
 main variable to be specified by the user.
 @end table
 
-@subsubheading Matrix computations
+@unnumberedsubsec Matrix computations
 @table @code
 @item bareiss
 @ref{bareiss}@*
@@ -1065,6 +1074,18 @@ computes the determinant of a square matrix.
 
 For matrices with integer entries a modular algorithm is used.  For
 other domains, elementary algorithms are used.
+@item minor
+@ref{minor}@*
+computes all minors (=subdeterminants) of a given size for a matrix.
+@end table
+
+@unnumberedsubsec Controlling computations
+@table @code
+@item option
+@ref{option}@*
+allows to set options for manipulating the behaviour of computations 
+(such as reduction strategies) and to show protocol information indicating
+the progress of a computation.
 @end table
 
 @c ---------------------------------------------------------------------------
@@ -1167,11 +1188,11 @@ the default value of the specific type to it.
 for a description of all data types known to @sc{Singular}.
 
 @example
-ring r;              // the default ring
+ring r;                   // the default ring
 poly f,g = x^2+y^3,xy+z2; // the polynomials f=x^2+y^3 and g=x*y+z^2
-ideal I = f,g;       // the ideal generated by f and g
-matrix m[3][3];      // a 3 x 3 zero matrix
-int i=2;             // the integer i=2
+ideal I = f,g;            // the ideal generated by f and g
+matrix m[3][3];           // a 3 x 3 zero matrix
+int i=2;                  // the integer i=2
 @end example
 
 @subsubheading Assignment
@@ -1218,8 +1239,9 @@ Some of these functions have to be called without parentheses, e.g.,
 @example
 @c example
   ring r;
-  ideal i=x2+y2,x; i=std(i);
-  degree(i);  // degree has no return value but prints output
+  ideal i=x2+y2,x;
+  i=std(i);
+  degree(i);        // degree has no return value but prints output
 @c example
 @end example
 
@@ -1230,7 +1252,8 @@ expression @code{;}
 @* prints the value of an expression, for example, of a variable.
 @end enumerate
 
-Use the function @code{print} to get a pretty output of various data
+Use the function @code{print} (or the procedure show from inout.lib)
+to get a pretty output of various data
 types, e.g., matrix or intmat. @xref{print}.
 
 @example
@@ -1626,6 +1649,10 @@ Links are the communication channels of @sc{Singular}, i.e., something
 @sc{Singular} can write to and read from.  In this section, a short
 overview of the usage of links and of the different link types is given.
 
+Even though library loading may be considered an I/O operation, too,
+this section does not treat loading of libraries (@pxref{LIB}).
+
+@unnumberedsubsec Monitoring
 A special form of I/O is monitoring.  When monitoring is enabled,
 @sc{Singular} makes a typescript of everything printed on your terminal
 to a file.  It is useful for students who need a hardcopy record of an
@@ -1634,10 +1661,7 @@ useful to create a protocol of a @sc{Singular} session.  The
 @code{monitor} command enables and disables this feature
 (@pxref{monitor}).
 
-Even though library loading may be considered an I/O operation, too,
-this section does not treat loading of libraries (@pxref{LIB}).
-
-@subsubheading How to use links
+@unnumberedsubsec How to use links
 Besides the usual I/O functions @code{write} and @code{read}, there are
 also the functions @code{dump} and @code{getdump} which store resp.@:
 retrieve the content of an entire @sc{Singular} session to resp.@: from
@@ -1651,9 +1675,10 @@ For more information, see @ref{write}, @ref{read}, @ref{dump},
 @example
 @c example
   ring r; poly p = x+y;
-  dump("MPfile:w test.mp");
-  kill r;
-  getdump("MPfile:r test.mp");
+  dump("MPfile:w test.mp");   // dump the session to the file test.mp
+  kill r;                     // kill the basering
+  listvar();
+  getdump("MPfile:r test.mp");// read the dump from the file
   listvar();
 @c example
 @end example
@@ -1679,7 +1704,7 @@ Links have various properties which can be checked for using the
 @c example
 @end example
 
-@subsubheading ASCII links
+@unnumberedsubsec ASCII links
 Data that can be converted to a string can be written into files for
 storage or communication with other programs. The data is written in
 plain ASCII format. Reading from an ASCII link returns a string ---
@@ -1705,7 +1730,7 @@ manipulate the data.
 @c example
 @end example
 
-@subsubheading MPfile links
+@unnumberedsubsec MPfile links
 Data is stored in the binary MP format.  Read and write access is very
 fast compared to ASCII links.  All data (including such data that cannot
 be converted to a string) can be written to an MPfile link.  Reading
@@ -1733,7 +1758,7 @@ MPfile links are implemented on Unix-like operating systems only.
 @c example
 @end example
 
-@subsubheading MPtcp links
+@unnumberedsubsec MPtcp links
 Data is communicated with other processes (e.g., @sc{Singular}
 processes) which may run on the same or on different computers.  Data
 exchange is accomplished using TCP/IP links in the binary MP format.
@@ -1762,7 +1787,7 @@ MPtcp links are implemented on Unix-like operating systems only.
 @c example
 @end example
 
-@subsubheading DBM links
+@unnumberedsubsec DBM links
 Data is stored in and accessed from a data base.  Writing is
 accomplished by a key and a value and associates the value with the key
 in the specified data base.  Reading is accomplished w.r.t.@: a key,
@@ -2221,11 +2246,58 @@ declared @code{static}.
 No procedures should be defined within the body of another procedure.
 
 @item
-Executing procedures defined in a library should not result in any
-message displays, by default (please, shut up, by default). That is, only if
-special options or variable values are set, should a procedure display
-progress, debugging or any other information. A good way to accomplish
-this is the usage of the @ref{dbprint} command.
+It is often useful for a procedure to print out comments, either to
+explain results or to display intermediate computations. However,
+if this procedure is called by another procedure, such comments are
+confusing and disturbing in most cases. 
+
+@sc{Singular} offers an elegant solution, which requires the usage of
+the @sc{Singular} function @ref{dbprint} and the reserved variables
+@ref{printlevel}, and @ref{voice} (@code{voice} counts the nesting of
+procedures; It has the value 1 on the top level, 2 inside the first
+procedure etc.; @code{printlevel} has the value 0 by default, but can be
+set to any integer value by the user).  
+
+For example, if the following procedure @code{Test} is called
+directly from the top level then @samp{comment1} is displayed (i.e.,
+printed out) but not
+@samp{comment2}; and nothing is displayed if  @code{Test} is called
+from within any other procedure. 
+However, if @code{printlevel} is set to  a value k with k>0, then
+@samp{comment1} (resp. @samp{comment2} is displayed provided that
+@code{Test} is called from other procedures, with a nesting level up to
+k (resp. k-1).  
+
+Note furthermore, that the example part of a procedure 
+behaves in this respect like a procedure (i.e. the value of @code{voice} 
+is 1). Therefore, the command @code{printlevel=1;} is necessary for
+@samp{comment1} to be displayed on @code{ example Test;}. However,
+since printlevel is a global variable, it should be reset to the old
+value after at the end of the example part.
+
+@example
+proc Test
+"USAGE:   ...
+         ...
+EXAMPLE: example Test; shows an example
+"
+@{   ...
+   int p = printlevel - voice + 3;
+    ...
+   dpprint(p,"comment1");
+   dpprint(p-1,"comment2");   
+   // dbprint prints only if p > 0
+    ...
+@}
+example
+@{ "EXAMPLE:"; echo = 2;
+   int p = printlevel;   //store old value of printlevel
+   printlevel = 1;       //assign new value to printlevel
+    ...
+   Test(); 
+   printlevel = p;       //reset printlevel to old value
+@}
+@end example
 
 @end enumerate
 @c @end table
@@ -2285,6 +2357,7 @@ If @code{Singular} reaches a break point it asks for lines of commands
 from the user. It returns to normal execution if given an empty line.
 See @ref{~}.
 
+
 @strong{Example:}
 @example
 proc t
@@ -2296,7 +2369,7 @@ proc t
 t();
 @expansion{} -- break point in t --
 @expansion{} -- 0: called    from STDIN --
-i;
+i;               // here local variables of the procedure can be accessed
 @expansion{} 2
 @expansion{} -- break point in t --
 
@@ -2361,8 +2434,8 @@ $ libparse sample.lib
 Checking library 'sample.lib'
   Library         function      line,start-eod line,body-eob  line,example-eoe
 Version:0.0.0;
-g libparse             tab line    9,  149-165   13,  271-298   14,  300-402
-l libparse    internal_tab line   24,  450-475   25,  476-496    0,    0-496
+g Sample               tab line    9,  149-165   13,  271-298   14,  300-402
+l Sample      internal_tab line   24,  450-475   25,  476-496    0,    0-496
 @end example
 
 where the following abbreviations are used:
@@ -2380,6 +2453,13 @@ each of the following is the position of the byte in the library.
 @item example: position of 'example'
 @item eoe: end of example '@}'
 @end itemize
+
+Hence in the above example, the first procedure of the library 
+sample.lib is user-accessible and its name is tab. The procedure
+starts in line 9, at character 149. The head of the procedure
+ends at character 165, the body starts in line 13 at character 271
+and ends at character 298. The example section extends from line 14
+character 300 to character 402.
 
 The following example shows the result of a missing close-bracket @} in
 line 26 of the library @code{sample.lib}.

@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: tutor.tex,v 1.3 1998-07-09 07:39:12 Singular Exp $
+@comment $Id: tutor.tex,v 1.4 1998-10-26 15:05:46 obachman Exp $
 @c ---------------------------------------------------------------------------
 @comment %**start of header
 @c -----------------------
@@ -13,36 +13,18 @@
 @c ------------------------
 @set VERSION 1.2
 @c ------------------------
+@html
+<CENTER><A HREF="http://www.mathematik.uni-kl.de/~zca/Singular" TARGET="_parent">
+<IMG SRC="images/singular.jpg"></A></CENTER><BR>
+@end html
 @ifinfo
 this is the texinfo file with the Singular Tutorial (version @value{VERSION})
 @end ifinfo
 @c
-@titlepage
-@sp 2
-@center @titlefont{Singular}
-@sp 2
-@center A Computer Algebra System for Polynomial Computations
-@sp 5
-@center @titlefont{Tutorial}
-@center Version @value{VERSION}
-@sp 2
-@center Singular is created and its development is directed and coordinated by
-@center G.-M. Greuel, G. Pfister and H.Schoenemann
-@sp 2
-@center with contributions by
-@center O. Bachmann, W. Decker, C. Gorzel, H. Grassmann, A. Heydtmann, K. Krueger, M. Lamm,
-@center B. Martin, M. Messollen, W. Neumann, T. Nuessler, W. Pohl, T. Siebert, R. Stobbe, T. Wichmann
-@sp 2
-@author Fachbereich Mathematik
-@author und
-@author Zentrum fuer Computeralgebra
-@author Universitaet Kaiserslautern
-@author D-67653 Kaiserslautern
-@end titlepage
 @c ----------------------------------------------------------------------------
-@node    Top, ,    (dir),    (dir)
+@node    Top, Preface,    (dir),    (dir)
 @ifinfo
-q: quit help, m: menu item, n: next node, p: previous node, u: up
+@c q: quit help, m: menu item, n: next node, p: previous node, u: up
 @sp 1
 @center Singular Tutorial
 @center Version @value{VERSION}
@@ -52,10 +34,10 @@ q: quit help, m: menu item, n: next node, p: previous node, u: up
 @center Department of Mathematics and Centre for Computer algebra
 @end ifinfo
 @menu
-* Preface
+* Preface::
 * Introduction::
+* Getting started::
 * Examples::
-* Index::
 @end menu
 @c ----------------------------------------------------------------------------
 @node Preface, Introduction, (dir),  (dir)
@@ -76,8 +58,6 @@ q: quit help, m: menu item, n: next node, p: previous node, u: up
 
 @include examples.tex
 @c ----------------------------------------------------------------------------
-@node Index,,Examples,Top
-@chapter Index
-@printindex cp
+@node ,,Examples,Top
 @contents
 @bye

@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: start.doc,v 1.30 1998-07-28 12:04:01 Singular Exp $
+@comment $Id: start.doc,v 1.31 1998-10-26 15:05:45 obachman Exp $
 @comment this file contains the "Introduction" chapter.
 @c * wichmann: + added chages by GMG.
 
@@ -997,7 +997,13 @@ $M = r^3/U$,
 @ifinfo
 M = r^3/U,
 @end ifinfo
-where U is our defining module of relations.
+where U is our defining module of relations for the module 
+@tex
+$M$.
+@end tex
+@ifinfo
+M.
+@end ifinfo
 
 @example
 module U = [z3,xy2,x3],[yz2,1,xy5z+z3],[y2z,0,x3],[xyz+x2,y2,0],[xyz,x2y,1];

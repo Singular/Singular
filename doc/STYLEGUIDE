@@ -146,11 +146,13 @@ ideal i=x,y;
 @end example
 
 + Bei Beispielen, die nicht wirklich von doc2tex gerechnet, muss nach dem
-  @expansion ein Leerzeichen kommen:
+  @expansion ein Leerzeichen kommen, und geschweifte Klammern muessen
+  gequoted werden mit @:
 @example
 int i=3; 
     // Kommentare ueber mehere Zeilen duerfen natuerlich
 i;  // mit Leerzeichen beginnen.
+@{@} // quote von geschweiften Klammern
 @expansion{} 3
 @end example
 
@@ -219,5 +221,5 @@ i;  // mit Leerzeichen beginnen.
   domkumentiert. Siehe doc2tex.c.
 
 ------------------------------------------------------------
-$Id: STYLEGUIDE,v 1.8 1998-05-18 19:59:07 wichmann Exp $
+$Id: STYLEGUIDE,v 1.9 1998-10-26 15:05:33 obachman Exp $
 ------------------------------------------------------------

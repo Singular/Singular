@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.34 1998-06-19 15:55:23 obachman Exp $
+@comment $Id: math.doc,v 1.35 1998-10-26 15:05:40 obachman Exp $
 @comment this file contains the mathematical background of Singular
 
 @c The following directives are necessary for proper compilation
@@ -390,6 +390,11 @@ Math. Comp. 22 (1968), 565-578
 Campillo, A.: Algebroid curves in positive characteristic. SLN 813, 1980
 
 @item
+Chou, S.:
+Mechanical Geometry Theorem Proving.
+D.Reidel Publishing Company, 1988
+
+@item
 Decker, W.; G.-M. Greuel, G.-M.; Pfister, G.:
 Primary decomposition: algorithms and
 comparisons.  Preprint, Univ. Kaiserslautern, 1998.
@@ -471,5 +476,10 @@ Reports on Computer Algebra 2(1996), Kaiserslautern
 Siebert, T.:
 On strategies and implementations for computations of free resolutions.
 Reports on Computer Algebra 8(1996), Kaiserslautern
+
+@item
+Wang, D.:
+Characteristic Sets and Zero Structure of Polynomial Sets.
+Lecture Notes, RISC Linz, 1989
 @end itemize
 

@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.35 1998-07-28 12:03:59 Singular Exp $
+@comment $Id: examples.doc,v 1.36 1998-10-26 15:05:35 obachman Exp $
 @comment this file contains the examples
 
 @c The following directives are necessary for proper compilation
@@ -1322,6 +1322,7 @@ the lres command.
   size(list(rs));            //gets the minimized resolution
 @c example
 @end example
+
 
 @c ----------------------------------------------------------------------------
 @ifset singularmanual

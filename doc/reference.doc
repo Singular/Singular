@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.95 1998-09-08 14:34:26 Singular Exp $
+@comment $Id: reference.doc,v 1.96 1998-10-26 15:05:42 obachman Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -214,28 +214,31 @@ to the value @emph{expression}.
 @example
 @c example
   ring r=0,(x,y,z),dp;
-  ideal I=std(maxideal(2));
+  ideal I=maxideal(2); // the attribute "isSB" is not set
   vdim(I);
-  attrib(I,"isSB",0);  // the standard basis attribute is set to 0
+  attrib(I,"isSB",1);  // the standard basis attribute is set here 
   vdim(I);
 @c example
 @end example
 @item @strong{Remark:}
 An attribute may be described by any string_expression, but some are reserved.
-Only the reserved attributes are used by the kernel of @sc{Singular}.
+Only the reserved attributes are used by the kernel of @sc{Singular}. 
+Non-reserved attributes may be used, however, in procedures and can 
+considerably speed up computations.
 @sp 1
 @item @strong{Reserved attributes:}
 (not all are used at the moment)
 @table @code
 @item isSB
-standard basis - set by @code{std}, used by @code{lift}, @code{dim},
+standard basis - set by all commands compution a standard basis like 
+@code{groebner}, @code{std}, @code{stdhilb} etc.; used by @code{lift}, @code{dim},
 @code{degree}, @code{mult}, @code{hilb}, @code{vdim}, @code{kbase}
 @item isHomog
 the weight vector for homogeneous or quasihomogeneous ideals/modules
 @item isCI
-complete intersection
+complete intersection property
 @item isCM
-Cohen-Macaulay  module
+Cohen-Macaulay property
 @item rank
 set the rank of a module (see @ref{nrows})
 @item withSB
@@ -273,7 +276,7 @@ list of matrix and intvec
 @item @strong{Purpose:}
 applies Gauss-Bareiss algorithm (see @ref{References})
 to a matrix with an 'optimal' pivotstrategy.
-Result is a list: the first entry a lower triangular matrix,
+Result is a list: the first entry is a lower triangular matrix,
 the second entry an intvec with the permutations of the columns
 w.r.t. the original matrix.
 @item @strong{Example:}
@@ -331,7 +334,7 @@ generators in degree i+j of the j-th syzygy module (= module of
 relations) of R^n/M (the 0-th (resp.1-st) syzygy module of R^n/M is R^n
 (resp. M)).
 @end ifinfo
-The argument is considered to be the result of a res/sres/mres command.
+The argument is considered to be the result of a res/sres/mres/lres command.
 (Only the initial monomials are considered for the computation
 of the graded Betti numbers.)
 @item @strong{Example:}
@@ -357,16 +360,16 @@ of the graded Betti numbers.)
 
 Hence
 @itemize @bullet
-@item the 0th syzygy module of r/j (which is j) has 1 generator in
+@item the 0th syzygy module of r/j (which is r) has 1 generator in
 degree 0 (which is 1)
 
-@item the 1st syzygy module (which is j) has 4
+@item the 1st syzygy module @code{T[1]} (which is j) has 4
 generators (one in degree 2 and three in degree 3)
 
 @item the 2nd syzygy
-module has 4 generators (all in degree 4)
+module @code{T[2]} has 4 generators (all in degree 4)
 
-@item the 3rd syzygy module has
+@item the 3rd syzygy module @code{T[3]} has
 1 generator in degree 5
 @end itemize
 
@@ -446,9 +449,6 @@ matrix
 @item @strong{Purpose:}
 the rows of the matrix represent the irreducible characteristic series of the
 ideal with respect to the current variable ordering.
-@*See Shang-Ching Chou, Mechanical Geometry Theorem Proving (D. Reidel Publishing Company, 1988)
-or Dongming Wang, Characteristic Sets and Zero Structure of Polynomial Sets
-(Lecture Notes, RISC-Linz, Johannes Kepler University, 1989).
 @*One applicatation is the decomposition of the zero set.
 @item @strong{Example:}
 @example
@@ -643,8 +643,9 @@ matrix
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
-determines the monomials in f occurring in m, where f is the first argument
-and m the second argument.
+determines the monomials in f divisible by one of the ring variables of m
+(where f is the first argument and m the second argument) and the coefficients
+of these monomails as polynomials in the remaining variables.
 
 First case:  returns a 2 x n matrix M, n being the number
 of the determined monomials.
@@ -653,8 +654,14 @@ of the corresponding coefficients of the monomials in f.
 Thus f = M[1,1]*M[2,1]+..+M[1,n]*M[2,n].
 
 Second case: the first matrix (i.e. the 3rd argument) contains the
-monomials, the second (i.e. the 4th argument) the corresponding
+monomials, the second matrix (i.e. the 4th argument) the corresponding
 coefficients of the monomials in the vector.
+
+@item @strong{Note:}
+coef considers only monomials which really occur in f (i.e. are not 0),
+while coeffs returns the coefficient 0 at the appropriate place if a 
+monomial is not present (c.f. @ref{coeffs}).
+
 @item @strong{Example:}
 @example
 @c example
@@ -662,7 +669,7 @@ coefficients of the monomials in the vector.
   poly f=x5+5x4y+10x2y3+y5;
   matrix m=coef(f,y);
   print(m);
-  f=x^20+xy+x2y;
+  f=x^20+xyz+xy+x2y+z3;
   print(coef(f,xy));
   vector v=[f,zy+77+xy];
   print(v);
@@ -702,30 +709,45 @@ say @code{z}, and returns the coefficients as a @code{k} x @code{d}
 matrix @code{M},
 where:
 @* @code{d-1} = maximum @code{z}-degree of all occuring polynomials
-@* @code{k}   = 1 in case of a polynomial resp. number of generators
-in case of an ideal;
+@* @code{k}   = 1 in case J is a polynomial resp. number of generators
+in case J is an ideal;
 in case of a vector or a module this procedure is repeated for each
 component and the resulting matrices are appended.
 @*If a third argument is present, say @code{T},
 it contains the coefficients such that
 @*  @code{matrix(J) = T*M}.
-@*Thus the j-th generator of an ideal @code{J} is equal to
+@*Thus if
+@tex
+$M=(m_{ij})$
+@end tex
+@ifinfo
+M=(M[i,j])
+@end ifinfo
+the j-th generator of an ideal @code{J} is equal to
+@*
 @*
 @tex
-$J[j] = z^0*M[1,j] + z^1*M[2,j] + ... + z^{d-1}*M[d,j]$,
+$J_j = z^0 \cdot m_{1j} + z^1 \cdot m_{2j} + ... + z^{d-1} \cdot m_{dj}$,
 @end tex
 @ifinfo
 J[j] = z^0*M[1,j] + z^1*M[2,j] + ... + z^(d-1)*M[d,j],
 @end ifinfo
+@*
 @*while for a module @code{J} the i-th component of the j-th generator is equal to the
-entry _[i,j] of matrix(@code{J}) and we get
+entry [i,j] of matrix(@code{J}) and we get
 @*
 @tex
-$[i,j] = z^0*M[(i-1)*d+1,j] + z^1*M[(i-1)*d+2,j] + ... + z^{d-1}*M[i*d,j]$
+$[i,j] = z^0 \cdot m_{(i-1)d+1,j} + z^1 \cdot m_{(i-1)d+2,j} + ... + z^{d-1} \cdot m_{id,j}$
 @end tex
 @ifinfo
-_[i,j] = z^0*M[(i-1)*d+1,j] + z^1*M[(i-1)*d+2,j] + ... + z^(d-1)*M[i*d,j]
+ [i,j] = z^0*M[(i-1)*d+1,j] + z^1*M[(i-1)*d+2,j] + ... + z^(d-1)*M[i*d,j]
 @end ifinfo
+
+@item @strong{Note:}
+coeffs returns the coefficient 0 at the appropriate place if a monomial is
+not present, while coef considers only monomials which really occur in the
+given expression.
+
 @item @strong{Example:}
 @example
 @c example
@@ -738,16 +760,23 @@ _[i,j] = z^0*M[(i-1)*d+1,j] + z^1*M[(i-1)*d+2,j] + ... + z^(d-1)*M[i*d,j]
 @c example
 @end example
 @item @strong{Syntax:}
-@code{coeffs (} ideal_expression@code{,} ideal_expression@code{,} poly_expression @code{)}
-@*@code{coeffs (} module_expression@code{,} module_expression@code{,} poly_expression @code{)}
+@code{coeffs (} ideal_expression@code{,} ideal_expression@code{,} product_of_ringvars @code{)}
+@*@code{coeffs (} module_expression@code{,} module_expression@code{,} product_of_ringvars @code{)}
 @item @strong{Type:}
 matrix
 @item @strong{Purpose:}
 let the first argument be M,
 the second argument  be K (a set of monomials in P),
 the third argument be the product P of variables to consider.
+M is supposed to be consisting of elements of (resp. have entries in)
+a finitely generated module
+over a ring in the variables not appearing in P. K should contain the
+generators of the module over this smaller ring.
 Then @code{coeffs(M,K,P)} returns a matrix A of coefficients with K*A=M
-such that the entries of A does not contain any variable from P.
+such that the entries of A do not contain any variable from P.
+@*If K does not contain all generators that are necessary to express
+M, then K*A=M' where M' is the part of M that can be expressed.
+
 @item @strong{Example:}
 @example
 @c example
@@ -759,7 +788,7 @@ such that the entries of A does not contain any variable from P.
 @end table
 @c ref
 See
-@ref{coef}.
+@ref{coef}; @ref{kbase}.
 @c ref
 @c ---------------------------------------
 @node contract, dbprint, coeffs, Functions
@@ -821,6 +850,9 @@ none
 @item @strong{Purpose:}
 The print command is applied to the expression,
 if @code{printlevel=>voice}.
+@item @strong{Note:} 
+@xref{Guidelines for writing a library} for an example how this is used
+for the display of comments while procedures are executed.
 @item @strong{Example:}
 @example
 @c example
@@ -855,12 +887,12 @@ See @ref{print}; @ref{voice}; @ref{printlevel}; @ref{Debugging tools}.
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
-returns a value !=0 (TRUE) if there is an userdefined object with this name,
+returns a value !=0 (TRUE) if there is a userdefined object with this name,
 and 0 (FALSE) otherwise.
 @*A nonzero return value is the level where the object is defined (level
 1 denotes the top level, level 2 the level of a first procedure, level 3
-the level of a procedure called by a procedure, etc.).
-Local objects may be identified by @code{if (defined(..)==voice) ..}.
+the level of a procedure called by a first procedure, etc.).
+A local object @code{m} may be identified by @code{if (defined(m)==voice)}.
 @item @strong{Example:}
 @example
 @c example
@@ -868,6 +900,7 @@ Local objects may be identified by @code{if (defined(..)==voice) ..}.
   matrix m[5][6]= x,y,1,2,0,x+y;
   defined(mm);
   defined(r) and defined(m);
+  defined(m)==voice;             // m is defined in the current level
   defined(x);
   defined(z);
   defined(t);
@@ -943,10 +976,7 @@ degree ordering.
 @item @strong{Example:}
 @example
 ring r3=32003,(x,y,z),ds;
-int a =11;
-int b =10;
-int c =3;
-int t =1;
+int a,b,c,t =11,10,3,1;
 poly f =x^a+y^b+z^(3*c)+x^(c+2)*y^(c-1)+x^(c-1)*y^(c-1)*z3
   +x^(c-2)*y^c*(y2+t*x)^2;
 ideal i= jacob(f);
@@ -1058,7 +1088,7 @@ ideal, producing a m x n matrix.
   // corresponds to differential operators
   // d2/dx2, d2/dx2+d2/dxdy, d3/dx/dy/dz:
   ideal i=x2,x2+yz,xyz;
-  ideal j=x2-yz,xyz;;
+  ideal j=x2-yz,xyz;
   print(diff(i,j));
 @c example
 @end example
@@ -1139,9 +1169,13 @@ link (which must be either an ASCII or MP link) such that a
 @example
 @c example
   ring r;
+  // write the whole session to the file dump.ascii 
+  // in ASCII format
   dump(":w dump.ascii");
-  kill r;
-  getdump("dump.ascii");
+  kill r;                  // kill the basering
+  // reread the session from the file
+  // redefining everything which was not explicitly killed before
+  getdump("dump.ascii");   
   r;
 @c example
 @end example
@@ -1258,7 +1292,7 @@ See @ref{MPfile links}; @ref{quote}; @ref{write}.
 @cindex execute
 @table @code
 @item @strong{Syntax:}
-@code{execute} string_expression
+@code{execute}(string_expression);
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
@@ -1280,7 +1314,7 @@ provide in the future).
   ring r0=0,(x,y,z),Dp;
   string s="ideal k="+read("save_i")+";";
   s;
-  execute s; // define the ideal k
+  execute(s); // define the ideal k
   k;
 @c example
 @end example
@@ -1401,7 +1435,7 @@ together with or without
 the multiplicities (as an intvec) depending on the second argument:
 @*0: returns factors and multiplicities, first factor is a constant.
 May also be written with only one argument
-@*1: returns non-constant factors
+@*1: returns non-constant factors (no multiplicities)
 @*2: returns non-constant factors and multiplicities
 @item @strong{Note:}
 Not implemented for the coefficient fields real, finite fields of the
@@ -1487,7 +1521,7 @@ See @ref{imap}; @ref{map}; @ref{ring}; @ref{qring}.
 @item @strong{Type:}
 ideal
 @item @strong{Purpose:}
-calculates for the given ideal ideal_name in the given ring ring_name
+calculates for the given ideal in the given ring 
 a Groebner basis in the current ring. Implements the so-called FGLM
 (Faugere, Gianni, Lazard, Mora)  algorithm.
 @*The ideal must be zero dimensional and given as a reduced Groebner
@@ -2149,7 +2183,7 @@ ideal resp. module
 @item @strong{Purpose:}
 ideal resp. module intersection.
 @item @strong{Note:}
-If the option @code{computeSB} is enabled the result is a standard basis.
+If the option @code{computeSB} is enabled then the result is a standard basis.
 @item @strong{Example:}
 @example
 @c example
@@ -2187,7 +2221,7 @@ See @ref{ideal};
 ideal, if the input is a polynomial
 @* matrix, if the input is an ideal
 @item @strong{Purpose:}
-computes the Jacobi ideal resp.@: Hessian matrix generated by all
+computes the Jacobi ideal resp.@: Jacobi matrix generated by all
 partial derivatives of the input.
 @item @strong{Example:}
 @example
@@ -2293,14 +2327,14 @@ the same as the input type of the first argument
 @item @strong{Purpose:}
 @*with one argument:
 computes a vector space basis (consisting of monomials)
-of the quotient of the ring by an ideal
-resp. of a free module by a module in case this is finite dimensional
-(and if the input is a standard basis with respect to the ring ordering).
+of the quotient ring by the ideal
+resp. of a free module by the module in case this is finite dimensional
+and if the input is a standard basis with respect to the ring ordering.
 If the input is no standard basis, the leading terms of the input are
 used and the result may have no meaning.
 @*with two arguments:
 a part of the same result with degree of the monomials equal to the
-second argument, the quotient must be not finite dimensional.
+second argument, the quotient need not be finite dimensional.
 @item @strong{Example:}
 @example
 @c example
@@ -2326,8 +2360,8 @@ See @ref{ideal}; @ref{module}; @ref{vdim}.
 @cindex kill
 @table @code
 @item @strong{Syntax:}
-@code{kill} name @code{;}
-@*@code{kill} list_of_names @code{;}
+@code{kill}(name)@code{;}
+@*@code{kill}(list_of_names)@code{;}
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
@@ -2339,8 +2373,9 @@ deletes objects.
   ring r= 0,x,dp;
   poly p;
   listvar();
-  kill i,r;
-  i;          // the variable `i` is no longer existent
+  kill(i,r);
+  // the variable `i` does not exist any more
+  i;
   listvar();
 @c example
 @end example
@@ -2490,7 +2525,7 @@ with respect to the monomial ordering.
 @item @strong{Example:}
 @example
 @c example
-  ring r=32003,(x,y,z),ds;
+  ring r=32003,(x,y,z),(c,ds);
   poly f=x2+y+z3;
   vector v=[2*x^10,f];
   leadcoef(f);
@@ -2612,10 +2647,13 @@ submodule in terms of the generators of a module.  Uses different
 algorithms for modules which are resp.@: are not represented by a
 standard basis.
 @* Hence, if @code{sm} is the submodule (or ideal), @code{m} the
-module (or ideal) and @code{T} the transformation matrix
-then @code{matrix(sm)=matrix(m)*T}
+module (or ideal) and @code{T} the transformation matrix returned by
+lift then @code{matrix(sm)=matrix(m)*T}
 and @code{sm=module(matrix(m)*T)} (or @code{sm=ideal(matrix(m)*T)}).
 Gives a warning if @code{sm} is not a submodule.
+@item @strong{Note:}
+For local or mixed orderings this holds only up to units in the associated
+localized ring.
 @item @strong{Example:}
 @example
 @c example
@@ -2783,8 +2821,19 @@ module of L[1], etc.
 $=M_i$
 @end tex
  in the notations from above).
+@item @strong{Note:}
+To access the elements of a resolution, it has to be assigned to a list,
+which also completes computations and may therefore take time.
 @item @strong{Example:}
 @example
+@c example
+  ring r=0,(x,y,z),dp;
+  ideal i=xz,yz,x^3-y^3;
+  def l=lres(i,0);
+  print(betti(l),"betti"); // input to betti may be of type resolution
+  list ll=l;
+  l[2];                    // elements can only be accessed in the list
+@c example
 @end example
 @end table
 @c ref
@@ -2809,7 +2858,7 @@ See
 ideal
 @item @strong{Purpose:}
 returns the power given by int_expression of the maximal ideal
-(maxideal(i)=(1) for i<=0).
+generated by all variables (maxideal(i)=(1) for i<=0).
 @item @strong{Example:}
 @example
 @c example
@@ -2838,6 +2887,10 @@ int
 returns statistics concerning the memory management:
 @*@code{memory(0)} is the number of active bytes
 @*@code{memory(1)} is the number of allocated bytes
+@item @strong{Note:} 
+To monitor the memory usage during ongoing computations the option
+@code{mem} should be set (using the command @code{option(mem);}, see
+also @ref{option}). 
 @item @strong{Example:}
 @example
 @c example
@@ -2898,7 +2951,7 @@ returns the set of all minors (=subdeterminants) of the given size of a matrix.
 @example
 @c example
   ring r = 0, (x(1..5)), ds;
-  matrix m[2][4]= x(1), x(2), x(3), x(4), x(2), x(3), x(4), x(5);
+  matrix m[2][4]= x(1..4), x(2..5);
   print(m);
   ideal j = minor(m, 2);
   j;
@@ -2930,13 +2983,13 @@ given by the list resp. resolution argument.
 @item @strong{Example:}
 @example
 @c example
-  ring r=31991,(t,x,y,z,w),ls;
-  ideal T=t2x2+tx2y+x2yz,t2y2+ty2z+y2zw,
-    t2z2+tz2w+xz2w,t2w2+txw2+xyw2;
-  resolution R3=sres(std(T),0);
-  R3;
-  resolution R4=minres(R3);
-  R4;
+  ring r1=32003,(x,y),dp;
+  ideal i=x5+xy4,x3+x2y+xy2+y3;
+  resolution rs=lres(i,0);
+  rs;
+  list(rs);
+  minres(rs);
+  list(rs);
 @c example
 @end example
 @end table
@@ -2964,34 +3017,69 @@ module
 represents h1/(h1 intersect h2) (isomorphic to (h1+h2)/h2)
 @end ifinfo
 @tex
-represents $h_1/(h_1 \cap h_2) (\cong (h_1+h_2)/h_2)$
+represents $h_1/(h_1 \cap h_2) \cong (h_1+h_2)/h_2)$
 @end tex
-as factor of the free module
-@ifinfo
-R^k
-@end ifinfo
+where 
 @tex
-R$^k$
+$h_1$ and $h_2$
 @end tex
-by the resulting submodule M,  where
 @ifinfo
-h1
+h1 and h2
 @end ifinfo
+are considered as submodules of the same free module
 @tex
-$h_1$
+$R^l$
 @end tex
-is generated by k elements as in
-the following exact sequence:
+@ifinfo
+R^l
+@end ifinfo
+(l=1 for ideals). Let 
+@tex
+$H_1$ resp. $H_2$ 
+@end tex
+@ifinfo
+H1 and H2
+@end ifinfo
+be the matrices of size l x k resp. l x m having the columns of 
+@tex
+$h_1$ resp. $h_2$
+@end tex
+@ifinfo
+h1 resp. h2
+@end ifinfo
+as generators:
 @*
+@tex
+$R^k \buildrel{H_1}\over{\rightarrow} R^l
+\buildrel{H_2}\over{\leftarrow} R^m$
+@end tex
 @ifinfo
 @example
-                                M
-h1/(h1 intersect h2) <--- R^k <--- R^l
+     H1         H2
+R^k ----> R^l <---- R^m
 @end example
 @end ifinfo
+Then 
 @tex
-$h_1/(h_1 \cap h_2)\ \leftarrow\  R^k\ \buildrel{M}\over{\leftarrow}\ R^l$
+$h_1/(h_1 \cap h_2) \cong R^k / ker(\overline{H_1})$
 @end tex
+@ifinfo
+@example
+                                              __
+h1/(h1 intersect h2) is isomorphic to R^k/ker(H1)
+@end example
+@end ifinfo
+where 
+@tex
+$\overline{H_1}: R^k \rightarrow R^l/Im(H_2)=R^l/h_2$
+@end tex
+@ifinfo
+__
+H1:R^k ----> R^l/Im(H2)=R^l/h2
+@end ifinfo
+is the induced map. 
+@*@code{modulo(h1,h2)} returns generators of
+the kernel of this induced map.
 @item @strong{Example:}
 @example
 @c example
@@ -3024,18 +3112,18 @@ controls recording all user input and/or program output into a file.
 The second argument describes what to log: @code{"i"} means input,
 @code{"o"} means output, @code{"io"} for both.
 @*The default for the second argument is @code{"i"}.
-@*Each @code{monitor} command closes an previous monitor file
+@*Each @code{monitor} command closes a previous monitor file
 and opens the file given by the first string expression.
 @*@code{monitor ("")} turns off recording.
 @item @strong{Example:}
 @example
 @c example
-  monitor("doe.tmp");
+  monitor("doe.tmp","io"); // log input and output to doe.tmp
   ring r;
   poly f=x+y+z;
   int i=7;
   ideal I=f,x,y;
-  monitor("");
+  monitor("");             // stop logging
 @c example
 @end example
 @end table
@@ -3078,8 +3166,9 @@ $M_i={\tt module}(A_i)$, i=1..k.
 @ifinfo
 Mi=module(Ai), i=1..k.
 @end ifinfo
-@*If k=0 @code{mres(M,0)}
-returns a list of n modules where n is the number of variables of the basering.
+@*If k=0 then @code{mres(M,0)}
+returns a resolution consisting of not more than n modules
+where n is the number of variables of the basering.
 Let @code{list L=mres(M,0);}
  then L[1] consists of a minimal set of generators of the input, L[2]
 consists of a minimal set of generators of the first szyzgy module of
@@ -3092,6 +3181,9 @@ $\ne 0$ for i$\le$p
 @end tex
  but L[p+1], the
 first szyzgy module of L[p], is 0 (if the basering is not a qring).
+@item @strong{Note:}
+To access the elements of a resolution, it has to be assigned to a list,
+which also completes computations and may therefore take time.
 @item @strong{Example:}
 @example
 @c example
@@ -3125,11 +3217,10 @@ See @ref{ideal}; @ref{lres}; @ref{module};
 @item @strong{Type:}
 list
 @item @strong{Purpose:}
-returns a list consisting of a standard basis and a minimal set of
-generators.
-@item @strong{Note:}
-the input must be homogeneous and
-the ring a polynomial ring (global ordering).
+returns a list whose first entry is a standard basis and whose second
+entry is a set of generators of size smaller or equal to the input set,
+which is a minimal subset of the standard basis for homogenous
+input  (w.r.t. any monomial ordering).  
 @item @strong{Example:}
 @example
 @c example
@@ -3555,12 +3646,16 @@ shows protocol information indicating the
 progress during the following computations:
 @code{facstd},
 @code{fglm},
+@code{groebner},
 @code{lres},
 @code{mres},
 @code{minres},
+@code{mstd},
 @code{res},
 @code{sres},
 @code{std},
+@code{stdfglm},
+@code{stdhilb},
 @code{syz}.
 See below for more details.
 @item @code{redSB}
@@ -3573,6 +3668,7 @@ uses criteria similar to the homogeneous case to keep more useless pairs
 automatically computes suitable weights for the weighted ecart and the
 weighted sugar method
 @end table
+@*
 There are further options that control the behaviour of the computations,
 but these options are not manipulated using the @code{option} command:
 @table @asis
@@ -3581,6 +3677,7 @@ a multiplicity bound is set (see @ref{multBound})
 @item @code{degBound}
 a degree bound is set (see @ref{degBound})
 @end table
+@*
 The last set of options controls the output of @sc{Singular}:
 @table @asis
 @item @code{Imap}
@@ -3632,9 +3729,12 @@ shows correct usage in error messages (default)
 @item @tab @tab @tab all other characters: like the output of @code{std}
 
 @item @tab @code{fglm}
-@tab @code{.} @tab basis monom found
-@item @tab @tab @code{+} @tab edge monom found
-@item @tab @tab @code{-} @tab border monom found
+@tab @code{.} @tab basis monomial found
+@item @tab @tab @code{+} @tab edge monomial found
+@item @tab @tab @code{-} @tab border monomial found
+
+@item @tab @code{groebner} @tab @tab all characters: 
+like the output of @code{std}
 
 @item @tab @code{lres}
 @tab @code{.} @tab minimal syzygy found
@@ -3651,6 +3751,9 @@ shows correct usage in error messages (default)
 @item @tab @code{minres}
 @tab @code{[}@math{d}@code{]}
 @tab minimizing of the @math{d}-th syzygy module
+
+@item @tab @code{mstd} @tab @tab all characters: 
+like the output of @code{std}
 
 @item @tab @code{res}
 @tab @code{[}@math{d}@code{]}
@@ -3676,6 +3779,15 @@ are still to be reduced
 of @math{n} elements
 @item @tab @tab @math{d} @tab the degree of the leading terms is
 currently @math{d}
+
+@item @tab @code{stdfglm} @tab @tab all characters in first part: 
+like the output of @code{std}
+@item @tab @tab @tab all characters in second part:
+like the output of @code{fglm}
+
+@item @tab @code{stdhilb} @tab @tab all characters: 
+like the output of @code{std}
+
 @item @tab @code{syz} @tab @tab all characters: like the output of @code{std}
 @end multitable
 
@@ -4030,7 +4142,7 @@ See @ref{module}.
 @item @strong{Type:}
 intvec
 @item @strong{Purpose:}
-computes the weight vector for a quasihomogeneous ideal.
+computes the weight vector of the variables for a quasihomogeneous ideal.
 If the input is not weighted homogeneous, an intvec of zeroes is returned.
 @item @strong{Example:}
 @example
@@ -4132,6 +4244,9 @@ ideal id2=x2+xyz,y2-z3y,z3+y5xz;
 ideal id6=quotient(id1,id2);
 id6;
 quotient(id2,id1);
+module m=x*freemodule(3),y*freemodule(2);
+ideal id3=x,y;
+quotient(m,id3);
 @c example
 @end example
 @end table
@@ -4161,7 +4276,7 @@ returns random integer between min_integer and max_integer.
 intmat
 @item @strong{Purpose:}
 returns a random intmat of size rows x cols with entries between
--max_integer and +max_integer (inclusive).
+-max_integer and +max_integer (inclusively).
 @item @strong{Note:} The random generator can be set to a startvalue with
 the function @code{system} by a commandline option.
 @item @strong{Example:}
@@ -4169,11 +4284,12 @@ the function @code{system} by a commandline option.
 @c example
   random(1,1000);
   random(1,2,3);
-  system("random",210);     // start the random generator with 210
+  // start the random generator with 210
+  system("random",210);     
   random(-1000,1000);
   random(-1000,1000);
   system("random",210);
-  random(-1000,1000);         // the same random values again
+  random(-1000,1000);    // the same random values again
 @c example
 @end example
 @end table
@@ -4300,6 +4416,7 @@ See @ref{ideal}; @ref{vector}; @ref{std}.
 @table @code
 @item @strong{Syntax:}
 @code{regularity (} list_expression @code{)}
+@code{regularity (} resolution_expression @code{)}
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
@@ -4330,7 +4447,9 @@ the computation unless @code{option(notRegularity);} is given.
   ring rh3=32003,(w,x,y,z),(dp,C);
   poly f= x11+y10+z9+x5*y2+x2*y2*z3+x*y^3*(y2+x)^2;
   ideal j= homog(jacob(f),w);
-  list jj=res(j,0);
+  def jr=res(j,0);
+  regularity(jr);
+  list jj=jr;
   regularity(jj);
 @c example
 @end example
@@ -4405,6 +4524,9 @@ module of L[1], etc.
 $=M_i$
 @end tex
  in the notations from above).
+@item @strong{Note:}
+To access the elements of a resolution, it has to be assigned to a list,
+which also completes computations and may therefore take time. 
 @item @strong{Example:}
 @example
 @c example
@@ -4413,6 +4535,7 @@ $=M_i$
             t2z2+tz2w+xz2w,t2w2+txw2+xyw2;
   resolution L = res(M,0);
   L;
+  betti(L);
 @c example
 @end example
 @end table
@@ -4581,7 +4704,7 @@ given as the second argument.
 functions:
 @table @code
 @item 1
-normalize (leading coefficients are 1)
+normalize (make leading coefficients 1)
 @item 2
 erase zero generators/columns
 @item 4
@@ -4639,18 +4762,19 @@ See @ref{poly}; @ref{vector};
 @*@code{size (} module_expression @code{)}
 @*@code{size (} matrix_expression @code{)}
 @*@code{size (} list_expression @code{)}
+@*@code{size (} resolution @code{)}
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
 @table @asis
 @item ideal or module
 returns the number of (non zero) generators.
-@item string, intvec or list
-returns the length.
+@item string, intvec, list or resolution
+returns the length, i.e. the number of characters, entries or elements.
 @item poly or vector
 returns the number of monomials.
 @item matrix or intmat
-returns the the number of entries (rows*columns).
+returns the number of entries (rows*columns).
 @end table
 @item @strong{Example:}
 @example
@@ -4780,6 +4904,9 @@ module of L[1], etc.
 $=M_i$
 @end tex
  in the notations from above).
+@item @strong{Note:}
+To access the elements of a resolution, it has to be assigned to a list,
+which also completes computations and may therefore take time.
 @item @strong{Example:}
 @example
 @c example
@@ -4789,6 +4916,7 @@ $=M_i$
   M       = std(M);
   resolution L  = sres(M,0);
   L;
+  print(betti(L),"betti");
 @c example
 @end example
 @end table
@@ -4830,12 +4958,13 @@ string is returned: @code{(status(l,s1)==s2)} is equivalent to
 @code{status(l,s1,s2)}.  If a fourth integer argument (say, @code{i}) is
 given and if @code{status(l,s1,s2)} yields @code{0}, then the execution
 of the current process is suspended (the process is put to ``sleep'')
-for appr.@: @code{i} microseconds, and afterwards the result of another
+for approximately@: @code{i} microseconds, and afterwards the result of another
 call to @code{status(l,s1,s2)} is returned. The latter is useful for
 ``polling'' the @code{read} status of @code{MPtcp} links such that busy
 loops are avoided (see @ref{Parallelization with MPtcp links} for an
 example).  Note that on some systems, the minimium time for a process to
 be put to sleep is one second.
+@*The following string expressions are allowed:
 @table @code
 @item @code{"name"}
 the name string given by the definition of the link (usually the filename)
@@ -4896,7 +5025,7 @@ the leading terms generate the leading ideal resp. module.
 second argument as Hilbert series
 (result of @code{hilb(i,1)}, see @ref{hilb}),
 if the ideal resp. module is homogeneous,
-(Hilbert driven standard basis computation,@ref{stdhilb}).
+(Hilbert driven standard basis computation, @ref{stdhilb}).
 @item @strong{Example:}
 @example
 @c example
@@ -4974,10 +5103,10 @@ See
 @item @strong{Type:}
 ideal
 @item @strong{Purpose:}
-returns a standard basis of an homogeneous ideal with respect to the
+returns a standard basis of a homogeneous ideal with respect to the
 monomial ordering of the basering
 (Hilbert driven standard basis computation).
-First the hilbert series is computed (if not given).
+First the Hilbert series is computed (if not given).
 @*Use an optional
 second argument as Hilbert series
 (result of @code{hilb(i,1)}, see @ref{hilb}).
@@ -5079,7 +5208,7 @@ returns the seed of the random generator (type int)
 returns the generating element of the multiplicative
 group of Z/p\@{0@} (as int) where p is the characteristic of the
 basering
-@item @code{system("nblocks" [, ring]}
+@item @code{system("nblocks" [, ring])}
 returns the number of blocks of @code{ring}, or the number of parameters
 of the current basering, if no second argument is given.
 @item @code{system("HC")}
@@ -5096,7 +5225,7 @@ int and either 1 or 0; for all other options, the return type is string.
 @example
 // a listing of the current directory:
 system("sh","ls");
-// execute a shell, return to SINGULAR with exit
+// execute a shell, return to SINGULAR with exit:
 system("sh","sh");
 string unique_name="/tmp/xx"+string(system("pid"));
 unique_name;
@@ -5505,8 +5634,8 @@ string can be written to an  @code{ASCII} link.
 ring-dependent expressions are written together with a ring
 description. To prevent an evaluation of the expression before it is
 written, the @code{quote} command (possibly together with @code{eval})
-can be used. A @code{write} blocks (i.e. does not return), as long as a
-MPtcp link is not ready for writing.
+can be used. A @code{write} blocks (i.e. does not return to the prompt), 
+as long as a MPtcp link is not ready for writing.
 @*For DBM links, @code{write} with three arguments inserts the first
 string as key and the second string as value into the dbm data
 base.
@@ -5911,6 +6040,24 @@ lines of @sc{Singular} commands. The line length can not exceed 80
 characters.
 @sc{Singular} proceeds with the execution of the command following @code{~;}
 as soon as it receives an empty line.
+@item @strong{Example:}
+@example
+proc t
+@{
+  int i=2;
+  ~;
+  return(i+1);
+@}
+t();
+@expansion{} -- break point in t --
+@expansion{} -- 0: called    from STDIN --
+// here local variables of the procedure can be accessed
+i;
+@expansion{} 2
+@expansion{} -- break point in t --
+
+@expansion{} 3
+@end example
 @end table
 @c ref
 See @ref{Break points}.
@@ -6143,6 +6290,9 @@ int
 sets the debug level for dbprint.
 If @code{printlevel} >= @code{voice} @code{dbprint} is equivalent to
 @code{print}, otherwise nothing is printed.
+@item @strong{Note:} 
+@xref{Guidelines for writing a library} for an example how this is used
+for the display of comments while procedures are executed.
 @item @strong{Example:}
 @example
 @c example
@@ -6311,6 +6461,9 @@ See @ref{timer}; @ref{Command line options}; @ref{system}.
 int
 @item @strong{Purpose:}
 shows the nesting level of procedures.
+@item @strong{Note:} 
+@xref{Guidelines for writing a library} for an example how this is used
+for the display of comments while procedures are executed.
 @item @strong{Example:}
 @example
 @c example

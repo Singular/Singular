@@ -76,7 +76,7 @@ usercard.dvi: usercard.tex singcard.tex
 ps: singular.ps usercard.ps
 
 usercard.ps: usercard.dvi
-	${DVIPS} -t landscape $< -o $@
+	${DVIPS} -t landscape -t a4 $< -o $@
 
 %.ps: %.dvi
 	${DVIPS} $< -o $@

@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.72 1998-06-19 14:31:16 gorzel Exp $
+@comment $Id: types.doc,v 1.73 1998-10-26 15:05:48 obachman Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -316,9 +316,10 @@ ideal intersection (see @ref{intersect})
 @item jacob
 ideal of all partial derivatives resp.@: jacobian matrix (see @ref{jacob})
 @item jet
-k-jet: Taylor series up to a given order (see @ref{jet})
+Taylor series up to a given order (see @ref{jet})
 @item kbase
-vector space basis of basering modulo standard basis (see @ref{kbase})
+vector space basis of basering modulo ideal of leading terms
+(see @ref{kbase})
 @item koszul
 Koszul matrix (see @ref{koszul})
 @item lead
@@ -351,7 +352,7 @@ minimal free resolution of an ideal resp.@: module, also minimizing the given id
 @item mstd
 standard basis and minimal generating set of an ideal (see @ref{mstd})
 @item mult
-multiplicity of an ideal resp.@: module (see @ref{mult})
+multiplicity resp. degree of the ideal of leading terms (see @ref{mult})
 @item ncols
 number of columns (see @ref{ncols})
 @item preimage
@@ -384,7 +385,8 @@ substitute a ring variable (see @ref{subst})
 @item syz
 computation of the first syzygy module (see @ref{syz})
 @item vdim
-vector space dimension of basering modulo ideal (see @ref{vdim})
+vector space dimension of basering modulo ideal of leading terms
+(see @ref{vdim})
 @item weight
 optimal weights (see @ref{weight})
 @end table
@@ -549,8 +551,11 @@ exponentiation (exponent must be non-negative)
 comparison
 @end table
 
-@strong{Note:} An assignment @code{j=i++;} or @code{j=i--;} does not change
+@strong{Note:} An assignment @code{j=i++;} or @code{j=i--;} is not allowed,
+in particular it does not change
 the value of @code{j}, see @ref{Limitations}.
+
+@strong{Note:} @code{/} might no longer be available in the future.
 
 @*@strong{Example:}
 @example
@@ -580,7 +585,8 @@ degree of a poly resp.@: vector (see @ref{deg})
 @item det
 determinant (see @ref{det})
 @item dim
-Krull dimension of basering modulo ideal resp.@: module (see @ref{dim})
+Krull dimension of basering modulo ideal resp.@: module of leading terms
+(see @ref{dim})
 @item extgcd
 Bezout representation of gcd (see @ref{extgcd})
 @item find
@@ -592,7 +598,7 @@ Koszul matrix (see @ref{koszul})
 @item memory
 memory usage (see @ref{memory})
 @item mult
-multiplicity of an ideal resp.@: module (see @ref{mult})
+multiplicity of an ideal resp.@: module of leading terms (see @ref{mult})
 @item ncols
 number of columns (see @ref{ncols})
 @item npars
@@ -625,7 +631,7 @@ trace of an integer matrix (see @ref{trace})
 n-th ring variable of the basering (see @ref{var})
 @item vdim
 vector space dimension of basering modulo ideal resp.@: of freemodule modulo
-module (see @ref{vdim})
+module of leading terms (see @ref{vdim})
 @end table
 
 @c ------------------------------
@@ -837,7 +843,7 @@ an identifier of type intmat
 @item
 a function returning intmat
 @item
-intmat operations with int (@code{+}, @code{-}, @code{*}, @code{/}, @code{%})
+intmat operations with int (@code{+}, @code{-}, @code{*}, @code{div}, @code{%})
 @item
 intmat operations (@code{+}, @code{-}, @code{*})
 @item
@@ -883,7 +889,7 @@ diagonal intmat
 multiplication with intmat, intvec, or int; the int is converted into a
 diagonal intmat
 
-@item @code{div, /}
+@item @code{div,/}
 division of entries in the integers (omitting the remainder)
 @item @code{%, mod}
 entries modulo int (remainder of the division)
@@ -1078,7 +1084,7 @@ is an element of the intvec; the first element has index one.
   iv-10;
   iv=iv,0;
   iv;
-  iv/2;
+  iv div 2;
   iv+iv;              // componentwise addition
   iv[size(iv)-1];     // last-1 entry
   intvec iw=2,3,4,0;
@@ -1170,11 +1176,11 @@ none
 @c it first migth be confusing
 @c example
   link l=":w example.txt";
-  int i=22;
+  int i=22;          // cf. ASCII links for explanation
   string s="An int follows:";
   write(l,s,i);
   l;
-  close(l);
+  close(l);          //
   read(l);
   close(l);
 @c example
@@ -1403,14 +1409,18 @@ either for reading or for writing, but not for both at the same time. A
   write (l,1, i, "hello world");// write three expressions
   write(l,4);                   // append one more expression
   close(l);                     // link is closed
+  // open the file for reading now
   read(l);                      // only first expression is read
-  kill r;
+  kill r;                       // no basering active now
   def i = read(l);              // second expression
+  // notice that current ring was set, the name was assigned
+  // automatically
+  listvar(ring);                    
   def s = read(l);              // third expression
-  listvar();                    // notice that current ring was set
+  listvar();
   close(l);                     // link is closed
   dump("MPfile:w example.mp");  // dump everything to example.mp
-  kill i, s;                    // kill everything
+  kill i, s;                    // kill i and s
   getdump("MPfile: example.mp");// get previous dump
   listvar();                    // got all variables and values back
 @c example
@@ -1890,7 +1900,8 @@ For the mapping of coefficients from different fields see @ref{map}.
 none
 
 @item Note:
-There are standard mappings for the identity map: @code{fetch} and @code{imap}.
+There are standard mappings for maps which are close to the identity 
+map: @code{fetch} and @code{imap}.
 
 The name of a map serves as the function which maps objects from the
 preimage_ring into the basering.  These objects must be defined
@@ -1904,7 +1915,9 @@ by names (no evaluation in the preimage ring is possible).
   ring r2=32003,(a,b),dp;
   map f=r1,a,b,a+b;
   // maps from r1 to r2,
-  // x to a, y to b and z to a+b
+  // x -> a
+  // y -> b
+  // z -> a+b
   f(i);
   // operations like f(i[1]) or f(i*i) are not allowed
   ideal i=f(i);
@@ -1913,7 +1926,9 @@ by names (no evaluation in the preimage ring is possible).
   map phi = g(f);
   // composition of map f and g
   // maps from r1 to r2,
-  // x to a2, y to b2, z to a2+b2
+  // x -> a2
+  // y -> b2
+  // z -> a2+b2
   phi(i);
 @c example
 @end example
@@ -2030,7 +2045,7 @@ If the size is omitted a 1x1 matrix is created.
   poly f=xyz;
   poly g=z*f;
   ideal i=f,g,g^2;
-  matrix m[ro][3] = 1x3y4, 0, i, f ; // a 3 x 3 matrix
+  matrix m[ro][3] = x3y4, 0, i, f ; // a 3 x 3 matrix
   m;
   print(m);
   matrix A;   // the 1 x 1 zero matrix
@@ -2217,7 +2232,7 @@ v_1, @dots{}, v_k
 @tex
 $v_1, \ldots, v_k$
 @end tex
-which generate M.
+which generate M (cf. @ref{Representation of mathematical objects}).
 
 @menu
 * module declarations::
@@ -2352,10 +2367,10 @@ interreduction of a module (see @ref{interred})
 @item intersect
 module intersection (see @ref{intersect})
 @item jet
-k-jet: Taylor series up to a given order (see @ref{jet})
+Taylor series up to a given order (see @ref{jet})
 @item kbase
-vector space basis of free module over the basering modulo standard basis
-(see @ref{kbase})
+vector space basis of free module over the basering modulo the module of 
+leading terms (see @ref{kbase})
 @item lead
 initial module (see @ref{lead})
 @item lift
@@ -2380,7 +2395,7 @@ $(h1+h2)/h1=h2/(h1 \cap h2)$
 minimal free resolution of an ideal resp.@: module, also minimizing the given module
 (see @ref{mres})
 @item mult
-multiplicity of a module (see @ref{mult})
+multiplicity resp. degree of the module of leading terms (see @ref{mult})
 @item ncols
 number of columns (see @ref{ncols})
 @item nrows
@@ -2413,7 +2428,8 @@ substitute a ring variable (see @ref{subst})
 @item syz
 computation of the first syzygy module (see @ref{syz})
 @item vdim
-vector space dimension of free module over the basering modulo module (see @ref{vdim})
+vector space dimension of free module over the basering modulo module 
+of leading terms (see @ref{vdim})
 @item weight
 "optimal" weights (see @ref{weight})
 @end table
@@ -2500,7 +2516,10 @@ a type cast to number
 @*@strong{Example:}
 @example
 @c example
-  2 / 3, 4/ 8,  2 /2; // are in any ring int expressions
+  // the following expressions are in any ring int expressions 
+  2 / 3;
+  4/ 8;  
+  2 /2;   // the notation of / for div might change in the future
   ring r0=0,x,dp;
   2/3, 4/8, 2/2 ; // are numbers
 
@@ -2678,9 +2697,9 @@ a type cast to poly
 2x, x3, 2x2y3, xyz, 2xy2; //  are monomials
 2*x, x^3, 2*x^2*y^3, x*y*z, 2*x*y^2; // are poly expressions
 2*x(1); // is a valid poly expression, but not 2x(1) (a syntax error)
-2*x^3;  //  is a valid poly expression equal to 2x3 (a valid monomial)
-        // but not equal to 2x^3
-        // which will be interpreted as (2x)^3
+2*x^3;  // is a valid poly expression equal to 2x3 (a valid monomial)
+        // but not equal to 2x^3 which will be interpreted as (2x)^3
+        // since 2x is a monomial
 @c example
   ring r=0,(x,y),dp;
   poly f = 10x2y3 +2x2y2-2xy+y -x+2;
@@ -2720,7 +2739,7 @@ division by a monomial, non divisible terms yield 0
 power by an integer
 
 @item @code{<}, @code{<=}, @code{>}, @code{>=}, @code{==}, @code{<>}
-comparison
+comparison (of leading terms w.r.t. monomial ordering)
 
 @item poly_expression @code{[} intvec_expression @code{]}
 the monomial at the indicated place w.r.t.@: the monomial order
@@ -2777,7 +2796,7 @@ factorize polynomial (see @ref{factorize})
 @item finduni
 find univariate polynomials in a zero dimensional ideal (see @ref{finduni})
 @item gcd
-greates common division (see @ref{gcd})
+greatest common divisor (see @ref{gcd})
 @item homog
 homogenization (see @ref{homog})
 @item jacob
@@ -2913,7 +2932,7 @@ See
 
 @sc{Singular} offers the opportunity to calculate in quotient rings
 (factor rings), i.e., rings modulo an ideal.  The ideal has to be given
-in form of a standard basis.  For a detailed description of the concept
+as a standard basis.  For a detailed description of the concept
 of rings and quotient rings see @ref{Rings and orderings}.
 
 @menu
@@ -2938,6 +2957,15 @@ none
 @item Purpose:
 declares a quotient ring as the basering modulo ideal_expression.  Sets
 it as current basering.
+@item Example:
+@example
+@c example
+ring r=0,(x,y,z),dp;
+ideal i=xy;
+qring q=std(i);
+basering;
+@c example
+@end example
 @end table
 
 @c ---------------------------------------
@@ -2953,7 +2981,7 @@ and modules, a resolution can only be defined w.r.t.@: a basering.
 
 @strong{Note:}
 to access the elements of a resolution, it has to be assigned to a list,
-which also complete computations and may therefore take time,
+which also completes computations and may therefore take time,
 (resp.@: an access directly with the brackets @code{[ , ]} causes
 implicitly a cast to a list).
 
@@ -3099,7 +3127,7 @@ weight vector given as an intvec_expression in parentheses.
 @end enumerate
 
 For the definition of the orderings, see @ref{Term orderings},
-@ref{Mathematical background}.
+@ref{Monomial orderings}.
 
 If one of coefficient_field, names_of_ring_variables, and ordering
 consists of only one entry, the parentheses around this entry may be
@@ -3242,6 +3270,10 @@ s[2,4];
 "abcd"[2,2];
 // string_expression[position] : a character from a string
 s[3];
+// string_expression[position..position] :
+// a substring starting at the first position up to the second
+// given position
+s[2..4];
 // a function returning a string
 typeof(s);
 @c example
@@ -3298,7 +3330,7 @@ is a expression list of characters from the string
 @item charstr
 description of the coeffinet field of a ring (see @ref{charstr})
 @item execute
-interpret string as command (see @ref{execute})
+executing string as command (see @ref{execute})
 @item find
 position of a substring in a string (see @ref{find})
 @item names
@@ -3344,6 +3376,7 @@ can only be defined or accessed with respect to this basering.
 @code{f*gen(1)+g*gen(3)+gen(4)} may also be written as @code{[f,0,g,1]}
 or as @code{[f,0,g,1,0]}.). Note that the elements of a vector have to be
 surrounded by square brackets (@code{[}  , @code{]}).
+(cf. @ref{Representation of mathematical objects}) 
 
 @menu
 * vector declarations::
@@ -3439,7 +3472,7 @@ negation or subtraction
 division by a monomial, not divisible terms yield 0
 
 @item @code{<}, @code{<=}, @code{>}, @code{>=}, @code{==}, @code{<>}
-comparison
+comparison of leading terms w.r.t. monomial ordering
 
 @item vector_expression @code{[} int_expressions @code{]}
 is a vector entry; the index 1 gives the first entry.
