@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.24 1998-05-14 16:12:19 obachman Exp $
+@comment $Id: singular.doc,v 1.25 1998-05-14 18:59:38 Singular Exp $
 @comment this file contains the main structure of the manual
 @c ------------------------
 @comment %**start of header
@@ -348,7 +348,7 @@ ring-dependent value (like a polynom or module).
 @c example
 proc def_return
 {
-  ring r;
+  ring r=0,(x,y),dp;
   poly p = x;
   keepring r;
   return (x);
@@ -485,7 +485,7 @@ be kept in mind. Otherwise, surprising results may come up.
 
 @example
 @c example
-ring r;
+ring r=0,(x,y),dp;
 int x;
 x*y; // resolved product int*poly, i.e. 0*y 
 xy; // "xy" is one identifier and resolved to monom xy
