@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.60 1998-05-20 09:00:42 schmidt Exp $
+@comment $Id: types.doc,v 1.61 1998-05-20 10:55:22 schmidt Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -2840,8 +2840,9 @@ library file) makes this procedure local to the library.
 @cindex qring
 
 @sc{Singular} offers the opportunity to calculate in quotient rings
-(factor rings), i.e., rings modulo an ideal. The ideal has to be given
-in form of a standard basis.
+(factor rings), i.e., rings modulo an ideal.  The ideal has to be given
+in form of a standard basis.  For a detailed description of the concept
+of rings and quotient rings see @ref{Rings and orderings}.
 
 @menu
 * qring declaration::
@@ -2860,35 +2861,11 @@ in form of a standard basis.
 @table @strong
 @item Syntax:
 @code{qring} name @code{=} ideal_expression @code{;}
-@item Purpose:
-defines a quotient ring as the basering modulo an ideal.
-
-The ideal must be a standard basis. The qring command performs a change
-of the basering to this new ring.
-
 @item Default:
 none
-
-@item Note:
-In a qring, polynomials are not immediately reduced with respect
-to the quotient ring. It will be calculated as long as possible with the
-input as representing objects of their class in the qring.
-
-@item Example:
-@example
-@c example
-  ring r1=32003,(x,y,z),dp;
-  ideal i=std(ideal(x,y));
-  qring q=i;
-  basering;
-  std(ideal(x+y,x+y+z,z));
-  poly  f= x2 +y + 1;
-  poly g = x+y+z;
-  f,g;
-  f+g;               // not reduced w.r.t to the quotient
-  std(_);            // reduction 
-@c example
-@end example
+@item Purpose:
+declares a quotient ring as the basering modulo ideal_expression.  Sets
+it as current basering.
 @end table
 
 @c ---------------------------------------
@@ -3003,74 +2980,58 @@ For a detailed description of the concept of rings see
 * ring related functions::
 @end menu
 
-@c ---------------------------------------
 @node ring declarations, ring related functions, ring, ring
 @subsection ring declarations
 @cindex ring declarations
 
-@c ------------------------------------------------------------
-@c   This piece of text exists also in the file general.doc,
-@c   chapter "General syntax of a ring declaration".
-@c   If you change something here, change it there, too!
-@c ------------------------------------------------------------
+@c ---------------------------------------
 @table @strong
 @item Syntax:
-@code{ring} name @code{=} field@code{,}
-@code{(} names_of_ring_variables @code{),}
-@code{(} ordering @code{);}
+@code{ring} name @code{=} coefficient_field@code{,}
+  @code{(} names_of_ring_variables @code{),}
+  @code{(} ordering @code{);}
 @item Default:
 @code{32003,(x,y,z),(dp,C);}
 @item Purpose:
-defines a basering for polynomials, ideals, vectors, modules, resolutions
-and matrices and sets it as the actual basering.
+declares a ring and sets it as the actual basering.
+@end table
 
-The coefficient field is given by either
+The coefficient_field is given by one of the following:
 @enumerate
 @item
-the characteristic (0 or a prime <= 32003)
+a non-negative int_expression less or equal 32003.
 @item
-an expression_list of the characteristic and
-the names of parameters
+an expression_list of an int_expression and one or more names.
 @item
-an expression_list of the number of elements
-(a small prime characteristic p to the power of a small exponent n) and a
-name for a primitive element
-@item
-@code{real}
+the name @code{real}.
 @end enumerate
 
-The names of ring variables are like variable names (comma separated).
+The names_of_ring_variables is a list of names or indexed names.
 
-The ordering is a list of blockorderings which have an order keyword and
-a weight vector or an optional size.
+The ordering is a list of block orderings where each block ordering is either
 
-Possible order keywords are:
-@itemize @bullet
-@item @code{lp}, @code{dp}, @code{Dp}, @code{ls}, @code{ds}, @code{Ds}, @code{M}
-with optional size parameter
+@enumerate
+@item
+@code{lp}, @code{dp}, @code{Dp}, @code{ls}, @code{ds}, or @code{Ds}
+optionally followed by a size parameter in parentheses.
 
-@item @code{wp}, @code{Wp}, @code{ws}, @code{Ws}
-with weight vector
+@item
+@code{wp}, @code{Wp}, @code{ws}, @code{Ws}, or @code{a} followed by a
+weight vector given as an intvec_expression in parentheses.
 
-@item @code{c}, @code{C}
-for components orders
+@item
+@code{M} followed by an intmat_expresion in parantheses.
 
-@end itemize
+@item
+@code{c} or @code{C}.
+@end enumerate
 
-If one element of the list consists of only one entry, the parentheses may
-be omitted.
+For the definition of the orderings, see @ref{Term orderings},
+@ref{Mathematical background}.
 
-@item Example:
-@example
-@c example
-  ring r=0,(a,b,c,d),dp;
-  r;
-  ring ri=(0,i),(x),lp;     // polynomial ring over the gaussian numbers
-  minpoly = i2+1;
-  ri;
-@c example
-@end example
-@end table
+If one of coefficient_field, names_of_ring_variables, and ordering
+consists of only one entry, the parentheses around this entry may be
+omitted.
 
 @c ---------------------------------------
 @node ring related functions,  , ring declarations, ring
