@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: mondromy.lib,v 1.3 1999-06-22 15:38:54 mschulze Exp $";
+version="$Id: mondromy.lib,v 1.4 1999-06-22 15:47:35 mschulze Exp $";
 info="
 LIBRARY: mondromy.lib  PROCEDURES TO COMPUTE THE MONODROMY OF A SINGULARITY
 AUTHOR:  Mathias Schulze, email: mschulze@mathematik.uni-kl.de
@@ -163,7 +163,7 @@ EXAMPLE: example invunit; shows an example.
     int t=timer;
     poly v=lift(fetch(br,u),1)[1,1];
     dbprint(printlevel-voice+2,"//...inverse computed ["+string(timer-t)+
-      " secs, "+string(memory(1))+" bytes]");
+      " secs, "+string((memory(1)+1023)/1024)+" K]");
 
     setring br;
     return(fetch(qr,v));
@@ -199,7 +199,7 @@ EXAMPLE: example detadj; shows an example.
     int t=timer;
     poly detU=det(U);
     dbprint(printlevel-voice+2,"//...determinant computed ["+string(timer-t)+
-      " secs, "+string(memory(1))+" bytes]");
+      " secs, "+string((memory(1)+1023)/1024)+" K]");
 
     if(detU==0)
     {
@@ -217,7 +217,7 @@ EXAMPLE: example detadj; shows an example.
       t=timer;
       matrix adjU=lift(U,detU*freemodule(nrows(U)));
       dbprint(printlevel-voice+2,"//...adjoint matrix computed ["
-        +string(timer-t)+" secs, "+string(memory(1))+" bytes]");
+        +string(timer-t)+" secs, "+string((memory(1)+1023)/1024)+" K]");
 
       setring br;
       matrix adjU=fetch(pr,adjU);
@@ -267,19 +267,19 @@ EXAMPLE: example jacoblift; shows an example.
   }
   dbprint(printlevel-voice+2,"//kappa="+string(kappa));
   dbprint(printlevel-voice+2,"//...kappa computed ["+string(timer-t)+" secs, "
-    +string(memory(1))+" bytes]");
+    +string((memory(1)+1023)/1024)+" K]");
 
   dbprint(printlevel-voice+2,"//computing xi...");
   t=timer;
   vector xi=lift(jf,fkappa)[1];
   dbprint(printlevel-voice+2,"//...xi computed ["+string(timer-t)+" secs, "
-    +string(memory(1))+" bytes]");
+    +string((memory(1)+1023)/1024)+" K]");
 
   dbprint(printlevel-voice+2,"//computing u...");
   t=timer;
   poly u=(matrix(jf)*xi)[1,1]/fkappa;
   dbprint(printlevel-voice+2,"//...u computed ["+string(timer-t)+" secs, "
-    +string(memory(1))+" bytes]");
+    +string((memory(1)+1023)/1024)+" K]");
 
   return(list(kappa,xi,u));
 }
@@ -364,7 +364,7 @@ static proc incK(poly f,int mu,int K,int deltaK,int N,
   while(codimV(V1+V2,N)<K*mu)
   {
     dbprint(printlevel-voice+2,"//...codimension computed ["+string(timer-t)
-      +" secs, "+string(memory(1))+" bytes]");
+      +" secs, "+string((memory(1)+1023)/1024)+" K]");
 
     deltaP1=getdeltaP1(f,K,N,deltaN);
     V1=pcvladdl(V1,pcvp2cv(P1,N,N+deltaN))+pcvp2cv(deltaP1,0,N+deltaN);
@@ -385,7 +385,7 @@ static proc incK(poly f,int mu,int K,int deltaK,int N,
     t=timer;
   }
   dbprint(printlevel-voice+2,"//...codimension computed ["+string(timer-t)
-    +" secs, "+string(memory(1))+" bytes]");
+    +" secs, "+string((memory(1)+1023)/1024)+" K]");
 
   return(K,N,P1,P2,Pe,V1,V2,Ve);
 }
@@ -425,7 +425,7 @@ static proc MK(poly f,int mu,int kappa,vector xi,poly u,
   int t=timer;
   Vnablae=nablaK(f,kappa,xi,u,N,prevN,Vnablae,e);
   dbprint(printlevel-voice+2,"//...nabla(e) computed ["+string(timer-t)
-    +" secs, "+string(memory(1))+" bytes]");
+    +" secs, "+string((memory(1)+1023)/1024)+" K]");
 
   dbprint(printlevel-voice+2,
     "//lifting nabla(e) to C-basis of H''/t^KH''...");
@@ -436,7 +436,7 @@ static proc MK(poly f,int mu,int kappa,vector xi,poly u,
   t=timer;
   matrix C=lift(W,module(Vnablae[1..size(Vnablae)]));
   dbprint(printlevel-voice+2,"//...nabla(e) lifted ["+string(timer-t)
-    +" secs, "+string(memory(1))+" bytes]");
+    +" secs, "+string((memory(1)+1023)/1024)+" K]");
 
   dbprint(printlevel-voice+2,"//computing e-lift of nabla(e)...");
   t=timer;
@@ -453,7 +453,7 @@ static proc MK(poly f,int mu,int kappa,vector xi,poly u,
     }
   }
   dbprint(printlevel-voice+2,"//...e-lift of nabla(e) computed ["
-    +string(timer-t)+" secs, "+string(memory(1))+" bytes]");
+    +string(timer-t)+" secs, "+string((memory(1)+1023)/1024)+" K]");
 
   return(M,N,Vnablae);
 }
@@ -496,7 +496,7 @@ static proc decmide(matrix M,ideal eM0,list bM0)
     U=syz(M0e)+U;
   }
   dbprint(printlevel-voice+2,"//...U computed ["+string(timer-t)+" secs, "
-    +string(memory(1))+" bytes]");
+    +string((memory(1)+1023)/1024)+" K]");
 
   dbprint(printlevel-voice+2,"//transforming M to U...");
   t=timer;
@@ -504,7 +504,7 @@ static proc decmide(matrix M,ideal eM0,list bM0)
   daU[2]=(1/number(daU[1]))*daU[2];
   M=daU[2]*M*U;
   dbprint(printlevel-voice+2,"//...M transformed ["+string(timer-t)+" secs, "
-    +string(memory(1))+" bytes]");
+    +string((memory(1)+1023)/1024)+" K]");
 
   dbprint(printlevel-voice+2,
     "//computing integer differences of eigenvalues of M0...");
@@ -540,7 +540,7 @@ static proc decmide(matrix M,ideal eM0,list bM0)
   }
   dbprint(printlevel-voice+2,
     "//...integer differences of eigenvalues of M0 computed ["+string(timer-t)
-    +" secs, "+string(memory(1))+" bytes]");
+    +" secs, "+string((memory(1)+1023)/1024)+" K]");
 
   dbprint(printlevel-voice+2,"//transforming M...");
   t=timer;
@@ -566,7 +566,7 @@ static proc decmide(matrix M,ideal eM0,list bM0)
     }
   }
   dbprint(printlevel-voice+2,"//...M transformed ["+string(timer-t)+" secs, "
-    +string(memory(1))+" bytes]");
+    +string((memory(1)+1023)/1024)+" K]");
 
   return(M);
 }
@@ -608,7 +608,7 @@ static proc nonqhmonodromy(poly f,int mu,int opt)
   int t=timer;
   e=pcvcv2p(quotV(V1+V2,N),0,N);
   dbprint(printlevel-voice+2,"//...e computed ["+string(timer-t)+" secs, "
-    +string(memory(1))+" bytes]");
+    +string((memory(1)+1023)/1024)+" K]");
 
   dbprint(printlevel-voice+2,"//e=");
   dbprint(printlevel-voice+2,e);
@@ -637,7 +637,7 @@ static proc nonqhmonodromy(poly f,int mu,int opt)
     for(i=mu-1;i>=1&&size(reduce(U,std(prevU)))>0;i--)
     {
       dbprint(printlevel-voice+2,"//...compared with previous lattice ["
-        +string(timer-t)+" secs, "+string(memory(1))+" bytes]");
+        +string(timer-t)+" secs, "+string((memory(1)+1023)/1024)+" K]");
 
       dbprint(printlevel-voice+2,"//increasing K and N...");
       K,N,P1,P2,Pe,V1,V2,Ve=incK(f,mu,K,kappa-1,N,e,P1,P2,Pe,V1,V2,Ve);
@@ -655,13 +655,13 @@ static proc nonqhmonodromy(poly f,int mu,int opt)
       U=interred(jet(module(U)+module(var(1)*diff(U,var(1)))+
         module(mdivp(M*U,var(1)^(kappa-1))),(kappa-1)*(mu-1)));
       dbprint(printlevel-voice+2,"//...lattice enlarged ["+string(timer-t)
-        +" secs, "+string(memory(1))+" bytes]");
+        +" secs, "+string((memory(1)+1023)/1024)+" K]");
 
       dbprint(printlevel-voice+2,"//comparing with previous lattice...");
       t=timer;
     }
     dbprint(printlevel-voice+2,"//...compared with previous lattice ["
-      +string(timer-t)+" secs, "+string(memory(1))+" bytes]");
+      +string(timer-t)+" secs, "+string((memory(1)+1023)/1024)+" K]");
     dbprint(printlevel-voice+2,"//...t*nabla-stable lattice computed");
 
     if(ncols(U)>nrows(U))
@@ -672,7 +672,7 @@ static proc nonqhmonodromy(poly f,int mu,int opt)
       U=minbase(U);
       dbprint(printlevel-voice+2,
         "//...C{f}-basis of t*nabla-stable lattice computed ["+string(timer-t)
-        +" secs, "+string(memory(1))+" bytes]");
+        +" secs, "+string((memory(1)+1023)/1024)+" K]");
     }
 
     U=mdivp(U,var(1)^pcvmindeg(U));
@@ -705,7 +705,7 @@ static proc nonqhmonodromy(poly f,int mu,int opt)
     M=mdivp(daU[2]*(var(1)^kappa*diff(U,var(1))+M*U),
       leadcoef(daU[1])*var(1)^(kappa+pcvmindeg(daU[1])-1));
     dbprint(printlevel-voice+2,"//...M/t^kappa transformed to simple pole ["
-      +string(timer-t)+" secs, "+string(memory(1))+" bytes]");
+      +string(timer-t)+" secs, "+string((memory(1)+1023)/1024)+" K]");
   }
 
   if(opt==0)
@@ -717,7 +717,7 @@ static proc nonqhmonodromy(poly f,int mu,int opt)
     def eM0,bM0=jd[1..2];
     int delta=mid(eM0);
     dbprint(printlevel-voice+2,"//...delta computed ["+string(timer-t)
-      +" secs, "+string(memory(1))+" bytes]");
+      +" secs, "+string((memory(1)+1023)/1024)+" K]");
 
     dbprint(printlevel-voice+2,"//delta="+string(delta));
 
@@ -749,7 +749,7 @@ static proc nonqhmonodromy(poly f,int mu,int opt)
           var(1)^(kappa+pcvmindeg(daU[1])-1));
         dbprint(printlevel-voice+2,
           "//...M/t^kappa transformed to simple pole ["+string(timer-t)
-          +" secs, "+string(memory(1))+" bytes]");
+          +" secs, "+string((memory(1)+1023)/1024)+" K]");
       }
 
       dbprint(printlevel-voice+2,"//decreasing delta...");
@@ -783,7 +783,7 @@ static proc qhmonodromy(poly f,intvec w)
   int t=timer;
   ideal e=kbase(std(jacob(f)));
   dbprint(printlevel-voice+2,"//...e computed ["+string(timer-t)+" secs, "
-    +string(memory(1))+" bytes]");
+    +string((memory(1)+1023)/1024)+" K]");
 
   dbprint(printlevel-voice+2,
     "//computing Milnor number mu and quasihomogeneous degree d...");
@@ -864,7 +864,7 @@ EXAMPLE: example monodromy; shows an example.
     int t=timer;
     int mu=milnor(f);
     dbprint(printlevel-voice+2,"//...mu computed ["+string(timer-t)+" secs, "
-      +string(memory(1))+" bytes]");
+      +string((memory(1)+1023)/1024)+" K]");
 
     dbprint(printlevel-voice+2,"//mu="+string(mu));
 
@@ -952,7 +952,7 @@ EXAMPLE: example H''basis; shows an example.
     int t=timer;
     int mu=milnor(f);
     dbprint(printlevel-voice+2,"//...mu computed ["+string(timer-t)+" secs, "
-      +string(memory(1))+" bytes]");
+      +string((memory(1)+1023)/1024)+" K]");
 
     dbprint(printlevel-voice+2,"//mu="+string(mu));
 
@@ -1004,7 +1004,7 @@ EXAMPLE: example H''basis; shows an example.
       t=timer;
       e=pcvcv2p(quotV(V1+V2,N),0,N);
       dbprint(printlevel-voice+2,"//...e computed ["+string(timer-t)+" secs, "
-        +string(memory(1))+" bytes]");
+        +string((memory(1)+1023)/1024)+" K]");
 
       dbprint(printlevel-voice+2,"//e=");
       dbprint(printlevel-voice+2,e);
