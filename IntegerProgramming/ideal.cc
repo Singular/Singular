@@ -15,7 +15,7 @@
 
 #ifdef SUPPORT_DRIVEN_METHODS_EXTENDED
 
-ideal::create_subset_tree()
+void ideal::create_subset_tree()
 {
   for(short i=0;i<Number_of_Lists;i++)
   {
@@ -56,7 +56,7 @@ ideal::create_subset_tree()
   }
 }
 
-ideal::destroy_subset_tree()
+void ideal::destroy_subset_tree()
 {
   for(short i=0;i<Number_of_Lists;i++)
     delete[] S.subsets_of_support[i];

@@ -132,8 +132,8 @@ private:
 
 #ifdef SUPPORT_DRIVEN_METHODS_EXTENDED
 
-  create_subset_tree();
-  destroy_subset_tree();
+  void create_subset_tree();
+  void destroy_subset_tree();
 
 #endif  // SUPPORT_DRIVEN_METHODS_EXTENDED
 
