@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gring.h,v 1.14 2002-12-06 20:51:42 levandov Exp $ */
+/* $Id: gring.h,v 1.15 2003-01-29 16:04:18 levandov Exp $ */
 /*
 * ABSTRACT additional defines etc for --with-plural
 */
@@ -20,8 +20,15 @@ poly nc_p_Minus_mm_Mult_qq(poly p, const poly m, poly q, const ring r);
 poly nc_mm_Mult_p(const poly m, poly p, const ring r);
 poly nc_mm_Mult_nn (Exponent_t *F, Exponent_t *G, const ring r); 
 poly nc_mm_Mult_uu (Exponent_t *F,int jG,int bG, const ring r);
-poly nc_uu_Mult_ww (int i, int a, int j, int b, const ring r);
+
+#define nc_uu_Mult_ww nc_uu_Mult_ww_horvert
+poly nc_uu_Mult_ww_vert (int i, int a, int j, int b, const ring r);
+poly nc_uu_Mult_ww_horvert (int i, int a, int j, int b, const ring r);
+poly nc_uu_Mult_ww_hvdiag (int i, int a, int j, int b, const ring r);
+
+
 poly _nc_p_Mult_q(poly p, poly q, const int copy, const ring r);
+
 //syzygies :
 poly nc_spGSpolyCreate(poly p1, poly p2,poly spNoether, const ring r);
 poly nc_spGSpolyRed(poly p1, poly p2,poly spNoether, const ring r);
@@ -44,6 +51,8 @@ ideal twostd(ideal I);
 
 void nc_kBucketPolyRed(kBucket_pt b, poly p, number *c);
 void nc_PolyPolyRed(poly &b, poly p, number *c);
+
+matrix nc_PrintMat(int a, int b, ring r, int metric);
 
 #else
 // dummy definition to make gcc happy

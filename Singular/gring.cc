@@ -6,7 +6,7 @@
  *  Purpose: p_Mult family of procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.18 2002-12-20 17:16:58 levandov Exp $
+ *  Version: $Id: gring.cc,v 1.19 2003-01-29 16:04:17 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -592,7 +592,7 @@ poly nc_mm_Mult_uu(Exponent_t *F,int jG,int bG, const ring r)
   return (out);
 }
 
-poly nc_uu_Mult_ww (int i, int a, int j, int b, const ring r)
+poly nc_uu_Mult_ww_vert (int i, int a, int j, int b, const ring r)
 {
   poly out=pOne();
   number tmp_number=NULL;
@@ -706,6 +706,283 @@ poly nc_uu_Mult_ww (int i, int a, int j, int b, const ring r)
   p_Delete(&y,r);
   t=MATELEM(cMT,a,b);
   return(p_Copy(t,r));  /* as the last computed element was cMT[a,b] */
+}
+
+poly nc_uu_Mult_ww_horvert (int i, int a, int j, int b, const ring r)
+  /* (x_i)^a times (x_j)^b */
+  /* x_i = y,  x_j = x ! */
+{
+  /* Check zero exeptions, (q-)commutativity and should we do something at all?  */
+  assume(a!=0);
+  assume(b!=0);
+  poly out=pOne();
+  if (i<=j)
+  {
+    p_SetExp(out,i,a,r);
+    p_AddExp(out,j,b,r);
+    p_Setm(out,r);
+    return(out);
+  }/* zero exeptions and usual case */
+  /*  if ((a==0)||(b==0)||(i<=j)) return(out); */
+  
+  if (MATELEM(r->nc->COM,j,i)!=NULL)
+    /* commutative or quasicommutative case */
+  {
+    if (r->cf->nIsOne(p_GetCoeff(MATELEM(r->nc->COM,j,i),r))) /* commutative case */
+    {
+      return(out);
+    }     
+    else
+    {
+      number tmp_number=p_GetCoeff(MATELEM(r->nc->COM,j,i),r); /* quasicommutative case */
+      nPower(tmp_number,a*b,&tmp_number);
+      p_SetCoeff(out,tmp_number,r);
+      return(out);
+    }
+  }/* end_of commutative or quasicommutative case */
+  p_Delete(&out,r);
+
+  /* we are here if  i>j and variables do not commute or quasicommute */
+  /* in fact, now a>=1 and b>=1; and j<i */
+  /* now check whether the polynomial is already computed */
+
+  int vik = UPMATELEM(j,i,r->N);
+  int cMTsize=r->nc->MTsize[vik];
+  int newcMTsize=0;
+  if (a>b) {newcMTsize=a;} else {newcMTsize=b;}
+
+  if (newcMTsize<=cMTsize)
+  {
+    if ( MATELEM(r->nc->MT[vik],a,b)!=NULL)
+    {
+      out=p_Copy(MATELEM(r->nc->MT[vik],a,b),r);
+      return (out);
+    }
+  }
+  int k,m;    
+  if (newcMTsize > cMTsize)
+  {
+    number nM = nInit(newcMTsize);
+    number cM = nInit(7);
+    int inM;
+    number nM2 = nDiv(nM,cM);
+    nDelete(&nM);
+    nDelete(&cM);
+    if (nIsZero(nM2))
+    {
+      /* Indicates |nM/cM| > MAXINT */
+      /* Should never get there */
+      WarnS("too big matrix in nc_uu_Mult_ww");
+    }
+    else
+    {
+      inM = nInt(nM2);
+      inM=inM*7;/* 7=DefMTSize in extra.cc */
+      if (inM<newcMTsize) inM=inM+7;
+    }
+    nDelete(&nM2);
+    newcMTsize = inM;
+    //    matrix tmp = (matrix)omAlloc0(inM*inM*sizeof(poly));
+    matrix tmp = mpNew(newcMTsize,newcMTsize);
+     
+    for (k=1;k<=cMTsize;k++)
+    {
+      for (m=1;m<=cMTsize;m++)
+      {
+	if ( MATELEM(r->nc->MT[UPMATELEM(j,i,r->N)],k,m) != NULL )
+	{
+	  MATELEM(tmp,k,m) = MATELEM(r->nc->MT[UPMATELEM(j,i,r->N)],k,m);
+	  //	   omCheckAddr(tmp->m);
+	  MATELEM(r->nc->MT[UPMATELEM(j,i,r->N)],k,m)=NULL;
+	  //	   omCheckAddr(r->nc->MT[UPMATELEM(j,i,r->N)]->m);
+	}
+      }
+    }
+    id_Delete((ideal *)&(r->nc->MT[UPMATELEM(j,i,r->N)]),r);
+    r->nc->MT[UPMATELEM(j,i,r->N)] = tmp;
+    tmp=NULL;
+    r->nc->MTsize[UPMATELEM(j,i,r->N)] = newcMTsize;
+  }  /* The update of multiplication matrix is finished */
+
+  matrix cMT=r->nc->MT[UPMATELEM(j,i,r->N)];         /* cMT=current MT */
+
+  poly x=pOne();p_SetExp(x,j,1,r);p_Setm(x,r);p_Test(x,r); /* var(j); */
+  poly y=pOne();p_SetExp(y,i,1,r);p_Setm(y,r);p_Test(y,r); /*var(i);  for convenience */
+  
+  poly t=NULL;
+
+  int toXY;
+  int toYX;
+
+  if (a==1) /* y*x^b, b>=2 */
+  {
+    toXY=b-1;
+    while ( (MATELEM(cMT,1,toXY)==NULL) && (toXY>=2)) toXY--;
+    for (m=toXY+1;m<=b;m++)
+    {
+      t=MATELEM(cMT,1,m);
+      if (t==NULL)   /* remove after debug */
+      {
+	t = p_Copy(MATELEM(cMT,1,m-1),r);
+	t = nc_p_Mult_mm(t,x,r);
+	MATELEM(cMT,1,m) = t;
+	/*	omCheckAddr(cMT->m); */
+      }
+      else
+      {	  
+	/* Error, should never get there */
+	WarnS("Error: a=1; MATELEM!=0");
+      }
+      t=NULL;
+    }
+    return(p_Copy(MATELEM(cMT,1,b),r));
+  }
+
+  if (b==1) /* y^a*x, a>=2 */
+  {
+    toYX=a-1;
+    while ( (MATELEM(cMT,toYX,1)==NULL) && (toYX>=2)) toYX--;
+    for (m=toYX+1;m<=a;m++)
+    {
+      t=MATELEM(cMT,m,1);
+      if (t==NULL)   /* remove after debug */
+      {
+	t = p_Copy(MATELEM(cMT,m-1,1),r);
+	t = nc_mm_Mult_p(y,t,r);
+	MATELEM(cMT,m,1) = t;
+	/*	omCheckAddr(cMT->m); */
+      }
+      else
+      {	  
+	/* Error, should never get there */
+	WarnS("Error: b=1, MATELEM!=0");
+      }
+      t=NULL;
+    }
+    return(p_Copy(MATELEM(cMT,a,1),r));
+  }
+
+/* ------------ Main Cycles ----------------------------*/
+  /*            a>1, b>1              */
+
+  int dXY=0; int dYX=0;
+  /* dXY = distance for computing x-mult, then y-mult */
+  /* dYX = distance for computing y-mult, then x-mult */
+  int toX=a-1; int toY=b-1; /* toX = to axe X, toY = to axe Y */
+  toXY=b-1; toYX=a-1; 
+  /* if toX==0, toXY = dist. to computed y * x^toXY */
+  /* if toY==0, toYX = dist. to computed y^toYX * x */
+  while ( (MATELEM(cMT,toX,b)==NULL) && (toX>=1)) toX--;
+  if (toX==0) /* the whole column is not computed yet */
+  {
+    while ( (MATELEM(cMT,1,toXY)==NULL) && (toXY>=1)) toXY--;
+    /* toXY >=1 */
+    dXY=b-1-toXY;
+  }
+  dXY=dXY+a-toX; /* the distance to nearest computed y^toX x^b */
+
+  while ( (MATELEM(cMT,a,toY)==NULL) && (toY>=1)) toY--;
+  if (toY==0) /* the whole row is not computed yet */
+  {
+    while ( (MATELEM(cMT,toYX,1)==NULL) && (toYX>=1)) toYX--;
+    /* toYX >=1 */
+    dYX=a-1-toYX;
+  }
+  dYX=dYX+b-toY; /* the distance to nearest computed y^a x^toY */
+  
+  if (dYX>=dXY)
+  {
+    /* first x, then y */
+    if (toX==0) /* start with the row*/
+    {
+      for (m=toXY+1;m<=b;m++)
+      {
+	t=MATELEM(cMT,1,m);
+	if (t==NULL)   /* remove after debug */
+	{
+	  t = p_Copy(MATELEM(cMT,1,m-1),r);
+	  t = nc_p_Mult_mm(t,x,r);
+	  MATELEM(cMT,1,m) = t;
+	  /*	omCheckAddr(cMT->m); */
+	}
+	else
+	{	  
+	  /* Error, should never get there */
+	  WarnS("dYX>=dXY,toXY; MATELEM==0");
+	}
+	t=NULL;
+      }
+      toX=1; /* y*x^b is computed */
+    }
+    /* Now toX>=1 */
+    for (k=toX+1;k<=a;k++)
+    {
+      t=MATELEM(cMT,k,b);
+      if (t==NULL)   /* remove after debug */
+      {
+        t = p_Copy(MATELEM(cMT,k-1,b),r);
+        t = nc_mm_Mult_p(y,t,r);
+        MATELEM(cMT,k,b) = t;
+	/*	omCheckAddr(cMT->m); */
+      }
+      else
+      {
+	/* Error, should never get there */
+	WarnS("dYX>=dXY,toX; MATELEM==0");
+      }
+      t=NULL;
+    }
+  } /* endif (dYX>=dXY) */
+
+
+  if (dYX<dXY)
+  {
+    /* first y, then x */
+    if (toY==0) /* start with the column*/
+    {
+      for (m=toYX+1;m<=a;m++)
+      {
+	t=MATELEM(cMT,m,1);
+	if (t==NULL)   /* remove after debug */
+	{
+	  t = p_Copy(MATELEM(cMT,m-1,1),r);
+	  t = nc_mm_Mult_p(y,t,r);
+	  MATELEM(cMT,m,1) = t;
+	  /*	omCheckAddr(cMT->m); */
+	}
+	else
+	{	  
+	  /* Error, should never get there */
+	  WarnS("dYX<dXY,toYX; MATELEM==0");
+	}
+	t=NULL;
+      }
+      toY=1; /* y^a*x is computed */
+    }
+    /* Now toY>=1 */
+    for (k=toY+1;k<=b;k++)
+    {
+      t=MATELEM(cMT,a,k);
+      if (t==NULL)   /* remove after debug */
+      {
+        t = p_Copy(MATELEM(cMT,a,k-1),r);
+        t = nc_p_Mult_mm(t,x,r);
+        MATELEM(cMT,a,k) = t;
+	/*	omCheckAddr(cMT->m); */
+      }
+      else
+      {
+	/* Error, should never get there */
+	WarnS("dYX<dXY,toY; MATELEM==0");
+      }
+      t=NULL;
+    }
+  } /* endif (dYX<dXY) */
+	
+  p_Delete(&x,r);
+  p_Delete(&y,r);
+  t=p_Copy(MATELEM(cMT,a,b),r);
+  return(t);  /* as the last computed element was cMT[a,b] */
 }
 
 
@@ -1138,6 +1415,71 @@ ideal twostd(ideal I)
     idDelete(&id_tmp);
     idSkipZeroes(J);
   }
+}
+
+matrix nc_PrintMat(int a, int b, ring r, int metric)
+  /* returns matrix with the info on noncomm multiplication */
+{
+  
+  if ( (a==b) || !rIsPluralRing(r) ) return(NULL);
+  int i;
+  int j;
+  if (a>b) {j=b; i=a;}
+  else {j=a; i=b;}
+  /* i<j */
+  int size=r->nc->MTsize[UPMATELEM(i,j,r->N)];
+  matrix M = r->nc->MT[UPMATELEM(i,j,r->N)];
+  /*  return(M); */
+  int sizeofres;
+  if (metric==0)
+  {
+    sizeofres=sizeof(int);
+  }
+  if (metric==1)
+  {
+    sizeofres=sizeof(number);
+  }
+  matrix res=mpNew(size,size);
+  int s;
+  int t;
+  int length;
+  long totdeg;
+  poly p;
+  for(s=1;s<=size;s++)
+  {
+    for(t=1;t<=size;t++)
+    {
+      p=MATELEM(M,s,t);
+      if (p==NULL)
+      { 
+	MATELEM(res,s,t)=0;
+      }
+      else
+      {
+	length = pLength(p);
+	if (metric==0) /* length */
+	{	
+	  MATELEM(res,s,t)= p_ISet(length,r);
+	}
+	else if (metric==1) /* sum of deg divided by the length */
+	{
+	  totdeg=0;
+	  while (p!=NULL) 
+	  {
+	    totdeg=totdeg+pDeg(p,r);
+	    pIter(p);
+	  }
+	  number ntd = nInit(totdeg);
+	  number nln = nInit(length);
+	  number nres=nDiv(ntd,nln);
+	  nDelete(&ntd);
+	  nDelete(&nln);
+	  MATELEM(res,s,t)=p_NSet(nres,r);	  
+	}
+      }
+    }
+  }
+  return(res);
 }
 
 #endif

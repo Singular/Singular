@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.191 2002-11-21 13:37:20 Singular Exp $ */
+/* $Id: extra.cc,v 1.192 2003-01-29 16:04:18 levandov Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -1314,6 +1314,40 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 #ifdef HAVE_PLURAL
+/*==================== PrintMat  =================*/
+      if (strcmp(sys_cmd, "PrintMat") == 0)
+      {
+	int a;
+	int b;
+	ring r;
+	int metric;
+	if ((h!=NULL) && (h->Typ()==INT_CMD))
+	{
+	  a=(int)h->CopyD();
+	  h=h->next;
+	}
+	else return TRUE;
+	if ((h!=NULL) && (h->Typ()==INT_CMD))
+	{
+	  b=(int)h->CopyD();
+	  h=h->next;
+	}
+	else return TRUE;
+	if ((h!=NULL) && (h->Typ()==RING_CMD))
+	{
+	  r=(ring)h->Data();
+	  h=h->next;
+	}
+	else return TRUE;
+	if ((h!=NULL) && (h->Typ()==INT_CMD))
+	{
+	  metric=(int)h->CopyD();
+	}
+	res->rtyp=MATRIX_CMD;
+	if (rIsPluralRing(r)) res->data=nc_PrintMat(a,b,r,metric);
+	else res->data=NULL;
+	return FALSE;
+      }
 /*==================== twostd  =================*/
       if (strcmp(sys_cmd, "twostd") == 0)
       {
