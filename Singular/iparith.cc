@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.324 2004-07-21 16:44:33 Singular Exp $ */
+/* $Id: iparith.cc,v 1.325 2004-08-04 16:36:14 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2096,7 +2096,7 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
   int l=0;
   //resolvente r;
   syStrategy r;
-  intvec **weights=NULL;
+  intvec *weights=NULL;
   int wmaxl=maxl;
   ideal u_id=(ideal)u->Data();
 
@@ -2111,10 +2111,27 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
       maxl+1);
     }
   }
+  weights=(intvec*)atGet(u,"isHomog",INTVEC_CMD);
+  if (weights!=NULL)
+  {
+    if (!idTestHomModule(u_id,currQuotient,weights))
+    {
+      WarnS("wrong weights given:");weights->show();PrintLn();
+      weights=NULL;
+    }
+  }
+  intvec *ww=NULL;
+  int add_row_shift=0;
+  if (weights!=NULL)
+  {
+     ww=ivCopy(weights);
+     add_row_shift = ww->min_in();
+     (*ww) -= add_row_shift;
+  }
+
   if ((iiOp == RES_CMD) || (iiOp == MRES_CMD))
   {
-    intvec * iv=(intvec*)atGet(u,"isHomog");
-    r=syResolution(u_id,maxl, iv, iiOp==MRES_CMD);
+    r=syResolution(u_id,maxl, ww, iiOp==MRES_CMD);
   }
   else if (iiOp==SRES_CMD)
   //  r=sySchreyerResolvente(u_id,maxl+1,&l);
@@ -2138,7 +2155,7 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
     (!idHomIdeal (u_id,NULL)))
     {
        WerrorS
-       ("`lres` not implemented for inhomogeneous input or qring");
+       ("`kres` not implemented for inhomogeneous input or qring");
        return TRUE;
     }
     r=syKosz(u_id,&dummy);
@@ -2159,6 +2176,20 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
   //res->data=(void *)liMakeResolv(r,l,wmaxl,u->Typ(),weights);
   r->list_length=wmaxl;
   res->data=(void *)r;
+  if (ww!=NULL) { delete ww; ww=NULL; }
+  if ((r->weights!=NULL) && (r->weights[0]!=NULL))
+  { 
+    ww=ivCopy(r->weights[0]);
+    if (weights!=NULL) (*ww) += add_row_shift;
+    atSet(res,omStrDup("isHomog"),ww,INTVEC_CMD);
+  }
+  else if (atGet(res,"isHomog",INTVEC_CMD)==NULL)
+  {
+    if (weights!=NULL)
+    {
+      atSet(res,omStrDup("isHomog"),ivCopy(weights),INTVEC_CMD);
+    }
+  }
   return FALSE;
 }
 static BOOLEAN jjRSUM(leftv res, leftv u, leftv v)
@@ -4560,6 +4591,7 @@ static BOOLEAN jjRANDOM_Im(leftv res, leftv u, leftv v, leftv w)
   int i=(int)u->Data();
   int r=(int)v->Data();
   int c=(int)w->Data();
+  if ((r<=0) || (c<=0)) return TRUE;
   intvec *iv = new intvec(r, c, 0);
   if (iv->rows()==0)
   {
