@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.2 2004-01-09 10:42:11 Singular Exp $ */
+/* $Id: polys1.cc,v 1.3 2004-03-25 21:16:47 levandov Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -322,6 +322,20 @@ poly pPower(poly p, int i)
         }
         else
         {
+#ifdef HAVE_PLURAL
+	  if (rIsPluralRing(currRing)) /* in the NC case nothing helps :-( */
+	  {
+	    int j=i;
+	    rc = pCopy(p);
+	    while (j>1)
+	    {
+	      rc = pMult(pCopy(p),rc);
+	      j--;
+	    }
+	    pDelete(&p);
+	    return rc;
+	  }
+#endif
           rc = pNext(p);
           if (rc == NULL)
             return pMonPower(p,i);
