@@ -1,12 +1,11 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_rat.cc,v 1.3 1997-06-19 12:22:27 schmidt Exp $ */
+/* $Id: int_rat.cc,v 1.4 1997-09-09 09:03:37 schmidt Exp $ */
 
 #include <config.h>
 
 #include "assert.h"
 
 #include "cf_defs.h"
-#include "cf_globals.h"
 #include "int_rat.h"
 #include "int_int.h"
 #include "imm.h"

@@ -1,12 +1,11 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_primes.cc,v 1.5 1997-06-19 12:24:11 schmidt Exp $ */
+/* $Id: cf_primes.cc,v 1.6 1997-09-09 09:03:28 schmidt Exp $ */
 
 #include <config.h>
 
 #include "assert.h"
 
 #include "cf_defs.h"
-#include "cf_globals.h"
 #include "cf_primes.h"
 #include "cf_primetab.h"
 

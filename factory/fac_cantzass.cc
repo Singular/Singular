@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_cantzass.cc,v 1.2 1997-06-19 12:23:43 schmidt Exp $ */
+/* $Id: fac_cantzass.cc,v 1.3 1997-09-09 09:03:31 schmidt Exp $ */
 
 #include <config.h>
 
@@ -8,7 +8,6 @@
 #include "assert.h"
 
 #include "cf_defs.h"
-#include "cf_globals.h"
 #include "cf_random.h"
 #include "cf_util.h"
 #include "fac_cantzass.h"
