@@ -5229,6 +5229,7 @@ cat >> $CONFIG_STATUS <<EOF
 EOF
 cat >> $CONFIG_STATUS <<\EOF
 \
+ cp mod2.h ../kernel/mod2.h; \
  if test "$CONFIG_HEADERS"; then echo timestamp > stamp-h; fi
 exit 0
 EOF

@@ -878,4 +878,5 @@ if test "$ac_cv_singuname" = "ix86-Win"; then
 fi
 
 AC_OUTPUT(${OUTPUT_MAKEFILES}, \
+ cp mod2.h ../kernel/mod2.h; \
  if test "$CONFIG_HEADERS"; then echo timestamp > stamp-h; fi)
