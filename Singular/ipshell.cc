@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.42 1999-06-25 13:12:49 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.43 1999-07-05 13:52:06 obachman Exp $ */
 /*
 * ABSTRACT:
 */
@@ -416,7 +416,7 @@ void test_cmd(int i)
       ii= -i;
       if (Sy_bit(ii) & kOptions)
       {
-        Warn("use the option command");
+        Warn("Gerhard, use the option command");
         test &= ~Sy_bit(ii);
       }
       else if (Sy_bit(ii) & validOpts)
@@ -426,7 +426,7 @@ void test_cmd(int i)
     {
       if (Sy_bit(ii) & kOptions)
       {
-        Warn("use the option command");
+        Warn("Gerhard, use the option command");
         test |= Sy_bit(ii);
       }
       else if (Sy_bit(ii) & validOpts)
