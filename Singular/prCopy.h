@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: prCopy.h,v 1.2 2000-12-31 15:14:43 obachman Exp $ */
+/* $Id: prCopy.h,v 1.3 2002-01-19 13:06:03 obachman Exp $ */
 /*
 * ABSTRACT - declarations of functions for Copy/Move/Delete for Polys
 */
@@ -9,24 +9,30 @@
 
 /*************************************************************************
  *
- * MoveR, CopyR, DeleteR, HeadR, SortR
- * Assume: ideal/poly from ring r
- *         Coeff(r) == Coeff(currRing)
- * Move, Delete: input object is destroyed and set to NULL
- *
+ * MoveR, CopyR, ShallowCopyR: operations to get ideals/polys
+ *                             from source_r to dest_r where
+ *  - Coeff(source_r) == Coeff(dest_r)
+ *  - dest_r->N <= source_r->N
+ * Move:        input is destroyed
+ * ShallowCopy: monomials are copied, coeffs are set
+ * Copy:        monomials and coeffs are copied
  *
  ************************************************************************/
-poly prMoveR_NoSort(poly &p, ring r);
-poly prMoveR(poly &p, ring r);
-poly prCopyR_NoSort(poly p, ring r);
-poly prCopyR(poly p, ring r);
-poly prHeadR(poly p, ring r);
+poly prMoveR_NoSort(poly &p, ring r, ring dest_r = currRing);
+poly prMoveR(poly &p, ring r, ring dest_r = currRing);
+poly prCopyR_NoSort(poly p, ring r, ring dest_r = currRing);
+poly prCopyR(poly p, ring r, ring dest_r = currRing);
+poly prShallowCopyR_NoSort(poly p, ring r, ring dest_t = currRing);
+poly prShallowCopyR(poly p, ring r, ring dest_t = currRing);
+poly prHeadR(poly p, ring r, ring dest_r = currRing);
 
-ideal idrMoveR_NoSort(ideal &id, ring r);
-ideal idrMoveR(ideal &id, ring r);
-ideal idrCopyR_NoSort(ideal id, ring r);
-ideal idrCopyR(ideal id, ring r);
-ideal idrHeadR(ideal id, ring r);
+ideal idrMoveR_NoSort(ideal &id, ring r, ring dest_r = currRing);
+ideal idrMoveR(ideal &id, ring r, ring dest_r = currRing);
+ideal idrCopyR_NoSort(ideal id, ring r, ring dest_r = currRing);
+ideal idrCopyR(ideal id, ring r, ring dest_r = currRing);
+ideal idrShallowCopyR_NoSort(ideal id, ring r, ring dest_r = currRing);
+ideal idrShallowCopyR(ideal id, ring r, ring dest_r = currRing);
+ideal idrHeadR(ideal id, ring r, ring dest_r = currRing);
 
 
 
