@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_base.cc,v 1.19 2000-02-29 18:15:54 Singular Exp $ */
+/* $Id: mpr_base.cc,v 1.20 2000-03-01 14:00:05 Singular Exp $ */
 
 /*
  * ABSTRACT - multipolynomial resultants - resultant matrices
@@ -387,7 +387,7 @@ void print_matrix( matrix omat )
     for ( j= 1; j <= MATCOLS( omat ); j++ )
     {
       if ( (MATELEM( omat, i, j)!=NULL)
-      && (!nIsZero(pGetCoeff( MATELEM( omat, i, j)) ) )
+      && (!nIsZero(pGetCoeff( MATELEM( omat, i, j)))))
       {
         val= nInt(pGetCoeff( MATELEM( omat, i, j) ));
         if ( i==MATROWS(omat) && j==MATCOLS(omat) )
