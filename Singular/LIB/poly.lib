@@ -1,10 +1,10 @@
-// $Id: poly.lib,v 1.13 1998-05-14 18:45:11 Singular Exp $
+// $Id: poly.lib,v 1.14 1998-05-19 18:08:26 obachman Exp $
 //system("random",787422842);
 //(GMG, last modified 22.06.96)
 //(obachman: 17.12.97 -- added katsura)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: poly.lib,v 1.13 1998-05-14 18:45:11 Singular Exp $";
+version="$Id: poly.lib,v 1.14 1998-05-19 18:08:26 obachman Exp $";
 info="
 LIBRARY:  poly.lib      PROCEDURES FOR MANIPULATING POLYS, IDEALS, MODULES
 
@@ -58,21 +58,37 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc katsura
-"USAGE: katsura([n]); n integer
-RETURN: katsura(n) : n-th katsura ideal of newly created and set ring
-                     (32003, x(0..n), dp)
+"USAGE: katsura([n]): n integer
+RETURN: katsura(n) : n-th katsura ideal of 
+                      (1) newly created and set ring (32003, x(0..n), dp), if 
+                          nvars(basering) < n
+                      (2) basering, if nvars(basering) >= n
         katsura()  : katsura ideal of basering
 EXAMPLE: example katsura; shows examples
 "
 {
+  int n;
   if ( size(#) == 1 && typeof(#[1]) == "int")
   {
-    ring katsura_ring = 32003, x(0..#[1]), dp;
-    keepring katsura_ring;
+    n = #[1] - 1;
+    while (1)
+    {
+      if (defined(basering))
+      {
+        if (nvars(basering) >= #[1]) {break;}
+      }
+      ring katsura_ring = 32003, x(0..#[1]), dp;
+      keepring katsura_ring;
+      break;
+    }
   }
+  else
+  {
+    n = nvars(basering) -1;
+  }
+  
   ideal s;
   int i, j;
-  int n = nvars(basering) -1;
   poly p;
 
   p = -1;
