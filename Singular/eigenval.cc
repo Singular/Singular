@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: eigenval.cc,v 1.12 2002-03-06 16:43:18 mschulze Exp $ */
+/* $Id: eigenval.cc,v 1.13 2002-05-31 09:00:12 Singular Exp $ */
 /*
 * ABSTRACT: eigenvalues of constant square matrices
 */
@@ -291,7 +291,7 @@ lists evEigenvals(matrix M)
         if(pGetExp(e0->m[i],1)<2&&pGetExp(pNext(e0->m[i]),1)<2&&
            pNext(pNext(e0->m[i]))==NULL)
 	{
-          number e1=nNeg(pGetCoeff(e0->m[i]));
+          number e1=nNeg(nCopy(pGetCoeff(e0->m[i])));
           if(pGetExp(pNext(e0->m[i]),1)==0)
             e->m[k]=pNSet(nDiv(pGetCoeff(pNext(e0->m[i])),e1));
           else
