@@ -1,9 +1,9 @@
-// $Id: hnoether.lib,v 1.7 1998-05-14 18:45:05 Singular Exp $
+// $Id: hnoether.lib,v 1.8 1998-05-27 10:54:24 Singular Exp $
 // author:  Martin Lamm,  email: lamm@mathematik.uni-kl.de
 // last change:           26.03.98
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: hnoether.lib,v 1.7 1998-05-14 18:45:05 Singular Exp $";
+version="$Id: hnoether.lib,v 1.8 1998-05-27 10:54:24 Singular Exp $";
 info="
 LIBRARY:  hnoether.lib   PROCEDURES FOR THE HAMBURGER-NOETHER-DEVELOPMENT
 
@@ -18,36 +18,35 @@ LIBRARY:  hnoether.lib   PROCEDURES FOR THE HAMBURGER-NOETHER-DEVELOPMENT
  generators(hne);    computes the generators of the semigroup of values
  intersection(hne1,hne2); intersection multiplicity of two curves
  stripHNE(hne);      reduce amount of memory consumed by hne
-
-           perhaps useful procedures:
- puiseux2generators(m,n); convert puiseux pairs to generators of semigroup
- multiplicities(hne);     multiplicities of blowed up curves
- newtonpoly(f);      newtonpolygon of polynom f
- newtonhoehne(f);    same as newtonpoly, but uses internal procedure
- getnm(f);           intersection points of the Newton-polygon with the axes
- T_Transform(f,Q,N); returns f(y,xy^Q)/y^NQ (type f(x,y): poly, Q,N: int)
- T1_Transform(f,d,M); returns f(x,y+d*x^M)  (type f(x,y): poly,d:number,M:int)
- T2_Transform(f,d,M,N);   a composition of T1 & T
- koeff(f,I,J);       gets coefficient of indicated monomial of poly f (I,J:int)
- redleit(f,S,E);     restriction of monomials of f to line (S-E)
- squarefree(f);      returns a squarefree divisor of the poly f
- allsquarefree(f,l); returns the maximal squarefree divisor of the poly f
- set_list(L,v,l);    managing interconnected lists
-
-           procedures (more or less) for internal use:
- leit(f,n,m);        special case of redleit (for irred. polynomials)
- testreducible(f,n,m); tests whether f is reducible
- polytest(f);        tests coefficients and exponents of poly f
- charPoly(f,M,N);    characteristic polynomial of f
- find_in_list(L,p);  find int p in list L
- get_last_divisor(M,N); last divisor in Euclid's algorithm
- factorfirst(f,M,N); try to factor f in a trivial way before using 'factorize'
- extrafactor(f,M,N); try to factor charPoly(f,M,N) where 'factorize' cannot
- extractHNEs(H,t);   extracts output H of HN to output of reddevelop
- HN(f,grenze);       recursive subroutine for reddevelop
- constructHNEs(...); subroutine for HN
 ";
-
+////////////////////////////////////////////////////////////////////////////
+//           perhaps useful procedures:
+// puiseux2generators(m,n); convert puiseux pairs to generators of semigroup
+// multiplicities(hne);     multiplicities of blowed up curves
+// newtonpoly(f);      newtonpolygon of polynom f
+// newtonhoehne(f);    same as newtonpoly, but uses internal procedure
+// getnm(f);           intersection points of the Newton-polygon with the axes
+// T_Transform(f,Q,N); returns f(y,xy^Q)/y^NQ (type f(x,y): poly, Q,N: int)
+// T1_Transform(f,d,M); returns f(x,y+d*x^M)  (type f(x,y): poly,d:number,M:int)
+// T2_Transform(f,d,M,N);   a composition of T1 & T
+// koeff(f,I,J);       gets coefficient of indicated monomial of poly f (I,J:int)
+// redleit(f,S,E);     restriction of monomials of f to line (S-E)
+// squarefree(f);      returns a squarefree divisor of the poly f
+// allsquarefree(f,l); returns the maximal squarefree divisor of the poly f
+// set_list(L,v,l);    managing interconnected lists
+//
+//           procedures (more or less) for internal use:
+// leit(f,n,m);        special case of redleit (for irred. polynomials)
+// testreducible(f,n,m); tests whether f is reducible
+// polytest(f);        tests coefficients and exponents of poly f
+// charPoly(f,M,N);    characteristic polynomial of f
+// find_in_list(L,p);  find int p in list L
+// get_last_divisor(M,N); last divisor in Euclid's algorithm
+// factorfirst(f,M,N); try to factor f in a trivial way before using 'factorize'
+// extrafactor(f,M,N); try to factor charPoly(f,M,N) where 'factorize' cannot
+// extractHNEs(H,t);   extracts output H of HN to output of reddevelop
+// HN(f,grenze);       recursive subroutine for reddevelop
+// constructHNEs(...); subroutine for HN
 ///////////////////////////////////////////////////////////////////////////////
 LIB "primitiv.lib";
 ///////////////////////////////////////////////////////////////////////////////
