@@ -1,8 +1,14 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_map.h,v 1.6 1997-06-30 15:27:51 schmidt Exp $ */
+/* $Id: cf_map.h,v 1.7 1997-07-23 16:25:08 schmidt Exp $ */
 
 #ifndef INCL_CF_MAP_H
 #define INCL_CF_MAP_H
+
+//{{{ docu
+//
+// cf_map.h - header to cf_map.cc.
+//
+//}}}
 
 #include <config.h>
 
@@ -11,15 +17,36 @@
 #endif /* NOSTREAMIO */
 
 #include "variable.h"
+#include "canonicalform.h"
 #ifdef macintosh
 #include <::templates:ftmpl_functions.h>
+#include <::templates:ftmpl_list.h>
 #else
 #include "templates/ftmpl_functions.h"
+#include "templates/ftmpl_list.h"
 #endif
-#include "canonicalform.h"
 
 /*BEGINPUBLIC*/
 
+//{{{ class MapPair
+//{{{ docu
+//
+// class MapPair - stores one mapping pair (Variable -> CanonicalForm).
+//
+// This class is only used to store such pairs.  It has no
+// methods to transform a CanonicalForm as the class CFMap has.
+//
+// V, S: the pair (V -> S)
+//
+//}}}
+//{{{ inline method docu
+//
+// Variable var() const
+// CanonicalForm subst() const
+//
+// var(), subst() - selectors, return V and P, resp.
+//
+//}}}
 class MapPair
 {
 private:
@@ -30,18 +57,32 @@ public:
     MapPair() : V(), S(1) {}
     MapPair( const MapPair & p ) : V(p.V), S(p.S) {}
     ~MapPair() {}
-    MapPair& operator=( const MapPair & p );
+    MapPair& operator = ( const MapPair & p );
     Variable var() const { return V; }
     CanonicalForm subst() const { return S; }
 #ifndef NOSTREAMIO
     friend ostream& operator << ( ostream& s, const MapPair & p );
 #endif /* NOSTREAMIO */
 };
+//}}}
 
 typedef List<MapPair> MPList;
 typedef ListIterator<MapPair> MPListIterator;
 
-
+//{{{ class CFMap
+//{{{ docu
+//
+// class CFMap - class to map canonical forms.
+//
+// Use an object of class CFMap to insert 'values' into canonical
+// form.  Such a mapping is defined by a list of MapPairs (V -> S)
+// describing which canonical form S to insert for variable v.
+// Hereby, the substituted canonical forms are not subject to
+// further substitutions.
+//
+// P: list of MapPairs, sorted by level in descending order
+//
+//}}}
 class CFMap
 {
 private:
@@ -50,17 +91,18 @@ public:
   CFMap() {}
   CFMap( const CanonicalForm & s ) : P( MapPair( Variable(), s ) ) {}
   CFMap( const Variable & v ) : P( MapPair( v, 1 ) ) {}
-  CFMap( const Variable & v, const CanonicalForm & s ) : P( MapPair(v,s) ) {}
+  CFMap( const Variable & v, const CanonicalForm & s ) : P( MapPair( v, s ) ) {}
   ~CFMap() {}
-  CFMap( const List<CanonicalForm> & L );
+  CFMap( const CFList & L );
   CFMap( const CFMap & m ) : P( m.P ) {}
-  CFMap& operator=( const CFMap & m );
+  CFMap & operator = ( const CFMap & m );
   void newpair( const Variable & v, const CanonicalForm & s );
-  CanonicalForm operator() ( const CanonicalForm & f ) const;
+  CanonicalForm operator () ( const CanonicalForm & f ) const;
 #ifndef NOSTREAMIO
-  friend ostream& operator<< ( ostream& s, const CFMap & m );
+  friend ostream& operator << ( ostream& s, const CFMap & m );
 #endif /* NOSTREAMIO */
 };
+//}}}
 
 CanonicalForm compress ( const CanonicalForm & f, CFMap & m );
 void compress ( const CFArray & a, CFMap & M, CFMap & N );
