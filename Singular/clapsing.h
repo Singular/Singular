@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.h,v 1.3 1997-09-16 13:45:30 Singular Exp $
+// $Id: clapsing.h,v 1.4 1997-09-18 14:08:19 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -21,6 +21,7 @@
 
 poly singclap_gcd ( poly f, poly g );
 alg singclap_alglcm ( alg f, alg g );
+void singclap_algdividecontent ( alg f, alg g, alg &ff, alg &gg );
 
 poly singclap_resultant ( poly f, poly g , poly x);
 

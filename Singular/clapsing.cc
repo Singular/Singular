@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.13 1997-09-16 13:45:29 Singular Exp $
+// $Id: clapsing.cc,v 1.14 1997-09-18 14:08:18 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -855,5 +855,36 @@ alg singclap_alglcm ( alg f, alg g )
  }
  Off(SW_RATIONAL);
  return res;
+}
+
+void singclap_algdividecontent ( alg f, alg g, alg &ff, alg &gg )
+{
+  // over Q(a) / Fp(a)
+ if (nGetChar()==1) setCharacteristic( 0 );
+ else               setCharacteristic( -nGetChar() );
+ ff=gg=NULL;
+ if (currRing->minpoly!=NULL)
+ {
+   CanonicalForm mipo=convSingTrClapP(((lnumber)currRing->minpoly)->z);
+   Variable a=rootOf(mipo);
+   CanonicalForm F( convSingAClapA( f,a ) ), G( convSingAClapA( g,a ) );
+   CanonicalForm GCD=gcd( F, G );
+   if (GCD!=1)
+   {
+     ff= convClapASingA( F/ GCD );
+     gg= convClapASingA( G/ GCD );
+   }  
+ }
+ else
+ {
+   CanonicalForm F( convSingTrClapP( f ) ), G( convSingTrClapP( g ) );
+   CanonicalForm GCD=gcd( F, G );
+   if (GCD!=1)
+   {
+     ff= convClapPSingTr( F/ GCD );
+     gg= convClapPSingTr( G/ GCD );
+   }  
+ }
+ Off(SW_RATIONAL);
 }
 #endif

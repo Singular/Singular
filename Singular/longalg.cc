@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.12 1997-09-18 09:58:20 Singular Exp $ */
+/* $Id: longalg.cc,v 1.13 1997-09-18 14:08:19 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -334,7 +334,7 @@ alg napAdd(alg p1, alg p2)
     {
       a = a->ne = a1;
       a1 = a1->ne;
-      if (!a1)
+      if (a1==NULL)
       {
         a->ne= a2;
         break;
@@ -345,7 +345,7 @@ alg napAdd(alg p1, alg p2)
     {
       a = a->ne = a2;
       a2 = a2->ne;
-      if (!a2)
+      if (a2==NULL)
       {
         a->ne = a1;
         break;
@@ -2002,24 +2002,15 @@ void naNormalize(number &pp)
 #ifdef HAVE_FACTORY
   else
   {
-    alg l=singclap_alglcm(x,y);
-    if (napDeg(l)>0)
+    alg xx,yy;
+    singclap_algdividecontent(x,y,xx,yy);
+    if (xx!=NULL)
     {
-      alg h,r;
-      napDivMod(x,l,&h,&r);
-      if (r!=NULL)
-      {
-        WerrorS("internal error (1) while normalizing");
-        p->z=h;
-      }
-      napDivMod(y,l,&h,&r);
-      if (r!=NULL)
-      {
-        WerrorS("internal error (2) while normalizing");
-        p->n=h;
-      }
-    }
-    napDelete(&l);
+      p->z=xx;
+      p->n=yy;
+      napDelete(&x);
+      napDelete(&y);
+    }  
   }
 #endif
   /* remove common factors from z and n */

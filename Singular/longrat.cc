@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.12 1997-08-14 13:10:45 Singular Exp $ */
+/* $Id: longrat.cc,v 1.13 1997-09-18 14:08:20 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -144,34 +144,39 @@ BOOLEAN nlDBTest(number a, char *f,int l)
   }
 #ifdef MDEBUG
   mmDBTestBlock(a,sizeof(*a),f,l);
-#else
+#endif
   if (a->debug!=123456)
   {
     Print("!!longrat:debug:%d in %s:%d\n",a->debug,f,l);
     a->debug=123456;
     return FALSE;
   }
-#endif
   if ((a->s<0)||(a->s>4))
   {
-    Print(" !!longrat:s=%d in %s:%d\n",a->s,f,l);
+    Print("!!longrat:s=%d in %s:%d\n",a->s,f,l);
     return FALSE;
   }
 #ifdef MDEBUG
 #ifdef HAVE_LIBGMP2
   mmDBTestBlock(a->z._mp_d,a->z._mp_alloc*BYTES_PER_MP_LIMB,f,l);
+  if (a->z._mp_alloc==0)
 #else
   mmDBTestBlock(a->z.d,a->z.alloc*BYTES_PER_MP_LIMB,f,l);
+  if(a->z.alloc==0)
 #endif
+    Print("!!longrat:z->alloc=0 in %s:%l\n",f,l);
 #endif
   if (a->s<2)
   {
 #ifdef MDEBUG
 #ifdef HAVE_LIBGMP2
     mmDBTestBlock(a->n._mp_d,a->n._mp_alloc*BYTES_PER_MP_LIMB,f,-l);
+    if (a->z._mp_alloc==0)
 #else
     mmDBTestBlock(a->n.d,a->n.alloc*BYTES_PER_MP_LIMB,f,-l);
+    if(a->z.alloc==0)
 #endif
+      Print("!!longrat:n->alloc=0 in %s:%l\n",f,l);
 #endif
     if (mpz_cmp_si(&a->n,(long)1)==0)
     {

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.5 1997-04-25 15:04:07 obachman Exp $ */
+/* $Id: polys1.cc,v 1.6 1997-09-18 14:08:22 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -905,6 +905,42 @@ void pCleardenom(poly ph)
         pIter(p);
       }
       nDelete(&h);
+      if (nGetChar()==1)
+      {
+        h = nInit(1);
+        p=ph;
+        while (p!=NULL)
+        {
+          d=nLcm(h,pGetCoeff(p));
+          nDelete(&h);
+          h=d;
+          pIter(p);
+        }
+        /* contains the 1/lcm of all denominators */
+        if(!nIsOne(h))
+        {
+          p = ph;
+          while (p!=NULL)
+          {
+            /* should be:
+            * number hh;
+            * nGetDenom(p->coef,&hh);
+            * nMult(&h,&hh,&d);
+            * nNormalize(d);
+            * nDelete(&hh);
+            * nMult(d,p->coef,&hh);
+            * nDelete(&d);
+            * nDelete(&(p->coef));
+            * p->coef =hh;
+            */
+            d=nMult(h,pGetCoeff(p));
+            nNormalize(d);
+            pSetCoeff(p,d);
+            pIter(p);
+          }
+          nDelete(&h);
+        }
+      }
     }
     pContent(ph);
   }

@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapconv.cc,v 1.7 1997-09-16 13:45:28 Singular Exp $
+// $Id: clapconv.cc,v 1.8 1997-09-18 14:08:17 Singular Exp $
 /*
 * ABSTRACT: convert data between Singular and factory
 */
@@ -190,7 +190,9 @@ convSingTrClapP( alg p )
         {
           MP_INT num, den;
           On(SW_RATIONAL);
-          Print("switch to rational\n");
+          #ifdef LDEBUG
+            PrintS("switch to rational\n");
+          #endif
           mpz_init_set( &num, &(napGetCoeff( p )->z) );
           mpz_init_set( &den, &(napGetCoeff( p )->n) );
           term = make_cf( num, den, false );
@@ -199,7 +201,9 @@ convSingTrClapP( alg p )
         { // assume s == 0
           MP_INT num, den;
           On(SW_RATIONAL);
-          Print("switch to rational ?1\n");
+          #ifdef LDEBUG
+            PrintS("switch to rational ?1\n");
+          #endif
           mpz_init_set( &num, &(napGetCoeff( p )->z) );
           mpz_init_set( &den, &(napGetCoeff( p )->n) );
           term = make_cf( num, den, true );
@@ -393,7 +397,9 @@ CanonicalForm convSingAClapA ( alg p , const Variable & a )
         {
           MP_INT num, den;
           On(SW_RATIONAL);
-          Print("switch to rational\n");
+          #ifdef LDEBUG
+            PrintS("switch to rational\n");
+          #endif  
           mpz_init_set( &num, &(napGetCoeff( p )->z) );
           mpz_init_set( &den, &(napGetCoeff( p )->n) );
           term = make_cf( num, den, false );
@@ -402,7 +408,9 @@ CanonicalForm convSingAClapA ( alg p , const Variable & a )
         { // assume s == 0
           MP_INT num, den;
           On(SW_RATIONAL);
-          Print("switch to rational ?2\n");
+          #ifdef LDEBUG
+            PrintS("switch to rational ?2\n");
+          #endif  
           mpz_init_set( &num, &(napGetCoeff( p )->z) );
           mpz_init_set( &den, &(napGetCoeff( p )->n) );
           term = make_cf( num, den, true );
@@ -432,6 +440,10 @@ static number convClapNSingAN( const CanonicalForm &f)
       z->n = gmp_denominator( f );
       z->s = 0;
     }
+    #ifdef LDEBUG
+    z->debug=123456;
+    nlDBTest(z,__FILE__,__LINE__);
+    #endif
     return z;
   }
 }
@@ -466,7 +478,7 @@ CanonicalForm convSingTrPClapP ( poly p )
 
   while ( p!=NULL )
   {
-    nNormalize(&pGetCoeff(p));
+    nNormalize(pGetCoeff(p));
     CanonicalForm term=convSingTrClapP(((lnumber)pGetCoeff(p))->z);
     for ( int i = 1; i <= n; i++ )
     {
