@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: standard.lib,v 1.61 2001-11-05 16:05:08 pfister Exp $";
+version="$Id: standard.lib,v 1.62 2001-11-14 17:15:19 greuel Exp $";
 category="Miscellaneous";
 info="
 LIBRARY: standard.lib   Procedures which are always loaded at Start-up
@@ -1222,7 +1222,7 @@ example
   poly p=y2w9+yz7t-yz5w4-z2w4t4-w8t3;
   factorize(p);  //fast
   system("random",992851262);
-  factorize(p);  //slow
+  //factorize(p);  //slow
   system("random",992851262);
   factorH(p);
 }
