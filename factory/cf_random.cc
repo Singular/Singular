@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_random.cc,v 1.4 1997-07-01 12:35:11 schmidt Exp $ */
+/* $Id: cf_random.cc,v 1.5 1997-10-22 13:44:34 schmidt Exp $ */
 
 #include <config.h>
 
@@ -192,7 +192,10 @@ CFRandom * CFRandomFactory::generate()
 
 int factoryrandom( int n )
 {
-    return ranGen.generate() % n;
+    if ( n == 0 )
+	return (int)ranGen.generate();
+    else
+	return ranGen.generate() % n;
 }
 
 void factoryseed ( int s )
