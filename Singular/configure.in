@@ -402,7 +402,7 @@ AC_ARG_WITH(
   [  --with-lex=[LEX,no]     uses LEX as lex program, default is flex])
 AC_ARG_WITH(
   perl5,
-  [  --with-perl5=[PERL5,no] uses PERL5 as perl5 program, default is perl])
+  [  --with-perl5=[PERL5,no] uses PERL5 as perl5 program, default is perl5])
 AC_ARG_WITH(
   info,
   [  --with-info=[INFO,no]   uses INFO as info program, default is info])
