@@ -1,0 +1,95 @@
+The routines in this directory provide some simple tests of the MP put
+and get routines. They may also be used as a first example for writing
+MP code.  The programs are divded into three sets.
+
+First Set:
+
+gmptest.c - test arbitrary precision integer routines
+
+This program simply tests the use of the arbitrary precision integer
+routines.  Respond to the prompts and compare the output with what you
+entered.
+ 
+
+Second and Third Sets:
+
+The second and third sets of test programs communicate MP data between
+a client (the sender) and a server (the receiver).  The data may be
+sent via files or sockets. 
+
+See the documention for how to access the TCP and FILE transport
+mechanisms and the additional arguments required.
+
+Second Set: 
+
+The client.c and server.c programs use the packet-level routines
+(e.g., MP_PutSint32Packet()), while the imp-client and imp-server
+programs use data level routines (the packets are sent/received
+piecemeal; for example, IMP_PutNodeHeader() followed by
+IMP_PutSint32Type()).  See the documentation in doc subdirectory of
+this distribution for further explanation of packet-level versus
+data-level access.
+
+client.c      - send MP data using packet-level routines
+imp-client.c  - send MP data using data-level routines
+server.c      - receive MP data using packet-level routines
+imp-server.c  - receive MP data using data-level routines
+
+You may use either of the sample test file (test.ex1 or test.ex2) as
+input.  Output produced by the server is sent to the screen and to the
+output file test.out in an ascii format for comparison with the source
+file (e.g., with diff).  test.ex2 contains Label and Reference
+annotations not recognized by the code in the second set of test
+programs (see the test programs in the third set below for that).
+
+Note that, on the client side, there is no understanding of what a
+tree "looks like".  Specifically, MP_EndMsgReset() is not called until
+after all the source input has been read.  Similarly, on the receving
+side, MP_SkipMsg() is called only once, before any MP data is read.
+The code in the third set of examples is more realistic in this
+respect.  For this reason, the client-side test routines from the
+second set will only work with the server-side test routines from the
+second set.  Similarly for the routines from the third set.
+
+
+Third Set:
+
+send-tree.c  - send an MP tree using data-level routines
+recv-tree.c  - receive an MP tree using data-level routines.
+
+The client code (send-tree.c) and server code (recv-tree.c) know
+something of MP tree structure.  So the client will make a call to
+MP_EndMsgReset() at the end of each tree.  Correspondingly, the server
+makes a call to MP_SkipMsg() before receiving each tree. The server
+code (recv-tree.c and node.c) builds the incoming tree in memory
+before printing it out to the file test.out.  The server recognizes
+Label and Reference annotations, but expects the Label annotation to
+appear before the Reference annotation.  Test this code with file
+test.ex2, but don't expect the test.out to be identical to the input
+since Labels and References are used.
+
+
+Format of the test files:
+
+To make the comparison of the source files and the server's output
+file (test.out), the format of the source file must be precise.  There
+must be no trailing blanks and one a single blank space separating
+fields (e.g. type field from number-of-annotations field).
+
+For data nodes the format is:
+
+Type  [dictionary]  Data-value  Number-of-annotations  [Number-of-children]
+
+with fields given between brackets ([]) not present for all types.
+See the MP documentation for more information.
+
+For annotation nodes the format is:
+
+Type  dictionary  Flags
+
+Currently the annotation Type field is a string representing a MP
+defined annotation.  The Flags field is given as a hexadecimal number.
+
+The dictionary is identified by it tag number.  Values for the common
+types defined in dictionaries (common operator and common constant)
+are specified using their tag number.

@@ -1,0 +1,149 @@
+#################################################################
+###
+### Makefile for MP library
+###
+#################################################################
+
+SHELL		= /bin/sh
+
+##
+## versions
+##
+PRODUCT		= @PRODUCT@
+VERSION		= @VERSION@
+
+## 
+## various paths
+##
+top_srcdir	= @top_srcdir@
+prefix 		= @prefix@
+exec_prefix 	= @exec_prefix@
+# header file is installed here
+includedir	= @includedir@
+# library is installed here
+libdir 		= @libdir@
+# header files reside here
+hdir		= h
+
+## 
+## various programs
+##
+@SET_MAKE@
+CLEAN		= @CLEAN@
+CC		= @CC@
+AR		= @AR@
+RANLIB		= ranlib
+RANLIB_TEST = [ -f /usr/bin/ranlib -o -f /bin/ranlib ]
+INSTALL		= ../install-sh -c
+INSTALL_PROGRAM	= ${INSTALL}
+INSTALL_DATA	= ${INSTALL} -m 644
+MKINSTALLDIRS   = ../mkinstalldirs
+
+##
+## compiler and linker options
+##
+CFLAGS		= @CFLAGS@
+CPPFLAGS	= -I. @CPPFLAGS@ 
+DEFS		= @DEFS@ 
+
+##
+## End configuration dependend stuff
+#################################################################
+
+##
+## file sets
+##
+
+SRCS =	MP_Link.c MP_Put.c MP_Get.c MP_Error.c MP_Util.c MP_Annotations.c \
+	MP_Vector.c MP_Env.c MP_FileTransp.c MP_TcpTransp.c \
+	MP_Buffer.c MP_BigNum.c Memory.c \
+	MP_GmpBigInt.c MP_GmpBigReal.c MP_PariBigInt.c \
+	MP_SacBigInt.c MP_TbTransp.c MP_PvmTransp.c
+
+OBJS= MP_Link.o MP_Put.o MP_Get.o MP_Error.o MP_Util.o MP_Annotations.o  \
+	MP_Vector.o  MP_Env.o MP_FileTransp.o MP_TcpTransp.o  \
+	MP_Buffer.o MP_BigNum.o MP_Memory.o   \
+	MP_GmpBigInt.o MP_GmpBigReal.o MP_PariBigInt.o \
+	MP_SacBigInt.o MP_TbTransp.o MP_PvmTransp.o
+
+HEADERS= ${hdir}/MP.h  ${hdir}/MP_FileTransp.h ${hdir}/MP_ProtoDict.h \
+	${hdir}/MP_Get.h ${hdir}/MP_Put.h ${hdir}/MP_GmpBigInt.h \
+	${hdir}/MP_GmpBigReal.h ${hdir}/MP_PvmTransp.h ${hdir}/MP_SacBigInt.h\
+	${hdir}/MP_Annotations.h ${hdir}/MP_Link.h ${hdir}/MP_TbTransp.h \
+	${hdir}/MP_BasicDict.h ${hdir}/MP_MatrixDict.h ${hdir}/MP_TcpTransp.h\
+	${hdir}/MP_BigNum.h ${hdir}/MP_Memory.h ${hdir}/MP_PolyDict.h \
+	${hdir}/MP_Types.h ${hdir}/MP_BuffTypes.h ${hdir}/MP_MpDict.h \
+	${hdir}/MP_Util.h ${hdir}/MP_Buffer.h ${hdir}/MP_NumberDict.h \
+	${hdir}/MP_Vector.h ${hdir}/MP_Env.h ${hdir}/MP_PariBigInt.h \
+	${hdir}/MP_Error.h 
+
+DISTFILES=${HEADERS} ${SOURCES} ${hdir}/MP_Config.h.in Makefile.in \
+	  makeheader.pl MP.h
+
+.SUFFIXES:
+.SUFFIXES: .c .o 
+.c.o: 
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) -c $<
+
+all: libMP.a 
+
+libMP.a: MP.h MP_Config.h Makefile $(OBJS) 
+	rm -f $@
+	$(AR) cr $@ $(OBJS) 
+	$(RANLIB) $@
+
+install: libMP.a 
+	${MKINSTALLDIRS} ${libdir}
+	${MKINSTALLDIRS} ${includedir}
+	$(INSTALL_DATA) libMP.a $(libdir)
+	if $(RANLIB_TEST) ; then $(RANLIB) $(libdir)/libMP.a; else true; fi
+	$(INSTALL_DATA) MP.h $(includedir)
+	$(INSTALL_DATA) MP_Config.h $(includedir)	
+	-chmod a-x $(libdir)/libMP.a $(includedir)/MP.h $(includedir)/MP_Config.h
+
+clean:
+	${CLEAN} 
+	rm -f libMP.a tmp.* tmp-* MP.tar*
+	cd ${hdir}; ${CLEAN}
+
+uninstall: 
+	rm -f $(libdir)/libMP.a $(includedir)/MP.h
+	- rmdir $(libdir) $(includedir)
+
+distclean: clean  
+	rm -f Makefile MP_Config.h stamp-h
+
+maintainer-clean: distclean
+	@echo "This command is intendended for maintainers"
+	@echo "You need perl to rebuild the deleted file"
+	rm -f MP.h 
+	
+MP.h: ${HEADERS} 
+	perl ./makeheader.pl -I${hdir} ${hdir}/MP.h MP.h
+
+MP_Config.h: stamp-h
+
+stamp-h : ${top_srcdir}/config.status ${hdir}/MP_Config.h.in
+	cd ${top_srcdir}; \
+	CONFIG_HEADERS="MP/MP_Config.h:MP/h/MP_Config.h.in" CONFIG_FILES= \
+	./config.status
+
+Makefile: ${top_srcdir}/config.status Makefile.in
+	cd ${top_srcdir}; CONFIG_HEADERS= CONFIG_FILES=MP/Makefile ./config.status
+
+${top_srcdir}/config.status : ${top_srcdir}/configure
+	cd ${top_srcdir}; ${MAKE} config.status
+
+${top_srcdir}/configure: ${top_srcdir}/configure.in
+	cd ${top_srcdir}; ${MAKE} configure
+
+TAGS: 
+	etags *.c ${hdir}/*.h
+
+dist: MP.h
+	rm -f MP.tar*
+	tar cf MP.tar ${DISTFILES} ChangeLog 
+	gzip -9 MP.tar
+
+depend:	
+	$(CC) -MM $(CPPFLAGS) $(DEFS) $(SRCS) >> Makefile

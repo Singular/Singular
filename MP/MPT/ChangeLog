@@ -1,0 +1,22 @@
+Tue May 20 18:57:50 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* MPT_ApNumber.c: Move MPT_DeleteApReal to the proper place
+
+Sat May  3 20:49:16 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* MPT_Tree.c (MPT_CpyNode): Changed name MPT_CpyAp to MPT_InitCpyAp
+
+Sat Mar 29 10:07:52 1997  Simon Gray  (sgray@Pooh)
+
+	* Makefile.in: Moved MPT.h to the MPT subdirectory and changed
+	  Makefile.in to install the header file in the subdir where all
+	  the MP include files are installed.  Also changed uninstall so
+	  that it will rm MPT.h from the include subdir.
+
+          - removed all references to $(MP_ARCH), which is now obsolete
+	    because it is handled by configure.
+
+Sun Mar 16 10:04:25 1997  Olaf Bachmann  <obachman@schlupp.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* Updated names to reflect new naming schmes of dict-defined items
+

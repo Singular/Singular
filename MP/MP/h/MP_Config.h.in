@@ -1,0 +1,58 @@
+/****************************************************************
+ *                                                                  
+ * HEADER FILE:  MP_Config.h
+ * THIS FILE WAS AUTOMATICALLY CREATED BY CONFIGURE. DO NOT EDIT!!
+ *                                                                
+ ***************************************************************/
+/* Define MP version */
+#define MP_VERSION ""
+
+/* Define for use with GMP ApInts*/
+#undef MP_HAVE_GMP_APINT
+/* define ptr to gmp ApInt */
+#define mpz_ptr mpz_ptr
+/* define num-of-alloc-limbs field */
+#define _mp_alloc _mp_alloc
+/* define size field */
+#define _mp_size _mp_size
+/* define ptr to limbs */
+#define _mp_d _mp_d
+
+/* Define for use with GMP ApReals*/
+#undef MP_HAVE_GMP_APREAL
+
+/* Define for use with PARI */
+#undef MP_HAVE_PARI
+
+/* Define for use with Saclib */
+#undef MP_HAVE_SAC
+
+/* Define for use with Pvm */
+#undef MP_HAVE_PVM
+
+/* Define for use with Toolbus */
+#undef MP_HAVE_TB
+
+/* Define values for Ap formats */
+#define MP_DUMMY    0
+#define MP_GMP      1
+#define MP_PARI     2
+#define MP_SAC      3
+
+/* Define default Ap Number formats */
+#define MP_DEFAULT_APINT_FORMAT     MP_DUMMY
+#define MP_DEFAULT_APREAL_FORMAT    MP_DUMMY
+
+/* Under AIX, undefine to enable some BSD functionality */
+#ifndef _ALL_SOURCE
+#undef _ALL_SOURCE
+#endif
+
+/* Define if you have <sys/select.h> */
+#undef HAVE_SYS_SELECT_H
+
+/* Define to turn off logging */
+#undef NO_LOGGING
+
+/* Define to turn on MPT debugging */
+#undef MPT_DEBUG

@@ -1,0 +1,75 @@
+## file:      Makefile.in
+## directory: mpviewer
+## makefile creates the mpview -- a viewer for .mp files
+##
+
+srcdir		= @srcdir@
+top_srcdir      = @top_srcdir@
+prefix		= @prefix@
+exec_prefix	= @exec_prefix@
+libdir		= $(exec_prefix)/lib
+includedir	= $(prefix)/include
+
+CC		= @CC@
+SHELL		= /bin/sh
+CFLAGS          = @CFLAGS@
+
+INCLUDES	= -I$(includedir) 
+LIBS		= @LIBS@ -lMP -lgmp
+LIBDIR		= $(libdir)
+
+CLEAN           = @CLEAN@
+
+
+COMPILE = $(CC) $(DEFS) -L$(LIBDIR) $(INCLUDES) $(CPPFLAGS) $(CFLAGS) $@.c -o $@ $(LIBS)
+
+.SUFFIXES:
+.SUFFIXES: .c .o
+
+.c.o:
+	${CC} $(INCLUDES) ${CFLAGS} ${DEFS} -c $<
+
+HEADER =  label.h  leaf.h node.h  ${prefix}/include/MP.h
+
+SRC = infix.c latex.c leaf.c mpview.c node.c prefix.c util.c
+
+OBJ = infix.o latex.o leaf.o mpview.o node.o prefix.o util.o
+
+DISTFILES = ${SRC} ${HEADER} Makefile.in displaymp testall README 
+
+all: mpview
+
+install: mpview
+
+mpview: ${OBJ}
+	${CC} -o $@ $(INCLUDES) ${CFLAGS} ${DEFS} -L$(LIBDIR) ${OBJ} $(LIBS)
+
+${OBJ}: ${HEADER}
+infix.o: infix.h
+prefix.o: prefix.h
+latex.o:  latex.h
+
+TAGS:
+	etags *.c *.h
+
+test:
+	./testall > testall.out
+
+dist:
+	rm -f  mpview.tar*
+	tar cf mpview.tar ${DISTFILES} data
+	gzip -9  mpview.tar
+
+clean:
+	rm -f ${OBJ}
+
+distclean: clean
+	rm -f mpview
+	rm -f Makefile
+
+tar: clean
+	/bin/rm -f mime.tar*
+	tar cvf mime.tar Makefile README data displaymp* infix.c \
+	infix.h label.h latex.c latex.h leaf.c leaf.h mpview.c \
+	my.mp node.c node.h prefix.c prefix.h testall testall.out
+	uuencode mime.tar mime.tar > mime.tar.uue

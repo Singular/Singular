@@ -1,0 +1,77 @@
+Most of the sample programs here implement a simple master/slave
+paradigm in which the master cooperates with a single slave.  Each
+"master" program takes a commandline argument specifying the transport
+device to use: -MPtransp PVM.  This argument is passed to the "slave"
+in the spawn command.  Some programs take additional arguments, as
+specified below.  The order of the arguments on the commandline does
+not matter.
+
+The PVM convention is to place the Makefile and the source files in
+$HOME/pvm3/bin/src and the executables in $HOME/pvm3/bin/$$PVM_ARCH,
+where $PVM_ARCH specifies the machine architecture (e.g., SUN4).  PVM
+expects the environment variables PVM_ROOT and PVM_ARCH to be set.
+PVM_ROOT specifies the directory where pvm is installed (for example,
+/usr/local/pvm3).  See the PVM3 documentation for details.
+
+The Makefile assumes that MP has been installed in the user's home
+directory.  Modify the Makefile accordingly if this is not the
+case. The Makefile makes the examples in the current directory and
+moves the binaries to $HOME/pvm3/bin/$PVM_ARCH.  Once the programs are
+compiled, they can be run in the usual PVM manner.
+
+
+master/slave
+------------ 
+The master program will prompt for the name of the input file, which
+it sends to the slave.  The input file contains some syntactically
+correct MP trees in ASCII format.  Three example files are given in
+this directory (test.ex1, test.ex2, test.ex3, test.ex4).  The slave
+reads the MP trees from the file (which it expects to find in the root
+of your home directory), converts them to the MP format and returns
+them to the master, which outputs them in ASCII format and prints them
+to the file /tmp/test.out.  The master takes an optional argument
+-remhost giving the name of the remote host on which to run the slave.
+If -remhost is missing, pvm chooses the remote host. To run this
+example, type: master -MPtransp PVM [-remhost <remote hostname>]
+
+
+put-tree/get-tree
+-----------------
+Similar to the master/slave programs, except that the put-tree program
+takes a command line argument -infile specifying the name of the input
+file containing ASCII version of the MP tree, which it reads in,
+converts to the MP format, and puts to the get-tree process, which
+converts the trees back to ASCII and writes them to /tmp/get-tree.out.
+put-tree also takes the optional -remhost argument as described for
+the master/slave example.  To run this example, type:
+put-tree -MPtransp PVM -infile <testfilename> [-remhost <rem host>]
+
+
+put-vec/get-vec
+---------------
+Programs for timings for transmitting vectors of integers.  The
+put-vec program sends a vector of integers to the get-vec program
+using the usual pvm integer pack routine as well as the MP put vector
+routine.  The put-vec routine takes two commandline arguments in
+addition to the -MPtransp PVM argument:
+
+-pts    ==> an integer specifying the number of integers to send;
+-iters  ==> an integer specifying the number of times to send the
+ 	    vector of integers.
+
+put-vec also takes the optional argument -remhost, described under the
+master/slave example.
+
+To run this program example type:
+
+put-vec -pts <#pts> -iters <#iters> [-remhost <rem host>] -MPtransp PVM
+
+The output is stored in a file mp-pvm.dat in the current directory.
+
+mcast-put-tree/mcast-get-tree
+-----------------------------
+Similar to the put/get-tree programs, except there are multiple "slaves"
+who receive the same tree from the "master".
+
+
+

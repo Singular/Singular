@@ -1,0 +1,16 @@
+#!/bin/sh
+mpview -latex data/sum.mp
+mpview -latex data/factor.mp
+mpview -latex data/expand.mp
+mpview -latex data/integrate.mp
+
+mpview -infix data/sum.mp
+mpview -infix data/factor.mp
+mpview -infix data/expand.mp
+mpview -infix data/integrate.mp
+
+mpview -prefix data/sum.mp
+mpview -prefix data/factor.mp
+mpview -prefix data/expand.mp
+mpview -prefix data/integrate.mp
+

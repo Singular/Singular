@@ -1,0 +1,59 @@
+This directory contains initial work on:
+
+mpview
+
+a program that can display file.mp, an mp-encoded data file,
+in prefix, infix, or latex form.  See testall for the usage.
+The work is imcomplete by far:
+
+(1) displaying annotations has to be addressed
+(2) Many latex constructs to be added
+(3) must be tested and ported on different platforms
+
+The purpose is for mpview to be a viewer for mp data files just like
+a .gif viewer.  It can then be used together with MIME mail and
+on the Web.  We use application/mp as the MIME document type for mp.
+A simple previewer program for .mp files is found in the
+displaymp script.
+
+To enable MIME mail viewing of MP data modify the following line and
+add to your ~/.mailcap file something like the following
+
+application/mp;  LOCAL_BIN_PATH/displaymp %s
+
+where LOCAL_BIN_PATH is the full pathname to where displaymp will 
+be installed.  For example,
+
+application/mp;  /users/research/wang/pwang/cmd/displaymp %s
+
+displaymp is a script which will invoke the mpview program, so you
+will need to modify displaymp to contain the correct path to where
+mpview is to be installed.
+
+This also enables any Web viewer which uses the .mailcap file to
+treat this type of MIME data.
+
+To enable a Web browser such as netscape and xmosaic to display
+a file with .mp extension you need to also add the following line
+to your ~/.mime.types file
+
+application/mp     mp
+
+
+Another part of this project is the creation of MP data from
+MAXIMA.  This facility is in the file "maxima/mpsend.lsp".  See that
+file for details of compilation and use.
+
+
+===============
+
+Files:
+
+mpview.c -- the main program
+infix.c -- for converting to infix form
+latex.c -- for for converting to latex form
+prefix.c -- for converting to prefix form
+leaf.c -- handling leaf nodes, used by both infix.c and latex.c
+node.c -- this contains knowledge of the .mp binary file structure
+          and supplies routines to read a nodes from an mp-tree
+          contained in a .mp file.

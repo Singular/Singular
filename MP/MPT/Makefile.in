@@ -1,0 +1,105 @@
+#################################################################
+###
+### Makefile for MPT library
+###
+#################################################################
+
+SHELL		= /bin/sh
+
+## 
+## various paths
+##
+top_srcdir	= @top_srcdir@
+prefix 		= @prefix@
+exec_prefix 	= @exec_prefix@
+# header file is installed here
+includedir	= @includedir@
+# library is installed here
+libdir 		= @libdir@
+# MP sources and MP.h reside here
+mp_srcdir	= ../MP
+
+@SET_MAKE@
+CLEAN		= @CLEAN@
+CC		= @CC@
+AR		= @AR@
+RANLIB		= @RANLIB@
+INSTALL		= ../install-sh -c
+INSTALL_PROGRAM	= ${INSTALL}
+INSTALL_DATA	= ${INSTALL} -m 644
+MKINSTALLDIRS   = ../mkinstalldirs
+
+##
+## compiler and linker options
+##
+CFLAGS		= @CFLAGS@
+CPPFLAGS	= -I. -I${mp_srcdir} @CPPFLAGS@ 
+DEFS		= @DEFS@ 
+
+##
+## End configuration dependend stuff
+#################################################################
+
+
+##
+## file sets
+##
+
+SRCS = MPT_Tree.c MPT_Error.c MPT_ExternalData.c MPT_Misc.c \
+       MPT_ApNumber.c MPT_Get.c MPT_Put.c
+OBJS = MPT_Tree.o MPT_Error.o MPT_ExternalData.o MPT_Misc.o \
+       MPT_ApNumber.o MPT_Get.o MPT_Put.o
+
+DISTFILES = ${SRCS} MPT.h Makefile.in
+
+.SUFFIXES:
+.SUFFIXES: .c .o 
+.c.o: ${mp_srcdir}/MP.h ${mp_srcdir}/MP_Config.h
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) -c $<
+
+all: libMPT.a ${mp_srcdir}/MP.h ${mp_srcdir}/MP_Config.h Makefile
+
+libMPT.a:  $(OBJS) ${mp_srcdir}/MP.h ${mp_srcdir}/MP_Config.h MPT.h Makefile
+	rm -f $@
+	$(AR) cr $@ $(OBJS) 
+	$(RANLIB) $@
+
+install: libMPT.a 
+	$(INSTALL_DATA) libMPT.a $(libdir)
+	$(RANLIB) $(libdir)/libMPT.a
+	$(INSTALL_DATA) MPT.h $(includedir)
+	-chmod a-x $(libdir)/libMPT.a $(includedir)/MPT.h
+
+uninstall: 
+	rm -f libMPT.a
+	rm -f $(libdir)/libMPT.a
+	rm -f $(includedir)/MPT.h
+	- rmdir $(includedir)
+	- rmdir $(libdir)
+
+clean:
+	${CLEAN}
+	rm -f libMPT.a tmp.* tmp-*
+
+distclean maintainer-clean: clean  
+	rm -f Makefile 
+
+${mp_srcdir}/MP.h:
+	cd ${mp_srcdir}; ${MAKE} MP.h
+
+${mp_srcdir}/MP_Config.h:
+	cd ${mp_srcdir}; ${MAKE} MP_Config.h
+
+Makefile: Makefile.in
+	cd ..; rm -f Makefile; ${MAKE} Makefile
+
+TAGS:
+	etags *.c *.h
+
+dist:
+	rm -f MPT.tar*
+	tar cf MPT.tar ${DISTFILES} ChangeLog
+	gzip -9 MPT.tar
+
+depend:	
+	$(CC) -MM $(CPPFLAGS) $(DEFS) $(SRCS) >> Makefile

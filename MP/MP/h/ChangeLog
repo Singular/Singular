@@ -1,0 +1,68 @@
+Sun May 25 11:11:47 1997  Simon Gray  (sgray@Pooh)
+
+       * MP_Put.h: removed obsolete IMP_PutMpOperator macro
+	 MP_Types.h: removed obsolete MP_MpOperatorType
+	 MP_Get.h: removed obsolete references to getting an MpOperator
+		   added macros to get MetaOperator and CommonMetaOperator
+
+Tue May 20 17:39:31 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* MP_Config.h.in: added defines for _mp_d, _mp_size, _mp_alloc, so
+	  that MP can be built with gmp v1.3
+
+	* MP.h: added #include sys/select.h (AIX needs it)
+
+	* MP_Config.h.in: added define HAVE_SYS_SELECT_H which is set by
+	  configure 
+
+Mon May  5 12:19:30 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* MP_MatrixDict.h: removed comment beginning with //
+
+Fri May  2 23:20:05 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* MP_PolyDict.h (MP_CopPolyResultant): Added some more Cop's
+
+Wed Mar 26 13:24:17 1997  Simon Gray  (sgray@Pooh)
+
+	* MP_MpDict.h: - Creation!! Corresponds with dropping the MP
+	  MpOperator.  Instead, we now use the regular Put/Get operator
+	  routines and specify operators from the MpDict.
+
+	* MP_Annotations.h: - moved defines for annotations to the new
+	  MP dictionary (MP_MpDict.h).
+
+Sat Mar 22 14:50:56 1997  Simon Gray  (sgray@Pooh)
+
+        * MP_Env.h: - added flush_buf() to the set of routines that must
+	  be supported by every device in the MP_TranspOps_t structure.
+
+	* MP_FileTransp.h: - Changed integer file descriptor in the
+	  MP_FILE_t structure to FILE * so that we can use fflush() in
+	  file_flush(), which has been added to the Abstract Device
+	  Interface. 
+
+
+Fri Mar 14 10:24:43 1997  Olaf Bachmann  <obachman@schlupp.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* MP_Memory.h: made totally independent of GMP
+
+Thu Mar 13 17:47:36 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* rewrote MP_BigNum.h to reflect new BigNum handling, added
+	  MP_GmpBigInt.h MP_GmpBigReal.h MP_PariBigReal.h
+
+	* moved stuff from MP_Env.h related to BigNums to MP_BigNum.h
+
+	* moved typedef of MP_Link_pt from MP_Link.h to MP_Types.h
+
+Tue Aug 20 08:43:23 1996  Marcus Thiessel  <thiessel@cochlea.e-technik.uni-kl.de>
+
+	* MP_FileTransp.h: 
+
+	* MP_Put.h: 
+
+	* MP_Memory.h: 
+
+	* MP_TcpTransp.h: Changes due to WNI95/NT porting.
+

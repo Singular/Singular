@@ -1,0 +1,65 @@
+Tue May  6 09:30:51 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* Added ranlib after installing libs -- Suns seem to need it
+
+	* configure.in: Manuallu put INSTALL into Makefile.in
+
+Tue May  6 09:32:28 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+
+
+	* Makefile.in (configure): took out rules which automatically
+	  reruns autoconf. Print out warning, instead
+
+Sun May  4 16:30:26 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* [MP,MPT]/Makefile.in: Added chmod a-x for install of libs,
+	  headers.
+
+	* configure.in, MP/MP_Gmp*.[ch]: Cut apart HAVE_GMP into
+	  HAVE_GMP_APINT and HAVE_GMP_APREAL to enable the use of pre-2.0
+	  gmp. Check for mpz_ptr, mpf_ptr to determine wheter or not these
+	  macro's. 
+
+Fri May  2 14:09:29 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* Small bug fixes in configure mechanisms: use time-stamp 
+
+	* configure.in (VERSION): fixeed small bug in -I -L extensions
+
+	* Created file INSTALL, updated README
+
+	* Made new configure.in Makefile.in(s) MP_Config.h.in 
+
+	* added makeheaders and MP.h mechanism
+
+	* introduced defines MP_HAVE_GMP, MP_HAVE_SAC, MP_HAVE_TB, etc
+  
+        * One central place to define a version: configure.in -- exported
+          from there into Makefiles and MP_Config.h
+
+Fri Apr  4 20:07:09 1997  Simon Gray  (sgray@Pooh)
+
+	* README: Updated to reflect configure changes.
+
+Sat Mar 29 10:13:49 1997  Simon Gray  (sgray@Pooh)
+
+	* include/MP_SacBigInt.h: Added IMP_SacBigIntAsciiSize().
+
+	* include/MP_BasicDict.h: Set BasicDict to dictionary 1
+
+	* examples/Makefile.in: Removed obsolete references to -DHAVE_GMP 
+
+Fri Mar 28 14:55:50 1997  Simon Gray  (sgray@Pooh)
+
+	* Makefile.in: Now gets the SUBDIRS from configure, which
+	  determines if GMP is to be built.  Also gets prefix (the
+	  location to which non-machine dependent stuff is placed) and
+	  exec_prefix (the place to which machine-dependent - libs - stuff
+	  is placed) from configure.
+
+	* configure: now checks for argument --without-gmp to indicate
+	  that the gmp package should not be built.  Also, for all
+	  packages (MP, MPT, gmp), default install dir is /usr/local.  The
+	  user must now specify another location explicitly if /usr/local
+	  is not to be the installation point.
+

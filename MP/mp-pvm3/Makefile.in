@@ -1,0 +1,114 @@
+## Makefile.in for MP-PVM example programs.
+#
+# Set PVM_ROOT to the path where PVM includes and libraries are installed.
+# Set PVM_ARCH to your architecture type (SUN4, HP9K, RS6K, SGI, etc.)
+# Set ARCHLIB to any special libs needed on PVM_ARCH (-lrpc, -lsocket, etc.)
+# otherwise leave ARCHLIB blank
+#
+# PVM_ARCH and ARCHLIB are set for you if you use "$PVM_ROOT/lib/aimk"
+# instead of "make".
+#
+# aimk also creates a $PVM_ARCH directory below this one and will cd to it
+# before invoking make - this allows building in parallel on different arches.
+#
+
+srcdir		= @srcdir@
+VPATH		= @srcdir@
+top_srcdir      = @top_srcdir@
+prefix		= @prefix@
+exec_prefix	= @exec_prefix@
+libdir		= @libdir@
+includedir	= @includedir@
+#libdir		= $(exec_prefix)/lib
+#includedir	= $(prefix)/include
+
+CC		= @CC@
+SHELL		= /bin/sh
+CFLAGS          = @CFLAGS@
+
+INCLUDES	= -I$(PVM_ROOT)/include -I$(includedir) 
+LIBS		= @LIBS@ -lpvm3 -lMP -lgmp
+GLIBS		= -lgpvm3
+LIBDIR		= -L$(libdir) -L$(PVM_ROOT)/lib/$(PVM_ARCH)
+
+CLEAN           = @CLEAN@
+
+COMPILE = $(CC) $(DEFS) $(LIBDIR) $(INCLUDES) $(CPPFLAGS) $(CFLAGS) 
+ 
+OBJCOMPILE = $(CC) -c $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CFLAGS)
+
+.SUFFIXES:
+.SUFFIXES: .c .o
+
+.c.o:
+	${CC} $(INCLUDES) ${CFLAGS} ${DEFS} -c $<
+
+BDIR	=	$(HOME)/pvm3/bin
+XDIR	=	$(BDIR)/$(PVM_ARCH)
+
+##
+## file sets
+##
+
+SRCS	=	master.c slave.c get-vec.c put-vec.c put-tree.c get-tree.c \
+		mcast-put-tree.c mcast-get-tree.c util.c mp_pvm.c node.c \
+		pvm_imp_getdata.c
+
+DISTFILES =	${SRCS} Makefile.in README node.h label.h
+
+default:	master slave get-vec put-vec put-tree get-tree \
+		mcast-put-tree mcast-get-tree
+
+all: c-all
+
+install: c-all
+
+c-all:		master slave get-vec put-vec put-tree get-tree \
+		mcast-put-tree mcast-get-tree
+
+clean:		
+		rm -f *.o master slave get-vec put-vec
+
+distclean: clean
+	rm -f Makefile
+
+dist:
+	rm -f mp-pvm.tar
+	tar -cf mp-pvm.tar ${DISTFILES}
+	gzip -9 mp-pvm.tar
+
+get-vec: get-vec.c 
+	${COMPILE} $@.c -o $@ $(LIBS)
+	mv get-vec $(XDIR)
+
+put-vec: put-vec.c 
+	${COMPILE} $@.c -o $@ $(LIBS)
+	mv put-vec $(XDIR)
+
+master: master.c util
+	${COMPILE} util.o $@.c -o $@ $(LIBS)
+	mv master $(XDIR)
+
+put-tree: put-tree.c 
+	${COMPILE} $@.c -o $@ $(LIBS)
+	mv put-tree $(XDIR)
+
+get-tree: get-tree.c util
+	${COMPILE} util.o $@.c -o $@ $(LIBS)
+	mv get-tree $(XDIR)
+
+mcast-put-tree: mcast-put-tree.c 
+	${COMPILE} $@.c -o $@ $(LIBS)
+	mv mcast-put-tree $(XDIR)
+
+mcast-get-tree: mcast-get-tree.c  util
+	${COMPILE} util.o $@.c -o $@ $(LIBS)
+	mv mcast-get-tree $(XDIR)
+
+slave: slave.c 
+	${COMPILE} $@.c -o $@ $(LIBS)
+	mv slave $(XDIR)
+
+util : util.c
+	${OBJCOMPILE} $(INCLUDES) $@.c
+

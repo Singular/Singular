@@ -1,0 +1,83 @@
+# @configure_input@
+# file:      Makefile.in
+# directory: test
+
+PRODUCT		= @PRODUCT@
+VERSION		= @VERSION@
+
+srcdir		= @srcdir@
+VPATH		= @srcdir@
+top_srcdir      = @top_srcdir@
+prefix		= @prefix@
+exec_prefix	= @exec_prefix@
+libdir		= $(exec_prefix)/lib
+includedir	= $(prefix)/include
+BIGNUM_INCL     = $(prefix)/gmp
+
+CC		= @CC@
+SHELL		= /bin/sh
+CFLAGS          = @CFLAGS@
+DEFS            = @DEFS@ 
+
+INCLUDES	= -I$(includedir) -I$(BIGNUM_INCL)
+LIBS		= @LIBS@ -lMP -lgmp
+LIBDIR		= $(libdir)
+
+CLEAN           = @CLEAN@  rm -f *.out
+
+
+COMPILE = $(CC) $(DEFS) -L$(LIBDIR) $(INCLUDES) $(CPPFLAGS) $(CFLAGS) 
+
+OBJCOMPILE = $(CC) -c $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CFLAGS) 
+
+.SUFFIXES:
+.SUFFIXES: .c .o
+
+PROGRAMS = gmptest client server imp-client imp-server send-tree recv-tree \
+        send-vec recv-vec
+
+all:    mk-progs
+
+install: mk-progs
+
+mk-progs: $(PROGRAMS)
+
+clean:  
+	rm -f ${PROGRAMS}
+	${CLEAN}
+
+distclean: clean
+	rm -f Makefile
+
+gmptest : gmptest.c $(libdir)/libMP.a
+	${COMPILE} $@.c -o $@ $(LIBS)
+
+client : client.c $(libdir)/libMP.a
+	${COMPILE} $@.c -o $@ $(LIBS)
+
+server : server.c util $(libdir)/libMP.a
+	${COMPILE} util.o $@.c -o $@ $(LIBS)
+
+imp-client : imp-client.c $(libdir)/libMP.a
+	${COMPILE} $@.c -o $@ $(LIBS)
+
+imp-server : imp-server.c util $(libdir)/libMP.a
+	${COMPILE} util.o $@.c -o $@ $(LIBS)
+
+send-tree : send-tree.c $(libdir)/libMP.a
+	${COMPILE} $@.c -o $@ $(LIBS)
+
+recv-tree : recv-tree.c node util $(libdir)/libMP.a
+	${COMPILE} node.o util.o $@.c -o $@ $(LIBS)
+
+send-vec : send-vec.c $(libdir)/libMP.a
+	${COMPILE} $@.c -o $@ $(LIBS)
+
+recv-vec : recv-vec.c $(libdir)/libMP.a
+	${COMPILE} $@.c -o $@ $(LIBS)
+
+node : node.c
+	${OBJCOMPILE} $(INCLUDES) $@.c
+
+util : util.c
+	${OBJCOMPILE} $(INCLUDES) $@.c

@@ -1,0 +1,91 @@
+MP_OperatorType 129 testSint32s 0 3
+MP_Sint32Type 0 0
+MP_Sint32Type -2147483648 1
+Comment_AP  2  2
+MP_StringType lowerbound-for-Sint32s 0
+MP_Sint32Type 2147483647 1
+Comment_AP  2  2
+MP_StringType upperbound-for-Sint32s 0
+MP_OperatorType 129 testUint32s 0 2
+MP_Uint32Type 0 1
+Comment_AP  2  2
+MP_StringType lowerbound-for-Uint32s 0
+MP_Uint32Type 4294967295 1
+Comment_AP  2  2
+MP_StringType upperbound-for-Uint32s 0
+MP_OperatorType 129 testSint8s 0 3
+MP_Sint8Type 0 0
+MP_Sint8Type -128 1
+Comment_AP  2  2
+MP_StringType lowerbound-for-Sint8s 0
+MP_Sint8Type 127 1
+Comment_AP  2  2
+MP_StringType upperbound-for-Sint8s 0
+MP_OperatorType 129 testUint8s 0 2
+MP_Uint8Type 0 1
+Comment_AP  2  2
+MP_StringType lowerbound-for-Uint8s 0
+MP_Uint8Type 255 1
+Comment_AP  2  2
+MP_StringType upperbound-for-Uint8s 0
+MP_OperatorType 129 testbools 0 2
+MP_BooleanType T 0 
+MP_BooleanType F 0
+MP_OperatorType 129 testApInts 0 3
+MP_ApIntType 0 0
+MP_ApIntType 9876543211234567890123456789 0
+MP_ApIntType -9876543211234567890123456789 0
+MP_OperatorType 129 testApReals 0 3
+MP_ApRealType 0.1234567890123456789@30 0
+MP_ApRealType -0.1234567890123456789@30 0
+MP_ApRealType 0.@0 0
+MP_OperatorType 129 testidentifiers 0 3
+MP_IdentifierType 128 ABC 0
+MP_CommonLatinIdentifierType 129 a 1
+Comment_AP  2  2
+MP_StringType just-a-test-we-are-cheating-here 0
+MP_CommonGreekIdentifierType 129 b 1
+Comment_AP  2  2
+MP_StringType just-a-test-we-are-cheating-here 0
+MP_OperatorType 129 testReal64s 0 2
+MP_Real32Type             1234567.5 0
+MP_Real32Type          -123456.3984 0
+MP_OperatorType 129 testReal64s 0 2
+MP_Real64Type     -1200000.20024014 0
+MP_Real64Type          512343214.33 0
+MP_OperatorType 129 testraw 0 1
+MP_RawType not-a-good-example-of-raw-data 0
+MP_OperatorType 129 array 1 2
+Prototype_AP  6  7
+MP_OperatorType 129 struct 1 2
+Comment_AP  2  2
+MP_StringType testing-meta-type-and-prototype-annotation 0
+MP_MetaType 6 Real64 0
+MP_MetaType 6 Real64 0
+MP_Real64Type           5.329999924 0
+MP_Real64Type          -12.20024014 0
+MP_OperatorType 129 testReal64s 0 2
+MP_Real32Type             1234567.5 0
+MP_Real32Type          -123456.3984 0
+
+MP_OperatorType 129 testReal64s 0 2
+MP_Real64Type     -1200000.20024014 0
+MP_Real64Type          512343214.33 0
+
+MP_OperatorType 129 array 1 8
+Prototype_AP  6  7
+MP_OperatorType 129 struct 1 2
+Comment_AP  2  2
+MP_StringType testing-meta-type-and-prototype-annotation-right-here-now 0
+MP_MetaType 6 Real64 0
+MP_MetaType 6 Real64 0
+MP_Real64Type           5.329999924 0
+MP_Real64Type          -12.20024014 0
+MP_Real64Type           15.329999924 0
+MP_Real64Type           53.3299924 0
+MP_Real64Type           5.329799924 0
+MP_Real64Type           5.329999924 0
+MP_Real64Type           111.329999924 0
+MP_Real64Type           9875.329999924 0
+
+MP_CommonOperatorType 2 1 0 0

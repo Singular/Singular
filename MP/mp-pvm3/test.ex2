@@ -1,0 +1,29 @@
+MP_OperatorType 129 @ 0 2
+MP_Sint32Type -5 0
+MP_Real32Type         -7.400000095 0
+MP_OperatorType 129 - 0 2
+MP_Uint32Type 1790 0
+MP_Sint32Type -1790 0
+MP_OperatorType 1 / 1 2
+Comment_AP  2  2
+MP_StringType This_is_a_test_of_the_string_type 0
+MP_OperatorType 129 * 1 2
+Label_AP  2  7
+MP_StringType L2 0
+MP_BooleanType F 0
+MP_CommonGreekIdentifierType 129 G 0
+MP_OperatorType 1 + 0 2
+MP_CommonLatinIdentifierType 129 L 0
+MP_IdentifierType 128 DummyNode 1
+Reference_AP  2  7
+MP_StringType L2 0
+MP_OperatorType 1 * 0 2
+MP_OperatorType 5 / 1 2
+Label_AP  2  7
+MP_StringType L1 0
+MP_Real64Type    -1027.40880000095 0
+MP_ConstantType 1 Pi 0
+MP_IdentifierType 128 A700 1
+Reference_AP  2  7
+MP_StringType L1 0
+MP_CommonOperatorType 2 1 0 0

@@ -1,0 +1,393 @@
+dnl
+dnl Written by Olaf Bachmann (obachman@mathematik.uni-kl.de)
+dnl
+dnl configure.in for MP
+dnl Process this file with autoconf to produce a configure script.
+AC_INIT(MP/MP_Put.c)
+AC_CONFIG_HEADER(MP/MP_Config.h:MP/h/MP_Config.h.in)
+
+PRODUCT=MP
+VERSION=1.1.2
+AC_SUBST(PRODUCT)
+AC_SUBST(VERSION)
+AC_DEFINE_UNQUOTED(MP_VERSION, "$VERSION")
+AC_CANONICAL_SYSTEM
+
+AC_PREFIX_DEFAULT(`pwd`)
+
+dnl Check for programs
+AC_PROG_RANLIB
+AC_CHECK_PROG(AR, ar, ar, :)
+if test "$ac_cv_prog_AR" != ar; then
+  AC_MSG_ERROR(*** ar program not found)
+fi
+
+dnl compiler stuff
+dnl we do not want to have "-g -O" for CFLAGS
+
+if test "$with_debug" = yes; then
+  if test "${CFLAGS+set}" != set; then  
+    CFLAGS="-g"
+  fi
+  AC_DEFINE(MPT_DEBUG)
+else
+  if test "${CFLAGS+set}" != set; then
+    CFLAGS="-O"
+  fi
+  AC_DEFINE(NO_LOGGING)
+fi
+
+AC_PROG_CC
+AC_PROG_CPP
+AC_AIX
+
+dnl compiler/system specific options
+if test "${GCC}" != yes; then
+  echo not using gcc, so checking for special flags and defines
+  case "$target" in
+    hppa1*)
+      if test "$ac_cv_prog_CC" = cc; then
+         echo Using HPUX native compiler with -Aa and -D_HPUX_SOURCE
+         CFLAGS="$CFLAGS -Aa "
+	 AC_DEFUN(_HPUX_SOURCE)
+      fi
+  esac
+fi
+
+dnl add to CPPFLAGS and LDFLAGS so that ${includedir} and ${libdir}
+dnl are in there
+if test "$libdir" = '${exec_prefix}/lib'; then
+  if test "x$exec_prefix" = xNONE; then
+    if test "x$prefix" = xNONE; then
+      LDFLAGS="-L${ac_default_prefix}/lib ${LDFLAGS}"
+    else
+      LDFLAGS="-L${prefix}/lib ${LDFLAGS}"
+    fi
+  else
+    LDFLAGS="-L${exec_prefix}/lib ${LDFLAGS}"
+  fi
+else
+  LDFLAGS="-L${libdir} ${LDFLAGS}"
+fi
+
+if test "$includedir" = '${prefix}/include'; then
+  if test "x$prefix" = xNONE; then
+    CPPFLAGS="-I${ac_default_prefix}/include ${CPPFLAGS}"
+  else
+    CPPFLAGS="-I${prefix}/include ${CPPFLAGS}"
+  fi
+else
+  CPPFLAGS="-I${includedir} ${CPPFLAGS}"
+fi
+
+dnl Check for env variable $PVM_ROOT and, it it exists, add $PVM_ROOT/include
+dnl and PVM_ROOT/lib to flags
+if test "$enable_mppvm" = yes && test "${PVM_ROOT+set}" = set; then
+  CPPFLAGS="${CPPFLAGS} -I${PVM_ROOT}/include"
+  LDFLAGS="${LDFLAGS} -L${PVM_ROOT}/lib"
+fi
+
+AC_SET_MAKE
+AC_FUNC_VFORK
+
+dnl
+dnl Lib checks --depend on enable/disable options
+dnl
+AC_ARG_ENABLE(MPT, \
+ [  --disable-MPT           disable building of MPT library])
+
+AC_ARG_ENABLE(gmp, \
+ [  --disable-gmp           configure and built without gmp library])
+
+AC_ARG_ENABLE(tests, \
+ [  --enable-example        enable building of example programs])
+
+AC_ARG_ENABLE(mpviewer, \
+ [  --enable-mpviewer       enable building of mpviewer program])
+
+AC_ARG_ENABLE(mppvm, \
+ [  --enable-mppvm,         enable building of mppvm routines])
+
+if test "$enable_gmp" != no && test -d gmp; then
+  CONFIG_SUBDIRS="gmp"
+  enable_gmp=yes
+fi
+BUILD_SUBDIRS="$CONFIG_SUBDIRS MP"
+
+if test "$enable_MPT" != no && test -d MPT; then
+  if test "$with_default_apint" = saclib; then 
+    AC_MSG_WARN(Can not build MPT library with saclib ApInt)
+  elif test "$with_default_apint" = pari; then
+    AC_MSG_WARN(Can not build MPT library with pari ApInt)
+  else
+    BUILD_SUBDIRS="${BUILD_SUBDIRS} MPT"
+  fi
+fi
+
+if test "$enable_examples" = yes && test -d examples; then
+  BUILD_SUBDIRS="${BUILD_SUBDIRS} examples"
+  ac_check_prog=yes
+fi
+
+if test "$enable_mpviewer" = yes && test -d mpviewer; then
+  BUILD_SUBDIRS="${BUILD_SUBDIRS} mpviewer"
+  ac_check_prog=yes
+fi
+
+if test "$enable_mppvm" = yes && test -d mp-pvm3; then
+  BUILD_SUBDIRS="${BUILD_SUBDIRS} mp-pvm3"
+  ac_check_prog=yes
+fi
+AC_SUBST(BUILD_SUBDIRS)
+AC_SUBST(CONFIG_SUBDIRS)
+
+if test "$ac_check_prog" = yes; then
+  AC_CHECK_LIB(m, atof)
+  AC_CHECK_LIB(bsd, socket)
+  AC_CHECK_LIB(gmp, mpz_init)
+
+  if test "$enable_gmp" != no; then
+    AC_MSG_WARN(Did not find gmp library: Install before making programs)
+    NEED_LIBS="-lgmp $LIBS"
+  else
+    AC_MSG_WARN(Did not find gmp library: Linking programs with MP will fail)
+    NEED_LIBS=$LIBS
+  fi
+  
+  AC_CHECK_FUNCS(select socket gethostname strtol)
+  if test "$ac_cv_func_select" != yes; then
+    AC_MSG_WARN(Did not find library containing function select)
+    AC_MSG_WARN(Linking programs with MP might fail)
+  fi
+  if test "$ac_cv_func_socket" != yes; then
+    AC_MSG_WARN(Did not find library containing socket)
+    AC_MSG_WARN(Linking programs with MP might fail)
+  fi
+  if test "$ac_cv_func_gethostname" != yes; then
+    AC_MSG_WARN(Did not find library containing gethostname)
+    AC_MSG_WARN(Linking programs with MP might fail)
+  fi
+fi
+AC_SUBST(NEED_LIBS)
+
+dnl Do the header checks now
+AC_HEADER_STDC
+AC_HEADER_CHECK(arpa/inet.h,:, echo "*** no arpa/inet.h";exit)
+AC_HEADER_CHECK(assert.h,:, echo "*** no assert.h";exit)
+AC_HEADER_CHECK(ctype.h,:, echo "*** no ctype.h";exit)
+AC_HEADER_CHECK(errno.h,:, echo "*** no errno.h";exit)
+AC_HEADER_CHECK(netdb.h,:, echo "*** no netdb.h";exit)
+AC_HEADER_CHECK(netinet/in.h,:, echo "*** no netinet/in.h";exit)
+AC_HEADER_CHECK(netinet/tcp.h,:, echo "*** no netinet/tcp.h";exit)
+AC_HEADER_CHECK(signal.h,:, echo "*** no sihnal.h";exit)
+AC_HEADER_CHECK(stdarg.h,:, echo "*** no stdarg.h";exit)
+AC_HEADER_CHECK(stdio.h,:, echo "*** no stdio.h";exit)
+AC_HEADER_CHECK(stdlib.h,:, echo "*** no stdlib.h";exit)
+AC_HEADER_CHECK(string.h,:, echo "*** no string.h";exit)
+AC_HEADER_CHECK(stddef.h,:, echo "*** no stddef.h";exit)
+AC_HEADER_CHECK(values.h,:, echo "*** no values.h";exit)
+
+AC_HEADER_CHECK(fcntl.h,:, echo "*** no fcntl.h";exit)
+AC_HEADER_CHECK(sys/ioctl.h,:, echo "*** no sys/ioctl.h";exit)
+AC_HEADER_CHECK(sys/param.h,:, echo "*** no sys/param.h";exit)
+AC_HEADER_CHECK(sys/socket.h,:, echo "*** no sys/socket.h";exit)
+AC_HEADER_CHECK(sys/stat.h,:, echo "*** no sys/stat.h";exit)
+AC_HEADER_CHECK(sys/time.h,:, echo "*** no sys/time.h";exit)
+AC_HEADER_CHECK(sys/types.h,:, echo "*** no sys/types.h";exit)
+AC_HEADER_CHECK(sys/uio.h,:, echo "*** no sys/uio.h";exit)
+AC_HEADER_CHECK(sys/un.h,:, echo "*** no sys/un.h";exit)
+AC_HEADER_CHECK(unistd.h,:, echo "*** no unistd.h";exit)
+AC_HEADER_CHECK(math.h,:, echo "*** no math.h";exit)
+
+
+AC_CHECK_HEADERS(sys/select.h gmp.h genpari.h saclib.h)
+
+dnl Check whether mpz_ptr is defined (is not defined in earlier gmp versions)
+if test "$ac_cv_header_gmp_h" = yes; then
+  AC_EGREP_HEADER(mpz_ptr, gmp.h, MPZ_PTR=mpz_ptr)
+  if test ! "$MPZ_PTR" = mpz_ptr; then
+    AC_EGREP_HEADER(MP_INT, gmp.h, MPZ_PTR="MP_INT*")
+    AC_DEFINE_UNQUOTED(mpz_ptr, MP_INT*)
+    AC_DEFINE_UNQUOTED(_mp_alloc,alloc)
+    AC_DEFINE_UNQUOTED(_mp_size,size)
+    AC_DEFINE_UNQUOTED(_mp_d,d)
+  fi
+  AC_EGREP_HEADER(mpf_ptr, gmp.h, MPF_PTR=mpf_ptr)
+fi
+
+dnl
+dnl deal with Ap Number configuration
+dnl
+AC_ARG_WITH(apint, \
+ [  --with-default_apint=PACKAGE    use PACKAGE as MP's default ApInt format
+                           where PACKAGE can be none, gmp (default), 
+                           pari, saclib])
+AC_ARG_WITH(apreal, \
+ [  --with-default_apreal=PACKAGE   use PACKAGE as MP's default ApReal format
+                           where PACKAGE can be none, gmp (default)])
+AC_ARG_WITH(gmp, \
+ [  --without-gmp           build without gmp ApNumber routines])
+
+AC_ARG_WITH(pari, \
+ [  --with-pari             build with pari ApInt routines])
+
+AC_ARG_WITH(saclib, \
+ [  --with-saclib           build with saclib ApInt routines])
+
+AC_ARG_WITH(tb, \
+ [  --with-tb               build with Toolbus device interface])
+
+AC_ARG_WITH(pvm, \
+ [  --with-pvm              build with Pvm saclib device interface])
+
+AC_ARG_WITH(debug, \
+ [  --with-debug            build with debug options and logging])
+
+dnl evaluate specifications
+AC_DEFINE(MP_DUMMY, 0)
+AC_DEFINE(MP_GMP, 1)
+AC_DEFINE(MP_PARI, 2)
+AC_DEFINE(MP_SAC, 3)
+
+if test "$with_default_apint" = none; then
+  AC_DEFINE(MP_DEFAULT_APINT, MP_DUMMY)
+elif test "$with_default_apint" = pari; then
+  if test "$ac_cv_header_genpari_h" != yes; then
+    AC_MSG_WARN(Need genpari.h to use pari as default ApInt format)
+    AC_MSG_WARN(Use dummy as default MP ApInt format)
+    AC_DEFINE(MP_DEFAULT_APINT_FORMAT, MP_DUMMY)  
+  else
+    AC_DEFINE(MP_DEFAULT_APINT_FORMAT, MP_PARI)
+    AC_DEFINE(MP_HAVE_PARI)
+  fi
+elif test "$with_default_apint" = saclib; then
+  if test "$ac_cv_header_saclib_h" != yes; then
+    AC_MSG_WARN(Need saclib.h to use saclib as default ApInt format)
+    AC_MSG_WARN(Use dummy as default MP ApInt format)
+    AC_DEFINE(MP_DEFAULT_APINTFORMAT, MP_DUMMY)  
+  else
+    AC_DEFINE(MP_DEFAULT_APINT_FORMAT, MP_SAC)
+    AC_DEFINE(MP_HAVE_SACLIB)
+  fi
+else
+  if test "$ac_cv_header_gmp_h" != yes && test "$enable_gmp" != yes; then
+    AC_MSG_WARN(Need gmp.h to use gmp as default ApInt format)
+    AC_MSG_WARN(Use dummy as default MP ApInt format)
+    AC_DEFINE(MP_DEFAULT_APINTFORMAT, MP_DUMMY)  
+  elif test -z "$MPZ_PTR" && test "$enable_gmp" != yes; then
+    AC_MSG_WARN(Need gmp.h containing typedef of 'mpz_ptr' or 'MP_INT')
+    AC_MSG_WARN(Use dummy as default MP ApInt format)
+    AC_DEFINE(MP_DEFAULT_APINTFORMAT, MP_DUMMY)
+  else
+    AC_DEFINE(MP_DEFAULT_APINT_FORMAT, MP_GMP)
+    AC_DEFINE(MP_HAVE_GMP_APINT)
+    if test "$ac_cv_header_gmp_h" != yes; then
+      AC_MSG_WARN(Need gmp.h to use gmp as default ApInt format)
+      AC_MSG_WARN(Install gmp.h before making MP)
+    fi
+  fi
+fi
+
+
+if test "$with_default_apreal" = none; then
+  AC_DEFINE(MP_DEFAULT_APREAL, MP_DUMMY)
+else
+  if test "$ac_cv_header_gmp_h" != yes && test "$enable_gmp" != yes; then
+    AC_MSG_WARN(Need gmp.h to use gmp as default ApReal format)
+    AC_MSG_WARN(Use dummy as default MP ApReal format)
+    AC_DEFINE(MP_DEFAULT_APREALFORMAT, MP_DUMMY)  
+  elif test -z "$MPF_PTR" && test "$enable_gmp" != yes; then
+    AC_MSG_WARN(Need gmp.h containing tyedef of 'mpf_ptr')
+    AC_MSG_WARN(Use dummy as default MP ApReal format)
+    AC_DEFINE(MP_DEFAULT_APREALFORMAT, MP_DUMMY)  
+  else
+    AC_DEFINE(MP_DEFAULT_APREAL_FORMAT, MP_GMP)
+    AC_DEFINE(MP_HAVE_GMP_APREAL)
+    if test "$ac_cv_header_gmp_h" != yes ; then
+      AC_MSG_WARN(Need gmp.h to use gmp as default ApReal format)
+      AC_MSG_WARN(Install gmp.h before making MP)
+    fi
+  fi
+fi
+
+if test "$with_gmp" != no; then
+  if test "$ac_cv_header_gmp_h" != yes && test "$enable_gmp" != yes; then
+    AC_MSG_WARN(Can not build MP with gmp ApInt routines: Need gmp.h)
+  else
+    AC_DEFINE(MP_HAVE_GMP)
+    if test "$ac_cv_header_gmp_h" != yes; then
+      AC_MSG_WARN(Need gmp.h to build MP with gmp ApInt routines)
+      AC_MSG_WARN(Install gmp.h before making MP)
+    fi
+  fi
+fi
+
+if test "$with_saclib" = yes; then
+  if test "$ac_cv_header_saclib_h" != yes; then
+    AC_MSG_WARN(Can not build MP with saclib ApInt routines: Need saclib.h)
+  else
+    AC_DEFINE(MP_HAVE_SAC)
+  fi
+fi
+
+if test "$with_pari" = yes; then
+  if test "$ac_cv_header_genpari_h" != yes; then
+    AC_MSG_WARN(Can not build MP with pari ApInt routines: Need genpari.h)
+  else
+    AC_DEFINE(MP_HAVE_PARI)
+  fi
+fi
+
+if test "$with_tb" = yes; then
+  AC_CHECK_HEADER(TB.h)
+  if test "$ac_cv_header_TB_h" != yes; then
+    AC_MSG_WARN(Can not build with Toolbus: Need TB.h)
+  else
+    AC_DEFINE(MP_HAVE_TB)
+  fi
+fi
+
+if test "$with_pvm" = yes; then
+ if test "$ac_cv_header_pvm3_h" != yes; then
+    AC_MSG_WARN(Can not build with Pvm: Need pvm3.h)
+  else
+    AC_DEFINE(MP_HAVE_PVM)
+  fi
+fi
+
+  
+dnl Checks for typedefs, structures, and compiler characteristics.
+AC_C_BIGENDIAN
+AC_C_CONST
+AC_TYPE_SIZE_T
+AC_HEADER_TIME
+
+dnl miscellanous stuff
+dnl check for sizeof(long)
+AC_CHECK_SIZEOF(long, 4)
+if test "$ac_cv_sizeof_long" != 4; then
+  AC_MSG_ERROR(Need sizeof long to equal 4)
+fi
+
+CLEAN="rm -f *~ a.out core *.o .log"
+AC_SUBST(CLEAN)
+
+dnl if we use GCC, then we know CFLAGS best and do not let user overwrite it
+if test "${GCC}" = yes; then
+  if test "$with_debug" = yes; then
+    CFLAGS="-g -Wall -Wno-unused"
+  else
+    CFLAGS="-O3 -w -fomit-frame-pointer"
+  fi
+fi
+
+dnl check for args to pass to subconfigure
+if test "$prefix" = NONE; then
+  ac_configure_args="$ac_configure_args --prefix=$ac_default_prefix"
+fi
+  
+AC_CONFIG_SUBDIRS($CONFIG_SUBDIRS)
+
+AC_OUTPUT(Makefile MP/Makefile MPT/Makefile mpviewer/Makefile \
+	mp-pvm3/Makefile examples/Makefile, \
+	if test "$CONFIG_HEADERS"; then echo timestamp > MP/stamp-h; fi)

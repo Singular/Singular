@@ -1,0 +1,108 @@
+#################################################################
+###
+### Top-level Makefile for MP
+###
+#################################################################
+
+SHELL		= /bin/sh
+
+##
+## versions
+##
+PRODUCT		= @PRODUCT@
+VERSION		= @VERSION@
+DISTNAME	= ${PRODUCT}-${VERSION}
+
+## 
+## various programs
+##
+@SET_MAKE@
+CLEAN		= @CLEAN@
+
+## 
+## subdirs
+##
+SUBDIRS		= MP MPT examples mpviewer mp-pvm3 @CONFIG_SUBDIRS@
+BUILD_SUBDIRS	= @BUILD_SUBDIRS@
+TEMPDIR		= /tmp
+
+##
+## End configuration dependend stuff
+#################################################################
+
+all install uninstall: Makefile
+	for SUBDIR in ${BUILD_SUBDIRS}; \
+	do \
+		echo ${MAKE} $@ in $${SUBDIR}; \
+		cd $${SUBDIR}; \
+		${MAKE} $@; \
+		cd .. ;\
+	done
+
+clean distclean mostlyclean maintainer-clean:
+	for SUBDIR in ${SUBDIRS}; \
+	do \
+		echo ${MAKE} $@ in $${SUBDIR}; \
+		cd $${SUBDIR}; \
+		${MAKE} $@; \
+		cd .. ;\
+	done
+	case $@ in \
+	clean) ${CLEAN} ;;\
+	mostlyclean) ${CLEAN} ;;\
+	distclean) ${CLEAN}; \
+               rm -rf Makefile config.status config.log config.cache TAGS* \
+                      *.gz *.tar *.tgz lib include info;;\
+	maintainer-clean) rm -f configure; ${CLEAN}; \
+               rm -rf Makefile config.status config.log config.cache TAGS* \
+                      *.gz *.tar *.tgz lib include info;;\
+	esac
+	
+libMP.a MP: force
+	cd MP; $(MAKE) all
+
+libMPT.a MPT : force
+	cd MPT; $(MAKE) all
+
+examples: force
+	cd examples; $(MAKE) all
+
+mpviewer: force
+	cd mpviewer; $(MAKE) all
+
+mp-pvm3: force
+	cd mp-pvm3; $(MAKE) all
+
+force:
+.PNONY: install uninstall 
+.PHONY: clean distclean force 
+
+dist: 
+	rm -rf ${DISTNAME}.tar* ${TEMPDIR}/${DISTNAME}*
+	mkdir ${TEMPDIR}/${DISTNAME}
+	cp -pR . ${TEMPDIR}/${DISTNAME}
+	cd ${TEMPDIR}/${DISTNAME}; ${MAKE} distclean; 
+	- find ${TEMPDIR}/${DISTNAME} -name CVS -exec rm -rf {} \; 
+	cd ${TEMPDIR}; tar cf ${DISTNAME}.tar ${DISTNAME} 
+	rm -rf ${TEMPDIR}/${DISTNAME}
+	gzip -9 ${TEMPDIR}/${DISTNAME}.tar
+	- mv ${TEMPDIR}/${DISTNAME}.tar.gz .
+
+TAGS: 
+	etags MP/*.c MPT/*.c MP/h/*.h MPT/*.h
+
+info dvi check:
+	echo Sorry, make target $@ is not implemented
+
+Makefile: Makefile.in config.status 
+	CONFIG_FILES=Makefile CONFIG_HEADERS= ./config.status
+
+config.status : configure	
+	./config.status --recheck
+
+configure: configure.in
+	@echo "WARNING: You need to rerun autoconf. I am proceeding, for now."
+	touch configure
+#	autoconf 
+
+

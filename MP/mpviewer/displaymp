@@ -1,0 +1,38 @@
+#!/bin/csh -f
+# previews an mp data file using latex
+# NOTE:  you must change the following to the correct path for the
+#        the mpview program
+
+set progpath = $HOME/bin/$MP_ARCH
+
+if ( $?DISPLAY ) then
+     echo "Viewing MP data with LaTeX"
+     echo ""
+#set term = "xterm"  not needed if latex script checks $DISPLAY
+     set term = "xterm"
+
+     set file = /tmp/mpl$$.tex
+     cat > $file <<HERE
+\documentstyle[12pt]{article}
+\begin{document}
+
+HERE
+
+     $progpath/mpview -latex $1 >> $file 
+    
+     cat >> $file <<HERE
+
+\end{document}
+HERE
+     cd /tmp; /usr/local/bin/latex $file >& /dev/null ; /bin/rm -f mpl$$.*
+
+else
+     echo "Viewing MP data in infix form"
+     echo ""
+     $progpath/mpview -infix $1
+endif
+
+set savefile = $HOME/${USER}{$$}.mp
+if ( { cp $1 $savefile } )  then
+     echo MP data saved in $savefile for you
+endif
