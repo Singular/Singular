@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_PutPoly.cc,v 1.12 1998-04-21 10:59:29 obachman Exp $ */
+/* $Id: mpsr_PutPoly.cc,v 1.13 1998-11-13 12:21:00 obachman Exp $ */
 
 /***************************************************************
  *
@@ -626,8 +626,8 @@ static mpsr_Status_t PutSimpleOrdering(MP_Link_pt link, ring r, short index)
                                         MP_BasicDict,
                                         MP_CopBasicList,
                                         0, 2));
-    mp_failr(MP_PutUint32Packet(link, (MP_Uint32_t) vlength, 0));
-    mp_failr(MP_PutUint32Packet(link, (MP_Uint32_t) vlength, 0));
+    mp_failr(MP_PutSint32Packet(link, (MP_Sint32_t) vlength, 0));
+    mp_failr(MP_PutSint32Packet(link, (MP_Sint32_t) vlength, 0));
     vlength *= vlength;
   }
   else

@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_Get.cc,v 1.20 1998-11-09 15:43:03 obachman Exp $ */
+/* $Id: mpsr_Get.cc,v 1.21 1998-11-13 12:20:59 obachman Exp $ */
 /***************************************************************
  *
  * File:       mpsr_Get.cc
@@ -523,11 +523,11 @@ static mpsr_Status_t GetIntMatLeftv(MP_Link_pt link, MPT_Node_pt node,
                 MP_CopBasicList))
   {
     MPT_Tree_pt *tarray = (MPT_Tree_pt *) annot->value->args;
-    if (tarray[0]->node->type == MP_Uint32Type &&
-        tarray[1]->node->type == MP_Uint32Type)
+    if (tarray[0]->node->type == MP_Sint32Type &&
+        tarray[1]->node->type == MP_Sint32Type)
     {
-      row = MP_UINT32_T(tarray[0]->node->nvalue);
-      col = MP_UINT32_T(tarray[1]->node->nvalue);
+      row = MP_SINT32_T(tarray[0]->node->nvalue);
+      col = MP_SINT32_T(tarray[1]->node->nvalue);
     }
   }
 
@@ -644,11 +644,11 @@ static mpsr_Status_t GetMatrixLeftv(MP_Link_pt link, MPT_Node_pt node,
                MP_CopBasicList))
   {
     MPT_Tree_pt *tarray = (MPT_Tree_pt *) annot->value->args;
-    if (tarray[0]->node->type == MP_Uint32Type &&
-        tarray[1]->node->type == MP_Uint32Type)
+    if (tarray[0]->node->type == MP_Sint32Type &&
+        tarray[1]->node->type == MP_Sint32Type)
     {
-      row = MP_UINT32_T(tarray[0]->node->nvalue);
-      col = MP_UINT32_T(tarray[1]->node->nvalue);
+      row = MP_SINT32_T(tarray[0]->node->nvalue);
+      col = MP_SINT32_T(tarray[1]->node->nvalue);
     }
   }
 

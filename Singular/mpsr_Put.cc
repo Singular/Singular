@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_Put.cc,v 1.13 1998-10-21 10:25:54 krueger Exp $ */
+/* $Id: mpsr_Put.cc,v 1.14 1998-11-13 12:20:59 obachman Exp $ */
 
 #define KAI
 
@@ -202,8 +202,8 @@ mpsr_Status_t mpsr_PutIntMat(MP_Link_pt link, intvec *iv)
                                       MP_CopBasicList,
                                       0,
                                       2));
-  mp_failr(MP_PutUint32Packet(link, (MP_Uint32_t) r, 0));
-  mp_failr(MP_PutUint32Packet(link, (MP_Uint32_t) c, 0));
+  mp_failr(MP_PutSint32Packet(link, (MP_Sint32_t) r, 0));
+  mp_failr(MP_PutSint32Packet(link, (MP_Sint32_t) c, 0));
 
   // And finally, we put the elments
   mp_return(IMP_PutSint32Vector(link, (MP_Sint32_t *) iv->ivGetVec(),
@@ -473,8 +473,8 @@ mpsr_Status_t mpsr_PutMatrix(MP_Link_pt link, ideal id, ring cring)
                                       MP_BasicDict,
                                       MP_CopBasicList,
                                       0, 2));
-  mp_failr(MP_PutUint32Packet(link, (MP_Uint32_t) nrows, 0));
-  mp_failr(MP_PutUint32Packet(link, (MP_Uint32_t) ncols, 0));
+  mp_failr(MP_PutSint32Packet(link, (MP_Sint32_t) nrows, 0));
+  mp_failr(MP_PutSint32Packet(link, (MP_Sint32_t) ncols, 0));
 
   // And finally, we put the elments
   for (i=0; i < n; i++)

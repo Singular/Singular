@@ -66,7 +66,7 @@ void* MPT_GP_Iterator_t::Next()
   return NULL;
 }
 
-bool MPT_GP_IsValueIterator(MPT_Tree_pt tree, int vtype)
+bool MPT_GP_IsValueIterator(MPT_Tree_pt tree, long vtype)
 {
   if (tree == NULL || tree->node->type != MP_CommonOperatorType)
     return false;
@@ -84,7 +84,7 @@ bool MPT_GP_IsValueIterator(MPT_Tree_pt tree, int vtype)
   }
   if (vtype >= 0)
   {
-    int nc = tree->node->numchild, i;
+    long nc = tree->node->numchild, i;
     MPT_Arg_pt args;
   
     for (i=0; i<nc; i++)
@@ -96,7 +96,7 @@ bool MPT_GP_IsValueIterator(MPT_Tree_pt tree, int vtype)
   return true;
 }
 
-MPT_GP_ValueIterator_t::MPT_GP_ValueIterator_t(MPT_Tree_pt tree, int vtype) 
+MPT_GP_ValueIterator_t::MPT_GP_ValueIterator_t(MPT_Tree_pt tree, long vtype) 
     : MPT_GP_Iterator_t(tree->node)
 {
   MPT_Assume(MPT_GP_IsValueIterator(tree, vtype));
@@ -158,13 +158,13 @@ static GP_AtomEncoding_t MP_Type_2_GP_AtomEncoding(MP_Common_t mptype)
       if (mptype == MP_Uint32Type)
         return GP_UlongAtomEncoding;
       if (mptype == MP_Sint8Type)
-        return GP_SintAtomEncoding;
+        return GP_SlongAtomEncoding;
       MPT_Assume(mptype == MP_Uint8Type);
-      return GP_UintAtomEncoding;
+      return GP_UlongAtomEncoding;
     }
     else
     {
-      int format = MPT_GetApIntFormat();
+      long format = MPT_GetApIntFormat();
       if (format == MP_GMP) return GP_GmpApIntAtomEncoding;
       if (format == MP_PARI) return GP_PariApIntAtomEncoding;
     }
@@ -224,20 +224,6 @@ GP_AtomEncoding_t MPT_GP_Atom_t::AtomEncoding(const void* data)
   return MP_Type_2_GP_AtomEncoding(((MPT_Tree_pt) data)->node->type);
 }
 
-unsigned int MPT_GP_Atom_t::AtomUint(const void* data)
-{
-  MPT_Assume(AtomEncoding() == GP_UintAtomEncoding);
-
-  return (unsigned int) 
-    MP_UINT8_T(_tnode != NULL ? data : ((MPT_Tree_pt) data)->node->nvalue);
-}
-signed int MPT_GP_Atom_t::AtomSint(const void* data)
-{
-  MPT_Assume(AtomEncoding(data) == GP_SintAtomEncoding);
-
-  return (int) 
-    MP_SINT8_T((_tnode!=NULL ? data : ((MPT_Tree_pt) data)->node->nvalue));
-}
 unsigned long MPT_GP_Atom_t::AtomUlong(const void* data) 
 {
   MPT_Assume(AtomEncoding(data) == GP_UlongAtomEncoding);
@@ -286,7 +272,7 @@ const void* MPT_GP_Atom_t::AtomPariApInt(const void* data)
 ///
 /////////////////////////////////////////////////////////////////////
 static GP_CompType_t 
-MP_TypeDictOp_2_GP_CompType(int type,
+MP_TypeDictOp_2_GP_CompType(long type,
                             MP_DictTag_t dict, MP_Common_t cvalue) 
 {
   if (type == MP_CommonOperatorType || type == MP_CommonMetaOperatorType)
@@ -374,7 +360,7 @@ MPT_GP_Comp_pt MPT_GetGP_Comp(MPT_Node_pt tnode)
                                       MP_MatrixDict,
                                       MP_AnnotMatrixDimension);
     MPT_Tree_pt ctree;
-    int dx, dy;
+    long dx, dy;
     
     if (tree == NULL || tree->node->type != MP_CommonOperatorType ||
         tree->node->numchild != 2) 
@@ -428,7 +414,7 @@ MPT_GP_MvPoly_pt MPT_GetGP_MvPoly(MPT_Node_pt tnode)
 
 MPT_GP_MvPoly_t::MPT_GP_MvPoly_t(MPT_Node_pt tnode, 
                                  MPT_GP_pt coeffs, 
-                                 int nvars)
+                                 long nvars)
     : MPT_GP_Poly_t(tnode, coeffs)
 {
   _nvars = nvars;
@@ -448,7 +434,7 @@ MPT_GP_MvPoly_t::MPT_GP_MvPoly_t(MPT_Node_pt tnode,
 static GP_DistMvPolyType_t 
 MPT_GetGP_DistMvPolyType(MPT_Node_pt tnode,
                          MPT_GP_pt &coeffs,
-                         int &nvars)
+                         long &nvars)
 {
   MPT_Assume(tnode != NULL);
   MPT_Node_pt node;
@@ -494,7 +480,7 @@ MPT_GP_DistMvPoly_pt MPT_GetGP_DistMvPoly(MPT_Node_pt tnode)
   if (tnode == NULL) return NULL;
 
   MPT_GP_pt coeffs;
-  int nvars;
+  long nvars;
   
   if (MPT_GetGP_DistMvPolyType(tnode, coeffs, nvars) 
       != GP_DenseDistMvPolyType)
@@ -516,7 +502,7 @@ MPT_GP_DistMvPoly_pt MPT_GetGP_DistMvPoly(MPT_Node_pt tnode)
 }
 
 MPT_GP_DistMvPoly_t::MPT_GP_DistMvPoly_t(MPT_Node_pt tnode,
-                                         MPT_GP_pt coeffs, int nvars,
+                                         MPT_GP_pt coeffs, long nvars,
                                          MPT_GP_Ordering_pt has_ordering,
                                          MPT_GP_Ordering_pt should_ordering)
     : MPT_GP_MvPoly_t(tnode, coeffs, nvars), _monom_iterator(tnode)
@@ -531,18 +517,18 @@ void* MPT_GP_DistMvPoly_t::Coeff(const void* monom)
   return (MPT_ARG_PT(monom))[0];
 }
 
-void MPT_GP_DistMvPoly_t::ExpVector(const void* monom, int* &expvector)
+void MPT_GP_DistMvPoly_t::ExpVector(const void* monom, long* &expvector)
 {
   MP_Sint32_t* ev = MP_SINT32_PT((MPT_ARG_PT(monom))[1]);
   
   if (expvector != NULL)
   {
-    int i;
+    long i;
     for (i=0; i < _nvars; i++) 
       expvector[i] = ev[i];
   }
   else
-    expvector = (int*) ev;
+    expvector = (long*) ev;
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -555,7 +541,7 @@ MPT_GP_Ordering_t::MPT_GP_Ordering_t(MPT_Tree_pt otree)
   _otree = otree;
 }
 
-MPT_GP_Ordering_pt   MPT_GetGP_Ordering(MPT_Tree_pt o_tree, int nvars)  
+MPT_GP_Ordering_pt   MPT_GetGP_Ordering(MPT_Tree_pt o_tree, long nvars)  
 {
   if (o_tree != NULL)
   {
@@ -579,7 +565,6 @@ GP_OrderingType_t MP_CcPolyOrdering_2_GP_OrderingType(MP_Common_t cc)
       case  MP_CcPolyOrdering_NegRevLex     : return GP_NegRevLexOrdering;
       case  MP_CcPolyOrdering_NegDegRevLex  : return GP_NegDegRevLexOrdering; 
       case  MP_CcPolyOrdering_NegDegLex     : return GP_NegDegLexOrdering;
-      case  MP_CcPolyOrdering_Vector        : return GP_VectorOrdering;
       case  MP_CcPolyOrdering_Matrix        : return GP_MatrixOrdering;
       case  MP_CcPolyOrdering_IncComp       : return GP_IncrCompOrdering;
       case  MP_CcPolyOrdering_DecComp       : return GP_DecrCompOrdering;
@@ -669,17 +654,17 @@ GP_Iterator_pt MPT_GP_Ordering_t::BlockOrderingIterator()
   return &(_block_iterator);
 }
 
-void MPT_GP_Ordering_t::BlockLimits(const void* block, int &low, int &high)
+long MPT_GP_Ordering_t::BlockLength(const void* block)
 {
-  low = -1;
-  high = -2;
+  long low = -1;
+  long high = -2;
 
-  if (block == NULL) return;
+  if (block == NULL) return -1;
   
   GP_OrderingType_t otype = OrderingType(block);
   if (otype == GP_UnknownOrdering ||
       otype == GP_ProductOrdering)  
-    return;
+    return -1;
   
   MPT_Tree_pt btree = MPT_TREE_PT(block);
 
@@ -688,21 +673,23 @@ void MPT_GP_Ordering_t::BlockLimits(const void* block, int &low, int &high)
                  MP_CopBasicList, 3))
   {
     MPT_Tree_pt ctree = MPT_TREE_PT(btree->args[1]);
-    if (ctree == NULL) return;
+    if (ctree == NULL) return -1;
     if (ctree->node->type != MP_Sint32Type) 
       low = MP_SINT32_T(ctree->node->nvalue);
     else if  (ctree->node->type != MP_Uint32Type) 
       low = MP_UINT32_T(ctree->node->nvalue);
-    else return;
+    else return -1;
 
     ctree  = MPT_TREE_PT(btree->args[2]);
-    if (ctree == NULL) return;
+    if (ctree == NULL) return -1;
     if (ctree->node->type != MP_Sint32Type) 
       high = MP_SINT32_T(ctree->node->nvalue);
     else if  (ctree->node->type != MP_Uint32Type) 
       high = MP_UINT32_T(ctree->node->nvalue);
-    else low = -1;
+    else return -1;
   }
+
+  return high - low;
 }
 
     

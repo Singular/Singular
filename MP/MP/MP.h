@@ -2172,6 +2172,7 @@ EXTERN MP_Status_t MP_TbSetTerm _ANSI_ARGS_((MP_Link_pt link, term *t));
 #define MP_CopPolyClearDenom            42
 #define MP_CopPolyFacStd                43
 #define MP_CopPolyResultant             44
+#define MP_CopPolyFreeModule            45
 
 /***************************************************************************
  *

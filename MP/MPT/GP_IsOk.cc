@@ -75,13 +75,12 @@ bool GP_Atom_t::IsAtomDataOk(const void* data)
   GP_AtomType_t type = AtomType();
   
   if (AtomEncoding() == GP_DynamicAtomEncoding &&
-      AtomEncoding(data) == GP_UnknownAtomEncoding) 
+      (AtomEncoding(data) == GP_UnknownAtomEncoding || 
+       AtomEncoding(data) == GP_UnknownAtomEncoding))
     return false;
   
   return true;
 }
-
-
 
 /////////////////////////////////////////////////////////////////////
 ///
@@ -93,7 +92,7 @@ bool GP_Comp_t::IsCompSpecOk()
   GP_CompType_t ctype = CompType();
   GP_pt elements = Elements();
   
-  if (ctype == GP_UnknownCompType)
+  if (ctype == GP_UnknownCompType || elements == NULL)
     return false;
   
   if (elements->IsSpecOk() == false) return false;
@@ -124,6 +123,14 @@ bool GP_Comp_t::IsCompSpecOk()
           return false;
         return true;
 
+      case GP_MatrixCompType:
+      {
+        long dx = -1, dy = -1;
+        MatrixDimension(dx, dy);
+        if (dx <= 0 || dy <= 0) return false;
+        return true;
+      }
+
       default:
         return true;
   }
@@ -133,10 +140,10 @@ bool GP_Comp_t::IsCompDataOk(const void* data)
   GP_Iterator_pt it = ElementDataIterator(data);
   GP_pt elements = Elements();
   GP_CompType_t ctype = CompType();
-  int i, n;
+  long i, n;
   
   
-  if (it == NULL) return false;
+  if (it == NULL || elements == NULL) return false;
   n = it->N();
   if (n < 0) return false;
   
@@ -144,7 +151,7 @@ bool GP_Comp_t::IsCompDataOk(const void* data)
   {
       case GP_MatrixCompType:
       {
-        int dx, dy;
+        long dx = -1, dy = -1;
         MatrixDimension(dx, dy);
         if (dx < 0 || dy < 0) return false;
         if (dx*dy != n) return false;
@@ -156,7 +163,20 @@ bool GP_Comp_t::IsCompDataOk(const void* data)
       case GP_ComplexCompType:
         if (n == 0 || n > 2) return false;
         break;
-        
+
+      case GP_FreeModuleCompType:
+      {
+        for (i=0; i<n; i++)
+        {
+          void* fmel = it->Next();
+          long comp = FreeModuleComponent(fmel);
+          if (comp < 0) return false;
+          if (elements->IsDataOk(FreeModuleElement(fmel)) == false)
+            return false;
+        }
+        return true;
+      }
+      
       case GP_UnknownCompType:
         return false;
         
@@ -192,7 +212,7 @@ bool GP_Poly_t::IsPolySpecOk()
       default:
         return false;
   }
-  if (Coeffs()->IsSpecOk() == false) return false;
+  if (Coeffs() == NULL || Coeffs()->IsSpecOk() == false) return false;
   
   mpoly = MinPoly();
   if (mpoly != NULL) return IsPolyDataOk(mpoly);
@@ -232,7 +252,7 @@ bool GP_UvPoly_t::IsUvPolyDataOk(const void* data)
   bool isSparse = (UvPolyType() == GP_SparseUvPolyType);
   GP_pt coeff = Coeffs();
 
-  int i, n;
+  long i, n;
   void* term;
   
   
@@ -319,16 +339,15 @@ bool GP_DistMvPoly_t::IsDistMvPolyDataOk(const void* data)
   GP_Iterator_pt    monoms = MonomIterator(data);
   GP_pt             coeffs = Coeffs();
   void*             monom;
-  int i, n,j,       nvars  = NumberOfVars();
+  long i, n,j,       nvars  = NumberOfVars();
   GP_Iterator_pt    expvector = NULL;
 
-  if (type ==  GP_UnknownDistMvPolyType) return false;
-  if (monoms == NULL) return false;
-  if (nvars <= 0) return false;
-  
-  n = monoms->N();
-  
-  if (n < 0) return false;
+  if (type ==  GP_UnknownDistMvPolyType ||
+      monoms == NULL ||
+      coeffs == NULL ||
+      nvars <= 0 ||
+      (n = monoms->N()) < 0)
+    return false;
   
   for (i=0; i<n; i++)
   {
@@ -337,7 +356,7 @@ bool GP_DistMvPoly_t::IsDistMvPolyDataOk(const void* data)
     
     if (type == GP_SparseDistMvPolyType)
     {
-      int m;
+      long m;
       void* exp;
 
       if (expvector == NULL)  
@@ -359,7 +378,7 @@ bool GP_DistMvPoly_t::IsDistMvPolyDataOk(const void* data)
     }
     else
     {
-      long int* evector = NULL;
+      long* evector = NULL;
       ExpVector(monom, evector);
       
       if (evector == NULL) return NULL;
@@ -403,11 +422,9 @@ bool GP_RecMvPoly_t::IsRecMvPolyDataOk(const void* data)
 /////////////////////////////////////////////////////////////////////
 bool GP_Ordering_t::IsBlockOrderingOk(const void* block_ordering)
 {
-  int length;
+  long length = BlockLength(block_ordering);
   
-  BlockLimits(block_ordering, length);
-  
-  if (length <= NULL) return false;
+  if (length <= 0) return false;
   
   switch (OrderingType(block_ordering))
   {
@@ -415,20 +432,30 @@ bool GP_Ordering_t::IsBlockOrderingOk(const void* block_ordering)
       case GP_ProductOrdering: 
         return false;
 
+      case GP_IncrCompOrdering:
+      case GP_DecrCompOrdering:
+        if (length != 1) return false;
+        return true;
+        
       case GP_MatrixOrdering:
       {
-        GP_Iterator_pt iter = WeightsIterator();
+        GP_Iterator_pt iter = WeightsIterator(block_ordering);
         if (iter == NULL) return false;
         if (iter->N() != length*length) return false;
         return true;
       }
         
       default:
-        return true;
+      {
+        GP_Iterator_pt iter = WeightsIterator(block_ordering);
+        if (iter == NULL || iter->N() > 0 && iter->N() <= length)
+          return true;
+        return false;
+      }
   }
 }
     
-bool GP_Ordering_t::IsOk(const int nvars)
+bool GP_Ordering_t::IsOk(const long nvars)
 {
   if (nvars <= 0) return false;
   
@@ -437,7 +464,6 @@ bool GP_Ordering_t::IsOk(const int nvars)
       case GP_UnknownOrdering:
         return false;
         
-      case GP_VectorOrdering:
       case GP_IncrCompOrdering:
       case GP_DecrCompOrdering:
         // incomplete orderings are no good
@@ -454,8 +480,7 @@ bool GP_Ordering_t::IsOk(const int nvars)
       case GP_ProductOrdering:
       {
         GP_Iterator_pt iter = BlockOrderingIterator();
-        int i, n = 0, low, high;
-        bool found_zero=false, found_nvars=false;
+        long i, n = 0, length = 0;
         void* block_ordering;
         
         if (iter !=NULL) 
@@ -464,24 +489,21 @@ bool GP_Ordering_t::IsOk(const int nvars)
           {
             block_ordering = iter->Next();
             if (! IsBlockOrderingOk(block_ordering)) return false;
-            BlockLimits(block_ordering, low, high);
-          
-            if (low < 0 || high >= nvars) return false;
-
-            // Hmm.. we should check fo complete coverage of all
-            // variables However, we would need to allocate memory to do
-            // so, and I'd like to avoid this here
-            if (low == 0) found_zero = true;
-            if (high == nvars -1) found_nvars = true;
+            length += BlockLength(block_ordering);
           }
         }
-        return (found_zero && found_nvars);
+        return (length == nvars);
       }
       
       default:
-        return true;
+      {
+        GP_Iterator_pt it = WeightsIterator();
+        if (it == NULL || (it->N() > 0 && it->N() <= nvars)) return true;
+        return false;
+      }
   }
 }
+
 
 #if 0
 //

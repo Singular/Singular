@@ -60,10 +60,10 @@ class GP_t
 {
 public:
   // has to say what kind of specification it is
-  virtual GP_Type_t     Type()      {return GP_UnknownType;}
-  virtual GP_Atom_pt    Atom()      {return NULL;}
-  virtual GP_Comp_pt    Comp()      {return NULL;}
-  virtual GP_Poly_pt    Poly()      {return NULL;}
+  virtual GP_Type_t     Type()      = 0;
+  virtual GP_Atom_pt    Atom()      = 0;
+  virtual GP_Comp_pt    Comp()      = 0;
+  virtual GP_Poly_pt    Poly()      = 0;
   
   // traverses through the spec tree and checks everything for
   // semantic correctness
@@ -82,7 +82,7 @@ public:
 typedef class GP_Iterator_t
 {
 public:
-  virtual int   N()                     = 0;
+  virtual long   N()                    = 0;
   virtual void* Next()                  = 0;
   virtual void  Reset(const void* data) = 0;
   virtual ~GP_Iterator_t() {}
@@ -112,8 +112,6 @@ typedef enum
 {
   GP_UnknownAtomEncoding,
   GP_DynamicAtomEncoding,
-  GP_UintAtomEncoding,
-  GP_SintAtomEncoding,
   GP_UlongAtomEncoding,
   GP_SlongAtomEncoding,
   GP_FloatAtomEncoding,
@@ -133,9 +131,9 @@ public:
   bool  IsAtomDataOk(const void* data);
 
   // the following need to be implemented by a child of GP_Atom_t
-  virtual GP_AtomType_t AtomType()  = 0;
+  virtual GP_AtomType_t AtomType()                  = 0;
   // GP_UnknownAtomEncoding: means can only be determined from the atom itself
-  virtual GP_AtomEncoding_t AtomEncoding()        = 0;
+  virtual GP_AtomEncoding_t AtomEncoding()          = 0;
   // for GP_CharPAtomType and GP_ModuloAtomType
   // this returns the modulus, otherwise, this returns 0
   // Encoding of return is equivalent to that of AtomEncoding()
@@ -147,15 +145,13 @@ public:
     {return GP_UnknownAtomEncoding;}
   
   // getting the value of Atoms
-  virtual unsigned int  AtomUint(const void* data)  {return 0;}
-  virtual signed int    AtomSint(const void* data)  {return 0;}
   virtual unsigned long AtomUlong(const void* data) {return 0;}
   virtual signed long   AtomSlong(const void* data) {return 0;}
   virtual float         AtomFloat(const void* data) {return 0.0;}
   virtual double        AtomDouble(const void* data){return 0.0;}
 
-  virtual   unsigned int   AtomApIntLength(const void* data)   {return 0;}
-  virtual   signed int     AtomApIntSign(const void* data)     {return 0;}
+  virtual   unsigned long   AtomApIntLength(const void* data)   {return 0;}
+  virtual   signed long     AtomApIntSign(const void* data)     {return 0;}
   virtual   void           AtomApInt(const void* data, unsigned long* apint) {}
   virtual   const unsigned long*  AtomApInt(const void* data) {return NULL;}
   virtual   const void*    AtomGmpApInt(const void* data) {return NULL;}
@@ -194,12 +190,12 @@ public:
   virtual   GP_Iterator_pt  ElementDataIterator(const void* data)  = 0;
 
   // only relevant for matricies
-  virtual void MatrixDimension(int &dx, int &dy) 
+  virtual void MatrixDimension(long &dx, long &dy) 
     {dx = -1; dy = -1;}
 
   // only relevant fro Free modules
-  virtual int   FreeModuleComponent(void* data);
-  virtual void* FreeModuleElement(void* data);
+  virtual long   FreeModuleComponent(void* data)    {return -1;}
+  virtual void*  FreeModuleElement(void* data)      {return NULL;}
 };
 
 
@@ -221,9 +217,9 @@ public:
   bool  IsPolySpecOk();
   bool  IsPolyDataOk(const void* data);
 
-  virtual GP_PolyType_t PolyType()      {return GP_UnknownPolyType;}
-  virtual GP_UvPoly_pt  UvPoly()        {return NULL;}
-  virtual GP_MvPoly_pt  MvPoly()        {return NULL;}
+  virtual GP_PolyType_t PolyType()      = 0;
+  virtual GP_UvPoly_pt  UvPoly()        = 0;
+  virtual GP_MvPoly_pt  MvPoly()        = 0;
   
   virtual GP_pt   Coeffs()              = 0;
 
@@ -232,7 +228,7 @@ public:
   // a specification whether the first variable of the poly is to be
   // interpreted as index of a free vector generator -- i.e. whether
   // poly is actually a vector over a free module 
-  virtual bool      IsFreeModuleVector()        {return false;}
+  virtual bool      IsFreeModuleVector()    {return false;}
 };
 
 
@@ -264,9 +260,8 @@ public:
 
   // The next two functions are only relevant for Sparse Univariate polys
   virtual void* ExpCoeff(const void* term)     {return NULL;}
-  virtual int   ExpValue(const void* term)     {return -1;}
+  virtual long  ExpValue(const void* term)     {return -1;}
 };
-
 
 
 ////////////////////////////////////////
@@ -286,12 +281,12 @@ public:
   bool  IsMvPolySpecOk();
   bool  IsMvPolyDataOk(const void* data);
 
-  virtual GP_MvPolyType_t   MvPolyType()    {return GP_UnknownMvPolyType;}
-  virtual GP_DistMvPoly_pt  DistMvPoly()    {return NULL;}
-  virtual GP_RecMvPoly_pt   RecMvPoly()     {return NULL;}
+  virtual GP_MvPolyType_t   MvPolyType()    = 0;
+  virtual GP_DistMvPoly_pt  DistMvPoly()    = 0;
+  virtual GP_RecMvPoly_pt   RecMvPoly()     = 0;
   
   // the number of variables of the poly
-  virtual int   NumberOfVars()              = 0;
+  virtual long   NumberOfVars()             = 0;
   // iterator for variable names
   virtual GP_Iterator_pt    VarNamesIterator() {return NULL;}
 };
@@ -330,8 +325,8 @@ public:
   // for SparseDistPolys, we need another iterator
   virtual GP_Iterator_pt ExpVectorIterator(const void* monom) {return NULL;}
   // from which we can extract the (number, value) tuple
-  virtual int ExpValue(void* exp)  {return -1;}
-  virtual int ExpNumber(void* exp) {return -1;}
+  virtual long ExpValue(void* exp)  {return -1;}
+  virtual long ExpNumber(void* exp) {return -1;}
 };
 
 
@@ -350,9 +345,9 @@ public:
   virtual   void*  Coeff(const void* data)        = 0;
   // or a term of the form v^e*MutlSubPoly() + AddSubPoly()
   // index of variable v ( in range 0 to VarNumber()-1)
-   virtual   int Variable(const void* data)       = 0;    
+   virtual   long Variable(const void* data)       = 0;    
   // exponent e of v
-   virtual   int Exponent(const void* data)       = 0;
+   virtual   long Exponent(const void* data)       = 0;
   // multiplicative subpoly of v
    virtual   void*    MultSubPoly(const void* data)   = 0;
   // additive submonom of v
@@ -373,19 +368,17 @@ typedef enum
   // either simple orderings like global orderings (which are complete)
   GP_LexOrdering, 
   GP_RevLexOrdering,
-  GP_DegLexOrdering,       // can have pos. integers as weights
-  GP_DegRevLexOrdering,    // can have pos. integers as weights
+  GP_DegLexOrdering,       
+  GP_DegRevLexOrdering,    
 
   // local orderings (are complete)
   GP_NegLexOrdering,
   GP_NegRevLexOrdering,
-  GP_NegDegLexOrdering,    // can have pos. integers as weights
-  GP_NegDegRevLexOrdering, // can have pos. integers as weights
+  GP_NegDegLexOrdering,    
+  GP_NegDegRevLexOrdering, 
 
   // matrix ordering (is complete)
   GP_MatrixOrdering,      
-  // extra weight vector ordering (is incomplete)
-  GP_VectorOrdering,
 
   // module orderings (are incomplete)
   GP_IncrCompOrdering,  
@@ -399,10 +392,10 @@ typedef enum
 class GP_Ordering_t
 {
 public:
-  bool IsOk(const int nvars);
+  bool IsOk(const long nvars);
   
   // type 
-  virtual GP_OrderingType_t OrderingType() = 0;
+  virtual GP_OrderingType_t OrderingType()          = 0;
   GP_OrderingType_t OrderingType(const void* block) 
     {return GP_UnknownOrdering;}
 
@@ -413,8 +406,8 @@ public:
   // blocks of orderings and number of blocks for product orderings 
   virtual GP_Iterator_pt BlockOrderingIterator() {return NULL;}
 
-  virtual void BlockLength(const void* block, int &length)
-    {length = -1;}
+  virtual long BlockLength(const void* block)
+    {return -1;}
 
 private:
   bool IsBlockOrderingOk(const void* block_ordering);

@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.74 1998-11-12 13:06:11 Singular Exp $ */
+/* $Id: extra.cc,v 1.75 1998-11-13 12:20:58 obachman Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -64,6 +64,7 @@
 
 #include "silink.h"
 #include "mpsr.h"
+#include "MPT_GP.h"
 
 #ifdef HAVE_DYNAMIC_LOADING
 #include <dlfcn.h>
@@ -917,6 +918,13 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         WerrorS("Can not get tree");
         return TRUE;
       }
+      MPT_GP_pt gp_tree = MPT_GetGP(tree);
+      if (gp_tree == NULL || ! gp_tree->IsOk(gp_tree))
+      {
+        WerrorS("gp error");
+        return TRUE;
+      }
+      delete gp_tree;
       MPT_DeleteTree(tree);
       return FALSE;
     }

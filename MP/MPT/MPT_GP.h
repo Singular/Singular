@@ -63,14 +63,14 @@ typedef class MPT_GP_Iterator_t : public GP_Iterator_t, public MPT_Top_t
 public:
   MPT_GP_Iterator_t(MPT_Node_pt tnode);
   MPT_GP_Iterator_t();
-  virtual int N()                       {return _n;}
+  virtual long  N()                       {return _n;}
   virtual void* Next();
   virtual void  Reset(const void* data);
   ~MPT_GP_Iterator_t() {}
 
 private:
-  int _i;
-  int _n;
+  long _i;
+  long _n;
   MPT_Arg_pt _args;
   bool _dynamic;
 } * MPT_GP_Iterator_pt;
@@ -78,15 +78,15 @@ private:
 typedef class MPT_GP_ValueIterator_t : public MPT_GP_Iterator_t
 {
 public:
-  MPT_GP_ValueIterator_t(MPT_Tree_pt tree, int vtype);
+  MPT_GP_ValueIterator_t(MPT_Tree_pt tree, long vtype);
   MPT_GP_ValueIterator_t();
   void* Next();
 
 private:
   MPT_Tree_pt _prototype;
-  int _vtype;
+  long _vtype;
 };
-bool MPT_GP_IsValueIterator(MPT_Tree_pt tree, int vtype = -1);
+bool MPT_GP_IsValueIterator(MPT_Tree_pt tree, long vtype = -1);
 
   
 MPT_GP_Atom_pt      MPT_GetGP_Atom(MPT_Node_pt tnode);
@@ -94,7 +94,7 @@ MPT_GP_Comp_pt      MPT_GetGP_Comp(MPT_Node_pt tnode);
 MPT_GP_Poly_pt      MPT_GetGP_Poly(MPT_Node_pt tnode);
 MPT_GP_MvPoly_pt    MPT_GetGP_MvPoly(MPT_Node_pt tnode);
 MPT_GP_DistMvPoly_pt MPT_GetGP_DistMvPoly(MPT_Node_pt tnode);
-MPT_GP_Ordering_pt MPT_GetGP_Ordering(MPT_Node_pt tnode, int nvars);
+MPT_GP_Ordering_pt MPT_GetGP_Ordering(MPT_Node_pt tnode, long nvars);
 
 /////////////////////////////////////////////////////////////////////
 ///
@@ -103,7 +103,7 @@ MPT_GP_Ordering_pt MPT_GetGP_Ordering(MPT_Node_pt tnode, int nvars);
 /////////////////////////////////////////////////////////////////////
 class MPT_GP_Ordering_t : public GP_Ordering_t
 {
-  friend MPT_GP_Ordering_pt MPT_GetGP_Ordering(MPT_Tree_pt tnode,int nvars);
+  friend MPT_GP_Ordering_pt MPT_GetGP_Ordering(MPT_Tree_pt tnode,long nvars);
   
 public:
   
@@ -119,7 +119,7 @@ public:
   GP_Iterator_pt BlockOrderingIterator();
 
   // only relevant for blocks
-  void BlockLimits(const void* block, int &low, int &high);
+  long BlockLength(const void* block);
 
 protected:
   MPT_GP_Ordering_t(MPT_Tree_pt otree);
@@ -149,8 +149,6 @@ public:
   void*             AtomModulus()   {return _modulus;} 
   GP_AtomEncoding_t AtomEncoding(const void* data);
 
-  unsigned int      AtomUint(const void* data);  
-  signed int        AtomSint(const void* data);  
   unsigned long     AtomUlong(const void* data); 
   signed long       AtomSlong(const void* data); 
   float             AtomFloat(const void* data);
@@ -206,18 +204,18 @@ class MPT_GP_MatrixComp_t : public MPT_GP_Comp_t
   friend MPT_GP_Comp_pt MPT_GetGP_Comp(MPT_Node_pt tnode);
 
 public:
-  void MatrixDimension(const void* data, int &dx, int &dy)
+  void MatrixDimension(long &dx, long &dy)
    {dx = _dx; dy = _dy;} 
   
 protected:
   MPT_GP_MatrixComp_t(MPT_Node_pt tnode, MPT_GP_pt elements,     
-                      int dx, int dy) 
+                      long dx, long dy) 
       : MPT_GP_Comp_t(tnode, GP_MatrixCompType, elements)
     {_dx = dx; _dy = dy;}
 
 private:
-  int _dx;
-  int _dy;
+  long _dx;
+  long _dy;
 };
 
 /////////////////////////////////////////////////////////////////////
@@ -259,7 +257,7 @@ public:
   virtual GP_DistMvPoly_pt  DistMvPoly()    {return NULL;}
   virtual GP_RecMvPoly_pt   RecMvPoly()     {return NULL;}
   
-  int               NumberOfVars()  {return _nvars;}
+  long              NumberOfVars()  {return _nvars;}
   GP_Iterator_pt    VarNamesIterator() 
     {
       if (_vname_iterator != NULL) _vname_iterator->Reset(_tnode); 
@@ -269,8 +267,8 @@ public:
   ~MPT_GP_MvPoly_t() {if (_vname_iterator != NULL) delete _vname_iterator;}
 
 protected:
-  MPT_GP_MvPoly_t(MPT_Node_pt tnode, MPT_GP_pt coeffs, int nvars);
-  int _nvars;
+  MPT_GP_MvPoly_t(MPT_Node_pt tnode, MPT_GP_pt coeffs, long nvars);
+  long _nvars;
   MPT_GP_Iterator_pt _vname_iterator;
 };
 
@@ -291,7 +289,7 @@ public:
   GP_Iterator_pt MonomIterator(const void* data)
     {_monom_iterator.Reset(data); return &(_monom_iterator);}
   void*         Coeff(const void* monom);
-  void          ExpVector(const void* monom, int* &expvector);
+  void          ExpVector(const void* monom, long* &expvector);
   
   ~MPT_GP_DistMvPoly_t()
     {
@@ -300,7 +298,7 @@ public:
     }
 
 protected:
-  MPT_GP_DistMvPoly_t(MPT_Node_pt tnode, MPT_GP_pt coeffs, int nvars,
+  MPT_GP_DistMvPoly_t(MPT_Node_pt tnode, MPT_GP_pt coeffs, long nvars,
                       MPT_GP_Ordering_pt has_ordering,
                       MPT_GP_Ordering_pt should_have_ordering);
 

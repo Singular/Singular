@@ -11,13 +11,12 @@
 #include "MP.h"
 
 
-MP_Status_t MP_PutGP_Spec(MP_Link_pt link, GP_pt gp, 
-                          bool meta = TRUE, void* data = NULL)
+MP_Status_t MP_PutGP_Object(MP_Link_pt link, GP_Object_t gp)
 {
   switch(gp->Type())
   {
       case GP_AtomType:
-        return MP_PutGP_AtomSpec(link, gp->Atom(), meta, data);
+        return MP_PutGP_AtomPacket(link, gp->Atom(), data);
         
       case GP_PolyType:
         return MP_PutGP_PolySpec(link, gp->Poly(), meta, data);
@@ -69,11 +68,9 @@ MP_Status_t MP_PutGP_AtomSpec(MP_Link_pt link, GP_Atom_pt gp,
   switch(aencoding)
   {
       case GP_SlongAtomEncoding:
-      case GP_SintAtomEncoding:
         mtype = MP_CmtProtoIMP_Sint32;
         break;
         
-      case GP_UintAtomEncoding:
       case GP_UlongAtomEncoding:
         mtype = MP_CmtProtoIMP_Uint32;
         break;
@@ -169,15 +166,9 @@ MP_Status_t MP_PutGP_AtomData(MP_Link_pt link, GP_Atom_pt gp, void* data)
       case GP_UlongAtomEncoding:
         return IMP_PutUint32(link, (MP_Uint32_t) gp->AtomUlong(data));
         
-      case GP_UintAtomEncoding:
-        return IMP_PutUint32(link, (MP_Uint32_t) gp->AtomUint(data));
-        
       case GP_SlongAtomEncoding:
         return IMP_PutSint32(link, (MP_Sint32_t) gp->AtomSlong(data));
         
-      case GP_SintAtomEncoding:
-        return IMP_PutSint32(link, (MP_Sint32_t) gp->AtomSint(data));
-
       case GP_FloatAtomEncoding:
         return IMP_PutReal32(link, (MP_Real32_t) gp->AtomFloat(data));
         
@@ -204,7 +195,8 @@ MP_Status_t MP_PutGP_AtomData(MP_Link_pt link, GP_Atom_pt gp, void* data)
 /// Composites
 ///
 /////////////////////////////////////////////////////////////////////
-MP_Status_t MP_PutGP_CompSpec((MP_Link_pt link, GP_Comp_pt gp, 
+
+MP_Status_t MP_PutGP_CompSpec(MP_Link_pt link, GP_Comp_pt gp, 
                               bool meta = TRUE, void* data = NULL)
 {
   GP_CompType_t ctype = CompType();
@@ -214,7 +206,6 @@ MP_Status_t MP_PutGP_CompSpec((MP_Link_pt link, GP_Comp_pt gp,
   MP_NumAnnot_t numannot = 1;
   MP_NumChild_t numchild = 0;
   
-
   if (ctype == GP_RationalCompType ||
       ctype == GP_ComplexCompType)
   {
@@ -231,7 +222,7 @@ MP_Status_t MP_PutGP_CompSpec((MP_Link_pt link, GP_Comp_pt gp,
     numchild = gp->ElementIterator()->N();
     ntype = MP_CommonOperatorType;
   }
-  
+
   switch (ctype)
   {
       case GP_IdealCompType:
@@ -259,6 +250,11 @@ MP_Status_t MP_PutGP_CompSpec((MP_Link_pt link, GP_Comp_pt gp,
         cval = MP_CopMatrixDenseMatrix;
         numannot++;
         break;
+
+      case GP_FreeModuleCompType:
+        dict = MP_PolyDict;
+        cval = MP_CopPolyFreeModule;
+        break;
         
       default:
         return MP_SetError(link, MP_ExternalError);
@@ -269,8 +265,8 @@ MP_Status_t MP_PutGP_CompSpec((MP_Link_pt link, GP_Comp_pt gp,
   ERR_CHK(MP_PutGP_Spec(link, gp->Elements()));
   if (ctype == GP_MatrixCompType)
   {
-    int dx, dy;
-    gp->
+    long  dx, dy;
+    gp->MatrixDimension(dx, dy);
     
     ERR_CHK(MP_PutAnnotationPacket(link,
                                    MP_MatrixDict,
@@ -281,17 +277,24 @@ MP_Status_t MP_PutGP_CompSpec((MP_Link_pt link, GP_Comp_pt gp,
                                         MP_CopBasicList,
                                         0, 2));
     
-    mp_failr(MP_PutUint32Packet(link, (MP_Uint32_t) , 0));
-    mp_failr(MP_PutUint32Packet(link, (MP_Uint32_t) vlength, 0));
-  
-  
+    ERR_CHK(MP_PutSint32Packet(link, (MP_Uint32_t) , dx));
+    ERR_CHK(MP_PutSint32Packet(link, (MP_Uint32_t) , dy));
+  }
+  return MP_Success;
 }
+  
+
+MP_Status_t MP_PutGP_CompData(MP_Link_pt link, GP_Atom_pt gp, void* data, 
+                              bool meta)
+{
+  
+
 bool GP_Comp_t::IsCompDataOk(const void* data)
 {
   GP_Iterator_pt it = ElementDataIterator(data);
   GP_pt elements = Elements();
   GP_CompType_t ctype = CompType();
-  int i, n;
+  long i, n;
   
   
   if (it == NULL) return false;
@@ -302,7 +305,7 @@ bool GP_Comp_t::IsCompDataOk(const void* data)
   {
       case GP_MatrixCompType:
       {
-        int dx, dy;
+        long dx, dy;
         MatrixDimension(data, dx, dy);
         if (dx < 0 || dy < 0) return false;
         if (dx*dy != n) return false;
@@ -390,7 +393,7 @@ bool GP_UvPoly_t::IsUvPolyDataOk(const void* data)
   bool isSparse = (UvPolyType() == GP_SparseUvPolyType);
   GP_pt coeff = Coeffs();
 
-  int i, n;
+  long i, n;
   void* term;
   
   
@@ -477,7 +480,7 @@ bool GP_DistMvPoly_t::IsDistMvPolyDataOk(const void* data)
   GP_Iterator_pt    monoms = MonomIterator(data);
   GP_pt             coeffs = Coeffs();
   void*             monom;
-  int i, n,j,       nvars  = NumberOfVars();
+  long i, n,j,       nvars  = NumberOfVars();
   GP_Iterator_pt    expvector = NULL;
 
   if (type ==  GP_UnknownDistMvPolyType) return false;
@@ -495,7 +498,7 @@ bool GP_DistMvPoly_t::IsDistMvPolyDataOk(const void* data)
     
     if (type == GP_SparseDistMvPolyType)
     {
-      int m;
+      long m;
       void* exp;
 
       if (expvector == NULL)  
@@ -561,7 +564,7 @@ bool GP_RecMvPoly_t::IsRecMvPolyDataOk(const void* data)
 /////////////////////////////////////////////////////////////////////
 bool GP_Ordering_t::IsBlockOrderingOk(const void* block_ordering)
 {
-  int low, high;
+  long low, high;
   
   BlockLimits(block_ordering, low, high);
   
@@ -586,7 +589,7 @@ bool GP_Ordering_t::IsBlockOrderingOk(const void* block_ordering)
   }
 }
     
-bool GP_Ordering_t::IsOk(const int nvars)
+bool GP_Ordering_t::IsOk(const long nvars)
 {
   if (nvars <= 0) return false;
   
@@ -612,7 +615,7 @@ bool GP_Ordering_t::IsOk(const int nvars)
       case GP_ProductOrdering:
       {
         GP_Iterator_pt iter = BlockOrderingIterator();
-        int i, n = 0, low, high;
+        long i, n = 0, low, high;
         bool found_zero=false, found_nvars=false;
         void* block_ordering;
         

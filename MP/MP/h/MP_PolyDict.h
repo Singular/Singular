@@ -119,6 +119,7 @@
 #define MP_CopPolyClearDenom            42
 #define MP_CopPolyFacStd                43
 #define MP_CopPolyResultant             44
+#define MP_CopPolyFreeModule            45
 
 /***************************************************************************
  *
