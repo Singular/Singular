@@ -60,7 +60,6 @@ AC_PROG_CPP
 AC_AIX
 
 AC_CHECK_PROGS(PERL, perl5 perl)
-AC_CHECK_PROGS(ZIP, zip pkzip)
 AC_PROG_LN_S
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll

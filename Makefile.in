@@ -101,44 +101,51 @@ Tst-Long:  ${SINGULAR} Tst/Short Tst/regress.cmd
 	${PERL} Tst/regress.cmd -s ${SINGULAR} Tst/Long/*.tst
 
 
+
+
 ##############################################################
 # distribution targets
 LN_S		= @LN_S@
 MKINSTALLDIRS 	= ./mkinstalldirs
 TMPDIR		= /tmp/singdist
 SINGUNAME 	= @SINGUNAME@
-SINGULAR_VERSION= @SINGULAR_VERSION@
+S_VERSION       = $${SINGULAR_VERSION-@SINGULAR_VERSION@}
 SINGULAR_DOS_VERSION = @SINGULAR_DOS_VERSION@
-DISTROOT_NAME	= Singular-${SINGULAR_VERSION}
+DISTROOT_NAME	= Singular-${S_VERSION}
 BINDIST_NAME	= ${DISTROOT_NAME}-${SINGUNAME}
+SHAREDIST_NAME  = ${DISTROOT_NAME}-share
+
+test_t:
+	echo ${S_VERSION}
 
 .PHONY: sharedist bindist static-bindist infodist win-sharedist
 sharedist: ${SINGULAR}
 	cd doc; ${MAKE} all 
 	rm -rf ${TMPDIR}
-	${MKINSTALLDIRS} ${TMPDIR}/Singular/LIB/$${S_VERSION-${SINGULAR_VERSION}}
-	${MKINSTALLDIRS} ${TMPDIR}/Singular/doc/$${S_VERSION-${SINGULAR_VERSION}}
-	${MKINSTALLDIRS} ${TMPDIR}/Singular/html/$${S_VERSION-${SINGULAR_VERSION}}
+	${MKINSTALLDIRS} ${TMPDIR}/Singular/LIB/${S_VERSION}
+	${MKINSTALLDIRS} ${TMPDIR}/Singular/doc/${S_VERSION}
+	${MKINSTALLDIRS} ${TMPDIR}/Singular/html/${S_VERSION}
 	${MKINSTALLDIRS} ${TMPDIR}/info
-	cp Singular/LIB/*.lib ${TMPDIR}/Singular/LIB/$${S_VERSION-${SINGULAR_VERSION}}
-	cp -R Singular/LIB/gftables ${TMPDIR}/Singular/LIB/
-	cd ${TMPDIR}/Singular/LIB/$${S_VERSION-${SINGULAR_VERSION}}; \
+	${MKINSTALLDIRS} ${TMPDIR}/LIB/gftables
+	cp Singular/LIB/*.lib ${TMPDIR}/Singular/LIB/${S_VERSION}
+	cp Singular/LIB/gftables/[0-9]* ${TMPDIR}/LIB/gftables
+	cd ${TMPDIR}/Singular/LIB/${S_VERSION}; \
 		${LN_S} ../gftables .
 	cp doc/singular.hlp doc/singular.ps doc/usercard.ps \
            doc/singular.dvi doc/usercard.dvi \
-           ${TMPDIR}/Singular/doc/$${S_VERSION-${SINGULAR_VERSION}}
-	cp -R doc/html/* ${TMPDIR}/Singular/html/$${S_VERSION-${SINGULAR_VERSION}}
+           ${TMPDIR}/Singular/doc/${S_VERSION}
+	cp -R doc/html/* ${TMPDIR}/Singular/html/${S_VERSION}
 	cd ${TMPDIR}/info; \
-        ${LN_S} ../Singular/doc/$${S_VERSION-${SINGULAR_VERSION}}/singular.hlp .
+        ${LN_S} ../Singular/doc/${S_VERSION}/singular.hlp .
 	cp README.share COPYING README.general ${TMPDIR}/Singular
 	cd ${TMPDIR}; \
            tar -cf sing.tar Singular info; \
            gzip sing.tar
-	cp ${TMPDIR}/sing.tar.gz Singular-$${S_VERSION-${SINGULAR_VERSION}}-share.tar.gz
+	cp ${TMPDIR}/sing.tar.gz ${SHAREDIST_NAME}.tar.gz
 	rm -rf ${TMPDIR}
 
 win-sharedist:
-	export S_VERSION=${SINGULAR_DOS_VERSION} && ${MAKE} sharedist
+	export SINGULAR_VERSION=${SINGULAR_DOS_VERSION} && ${MAKE} sharedist
 
 bindist: ${SINGULAR}
 	cd Singular; ${MAKE} Singular-$@ libparse
@@ -162,8 +169,10 @@ static-bindist: ${SINGULAR}
 	rm -rf ${TMPDIR}
 	${MKINSTALLDIRS} ${TMPDIR}/${SINGUNAME}/bin/
 	${MKINSTALLDIRS} ${TMPDIR}/Singular
-	cp Singular/Singular-$@ ${TMPDIR}/${SINGUNAME}/bin/Singular-${S_VERSION}-static
-	cd ${TMPDIR}/${SINGUNAME}/bin; ${LN_S} Singular-${S_VERSION}-static Singular
+	cp Singular/Singular-$@ \
+           ${TMPDIR}/${SINGUNAME}/bin/Singular-${S_VERSION}-static
+	cd ${TMPDIR}/${SINGUNAME}/bin;  \
+           ${LN_S} Singular-${S_VERSION}-static Singular
 	cp Singular/libparse ${TMPDIR}/${SINGUNAME}/bin/
 	cp INSTALL COPYING README.bin README.general ${TMPDIR}/Singular
 	cd ${TMPDIR}; \
@@ -181,15 +190,14 @@ infodist:
 	cp ${TMPDIR}/info-${SINGUNAME}.tar.gz .
 	rm -rf ${TMPDIR}
 
-ZIP		= @ZIP@
+ZIP		= zip
 INSTALL		= ./Singular/install-sh -c
 SH_PROGRAM 	= /bin/sh
 INFO_PROGRAM 	= /bin/info
 CYGWIN_DLL	= /bin/cygwinb19.dll
 WIN_BINDIR      = ${TMPDIR}/Singular/${SINGULAR_VERSION}
-SHAREDISTNAME   = Singular-${SINGULAR_DOS_VERSION}-share
 
-windist: ${SHAREDISTNAME}.tar.gz ${SINGULAR}
+windist: ${SHAREDIST_NAME}.tar.gz ${SINGULAR}
 	cd Singular; ${MAKE} Singular-bindist libparse
 	rm -rf ${TMPDIR}
 	${MKINSTALLDIRS} ${WIN_BINDIR}
@@ -198,16 +206,16 @@ windist: ${SHAREDISTNAME}.tar.gz ${SINGULAR}
 	${INSTALL} ${SH_PROGRAM} ${WIN_BINDIR}
 	${INSTALL} ${INFO_PROGRAM} ${WIN_BINDIR}
 	${INSTALL} ${CYGWIN_DLL} ${WIN_BINDIR}
-	cp  ${SHAREDISTNAME}.tar.gz ${TMPDIR}
-	cd ${TMPDIR}; gunzip ${SHAREDISTNAME}.tar.gz; \
-                      tar xf ${SHAREDISTNAME}.tar
+	cp  ${SHAREDIST_NAME}.tar.gz ${TMPDIR}
+	cd ${TMPDIR}; gunzip ${SHAREDIST_NAME}.tar.gz; \
+                      tar xf ${SHAREDIST_NAME}.tar
 	rm -rf ${TMPDIR}/info ${TMPDIR}/Singular/README.share
 	cp INSTALL.win	${TMPDIR}/Singular/INSTALL
 	cp README.win	${TMPDIR}/Singular/README
 	cd ${TMPDIR}; \
            ${ZIP} -r sing Singular 
 	cp ${TMPDIR}/sing.zip Singular-${SINGULAR_VERSION}-${SINGUNAME}.zip .
-#	rm -rf ${TMPDIR}
+	rm -rf ${TMPDIR}
 
 
 ##############################################################

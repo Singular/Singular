@@ -45,6 +45,7 @@ MANUAL_FILES	= ${TEX_FILES} ${DOC2TEX_FILES}
 TUTOR_FILES	= \
 		tutor.tex examples.tex start.tex proc.tex copyright.tex
 
+.PHONY: info dvi ps 
 # default target
 all: info dvi html
 
@@ -79,6 +80,7 @@ usercard.ps: usercard.dvi
 html: ${MANUAL_FILES}
 	test -d html || mkdir html
 	cd html && ../texi2html -I .. -menu -expandinfo -number -split_node -verbose ../singular.tex
+	touch html
 
 # how to create the texinfo files
 %.tex: %.doc doc2tex ${SINGULAR}
