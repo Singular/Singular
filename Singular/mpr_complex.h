@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_complex.h,v 1.1 1999-04-29 11:38:50 Singular Exp $ */
+/* $Id: mpr_complex.h,v 1.2 1999-05-17 11:31:45 Singular Exp $ */
 
 /* 
 * ABSTRACT - multipolynomial resultants - real floating-point numbers using gmp
@@ -128,6 +128,9 @@ typedef gmp_float mprfloat_g;
  */
 class complex
 {
+private:
+  mprfloat_g r, i;
+
 public:
   complex( const mprfloat_g re= 0.0, const mprfloat_g im= 0.0 );
   complex( const mprfloat re, const mprfloat im = 0.0 );
@@ -156,20 +159,20 @@ public:
   complex & operator = ( const complex & a );
 
   // access to real and imaginary part
-  inline mprfloat_g real() const;
-  inline mprfloat_g imag() const;
+  inline mprfloat_g real() const { return r; }
+  inline mprfloat_g imag() const { return i; }
 
-  inline void real( mprfloat_g );
-  inline void imag( mprfloat_g );
-
-private:
-  mprfloat_g r, i;
+  inline void real( mprfloat_g val ) { r = val; }
+  inline void imag( mprfloat_g val ) { i = val; }
 };
 
 mprfloat_g abs( const complex & c );
 complex sqrt( const complex & x );
 
-complex numberToComplex( number num );
+inline complex numberToComplex( number num )
+{
+  return complex( numberToFloat(num) );
+}
 char *complexToStr( const complex & c, const  unsigned int oprec );
 //<-
 

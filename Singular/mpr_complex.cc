@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_complex.cc,v 1.3 1999-05-10 15:10:52 Singular Exp $ */
+/* $Id: mpr_complex.cc,v 1.4 1999-05-17 11:31:47 Singular Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - real floating-point numbers using gmp
@@ -660,24 +660,6 @@ complex & complex::operator = ( const complex & a )
   return *this;
 }
 
-inline mprfloat_g complex::real() const
-{
-  return r;
-}
-inline mprfloat_g complex::imag() const
-{
-  return i;
-}
-
-inline void complex::real( const mprfloat_g val )
-{
-  r= val;
-}
-inline void complex::imag( const mprfloat_g val )
-{
-  i= val;
-}
-
 // Returns absolute value of a complex number
 //
 mprfloat_g abs( const complex & c )
@@ -715,11 +697,6 @@ complex sqrt( const complex & x )
 
 // converts a number to a complex
 //
-complex numberToComplex( number num )
-{
-  return complex( numberToFloat(num) );
-}
-
 char *complexToStr( const complex & c, const size_t oprec )
 {
   char *out,*in_imag,*in_real;
