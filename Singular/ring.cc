@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.71 1999-10-14 15:33:40 Singular Exp $ */
+/* $Id: ring.cc,v 1.72 1999-10-14 17:59:35 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -2711,12 +2711,12 @@ static void rO_Syz(int &place, int &prev_ord,
     long *o, sro_ord &ord_struct)
 {
   // ordering is derived from component number
-  if(prev_ord!= -1) rO_Align(place);
+  if(prev_ord!= 1) rO_Align(place);
   ord_struct.ord_typ=ro_syz;
   ord_struct.data.syz.place=place/(sizeof(long)/sizeof(Exponent_t));
   ord_struct.data.syz.limit=0;
-  o[place/(sizeof(long)/sizeof(Exponent_t))]=-1;
-  prev_ord=-1;
+  o[place/(sizeof(long)/sizeof(Exponent_t))]=1;
+  prev_ord=1;
   place++;
   rO_Align(place);
 }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.46 1999-10-14 15:33:39 Singular Exp $ */
+/* $Id: polys.cc,v 1.47 1999-10-14 17:59:34 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -140,7 +140,10 @@ void rSetm(poly p)
         case ro_syz:
         {
           int c=pGetComp(p);
-          p->exp.l[o->data.syz.place]= (o->data.syz.limit > c);
+	  if (c > o->data.syz.limit)
+            p->exp.l[o->data.syz.place]= 0;
+	  else
+            p->exp.l[o->data.syz.place]= 1;
           break;
         }
         default:
@@ -395,13 +398,14 @@ void pSetSchreyerOrdM(polyset nextOrder, int length,int comps)
 void pSetSyzComp(int k)
 {
   pMaxBound=k;
-  if(currRing->typ[0].ord_typ==ro_syz)
+  if((currRing->typ!=NULL) && (currRing->typ[0].ord_typ==ro_syz))
   {
-    currRing->typ[0].data.syz.limit=k;
+    if (currRing->typ!=NULL)
+      currRing->typ[0].data.syz.limit=k;
   }
-  else if (k!=0)
+  else if ((currRing->order[0]!=ringorder_c) && (k!=0))
   {
-    Warn("syzcomp in incompatible ring");
+    WarnS("syzcomp in incompatible ring");
   }
 }
 

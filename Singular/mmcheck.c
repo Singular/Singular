@@ -1,10 +1,10 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmcheck.c,v 1.10 1999-10-14 14:27:18 obachman Exp $ */
+/* $Id: mmcheck.c,v 1.11 1999-10-14 17:59:33 Singular Exp $ */
 
 /*
-* ABSTRACT:
+* ABSTRACT: several checking routines to help debugging the memory subsystem
 */
 
 #define _POSIX_SOURCE 1
@@ -22,8 +22,6 @@
 #ifdef MTRACK
 #include "mmbt.h"
 #endif
-
-
 
 DBMCB mm_theDBused;
 DBMCB mm_theDBfree;
@@ -127,7 +125,7 @@ static int mmPrintDBMCB ( DBMCB * what, char* msg , int given_size)
 
   if ((what->flags & MM_FREEFLAG) && what->freed_fname != NULL)
   {
-    (void)fprintf( stderr, "freed in: %s:%d",
+    (void)fprintf( stderr, "freed in: %s:%d ",
                    what->freed_fname, what->freed_lineno );
 #ifdef MTRACK_FREE
     mmDBPrintThisStack(what, MM_PRINT_ALL_STACK, 1);
@@ -136,7 +134,7 @@ static int mmPrintDBMCB ( DBMCB * what, char* msg , int given_size)
 #ifndef MTRACK
   fprintf(stderr, "\n");
 #endif
-    
+
   if (strcmp(msg,"size")==0)
     (void)fprintf( stderr, "size is: %d, but check said %d \n",
       (int)what->size, given_size );
@@ -187,11 +185,11 @@ void mmFillDBMCB(DBMCB* what, size_t size, memHeap heap,
     what->freed_lineno = lineno;
   }
   else
-  { 
+  {
     what->allocated_fname = fname;
     what->allocated_lineno = lineno;
   }
-  
+
   if (flags == MM_FREEFLAG)
   {
     what->flags &= ~ MM_USEDFLAG;
@@ -205,7 +203,7 @@ void mmFillDBMCB(DBMCB* what, size_t size, memHeap heap,
     if (mm_markCurrentUsage == 1)
       what->flags |= MM_CURRENTLY_USEDFLAG;
   }
-  
+
   if (flags & MM_FREEFLAG)
     memset(addr, MM_FREE_PATTERN, size);
 
@@ -312,7 +310,7 @@ static int mmCheckSingleDBMCB ( DBMCB * what, int size , int flags)
       ok=0;
     }
   }
-  
+
 
   #ifdef unix
   if ( (what->next!=NULL)
@@ -362,7 +360,7 @@ static int mmCheckSingleDBMCB ( DBMCB * what, int size , int flags)
     else
       what->flags |= MM_REFERENCEFLAG;
   }
-      
+
   if ( what->size != size )
     return mmPrintDBMCB( what, "size", size );
 

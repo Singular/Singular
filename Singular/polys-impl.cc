@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.cc,v 1.27 1999-10-14 14:27:27 obachman Exp $ */
+/* $Id: polys-impl.cc,v 1.28 1999-10-14 17:59:33 Singular Exp $ */
 
 /***************************************************************
  *
@@ -334,7 +334,11 @@ poly _pCopy(memHeap d_h, poly s_p)
     pIter(s_p);
   }
   pNext(d_p) = NULL;
+#if defined(MDEBUG) && defined(PDEBUG)
+  pDBTest(dp.next, d_h, f,l);
+#else
   pHeapTest(dp.next, d_h);
+#endif
   return dp.next;
 }
 
@@ -910,7 +914,7 @@ void pDBMonAdd(poly p1, poly p2, poly p3, char* f, int l)
   }
   __pMonAdd(p1, p2, p3);
 
-  
+
   poly ptemp = pInit();
   for (int i=1; i<=pVariables; i++)
   {
@@ -918,7 +922,7 @@ void pDBMonAdd(poly p1, poly p2, poly p3, char* f, int l)
     if (pGetExp(ptemp, i) != pGetExp(p1, i))
     {
       Warn("Error in pMonAdd: %th exponent: %d != (%d == %d + %d)",
-           i, pGetExp(p1, i), pGetExp(ptemp, i), pGetExp(p2, i), 
+           i, pGetExp(p1, i), pGetExp(ptemp, i), pGetExp(p2, i),
            pGetExp(p3, i));
     }
   }
@@ -1089,7 +1093,7 @@ BOOLEAN pDBTest(poly p, memHeap heap, char *f, int l)
     {
       WarnS("wrong order (");
       wrp(old);
-      Warn(") in %s:%d (pComp=%d)\n",f,l,pComp(old,p));
+      Print(") in %s:%d (pComp=%d)\n",f,l,pComp(old,p));
       return FALSE;
     }
   }
@@ -1124,7 +1128,7 @@ static unsigned long GetBitFields(Exponent_t e,
 // exponents). If the value of an exponent is greater or equal to n, then
 // all of its respective n bits are set to 1. If the value of an exponent
 // is smaller than n, say m, then only the first m bits of the respective
-// n bits are set to 1, the others are set to 0. 
+// n bits are set to 1, the others are set to 0.
 // This way, we have:
 // exp1 / exp2 ==> (ev1 & ~ev2) == 0, i.e.,
 // if (ev1 & ~ev2) then exp1 does not divide exp2
@@ -1176,18 +1180,18 @@ static int pDivisibleBy_FALSE = 1;
 static int pDivisibleBy_ShortFalse = 1;
 static int pDivisibleBy_Null = 1;
 BOOLEAN pDBShortDivisibleBy(poly p1, unsigned long sev_1,
-                            poly p2, unsigned long not_sev_2, 
+                            poly p2, unsigned long not_sev_2,
                             char* f, int l)
 {
   if (sev_1 != 0 && pGetShortExpVector(p1) != sev_1)
   {
-    Warn("sev1 is %o but should be %o in %s:%d\n", sev_1, 
+    Warn("sev1 is %o but should be %o in %s:%d\n", sev_1,
           pGetShortExpVector(p1), f, l);
     assume(0);
   }
   if (~ pGetShortExpVector(p2) != not_sev_2)
   {
-    Warn("not_sev2 is %o but should be %o in %s:%d\n", not_sev_2, 
+    Warn("not_sev2 is %o but should be %o in %s:%d\n", not_sev_2,
           ~ pGetShortExpVector(p2), f, l);
     assume(0);
   }
@@ -1210,7 +1214,7 @@ BOOLEAN pDBShortDivisibleBy(poly p1, unsigned long sev_1,
 void pPrintDivisbleByStat()
 {
   Print("#Tests: %d; #FALSE %d(%d); #SHORT %d(%d) #NULL:%d(%d)\n",
-        pDivisibleBy_number, 
+        pDivisibleBy_number,
         pDivisibleBy_FALSE, pDivisibleBy_FALSE*100/pDivisibleBy_number,
         pDivisibleBy_ShortFalse, pDivisibleBy_ShortFalse*100/pDivisibleBy_FALSE,
         pDivisibleBy_Null, pDivisibleBy_Null*100/pDivisibleBy_number);

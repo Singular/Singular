@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.59 1999-10-14 15:33:39 Singular Exp $ */
+/* $Id: ideals.cc,v 1.60 1999-10-14 17:59:31 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -911,6 +911,7 @@ void pShift (poly * p,int i)
     if ((pGetComp(qp1)+i > 0) || ((j == -i) && (j == k)))
     {
       pSetComp(qp1,pGetComp(qp1)+i);
+      pSetm(qp1);
       qp2 = qp1;
       pIter(qp1);
     }
@@ -1149,9 +1150,10 @@ ideal idSect (ideal h1,ideal h2)
     rChangeCurrRing(syz_ring,FALSE);
   idDelete(&temp1);
   if(syz_ring!=orig_ring)
+  {
     rChangeCurrRing(orig_ring,TRUE);
-  if(syz_ring!=orig_ring)
     rKill(syz_ring);
+  }
 
   idSkipZeroes(result);
   return result;
@@ -1327,6 +1329,7 @@ static ideal idPrepare (ideal  h1,ideal  quot, tHomog h,
     p = h2->m[j];
     q = pOne();
     pSetComp(q,syzcomp+1+j);
+    pSetm(q);
     if (p!=NULL)
     {
       while (pNext(p)) pIter(p);
@@ -1350,6 +1353,12 @@ ideal idSyzygies (ideal  h1,ideal  quot, tHomog h,intvec **w)
   return idSyzygies(h1,quot,h,w,FALSE,d);
 }
 
+/*2
+* compute the syzygies of h1 in R/quot, 
+* weights of components are in w
+* if setRegularity, return the regularity in deg
+* do not change h1, quot, w
+*/
 ideal idSyzygies (ideal  h1,ideal  quot, tHomog h,intvec **w,
                   BOOLEAN setRegularity, int &deg)
 {
@@ -1368,11 +1377,12 @@ ideal idSyzygies (ideal  h1,ideal  quot, tHomog h,intvec **w,
 #endif
   if (idIs0(h1))
     return idFreeModule(IDELEMS(h1));
-  k=max(0,idRankFreeModule(h1));
+  k=max(1,idRankFreeModule(h1));
 
   ring orig_ring=currRing;
   ring syz_ring=rAddSyzComp(currRing);
   pSetSyzComp(k);
+
   ideal s_h1=idInit(IDELEMS(h1),h1->rank);
   for(i=IDELEMS(h1)-1;i>=0;i--)
   {
@@ -1428,7 +1438,9 @@ ideal idSyzygies (ideal  h1,ideal  quot, tHomog h,intvec **w,
           s_h3->m[j]=NULL;
         }
         else
+        {
           p = pPermPoly(s_h3->m[j],NULL,syz_ring,NULL,0);
+        }
         pShift(&p,-k);
         if (p!=NULL)
         {
@@ -1451,7 +1463,9 @@ ideal idSyzygies (ideal  h1,ideal  quot, tHomog h,intvec **w,
           rChangeCurrRing(orig_ring,TRUE);
         }
         else
+        {
           pDelete(&pNext(s_h3->m[j]));
+        }
       }
     }
   }
@@ -1467,7 +1481,7 @@ ideal idSyzygies (ideal  h1,ideal  quot, tHomog h,intvec **w,
     else
     {
       h3=idInit(IDELEMS(s_h3),s_h3->rank);
-      for(i=IDELEMS(quot)-1;i>=0;i--)
+      for(i=IDELEMS(s_h3)-1;i>=0;i--)
       {
         h3->m[i]=pPermPoly(s_h3->m[i],NULL,syz_ring,NULL,0);
       }
@@ -1493,6 +1507,11 @@ ideal idSyzygies (ideal  h1,ideal  quot, tHomog h,intvec **w,
   else
     idDelete(&s_h3);
   idSkipZeroes(e);
+#ifdef PDEBUG
+  idTest(e);
+  idTest(h1);
+  if (quot!=NULL) idTest(quot);
+#endif
   return e;
 }
 
@@ -1692,9 +1711,9 @@ ideal idLiftStd (ideal  h1,ideal  quot, matrix* ma, tHomog h)
   *ma=mpNew(1,0);
   if (idIs0(h1))
     return idInit(1,h1->rank);
-  k=max(0,idRankFreeModule(h1));
+  k=max(1,idRankFreeModule(h1));
   //RING AENDERN(pSetSyzComp(k))
-  h3=idPrepare(h1,quot,h,&k,&quotgen,&i,&w);
+  h3=idPrepare(h1,quot,h,k,&quotgen,&i,&w);
   //RING AENDERN(pSetSyzComp)
   if (w!=NULL) delete w;
   i = 0;
@@ -2722,7 +2741,7 @@ ideal idVec2Ideal(poly vec)
    return result;
 }
 
-// converts mat to module, destroys mat 
+// converts mat to module, destroys mat
 ideal idMatrix2Module(matrix mat)
 {
   ideal result = idInit(MATCOLS(mat),MATROWS(mat));
@@ -2796,7 +2815,7 @@ matrix idModule2Matrix(ideal mod)
       MATELEM(result,cp,i+1) = pAdd(MATELEM(result,cp,i+1),h);
     }
   }
-// obachman 10/99: added the following line, otherwise memory lack! 
+// obachman 10/99: added the following line, otherwise memory lack!
   idDelete(&mod);
   return result;
 }

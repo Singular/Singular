@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.cc,v 1.7 1999-10-14 14:27:10 obachman Exp $ */
+/* $Id: kbuckets.cc,v 1.8 1999-10-14 17:59:32 Singular Exp $ */
 
 #include "mod2.h"
 #include "tok.h"
@@ -46,20 +46,23 @@ inline unsigned int pLogLength(poly p)
 
 void kbDBTest(kBucket_pt bucket, int i, char* file, int line)
 {
-  pDBTest(bucket->buckets[i], file, line);
-  if (bucket->buckets_length[i] != pLength(bucket->buckets[i]))
+  if (pDBTest(bucket->buckets[i], file, line))
   {
-    Warn("Bucket %d lengths difference should:%d has:%d in %s:%d",
-          i, bucket->buckets_length[i], pLength(bucket->buckets[i]), file, line);
-    assume(0);
+    if (bucket->buckets_length[i] != pLength(bucket->buckets[i]))
+    {
+      Warn("Bucket %d lengths difference should:%d has:%d in %s:%d",
+            i, bucket->buckets_length[i], pLength(bucket->buckets[i]),
+            file, line);
+      assume(0);
+    }
+    else if (i > 0 && (int) pLogLength(bucket->buckets_length[i]) > i)
+    {
+      Warn("Bucket %d too long %d in %s:%d",
+            i, bucket->buckets_length[i], file, line);
+      assume(0);
+    }
   }
-  else if (i > 0 && (int) pLogLength(bucket->buckets_length[i]) > i)
-  {
-    Warn("Bucket %d too long %d in %s:%d",
-          i, bucket->buckets_length[i], file, line);
-    assume(0);
-  }
-  else if (i==0 && bucket->buckets_length[0] > 1)
+  if (i==0 && bucket->buckets_length[0] > 1)
   {
     Warn("Bucket 0 too long");
   }
@@ -290,7 +293,7 @@ static int kBucketCanonicalize(kBucket_pt bucket)
 
   for (i=2; i<=bucket->buckets_used; i++)
   {
-    p = p_Add_q(p, bucket->buckets[i], 
+    p = p_Add_q(p, bucket->buckets[i],
                 &pl, bucket->buckets_length[i],
                 bucket->heap);
   }
@@ -462,7 +465,7 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
     i = pLogLength(l1);
     while (bucket->buckets[i] != NULL)
     {
-      p1 = p_Add_q(p1, bucket->buckets[i], 
+      p1 = p_Add_q(p1, bucket->buckets[i],
                    &l1, bucket->buckets_length[i],
                    bucket->heap);
       i = pLogLength(l1);
@@ -482,8 +485,8 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
   else
     kBucketAdjustBucketsUsed(bucket);
 #else // HAVE_PSEUDO_BUCKETS
-  bucket->p = p_Minus_m_Mult_q(bucket->p, m,  p, 
-                               &(bucket->l), l1, 
+  bucket->p = p_Minus_m_Mult_q(bucket->p, m,  p,
+                               &(bucket->l), l1,
                                spNoether, bucket->heap);
 #endif
   kbTests(bucket);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.39 1999-10-14 14:27:11 obachman Exp $ */
+/* $Id: kstd1.cc,v 1.40 1999-10-14 17:59:33 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1696,13 +1696,6 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
     {
       h = (tHomog)idHomModule(F,Q,w);
     }
-    //Print("test homog:%d\n",h);
-    //if ((h==isHomog)&&(w!=NULL)&&(*w!=NULL))
-    //{
-    //  (*w)->show();
-    //  PrintLn();
-    //  if (F!=NULL) jjPRINT_MA0(idModule2Matrix(idCopy(F)),sNoName);
-    //}
   }
   pLexOrder=b;
   if (h==isHomog)

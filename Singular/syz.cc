@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.cc,v 1.24 1999-10-14 14:27:33 obachman Exp $ */
+/* $Id: syz.cc,v 1.25 1999-10-14 17:59:35 Singular Exp $ */
 
 /*
 * ABSTRACT: resolutions
@@ -427,9 +427,6 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
     {
       *weights = (intvec**)Alloc0((*length)*sizeof(intvec*));
       if (w!=NULL) (*weights)[0] = ivCopy(w);
-//Print("die %d Modulegewichte sind:\n",w->length());
-//w->show();
-//PrintLn();
     }
   }
   else
