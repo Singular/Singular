@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.133 2003-03-28 09:39:46 Singular Exp $ */
+/* $Id: ideals.cc,v 1.134 2003-06-11 10:00:49 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1059,6 +1059,11 @@ int binom (int n,int r)
   for (i=2;i<=r;i++)
   {
     result *= n-r+i;
+    if (result<0)
+    {
+      WarnS("overflow in binomials");
+      return 0;
+    }
     result /= i;
   }
   return result;
@@ -2219,6 +2224,7 @@ ideal idMaxIdeal(int deg)
 
   int vars = currRing->N;
   int i = binom(vars+deg-1,deg);
+  if (i<=0) return idInit(1,1);
   ideal id=idInit(i,1);
   idpower = id->m;
   idpowerpoint = 0;
