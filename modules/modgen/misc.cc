@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: misc.cc,v 1.14 2002-06-18 15:09:16 anne Exp $ */
+/* $Id: misc.cc,v 1.15 2002-06-26 12:03:16 anne Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -481,11 +481,10 @@ void  mod_write_header(FILE *fp, char *module, char what)
     write_enter_id(fp);
     fprintf(fp, "\n");    modlineno+=1;
     fprintf(fp, "#line %d \"%s.cc\"\n", modlineno++, module);
-/* DAS HIER FLIEGT RAUS
-    write_add_singular_proc(fp);
-    fprintf(fp, "\n");
-   BIS HIER HIN 
+/* Laden von SINGULAR proceduren innerhalb eines moduls derzeit nicht vorgesehen
+*    write_add_singular_proc(fp);
 */
+    fprintf(fp, "\n");
     
 /* HIER FEHLT ZUARBEIT VON HANS
     fprintf(fp, "void fill_help_package(idhdl pl);\n");

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: makefile.cc,v 1.8 2001-02-01 13:05:03 krueger Exp $ */
+/* $Id: makefile.cc,v 1.9 2002-06-26 12:03:16 anne Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -25,6 +25,8 @@
 #include "modgen.h"
 #include "typmap.h"
 #include "pathnames.h"
+
+extern char* inst_dir;
 
 extern void mod_create_makefile(moddefv module);
 extern void build_head_section(FILE *fp, moddefv module);
@@ -86,11 +88,11 @@ void build_head_section(
 {
   fprintf(fp, "CC\t= gcc\n");
   fprintf(fp, "CXX\t= gcc\n");
-  fprintf(fp, "CFLAGS\t= -DNDEBUG -DBUILD_MODULE -I. -I../../include\n");
-  fprintf(fp, "DCFLAGS\t= -DBUILD_MODULE -I. -I../../include\n");
+  fprintf(fp, "CFLAGS\t= -DNDEBUG -DBUILD_MODULE -I. -I%s/include\n",TOPSRCDIR);
+  fprintf(fp, "DCFLAGS\t= -DBUILD_MODULE -I. -I%s/include\n",TOPSRCDIR);
   fprintf(fp, "#LD\t=\n");
   fprintf(fp, "\n");
-  fprintf(fp, "libdir          = %s\n", LIBDIR);
+  fprintf(fp, "instdir          = %s\n", inst_dir );
   fprintf(fp, "INSTALL\t\t= %s/Singular/install-sh -c\n", TOPSRCDIR);
   fprintf(fp, "INSTALL_PROGRAM\t= ${INSTALL}\n");
   fprintf(fp, "INSTALL_DATA\t= ${INSTALL} -m 644\n");
@@ -116,8 +118,9 @@ void build_install_section(
   )
 {
   fprintf(fp, "install:\n");
-  fprintf(fp, "\t${MKINSTALLDIRS} ${bindir}\n");
-  fprintf(fp, "\t${INSTALL_PROGRAM} %s.so ${libdir}/%s.so\n",
+  fprintf(fp, "\t${MKINSTALLDIRS} ${instdir}\n");
+  fprintf(fp, "\t${MKINSTALLDIRS} ${instdir}/modules\n");
+  fprintf(fp, "\t${INSTALL_PROGRAM} %s.so ${instdir}/modules/%s.so\n",
           module->name, module->name);
 }
 

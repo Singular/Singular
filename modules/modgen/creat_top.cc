@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: creat_top.cc,v 1.14 2002-06-18 15:09:15 anne Exp $ */
+/* $Id: creat_top.cc,v 1.15 2002-06-26 12:03:16 anne Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -50,7 +50,7 @@ void write_enter_id(FILE *fp)
   fprintf(fp, "{\n");
   fprintf(fp, "  idhdl h;\n");
   fprintf(fp, "\n");
-  fprintf(fp, "  h=enterid(omStrDup(name),0, t, &(basePack->idroot), TRUE/*FALSE*/);\n");
+  fprintf(fp, "  h=enterid(omStrDup(name),0, t, &(currPack->idroot), TRUE/*FALSE*/);\n");
   fprintf(fp, "  if(h!=NULL) {\n");
   fprintf(fp, "     switch(t) {\n");
   fprintf(fp, "         case STRING_CMD: \n");
@@ -69,43 +69,42 @@ void write_enter_id(FILE *fp)
 
 /*========================================================================*/
 /* SINGULAR procedures sollen nicht in modules geladen werden!!
-   DAS HIER FLIEGT RAUS
-void write_add_singular_proc(FILE *fp)
-{
-  fprintf(fp, "\nidhdl add_singular_proc(char *procname, int line,\n");
-  fprintf(fp, "                       long pos, long end, BOOLEAN pstatic)\n");
-  fprintf(fp, "{\n");
-  fprintf(fp, "  idhdl h;\n");
-  fprintf(fp, "  procinfov pi;\n\n");
-  fprintf(fp, "  h = enter_id(procname, NULL, PROC_CMD);\n");
-  fprintf(fp, "  if(h == NULL) return NULL;\n");
-  fprintf(fp, "\n");
-  fprintf(fp, "  IDDATA(h)=(char *) pi;\n");
-  fprintf(fp, "\n");
-//  fprintf(fp, "  pi->libname = omStrDup(libname);\n");
-  fprintf(fp, "  pi->procname = omStrDup(procname);\n");
-  fprintf(fp, "  pi->language = LANG_SINGULAR;\n");
-  fprintf(fp, "  pi->ref = 1;\n");
-  fprintf(fp, "  pi->is_static = pstatic;\n");
-  fprintf(fp, "  pi->data.s.proc_start = pos;\n");
-  fprintf(fp, "  pi->data.s.def_end    = pos;\n");
-  fprintf(fp, "  pi->data.s.help_start = 0L;\n");
-  fprintf(fp, "  pi->data.s.help_end   = 0L;\n");
-  fprintf(fp, "  pi->data.s.body_start = pos;\n");
-  fprintf(fp, "  pi->data.s.body_end   = end;\n");
-  fprintf(fp, "  pi->data.s.proc_end   = end;\n");
-  fprintf(fp, "  pi->data.s.example_start = 0L;\n");
-  fprintf(fp, "  pi->data.s.proc_lineno = line;\n");
-  fprintf(fp, "  pi->data.s.body_lineno = line;\n");
-  fprintf(fp, "  pi->data.s.example_lineno = 0;\n");
-  fprintf(fp, "  pi->data.s.body = NULL;\n");
-  fprintf(fp, "  pi->data.s.help_chksum = 0;\n");
-  fprintf(fp, "  \n");
-  fprintf(fp, "  return(h);\n");
-  fprintf(fp, "}\n");
-  modlineno+=30;
-}
-  BIS HIERHIN FLIEGT ES RAUS
+*  Dieser code wird daher momentan nicht benoetigt
+* void write_add_singular_proc(FILE *fp)
+* {
+*   fprintf(fp, "\nidhdl add_singular_proc(char *procname, int line,\n");
+*   fprintf(fp, "                       long pos, long end, BOOLEAN pstatic)\n");
+*   fprintf(fp, "{\n");
+*   fprintf(fp, "  idhdl h;\n");
+*   fprintf(fp, "  procinfov pi;\n\n");
+*   fprintf(fp, "  h = enter_id(procname, NULL, PROC_CMD);\n");
+*   fprintf(fp, "  if(h == NULL) return NULL;\n");
+*   fprintf(fp, "\n");
+*   fprintf(fp, "  IDDATA(h)=(char *) pi;\n");
+*   fprintf(fp, "\n");
+* //  fprintf(fp, "  pi->libname = omStrDup(libname);\n");
+*   fprintf(fp, "  pi->procname = omStrDup(procname);\n");
+*   fprintf(fp, "  pi->language = LANG_SINGULAR;\n");
+*   fprintf(fp, "  pi->ref = 1;\n");
+*   fprintf(fp, "  pi->is_static = pstatic;\n");
+*   fprintf(fp, "  pi->data.s.proc_start = pos;\n");
+*   fprintf(fp, "  pi->data.s.def_end    = pos;\n");
+*   fprintf(fp, "  pi->data.s.help_start = 0L;\n");
+*   fprintf(fp, "  pi->data.s.help_end   = 0L;\n");
+*   fprintf(fp, "  pi->data.s.body_start = pos;\n");
+*   fprintf(fp, "  pi->data.s.body_end   = end;\n");
+*   fprintf(fp, "  pi->data.s.proc_end   = end;\n");
+*   fprintf(fp, "  pi->data.s.example_start = 0L;\n");
+*   fprintf(fp, "  pi->data.s.proc_lineno = line;\n");
+*   fprintf(fp, "  pi->data.s.body_lineno = line;\n");
+*   fprintf(fp, "  pi->data.s.example_lineno = 0;\n");
+*   fprintf(fp, "  pi->data.s.body = NULL;\n");
+*   fprintf(fp, "  pi->data.s.help_chksum = 0;\n");
+*   fprintf(fp, "  \n");
+*   fprintf(fp, "  return(h);\n");
+*   fprintf(fp, "}\n");
+*   modlineno+=30;
+* }
 */
 
 /*========================================================================*/

@@ -68,12 +68,14 @@ extern void init_type_conv();
 int debug = 0;
 int trace = 0;
 int do_create_makefile = 1;
+char* inst_dir = ".";
 
 static struct option long_options[] =
 {
   {"debug", 0, 0, 'd'},
   {"verbose", 0, 0, 'v'},
   {"nocreate-makefile", 0, 0, 'm'},
+  {"install-dir",1,0,'i'},
   {"help", 0, 0, '?'},
   {0, 0, 0, 0}
 };
@@ -83,9 +85,24 @@ void usage(char *name)
   int i;
   printf("usage: %s [args] filename\n", name);
   for(i=0; long_options[i].name != NULL; i++)
-    printf("\t-%c (--%s) %s\n", long_options[i].val,
-           long_options[i].name, "");
-  
+  {
+    if(long_options[i].has_arg!=0)
+    {
+      switch(long_options[i].val) {
+         case 'i':
+                   printf("\t-%c (--%s) %s\n", long_options[i].val,
+                      long_options[i].name, "<destination-dir>");
+                   break;
+         default:
+	           printf("\t-%c (--%s) %s\n", long_options[i].val,
+		      long_options[i].name, "<argument>");
+      }
+    } else
+    {
+      printf("\t-%c (--%s) %s\n", long_options[i].val,
+                 long_options[i].name, "");
+    }
+  } 
 }
 
 main( int argc, char *argv[] )
@@ -94,13 +111,14 @@ main( int argc, char *argv[] )
   int c;
   int option_index = 0;
 
-  while( (c=getopt_long (argc, argv, "dmv",
+  while( (c=getopt_long (argc, argv, "dmvi:",
                          long_options, &option_index))>=0) {
     switch (c)
     {
         case 'd' : debug++; break;
         case 'v' : trace=1; break;
         case 'm' : do_create_makefile = 0; break;
+	case 'i' : inst_dir=optarg; break;
           
         case '?' : usage(argv[0]);
           return 0;
