@@ -4059,7 +4059,7 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
   }
   omfree(c->tmp_pair_lm);
   omfree(c->tmp_spn);
-  
+ 
   omfree(c->T_deg);
   if(c->T_deg_full)
     omfree(c->T_deg_full);
@@ -4532,14 +4532,7 @@ static void multi_reduction_lls_trick(red_object* los, int losl,calc_dat* c,find
 	red_object h=los[erg.to_reduce_u];
 	los[erg.to_reduce_u]=los[best];
 	los[best]=h;
-	if(erg.to_reduce_u>erg.to_reduce_l)
-	{
-	  erg.reduce_by=erg.to_reduce_u;
-	  erg.fromS=FALSE;
-	  erg.to_reduce_u--;
-	}
-	   //swap_roles=TRUE;
-	swap_roles=FALSE;
+	swap_roles=TRUE;
       }
       else{
 	
@@ -4595,7 +4588,6 @@ static void multi_reduction_lls_trick(red_object* los, int losl,calc_dat* c,find
 		if(erg.reduce_by<c->n/4)
 		  exp=TRUE;
 	    }
-	    exp=FALSE;
 	    if (exp){
 	      poly clear_into;
 	      los[erg.to_reduce_u].flatten();
@@ -4658,8 +4650,6 @@ static void multi_reduction_lls_trick(red_object* los, int losl,calc_dat* c,find
     }
   
   }
-  if (swap_roles)
-    Print("ALARM\n");
   if(swap_roles)
   {
     if (TEST_OPT_PROT)
