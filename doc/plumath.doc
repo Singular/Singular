@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: plumath.doc,v 1.10 2003-04-25 18:34:56 levandov Exp $
+@comment $Id: plumath.doc,v 1.11 2003-05-20 17:46:51 levandov Exp $
 @comment this file contains the mathematical background of Singular
 
 @c The following directives are necessary for proper compilation
@@ -104,9 +104,9 @@ $$
 
 @ifinfo
 For all  0< i<j<k< n+1  NDC_@{ijk@} =0, where
-NDC_@{ijk@}= c_@{ik@}  c_@{jk@} ... d_@{ij@} x_k - x_k d_@{ij@} + 
-c_@{jk@} ...  x_j d_@{ik@} - c_@{ij@}...d_@{ik@} x_j + d_@{jk@}x_i 
-- c_@{ij@}c_@{ik@}... x_i d_@{jk@}.
+NDC_@{ijk@}= c_@{ik@}  c_@{jk@} d_@{ij@} x_k - x_k d_@{ij@} + 
+c_@{jk@} x_j d_@{ik@} - c_@{ij@} d_@{ik@} x_j + d_@{jk@}x_i 
+- c_@{ij@}c_@{ik@} x_i d_@{jk@}.
 
 @end ifinfo
 
