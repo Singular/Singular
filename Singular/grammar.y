@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.39 1998-06-13 12:44:37 krueger Exp $ */
+/* $Id: grammar.y,v 1.40 1998-06-18 17:32:11 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -73,9 +73,7 @@ int        inerror = 0;
 
 void yyerror(char * fmt)
 {
-  int oldInError=inerror;
 
-  inerror = 1;
   BOOLEAN old_errorreported=errorreported;
   errorreported = TRUE;
   if (currid!=NULL)
@@ -83,7 +81,7 @@ void yyerror(char * fmt)
     killid(currid,&IDROOT);
     currid = NULL;
   }
-  if(!oldInError)
+  if(inerror==0)
   {
     Werror( "error occurred in %s line %d: `%s`"
            ,VoiceName(), yylineno, my_yylinebuf);
@@ -103,15 +101,13 @@ void yyerror(char * fmt)
     {
       Werror("last reserved name was `%s`",lastreserved);
     }
+    inerror=1;
   }
-  else
-    inerror=oldInError;
   if ((currentVoice!=NULL)
   && (currentVoice->prev!=NULL)
-  &&(myynest>0))
+  && (myynest>0))
   {
     Werror("leaving %s",VoiceName());
-    exitBuffer(BT_proc);
   }
 }
 
@@ -306,7 +302,6 @@ lines:
             }
             #endif
             prompt_char = '>';
-            currid = NULL;
             if(siCntrlc)
             {
               siCntrlc=FALSE;
@@ -318,10 +313,8 @@ lines:
             }
             if (inerror==2) PrintLn();
             errorreported = inerror = cmdtok = 0;
-            lastreserved=NULL;
-            expected_parms=FALSE;
-            noringvars = FALSE;
-            siCntrlc = FALSE;
+            lastreserved = currid = NULL;
+            expected_parms = noringvars = siCntrlc = FALSE;
           }
         ;
 
@@ -344,34 +337,31 @@ pprompt:
           {currentVoice->ifsw=0;}
         | error ';'
           {
-            feBufferTypes t=currentVoice->Typ();
             #ifdef SIQ
             siq=0;
             #endif
             currentVoice->ifsw=0;
-            if (inerror&&($1.i<UMINUS) && ($1.i>' '))
-            {
-              // 1: yyerror called
-              // 2: scanner put actual string
-              // 3: error rule put token+\n
-              inerror=3;
-              Print(" error at token `%s`\n",iiTwoOps($1.i));
+            if (inerror)
+	    {
+	      if ((inerror!=3) && ($1.i<UMINUS) && ($1.i>' '))
+              {
+                // 1: yyerror called
+                // 2: scanner put actual string
+                // 3: error rule put token+\n
+                inerror=3;
+                Print(" error at token `%s`\n",iiTwoOps($1.i));
+              }		
             }
             if (!errorreported) WerrorS("...parse error");
             yyerror("");
             yyerrok;
             if (myynest>0)
             {
+              feBufferTypes t=currentVoice->Typ();
               //PrintS("leaving yyparse\n");
+	      exitBuffer(BT_proc);
               if (t==BT_example)
-              {
-                errorreported = inerror = cmdtok = 0;
-                lastreserved=NULL;
-                expected_parms=FALSE;
-                inerror = 0;
-                yyerrok;
                 YYACCEPT;
-              }
               else
                 YYABORT;
             }
@@ -379,8 +369,6 @@ pprompt:
             {
               exitVoice();
             }
-            //errorreported = FALSE;
-            //lastreserved=NULL;
           }
         ;
 
@@ -1343,6 +1331,7 @@ typecmd:
             #endif
             $1.Print(&sLastPrinted);
             $1.CleanUp();
+	    if (errorreported) YYERROR;
           }
         ;
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.30 1998-06-13 12:44:42 krueger Exp $ */
+/* $Id: iplib.cc,v 1.31 1998-06-18 17:32:12 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -129,7 +129,7 @@ char* iiGetLibProcBuffer(procinfo *pi, int part )
 {
   char buf[256], *s = NULL, *p;
   long procbuflen;
-  
+
   FILE * fp = feFopen( pi->libname, "rb", NULL, TRUE );
   if (fp==NULL)
   {
@@ -319,15 +319,19 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
   char *plib = iiConvName(pi->libname);
   idhdl ns = namespaceroot->get(plib,0, TRUE);
   FreeL(plib);
-  if(ns != NULL) {
+  if(ns != NULL)
+  {
     namespaceroot->push(IDPACKAGE(ns), IDID(ns));
     //printf("iiMake_proc: namespace found.\n");
-  } else {
+  }
+  else
+  {
     namespaceroot->push(namespaceroot->root->pack, "toplevel");
     //printf("iiMake_proc: staying in TOP-LEVEL\n");
   }
 #else /* HAVE_NAMESPACES */
-  if(pi->is_static && myynest==0) {
+  if(pi->is_static && myynest==0)
+  {
     Werror("'%s::%s()' is a local procedure and cannot be accessed by an user.",
            pi->libname, pi->procname);
     return NULL;
@@ -345,8 +349,11 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
   if (traceit&TRACE_SHOW_RINGS) iiShowLevRings();
 #endif
 #if 1
-  if(pi->language == LANG_SINGULAR) err=iiPStart(pn,sl);
-  if(pi->language == LANG_C)
+  if(pi->language == LANG_SINGULAR)
+  {
+    err=iiPStart(pn,sl);
+  }
+  else if(pi->language == LANG_C)
   {
     leftv res = (leftv)Alloc0(sizeof(sleftv));
     res->rtyp=NONE;
@@ -407,7 +414,7 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
   }
   if (iiCurrArgs!=NULL)
   {
-    Warn("too many arguments for %s",IDID(pn));
+    if (!err) Warn("too many arguments for %s",IDID(pn));
     iiCurrArgs->CleanUp();
     Free((ADDRESS)iiCurrArgs,sizeof(sleftv));
     iiCurrArgs=NULL;
@@ -415,7 +422,8 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
 #ifdef HAVE_NAMESPACES
   namespaceroot->pop();
 #endif /* HAVE_NAMESPACES */
-  if (err) return NULL;
+  if (err)
+    return NULL;
   return &iiRETURNEXPR[myynest+1];
 }
 

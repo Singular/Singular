@@ -1,56 +1,64 @@
+Thu Jun 18 19:27:27 MET DST 1998 hannes
+        * error handling (grammar.y iparith.cc iplib.cc)
+          (leaving of levels, local vars, messages,..)
+          The reason:
+               proc p { intvec w; w[0]; }
+               proc p2 {int i;p();"huhu";}
+               p2(); int i; listvar();
+
 1998-06-13  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
-	* feread.cc: explicit declaration of stuff we need from readline.h
+        * feread.cc: explicit declaration of stuff we need from readline.h
 
 1998-06-12  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
-	* polys.cc: pComp for simple orderings based on only three
-	routines (no variation for # of variables)
+        * polys.cc: pComp for simple orderings based on only three
+        routines (no variation for # of variables)
 
-	* spolys0.cc (spGSpolyLoop): globally replaced by spSpolyLoop_General
+        * spolys0.cc (spGSpolyLoop): globally replaced by spSpolyLoop_General
 
 Fri Jun 12 12:11:06 MET DST 1998 hannes
-	* minor optimizations in polys.cc, kutil.* kstd1.cc:
-	  pass pointers, not structures to posIn[LT],
-	  do not check for NULL in pDeg (as pFDeg does not check)
+        * minor optimizations in polys.cc, kutil.* kstd1.cc:
+          pass pointers, not structures to posIn[LT],
+          do not check for NULL in pDeg (as pFDeg does not check)
 
 Wed Jun  3 16:20:22 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
-	* Makefile.in (DOCS): target removed
-	  (DISTFILES): reference to `$(DOC)' removed
-	  (distclean): reference to `$(docdir)' removed
+        * Makefile.in (DOCS): target removed
+          (DISTFILES): reference to `$(DOC)' removed
+          (distclean): reference to `$(docdir)' removed
 
 Wed Jun 03 16:46:06 1998    <pohl@FUECHSE>
 
-	* claptmpl.cc: instantiation for operator == (CFFactor, CFFactor)
-	  added
+        * claptmpl.cc: instantiation for operator == (CFFactor, CFFactor)
+          added
 
 Tue Jun  2 17:28:48 MET DST 1998 hannes
-	* introduced /* */ comments
-	* some code cleanups
+        * introduced /* */ comments
+        * some code cleanups
 Fri May 29 17:00:27 MET DST 1998 hannes
-	* change res to nres (cmd), resu to res(standard.lib)
-	  including changes to libs, docs (partially)
+        * change res to nres (cmd), resu to res(standard.lib)
+          including changes to libs, docs (partially)
 Wed May 27 19:13:10 MET DST 1998 hannes
-	* removed #define HAVE_GMP and non-gmp-parts
+        * removed #define HAVE_GMP and non-gmp-parts
 Wed May 20 15:03:28 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
-	* LIB/primdec.lib (info): info string reformated
+        * LIB/primdec.lib (info): info string reformated
 
 1998-05-19  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
-	* find_exec.c (find_executable): add "." top path, if under WINNT
-	and MSDOS display
+        * find_exec.c (find_executable): add "." top path, if under WINNT
+        and MSDOS display
 
-	* mmutil.c (mmCheckDBMCB): use _end only #ifdef unix
+        * mmutil.c (mmCheckDBMCB): use _end only #ifdef unix
 
-	* ideals.cc (idDelLmEquals): added idDelLmEqual == simplify(16),
-	and idDelDiv == simplify(32); improved pComparePolys
+        * ideals.cc (idDelLmEquals): added idDelLmEqual == simplify(16),
+        and idDelDiv == simplify(32); improved pComparePolys
 
 1998-05-18  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
-	* extra.cc (jjSYSTEM): changed "whoami" --> "Singular", added
-	"nblocks"
+        * extra.cc (jjSYSTEM): changed "whoami" --> "Singular", added
+        "nblocks"
 
 Sat May 16 14:14:20 MET DST 1998 hannes
 * avoid multiple objects of the same name (fix keepring)
@@ -64,75 +72,75 @@ Thu May 14 12:01:53 MET DST 1998 hannes
 * a ring with a coeff. field GF(p,n) cannot be constructed
   without gftables (ring.cc)
 Wed May 13 16:52:09 MET DST 1998 hannes
-	* changed syntax of NOT (does not require () any more)
+        * changed syntax of NOT (does not require () any more)
 Tue May 12 16:58:13 MET DST 1998 hannes
-	* changed return type of option(): none -> string
+        * changed return type of option(): none -> string
 Tue May 12 11:57:50 MET DST 1998 hannes
-	* added "lres"
+        * added "lres"
 1998-05-08  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
-	* extra.cc (jjSYSTEM): put all undocumented system calls into
-	#ifdef HAVE_EXTENDED_SYSTEM which is _not_ defined by default
+        * extra.cc (jjSYSTEM): put all undocumented system calls into
+        #ifdef HAVE_EXTENDED_SYSTEM which is _not_ defined by default
 
-	* exteded system("random") to always return the seed of the random
-	generator
+        * exteded system("random") to always return the seed of the random
+        generator
 
 Thu May  7 19:49:34 MET DST 1998 hannes
         * added syntax rule "proc <name> <arglist> <string> <body>"
-	* speedup for feReadLine
+        * speedup for feReadLine
 
 Wed May  6 19:10:59 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
-	* find_exec.c (find_executable): bug fix.  Recognizes
-	  `../Singular' properly.
+        * find_exec.c (find_executable): bug fix.  Recognizes
+          `../Singular' properly.
 
 Tue May  5 14:06:12 1998  Jens/Kai
 
-	* libparse.l: message fix
+        * libparse.l: message fix
 
 Thu Apr 30 19:16:45 MET DST 1998 hannes
-	* fixed "missing e-o-buffer" for long lines in febase.inc
+        * fixed "missing e-o-buffer" for long lines in febase.inc
 
 Wed Apr 29 18:26:19 MET DST 1998 hannes
-	* added filed list_length tossyStrategy
-	( for conversion list <-> resolution): syz.h, syz1.cc, iparith.cc
+        * added filed list_length tossyStrategy
+        ( for conversion list <-> resolution): syz.h, syz1.cc, iparith.cc
 1998-04-29  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
-	* mmutil.c (mmGetIndex): new implementation: Use generated lookup
-	table (mmutil.inc) instead of "binary" search on size
+        * mmutil.c (mmGetIndex): new implementation: Use generated lookup
+        table (mmutil.inc) instead of "binary" search on size
 
 Tue Apr 28 19:56:46 MET DST 1998 hannes
   * ipassign.cc: fixed assignment of resolution to list: need ipMoveId
 1998-04-28  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
-	* kstd2.cc (redHomog): Some more ouput for KDEBUG && TEST_OPT_DEBUG
+        * kstd2.cc (redHomog): Some more ouput for KDEBUG && TEST_OPT_DEBUG
 
-	* mminit.cc: introduced memory(2) which measures physical memory
-	consumption using the system call sbrk (this never lies!)
+        * mminit.cc: introduced memory(2) which measures physical memory
+        consumption using the system call sbrk (this never lies!)
 
 Mon Apr 27 18:07:21 MET DST 1998 hannes
-	* use ReAlloc for enlargeT, enlargeL  (kutil.cc)
+        * use ReAlloc for enlargeT, enlargeL  (kutil.cc)
 Mon Apr 27 16:45:41 MET DST 1998 hannes
         * fixed conversion of factory 0 to poly NULL (clapconv.cc)
 
 1998-04-27  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
-	* febase.cc (myfread): introduced myfread and myfopen which assure
-	that newlines in text files are always \n
+        * febase.cc (myfread): introduced myfread and myfopen which assure
+        that newlines in text files are always \n
 
 Fri Apr 24 19:14:42 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
-	* clapsing.cc (FACTORY_GCD_STAT, singclap_divide_content):
-	  dependency on FACTORY_GCD_TEST removed.  Statistics are now done
- 	  using `FACTORY_GCDSTAT' and `FCATORY_CONTSTAT' which are defined
- 	  to expand to nothing if `FACTORY_GCD_TIMING' is off.
+        * clapsing.cc (FACTORY_GCD_STAT, singclap_divide_content):
+          dependency on FACTORY_GCD_TEST removed.  Statistics are now done
+           using `FACTORY_GCDSTAT' and `FCATORY_CONTSTAT' which are defined
+           to expand to nothing if `FACTORY_GCD_TIMING' is off.
 
-	* extra.cc (FACTORY_GCD_STAT): dependency on `FACTORY_GCD_TEST'
-	  removed.  Includes `gcd_stat.h' in dependency on
-	  `FACTORY_CGD_STAT'.
+        * extra.cc (FACTORY_GCD_STAT): dependency on `FACTORY_GCD_TEST'
+          removed.  Includes `gcd_stat.h' in dependency on
+          `FACTORY_CGD_STAT'.
 
-	* extra.cc (jjSYSTEM): new command `gcdstat' in dependency on
-	  `FACTORY_GCD_STAT'
+        * extra.cc (jjSYSTEM): new command `gcdstat' in dependency on
+          `FACTORY_GCD_STAT'
 
 Fri Apr 24 18:25:23 MET DST 1998 hannes
   * fixed bug in maps.cc: size of monom is not pMonomSize but mmGetSpecSize()
@@ -145,24 +153,24 @@ Thu Apr 23 20:16:24 MET DST 1998 hannes
 
 Thu Apr 23 11:12:48 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
-	* clapsing.cc (FACTORY_CFTROUT, FACTORY_CFAOUT): stuipd bug fix
+        * clapsing.cc (FACTORY_CFTROUT, FACTORY_CFAOUT): stuipd bug fix
 
-	* clapsing.cc (FACTORY_ALGOUT, FACTORY_CFTROUT, FACTORY_CFAOUT):
-	  new macros for debugging data transfer to Factory
- 	  (singclap_divide_content, singclap_alglcm,
- 	  singclap_algdividecontent): use the new macros
+        * clapsing.cc (FACTORY_ALGOUT, FACTORY_CFTROUT, FACTORY_CFAOUT):
+          new macros for debugging data transfer to Factory
+           (singclap_divide_content, singclap_alglcm,
+           singclap_algdividecontent): use the new macros
 
-	* clapsing.cc (FACTORY_GCD_TIMING, singclap_divide_content,
-	  singclap_alglcm, singclap_algdividecontent): dependency on
-	  FACTORY_GCD_TEST removed.  Timings are now done directly using
-	  `TIMING_START' and `TIMING_END' which are defined to expand to
-	  nothing if `FACTORY_GCD_TIMING' is off.
+        * clapsing.cc (FACTORY_GCD_TIMING, singclap_divide_content,
+          singclap_alglcm, singclap_algdividecontent): dependency on
+          FACTORY_GCD_TEST removed.  Timings are now done directly using
+          `TIMING_START' and `TIMING_END' which are defined to expand to
+          nothing if `FACTORY_GCD_TIMING' is off.
 
-	* extra.cc (FACTORY_GCD_TIMING): dependency on FACTORY_GCD_TEST
-	  removed
+        * extra.cc (FACTORY_GCD_TIMING): dependency on FACTORY_GCD_TEST
+          removed
 
-	* longalg.cc (naNormalize): gcd calculation depends on #define
-	  `FACTORY_GCD_TEST'
+        * longalg.cc (naNormalize): gcd calculation depends on #define
+          `FACTORY_GCD_TEST'
 
 Wed Apr 22 09:42:35 MET DST 1998 hannes
   * several changes concerning stdfac
@@ -173,17 +181,17 @@ Tue Apr 21 15:19:10 MET DST 1998 hannes/jens
 
 Tue Apr 21 12:30:44 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
-	* clapsing.cc  (singclap_gcd): checks for `NULL' removed
-	
-	* clapsing.cc, extra.cc (FACTORY_GCD_TEST, FACTORY_GCD_STAT,
- 	  FACTORY_GCD_DEBOUT, FACTORY_GCD_TIMING): new #defines for gcd
-	  testing
-	* clapsing.cc (singclap_divide_content, singclap_alglcm,
-	  singclap_algdividecontent): code added for factory testing.
-  	  Wrapped by #defines `FACTORY_GCD_TEST', `FACTORY_GCD_STAT',
- 	  `FACTORY_GCD_DEBOUT', and `FACTORY_GCD_TIMING'.
-	* extra.cc (jjSYSTEM): code added for factory testing.  Wrapped
-	  by #defines `FACTORY_GCD_TEST' and `FACTORY_GCD_TIMING'.
+        * clapsing.cc  (singclap_gcd): checks for `NULL' removed
+
+        * clapsing.cc, extra.cc (FACTORY_GCD_TEST, FACTORY_GCD_STAT,
+           FACTORY_GCD_DEBOUT, FACTORY_GCD_TIMING): new #defines for gcd
+          testing
+        * clapsing.cc (singclap_divide_content, singclap_alglcm,
+          singclap_algdividecontent): code added for factory testing.
+            Wrapped by #defines `FACTORY_GCD_TEST', `FACTORY_GCD_STAT',
+           `FACTORY_GCD_DEBOUT', and `FACTORY_GCD_TIMING'.
+        * extra.cc (jjSYSTEM): code added for factory testing.  Wrapped
+          by #defines `FACTORY_GCD_TEST' and `FACTORY_GCD_TIMING'.
 
 Fri Apr 17 09:53:53 MET DST 1998 hannes
  * fixed a minor but very nasty bug: nlSetMap was resetting npPrimeM
@@ -191,139 +199,139 @@ Fri Apr 17 09:53:53 MET DST 1998 hannes
 
 1998-04-21  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
-	* mmprivat.h: Got rid off mmheap.cc, "inlined" mmPutMemory
+        * mmprivat.h: Got rid off mmheap.cc, "inlined" mmPutMemory
 
-	* longalg.h:  Exponents in parameter (polys) are typedef'ed to
-	EXPONENT_TYPE
+        * longalg.h:  Exponents in parameter (polys) are typedef'ed to
+        EXPONENT_TYPE
 
 1998-04-20  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
-	* mmallocb.c: Merged with mmheap.c.
+        * mmallocb.c: Merged with mmheap.c.
 
 1998-04-16  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
-	* mpsr_PutPoly.cc: Took out normalization of rational numbers
-	before they are put -- might have side effects
+        * mpsr_PutPoly.cc: Took out normalization of rational numbers
+        before they are put -- might have side effects
 
-	* extra.cc: added system("--option") which returns value of
-	option; in debug mode: system("OptionValues") lists all option
-	values
-	
-	* sing_mp.cc: use long option names for MP link options
-	* MPtcp:launch: Uses find_exec as default application
-	
-	*  tesths.cc: New (handling of) command line options (long
-	options, usage of getopt_long): Parse more than one argument
-	script, etc ..
-	*  added getopt.[c,h]for parsing of command lines
-	
-	* mod2.h.in, configure.in: Got rid off str* tests
+        * extra.cc: added system("--option") which returns value of
+        option; in debug mode: system("OptionValues") lists all option
+        values
+
+        * sing_mp.cc: use long option names for MP link options
+        * MPtcp:launch: Uses find_exec as default application
+
+        *  tesths.cc: New (handling of) command line options (long
+        options, usage of getopt_long): Parse more than one argument
+        script, etc ..
+        *  added getopt.[c,h]for parsing of command lines
+
+        * mod2.h.in, configure.in: Got rid off str* tests
 
 1998-04-07  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
-	* mpsr_Put.cc (mpsr_PutDump): dump does not dump LIB string any more
+        * mpsr_Put.cc (mpsr_PutDump): dump does not dump LIB string any more
 
-	* extra.cc (jjSYSTEM): added System("whoami") to return full
-	executable pathname of running Singular
+        * extra.cc (jjSYSTEM): added System("whoami") to return full
+        executable pathname of running Singular
 
 Tue Apr  7 10:27:50 MET DST 1998 hannes
         * fixed scanner bug: ignoring { and } in <block> (scanner.l)
 
 1998-04-06  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
-	* spSpolyLoop.h: neww calling interface for spGetSpolyLoop
+        * spSpolyLoop.h: neww calling interface for spGetSpolyLoop
 
-	* kstd1.cc (kNF): moved strat->ak field initailization out of
-	initBuchMora into single routines
+        * kstd1.cc (kNF): moved strat->ak field initailization out of
+        initBuchMora into single routines
 
-	* febase.cc (feGetSearchPath): added feGetSearchPath; changed
-	algorithm for searching files: $SINGULARPATH -> relative to
-	executable -> burnt-in locations
-	* added find_exec.c to get absolute pathname of executable
+        * febase.cc (feGetSearchPath): added feGetSearchPath; changed
+        algorithm for searching files: $SINGULARPATH -> relative to
+        executable -> burnt-in locations
+        * added find_exec.c to get absolute pathname of executable
 
 Mon Apr  6 14:23:52 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
-	* claptmpl.cc: instantiation for `tabs()' added
+        * claptmpl.cc: instantiation for `tabs()' added
 
 Sat Apr  4 00:52:58 MET DST 1998 Kai Krueger <krueger@mathematik.uni-kl.de>
-	* iplib.cc libparse.cc libparse.h libparse.l misc.cc LIB/*.lib
-	  Changed help for libraries.
-	
+        * iplib.cc libparse.cc libparse.h libparse.l misc.cc LIB/*.lib
+          Changed help for libraries.
+
 Wed Apr  1 20:55:15 MET DST 1998 hannes
-	* mpsr_Tok.cc,tok.h: minor fix, removed VERBOSE_CMD
-	* iparith.cc ipconv.cc: added conversion list <-> resolution
-	* lists.cc, syz1.cc : fixed bug in conversion (list<->res.):
-	  handling "empty" case
-	* scanner.l: added option: %option always-interactive
+        * mpsr_Tok.cc,tok.h: minor fix, removed VERBOSE_CMD
+        * iparith.cc ipconv.cc: added conversion list <-> resolution
+        * lists.cc, syz1.cc : fixed bug in conversion (list<->res.):
+          handling "empty" case
+        * scanner.l: added option: %option always-interactive
 
 Tue Mar 31 10:47:06 MET DST 1998 hannes
         * feread.cc: fixed handling of empty history
-	* clapsing.cc: fixed gcd(0,..) and gcd(..,0) -> pOne()
-	* febase.h/febase.inc: renaming of scanner variables
-	  ( yy_blocklineno, yy_noeof)
-	* febase.inc: increased speed in feReadLine
-	* minor changes in scanner/grammar/iparith.cc (example)
+        * clapsing.cc: fixed gcd(0,..) and gcd(..,0) -> pOne()
+        * febase.h/febase.inc: renaming of scanner variables
+          ( yy_blocklineno, yy_noeof)
+        * febase.inc: increased speed in feReadLine
+        * minor changes in scanner/grammar/iparith.cc (example)
 
 1998-03-27  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
-	* longalg.cc (naDBTest): fixed lines for number tests
+        * longalg.cc (naDBTest): fixed lines for number tests
 
-	* added spSpolyLoop.inc to repository
+        * added spSpolyLoop.inc to repository
 
-	* algmap.cc (maAlgpolyMap): fixed bug which changed preimage
+        * algmap.cc (maAlgpolyMap): fixed bug which changed preimage
 
 1998-03-23  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
-	* taged version 1.1.7 -- unconditional fast version
+        * taged version 1.1.7 -- unconditional fast version
 
-	* polys-impl.cc, polys.cc: No COMP_FAST any more
+        * polys-impl.cc, polys.cc: No COMP_FAST any more
 
-	* Makefile.in: Introduced variable PERL, set by configure
+        * Makefile.in: Introduced variable PERL, set by configure
 
-	* kstdfac.cc (kStratCopy): kModW iv is not copied, but just the
-	pointer is set
+        * kstdfac.cc (kStratCopy): kModW iv is not copied, but just the
+        pointer is set
 
 1998-03-18  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
-	* Makefile.in: added Singularb target for bprof
+        * Makefile.in: added Singularb target for bprof
 
-	* polys-impl.h, polys-comp.h: Cleaned up COMP_FAST and related
-	#defines
+        * polys-impl.h, polys-comp.h: Cleaned up COMP_FAST and related
+        #defines
 
 1998-03-16  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
-	* polys-impl.h: no #define COMP_FAST
+        * polys-impl.h: no #define COMP_FAST
 
-	* configure.in,Makefile.in: check for flex -P; increased version
-	number to 1.1.7
+        * configure.in,Makefile.in: check for flex -P; increased version
+        number to 1.1.7
 
 Fri Mar 13 16:16:27 MET 1998 hannes
   * fixed: Singular crashed while changing the minpoly in GF(q)
     (ipassign.cc)
 
 Fri Mar  6 13:27:45 MET 1998 Kai Krueger <krueger@mathematik.uni-kl.de>
-	* new: libparse.l,libparse.cc,utils.cc,ytils.h
-	  scanner for a quick check of singular-libraries.
-	* Makefile.in,mod2.h.in,iplib.cc,structs.h,subexpr.h
-	  use a scanner when loading libraries.
-	* grammar.y,ipassign.cc,subexpr.h
-	  procinfo: added position of end of proc-definition
-	            added flag for 'static'-proc (proc that can only be used
-	                  in the library they are defined).
-	* LIB: deform.lib,finvar.lib,hnoether.lib,normal.lib,presolve.lib
-	       primdec.lib,tex.lib
-	  made fixes requested by libparse (s.a. brackets, ....)
-	
+        * new: libparse.l,libparse.cc,utils.cc,ytils.h
+          scanner for a quick check of singular-libraries.
+        * Makefile.in,mod2.h.in,iplib.cc,structs.h,subexpr.h
+          use a scanner when loading libraries.
+        * grammar.y,ipassign.cc,subexpr.h
+          procinfo: added position of end of proc-definition
+                    added flag for 'static'-proc (proc that can only be used
+                          in the library they are defined).
+        * LIB: deform.lib,finvar.lib,hnoether.lib,normal.lib,presolve.lib
+               primdec.lib,tex.lib
+          made fixes requested by libparse (s.a. brackets, ....)
+
 1998-03-04  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
-	* febase.h: added macro assume()
+        * febase.h: added macro assume()
 
-	* spSpolyLoop.cc: Automatic generation of SpolyLoops using
-	spSpolyLoop.pl
+        * spSpolyLoop.cc: Automatic generation of SpolyLoops using
+        spSpolyLoop.pl
 
-	* kstd*.cc: New calling interface to get SpolyLoop
+        * kstd*.cc: New calling interface to get SpolyLoop
 
-	* ring.h: Introduced rOrderType_t
+        * ring.h: Introduced rOrderType_t
 
 Mon Mar  2 16:18:25 MET 1998 hannes
    * changed handling of "echo" in examples: do not report file + lineno
@@ -334,17 +342,17 @@ Fri Feb 27 15:02:10 MET 1998 hannes
      febase.cc, scanner.l, grammar.y, iplib.cc
 
 Tue Feb 17 18:43:11 MET 1998 hannes
-	* added additional factorization check after redTail
-	  (kstdfac.cc)
+        * added additional factorization check after redTail
+          (kstdfac.cc)
 
 1998-02-17  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
-	* longalg.cc (napWrite): made it globally available to support
-	FACTORY_DEBUG_OUT
+        * longalg.cc (napWrite): made it globally available to support
+        FACTORY_DEBUG_OUT
 
-	* clapsing.cc (singclap_algdividecontent): inserted
-	FACTORY_DEBUG_OUT
-	
+        * clapsing.cc (singclap_algdividecontent): inserted
+        FACTORY_DEBUG_OUT
+
 Mon Feb 16 10:43:38 MET 1998 hannes
    * added HAVE_TCL to ring.cc
 

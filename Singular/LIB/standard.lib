@@ -1,7 +1,7 @@
-// $Id: standard.lib,v 1.20 1998-06-18 15:45:12 siebert Exp $
+// $Id: standard.lib,v 1.21 1998-06-18 17:32:13 Singular Exp $
 //////////////////////////////////////////////////////////////////////////////
 
-version="$Id: standard.lib,v 1.20 1998-06-18 15:45:12 siebert Exp $";
+version="$Id: standard.lib,v 1.21 1998-06-18 17:32:13 Singular Exp $";
 info="
 LIBRARY: standard.lib   PROCEDURES WHICH ARE ALWAYS LOADED AT START-UP
 
@@ -282,7 +282,7 @@ EXAMPLE: example groebner; shows an example"
   int is_homog = (homog(i) && (npars_P <= 1));
   int add_vars = 0;
   string ri = "ring Phelp =";
-  
+
   // more than one parameters are converted to ring variables
   if (npars_P > 1)
   {
@@ -340,7 +340,7 @@ EXAMPLE: example groebner; shows an example"
   {
     // additional variables were introduced
     // need another intermediate ring
-    ri = "ring Phelp1 = (" + charstr(Phelp) 
+    ri = "ring Phelp1 = (" + charstr(Phelp)
       + "),(" + varstr(Phelp) + "),(" + ordstr_P;
 
     // for lp wit at most one parameter, we do not need a block ordering
@@ -715,7 +715,7 @@ proc minres(list #)
       }
     }
   }
-  
+
   if (typeof(#[1]) == "resolution")
   {
     return minimizeres(#[1]);
@@ -724,7 +724,7 @@ proc minres(list #)
   {
     return minimizeres(#);
   }
-  
+
 }
 
 */
