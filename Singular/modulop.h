@@ -3,11 +3,14 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.h,v 1.11 2000-11-16 16:52:37 Singular Exp $ */
+/* $Id: modulop.h,v 1.12 2000-11-25 20:30:18 obachman Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
 #include "structs.h"
+
+// define if a*b is with mod instead of tables
+#define HAVE_MULT_MOD
 
 extern int npPrimeM;
 extern int npGen;
@@ -46,11 +49,19 @@ extern int npPminus1M;
 extern CARDINAL *npExpTable;
 extern CARDINAL *npLogTable;
 
+#ifdef HAVE_MULT_MOD
+inline number npMultM(number a, number b)
+{
+  return (number) 
+    ((((unsigned long) a)*((unsigned long) b)) % ((unsigned long) npPrimeM));
+}
+#else
 inline number npMultM(number a, number b)
 {
   int x = npLogTable[(int)a]+npLogTable[(int)b];
   return (number)npExpTable[x<npPminus1M ? x : x-npPminus1M];
 }
+#endif
 
 #if 0
 inline number npAddAsm(number a, number b, int m)

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.cc,v 1.20 2000-11-17 14:07:11 Singular Exp $ */
+/* $Id: modulop.cc,v 1.21 2000-11-25 20:30:19 obachman Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
@@ -25,10 +25,19 @@ int npMapPrime;
 CARDINAL *npExpTable=NULL;
 CARDINAL *npLogTable=NULL;
 
+
 BOOLEAN npGreaterZero (number k)
 {
   int h = (int) k;
   return ((int)h !=0) && (h <= (npPrimeM>>1));
+}
+
+unsigned long npMultMod(unsigned long a, unsigned long b)
+{
+  unsigned long c = a*b;
+  c = c % npPrimeM;
+  assume(c == (unsigned long) npMultM((number) a, (number) b));
+  return c;
 }
 
 number npMult (number a,number b)
