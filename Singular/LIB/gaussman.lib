@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.59 2001-12-13 12:02:47 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.60 2002-01-16 13:16:17 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -11,16 +11,16 @@ OVERVIEW: A library to compute Hodge-theoretic invariants
           of isolated hypersurface singularities
 
 PROCEDURES:
- gmsring(t,s);              Gauss-Manin system of t with variable s
- gmsnf(p,K[,Kmax]);         normal form of p in Gauss-Manin system
- gmscoeffs(p,K[,Kmax]);     basis representation of p in Gauss-Manin system
+ gmsring(t,s);              Gauss-Manin connection of t with variable s
+ gmsnf(p,K[,Kmax]);         Gauss-Manin connection normal form of p
+ gmscoeffs(p,K[,Kmax]);     Gauss-Manin connection basis representation of p
  monodromy(t);              Jordan data of monodromy of t
  spectrum(t);               singularity spectrum of t
  sppairs(t);                spectral pairs of t
  sppnf(a,w[,m][,V]);        spectral pairs normal form of (a,w,m,V)
- vfilt(t);                  V-filtration of t on Brieskorn lattice H''
- vwfilt(t);                 weighted V-filtration of t on Brieskorn lattice H''
- tmatrix(t);                t-matrix on Brieskorn lattice H''
+ vfilt(t);                  V-filtration of t on Brieskorn lattice
+ vwfilt(t);                 weighted V-filtration of t on Brieskorn lattice
+ tmatrix(t);                t-matrix on Brieskorn lattice
  endvfilt(V);               endomorphism V-filtration on Jacobian algebra
  spprint(sp);               print spectrum sp
  sppprint(spp);             print spectral pairs spp
@@ -111,11 +111,11 @@ ASSUME:   characteristic 0; local degree ordering;
           isolated critical point 0 of t
 RETURN:
 @format
-ring G;  Gauss-Manin system of t with variable s
+ring G;  Gauss-Manin connection of t with variable s
   poly gmspoly=t;
   ideal gmsjacob;  Jacobian ideal of t
   ideal gmsstd;  standard basis of Jacobian ideal
-  matrix gmsmatrix;  matrix(gmsjacob)*gmsmatrix=matrix(gmsstd)
+  matrix gmsmatrix;  matrix(gmsjacob)*gmsmatrix==matrix(gmsstd)
   ideal gmsbasis;  monomial vector space basis of Jacobian algebra
   int gmsmaxweight;  maximal weight of variables
 @end format
@@ -320,7 +320,7 @@ list l;
   matrix l[1];  gmsbasis representation of p mod s^(K+1)
   ideal l[2];  p=matrix(gmsbasis)*l[1]+l[2] mod s^(Kmax+1)
 @end format
-NOTE:     by setting p=l[2] the computation can be continued up to order 
+NOTE:     by setting p=l[2] the computation can be continued up to degree 
           at most Kmax, by default Kmax=infinity
 KEYWORDS: singularities; Gauss-Manin connection; Brieskorn lattice
 EXAMPLE:  example gmscoeffs; shows examples
@@ -425,8 +425,6 @@ static proc saturate(int K0)
   H=std(H0);
 
   dbprint(printlevel-voice+2,"// transform H'' to saturation of H''");
-//  l=division(H,freemodule(mu)*s^k);
-//  H0=l[1];
   H0=liftbound(H,freemodule(mu)*s^k,k,k);
 
   return(A0,r,H,H0,k);
@@ -443,8 +441,6 @@ static proc basisrep(matrix A0,ideal r,module H,int k0,int K,int K0)
   A0=A0+C;
 
   dbprint(printlevel-voice+2,"// transform A to saturation of H''");
-//  l=division(H*s,A0*H+s^2*diff(matrix(H),s));
-//  matrix A=jet(l[1],l[2],K);
   matrix A=liftbound(H*s,A0*H+s^2*diff(matrix(H),s),k0+1,K);
 
   return(A,A0,r);
@@ -651,7 +647,7 @@ example
 
 proc sppnf(ideal a,intvec w,list #)
 "USAGE:    sppnf(a,w[,m][,V]); ideal a, intvec w, intvec m, list V
-ASSUME:   ncols(e)=size(w)=size(m)=size(V); module V[i]
+ASSUME:   ncols(e)=size(w)=size(m)=size(V); typeof(V[i])=="module"
 RETURN:
 @format
 list spp;  spectral pairs normal form of (a,w,m,V)
@@ -801,7 +797,7 @@ list v;  V-filtration on H''/s*H''
   intvec v[2]; 
     int v[2][i];  multiplicity of i-th spectral pair
   list v[3]; 
-    module v[3][i];  vector space of i-th spectral pair in terms of v[4]
+    module v[3][i];  vector space of i-th graded part in terms of v[4]
   ideal v[4];  monomial vector space basis of H''/s*H''
   ideal v[5];  standard basis of Jacobian ideal
 @end format
@@ -836,8 +832,7 @@ list vw;  weighted V-filtration on H''/s*H''
   intvec vw[3]; 
     int vw[3][i];  multiplicity of i-th spectral pair
   list vw[4]; 
-    module vw[4][i];  vector space of i-th spectral pair
-                      in terms of vw[5]
+    module vw[4][i];  vector space of i-th graded part in terms of vw[5]
   ideal vw[5];  monomial vector space basis of H''/s*H''
   ideal vw[6];  standard basis of Jacobian ideal
 @end format
@@ -991,7 +986,6 @@ EXAMPLE:  example tmatrix; shows examples
 
   dbprint(printlevel-voice+2,"// transform to V-splitting basis");
   A=jet(A,0);
-//  H=std(jet(division(U,H)[1],k0+k1));
   H=std(liftbound(U,H,0,k0+k1));
 
   dbprint(printlevel-voice+2,"// compute V-leading terms of H''");
@@ -1107,8 +1101,6 @@ EXAMPLE:  example tmatrix; shows examples
   H=imap(S,H);
 
   dbprint(printlevel-voice+2,"// compute matrix A0+sA1 of t");
-//  list l=division(H,s*A*H+s^2*diff(matrix(H),s));
-//  A=jet(l[1],l[2],k0+k1+1);
   A=liftbound(H,s*A*H+s^2*diff(matrix(H),s),k0+k1,1);
   A0=jet(A,0);
   A=jet(A,1)/s;
@@ -1131,13 +1123,13 @@ proc endvfilt(list v)
 ASSUME:  v returned by vfilt
 RETURN:
 @format
-list ev;  endomorphism V-filtration on Jacobian algebra
+list ev;  V-filtration on Jacobian algebra
   ideal ev[1];
     number ev[1][i];  V-filtration index of i-th spectral pair
   intvec ev[2]; 
     int ev[2][i];  multiplicity of i-th spectral pair
   list ev[3]; 
-    module ev[3][i];  vector space of i-th spectral pair in terms of ev[4]
+    module ev[3][i];  vector space of i-th graded part in terms of ev[4]
   ideal ev[4];  monomial vector space basis of Jacobian algebra
   ideal ev[5];  standard basis of Jacobian ideal
 @end format
