@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpr_inout.cc,v 1.10 2000-09-18 09:19:20 obachman Exp $ */
+/* $Id: mpr_inout.cc,v 1.11 2000-10-05 15:16:58 Singular Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultant
@@ -190,7 +190,7 @@ BOOLEAN nuUResSolve( leftv res, leftv args )
   // get and set precision in digits ( > 0 )
   if ( v->Typ() != INT_CMD )
     return TRUE;
-  else if ( !(rField_is_R()||rField_is_long_R()||rField_is_long_C()) ) 
+  else if ( !(rField_is_R()||rField_is_long_R()||rField_is_long_C()) )
   {
     setGMPFloatDigits( (unsigned long int)v->Data() );
   }
@@ -243,7 +243,7 @@ BOOLEAN nuUResSolve( leftv res, leftv args )
   {
     smv= ures->accessResMat()->getSubDet();
 #ifdef mprDEBUG_PROT
-    Print("// Determinant of submatrix: ");nPrint(smv);PrintLn();
+    PrintS("// Determinant of submatrix: ");nPrint(smv);PrintLn();
 #endif
     if ( nIsZero(smv) )
     {
@@ -360,8 +360,8 @@ BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
     WerrorS("Ground field not implemented!");
     return TRUE;
   }
-  
-  if ( !(rField_is_R()||rField_is_long_R()||rField_is_long_C()) ) 
+
+  if ( !(rField_is_R()||rField_is_long_R()||rField_is_long_C()) )
   {
     setGMPFloatDigits( (unsigned long int)arg2->Data() );
   }
@@ -413,7 +413,7 @@ BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
     if ( piter && pTotaldegree(piter) == i )
     {
       pcoeffs[i]= nCopy( pGetCoeff( piter ) );
-      //nPrint( pcoeffs[i] );Print("  ");
+      //nPrint( pcoeffs[i] );PrintS("  ");
       pIter( piter );
     }
     else
@@ -425,7 +425,7 @@ BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
 #ifdef mprDEBUG_PROT
   for (i=deg; i >= 0; i--)
   {
-    nPrint( pcoeffs[i] );Print("  ");
+    nPrint( pcoeffs[i] );PrintS("  ");
   }
   PrintLn();
 #endif
@@ -606,7 +606,7 @@ poly u_resultant_det( ideal gls, int imtype )
   {
     smv= ures->accessResMat()->getSubDet();
 #ifdef mprDEBUG_PROT
-    Print("// Determinant of submatrix: ");nPrint(smv); PrintLn();
+    PrintS("// Determinant of submatrix: ");nPrint(smv); PrintLn();
 #endif
     if ( nIsZero(smv) )
     {
@@ -654,40 +654,40 @@ BOOLEAN loSimplex( leftv res, leftv args )
   leftv v= args;
   if ( v->Typ() != MATRIX_CMD ) // 1: matrix
     return TRUE;
-  else 
+  else
     m= (matrix)(v->Data());
-  
+
   LP = new simplex(MATROWS(m),MATCOLS(m));
   LP->mapFromMatrix(m);
 
   v= v->next;
   if ( v->Typ() != INT_CMD )    // 2: m = number of constraints
     return TRUE;
-  else 
+  else
     LP->m= (int)(v->Data());
 
   v= v->next;
-  if ( v->Typ() != INT_CMD )    // 3: n = number of variables 
+  if ( v->Typ() != INT_CMD )    // 3: n = number of variables
     return TRUE;
-  else 
+  else
     LP->n= (int)(v->Data());
 
   v= v->next;
   if ( v->Typ() != INT_CMD )    // 4: m1 = number of <= constraints
     return TRUE;
-  else 
+  else
     LP->m1= (int)(v->Data());
 
   v= v->next;
   if ( v->Typ() != INT_CMD )    // 5: m2 = number of >= constraints
     return TRUE;
-  else 
+  else
     LP->m2= (int)(v->Data());
 
   v= v->next;
   if ( v->Typ() != INT_CMD )    // 6: m3 = number of == constraints
     return TRUE;
-  else 
+  else
     LP->m3= (int)(v->Data());
 
 #ifdef mprDEBUG_PROT
@@ -711,7 +711,7 @@ BOOLEAN loSimplex( leftv res, leftv args )
 
   lres->m[2].rtyp= INTVEC_CMD;
   lres->m[2].data=(void*)LP->posvToIV();
- 
+
   lres->m[3].rtyp= INTVEC_CMD;
   lres->m[3].data=(void*)LP->zrovToIV();
 
@@ -740,12 +740,3 @@ BOOLEAN loSimplex( leftv res, leftv args )
 // in folding: C-c x
 // leave fold: C-c y
 //   foldmode: F10
-
-
-
-
-
-
-
-
-

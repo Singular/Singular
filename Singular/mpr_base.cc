@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_base.cc,v 1.23 2000-09-18 09:19:18 obachman Exp $ */
+/* $Id: mpr_base.cc,v 1.24 2000-10-05 15:14:07 Singular Exp $ */
 
 /*
  * ABSTRACT - multipolynomial resultants - resultant matrices
@@ -337,9 +337,9 @@ void print_mat(mprfloat **a, int maxrow, int maxcol)
 
   for (i = 1; i <= maxrow; i++)
   {
-    Print("[");
+    PrintS("[");
     for (j = 1; j <= maxcol; j++) Print("% 7.2f, ", a[i][j]);
-    Print("],\n");
+    PrintS("],\n");
   }
 }
 void print_bmat(mprfloat **a, int nrows, int ncols, int N, int *iposv)
@@ -366,7 +366,7 @@ void print_exp( const onePointP vert, int n )
   {
     Print(" %d",vert->point[i] );
 #ifdef LONG_OUTPUT
-    if ( i < n ) Print(", ");
+    if ( i < n ) PrintS(", ");
 #endif
   }
 }
@@ -699,14 +699,14 @@ void pointSet::lift( int l[] )
   }
 
 #ifdef mprDEBUG_ALL
-  Print(" lift vector: ");
+  PrintS(" lift vector: ");
   for ( j=1; j < dim; j++ ) Print(" %d ",l[j] );
   PrintLn();
 #ifdef mprDEBUG_ALL
-  Print(" lifted points: \n");
+  PrintS(" lifted points: \n");
   for ( j=1; j <= num; j++ )
   {
-    Print("%d: <",j);print_exp(points[j],dim);Print(">\n");
+    Print("%d: <",j);print_exp(points[j],dim);PrintS(">\n");
   }
   PrintLn();
 #endif
@@ -977,7 +977,7 @@ mprfloat mayanPyramidAlg::vDistance( Coord_t * acoords, int dim )
   pLP->compute();
 
 #ifdef mprDEBUG_ALL
-  Print("LP returns matrix\n");
+  PrintS("LP returns matrix\n");
   print_bmat( pLP->LiPM, pLP->m+1, cols+1-pLP->m, cols, pLP->iposv);
 #endif
 
@@ -1613,7 +1613,7 @@ resMatrixSparse::resMatrixSparse( const ideal _gls, const int special )
   randomVector( idelem, shift );
 #endif
 #ifdef mprDEBUG_PROT
-  Print(" shift vector: ");
+  PrintS(" shift vector: ");
   for ( i= 1; i <= idelem; i++ ) Print(" %.12f ",(double)shift[i]);
   PrintLn();
 #endif
@@ -1632,12 +1632,12 @@ resMatrixSparse::resMatrixSparse( const ideal _gls, const int special )
 
 #ifdef mprDEBUG_PROT
 #ifdef mprMINKSUM
-  Print("(MinkSum)");
+  PrintS("(MinkSum)");
 #endif
   PrintS("\n E = (Q_0 + ... + Q_n) \\cap \\N :\n");
   for ( pnt= 1; pnt <= E->num; pnt++ )
   {
-    Print("%d: <",pnt);print_exp( (*E)[pnt], E->dim );Print(">\n");
+    Print("%d: <",pnt);print_exp( (*E)[pnt], E->dim );PrintS(">\n");
   }
   PrintLn();
 #endif
@@ -1680,7 +1680,7 @@ resMatrixSparse::resMatrixSparse( const ideal _gls, const int special )
   PrintS(" points which lie in a cell:\n");
   for ( pnt= 1; pnt <= E->num; pnt++ )
   {
-    Print("%d: <",pnt);print_exp( (*E)[pnt], E->dim );Print(">\n");
+    Print("%d: <",pnt);print_exp( (*E)[pnt], E->dim );PrintS(">\n");
   }
   PrintLn();
 #endif
@@ -1696,8 +1696,8 @@ resMatrixSparse::resMatrixSparse( const ideal _gls, const int special )
   {
     Print("Punkt p \\in E[%d]: <",pnt);print_exp( (*E)[pnt], E->dim );
     Print(">, RC(p) = (i:%d, j:%d), a[i,j] = <",(*E)[pnt]->rc.set,(*E)[pnt]->rc.pnt);
-    //print_exp( (Qi[(*E)[pnt]->rc.set])[(*E)[pnt]->rc.pnt], E->dim );Print("> = <");
-    print_exp( (*E)[pnt]->rcPnt, E->dim );Print(">\n");
+    //print_exp( (Qi[(*E)[pnt]->rc.set])[(*E)[pnt]->rc.pnt], E->dim );PrintS("> = <");
+    print_exp( (*E)[pnt]->rcPnt, E->dim );PrintS(">\n");
   }
 #endif
 
@@ -1936,13 +1936,13 @@ public:
 
   /** Evaluate the determinant of the matrix M at the point evpoint
    * where the ui's are replaced by the components of evpoint.
-   * Uses singclap_det from fractory.
+   * Uses singclap_det from factory.
    */
   const number getDetAt( const number* evpoint );
 
   /** Evaluates the determinant of the submatrix M'.
    * Since the matrix is numerically, no evaluation point is needed.
-   * Uses singclap_det from fractory.
+   * Uses singclap_det from factory.
    */
   const number getSubDet();
 
@@ -2084,8 +2084,10 @@ resMatrixDense::~resMatrixDense()
         nDelete( resVectorList[i].numColVector+j );
     }
     // OB: ????? (solve_s.tst)
-    omfreeSize( (ADDRESS)resVectorList[i].numColVector, numVectors*sizeof( number ) );
-    omfreeSize( (ADDRESS)resVectorList[i].numColParNr, (pVariables+1) * sizeof(int) );
+    omfreeSize( (ADDRESS)resVectorList[i].numColVector,
+                numVectors * sizeof( number ) );
+    omfreeSize( (ADDRESS)resVectorList[i].numColParNr,
+                (pVariables+1) * sizeof(int) );
   }
 
   omFreeSize( (ADDRESS)resVectorList, veclistmax*sizeof( resVector ) );
@@ -2093,11 +2095,7 @@ resMatrixDense::~resMatrixDense()
   // free matrix m
   if ( m != NULL )
   {
-    for ( i= 1; i <= numVectors; i++ )
-      for ( j= 1; j <= numVectors; j++ )
-        pDelete( &MATELEM(m , i, j) );
-    omfreeSize( (ADDRESS)m->m, numVectors * numVectors * sizeof(poly) );
-    omFreeBin((ADDRESS)m,  ip_smatrix_bin);
+    idDelete((ideal *)&m);
   }
 }
 
@@ -2444,7 +2442,7 @@ void resMatrixDense::generateBaseData()
 
   // create the matrix M
   createMatrix();
-  
+
 }
 
 resVector *resMatrixDense::getMVector(int i)
@@ -2459,14 +2457,18 @@ const ideal resMatrixDense::getMatrix()
 
   // copy matrix
   matrix resmat= mpNew(numVectors,numVectors);
+  poly p;
   for (i=1; i <= numVectors; i++)
   {
     for (j=1; j <= numVectors; j++ )
     {
-      if ( (MATELEM(m,i,j)!=NULL)
-      && (!nIsZero(pGetCoeff(MATELEM(m,i,j)))) )
+      p=MATELEM(m,i,j);
+      if (( p!=NULL)
+      && (!nIsZero(pGetCoeff(p)))
+      && (pGetCoeff(p)!=NULL)
+      )
       {
-        MATELEM(resmat,i,j)= pCopy( MATELEM(m,i,j) );
+        MATELEM(resmat,i,j)= pCopy( p );
       }
     }
   }
@@ -2481,7 +2483,7 @@ const ideal resMatrixDense::getMatrix()
           pDelete( &MATELEM(resmat,numVectors-i,numVectors-resVectorList[i].numColParNr[j-1]) );
         MATELEM(resmat,numVectors-i,numVectors-resVectorList[i].numColParNr[j-1])= pOne();
         // FIX ME
-        if ( true )
+        if ( FALSE )
         {
           pSetCoeff( MATELEM(resmat,numVectors-i,numVectors-resVectorList[i].numColParNr[j-1]), nPar(j) );
         }

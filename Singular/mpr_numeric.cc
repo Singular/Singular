@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpr_numeric.cc,v 1.10 2000-09-18 09:19:20 obachman Exp $ */
+/* $Id: mpr_numeric.cc,v 1.11 2000-10-05 15:16:58 Singular Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - numeric stuff
@@ -856,9 +856,9 @@ BOOLEAN simplex::mapFromMatrix( matrix m )
   number coef;
   for ( i= 1; i <= MATROWS( m ); i++ )
   {
-     for ( j= 1; j <= MATCOLS( m ); j++ ) 
+     for ( j= 1; j <= MATCOLS( m ); j++ )
      {
-	if ( MATELEM(m,i,j) != NULL ) 
+	if ( MATELEM(m,i,j) != NULL )
 	{
 	   coef= pGetCoeff( MATELEM(m,i,j) );
 	   if ( coef != NULL && !nIsZero(coef) )
@@ -893,7 +893,7 @@ matrix simplex::mapToMatrix( matrix m )
        pDelete( &(MATELEM(m,i,j)) );
        MATELEM(m,i,j)= NULL;
 //Print(" %3.0f ",LiPM[i][j]);
-       if ( LiPM[i][j] != 0.0 ) 
+       if ( LiPM[i][j] != 0.0 )
        {
 	  bla= new gmp_float(LiPM[i][j]);
 	  coef= (number)bla;
@@ -903,7 +903,7 @@ matrix simplex::mapToMatrix( matrix m )
     }
 //PrintLn();
   }
-  
+
   return m;
 }
 
@@ -926,7 +926,7 @@ intvec * simplex::zrovToIV()
    {
       IMATELEM(*iv,i,1)= izrov[i];
    }
-   return iv; 
+   return iv;
 }
 
 void simplex::compute()
