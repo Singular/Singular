@@ -1,21 +1,21 @@
-// $Id: surf.lib,v 1.7 1999-12-10 16:43:34 obachman Exp $
+// $Id: surf.lib,v 1.8 2000-01-12 12:53:44 Singular Exp $
 //
 // author : Hans Schoenemann
 //
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: surf.lib,v 1.7 1999-12-10 16:43:34 obachman Exp $";
+version="$Id: surf.lib,v 1.8 2000-01-12 12:53:44 Singular Exp $";
 info="
 LIBRARY: surf.lib    PROCEDURES FOR GRAPHICS WITH SURF
 
 AUTHOR: surf is written by Stefan Endrass
 
-NOTE: 
-@texinfo 
-To use this library requires the program @code{surf} to be installed. 
+NOTE:
+@texinfo
+To use this library requires the program @code{surf} to be installed.
 @code{surf} is only available for Linux PCs and Sun workstations.
-You can download @code{surf} either from 
- @uref{http://www.mathematik.uni-mainz.de/AlgebraischeGeometrie/surf/surf.shtml}
- or from @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/utils/}. 
+You can download @code{surf} either from
+ @uref{http://enriques.mathematik.uni-mainz.de/kon/surf/surf.shtml}
+ or from @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/utils/}.
 @end texinfo
 
 PROCEDURES:
@@ -103,6 +103,11 @@ EXAMPLE: example plot; shows an example
   }
 //  "calling surf (by Stephan Endrass) for drawing";
   i=system("sh","surf "+l+" >/dev/null 2>&1");
+  if (i!=0)
+  {
+    "calling `surf` failed. (the shell return the error code",i,").";
+    "probably the executable `surf` is not found.";
+  }
   i=system("sh","/bin/rm "+l);
 }
 example
