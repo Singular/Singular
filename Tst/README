@@ -141,4 +141,7 @@ To add a new test for a library/commando to the test-suite:
 * The command for generating xx.res.gz.uu and xx.stat is: 
   cd <directopry where xx.tst resides>; perl ../regress.cmd -g xx.tst
 
+* You can download the newest version of tst.lib from
+  ftp://www.mathematik.uni-kl.de/pub/Math/Singular/misc/tst.lib
+
 

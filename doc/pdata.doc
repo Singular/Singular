@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: pdata.doc,v 1.20 2000-12-18 11:59:18 obachman Exp $
+@comment $Id: pdata.doc,v 1.21 2000-12-18 14:22:56 obachman Exp $
 @comment this file contains the "Polynomial data" appendix.
 
 @c The following directives are necessary for proper compilation
@@ -486,6 +486,7 @@ described in the following sections.
 @node Global orderings, Local orderings, General definitions for orderings, Monomial orderings
 @subsection Global orderings
 @cindex Global orderings
+@cindex orderings, global
 
 @tex
 For all these orderings: Loc $K[x]$ = $K[x]$
@@ -497,6 +498,8 @@ For all these orderings: Loc K[x] = K[x]
 @table @asis
 @item lp:
 lexicographical ordering:
+@cindex lp, global ordering
+@cindex lexicographical ordering
 @*
 @ifinfo
 x^a < x^b  <==> there is an i,  1 <= i <= n :
@@ -509,6 +512,8 @@ $x^\alpha < x^\beta  \Leftrightarrow  \exists\; 1 \le i \le n :
 @end tex
 @item rp:
 reverse lexicographical ordering:
+@cindex rp, global ordering
+@cindex reverse lexicographical ordering
 @*
 @ifinfo
 x^a < x^b  <==> there is an i,  1 <= i <= n :
@@ -521,6 +526,8 @@ $x^\alpha < x^\beta  \Leftrightarrow  \exists\; 1 \le i \le n :
 @end tex
 @item dp:
 degree reverse lexicographical ordering:
+@cindex degree reverse lexicographical ordering
+@cindex dp, global ordering
 @*
 @ifinfo 
 let deg(x^a) = a_1 + @dots{} + a_n, then
@@ -548,6 +555,8 @@ let $\deg(x^\alpha) = \alpha_1 + \cdots + \alpha_n,$ then
 @end tex
 @item Dp:
 degree lexicographical ordering:
+@cindex degree lexicographical ordering
+@cindex Dp, global ordering
 @*
 @ifinfo 
 let deg(x^a) = a_1 + @dots{} + a_n, then
@@ -575,6 +584,8 @@ let $\deg(x^\alpha) = \alpha_1 + \cdots + \alpha_n,$ then
 @end tex
 @item wp:
 weighted reverse lexicographical ordering:
+@cindex weighted reverse lexicographical ordering
+@cindex wp, global ordering
 @*
 @ifinfo
  wp(w_1, @dots{}, w_n), w_i  positive integers,
@@ -593,6 +604,8 @@ $\deg(x^\alpha) = w_1 \alpha_1 + \cdots + w_n\alpha_n.$
 @end tex
 @item Wp:
 weighted lexicographical ordering:
+@cindex weighted lexicographical ordering
+@cindex WP, global ordering
 @*
 @ifinfo
  Wp(w_1, @dots{}, w_n), w_i  positive integers,
@@ -614,6 +627,7 @@ $\deg(x^\alpha) = w_1 \alpha_1 + \cdots + w_n\alpha_n.$
 @node Local orderings, Module orderings, Global orderings, Monomial orderings
 @subsection Local orderings
 @cindex Local orderings
+@cindex orderings, local
 
 For ls, ds, Ds and, if the weights are positive integers, also for ws and
 Ws,  we have
@@ -641,6 +655,8 @@ at the maximal ideal
 @table @asis
 @item ls:
 negative lexicographical ordering:
+@cindex negative lexicographical ordering
+@cindex ls, local ordering
 @*
 @ifinfo
 x^a < x^b  <==> there is an i,  1 <= i <= n :
@@ -653,6 +669,8 @@ $x^\alpha < x^\beta  \Leftrightarrow  \exists\; 1 \le i \le n :
 @end tex
 @item ds:
 negative degree reverse lexicographical ordering:
+@cindex negative degree reverse lexicographical ordering
+@cindex ds, local ordering
 @*
 @ifinfo 
 let deg(x^a) = a_1 + @dots{} + a_n, then
@@ -680,6 +698,8 @@ let $\deg(x^\alpha) = \alpha_1 + \cdots + \alpha_n,$ then
 @end tex
 @item Ds:
 negative degree lexicographical ordering:
+@cindex negative degree lexicographical ordering
+@cindex Ds, local ordering
 @*
 @ifinfo
 let deg(x^a) = a_1 + @dots{} + a_n, then
@@ -707,6 +727,9 @@ x^a < x^b <==>
 @end tex
 @item ws:
 (general) weighted reverse lexicographical ordering:
+@cindex general weighted reverse lexicographical ordering
+@cindex local weighted reverse lexicographical ordering
+@cindex ws, local ordering
 @*
 @ifinfo
  ws(w_1, @dots{}, w_n), w_1
@@ -732,6 +755,9 @@ $\deg(x^\alpha) = w_1 \alpha_1 + \cdots + w_n\alpha_n.$
 @end tex
 @item Ws:
 (general) weighted lexicographical ordering:
+@cindex general weighted lexicographical ordering
+@cindex local weighted lexicographical ordering
+@cindex Ws, local ordering
 @*
 @ifinfo
  Ws(w_1, @dots{}, w_n), w_1
@@ -800,6 +826,8 @@ as above.
 
 @table @asis
 @item (<,C):
+@cindex C, module ordering
+@cindex module ordering C
 @ifinfo
 <_m = (<,C) denotes the module ordering (giving priority to the coefficients):
 @* x^a*gen(i) <_m x^b*gen(j) <==>
@@ -856,6 +884,8 @@ i = j $ and $ x^\alpha < x^\beta $).
 @end smallexample
 
 @item (<,c):
+@cindex c, module ordering
+@cindex module ordering c
 @ifinfo
 <_m = (<,c) denotes the module ordering (giving priority to the coefficients):
 @* x^a*gen(i) <_m x^b*gen(j) <==>
@@ -934,6 +964,8 @@ In all cases @sc{Singular} can read input in both formats.
 @node Matrix orderings, Product orderings, Module orderings, Monomial orderings
 @subsection Matrix orderings
 @cindex Matrix orderings
+@cindex orderings, M
+@cindex M, ordering
 
 Let 
 @tex
@@ -1229,6 +1261,7 @@ matrix orderings, since evaluating a matrix product is time consuming.
 @node Product orderings, Extra weight vector, Matrix orderings, Monomial orderings
 @subsection Product orderings
 @cindex Product orderings
+@cindex orderings, product
 
 Let
 @ifinfo
@@ -1277,6 +1310,8 @@ defines: @code{lp} on the first 3 variables, the matrix ordering
 @node Extra weight vector,  , Product orderings, Monomial orderings
 @subsection Extra weight vector
 @cindex Extra weight vector
+@cindex a, ordering
+@cindex orderings, a 
 
 @ifinfo
 a(w_1, @dots{}, w_n),

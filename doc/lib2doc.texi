@@ -24,7 +24,7 @@ To generate the documentation for a library, follow these steps:
 @item
 Unpack lib2doc.tar.gz
 @smallexample
-gzip -dc  lib2doc.tar.gz | tar -pxf-
+gzip -dc  lib2doc.tar.gz | tar -pxf -
 @end smallexample
 and 
 @smallexample

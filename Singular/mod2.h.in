@@ -5,7 +5,7 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id: mod2.h.in,v 1.96 2000-12-15 16:37:26 Singular Exp $
+ *  Version: $Id: mod2.h.in,v 1.97 2000-12-18 14:22:54 obachman Exp $
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H
@@ -612,8 +612,8 @@ do                                              \
 while (0)
 #endif /* HAVE_ASSUME */
 
-#if 1
-#define HAVE_SHIFTED_EXPONENTS
+/* do have RDEBUG, unless we are doing the very real thing */
+#ifdef HAVE_ASSUME
 #ifndef RDEBUG
 #define RDEBUG 
 #endif
