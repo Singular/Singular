@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.3 1997-04-02 15:07:04 Singular Exp $ */
+/* $Id: ideals.cc,v 1.4 1997-04-08 15:31:04 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1920,15 +1920,24 @@ static void makemonoms(int vars,int actvar,int deg,int monomdeg)
 */
 ideal idMaxIdeal(int deg)
 {
-  int vars = currRing->N,i;
-  ideal id;
-
-  if (deg <= 1)
+  if (deg < 0)
+  {
+    WarnS("maxideal: power must be non-negative");
+  }
+  if (deg < 1)
+  {
+    ideal I=idInit(1,1);
+    I->m[0]=pOne();
+    return I; 
+  }
+  if (deg == 1)
   {
     return idMaxIdeal();
   }
-  i = binom(vars+deg-1,deg);
-  id=idInit(i,1);
+
+  int vars = currRing->N;
+  int i = binom(vars+deg-1,deg);
+  ideal id=idInit(i,1);
   idpower = id->m;
   idpowerpoint = 0;
   makemonoms(vars,1,deg,0);
