@@ -6,7 +6,7 @@
 /*
 * ABSTRACT: token for interpreter, as types; general macros
 */
-/* $Id: tok.h,v 1.8 1997-06-17 10:12:13 obachman Exp $ */
+/* $Id: tok.h,v 1.9 1997-06-24 16:52:45 Singular Exp $ */
 
 #ifndef MYYSTYPE
 #include "structs.h"
@@ -112,9 +112,7 @@ enum {
   VPAGELENGTH,
   VCOLMAX,
   VTIMER,
-#ifdef HAVE_RTIMER
   VRTIMER,
-#endif  
   TRACE,
   VOICE,
   VSHORTOUT,

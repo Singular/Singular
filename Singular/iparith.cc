@@ -296,9 +296,7 @@ cmdnames cmds[] =
   { "printlevel",  0, VPRINTLEVEL ,       SYSVAR},
   { "short",       0, VSHORTOUT ,         SYSVAR},
   { "timer",       0, VTIMER ,            SYSVAR},
-#ifdef HAVE_RTIMER
   { "rtimer",      0, VRTIMER,            SYSVAR},
-#endif
   { "TRACE",       0, TRACE ,             SYSVAR},
   { "voice",       0, VOICE ,             SYSVAR},
 
@@ -4314,6 +4312,7 @@ void ttGen2()
     if(f)
     {
       id_nr++;
+      if(cmds[m].tokval==VRTIMER) fprintf(outfile,"#ifdef HAVE_RTIMER\n");
       fprintf(outfile,"  {\"%s\", %*d, %3d, ",cmds[m].name,
                                              20-strlen(cmds[m].name),
                                              cmds[m].alias,
@@ -4334,6 +4333,7 @@ void ttGen2()
         case NONE:   fprintf(outfile,"NONE },\n"); break;
         default:       fprintf(outfile,"%d },\n",cmds[m].toktype);
       }
+      if(cmds[m].tokval==VRTIMER) fprintf(outfile,"#endif\n");
       cmds[m].name=NULL;
       m=-1;
       i=1;
@@ -4382,7 +4382,11 @@ void ttGen2()
 "/* end of list marker */\n"
 "  { NULL, 0, 0, 0}\n"
 "};\n"
-"#define LAST_IDENTIFIER %d\n",id_nr);
+"#ifdef HAVE_RTIMER\n"
+"#define LAST_IDENTIFIER %d\n"
+"#else\n"
+"#define LAST_IDENTIFIER %d\n"
+"#endif\n",id_nr,id_nr-1);
   fclose(outfile);
 }
 /*-------------------------------------------------------------------*/
