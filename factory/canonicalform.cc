@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.cc,v 1.28 1999-07-08 07:50:51 Singular Exp $ */
+/* $Id: canonicalform.cc,v 1.29 2000-02-07 13:51:34 Singular Exp $ */
 
 #include <config.h>
 
@@ -1632,6 +1632,9 @@ power ( const CanonicalForm & f, int n )
     }
     else  if ( n == 0 )
 	return 1;
+    //else if (f.inGF())
+    //{
+    //}
     else {
 	CanonicalForm result = f;
 	for ( int i = 1; i < n; i++ )
