@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.13 1998-06-13 12:44:49 krueger Exp $ */
+/* $Id: structs.h,v 1.14 1998-09-09 13:08:38 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -48,6 +48,7 @@ class procinfo;
 #ifdef HAVE_NAMESPACES
 class namerec;
 #endif
+#endif
 
 struct  sip_sring;
 struct  sip_sideal;
@@ -76,29 +77,31 @@ typedef struct sip_package ip_package;
 /* the pointer types */
 typedef ip_sring *         ring;
 typedef int                idtyp;
-typedef idrec *            idhdl;
 typedef rnumber *          number;
 typedef polyrec *          poly;
 typedef poly *             polyset;
 typedef ip_sideal *        ideal;
 typedef ip_smap *          map;
-typedef ip_link *          si_link;
 typedef ideal *            resolvente;
+typedef union uutypes      utypes;
+typedef ip_command *       command;
+typedef struct s_si_link_extension *si_link_extension;
+typedef struct reca *      alg;
+#ifdef __cplusplus
+typedef idrec *            idhdl;
 typedef ip_smatrix *       matrix;
+typedef ip_link *          si_link;
 typedef sleftv *           leftv;
 typedef slists *           lists;
 typedef sSubexpr *         Subexpr;
-typedef union uutypes      utypes;
 typedef sattr *            attr;
 typedef skStrategy *       kStrategy;
-typedef ip_command *       command;
 typedef ip_package *       package;
-typedef struct s_si_link_extension *si_link_extension;
 typedef ssyStrategy *      syStrategy;
-typedef struct reca *      alg;
 typedef procinfo *         procinfov;
 #ifdef HAVE_NAMESPACES
 typedef namerec *          namehdl;
+#endif
 #endif
 
 struct _scmdnames
@@ -111,7 +114,6 @@ struct _scmdnames
 typedef struct _scmdnames cmdnames;
 
 /* the function pointer types */
-//typedef void (*numberproc)(number a,number b,number * c);
 typedef number (*numberfunc)(number a,number b);
 
 typedef void    (*pSetmProc)(poly p);
@@ -120,7 +122,6 @@ typedef int     (*pFDegProc)(poly p);
 typedef int     (*pCompProc)(poly p1, poly p2);
 
 extern ring      currRing;
-#endif
 
 /*
 **  7. runtime procedures/global data
