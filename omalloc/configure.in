@@ -3,7 +3,7 @@ dnl File: configure.in
 dnl Purpose: Process this file with autoconf to produce configure
 dnl Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
 dnl Created: 11/99
-dnl Version: $Id: configure.in,v 1.5 2000-08-16 12:06:10 obachman Exp $
+dnl Version: $Id: configure.in,v 1.6 2000-08-16 12:55:45 obachman Exp $
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 
 AC_INIT(omAlloc.c)
@@ -111,10 +111,6 @@ AC_CHECK_PROG(ADDR2LINE, addr2line, addr2line, no)
 if test "$ac_cv_prog_ADDR2LINE" = addr2line; then
   AC_DEFINE_UNQUOTED(OM_PROG_ADDR2LINE, "$ac_cv_prog_ADDR2LINE")
 fi
-AC_CHECK_PROG(NM, nm, nm, no)
-if test "$ac_cv_prog_NM" = nm; then
-  AC_DEFINE_UNQUOTED(OM_PROG_NM, "$ac_cv_prog_NM")
-fi
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl header file checks
@@ -122,7 +118,7 @@ dnl
 AC_HEADER_STDC
 AC_CHECK_HEADERS(limits.h,,
   AC_MSG_ERROR(Can not compile without limits.h))
-AC_CHECK_HEADERS(unistd.h sys/mman.h fcntl.h)
+AC_CHECK_HEADERS(unistd.h sys/mman.h fcntl.h /usr/include/malloc.h)
 
 AC_CHECK_FUNCS(popen readlink getcwd getwd mmap sbrk)
 

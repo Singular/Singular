@@ -147,8 +147,12 @@ int size_range_number = RANGE_MAX / RANGE_MIN;
 
 int MyRandSpec()
 {
-  int spec = 1 + (int) ( ((double) SPEC_MAX)* ((double) rand())/(RAND_MAX + 1.0));
-  
+#if 0
+  /* This behaves badly on the HP's, because RAND_MAX == 32767 */
+  int spec = 1 + (int) ( ((double) SPEC_MAX)* ((double) random())/(RAND_MAX + 1.0));
+#else
+  int spec = random() + 1;
+#endif  
   if (! size_range_number)
   {
     size_range = size_range << 1;
@@ -279,7 +283,7 @@ int main(int argc, char* argv[])
   
   if (argc > 1) sscanf(argv[1], "%d", &error_test);
   if (argc > 2) sscanf(argv[2], "%d", &seed);
-  srand(seed);
+  srandom(seed);
 
   if (argc > 3) sscanf(argv[3], "%d", &n);
   if (argc > 4) sscanf(argv[4], "%d", &decr);

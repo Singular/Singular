@@ -3,13 +3,13 @@
  *  Purpose: declaration of Alloc routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omAllocDecl.h,v 1.3 2000-08-14 12:26:39 obachman Exp $
+ *  Version: $Id: omAllocDecl.h,v 1.4 2000-08-16 12:55:46 obachman Exp $
  *******************************************************************/
 #ifndef OM_ALLOC_DECL_H
 #define OM_ALLOC_DECL_H
 
 
-#ifndef OMALLOC_C
+#if !defined(OMALLOC_C) && !defined(OM_NO_MALLOC_MACROS)
 #define calloc      omcalloc
 #define malloc      omalloc
 #define free        omfree

@@ -3,7 +3,7 @@
  *  Purpose: declarations for dlmalloc 
  *  This was obtained by taking cutting out the beginning of malloc.c 
  *
- *  Version: $Id: dlmalloc.h,v 1.4 2000-08-14 12:36:59 obachman Exp $
+ *  Version: $Id: dlmalloc.h,v 1.5 2000-08-16 12:55:46 obachman Exp $
  *******************************************************************/
 #ifndef DL_MALLOC_H
 #define DL_MALLOC_H
@@ -14,6 +14,13 @@
 #define OM_PROVIDE_MALLOC 0
 #endif
 
+#ifndef HAVE__USR_INCLUDE_MALLOC_H
+#undef  HAVE__USR_INCLUDE_MALLOC_H
+#endif
+
+#ifdef HAVE__USR_INCLUDE_MALLOC_H
+#define HAVE_USR_INCLUDE_MALLOC_H 1
+#endif
 
 #define OM_MALLOC_MALLOC   mALLOc
 #define OM_MALLOC_REALLOC  rEALLOc

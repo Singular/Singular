@@ -5,7 +5,7 @@
 #define CHECK_LEVEL   1
 // #define MAX_CELLS  500000   
 #define MAX_CELLS     100000
-// #define MAX_CELLS     10000
+// #define MAX_CELLS     1000
 #define KEEP_ADDR     100
 #define END_CHECK_LEVEL 5
 
