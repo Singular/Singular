@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpr_numeric.cc,v 1.13 2000-12-31 15:14:36 obachman Exp $ */
+/* $Id: mpr_numeric.cc,v 1.14 2001-01-15 18:31:00 Singular Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - numeric stuff
@@ -230,9 +230,12 @@ number * vandermonde::interpolateDense( const number * q )
         t= newnum;
       }
 
-      nDelete( &w[i] );                      // w[i]= s/t
-      w[i]= nDiv( s, t );
-      nNormalize( w[i] );
+      if (!nIsZero(t))
+      {
+        nDelete( &w[i] );                      // w[i]= s/t
+        w[i]= nDiv( s, t );
+        nNormalize( w[i] );
+      }
 
       mprSTICKYPROT(ST_VANDER_STEP);
     }
@@ -862,15 +865,15 @@ BOOLEAN simplex::mapFromMatrix( matrix m )
   {
      for ( j= 1; j <= MATCOLS( m ); j++ )
      {
-	if ( MATELEM(m,i,j) != NULL )
-	{
-	   coef= pGetCoeff( MATELEM(m,i,j) );
-	   if ( coef != NULL && !nIsZero(coef) )
-	      LiPM[i][j]= (double)(*(gmp_float*)coef);
-	   //#ifdef mpr_DEBUG_PROT
-	   //Print("%f ",LiPM[i][j]);
-	   //#endif
-	}
+        if ( MATELEM(m,i,j) != NULL )
+        {
+           coef= pGetCoeff( MATELEM(m,i,j) );
+           if ( coef != NULL && !nIsZero(coef) )
+              LiPM[i][j]= (double)(*(gmp_float*)coef);
+           //#ifdef mpr_DEBUG_PROT
+           //Print("%f ",LiPM[i][j]);
+           //#endif
+        }
      }
      //     PrintLn();
   }
@@ -899,10 +902,10 @@ matrix simplex::mapToMatrix( matrix m )
 //Print(" %3.0f ",LiPM[i][j]);
        if ( LiPM[i][j] != 0.0 )
        {
-	  bla= new gmp_float(LiPM[i][j]);
-	  coef= (number)bla;
-	  MATELEM(m,i,j)= pOne();
-	  pSetCoeff( MATELEM(m,i,j), coef );
+          bla= new gmp_float(LiPM[i][j]);
+          coef= (number)bla;
+          MATELEM(m,i,j)= pOne();
+          pSetCoeff( MATELEM(m,i,j), coef );
        }
     }
 //PrintLn();
