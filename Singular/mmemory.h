@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmemory.h,v 1.31 1999-11-15 17:20:24 obachman Exp $ */
+/* $Id: mmemory.h,v 1.32 2000-02-01 15:30:25 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -16,7 +16,6 @@ extern "C" {
 #define inline static
 #endif
 
-#include "mod2.h"
 #include "structs.h"
 
 /**********************************************************************
@@ -39,7 +38,7 @@ void * mmAllocAlignedBlock( size_t );
 void * mmAllocAlignedBlock0( size_t );
 void   mmFreeAlignedBlock( void*, size_t );
 #endif
-#define AllocHeap(h)            _AllocHeap(h)           
+#define AllocHeap(h)            _AllocHeap(h)
 #define Alloc0Heap(h)           _Alloc0Heap(h)
 #define AllocHeapType(h, t)     (t) AllocHeap(h)
 #define Alloc0HeapType(h, t)    (t) Alloc0Heap(h)
@@ -123,7 +122,7 @@ void   mmDBFreeAlignedBlock( void*, size_t, char*, int );
 #if defined(ASO_DEBUG) || defined(MDEBUG)
 void* mmDBAllocHeapSizeOf(memHeap heap, size_t size, char* file, int line);
 void* mmDBAlloc0HeapSizeOf(memHeap heap, size_t size, char* file, int line);
-void  mmDBFreeHeapSizeOf(void* addr, memHeap heap, size_t size, 
+void  mmDBFreeHeapSizeOf(void* addr, memHeap heap, size_t size,
                          char* file, int line);
 #define AllocHeapSizeOf(h, s, t) (t) mmDBAllocHeapSizeOf(h, s, __FILE__, __LINE__)
 #define Alloc0HeapSizeOf(h, s, t) (t) mmDBAlloc0HeapSizeOf(h, s, __FILE__, __LINE__)
@@ -197,7 +196,7 @@ void mmTestList(FILE *fd, int all);
 #define mmTestLP(A)  TRUE
 #define mmTestMemory() TRUE
 #define mmMarkInitDBMCB()
-#define mmTestList(a) 
+#define mmTestList(a)
 
 #endif /* MDEBUG */
 
@@ -222,7 +221,7 @@ extern void mmUnGetTempHeap(memHeap *heap_p);
 extern void mmUnGetTempHeap(memHeap *heap);
 #endif /* HEAP_DEBUG */
 
-// #define HAVE_AUTOMATIC_GC 
+// #define HAVE_AUTOMATIC_GC
 #ifndef HAVE_AUTOMATIC_GC
 /* removes chunks in freelist which fill one page */
 /* if strict & 1, does it even if free ptr  has not changed w.r.t. last gc */
@@ -231,7 +230,7 @@ extern void mmUnGetTempHeap(memHeap *heap);
 extern void mmGarbageCollectHeaps(int strict);
 extern void mmGarbageCollectHeap(memHeap heap, int strict);
 #else
-#define  mmGarbageCollectHeaps(s) 
+#define  mmGarbageCollectHeaps(s)
 #define  mmGarbageCollectHeap(h, s)
 #endif /* HAVE_AUTOMATIC_GC */
 
@@ -239,7 +238,7 @@ extern void mmGarbageCollectHeap(memHeap heap, int strict);
 extern memHeap mmGetSpecHeap( size_t );
 /* use this to "unget" (free) a heap once allocated with mmGetSpecHeap */
 extern void mmUnGetSpecHeap(memHeap *heap);
-  
+
 /* Merges what is free in Heap "what" into free list of heap "into" */
 extern void mmMergeHeap(memHeap into, memHeap what);
 
@@ -256,8 +255,8 @@ extern void mmMergeHeap(memHeap into, memHeap what);
 #define mmCheckHeapAddr(addr, heap) 1
 #define mmTestHeaps()               1
 #else
-/* 
- * define HEAP_DEBUG  and/or set mm_HEAP_DEBUG to 
+/*
+ * define HEAP_DEBUG  and/or set mm_HEAP_DEBUG to
  * 0 to enable basic heap addr checks (at least on each alloc/free)
  * 1 for addtl. containment checks in free/alloc list of heap
  * 2 for addtl. check of entire  heap at each heap addr check
@@ -280,7 +279,7 @@ void   mmDebugFreeHeap(void* addr, memHeap heap, const char*, int );
 int mmDebugCheckHeap(memHeap heap, const char* fn, int line);
 
 #define mmCheckHeapAddr(addr, heap) \
-  mmDebugCheckHeapAdr(addr, heap, MM_HEAP_ADDR_USED_FLAG, __FILE__, __LINE__)  
+  mmDebugCheckHeapAdr(addr, heap, MM_HEAP_ADDR_USED_FLAG, __FILE__, __LINE__)
 int mmDebugCheckHeapAddr(void* addr, memHeap heap, int flag,
                          const char* fn, int l);
 int mmTestHeaps();
@@ -288,7 +287,7 @@ int mmTestHeaps();
 
 /**********************************
  *
- * Low-level heap stuff 
+ * Low-level heap stuff
  *
  **********************************/
 /* Need to define it here, has to be known to macros */
@@ -298,7 +297,7 @@ extern struct sip_memHeap mm_theList[];
 extern memHeapPage mmAllocNewHeapPage(memHeap heap);
 
 #ifndef  HAVE_AUTOMATIC_GC
-struct sip_memHeapPage 
+struct sip_memHeapPage
 {
   memHeapPage next;
   long counter;
@@ -306,10 +305,10 @@ struct sip_memHeapPage
 
 /* Change this appropriately, if you change sip_memHeapPage           */
 /* However, make sure that sizeof(sip_memHeapPage) is a multiple of 8 */
-#define SIZE_OF_HEAP_PAGE_HEADER (SIZEOF_VOIDP + SIZEOF_LONG) 
+#define SIZE_OF_HEAP_PAGE_HEADER (SIZEOF_VOIDP + SIZEOF_LONG)
 #define SIZE_OF_HEAP_PAGE (SIZE_OF_PAGE - SIZE_OF_HEAP_PAGE_HEADER)
 
-struct sip_memHeap 
+struct sip_memHeap
 {
   void*         current; /* Freelist pointer */
   memHeapPage   pages;   /* Pointer to linked list of pages */
@@ -328,7 +327,7 @@ do                                                          \
 }                                                           \
 while (0)
 
-/* Frees addr into heap, assumes  addr was previously allocated from heap */ 
+/* Frees addr into heap, assumes  addr was previously allocated from heap */
 #define _mmFreeHeap(addr, heap)                \
 do                                              \
 {                                               \
@@ -350,7 +349,7 @@ struct sip_memHeapPage
 
 /* Change this appropriately, if you change sip_memHeapPage           */
 /* However, make sure that sizeof(sip_memHeapPage) is a multiple of 8 */
-#define SIZE_OF_HEAP_PAGE_HEADER (3*SIZEOF_VOIDP + SIZEOF_LONG) 
+#define SIZE_OF_HEAP_PAGE_HEADER (3*SIZEOF_VOIDP + SIZEOF_LONG)
 #define SIZE_OF_HEAP_PAGE (SIZE_OF_PAGE - SIZE_OF_HEAP_PAGE_HEADER)
 
 struct sip_memHeap
@@ -397,7 +396,7 @@ while (0)
 
 #endif /* ! HAVE_AUTOMATIC_GC */
 
-#define MM_HEAP_ADDR_UNKNOWN_FLAG 0  
+#define MM_HEAP_ADDR_UNKNOWN_FLAG 0
 #define MM_HEAP_ADDR_USED_FLAG   1
 #define MM_HEAP_ADDR_FREE_FLAG   2
 /* use this for unknown heaps */
@@ -455,16 +454,16 @@ void* mmGListHasCycle(void* list, int next);
 /* Removes element from list, if contained in it and returns list */
 void* mmRemoveFromGList(void* list, int next, void* element);
 
-/* The following cast (list + int_field) to a pointer to int 
-   and assume list is sorted in ascending order w.r.t. *(list + int_field) 
+/* The following cast (list + int_field) to a pointer to int
+   and assume list is sorted in ascending order w.r.t. *(list + int_field)
  */
 /* Inserts element at the right place */
 void* mmSortedInsertInGList(void* list, int next, int int_field, void* element);
 /* Finds element */
 void* mmFindInSortedGList(void* list, int next, int int_field, int what);
-  
 
-  
+
+
 /**********************************************************************
  *
  * some fast macros for basic memory operations

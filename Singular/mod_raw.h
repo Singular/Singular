@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mod_raw.h,v 1.3 1999-11-15 17:20:28 obachman Exp $ */
+/* $Id: mod_raw.h,v 1.4 2000-02-01 15:30:26 Singular Exp $ */
 /*
  * ABSTRACT: machine depend code for dynamic modules
  *
@@ -13,7 +13,6 @@
  *           dunl_close()
 */
 
-#include "mod2.h"
 #if defined(HAVE_DYNAMIC_LOADING) || defined(HAVE_DYN_RL)
 
 void *       dynl_open(char *filename);

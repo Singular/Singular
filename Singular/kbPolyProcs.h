@@ -3,8 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbPolyProcs.h,v 1.4 1999-10-14 14:27:10 obachman Exp $ */
-#include "mod2.h"
+/* $Id: kbPolyProcs.h,v 1.5 2000-02-01 15:30:24 Singular Exp $ */
 #include "ring.h"
 #include "kutil.h"
 
@@ -16,28 +15,28 @@
 typedef void (*kb_n_Mult_p_Proc)(number n, poly p);
 extern void kb_n_Mult_p_General(number n, poly p);
 
-typedef void (*kb_p_Add_q_Proc)(poly *p, int *lp, 
-                                poly* q, int* lq, 
+typedef void (*kb_p_Add_q_Proc)(poly *p, int *lp,
+                                poly* q, int* lq,
                                 memHeap heap = NULL);
-extern void kb_p_Add_q_General(poly *p, int *lp, 
-                               poly *q, int *lq, 
+extern void kb_p_Add_q_General(poly *p, int *lp,
+                               poly *q, int *lq,
                                memHeap heap = NULL);
 
-typedef poly (*kb_p_Mult_m_Proc)(poly p, 
-                                 poly m, 
+typedef poly (*kb_p_Mult_m_Proc)(poly p,
+                                 poly m,
                                  poly spNoether,
                                  memHeap heap = NULL);
-extern poly  kb_p_Mult_m_General(poly p,  
-                                 poly m, 
+extern poly  kb_p_Mult_m_General(poly p,
+                                 poly m,
                                  poly spNoether,
                                  memHeap heap = NULL);
 
-typedef void (*kb_p_Minus_m_Mult_q_Proc)(poly *p, int *lp, 
+typedef void (*kb_p_Minus_m_Mult_q_Proc)(poly *p, int *lp,
                                          poly m,
                                          poly q, int lq,
                                          poly spNoether,
                                          memHeap heap = NULL);
-extern void kb_p_Minus_m_Mult_q_General(poly *p, int *lp, 
+extern void kb_p_Minus_m_Mult_q_General(poly *p, int *lp,
                                         poly m,
                                         poly q, int lq,
                                         poly spNoether,
@@ -74,13 +73,13 @@ extern void kbSetPolyProcs(kbPolyProcs_pt procs,
 ///
 void kb_n_Mult_p_General(number n, poly p);
 void kb_p_Add_q_General(poly *p, int *lp,
-                        poly *q, int *lq, 
+                        poly *q, int *lq,
                         memHeap heap = NULL);
 poly  kb_p_Mult_m_General(poly p,
-                          poly m, 
+                          poly m,
                           poly spNoether = NULL,
                           memHeap heap = NULL);
-void kb_p_Minus_m_Mult_q_General (poly *pp, int *lpp, 
+void kb_p_Minus_m_Mult_q_General (poly *pp, int *lpp,
                                   poly m,
                                   poly q, int lq,
                                   poly spNoether = NULL,

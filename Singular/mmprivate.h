@@ -3,12 +3,11 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmprivate.h,v 1.16 1999-11-15 17:20:26 obachman Exp $ */
+/* $Id: mmprivate.h,v 1.17 2000-02-01 15:30:25 Singular Exp $ */
 /*
 * ABSTRACT
 */
 #include <stdlib.h>
-#include "mod2.h"
 #include "structs.h"
 #ifdef MTRACK
 #include "mmbt.h"
@@ -161,6 +160,6 @@ struct sip_memSpecHeap
   int               ref;   /* ref count */
 };
 
-  
+
 #endif /* MM_PRIVATE_H */
 

@@ -3,8 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.h,v 1.7 1999-11-15 17:20:13 obachman Exp $ */
-#include "mod2.h"
+/* $Id: kbuckets.h,v 1.8 2000-02-01 15:30:24 Singular Exp $ */
 #include "structs.h"
 #if HAVE_ASO == 1
 #include "kbuckets.aso"
@@ -14,7 +13,7 @@
 // configuration
 //
 
-// define to enable buckets 
+// define to enable buckets
 #define HAVE_BUCKETS
 
 // define to not really use the bucket feature
@@ -38,7 +37,7 @@ void kBucketDestroy(kBucket_pt *bucket);
 //         Uses heap for intermediate monom allocations
 void kBucketInit(kBucket_pt bucket, poly p, int length, memHeap heap = NULL);
 
-// Converts Bpoly into a poly and clears bucket 
+// Converts Bpoly into a poly and clears bucket
 // i.e., afterwards Bpoly == 0
 void kBucketClear(kBucket_pt bucket, poly *p, int *length);
 
@@ -50,7 +49,7 @@ void kBucketClear(kBucket_pt bucket, poly *p, int *length);
 const poly kBucketGetLm(kBucket_pt bucket);
 
 /////////////////////////////////////////////////////////////////////////////
-// Extracts lm of Bpoly, i.e. Bpoly is changed s.t. 
+// Extracts lm of Bpoly, i.e. Bpoly is changed s.t.
 // Bpoly == Bpoly - Lm(Bpoly)
 //
 poly kBucketExtractLm(kBucket_pt bucket);
@@ -59,24 +58,24 @@ poly kBucketExtractLm(kBucket_pt bucket);
 // Reduces Bpoly (say, q) with p, i.e.:
 // q = (Lc(p) / gcd(Lc(p), Lc(q)))*q - (Lc(q)/gcd(Lc(p),Lc(q)))*p*(Lm(q)/Lm(p))
 // Assumes p1 != NULL, Bpoly != NULL
-//         Lm(p1) divides Lm(Bpoly) 
+//         Lm(p1) divides Lm(Bpoly)
 //         pLength(p1) == l1
 // Returns: Lc(p) / gcd(Lc(p), Lc(q))
 number kBucketPolyRed(kBucket_pt bucket,
-                      poly p, int l, 
+                      poly p, int l,
                       poly spNoether);
 
 
 /////////////////////////////////////////////////////////////////////////////
-// 
+//
 // Extract all monomials from bucket with component comp
 // Return as a polynomial *p with length *l
-// In other words, afterwards 
+// In other words, afterwards
 // Bpoly == Bpoly - (poly consisting of all monomials with component comp)
 // and components of monomials of *p are all 0
 
-void kBucketTakeOutComp(kBucket_pt bucket, 
-                        Exponent_t comp, 
+void kBucketTakeOutComp(kBucket_pt bucket,
+                        Exponent_t comp,
                         poly *p, int *l);
 
 #if HAVE_ASO == 1
@@ -84,8 +83,8 @@ void kBucketTakeOutComp(kBucket_pt bucket,
 // degree == order
 // ASSUME: monomial ordering is Order compatible, i.e., if m1, m2 Monoms then
 //         m1 >= m2 ==> pGetOrder(m1) >= pGetOrder(m2)
-void kBucketDecrOrdTakeOutComp(kBucket_pt bucket, 
-                               Exponent_t comp, Order_t order, 
+void kBucketDecrOrdTakeOutComp(kBucket_pt bucket,
+                               Exponent_t comp, Order_t order,
                                poly *p, int *l);
 #endif
 
@@ -118,7 +117,7 @@ public:
 #ifdef HAVE_PSEUDO_BUCKETS
   poly p;
   int l;
-#else  
+#else
   poly buckets[MAX_BUCKET + 1];        // polys in bucket
   int  buckets_length[MAX_BUCKET + 1]; // length if i-th poly
   int buckets_used;                    // max number of used bucket
@@ -129,7 +128,7 @@ public:
 /***************************************************************
  *
  * Memory Management
- * 
+ *
  *
  ***************************************************************/
 #define kb_pNew(p, heap)            p = AllocHeap(mm_specHeap)

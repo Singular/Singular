@@ -3,12 +3,11 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.23 1999-11-17 12:09:27 obachman Exp $ */
+/* $Id: kutil.h,v 1.24 2000-02-01 15:30:24 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
 #include <string.h>
-#include "mod2.h"
 #include "structs.h"
 #include "mmemory.h"
 #include "ring.h"
@@ -186,8 +185,8 @@ inline TSet initT () { return (TSet)Alloc0(setmax*sizeof(TObject)); }
 BOOLEAN K_Test(char *f, int l,kStrategy strat, int pref=0);
 BOOLEAN K_Test_TS(char *f, int l,kStrategy strat);
 BOOLEAN K_Test_T(char *f, int l, TObject* T, int tpos = -1);
-BOOLEAN K_Test_L(char* f, int l, LObject* L, 
-                 BOOLEAN testp = FALSE, int lpos = -1, 
+BOOLEAN K_Test_L(char* f, int l, LObject* L,
+                 BOOLEAN testp = FALSE, int lpos = -1,
                  TSet T = NULL, int tlength = -1);
 BOOLEAN K_Test_S(char* f, int l, kStrategy strat);
 #else
@@ -203,7 +202,7 @@ BOOLEAN K_Test_S(char* f, int l, kStrategy strat);
 /***************************************************************
  *
  * From kstd2.cc
- * 
+ *
  ***************************************************************/
 ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat);
 poly kNF2 (ideal F, ideal Q, poly q, kStrategy strat, int lazyReduce);
@@ -213,7 +212,7 @@ void initBba(ideal F,kStrategy strat);
 /***************************************************************
  *
  * From kSpolys.cc
- * 
+ *
  ***************************************************************/
 // Reduces PR with PW
 // Assumes PR != NULL, PW != NULL, Lm(PW) divides Lm(PR)
@@ -226,7 +225,7 @@ void ksReducePoly(LObject* PR,
                   number *coef = NULL);
 
 // Reduces PR at Current->next with PW
-// Assumes PR != NULL, Current contained in PR 
+// Assumes PR != NULL, Current contained in PR
 //         Current->next != NULL, LM(PW) devides LM(Current->next)
 // Changes: PR
 // Const:   PW
@@ -239,7 +238,7 @@ void ksReducePolyTail(LObject* PR,
 // Const:   Pair->p1, Pair->p2
 // Changes: Pair->p == S-Poly of p1, p2
 // Assume:  Pair->p1 != NULL && Pair->p2
-void ksCreateSpoly(LObject* Pair, 
+void ksCreateSpoly(LObject* Pair,
                    poly spNoether = NULL);
 
 

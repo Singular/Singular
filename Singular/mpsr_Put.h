@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_Put.h,v 1.11 1999-11-15 17:20:34 obachman Exp $ */
+/* $Id: mpsr_Put.h,v 1.12 2000-02-01 15:30:26 Singular Exp $ */
 /***************************************************************
  *
  * File:       mpsr_Put.h
@@ -16,8 +16,6 @@
 
 #ifndef __MPSR_PUT__
 #define __MPSR_PUT__
-
-#include"mod2.h"
 
 #include"mpsr.h"
 

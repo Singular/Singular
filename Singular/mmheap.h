@@ -3,9 +3,8 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmheap.h,v 1.12 1999-10-14 14:27:20 obachman Exp $ */
+/* $Id: mmheap.h,v 1.13 2000-02-01 15:30:25 Singular Exp $ */
 
-#include "mod2.h"
 #include "structs.h"
 #include <stdlib.h>
 
@@ -32,7 +31,7 @@ extern void mmDestroyHeap(memHeap *heap);
 #endif
 
 /* if all cunks of one page are in free list, then removes these
-   chunks from freelist 
+   chunks from freelist
    if strict == 0, does it only if current free pointer is different
    from what it was the last time we did a GC
 */
@@ -43,7 +42,7 @@ void mmMergeHeap(memHeap into, memHeap what);
 
 /* Removes addr from freelist of heap, provided it finds it there */
 void mmRemoveFromCurrentHeap(memHeap heap, void* addr);
-  
+
 
 /*****************************************************************
  *
@@ -59,15 +58,15 @@ void mmRemoveFromCurrentHeap(memHeap heap, void* addr);
 #define mmCheckHeapAddr(addr, heap) 1
 
 #else
-/* 
- * define HEAP_DEBUG  and/or set mm_HEAP_DEBUG to 
+/*
+ * define HEAP_DEBUG  and/or set mm_HEAP_DEBUG to
  * 0 to enable basic heap addr checks (at least on each alloc/free)
  * 1 for addtl. containment checks in free/alloc list of heap
  * 2 for addtl. check of entire  heap at each heap addr check
  * NOTE: For HEAP_DEBUG > 1 on, it gets very slow
  */
 extern int mm_HEAP_DEBUG;
-  
+
 #define mmAllocHeap(res, heap)\
   (res) = mmDebugAllocHeap(heap, __FILE__, __LINE__)
 void * mmDebugAllocHeap(memHeap heap, const char*, int );
@@ -81,10 +80,10 @@ void   mmDebugFreeHeap(void* addr, memHeap heap, const char*, int );
 int mmDebugCheckHeap(memHeap heap, const char* fn, int line);
 
 #define mmCheckHeapAddr(addr, heap) \
-  mmDebugCheckHeapAdr(addr, heap, MM_HEAP_ADDR_USED_FLAG, __FILE__, __LINE__)  
+  mmDebugCheckHeapAdr(addr, heap, MM_HEAP_ADDR_USED_FLAG, __FILE__, __LINE__)
 int mmDebugCheckHeapAddr(void* addr, memHeap heap, int flag,
                          const char* fn, int l);
-  
+
 
 #define mmClearHeap(h)   mmDebugClearHeap(h, __FILE__, __LINE__)
 #define mmDestroyHeap(h) mmDebugDestroyHeap(h, __FILE__, __LINE__)
@@ -101,7 +100,7 @@ void mmDebugDestroyHeap(memHeap *heap, const char* fn, int line);
  *
  *****************************************************************/
 
-struct sip_memHeapPage 
+struct sip_memHeapPage
 {
   memHeapPage next;
   long counter;
@@ -109,7 +108,7 @@ struct sip_memHeapPage
 
 /* Change this appropriately, if you change sip_memHeapPage           */
 /* However, make sure that sizeof(sip_memHeapPage) is a multiple of 8 */
-#define SIZE_OF_HEAP_PAGE_HEADER (SIZEOF_VOIDP + SIZEOF_LONG) 
+#define SIZE_OF_HEAP_PAGE_HEADER (SIZEOF_VOIDP + SIZEOF_LONG)
 #define SIZE_OF_HEAP_PAGE (SIZE_OF_PAGE - SIZE_OF_HEAP_PAGE_HEADER)
 
 struct sip_memHeap
@@ -134,7 +133,7 @@ do                                                          \
 }                                                           \
 while (0)
 
-/* Frees addr into heap, assumes  addr was previously allocated from heap */ 
+/* Frees addr into heap, assumes  addr was previously allocated from heap */
 #define _mmFreeHeap(addr, heap)                \
 do                                              \
 {                                               \
@@ -144,7 +143,7 @@ do                                              \
 }                                               \
 while (0)
 
-#define MM_HEAP_ADDR_UNKNOWN_FLAG 0  
+#define MM_HEAP_ADDR_UNKNOWN_FLAG 0
 #define MM_HEAP_ADDR_USED_FLAG   1
 #define MM_HEAP_ADDR_FREE_FLAG   2
 

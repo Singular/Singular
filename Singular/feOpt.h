@@ -3,12 +3,11 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feOpt.h,v 1.4 1999-12-03 11:20:15 obachman Exp $ */
+/* $Id: feOpt.h,v 1.5 2000-02-01 15:30:23 Singular Exp $ */
 /*
 * ABSTRACT: Declarations for working with Options
 */
 
-#include "mod2.h"
 #include "fegetopt.h"
 
 extern const char SHORT_OPTS_STRING[];
