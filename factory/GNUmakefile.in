@@ -1,5 +1,5 @@
 # @configure_input@
-# $Id: GNUmakefile.in,v 1.40 1999-02-16 18:18:31 schmidt Exp $
+# $Id: GNUmakefile.in,v 1.41 1999-02-16 18:31:14 schmidt Exp $
 
 #
 # GNUmakefile.in - used by `configure' to create `GNUmakefile', the
@@ -161,6 +161,7 @@ basefactorysrc := \
 		ffops.cc \
 		gf_tabutil.cc \
 		gfops.cc \
+		imm.cc \
 		initgmp.cc \
 		int_cf.cc \
 		int_int.cc \
@@ -325,6 +326,7 @@ ftestm4src :=	$(ftestm4develsrc) \
 		degree.m4 \
 		deriv.m4 \
 		divides.m4 \
+		divrem.m4 \
 		extgcd.m4 \
 		factorize.m4 \
 		fbinops.m4 \
@@ -376,6 +378,7 @@ distfiles :=	\
 		$(addprefix ftest/,$(ftestdistfiles)) \
 		GNUmakefile.in configure.in config.h.in configure \
 		ChangeLog README NEWS INSTALL \
+		factory.cfg \
 		$(addprefix winnt/,$(distntfiles)) \
 		examples/GNUmakefile examples/application.cc \
 		examples/factorize.cc examples/gcd.cc \
