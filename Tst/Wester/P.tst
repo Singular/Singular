@@ -168,15 +168,12 @@ tst_ReportTimer("P'");
 result;
 
 tst_InitTimer();
-/* this goes nowhere !
 result = det(m2 - x*freemodule(101));
 tst_ReportTimer("Q'");
 
 size(result);
 lead(result);
 subst(result, x, 2);
-*/
-tst_OutTimer(100000, "Q': killed");
 
 kill i,j, R;
 

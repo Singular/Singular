@@ -1,0 +1,12 @@
+Status Output of A.new.stat
+init >> USER    :obachman
+init >> HOSTNAME:nepomuck
+init >> uname -a:Linux nepomuck 2.2.16 #14 Wed Nov 8 12:29:37 CET 2000 i686 unknown
+init >> date    :Sun Dec 31 17:03:40 CET 2000
+init >> version :1313
+init >> ticks   :100
+A >> tst-Timer :: nepomuck:24
+1 >> tst_memory_0 :: nepomuck:157060
+1 >> tst_memory_1 :: nepomuck:703000
+1 >> tst_memory_2 :: nepomuck:1436184
+1 >> tst_timer_1 :: nepomuck:27

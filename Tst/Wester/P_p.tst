@@ -138,15 +138,12 @@ tst_ReportTimer("Pp");
 result;
 
 tst_InitTimer();
-/*
 result = det(m - x*freemodule(101));
 tst_ReportTimer("Qp");
 
 size(result);
 lead(result);
 subst(result, x, 2);
-*/
-tst_OutTimer(100000, "Qp: killed");
 
 matrix m2[101][101];
 

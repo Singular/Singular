@@ -5,7 +5,6 @@ proc hilbert (int n)
 {
    matrix a[n][n];
    int i, j;
-   int j;
    for (i = 1; i <= n; i++)
       {
       for (j = 1; j <= n; j++)
