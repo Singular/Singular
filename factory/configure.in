@@ -1,5 +1,5 @@
 dnl # emacs edit mode for this file is -*- sh -*-
-dnl # $Id: configure.in,v 1.14 1997-11-06 15:43:44 schmidt Exp $
+dnl # $Id: configure.in,v 1.15 1997-11-12 17:09:15 schmidt Exp $
 
 dnl #
 dnl # configure.in - process this file with `autoconf' to generate
@@ -12,7 +12,7 @@ dnl #
 #
 # - initialisation.
 #
-AC_REVISION($Id: configure.in,v 1.14 1997-11-06 15:43:44 schmidt Exp $)
+AC_REVISION($Id: configure.in,v 1.15 1997-11-12 17:09:15 schmidt Exp $)
 AC_INIT(canonicalform.cc)
 AC_CONFIG_HEADER(config.h)
 AC_CONFIG_AUX_DIR(bin)
@@ -197,7 +197,7 @@ if test "x$enable_streamio" != xno; then
 
   # since the FTE will compile only with stream IO enabled we will not
   # check for the necessary header files if stream IO is disabled
-  AC_CHECK_HEADERS(stdarg.h signal.h errno.h unistd.h GetOpt.h, ,
+  AC_CHECK_HEADERS(stdarg.h signal.h errno.h unistd.h, ,
     [ AC_MSG_WARN(C/C++ header files not found.
                     You will not be able to build the Factory Test Environment
                     (though Factory itself should compile)) ])
