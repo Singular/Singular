@@ -9,7 +9,7 @@ The @code{lib2doc} utility should be used by developers of @sc{Singular}
 libraries to check the generation of the documentation of their
 libraries.
 
-@code{lib2doc} can ve downloaded from
+@code{lib2doc} can be downloaded from
 @url{ftp:/www.mathematik.uni-kl.de/pub/Math/Singular/Misc/lib2doc.tar.gz}
 
 

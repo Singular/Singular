@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.141 1999-07-28 15:11:26 obachman Exp $
+@comment $Id: general.doc,v 1.142 1999-07-28 16:08:35 obachman Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -2391,7 +2391,7 @@ distribution, the folowing guidelines are mandatory.
 * Typesetting of help strings::
 * The help string of a library::
 * The help string of procedures::
-* template_lib:: a template and example library
+* template_lib:: 
 @end menu
 
 @c ---------------------------------------
@@ -2401,8 +2401,8 @@ distribution, the folowing guidelines are mandatory.
 @cindex Procedures in a library
 @cindex library, procedures
 
-In this section we list miscellaneous recommendations for procedures
-contained in a library.
+In this section we list miscellaneous recommendations on how procedures
+contained in a library should be implemented.
 @enumerate
 @item
 The info- and version-string should appear at the beginning of the
@@ -2423,8 +2423,6 @@ help and example section as explained in @ref{Procedure definition}.
 made about their input (like the type of list elements), and, if
 necesary, ommit an error using the  function @ref{ERROR}.
 
-@item 
-Each procedure which is 
 @item
 No procedures should be defined within the body of another procedure.
 
@@ -2506,6 +2504,54 @@ example
 @subsection The generation of the documentation of a library
 @cindex Generation of the documentation of a libraryProcedures in a library
 @cindex library, generation of documentation
+
+The "native" @sc{Singular} documentation is written in
+@code{texinfo}. Based on various tools, @code{info, dvi, ps,} and
+@code{html} versions of the @code{texinfo} documentation are generated.
+
+
+Starting with @sc{Singular} version 1-4, the @code{texinfo}
+documentation of all libraries of the @sc{Singular} distribution is
+generated automatically from their source code.
+
+More precisely, for each library,
+@itemize
+@item
+the info string of the library is parsed and typeset 
+as explained in @ref{Typesetting of help strings}.
+
+@item
+the help string of each procedure listed in the @code{PROCEDURE:}
+section of the library info string is parsed 
+and typeset as explained in @ref{Typesetting of help strings}.
+
+@item 
+the example of each procedure listed in the @code{PROCEDURE:} section of
+the library info string is computed and its output is
+included into the documentation.
+@end itemize
+
+For a uniform look-and-feel of the library documentation, library
+developers should follow the recommendation of 
+@ref{The help string of a library} and @ref{The help string of
+procedures} and should consult the source code of libraries like
+@code{template.lib} (@pxref{template_lib}) or @code{standard.lib}
+(@pxref{standard_lib}) for examples on how library documentations are
+written. 
+
+Furthermore, library developers should carefully check the generated
+documentation in its various fomrmats using the @code{lib2doc} utility:
+
+@menu
+* lib2doc::
+@end menu
+
+@node lib2doc,,,The generation of the documentation of a library
+@subsubsection lib2doc
+@cindex lib2doc
+@cindex library, documentation in various formats
+
+@include lib2doc.texi
 
 @c ----------------------------------------
 @node Typesetting of help strings, The help string of a library, The generation of the documentation of a library, Guidelines for writing a library
