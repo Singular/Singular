@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.14 1997-06-25 07:53:08 Singular Exp $ */
+/* $Id: grammar.y,v 1.15 1997-06-25 14:26:24 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -427,9 +427,16 @@ elemexpr:
           }
         | elemexpr '(' exprlist ')'
           {
-            $1.next=(leftv)Alloc(sizeof(sleftv));
-            memcpy($1.next,&$3,sizeof(sleftv));
-            if(iiExprArithM(&$$,&$1,'(')) YYERROR;
+            if ($1.rtyp==LIB_CMD)
+            {
+              if(iiExprArith1(&$$,&$3,LIB_CMD)) YYERROR; 
+            }
+            else
+            {
+              $1.next=(leftv)Alloc(sizeof(sleftv));
+              memcpy($1.next,&$3,sizeof(sleftv));
+              if(iiExprArithM(&$$,&$1,'(')) YYERROR;
+            }
           }
         | elemexpr '.' extendedid
           {
@@ -638,24 +645,6 @@ expr:   expr_arithmetic
         | quote_start expr quote_end
           {
             $$=$2;
-          }
-        | quote_start LIB_CMD '(' expr ')' quote_end
-          {
-            #ifdef SIQ
-            siq++;
-            if (siq>0)
-            { if (iiExprArith1(&$$,&$4,LIB_CMD)) YYERROR; }
-            else
-            #endif
-            {
-              memset(&$$,0,sizeof($$));
-              $$.rtyp=NONE;
-              if (($4.Typ()!=STRING_CMD)||(iiLibCmd((char *)$4.Data())))
-                YYERROR;
-            }
-            #ifdef SIQ
-            siq--;
-            #endif
           }
         | quote_start expr '=' expr quote_end
           {
@@ -956,12 +945,6 @@ declare_ip_variable:
 
 stringexpr:
         STRINGTOK
-        | LIB_CMD
-          {
-            idhdl h = ggetid( "LIB" );
-            if (h==NULL) YYERROR;
-            $$ = mstrdup(IDSTRING(h));
-          }
         ;
 
 rlist:
@@ -1302,9 +1285,9 @@ ringcmd:
         ;
 
 scriptcmd:
-         LIB_CMD stringexpr
+         SYSVAR stringexpr
           {
-            if (iiLibCmd($2)) YYERROR;
+            if (($1!=LIB_CMD)||(iiLibCmd($2))) YYERROR;
           }
         ;
 

@@ -297,6 +297,7 @@ void sleftv::CleanUp()
       case VSHORTOUT:
       case VNOETHER:
       case VMINPOLY:
+      case LIB_CMD:
       case 0:
       case INT_CMD:
         break;
@@ -325,7 +326,7 @@ void sleftv::CleanUp()
       case VCOLMAX:
       case VTIMER:
 #ifdef HAVE_RTIMER
-        case VRTIMER:
+      case VRTIMER:
 #endif          
       case VOICE:
       case VMAXDEG:
@@ -334,6 +335,7 @@ void sleftv::CleanUp()
       case VSHORTOUT:
       case VNOETHER:
       case VMINPOLY:
+      case LIB_CMD:
       case 0:
         attribute=NULL;
         break;
@@ -502,6 +504,8 @@ void * sleftv::CopyD(int t)
   {
     void *x=data;
     if (rtyp==VNOETHER) x=(void *)pCopy(ppNoether);
+    else if (rtyp==LIB_CMD)
+      x=(void *)mstrdup(Data());
     else if ((rtyp==VMINPOLY)&& (currRing->minpoly!=NULL)&&(currRing->ch<2))
       x=(void *)nCopy(currRing->minpoly);
     data=NULL;
@@ -576,7 +580,7 @@ void * sleftv::CopyD(int t)
 void * sleftv::CopyD()
 {
   if ((rtyp!=IDHDL)&&(e==NULL)
-  &&(rtyp!=VNOETHER)&&(rtyp!=VMINPOLY))
+  &&(rtyp!=VNOETHER)&&(rtyp!=LIB_CMD)&&(rtyp!=VMINPOLY))
   {
     void *x=data;
     data=NULL;
@@ -702,7 +706,7 @@ int  sleftv::Typ()
       case VCOLMAX:
       case VTIMER:
 #ifdef HAVE_RTIMER
-        case VRTIMER:
+      case VRTIMER:
 #endif          
       case VOICE:
       case VMAXDEG:
@@ -710,6 +714,8 @@ int  sleftv::Typ()
       case TRACE:
       case VSHORTOUT:
         return INT_CMD;
+      case LIB_CMD:
+        return STRING_CMD;  
       case VMINPOLY:
         return NUMBER_CMD;
       case VNOETHER:
@@ -826,6 +832,11 @@ void * sleftv::Data()
                        else
                          return (void *)nNULL;
       case VNOETHER:   return (void *) ppNoether;
+      case LIB_CMD:    {
+                         idhdl h = ggetid( "LIB" );
+                         if(h==NULL) return sNoName;
+                         return IDSTRING(h);
+                       }  
       case IDHDL:
         return IDDATA((idhdl)data);
       case COMMAND:

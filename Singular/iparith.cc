@@ -189,7 +189,7 @@ cmdnames cmds[] =
   { "lead",        0, LEAD_CMD ,          CMD_1},
   { "leadcoef",    0, LEADCOEF_CMD ,      CMD_1},
   { "leadexp",     0, LEADEXP_CMD ,       CMD_1},
-  { "LIB",         0, LIB_CMD ,           LIB_CMD},
+  { "LIB",         0, LIB_CMD ,           SYSVAR},
   { "lift",        0, LIFT_CMD ,          CMD_2},
   { "liftstd",     0, LIFTSTD_CMD ,       CMD_2},
   { "link",        0, LINK_CMD ,          ROOT_DECL},
@@ -2434,6 +2434,11 @@ static BOOLEAN jjKBASE(leftv res, leftv v)
   res->data = (char *)scKBase((ideal)(v->Data()),currQuotient);
   return FALSE;
 }
+static BOOLEAN jjKLAMMER_LIB(leftv res, leftv u)
+{
+  char * s=(char *)u->Data();
+  return iiLibCmd(s);
+}
 #ifdef MDEBUG
 static BOOLEAN jjpHead(leftv res, leftv v)
 {
@@ -2893,6 +2898,7 @@ struct sValCmd1 dArith1[]=
 #ifdef HAVE_DLD
 ,{jjBIN1,       '(',             ANY_TYPE/*set by p*/,BINARY_CMD }
 #endif
+,{jjKLAMMER_LIB,'(',             NONE,           STRING_CMD }
 // and the procedures with 1 argument:
 ,{atATTRIB1,    ATTRIB_CMD,      NONE,           DEF_CMD }
 ,{jjBAREISS_IM, BAREISS_CMD,     INTMAT_CMD,     INTMAT_CMD }
