@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: INSTALL_win.plural.texi,v 1.1 2003-07-31 19:54:14 levandov Exp $
+@comment $Id: INSTALL_win.plural.texi,v 1.2 2003-07-31 20:14:28 levandov Exp $
 @c FILE: INSTALL_unix.texi
 @c PURPOSE: Installation instruction for Singular on Unix
 @c
@@ -32,7 +32,7 @@ program.
 
 You can obtain these (and other) archives from
 @display
-@uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/non-commutative/}.
+@uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/non-commutative/Plural/}.
 @end display
 
 @include register.texi

@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: README_download.plural.texi,v 1.1 2003-05-22 19:15:53 levandov Exp $
+@comment $Id: README_download.plural.texi,v 1.2 2003-07-31 20:14:28 levandov Exp $
 @c FILE: README_download.texi
 @c PURPOSE: downloading instructions, to be includeded in manual and README_ftp
 @c
@@ -80,6 +80,6 @@ unzip -u SingularPlural-@value{VERSION}-share.zip
 @item 
 After unpacking, see the created file
 @code{Plural/@value{VERSION}/INSTALL} (which is also located at
-@uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/INSTALL_unix.html}
+@uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/non-commutative/Plural/INSTALL_unix.html}
 for details on how to finish the installation.
 @end enumerate

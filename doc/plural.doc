@@ -143,7 +143,7 @@ variables@value{PSUFFIX}, PLURAL
 @include plumath.tex
 
 @c --------------------------------------------------------------------
-@node PLURAL libraries, Index, Mathematical background@value{PSUFFIX}, Top
+@node PLURAL libraries, Release Notes, Mathematical background@value{PSUFFIX}, Top
 @appendix  PLURAL libraries
 @cindex  PLURAL libraries
 @cindex  PLURAL LIBs
