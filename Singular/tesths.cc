@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.39 1998-05-06 11:54:43 Singular Exp $ */
+/* $Id: tesths.cc,v 1.40 1998-05-08 10:11:50 obachman Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -41,7 +41,7 @@
 #define LON_QUIET           "quiet"
 #define LON_NO_TTY          "no-tty"
 #define LON_USER_OPTION     "user-option"
-#define LON_VERSION         "version"
+#define LON_VERSION         "verbose"
 #define LON_MIN_TIME        "min-time"
 #define LON_NO_STDLIB       "no-stdlib"
 #define LON_NO_RC           "no-rc"
@@ -55,6 +55,7 @@
 #define LON_MP_MODE         "MPmode"
 #endif
 
+#define LONG_OPTION_RETURN -1
 static struct option longopts[] =
 {
 #ifdef HAVE_MPSR
@@ -71,18 +72,18 @@ static struct option longopts[] =
 #ifdef HAVE_TCL
   {LON_TCLMODE,           0,  0,  'x'},
 #endif
-  {LON_NO_STDLIB,         0,  0,  0},
-  {LON_NO_RC,             0,  0,  0},
-  {LON_MIN_TIME,          1,  0,  0},
+  {LON_NO_STDLIB,         0,  0,  LONG_OPTION_RETURN},
+  {LON_NO_RC,             0,  0,  LONG_OPTION_RETURN},
+  {LON_MIN_TIME,          1,  0,  LONG_OPTION_RETURN},
 #ifdef HAVE_MPSR
-  {LON_MP_PORT,           1,  0,  0},
-  {LON_MP_HOST,           1,  0,  0},
+  {LON_MP_PORT,           1,  0,  LONG_OPTION_RETURN},
+  {LON_MP_HOST,           1,  0,  LONG_OPTION_RETURN},
 #endif
-  {LON_TICKS_PER_SEC,     1,  0,  0},
+  {LON_TICKS_PER_SEC,     1,  0,  LONG_OPTION_RETURN},
 // undocumented options
 #ifdef HAVE_MPSR
-  {LON_MP_TRANSP,         1,  0,  0},
-  {LON_MP_MODE,           1,  0,  0},
+  {LON_MP_TRANSP,         1,  0,  LONG_OPTION_RETURN},
+  {LON_MP_MODE,           1,  0,  LONG_OPTION_RETURN},
 #endif
 // terminator
   { 0, 0, 0, 0 }
@@ -395,7 +396,7 @@ int main(          /* main entry to Singular */
           mainSetSingOptionValue(LON_USER_OPTION, optarg);
           break;
 
-        case 0:
+        case LONG_OPTION_RETURN:
           if (strcmp(longopts[option_index].name, LON_NO_STDLIB) == 0)
           {
             load_std_lib = FALSE;
