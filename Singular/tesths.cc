@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.64 1999-08-03 17:03:29 obachman Exp $ */
+/* $Id: tesths.cc,v 1.65 1999-08-03 17:28:11 obachman Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -610,8 +610,10 @@ int main(          /* main entry to Singular */
 
   if (mainGetSingOptionValue(LON_EMACS))
   {
-    Warn("EmacsDir: %s", feResource("EmacsDir"));
-    Warn("InfoFile: %s", feResource("InfoFile"));
+    Warn("EmacsDir: %s", (feResource("EmacsDir") != NULL ? 
+                          feResource("EmacsDir") : ""));
+    Warn("InfoFile: %s", (feResource("InfoFile") != NULL ? 
+                          feResource("InfoFile") : ""));
     feHelpBrowser("emacs");
   }
   /* start shell */
