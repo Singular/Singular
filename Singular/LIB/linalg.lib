@@ -1,6 +1,6 @@
 //GMG last modified: 04/25/2000
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: linalg.lib,v 1.25 2002-02-16 18:26:08 mschulze Exp $";
+version="$Id: linalg.lib,v 1.26 2002-03-06 16:38:54 mschulze Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  linalg.lib  Algorithmic Linear Algebra
@@ -24,6 +24,8 @@ PROCEDURES:
  mat_rk(A);           rank of constant matrix A
  U_D_O(A);            P*A=U*D*O, P,D,U,O=permutaion,diag,lower-,upper-triang
  pos_def(A,i);        test symmetric matrix for positive definiteness
+ hessenberg(M);       Hessenberg form of M
+ evnf(e[,m]);         eigenvalues normal form of (e[,m])
  eigenvals(M);        eigenvalues and multiplicities of M
  jordan(M);           Jordan data of M
  jordanbasis(M);      Jordan basis and weight filtration of M
@@ -1234,6 +1236,181 @@ example
 //    AUTHOR:  Mathias Schulze, email: mschulze@mathematik.uni-kl.de
 ///////////////////////////////////////////////////////////////////////////////
 
+static proc rowcolswap(matrix M,int i,int j)
+{
+  if(i==j)
+  {
+    return(M);
+  }
+  poly p;
+  for(int k=1;k<=nrows(M);k++)
+  {
+    p=M[i,k];
+    M[i,k]=M[j,k];
+    M[j,k]=p;
+  }
+  for(k=1;k<=ncols(M);k++)
+  {
+    p=M[k,i];
+    M[k,i]=M[k,j];
+    M[k,j]=p;
+  }
+  return(M);
+}
+//////////////////////////////////////////////////////////////////////////////
+
+static proc rowelim(matrix M,int i,int j,int k)
+{
+  if(jet(M[i,k],0)==0||jet(M[j,k],0)==0)
+  {
+    return(M);
+  }
+  number n=number(jet(M[i,k],0))/number(jet(M[j,k],0));
+  for(int l=1;l<=ncols(M);l++)
+  {
+    M[i,l]=M[i,l]-n*M[j,l];
+  }
+  for(l=1;l<=nrows(M);l++)
+  {
+    M[l,j]=M[l,j]+n*M[l,i];
+  }
+  return(M);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+static proc colelim(matrix M,int i,int j,int k)
+{
+  if(jet(M[k,i],0)==0||jet(M[k,j],0)==0)
+  {
+    return(M);
+  }
+  number n=number(jet(M[k,i],0))/number(jet(M[k,j],0));
+  for(int l=1;l<=nrows(M);l++)
+  {
+    M[l,i]=M[l,i]-n*M[l,j];
+  }
+  for(l=1;l<=ncols(M);l++)
+  {
+    M[j,l]=M[j,l]+n*M[i,l];
+  }
+  return(M);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc hessenberg(matrix M)
+"USAGE:   hessenberg(M); matrix M
+ASSUME:  M constant square matrix
+RETURN:  matrix H;  Hessenberg form of M
+EXAMPLE: example hessenberg; shows examples
+"
+{
+  if(system("with","eigenval"))
+  {
+   return(system("hessenberg",M));
+  }
+
+  int n=ncols(M);
+  int i,j;
+  for(int k=1;k<n-1;k++)
+  {
+    j=k+1;
+    while(j<n&&jet(M[j,k],0)==0)
+    {
+      j++;
+    }
+    if(jet(M[j,k],0)!=0)
+    {
+      M=rowcolswap(M,j,k+1);
+      for(i=j+1;i<=n;i++)
+      {
+        M=rowelim(M,i,k+1,k);
+      }
+    }
+  }
+  return(M);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring R=0,x,dp;
+  matrix M[3][3]=3,2,1,0,2,1,0,0,3;
+  print(M);
+  print(hessenberg(M));
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc evnf(ideal e,list #)
+"USAGE:   evnf(e[,m]); ideal e, intvec m
+ASSUME:  ncols(e)==size(m)
+RETURN:  order eigenvalues e with multiplicities m
+EXAMPLE: example evnf; shows examples
+"
+{
+  int n=ncols(e);
+  intvec m;
+  int i,j;
+  while(i<size(#))
+  {
+    i++;
+    if(typeof(#[i])=="intvec")
+    {
+      m=#[i];
+    }
+  }
+  if(m==0)
+  {
+    for(i=n;i>=1;i--)
+    {
+      m[i]=1;
+    }
+  }
+
+  int k;
+  ideal e0;
+  intvec m0;
+  number e1;
+  int m1;
+  for(i=n;i>=1;i--)
+  {
+    if(m[i]!=0)
+    {
+      for(j=i-1;j>=1;j--)
+      {
+        if(m[j]!=0)
+	{
+          if(number(e[i])>number(e[j]))
+          {
+            e1=number(e[i]);
+            e[i]=e[j];
+            e[j]=e1;
+            m1=m[i];
+            m[i]=m[j];
+            m[j]=m1;
+          }
+          if(number(e[i])==number(e[j]))
+          {
+            m[i]=m[i]+m[j];
+            m[j]=0;
+          }
+        }
+      }
+      k++;
+      e0[k]=e[i];
+      m0[k]=m[i];
+    }
+  }
+
+  list l;
+  if(k>0)
+  {
+    l=e0,m0;
+  }
+  return(l);
+}
+example
+{ "EXAMPLE:"; echo=2;
+}
+///////////////////////////////////////////////////////////////////////////////
+
 proc eigenvals(matrix M)
 "USAGE:   eigenvals(M); matrix M
 ASSUME:  eigenvalues of M in basefield
@@ -1248,7 +1425,60 @@ list l;
 EXAMPLE: example eigenvals; shows examples
 "
 {
-  return(system("eigenvals",M));
+  if(system("with","eigenval"))
+  {
+   return(system("eigenvals",M));
+  }
+
+  M=jet(hessenberg(M),0);
+  int n=ncols(M);
+  int k;
+  ideal e;
+  intvec m;
+  number e0;
+  intvec v;
+  list l;
+  int i,j;
+  j=1;
+  while(j<=n)
+  {
+    v=j;
+    j++;
+    if(j<=n)
+    {
+      while(j<n&&M[j,j-1]!=0)
+      {
+        v=v,j;
+        j++;
+      }
+      if(M[j,j-1]!=0)
+      {
+        v=v,j;
+        j++;
+      }
+    }
+    if(size(v)==1)
+    {
+      k++;
+      e[k]=M[v,v];
+      m[k]=1;
+    }
+    else
+    {
+      l=factorize(det(submat(M,v,v)-var(1)));
+      for(i=size(l[1]);i>=1;i--)
+      {
+        e0=number(jet(l[1][i]/var(1),0));
+        if(e0!=0)
+	{
+          k++;
+          e[k]=(e0*var(1)-l[1][i])/e0;
+          m[k]=l[2][i];
+	}
+      }
+    }
+  }
+  return(evnf(e,m));
 }
 example
 { "EXAMPLE:"; echo=2;
@@ -1516,6 +1746,7 @@ example
   print(M);
   print(jordannf(M));
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 
 /*

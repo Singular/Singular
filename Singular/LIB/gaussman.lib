@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.74 2002-03-05 14:22:14 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.75 2002-03-06 16:39:09 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -7,7 +7,7 @@ LIBRARY:  gaussman.lib  Algorithmic Gauss-Manin Connection
 
 AUTHOR:   Mathias Schulze, email: mschulze@mathematik.uni-kl.de
 
-OVERVIEW: A library to compute Hodge-theoretic invariants 
+OVERVIEW: A library to compute Hodge-theoretic invariants
           of isolated hypersurface singularities
 
 PROCEDURES:
@@ -41,7 +41,7 @@ KEYWORDS: singularities; Gauss-Manin connection; Brieskorn lattice;
           mixed Hodge structure; V-filtration; weight filtration
 ";
 
-LIB "linalg2.lib";
+LIB "linalg.lib";
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -150,7 +150,7 @@ EXAMPLE:  example gmsring; shows examples
     {
       ERROR("isolated critical point 0 expected");
     }
-  }  
+  }
   matrix B=l[2];
   ideal m=kbase(g);
 
@@ -216,7 +216,7 @@ proc gmsnf(ideal p,int K)
 ASSUME:   basering returned by gmsring
 RETURN:
 @format
-list nf; 
+list nf;
   ideal nf[1];  projection of p to gmsbasis mod s^(K+1)
   ideal nf[2];  p=nf[1]+nf[2]
 @end format
@@ -225,7 +225,56 @@ KEYWORDS: singularities; Gauss-Manin connection; Brieskorn lattice
 EXAMPLE:  example gmsnf; shows examples
 "
 {
-  return(system("gmsnf",p,gmsstd,gmsmatrix,(K+1)*deg(var(1))-2*gmsmaxdeg,K));
+  if(system("with","gms"))
+  {
+    return(system("gmsnf",p,gmsstd,gmsmatrix,(K+1)*deg(var(1))-2*gmsmaxdeg,K));
+  }
+
+  intvec v=1;
+  v[nvars(basering)]=0;
+
+  int k;
+  ideal r,q;
+  r[ncols(p)]=0;
+  q[ncols(p)]=0;
+
+  poly s;
+  int i,j;
+  for(k=ncols(p);k>=1;k--)
+  {
+    while(p[k]!=0&&deg(lead(p[k]),v)<=K)
+    {
+      i=1;
+      s=lead(p[k])/lead(gmsstd[i]);
+      while(i<ncols(gmsstd)&&s==0)
+      {
+        i++;
+        s=lead(p[k])/lead(gmsstd[i]);
+      }
+      if(s!=0)
+      {
+        p[k]=p[k]-s*gmsstd[i];
+        for(j=1;j<=nrows(gmsmatrix);j++)
+        {
+          p[k]=p[k]+diff(s*gmsmatrix[j,i],var(j+1))*var(1);
+        }
+      }
+      else
+      {
+        r[k]=r[k]+lead(p[k]);
+        p[k]=p[k]-lead(p[k]);
+      }
+      while(deg(lead(p[k]))>(K+1)*deg(var(1))-2*gmsmaxdeg&&
+        deg(lead(p[k]),v)<=K)
+      {
+        q[k]=q[k]+lead(p[k]);
+        p[k]=p[k]-lead(p[k]);
+      }
+    }
+    q[k]=q[k]+p[k];
+  }
+
+  return(list(r,q));
 }
 example
 { "EXAMPLE:"; echo=2;
@@ -247,7 +296,7 @@ proc gmscoeffs(ideal p,int K)
 ASSUME:   basering constructed by gmsring
 RETURN:
 @format
-list l; 
+list l;
   matrix l[1];  gmsbasis representation of p mod s^(K+1)
   ideal l[2];  p=matrix(gmsbasis)*l[1]+l[2]
 @end format
@@ -281,7 +330,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc min(ideal e)
+static proc nmin(ideal e)
 {
   int i;
   number m=number(e[1]);
@@ -296,7 +345,7 @@ static proc min(ideal e)
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc max(ideal e)
+static proc nmax(ideal e)
 {
   int i;
   number m=number(e[1]);
@@ -347,7 +396,7 @@ static proc saturate()
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc basisrep(matrix A0,ideal r,module H,int k0,int K)
+static proc tjet(matrix A0,ideal r,module H,int k0,int K)
 {
   dbprint(printlevel-voice+2,"// compute matrix A of t");
   dbprint(printlevel-voice+2,"// k="+string(K+k0+1));
@@ -363,12 +412,12 @@ static proc basisrep(matrix A0,ideal r,module H,int k0,int K)
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc eigvals(matrix A0,ideal r,module H,int k0)
+static proc eigenval(matrix A0,ideal r,module H,int k0)
 {
   dbprint(printlevel-voice+2,
     "// compute eigenvalues e with multiplicities m of A0");
   matrix A;
-  A,A0,r=basisrep(A0,r,H,k0,0);
+  A,A0,r=tjet(A0,r,H,k0,0);
   list l=eigenvals(A);
   def e,m=l[1..2];
   dbprint(printlevel-voice+2,"// e="+string(e));
@@ -378,11 +427,11 @@ static proc eigvals(matrix A0,ideal r,module H,int k0)
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc transf(matrix A,matrix A0,ideal r,module H,module H0,ideal e,intvec m,int k0,int K,int opt)
+static proc transform(matrix A,matrix A0,ideal r,module H,module H0,ideal e,intvec m,int k0,int K,int opt)
 {
   int mu=ncols(gmsbasis);
 
-  number e0,e1=min(e),max(e);
+  number e0,e1=nmin(e),nmax(e);
 
   int i,j,k;
   int k1;
@@ -430,7 +479,7 @@ static proc transf(matrix A,matrix A0,ideal r,module H,module H0,ideal e,intvec 
     }
   }
 
-  A,A0,r=basisrep(A0,r,H,k0,K+k1);
+  A,A0,r=tjet(A0,r,H,k0,K+k1);
   module U0=s^k0*freemodule(mu);
 
   if(k>0)
@@ -513,8 +562,17 @@ proc monodromy(poly t)
 "USAGE:    monodromy(t); poly t
 ASSUME:   characteristic 0; local degree ordering;
           isolated critical point 0 of t
-RETURN:   list l=jordan(M);  Jordan data of monodromy matrix exp(-2*pi*i*M)
-SEE ALSO: mondromy_lib, linalg.lib
+RETURN:
+@format
+list l=jordan(M);  Jordan data of monodromy matrix exp(-2*pi*i*M)
+  ideal l[1]; 
+    number l[1][i];  eigenvalue of i-th Jordan block of M
+  intvec l[2]; 
+    int l[2][i];  size of i-th Jordan block of M
+  intvec l[3]; 
+    int l[3][i];  multiplicity of i-th Jordan block of M
+@end format
+SEE ALSO: mondromy_lib, linalg_lib
 KEYWORDS: singularities; Gauss-Manin connection; Brieskorn lattice; monodromy
 EXAMPLE:  example monodromy; shows examples
 "
@@ -530,8 +588,8 @@ EXAMPLE:  example monodromy; shows examples
   intvec m;
 
   def A0,r,H,H0,k0=saturate();
-  e,m,A0,r=eigvals(A0,r,H,k0);
-  A,A0,r,H0,U0,e,m=transf(A,A0,r,H,H0,e,m,k0,0,0);
+  e,m,A0,r=eigenval(A0,r,H,k0);
+  A,A0,r,H0,U0,e,m=transform(A,A0,r,H,H0,e,m,k0,0,0);
 
   list l=jordan(A,e,m);
   setring(R);
@@ -561,7 +619,7 @@ list sp;  singularity spectrum of t
     int sp[2][i];  multiplicity of i-th spectral number
 @end format
 SEE ALSO: spectrum_lib
-KEYWORDS: singularities; Gauss-Manin connection; Brieskorn lattice; 
+KEYWORDS: singularities; Gauss-Manin connection; Brieskorn lattice;
           mixed Hodge structure; V-filtration; spectrum
 EXAMPLE:  example spectrum; shows examples
 "
@@ -588,7 +646,7 @@ list spp;  spectral pairs of t
     number spp[1][i];  V-filtration index of i-th spectral pair
   intvec spp[2];
     int spp[2][i];  weight filtration index of i-th spectral pair
-  intvec spp[3]; 
+  intvec spp[3];
     int spp[3][i];  multiplicity of i-th spectral pair
 @end format
 SEE ALSO: spectrum_lib
@@ -609,22 +667,14 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc spnf(ideal e,list #)
-"USAGE:   spnf(e[,m][,V]); ideal e, intvec m, list V
-ASSUME:  ncols(e)==size(m)==size(V); typeof(V[i])=="int"
-RETURN:
-@format
-list sp;  spectrum normal form of (e,m,V)
-  ideal sp[1];  numbers in e in increasing order
-  intvec sp[2]; 
-    int sp[2][i];  multiplicity of number sp[1][i] in e
-  list sp[3]; 
-    module sp[3][i];  module associated to number sp[1][i]
-@end format
+proc spnf(ideal a,list #)
+"USAGE:   spnf(a[,m][,V]); ideal a, intvec m, list V
+ASSUME:  ncols(a)==size(m)==size(V); typeof(V[i])=="int"
+RETURN:  order (a[i][,V[i]]) with multiplicity m[i] lexicographically
 EXAMPLE: example spnf; shows examples
 "
 {
-  int n=ncols(e);
+  int n=ncols(a);
   intvec m;
   module v;
   list V;
@@ -658,10 +708,10 @@ EXAMPLE: example spnf; shows examples
   }
 
   int k;
-  ideal e0;
+  ideal a0;
   intvec m0;
   list V0;
-  number e1;
+  number a1;
   int m1;
   for(i=n;i>=1;i--)
   {
@@ -671,11 +721,11 @@ EXAMPLE: example spnf; shows examples
       {
         if(m[j]!=0)
 	{
-          if(number(e[i])>number(e[j]))
+          if(number(a[i])>number(a[j]))
           {
-            e1=number(e[i]);
-            e[i]=e[j];
-            e[j]=e1;
+            a1=number(a[i]);
+            a[i]=a[j];
+            a[j]=a1;
             m1=m[i];
             m[i]=m[j];
             m[j]=m1;
@@ -686,7 +736,7 @@ EXAMPLE: example spnf; shows examples
               V[j]=v;
             }
           }
-          if(number(e[i])==number(e[j]))
+          if(number(a[i])==number(a[j]))
           {
             m[i]=m[i]+m[j];
             m[j]=0;
@@ -698,7 +748,7 @@ EXAMPLE: example spnf; shows examples
         }
       }
       k++;
-      e0[k]=e[i];
+      a0[k]=a[i];
       m0[k]=m[i];
       if(size(V)>0)
       {
@@ -724,7 +774,7 @@ EXAMPLE: example spnf; shows examples
   list l;
   if(k>0)
   {
-    l=e0,m0;
+    l=a0,m0;
     if(size(V0)>0)
     {
       l[3]=V0;
@@ -738,25 +788,10 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc sppnf(ideal a,intvec w,list #)
-"USAGE:    sppnf(a,w[,m][,V]); ideal a, intvec w, intvec m, list V
-ASSUME:   ncols(e)=size(w)=size(m)=size(V); typeof(V[i])=="module"
-RETURN:
-@format
-list spp;  spectral pairs normal form of (a,w,m,V)
-  ideal spp[1];
-    number spp[1][i];  V-filtration index of i-th spectral pair
-  intvec spp[2];
-    int spp[2][i];  weight filtration index of i-th spectral pair
-  intvec spp[3]; 
-    int spp[3][i];  multiplicity of i-th spectral pair
-  list spp[4]; 
-    module spp[4][i];  vector space of i-th spectral pair
-@end format
-SEE ALSO: spectrum_lib
-KEYWORDS: singularities; Gauss-Manin connection; Brieskorn lattice;
-          mixed Hodge structure; V-filtration; weight filtration;
-          spectrum; spectral pairs
-EXAMPLE:  example sppnorm; shows examples
+"USAGE:   sppnf(a,w[,m][,V]); ideal a, intvec w, intvec m, list V
+ASSUME:  ncols(e)=size(w)=size(m)=size(V); typeof(V[i])=="module"
+RETURN:  order (a[i][,w[i]][,V[i]]) with multiplicity m[i] lexicographically
+EXAMPLE: example sppnorm; shows examples
 "
 {
   int n=ncols(a);
@@ -805,7 +840,7 @@ EXAMPLE:  example sppnorm; shows examples
       for(j=i-1;j>=1;j--)
       {
         if(m[j]!=0)
-	{
+        {
           if(number(a[i])>number(a[j])||
             (number(a[i])==number(a[j])&&w[i]<w[j]))
           {
@@ -886,9 +921,9 @@ RETURN:
 list v;  V-filtration on H''/s*H''
   ideal v[1];
     number v[1][i];  V-filtration index of i-th spectral pair
-  intvec v[2]; 
+  intvec v[2];
     int v[2][i];  multiplicity of i-th spectral pair
-  list v[3]; 
+  list v[3];
     module v[3][i];  vector space of i-th graded part in terms of v[4]
   ideal v[4];  monomial vector space basis of H''/s*H''
   ideal v[5];  standard basis of Jacobian ideal
@@ -921,9 +956,9 @@ list vw;  weighted V-filtration on H''/s*H''
     number vw[1][i];  V-filtration index of i-th spectral pair
   intvec vw[2];
     int vw[2][i];  weight filtration index of i-th spectral pair
-  intvec vw[3]; 
+  intvec vw[3];
     int vw[3][i];  multiplicity of i-th spectral pair
-  list vw[4]; 
+  list vw[4];
     module vw[4][i];  vector space of i-th graded part in terms of vw[5]
   ideal vw[5];  monomial vector space basis of H''/s*H''
   ideal vw[6];  standard basis of Jacobian ideal
@@ -947,8 +982,8 @@ EXAMPLE:  example vwfilt; shows examples
   intvec m;
 
   def A0,r,H,H0,k0=saturate();
-  e,m,A0,r=eigvals(A0,r,H,k0);
-  A,A0,r,H0,U0,e,m=transf(A,A0,r,H,H0,e,m,k0,0,1);
+  e,m,A0,r=eigenval(A0,r,H,k0);
+  A,A0,r,H0,U0,e,m=transform(A,A0,r,H,H0,e,m,k0,0,1);
 
   dbprint(printlevel-voice+2,"// compute weight filtration basis");
   list l=jordanbasis(A,e,m);
@@ -1051,9 +1086,9 @@ EXAMPLE:  example tmatrix; shows examples
   intvec m;
 
   def A0,r,H,H0,k0=saturate();
-  e,m,A0,r=eigvals(A0,r,H,k0);
-  int k1=int(max(e)-min(e));
-  A,A0,r,H0,U0,e,m=transf(A,A0,r,H,H0,e,m,k0,k0+k1,1);
+  e,m,A0,r=eigenval(A0,r,H,k0);
+  int k1=int(nmax(e)-nmin(e));
+  A,A0,r,H0,U0,e,m=transform(A,A0,r,H,H0,e,m,k0,k0+k1,1);
 
   ring S=0,s,(ds,c);
   matrix A=imap(G,A);
@@ -1227,9 +1262,9 @@ RETURN:
 list ev;  V-filtration on Jacobian algebra
   ideal ev[1];
     number ev[1][i];  V-filtration index of i-th spectral pair
-  intvec ev[2]; 
+  intvec ev[2];
     int ev[2][i];  multiplicity of i-th spectral pair
-  list ev[3]; 
+  list ev[3];
     module ev[3][i];  vector space of i-th graded part in terms of ev[4]
   ideal ev[4];  monomial vector space basis of Jacobian algebra
   ideal ev[5];  standard basis of Jacobian ideal
@@ -1254,7 +1289,7 @@ EXAMPLE:  example endvfilt; shows examples
   module U=freemodule(ncols(m));
   for(i=ncols(m);i>=1;i--)
   {
-    M[i]=division(V0,coeffs(reduce(m[i]*m,U,g),m)*V0)[1];
+    M[i]=division(V0,coeffs(reduce(m[i]*m,g,U),m)*V0)[1];
   }
 
   int j,k,i0,j0,i1,j1;
@@ -1616,8 +1651,8 @@ proc spsemicont(list sp0,list sp,list #)
 RETURN:
 @format
 list l;
-  intvec l[i];  if the spectra sp0 occur with multiplicities k 
-                in a deformation of a [quasihomogeneous] singularity 
+  intvec l[i];  if the spectra sp0 occur with multiplicities k
+                in a deformation of a [quasihomogeneous] singularity
                 with spectrum sp then k<=l[i]
 @end format
 EXAMPLE: example spsemicont; shows examples
@@ -1633,26 +1668,26 @@ EXAMPLE: example spsemicont; shows examples
       for(i=1;i<=size(l0);i++)
       {
         if(size(l)>0)
-	{
+        {
           j=1;
           while(j<size(l)&&l[j]!=l0[i])
-	  {
+          {
             j++;
           }
           if(l[j]==l0[i])
-	  {
+          {
             l[j][size(sp)]=k;
           }
           else
-	  {
+          {
             l0[i][size(sp)]=k;
             l=l+list(l0[i]);
           }
-	}
+        }
         else
-	{
+        {
           l=l0;
-	}
+        }
       }
     }
     sp0=spsub(sp0,sp[size(sp)]);
