@@ -210,9 +210,10 @@ INSTALL		= ./Singular/install-sh -c
 SH_PROGRAM 	= /bin/sh
 INFO_PROGRAM 	= /bin/info
 CYGWIN_DLL	= /bin/cygwinb19.dll
-WIN_BINDIR      = ${TMPDIR}/Singular/${SINGULAR_VERSION}
+WIN_BINDIR      = ${TMPDIR}/Singular/${S_VERSION}
+WIN_SHAREDIST_NAME = Singular-${SINGULAR_DOS_VERSION}-share
 
-windist: ${SHAREDIST_NAME}.tar.gz ${SINGULAR}
+windist: ${WIN_SHAREDIST_NAME}.tar.gz ${SINGULAR}
 	cd Singular; ${MAKE} Singular-bindist libparse
 	rm -rf ${TMPDIR}
 	${MKINSTALLDIRS} ${WIN_BINDIR}
@@ -221,17 +222,17 @@ windist: ${SHAREDIST_NAME}.tar.gz ${SINGULAR}
 	${INSTALL} ${SH_PROGRAM} ${WIN_BINDIR}
 	${INSTALL} ${INFO_PROGRAM} ${WIN_BINDIR}
 	${INSTALL} ${CYGWIN_DLL} ${WIN_BINDIR}
-	cp  ${SHAREDIST_NAME}.tar.gz ${TMPDIR}
-	cd ${TMPDIR}; gunzip ${SHAREDIST_NAME}.tar.gz; \
-                      tar xf ${SHAREDIST_NAME}.tar
+	cp  ${WIN_SHAREDIST_NAME}.tar.gz ${TMPDIR}
+	cd ${TMPDIR}; gunzip ${WIN_SHAREDIST_NAME}.tar.gz; \
+                      tar xf ${WIN_SHAREDIST_NAME}.tar
 	rm -rf ${TMPDIR}/info ${TMPDIR}/Singular/README.share
 	cat INSTALL.win	| sed -e "s/<x.y.z>/${S_VERSION}/" > \
                          ${TMPDIR}/Singular/INSTALL
-	cp README.win | sed -e "s/<x.y.z>/${S_VERSION}/" > \
+	cat README.win | sed -e "s/<x.y.z>/${S_VERSION}/" > \
                          ${TMPDIR}/Singular/README
 	cd ${TMPDIR}; \
            ${ZIP} -r sing Singular 
-	cp ${TMPDIR}/sing.zip Singular-${S_VERSION}-${SINGUNAME}.zip .
+	cp ${TMPDIR}/sing.zip Singular-${S_VERSION}-${SINGUNAME}.zip 
 	rm -rf ${TMPDIR}
 
 
