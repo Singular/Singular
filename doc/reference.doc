@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.44 1998-05-13 12:45:18 Singular Exp $
+@comment $Id: reference.doc,v 1.45 1998-05-13 12:59:59 wichmann Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -1338,7 +1338,7 @@ number, poly, vector, ideal, module, matrix or list
 @item @strong{Purpose:}
 maps objects between "almost identical" rings.
 @code{fetch} is the
-identity map between rings, and qrings with the same
+identity map between rings and qrings with the same
 coefficient field and the same number of variables (but possibly with
 different orderings), the i-th variable of the source ring is mapped to
 the i-th variable of the basering.
@@ -1397,6 +1397,10 @@ The result will be a reduced Groebner basis.
 @*The only permissable difference between the given ring and the current ring
 may be the monomial ordering and a permutation of the variables
 resp. parameters.
+@*The main application is to compute a lexicographical Groebner basis
+from a reduced Groebner basis with respect to a degree ordering. This
+can be much faster than computing a lexicographical Groebner basis
+directly. 
 @c @item @strong{Example:}
 @example
 @c example
@@ -3408,7 +3412,7 @@ int
 returns the (weighted) degree of
 the initial term of a polynomial or a vector;
 the weights are the weights used for the first block of the ring ordering.
-@*ord(0) is -1
+@*@code{ord(0)} is @code{-1}.
 @item @strong{Example:}
 @example
 @c example
@@ -3469,7 +3473,7 @@ See @ref{ring}; @ref{varstr}; @ref{parstr}; @ref{charstr}.
 @item @strong{Type:}
 number
 @item @strong{Purpose:}
-returns the n-th parameter of the basering ring.
+returns the n-th parameter of the basering.
 @item @strong{Example:}
 @example
 @c example
@@ -3807,7 +3811,8 @@ in the first case and
 @{b in basering | b j in m @}, where m in basering^n,
 @end ifinfo
 @tex
-$\{b \in basering^n \mid b j \subset m\}$, where $m\subset basering^n$,
+$\{b \in {\rm basering}^n \mid b j \subset m\}$, 
+where $m\subset {\rm basering}^n$,
 @end tex
 in the second case.
 @item @strong{Example:}
