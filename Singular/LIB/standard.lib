@@ -1,9 +1,10 @@
-// $Id: standard.lib,v 1.2 1997-07-11 11:12:46 obachman Exp $
+// $Id: standard.lib,v 1.3 1997-08-01 13:42:14 obachman Exp $
 ///////////////////////////////////////////////////////////////////////////////
 
 LIBRARY: standard.lib	PROCEDURES WHICH ARE ALWAYS LOADED AT START-UP
 
  stdfglm(ideal[,ord])   standard basis of the ideal via fglm [and ordering ord]
+ stdhilbert(ideal)	standard basis of the ideal using the Hilbert function
 ///////////////////////////////////////////////////////////////////////////////
 
 proc stdfglm (ideal i, list #)
@@ -45,3 +46,64 @@ example
    ideal is=stdfglm(i,"Dp"); is;
 }
 ///////////////////////////////////////////////////////////////////////////////
+
+proc stdhilbert(ideal i,list #)
+USAGE:  stdhilbert(i);  i ideal
+        stdhilbert(i,v); i homogeneous ideal, v intvec (the Hilbert function)
+RETURN: stdhilbert(i);  standard basis of i computed using the Hilbert function
+EXAMPLE: example stdhilbert; shows an example
+{
+   def R=basering;
+
+   if((homog(i)==1)||(ordstr(basering)[1]=="d"))
+   {
+      if ((size(#)!=0)&&(homog(i)==1))
+      {
+         return(std(i,#[1]));
+      }
+
+      return(std(i));
+   }
+ 
+   execute "ring S = ("+charstr(R)+"),("+varstr(R)+",@t),dp;";
+   ideal i=homog(imap(R,i),@t);
+   intvec v=hilb(std(i),1);
+   execute "ring T = ("+charstr(R)+"),("+varstr(R)+",@t),("+ordstr(R)+");";
+   ideal i=fetch(S,i);
+   ideal a=std(i,v);
+   setring R;
+   map phi=T,maxideal(1),1;
+   ideal a=phi(a);
+
+   int k,j;
+   poly m;
+   int c=size(i);
+
+   for(j=1;j<c;j++)
+   {
+     if(deg(a[j])==0)
+     {
+       a=ideal(1);
+       return(a);
+     }
+     if(deg(a[j])>0)
+     {
+       m=lead(a[j]);
+       for(k=j+1;k<=c;k++)
+       {
+          if(size(lead(a[k])/m)>0)
+          {
+            a[k]=0;
+          }
+       }
+     }
+   }
+   return(simplify(a,2));   
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r=0,(x,y,z), lp; ideal i=y3+x2, x2y+x2, x3-x2, z4-x2-y;
+   ideal is=stdhilbert(i); is;
+}
+///////////////////////////////////////////////////////////////////////////////
+
