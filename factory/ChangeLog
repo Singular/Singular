@@ -1,3 +1,8 @@
+Tue Feb 16 19:00:03 1999  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* GNUmakefile.in (ftestsrc, ftestincl): ntl-stuff added
+	  (ftestm4src): `gcd.ntl.m4', `revert.m4' added
+
 Wed Sep 23 19:05:47 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* fac_ezgcd.cc (ezgcd_specialcase): bug fix (???).  See comments
