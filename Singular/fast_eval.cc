@@ -26,24 +26,29 @@ static poly maPoly_EvalMon(poly src, ring src_r, poly* dest_id, ring dest_r)
   int i;
   int e;
   poly p=NULL;
+  poly pp;
   for(i=1;i<=src_r->N;i++)
   {
     e=p_GetExp(src,i,src_r);
-    if ((e>0) && (dest_id[i-1]==NULL))
+    if (e>0)
     {
-      p_Delete(&p,dest_r);
-      return NULL;
-    }  
-    if ((p==NULL) && (e>0))
-    {
-      p=p_Copy(dest_id[i-1],dest_r);
-      e--;
+      pp=dest_id[i-1];
+      if (pp==NULL)
+      {
+        p_Delete(&p,dest_r);
+        return NULL;
+      }
+      if ((p==NULL) /* && (e>0)*/)
+      {
+        p=p_Copy(pp /*dest_id[i-1]*/,dest_r);
+        e--;
+      }
+      while (e>0)
+      {
+        p=p_Mult_q(p,p_Copy(pp /*dest_id[i-1]*/,dest_r),dest_r);
+        e--;
+      }
     }
-    while (e>0)
-    {
-      p=p_Mult_q(p,p_Copy(dest_id[i-1],dest_r),dest_r);
-      e--;
-    } 
   }
   if (p==NULL) p=p_ISet(1,dest_r);
   return p;
@@ -69,11 +74,11 @@ void maPoly_Eval(mapoly root, ring src_r, ideal dest_id, ring dest_r, int total_
 
   total_cost /= 10;
   int next_print_cost = total_cost;
- 
+
   // the evaluation -----------------------------------------
   mapoly p=root;
   int cost = 0;
- 
+
   while (p!=NULL)
   {
     // look at each mapoly: compute its value in ->dest
