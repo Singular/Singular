@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.208 2004-08-13 18:29:37 levandov Exp $ */
+/* $Id: extra.cc,v 1.209 2004-08-14 20:31:56 levandov Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -1691,6 +1691,33 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       else
       {
         WerrorS("`system(\"env\",<ring>)` expected");
+        return TRUE;
+      }
+    }
+    else
+/*==================== oppose ==================================*/
+    if (strcmp(sys_cmd, "oppose")==0)
+    {
+      ring Rop;
+      if ((h!=NULL) && (h->Typ()==RING_CMD))
+      {
+        Rop =(ring)h->Data();
+        h=h->next;
+      }
+      if ((h!=NULL)) 
+      {
+	idhdl w;
+	if ((w=Rop->idroot->get(h->Name(),myynest))!=NULL)
+	{
+	  poly p = (poly)IDDATA(w);
+	  res->data = p_Oppose(Rop,p);
+	  res->rtyp = POLY_CMD;
+	  return FALSE;
+	}
+       }
+      else
+      {
+        WerrorS("`system(\"oppose\",<ring>,<poly>)` expected");
         return TRUE;
       }
     }
