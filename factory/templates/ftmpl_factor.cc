@@ -1,8 +1,12 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: ftmpl_factor.cc,v 1.2 1997-04-15 10:06:53 schmidt Exp $
+// $Id: ftmpl_factor.cc,v 1.3 1997-04-30 13:08:24 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.2  1997/04/15 10:06:53  schmidt
+#include <config.h> added
+the header config.h will be included be makeheader
+
 Revision 1.1  1997/03/27 10:30:00  schmidt
 stream-io wrapped by NOSTREAMIO
 
@@ -11,8 +15,7 @@ Initial revision
 
 */
 
-/*MAKEHEADER*/
-#include "templates/config.h"
+#include <factoryconf.h>
 
 #include <templates/factor.h>
 

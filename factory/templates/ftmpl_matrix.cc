@@ -1,8 +1,12 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: ftmpl_matrix.cc,v 1.4 1997-04-18 16:44:13 schmidt Exp $
+// $Id: ftmpl_matrix.cc,v 1.5 1997-04-30 13:08:28 schmidt Exp $
 
 /*
  * $Log: not supported by cvs2svn $
+ * Revision 1.4  1997/04/18 16:44:13  schmidt
+ * o Matrix::Matrix( int, int ), Matrix::Matrix( const Matrix& ),
+ *   Matrix::operator=: new (T*)[..]; changed to new T_prt[..];
+ *
  * Revision 1.3  1997/04/15 10:12:43  schmidt
  * #include <config.h> added
  * the headers config.h and assert.h will be included
@@ -17,11 +21,7 @@
  *
  */
 
-/*MAKEHEADER*/
-#include "templates/config.h"
-
-/*MAKEHEADER*/
-#include "templates/assert.h"
+#include <factoryconf.h>
 
 #include <templates/matrix.h>
 
