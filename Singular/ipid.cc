@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.47 2001-03-26 19:30:21 Singular Exp $ */
+/* $Id: ipid.cc,v 1.48 2001-03-26 21:15:23 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -954,9 +954,12 @@ void iiname2hdl(const char *name, idhdl *pck, idhdl *h)
       sscanf(name, "%[^:]::%s", p, i);
 #ifdef HAVE_NAMESPACES
       *pck =namespaceroot->get(p, myynest, TRUE); // search in toplevel namespace
-      namespaceroot->push(IDPACKAGE(*pck), IDID(*pck));
-      *h =namespaceroot->get(i, myynest); // search in toplevel namespace
-      namespaceroot->pop();
+      if((*pck!=NULL)&&(IDTYP(*pck)==PACKAGE_CMD))
+      {
+        namespaceroot->push(IDPACKAGE(*pck), IDID(*pck));
+        *h =namespaceroot->get(i, myynest); // search in toplevel namespace
+        namespaceroot->pop();
+      }
 #else /* HAVE_NAMESPACES */
 #endif /* HAVE_NAMESPACES */
     }

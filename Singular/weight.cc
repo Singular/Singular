@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: weight.cc,v 1.19 2001-03-05 16:39:02 mschulze Exp $ */
+/* $Id: weight.cc,v 1.20 2001-03-26 21:15:26 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -244,10 +244,9 @@ short * iv2array(intvec * iv)
   int len=0;
   if(iv!=NULL)
     len=iv->length();
-  for(int i=pVariables;i>len;i--)
-    s[i]= 1;
-  for(;i>0;i--)
-    s[i]= (*iv)[i-1];
+  int i;
+  for(i=pVariables;i>len;i--) s[i]=1;
+  for(;i>0;i--)               s[i]=(*iv)[i-1];
   return s;
 }
 

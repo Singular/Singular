@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: eigenval.cc,v 1.3 2001-03-22 19:10:59 Singular Exp $ */
+/* $Id: eigenval.cc,v 1.4 2001-03-26 21:15:26 Singular Exp $ */
 /*
 * ABSTRACT: eigenvalues of constant square matrices
 */
@@ -42,8 +42,8 @@ matrix rowelim(matrix M,int i, int j, int k)
 {
   if(MATELEM(M,i,k)==NULL||MATELEM(M,j,k)==NULL)
     return M;
-  number n=nDiv(nCopy(pGetCoeff(MATELEM(M,i,k))),
-                nCopy(pGetCoeff(MATELEM(M,j,k))));
+  number n=nDiv(pGetCoeff(MATELEM(M,i,k)),
+                pGetCoeff(MATELEM(M,j,k)));
   for(int l=1;l<=MATCOLS(M);l++)
   {
     MATELEM(M,i,l)=pSub(MATELEM(M,i,l),pMult_nn(pCopy(MATELEM(M,j,l)),n));
@@ -60,8 +60,8 @@ matrix colelim(matrix M,int i, int j, int k)
 {
   if(MATELEM(M,k,i)==NULL||MATELEM(M,k,j)==NULL)
     return M;
-  number n=nDiv(nCopy(pGetCoeff(MATELEM(M,k,i))),
-                nCopy(pGetCoeff(MATELEM(M,k,j))));
+  number n=nDiv(pGetCoeff(MATELEM(M,k,i)),
+                pGetCoeff(MATELEM(M,k,j)));
   for(int l=1;l<=MATROWS(M);l++)
   {
     MATELEM(M,l,i)=pSub(MATELEM(M,l,i),pMult_nn(pCopy(MATELEM(M,l,j)),n));
@@ -80,10 +80,7 @@ matrix tridiag(matrix M)
   for(int k=1;k<=n-2;k++)
   {
     int j=k+1;
-    while(j<=n&&MATELEM(M,j,k)==NULL)
-    {
-      j++;
-    }
+    while(j<=n&&MATELEM(M,j,k)==NULL) j++;
     if(j<=n)
     {
       for(int i=j+1;i<=n;i++)
@@ -93,10 +90,7 @@ matrix tridiag(matrix M)
       M=swap(M,j,k+1);
     }
     j=k+1;
-    while(j<=n&&MATELEM(M,k,j)==NULL)
-    {
-      j++;
-    }
+    while(j<=n&&MATELEM(M,k,j)==NULL) j++;
     if(j<=n)
     {
       for(int i=j+1;i<=n;i++)
@@ -181,6 +175,7 @@ lists eigenval(matrix M)
     {
       poly t=pOne();
       pSetExp(t,1,1);
+      pSetm(t);
       poly d0=pSub(MATELEM(M,j,j),t);
       MATELEM(M,j,j)=NULL;
       j++;
@@ -192,6 +187,7 @@ lists eigenval(matrix M)
         d1=pCopy(d0);
         poly t=pOne();
         pSetExp(t,1,1);
+        pSetm(t);
         d0=pSub(pMult(d0,pSub(MATELEM(M,j,j),t)),
                 pMult(pMult(d2,MATELEM(M,j-1,j)),MATELEM(M,j,j-1)));
         MATELEM(M,j,j)=NULL;
@@ -221,7 +217,7 @@ lists eigenval(matrix M)
         if(pp==NULL)
         {
           pp=p;
-          p=pNSet(nNeg(nDiv(nCopy(pGetCoeff(p0)),nCopy(pGetCoeff(p1)))));
+          p=pNSet(nNeg(nDiv(pGetCoeff(p0),pGetCoeff(p1))));
           pDelete(&pp);
         }
         else
@@ -240,7 +236,7 @@ lists eigenval(matrix M)
 
 BOOLEAN tridiag(leftv res,leftv h)
 {
-  if(h!=NULL&&h->Typ()==MATRIX_CMD)
+  if((h!=NULL) && (h->Typ()==MATRIX_CMD))
   {
     matrix M=(matrix)h->Data();
     if(MATCOLS(M)!=MATROWS(M))
@@ -252,11 +248,12 @@ BOOLEAN tridiag(leftv res,leftv h)
     return FALSE;
   }
   WerrorS("<matrix> expected");
+  return TRUE;
 }
 
 BOOLEAN eigenval(leftv res,leftv h)
 {
-  if(h!=NULL&&h->Typ()==MATRIX_CMD)
+  if((h!=NULL) && (h->Typ()==MATRIX_CMD))
   {
     matrix M=(matrix)h->Data();
     if(MATCOLS(M)!=MATROWS(M))
@@ -268,6 +265,6 @@ BOOLEAN eigenval(leftv res,leftv h)
     return FALSE;
   }
   WerrorS("<matrix> expected");
+  return TRUE;
 }
-
 #endif

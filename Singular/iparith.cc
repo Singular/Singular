@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.261 2001-03-26 19:30:20 Singular Exp $ */
+/* $Id: iparith.cc,v 1.262 2001-03-26 21:15:24 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -715,6 +715,7 @@ static BOOLEAN jjCOLCOL(leftv res, leftv u, leftv v)
           Werror("'%s' no such package", u->name);
           return TRUE;
         }
+        syMake(u,u->name,NULL);
         // else: use next case !!! no break !!!
 
       case PACKAGE_CMD:
@@ -5248,7 +5249,7 @@ static BOOLEAN jjEXPORTTO(leftv res, leftv v)
     //PrintS("export to package\n");
     while(v->next!=NULL)
     {
-      nok = iiInternalExport(v->next, 0, u->data);
+      nok = iiInternalExport(v->next, 0, (idhdl)u->data);
       if(nok) return nok;
       v = v->next;
     }
