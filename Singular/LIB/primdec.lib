@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: primdec.lib,v 1.96 2001-02-15 17:19:34 lossen Exp $";
+version="$Id: primdec.lib,v 1.97 2001-02-20 09:43:07 pfister Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -1636,11 +1636,13 @@ EXAMPLE: example minAssPrimes; shows an example
    }
 
    option(redSB);
+
    q=facstd(i);
 
    if((size(q)==1)&&(dim(i)>1))
    {
       execute ("ring gnir=("+charstr(P)+"),("+varstr(P)+"),lp;");
+      
       list p=facstd(fetch(P,i));
       if(size(p)>1)
       {
@@ -1752,7 +1754,8 @@ static proc union(list li)
 proc equidim(ideal i,list #)
 "USAGE:  equidim(i) or equidim(i,1) ; i ideal
 RETURN: list of equidimensional ideals a[1],...,a[s] with:
-        - a[s] the equidimensional locus of i, 
+        - a[s] the equidimensional locus of i, i.e. the intersection
+          of the primary ideals of dimension of i
         - a[1],...,a[s-1] the lower dimensional equidimensional loci.  
 NOTE:    An embedded component q (primary ideal) of i can be replaced in the 
          decomposition by a primary ideal q1 with the same radical as q. @*
@@ -2861,6 +2864,7 @@ static proc zeroRad(ideal I,list #)
 
    option(redSB);
    ideal F=finduni(I);//F[i] generates I intersected with K[var(i)]
+
    option(set,op);
    if(size(#)>0){I=#[1];}
 
@@ -4447,8 +4451,9 @@ example
    pr;
 }
 ///////////////////////////////////////////////////////////////////////////////
-proc minAssGTZ(ideal i)
+proc minAssGTZ(ideal i,list #)
 "USAGE:   minAssGTZ(i); i ideal
+          minAssGTZ(i,1); i ideal  does not use the factorizing Groebner
 RETURN:  a list, the minimal associated prime ideals of i.
 NOTE:    Designed for characteristic 0, works also in char k > 0 if it
          terminates, may result in an infinite loop in small characteristic.
@@ -4461,7 +4466,11 @@ EXAMPLE: example minAssGTZ; shows an example
       "// Not implemented for this ordering, please change to global ordering."
       );
    }
-   return(minAssPrimes(i,1));
+   if(size(#)==0)
+   {
+      return(minAssPrimes(i,1));
+   }
+   return(minAssPrimes(i));   
 }
 example
 { "EXAMPLE:";  echo = 2;
