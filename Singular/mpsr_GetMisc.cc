@@ -162,7 +162,7 @@ BOOLEAN mpsr_RingEqual(ring r1, ring r2)
 
   return 1;
 }
-  
+
   
 // returns TRUE, if r1 less or equals r2
 // FALSE, otherwise
@@ -174,6 +174,8 @@ inline BOOLEAN RingLessEqual(ring r1, ring r2)
   if (r1 == r2) return 1;
 
   if (r1 == NULL) return 1;
+
+  if (r2 == NULL) return 0;
 
   if ((r1->N > r2->N) || (r1->OrdSgn != r2->OrdSgn) || (r1->P > r2->P))
     return 0;
@@ -218,15 +220,6 @@ mpsr_Status_t mpsr_MergeLeftv(mpsr_leftv mlv1, mpsr_leftv mlv2)
     if (r2 != NULL) rKill(r2);
     r = r1;
   }
-  else if (RingLessEqual(r2, r1))
-  {
-    r = r1;
-    if (r2 != NULL)
-    {
-      mpsr_MapLeftv(mlv2->lv, r2, r);
-      rKill(r2);
-    }
-  }
   else if (RingLessEqual(r1, r2))
   {
     r = r2;
@@ -234,6 +227,15 @@ mpsr_Status_t mpsr_MergeLeftv(mpsr_leftv mlv1, mpsr_leftv mlv2)
     {
       mpsr_MapLeftv(mlv1->lv, r1, r);
       rKill(r1);
+    }
+  }
+  else if (RingLessEqual(r2, r1))
+  {
+    r = r1;
+    if (r2 != NULL)
+    {
+      mpsr_MapLeftv(mlv2->lv, r2, r);
+      rKill(r2);
     }
   }
   else if (rSum(r1, r2, r) >= 0)
