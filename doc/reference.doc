@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.224 2004-06-28 14:30:52 Singular Exp $
+@comment $Id: reference.doc,v 1.225 2004-08-05 14:50:44 levandov Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -3165,7 +3165,7 @@ module (or ideal), @code{sm} the submodule (or ideal),
 and @code{T} the transformation matrix returned by
 lift, then @code{matrix(sm)*U = matrix(m)*T}
 and @code{module(sm*U) = module(matrix(m)*T)}
-(resp.@: @code{ideal(sm*U) = ideal(matrix(m)*T)}),
+(resp.@: @code{ideal(sm) = ideal(matrix(m)*T)}),
 where @code{U} is a diagonal matrix of units.
 @*@code{U} is always the unity matrix if the basering is a polynomial ring
 (not power series ring). @code{U} is stored in the optional third argument.
