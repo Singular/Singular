@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: gaussman.lib,v 1.13 2000-12-06 12:34:50 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.14 2000-12-06 14:56:26 mschulze Exp $";
 info="
 LIBRARY:  gaussman.lib  GAUSS-MANIN CONNECTION OF A SINGULARITY
 
@@ -819,6 +819,8 @@ EXAMPLE: example vjacob; shows an example
     V=V,v[i];
   }
 
+  dbprint(printlevel-voice+2,
+    "//gaussman::vjacob: compute multiplication of Jacobian algebra");
   list M;
   for(i=ncols(m);i>=1;i--)
   {
@@ -835,6 +837,8 @@ EXAMPLE: example vjacob; shows an example
 
   while(r0<number(s[ncols(s)]-s[1]))
   {
+    dbprint(printlevel-voice+2,
+      "//gaussman::vjacob: compute next difference r0 of spectral numbers");
     r1=number(s[ncols(s)]-s[1]);
     for(j=ncols(s);j>=1;j--)
     {
@@ -855,6 +859,7 @@ EXAMPLE: example vjacob; shows an example
       }
     }
     r0=r1;
+    dbprint(printlevel-voice+2,"//gaussman::vjacob: r0="+string(r1));
 
     l=ideal();
     for(k=ncols(m);k>=2;k--)
@@ -862,8 +867,10 @@ EXAMPLE: example vjacob; shows an example
       l=l+list(ideal());
     }
 
-    j0=mu-d[ncols(s)]+1;
-    for(j=ncols(s);j>=1;j--)
+    dbprint(printlevel-voice+2,"//gaussman::vjacob: compute conditions");
+    j=ncols(s);
+    j0=mu;
+    while(j>=1)
     {
       i0=1;
       i=1;
@@ -882,22 +889,27 @@ EXAMPLE: example vjacob; shows an example
         M0=M[k];
         if(i0>1)
         {
-          l[k]=l[k],M0[1..i0-1,j0..j0+d[j]-1];
+          l[k]=l[k],M0[1..i0-1,j0-d[j]+1..j0];
         }
       }
       j0=j0-d[j];
+      j--;
     }
 
+    dbprint(printlevel-voice+2,"//gaussman::vjacob: compute condition matrix");
     L=transpose(module(l[1]));
     for(k=2;k<=ncols(m);k++)
     {
       L=L,transpose(module(l[k]));
     }
 
+    dbprint(printlevel-voice+2,
+      "//gaussman::vjacob: compute kernel of condition matrix");
     v0=v0+list(syz(L));
     s0=s0,r0;
   }
 
+  dbprint(printlevel-voice+2,"//gaussman::vjacob: compute graded parts");
   option(redSB);
   for(i=1;i<size(v0);i++)
   {
@@ -905,6 +917,8 @@ EXAMPLE: example vjacob; shows an example
     v0[i]=std(reduce(v0[i],v0[i+1]));
   }
 
+  dbprint(printlevel-voice+2,
+    "//gaussman::vjacob: remove trivial graded parts");
   i=1;
   while(size(v0[i])==0)
   {
