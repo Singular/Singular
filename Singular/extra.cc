@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.199 2003-07-25 13:37:02 levandov Exp $ */
+/* $Id: extra.cc,v 1.200 2003-10-15 17:07:24 levandov Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -135,6 +135,8 @@ void piShowProcList();
 #ifndef MAKE_DISTRIBUTION
 static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h);
 #endif
+
+extern BOOLEAN jjJanetBasis(leftv res, leftv v);
 
 
 //void emStart();
@@ -587,6 +589,20 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
      res->data=(void *)omStrDup(
        "Olaf Bachmann, Hubert Grassmann, Kai Krueger, Wolfgang Neumann, Thomas Nuessler, Wilfred Pohl, Jens Schmidt, Mathias Schulze, Thomas Siebert, Ruediger Stobbe, Moritz Wenk, Tim Wichmann");
      return FALSE;
+   }
+   else
+/*==================== janet =============================*/
+ if(strcmp(sys_cmd,"janet") == 0)
+   {
+     if ((h!=NULL) && ((h->Typ() == IDEAL_CMD) || (h->Typ()== MODUL_CMD)))
+     {
+	return jjJanetBasis(res,h);
+     }
+     else
+     {
+      WerrorS("ideal expected");
+      return TRUE;
+     }
    }
    else
 /*==================== spectrum =============================*/

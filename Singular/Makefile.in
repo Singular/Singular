@@ -110,7 +110,7 @@ CXXSOURCES=grammar.cc scanner.cc algmap.cc attrib.cc clapconv.cc \
     numbers.cc polys.cc p_polys.cc polys0.cc polys1.cc polys-impl.cc \
     ring.cc shortfl.cc silink.cc kspoly.cc \
     subexpr.cc syz.cc syz0.cc syz1.cc syz2.cc syz3.cc\
-    timer.cc weight.cc \
+    timer.cc weight.cc janet.cc wrapper.cc\
     GMPrat.cc multicnt.cc npolygon.cc semic.cc spectrum.cc splist.cc \
     libparse.cc mod_raw.cc sing_win.cc\
     gms.cc pcv.cc units.cc kbuckets.cc sbuckets.cc\
@@ -171,7 +171,7 @@ HEADERS=algmap.h hutil.h lists.h stairc.h attrib.h ideals.h \
 	ffields.h khstd.h silink.h sparsmat.h gnumpfl.h gnumpc.h \
 	fglm.h kstd1.h modulop.h sing_dbm.h weight.h \
 	fglmgauss.h fglmvec.h mpsr.h mpsr_sl.h\
-	kstdfac.h mpsr_Get.h kmatrix.h\
+	kstdfac.h mpsr_Get.h kmatrix.h janet.h\
 	kutil.h mpsr_Put.h\
 	ndbm.h dbm_sl.h polys-impl.h libparse.h \
         GMPrat.h multicnt.h npolygon.h semic.h spectrum.h splist.h multicnt.h \
