@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz2.cc,v 1.14 2000-02-29 10:46:06 siebert Exp $ */
+/* $Id: syz2.cc,v 1.15 2000-03-31 12:15:03 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -880,7 +880,7 @@ PrintLn();
           syEnlargeFields(syzstr,1);
           res=syzstr->res[1];
         }
-        if (BTEST1(6))
+        if (TEST_OPT_DEBUG)
         {
           if ((sPairs)[i].isNotMinimal==NULL)
           {

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz0.cc,v 1.28 2000-02-29 10:46:04 siebert Exp $ */
+/* $Id: syz0.cc,v 1.29 2000-03-31 12:15:02 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -323,7 +323,7 @@ static ideal sySchreyersSyzygiesFM(ideal arg,intvec ** modcomp)
         toRed = ksOldCreateSpoly(S[j],S[k]);
         ecartToRed = 1;
         bestEcart = 1;
-        if (BTEST1(6))
+        if (TEST_OPT_DEBUG)
         {
           PrintS("pair: ");pWrite0(S[j]);PrintS(" ");pWrite(S[k]);
         }
@@ -338,7 +338,7 @@ static ideal sySchreyersSyzygiesFM(ideal arg,intvec ** modcomp)
 //Print("Spoly: ");pWrite(toRed);
         while (pGetComp(toRed)<=rkF)
         {
-          if (BTEST1(6))
+          if (TEST_OPT_DEBUG)
           {
             PrintS("toRed: ");pWrite(toRed);
           }
@@ -620,7 +620,7 @@ if (modcomp!=NULL) (*modcomp)->show(0,0);
         pairs[k] = NULL;
         //the next term of the syzygy
         //constructs the spoly
-        if (BTEST1(6))
+        if (TEST_OPT_DEBUG)
         {
           if (k<Fl)
           {
@@ -644,7 +644,7 @@ if (modcomp!=NULL) (*modcomp)->show(0,0);
         isNotReduced = TRUE;
         while (toRed!=NULL)
         {
-          if (BTEST1(6))
+          if (TEST_OPT_DEBUG)
           {
             PrintS("toRed: ");pWrite(toRed);
           }
@@ -691,7 +691,7 @@ if (modcomp!=NULL) (*modcomp)->show(0,0);
           {
             //the next monom of the syzygy
             isNotReduced = TRUE;
-            if (BTEST1(6))
+            if (TEST_OPT_DEBUG)
             {
               PrintS("reduced with: ");pWrite(F[l]);
             }

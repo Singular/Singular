@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.41 2000-01-22 12:04:07 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.42 2000-03-31 12:15:01 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -225,7 +225,7 @@ static int redHoney (LObject*  h,kStrategy strat)
       i++;
       if (i > strat->tl)
         break;
-      if ((!BTEST1(20)) && (ei <= (*h).ecart))
+      if ((!TEST_OPT_REDBEST) && (ei <= (*h).ecart))
         break;
       if ((strat->T[i].ecart < ei) && 
           pShortDivisibleBy(strat->T[i].p, strat->T[i].sev,
@@ -508,7 +508,7 @@ void initBba(ideal F,kStrategy strat)
   idhdl h;
  /* setting global variables ------------------- */
   strat->enterS = enterSBba;
-  if ((BTEST1(20)) && (!strat->honey))
+  if ((TEST_OPT_REDBEST) && (!strat->honey))
     strat->red = redBest;
   else if (strat->honey)
     strat->red = redHoney;

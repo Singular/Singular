@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.57 2000-03-22 08:56:05 siebert Exp $ */
+/* $Id: syz1.cc,v 1.58 2000-03-31 12:15:02 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -1053,7 +1053,7 @@ static void syRedGenerOfCurrDeg(syStrategy syzstr, int deg, int index)
           syEnlargeFields(syzstr,index);
           res=syzstr->res[index];
         }
-        if (BTEST1(6))
+        if (TEST_OPT_DEBUG)
         {
           if ((sPairs)[i].isNotMinimal==NULL)
           {

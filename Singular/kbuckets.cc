@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.cc,v 1.12 1999-11-15 17:20:12 obachman Exp $ */
+/* $Id: kbuckets.cc,v 1.13 2000-03-31 12:15:01 Singular Exp $ */
 
 #include "mod2.h"
 #include "tok.h"
@@ -840,7 +840,7 @@ void kBucketRedHoney (LObject*  h,kStrategy strat)
         i++;
         if (i > strat->tl)
           break;
-        if ((!BTEST1(20)) && (ei <= (*h).ecart))
+        if ((!TEST_OPT_REDBEST) && (ei <= (*h).ecart))
           break;
         if ((strat->T[i].ecart < ei) && pDivisibleBy1(strat->T[i].p,lm))
         {
