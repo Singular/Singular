@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 #################################################################
-# $Id: regress.cmd,v 1.5 1998-04-23 12:44:46 obachman Exp $
+# $Id: regress.cmd,v 1.6 1998-04-23 13:40:45 obachman Exp $
 # FILE:    regress.cmd 
 # PURPOSE: Script which runs regress test of Singular
 # CREATED: 2/16/98
@@ -166,7 +166,7 @@ sub tst_check
     }
     else
     {
-      & mysystem("$gzip -f $root.res; $uuencode $root.res.gz $root.res.gz > $root.res.gz.uu");
+      & mysystem("$gzip -f $root.res; $uuencode $root.res.gz $root.res.gz > $root.res.gz.uu; $rm -rf $root.res.gz");
     }
   } 
   elsif ($generate eq "yes")
