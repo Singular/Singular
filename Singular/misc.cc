@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: misc.cc,v 1.5 1997-04-09 12:19:59 Singular Exp $ */
+/* $Id: misc.cc,v 1.6 1997-04-13 12:43:02 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -586,7 +586,7 @@ void showOption(int cmd)
       PrintLn();
     }
     else
-      PrintS("none\n");
+      PrintS(" none\n");
   }
   else
   {
@@ -609,7 +609,7 @@ void showOption(int cmd)
       PrintLn();
     }
     else
-      PrintS("minimum\n");
+      PrintS(" minimum\n");
   }
 }
 

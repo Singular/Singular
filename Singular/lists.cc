@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: lists.cc,v 1.4 1997-04-09 12:19:55 Singular Exp $ */
+/* $Id: lists.cc,v 1.5 1997-04-13 12:43:01 Singular Exp $ */
 /*
 * ABSTRACT: handling of the list type
 */
@@ -12,6 +12,7 @@
 #include "polys.h"
 #include "ideals.h"
 #include "attrib.h"
+#include "ipshell.h"
 #include "lists.h"
 
 lists lCopy(lists L)
@@ -99,7 +100,12 @@ BOOLEAN lInsert(leftv res, leftv u, leftv v)
 {
   lists ul=(lists)u->CopyD();
   res->data=(char *)lInsert0(ul,v,0);
-  return (res->data==NULL);
+  if (res->data==NULL)
+  {
+    Werror("cannot insert type `%s`",Tok2Cmdname(v->Typ()));
+    return TRUE;
+  }
+  return FALSE;
 }
 
 /*2
@@ -109,7 +115,13 @@ BOOLEAN lInsert3(leftv res, leftv u, leftv v, leftv w)
 {
   lists ul=(lists)u->CopyD();
   res->data=(char *)lInsert0(ul,v,(int)w->Data());
-  return (res->data==NULL);
+  if (res->data==NULL)
+  {
+    Werror("cannot insert type `%s` at pos. %d",
+      Tok2Cmdname(v->Typ()),(int)w->Data());
+    return TRUE;
+  }
+  return FALSE;
 }
 
 /*2

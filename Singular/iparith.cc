@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.18 1997-04-12 16:04:38 Singular Exp $ */
+/* $Id: iparith.cc,v 1.19 1997-04-13 12:43:00 Singular Exp $ */
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
 */
@@ -2387,6 +2387,7 @@ static BOOLEAN jjIm2Iv(leftv res, leftv v)
 }
 static BOOLEAN jjINDEPSET(leftv res, leftv v)
 {
+  assumeStdFlag(v);
   res->data=(void *)scIndIntvec((ideal)(v->Data()),currQuotient);
   return FALSE;
 }
