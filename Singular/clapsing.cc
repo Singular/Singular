@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.47 1999-03-15 13:58:30 Singular Exp $
+// $Id: clapsing.cc,v 1.48 1999-03-15 16:18:51 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -270,6 +270,8 @@ poly singclap_resultant ( poly f, poly g , poly x)
     WerrorS("3rd argument must be a ring variable");
     return NULL;
   }
+  if ((f==NULL) || (g==NULL))
+    return NULL;
   // for now there is only the possibility to handle polynomials over
   // Q and Fp ...
   if (( nGetChar() == 0 || nGetChar() > 1 )

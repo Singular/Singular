@@ -423,7 +423,7 @@ void sleftv::CleanUp()
   rtyp=NONE;
   if (next!=NULL)
   {
-    next->name=NULL;
+    //next->name=NULL;
     next->CleanUp();
     Free((ADDRESS)next,sizeof(sleftv));
     next=NULL;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.29 1998-12-10 13:14:23 krueger Exp $ */
+/* $Id: ipid.cc,v 1.30 1999-03-15 16:18:52 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -228,7 +228,7 @@ idhdl enterid(char * s, int lev, idtyp t, idhdl* root, BOOLEAN init)
 #ifdef KAI
         Warn("1 redefining %s **",s);
 #else
-        Warn(" redefining %s **",s);
+        Warn("redefining %s **",s);
 #endif
 #ifdef HAVE_NAMESPACES
         if(t==PACKAGE_CMD && strcmp(s,"Top")==0) {
@@ -258,7 +258,7 @@ idhdl enterid(char * s, int lev, idtyp t, idhdl* root, BOOLEAN init)
 #ifdef KAI
           Warn("2 redefining %s **",s);
 #else
-          Warn(" redefining %s **",s);
+          Warn("redefining %s **",s);
 #endif
         IDID(h)=NULL;
         killhdl(h,&IDROOT);
@@ -294,7 +294,7 @@ idhdl enterid(char * s, int lev, idtyp t, idhdl* root, BOOLEAN init)
 #ifdef KAI
           Warn("3 redefining %s **",s);
 #else
-          Warn(" redefining %s **",s);
+          Warn("redefining %s **",s);
 #endif
         IDID(h)=NULL;
         killhdl(h,&currRing->idroot);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.37 1999-03-11 15:58:06 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.38 1999-03-15 16:18:53 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -887,7 +887,7 @@ static BOOLEAN iiInternalExport (leftv v, int toLev)
 #ifdef KAI
           Warn("!!! redefining %s",IDID(h));
 #else
-          Warn(" redefining %s",IDID(h));
+          Warn("redefining %s",IDID(h));
 #endif
         }
 #ifdef HAVE_NAMESPACES
