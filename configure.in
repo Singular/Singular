@@ -2,6 +2,17 @@ dnl Process this file with autoconf to produce a configure script
 AC_INIT(Singular/matpol.h)
 AC_PREFIX_DEFAULT(`pwd`)
 
+dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
+dnl Version business -- should be the same as in Singular subdir 
+dnl
+SINGULAR_MAJOR_VERSION=1
+SINGULAR_MINOR_VERSION=1
+SINGULAR_SUB_VERSION=0
+VERSION_DATE="June 1997"
+AC_SUBST(SINGULAR_MAJOR_VERSION)
+AC_SUBST(SINGULAR_MINOR_VERSION)
+AC_SUBST(SINGULAR_SUB_VERSION)
+
 AC_CANONICAL_HOST
 AC_SUBST(host)
 
