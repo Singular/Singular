@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.141 2000-11-16 16:49:21 Singular Exp $ */
+/* $Id: ring.cc,v 1.142 2000-11-21 15:03:04 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -1486,7 +1486,7 @@ int rSum(ring r1, ring r2, ring &sum)
 
     if (b)
     {
-      //Print("name : %d: %s\n",k,r1->names[i]);
+      Print("name : %d: %s\n",k,r1->names[i]);
       names[k]=omStrDup(r1->names[i]);
       k++;
     }
@@ -1525,8 +1525,8 @@ int rSum(ring r1, ring r2, ring &sum)
       }
       if (b)
       {
+        Print("name : %d : %s\n",k,r2->names[i]);
         names[k]=omStrDup(r2->names[i]);
-        //Print("name : %d : %s\n",k,r2->names[i]);
         k++;
       }
       //else
@@ -1616,7 +1616,7 @@ int rSum(ring r1, ring r2, ring &sum)
         j--;
         tmpR.order[b-2]=r1->order[i];
       }
-      for (i=0;r2->order[i]!=0;i++,j++)
+      for (i=0;r2->order[i]!=0;i++)
       {
         if ((r2->order[i]!=ringorder_c)
             &&(r2->order[i]!=ringorder_C))
@@ -1628,6 +1628,7 @@ int rSum(ring r1, ring r2, ring &sum)
           {
             tmpR.wvhdl[j] = (int*) omMemDup(r2->wvhdl[i]);
           }
+	  j++;
         }
       }
       if((r1->OrdSgn==-1)||(r2->OrdSgn==-1))
