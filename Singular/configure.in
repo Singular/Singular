@@ -95,6 +95,36 @@ AC_AIX
 # not overwrite it explicitely
 if test "${GXX}" = yes && test "${ac_cxx_set}" = no; then
   CXX=gcc
+temp_cflags=${CXXFLAGS}
+
+# check whether gcc accepts --no-rtti
+AC_MSG_CHECKING(whether gcc accepts --no-rtti)
+CXXFLAGS="${CXXFLAGS} --no-rtti"
+AC_CACHE_VAL(ac_cv_cxx_have_rtti,
+AC_TRY_COMPILE(,,ac_cv_cxx_have_rtti=yes,ac_cv_cxx_have_rtti=no)
+)
+AC_MSG_RESULT(${ac_cv_cxx_have_rtti})
+if test "${ac_cv_cxx_have_rtti}" != yes; then
+CXXFLAGS=$temp_flags
+else
+CXX="${CXX} --no-rtti"
+fi
+
+# check whether gcc accepts --no-exceptions
+AC_MSG_CHECKING(whether gcc accepts --no-exceptions)
+CXXFLAGS="${CXXFLAGS} --no-exceptions"
+AC_CACHE_VAL(ac_cv_cxx_have_exceptions,
+AC_TRY_COMPILE(,,ac_cv_cxx_have_exceptions=yes,ac_cv_cxx_have_exceptions=no)
+)
+AC_MSG_RESULT(${ac_cv_cxx_have_exceptions})
+if test "${ac_cv_cxx_have_exceptions}" != yes; then
+CXXFLAGS=$temp_flags
+else
+CXX="${CXX} --no-exceptions"
+fi
+
+CXXFLAGS=$temp_flags
+
 fi
 
 # check whether the compiler accepts -pipe

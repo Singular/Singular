@@ -1,5 +1,5 @@
 dnl # emacs edit mode for this file is -*- sh -*-
-dnl # $Id: configure.in,v 1.27 2000-09-04 14:02:45 obachman Exp $
+dnl # $Id: configure.in,v 1.28 2000-12-12 12:35:13 obachman Exp $
 
 dnl #
 dnl # configure.in - process this file with `autoconf' to generate
@@ -12,7 +12,7 @@ dnl #
 #
 # - initialisation.
 #
-AC_REVISION($Id: configure.in,v 1.27 2000-09-04 14:02:45 obachman Exp $)
+AC_REVISION($Id: configure.in,v 1.28 2000-12-12 12:35:13 obachman Exp $)
 AC_INIT(canonicalform.cc)
 AC_CONFIG_HEADER(config.h)
 AC_CONFIG_AUX_DIR(bin)
@@ -148,6 +148,35 @@ else
     AC_MSG_WARN([we use \`-O2 -fomit-frame-pointer' as default for \`CFLAGS'
                     (instead of the configure default \`-g -O')])
   fi
+
+# check whether CXX accepts --no-rtti
+AC_MSG_CHECKING(whether gcc accepts --no-rtti)
+CXXFLAGS="${CXXFLAGS} --no-rtti"
+AC_CACHE_VAL(ac_cv_cxx_have_rtti,
+AC_TRY_COMPILE(,,ac_cv_cxx_have_rtti=yes,ac_cv_cxx_have_rtti=no)
+)
+AC_MSG_RESULT(${ac_cv_cxx_have_rtti})
+if test "${ac_cv_cxx_have_rtti}" != yes; then
+CXXFLAGS=$temp_flags
+else
+CXX="${CXX} --no-rtti"
+fi
+
+# check whether gcc accepts --no-exceptions
+AC_MSG_CHECKING(whether gcc accepts --no-exceptions)
+CXXFLAGS="${CXXFLAGS} --no-exceptions"
+AC_CACHE_VAL(ac_cv_cxx_have_exceptions,
+AC_TRY_COMPILE(,,ac_cv_cxx_have_exceptions=yes,ac_cv_cxx_have_exceptions=no)
+)
+AC_MSG_RESULT(${ac_cv_cxx_have_exceptions})
+if test "${ac_cv_cxx_have_exceptions}" != yes; then
+CXXFLAGS=$temp_flags
+else
+CXX="${CXX} --no-exceptions"
+fi
+
+CXXFLAGS=$temp_flags
+  
 fi
 
 #
