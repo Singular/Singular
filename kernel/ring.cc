@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.29 2005-02-08 18:59:36 levandov Exp $ */
+/* $Id: ring.cc,v 1.30 2005-02-09 12:55:38 levandov Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -3606,8 +3606,11 @@ ring rOpposite(ring src)
   /* that is R^opp, where f (*^opp) g = g*f  */
   /* treats the case of qring */
 {
-  ring save = currRing;  
-  ring    r = rCopy0(src,TRUE); /* TRUE for copy the qideal */
+  if (src == NULL) return(NULL);
+  ring save = currRing;
+  rChangeCurrRing(src);
+  ring r = rCopy0(src,TRUE); /* TRUE for copy the qideal */
+  /*  rChangeCurrRing(r); */
   // change vars v1..vN -> vN..v1
   int i;
   int i2 = (rVar(r)-1)/2;
@@ -3825,7 +3828,7 @@ ring rOpposite(ring src)
     return r;
   }
   {
-  rChangeCurrRing(r);  
+  rChangeCurrRing(r);  /* we were not in r */
   /* basic nc constructions  */
   r->nc           = (nc_struct *)omAlloc0(sizeof(nc_struct));
   r->nc->ref      = 1; /* in spite of rCopy(src)? */
