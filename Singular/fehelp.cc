@@ -116,10 +116,36 @@ void feHelp(char *str)
   str = strclean(str);
   if (str == NULL) {heBrowserHelp(NULL); return;}
 
+  BOOLEAN key_is_regexp = (strchr(str, '*') != NULL);
+#ifdef HAVE_NS
+  if (!key_is_regexp)
+  {
+    // test for help mod::p;
+    char *cc=strstr(str,"::");
+    if ((cc!=NULL) && (cc!=str))
+    {
+      char *cc=strstr(str,"::");
+      *cc='\0';
+      cc+=2;
+      idhdl pack=basePack->idroot->get(str,0);
+      if (IDTYP(pack)==PACKAGE_CMD)
+      {
+        package save=currPack;
+        currPack=IDPACKAGE(pack);
+        BOOLEAN r=heOnlineHelp(cc);
+        currPack=save;
+        if (r) return;
+	else
+        {
+          cc-=2; *cc=':';
+        }
+      }
+    }
+  }
+#endif
   if (strlen(str) > MAX_HE_ENTRY_LENGTH - 2)  // need room for extra **
     str[MAX_HE_ENTRY_LENGTH - 3] = '\0';
 
-  BOOLEAN key_is_regexp = (strchr(str, '*') != NULL);
   heEntry_s hentry;
   char* idxfile = feResource('x' /*"IdxFile"*/);
 
@@ -547,18 +573,31 @@ static BOOLEAN heOnlineHelp(char* s)
   // try help for a procedure
   if ((h!=NULL) && (IDTYP(h)==PROC_CMD))
   {
-    char *lib=iiGetLibName(IDPROC(h));
-    if((lib!=NULL)&&(*lib!='\0'))
+    procinfo *p=IDPROC(h);
+#ifdef HAVE_NS
+    if (p->language==LANG_SINGULAR)
+#endif
     {
-      Print("// proc %s from lib %s\n",s,lib);
-      s=iiGetLibProcBuffer(IDPROC(h), 0);
-      if (s!=NULL)
+      char *lib=iiGetLibName(p /*IDPROC(h)*/);
+      if((lib!=NULL)&&(*lib!='\0'))
       {
-        PrintS(s);
-        omFree((ADDRESS)s);
-      }
+        Print("// proc %s from lib %s\n",s,lib);
+        s=iiGetLibProcBuffer(p /*IDPROC(h)*/, 0);
+        if (s!=NULL)
+        {
+          PrintS(s);
+          omFree((ADDRESS)s);
+        }
+        return TRUE;
+     }
+    }
+#ifdef HAVE_NS
+    else if (p->language==LANG_C)
+    {
+      Print("// c-proc %s\n",s);
       return TRUE;
     }
+#endif
     return FALSE;
   }
 
