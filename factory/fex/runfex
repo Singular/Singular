@@ -1,5 +1,5 @@
 #! /home/schmidt/bin/bash
-# $Id: runfex,v 1.4 1998-01-30 15:23:43 schmidt Exp $
+# $Id: runfex,v 1.5 1998-02-02 11:00:54 schmidt Exp $
 
 #{{{ docu
 #
@@ -38,6 +38,8 @@ readonly EvalAlg="feval"
 # runOptions, collectionOptions, runEnvironment,
 # collectionEnvironment: options and environment for the
 #   examples.  Used by runAlgorithm().
+# runConfiguration: which configurations' executables to use.
+#   Used by runAlgorithm().
 # collectionROOptions: options to print run overview.  Use by
 #   main().
 # runTBOptions, collectionTBOptions: options to print XX tables.
@@ -53,6 +55,7 @@ readonly EvalAlg="feval"
 runOptions=""
 runEnvironment=""
 runTBOptions=""
+runConfiguration="opt"
 
 collectionOptions=""
 collectionEnvironment=""
@@ -91,7 +94,7 @@ warn()
 # rest: arguments to algorithm
 #
 # Global variables used:
-#   runOptions, runEnvironment,
+#   runOptions, runEnvironment, runConfiguration,
 #   collectionOptions, collectionEnvironment,
 #   exampleOptions, exampleEnvironment,
 #   debugMode
@@ -112,9 +115,9 @@ runAlgorithm()
     FTEST_ALARM=""
 
     if [ -n "$debugMode" ]; then
-	echo "calling $algorithmName" $algorithmOptions "$outputOptions" "$algorithmEnvironment" "$@"
+	echo "calling $algorithmName.$runConfiguration" $algorithmOptions "$outputOptions" "$algorithmEnvironment" "$@"
     else
-	"$algorithmName" $algorithmOptions "$outputOptions" "$algorithmEnvironment" "$@"
+	"$algorithmName.$runConfiguration" $algorithmOptions "$outputOptions" "$algorithmEnvironment" "$@"
     fi
 }
 #}}}
@@ -447,11 +450,12 @@ typeset rawCollectionName=""
 #{{{ read options and environment
 # read options
 typeset opt
-while getopts "n:a:c:t:r:d" opt; do
+while getopts "n:a:c:C:t:r:d" opt; do
     case "$opt" in
 	(n)  runNote="$OPTARG" ;;
 	(a)  runOptions="$runOptions -a$OPTARG" ;;
 	(c)  runOptions="$runOptions -c$OPTARG" ;;
+	(C)  runConfiguration="$OPTARG" ;;
 	(t)  runTBOptions="$OPTARG" ;;
 	(r)  runROOptions="$OPTARG" ;;
 	(d)  debugMode="1" ;;
