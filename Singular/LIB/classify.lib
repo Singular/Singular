@@ -1,8 +1,8 @@
-// $Id: classify.lib,v 1.30 1999-01-26 15:26:05 Singular Exp $
+// $Id: classify.lib,v 1.31 1999-05-28 09:31:35 krueger Exp $
 // KK, last modified: 04.04.1998
 ///////////////////////////////////////////////////////////////////////////////
 
-version  = "$Id: classify.lib,v 1.30 1999-01-26 15:26:05 Singular Exp $";
+version  = "$Id: classify.lib,v 1.31 1999-05-28 09:31:35 krueger Exp $";
 info="
 LIBRARY:  classify.lib  PROCEDURES FOR THE ARNOLD-CLASSIFIER OF SINGULARITIES
 
@@ -1027,7 +1027,7 @@ proc Funktion82 (poly f, list cstn)
     }
     if(Fall == 2) {
        v = tschirnhaus(f3/x(kz), x(kx));
-       b1, VERT = [1..2];
+       b1, VERT = v[1..2];
     }
     if(Fall == 3) {
       v = tschirnhaus(f3/x(kx), x(kx));
