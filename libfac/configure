@@ -529,9 +529,9 @@ fi
 
 libfac_name="\"Factorization and characteristic sets library\""
 
-libfac_version="0.3.0"
+libfac_version="0.3.2"
 
-libfac_date="\"Sep 11 1997\""
+libfac_date="\"Jan 31 2001\""
 
 libfac_author="\"M. Messollen\""
 
@@ -586,14 +586,14 @@ fi
 
 if (test "x${prefix} != xNONE && test "${prefix} != "/usr/local") || \
   test "${ac_default_prefix}" != "/usr/local" || \
-  test "${includedir}" != '${prefix}/include'; then 
+  test "${includedir}" != '${prefix}/include'; then
   CPPFLAGS="-I${includedir} ${CPPFLAGS}"
 fi
 CPPFLAGS="-I./factor ${CPPFLAGS}"
 
 if (test "x${prefix} != xNONE && test "${prefix} != "/usr/local") || \
   test "${ac_default_prefix}" != "/usr/local" || \
-  test "${libdir}" != '${prefix}/lib'; then 
+  test "${libdir}" != '${prefix}/lib'; then
   LDFLAGS="-L${libdir} ${LDFLAGS}"
 fi
 LDFLAGS="-L. ${LDFLAGS}"
@@ -608,7 +608,7 @@ if test "${CXXFLAGS+set}" != set; then
 #define NDEBUG 1
 EOF
 
-  fi  
+  fi
 fi
 
 ac_ext=C
@@ -617,7 +617,7 @@ ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='${CXX-g++} -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext 1>&5'
 ac_link='${CXX-g++} -o conftest${ac_exeext} $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
 cross_compiling=$ac_cv_prog_cxx_cross
-  
+
 for ac_prog in $CCC c++ g++ gcc CC cxx cc++ cl
 do
 # Extract the first word of "$ac_prog", so it can be a program name with args.
@@ -1151,7 +1151,7 @@ else
   CXXTEMPFLAGS=""
 fi
 
-  
+
 trap '' 1 2 15
 cat > confcache <<\EOF
 # This file is a shell script that caches the results of configure

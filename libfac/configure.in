@@ -14,9 +14,9 @@ dnl Change libfac variables here:
 AC_SUBST(libfac_name)
 libfac_name="\"Factorization and characteristic sets library\""
 AC_SUBST(libfac_version)
-libfac_version="0.3.0"
+libfac_version="0.3.2"
 AC_SUBST(libfac_date)
-libfac_date="\"Sep 11 1997\""
+libfac_date="\"Jan 31 2001\""
 AC_SUBST(libfac_author)
 libfac_author="\"M. Messollen\""
 
@@ -61,18 +61,18 @@ else
 fi
 
 dnl
-dnl add to -I and -L, if necessary 
+dnl add to -I and -L, if necessary
 dnl
 if (test "x${prefix} != xNONE && test "${prefix} != "/usr/local") || \
   test "${ac_default_prefix}" != "/usr/local" || \
-  test "${includedir}" != '${prefix}/include'; then 
+  test "${includedir}" != '${prefix}/include'; then
   CPPFLAGS="-I${includedir} ${CPPFLAGS}"
 fi
 CPPFLAGS="-I./factor ${CPPFLAGS}"
 
 if (test "x${prefix} != xNONE && test "${prefix} != "/usr/local") || \
   test "${ac_default_prefix}" != "/usr/local" || \
-  test "${libdir}" != '${prefix}/lib'; then 
+  test "${libdir}" != '${prefix}/lib'; then
   LDFLAGS="-L${libdir} ${LDFLAGS}"
 fi
 LDFLAGS="-L. ${LDFLAGS}"
@@ -84,13 +84,13 @@ if test "${CXXFLAGS+set}" != set; then
   else
     CXXFLAGS="-O"
     AC_DEFINE(NDEBUG)
-  fi  
+  fi
 fi
 
 dnl
 dnl Checks for programs.
 dnl
-AC_LANG_CPLUSPLUS  
+AC_LANG_CPLUSPLUS
 AC_PROG_CXX
 AC_REQUIRE_CPP
 AC_PROG_MAKE_SET
@@ -104,7 +104,7 @@ dnl
 dnl programs for installation
 dnl
 dnl ac_save_path=${PATH}
-dnl PATH="$PATH:.."  
+dnl PATH="$PATH:.."
 dnl AC_PROG_INSTALL
 dnl AC_PATH_PROG(MKINSTALLDIRS, mkinstalldirs, -mkdir -p)
 dnl PATH="$ac_save_path"
@@ -174,10 +174,10 @@ else
   CXXTEMPFLAGS=""
 fi
 AC_SUBST(CXXTEMPLFLAGS)
-  
+
 AC_OUTPUT(Makefile)
 
-dnl 
+dnl
 dnl Plans:
 dnl 1) look for libraries (warn if not found) for building testprog
 dnl 1) search for perl
