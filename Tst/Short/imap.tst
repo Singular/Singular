@@ -1,5 +1,5 @@
 LIB "tst.lib";
-tst_init();
+tst_init(); option(Imap);
 
 ring r0 = 0, (a,b,x,y), lp;
 poly p = 1 + a + a2 + b + ab + ax + ay + bx + x + y + xy; p;

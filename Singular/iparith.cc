@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.242 2000-12-18 15:44:40 obachman Exp $ */
+/* $Id: iparith.cc,v 1.243 2000-12-18 18:26:31 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1678,14 +1678,14 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
     if ((iiOp==FETCH_CMD) &&(BVERBOSE(V_IMAP)))
     {
       int i;
-      for(i=1;i<=min(r->N,pVariables);i++)
+      for(i=0;i<min(r->N,pVariables);i++)
       {
-        Print("// var nr %d: %s -> %s\n",i,r->names[i+1],currRing->names[i+1]);
+        Print("// var nr %d: %s -> %s\n",i,r->names[i],currRing->names[i]);
       }
-      for(i=1;i<=min(rPar(r),rPar(currRing));i++) // possibly empty loop
+      for(i=0;i<min(rPar(r),rPar(currRing));i++) // possibly empty loop
       {
         Print("// par nr %d: %s -> %s\n",
-              i,r->parameter[i+1],currRing->parameter[i+1]);
+              i,r->parameter[i],currRing->parameter[i]);
       }
     }
     sleftv tmpW;
