@@ -239,6 +239,8 @@ windist: ${WIN_SHAREDIST_NAME}.tar.gz ${SINGULAR}
 	cp ${TMPDIR}/sing.zip Singular-${S_VERSION}-${SINGUNAME}.zip 
 	rm -rf ${TMPDIR}
 
+rpmdist:
+	cd rpm; ${MAKE} rpm
 
 ##############################################################
 # stuff for configure
