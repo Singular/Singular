@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: maps.cc,v 1.33 2000-12-19 18:31:43 obachman Exp $ */
+/* $Id: maps.cc,v 1.34 2000-12-20 11:23:47 Singular Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */
@@ -214,7 +214,8 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id)
   char** names = (char**) omAlloc0(N*sizeof(char*));
 
   memcpy(names, currRing->names, currRing->N*sizeof(char*));
-  memcpy(&(names[currRing->N]), theImageRing->names, (theImageRing->N*sizeof(char*)));
+  memcpy(&(names[currRing->N]), theImageRing->names,
+          (theImageRing->N*sizeof(char*)));
   sip_sring tmpR;
 
   if (theImageRing->OrdSgn == 1) orders[0] = ringorder_dp;
@@ -367,7 +368,7 @@ void maFindPerm(char **preim_names, int preim_n, char **preim_par, int preim_p,
         {
           if (BVERBOSE(V_IMAP))
             Print("// par %s: par %d -> nr %d\n",preim_par[i],i+1,j+1);
-          /* var i+1 from preimage ring is var j+1  (index j+1) from image ring */
+          /*par i+1 from preimage ring is var j+1  (index j+1) from image ring*/
           par_perm[i]=j+1;
           break;
         }
@@ -380,7 +381,7 @@ void maFindPerm(char **preim_names, int preim_n, char **preim_par, int preim_p,
           {
             if (BVERBOSE(V_IMAP))
               Print("// par %s: nr %d -> par %d\n",preim_par[i],i+1,j+1);
-            /* var i+1 from preimage ring is par j+1 (index j) from image ring */
+            /*par i+1 from preimage ring is par j+1 (index j) from image ring */
             par_perm[i]=-(j+1);
           }
         }

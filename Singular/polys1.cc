@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.59 2000-12-20 11:15:48 obachman Exp $ */
+/* $Id: polys1.cc,v 1.60 2000-12-20 11:23:47 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -301,6 +301,7 @@ static poly pPow(poly p, int i)
   do
   {
     rc = pMult(rc,pCopy(p));
+    pNormalize(rc);
     i--;
   }
   while (i != 0);
@@ -360,7 +361,7 @@ poly pPower(poly p, int i)
           rc = pNext(p);
           if (rc == NULL)
             return pMonPower(p,i);
-          /* else: binom */
+          /* else: binom ?*/
           int char_p=rChar(currRing);
           if (pNext(rc) != NULL)
             return pPow(p,i);
