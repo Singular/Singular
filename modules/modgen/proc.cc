@@ -1,5 +1,5 @@
 /*
- * $Id: proc.cc,v 1.3 2000-01-21 09:23:21 krueger Exp $
+ * $Id: proc.cc,v 1.4 2000-01-21 13:38:52 krueger Exp $
  */
 
 #include <stdio.h>
@@ -109,7 +109,7 @@ void write_function_declaration(
     fprintf(module->fmtfp, "  int tok = NONE, index = 0;\n");
     for (i=0;i<pi->paramcnt; i++)
       fprintf(module->fmtfp, 
-              "  leftv res%d = (leftv)Alloc0(sizeof(sleftv));\n", i);
+              "  sleftv sres%d; leftv res%d = &sres%d;\n", i, i, i);
 
     fprintf(module->fmtfp, "\n");
     pi->flags.declaration_done = 1;
