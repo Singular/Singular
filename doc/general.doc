@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.58 1998-05-13 07:38:51 Singular Exp $
+@comment $Id: general.doc,v 1.59 1998-05-13 07:59:29 wichmann Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -174,7 +174,7 @@ and select the node in which the next occurrence is found
 @subsection Interrupting SINGULAR
 @cindex Interrupting SINGULAR
 
-Typing @code{CTRL-C} (control C) interrupts Singular (system dependend).
+Typing @code{CTRL-C} (control C) interrupts @sc{Singular} (system dependend).
 @sc{Singular} prints the current command and the current line.
 You have the following choices:
 @table @code
@@ -413,8 +413,8 @@ if an option was not given), can be checked with the command
 @strong{Example:}
 @example
 @c example
-system("--quiet");    // if "quiet" 1, otherwise 0
-system("--min-time"); // minimal reported time 
+  system("--quiet");    // if "quiet" 1, otherwise 0
+  system("--min-time"); // minimal reported time 
 @c example
 @end example
 @c --------------------------------------------------------------------------
@@ -1213,11 +1213,11 @@ the attributes by means of @code{attrib}:
 
 @example
 @c example
-ring r=0,x,dp;
-typeof(10); typeof(10000000000000000);
-typeof(r);
-attrib(x);
-attrib(std(x));
+  ring r=0,x,dp;
+  typeof(10); typeof(10000000000000000);
+  typeof(r);
+  attrib(x);
+  attrib(std(x));
 @c example
 @end example
 
@@ -2263,13 +2263,13 @@ example, using the command @code{execute} (see @ref{execute}).
 @strong{Example:}
 @example
 @c example
-// (over)write file test.ascii, link is specified as string
-write(":w test.ascii", "int i =", 3, ";"); 
-// reading simply returns the string
-read("test.ascii"); 
-// but now test.ascii is "executed"
-execute read("test.ascii");
-i;
+  // (over)write file test.ascii, link is specified as string
+  write(":w test.ascii", "int i =", 3, ";"); 
+  // reading simply returns the string
+  read("test.ascii"); 
+  // but now test.ascii is "executed"
+  execute read("test.ascii");
+  i;
 @c example
 @end example
 ASCII links should primarily be used for storing small amounts of data,
@@ -2286,12 +2286,12 @@ general).
 @strong{Example:}
 @example
 @c example
-ring r;
-// (over)write MPfile test.mp, link is specified as string
-write("MPfile:w test.mp", x+y); 
-kill r;
-def p = read("MPfile:r test.mp");
-typeof(p); p;
+  ring r;
+  // (over)write MPfile test.mp, link is specified as string
+  write("MPfile:w test.mp", x+y); 
+  kill r;
+  def p = read("MPfile:r test.mp");
+  typeof(p); p;
 @c example
 @end example
 MPfile links should primarily be used for storing large amounts of data
@@ -2308,14 +2308,14 @@ in the binary MP format.
 @strong{Example:}
 @example
 @c example
-ring r; 
-link l = "MPtcp:launch"; // declare a link explicitely
-open(l); // need an open, launches another Singular as a server
-write(l, x+y);
-kill r;
-def p = read(l);
-typeof(p); p;
-close(l); // shuts down Singular server
+  ring r; 
+  link l = "MPtcp:launch"; // declare a link explicitely
+  open(l); // need an open, launches another SINGULAR as a server
+  write(l, x+y);
+  kill r;
+  def p = read(l);
+  typeof(p); p;
+  close(l); // shuts down SINGULAR server
 @c example
 @end example
 MPtcp links should primarily be used for communications with other
@@ -2331,11 +2331,11 @@ the specfied data base. Reading is accomplished w.r.t. a key
 @strong{Example:}
 @example
 @c example
-ring r;
-// associate "x+y" with "mykey"
-write("DBM:w test.dbm", "mykey", string(x+y));
-// get from data base what is stored under "mykey"
-execute read("DBM: test.dbm", "mykey");
+  ring r;
+  // associate "x+y" with "mykey"
+  write("DBM:w test.dbm", "mykey", string(x+y));
+  // get from data base what is stored under "mykey"
+  execute read("DBM: test.dbm", "mykey");
 @c example
 @end example
 DBM links should primarily be used when data needs to be accessed not in a
@@ -2353,11 +2353,11 @@ content of an entire @sc{Singular} session to (resp. from) a link.
 @strong{Example:}
 @example
 @c example
-ring r; poly p = x+y;
-dump("MPfile:w test.mp");
-kill r;
-getdump("MPfile:r test.mp");
-listvar();
+  ring r; poly p = x+y;
+  dump("MPfile:w test.mp");
+  kill r;
+  getdump("MPfile:r test.mp");
+  listvar();
 @c example
 @end example
 
@@ -2370,11 +2370,11 @@ checked for using the @code{status} (see @ref{status}) command.
 @strong{Example:}
 @example
 @c example
-link l = "MPtcp:fork";
-l;
-open(l);
-l;
-status(l, "mode");
-close(l);
+  link l = "MPtcp:fork";
+  l;
+  open(l);
+  l;
+  status(l, "mode");
+  close(l);
 @c example
 @end example
