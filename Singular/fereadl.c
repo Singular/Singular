@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: fereadl.c,v 1.21 2001-08-27 14:47:00 Singular Exp $ */
+/* $Id: fereadl.c,v 1.22 2002-07-24 15:36:56 Singular Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -192,7 +192,7 @@ int     fe_cursor_line; /* 0..pagelength-1*/
 #endif
 
 static char termcap_buff[2048];
-static int fe_out_char(char c)
+static int fe_out_char(int c)
 {
   fputc(c,fe_echo);
   return c;
@@ -292,10 +292,10 @@ void fe_init (void)
       char *temp;
 
       /* Extract information that termcap functions use.  */
-      temp = tgetstr ("pc", &t_buf);
+      temp = tgetstr ("pc", (char **)&t_buf);
       PC = (temp!=NULL) ? *temp : '\0';
-      BC=tgetstr("le",&t_buf);
-      UP=tgetstr("up",&t_buf);
+      BC=tgetstr("le",(char **)&t_buf);
+      UP=tgetstr("up",(char **)&t_buf);
 
       /* Extract information we will use */
       colmax=tgetnum("co");
@@ -303,7 +303,7 @@ void fe_init (void)
       fe_cursor_line=pagelength-1;
 
       /* init screen */
-      temp = tgetstr ("ti", &t_buf);
+      temp = tgetstr ("ti", (char **)&t_buf);
       #if 0
       if (temp!=NULL) tputs(temp,1,fe_out_char);
       #endif
@@ -455,7 +455,8 @@ static void fe_set_cursor(char *s,int i)
   if (0)/*(fe_cursor_pos>1) && (i>0))*/
   {
     /*fputs(tgoto(tgetstr("cm",&tgoto_buf),fe_cursor_pos-1,fe_cursor_line),fe_echo);*/
-    tputs(tgoto(tgetstr("cm",&tgoto_buf),fe_cursor_pos-1,fe_cursor_line),
+    tputs(
+      tgoto(tgetstr("cm",(char **)&tgoto_buf),fe_cursor_pos-1,fe_cursor_line),
       pagelength,fe_out_char);
     fputc(s[i-1],fe_echo);
   }
@@ -463,7 +464,7 @@ static void fe_set_cursor(char *s,int i)
   {
     /*fputs(
       tgoto(tgetstr("cm",&tgoto_buf),fe_cursor_pos,fe_cursor_line),fe_echo);*/
-    tputs(tgoto(tgetstr("cm",&tgoto_buf),fe_cursor_pos,fe_cursor_line),
+    tputs(tgoto(tgetstr("cm",(char **)&tgoto_buf),fe_cursor_pos,fe_cursor_line),
       pagelength,fe_out_char);
   }
   fflush(fe_echo);
