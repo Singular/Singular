@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.24 2000-12-13 17:25:16 Singular Exp $
+@comment $Id: NEWS.texi,v 1.25 2000-12-15 16:20:47 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -100,7 +100,7 @@ visualization of curves and surfaces with @code{surf}
 Rees Algebra and integral closure of an ideal
 @item @nref{brnoeth_lib}
 Brill-Noether algorithm, Weierstrass semigroups and AG codes
-@item @nref{stratify_lib}
+@c @item @nref{stratify_lib}
 @item @nref{paramet_lib}
 @item @nref{rinvar_lib}
 @item @nref{zeroset_lib}

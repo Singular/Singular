@@ -1,13 +1,12 @@
-// $Id: spectrum.lib,v 1.6 2000-12-15 11:51:57 Singular Exp $
+// $Id: spectrum.lib,v 1.7 2000-12-15 16:20:45 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: spectrum.lib,v 1.6 2000-12-15 11:51:57 Singular Exp $";
+version="$Id: spectrum.lib,v 1.7 2000-12-15 16:20:45 Singular Exp $";
 info="
 LIBRARY:  spectrum.lib   PROCEDURES FOR COMPUTING SINGULARITY SPECTRA
 
 PROCEDURES:
- spectrum(poly);        spectrum of a isolated singularity
- spectrum(poly[,1]);    spectrum of a isolated singularity without tests
+ spectrum(poly[,1]);    spectrum of a isolated singularity (with/without tests)
  semic(s1,s2[,1]);      tests if s2 is semicontinous for s1 using
                         half open intervalls
                         (and open intervalls for a 3rd paramater 1)
