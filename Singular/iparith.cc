@@ -3190,7 +3190,8 @@ struct sValCmd1 dArith1[]=
 ,{jjREAD,       READ_CMD,        STRING_CMD,     LINK_CMD }
 ,{jjREGULARITY, REGULARITY_CMD,  INT_CMD,        LIST_CMD }
 ,{jjRESERVEDNAME,RESERVEDNAME_CMD, INT_CMD,      STRING_CMD }
-,{jjL2R,        RESOLUTION_CMD,  RESOLUTION_CMD, LIST_CMD }
+//,{jjL2R,        RESOLUTION_CMD,  RESOLUTION_CMD, LIST_CMD }
+,{jjDUMMY,      RESOLUTION_CMD,  RESOLUTION_CMD, RESOLUTION_CMD }
 ,{jjWRONG,      ROWS_CMD,        0,              POLY_CMD }
 ,{jjpMaxComp,   ROWS_CMD,        XS(INT_CMD),    VECTOR_CMD }
 ,{jjROWS,       ROWS_CMD,        INT_CMD,        MODUL_CMD }
@@ -3201,7 +3202,7 @@ struct sValCmd1 dArith1[]=
 ,{jjSort_Id,    SORTVEC_CMD,     INTVEC_CMD,     MODUL_CMD }
 ,{jjSTD,        STD_CMD,         IDEAL_CMD,      IDEAL_CMD }
 ,{jjSTD,        STD_CMD,         MODUL_CMD,      MODUL_CMD }
-,{jjSTRING,     STRING_CMD,      STRING_CMD,     STRING_CMD }
+,{jjDUMMY,      STRING_CMD,      STRING_CMD,     STRING_CMD }
 ,{jjSTRING,     STRING_CMD,      STRING_CMD,     INT_CMD }
 ,{jjSTRING,     STRING_CMD,      STRING_CMD,     POLY_CMD }
 ,{jjSTRING,     STRING_CMD,      STRING_CMD,     VECTOR_CMD }
