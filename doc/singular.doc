@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.16 1998-05-06 14:02:18 Singular Exp $
+@comment $Id: singular.doc,v 1.17 1998-05-07 16:38:56 Singular Exp $
 @comment this file contains the main structure of the manual
 @c ------------------------
 @comment %**start of header
@@ -144,7 +144,7 @@ displays only the first 20 characters
 @end table
 
 @c -------------------------------------------------------------------------
-@node Major differences to the C programming language,Evaluation of logical expressions,Monomials and precedence,Tricks and pitfalls
+@node Major differences to the C programming language,Miscellaneous oddities,Limitations,Tricks and pitfalls
 @section Major differences to the C programming language
 @cindex C programming language
 
@@ -153,35 +153,37 @@ to those from the C programming language, there are some subtle
 differences. Most notably:
 
 @menu
-* no rvalue of increments::
-* no rvalue of assignments::
-* no left-to-right evaluation of logical expressions::
-* no case/switch statement::
-* usage of commas::
-* usage of brackets::
-* behaviour of continue::
+* No rvalue of increments::
+* No rvalue of assignments::
+* Evaluation of logical expressions::
+* No case/switch statement::
+* Usage of commas::
+* Usage of brackets::
+* Behaviour of continue::
 @end menu
 @c ---------------------------------------
-@node no rvalue of increments, no rvalue of assignments,,Major differences to the C programming language 
-@subsection no rvalue of increments
+@node No rvalue of increments, No rvalue of assignments,,Major differences to the C programming language 
+@subsection No rvalue of increments
 @cindex rvalue of increments
- The increment @code{++} (resp. decrement operator @code{--}) has no rvalue 
- rvalue, i.e. can not be used on the right-hand sides of 
- assignments. So, instead of 
+The increment @code{++} (resp. decrement operator @code{--}) has no rvalue 
+rvalue, i.e. can not be used on the right-hand sides of 
+assignments. So, instead of 
 @*@code{j = i++;  // WRONG!!!}
 @*(which results in an error), it must be written
 @*@code{i++; j = i;}
 
 @c ---------------------------------------
-@node no rvalue of assignments, no left-to-right evaluation of logical expressions, no rvalue of increments, Major differences to the C programming language
-@subsection no rvalue of assignments
+@node No rvalue of assignments, Evaluation of logical expressions, No rvalue of increments, Major differences to the C programming language
+@subsection No rvalue of assignments
 @cindex rvalue of assignments 
-An assignment expression does not have a result, i.e., does not have an rvalue. Therefore, compound assignments like @code{i = j = k;} are not allowed. However, the following works:
+An assignment expression does not have a result, i.e., does not have an rvalue.
+Therefore, compound assignments like @code{i = j = k;} are not allowed.
+However, the following works:
 @*@code{string s; int i;}
 @*@code{s, i = "Hello", 2;}
 
 @c ---------------------------------------
-@node Evaluation of logical expressions, no case/switch statement, no rvalue of assignments, Major differences to the C programming language
+@node Evaluation of logical expressions, No case/switch statement, No rvalue of assignments, Major differences to the C programming language
 @subsection Evaluation of logical expressions
 @cindex and
 @cindex or
@@ -232,8 +234,8 @@ value is overwritten.
 @end enumerate
 
 @c ---------------------------------------
-@node no case/switch statement,  usage of commas, no left-to-right evaluation of logical expressions, Major differences to the C programming language
-@subsection no case/switch statement
+@node No case/switch statement,  Usage of commas, Evaluation of logical expressions, Major differences to the C programming language
+@subsection No case/switch statement
 @cindex case
 @cindex switch
 
@@ -250,13 +252,15 @@ statement. However, it can be imitated in the following way:
   @}
 @end example
 
-@node  usage of commas, usage of brackets, no case/switch statement, Major differences to the C programming language
-@subsection usage of commas
+@c ---------------------------------------
+@node Usage of commas, Usage of brackets, No case/switch statement, Major differences to the C programming language
+@subsection Usage of commas
 @cindex comma
 
-@c ---------------------------------------
 In Singular, a comma separates list elements and the value of a comma
-expression is a list. Hence, commas can not be used to combine several expressions into a single expression. For example, instead of writing
+expression is a list.
+Hence, commas can not be used to combine several expressions into
+a single expression. For example, instead of writing
 @example
  for (i=1, j=5; i<j; i++, j++) @{@dots{}@} // WRONG!!!!!! 
 @end example
@@ -266,8 +270,8 @@ you have to write
 @end example
 
 @c ---------------------------------------
-@node  usage of brackets, behaviour of continue, usage of commas, Major differences to the C programming language
-@subsection usage of brackets
+@node Usage of brackets, Behaviour of continue, Usage of commas, Major differences to the C programming language
+@subsection Usage of brackets
 @cindex bracket
 
 In Singular, curly brackets (i.e. "@code{@{@}}") @strong{must always} be
@@ -282,7 +286,7 @@ For example,
 @end example
 results in a errors. Instead, it must be written as
 @example
-  if (i == 1) return (i); 
+  if (i == 1) @{ return (i); @} 
 @end example
 
 On the other hand, more than one value can be returned by a single
@@ -293,8 +297,8 @@ int i,j = tworeturn();
 @end example
 
 @c ---------------------------------------
-@node  behaviour of continue,, usage of brackets, Major differences to the C programming language
-@subsection behaviour of continue
+@node  Behaviour of continue,, Usage of brackets, Major differences to the C programming language
+@subsection Behaviour of continue
 @cindex continue 
 Singular's @code{continue} construct is only valid inside the body of
 the @code{for} construct. It skips the rest of the loop-body and jumps
@@ -320,7 +324,7 @@ example,
 
 
 @c -------------------------------------------------------------------------
-@node Miscellaneous oddities,,Major differences to the C programming language, Tricks and Pitfalls
+@node Miscellaneous oddities,,Major differences to the C programming language, Tricks and pitfalls
 @section Miscellaneous oddities
 
 @enumerate
