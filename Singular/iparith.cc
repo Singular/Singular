@@ -896,13 +896,17 @@ static BOOLEAN jjLT_N(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjDIV_I(leftv res, leftv u, leftv v)
 {
+  int a= (int) u->Data();
   int b= (int) v->Data();
   if (b==0)
   {
     WerrorS("div. by 0");
     return TRUE;
   }
-  res->data = (char *)((int)u->Data() / b);
+  //int c=a%ABS(b);
+  //if(c<0) c+=ABS(b);
+  //res->data = (char *)((a-c) / b);
+  res->data = (char *)(a / b);
   return FALSE;
 }
 static BOOLEAN jjDIV_N(leftv res, leftv u, leftv v)
@@ -945,14 +949,14 @@ static BOOLEAN jjDIV_P(leftv res, leftv u, leftv v)
 static BOOLEAN jjMOD_I(leftv res, leftv u, leftv v)
 {
   int a=(int)u->Data();
-  int b=(int)v->Data();
+  int b=ABS((int)v->Data());
   if (errorreported) return TRUE;
   if (b==0)
   {
     WerrorS("div. by 0");
     return TRUE;
   }
-  int c=a%ABS(b);
+  int c=a%b;
   if(c<0) c+=b;
   res->data = (char *)c;
   return FALSE;
