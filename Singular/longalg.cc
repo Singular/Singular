@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.38 1999-11-15 17:20:19 obachman Exp $ */
+/* $Id: longalg.cc,v 1.39 2000-02-02 14:25:44 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -2367,6 +2367,26 @@ number naMapQaQb(number c)
   erg->s=src->s;
   erg->z=napMap(src->z);
   erg->n=napMap(src->n);
+  if (naMinimalPoly!=NULL)
+  {
+    if (erg->z->e[0] >= naMinimalPoly->e[0])
+    {
+      erg->z = napRemainder(erg->z, naMinimalPoly);
+      if (erg->z==NULL)
+      {
+        number t_erg=(number)erg;
+        naDelete(&t_erg);
+	return (number)NULL;
+      }
+    }
+    if (erg->n!=NULL)
+    {
+      if (erg->n->e[0] >= naMinimalPoly->e[0])
+        erg->n = napRemainder(erg->n, naMinimalPoly);
+      if ((napDeg(erg->n)==0) && nacIsOne(erg->n->ko))
+        napDelete(&(erg->n));
+    }
+  }
   return (number)erg;
 }
 
