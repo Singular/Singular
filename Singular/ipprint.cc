@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipprint.cc,v 1.15 1999-11-15 17:20:11 obachman Exp $ */
+/* $Id: ipprint.cc,v 1.16 2000-02-03 12:29:22 siebert Exp $ */
 /*
 * ABSTRACT: interpreter: printing
 */
@@ -18,6 +18,7 @@
 #include "ipshell.h"
 #include "ipprint.h"
 #include "ideals.h"
+#include "attrib.h"
 
 /*2
 * print for: int, string, poly, vector, ideal
@@ -284,6 +285,7 @@ BOOLEAN jjDBPRINT(leftv res, leftv u)
 static void ipPrintBetti(leftv u)
 {
   int i,j;
+  int row_shift=(int)atGet(u,"rowShift");
   intvec * betti=(intvec *)u->Data();
   // head line --------------------------------------------------------
   PrintS("      "); // 6 spaces for no. and :
@@ -294,7 +296,7 @@ static void ipPrintBetti(leftv u)
   // the table --------------------------------------------------------
   for(i=0;i<betti->rows();i++)
   {
-    Print("%5d:",i);
+    Print("%5d:",i+row_shift);
     for(j=1;j<=betti->cols();j++)
     {
       int m=IMATELEM(*betti,i+1,j);

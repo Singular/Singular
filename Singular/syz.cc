@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.cc,v 1.33 1999-11-25 13:12:26 siebert Exp $ */
+/* $Id: syz.cc,v 1.34 2000-02-03 12:29:23 siebert Exp $ */
 
 /*
 * ABSTRACT: resolutions
@@ -718,12 +718,14 @@ void syDetect(ideal id,int index,int rsmin, BOOLEAN homog,
 * and the regularity
 */
 intvec * syBetti(resolvente res,int length, int * regularity,
-                 intvec* weights,BOOLEAN tomin)
+                 intvec* weights,BOOLEAN tomin,int * row_shift)
 {
+//#define BETTI_WITH_ZEROS
   //tomin = FALSE;
   int i,j=0,k=0,l,rows,cols,mr;
   int *temp1,*temp2,*temp3;/*used to compute degrees*/
   int *tocancel; /*(BOOLEAN)tocancel[i]=element is superfluous*/
+  int r0_len;
 
   /*------ compute size --------------*/
   *regularity = -1;
@@ -743,6 +745,8 @@ intvec * syBetti(resolvente res,int length, int * regularity,
       result = NewIntvec3(1,1,res[0]->rank);
     return result;
   }
+  r0_len=IDELEMS(res[0]);
+  while ((r0_len>0) && (res[0]->m[r0_len-1]==NULL)) r0_len--;
   intvec *w=NULL;
   if (idHomModule(res[0],currQuotient,&w)!=isHomog)
   {
@@ -768,7 +772,7 @@ intvec * syBetti(resolvente res,int length, int * regularity,
     for (j=0;j<IDELEMS(res[i]);j++)
     {
       if (res[i]->m[j]!=NULL)
-     {
+      {
         if ((pGetComp(res[i]->m[j])>l)
         || ((i>1) && (res[i-1]->m[pGetComp(res[i]->m[j])-1]==NULL)))
         {
@@ -812,6 +816,10 @@ intvec * syBetti(resolvente res,int length, int * regularity,
         //(*result)[i+1+(temp2[j+1]-i-1)*cols]++;
         //if (temp2[j+1]>i) IMATELEM((*result),temp2[j+1]-i-mr,i+2)++;
         IMATELEM((*result),temp2[j+1]-i-mr,i+2)++;
+      }
+      else if (i==0)
+      {
+        if (j<r0_len) IMATELEM((*result),-mr,2)++;
       }
     }
   /*------ computation betti numbers, if res not minimal --------------*/
@@ -882,6 +890,7 @@ intvec * syBetti(resolvente res,int length, int * regularity,
       IMATELEM(*exactresult,i+1,j+1) = IMATELEM(*result,i+1,j+1);
     }
   }
+  if (row_shift!=NULL) *row_shift = mr;
   delete result;
   return exactresult;
 }

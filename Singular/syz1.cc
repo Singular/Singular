@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.53 2000-01-31 14:57:34 Singular Exp $ */
+/* $Id: syz1.cc,v 1.54 2000-02-03 12:29:23 siebert Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -9,6 +9,7 @@
 #include <limits.h>
 #include "mod2.h"
 #include "tok.h"
+#include "attrib.h"
 #include "mmemory.h"
 #include "polys.h"
 #include "febase.h"
@@ -1725,7 +1726,7 @@ void syKillComputation(syStrategy syzstr)
 * read out the Betti numbers from resolution
 * (if not LaScala calls the traditional Betti procedure)
 */
-intvec * syBettiOfComputation(syStrategy syzstr, BOOLEAN minim)
+intvec * syBettiOfComputation(syStrategy syzstr, BOOLEAN minim,int * row_shift)
 {
   int dummy;
   if (syzstr->betti!=NULL)
@@ -1788,9 +1789,9 @@ intvec * syBettiOfComputation(syStrategy syzstr, BOOLEAN minim)
     syzstr->betti = result;
   }
   else if (syzstr->fullres!=NULL)
-    syzstr->betti = syBetti(syzstr->fullres,syzstr->length,&dummy,NULL,minim);
+    syzstr->betti = syBetti(syzstr->fullres,syzstr->length,&dummy,NULL,minim,row_shift);
   else
-    syzstr->betti = syBetti(syzstr->minres,syzstr->length,&dummy,NULL,minim);
+    syzstr->betti = syBetti(syzstr->minres,syzstr->length,&dummy,NULL,minim,row_shift);
   return ivCopy(syzstr->betti);
 }
 
@@ -1802,8 +1803,10 @@ BOOLEAN syBetti2(leftv res, leftv u, leftv w)
 {
   syStrategy syzstr=(syStrategy)u->Data();
   BOOLEAN minim=(int)w->Data();
+  int row_shift=0;
 
-  res->data=(void *)syBettiOfComputation(syzstr,minim);
+  res->data=(void *)syBettiOfComputation(syzstr,minim,&row_shift);
+  atSet(res,mstrdup("rowShift"),(void*)row_shift,INT_CMD);
   return FALSE;
 }
 BOOLEAN syBetti1(leftv res, leftv u)

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.89 2000-02-02 14:26:11 Singular Exp $ */
+/* $Id: ideals.cc,v 1.90 2000-02-03 12:29:21 siebert Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -2285,61 +2285,6 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
     delete w;
   return h3;
 }
-
-//void idEnterSet (poly p,ideal r, int * next)
-//{
-//
-//  if ((*next) == IDELEMS(r)-1)
-//  {
-//    pEnlargeSet(&(r->m),IDELEMS(r),16);
-//    IDELEMS(r)+=16;
-//  }
-//  int at;
-//  int i;
-//  if (*next==0) at=0;
-//  else
-//  {
-//    int an = 0;
-//    int en= *next-1;
-//    int c;
-//    if (pComp0(r->m[(*next)-1],p)!= 1)
-//      at=*next;
-//    else
-//    {
-//      loop
-//      {
-//        if (an >= en-1)
-//        {
-//          if (pComp0(r->m[an],p) == 1)
-//          {
-//            at=an; break;
-//          }
-//          else
-//          {
-//            at=en; break;
-//          }
-//        }
-//        i=(an+en) / 2;
-//        if (pComp0(r->m[i],p) == 1) en=i;
-//        else                       an=i;
-//      }
-//    }
-//  }
-//  if (pComp(r->m[at],p)==0)
-//  {
-//    pDelete(&p);
-//  }
-//  else
-//  {
-//    (*next)++;
-//    for (i=(*next); i>=at+1; i--)
-//    {
-//      r->m[i] = r->m[i-1];
-//    }
-//    /*- save result -*/
-//    r->m[at] = p;
-//  }
-//}
 
 #ifdef WITH_OLD_MINOR
 /*2
