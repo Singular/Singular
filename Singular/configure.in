@@ -493,6 +493,11 @@ AC_ARG_WITH(apint,
 AC_ARG_WITH(
   plural,
   [  --with-plural           do compile with Plural support])
+AC_ARG_WITH(
+  NTL,
+  [  --with-NTL              build for use with NTL.],
+  ,
+  with_NTL=yes)
 
 dnl llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl check for packages we need
