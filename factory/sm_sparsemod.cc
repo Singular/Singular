@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: sm_sparsemod.cc,v 1.5 1998-01-27 11:01:29 pohl Exp $ */
+/* $Id: sm_sparsemod.cc,v 1.6 1998-03-10 14:48:29 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -27,13 +27,8 @@
 #include "cf_algorithm.h"
 #include "sm_util.h"
 #include "sm_sparsemod.h"
-#ifdef macintosh
-#include <:templates:ftmpl_array.h>
-#include <:templates:ftmpl_functions.h>
-#else
-#include "templates/ftmpl_array.h"
-#include "templates/ftmpl_functions.h"
-#endif
+#include "ftmpl_array.h"
+#include "ftmpl_functions.h"
 
 static CanonicalForm
 smodgcd( const CanonicalForm & u, const CanonicalForm & v, const CanonicalForm & lcggt, const REvaluation & alpha, CFRandom & gen, int CHAR, const Variable & extension )

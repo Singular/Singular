@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: sm_util.cc,v 1.4 1998-01-27 11:06:41 pohl Exp $ */
+/* $Id: sm_util.cc,v 1.5 1998-03-10 14:48:34 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -22,11 +22,7 @@
 #include "cf_reval.h"
 #include "canonicalform.h"
 #include "variable.h"
-#ifdef macintosh
-#include <:templates:ftmpl_array.h>
-#else
-#include "templates/ftmpl_array.h"
-#endif
+#include "ftmpl_array.h"
 
 //{{{ static CanonicalForm fmonome( const CanonicalForm & f  )
 //{{{ docu

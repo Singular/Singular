@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_ezgcd.cc,v 1.9 1998-01-27 11:04:04 pohl Exp $ */
+/* $Id: fac_ezgcd.cc,v 1.10 1998-03-10 14:48:24 schmidt Exp $ */
 
 #include <config.h>
 
@@ -7,11 +7,6 @@
 #include "debug.h"
 
 #include "cf_defs.h"
-#ifdef macintosh
-#include <:templates:ftmpl_functions.h>
-#else
-#include "templates/ftmpl_functions.h"
-#endif
 #include "canonicalform.h"
 #include "fac_util.h"
 #include "cf_algorithm.h"
@@ -19,6 +14,7 @@
 #include "cf_random.h"
 #include "cf_primes.h"
 #include "fac_distrib.h"
+#include "ftmpl_functions.h"
 
 
 static void findeval( const CanonicalForm & F, const CanonicalForm & G, CanonicalForm & Fb, CanonicalForm & Gb, CanonicalForm & Db, REvaluation & b, int delta, int degF, int degG );
