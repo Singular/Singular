@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.42 1998-05-12 16:47:54 obachman Exp $
+@comment $Id: reference.doc,v 1.43 1998-05-13 08:09:41 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -3360,37 +3360,39 @@ shows correct usage in error messages (default)
 The output reported on @code{option(prot)} has the following meaning:
 @table @code
 @item facstd
-@code{F} 
+@code{F} - found a new factor@*
+all other characters: like the output of @code{std}
 @item fglm 
 @item lres
 @item mres 
+@code{[c]} - computations of the @code{d}-th syzygy module
+all other characters: like the output of @code{std}
 @item minres
+@code{[c]} - minimizing of the @code{d}-th syzygy module
 @item res 
+@code{[c]} - computations of the @code{d}-th syzygy module
+all other characters: like the output of @code{std}
 @item sres
 @item std 
+@code{s} - found a new element of the standard basis@*
+@code{-} - reduced a pair to 0@*
+@code{.} - postponed a reduction of an S-polynomial@*
+@code{H(d)} - found a 'highest corner' of degree @code{d},
+              no need to consider higher degrees@*
+@code{(n)} - @code{n} critical pairs are still to be reduced@*
+@code{(S:n)} - doing complete reduction of @code{n} elements@*
+@code{d} - the degree of the leading terms is currently @code{n}
 @item syz
+all characters: like the output of @code{std}
 @end table
 
 
-the
-number between brackets @code{()} is the number of critical pairs still
-to be reduced (except immediatly after an @code{H} 'high corner' where
-it is the degree above which all monomials can be discarded); a
-@code{-} sign indicates that one critical pair has been reduced to 0;
-@code{s} indicates that a new (either
-to 0 or to a new s-polynomial which is indicated by an @code{s}), a
-number without brackets shows the degree in which the computation takes
-place.
-
-
-@menu
-* degBound::
-* multBound::
-* std::
-@end menu
-@iftex
-See @ref{degBound}; @ref{multBound}; @ref{std}.
-@end iftex
+@c ref
+See
+@ref{degBound};
+@ref{multBound};
+@ref{std}.
+@c ref
 @c ---------------------------------------
 @node ord, ordstr, option, Functions
 @subsection ord

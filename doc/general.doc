@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.59 1998-05-13 07:59:29 wichmann Exp $
+@comment $Id: general.doc,v 1.60 1998-05-13 08:09:39 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -557,13 +557,18 @@ Possible order keywords are:
 @code{a} (additioanl weight vector)
 with optional size parameter
 
-@item @code{wp}, @code{Wp}, @code{ws}, @code{Ws}
+@item @code{wp} (weighted revers lexicographic),
+@code{Wp} (weighted lexicographic),
+@code{ws} (negative weighted revers lexicographic),
+@code{Ws} (negative weighted lexicographic)
 with weight vector
 
 @item @code{c}, @code{C}
 for components orders
 
 @end itemize
+
+For the definition of these orderings see @ref{Monomial orderings}.
 
 If one element of the list consists of only one entry, the parentheses may
 be omitted.
