@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feResource.cc,v 1.19 1999-12-08 19:52:59 obachman Exp $ */
+/* $Id: feResource.cc,v 1.20 1999-12-13 15:30:42 obachman Exp $ */
 /*
 * ABSTRACT: management of resources
 */
@@ -139,19 +139,19 @@ extern "C" int cygwin32_posix_path_list_p (const char *path);
  * Public functions
  *
  *****************************************************************/
+char* feResource(const char* key, int warn = -1)
+{
+  return feResource(feGetResourceConfig(key), warn);
+}
+
 char* feGetResource(const char id)
 {
-  return feResource(id, -1);
+  return feResource(feGetResourceConfig(id), -1);
 }
 
 char* feResource(const char id, int warn = -1)
 {
   return feResource(feGetResourceConfig(id), warn);
-}
-
-char* feResource(const char* key, int warn = -1)
-{
-  return feResource(feGetResourceConfig(key), warn);
 }
 
 char* feResourceDefault(const char id)

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: emacs.cc,v 1.9 1999-09-20 20:00:34 obachman Exp $ */
+/* $Id: emacs.cc,v 1.10 1999-12-13 15:30:41 obachman Exp $ */
 /*
 * ABSTRACT: Esingular main file
 */
@@ -240,7 +240,7 @@ int main(int argc, char** argv)
   {
     if (system(syscall) != 0)
     {
-      fprintf(stderr, "Error: Executation of\n%s\n");
+      fprintf(stderr, "Error: Execution of\n%s\n", syscall);
       mainUsage();
       exit(1);
     }

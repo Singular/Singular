@@ -16,7 +16,7 @@
 
 #include <unistd.h> /* always defiend */
 #include <stdlib.h>
-#include <strings.h>
+#include <string.h>
 
 #ifndef ESINGULAR
 #include "mmemory.h"
@@ -51,7 +51,9 @@ char * find_executable_link (const char *name)
 {
   char *search;
   char *p;
+#ifdef WINNT
   char *extra = NULL;
+#endif
   char tbuf[MAXPATHLEN];
 
   if (ABSOLUTE_FILENAME_P(name))
