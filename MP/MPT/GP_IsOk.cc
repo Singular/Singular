@@ -362,12 +362,10 @@ bool GP_DistMvPoly_t::IsDistMvPolyDataOk(const void* data)
       int* evector = NULL;
       ExpVector(monom, evector);
       
-      if (evector != NULL)
+      if (evector == NULL) return NULL;
+      for (j = 0; j<nvars; j++)
       {
-        for (j = 0; j<nvars; j++)
-        {
-          if (evector[j] < 0) return false;
-        }
+        if (evector[j] < 0) return false;
       }
     }
   }

@@ -32,10 +32,9 @@ typedef class MPT_GP_Ordering_t * MPT_GP_Ordering_pt;
  ******************************************************************/
 class MPT_Top_t
 {
-protected:
-  void * operator new(size_t size)
-    {return IMP_MemAllocFnc(size);}
 public:
+  void* operator new(size_t size)
+    {return IMP_MemAllocFnc(size);}
   void operator delete(void* p, size_t s)
     {IMP_MemFreeFnc(p,s);}
 
@@ -52,19 +51,22 @@ public:
   virtual ~MPT_GP_t() {}
 
 protected:
-  MPT_GP_t()                         {_typespec = NULL;}
-  MPT_GP_t(MPT_Tree_pt typespec)     {_typespec = typespec;}
-  MPT_Tree_pt _typespec;
+  MPT_GP_t()                         {_tnode = NULL;}
+  MPT_GP_t(MPT_Node_pt tnode)     {_tnode = tnode;}
+  MPT_Node_pt _tnode;
 };
-MPT_GP_pt MPT_GetGP(MPT_Tree_pt typespec);
+MPT_GP_pt MPT_GetGP(MPT_Node_pt tnode);
+MPT_GP_pt MPT_GetGP(MPT_Tree_pt tree);
 
-typedef class MPT_GP_Iterator_t : public GP_Iterator_t
+typedef class MPT_GP_Iterator_t : public GP_Iterator_t, public MPT_Top_t
 {
 public:
-  MPT_GP_Iterator_t(MPT_Tree_pt typespec);
+  MPT_GP_Iterator_t(MPT_Node_pt tnode);
+  MPT_GP_Iterator_t();
   virtual int N()                       {return _n;}
   virtual void* Next();
   virtual void  Reset(const void* data);
+  ~MPT_GP_Iterator_t() {}
 
 private:
   int _i;
@@ -73,24 +75,26 @@ private:
   bool _dynamic;
 } * MPT_GP_Iterator_pt;
 
-typedef class MPT_GP_IntIterator_t : public MPT_GP_Iterator_t
+typedef class MPT_GP_ValueIterator_t : public MPT_GP_Iterator_t
 {
 public:
-  MPT_GP_IntIterator_t(MPT_Tree_pt tree);
+  MPT_GP_ValueIterator_t(MPT_Tree_pt tree, int vtype);
+  MPT_GP_ValueIterator_t();
   void* Next();
 
 private:
   MPT_Tree_pt _prototype;
+  int _vtype;
 };
-
+bool MPT_GP_IsValueIterator(MPT_Tree_pt tree, int vtype = -1);
 
   
-MPT_GP_Atom_pt      MPT_GetGP_Atom(MPT_Tree_pt typespec);
-MPT_GP_Comp_pt      MPT_GetGP_Comp(MPT_Tree_pt typespec);
-MPT_GP_Poly_pt      MPT_GetGP_Poly(MPT_Tree_pt typespec);
-MPT_GP_MvPoly_pt    MPT_GetGP_MvPoly(MPT_Tree_pt typespec);
-MPT_GP_DistMvPoly_pt MPT_GetGP_DistMvPoly(MPT_Tree_pt typespec);
-MPT_GP_Ordering_pt MPT_GetGP_Ordering(MPT_Tree_pt typespec, int nvars);
+MPT_GP_Atom_pt      MPT_GetGP_Atom(MPT_Node_pt tnode);
+MPT_GP_Comp_pt      MPT_GetGP_Comp(MPT_Node_pt tnode);
+MPT_GP_Poly_pt      MPT_GetGP_Poly(MPT_Node_pt tnode);
+MPT_GP_MvPoly_pt    MPT_GetGP_MvPoly(MPT_Node_pt tnode);
+MPT_GP_DistMvPoly_pt MPT_GetGP_DistMvPoly(MPT_Node_pt tnode);
+MPT_GP_Ordering_pt MPT_GetGP_Ordering(MPT_Node_pt tnode, int nvars);
 
 /////////////////////////////////////////////////////////////////////
 ///
@@ -99,7 +103,7 @@ MPT_GP_Ordering_pt MPT_GetGP_Ordering(MPT_Tree_pt typespec, int nvars);
 /////////////////////////////////////////////////////////////////////
 class MPT_GP_Ordering_t : public GP_Ordering_t
 {
-  friend MPT_GP_Ordering_pt MPT_GetGP_Ordering(MPT_Tree_pt typespec,int nvars);
+  friend MPT_GP_Ordering_pt MPT_GetGP_Ordering(MPT_Tree_pt tnode,int nvars);
   
 public:
   
@@ -123,8 +127,8 @@ protected:
 private:
   MPT_Tree_pt _otree;
   MPT_GP_Iterator_t _block_iterator;
-  MPT_GP_IntIterator_t _weights_iterator;
-  MPT_GP_IntIterator_t _block_weights_iterator;
+  MPT_GP_ValueIterator_t _weights_iterator;
+  MPT_GP_ValueIterator_t _block_weights_iterator;
 };
       
 
@@ -135,8 +139,8 @@ private:
 /////////////////////////////////////////////////////////////////////
 class MPT_GP_Atom_t : public GP_Atom_t, public MPT_GP_t
 {
-  friend MPT_GP_Atom_pt MPT_GetGP_Atom(MPT_Tree_pt typespec);
-  friend MPT_GP_Comp_pt MPT_GetGP_Comp(MPT_Tree_pt typespec);
+  friend MPT_GP_Atom_pt MPT_GetGP_Atom(MPT_Node_pt tnode);
+  friend MPT_GP_Comp_pt MPT_GetGP_Comp(MPT_Node_pt tnode);
 
 public:
   GP_Atom_pt        Atom()          {return this;}
@@ -155,10 +159,10 @@ public:
   const void*       AtomPariApInt(const void* data);
 
 protected:
-  MPT_GP_Atom_t(MPT_Tree_pt typespec, 
+  MPT_GP_Atom_t(MPT_Node_pt tnode, 
                 GP_AtomType_t atype, GP_AtomEncoding_t aencoding,
                 MPT_Arg_t modulus = NULL) 
-      : MPT_GP_t(typespec) 
+      : MPT_GP_t(tnode) 
     {_atype = atype; _aencoding = aencoding; _modulus = modulus;}
 
 private:
@@ -174,11 +178,11 @@ private:
 /////////////////////////////////////////////////////////////////////
 class MPT_GP_Comp_t : public GP_Comp_t, public MPT_GP_t
 {
-  friend MPT_GP_Comp_pt MPT_GetGP_Comp(MPT_Tree_pt typespec);
+  friend MPT_GP_Comp_pt MPT_GetGP_Comp(MPT_Node_pt tnode);
 
 protected:
-  MPT_GP_Comp_t(MPT_Tree_pt typespec, GP_CompType_t ctype, MPT_GP_pt elements) 
-      : _iterator(typespec), MPT_GP_t(typespec) 
+  MPT_GP_Comp_t(MPT_Node_pt tnode, GP_CompType_t ctype, MPT_GP_pt elements) 
+      : _iterator(tnode), MPT_GP_t(tnode) 
     {_ctype = ctype; _elements = elements;}
   
 public:
@@ -199,16 +203,16 @@ private:
 
 class MPT_GP_MatrixComp_t : public MPT_GP_Comp_t
 {
-  friend MPT_GP_Comp_pt MPT_GetGP_Comp(MPT_Tree_pt typespec);
+  friend MPT_GP_Comp_pt MPT_GetGP_Comp(MPT_Node_pt tnode);
 
 public:
   void MatrixDimension(const void* data, int &dx, int &dy)
    {dx = _dx; dy = _dy;} 
   
 protected:
-  MPT_GP_MatrixComp_t(MPT_Tree_pt typespec, MPT_GP_pt elements,     
+  MPT_GP_MatrixComp_t(MPT_Node_pt tnode, MPT_GP_pt elements,     
                       int dx, int dy) 
-      : MPT_GP_Comp_t(typespec, GP_MatrixCompType, elements)
+      : MPT_GP_Comp_t(tnode, GP_MatrixCompType, elements)
     {_dx = dx; _dy = dy;}
 
 private:
@@ -223,15 +227,16 @@ private:
 /////////////////////////////////////////////////////////////////////
 class MPT_GP_Poly_t : public virtual GP_Poly_t, public MPT_GP_t
 {
-  friend MPT_GP_Poly_pt MPT_GetGP_Poly(MPT_Tree_pt typespec);
+  friend MPT_GP_Poly_pt MPT_GetGP_Poly(MPT_Node_pt tnode);
 
 protected:
-  MPT_GP_Poly_t(MPT_Tree_pt typespec, MPT_GP_pt coeffs) 
-      : MPT_GP_t(typespec)
+  MPT_GP_Poly_t(MPT_Node_pt tnode, MPT_GP_pt coeffs) 
+      : MPT_GP_t(tnode)
     {_coeffs = coeffs;}
   MPT_GP_pt _coeffs;
 
 public:
+  GP_Poly_pt            Poly()      {return this;}
   virtual GP_UvPoly_pt  UvPoly()    {return NULL;} 
   virtual GP_MvPoly_pt  MvPoly()    {return NULL;} 
 
@@ -247,7 +252,7 @@ public:
 
 class MPT_GP_MvPoly_t : public virtual GP_MvPoly_t, public MPT_GP_Poly_t
 {
-  friend MPT_GP_MvPoly_pt MPT_GetGP_MvPoly(MPT_Tree_pt typespec);
+  friend MPT_GP_MvPoly_pt MPT_GetGP_MvPoly(MPT_Node_pt tnode);
   
 public:
   GP_MvPoly_pt              MvPoly()        {return this;}
@@ -257,14 +262,14 @@ public:
   int               NumberOfVars()  {return _nvars;}
   GP_Iterator_pt    VarNamesIterator() 
     {
-      if (_vname_iterator != NULL) _vname_iterator->Reset(_typespec); 
+      if (_vname_iterator != NULL) _vname_iterator->Reset(_tnode); 
       return (GP_Iterator_pt) _vname_iterator;
     }
   
   ~MPT_GP_MvPoly_t() {if (_vname_iterator != NULL) delete _vname_iterator;}
 
 protected:
-  MPT_GP_MvPoly_t(MPT_Tree_pt typespec, MPT_GP_pt coeffs, int nvars);
+  MPT_GP_MvPoly_t(MPT_Node_pt tnode, MPT_GP_pt coeffs, int nvars);
   int _nvars;
   MPT_GP_Iterator_pt _vname_iterator;
 };
@@ -274,7 +279,7 @@ protected:
 class MPT_GP_DistMvPoly_t 
   : public virtual GP_DistMvPoly_t, public MPT_GP_MvPoly_t
 {
-  friend MPT_GP_DistMvPoly_pt MPT_GetGP_DistMvPoly(MPT_Tree_pt typespec);
+  friend MPT_GP_DistMvPoly_pt MPT_GetGP_DistMvPoly(MPT_Node_pt tnode);
   
 public:
   // only DenseDistMvPoly is implemented, at the moment
@@ -295,7 +300,7 @@ public:
     }
 
 protected:
-  MPT_GP_DistMvPoly_t(MPT_Tree_pt typespec, MPT_GP_pt coeffs, int nvars,
+  MPT_GP_DistMvPoly_t(MPT_Node_pt tnode, MPT_GP_pt coeffs, int nvars,
                       MPT_GP_Ordering_pt has_ordering,
                       MPT_GP_Ordering_pt should_have_ordering);
 

@@ -79,6 +79,8 @@ install: libMPT.a
 	$(INSTALL_DATA) libMPT.a $(libdir)
 	$(RANLIB) $(libdir)/libMPT.a
 	$(INSTALL_DATA) MPT.h $(includedir)
+	$(INSTALL_DATA) MPT_GP.h $(includedir)
+	$(INSTALL_DATA) GP.h $(includedir)
 	-chmod a-x $(libdir)/libMPT.a $(includedir)/MPT.h
 
 uninstall: 

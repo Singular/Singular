@@ -356,6 +356,14 @@ extern void MPT_RemoveAnnot(MPT_Node_pt node,
 MPT_RemoveAnnot(node, MP_ProtoDict, MP_AnnotProtoPrototype)
 
 extern MP_Boolean_t MPT_IsTrueProtoTypeSpec(MPT_Tree_pt typespec);
+inline MPT_Tree_pt MPT_TrueProtoAnnotValue(MPT_Node_pt node)
+{
+  MPT_Tree_pt ptree = MPT_ProtoAnnotValue(node);
+  if (ptree != NULL && MPT_IsTrueProtoTypeSpec(ptree))
+    return ptree;
+  
+  return NULL;
+}
 
 extern void*       IMP_MemAlloc0Fnc(size_t size);
 extern MPT_Tree_pt MPT_InitTree(MP_Common_t type,

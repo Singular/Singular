@@ -14,25 +14,33 @@
 //  BUG: Iterator does not work for array of Real64, or Uint8
 ///
 /////////////////////////////////////////////////////////////////////
-MPT_GP_Iterator_t::MPT_GP_Iterator_t(MPT_Tree_pt typespec)
+MPT_GP_Iterator_t::MPT_GP_Iterator_t(MPT_Node_pt tnode)
 {
-  MPT_Assume(typespec != NULL &&
-             (typespec->node->type == MP_CommonOperatorType || 
-              typespec->node->type == MP_CommonMetaOperatorType));
+  MPT_Assume(tnode != NULL &&
+             (tnode->type == MP_CommonOperatorType || 
+              tnode->type == MP_CommonMetaOperatorType));
 
-  if (typespec->node->type == MP_CommonMetaOperatorType &&
-      typespec->node->numchild == 0)
+  if (tnode->type == MP_CommonMetaOperatorType &&
+      tnode->numchild == 0)
   {
     _n = -1;
     _dynamic = true;
   }
   else
   {
-    _n = typespec->node->numchild;
+    _n = tnode->numchild;
     _dynamic = false;
   }
 
   _i = _n+1;
+  _args = NULL;
+}
+
+MPT_GP_Iterator_t::MPT_GP_Iterator_t()
+{
+  _n = -1;
+  _dynamic = false;
+  _i = -2;
   _args = NULL;
 }
 
@@ -58,42 +66,52 @@ void* MPT_GP_Iterator_t::Next()
   return NULL;
 }
 
-bool MPT_GP_IsIntIterator(MPT_Tree_pt tree)
+bool MPT_GP_IsValueIterator(MPT_Tree_pt tree, int vtype)
 {
   if (tree == NULL || tree->node->type != MP_CommonOperatorType)
     return false;
-  MPT_Tree_pt proto = MPT_ProtoAnnotValue(tree->node);
+  MPT_Tree_pt proto = MPT_TrueProtoAnnotValue(tree->node);
+
   if (proto != NULL)
   {
-    if (proto->node->type == MP_CommonMetaType && 
-        proto->node->dict == MP_ProtoDict && 
-        MP_IsFixedIntegerType(MP_CmtProto_2_MPType
-                              (MP_COMMON_T(proto->node->nvalue))))
+    if (vtype < 0 || 
+        (proto->node->type == MP_CommonMetaType && 
+         proto->node->dict == MP_ProtoDict && 
+         vtype == MP_CmtProto_2_MPType(MP_COMMON_T(proto->node->nvalue))))
       return true;
-    else if (proto->node->type != MP_CommonMetaType &&
-             proto->node->dict == MP_NumberDict &&
-             MP_COMMON_T(proto->node->nvalue) !=  MP_CmtNumberInteger)
+    else 
       return false;
   }
-  int nc = tree->node->numchild, i;
-  for (i=0; i<nc; i++)
+  if (vtype >= 0)
   {
-    if (! MP_IsFixedIntegerType(
-      MP_COMMON_T(MPT_TREE_PT(tree->args[i])->node->type)))
-      return false;
+    int nc = tree->node->numchild, i;
+    MPT_Arg_pt args;
+  
+    for (i=0; i<nc; i++)
+    {
+      if (vtype != MP_COMMON_T(MPT_TREE_PT(tree->args[i])->node->type))
+        return false;
+    }
   }
   return true;
 }
-  
 
-MPT_GP_IntIterator_t::MPT_GP_IntIterator_t(MPT_Tree_pt tree) 
-    : MPT_GP_Iterator_t(NULL)
+MPT_GP_ValueIterator_t::MPT_GP_ValueIterator_t(MPT_Tree_pt tree, int vtype) 
+    : MPT_GP_Iterator_t(tree->node)
 {
-  MPT_Assume(MPT_GP_IsIntIterator(tree));
-  _prototype = MPT_ProtoAnnotValue(tree->node);
+  MPT_Assume(MPT_GP_IsValueIterator(tree, vtype));
+  _prototype = MPT_TrueProtoAnnotValue(tree->node);
+  _vtype = vtype;
 }
 
-void* MPT_GP_IntIterator_t::Next()
+MPT_GP_ValueIterator_t::MPT_GP_ValueIterator_t() 
+    : MPT_GP_Iterator_t()
+{
+  _vtype = -1;
+  _prototype = NULL;
+}
+
+void* MPT_GP_ValueIterator_t::Next()
 {
   void* arg = MPT_GP_Iterator_t::Next();
   
@@ -108,16 +126,20 @@ void* MPT_GP_IntIterator_t::Next()
 ///
 /////////////////////////////////////////////////////////////////////
 
-MPT_GP_pt MPT_GetGP(MPT_Tree_pt typespec)
+MPT_GP_pt MPT_GetGP(MPT_Node_pt tnode)
 {
-  if (typespec != NULL)
-  {
-    MPT_GP_pt gp;
-    if ((gp = MPT_GetGP_Atom(typespec)) != NULL) return gp;
-    if ((gp = MPT_GetGP_Comp(typespec)) != NULL) return gp;
-    if ((gp = MPT_GetGP_Poly(typespec)) != NULL) return gp;
-  }
+  MPT_Assume(tnode != NULL);
+  MPT_GP_pt gp;
+  if ((gp = MPT_GetGP_Atom(tnode)) != NULL) return gp;
+  if ((gp = MPT_GetGP_Comp(tnode)) != NULL) return gp;
+  if ((gp = MPT_GetGP_Poly(tnode)) != NULL) return gp;
   return NULL;
+}
+
+MPT_GP_pt MPT_GetGP(MPT_Tree_pt tree)
+{
+  if (tree == NULL) return NULL;
+  return MPT_GetGP(tree->node);
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -156,20 +178,19 @@ static GP_AtomEncoding_t MP_Type_2_GP_AtomEncoding(MP_Common_t mptype)
   return GP_UnknownAtomEncoding;
 }
 
-MPT_GP_Atom_pt MPT_GetGP_Atom(MPT_Tree_pt typespec)
+MPT_GP_Atom_pt MPT_GetGP_Atom(MPT_Node_pt tnode)
 {
-  if (typespec == NULL) return NULL;
+  if (tnode == NULL) return NULL;
   
-  MPT_Node_pt node = typespec->node;
-  MP_NodeType_t ntype = node->type;
+  MP_NodeType_t ntype = tnode->type;
   GP_AtomType_t atype;
   MPT_Arg_t modulus = NULL;
-  MPT_Tree_pt _typespec = NULL;
+  MPT_Node_pt _tnode = NULL;
   
-  if (ntype == MP_CommonMetaType && node->dict == MP_ProtoDict)
+  if (ntype == MP_CommonMetaType && tnode->dict == MP_ProtoDict)
   {
-    _typespec = typespec;
-    ntype = MP_CmtProto_2_MPType(MP_COMMON_T(node->nvalue));
+    _tnode = tnode;
+    ntype = MP_CmtProto_2_MPType(MP_COMMON_T(tnode->nvalue));
   }
   
   if (MP_IsRealType(ntype)) atype = GP_RealAtomType;
@@ -177,7 +198,7 @@ MPT_GP_Atom_pt MPT_GetGP_Atom(MPT_Tree_pt typespec)
   {
     atype = GP_IntegerAtomType;
 
-    MPT_Tree_pt mtree = MPT_AnnotValue(typespec->node,
+    MPT_Tree_pt mtree = MPT_AnnotValue(tnode,
                                        MP_NumberDict, MP_AnnotNumberModulos);
     if (mtree != NULL && ntype == mtree->node->type)
     {
@@ -191,15 +212,15 @@ MPT_GP_Atom_pt MPT_GetGP_Atom(MPT_Tree_pt typespec)
   else 
     return NULL;
   
-  return new MPT_GP_Atom_t(_typespec, atype, 
+  return new MPT_GP_Atom_t(_tnode, atype, 
                            MP_Type_2_GP_AtomEncoding(ntype), 
                            modulus);
 }
-
+ 
 GP_AtomEncoding_t MPT_GP_Atom_t::AtomEncoding(const void* data)
 {
   if (_aencoding != GP_DynamicAtomEncoding) return _aencoding;
-  MPT_Assume(_typespec == NULL && data != NULL);
+  MPT_Assume(_tnode == NULL && data != NULL);
   return MP_Type_2_GP_AtomEncoding(((MPT_Tree_pt) data)->node->type);
 }
 
@@ -208,33 +229,33 @@ unsigned int MPT_GP_Atom_t::AtomUint(const void* data)
   MPT_Assume(AtomEncoding() == GP_UintAtomEncoding);
 
   return (unsigned int) 
-    MP_UINT8_T(_typespec != NULL ? data : ((MPT_Tree_pt) data)->node->nvalue);
+    MP_UINT8_T(_tnode != NULL ? data : ((MPT_Tree_pt) data)->node->nvalue);
 }
 signed int MPT_GP_Atom_t::AtomSint(const void* data)
 {
   MPT_Assume(AtomEncoding(data) == GP_SintAtomEncoding);
 
   return (int) 
-    MP_SINT8_T((_typespec!=NULL ? data : ((MPT_Tree_pt) data)->node->nvalue));
+    MP_SINT8_T((_tnode!=NULL ? data : ((MPT_Tree_pt) data)->node->nvalue));
 }
 unsigned long MPT_GP_Atom_t::AtomUlong(const void* data) 
 {
   MPT_Assume(AtomEncoding(data) == GP_UlongAtomEncoding);
 
   return (unsigned long) 
-    (_typespec != NULL ? data : ((MPT_Tree_pt) data)->node->nvalue);
+    (_tnode != NULL ? data : ((MPT_Tree_pt) data)->node->nvalue);
 }
 signed long MPT_GP_Atom_t::AtomSlong(const void* data) 
 {
   MPT_Assume(AtomEncoding(data) == GP_SlongAtomEncoding);
 
   return (long) 
-    (_typespec != NULL ? data : ((MPT_Tree_pt) data)->node->nvalue);
+    (_tnode != NULL ? data : ((MPT_Tree_pt) data)->node->nvalue);
 }
 float MPT_GP_Atom_t::AtomFloat(const void* data)
 {
   MPT_Assume(AtomEncoding(data) == GP_FloatAtomEncoding);
-  if (_typespec != NULL)
+  if (_tnode != NULL)
     return *((float*) &data);
   return *((float*) &(((MPT_Tree_pt) data)->node->nvalue));
 }
@@ -243,19 +264,19 @@ double MPT_GP_Atom_t::AtomDouble(const void* data)
   MPT_Assume(AtomEncoding(data) == GP_DoubleAtomEncoding);
 
   return (double) 
-    MP_REAL64_T((_typespec!=NULL ? data : ((MPT_Tree_pt) data)->node->nvalue));
+    MP_REAL64_T((_tnode!=NULL ? data : ((MPT_Tree_pt) data)->node->nvalue));
 }
 const void* MPT_GP_Atom_t::AtomGmpApInt(const void* data)
 {
   MPT_Assume(AtomEncoding(data) == GP_GmpApIntAtomEncoding);
 
-  return (_typespec != NULL ? data : ((MPT_Tree_pt) data)->node->nvalue);
+  return (_tnode != NULL ? data : ((MPT_Tree_pt) data)->node->nvalue);
 }
 const void* MPT_GP_Atom_t::AtomPariApInt(const void* data)
 {
   MPT_Assume(AtomEncoding(data) == GP_PariApIntAtomEncoding);
 
-  return (_typespec != NULL ? data : ((MPT_Tree_pt) data)->node->nvalue);
+  return (_tnode != NULL ? data : ((MPT_Tree_pt) data)->node->nvalue);
 }
 
 
@@ -300,18 +321,16 @@ MP_TypeDictOp_2_GP_CompType(int type,
   return GP_UnknownCompType;
 }
 
-MPT_GP_Comp_pt MPT_GetGP_Comp(MPT_Tree_pt typespec)
+MPT_GP_Comp_pt MPT_GetGP_Comp(MPT_Node_pt tnode)
 {
-  if (typespec == NULL) return NULL;
-  
+  if (tnode == NULL) return NULL;
   GP_CompType_t comptype 
-    =   MP_TypeDictOp_2_GP_CompType(typespec->node->type, 
-                                    typespec->node->dict,
-                                    MP_COMMON_T(typespec->node->nvalue));
+    =   MP_TypeDictOp_2_GP_CompType(tnode->type, tnode->dict,
+                                    MP_COMMON_T(tnode->nvalue));
   
   if (comptype == GP_UnknownCompType) return NULL;
   
-  MPT_GP_pt elements = MPT_GetGP(MPT_ProtoAnnotValue(typespec->node));
+  MPT_GP_pt elements = MPT_GetGP(MPT_ProtoAnnotValue(tnode));
   
   if (elements == NULL)
   {
@@ -351,7 +370,7 @@ MPT_GP_Comp_pt MPT_GetGP_Comp(MPT_Tree_pt typespec)
   }
   else if (comptype == GP_MatrixCompType)
   {
-    MPT_Tree_pt tree = MPT_AnnotValue(typespec->node, 
+    MPT_Tree_pt tree = MPT_AnnotValue(tnode, 
                                       MP_MatrixDict,
                                       MP_AnnotMatrixDimension);
     MPT_Tree_pt ctree;
@@ -374,10 +393,9 @@ MPT_GP_Comp_pt MPT_GetGP_Comp(MPT_Tree_pt typespec)
     else if  (ctree->node->type != MP_Uint32Type) 
       dy = MP_UINT32_T(ctree->node->nvalue);
     else goto null_return;
-    return new MPT_GP_MatrixComp_t(typespec, elements, dx, dy);
+    return new MPT_GP_MatrixComp_t(tnode, elements, dx, dy);
   }
-  return new MPT_GP_Comp_t(typespec, comptype, elements);
-  return NULL;
+  return new MPT_GP_Comp_t(tnode, comptype, elements);
   
   null_return:
   delete elements;
@@ -389,57 +407,56 @@ MPT_GP_Comp_pt MPT_GetGP_Comp(MPT_Tree_pt typespec)
 /// Polys
 ///
 /////////////////////////////////////////////////////////////////////
-MPT_GP_Poly_pt MPT_GetGP_Poly(MPT_Tree_pt typespec)
+MPT_GP_Poly_pt MPT_GetGP_Poly(MPT_Node_pt tnode)
 {
-  return MPT_GetGP_MvPoly(typespec);
+  return MPT_GetGP_MvPoly(tnode);
 }
 
 bool MPT_GP_Poly_t::IsFreeModuleVector()
 {
-  if (MPT_Annot(_typespec->node,
+  if (MPT_Annot(_tnode,
                 MP_PolyDict,
                 MP_AnnotPolyModuleVector) != NULL)
     return true;
   return false;
 }
 
-MPT_GP_MvPoly_pt MPT_GetGP_MvPoly(MPT_Tree_pt typespec)
+MPT_GP_MvPoly_pt MPT_GetGP_MvPoly(MPT_Node_pt tnode)
 {
-  return MPT_GetGP_DistMvPoly(typespec);
+  return MPT_GetGP_DistMvPoly(tnode);
 }
 
-MPT_GP_MvPoly_t::MPT_GP_MvPoly_t(MPT_Tree_pt typespec, 
+MPT_GP_MvPoly_t::MPT_GP_MvPoly_t(MPT_Node_pt tnode, 
                                  MPT_GP_pt coeffs, 
                                  int nvars)
-    : MPT_GP_Poly_t(typespec, coeffs)
+    : MPT_GP_Poly_t(tnode, coeffs)
 {
   _nvars = nvars;
-  MPT_Tree_pt vtree = MPT_AnnotValue(typespec->node,
+  MPT_Tree_pt vtree = MPT_AnnotValue(tnode,
                                      MP_PolyDict,
                                      MP_AnnotPolyVarNames);
 
-  if (vtree != NULL && vtree->node->type == MP_CommonOperatorType)
+  if (vtree != NULL && MPT_GP_IsValueIterator(vtree, MP_StringType))
   {
-    // Hmm ... should check for strings
-    _vname_iterator = new MPT_GP_Iterator_t(NULL);
-    _vname_iterator->Reset(vtree);
+    _vname_iterator = new MPT_GP_ValueIterator_t(vtree, MP_StringType);
+    _vname_iterator->Reset(vtree->args);
   }
   else
     _vname_iterator = NULL;
 }
 
 static GP_DistMvPolyType_t 
-MPT_GetGP_DistMvPolyType(MPT_Tree_pt typespec,
+MPT_GetGP_DistMvPolyType(MPT_Node_pt tnode,
                          MPT_GP_pt &coeffs,
                          int &nvars)
 {
-  MPT_Assume(typespec != NULL);
+  MPT_Assume(tnode != NULL);
   MPT_Node_pt node;
   MPT_Tree_pt val;
   MPT_Arg_pt  ta;
   
   // a DDP consists of monoms
-  if ((val =  MPT_ProtoAnnotValue(typespec->node)) == NULL)
+  if ((val =  MPT_ProtoAnnotValue(tnode)) == NULL)
     return GP_UnknownDistMvPolyType;
   
   node = val->node;
@@ -472,37 +489,37 @@ MPT_GetGP_DistMvPolyType(MPT_Tree_pt typespec,
   else  return  GP_DenseDistMvPolyType;
 }
   
-MPT_GP_DistMvPoly_pt MPT_GetGP_DistMvPoly(MPT_Tree_pt typespec)
+MPT_GP_DistMvPoly_pt MPT_GetGP_DistMvPoly(MPT_Node_pt tnode)
 {
-  if (typespec == NULL) return NULL;
+  if (tnode == NULL) return NULL;
 
   MPT_GP_pt coeffs;
   int nvars;
   
-  if (MPT_GetGP_DistMvPolyType(typespec, coeffs, nvars) 
+  if (MPT_GetGP_DistMvPolyType(tnode, coeffs, nvars) 
       != GP_DenseDistMvPolyType)
     return NULL;
 
   return new 
-    MPT_GP_DistMvPoly_t(typespec, coeffs, nvars,
+    MPT_GP_DistMvPoly_t(tnode, coeffs, nvars,
                         MPT_GetGP_Ordering(
-                          MPT_AnnotValue(typespec->node,
+                          MPT_AnnotValue(tnode,
                                          MP_PolyDict,
                                          MP_AnnotPolyOrdering), 
                           nvars), 
                         MPT_GetGP_Ordering(
-                          MPT_AnnotValue(typespec->node,
+                          MPT_AnnotValue(tnode,
                                          MP_PolyDict,
                                          MP_AnnotShouldHavePolyOrdering),
                           nvars));
   
 }
 
-MPT_GP_DistMvPoly_t::MPT_GP_DistMvPoly_t(MPT_Tree_pt typespec,
+MPT_GP_DistMvPoly_t::MPT_GP_DistMvPoly_t(MPT_Node_pt tnode,
                                          MPT_GP_pt coeffs, int nvars,
                                          MPT_GP_Ordering_pt has_ordering,
                                          MPT_GP_Ordering_pt should_ordering)
-    : MPT_GP_MvPoly_t(typespec, coeffs, nvars), _monom_iterator(typespec)
+    : MPT_GP_MvPoly_t(tnode, coeffs, nvars), _monom_iterator(tnode)
 {
   _has_ordering = has_ordering;
   _should_have_ordering = should_ordering;
@@ -534,9 +551,6 @@ void MPT_GP_DistMvPoly_t::ExpVector(const void* monom, int* &expvector)
 ///
 /////////////////////////////////////////////////////////////////////
 MPT_GP_Ordering_t::MPT_GP_Ordering_t(MPT_Tree_pt otree) 
-    : _block_iterator(NULL), 
-      _weights_iterator(NULL), 
-      _block_weights_iterator(NULL)
 {
   _otree = otree;
 }
@@ -576,7 +590,6 @@ GP_OrderingType_t MP_CcPolyOrdering_2_GP_OrderingType(MP_Common_t cc)
 
 GP_OrderingType_t MPT_GP_Ordering_t::OrderingType()
 {
-  
   if (MPT_IsNode(_otree->node, MP_CommonConstantType, MP_PolyDict))
     return 
       MP_CcPolyOrdering_2_GP_OrderingType(MP_COMMON_T(_otree->node->nvalue));
@@ -617,8 +630,9 @@ GP_Iterator_pt MPT_GP_Ordering_t::WeightsIterator()
   MPT_Tree_pt wtree = MPT_AnnotValue(_otree->node,
                                      MP_PolyDict,
                                      MP_AnnotPolyWeights);
-  if (! MPT_GP_IsIntIterator(wtree)) return NULL;
-  _weights_iterator = MPT_GP_IntIterator_t(wtree);
+  if (wtree == NULL || ! MPT_GP_IsValueIterator(wtree, MP_Sint32Type))
+    return NULL;
+  _weights_iterator = MPT_GP_ValueIterator_t(wtree, MP_Sint32Type);
   return &(_weights_iterator);
 }
 
@@ -637,8 +651,9 @@ GP_Iterator_pt MPT_GP_Ordering_t::WeightsIterator(const void* block)
                                      MP_PolyDict,
                                      MP_AnnotPolyWeights);
 
-  if (MPT_GP_IsIntIterator(btree) == NULL) return NULL;
-  _block_weights_iterator = MPT_GP_IntIterator_t(btree);
+  if (btree == NULL || ! MPT_GP_IsValueIterator(btree, MP_Sint32Type)) 
+    return NULL;
+  _block_weights_iterator = MPT_GP_ValueIterator_t(btree, MP_Sint32Type);
   
   return &(_block_weights_iterator);
 }
@@ -649,8 +664,8 @@ GP_Iterator_pt MPT_GP_Ordering_t::BlockOrderingIterator()
   
   if (otype != GP_ProductOrdering) return NULL;
   
-  _block_iterator =  MPT_GP_Iterator_t(NULL);
-  _block_iterator.Reset(_otree);
+  _block_iterator =  MPT_GP_Iterator_t(_otree->node);
+  _block_iterator.Reset(_otree->args);
   return &(_block_iterator);
 }
 

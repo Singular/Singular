@@ -84,7 +84,9 @@ public:
   virtual int   N()                     = 0;
   virtual void* Next()                  = 0;
   virtual void  Reset(const void* data) = 0;
-  virtual ~GP_Iterator_t()              = 0;
+  virtual ~GP_Iterator_t() {}
+  
+      
 } * GP_Iterator_pt;
 
 
@@ -205,7 +207,7 @@ typedef enum
   GP_MvPolyType   // and, multivariate polynomials
 } GP_PolyType_t;
 
-class GP_Poly_t : public GP_t
+class GP_Poly_t : virtual public GP_t
 {
 public:
   GP_Type_t Type()  {return GP_PolyType;}
