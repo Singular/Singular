@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.303 2003-06-13 10:54:20 levandov Exp $ */
+/* $Id: iparith.cc,v 1.304 2003-07-15 11:10:22 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2401,12 +2401,12 @@ struct sValCmd2 dArith2[]=
 #endif
 ,{jjFIND2,     FIND_CMD,       INT_CMD,        STRING_CMD, STRING_CMD ALLOW_PLURAL}
 ,{jjGCD_I,     GCD_CMD,        INT_CMD,        INT_CMD,    INT_CMD ALLOW_PLURAL}
+,{jjGCD_N,     GCD_CMD,        NUMBER_CMD,     NUMBER_CMD, NUMBER_CMD ALLOW_PLURAL}
 #if defined(HAVE_FACTORY) && defined(HAVE_LIBFAC_P)
 ,{jjGCD_P,     GCD_CMD,        POLY_CMD,       POLY_CMD,   POLY_CMD NO_PLURAL}
 #else
 ,{jjWRONG2,    GCD_CMD,        POLY_CMD,       POLY_CMD,   POLY_CMD NO_PLURAL}
 #endif
-,{jjGCD_N,     GCD_CMD,        NUMBER_CMD,     NUMBER_CMD, NUMBER_CMD ALLOW_PLURAL}
 ,{jjHILBERT2,  HILBERT_CMD,    INTVEC_CMD,     IDEAL_CMD,  INT_CMD NO_PLURAL}
 ,{jjHILBERT2,  HILBERT_CMD,    INTVEC_CMD,     MODUL_CMD,  INT_CMD NO_PLURAL}
 ,{jjHOMOG_P,   HOMOG_CMD,      POLY_CMD,       POLY_CMD,   POLY_CMD ALLOW_PLURAL}
