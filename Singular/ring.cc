@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.132 2000-10-26 10:55:12 Singular Exp $ */
+/* $Id: ring.cc,v 1.133 2000-10-26 13:34:56 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -2387,6 +2387,7 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
   int j=0; /*  i index in r, j index in res */
   loop
   {
+    BOOLEAN copy_block_index=TRUE;
     switch(r->order[i])
     {
       case ringorder_C:
@@ -2400,6 +2401,7 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
           j--;
           need_other_ring=TRUE;
           omit_comp=FALSE;
+          copy_block_index=FALSE;
         }
         break;
       case ringorder_wp:
@@ -2436,9 +2438,12 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
         order[j]=r->order[i];
         break;
     }
-    block0[j]=r->block0[i];
-    block1[j]=r->block1[i];
-    wvhdl[j]=r->wvhdl[i];
+    if (copy_block_index)
+    {
+      block0[j]=r->block0[i];
+      block1[j]=r->block1[i];
+      wvhdl[j]=r->wvhdl[i];
+    }
     i++;j++;
     // order[j]=ringorder_no; //  done by omAlloc0
     if (i==nblocks) break;
