@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.36 1998-05-12 16:06:18 Singular Exp $
+@comment $Id: types.doc,v 1.37 1998-05-13 13:16:57 gorzel Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -206,9 +206,16 @@ and is therefore faster
 @item
 a typecast to ideal.
 @end enumerate
+@strong{Example:}
+@example
+@c example
+
+@c example
+@end example
 @c ref
 See @ref{Type conversion and casting}.
 @c ref
+
 
 @c ------------------------------
 @node ideal operations, ideal related functions, ideal expressions, ideal
@@ -225,9 +232,12 @@ power, exponentiation (by an integer)
 @end table
 Brackets may be used to access elements of ideals:
 @emph{ideal expressions} @code{[} @emph{position} @code{]} is a generator of the ideal.
-@c @strong{Example:}
-@c @example
-@c @end example
+@strong{Example:}
+@example
+@c example
+
+@c example
+@end example
 
 @c ------------------------------
 @node ideal related functions, ,ideal operations, ideal
@@ -250,9 +260,10 @@ Krull dimension of basering modulo the ideal of leading terms (see @ref{dim})
 @item @code{eliminate}
 elimination of variables (see @ref{eliminate})
 @item @code{facstd}
+@item @code{ factorize } ideal of factors of a polynomial (see @ref{factorize})
 factorizing Groebner basis algorithm (see @ref{facstd})
 @item @code{fglm}
-compute the Groebner basis from a GB w.r.t. a different ordering (see @ref{fglm})
+compute the Groebner basis from a Groebner basis w.r.t. a different ordering (see @ref{fglm})
 @item @code{finduni}
 find univariate polynomials in a zero dimensional ideal (see @ref{finduni})
 @item @code{homog}
@@ -279,6 +290,7 @@ leading terms of a set of generators (see @ref{lead})
 lift-matrix (see @ref{lift})
 @item @code{liftstd}
 standardbasis and transformation matrix computation (see @ref{liftstd})
+@item @code{lres} minimal resolution  ( see @ref{lres})
 @item @code{maxideal}
 power of the maximal ideal at 0 (see @ref{maxideal})
 @item @code{minbase}
@@ -317,8 +329,10 @@ permutation for sorting ideals/modules (see @ref{sortvec})
 @item @code{sres}
 free resolution of a standard basis (see @ref{sres})
 @item @code{std}
-standardbasis computation (see @ref{std}, @ref{liftstd})
-@item @code{subst}
+standardbasis computation (see @ref{std})
+@item @code{stdfglm} standard basis computation with fglm technique (see @ref{stdfglm})
+@item @code{stdhilbert} Hilbert driven standardbasis computation (see @ref{stdhilbert} 
+@item @code{subst} 
 substitute a ring variable (see @ref{subst})
 @item @code{syz}
 computation of the first syzygy module (see @ref{syz})
@@ -327,9 +341,6 @@ vector space dimension of basering modulo ideal (see @ref{vdim})
 @item @code{weight}
 optimal weights (see @ref{weight})
 @end table
-@c @strong{Example:}
-@c @example
-@c @end example
 
 
 @c ---------------------------------------
@@ -386,7 +397,7 @@ defines an integer variable.
 Integers consist of a sequence of digits, possibly preceded by a sign.
 A space is considered as a separator, so it is not allowed between digits.
 A sequence of digits outside the allowed range will be converted to the type
-poly if possible.
+number if possible.
 @example
 @c example
   int j=1;
@@ -424,18 +435,26 @@ int expressions combined by arithmetic operations
 @code{+},@code{-},@code{*},@code{/},@code{%} or @code{^}.
 @end enumerate
 Variables of type int represent the compiler integers  and are, therefore,
-limited  in their range. If this range is too small the expression
-must be converted to the type number over a ring with characteristic 0.
+limited  in their range (see @ref{Limitatoins}). If this range is too small 
+the expression must be converted to the type number over a ring with 
+characteristic 0.
 
 @strong{Example:}
 @example
 @c example
+  12345678901;
+  typeof(_);
   ring r=0,x,dp;
+  12345678901;
+  typeof(_);
   // using the type cast number for a greater allowed range
   number(11)*13*17*100*200*2000*503*1111*222222;
   // Note: 11*13*17*100*200*2000*503*1111*222222
   // would return a machine integer:
   11*13*17*100*200*2000*503*1111*222222;
+  ring rp;
+  12345678901;
+  typeof(_);  
   int i;
   i+2;
   intvec v=i..i+3;
@@ -524,7 +543,7 @@ a number comparison:
 @end example
 For numbers from Z/p or from field extensions not all operations are useful:
 @* - 0 ist always the smallest element,
-@* - in Z/p the representatives in the range -p/2..p/2 are used for comparisons
+@* - in Z/p the representatives in the range -p/2..p/2 are used for comparisons,
 @* - in field extensions the last two operations
 (@code{>=,<=}) yield always TRUE (1) and
 the @code{<} and @code{>} are equivalent to @code{!=}.
@@ -557,7 +576,7 @@ a string comparison:
 boolean expressions combined by boolean operations (@code{and},
 @code{or}, @code{not}). 
 
-@strong{Remark:} All arguments of a logical expressions are first
+@strong{Note:} All arguments of a logical expressions are first
 evaluated and then the value of the logical expression is
 determined. For example, the logical expressions @code{(1 || a)} is
 evaluated by first evaluating @code{a}, even though the value of
@@ -604,6 +623,7 @@ Krull dimension of basering modulo ideal resp. module (see @ref{dim})
 position of a substring in a string (see @ref{find})
 @item @code{gcd}
 greatest common divisor (see @ref{gcd})
+@item @code{koszul} Koszul matrix (see @ref{koszul})
 @item @code{memory}
 memory usage (see @ref{memory})
 @item @code{mult}
@@ -700,15 +720,20 @@ A intmat expression is:
 @enumerate
 @item
 a list of int expressions, intvec expressions and intmat expressions
+@item an identifier of type intmat
 @item
-a function returning intmat (see @ref{intmat related functions})
+a function returning intmat
+@item
+ a typecast to intmat
 @item
 intmat operations with int: @code{+}, @code{-}, @code{*}, @code{/}, @code{%}
 @item
 intmat operations: @code{+}, @code{-}, @code{*}
-@item
-intmat comparison (yielding int): @code{<>}, @code{==}
 @end enumerate
+@c ref
+See @ref{Type conversion and casting}.
+@c ref
+
 
 @strong{Example:}
 @example
@@ -733,6 +758,18 @@ intmat comparison (yielding int): @code{<>}, @code{==}
 @subsection intmat operations
 @cindex intmat operations
 
+@table @asis
+@code{<>}, @code{==} comparison
+@end tableBrackets may be used to access elements of intmats:
+@emph{ideal expressions} @code{[} @emph{row, column} @code{]} is a iintmat entry.
+
+@strong{Example:}
+@example
+@c example
+
+@c example
+@end exampl
+
 @c ------------------------------
 @node intmat related functions, ,intmat operations, intmat
 @subsection intmat related functions
@@ -750,7 +787,7 @@ number of cols (see @ref{ncols})
 @item @code{nrows}
 number of rows (see @ref{nrows})
 @item @code{random}
-create a random intmat (see @ref{random})
+create a pseudo random intmat (see @ref{random})
 @item @code{size}
 total number of entries (see @ref{size})
 @item @code{transpose}
@@ -823,16 +860,13 @@ a list of int expressions and of intvec expressions
 @item
 a range: int expression @code{..} int expression
 @item
-a function returning intvec (see @ref{intvec related functions})
+a function returning intvec 
 @item
 intvec operations with int: @code{+}, @code{-}, @code{*}, @code{/}, @code{%}
 @item
 intvec operations: @code{+}, @code{-}
 @item
 intvec operation with an intmat: @code{*}
-@item
-intvec comparison (done lexicographically, yielding int):
-@code{<>}, @code{==}, @code{<=}, @code{>=}, @code{>}, @code{<}
 @end enumerate
 
 @c ref
@@ -866,6 +900,21 @@ See @ref{Type conversion and casting}.
 @node intvec operations, intvec related functions, intvec expressions, intvec
 @subsection intvec operations
 @cindex intvec operations
+@table @asis
+@item  @code{+} addition with integers or intvec
+@item  @code{-} subtraction of integer or intvec
+@item  @code{*} multiplication with integer or intmat
+@item  @code{/, div} division with integers 
+@item  @code{%, mod} modulo
+@item  @code{<>}, @code{==}, @code{<=}, @code{>=}, @code{>}, @code{<}
+comparison (done lexicographically)
+@end table
+@strong{Example:}
+@example
+@c example
+
+@c example
+@end example
 
 @c ------------------------------
 @node intvec related functions, ,intvec operations, intvec
@@ -873,6 +922,7 @@ See @ref{Type conversion and casting}.
 @cindex intvec related functions
 
 @table @asis
+@item @code{factorize} multiplicities of factors of a polynomial (see @ref{factorize})
 @item @code{hilb}
 returns Hilbert series as intvec (see @ref{hilb})
 @item @code{indepSet}
@@ -887,6 +937,7 @@ returns quasihgomogeneous weights (see @ref{qhweight})
 length of the intvec (see @ref{size})
 @item @code{sortvec}
 permutation for sorting ideals/modules (see @ref{sortvec})
+@item @code{stdhilbert} Hilbert series for Hilbert driven standard basis computation (see @ref{stdhilbert})
 @item @code{transpose}
 transpose of an intvec, returns an intmat (see @ref{transpose})
 @item @code{weight}
@@ -1472,6 +1523,8 @@ empty list
 A list expression is:
 @enumerate
 @item
+the empty list @code{list()}
+@item
 an identifier of type list
 @item
 a function returning list
@@ -1479,12 +1532,18 @@ a function returning list
 list expressions combined by arithmetic operation @code{+} and @code{,}
 @item
 a typecast to list
-@item
-the empty list @code{list()}
+
 @end enumerate
 @c ref
 See @ref{Type conversion and casting}.
 @c ref
+@strong{Example:}
+@example
+@c example 
+
+@c example 
+@end example
+
 
 @c ------------------------------
 @node list operations, list related functions, list expressions, list
@@ -1499,9 +1558,12 @@ construct a new list whose elements are the parts of the expression list
 @end table
 Brackets may be used to access elements of lists:
 @emph{list expressions} @code{[} @emph{int expressions} @code{]} is a list entry.
-@c @strong{Example:}
-@c @example
-@c @end example
+@strong{Example:}
+@example
+@c example 
+
+@c example 
+@end example
 
 @c ------------------------------
 @node list related functions, ,list operations, list
@@ -1515,8 +1577,12 @@ Betti numbers from a resolution (see @ref{betti})
 delete an element from a list (see @ref{delete})
 @item @code{facstd}
 factorizing Groebner basis algorithm (see @ref{facstd})
+@item @code{factorize}
+list of factors of a polynomial (see @ref{factorize})
 @item @code{insert}
 insert or append a new element to a list (see @ref{insert})
+@item @code{lres}
+minimal resolution (see @ref{lres})
 @item @code{minres}
 minimize a free resolution (see @ref{minres})
 @item @code{mres}
@@ -1531,9 +1597,7 @@ number of entries (see @ref{size})
 @item @code{sres}
 free resolution of an ideal/module given by a standard base (see @ref{sres})
 @end table
-@c @strong{Example:}
-@c @example
-@c @end example
+
 
 @c ---------------------------------------
 @node map, matrix, list, Data types
@@ -1587,7 +1651,7 @@ See @ref{imap}; @ref{fetch}; @ref{subst}.
 @item @strong{Syntax:}
 @code{map} name @code{=} preimage_ring_name @code{,} ideal_expression @code{;}
 @item @strong{Purpose:}
-define a ring map from preimage_ring to basering
+defines a ring map from preimage_ring to basering
 @sp 1
 map the variables of the preimage ring to the generators of the ideal.
 If the ideal contains less elements than variables in the
@@ -1597,7 +1661,6 @@ The image ring is always the actual basering.
 For the mapping of coefficients from different fields see @ref{map}.
 @item @strong{Default:}
 none
-@*Maps may be composed.
 @item @strong{Remark:}
 There are standard mappings for the identity map: @code{fetch} and @code{imap}.
 @item @strong{Example:}
@@ -1642,16 +1705,31 @@ a function returning map
 map expressions combined by composition
 @end enumerate
 
-@c @c ------------------------------
-@c @node map operations, map related functions, map expressions, map
-@c @subsection map operations
-@c @cindex map operations
-@c
-
 @c ------------------------------
-@node map related functions,  , map expressions, map
-@subsection map related functions
-@cindex map related functions
+@node map operations, map related functions, map expressions, map
+@subsection map operations
+
+@cindex map operations
+
+@table @asis
+Maps may be composed.
+@end table
+
+Brackets may be used to access elements of maps:
+@emph{map expressions} @code{[} @emph{int expressions} @code{]} is a map entry.
+@strong{Example:}
+@example
+@c example
+ 
+@c example
+@end example
+
+
+
+@c @c ------------------------------
+@c @node map related functions,  , map expressions, map
+@c @subsection map related functions
+@c @cindex map related functions
 
 @strong{Apply a map:}
 the name of a map serves as the function which maps objects from the
@@ -1744,6 +1822,12 @@ a typecast to matrix.
 @c ref
 See @ref{Type conversion and casting}.
 @c ref
+@strong{Example:}
+@example
+@c example
+
+@c example
+@end example
 
 @c ------------------------------
 @node matrix operations, matrix related functions, matrix expressions, matrix
@@ -1761,10 +1845,13 @@ multiplication (with poly, matrix)
 comparison
 @end table
 Brackets may be used to access elements of matrices:
-@emph{matrix expressions} @code{[} @emph{row}@code{,} @emph{column} @code{]} is a matrix entry.
-@c @strong{Example:}
-@c @example
-@c @end example
+@emph{matrix expressions} @code{[} @emph{row}@code{,} @emph{column} @code{]} is a matrix entry; @emph{matrix expressions} @code{[} @emph{column} @code{]} is a vector.
+@strong{Example:}
+@example
+@c example
+
+@c example
+@end example
 
 @c ------------------------------
 @node matrix related functions, ,matrix operations, matrix
@@ -1796,6 +1883,8 @@ set of minors of a matrix (see @ref{minor})
 number of columns (see @ref{ncols})
 @item @code{nrows}
 number of rows (see @ref{nrows})
+@print @code(print)  
+nice print format (see @ref{print})
 @item @code{size}
 number of matrix entries (see @ref{size})
 @item @code{subst}
@@ -1912,15 +2001,22 @@ an identifier of type module
 @item
 a function returning module
 @item
-module expressions combined by the arithmetic operation @code{+}
+module expressions combined by the arithmetic operation: @code{+}
 @item
-multiplication of a module expressions with an ideal or poly expression (@code{*})
+multiplication of a module expressions with an ideal or poly expression: @code{*}
 @item
 a typecast to module.
 @end enumerate
+
 @c ref
 See @ref{Type conversion and casting}.
 @c ref
+@strong{Example:}
+@example
+@c example
+
+@c example
+@end example
 
 @c ------------------------------
 @node module operations, module related functions, module expressions, module
@@ -1932,11 +2028,18 @@ See @ref{Type conversion and casting}.
 addition (concatenation of the generators and simplification)
 @item @code{*}
 multiplication with ideal or poly, but not `module` * `module`
+@item 
 @end table
+@strong{Example:}
+@example
+@c example
 
-@c @strong{Example:}
-@c @example
-@c @end example
+@c example
+@end example
+
+Brackets may be used to access elements of moduless:
+@emph{module expressions} @code{[} @emph{row} @emph{,} @emph{column}  @code{]} is a module entry.
+@emph{module expressions} @code{[} @emph{column} @code{]} is a vector.
 
 @c ------------------------------
 @node module related functions, ,module operations, module
@@ -1974,6 +2077,8 @@ initial module (see @ref{lead})
 lift-matrix (see @ref{lift})
 @item @code{liftstd}
 standardbasis and transformation matrix computation (see @ref{liftstd})
+@item @code{lres}
+minimal resolution (see @ref{lres})
 @item @code{minbase}
 minimal generating set of a homogeneous ideal/module or an ideal/module
 over a local ring
@@ -2104,6 +2209,8 @@ an int expression (see @ref{Type conversion and casting})
 @item
 number s combined by arithmetic operations @code{+,-,*,/} or @code{^,**}.
 (see @ref{number operations}).
+@item 
+a cast to number
 @end enumerate
 
 @strong{Example:}
@@ -2117,7 +2224,7 @@ See @ref{number}; @ref{ring}; @ref{Type conversion and casting}.
 @c ref
 
 @c ------------------------------
-@node number operations, , number expressions, number
+@node number operations,number related functions , number expressions, number
 @subsection number operations
 @cindex number operations
 
@@ -2134,13 +2241,27 @@ division
 power, exponentiation (by an integer)
 @item @code{<=, >=, ==, <>}
 comparison
-@item @code{leadcoef}
-coefficient of the leading term (see @ref{leadcoef})
+
 @end table
 
-@c @strong{Example:}
-@c @example
-@c @end example
+@strong{Example:}
+@example
+@c example
+
+@c example
+@end example
+
+@c ------------------------------
+@node number related functions, ,number operations, number
+@subsection number related functions
+@cindex ideal number functions
+
+@item @code{leadcoef} 
+coefficient of the leading term (see @ref{leadcoef})
+@item @code{par} n-th paramter of the basering (see @ref{par})
+@item @code{pardeg} degree of a number in ring paramters (see @ref{pardeg}) 
+@item @code{parstr} string form of paramter  (see @ref{parstr})
+@end table
 
 @c ---------------------------------------
 @node poly, proc, number, Data types
@@ -2211,7 +2332,7 @@ an identifier of type poly
 @item
 a function returning poly (see @ref{poly related functions})
 @item
-an int expression (see @ref{Type conversion and casting})
+a typecast to poly 
 @item
 poly expressions combined by arithmetic operations +,-,*,/ or ^.
 (see @ref{poly operations}).
@@ -2248,13 +2369,13 @@ division by a monomial, non divisible terms yield 0
 power by an integer
 @item @code{<}, @code{<=}, @code{>}, @code{>=}, @code{==}, @code{<>}
 comparison
-@item @code{[}, @code{]}
-choice of the monomial at the indicated place w.r.t. the monomial order
+@c @item @code{[}, @code{]}
+@c choice of the monomial at the indicated place w.r.t. the monomial order
 @end table
-@*
-Brackets may be used to access elements of ideals and matrices:
-@emph{ideal expressions} @code{[} @emph{position} @code{]} is a generator of the ideal,
-@emph{matrix expressions} @code{[} @emph{row}@code{,} @emph{column} @code{]} is a matrix entry.
+@*Brackets may be used to access single terms of a polynomial:
+@emph{list expressions} @code{[} @emph{int expressions} @code{]} is a poly  entry
+
+
 
 @strong{Example:}
 @example
@@ -2285,6 +2406,8 @@ degree (see @ref{deg})
 determinant (see @ref{det})
 @item @code{diff}
 partial derivative (see @ref{diff})
+@item @code{extgcd} Bezout representation of gcd (see @ref{extgcd})
+@item @code{factorize} factorize polynomial (see @ref{factorize})
 @item @code{finduni}
 find univariate polynomials in a zero dimensional ideal (see @ref{finduni})
 @item @code{homog}
@@ -2307,6 +2430,7 @@ normal form with respect to a standard base (see @ref{reduce})
 test for ring variable (see @ref{rvar})
 @item @code{simplify}
 normalize a polynomial (see @ref{simplify})
+@item @code{qhweight}  quasihomogenous weights (see @ref{qhweight})
 @item @code{size}
 number of monomials (see @ref{size})
 @item @code{subst}
@@ -2315,6 +2439,8 @@ substitute a ring variable (see @ref{subst})
 trace of a matrix (see @ref{trace})
 @item @code{var}
 the indicated variable of the ring (see @ref{var})
+@item @code{varstr} 
+variable in string form (see @ref{varstr})
 @end table
 
 @c @strong{Example:}
@@ -2326,6 +2452,13 @@ the indicated variable of the ring (see @ref{var})
 @section proc
 @cindex proc
 
+@strong{Example:}
+@example
+@c example 
+
+@c example 
+@end example
+
 See @ref{Procedures}.
 
 @c ---------------------------------------
@@ -2333,6 +2466,7 @@ See @ref{Procedures}.
 @section qring
 @cindex qring
 
+  -- TEXT --
 @table @code
 @item @strong{Syntax:}
 @code{qring} name @code{=} ideal_expression @code{;}
@@ -2529,7 +2663,7 @@ The @code{+} sign "adds" strings, @code{""} is the empty string
 (hence strings form a semigroup). Strings may be used to comment
 the output of a computation or to give it a nice format.
 Strings may also be used
-to convert one type into another.
+for intermidiate conversion of one type into another.
 @example
 @c example
   string s="Hi";
@@ -2640,7 +2774,8 @@ comparison (lexicographic with respect to the ASCII coding)
 @*
 Brackets may be used to access parts of a string:
 @emph{string expressions} @code{[} @emph{position} @code{]} is a character of the string,
-@emph{string expressions} @code{[} @emph{position}@code{,} @emph{length} @code{]} is a substring
+@emph{string expressions} @code{[} @emph{position}@code{,} @emph{length} @code{]} is a substring filled up with blanks if @emph{length} exceeds the total size
+of the string
 and @emph{string expressions} @code{[} @emph{intvec} @code{]} is a list of characters
 from the string.
 
@@ -2664,25 +2799,25 @@ from the string.
 @cindex string related functions
 
 @table @asis
+@item @code{charstr}
+description of the coeffinet field of a ring (see @ref{charstr})
+@item @code{find}
+position of a substring in a string (see @ref{find})
 @item @code{nameof}
 name of an object (see @ref{nameof})
 @item @code{option}
 lists all defined options (see @ref{option})
+@item @code{ordstr}
+monomial ordering of a ring (see @ref{ordstr})
+@item @code{parstr}
+names of all ring parameters or the
+name of the n-th ring parameter (see @ref{parstr})
 @item @code{read}
 read a file (see @ref{read})
 @item @code{size}
 length of a string (see @ref{size})
-@item @code{find}
-position of a substring in a string (see @ref{find})
 @item @code{typeof}
 type of an object (see @ref{typeof})
-@item @code{ordstr}
-monomial ordering of a ring (see @ref{ordstr})
-@item @code{charstr}
-description of the coeffinet field of a ring (see @ref{charstr})
-@item @code{parstr}
-names of all ring parameters or the
-name of the n-th ring parameter (see @ref{parstr})
 @item @code{varstr}
 names of all ring variables or the
 name of the n-th ring variable (see @ref{varstr})
@@ -2804,6 +2939,8 @@ choice of a component
 @c example
 @end example
 
+Brackets may be used to access elements of vectors:
+@emph{vector expressions} @code{[} @emph{int expressions} @code{]} is a vector entry.
 @c ------------------------------
 @node vector related functions, ,vector operations, vector
 @subsection vector related functions
