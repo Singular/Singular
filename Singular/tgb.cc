@@ -17,7 +17,9 @@
 
 #define FULLREDUCTIONS
 #define HEAD_BIN
-#define HOMOGENEOUS_EXAMPLE
+//#define HOMOGENEOUS_EXAMPLE
+#define REDTAIL_S
+//#define REDTAIL_PROT
 //#define QUICK_SPOLY_TEST
 //#define DIAGONAL_GOING
 //#define RANDOM_WALK
@@ -173,7 +175,8 @@ bool find_next_pair(calc_dat* c)
   }
   return false;
 }
-void move_forward_in_S(int old_pos, int new_pos,kStrategy strat){
+void move_forward_in_S(int old_pos, int new_pos,kStrategy strat)
+{
   poly p=strat->S[old_pos];
   int ecart=strat->ecartS[old_pos];
   long sev=strat->sevS[old_pos];
@@ -190,7 +193,7 @@ void move_forward_in_S(int old_pos, int new_pos,kStrategy strat){
   if (strat->lenS!=NULL)
     for (i=old_pos; i>new_pos; i--)
       strat->lenS[i] = strat->lenS[i-1];
-    
+
     strat->S[new_pos]=p;
   strat->ecartS[new_pos]=ecart;
   strat->sevS[new_pos]=sev;
@@ -511,17 +514,12 @@ void initial_data(calc_dat* c){
   {
   #ifdef HEAD_BIN
     c->S->m[i]=p_MoveHead(c->S->m[i],c->HeadBin);
-  #endif  
+  #endif
     c->T_deg[i]=pFDeg(c->S->m[i]);
     c->lengths[i]=pLength(c->S->m[i]);
     c->misses[i]=0;
-    h=omalloc(i*sizeof(char));
-    if (h!=NULL){
-      c->states[i]=(char*) h;
-    } else {
-      exit(1);
-    }
-    c->deg[i]=(int*) omalloc(i*sizeof(int));
+    c->states[i]=(char *)omAlloc((i+1)*sizeof(char));
+    c->deg[i]=(int*) omAlloc((i+1)*sizeof(int));
     for (j=0;j<i;j++){
       //check product criterion
       if (pHasNotCF(c->S->m[i],c->S->m[j])){
@@ -804,11 +802,13 @@ static poly redNF (poly h,kStrategy strat)
   }
 }
 #else
-static poly redNF (poly h,kStrategy strat)
+static poly redNF (poly h,kStrategy strat, int &len)
 {
+  len=0;
   if (h==NULL) return NULL;
   int j;
 
+  len=pLength(h);
   if (0 > strat->sl)
   {
     return h;
@@ -816,7 +816,7 @@ static poly redNF (poly h,kStrategy strat)
   LObject P(h);
   P.SetShortExpVector();
   P.bucket = kBucketCreate(currRing);
-  kBucketInit(P.bucket,P.p,pLength(P.p));
+  kBucketInit(P.bucket,P.p,len /*pLength(P.p)*/);
   //int max_pos=simple_posInS(strat,P.p);
   loop
   {
@@ -853,11 +853,110 @@ static poly redNF (poly h,kStrategy strat)
     }
     else
     {
-      P.p=kBucketClear(P.bucket);
+      kBucketClear(P.bucket,&(P.p),&len);
       kBucketDestroy(&P.bucket);
       pNormalize(P.p);
       return P.p;
     }
+  }
+}
+#endif
+#ifdef REDTAIL_S
+poly redNFTail (poly h,const int sl,kStrategy strat, int len)
+{
+  if (h==NULL) return NULL;
+  if (pNext(h)==NULL) return h;
+  pTest(h);
+  if (0 > sl)
+    return h;
+
+  int j;
+  poly res=h;
+  poly act=res;
+  LObject P(pNext(h));
+  pNext(res)=NULL;
+  P.bucket = kBucketCreate(currRing);
+  len--;
+  h=P.p;
+  if (len <=0) len=pLength(h);
+  kBucketInit(P.bucket,h /*P.p*/,len /*pLength(P.p)*/);
+  pTest(h);
+  loop
+  {
+    P.p=h;
+    P.t_p=NULL;
+    P.SetShortExpVector();
+    loop
+    {
+      j=kFindDivisibleByInS(strat->S,strat->sevS,sl,&P);
+      if (j>=0)
+      {
+      #ifdef REDTAIL_PROT
+        PrintS("r");
+      #endif
+        nNormalize(pGetCoeff(P.p));
+#ifdef KDEBUG
+        if (TEST_OPT_DEBUG)
+        {
+          PrintS("red tail:");
+          wrp(h);
+          PrintS(" with ");
+          wrp(strat->S[j]);
+        }
+#endif
+        number coef;
+        pTest(strat->S[j]);
+        coef=kBucketPolyRed(P.bucket,strat->S[j],
+               strat->lenS[j]/*pLength(strat->S[j])*/,strat->kNoether);
+        pMult_nn(res,coef);
+        nDelete(&coef);
+        h = kBucketGetLm(P.bucket);
+        pTest(h);
+        if (h==NULL)
+        {
+          #ifdef REDTAIL_PROT
+            PrintS(" ");
+          #endif
+          return res;
+        }
+  pTest(h);
+        P.p=h;
+        P.t_p=NULL;
+        P.SetShortExpVector();
+#ifdef KDEBUG
+        if (TEST_OPT_DEBUG)
+        {
+          PrintS("\nto tail:");
+          wrp(h);
+          PrintLn();
+        }
+#endif
+      }
+      else
+      {
+        #ifdef REDTAIL_PROT
+          PrintS("n");
+        #endif
+        break;
+      }
+    } /* end loop current mon */
+    poly tmp=pHead(h /*kBucketGetLm(P.bucket)*/);
+    act->next=tmp;pIter(act);
+    poly tmp2=pHead(h);
+    pNeg(tmp2);
+    int ltmp2=1;
+    pTest(tmp2);
+    kBucket_Add_q(P.bucket, tmp2, &ltmp2);
+
+    h = kBucketGetLm(P.bucket);
+    if (h==NULL)
+    {
+      #ifdef REDTAIL_PROT
+        PrintS(" ");
+      #endif
+      return res;
+    }
+  pTest(h);
   }
 }
 #endif
@@ -868,17 +967,23 @@ void do_this_spoly_stuff(int i,int j,calc_dat* c){
   poly h=ksOldCreateSpoly(f, g, NULL, c->r);
   poly hr=NULL;
 #ifdef FULLREDUCTIONS
-//  if (h!=NULL) hr=kNF2(c->S,NULL,h,c->strat, 0);
   if (h!=NULL)
   {
-    hr=redNF(h,c->strat);
+    int len;
+    hr=redNF(h,c->strat,len);
     if (hr!=NULL)
+    #ifdef REDTAIL_S
+      hr = redNFTail(hr,c->strat->sl,c->strat,len);
+    #else
       hr = redtailBba(hr,c->strat->sl,c->strat);
+    #endif
   }
 #else
-  //if (h!=NULL) hr=kNF2(c->S,NULL,h,c->strat, 1);
   if (h!=NULL)
-    hr=redNF(h,c->strat);
+  {
+    int len;
+    hr=redNF(h,c->strat,&len);
+  }
 #endif
   c->normal_forms++;
   if (hr==NULL)
@@ -888,11 +993,13 @@ void do_this_spoly_stuff(int i,int j,calc_dat* c){
     c->misses[i]++;
     c->misses[j]++;
     c->misses_series++;
-  } else {
+  }
+  else
+  {
     c->misses_series=0;
   #ifdef HEAD_BIN
     hr=p_MoveHead(hr,c->HeadBin);
-  #endif  
+  #endif
     add_to_basis(hr, i,j,c);
   }
 }
@@ -1007,58 +1114,71 @@ int pMinDeg3(poly f){
 }
 
 
-void shorten_tails(calc_dat* c, poly monom){
- 
-  for(int i=0;i<c->n;i++){
+void shorten_tails(calc_dat* c, poly monom)
+{
+
+  for(int i=0;i<c->n;i++)
+  {
     //enter tail
     if (c->rep[i]!=i) continue;
     if (c->S->m[i]==NULL) continue;
     poly tail=c->S->m[i]->next;
     poly prev=c->S->m[i];
     bool did_something=false;
-    while((tail!=NULL)&& (pLmCmp(tail, monom)>=0)){
-      if (p_LmDivisibleBy(monom,tail,c->r)){
-
-	did_something=true;
-	prev->next=tail->next;
-	tail->next=NULL;
-	p_Delete(& tail,c->r);
-	tail=prev;
-	//PrintS("Shortened");
-	c->lengths[i]--;
-	
+    while((tail!=NULL)&& (pLmCmp(tail, monom)>=0))
+    {
+      if (p_LmDivisibleBy(monom,tail,c->r))
+      {
+        did_something=true;
+        prev->next=tail->next;
+        tail->next=NULL;
+        p_Delete(& tail,c->r);
+        tail=prev;
+        //PrintS("Shortened");
+        c->lengths[i]--;
       }
-
       prev=tail;
       tail=tail->next;
     }
-    if (did_something){
+    if (did_something)
+    {
       int new_pos=simple_posInS(c->strat,c->S->m[i],c->lengths[i]);
       int old_pos=-1;
       //assume new_pos<old_pos
       for (int z=new_pos;z<=c->strat->sl;z++)
       {
-	if (c->strat->S[z]==c->S->m[i])
-	  {
-	    old_pos=z;
-	    break;
-	  }
+        if (c->strat->S[z]==c->S->m[i])
+        {
+          old_pos=z;
+          break;
+        }
+      }
+      if (old_pos== -1)
+      for (int z=new_pos-1;z>=0l;z--)
+      {
+        if (c->strat->S[z]==c->S->m[i])
+        {
+          old_pos=z;
+          break;
+        }
       }
       assume(old_pos>=0);
       assume(pLength(c->strat->S[old_pos])==c->lengths[i]);
       c->strat->lenS[old_pos]=c->lengths[i];
-
-      move_forward_in_S(old_pos,new_pos,c->strat);
-      if (c->lengths[i]==1){
-	int j;
-	for ( j=0;j<i;j++){
-	  if (c->lengths[j]==1)
-	    c->states[i][j]=HASTREP;
-	}
-	for ( j=i+1;j<c->n;j++){
-	  if (c->lengths[j]==1)
-	    c->states[j][i]=HASTREP;
-	}
+      if (new_pos<old_pos)
+        move_forward_in_S(old_pos,new_pos,c->strat);
+      if (c->lengths[i]==1)
+      {
+        int j;
+        for ( j=0;j<i;j++)
+        {
+          if (c->lengths[j]==1)
+            c->states[i][j]=HASTREP;
+        }
+        for ( j=i+1;j<c->n;j++){
+          if (c->lengths[j]==1)
+            c->states[j][i]=HASTREP;
+        }
       }
     }
   }
