@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: scanner.l,v 1.13 2002-06-27 14:01:12 anne Exp $ */
+/* $Id: scanner.l,v 1.14 2002-07-01 12:31:34 anne Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -395,6 +395,7 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
 
         <<EOF>>  { sectnum = 0;
 	           iseof=1;
+		   lvalp->name = yytext;
 	           return SECT4END;
                    /* yyterminate(); */
                  }

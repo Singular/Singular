@@ -53,6 +53,8 @@ pathnames.h:
 	echo "" >> pathnames.h
 	echo "#define TOPSRCDIR \"$(topsrcdir)\"" >> pathnames.h
 	echo "#define LIBDIR    \"$(libdir)\"" >> pathnames.h
+	echo "#define PREFIX	\"$(prefix)\"" >> pathnames.h
+	echo "#define EXEC_PREFIX	\"$(exec_prefix)\"" >> pathnames.h
 
 modgen: ${OBJS} modgen.h decl.inc typmap.h pathnames.h stype.h
 	gcc -o $@ ${CFLAGS} ${OBJS} ${LIBS}

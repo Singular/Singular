@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: creat_top.cc,v 1.15 2002-06-26 12:03:16 anne Exp $ */
+/* $Id: creat_top.cc,v 1.16 2002-07-01 12:31:32 anne Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -118,19 +118,9 @@ void write_mod_init(
   fprintf(fp, "extern \"C\"\n");
   fprintf(fp, "int mod_init(int(*iiAddCproc)())\n{\n");
   fprintf(fp, "  idhdl h;\n");
-/* HIER MUSS ERST ZUARBEIT VON HANS KOMMEN
-  fprintf(fp, "  idhdl helphdl = enter_id(\"Help\", NULL, PACKAGE_CMD);\n");
-  fprintf(fp, "  idhdl examplehdl = enter_id(\"Example\", NULL, PACKAGE_CMD);\n\n");
+  fprintf(fp, "   fill_help_package();\n");
   fprintf(fp, "  \n");
-  fprintf(fp, "   if( helphdl == NULL)\n");
-  fprintf(fp, "     Warn(\"Cannot create help-package\\n\");\n");
-  fprintf(fp, "   else fill_help_package(helphdl);\n");
-  fprintf(fp, "  \n");
-  fprintf(fp, "   if( examplehdl == NULL)\n");
-  fprintf(fp, "     Warn(\"Cannot create example-package\\n\");\n");
-  fprintf(fp, "   else fill_example_package(examplehdl);\n");
-   BIS HIERHIN ZUARBEIT VON HANS NOETIG
-*/
+  fprintf(fp, "   fill_example_package();\n");
 }
 
 /*========================================================================*/

@@ -1,5 +1,5 @@
 /*
- * $Id: proc.cc,v 1.17 2002-06-18 15:09:16 anne Exp $
+ * $Id: proc.cc,v 1.18 2002-07-01 12:31:33 anne Exp $
  */
 
 #include <stdio.h>
@@ -363,24 +363,20 @@ void write_finish_functions(
   
   fprintf(module->modfp, "#line %d \"%s.cc\"\n", modlineno++, module->name);
   fprintf(module->modfp, "/* Help section */\n");
-//  fprintf(module->modfp, "void fill_help_package(idhdl pl) {\n");
-//  fprintf(module->modfp, "  namespaceroot->push(IDPACKAGE(pl), IDID(pl));\n");
-//  modlineno+=3;
-//  mod_copy_tmp(module->modfp, module->fmtfp2);
-//  fprintf(module->modfp, "#line %d \"%s.cc\"\n", modlineno++, module->name);
-//  fprintf(module->modfp, "  namespaceroot->pop();\n");
-//  fprintf(module->modfp, "}  /* End of Help section */\n\n");
-//  modlineno+=3;
+  fprintf(module->modfp, "void fill_help_package() {\n");
+  modlineno+=3;
+  mod_copy_tmp(module->modfp, module->fmtfp2);
+  fprintf(module->modfp, "#line %d \"%s.cc\"\n", modlineno++, module->name);
+  fprintf(module->modfp, "}  /* End of Help section */\n\n");
+  modlineno+=3;
 
-//  fprintf(module->modfp, "/* Example section */\n");
-//  fprintf(module->modfp, "void fill_example_package(idhdl pl) {\n");
-//  fprintf(module->modfp, "  namespaceroot->push(IDPACKAGE(pl), IDID(pl));\n");
-//  modlineno+=3;
-//  mod_copy_tmp(module->modfp, module->fmtfp3);
-//  fprintf(module->modfp, "#line %d \"%s.cc\"\n", modlineno++, module->name);
-//  fprintf(module->modfp, "  namespaceroot->pop();\n");
-//  fprintf(module->modfp, "} /* End of Example section */\n\n");
-//  modlineno+=2;
+  fprintf(module->modfp, "/* Example section */\n");
+  fprintf(module->modfp, "void fill_example_package() {\n");
+  modlineno+=3;
+  mod_copy_tmp(module->modfp, module->fmtfp3);
+  fprintf(module->modfp, "#line %d \"%s.cc\"\n", modlineno++, module->name);
+  fprintf(module->modfp, "} /* End of Example section */\n\n");
+  modlineno+=2;
 
   mod_copy_tmp(module->modfp, module->fmtfp);
   fprintf(module->modfp, "#line %d \"%s.cc\"\n", modlineno++, module->name);
@@ -541,7 +537,7 @@ void write_help(
   if(pi->help_string!=NULL) {
     fprintf(module->fmtfp2, "#line %d \"%s\"\n", pi->lineno_other,
             module->filename);
-    fprintf(module->fmtfp2, "  enter_id(\"%s\",", pi->procname);
+    fprintf(module->fmtfp2, "  enter_id(\"%s_help\",", pi->procname);
     fprintf(module->fmtfp2, " \"%s\", STRING_CMD);\n\n", pi->help_string);
   }
 }
@@ -558,7 +554,7 @@ void write_example(
   if(pi->example_string!=NULL) {
     fprintf(module->fmtfp3, "#line %d \"%s\"\n", pi->lineno_other,
             module->filename);
-    fprintf(module->fmtfp3, "  enter_id(\"%s\",\n", pi->procname);
+    fprintf(module->fmtfp3, "  enter_id(\"%s_example\",\n", pi->procname);
     fprintf(module->fmtfp3, " \"%s\", STRING_CMD);\n\n", pi->example_string);
   }
 }

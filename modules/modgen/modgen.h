@@ -1,5 +1,5 @@
 /*
- *  $Id: modgen.h,v 1.13 2000-11-09 21:58:14 krueger Exp $
+ *  $Id: modgen.h,v 1.14 2002-07-01 12:31:33 anne Exp $
  *
  */
 
@@ -87,7 +87,8 @@ class moddef {
   FILE * binfp;           /* include singular procedures are stored
                              in an extra file */
   char * filename;        /* inputfile to parse */
-  char * name;            /* name of the module */
+  char * name;            /* name of the module directory*/
+  char * targetname;      /* name of dynamic module + package */
   unsigned int major, minor, level;
   char * version;
   char * revision;
@@ -147,6 +148,7 @@ extern void mod_write_header(FILE *fp, char *module, char what);
 extern void generate_header(procdefv pi, FILE *fp);
 extern void write_header(FILE *fp, char *module, char *comment="");
 extern void make_version(char *p, moddefv module);
+extern void make_module_name(char *p, moddefv module);
 extern void write_procedure_text(moddefv module, int lineno);
 /*extern void write_procedure_header(moddefv module);*/
 

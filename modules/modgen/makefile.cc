@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: makefile.cc,v 1.10 2002-06-27 14:01:11 anne Exp $ */
+/* $Id: makefile.cc,v 1.11 2002-07-01 12:31:33 anne Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -48,6 +48,12 @@ void mod_create_makefile(moddefv module)
 {
   FILE *fp;
 
+  if(module->targetname==NULL)
+  {
+     module->targetname = (char *)malloc(strlen(module->name)+1);
+     memset(module->targetname, '\0', strlen(module->name)+1);
+     memcpy(module->targetname,module->name,strlen(module->name));
+  }
   mkdir(module->name, 0755);
   fp = fopen(build_filename(module, "Makefile", 0), "w");
   cfilesv cf = module->files;
@@ -123,7 +129,7 @@ void build_install_section(
   fprintf(fp, "\t${MKINSTALLDIRS} ${instdir}\n");
   fprintf(fp, "\t${MKINSTALLDIRS} ${instdir}/modules\n");
   fprintf(fp, "\t${INSTALL_PROGRAM} %s.so ${instdir}/modules/%s.so\n",
-          module->name, module->name);
+          module->targetname, module->targetname);
 }
 
 /*========================================================================*/
@@ -148,7 +154,7 @@ void build_compile_section(
   moddefv module
   )
 {
-  fprintf(fp, "all:\t%s.so %s_g.so \n", module->name, module->name);
+  fprintf(fp, "all:\t%s.so %s_g.so \n", module->targetname, module->targetname);
   fprintf(fp, "\n");
   fprintf(fp, "%%.o: %%.cc Makefile\n");
   fprintf(fp, "\t${CC} ${CFLAGS} -c -fPIC -DPIC $< -o $*.o\n");
@@ -157,24 +163,24 @@ void build_compile_section(
   fprintf(fp, "\t${CC} ${DCFLAGS} -c -fPIC -DPIC $< -o $*.og\n");
   fprintf(fp, "\n");
   
-  fprintf(fp, "%s.so: ${OBJS}\n", module->name);
+  fprintf(fp, "%s.so: ${OBJS}\n", module->targetname);
   fprintf(fp, "\t${CC} ${CFLAGS} -shared -Wl,-soname -Wl,%s.so.%d \\\n",
-          module->name, module->major);
-  fprintf(fp, "\t\t-o %s.so.%d.%d.%d ${OBJS}\n", module->name,
+          module->targetname, module->major);
+  fprintf(fp, "\t\t-o %s.so.%d.%d.%d ${OBJS}\n", module->targetname,
           module->major, module->minor, module->level);
-  fprintf(fp, "\trm -f %s.so\n", module->name);
-  fprintf(fp, "\tln -s %s.so.%d.%d.%d %s.so\n", module->name, module->major,
-          module->minor, module->level, module->name);
+  fprintf(fp, "\trm -f %s.so\n", module->targetname);
+  fprintf(fp, "\tln -s %s.so.%d.%d.%d %s.so\n", module->targetname, module->major,
+          module->minor, module->level, module->targetname);
   fprintf(fp, "\n");
 
-  fprintf(fp, "%s_g.so: ${DOBJS}\n", module->name);
+  fprintf(fp, "%s_g.so: ${DOBJS}\n", module->targetname);
   fprintf(fp, "\t${CC} ${DCFLAGS} -shared -Wl,-soname -Wl,%s_g.so.%d \\\n",
-          module->name, module->major);
-  fprintf(fp, "\t\t-o %s_g.so.%d.%d.%d ${DOBJS}\n", module->name,
+          module->targetname, module->major);
+  fprintf(fp, "\t\t-o %s_g.so.%d.%d.%d ${DOBJS}\n", module->targetname,
           module->major, module->minor, module->level);
-  fprintf(fp, "\trm -f %s_g.so\n", module->name);
-  fprintf(fp, "\tln -s %s_g.so.%d.%d.%d %s_g.so\n", module->name, 
-          module->major, module->minor, module->level, module->name);
+  fprintf(fp, "\trm -f %s_g.so\n", module->targetname);
+  fprintf(fp, "\tln -s %s_g.so.%d.%d.%d %s_g.so\n", module->targetname, 
+          module->major, module->minor, module->level, module->targetname);
   fprintf(fp, "\n");
 }
 #endif /* ix86_Linux */
@@ -186,13 +192,13 @@ void build_compile_section(
   moddefv module
   )
 {
-  fprintf(fp, "all:\t%s.sl\n", module->name);
+  fprintf(fp, "all:\t%s.sl\n", module->targetname);
   fprintf(fp, "\n");
   fprintf(fp, "%%.o: %%.cc Makefile\n");
   fprintf(fp, "\t${CC} ${CFLAGS} -c -fPIC -DPIC $< -o $*.o\n");
   fprintf(fp, "\n");
-  fprintf(fp, "%s.sl: ${OBJS}\n", module->name);
-  fprintf(fp, "\t${LD} -b -o %s.sl \\\n", module->name);
+  fprintf(fp, "%s.sl: ${OBJS}\n", module->targetname);
+  fprintf(fp, "\t${LD} -b -o %s.sl \\\n", module->targetname);
   fprintf(fp, "\t\t${OBJS}\n");
 }
 

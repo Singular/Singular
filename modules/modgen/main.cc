@@ -12,6 +12,7 @@
 #include <getopt.h>
 
 #include "modgen.h"
+#include "pathnames.h"
 #include "stype.h"
 
 /*
@@ -68,7 +69,7 @@ extern void init_type_conv();
 int debug = 0;
 int trace = 0;
 int do_create_makefile = 1;
-char* inst_dir = ".";
+char* inst_dir = EXEC_PREFIX;
 
 static struct option long_options[] =
 {

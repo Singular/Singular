@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: misc.cc,v 1.15 2002-06-26 12:03:16 anne Exp $ */
+/* $Id: misc.cc,v 1.16 2002-07-01 12:31:33 anne Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -311,6 +311,22 @@ void make_version(char *p, moddefv module)
 }
 
 /*========================================================================*/
+void make_module_name(char *p, moddefv module)
+{
+  if(strlen(p)>=1)
+  {
+    module->targetname = (char *)malloc(strlen(p)+1);
+    memset(module->targetname, '\0', strlen(p)+1);
+    memcpy(module->targetname,p,strlen(p));
+  } else {
+    module->targetname = (char *)malloc(strlen(module->name)+1);
+    memset(module->targetname, '\0', strlen(module->name)+1);
+    memcpy(module->targetname,module->name,strlen(module->name));
+  }
+
+}
+
+/*========================================================================*/
 void Add2files(
   moddefv module,
   char *name
@@ -486,11 +502,8 @@ void  mod_write_header(FILE *fp, char *module, char what)
 */
     fprintf(fp, "\n");
     
-/* HIER FEHLT ZUARBEIT VON HANS
-    fprintf(fp, "void fill_help_package(idhdl pl);\n");
-    fprintf(fp, "void fill_example_package(idhdl pl);\n");
-   BIS HIER 
-*/
+    fprintf(fp, "void fill_help_package();\n");
+    fprintf(fp, "void fill_example_package();\n");
     modlineno+=3;
   }
   fprintf(fp, "\n");

@@ -1,5 +1,5 @@
 /*
- * $Id: grammar.y,v 1.17 2002-06-27 14:01:11 anne Exp $
+ * $Id: grammar.y,v 1.18 2002-07-01 12:31:32 anne Exp $
  */
 
 %{
@@ -65,7 +65,7 @@ void yyerror(char * fmt)
 %token SECT3END
 /* SECT4: C/C++ text */
 %token SECT4START
-%token SECT4END
+%token <name> SECT4END
 
 /*%token PROCEND*/
 %token PROCDECLTOK
@@ -176,6 +176,8 @@ expr:   NAME '=' MSTRINGTOK
                     write_cmd(&module_def, vt, STRING_CMD, $1, $3.string);
                   if(vt==VAR_VERSION)
                     make_version($3.string, &module_def);
+		  if(vt==VAR_MODULE)
+		    make_module_name($3.string, &module_def);
                 }
                 else {
                   rc=myyyerror("Line %d: Unknown variable '%s' in section %d\n",
@@ -490,8 +492,6 @@ examplecodeline: CODEPART
           memcpy(procedure_decl.example_string+procedure_decl.example_len,
                  $2, len);
           procedure_decl.example_len = newlen;
-          //strncat(procedure_decl.example_string, $2, strlen($2));
-          //procedure_decl.example_string[procedure_decl.example_len] = '\0';
         };
 
 proccmd: '%' NAME ';'
