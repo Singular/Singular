@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.h,v 1.25 1999-02-26 15:32:05 Singular Exp $ */
+/* $Id: ipid.h,v 1.26 1999-07-06 13:35:32 Singular Exp $ */
 /*
 * ABSTRACT: identfier handling
 */
@@ -62,8 +62,8 @@ class idrec
   idhdl      next;
   char *     id;
   utypes     data;
-  BITSET     flag;
   attr       attribute;
+  BITSET     flag;
   idtyp      typ;
 
   short      lev;
@@ -94,6 +94,7 @@ class idrec
   idrec() { memset(this,0,sizeof(*this)); }
   idhdl get(const char * s, int lev);
   idhdl set(char * s, int lev, idtyp t, BOOLEAN init=TRUE);
+  char * String();
 //  ~idrec();
 };
 

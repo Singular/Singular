@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: subexpr.h,v 1.17 1999-04-17 14:58:54 obachman Exp $ */
+/* $Id: subexpr.h,v 1.18 1999-07-06 13:35:34 Singular Exp $ */
 /*
 * ABSTRACT: handling of leftv
 */
@@ -33,8 +33,8 @@ class sleftv
     leftv       next;
     char *      name;
     void *      data;
-    BITSET      flag;
     attr        attribute;
+    BITSET      flag;
     int         rtyp;
                  /* the type of the expression, describes the data field
                   * (E) markes the type field in iparith

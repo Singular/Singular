@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.32 1999-05-06 16:53:24 Singular Exp $ */
+/* $Id: ipid.cc,v 1.33 1999-07-06 13:35:32 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -200,6 +200,17 @@ idhdl idrec::set(char * s, int lev, idtyp t, BOOLEAN init)
   // --------------------------------------------------------
   return  h;
 }
+
+char * idrec::String()
+{
+  sleftv tmp;
+  memset(&tmp,0,sizeof(sleftv));
+  tmp.rtyp=IDTYP(this);
+  tmp.data=IDDATA(this);
+  tmp.name=IDID(this);
+  return tmp.String();
+}  
+
 
 //#define KAI
 idhdl enterid(char * s, int lev, idtyp t, idhdl* root, BOOLEAN init)

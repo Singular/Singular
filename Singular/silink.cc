@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: silink.cc,v 1.27 1999-04-17 12:30:24 Singular Exp $ */
+/* $Id: silink.cc,v 1.28 1999-07-06 13:35:33 Singular Exp $ */
 
 /*
 * ABSTRACT: general interface to links
@@ -388,7 +388,7 @@ BOOLEAN slCloseAscii(si_link l)
   return FALSE;
 }
 
-leftv slReadAscii(si_link l)
+leftv slReadAscii2(si_link l, leftv pr)
 {
   FILE * fp=(FILE *)l->data;
   char * buf=NULL;
@@ -414,9 +414,16 @@ leftv slReadAscii(si_link l)
     else
   #endif
     {
-      //PrintS("? "); mflush();
-      buf=(char *)AllocL(80);
-      fe_fgets_stdin("? ",buf,80);
+      if (pr->Typ()==STRING_CMD)
+      {
+        buf=(char *)AllocL(80);
+        fe_fgets_stdin(pr->Data(),buf,80);
+      }
+      else
+      {
+        WerrorS("read(<link>,<string>) expected");
+        buf=mstrdup("");
+      }
     }
   }
   leftv v=(leftv)Alloc0(sizeof(sleftv));
@@ -424,6 +431,16 @@ leftv slReadAscii(si_link l)
   v->data=buf;
   return v;
 }
+
+leftv slReadAscii(si_link l)
+{
+  sleftv tmp;
+  memset(&tmp,0,sizeof(sleftv));
+  tmp.rtyp=STRING_CMD;
+  tmp.data="? ";
+  return slReadAscii2(l,&tmp);
+}
+
 BOOLEAN slWriteAscii(si_link l, leftv v)
 {
   FILE *outfile=(FILE *)l->data;
@@ -523,12 +540,12 @@ static BOOLEAN DumpAsciiMaps(FILE *fd, idhdl h, idhdl rhdl)
   {
     char *rhs;
     rSetHdl(rhdl, TRUE);
-    rhs = ((leftv) h)->String();
+    rhs = h->String();
 
 #ifdef HAVE_NAMESPACES
-    if (fprintf(fd, "setring %s::%s;\n", 
+    if (fprintf(fd, "setring %s::%s;\n",
                 namespaceroot->name, IDID(rhdl)) == EOF) return TRUE;
-    if (fprintf(fd, "%s %s::%s = %s, %s;\n", Tok2Cmdname(MAP_CMD), 
+    if (fprintf(fd, "%s %s::%s = %s, %s;\n", Tok2Cmdname(MAP_CMD),
                  namespaceroot->name, IDID(h),
                 IDMAP(h)->preimage, rhs) == EOF)
 #else
@@ -554,26 +571,30 @@ static BOOLEAN DumpAsciiIdhdl(FILE *fd, idhdl h)
   char *type_str = GetIdString(h);
   idtyp type_id = IDTYP(h);
 
-  if (type_id == PACKAGE_CMD && strcmp(IDID(h), "Top") == 0) return FALSE;
-  
+#ifdef HAVE_NAMESPACES
+  if ((type_id == PACKAGE_CMD) &&(strcmp(IDID(h), "Top") == 0))
+    return FALSE;
+#endif
+
   // we do not throw an error if a wrong type was attempted to be dumped
-  if (type_str == NULL) return FALSE;
+  if (type_str == NULL)
+    return FALSE;
 
   // handle qrings separately
-  if (type_id == QRING_CMD) return DumpQring(fd, h, type_str);
+  if (type_id == QRING_CMD)
+    return DumpQring(fd, h, type_str);
 
   // do not dump LIB string
   if (type_id == STRING_CMD && strcmp("LIB", IDID(h)) == 0)
-  {
     return FALSE;
-  }
 
+  // put type and name
 #ifdef HAVE_NAMESPACES
-  // put type and name
-  if (fprintf(fd, "%s %s::%s", type_str, namespaceroot->name, IDID(h)) == EOF) return TRUE; 
+  if (fprintf(fd, "%s %s::%s", type_str, namespaceroot->name, IDID(h)) == EOF)
+    return TRUE;
 #else
-  // put type and name
-  if (fprintf(fd, "%s %s", type_str, IDID(h)) == EOF) return TRUE;
+  if (fprintf(fd, "%s %s", type_str, IDID(h)) == EOF)
+    return TRUE;
 #endif
   // for matricies, append the dimension
   if (type_id == MATRIX_CMD)
@@ -587,11 +608,14 @@ static BOOLEAN DumpAsciiIdhdl(FILE *fd, idhdl h)
         == EOF) return TRUE;
   }
 
-  if (type_id == PACKAGE_CMD) {
+#ifdef HAVE_NAMESPACES
+  if (type_id == PACKAGE_CMD)
+  {
     if (fprintf(fd, ";\n") == EOF) return TRUE;
     else return FALSE;
   }
-  
+#endif
+
   // write the equal sign
   if (fprintf(fd, " = ") == EOF) return TRUE;
 
@@ -647,7 +671,7 @@ static char* GetIdString(idhdl h)
 
 static BOOLEAN DumpQring(FILE *fd, idhdl h, char *type_str)
 {
-  char *ring_str = ((leftv) h)->String();
+  char *ring_str = h->String();
   if (fprintf(fd, "%s temp_ring = %s;\n", Tok2Cmdname(RING_CMD), ring_str)
               == EOF) return TRUE;
   if (fprintf(fd, "%s temp_ideal = %s;\n", Tok2Cmdname(IDEAL_CMD),
@@ -655,7 +679,7 @@ static BOOLEAN DumpQring(FILE *fd, idhdl h, char *type_str)
       == EOF) return TRUE;
   if (fprintf(fd, "attrib(temp_ideal, \"isSB\", 1);\n") == EOF) return TRUE;
 #ifdef HAVE_NAMESPACES
-  if (fprintf(fd, "%s %s::%s = temp_ideal;\n", 
+  if (fprintf(fd, "%s %s::%s = temp_ideal;\n",
               type_str,  namespaceroot->name, IDID(h)) == EOF)
 #else
   if (fprintf(fd, "%s %s = temp_ideal;\n", type_str, IDID(h)) == EOF)
@@ -721,7 +745,7 @@ static int DumpRhs(FILE *fd, idhdl h)
   }
   else
   {
-    char *rhs = ((leftv) h)->String();
+    char *rhs = h->String();
 
     if (rhs == NULL) return EOF;
 
@@ -795,6 +819,7 @@ void slStandardInit()
   si_link_root->Close=slCloseAscii;
   si_link_root->Kill=slCloseAscii;
   si_link_root->Read=slReadAscii;
+  si_link_root->Read2=slReadAscii2;
   si_link_root->Write=slWriteAscii;
   si_link_root->Dump=slDumpAscii;
   si_link_root->GetDump=slGetDumpAscii;
