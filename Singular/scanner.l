@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: scanner.l,v 1.10 1998-03-31 09:00:44 Singular Exp $ */
+/* $Id: scanner.l,v 1.11 1998-04-01 19:00:49 Singular Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -79,6 +79,7 @@ name           ({letter}({letter}*{digit}*_*)*|_)
 parname        #
 
 /* %start START */
+%option always-interactive
 
 %x string
 %x block
