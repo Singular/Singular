@@ -1,0 +1,784 @@
+///////////////////////////////////////////////////////////////////////////////
+
+version="$Id: gmsystem.lib,v 1.1 2000-10-25 10:26:05 mschulze Exp $";
+info="
+LIBRARY:  gmsystem.lib  GAUSS-MANIN SYSTEM OF A SINGULARITY
+
+AUTHOR:   Mathias Schulze (mschulze@mathematik.uni-kl.de)
+
+OVERVIEW:
+ A library to compute invariants related to the Gauss-Manin system 
+ of an isolated hypersurface singularity
+
+PROCEDURES:
+ monomat(f);   monodromy matrix of f
+ monospec(f);  spectrum of monodromy of f
+ vfilt(f);     V-filtration of f on H''/H'
+ singspec(f);  singularity spectrum of f
+ vjacob(f);    V-filtration of f on Jacobian algebra
+";
+
+LIB "jordan.lib";
+
+///////////////////////////////////////////////////////////////////////////////
+
+static proc maxintdif(ideal e)
+{
+  int i,j,id;
+  int mid=0;
+  for(i=ncols(e);i>=1;i--)
+  {
+    for(j=i-1;j>=1;j--)
+    {
+      id=int(e[i]-e[j]);
+      if(id<0)
+      {
+        id=-id;
+      }
+      if(id>mid)
+      {
+        mid=id;
+      }
+    }
+  }
+  return(mid);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+static proc maxorddif(matrix H)
+{
+  int i,j,d;
+  int d0,d1=-1,-1;
+  for(i=nrows(H);i>=1;i--)
+  {
+    for(j=ncols(H);j>=1;j--)
+    {
+      d=ord(H[i,j]);
+      if(d>=0)
+      {
+        if(d0<0||d<d0)
+        {
+          d0=d;
+        }
+        if(d1<0||d>d1)
+        {
+          d1=d;
+        }
+      }
+    }
+  }
+  return(d1-d0);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+static proc invunit(poly u,int n)
+{
+  if(ord(u)>0)
+  {
+    ERROR("no unit");
+  }
+  poly u0=jet(u,0);
+  u=jet(1-u/u0,n);
+  poly w=u;
+  poly v=1+u;
+  for(int i=n div ord(u);i>1;i--)
+  {
+    w=jet(w*u,n);
+    v=v+w;
+  }
+  v=jet(v,n)/u0;
+  return(v);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+static proc expand(matrix M,matrix U,int n)
+{
+  for(int i=ncols(U);i>=1;i--)
+  {
+    U[i,i]=invunit(U[i,i],n-ord(M[i]));
+  }
+  return(jet(M*U,n));
+}
+///////////////////////////////////////////////////////////////////////////////
+
+static proc redNF(module M,module N,list #)
+{
+  matrix U=freemodule(ncols(M));
+  if(size(#)>0)
+  {
+    if(typeof(#[1])=="matrix")
+    {
+      U=#[1];
+    }
+  }
+
+  for(int i=ncols(M);i>=1;i--)
+  {
+    M[i]=M[i]/lead(U[i,i]);
+    U[i,i]=U[i,i]/lead(U[i,i]);
+  }
+  N=std(N);
+  module redNFM=matrix(0,nrows(M),ncols(M));
+  module weakNFM=reduce(M,N);
+  while(size(weakNFM)>0)
+  {
+    redNFM=matrix(redNFM)+matrix(lead(weakNFM));
+    M=matrix(M)-matrix(lead(weakNFM))*U;
+    weakNFM=reduce(M,N);
+  }
+  return(redNFM);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc monomat(poly f,list #)
+"USAGE:   monomat(f); f poly
+ASSUME:  f defines an isolated hypersurface singularity
+RETURN:  a matrix M such that exp(-2*pi*i*M) is a monodromy matrix of f
+EXAMPLE: example monomat; shows an example
+"
+{
+  int mide=-1;
+  if(size(#)>0)
+  {
+    mide=0;
+  }
+
+  int i,j;
+  int n=nvars(basering)-1;
+  for(i=n+1;i>=1;i--)
+  {
+    if(var(i)>1)
+    {
+      ERROR("basering not local");
+    }
+  }
+  ideal J=jacob(f);
+  ideal sJ=std(J);
+  if(vdim(sJ)<=0)
+  {
+    if(vdim(sJ)==0)
+    {
+      ERROR("singularity not singular");
+    }
+    else
+    {
+      ERROR("singularity not isolated");
+    }
+  }
+  ideal m=kbase(sJ);
+  int mu,modm=ncols(m),maxorddif(m);
+
+  ideal w=f*m;
+  matrix U=freemodule(mu);
+  matrix A0[mu][mu],A,C,D;
+  list l;
+  module H,dH=freemodule(mu),freemodule(mu);
+  module H0;
+  int sdH=1;
+  int k=-1;
+  int K,N;
+  while(k<K||sdH>0)
+  {
+    k++;
+    C=coeffs(redNF(w,sJ,U),m,product(maxideal(1)));
+    A0=A0+C*var(1)^k;
+    if(sdH>0)
+    {
+      H0=H;
+      dH=jet(module(A0*dH+var(1)^2*diff(matrix(dH),var(1))),k);
+      H=H*var(1)+dH;
+      sdH=size(reduce(H,std(H0*var(1))));
+      if(sdH>0)
+      {
+        A0=A0-var(1);
+      }
+      else
+      {
+        H=minbase(H0);
+        int modH=maxorddif(H);
+        K=modH+1;
+      }
+    }
+    if(k==K&&sdH==0)
+    {
+      N=k-modH;
+      l=division(H*var(1),A0*H+var(1)^2*diff(matrix(H),var(1)));
+      A=expand(l[1],l[2],N-1);
+      if(mide<0)
+      {
+        ideal e=jordan(A,-1)[1];
+        mide=maxintdif(e);
+        K=K+mide;
+      }
+    }
+    if(k<K||sdH>0)
+    {
+      l=division(J,ideal(matrix(w)-matrix(m)*C*U));
+      D=l[1];
+      for(i=mu;i>=1;i--) // Fehler bei division!
+      {
+        if(l[2][i,i]!=0)
+        {
+          U[i,i]=U[i,i]*l[2][i,i];
+        }
+      }
+      for(j=mu;j>=1;j--)
+      {
+        w[j]=0;
+        for(i=n+1;i>=1;i--)
+        {
+          w[j]=w[j]+U[j,j]*diff(D[i,j],var(i))-diff(U[j,j],var(i))*D[i,j];
+        }
+      }
+      U=U*U;
+    }
+  }
+
+  while(mide>0)
+  {
+    intvec b;
+    b[mu]=0;
+    U=0;
+    module dU;
+    A0=jet(A,0);
+    matrix A0e;
+    for(i=ncols(e);i>=1;i--)
+    {
+      A0e=freemodule(mu);
+      for(j=n;j>=0;j--) // Potenzen von Matrizen?
+      {
+        A0e=A0e*(A0-e[i]);
+      }
+      dU=syz(A0e);
+      U=dU+U;
+      b[i]=size(dU);
+    }
+    A=division(U,A*U)[1];
+
+    intvec ide;
+    ide[mu]=0;
+    for(i=ncols(e);i>=1;i--)
+    {
+      for(j=i-1;j>=1;j--)
+      {
+        k=int(e[j]-e[i]);
+        if(k>ide[i])
+        {
+          ide[i]=k;
+        }
+        if(-k>ide[j])
+        {
+          ide[j]=-k;
+        }
+      }
+    }
+    for(j,k=ncols(b),mu;j>=1;j--)
+    {
+      for(i=b[j];i>=1;i--)
+      {
+        ide[k]=ide[j];
+        k--;
+      }
+    }
+
+    for(i=mu;i>=1;i--)
+    {
+      if(ide[i]>0)
+      {
+        A[i,i]=A[i,i]+1;
+        e[i]=e[i]+1;
+      }
+      for(j=mu;j>=1;j--)
+      {
+        if(ide[i]==0&&ide[j]>0)
+        {
+          A[i,j]=A[i,j]*var(1);
+        }
+        else
+        {
+          if(ide[i]>0&&ide[j]==0)
+          {
+            A[i,j]=A[i,j]/var(1);
+          }
+        }
+      }
+    }
+    mide--;
+  }
+
+  return(jet(A,0));
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring R=0,(x,y),ds;
+  poly f=x5+x2y2+y5;
+  matrix M=monomat(f);
+  print(M);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc monospec(poly f)
+"USAGE:   monospec(f); f poly
+ASSUME:  f defines an isolated hypersurface singularity
+RETURN:  a matrix M such that the spectrum of exp(-2*pi*i*M) is the spectrum of
+         the monodromy of f
+EXAMPLE: example monospec; shows an example
+"
+{
+  return(monomat(f,0));
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring R=0,(x,y),ds;
+  poly f=x5+x2y2+y5;
+  matrix M=monospec(f);
+  print(M);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc vfilt(poly f,list #)
+"USAGE:   vfilt(f); f poly
+ASSUME:  f defines an isolated hypersurface singularity
+RETURN:  a list l where l[1] is an ideal containing the spectral numbers of f
+         in increasing order and l[2] is a list of modules such that l[2][i]
+         contains a vector space basis of the l[1][i]-th graded part of the
+         V-filtration of f on H''/H' in terms of the monomial vector space 
+         basis contained in the ideal l[3]
+EXAMPLE: example vfilt; shows an example
+"
+{
+  int i,j;
+  int n=nvars(basering)-1;
+  for(i=n+1;i>=1;i--)
+  {
+    if(var(i)>1)
+    {
+      ERROR("basering not local");
+    }
+  }
+  ideal J=jacob(f);
+  ideal sJ=std(J);
+  if(vdim(sJ)<=0)
+  {
+    if(vdim(sJ)==0)
+    {
+      ERROR("singularity not singular");
+    }
+    else
+    {
+      ERROR("singularity not isolated");
+    }
+  }
+  ideal m=kbase(sJ);
+  int mu,modm=ncols(m),maxorddif(m);
+
+  ideal w=f*m;
+  matrix U=freemodule(mu);
+  matrix A[mu][mu],C,D;
+  list l;
+  module H,dH=freemodule(mu),freemodule(mu);
+  module H0;
+  int sdH=1;
+  int k=-1;
+  int K;
+  while(k<K||sdH>0)
+  {
+    k++;
+    C=coeffs(redNF(w,sJ,U),m,product(maxideal(1)));
+    A=A+C*var(1)^k;
+    if(sdH>0)
+    {
+      H0=H;
+      dH=jet(module(A*dH+var(1)^2*diff(matrix(dH),var(1))),k);
+      H=H*var(1)+dH;
+      sdH=size(reduce(H,std(H0*var(1))));
+      if(sdH>0)
+      {
+        A=A-var(1);
+      }
+      else
+      {
+        H=minbase(H0);
+        int modH=maxorddif(H);
+        if(k<n)
+        {
+          K=modH+n+1;
+        }
+        else
+        {
+          K=modH+k+1;
+        }
+        H0=freemodule(mu)*var(1)^k;
+      }
+    }
+    if(k<K||sdH>0)
+    {
+      l=division(J,ideal(matrix(w)-matrix(m)*C*U));
+      D=l[1];
+      for(i=mu;i>=1;i--) // Fehler bei division!
+      {
+        if(l[2][i,i]!=0)
+        {
+          U[i,i]=U[i,i]*l[2][i,i];
+        }
+      }
+      for(j=mu;j>=1;j--)
+      {
+        w[j]=0;
+        for(i=n+1;i>=1;i--)
+        {
+          w[j]=w[j]+U[j,j]*diff(D[i,j],var(i))-diff(U[j,j],var(i))*D[i,j];
+        }
+      }
+      U=U*U;
+    }
+  }
+  int N=k-modH;
+
+  l=division(H,H0);
+  H0=expand(l[1],l[2],N-1);
+
+  poly p;
+  int i0,j0,i1,j1;
+  matrix V0[mu*N][mu*N];
+  matrix V1[mu*N][mu*(N-1)];
+  for(i0=mu;i0>=1;i0--)
+  {
+    for(i1=mu;i1>=1;i1--)
+    {
+      p=H0[i1,i0];
+      while(p!=0)
+      {
+        j1=leadexp(p)[1];
+        for(j0=N-j1-1;j0>=0;j0--)
+        {
+          V0[i1+(j1+j0)*mu,i0+j0*mu]=V0[i1+(j1+j0)*mu,i0+j0*mu]+leadcoef(p);
+          if(j1+j0+1<N)
+          {
+            V1[i1+(j1+j0+1)*mu,i0+j0*mu]=V1[i1+(j1+j0+1)*mu,i0+j0*mu]+
+                                         leadcoef(p);
+          }
+        }
+        p=p-lead(p);
+      }
+    }
+  }
+
+  l=division(H*var(1),A*H+var(1)^2*diff(matrix(H),var(1)));
+  A=expand(l[1],l[2],N-1);
+
+  matrix M[mu*N][mu*N];
+  for(i0=mu;i0>=1;i0--)
+  {
+    for(i1=mu;i1>=1;i1--)
+    {
+      p=A[i1,i0];
+      while(p!=0)
+      {
+        j1=leadexp(p)[1];
+        for(j0=N-j1-1;j0>=0;j0--)
+        {
+          M[i1+(j0+j1)*mu,i0+j0*mu]=leadcoef(p);
+        }
+        p=p-lead(p);
+      }
+    }
+  }
+  for(i0=mu;i0>=1;i0--)
+  {
+    for(j0=N-1;j0>=0;j0--)
+    {
+      M[i0+j0*mu,i0+j0*mu]=M[i0+j0*mu,i0+j0*mu]+j0;
+    }
+  }
+
+  ideal eA=jordan(A,-1)[1];
+  ideal eM;
+  k=0;
+  intvec u;
+  for(i=N;i>=1;i--)
+  {
+    u[i]=1;
+  }
+  i0=1;
+  while(u[N]<=ncols(eA))
+  {
+    for(i,i1=i0+1,i0;i<=N;i++)
+    {
+      if(eA[u[i]]+i<eA[u[i1]]+i1)
+      {
+        i1=i;
+      }
+    }
+    k++;
+    eM[k]=eA[u[i1]]+i1-1;
+    u[i1]=u[i1]+1;
+    if(u[i1]>ncols(eA))
+    {
+      i0=i1+1;
+    }
+  }
+
+  ideal s;
+  k=0;
+  list V;
+  matrix Me;
+  V[ncols(eM)+1]=std(V1);
+  if(size(#)>0)
+  {
+    intvec d;
+    for(i=ncols(eM);i>=1&&number(eM[i])-1>=number(n-1)/2;i--)
+    {
+      Me=freemodule(mu*N);
+      for(i0=n;i0>=0;i0--) // Potenzen von Matrizen?
+      {
+        Me=Me*(M-eM[i]);
+      }
+      V1=module(V1)+syz(Me);
+      V[i]=std(intersect(V1,V0));
+      if(size(V[i])>size(V[i+1]))
+      {
+        k++;
+        s[k]=eM[i]-1;
+        d[k]=size(V[i])-size(V[i+1]);
+      }
+    }
+    if(s[k]==number(n-1)/2)
+    {
+      j=k-1;
+    }
+    else
+    {
+      j=k;
+    }
+    while(j>=1)
+    {
+      k++;
+      s[k]=s[j];
+      s[j]=n-1-s[k];
+      d[k]=d[j];
+      j--;
+    }
+    return(list(s,d));
+  }
+  else
+  {
+    list v;
+    j=-1;
+    for(i=ncols(eM);i>=1;i--)
+    {
+      Me=freemodule(mu*N);
+      for(i0=n;i0>=0;i0--) // Potenzen von Matrizen?
+      {
+        Me=Me*(M-eM[i]);
+      }
+      V1=module(V1)+syz(Me);
+      V[i]=std(intersect(V1,V0));
+      if(size(V[i])>size(V[i+1]))
+      {
+        if(number(eM[i]-1)>=number(n-1)/2)
+        {
+          k++;
+          s[k]=eM[i]-1;
+          v[k]=matrix(freemodule(ncols(V[i])),mu,mu*N)*division(V0,V[i])[1];
+        }
+        else
+        {
+          if(j<0)
+          {
+            if(s[k]==number(n-1)/2)
+            {
+              j=k-1;
+            }
+            else
+            {
+              j=k;
+            }
+          }
+          k++;
+          s[k]=s[j];
+          s[j]=eM[i]-1;
+          v[k]=v[j];
+          v[j]=matrix(freemodule(ncols(V[i])),mu,mu*N)*division(V0,V[i])[1];
+          j--;
+        }
+      }
+    }
+    option(redSB);
+    for(k=1;k<size(v);k++)
+    {
+      v[k]=std(reduce(v[k],std(v[k+1])));
+    }
+    v[size(v)]=std(v[size(v)]);
+    return(list(s,v,m));
+  }
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring R=0,(x,y),ds;
+  poly f=x5+x2y2+y5;
+  list l=vfilt(f);
+  print(l);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc singspec(poly f)
+"USAGE:   singspec(f); f poly
+ASSUME:  f defines an isolated hypersurface singularity
+RETURN:  a list l where l[1] is an ideal containing the spectral numbers of f
+         in increasing order and l[2] is a list of intvecs such that l[2][i]
+         is the multiplicity of the spectral number l[1][i]
+EXAMPLE: example singspec; shows an example
+"
+{
+  return(vfilt(f,0));
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring R=0,(x,y),ds;
+  poly f=x5+x2y2+y5;
+  list l=singspec(f);
+  print(l);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc vjacob(poly f)
+"USAGE:   vjacob(f); f poly
+ASSUME:  f defines an isolated hypersurface singularity
+RETURN:  a list l where l[1] is an ideal containing the spectral numbers of
+         the V-filtration of f on the Jacobian algebra in increasing order and 
+         l[2] is a list of modules such that l[2][i] contains a vector space 
+         basis of the l[1][i]-th graded part of the V-filtration of f on the 
+         Jacobian algebra in terms of the monomial vector space basis 
+         contained in the ideal l[3]
+EXAMPLE: example vjacob; shows an example
+"
+{
+  list l=vfilt(f);
+  def s,v,m=l[1..3];
+  int mu=ncols(m);
+
+  int i,j,k;
+  module V=v[1];
+  intvec d=ncols(v[1]);
+  for(i=2;i<=size(v);i++)
+  {
+    V=V,v[i];
+    d=d,ncols(v[i]);
+  }
+  
+  ideal sJ=std(jacob(f));
+  list M;
+  for(i=ncols(m);i>=1;i--)
+  {
+    M[i]=lift(V,coeffs(redNF(m[i]*m,sJ),m,product(maxideal(1)))*V);
+  }
+
+  int i0,j0,i1,j1;
+  number r0=number(s[1]-s[ncols(s)]);
+  number r1,r2;
+  matrix M0;
+  module L;
+  list v0=freemodule(ncols(m));
+  ideal s0=r0;
+
+  while(r0<number(s[ncols(s)]-s[1]))
+  {
+    r1=number(s[ncols(s)]-s[1]);
+    for(j=ncols(s);j>=1;j--)
+    {
+      for(i=ncols(s);i>=1;i--)
+      {
+        r2=number(s[i]-s[j]);
+        if(r2>r0&&r2<r1)
+        {
+          r1=r2;
+        }
+        else
+        {
+          if(r2<=r0)
+          {
+            i=0;
+          }
+        }
+      }
+    }
+    r0=r1;
+
+    l=ideal();
+    for(k=ncols(m);k>=2;k--)
+    {
+      l=l+list(ideal());
+    }
+
+    j0=mu-d[ncols(s)]+1;
+    for(j=ncols(s);j>=1;j--)
+    {
+      i0=1;
+      i=1;
+      while(i<ncols(s)&&s[i]<s[j]+r0)
+      {
+        i0=i0+d[i];
+        i++;
+      }
+      if(s[i]<s[j]+r0)
+      {
+        i0=i0+d[i];
+        i++;
+      }
+      for(k=1;k<=ncols(m);k++)
+      {
+        M0=M[k];
+        if(i0>1)
+        {
+          l[k]=l[k],M0[1..i0-1,j0..j0+d[j]-1];
+        }
+      }
+      j0=j0-d[j];
+    }
+
+    L=transpose(module(l[1]));
+    for(k=2;k<=ncols(m);k++)
+    {
+      L=L,transpose(module(l[k]));
+    }
+
+    v0=v0+list(syz(L));
+    s0=s0,r0;
+  }
+
+  option(redSB);
+
+  for(i=1;i<size(v0);i++)
+  {
+    v0[i+1]=std(v0[i+1]);
+    v0[i]=std(reduce(v0[i],v0[i+1]));
+  }
+
+  i=1;
+  while(size(v0[i])==0)
+  {
+    i++;
+  }
+  list v1=v0[i];
+  ideal s1=s0[i];
+  i++;
+  while(i<=size(v0))
+  {
+    if(size(v0[i])>0)
+    {
+      v1=v1+list(v0[i]);
+      s1=s1,s0[i];
+    }
+    i++;
+  }
+
+  return(list(s1,v1,m));
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring R=0,(x,y),ds;
+  poly f=x5+x2y2+y5;
+  vjacob(f);
+}
+///////////////////////////////////////////////////////////////////////////////
