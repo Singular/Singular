@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.h,v 1.6 1998-05-19 17:11:45 pohl Exp $ */
+/* $Id: matpol.h,v 1.7 1998-07-16 06:44:29 obachman Exp $ */
 /*
 * ABSTRACT
 */
@@ -51,6 +51,7 @@ poly mpDet (matrix m);
 matrix mpWedge(matrix a, int ar);
 BOOLEAN mpJacobi(leftv res,leftv a);
 BOOLEAN mpKoszul(leftv res,leftv b/*in*/, leftv c/*ip*/, leftv id=NULL);
+poly mpDetBareiss (matrix a);
 
 //matrix mpHomogen(matrix a, int v);
 
