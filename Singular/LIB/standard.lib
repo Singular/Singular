@@ -1,7 +1,7 @@
-// $Id: standard.lib,v 1.30 1999-05-19 11:28:55 Singular Exp $
+// $Id: standard.lib,v 1.31 1999-05-26 13:14:33 obachman Exp $
 //////////////////////////////////////////////////////////////////////////////
 
-version="$Id: standard.lib,v 1.30 1999-05-19 11:28:55 Singular Exp $";
+version="$Id: standard.lib,v 1.31 1999-05-26 13:14:33 obachman Exp $";
 info="
 LIBRARY: standard.lib   PROCEDURES WHICH ARE ALWAYS LOADED AT START-UP
 
@@ -367,13 +367,25 @@ EXAMPLE: example groebner; shows an example"
     // subst 1 for homogenizing var
     if (!is_homog)
     {
+      if (p_opt)
+      {
+        "dehomogenization";
+      }
       qh = subst(qh, @t, 1);
     }
 
     // go back to original ring
     setring P;
     // get ideal, delete zeros and clean SB
+    if (p_opt)
+    {
+      "imap to original ring";
+    }
     i = imap(Phelp1,qh);
+    if (p_opt)
+    {
+      "simplification";
+    }
     i = simplify(i, 34);
     kill Phelp1;
   }
@@ -382,6 +394,10 @@ EXAMPLE: example groebner; shows an example"
   option(set, opt);
   if (find(s_opt, "redSB") > 0)
   {
+    if (p_opt)
+    {
+      "interreduction";
+    }
     i=interred(i);
   }
   attrib(i, "isSB", 1);
