@@ -1,9 +1,9 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: pcv.cc,v 1.7 1998-11-20 17:07:27 mschulze Exp $ */
+/* $Id: pcv.cc,v 1.8 1998-11-23 08:40:37 mschulze Exp $ */
 /*
-* ABSTRACT: conversion between polys and coeff vectors
+* ABSTRACT: conversion between polys and coef vectors
 */
 
 #include "mod2.h"
