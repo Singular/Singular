@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.9 2004-05-12 11:24:37 levandov Exp $ */
+/* $Id: ring.cc,v 1.10 2004-05-20 13:23:40 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -1245,6 +1245,7 @@ static ring rCopy0(ring r, BOOLEAN copy_qideal = TRUE,
 #ifdef HAVE_PLURAL
   if (rIsPluralRing(r))
   {
+    res->nc=r->nc;
     res->nc->ref++;
   }
 #endif
