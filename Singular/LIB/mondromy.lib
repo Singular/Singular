@@ -1,9 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////////
-
-version="$Id: mondromy.lib,v 1.17 2000-12-19 15:05:30 anne Exp $";
+version="$Id: mondromy.lib,v 1.18 2000-12-22 14:16:11 greuel Exp $";
 category="Singularities";
 info="
-LIBRARY:  mondromy.lib  PROCEDURES TO COMPUTE THE MONODROMY OF A SINGULARITY
+LIBRARY:  mondromy.lib  Monodromy of an Isolated Hypersurface Singularity
 AUTHOR:   Mathias Schulze, email: mschulze@mathematik.uni-kl.de
 
 OVERVIEW: 
@@ -14,8 +13,8 @@ OVERVIEW:
  Fourier, Grenoble 23,1 (1973), pp. 157-195) to transform it to a simple pole.
 
 PROCEDURES:
- invunit(u,n);         series inverse of polynomial u up to order n
  detadj(U);            determinant and adjoint matrix of square matrix U
+ invunit(u,n);         series inverse of polynomial u up to order n
  jacoblift(f);         lifts f^kappa in jacob(f) with minimal kappa
  monodromy(f[,opt]);   monodromy of isolated hypersurface singularity f
  H2basis(f);           basis of Brieskorn lattice H''

@@ -1,43 +1,37 @@
-// $Id: primdec.lib,v 1.80 2000-12-19 14:41:44 anne Exp $
 ///////////////////////////////////////////////////////////////////////////////
-// primdec.lib                                                               //
-// algorithms for primary decomposition based on                             //
-// the ideas of Gianni,Trager,Zacharias                                      //
-// written by Gerhard Pfister                                                //
-//                                                                           //
-// algorithms for primary decomposition based on                             //
-// the ideas of Shimoyama/Yokoyama                                           //
-// written by Wolfram Decker and Hans Schoenemann                            //
-///////////////////////////////////////////////////////////////////////////////
-
-version="$Id: primdec.lib,v 1.80 2000-12-19 14:41:44 anne Exp $";
+version="$Id: primdec.lib,v 1.81 2000-12-22 14:24:36 greuel Exp $";
 category="Commutative Algebra";
 info="
-LIBRARY: primdec.lib   PROCEDURES FOR PRIMARY DECOMPOSITION
+LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
 AUTHORS:  Gerhard Pfister, email: pfister@mathematik.uni-kl.de (GTZ)
           Wolfram Decker, email: decker@math.uni-sb.de         (SY)
           Hans Schoenemann, email: hannes@mathematik.uni-kl.de (SY)
 
-PROCEDURES:
-  primdecGTZ(I);    complete primary decomposition via Gianni,Trager,Zacharias
-  primdecSY(I...);  complete primary decomposition via Shimoyama-Yokoyama
-  minAssGTZ(I);     the minimal associated primes via Gianni,Trager,Zacharias
-  minAssChar(I...); the minimal associated primes using characteristic sets
-  testPrimary(L,k); tests the result of the primary decomposition
-  radical(I);       computes the radical of the ideal I
-  equiRadical(I);   the radical of the equidimensional part of the ideal I
-  prepareAss(I);    list of radicals of the equidimensional components of I
-  equidim(I);       weak equidimensional decomposition of I
-  equidimMax(I);    equidimensional locus of I
-  equidimMaxEHV(I); equidimensional locus of I via Eisenbud,Huneke,Vasconcelos
-  zerodec(I);       zerodimensional decomposition via Monico
+OVERVIEW: 
+ Algorithms for primary decomposition based on the ideas of 
+ Gianni,Trager,Zacharias was written by Gerhard Pfister.                       
+ Algorithms for primary decomposition based on the ideas of
+ Shimoyama/Yokoyama was written by Wolfram Decker and Hans Schoenemann.   
+ These procedures are implemented to be used in characteristic 0.
+ @*They also work in positive characteristic >> 0.
+ @*In small characteristic and for algebraic extensions, primdecGTZ,
+ minAssGTZ, radical and equiRadical may not terminate and primdecSY and
+ minAssChar may not give a complete decomposition.
 
-REMARK:
-These procedures are implemented to be used in characteristic 0.
-@*They also work in positive characteristic >> 0.
-@*In small characteristic and for algebraic extensions, primdecGTZ,
-minAssGTZ, radical and equiRadical may not terminate and primdecSY and
-minAssChar may not give a complete decomposition.  ";
+PROCEDURES:
+ primdecGTZ(I);    complete primary decomposition via Gianni,Trager,Zacharias
+ primdecSY(I...);  complete primary decomposition via Shimoyama-Yokoyama
+ minAssGTZ(I);     the minimal associated primes via Gianni,Trager,Zacharias
+ minAssChar(I...); the minimal associated primes using characteristic sets
+ testPrimary(L,k); tests the result of the primary decomposition
+ radical(I);       computes the radical of the ideal I
+ equiRadical(I);   the radical of the equidimensional part of the ideal I
+ prepareAss(I);    list of radicals of the equidimensional components of I
+ equidim(I);       weak equidimensional decomposition of I
+ equidimMax(I);    equidimensional locus of I
+ equidimMaxEHV(I); equidimensional locus of I via Eisenbud,Huneke,Vasconcelos
+ zerodec(I);       zerodimensional decomposition via Monico
+";
 
 LIB "general.lib";
 LIB "elim.lib";
@@ -4701,9 +4695,9 @@ proc zerodec(ideal I)
 "USAGE:   zerodec(I); I ideal
 RETURN:  a list of primary ideals, the zero-dimensional decomposition of I
 ASSUME:  I is zero-dimensional, the characterisitic of the ground field is 0
-NOTE:    the algorithm,due to C. Monico, works well only good for small total
+NOTE:    the algorithm (of C. Monico), works well only for small total
          number of solutions (i.e. vdim(std(I)) should be < 100) 
-         and without parameters. In practise, it works also in big 
+         and without parameters. In practice, it works also in big 
          characteristic p>0 but may fail for small p.
          If printlevel > 0 (default = 0) additional information is displayed
 EXAMPLE: example zerodec; shows an example

@@ -1,12 +1,9 @@
-// $Id: homolog.lib,v 1.11 2000-12-19 14:41:42 anne Exp $
 //(BM/GMG)
 ///////////////////////////////////////////////////////////////////////////////
-
-version="$Id: homolog.lib,v 1.11 2000-12-19 14:41:42 anne Exp $";
+version="$Id: homolog.lib,v 1.12 2000-12-22 14:05:48 greuel Exp $";
 category="Commutative Algebra";
 info="
-LIBRARY:  homolog.lib   PROCEDURES FOR HOMOLOGICAL ALGEBRA
-
+LIBRARY:  homolog.lib   Procedures for Homological Algebra
 AUTHORS:  Gert-Martin Greuel, email: greuel@mathematik.uni-kl.de, 
           Bernd Martin, email: martin@math.tu-cottbus.de
 
@@ -94,8 +91,8 @@ EXAMPLE: example cup; shows examples
    kb1 = kbase(ext10);
    kb1 = matrix(ker)*kb1;
    dbprint(p-1,"// kbase of Ext^1(M,M)",
-               "//  - the columns present the kbase elements in Hom(F(1),F(0))",
-               "//  - F(*) a free resolution of M",kb1);
+              "//  - the columns present the kbase elements in Hom(F(1),F(0))",
+              "//  - F(*) a free resolution of M",kb1);
 
 //------ compute the liftings of Ext^1 ----------------------------------------
    mC = matrix(A)*kb1;
@@ -633,7 +630,7 @@ EXAMPLE: example Ext;   shows examples
     resM = mres(M,max+1);
     for( ii=1; ii<=s; ii++ )
     { k=v[ii];
-      if( k<0  )                                    // Ext^k is 0 for negative k
+      if( k<0  )                                   // Ext^k is 0 for negative k
       { dbprint(p-1,"// Ext^k=0 for k<0!");
         extMN    = gen(1);
         extMN0   = std(extMN);
@@ -711,7 +708,7 @@ example
   list l     = Ext(4,M,M,1);     // Ext^4(R^2/M,R^2/M) over R=r/i
   printlevel = p;
 }
-////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 proc Hom (module M, module N, list #)
 "USAGE:   Hom(M,N,[any]);  M,N=modules
@@ -772,12 +769,12 @@ EXAMPLE: example Hom;  shows examples
         if( p>2 )
         {  for (l=1;l<=ncols(kb);l=l+1)
            {
-             "// element",l,"of kbase of Hom in Hom(F0,G0) as matrix: F0-->G0:";
+            "// element",l,"of kbase of Hom in Hom(F0,G0) as matrix: F0-->G0:";
              print(matrix(ideal(kb[l]),nrows(N),nrows(M)));
            }
         }
         else
-       { dbprint(p-1,"// columns of matrix are kbase of Hom in Hom(F0,G0)",kb); }
+       {dbprint(p-1,"// columns of matrix are kbase of Hom in Hom(F0,G0)",kb);}
         L=homMN,homMN0,kb; return(L);
      }
      L=homMN,homMN0; return(L);
@@ -807,7 +804,7 @@ example
   list l=Hom(M,N,1);
   printlevel = p;
 }
-////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 proc homology (matrix A,matrix B,module M,module N,list #)
 "USAGE:   homology(A,B,M,N);
@@ -816,7 +813,7 @@ COMPUTE: Let M and N be submodules of R^m and R^n presenting M'=R^m/M, N'=R^n/N
          Compute a presentation R^q --H-> R^m of the module
               ker(B)/im(A) := ker(M'/im(A) --B--> N'/im(BM)+im(BA)).
          If B induces a map M'--B-->N' (i.e BM=0) and if R^k--A-->M'--B-->N' is
-         a complex (i.e. BA=0) then ker(B)/im(A) is the homology of this complex
+         a complex (i.e. BA=0) then ker(B)/im(A) is the homology of the complex
 RETURN:  module H, a presentation of ker(B)/im(A)
 NOTE:    homology returns a free module of rank m if ker(B)=im(A)
 EXAMPLE: example homology; shows examples
@@ -877,7 +874,7 @@ example
   degree(std(K));
   print(K);
 }
-////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 proc kohom (matrix M, int j)
 "USAGE:   kohom(A,k); A=matrix, k=integer
@@ -898,7 +895,7 @@ example
   matrix n[2][3]=x,y,5,z,77,33;
   print(kohom(n,3));
 }
-/////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 proc kontrahom (matrix M, int j)
 "USAGE:   kontrahom(A,k); A=matrix, k=integer

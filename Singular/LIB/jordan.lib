@@ -1,9 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////////
-
-version="$Id: jordan.lib,v 1.18 2000-12-19 14:37:25 anne Exp $";
+version="$Id: jordan.lib,v 1.19 2000-12-22 14:09:44 greuel Exp $";
 category="Linear Algebra";
 info="
-LIBRARY: jordan.lib  PROCEDURES TO COMPUTE THE JORDAN NORMAL FORM
+LIBRARY: jordan.lib  Jordan Normal Form of a Matrix with rational Eigenvalues
 AUTHOR:  Mathias Schulze, email: mschulze@mathematik.uni-kl.de
 
 PROCEDURES:

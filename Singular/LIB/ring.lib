@@ -1,24 +1,22 @@
-// $Id: ring.lib,v 1.13 2000-12-19 14:37:27 anne Exp $
 //(GMG, last modified 03.11.95)
 ///////////////////////////////////////////////////////////////////////////////
-
-version="$Id: ring.lib,v 1.13 2000-12-19 14:37:27 anne Exp $";
+version="$Id: ring.lib,v 1.14 2000-12-22 14:33:13 greuel Exp $";
 category="General purpose";
 info="
-LIBRARY:  ring.lib      PROCEDURES FOR MANIPULATING RINGS AND MAPS
+LIBRARY:  ring.lib      Manipulating Rings and Maps
 
 PROCEDURES:
  changechar(\"R\",c[,r]); make a copy R of basering [ring r] with new char c
  changeord(\"R\",o[,r]);  make a copy R of basering [ring r] with new ord o
  changevar(\"R\",v[,r]);  make a copy R of basering [ring r] with new vars v
  defring(\"R\",c,n,v,o);  define a ring R in specified char c, n vars v, ord o
- defrings(n[,p]);       define ring Sn in n vars, char 32003 [p], ord ds
- defringp(n[,p]);       define ring Pn in n vars, char 32003 [p], ord dp
+ defrings(n[,p]);         define ring Sn in n vars, char 32003 [p], ord ds
+ defringp(n[,p]);         define ring Pn in n vars, char 32003 [p], ord dp
  extendring(\"R\",n,v,o); extend given ring by n vars v, ord o and name it R
- fetchall(R[,str]);     fetch all objects of ring R to basering
- imapall(R[,str]);      imap all objects of ring R to basering
- mapall(R,i[,str]);     map all objects of ring R via ideal i to basering
- ord_test(R);           test wether ordering of R is global, local or mixed
+ fetchall(R[,str]);       fetch all objects of ring R to basering
+ imapall(R[,str]);        imap all objects of ring R to basering
+ mapall(R,i[,str]);       map all objects of ring R via ideal i to basering
+ ord_test(R);             test wether ordering of R is global, local or mixed
  ringtensor(\"R\",s,t,..);create ring R, tensor product of rings s,t,...
            (parameters in square brackets [] are optional)
 ";
@@ -738,7 +736,7 @@ example
    type R;
    setring s;
    ideal i = a2+b3+c5;
-   changevar("S","x,y,z");       //set S (change vars of s to x,y,z) the basering
+   changevar("S","x,y,z");      //set S (change vars of s to x,y,z) the basering
    qring qS =std(fetch(s,i));    //create qring of S mod i (maped to S)
    changevar("T","d,e,f,g,h",t); //set T (change vars of t to d..h) the basering
    qring qT=std(d2+e2-f3);       //create qring of T mod d2+e2-f3

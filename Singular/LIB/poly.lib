@@ -1,13 +1,9 @@
-// $Id: poly.lib,v 1.28 2000-12-19 14:37:26 anne Exp $
-//(GMG, last modified 22.06.96)
-//(obachman: 17.12.97 -- added katsura)
-//(anne: 11.12.2000 -- added mod2id, id2mod, subrInterred)
 ///////////////////////////////////////////////////////////////////////////////
-
-version="$Id: poly.lib,v 1.28 2000-12-19 14:37:26 anne Exp $";
+version="$Id: poly.lib,v 1.29 2000-12-22 14:22:23 greuel Exp $";
 category="General purpose";
 info="
-LIBRARY:  poly.lib      PROCEDURES FOR MANIPULATING POLYS, IDEALS, MODULES
+LIBRARY:  poly.lib      Procedures for Manipulating Polys, Ideals, Modules
+AUTHORS:  O. Bachmann, G.-M: Greuel, A. Fruehbis
 
 PROCEDURES:
  cyclic(int);           ideal of cyclic n-roots
@@ -67,9 +63,9 @@ example
 proc katsura
 "USAGE: katsura([n]): n integer
 RETURN: katsura(n) : n-th katsura ideal of
-                      (1) newly created and set ring (32003, x(0..n), dp), if
-                          nvars(basering) < n
-                      (2) basering, if nvars(basering) >= n
+         (1) newly created and set ring (32003, x(0..n), dp), if
+             nvars(basering) < n
+         (2) basering, if nvars(basering) >= n
         katsura()  : katsura ideal of basering
 EXAMPLE: example katsura; shows examples
 "
@@ -819,21 +815,21 @@ example
 ///////////////////////////////////////////////////////////////////////
 
 proc subrInterred(ideal mon, ideal sm, intvec iv)
-"USAGE:    subrInterred(mon,sm,iv);
-          sm:   ideal in a ring r with n + s variables,
-                e.g. x_1,..,x_n and t_1,..,t_s
-          mon:  ideal with monomial generators (not divisible by
-                one of the t_i) such that sm is contained in the module
-                k[t_1,..,t_s]*mon[1]+..+k[t_1,..,t_s]*mon[size(mon)]
-          iv:   intvec listing the variables which are supposed to be used
-                as x_i
-RETURN:   list l:
+"USAGE:   subrInterred(mon,sm,iv);
+         sm:   ideal in a ring r with n + s variables,
+               e.g. x_1,..,x_n and t_1,..,t_s
+         mon:  ideal with monomial generators (not divisible by
+               one of the t_i) such that sm is contained in the module
+               k[t_1,..,t_s]*mon[1]+..+k[t_1,..,t_s]*mon[size(mon)]
+         iv:   intvec listing the variables which are supposed to be used
+               as x_i
+RETURN:  list l:
           l[1]=the monomials from mon in the order used
           l[2]=their coefficients after interreduction
           l[3]=l[1]*l[2]
-               (interreduced system of generators of sm seen as a submodule
-                of k[t_1,..,t_s]*mon[1]+..+k[t_1,..,t_s]*mon[size(mon)])
-EXAMPLE:  example subrInterred; shows an example"
+          (interreduced system of generators of sm seen as a submodule
+          of k[t_1,..,t_s]*mon[1]+..+k[t_1,..,t_s]*mon[size(mon)])
+EXAMPLE: example subrInterred; shows an example"
 {
   int p = printlevel-voice+3;  // p=printlevel+1 (default: p=1)
 //-----------------------------------------------------------------------

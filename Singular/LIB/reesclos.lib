@@ -1,11 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////////
-// reesclos.lib
-///////////////////////////////////////////////////////////////////////////////
-
 version="$id reesclos.lib,v 1.30 2000/12/5 hirsch Exp $";
 category="Commutative Algebra";
 info="
-LIBRARY:     reesclos.lib
+LIBRARY:     reesclos.lib Rees Algebra and Integral Closure of Ideals
 AUTHOR:      Tobias Hirsch, email: hirsch@math.tu-cottbus.de
 
 OVERVIEW:
@@ -97,8 +94,7 @@ example
 
 ////////////////////////////////////////////////////////////////////////////
 
-static
-proc ClosureRees (list L)
+static proc ClosureRees (list L)
 "USAGE:    ClosureRees (L); L a list containing 
           - a ring L[1], inside L[1] an ideal ker such that L[1]/ker is 
             isomorphic to the Rees Algebra R[It] of an ideal I in k[x]
@@ -400,8 +396,7 @@ RETURN:   a list images, the first size(images)-1 entries are the nu-
 
 ////////////////////////////////////////////////////////////////////////////
 
-static
-proc ClosurePower(list images, list #)
+static proc ClosurePower(list images, list #)
 "USAGE:    ClosurePower (L [,#]); 
           - L a list containing generators of the closure of R[It] in k[x,t]
             (the first size(L)-1 elements are the numerators, the last one
@@ -671,3 +666,7 @@ example
   I;
   J;                             // J is the integral closure of I
 }
+///////////////////////////////////////////////////////////////////////////////
+/*
+  BEISPIELE
+*/

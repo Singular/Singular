@@ -1,11 +1,9 @@
-//
-//	last modified: 04/25/2000 by GMG
+//GMG last modified: 04/25/2000 
 //////////////////////////////////////////////////////////////////////////////
-
-version="$Id: linalg.lib,v 1.6 2000-12-19 14:37:26 anne Exp $";
+version="$Id: linalg.lib,v 1.7 2000-12-22 14:12:32 greuel Exp $";
 category="Linear Algebra";
 info="
-LIBRARY:  linalg.lib	PROCEDURES FOR ALGORITHMIC LINEAR ALGEBRA
+LIBRARY:  linalg.lib	Algorithmic Linear Algebra
 AUTHOR:	  Ivor Saynisch (ivs@math.tu-cottbus.de)
 
 PROCEDURES:
@@ -31,12 +29,9 @@ LIB "matrix.lib";
 LIB "ring.lib";
 
 //////////////////////////////////////////////////////////////////////////////
-
-//////////////////////////////////////////////////////////////////////////////
 // help functions
 //////////////////////////////////////////////////////////////////////////////
-static
-proc abs(poly c)
+static proc abs(poly c)
 "RETURN: absolut value of c, c must be constants"
 {
   if(c>=0){ return(c);}
@@ -64,8 +59,8 @@ proc const_mat(matrix A)
   setring BR;
   return(1);  
 }
-static
-proc red(matrix A,int i,int j)
+//////////////////////////////////////////////////////////////////////////////
+static proc red(matrix A,int i,int j)
 "USAGE:    red(A,i,j);  A = constant matrix
           reduces column j with respect to A[i,i] and column i
           reduces row j with respect to A[i,i] and row i
@@ -90,7 +85,7 @@ RETURN:   matrix
   return(matrix(m));
 }
 
-//proc sp(vector v1,vector v2)
+//////////////////////////////////////////////////////////////////////////////
 proc inner_product(vector v1,vector v2)
 "RETURN:   inner product <v1,v2> "
 {
@@ -98,7 +93,6 @@ proc inner_product(vector v1,vector v2)
   if (nrows(v2)>nrows(v1)) { k=nrows(v2); } else { k=nrows(v1); } 
   return ((transpose(matrix(v1,k,1))*matrix(v2,k,1))[1,1]);
 }
-
 
 /////////////////////////////////////////////////////////////////////////////
 // user functions
@@ -514,7 +508,6 @@ example
   print(Adj*A);
 }
 
-
 //////////////////////////////////////////////////////////////////////////////
 proc inverse_B(matrix A)
 "USAGE:     inverse_B(A);  A = square matrix
@@ -559,7 +552,6 @@ example
   print(Inv[1]*A);
 }
 
-
 //////////////////////////////////////////////////////////////////////////////
 proc det_B(matrix A)
 "USAGE:     det_B(A);  A any matrix  
@@ -574,8 +566,6 @@ EXAMPLE:   example det_B; shows an example"
 
   L=busadj(A);
   return((-1)^n*L[1][1]);
-  
-  
 }
 example
 { "EXAMPLE"; echo=2; 
@@ -584,7 +574,6 @@ example
   print(A);
   det_B(A); 
 }
-
 
 //////////////////////////////////////////////////////////////////////////////
 proc inverse_L(matrix A)
@@ -819,7 +808,6 @@ example
   print(Z[2]*Z[3]);          //U*S
 }
 
-
 //////////////////////////////////////////////////////////////////////////////
 proc gauss_nf(matrix A)
 "USAGE:    gauss_nf(A); A any constant matrix
@@ -928,7 +916,6 @@ example
   print(Z[2]*Z[3]*Z[4]);          //U*D*O
 }
 
-
 //////////////////////////////////////////////////////////////////////////////
 proc pos_def(matrix A)
 "USAGE:     pos_def(A); A = constant, symmetric square matrix       
@@ -989,7 +976,6 @@ example
                     0,  4,  2;
   pos_def(B);
 }
-
 
 //////////////////////////////////////////////////////////////////////////////
 proc linsolve(matrix A, matrix b)

@@ -1,22 +1,15 @@
-version="$Id: intprog.lib,v 1.2 2000-12-19 14:41:42 anne Exp $";
-category="Commutative Algebra";
 ///////////////////////////////////////////////////////////////////////////////
-
+version="$Id: intprog.lib,v 1.3 2000-12-22 14:08:19 greuel Exp $";
+category="Commutative Algebra";
 info="
-LIBRARY: intprog.lib      INTEGER PROGRAMMING WITH GROEBNER BASIS METHODS
-
+LIBRARY: intprog.lib      Integer Programming with Groebner Basis Methods
 AUTHOR:  Christine Theis, email: ctheis@math.uni-sb.de
 
 PROCEDURES:
-
-solve_IP(intmat A, [intvec|list] bx, intvec c, string alg [, intvec prsv]);
-    procedures for solving IP-problems
+ solve_IP(..);   procedures for solving Integer Programming  problems
 ";
 
 ///////////////////////////////////////////////////////////////////////////////
-
-
-
 static proc solve_IP_1(intmat A, intvec bx, intvec c, string alg)
 {
   intvec v;
@@ -166,9 +159,7 @@ static proc solve_IP_1(intmat A, intvec bx, intvec c, string alg)
 
   return(v);
 }
-
-
-
+///////////////////////////////////////////////////////////////////////////////
 static proc solve_IP_2(intmat A, list bx, intvec c, string alg)
 {
   list l;;
@@ -345,8 +336,7 @@ static proc solve_IP_2(intmat A, list bx, intvec c, string alg)
 
   return(l);
 }
-
-
+///////////////////////////////////////////////////////////////////////////////
 
 static proc solve_IP_3(intmat A, intvec bx, intvec c, string alg, intvec prsv)
 {
@@ -479,8 +469,7 @@ static proc solve_IP_3(intmat A, intvec bx, intvec c, string alg, intvec prsv)
 
   return(v);
 }
-
-
+///////////////////////////////////////////////////////////////////////////////
 
 static proc solve_IP_4(intmat A, list bx, intvec c, string alg, intvec prsv)
 {
@@ -640,49 +629,56 @@ static proc solve_IP_4(intmat A, list bx, intvec c, string alg, intvec prsv)
 
   return(l);
 }
-
-
-
-
-
+///////////////////////////////////////////////////////////////////////////////
 
 proc solve_IP
-"USAGE:   solve_IP(A,bx,c,alg);       A intmat, bx intvec, c intvec, alg string
+"USAGE:  solve_IP(A,bx,c,alg);  A intmat, bx intvec, c intvec, alg string
+        solve_IP(A,bx,c,alg);  A intmat, bx list of intvec, c intvec, 
+                                 alg string
+        solve_IP(A,bx,c,alg,prsv);  A intmat, bx intvec, c intvec, 
+                                 alg string, prsv intvec
+        solve_IP(A,bx,c,alg,prsv);  A intmat, bx list of intvec, c intvec, 
+                                 alg string, prsv intvec
+RETURN: type of bx: solution of the associated integer programming 
+        problem(s) as explained in
+   @texinfo
+   @ref{Toric ideals and integer programming}.
+   @end texinfo
+NOTE:   This procedure returns the solution(s) of the given IP-problem(s) 
+        or the message `not solvable'.
+        One may call the procedure with several different algorithms:
+        - the algorithm of Conti/Traverso using elimination (ect),
+        - the algorithm of Pottier (pt),
+        - an algorithm of Bigatti/La Scala/Robbiano (blr),
+        - the algorithm of Hosten/Sturmfels (hs),
+        - the algorithm of DiBiase/Urbanke (du).
+        The argument `alg' should be the abbreviation for an algorithm as 
+        above: ect, pt, blr, hs or du.
 
-          solve_IP(A,bx,c,alg);       A intmat, bx list of intvec, c intvec, alg string
+        `ct' allows to compute an optimal solution of the IP-problem 
+        directly from the right-hand vector b. 
+        The same is true for its `positive' variant `pct' which may only be 
+        applied if A and b have nonnegative entries. 
+        All other algorithms need initial solutions of the IP-problem.
 
-          solve_IP(A,bx,c,alg,prsv);  A intmat, bx intvec, c intvec, alg string, prsv intvec
+        If `alg' is chosen to be `ct' or `pct', bx is read as the right hand 
+        vector b of the system Ax=b. b should then be an intvec of size m 
+        where m is the number of rows of A. 
+        Furthermore, bx and A should be nonnegative if `pct' is used. 
+        If `alg' is chosen to be `ect',`pt',`blr',`hs' or `du', 
+        bx is read as an initial solution x of the system Ax=b. 
+        bx should then be a nonnegative intvec of size n where n is the 
+        number of columns of A.
 
-          solve_IP(A,bx,c,alg,prsv);  A intmat, bx list of intvec, c intvec, alg string, prsv intvec
-RETURN:   type of bx: solution of the associated integer programming problem(s) as explained in
-@texinfo
-@ref{Toric ideals and integer programming}.
-@end texinfo
-NOTE:     This procedure returns the solution(s) of the given IP-problem(s) or the message `not solvable'.
+        If `alg' is chosen to be `blr' or `hs', the algorithm needs a vector 
+        with positive coefficients in the row space of A. 
+        If no row of A contains only positive entries, one has to use the 
+        versions of solve_IP which take such a vector prsv as an argument.
 
-One may call the procedure with several different algorithms:
-
-- the algorithm of Conti/Traverso using elimination (ect),
-
-- the algorithm of Pottier (pt),
-
-- an algorithm of Bigatti/La Scala/Robbiano (blr),
-
-- the algorithm of Hosten/Sturmfels (hs),
-
-- the algorithm of DiBiase/Urbanke (du).
-
-The argument `alg' should be the abbreviation for an algorithm as above: ect, pt, blr, hs or du.
-
-`ct' allows to compute an optimal solution of the IP-problem directly from the right-hand vector b. The same is true for its `positive' variant `pct' which may only be applied if A and b have nonnegative entries. All other algorithms need initial solutions of the IP-problem.
-
-If `alg' is chosen to be `ct' or `pct', bx is read as the right hand vector b of the system Ax=b. b should then be an intvec of size m where m is the number of rows of A. Furthermore, bx and A should be nonnegative if `pct' is used. If `alg' is chosen to be `ect',`pt',`blr',`hs' or `du', bx is read as an initial solution x of the system Ax=b. bx should then be a nonnegative intvec of size n where n is the number of columns of A.
-
-If `alg' is chosen to be `blr' or `hs', the algorithm needs a vector with positive coefficients in the row space of A. If no row of A contains only positive entries, one has to use the versions of solve_IP which take such a vector prsv as an argument.
-
-solve_IP may also be called with a list bx of intvecs instead of a single intvec.
-EXAMPLE:  example solve_IP; shows an example
+        solve_IP may also be called with a list bx of intvecs instead of a 
+        single intvec.
 SEE ALSO: intprog_lib, toric_lib, Integer programming
+EXAMPLE:  example solve_IP; shows an example
 "
 {
   if(size(#)==4)
@@ -712,48 +708,41 @@ SEE ALSO: intprog_lib, toric_lib, Integer programming
 
 
 example
-{
-"EXAMPLE"; echo=2;
+{ "EXAMPLE"; echo=2;
+  // 1. call with single right-hand vector
+  intmat A[2][3]=1,1,0,0,1,1;
+  intvec b1=1,1;
+  intvec c=2,2,1;
+  intvec solution_vector=solve_IP(A,b1,c,"pct");
+  solution_vector;"";
 
-// call with single right-hand vector
-intmat A[2][3]=1,1,0,0,1,1;
-A;
-intvec b1=1,1;
-b1;
-intvec c=2,2,1;
-c;
-intvec solution_vector=solve_IP(A,b1,c,"pct");
-solution_vector;
+  // 2. call with list of right-hand vectors
+  intvec b2=-1,1;
+  list l=b1,b2;
+  l;
+  list solution_list=solve_IP(A,l,c,"ct");
+  solution_list;"";
 
-// call with list of right-hand vectors
-intvec b2=-1,1;
-list l=b1,b2;
-l;
-list solution_list=solve_IP(A,l,c,"ct");
-solution_list;
+  // 3. call with single initial solution vector
+  A=2,1,-1,-1,1,2;
+  b1=3,4,5;
+  solve_IP(A,b1,c,"du");"";
 
-// call with single initial solution vector
-A=2,1,-1,-1,1,2;
-A;
-b1=3,4,5;
-solution_vector=solve_IP(A,b1,c,"du");
+  // 4. call with single initial solution vector
+  //    and algorithm needing a positive row space vector
+  solution_vector=solve_IP(A,b1,c,"hs");"";
 
-// call with single initial solution vector
-// and algorithm needing a positive row space vector
-solution_vector=solve_IP(A,b1,c,"hs");
+  // 5. call with single initial solution vector
+  //     and positive row space vector
+  intvec prsv=1,2,1;
+  solution_vector=solve_IP(A,b1,c,"hs",prsv);
+  solution_vector;"";
 
-// call with single initial solution vector
-// and positive row space vector
-intvec prsv=1,2,1;
-prsv;
-solution_vector=solve_IP(A,b1,c,"hs",prsv);
-solution_vector;
-
-// call with list of initial solution vectors
-// and positive row space vector
-b2=7,8,0;
-l=b1,b2;
-l;
-solution_list=solve_IP(A,l,c,"blr",prsv);
-solution_list;
+  // 6. call with list of initial solution vectors
+  //    and positive row space vector
+  b2=7,8,0;
+  l=b1,b2;
+  l;
+  solution_list=solve_IP(A,l,c,"blr",prsv);
+  solution_list;
 }

@@ -1,45 +1,36 @@
-// $Id: mregular.lib,v 1.3 2000-12-19 14:41:43 anne Exp $
 // IB/PG/GMG, last modified:  21.7.2000
 //////////////////////////////////////////////////////////////////////////////
-version = "$Id: mregular.lib,v 1.3 2000-12-19 14:41:43 anne Exp $";
+version = "$Id: mregular.lib,v 1.4 2000-12-22 14:17:21 greuel Exp $";
 category="Commutative Algebra";
 info="
-LIBRARY: mregular.lib       PROCEDURES FOR THE CASTELNUOVO-MUMFORD REGULARITY
-AUTHORS: I.Bermejo, email: ibermejo@ull.es
-         Ph.Gimenez, email: pgimenez@agt.uva.es
-         G.-M.Greuel, email: greuel@mathematik.uni-kl.de
+LIBRARY: mregular.lib   Castelnuovo-Mumford Regularity of CM-Schemes and Curves
+AUTHORS: I.Bermejo,     ibermejo@ull.es
+         Ph.Gimenez,    pgimenez@agt.uva.es
+         G.-M.Greuel,   greuel@mathematik.uni-kl.de
 
-A library for computing the Castelnuovo-Mumford regularity of a subscheme of
-the projective n-space that DOES NOT require the computation of a minimal
-graded free resolution of the saturated ideal defining the subscheme.
+OVERVIEW: 
+ A library for computing the Castelnuovo-Mumford regularity of a subscheme of
+ the projective n-space that DOES NOT require the computation of a minimal
+ graded free resolution of the saturated ideal defining the subscheme.
+ The procedures are based on two papers by Isabel Bermejo and Philippe Gimenez:
+ 'On Castelnuovo-Mumford regularity of projective curves' Proc.Amer.Math.Soc. 
+ 128(5) (2000), and 'Computing the Castelnuovo-Mumford regularity of some 
+ subschemes of Pn using quotients of monomial ideals', Proceedings of 
+ MEGA-2000, J. Pure Appl. Algebra (to appear).
+ The algorithm assumes the variables to be in Noether position.
 
 PROCEDURES:
  reg_CM(id);         regularity of arith. C-M subscheme V(id_sat) of Pn
  reg_curve(id,[,e]); regularity of projective curve V(id_sat) in Pn
  reg_moncurve(li);   regularity of projective monomial curve defined by li
-
-REMARK:
-The procedures are based on two papers by Isabel Bermejo and Philippe Gimenez:
-'On Castelnuovo-Mumford regularity of projective curves'
- Proc.Amer.Math.Soc. 128(5) (2000), and
-'Computing the Castelnuovo-Mumford regularity of some subschemes of Pn using
- quotients of monomial ideals',
- Proceedings of MEGA-2000, J. Pure Appl. Algebra (to appear).
-
-IMPORTANT:
-To use the first two procedures, the variables must be in Noether
-position, i.e. that the polynomial ring in the last variables must be a
-Noether normalization of basering/id.
-If it is not the case, you should compute a Noether normalization before,
-e.g. by using the procedure noetherNormal from algebra.lib.
 ";
-//
+
 LIB "general.lib";
-LIB "elim.lib";
+LIB "algebra.lib";
 LIB "sing.lib";
 LIB "poly.lib";
 //////////////////////////////////////////////////////////////////////////////
-//
+
 proc reg_CM (ideal i)
 "
 USAGE:   reg_CM (i); i ideal
@@ -47,7 +38,8 @@ RETURN:  an integer, the Castelnuovo-Mumford regularity of i-sat.
 ASSUME:  i is a homogeneous ideal of the basering S=K[x(0)..x(n)] where
          the field K is infinite, and S/i-sat is Cohen-Macaulay.
          Assume that K[x(n-d),...,x(n)] is a Noether normalization of S/i-sat
-         where d=dim S/i -1.
+         where d=dim S/i -1. If this is not the case, compute a Noether
+         normalization e.g. by using the proc noetherNormal from algebra.lib.
 NOTE:    The output is reg(X)=reg(i-sat) where X is the arithmetically
          Cohen-Macaulay subscheme of the projective n-space defined by i.
          If printlevel > 0 (default = 0) additional information is displayed.
@@ -146,6 +138,8 @@ example
    printlevel = 1;
    reg_CM(i);
 }
+
+///////////////////////////////////////////////////////////////////////////////
 /*
 Out-commented examples:
    ring r=0,(x,y,z,t),dp;
@@ -194,7 +188,7 @@ Out-commented examples:
 //
 */
 //////////////////////////////////////////////////////////////////////////////
-//
+
 proc reg_curve (ideal i, list #)
 "
 USAGE:   reg_curve (i[,e]); i ideal, e integer
@@ -493,6 +487,8 @@ example
    printlevel = 1;
    reg_curve(j);
 }
+
+///////////////////////////////////////////////////////////////////////////////
 /*
 Out-commented examples:
 //
@@ -551,7 +547,7 @@ Out-commented examples:
 //
 */
 //////////////////////////////////////////////////////////////////////////////
-//
+
 proc reg_moncurve (list #)
 "
 USAGE:   reg_moncurve (a0,...,an) ; ai integers with a0=0 < a1 < ... < an=:d
@@ -773,6 +769,7 @@ example
    printlevel = 1;
    reg_moncurve(0,1,3,5,6);
 }
+///////////////////////////////////////////////////////////////////////////////
 /*
 Out-commented examples:
 //
@@ -810,6 +807,5 @@ Out-commented examples:
 // In the last three examples, the m.g.f.r. could not be obtained using mres.
 //
 */
-//
 //////////////////////////////////////////////////////////////////////////////
-//
+

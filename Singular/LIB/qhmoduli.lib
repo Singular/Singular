@@ -2,7 +2,7 @@
 version="Id: qhmoduli.lib,v 1.0 2000/12/12 12:32:15 Singular Exp $";
 category="Singularities";
 info="
-LIBRARY:  qhmoduli.lib    PROCEDURES FOR MODULI SPACES OF SQH-SINGULARITIES
+LIBRARY:  qhmoduli.lib    Moduli Spaces of Semi-Quasihomogeneous Singularities
 AUTHOR:   Thomas Bayer, email: bayert@in.tum.de
 
 PROCEDURES:
@@ -42,8 +42,7 @@ RETURN:  polynomial ring, possibly a simple extension of the groundfield of
 OPTIONS: 1 compute equations of the mod. space,
          2 use a primary decomposition
          4 compute E_f0, i.e., the image of G_f0
-         To combine options, add their value.
-DEFAULT: opt = 7
+         To combine options, add their value, default: opt =7
 EXAMPLE: example ModEqn; shows an example
 "
 {
@@ -198,15 +197,14 @@ ASSUME:  'action' is linear, G must be finite if the Reynolds operator is
          needed (i.e., NullCone(G,action) returns some non-invariant polys)
 RETURN:   polynomial ring over a simple extension of the groundfield of the
           basering, containing the ideals 'id' and 'embedid'.
-   - 'id' contains the equations of the quotient if opt = 1,
-     if opt = 0, 2 'id' contains generators of the coordinate ring R
-           of the quotient (Spec(R) is the quotient)
-   - 'embedid' = 0 if opt = 1,
-           if opt = 0, 2 it is the ideal defining the equivariant embedding
+          - 'id' contains the equations of the quotient if opt = 1,
+            if opt = 0, 2 'id' contains generators of the coordinate ring R
+            of the quotient (Spec(R) is the quotient)
+          - 'embedid' = 0 if opt = 1,
+            if opt = 0, 2 it is the ideal defining the equivariant embedding
 OPTIONS: 1 compute equations of the quotient,
          2 use a primary decomposition when computing the Reynolds operator
-   To combine options, add their value.
-DEFAULT: opt = 3
+         To combine options, add their value, default: opt =3.
 EXAMPLE: example QuotientEquations; shows an example
 "
 {
@@ -725,7 +723,7 @@ PURPOSE: returns a list of all monomials and terms occuring in f of
          weighted degree < ub
 RETURN:  list
          _[1]  list of monomials
-        _[2]  list of terms
+         _[2]  list of terms
 EXAMPLE: example MonosAndTerms shows an example
 "
 {
@@ -760,8 +758,8 @@ proc SelectMonos(parts, intvec wt, int d)
 PURPOSE: returns a list of all monomials and terms occuring in f of
          weighted degree = d
 RETURN:  list
-   _[1]  list of monomials
-   _[2]  list of terms
+         _[1]  list of monomials
+         _[2]  list of terms
 EXAMPLE: example SelectMonos; shows an example
 "
 {
@@ -1190,7 +1188,7 @@ GLOBAL: 'varSubsList', contains the index j s.t. x(i) -> x(i)t(j) ...
 
 proc AllCombinations(list partition, list indices)
 "USAGE:   AllCombinations(partition,indices); list partition, indices)
-PURPOSE: all compbinations for a given partititon
+PURPOSE: all combinations for a given partititon
 RETURN:  list
 GLOBAL: varSubsList, contains the index j s.t. x(i) -> x(i)t(j) ...
 "

@@ -1,11 +1,9 @@
-// $Id: matrix.lib,v 1.14 2000-12-19 14:37:26 anne Exp $
 // GMG/BM, last modified: 8.10.98
 ///////////////////////////////////////////////////////////////////////////////
-
-version="$Id: matrix.lib,v 1.14 2000-12-19 14:37:26 anne Exp $";
+version="$Id: matrix.lib,v 1.15 2000-12-22 14:15:05 greuel Exp $";
 category="Linear Algebra";
 info="
-LIBRARY:  matrix.lib    PROCEDURES FOR MATRIX OPERATIONS
+LIBRARY:  matrix.lib    Elementary Matrix Operations
 
 PROCEDURES:
  compress(A);           matrix, zero columns from A deleted
@@ -462,17 +460,18 @@ EXAMPLE: example tensor; shows an example
 "
 {
    int i,j;
-   matrix C=B;
-   for( i=2; i<=nrows(A); i=i+1 ) { C=dsum(C,B); }
-   matrix D[nrows(C)][ncols(A)*nrows(B)];
-   for( j=1; j<=nrows(B); j=j+1 )
-   {
-      for( i=1; i<=nrows(A); i=i+1 )
-      {
-         D[(i-1)*nrows(B)+j,(j-1)*ncols(A)+1..j*ncols(A)]=A[i,1..ncols(A)];
-      }
+   matrix C,D;
+   for( i=1; i<=nrows(A); i++ ) 
+   { 
+     C = A[i,1]*B;
+     for( j=2; j<=ncols(A); j++ )
+     {
+       C = concat(C,A[i,j]*B);
+     }  
+     D = concat(D,transpose(C));
    }
-   return(concat(C,D));
+   D = transpose(D);
+   return(submat(D,2..nrows(D),1..ncols(D)));
 }
 example
 { "EXAMPLE:"; echo = 2;

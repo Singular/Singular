@@ -1,11 +1,8 @@
-// $Id: presolve.lib,v 1.14 2000-12-19 15:05:32 anne Exp $
-//(GMG)
 ///////////////////////////////////////////////////////////////////////////////
-
-version="$Id: presolve.lib,v 1.14 2000-12-19 15:05:32 anne Exp $";
+version="$Id: presolve.lib,v 1.15 2000-12-22 14:23:35 greuel Exp $";
 category="Symbolic-numerical solving";
 info="
-LIBRARY:  presolve.lib     PROCEDURES FOR PRE-SOLVING POLYNOMIAL EQUATIONS
+LIBRARY:  presolve.lib     Pre-Solving of Polynomial Equations
 AUTHOR:   Gert-Martin Greuel, email: greuel@mathematik.uni-kl.de,
 
 PROCEDURES:

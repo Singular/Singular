@@ -1,15 +1,10 @@
 ///////////////////////////////////////////////////////////////////////////////
-// normal.lib
-// algorithms for computing the normalization based on
-// the criterion of Grauert/Remmert and ideas of De Jong & Vasconcelos
-///////////////////////////////////////////////////////////////////////////////
-
-version="$Id: normal.lib,v 1.27 2000-12-19 14:41:43 anne Exp $";
+version="$Id: normal.lib,v 1.28 2000-12-22 14:18:34 greuel Exp $";
 category="Commutative Algebra";
 info="
-LIBRARY:  normal.lib     PROCEDURES FOR NORMALIZATION
-AUTHORS:  Gert-Martin Greuel, email: greuel@mathematik.uni-kl.de,
-          Gerhard Pfister, email: pfister@mathematik.uni-kl.de
+LIBRARY:  normal.lib     Normalization of Affine Rings
+AUTHORS:  G.-M. Greuel   greuel@mathematik.uni-kl.de,
+          G. Pfister     pfister@mathematik.uni-kl.de
 
 PROCEDURES:
  normal(I);             computes the normalization of basering/I
@@ -23,8 +18,7 @@ LIB "elim.lib";
 LIB "presolve.lib";
 LIB "inout.lib";
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc isR_HomJR (list Li)
+static proc isR_HomJR (list Li)
 "USAGE:   isR_HomJR (Li);  Li = list: ideal SBid, ideal J, poly p
 COMPUTE: module Hom_R(J,R) = R:J and compare with R
 ASSUME:  R    = P/SBid,  P = basering
@@ -375,21 +369,22 @@ example
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+
 proc normal(ideal id, list #)
 "USAGE:   normal(i [,choose]);  i a radical ideal, choose empty or 1
          if choose=1 the normalization of the associated primes is computed 
          (which is sometimes more efficient)
+ASSUME:  The ideal must be radical, for non radical ideals the output may 
+         be wrong (i=radical(i); makes i radical)
 RETURN:  a list of rings (say nor), in each ring nor[i] are two ideals
          norid, normap such that the direct sum of the rings nor[i]/norid is 
          the normalization of basering/id; normap gives the normalization map 
          from basering/id to nor[i]/norid (for each i)
 NOTE:    to use the i-th ring type: def R=nor[i]; setring R;
          increasing printlevel displays more comments (default: printlevel=0)
-COMMENT: Not implemented for local or mixed orderings.
+         Not implemented for local or mixed orderings.
          If the input ideal i is weighted homogeneous a weighted ordering may
          be used (qhweight(i); computes weights).
-CAUTION: The proc does not check whether the input is radical, for non radical
-         ideals the output may be wrong (i=radical(i); makes i radical)
 EXAMPLE: example normal; shows an example
 "
 {
@@ -535,8 +530,7 @@ example
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc normalizationPrimes(ideal i,ideal ihp, list #)
+static proc normalizationPrimes(ideal i,ideal ihp, list #)
 "USAGE:   normalizationPrimes(i,ihp[,si]);  i prime ideal, ihp map 
          (partial normalization), si SB of singular locus
 RETURN:  a list of one ring L=R, in  R are two ideals
@@ -1132,8 +1126,7 @@ example
    normap;
 }
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc substpart(ideal endid, ideal endphi, int homo, intvec rw)
+static proc substpart(ideal endid, ideal endphi, int homo, intvec rw)
 
 "//Repeated application of elimpart to endid, until no variables can be 
 //directy substituded. homo=1 if input is homogeneous, rw contains
@@ -1416,8 +1409,5 @@ puv2-puw;
 
 ring r=0,(u,v,w,x,y,z),wp(1,1,1,3,2,1);
 ideal i=wx,wy,wz,vx,vy,vz,ux,uy,uz,y3-x2;
-
-
-
 */
 

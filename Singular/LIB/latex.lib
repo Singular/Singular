@@ -1,14 +1,8 @@
-// $Id: latex.lib,v 1.12 2000-12-19 15:05:28 anne Exp $
-//                        1998/04/17
-// author : Christian Gorzel email: gorzelc@math.uni-muenster.de
-//
 ///////////////////////////////////////////////////////////////////////////////
-
-version="$Id: latex.lib,v 1.12 2000-12-19 15:05:28 anne Exp $";
+version="$Id: latex.lib,v 1.13 2000-12-22 14:11:33 greuel Exp $";
 category="Visualization";
 info="
-LIBRARY: latex.lib    PROCEDURES FOR TYPESET OF SINGULAROBJECTS IN LATEX2E
-
+LIBRARY: latex.lib    Typesetting of Singular-Objects in LaTex2e
 AUTHOR: Christian Gorzel, gorzelc@math.uni-muenster.de
 
 PROCEDURES:
@@ -29,9 +23,8 @@ PROCEDURES:
 
 GLOBAL VARIABLES:
   TeXwidth, TeXnofrac, TeXbrack, TeXproj, TeXaligned, TeXreplace, NoDollars
-                  are used to control the typesetting
-    Call example texdemo; to become familiar with the features of latex.lib
-
+  are used to control the typesetting
+  Call example texdemo; to become familiar with the features of latex.lib
 
   TeXwidth      : int: -1,0,1..9, >9  controls the breaking of long polynomials
   TeXnofrac     : (int) flag,  write 1/2 instead of \frac{1}{2}
@@ -3116,3 +3109,4 @@ pagewidth =80;
   kill fname,nl,nl2,lb,bv,ev;
   return();
  }
+///////////////////////////////////////////////////////////////////////////////

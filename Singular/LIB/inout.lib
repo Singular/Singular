@@ -1,11 +1,9 @@
-// $Id: inout.lib,v 1.18 2000-12-19 14:37:25 anne Exp $
 // (GMG/BM, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
-
-version="$Id: inout.lib,v 1.18 2000-12-19 14:37:25 anne Exp $";
+version="$Id: inout.lib,v 1.19 2000-12-22 14:06:55 greuel Exp $";
 category="General purpose";
 info="
-LIBRARY:  inout.lib     PROCEDURES FOR MANIPULATING IN- AND OUTPUT
+LIBRARY:  inout.lib     Printing and Manipulating In- and Output
 
 PROCEDURES:
  allprint(list);        print list if ALLprint is defined, with pause if >0

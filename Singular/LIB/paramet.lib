@@ -1,17 +1,15 @@
-// $Id: paramet.lib,v 1.7 2000-12-19 15:05:31 anne Exp $
-// author : Thomas Keilen email: keilen@mathematik.uni-kl.de
 // last change:           05.12.2000
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: paramet.lib,v 1.7 2000-12-19 15:05:31 anne Exp $";
+version="$Id: paramet.lib,v 1.8 2000-12-22 14:20:59 greuel Exp $";
 category="Visualization";
 info="
-LIBRARY: paramet.lib   PROCEDURES FOR PARAMETRIZATIONS
-AUTHOR:  Thomas Keilen, email: keilen@mathematik.uni-kl.de
+LIBRARY: paramet.lib   Parametrization of Varieties
+AUTHOR:  Thomas Keilen, keilen@mathematik.uni-kl.de
 
 OVERVIEW:
  A library to compute parametrizations of algebraic varieties (if possible)
- with the aid of a primary decomposition, respectively to compute a
- parametrization of a plane curve singularity with the aid of a
+ with the aid of a normalization, or a primary decomposition, resp. to compute
+ a parametrization of a plane curve singularity with the aid of a
  Hamburger-Noether expansion.
 
  PROCEDURES:
@@ -25,9 +23,8 @@ LIB "normal.lib";
 LIB "hnoether.lib";
 ///////////////////////////////////////////////////////////////////////////////
 
-
 proc parametrize(ideal I)
-"USAGE:  parametrize(); I ideal in an arbitrary number of variables,
+"USAGE:  parametrize(I); I ideal in an arbitrary number of variables,
          whose radical is prime, in a ring with global ordering
 RETURN:  a list containing the parametrization ideal resp. the original ideal,
          the number of variables needed for the parametrization resp. 0, and
@@ -98,14 +95,12 @@ example
 { "EXAMPLE:";echo = 2;
   ring RING=0,(x,y,z),dp;
   ideal I=z2-y2x2+x3;
-  parametrize(I);parametrize(I);
+  parametrize(I);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-
-
 proc parametrizepd(ideal I)
-"USAGE:  parametrizepd(); I ideal in a polynomial ring with global ordering
+"USAGE:  parametrizepd(I); I ideal in a polynomial ring with global ordering
 RETURN:  a list of lists, where each entry contains the parametrization
          of a primary component of I resp. 0, the number of variables
          resp. 0, and 1 resp. 0 depending on whether the parametrization
@@ -183,12 +178,10 @@ example
 }
 /////////////////////////////////////////////////////////////////////////////
 
-
-
 proc parametrizesing(poly f)
 "USAGE:  parametrizesing(); f a polynomial in two variables,ordering ls or ds
-RETURN:  a list containing the parametrizations of the different branches of the
-         singularity at the origin resp. 0, if f was not of the desired kind
+RETURN:  a list of ideals, each ideal parametrizes a branch of the
+         singularity at the origin; resp. 0, if f was not of the desired kind
 CREATE:  If the parametrization is successful, the basering will be changed to
          the parametrization ring, that is to the ring  0,(x,y),ls;
 EXAMPLE: example parametrizesing; shows an example

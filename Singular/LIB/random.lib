@@ -1,22 +1,20 @@
-// $Id: random.lib,v 1.12 2000-12-19 14:37:27 anne Exp $
 //(GMG/BM, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
-
-version="$Id: random.lib,v 1.12 2000-12-19 14:37:27 anne Exp $";
+version="$Id: random.lib,v 1.13 2000-12-22 14:29:01 greuel Exp $";
 category="General purpose";
 info="
-LIBRARY:  random.lib    PROCEDURES OF RANDOM MATRIX AND POLY OPERATIONS
+LIBRARY:  random.lib    Creating Random and Sparse Matrices, Ideals, Polys
 
 PROCEDURES:
- genericid(id[,p,b]);     generic sparse linear combinations of generators of id
- randomid(id,[k,b]);      random linear combinations of generators of id
- randommat(n,m[,id,b]);   nxm matrix of random linear combinations of id
- sparseid(k,u[,o,p,b]);   ideal of k random sparse poly's of degree d [u<=d<=o]
- sparsemat(n,m[,p,b]);    nxm sparse integer matrix with random coefficients
- sparsepoly(u[,o,p,b]);   random sparse polynomial with terms of degree in [u,o]
- sparsetriag(n,m[,.]);    nxm sparse lower-triag intmat with random coefficients
- randomLast(b);           random transformation of the last variable
- randomBinomial(k,u[,.]); binomial ideal, k random generators of degree >=u
+ genericid(i[,p,b]);     generic sparse linear combinations of generators of i
+ randomid(id,[k,b]);     random linear combinations of generators of id
+ randommat(n,m[,id,b]);  nxm matrix of random linear combinations of id
+ sparseid(k,u[,o,p,b]);  ideal of k random sparse poly's of degree d [u<=d<=o]
+ sparsemat(n,m[,p,b]);   nxm sparse integer matrix with random coefficients
+ sparsepoly(u[,o,p,b]);  random sparse polynomial with terms of degree in [u,o]
+ sparsetriag(n,m[,.]);   nxm sparse lower-triag intmat with random coefficients
+ randomLast(b);          random transformation of the last variable
+ randomBinomial(k,u,..); binomial ideal, k random generators of degree >=u
            (parameters in square brackets [] are optional)
 ";
 
