@@ -1,8 +1,8 @@
-// $Id: matrix.lib,v 1.6 1998-05-05 11:55:31 krueger Exp $
+// $Id: matrix.lib,v 1.7 1998-05-14 18:45:10 Singular Exp $
 // (GMG/BM, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: matrix.lib,v 1.6 1998-05-05 11:55:31 krueger Exp $";
+version="$Id: matrix.lib,v 1.7 1998-05-14 18:45:10 Singular Exp $";
 info="
 LIBRARY:  matrix.lib    PROCEDURES FOR MATRIX OPERATIONS
 
@@ -297,20 +297,20 @@ EXAMPLE: example power; shows an example
    }
 //---------------------------- trivial cases ----------------------------------
    int ii;
-   if( n <= 0 ) 
+   if( n <= 0 )
    {
-      if( typeof(A)=="matrix" ) 
-      { 
-         return (unitmat(nrows(A))); 
+      if( typeof(A)=="matrix" )
+      {
+         return (unitmat(nrows(A)));
       }
-      if( typeof(A)=="intmat" ) 
-      { 
+      if( typeof(A)=="intmat" )
+      {
          intmat B[nrows(A)][nrows(A)];
          for( ii=1; ii<=nrows(A); ii++ )
          {
             B[ii,ii] = 1;
          }
-         return (B); 
+         return (B);
       }
    }
    if( n == 1 ) { return (A); }

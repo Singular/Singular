@@ -1,18 +1,18 @@
-// $Id: deform.lib,v 1.10 1998-05-05 11:55:22 krueger Exp $
+// $Id: deform.lib,v 1.11 1998-05-14 18:44:57 Singular Exp $
 // author: Bernd Martin email: martin@math.tu-cottbus.de
-//(bm, last modified 4/98)   
+//(bm, last modified 4/98)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: deform.lib,v 1.10 1998-05-05 11:55:22 krueger Exp $";
+version="$Id: deform.lib,v 1.11 1998-05-14 18:44:57 Singular Exp $";
 info="
 LIBRARY:  deform.lib       PROCEDURES FOR COMPUTING MINIVERSAL DEFORMATION
                            by Bernd Martin (martin@math.tu-cottbus.de)
 
  versal(Fo[,d,any])        miniversal deformation of isolated singularity Fo
  mod_versal(Mo,I,[,d,any]) miniversal deformation of module Mo modulo ideal I
- lift_kbase(N,M);          lifting N into standard kbase of M 
+ lift_kbase(N,M);          lifting N into standard kbase of M
  lift_rel_kb(N,M[,kbM,p])  relative lifting N into a kbase of M
  kill_rings([\"prefix\"])    kills the exported rings from above
- 
+
   SUB-PROCEDURES            used by main procedure:
                   get_rings,compute_ext,get_inf_def,interact1,
                   interact2,negative_part,homog_test
@@ -32,14 +32,14 @@ proc versal (ideal Fo,list #)
 "USAGE:   versal(Fo[,d,any]); Fo=ideal, d=int, any=list
 COMUPTE: miniversal deformation of Fo up to degree d (default d=100),
 CREATE:  Rings (exported):
-         'my'Px = extending the basering Po by new variables given by \"A,B,..\" 
+         'my'Px = extending the basering Po by new variables given by \"A,B,..\"
                   (deformation parameters), returns as basering,
                   the new variables come before the old ones,
                   the ordering is the product between \"ls\" and \"ord(Po)\",
          'my'Qx = Px/Fo extending Qo=Po/Fo,
          'my'So = being the embedding-ring of the versal base space,
          'my'Ox = Px/Js extending So/Js.   (default my=\"\")
-      Matrices (in Px, exported): 
+      Matrices (in Px, exported):
          Js  = giving the versal base space (obstructions),
          Fs  = giving the versal family of Fo,
          Rs  = giving the lifting of Ro=syz(Fo).
@@ -47,10 +47,10 @@ CREATE:  Rings (exported):
       If 'any' is defined and any[1] is no string, interactive version.
       Otherwise 'any' gives predefined strings: \"my\",\"param\",\"order\",\"out\"
       (\"my\" prefix-string, \"param\" is a letter (e.g. \"A\")  for the name of
-      first parameter or (e.g. \"A(\") for index parameter variables, \"order\" 
+      first parameter or (e.g. \"A(\") for index parameter variables, \"order\"
       ordering string for ring extension), \"out\" name of output-file).
 NOTE:   printlevel < 0        no output at all,
-        printlevel >=0,1,2,.. informs you, what is going on;            
+        printlevel >=0,1,2,.. informs you, what is going on;
         this proc uses 'execute'.
 EXAMPLE:example versal; shows an example
 "
@@ -61,12 +61,12 @@ EXAMPLE:example versal; shows an example
   int p    = printlevel-voice+3;
   int time = timer;
   intvec @iv,@jv,@is_qh,@degr;
-  d_max    = 100;  
+  d_max    = 100;
   @my = ""; @param="A"; @order="ds"; @out="no";
   @size    = size(#);
   if( @size>0 ) { d_max = #[1]; }
-  if( @size>1 ) 
-  { if(typeof(#[2])!="string") 
+  if( @size>1 )
+  { if(typeof(#[2])!="string")
     { string @active;
       @my,@param,@order,@out = interact1();
     }
@@ -85,7 +85,7 @@ EXAMPLE:example versal; shows an example
   @is_qh      = qhweight(Fo);
   int    @rowR= size(Fo);
   def    Po   = basering;
-setring  Po; 
+setring  Po;
   poly   X_s  = product(maxideal(1));
 //-------  reproduce T12 ------------------------------------------------------
   list   Ls   = T12(Fo,1);
@@ -105,32 +105,32 @@ setring  Po;
   @t1 = Ls[3];                                 // vdim of T1
   @t2 = Ls[4];                                 // vdim of T2
   kill Ls;
-  t1' = @t1;  
-  if( @t1==0) { dbprint(p,"// rigit!"); return();}  
-  if( @t2==0) { @smooth=1; dbprint(p,"// smooth base space");}   
+  t1' = @t1;
+  if( @t1==0) { dbprint(p,"// rigit!"); return();}
+  if( @t2==0) { @smooth=1; dbprint(p,"// smooth base space");}
   dbprint(p,"// ready: T1 and T2");
   @colR = ncols(Ro);
 //-----  test: quasi-homogeneous, choice of inf. def.--------------------------
   @degrees = homog_test(@is_qh,matrix(Fo),InfD);
   @jv = 1..@t1;
-  if (@degrees!="") 
+  if (@degrees!="")
   { dbprint(p-1,"// T1 is quasi-homogeneous represented with weight-vector",
     @degrees);
   }
   if (defined(@active))
-  { "// matrix of infinitesimal deformations:";print(InfD); 
+  { "// matrix of infinitesimal deformations:";print(InfD);
     "// weights of infinitesimal deformations (  emty ='not qhomog'):";
      @degrees;
      matrix dummy;
      InfD,dummy,t1' = interact2(InfD,@jv);kill dummy;
-  } 
+  }
  //---- create new rings and objects ------------------------------------------
   get_rings(Fo,t1',1,@my,@order,@param);
  setring `myPx`;
-  @jv=0; @jv[t1']=0; @jv=@jv+1; @jv[nvars(basering)]=0;       
+  @jv=0; @jv[t1']=0; @jv=@jv+1; @jv[nvars(basering)]=0;
                                                //weight-vector for calculating
                                                //rel-jet with resp to def-para
-  ideal  Io   = imap(Po,Fo);                
+  ideal  Io   = imap(Po,Fo);
   ideal  J,m_J,tid;     attrib(J,"isSB",1);
   matrix Fo   = matrix(Io);                   //initial equations
   matrix homF = kohom(Fo,@colR);
@@ -138,29 +138,29 @@ setring  Po;
   matrix homR = transpose(Ro);
   matrix homFR= concat(homR,homF);
   module hom' = std(homFR);
-  matrix Js[1][@t2]; 
-  matrix F_R,Fs,Rs,Fn,Rn; 
-  export Js,Fs,Rs;                         
-  matrix Mon[t1'][1]=maxideal(1);             
+  matrix Js[1][@t2];
+  matrix F_R,Fs,Rs,Fn,Rn;
+  export Js,Fs,Rs;
+  matrix Mon[t1'][1]=maxideal(1);
   Fn  = transpose(imap(Po,InfD)*Mon);         //infinitesimal deformations
-  Fs  = Fo + Fn; 
+  Fs  = Fo + Fn;
   dbprint(p-1,"// infinitesimal deformation: Fs: ",Fs);
   Rn  = (-1)*lift(Fo,Fs*Ro);                  //infinit. relations
   Rs  = Ro + Rn;
   F_R = Fs*Rs;
   tid = 0 + ideal(F_R);
   if (tid[1]==0) {d_max=1;}                   //finished ?
- setring `myOx`;  
+ setring `myOx`;
   matrix Fs,Rs,Cup,Cup',F_R,homFR,New,Rn,Fn;
   module hom';
-  ideal  null,tid;  attrib(null,"isSB",1); 
- setring `myQx`;    
-  poly X_s = imap(Po,X_s);       
-  matrix Cup,Cup',MASS;              
+  ideal  null,tid;  attrib(null,"isSB",1);
+ setring `myQx`;
+  poly X_s = imap(Po,X_s);
+  matrix Cup,Cup',MASS;
   ideal  tid,null;               attrib(null,"isSB",1);
-  ideal  J,m_J;                  attrib(J,"isSB",1); 
+  ideal  J,m_J;                  attrib(J,"isSB",1);
                                  attrib(m_J,"isSB",1);
-  matrix PreO = imap(Po,PreO); 
+  matrix PreO = imap(Po,PreO);
   module PreO'= imap(Po,PreO');  attrib(PreO',"isSB",1);
   module PreT = imap(Po,PreT);   attrib(PreT,"isSB",1);
   matrix kbT2 = imap(Po,kbT2);
@@ -171,16 +171,16 @@ setring  Po;
    for (@d=2;@d<=d_max;@d=@d+1)
    {
      if( @t1==0) {break};
-     dbprint(p,"// start computation in degree "+string(@d)+".");      
+     dbprint(p,"// start computation in degree "+string(@d)+".");
      dbprint(p-3,">>> TIME = "+string(timer-time));
      dbprint(p-3,"==> memory = "+string(kmemory())+"k");
 //------- compute obstruction-vector  -----------------------------------------
      if (@smooth) { @noObstr=1;}
      else
-     { Cup = jet(F_R,@d,@jv); 
-       Cup = matrix(reduce(ideal(Cup),m_J),@colR,1);   
-       Cup = jet(Cup,@d,@jv);          
-     }   
+     { Cup = jet(F_R,@d,@jv);
+       Cup = matrix(reduce(ideal(Cup),m_J),@colR,1);
+       Cup = jet(Cup,@d,@jv);
+     }
 //------- express obstructions in kbase of T2  --------------------------------
      if ( @noObstr==0 )
      {  Cup' = reduce(Cup,PreO');
@@ -190,10 +190,10 @@ setring  Po;
            Cup=Cup-Cup';
         }
         Cup   = lift(PreO,Cup);
-        MASS  = lift_rel_kb(Cup,PreT,kbT2,X_s); 
-        dbprint(p-3,"// next MASSEY-products:",MASS-jet(MASS,@d-1,@jv)); 
+        MASS  = lift_rel_kb(Cup,PreT,kbT2,X_s);
+        dbprint(p-3,"// next MASSEY-products:",MASS-jet(MASS,@d-1,@jv));
         if    (MASS==transpose(Js))
-              { @noObstr=1;dbprint(p-1,"// no obstruction"); } 
+              { @noObstr=1;dbprint(p-1,"// no obstruction"); }
          else { @noObstr=0; }
       }
 //------- obtain equations of base space --------------------------------------
@@ -203,27 +203,27 @@ setring  Po;
         simplify(ideal(Js),10));
  setring `myPx`;
         Js   = imap(`myQx`,Js);
-      degBound = @d+1; 
+      degBound = @d+1;
         J    = std(ideal(Js));
         m_J  = std(J*ideal(Mon));
       degBound = 0;
 //--------------- obtain new base-ring ----------------------------------------
         kill `myOx`;
-  qring `myOx` = J;  
+  qring `myOx` = J;
         matrix Fs,Rs,F_R,Cup,Cup',homFR,New,Rn,Fn;
         module hom';
         ideal  null,tid;  attrib(null,"isSB",1);
       }
 //---------------- lift equations F and relations R ---------------------------
  setring `myOx`;
-      Fs    = fetch(`myPx`,Fs);                  
-      Rs    = fetch(`myPx`,Rs);   
-      F_R   = Fs*Rs;    
-      F_R   = matrix(reduce(ideal(F_R),null));  
+      Fs    = fetch(`myPx`,Fs);
+      Rs    = fetch(`myPx`,Rs);
+      F_R   = Fs*Rs;
+      F_R   = matrix(reduce(ideal(F_R),null));
       tid   = 0 + ideal(F_R);
-      if (tid[1]==0) { dbprint(p-1,"// finished"); break;}   
-      Cup   = (-1)*transpose(jet(F_R,@d,@jv));  
-      homFR = fetch(`myPx`,homFR);  
+      if (tid[1]==0) { dbprint(p-1,"// finished"); break;}
+      Cup   = (-1)*transpose(jet(F_R,@d,@jv));
+      homFR = fetch(`myPx`,homFR);
       hom'  = fetch(`myPx`,hom');  attrib(hom',"isSB",1);
       Cup'  = simplify(reduce(Cup,hom'),10);
       tid   = simplify(ideal(Cup'),10);
@@ -237,7 +237,7 @@ setring  Po;
       Fs    = Fs+Fn;
       Rs    = Rs+Rn;
       F_R   = Fs*Rs;
-      tid   = 0+reduce(ideal(F_R),null); 
+      tid   = 0+reduce(ideal(F_R),null);
 //---------------- fetch results into other rings -----------------------------
   setring `myPx`;
       Fs    = fetch(`myOx`,Fs);
@@ -247,25 +247,25 @@ setring  Po;
       F_R = fetch(`myPx`,F_R);
       m_J = fetch(`myPx`,m_J);  attrib(m_J,"isSB",1);
       J   = fetch(`myPx`,J);    attrib(J,"isSB",1);
-      Js  = fetch(`myPx`,Js); 
-      tid = fetch(`myOx`,tid); 
-      if (tid[1]==0) { dbprint(p-1,"// finished");break;}         
+      Js  = fetch(`myPx`,Js);
+      tid = fetch(`myOx`,tid);
+      if (tid[1]==0) { dbprint(p-1,"// finished");break;}
    }
 //---------  end loop and final output ----------------------------------------
   setring `myPx`;
    if (@out!="no")
    {  string out = @out+"_"+string(@d);
-      "// writing file "+out+" with matrix Js, matrix Fs, matrix Rs ready 
+      "// writing file "+out+" with matrix Js, matrix Fs, matrix Rs ready
       for reading in rings "+myPx+" or "+myQx;
       write(out,"matrix Js[1][",@t2,"]=",Js,";matrix Fs[1][",@rowR,"]=",Fs,
       ";matrix Rs[",@rowR,"][",@colR,"]=",Rs,";");
-   } 
+   }
    dbprint(p-3,">>> TIME = "+string(timer-time));
    if (@is_qh != 0)
    { @degr = qhweight(ideal(Js));
      @degr = @degr[1..t1'];
      dbprint(p-1,"// quasi-homogeneous weights of miniversal base",@degr);
-   } 
+   }
    dbprint(p-1,
    "// ___ Equations of miniversal base space ___",Js,
    "// ___ Equations of miniversal total space ___",Fs);
@@ -276,7 +276,7 @@ setring  Po;
    +myPx+" by typing:",
    "   setring "+myPx+"; show("+myPx+");","   listvar(matrix);",
    "// NOTE: rings "+myQx+", "+myPx+", "+mySo+" are alive!",
-   "// (use 'kill_rings(\""+@my+"\");' to remove)"); 
+   "// (use 'kill_rings(\""+@my+"\");' to remove)");
    return();
 }
 example
@@ -285,7 +285,7 @@ example
    printlevel     = 0;
    ring r1        = 0,(x,y,z,u,v),ds;
    matrix m[2][4] = x,y,z,u,y,z,u,v;
-   ideal Fo       = minor(m,2);    
+   ideal Fo       = minor(m,2);
                     // cone over rational normal curve of degree 4
    versal(Fo);
    setring Px;
@@ -304,7 +304,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 proc mod_versal(matrix Mo, ideal I, list #)
 "
-USAGE:   mod_versal(Mo,I[,d,any]); I=ideal, M=module, d=int, any =list 
+USAGE:   mod_versal(Mo,I[,d,any]); I=ideal, M=module, d=int, any =list
 COMUPTE: miniversal deformation of coker(Mo) over Qo=Po/Io, Po=basering;
 CREATE:  Ringsr (exported):
          'my'Px  = extending the basering by new variables
@@ -313,19 +313,19 @@ CREATE:  Ringsr (exported):
                    the ordering is the product between \"my_ord\" and \"ord(Po)\",
          'my'Qx  = Px/Io extending Qo (returns as basering),
          'my'Ox  = Px/(Io+Js) ring of the versal deformation of coker(Ms),
-         'my'So  = embedding-ring of the versal base space.  (default 'my'=\"\") 
+         'my'So  = embedding-ring of the versal base space.  (default 'my'=\"\")
       Matrices (in Qx, exported):
          Js  = giving the versal base space (obstructions),
          Ms  = giving the versal family of Mo,
-         Ls  = giving the lifting of syzygies Lo=syz(Mo), 
+         Ls  = giving the lifting of syzygies Lo=syz(Mo),
       If d is defined (!=0), it computes up to degree d.
       If 'any' is defined and any[1] is no string, interactive version.
       Otherwise 'any' gives predefined strings:\"my\",\"param\",\"order\",\"out\"
       (\"my\" prefix-string, \"param\" is a letter (e.g. \"A\")  for the name of
-      first parameter or (e.g. \"A(\") for index parameter variables, \"ord\" 
+      first parameter or (e.g. \"A(\") for index parameter variables, \"ord\"
       ordering string for ringextension), \"out\" name of output-file).
 NOTE:   printlevel < 0        no output at all,
-        printlevel >=0,1,2,.. informs you, what is going on,             
+        printlevel >=0,1,2,.. informs you, what is going on,
         this proc uses 'execute'.
 EXAMPLE:example mod_versal; shows an example
 "
@@ -336,12 +336,12 @@ EXAMPLE:example mod_versal; shows an example
   int p    = printlevel-voice+3;
   int time = timer;
   intvec @iv,@jv,@is_qh,@degr;
-  d_max    = 100;  
+  d_max    = 100;
   @my = ""; @param="A"; @order="ds"; @out="no";
   @size = size(#);
   if( @size>0 ) { d_max = #[1]; }
-  if( @size>1 ) 
-  { if(typeof(#[2])!="string") 
+  if( @size>1 )
+  { if(typeof(#[2])!="string")
     { string @active;
       @my,@param,@order,@out = interact1();
     }
@@ -351,7 +351,7 @@ EXAMPLE:example mod_versal; shows an example
       if (@size>3) {@order = #[4];}
       if (@size>4) {@out   = #[5];}
     }
-  }  
+  }
   string myPx = @my+"Px";
   string myQx = @my+"Qx";
   string myOx = @my+"Ox";
@@ -362,9 +362,9 @@ EXAMPLE:example mod_versal; shows an example
   poly   X_s = product(maxideal(1));
 //-------- compute Ext's ------------------------------------------------------
          I   = std(I);
- qring   Qo  = I;   
+ qring   Qo  = I;
   matrix Mo  = fetch(Po,Mo);
-  list   Lo  = compute_ext(Mo,p); 
+  list   Lo  = compute_ext(Mo,p);
          f0,f1,f2,e1,e2,ok_ann=Lo[1];
   matrix Ls,kb1,lift1 = Lo[2],Lo[3],Lo[4];
   matrix kb2,C',D' = Lo[5][2],Lo[5][3],Lo[5][5];
@@ -372,17 +372,17 @@ EXAMPLE:example mod_versal; shows an example
   kill Lo;
   dbprint(p,"// ready: Ext1 and Ext2");
 //-----  test: quasi-homogeneous, choice of inf. def.--------------------------
-  @degrees = homog_test(@is_qh,Mo,kb1);  
+  @degrees = homog_test(@is_qh,Mo,kb1);
   e1' = e1;  @jv = 1..e1;
-  if (@degrees != "") 
+  if (@degrees != "")
   { dbprint(p-1,"// Ext1 is quasi-homogeneous represented: "+@degrees);
   }
   if (defined(@active))
   { "// kbase of Ext1:";
-    print(kb1); 
+    print(kb1);
     "// weights of kbase of Ext1 ( empty = 'not qhomog')";@degrees;
     kb1,lift1,e1' = interact2(kb1,@jv,lift1);
-  } 
+  }
 //-------- get new rings and objects ------------------------------------------
  setring Po;
   get_rings(I,e1',0,@my,@order,@param);
@@ -391,17 +391,17 @@ EXAMPLE:example mod_versal; shows an example
   ideal  I_J  = imap(Po,I);
   ideal  Io   = I_J;
   matrix Mon[e1'][1] = maxideal(1);
-  matrix Ms   = imap(Qo,Mo);              
-  matrix Ls   = imap(Qo,Ls);       
-  matrix Js[1][e2];            
+  matrix Ms   = imap(Qo,Mo);
+  matrix Ls   = imap(Qo,Ls);
+  matrix Js[1][e2];
  setring `myQx`;
   ideal  J,I_J,tet,null;              attrib(null,"isSB",1);
   ideal  m_J  = fetch(`myPx`,m_J);   attrib(m_J,"isSB",1);
   @jv=0;  @jv[e1] = 0; @jv = @jv+1;   @jv[nvars(`myPx`)] = 0;
-  matrix Ms   = imap(Qo,Mo);          export(Ms);       
+  matrix Ms   = imap(Qo,Mo);          export(Ms);
   matrix Ls   = imap(Qo,Ls);          export(Ls);
   matrix Js[e2][1];                   export(Js);
-  matrix MASS; 
+  matrix MASS;
   matrix Mon  = fetch(`myPx`,Mon);
   matrix Mn,Ln,ML,Cup,Cup',Lift;
   matrix C'   = imap(Qo,C');
@@ -409,21 +409,21 @@ EXAMPLE:example mod_versal; shows an example
   module ex2  = imap(Qo,ex2);         attrib(ex2,"isSB",1);
   matrix D'   = imap(Qo,D');
   module Do   = imap(Qo,Do);          attrib(Do,"isSB",1);
-  matrix kb2  = imap(Qo,kb2);    
+  matrix kb2  = imap(Qo,kb2);
   matrix kb1  = imap(Qo,kb1);
   matrix lift1= imap(Qo,lift1);
   poly   X_s  = imap(Po,X_s);
-  intvec intv = e1',e1,f0,f1,f2; 
-         Ms,Ls= get_inf_def(Ms,Ls,kb1,lift1,X_s);     
+  intvec intv = e1',e1,f0,f1,f2;
+         Ms,Ls= get_inf_def(Ms,Ls,kb1,lift1,X_s);
   kill   kb1,lift1;
   dbprint(p-1,"// infinitesimal extension",Ms);
 //----------- start the loop --------------------------------------------------
   for (@d=2;@d<=d_max;@d=@d+1)
-  { 
+  {
     dbprint(p-3,">>> time = "+string(timer-time));
     dbprint(p-3,"==> memory = "+string(memory(0)/1000)+
                 ",  allocated = "+string(memory(1)/1000));
-    dbprint(p,"// start deg = "+string(@d));   
+    dbprint(p,"// start deg = "+string(@d));
 //-------- get obstruction ----------------------------------------------------
     Cup  = matrix(ideal(Ms*Ls),f0*f2,1);
     Cup  = jet(Cup,@d,@jv);
@@ -432,7 +432,7 @@ EXAMPLE:example mod_versal; shows an example
 //-------- express obstruction in kbase ---------------------------------------
     Cup' = reduce(Cup,Do);
     tet  = simplify(ideal(Cup'),10);
-    if (tet[1]!=0) 
+    if (tet[1]!=0)
     { dbprint(p-4,"// *");
       Cup = Cup-Cup';
     }
@@ -440,12 +440,12 @@ EXAMPLE:example mod_versal; shows an example
     if (ok_ann)
     { MASS = lift_rel_kb(Cup,ex2,kb2,X_s);}
     else
-    { MASS = reduce(Cup,ex2);}      
+    { MASS = reduce(Cup,ex2);}
     dbprint(p-3,"// next MATRIC-MASSEY-products",
     MASS-jet(MASS,@d-1,@jv));
     if   ( MASS==transpose(Js))
          { @noObstr = 1;dbprint(p-1,"//no obstruction"); }
-    else { @noObstr = 0; }	  
+    else { @noObstr = 0; }
 //-------- obtain equations of base space -------------------------------------
     if (@noObstr == 0)
     { Js = MASS;
@@ -457,31 +457,31 @@ EXAMPLE:example mod_versal; shows an example
       m_J = std(ideal(Mon)*J);
      degBound=0;
       I_J = Io,J;                attrib(I_J,"isSB",1);
-//-------- obtain new base ring ----------------------------------------------- 
+//-------- obtain new base ring -----------------------------------------------
       kill `myOx`;
- qring `myOx` = I_J;     
+ qring `myOx` = I_J;
       ideal null,tet;            attrib(null,"isSB",1);
       matrix Ms  = imap(`myQx`,Ms);
       matrix Ls  = imap(`myQx`,Ls);
       matrix Mn,Ln,ML,Cup,Cup',Lift;
-      matrix C'  = imap(Qo,C');  
+      matrix C'  = imap(Qo,C');
       module Co  = imap(Qo,Co);   attrib(Co,"isSB",1);
       module ex2 = imap(Qo,ex2);  attrib(ex2,"isSB",1);
       matrix kb2 = imap(Qo,kb2);
       poly   X_s = imap(Po,X_s);
-    }  
+    }
 //-------- get lifts ----------------------------------------------------------
    setring `myOx`;
     ML  = matrix(reduce(ideal(Ms*Ls),null),f0,f2);
     Cup = matrix(ideal(ML),f0*f2,1);
     Cup = jet(Cup,@d,@jv);
     Cup'= reduce(Cup,Co);
-    tet = simplify(ideal(Cup'),10);    
-    if (tet[1]!=0) 
+    tet = simplify(ideal(Cup'),10);
+    if (tet[1]!=0)
     { dbprint(p-4,"// #");
      Cup = Cup-Cup';
     }
-    Lift = lift(C',Cup);                  
+    Lift = lift(C',Cup);
     Mn   = matrix(ideal(Lift),f0,f1);
     Ln   = matrix(ideal(Lift[f0*f1+1..nrows(Lift),1]),f1,f2);
     Ms   = Ms-Mn;
@@ -489,25 +489,25 @@ EXAMPLE:example mod_versal; shows an example
     dbprint(p-3,"// next extension of Mo",Mn);
     dbprint(p-3,"// next extension of syz(Mo)",Ln);
     ML   = reduce(ideal(Ms*Ls),null);
-//--------- test: finished ---------------------------------------------------- 
+//--------- test: finished ----------------------------------------------------
     tet  = simplify(ideal(ML),10);
     if (tet[1]==0) { dbprint(p-1,"// finished in degree ",@d);}
 //---------fetch results into Qx and Px ---------------------------------------
    setring `myPx`;
     Ms   = fetch(`myOx`,Ms);
-    Ls   = fetch(`myOx`,Ls); 
+    Ls   = fetch(`myOx`,Ls);
    setring `myQx`;
     Ms   = fetch(`myOx`,Ms);
-    Ls   = fetch(`myOx`,Ls); 
+    Ls   = fetch(`myOx`,Ls);
     ML   = Ms*Ls;
-    ML   = matrix(reduce(ideal(ML),null),f0,f2); 
+    ML   = matrix(reduce(ideal(ML),null),f0,f2);
     tet  = imap(`myOx`,tet);
     if (tet[1]==0) { break;}
-  }  
-//------- end of loop, final output ------------------------------------------- 
+  }
+//------- end of loop, final output -------------------------------------------
   if (@out != "no")
   { string out = @out+"_"+string(@d);
-    "// writing file '"+out+"' with matrix Js, matrix Ms, matrix Ls 
+    "// writing file '"+out+"' with matrix Js, matrix Ms, matrix Ls
     ready for reading in rings "+myPx+" or "+myQx;
     write(out,"matrix Js[1][",e2,"]=",Js,";matrix Ms[",f0,"][",f1,"]=",Ms,
     ";matrix Ls[",f1,"][",f2,"]=",Ls,";");
@@ -517,7 +517,7 @@ EXAMPLE:example mod_versal; shows an example
   { @degr = qhweight(ideal(Js));
     @degr = @degr[1..e1'];
     dbprint(p-1,"// quasi-homogeneous weights of miniversal base",@degr);
-  } 
+  }
   dbprint(p-1,"// Result belongs to qring "+myQx,
   "// Equations of total space of miniversal deformation are in Js",
   simplify(ideal(Js),10),
@@ -539,13 +539,13 @@ example
   matrix Mo[2][2] = x2,y,-y2,x2;
   mod_versal(Mo,Io);
   printlevel = p;
-  kill Px,Qx,So; 
+  kill Px,Qx,So;
 }
-//============================================================================= 
+//=============================================================================
 ///////////////////////////////////////////////////////////////////////////////
 proc kill_rings(list #)
 "USAGE: kill_rings([string]);
-Sub-procedure: kills exported rings of 'versal' and 
+Sub-procedure: kills exported rings of 'versal' and
                'mod_versal' with prefix 'string'
 "
 {
@@ -573,12 +573,12 @@ proc compute_ext(matrix Mo,int p)
 "
 Sub-procedure: obtain Ext1 and Ext2 and other objects used by mod_versal
 "
-{ 
+{
    int    l,f0,f1,f2,f3,e1,e2,ok_ann;
    module Co,Do,ima,ex1,ex2;
-   matrix M0,M1,M2,ker,kb1,lift1,kb2,A,B,C,D;  
+   matrix M0,M1,M2,ker,kb1,lift1,kb2,A,B,C,D;
 //------- resM ---------------------------------------------------------------
-   list resM = res(Mo,3);   
+   list resM = res(Mo,3);
    M0 = resM[1];
    M1 = resM[2];
    M2 = resM[3];   kill resM;
@@ -587,10 +587,10 @@ Sub-procedure: obtain Ext1 and Ext2 and other objects used by mod_versal
    f2 = ncols(M1);
    f3 = ncols(M2);
 //------ compute Ext^2  ------------------------------------------------------
-   B    = kohom(M0,f3); 
+   B    = kohom(M0,f3);
    A    = kontrahom(M2,f0);
-   D    = modulo(A,B); 
-   Do   = std(D);   
+   D    = modulo(A,B);
+   Do   = std(D);
    ima  = kohom(M0,f2),kontrahom(M1,f0);
    ex2  = modulo(D,ima);
    ex2  = std(ex2);
@@ -602,14 +602,14 @@ Sub-procedure: obtain Ext1 and Ext2 and other objects used by mod_versal
    { ok_ann = ok_ann+ord(kb2[l]);
    }
    if (ok_ann==0)
-   {  e2 =nrows(ex2);    
+   {  e2 =nrows(ex2);
       dbprint(p,"// Ann(Ext2) is maximal");
    }
 //------ compute Ext^1 -------------------------------------------------------
-   B     = kohom(M0,f2); 
+   B     = kohom(M0,f2);
    A     = kontrahom(M1,f0);
    ker   = modulo(A,B);
-   ima   = kohom(M0,f1),kontrahom(M0,f0);  
+   ima   = kohom(M0,f1),kontrahom(M0,f0);
    ex1   = modulo(ker,ima);
    ex1   = std(ex1);
    e1    = vdim(ex1);
@@ -620,7 +620,7 @@ Sub-procedure: obtain Ext1 and Ext2 and other objects used by mod_versal
    Co    = std(C);
 //------ compute the liftings of Ext^1 ---------------------------------------
    lift1 = A*kb1;
-   lift1 = lift(B,lift1); 
+   lift1 = lift(B,lift1);
    intvec iv = f0,f1,f2,e1,e2,ok_ann;
    list   L' = ex2,kb2,C,Co,D,Do;
    return(iv,M1,kb1,lift1,L');
@@ -628,23 +628,23 @@ Sub-procedure: obtain Ext1 and Ext2 and other objects used by mod_versal
 //////////////////////////////////////////////////////////////////////////////
 proc get_rings(ideal Io,int e1,int switch, list #)
 "
-Sub-procedure: creating ring-extensions 
+Sub-procedure: creating ring-extensions
 "
-{ 
-   def Po = basering; 
+{
+   def Po = basering;
    string my;
    string my_ord = "ds";
-   string my_var = "A"; 
+   string my_var = "A";
    if (size(#)>2)
    {
      my     = #[1];
      my_ord = #[2];
      my_var = #[3];
    }
-   string my_Px = my+"Px"; 
-   string my_Qx = my+"Qx"; 
-   string my_Ox = my+"Ox"; 
-   string my_So = my+"So"; 
+   string my_Px = my+"Px";
+   string my_Qx = my+"Qx";
+   string my_Ox = my+"Ox";
+   string my_So = my+"So";
   extendring(my_Px,e1,my_var,my_ord);
    ideal Io  = imap(Po,Io);         attrib(Io,"isSB",1);
    my ="qring "+my_Qx+" = Io;       export("+my_Qx+");";
@@ -665,7 +665,7 @@ Sub-procedure: creating ring-extensions
 //////////////////////////////////////////////////////////////////////////////
 proc get_inf_def(list #)
 "
-Sub-procedure: compute infinitesimal family of a module and its syzygies 
+Sub-procedure: compute infinitesimal family of a module and its syzygies
                from a kbase of Ext1 and its lifts
 "
 {
@@ -686,7 +686,7 @@ Sub-procedure: compute infinitesimal family of a module and its syzygies
      Ls = Ls - var(l)*matrix(ideal(li1[l]),f1,f2);
   }
   return(Ms,Ls);
-} 
+}
 //////////////////////////////////////////////////////////////////////////////
 proc lift_rel_kb (module N, module M, list #)
 "
@@ -694,7 +694,7 @@ USAGE   lift_rel_kb(N,M[,kbaseM,p]);
 ASSUME  [p a monomial ] or the product of all variables
         N, M modules of same rank,
         M depending only on variables not in p and vdim(M) finite in this ring,
-        [ kbaseM the kbase of M in the subring given by variables not in p ] 
+        [ kbaseM the kbase of M in the subring given by variables not in p ]
         warning: check that these assumtions are fulfilled!
 RETURN  matrix A, whose j-th columnes present the coeff's of N[j] in kbaseM,
         i.e. kbaseM*A = reduce(N,std(M))
@@ -703,9 +703,9 @@ EXAMPLE example lift_rel_kb;  shows examples
 {
   poly p = product(maxideal(1));
        M = std(M);
-  matrix A; 
+  matrix A;
   if (size(#)>0) { p=#[2]; module kbaseM=#[1];}
-  else 
+  else
   { if (vdim(M)<=0) { "// vdim(M) not finite";return(A);}
     module kbaseM = kbase(M);
   }
@@ -713,7 +713,7 @@ EXAMPLE example lift_rel_kb;  shows examples
   if (simplify(N,10)[1]==[0]) {return(A);}
   A = coeffs(N,kbaseM,p);
   return(A);
-} 
+}
 example
 {
   "EXAMPLE"; echo=2;
@@ -735,7 +735,7 @@ example
   print(A);
   print(kbase(std(M))*A);
   print(reduce(N,std(M)));
-} 
+}
 ///////////////////////////////////////////////////////////////////////////////
 proc lift_kbase (N, M)
 "USAGE:   lift_kbase(N,M); N,M=poly/ideal/vector/module
@@ -768,32 +768,32 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 proc interact1 ()
 "
-Sub_procedure: asking for and reading your input-strings 
+Sub_procedure: asking for and reading your input-strings
 "
 {
  string my = "@";
  string str,out,my_ord,my_var;
  my_ord = "ds";
- my_var = "A"; 
+ my_var = "A";
  "INPUT: name of output-file (ENTER = no output, do not use \"my\"!)";
-   str = read("");                                 
-   if (size(str)>1) 
+   str = read("");
+   if (size(str)>1)
    { out = str[1..size(str)-1];}
    else
    { out = "no";}
  "INPUT: prefix-string of ring-extension (ENTER = '@')";
-   str = read(""); 
-   if ( size(str) > 1 ) 
-   { my = str[1..size(str)-1]; }      
- "INPUT:parameter-string 
+   str = read("");
+   if ( size(str) > 1 )
+   { my = str[1..size(str)-1]; }
+ "INPUT:parameter-string
    (give a letter corresponding to first new variable followed by the next letters,
    or 'T('       - a letter + '('  - getting a string of indexed variables)
    (ENTER = A) :";
-   str = read(""); 
+   str = read("");
    if (size(str)>1) { my_var=str[1..size(str)-1]; }
  "INPUT:order-string (local or weighted!) (ENTER = ds) :";
-   str = read(""); 
-   if (size(str)>1) { my_ord=str[1..size(str)-1]; }    
+   str = read("");
+   if (size(str)>1) { my_ord=str[1..size(str)-1]; }
    if( find(my_ord,"s")+find(my_ord,"w") == 0 )
    { "// ordering must be an local! changed into 'ds'";
      my_ord = "ds";
@@ -815,7 +815,7 @@ Sub-procedure: asking for and reading your input
   string str = read("");
   if (size(str)>1)
   { ">> Choose columnes of the matrix";
-    ">> (Enter = all columnes)"; 
+    ">> (Enter = all columnes)";
     "INPUT (number of columnes to use as integer-list 'i_1,i_2,.. ,i_t' ):";
     string columnes = read("");
     if (size(columnes)<2) {columnes=string(col_vec);}
@@ -825,7 +825,7 @@ Sub-procedure: asking for and reading your input
     {
       execute("l1= "+columnes[2*l-1]+";");
       B[l] = A[l1];
-      if(flag) { C[l]=D[l1];}   
+      if(flag) { C[l]=D[l1];}
     }
     A = matrix(B,nrows(A),size(B));
     D = matrix(C,nrows(D),size(C));
@@ -835,13 +835,13 @@ Sub-procedure: asking for and reading your input
 ///////////////////////////////////////////////////////////////////////////////
 proc negative_part(intvec iv)
 "
-RETURNS intvec of indices of jv having negative entries (or iv, if non) 
+RETURNS intvec of indices of jv having negative entries (or iv, if non)
 "
 {
    intvec jv;
    int    l,k;
    for (l=1;l<=size(iv);l=l+1)
-   { if (iv[l]<0) 
+   { if (iv[l]<0)
      {  k = k+1;
         jv[k]=l;
      }
@@ -864,21 +864,21 @@ Sub-proc: return martix ord(a_ij) with respect to weight_vec, or
  changeord("nr",ord_str);
   matrix A    = imap(br,A);
   intmat degA[@r][@c];
-  if (homog(ideal(A))) 
+  if (homog(ideal(A)))
   { for (i=1;i<=@r;i=i+1)
     { for(j=1;j<=@c;j=j+1)
       {  degA[i,j]=ord(A[i,j]); }
     }
   }
  setring br;
-  kill nr; 
+  kill nr;
   return(degA);
 }
 //////////////////////////////////////////////////////////////////////////////////
 proc homog_test(intvec w_vec, matrix Mo, matrix A)
 "
-Sub proc: return relative weight string of columnes of A with respect 
-          to the given w_vec and to Mo, or \"\" if not qh 
+Sub proc: return relative weight string of columnes of A with respect
+          to the given w_vec and to Mo, or \"\" if not qh
     NOTE: * means weight is not determined
 "
 {
@@ -887,24 +887,24 @@ Sub proc: return relative weight string of columnes of A with respect
   string @nv;
   int @r = nrows(A);
   int @c = ncols(A);
-  A = concat(matrix(ideal(Mo),@r,1),A); 
-  intmat a = find_ord(A,w_vec);      
+  A = concat(matrix(ideal(Mo),@r,1),A);
+  intmat a = find_ord(A,w_vec);
   intmat b[@r][@c];
   for (l=1;l<=@c;l=l+1)
-  { 
+  {
     for (k=1;k<=@r;k=k+1)
-    {  if (A[k,l+1]!=0) 
+    {  if (A[k,l+1]!=0)
        { b[k,l] = a[k,l+1]-a[k,1];}
     }
     tv = 0;
     for (k=1;k<=@r;k=k+1)
-    {  if (A[k,l+1]*A[k,1]!=0) 
+    {  if (A[k,l+1]*A[k,1]!=0)
        {tv = tv,b[k,l];}
     }
     if (size(tv)>1)
-    { k = tv[2]; 
+    { k = tv[2];
       tv = tv[2..size(tv)]; tv = tv -k;
-      if (tv==0) { @nv = @nv+string(-k)+",";} 
+      if (tv==0) { @nv = @nv+string(-k)+",";}
       else {return("");}
     }
     else { @nv = @nv+"*,";}
@@ -915,7 +915,7 @@ Sub proc: return relative weight string of columnes of A with respect
 //////////////////////////////////////////////////////////////////////////////////
 proc homog_t(intvec d_vec, matrix Fo, matrix A)
 "
-Sub-procedure: Computing relative (with respect to flatten(Fo)) weight_vec 
+Sub-procedure: Computing relative (with respect to flatten(Fo)) weight_vec
                of columnes of A (return zero if Fo or A not qh)
 "
 {
@@ -933,7 +933,7 @@ Sub-procedure: Computing relative (with respect to flatten(Fo)) weight_vec
    l  = dv[1];
    dv = dv[2..size(dv)];
    dv = dv-l;
- setring br; 
+ setring br;
    kill nr;
    return(dv);
 }

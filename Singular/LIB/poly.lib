@@ -1,15 +1,15 @@
-// $Id: poly.lib,v 1.12 1998-05-05 11:55:33 krueger Exp $
+// $Id: poly.lib,v 1.13 1998-05-14 18:45:11 Singular Exp $
 //system("random",787422842);
 //(GMG, last modified 22.06.96)
 //(obachman: 17.12.97 -- added katsura)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: poly.lib,v 1.12 1998-05-05 11:55:33 krueger Exp $";
+version="$Id: poly.lib,v 1.13 1998-05-14 18:45:11 Singular Exp $";
 info="
 LIBRARY:  poly.lib      PROCEDURES FOR MANIPULATING POLYS, IDEALS, MODULES
 
  cyclic(int);           ideal of cyclic n-roots
- katsura([i]);		katsura [i] ideal
+ katsura([i]);          katsura [i] ideal
  freerank(poly/...)     rank of coker(input) if coker is free else -1
  is_homog(poly/...);    int, =1 resp. =0 if input is homogeneous resp. not
  is_zero(poly/...);     int, =1 resp. =0 if coker(input) is 0 resp. not
@@ -58,10 +58,10 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc katsura
-"USAGE:	katsura([n]); n integer
+"USAGE: katsura([n]); n integer
 RETURN: katsura(n) : n-th katsura ideal of newly created and set ring
                      (32003, x(0..n), dp)
-        katsura()  : katsura ideal of basering 
+        katsura()  : katsura ideal of basering
 EXAMPLE: example katsura; shows examples
 "
 {
@@ -74,14 +74,14 @@ EXAMPLE: example katsura; shows examples
   int i, j;
   int n = nvars(basering) -1;
   poly p;
-  
+
   p = -1;
   for (i = -n; i <= n; i++)
   {
     p = p + kat_var(i, n);
   }
   s[1] = p;
-  
+
   for (i = 0; i < n; i++)
   {
     p = -1 * kat_var(i,n);
@@ -595,7 +595,7 @@ example
 proc lcm (ideal i)
 "USAGE:   lcm(i); i ideal
 RETURN:  poly = lcm(i[1],...,i[size(i)])
-NOTE:    
+NOTE:
 EXAMPLE: example lcm; shows an example
 "
 {
@@ -655,7 +655,7 @@ EXAMPLE: example content; shows an example
 "
 {
   return(leadcoef(f)/leadcoef(cleardenom(f)));
-}  
+}
 example
 { "EXAMPLE:"; echo = 2;
    ring r=0,(x,y,z),(c,lp);

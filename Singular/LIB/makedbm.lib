@@ -1,11 +1,11 @@
-// $Id: makedbm.lib,v 1.7 1998-05-05 11:55:31 krueger Exp $
+// $Id: makedbm.lib,v 1.8 1998-05-14 18:45:09 Singular Exp $
 //=========================================================================
 //
 // Please send bugs and comments to krueger@mathematik.uni-kl.de
 //
 //=============================================================================
 
-version="$Id: makedbm.lib,v 1.7 1998-05-05 11:55:31 krueger Exp $";
+version="$Id: makedbm.lib,v 1.8 1998-05-14 18:45:09 Singular Exp $";
 info="
 LIBRARY:  makedbm.lib     some usefull tools needed by the Arnold-Classifier.
 
@@ -37,7 +37,7 @@ proc dbm_read (link l)
 {
   string s="";
   s=read(l);
-  while( s != "" ) 
+  while( s != "" )
   {
     s,"=",read(l,s);
     s=read(l);
@@ -236,7 +236,7 @@ proc create_sing_dbm
 }
 
 proc read_sing_dbm
-{ 
+{
   link l="DBM: NFlist";
   "A[k]     = "+read(l, "A[k]");
   "D[k]     = "+read(l, "D[k]");

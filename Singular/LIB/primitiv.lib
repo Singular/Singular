@@ -1,8 +1,8 @@
-// $Id: primitiv.lib,v 1.5 1998-05-05 11:55:35 krueger Exp $
+// $Id: primitiv.lib,v 1.6 1998-05-14 18:45:14 Singular Exp $
 // author:  Martin Lamm,  email: lamm@mathematik.uni-kl.de
 // last change:           11.3.98
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: primitiv.lib,v 1.5 1998-05-05 11:55:35 krueger Exp $";
+version="$Id: primitiv.lib,v 1.6 1998-05-14 18:45:14 Singular Exp $";
 info="
 LIBRARY:    primitiv.lib    PROCEDURES FOR FINDING A PRIMITIVE ELEMENT
 
@@ -171,13 +171,13 @@ EXAMPLE: example splitring;  shows an example
   if (find(varnames,"a")==0)        { algname="a";}
   else { if (find(varnames,"b")==0) { algname="b";}
          else { if (find(varnames,"c")==0)
-				    { algname="c";}
+                                    { algname="c";}
          else { if (find(varnames,"o")==0)
-				    { algname="o";}
+                                    { algname="o";}
          else {
            "** Sorry -- could not find a free name for the primitive element.";
            "** Try e.g. a ring without 'a' or 'b' as variable.";
-	   return();
+           return();
          }}
        }
   }
@@ -244,7 +244,7 @@ EXAMPLE: example splitring;  shows an example
  //----- rechne das primitive Element von altring in das von neuring um: ------
     ideal convid=maxideal(1);
     convid[1]=nach_splt3_1(primit)[2];
-    map convert=splt3,convid; 
+    map convert=splt3,convid;
     zwi=convert(zwi);
     setring neuring;
     erg=imap(splt3,zwi);

@@ -1,9 +1,9 @@
-// $Id: inout.lib,v 1.5 1998-05-05 11:55:29 krueger Exp $
+// $Id: inout.lib,v 1.6 1998-05-14 18:45:07 Singular Exp $
 // system("random",787422842);
 // (GMG/BM, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: inout.lib,v 1.5 1998-05-05 11:55:29 krueger Exp $";
+version="$Id: inout.lib,v 1.6 1998-05-14 18:45:07 Singular Exp $";
 info="
 LIBRARY:  inout.lib     PROCEDURES FOR MANIPULATING IN- AND OUTPUT
 
@@ -548,7 +548,7 @@ EXAMPLE: example showrecursive; shows an example
       }
    }
    newvar = newvar[2,size(newvar)-1];
-   
+
    execute "ring newP=("+newchar+"),("+newvar+"),("+neword+");";
    def id = imap(P,id);
    show(id);

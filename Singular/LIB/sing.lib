@@ -1,9 +1,9 @@
-// $Id: sing.lib,v 1.10 1998-05-05 11:55:38 krueger Exp $
+// $Id: sing.lib,v 1.11 1998-05-14 18:45:16 Singular Exp $
 //system("random",787422842);
 //(GMG/BM, last modified 26.06.96)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: sing.lib,v 1.10 1998-05-05 11:55:38 krueger Exp $";
+version="$Id: sing.lib,v 1.11 1998-05-14 18:45:16 Singular Exp $";
 info="
 LIBRARY:  sing.lib      PROCEDURES FOR SINGULARITIES
 
@@ -382,9 +382,9 @@ ASSUME:  f is a weighted homogeneous isolated singularity w.r.t. the weights
          are variables of the basering
 COMPUTE: the spectral numbers of the w-homogeneous polynomial f, computed in a
          ring of charcteristik 0
-RETURN:  intvec  d,s1,...,su  where: 
+RETURN:  intvec  d,s1,...,su  where:
          d = w-degree(f)  and  si/d = ith spectral-number(f)
-         No return value if basering has parameters or if f is no isolated 
+         No return value if basering has parameters or if f is no isolated
          singularity, displays a warning in this case
 EXAMPLE: example spectrum; shows an example
 "
@@ -410,14 +410,14 @@ EXAMPLE: example spectrum; shows an example
     }
    k = kbase(k);
    for (i=1; i<=size(k); i++)
-   { 
+   {
       sp[i]=W+ord(k[i]);
    }
    list L  = sort(sp);
    sp      = d,L[1];
    return(sp);
 }
-example 
+example
 { "EXAMPLE:"; echo = 2;
    ring r;
    poly f=x3+y5+z2;
@@ -528,11 +528,11 @@ EXAMPLE: example T1; shows an example
      ideal t1  = std(J+jacob(J[1]));
      module nb = [1]; module pnb;
      dbprint(printlevel-voice+3,"// dim T1 = "+string(vdim(t1)));
-     if( size(#)>0 ) 
-     { 
-        module st1 = t1*gen(1); 
+     if( size(#)>0 )
+     {
+        module st1 = t1*gen(1);
         attrib(st1,"isSB",1);
-        return(st1,nb,pnb); 
+        return(st1,nb,pnb);
      }
      return(t1);
   }
@@ -718,7 +718,7 @@ EXAMPLE: example T12; shows an example
      else
      {
        kbT1 = 0;
-     }	
+     }
      Sx   = fetch(Ox,Sx);
      L = sbt1,sbt2,d1,d2,kbT1,Syz,Sx,t1,t2;
      return(L);
@@ -827,7 +827,7 @@ EXAMPLE: example codim; shows an example
      {
        if (ie == 0)
        {
-	 return(0);
+         return(0);
        }
        if (iv[ie] != 0)
        {
@@ -866,6 +866,6 @@ example
    ideal j = y6,x4;
    ideal m = x,y;
    attrib(m,"isSB",1);  //let Singular know that ideals are a standard basis
-   attrib(j,"isSB",1);  
+   attrib(j,"isSB",1);
    codim(m,j);          // should be 23 (Milnor number -1 of y7-x5)
 }

@@ -1,12 +1,12 @@
-// $Id: standard.lib,v 1.9 1998-05-14 12:49:28 krueger Exp $
+// $Id: standard.lib,v 1.10 1998-05-14 18:45:16 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: standard.lib,v 1.9 1998-05-14 12:49:28 krueger Exp $";
+version="$Id: standard.lib,v 1.10 1998-05-14 18:45:16 Singular Exp $";
 info="
-LIBRARY: standard.lib	PROCEDURES WHICH ARE ALWAYS LOADED AT START-UP
+LIBRARY: standard.lib   PROCEDURES WHICH ARE ALWAYS LOADED AT START-UP
 
  stdfglm(ideal[,ord])   standard basis of the ideal via fglm [and ordering ord]
- stdhilbert(ideal)	standard basis of the ideal using the Hilbert function
+ stdhilbert(ideal)      standard basis of the ideal using the Hilbert function
 ";
 
 ///////////////////////////////////////////////////////////////////////////////

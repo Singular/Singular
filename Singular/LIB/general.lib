@@ -1,9 +1,9 @@
-// $Id: general.lib,v 1.7 1998-05-05 11:55:27 krueger Exp $
+// $Id: general.lib,v 1.8 1998-05-14 18:45:03 Singular Exp $
 //system("random",787422842);
 //(GMG, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: general.lib,v 1.7 1998-05-05 11:55:27 krueger Exp $";
+version="$Id: general.lib,v 1.8 1998-05-14 18:45:03 Singular Exp $";
 info="
 LIBRARY:  general.lib   PROCEDURES OF GENERAL TYPE
 
@@ -20,7 +20,7 @@ LIBRARY:  general.lib   PROCEDURES OF GENERAL TYPE
  ringweights(r);        intvec of weights of ring variables of ring r
  sort(ideal/module);    sort generators according to monomial ordering
  sum(vector/id/..[,v]); add components of vector/ideal/...[with indices v]
- which(command);	searches for command and returns absolute
+ which(command);        searches for command and returns absolute
                         path, if found
            (parameters in square brackets [] are optional)
 ";
@@ -199,7 +199,7 @@ proc killall
          killall(\"type_name\");
          killall(\"not\", \"type_name\");
 COMPUTE: killall(); kills all user-defined variables but not loaded procedures
-         killall(\"type_name\"); kills all user-defined variables, of type \"type_name\" 
+         killall(\"type_name\"); kills all user-defined variables, of type \"type_name\"
          killall(\"not\", \"type_name\"); kills all user-defined
          variables, except those of type \"type_name\" and except loaded procedures
 RETURN:  no return value
@@ -215,7 +215,7 @@ EXAMPLE: example killall; shows an example AND KILLS ALL YOUR VARIABLES
          if( L[joni]!="LIB" and typeof(`L[joni]`)!="proc" ) { kill `L[joni]`; }
       }
    }
-   else 
+   else
    {
      if( size(#)==1 )
      {
@@ -223,11 +223,11 @@ EXAMPLE: example killall; shows an example AND KILLS ALL YOUR VARIABLES
        {
           for ( joni=size(L); joni>0; joni-- )
           {
-             if( L[joni]=="LIB" or typeof(`L[joni]`)=="proc" ) 
+             if( L[joni]=="LIB" or typeof(`L[joni]`)=="proc" )
                { kill `L[joni]`; }
           }
        }
-       else 
+       else
        {
           for ( ; joni>2; joni-- )
           {
@@ -648,9 +648,9 @@ EXAMPLE:  example which; shows an example
    int i;
    string fn = "/tmp/which_" + string(system("pid"));
    string pn;
-   if( typeof(command) != "string") 
+   if( typeof(command) != "string")
    {
-	return (pn);
+     return (pn);
    }
    i = system("sh", "which " + command + " > " + fn);
    pn = read(fn);
@@ -664,7 +664,7 @@ EXAMPLE:  example which; shows an example
    rs = system("sh", "ls " + pn + " > " + fn + " 2>&1 ");
    i = system("sh", "rm " + fn);
    if (rs == 0) {return (pn);}
-   else 
+   else
    {
      print (command + " not found ");
      return ("");
