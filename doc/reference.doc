@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.108 1999-05-07 16:16:48 Singular Exp $
+@comment $Id: reference.doc,v 1.109 1999-05-19 13:13:10 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -3159,7 +3159,7 @@ which also completes computations and may therefore take time.
             t2z2+tz2w+xz2w,t2w2+txw2+xyw2;
   resolution L = mres(M,0);
   L;
-  // projective dimension of M is 4
+  // projective dimension of M is 5
 @c example
 @end example
 @end table
