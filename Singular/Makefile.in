@@ -655,7 +655,7 @@ ESingularg: fegetopt.og feResource.cc mod2.h feOpt.cc version.h emacs.cc \
 ##
 
 CCP		= gcc
-CXXP		= gcc
+CXXP		= @CXX@
 
 CFLAGSP		= -pg -O3 ${PIPE}
 CXXFLAGSP	= -pg -O3 ${PIPE}
