@@ -1,3 +1,10 @@
+Wed Apr  1 20:55:15 MET DST 1998 hannes
+	* mpsr_Tok.cc,tok.h: minor fix, removed VERBOSE_CMD
+	* iparith.cc ipconv.cc: added conversion list <-> resolution
+	* lists.cc, syz1.cc : fixed bug in conversion (list<->res.):
+	  handling "empty" case
+	* scanner.l: added option: %option always-interactive  
+
 Tue Mar 31 10:47:06 MET DST 1998 hannes
         * feread.cc: fixed handling of empty history
 	* clapsing.cc: fixed gcd(0,..) and gcd(..,0) -> pOne()

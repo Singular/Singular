@@ -30,14 +30,7 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homGEN_nwEVEN
     _pMonComp_otEXP_nwEVEN(b, a2, pVariables1W, d, NonZeroA(d, pLexSgn, goto NotEqual ), goto Equal);;
 
   Equal:   // b equals a2
-//    assume(pComp0(b, a2) == 0);
-    if (pComp0(b, a2) != 0)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
-
+    assume(pComp0(b, a2) == 0);
     tb = npMultM(pGetCoeff(a1), tm);
     if (!npEqualM(pGetCoeff(a2), tb))
     {
@@ -62,12 +55,6 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homGEN_nwEVEN
     if (d < 0)  // b < a2: 
     {
       assume(pComp0(b, a2) == -1);
-    if (pComp0(b, a2) != -1)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
       a = pNext(a) = a2;// append a2 to result and advance a2
       pIter(a2);
       if (a2==NULL) goto Finish;;
@@ -76,12 +63,6 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homGEN_nwEVEN
     else // now d >= 0, i.e., b > a2
     {
       assume(pComp0(b, a2) == 1);
-    if (pComp0(b, a2) != 1)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
       pSetCoeff0(b,npMultM(pGetCoeff(a1), tneg));
       a = pNext(a) = b;       // append b to result and advance a1
       pIter(a1);
@@ -128,14 +109,7 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homGEN_nwODD
     _pMonComp_otEXP_nwODD(b, a2, pVariables1W, d, NonZeroA(d, pLexSgn, goto NotEqual ), goto Equal);;
 
   Equal:   // b equals a2
-//    assume(pComp0(b, a2) == 0);
-    if (pComp0(b, a2) != 0)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
-
+    assume(pComp0(b, a2) == 0);
     tb = npMultM(pGetCoeff(a1), tm);
     if (!npEqualM(pGetCoeff(a2), tb))
     {
@@ -160,12 +134,6 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homGEN_nwODD
     if (d < 0)  // b < a2: 
     {
       assume(pComp0(b, a2) == -1);
-    if (pComp0(b, a2) != -1)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
       a = pNext(a) = a2;// append a2 to result and advance a2
       pIter(a2);
       if (a2==NULL) goto Finish;;
@@ -174,12 +142,6 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homGEN_nwODD
     else // now d >= 0, i.e., b > a2
     {
       assume(pComp0(b, a2) == 1);
-    if (pComp0(b, a2) != 1)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
       pSetCoeff0(b,npMultM(pGetCoeff(a1), tneg));
       a = pNext(a) = b;       // append b to result and advance a1
       pIter(a1);
@@ -226,14 +188,7 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homGEN_nwONE
     _pMonComp_otEXP_nwONE(b, a2, d, NonZeroA(d, pLexSgn, goto NotEqual ), goto Equal);;
 
   Equal:   // b equals a2
-//    assume(pComp0(b, a2) == 0);
-    if (pComp0(b, a2) != 0)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
-
+    assume(pComp0(b, a2) == 0);
     tb = npMultM(pGetCoeff(a1), tm);
     if (!npEqualM(pGetCoeff(a2), tb))
     {
@@ -258,12 +213,6 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homGEN_nwONE
     if (d < 0)  // b < a2: 
     {
       assume(pComp0(b, a2) == -1);
-    if (pComp0(b, a2) != -1)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
       a = pNext(a) = a2;// append a2 to result and advance a2
       pIter(a2);
       if (a2==NULL) goto Finish;;
@@ -272,12 +221,6 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homGEN_nwONE
     else // now d >= 0, i.e., b > a2
     {
       assume(pComp0(b, a2) == 1);
-    if (pComp0(b, a2) != 1)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
       pSetCoeff0(b,npMultM(pGetCoeff(a1), tneg));
       a = pNext(a) = b;       // append b to result and advance a1
       pIter(a1);
@@ -324,14 +267,7 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homGEN_nwTWO
     _pMonComp_otEXP_nwTWO(b, a2, d, NonZeroA(d, pLexSgn, goto NotEqual ), goto Equal);;
 
   Equal:   // b equals a2
-//    assume(pComp0(b, a2) == 0);
-    if (pComp0(b, a2) != 0)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
-
+    assume(pComp0(b, a2) == 0);
     tb = npMultM(pGetCoeff(a1), tm);
     if (!npEqualM(pGetCoeff(a2), tb))
     {
@@ -356,12 +292,6 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homGEN_nwTWO
     if (d < 0)  // b < a2: 
     {
       assume(pComp0(b, a2) == -1);
-    if (pComp0(b, a2) != -1)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
       a = pNext(a) = a2;// append a2 to result and advance a2
       pIter(a2);
       if (a2==NULL) goto Finish;;
@@ -370,12 +300,6 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homGEN_nwTWO
     else // now d >= 0, i.e., b > a2
     {
       assume(pComp0(b, a2) == 1);
-    if (pComp0(b, a2) != 1)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
       pSetCoeff0(b,npMultM(pGetCoeff(a1), tneg));
       a = pNext(a) = b;       // append b to result and advance a1
       pIter(a1);
@@ -420,14 +344,7 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homYES_nwEVEN
     _pMonComp_otEXP_nwEVEN(b, a2, pVariables1W, d, NonZeroA(d, pLexSgn, goto NotEqual ), goto Equal);;
 
   Equal:   // b equals a2
-//    assume(pComp0(b, a2) == 0);
-    if (pComp0(b, a2) != 0)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
-
+    assume(pComp0(b, a2) == 0);
     tb = npMultM(pGetCoeff(a1), tm);
     if (!npEqualM(pGetCoeff(a2), tb))
     {
@@ -452,12 +369,6 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homYES_nwEVEN
     if (d < 0)  // b < a2: 
     {
       assume(pComp0(b, a2) == -1);
-    if (pComp0(b, a2) != -1)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
       a = pNext(a) = a2;// append a2 to result and advance a2
       pIter(a2);
       if (a2==NULL) goto Finish;;
@@ -466,12 +377,6 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homYES_nwEVEN
     else // now d >= 0, i.e., b > a2
     {
       assume(pComp0(b, a2) == 1);
-    if (pComp0(b, a2) != 1)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
       pSetCoeff0(b,npMultM(pGetCoeff(a1), tneg));
       a = pNext(a) = b;       // append b to result and advance a1
       pIter(a1);
@@ -516,14 +421,7 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homYES_nwODD
     _pMonComp_otEXP_nwODD(b, a2, pVariables1W, d, NonZeroA(d, pLexSgn, goto NotEqual ), goto Equal);;
 
   Equal:   // b equals a2
-//    assume(pComp0(b, a2) == 0);
-    if (pComp0(b, a2) != 0)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
-
+    assume(pComp0(b, a2) == 0);
     tb = npMultM(pGetCoeff(a1), tm);
     if (!npEqualM(pGetCoeff(a2), tb))
     {
@@ -548,12 +446,6 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homYES_nwODD
     if (d < 0)  // b < a2: 
     {
       assume(pComp0(b, a2) == -1);
-    if (pComp0(b, a2) != -1)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
       a = pNext(a) = a2;// append a2 to result and advance a2
       pIter(a2);
       if (a2==NULL) goto Finish;;
@@ -562,12 +454,6 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homYES_nwODD
     else // now d >= 0, i.e., b > a2
     {
       assume(pComp0(b, a2) == 1);
-    if (pComp0(b, a2) != 1)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
       pSetCoeff0(b,npMultM(pGetCoeff(a1), tneg));
       a = pNext(a) = b;       // append b to result and advance a1
       pIter(a1);
@@ -612,14 +498,7 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homYES_nwONE
     _pMonComp_otEXP_nwONE(b, a2, d, NonZeroA(d, pLexSgn, goto NotEqual ), goto Equal);;
 
   Equal:   // b equals a2
-//    assume(pComp0(b, a2) == 0);
-    if (pComp0(b, a2) != 0)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
-
+    assume(pComp0(b, a2) == 0);
     tb = npMultM(pGetCoeff(a1), tm);
     if (!npEqualM(pGetCoeff(a2), tb))
     {
@@ -644,12 +523,6 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homYES_nwONE
     if (d < 0)  // b < a2: 
     {
       assume(pComp0(b, a2) == -1);
-    if (pComp0(b, a2) != -1)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
       a = pNext(a) = a2;// append a2 to result and advance a2
       pIter(a2);
       if (a2==NULL) goto Finish;;
@@ -658,12 +531,6 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homYES_nwONE
     else // now d >= 0, i.e., b > a2
     {
       assume(pComp0(b, a2) == 1);
-    if (pComp0(b, a2) != 1)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
       pSetCoeff0(b,npMultM(pGetCoeff(a1), tneg));
       a = pNext(a) = b;       // append b to result and advance a1
       pIter(a1);
@@ -708,14 +575,7 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homYES_nwTWO
     _pMonComp_otEXP_nwTWO(b, a2, d, NonZeroA(d, pLexSgn, goto NotEqual ), goto Equal);;
 
   Equal:   // b equals a2
-//    assume(pComp0(b, a2) == 0);
-    if (pComp0(b, a2) != 0)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
-
+    assume(pComp0(b, a2) == 0);
     tb = npMultM(pGetCoeff(a1), tm);
     if (!npEqualM(pGetCoeff(a2), tb))
     {
@@ -740,12 +600,6 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homYES_nwTWO
     if (d < 0)  // b < a2: 
     {
       assume(pComp0(b, a2) == -1);
-    if (pComp0(b, a2) != -1)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
       a = pNext(a) = a2;// append a2 to result and advance a2
       pIter(a2);
       if (a2==NULL) goto Finish;;
@@ -754,12 +608,6 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homYES_nwTWO
     else // now d >= 0, i.e., b > a2
     {
       assume(pComp0(b, a2) == 1);
-    if (pComp0(b, a2) != 1)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
       pSetCoeff0(b,npMultM(pGetCoeff(a1), tneg));
       a = pNext(a) = b;       // append b to result and advance a1
       pIter(a1);
@@ -804,14 +652,7 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homGEN_nwEVEN
     _pMonComp_otEXPCOMP_nwEVEN(b, a2, pVariables1W, d, NonZeroA(d, pLexSgn, goto NotEqual ), goto Equal);;
 
   Equal:   // b equals a2
-//    assume(pComp0(b, a2) == 0);
-    if (pComp0(b, a2) != 0)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
-
+    assume(pComp0(b, a2) == 0);
     tb = npMultM(pGetCoeff(a1), tm);
     if (!npEqualM(pGetCoeff(a2), tb))
     {
@@ -836,12 +677,6 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homGEN_nwEVEN
     if (d < 0)  // b < a2: 
     {
       assume(pComp0(b, a2) == -1);
-    if (pComp0(b, a2) != -1)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
       a = pNext(a) = a2;// append a2 to result and advance a2
       pIter(a2);
       if (a2==NULL) goto Finish;;
@@ -850,12 +685,6 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homGEN_nwEVEN
     else // now d >= 0, i.e., b > a2
     {
       assume(pComp0(b, a2) == 1);
-    if (pComp0(b, a2) != 1)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
       pSetCoeff0(b,npMultM(pGetCoeff(a1), tneg));
       a = pNext(a) = b;       // append b to result and advance a1
       pIter(a1);
@@ -900,14 +729,7 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homGEN_nwODD
     _pMonComp_otEXPCOMP_nwODD(b, a2, pVariables1W, d, NonZeroA(d, pLexSgn, goto NotEqual ), goto Equal);;
 
   Equal:   // b equals a2
-//    assume(pComp0(b, a2) == 0);
-    if (pComp0(b, a2) != 0)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
-
+    assume(pComp0(b, a2) == 0);
     tb = npMultM(pGetCoeff(a1), tm);
     if (!npEqualM(pGetCoeff(a2), tb))
     {
@@ -932,12 +754,6 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homGEN_nwODD
     if (d < 0)  // b < a2: 
     {
       assume(pComp0(b, a2) == -1);
-    if (pComp0(b, a2) != -1)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
       a = pNext(a) = a2;// append a2 to result and advance a2
       pIter(a2);
       if (a2==NULL) goto Finish;;
@@ -946,12 +762,6 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homGEN_nwODD
     else // now d >= 0, i.e., b > a2
     {
       assume(pComp0(b, a2) == 1);
-    if (pComp0(b, a2) != 1)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
       pSetCoeff0(b,npMultM(pGetCoeff(a1), tneg));
       a = pNext(a) = b;       // append b to result and advance a1
       pIter(a1);
@@ -996,14 +806,7 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homGEN_nwONE
     _pMonComp_otEXPCOMP_nwONE(b, a2, d, NonZeroA(d, pLexSgn, goto NotEqual ), goto Equal);;
 
   Equal:   // b equals a2
-//    assume(pComp0(b, a2) == 0);
-    if (pComp0(b, a2) != 0)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
-
+    assume(pComp0(b, a2) == 0);
     tb = npMultM(pGetCoeff(a1), tm);
     if (!npEqualM(pGetCoeff(a2), tb))
     {
@@ -1028,12 +831,6 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homGEN_nwONE
     if (d < 0)  // b < a2: 
     {
       assume(pComp0(b, a2) == -1);
-    if (pComp0(b, a2) != -1)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
       a = pNext(a) = a2;// append a2 to result and advance a2
       pIter(a2);
       if (a2==NULL) goto Finish;;
@@ -1042,12 +839,6 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homGEN_nwONE
     else // now d >= 0, i.e., b > a2
     {
       assume(pComp0(b, a2) == 1);
-    if (pComp0(b, a2) != 1)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
       pSetCoeff0(b,npMultM(pGetCoeff(a1), tneg));
       a = pNext(a) = b;       // append b to result and advance a1
       pIter(a1);
@@ -1092,14 +883,7 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homGEN_nwTWO
     _pMonComp_otEXPCOMP_nwTWO(b, a2, d, NonZeroA(d, pLexSgn, goto NotEqual ), goto Equal);;
 
   Equal:   // b equals a2
-//    assume(pComp0(b, a2) == 0);
-    if (pComp0(b, a2) != 0)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
-
+    assume(pComp0(b, a2) == 0);
     tb = npMultM(pGetCoeff(a1), tm);
     if (!npEqualM(pGetCoeff(a2), tb))
     {
@@ -1124,12 +908,6 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homGEN_nwTWO
     if (d < 0)  // b < a2: 
     {
       assume(pComp0(b, a2) == -1);
-    if (pComp0(b, a2) != -1)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
       a = pNext(a) = a2;// append a2 to result and advance a2
       pIter(a2);
       if (a2==NULL) goto Finish;;
@@ -1138,12 +916,6 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homGEN_nwTWO
     else // now d >= 0, i.e., b > a2
     {
       assume(pComp0(b, a2) == 1);
-    if (pComp0(b, a2) != 1)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
       pSetCoeff0(b,npMultM(pGetCoeff(a1), tneg));
       a = pNext(a) = b;       // append b to result and advance a1
       pIter(a1);
@@ -1186,14 +958,7 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homYES_nwEVEN
     _pMonComp_otEXPCOMP_nwEVEN(b, a2, pVariables1W, d, NonZeroA(d, pLexSgn, goto NotEqual ), goto Equal);;
 
   Equal:   // b equals a2
-//    assume(pComp0(b, a2) == 0);
-    if (pComp0(b, a2) != 0)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
-
+    assume(pComp0(b, a2) == 0);
     tb = npMultM(pGetCoeff(a1), tm);
     if (!npEqualM(pGetCoeff(a2), tb))
     {
@@ -1218,12 +983,6 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homYES_nwEVEN
     if (d < 0)  // b < a2: 
     {
       assume(pComp0(b, a2) == -1);
-    if (pComp0(b, a2) != -1)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
       a = pNext(a) = a2;// append a2 to result and advance a2
       pIter(a2);
       if (a2==NULL) goto Finish;;
@@ -1232,12 +991,6 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homYES_nwEVEN
     else // now d >= 0, i.e., b > a2
     {
       assume(pComp0(b, a2) == 1);
-    if (pComp0(b, a2) != 1)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
       pSetCoeff0(b,npMultM(pGetCoeff(a1), tneg));
       a = pNext(a) = b;       // append b to result and advance a1
       pIter(a1);
@@ -1280,14 +1033,7 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homYES_nwODD
     _pMonComp_otEXPCOMP_nwODD(b, a2, pVariables1W, d, NonZeroA(d, pLexSgn, goto NotEqual ), goto Equal);;
 
   Equal:   // b equals a2
-//    assume(pComp0(b, a2) == 0);
-    if (pComp0(b, a2) != 0)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
-
+    assume(pComp0(b, a2) == 0);
     tb = npMultM(pGetCoeff(a1), tm);
     if (!npEqualM(pGetCoeff(a2), tb))
     {
@@ -1312,12 +1058,6 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homYES_nwODD
     if (d < 0)  // b < a2: 
     {
       assume(pComp0(b, a2) == -1);
-    if (pComp0(b, a2) != -1)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
       a = pNext(a) = a2;// append a2 to result and advance a2
       pIter(a2);
       if (a2==NULL) goto Finish;;
@@ -1326,12 +1066,6 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homYES_nwODD
     else // now d >= 0, i.e., b > a2
     {
       assume(pComp0(b, a2) == 1);
-    if (pComp0(b, a2) != 1)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
       pSetCoeff0(b,npMultM(pGetCoeff(a1), tneg));
       a = pNext(a) = b;       // append b to result and advance a1
       pIter(a1);
@@ -1374,14 +1108,7 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homYES_nwONE
     _pMonComp_otEXPCOMP_nwONE(b, a2, d, NonZeroA(d, pLexSgn, goto NotEqual ), goto Equal);;
 
   Equal:   // b equals a2
-//    assume(pComp0(b, a2) == 0);
-    if (pComp0(b, a2) != 0)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
-
+    assume(pComp0(b, a2) == 0);
     tb = npMultM(pGetCoeff(a1), tm);
     if (!npEqualM(pGetCoeff(a2), tb))
     {
@@ -1406,12 +1133,6 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homYES_nwONE
     if (d < 0)  // b < a2: 
     {
       assume(pComp0(b, a2) == -1);
-    if (pComp0(b, a2) != -1)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
       a = pNext(a) = a2;// append a2 to result and advance a2
       pIter(a2);
       if (a2==NULL) goto Finish;;
@@ -1420,12 +1141,6 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homYES_nwONE
     else // now d >= 0, i.e., b > a2
     {
       assume(pComp0(b, a2) == 1);
-    if (pComp0(b, a2) != 1)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
       pSetCoeff0(b,npMultM(pGetCoeff(a1), tneg));
       a = pNext(a) = b;       // append b to result and advance a1
       pIter(a1);
@@ -1468,14 +1183,7 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homYES_nwTWO
     _pMonComp_otEXPCOMP_nwTWO(b, a2, d, NonZeroA(d, pLexSgn, goto NotEqual ), goto Equal);;
 
   Equal:   // b equals a2
-//    assume(pComp0(b, a2) == 0);
-    if (pComp0(b, a2) != 0)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
-
+    assume(pComp0(b, a2) == 0);
     tb = npMultM(pGetCoeff(a1), tm);
     if (!npEqualM(pGetCoeff(a2), tb))
     {
@@ -1500,12 +1208,6 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homYES_nwTWO
     if (d < 0)  // b < a2: 
     {
       assume(pComp0(b, a2) == -1);
-    if (pComp0(b, a2) != -1)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
       a = pNext(a) = a2;// append a2 to result and advance a2
       pIter(a2);
       if (a2==NULL) goto Finish;;
@@ -1514,12 +1216,6 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homYES_nwTWO
     else // now d >= 0, i.e., b > a2
     {
       assume(pComp0(b, a2) == 1);
-    if (pComp0(b, a2) != 1)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
       pSetCoeff0(b,npMultM(pGetCoeff(a1), tneg));
       a = pNext(a) = b;       // append b to result and advance a1
       pIter(a1);
@@ -1564,14 +1260,7 @@ static void spSpolyLoop_chMODP_otEXP_homGEN_nwEVEN
     _pMonComp_otEXP_nwEVEN(b, a2, pVariables1W, d, NonZeroA(d, pLexSgn, goto NotEqual ), goto Equal);;
 
   Equal:   // b equals a2
-//    assume(pComp0(b, a2) == 0);
-    if (pComp0(b, a2) != 0)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
-
+    assume(pComp0(b, a2) == 0);
     tb = npMultM(pGetCoeff(a1), tm);
     if (!npEqualM(pGetCoeff(a2), tb))
     {
@@ -1596,12 +1285,6 @@ static void spSpolyLoop_chMODP_otEXP_homGEN_nwEVEN
     if (d < 0)  // b < a2: 
     {
       assume(pComp0(b, a2) == -1);
-    if (pComp0(b, a2) != -1)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
       a = pNext(a) = a2;// append a2 to result and advance a2
       pIter(a2);
       if (a2==NULL) goto Finish;;
@@ -1610,12 +1293,6 @@ static void spSpolyLoop_chMODP_otEXP_homGEN_nwEVEN
     else // now d >= 0, i.e., b > a2
     {
       assume(pComp0(b, a2) == 1);
-    if (pComp0(b, a2) != 1)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
       pSetCoeff0(b,npMultM(pGetCoeff(a1), tneg));
       a = pNext(a) = b;       // append b to result and advance a1
       pIter(a1);
@@ -1660,14 +1337,7 @@ static void spSpolyLoop_chMODP_otEXP_homGEN_nwODD
     _pMonComp_otEXP_nwODD(b, a2, pVariables1W, d, NonZeroA(d, pLexSgn, goto NotEqual ), goto Equal);;
 
   Equal:   // b equals a2
-//    assume(pComp0(b, a2) == 0);
-    if (pComp0(b, a2) != 0)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
-
+    assume(pComp0(b, a2) == 0);
     tb = npMultM(pGetCoeff(a1), tm);
     if (!npEqualM(pGetCoeff(a2), tb))
     {
@@ -1692,12 +1362,6 @@ static void spSpolyLoop_chMODP_otEXP_homGEN_nwODD
     if (d < 0)  // b < a2: 
     {
       assume(pComp0(b, a2) == -1);
-    if (pComp0(b, a2) != -1)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
       a = pNext(a) = a2;// append a2 to result and advance a2
       pIter(a2);
       if (a2==NULL) goto Finish;;
@@ -1706,12 +1370,6 @@ static void spSpolyLoop_chMODP_otEXP_homGEN_nwODD
     else // now d >= 0, i.e., b > a2
     {
       assume(pComp0(b, a2) == 1);
-    if (pComp0(b, a2) != 1)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
       pSetCoeff0(b,npMultM(pGetCoeff(a1), tneg));
       a = pNext(a) = b;       // append b to result and advance a1
       pIter(a1);
@@ -1756,14 +1414,7 @@ static void spSpolyLoop_chMODP_otEXP_homGEN_nwONE
     _pMonComp_otEXP_nwONE(b, a2, d, NonZeroA(d, pLexSgn, goto NotEqual ), goto Equal);;
 
   Equal:   // b equals a2
-//    assume(pComp0(b, a2) == 0);
-    if (pComp0(b, a2) != 0)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
-
+    assume(pComp0(b, a2) == 0);
     tb = npMultM(pGetCoeff(a1), tm);
     if (!npEqualM(pGetCoeff(a2), tb))
     {
@@ -1788,12 +1439,6 @@ static void spSpolyLoop_chMODP_otEXP_homGEN_nwONE
     if (d < 0)  // b < a2: 
     {
       assume(pComp0(b, a2) == -1);
-    if (pComp0(b, a2) != -1)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
       a = pNext(a) = a2;// append a2 to result and advance a2
       pIter(a2);
       if (a2==NULL) goto Finish;;
@@ -1802,12 +1447,6 @@ static void spSpolyLoop_chMODP_otEXP_homGEN_nwONE
     else // now d >= 0, i.e., b > a2
     {
       assume(pComp0(b, a2) == 1);
-    if (pComp0(b, a2) != 1)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
       pSetCoeff0(b,npMultM(pGetCoeff(a1), tneg));
       a = pNext(a) = b;       // append b to result and advance a1
       pIter(a1);
@@ -1852,14 +1491,7 @@ static void spSpolyLoop_chMODP_otEXP_homGEN_nwTWO
     _pMonComp_otEXP_nwTWO(b, a2, d, NonZeroA(d, pLexSgn, goto NotEqual ), goto Equal);;
 
   Equal:   // b equals a2
-//    assume(pComp0(b, a2) == 0);
-    if (pComp0(b, a2) != 0)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
-
+    assume(pComp0(b, a2) == 0);
     tb = npMultM(pGetCoeff(a1), tm);
     if (!npEqualM(pGetCoeff(a2), tb))
     {
@@ -1884,12 +1516,6 @@ static void spSpolyLoop_chMODP_otEXP_homGEN_nwTWO
     if (d < 0)  // b < a2: 
     {
       assume(pComp0(b, a2) == -1);
-    if (pComp0(b, a2) != -1)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
       a = pNext(a) = a2;// append a2 to result and advance a2
       pIter(a2);
       if (a2==NULL) goto Finish;;
@@ -1898,12 +1524,6 @@ static void spSpolyLoop_chMODP_otEXP_homGEN_nwTWO
     else // now d >= 0, i.e., b > a2
     {
       assume(pComp0(b, a2) == 1);
-    if (pComp0(b, a2) != 1)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
       pSetCoeff0(b,npMultM(pGetCoeff(a1), tneg));
       a = pNext(a) = b;       // append b to result and advance a1
       pIter(a1);
@@ -1946,14 +1566,7 @@ static void spSpolyLoop_chMODP_otEXP_homYES_nwEVEN
     _pMonComp_otEXP_nwEVEN(b, a2, pVariables1W, d, NonZeroA(d, pLexSgn, goto NotEqual ), goto Equal);;
 
   Equal:   // b equals a2
-//    assume(pComp0(b, a2) == 0);
-    if (pComp0(b, a2) != 0)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
-
+    assume(pComp0(b, a2) == 0);
     tb = npMultM(pGetCoeff(a1), tm);
     if (!npEqualM(pGetCoeff(a2), tb))
     {
@@ -1978,12 +1591,6 @@ static void spSpolyLoop_chMODP_otEXP_homYES_nwEVEN
     if (d < 0)  // b < a2: 
     {
       assume(pComp0(b, a2) == -1);
-    if (pComp0(b, a2) != -1)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
       a = pNext(a) = a2;// append a2 to result and advance a2
       pIter(a2);
       if (a2==NULL) goto Finish;;
@@ -1992,12 +1599,6 @@ static void spSpolyLoop_chMODP_otEXP_homYES_nwEVEN
     else // now d >= 0, i.e., b > a2
     {
       assume(pComp0(b, a2) == 1);
-    if (pComp0(b, a2) != 1)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
       pSetCoeff0(b,npMultM(pGetCoeff(a1), tneg));
       a = pNext(a) = b;       // append b to result and advance a1
       pIter(a1);
@@ -2040,14 +1641,7 @@ static void spSpolyLoop_chMODP_otEXP_homYES_nwODD
     _pMonComp_otEXP_nwODD(b, a2, pVariables1W, d, NonZeroA(d, pLexSgn, goto NotEqual ), goto Equal);;
 
   Equal:   // b equals a2
-//    assume(pComp0(b, a2) == 0);
-    if (pComp0(b, a2) != 0)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
-
+    assume(pComp0(b, a2) == 0);
     tb = npMultM(pGetCoeff(a1), tm);
     if (!npEqualM(pGetCoeff(a2), tb))
     {
@@ -2072,12 +1666,6 @@ static void spSpolyLoop_chMODP_otEXP_homYES_nwODD
     if (d < 0)  // b < a2: 
     {
       assume(pComp0(b, a2) == -1);
-    if (pComp0(b, a2) != -1)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
       a = pNext(a) = a2;// append a2 to result and advance a2
       pIter(a2);
       if (a2==NULL) goto Finish;;
@@ -2086,12 +1674,6 @@ static void spSpolyLoop_chMODP_otEXP_homYES_nwODD
     else // now d >= 0, i.e., b > a2
     {
       assume(pComp0(b, a2) == 1);
-    if (pComp0(b, a2) != 1)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
       pSetCoeff0(b,npMultM(pGetCoeff(a1), tneg));
       a = pNext(a) = b;       // append b to result and advance a1
       pIter(a1);
@@ -2134,14 +1716,7 @@ static void spSpolyLoop_chMODP_otEXP_homYES_nwONE
     _pMonComp_otEXP_nwONE(b, a2, d, NonZeroA(d, pLexSgn, goto NotEqual ), goto Equal);;
 
   Equal:   // b equals a2
-//    assume(pComp0(b, a2) == 0);
-    if (pComp0(b, a2) != 0)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
-
+    assume(pComp0(b, a2) == 0);
     tb = npMultM(pGetCoeff(a1), tm);
     if (!npEqualM(pGetCoeff(a2), tb))
     {
@@ -2166,12 +1741,6 @@ static void spSpolyLoop_chMODP_otEXP_homYES_nwONE
     if (d < 0)  // b < a2: 
     {
       assume(pComp0(b, a2) == -1);
-    if (pComp0(b, a2) != -1)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
       a = pNext(a) = a2;// append a2 to result and advance a2
       pIter(a2);
       if (a2==NULL) goto Finish;;
@@ -2180,12 +1749,6 @@ static void spSpolyLoop_chMODP_otEXP_homYES_nwONE
     else // now d >= 0, i.e., b > a2
     {
       assume(pComp0(b, a2) == 1);
-    if (pComp0(b, a2) != 1)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
       pSetCoeff0(b,npMultM(pGetCoeff(a1), tneg));
       a = pNext(a) = b;       // append b to result and advance a1
       pIter(a1);
@@ -2228,14 +1791,7 @@ static void spSpolyLoop_chMODP_otEXP_homYES_nwTWO
     _pMonComp_otEXP_nwTWO(b, a2, d, NonZeroA(d, pLexSgn, goto NotEqual ), goto Equal);;
 
   Equal:   // b equals a2
-//    assume(pComp0(b, a2) == 0);
-    if (pComp0(b, a2) != 0)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
-
+    assume(pComp0(b, a2) == 0);
     tb = npMultM(pGetCoeff(a1), tm);
     if (!npEqualM(pGetCoeff(a2), tb))
     {
@@ -2260,12 +1816,6 @@ static void spSpolyLoop_chMODP_otEXP_homYES_nwTWO
     if (d < 0)  // b < a2: 
     {
       assume(pComp0(b, a2) == -1);
-    if (pComp0(b, a2) != -1)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
       a = pNext(a) = a2;// append a2 to result and advance a2
       pIter(a2);
       if (a2==NULL) goto Finish;;
@@ -2274,12 +1824,6 @@ static void spSpolyLoop_chMODP_otEXP_homYES_nwTWO
     else // now d >= 0, i.e., b > a2
     {
       assume(pComp0(b, a2) == 1);
-    if (pComp0(b, a2) != 1)
-    {
-       WarnS("Wrong comp in SpolyLoop
-");
-       pComp0(b,a2);
-    }
       pSetCoeff0(b,npMultM(pGetCoeff(a1), tneg));
       a = pNext(a) = b;       // append b to result and advance a1
       pIter(a1);
