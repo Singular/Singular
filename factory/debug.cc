@@ -1,19 +1,24 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: debug.cc,v 1.1 1996-12-04 13:59:26 schmidt Exp $ */
+/* $Id: debug.cc,v 1.2 1997-03-26 16:58:13 schmidt Exp $ */
 
 /*
 $Log:
 */
 
-static int deb_level;
-char * deb_level_msg = 0;
+static int deb_level = -1;
+char * deb_level_msg = "";
 
 void deb_inc_level()
 {
     int i;
-    deb_level++;
-    if ( deb_level_msg != 0 )
+
+    // deb_level == -1 iff we enter this function for the first time
+    if ( deb_level == -1 )
+	deb_level = 0;
+    else
 	delete [] deb_level_msg;
+
+    deb_level++;
     deb_level_msg = new char[3*deb_level+1];
     for ( i = 0; i < 3*deb_level; i++ )
 	deb_level_msg[i] = ' ';
