@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: standard.lib,v 1.56 2001-01-16 14:49:46 lossen Exp $";
+version="$Id: standard.lib,v 1.57 2001-01-17 14:07:25 Singular Exp $";
 category="Miscellaneous";
 info="
 LIBRARY: standard.lib   Procedures which are always loaded at Start-up
@@ -434,7 +434,7 @@ resolution
 computes a (possibly minimal) free resolution of an ideal or module using
 a heuristically choosen method.
 @* The second (int) argument (say, @code{k}) specifies the length of
-the resolution. If it is not positive then @code{k} is assumed to be the 
+the resolution. If it is not positive then @code{k} is assumed to be the
 number of variables of the basering.
 @* If a third argument is given, the returned resolution is minimized.
 
