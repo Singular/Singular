@@ -24,7 +24,7 @@ hlp-cmpl.el: ${SINGULAR_HLP} cmpl.pl
 # then things break from time to time
 lib-cmpl.el: ${prefix}/Singular/Makefile cmpl.pl
 	${MAKE} --no-print-directory -s -f ${prefix}/Singular/Makefile echoLIBS > lib-temp
-	cat lib-temp | cmpl.pl -cmpl lib > lib-cmpl.el
+	cat lib-temp | ${PERL5} cmpl.pl -cmpl lib > lib-cmpl.el
 	rm lib-temp
 
 clean:
