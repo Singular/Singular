@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.l,v 1.15 1998-04-28 15:51:47 krueger Exp $ */
+/* $Id: libparse.l,v 1.16 1998-04-29 11:25:19 krueger Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -190,6 +190,7 @@ quote          [\"]
 escquote       (\\\")
 taborspace     [ \t]
 tos            ({taborspace}*)
+eq             (=|{tos}+=|=+{tos}|{tos}+=+{tos})
 
 /* %start START */
 
@@ -215,7 +216,7 @@ info=+"\"" { old_state = YYSTATE; quote++; BEGIN(string);
              last_cmd = LP_INFO;
            }
 
-(version=+{quote}+{strings}+{quote})|(version+{tos}+=+{quote}+{strings}+{quote})|(version+{tos}+=+{tos}+{quote}+{strings}+{quote})|(version=+{tos}+{quote}+{strings}+{quote}) {
+(version+{eq}+{quote}+{strings}+{quote}) {
              if ( mode != GET_INFO ) {
                make_version(yytext,1);
 #ifdef STANDALONE_PARSER
@@ -302,7 +303,8 @@ LIB[ \t]+"\"" { quote++;
              BEGIN(INITIAL);
              yymore();
            }
-<header>(info=\")|(version=\")|(version+{tos}+=\")|(version+{tos}+=+{tos}+\")|(version=+{tos}+\") { yyless(0);
+<header>(info+{eq}+\")|(version+{eq}+\") {
+             yyless(0);
              *lib_style = NEW_LIBSTYLE;
              BEGIN(INITIAL);
              yymore();
@@ -331,7 +333,8 @@ LIB[ \t]+"\"" { quote++;
 #endif
              BEGIN(INITIAL);
            }
-<help>(info=\")|(version=\")|(version+{tos}+=\")|(version+{tos}+=+{tos}+\")|(version=+{tos}+\") { yyless(0);
+<help>(info+{eq}+\")|(version+{eq}+\") {
+             yyless(0);
              *lib_style = NEW_LIBSTYLE;
              BEGIN(INITIAL);
              yymore();
