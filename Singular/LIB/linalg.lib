@@ -1,6 +1,6 @@
 //GMG last modified: 04/25/2000
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: linalg.lib,v 1.14 2001-06-01 12:58:41 mschulze Exp $";
+version="$Id: linalg.lib,v 1.15 2001-07-30 16:38:12 mschulze Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  linalg.lib        Algorithmic Linear Algebra
@@ -1528,7 +1528,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc jordanbasis(matrix M)
-"USAGE:   jordan(M); matrix M
+"USAGE:   jordanbasis(M); matrix M
 ASSUME:  M constant square matrix, eigenvalues of M in coefficient field
 RETURN:  matrix U with inverse(U)*M*U in Jordan normal form
 EXAMPLE: example jordanbasis; shows examples
@@ -1560,7 +1560,7 @@ EXAMPLE: example jordanbasis; shows examples
   }
 
   int j,k,l;
-  matrix N,NN;
+  matrix N0,N1;
   module K0,K1;
   list K;
   matrix u[ncols(M)][1];
@@ -1568,23 +1568,23 @@ EXAMPLE: example jordanbasis; shows examples
 
   for(i=ncols(e);i>0;i--)
   {
-    N=M-e[i]*freemodule(ncols(M));
+    N0=M-e[i]*freemodule(ncols(M));
 
     K0=0;
-    NN=N;
+    N1=N0;
     K=module();
     while(size(K0)<m[i])
     {
-      K0=syz(NN);
+      K0=syz(N1);
       K=K+list(K0);
-      NN=NN*N;
+      N1=N1*N0;
     }
 
     K1=0;
     for(j=2;j<size(K);j++)
     {
       K0=K[j];
-      K[j]=interred(reduce(K[j],std(K1+module(N*K[j+1]))));
+      K[j]=interred(reduce(K[j],std(K1+module(N0*K[j+1]))));
       K1=K0;
     }
     K[j]=interred(reduce(K[j],std(K1)));
@@ -1597,7 +1597,7 @@ EXAMPLE: example jordanbasis; shows examples
         for(l=j;l>0;l--)
         {
           U=module(u)+U;
-          u=N*u;
+          u=N0*u;
         }
       }
     }
