@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.109 2000-10-26 07:19:16 pohl Exp $ */
+/* $Id: ideals.cc,v 1.110 2000-10-26 11:12:06 pohl Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -3330,6 +3330,7 @@ intvec * idQHomWeight(ideal id)
   int k;
   int in=IDELEMS(id)-1, ready=0, all=0,
       coldim=pVariables, rowmax=2*coldim;
+  if (in<0) return NULL;
   intvec *imat=new intvec(rowmax+1,coldim,0);
 
   do
