@@ -39,7 +39,9 @@ matrix m[2][4]= x(1), x(2), x(3), x(4), x(2), x(3), x(4), x(5);
 ideal j = minor(m, 2);
 ideal i = std(j);
 
-mres(i, 2, ires);
+list ires = mres(i, 2);
+def ires(1..2) = ires[1..2];
+kill ires;
 matrix jaco = jacob(ires(1));
 qring s = i;
 s;
