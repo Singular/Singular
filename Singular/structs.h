@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.68 2003-01-29 16:13:10 Singular Exp $ */
+/* $Id: structs.h,v 1.69 2003-01-29 17:48:37 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -353,6 +353,7 @@ struct nc_struct
 {
   short ref;
   nc_type type;
+  ring basering; // the ring C,D,.. live in
   matrix C;
   matrix D;
   matrix *MT;

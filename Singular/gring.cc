@@ -6,7 +6,7 @@
  *  Purpose: p_Mult family of procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.20 2003-01-29 16:13:11 Singular Exp $
+ *  Version: $Id: gring.cc,v 1.21 2003-01-29 17:49:29 Singular Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -1489,14 +1489,14 @@ void ncKill(ring r)
   {
     for(j=i+1;j<=r->N;j++)
     {
-      id_Delete((ideal *)&(r->nc->MT[UPMATELEM(i,j,r->N)]),r);
+      id_Delete((ideal *)&(r->nc->MT[UPMATELEM(i,j,r->N)]),r->nc->basering);
     }
   }
   omFreeSize((ADDRESS)r->nc->MT,r->N*(r->N-1)/2*sizeof(matrix));
   omFreeSize((ADDRESS)r->nc->MTsize,r->N*(r->N-1)/2*sizeof(int));
-  id_Delete((ideal *)&(r->nc->C),r);
-  id_Delete((ideal *)&(r->nc->D),r);
-  id_Delete((ideal *)&(r->nc->COM),r);
+  id_Delete((ideal *)&(r->nc->C),r->nc->basering);
+  id_Delete((ideal *)&(r->nc->D),r->nc->basering);
+  id_Delete((ideal *)&(r->nc->COM),r->nc->basering);
   omFreeSize((ADDRESS)r->nc,sizeof(nc_struct));
   r->nc=NULL;
 }
