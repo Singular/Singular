@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftmpl_list.h,v 1.4 1997-06-19 13:11:23 schmidt Exp $ */
+/* $Id: ftmpl_list.h,v 1.5 1997-12-08 18:49:16 schmidt Exp $ */
 
 #ifndef INCL_LIST_H
 #define INCL_LIST_H
@@ -10,6 +10,11 @@
 #include <iostream.h>
 #endif /* NOSTREAMIO */
 
+template <class T>
+class ListIterator;
+
+template <class T>
+class List;
 
 template <class T>
 class ListItem
