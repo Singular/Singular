@@ -217,7 +217,7 @@ SLIBS = COPYING \
         solve.lib    spcurve.lib   spectrum.lib  standard.lib   stratify.lib \
         surf.lib     toric.lib     triang.lib    zeroset.lib    help.cnf
 
-PLIBS = lieA.lib
+PLIBS = ncalg.lib ncdecomp.lib nctools.lib gkdim.lib qmatrix.lib
 
 SLIBS_FILES = $(addprefix LIB/,${SLIBS})
 
