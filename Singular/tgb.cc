@@ -2094,13 +2094,15 @@ static BOOLEAN pair_better(sorted_pair_node* a,sorted_pair_node* b, calc_dat* c)
   if (a->deg<b->deg) return TRUE;
   if (a->deg>b->deg) return FALSE;
 
-  if (a->expected_length<b->expected_length) return TRUE;
-  if (a->expected_length>b->expected_length) return FALSE;
+//  if (a->expected_length<b->expected_length) return TRUE;
+  // if (a->expected_length>b->expected_length) return FALSE;
   int comp=pLmCmp(a->lcm_of_lm, b->lcm_of_lm);
   if (comp==1) return FALSE;
   if (-1==comp) return TRUE;
-  if (a->i<b->i) return TRUE;
+  if (a->i+a->j<b->i+b->j) return TRUE;
+   if (a->i+a->j>b->i+b->j) return FALSE;
   if (a->j<b->j) return TRUE;
+  if (a->j>b->j) return FALSE;
   return TRUE;
 }
 
@@ -2114,14 +2116,16 @@ static int pair_better_gen(const void* ap,const void* bp){
   if (a->deg>b->deg) return 1;
 
 
-  if (a->expected_length<b->expected_length) return -1;
-  if (a->expected_length>b->expected_length) return 1;
+//  if (a->expected_length<b->expected_length) return -1;
+  // if (a->expected_length>b->expected_length) return 1;
  int comp=pLmCmp(a->lcm_of_lm, b->lcm_of_lm);
   
   if (comp==1) return 1;
   if (-1==comp) return -1;
-  if (a->i<b->i) return -1;
+  if (a->i+a->j<b->i+b->j) return -1;
+   if (a->i+a->j>b->i+b->j) return 1;
   if (a->j<b->j) return -1;
+   if (a->j>b->j) return 1;
   return 0;
 }
 
