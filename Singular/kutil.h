@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.56 2001-02-09 17:26:00 obachman Exp $ */
+/* $Id: kutil.h,v 1.57 2001-02-16 09:19:35 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -224,6 +224,7 @@ public:
   pFDegProc pOrigFDeg_TailRing;
   pLDegProc pOrigLDeg_TailRing;
 
+  LObject P;
   ideal Shdl;
   ideal D; /*V(S) is in D(D)*/
   ideal M; /*set of minimal generators*/
@@ -241,20 +242,19 @@ public:
   KINLINE poly    kNoetherTail();
   poly    t_kNoether;
   BOOLEAN * NotUsedAxis;
-  LObject P;
   poly tail;
   leftv kIdeal;
   intvec * kModW;
   intvec * kHomW;
   // procedure for ShalloCopy from tailRing  to currRing
   pShallowCopyDeleteProc p_shallow_copy_delete;
-  BOOLEAN *pairtest;/*used for enterOnePair*/
-  // if set, pLDeg(p, l) == (pFDeg(pLast(p), pLength)
-  BOOLEAN LDegLast;
-  // if set, then L.length == L.pLength
-  BOOLEAN length_pLength;
-  // if set, then posInL does not depend on L.length
-  BOOLEAN posInLDependsOnLength;
+  // pointers to Tobjects R[i] is ith Tobject which is generated
+  TObject**  R; 
+  // S_2_R[i] yields Tobject which corresponds to S[i]
+  int*      S_2_R; 
+  ring tailRing;
+  omBin lmBin;
+  omBin tailBin;
   int cp,c3;
   int sl,mu;
   int tl,tmax;
@@ -276,18 +276,18 @@ public:
   BOOLEAN update;
   BOOLEAN posInLOldFlag;
   BOOLEAN use_buckets;
-  ring tailRing;
-  omBin lmBin;
-  omBin tailBin;
+  BOOLEAN interred_flag;
+  BOOLEAN *pairtest;/*used for enterOnePair*/
+  // if set, pLDeg(p, l) == (pFDeg(pLast(p), pLength)
+  BOOLEAN LDegLast;
+  // if set, then L.length == L.pLength
+  BOOLEAN length_pLength;
+  // if set, then posInL does not depend on L.length
+  BOOLEAN posInLDependsOnLength;
   /*FALSE, if posInL == posInL10*/
   char    redTailChange;
   char    news;
   char    newt;/*used for messageSets*/
-
-  // pointers to Tobjects R[i] is ith Tobject which is generated
-  TObject**  R; 
-  // S_2_R[i] yields Tobject which corresponds to S[i]
-  int*      S_2_R; 
   
   skStrategy();
   ~skStrategy();
