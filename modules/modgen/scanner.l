@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: scanner.l,v 1.7 2000-02-18 13:33:49 krueger Exp $ */
+/* $Id: scanner.l,v 1.8 2000-03-22 10:23:58 krueger Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -144,9 +144,9 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
                  }
 
 <INITIAL>{
-        ^{WS}        push_state(YYSTATE, CODEBLOCK, "CODEBLOCK");
-        ^"/*"       ACTION_ECHO; push_state(YYSTATE, COMMENT, "COMMENT");
-        ^"//".*{NL}  ++yylineno; ACTION_ECHO; 
+        ^{WS}      push_state(YYSTATE, CODEBLOCK, "CODEBLOCK");
+        ^"/*"      push_state(YYSTATE, COMMENT, "COMMENT"); yymore();
+        "//".*{NL} ++yylineno; ACTION_ECHO;
 	{BOOL}  { if(yyleng == 1) sscanf(yytext, "%d", &lvalp->i);
 	          else {
 		    if(strcasecmp(yytext, "yes")==0) lvalp->i = 1;
@@ -231,7 +231,7 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
 
 <COMMENT>{
         "*/"            ACTION_ECHO; pop_state(); yymore();
-        "*"             ACTION_ECHO; yymore();
+        "*"           yymore();
         {NL}          { yylineno++; yymore(); }
         .             { yymore(); }
 	  }
@@ -250,7 +250,7 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
         {NL}    { yylineno++; }
         {WS}    /* ignore */
         ;       /* ignore */
-        "/*"       ACTION_ECHO; push_state(YYSTATE, COMMENT, "COMMENT");
+        "/*"      push_state(YYSTATE, COMMENT, "COMMENT"); yymore();
         "//".*{NL}  ++yylineno; ACTION_ECHO; 
         proc+{WS} {
                   brace1 = 0; /* { */
@@ -321,7 +321,7 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
 		   switch_state(YYSTATE, CODEBLOCK2, "CODEBLOCK2");
 		   return '{';
 		 }
-         "/*"       ACTION_ECHO; push_state(YYSTATE, COMMENT, "COMMENT");
+         "/*"       push_state(YYSTATE, COMMENT, "COMMENT");yymore();
          "//".*{NL}  ++yylineno; ACTION_ECHO; 
          "\""    { do_return++; push_state(YYSTATE, STRING, "string"); /*yymore();*/}
 	 {BOOL}  { if(yyleng == 1) sscanf(yytext, "%d", &lvalp->i);
@@ -489,13 +489,13 @@ void add_action(char *new_text)
   return;
   switch(sectnum) {
     case 1:
-      printf("1>%s", new_text);
+      printf("1>%s<#\n", new_text);
       break;
     case 2:
-      printf("2>%s", new_text);
+      printf("2>%s<#\n", new_text);
       break;
     case 3:
-      printf("3>%s", new_text);
+      printf("3>%s<#\n", new_text);
       break;
   }
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: proc.cc,v 1.7 2000-02-18 13:33:48 krueger Exp $
+ * $Id: proc.cc,v 1.8 2000-03-22 10:23:57 krueger Exp $
  */
 
 #include <stdio.h>
@@ -184,6 +184,25 @@ void write_function_return(
   write_procedure_return(module, pi, module->fmtfp);
 }
 
+void write_function_singularcmd(
+  moddefv module,
+  procdefv pi,
+  void *arg
+)
+{
+  int i;
+  
+  printf("\nWriting return-block\n");
+  fprintf(module->fmtfp, "/* code for running singular commands */\n");
+  fprintf(module->fmtfp, "/*\n");
+  fprintf(module->fmtfp, " *\n");
+  fprintf(module->fmtfp, " * get idhdl for '%s'\n", arg);
+  fprintf(module->fmtfp, " * building leftv of arguments\n");
+  fprintf(module->fmtfp, " * sleftv cmdret = iiMake_proc(cmd, ???, sl)\n");
+  fprintf(module->fmtfp, " *\n");
+  fprintf(module->fmtfp, "### SINGULAR command: '%s'\n", arg);
+  fprintf(module->fmtfp, "*/\n");
+}
 
 /*========================================================================*/
 /*
@@ -351,6 +370,8 @@ void write_procedure_return(
           fprintf(fmtfp, "  else return TRUE;\n\n");
     }
 }
+
+/*========================================================================*/
 
 /*========================================================================*/
 /*

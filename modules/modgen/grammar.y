@@ -1,5 +1,5 @@
 /*
- * $Id: grammar.y,v 1.7 2000-02-18 13:33:47 krueger Exp $
+ * $Id: grammar.y,v 1.8 2000-03-22 10:23:56 krueger Exp $
  */
 
 %{
@@ -75,6 +75,7 @@ void yyerror(char * fmt)
 %token <i>    BOOLTOK
 
 %type <i>    '='
+%type <name> identifier
 
 %nonassoc '='
 %%
@@ -405,12 +406,17 @@ proccmd: '%' NAME ';'
         { cmd_token vt;
           void (*write_cmd)(moddefv module, procdefv pi, void *arg = NULL);
           
-          if( (vt=checkcmd($2, &write_cmd, 0)) ) {
-            write_cmd(&module_def, &procedure_decl);
-          }
-          else {
-            myyyerror("Line %d: Unknown command '%s' in section %d\n",
-                      yylineno, $2, sectnum);
+          switch(vt=checkcmd($2, &write_cmd, CMDT_SINGLE, 0)) {
+              case CMD_NONE:
+                myyyerror("Line %d: Unknown command '%s' in section %d\n",
+                          yylineno, $2, sectnum);
+                break;
+              case CMD_BADSYNTAX:
+                myyyerror("Line %d: bad syntax of command '%s' in section %d\n",
+                          yylineno, $2, sectnum);
+                break;
+              default:
+                write_cmd(&module_def, &procedure_decl);
           }
           free($2);
         }
@@ -419,12 +425,18 @@ proccmd: '%' NAME ';'
           cmd_token vt;
           void (*write_cmd)(moddefv module, procdefv pi, void *arg = NULL);
           
-          if( (vt=checkcmd($2, &write_cmd, 1)) ) {
-            write_cmd(&module_def, &procedure_decl, procedure_decl.procname);
-          }
-          else {
-            myyyerror("Line %d: Unknown command '%s' in section %d\n",
-                      yylineno, $2, sectnum);
+          switch(vt=checkcmd($2, &write_cmd, CMDT_0, 1)) {
+              case CMD_NONE:
+                myyyerror("Line %d: Unknown command '%s' in section %d\n",
+                          yylineno, $2, sectnum);
+                break;
+              case CMD_BADSYNTAX:
+                myyyerror("Line %d: bad syntax of command '%s' in section %d\n",
+                          yylineno, $2, sectnum);
+                break;
+              default:
+                write_cmd(&module_def, &procedure_decl,
+                          procedure_decl.procname);
           }
           free($2);
         }
@@ -433,12 +445,17 @@ proccmd: '%' NAME ';'
           cmd_token vt;
           void (*write_cmd)(moddefv module, procdefv pi, void *arg = NULL);
           
-          if( (vt=checkcmd($2, &write_cmd, 1)) ) {
-            write_cmd(&module_def, &procedure_decl, $4);
-          }
-          else {
-            myyyerror("Line %d: Unknown command '%s' in section %d\n",
-                      yylineno, $2, sectnum);
+          switch(vt=checkcmd($2, &write_cmd, CMDT_ANY, 1)) {
+              case CMD_NONE:
+                myyyerror("Line %d: Unknown command '%s' in section %d\n",
+                          yylineno, $2, sectnum);
+                break;
+              case CMD_BADSYNTAX:
+                myyyerror("Line %d: bad syntax of command '%s' in section %d\n",
+                          yylineno, $2, sectnum);
+                break;
+              default:
+                write_cmd(&module_def, &procedure_decl, $4);
           }
           free($2); free($4);
         }
@@ -447,23 +464,33 @@ proccmd: '%' NAME ';'
           cmd_token vt;
           void (*write_cmd)(moddefv module, procdefv pi, void *arg = NULL);
           
-          if( (vt=checkcmd($2, &write_cmd, 1)) ) {
-            //write_cmd(&module_def, &procedure_decl, $4);
-          }
-          else {
-            myyyerror("Line %d: Unknown command '%s' in section %d\n",
-                      yylineno, $2, sectnum);
+          switch(vt=checkcmd($2, &write_cmd, CMDT_ANY, 1)) {
+              case CMD_NONE:
+                myyyerror("Line %d: Unknown command '%s' in section %d\n",
+                          yylineno, $2, sectnum);
+                break;
+              case CMD_BADSYNTAX:
+                myyyerror("Line %d: bad syntax of command '%s' in section %d\n",
+                          yylineno, $2, sectnum);
+                break;
+              default:
+                write_cmd(&module_def, &procedure_decl, $4);
           }
           free($2);
         };
 
 identifier: NAME
         {
-          printf("### Name %s\n", $1);
+          printf("### ID ### Name %s\n", $1);
+          $$ = $1;
         }
         | identifier MCOLONCOLON NAME
         {
-          printf("### Name %s\n", $3);
+          int len = strlen($$) + strlen($3) + 2;
+          printf("### ID ### Name %s\n", $3);
+          $$ = (char *)realloc($$, len);
+          strcat($$, "::");
+          strcat($$, $3);
         };
 
 arglist: NAME

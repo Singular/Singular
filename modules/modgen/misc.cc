@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: misc.cc,v 1.6 2000-02-14 21:44:04 krueger Exp $ */
+/* $Id: misc.cc,v 1.7 2000-03-22 10:23:57 krueger Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -204,28 +204,37 @@ struct valid_cmds_def
   char *name;
   void (*write_cmd)(moddefv module, procdefv pi, void *arg = NULL);
   cmd_token id;
+  cmd_type  type;
   int args;
 } valid_cmds[] = {
-  { "declaration",  write_function_declaration, CMD_DECL,   0 },
-  { "typecheck",    write_function_typecheck,   CMD_CHECK,  0 },
-  { "return",       write_function_return,      CMD_RETURN, 1 },
-  { "singularcmd",  0,      CMD_SINGULAR, 1 },
+  { "declaration",  write_function_declaration, CMD_DECL,   CMDT_SINGLE, 0 },
+  { "typecheck",    write_function_typecheck,   CMD_CHECK,  CMDT_SINGLE, 0 },
+  { "return",       write_function_return,      CMD_RETURN, CMDT_SINGLE, 1 },
+  { "return",       write_function_return,      CMD_RETURN, CMDT_0,     1 },
+  { "return",       write_function_return,      CMD_RETURN, CMDT_ANY,   1 },
+  { "singularcmd",  write_function_singularcmd, CMD_SINGULAR, CMDT_ANY, 1 },
   { NULL,           0, CMD_NONE, 0 }
 };
 
 cmd_token checkcmd(
   char *cmdname,
   void (**write_cmd)(moddefv module, procdefv pi, void *arg),
+  cmd_type  type,
   int args
   )
 {
   int i;
+  cmd_token rc = CMD_NONE;
+  
   for(i=0; valid_cmds[i].name!=NULL; i++)
     if(strcmp(valid_cmds[i].name, cmdname)==0) {
-      *write_cmd = valid_cmds[i].write_cmd;
-      return valid_cmds[i].id;
+      rc = CMD_BADSYNTAX;
+      if(valid_cmds[i].type == type) {
+        *write_cmd = valid_cmds[i].write_cmd;
+        return valid_cmds[i].id;
+      }
     }
-  return CMD_NONE;
+  return rc;
 }
   
 struct valid_vars_def {
