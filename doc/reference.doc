@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.7 1998-04-27 16:36:55 Singular Exp $
+@comment $Id: reference.doc,v 1.8 1998-04-27 16:39:54 Singular Exp $
 @comment this file contains the reference part of the manual
 @c ---------------------------------------
 @c @node Functions, Control structures, Declaration commands, Commands
@@ -5291,7 +5291,6 @@ See @ref{read}, @ref{link}, @ref{Expressions}; @ref{expression list};
 @*List of all system variables.
 @end ifinfo
 @menu
-* alternating::
 * degBound::
 * echo::
 * minpoly::
@@ -5303,43 +5302,8 @@ See @ref{read}, @ref{link}, @ref{Expressions}; @ref{expression list};
 * TRACE var::
 * voice::
 @end menu
-@c ---------------------------------------
-@node alternating, degBound, System variables, System variables
-@subsection alternating
-@cindex alternating
-@table @code
-@item @strong{Syntax:}
-@code{alternating =} int_expression@code{;}
-@*int_variable @code{= alternating;}
-@item @strong{Purpose:}
-describes the position of the first alternating variable in the current
-base ring, thus creating the tensor
-product of a polynomial ring with an exterior algebra.
-@*Remark: Setting @code{alternating=1;} defines the exterior algebra.
-@item @strong{Note:}
-These algebras are only available in those versions of
-@sc{Singular} which are compiled with the SRING option.
-The SRING version is
-significantly slower for usual (commutative) ring operations.
-@item @strong{Example:}
-@example
-  // define the exterior algebra in 3 variables x, y, z
-  ring r=0,(x,y,z),dp;
-  alternating=1;
-  y*x;
-  @expansion{} -1*xy
-@end example
-@end table
-@menu
-@strong{See:}
-* int expressions::
-* ring::
-@end menu
-@iftex
-See @ref{ring}; @ref{int expressions}.
-@end iftex
 @c -----------------------------------------------------
-@node degBound, echo, alternating, System variables
+@node degBound, echo, System variables, System variables
 @subsection degBound
 @cindex degBound
 @table @code

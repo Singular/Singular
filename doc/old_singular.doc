@@ -2610,7 +2610,6 @@ unless a @code{keepring} command is used.
 * ring::
 * Monomial orderings::
 * qring:: define quotient rings
-* alternating:: define supercommutative superalgebras
 * dring:: define Weyl algebras
 * charstr:: the coefficient field
 * npars:: number of parameters
@@ -2734,55 +2733,6 @@ none
 @iftex
 See @ref{ideal expression}; @ref{ring}.
 @end iftex
-@c ---------------------------------------
-@node  dring, list, qring, Declaration commands
-@subsection dring
-@cindex dring
-
-@table @code
-@item @strong{Syntax:}
-@example
-  @code{dring} name @code{=} field@code{,}
-              @code{(} names_of_ring_variables @code{),}
-              @code{(} ordering @code{);}
-@end example
-@item @strong{Purpose:}
-define a Weyl algebra
-@sp 1
-For each of the variables x_i an additional variable dx_i
-is created which is the differentiation operator by x_i.
-@*The allowed orderings are @code{dp} and @code{Dp} (at the moment).
-@sp 1
-By default ideals are set of differential operators (polynomials
-in x_i and dx_i), which  operate on modules.
-This can be changed by the predefined attribute @code{D}, see @ref{attrib}.
-@item @strong{Default:}
-none
-@item @strong{Example:}
-@example
-  dring w=0,(x),(c,dp);
-  // the ring variables are dx and x with dx*x=x*dx+1
-  ideal i=x,dx;
-  i[1]*i[2];
-  @expansion{} x*dx
-  i[2]*i[1];
-  @expansion{} x*dx+1
-  module m=[x];
-  dx*m[1];
-  @expansion{} [1]
-@end example
-@end table
-@menu
-* ring::
-@end menu
-@iftex
-See @ref{ring}.
-@end iftex
-
-@strong{Note:} These rings are only available in those versions of
-@sc{Singular} which are compiled with the DRING option.
-The DRING version is
-significantly slower for usual (commutative) ring operations.
 @c ---------------------------------------
 @node  list, def, dring, Declaration commands
 @subsection list
