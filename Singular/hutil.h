@@ -27,6 +27,7 @@ extern Exponent_t hisModule;
 extern monf stcmem, radmem;
 
 scfmon hInit(ideal S, ideal Q, int * Nexist);
+void hWeight();
 void hDelete(scfmon ev, int ev_length);
 void hComp(scfmon exist, int Nexist, Exponent_t ak, scfmon stc, int * Nstc);
 void hSupp(scfmon stc, int Nstc, varset var, int * Nvar);

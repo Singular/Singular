@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hutil.cc,v 1.8 1998-09-24 09:59:43 Singular Exp $ */
+/* $Id: hutil.cc,v 1.9 1998-12-08 10:55:19 pohl Exp $ */
 /*
 * ABSTRACT: Utilities for staircase operations
 */
@@ -106,6 +106,31 @@ scfmon hInit(ideal S, ideal Q, int *Nexist)
   return ex;
 }
 
+void hWeight()
+{
+  int i, k;
+  Exponent_t x;
+
+  i = pVariables;
+  loop
+  {
+    if (pWeight(i) != 1) break;
+    i--;
+    if (i == 0) return;
+  }
+  for (i=pVariables; i; i--)
+  {
+    x = pWeight(i);
+    if (x != 1)
+    {
+      for (k=hNexist-1; k>=0; k--)
+      {
+        hexist[k][i] *= x;
+      }
+    }
+  }
+}
+
 void hDelete(scfmon ev, int ev_length)
 {
   int i;
@@ -116,7 +141,7 @@ void hDelete(scfmon ev, int ev_length)
   Free(ev,  ev_length*sizeof(scmon));
 }
 
-
+  
 void hComp(scfmon exist, int Nexist, Exponent_t ak, scfmon stc, int *Nstc)
 {
   int  i = Nexist, k = 0;
@@ -223,7 +248,7 @@ void hOrdSupp(scfmon stc, int Nstc, varset var, int Nvar)
        if (g > o)
          g -= o;
        else
-         g = o - g;
+	 g = o - g;
        if (g > h)
          h = g;
     }

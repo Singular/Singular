@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hdegree.cc,v 1.13 1998-09-24 09:59:42 Singular Exp $ */
+/* $Id: hdegree.cc,v 1.14 1998-12-08 10:55:25 pohl Exp $ */
 /*
 *  ABSTRACT -  dimension, multiplicity, HC, kbase
 */
@@ -798,6 +798,7 @@ static void hDegree(ideal S, ideal Q)
     hMu = 1;
     return;
   }
+  hWeight();
   hwork = (scfmon)Alloc(hNexist * sizeof(scmon));
   hvar = (varset)Alloc((pVariables + 1) * sizeof(int));
   hsel = (varset)Alloc((pVariables + 1) * sizeof(int));
@@ -912,6 +913,7 @@ static void hDegree0(ideal S, ideal Q)
   }
   else
     hMu = 0;
+  hWeight();
   hwork = (scfmon)Alloc(hNexist * sizeof(scmon));
   hvar = (varset)Alloc((pVariables + 1) * sizeof(int));
   hpur0 = (scmon)Alloc((1 + (pVariables * pVariables)) * sizeof(Exponent_t));

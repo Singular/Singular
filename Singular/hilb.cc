@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hilb.cc,v 1.7 1997-12-15 22:46:24 obachman Exp $ */
+/* $Id: hilb.cc,v 1.8 1998-12-08 10:55:27 pohl Exp $ */
 /*
 *  ABSTRACT -  Hilbert series
 */
@@ -203,6 +203,7 @@ static intvec * hSeries(ideal S, intvec *modulweight, ideal Q, int notstc)
     (*hseries1)[1]=0;
     return hseries1;
   }
+  hWeight();
   p0 = (int *)Alloc(sizeof(int));
   *p0 = 1;
   hwork = (scfmon)Alloc(hNexist * sizeof(scmon));
