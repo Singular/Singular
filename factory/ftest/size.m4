@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: size.m4,v 1.1 1997-09-30 08:35:01 schmidt Exp $ */
+/* $Id: size.m4,v 1.2 1997-10-15 09:19:17 schmidt Exp $ */
 
 ftestSetNameOfGame( size,
         `"Usage: size [<options>] [<envSpec>] <f> [<x>]\n"
@@ -15,7 +15,7 @@ ftestSetNameOfGame( size,
 // To create ftestAlgorithm.cc, run m4 using the ftest_util.m4 library in
 // the following way:
 //
-// m4 ftest_util.m4 ftestAlgorithm.m4 > ftestAlgorithm.cc'
+// m4 ftest_util.m4 ftestAlgorithm.m4 > ftestAlgorithm.cc
 //
 //}}}
 

@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: totaldegree.m4,v 1.1 1997-09-29 12:57:26 schmidt Exp $ */
+/* $Id: totaldegree.m4,v 1.2 1997-10-15 09:19:20 schmidt Exp $ */
 
 ftestSetNameOfGame( totaldegree,
         `"Usage: totaldegree [<options>] [<envSpec>] <f> [<x> <y>]\n"
@@ -15,7 +15,7 @@ ftestSetNameOfGame( totaldegree,
 // To create ftestAlgorithm.cc, run m4 using the ftest_util.m4 library in
 // the following way:
 //
-// m4 ftest_util.m4 ftestAlgorithm.m4 > ftestAlgorithm.cc'
+// m4 ftest_util.m4 ftestAlgorithm.m4 > ftestAlgorithm.cc
 //
 //}}}
 

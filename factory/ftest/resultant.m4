@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: resultant.m4,v 1.3 1997-09-29 13:02:02 schmidt Exp $ */
+/* $Id: resultant.m4,v 1.4 1997-10-15 09:19:14 schmidt Exp $ */
 
 ftestSetNameOfGame( resultant,
         `"Usage: resultant [<options>] [<envSpec>] <f> <g> <x>\n"
@@ -13,7 +13,7 @@ ftestSetNameOfGame( resultant,
 // To create ftestAlgorithm.cc, run m4 using the ftest_util.m4 library in
 // the following way:
 //
-// m4 ftest_util.m4 ftestAlgorithm.m4 > ftestAlgorithm.cc'
+// m4 ftest_util.m4 ftestAlgorithm.m4 > ftestAlgorithm.cc
 //
 //}}}
 

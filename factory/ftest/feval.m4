@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: feval.m4,v 1.1 1997-10-10 12:52:51 schmidt Exp $ */
+/* $Id: feval.m4,v 1.2 1997-10-15 09:19:09 schmidt Exp $ */
 
 ftestSetNameOfGame( feval,
         `"Usage: feval [<options>] [<envSpec>] <f>\n"
@@ -18,7 +18,7 @@ ftestSetNameOfGame( feval,
 // To create ftestAlgorithm.cc, run m4 using the ftest_util.m4 library in
 // the following way:
 //
-// m4 ftest_util.m4 ftestAlgorithm.m4 > ftestAlgorithm.cc'
+// m4 ftest_util.m4 ftestAlgorithm.m4 > ftestAlgorithm.cc
 //
 //}}}
 

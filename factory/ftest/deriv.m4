@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: deriv.m4,v 1.2 1997-09-24 10:49:52 schmidt Exp $ */
+/* $Id: deriv.m4,v 1.3 1997-10-15 09:19:06 schmidt Exp $ */
 
 ftestSetNameOfGame( deriv,
         `"Usage: deriv [<options>] [<envSpec>] <f> [<x>]\n"
@@ -13,7 +13,7 @@ ftestSetNameOfGame( deriv,
 // To create ftestAlgorithm.cc, run m4 using the ftest_util.m4 library in
 // the following way:
 //
-// m4 ftest_util.m4 ftestAlgorithm.m4 > ftestAlgorithm.cc'
+// m4 ftest_util.m4 ftestAlgorithm.m4 > ftestAlgorithm.cc
 //
 //}}}
 

@@ -1,4 +1,21 @@
+Wed Oct 15 10:50:07 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* gcd.m4, deriv.m4, feval.m4, resultant.m4, size.m4,
+	  totaldegree.m4: doc fix
+
+Fri Oct 10 14:33:59 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* runfex: runfxc renamed to runfex
+
+	* feval.m4: eval.m4 renamed to feval.m4
+	* runfxc (EvalAlg): is 'feval' now instead of './eval'
+
+	* runfxc (main): variable 'rawCollectionName' added
+
 Wed Oct  8 11:16:07 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* runfxc (example): reports examples being called
+	  (defineSkip): new function.  Call in main() added.
 
 	* eval.m4 (main): does not output timer/check status when there
 	  are not any arguments
