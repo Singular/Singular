@@ -11,18 +11,15 @@
 #include <signal.h>
 #include <sys/types.h>
 #include <sys/times.h>
+#include "tok.h"
+#include "page.h"
 
-unsigned long page_tab[2048];
-char          use_tab [2048];
-int           page_tab_ind=2049;
-void *
-Page_Create(size_t size);
-void
-Page_AllowAccess(void * address, size_t size);
-void
-Page_DenyAccess(void * address, size_t size);
-size_t
-Page_Size(void);
+unsigned long mmPage_tab[MAX_PAGE_TAB];
+char          mmUse_tab [MAX_PAGE_TAB];
+int           mmPage_tab_ind=0;
+int           mmPage_tab_acc=0;
+static caddr_t  startAddr = (caddr_t) 0;
+
 #ifndef  PROT_NONE
 #define  PROT_NONE  0
 #endif
@@ -31,13 +28,11 @@ Page_Size(void);
 #define  MAP_ANONYMOUS  MAP_ANON
 #endif
 
-static caddr_t  startAddr = (caddr_t) 0;
 
 extern int  sys_nerr;
 extern char *  sys_errlist[];
 
-static const char *
-stringErrorReport(void)
+static const char * mmStringErrorReport(void)
 {
   if ( errno > 0 && errno < sys_nerr )
     return sys_errlist[errno];
@@ -50,7 +45,7 @@ stringErrorReport(void)
  */
 #if defined(MAP_ANONYMOUS)
 void *
-Page_Create(size_t size)
+mmPage_Create(size_t size)
 {
   caddr_t    allocation;
 
@@ -85,25 +80,30 @@ Page_Create(size_t size)
   startAddr = allocation + size;
 
   if ( allocation == (caddr_t)-1 )
-    printf("mmap() failed: %s", stringErrorReport());
+    printf("mmap() failed: %s", mmStringErrorReport());
 
-  page_tab[page_tab_ind]=allocation;
-  page_tab_ind++;
+  if (mmPage_tab_ind<MAX_PAGE_TAB)
+  {
+    mmPage_tab[mmPage_tab_ind]=(long)allocation;
+    if (mmPage_tab_ind==0)
+    {
+      memset(mmUse_tab,'0',MAX_PAGE_TAB);
+    }
+    mmPage_tab_ind++;
+  }
   return (void *)allocation;
 }
 #else
-void *
-Page_Create(size_t size)
+void * mmPage_Create(size_t size)
 {
   static int  devZeroFd = -1;
   caddr_t    allocation;
 
-  if ( devZeroFd == -1 ) {
+  if ( devZeroFd == -1 )
+  {
     devZeroFd = open("/dev/zero", O_RDWR);
     if ( devZeroFd < 0 )
-      printf(
-       "open() on /dev/zero failed: %s"
-      ,stringErrorReport());
+      printf( "open() on /dev/zero failed: %s",mmStringErrorReport());
   }
 
   /*
@@ -127,60 +127,87 @@ Page_Create(size_t size)
   startAddr = allocation + size;
 
   if ( allocation == (caddr_t)-1 )
-    printf("mmap() failed: %s", stringErrorReport());
+    printf("mmap() failed: %s", mmStringErrorReport());
 
-  page_tab[page_tab_ind]=allocation;
-  page_tab_ind++;
+  if (mmPage_tab_ind<MAX_PAGE_TAB)
+  {
+    mmPage_tab[mmPage_tab_ind]=allocation;
+    if (mmPage_tab_ind==0)
+    {
+      memset(mmUse_tab,'0',MAX_PAGE_TAB);
+    }
+    mmPage_tab_ind++;
+  }
   return (void *)allocation;
 }
 #endif
 
-static void
-mprotectFailed(void)
+void mmPage_AllowAccess(void * address)
 {
-  printf("mprotect() failed: %s", stringErrorReport());
+  if ( mprotect((caddr_t)address, 4096, PROT_READ|PROT_WRITE) < 0 )
+    printf("mprotect(READ|WRITE) failed: %s", mmStringErrorReport());
 }
 
-void
-Page_AllowAccess(void * address, size_t size)
+void mmPage_DenyAccess(void * address)
 {
-  if ( mprotect((caddr_t)address, size, PROT_READ|PROT_WRITE) < 0 )
-    mprotectFailed();
+  if ( mprotect((caddr_t)address, 4096, PROT_NONE) < 0 )
+    printf("mprotect(NONE) failed: %s", mmStringErrorReport());
 }
 
-void
-Page_DenyAccess(void * address, size_t size)
+void mmPage_Delete(void * address)
 {
-  if ( mprotect((caddr_t)address, size, PROT_NONE) < 0 )
-    mprotectFailed();
+  if ( munmap((caddr_t)address, 4096) < 0 )
+    mmPage_DenyAccess(address);
 }
 
-void
-Page_Delete(void * address, size_t size)
+FILE *mmStatFile=NULL;
+unsigned mmStatLines=0;
+void mmWriteStat()
 {
-  if ( munmap((caddr_t)address, size) < 0 )
-    Page_DenyAccess(address, size);
-}
-
-#if defined(_SC_PAGESIZE)
-size_t
-Page_Size(void)
-{
-  return (size_t)sysconf(_SC_PAGESIZE);
-}
-#elif defined(_SC_PAGE_SIZE)
-size_t
-Page_Size(void)
-{
-  return (size_t)sysconf(_SC_PAGE_SIZE);
-}
-#else
-/* extern int  getpagesize(); */
-size_t
-Page_Size(void)
-{
-  return getpagesize();
-}
+  int i,l,start;
+  if (mmStatFile==NULL)
+  {
+    mmStatFile=fopen(MM_STAT_FILE,"w");
+#if 0    
+    fprintf(mmStatFile,"P1\n%d ???\n",MAX_PAGE_TAB);
 #endif
+  } 
+  if ((mmUse_tab[MAX_PAGE_TAB-1]=='0')
+   || (mmUse_tab[MAX_PAGE_TAB-1]=='1'))
+  {
+    mmStatLines++;
+    l=MAX_PAGE_TAB;
+    start=0;
+    fprintf(mmStatFile,"%d\n",mmPage_tab_acc);
+    /* fwrite("#\n", 2, 1, mmStatFile);*/
+#if 0
+    fflush(mmStatFile);
+#endif
+    /* fwrite("#\n", 2, 1, mmStatFile);*/
+#if 0
+    do
+    {
+      i=min(70,l);
+      fwrite(&(mmUse_tab[start]), i, 1, mmStatFile);
+      fwrite("\n", 1, 1, mmStatFile);
+      start+=i;
+      l-=i;
+    } while (l>0);
+#endif
+  }
+  memset(mmUse_tab,'0',MAX_PAGE_TAB);
+  mmPage_tab_acc=0;
+}
 
+void mmEndStat()
+{
+  if (mmStatFile!=NULL)
+  {
+    mmWriteStat();
+#if 0
+    fprintf(mmStatFile,"# %d %d\n",MAX_PAGE_TAB,mmStatLines);
+#endif
+    fclose(mmStatFile);
+  }
+}
 #endif

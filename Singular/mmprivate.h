@@ -3,11 +3,10 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmprivate.h,v 1.1 1998-12-02 13:57:36 obachman Exp $ */
+/* $Id: mmprivate.h,v 1.2 1998-12-07 08:48:25 Singular Exp $ */
 /*
 * ABSTRACT
 */
-#include "mod2.h"
 #include "structs.h"
 #include "mmheap.h"
 

@@ -1,6 +1,12 @@
 #ifndef MMPAGE_H
 #define MMPAGE_H
-#include "mod2.h"
+
+#ifdef PAGE_TEST
+#undef PALLOC
+#define PALLOC mmPage_Create
+#undef PFREE
+#define PFREE mmPage_Delete
+#endif
 
 /***********************************************************************
  *

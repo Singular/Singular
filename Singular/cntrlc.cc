@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: cntrlc.cc,v 1.20 1998-09-24 09:59:36 Singular Exp $ */
+/* $Id: cntrlc.cc,v 1.21 1998-12-07 08:48:23 Singular Exp $ */
 /*
 * ABSTRACT - interupt handling
 */
@@ -131,40 +131,25 @@ void sigsegv_handler(int sig, sigcontext s)
 }
 
 #ifdef PAGE_TEST
-#ifdef PAGE_COUNT
-  static int page_segv_count=0;
-#endif
 void sig11_handler(int sig, sigcontext s)
 {
-#ifdef PAGE_COUNT
-  page_segv_count++;
-#endif
-  long base =s.cr2&(~4095);
-  int i=page_tab_ind-1;
-  for(;i>=0;i--)
-  {
-    if (page_tab[i]==base) { use_tab[i]='X'; break; }
-  }
-  Page_AllowAccess((void *)base, 4096);
+  unsigned long base =(unsigned long)(s.cr2&(~4095));
+  int i;
+  i=mmPage_tab_ind-1;
+  while (mmPage_tab[i]!=base) i--;
+  mmUse_tab[i]='1';
+  mmPage_tab_acc++;
+  mmPage_AllowAccess((void *)base);
   signal(SIGSEGV,(si_hdl_typ)sig11_handler);
 }
 
 void sigalarm_handler(int sig, sigcontext s)
 {
-  int i=page_tab_ind-1;
-#ifdef PAGE_COUNT
-  write(2,use_tab,page_segv_count);
-  page_segv_count=0;
-#else
-  write(2,use_tab,page_tab_ind);
-#endif
-  write(2,"<\n",2);
+  int i=mmPage_tab_ind-1;
+  mmWriteStat();
   for(;i>=0;i--)
   {
-    Page_DenyAccess((void *)page_tab[i],4096);
-#ifndef PAGE_COUNT
-    use_tab[i]=' ';
-#endif
+    mmPage_DenyAccess((void *)mmPage_tab[i]);
   }
   struct itimerval t,o;
   memset(&t,0,sizeof(t));
@@ -175,7 +160,6 @@ void sigalarm_handler(int sig, sigcontext s)
   setitimer(ITIMER_VIRTUAL,&t,&o);
   signal(SIGVTALRM,(si_hdl_typ)sigalarm_handler);
 }
-
 #endif
 
 /*2
@@ -186,7 +170,6 @@ void init_signals()
 /*4 signal handler: linux*/
 #ifdef PAGE_TEST
   signal(SIGSEGV,(si_hdl_typ)sig11_handler);
-  page_tab_ind=0;
   struct itimerval t,o;
   memset(&t,0,sizeof(t));
   t.it_value.tv_sec     =(unsigned)0;

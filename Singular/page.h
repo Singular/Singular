@@ -1,6 +1,6 @@
 #ifndef PAGE_H
 #define PAGE_H
-#if defined(PAGE_TEST) || defined(PAGE_COUNT)
+#if defined(PAGE_TEST)
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -11,13 +11,20 @@ extern "C" {
 #include <sys/types.h>
 #include <sys/times.h>
 
-void * Page_Create(size_t size);
-void Page_AllowAccess(void * address, size_t size);
-void Page_DenyAccess(void * address, size_t size);
-size_t Page_Size(void);
-extern unsigned long page_tab[2048];
-extern char          use_tab [2048];
-extern int           page_tab_ind;
+void * mmPage_Create(size_t size);
+void mmPage_Delete(void * address);
+
+void mmPage_AllowAccess(void * address);
+void mmPage_DenyAccess(void * address);
+void mmWriteStat();
+void mmEndStat();
+#define MAX_PAGE_TAB 4096
+#define MM_STAT_FILE "mem_stat.txt"
+
+extern unsigned long mmPage_tab[MAX_PAGE_TAB];
+extern char          mmUse_tab [MAX_PAGE_TAB];
+extern int           mmPage_tab_ind;
+extern int           mmPage_tab_acc;
 #ifdef __cplusplus
 }
 #endif

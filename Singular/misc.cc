@@ -18,6 +18,7 @@
 #include "febase.h"
 #include "cntrlc.h"
 #include "mmemory.h"
+#include "page.h"
 #include "ipid.h"
 #include "ipshell.h"
 #include "kstd1.h"
@@ -87,6 +88,9 @@ int inits(void)
 extern "C" {
 void m2_end(short i)
 {
+  #ifdef PAGE_TEST
+  mmEndStat();
+  #endif
   #ifdef HAVE_TCL
   if (tclmode)
   {
