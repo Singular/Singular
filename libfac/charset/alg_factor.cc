@@ -2,7 +2,7 @@
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
 ////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: alg_factor.cc,v 1.8 2001-08-06 08:32:53 Singular Exp $";
+static char * rcsid = "$Id: alg_factor.cc,v 1.9 2002-07-30 15:16:19 Singular Exp $";
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -193,7 +193,16 @@ sqrf_norm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
       // (z+a^5+w)^4 with z<w<a should not give sqfreetest=1 !
       // for now we use this workaround with Factorize...
       // ...but it should go away soon!!!!
-      testlist= Factorize(R);
+      Variable X;
+      if (getAlgVar(R,X))
+      { 
+        if (R.isUnivariate())
+	  testlist=factorize( R, X );
+	else  
+          testlist= Factorize(R, X, 0);
+      }
+      else 
+        testlist= Factorize(R);
       DEBOUTLN(cout, "testlist= ", testlist);
       testlist.removeFirst();
       sqfreetest=1;
@@ -639,7 +648,6 @@ newfactoras( const CanonicalForm & f, const CFList & as, int success){
       Factorlist= alg_factor(f, Astar, vminpoly, oldord, as);
       DEBDECLEVEL(cout,"newfactoras");
       return Factorlist;
-      ;
     }
   }
   else{ // char=0 apply trager directly
@@ -648,7 +656,6 @@ newfactoras( const CanonicalForm & f, const CFList & as, int success){
     Factorlist= alg_factor(f, Astar, vminpoly, oldord, as);
       DEBDECLEVEL(cout,"newfactoras");
       return Factorlist;
-    ;
   }
 
   DEBDECLEVEL(cout,"newfactoras");
@@ -675,6 +682,9 @@ newcfactor(const CanonicalForm & f, const CFList & as, int success ){
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.8  2001/08/06 08:32:53  Singular
+* hannes: code cleanup
+
 Revision 1.7  2001/06/27 13:58:05  Singular
 *hannes/GP: debug newfactoras, char_series, ...
 
