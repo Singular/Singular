@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C -*- */
-/* $Id: config.h.in,v 1.7 1998-05-11 12:04:23 schmidt Exp $ */
+/* $Id: config.h.in,v 1.8 1998-06-29 14:18:24 schmidt Exp $ */
 
 #ifndef INCL_CONFIG_H
 #define INCL_CONFIG_H
@@ -42,6 +42,9 @@
 
 /* define if your compiler does arithmetic shift */
 #undef HAS_ARITHMETIC_SHIFT
+
+/* define to use "configurable inline methods" (see `cf_inline.cc') */
+#undef CF_USE_INLINE
 
 /* define to build factory without stream IO */
 #undef NOSTREAMIO
