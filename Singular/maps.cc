@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: maps.cc,v 1.41 2003-03-31 12:26:39 Singular Exp $ */
+/* $Id: maps.cc,v 1.42 2003-05-23 08:45:08 Singular Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */
@@ -259,20 +259,21 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id)
   temp1 = idInit(sourcering->N+j,1);
   for (i=0;i<sourcering->N;i++)
   {
+    q = pISet(-1);
+    pSetExp(q,i+1+imagepvariables,1);
+    pSetm(q);
     if ((i<IDELEMS(theMap)) && (theMap->m[i]!=NULL))
     {
       p = pSort(pChangeSizeOfPoly(theImageRing,theMap->m[i],1,imagepvariables));
-      q = p;
-      while (pNext(q)!=NULL) pIter(q);
-      pNext(q) = pISet(-1);
-      pIter(q);
+      p=pAdd(p,q);
     }
     else
-      q = p = pISet(-1);
-    pSetExp(q,i+1+imagepvariables,1);
-    pSetm(q);
+    {
+      p = q;
+    }
     temp1->m[i] = p;
   }
+  idTest(temp1);
   for (i=sourcering->N;i<sourcering->N+j0;i++)
   {
     temp1->m[i] = pSort(pChangeSizeOfPoly(theImageRing,
@@ -520,9 +521,9 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
           nNormalize(a);
           res->data=(void *)a;
         }
-	#ifdef LDEBUG
+        #ifdef LDEBUG
         nTest((number) res->data);
-	#endif
+        #endif
       }
       break;
     case POLY_CMD:
@@ -681,7 +682,7 @@ poly pSubstPoly(poly p, int var, poly image)
   theMap->preimage=NULL;
   pDelete(&(theMap->m[var-1]));
   theMap->m[var-1]=pCopy(image);
-  
+
   leftv v=(leftv)omAlloc0Bin(sleftv_bin);
   sleftv tmpW;
   memset(&tmpW,0,sizeof(sleftv));
