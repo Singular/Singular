@@ -1,9 +1,9 @@
-// $Id: hnoether.lib,v 1.4 1998-04-03 22:47:05 krueger Exp $
+// $Id: hnoether.lib,v 1.5 1998-04-23 13:23:23 obachman Exp $
 // author:  Martin Lamm,  email: lamm@mathematik.uni-kl.de
-// last change:           13.03.98
+// last change:           26.03.98
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: hnoether.lib,v 1.4 1998-04-03 22:47:05 krueger Exp $";
+version="$Id: hnoether.lib,v 1.5 1998-04-23 13:23:23 obachman Exp $";
 info="
 LIBRARY:  hnoether.lib   PROCEDURES FOR THE HAMBURGER-NOETHER-DEVELOPMENT
 
@@ -48,6 +48,7 @@ LIBRARY:  hnoether.lib   PROCEDURES FOR THE HAMBURGER-NOETHER-DEVELOPMENT
  constructHNEs(...); subroutine for HN
 ";
 
+///////////////////////////////////////////////////////////////////////////////
 LIB "primitiv.lib";
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -86,14 +87,14 @@ proc testreducible (poly f, int n, int m)
  return(size(jet(f,m*n-1,intvec(n,m))) != 0)
 }
 ///////////////////////////////////////////////////////////////////////////////
-proc T_Transform (poly f, int Q, int N)
+proc T_Transform (poly f, int Q, int N) 
 // returns f(y,xy^Q)/y^NQ
 {
  map T = basering,y,x*y^Q;
  return(T(f)/y^(N*Q));
 }
 ///////////////////////////////////////////////////////////////////////////////
-proc T1_Transform (poly f, number d, int M)
+proc T1_Transform (poly f, number d, int M) 
 // returns f(x,y+d*x^M)
 {
  map T1 = basering,x,y+d*x^M;
@@ -108,7 +109,7 @@ RETURN: list: poly T2(f,d',M,N), number d' in \{ d, 1/d \}
  //---------------------- compute gcd and extgcd of N,M -----------------------
   int ggt=gcd(M,N);
   M=M/ggt; N=N/ggt;
-  list ts=extgcd(M,N);
+  list ts=extgcd(M,N); 
   int tau,sigma=ts[2],-ts[3];
   if (sigma<0) { tau=-tau; sigma=-sigma;}
  // es gilt: 0<=tau<=N, 0<=sigma<=M, |N*sigma-M*tau| = 1 = ggT(M,N)
@@ -136,7 +137,7 @@ RETURN: list: poly T2(f,d',M,N), number d' in \{ d, 1/d \}
   f=Tstar(f); // hier dann refpoly=Tstar(refpoly)
   poly hilf;
  // dividiere f so lange durch x, wie die Div. aufgeht:
-  for (hilf=f/x; hilf*x==f; hilf=f/x) {f=hilf;}
+  for (hilf=f/x; hilf*x==f; hilf=f/x) {f=hilf;} 
   for (hilf=f/y; hilf*y==f; hilf=f/y) {f=hilf;} // gleiches fuer y
   return(list(T1(f),d));
 }
@@ -148,7 +149,7 @@ RETURN: if f = sum(a(i,j)*x^i*y^j), then koeff(f,I,J)= a(I,J) (of type number)
 EXAMPLE: example koeff;  shows an example
 {
   matrix mat = coeffs(coeffs(f,y)[J+1,1],x);
-  if (size(mat) <= I) { return(0);}
+  if (size(mat) <= I) { return(0);} 
   else { return(leadcoef(mat[I+1,1]));}
 }
 example
@@ -190,7 +191,7 @@ EXAMPLE: example squarefree; shows some examples.
   poly f=fetch(altring,f);
   poly dif,g,l;
   if (gcd_ok!=0) {
- //-------------------- Berechne f/ggT(f,df/dx,df/dy) ------------------------
+ //-------------------- Berechne f/ggT(f,df/dx,df/dy) ------------------------ 
     dif=diff(f,x);
     if (dif==0) { g=f; }        // zur Beschleunigung
     else { g=gcd(f,dif); }
@@ -314,7 +315,7 @@ NOTE:   this procedure is only useful in characteristic zero, because otherwise
  for (; (f<>0) and (verbrecher==0); f=f-lead(f)) {
   if ((leadcoef(f)<-16001) or (leadcoef(f)>16001)) {verbrecher=lead(f);}
   leitexp=leadexp(f);
-  if (( ((leitexp[1] % 32003) == 0)   and (leitexp[1]<>0))
+  if (( ((leitexp[1] % 32003) == 0)   and (leitexp[1]<>0)) 
      or ( ((leitexp[2] % 32003) == 0) and (leitexp[2]<>0)) )
        {verbrecher=lead(f);}
  }
@@ -437,9 +438,9 @@ EXAMPLES: example develop; shows an example
  int p = char(basering);
  string ringchar=charstr(basering);
  map xytausch = basering,y,x;
- if ((p!=0) and (ringchar != string(p))) {
+ if ((p!=0) and (ringchar != string(p))) { 
                             // coefficient field is extension of Z/pZ
-   execute "int n_elements="+ringchar[1,size(ringchar)-2]+";";
+   execute "int n_elements="+ringchar[1,size(ringchar)-2]+";"; 
                             // number of elements of actual ring
    number generat=par(1);   // generator of the coefficient field of the ring
  }
@@ -501,7 +502,7 @@ EXAMPLES: example develop; shows an example
       else {"everything is ok -- the polynomial is squarefree in char(k)=0";}
     }
     else {
-      if ((str=="s") and (testerg==1)) {
+      if ((str=="s") and (testerg==1)) { 
        "(*) attention: it could be that the factor is only one in char 32003!";
         f=polyhinueber(test_sqr);
       }
@@ -604,7 +605,7 @@ EXAMPLES: example develop; shows an example
         if (defined(Protokoll)) {e," -> ",eps,"*",p,"^",l;}
         delta = koeff(f,(M/ e)*p^l,(N/ e)*p^l*(eps-1)) / (-1*eps*c);
 
-        if ((ringchar != string(p)) and (delta != 0)) {
+        if ((ringchar != string(p)) and (delta != 0)) { 
  //- coeff. field is not Z/pZ => we`ve to correct delta by taking (p^l)th root-
           if (delta == generat) {exponent=1;}
           else {
@@ -613,9 +614,9 @@ EXAMPLES: example develop; shows an example
             exponent=pardeg(delta);
 
  //-- an dieser Stelle kann ein Fehler auftreten, wenn wir eine transzendente -
- //-- Erweiterung von Z/pZ haben: dann ist das hinzuadjungierte Element nicht -
- //-- primitiv, d.h. in Z/pZ (a) gibt es i.A. keinen Exponenten mit           -
- //-- z.B. a2+a = a^exp                                                       -
+ //-- Erweiterung von Z/pZ haben: dann ist das hinzuadjungierte Element kein  -
+ //-- Erzeuger der mult. Gruppe, d.h. in Z/pZ (a) gibt es i.allg. keinen      -
+ //-- Exponenten mit z.B. a2+a = a^exp                                        -
  //----------------------------------------------------------------------------
           }}
           delta = generat^(extgcd(n_elements-1,p^l)[3]*exponent);
@@ -737,7 +738,7 @@ RETURN: ideal of two polynomials: if the HNE was finite, f(param[1],param[2])
         will be  zero. If not, the real parametrisation will be
         two power series; then param will return a truncation of these series.
 EXAMPLE: example param;      shows an example
-         example developp;   shows another example
+         example develop;   shows another example
 
 {
  //-------------------------- Initialisierungen -------------------------------
@@ -1194,7 +1195,7 @@ EXAMPLE: example intersection;  shows an example
  return(schnitt);
 }
 example
-{
+{ 
   if (nameof(basering)=="HNEring") {
    def rettering=HNEring;
    kill HNEring;
@@ -1292,7 +1293,7 @@ if (size(#) == 0) {
    return();
  }
 if (size(#) != 0) {
-   "// basering is now 'displayring' containing ideal 'HNE'";
+   "// basering is now 'displayring' containing ideal 'HNE'"; 
    keepring(displayring);
    export(HNE);
    return(HNE);
@@ -1360,7 +1361,7 @@ EXAMPLE: example newtonpoly;  shows an example
    }
  //- finde alle Monome auf der Geraden durch A und C (unterhalb gibt's keine) -
    hilf=jet(f,A[2]*C[1]-A[1]*C[2],intvec(A[2]-C[2],C[1]-A[1]));
-
+       
    H=leadexp(xytausch(hilf));
    D=H[2],H[1];
 
@@ -1543,7 +1544,7 @@ EXAMPLE: example extdevelop;  shows an example
        }
      }
      else {
-       execute "ring extdguenstig=("+charstr(basering)+"),(x,y),ls;";
+       execute "ring extdguenstig=("+charstr(basering)+"),(x,y),ls;";      
      }
   }
   else {                               // charstr(basering)== p : no parameter
@@ -1731,7 +1732,7 @@ EXAMPLE: example factorfirst;  shows an example
      if (defined(Protokoll)) {e," -> ",eps,"*",p,"^",l;}
      delta = koeff(f,(M/ e)*p^l,(N/ e)*p^l*(eps-1)) / (-1*eps*c);
 
-     if ((charstr(basering) != string(p)) and (delta != 0)) {
+     if ((charstr(basering) != string(p)) and (delta != 0)) { 
  //------ coefficient field is not Z/pZ => (p^l)th root is not identity -------
        delta=0;
        if (defined(Protokoll)) {
@@ -1759,7 +1760,7 @@ example
 proc reddevelop (poly f)
 USAGE:   reddevelop(f); f poly
 RETURN:  Hamburger-Noether development of f :
-         A list of lists in the form of develop(f); each entry contains the
+         A list of lists in the form of develop(f); each entry contains the 
          data for one of the branches of f.
          For more details type 'help develop;'
 NOTE:    as the Hamburger-Noether development of a reducible curve normally
@@ -1887,7 +1888,7 @@ EXAMPLE: example reddevelop;  shows an example
            "characteristic 0";}
    }
    else {
-     if ((str=="s") and (testerg==1)) {
+     if ((str=="s") and (testerg==1)) { 
        "(*)attention: it could be that the factor is only one in char 32003!";
        f=polyhinueber(test_sqr);
      }
@@ -1953,9 +1954,9 @@ EXAMPLE: example reddevelop;  shows an example
    return(list());
  }
  //---------------------- Test, ob f teilbar durch x oder y -------------------
- if (subst(f,y,0)==0) {
+ if (subst(f,y,0)==0) { 
    f=f/y; NullHNEy=1; }             // y=0 is a solution
- if (subst(f,x,0)==0) {
+ if (subst(f,x,0)==0) { 
    f=f/x; NullHNEx=1; }             // x=0 is a solution
 
  Newton=newtonpoly(f);
@@ -2054,7 +2055,7 @@ EXAMPLE: example reddevelop;  shows an example
  return(Ergebnis);
 }
 example
-{
+{ 
   if (nameof(basering)=="HNEring") {
    def rettering=HNEring;
    kill HNEring;
@@ -2259,53 +2260,53 @@ NOTE: This procedure is only for internal use, it is called via reddevelop
           zaehler++;
         }
         else {
-          " Change of basering necessary!!";
-          if (defined(Protokoll)) { teiler,"is not properly factored!"; }
-          if (needext==0) { poly zerlege=teiler; }
-          needext=1;
+	  " Change of basering necessary!!";
+	  if (defined(Protokoll)) { teiler,"is not properly factored!"; }
+	  if (needext==0) { poly zerlege=teiler; }
+	  needext=1;
         }
       }
      }                             // end(for j)
     }
     else { deltais=ideal(delta); eis=e;}
     if (defined(Protokoll)) {"roots of char. poly:";deltais;
-                             "with multiplicities:",eis;}
+			     "with multiplicities:",eis;}
     if (needext==1) {
  //--------------------- fuehre den Ringwechsel aus: --------------------------
       ringischanged=1;
       if ((size(parstr(basering))>0) && string(minpoly)=="0") {
-        " ** We've had bad luck! The HNE cannot completely be calculated!";
+	" ** We've had bad luck! The HNE cannot completely be calculated!";
                                    // HNE in transzendenter Erw. fehlgeschlagen
         kill zerlege;
-        ringischanged=0; break;    // weiter mit gefundenen Faktoren
+	ringischanged=0; break;    // weiter mit gefundenen Faktoren
       }
       if (parstr(basering)=="") {
-        EXTHNEnumber++;
-        splitring(zerlege,"EXTHNEring("+string(EXTHNEnumber)+")");
-        poly transf=0;
-        poly transfproc=0;
+	EXTHNEnumber++;
+	splitring(zerlege,"EXTHNEring("+string(EXTHNEnumber)+")");
+	poly transf=0;
+	poly transfproc=0;
       }
       else {
-        if (defined(translist)) { kill translist; } // Vermeidung einer Warnung
-        if (numberofRingchanges>1) {  // ein Ringwechsel hat nicht gereicht
-         list translist=splitring(zerlege,"",list(transf,transfproc));
-         poly transf=translist[1]; poly transfproc=translist[2];
+	if (defined(translist)) { kill translist; } // Vermeidung einer Warnung
+	if (numberofRingchanges>1) {  // ein Ringwechsel hat nicht gereicht
+	 list translist=splitring(zerlege,"",list(transf,transfproc));
+	 poly transf=translist[1]; poly transfproc=translist[2];
         }
         else {
-         if (defined(transfproc)) { // in dieser proc geschah schon Ringwechsel
-          EXTHNEnumber++;
-          list translist=splitring(zerlege,"EXTHNEring("
+	 if (defined(transfproc)) { // in dieser proc geschah schon Ringwechsel
+	  EXTHNEnumber++;
+	  list translist=splitring(zerlege,"EXTHNEring("
                +string(EXTHNEnumber)+")",list(a,transfproc));
-          poly transf=translist[1];
+	  poly transf=translist[1];
           poly transfproc=translist[2];
-         }
-         else {
-          EXTHNEnumber++;
-          list translist=splitring(zerlege,"EXTHNEring("
+	 }
+	 else {
+	  EXTHNEnumber++;
+	  list translist=splitring(zerlege,"EXTHNEring("
                +string(EXTHNEnumber)+")",a);
-          poly transf=translist[1];
-          poly transfproc=transf;
-        }}
+	  poly transf=translist[1];
+	  poly transfproc=transf;
+	}}
       }
  //----------------------------------------------------------------------------
  // transf enthaelt jetzt den alten Parameter des Ringes, der aktiv war vor
@@ -2371,13 +2372,13 @@ NOTE: This procedure is only for internal use, it is called via reddevelop
        HNEs=set_list(HNEs,intvec(hnezaehler,1,zeile+1),Q);
                                   // aktualisiere Vektor mit den hqs
        if (eis[j]>1) {
-        transformiert=transformiert/y;
-        if (subst(transformiert,y,0)==0) {
+	transformiert=transformiert/y;
+	if (subst(transformiert,y,0)==0) {
  "THE TEST FOR SQUAREFREENESS WAS BAD!! The polynomial was NOT squarefree!!!";}
-        else {
+	else {
  //------ Spezialfall (###) eingetreten: Noch weitere Zweige vorhanden --------
           eis[j]=eis[j]-1;
-        }
+	}
        }
       }
     }
@@ -2409,7 +2410,7 @@ NOTE: This procedure is only for internal use, it is called via reddevelop
         zl=zl+1;
  //-------- Bereitstellung von Speicherplatz fuer eine neue Zeile: ------------
         HNEs=set_list(HNEs,intvec(hnezaehler,zeile+zl),ideal(0));
-
+               
         M1=N1; N1=R1; R1=M1%N1; Q1=M1 / N1;
        }
        if (defined(Protokoll)) {
@@ -2627,4 +2628,3 @@ example
   factors,flag=extrafactor(f,4,4);
   if (flag!=0) {factors;}
 }
-
