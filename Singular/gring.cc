@@ -6,7 +6,7 @@
  *  Purpose: p_Mult family of procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.16 2002-12-06 20:51:38 levandov Exp $
+ *  Version: $Id: gring.cc,v 1.17 2002-12-06 21:50:09 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -19,6 +19,7 @@
 #include "matpol.h"
 #include "kbuckets.h"
 #include "kstd1.h"
+#include "sbuckets.h"
 
 /* global nc_macros : */
 #define freeT(A,v) omFreeSize((ADDRESS)A,(v+1)*sizeof(Exponent_t))
@@ -81,7 +82,9 @@ poly  nc_p_Mult_mm(poly p, const poly m, const ring r)
   const Exponent_t expM=p_GetComp(m,r);
   Exponent_t expP=0;
   Exponent_t expOut=0;
-  
+
+  sBucket_pt bu_out=sBucketCreate(r);
+
   while (p!=NULL)
   {
     v=p_Head(p,r);
@@ -121,11 +124,15 @@ poly  nc_p_Mult_mm(poly p, const poly m, const ring r)
     v= nc_mm_Mult_nn(P,M,r);
     v=p_Mult_nn(v,cOut,r);
     p_SetCompP(v,expOut,r);
-    out = p_Add_q(out,v,r);
+    /* hats off before buckets! */
+    sBucket_Add_p(bu_out,v,pLength(v));
+    /*    out = p_Add_q(out,v,r); */
     p=p_LmDeleteAndNext(p,r);
   }
   freeT(P,r->N);
   freeT(M,r->N);
+  int len=pLength(out);
+  sBucketDestroyAdd(bu_out, &out, &len);
   p_Test(out,r);
   return(out);
 }
@@ -155,6 +162,8 @@ poly nc_mm_Mult_p(const poly m, poly p, const ring r)
   const Exponent_t expM=p_GetComp(m,r);
   Exponent_t expP=0;
   Exponent_t expOut=0;
+
+  sBucket_pt bu_out=sBucketCreate(r);
   
   while (p!=NULL)
   {
@@ -194,11 +203,16 @@ poly nc_mm_Mult_p(const poly m, poly p, const ring r)
     v= nc_mm_Mult_nn(M,P,r);
     v = p_Mult_nn(v,cOut,r);
     p_SetCompP(v,expOut,r);
-    out = p_Add_q(out,v,r);
+    /* hats off before buckets! */
+    sBucket_Add_p(bu_out,v,pLength(v));
+    /* out = p_Add_q(out,v,r); */
     p_DeleteLm(&p,r);
   }
   freeT(P,r->N);
   freeT(M,r->N);
+  int len=pLength(out);
+  sBucketDestroyAdd(bu_out, &out, &len );
+  p_Test(out,r);
   return(out);
 }
 
@@ -873,7 +887,7 @@ void nc_kBucketPolyRed(kBucket_pt b, poly p, number *c)
   pTest(m);
   poly pp=nc_mm_Mult_p(m,pCopy(p),currRing);
   pDelete(&m);
-  number n=pGetCoeff(pp);
+  number n=nCopy(pGetCoeff(pp));
   number MinusOne=nInit(-1);
   number nn;
   if (!nEqual(n,MinusOne))
@@ -903,7 +917,7 @@ void nc_PolyPolyRed(poly &b, poly p, number *c)
   pTest(m);
   poly pp=nc_mm_Mult_p(m,pCopy(p),currRing);
   pDelete(&m);
-  number n=pGetCoeff(pp);
+  number n=nCopy(pGetCoeff(pp));
   number MinusOne=nInit(-1);
   number nn;
   if (!nEqual(n,MinusOne))
