@@ -1,7 +1,7 @@
-// $Id: standard.lib,v 1.14 1998-05-24 16:48:30 obachman Exp $
+// $Id: standard.lib,v 1.15 1998-05-25 08:44:14 obachman Exp $
 //////////////////////////////////////////////////////////////////////////////
 
-version="$Id: standard.lib,v 1.14 1998-05-24 16:48:30 obachman Exp $";
+version="$Id: standard.lib,v 1.15 1998-05-25 08:44:14 obachman Exp $";
 info="
 LIBRARY: standard.lib   PROCEDURES WHICH ARE ALWAYS LOADED AT START-UP
 
@@ -137,8 +137,8 @@ RETURNS: Standard basis of ideal or module which is computed using a
 NOTE: If a 2nd argument 'wait' is given, then the computation proceeds
       at most 'wait' seconds. That is, if no result could be computed in 
       'wait' seconds, then the computation is interrupted, 0 is returned, 
-       a warning message is displayed, and the global variable 
-       'groebner_error' is defined. 
+      a warning message is displayed, and the global variable 
+      'groebner_error' is defined. 
 EXAMPLE: example groebner; shows an example"
 {
   def P=basering;
