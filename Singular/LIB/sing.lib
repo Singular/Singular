@@ -1,8 +1,8 @@
-// $Id: sing.lib,v 1.18 1999-11-11 16:03:33 Singular Exp $
+// $Id: sing.lib,v 1.19 1999-12-13 15:33:50 obachman Exp $
 //(GMG/BM, last modified 26.06.96)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: sing.lib,v 1.18 1999-11-11 16:03:33 Singular Exp $";
+version="$Id: sing.lib,v 1.19 1999-12-13 15:33:50 obachman Exp $";
 info="
 LIBRARY:  sing.lib      PROCEDURES FOR SINGULARITIES
 AUTHORS:  Gert-Martin Greuel, email: greuel@mathematik.uni-kl.de
@@ -23,9 +23,9 @@ PROCEDURES:
  qhspectrum(f,w);       spectrum numbers of w-homogeneous polynomial f
  Tjurina(i);            SB of Tjurina module of ideal i (assume i is ICIS)
  tjurina(i);            Tjurina number of ideal i (assume i is ICIS)
- T1(i);                 T1-module of ideal i
- T2((i);                T2-module of ideal i
- T12(i);                T1- and T2-module of ideal i
+ T_1(i);                T^1-module of ideal i
+ T_2((i);               T^2-module of ideal i
+ T_12(i);               T^1- and T^2-module of ideal i
 ";
 
 LIB "inout.lib";
@@ -38,7 +38,7 @@ RETURN:  matrix, columns are kbase of infinitesimal deformations
 EXAMPLE: example deform; shows an example
 "
 {
-   list L=T1(id,"");
+   list L=T_1(id,"");
    def K=L[1]; attrib(K,"isSB",1);
    return(L[2]*kbase(K));
 }
@@ -498,29 +498,29 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc T1 (ideal id, list #)
-"USAGE:   T1(id[,<any>]);  id = ideal or poly
-RETURN:  T1(id): of type module/ideal if id is of type ideal/poly.
-         We call T1(id) the T1-module of id. It is a std basis of the
+proc T_1 (ideal id, list #)
+"USAGE:   T_1(id[,<any>]);  id = ideal or poly
+RETURN:  T_1(id): of type module/ideal if id is of type ideal/poly.
+         We call T_1(id) the T_1-module of id. It is a std basis of the
          presentation of 1st order deformations of P/id, if P is the basering.
          If a second argument is present (of any type) return a list of
          3 modules:
-            [1]= T1(id)
+            [1]= T_1(id)
             [2]= generators of normal bundle of id, lifted to P
             [3]= module of relations of [2], lifted to P
                  (note: transpose[3]*[2]=0 mod id)
          The list contains all non-easy objects which must be computed
-         to get T1(id).
-DISPLAY: k-dimension of T1(id) if printlevel >= 0 (default)
-NOTE:    T1(id) itself is usually of minor importance. Nevertheless, from it
+         to get T_1(id).
+DISPLAY: k-dimension of T_1(id) if printlevel >= 0 (default)
+NOTE:    T_1(id) itself is usually of minor importance. Nevertheless, from it
          all relevant information can be obtained. The most important are
-         probably vdim(T1(id)); (which computes the Tjurina number),
-         hilb(T1(id)); and kbase(T1(id));
-         If T1 is called with two argument, then matrix([2])*(kbase([1]))
+         probably vdim(T_1(id)); (which computes the Tjurina number),
+         hilb(T_1(id)); and kbase(T_1(id));
+         If T_1 is called with two argument, then matrix([2])*(kbase([1]))
          represents a basis of 1st order semiuniversal deformation of id
          (use proc 'deform', to get this in a direct way).
          For a complete intersection the proc Tjurina is faster
-EXAMPLE: example T1; shows an example
+EXAMPLE: example T_1; shows an example
 "
 {
    ideal J=simplify(id,10);
@@ -529,7 +529,7 @@ EXAMPLE: example T1; shows an example
   {
      ideal t1  = std(J+jacob(J[1]));
      module nb = [1]; module pnb;
-     dbprint(printlevel-voice+3,"// dim T1 = "+string(vdim(t1)));
+     dbprint(printlevel-voice+3,"// dim T_1 = "+string(vdim(t1)));
      if( size(#)>0 )
      {
         module st1 = t1*gen(1);
@@ -555,9 +555,9 @@ EXAMPLE: example T1; shows an example
    rk=nrows(t1);
 //-------------------------- pull back to basering ----------------------------
    setring P;
-   t1 = fetch(R,t1)+J*freemodule(rk);  // T1-module, presentation of T1
+   t1 = fetch(R,t1)+J*freemodule(rk);  // T_1-module, presentation of T_1
    t1 = std(t1);
-   dbprint(printlevel-voice+3,"// dim T1 = "+string(vdim(t1)));
+   dbprint(printlevel-voice+3,"// dim T_1 = "+string(vdim(t1)));
    if( size(#)>0 )
    {
       module B2 = fetch(R,B(2));        // presentation of normal bundle
@@ -573,9 +573,9 @@ example
    printlevel = 1;
    ring r     = 32003,(x,y,z),(c,ds);
    ideal i    = xy,xz,yz;
-   module T   = T1(i);
-   vdim(T);                      // Tjurina number = dim_K(T1), should be 3
-   list L=T1(i,"");
+   module T   = T_1(i);
+   vdim(T);                      // Tjurina number = dim_K(T_1), should be 3
+   list L=T_1(i,"");
    module kB  = kbase(L[1]);
    print(L[2]*kB);               // basis of 1st order miniversal deformation
    show(L[2]);                   // presentation of normal bundle
@@ -585,23 +585,23 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc T2 (ideal id, list #)
-"USAGE:   T2(id[,<any>]);  id = ideal
-RETURN:  T2(id): T2-module of id . This is a std basis of a presentation of
+proc T_2 (ideal id, list #)
+"USAGE:   T_2(id[,<any>]);  id = ideal
+RETURN:  T_2(id): T_2-module of id . This is a std basis of a presentation of
          the module of obstructions of R=P/id, if P is the basering.
          If a second argument is present (of any type) return a list of
          4 modules and 1 ideal:
-            [1]= T2(id)
+            [1]= T_2(id)
             [2]= standard basis of id (ideal)
             [3]= module of relations of id (=1st syzygy module of id)
             [4]= presentation of syz/kos
             [5]= relations of Hom_P([3]/kos,R), lifted to P
          The list contains all non-easy objects which must be computed
-         to get T2(id).
-DISPLAY: k-dimension of T2(id) if printlevel >= 0 (default)
-NOTE:    The most important information is probably vdim(T2(id)).
+         to get T_2(id).
+DISPLAY: k-dimension of T_2(id) if printlevel >= 0 (default)
+NOTE:    The most important information is probably vdim(T_2(id)).
          Use proc miniversal to get equations of miniversal deformation.
-EXAMPLE: example T2; shows an example
+EXAMPLE: example T_2; shows an example
 "
 {
 //--------------------------- initialisation ----------------------------------
@@ -623,13 +623,13 @@ EXAMPLE: example T2; shows an example
    module t2  = transpose(fetch(P,SK));   // dual of syz/kos
    list B=nres(t2,2);                     // resolve (syz/kos)*
    def B(1..2)=B[1..2]; kill B;
-   t2 = modulo(B(2),A2');                 // presentation of T2
+   t2 = modulo(B(2),A2');                 // presentation of T_2
    rk = nrows(t2);
 //---------------------  fetch back to basering -------------------------------
    setring P;
    t2 = fetch(R,t2)+J*freemodule(rk);
    t2 = std(t2);
-   dbprint(printlevel-voice+3,"// dim T2 = "+string(vdim(t2)));
+   dbprint(printlevel-voice+3,"// dim T_2 = "+string(vdim(t2)));
    if( size(#)>0 )
    {
       B2 = fetch(R,B(2));        // generators of Hom_P(syz/kos,R)
@@ -644,38 +644,38 @@ example
    printlevel = 1;
    ring  r    = 32003,(x,y),(c,dp);
    ideal j    = x6-y4,x6y6,x2y4-x5y2;
-   module T   = T2(j);
+   module T   = T_2(j);
    vdim(T);
    hilb(T);"";
    ring r1    = 0,(x,y,z),dp;
    ideal id   = xy,xz,yz;
-   list L     = T2(id,"");
-   vdim(L[1]);                           // vdim of T2
+   list L     = T_2(id,"");
+   vdim(L[1]);                           // vdim of T_2
    print(L[3]);                          // syzygy module of id
    printlevel = p;
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc T12 (ideal i, list #)
-"USAGE:   T12(i[,any]);  i = ideal
-RETURN:  T12(i): list of 2 modules:
-             std basis of T1-module =T1(i), 1st order deformations
-             std basid of T2-module =T2(i), obstructions of R=P/i
+proc T_12 (ideal i, list #)
+"USAGE:   T_12(i[,any]);  i = ideal
+RETURN:  T_12(i): list of 2 modules:
+             std basis of T_1-module =T_1(i), 1st order deformations
+             std basid of T_2-module =T_2(i), obstructions of R=P/i
          If a second argument is present (of any type) return a list of
          9 modules, matrices, integers:
-             [1]= standard basis of T1-module
-             [2]= standard basis of T2-module
-             [3]= vdim of T1
-             [4]= vdim of T2
+             [1]= standard basis of T_1-module
+             [2]= standard basis of T_2-module
+             [3]= vdim of T_1
+             [4]= vdim of T_2
              [5]= matrix, whose cols present infinitesimal deformations
              [6]= matrix, whose cols are generators of relations of i (=syz(i))
              [7]= matrix, presenting Hom_P(syz/kos,R), lifted to P
-             [8]= presentation of T1-module, no std basis
-             [9]= presentation of T2-module, no std basis
-DISPLAY: k-dimension of T1 and T2 if printlevel >= 0 (default)
+             [8]= presentation of T_1-module, no std basis
+             [9]= presentation of T_2-module, no std basis
+DISPLAY: k-dimension of T_1 and T_2 if printlevel >= 0 (default)
 NOTE:    Use proc miniversal from deform.lib to get miniversal deformation of i,
          the list contains all objects used by proc miniversal
-EXAMPLE: example T12; shows an example
+EXAMPLE: example T_12; shows an example
 "
 {
 //--------------------------- initialisation ----------------------------------
@@ -683,7 +683,7 @@ EXAMPLE: example T12; shows an example
    def P = basering;
    i = simplify(i,10);
    module jac,t1,t2,sbt1,sbt2;
-   matrix Kos,Syz,SK,kbT1,Sx;
+   matrix Kos,Syz,SK,kbT_1,Sx;
    list L;
    ideal  i0 = std(i);
 //-------------------- presentation of non-trivial syzygies -------------------
@@ -701,31 +701,31 @@ EXAMPLE: example T12; shows an example
    matrix Sx  = resS[2];
    list resN  = nres(No,2);
    matrix Nx  = resN[2];
-   module T2  = modulo(Sx,No);                  // presentation of T2
-   r2         = nrows(T2);
-   module T1  = modulo(Nx,Jac);                 // presentation of T1
-   r1         = nrows(T1);
+   module T_2  = modulo(Sx,No);                  // presentation of T_2
+   r2         = nrows(T_2);
+   module T_1  = modulo(Nx,Jac);                 // presentation of T_1
+   r1         = nrows(T_1);
 //------------------------ pull back to basering ------------------------------
    setring P;
-   t1   = fetch(Ox,T1)+i*freemodule(r1);
-   t2   = fetch(Ox,T2)+i*freemodule(r2);
+   t1   = fetch(Ox,T_1)+i*freemodule(r1);
+   t2   = fetch(Ox,T_2)+i*freemodule(r2);
    sbt1 = std(t1);
    d1   = vdim(sbt1);
    sbt2 = std(t2);
    d2   = vdim(sbt2);
-   dbprint(printlevel-voice+3,"// dim T1 = "+string(d1),"// dim T2 = "+string(d2));
+   dbprint(printlevel-voice+3,"// dim T_1 = "+string(d1),"// dim T_2 = "+string(d2));
    if  ( size(#)>0)
    {
      if (d1>0)
      {
-       kbT1 = fetch(Ox,Nx)*kbase(sbt1);
+       kbT_1 = fetch(Ox,Nx)*kbase(sbt1);
      }
      else
      {
-       kbT1 = 0;
+       kbT_1 = 0;
      }
      Sx   = fetch(Ox,Sx);
-     L = sbt1,sbt2,d1,d2,kbT1,Syz,Sx,t1,t2;
+     L = sbt1,sbt2,d1,d2,kbT_1,Syz,Sx,t1,t2;
      return(L);
    }
    L = sbt1,sbt2;
@@ -738,7 +738,7 @@ example
    ring r     = 200,(x,y,z,u,v),(c,ws(4,3,2,3,4));
    ideal i    = xz-y2,yz2-xu,xv-yzu,yu-z3,z2u-yv,zv-u2;
                             //a cyclic quotient singularity
-   list L     = T12(i,1);
+   list L     = T_12(i,1);
    print(L[5]);             //matrix of infin. deformations
    printlevel = p;
 }

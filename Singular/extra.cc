@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.129 1999-12-08 16:49:06 obachman Exp $ */
+/* $Id: extra.cc,v 1.130 1999-12-13 15:33:43 obachman Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -1160,26 +1160,13 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 #endif
-/*==================== thomas =================*/
-    if (strcmp(sys_cmd, "thomas") == 0)
+/*==================== test =================*/
+    if (strcmp(sys_cmd, "test") == 0)
     {
-      ideal id = (ideal) h->Data();
-      id = idCopy(id);
-      ring cr = currRing;
-      ring r = rCurrRingAssure_C_dp();
-      ideal id_r = idrMoveR(id, cr);
-      idTest(id_r);
-      idPrint(id_r);
-      if (r != cr)
-      {
-        rChangeCurrRing(cr, TRUE);
-        id_r = idrMoveR(id_r, r);
-        idTest(id_r);
-        idPrint(id_r);
-        idDelete(&id_r);
-        rKill(r);
-      }
-      return FALSE;
+      intvec v(3);
+      
+      v[4] = 1;
+      
     }
 /*==================== Error =================*/
       Werror( "system(\"%s\",...) %s", sys_cmd, feNotImplemented );

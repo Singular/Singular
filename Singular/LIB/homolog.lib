@@ -1,8 +1,8 @@
-// $Id: homolog.lib,v 1.9 1999-08-03 11:43:06 obachman Exp $
+// $Id: homolog.lib,v 1.10 1999-12-13 15:33:47 obachman Exp $
 //(BM/GMG)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: homolog.lib,v 1.9 1999-08-03 11:43:06 obachman Exp $";
+version="$Id: homolog.lib,v 1.10 1999-12-13 15:33:47 obachman Exp $";
 info="
 LIBRARY:  homolog.lib   PROCEDURES FOR HOMOLOGICAL ALGEBRA
 
@@ -553,6 +553,7 @@ COMPUTE: A presentation of Ext^k(M',N'); for k=v[1],v[2],... where
          M'=coker(M) and N'=coker(N). Let
          0<--M'<-- F0 <-M-- F1 <-- F2 <--...  resp. 0<--N'<-- G0 <--N- G1 be
          a free resolution of M' resp. a presentations of N'. Consider
+@format
                       0                  0                  0
                       |^                 |^                 |^
                --> Hom(Fk-1,N') -Ak-> Hom(Fk,N') -Ak+1-> Hom(Fk+1,N')
@@ -561,13 +562,15 @@ COMPUTE: A presentation of Ext^k(M',N'); for k=v[1],v[2],... where
                                          |^                 |^
                                          |C                 |B
                                       Hom(Fk,G1) -----> Hom(Fk+1,G1)
+@end format
          (Ak,Ak+1 induced by M and B,C induced by N).
          Let K=modulo(Ak+1,B), J=module(Ak)+module(C) and Ext=modulo(K,J),
          then we have exact sequences
                   R^p  --K-> Hom(Fk,G0) --Ak+1-> Hom(Fk+1,G0)/im(B)
          R^q -Ext-> R^p --K->Hom(Fk,G0)/im(Ak)+im(C) --Ak+1->Hom(Fk+1,G0)/im(B)
          Hence Ext presents Ext^k(M',N')
-RETURN:  Ext, of type module, a presentation of Ext^k(M',N') if v is of type
+RETURN:  
+         Ext, of type module, a presentation of Ext^k(M',N') if v is of type
          int, resp. a list of Ext^k (k=v[1],v[2],...) if v is of type intvec.
          In case of a third argument of any type return a list:
            [1] = module Ext/list of Ext^k
@@ -714,6 +717,7 @@ proc Hom (module M, module N, list #)
 COMPUTE: A presentation of Hom(M',N'), M'=coker(M), N'=coker(N) as follows:
          Let ...-->F1 --M-> F0-->M'-->0 and ...-->G1 --N-> G0-->N'-->0  be
          presentations of M' and N'. Consider
+@format
                                          0               0
                                          |^              |^
               0 --> Hom(M',N') ----> Hom(F0,N') ----> Hom(F1,N')
@@ -727,6 +731,7 @@ COMPUTE: A presentation of Hom(M',N'), M'=coker(M), N'=coker(N) as follows:
               R^p  --D-> Hom(F0,G0) --A-> Hom(F1,G0)/im(B)
               R^q -Hom-> R^p --D-> Hom(F0,G0)/im(C) --A-> Hom(F1,G0)/im(B).
          Hence Hom presents Hom(M',N')
+@end format
 RETURN:  Hom, of type module, presentation of Hom(M',N') or,
          in case of 3 arguments, a list:
            [1] = Hom
@@ -844,6 +849,7 @@ proc kernel (matrix A,module M,module N)
 COMPUTE: Let M and N be submodules of R^m and R^n presenting M'=R^m/M, N'=R^n/N
          (R=basering) and let A:R^m-->R^n a matrix inducing a map A':M'-->N'.
          Compute a presentation K of ker(A') as in the commutative diagram:
+@format
                        ker(A') --->  M' --A'--> N'
                            |^        |^         |^
                            |         |          |
@@ -852,6 +858,7 @@ COMPUTE: Let M and N be submodules of R^m and R^n presenting M'=R^m/M, N'=R^n/N
                            |K        |M         |N
                            |         |          |
                           R^s  ---> R^p -----> R^q
+@end format
 RETURN:  module K, a presentation of ker(A')
 EXAMPLE: example kernel; shows examples
 "

@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: mondromy.lib,v 1.10 1999-11-12 11:21:02 mschulze Exp $";
+version="$Id: mondromy.lib,v 1.11 1999-12-13 15:33:48 obachman Exp $";
 info="
 LIBRARY:  mondromy.lib  PROCEDURES TO COMPUTE THE MONODROMY OF A SINGULARITY
 AUTHOR:   Mathias Schulze, email: mschulze@mathematik.uni-kl.de
@@ -17,7 +17,7 @@ PROCEDURES:
  detadj(U);            determinant and adjoint matrix of square matrix U
  jacoblift(f);         lifts f^kappa in jacob(f) with minimal kappa
  monodromy(f[,opt]);   monodromy of isolated hypersurface singularity f
- H''basis(f);          basis of Brieskorn lattice H''
+ H2basis(f);           basis of Brieskorn lattice H''
 ";
 
 LIB "ring.lib";
@@ -915,15 +915,15 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc H''basis(poly f)
-"USAGE:   H''basis(f); f poly
+proc H2basis(poly f)
+"USAGE:   H2basis(f); f poly
 ASSUME:  The polynomial f in a series ring (local ordering) defines
          an isolated hypersurface singularity.
 RETURN:  The procedure returns a list of representatives of a C{f}-basis of the
          Brieskorn lattice H''=Omega^(n+1)/df^dOmega^(n-1).
 THEORY:  H'' is a free C{f}-module of rank milnor(f).
 DISPLAY: The procedure displays more comments for higher printlevel.
-EXAMPLE: example H''basis; shows an example.
+EXAMPLE: example H2basis; shows an example.
 "
 {
   pcvinit();
@@ -1018,6 +1018,6 @@ example
 { "EXAMPLE:"; echo=2;
   ring R=0,(x,y),ds;
   poly f=x2y2+x6+y6;
-  H''basis(f);
+  H2basis(f);
 }
 ///////////////////////////////////////////////////////////////////////////////

@@ -1,13 +1,13 @@
-// $Id: general.lib,v 1.22 1999-10-22 09:07:07 obachman Exp $
+// $Id: general.lib,v 1.23 1999-12-13 15:33:46 obachman Exp $
 //GMG, last modified 18.6.99
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: general.lib,v 1.22 1999-10-22 09:07:07 obachman Exp $";
+version="$Id: general.lib,v 1.23 1999-12-13 15:33:46 obachman Exp $";
 info="
 LIBRARY:  general.lib   PROCEDURES OF GENERAL TYPE
 
 PROCEDURES:
- A_Z(\"a\",n);          string a,b,... of n comma seperated letters
+ A_Z(\"a\",n);          string a,b,... of n comma separated letters
  ASCII([n,m]);          string of printable ASCII characters (number n to m)
  binomial(n,m[,../..]); n choose m (type int), [type string/type number]
  factorial(n[,../..]);  n factorial (=n!) (type int), [type string/number]
@@ -31,7 +31,7 @@ LIB "inout.lib";
 proc A_Z (string s,int n)
 "USAGE:   A_Z(\"a\",n);  a any letter, n integer (-26<= n <=26, !=0)
 RETURN:  string of n small (if a is small) or capital (if a is capital)
-         letters, comma seperated, beginning with a, in alphabetical
+         letters, comma separated, beginning with a, in alphabetical
          order (or revers alphabetical order if n<0)
 EXAMPLE: example A_Z; shows an example
 "
@@ -94,7 +94,7 @@ EXAMPLE: example ASCII; shows an example
 "
 {
   string s1 =
- "     !    \"    #    $       &    '    (    )    *    +    ,    -    .
+ "     !    \"    #    $     &    '    (    )    *    +    ,    -    .
 32   33   34   35   36   37   38   39   40   41   42   43   44   45   46
 /    0    1    2    3    4    5    6    7    8    9    :    ;    <    =
 47   48   49   50   51   52   53   54   55   56   57   58   59   60   61
@@ -136,10 +136,10 @@ example
 proc binomial (int n, int k, list #)
 "USAGE:   binomial(n,k[,p]); n,k,p integers
 RETURN:  binomial(n,k); binomial coefficient n choose k,
-         - of type string (computed in characteristic 0)
+@*         - of type string (computed in characteristic 0)
          binomial(n,k,p); n choose k, computed in characteristic prime(p)
-         - of type number if a basering is present and prime(p)=char(basering)
-         - of type string else
+@*         - of type number if a basering is present and prime(p)=char(basering)
+@*         - of type string else
 NOTE:    In any characteristic, binomial(n,k) = coefficient of x^k in (1+x)^n
 EXAMPLE: example binomial; shows an example
 "

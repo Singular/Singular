@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.56 1999-12-03 11:20:44 obachman Exp $
+@comment $Id: examples.doc,v 1.57 1999-12-13 15:32:44 obachman Exp $
 @comment this file contains the examples
 
 @c The following directives are necessary for proper compilation
@@ -597,21 +597,21 @@ j_0=j_t=a
 @cindex T1
 @cindex T2
 
-T1, resp.@: T2, of an ideal j usually denote the modules of
+@math{T^1}, resp.@: @math{T^2}, of an ideal @math{j} usually denote the modules of
 infinitesimal deformations, resp.@: of obstructions.
-In @sc{Singular} there are procedures @code{T1} and @code{T2} in
+In @sc{Singular} there are procedures @code{T_1} and @code{T_2} in
 @code{sing.lib} such that
-@code{T1(j)} and @code{T2(j)} compute a standard basis of
+@code{T_1(j)} and @code{T_2(j)} compute a standard basis of
 a presentation of these modules.
-If T1 and T2 are finite dimensional K-vector spaces (e.g., for isolated
+If T_1 and T_2 are finite dimensional K-vector spaces (e.g., for isolated
 singularities), a basis can be computed by applying
-@code{kbase(T1(j));}, resp.@: @code{kbase(T2(j));}, the dimensions by
+@code{kbase(T_1(j));}, resp.@: @code{kbase(T_2(j));}, the dimensions by
 applying @code{vdim}.
 For a complete intersection j the procedure @code{Tjurina} also
-computes T1, but faster (T2=0 in this case).
-For a non complete intersection, it is faster to use the procedure @code{T12}
-instead of @code{T1} and @code{T2}.
-Type @code{help T1;} (or @code{help T2;} or @code{help T12;}) to obtain
+computes T_1, but faster (T_2=0 in this case).
+For a non complete intersection, it is faster to use the procedure @code{T_12}
+instead of @code{T_1} and @code{T_2}.
+Type @code{help T_1;} (or @code{help T_2;} or @code{help T_12;}) to obtain
 more detailed information about these procedures.
 
 We give three examples, the first being a hypersurface, the second a complete
@@ -625,13 +625,13 @@ check whether the ideal j is a complete intersection. It is, if
 @item
 compute the Tjurina number
 @item
-compute a vector space basis (kbase) of T1
+compute a vector space basis (kbase) of T_1
 @item
-compute the Hilbert function of T1
+compute the Hilbert function of T_1
 @item
 create a polynomial encoding the Hilbert series
 @item
-compute the dimension of T2
+compute the dimension of T_2
 @end itemize
 
 @smallexample
@@ -653,14 +653,14 @@ compute the dimension of T2
   size(minbase(j));     // minimal number of generators
   tjurina(j);           // Tjurina number
   module T=Tjurina(j);
-  kbase(T);             // a sparse output of the k-basis of T1
-  print(kbase(T));      // columns of matrix are a k-basis of T1
+  kbase(T);             // a sparse output of the k-basis of T_1
+  print(kbase(T));      // columns of matrix are a k-basis of T_1
   // ---------------------------------------
   // general case (cone over rational normal curve of degree 4):
   ring r1=0,(x,y,z,u,v),ds;
   matrix m[2][4]=x,y,z,u,y,z,u,v;
   ideal i=minor(m,2);   // 2x2 minors of matrix m
-  module M=T1(i);       // a presentation matrix of T1
+  module M=T_1(i);       // a presentation matrix of T_1
   vdim(M);              // Tjurina number
   hilb(M);              // display of both Hilbert series
   intvec v1=hilb(M,1);  // first Hilbert series as intvec
@@ -668,7 +668,7 @@ compute the dimension of T2
   v1;
   v2;
   v1[3];                // 3rd coefficient of the 1st Hilbert series
-  module N=T2(i);
+  module N=T_2(i);
 @c example
 @end smallexample
 @smallexample
@@ -689,27 +689,27 @@ diff(h1,t);           // differentiate  h1
 subst(h1,t,1);        // substitute t by 1
 @expansion{} 0
 
-// The procedures T1, T2, T12 may be called with two arguments and then
-// they return a list with more information (type help T1; etc.)
-// e.g., T12(i,<any>); returns a list with 9 nonempty objects where
-// _[1] = std basis of T1-module, _[2] = std basis of T2-module,
-// _[3]= vdim of T1, _[4]= vdim of T2
+// The procedures T_1, T_2, T_12 may be called with two arguments and then
+// they return a list with more information (type help T_1; etc.)
+// e.g., T_12(i,<any>); returns a list with 9 nonempty objects where
+// _[1] = std basis of T_1-module, _[2] = std basis of T_2-module,
+// _[3]= vdim of T_1, _[4]= vdim of T_2
 setring r1;           // make r1 again the basering
-list L = T12(i,1);
-@expansion{} // dim T1  =  4
-@expansion{} // dim T2  =  3
-kbase(L[1]);          // kbase of T1
+list L = T_12(i,1);
+@expansion{} // dim T_1  =  4
+@expansion{} // dim T_2  =  3
+kbase(L[1]);          // kbase of T_1
 @expansion{} _[1]=1*gen(2)
 @expansion{} _[2]=1*gen(3)
 @expansion{} _[3]=1*gen(6)
 @expansion{} _[4]=1*gen(7)
-kbase(L[2]);          // kbase of T2
+kbase(L[2]);          // kbase of T_2
 @expansion{} _[1]=1*gen(6)
 @expansion{} _[2]=1*gen(8)
 @expansion{} _[3]=1*gen(9)
-L[3];                 // vdim of T1
+L[3];                 // vdim of T_1
 @expansion{} 4
-L[4];                 // vdim of T2
+L[4];                 // vdim of T_2
 @expansion{} 3
 @end smallexample
 @c killall();            // a procedure from general.lib

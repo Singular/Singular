@@ -1,8 +1,8 @@
-// $Id: deform.lib,v 1.18 1999-08-19 15:19:52 obachman Exp $
+// $Id: deform.lib,v 1.19 1999-12-13 15:33:45 obachman Exp $
 // author: Bernd Martin email: martin@math.tu-cottbus.de
 //(bm, last modified 4/98)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: deform.lib,v 1.18 1999-08-19 15:19:52 obachman Exp $";
+version="$Id: deform.lib,v 1.19 1999-12-13 15:33:45 obachman Exp $";
 info="
 LIBRARY:  deform.lib       PROCEDURES FOR COMPUTING MINIVERSAL DEFORMATION
 
@@ -83,34 +83,34 @@ EXAMPLE:example versal; shows an example
   def    Po   = basering;
 setring  Po;
   poly   X_s  = product(maxideal(1));
-//-------  reproduce T12 ------------------------------------------------------
-  list   Ls   = T12(Fo,1);
+//-------  reproduce T_12 -----------------------------------------------------
+  list   Ls   = T_12(Fo,1);
   matrix Ro   = Ls[6];                         // syz(i)
   matrix InfD = Ls[5];                         // matrix of inf. deformations
   matrix PreO = Ls[7];                         // representation of (Syz/Kos)*
   module PreO'= std(PreO);
-  module PreT = Ls[2];                         // representation of modT2 (sb)
+  module PreT = Ls[2];                         // representation of modT_2 (sb)
   if(dim(PreT)==0)
   {
-    matrix kbT2 = kbase(PreT);                 // kbase of T2
+    matrix kbT_2 = kbase(PreT);                 // kbase of T_2
   }
   else
   {
-    matrix kbT2 ;                              // kbase of T2 : empty
+    matrix kbT_2 ;                              // kbase of T_2 : empty
   }
-  @t1 = Ls[3];                                 // vdim of T1
-  @t2 = Ls[4];                                 // vdim of T2
+  @t1 = Ls[3];                                 // vdim of T_1
+  @t2 = Ls[4];                                 // vdim of T_2
   kill Ls;
   t1' = @t1;
   if( @t1==0) { dbprint(p,"// rigit!"); return();}
   if( @t2==0) { @smooth=1; dbprint(p,"// smooth base space");}
-  dbprint(p,"// ready: T1 and T2");
+  dbprint(p,"// ready: T_1 and T_2");
   @colR = ncols(Ro);
 //-----  test: quasi-homogeneous, choice of inf. def.--------------------------
   @degrees = homog_test(@is_qh,matrix(Fo),InfD);
   @jv = 1..@t1;
   if (@degrees!="")
-  { dbprint(p-1,"// T1 is quasi-homogeneous represented with weight-vector",
+  { dbprint(p-1,"// T_1 is quasi-homogeneous represented with weight-vector",
     @degrees);
   }
   if (defined(@active))
@@ -159,7 +159,7 @@ setring  Po;
   matrix PreO = imap(Po,PreO);
   module PreO'= imap(Po,PreO');  attrib(PreO',"isSB",1);
   module PreT = imap(Po,PreT);   attrib(PreT,"isSB",1);
-  matrix kbT2 = imap(Po,kbT2);
+  matrix kbT_2 = imap(Po,kbT_2);
   matrix Mon  = fetch(`myPx`,Mon);
   matrix F_R  = fetch(`myPx`,F_R);
   matrix Js[1][@t2];
@@ -177,7 +177,7 @@ setring  Po;
        Cup = matrix(reduce(ideal(Cup),m_J),@colR,1);
        Cup = jet(Cup,@d,@jv);
      }
-//------- express obstructions in kbase of T2  --------------------------------
+//------- express obstructions in kbase of T_2  --------------------------------
      if ( @noObstr==0 )
      {  Cup' = reduce(Cup,PreO');
         tid  = simplify(ideal(Cup'),10);
@@ -186,7 +186,7 @@ setring  Po;
            Cup=Cup-Cup';
         }
         Cup   = lift(PreO,Cup);
-        MASS  = lift_rel_kb(Cup,PreT,kbT2,X_s);
+        MASS  = lift_rel_kb(Cup,PreT,kbT_2,X_s);
         dbprint(p-3,"// next MASSEY-products:",MASS-jet(MASS,@d-1,@jv));
         if    (MASS==transpose(Js))
               { @noObstr=1;dbprint(p-1,"// no obstruction"); }

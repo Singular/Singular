@@ -1,15 +1,22 @@
-// $Id: hnoether.lib,v 1.17 1999-08-31 14:58:38 lamm Exp $
+// $Id: hnoether.lib,v 1.18 1999-12-13 15:33:46 obachman Exp $
 // last change:           31.08.99
 ///////////////////////////////////////////////////////////////////////////////
 // This library is for Singular 1-3-4 or newer
 
-version="$Id: hnoether.lib,v 1.17 1999-08-31 14:58:38 lamm Exp $";
+version="$Id: hnoether.lib,v 1.18 1999-12-13 15:33:46 obachman Exp $";
 info="
-LIBRARY:  hnoether.lib   PROCEDURES FOR THE HAMBURGER-NOETHER DEVELOPMENT
+LIBRARY:  hnoether.lib   Procedures for the Hamburger-Noether (Puiseux) development
 
 AUTHOR:   Martin Lamm,   lamm@mathematik.uni-kl.de
-KEYWORDS: Hamburger-Noether expansion; curve singularities
 
+OVERVIEW:
+           A library for computing the Hamburger-Noether resp. Puiseux
+           development of a plane curve singularity following A. Campillo:
+           Algebroid curves in positive characteristic, Lecture Notes in Math.
+           813, Springer (1980).
+           The library contains also procedures for computing the (topoligical)
+           numerical invariants of plane curve singularities.
+  
 MAIN PROCEDURES:
  HNdevelop(f);       Hamburger-Noether development of f
  develop(f [,n]);    Hamburger-Noether development of irreducible curves
@@ -32,6 +39,8 @@ SUB-PROCEDURES:
  squarefree(f);      returns a squarefree divisor of the poly f
  allsquarefree(f,l); returns the maximal squarefree divisor of the poly f
  further_hn_proc();  show further procedures useful for interactive use
+
+KEYWORDS: Hamburger-Noether expansion; curve singularities
 ";
 ///////////////////////////////////////////////////////////////////////////////
 LIB "primitiv.lib";
