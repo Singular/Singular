@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: mondromy.lib,v 1.2 1999-06-22 14:50:49 mschulze Exp $";
+version="$Id: mondromy.lib,v 1.3 1999-06-22 15:38:54 mschulze Exp $";
 info="
 LIBRARY: mondromy.lib  PROCEDURES TO COMPUTE THE MONODROMY OF A SINGULARITY
 AUTHOR:  Mathias Schulze, email: mschulze@mathematik.uni-kl.de
@@ -148,7 +148,7 @@ proc invunit(poly u,int n)
 ASSUME:  The polynomial u is a series unit.
 RETURN:  The procedure returns the series inverse of u up to order n
          or a zero polynomial if u is no series unit.
-DISPLAY: printlevel>=1; shows comments.
+DISPLAY: The procedure displays comments if printlevel>=1.
 EXAMPLE: example invunit; shows an example.
 "
 {
@@ -163,7 +163,7 @@ EXAMPLE: example invunit; shows an example.
     int t=timer;
     poly v=lift(fetch(br,u),1)[1,1];
     dbprint(printlevel-voice+2,"//...inverse computed ["+string(timer-t)+
-      " secs]");
+      " secs, "+string(memory(1))+" bytes]");
 
     setring br;
     return(fetch(qr,v));
@@ -189,7 +189,7 @@ RETURN:  The procedure returns a list with at most 2 entries.
          If U is a sqaure matrix, then the first entry is the determinant of U.
          If U is a square matrix and the determinant of U not zero, 
          then the second entry is the adjoint matrix of U.
-DISPLAY: printlevel>=1; shows comments.
+DISPLAY: The procedure displays comments if printlevel>=1.
 EXAMPLE: example detadj; shows an example.
 "
 {
@@ -199,7 +199,7 @@ EXAMPLE: example detadj; shows an example.
     int t=timer;
     poly detU=det(U);
     dbprint(printlevel-voice+2,"//...determinant computed ["+string(timer-t)+
-      " secs]");
+      " secs, "+string(memory(1))+" bytes]");
 
     if(detU==0)
     {
@@ -217,7 +217,7 @@ EXAMPLE: example detadj; shows an example.
       t=timer;
       matrix adjU=lift(U,detU*freemodule(nrows(U)));
       dbprint(printlevel-voice+2,"//...adjoint matrix computed ["
-        +string(timer-t)+" secs]");
+        +string(timer-t)+" secs, "+string(memory(1))+" bytes]");
 
       setring br;
       matrix adjU=fetch(pr,adjU);
@@ -249,7 +249,7 @@ ASSUME:  The polynomial f in a series ring (local ordering) defines
 RETURN:  The procedure returns a list with entries kappa, xi, u of type 
          int, vector, poly such that kappa is minimal with f^kappa in jacob(f),
          u is a unit, and u*f^kappa=(matrix(jacob(f))*xi)[1,1].
-DISPLAY: printlevel>=1; shows comments.
+DISPLAY: The procedure displays comments if printlevel>=1.
 EXAMPLE: example jacoblift; shows an example.
 "
 {
@@ -266,17 +266,20 @@ EXAMPLE: example jacoblift; shows an example.
     fkappa=fkappa*f;
   }
   dbprint(printlevel-voice+2,"//kappa="+string(kappa));
-  dbprint(printlevel-voice+2,"//...kappa computed ["+string(timer-t)+" secs]");
+  dbprint(printlevel-voice+2,"//...kappa computed ["+string(timer-t)+" secs, "
+    +string(memory(1))+" bytes]");
 
   dbprint(printlevel-voice+2,"//computing xi...");
   t=timer;
   vector xi=lift(jf,fkappa)[1];
-  dbprint(printlevel-voice+2,"//...xi computed ["+string(timer-t)+" secs]");
+  dbprint(printlevel-voice+2,"//...xi computed ["+string(timer-t)+" secs, "
+    +string(memory(1))+" bytes]");
 
   dbprint(printlevel-voice+2,"//computing u...");
   t=timer;
   poly u=(matrix(jf)*xi)[1,1]/fkappa;
-  dbprint(printlevel-voice+2,"//...u computed ["+string(timer-t)+" secs]");
+  dbprint(printlevel-voice+2,"//...u computed ["+string(timer-t)+" secs, "
+    +string(memory(1))+" bytes]");
 
   return(list(kappa,xi,u));
 }
@@ -361,7 +364,7 @@ static proc incK(poly f,int mu,int K,int deltaK,int N,
   while(codimV(V1+V2,N)<K*mu)
   {
     dbprint(printlevel-voice+2,"//...codimension computed ["+string(timer-t)
-      +" secs]");
+      +" secs, "+string(memory(1))+" bytes]");
 
     deltaP1=getdeltaP1(f,K,N,deltaN);
     V1=pcvladdl(V1,pcvp2cv(P1,N,N+deltaN))+pcvp2cv(deltaP1,0,N+deltaN);
@@ -382,7 +385,7 @@ static proc incK(poly f,int mu,int K,int deltaK,int N,
     t=timer;
   }
   dbprint(printlevel-voice+2,"//...codimension computed ["+string(timer-t)
-    +" secs]");
+    +" secs, "+string(memory(1))+" bytes]");
 
   return(K,N,P1,P2,Pe,V1,V2,Ve);
 }
@@ -422,7 +425,7 @@ static proc MK(poly f,int mu,int kappa,vector xi,poly u,
   int t=timer;
   Vnablae=nablaK(f,kappa,xi,u,N,prevN,Vnablae,e);
   dbprint(printlevel-voice+2,"//...nabla(e) computed ["+string(timer-t)
-    +" secs]");
+    +" secs, "+string(memory(1))+" bytes]");
 
   dbprint(printlevel-voice+2,
     "//lifting nabla(e) to C-basis of H''/t^KH''...");
@@ -433,7 +436,7 @@ static proc MK(poly f,int mu,int kappa,vector xi,poly u,
   t=timer;
   matrix C=lift(W,module(Vnablae[1..size(Vnablae)]));
   dbprint(printlevel-voice+2,"//...nabla(e) lifted ["+string(timer-t)
-    +" secs]");
+    +" secs, "+string(memory(1))+" bytes]");
 
   dbprint(printlevel-voice+2,"//computing e-lift of nabla(e)...");
   t=timer;
@@ -450,7 +453,7 @@ static proc MK(poly f,int mu,int kappa,vector xi,poly u,
     }
   }
   dbprint(printlevel-voice+2,"//...e-lift of nabla(e) computed ["
-    +string(timer-t)+" secs]");
+    +string(timer-t)+" secs, "+string(memory(1))+" bytes]");
 
   return(M,N,Vnablae);
 }
@@ -492,14 +495,16 @@ static proc decmide(matrix M,ideal eM0,list bM0)
     }
     U=syz(M0e)+U;
   }
-  dbprint(printlevel-voice+2,"//...U computed ["+string(timer-t)+" secs]");
+  dbprint(printlevel-voice+2,"//...U computed ["+string(timer-t)+" secs, "
+    +string(memory(1))+" bytes]");
 
   dbprint(printlevel-voice+2,"//transforming M to U...");
   t=timer;
   list daU=detadj(U);
   daU[2]=(1/number(daU[1]))*daU[2];
   M=daU[2]*M*U;
-  dbprint(printlevel-voice+2,"//...M transformed ["+string(timer-t)+" secs]");
+  dbprint(printlevel-voice+2,"//...M transformed ["+string(timer-t)+" secs, "
+    +string(memory(1))+" bytes]");
 
   dbprint(printlevel-voice+2,
     "//computing integer differences of eigenvalues of M0...");
@@ -535,7 +540,7 @@ static proc decmide(matrix M,ideal eM0,list bM0)
   }
   dbprint(printlevel-voice+2,
     "//...integer differences of eigenvalues of M0 computed ["+string(timer-t)
-    +" secs]");
+    +" secs, "+string(memory(1))+" bytes]");
 
   dbprint(printlevel-voice+2,"//transforming M...");
   t=timer;
@@ -560,7 +565,8 @@ static proc decmide(matrix M,ideal eM0,list bM0)
       }
     }
   }
-  dbprint(printlevel-voice+2,"//...M transformed ["+string(timer-t)+" secs]");
+  dbprint(printlevel-voice+2,"//...M transformed ["+string(timer-t)+" secs, "
+    +string(memory(1))+" bytes]");
 
   return(M);
 }
@@ -601,7 +607,8 @@ static proc nonqhmonodromy(poly f,int mu,int opt)
     +"H''=Omega^(n+1)/df^dOmega^(n-1)...");
   int t=timer;
   e=pcvcv2p(quotV(V1+V2,N),0,N);
-  dbprint(printlevel-voice+2,"//...e computed ["+string(timer-t)+" secs]");
+  dbprint(printlevel-voice+2,"//...e computed ["+string(timer-t)+" secs, "
+    +string(memory(1))+" bytes]");
 
   dbprint(printlevel-voice+2,"//e=");
   dbprint(printlevel-voice+2,e);
@@ -630,7 +637,7 @@ static proc nonqhmonodromy(poly f,int mu,int opt)
     for(i=mu-1;i>=1&&size(reduce(U,std(prevU)))>0;i--)
     {
       dbprint(printlevel-voice+2,"//...compared with previous lattice ["
-        +string(timer-t)+" secs]");
+        +string(timer-t)+" secs, "+string(memory(1))+" bytes]");
 
       dbprint(printlevel-voice+2,"//increasing K and N...");
       K,N,P1,P2,Pe,V1,V2,Ve=incK(f,mu,K,kappa-1,N,e,P1,P2,Pe,V1,V2,Ve);
@@ -648,13 +655,13 @@ static proc nonqhmonodromy(poly f,int mu,int opt)
       U=interred(jet(module(U)+module(var(1)*diff(U,var(1)))+
         module(mdivp(M*U,var(1)^(kappa-1))),(kappa-1)*(mu-1)));
       dbprint(printlevel-voice+2,"//...lattice enlarged ["+string(timer-t)
-        +" secs]");
+        +" secs, "+string(memory(1))+" bytes]");
 
       dbprint(printlevel-voice+2,"//comparing with previous lattice...");
       t=timer;
     }
     dbprint(printlevel-voice+2,"//...compared with previous lattice ["
-      +string(timer-t)+" secs]");
+      +string(timer-t)+" secs, "+string(memory(1))+" bytes]");
     dbprint(printlevel-voice+2,"//...t*nabla-stable lattice computed");
 
     if(ncols(U)>nrows(U))
@@ -665,7 +672,7 @@ static proc nonqhmonodromy(poly f,int mu,int opt)
       U=minbase(U);
       dbprint(printlevel-voice+2,
         "//...C{f}-basis of t*nabla-stable lattice computed ["+string(timer-t)
-        +" secs]");
+        +" secs, "+string(memory(1))+" bytes]");
     }
 
     U=mdivp(U,var(1)^pcvmindeg(U));
@@ -698,7 +705,7 @@ static proc nonqhmonodromy(poly f,int mu,int opt)
     M=mdivp(daU[2]*(var(1)^kappa*diff(U,var(1))+M*U),
       leadcoef(daU[1])*var(1)^(kappa+pcvmindeg(daU[1])-1));
     dbprint(printlevel-voice+2,"//...M/t^kappa transformed to simple pole ["
-      +string(timer-t)+" secs]");
+      +string(timer-t)+" secs, "+string(memory(1))+" bytes]");
   }
 
   if(opt==0)
@@ -710,7 +717,7 @@ static proc nonqhmonodromy(poly f,int mu,int opt)
     def eM0,bM0=jd[1..2];
     int delta=mid(eM0);
     dbprint(printlevel-voice+2,"//...delta computed ["+string(timer-t)
-      +" secs]");
+      +" secs, "+string(memory(1))+" bytes]");
 
     dbprint(printlevel-voice+2,"//delta="+string(delta));
 
@@ -742,7 +749,7 @@ static proc nonqhmonodromy(poly f,int mu,int opt)
           var(1)^(kappa+pcvmindeg(daU[1])-1));
         dbprint(printlevel-voice+2,
           "//...M/t^kappa transformed to simple pole ["+string(timer-t)
-          +" secs]");
+          +" secs, "+string(memory(1))+" bytes]");
       }
 
       dbprint(printlevel-voice+2,"//decreasing delta...");
@@ -775,7 +782,8 @@ static proc qhmonodromy(poly f,intvec w)
   dbprint(printlevel-voice+2,"//computing basis e of Milnor algebra...");
   int t=timer;
   ideal e=kbase(std(jacob(f)));
-  dbprint(printlevel-voice+2,"//...e computed ["+string(timer-t)+" secs]");
+  dbprint(printlevel-voice+2,"//...e computed ["+string(timer-t)+" secs, "
+    +string(memory(1))+" bytes]");
 
   dbprint(printlevel-voice+2,
     "//computing Milnor number mu and quasihomogeneous degree d...");
@@ -811,7 +819,7 @@ THEORY:  The procedure uses an algorithm by Brieskorn (See E. Brieskorn,
          and an algorithm of Gerard and Levelt (See R. Gerard, A.H.M. Levelt, 
          Ann. Inst. Fourier, Grenoble 23,1 (1973), pp. 157-195) to transform 
          it to a simple pole.
-DISPLAY: printlevel>=1; shows comments.
+DISPLAY: The procedure displays more comments for higher printlevel.
 EXAMPLE: example monodromy; shows an example.
 "
 {
@@ -855,7 +863,8 @@ EXAMPLE: example monodromy; shows an example.
     dbprint(printlevel-voice+2,"//computing milnor number mu of f...");
     int t=timer;
     int mu=milnor(f);
-    dbprint(printlevel-voice+2,"//...mu computed ["+string(timer-t)+" secs]");
+    dbprint(printlevel-voice+2,"//...mu computed ["+string(timer-t)+" secs, "
+      +string(memory(1))+" bytes]");
 
     dbprint(printlevel-voice+2,"//mu="+string(mu));
 
@@ -912,7 +921,7 @@ ASSUME:  The polynomial f in a series ring (local ordering) defines
 RETURN:  The procedure returns a list of representatives of a C{f}-basis of the
          Brieskorn lattice H''=Omega^(n+1)/df^dOmega^(n-1).
 THEORY:  H'' is a free C{f}-module of rank milnor(f).
-DISPLAY: printlevel>=1; shows comments.
+DISPLAY: The procedure displays more comments for higher printlevel.
 EXAMPLE: example H''basis; shows an example.
 "
 {
@@ -942,7 +951,8 @@ EXAMPLE: example H''basis; shows an example.
     dbprint(printlevel-voice+2,"//computing milnor number mu of f...");
     int t=timer;
     int mu=milnor(f);
-    dbprint(printlevel-voice+2,"//...mu computed ["+string(timer-t)+" secs]");
+    dbprint(printlevel-voice+2,"//...mu computed ["+string(timer-t)+" secs, "
+      +string(memory(1))+" bytes]");
 
     dbprint(printlevel-voice+2,"//mu="+string(mu));
 
@@ -993,7 +1003,8 @@ EXAMPLE: example H''basis; shows an example.
         +"H''=Omega^(n+1)/df^dOmega^(n-1)...");
       t=timer;
       e=pcvcv2p(quotV(V1+V2,N),0,N);
-      dbprint(printlevel-voice+2,"//...e computed ["+string(timer-t)+" secs]");
+      dbprint(printlevel-voice+2,"//...e computed ["+string(timer-t)+" secs, "
+        +string(memory(1))+" bytes]");
 
       dbprint(printlevel-voice+2,"//e=");
       dbprint(printlevel-voice+2,e);

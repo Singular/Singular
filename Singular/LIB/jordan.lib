@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: jordan.lib,v 1.12 1999-06-21 08:45:41 mschulze Exp $";
+version="$Id: jordan.lib,v 1.13 1999-06-22 15:39:03 mschulze Exp $";
 info="
 LIBRARY: jordan.lib  PROCEDURES TO COMPUTE THE JORDAN NORMAL FORM
 AUTHOR:  Mathias Schulze, email: mschulze@mathematik.uni-kl.de
@@ -69,6 +69,7 @@ RETURN:  The procedure returns a list jd with 3 entries of type
          if opt= 2, jd[1] and jd[3] are computed.
          By default, opt=0.
 NOTE:    A non constant polynomial matrix M is replaced by its constant part.
+DISPLAY: The procedure displays comments if printlevel>=1.
 EXAMPLE: example jordan; shows an example.
 "
 {
@@ -385,6 +386,7 @@ proc jordanmatrix(list jd)
 "USAGE:   jordanmatrix(jd); jd list of ideal and list of intvecs
 RETURN:  The procedure returns the Jordan matrix J with eigenvalues jd[1] and
          size jd[2][i][j] of j-th Jordan block with eigenvalue jd[1][i].
+DISPLAY: The procedure displays comments if printlevel>=1.
 EXAMPLE: example jordanmatrix; shows an example.
 "
 {
@@ -476,6 +478,7 @@ proc jordanform(matrix M)
 ASSUME:  The eigenvalues of M are in the coefficient field.
 RETURN:  The procedure returns the Jordan normal form of M.
 NOTE:    A non constant polynomial matrix M is replaced by its constant part.
+DISPLAY: The procedure displays more comments for higher printlevel.
 EXAMPLE: example jordanform; shows an example.
 "
 {
