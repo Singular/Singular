@@ -4,7 +4,7 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id: subexpr.cc,v 1.83 2002-06-26 11:17:10 Singular Exp $ */
+/* $Id: subexpr.cc,v 1.84 2002-11-26 13:56:57 Singular Exp $ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -1246,7 +1246,7 @@ BOOLEAN assumeStdFlag(leftv h)
   if (!hasFlag(h,FLAG_STD))
   {
     if (!TEST_VERB_NSB)
-      Warn("%s is no standardbasis",h->Name());
+      Warn("%s is no standard basis",h->Name());
     return FALSE;
   }
   return TRUE;
@@ -1458,8 +1458,18 @@ void syMake(leftv v,char * id, idhdl packhdl)
 #ifdef HAVE_NS
     if((v->req_packhdl!=basePack) && (v->req_packhdl==currPack))
     {
-      v->req_packhdl=basePack;
-      return syMake(v,id,basePackHdl);
+      h=basePack->idroot->get(id,myynest);
+      if (h!=NULL)
+      {	
+        if (id!=IDID(h)) omFree((ADDRESS)id);
+        v->rtyp = IDHDL;
+        v->data = (char *)h;
+        v->flag = IDFLAG(h);
+        v->name = IDID(h);
+        v->attribute=IDATTR(h);
+        v->req_packhdl=basePack;
+        return;
+      }
     }
 #endif
   }
