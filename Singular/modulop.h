@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.h,v 1.18 2003-02-10 18:23:21 Singular Exp $ */
+/* $Id: modulop.h,v 1.19 2003-05-26 13:13:00 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
@@ -21,9 +21,9 @@
 #define NV_OPS
 #define NV_MAX_PRIME 32003
 
-extern int npPrimeM;
+extern long npPrimeM;
 extern int npGen;
-extern int npMapPrime;
+extern long npMapPrime;
 
 BOOLEAN npGreaterZero (number k);
 number  npMult        (number a, number b);
@@ -58,7 +58,7 @@ number  npMapP(number from);
 extern CARDINAL *npInvTable;
 #else
 #ifndef HAVE_MULT_MOD
-extern int npPminus1M;
+extern long npPminus1M;
 extern CARDINAL *npExpTable;
 extern CARDINAL *npLogTable;
 #endif
@@ -89,7 +89,7 @@ static inline number npMultM(number a, number b)
 #else
 static inline number npMultM(number a, number b)
 {
-  int x = npLogTable[(int)a]+npLogTable[(int)b];
+  int x = npLogTable[(long)a]+npLogTable[(long)b];
   return (number)npExpTable[x<npPminus1M ? x : x-npPminus1M];
 }
 #endif
@@ -117,7 +117,7 @@ inline number npSubAsm(number a, number b, int m)
 #ifdef HAVE_GENERIC_ADD
 static inline number npAddM(number a, number b)
 {
-  int r = (int)a + (int)b;
+  long r = (long)a + (long)b;
   return (number)(r >= npPrimeM ? r - npPrimeM : r);
 }
 static inline number npSubM(number a, number b)
@@ -128,14 +128,14 @@ static inline number npSubM(number a, number b)
 #else
 static inline number npAddM(number a, number b)
 {
-   int res = (int)a + (int)b;
+   int res = (int)((long)a + (long)b);
    res -= npPrimeM;
    res += (res >> 31) & npPrimeM;
    return (number)res;
 }
 static inline number npSubM(number a, number b)
 {
-   int res = (int)a - (int)b;
+   int res = (int)((long)a - (long)b);
    res += (res >> 31) & npPrimeM;
    return (number)res;
 }
@@ -143,18 +143,18 @@ static inline number npSubM(number a, number b)
 
 static inline BOOLEAN npIsZeroM (number  a)
 {
-  return 0 == (int)a;
+  return 0 == (long)a;
 }
 
 /*
 *inline number npMultM(number a, number b)
 *{
-*  return (number)(((int)a*(int)b) % npPrimeM);
+*  return (number)(((long)a*(long)b) % npPrimeM);
 *}
 */
 
-#define npNegM(A)      (number)(npPrimeM-(int)(A))
-#define npEqualM(A,B)  ((int)A==(int)B)
+#define npNegM(A)      (number)(npPrimeM-(long)(A))
+#define npEqualM(A,B)  ((A)==(B))
 
 
 #ifdef NV_OPS
