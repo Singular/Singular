@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C -*- */
-/* $Id: memutil.c,v 1.3 1997-06-19 12:22:18 schmidt Exp $ */
+/* $Id: memutil.c,v 1.4 2004-02-02 18:04:09 Singular Exp $ */
 
 #define _POSIX_SOURCE 1
 
@@ -88,8 +88,13 @@ void freeBlock ( void* block, size_t size )
 
 void* reallocBlock ( void* block, size_t oldsize, size_t newsize )
 {
-    void* dummy = getBlock( newsize );
-    memcpy( dummy, block, (newsize < oldsize) ? newsize : oldsize );
-    freeBlock( block, oldsize );
-    return dummy;
+#if 1
+  char* dum = (char*)block - 4;
+  int size = *((int*)dum);
+  if (newsize <= size) return block;
+#endif
+  void* dummy = getBlock( newsize );
+  memcpy( dummy, block, newsize < oldsize ? newsize : oldsize );
+  freeBlock( block, oldsize );
+  return dummy;
 }
