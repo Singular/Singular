@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.342 2005-02-22 15:28:10 Singular Exp $ */
+/* $Id: iparith.cc,v 1.343 2005-04-01 15:16:09 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -4727,11 +4727,9 @@ static BOOLEAN jjPREIMAGE(leftv res, leftv u, leftv v, leftv w)
       if (((currRing->qideal!=NULL) && (pOrdSgn==-1))
       || ((rr->qideal!=NULL) && (rr->OrdSgn==-1)))
       {
-        WerrorS("cannot compute preimage in local qring");
-        return TRUE;
+        WarnS("preimage in local qring may be wrong: use Ring::preimageLoc instead");
       }
-      else
-        res->data=(char *)maGetPreimage(rr,mapping,IDIDEAL(h));
+      res->data=(char *)maGetPreimage(rr,mapping,IDIDEAL(h));
     }
     else
     {
