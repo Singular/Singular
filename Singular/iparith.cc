@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.151 1999-06-14 16:35:34 Singular Exp $ */
+/* $Id: iparith.cc,v 1.152 1999-06-22 11:22:23 pohl Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2461,7 +2461,10 @@ static BOOLEAN jjDET(leftv res, leftv v)
   }
 nonconst:
 //  res->data = (char *)mpDet(m);
-  poly p = mpDetBareiss(m);
+//  poly p = mpDetBareiss(m);
+    ideal I=idMatrix2Module(m);
+    poly p=smCallDet(I);
+    idDelete(&I);
 #ifdef PDEBUG
   poly old = mpDet(m);
   if (!pEqual(p,old))
