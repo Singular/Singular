@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.155 2001-01-30 13:37:02 Singular Exp $ */
+/* $Id: ring.cc,v 1.156 2001-01-31 17:55:28 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -494,6 +494,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
     if ((pn->next!=NULL) && (pn->next->Typ()==INT_CMD))
     {
       float_len=(int)pn->next->Data();
+      float_len2=float_len;
       pn=pn->next;
       if ((pn->next!=NULL) && (pn->next->Typ()==INT_CMD))
       {
@@ -558,7 +559,6 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   R->ch = ch;
   if (ch == -1)
   {
-    if (float_len2==0) float_len2=float_len;
     R->float_len= min(float_len,32767);
     R->float_len2= min(float_len2,32767);
   }
@@ -592,7 +592,10 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   if ((R->ch == - 1)
   && (R->parameter !=NULL)
   && (R->float_len < SHORT_REAL_LENGTH))
+  {
     R->float_len = SHORT_REAL_LENGTH;
+    R->float_len = 1;
+  }  
 
   /* names and number of variables-------------------------------------*/
   R->N = rv->listLength();
@@ -708,7 +711,7 @@ void rWrite(ring r)
       Print("0 (real:%d digits, additional %d digits)\n",
              r->float_len,r->float_len2);  /* long R */
     else if ( rField_is_long_C(r) )
-      Print("0 (complex:%d digits, , additional %d digits)\n",
+      Print("0 (complex:%d digits, additional %d digits)\n",
              r->float_len, r->float_len2);  /* long C */
     else
       Print ("%d\n",rChar(r)); /* Fp(a) */
