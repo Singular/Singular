@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: pdata.doc,v 1.17 1999-08-06 14:06:46 obachman Exp $
+@comment $Id: pdata.doc,v 1.18 1999-08-17 06:36:23 wichmann Exp $
 @comment this file contains the "Polynomial data" appendix.
 
 @c The following directives are necessary for proper compilation
@@ -43,9 +43,9 @@ w.r.t@:. the monomial ordering.
 Hence, in order to define such an object in @sc{Singular},
 one has to give a list of polynomials in a specific format.
 
-For ideals, resp@:. matrices, this is straight forward:
+For ideals, resp.@: matrices, this is straight forward:
 The user gives a list of polynomials
-which generate the ideal, resp@:. which are the entries of the matrix.
+which generate the ideal, resp.@:local/Singular/ which are the entries of the matrix.
 (The number of rows and columns has to be given when creating the matrix.)
 
 A vector  in @sc{Singular} is always an element of a free module over the
@@ -76,8 +76,9 @@ $[f_1,...,f_n]$
 [f_1,...,f_n]
 @end ifinfo
 is given as output only if the monomial ordering gives priority to the
-component, i.e@:., is of the form @code{(c,...)} (see @ref{Module orderings}).
-However, in any case the procedure @code{show} from the library @code{inout.lib} displays the bracket form.
+component, i.e@:., is of the form @code{(c,...)} (see @ref{Module
+orderings}).  However, in any case the procedure @code{show} from the
+library @code{inout.lib} displays the bracket format.
 
 A vector
 @tex
@@ -177,7 +178,7 @@ nrows(v_i).
 @end ifinfo
 
 If one wants to create a module with a larger rank than given by its
-generators, one has to use the command @code{attrib(m,"rank",r)} (see
+generators, one has to use the command @code{attrib(M,"rank",r)} (see
 @ref{attrib}, @ref{nrows}) or to define a matrix first, then converting it
 into a module.  Modules in @sc{Singular} are almost the same as
 matrices, they may be considered as sparse representations of matrices.
@@ -278,7 +279,7 @@ N as N=R^n/std(M)).
 @end ifinfo
 However, @code{dim(M)}, resp.@: @code{vdim(M)}, returns
 @tex
-dim$(R^n/M)$, resp. dim$_k(R^n/M)$
+dim$(R^n/M)$, resp.@: dim$_k(R^n/M)$
 @end tex
 @ifinfo
 dim(R^n/M), resp.@: dim_k(R^n/M)
@@ -311,7 +312,7 @@ Refer to the description of each function in
 @ref{Functions} to get information which module the function deals with.
 
 The numbering in @code{res} and other commands for computing resolutions
-refer to a resolution of
+refers to a resolution of
 @tex
 $N = R^n/M$
 @end tex
@@ -357,7 +358,7 @@ computes a normal form of a polynomial f in a quotient ring (cf.@:
 @cindex monomial orderings introduction
 
 @sc{Singular} offers a great variety of monomial orderings which provide
-an enourmous functionality, if used diligently. However, this
+an enormous functionality, if used diligently. However, this
 flexibility might also be confusing for the novice user.  Therefore, we
 recommend to those not familiar with monomial orderings to generally use
 the ordering @code{dp} for computations in the polynomial ring
@@ -369,17 +370,35 @@ K[x1,...,xn],
 @end ifinfo
 resp.@:  @code{ds} for computations in the localization 
 @tex
-$\hbox{Loc}_{(x)}K[x_1,\ldots,x_n])$.
+$\hbox{Loc}_{(x)}K[x_1,\ldots,x_n]$.
 @end tex
 @ifinfo
-Loc_(x)K[x1,...,xn]).
+Loc_(x)K[x1,...,xn].
 @end ifinfo
 
 For inhomogenous input ideals,  standard (resp.@: groebner) bases
 computations are generally faster 
-with the orderings Wp(w_1, @dots{}, w_n) (resp.@: Ws(w_1, @dots{}, w_n))
-if the input is quasihomogenous w.r.t. the weights w_1, @dots{}, w_n of
-x_1, @dots{}, x_n. 
+with the orderings 
+@tex
+$\hbox{Wp}(w_1, \ldots, w_n)$
+@end tex
+@ifinfo
+Wp(w_1, ..., w_n)
+@end ifinfo
+(resp.@: 
+@tex
+$\hbox{Ws}(w_1, \ldots, w_n)$)
+@end tex
+@ifinfo
+Ws(w_1, ..., w_n))
+@end ifinfo
+if the input is quasihomogenous w.r.t. the weights 
+@tex
+$w_1$, $\ldots$, $w_n$ of $x_1$, $\ldots$, $x_n$. 
+@end tex
+@ifinfo
+w_1, ..., w_n of x_1, ..., x_n. 
+@end ifinfo
 
 If the output needs to be "triangular" (resp.@: "block-triangular"), the
 lexicographical ordering @code{lp} (resp.@: lexicographical
@@ -492,10 +511,10 @@ $x^\alpha < x^\beta  \Leftrightarrow  \exists\; 1 \le i \le n :
 degree reverse lexicographical ordering:
 @*
 @ifinfo 
-Let deg(x^a) = a_1 + @dots{} + a_n, then
+let deg(x^a) = a_1 + @dots{} + a_n, then
 @end ifinfo
 @tex
-Let $\deg(x^\alpha) = \alpha_1 + \cdots + \alpha_n,$ then
+let $\deg(x^\alpha) = \alpha_1 + \cdots + \alpha_n,$ then
 @end tex
 @ifinfo
 @*x^a < x^b <==>
@@ -505,7 +524,7 @@ Let $\deg(x^\alpha) = \alpha_1 + \cdots + \alpha_n,$ then
 @*     a_n = b_n, @dots{}, a_(i+1) = b_(i+1), a_i > b_i.
 @end ifinfo
 @tex
-    $x^\alpha < x^\beta \Leftrightarrow \deg(x^\alpha) < \deg(x^\beta)$, or
+    $x^\alpha < x^\beta \Leftrightarrow \deg(x^\alpha) < \deg(x^\beta)$ or
 @end tex
 @iftex
 @*
@@ -519,10 +538,10 @@ Let $\deg(x^\alpha) = \alpha_1 + \cdots + \alpha_n,$ then
 degree lexicographical ordering:
 @*
 @ifinfo 
-Let deg(x^a) = a_1 + @dots{} + a_n, then
+let deg(x^a) = a_1 + @dots{} + a_n, then
 @end ifinfo
 @tex
-Let $\deg(x^\alpha) = \alpha_1 + \cdots + \alpha_n,$ then
+let $\deg(x^\alpha) = \alpha_1 + \cdots + \alpha_n,$ then
 @end tex
 @ifinfo
 @*x^a < x^b <==>
@@ -532,7 +551,7 @@ Let $\deg(x^\alpha) = \alpha_1 + \cdots + \alpha_n,$ then
 @*     a_1 = b_1, @dots{}, a_(i-1) = b_(i-1), a_i < b_i.
 @end ifinfo
 @tex
-    $x^\alpha < x^\beta \Leftrightarrow \deg(x^\alpha) < \deg(x^\beta)$, or
+    $x^\alpha < x^\beta \Leftrightarrow \deg(x^\alpha) < \deg(x^\beta)$ or
 @end tex
 @iftex
 @*
@@ -624,10 +643,10 @@ $x^\alpha < x^\beta  \Leftrightarrow  \exists\; 1 \le i \le n :
 negative degree reverse lexicographical ordering:
 @*
 @ifinfo 
-Let deg(x^a) = a_1 + @dots{} + a_n, then
+let deg(x^a) = a_1 + @dots{} + a_n, then
 @end ifinfo
 @tex
-Let $\deg(x^\alpha) = \alpha_1 + \cdots + \alpha_n,$ then
+let $\deg(x^\alpha) = \alpha_1 + \cdots + \alpha_n,$ then
 @end tex
 @ifinfo
 @*x^a < x^b <==>
@@ -637,7 +656,7 @@ Let $\deg(x^\alpha) = \alpha_1 + \cdots + \alpha_n,$ then
 @*     a_n = b_n, @dots{}, a_(i+1) = b_(i+1), a_i > b_i.
 @end ifinfo
 @tex
-    $x^\alpha < x^\beta \Leftrightarrow \deg(x^\alpha) > \deg(x^\beta)$, or
+    $x^\alpha < x^\beta \Leftrightarrow \deg(x^\alpha) > \deg(x^\beta)$ or
 @end tex
 @iftex
 @*
@@ -651,10 +670,10 @@ Let $\deg(x^\alpha) = \alpha_1 + \cdots + \alpha_n,$ then
 negative degree lexicographical ordering:
 @*
 @ifinfo
-Let deg(x^a) = a_1 + @dots{} + a_n, then
+let deg(x^a) = a_1 + @dots{} + a_n, then
 @end ifinfo
 @tex
-Let $\deg(x^\alpha) = \alpha_1 + \cdots + \alpha_n,$ then
+let $\deg(x^\alpha) = \alpha_1 + \cdots + \alpha_n,$ then
 @end tex
 @ifinfo
 x^a < x^b <==>
@@ -664,7 +683,7 @@ x^a < x^b <==>
 @*     a_1 = b_1, @dots{}, a_(i-1) = b_(i-1), a_i < b_i.
 @end ifinfo
 @tex
-    $x^\alpha < x^\beta \Leftrightarrow \deg(x^\alpha) > \deg(x^\beta)$, or 
+    $x^\alpha < x^\beta \Leftrightarrow \deg(x^\alpha) > \deg(x^\beta)$ or 
 @end tex
 @iftex
 @*
@@ -890,15 +909,14 @@ The output of a vector v in K[x]^r with components v_1,
 The output of a vector $v$ in $K[x]^r$ with components $v_1,
 \ldots, v_r$ has the format $v_1 * gen(1) + \ldots + v_r * gen(r)$
 @end tex
-unless the ordering starts with @code{c}.
+(up to permutation) unless the ordering starts with @code{c}.
 @ifinfo
 In this case a vector is written as [v_1, @dots{}, v_r].
 @end ifinfo
 @tex
 In this case a vector is written as $[v_1, \ldots, v_r]$.
 @end tex
-In all cases @sc{Singular} can read the
-input in both formats.
+In all cases @sc{Singular} can read input in both formats.
 
 @c --------------------------------------------------------------------------
 @node Matrix orderings, Product orderings, Module orderings, Monomial orderings
@@ -912,7 +930,14 @@ $M$
 @ifinfo
 M
 @end ifinfo
-be an invertible n x n matrix with integer coefficients and
+be an invertible 
+@tex
+$(n \times n)$-matrix
+@end tex
+@ifinfo
+(n x n)-matrix
+@end ifinfo
+with integer coefficients and
 @ifinfo
 M_1, @dots{}, M_n the rows of M.
 @end ifinfo
@@ -1148,9 +1173,7 @@ $\left(\matrix{
 @*@strong{Example}:
 @smallexample
 @c example
-  ring r = 0, (x,y,z), M(1, 0, 0,
-                         0, 1, 0,
-                         0, 0, 1);
+  ring r = 0, (x,y,z), M(1, 0, 0,   0, 1, 0,   0, 0, 1);
 @c example
 @end smallexample
 @*which may also be written as:
