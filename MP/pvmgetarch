@@ -48,8 +48,8 @@ if [ -f /bin/uname -o -f /usr/bin/uname ]; then
 	*,88k )                 ARCH=E88K ;;
 	*,mips )                ARCH=MIPS ;;
 	*,CRAY-2 )              ARCH=CRAY2 ;;
-	Linux,i[345]86 )        ARCH=LINUX ;;
-	BSD/OS,i[345]86 )       ARCH=BSD386 ;;
+	Linux,i[3456]86 )       ARCH=LINUX ;;
+	BSD/OS,i[3456]86 )      ARCH=BSD386 ;;
 	FreeBSD,i386 )          ARCH=FREEBSD ;;
 	SUPER-UX,SX-3 )         ARCH=SX3 ;;
 	uts,* )                 ARCH=UTS2 ;;
