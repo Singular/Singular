@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_cf.h,v 1.3 1997-06-19 12:22:49 schmidt Exp $ */
+/* $Id: int_cf.h,v 1.4 1997-07-14 13:47:23 schmidt Exp $ */
 
 #ifndef INCL_INT_CF_H
 #define INCL_INT_CF_H
@@ -93,7 +93,5 @@ public:
     virtual int taildegree();
     virtual CanonicalForm tailcoeff();
 };
-
-#define OBJDEL( x ) if ( (x)->deleteObject() ) delete (x)
 
 #endif /* ! INCL_INT_CF_H */
