@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.76 2000-12-21 16:37:49 obachman Exp $ */
+/* $Id: kstd1.cc,v 1.77 2000-12-31 15:14:33 obachman Exp $ */
 /*
 * ABSTRACT:
 */
@@ -10,7 +10,7 @@
 #define MORA_USE_BUCKETS
 
 // define if tailrings should be used
-// #define HAVE_TAIL_RING
+#define HAVE_TAIL_RING
 
 #include "mod2.h"
 #include "tok.h"
@@ -737,6 +737,7 @@ void updateL(kStrategy strat)
       if (pNext(strat->L[j].p) == strat->tail)
       {
         pLmFree(strat->L[j].p);    /*deletes the short spoly and computes*/
+        strat->L[j].p = NULL;
         poly m1 = NULL, m2 = NULL;
         // check that spoly creation is ok 
         while (strat->tailRing != currRing && 
@@ -751,6 +752,7 @@ void updateL(kStrategy strat)
         ksCreateSpoly(&(strat->L[j]), strat->kNoetherTail(), FALSE, 
                       strat->tailRing, m1, m2, strat->R);
 
+        strat->L[j].SetLmCurrRing();
         if (!strat->honey)
           strat->initEcart(&strat->L[j]);
         else
@@ -794,6 +796,7 @@ void updateLHC(kStrategy strat)
       else
       {
         pLmFree(strat->L[i].p);
+        strat->L[i].p = NULL;
         poly m1 = NULL, m2 = NULL;
         // check that spoly creation is ok 
         while (strat->tailRing != currRing && 
@@ -809,6 +812,7 @@ void updateLHC(kStrategy strat)
                       strat->tailRing, m1, m2, strat->R);
         if (! strat->L[i].IsNull())
         {
+          strat->L[i].SetLmCurrRing();
           strat->L[i].SetpFDeg();
           strat->L[i].ecart 
             = strat->L[i].pLDeg(strat->LDegLast) - strat->L[i].GetpFDeg();

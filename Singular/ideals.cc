@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.118 2000-12-14 16:38:48 obachman Exp $ */
+/* $Id: ideals.cc,v 1.119 2000-12-31 15:14:30 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -2591,6 +2591,8 @@ ideal idVec2Ideal(poly vec)
    return result;
 }
 
+// #define NEW_STUFF
+#ifndef NEW_STUFF
 // converts mat to module, destroys mat
 ideal idMatrix2Module(matrix mat)
 {
@@ -2621,6 +2623,39 @@ ideal idMatrix2Module(matrix mat)
   idDelete((ideal*) &mat);
   return result;
 }
+#else
+
+#include "sbuckets.h"
+
+// converts mat to module, destroys mat
+ideal idMatrix2Module(matrix mat)
+{
+  ideal result = idInit(MATCOLS(mat),MATROWS(mat));
+  int i,j, l;
+  poly h;
+  poly p;
+  sBucket_pt bucket = sBucketInit(currRing);
+
+  for(j=0;j<MATCOLS(mat);j++) /* j is also index in result->m */
+  {
+    for (i=1;i<=MATROWS(mat);i++)
+    {
+      h = MATELEM(mat,i,j+1);
+      if (h!=NULL)
+      {
+        MATELEM(mat,i,j+1)=NULL;
+        p_SetCompP(h,i, currRing, &l);
+        sBucket_Merge_p(bucket, h, l);
+      }
+    }
+    sBucketClearMerge(bucket, &(result->m[j]), &l);
+  }
+  
+  // obachman: need to clean this up
+  idDelete((ideal*) &mat);
+  return result;
+}
+#endif
 
 /*2
 * converts a module into a matrix, destroyes the input
@@ -2666,7 +2701,7 @@ matrix idModule2Matrix(ideal mod)
       MATELEM(result,cp,i+1) = pAdd(MATELEM(result,cp,i+1),h);
     }
   }
-// obachman 10/99: added the following line, otherwise memory lack!
+  // obachman 10/99: added the following line, otherwise memory leack!
   idDelete(&mod);
   return result;
 }

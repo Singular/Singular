@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.91 2000-12-21 16:37:50 obachman Exp $ */
+/* $Id: kutil.cc,v 1.92 2000-12-31 15:14:33 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -695,10 +695,10 @@ BOOLEAN kTest (kStrategy strat)
     for (i=0; i<=strat->Ll; i++)
     {
       kFalseReturn(kTest_L(&(strat->L[i]), strat->tailRing,
-                           (pNext(strat->L[i].p) != strat->tail), i,
+                           strat->L[i].Next() != strat->tail, i,
                            strat->T, strat->tl));
-      if (strat->use_buckets && pNext(strat->L[i].p) != strat->tail && 
-          strat->L[i].p1 != NULL)
+      if (strat->use_buckets && strat->L[i].Next() != strat->tail && 
+          strat->L[i].Next() != NULL && strat->L[i].p1 != NULL)
       {
         assume(strat->L[i].bucket != NULL);
       }

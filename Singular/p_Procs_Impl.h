@@ -6,7 +6,7 @@
  *  Purpose: implementation of primitive procs for polys
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: p_Procs_Impl.h,v 1.3 2000-12-20 17:18:52 obachman Exp $
+ *  Version: $Id: p_Procs_Impl.h,v 1.4 2000-12-31 15:14:39 obachman Exp $
  *******************************************************************/
 #ifndef P_PROCS_IMPL_H
 #define P_PROCS_IMPL_H
@@ -187,6 +187,7 @@ typedef enum p_Proc
   p_Minus_mm_Mult_qq_Proc,
   p_Neg_Proc,
   pp_Mult_Coeff_mm_DivSelect_Proc,
+  pp_Mult_Coeff_mm_DivSelectMult_Proc,
   p_Merge_q_Proc,
   p_kBucketSetLm_Proc,
   p_Unknown_Proc
@@ -276,6 +277,7 @@ static inline char* p_ProcEnum_2_String(p_Proc proc)
       case p_Minus_mm_Mult_qq_Proc: return "p_Minus_mm_Mult_qq_Proc";
       case p_Neg_Proc: return "p_Neg_Proc";
       case pp_Mult_Coeff_mm_DivSelect_Proc: return "pp_Mult_Coeff_mm_DivSelect_Proc";
+      case pp_Mult_Coeff_mm_DivSelectMult_Proc: return "pp_Mult_Coeff_mm_DivSelectMult_Proc";
       case p_Merge_q_Proc: return "p_Merge_q_Proc";
       case p_kBucketSetLm_Proc: return "p_kBucketSetLm_Proc";
       case p_Unknown_Proc: return "p_Unknown_Proc";
@@ -518,7 +520,17 @@ static inline void FastProcFilter(p_Proc proc, p_Field &field,
       case pp_Mult_mm_Noether_Proc:
         pp_Mult_mm_Noether_Filter(field, length, ord);
         break;
-        
+
+        case pp_Mult_Coeff_mm_DivSelectMult_Proc:
+          if (length == LengthOne)
+          {
+            field = FieldGeneral;
+            length = LengthGeneral;
+            ord = OrdGeneral;
+            return;
+          }
+          break;
+          
       default: break;
   }
 
@@ -589,6 +601,7 @@ static inline int index(p_Proc proc, p_Field field, p_Length length, p_Ord ord)
       case p_Mult_mm_Proc:
       case pp_Mult_nn_Proc:
       case pp_Mult_Coeff_mm_DivSelect_Proc:
+      case pp_Mult_Coeff_mm_DivSelectMult_Proc:
         return index(field, length);
 
       case p_Add_q_Proc:
@@ -626,24 +639,25 @@ do                                                          \
 }                                                           \
 while (0)                                                   \
   
-#define SetProcs(field, length, ord)                                \
-do                                                                  \
-{                                                                   \
-  SetProc(p_Delete, field, LengthGeneral, OrdGeneral);              \
-  SetProc(p_Mult_nn, field, LengthGeneral, OrdGeneral);             \
-  SetProc(pp_Mult_nn, field, length, OrdGeneral);                   \
-  SetProc(p_ShallowCopyDelete, FieldGeneral, length, OrdGeneral);   \
-  SetProc(p_Copy, field, length, OrdGeneral);                       \
-  SetProc(pp_Mult_mm, field, length, OrdGeneral);                   \
-  SetProc(pp_Mult_mm_Noether, field, length, ord);                  \
-  SetProc(p_Mult_mm, field, length, OrdGeneral);                    \
-  SetProc(p_Add_q, field, length, ord);                             \
-  SetProc(p_Minus_mm_Mult_qq, field, length, ord);                  \
-  SetProc(p_kBucketSetLm, field, length, ord);                      \
-  SetProc(p_Neg, field, LengthGeneral, OrdGeneral);                 \
-  SetProc(pp_Mult_Coeff_mm_DivSelect, field, length, OrdGeneral);   \
-  SetProc(p_Merge_q, FieldGeneral, length, ord);                    \
-}                                                                   \
+#define SetProcs(field, length, ord)                                    \
+do                                                                      \
+{                                                                       \
+  SetProc(p_Delete, field, LengthGeneral, OrdGeneral);                  \
+  SetProc(p_Mult_nn, field, LengthGeneral, OrdGeneral);                 \
+  SetProc(pp_Mult_nn, field, length, OrdGeneral);                       \
+  SetProc(p_ShallowCopyDelete, FieldGeneral, length, OrdGeneral);       \
+  SetProc(p_Copy, field, length, OrdGeneral);                           \
+  SetProc(pp_Mult_mm, field, length, OrdGeneral);                       \
+  SetProc(pp_Mult_mm_Noether, field, length, ord);                      \
+  SetProc(p_Mult_mm, field, length, OrdGeneral);                        \
+  SetProc(p_Add_q, field, length, ord);                                 \
+  SetProc(p_Minus_mm_Mult_qq, field, length, ord);                      \
+  SetProc(p_kBucketSetLm, field, length, ord);                          \
+  SetProc(p_Neg, field, LengthGeneral, OrdGeneral);                     \
+  SetProc(pp_Mult_Coeff_mm_DivSelect, field, length, OrdGeneral);       \
+  SetProc(pp_Mult_Coeff_mm_DivSelectMult, field, length, OrdGeneral);   \
+  SetProc(p_Merge_q, FieldGeneral, length, ord);                        \
+}                                                                       \
 while (0)
 
 #endif // P_PROCS_IMPL_H

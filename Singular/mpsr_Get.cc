@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_Get.cc,v 1.34 2000-12-12 11:03:00 obachman Exp $ */
+/* $Id: mpsr_Get.cc,v 1.35 2000-12-31 15:14:36 obachman Exp $ */
 /***************************************************************
  *
  * File:       mpsr_Get.cc
@@ -565,7 +565,7 @@ static mpsr_Status_t GetPolyLeftv(MP_Link_pt link, MPT_Node_pt node,
   mpsr_assume(mlv->r != NULL);
 
   failr(mpsr_GetPoly(link, p, node->numchild, mlv->r));
-  if (IsUnOrdered) p = pOrdPolyMerge(p);
+  if (IsUnOrdered) p = pSort(p);
   pTest(p);
   mlv->lv = mpsr_InitLeftv(POLY_CMD, (void *) p);
   return mpsr_Success;
@@ -579,7 +579,7 @@ static mpsr_Status_t GetPolyVectorLeftv(MP_Link_pt link, MPT_Node_pt node,
   mpsr_assume(mlv->r != NULL);
 
   failr(mpsr_GetPolyVector(link, p, node->numchild, mlv->r));
-  if (IsUnOrdered) p = pOrdPolyMerge(p);
+  if (IsUnOrdered) p = pSort(p);
   pTest(p);
   mlv->lv = mpsr_InitLeftv(VECTOR_CMD, (void *) p);
   return mpsr_Success;
@@ -598,7 +598,7 @@ static mpsr_Status_t GetIdealLeftv(MP_Link_pt link, MPT_Node_pt node,
   {
     mp_failr(IMP_GetUint32(link, &nmon));
     failr(mpsr_GetPoly(link, id->m[i], nmon, r));
-    if (IsUnOrdered) id->m[i] = pOrdPolyMerge(id->m[i]);
+    if (IsUnOrdered) id->m[i] = pSort(id->m[i]);
   }
   idTest(id);
   mlv->lv = mpsr_InitLeftv(IDEAL_CMD, (void *) id);
@@ -625,7 +625,7 @@ static mpsr_Status_t GetModuleLeftv(MP_Link_pt link, MPT_Node_pt node,
   {
     mp_failr(IMP_GetUint32(link, &nmon));
     failr(mpsr_GetPolyVector(link, id->m[i], nmon, r));
-    if (IsUnOrdered) id->m[i] = pOrdPolyMerge(id->m[i]);
+    if (IsUnOrdered) id->m[i] = pSort(id->m[i]);
   }
   if (rank == 1)
     id->rank = idRankFreeModule(id);
@@ -663,7 +663,7 @@ static mpsr_Status_t GetMatrixLeftv(MP_Link_pt link, MPT_Node_pt node,
   {
     mp_failr(IMP_GetUint32(link, &nmon));
     failr(mpsr_GetPoly(link, mp->m[i], nmon, mlv->r));
-    if (IsUnOrdered) mp->m[i] = pOrdPolyMerge(mp->m[i]);
+    if (IsUnOrdered) mp->m[i] = pSort(mp->m[i]);
   }
 
   mlv->lv = mpsr_InitLeftv(MATRIX_CMD, (void *) mp);

@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly Level 0 functions
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline0.h,v 1.5 2000-11-23 17:34:11 obachman Exp $
+ *  Version: $Id: pInline0.h,v 1.6 2000-12-31 15:14:37 obachman Exp $
  *******************************************************************/
 #ifndef PINLINE0_H
 #define PINLINE0_H
@@ -19,25 +19,56 @@
 
 #include "mod2.h"
 #include "p_polys.h"
+#include "ring.h"
   
-PINLINE0 void p_SetCompP(poly p, int i, ring r)
+PINLINE0 int p_SetCompP(poly p, int i, ring r)
 {
-  while (p != NULL)
+  if (p == NULL) return 0;
+  
+#ifdef PDEBUG
+  poly q = p;
+#endif
+  
+  int l = 0;
+  
+  if (rOrd_SetCompRequiresSetm(r))
   {
-    p_SetComp(p, i, r);
-    p_SetmComp(p, r);
-    pIter(p);
+    do
+    {
+      p_SetComp(p, i, r);
+      p_SetmComp(p, r);
+      l++;
+      pIter(p);
+    }
+    while (p != NULL);
   }
+  else
+  {
+    do
+    {
+      p_SetComp(p, i, r);
+      l++;
+      pIter(p);
+    }
+    while(p != NULL);
+  }
+#ifdef PDEBUG
+  p_Test(q, r);
+  assume(l == pLength(q));
+#endif
+  return l;
 }
 
-PINLINE0 void p_SetCompP(poly p, int i, ring lmRing, ring tailRing)
+PINLINE0 int p_SetCompP(poly p, int i, ring lmRing, ring tailRing)
 {
   if (p != NULL)
   {
     p_SetComp(p, i, lmRing);
     p_SetmComp(p, lmRing);
-    p_SetCompP(pNext(p), i, tailRing);
+    return p_SetCompP(pNext(p), i, tailRing) + 1;
   }
+  else
+    return 0;
 }
 
 // returns minimal column number in the modul element a (or 0)
@@ -76,6 +107,17 @@ PINLINE0 long p_MaxComp(poly p, ring lmRing, ring tailRing)
     }
   }
   return result;
+}
+
+BOOLEAN   p_IsConstantPoly(poly p, ring r)
+{
+  while(p!=NULL)
+  {
+    if (! p_LmIsConstantComp(p, r))
+      return FALSE;
+    pIter(p);
+  }
+  return TRUE;
 }
 
 /***************************************************************

@@ -7,7 +7,7 @@
  *           currRing
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
- *  Version: $Id: p_polys.h,v 1.18 2000-12-20 11:15:47 obachman Exp $
+ *  Version: $Id: p_polys.h,v 1.19 2000-12-31 15:14:40 obachman Exp $
  *******************************************************************/
 #ifndef P_POLYS_H
 #define P_POLYS_H
@@ -184,6 +184,8 @@ PINLINE1 BOOLEAN p_LmShortDivisibleBy(poly a, unsigned long sev_a, ring r_a,
 // test if the monomial is a constant as a vector component
 // i.e., test if all exponents are zero 
 PINLINE1 BOOLEAN p_LmIsConstantComp(const poly p, const ring r);
+PINLINE1 BOOLEAN p_LmIsConstant(const poly p, const ring r);
+
 // return TRUE, if p_LmExpVectorAdd stays within ExpBound of ring r,
 //       FALSE, otherwise
 PINLINE1 BOOLEAN p_LmExpVectorAddIsOk(const poly p1, const poly p2, ring r);
@@ -210,6 +212,12 @@ PINLINE2 Exponent_t p_GetMaxExp(const unsigned long l, const ring r, const int n
 PINLINE2 unsigned long p_GetTotalDegree(const unsigned long l, const ring r);
 // return the total degree of the long var l containing number_of_exp exponents
 PINLINE2 unsigned long p_GetTotalDegree(const unsigned long l, const ring r, const int number_of_exps);
+
+
+// like the respective p_LmIs* routines, except that p might be empty
+PINLINE1 BOOLEAN p_IsConstantComp(const poly p, const ring r);
+PINLINE1 BOOLEAN p_IsConstant(const poly p, const ring r);
+PINLINE0 BOOLEAN p_IsConstantPoly(const poly p, const ring r);
 
 // return TRUE if all monoms have the same component
 BOOLEAN   p_OneComp(poly p, ring r);
@@ -278,6 +286,10 @@ PINLINE2 poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int &lp, int lq,
 // returns p + m*q destroys p, const: q, m
 PINLINE2 poly p_Plus_mm_Mult_qq(poly p, poly m, poly q, const ring r);
 
+// returns p + m*q destroys p, const: q, m
+PINLINE2 poly p_Plus_mm_Mult_qq(poly p, poly m, poly q, int &lp, int lq, 
+                                const ring r);
+
 // returns p*q, destroys p and q
 PINLINE2 poly p_Mult_q(poly p, poly q, const ring r);
 // returns p*q, does neither destroy p nor q
@@ -286,8 +298,19 @@ PINLINE2 poly pp_Mult_qq(poly p, poly q, const ring r);
 // returns p*Coeff(m) for such monomials pm of p, for which m is divisble by pm
 PINLINE2 poly pp_Mult_Coeff_mm_DivSelect(poly p, const poly m, const ring r);
 
+// returns p*Coeff(m) for such monomials pm of p, for which m is divisble by pm
+// if lp is length of p on input then lp is length of returned poly on output
+PINLINE2 poly pp_Mult_Coeff_mm_DivSelect(poly p, int &lp, const poly m, const ring r);
+
 // returns merged p and q, assumes p and q have no monomials which are equal
 PINLINE2 poly p_Merge_q(poly p, poly c, const ring r);
+// sorts p using bucket sort: returns sorted poly
+// assumes that monomials of p are all different
+// reverses it first, if revert == TRUE, use this if input p is "almost" sorted
+// correctly
+PINLINE2 poly p_SortMerge(poly p, const ring r, BOOLEAN revert = FALSE);
+// like SortMerge, except that p may have equal monimals
+PINLINE2 poly p_SortAdd(poly p, const ring r, BOOLEAN revert = FALSE);
 
 /***************************************************************
  *
@@ -300,9 +323,9 @@ p_SetmProc p_GetSetmProc(ring r);
 // TODO:
 #define p_SetmComp  p_Setm
 
-// reverses the monomials of p
-PINLINE0   void p_SetCompP(poly a, int i, ring r);
-PINLINE0   void p_SetCompP(poly a, int i, ring lmRing, ring tailRing);
+// sets component of poly a to i, returns length of a
+PINLINE0   int p_SetCompP(poly a, int i, ring r);
+PINLINE0   int p_SetCompP(poly a, int i, ring lmRing, ring tailRing);
 PINLINE0   long p_MaxComp(poly p, ring lmRing, ring tailRing);
 inline long p_MaxComp(poly p,ring lmRing) {return p_MaxComp(p,lmRing,lmRing);}
 PINLINE0   long p_MinComp(poly p, ring lmRing, ring tailRing);

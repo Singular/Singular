@@ -6,7 +6,7 @@
  *  Purpose: source for dynamically loaded version of p_Procs
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: p_Procs_Dynamic.cc,v 1.2 2000-12-12 08:44:49 obachman Exp $
+ *  Version: $Id: p_Procs_Dynamic.cc,v 1.3 2000-12-31 15:14:39 obachman Exp $
  *******************************************************************/
 #include "mod2.h"
 #include "structs.h"
@@ -104,6 +104,8 @@ static void* GetGeneralProc(p_Proc proc)
         return p_Neg__FieldGeneral_LengthGeneral_OrdGeneral;
       case pp_Mult_Coeff_mm_DivSelect_Proc: 
         return pp_Mult_Coeff_mm_DivSelect__FieldGeneral_LengthGeneral_OrdGeneral;
+      case pp_Mult_Coeff_mm_DivSelectMult_Proc: 
+        return pp_Mult_Coeff_mm_DivSelectMult__FieldGeneral_LengthGeneral_OrdGeneral;
       case p_Merge_q_Proc: 
         return p_Merge_q__FieldGeneral_LengthGeneral_OrdGeneral;
       case p_kBucketSetLm_Proc: 
@@ -146,6 +148,8 @@ static char* GetGeneralProcName(p_Proc proc)
         return "p_Neg__FieldGeneral_LengthGeneral_OrdGeneral";
       case pp_Mult_Coeff_mm_DivSelect_Proc: 
         return "pp_Mult_Coeff_mm_DivSelect__FieldGeneral_LengthGeneral_OrdGeneral";
+      case pp_Mult_Coeff_mm_DivSelectMult_Proc: 
+        return "pp_Mult_Coeff_mm_DivSelectMult__FieldGeneral_LengthGeneral_OrdGeneral";
       case p_Merge_q_Proc: 
         return "p_Merge_q__FieldGeneral_LengthGeneral_OrdGeneral";
       case p_kBucketSetLm_Proc: 

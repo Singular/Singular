@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.cc,v 1.22 2000-11-28 11:50:51 obachman Exp $ */
+/* $Id: kbuckets.cc,v 1.23 2000-12-31 15:14:32 obachman Exp $ */
 
 #include "mod2.h"
 #include "tok.h"
@@ -135,7 +135,6 @@ void kBucketDeleteAndDestroy(kBucket_pt *bucket_pt)
   omFreeBin(bucket, kBucket_bin);
   *bucket_pt = NULL;
 }
-
 
 /////////////////////////////////////////////////////////////////////////////
 // Convertion from/to Bpolys
@@ -271,6 +270,14 @@ void kBucketClear(kBucket_pt bucket, poly *p, int *length)
   }
 }
 
+void kBucketSetLm(kBucket_pt bucket, poly lm)
+{
+  kBucketMergeLm(bucket);
+  pNext(lm) = NULL;
+  bucket->buckets[0] = lm;
+  bucket->buckets_length[0] = 1;
+}
+
 #else // HAVE_PSEUDO_BUCKETS
 
 void kBucketInit(kBucket_pt bucket, poly lm, int length)
@@ -357,6 +364,51 @@ void kBucket_Mult_n(kBucket_pt bucket, number n)
 #endif
 }
 
+
+//////////////////////////////////////////////////////////////////////////
+///
+/// Add to Bucket a poly ,i.e. Bpoly == n*Bpoly
+///
+void kBucket_Add_q(kBucket_pt bucket, poly q, int *l)
+{
+  if (q == NULL) return;
+  assume(*l <= 0 || pLength(q) == *l);
+
+  int i, l1;
+  ring r = bucket->bucket_ring;
+
+  if (*l <= 0)
+  {
+    l1 = pLength(q);
+    *l = l1;
+  }
+  else
+    l1 = *l;
+  
+  kBucketMergeLm(bucket);
+  kbTest(bucket);
+  i = pLogLength(l1);
+
+  while (bucket->buckets[i] != NULL)
+  {
+    q = p_Add_q(q, bucket->buckets[i],
+                 l1, bucket->buckets_length[i], r);
+    bucket->buckets[i] = NULL;
+    bucket->buckets_length[i] = 0;
+    i = pLogLength(l1);
+  }
+
+  bucket->buckets[i] = q;
+  bucket->buckets_length[i]=l1;
+  if (i >= bucket->buckets_used)
+    bucket->buckets_used = i;
+  else
+    kBucketAdjustBucketsUsed(bucket);
+  kbTest(bucket);
+}
+
+
+
 //////////////////////////////////////////////////////////////////////////
 ///
 /// Bpoly == Bpoly - m*p; where m is a monom
@@ -431,6 +483,88 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
                                spNoether, r);
 #endif
   kbTest(bucket);
+}
+
+//////////////////////////////////////////////////////////////////////////
+///
+/// Bpoly == Bpoly - m*p; where m is a monom
+/// Does not destroy p and m
+/// assume (l <= 0 || pLength(p) == l)
+void kBucket_Plus_mm_Mult_pp(kBucket_pt bucket, poly m, poly p, int l)
+{
+  assume(l <= 0 || pLength(p) == l);
+  int i, l1;
+  poly p1 = p;
+  poly last;
+  ring r = bucket->bucket_ring;
+
+  if (l <= 0)
+  {
+    l1 = pLength(p1);
+    l = l1;
+  }
+  else
+    l1 = l;
+
+  if (m == NULL || p == NULL) return;
+
+  kBucketMergeLm(bucket);
+  kbTest(bucket);
+  i = pLogLength(l1);
+
+  if (i <= bucket->buckets_used && bucket->buckets[i] != NULL)
+  {
+    p1 = p_Plus_mm_Mult_qq(bucket->buckets[i], m, p1,
+                           bucket->buckets_length[i], l1, r);
+    l1 = bucket->buckets_length[i];
+    bucket->buckets[i] = NULL;
+    bucket->buckets_length[i] = 0;
+    i = pLogLength(l1);
+  }
+  else
+  {
+    p1 = r->p_Procs->pp_Mult_mm(p1, m, r, last);
+  }
+    
+  while (bucket->buckets[i] != NULL)
+  {
+    p1 = p_Add_q(p1, bucket->buckets[i],
+                 l1, bucket->buckets_length[i], r);
+    bucket->buckets[i] = NULL;
+    bucket->buckets_length[i] = 0;
+    i = pLogLength(l1);
+  }
+
+  bucket->buckets[i] = p1;
+  bucket->buckets_length[i]=l1;
+  if (i >= bucket->buckets_used)
+    bucket->buckets_used = i;
+  else
+    kBucketAdjustBucketsUsed(bucket);
+
+  kbTest(bucket);
+}
+
+poly kBucket_ExtractLarger(kBucket_pt bucket, poly q, poly append)
+{
+  if (q == NULL) return append;
+  poly lm;
+  do
+  {
+    lm = kBucketGetLm(bucket);
+    if (lm == NULL) return append;
+    if (p_LmCmp(lm, q, bucket->bucket_ring) == 1)
+    {
+      lm = kBucketExtractLm(bucket);
+      pNext(append) = lm;
+      pIter(append);
+    }
+    else
+    {
+      return append;
+    }
+  }
+  while (1);
 }
 
 /////////////////////////////////////////////////////////////////////////////

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.cc,v 1.36 2000-12-20 17:20:01 obachman Exp $ */
+/* $Id: matpol.cc,v 1.37 2000-12-31 15:14:35 obachman Exp $ */
 
 /*
 * ABSTRACT:
@@ -32,8 +32,6 @@
 omBin ip_smatrix_bin = omGetSpecBin(sizeof(ip_smatrix));
 /*0 implementation*/
 
-static void ppp(matrix);
-static void qqq() {int i=0;}
 
 typedef int perm[100];
 static void mpReplace(int j, int n, int &sign, int *perm);

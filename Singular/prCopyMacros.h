@@ -45,6 +45,6 @@ while (0)
 #if PR_NO_SORT > 0
 #define PR_SORT_POLY(p, d_r, s_r) ((void)0)
 #else
-#define PR_SORT_POLY(p, d_r, s_r) p = prSortR(p, d_r, d_r->OrdSgn == s_r->OrdSgn)
+#define PR_SORT_POLY(p, d_r, s_r) p = p_SortMerge(p, d_r, d_r->OrdSgn == s_r->OrdSgn)
 #endif
 

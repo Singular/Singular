@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.152 2000-12-20 11:15:48 obachman Exp $ */
+/* $Id: ring.cc,v 1.153 2000-12-31 15:14:43 obachman Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -1988,6 +1988,21 @@ BOOLEAN rHasSimpleOrderAA(ring r)
   {
     return (r->order[0] == ringorder_aa && r->order[1] != ringorder_M);
   }
+}
+
+// return TRUE if p_SetComp requires p_Setm
+BOOLEAN rOrd_SetCompRequiresSetm(ring r)
+{
+  if (r->typ != NULL)
+  {
+    int pos;
+    for (pos=0;pos<r->OrdSize;pos++)
+    {
+      sro_ord* o=&(r->typ[pos]);
+      if (o->ord_typ == ro_syzcomp || o->ord_typ == ro_syz) return TRUE;
+    }
+  }
+  return FALSE;
 }
 
 // return TRUE if p->exp[r->pOrdIndex] holds total degree of p */

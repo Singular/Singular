@@ -7,7 +7,7 @@
  *  Note:    this file is included by p_Procs.cc
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Procs_Generate.cc,v 1.3 2000-12-20 17:20:02 obachman Exp $
+ *  Version: $Id: p_Procs_Generate.cc,v 1.4 2000-12-31 15:14:39 obachman Exp $
  *******************************************************************/
 
 
@@ -69,7 +69,7 @@ inline int AlreadyHaveProc(p_Proc proc, p_Field field, p_Length length, p_Ord or
 const char* macros_field[] = {"n_Copy","n_Delete", "n_Mult", "n_Add", "n_Sub", "n_IsZero", "n_Equal" , "n_Neg", NULL};
 
 const char* macros_length[] =
-{"p_MemCopy", "p_MemAdd", "p_MemSum", NULL};
+{"p_MemCopy", "p_MemAdd", "p_MemSum", "p_MemDiff", NULL};
 
 const char* macros_length_ord[] = {"p_MemCmp", NULL};
 int DummyProcs = 0;
@@ -146,7 +146,10 @@ void AddProc(const char* s_what, p_Proc proc, p_Field field, p_Length length, p_
   else
   {
     printf("#define DECLARE_LENGTH(what) what\n");
-    printf("#define p_MemAddAdjust(p, r) p_MemAdd_NegWeightAdjust(p, r)\n");
+    if (proc != pp_Mult_Coeff_mm_DivSelectMult_Proc)
+      printf("#define p_MemAddAdjust(p, r) p_MemAdd_NegWeightAdjust(p, r)\n");
+    else
+      printf("#define p_MemAddAdjust(p, r) ((void)0)\n");
   }
   
   // define DECLARE_ORDSGN
@@ -155,6 +158,29 @@ void AddProc(const char* s_what, p_Proc proc, p_Field field, p_Length length, p_
     printf("#define DECLARE_ORDSGN(what) ((void)0)\n");
   else
     printf("#define DECLARE_ORDSGN(what) what\n");
+
+  if (proc == pp_Mult_Coeff_mm_DivSelectMult_Proc)
+  {
+    printf("#undef DECLARE_LENGTH_2\n");
+    printf("#undef p_MemCmp_Bitmask_2\n");
+    if (length != LengthGeneral)
+    {
+      printf("#define DECLARE_LENGTH_2(what) ((void)0)\n");
+      if (length < LengthTwo)
+        printf("#define p_MemCmp_Bitmask_2 p_MemCmp_Bitmask_%s\n", p_LengthEnum_2_String((p_Length) ((int) length + 2)));
+      else
+      printf("#define p_MemCmp_Bitmask_2 p_MemCmp_Bitmask_LengthZero\n");
+    }
+    else
+    {
+      printf("#define DECLARE_LENGTH_2(what) what \n");
+      printf("#define p_MemCmp_Bitmask_2 p_MemCmp_Bitmask_LengthGeneral\n");
+    }
+    
+      
+    printf("#undef p_MemAddAdjust\n");
+    printf("#define p_MemAddAdjust(p, r) ((void)0)\n");
+  }
 
   printf("#undef %s\n#define %s %s\n", s_what, s_what, s_full_proc_name);
   printf("#include \"%s__Template.cc\"\n", s_what);

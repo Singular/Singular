@@ -6,7 +6,7 @@
  *  Purpose: template for p_Add_q
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Merge_q__Template.cc,v 1.3 2000-12-07 15:03:58 obachman Exp $
+ *  Version: $Id: p_Merge_q__Template.cc,v 1.4 2000-12-31 15:14:38 obachman Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -35,8 +35,8 @@ LINKAGE poly p_Merge_q(poly p, poly q, const ring r)
   Equal:
   // should never get here
   dReportError("Equal monomials in p_Merge_q");
-  goto Finish;
-     
+  return NULL;
+  
   Greater:
   a = pNext(a) = p;
   pIter(p);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.74 2000-12-20 11:15:47 obachman Exp $ */
+/* $Id: polys.cc,v 1.75 2000-12-31 15:14:41 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -230,9 +230,9 @@ poly pmInit(char *st, BOOLEAN &ok)
 */
 poly pHomogen (poly p, int varnum)
 {
-  poly q=NULL;
-  poly res;
+  poly q=NULL, qn;
   int  o,ii;
+  sBucket_pt bp;
 
   if (p!=NULL)
   {
@@ -249,7 +249,7 @@ poly pHomogen (poly p, int varnum)
       pIter(q);
     }
     q = pCopy(p);
-    res = q;
+    bp = sBucketCreate(currRing);
     while (q != NULL)
     {
       ii = o-pWTotaldegree(q);
@@ -258,9 +258,12 @@ poly pHomogen (poly p, int varnum)
         pAddExp(q,varnum, (Exponent_t)ii);
         pSetm(q);
       }
-      pIter(q);
+      qn = pNext(q);
+      pNext(q) = NULL;
+      sBucket_Add_p(bp, q, 1);
+      q = qn;
     }
-    q = pOrdPolyInsertSetm(res);
+    sBucketDestroyAdd(bp, &q, &ii);
   }
   return q;
 }

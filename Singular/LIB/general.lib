@@ -1,7 +1,7 @@
 //GMG, last modified 18.6.99
 //anne, added deleteSublist and watchdog 12.12.2000
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: general.lib,v 1.33 2000-12-30 03:00:57 greuel Exp $";
+version="$Id: general.lib,v 1.34 2000-12-31 15:14:46 obachman Exp $";
 category="General purpose";
 info="
 LIBRARY:  general.lib   Elementary Computations of General Type
@@ -270,10 +270,10 @@ RETURN:   factorial(n):   n! (computed in characteristic 0), of type string.
 SEE ALSO: prime
 EXAMPLE:  example factorial; shows an example
 "
-{   int str,l,p;
+{   int l,p;
 //---------------------------- initialization -------------------------------
    if ( size(#) == 0 )
-   {  str = 1;
+   {  
       ring bin = 0,x,dp;
       number r=1;
    }
@@ -283,16 +283,40 @@ EXAMPLE:  example factorial; shows an example
       if ( defined(basering) )
       {
          if ( p == char(basering) )
-         {  number r=1;
+         {
+           // do it clever !
+           if (n < 1) {return (0);}
+           if (! defined(sv_factorials))
+           {
+             ideal sv_factorials;
+             sv_factorials[1] = 1;
+             export(sv_factorials);
+           }
+           if (n > size(sv_factorials))
+           {
+             int i = size(sv_factorials);
+             sv_factorials[n] = 0;
+             number fi = number(sv_factorials[i]);
+             for (i++;i<=n;i++)
+             {
+               fi = fi * i;
+               sv_factorials[i] = fi;
+             }
+             return (fi);
+           }
+           else
+           {
+             return (number(sv_factorials[n]));
+           }
          }
          else
-         {  str = 1;
+         {  
             ring bin = p,x,dp;
             number r=1;
          }
       }
       else
-      {  str = 1;
+      {  
          ring bin = p,x,dp;
          number r=1;
       }
@@ -302,8 +326,7 @@ EXAMPLE:  example factorial; shows an example
    {
       r=r*l;
    }
-   if ( str==1 ) { return(string(r)); }
-   else { return(r); }
+   return(string(r));
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -312,6 +335,8 @@ example
    number p = factorial(37,0);       //37! of type number, computed in r
    p;
 }
+    
+        
 ///////////////////////////////////////////////////////////////////////////////
 
 proc fibonacci (int n, list #)

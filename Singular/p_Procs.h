@@ -7,7 +7,7 @@
  *  Purpose: declaration of primitive procs for polys
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Procs.h,v 1.11 2000-12-07 15:03:59 obachman Exp $
+ *  Version: $Id: p_Procs.h,v 1.12 2000-12-31 15:14:39 obachman Exp $
  *******************************************************************/
 #ifndef P_PROCS_H
 #define P_PROCS_H
@@ -31,8 +31,11 @@ typedef poly (*p_Minus_mm_Mult_qq_Proc_Ptr)(poly p, poly m, poly q,
                                             int &shorter, const poly spNoether,
                                             const ring r, poly &last);
 typedef poly (*p_Neg_Proc_Ptr)(poly p, const ring r);
-typedef poly (*pp_Mult_Coeff_mm_DivSelect_Proc_Ptr)(poly p, const poly m, 
-                                                    const ring r);
+typedef poly (*pp_Mult_Coeff_mm_DivSelect_Proc_Ptr)(poly p, const poly m,
+                                                    int &shorter,const ring r);
+typedef poly (*pp_Mult_Coeff_mm_DivSelectMult_Proc_Ptr)
+  (poly p,const poly m, const poly a, const poly b, int &shorter,const ring r);
+
 typedef poly (*p_Merge_q_Proc_Ptr)(poly p, poly q, const ring r);
 typedef void (*p_kBucketSetLm_Proc_Ptr)(kBucket_pt bucket);
 
@@ -50,6 +53,7 @@ typedef struct p_Procs_s
   p_Minus_mm_Mult_qq_Proc_Ptr           p_Minus_mm_Mult_qq;
   p_Neg_Proc_Ptr                        p_Neg;
   pp_Mult_Coeff_mm_DivSelect_Proc_Ptr   pp_Mult_Coeff_mm_DivSelect;
+  pp_Mult_Coeff_mm_DivSelectMult_Proc_Ptr   pp_Mult_Coeff_mm_DivSelectMult;
   p_Merge_q_Proc_Ptr                    p_Merge_q;
   p_kBucketSetLm_Proc_Ptr               p_kBucketSetLm;
 } pProcs_s;

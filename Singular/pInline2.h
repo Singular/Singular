@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which are of constant time
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline2.h,v 1.22 2000-12-05 13:01:11 obachman Exp $
+ *  Version: $Id: pInline2.h,v 1.23 2000-12-31 15:14:37 obachman Exp $
  *******************************************************************/
 #ifndef PINLINE2_H
 #define PINLINE2_H
@@ -22,6 +22,7 @@
 #include "omalloc.h"
 #include "numbers.h"
 #include "p_Procs.h"
+#include "sbuckets.h"
 
 PINLINE2 number p_SetCoeff(poly p, number n, ring r)
 {
@@ -436,7 +437,10 @@ PINLINE2 poly p_Add_q(poly p, poly q, int &lp, int lq, const ring r)
 // returns p*n, destroys p
 PINLINE2 poly p_Mult_nn(poly p, number n, const ring r)
 {
-  return r->p_Procs->p_Mult_nn(p, n, r);
+  if (n_IsOne(n, r))
+    return p;
+  else
+    return r->p_Procs->p_Mult_nn(p, n, r);
 }
 
 PINLINE2 poly p_Mult_nn(poly p, number n, const ring lmRing,
@@ -458,20 +462,31 @@ PINLINE2 poly p_Mult_nn(poly p, number n, const ring lmRing,
 // returns p*n, does not destroy p
 PINLINE2 poly pp_Mult_nn(poly p, number n, const ring r)
 {
-  return r->p_Procs->pp_Mult_nn(p, n, r);
+  if (n_IsOne(n, r))
+    return p_Copy(p, r);
+  else
+    return r->p_Procs->pp_Mult_nn(p, n, r);
 }
 
 // returns Copy(p)*m, does neither destroy p nor m
 PINLINE2 poly pp_Mult_mm(poly p, poly m, const ring r)
 {
-  poly last;
-  return r->p_Procs->pp_Mult_mm(p, m, r, last);
+  if (p_LmIsConstant(m, r))
+    return pp_Mult_nn(p, pGetCoeff(m), r);
+  else
+  {
+    poly last;
+    return r->p_Procs->pp_Mult_mm(p, m, r, last);
+  }
 }
 
 // returns p*m, destroys p, const: m
 PINLINE2 poly p_Mult_mm(poly p, poly m, const ring r)
 {
-  return r->p_Procs->p_Mult_mm(p, m, r);
+  if (p_LmIsConstant(m, r))
+    return p_Mult_nn(p, pGetCoeff(m), r);
+  else
+    return r->p_Procs->p_Mult_mm(p, m, r);
 }
 
 // return p - m*Copy(q), destroys p; const: p,m
@@ -493,7 +508,16 @@ PINLINE2 poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int &lp, int lq,
 
 PINLINE2 poly pp_Mult_Coeff_mm_DivSelect(poly p, const poly m, const ring r)
 {
-  return r->p_Procs->pp_Mult_Coeff_mm_DivSelect(p, m, r);
+  int shorter;
+  return r->p_Procs->pp_Mult_Coeff_mm_DivSelect(p, m, shorter, r);
+}
+
+PINLINE2 poly pp_Mult_Coeff_mm_DivSelect(poly p, int &lp, const poly m, const ring r)
+{
+  int shorter;
+  poly pp = r->p_Procs->pp_Mult_Coeff_mm_DivSelect(p, m, shorter, r);
+  lp -= shorter;
+  return pp;
 }
 
 // returns -p, destroys p
@@ -564,7 +588,8 @@ PINLINE2 poly pp_Mult_qq(poly p, poly q, const ring r)
 
 // returns p + m*q destroys p, const: q, m
 // this should be implemented more efficiently
-PINLINE2 poly p_Plus_mm_Mult_qq(poly p, poly m, poly q, const ring r)
+PINLINE2 poly p_Plus_mm_Mult_qq(poly p, poly m, poly q, int &lp, int lq, 
+                                const ring r)
 {
   poly res, last;
   int shorter;
@@ -574,14 +599,33 @@ PINLINE2 poly p_Plus_mm_Mult_qq(poly p, poly m, poly q, const ring r)
   pSetCoeff0(m, n_neg);
 
   res = r->p_Procs->p_Minus_mm_Mult_qq(p, m, q, shorter, NULL, r, last);
+  lp = (lp + lq) - shorter;
   pSetCoeff0(m, n_old);
   n_Delete(&n_neg, r);
   return res;
 }
 
+PINLINE2 poly p_Plus_mm_Mult_qq(poly p, poly m, poly q, const ring r)
+{
+  int lp = 0, lq = 0;
+  return p_Plus_mm_Mult_qq(p, m, q, lp, lq, r);
+}
+
 PINLINE2 poly p_Merge_q(poly p, poly q, const ring r)
 {
   return r->p_Procs->p_Merge_q(p, q, r);
+}
+
+PINLINE2 poly p_SortAdd(poly p, const ring r, BOOLEAN revert)
+{
+  if (revert) p = pReverse(p);
+  return sBucketSortAdd(p, r);
+}
+
+PINLINE2 poly p_SortMerge(poly p, const ring r, BOOLEAN revert)
+{
+  if (revert) p = pReverse(p);
+  return sBucketSortMerge(p, r);
 }
 
 /***************************************************************

@@ -6,7 +6,7 @@
  *  Purpose: implementation for debug error handling
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
- *  Version: $Id: dError.c,v 1.5 2000-11-06 15:20:37 obachman Exp $
+ *  Version: $Id: dError.c,v 1.6 2000-12-31 15:14:29 obachman Exp $
  *******************************************************************/
 #ifndef DERROR_C
 #define DERROR_C
@@ -32,8 +32,8 @@ int dReportError(const char* fmt, ...)
 #ifndef MAKE_DISTRIBUTION
   fprintf(stderr, "\n// ***dErrror: ");
   vfprintf(stderr, fmt, ap);
+#if !defined(OM_NDEBUG) && defined(HAVE_CONFIG_H)
   fprintf(stderr, " occured at: \n");
-#ifdef HAVE_CONFIG_H
   omPrintCurrentBackTraceMax(stderr, 8);
 #endif
   dErrorBreak();

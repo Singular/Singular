@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.60 2000-12-20 11:23:47 Singular Exp $ */
+/* $Id: polys1.cc,v 1.61 2000-12-31 15:14:42 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -26,41 +26,6 @@
 #ifdef HAVE_FACTORY
 #include "clapsing.h"
 #endif
-
-/*-------- several access procedures to monomials -------------------- */
-/*2
-*test if the monomial is a constant
-*/
-BOOLEAN   p_IsConstant(const poly p, const ring r)
-{
-  if (p!=NULL)
-  {
-    int i;
-    for (i=r->N;i;i--)
-    {
-      if (p_GetExp(p,i,r)!=0) return FALSE;
-    }
-    if (p_GetComp(p,r)>0) return FALSE;
-  }
-  return TRUE;
-}
-
-/*2
-*test if the polynom is a constant
-*/
-BOOLEAN   pIsConstantPoly(poly p)
-{
-  while(p!=NULL)
-  {
-    for (int i=pVariables;i;i--)
-    {
-      if (pGetExp(p,i)!=0) return FALSE;
-    }
-    pIter(p);
-  }
-  return TRUE;
-}
-
 
 
 /*-----------------------------------------------------------*/
@@ -738,75 +703,6 @@ BOOLEAN pIsHomogeneous (poly p)
   return TRUE;
 }
 
-// orders monoms of poly using merge sort (ususally faster than
-// insertion sort). ASSUMES that pSetm was performed on monoms
-poly pOrdPolyMerge(poly p)
-{
-  poly qq,pp,result=NULL;
-
-  if (p == NULL) return NULL;
-
-  loop
-  {
-    qq = p;
-    loop
-    {
-      if (pNext(p) == NULL)
-      {
-        result=pAdd(result, qq);
-        pTest(result);
-        return result;
-      }
-      if (pLmCmp(p,pNext(p)) != 1)
-      {
-        pp = p;
-        pIter(p);
-        pNext(pp) = NULL;
-        result = pAdd(result, qq);
-        break;
-      }
-      pIter(p);
-    }
-  }
-}
-
-// orders monoms of poly using insertion sort, performs pSetm on each monom
-poly pOrdPolyInsertSetm(poly p)
-{
-  poly qq,result = NULL;
-
-#if 0
-  while (p != NULL)
-  {
-    qq = p;
-    pIter(p);
-    qq->next = NULL;
-    pSetm(qq);
-    result = pAdd(result,qq);
-    pTest(result);
-  }
-#else
-  while (p != NULL)
-  {
-    qq = p;
-    pIter(p);
-    qq->next = result;
-    result = qq;
-    pSetm(qq);
-  }
-  p = result;
-  result = NULL;
-  while (p != NULL)
-  {
-    qq = p;
-    pIter(p);
-    qq->next = NULL;
-    result = pAdd(result, qq);
-  }
-  pTest(result);
-#endif
-  return result;
-}
 
 /*2
 *returns a re-ordered copy of a polynomial, with permutation of the variables
@@ -920,7 +816,7 @@ poly pPermPoly (poly p, int * perm, ring oldRing, nMapFunc nMap,
       pDelete(&aq);
     }
   }
-  result=pOrdPolyMerge(result);
+  result=pSortAdd(result);
 #else
   //  if (qq!=NULL)
   //  {

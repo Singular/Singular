@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpr_numeric.cc,v 1.12 2000-12-18 15:44:42 obachman Exp $ */
+/* $Id: mpr_numeric.cc,v 1.13 2000-12-31 15:14:36 obachman Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - numeric stuff
@@ -149,7 +149,7 @@ poly vandermonde::numvec2poly( const number * q )
 
   omFreeSize( (ADDRESS) exp, (n+1) * sizeof(Exponent_t) );
 
-  pOrdPolyMerge(pit);
+  pSortAdd(pit);
   return pit;
 }
 

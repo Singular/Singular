@@ -6,7 +6,7 @@
  *  Purpose: macros for memory comparisons
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_MemCmp.h,v 1.1 2000-09-04 14:08:17 obachman Exp $
+ *  Version: $Id: p_MemCmp.h,v 1.2 2000-12-31 15:14:37 obachman Exp $
  *******************************************************************/
 #ifndef P_MEM_CMP_H
 #define P_MEM_CMP_H
@@ -763,5 +763,187 @@ do                                                                              
   actionE;                                                                                      \
 }                                                                                               \
 while (0)
+
+/***************************************************************
+ *  
+ *  Bitmask
+ *  
+ *******************************************************************/
+#define _p_MemCmp_Bitmask_Declare(s1, s2, bitmask)  \
+  const unsigned long* _s1 = ((unsigned long*) s1); \
+  const unsigned long* _s2 = ((unsigned long*) s2); \
+  register const unsigned long _bitmask = bitmask;  \
+  register unsigned long _v1;                       \
+  register unsigned long _v2;                       \
+  register unsigned long _i                         \
+
+
+#define p_MemCmp_Bitmask_LengthGeneral(s1, s2, bitmask, length, actionG, actionS)   \
+do                                                                                  \
+{                                                                                   \
+  _p_MemCmp_Bitmask_Declare(s1, s2, bitmask);                                             \
+  const unsigned long _l = (unsigned long) length;                                  \
+                                                                                    \
+  _i=0;                                                                             \
+                                                                                    \
+  while (_i < _l)                                                                   \
+  {                                                                                 \
+    _v1 = _s1[_i];                                                                  \
+    _v2 = _s2[_i];                                                                  \
+                                                                                    \
+    if ((_v1 > _v2) ||                                                              \
+        (((_v1 & _bitmask) ^ (_v2 & _bitmask)) != ((_v2 - _v1) & _bitmask)))           \
+      actionS;                                                                      \
+    _i++;                                                                           \
+  }                                                                                 \
+  actionG;                                                                          \
+}                                                                                   \
+while (0)
+
+
+#define _p_MemCmp_Bitmask(i, actionS)                                       \
+do                                                                          \
+{                                                                           \
+  _i = i;                                                                   \
+  _v1 = _s1[i];                                                             \
+  _v2 = _s2[i];                                                             \
+  if ((_v1 > _v2) ||                                                        \
+      (((_v1 & _bitmask) ^ (_v2 & _bitmask)) != ((_v2 - _v1) & _bitmask)))     \
+    actionS;                                                               \
+}                                                                           \
+while (0)
+  
+#define _p_MemCmp_Bitmask_LengthTwo(actionS)    \
+  do                                            \
+{                                               \
+  _p_MemCmp_Bitmask(0, actionS);                \
+  _p_MemCmp_Bitmask(1, actionS);                \
+}                                               \
+while (0)
+
+#define _p_MemCmp_Bitmask_LengthThree(actionS)  \
+  do                                            \
+{                                               \
+  _p_MemCmp_Bitmask_LengthTwo(actionS);         \
+  _p_MemCmp_Bitmask(2, actionS);                \
+}                                               \
+while (0)
+
+#define _p_MemCmp_Bitmask_LengthFour(actionS)   \
+  do                                            \
+{                                               \
+  _p_MemCmp_Bitmask_LengthThree(actionS);    \
+  _p_MemCmp_Bitmask(3, actionS);                \
+}                                               \
+while (0)
+
+
+#define _p_MemCmp_Bitmask_LengthFive(actionS)   \
+  do                                            \
+{                                               \
+  _p_MemCmp_Bitmask_LengthFour(actionS);     \
+  _p_MemCmp_Bitmask(4, actionS);                \
+}                                               \
+while (0)
+
+
+#define _p_MemCmp_Bitmask_LengthSix(actionS)    \
+  do                                            \
+{                                               \
+  _p_MemCmp_Bitmask_LengthFive(actionS);     \
+  _p_MemCmp_Bitmask(5, actionS);                \
+}                                               \
+while (0)
+
+#define _p_MemCmp_Bitmask_LengthSeven(actionS)  \
+  do                                            \
+{                                               \
+  _p_MemCmp_Bitmask_LengthSix(actionS);      \
+  _p_MemCmp_Bitmask(6, actionS);                \
+}                                               \
+while (0)
+
+#define _p_MemCmp_Bitmask_LengthEight(actionS)  \
+do                                              \
+{                                               \
+  _p_MemCmp_Bitmask_LengthSeven(actionS);    \
+  _p_MemCmp_Bitmask(7, actionS);                \
+}                                               \
+while (0)
+
+#define p_MemCmp_Bitmask_LengthZero(s1, s2, bitmask, length, actionG, actionS) actionG
+
+#define p_MemCmp_Bitmask_LengthOne(s1, s2, bitmask, length, actionG, actionS)   \
+do                                                                              \
+{                                                                               \
+  _p_MemCmp_Bitmask_Declare(s1, s2, bitmask);                                         \
+  _p_MemCmp_Bitmask(0, actionS);                                                \
+  actionG;                                                                      \
+}                                                                               \
+while (0)
+
+#define p_MemCmp_Bitmask_LengthTwo(s1, s2, bitmask, length, actionG, actionS)   \
+do                                                                              \
+{                                                                               \
+  _p_MemCmp_Bitmask_Declare(s1, s2, bitmask);                                         \
+  _p_MemCmp_Bitmask_LengthTwo(actionS);                                         \
+  actionG;                                                                      \
+}                                                                               \
+while (0)
+
+#define p_MemCmp_Bitmask_LengthThree(s1, s2, bitmask, length, actionG, actionS)   \
+do                                                                              \
+{                                                                               \
+  _p_MemCmp_Bitmask_Declare(s1, s2, bitmask);                                         \
+  _p_MemCmp_Bitmask_LengthThree(actionS);                                         \
+  actionG;                                                                      \
+}                                                                               \
+while (0)
+
+#define p_MemCmp_Bitmask_LengthFour(s1, s2, bitmask, length, actionG, actionS)   \
+do                                                                              \
+{                                                                               \
+  _p_MemCmp_Bitmask_Declare(s1, s2, bitmask);                                         \
+  _p_MemCmp_Bitmask_LengthFour(actionS);                                         \
+  actionG;                                                                      \
+}                                                                               \
+while (0)
+
+#define p_MemCmp_Bitmask_LengthFive(s1, s2, bitmask, length, actionG, actionS)   \
+do                                                                              \
+{                                                                               \
+  _p_MemCmp_Bitmask_Declare(s1, s2, bitmask);                                         \
+  _p_MemCmp_Bitmask_LengthFive(actionS);                                         \
+  actionG;                                                                      \
+}                                                                               \
+while (0)
+
+#define p_MemCmp_Bitmask_LengthSix(s1, s2, bitmask, length, actionG, actionS)   \
+do                                                                              \
+{                                                                               \
+  _p_MemCmp_Bitmask_Declare(s1, s2, bitmask);                                         \
+  _p_MemCmp_Bitmask_LengthSix(actionS);                                         \
+  actionG;                                                                      \
+}                                                                               \
+while (0)
+
+#define p_MemCmp_Bitmask_LengthSeven(s1, s2, bitmask, length, actionG, actionS) \
+do                                                                              \
+{                                                                               \
+  _p_MemCmp_Bitmask_Declare(s1, s2, bitmask);                                         \
+  _p_MemCmp_Bitmask_LengthSeven(actionS);                                       \
+  actionG;                                                                      \
+}                                                                               \
+while (0)
+
+#define p_MemCmp_Bitmask_LengthEigth(s1, s2, bitmask, length, actionG, actionS) \
+do                                                                              \
+{                                                                               \
+  _p_MemCmp_Bitmask_Declare(s1, s2, bitmask);                                         \
+  _p_MemCmp_Bitmask_LengthEigth(actionS);                                       \
+  actionG;                                                                      \
+}                                                                               \
+while (0)
+
 
 #endif // P_MEM_CMP

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.h,v 1.13 2000-11-28 11:50:52 obachman Exp $ */
+/* $Id: kbuckets.h,v 1.14 2000-12-31 15:14:32 obachman Exp $ */
 #include "structs.h"
 #include "p_Procs.h"
 #include "pShallowCopyDelete.h"
@@ -36,6 +36,13 @@ void kBucketInit(kBucket_pt bucket, poly p, int length);
 // Converts Bpoly into a poly and clears bucket
 // i.e., afterwards Bpoly == 0
 void kBucketClear(kBucket_pt bucket, poly *p, int *length);
+inline poly kBucketClear(kBucket_pt bucket)
+{
+  int dummy;
+  poly p;
+  kBucketClear(bucket, &p, &dummy);
+  return p;
+}
 
 // Canonicalizes Bpoly, i.e. converts polys of buckets into one poly in
 // one bucket: Returns number of bucket into which it is canonicalized
@@ -52,6 +59,13 @@ inline const poly kBucketGetLm(kBucket_pt bucket);
 // Bpoly == Bpoly - Lm(Bpoly)
 //
 inline poly kBucketExtractLm(kBucket_pt bucket);
+
+/////////////////////////////////////////////////////////////////////////////
+// Sets Lm of Bpoly, i.e. Bpoly is changed s.t.
+// Bpoly = Bpoly + m
+// assumes that m is larger than all monomials of Bpoly
+void kBucketSetLm(kBucket_pt bucket, poly lm);
+
 
 /////////////////////////////////////////////////////////////////////////////
 // Reduces Bpoly (say, q) with p, i.e.:
@@ -91,6 +105,28 @@ void kBucketDecrOrdTakeOutComp(kBucket_pt bucket,
 ///
 void kBucket_Mult_n(kBucket_pt bucket, number n);
 
+//////////////////////////////////////////////////////////////////////////
+///
+/// Extract all monomials of bucket which are larger than q
+/// Append those to append, and return last monomial of append
+poly kBucket_ExtractLarger(kBucket_pt bucket, poly q, poly append);
+
+
+//////////////////////////////////////////////////////////////////////////
+///
+/// Add to Bucket a poly ,i.e. Bpoly == Bpoly + q
+///
+void kBucket_Add_q(kBucket_pt bucket, poly q, int* lq);
+
+// first, do ExtractLarger
+// then add q
+inline poly 
+kBucket_ExtractLarger_Add_q(kBucket_pt bucket, poly append, poly q, int *lq)
+{
+  append = kBucket_ExtractLarger(bucket, q, append);
+  kBucket_Add_q(bucket, q, lq);
+  return append;
+}
 
 //////////////////////////////////////////////////////////////////////////
 ///
@@ -100,6 +136,12 @@ void kBucket_Mult_n(kBucket_pt bucket, number n);
 void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
                             poly spNother = NULL);
 
+//////////////////////////////////////////////////////////////////////////
+///
+/// Bpoly == Bpoly + m*p; where m is a monom
+/// Does not destroy p and m
+/// assume (l <= 0 || pLength(p) == l)
+void kBucket_Plus_mm_Mult_pp(kBucket_pt bucket, poly m, poly p, int l);
 
 //////////////////////////////////////////////////////////////////////////
 ///

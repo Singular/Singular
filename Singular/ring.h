@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.61 2000-12-14 16:38:55 obachman Exp $ */
+/* $Id: ring.h,v 1.62 2000-12-31 15:14:44 obachman Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -230,9 +230,18 @@ BOOLEAN rHasSimpleOrder(ring r);
 BOOLEAN rHasSimpleLexOrder(ring r);
 // return TRUE if p->exp[r->pOrdIndex] holds total degree of p */
 BOOLEAN rOrd_is_Totaldegree_Ordering(ring r =currRing);
+// return TRUE if p_SetComp requires p_Setm
+BOOLEAN rOrd_SetCompRequiresSetm(ring r);
 rOrderType_t    rGetOrderType(ring r);
 /* returns TRUE if var(i) belongs to p-block */
 BOOLEAN rIsPolyVar(int i, ring r = currRing); 
+
+inline BOOLEAN rOrd_is_c_dp(ring r)
+{
+  return (r->order[0] == ringorder_c && 
+          r->order[1] == ringorder_dp && 
+          r->order[2] == 0);
+}
 
 #ifdef HAVE_PLURAL
 inline BOOLEAN rIsPluralRing(ring r)

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.52 2000-12-15 18:49:31 Singular Exp $ */
+/* $Id: longalg.cc,v 1.53 2000-12-31 15:14:35 obachman Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -2569,6 +2569,7 @@ number   naGetDenom(number &n)
 #ifdef LDEBUG
 BOOLEAN naDBTest(number a, char *f,int l)
 {
+#if 0
   lnumber x=(lnumber)a;
   if (x == NULL)
     return TRUE;
@@ -2611,6 +2612,7 @@ BOOLEAN naDBTest(number a, char *f,int l)
     if (omCheckAddrSize(p, napMonomSize)) return FALSE;
     p = p->ne;
   }
+#endif
   return TRUE;
 }
 #endif

@@ -6,7 +6,7 @@
  *  Purpose: source for static version of p_Procs
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: p_Procs_Static.cc,v 1.2 2000-12-12 08:44:50 obachman Exp $
+ *  Version: $Id: p_Procs_Static.cc,v 1.3 2000-12-31 15:14:40 obachman Exp $
  *******************************************************************/
 #include "mod2.h"
 #include "structs.h"
@@ -18,9 +18,11 @@
 #include "p_MemAdd.h"
 #include "p_MemCopy.h"
 #include "kbuckets.h"
+#include "dError.h"
 
 BOOLEAN p_procs_dynamic = FALSE;
 
+#define p_Procs_Static
 #include "p_Procs_Static.inc"
 
 // include generated configuration

@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which iter over ExpVector
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline1.h,v 1.14 2000-12-05 13:01:11 obachman Exp $
+ *  Version: $Id: pInline1.h,v 1.15 2000-12-31 15:14:37 obachman Exp $
  *******************************************************************/
 #ifndef PINLINE1_H
 #define PINLINE1_H
@@ -490,6 +490,27 @@ PINLINE1 BOOLEAN p_LmIsConstantComp(const poly p, const ring r)
   }
   while (i >= 0);
   return TRUE;
+}
+// test if monomial is a constant, i.e. if all exponents and the component 
+// is zero
+PINLINE1 BOOLEAN p_LmIsConstant(const poly p, const ring r)
+{
+  if (p_LmIsConstantComp(p, r))
+    return (p_GetComp(p, r) == 0);
+  return FALSE;
+}
+
+// like the respective p_LmIs* routines, except that p might be empty
+PINLINE1 BOOLEAN p_IsConstantComp(const poly p, const ring r)
+{
+  if (p == NULL) return TRUE;
+  return p_LmIsConstantComp(p, r);
+}
+
+PINLINE1 BOOLEAN p_IsConstant(const poly p, const ring r)
+{
+  if (p == NULL) return TRUE;
+  return p_LmIsConstant(p, r);
 }
 
 PINLINE1 BOOLEAN p_LmExpVectorAddIsOk(const poly p1, const poly p2, 

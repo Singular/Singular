@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz0.cc,v 1.35 2000-12-06 11:03:31 Singular Exp $ */
+/* $Id: syz0.cc,v 1.36 2000-12-31 15:14:46 obachman Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -994,7 +994,7 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
       for (i=0;i<IDELEMS(res[1]);i++)
       {
         if (res[1]->m[i])
-          res[1]->m[i] = pOrdPolyMerge(res[1]->m[i]);
+          res[1]->m[i] = pSort(res[1]->m[i]);
       }
     }
   }

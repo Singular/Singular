@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.51 2000-12-20 11:15:49 obachman Exp $ */
+/* $Id: structs.h,v 1.52 2000-12-31 15:14:45 obachman Exp $ */
 /*
 * ABSTRACT
 */
@@ -78,6 +78,7 @@ class ssyStrategy;
 class procinfo;
 class namerec;
 class kBucket;
+class sBucket;
 #endif
 
 struct n_Procs_s;
@@ -144,6 +145,7 @@ typedef ssyStrategy *      syStrategy;
 typedef procinfo *         procinfov;
 typedef namerec *          namehdl;
 typedef kBucket*           kBucket_pt;
+typedef sBucket*           sBucket_pt;
 typedef struct p_Procs_s p_Procs_s;
 
 // for hdegree.cc

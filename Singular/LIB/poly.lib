@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: poly.lib,v 1.30 2000-12-31 01:55:11 greuel Exp $";
+version="$Id: poly.lib,v 1.31 2000-12-31 15:14:47 obachman Exp $";
 category="General purpose";
 info="
 LIBRARY:  poly.lib      Procedures for Manipulating Polys, Ideals, Modules
@@ -751,7 +751,7 @@ EXAMPLE:  example numerator; shows an example
 "
 {
   poly p = cleardenom(n+var(1));
-  return (coeffs(p,var(1))[1,1]);
+  return (number(coeffs(p,var(1))[1,1]));
 }
 example
 {
@@ -770,7 +770,7 @@ EXAMPLE:  example denominator; shows an example
 "
 {
   poly p = cleardenom(n+var(1));
-  return (coeffs(p,var(1))[2,1]);
+  return (number(coeffs(p,var(1))[2,1]));
 }
 example
 {

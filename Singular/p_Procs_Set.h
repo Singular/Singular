@@ -11,7 +11,7 @@
  *           have to be defined before this file is included
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: p_Procs_Set.h,v 1.2 2000-12-12 08:44:50 obachman Exp $
+ *  Version: $Id: p_Procs_Set.h,v 1.3 2000-12-31 15:14:40 obachman Exp $
  *******************************************************************/
 
 // extract p_Procs properties from a ring
@@ -113,6 +113,19 @@ static p_Procs_s *_p_procs;
 static int set_names = 0;
 #endif
 
+#define CheckProc(which)                                    \
+do                                                          \
+{                                                           \
+  if (p_Procs->which == NULL)                               \
+  {                                                         \
+    dReportBug("p_Procs is NULL");                          \
+    Warn("Singular will work properly, but much slower");   \
+    p_Procs->which = (which##_Proc_Ptr)                     \
+      which##__FieldGeneral_LengthGeneral_OrdGeneral;       \
+  }                                                         \
+}                                                           \
+while (0)
+
 // Choose a set of p_Procs
 void p_ProcsSet(ring r, p_Procs_s* p_Procs)
 {
@@ -129,21 +142,22 @@ void p_ProcsSet(ring r, p_Procs_s* p_Procs)
 
   InitSetProcs(field, length, ord);
   SetProcs(field, length, ord);
-  assume(
-    (p_Procs->p_Delete != NULL) &&
-    (p_Procs->p_ShallowCopyDelete != NULL) &&
-    (p_Procs->p_Mult_nn != NULL) &&
-    (p_Procs->pp_Mult_nn != NULL) &&
-    (p_Procs->p_Copy != NULL) &&
-    (p_Procs->pp_Mult_mm != NULL) &&
-    (p_Procs->pp_Mult_mm_Noether != NULL) &&
-    (p_Procs->p_Mult_mm != NULL) &&
-    (p_Procs->p_Add_q != NULL) &&
-    (p_Procs->p_Neg != NULL) &&
-    (p_Procs->pp_Mult_Coeff_mm_DivSelect != NULL) &&
-    (p_Procs->p_Merge_q != NULL) &&
-    (p_Procs->p_kBucketSetLm != NULL) &&
-    (p_Procs->p_Minus_mm_Mult_qq != NULL));
+  CheckProc(p_Copy);
+  CheckProc(p_Delete);
+  CheckProc(p_ShallowCopyDelete);
+  CheckProc(p_Mult_nn);
+  CheckProc(pp_Mult_nn);
+  CheckProc(pp_Mult_mm);
+  CheckProc(pp_Mult_mm_Noether);
+  CheckProc(p_Mult_mm);
+  CheckProc(p_Add_q);
+  CheckProc(p_Minus_mm_Mult_qq);
+  CheckProc(p_Neg);
+  CheckProc(pp_Mult_Coeff_mm_DivSelect);
+  CheckProc(pp_Mult_Coeff_mm_DivSelectMult);
+  CheckProc(p_Merge_q);
+  CheckProc(p_kBucketSetLm);
+
   assume(p_Procs->pp_Mult_mm_Noether != pp_Mult_mm_Noether__FieldGeneral_LengthGeneral_OrdGeneral || 
          p_Procs->p_Minus_mm_Mult_qq == p_Minus_mm_Mult_qq__FieldGeneral_LengthGeneral_OrdGeneral || 
          r->OrdSgn == 1 || r->LexOrder);

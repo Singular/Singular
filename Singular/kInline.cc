@@ -6,7 +6,7 @@
  *  Purpose: implementation of std related inline routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: kInline.cc,v 1.22 2000-12-21 16:37:49 obachman Exp $
+ *  Version: $Id: kInline.cc,v 1.23 2000-12-31 15:14:32 obachman Exp $
  *******************************************************************/
 #ifndef KINLINE_CC
 #define KINLINE_CC
@@ -268,6 +268,12 @@ KINLINE void sTObject::SetLmCurrRing()
     p = k_LmInit_tailRing_2_currRing(t_p, tailRing);
 }
 
+KINLINE poly sTObject::Next()
+{
+  assume(p != NULL || t_p != NULL);
+  if (t_p != NULL) return pNext(t_p);
+  return pNext(p);
+}
     
 // Iterations
 KINLINE void sTObject::LmDeleteAndIter()
@@ -619,6 +625,7 @@ sLObject::ShallowCopyDelete(ring new_tailRing,
   sTObject::ShallowCopyDelete(new_tailRing, 
                               new_tailRing->PolyBin,p_shallow_copy_delete, 
                               FALSE);
+  last = NULL;
 }
 
 KINLINE void sLObject::SetShortExpVector()
@@ -690,7 +697,7 @@ KINLINE long sLObject::pLDeg(BOOLEAN deg_last)
   if (! deg_last || bucket != NULL) return sLObject::pLDeg();
   
   if (last == NULL || pLength == 0) 
-    last = pLast((t_p != NULL ? t_p : p), pLength);
+    last = pLast(GetLmTailRing(), pLength);
 #ifdef HAVE_ASSUME
   long fdeg;
   fdeg = tailRing->pLDeg(GetLmTailRing(), &length, tailRing);

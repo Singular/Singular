@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.51 2000-12-20 11:15:48 obachman Exp $ */
+/* $Id: polys.h,v 1.52 2000-12-31 15:14:41 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials of the
              currRing
@@ -208,12 +208,43 @@ extern poly pHeadProc(poly p);
 #define ppMult_qq(p, q)             pp_Mult_qq(p, q, currRing)
 // p*Coeff(m) for such monomials pm of p, for which m is divisble by pm
 #define ppMult_Coeff_mm_DivSelect(p, m)   pp_Mult_Coeff_mm_DivSelect(p, m, currRing)
+/*************************************************************************
+ *
+ * Sort routines
+ *
+ *************************************************************************/
+// sorts p, assumes all monomials in p are different
+#define pSortMerger(p)          pSort(p)
+#define pSort(p)                p_SortMerge(p, currRing)
+
+// sorts p, p may have equal monomials
+#define pSortAdd(p)             p_SortAdd(p, currRing)
+
+
+// Assume: If considerd only as poly in any component of p 
+// (say, monomials of other components of p are set to 0), 
+// then p is already sorted correctly 
+#define pSortCompCorrect(p) pSort(p)
+
 /***************************************************************
  *
  * Predicates on polys/Lm's
  *
  ***************************************************************/
-#define pLmIsConstantComp(p)        p_LmIsConstantComp(p, currRing)
+// return true if all p is eihter NULL, or if all exponents
+// of p are 0 and Comp of p is zero
+#define   pIsConstantComp(p)        p_IsConstantComp(p, currRing)
+// like above, except that Comp might be != 0
+#define   pIsConstant(p)            p_IsConstant(p,currRing)
+// like above, except that p must be != NULL
+#define   pLmIsConstantComp(p)      p_LmIsConstantComp(p, currRing)
+#define   pLmIsConstant(p)          p_LmIsConstant(p,currRing)
+
+// return TRUE if all monomials of p are constant
+#define   pIsConstantPoly(p)        p_IsConstantPoly(p, currRing)
+
+#define   pIsPurePower(p)   p_IsPurePower(p, currRing)
+#define   pIsVector(p)      (pGetComp(p)>0)
 
 
 /***************************************************************
@@ -234,11 +265,6 @@ extern poly     ppNoether;
 extern BOOLEAN  pVectorOut;
 
 /*-------------predicate on polys ----------------------*/
-BOOLEAN   p_IsConstant(const poly p, const ring r);
-#define   pIsConstant(p)    p_IsConstant(p,currRing)
-BOOLEAN   pIsConstantPoly(poly p);
-#define   pIsPurePower(p)   p_IsPurePower(p, currRing)
-#define   pIsVector(p)      (pGetComp(p)>0)
 BOOLEAN   pHasNotCF(poly p1, poly p2);   /*has no common factor ?*/
 void      pSplit(poly p, poly * r);   /*p => IN(p), r => REST(p) */
 
@@ -346,15 +372,6 @@ poly      pDivByMonom (poly p1,poly p2);
 // Returns as i-th entry of P the coefficient of the (i-1) power of
 // the leading monomial of p2 in p1
 void      pCancelPolyByMonom (poly p1,poly p2,polyset * P,int * SizeOfSet);
-
-// orders monoms of poly using insertion sort, performs pSetm on each
-// monom (i.e. sets Order field)
-poly      pOrdPolyInsertSetm(poly p);
-
-// orders monoms of poly using merge sort (ususally faster than
-// insertion sort). ASSUMES that pSetm was performed on monoms
-// (i.e. that Order field is set correctly)
-poly      pOrdPolyMerge(poly p);
 
 poly      pPermPoly (poly p, int * perm, ring OldRing, nMapFunc nMap,
                      int *par_perm=NULL, int OldPar=0);

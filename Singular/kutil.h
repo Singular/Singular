@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.53 2000-12-21 16:37:51 obachman Exp $ */
+/* $Id: kutil.h,v 1.54 2000-12-31 15:14:34 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -95,6 +95,8 @@ public:
   KINLINE void SetLmCurrRing();
 
   // Iterations
+  // simply get the next monomial
+  KINLINE poly Next();
   KINLINE void LmDeleteAndIter();
 
   // deg stuff

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sparsmat.cc,v 1.46 2000-12-06 11:03:30 Singular Exp $ */
+/* $Id: sparsmat.cc,v 1.47 2000-12-31 15:14:45 obachman Exp $ */
 
 /*
 * ABSTRACT: operations with sparse matrices (bareiss, ...)
@@ -21,25 +21,22 @@
 #include "numbers.h"
 #include "sparsmat.h"
 #include "prCopy.h"
+#include "p_Procs.h"
+#include "kbuckets.h"
+#include "p_Mult_q.h"
 
-/* ----------------- general definitions ------------------ */
-/* in structs.h
-typedef struct smprec sm_prec;
-typedef sm_prec * smpoly;
-struct smprec{
-  smpoly n;            // the next element
-  int pos;             // position
-  int e;               // level
-  poly m;              // the element
-  float f;             // complexity of the element
-};
-*/
+// define SM_NO_BUCKETS, if sparsemat stuff should not use buckets
+// #define SM_NO_BUCKETS
 
-#if OLD > 0
-static poly smSelectCopy(poly, const poly);
+// this is also influenced by TEST_OPT_NOTBUCKETS
+#ifndef SM_NO_BUCKETS
+// buckets do carry a small additional overhead: only use them if 
+// min-length of polys is >= SM_MIN_LENGTH_BUCKET
+#define SM_MIN_LENGTH_BUCKET MIN_LENGTH_BUCKET - 5
 #else
-#define smSelectCopy ppMult_Coeff_mm_DivSelect
+#define SM_MIN_LENGTH_BUCKET    INT_MAX
 #endif
+
 
 /* declare internal 'C' stuff */
 static void smExactPolyDiv(poly, poly);
@@ -57,6 +54,31 @@ static smpoly smPoly2Smpoly(poly);
 static poly smSmpoly2Poly(smpoly);
 static BOOLEAN smHaveDenom(poly);
 static number smCleardenom(ideal);
+
+static poly pp_Mult_Coeff_mm_DivSelect_MultDiv(poly p, int &lp, poly m, 
+                                               poly a, poly b)
+{
+  if (rOrd_is_c_dp(currRing))
+  {
+    int shorter;
+    p = currRing->p_Procs->pp_Mult_Coeff_mm_DivSelectMult(p, m, a, b, 
+                                                          shorter, currRing);
+    lp -= shorter;
+  }
+  else
+  {
+    p = pp_Mult_Coeff_mm_DivSelect(p, lp, m, currRing);
+    smExpMultDiv(p, a, b);
+  }
+  return p;
+}
+
+static poly smSelectCopy_ExpMultDiv(poly p, poly m, poly a, poly b)
+{
+  int lp = 0;
+  return pp_Mult_Coeff_mm_DivSelect_MultDiv(p, lp, m, a, b);
+}
+
 
 /* class for sparse matrix:
 *      3 parts of matrix during the algorithm
@@ -133,37 +155,61 @@ public:
   void smToIntvec(intvec *);
 };
 
+Exponent_t smExpBound(ideal Id)
+{
+  Exponent_t max = 0;
+  long ldeg;
+  int dummy, i, n = IDELEMS(Id);
+  
+  for (i=0; i<n; i++)
+  {
+    if (Id->m[i] != NULL)
+    {
+      ldeg = pLDeg(Id->m[i], &dummy);
+      if (ldeg > max) max = ldeg;
+    }
+  }
+  return max*2*n;
+}
+
+// #define HOMOG_LP
 /* ----------------- ops with rings ------------------ */
 ideal smRingCopy(ideal I, ring *ri, sip_sring &tmpR)
 {
   ring origR =NULL;
   ideal II;
-  if (currRing->order[0]!=ringorder_c)
-  {
-    origR =currRing;
-    tmpR=*origR;
-    int *ord=(int*)omAlloc0(3*sizeof(int));
-    int *block0=(int*)omAlloc(3*sizeof(int));
-    int *block1=(int*)omAlloc(3*sizeof(int));
-    ord[0]=ringorder_c;
-    ord[1]=ringorder_dp;
-    tmpR.order=ord;
-    tmpR.OrdSgn=1;
-    block0[1]=1;
-    tmpR.block0=block0;
-    block1[1]=tmpR.N;
-    tmpR.block1=block1;
-    rComplete(&tmpR,1);
-    rChangeCurrRing(&tmpR);
-    // fetch data from the old ring
-    II=idInit(IDELEMS(I),I->rank);
-    int k;
-    for (k=0;k<IDELEMS(I);k++) II->m[k] = prCopyR( I->m[k], origR);
-  }
+  origR =currRing;
+  tmpR=*origR;
+  int *ord=(int*)omAlloc0(3*sizeof(int));
+  int *block0=(int*)omAlloc(3*sizeof(int));
+  int *block1=(int*)omAlloc(3*sizeof(int));
+  ord[0]=ringorder_c;
+#ifdef HOMOG_LP
+  if (idHomIdeal(I))
+    ord[1] = ringorder_lp;
   else
-  {
-    II=idCopy(I);
-  }
+#endif
+    ord[1]=ringorder_dp;
+  tmpR.order=ord;
+  tmpR.OrdSgn=1;
+  block0[1]=1;
+  tmpR.block0=block0;
+  block1[1]=tmpR.N;
+  tmpR.block1=block1;
+
+  tmpR.bitmask = smExpBound(I);
+
+  // unfortunately, we can not work (yet) with r->N == 0
+  if (tmpR.bitmask < 1) tmpR.bitmask = 1;
+  if (tmpR.bitmask > currRing->bitmask) tmpR.bitmask = currRing->bitmask;
+
+  rComplete(&tmpR,1);
+  rChangeCurrRing(&tmpR);
+  if (TEST_OPT_PROT)
+    Print("[%d:%d]", (long) tmpR.bitmask, tmpR.ExpL_Size);
+  // fetch data from the old ring
+  II = idrCopyR(I, origR);
+  idTest(II);
   *ri = origR;
   return II;
 }
@@ -950,7 +996,7 @@ void sparse_mat::sm1Elim()
         do
         {
           res = res->n = smElemCopy(b);
-          res->m = smMult(b->m, w);
+          res->m = ppMult_qq(b->m, w);
           res->e = 1;
           res->f = smPolyWeight(res);
           b = b->n;
@@ -965,16 +1011,16 @@ void sparse_mat::sm1Elim()
       else if (a->pos > b->pos)
       {
         res = res->n = smElemCopy(b);
-        res->m = smMult(b->m, w);
+        res->m = ppMult_qq(b->m, w);
         res->e = 1;
         res->f = smPolyWeight(res);
         b = b->n;
       }
       else
       {
-        ha = smMult(a->m, p);
+        ha = ppMult_qq(a->m, p);
         pDelete(&a->m);
-        hb = smMult(b->m, w);
+        hb = ppMult_qq(b->m, w);
         ha = pAdd(ha, hb);
         if (ha != NULL)
         {
@@ -1679,39 +1725,6 @@ void sparse_mat::smInitPerm()
 }
 
 /* ----------------- arithmetic ------------------ */
-
-/*
-*  returns a*b
-*  a,b NOT destroyed
-*/
-poly smMult(poly a, poly b)
-{
-  poly pa, res, r;
-
-  if (smSmaller(a, b))
-  {
-    r = a;
-    a = b;
-    b = r;
-  }
-  if (pNext(b) == NULL)
-  {
-    if (pLmIsConstantComp(b))
-      return ppMult_nn(a, pGetCoeff(b));
-    else
-      return ppMult_mm(a, b);
-  }
-  pa = res = ppMult_mm(a, b);
-  pIter(b);
-  do
-  {
-    r = ppMult_mm(a, b);
-    smCombineChain(&pa, r);
-    pIter(b);
-  } while (b != NULL);
-  return res;
-}
-
 /*2
 * exact division a/b
 * a destroyed, b NOT destroyed
@@ -1769,38 +1782,35 @@ void smPolyDiv(poly a, poly b)
   pLmFree(dummy);
 }
 
+#define X_MAS
+#ifdef X_MAS
+
 /*
 *  returns the part of (a*b)/exp(lead(c)) with nonegative exponents
 */
 poly smMultDiv(poly a, poly b, const poly c)
 {
   poly pa, e, res, r;
-  BOOLEAN lead;
+  BOOLEAN lead;\
+  int la, lb, lr;
 
-  if (smSmaller(a, b))
+  if ((c == NULL) || pLmIsConstantComp(c))
+  {
+    return ppMult_qq(a, b);
+  }
+
+  pqLength(a, b, la, lb, SM_MIN_LENGTH_BUCKET);
+
+  // we iter over b, so, make sure b is the shortest
+  // such that we minimize our iterations
+  if (lb > la)
   {
     r = a;
     a = b;
     b = r;
-  }
-  if ((c == NULL) || pLmIsConstantComp(c))
-  {
-    if (pNext(b) == NULL)
-    {
-      if (pLmIsConstantComp(b))
-        return ppMult_nn(a, pGetCoeff(b));
-      else
-        return ppMult_mm(a, b);
-    }
-    pa = res = ppMult_mm(a, b);
-    pIter(b);
-    do
-    {
-      r = ppMult_mm(a, b);
-      smCombineChain(&pa, r);
-      pIter(b);
-    } while (b != NULL);
-    return res;
+    lr = la;
+    la = lb;
+    lb = lr;
   }
   res = NULL;
   e = pInit();
@@ -1811,8 +1821,136 @@ poly smMultDiv(poly a, poly b, const poly c)
     if (smIsNegQuot(e, b, c))
     {
       lead = pLmDivisibleByNoComp(e, a);
-      r = smSelectCopy(a, e);
-      smExpMultDiv(r, b, c);
+      r = smSelectCopy_ExpMultDiv(a, e, b, c);
+    }
+    else
+    {
+      lead = TRUE;
+      r = ppMult_mm(a, e);
+    }
+    if (lead)
+    {
+      if (res != NULL)
+      {
+        smFindRef(&pa, &res, r);
+        if (pa == NULL)
+          lead = FALSE;
+      }
+      else
+      {
+        pa = res = r;
+      }
+    }
+    else
+      res = pAdd(res, r);
+    pIter(b);
+    if (b == NULL)
+    {
+      pLmFree(e);
+      return res;
+    }
+  }
+  
+  if (!TEST_OPT_NOT_BUCKETS && lb >= SM_MIN_LENGTH_BUCKET)
+  {
+    // use buckets if minimum length is smaller than threshold
+    spolyrec rp;
+    poly append;
+    // find the last monomial before pa
+    if (res == pa)
+    {
+      append = &rp;
+      pNext(append) = res;
+    }
+    else
+    {
+      append = res;
+      while (pNext(append) != pa) 
+      {
+        assume(pNext(append) != NULL);
+        pIter(append);
+      }
+    }
+    kBucket_pt bucket = kBucketCreate(currRing);
+    kBucketInit(bucket, pNext(append), 0);
+    do
+    {
+      pSetCoeff0(e,pGetCoeff(b));
+      if (smIsNegQuot(e, b, c))
+      {
+        lr = la;
+        r = pp_Mult_Coeff_mm_DivSelect_MultDiv(a, lr, e, b, c);
+        if (pLmDivisibleByNoComp(e, a))
+          append = kBucket_ExtractLarger_Add_q(bucket, append, r, &lr);
+        else
+          kBucket_Add_q(bucket, r, &lr);
+      }
+      else
+      {
+        r = ppMult_mm(a, e);
+        append = kBucket_ExtractLarger_Add_q(bucket, append, r, &la);
+      }
+      pIter(b);
+    } while (b != NULL);
+    pNext(append) = kBucketClear(bucket);
+    kBucketDestroy(&bucket);
+  }
+  else
+  {
+    // use old sm stuff
+    do
+    {
+      pSetCoeff0(e,pGetCoeff(b));
+      if (smIsNegQuot(e, b, c))
+      {
+        r = smSelectCopy_ExpMultDiv(a, e, b, c);
+        if (pLmDivisibleByNoComp(e, a))
+          smCombineChain(&pa, r);
+        else
+          pa = pAdd(pa,r);
+      }
+      else
+      {
+        r = ppMult_mm(a, e);
+        smCombineChain(&pa, r);
+      }
+      pIter(b);
+    } while (b != NULL);
+  }
+  pLmFree(e);
+  return res;
+}
+
+#else
+
+/*
+*  returns the part of (a*b)/exp(lead(c)) with nonegative exponents
+*/
+poly smMultDiv(poly a, poly b, const poly c)
+{
+  poly pa, e, res, r;
+  BOOLEAN lead;
+
+  if ((c == NULL) || pLmIsConstantComp(c))
+  {
+    return ppMult_qq(a, b);
+  }
+  if (smSmaller(a, b))
+  {
+    r = a;
+    a = b;
+    b = r;
+  }
+  res = NULL;
+  e = pInit();
+  lead = FALSE;
+  while (!lead)
+  {
+    pSetCoeff0(e,pGetCoeff(b));
+    if (smIsNegQuot(e, b, c))
+    {
+      lead = pLmDivisibleByNoComp(e, a);
+      r = smSelectCopy_ExpMultDiv(a, e, b, c);
     }
     else
     {
@@ -1846,8 +1984,7 @@ poly smMultDiv(poly a, poly b, const poly c)
     pSetCoeff0(e,pGetCoeff(b));
     if (smIsNegQuot(e, b, c))
     {
-      r = smSelectCopy(a, e);
-      smExpMultDiv(r, b, c);
+      r = smSelectCopy_ExpMultDiv(a, e, b, c);
       if (pLmDivisibleByNoComp(e, a))
         smCombineChain(&pa, r);
       else
@@ -1863,7 +2000,7 @@ poly smMultDiv(poly a, poly b, const poly c)
   pLmFree(e);
   return res;
 }
-
+#endif
 /*n
 * exact division a/b
 * a is a result of smMultDiv
@@ -1879,6 +2016,7 @@ void smSpecialPolyDiv(poly a, poly b)
   smExactPolyDiv(a, b);
 }
 
+
 /* ------------ internals arithmetic ------------- */
 static void smExactPolyDiv(poly a, poly b)
 {
@@ -1886,24 +2024,51 @@ static void smExactPolyDiv(poly a, poly b)
   poly tail = pNext(b), e = pInit();
   poly h;
   number y, yn;
+  int lt = pLength(tail);
 
-  do
+  if (lt + 1 >= SM_MIN_LENGTH_BUCKET &&  !TEST_OPT_NOT_BUCKETS)
   {
-    y = nDiv(pGetCoeff(a), x);
-    nNormalize(y);
-    pSetCoeff(a,y);
-    yn = nNeg(nCopy(y));
-    pSetCoeff0(e,yn);
-    if (smIsNegQuot(e, a, b))
+    kBucket_pt bucket = kBucketCreate(currRing);
+    kBucketInit(bucket, pNext(a), 0);
+    int lh = 0;
+    do
     {
-      h = smSelectCopy(tail, e);
-      smExpMultDiv(h, a, b);
-    }
-    else
-      h = ppMult_mm(tail, e);
-    nDelete(&yn);
-    a = pNext(a) = pAdd(pNext(a), h);
-  } while (a!=NULL);
+      y = nDiv(pGetCoeff(a), x);
+      nNormalize(y);
+      pSetCoeff(a,y);
+      yn = nNeg(nCopy(y));
+      pSetCoeff0(e,yn);
+      lh = lt;
+      if (smIsNegQuot(e, a, b))
+      {
+        h = pp_Mult_Coeff_mm_DivSelect_MultDiv(tail, lh, e, a, b);
+      }
+      else
+        h = ppMult_mm(tail, e);
+      nDelete(&yn);
+      kBucket_Add_q(bucket, h, &lh);
+    
+      a = pNext(a) = kBucketExtractLm(bucket);
+    } while (a!=NULL);
+    kBucketDestroy(&bucket);
+  }
+  else
+  {
+    do
+    {
+      y = nDiv(pGetCoeff(a), x);
+      nNormalize(y);
+      pSetCoeff(a,y);
+      yn = nNeg(nCopy(y));
+      pSetCoeff0(e,yn);
+      if (smIsNegQuot(e, a, b))
+        h = smSelectCopy_ExpMultDiv(tail, e, a, b);
+      else
+        h = ppMult_mm(tail, e);
+      nDelete(&yn);
+      a = pNext(a) = pAdd(pNext(a), h);
+    } while (a!=NULL);
+  }
   pLmFree(e);
 }
 
@@ -1939,12 +2104,18 @@ static void smExpMultDiv(poly t, const poly b, const poly c)
   pTest(t);
   pLmTest(b);
   pLmTest(c);
+  poly bc = p_New(currRing);
+  
+  p_ExpVectorDiff(bc, b, c, currRing);
+  
   while(t!=NULL)
   {
-    pExpVectorAddSub(t, b, c);
+    pExpVectorAdd(t, bc);
     pIter(t);
   }
+  p_LmFree(bc, currRing);
 }
+
 
 static void smPolyDivN(poly a, const number x)
 {
@@ -2015,6 +2186,7 @@ static void smCombineChain(poly *px, poly r)
   }
   *px = pa;
 }
+
 
 static void smFindRef(poly *ref, poly *px, poly r)
 {

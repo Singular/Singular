@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.244 2000-12-19 18:31:39 obachman Exp $ */
+/* $Id: iparith.cc,v 1.245 2000-12-31 15:14:30 obachman Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1743,6 +1743,12 @@ static BOOLEAN jjGCD_I(leftv res, leftv u, leftv v)
   res->data=(char *)p0;
   return FALSE;
 }
+static BOOLEAN jjGCD_N(leftv res, leftv u, leftv v)
+{
+  res->rtyp=NUMBER_CMD;
+  res->data=(char *)nGcd((number) u->Data(), (number) v->Data());
+  return FALSE;
+}
 static BOOLEAN jjHILBERT2(leftv res, leftv u, leftv v)
 {
   assumeStdFlag(u);
@@ -2352,6 +2358,7 @@ struct sValCmd2 dArith2[]=
 #else
 ,{jjWRONG2,    GCD_CMD,        POLY_CMD,       POLY_CMD,   POLY_CMD PROFILER}
 #endif
+,{jjGCD_N,     GCD_CMD,        NUMBER_CMD,     NUMBER_CMD, NUMBER_CMD PROFILER}
 ,{jjHILBERT2,  HILBERT_CMD,    INTVEC_CMD,     IDEAL_CMD,  INT_CMD PROFILER}
 ,{jjHILBERT2,  HILBERT_CMD,    INTVEC_CMD,     MODUL_CMD,  INT_CMD PROFILER}
 ,{jjHOMOG_P,   HOMOG_CMD,      POLY_CMD,       POLY_CMD,   POLY_CMD PROFILER}

@@ -1,8 +1,8 @@
-// $Id: tst.lib,v 1.30 2000-12-22 15:05:57 greuel Exp $
+// $Id: tst.lib,v 1.31 2000-12-31 15:14:47 obachman Exp $
 //(obachman, last modified 6/30/98)
 /////////////////////////////////////////////////////////////////////////////
 
-version="$Id: tst.lib,v 1.30 2000-12-22 15:05:57 greuel Exp $";
+version="$Id: tst.lib,v 1.31 2000-12-31 15:14:47 obachman Exp $";
 category="Utilities";
 info="
 LIBRARY:  tst.lib      Procedures for running automatic tst Tests
@@ -13,6 +13,10 @@ PROCEDURES:
                                    prepending prefix \"// tst_ignore:\"
  tst_init()             writes some identification data to GetTstStatusFile()
  tst_status([any])      writes status info to to GetTstStatusFile()
+ tst_InitTimer()        initialize tst-Timer
+ tst_StopTimer()        stop Tst-Timer
+ tst_GetTimer           get value of Tst-Timer
+ tst_ReportTimer        report value of Tst-Timer
  tst_groebnerTest(ideal i)
                         tests groebner command
  tst_stdEqual(ideal i1, ideal i2)
@@ -185,15 +189,39 @@ static proc tst_status_out (def prefix, def what, list #)
 }
 
 proc tst_status (list #)
-"USAGE:   tst_status([any])
-RETURN:   none; writes to stdout the current memory usage and used time
-          since last call to tst_status(), if no argument is given, or,
-          since start-up of Singular, if an argument is given.
+"USAGE:   tst_status([prefix [, start_up]])
+           prefix -- string
+           start_up -- int
+RETURN:   none
+PURPOSE: writes to tst-output the current memory usage and used CPU time.
+         If no integer argument is given, the elapsed CPU time since 
+         the last call to tst_status() is reported.
+         If an integer argument is given, the elapsed CPU time since the
+         start-up of Singular is reported.
+         If prefix is given, output reported start with prefix.
 NOTE:     Should be used regularly within tst files to enable automatic
           tracking of memory and time performance.
 EXAMPLE: example tst_status; shows example
+SEE ALSO: tst_init
 "
 {
+  int start_up;
+  
+  if (size(#) > 0)
+  {
+    if (typeof(#[1]) == "string")
+    {
+      string prefix = #[1];
+      if (size(#) > 1)
+      {
+        start_up = 1;
+      }
+    }
+    else
+    {
+      start_up = 1;
+    }
+  }
   if (! defined(tst_no_status))
   {
     if (! defined(tst_status_counter))
@@ -206,16 +234,20 @@ EXAMPLE: example tst_status; shows example
       tst_status_counter++;
     }
 
-    tst_status_out(tst_status_counter, "tst_memory_0", memory(0));
-    tst_status_out(tst_status_counter, "tst_memory_1", memory(1));
-    tst_status_out(tst_status_counter, "tst_memory_2", memory(2));
-    if (size(#) > 0)
+    if (!defined(prefix))
     {
-      tst_status_out(tst_status_counter, "tst_timer_1", timer);
+      def prefix = tst_status_counter;
+    }
+    tst_status_out(prefix, "tst_memory_0", memory(0));
+    tst_status_out(prefix, "tst_memory_1", memory(1));
+    tst_status_out(prefix, "tst_memory_2", memory(2));
+    if (start_up > 0)
+    {
+      tst_status_out(prefix, "tst_timer_1", timer);
     }
     else
     {
-      tst_status_out(tst_status_counter, "tst_timer", timer - Get_tst_timer());
+      tst_status_out(prefix, "tst_timer", timer - Get_tst_timer());
       Set_tst_timer(timer);
     }
   }
@@ -231,16 +263,37 @@ example
 }
 
 
-proc tst_init()
-"USAGE:   tst_init()
-RETURN:  none; writes some identification data to stdout;
-         should be called as first routine in a tst file
+proc tst_init(list #)
+"USAGE:   tst_init([file])
+            file -- string
+RETURN:  none
+PURPOSE: initializes further calls to tst routines:
+         If no arguments are given, and if tst_status_file is not defined,
+         then tst-output is written to stdout, else tst-output is written
+         to file.
 EXAMPLE: example tst_init; shows example
 "
 {
   if (! defined(tst_no_status))
   {
-    write(":w " + GetTstStatusFile(), "Status Output of " + GetTstStatusFile());
+    string outfile = "";
+    
+    if (size(#) > 0)
+    {
+      if (typeof(#[1]) == string)
+      {
+        outfile  = #[1];
+      }
+    }
+    if (!defined(tst_status_file))
+    {
+      string tst_status_file = outfile;
+      export tst_status_file;
+    }
+    if (GetTstStatusFile() != "")
+    {
+      write(":w " + GetTstStatusFile(), "Status Output of " + GetTstStatusFile());
+    }
     tst_status_out("init", "USER    :" + system("getenv", "USER"));
     tst_status_out("init", "HOSTNAME:" + tst_system("hostname", 1));
     tst_status_out("init", "uname -a:" + tst_system("uname -a", 1));
@@ -254,6 +307,95 @@ example
 {
   "EXAMPLE";  echo = 2;
   tst_init();
+}
+
+proc tst_InitTimer(list #)
+"USAGE: tst_InitTime([ticks_per_second])
+          ticks_per_second -- int
+RETURN: none
+PURPOSE: initializes tst timer for subsequent calls to tst_StopTimer or
+         tst_ReportTimer.
+         If the ticks_per_second argument is given, then the timer resolution
+         is set to this value. Otherwise, the default timer resolution is used.
+SEE ALSO: tst_StopTimer, tst_GetTimer, tst_ReportTimer
+"
+{
+  if (!defined(tst_Timer))
+  {
+    int tst_Timer;
+    export tst_Timer;
+  }
+  if (size(#) > 0)
+  {
+    if (typeof(#[1]) == "int")
+    {
+      if (#[1] > 0)
+      {
+        system("--ticks-per-sec", #[1]);
+      }
+      else
+      {
+        ERROR("need integer argument > 0");
+      }
+    }
+    else
+    {
+      ERROR("need integer argument");
+    }
+  }
+  tst_Timer = timer;
+}
+
+proc tst_StopTimer()
+"USAGE: tst_StopTimer()
+RETURN: int, timer ticks of elapsed CPU time since last call to tst_InitTimer
+PUPOSE: stops the timer initialized by previous call to tst_InitTimer
+SEE ALSO: tst_InitTimer, tst_GetTimer, tst_ReportTimer
+"
+{
+  tst_Timer = timer - tst_Timer;
+  return (tst_Timer);
+}
+
+proc tst_GetTimer()
+"USAGE: tst_GetTimer()
+RETURN: int, timer ticks of elapsed CPU time since last call to tst_Init
+NOTE:  does NOT stop the time initialized by previous call to tst_InitTimer
+SEE ALSO: tst_InitTimer, tst_GetTimer, tst_ReportTimer
+"
+{
+  int tt = timer - tst_Timer;
+  return (tt);
+}
+
+proc tst_ReportTimer(list #)
+"USAGE: tst_ReportTimer([prefix])
+RETURN: none
+PUPOSE: stops the timer initialized by previous call to tst_InitTimer;
+        reports time to tst-output;
+        if prefix is given, timer output is prefixed by it.
+SEE ALSO: tst_InitTimer, tst_GetTimer, tst_StopTimer, tst_OutTimer, tst_init
+"
+{
+  tst_Timer = timer - tst_Timer;
+  tst_OutTimer(tst_Timer, #);
+}
+
+proc tst_OutTimer(int tt, list #)
+"USAGE: tst_OutTimer(ticks [, prefix])
+RETURN: none
+PURPOSE: reports value of tt to tst-output;
+         if prefix is given, timer output is prefixed by it.
+SEE ALSO: tst_InitTimer, tst_GetTimer, tst_StopTimer, tst_ReportTimer, tst_init
+"
+{
+  string prefix = "OutTimer";
+  
+  if (size(#) > 0)
+  {
+    prefix = string(#[1]);
+  }
+  tst_status_out(prefix, "tst-Timer", tt);
 }
 
 ///////////////////////////////////////////////////////////////////////
