@@ -1,11 +1,13 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: sm_util.cc,v 1.1 1997-07-14 15:11:56 schmidt Exp $ */
+/* $Id: sm_util.cc,v 1.2 1997-07-19 08:39:15 schmidt Exp $ */
 
 //{{{ docu
 //
 // sm_util.cc - utlities for sparse modular gcd.
 //
 // Dependencies: Routines used by and only by sm_sparsemod.cc.
+//
+// Contributed by Marion Bruder <bruder@math.uni-sb.de>.
 //
 //}}}
 
@@ -56,7 +58,14 @@ fmonome( const CanonicalForm & f  )
 //{{{ static CanonicalForm interpol( const CFArray & values, const CanonicalForm & point, const CFArray & points, const Variable & x, int d, int CHAR )
 //{{{ docu
 //
-// interpol() - ???.
+// interpol() - Newton interpolation.
+//
+// Calculate f in x such that f(point) = values[1],
+// f(points[i]) = values[i], i=2, ..., d+1.
+// Make sure that you are calculating in a field.
+//
+// alpha: the values at the interpolation points (= values)
+// punkte: the point at which we interpolate (= (point, points))
 //
 //}}}
 static CanonicalForm
@@ -64,8 +73,6 @@ interpol( const CFArray & values, const CanonicalForm & point, const CFArray & p
 {
   CFArray alpha( 1, d+1 );
   int i;
-
-  // alpha sind die Werte und punkte die Punkte d.h. [punkte[i], alpha[i]]
   for ( i = 1 ; i <= d+1 ; i++ )
     {
       alpha[i] = values[i];
@@ -85,6 +92,7 @@ interpol( const CFArray & values, const CanonicalForm & point, const CFArray & p
 	}
     }
 
+  // calculate Newton coefficients alpha[i]
   for ( k = 2 ; k <= d+1 ; k++ )
     {
       for ( j = d+1 ; j >= k ; j-- )
@@ -93,25 +101,13 @@ interpol( const CFArray & values, const CanonicalForm & point, const CFArray & p
 	}
     }
 
+  // calculate f from Newton coefficients
   CanonicalForm f = alpha [1], produkt = 1;
   for ( i = 1 ; i <= d ; i++ )
     {
       produkt *= ( x - punkte[i] );
-      f += ( alpha[ i + 1 ] * produkt ) ;
+      f += ( alpha[i+1] * produkt ) ;
     }
-
-  //else
-  //  {
-  // voellig unnuetze Fallunterscheidung !?
-  //    cout << " in Lagrange " << endl;
-  //    CanonicalForm result = 0;
-  // Lagrange ///
-  //    for ( i = 1; i <= d+1; i++ )
-  //{
-  //result += (alpha[i] * ( zaehler( i, d+1 , punkte, x)/ nenner( i, d+1, punkte )));
-  //}
-  //    return result;
-  //  }
 
   return f;
 }
