@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.44 1998-05-08 14:17:21 obachman Exp $ */
+/* $Id: extra.cc,v 1.45 1998-05-08 15:29:38 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -261,7 +261,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
     {
       BOOLEAN mainGetSingOptionValue(const char* name, char** result);
       char* val;
-      
+
       if (mainGetSingOptionValue(&((char*)(h->data))[2], &val))
       {
         res->data = (void*) val;
@@ -566,7 +566,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
         {
           if (h->next->next->Typ()!=POLY_CMD)
           {
-	      Warn("Wrong types for poly= comb(ideal,poly)");
+              Warn("Wrong types for poly= comb(ideal,poly)");
           }
         }
         res->rtyp=POLY_CMD;
@@ -587,7 +587,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
         {
           if (h->next->next->Typ()!=POLY_CMD)
           {
-	      Warn("Wrong types for poly= comb(ideal,poly)");
+              Warn("Wrong types for poly= comb(ideal,poly)");
           }
         }
         res->rtyp=POLY_CMD;
@@ -628,35 +628,35 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
 #ifdef FACTORY_GCD_TEST
 /*=======================gcd Testerei ================================*/
     if ( ! strcmp( (char*)(h->Data()), "setgcd" ) ) {
-	if ( (h->next != NULL) && (h->next->Typ() == INT_CMD) ) {
-	    CFPrimitiveGcdUtil::setAlgorithm( (int)h->next->Data() );
-	    return FALSE;
-	} else
-	    WerrorS("int expected");
+        if ( (h->next != NULL) && (h->next->Typ() == INT_CMD) ) {
+            CFPrimitiveGcdUtil::setAlgorithm( (int)h->next->Data() );
+            return FALSE;
+        } else
+            WerrorS("int expected");
     }
     else
 #endif
 
 #ifdef FACTORY_GCD_TIMING
     if ( ! strcmp( (char*)(h->Data()), "gcdtime" ) ) {
-	TIMING_PRINT( contentTimer, "time used for content: " );
-	TIMING_PRINT( algContentTimer, "time used for algContent: " );
-	TIMING_PRINT( algLcmTimer, "time used for algLcm: " );
-	TIMING_RESET( contentTimer );
-	TIMING_RESET( algContentTimer );
-	TIMING_RESET( algLcmTimer );
-	return FALSE;
+        TIMING_PRINT( contentTimer, "time used for content: " );
+        TIMING_PRINT( algContentTimer, "time used for algContent: " );
+        TIMING_PRINT( algLcmTimer, "time used for algLcm: " );
+        TIMING_RESET( contentTimer );
+        TIMING_RESET( algContentTimer );
+        TIMING_RESET( algLcmTimer );
+        return FALSE;
     }
     else
 #endif
-      
+
 #ifdef FACTORY_GCD_STAT
     if ( ! strcmp( (char*)(h->Data()), "gcdstat" ) ) {
-	printGcdTotal();
-	printContTotal();
-	resetGcdTotal();
-	resetContTotal();
-	return FALSE;
+        printGcdTotal();
+        printContTotal();
+        resetGcdTotal();
+        resetContTotal();
+        return FALSE;
     }
     else
 #endif
@@ -686,9 +686,10 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
       idhdl hh=namespaceroot->get((char*)h->next->Data(),0, TRUE);
       if ((hh!=NULL)&&(IDTYP(hh)==PACKAGE_CMD))
       {
-	namespaceroot = namespaceroot->push(IDPACKAGE(hh), IDID(hh));
-	return FALSE;
-      } else
+        namespaceroot = namespaceroot->push(IDPACKAGE(hh), IDID(hh));
+        return FALSE;
+      }
+      else
         Warn("package `%s` not found",(char*)h->next->Data());
     }
     else
@@ -704,7 +705,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
     {
       namehdl nshdl = namespaceroot;
       for( ; nshdl->isroot != TRUE; nshdl = nshdl->next) {
-	Print("NSstack: %s:%d\n", nshdl->name, nshdl->lev);
+        Print("NSstack: %s:%d\n", nshdl->name, nshdl->lev);
       }
       Print("NSstack: %s:%d\n", nshdl->name, nshdl->lev);
       return FALSE;
@@ -725,11 +726,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
     if(strcmp((char*)(h->Data()),"load")==0)
     {
       if ((h->next!=NULL) && (h->next->Typ()==STRING_CMD)) {
-	int iiAddCproc(char *libname, char *procname, BOOLEAN pstatic,
-		       BOOLEAN(*func)(leftv res, leftv v));
+        int iiAddCproc(char *libname, char *procname, BOOLEAN pstatic,
+                       BOOLEAN(*func)(leftv res, leftv v));
         int (*fktn)(int(*iiAddCproc)(char *libname, char *procname,
-				     BOOLEAN pstatic,
-				     BOOLEAN(*func)(leftv res, leftv v)));
+                                     BOOLEAN pstatic,
+                                     BOOLEAN(*func)(leftv res, leftv v)));
         void *vp;
         res->rtyp=STRING_CMD;
 
