@@ -1,5 +1,5 @@
 # @configure_input@
-# $Id: GNUmakefile.in,v 1.9 1997-07-21 11:17:44 schmidt Exp $
+# $Id: GNUmakefile.in,v 1.10 1997-07-21 14:58:21 schmidt Exp $
 
 #
 # GNUmakefile.in - used by configure to create GNUmakefile, the
@@ -306,7 +306,7 @@ distincl :=	\
 distfiles :=	\
 		$(distsrc) $(distincl) $(hdrtemplsrc) \
 		GNUmakefile.in configure.in config.h.in configure \
-		ChangeLog README \
+		ChangeLog README NEWS INSTALL \
 		bin/install-sh bin/makeheader bin/mkinstalldirs
 
 #
@@ -466,7 +466,7 @@ uninstallgftables:
 # - building a distribution.
 #
 dist:		$(srcdir)/readcf.cc $(srcdir)/configure
-		rm -f $(distname).tar.gz
+		rm -f $(distname).tgz
 		rm -rf $(distname)
 		$(MKINSTALLDIRS) $(distname)/templates
 		$(MKINSTALLDIRS) $(distname)/bin
@@ -476,6 +476,7 @@ dist:		$(srcdir)/readcf.cc $(srcdir)/configure
 		done
 		tar cf $(distname).tar $(distname)
 		gzip $(distname).tar
+		mv $(distname).tar.gz $(distname).tgz
 
 #
 # - cleaning up.
@@ -492,7 +493,7 @@ mostlyclean:	clean
 		fi
 
 distclean:	mostlyclean
-		-rm -f $(distname).tar.gz GNUmakefile stamp-h \
+		-rm -f $(distname).tgz GNUmakefile stamp-h \
 		  config.cache config.log config.status config.h
 		-rm -rf $(distname)
 
