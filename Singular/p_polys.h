@@ -7,7 +7,7 @@
  *           currRing
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
- *  Version: $Id: p_polys.h,v 1.15 2000-11-23 17:34:12 obachman Exp $
+ *  Version: $Id: p_polys.h,v 1.16 2000-11-23 17:41:32 Singular Exp $
  *******************************************************************/
 #ifndef P_POLYS_H
 #define P_POLYS_H
@@ -214,6 +214,9 @@ PINLINE2 unsigned long p_GetTotalDegree(const unsigned long l, const ring r, con
 // return TRUE if all monoms have the same component
 BOOLEAN   p_OneComp(poly p, ring r);
 int       p_IsPurePower(const poly p, const ring r);
+
+// returns the poly representing the integer i
+poly      p_ISet(int i, ring r);
 
 /***************************************************************
  *

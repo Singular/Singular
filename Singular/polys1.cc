@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.54 2000-11-23 17:34:13 obachman Exp $ */
+/* $Id: polys1.cc,v 1.55 2000-11-23 17:44:07 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -496,22 +496,6 @@ void pEnlargeSet(polyset *p, int l, int increment)
     memset(&(h[l]),0,increment*sizeof(poly));
   }
   *p=h;
-}
-
-/*2
-* returns a polynomial representing the integer i
-*/
-poly pISet(int i)
-{
-  poly rc = NULL;
-  if (i!=0)
-  {
-    rc = pInit();
-    pSetCoeff0(rc,nInit(i));
-    if (nIsZero(pGetCoeff(rc)))
-      pDeleteLm(&rc);
-  }
-  return rc;
 }
 
 void pContent(poly ph)
