@@ -81,6 +81,4 @@ list L=splitring(c2-2j,"",list(a2+ja,j,l[5]));
 L;
 L[3]^2;
 kill R1,r;
-// ------------ test of randomLast: ------------------
-example randomLast;
-$
+tst_status(1); $
