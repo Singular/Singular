@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: doc2tex.pl,v 1.11 1999-07-21 19:53:23 obachman Exp $
+# $Id: doc2tex.pl,v 1.12 1999-07-21 21:04:21 obachman Exp $
 ###################################################################
 #  Computer Algebra System SINGULAR
 #
@@ -157,7 +157,7 @@ else
     if ($verbose > 1);
 }
 
-dbmopen(%EXAMPLES, $doc_examples_db, oct(755)) || die "$ERROR: can't open examples data base: $!\n";
+# dbmopen(%EXAMPLES, $doc_examples_db, oct(755)) || die "$ERROR: can't open examples data base: $!\n";
 
 #######################################################################
 # 
@@ -182,7 +182,7 @@ while (<DOC>)
 # wrap up
 #
 close(TEX);
-dbmclose(%EXAMPLES);
+#dbmclose(%EXAMPLES);
 print "\nd2t: Finished generation of $tex_file \n" if ($verbose > 1);
 print "\n" if ($verbose == 1);
 
@@ -241,7 +241,6 @@ sub HandleExample
   return if ($no_ex);
 
   # check whether it can be reused
-  $include = $EXAMPLES{$thisexample};
   if ($reuse && ($include = $EXAMPLES{$thisexample}))
   {
     print "<$example>" if ($verbose);
