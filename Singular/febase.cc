@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.42 1998-06-04 16:24:10 obachman Exp $ */
+/* $Id: febase.cc,v 1.43 1998-06-04 16:34:19 pohl Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -120,7 +120,6 @@ BOOLEAN tclmode=FALSE;
 #  define  DIR_SEP '\\'
 #  define  DIR_SEPP "\\"
 #else  /* unix */
-#  define  FS_SEP ':'
 #  define  DIR_SEP '/'
 #  define  DIR_SEPP "/"
 #endif  /* atarist */
@@ -129,7 +128,7 @@ BOOLEAN tclmode=FALSE;
 
 #if defined(WINNT)
 #  define  FS_SEP ';'
-#elsif defined(macintosh)
+#elif defined(macintosh)
 #define FS_SEP ','
 #else
 #define FS_SEP ':'
@@ -143,7 +142,7 @@ BOOLEAN tclmode=FALSE;
  *****************************************************************/
 
 // Define to chatter about path stuff
-// #define PATH_DEBUG
+#define PATH_DEBUG
 static char* feArgv0 = NULL;
 static char* feExpandedExecutable = NULL;
 static char* feBinDir = NULL;
@@ -247,6 +246,20 @@ static char* feGetSearchPath(const char* bindir)
 // bindir/../../info/singular.hlp
 // ROOTDIR/doc/singular.hlp
 // ROOTDIR/info/singular.hlp
+#ifdef WINNT
+static char * feFixFileName(char *hlpdir)
+{
+  if(strncmp(hlpdir,"//",2)==0)
+  {
+    hlpdir[0]=hlpdir[2];
+    hlpdir[1]=':';
+    mystrcpy(hlpdir+2,hlpdir+3); 
+  }
+  return hlpdir;
+}
+#else
+#define  feFixFileName(A) (A)
+#endif
 
 static char* feGetInfoFile(const char* bindir)
 {
