@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.220 2003-07-03 08:37:51 Singular Exp $
+@comment $Id: reference.doc,v 1.221 2003-08-11 10:02:33 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -4246,10 +4246,10 @@ uses a more lazy approach in std computations,
 which was used in Singular version before 2-0
 (and which may lead to faster or slower computations, depending on the example)
 @c ---------
-@item @code{minRes}
-@cindex minRes, option
-special (additional) minimizing during computations (@code{res}, @code{mres}),
-@*assumes homogeneous case and degree-compatible ordering.
+@c @item @code{minRes}
+@c @cindex minRes, option
+@c special (additional) minimizing during computations (@code{res}, @code{mres}),
+@c @*assumes homogeneous case and degree-compatible ordering.
 @c ---------
 @item @code{notRegularity}
 @cindex notRegularity, option
