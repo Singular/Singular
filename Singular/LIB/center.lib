@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 category="Noncommutative";
 info="
-LIBRARY:  center.lib      computation of central elements of G-algebras/Q-algebras.
+LIBRARY:  center.lib      computation of central elements of G-algebras.
 AUTHORS:  Oleksandr Motsak,        motsak@mathematik.uni-kl.de.
 
 PROCEDURES:
@@ -12,7 +12,7 @@ OVERVIEW:
  (advisor: Prof. Ovsienko Sergiy Adamovich) at Kyiv Taras Shevchenko University: 
  'An algorithm for the computation of the center of noncommutative polynomial algebra'.
  @* The procedures are implemented to be used in characteristic not equal to 2.
- @* This also works for algebraic extensions.
+ @* This also works for algebraic extensions of fields.
  @* The last version of the library can be found via internet at 
     url: 'http://www-user.rhrk.uni-kl.de/~motsak/main/center/'
 
@@ -20,7 +20,8 @@ SUPPORT: HiWi for Viktor Levandovskyy
  
 MAIN PROCEDURES:
 
-center(MaxDeg);             computes the set of 'minimal' elements of degree <= MaxDeg in center, or if MaxDeg == 0 then it attempts to find all generators of center
+center(MaxDeg);             computes the set of 'minimal' elements of degree <= MaxDeg in center, 
+                            or if MaxDeg == 0 then it attempts to find all generators of center
 centralizator(f, MaxDeg);   computes the set of 'minimal' elements of degree <= MaxDeg in centralizator of f
 
 SEE ALSO:  ncalg_lib, nctools_lib
@@ -1759,6 +1760,7 @@ static proc zCancel ( list @tt, list @leads )
 /// procedure for computing "minimal" set of generators...
 //////////////////////////////////////////////////////////////////////////
 
+//////////////////////////////////////////////////////////////////////////
 static proc zReduce( list @z )
 "
 	reduce a set @z - base of Center as V.S.
