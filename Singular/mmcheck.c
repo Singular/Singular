@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmcheck.c,v 1.17 1999-11-15 17:20:23 obachman Exp $ */
+/* $Id: mmcheck.c,v 1.18 1999-11-16 13:04:04 hannes Exp $ */
 
 /*
 * ABSTRACT: several checking routines to help debugging the memory subsystem
@@ -246,7 +246,12 @@ static int mmCheckPattern(char* ptr, char pattern, size_t size)
 }
 
 #ifdef unix
+#ifdef sun
+extern int end;
+#define _end end
+#else
 extern int _end;
+#endif
 #endif
 static int mmCheckSingleDBMCB ( DBMCB * what, int size , int flags)
 {
