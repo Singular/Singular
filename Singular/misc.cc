@@ -189,8 +189,8 @@ int siRand()
 #define Index_File     SINGULAR_INFODIR "/singular.hlp"
 #define Help_File      SINGULAR_INFODIR "/singular.hlp"
 #else
-#define Index_File     "singular.hlp"
-#define Help_File      "singular.hlp"
+#define Index_File     SINGULAR_INFODIR "singular.hlp"
+#define Help_File      SINGULAR_INFODIR "singular.hlp"
 #endif
 #define BUF_LEN        128
 #define IDX_LEN        64
