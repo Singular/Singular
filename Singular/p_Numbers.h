@@ -6,7 +6,7 @@
  *  Purpose: macros/inline functions for number oerations
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Numbers.h,v 1.3 2000-09-18 09:19:27 obachman Exp $
+ *  Version: $Id: p_Numbers.h,v 1.4 2000-09-20 13:25:41 obachman Exp $
  *******************************************************************/
 #ifndef P_NUMBERS_H
 #define P_NUMBERS_H
@@ -31,5 +31,15 @@
 #define n_Neg_FieldZp(n, r)	        npNegM(n)
 #define n_Sub_FieldZp(n1, n2, r)    npSubM(n1, n2)
 
+#define DO_LINLINE
+#include "longrat.cc"
+#define n_Copy_FieldQ(n, r)        nlCopy(n)
+#define n_Delete_FieldQ(n, r)      nlDelete(n)
+#define n_Mult_FieldQ(n1, n2, r)   nlMult(n1,n2)
+#define n_Add_FieldQ(n1, n2, r)    nlAdd(n1, n2)
+#define n_IsZero_FieldQ(n, r)	   nlIsZero(n)
+#define n_Equal_FieldQ(n1, n2, r)  nlEqual(n1, n2)
+#define n_Neg_FieldQ(n, r)	       nlNeg(n)
+#define n_Sub_FieldQ(n1, n2, r)    nlSub(n1, n2)
 #endif
 

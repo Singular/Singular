@@ -6,9 +6,11 @@
  *  Purpose: implementation of primitive procs for polys
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Procs.cc,v 1.9 2000-09-18 10:26:13 obachman Exp $
+ *  Version: $Id: p_Procs.cc,v 1.10 2000-09-20 13:25:41 obachman Exp $
  *******************************************************************/
 #include <string.h>
+
+#define PDEBUG 2
 #include "mod2.h"
 
 
@@ -17,7 +19,6 @@
  * Configurations
  * 
  *******************************************************************/
-// define to enable/disable ptest in p_Procs
 
 /***************************************************************
  Here is how it works:
@@ -41,10 +42,11 @@
 //   0 -- only FieldGeneral_LengthGeneral_OrdGeneral
 //   1 -- plus FieldZp_Length*_OrdGeneral procs
 //   2 -- plus FieldZp_Length*_Ord* procs
-//   3 -- plus Field*_Length*_OrdGeneral procs
-//   4 -- all Field*_Length*_Ord* procs
+//   3 -- plus FieldQ_Length*_Ord*
+//   4 -- plus FieldGeneral_Length*_OrdGeneral procs
+//   5 -- all Field*_Length*_Ord* procs
 #ifdef NDEBUG
-const int HAVE_FAST_P_PROCS = 4;
+const int HAVE_FAST_P_PROCS = 5;
 #else
 const int HAVE_FAST_P_PROCS = 0;
 #endif
@@ -52,6 +54,7 @@ const int HAVE_FAST_P_PROCS = 0;
 // Set HAVE_FAST_FIELD to:
 //   0 -- only FieldGeneral
 //   1 -- special cases for FieldZp
+//   2 -- plus special cases for FieldQ
 //   nothing else is implemented, yet
 const int HAVE_FAST_FIELD = 1;
 
@@ -100,8 +103,8 @@ typedef enum p_Field
   FieldZp,          
   FieldR,
   FieldGF,
-#if HAVE_MORE_FIELDS_IMPLEMENTED
   FieldQ,
+#if HAVE_MORE_FIELDS_IMPLEMENTED
   FieldLong_R,
   FieldLong_C,
   FieldZp_a,
@@ -191,8 +194,8 @@ char* p_FieldEnum_2_String(p_Field field)
       case FieldZp: return "FieldZp";          
       case FieldR: return "FieldR";
       case FieldGF: return "FieldGF";
-#if HAVE_MORE_FIELDS_IMPLEMENTED
       case FieldQ: return "FieldQ";
+#if HAVE_MORE_FIELDS_IMPLEMENTED
       case FieldLong_R: return "FieldLong_R";
       case FieldLong_C: return "FieldLong_C";
       case FieldZp_a: return "FieldZp_a";
@@ -330,23 +333,28 @@ static inline p_Ord ZeroOrd_2_NonZeroOrd(p_Ord ord, int strict)
  *******************************************************************/
 static inline void FastP_ProcsFilter(p_Field &field, p_Length &length, p_Ord &ord)
 {
-  if (HAVE_FAST_P_PROCS >= 4) return;
+  if (HAVE_FAST_P_PROCS >= 5) return;
+  
+  if (HAVE_FAST_P_PROCS < 3 && field == FieldQ)
+    field = FieldGeneral;
   
   if ((HAVE_FAST_P_PROCS == 0) ||
-      (HAVE_FAST_P_PROCS <= 3 && field != FieldZp))
+      (HAVE_FAST_P_PROCS <= 4 && field != FieldZp && field != FieldQ))
   {
     field = FieldGeneral;
     length = LengthGeneral;
     ord = OrdGeneral;
     return;
   }
-  if (HAVE_FAST_P_PROCS == 1 || (HAVE_FAST_P_PROCS == 3 && field != FieldZp))
+  if (HAVE_FAST_P_PROCS == 1 || (HAVE_FAST_P_PROCS == 4 && field != FieldZp))
     ord = OrdGeneral;
 }
 
 static inline void FastFieldFilter(p_Field &field)
 {
-  if (HAVE_FAST_FIELD == 0 || field != FieldZp)
+  if (HAVE_FAST_FIELD <= 0 || 
+      (HAVE_FAST_FIELD == 1 && field != FieldZp) ||
+      (field != FieldZp && field != FieldQ))
     field = FieldGeneral;
 }
       
@@ -519,8 +527,8 @@ static inline p_Field p_FieldIs(ring r)
   if (rField_is_Zp(r)) return FieldZp;          
   if (rField_is_R(r)) return FieldR;
   if (rField_is_GF(r)) return FieldGF;
-#ifdef HAVE_MORE_FIELDS_IMPLEMENTED
   if (rField_is_Q(r)) return FieldQ;
+#ifdef HAVE_MORE_FIELDS_IMPLEMENTED
   if (rField_is_long_R(r)) return FieldLong_R;
   if (rField_is_long_C(r)) return FieldLong_C;
   if (rField_is_Zp_a(r)) return FieldZp_a;

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.h,v 1.17 2000-08-14 12:56:36 obachman Exp $ */
+/* $Id: longrat.h,v 1.18 2000-09-20 13:25:41 obachman Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers
 */
@@ -51,30 +51,43 @@ struct snumber
   BOOLEAN s;
 };
 
+// allow inlining only from p_Numbers.h and if ! LDEBUG
+
+#if defined(DO_LINLINE) && defined(P_NUMBERS_H) && !defined(LDEBUG)
+#define LINLINE static inline
+#else
+#define LINLINE
+#undef DO_LINLINE
+#endif // DO_LINLINE
+
+LINLINE BOOLEAN  nlEqual(number a, number b);
+LINLINE number   nlInit(int i);
+LINLINE BOOLEAN  nlIsOne(number a);
+LINLINE BOOLEAN  nlIsZero(number za);
+LINLINE number   nlCopy(number a);
+LINLINE void     nlNew(number *r);
+#ifndef LDEBUG
+LINLINE void     nlDelete(number *a);
+#endif
+LINLINE number   nlNeg(number za);
+LINLINE number   nlAdd(number la, number li);
+LINLINE number   nlSub(number la, number li);
+LINLINE number   nlMult(number a, number b);
+
 number   nlGcd(number a, number b);
 number   nlLcm(number a, number b);   /*special routine !*/
 BOOLEAN  nlGreater(number a, number b);
-BOOLEAN  nlEqual(number a, number b);
-BOOLEAN  nlIsOne(number a);
 BOOLEAN  nlIsMOne(number a);
-void     nlNew(number *r);
-number   nlInit(int i);
 number   nlInit(number i);
 int      nlInt(number &n);
-BOOLEAN  nlIsZero(number za);
 BOOLEAN  nlGreaterZero(number za);
-number   nlNeg(number za);
 number   nlInvers(number a);
 void     nlNormalize(number &x);
-number   nlAdd(number la, number li);
-number   nlSub(number la, number li);
-number   nlMult(number a, number b);
 number   nlDiv(number a, number b);
 number   nlExactDiv(number a, number b);
 number   nlIntDiv(number a, number b);
 number   nlIntMod(number a, number b);
 void     nlPower(number x, int exp, number *lu);
-number   nlCopy(number a);
 char *   nlRead (char *s, number *a);
 void     nlWrite(number &a);
 int      nlModP(number n, int p);
@@ -84,8 +97,6 @@ number   nlGetDenom(number &n);
 BOOLEAN  nlDBTest(number a, char *f, int l);
 void     nlDBDelete(number *a, char *f, int l);
 #define  nlDelete(A) nlDBDelete(A,__FILE__,__LINE__)
-#else
-void     nlDelete(number *a);
 #endif
 
 BOOLEAN nlSetMap(ring r);

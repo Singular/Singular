@@ -6,7 +6,7 @@
  *  Purpose: template for p_Mult_n
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pp_Mult_mm__Template.cc,v 1.3 2000-09-18 09:19:31 obachman Exp $
+ *  Version: $Id: pp_Mult_mm__Template.cc,v 1.4 2000-09-20 13:25:42 obachman Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -20,7 +20,7 @@
 poly pp_Mult_mm(poly p, const poly m, const poly spNoether, const ring ri)
 {
   p_Test(p, ri);
-  p_LmTest(p, ri);
+  p_LmTest(m, ri);
   if (p == NULL) return NULL;
   spolyrec rp;
   poly q = &rp, r;
@@ -28,7 +28,9 @@ poly pp_Mult_mm(poly p, const poly m, const poly spNoether, const ring ri)
   omBin bin = ri->PolyBin;
   DECLARE_LENGTH(const unsigned long length = ri->ExpLSize);
   const unsigned long* m_e = m->exp;
-  pAssume(!n_IsZero(ln,r));
+  pAssume(!n_IsZero(ln,ri));
+  pAssume1(p_GetComp(m, ri) == 0 || p_MaxComp(p, ri) == 0);
+
 
   if (spNoether == NULL)
   {

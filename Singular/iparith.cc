@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.226 2000-09-19 12:43:28 Singular Exp $ */
+/* $Id: iparith.cc,v 1.227 2000-09-20 13:25:39 obachman Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -3359,7 +3359,7 @@ void jjInitTab1()
         case (int)jjidMaxIdeal:   dArith1[i].p=(proc1)idMaxIdeal; break;
         case (int)jjidMinBase:    dArith1[i].p=(proc1)idMinBase; break;
         case (int)jjsyMinBase:    dArith1[i].p=(proc1)syMinBase; break;
-        case (int)jjpMaxComp:     dArith1[i].p=(proc1)pMaxComp; break;
+        case (int)jjpMaxComp:     dArith1[i].p=(proc1)pMaxCompProc; break;
         case (int)jjmpTrace:      dArith1[i].p=(proc1)mpTrace; break;
         case (int)jjmpTransp:     dArith1[i].p=(proc1)mpTransp; break;
         case (int)jjrOrdStr:      dArith1[i].p=(proc1)rOrdStr; break;
