@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.38 2001-01-20 11:40:14 Singular Exp $ */
+/* $Id: numbers.cc,v 1.39 2001-01-30 13:37:04 Singular Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -120,14 +120,11 @@ void nSetChar(ring r)
   {
   }
   /* -------------- long R -----------------------*/
-  else if (rField_is_long_R(r))
-  {
-    setGMPFloatDigits(r->ch_flags,r->ch_flags);
-  }
   /* -------------- long C -----------------------*/
-  else if (rField_is_long_C(r))
+  else if ((rField_is_long_R(r))
+  || (rField_is_long_C(r)))
   {
-    setGMPFloatDigits(r->ch_flags,r->ch_flags);
+    setGMPFloatDigits(r->float_len,r->float_len2);
   }
 #ifdef TEST
   /* -------------- R -----------------------*/
@@ -409,7 +406,6 @@ void nInitChar(ring r)
   /* -------------- long R -----------------------*/
   else if (rField_is_long_R(r))
   {
-    //setGMPFloatDigits(r->ch_flags);
     r->cf->cfDelete= ngfDelete;
     r->cf->nNew=ngfNew;
     r->cf->nNormalize=nDummy2;
@@ -446,7 +442,6 @@ void nInitChar(ring r)
   /* -------------- long C -----------------------*/
   else if (rField_is_long_C(r))
   {
-    //setGMPFloatDigits(r->ch_flags);
     r->cf->cfDelete= ngcDelete;
     r->cf->nNew=ngcNew;
     r->cf->nNormalize=nDummy2;

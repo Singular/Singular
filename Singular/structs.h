@@ -3,11 +3,11 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.54 2001-01-20 11:41:48 Singular Exp $ */
+/* $Id: structs.h,v 1.55 2001-01-30 13:37:02 Singular Exp $ */
 /*
 * ABSTRACT
 */
-//#define LONGALGNEW
+#define LONGALGNEW
 /* standard types */
 typedef unsigned char  uchar ;
 typedef unsigned short CARDINAL;
@@ -384,7 +384,8 @@ struct sip_sring
 
   struct omBin_s*   PolyBin; /* Bin from where monoms are allocated */
   short      ch;     /* characteristic */
-  short      ch_flags; /* additional char-flags */
+  short      float_len; /* additional char-flags */
+  short      float_len2; /* additional char-flags */
 
   short      N;      /* number of vars */
 

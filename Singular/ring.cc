@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.154 2001-01-20 11:40:14 Singular Exp $ */
+/* $Id: ring.cc,v 1.155 2001-01-30 13:37:02 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -76,7 +76,7 @@ static void rOptimizeLDeg(ring r);
 //{
 //  if (r->ch== -1)
 //  {
-//    if (r->ch_flags==(short)0) return TRUE;
+//    if (r->float_len==(short)0) return TRUE;
 //  }
 //  return FALSE;
 //}
@@ -472,6 +472,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
 {
   int ch;
   int float_len=0;
+  int float_len2=0;
   ring R = NULL;
   idhdl tmp = NULL;
   BOOLEAN ffChar=FALSE;
@@ -494,6 +495,11 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
     {
       float_len=(int)pn->next->Data();
       pn=pn->next;
+      if ((pn->next!=NULL) && (pn->next->Typ()==INT_CMD))
+      {
+        float_len2=(int)pn->next->Data();
+        pn=pn->next;
+      }
     }
     if ((pn->next==NULL) && complex_flag)
     {
@@ -513,7 +519,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   /*every entry in the new ring is initialized to 0*/
 
   /* characteristic -----------------------------------------------*/
-  /* input: 0 ch=0 : Q     parameter=NULL    ffChar=FALSE   ch_flags
+  /* input: 0 ch=0 : Q     parameter=NULL    ffChar=FALSE   float_len
    *         0    1 : Q(a,...)        *names         FALSE
    *         0   -1 : R               NULL           FALSE  0
    *         0   -1 : R               NULL           FALSE  prec. >6
@@ -552,7 +558,9 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   R->ch = ch;
   if (ch == -1)
   {
-    R->ch_flags= min(float_len,32767);
+    if (float_len2==0) float_len2=float_len;
+    R->float_len= min(float_len,32767);
+    R->float_len2= min(float_len2,32767);
   }
 
   /* parameter -------------------------------------------------------*/
@@ -583,8 +591,8 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   // we have short reals, but no short complex
   if ((R->ch == - 1)
   && (R->parameter !=NULL)
-  && (R->ch_flags < SHORT_REAL_LENGTH))
-    R->ch_flags = SHORT_REAL_LENGTH;
+  && (R->float_len < SHORT_REAL_LENGTH))
+    R->float_len = SHORT_REAL_LENGTH;
 
   /* names and number of variables-------------------------------------*/
   R->N = rv->listLength();
@@ -697,9 +705,11 @@ void rWrite(ring r)
     PrintS("//   characteristic : ");
     if ( rField_is_R(r) )             PrintS("0 (real)\n");  /* R */
     else if ( rField_is_long_R(r) )
-      Print("0 (real:%d digits)\n",r->ch_flags);  /* long R */
+      Print("0 (real:%d digits, additional %d digits)\n",
+             r->float_len,r->float_len2);  /* long R */
     else if ( rField_is_long_C(r) )
-      Print("0 (complex:%d digits)\n",r->ch_flags);  /* long C */
+      Print("0 (complex:%d digits, , additional %d digits)\n",
+             r->float_len, r->float_len2);  /* long C */
     else
       Print ("%d\n",rChar(r)); /* Fp(a) */
     if (r->parameter!=NULL)
@@ -1806,7 +1816,8 @@ BOOLEAN rEqual(ring r1, ring r2, BOOLEAN qr)
   if (r1 == NULL || r2 == NULL) return 0;
 
   if ((rInternalChar(r1) != rInternalChar(r2))
-  || (r1->ch_flags != r2->ch_flags)
+  || (r1->float_len != r2->float_len)
+  || (r1->float_len2 != r2->float_len2)
   || (r1->N != r2->N)
   || (r1->OrdSgn != r2->OrdSgn)
   || (rPar(r1) != rPar(r2)))
