@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: standard.lib,v 1.53 2001-01-12 19:52:48 lossen Exp $";
+version="$Id: standard.lib,v 1.54 2001-01-15 19:06:12 lossen Exp $";
 category="Miscellaneous";
 info="
 LIBRARY: standard.lib   Procedures which are always loaded at Start-up
@@ -18,14 +18,14 @@ PROCEDURES:
 //////////////////////////////////////////////////////////////////////////////
 
 proc stdfglm (ideal i, list #)
-"SYNTAX:  stdfglm(ideal_expression);
-         stdfglm(ideal_expression, string_expression);
+"SYNTAX: @code{stdfglm (} ideal_expression @code{)} @*
+         @code{stdfglm (} ideal_expression@code{,} string_expression @code{)}
 TYPE:    ideal
-PURPOSE: computes the standard basis of the ideal in the basering,
-         calculated via fglm from ordering given as the second argumnent
-         to the ordering of the basering.
-         If no second argumnt is given, \"dp\" is used.
-SEE ALSO: stdhilb, std, groebner
+PURPOSE: computes the standard basis of the ideal in the basering
+         via @code{fglm} (from the ordering given as the second argument
+         to the ordering of the basering).@*
+         If no second argument is given, \"dp\" is used.
+SEE ALSO: fglm, groebner, std, stdhilb
 KEYWORDS: fglm
 EXAMPLE: example stdfglm; shows an example"
 {
@@ -55,22 +55,22 @@ EXAMPLE: example stdfglm; shows an example"
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring r  = 0,(x,y,z),lp;
-   ideal i = y3+x2, x2y+x2, x3-x2, z4-x2-y;
-   ideal i1= stdfglm(i);         //uses fglm from "dp" to "lp"
+   ring r=0,(x,y,z),lp;
+   ideal i=y3+x2,x2y+x2,x3-x2,z4-x2-y;
+   ideal i1=stdfglm(i);         //uses fglm from "dp" to "lp"
    i1;
-   ideal i2= stdfglm(i,"Dp");    //uses fglm from "Dp" to "lp"
+   ideal i2=stdfglm(i,"Dp");    //uses fglm from "Dp" to "lp"
    i2;
 }
 /////////////////////////////////////////////////////////////////////////////
 
 proc stdhilb(ideal i,list #)
-"SYNTAX: stdhilb ( ideal_expression )
-         stdhilb ( ideal_expression, intvec_expression )
+"SYNTAX: @code{stdhilb (} ideal_expression @code{)} @*
+         @code{stdhilb (} ideal_expression@code{,} intvec_expression @code{)}
 TYPE:    ideal
 PURPOSE: computes the standard basis of the homogeneous ideal in the basering,
-         calculated via a Hilbert driven standard basis computation.
-         An optional second argument will be used as the Hilbert function.
+         via a Hilbert driven standard basis computation.
+         An optional second argument will be used as Hilbert function.
 SEE ALSO: stdfglm, std, groebner
 KEYWORDS: Hilbert function
 EXAMPLE: example stdhilb;  shows an example"
@@ -136,10 +136,10 @@ example
 //////////////////////////////////////////////////////////////////////////
 
 proc groebner(def i, list #)
-"SYNTAX: groebner ( ideal_expression )
-         groebner ( module_expression )
-         groebner ( ideal_expression, int_expression )
-         groebner ( module_expression, int_expression )
+"SYNTAX: @code{groebner (} ideal_expression @code{)} @*
+         @code{groebner (} module_expression @code{)} @*
+         @code{groebner (} ideal_expression@code{,} int_expression @code{)} @*
+         @code{groebner (} module_expression@code{,} int_expression @code{)}
 TYPE:    type of the first argument
 PURPOSE: computes the standard basis of the first argument @code{I}
          (ideal or module), by a heuristically chosen method: if the 
@@ -447,8 +447,14 @@ following methods:
 @item @strong{homogeneous ideals and k=0:}
 @code{lres} (La'Scala's method), see @ref{lres}.
 
-@item @strong{not minimized resolution and (homogeneous input with k<>0 
-or local rings):}
+@ifinfo
+@item *not minimized resolution and (homogeneous input with k<>0, 
+or local rings):*@*
+@end ifinfo
+@tex
+@item {\bf not minimized resolution and (homogeneous input with k
+$\neq$0, or local rings):}
+@end tex
 @code{sres} (Schreyer's method), see @ref{sres}.
 
 @item @strong{all other inputs:}
@@ -592,12 +598,14 @@ example
 /////////////////////////////////////////////////////////////////////////
 
 proc quot (m1,m2,list #)
-"SYNTAX: @code{quot} ( module_expression, module_expression )
-         @*@code{quot} ( module_expression, module_expression, int_expression )
-         @*@code{quot} ( ideal_expression, ideal_expression )
-         @*@code{quot} ( ideal_expression, ideal_expression, int_expression )
+"SYNTAX: @code{quot (} module_expression@code{,} module_expression @code{)}
+         @*@code{quot (} module_expression@code{,} module_expression@code{,} 
+            int_expression @code{)}
+         @*@code{quot (} ideal_expression@code{,} ideal_expression @code{)}
+         @*@code{quot (} ideal_expression@code{,} ideal_expression@code{,} 
+            int_expression @code{)}
 TYPE:    ideal
-SYNTAX:  @code{quot} ( module_expression, ideal_expression )
+SYNTAX:  @code{quot (} module_expression@code{,} ideal_expression @code{)}
 TYPE:    module
 PURPOSE: computes the quotient of the first and the 2nd argument.
          If a 3rd argument 'n' is given the n-th method is used
@@ -847,7 +855,8 @@ static proc intersect1(ideal i,ideal j)
 /// sprintf, fprintf printf
 ///
 proc sprintf(string fmt, list #)
-"SYNTAX:  @code{sprintf} ( string_expression [, any_expressions] )
+"SYNTAX:  @code{sprintf (} string_expression @code{[,} any_expressions
+               @code{] )}
 RETURN:   string
 PURPOSE:  @code{sprintf(fmt,...);} performs output formatting. The first 
           argument is a format control string. Additional arguments may be 
@@ -936,7 +945,7 @@ example
 }
 
 proc printf(string fmt, list #)
-"SYNTAX:  @code{printf} ( string_expression [, any_expressions] )
+"SYNTAX:  @code{printf (} string_expression @code{[,} any_expressions@code{] )}
 RETURN:   none
 PURPOSE:  @code{printf(fmt,...);} performs output formatting. The first 
           argument is a format control string. Additional arguments may be 
@@ -976,8 +985,8 @@ example
 
 
 proc fprintf(link l, string fmt, list #)
-"SYNTAX:  @code{fprintf} ( link_expression, string_expression [, 
-          any_expressions] )
+"SYNTAX:  @code{fprintf (} link_expression@code{,} string_expression @code{[,} 
+                any_expressions@code{] )}
 RETURN:   none
 PURPOSE:  @code{fprintf(l,fmt,...);} performs output formatting. 
           The second argument is a format control string. Additional 
