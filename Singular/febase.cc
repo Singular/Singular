@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.57 1998-06-18 17:11:52 Singular Exp $ */
+/* $Id: febase.cc,v 1.58 1998-07-03 10:47:42 pohl Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <limits.h>
 #include <stdarg.h>
-#ifndef macintosh
+#ifndef __MWERKS__
 #include <unistd.h>
 #endif
 #ifdef NeXT
@@ -122,7 +122,7 @@ BOOLEAN tclmode=FALSE;
 #define FS_SEP ':'
 #endif
 
-
+#ifndef __MWERKS__
 /*****************************************************************
  *
  * PATH STUFF
@@ -631,7 +631,7 @@ static char* CleanUpName(char* fname)
   }
   return fname;
 }
-
+#endif
 /*****************************************************************
  *
  * File handling
@@ -838,7 +838,7 @@ char * StringSetS(char *st)
 
 void PrintTCLS(char c, char *s)
 {
-#ifndef macintosh
+#ifndef __MWERKS__
   int l=strlen(s);
   if (l>0) PrintTCL(c,l,s);
 #endif
