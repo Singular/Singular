@@ -1,10 +1,64 @@
-;;;
-;;; .emacs - sample .emacs file to use for Singular interactive mode.
-;;;
+;;; Emacs edit mode for this file is  -*- Emacs-Lisp -*-
+;;; $Id: .emacs-singular,v 1.2 1999-08-31 18:53:53 wichmann Exp $
 
 ;;;
-;;; - extra key bindings.
+;;; .emacs-singular - Emacs initialization file to use for
+;;;                   Singular interactive mode.
 ;;;
+;;; How you use this file very much depends on your attitude
+;;; towards Emacs:
+;;;
+;;; 1) If you are going to use Emacs solely as frontend to
+;;;    Singular you do not have to worry at all about this file.
+;;; 2) If you are already an experienced Emacs user you may
+;;;    want to copy this file's contents to your .emacs file.
+;;; 3) If you are planning to become an experienced Emacs user
+;;;    you may use this file as starting point for your .emacs
+;;;    file, that is, for your Emacs initialization file.  Simply
+;;;    copy it to your home directory and rename it to ".emacs"
+;;;    (without the quotes, of course).  Then edit it as
+;;;    described below.
+;;;
+;;; In cases 2) and 3) you should be careful what exactly to copy
+;;; to your .emacs file.  In general, you need the following:
+;;;
+;;; o the hook-customizations with `add-hook';
+;;; o the pre-customized settings with `custom-set-variables' and
+;;;   `custom-set-faces';
+;;; o the code which creates menus for starting Singular;
+;;; o the code which loads singular.el (located at the end of
+;;;   this file) you have to replace by something else, for
+;;;   example, an `autoload'.
+;;;
+;;; Here is how the Singular customization in your .emacs may
+;;; look like:
+;;;
+;;; ;; extra key bindings
+;;; (add-hook 'singular-interactive-mode-hook
+;;;            <... code omitted, see below for details ...>)
+;;;
+;;; ;; other, "non-customizable" settings
+;;; (add-hook 'singular-interactive-mode-hook
+;;;            <... code omitted, see below for details ...>)
+;;;
+;;; ;; pre-customized settings
+;;; (custom-set-variables
+;;;  <... code omitted, see below for details ...>)
+;;; (custom-set-faces
+;;;  <... code omitted, see below for details ...>)
+;;;
+;;; ;; add global menus for Singular
+;;; <... choose your version for either Emacs or XEmacs, see below ...>
+;;;
+;;; ;; add Singular Emacs home directory to `load-path'
+;;; (setq load-path (cons "<your-singular-emacs-home-directory>" load-path))
+;;; (autoload 'singular "singular"
+;;;   "Start Singular using default values." t)
+;;; (autoload 'singular-other "singular"
+;;;   "Ask for arguments and start Singular." t)
+;;;
+
+;; extra key bindings
 (add-hook 'singular-interactive-mode-hook
 	  (function (lambda ()
 		      ;; control cursor keys
@@ -22,17 +76,9 @@
 			(local-set-key [(control up)] 'comint-previous-prompt)
 			(local-set-key [(control down)] 'comint-next-prompt))))))
 
-;;;
-;;; - other, "non-customizable" settings.
-;;;
-
-;; maybe we should make this a customizable variable?
+;; other, "non-customizable" settings
 (add-hook 'singular-interactive-mode-hook
 	  (function (lambda () (font-lock-mode 1))))
-
-;;;
-;;; - customizing stuff.
-;;;
 
 ;; this is a work-around for early version of Font Lock mode
 ;; which do not use `defface' to define faces.  It forces
@@ -40,14 +86,19 @@
 (make-face 'font-lock-comment-face)
 (make-face 'font-lock-string-face)
 
+;; tricky stuff: these customization settings are not used any
+;; longer as soon as user saved her own to ~/.emacs-singular-cust
+(setq custom-file "~/.emacs-singular-cust")
+(if (file-exists-p custom-file)
+    (load-file custom-file)
+
+;; pre-customized settings
 (custom-set-variables
- '(custom-file "~/work/elisp/singular/.emacs")
  '(font-lock-maximum-decoration nil t)
  '(next-line-add-newlines nil)
  '(paren-mode (quote paren) nil (paren))
  '(show-paren-mode t nil (paren))
- '(singular-cursor-keys (quote (cursor)))
- '(singular-history-keys (quote (control meta)))
+ '(singular-help-same-window t)
  '(transient-mark-mode t))
 (custom-set-faces
  '(font-lock-comment-face ((t (:bold nil :foreground "Grey50"))) t)
@@ -55,8 +106,45 @@
  '(paren-match ((t (:foreground "Red"))) t)
  '(show-paren-match-face ((((class color)) (:foreground "Red")))))
 
+)
+
+;; add global menus for Singular, Emacs version
+(unless (fboundp 'add-submenu)
+  (setq singular-start-map (make-sparse-keymap))
+  (define-key singular-start-map [menu-bar singular]
+    (cons "Singular" (make-sparse-keymap "Singular")))
+  (define-key singular-start-map [menu-bar singular restart]
+    '("Start..." . singular-other))
+  (define-key singular-start-map [menu-bar singular start-default]
+    '("Start default" . singular))
+  (setq menu-bar-final-item (append '(singular) menu-bar-final-items))
+  (use-local-map singular-start-map))
+
+;; add global menus for Singular, XEmacs version
+(if (fboundp 'add-submenu)
+    (add-submenu nil 
+		 '("Singular"
+		   ["Start default" singular t]
+		   ["Start..." singular-other t])))
+
 ;;;
-;;; - load and start Singular interactive mode.
+;;; - load singular.el.
 ;;;
-(load-file "~/work/elisp/singular/singular.el")
-(singular)
+
+;; get rid of superfluous "Load .emacs" menu entry on XEmacs
+(when (fboundp 'delete-menu-item)
+  (delete-menu-item '("Load .emacs"))		; that is for the current buffer
+  (let ((current-menubar (default-value 'current-menubar)))
+    (delete-menu-item '("Load .emacs"))		; that is for all other buffers
+    (set-default 'current-menubar current-menubar)))
+
+;; load singular.el from `singular-emacs-home-directory'
+(load-file (concat singular-emacs-home-directory
+		   ;; we check for trailing slash and backslash
+		   ;; but unconditionally insert a slash.
+		   ;; Hopefully that works on NT, too.
+		   (if (memq (aref singular-emacs-home-directory
+				   (1- (length singular-emacs-home-directory)))
+			     '(?/ ?\\))
+		       "" "/")
+		   "singular.el"))
