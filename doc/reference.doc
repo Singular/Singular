@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.152 1999-09-20 19:41:22 obachman Exp $
+@comment $Id: reference.doc,v 1.153 1999-09-21 16:26:30 obachman Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -6875,8 +6875,8 @@ of the Windows95/98 operating system). Use @ref{rtimer}, instead.
   t = timer - t;
   t;  // yields the time in ticks-per-sec (default 1)
       // since t was initialized by timer
-  execute "int tps=" + system("--ticks-per-sec");
-  t/tps; // yields the time in seconds
+  int tps = system("--ticks-per-sec");
+  t/tps; // yields the time in seconds truncated to int
 @c example
 @end smallexample
 @end table
