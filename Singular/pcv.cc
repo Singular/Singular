@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: pcv.cc,v 1.24 1999-06-11 14:45:29 Singular Exp $ */
+/* $Id: pcv.cc,v 1.25 1999-06-11 17:13:40 mschulze Exp $ */
 /*
 * ABSTRACT: conversion between polys and coef vectors
 */
@@ -173,19 +173,20 @@ void pcvInit(int d)
     pcvIndex[i]=pcvTable+i*pcvMaxDegree;
   for(int i=0;i<pcvMaxDegree;i++)
     pcvIndex[0][i]=i;
+  unsigned k,l;
   for(int i=1;i<pVariables;i++)
   {
-    unsigned x=0;
+    k=0;
     for(int j=0;j<pcvMaxDegree;j++)
     {
-      unsigned y=pcvIndex[i-1][j];
-      if(y>(unsigned)~0-x)
+      l=pcvIndex[i-1][j];
+      if(l>unsigned(~0)-k)
       {
         j=pcvMaxDegree;
         i=pVariables;
         WerrorS("unsigned overflow");
       }
-      pcvIndex[i][j]=x+=y;
+      else pcvIndex[i][j]=k+=l;
     }
   }
 }
@@ -206,11 +207,17 @@ void pcvClean()
 
 int pcvM2N(poly m)
 {
-  unsigned n=0,d=0;
+  unsigned n=0,dn,d=0;
   for(int i=0;i<pVariables;i++)
   {
     d+=pGetExp(m,i+1);
-    n+=pcvIndex[i][d];
+    dn=pcvIndex[i][d];
+    if(dn>MAX_COMPONENT-n)
+    {
+      i=pVariables;
+      WerrorS("component overflow");
+    }
+    else n+=dn;
   }
   return n+1;
 }
