@@ -1,8 +1,8 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: debug.cc,v 1.2 1997-03-26 16:58:13 schmidt Exp $ */
+/* $Id: debug.cc,v 1.3 1997-04-07 16:16:42 schmidt Exp $ */
 
 /*
-$Log:
+$Log: not supported by cvs2svn $
 */
 
 static int deb_level = -1;
