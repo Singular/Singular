@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-//static char * rcsid = "@(#) $Id: Truefactor.cc,v 1.3 1997-09-12 07:19:52 Singular Exp $";
+//static char * rcsid = "@(#) $Id: Truefactor.cc,v 1.4 1997-11-18 16:39:07 Singular Exp $";
 ///////////////////////////////////////////////////////////////////////////////
 // Factory - Includes
 #include <factory.h>
@@ -13,6 +13,7 @@
 
 #ifdef SINGULAR
 #  define HAVE_SINGULAR
+   extern "C" { void WerrorS(char *); }
 #endif
 
 #ifdef TRUEFACTORDEBUG
@@ -280,7 +281,6 @@ TakeNorms(const CFFList & PiList){
     int n=2;
     if ( PossibleFactors.length() < n ) { // a little check
 #ifdef HAVE_SINGULAR
-      extern void WerrorS(char *);
       WerrorS("libfac: ERROR: TakeNorms less then two items remaining!");
 #else
       cerr << "libfac: ERROR: TakeNorms less then two items remaining! " 
@@ -323,7 +323,6 @@ TakeNorms(const CFFList & PiList){
       }
       else{ 
 #ifdef HAVE_SINGULAR
-        extern void WerrorS(char *);
 	WerrorS("libfac: TakeNorms: somethings wrong with remaining factors!");
 #else
 	cerr << "libfac: TakeNorms: somethings wrong with remaining factors!" 
@@ -338,6 +337,9 @@ TakeNorms(const CFFList & PiList){
 ////////////////////////////////////////////////////////////
 /*
 $Log: not supported by cvs2svn $
+Revision 1.3  1997/09/12 07:19:52  Singular
+* hannes/michael: libfac-0.3.0
+
 Revision 1.3  1997/04/25 22:39:11  michael
 changed cerr and cout messages for use with Singular
 Version for libfac-0.2.1

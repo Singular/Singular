@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// static char * rcsid = "$Id: MVMultiHensel.cc,v 1.3 1997-09-12 07:19:48 Singular Exp $";
+// static char * rcsid = "$Id: MVMultiHensel.cc,v 1.4 1997-11-18 16:39:05 Singular Exp $";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -13,6 +13,7 @@
 
 #ifdef SINGULAR
 #  define HAVE_SINGULAR
+   extern "C" { void WerrorS(char *); }
 #endif
 
 #ifdef HENSELDEBUG
@@ -105,7 +106,6 @@ diophant( int levelU , const CanonicalForm & F1 , const CanonicalForm & F2 , int
   // Degrees ok? degree(F1,mainvar) + degree(F2,mainvar) <= i ?
   if ( (degree(F1,levelU) + degree(F2,levelU) ) <= i ) {
 #ifdef HAVE_SINGULAR
-    extern void WerrorS(char *);
     WerrorS("libfac: diophant ERROR: degree too large!  ");
 #else
     cerr << "libfac: diophant ERROR: degree too large!  " 
@@ -120,7 +120,6 @@ diophant( int levelU , const CanonicalForm & F1 , const CanonicalForm & F2 , int
     // check if gcd(F1,F2) <> 1 , i.e. F1 and F2 are not relatively prime 
     if ( ! r.isOne() ){ 
 #ifdef HAVE_SINGULAR
-      extern void WerrorS(char *);
       WerrorS("libfac: diophant ERROR: F1 and F2 are not relatively prime! ");
 #else
       cerr << "libfac: diophant ERROR: " << F1 << "  and  " << F2 
@@ -397,6 +396,9 @@ MultiHensel( const CanonicalForm & mF, const CFFList & Factorlist,
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.3  1997/09/12 07:19:48  Singular
+* hannes/michael: libfac-0.3.0
+
 Revision 1.4  1997/04/25 22:40:02  michael
 changed cerr and cout messages for use with Singular
 Version for libfac-0.2.1

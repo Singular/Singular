@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-static char * rcsid = "$Id: SqrFree.cc,v 1.3 1997-09-12 07:19:50 Singular Exp $";
+static char * rcsid = "$Id: SqrFree.cc,v 1.4 1997-11-18 16:39:06 Singular Exp $";
 static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) michael@math.uni-sb.de .\n Please include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -14,6 +14,7 @@ static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) mi
 
 #ifdef SINGULAR
 #  define HAVE_SINGULAR
+   extern "C" { void WerrorS(char *); }
 #endif
 
 #ifdef SQRFREEDEBUG
@@ -124,7 +125,6 @@ SqrFreeTest( const CanonicalForm & r, int opt){
     else return 0 ;
   }
 #ifdef HAVE_SINGULAR
-  extern void WerrorS(char *);
   WerrorS("libfac: ERROR: SqrFreeTest: we should never fall trough here!");
 #else
   cerr << "\nlibfac: ERROR: SqrFreeTest: we should never fall trough here!\n" 
@@ -251,7 +251,6 @@ SqrFreed( const CanonicalForm & r ){
     return Outputlist ;
   }
 #ifdef HAVE_SINGULAR
-  extern void WerrorS(char *);
   WerrorS("libfac: ERROR: SqrFreed: we should never fall trough here!");
 #else
   cerr << "\nlibfac: ERROR: SqrFreed: we should never fall trough here!\n" 
@@ -331,6 +330,9 @@ SqrFree(const CanonicalForm & r ){
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.3  1997/09/12 07:19:50  Singular
+* hannes/michael: libfac-0.3.0
+
 Revision 1.4  1997/04/25 22:19:46  michael
 changed cerr and cout messages for use with Singular
 Version for libfac-0.2.1

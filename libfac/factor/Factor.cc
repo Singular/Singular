@@ -1,6 +1,6 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: Factor.cc,v 1.3 1997-09-12 07:19:46 Singular Exp $ ";
+static char * rcsid = "$Id: Factor.cc,v 1.4 1997-11-18 16:39:04 Singular Exp $ ";
 static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) michael@math.uni-sb.de \nPlease include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -18,6 +18,7 @@ static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) mi
 
 #ifdef SINGULAR
 #  define HAVE_SINGULAR
+   extern "C" { void WerrorS(char *); }
 #endif
 
 #ifdef FACTORDEBUG
@@ -211,7 +212,6 @@ not_monic( const CFFList & TheList, const CanonicalForm & ltt, const CanonicalFo
 	  }
 	  else { 
 #ifdef HAVE_SINGULAR
-	    extern void WerrorS(char *);
 	    WerrorS("libfac: ERROR: not_monic1: case lt is a sum.");
 #else 
 	    cerr << "libfac: ERROR: not_monic1: case lt is a sum.\n" 
@@ -229,7 +229,6 @@ not_monic( const CFFList & TheList, const CanonicalForm & ltt, const CanonicalFo
 	  Returnlist= myUnion( CFFList(CFFactor(1/a,1)),Returnlist) ;
 	else {
 #ifdef HAVE_SINGULAR
-	  extern void WerrorS(char *);
 	  WerrorS("libfac: ERROR: not_monic2: case lt is a sum.");
 #else 
 	  cerr << "libfac: ERROR: not_monic2: case lt is a sum.\n" 
@@ -319,7 +318,6 @@ generate_mipo( int degree_of_Extension , const Variable & Extension ){
     if ( degree(Extension) == 0 ) FFRandom gen;
     else { 
 #ifdef HAVE_SINGULAR
-    extern void WerrorS(char *);
     WerrorS("libfac: evaluate: Extension not inFF() or inGF() !");
 #else 
     cerr << "libfac: evaluate: " << Extension << " not inFF() or inGF() !" 
@@ -391,7 +389,6 @@ specializePoly(const CanonicalForm & f, Variable & Extension, int deg, SFormList
     }
     else {
 #ifdef HAVE_SINGULAR
-      extern void WerrorS(char *);
       WerrorS("libfac: spezializePoly ERROR: Working over given extension-field not yet implemented!");
 #else 
       cerr << "libfac: spezializePoly ERROR: Working over given extension-field not yet implemented!\n" 
@@ -426,7 +423,6 @@ evaluate( int maxtries, int sametries, int failtries, const CanonicalForm &f , c
   else { if ( degree(Extension) == 0 ) FFRandom gen;
   else { 
 #ifdef HAVE_SINGULAR
-    extern void WerrorS(char *);
     WerrorS("libfac: evaluate: Extension not inFF() or inGF() !");
 #else
     cerr << "libfac: evaluate: " << Extension << " not inFF() or inGF() !" 
@@ -606,7 +602,6 @@ Factorized( const CanonicalForm & F, const Variable & alpha, int Mainvar){
     DEBOUTLN(cout,  "Returned from specializePoly: success: ", success);
     if (success == 0 ){ // No spezialisation could be found
 #ifdef HAVE_SINGULAR
-      extern void WerrorS(char *);
       WerrorS("libfac: Factorize: ERROR: Not able to find a valid specialization!");    
 #else
       cerr << "libfac: Factorize: ERROR: Not able to find a valid specialization!\n" 
@@ -807,6 +802,9 @@ Factorize( const CanonicalForm & F, int is_SqrFree ){
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.3  1997/09/12 07:19:46  Singular
+* hannes/michael: libfac-0.3.0
+
 Revision 1.6  1997/04/25 22:18:40  michael
 changed lc == 1 to lc == unit in choose_mainvar
 changed cerr and cout messages for use with Singular
