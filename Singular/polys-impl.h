@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.6 1998-01-12 18:59:52 obachman Exp $ */
+/* $Id: polys-impl.h,v 1.7 1998-01-13 12:00:44 obachman Exp $ */
 
 /***************************************************************
  *
@@ -651,8 +651,8 @@ inline BOOLEAN __pDivisibleBy(poly a, poly b)
   }
   
 #else // !WORDS_BIGENDIAN
-  const Exponent_t* s1 = &(a->exp[0]);
-  const Exponent_t* s2 = &(b->exp[0]);
+  const Exponent_t* s1 = &(a->exp[1]);
+  const Exponent_t* s2 = &(b->exp[1]);
   const Exponent_t* lb = (Exponent_t*) s1 + pVariables;
 
   for (;;)
