@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_complex.cc,v 1.12 1999-07-02 16:43:19 wenk Exp $ */
+/* $Id: mpr_complex.cc,v 1.13 1999-07-08 10:18:11 wenk Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - real floating-point numbers using gmp
@@ -68,8 +68,8 @@ void setGMPFloatDigits( size_t digits )
 {
   size_t bits= 1 + (size_t) (digits / (log(2)/log(10)));
   bits= bits>64?bits:64;
-  //  gmp_float::setPrecision( bits+EXTRABYTES*8 );
-  gmp_float::setPrecision( bits+(bits/2) );
+  //gmp_float::setPrecision( bits+EXTRABYTES*8 );
+  gmp_float::setPrecision( bits+(bits/5) );
   gmp_float::setEqualBits( bits );
   gmp_output_digits= digits;
 }
@@ -337,7 +337,7 @@ char *nicifyFloatStr( char * in, mp_exp_t exponent, size_t oprec, int *size, int
       *size= (strlen(in)+12+c) * sizeof(char) + 10;
       out= (char*)AllocL(*size);
       memset(out,0,*size);
-      sprintf(out,"%s0.%se%d",csign,in+sign,(unsigned int)exponent);
+      sprintf(out,"%s0.%se%s%d",csign,in+sign,exponent>=0?"+":"",(int)exponent);
 //      }
 //      else
 //      {

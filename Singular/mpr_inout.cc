@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpr_inout.cc,v 1.3 1999-06-29 09:03:45 wenk Exp $ */
+/* $Id: mpr_inout.cc,v 1.4 1999-07-08 10:18:12 wenk Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultant
@@ -165,13 +165,40 @@ uResultant::resMatType determineMType( int imtype )
 }
 //<-
 
-//-> BOOLEAN nuUResSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
-BOOLEAN nuUResSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
+//-> BOOLEAN nuUResSolve( leftv res, leftv args )
+BOOLEAN nuUResSolve( leftv res, leftv args )
 {
+  leftv v= args;
+
   ideal gls;
-  gls= (ideal)(arg1->Data());
-  int imtype= (int)arg2->Data();
-  int howclean= (int)arg3->Data();
+  int imtype;
+  int howclean;
+
+  // get ideal
+  if ( v->Typ() != IDEAL_CMD )
+    return TRUE;
+  else gls= (ideal)(args->Data());
+  v= v->next;
+
+  // get resultant matrix type to use (0,1)
+  if ( v->Typ() != INT_CMD )
+    return TRUE;
+  else imtype= (int)v->Data();
+  v= v->next;
+
+  // get and set precision in digits ( > 0 )
+  if ( v->Typ() != INT_CMD )
+    return TRUE;
+  else if ( !(rField_is_R()||rField_is_long_R()||rField_is_long_C()) ) 
+  {
+    setGMPFloatDigits( (unsigned long int)v->Data() );
+  }
+  v= v->next;
+
+  // get interpolation steps (0,1,2)
+  if ( v->Typ() != INT_CMD )
+    return TRUE;
+  else howclean= (int)v->Data();
 
   uResultant::resMatType mtype= determineMType( imtype );
   int i,c,count;
@@ -180,16 +207,16 @@ BOOLEAN nuUResSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
   number smv= NULL;
   BOOLEAN interpolate_det= (mtype==uResultant::denseResMat)?TRUE:FALSE;
 
-  emptylist= (lists)Alloc( sizeof(slists) );
-  emptylist->Init( 0 );
+  //emptylist= (lists)Alloc( sizeof(slists) );
+  //emptylist->Init( 0 );
 
-  res->rtyp = LIST_CMD;
-  res->data= (void *)emptylist;
+  //res->rtyp = LIST_CMD;
+  //res->data= (void *)emptylist;
 
   TIMING_START(mpr_overall);
 
   // check input ideal ( = polynomial system )
-  if ( mprIdealCheck( gls, arg1->Name(), mtype ) != mprOk )
+  if ( mprIdealCheck( gls, args->Name(), mtype ) != mprOk )
   {
     return TRUE;
   }
@@ -264,7 +291,7 @@ BOOLEAN nuUResSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
   }
   else
   {
-    WerrorS("Solver was unable to find any root!");
+    WerrorS("Solver was unable to find any roots!");
     return TRUE;
   }
 
@@ -282,8 +309,8 @@ BOOLEAN nuUResSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
 
   res->data= (void *)listofroots;
 
-  emptylist->Clean();
-  //Free( (ADDRESS) emptylist, sizeof(slists) );
+  //emptylist->Clean();
+  //  Free( (ADDRESS) emptylist, sizeof(slists) );
 
   TIMING_EPR(mpr_overall,"overall time\t\t")
 
@@ -317,13 +344,18 @@ BOOLEAN nuMPResMat( leftv res, leftv arg1, leftv arg2 )
 }
 //<-
 
-//-> BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2 )
-BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2 )
+//-> BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
+BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
 {
 
   poly gls;
   gls= (poly)(arg1->Data());
-  int howclean= (int)arg2->Data();
+  int howclean= (int)arg3->Data();
+
+  if ( !(rField_is_R()||rField_is_long_R()||rField_is_long_C()) ) 
+  {
+    setGMPFloatDigits( (unsigned long int)arg2->Data() );
+  }
 
   int deg= pTotaldegree( gls );
   //  int deg= pDeg( gls );

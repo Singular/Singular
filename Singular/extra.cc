@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.94 1999-06-28 12:48:07 wenk Exp $ */
+/* $Id: extra.cc,v 1.95 1999-07-08 10:18:07 wenk Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -408,30 +408,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
   {
     char *sys_cmd=(char *)(h->Data());
     h=h->next;
-/*==================== setFloatDigits ================================*/
-    if(strcmp(sys_cmd,"setFloatDigits")==0)
-    {
-      if ((h!=NULL) && (h->Typ()==INT_CMD)) 
-        {
-	  if ( !(rField_is_R()||rField_is_long_R()||rField_is_long_C()) ) 
-	  {
-	    setGMPFloatDigits( (unsigned long int)h->Data() );
-	    res->rtyp=INT_CMD;
-	    res->data=(void*)getGMPFloatDigits();
-	  }
-	  else
-	  {
-	    res->rtyp=INT_CMD;
-	    res->data=(void*)0;
-	  }
-	  return FALSE;
-        }
-      else
-	{
-	  WerrorS("int expected as second parameter");
-	}
-    }
-    else
 /*==================== pcv ==================================*/
 #ifndef HAVE_DYNAMIC_LOADING
 #ifdef HAVE_PCV

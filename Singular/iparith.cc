@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.155 1999-06-30 14:41:04 pohl Exp $ */
+/* $Id: iparith.cc,v 1.156 1999-07-08 10:18:09 wenk Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -195,7 +195,7 @@ cmdnames cmds[] =
   { "kill",        0, KILL_CMD ,          KILL_CMD},
   { "killattrib",  0, KILLATTR_CMD ,      CMD_12},
   { "koszul",      0, KOSZUL_CMD ,        CMD_23},
-  { "laguerre",    0, LAGSOLVE_CMD,       CMD_2},
+  { "laguerre",    0, LAGSOLVE_CMD,       CMD_3},
   { "lead",        0, LEAD_CMD ,          CMD_1},
   { "leadcoef",    0, LEADCOEF_CMD ,      CMD_1},
   { "leadexp",     0, LEADEXP_CMD ,       CMD_1},
@@ -294,7 +294,7 @@ cmdnames cmds[] =
 #ifdef HAVE_NAMESPACES
   { "unload",      0, UNLOAD_CMD ,        CMD_M},
 #endif
-  { "uressolve",   0, URSOLVE_CMD,        CMD_3},
+  { "uressolve",   0, URSOLVE_CMD,        CMD_M},
   { "vandermonde", 0, VANDER_CMD,         CMD_3},
   { "var",         0, VAR_CMD ,           CMD_1},
   { "varstr",      0, VARSTR_CMD ,        CMD_12},
@@ -2277,7 +2277,6 @@ struct sValCmd2 dArith2[]=
 ,{jjVARSTR2,   VARSTR_CMD,     STRING_CMD,     QRING_CMD,  INT_CMD PROFILER}
 ,{jjWEDGE,     WEDGE_CMD,      MATRIX_CMD,     MATRIX_CMD, INT_CMD PROFILER}
 ,{jjLOAD_E,    LOAD_CMD,       NONE,           STRING_CMD, STRING_CMD PROFILER}
-,{nuLagSolve,  LAGSOLVE_CMD,   LIST_CMD,       POLY_CMD,   INT_CMD PROFILER}
 ,{nuMPResMat,  MPRES_CMD,      MODUL_CMD,      IDEAL_CMD,  INT_CMD PROFILER}
 ,{NULL,        0,              0,              0,          0 PROFILER}
 };
@@ -4297,9 +4296,9 @@ struct sValCmd3 dArith3[]=
 ,{jjSUBST_Id,       SUBST_CMD,  IDEAL_CMD,  IDEAL_CMD,  POLY_CMD,   POLY_CMD }
 ,{jjSUBST_Id,       SUBST_CMD,  MODUL_CMD,  MODUL_CMD,  POLY_CMD,   POLY_CMD }
 ,{jjSUBST_Id,       SUBST_CMD,  MATRIX_CMD, MATRIX_CMD, POLY_CMD,   POLY_CMD }
-,{jjCALL3MANY,      SYSTEM_CMD, NONE,       STRING_CMD, DEF_CMD,    DEF_CMD }
-,{nuUResSolve,      URSOLVE_CMD,LIST_CMD,   IDEAL_CMD,  INT_CMD,    INT_CMD }
-,{nuVanderSys,      VANDER_CMD, POLY_CMD,   IDEAL_CMD,  IDEAL_CMD,  INT_CMD }
+,{jjCALL3MANY,      SYSTEM_CMD, NONE,       STRING_CMD, DEF_CMD,    DEF_CMD  }
+,{nuLagSolve,       LAGSOLVE_CMD,LIST_CMD,  POLY_CMD,   INT_CMD,    INT_CMD  }
+,{nuVanderSys,      VANDER_CMD, POLY_CMD,   IDEAL_CMD,  IDEAL_CMD,  INT_CMD  }
 ,{NULL,             0,          0,          0,          0,          0 }
 };
 /*=================== operations with many arg.: static proc =================*/
@@ -4813,7 +4812,8 @@ struct sValCmdM dArithM[]=
 ,{jjEXPORTTO,  EXPORTTO_CMD,    NONE,               -2 }
 ,{jjUNLOAD,    UNLOAD_CMD,      NONE,               -2 }
 #endif /* HAVE_NAMESPACES */
-,{NULL,        0,               0,                  0  }
+,{nuUResSolve, URSOLVE_CMD,     LIST_CMD,            4 }
+,{NULL,        0,               0,                   0 }
 };
 #ifdef MDEBUG
 static Subexpr jjDBMakeSub(leftv e,char *f, int l)

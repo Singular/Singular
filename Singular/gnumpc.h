@@ -3,13 +3,13 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpc.h,v 1.2 1999-06-24 07:46:49 wenk Exp $ */
+/* $Id: gnumpc.h,v 1.3 1999-07-08 10:18:08 wenk Exp $ */
 /*
 * ABSTRACT: computations with GMP floating-point numbers
 */
 #include "structs.h"
 
-BOOLEAN  ngcGreaterZero(number za);
+BOOLEAN  ngcGreaterZero(number za);      // !!! MAY NOT WORK AS EXPECTED !!!
 BOOLEAN  ngcGreater(number a, number b);
 BOOLEAN  ngcEqual(number a, number b);
 BOOLEAN  ngcIsOne(number a);

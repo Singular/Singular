@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_base.cc,v 1.6 1999-06-30 11:54:31 Singular Exp $ */
+/* $Id: mpr_base.cc,v 1.7 1999-07-08 10:18:10 wenk Exp $ */
 
 /*
  * ABSTRACT - multipolynomial resultants - resultant matrices
@@ -49,7 +49,7 @@ extern void nPrint(number n);  // for debugging output
 #define MAXPOINTS      1000
 #define MAXINITELEMS   256
 #define LIFT_COOR      100000000
-#define SCALEDOWN      10000.0
+#define SCALEDOWN      100000.0
 #define MAXSEED        1024 //512
 #define MINVDIST       0.0
 #define RVMULT         0.00005 // 0.000000005
@@ -2614,7 +2614,7 @@ const number resMatrixDense::getSubDet()
 //-------------- uResultant ---------------------------------------------------
 //-----------------------------------------------------------------------------
 
-#define MAXEVPOINT 1000000.0
+#define MAXEVPOINT 1.0e+6
 
 //-> unsigned long over(unsigned long n,unsigned long d)
 // Calculates (n+d \over d) using gmp functionality

@@ -4,7 +4,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpr_inout.h,v 1.3 1999-06-29 09:03:45 wenk Exp $ */
+/* $Id: mpr_inout.h,v 1.4 1999-07-08 10:18:13 wenk Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - interface to Singular
@@ -21,26 +21,39 @@
  * Resultant method can be MPR_DENSE, which uses Macaulay Resultant (good for
  * dense homogeneous polynoms) or MPR_SPARSE, which uses Sparse Resultant
  * (Gelfand, Kapranov, Zelevinsky).
- * If interpolate == true then the determinant of the u-resultant will be
- * numerically interpolatet using a Vandermonde System.
- * Otherwise, the Sparse Bareiss will be used (faster!).
+ * Arguments 4: ideal i, int k, int l, int m
+ *   k=0: use sparse resultant matrix of Gelfand, Kapranov and Zelevinsky
+ *   k=1: use resultant matrix of Macaulay (k=0 is default)
+ *   l>0: defines precision of fractional part if ground field is Q
+ *   m=0,1,2: number of iterations for approximation of roots (default=2)
  * Returns a list containing the roots of the system.
  */
-BOOLEAN nuUResSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 );
+BOOLEAN nuUResSolve( leftv res, leftv args );
 
-/** build resultant matrix from ideal
- * Make sure that IDELEMS(ideal) == pVariables+1.
+/** returns module representing the multipolynomial resultant matrix
+ * Arguments 2: ideal i, int k
+ *   k=0: use sparse resultant matrix of Gelfand, Kapranov and Zelevinsky
+ *   k=1: use resultant matrix of Macaulay (k=0 is default)
  */
 BOOLEAN nuMPResMat( leftv res, leftv arg1, leftv arg2 );
 
 /** find the (complex) roots an univariate polynomial
  * Determines the roots of an univariate polynomial using Laguerres'
  * root-solver. Good for polynomials with low and middle degree (<40).
- * Returns a list containing the roots of the polynomial.
+ * Arguments 3: poly arg1 , int arg2 , int arg3
+ *  arg2>0: defines precision of fractional part if ground field is Q
+ *  arg3: number of iterations for approximation of roots (default=2)
+ * Returns a list of all (complex) roots of the polynomial arg1
  */
-BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2 );
+BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 );
 
 /**
+ * COMPUTE: polynomial p with values given by v at points p1,..,pN derived 
+ * from p; more precisely: consider p as point in K^n and v as N elements in K,
+ * let p1,..,pN be the points in K^n obtained by evaluating all monomials
+ * of degree 0,1,...,N at p in lexicographical order, then the procedure 
+ * computes the polynomial f satisfying f(pi) = v[i]
+ * RETURN:  polynomial f of degree d
  */
 BOOLEAN nuVanderSys( leftv res, leftv arg1, leftv arg2, leftv arg3 );
 
