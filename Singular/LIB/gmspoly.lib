@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gmspoly.lib,v 1.3 2003-06-02 10:55:27 mschulze Exp $";
+version="$Id: gmspoly.lib,v 1.4 2003-06-05 09:33:15 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -457,7 +457,7 @@ EXAMPLE:  example gbasis; shows examples
   int i,j,k,l;
 
   ideal X=maxideal(1);
-  string c="ring @XS=0,(s,"+varstr(@X)+"),(C,dp);";
+  string c="ring @XS=0,(s,"+varstr(@X)+"),(C,dp(1),dp(n));";
   execute(c);
   poly f=imap(@X,f);
   ideal J=imap(@X,J);
