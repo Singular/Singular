@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.39 1999-11-15 17:20:10 obachman Exp $ */
+/* $Id: ipid.cc,v 1.40 2000-05-23 14:33:24 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -509,7 +509,7 @@ void killhdl(idhdl h, idhdl * ih)
     syKillComputation((syStrategy)IDDATA(h));
   }
 #ifdef TEST
-  else if ((IDTYP(h)!= INT_CMD)&&(IDTYP(h)!=DEF_CMD))
+  else if ((IDTYP(h)!= INT_CMD)&&(IDTYP(h)!=DEF_CMD) && (IDTYP(h)!=NONE))
     Warn("unknown type to kill: %s(%d)",Tok2Cmdname(IDTYP(h)),IDTYP(h));
 #endif
 

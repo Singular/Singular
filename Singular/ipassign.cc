@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.55 2000-05-15 14:21:45 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.56 2000-05-23 14:33:23 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -582,8 +582,11 @@ static BOOLEAN jiAssign_1(leftv l, leftv r)
   }
   if((rt==DEF_CMD)||(rt==NONE))
   {
-    if (!errorreported) WerrorS("right side is not a datum");
-    return TRUE;
+    WarnS("right side is not a datum, assignment ignored");
+    // if (!errorreported)
+    //   WerrorS("right side is not a datum");
+    //return TRUE;
+    return FALSE;
   }
 
   int i=0;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_Put.cc,v 1.20 2000-02-29 16:33:10 Singular Exp $ */
+/* $Id: mpsr_Put.cc,v 1.21 2000-05-23 14:33:24 Singular Exp $ */
 
 /***************************************************************
  *
@@ -231,6 +231,9 @@ mpsr_Status_t mpsr_PutProc(MP_Link_pt link, char* pname, procinfov proc)
                                         cop,
                                         0,
                                         2));
+  if (pname==NULL)
+    pname=proc->procname;
+
   mp_failr(MP_PutIdentifierPacket(link, MP_SingularDict, pname,1));
   mp_failr(MP_PutAnnotationPacket(link,
                                   MP_SingularDict,
@@ -587,7 +590,7 @@ mpsr_Status_t mpsr_PutDump(MP_Link_pt link)
       cmd.arg2.attribute=h->attribute;
       cmd.arg2.rtyp=h->typ;
 #ifdef HAVE_NAMESPACES
-      if (mpsr_PutLeftv(link, lv , currRing) != mpsr_Success)
+      if (mpsr_PutLeftv(link, lv , r) != mpsr_Success)
       {
         FreeL(cmd.arg1.name);
         break;
@@ -630,7 +633,7 @@ mpsr_Status_t mpsr_PutDump(MP_Link_pt link)
           cmd.arg2.attribute = h2->attribute;
           cmd.arg2.rtyp = h2->typ;
 #ifdef HAVE_NAMESPACES
-          if (mpsr_PutLeftv(link, lv , currRing) != mpsr_Success)
+          if (mpsr_PutLeftv(link, lv , r) != mpsr_Success)
           {
             FreeL(cmd.arg1.name);
             break;
