@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.114 2000-09-12 16:01:14 obachman Exp $ */
+/* $Id: ring.cc,v 1.115 2000-09-13 13:42:40 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -2408,7 +2408,7 @@ void rKillModifiedRing(ring r)
   omFreeBin(r,ip_sring_bin);
 }
 
-BOOLEAN rComplete(ring r, int force) 
+BOOLEAN rComplete(ring r, int force)
 {
   if (r->VarOffset!=NULL && force == 0) return FALSE;
 
@@ -2487,7 +2487,7 @@ BOOLEAN rComplete(ring r, int force)
       case ringorder_dp:
         if (r->block0[i]==r->block1[i])
         {
-          rO_LexVars(j, j_bits, r->block0[i],r->block1[i], prev_ordsgn,
+          rO_LexVars(j, j_bits, r->block0[i],r->block0[i], prev_ordsgn,
                      tmp_ordsgn,v, bits);
         }
         else
@@ -2498,13 +2498,17 @@ BOOLEAN rComplete(ring r, int force)
           typ_i++;
           rO_LexVars_neg(j, j_bits, r->block1[i],r->block0[i]+1,
                          prev_ordsgn,tmp_ordsgn,v,bits);
+          if ((j_bits >= bits)&&(j_bits != BITS_PER_LONG-bits))
+          // there is enough space for the last var
+            rO_LexVars_neg(j, j_bits, r->block0[i],r->block0[i],
+                         prev_ordsgn,tmp_ordsgn,v,bits);
         }
         break;
 
       case ringorder_Dp:
         if (r->block0[i]==r->block1[i])
         {
-          rO_LexVars(j, j_bits, r->block0[i],r->block1[i], prev_ordsgn,
+          rO_LexVars(j, j_bits, r->block0[i],r->block0[i], prev_ordsgn,
                      tmp_ordsgn,v, bits);
         }
         else
@@ -2515,6 +2519,10 @@ BOOLEAN rComplete(ring r, int force)
           typ_i++;
           rO_LexVars(j, j_bits, r->block0[i],r->block1[i]-1, prev_ordsgn,
                      tmp_ordsgn,v, bits);
+          if ((j_bits >= bits)&&(j_bits != BITS_PER_LONG-bits))
+          // there is enough space for the last var
+            rO_LexVars(j, j_bits, r->block0[i],r->block0[i],
+                         prev_ordsgn,tmp_ordsgn,v,bits);
         }
         break;
 
@@ -2532,13 +2540,17 @@ BOOLEAN rComplete(ring r, int force)
           typ_i++;
           rO_LexVars_neg(j, j_bits, r->block1[i],r->block0[i]+1,
                          prev_ordsgn,tmp_ordsgn,v,bits);
+          if ((j_bits >= bits)&&(j_bits != BITS_PER_LONG-bits))
+          // there is enough space for the last var
+            rO_LexVars_neg(j, j_bits, r->block0[i],r->block0[i],
+                         prev_ordsgn,tmp_ordsgn,v,bits);
         }
         break;
 
       case ringorder_Ds:
         if (r->block0[i]==r->block1[i])
         {
-          rO_LexVars_neg(j, j_bits, r->block0[i],r->block1[i],prev_ordsgn,
+          rO_LexVars_neg(j, j_bits, r->block0[i],r->block0[i],prev_ordsgn,
                          tmp_ordsgn,v, bits);
         }
         else
@@ -2549,6 +2561,10 @@ BOOLEAN rComplete(ring r, int force)
           typ_i++;
           rO_LexVars(j, j_bits, r->block0[i],r->block1[i]-1, prev_ordsgn,
                      tmp_ordsgn,v, bits);
+          if ((j_bits >= bits)&&(j_bits != BITS_PER_LONG-bits))
+          // there is enough space for the last var
+            rO_LexVars(j, j_bits, r->block0[i],r->block0[i],
+                         prev_ordsgn,tmp_ordsgn,v,bits);
         }
         break;
 
@@ -2558,8 +2574,14 @@ BOOLEAN rComplete(ring r, int force)
         r->pVarLowIndex=j;
         typ_i++;
         if (r->block1[i]!=r->block0[i])
+        {
           rO_LexVars_neg(j, j_bits,r->block1[i],r->block0[i]+1, prev_ordsgn,
                          tmp_ordsgn, v,bits);
+          if ((j_bits >= bits)&&(j_bits != BITS_PER_LONG-bits))
+          // there is enough space for the last var
+            rO_LexVars_neg(j, j_bits, r->block0[i],r->block0[i],
+                         prev_ordsgn,tmp_ordsgn,v,bits);
+        }
         break;
 
       case ringorder_Wp:
@@ -2568,8 +2590,14 @@ BOOLEAN rComplete(ring r, int force)
         r->pVarLowIndex=j;
         typ_i++;
         if (r->block1[i]!=r->block0[i])
+        {
           rO_LexVars(j, j_bits,r->block0[i],r->block1[i]-1, prev_ordsgn,
                      tmp_ordsgn,v, bits);
+          if ((j_bits >= bits)&&(j_bits != BITS_PER_LONG-bits))
+          // there is enough space for the last var
+            rO_LexVars(j, j_bits, r->block0[i],r->block0[i],
+                         prev_ordsgn,tmp_ordsgn,v,bits);
+        }
         break;
 
       case ringorder_ws:
@@ -2578,8 +2606,14 @@ BOOLEAN rComplete(ring r, int force)
         r->pVarLowIndex=j;
         typ_i++;
         if (r->block1[i]!=r->block0[i])
+        {
           rO_LexVars_neg(j, j_bits,r->block1[i],r->block0[i]+1, prev_ordsgn,
                          tmp_ordsgn, v,bits);
+          if ((j_bits >= bits)&&(j_bits != BITS_PER_LONG-bits))s
+          // there is enough space for the last var
+            rO_LexVars_neg(j, j_bits, r->block0[i],r->block0[i],
+                         prev_ordsgn,tmp_ordsgn,v,bits);
+        }
         break;
 
       case ringorder_Ws:
@@ -2588,8 +2622,14 @@ BOOLEAN rComplete(ring r, int force)
         r->pVarLowIndex=j;
         typ_i++;
         if (r->block1[i]!=r->block0[i])
+        {
           rO_LexVars(j, j_bits,r->block0[i],r->block1[i]-1, prev_ordsgn,
                      tmp_ordsgn,v, bits);
+          if ((j_bits >= bits)&&(j_bits != BITS_PER_LONG-bits))
+          // there is enough space for the last var
+            rO_LexVars_neg(j, j_bits, r->block0[i],r->block0[i],
+                         prev_ordsgn,tmp_ordsgn,v,bits);
+        }
         break;
 
       case ringorder_S:
