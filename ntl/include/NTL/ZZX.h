@@ -92,12 +92,6 @@ Leading zeroes are stripped.
 *********************************************************************/
 
 
-NTL_SNS istream& operator>>(NTL_SNS istream& s, ZZX& x);
-NTL_SNS ostream& operator<<(NTL_SNS ostream& s, const ZZX& a);
-
-
-
-
 /**********************************************************
 
                    Some utility routines
@@ -717,8 +711,6 @@ long CRT(ZZX& a, ZZ& prod, const ZZ_pX& A);
 NTL_vector_decl(ZZX,vec_ZZX)
 
 NTL_eq_vector_decl(ZZX,vec_ZZX)
-
-NTL_io_vector_decl(ZZX,vec_ZZX)
 
 NTL_CLOSE_NNS
 

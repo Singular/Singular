@@ -65,12 +65,6 @@ inline mat_GF2 to_mat_GF2(const vec_vec_GF2& a)
 long operator==(const mat_GF2& a, const mat_GF2& b); 
 long operator!=(const mat_GF2& a, const mat_GF2& b); 
 
-
-NTL_SNS istream& operator>>(NTL_SNS istream&, mat_GF2&); 
-NTL_SNS ostream& operator<<(NTL_SNS ostream&, const mat_GF2&);  
-
-
-
 void add(mat_GF2& X, const mat_GF2& A, const mat_GF2& B); 
 
 inline void sub(mat_GF2& X, const mat_GF2& A, const mat_GF2& B)

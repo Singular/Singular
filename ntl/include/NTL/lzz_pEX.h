@@ -62,12 +62,6 @@ zz_pEX(zz_pEX& x, INIT_TRANS_TYPE) : rep(x.rep, INIT_TRANS) { }
 };
 
 
-NTL_SNS istream& operator>>(NTL_SNS istream& s, zz_pEX& x);
-NTL_SNS ostream& operator<<(NTL_SNS ostream& s, const zz_pEX& a);
-
-
-
-
 /**********************************************************
 
                    Some utility routines
@@ -708,8 +702,6 @@ inline zz_pEX& operator/=(zz_pEX& x, const zz_pEXModulus& F)
 NTL_vector_decl(zz_pEX,vec_zz_pEX)
 
 NTL_eq_vector_decl(zz_pEX,vec_zz_pEX)
-
-NTL_io_vector_decl(zz_pEX,vec_zz_pEX)
 
 
 

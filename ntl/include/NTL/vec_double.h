@@ -8,8 +8,6 @@ NTL_OPEN_NNS
 
 NTL_vector_decl(double,vec_double)
 
-NTL_io_vector_decl(double,vec_double)
-
 NTL_eq_vector_decl(double,vec_double)
 
 NTL_CLOSE_NNS

@@ -10,8 +10,6 @@ NTL_vector_decl(vec_zz_p,vec_vec_zz_p)
 
 NTL_eq_vector_decl(vec_zz_p,vec_vec_zz_p)
 
-NTL_io_vector_decl(vec_zz_p,vec_vec_zz_p)
-
 NTL_CLOSE_NNS
 
 #endif

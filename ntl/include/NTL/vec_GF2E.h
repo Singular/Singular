@@ -8,8 +8,6 @@ NTL_OPEN_NNS
 
 NTL_vector_decl(GF2E,vec_GF2E)
 
-NTL_io_vector_decl(GF2E,vec_GF2E)
-
 NTL_eq_vector_decl(GF2E,vec_GF2E)
 
 

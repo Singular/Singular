@@ -164,10 +164,6 @@ void append(vec_GF2& v, const vec_GF2& a);
 long operator==(const vec_GF2& a, const vec_GF2& b);
 inline long operator!=(const vec_GF2& a, const vec_GF2& b)
    { return !(a == b); }
-
-NTL_SNS ostream& operator<<(NTL_SNS ostream& s, const vec_GF2& a);
-NTL_SNS istream& operator>>(NTL_SNS istream& s, vec_GF2& a);
-
 void shift(vec_GF2& x, const vec_GF2& a, long n);
 // x = a shifted n places, i.e., if l = a.length(),
 //    x.length() = l, x[i] = a[i-n] for 0 <= i-n < l,

@@ -221,11 +221,6 @@ inline long compare(double x, const quad_float& y)
    { return compare(to_quad_float(x), y); }
 
 
-
-NTL_SNS istream& operator >> (NTL_SNS istream&, quad_float&);
-NTL_SNS ostream& operator << (NTL_SNS ostream&, const quad_float&);
-
-
 quad_float sqrt(const quad_float&);
 quad_float floor(const quad_float&);
 quad_float ceil(const quad_float&);

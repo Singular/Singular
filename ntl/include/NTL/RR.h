@@ -334,10 +334,6 @@ void power2(RR& z, long e);
 inline RR power2_RR(long e)
    { RR z; power2(z, e); NTL_OPT_RETURN(RR, z); }
 
-NTL_SNS ostream& operator<<(NTL_SNS ostream& s, const RR& a);
-NTL_SNS istream& operator>>(NTL_SNS istream& s, RR& x);
-
-
 void SqrRoot(RR& x, const RR& a);
 inline RR SqrRoot(const RR& a)
    { RR z; SqrRoot(z, a); NTL_OPT_RETURN(RR, z); }

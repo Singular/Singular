@@ -4,16 +4,6 @@
 
 #include <NTL/tools.h>
 
-#if (defined(NTL_STD_CXX) || defined(NTL_PSTD_NHF))
-
-#include <fstream>                                                              
-
-#else
-
-#include <fstream.h>
-
-#endif
-
 #if 0
 namespace foo_bar {
 
@@ -25,12 +15,6 @@ class ifstream;
 
 NTL_OPEN_NNS
 
-
-void OpenWrite(NTL_SNS ofstream& s, const char *name);
-
-// opens file for writing...aborts if fails
-
-void OpenRead(NTL_SNS ifstream& s, const char *name);
 
 // opens file for reading
 

@@ -5,23 +5,8 @@
 #include <NTL/config.h>
 #include <NTL/mach_desc.h>
 
-#if (defined(NTL_STD_CXX) || defined(NTL_PSTD_NHF))
-
-// new header files
-
-#include <cstdlib>
-#include <cmath>
-#include <iostream>
-
-#else
-
-// old header files
-
 #include <stdlib.h>
 #include <math.h>
-#include <iostream.h>
-
-#endif
 
 #if (defined(NTL_STD_CXX) || defined(NTL_PSTD_NHF))
 
@@ -83,9 +68,6 @@
 
 #if 0
 namespace foo_bar {
-
-class ostream;
-class istream;
 
 typedef unsigned int size_t;
 
@@ -204,11 +186,6 @@ inline double to_double(long a) { return double(a); }
 inline double to_double(float a) { return double(a); }
 inline double to_double(double a) { return a; }
 
-
-long SkipWhiteSpace(NTL_SNS istream& s);
-
-
-
 void Error(const char *s);
 
 
@@ -217,9 +194,6 @@ inline double GetTime() { return _ntl_GetTime(); }
 inline long IsFinite(double *p) { return _ntl_IsFinite(p); }
 inline void ForceToMem(double *p) { _ntl_ForceToMem(p); }
 
-
-
-void PrintTime(NTL_SNS ostream& s, double t);
 
 NTL_CLOSE_NNS
 

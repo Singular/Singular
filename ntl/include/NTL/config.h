@@ -284,7 +284,7 @@ to unset a flag, just replace the 'if 1' by an 'if 0'.
  * 
  */
 
-#if 1
+#if 0
 #define NTL_LONG_LONG
 
 /*
@@ -354,7 +354,7 @@ to unset a flag, just replace the 'if 1' by an 'if 0'.
 
 
 
-#if 1
+#if 0
 #define NTL_TBL_REM
 
 /*
