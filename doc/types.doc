@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.61 1998-05-20 10:55:22 schmidt Exp $
+@comment $Id: types.doc,v 1.62 1998-05-20 11:28:35 wichmann Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -202,7 +202,7 @@ all products of generators of @code{i} and simplifies the product
 while @code{i^2} involves only the different ones, 
 but does not simplify the result and is therefore faster.
 @item
-a typecast to ideal
+a type cast to ideal
 @end enumerate
 
 @*@strong{Example:}
@@ -315,7 +315,7 @@ interreduction of an ideal (see @ref{interred})
 @item intersect
 ideal intersection (see @ref{intersect})
 @item jacob
-ideal of all partial derivatives resp. jacobian matrix (see @ref{jacob})
+ideal of all partial derivatives resp.@: jacobian matrix (see @ref{jacob})
 @item jet
 k-jet: Taylor series up to a given order (see @ref{jet})
 @item kbase
@@ -333,7 +333,7 @@ minimal resolution (see @ref{lres})
 @item maxideal
 power of the maximal ideal at 0 (see @ref{maxideal})
 @item minbase
-minimal generating set of a homogeneous ideal resp. module or an ideal resp. module in a local ring
+minimal generating set of a homogeneous ideal resp.@: module or an ideal resp.@: module in a local ring
 (see @ref{minbase})
 @item minor
 set of minors of a matrix (see @ref{minor})
@@ -347,12 +347,12 @@ $(h1+h2)/h1 \cong h2/(h1 \cap h2)$
 @end ifinfo
 (see @ref{modulo})
 @item mres
-minimal free resolution of an ideal resp. module, also minimizing the given ideal resp. module
+minimal free resolution of an ideal resp.@: module, also minimizing the given ideal resp.@: module
 (see @ref{mres})
 @item mstd
 standard basis and minimal generating set of an ideal (see @ref{mstd})
 @item mult
-multiplicity of an ideal resp. module (see @ref{mult})
+multiplicity of an ideal resp.@: module (see @ref{mult})
 @item ncols
 number of columns (see @ref{ncols})
 @item preimage
@@ -364,7 +364,7 @@ ideal quotient (see @ref{quotient})
 @item reduce
 normalform with respect to a standard basis (see @ref{reduce})
 @item res
-minimal free resolution of an ideal resp. module but not changing the given ideal resp. module
+minimal free resolution of an ideal resp.@: module but not changing the given ideal resp.@: module
 (see @ref{res})
 @item simplify
 simplify a set of polynomials (see @ref{simplify})
@@ -466,7 +466,7 @@ int expressions combined by the arithmetic operations
 @code{%} (@code{mod}), or @code{^}
 @item a boolean expression 
 @item
-a typecast to int
+a type cast to int
 @end enumerate
 
 @strong{Note:}
@@ -584,11 +584,11 @@ the value of @code{j}, see @ref{Limitations}.
 @item char
 characteristic of the coefficient field of a ring (see @ref{char})
 @item deg
-degree of a poly resp. vector (see @ref{deg})
+degree of a poly resp.@: vector (see @ref{deg})
 @item det
 determinant (see @ref{det})
 @item dim
-Krull dimension of basering modulo ideal resp. module (see @ref{dim})
+Krull dimension of basering modulo ideal resp.@: module (see @ref{dim})
 @item extgcd
 Bezout representation of gcd (see @ref{extgcd})
 @item find
@@ -600,7 +600,7 @@ Koszul matrix (see @ref{koszul})
 @item memory
 memory usage (see @ref{memory})
 @item mult
-multiplicity of an ideal resp. module (see @ref{mult})
+multiplicity of an ideal resp.@: module (see @ref{mult})
 @item ncols
 number of columns (see @ref{ncols})
 @item npars
@@ -612,7 +612,7 @@ the rank of the free module where the vector or module lives
 @item nvars
 number of ring variables (see @ref{nvars})
 @item ord
-degree of the leading term of a poly resp. vector (see @ref{ord})
+degree of the leading term of a poly resp.@: vector (see @ref{ord})
 @item par
 n-th paramter of the basering (see @ref{par})
 @item pardeg
@@ -632,7 +632,7 @@ trace of an integer matrix (see @ref{trace})
 @item var
 n-th ring variable of the basering (see @ref{var})
 @item vdim
-vector space dimension of basering modulo ideal resp. of freemodule modulo
+vector space dimension of basering modulo ideal resp.@: of freemodule modulo
 module (see @ref{vdim})
 @end table
 
@@ -844,7 +844,7 @@ intmat operations with int (@code{+}, @code{-}, @code{*}, @code{/}, @code{%})
 @item
 intmat operations (@code{+}, @code{-}, @code{*})
 @item
-a typecast to intmat
+a type cast to intmat
 @end enumerate
 
 @*@strong{Example:}
@@ -1019,7 +1019,7 @@ intvec operations (@code{+}, @code{-})
 @item
 intvec operation with intmat (@code{*})
 @item
-a typecast to intvec
+a type cast to intvec
 @end enumerate
 
 @*@strong{Example:}
@@ -1701,7 +1701,7 @@ a function returning list
 @item
 list expressions combined by the arithmetic operation @code{+}
 @item
-a typecast to list
+a type cast to list
 @end enumerate
 
 @c ref
@@ -1774,16 +1774,16 @@ minimal resolution (see @ref{lres})
 @item minres
 minimize a free resolution (see @ref{minres})
 @item mres
-minimal free resolution of an ideal resp. module, also
+minimal free resolution of an ideal resp.@: module, also
 minimizing the first module (see @ref{mres})
 @item names
 list of all userdefined variable names (see @ref{names})
 @item res
-minimal free resolution of an ideal resp. module (see @ref{res})
+minimal free resolution of an ideal resp.@: module (see @ref{res})
 @item size
 number of entries (see @ref{size})
 @item sres
-free resolution of an ideal resp. module given by a standard base (see @ref{sres})
+free resolution of an ideal resp.@: module given by a standard base (see @ref{sres})
 @end table
 
 
@@ -2052,7 +2052,7 @@ a function returning matrix
 matrix expressions combined by the arithmetic operations
 @code{+}, @code{-} or @code{*}
 @item
-a typecast to matrix
+a type cast to matrix
 @end enumerate
 
 @*@strong{Example:}
@@ -2251,7 +2251,7 @@ module expressions combined by the arithmetic operation @code{+}
 @item
 multiplication of a module expressions with an ideal or poly expression: @code{*}
 @item
-a typecast to module
+a type cast to module
 @end enumerate
 
 @c ref
@@ -2339,7 +2339,7 @@ standard basis and transformation matrix computation (see @ref{liftstd})
 @item lres
 minimal resolution (see @ref{lres})
 @item minbase
-minimal generating set of a homogeneous ideal resp. module or an ideal resp. module
+minimal generating set of a homogeneous ideal resp.@: module or an ideal resp.@: module
 over a local ring
 @item modulo
 represents
@@ -2351,7 +2351,7 @@ $(h1+h2)/h1=h2/(h1 \cap h2)$
 @end ifinfo
 (see @ref{modulo})
 @item mres
-minimal free resolution of an ideal resp. module, also minimizing the given module
+minimal free resolution of an ideal resp.@: module, also minimizing the given module
 (see @ref{mres})
 @item mult
 multiplicity of a module (see @ref{mult})
@@ -2364,13 +2364,13 @@ nice print format (see @ref{print})
 @item prune
 minimize the embedding into a free module (see @ref{prune})
 @item qhweight
-quasihomogeneous weights of an ideal resp. module (see @ref{qhweight})
+quasihomogeneous weights of an ideal resp.@: module (see @ref{qhweight})
 @item quotient
 ideal quotient (see @ref{quotient})
 @item reduce
 normalform with respect to a standard basis (see @ref{reduce})
 @item res
-minimal free resolution of an ideal resp. module but not changing the given ideal resp. module
+minimal free resolution of an ideal resp.@: module but not changing the given ideal resp.@: module
 (see @ref{res})
 @item simplify
 simplify a set of vectors (see @ref{simplify})
@@ -2468,7 +2468,7 @@ an int expression (see @ref{Type conversion and casting})
 number expressions combined by the arithmetic operations
 @code{+}, @code{-}, @code{*}, @code{/}, @code{^}, or @code{**}.
 @item
-a typecast to number
+a type cast to number
 @end enumerate
 
 @*@strong{Example:}
@@ -2635,7 +2635,7 @@ a function returning poly
 poly expressions combined by the arithmetic operations
 @code{+}, @code{-}, @code{*}, @code{/}, or @code{^}
 @item
-a typecast to poly
+a type cast to poly
 @end enumerate
 
 @*@strong{Example:}
@@ -2720,7 +2720,7 @@ greates common division (see @ref{gcd})
 @item homog
 homogenization (see @ref{homog})
 @item jacob
-ideal resp. matrix of all partial derivatives (see @ref{jacob})
+ideal resp.@: matrix of all partial derivatives (see @ref{jacob})
 @item lead
 leading monomial (see @ref{lead})
 @item leadcoef
@@ -2932,7 +2932,7 @@ an identifier of type resolution
 @item
 a function returning a resolution
 @item
-a typecast to resolution from a list of ideals resp.@: modules..
+a type cast to resolution from a list of ideals resp.@: modules..
 @end enumerate
 
 @c ref
@@ -2952,11 +2952,11 @@ minimal resolution (see @ref{lres})
 @item minres
 minimize a free resolution (see @ref{minres})
 @item mres
-minimal free resolution of an ideal resp. module, also minimizing the
-given ideal resp. module (see @ref{mres})
+minimal free resolution of an ideal resp.@: module, also minimizing the
+given ideal resp.@: module (see @ref{mres})
 @item res
-minimal free resolution of an ideal resp. module but not changing the
-given ideal resp. module (see @ref{res})
+minimal free resolution of an ideal resp.@: module but not changing the
+given ideal resp.@: module (see @ref{res})
 @item sres
 free resolution of a standard basis (see @ref{sres})
 @end table
@@ -3147,7 +3147,7 @@ a function returning string
 @item
 a substring (using the bracket operator)
 @item
-a typecast to string
+a type cast to string
 @item
 string expressions combined by the operation @code{+}.
 @end enumerate
@@ -3156,7 +3156,7 @@ string expressions combined by the operation @code{+}.
 @example
 @c  // a string constant
 @c  "@dots{}";
-@c  // a typecast from name
+@c  // a type cast from name
 @c  string(name)
 @c  // concatenation
 @c  string_expression + string_expression
@@ -3327,7 +3327,7 @@ vector expressions combined by the arithmetic operations @code{+} or
 a poly expression and a vector expression combined by the arithmetic
 operation @code{*}
 @item 
-a typecast to vector using the brackets @code{[} , @code{]}
+a type cast to vector using the brackets @code{[} , @code{]}
 @end enumerate
 
 @*@strong{Example:}
