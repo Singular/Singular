@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.203 2003-03-18 23:52:04 levandov Exp $ */
+/* $Id: ring.cc,v 1.204 2003-05-31 14:14:01 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -1006,9 +1006,9 @@ idhdl rFindHdl(ring r, idhdl n, idhdl w)
   proclevel *p=procstack;
   while(p!=NULL)
   {
-    if ((p->currPack!=basePack)
-    && (p->currPack!=currPack))
-      h=rSimpleFindHdl(r,p->currPack->idroot,n);
+    if ((p->cPack!=basePack)
+    && (p->cPack!=currPack))
+      h=rSimpleFindHdl(r,p->cPack->idroot,n);
     if (h!=NULL)  return h;
     p=p->next;
   }

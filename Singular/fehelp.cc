@@ -3,6 +3,7 @@
 ****************************************/
 /*
 * ABSTRACT: help system
+* versin $Id: fehelp.cc,v 1.38 2003-05-31 14:13:06 Singular Exp $
 */
 
 #include <string.h>
@@ -637,7 +638,11 @@ static BOOLEAN heOnlineHelp(char* s)
   idhdl h, ns;
   iiname2hdl(s, &ns, &h);
 #else /* HAVE_NAMESPACES */
+#ifdef HAVE_NS
+  idhdl h=IDROOT->get(s,myynest);
+#else
   idhdl h=idroot->get(s,myynest);
+#endif /* HAVE_NS */
 #endif /* HAVE_NAMESPACES */
 
   // try help for a procedure
@@ -691,7 +696,11 @@ static BOOLEAN heOnlineHelp(char* s)
 #ifdef HAVE_NAMESPACES
     yylplex(str, libnamebuf, &lib_style, IDROOT, FALSE, GET_INFO);
 #else /* HAVE_NAMESPACES */
+#ifdef HAVE_NS
+    yylplex(str, libnamebuf, &lib_style, IDROOT, FALSE, GET_INFO);
+#else
     yylplex(str, libnamebuf, &lib_style, GET_INFO);
+#endif /* HAVE_NS */
 #endif /* HAVE_NAMESPACES */
     reinit_yylp();
     if(lib_style == OLD_LIBSTYLE)
@@ -742,7 +751,11 @@ static long heKeyChksum(char* key)
   idhdl h, ns;
   iiname2hdl(key, &ns, &h);
 #else /* HAVE_NAMESPACES */
+#ifdef HAVE_NS
+  idhdl h=IDROOT->get(key,myynest);
+#else
   idhdl h=idroot->get(key,myynest);
+#endif /* HAVE_NS */
 #endif /* HAVE_NAMESPACES */
   if ((h!=NULL) && (IDTYP(h)==PROC_CMD))
   {
