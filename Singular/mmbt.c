@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmbt.c,v 1.8 1999-03-19 17:42:28 obachman Exp $ */
+/* $Id: mmbt.c,v 1.9 1999-09-01 13:13:24 Singular Exp $ */
 /*
 * ABSTRACT: backtrace: part of memory subsystem (for linux/elf)
 * needed programs: - mprpc to set the variable MPRPC
@@ -69,7 +69,9 @@ void mmTrack (unsigned long *bt_stack)
 
   if (mm_lowpc==0) mmTrackInit();
 
-  while ((fp!=NULL) && ((unsigned long)fp>4095)  && *fp && (pc = getpc (fp)) 
+  while ((fp!=NULL) && ((unsigned long)fp>4095)  
+  && ((unsigned long)fp < ((unsigned long)0x800000))
+  && *fp && (pc = getpc (fp)) 
   && !entrypc (pc) && (i<BT_MAXSTACK))
   {
     bt_stack[i]=pc; i++;
@@ -182,7 +184,7 @@ void mmPrintStackFrames(unsigned long *bt_stack, int start, int end, int mm)
       if (strcmp(s, "main") == 0) break;
     }
     else
-      fprintf( stderr,":%x",bt_stack[i]);
+      fprintf( stderr,":%lx",(long)bt_stack[i]);
     i++;
   } while ((i<end) && (bt_stack[i]!=0));
   fprintf( stderr,"\n");
