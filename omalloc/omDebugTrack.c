@@ -3,7 +3,7 @@
  *  Purpose: implementation of main omDebug functions
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omDebugTrack.c,v 1.6 2000-09-12 16:02:18 obachman Exp $
+ *  Version: $Id: omDebugTrack.c,v 1.7 2000-09-14 12:59:53 obachman Exp $
  *******************************************************************/
 #include <limits.h>
 #include "omConfig.h"
@@ -452,6 +452,9 @@ static omError_t omDoCheckTrackAddr(omTrackAddr d_addr, void* addr, void* bin_si
   omAddrCheckReturnCorrupted(omCheckFlags(d_addr->flags));
   omAddrCheckReturnError((d_addr->flags & OM_FUSED) ^ (flags & OM_FUSED), omError_FreedAddrOrMemoryCorrupted);
 
+  if (flags & OM_FBINADDR && flags & OM_FSIZE)
+    omAddrCheckReturnError(omTrackAddr_2_OutSize(d_addr) != (size_t) bin_size, omError_WrongSize);
+  
   if (d_addr->track > 2)
   {
     if (d_addr->flags & OM_FBIN)

@@ -258,7 +258,7 @@ void TestFree(omMemCell cell)
 
 void my_exit()
 {
-  printf("\notTest Summary: ");
+  printf("\nomtTest Summary: ");
   if (errors || missed_errors || used_regions)
   {   
     printf("***FAILED***errors:%d, missed_errors:%d, used_regions:%d, seed=%d\n", errors, missed_errors, used_regions, seed);

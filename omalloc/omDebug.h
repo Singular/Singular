@@ -3,7 +3,7 @@
  *  Purpose: declaration of common Debug/Check/Track stuff
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 7/00
- *  Version: $Id: omDebug.h,v 1.8 2000-09-12 16:02:18 obachman Exp $
+ *  Version: $Id: omDebug.h,v 1.9 2000-09-14 12:59:52 obachman Exp $
  *******************************************************************/
 #ifndef OM_DEBUG_H
 #define OM_DEBUG_H
@@ -178,7 +178,7 @@ do                                                                            \
   omError_t _status = cond;                                                   \
   if (_status && _status != omError_MaxError)                                 \
   {                                                                           \
-    omPrintAddrInfo(stderr, _status, addr, bin_size, flags, "  occured for"); \
+    _omPrintAddrInfo(stderr, _status, addr, bin_size, flags, "  occured for"); \
     return _status;                                                           \
   }                                                                           \
 } while (0)

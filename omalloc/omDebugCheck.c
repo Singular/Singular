@@ -3,7 +3,7 @@
  *  Purpose: implementation of omCheck functions
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omDebugCheck.c,v 1.4 2000-08-18 09:05:52 obachman Exp $
+ *  Version: $Id: omDebugCheck.c,v 1.5 2000-09-14 12:59:52 obachman Exp $
  *******************************************************************/
 #include <limits.h>
 #include <stdarg.h>
@@ -25,7 +25,7 @@ omError_t omDoCheckBin(omBin bin, int normal_bin, char level,
                        omError_t report, OM_FLR_DECL);
 static omError_t omDoCheckBinPage(omBinPage page, int normal_page, int level, 
                                   omError_t report, OM_FLR_DECL);
-static void omPrintAddrInfo(FILE* fd, omError_t error, void* addr, void* bin_size, omTrackFlags_t flags, char* s);
+static void _omPrintAddrInfo(FILE* fd, omError_t error, void* addr, void* bin_size, omTrackFlags_t flags, char* s);
 
 
 /*******************************************************************
@@ -198,6 +198,9 @@ omError_t omDoCheckBinAddr(void* addr, void* bin_size, omTrackFlags_t flags, cha
   
   omAddrCheckReturnCorrupted(! omIsKnownTopBin(bin, ! omIsBinAddrTrackAddr(addr)));
 
+  if (flags & OM_FBINADDR && flags & OM_FSIZE)
+    omAddrCheckReturnError(bin->sizeW*SIZEOF_LONG != (size_t) bin_size, omError_WrongSize);
+    
   if (level > 1)
   {
     omAddrCheckReturnError(omIsAddrOnFreeBinPage(addr), omError_FreedAddr);
@@ -422,11 +425,11 @@ omError_t omReportAddrError(omError_t error, omError_t report_error, void* addr,
   va_start(ap, fmt);
   omReportError(error, report_error, OM_FLR_VAL, fmt, ap);
   
-  omPrintAddrInfo(stderr, error, addr, bin_size, flags, " occured for");
+  _omPrintAddrInfo(stderr, error, addr, bin_size, flags, " occured for");
   return om_ErrorStatus;
 }
 
-void omPrintAddrInfo(FILE* fd, omError_t error, void* addr, void* bin_size, omTrackFlags_t flags, char* s)
+void _omPrintAddrInfo(FILE* fd, omError_t error, void* addr, void* bin_size, omTrackFlags_t flags, char* s)
 {
   if (! omCheckPtr(addr, omError_MaxError, OM_FLR))
   {
@@ -447,6 +450,11 @@ void omPrintAddrInfo(FILE* fd, omError_t error, void* addr, void* bin_size, omTr
   {
     fprintf(fd, "%s (invalid) addr: %p\n", s, addr);
   }
+}
+
+void omPrintAddrInfo(FILE* fd, void *addr, char* s)
+{
+  _omPrintAddrInfo(fd, omError_NoError, addr, NULL, 0, s);
 }
 
 /*******************************************************************
@@ -536,7 +544,7 @@ static void _omPrintUsedAddr(void* addr)
   {
     om_total_used_blocks++;
     om_total_used_size += omSizeOfAddr(addr);
-    omPrintAddrInfo(om_print_used_addr_fd, omError_NoError, addr, NULL, 0, "");
+    _omPrintAddrInfo(om_print_used_addr_fd, omError_NoError, addr, NULL, 0, "");
     fprintf(om_print_used_addr_fd, "\n");
   }
 }

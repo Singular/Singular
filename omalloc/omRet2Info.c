@@ -3,7 +3,7 @@
  *  Purpose: translation of return addr to RetInfo
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omRet2Info.c,v 1.5 2000-09-12 16:02:19 obachman Exp $
+ *  Version: $Id: omRet2Info.c,v 1.6 2000-09-14 12:59:53 obachman Exp $
  *******************************************************************/
 #include <stdio.h>
 #include <strings.h>
@@ -24,6 +24,9 @@
 #define MAXPATHLEN 1024
 #endif
 
+/* define to also print return addresses in (default)
+   output of omPrintInfo */
+/* #define OM_PRINT_RETURN_ADDRESS */
 static char om_this_prog[MAXPATHLEN] = "";
 
 #ifndef OM_MAX_BACKTRACE_DEPTH
@@ -138,15 +141,21 @@ int omPrintBackTrace(void** bt, int max, FILE* fd)
   if (max > OM_MAX_BACKTRACE_DEPTH) max = OM_MAX_BACKTRACE_DEPTH;
   
   i = omBackTrace_2_RetInfo(bt, info, max);
-  return omPrintRetInfo(info, i, fd, "  #%i %L in %F\n");
+#ifdef OM_PRINT_RETURN_ADDRESS
+  return omPrintRetInfo(info, i, fd, "  #%i at %L in %F ra=%p\n");
+#else
+  return omPrintRetInfo(info, i, fd, "  #%i at %L in %F\n");
+#endif  
 }
 
-int omPrintCurrentBackTrace(FILE* fd)
+int omPrintCurrentBackTraceMax(FILE* fd, int max)
 {
   int i;
   void* bt[OM_MAX_BACKTRACE_DEPTH];
-  
-  i = omGetBackTrace(bt, 1, OM_MAX_BACKTRACE_DEPTH);
+  if (max > OM_MAX_BACKTRACE_DEPTH)
+    max = OM_MAX_BACKTRACE_DEPTH;
+  if (max <= 0) return 0;
+  i = omGetBackTrace(bt, 1, max);
   return omPrintBackTrace(bt, i, fd);
 }
 
@@ -230,7 +239,11 @@ int _omPrintBackTrace(void** bt, int max, FILE* fd , OM_FLR_DECL)
   }
   else
 #endif /* ! OM_INTERNAL_DEBUG */
+#ifdef OM_PRINT_RETURN_ADDRESS
     return omPrintRetInfo(info, i, fd, "\n  #%i at %L in %F ra=%p");
+#else
+    return omPrintRetInfo(info, i, fd, "\n  #%i at %L in %F");
+#endif
 }
 
 int _omPrintCurrentBackTrace(FILE* fd , OM_FLR_DECL)

@@ -3,7 +3,7 @@
  *  Purpose: implementation of main omTest functions
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 7/00
- *  Version: $Id: omDebug.c,v 1.8 2000-09-12 16:02:18 obachman Exp $
+ *  Version: $Id: omDebug.c,v 1.9 2000-09-14 12:59:52 obachman Exp $
  *******************************************************************/
 #include <limits.h>
 #include "omConfig.h"
@@ -38,6 +38,10 @@ static void* om_LastKeptAddr = NULL;
 omError_t omTestAddrBin(void* addr, omBin bin, int check_level)
 {
   return _omDebugAddr(addr,bin,OM_FBIN,OM_CLFL);
+}
+omError_t omTestBinAddrSize(void* addr, size_t size, int check_level)
+{
+  return _omDebugAddr(addr,(void*)(size),OM_FSIZE|OM_FBINADDR,OM_CLFL);
 }
 omError_t omTestAddrSize(void* addr, size_t size, int check_level)
 {
@@ -236,11 +240,14 @@ char* _omDebugStrDup(const char* addr, OM_TFL_DECL)
     size = ULONG_MAX;
   }
   while (addr[i] != '\0' && i < size) i++;
+// there seems to be no way to check if it is really a string
+#if 0
   if (i == size)
   {
     omReportAddrError(omError_NotString, omError_NoError, addr, 0, 0, OM_FLR_VAL, "Not 0 terminated");
     i = size-1;
   }
+#endif 
   ret = __omDebugAlloc((void*)i+1, OM_FSIZE, track, OM_FLR_VAL);
   memcpy(ret, addr, i);
   ret[i] = '\0';

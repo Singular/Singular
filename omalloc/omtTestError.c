@@ -117,14 +117,30 @@ int omtTestErrors()
           if (cell != NULL)
           {
             omDebugAddrSize(cell->addr, OM_MAX_BLOCK_SIZE + 1);
-            spec.MaxSize = 0;
-            spec.MinTrack = 3;
-            spec.NotIsBin = 1;
-            cell = omFindCell(spec);
-            if (cell != NULL)
-            {   
-              omDebugAddrSize(cell->addr, GET_SIZE(cell->spec) + SIZEOF_OM_ALIGNMENT);
-            } else printf("cell not found\n");
+            if (om_ErrorStatus != omError_NoError)
+            {
+              om_ErrorStatus = omError_NoError;
+              spec.MaxSize = 0;
+              spec.MinTrack = 3;
+              spec.NotIsBin = 1;
+              cell = omFindCell(spec);
+              if (cell != NULL)
+              {   
+                omDebugAddrSize(cell->addr, GET_SIZE(cell->spec) + SIZEOF_OM_ALIGNMENT);
+                if (om_ErrorStatus != omError_NoError)
+                {
+                  om_ErrorStatus = omError_NoError;
+                  spec.MaxSize = OM_MAX_BLOCK_SIZE;
+                  spec.MinTrack = 0;
+                  spec.NotIsBin = 0;
+                  cell = omFindCell(spec);
+                  if (cell != NULL)
+                    omDebugBinAddrSize(cell->addr, GET_SIZE(cell->spec) - 1);
+                  else printf("cell not found");
+                } 
+              }
+              else printf("cell not found\n");
+            }
           }
           else printf("cell not found\n");
           break;
@@ -318,6 +334,8 @@ int omtTestErrors()
 
         case omError_NotString:
         {
+/* can only test for NULL string */
+#if 0 
           spec.MaxSize = OM_MAX_BLOCK_SIZE;
           cell = omFindCell(spec);
           if (cell != NULL)
@@ -332,6 +350,8 @@ int omtTestErrors()
           }
           else printf("cell not found\n");
           break;
+#endif
+          omStrDup(NULL);
         }
         default:
           printf("No Error test implemented\n");

@@ -3,11 +3,12 @@
  *  Purpose: Error handling of omalloc
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omError.h,v 1.4 2000-08-18 09:05:53 obachman Exp $
+ *  Version: $Id: omError.h,v 1.5 2000-09-14 12:59:53 obachman Exp $
  *******************************************************************/
 #ifndef OM_ERROR_H
 #define OM_ERROR_H
 
+#include <stdio.h>
 /*******************************************************************
  *  
  *  error codes
@@ -52,6 +53,12 @@ const char* omError2String(omError_t error);
 const char* omError2Serror(omError_t error);
 extern omError_t omReportError(omError_t error, omError_t report_error, OM_FLR_DECL,  
                                const char* fmt, ...);
+
+#ifndef OM_NDEBUG
+extern void omPrintAddrInfo(FILE* fd, void* addr, char* s);
+#else
+#define omPrintAddrInfo(fd, addr, s) fprintf(fd, "OM_NDEBUG: no addr info available\n")
+#endif
 
 /*BEGINPRIVATE*/
 /*******************************************************************
