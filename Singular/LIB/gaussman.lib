@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.23 2001-01-10 13:14:46 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.24 2001-01-10 17:42:26 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -144,8 +144,9 @@ static proc redNF(module M,module N,list #)
 proc monodromy(poly f,list #)
 "USAGE:    monodromy(f[,mode]); poly f, int mode[=1]
 ASSUME:   basering has local ordering, f has isolated singularity at 0
+RETURN:
 @format
-RETURN:   if mode=0:
+          if mode=0:
             matrix M: exp(-2*pi*i*M) is a monodromy matrix of f
           if mode=1:
             ideal e: exp(-2*pi*i*e) is the spectrum of the monodromy of f
@@ -386,8 +387,9 @@ example
 proc vfiltration(poly f,list #)
 "USAGE:    vfiltration(f[,mode]); poly f, int mode[=1]
 ASSUME:   basering has local ordering, f has isolated singularity at 0
+RETURN:
 @format
-RETURN:   list l:
+          list l:
           if mode=0 or mode=1:
             ideal l[1]: spectral numbers in increasing order
             intvec l[2]:
@@ -763,8 +765,9 @@ example
 proc vfiltjacalg(list l)
 "USAGE:   vfiltjacalg(vfiltration(f)); poly f
 ASSUME:  basering has local ordering, f has isolated singularity at 0
+RETURN:
 @format
-RETURN:  list l:
+         list l:
            ideal l[1]: spectral numbers of the V-filtration
                        on the Jacobian algebra in increasing order
            intvec l[2]:
