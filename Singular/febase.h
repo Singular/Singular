@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.15 1998-04-27 12:34:13 obachman Exp $ */
+/* $Id: febase.h,v 1.16 1998-05-04 13:44:47 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -12,12 +12,14 @@
 #include "structs.h"
 
 
+/*
 // These are our versions of fopen and fread They are very similar to
 // the usual fopen and fread, except that on reading, they always
 // convert "\r\n" into " \n" and "\r" into "\n".
 //
 // IMPORTANT: do only use myfopen and myfread when reading text,
 // do never use fopen and fread
+*/
 #ifndef unix
 extern FILE *myfopen(char *path, char *mode); 
 #else
