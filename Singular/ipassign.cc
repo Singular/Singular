@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.8 1997-04-09 12:19:48 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.9 1997-04-12 16:04:39 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -118,12 +118,12 @@ static BOOLEAN jjMINPOLY(leftv res, leftv a)
   if ((currRing->parameter!=NULL)
   && (currRing->P>1))
   {
-    Werror("no minpoly allowed");
+    WerrorS("no minpoly allowed");
     return TRUE;
   }
   if (currRing->minpoly!=NULL)
   {
-    Werror("minpoly already set");
+    WerrorS("minpoly already set");
     return TRUE;
   }
   number p=(number)a->CopyD(NUMBER_CMD);
@@ -1223,13 +1223,13 @@ BOOLEAN iiAssign(leftv l, leftv r)
       }
       else
       {
-        Werror("expected ring-name");
+        WerrorS("expected ring-name");
         nok=TRUE;
         break;
       }
       if (hh==NULL) /* map-assign: map f=r; */
       {
-        Werror("expected image ideal");
+        WerrorS("expected image ideal");
         nok=TRUE;
         break;
       }
@@ -1364,7 +1364,7 @@ BOOLEAN iiAssign(leftv l, leftv r)
       break;
 #endif
   } /* end switch: typ */
-  if (nok && (!errorreported)) Werror("incompatible type in list assignment");
+  if (nok && (!errorreported)) WerrorS("incompatible type in list assignment");
   r->CleanUp();
   return nok;
 }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.cc,v 1.3 1997-04-02 15:07:56 Singular Exp $ */
+/* $Id: syz.cc,v 1.4 1997-04-12 16:04:47 Singular Exp $ */
 
 /*
 * ABSTRACT: resolutions
@@ -695,7 +695,7 @@ intvec * syBetti(resolvente res,int length, int * regularity,
         if ((pGetComp(res[i]->m[j])>l)
         || ((i>1) && (res[i-1]->m[pGetComp(res[i]->m[j])-1]==NULL)))
         {
-          Werror("input not a resolvent");
+          WerrorS("input not a resolvent");
           Free((ADDRESS)temp1,(l+1)*sizeof(int));
           Free((ADDRESS)temp2,(l+1)*sizeof(int));
           return NULL;

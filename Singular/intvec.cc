@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: intvec.cc,v 1.4 1997-04-02 15:07:05 Singular Exp $ */
+/* $Id: intvec.cc,v 1.5 1997-04-12 16:04:37 Singular Exp $ */
 /*
 * ABSTRACT: class intvec: lists/vectors of integers
 */
@@ -147,124 +147,11 @@ void intvec::operator/=(int intop)
 void intvec::operator%=(int intop)
 {
   if (intop == 0) return;
-  for (int i=0; i<row*col; i++) { v[i] %= intop; }
+  if (intop<0) intop*=(-1);
+  for (int i=0; i<row*col; i++) 
+  { v[i] %= intop; if (v[i]<0) v[i] += intop; }
 }
 
-//BOOLEAN intvec::operator==(intvec * op)
-//{
-//  if (row!=op->rows()) return FALSE;
-//  if (col!=op->cols()) return FALSE;
-//  for (int i=0; i<row*col; i++) { if (v[i] != (*op)[i]) return FALSE; }
-//  return TRUE;
-//}
-//BOOLEAN intvec::operator<(intvec* op)
-//{
-//  if ((col!=1) ||(op->cols()!=1)) return FALSE;
-//  int i;
-//  for (i=0; i<min(row,op->rows()); i++)
-//  {
-//    if (v[i] > (*op)[i])
-//      return FALSE;
-//    if (v[i] < (*op)[i])
-//      return TRUE;
-//  }
-//  for (; i<row; i++)
-//  {
-//    if (v[i] > 0)
-//      return FALSE;
-//    if (v[i] < 0)
-//      return TRUE;
-//  }
-//  for (; i<op->rows(); i++)
-//  {
-//    if (0 > (*op)[i])
-//      return FALSE;
-//    if (0 < (*op)[i])
-//      return TRUE;
-//  }
-//  return FALSE;
-//}
-//BOOLEAN intvec::operator>(intvec* op)
-//{
-//  if ((col!=1) ||(op->cols()!=1)) return FALSE;
-//  int i;
-//  for (i=0; i<min(row,op->rows()); i++)
-//  {
-//    if (v[i] < (*op)[i])
-//      return FALSE;
-//    if (v[i] > (*op)[i])
-//      return TRUE;
-//  }
-//  for (; i<row; i++)
-//  {
-//    if (v[i] < 0)
-//      return FALSE;
-//    if (v[i] > 0)
-//      return TRUE;
-//  }
-//  for (; i<op->rows(); i++)
-//  {
-//    if (0 < (*op)[i])
-//      return FALSE;
-//    if (0 > (*op)[i])
-//      return TRUE;
-//  }
-//  return FALSE;
-//}
-//BOOLEAN intvec::operator>=(intvec* op)
-//{
-//  if ((col!=1) ||(op->cols()!=1)) return FALSE;
-//  int i;
-//  for (i=0; i<min(row,op->rows()); i++)
-//  {
-//    if (v[i] < (*op)[i])
-//      return FALSE;
-//    if (v[i] > (*op)[i])
-//      return TRUE;
-//  }
-//  for (; i<row; i++)
-//  {
-//    if (v[i] < 0)
-//      return FALSE;
-//    if (v[i] > 0)
-//      return TRUE;
-//  }
-//  for (; i<op->rows(); i++)
-//  {
-//    if (0 < (*op)[i])
-//      return FALSE;
-//    if (0 > (*op)[i])
-//      return TRUE;
-//  }
-//  return TRUE;
-//}
-//BOOLEAN intvec::operator<=(intvec* op)
-//{
-//  if ((col!=1) ||(op->cols()!=1)) return FALSE;
-//  int i;
-//  for (i=0; i<min(row,op->rows()); i++)
-//  {
-//    if (v[i] > (*op)[i])
-//      return FALSE;
-//    if (v[i] < (*op)[i])
-//      return TRUE;
-//  }
-//  for (; i<row; i++)
-//  {
-//    if (v[i] > 0)
-//      return FALSE;
-//    if (v[i] < 0)
-//      return TRUE;
-//  }
-//  for (; i<op->rows(); i++)
-//  {
-//    if (0 > (*op)[i])
-//      return FALSE;
-//    if (0 < (*op)[i])
-//      return TRUE;
-//  }
-//  return TRUE;
-//}
 int intvec::compare(intvec* op)
 {
   if ((col!=1) ||(op->cols()!=1)) 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.17 1997-04-09 12:19:46 Singular Exp $ */
+/* $Id: iparith.cc,v 1.18 1997-04-12 16:04:38 Singular Exp $ */
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
 */
@@ -132,11 +132,11 @@ cmdnames cmds[] =
   { "char",        0, CHARACTERISTIC_CMD ,CMD_1},
   { "char_series", 0, CHAR_SERIES_CMD ,   CMD_1},
   { "charstr",     0, CHARSTR_CMD ,       CMD_1},
+  { "cleardenom",  0, CONTENT_CMD ,       CMD_1},
   { "close",       0, CLOSE_CMD ,         CMD_1},
   { "coef",        0, COEF_CMD ,          CMD_M},
   { "coeffs",      0, COEFFS_CMD ,        CMD_23},
   { "continue",    0, CONTINUE_CMD ,      CONTINUE_CMD},
-  { "content",     0, CONTENT_CMD ,       CMD_1},
   { "contract",    0, CONTRACT_CMD ,      CMD_2},
   { "dbprint",     0, DBPRINT_CMD ,       CMD_M},
   { "def",         0, DEF_CMD ,           ROOT_DECL},
@@ -151,7 +151,7 @@ cmdnames cmds[] =
   { "dring",       0, DRING_CMD ,         DRING_CMD},
 #endif
   { "dump",        0, DUMP_CMD,           CMD_1},
-  { "EXTGCD",      0, EXTGCD_CMD ,        CMD_2},
+  { "extgcd",      0, EXTGCD_CMD ,        CMD_2},
   { "eliminate",   0, ELIMINATION_CMD,    CMD_23},
   { "else",        0, ELSE_CMD ,          ELSE_CMD},
   { "eval",        0, EVAL ,              EVAL},
@@ -167,7 +167,7 @@ cmdnames cmds[] =
   { "facstd",      0, FACSTD_CMD ,        CMD_12},
   { "gen",         0, E_CMD ,             CMD_1},
   { "getdump",     0, GETDUMP_CMD,        CMD_1},
-  { "GCD",         0, GCD_CMD ,           CMD_2},
+  { "gcd",         0, GCD_CMD ,           CMD_2},
   { "hilb",        0, HILBERT_CMD ,       CMD_12},
   { "homog",       0, HOMOG_CMD ,         CMD_12},
   { "ideal",       0, IDEAL_CMD ,         IDEAL_CMD},
@@ -950,7 +950,9 @@ static BOOLEAN jjMOD_I(leftv res, leftv u, leftv v)
     WerrorS("div. by 0");
     return TRUE;
   }
-  res->data = (char *)(a % b);
+  int c=a%ABS(b);
+  if(c<0) c+=b;
+  res->data = (char *)c;
   return FALSE;
 }
 static BOOLEAN jjEQUAL_I(leftv res, leftv u, leftv v)
@@ -1109,7 +1111,7 @@ static BOOLEAN jjINDEX_P_IV(leftv res, leftv u, leftv v)
 static BOOLEAN jjINDEX_V(leftv res, leftv u, leftv v)
 {
   poly p=(poly)u->CopyD();
-  poly r=p; // pointer to the begiining of component i
+  poly r=p; // pointer to the beginning of component i
   poly o=NULL;
   int i=(int)v->Data();
   while (p!=NULL)
@@ -1138,26 +1140,36 @@ static BOOLEAN jjINDEX_V(leftv res, leftv u, leftv v)
 static BOOLEAN jjINDEX_V_IV(leftv res, leftv u, leftv v)
 {
   poly p=(poly)u->CopyD();
-  poly r=p;
-  intvec *iv=(intvec *)v->Data();
-  int i;
-  while (p!=NULL)
+  if (p!=NULL)
   {
-    for(i=0;i<iv->length();i++)
+    poly r=pOne();
+    poly hp=r;
+    intvec *iv=(intvec *)v->Data();
+    int i;
+    loop
     {
-      if (pGetComp(p)==(*iv)[i])
+      for(i=0;i<iv->length();i++)
       {
-        pIter(p);
-        i=0;
+        if (pGetComp(p)==(*iv)[i])
+        {
+          poly h;
+          pSplit(p,&h);
+          pNext(hp)=p;
+          p=h;
+          pIter(hp);
+          break;
+        }
       }
+      if (p==NULL) break;
+      if (i==iv->length())
+      {
+        pDelete1(&p);
+        if (p==NULL) break;
+      }  
     }
-    if (p!=NULL)
-    {
-      if (r==p) r=pNext(p);
-       pDelete1(&p);
-    }
+    pDelete1(&r);
+    res->data=(char *)r;
   }
-  res->data=(char *)r;
   return FALSE;
 }
 static BOOLEAN jjKLAMMER(leftv res, leftv u, leftv v)
@@ -1205,7 +1217,7 @@ static BOOLEAN jjPROC(leftv res, leftv u, leftv v)
   else
   {
     memcpy(res,sl,sizeof(sleftv));
-  }    
+  }
   return FALSE;
 }
 #ifdef HAVE_DLD
@@ -1220,7 +1232,7 @@ static BOOLEAN jjBIN(leftv res, leftv u, leftv v)
   {
     memcpy(res,sl,sizeof(sleftv));
     Free((ADDRESS)sl,sizeof(sleftv));
-  }    
+  }
   return FALSE;
 }
 #endif
@@ -1305,7 +1317,7 @@ static BOOLEAN jjDIFF_ID_ID(leftv res, leftv u, leftv v)
   res->data=(char *)idDiffOp((ideal)u->Data(),(ideal)v->Data());
   return FALSE;
 }
-  
+
 static BOOLEAN jjELIMIN(leftv res, leftv u, leftv v)
 {
   res->data=(char *)idElimination((ideal)u->Data(),(poly)v->Data());
@@ -1988,10 +2000,10 @@ struct sValCmd2 dArith2[]=
 #endif
 ,{jjFETCH,     FETCH_CMD,      ANY_TYPE/*set by p*/,RING_CMD,  ANY_TYPE }
 ,{jjFETCH,     FETCH_CMD,      ANY_TYPE/*set by p*/,QRING_CMD, ANY_TYPE }
-#ifdef HAVE_FGLM 
+#ifdef HAVE_FGLM
 ,{fglmProc,    FGLM_CMD,       IDEAL_CMD,      RING_CMD,   DEF_CMD }
 ,{fglmProc,    FGLM_CMD,       IDEAL_CMD,      QRING_CMD,  DEF_CMD }
-#endif 
+#endif
 ,{jjFIND2,     FIND_CMD,       INT_CMD,        STRING_CMD, STRING_CMD }
 ,{jjGCD_I,     GCD_CMD,        INT_CMD,        INT_CMD,    INT_CMD }
 #ifdef HAVE_LIBFACTORY
@@ -2132,7 +2144,7 @@ static BOOLEAN jjPROC1(leftv res, leftv u)
   else
   {
     memcpy(res,sl,sizeof(sleftv));
-  }    
+  }
   return FALSE;
 }
 #ifdef HAVE_DLD
@@ -2147,7 +2159,7 @@ static BOOLEAN jjBIN1(leftv res, leftv u)
   {
     memcpy(res,sl,sizeof(sleftv));
     Free((ADDRESS)sl,sizeof(sleftv));
-  }    
+  }
   return FALSE;
 }
 #endif
@@ -2715,7 +2727,7 @@ static BOOLEAN jjTYPEOF(leftv res, leftv v)
     case NUMBER_CMD:  res->data=mstrdup("number"); break;
     case LIST_CMD:   res->data=mstrdup("list"); break;
     case PACKAGE_CMD: res->data=mstrdup("package"); break;
-    case LINK_CMD:   res->data=mstrdup("link"); break; 
+    case LINK_CMD:   res->data=mstrdup("link"); break;
     case DEF_CMD:
     case NONE:    res->data=mstrdup("none"); break;
     default:       res->data=mstrdup("?unknown type?");
@@ -2939,7 +2951,7 @@ struct sValCmd1 dArith1[]=
 #else
 ,{jjWRONG,      FACSTD_CMD,      LIST_CMD,       IDEAL_CMD }
 #endif
-,{jjGETDUMP,    GETDUMP_CMD,     NONE,           LINK_CMD } 
+,{jjGETDUMP,    GETDUMP_CMD,     NONE,           LINK_CMD }
 ,{jjHILBERT,    HILBERT_CMD,     NONE,           IDEAL_CMD }
 ,{jjHILBERT,    HILBERT_CMD,     NONE,           MODUL_CMD }
 ,{jjHILBERT_IV, HILBERT_CMD,     INTVEC_CMD,     INTVEC_CMD }
@@ -3905,7 +3917,7 @@ static BOOLEAN jjKLAMMER_PL(leftv res, leftv u)
     u->next=NULL;
     b=iiExprArith2(res,u,iiOp,v);
     u->next=v;
-  }  
+  }
   return b;
 }
 static BOOLEAN jjLIST_PL(leftv res, leftv v)

@@ -1,14 +1,14 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.6 1997-04-08 08:43:34 obachman Exp $ */
+/* $Id: tesths.cc,v 1.7 1997-04-12 16:04:49 Singular Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
 */
 
-#define S_VERSION1 "version: 0.9.3"
-#define S_VERSION2 "March  1997"
+#define S_VERSION1 "version: 0.9.9"
+#define S_VERSION2 "April  1997"
 
 #ifndef macintosh
 #include <unistd.h>

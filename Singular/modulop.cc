@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.cc,v 1.4 1997-04-08 16:49:25 Singular Exp $ */
+/* $Id: modulop.cc,v 1.5 1997-04-12 16:04:42 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
@@ -27,7 +27,7 @@ CARDINAL *npLogTable=NULL;
 BOOLEAN npGreaterZero (number k)
 {
   int h = (int) k;
-  return (h <= (npPrimeM>>1));
+  return ((int)h !=0) && (h <= (npPrimeM>>1));
 }
 
 number npMult (number a,number b)
@@ -101,7 +101,7 @@ number npDiv (number a,number b)
     return (number)0;
   else if ((int)b==0)
   {
-    Werror("div by 0");
+    WerrorS("div by 0");
     return (number)0;
   }
 #else
@@ -121,7 +121,7 @@ number  npInvers (number c)
 {
   if ((int)c==0)
   {
-    Werror("1/0");
+    WerrorS("1/0");
     return (number)0;
   }
   return (number)npExpTable[npPminus1M - npLogTable[(int)c]];

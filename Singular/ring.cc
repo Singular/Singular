@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.4 1997-04-02 15:07:48 Singular Exp $ */
+/* $Id: ring.cc,v 1.5 1997-04-12 16:04:44 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -207,7 +207,7 @@ BOOLEAN rCheckIV(intvec *iv)
 {
   if ((iv->length()!=2)&&(iv->length()!=3))
   {
-    Werror("weights only for orderings wp,ws,Wp,Ws,a,M");
+    WerrorS("weights only for orderings wp,ws,Wp,Ws,a,M");
     return TRUE;
   }
   return FALSE;
@@ -225,7 +225,7 @@ static int rTypeOfMatrixOrder(intvec * order)
     if (j>=sz)
     {
       typ = 0;
-      Werror("Matrix order not complete");
+      WerrorS("Matrix order not complete");
     }
     else if ((*order)[j*sz+i+2]<0)
       typ = -1;
@@ -281,11 +281,7 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
   {
     if ((ch!=0) &&((ch<2) || (ch > 32003)))
     {
-      Werror("invalid characteristic");
-      if (pn!=NULL) pn->CleanUp();
-      rv->CleanUp();
-      ord->CleanUp();
-      return NULL;
+      ch=32003;
     }
     l=0;
     if (pn!=NULL)
@@ -311,6 +307,21 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
 /* parameter -------------------------------------------------------*/
   sleftv* hs;
   const char* h;
+
+  if ((pn!=NULL)&& (ffChar||(ch==-1)))
+  {
+    if((ffChar && (pn->next!=NULL))
+    || (ch==-1))
+    {
+      WarnS("too many parameters");
+      if (ffChar) hs=pn->next; 
+      else hs=pn;
+      hs->CleanUp();
+      Free((ADDRESS)hs,sizeof(sleftv));
+      if (ffChar) pn->next=NULL;
+      else pn=NULL;
+    }
+  }
   /* a tempory pointer for typ conversion
   * and for deallocating sleftv*-lists:
   *  don't deallocate the first but all other entries*/
@@ -318,6 +329,18 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
   if (pn!=NULL)
   {
     tmpR.P=pn->listLength();
+    if((ffChar && (tmpR.P>1))
+    || ((ch==-1) && (tmpR.P>0)))
+    {
+      tmpR.P=ffChar; /* GF(q): 1, R: 0 */
+      WarnS("too many parameters");
+      if (ffChar) hs=pn->next; 
+      else hs=pn;
+      hs->CleanUp();
+      Free((ADDRESS)hs,sizeof(sleftv));
+      if (ffChar) pn->next=NULL;
+      else pn=NULL;
+    }
     tmpR.parameter=(char**)Alloc(tmpR.P*sizeof(char *));
     sl=pn;
     char** p=tmpR.parameter;
@@ -403,7 +426,7 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
       if (h==sNoName)
       {
         #ifndef SIC
-        Werror("expected name of ring variable");
+        WerrorS("expected name of ring variable");
         sl->CleanUp();
         ord->CleanUp();
         return NULL;
@@ -449,13 +472,13 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
     }
     if (o==0)
     {
-      Werror("invalid combination of orderings");
+      WerrorS("invalid combination of orderings");
       ord->CleanUp();
       return NULL;
     }
     if (i==0) n++;
     else if (i!=1)
-      Werror("more than one ordering c/C -- ignored");
+      WarnS("more than one ordering c/C -- ignored");
 
     /* allocating */
     tmpR.order=(int *)Alloc0(n*sizeof(int));
@@ -542,6 +565,7 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
       sl=sl->next;
       n++;
     }
+    ord->CleanUp();
     if (i==0)
     {
       /*there is no c/C-ordering, so append it at the end*/
@@ -564,25 +588,24 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
         #ifndef SIC
         if (tmpR.block0[n]>tmpR.block1[n])
         {
-          Werror("mismatch of number of vars (%d) and ordering (>=%d vars)",
-          tmpR.N,tmpR.block0[n]);
-          ord->CleanUp();
-          return NULL;
+          goto ord_mismatch;
+          //Werror("mismatch of number of vars (%d) and ordering (>=%d vars)",
+          //  tmpR.N,tmpR.block0[n]);
+          //return NULL;
         }
         #endif
       }
       #ifndef SIC
       else
       {
+ord_mismatch:
         Werror("mismatch of number of vars (%d) and ordering (%d vars)",
           tmpR.N,tmpR.block1[n]);
-        ord->CleanUp();
         return NULL;
       }
       #endif
     }
   }
-  ord->CleanUp();
   tmpR.OrdSgn = typ;
 /* try to enter the ring into the name list*/
   if ((tmp = enterid(s, myynest, RING_CMD, &idroot))==NULL)
@@ -1050,6 +1073,8 @@ char * rString(ring r)
 
 int rChar(ring r)
 {
+  if (r->ch==-1)
+    return 0;
   if (r->parameter==NULL) /* Q, Fp */
     return r->ch;
   if (r->ch<0)           /* Fp(a)  */

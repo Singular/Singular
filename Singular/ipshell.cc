@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.5 1997-04-08 08:43:21 obachman Exp $ */
+/* $Id: ipshell.cc,v 1.6 1997-04-12 16:04:40 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -443,13 +443,13 @@ BOOLEAN iiWRITE(leftv res,leftv v)
   sleftv vf;
   if (iiConvert(v->Typ(),LINK_CMD,iiTestConvert(v->Typ(),LINK_CMD),v,&vf))
   {
-    Werror("link expected");
+    WerrorS("link expected");
     return TRUE;
   }
   si_link l=(si_link)vf.Data();
   if (vf.next == NULL)
   {
-    Werror("write: need at least two arguments");
+    WerrorS("write: need at least two arguments");
     return TRUE;
   }
 
@@ -490,7 +490,7 @@ leftv iiMap(map theMap, char * what)
     }
     if (what==NULL)
     {
-      Werror("argument of a map must have a name");
+      WerrorS("argument of a map must have a name");
     }
     else if ((w=IDRING(r)->idroot->get(what,myynest))!=NULL)
     {
@@ -700,7 +700,7 @@ int iiDeclCommand(leftv sy, leftv name, int lev,int t, idhdl* root,BOOLEAN init_
   memset(sy,0,sizeof(sleftv));
   if ((name->name==NULL)||(isdigit(name->name[0])))
   {
-    Werror("object to declare is not a name");
+    WerrorS("object to declare is not a name");
     res=TRUE;
   }
   else
@@ -769,7 +769,7 @@ BOOLEAN iiExport (leftv v, int toLev)
   {
     if ((v->name==NULL)||(v->rtyp==0)||(v->e!=NULL))
     {
-      Werror("cannot export");
+      WerrorS("cannot export");
       nok=TRUE;
     }
     else
@@ -820,7 +820,7 @@ BOOLEAN iiExport (leftv v, int toLev, idhdl &root)
     if ((v->name==NULL)||(v->rtyp==0)||(v->e!=NULL)
     )
     {
-      Werror("cannot export");
+      WerrorS("cannot export");
       nok=TRUE;
     }
     else
@@ -875,7 +875,7 @@ BOOLEAN iiCheckRing(int i)
     #endif
       if ((i>BEGIN_RING) && (i<END_RING))
       {
-        Werror("no ring active");
+        WerrorS("no ring active");
         return TRUE;
       }
     #ifdef SIQ

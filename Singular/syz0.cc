@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz0.cc,v 1.6 1997-04-08 15:32:14 Singular Exp $ */
+/* $Id: syz0.cc,v 1.7 1997-04-12 16:04:48 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -348,7 +348,7 @@ void sySchreyersSyzygiesFM(polyset F,int Fmax,polyset* Shdl,int* Smax,
           }
           if (p==NULL)
           {
-            Werror("ideal not a standardbasis");//no polynom for reduction
+            WerrorS("ideal not a standardbasis");//no polynom for reduction
             pDelete(&toRed);
             for(k=j;k<Fl;k++) pDelete(&(pairs[k]));
             Free((ADDRESS)pairs,Fl*sizeof(poly));
@@ -623,7 +623,7 @@ void sySchreyersSyzygiesFB(polyset *FF,int Fmax,polyset* Shdl,int* Smax,
             else
             {
               //no polynom for reduction
-              Werror("ideal not a standardbasis");
+              WerrorS("ideal not a standardbasis");
               pDelete(&toRed);
               pDelete(&syz);
               for(k=j;k<Fl;k++) pDelete(&(pairs[k]));
@@ -764,7 +764,7 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
 
   if ((!isMonomial) && syTestOrder(arg))
   {
-    Werror("sres only implemented for modules with ordering  ..,c or ..,C");
+    WerrorS("sres only implemented for modules with ordering  ..,c or ..,C");
     return NULL;
   }
   *length = 4;

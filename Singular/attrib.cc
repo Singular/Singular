@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: attrib.cc,v 1.4 1997-04-08 16:49:15 Singular Exp $ */
+/* $Id: attrib.cc,v 1.5 1997-04-12 16:04:33 Singular Exp $ */
 
 /*
 * ABSTRACT: attributes to leftv and idhdl
@@ -325,7 +325,7 @@ BOOLEAN atATTRIB3(leftv res,leftv a,leftv b,leftv c)
   {
     if (c->Typ()!=INT_CMD)
     {
-      Werror("attrib isSB must be int");
+      WerrorS("attrib isSB must be int");
       return TRUE;
     }
     if (((int)c->Data())!=0)
@@ -343,7 +343,7 @@ BOOLEAN atATTRIB3(leftv res,leftv a,leftv b,leftv c)
   {
     if (c->Typ()!=INT_CMD)
     {
-      Werror("attrib rank must be int");
+      WerrorS("attrib `rank` must be int");
       return TRUE;
     }
     ideal I=(ideal)v->Data();
@@ -354,7 +354,7 @@ BOOLEAN atATTRIB3(leftv res,leftv a,leftv b,leftv c)
   {
     if (c->Typ()!=INT_CMD)
     {
-      Werror("D attrib must be int");
+      WerrorS("attrib `D` must be int");
       return TRUE;
     }
     switch (v->Typ())
@@ -373,7 +373,7 @@ BOOLEAN atATTRIB3(leftv res,leftv a,leftv b,leftv c)
           break;
         }
       default:
-        Werror("cannot set attrib D for this type");
+        WerrorS("cannot set attrib `D` for this type");
     }
   }
 #endif
@@ -389,7 +389,7 @@ BOOLEAN atKILLATTR1(leftv res,leftv a)
 {
   if ((a->rtyp!=IDHDL)||(a->e!=NULL))
   {
-    Werror("object must have a name");
+    WerrorS("object must have a name");
     return TRUE;
   }
   resetFlag(a,FLAG_STD);
@@ -407,7 +407,7 @@ BOOLEAN atKILLATTR2(leftv res,leftv a,leftv b)
 {
   if ((a->rtyp!=IDHDL)||(a->e!=NULL))
   {
-    Werror("object must have a name");
+    WerrorS("object must have a name");
     return TRUE;
   }
   char *name=(char *)b->Data();

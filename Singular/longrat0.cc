@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat0.cc,v 1.3 1997-04-02 15:07:23 Singular Exp $ */
+/* $Id: longrat0.cc,v 1.4 1997-04-12 16:04:41 Singular Exp $ */
 /*
 * ABSTRACT -
 * IO for long rational numbers (Hubert Grassmann)
@@ -202,7 +202,7 @@ char * nlRead (char *s, number *a)
     s = nlEatLong(s, &n);
     if (nlIsZero(n))
     {
-      Werror("Zero Denominator");
+      WerrorS("Zero Denominator");
       nlDelete(&n);
       nlDelete(a);
       return s;

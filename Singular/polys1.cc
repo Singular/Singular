@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.3 1997-04-02 15:07:46 Singular Exp $ */
+/* $Id: polys1.cc,v 1.4 1997-04-12 16:04:44 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -652,6 +652,13 @@ int pLength(poly a)
     l++;
   }
   return l;
+}
+
+
+void pSplit(poly p, poly *h)
+{
+  *h=pNext(p);
+  pNext(p)=NULL;
 }
 
 /*2

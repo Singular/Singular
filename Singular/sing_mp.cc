@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sing_mp.cc,v 1.11 1997-04-10 16:17:11 obachman Exp $ */
+/* $Id: sing_mp.cc,v 1.12 1997-04-12 16:04:46 Singular Exp $ */
 
 /*
 * ABSTRACT: interface to MP links
@@ -141,7 +141,7 @@ BOOLEAN slOpenMPFile(si_link l, short flag)
 
   if (mp_Env == NULL)
   {
-    Werror("Open: Error in initialization of MP environment");
+    WerrorS("Open: Error in initialization of MP environment");
     return TRUE;
   }
 
@@ -233,7 +233,7 @@ BOOLEAN slOpenMPTcp(si_link l, short flag)
 
   if (mp_Env == NULL)
   {
-    Werror("Open: Error in initialization of MP environment");
+    WerrorS("Open: Error in initialization of MP environment");
     return TRUE;
   }
 

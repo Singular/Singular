@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ffields.cc,v 1.5 1997-04-02 15:07:00 Singular Exp $ */
+/* $Id: ffields.cc,v 1.6 1997-04-12 16:04:35 Singular Exp $ */
 /*
 * ABSTRACT: finite fields with a none-prime number of elements (via tables)
 */
@@ -312,8 +312,15 @@ void nfWrite (number &a)
 {
   if ((int)a==nfCharQ)  StringAppendS("0");
   else if ((int)a==0)   StringAppendS("1");
-  else if ((int)a==1)   StringAppendS(nfParameter);
-  else                  StringAppend("%s^%d",nfParameter,(int)a);
+  else                  
+  {
+    StringAppendS(nfParameter);
+    if ((int)a!=1)
+    {
+      if(pShortOut==0)  StringAppendS("^");
+      StringAppend("%d",(int)a);
+    }
+  }
 }
 
 /*2

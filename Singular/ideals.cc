@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.4 1997-04-08 15:31:04 Singular Exp $ */
+/* $Id: ideals.cc,v 1.5 1997-04-12 16:04:35 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1531,7 +1531,7 @@ ideal idLiftNonStB (ideal  mod, ideal submod)
     {
       if (pGetComp(result->m[j])<=k)
       {
-        Werror("second module lies not in the first");
+        WerrorS("2nd module lies not in the first");
         idDelete(&result);
         return idInit(1,1);
       }
@@ -2077,7 +2077,7 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
   }
   if (currQuotient!=NULL)
   {
-    Werror("cannot eliminate in a qring");
+    WerrorS("cannot eliminate in a qring");
     return idCopy(h1);
   }
   if (idIs0(h1)) return idInit(1,h1->rank);
@@ -2610,7 +2610,7 @@ ideal idJetW(ideal i,int d, intvec * iv)
   ideal r=idInit(IDELEMS(i),i->rank);
   if (ecartWeights!=NULL)
   {
-    Werror("cannot compute weighted jets now");
+    WerrorS("cannot compute weighted jets now");
   }
   else
   {
@@ -2905,7 +2905,7 @@ intvec * idQHomWeights(ideal id)
   }
   //else
   //{
-  //  Werror("not homogeneous");
+  //  WerrorS("not homogeneous");
   //}
   delete imat;
   return result;

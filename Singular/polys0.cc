@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys0.cc,v 1.3 1997-04-02 15:07:45 Singular Exp $ */
+/* $Id: polys0.cc,v 1.4 1997-04-12 16:04:43 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to convert polynomials to strings
@@ -24,24 +24,27 @@ int pVectorOut=TRUE;
 */
 static void writemon(poly p, int ko)
 {
-  int i;
   BOOLEAN wroteCoef=FALSE,writeGen=FALSE;
 
   if ((pIsConstantComp(p))
-  || (!nIsOne(pGetCoeff(p)))
+  || ((!nIsOne(pGetCoeff(p)))
+      && (!nIsMOne(pGetCoeff(p)))
+    )
 #ifdef DRING
   || (pDRING && pdIsConstantComp(p))
 #endif
   )
   {
-//    if (nIsMOne(pGetCoeff(p))  StringAppendS("-");
-//    else
-    {
-      nWrite(p->coef);
-      wroteCoef=((pShortOut==0)||(currRing->parameter!=NULL));
-      writeGen=TRUE;
-    }
+    nWrite(p->coef);
+    wroteCoef=((pShortOut==0)||(currRing->parameter!=NULL));
+    writeGen=TRUE;
   }
+  else if (nIsMOne(pGetCoeff(p)))
+  {
+    StringAppendS("-");
+  }
+
+  int i;
   for (i=0; i<pVariables; i++)
   {
 #ifdef DRING
@@ -112,12 +115,12 @@ char* pString0(poly p)
       k++;
     }
     writemon(p,k);
-    p = pNext(p);
+    pIter(p);
     while ((p!=NULL) && (k == p->exp[0]))
     {
       if (nGreaterZero(p->coef)) StringAppendS("+");
       writemon(p,k);
-      p = pNext(p);
+      pIter(p);
     }
     if (p == NULL) break;
     StringAppendS(",");
@@ -137,7 +140,7 @@ char* pString(poly p)
 */
 void pWrite0(poly p)
 {
-  Print(pString(p));
+  PrintS(pString(p));
 }
 
 /*2

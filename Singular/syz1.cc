@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.3 1997-04-08 15:33:46 Singular Exp $ */
+/* $Id: syz1.cc,v 1.4 1997-04-12 16:04:48 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -924,7 +924,7 @@ static void syOrder(poly p,resolvente res,resolvente orderedRes,int index,
   }
   if (j>ie)
   {
-    Werror("orderedRes to small");
+    WerrorS("orderedRes to small");
     return;
   }
   ie++;

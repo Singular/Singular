@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: algmap.cc,v 1.3 1997-04-02 15:06:53 Singular Exp $ */
+/* $Id: algmap.cc,v 1.4 1997-04-12 16:04:33 Singular Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials from rings with
 * 'alg' numbers
@@ -155,7 +155,7 @@ poly maAlgpolyFetch(ring R, poly preimage)
   t = rPar(currRing);
   if ((m+s) != (n+t))
   {
-    Werror("no algfetch possible");
+    WerrorS("no algfetch possible");
     return NULL;
   }
   if (n == m)
@@ -191,7 +191,7 @@ poly maAlgpolyFetch(ring R, poly preimage)
 
 err_algfetch:
   pDelete(&result);
-  Werror("denominator in algnumber");
+  WerrorS("denominator in algnumber");
   return NULL;
 }
 
@@ -225,7 +225,7 @@ static poly maLongalgMap(poly res, poly p0, int s, int t,
   if (naGetDenom(pGetCoeff(p0)) != NULL)
   {
     *nom = TRUE;
-    Werror("denominator in algnumber");
+    WerrorS("denominator in algnumber");
     pDelete(&monpart);
     pDelete(&res);
     return NULL;
@@ -294,13 +294,13 @@ poly maAlgpolyMap(ring R, poly preimage, ideal F, ideal G)
   m = R->N;
   if (m != IDELEMS(G))
   {
-    Werror("error 1 in algmap");
+    WerrorS("error 1 in algmap");
     return NULL;
   }
   s = rPar(R);
   if ((s!=0) && (s != IDELEMS(F)))
   {
-    Werror("error 2 in algmap");
+    WerrorS("error 2 in algmap");
     return NULL;
   }
   t = rPar(currRing);
