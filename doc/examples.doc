@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.8 1998-05-04 17:41:04 Singular Exp $
+@comment $Id: examples.doc,v 1.9 1998-05-12 08:05:00 wichmann Exp $
 @comment this file contains the examples
 
 @ifinfo
@@ -1551,13 +1551,13 @@ and @code{stdhilbert} about 10 times faster than std.
 @section G_a -Invariants
 @cindex G_a -Invariants
 
-We work in char 0 and use the Lie algebra generated
+We work in characteristic 0 and use the Lie algebra generated
 by one vectorfield of the form
 @tex
-$\sum x_i \partial /\partial x_{i+1}$
+$\sum x_i \partial /\partial x_{i+1}$.
 @end tex
 @ifinfo
-sum x(i)*d/dx(i+1)
+sum x(i)*d/dx(i+1).
 @end ifinfo
 @example
 @c example
@@ -1592,9 +1592,9 @@ sum x(i)*d/dx(i+1)
 @section Invariants of a finite group
 @cindex Invariants of a finite group
 
-Two algorithms to compute the invariant ring are
-implemented in Singular, invariant_ring and invariant_ring_random,
-both by Agnes E. Heydtmann (agnes@@math.uni-sb.de):
+Two algorithms to compute the invariant ring are implemented in
+@sc{Singular}, @code{invariant_ring} and @code{invariant_ring_random},
+both by Agnes E. Heydtmann (@code{agnes@@math.uni-sb.de}):
 
 Bases of homogeneous invariants are generated successively and those
 are chosen as primary invariants that lower the dimension of the ideal
@@ -1626,7 +1626,7 @@ Sturmfels: "Algorithms in Invariant Theory 2.3.7:".
   // Use the first method to compute the invariants of G:
   matrix B(1..3);
   B(1..3)=invariant_ring(A);
-  // Singular returns 2 matrices, the first containing
+  // SINGULAR returns 2 matrices, the first containing
   // primary invariants and the second secondary
   // invariants, i.e. module generators over a Noetherian
   // normalization
@@ -1647,10 +1647,10 @@ Sturmfels: "Algorithms in Invariant Theory 2.3.7:".
 @section Factorization
 @cindex Factorization
 
-The factorization of polynomialsis is implemented in
+The factorization of polynomials is is implemented in
 the C++ -libraries 'Factory' (written mainly by
 Ruediger Stobbe) and 'libfac' (written by Michael
-Messollen) which are part of the Singular system.
+Messollen) which are part of the @sc{Singular} system.
 
 @example
 @c example
@@ -1663,7 +1663,7 @@ Messollen) which are part of the Singular system.
   // first factor is a constant.
   poly g = (y4+x8)*(x2+y2);
   factorize(g);
-  // The same in charcteristic 2:
+  // The same in characteristic 2:
   ring r =2,(x,y),dp;
   poly g = (y4+x8)*(x2+y2);
   factorize(g);
@@ -1678,15 +1678,15 @@ Messollen) which are part of the Singular system.
 The Puiseux pairs of an irreducible and reduced curve
 singularity are its most important invariants.
 They can be computed from its Hamburger-Noether expansion.
-The Library "hnoether.lib" written by Martin Lamm uses
+The Library @code{hnoether.lib} written by Martin Lamm uses
 the algorithm of Antonio Campillo "Algebroid curves
 in positive characteristic" SLN 813, 1980.
-This algoritm has the advantage that it needs least
+This algorithm has the advantage that it needs least
 possible field extensions and, moreover, works in
-any characteristik. This fact can be used to compute
-the invariants over a field of finite char, say
+any characteristic. This fact can be used to compute
+the invariants over a field of finite characteristic, say
 32003, which will then be most probably be the same
-in char 0.
+in characteristic 0.
 
 We compute the Hamburger-Noether expansion of some
 plane curve singularities given by a polynomial f in
@@ -1705,9 +1705,9 @@ and all numerical invariants like
 @item
     generators of semigroup
 @end itemize
-Besides this, the lirary contains procedures to
+Besides this, the library contains procedures to
 compute the Newton poytope of f, the squarefree part
-of f and a proc to convert one set of invariants to
+of f and a procedure to convert one set of invariants to
 another.
 
 
@@ -1719,20 +1719,20 @@ another.
   poly f = y4-2x3y2-4x5y+x6-x7;
   list hn = develop(f);
   show(hn[1]);     // Hamburger-Noether matrix
-  displayHNE(hn);  // Hamburger-Noether developement
+  displayHNE(hn);  // Hamburger-Noether development
   setring s;
   displayInvariants(hn);
   // invariants(hn); will return the invariants as list
-  param(hn);       // partial parametrization of f
+                   // partial parametrization of f
                    // param takes the first variable as
-                   // except the ring has >2 variables
+  param(hn);       // except the ring has >2 variables
   ring extring=0,(x,y,t),ds;
   poly f=x3+2xy2+y2;
   list hn=develop(f,-1);
   param(hn);       // partial parametrization of f
   list hn1=develop(f,6);
   param(hn1);     // a better parametrization
-  // instead or recomputing you may extend the developement:
+  // instead or recomputing you may extend the development:
   list hn2=extdevelop(hn,12);
   param(hn2);     // a still better parametrization
   // ======== The reducible case ========
@@ -1752,18 +1752,18 @@ another.
 @section Primary decomposition
 @cindex Primary decomposition
 
-There are two algorithms implemented in Singular which provide
-primary decomposition: 'primdecGTZ', based on
+There are two algorithms implemented in @sc{Singular} which provide
+primary decomposition: @code{primdecGTZ}, based on
 Gianni/Trager/Zacharias (written by Gerhard Pfister)
-and 'primdecSY', based on Shimoyama/Yokoyama
+and @code{primdecSY}, based on Shimoyama/Yokoyama
 (written by Wolfram Decker and Hans Schoenemann)
 
-The result of primdecGTZ will be presented as a list of ideals,
+The result of @code{primdecGTZ} will be presented as a list of ideals,
 where the even index blongs to the prime ideal
 corresponding to the primary ideal with odd index
 before.
 
-The result of primdecSY is a list of list of 2 ideals,
+The result of @code{primdecSY} is a list of list of 2 ideals,
 the primary ideal and the corresponding prime ideal.
 
 @example
@@ -1785,7 +1785,7 @@ the primary ideal and the corresponding prime ideal.
   primdecGTZ(J);
   // We see that there are two components which are both
   // prime, even linear subspaces, one 3-dimensional,
-  // the other 1-dimensional
+  // the other 1-dimensional.
   // (This is Pinkhams example and was the first found
   // surface singularity with two components of
   // different dimensions)
@@ -1795,8 +1795,8 @@ the primary ideal and the corresponding prime ideal.
   // the radical. We use the Characteristic set methods
   // from prim_dec.lib.
   J = intersect(J,maxideal(3));
-  primdecSY(J,1);    //shows that the maximal ideal is
-                    //embedded (takes a few seconds)
+                       //shows that the maximal ideal is
+  primdecSY(J,1);      //embedded (takes a few seconds)
   min_ass_prim_charsets(J,1);
   radical(J);
 @c example
