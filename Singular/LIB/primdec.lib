@@ -1,4 +1,4 @@
-// $Id: primdec.lib,v 1.22 1998-06-29 09:08:34 obachman Exp $
+// $Id: primdec.lib,v 1.23 1998-07-14 08:50:04 pfister Exp $
 ////////////////////////////////////////////////////////////////////////////////
 // primdec.lib                                                                //
 // algorithms for primary decomposition based on                              //
@@ -10,7 +10,7 @@
 // written by Wolfram Decker and Hans Schoenemann                             //
 ////////////////////////////////////////////////////////////////////////////////
 
-version="$Id: primdec.lib,v 1.22 1998-06-29 09:08:34 obachman Exp $";
+version="$Id: primdec.lib,v 1.23 1998-07-14 08:50:04 pfister Exp $";
 info="
 LIBRARY: primdec.lib: PROCEDURE FOR PRIMARY DECOMPOSITION
 
@@ -490,6 +490,7 @@ proc primaryTest (ideal i, poly p)
          {
            return(ideal(0));
          }
+
          h=interred(t);
          t=h[1];
 
@@ -1642,7 +1643,7 @@ EXAMPLE: example minAssPrimes; shows an example
 //       @res[j]=decomp(@pr[j],2,@pr[j],ser);
 //       for(k=1;k<=size(@res[j]);k++)
 //       {
-//          ser=intersect(ser,@res[j][k]);
+//          ser=intersect1(ser,@res[j][k]);
 //       }
      }
    }
@@ -1745,7 +1746,7 @@ proc radicalOld(ideal i)
    ideal k=pr[1];
    for(j=2;j<=size(pr);j++)
    {
-      k=intersect(k,pr[j]);
+      k=intersect1(k,pr[j]);
    }
    return(k);
 }
@@ -2257,7 +2258,7 @@ EXAMPLE: example decomp; shows an example
            ideal htest=hquprimary[1];
            for (@n1=2;@n1<=size(hquprimary)/2;@n1++)
            {
-              htest=intersect(htest,hquprimary[2*@n1-1]);
+              htest=intersect1(htest,hquprimary[2*@n1-1]);
            }
         }
         else
@@ -2266,13 +2267,13 @@ EXAMPLE: example decomp; shows an example
 
            for (@n1=2;@n1<=size(hquprimary)/2;@n1++)
            {
-              htest=intersect(htest,hquprimary[2*@n1]);
+              htest=intersect1(htest,hquprimary[2*@n1]);
            }
         }
 
         if(size(ser)>0)
         {
-           ser=intersect(htest,ser);
+           ser=intersect1(htest,ser);
         }
         else
         {
@@ -2449,11 +2450,11 @@ EXAMPLE: example decomp; shows an example
               {
                 if(@wr==0)
                 {
-                   ser=intersect(ser,hquprimary[2*@n-1]);
+                   ser=intersect1(ser,hquprimary[2*@n-1]);
                 }
                 else
                 {
-                   ser=intersect(ser,hquprimary[2*@n]);
+                   ser=intersect1(ser,hquprimary[2*@n]);
                 }
               }
               setring gnir;
@@ -2760,16 +2761,29 @@ proc radicalKL (list m,ideal ser,list #)
          {
             @q=@q*fac[lauf];
          }
-
-
-         @mu=mstd(quotient(@j+ideal(@q),rad));
+         if(deg(rad[1])>0)
+         {
+            @j=quotient(@j+ideal(@q),rad);
+         }
+         else
+         {
+            @j=@j+ideal(@q);
+         }
+         if(homog(@j)==1)
+         {
+            @mu=mstd(@j);   
+         }
+         else
+         {
+            @mu=std(@j),@j;
+         }
          @j=@mu[1];
          attrib(@j,"isSB",1);
 
       }
       if((deg(rad[1])>0)&&(deg(collectrad[1])>0))
       {
-         rad=intersect(rad,collectrad);
+         rad=intersect1(rad,collectrad);
       }
       else
       {
@@ -2795,8 +2809,8 @@ proc radicalKL (list m,ideal ser,list #)
    {
       return(rad);
    }
-  // rad=intersect(rad,radicalKL(@mu,rad,@wr));
-   rad=intersect(rad,radicalKL(@mu,ideal(1),@wr));
+  // rad=intersect1(rad,radicalKL(@mu,rad,@wr));
+   rad=intersect1(rad,radicalKL(@mu,ideal(1),@wr));
 
 
    option(noredSB);
@@ -2815,15 +2829,23 @@ proc radicalEHV(ideal i,ideal re,list #)
    }
 
    option(redSB);
-   list m=mstd(i);
+   if(homog(i)==1)
+   {
+      list m=mstd(i);
         I=m[2];
+   }
+   else
+   {
+      list m=std(i),i;
+      I=i;
+   }
    option(noredSB);
    if(size(reduce(re,m[1],1))==0)
    {
       return(re);
    }
    int cod=nvars(basering)-dim(m[1]);
-   if((nvars(basering)<=5)&&(size(m[2])<=5))
+   if((nvars(basering)<=6)&&(size(m[2])<=6))
    {
       if(cod==size(m[2]))
       {
@@ -2858,7 +2880,7 @@ proc radicalEHV(ideal i,ideal re,list #)
          {
             return(radI1);
          }
-         return(intersect(radI1,radicalEHV(I2,re,il)));
+         return(intersect1(radI1,radicalEHV(I2,re,il)));
       }
    }
    return(radicalKL(m,re,il));
@@ -2868,7 +2890,7 @@ proc radicalEHV(ideal i,ideal re,list #)
 proc Ann(module M)
 {
   M=prune(M);  //to obtain a small embedding
-  ideal ann=quotient1(M,freemodule(nrows(M)));
+  ideal ann=quotient2(M,freemodule(nrows(M)));
   return(ann);
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -2898,11 +2920,18 @@ proc AnnExt_R(int n,list re)
 {
   if(n<nvars(basering))
   {
-     matrix f=transpose(re[n+1]);      //Hom(_,R)
-     module k=nres(f,2)[2];            //the kernel
-     matrix g=transpose(re[n]);        //the image of Hom(_,R)
-
-     ideal ann=quotient1(g,k);           //the anihilator
+     if(size(re[n+1])==0)
+     {
+        ideal ann=Ann(transpose(re[n]));
+     }
+     else
+     {
+        module f=transpose(re[n+1]);      //Hom(_,R)
+//        module k=nres(f,2)[2];            //the kernel
+        module k=syz(f);            //the kernel
+        module g=transpose(re[n]);        //the image of Hom(_,R)
+        ideal ann=quotient2(g,k);         //the anihilator
+     }
   }
   else
   {
@@ -3358,7 +3387,7 @@ proc prim_dec(ideal I, int choose)
         QQ[1]=list(SQ,V[5]);  // primary component, associated prime,
                               // i.e., standard bases thereof
         U=U+QQ;
-        H=intersect(H,SQ);
+        H=intersect1(H,SQ);
         H=std(H);
         ncolsH=ncols(H);
         check=0;
@@ -4126,14 +4155,73 @@ NOTE:    a combination of the algorithms of Krick/Logar
 EXAMPLE: example radical; shows an example
 "
 {
-   def @P=basering;
+//test auf homogenitaet und qhweigt einbauen
+   def @Q=basering;
+   int homo=homog(i);
    int j,il;
+   if(homo==0)
+   {
+      intvec qhw=qhweight(i);
+      homo=2;
+      for(j=1;j<=size(qhw);j++)
+      {
+        if(qhw[j]==0)
+        {
+          homo=0;
+        }
+      }
+   }
    if(size(#)>0)
    {
      il=#[1];
    }
-   ideal re=1;
+
+   if(homo==2)
+   {
+       execute "ring @P = ("+charstr(basering)+"),
+                              ("+varstr(basering)+"),wp("+string(qhw)+");";
+   }
+   else
+   {
+       execute "ring @P = ("+charstr(basering)+"),
+                              ("+varstr(basering)+"),("+ordstr(@Q)+");";
+   }
+   ideal i=fetch(@Q,i);
+
    option(redSB);
+   ideal re=std(i);
+   if(dim(re)==0)
+   {
+      int @k, @n;
+      poly @p;
+      ideal fac;
+      ideal @j1=finduni(re);
+      for(@k=1;@k<=size(@j1);@k++)
+      {
+         fac=factorize(cleardenom(@j1[@k]),1);
+         @p=fac[1];
+         for(@n=2;@n<=size(fac);@n++)
+         {
+            @p=@p*fac[@n];
+         }
+         re=re,@p;
+      }
+      re=interred(re);
+      option(noredSB);
+      setring @Q;
+      ideal i1=fetch(@P,re);
+      return(i1);      
+   }
+   if(dim(re)+size(i)==nvars(basering))
+   {
+//hier spaeter SB uebergeben
+     i=radicalEHV(i,ideal(1),1);  
+     setring @Q;
+     ideal i1=fetch(@P,i);
+     return(i1);
+   }
+   re=1;
+
    list qr=simplifyIdeal(i);
    map phi=@P,qr[2];
    i=qr[1];
@@ -4146,7 +4234,10 @@ EXAMPLE: example radical; shows an example
       if((dim(pr[1])==0)&&(homog(pr[1])==1))
       {
          ideal @res=maxideal(1);
-         return(phi(@res));
+         @res=(phi(@res));
+         setring @Q;
+         ideal @res=fetch(@P,@res);
+         return(@res);
       }
       if(dim(pr[1])>1)
       {
@@ -4164,7 +4255,10 @@ EXAMPLE: example radical; shows an example
    if(s==1)
    {
      i=radicalEHV(i,ideal(1),il);
-     return(phi(i));
+     i=phi(i);
+     setring @Q;
+     ideal i1=fetch(@P,i);
+     return(i1);
    }
    intvec pos;
    pos[s]=0;
@@ -4198,10 +4292,13 @@ EXAMPLE: example radical; shows an example
    {
       if(pos[j]==0)
       {
-         re=intersect(re,radicalEHV(pr[s+1-j],re,il));
+         re=intersect1(re,radicalEHV(pr[s+1-j],re,il));
       }
    }
-   return(phi(re));
+   re=phi(re);
+   setring @Q;
+   ideal i1=fetch(@P,re);
+   return(i1);
 }
 example
 { "EXAMPLE:";  echo = 2;
@@ -4221,23 +4318,33 @@ EXAMPLE: example prepareAss; shows an example
 "
 {
   ideal j=std(i);
-  int cod=nvars(basering)-dim(j);
+  int di=dim(j);
+  int cod=nvars(basering)-di;
+  if((cod==nvars(basering))||(cod==size(i)))
+  {
+     return(radical(i));
+  }
   int e;
   list er;
   ideal ann;
   if(homog(i)==1)
   {
-     list re=sres(i,0);                   //the resolution
+     list re=lres(i,0);                   //the resolution
      re=minres(re);                       //minimized resolution
   }
   else
   {
     list re=mres(i,0);
   }
+  int depth=nvars(basering)-ncols(betti(re))+1;
+  if(depth==di)
+  {
+     //it is Cohen-Macaulay
+     return(radical(i));
+  }
   for(e=cod;e<=nvars(basering);e++)
   {
      ann=AnnExt_R(e,re);
-
      if(nvars(basering)-dim(std(ann))==e)
      {
         er[size(er)+1]=equiRadical(ann);
@@ -4268,7 +4375,7 @@ EXAMPLE: example testPrimary ; shows an example
    ideal j=pr[1];
    for (i=2;i<=size(pr)/2;i++)
    {
-       j=intersect(j,pr[2*i-1]);
+       j=intersect1(j,pr[2*i-1]);
    }
    return(idealsEqual(j,k));
 }
