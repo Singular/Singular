@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.222 2004-04-23 14:14:48 Singular Exp $
+@comment $Id: reference.doc,v 1.223 2004-06-01 16:11:07 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -1534,12 +1534,14 @@ In many (but not all!) cases this is already a decomposition of the radical
 of the ideal. (Note however, that, in general, no inclusion between the
 input and output ideals holds.)
 @*The second, optional argument gives a list of polynomials which define
-non-zero constraints. Hence, the intersection of the output ideals
-has a zero-set which is the (closure of the) complement of the zero-set
-of the second argument in the zero-set of the first argument.
+non-zero constraints:
+those ideals which contain one of the constraint polynomials are omitted
+from the output list. Thus the zero set of the intersection of the output
+ideals is contained in the zero set V of the first input ideal
+and contains the complement in V of the zero set of the second input ideal.
 @item @strong{Note:}
-Not implemented for baserings over real ground fields, galois fields and
-over algebraic extensions over the rational numbers (that is, only
+Not implemented for baserings over real ground fields and galois fields
+(that is, only
 implemented for ground fields for which @ref{factorize} is implemented).
 @item @strong{Example:}
 @smallexample
