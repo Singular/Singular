@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.178 2000-02-04 13:09:49 Singular Exp $
+@comment $Id: reference.doc,v 1.179 2000-02-04 14:53:11 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -281,12 +281,11 @@ value of type int is the multiplicity (see @ref{mult})
 @c @*only valid in a dring (see @ref{dring}).
 @end table
 @end table
-@c @menu
-@c * Expressions::
-@c @end menu
-@c @iftex
-@c See @ref{Expressions}; @ref{killattrib}.
-@c @end iftex
+@c @c ref
+@c See
+@c @ref{Expressions};
+@c @ref{killattrib}.
+@c @c ref
 @c ---------------------------------------
 @node bareiss, betti, attrib, Functions
 @subsection bareiss
@@ -657,12 +656,9 @@ all denominators from its coefficients and then divide it by its content.
 @c example
 @end smallexample
 @end table
-@c @menu
-@c * poly::
-@c @end menu
-@c @iftex
+@c @c ref
 @c See @ref{poly}.
-@c @end iftex
+@c @c ref
 @c ---------------------------------------
 @node close, coef, cleardenom, Functions
 @subsection close
@@ -1225,7 +1221,7 @@ Uses different
 algorithms for modules which are, resp.@: are not, represented by a
 standard basis.
 @* That is, if  @code{m} is the
-module (or ideal), @code{sm} the submodule (or ideal), 
+module (or ideal), @code{sm} the submodule (or ideal),
 @code{U} a diagonal matrix of units,
 @code{R} the normal form of @code{sm} w.r.t. @code{m},
 and @code{T} the transformation matrix returned by
@@ -3034,7 +3030,7 @@ submodule in terms of the generators of a module.  Uses different
 algorithms for modules which are, resp.@: are not, represented by a
 standard basis.
 @* That is, if  @code{m} is the
-module (or ideal), @code{sm} the submodule (or ideal), 
+module (or ideal), @code{sm} the submodule (or ideal),
 @code{U} a diagonal matrix of units
 and @code{T} the transformation matrix returned by
 lift, then @code{matrix(sm)*U=matrix(m)*T}
@@ -4144,7 +4140,7 @@ computation in some cases
 disables the regularity bound for @code{res} and @code{mres} (see
 @ref{regularity})
 @item @code{notSugar}
-disables the sugar strategy during standard basis computation 
+disables the sugar strategy during standard basis computation
 @anchor{option(prot)}
 @item @code{prot}
 shows protocol information indicating the
@@ -4189,7 +4185,7 @@ a degree bound is set (see @ref{degBound})
 The last set of options controls the output of @sc{Singular}:
 @table @asis
 @item @code{Imap}
-shows the mapping of variables with the imap command
+shows the mapping of variables with the fetch and imap commands
 @item @code{loadLib}
 shows loading of libraries (set by default)
 @item @code{debugLib}
