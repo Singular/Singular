@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpfl.h,v 1.2 1999-05-10 15:10:50 Singular Exp $ */
+/* $Id: gnumpfl.h,v 1.3 1999-06-24 07:46:49 wenk Exp $ */
 /*
 * ABSTRACT: computations with GMP floating-point numbers
 */
@@ -39,7 +39,7 @@ void     ngfDelete(number *a);
 
 BOOLEAN  ngfSetMap(int c, char ** par, int nop, number minpol);
 
-
+void setGMPFloatDigits( size_t digits );
 void setGMPFloatPrecBytes( unsigned long int bytes );
 #endif
 

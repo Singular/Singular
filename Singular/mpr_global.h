@@ -3,30 +3,33 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_global.h,v 1.1 1999-04-29 11:38:51 Singular Exp $ */
+/* $Id: mpr_global.h,v 1.2 1999-06-24 07:46:51 wenk Exp $ */
 
 /* 
 * ABSTRACT - multipolynomial resultants - 
 *                                global definitions and debugging stuff
 */
 
-// Define WITH_SUBDIV to compute mixed polyhedral subdivision
-//#define WITH_SUBDIV
-
-// <matrix representation>_<determinant algorithm>
-#define DENSE_FACTORY    1
-#define SPARSE_BAREISS   2
-#define SPARSE_GAUSS     3
-
-#define USE_MATRIX_REP SPARSE_BAREISS
+// to get detailed timigs, define MPR_TIMING
+#define MPR_TIMING
 
 // Set to double or long double. double is recomended.
-// Sets the global floating point type used in mpr_roots.cc and mpr_nric.cc.
+// Sets the global floating point type used in mpr_numeric.cc.
 typedef double mprfloat;
 
 // --------------------------- debugging stuff ----------------------------
+#if !defined(NDEBUG)
 //#define mprDEBUG_ALL
+#endif
+
+#if !defined(NDEBUG) || defined(mprDEBUG_ALL)
 #define mprDEBUG_PROT
+#endif
+
+#if !defined(NDEBUG) && !defined(MPR_TIMING)
+#define MPR_TIMING
+#endif
+
 #define mprDEBUG_STICKY
 
 #ifdef mprDEBUG_PROT
@@ -50,10 +53,12 @@ typedef double mprfloat;
 #endif
 
 #ifdef mprDEBUG_STICKY
-#define mprSTICKYPROT(msg) Print(msg) 
-//if (BTEST1(OPT_PROT)) Print(msg)
+// call 'option(prot);' to get status informations
+#define mprSTICKYPROT(msg) if (BTEST1(OPT_PROT)) Print(msg)
+#define mprSTICKYPROT2(msg,arg) if (BTEST1(OPT_PROT)) Print(msg,arg)
 #else
 #define mprSTICKYPROT(msg)
+#define mprSTICKYPROT2(msg,arg)
 #endif
 
 // output by mprSTICKYPROT
@@ -88,3 +93,6 @@ typedef double mprfloat;
 // compile-command-1: "make installg" ***
 // compile-command-2: "make install" ***
 // End: *** 
+
+
+
