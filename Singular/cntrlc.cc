@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: cntrlc.cc,v 1.13 1997-07-01 15:41:43 Singular Exp $ */
+/* $Id: cntrlc.cc,v 1.14 1997-12-01 18:12:02 Singular Exp $ */
 /*
 * ABSTRACT - interupt handling
 */
@@ -54,6 +54,8 @@ static void stack_trace_sigchld (int);
 #endif
 #endif
 
+/* types */
+typedef void (*si_sighandler_t)(int);
 /* data */
 jmp_buf si_start_jmpbuf;
 int siRandomStart;
@@ -143,7 +145,7 @@ void sig11_handler(int sig, sigcontext s)
     if (page_tab[i]==base) { use_tab[i]='X'; break; }
   }
   Page_AllowAccess((void *)base, 4096);
-  signal(SIGSEGV,(SignalHandler)sig11_handler);
+  signal(SIGSEGV,(si_sighandler_t)sig11_handler);
 }
 
 void sigalarm_handler(int sig, sigcontext s)
@@ -170,7 +172,7 @@ void sigalarm_handler(int sig, sigcontext s)
   o.it_value.tv_sec     =(unsigned)0;
   o.it_value.tv_usec    =(unsigned)200;
   setitimer(ITIMER_VIRTUAL,&t,&o);
-  signal(SIGVTALRM,(SignalHandler)sigalarm_handler);
+  signal(SIGVTALRM,(si_sighandler_t)sigalarm_handler);
 }
 
 #endif
@@ -182,7 +184,7 @@ void init_signals()
 {
 /*4 signal handler: linux*/
 #ifdef PAGE_TEST
-  signal(SIGSEGV,(SignalHandler)sig11_handler);
+  signal(SIGSEGV,(si_sighandler_t)sig11_handler);
   page_tab_ind=0;
   struct itimerval t,o;
   memset(&t,0,sizeof(t));
@@ -191,13 +193,13 @@ void init_signals()
   o.it_value.tv_sec     =(unsigned)0;
   o.it_value.tv_usec    =(unsigned)200;
   setitimer(ITIMER_VIRTUAL,&t,&o);
-  signal(SIGVTALRM,(SignalHandler)sigalarm_handler);
+  signal(SIGVTALRM,(si_sighandler_t)sigalarm_handler);
 #else
-  signal(SIGSEGV,(SignalHandler)sigsegv_handler);
+  signal(SIGSEGV,(si_sighandler_t)sigsegv_handler);
 #endif
-  signal(SIGFPE, (SignalHandler)sigsegv_handler);
-  signal(SIGILL, (SignalHandler)sigsegv_handler);
-  signal(SIGIOT, (SignalHandler)sigsegv_handler);
+  signal(SIGFPE, (si_sighandler_t)sigsegv_handler);
+  signal(SIGILL, (si_sighandler_t)sigsegv_handler);
+  signal(SIGIOT, (si_sighandler_t)sigsegv_handler);
   signal(SIGINT ,sigint_handler);
 }
 
