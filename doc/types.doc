@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.76 1999-01-22 18:18:48 Singular Exp $
+@comment $Id: types.doc,v 1.77 1999-03-19 14:09:43 obachman Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -2716,6 +2716,7 @@ a type cast to poly
   ring r=0,(x,y),dp;
   poly f = 10x2y3 +2x2y2-2xy+y -x+2;
   lead(f);
+  leadmonom(f);
   simplify(f,1);     // normalize leading coefficient
   poly g = 1/2x2 + 1/3y;
   cleardenom(g);
@@ -2814,11 +2815,13 @@ homogenization (see @ref{homog})
 @item jacob
 ideal resp.@: matrix of all partial derivatives (see @ref{jacob})
 @item lead
-leading monomial (see @ref{lead})
+leading term (see @ref{lead})
 @item leadcoef
 coefficient of the leading term (see @ref{leadcoef})
 @item leadexp
 the exponent vector of the leading monomial (see @ref{leadexp})
+@item leadmonom
+leading monomial (see @ref{leadmonom})
 @item jet
 monomials with degree smaller k+1 (see @ref{jet})
 @item ord
@@ -3521,11 +3524,13 @@ homogenization (see @ref{homog})
 @item jet
 k-jet: monomials with degree smaller k+1 (see @ref{jet})
 @item lead
-leading monomial (see @ref{lead})
+leading term (see @ref{lead})
 @item leadcoef
 leading coefficient (see @ref{leadcoef})
 @item leadexp
 the exponent vector of the leading monomial (see @ref{leadexp})
+@item leadmonom
+leading monomial (see @ref{leadmonom})
 @item nrows
 number of rows (see @ref{nrows})
 @item ord

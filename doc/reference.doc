@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.101 1999-03-15 09:33:16 Singular Exp $
+@comment $Id: reference.doc,v 1.102 1999-03-19 14:09:41 obachman Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -99,6 +99,7 @@ the brackets are optional. In the syntax of the commands @code{help}, @code{brea
 * lead::
 * leadcoef::
 * leadexp::
+* leadmonom::
 * LIB::
 * lift::
 * liftstd::
@@ -2531,10 +2532,10 @@ to the monomial ordering.
 @example
 @c example
   ring r=32003,(x,y,z),(c,ds);
-  poly f=x2+y+z3;
-  vector v=[x^10,f];
+  poly f=2x2+3y+4z3;
+  vector v=[2*x^10,f];
   ideal i=f,z;
-  module m=v,[0,0,1+x];
+  module m=v,[0,0,2+x];
   lead(f);
   lead(v);
   lead(i);
@@ -2543,19 +2544,16 @@ to the monomial ordering.
 @c example
 @end example
 @end table
-@menu
-* poly::
-* vector::
-* ideal::
-* module::
-@end menu
-@iftex
+@c ref
 See
+@ref{leadcoef};
+@ref{leadexp};
+@ref{leadmonom};
 @ref{poly};
 @ref{vector};
 @ref{ideal};
 @ref{module}.
-@end iftex
+@c ref
 @c -------------------------------------------------
 @node leadcoef, leadexp, lead, Functions
 @subsection leadcoef
@@ -2583,12 +2581,15 @@ with respect to the monomial ordering.
 @end table
 @c ref
 See
+@ref{lead};
+@ref{leadcexp};
+@ref{leadmonom};
 @ref{number}
 @ref{poly};
 @ref{vector}.
 @c ref
 @c -------------------------------------------------
-@node leadexp, LIB, leadcoef, Functions
+@node leadexp, leadmonom, leadcoef, Functions
 @subsection leadexp
 @cindex leadexp
 @table @code
@@ -2612,15 +2613,52 @@ In the case of a vector the last component is the index in the vector.
 @c example
 @end example
 @end table
+@c ref
+See
+@ref{lead};
+@ref{leadcoef};
+@ref{leadmonom};
+@ref{intvec};
+@ref{poly};
+@ref{vector}.
+@c ref
+@c -------------------------------------------------
+@node leadexp, LIB, leadexp, Functions
+@subsection leadmonom
+@cindex leadmonom
+@table @code
+@item @strong{Syntax:}
+@code{leadexp (} poly_expression @code{)}
+@*@code{leadexp (} vector_expression @code{)}
+@item @strong{Type:}
+the same as the input type
+@item @strong{Purpose:}
+returns the leading monomial of a polynomial or a vector as a polynomail 
+or vector whose coefficient is one.
+@item @strong{Example:}
+@example
+@c example
+  ring r=32003,(x,y,z),(c,ds);
+  poly f=2x2+3y+4z3;
+  vector v=[2*x^10,f];
+  leadmonom(f);
+  leadmonom(v);
+  leadmonom(0);
+@c example
+@end example
+@end table
 
 @c ref
 See
+@ref{lead};
+@ref{leadcoef};
+@ref{leadexp};
 @ref{intvec};
 @ref{poly};
 @ref{vector}.
 @c ref
 @c ---------------------------------------
-@node LIB, lift, leadexp, Functions
+@node LIB, lift, leadmonom, Functions
 @subsection LIB
 @cindex LIB
 @table @code
