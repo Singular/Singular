@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.12 1998-06-13 12:44:40 krueger Exp $ */
+/* $Id: ipid.cc,v 1.13 1998-07-21 17:18:19 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -122,7 +122,10 @@ idhdl idrec::set(char * s, int lev, idtyp t, BOOLEAN init)
         break;
       case RESOLUTION_CMD:
         len=sizeof(ssyStrategy);
-        break;   
+        break;
+      case PROC_CMD:
+        len=sizeof(procinfo);
+	break;
     //other types: without init (int,script,poly,def,package)
     }
     if (len!=0)
@@ -130,12 +133,17 @@ idhdl idrec::set(char * s, int lev, idtyp t, BOOLEAN init)
       IDSTRING(h) = (char *)Alloc0(len);
     }
   }
-  if(t == PROC_CMD)
+  // additional settings:--------------------------------------
+  if (t == QRING_CMD)
   {
-    IDPROC(h) = (procinfo *)Alloc(sizeof(procinfo));
-    memset(IDPROC(h),0,sizeof(*IDPROC(h)));
+    IDRING(h)=rCopy(currRing);
+    /* QRING_CMD is ring dep => currRing !=NULL */
+  }
+  else if (t == PROC_CMD)
+  {
     IDPROC(h)->language=LANG_NONE;
   }
+  // --------------------------------------------------------
   return  h;
 }
 
@@ -569,10 +577,12 @@ void piCleanUp(procinfov pi)
   {
     FreeL((ADDRESS)pi->libname);
     FreeL((ADDRESS)pi->procname);
-    if( pi->language == LANG_SINGULAR) { 
+    if( pi->language == LANG_SINGULAR)
+    {
       FreeL((ADDRESS)pi->data.s.body);
     }
-    if( pi->language == LANG_C) {
+    if( pi->language == LANG_C)
+    {
     }
     memset((void *) pi, 0, sizeof(procinfo));
     pi->language=LANG_NONE;
@@ -599,15 +609,19 @@ namehdl namerec::push(package pack, char *name, BOOLEAN init)
   //printf("PUSH: put entry (%s) on stack\n", name);
   namehdl ns = (namerec *)Alloc0(sizeof(namerec));
   ns->next   = this;
-  if(this==NULL && !init) {
+  if(this==NULL && !init)
+  {
     printf("PUSH: this is NULL and init not set.\n");
     init=TRUE;
   }
-  if(init) {
+  if(init)
+  {
     ns->pack   = (ip_package *)Alloc0(sizeof(ip_package));
     ns->isroot = TRUE;
     ns->lev    = 1;
-  } else {
+  }
+  elses
+  {
     ns->pack   = pack;
     ns->lev    = this->lev+1;
   }
@@ -617,10 +631,10 @@ namehdl namerec::push(package pack, char *name, BOOLEAN init)
   //if(ns->isroot) Print("PUSH: Add root NameSpace\n");
   if(ns->isroot) ns->root=ns; else ns->root = this->root;
   namespaceroot = ns;
-  if(init && ns->isroot) {
-    idhdl pl = enterid( mstrdup("toplevel"),0, PACKAGE_CMD, 
+  if(init && ns->isroot)
+  {
+    idhdl pl = enterid( mstrdup("toplevel"),0, PACKAGE_CMD,
                       &NSROOT(namespaceroot), TRUE );
-    
   }
   return(namespaceroot);
 }
