@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.58 2000-03-31 12:15:02 Singular Exp $ */
+/* $Id: syz1.cc,v 1.59 2000-05-26 11:23:33 siebert Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -1084,7 +1084,7 @@ static void syRedGenerOfCurrDeg(syStrategy syzstr, int deg, int index)
 /*3
 * puts a pair into the right place in resPairs
 */
-static void syEnterPair(SSet sPairs, SObject * so, int * sPlength,int index)
+void syEnterPair(SSet sPairs, SObject * so, int * sPlength,int index)
 {
   int ll,k,no=(*so).order,sP=*sPlength,i;
   poly p=(*so).lcm;

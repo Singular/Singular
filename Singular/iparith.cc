@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.213 2000-05-25 13:26:45 Singular Exp $ */
+/* $Id: iparith.cc,v 1.214 2000-05-26 11:23:31 siebert Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -203,6 +203,7 @@ cmdnames cmds[] =
   { "kill",        0, KILL_CMD ,          KILL_CMD},
   { "killattrib",  0, KILLATTR_CMD ,      CMD_12},
   { "koszul",      0, KOSZUL_CMD ,        CMD_23},
+  { "kres",        0, KRES_CMD ,          CMD_2},
   { "laguerre",    0, LAGSOLVE_CMD,       CMD_3},
   { "lead",        0, LEAD_CMD ,          CMD_1},
   { "leadcoef",    0, LEADCOEF_CMD ,      CMD_1},
@@ -1945,6 +1946,18 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
     }
     r=syLaScala3(u_id,&dummy);
   }
+  else if (iiOp == KRES_CMD)
+  {
+    int dummy;
+    if((currQuotient!=NULL)||
+    (!idHomIdeal (u_id,NULL)))
+    {
+       WerrorS
+       ("`lres` not implemented for inhomogeneous input or qring");
+       return TRUE;
+    }
+    r=syKosz(u_id,&dummy);
+  }
   else
   {
     int dummy;
@@ -2333,6 +2346,7 @@ struct sValCmd2 dArith2[]=
 ,{atKILLATTR2, KILLATTR_CMD,   NONE,           IDHDL,      STRING_CMD PROFILER}
 ,{jjKoszul,    KOSZUL_CMD,     MATRIX_CMD,     INT_CMD,    INT_CMD PROFILER}
 ,{jjKoszul_Id, KOSZUL_CMD,     MATRIX_CMD,     INT_CMD,    IDEAL_CMD PROFILER}
+,{jjRES,       KRES_CMD,       RESOLUTION_CMD, IDEAL_CMD,  INT_CMD PROFILER}
 ,{jjLIFT,      LIFT_CMD,       MATRIX_CMD,     IDEAL_CMD,  IDEAL_CMD PROFILER}
 ,{jjLIFT,      LIFT_CMD,       MATRIX_CMD,     MODUL_CMD,  MODUL_CMD PROFILER}
 ,{jjLIFTSTD,   LIFTSTD_CMD,    IDEAL_CMD,      IDEAL_CMD,  MATRIX_CMD PROFILER}
