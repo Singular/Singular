@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.18 2000-08-24 12:21:04 Singular Exp $
+@comment $Id: NEWS.texi,v 1.19 2000-08-24 14:22:44 obachman Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -93,7 +93,7 @@ TBC: docu, examples, tests
 @item @nref{spcurve_lib}
 procedures for cm codimension 2 singularities
 @item @nref{triang_lib}
-procedures for solving triangular systems
+procedures for decomposing zero-dimensional ideals
 @item @nref{solve_lib}
 procedures for solving polynomial systems
 @item @nref{surf_lib}
