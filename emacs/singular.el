@@ -1,6 +1,6 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.52 1999-12-06 16:07:00 obachman Exp $
+;; $Id: singular.el,v 1.53 1999-12-06 18:36:37 wichmann Exp $
 
 ;;; Commentary:
 
@@ -2647,13 +2647,15 @@ This variable is buffer-local.")
 (defun singular-scan-header-got-emacs-home ()
   "Load Singular completion and libraries files.
 Assumes that `singular-emacs-home-directory' is set to the appropriate
-value and loads the files \"cmd-cmpl.el\", \"hlp-cmpl.el\", and
-\"lib-cmpl.el\".
+value and loads the files \"cmd-cmpl.el\", \"hlp-cmpl.el\", \"ex-cmpl.el\",
+and \"lib-cmpl.el\".
 On success calls `singular-menu-install-libraries'."
   (or (load (singular-expand-emacs-file-name "cmd-cmpl.el" t) t t t)
       (message "Can't find command completion file! Command completion disabled."))
   (or (load (singular-expand-emacs-file-name "hlp-cmpl.el" t) t t t)
       (message "Can't find help topic completion file! Help completion disabled."))
+  (or (load (singular-expand-emacs-file-name "ex-cmpl.el" t) t t t)
+      (message "Can't find examples completion file! Examples completion disabled."))
   (if (load (singular-expand-emacs-file-name "lib-cmpl.el" t) t t t)
       (singular-menu-install-libraries)
     (message "Can't find library index file!")))
@@ -2783,11 +2785,12 @@ an error unless optional argument NOERROR is not nil."
 ;;{{{ Filename, Command, and Help Completion
 (defun singular-completion-init ()
   "Initialize completion for Singular interactive mode.
-Initializes completion of file names, commands and help topics.
+Initializes completion of file names, commands, examples, and help topics.
 
 This function is called by `singular-exec'."
   (singular-debug 'interactive (message "Initializing completion"))
   (set (make-local-variable 'singular-commands-alist) nil)
+  (set (make-local-variable 'singular-examples-alist) nil)
   (set (make-local-variable 'singular-help-topics-alist) nil))
 
 (defun singular-completion-do (pattern beg end completion-alist)
@@ -2816,6 +2819,8 @@ Assumes the COMPLETION-ALIST is not nil."
 Performs file name completion if point is inside a string.
 Performs completion of Singular help topics if point is at the end of a 
 help command (\"help\" or \"?\").
+Performs completion of Singular examples if point is at the end of an
+example command (\"example\").
 Otherwise performs completion of Singular commands."
   (interactive)
   ;; Check if we are inside a string. The search is done back to the
@@ -2827,17 +2832,30 @@ Otherwise performs completion of Singular commands."
       (comint-dynamic-complete-as-filename)
     ;; else: expand command or help
     (let ((end (point))
+	  (post-prompt (save-excursion
+			 (beginning-of-line)
+			 (singular-prompt-skip-forward)))
 	  beg)
-      (if (save-excursion
-	    (beginning-of-line)
-	    (singular-prompt-skip-forward)
-	    (looking-at "[ \t]*\\([\\?]\\|help \\)[ \t]*\\(.*\\)"))
-	  ;; then: help completion
-	  (if singular-help-topics-alist
-	      (singular-completion-do (match-string 2) (match-beginning 2)
-				      end singular-help-topics-alist)
-	    (message "Completion of Singular help topics disabled.")
-	    (ding))
+      (cond
+       ((save-excursion
+	  (goto-char post-prompt)
+	  (looking-at "[ \t]*\\([\\?]\\|help \\)[ \t]*\\(.*\\)"))
+	;; then: help completion
+	(if singular-help-topics-alist
+	    (singular-completion-do (match-string 2) (match-beginning 2)
+				    end singular-help-topics-alist)
+	  (message "Completion of Singular help topics disabled.")
+	  (ding)))
+       ((save-excursion
+	  (goto-char post-prompt)
+	  (looking-at "[ \t]*\\(example \\)[ \t]*\\(.*\\)"))
+	;; then: example completion
+	(if singular-help-topics-alist
+	    (singular-completion-do (match-string 2) (match-beginning 2)
+				    end singular-examples-alist)
+	  (message "Completion of Singular help topics disabled.")
+	  (ding)))
+       (t
 	;; else: command completion
 	(save-excursion
 	  (skip-chars-backward "a-zA-Z0-9")
@@ -2846,7 +2864,7 @@ Otherwise performs completion of Singular commands."
 	    (singular-completion-do (buffer-substring beg end) beg
 				    end singular-commands-alist)
 	  (message "Completion of Singular commands disabled.")
-	  (ding))))))
+	  (ding)))))))
 ;;}}}
 
 ;;{{{ Debugging filters
@@ -3869,8 +3887,8 @@ Inserts a string indicating that the Singular process is killed."
 (defun singular-control-c (mode)
   "Interrupt the Singular process running in the current buffer.
 If called interactiveley, asks whether to (a)bort the current Singular
-command, (q)uit or (r) restart the current Singular process, 
-or (c)ontinue without doing anything (default).
+command, (q)uit or (r) restart the current Singular process, or (c)ontinue
+without doing anything (default).
 
 If called non-interactiveley, MODE should be one of 'abort, 'quit, 'restart,
 or 'continue."
@@ -3977,16 +3995,12 @@ Sets singular-*-last values."
 	 ;; buffer associated with Singular, nil if there is none
 	 (buffer (get-buffer buffer-name)))
     
-    ;; make sure directory contains a "/" at the end
-    (setq directory 
-      (concat directory
-	      ;; we check for trailing slash and backslash
-	      ;; but unconditionally insert a slash.
-	      ;; Hopefully that works on NT, too.
-	      (if (memq (aref directory
-			      (1- (length directory)))
-			'(?/ ?\\))
-		  "" "/")))
+    ;; If directory is set, make sure that it ends in a "/" at the end.
+    ;; The check is done on both slash and backslash, but we unconditionally
+    ;; insert a slash. Hopefully that works on NT, too.
+    (and directory
+	 (memq (aref directory (1- (length directory))) '(?/ ?\\))
+	 (setq directory (concat directory "/")))
     
     (if (not buffer)
 	(progn
