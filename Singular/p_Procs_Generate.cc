@@ -7,7 +7,7 @@
  *  Note:    this file is included by p_Procs.cc
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Procs_Generate.cc,v 1.2 2000-12-12 08:44:50 obachman Exp $
+ *  Version: $Id: p_Procs_Generate.cc,v 1.3 2000-12-20 17:20:02 obachman Exp $
  *******************************************************************/
 
 
@@ -41,13 +41,15 @@ int IsKernelProc(p_Proc proc, p_Field field, p_Length length, p_Ord ord)
     return 1;
   
   // plus procs with FieldZp
-  if (field == FieldZp && 
+  if ((field == FieldZp || field == FieldQ) && 
       // which are not general in length or ord
       !((length == LengthGeneral && p_ProcDependsOn_Length(proc)) ||
         (ord == OrdGeneral && p_ProcDependsOn_Ord(proc))) &&
       // and whose length is smaller than five 
       (!p_ProcDependsOn_Length(proc) || (length >= LengthFour)))
     return 1;
+
+  
   
   return 0;
 }

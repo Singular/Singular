@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.cc,v 1.35 2000-09-18 09:19:15 obachman Exp $ */
+/* $Id: matpol.cc,v 1.36 2000-12-20 17:20:01 obachman Exp $ */
 
 /*
 * ABSTRACT:
@@ -217,9 +217,7 @@ matrix mpMult(matrix a, matrix b)
       t = NULL;
       for (k=1; k<=p; k++)
       {
-        aik = pCopy(MATELEM(a,i,k));
-        bkj = pCopy(MATELEM(b,k,j));
-        s = pMult(aik,bkj);
+        s = ppMult_qq(MATELEM(a,i,k), MATELEM(b,k,j));
         t = pAdd(t,s);
       }
       pNormalize(t);

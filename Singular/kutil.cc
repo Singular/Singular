@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.89 2000-12-20 13:38:21 obachman Exp $ */
+/* $Id: kutil.cc,v 1.90 2000-12-20 17:20:00 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -2654,7 +2654,7 @@ poly redtail (LObject* L, int pos, kStrategy strat)
   {
     op = strat->tailRing->pFDeg(hn, strat->tailRing);
     if ((Kstd1_deg>0)&&(op>Kstd1_deg)) goto all_done;
-    e = pLDeg(hn, &l, strat->tailRing) - op;
+    e = strat->tailRing->pLDeg(hn, &l, strat->tailRing) - op;
     while (1)
     {
       Ln.Set(hn, strat->tailRing);
@@ -2680,7 +2680,7 @@ poly redtail (LObject* L, int pos, kStrategy strat)
       if (hn == NULL) goto all_done;
       op = strat->tailRing->pFDeg(hn, strat->tailRing);
       if ((Kstd1_deg>0)&&(op>Kstd1_deg)) goto all_done;
-      e = pLDeg(hn, &l) - op;
+      e = strat->tailRing->pLDeg(hn, &l, strat->tailRing) - op;
     }
     h = hn;
     hn = pNext(h);
@@ -4018,6 +4018,8 @@ void completeReduce (kStrategy strat)
         else
           T_j->max = NULL;
       }
+      if (TEST_OPT_INTSTRATEGY)
+        T_j->pCleardenom();
     }
     else
     {
@@ -4026,9 +4028,9 @@ void completeReduce (kStrategy strat)
         strat->S[i] = redtailBba(strat->S[i], i-1, strat);
       else
         strat->S[i] = redtail(strat->S[i], strat->sl, strat);
+      if (TEST_OPT_INTSTRATEGY)
+        pCleardenom(strat->S[i]);
     }
-    if (TEST_OPT_INTSTRATEGY)
-      pCleardenom(strat->S[i]);
     if (TEST_OPT_PROT)
       PrintS("-");
   }
