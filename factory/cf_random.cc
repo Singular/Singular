@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_random.cc,v 1.3 1997-06-19 12:24:01 schmidt Exp $ */
+/* $Id: cf_random.cc,v 1.4 1997-07-01 12:35:11 schmidt Exp $ */
 
 #include <config.h>
 
@@ -15,24 +15,56 @@
 
 class RandomGenerator {
 private:
+#ifdef macintosh
+    // mac does not like const long int in a class
+    long int ia, im, iq, ir, deflt;
+#else
     const long int
 	ia = 16807,
 	im = 2147483647,
 	iq = 127773,
 	ir = 2836,
 	deflt = 123459876;
+#endif
     
     long s;
 
     // s must not equal zero!
     void seedInit( long ss ) { s = ((ss == 0) ? deflt : ss); }
 public:
+#ifdef macintosh
+    RandomGenerator();
+    RandomGenerator( long ss );
+#else
     RandomGenerator() { seedInit( (long)time( 0 ) ); }
     RandomGenerator( long ss ) { seedInit( ss ); }
+#endif
     ~RandomGenerator() {}
     long generate();
     void seed( long ss ) { seedInit( ss ); }
 };
+
+#ifdef macintosh
+RandomGenerator::RandomGenerator()
+{
+  ia = 16807;
+  im = 2147483647;
+  iq = 127773;
+  ir = 2836;
+  deflt = 123459876;
+  seedInit( (long)time( 0 ) );
+}
+
+RandomGenerator::RandomGenerator( long ss )
+{
+  ia = 16807;
+  im = 2147483647;
+  iq = 127773;
+  ir = 2836;
+  deflt = 123459876;
+  seedInit( ss );
+}
+#endif
 
 long
 RandomGenerator::generate()
