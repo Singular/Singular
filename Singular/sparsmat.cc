@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sparsmat.cc,v 1.39 2000-09-21 11:15:31 pohl Exp $ */
+/* $Id: sparsmat.cc,v 1.40 2000-09-25 14:07:59 pohl Exp $ */
 
 /*
 * ABSTRACT: operations with sparse matrices (bareiss, ...)
@@ -1941,6 +1941,15 @@ static BOOLEAN smCheckLead(const poly t, const poly e)
   return TRUE;
 }
 
+/*
+* e is a monomial with exponents e(i)
+* t is a polynom with monomials t_j and
+*   exponents t_j(i)
+* make a copy of a part of t:
+*   for the monomials t_j of t in the copy
+*   we have
+*     ((e(i)!=0)&&(e(i)<=t_j(i)) == TRUE
+*/
 static poly smSelectCopy(poly t, const poly e)
 {
   const number y = pGetCoeff(e);
