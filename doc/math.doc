@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.49 1999-11-24 14:06:59 obachman Exp $
+@comment $Id: math.doc,v 1.50 1999-11-25 10:43:51 Singular Exp $
 @comment this file contains the mathematical background of Singular
 
 @c The following directives are necessary for proper compilation
@@ -384,6 +384,7 @@ characteristic series} of the ideal (G).
 @smallexample
 @c example
   ring R= 0,(x,y,z,u),dp;
+  LIB "spectrum.lib";
   ideal i=-3zu+y2-2x+2,
           -3x2u-4yz-6xz+2y2+3xy,
           -3z2u-xu+y2z+y;
@@ -529,6 +530,7 @@ negative degree lexicographical ordering which is denoted
 @smallexample
 @c STILL BROKEN @c example
 ring r=0,(x,y,z),ds;
+LIB "spectrum.lib";
 poly f=x^7+y^7+z^7;
 list s1=spectrum( f );
 s1;
