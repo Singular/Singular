@@ -119,6 +119,8 @@ static MP_FpFormat_t MP_NATIVE_FP_FORMAT = MP_IEEE_fp;
 static MP_FpFormat_t MP_NATIVE_FP_FORMAT = MP_Vax_fp;
 #elif _AIX
 static MP_FpFormat_t MP_NATIVE_FP_FORMAT = MP_IEEE_fp;
+#else
+static MP_FpFormat_t MP_NATIVE_FP_FORMAT = MP_IEEE_fp;
 #endif
 
 
