@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.60 1999-08-16 12:39:57 Singular Exp $ */
+/* $Id: iplib.cc,v 1.61 1999-09-22 14:42:33 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -787,6 +787,28 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
 }
 
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+#ifndef HAVE_NAMESPACES
+static void iiCleanProcs(idhdl &root)
+{
+  loop
+  {
+    if (root==NULL) return;
+    if (IDTYP(root)==PROC_CMD)
+    {
+      procinfo pi=(procinfo)IDDATA(root);
+      if ((pi->language == LANG_SINGULAR)
+      && (pi->data.s.body_start == 0L))
+      {
+        // procinfo data incorrect:
+        // - no proc body can start at the beginning of the file
+        killhdl(&root);
+      }
+      continue;
+    }
+    root=IDNEXT(root);
+  }
+}
+/*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 static BOOLEAN iiLoadLIB(FILE *fp, char *libnamebuf, char*newlib,
              idhdl pl, BOOLEAN autoexport, BOOLEAN tellerror)
 {
@@ -821,6 +843,9 @@ static BOOLEAN iiLoadLIB(FILE *fp, char *libnamebuf, char*newlib,
     Werror("Cannot load library,... aborting.");
     reinit_yylp();
     fclose( yylpin );
+#ifdef HAVE_NAMESPACES
+    iiCleanProcs(idroot);
+#endif /* HAVE_NAMESPACES */
     return TRUE;
   }
 #ifdef HAVE_NAMESPACES
