@@ -1,4 +1,4 @@
-1 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:284318 966254004:2000081403:1-3-8:HPUX-10:wilde13:291974
-1 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:9716702 966254004:2000081403:1-3-8:HPUX-10:wilde13:9769950
-1 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:9924608 966254004:2000081403:1-3-8:HPUX-10:wilde13:9728000
-1 >> tst_timer_1 :: nepomuck.mathematik.uni-kl.de:27140 966254004:2000081403:1-3-8:HPUX-10:wilde13:70434
+1 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:284318 966254004:2000081403:1-3-8:HPUX-10:wilde13:291974 966198885:2000081322:1-3-8:ix86-Linux:nepo:283170 966433828:2000081615:1-3-9:ix86-Linux:nepo:272464
+1 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:9716702 966254004:2000081403:1-3-8:HPUX-10:wilde13:9769950 966198885:2000081322:1-3-8:ix86-Linux:nepo:9760626 966433828:2000081615:1-3-9:ix86-Linux:nepo:861396
+1 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:9924608 966254004:2000081403:1-3-8:HPUX-10:wilde13:9728000 966198885:2000081322:1-3-8:ix86-Linux:nepo:9732096 966433828:2000081615:1-3-9:ix86-Linux:nepo:6628564
+1 >> tst_timer_1 :: nepomuck.mathematik.uni-kl.de:27140 966254004:2000081403:1-3-8:HPUX-10:wilde13:70434 966198885:2000081322:1-3-8:ix86-Linux:nepo:11984 966433828:2000081615:1-3-9:ix86-Linux:nepo:10932
