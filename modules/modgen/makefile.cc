@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: makefile.cc,v 1.4 2000-03-29 13:56:27 krueger Exp $ */
+/* $Id: makefile.cc,v 1.5 2000-03-30 06:35:44 krueger Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -46,7 +46,7 @@ void mod_create_makefile(moddefv module)
   cfilesv cf = module->files;
   int i;
   
-  printf("Creating Makefile  ...");fflush(stdout);
+  if(trace)printf("Creating Makefile  ...");fflush(stdout);
   write_header(fp, module->name, "#");
   build_head_section(fp, module);
   fprintf(fp, "SRCS\t= %s.cc", module->name);
@@ -70,7 +70,7 @@ void mod_create_makefile(moddefv module)
   fprintf(fp, "\n");
 
   fclose(fp);
-  printf("  done.\n");
+  if(trace)printf("  done.\n");
 }
 
 /*========================================================================*/

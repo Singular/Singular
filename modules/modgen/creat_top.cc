@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: creat_top.cc,v 1.9 2000-03-29 13:56:26 krueger Exp $ */
+/* $Id: creat_top.cc,v 1.10 2000-03-30 06:35:44 krueger Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -132,18 +132,16 @@ int write_intro(
     //free(filename);
     return -1;
   }
-  printf("Creating %s, ", filename);fflush(stdout);
+  if(trace)printf("Creating %s, ", filename);fflush(stdout);
   mod_write_header(module->modfp, module->name, 'c');
   mod_copy_tmp(module->modfp, module->fmtfp);
-  printf("  done.\n");fflush(stdout);
+  if(trace)printf("\n");fflush(stdout);
   fclose(module->fmtfp);
   if(create_tmpfile(module)) return -1;
   if(create_tmpfile(module, 1)) return -1;
   if(create_tmpfile(module, 2)) return -1;
   if(module->fmtfp2 == NULL) { printf("Cannot write HELP\n"); return -1; }
   if(module->fmtfp3 == NULL) { printf("Cannot write EXAMPLE\n"); return -1; }
-  printf("%p %p %p\n", module->fmtfp, module->fmtfp2, module->fmtfp3);
-  
   
   strcpy(filename, build_filename(module, module->name, 2));
   //sprintf(filename, "%s/%s.h", module->name, module->name);
@@ -151,8 +149,9 @@ int write_intro(
     //free(filename);
     return -1;
   }
-  printf("Creating %s, ", filename);fflush(stdout);
+  if(trace)printf("Creating %s, ", filename);fflush(stdout);
   mod_write_header(module->modfp_h, module->name, 'h');
+  if(trace)printf("\n");fflush(stdout);
 
   //free(filename);
 //  write_enter_id(module->modfp);

@@ -1,5 +1,5 @@
 /*
- * $Id: proc_setup.cc,v 1.4 2000-02-14 21:44:40 krueger Exp $
+ * $Id: proc_setup.cc,v 1.5 2000-03-30 06:35:45 krueger Exp $
  */
 
 #include <stdio.h>
@@ -101,7 +101,7 @@ void AddParam(
 
   paramcnt = p->paramcnt;
   if(varname == NULL) {
-    snprintf(typname, sizeof(typname), "res%d", paramcnt);
+    snprintf(typname, sizeof(typname), "arg%d", paramcnt);
     pnew.varname = strdup(typname);
   } else pnew.varname = strdup(varname);
 

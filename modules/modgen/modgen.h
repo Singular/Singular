@@ -1,5 +1,5 @@
 /*
- *  $Id: modgen.h,v 1.10 2000-03-29 13:56:27 krueger Exp $
+ *  $Id: modgen.h,v 1.11 2000-03-30 06:36:10 krueger Exp $
  *
  */
 
@@ -124,11 +124,13 @@ typedef enum { VAR_NONE, VAR_MODULE, VAR_HELP, VAR_INFO, VAR_VERSION,
  *
  */
 extern int modlineno;    /* lineno within module */
+extern int debug;
+extern int trace;
 
 extern int IsCmd(char *n, int & tok);
 extern char * decl2str(int n, char *name);
 
-extern void myyyerror(char *fmt, ...);
+extern int myyyerror(char *fmt, ...);
 
 
 extern void PrintProclist(moddefv module);

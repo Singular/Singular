@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: misc.cc,v 1.8 2000-03-29 09:31:41 krueger Exp $ */
+/* $Id: misc.cc,v 1.9 2000-03-30 06:35:45 krueger Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -128,7 +128,7 @@ int IsCmd(char *n, int & tok)
   tok=cmds[i].tokval;
   if(cmds[i].alias==2)
   {
-    printf("outdated identifier `%s` used - please change your code",
+    if(trace)printf("outdated identifier `%s` used - please change your code",
     cmds[i].name);
     cmds[i].alias=1;
   }
@@ -173,30 +173,8 @@ char * decl2str(int n, char *name)
     case MAX_TOK: strcpy(name,"MAX_TOK");       break;
     default: strcpy(name,"(null)");
   }
-#if 0
-  printf("[%d=%s]", n, name);
-  fflush(stdout);
-#endif
   return(name);
 }
-
-#if 0
-static int iiTabIndex(const jjValCmdTab dArithTab, const int len, const int op)
-{
-  int a=0;
-  int e=len;
-  int p=len/2;
-  while ( a!=e)
-  {
-     if (op==dArithTab[p].cmd) return dArithTab[p].start;
-     else if (op<dArithTab[p].cmd)
-     { e=p; p=a+(e-a)/2;}
-     else
-     { a=p; p=p+(e-p)/2; }
-  }
-  return -1;
-}
-#endif
 
 /*========================================================================*/
 struct valid_cmds_def 
@@ -238,6 +216,7 @@ cmd_token checkcmd(
   return rc;
 }
   
+/*========================================================================*/
 struct valid_vars_def {
   char *name;
   var_type type;
@@ -272,6 +251,7 @@ var_token checkvar(
   return VAR_NONE;
 }
 
+/*========================================================================*/
 void write_main_variable(
   moddefv module,
   var_token type,
@@ -283,7 +263,6 @@ void write_main_variable(
   enter_id(module->fmtfp, t, (char *)arg1, (char *)arg2, yylineno,
            module->filename);
 }
-
   
 /*========================================================================*/
 void PrintProc(
@@ -567,13 +546,12 @@ void init_type_conv()
   strcpy(type_conv[], "");
   strcpy(type_conv[], "");
   strcpy(type_conv[], "");
-*/
   printf("[%d] %s\n", INT_CMD, type_conv[INT_CMD]);
   printf("[%d] %s\n", MODUL_CMD, type_conv[MODUL_CMD]);
   printf("[%d] %s\n", STRING_CMD, type_conv[STRING_CMD]);
   printf("[%d] %s\n", LINK_CMD, type_conv[LINK_CMD]);
   printf("[%d] %s\n", PACKAGE_CMD, type_conv[PACKAGE_CMD]);
-  /**/
+  / **/
 }
 
 /*========================================================================*/

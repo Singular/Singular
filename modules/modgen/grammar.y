@@ -1,5 +1,5 @@
 /*
- * $Id: grammar.y,v 1.10 2000-03-29 14:29:11 krueger Exp $
+ * $Id: grammar.y,v 1.11 2000-03-30 06:35:44 krueger Exp $
  */
 
 %{
@@ -20,6 +20,7 @@
 int sectnum = 1;
 extern moddef module_def;
 extern int yylineno;
+extern int do_create_makefile;
  
 extern int init_modgen(moddef *module_def, char *filename);
 extern int write_intro(moddefv module);
@@ -83,17 +84,16 @@ void yyerror(char * fmt)
 %%
 goal: part1 sect2 sect2end code
         {
-          printf("Finish modules\n");
+          if(trace)printf("Finish modules\n");
           return 0;
         }
 ;
 
 part1: initmod sect1 sect1end
         {
-          mod_create_makefile(&module_def);
+          if(do_create_makefile)mod_create_makefile(&module_def);
           if(write_intro(&module_def)) {
-            myyyerror("Error while creating files\n");
-            return 1;
+            return(myyyerror("Error while creating files\n"));
           }
         };
 
@@ -115,12 +115,14 @@ sect1: expr ';'
 sect1end: SECTEND
         {
           memset(&procedure_decl, 0, sizeof(procdef));
-          printf("End of section %d\n", sectnum-1);
+          if(debug>2)printf("End of section %d\n", sectnum-1);
         }
         ;
 
 expr:   NAME '=' MSTRINGTOK
-        { var_token vt;
+        {
+          var_token vt;
+          int rc = 0;
           void (*write_cmd)(moddefv module, var_token type = VAR_NONE,
                             idtyp t, void *arg1 = NULL, void *arg2 = NULL);
           
@@ -133,7 +135,7 @@ expr:   NAME '=' MSTRINGTOK
                     make_version($3.string, &module_def);
                 }
                 else {
-                  myyyerror("Line %d: Unknown variable '%s' in section %d\n",
+                  rc=myyyerror("Line %d: Unknown variable '%s' in section %d\n",
                             yylineno, $1, sectnum);
                 }
                 break;
@@ -142,7 +144,7 @@ expr:   NAME '=' MSTRINGTOK
                   proc_set_var(&procedure_decl, VAR_STRING, vt, $1, $3.string);
                 }
                 else {
-                  myyyerror("Line %d: Unknown variable '%s' in section %d\n",
+                  rc=myyyerror("Line %d: Unknown variable '%s' in section %d\n",
                             yylineno, $1, sectnum);
                 }
                 break;
@@ -151,6 +153,7 @@ expr:   NAME '=' MSTRINGTOK
           }
           free($1);
           free($3.string);
+          if(rc)return(rc);
         }
         | NAME '=' FILENAME
         { var_token vt;
@@ -207,7 +210,9 @@ expr:   NAME '=' MSTRINGTOK
           free($1);
         }
         | NAME '=' BOOLTOK
-        { var_token vt;
+        {
+          var_token vt;
+          int rc = 0;
           void (*write_cmd)(moddefv module, var_token type = VAR_NONE,
                             idtyp t, void *arg1 = NULL, void *arg2 = NULL);
           switch(sectnum) {
@@ -216,7 +221,7 @@ expr:   NAME '=' MSTRINGTOK
                   proc_set_default_var(VAR_BOOL, vt, $1, &$3);
                 }
                 else {
-                  myyyerror("Line %d: Unknown variable '%s' in section %d\n",
+                  rc=myyyerror("Line %d: Unknown variable '%s' in section %d\n",
                             yylineno, $1, sectnum);
                 }
                 break;
@@ -225,7 +230,7 @@ expr:   NAME '=' MSTRINGTOK
                   proc_set_var(&procedure_decl, VAR_BOOL, vt, $1, &$3);
                 }
                 else {
-                  myyyerror("Line %d: Unknown variable '%s' in section %d\n",
+                  rc=myyyerror("Line %d: Unknown variable '%s' in section %d\n",
                             yylineno, $1, sectnum);
                 }
                 break;
@@ -233,12 +238,13 @@ expr:   NAME '=' MSTRINGTOK
                 
           }
           free($1);
+          if(rc)return(rc);
         }
 ;
 
 files:  FILENAME ',' FILENAME
         {
-          printf(">>>>>>>>files '%s' , '%s'\n", $1, $3);
+          if(debug>2)printf(">>>>>>>>files '%s' , '%s'\n", $1, $3);
           Add2files(&module_def, $1);
           Add2files(&module_def, $3);
           free($1);
@@ -253,7 +259,7 @@ sect2:  procdef
 sect2end: SECT2END
         {
           write_finish_functions(&module_def, &procedure_decl);
-          printf("End of section %d\n", sectnum-1);
+          if(debug>2)printf("End of section %d\n", sectnum-1);
         }
         ;
 
@@ -261,11 +267,11 @@ sect2end: SECT2END
  */
 procdef: procdecl proccode
         {
-          printf("PROCDEF:\n");
+          if(debug>2)printf("PROCDEF:\n");
         }
         | procdecl proccode procdeclexample
         {
-          printf("PROCDEF mit example:\n");
+          if(debug>2)printf("PROCDEF mit example:\n");
           fflush(module_def.fmtfp);
         }
         ;
@@ -285,7 +291,7 @@ procdecl1: PROCDECLTOK NAME
           init_proc(&procedure_decl, $2, NULL, yylineno, LANG_SINGULAR);
           free($2); 
           if(write_singular_procedures(&module_def, &procedure_decl))
-            myyyerror("Error while creating bin-file\n");
+            return(myyyerror("Error while creating bin-file\n"));
         }
         | STATICTOK PROCDECLTOK NAME
         {
@@ -293,7 +299,7 @@ procdecl1: PROCDECLTOK NAME
           procedure_decl.is_static = TRUE;
           free($3);
           if(write_singular_procedures(&module_def, &procedure_decl))
-            myyyerror("Error while creating bin-file\n");
+            return(myyyerror("Error while creating bin-file\n"));
         };
 
 procdecl2: procdecl1 '(' sgtypelist ')'
@@ -314,26 +320,26 @@ procdecl2: procdecl1 '(' sgtypelist ')'
 
 funcdecl1: NAME
         {
-          printf("funcdecl1-1\n");
+          if(debug>2)printf("funcdecl1-1\n");
           init_proc(&procedure_decl, $1, NULL, yylineno);
           free($1);
         }
         | VARTYPETOK NAME
         {
-          printf("funcdecl1-2\n");
+          if(debug>2)printf("funcdecl1-2\n");
           init_proc(&procedure_decl, $2, &$1, yylineno);
           free($2);
         }
         | STATICTOK NAME
         {
-          printf("funcdecl1-3\n");
+          if(debug>2)printf("funcdecl1-3\n");
           init_proc(&procedure_decl, $2, NULL, yylineno);
           free($2);
           procedure_decl.is_static = TRUE;
         }
         | STATICTOK VARTYPETOK NAME
         {
-          printf("funcdecl1-4\n");
+          if(debug>2)printf("funcdecl1-4\n");
           init_proc(&procedure_decl, $3, &$2, yylineno);
           free($3);
           procedure_decl.is_static = TRUE;
@@ -344,7 +350,7 @@ procdeclhelp: MSTRINGTOK
         {
           procedure_decl.help_string = $1.string;
           procedure_decl.lineno_other = $1.lineno;
-          printf("\t\thelp at %d\n", yylineno);
+          if(debug>2)printf("\t\thelp at %d\n", yylineno);
           write_help(&module_def, &procedure_decl);
         }
         ;
@@ -376,10 +382,10 @@ procdeclexample: examplestart '{' examplecodeline MCODETOK
 examplestart: EXAMPLETOK
         {
           if(procedure_decl.procname == NULL) {
-            myyyerror("example without proc-declaration at line %d\n",
-                     yylineno);
+            return(myyyerror("example without proc-declaration at line %d\n",
+                     yylineno));
           }
-          printf("Example at %d\n", yylineno);
+          if(debug>2)printf("Example at %d\n", yylineno);
           procedure_decl.lineno_other = yylineno;
         };
   
@@ -413,12 +419,12 @@ proccmd: '%' NAME ';'
           
           switch(vt=checkcmd($2, &write_cmd, CMDT_SINGLE, 0)) {
               case CMD_NONE:
-                myyyerror("Line %d: Unknown command '%s' in section %d\n",
-                          yylineno, $2, sectnum);
+                return(myyyerror("Line %d: Unknown command '%s' in section %d\n",
+                          yylineno, $2, sectnum));
                 break;
               case CMD_BADSYNTAX:
-                myyyerror("Line %d: bad syntax of command '%s' in section %d\n",
-                          yylineno, $2, sectnum);
+                return(myyyerror("Line %d: bad syntax of command '%s' in section %d\n",
+                          yylineno, $2, sectnum));
                 break;
               default:
                 write_cmd(&module_def, &procedure_decl);
@@ -432,12 +438,12 @@ proccmd: '%' NAME ';'
           
           switch(vt=checkcmd($2, &write_cmd, CMDT_0, 1)) {
               case CMD_NONE:
-                myyyerror("Line %d: Unknown command '%s' in section %d\n",
-                          yylineno, $2, sectnum);
+                return(myyyerror("Line %d: Unknown command '%s' in section %d\n",
+                          yylineno, $2, sectnum));
                 break;
               case CMD_BADSYNTAX:
-                myyyerror("Line %d: bad syntax of command '%s' in section %d\n",
-                          yylineno, $2, sectnum);
+                return(myyyerror("Line %d: bad syntax of command '%s' in section %d\n",
+                          yylineno, $2, sectnum));
                 break;
               default:
                 write_cmd(&module_def, &procedure_decl,
@@ -452,12 +458,12 @@ proccmd: '%' NAME ';'
           
           switch(vt=checkcmd($2, &write_cmd, CMDT_ANY, 1)) {
               case CMD_NONE:
-                myyyerror("Line %d: Unknown command '%s' in section %d\n",
-                          yylineno, $2, sectnum);
+                return(myyyerror("Line %d: Unknown command '%s' in section %d\n",
+                          yylineno, $2, sectnum));
                 break;
               case CMD_BADSYNTAX:
-                myyyerror("Line %d: bad syntax of command '%s' in section %d\n",
-                          yylineno, $2, sectnum);
+                return(myyyerror("Line %d: bad syntax of command '%s' in section %d\n",
+                          yylineno, $2, sectnum));
                 break;
               default:
                 write_cmd(&module_def, &procedure_decl, $4);
@@ -471,12 +477,12 @@ proccmd: '%' NAME ';'
           
           switch(vt=checkcmd($2, &write_cmd, CMDT_ANY, 1)) {
               case CMD_NONE:
-                myyyerror("Line %d: Unknown command '%s' in section %d\n",
-                          yylineno, $2, sectnum);
+                return(myyyerror("Line %d: Unknown command '%s' in section %d\n",
+                          yylineno, $2, sectnum));
                 break;
               case CMD_BADSYNTAX:
-                myyyerror("Line %d: bad syntax of command '%s' in section %d\n",
-                          yylineno, $2, sectnum);
+                return(myyyerror("Line %d: bad syntax of command '%s' in section %d\n",
+                          yylineno, $2, sectnum));
                 break;
               default:
                 write_cmd(&module_def, &procedure_decl, $4);
@@ -490,12 +496,12 @@ proccmd: '%' NAME ';'
           
           switch(vt=checkcmd($2, &write_cmd, CMDT_EQ, 0)) {
               case CMD_NONE:
-                myyyerror("Line %d: Unknown command '%s' in section %d\n",
-                          yylineno, $2, sectnum);
+                return(myyyerror("Line %d: Unknown command '%s' in section %d\n",
+                          yylineno, $2, sectnum));
                 break;
               case CMD_BADSYNTAX:
-                myyyerror("Line %d: bad syntax of command '%s' in section %d\n",
-                          yylineno, $2, sectnum);
+                return(myyyerror("Line %d: bad syntax of command '%s' in section %d\n",
+                          yylineno, $2, sectnum));
                 break;
               default:
                 write_cmd(&module_def, &procedure_decl, $4);
@@ -505,13 +511,13 @@ proccmd: '%' NAME ';'
 
 identifier: NAME
         {
-          printf("### ID ### Name %s\n", $1);
+          if(debug>2)printf("### ID ### Name %s\n", $1);
           $$ = $1;
         }
         | identifier MCOLONCOLON NAME
         {
           int len = strlen($$) + strlen($3) + 2;
-          printf("### ID ### Name %s\n", $3);
+          if(debug>2)printf("### ID ### Name %s\n", $3);
           $$ = (char *)realloc($$, len);
           strcat($$, "::");
           strcat($$, $3);
@@ -519,36 +525,36 @@ identifier: NAME
 
 arglist: NAME
         {
-          printf("### ARGS %s\n", $1);
+          if(debug>2)printf("### ARGS %s\n", $1);
         }
         | arglist ',' NAME
         {
-          printf("### ARGS %s\n", $3);
+          if(debug>2)printf("### ARGS %s\n", $3);
         };
         
 sgtypelist: VARTYPETOK NAME
         {
-          printf("\tsgtypelist %s %s\n", $1.name, $2);
+          if(debug>2)printf("\tsgtypelist %s %s\n", $1.name, $2);
           write_singular_parameter(&module_def, yylineno, $1.name, $2);
           free($1.name);
           free($2);
         }
         | VARTYPETOK '#'
         {
-          printf("\tsgtypelist %s %s\n", $1.name, $2);
+          if(debug>2)printf("\tsgtypelist %s %s\n", $1.name, $2);
           write_singular_parameter(&module_def, yylineno, $1.name, "#");
           free($1.name);
         }
         | sgtypelist ',' VARTYPETOK NAME
         {
-          printf("\tsgtypelist next  %s %s\n", $3.name, $4);
+          if(debug>2)printf("\tsgtypelist next  %s %s\n", $3.name, $4);
           write_singular_parameter(&module_def, yylineno, $3.name, $4);
           free($3.name);
           free($4);
         }
         | sgtypelist ',' VARTYPETOK '#'
         {
-          printf("\tsgtypelist next  %s %s\n", $3.name, $4);
+          if(debug>2)printf("\tsgtypelist next  %s %s\n", $3.name, $4);
           write_singular_parameter(&module_def, yylineno, $3.name, "#");
           free($3.name);
         }
@@ -562,8 +568,8 @@ typelist: VARTYPETOK
         | VARTYPETOK NAME
         {
           if(check_reseverd($2)) 
-            myyyerror("Line %d: variablename '%s' is reserved\n",
-                            yylineno, $2);
+            return(myyyerror("Line %d: variablename '%s' is reserved\n",
+                            yylineno, $2));
           AddParam(&procedure_decl, &$1, $2);
           free($1.name); free($2);
         }
@@ -575,8 +581,8 @@ typelist: VARTYPETOK
         | typelist ',' VARTYPETOK NAME
         {
           if(check_reseverd($4)) 
-            myyyerror("Line %d: variablename '%s' is reserved\n",
-                            yylineno, $4);
+            return(myyyerror("Line %d: variablename '%s' is reserved\n",
+                            yylineno, $4));
           AddParam(&procedure_decl, &$3, $4);
           free($3.name); free($4);
         }

@@ -1,5 +1,5 @@
 /*
- * $Id: utils.cc,v 1.7 2000-03-29 13:56:27 krueger Exp $
+ * $Id: utils.cc,v 1.8 2000-03-30 06:35:46 krueger Exp $
  */
 
 #include <stdio.h>
@@ -58,10 +58,10 @@ int create_tmpfile(
   FILE *fp;
   
   memset(tmpfile, '\0', sizeof(tmpfile));
-  snprintf(tmpfile, sizeof(tmpfile), "tmp/modgen.tmpXXXXXX");
+  snprintf(tmpfile, sizeof(tmpfile), "modgen.tmpXXXXXX");
   mktemp(tmpfile);
 
-  printf("create_tmpfile (%d\n", which );
+  if(debug)printf("create_tmpfile '%s'\n", tmpfile );
   
   if (close(creat(tmpfile, 0600)) < 0) {
     (void) unlink (tmpfile);        /*  Blow it away!!  */
@@ -73,7 +73,6 @@ int create_tmpfile(
     (void) unlink (tmpfile); /* delete now to avoid turds... */
   }
 
-  printf("2)create_tmpfile (%d\n", which );
   switch(which) {
       case 0: module_def->fmtfp  = fp; break;
       case 1: module_def->fmtfp2 = fp; break;
@@ -115,7 +114,7 @@ char *build_filename(
 }
 
 /*========================================================================*/
-void myyyerror(
+int myyyerror(
   char *fmt, ...
   )
 {
@@ -123,4 +122,5 @@ void myyyerror(
   va_start(ap, fmt);
   vprintf(fmt, ap);
   va_end(ap);
+  return 1;
 }
