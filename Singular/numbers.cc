@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.30 2000-12-06 11:03:24 Singular Exp $ */
+/* $Id: numbers.cc,v 1.31 2000-12-08 14:57:21 Singular Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -107,7 +107,7 @@ void nSetChar(ring r)
 #endif
   if (rField_is_Extension(r))
   {
-    naSetChar(c,TRUE,r);
+    naSetChar(c,r);
     test |= Sy_bit(OPT_INTSTRATEGY); /*intStrategy*/
     test &= ~Sy_bit(OPT_REDTAIL); /*noredTail*/
   }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.49 2000-11-20 17:29:45 obachman Exp $ */
+/* $Id: longalg.cc,v 1.50 2000-12-08 14:59:50 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -78,7 +78,7 @@ static number nadGcd( number a, number b) { return nacInit(1); }
 /*2
 *  sets the appropriate operators
 */
-void naSetChar(int i, BOOLEAN complete, ring r)
+void naSetChar(int i, ring r)
 {
   if (naI!=NULL)
   {
@@ -102,28 +102,25 @@ void naSetChar(int i, BOOLEAN complete, ring r)
 #else
     nacDelete      = nlDelete;
 #endif
-    if (complete)
-    {
-      nacInit        = nlInit;
-      nacInt         = nlInt;
-      nacCopy        = nlCopy;
-      nacAdd         = nlAdd;
-      nacSub         = nlSub;
-      nacMult        = nlMult;
-      nacDiv         = nlDiv;
-      nacIntDiv      = nlIntDiv;
-      nacInvers      = nlInvers;
-      nacNormalize   = nlNormalize;
-      nacNeg         = nlNeg;
-      nacIsZero      = nlIsZero;
-      nacRead        = nlRead;
-      nacWrite       = nlWrite;
-      nacGreaterZero = nlGreaterZero;
-      nacIsOne       = nlIsOne;
-      nacIsMOne      = nlIsMOne;
-      nacGcd         = nlGcd;
-      nacLcm         = nlLcm;
-    }
+    nacInit        = nlInit;
+    nacInt         = nlInt;
+    nacCopy        = nlCopy;
+    nacAdd         = nlAdd;
+    nacSub         = nlSub;
+    nacMult        = nlMult;
+    nacDiv         = nlDiv;
+    nacIntDiv      = nlIntDiv;
+    nacInvers      = nlInvers;
+    nacNormalize   = nlNormalize;
+    nacNeg         = nlNeg;
+    nacIsZero      = nlIsZero;
+    nacRead        = nlRead;
+    nacWrite       = nlWrite;
+    nacGreaterZero = nlGreaterZero;
+    nacIsOne       = nlIsOne;
+    nacIsMOne      = nlIsMOne;
+    nacGcd         = nlGcd;
+    nacLcm         = nlLcm;
   }
   else if (i < 0)
   {
@@ -133,34 +130,31 @@ void naSetChar(int i, BOOLEAN complete, ring r)
 #else
     nacDelete      = nDummy1;
 #endif
-    if (complete)
-    {
-      npSetChar(-i, r->algring); // to be changes HS
-      nacInit        = npInit;
-      nacInt         = npInt;
-      nacCopy        = ndCopy;
-      nacAdd         = npAdd;
-      nacSub         = npSub;
-      nacMult        = npMult;
-      nacDiv         = npDiv;
-      nacIntDiv      = npDiv;
-      nacInvers      = npInvers;
-      nacNormalize   = nDummy2;
-      nacNeg         = npNeg;
-      nacIsZero      = npIsZero;
-      nacRead        = npRead;
-      nacWrite       = npWrite;
-      nacGreaterZero = npGreaterZero;
-      nacIsOne       = npIsOne;
-      nacIsMOne      = npIsMOne;
-      nacGcd         = nadGcd;
-      nacLcm         = nadGcd;
-    }
+    npSetChar(-i, r->algring); // to be changes HS
+    nacInit        = npInit;
+    nacInt         = npInt;
+    nacCopy        = ndCopy;
+    nacAdd         = npAdd;
+    nacSub         = npSub;
+    nacMult        = npMult;
+    nacDiv         = npDiv;
+    nacIntDiv      = npDiv;
+    nacInvers      = npInvers;
+    nacNormalize   = nDummy2;
+    nacNeg         = npNeg;
+    nacIsZero      = npIsZero;
+    nacRead        = npRead;
+    nacWrite       = npWrite;
+    nacGreaterZero = npGreaterZero;
+    nacIsOne       = npIsOne;
+    nacIsMOne      = npIsMOne;
+    nacGcd         = nadGcd;
+    nacLcm         = nadGcd;
   }
 #ifdef TEST
   else
   {
-    Print("naSetChar:c=%d compl=%d param=%d\n",i,complete,rPar(r));
+    Print("naSetChar:c=%d param=%d\n",i,rPar(r));
   }
 #endif
 }
