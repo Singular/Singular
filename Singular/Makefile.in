@@ -171,7 +171,7 @@ claptmpl.o: claptmpl.cc mod2.h
 weight.o: weight.cc mod2.h
 	${CXX} ${CXXNOOPTFLAGS} ${CPPFLAGS} ${DEFS} -c $<
 	
-iparith.inc mpsr_Tok.inc: iparith.cc ipconv.cc tok.h mpsr_Tok.cc grammar.h 
+iparith.inc mpsr_Tok.inc: iparith.cc ipconv.cc tok.h mpsr_Tok.cc grammar.h mod2.h
 	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${DEFS} -DGENTABLE -o gentable \
 	iparith.cc tesths.cc mpsr_Tok.cc ${OBJS} ${LDFLAGS} ${LIBS}
 	./gentable
