@@ -23,13 +23,14 @@ struct calc_dat{
   int* rep;
   int** states;
   ideal S;
+  ring r;
+  int* lengths;
+  kStrategy strat;
   int found_i;
   int found_j;
   int continue_i;
   int continue_j;
   int n;
-  ring r;
-  int* lengths;
   int skipped_i;
   int normal_forms;
 };
@@ -146,9 +147,12 @@ void replace_pair(int & i, int & j, calc_dat* c){
 	if (p_LmDivisibleBy(c->S->m[dz],short_s,c->r)) break;
       }
       p_Delete(&short_s,c->r);
-      if (c->lengths[i]+c->lengths[j]
+      if ((comp_deg<curr_deg)
+	  ||
+	  ((comp_deg==curr_deg) &&
+      (c->lengths[i]+c->lengths[j]
 	  <=
-	  c->lengths[i_con[m]]+c->lengths[j_con[n]])
+       c->lengths[i_con[m]]+c->lengths[j_con[n]])))
 	  {
 	curr_deg=comp_deg;
 	i=i_con[m];
@@ -247,6 +251,16 @@ void initial_data(calc_dat* c){
     c->rep[i]=i;
     c->lengths[i]=pLength(c->S->m[i]);
   }
+  c->strat=new skStrategy;
+  c->strat->syzComp = 0;
+  initBuchMoraCrit(c->strat);
+  initBuchMoraPos(c->strat);
+  c->strat->initEcart = initEcartBBA;
+  c->strat->enterS = enterSBba;
+  c->strat->sl = -1;
+  initS(c->S,NULL,c->strat);
+  for (i=c->strat->sl;i>=0;i--)
+     pNorm(c->strat->S[i]);
 }
 void add_to_basis(poly h, calc_dat* c){
   
@@ -322,25 +336,94 @@ void add_to_basis(poly h, calc_dat* c){
     c->continue_j=0;
     c->skipped_i=-1;
   }
+
+  i=posInS(c->strat,c->strat->sl,h,0 /*ecart*/);
+
+  LObject P; memset(&P,0,sizeof(P));
+  P.tailRing=c->r;
+  P.p=pCopy(h);
+  P.FDeg=pFDeg(P.p,c->r);
+  pCleardenom(P.p);
+  enterT(P,c->strat,-1);
+  c->strat->enterS(P,i,c->strat);
+  pNorm(c->strat->S[i]);
 }
+static poly redNF (poly h,kStrategy strat)
+{
+  int j = 0;
+  int z = 3;
+  unsigned long not_sev;
+
+  if (0 > strat->sl)
+  {
+    return h;
+  }
+  not_sev = ~ pGetShortExpVector(h);
+  loop
+  {
+    if (pLmShortDivisibleBy(strat->S[j], strat->sevS[j], h, not_sev))
+    {
+      //if (strat->interpt) test_int_std(strat->kIdeal);
+      /*- compute the s-polynomial -*/
+#ifdef KDEBUG
+      if (TEST_OPT_DEBUG)
+      {
+        PrintS("red:");
+        wrp(h);
+        PrintS(" with ");
+        wrp(strat->S[j]);
+      }
+#endif
+      h = ksOldSpolyRed(strat->S[j],h,strat->kNoether);
+#ifdef KDEBUG
+      if (TEST_OPT_DEBUG)
+      {
+        PrintS("\nto:");
+        wrp(h);
+        PrintLn();
+      }
+#endif
+      if (h == NULL) return NULL;
+      z++;
+      if (z>=10)
+      {
+        z=0;
+        pNormalize(h);
+      }
+      /*- try to reduce the s-polynomial -*/
+      j = 0;
+      not_sev = ~ pGetShortExpVector(h);
+    }
+    else
+    {
+      if (j >= strat->sl) return h;
+      j++;
+    }
+  }
+}
+
 void do_this_spoly_stuff(int i,int j,calc_dat* c){
   poly f=c->S->m[i];
   poly g=c->S->m[j];
   poly h=ksOldCreateSpoly(f, g, NULL, c->r);
+  poly hr=NULL;
 #ifdef FULLREDUCTIONS
-  poly hr=kNF(c->S,NULL,h);
+//  if (h!=NULL) hr=kNF2(c->S,NULL,h,c->strat, 0);
+  if (h!=NULL) 
+  {
+    hr=redNF(pCopy(h),c->strat);
+    if (hr!=NULL)
+      hr = redtailBba(hr,c->strat->sl,c->strat);
+  }
 #else
-
-  poly hr=kNF(c->S,NULL,h,0,1);
+  //if (h!=NULL) hr=kNF2(c->S,NULL,h,c->strat, 1);
+  if (h!=NULL) 
+    hr=redNF(pCopy(h),c->strat);
 #endif
   c->normal_forms++;
-  if (h!=NULL){
-    p_Delete(&h,c->r);
-  }
-  if ((pIsConstant(hr)) && (!(pIsUnit(hr)))){
-    if (hr!=NULL){
-      p_Delete(&hr,c->r);
-    }
+  p_Delete(&h,c->r);
+  if (hr==NULL)
+  {
     PrintS("-");
   } else {
     
@@ -363,8 +446,9 @@ ideal t_rep_gb(ring r,ideal arg_I){
     replace_pair(i,j,c);
     if (!(c->states[max(i,j)][min(i,j)]==HASTREP)){
       do_this_spoly_stuff(i,j,c);
-    } else {
-      PrintS("f");}
+    }
+    //else
+    //  PrintS("f");
     
     now_t_rep(i,j,c);
     now_t_rep(c->found_i,c->found_j,c);
@@ -405,16 +489,14 @@ bool has_t_rep(int arg_i, int arg_j, calc_dat* state){
     i=arg_i;
     j=arg_j;
   }
-  if (state->states[j][i]==HASTREP){
+  if (state->states[j][i]==HASTREP)
     return(true);
-  }
-  if (j==state->rep[i]) {return(false);}
+  if (j==state->rep[i]) return(false);
 
-  if (state->rep[i]!=i) {
+  if (state->rep[i]!=i) 
     return(has_t_rep(i,state->rep[i],state) && has_t_rep(state->rep[i],j,state));
-  }
-  if (state->rep[j]!=j) {
+  
+  if (state->rep[j]!=j)
     return(has_t_rep(j,state->rep[j],state) && has_t_rep(state->rep[j],i,state));
-  }
   return(false);
 }
