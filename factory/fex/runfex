@@ -1,0 +1,827 @@
+#! /mnt/amd/users/urmel/insider/schmidt/bin/bash
+# $Id: runfex,v 1.1 1997-10-10 13:07:25 schmidt Exp $
+
+#{{{ docu
+#
+# runfxc - run factory example collection.
+#
+#}}}
+
+set -o nounset
+set -o noglob
+
+#{{{ global constants
+#{{{ docu
+#
+# - global constants.
+#
+# ExecName: used to prefix error messages.  Used by warn().
+# XXColWidth: default width for data columns.  Used by main() and
+#   example().
+# PreCharWidth: width of one preformatted character in pixels.
+#   Used by printData().
+# EvalAlg: algorithm to read run/collection data from.  Used by
+#   main().
+#
+#}}}
+readonly ExecName="$0"
+
+typeset	-ir TBColWidth=300
+typeset	-ir XOColWidth=400
+typeset	-ir ROColWidth=400
+
+typeset -ir PreCharWidth=6
+
+readonly EvalAlg="feval"
+#}}}
+
+#{{{ global variables
+#{{{ docu
+#
+# - global variables.
+#
+# runName: name of current run.  Used by main() and example().
+# collectionName, collectionNote: name of current collection,
+#   comment on it.  Used by main() and createTable().
+# runOptions, collectionOptions, runEnvironment,
+# collectionEnvironment: options and environment for the
+#   examples.  Used by runAlgorithm().
+# collectionROOptions: options to print run overview.  Use by
+#   main().
+# runXXOptions, collectionXXOptions: options to print XX tables.
+#   Used by example().
+# debugMode: do not execute anything, just print what we would
+#   have executed.  Used by main(), example(), and
+#   runAlgorithm().
+#
+# The run* variables, debugMode, and collectionName are set in
+# the main program, the rest of the collection* variables in
+# collection().
+#
+#}}}
+runName=""
+runOptions=""
+runEnvironment=""
+runTBOptions=""
+runXOOptions=""
+
+collectionName=""
+collectionNote=""
+collectionOptions=""
+collectionEnvironment=""
+collectionTBOptions=""
+collectionXOOptions=""
+collectionROOptions=""
+
+debugMode=""
+#}}}
+
+#
+# - functions.
+#
+
+#{{{ warn()
+#{{{ docu
+#
+# warn() - print arguments to stderr prefixed $ExecName.
+#
+# Global variables used:
+#   ExecName
+#
+#}}}
+warn()
+{
+    echo "$ExecName:" "${@-}" >&2
+}
+#}}}
+
+#{{{ pc()
+#{{{ docu
+#
+# pc() - print html table cell.
+#
+# $1: cell contents
+# $2: cell format information
+#
+# Global variables used: none
+#
+#}}}
+pc()
+{
+    echo "<th ${2-}><font size=+1>$1</font></th>"
+}
+#}}}
+
+#{{{ pct()
+#{{{ docu
+#
+# pc() - print html table cell in type writer style.
+#
+# $1: cell contents
+# $2: cell format information
+#
+# Global variables used: none
+#
+#}}}
+pct()
+{
+    echo "<th valign=center ${2-}><tt><font size=+2>$1</font></tt></th>"
+}
+#}}}
+
+#{{{ runAlgorithm()
+#{{{ docu
+#
+# runAlgorithm() - run algorithm with the correct options.
+#
+# $1: algorithm to run
+# $2: output options
+# rest: arguments to algorithm
+#
+# Global variables used:
+#   runOptions, runEnvironment,
+#   collectionOptions, collectionEnvironment,
+#   exampleOptions, exampleEnvironment,
+#   debugMode
+#
+#}}}
+runAlgorithm()
+{
+    typeset \
+	algorithmName="$1" \
+	outputOptions="$2" \
+	algorithmOptions="$collectionOptions${exampleOptions-}$runOptions" \
+	algorithmEnvironment="$collectionEnvironment${exampleEnvironment-}$runEnvironment"
+    shift 2
+
+    # reset factory environemnt to exclude external influences
+    FTEST_ENV=""
+    FTEST_CIRCLE=""
+    FTEST_ALARM=""
+
+    if [ -n "$debugMode" ]; then
+	echo "calling $algorithmName" $algorithmOptions "$outputOptions" "$algorithmEnvironment" "$@"
+    else
+	"$algorithmName" $algorithmOptions "$outputOptions" "$algorithmEnvironment" "$@"
+    fi
+}
+#}}}
+
+#{{{ printData()
+#{{{ docu
+#
+# printData() - print example/run table.
+#
+# $1: options how to print data
+# $2: default width to print data
+# $3: initial cell
+# $4: blockheight offset
+#
+# Global variables used:
+#   alg* algorithm information,
+#   PreCharWidth
+#
+#}}}
+printData()
+{
+    typeset \
+	options="$1" \
+	colWidth
+
+    colWidth="${options//[a-z]/}"
+    colWidth="${colWidth:-$2}"
+    options="${options//[0-9]/}"
+
+    typeset -i \
+	colCharWidth=$colWidth/PreCharWidth+1 \
+	blockHeight=$4 \
+	i=0 n=0
+
+    # get correct block height
+    blockHeight=blockHeight+${#options}
+    case "$options" in
+	*r*) blockHeight=blockHeight+${#algResultTags[@]}-1 ;;
+    esac
+    case "$options" in
+	*d*) blockHeight=blockHeight+${#algDataTags[@]}-1 ;;
+    esac
+
+    #{{{ print first line
+    # for efficiency, we repeat this case statement to print the first line
+    if [ -n "$options" ]; then
+	case "$options" in
+	    *p*) echo "<tr align=left valign=top>$( pc "$3" "rowspan=$blockHeight" )<!bol>$( pc Char )$( pct "$algChar" "width=$colWidth" )<!eol></tr>"
+		 options="${options//p/}" ;;
+	    *s*) echo "<tr align=left valign=top>$( pc "$3" "rowspan=$blockHeight" )<!bol>$( pc Switches )$( pct "$algSwitch" "width=$colWidth" )<!eol></tr>"
+		 options="${options//s/}" ;;
+	    *v*) echo "<tr align=left valign=top>$( pc "$3" "rowspan=$blockHeight" )<!bol>$( pc Variables )$( pct "$algVars" "width=$colWidth" )<!eol></tr>"
+		 options="${options//v/}" ;;
+	    *n*) echo "<tr align=left valign=top>$( pc "$3" "rowspan=$blockHeight" )<!bol>$( pc Circles )$( pct "$algCircle" "width=$colWidth" )<!eol></tr>"
+		 options="${options//n/}" ;;
+	    *g*) echo "<tr align=left valign=top>$( pc "$3" "rowspan=$blockHeight" )<!bol>$( pc Seed )$( pct "$algSeed" "width=$colWidth" )<!eol></tr>"
+		 options="${options//g/}" ;;
+	    *f*) echo "<tr align=left valign=top>$( pc "$3" "rowspan=$blockHeight" )<!bol>$( pc Version )$( pct "$algVers" "width=$colWidth" )<!eol></tr>"
+		 options="${options//f/}" ;;
+	    *t*) echo "<tr align=left valign=top>$( pc "$3" "rowspan=$blockHeight" )<!bol>$( pc Time )$( pct "$algTime" "width=$colWidth" )<!eol></tr>"
+		 options="${options//t/}" ;;
+	    *c*) echo "<tr align=left valign=top>$( pc "$3" "rowspan=$blockHeight" )<!bol>$( pc Check )$( pct "$algCheck" "width=$colWidth" )<!eol></tr>"
+		 options="${options//c/}" ;;
+	    *d*|*r*)
+		 warn "first line in a table must not start with data or result information"
+		 options="" ;;
+	    *)   warn "unknown output type specifier '$options' in table specification"
+		 options="" ;;
+	esac
+    fi
+    #}}}
+
+    #{{{ print other lines
+    while [ -n "$options" ]; do
+	case "$options" in
+	    *p*) echo "<tr align=left valign=top><!bol>$( pc Char )$( pct "$algChar" )<!eol></tr>"
+		 options="${options//p/}" ;;
+	    *s*) echo "<tr align=left valign=top><!bol>$( pc Switches )$( pct "$algSwitch" )<!eol></tr>"
+		 options="${options//s/}" ;;
+	    *v*) echo "<tr align=left valign=top><!bol>$( pc Variables )$( pct "$algVars" )<!eol></tr>"
+		 options="${options//v/}" ;;
+	    *n*) echo "<tr align=left valign=top><!bol>$( pc Circles )$( pct "$algCircle" )<!eol></tr>"
+		 options="${options//n/}" ;;
+	    *g*) echo "<tr align=left valign=top><!bol>$( pc Seed )$( pct "$algSeed" )<!eol></tr>"
+		 options="${options//g/}" ;;
+	    *f*) echo "<tr align=left valign=top><!bol>$( pc Version )$( pct "$algVers" )<!eol></tr>"
+		 options="${options//f/}" ;;
+	    *t*) echo "<tr align=left valign=top><!bol>$( pc Time )$( pct "$algTime" )<!eol></tr>"
+		 options="${options//t/}" ;;
+	    *c*) echo "<tr align=left valign=top><!bol>$( pc Check )$( pct "$algCheck" )<!eol></tr>"
+		 options="${options//c/}" ;;
+	    *d*) 
+		n=${#algDataTags[@]}
+		i=0
+		while [ $i -lt $n ]; do
+		    cat << EOT
+<tr align=left valign=top>
+<!bol>
+$( pc "${algDataTags[i]}" )<th><pre>
+EOT
+		    echo "${algData[i]}" | fold -s -w$colCharWidth
+		    cat << EOT
+</pre></th>
+<!eol>
+</tr>
+EOT
+		    i=i+1
+		done
+		options="${options//d/}" ;;
+	    *r*)
+		n=${#algResultTags[@]}
+		i=0
+		while [ $i -lt $n ]; do
+		    cat << EOT
+<tr align=left valign=top>
+<!bol>
+$( pc "${algResultTags[i]}" )<th><pre>
+EOT
+		    echo "${algResult[i]}" | fold -s -w$colCharWidth
+		    cat << EOT
+</pre></th>
+<!eol>
+</tr>
+EOT
+		    i=i+1
+		done
+		options="${options//r/}" ;;
+	    *)   warn "unknown output type specifier '$options' in table specification"
+		 options="" ;;
+	esac
+    done
+    #}}}
+}
+#}}}
+
+#{{{ collection()
+#{{{ docu
+#
+# collection() - set up collection data.
+#
+# All we do is setting the collection* variables (except
+# collectionName) from commandline.
+# We do not set collectionNote and collectionXXOptions if they
+# are already set but reset collectionOptions and
+# collectionEnvironment on each run to allow for multiple calls
+# to collection() in one example collection file (though this is
+# bad style).
+#
+# Global variables used: none
+#
+#}}}
+collection()
+{
+    collectionOptions=""
+    collectionEnvironment=""
+
+    #{{{ read options and environment
+    # read options
+    typeset opt
+    while getopts "n:a:c:t:x:r:" opt; do
+	case "$opt" in
+	    n)	collectionNote="${collectionNote:-$OPTARG}" ;;
+	    a)	collectionOptions="$collectionOptions -a$OPTARG" ;;
+	    c)	collectionOptions="$collectionOptions -c$OPTARG" ;;
+	    t)	collectionTBOptions="${collectionTBOptions:-$OPTARG}" ;;
+	    x)	collectionXOOptions="${collectionXOOptions:-$OPTARG}" ;;
+	    r)	collectionROOptions="${collectionROOptions:-$OPTARG}" ;;
+	    ?)	warn "bad collection option"; exit 1 ;;
+	esac
+    done
+    # shift options and reset OPTIND
+    typeset -i optind
+    optind=OPTIND-1
+    shift $optind
+    OPTIND=1
+
+    # read environment
+    while [ "${1-}" != "${1+${1#/}}" ]; do
+	collectionEnvironment="$collectionEnvironment $1"
+	shift
+    done
+    #}}}
+}
+#}}}
+
+#{{{ createTable()
+#{{{ docu
+#
+# createTable() - create html file from output data.
+#
+# $1: runName
+#
+# Global variables used:
+#   collectionName, collectionNote
+#
+#}}}
+createTable()
+{
+    typeset runName="$1"
+
+    # write header
+    cat << EOT
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+  <title>Results from running $collectionName</title>
+  <meta name="Author" content="Jens Schmidt">
+</head>
+<! this corresponds to burlywood1>
+<body bgcolor="#fcce8e">
+EOT
+
+
+    # example table
+    cat << EOT
+<h2>Examples and Runs</h2>
+<table border=1 cellpadding=5 cellspacing=1>
+<tr align=left valign=top>$( pc "Coll. Name" )$( pct "$collectionName" colspan=2 )</tr>
+<tr align=left valign=top>$( pc "Coll. Note" )$( pct "${collectionNote:-(no note)}" colspan=2 )</tr>
+<tr align=left valign=top><!bol>$( pc "" )$( pc "<a name=\"TB$runName\" href=\"#RO$runName\">$runName</a>" "colspan=2")<!eol></tr>
+EOT
+    cat  "$runName.tb.tbl"
+
+    cat << EOT
+</table>
+EOT
+
+    # example overview
+    cat << EOT
+<h2>Overview over Examples</h2>
+<table border=1 cellpadding=5 cellspacing=1>
+<tr align=left valign=top>$( pc "Coll. Name" )$( pct "$collectionName" colspan=2 )</tr>
+<tr align=left valign=top>$( pc "Coll. Note" )$( pct "${collectionNote:-(no note)}" colspan=2 )</tr>
+<tr align=left valign=top>$( pc "Examples" )$( pc "Data" colspan=2 )</tr>
+EOT
+    cat  "$runName.xo.tbl"
+
+    cat << EOT
+</table>
+EOT
+
+
+    # run overview
+    cat << EOT
+<h2>Overview over Runs</h2>
+<table border=1 cellpadding=5 cellspacing=1>
+<tr align=left valign=top>$( pc "Coll. Name" )$( pct "$collectionName" colspan=2 )</tr>
+<tr align=left valign=top>$( pc "Coll. Note" )$( pct "${collectionNote:-(no note)}" colspan=2 )</tr>
+<tr align=left valign=top>$( pc "Runs" )$( pc "Data" colspan=2 )</tr>
+EOT
+    cat  "$runName.ro.tbl"
+
+    cat << EOT
+</table>
+EOT
+
+
+    # write footer
+    cat << EOT
+</body>
+</html>
+EOT
+}
+#}}}
+
+#{{{ defineSkip()
+#{{{ docu
+#
+# defineSkip() - define function skipExample().
+#
+#}}}
+defineSkip()
+{
+    typeset regExp=""
+    typeset notRegExp=""
+    typeset rawArg arg
+
+    for rawArg; do
+	# check for leading ^
+	arg="${rawArg#^}"
+	if [ "$rawArg" = "$arg" ]; then
+	    regExp="$regExp|$arg"
+	else
+	    notRegExp="$notRegExp|$arg"
+	fi
+	shift
+    done
+    regExp="${regExp#|}"
+    notRegExp="${notRegExp#|}"
+
+    if [ -z "$regExp" -a -z "$notRegExp" ]; then
+	eval "
+skipExample()
+{
+    return 1
+}
+"
+    elif [ -n "$regExp" -a -z "$notRegExp" ]; then
+	eval "
+skipExample()
+{
+    case \"\$1\" in
+	$regExp) return 1 ;;
+	*) return 0 ;;
+    esac
+}
+"
+    elif [ -z "$regExp" -a -n "$notRegExp" ]; then
+	eval "
+skipExample()
+{
+    case \"\$1\" in
+	$notRegExp) return 0 ;;
+	*) return 1 ;;
+    esac
+}
+"
+    else
+	eval "
+skipExample()
+{
+    case \"\$1\" in
+	$notRegExp) return 0 ;;
+	$regExp) return 1 ;;
+	*) return 0 ;;
+    esac
+}
+"
+    fi
+}
+#}}}
+
+#{{{ example()
+#{{{ docu
+#
+# example() - run an example.
+#
+# Global variables used:
+#   runName, debugMode,
+#   runTBOptions, runXOOptions,
+#   collectionTBOptions, collectionXOOptions,
+#   TBColWidth, XOColWidth
+#
+#}}}
+example()
+{
+    typeset exampleName="" \
+	    exampleNote="" \
+	    exampleOptions="" \
+	    exampleEnvironment="" \
+	    exampleTBOptions="" \
+	    exampleXOOptions=""
+
+    typeset algorithm="" \
+	    algorithmTBOptions="" \
+	    algorithmXOOptions=""
+
+    #{{{ read example name and skip it if necessary
+    if [ "$#" = "0" ]; then
+	warn "no example name specified"
+	exit 1
+    fi
+    exampleName="$1"
+    shift
+
+    if skipExample "$exampleName"; then
+	if [ -n "$debugMode" ]; then
+	    echo "skipping $exampleName"
+	else
+	    warn "skipping $exampleName"
+	fi
+	return
+    else
+	warn "running $exampleName"
+    fi
+    #}}}
+    
+    #{{{ read options and environment
+    # read options
+    typeset opt
+    while getopts "n:a:c:t:x:" opt; do
+	case "$opt" in
+	    n)	exampleNote="$OPTARG" ;;
+	    a)	exampleOptions="$exampleOptions -a$OPTARG" ;;
+	    c)	exampleOptions="$exampleOptions -c$OPTARG" ;;
+	    t)	exampleTBOptions="$OPTARG" ;;
+	    x)	exampleXOOptions="$OPTARG" ;;
+	    ?)	warn "bad example option"; exit 1 ;;
+	esac
+    done
+    # shift options and reset OPTIND
+    typeset -i optind
+    optind=OPTIND-1
+    shift $optind
+    OPTIND=1
+
+    # read environment
+    while [ "${1-}" != "${1+${1#/}}" ]; do
+	exampleEnvironment="$exampleEnvironment $1"
+	shift
+    done
+    #}}}
+
+    #{{{ read rest of arguments
+    if [ "$#" = "0" ]; then
+	warn "no example specified"
+	exit 1
+    fi
+    algorithm="$1"
+    shift
+    #}}}
+
+    # check for debug mode
+    if [ -n "$debugMode" ]; then
+	runAlgorithm "$algorithm" -oas "$@"
+	return
+    fi
+
+    # collect output options
+    algorithmTBOptions="${runTBOptions:-${exampleTBOptions:-$collectionTBOptions}}"
+    algorithmXOOptions="${runXOOptions:-${exampleXOOptions:-$collectionXOOptions}}"
+
+    #{{{ read and print data
+    typeset algChar \
+	    algSwitch \
+	    algVars \
+	    algCircle \
+	    algSeed \
+	    algVers \
+	    algTime \
+	    algCheck
+    
+    typeset -a algData \
+	       algResult \
+	       algDataTags \
+	       algResultTags
+
+    typeset -i i=0 j=0
+
+    # read data
+    runAlgorithm "$algorithm" -oas "$@" \
+	| {
+	read algChar
+	read algSwitch
+	read algVars
+	read algCircle
+	read algSeed
+	read algVers
+	read algTime
+	read algCheck
+
+	# preprocess output and store result in the arrays
+	while read line; do
+	    case "$line" in
+		@@!*)
+		    # read data lines
+		    algDataTags[i]="${line#@@!}"
+		    read line
+		    algData[i]="$line"
+		    while read line && test "$line" != "@@"; do
+			algData[i]="${algData[i]}
+$line"
+		    done
+		    i=i+1 ;;
+		@!*)
+		    # read one data line
+		    algDataTags[i]="${line#@!}"
+		    algDataTags[i]="${algDataTags[i]%%:*}"
+		    algData[i]="${line#*: }"
+		    i=i+1 ;;
+		@@*)
+		    # read result lines
+		    algResultTags[j]="${line#@@}"
+		    read line
+		    algResult[j]="$line"
+		    while read line && test "$line" != "@@"; do
+			algResult[j]="${algResult[j]}
+$line"
+		    done
+		    j=j+1 ;;
+		@*)
+		    # read one result line
+		    algResultTags[j]="${line#@}"
+		    algResultTags[j]="${algResultTags[j]%%:*}"
+		    algResult[j]="${line#*: }"
+		    j=j+1 ;;
+	    esac
+	done
+
+	#{{{ print table
+	# print header
+	cat << EOT >> "$runName.tb.tbl"
+<!TBBlock $exampleName>
+EOT
+	
+	# print table
+	printData "$algorithmTBOptions" "$TBColWidth" \
+	    "<a name=\"TB$exampleName\" href=\"#XO$exampleName\">$exampleName</a>" 0 >> "$runName.tb.tbl"
+
+	# print trailer
+	cat << EOT >> "$runName.tb.tbl"
+<!/TBBlock $exampleName>
+EOT
+	#}}}
+
+	#{{{ print example overview
+	# print header
+	cat << EOT >> "$runName.xo.tbl"
+<!XOBlockX $exampleName>
+<tr align=left valign=top>$( pc "<a name=\"XO$exampleName\" href=\"#TB$exampleName\">$exampleName</a>" )$( pc "Ex. Note" )$( pct "${exampleNote:-(no note)}" )</tr>
+<!XOBlockR $runName>
+EOT
+	
+	# print data
+	printData "$algorithmXOOptions" "$XOColWidth" \
+	    "<a href=\"#RO$runName\">$runName</a>" 0 >> "$runName.xo.tbl"
+
+	# print trailer
+	cat << EOT >> "$runName.xo.tbl"
+<!/XOBlockR $runName>
+<!/XOBlockX $exampleName>
+EOT
+	#}}}
+    }
+    #}}}
+}
+#}}}
+
+#{{{ main program
+#{{{ docu
+#
+# - main program.
+#
+# runROOptions: options for RO table.  Read from commandline.
+# runNote: comment on run.  Read from commandline.
+# rawCollectionName: collection name with full path
+#
+# Global variables used:
+#   runName, collectionName,
+#   collectionROOptions,
+#   debugMode,
+#   ROColWidth, EvalAlg
+#
+#}}}
+typeset runROOptions=""
+typeset runNote=""
+typeset rawCollectionName=""
+
+#{{{ read options and environment
+# read options
+typeset opt
+while getopts "n:a:c:t:x:r:d" opt; do
+    case "$opt" in
+	n)  runNote="$OPTARG" ;;
+	a)  runOptions="$runOptions -a$OPTARG" ;;
+	c)  runOptions="$runOptions -c$OPTARG" ;;
+	t)  runTBOptions="$OPTARG" ;;
+	x)  runXOOptions="$OPTARG" ;;
+	r)  runROOptions="$OPTARG" ;;
+	d)  debugMode="1" ;;
+	?)  warn "bad run option"; exit 1 ;;
+    esac
+done
+# shift options and reset OPTIND
+typeset -i optind
+optind=OPTIND-1
+shift $optind
+OPTIND=1
+
+# read environment
+while [ "${1-}" != "${1+${1#/}}" ]; do
+    runEnvironment="$runEnvironment $1"
+    shift
+done
+#}}}
+
+#{{{ read rest of arguments
+# process rest of arguments
+if [ "$#" = "0" ]; then
+    warn "no collection name specified"
+    exit 1
+fi
+rawCollectionName="${1%.fex}"
+collectionName="${rawCollectionName##*/}"
+shift
+
+if [ "$#" = "0" ]; then
+    warn "no run name specified"
+    exit 1
+fi
+runName="${1%.html}"
+shift
+
+defineSkip "$@"
+#}}}
+
+# before going on, check for existence of collection
+if [ ! -f "$rawCollectionName.fex" ]; then
+    warn "collection $rawCollectionName.fex not found"
+    exit 1
+fi
+
+# remove existing table files
+if [ -z "$debugMode" ]; then
+    rm -f "$runName.tb.tbl"
+    rm -f "$runName.xo.tbl"
+    rm -f "$runName.ro.tbl"
+    rm -f "$runName.html"
+fi
+
+# execute collection
+. "$rawCollectionName.fex"
+
+if [ -z "$debugMode" ]; then
+    #{{{ read and print data
+    typeset algChar
+    typeset algSwitch
+    typeset algVars
+    typeset algCircle
+    typeset algSeed
+    typeset algVers
+
+    # read data
+    runAlgorithm "$EvalAlg" -oes \
+	| {
+	read algChar
+	read algSwitch
+	read algVars
+	read algCircle
+	read algSeed
+	read algVers
+
+	# create empty file
+	cp /dev/null "$runName.ro.tbl"
+
+	# print header
+	cat << EOT >> "$runName.ro.tbl"
+<!ROBlock $runName>
+EOT
+
+	# print data
+	typeset options="${runROOptions:-$collectionROOptions}"
+	# remove some options
+	options="${options//tcrd/}"
+
+	printData "$options" "$ROColWidth" \
+	    "<a name=\"RO$runName\" href=\"#TB$runName\">$runName</a>" 4 >> "$runName.ro.tbl"
+
+	# print trailer
+	cat << EOT >> "$runName.ro.tbl"
+<tr align=left valign=top><!bol>$( pc Note )$( pct "${runNote:-(no note)}" )<!eol></tr>
+<tr align=left valign=top><!bol>$( pc Date )$( pct "$( date )" )<!eol></tr>
+<tr align=left valign=top><!bol>$( pc User )$( pct "${USER:-unknown}" )<!eol></tr>
+<tr align=left valign=top><!bol>$( pc Computer )$( pct "$( uname -a )" )<!eol></tr>
+<!/ROBlock $runName>
+EOT
+    }
+    #}}}
+
+    createTable "$runName" > "$runName.html"
+fi
+#}}}
