@@ -6,13 +6,161 @@
 #include "kbuckets.h"
 #include "ring.h"
 #include "ipid.h"
-#include "modulop.h"
 #include "numbers.h"
-#include "polys-comp.h"
 #include "kbPolyProcs.h"
+#include "modulop.h"
+#include "spolys0.h"
 
-// define to enable fast poly procs
-// #define FAST_POLY_PROCS
+/***************************************************************
+ *
+ * Reduces p1 with p2
+ * Assumes p1 != NULL, p2 != NULL, Lm(p1) divides Lm(p2)
+ *         pLength(p2) == l2
+ * 
+ ***************************************************************/
+void kbReducePoly(poly *p1, int *l1,
+                  poly p2, int l2, 
+                  poly spNoether,
+                  kbPolyProcs_pt pprocs,
+                  memHeap heap)
+{
+  assume(p2 != NULL && 
+         pDivisibleBy(p2,  *p1));
+#ifdef HAVE_LENGTH
+  assume(pLength(p2) == (int) l2);
+  assume(pLength(p1) == (int) l1);
+#endif  
+
+  poly a2 = pNext(p2), lm = *p1;
+  *p1 = pNext(*p1);
+  *l1 = *l1 -1;
+  BOOLEAN reset_vec=FALSE;
+  
+  if (a2==NULL)
+  {
+    kb_pDelete1(lm, heap);
+    return;
+  }
+
+  if (! nIsOne(pGetCoeff(p2)))
+  {
+    number an = pGetCoeff(p2), bn = pGetCoeff(lm);
+    int ct = spCheckCoeff(&an, &bn);
+    pSetCoeff(lm, bn);
+    if ((ct == 0) || (ct == 2)) kb_n_Mult_p_General(an, *p1);
+    nDelete(&an);
+  }
+
+  
+  if (pGetComp(p2) != pGetComp(lm))
+  {
+    pSetCompP(p2, pGetComp(lm));
+    reset_vec = TRUE;
+  }
+
+  pMonSubFast(lm, p2);
+  assume(pGetComp(lm) == 0);
+
+  kb_p_Minus_m_Mult_q_General(p1, l1, lm, a2, l2-1, spNoether);
+  
+  kb_pDelete1(lm, heap);
+  if (reset_vec) spModuleToPoly(p2);
+}
+
+/***************************************************************
+ *
+ * Creates S-Poly of p1 and p2
+ * 
+ *
+ ***************************************************************/
+void kbCreateSpoly(poly *sp, int *lsp, 
+                   poly p1, int l1,
+                   poly p2, int l2,
+                   poly spNoether,
+                   kbPolyProcs_pt pprocs,
+                   memHeap heap)
+{
+#ifdef HAVE_LENGTH
+  assume(p1 != NULL && (l1 <= 0 || pLength(p1) == l1));
+  assume(p2 != NULL && (l2 <= 0 || pLength(p2) == l2));
+#endif
+#ifdef KB_USE_HEAPS
+  assume(heap != NULL);
+#else
+  assume(heap == NULL);
+#endif  
+  
+  poly a1 = pNext(p1), a2 = pNext(p2);
+  number lc1 = pGetCoeff(p1), lc2 = pGetCoeff(p2);
+  poly m1, m2;
+  int co=0, ct = spCheckCoeff(&lc1, &lc2);
+  Exponent_t x;
+
+  if (pGetComp(p1)!=pGetComp(p2))
+  {
+    if (pGetComp(p1)==0)
+    {
+      co=1;
+      pSetCompP(p1,pGetComp(p2));
+    }
+    else
+    {
+      co=2;
+      pSetCompP(p2,pGetComp(p1));
+    }
+  }
+
+  // get m1 = LCM(LM(p1), LM(p2))/LM(p1)
+  //     m2 = LCM(LM(p1), LM(p2))/LM(p2)
+  m1 = pInit();
+  m2 = pInit();
+  for (int i = pVariables; i; i--)
+  {
+    x = pGetExpDiff(p1, p2, i);
+    if (x > 0)
+    {
+      pSetExp(m2,i,x);
+      pSetExp(m1,i,0);
+    }
+    else
+    {
+      pSetExp(m1,i,-x);
+      pSetExp(m2,i,0);
+    }
+  }
+  pSetm(m1);
+  pSetm(m2);           // now we have m1 * LM(p1) == m2 * LM(p2)
+  pSetCoeff0(m1, lc2);
+  pSetCoeff0(m2, lc1); // and now, m1 * LT(p1) == m2 * LT(p2)
+
+  // get m2 * a2
+  a2 = kb_p_Mult_m_General(a2, m2);
+#ifdef HAVE_LENGTH
+  if (l1 <= 0) l1 = pLength(a1); else l1--;
+  if (l2 <= 0) l2 = pLength(a2); else l2--;
+#endif
+  // and, finally, the spoly
+  kb_p_Minus_m_Mult_q_General(&a2, &l2, m1, a1, l1);
+  
+  // Clean-up time
+  pDelete1(&m1);
+  pDelete1(&m2);
+  
+  if (co != 0)
+  {
+    if (co==1)
+    {
+      spModuleToPoly(p1);
+    }
+    else
+    {
+      spModuleToPoly(p2);
+    }
+  }
+  *sp = a2;
+  *lsp = l2;
+  pTest(*sp);
+}
 
 /***************************************************************
  *
@@ -53,7 +201,9 @@ void kb_p_Add_q_General(poly *p, int *lp,
 #else
   assume(heap == NULL);
 #endif
+#ifdef HAVE_LENGTH
   assume(pLength(*p) == *lp && pLength(*q) == *lq);
+#endif
   
   number t, n1, n2;
   unsigned int l = *lp + *lq;
@@ -73,8 +223,13 @@ void kb_p_Add_q_General(poly *p, int *lp,
   }
 
   Top:     // compare a1 and a2 w.r.t. monomial ordering
-  register long d;
+//  register long d;
+  long d;
+#ifdef HAVE_COMP_MACROS
+  _pMonComp(a1, a2, d, goto NotEqual, goto Equal);
+#else
   if ((d = pComp0(a1, a2))) goto NotEqual; else goto Equal;
+#endif
 
   Equal:
   assume(pComp0(a1, a2) == 0);
@@ -137,8 +292,10 @@ void kb_p_Add_q_General(poly *p, int *lp,
   goto Top;
   
 
-  Finish:  
+  Finish:
+#ifdef HAVE_LENGTH  
   assume(pLength(pNext(&rp)) == (int) l);
+#endif
   *lp = l;
   *p  = pNext(&rp);
 }
@@ -162,13 +319,12 @@ poly  kb_p_Mult_m_General(poly p,
 #else
   assume(heap == NULL);
 #endif
+  assume(pGetComp(m) == 0);
+
   if (p == NULL) return NULL;
   spolyrec rp;
   poly q = &rp;
   number ln = pGetCoeff(m);
-  int comp = pGetComp(m);
-
-  pSetComp(m, 0);
 
   while (p != NULL)
   {
@@ -177,16 +333,14 @@ poly  kb_p_Mult_m_General(poly p,
 
     pSetCoeff0(q, nMult(ln, pGetCoeff(p)));
 
-    q->Order = p->Order + m->Order;
-    memaddW((unsigned long*) &(q->exp[0]),
-            (unsigned long*) &(p->exp[0]),
-            (unsigned long*) &(m->exp[0]),
-            pVariables1W);
+    memaddW((unsigned long*) &(q->exp.l[0]),
+            (unsigned long*) &(p->exp.l[0]),
+            (unsigned long*) &(m->exp.l[0]),
+            currRing->ExpLSize);
     
     p = pNext(p);
   }
   pNext(q) = NULL;
-  pSetComp(m, comp);
   return rp.next;
 }
 
@@ -218,9 +372,13 @@ void kb_p_Minus_m_Mult_q_General (poly *pp, int *lpp,
 #else
   assume(heap == NULL);
 #endif
+#ifdef HAVE_LENGTH
   assume(pLength(q) == lq);
   assume(pLength(*pp) == *lpp);
-  
+#endif
+  assume(pGetComp(m) == 0);
+  pTest(*pp);
+  pTest(q);
   // we are done if q == NULL
   if (q == NULL || m == NULL) return;
   
@@ -236,22 +394,23 @@ void kb_p_Minus_m_Mult_q_General (poly *pp, int *lpp,
 
   unsigned int lp = *lpp + lq;
 
-  int comp = pGetComp(m);
-  pSetComp(m, 0);
-  
   if (p == NULL) goto Finish; // we are done if p is 0
 
   kb_pNew(qm, heap);
-  qm->Order = q->Order + m->Order;
-  memaddW((unsigned long*) &(qm->exp[0]),
-          (unsigned long*) &(q->exp[0]),
-          (unsigned long*) &(m->exp[0]),
-          pVariables1W);
+  memaddW((unsigned long*) &(qm->exp.l[0]),
+          (unsigned long*) &(q->exp.l[0]),
+          (unsigned long*) &(m->exp.l[0]),
+          currRing->ExpLSize);
   
   // MAIN LOOP:
   Top:     // compare qm = m*q and p w.r.t. monomial ordering
-    register long d;
+//    register long d;
+  long d;
+#ifdef HAVE_COMP_MACROS
+    _pMonComp(qm, p, d, goto NotEqual, goto Equal);
+#else
     if ((d = pComp0(qm, p))) goto NotEqual; else goto Equal;
+#endif
 
   Equal:   // qm equals p
     tb = nMult(pGetCoeff(q), tm);
@@ -275,11 +434,10 @@ void kb_p_Minus_m_Mult_q_General (poly *pp, int *lpp,
     pIter(q);
     if (q == NULL || p == NULL) goto Finish; // are we done ?
     // no, so update qm
-    qm->Order = q->Order + m->Order;
-    memaddW((unsigned long*) &(qm->exp[0]),
-            (unsigned long*) &(q->exp[0]),
-            (unsigned long*) &(m->exp[0]),
-            pVariables1W);
+    memaddW((unsigned long*) &(qm->exp.l[0]),
+            (unsigned long*) &(q->exp.l[0]),
+            (unsigned long*) &(m->exp.l[0]),
+            currRing->ExpLSize);
     goto Top;
 
   NotEqual:     // qm != p 
@@ -302,22 +460,20 @@ void kb_p_Minus_m_Mult_q_General (poly *pp, int *lpp,
       }
       // construct new qm 
       kb_pNew(qm, heap);
-      qm->Order = q->Order + m->Order;
-      memaddW((unsigned long*) &(qm->exp[0]),
-              (unsigned long*) &(q->exp[0]),
-              (unsigned long*) &(m->exp[0]),
-              pVariables1W);
+      memaddW((unsigned long*) &(qm->exp.l[0]),
+              (unsigned long*) &(q->exp.l[0]),
+              (unsigned long*) &(m->exp.l[0]),
+              currRing->ExpLSize);
       goto Top;
     }
  
  Finish: // q or p is NULL: Clean-up time
-   pSetComp(m, comp);
    if (q == NULL) // append rest of p to result
      pNext(a) = p;
    else  // append (- q*m) to result
    {
      pSetCoeff0(m, tneg);
-     pNext(a) = kb_p_Mult_m(q, m, spNoether, heap);
+     pNext(a) = kb_p_Mult_m_General(q, m, spNoether, heap);
      pSetCoeff0(m, tm);
    }
    
@@ -327,9 +483,11 @@ void kb_p_Minus_m_Mult_q_General (poly *pp, int *lpp,
    *pp = pNext(m);
    *lpp = lp;
    pNext(m) = NULL;
-   
+
+#ifdef HAVE_LENGTH   
    assume(pLength(*pp) == *lpp);
-   pHeapTest(*pp, heap);
+#endif
+   pTest(*pp);
 } 
 
 
@@ -392,6 +550,9 @@ void kbSetPolyProcs(kbPolyProcs_pt pprocs,
       case rOrderType_Syz2dpc:
         ot = otSYZDPC;
         break;
+        
+      case rOrderType_ExpNoComp:
+        ot = otExpNoComp;
         
       default:
         ot = otGEN;
