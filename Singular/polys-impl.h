@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.18 1998-03-16 14:56:38 obachman Exp $ */
+/* $Id: polys-impl.h,v 1.19 1998-03-17 10:59:57 obachman Exp $ */
 
 /***************************************************************
  *
@@ -18,7 +18,6 @@
 #include "tok.h"
 #include "structs.h"
 #include "mmemory.h"
-#include "binom.h"
 
 /***************************************************************
  *
@@ -35,86 +34,22 @@ typedef Exponent_t  monomial[VARS + 1];
 typedef Exponent_t* Exponent_pt;
 
 typedef long Order_t;
-// make sure that exp is aligned
 struct  spolyrec
 {
   poly      next;
   number    coef;
   Order_t   Order;
-  #ifdef TEST_MAC_DEBUG
-  Order_t   MOrder;
-  #endif
-  monomial  exp;
+  monomial  exp; // make sure that exp is aligned
 };
 
-/***************************************************************
- * MACROS CONTROLING MONOMIAL COMPARIONS:
-
- * COMP_TRADITIONAL
-     Keeps the traditional comparison routines
-     defined -- needed as long as their might be comparisons with
-     negativ components.
-     All the traditional routines are prefixed by t_
-
- * COMP_FAST
-     Implements monomial operations using the fast vector
-     techniques and several other extensions which go along with that.
-     Undefine in case there are problems.
-
- * COMP_STATISTIC
-     Provides several routines for accumulating statistics on monomial
-     comparisons and divisibility tests
-
- * COMP_DEBUG
-     Turns on debugging of COMP_FAST by comparing the results of fast
-     comparison with traditional comparison
-
- * COMP_NO_EXP_VECTOR_OPS
-    Like COMP_FAST, except that it turns off "vector techniques" of
-    monomial operations, i.e. does everything exponent-wise.
- ***************************************************************/
-#define COMP_FAST
-// #define COMP_DEBUG
-// #define COMP_NO_EXP_VECTOR_OPS
-#define COMP_TRADITIONAL
-
-#if defined(COMP_NO_EXP_VECTOR_OPS) && ! defined(COMP_FAST)
-#define COMP_FAST
-#endif
-
-#if defined(COMP_FAST) && ! defined(NDEBUG)
-#define COMP_DEBUG
-#endif
-
-// some relations between these flags
-#ifdef COMP_DEBUG
-#define COMP_TRADITIONAL
-#define COMP_FAST
-#undef  COMP_PROFILE
-#undef  COMP_STATISTICS
-#endif // COMP_DEBUG
-
-#ifdef COMP_STATISTICS
-#undef COMP_FAST
-#endif // COMP_STATISTICS
-
-// for the time being COMP_TRADITIONAL always has to be defined, since
-// traditional routines are needed in spolys.cc -- monomials with
-// negative exponents are compared there!
-#define COMP_TRADITIONAL
 
 /***************************************************************
  *
- * variables used for storage management and monomial traversions
+ * variables/defines used for managment of monomials
  *
  ***************************************************************/
 
-// size of poly without exponents
-#ifdef TEST_MAC_DEBUG
-#define POLYSIZE (sizeof(poly) + sizeof(number) + 2*sizeof(Order_t))
-#else
 #define POLYSIZE (sizeof(poly) + sizeof(number) + sizeof(Order_t))
-#endif
 #define POLYSIZEW (POLYSIZE / sizeof(long))
 // number of Variables
 extern int pVariables;
@@ -122,18 +57,13 @@ extern int pVariables;
 extern int pMonomSize;
 // size of a monom in units of sizeof(void*) -- i.e. in words
 extern int pMonomSizeW;
-#ifdef COMP_FAST
 // Ceiling((pVariables+1) / sizeof(void*)) == length of exp-vector in words
 extern int pVariables1W;
 // Ceiling((pVariables) / sizeof(void*))
 extern int pVariablesW;
-extern int pCompIndex;
 extern int pVarOffset;
 extern int pVarLowIndex;
 extern int pVarHighIndex;
-#else
-#define pCompIndex 0
-#endif
 
 /***************************************************************
  *
@@ -145,32 +75,30 @@ extern int pVarHighIndex;
 //
 //
 // BIGENDIAN -- lex order
-// e_1, e_2, ... , e_n,..,comp : pVarOffset = -1,
-//                               pCompIndex = pVariables + #(..)
+// e_1, e_2, ... , e_n,comp,.. : pVarOffset = -1,
 //                               pVarLowIndex = 0,
 //                               pVarHighIndex = pVariables-1
+//                               P_COMP_INDEX = pVariables
 // BIGENDIAN -- rev lex order
-// e_n, ... , e_2, e_1,..,comp : pVarOffset = pVariables,
-//                               pCompIndex = pVariables + #(..)
+// e_n, ... , e_2, e_1,comp,.. : pVarOffset = pVariables,
 //                               pVarLowIndex = 0,
 //                               pVarHighIndex = pVariables-1
+//                               P_COMP_INDEX = pVariables
 // LITTLEENDIAN -- rev lex order
 // comp,.., e_1, e_2, ... , e_n : pVarOffset = #(..),
-//                                pCompIndex = 0,
 //                                pVarLowIndex = 1 + #(..),
 //                                pVarHighIndex = #(..) + pVariables
+//                                P_COMP_INDEX = pVariables
 // LITTLEENDIAN -- lex order
 // comp,..,e_n, .... , e_2, e_1 : pVarOffset = pVariables + 1 + #(..)
-//                                pCompIndex = 0
 //                                pVarLowIndex = 1 + #(..)
 //                                pVarHighIndex = #(..) + pVariables
+//                                P_COMP_INDEX = pVariables
 //
 // Furthermore, the size of the exponent vector is always a multiple
 // of the word size -- "empty exponents" (exactly #(..) ones) are
 // filled in between comp and first/last exponent -- i.e. comp and
 // first/last exponent might not be next to each other
-
-#ifdef COMP_FAST
 
 #ifdef WORDS_BIGENDIAN
 
@@ -192,54 +120,54 @@ extern int pVarHighIndex;
 
 #endif // WORDS_BIGENDIAN
 
-inline void pGetVarIndicies_Lex(int nvars,
-                                int &VarOffset, int &VarCompIndex,
+inline void pGetVarIndicies_Lex(int nvars, int &VarOffset,
                                 int &VarLowIndex, int &VarHighIndex)
 {
+#ifdef WORDS_BIGENDIAN
+  VarOffset    = -1;
+  VarLowIndex  = 0;
+  VarHighIndex = nvars - 1;
+#else //  ! WORDS_BIGENDIAN
   long temp = (nvars+1)*sizeof(Exponent_t);
   if ((temp % sizeof(long)) == 0)
     temp = temp / sizeof(long);
   else
     temp = (temp / sizeof(long)) + 1; // now temp == nvars1W
-#ifdef WORDS_BIGENDIAN
-  VarCompIndex = temp * sizeof(long)/sizeof(Exponent_t) - 1;
-  VarOffset    = -1;
-  VarLowIndex  = 0;
-  VarHighIndex = nvars - 1;
-#else //  ! WORDS_BIGENDIAN
   VarHighIndex = temp * sizeof(long)/sizeof(Exponent_t) - 1;
-  VarCompIndex = 0;
+  VarLowIndex  = VarHighIndex - nvars + 1;
   VarOffset    = VarHighIndex + 1;
-  VarLowIndex  = VarOffset - nvars;
 #endif // WORDS_BIGENDIAN
 }
-#define pSetVarIndicies_Lex(nvars) \
-  pGetVarIndicies_Lex(nvars,pVarOffset,pCompIndex,pVarLowIndex,pVarHighIndex)
 
-inline void pGetVarIndicies_RevLex(int nvars,
-                                   int &VarOffset, int &VarCompIndex,
+#define pSetVarIndicies_Lex(nvars) \
+  pGetVarIndicies_Lex(nvars,pVarOffset,pVarLowIndex,pVarHighIndex)
+  
+
+inline void pGetVarIndicies_RevLex(int nvars, int &VarOffset, 
                                    int &VarLowIndex, int &VarHighIndex)
 {
+#ifdef WORDS_BIGENDIAN
+  VarOffset    = nvars;
+  VarLowIndex  = 0;
+  VarHighIndex = nvars-1;
+#else //  ! WORDS_BIGENDIAN
   long temp = (nvars+1)*sizeof(Exponent_t);
   if ((temp % sizeof(long)) == 0)
     temp = temp / sizeof(long);
   else
     temp = (temp / sizeof(long)) + 1;
-#ifdef WORDS_BIGENDIAN
-  VarCompIndex = temp * sizeof(long)/sizeof(Exponent_t) - 1;
-  VarOffset    = nvars;
-  VarLowIndex  = 0;
-  VarHighIndex = nvars-1;
-#else //  ! WORDS_BIGENDIAN
-  // comp, ..., e_1, e_2, ... , e_n
   VarHighIndex = temp * sizeof(long)/sizeof(Exponent_t) - 1;
-  VarCompIndex = 0;
   VarLowIndex  = VarHighIndex - nvars + 1;
   VarOffset    = VarLowIndex - 1;
 #endif // WORDS_BIGENDIAN
 }
+#ifdef WORDS_BIGENDIAN
 #define pSetVarIndicies_RevLex(nvars) \
  pGetVarIndicies_RevLex(nvars,pVarOffset,pCompIndex,pVarLowIndex,pVarHighIndex)
+#else
+#define pSetVarIndicies_RevLex(nvars) \
+ pGetVarIndicies_RevLex(nvars,pVarOffset,pVarLowIndex, pVarLowIndex,pVarHighIndex)
+#endif
 
 // The default settings:
 inline void pGetVarIndicies(int nvars,
