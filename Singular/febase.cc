@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.51 1998-06-14 11:02:58 obachman Exp $ */
+/* $Id: febase.cc,v 1.52 1998-06-15 12:58:59 pohl Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -130,7 +130,7 @@ BOOLEAN tclmode=FALSE;
  *****************************************************************/
 
 // Define to chatter about path stuff
-// #define PATH_DEBUG
+/* #define PATH_DEBUG */
 static char* feArgv0 = NULL;
 static char* feExpandedExecutable = NULL;
 static char* feBinDir = NULL;
@@ -175,7 +175,7 @@ static char* feGetSearchPath(const char* bindir)
     env=getenv("SINGULARPATH");
 #endif
 #ifdef PATH_DEBUG
-    printf("I'm going to chatter about the Search path:\n");
+    Print("I'm going to chatter about the Search path:\n");
 #endif
     if (env != NULL)
       plength = strlen(env);
@@ -199,7 +199,7 @@ static char* feGetSearchPath(const char* bindir)
       path++;
 #ifdef PATH_DEBUG
       *(path +1) = '\0';
-      printf("Got from env var: %s\n", opath);
+      Print("Got from env var: %s\n", opath);
 #endif
     }
 
@@ -213,16 +213,16 @@ static char* feGetSearchPath(const char* bindir)
         bindir, FS_SEP,
         bindir, S_VERSION1, FS_SEP);
 #ifdef PATH_DEBUG
-      printf("From bindir: %s\n", path);
+      Print("From bindir: %s\n", path);
 #endif
       path += strlen(path);
     }
 
-    sprintf(path, "%s/Singular/LIB%c%sSingular/LIB/%s",
+    sprintf(path, "%s/Singular/LIB%c%s/Singular/LIB/%s",
             SINGULAR_ROOT_DIR, FS_SEP,
             SINGULAR_ROOT_DIR, S_VERSION1);
 #ifdef PATH_DEBUG
-    printf("From rootdir: %s\n", path);
+    Print("From rootdir: %s\n", path);
 #endif
     return CleanUpPath(opath);
 }
@@ -268,44 +268,44 @@ static char* feGetInfoFile(const char* bindir)
                                   + 30);
 
 #ifdef PATH_DEBUG
-  printf("Search for singular.hlp\n");
+  Print("Search for singular.hlp\n");
 #endif
 
   if (bindir != NULL)
   {
     sprintf(hlpfile,"%s/../doc/singular.hlp", bindir);
 #ifdef PATH_DEBUG
-    printf("trying %s -- %s\n", hlpfile, ( access(hlpfile, R_OK) ? "no" : "yes"));
+    Print("trying %s -- %s\n", hlpfile, ( access(hlpfile, R_OK) ? "no" : "yes"));
 #endif
     if (! access(hlpfile, R_OK)) return feFixFileName(hlpfile);
 
     sprintf(hlpfile,"%s/../info/singular.hlp", bindir);
 #ifdef PATH_DEBUG
-    printf("trying %s -- %s\n", hlpfile, ( access(hlpfile, R_OK) ? "no" : "yes"));
+    Print("trying %s -- %s\n", hlpfile, ( access(hlpfile, R_OK) ? "no" : "yes"));
 #endif
     if (! access(hlpfile, R_OK)) return feFixFileName(hlpfile);
 
     sprintf(hlpfile,"%s/../../doc/singular.hlp", bindir);
 #ifdef PATH_DEBUG
-    printf("trying %s -- %s\n", hlpfile, ( access(hlpfile, R_OK) ? "no" : "yes"));
+    Print("trying %s -- %s\n", hlpfile, ( access(hlpfile, R_OK) ? "no" : "yes"));
 #endif
     if (! access(hlpfile, R_OK)) return feFixFileName(hlpfile);
 
     sprintf(hlpfile,"%s/../../info/singular.hlp", bindir);
 #ifdef PATH_DEBUG
-    printf("trying %s -- %s\n", hlpfile, ( access(hlpfile, R_OK) ? "no" : "yes"));
+    Print("trying %s -- %s\n", hlpfile, ( access(hlpfile, R_OK) ? "no" : "yes"));
 #endif
     if (! access(hlpfile, R_OK)) return feFixFileName(hlpfile);
 
     sprintf(hlpfile,"%s/doc/singular.hlp", SINGULAR_ROOT_DIR);
 #ifdef PATH_DEBUG
-    printf("trying %s -- %s\n", hlpfile, ( access(hlpfile, R_OK) ? "no" : "yes"));
+    Print("trying %s -- %s\n", hlpfile, ( access(hlpfile, R_OK) ? "no" : "yes"));
 #endif
     if (! access(hlpfile, R_OK)) return feFixFileName(hlpfile);
 
     sprintf(hlpfile,"%s/info/singular.hlp", SINGULAR_ROOT_DIR);
  #ifdef PATH_DEBUG
-    printf("trying %s -- %s\n", hlpfile, ( access(hlpfile, R_OK) ? "no" : "yes"));
+    Print("trying %s -- %s\n", hlpfile, ( access(hlpfile, R_OK) ? "no" : "yes"));
 #endif
    if (! access(hlpfile, R_OK)) return feFixFileName(hlpfile);
   }
@@ -439,7 +439,7 @@ char* feGetInfoCall(const char* what)
             (*infofile != '\0' ? infofile : "Singular"));
 
 #ifdef PATH_DEBUG
-  printf("Info call with: %s \n", feInfoCall);
+  Print("Info call with: %s \n", feInfoCall);
 #endif
   return feInfoCall;
 }
@@ -463,7 +463,7 @@ static char* feRemovePathnameHead(const char* ef)
 static char* CleanUpPath(char* path)
 {
 #ifdef PATH_DEBUG
-  printf("Entered CleanUpPath with: %s\n", path);
+  Print("Entered CleanUpPath with: %s\n", path);
 #endif
   if (path == NULL) return path;
 
@@ -500,17 +500,17 @@ static char* CleanUpPath(char* path)
   for (i=0; i<n_comps; i++)
     path_comps[i] = CleanUpName(path_comps[i]);
 #ifdef PATH_DEBUG
-  printf("After CleanUpName: ");
+  Print("After CleanUpName: ");
   for (i=0; i<n_comps; i++)
-    printf("%s:", path_comps[i]);
-  printf("\n");
+    Print("%s:", path_comps[i]);
+  Print("\n");
 #endif
 
   for (i=0; i<n_comps;)
   {
 #ifdef PATH_DEBUG
     if (access(path_comps[i], X_OK))
-      printf("remove %d:%s -- can not access\n", i, path_comps[i]);
+      Print("remove %d:%s -- can not access\n", i, path_comps[i]);
 #endif
     if ( ! access(path_comps[i], X_OK))
     {
@@ -521,7 +521,7 @@ static char* CleanUpPath(char* path)
         {
           // found a duplicate
 #ifdef PATH_DEBUG
-          printf("remove %d:%s -- equal to %d:%s\n", j, path_comps[j], i, path_comps[i]);
+          Print("remove %d:%s -- equal to %d:%s\n", j, path_comps[j], i, path_comps[i]);
 #endif
           j = i+1;
           break;
@@ -551,7 +551,7 @@ static char* CleanUpPath(char* path)
   if (n_comps) strcpy(path, path_comps[i]);
   FreeL(path_comps);
 #ifdef PATH_DEBUG
-  printf("SearchPath is: %s\n", opath);
+  Print("SearchPath is: %s\n", opath);
 #endif
   return opath;
 }
@@ -582,7 +582,7 @@ static char* CleanUpName(char* fname)
           s = strrchr(fname, '/');
           if (s != NULL)
           {
-            mystrcpy(s+1, fn+3);
+            mystrcpy(s+1, fn + (*(fn + 3) != '\0' ? 4 : 3));
             fn = s-1;
           }
           else
