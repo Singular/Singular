@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmalloc.c,v 1.21 1999-12-13 17:52:12 Singular Exp $ */
+/* $Id: mmalloc.c,v 1.22 2000-03-02 17:43:49 Singular Exp $ */
 
 /*
 * ABSTRACT: implementation of alloc/free routines
@@ -393,7 +393,7 @@ void* mmDBAllocHeapSizeOf(memHeap heap, size_t size, char* file, int line)
   {
     fprintf(stderr, "ASO Error: Got heap %d:%ld but should be from heap %d:%d occured in %s:%d\n", 
             mmGetIndex(SizeFromRealSize(heap->size)), SizeFromRealSize(heap->size), 
-            mmGetIndex(size), size, file, line);
+            mmGetIndex(size), (int)size, file, line);
     fflush(stderr);
     heap = &(mm_theList[mmGetIndex(size)]);
   }
@@ -412,7 +412,7 @@ void* mmDBAlloc0HeapSizeOf(memHeap heap, size_t size, char* file, int line)
   {
     fprintf(stderr, "ASO Error: Got heap %d:%ld but should be from heap %d:%d occured in %s:%d\n", 
             mmGetIndex(SizeFromRealSize(heap->size)), SizeFromRealSize(heap->size), 
-            mmGetIndex(size), size, file, line);
+            mmGetIndex(size), (int)size, file, line);
     fflush(stderr);
     heap = &(mm_theList[mmGetIndex(size)]);
   }
@@ -432,7 +432,7 @@ void  mmDBFreeHeapSizeOf(void* addr, memHeap heap, size_t size,
   {
     fprintf(stderr, "ASO Error: Got heap %d:%ld but should be from heap %d:%d occured in %s:%d\n", 
             mmGetIndex(SizeFromRealSize(heap->size)), SizeFromRealSize(heap->size), 
-            mmGetIndex(size), size, file, line);
+            mmGetIndex(size), (int)size, file, line);
     fflush(stderr);
     heap = &(mm_theList[mmGetIndex(size)]);
   }
