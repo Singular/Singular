@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $id:$ */
+/* $Id: getopt.c,v 1.2 1998-04-17 07:53:41 Singular Exp $ */
 
 /* Getopt for GNU.
    NOTE: getopt is now part of the C library, so if you don't know what

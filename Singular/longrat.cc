@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.15 1998-01-12 17:32:47 Singular Exp $ */
+/* $Id: longrat.cc,v 1.16 1998-04-17 07:53:43 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -23,10 +23,14 @@
 #endif
 #endif
 
+static int nlPrimeM;
 static number nlMapP(number from)
 {
   number to;
+  int save=npPrimeM;
+  npPrimeM=nlPrimeM;
   to = nlInit(npInt(from));
+  npPrimeM=save;
   return to;
 }
 
@@ -41,7 +45,7 @@ BOOLEAN nlSetMap(int c, char ** par, int nop, number minpol)
   {
     if (par==NULL)
     {
-      npPrimeM=c;
+      nlPrimeM=c;
       nMap = nlMapP; /* Z/p -> Q */
       return TRUE;
     }
