@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.91 1999-11-21 12:26:48 Singular Exp $ */
+/* $Id: ring.cc,v 1.92 1999-11-22 14:22:09 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -3001,11 +3001,19 @@ BOOLEAN rComplete(ring r, int force)
   r->pCompLSize = r->pCompHighIndex - r->pCompLowIndex + 1;
   r->ordsgn=(long *)Alloc(r->pCompLSize*sizeof(long));
 
+#ifndef WORDS_BIGENDIAN
   for(j=r->pCompLowIndex;j<=r->pCompHighIndex;j++)
   {
     r->ordsgn[r->pCompLSize - (j - r->pCompLowIndex) - 1]
       = tmp_ordsgn[j-r->pCompLowIndex];
   }
+#else
+  for(j=r->pCompLowIndex;j<=r->pCompHighIndex;j++)
+  {
+    r->ordsgn[j]
+      = tmp_ordsgn[j-r->pCompLowIndex];
+  }
+#endif
 
   Free((ADDRESS)tmp_ordsgn,(2*(n+r->N)*sizeof(long)));
 
