@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.cc,v 1.9 1999-10-18 16:47:41 obachman Exp $ */
+/* $Id: kbuckets.cc,v 1.10 1999-10-18 16:49:21 obachman Exp $ */
 
 #include "mod2.h"
 #include "tok.h"
@@ -436,7 +436,6 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
                             poly spNoether)
 {
   assume (*l <= 0 || pLength(p) == *l);
-  kbTests(bucket);
   int i, l1;
   poly p1 = p;
 
