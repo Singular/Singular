@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: maps.cc,v 1.22 2000-02-10 16:46:54 Singular Exp $ */
+/* $Id: maps.cc,v 1.23 2000-05-02 16:30:44 Singular Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */
@@ -73,6 +73,7 @@ poly maEvalVariable(poly p, int v,int pExp,matrix s)
     {
       p0=MATELEM(s,v,j)=pMult(pCopy(p0/*MATELEM(s,v,j-1)*/),
                               pCopy(p/*theMap->m[v-1]*/));
+      pNormalize(p0);
     }
     res=pCopy(p0/*MATELEM(s,v,pExp)*/);
   }

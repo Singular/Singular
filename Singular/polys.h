@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.29 2000-02-02 18:04:07 Singular Exp $ */
+/* $Id: polys.h,v 1.30 2000-05-02 16:30:43 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
 */
@@ -247,6 +247,7 @@ poly      pISet(int i);
 
 void      pContent(poly p);
 void      pCleardenom(poly p);
+void      pNormalize(poly p);
 
 // homogenizes p by multiplying certain powers of the varnum-th variable
 poly      pHomogen (poly p, int varnum);
@@ -295,7 +296,6 @@ poly      pTakeOutComp(poly * p, int k);
 void      pSetPolyComp(poly p, int comp);
 void      pDeleteComp(poly * p,int k);
 void      pNorm(poly p);
-void      pNormalize(poly p);
 poly      pSubst(poly p, int n, poly e);
 poly      pJet(poly p, int m);
 poly      pJetW(poly p, int m, short * iv);
