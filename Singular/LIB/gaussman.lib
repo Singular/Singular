@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.71 2002-02-25 18:35:43 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.72 2002-02-26 09:01:38 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -357,7 +357,7 @@ static proc basisrep(matrix A0,ideal r,module H,int k0,int K)
   A0=A0+C;
 
   dbprint(printlevel-voice+2,"// transform A to saturation of H''");
-  matrix A=division(module(A0*H+s^2*diff(matrix(H),s)),H,K+1,intvec(1))[1]/s;
+  matrix A=division(A0*H+s^2*diff(matrix(H),s),H,K+1,intvec(1))[1]/s;
 
   return(A,A0,r);
 }
@@ -1199,7 +1199,7 @@ EXAMPLE:  example tmatrix; shows examples
   attrib(H,"isSB",1);
 
   dbprint(printlevel-voice+2,"// compute matrix A0+sA1 of t");
-  A=division(module(s*A*H+s^2*diff(matrix(H),s)),H,1,intvec(1))[1];
+  A=division(s*A*H+s^2*diff(matrix(H),s),H,1,intvec(1))[1];
   A0=jet(A,0);
   A=jet(A,1)/s;
 
