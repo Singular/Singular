@@ -363,7 +363,7 @@ if (size(sing))
 
       checkdump(ll);
     }
-    kill ll;
+    close(ll);
   }
 }
 
