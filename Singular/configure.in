@@ -325,6 +325,7 @@ case "$ac_cv_singuname" in
 	;;
         IRIX-6)
           LD_DYN_FLAGS="-lc"
+	  SLDFLAGS="-w -no_unresolved -_SYSTYPE_SVR4 -n32 -shared"
 	  ac_lib_dl=yes
         ;;
 esac

@@ -361,13 +361,13 @@ p_Procs_%.inc: p_Procs_Generate.cc p_Procs_Impl.h mod2.h
 	-rm -f p_Procs_$* p_Procs_$*.exe
 
 p_Procs_%.so: p_Procs_Lib_%.dl_o
-	${CXX} ${CXXFLAGS} ${SFLAGS} ${SLDFLAGS} $< -o $@
+	ld ${SLDFLAGS} -o $@ $^
 
 mpsr.so: $(MPSR_SOURCES:.cc=.dl_o)
-	${CXX} ${CXXFLAGS} ${SFLAGS} ${SLDFLAGS} ${LDFLAGS} -o $@ $^ ${MP_LIBS}
+	ld ${SLDFLAGS} -o $@ $^
 
 dbmsr.so: $(DBMSR_SOURCES:.cc=.dl_o)
-	${CXX} ${CXXFLAGS} ${SFLAGS} ${SLDFLAGS} ${LDFLAGS} -o $@ $^ ${MP_LIBS}
+	ld ${SLDFLAGS} -o $@ $^
 
 src: scanner.cc grammar.h grammar.cc libparse.cc 
 
