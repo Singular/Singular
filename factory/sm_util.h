@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: sm_util.h,v 1.2 1997-07-15 13:01:08 schmidt Exp $ */
+/* $Id: sm_util.h,v 1.3 1997-07-19 08:38:03 schmidt Exp $ */
 
 #ifndef INCL_SM_UTIL_H
 #define INCL_SM_UTIL_H
@@ -22,7 +22,7 @@
 #include "templates/ftmpl_array.h"
 #endif
 
-typedef REArray Array<REvaluation>;
+typedef Array<REvaluation> REArray;
 
 int countmonome( const CanonicalForm & f );
 
