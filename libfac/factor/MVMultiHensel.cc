@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// static char * rcsid = "$Id: MVMultiHensel.cc,v 1.6 2001-08-08 14:26:55 Singular Exp $";
+// static char * rcsid = "$Id: MVMultiHensel.cc,v 1.7 2001-08-22 14:21:17 Singular Exp $";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -111,7 +111,7 @@ diophant( int levelU , const CanonicalForm & F1 , const CanonicalForm & F2 , int
 
   // Degrees ok? degree(F1,mainvar) + degree(F2,mainvar) <= i ?
   if ( (degree(F1,levelU) + degree(F2,levelU) ) <= i ) {
-#ifdef factor/MVMultiHensel.cc
+#ifdef HAVE_SINGULAR_ERROR
     WerrorS("libfac: diophant ERROR: degree too large!  ");
 #else
 #ifndef NOSTREAMIO
@@ -410,6 +410,9 @@ MultiHensel( const CanonicalForm & mF, const CFFList & Factorlist,
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.6  2001/08/08 14:26:55  Singular
+*hannes: Dan's HAVE_SINGULAR_ERROR
+
 Revision 1.5  2001/08/08 11:59:12  Singular
 *hannes: Dan's NOSTREAMIO changes
 

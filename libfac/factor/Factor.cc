@@ -1,6 +1,6 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: Factor.cc,v 1.10 2001-08-08 14:26:55 Singular Exp $ ";
+static char * rcsid = "$Id: Factor.cc,v 1.11 2001-08-22 14:21:16 Singular Exp $ ";
 static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) michael@math.uni-sb.de \nPlease include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -725,8 +725,9 @@ Factorized( const CanonicalForm & F, const Variable & alpha, int Mainvar){
 //           * choosing an algebraic extension (n.y.u.)      //
 //           * ensuring poly is sqrfree (n.y.i.)             //
 ///////////////////////////////////////////////////////////////
+int find_mvar(const CanonicalForm &f);
 CFFList
-Factorize( const CanonicalForm & F, int is_SqrFree ){
+Factorize(const CanonicalForm & F, int is_SqrFree ){
   CFFList Outputlist,SqrFreeList,Intermediatelist,Outputlist2;
   ListIterator<CFFactor> i,j;
   CanonicalForm g=1,unit=1,r=1;
@@ -755,6 +756,17 @@ Factorize( const CanonicalForm & F, int is_SqrFree ){
     return Outputlist;
   }
   TIMING_START(factorize_time);
+  // search an "optimal" main variavble
+  int mv=F.level();
+  if (! F.isUnivariate() )
+  {
+     mv=find_mvar(F);
+     if (mv!=F.level())
+     {
+       swapvar(F,Variable(mv),F.mvar());
+     }
+  }
+
   ///////
   // Maybe it`s better to add a sqrfree-test before?
   // (If gcd is fast...)
@@ -828,6 +840,16 @@ Factorize( const CanonicalForm & F, int is_SqrFree ){
   r=F/g;
   Outputlist2.insert(CFFactor(r,1));
 
+  if ((mv!=F.level()) && (! F.isUnivariate() ))
+  {
+    CFFListIterator J=Outputlist2;
+    for ( ; J.hasItem(); J++)
+    {
+      swapvar(J.getItem().factor(),Variable(mv),F.mvar());
+    }
+    swapvar(F,Variable(mv),F.mvar());
+  }
+											 
   DEBDECLEVEL(cout, "Factorize");
   TIMING_END(factorize_time);
 
@@ -842,6 +864,9 @@ Factorize( const CanonicalForm & F, int is_SqrFree ){
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.10  2001/08/08 14:26:55  Singular
+*hannes: Dan's HAVE_SINGULAR_ERROR
+
 Revision 1.9  2001/08/08 11:59:12  Singular
 *hannes: Dan's NOSTREAMIO changes
 
