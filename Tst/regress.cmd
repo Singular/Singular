@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 #################################################################
-# $Id: regress.cmd,v 1.16 1998-06-18 08:46:11 pohl Exp $
+# $Id: regress.cmd,v 1.17 1998-06-19 08:19:11 obachman Exp $
 # FILE:    regress.cmd 
 # PURPOSE: Script which runs regress test of Singular
 # CREATED: 2/16/98
@@ -188,7 +188,7 @@ sub tst_check
   {
     if ((-r "$root.res.gz.uu") && ! ( -z "$root.res.gz.uu"))
     {
-      $exit_status = &mysystem("$uudecode $root.res.gz.uu > /dev/null 2&>1; $gunzip -f $root.res.gz");
+      $exit_status = &mysystem("$uudecode $root.res.gz.uu > /dev/null 2>&1; $gunzip -f $root.res.gz");
       if ($exit_status)
       {
 	print (STDERR "Can not decode $root.res.gz.uu\n");
