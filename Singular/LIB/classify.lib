@@ -1,11 +1,11 @@
-// $Id: classify.lib,v 1.11 1997-08-15 07:34:55 krueger Exp $
+// $Id: classify.lib,v 1.12 1997-08-15 07:46:44 krueger Exp $
 //=============================================================================
 //
 // Please send bugs and comments to krueger@mathematik.uni-kl.de
 //
 //=============================================================================
 
-LIBRARY:  Classify.lib
+LIBRARY:  classify.lib
 
  classify(f);            compute the Class of f.
 
@@ -40,10 +40,10 @@ LIBRARY:  Kclass.lib
 
 // required libraries
 
-LIB "Morse.lib";
+LIB "morse.lib";
 LIB "tools.lib";
-LIB "NFlist.lib";
-LIB "Hilbert.lib";
+LIB "nflist.lib";
+LIB "hilbert.lib";
 
 //=============================================================================
 //=============================================================================
