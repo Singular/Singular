@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.78 2001-10-09 16:36:18 Singular Exp $ */
+/* $Id: polys.cc,v 1.79 2003-01-30 14:59:59 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -691,13 +691,13 @@ void pNorm(poly p1)
 /*2
 *normalize all coeffizients
 */
-void pNormalize(poly p)
+void p_Normalize(poly p, ring r) 
 {
-  if (rField_has_simple_inverse()) return; /* Z/p, GF(p,n), R, long R/C */
+  if (rField_has_simple_inverse(r)) return; /* Z/p, GF(p,n), R, long R/C */
   while (p!=NULL)
   {
-    nTest(pGetCoeff(p));
-    nNormalize(pGetCoeff(p));
+    if (currRing==r) {nTest(pGetCoeff(p));}
+    n_Normalize(pGetCoeff(p),r);
     pIter(p);
   }
 }
