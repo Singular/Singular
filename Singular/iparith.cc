@@ -2534,13 +2534,17 @@ static BOOLEAN jjLEADCOEF(leftv res, leftv v)
 static BOOLEAN jjLEADEXP(leftv res, leftv v)
 {
   poly p=(poly)v->Data();
-  intvec *iv=new intvec(pVariables);
+  int s=pVariables;
+  if (v->Typ()==VECTOR_CMD) s++;
+  intvec *iv=new intvec(s);
   if (p!=NULL)
   {
     for(int i = pVariables;i;i--)
     {
       (*iv)[i-1]=pGetExp(p,i);
     }
+    if (s!=pVariables)
+      (*iv)[pVariables]=pGetComp(p);
   }
   res->data=(char *)iv;
   return FALSE;
