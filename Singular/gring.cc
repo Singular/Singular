@@ -6,7 +6,7 @@
  *  Purpose: p_Mult family of procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.6 2001-02-23 16:40:08 levandov Exp $
+ *  Version: $Id: gring.cc,v 1.7 2001-02-23 16:44:13 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #include "gring.h"
@@ -604,9 +604,9 @@ poly nc_uu_Mult_ww (int i, int a, int j, int b, const ring r)
       p_Setm(out,r);
       if ((a==0)||(b==0)||(i<=j)) return(out);//zero exeptions and usual case
       
-      if (r->nc->COM[UPMATELEM(i,j,r->N)]!=0) //commutative or quasicommutative case
+      if (p_GetCoeff(r->nc->COM[UPMATELEM(i,j,r->N)],r)!=0) //commutative or quasicommutative case
       {
-        if (pGetCoeff(r->nc->COM[UPMATELEM(i,j,r->N)])!=n_Init(1,r)) //commutative case
+        if (p_GetCoeff(r->nc->COM[UPMATELEM(i,j,r->N)],r)!=n_Init(1,r)) //commutative case
         {
           return(out);
         }     
