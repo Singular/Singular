@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: fereadl.c,v 1.15 2000-03-08 15:08:09 Singular Exp $ */
+/* $Id: fereadl.c,v 1.16 2000-03-09 13:18:58 Singular Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -107,12 +107,15 @@ int     fe_cursor_line; /* 0..pagelength-1*/
         #endif
         fe_is_raw_tty=0;
       }
-      for(i=fe_hist_max-1;i>=0;i--)
+      if (fe_hist!=NULL)
       {
-        FreeL((ADDRESS)fe_hist[i]);
+        for(i=fe_hist_max-1;i>=0;i--)
+        {
+          FreeL((ADDRESS)fe_hist[i]);
+        }
+        Free((ADDRESS)fe_hist,fe_hist_max*sizeof(char *));
+        fe_hist=NULL;
       }
-      Free((ADDRESS)fe_hist,fe_hist_max*sizeof(char *));
-      fe_hist=NULL;
       if (!fe_stdout_is_tty)
       {
         fclose(fe_echo);
