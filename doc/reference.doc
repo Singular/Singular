@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.17 1998-04-30 13:19:16 Singular Exp $
+@comment $Id: reference.doc,v 1.18 1998-04-30 15:41:28 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -181,7 +181,7 @@ If the attribute is not defined for this variable, attrib returns the empty stri
   ideal I=std(maxideal(2));
   attrib(I,"isSB");
   // although maxideal(2) is a standard basis,
-  // Singular does not know it:
+  // SINGULAR does not know it:
   attrib(maxideal(2), "isSB");
 @c example
 @end example
@@ -541,8 +541,8 @@ closes a link
 @example
   LIB "general.lib";
   link l="MPtcp:launch";
-  open(l); // start Singular "server" on localhost in batchmode
-  close(l); // shut down Singular server
+  open(l); // start SINGULAR "server" on localhost in batchmode
+  close(l); // shut down SINGULAR server
 @end example
 @end table
 @menu
@@ -1032,7 +1032,7 @@ See @ref{ideal}; @ref{std}; @ref{degree}; @ref{vdim}; @ref{mult}.
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
-dumps (i.e. writes in one "message" or "block") the state of the Singular
+dumps (i.e. writes in one "message" or "block") the state of the @sc{Singular}
 session (i.e., all defined variables and their values) to the specified
 link (which must be either an ASCII or MP link). 
 @item @strong{Example:}
@@ -2558,7 +2558,7 @@ returns statistics concerning the memory management:
 @item @strong{Example:}
 @example
 @c example
-  "Objects of Singular use (at the moment) ",memory(0)," bytes,"
+  "Objects of SINGULAR use (at the moment) ",memory(0)," bytes,"
    +newline+
   "allocated from system (at the moment):", memory(1), "bytes";
 @c example
@@ -3101,8 +3101,8 @@ opens a link
 @example
   LIB "general.lib";
   link l="MPtcp:launch";
-  open(l); // start Singular "server" on localhost in batchmode
-  close(l); // shut down Singular server
+  open(l); // start SINGULAR "server" on localhost in batchmode
+  close(l); // shut down SINGULAR server
 @end example
 @end table
 @menu
@@ -3194,7 +3194,7 @@ a multiplicity bound is set (see @ref{multBound})
 @item @code{degBound}
 a degree bound is set (see @ref{degBound})
 @end table
-The last set of options controls the output of Singular:
+The last set of options controls the output of @sc{Singular}:
 @table @asis
 @item @code{Imap}
 shows the mapping of variables with the imap command
@@ -4569,7 +4569,7 @@ computation or 0.
 @example
   // a listing of the current directory:
   system("sh","ls");
-  // execute a shell, return to Singular with exit
+  // execute a shell, return to SINGULAR with exit
   system("sh","sh");
   string unique_name="/tmp/xx"+string(system("pid"));
   unique_name;
@@ -4581,7 +4581,7 @@ computation or 0.
 @example
   // a listing of the current directory:
   system("sh","dir");
-  // execute a shell, return to Singular with exit:
+  // execute a shell, return to SINGULAR with exit:
   system("sh","command");
   string unique_name="/tmp/xx"+string(system("pid"));
   unique_name;
