@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.16 1998-04-30 13:17:13 Singular Exp $
+@comment $Id: general.doc,v 1.17 1998-04-30 15:33:45 Singular Exp $
 @comment this file contains the general information about Singular
 
 @menu
@@ -19,7 +19,7 @@
 
 @menu
 * How to enter and exit::       
-* Singular prompt and error recovery::  
+* SINGULAR prompt and error recovery::  
 * The online help system::      
 * Interrupting SINGULAR::       
 * Editing input::               
@@ -31,7 +31,7 @@
 
 @c --------------------------------------------------------------------------
 @c @node How to enter and exit -- command line options,General syntax,,Command Syntax
-@node How to enter and exit,Singular prompt and error recovery  , Interactive use, Interactive use
+@node How to enter and exit,SINGULAR prompt and error recovery  , Interactive use, Interactive use
 @subsection How to enter and exit
 @cindex How to enter and exit
 
@@ -80,9 +80,9 @@ systems) and finally by searching through some default directories
 (e.g., @code{/usr/local/share/Singular}).
 
 @c --------------------------------------------------------------------------
-@node Singular prompt and error recovery,The online help system,How to enter and exit, Interactive use
-@subsection Singular prompt and error recovery
-@cindex Singular prompt and error recovery
+@node SINGULAR prompt and error recovery,The online help system,How to enter and exit, Interactive use
+@subsection SINGULAR prompt and error recovery
+@cindex SINGULAR prompt and error recovery
 @cindex prompt
 @cindex error recovery
 The @sc{Singular} prompt @code{>}
@@ -90,12 +90,12 @@ asks the user for input of a command, while the prompt @code{.}
 asks the user for input of missing parts of a command (remember the
 semicolon @code{;} at the end of every command). If your input
 is erroneous @sc{Singular} may miss the semicolon.
-(It may be missed because @code{Singular} needs first a @code{"} or @code{@}}.)
+(It may be missed because @sc{Singular} needs first a @code{"} or @code{@}}.)
 On the other hand additional @code{;} will not harm @sc{Singular}:
 extra semicolons are interpreted as empty statements.
 
 @c --------------------------------------------------------------------------
-@node The online help system,Interrupting SINGULAR,Singular prompt and error recovery,Interactive use
+@node The online help system,Interrupting SINGULAR,SINGULAR prompt and error recovery,Interactive use
 @subsection The online help system
 @cindex The online help system
 
@@ -144,7 +144,7 @@ save the current line to the history and get the previous line
 kill the whole line
 @item RETURN
 save the current line to the history and
-send it to the Singular parser for interpretation
+send it to the @sc{Singular} parser for interpretation
 @end table
 @* @strong{Remark:}
 @* There is a history of the last 32 unique lines.
@@ -907,7 +907,7 @@ construct an intvec from start and end (see @ref{intvec expression})
 @item  @code{::}
 access identifiers within packages (complete name is package_name::identifier)
 @item  @code{$}
-ends @code{Singular}
+ends @sc{Singular}
 @end table
 
 @c ------------------------------------------------------------
@@ -948,7 +948,7 @@ The interpreter uses also the types
 (see @ref{typeof}).
 @end ifset
 @ifclear singularmanual
-(see section 'typeof' of the @sc{Singular Reference Manual}).
+(see section 'typeof' of the @sc{Singular Manual}).
 @end ifclear
 
 The most basic (and most complicated) object in @sc{Singular}
@@ -1332,7 +1332,7 @@ The user may add other procedures/libraries.
 @c (see @ref{procedures}; @ref{Procedures and LIB}).
 @c @end ifset
 @ifclear singularmanual
-(see 'procedures'; 'Procedures and LIB' of the @sc{Singular Reference Manual}).
+(see 'procedures'; 'Procedures and LIB' of the @sc{Singular Manual}).
 @end ifclear
 @*----------------------------------------------------------------------------
 
