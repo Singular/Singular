@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feread.cc,v 1.46 2003-03-04 16:29:51 bricken Exp $ */
+/* $Id: feread.cc,v 1.47 2003-03-04 19:35:03 bricken Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -93,6 +93,7 @@ char *command_generator (char *text, int state)
 // #undef READLINE_READLINE_H_OK
 
 extern "C" {
+  typedef char * (*RL_PROC)(const char*,int);
  #ifdef READLINE_READLINE_H_OK
   #include <readline/readline.h>
   #ifdef HAVE_READLINE_HISTORY_H
@@ -101,10 +102,10 @@ extern "C" {
  #else /* declare everything we need explicitely and do not rely on includes */
   extern char * rl_readline_name;
   extern char *rl_line_buffer;
-  char *filename_completion_function();
+  char *rl_filename_completion_function(const char*, int);
   typedef char **CPPFunction ();
 
-  extern char ** completion_matches ();
+  extern char ** rl_completion_matches (const char*, RL_PROC);
   extern CPPFunction * rl_attempted_completion_function;
   extern FILE * rl_outstream;
   extern char * readline ();
@@ -115,7 +116,7 @@ extern "C" {
   extern int history_total_bytes();
  #endif /* READLINE_READLINE_H_OK */
  typedef char * (*PROC)();
-   typedef char * (*RL_PROC)(const char*,int);
+
   typedef char **RL_CPPFunction (const char*, int,int);
 }
 
