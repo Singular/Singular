@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: COPYING.texi,v 1.3 1999-12-08 12:47:54 obachman Exp $
+@comment $Id: COPYING.texi,v 1.4 2000-01-13 12:16:47 obachman Exp $
 @comment this file contains the copyright notice on Singular
 @ifclear VERSION
 @include version.texi
@@ -140,7 +140,7 @@ Tim Wichmann.
 @cindex Pohl, Wilfred
 @cindex Schmidt, Jens
 @cindex Siebert, Thomas
-@cindex R@"Stobbe, udiger
+@cindex Stobbe, R@"udiger
 @cindex Wenk, Moritz
 @cindex Wichmann, Tim
 

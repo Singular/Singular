@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.106 1999-12-21 11:44:03 Singular Exp $
+@comment $Id: types.doc,v 1.107 2000-01-13 12:16:47 obachman Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -2611,6 +2611,9 @@ of leading terms (see @ref{vdim})
 @cindex coefficient field
 @cindex ground field
 @cindex field
+@cindex galois field
+@cindex finite field
+@cindex parameter, as numbers
 
 Numbers are elements from the coefficient field (or ground field).
 They can only be defined or accessed with respect to a basering
@@ -2642,6 +2645,12 @@ defines a number.
 
 @item Default:
 0
+
+@item Note:
+Numbers may only be declared w.r.t. the coefficient field of the current
+basering, i.e., a ring 
+has to be defined prior to any number declaration. See @ref{Rings and
+orderings} for a list of the available coeffficient fields.
 
 @item Example:
 @smallexample
@@ -2772,8 +2781,6 @@ comparison
 @strong{Note:} quotient and exponentiation is only recognized as a
 number expression if it is already a number, see @ref{Miscellaneous
 oddities}.
-@* To access the denominator or nominator of a rational number see
-@ref{Tricks and pitfalls}.
 @* For the behavior of comparison operators in rings with
 ground field different from real or the rational numbers, see @ref{boolean
 expressions}.
@@ -2808,6 +2815,9 @@ expressions}.
 @item cleardenom
 cancel denominators of numbers in poly and divide it by its content
 (see @ref{cleardenom})
+@item numerator, denominator
+return the numerator/denominator of a rational number 
+(see @ref{numerator}, @ref{denominator})
 @item leadcoef
 coefficient of the leading term (see @ref{leadcoef})
 @item par
@@ -3413,7 +3423,6 @@ For the definition of the 'coefficient_field', see @ref{Rings and orderings}.
 'names_of_ring_variables' must be a list of names or indexed names.
 
 'ordering' is a list of block orderings where each block ordering is either
-
 @enumerate
 @item
 @code{lp}, @code{dp}, @code{Dp}, @code{ls}, @code{ds}, or @code{Ds}
@@ -3483,6 +3492,11 @@ construct a new ring @math{k[X,Y]} from @math{k_1[X]}  and @math{k_2[Y]}.
   R;
 @c example
 @end smallexample
+
+@c ref
+@ref{ring_lib}
+@c ref
+
 @c ---------------------------------------
 @node string, vector, ring, Data types
 @section string
