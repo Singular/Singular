@@ -4,7 +4,7 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id: subexpr.cc,v 1.79 2002-01-10 12:33:23 Singular Exp $ */
+/* $Id: subexpr.cc,v 1.80 2002-01-18 16:35:40 Singular Exp $ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -319,7 +319,7 @@ void sleftv::CleanUp(ring r)
         n_Delete((number *)(&data),r);
         break;
       case LIST_CMD:
-        ((lists)data)->Clean();
+        ((lists)data)->Clean(r); // may contain ring-dep data
         break;
       case QRING_CMD:
       case RING_CMD:
