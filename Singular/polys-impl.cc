@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.cc,v 1.19 1998-11-10 17:18:20 Singular Exp $ */
+/* $Id: polys-impl.cc,v 1.20 1998-11-10 17:25:32 Singular Exp $ */
 
 /***************************************************************
  *
@@ -192,13 +192,13 @@ poly _pFetchCopy(ring r, poly p)
   poly res;
   poly a;
   if (p==NULL) return NULL;
-#ifdef PDEBUG
-  res = a = pDBNew(f,l);
-#else
-  res = a = pNew();
-#endif
   if (r->VarOffset == pVarOffset)
   {
+#ifdef PDEBUG
+    res = a = pDBNew(f,l);
+#else
+    res = a = pNew();
+#endif
     pCopy2(a,p);
     a->coef=nCopy(p->coef);
     pSetm(a);
