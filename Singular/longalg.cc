@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.50 2000-12-08 14:59:50 Singular Exp $ */
+/* $Id: longalg.cc,v 1.51 2000-12-08 16:20:33 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -2494,7 +2494,7 @@ BOOLEAN naSetMap(ring r)
 /*2
 * convert a alg number into a poly
 */
-poly naPermNumber(number z, int * par_perm, int P)
+poly naPermNumber(number z, int * par_perm, int P, ring r)
 {
   if (z==NULL) return NULL;
   poly res=NULL;

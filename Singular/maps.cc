@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: maps.cc,v 1.30 2000-12-06 11:03:19 Singular Exp $ */
+/* $Id: maps.cc,v 1.31 2000-12-08 16:21:31 Singular Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */
@@ -505,7 +505,7 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
     case NUMBER_CMD:
       if (P!=0)
       {
-        res->data=(void *)naPermNumber((number)data,par_perm,P);
+        res->data=(void *)naPermNumber((number)data,par_perm,P, preimage_r);
         res->rtyp=POLY_CMD;
         if (currRing->minpoly!=NULL)
           res->data=(void *)pMinPolyNormalize((poly)res->data);

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.h,v 1.22 2000-12-08 14:59:49 Singular Exp $ */
+/* $Id: longalg.h,v 1.23 2000-12-08 16:20:33 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -87,7 +87,7 @@ void    naSetIdeal(ideal I);
 #define RECA_SIZE (sizeof(alg)+sizeof(number))
 alg napAdd(alg p1, alg p2);
 void napDelete(alg *p);
-poly naPermNumber(number z, int * par_perm, int P);
+poly naPermNumber(number z, int * par_perm, int P, ring r);
 #define napVariables naNumbOfPar
 #define napNext(p) (p->ne)
 #define napIter(p) ((p) = (p)->ne)
