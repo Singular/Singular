@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.86 2001-08-27 14:47:03 Singular Exp $ */
+/* $Id: iplib.cc,v 1.87 2001-08-28 13:03:05 mschulze Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -1093,7 +1093,7 @@ BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN tellerror)
     pl = enterid( omStrDup(plib),0, PACKAGE_CMD,
                   &NSROOT(namespaceroot->root), TRUE );
 #else
-    pl = enterid( omStrDup(plib),0, PACKAGE_CMD,
+    pl = enterid( omStrDup(plib),0, PACKAGE_CMD, &IDROOT,
                   TRUE );
 #endif
     IDPACKAGE(pl)->language = LANG_C;
