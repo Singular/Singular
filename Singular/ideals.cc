@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.54 1999-08-26 12:50:12 siebert Exp $ */
+/* $Id: ideals.cc,v 1.55 1999-09-07 18:15:31 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1876,7 +1876,6 @@ ideal idQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN resultIsIdeal)
   //  resultIsIdeal=TRUE;
   //}
   hom = (tHomog)idHomModule(h1,currQuotient,&weights) ;
-  h4 = idInit(1,1);
   for (i=0; i<IDELEMS(h2); i++)
   {
     if (h2->m[i] != NULL)
@@ -1894,6 +1893,7 @@ ideal idQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN resultIsIdeal)
   p = pOne();
   pSetComp(p,kmax);
   pSetSyzComp(kmax-1);
+  h4 = idInit(16,kmax);
   q = pAdd(q,p);
   h4->m[0] = q;
   if (k2 == 0)

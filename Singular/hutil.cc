@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hutil.cc,v 1.10 1999-04-29 16:57:13 Singular Exp $ */
+/* $Id: hutil.cc,v 1.11 1999-09-07 18:15:31 Singular Exp $ */
 /*
 * ABSTRACT: Utilities for staircase operations
 */
@@ -492,16 +492,15 @@ void hRadical(scfmon rad, int *Nrad, int Nvar)
 
 void hLexS(scfmon stc, int Nstc, varset var, int Nvar)
 {
-  int  j = 1, i = 0, k, k1;
-  scmon n, o;
   if (Nstc < 2)
     return;
-  n = stc[j];
-  o = *stc;
-  k = Nvar;
+  int  j = 1, i = 0;
+  scmon n = stc[j];
+  scmon o = *stc;
+  int k = Nvar;
   loop
   {
-    k1 = var[k];
+    int k1 = var[k];
     if (o[k1] < n[k1])
     {
       i++;
@@ -525,9 +524,10 @@ void hLexS(scfmon stc, int Nstc, varset var, int Nvar)
       }
     }
     else if (o[k1] > n[k1])
-    {
-      for (k = j; k > i; k--)
-        stc[k] = stc[k - 1];
+    { 
+      int tmp_k;
+      for (tmp_k = j; tmp_k > i; tmp_k--)
+        stc[tmp_k] = stc[tmp_k - 1];
       stc[i] = n;
       j++;
       if (j < Nstc)
