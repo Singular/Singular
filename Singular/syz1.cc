@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.7 1997-05-18 11:13:14 Singular Exp $ */
+/* $Id: syz1.cc,v 1.8 1997-06-09 12:21:29 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -1752,6 +1752,8 @@ static SSet syChosePairs(SRes resPairs,intvec * Tl, int *index, int *howmuch,
     }
     (*index)++;
   }
+  if (TEST_OPT_DEGBOUND && (newdeg > Kstd1_deg))
+    return NULL;
   if (newdeg>*actdeg)
   {
     *actdeg = newdeg;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstdfac.cc,v 1.5 1997-04-25 15:04:01 obachman Exp $ */
+/* $Id: kstdfac.cc,v 1.6 1997-06-09 12:21:26 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
@@ -223,7 +223,7 @@ static void completeReduceFac (kStrategy strat, lists FL)
   }
   for (si=strat->sl; si>0; si--)
   {
-    if (strat->interpt) test_int_std(strat->kIdeal);
+    //if (strat->interpt) test_int_std(strat->kIdeal);
     strat->S[si] = redtailBba(strat->S[si],si-1,strat);
     if (TEST_OPT_INTSTRATEGY)
     {
@@ -426,7 +426,7 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
   {
     if (strat->Ll > lrmax) lrmax =strat->Ll;/*stat.*/
     if (TEST_OPT_DEBUG) messageSets(strat);
-    test_int_std(strat->kIdeal);
+    //test_int_std(strat->kIdeal);
     if (strat->Ll== 0) strat->interpt=TRUE;
     if (TEST_OPT_DEGBOUND
     && ((strat->honey && (strat->L[strat->Ll].ecart+pFDeg(strat->L[strat->Ll].p)>Kstd1_deg))

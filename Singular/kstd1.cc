@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.6 1997-05-20 08:52:08 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.7 1997-06-09 12:21:24 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -133,7 +133,7 @@ void redEcart19 (LObject* h,kStrategy strat)
     if (TEST_OPT_DEBUG) Print("%d",j);
     if (pDivisibleBy(strat->T[j].p,(*h).p))
     {
-      if (strat->interpt) test_int_std(strat->kIdeal);
+      //if (strat->interpt) test_int_std(strat->kIdeal);
       if (TEST_OPT_DEBUG) PrintS("+");
       /*- compute the s-polynomial -*/
       if (strat->T[j].ecart > (*h).ecart)
@@ -259,7 +259,7 @@ void redEcart (LObject* h,kStrategy strat)
     if (TEST_OPT_DEBUG) Print("%d",j);
     if (pDivisibleBy(strat->T[j].p,(*h).p))
     {
-      if (strat->interpt) test_int_std(strat->kIdeal);
+      //if (strat->interpt) test_int_std(strat->kIdeal);
       if (TEST_OPT_DEBUG) PrintS("+");
       /*- compute the s-polynomial -*/
       pi = strat->T[j].p;
@@ -428,7 +428,7 @@ void redFirst (LObject* h,kStrategy strat)
     if (TEST_OPT_DEBUG) Print("%d",j);
     if (pDivisibleBy(strat->T[j].p,(*h).p))
     {
-      if (strat->interpt) test_int_std(strat->kIdeal);
+      //if (strat->interpt) test_int_std(strat->kIdeal);
       if (TEST_OPT_DEBUG) PrintS("+\n");
       /*
       * the polynomial to reduce with is;
@@ -531,7 +531,7 @@ void redMoraBest (LObject* h,kStrategy strat)
     if (TEST_OPT_DEBUG) Print("%d",j);
     if (pDivisibleBy(strat->T[j].p,(*h).p))
     {
-      if (strat->interpt) test_int_std(strat->kIdeal);
+      //if (strat->interpt) test_int_std(strat->kIdeal);
       if (TEST_OPT_DEBUG) PrintS("+");
       /*- compute the s-polynomial -*/
       pi = strat->T[j].p;
@@ -705,7 +705,7 @@ static poly redMoraNF (poly h,kStrategy strat)
     if (TEST_OPT_DEBUG) Print("%d",j);
     if (pDivisibleBy(strat->T[j].p,H.p))
     {
-      if (strat->interpt) test_int_std(strat->kIdeal);
+      //if (strat->interpt) test_int_std(strat->kIdeal);
       if (TEST_OPT_DEBUG) PrintS("+");
       /*- remember the found T-poly -*/
       pi = strat->T[j].p;
@@ -1324,7 +1324,7 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   while (strat->Ll >= 0)
   {
     if (lrmax< strat->Ll) lrmax=strat->Ll; /*stat*/
-    test_int_std(strat->kIdeal);
+    //test_int_std(strat->kIdeal);
     if (TEST_OPT_DEBUG) messageSets(strat);
     if (TEST_OPT_DEGBOUND
     && (strat->L[strat->Ll].ecart+pFDeg(strat->L[strat->Ll].p)> Kstd1_deg))

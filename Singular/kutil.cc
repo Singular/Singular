@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.5 1997-05-21 13:05:13 obachman Exp $ */
+/* $Id: kutil.cc,v 1.6 1997-06-09 12:21:27 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for std
 */
@@ -3544,7 +3544,7 @@ void completeReduce (kStrategy strat)
   {
     for (i=strat->sl; i>0; i--)
     {
-      if (strat->interpt) test_int_std(strat->kIdeal);
+      //if (strat->interpt) test_int_std(strat->kIdeal);
       strat->S[i] = redtailBba(strat->S[i],i-1,strat);
       if (TEST_OPT_INTSTRATEGY)
       {
@@ -3560,7 +3560,7 @@ void completeReduce (kStrategy strat)
   {
     for (i=strat->sl; i>=0; i--)
     {
-      if (strat->interpt) test_int_std(strat->kIdeal);
+      //if (strat->interpt) test_int_std(strat->kIdeal);
       strat->S[i] = redtail(strat->S[i],strat->sl,strat);
       if (TEST_OPT_INTSTRATEGY)
       {

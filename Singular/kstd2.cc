@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.4 1997-06-04 19:45:20 obachman Exp $ */
+/* $Id: kstd2.cc,v 1.5 1997-06-09 12:21:25 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -116,7 +116,7 @@ static void redSyz (LObject* h,kStrategy strat)
           }
         }
       }
-      if (strat->interpt) test_int_std(strat->kIdeal);
+      //if (strat->interpt) test_int_std(strat->kIdeal);
       /*- compute the s-polynomial -*/
       (*h).p = spSpolyRed(strat->S[j],(*h).p,strat->kNoether);
       if ((*h).p == NULL)
@@ -203,7 +203,7 @@ static void redHomog (LObject* h,kStrategy strat)
         PrintS("+\nwith ");
         wrp(strat->S[j]);
       }
-      if (strat->interpt) test_int_std(strat->kIdeal);
+      //if (strat->interpt) test_int_std(strat->kIdeal);
       /*- compute the s-polynomial -*/
       (*h).p = spSpolyRed(strat->S[j],(*h).p,strat->kNoether);
       if ((*h).p == NULL)
@@ -266,7 +266,7 @@ static void redHomog0 (LObject* h,kStrategy strat)
     if (TEST_OPT_DEBUG) Print("%d",j);
     if (pDivisibleBy(strat->T[j].p,(*h).p))
     {
-      if (strat->interpt) test_int_std(strat->kIdeal);
+      //if (strat->interpt) test_int_std(strat->kIdeal);
       if (TEST_OPT_DEBUG)
       {
         PrintS("+\nwith ");
@@ -346,7 +346,7 @@ static void redLazy (LObject* h,kStrategy strat)
     if (TEST_OPT_DEBUG) Print("%d",j);
     if (pDivisibleBy(strat->S[j],(*h).p))
     {
-      if (strat->interpt) test_int_std(strat->kIdeal);
+      //if (strat->interpt) test_int_std(strat->kIdeal);
       if (TEST_OPT_DEBUG)
       {
         PrintS("+\nwith ");
@@ -643,7 +643,7 @@ static void redBest (LObject*  h,kStrategy strat)
   {
     if (pDivisibleBy(strat->T[j].p,(*h).p))
     {
-      if (strat->interpt) test_int_std(strat->kIdeal);
+      //if (strat->interpt) test_int_std(strat->kIdeal);
       /* compute the s-polynomial */
       if (!TEST_OPT_INTSTRATEGY) pNorm((*h).p);
 #ifdef SDRING
@@ -796,7 +796,7 @@ static poly redNF (poly h,kStrategy strat)
   {
     if (pDivisibleBy(strat->S[j],h))
     {
-      if (strat->interpt) test_int_std(strat->kIdeal);
+      //if (strat->interpt) test_int_std(strat->kIdeal);
       /*- compute the s-polynomial -*/
       if (TEST_OPT_DEBUG)
       {
@@ -911,7 +911,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   {
     if (strat->Ll > lrmax) lrmax =strat->Ll;/*stat.*/
     if (TEST_OPT_DEBUG) messageSets(strat);
-    test_int_std(strat->kIdeal);
+    //test_int_std(strat->kIdeal);
     if (strat->Ll== 0) strat->interpt=TRUE;
     if (TEST_OPT_DEGBOUND
     && ((strat->honey && (strat->L[strat->Ll].ecart+pFDeg(strat->L[strat->Ll].p)>Kstd1_deg))
