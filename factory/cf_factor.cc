@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_factor.cc,v 1.22 2004-01-19 11:27:46 Singular Exp $ */
+/* $Id: cf_factor.cc,v 1.23 2004-01-20 15:39:52 Singular Exp $ */
 
 //{{{ docu
 //
@@ -159,7 +159,7 @@ void test_cff(CFFList &L,const CanonicalForm & f)
 }
 #endif
 
-static bool isPurePoly(const CanonicalForm & f)
+bool isPurePoly(const CanonicalForm & f)
 {
   if (f.level()<=0) return false;
   for (CFIterator i=f;i.hasTerms();i++)

@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_gcd.cc,v 1.22 2004-01-19 11:26:20 Singular Exp $ */
+/* $Id: cf_gcd.cc,v 1.23 2004-01-20 15:39:52 Singular Exp $ */
 
 #include <config.h>
 
@@ -18,7 +18,9 @@
 #include "ftmpl_functions.h"
 
 #ifdef HAVE_NTL
+#include <NTL/ZZX.h>
 #include "NTLconvert.h"
+bool isPurePoly(const CanonicalForm & f);
 #endif
 
 static CanonicalForm gcd_poly( const CanonicalForm & f, const CanonicalForm& g, bool modularflag );
@@ -143,30 +145,47 @@ icontent ( const CanonicalForm & f )
 CanonicalForm
 extgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, CanonicalForm & b )
 {
-    CanonicalForm contf = content( f );
-    CanonicalForm contg = content( g );
+#ifdef HAVE_NTL
+  if (isOn(SW_USE_NTL_GCD) && ( getCharacteristic() > 0 )
+  && isPurePoly(f) && isPurePoly(g))
+  {
+    zz_pContext ccc(getCharacteristic());
+    ccc.restore();
+    zz_p::init(getCharacteristic());
+    zz_pX F1=convertFacCF2NTLzzpX(f);
+    zz_pX G1=convertFacCF2NTLzzpX(g);
+    zz_pX R;
+    zz_pX A,B;
+    XGCD(R,A,B,F1,G1);
+    a=convertNTLzzpX2CF(A,f.mvar());
+    b=convertNTLzzpX2CF(B,f.mvar());
+    return convertNTLzzpX2CF(R,f.mvar());
+  }
+#endif
+  CanonicalForm contf = content( f );
+  CanonicalForm contg = content( g );
 
-    CanonicalForm p0 = f / contf, p1 = g / contg;
-    CanonicalForm f0 = 1, f1 = 0, g0 = 0, g1 = 1, q, r;
+  CanonicalForm p0 = f / contf, p1 = g / contg;
+  CanonicalForm f0 = 1, f1 = 0, g0 = 0, g1 = 1, q, r;
 
-    while ( ! p1.isZero() ) {
-        divrem( p0, p1, q, r );
-        p0 = p1; p1 = r;
-        r = g0 - g1 * q;
-        g0 = g1; g1 = r;
-        r = f0 - f1 * q;
-        f0 = f1; f1 = r;
-    }
-    CanonicalForm contp0 = content( p0 );
-    a = f0 / ( contf * contp0 );
-    b = g0 / ( contg * contp0 );
-    p0 /= contp0;
-    if ( p0.sign() < 0 ) {
-        p0 = -p0;
-        a = -a;
-        b = -b;
-    }
-    return p0;
+  while ( ! p1.isZero() ) {
+      divrem( p0, p1, q, r );
+      p0 = p1; p1 = r;
+      r = g0 - g1 * q;
+      g0 = g1; g1 = r;
+      r = f0 - f1 * q;
+      f0 = f1; f1 = r;
+  }
+  CanonicalForm contp0 = content( p0 );
+  a = f0 / ( contf * contp0 );
+  b = g0 / ( contg * contp0 );
+  p0 /= contp0;
+  if ( p0.sign() < 0 ) {
+      p0 = -p0;
+      a = -a;
+      b = -b;
+  }
+  return p0;
 }
 //}}}
 
@@ -174,7 +193,7 @@ static CanonicalForm
 gcd_poly_univar0( const CanonicalForm & F, const CanonicalForm & G, bool primitive )
 {
 #ifdef HAVE_NTL 
-  if (isOn(SW_USE_NTL_GCD))
+  if (isOn(SW_USE_NTL_GCD) && isPurePoly(F) && isPurePoly(G)) 
   {
     if ( getCharacteristic() > 0 )
     {
@@ -294,13 +313,17 @@ gcd_poly1( const CanonicalForm & f, const CanonicalForm & g, bool modularflag )
     Ci = content( pi ); Ci1 = content( pi1 );
     C = gcd( Ci, Ci1 );
     pi1 = pi1 / Ci1; pi = pi / Ci;
-    if ( pi.isUnivariate() && pi1.isUnivariate() ) {
-        if ( modularflag )
-            return gcd_poly_univar0( pi, pi1, true ) * C;
+    if ( pi.isUnivariate() && pi1.isUnivariate() )
+    {
+      if ( modularflag
+#ifdef HAVE_NTL
+      || (isOn(SW_USE_NTL_GCD) && isPurePoly(pi) && isPurePoly(pi1))
+#endif
+      )
+        return gcd_poly_univar0( pi, pi1, true ) * C;
     }
-    else
-        if ( gcd_test_one( pi1, pi, true ) )
-            return C;
+    else if ( gcd_test_one( pi1, pi, true ) )
+      return C;
     delta = degree( pi, v ) - degree( pi1, v );
     Hi = power( LC( pi1, v ), delta );
     if ( (delta+1) % 2 )
