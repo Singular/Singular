@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: prCopy.cc,v 1.1 1999-11-15 17:20:42 obachman Exp $ */
+/* $Id: prCopy.cc,v 1.2 1999-12-03 11:50:25 obachman Exp $ */
 /*
 * ABSTRACT - implementation of functions for Copy/Move/Delete for Polys
 */
@@ -51,7 +51,7 @@ poly prMergeR(poly p1, poly p2, ring r)
   if (pNext(p2) != NULL)
   {
     pIter(p);
-    pIter(p1);
+    pIter(p2);
     goto Top;
   }
   pNext(p2) = p1;

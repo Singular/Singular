@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.125 1999-12-03 11:20:14 obachman Exp $ */
+/* $Id: extra.cc,v 1.126 1999-12-03 11:50:24 obachman Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -1163,17 +1163,14 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 /*==================== thomas =================*/
     if (strcmp(sys_cmd, "thomas") == 0)
     {
-      poly p = (poly) h->Data();
+      ideal id = (ideal) h->Data();
+      id = idCopy(id);
       ring cr = currRing;
-      ring r = rCurrRingAssure_SyzComp_CompLastBlock();
-      poly p_r = prCopyR(p, cr);
-      pTest(p_r);
-      pWrite(p_r);
-      rWrite(r);
-      pDelete(&p_r);
-      assume(rCurrRingAssure_SyzComp() == currRing &&
-             rCurrRingAssure_CompLastBlock() == currRing &&
-             rCurrRingAssure_SyzComp_CompLastBlock() == currRing);
+      ring r = rCurrRingAssure_C_dp();
+      ideal id_r = idrMoveR(id, cr);
+      idTest(id_r);
+      idPrint(id_r);
+      idDelete(&id_r);
       if (r != cr)
       {
         rChangeCurrRing(cr, TRUE);
