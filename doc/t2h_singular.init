@@ -41,6 +41,21 @@ EOT
 $T2H_PRE_BODY_CLOSE = <<EOT;
 EOT
 
+# footer of top_page
+
+sub t2h_print_Top_footer
+{
+  my $fh = shift;
+  print  $fh "<BLOCKQUOTE>\n" .
+    t2h_anchor('', $T2H_HREF{Contents}, "Table of Contents") .
+      "\n<BR>\n" .
+	t2h_anchor('', $T2H_HREF{About}, "About this document") .
+	  "</BLOCKQUOTE>";
+
+  t2h_print_foot_navigation($fh);
+  t2h_print_page_foot($fh) if $T2H_SPLIT; 
+}
+
 # footer of page
 sub t2h_print_page_foot
 {

@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.150 1999-09-20 17:45:53 Singular Exp $
+@comment $Id: reference.doc,v 1.151 1999-09-20 18:21:22 obachman Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -4290,35 +4290,27 @@ string determines, which format to use to generate the string. The
 following format strings are supported:
 @table @code
 @item "betti"
-given a matrix
-@tex
-$M$
-@end tex
-@ifinfo
-M
-@end ifinfo
-(the result of a @code{betti} command), it displays
-the graded Betti numbers of
-@tex
-$R^n/M$, if $R$ denotes the basering and if $M$ is a homogeneous submodule of $R^n$.
-@end tex
-@ifinfo
-R^n/M, if R denotes the basering and if M is a homogeneous submodule of R^n.
-@end ifinfo
 The Betti numbers are printed in a matrix like format where the entry
 @tex
-$R^n/M$, if $R$ denotes the basering and if $M$ is a homogeneous submodule of $R^n$:
+$d$ in row $i$ and column $j$
 @end tex
 @ifinfo
-R^n/M, if R denotes the basering and if M is a homogeneous submodule of R^n:
+d in row i and column j
 @end ifinfo
-@*The entry d at (i,j) is the minimal number of generators in degree i+j of
-the j-th syzygy module of
+is the minimal number of generators in
+degree
 @tex
-$R^n/M$ (the 0th (resp. 1st) syzygy module of $R^n/M$ is $R^n$ (resp.@: $M$))
+$i+j$ of the $j$-th 
 @end tex
 @ifinfo
-R^n/M (the 0th (resp. 1st) syzygy module of R^n/M is R^n (resp.@: M))
+i+j of the j-th 
+@end ifinfo
+ syzygy module of
+@tex
+$R^n/M$ (the 0th and 1st syzygy module of $R^n/M$ is $R^n$ and $M$, resp).
+@end tex
+@ifinfo
+R^n/M (the 0th and 1st syzygy module of R^n/M is R^n and M, resp).
 @end ifinfo
 @item "%s"
 returns @code{string(} expression @code{)}
@@ -5369,12 +5361,6 @@ returns the version number of  @sc{Singular} as int
 @cindex contributors
 @cindex system, contributors
 returns names of people who contributed to the Singular kernel as string
-@item @code{system("random"}, int_expression @code{)}
-@cindex random
-@cindex system, random
-resets the random generator to the given value and returns it as int
-@item @code{system("random")}
-returns the seed of the random generator as int
 @item @code{system("gen")}
 @cindex gen
 @cindex system, gen
@@ -5392,22 +5378,36 @@ is int.
 @cindex Singular
 @cindex system, Singular
 returns the absolute (path) name of the running @sc{Singular} as string
-@item @code{system("}long_option_name@code{")}
-@cindex system, command-line option
-returns the value of the (command-line) option long_option_name; for
-on/off options, the return value is of type int and either 1 or 0; for
-all other options, the return type is string. @xref{Command line
-options}.
-@item @code{system("}long_option_name@code{",} expression@code{)}
+@item @code{system("}--@code{")}
+@cindex system, --
+@cindex command-line options, all values of
+prints the values of all options
+@item @code{system("}--long_option_name@code{")}
+@cindex command-line option, value of
+@cindex system, --long_option_name
+returns the value of the (command-line) option long_option_name. The
+type of the returned value is either string or int.
+@xref{Command line options}.
+@item @code{system("}--long_option_name@code{",} expression@code{)}
+@cindex command-line option, setting value of
+@cindex system, --long_option_name=value
+@cindex random number generator, seed
+@cindex browsers, setting the
+@cindex help browsers, setting the
+@cindex timer resolution, setting the
+@cindex minimal display time, setting the
 sets the value of the (command-line) option long_option_name to the
-value given by the expression. Can only be used for some options (e.g.,
-for @code{--browser}). @xref{Command line options}.
+value given by the expression. Type of the expression must be string, or 
+int.  @xref{Command line options}. For example, 
+this can be used for setting the seed of the random number generator,
+the used help browser, the minimal display time, or the timer
+resolution.
 @item @code{system("browsers");}
 @cindex system, browsers
 returns a string about available help browsers.
 @xref{The online help system}.
 @end table
-@item @strong{Example for UNIX:}
+@item @strong{Example:}
 @smallexample
 // a listing of the current directory:
 system("sh","ls");
@@ -5420,19 +5420,38 @@ system("getenv","PATH");
 @expansion{} /bin:/usr/bin:/usr/local/bin
 system("Singular");
 @expansion{} /usr/local/bin/Singular
-// report minimal display time
-system("--min-time");
-@expansion{} 0.5
-@end smallexample
-@item @strong{Example for Windows:}
-@smallexample
-// a listing of the current directory:
-system("sh","dir");
-// execute a shell, return to SINGULAR with exit:
-system("sh","command");
-string unique_name="/tmp/xx"+string(system("pid"));
-unique_name;
-@expansion{} /tmp/xx0
+// report value of all options
+system("--");
+@expansion{} // --batch           0
+@expansion{} // --execute        
+@expansion{} // --sdb             0
+@expansion{} // --echo            0
+@expansion{} // --help            0
+@expansion{} // --quiet           0
+@expansion{} // --random          937848971
+@expansion{} // --no-tty          0
+@expansion{} // --user-option    
+@expansion{} // --version         0
+@expansion{} // --browser        
+@expansion{} // --emacs           0
+@expansion{} // --no-stdlib       0
+@expansion{} // --no-rc           0
+@expansion{} // --no-warn         0
+@expansion{} // --no-out          0
+@expansion{} // --min-time        "0.5"
+@expansion{} // --mp-port        
+@expansion{} // --mp-host        
+@expansion{} // --ticks-per-sec   1
+@expansion{} // --mp-transp      
+@expansion{} // --mp-mode  
+// set minimal display time
+system("--min-time", "0.01");
+// set timer resolution to 0.01 seconds
+system("--ticks-per-sec", 100);
+// re-seed random number generator
+system("--random", 12345678);
+// set hel browser to info
+system("--browser", "info");
 @end smallexample
 @end table
 @c -------------------------------------------------
