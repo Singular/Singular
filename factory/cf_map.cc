@@ -1,11 +1,17 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_map.cc,v 1.6 1997-06-30 15:28:50 schmidt Exp $ */
+/* $Id: cf_map.cc,v 1.7 1997-07-23 16:22:34 schmidt Exp $ */
+
+//{{{ docu
+//
+// cf_map.cc - definition of class CFMap.
+//
+// Used by: cf_gcd.cc, fac_multivar.cc, sm_sparsemod.cc
+//
+//}}}
 
 #include <config.h>
 
-#include "assert.h"
-
-#include "cf_defs.h"
+#include "canonicalform.h"
 #include "cf_map.h"
 #include "cf_iter.h"
 #ifdef macintosh
@@ -14,13 +20,93 @@
 #include "templates/ftmpl_functions.h"
 #endif
 
+//{{{ static int cmpfunc ( const MapPair & p1, const MapPair & p2 )
+//{{{ docu
+//
+// cmpfunc() - compare two map pairs.
+//
+// Return -1 if p2's variable is less than p1's, 0 if they are
+// equal, 1 if p2's level is greater than p1's.
+//
+//}}}
+static int
+cmpfunc ( const MapPair & p1, const MapPair & p2 )
+{
+    if ( p1.var() > p2.var() ) return -1;
+    else if ( p1.var() == p2.var() ) return 0;
+    else return 1;
+}
+//}}}
 
-static int cmpfunc ( const MapPair & p1, const MapPair & p2 );
-static void insfunc ( MapPair & orgp, const MapPair & newp );
-static CanonicalForm subsrec( const CanonicalForm & f, const ListIterator<MapPair> & i );
+//{{{ static void insfunc ( MapPair & orgp, const MapPair & newp )
+//{{{ docu
+//
+// insfunc() - assign newp to orgp.
+//
+// cmpfunc() and insfunc() are used as functions for inserting a
+// map pair into a Map.
+//
+//}}}
+static void
+insfunc ( MapPair & orgp, const MapPair & newp )
+{
+    orgp = newp;
+}
+//}}}
 
+//{{{ static CanonicalForm subsrec( const CanonicalForm & f, const MPListIterator & i )
+//{{{ docu
+//
+// subsrec() - recursively apply the substitutions in i to f.
+//
+// Substitutes algebraic variables, too.  The substituted
+// expression are not subject to further substitutions.
+//
+//}}}
+static CanonicalForm
+subsrec( const CanonicalForm & f, const MPListIterator & i )
+{
+    if ( f.inBaseDomain() ) return f;
+    MPListIterator j = i;
+
+    // skip MapPairs larger than the main variable of f
+    while ( j.hasItem() && j.getItem().var() > f.mvar() ) j++;
+
+    if ( j.hasItem() )
+	if ( j.getItem().var() != f.mvar() ) {
+	    // simply descend if the current MapPair variable is
+	    // not the main variable of f
+	    CanonicalForm result = 0;
+	    CFIterator I;
+	    for ( I = f; I.hasTerms(); I++ )
+		result += power( f.mvar(), I.exp() ) * subsrec( I.coeff(), j );
+	    return result;
+	}
+	else {
+	    // replace the main variable of f with the image of
+	    // the current variable under MapPair
+	    CanonicalForm result = 0;
+	    CanonicalForm s = j.getItem().subst();
+	    CFIterator I;
+	    // move on to the next MapPair
+	    j++;
+	    for ( I = f; I.hasTerms(); I++ )
+		result += subsrec( I.coeff(), j ) * power( s, I.exp() );
+	    return result;
+	}
+    else
+	return f;
+}
+//}}}
+
+//{{{ MapPair& MapPair::operator = ( const MapPair & p )
+//{{{ docu
+//
+// MapPair::operator = - assignment operator.
+//
+//}}}
 MapPair&
-MapPair::operator= ( const MapPair & p )
+MapPair::operator = ( const MapPair & p )
 {
     if ( this != &p ) {
 	V = p.V;
@@ -28,53 +114,100 @@ MapPair::operator= ( const MapPair & p )
     }
     return *this;
 }
+//}}}
 
 #ifndef NOSTREAMIO
+//{{{ ostream& operator << ( ostream& s, const MapPair & p )
+//{{{ docu
+//
+// operator << - print a map pair ("V -> S").
+//
+//}}}
 ostream&
 operator << ( ostream& s, const MapPair & p )
 {
     s << p.var() << " -> " << p.subst();
     return s;
 }
+//}}}
 #endif /* NOSTREAMIO */
 
-CFMap::CFMap ( const List<CanonicalForm> & L )
+//{{{ CFMap::CFMap ( const CFList & L )
+//{{{ docu
+//
+// CFMap::CFMap() - construct a CFMap from a CFList.
+//
+// Variable[i] will be mapped to CFList[i] under the resulting
+// map.
+//
+//}}}
+CFMap::CFMap ( const CFList & L )
 {
-    ListIterator<CanonicalForm> i;
+    CFListIterator i;
     int j;
     for ( i = L, j = 1; i.hasItem(); i++, j++ )
-	P.append( MapPair( Variable(j), i.getItem() ) );
+	P.insert( MapPair( Variable(j), i.getItem() ) );
 }
+//}}}
 
+//{{{ CFMap& CFMap::operator = ( const CFMap & m )
+//{{{ docu
+//
+// CFMap::operator = - assignment operator.
+//
+//}}}
 CFMap&
-CFMap::operator= ( const CFMap & m )
+CFMap::operator = ( const CFMap & m )
 {
     if ( this != &m )
 	P = m.P;
     return *this;
 }
+//}}}
 
+//{{{ void CFMap::newpair( const Variable & v, const CanonicalForm & s )
+//{{{ docu
+//
+// CFMap::newpair() - inserts a MapPair into a CFMap.
+//
+//}}}
 void
 CFMap::newpair( const Variable & v, const CanonicalForm & s )
 {
     P.insert( MapPair( v, s ), cmpfunc, insfunc );
 }
+//}}}
 
+//{{{ CanonicalForm CFMap::operator () ( const CanonicalForm & f ) const
+//{{{ docu
+//
+// CFMap::operator () - apply the map to f.
+//
+// See subsrec() for more detailed information.
+//
+//}}}
 CanonicalForm
-CFMap::operator() ( const CanonicalForm & f ) const
+CFMap::operator () ( const CanonicalForm & f ) const
 {
-    ListIterator<MapPair> i = P;
+    MPListIterator i = P;
     return subsrec( f, i );
 }
+//}}}
 
 #ifndef NOSTREAMIO
+//{{{ ostream& operator << ( ostream& s, const CFMap & m )
+//{{{ docu
+//
+// operator << - print a CFMap ("( V[1] -> S[1], ..., V[n] -> // S[n] )".
+//
+//}}}
 ostream&
-operator<< ( ostream& s, const CFMap & m )
+operator << ( ostream& s, const CFMap & m )
 {
     if ( m.P.isEmpty() )
 	s << "( )";
     else {
-	ListIterator<MapPair> i = m.P;
+	MPListIterator i = m.P;
 	s << "( " << i.getItem();
 	i++;
 	while ( i.hasItem() ) {
@@ -85,8 +218,21 @@ operator<< ( ostream& s, const CFMap & m )
     }
     return s;
 }
+//}}}
 #endif /* NOSTREAMIO */
 
+//{{{ CanonicalForm compress ( const CanonicalForm & f, CFMap & m )
+//{{{ docu
+//
+// compress() - compress the canonical form f.
+//
+// Compress the polynomial f such that the levels of its
+// polynomial variables are ordered without any gaps starting
+// from level 1.  Return the compressed polynomial and a map m to
+// undo the compression.  That is, if f' = compress(f, m), than f
+// = m(f').
+//
+//}}}
 CanonicalForm
 compress ( const CanonicalForm & f, CFMap & m )
 {
@@ -99,6 +245,7 @@ compress ( const CanonicalForm & f, CFMap & m )
     while ( i <= level( f ) ) {
 	while( degs[i] == 0 ) i++;
 	if ( i != n ) {
+	    // swap variables and remember the swap in the map
 	    m.newpair( Variable( n ), Variable( i ) );
 	    result = swapvar( result, Variable( i ), Variable( n ) );
 	}
@@ -107,7 +254,22 @@ compress ( const CanonicalForm & f, CFMap & m )
     delete [] degs;
     return result;
 }
+//}}}
 
+//{{{ void compress ( const CFArray & a, CFMap & M, CFMap & N )
+//{{{ docu
+//
+// compress() - compress the variables occuring in an a.
+//
+// Compress the polynomial variables occuring in a so that their
+// levels are ordered without any gaps starting from level 1.
+// Return the CFMap M to realize the compression and its inverse,
+// the CFMap N.  Note that if you compress a member of a using M
+// the result of the compression is not necessarily compressed,
+// since the map is constructed using all variables occuring in
+// a.
+//
+//}}}
 void
 compress ( const CFArray & a, CFMap & M, CFMap & N )
 {
@@ -116,23 +278,29 @@ compress ( const CFArray & a, CFMap & M, CFMap & N )
 	return;
     int maxlevel = level( a[a.min()] );
     int i, j;
+
+    // get the maximum of levels in a
     for ( i = a.min() + 1; i <= a.max(); i++ )
 	if ( level( a[i] ) > maxlevel )
 	    maxlevel = level( a[i] );
     if ( maxlevel <= 0 )
 	return;
+
     int * degs = new int[maxlevel+1];
     int * tmp = new int[maxlevel+1];
     for ( i = 1; i <= maxlevel; i++ )
 	degs[i] = 0;
+
+    // calculate the union of all levels occuring in a
     for ( i = a.min(); i <= a.max(); i++ ) {
 	tmp = degrees( a[i], tmp );
 	for ( j = 1; j <= level( a[i] ); j++ )
 	    if ( tmp[j] != 0 )
 		degs[j] = 1;
     }
-    i = 1;
-    j = 1;
+
+    // create the maps
+    i = 1; j = 1;
     while ( i <= maxlevel ) {
 	if ( degs[i] != 0 ) {
 	    M.newpair( Variable(i), Variable(j) );
@@ -144,8 +312,23 @@ compress ( const CFArray & a, CFMap & M, CFMap & N )
     delete [] tmp;
     delete [] degs;
 }
+//}}}
 
-void compress ( const CanonicalForm & f, const CanonicalForm & g, CFMap & M, CFMap & N )
+//{{{ void compress ( const CanonicalForm & f, const CanonicalForm & g, CFMap & M, CFMap & N )
+//{{{ docu
+//
+// compress() - compress the variables occurring in f and g.
+//
+// Compress the polynomial variables occurring in f and g so that
+// the levels of variables common to f and g are ordered without
+// any gaps starting from level 1, whereas the variables occuring
+// in only one of f or g are moved to levels higher than the
+// levels of the common variables.  Return the CFMap M to realize
+// the compression and its inverse, the CFMap N.
+//
+//}}}
+void
+compress ( const CanonicalForm & f, const CanonicalForm & g, CFMap & M, CFMap & N )
 {
     int n = tmax( f.level(), g.level() );
     int i, k, m;
@@ -155,11 +338,13 @@ void compress ( const CanonicalForm & f, const CanonicalForm & g, CFMap & M, CFM
     for ( i = 0; i <= n; i++ ) {
 	degsf[i] = degsg[i] = 0;
     }
+
     degsf = degrees( f, degsf );
     degsg = degrees( g, degsg );
     i = 1; k = 1; m = n;
     while ( i <= n ) {
 	if ( degsf[i] > 0 && degsg[i] > 0 ) {
+	    // store common variables at the beginning
 	    if ( i != k ) {
 		M.newpair( Variable(i), Variable(k) );
 		N.newpair( Variable(k), Variable(i) );
@@ -167,54 +352,15 @@ void compress ( const CanonicalForm & f, const CanonicalForm & g, CFMap & M, CFM
 	    k++;
 	}
 	else {
+	    // all others at the end
 	    M.newpair( Variable(i), Variable(m) );
 	    N.newpair( Variable(m), Variable(i) );
 	    m--;
 	}
 	i++;
     }
+
     delete [] degsf;
     delete [] degsg;
 }
-
-// static functions
-
-int
-cmpfunc ( const MapPair & p1, const MapPair & p2 )
-{
-    if ( p1.var() > p2.var() ) return -1;
-    else if ( p1.var() == p2.var() ) return 0;
-    else return 1;
-}
-
-void
-insfunc ( MapPair & orgp, const MapPair & newp )
-{
-    orgp = newp;
-}
-
-CanonicalForm
-subsrec( const CanonicalForm & f, const ListIterator<MapPair> & i )
-{
-    if ( f.inBaseDomain() ) return f;
-    ListIterator<MapPair> j = i;
-    while ( j.hasItem() && j.getItem().var() > f.mvar() ) j++;
-    if ( j.hasItem() )
-	if ( j.getItem().var() != f.mvar() ) {
-	    CanonicalForm result = 0;
-	    CFIterator I;
-	    for ( I = f; I.hasTerms(); I++ )
-		result += power( f.mvar(), I.exp() ) * subsrec( I.coeff(), j );
-	    return result;
-	}
-	else {
-	    CanonicalForm result = 0, s = j.getItem().subst();
-	    CFIterator I;
-	    j++;
-	    for ( I = f; I.hasTerms(); I++ )
-		result += subsrec( I.coeff(), j ) * power( s, I.exp() );
-	    return result;
-	}
-    else
-	return f;
-}
+//}}}
