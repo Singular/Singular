@@ -32,7 +32,7 @@ maxid
 minbas
 mino
 modu
-mre
+; BUG ! mre
 mult
 normalf
 numvar
@@ -44,15 +44,15 @@ preim
 prim
 qrin
 rang
-re
-regul
+; BUG re
+; BUG regul 
 ringdef
 row
 rvari
 setrin
 shor
 siz
-sre
+; BUG sre
 sstring
 substit
 syzygy
@@ -67,9 +67,9 @@ vec
 wedg
 m1ex
 m2ex
-m3ex
+; BUG m3ex
 m4ex
-m5ex
+; CORE m5ex
 m7ex
 m8ex
 m9ex
@@ -81,14 +81,14 @@ m16ex
 m17ex
 m18ex
 m19ex
-polylib
+; CORE polylib
 ringlib
 lamm
 alex2
 cyclic
 mora2
 weight2
-res2
+; CORE res2
 zahlen0
 aa
 formmat
@@ -98,7 +98,7 @@ betti
 binomial
 bluff
 cring
-curve
+; CORE curve
 ord
 coef
 coeff
@@ -164,8 +164,8 @@ redtail
 string
 namof
 koszul
-res
-sres
+; BUG res 
+; CORE sres
 syzygies
 varlist
 qhw
@@ -253,14 +253,14 @@ m81si
 m82si
 m83si
 m84si
-m85si
+m85si 
 m86si
 m88si
 m89si
-m90si
+; CORE m90si
 m91si
 m92si
-m93si
+; BUG m93si
 m94si
 m95si
 m96si
@@ -281,15 +281,15 @@ m110si
 m111si
 m112si
 m113si
-m114si
-m115si
+; BUG m114si
+; BUG m115si
 m116si
 m117si
 m118si
 m119si
 m120si
 m121si
-m122si
+; CORE m122si
 m123si
 m124si
 m125si
