@@ -1,6 +1,6 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.10 1998-07-29 10:17:50 schmidt Exp $
+;; $Id: singular.el,v 1.11 1998-07-29 16:57:32 schmidt Exp $
 
 ;;; Commentary:
 
@@ -44,6 +44,7 @@
 ;; - to switch between buffer and process names, use the functions
 ;;   `singular-process-name-to-buffer-name' and
 ;;   `singular-buffer-name-to-process-name'
+;; - we assume that the buffer is *not* read-only
 
 ;;}}}
 
@@ -173,7 +174,7 @@ NOT READY [should be rewritten completely.  Interface should stay the same.]!"
     (set-keymap-parents singular-interactive-mode-map (list comint-mode-map))
     (set-keymap-name singular-interactive-mode-map
 		     'singular-interactive-mode-map)))
-  (define-key singular-interactive-mode-map "\C-m" 'singular-send-input))
+  (define-key singular-interactive-mode-map "\C-m" 'singular-send-or-copy-input))
 ;;}}}
 
 ;;{{{ Miscellaneous
@@ -258,6 +259,57 @@ consisting of white-space only is not added to the history.")
 
 This variable is used to initialize `comint-input-filter' when
 Singular interactive mode starts up.")
+;;}}}
+
+;;{{{ Skipping and stripping prompts and newlines and other things
+
+;; Note:
+;;
+;; All of these functions modify the match data!
+
+(defconst singular-extended-prompt-regexp "\\([>.] \\)"
+  "Matches one Singular prompt.
+Should not be anchored neither to start nor to end!")
+
+(defconst singular-string-start-anchored-prompt-regexp
+  (concat "\\`" singular-extended-prompt-regexp "+")
+  "Matches Singular prompt anchored to string start.")
+
+(defconst singular-prompt-sequence-regexp
+  (concat singular-extended-prompt-regexp "*")
+  "Matches an arbitary sequence of Singular prompts.")
+
+(defun singular-strip-white-space (string &optional trailing leading)
+  "Strip off trailing or leading white-space from STRING.
+Strips off trailing white-space if optional argument TRAILING is
+non-nil.
+Strips off leading white-space if optional argument LEADING is
+non-nil."
+  (let ((beg 0)
+	(end (length string)))
+    (and leading
+	 (string-match "\\`\\s-*" string)
+	 (setq beg (match-end 0)))
+    (and trailing
+	 (string-match "\\s-*\\'" string beg)
+	 (setq end (match-beginning 0)))
+    (substring string beg end)))
+
+(defun singular-strip-prompts (string where)
+  "NOT READY!"
+  (cond
+   ((eq where 'trailing) string)
+   ((eq where 'all) string)
+   (t
+    ;; default is to remove leading prompts
+    (if (string-match singular-string-start-anchored-prompt-regexp string)
+	(substring string (match-end 0))
+      string))))
+
+(defun singular-skip-prompt-forward ()
+  "Skip forward over prompts."
+  (looking-at singular-prompt-sequence-regexp)
+  (goto-char (match-end 0)))
 ;;}}}
 
 ;;{{{ Simple section stuff for both Emacs and XEmacs
@@ -456,7 +508,7 @@ Assumes that no narrowing is in effect."
 		    (eq next-overlay-change (point-max))))
       (setq next-overlay-change
 	    (next-overlay-change next-overlay-change)))
-    next-overlay-change)))
+    next-overlay-change))
 
 (defun singular-emacs-simple-sec-type (simple-sec)
   "Return type of SIMPLE-SEC."
@@ -555,6 +607,25 @@ non-nil."
   `(aref ,section 3))
 ;;}}}
 
+;;{{{ Getting section contents
+(defun singular-input-section-to-string (section &optional end raw)
+  "Get content of SECTION as string.
+Returns text between start of SECTION and END if optional argument END
+is non-nil.  END should be a position inside SECTION.
+Strips leading prompts and trailing white space unless optional argument
+RAW is non-nil."
+  (save-restriction
+    (widen)
+    (let ((string (if end
+		      (buffer-substring (singular-section-start section) end)
+		    (buffer-substring (singular-section-start section)
+				      (singular-section-end section)))))
+      (if raw string
+	(singular-strip-prompts
+	 (singular-strip-trailing-white-space string t)
+	 'leading)))))
+;;}}}
+
 ;;{{{ Folding sections
 (defvar singular-folding-ellipsis "Singular I/O ..."
   "Ellipsis to show for folded input or output.")
@@ -562,27 +633,17 @@ non-nil."
 (defun singular-fold-internal (start end fold)
   "(Un)fold region from START to END.
 Folds if FOLD is non-nil, otherwise unfolds.
-Folds without affecting undo information, buffer-modified flag, and
-even for read-only files.
+Folds without affecting undo information, but changes buffer-modified
+flag.
 Assumes that there is no narrowing in effect."
-  (let ((inhibit-read-only t) (buffer-undo-list t)
-	(modified (buffer-modified-p))
-	(old-point (point)))
-    (unwind-protect
-	;; do it !!
-	(if fold
-	    (progn
-	      (goto-char start) (insert ?\r)
-	      (subst-char-in-region start end ?\n ?\r t))
-	  (subst-char-in-region start end ?\r ?\n t)
-	  (goto-char start) (delete-char 1))
-
-      ;; we have to restore the point and the modified flag.  The read-only
-      ;; state and undo information are restored by the outer `let'.
-      ;; This code is unwide-protected.
-      (goto-char old-point)
-      (or modified
-	  (set-buffer-modified-p nil)))))
+  (save-excursion
+    (let ((buffer-undo-list t))
+      (if fold
+	  (progn
+	    (goto-char start) (insert ?\r)
+	    (subst-char-in-region start end ?\n ?\r t))
+	(subst-char-in-region start end ?\r ?\n t)
+	(goto-char start) (delete-char 1)))))
 
 (defun singular-section-foldedp (section)
   "Return t iff SECTION is folded.
@@ -644,6 +705,20 @@ This variable is buffer-local.")
 
 This variable is buffer-local.")
 
+(defvar singular-demo-end nil
+  "Marker pointing to end of demo file.
+
+This variable is buffer-local.")
+
+(defun singular-demo-mode-init ()
+  "Initialize local variables and markers beloging to demo mode."
+  (make-local-variable 'singular-demo-mode)
+  (make-local-variable 'singular-demo-mode-old-name)
+  (make-local-variable 'singular-demo-mode-end)
+  (if (not (and (boundp 'singular-demo-end)
+		singular-demo-end))
+      (setq singular-demo-end (make-marker))))
+
 (defun singular-demo-mode (on)
   "Turn Singular demo mode on if ON is non-nil, otherwise off.
 Modifies `singular-demo-mode' and buffer's mode line."
@@ -667,29 +742,29 @@ Modifies `singular-demo-mode' and buffer's mode line."
 Moves point to end of buffer and widenes the buffer such that the next
 chunk of the demo file becomes visible.
 Finds and removes chunk separators as specified by
-`singular-demo-chunk-regexp'.  This does not affect neither the undo
-information nor the buffer-modified flag nad works even for read-only
-buffers.
+`singular-demo-chunk-regexp'.
+Removing chunk separators works without affecting undo information,
+but may change buffer-modified flag.
 Returns non-nil if there is still demo text to show."
-  (let ((inhibit-read-only t) (buffer-undo-list t)
-	(modified (buffer-modified-p))
+  (let ((buffer-undo-list t)
 	(old-point-min (point-min)))
     (unwind-protect
 	(progn
 	  (goto-char (point-max))
 	  (widen)
-	  (prog1 (and (re-search-forward singular-demo-chunk-regexp
-					 nil 'limit)
-		      ;; we want to return the result of the search,
-		      ;; not of the delete.  Hence the `(or ... t)'.
-		      (or (and (match-beginning 1)
-			       (delete-region (match-beginning 1)
-					      (match-end 1)))
-			  t))))
+	  (progn
+	    (if (re-search-forward singular-demo-chunk-regexp singular-demo-end 'limit)
+		(progn
+		  (and (match-beginning 1)
+		       (delete-region (match-beginning 1) (match-end 1)))
+		  t)
+	      ;; remove trailing white-space
+	      (skip-syntax-backward "-")
+	      (delete-region (point) singular-demo-end)
+	      nil)))
 
       ;; this is unwind-protected
-      (narrow-to-region old-point-min (point))
-      (or modified (set-buffer-modified-p)))))
+      (narrow-to-region old-point-min (point)))))
 
 (defun singular-demo-load (demo-file)
   "Load demo file DEMO-FILE and switch to Singular demo mode.
@@ -703,7 +778,9 @@ makes the first chunk of the demo file visible."
 	(progn
 	  (goto-char (point-max))
 	  (widen)
-	  (insert-file-contents demo-file))
+	  ;; load file and remember its end
+	  (set-marker singular-demo-end
+		      (+ (point) (nth 1 (insert-file-contents demo-file)))))
 
       ;; completely hide demo file.
       ;; This is unwide protected.
@@ -796,7 +873,25 @@ makes the first chunk of the demo file visible."
 
 ;;}}}
 
-(defun singular-send-input (send-full-section)
+(defun singular-get-old-input (get-section)
+  "Retrieve old input.
+Retrivies from beginning of current section to point if GET-SECTION is
+non-nil, otherwise on a per-line base."
+  (if get-section
+      ;; get input from input section
+      (let ((section (singular-section-at (point))))
+	(if (eq (singular-section-type section) 'input)
+	    (setq old-input (singular-input-section-to-string section (point)))
+	  (error "Not on an input section")))
+    ;; get input from line
+    (save-excursion
+      (beginning-of-line)
+      (singular-skip-prompt-forward)
+      (let ((old-point (point)))
+	(end-of-line)
+	(buffer-substring old-point (point))))))
+
+(defun singular-send-or-copy-input (send-full-section)
   "NOT READY!!"
   (interactive "P")
 
@@ -815,11 +910,9 @@ makes the first chunk of the demo file visible."
 
      (;; get old input
       (< (point) pmark)
-      (let ((section (singular-section-at (point))))
-	(if (not (eq (singular-section-type section) 'input))
-	    (error "Not on an input section")
-	  (goto-char pmark)
-	  (insert (singular-input-section-to-string section send-full-section)))))
+      (let ((old-input (singular-get-old-input send-full-section)))
+	(goto-char (point-max))
+	(insert old-input)))
 
      (;; send input from pmark to point
       t
@@ -885,7 +978,6 @@ notes on filters\" in singular.el."
 		    (old-point-min (point-min))
 		    (old-point-max (point-max))
 		    (old-pmark (marker-position (process-mark process)))
-		    (inhibit-read-only t)
 		    (n (length string)))
 		(widen)
 		(goto-char old-pmark)
@@ -983,9 +1075,8 @@ NOT READY [much more to come.  See shell.el.]!"
 	  (equal (file-truename comint-input-ring-file-name) "/dev/null"))
       (setq comint-input-ring-file-name nil))
 
-  ;; make our own local variables
-  (make-local-variable 'singular-demo-mode)
-  (make-local-variable 'singular-demo-old-mode-name)
+  ;; initialize singular demo mode
+  (singular-demo-mode-init)
 
   ;; selective display
   (setq selective-display t)
