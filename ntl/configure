@@ -30,7 +30,7 @@ fi
 
 if test x$SING_CXX = x
 then
-  SING_CC=g++
+  SING_CXX=g++
 fi
 
 if test x$CFLAGS = x
