@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sparsmat.cc,v 1.18 1999-11-15 17:20:50 obachman Exp $ */
+/* $Id: sparsmat.cc,v 1.19 1999-11-22 12:40:03 Singular Exp $ */
 
 /*
 * ABSTRACT: operations with sparse matrices (bareiss, ...)
@@ -189,10 +189,10 @@ void smRingClean(ring origR, ip_sring &tmpR)
 */
 poly smCallDet(ideal I)
 {
-  int r=idRankFreeModule(I);
-  if (I->ncols != r)
+  //int r=idRankFreeModule(I);
+  if (I->ncols != I->rank)
   {
-    Werror("det of %d x %d module (matrix)",r,I->ncols);
+    Werror("det of %d x %d module (matrix)",I->rank,I->ncols);
     return NULL;
   }
   number diag,h=nInit(1);
