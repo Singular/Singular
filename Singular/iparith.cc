@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.14 1997-04-02 15:07:07 Singular Exp $ */
+/* $Id: iparith.cc,v 1.15 1997-04-07 15:22:14 Singular Exp $ */
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
 */
@@ -1801,7 +1801,9 @@ static BOOLEAN jjWEDGE(leftv res, leftv u, leftv v)
   res->data = (char *)mpWedge((matrix)u->Data(),(int)v->Data());
   return FALSE;
 }
-static BOOLEAN jjWRONG2(leftv res, leftv u, leftv v)
+#define jjWRONG2 (proc2)jjWRONG
+#define jjWRONG3 (proc3)jjWRONG
+static BOOLEAN jjWRONG(leftv res, leftv u)
 {
   return TRUE;
 }
@@ -2057,10 +2059,6 @@ static BOOLEAN jjDUMMY(leftv res, leftv u)
 {
   res->data = (char *)u->CopyD();
   return FALSE;
-}
-static BOOLEAN jjWRONG(leftv res, leftv u)
-{
-  return TRUE;
 }
 //static BOOLEAN jjPLUSPLUS(leftv res, leftv u)
 //{
@@ -3644,7 +3642,7 @@ struct sValCmd3 dArith3[]=
 #ifdef HAVE_LIBFACTORY
 ,{jjRESULTANT,      RESULTANT_CMD, POLY_CMD,POLY_CMD,   POLY_CMD,   POLY_CMD }
 #else
-,{(proc3)jjWRONG2,  RESULTANT_CMD, POLY_CMD,POLY_CMD,   POLY_CMD,   POLY_CMD }
+,{jjWRONG3,         RESULTANT_CMD, POLY_CMD,POLY_CMD,   POLY_CMD,   POLY_CMD }
 #endif
 ,{jjRES3,           SRES_CMD,   NONE,       IDEAL_CMD,  INT_CMD,    ANY_TYPE }
 ,{jjRES3,           SRES_CMD,   NONE,       MODUL_CMD,  INT_CMD,    ANY_TYPE }
@@ -4100,7 +4098,7 @@ void ttGen1()
   while ((op=dArith3[i].cmd)!=0)
   {
     char *s = iiTwoOps(op);
-    if (dArith3[i].p==(proc3)jjWRONG2)
+    if (dArith3[i].p==jjWRONG3)
       fprintf(outfile,"// DUMMY ");
     fprintf(outfile,"// operation: %s (%s, %s, %s)  ->  %s\n",
           s,
