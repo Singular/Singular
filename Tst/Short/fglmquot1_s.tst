@@ -1,13 +1,13 @@
-// $Id: fglmquot1_s.tst,v 1.2 1999-11-24 13:34:48 wichmann Exp $
+// $Id: fglmquot1_s.tst,v 1.3 1999-11-24 13:38:05 wichmann Exp $
 
 //
-// fglm_s.tst - short tests for fglmquotient
+// fglmquot1_s.tst - short tests for fglmquot command
 //
 
 
 LIB "tst.lib";
 tst_init();
-tst_ignore("CVS: $Id: fglmquot1_s.tst,v 1.2 1999-11-24 13:34:48 wichmann Exp $");
+tst_ignore("CVS: $Id: fglmquot1_s.tst,v 1.3 1999-11-24 13:38:05 wichmann Exp $");
 
 option(redSB);
 
