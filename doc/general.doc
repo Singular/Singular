@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.109 1998-10-26 15:05:36 obachman Exp $
+@comment $Id: general.doc,v 1.110 1998-12-10 15:38:02 obachman Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -2284,8 +2284,8 @@ EXAMPLE: example Test; shows an example
 @{   ...
    int p = printlevel - voice + 3;
     ...
-   dpprint(p,"comment1");
-   dpprint(p-1,"comment2");   
+   dbprint(p,"comment1");
+   dbprint(p-1,"comment2");   
    // dbprint prints only if p > 0
     ...
 @}
