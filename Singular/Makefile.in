@@ -247,8 +247,8 @@ libparse.cc: libparse.l
 	fi
 	${LEX} -I -Pyylp -olibparse.cc libparse.l
 
-ESingular: feResource.cc mod2.h feCmdLineOptions.cc version.h emacs.cc
-	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${DEFS} -o ESingular emacs.cc
+ESingular: getopt.o feResource.cc mod2.h feCmdLineOptions.cc version.h emacs.cc
+	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${DEFS} -o ESingular emacs.cc getopt.o ${LDFLAGS} ${LIBS}
 
 src: scanner.cc grammar.h grammar.cc libparse.cc spSpolyLoop.inc
 
