@@ -378,7 +378,27 @@ poly pFastPower(poly f, int n, ring r){
   omfree(int_pot_array);
   return erg;
 }
+static omBin lm_bin=NULL;
+/*3
+* compute for monomials p*q
+* destroys p, keeps q
+*/
+static void p_MonMultMB(poly p, poly q,ring r)
+{
+  number x, y;
+  // int i;
 
+  y = p_GetCoeff(p,r);
+  x = n_Mult(y,pGetCoeff(q),r);
+  n_Delete(&y,r);
+  p_SetCoeff0(p,x,r);
+  //for (i=pVariables; i!=0; i--)
+  //{
+  //  pAddExp(p,i, pGetExp(q,i));
+  //}
+  //p->Order += q->Order;
+  p_ExpVectorAdd(p,q,r);
+}
 static poly p_MonPowerMB(poly p, int exp, ring r)
 {
   int i;
@@ -398,10 +418,10 @@ static poly p_MonPowerMB(poly p, int exp, ring r)
   p_Setm(p,r);
   return p;
 }
-static void buildTermAndAdd(int n,number* facult,poly* f_terms,int* exp,int f_len,kBucket_pt erg_bucket,ring r, number coef){
+static void buildTermAndAdd(int n,number* facult,poly* f_terms,int* exp,int f_len,kBucket_pt erg_bucket,ring r, number coef, poly & zw, poly tmp){
  
   int i;
-  poly term=p_Init(r);
+  //  poly term=p_Init(r);
 
    //  number denom=n_Init(1,r);
 //   for(i=0;i<f_len;i++){
@@ -415,32 +435,51 @@ static void buildTermAndAdd(int n,number* facult,poly* f_terms,int* exp,int f_le
 //   number coef=n_IntDiv(facult[n],denom,r);   //right function here?
 //   n_Delete(&denom,r);
 //   poly erg=p_NSet(coef,r);
-  poly erg=p_NSet(n_Copy(coef,r),r);
+  poly erg=p_Init(r,lm_bin);
+  p_SetCoeff0(erg, coef,r);
+  //p_NSet(n_Copy(coef,r),r);
   for(i=0;i<f_len;i++){
     if(exp[i]!=0){
-      poly term=p_Copy(f_terms[i],r);
-      term->next=NULL;
+      ///poly term=p_Copy(f_terms[i],r);
+      poly term=tmp;
+      p_ExpVectorCopy(term,f_terms[i],r);
+      p_SetCoeff(term, n_Copy(p_GetCoeff(f_terms[i],r),r),r);
+      //term->next=NULL;
+      
       p_MonPowerMB(term, exp[i],r);
-      erg=p_Mult_mm(erg,term,r);
-      p_Delete(&term,r);
+      p_MonMultMB(erg,term,r);
+      //p_Delete(&term,r);
     }
     
   }
   int pseudo_len=1;
-  kBucket_Add_q(erg_bucket,erg,&pseudo_len);
+  zw=erg;
+  //  kBucket_Add_q(erg_bucket,erg,&pseudo_len);
 }
 
 
 
-static void MC_iterate(poly f, int n, ring r, int f_len,number* facult, int* exp,poly* f_terms,kBucket_pt erg_bucket,int pos,int sum, number coef){
+static void MC_iterate(poly f, int n, ring r, int f_len,number* facult, int* exp,poly* f_terms,kBucket_pt erg_bucket,int pos,int sum, number coef, poly & zw, poly tmp){
   int i;
 
   if (pos<f_len-1){
+    poly zw_l=NULL;
     for(i=0;i<=n-sum;i++){
       exp[pos]=i;
       number new_coef=n_IntDiv(coef,facult[i],r);
-      MC_iterate(f, n, r, f_len,facult, exp,f_terms,erg_bucket,pos+1,sum+i,new_coef);
+      poly zw_real=NULL;
+      MC_iterate(f, n, r, f_len,facult, exp,f_terms,erg_bucket,pos+1,sum+i,new_coef,zw_real,tmp);
+      if (pos==f_len-2){
+	//get first small polys
+	
+	zw_real->next=zw_l;
+	zw_l=zw_real;
+      }
       n_Delete(& new_coef,r);
+    }
+    if (pos==f_len-2){
+      int len=n-sum+1;
+      kBucket_Add_q(erg_bucket,zw_l,&len);
     }
     return;
   }
@@ -448,16 +487,18 @@ static void MC_iterate(poly f, int n, ring r, int f_len,number* facult, int* exp
     i=n-sum;
     exp[pos]=i;
     number new_coef=n_IntDiv(coef,facult[i],r);
-    buildTermAndAdd(n,facult,f_terms,exp,f_len,erg_bucket,r, new_coef);
-    n_Delete(& new_coef,r);
+    buildTermAndAdd(n,facult,f_terms,exp,f_len,erg_bucket,r, new_coef,zw, tmp);
+    // n_Delete(& new_coef,r);
   }
   assume(pos<=f_len-1);
 }
 poly pFastPowerMC(poly f, int n, ring r){
   //only char=0
+  
   if(rChar(r)!=0)
     Werror("Char not 0, pFastPowerMC not implemented for this case");
-
+  if (n<=1)
+    Werror("not implemented for so small n, recursion fails");
   //  number null_number=n_Init(0,r);
   number* facult=(number*) omalloc((n+1)*sizeof(number));
   facult[0]=n_Init(1,r);
@@ -467,6 +508,9 @@ poly pFastPowerMC(poly f, int n, ring r){
     facult[i]=n_Mult(this_n,facult[i-1],r);
     n_Delete(&this_n,r);
   }
+
+  lm_bin=omGetSpecBin(POLYSIZE + (r->ExpL_Size)*sizeof(long));
+
   kBucket_pt erg_bucket= kBucketCreate(currRing);
   kBucketInit(erg_bucket,NULL,0);
   const int f_len=pLength(f);
@@ -479,19 +523,22 @@ poly pFastPowerMC(poly f, int n, ring r){
     f_iter=pNext(f_iter);
   }
   assume(f_iter==NULL);
-  MC_iterate(f,n,r,f_len,&facult[0], &exp[0], &f_terms[0],erg_bucket,0,0,facult[n]);
+  poly zw=NULL;
+  poly tmp=p_Init(r);
+  MC_iterate(f,n,r,f_len,&facult[0], &exp[0], &f_terms[0],erg_bucket,0,0,facult[n],zw,tmp);
 
 
 
 
 
-
+  
   //free res
   
   //free facult
   for(i=0;i<=n;i++){
-    nDelete(&facult[i]);
+    n_Delete(&facult[i],r);
   }
+  p_Delete(&tmp,r);
   omfree(exp);
   omfree(facult);
   omfree(f_terms);
@@ -499,5 +546,6 @@ poly pFastPowerMC(poly f, int n, ring r){
   poly erg;
   kBucketClear(erg_bucket,&erg, &len);
   kBucketDestroy(&erg_bucket);
+  omUnGetSpecBin(&lm_bin);
   return erg;
 }
