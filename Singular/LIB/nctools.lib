@@ -1,8 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: nctools.lib,v 1.1 2004-03-18 20:40:22 levandov Exp $";
+version="$Id: nctools.lib,v 1.2 2004-03-18 21:34:03 levandov Exp $";
 category="Noncommutative";
 info="
-LIBRARY: nctools.lib     General Tools for Noncommutative Algebras
+LIBRARY: nctools.lib     General tools for noncommutative algebras
 AUTHORS:   Levandovskyy V.,     levandov@mathematik.uni-kl.de,
 @*         Lobillo, F.J.,    jlobillo@ugr.es,
 @*	   Rabelo, C.,      crabelo@ugr.es.
@@ -16,6 +16,7 @@ weightedRing(r);	Changes the ordering of a ring to a weighted one,
 ndc([v]);               Computes the ideal of non-degeneracy conditions in G-algebra,
 RootOfUnity(n);         Computes the minimal polynomial for the n-th primitive root of unity,
 Weyl([p]);              Creates Weyl algebra structure in a basering (two different realizations),
+CreateWeyl(n, [p]);      Returns n-th Weyl algebra in x(i),D(i) presentation; in char p, if an integer p is given
 Heisenberg(N, [p]);     Returns N-th  Heisenberg algebra in x(i),y(i),h(i) realization,
 Exterior();             Returns qring, the exterior algebra of a basering,
 Fin_dim_algebra(matrix M, list #); Creates finite dimensional algebra structure from the multiplication matrix M,
@@ -729,6 +730,7 @@ example
 proc Heisenberg(int N, list #)
 "USAGE:   Heisenberg(N, [p]); N an integer (setting 3*N variables), p an optional integer (field characteristic)
 RETURN:  N-th  Heisenberg algebra in x(i),y(i),h(i) realization
+NOTE: you have to activate this ring with the "setring" command
 EXAMPLE: example Heisenberg; shows examples
 "
 {
@@ -754,14 +756,16 @@ example
 {
   "EXAMPLE:";echo=2;
   def a=Heisenberg(2);
-  setring a; a;
+  setring a; 
+  a;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 proc Exterior(list #)
 "USAGE:   Exterior();
-RETURN:  qring, the exterior algebra of a basering. 
+RETURN:  qring, the exterior algebra of a basering
+NOTE: you have to activate this qring with the "setring" command
 EXAMPLE: example Exterior; shows examples
 "
 {
@@ -798,3 +802,38 @@ example
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+
+proc CreateWeyl(int n, list #)
+"USAGE:   CreateWeyl(n,[p]); n an integer, n>0; p an optional integer (field characteristic)
+RETURN:  a ring, describing n-th Weyl algebra
+NOTE:    You have to activate this ring with the "setring" command.
+         The presentation of n-th Weyl algebra is classical:
+	 D(i)x(i)=x(i)D(i)+1
+SEE ALSO: Weyl
+EXAMPLE: example CreateWeyl; shows examples
+"{
+  if (n<1)
+  {
+    Print("Incorrect input");
+    return();
+  }
+  int @p = 0;
+  if ( size(#) > 0 )
+  {
+    if ( typeof( #[1] ) == "int" )
+    {
+      @p = #[1];
+    }
+  }
+  ring @rr=@p,(x(1..n),D(1..n)),dp;
+  Weyl();
+  return(@rr);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   def a = CreateWeyl(3);
+   setring a;
+   a;
+}
+
+//////////////////////////////////////////////////////////////////////
