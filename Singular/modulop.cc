@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.cc,v 1.30 2003-06-03 21:28:57 krueger Exp $ */
+/* $Id: modulop.cc,v 1.31 2003-06-14 14:55:57 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
@@ -49,7 +49,7 @@ BOOLEAN npGreaterZero (number k)
 
 number npMult (number a,number b)
 {
-  if (((int)a == 0) || ((int)b == 0))
+  if (((long)a == 0) || ((long)b == 0))
     return (number)0;
   else
     return npMultM(a,b);
@@ -60,9 +60,10 @@ number npMult (number a,number b)
 */
 number npInit (int i)
 {
-  while (i <  0)                   i += npPrimeM;
-  while ((i>1) && (i >= npPrimeM)) i -= npPrimeM;
-  return (number)i;
+  long ii=i;
+  while (ii <  0)                    ii += npPrimeM;
+  while ((ii>1) && (ii >= npPrimeM)) ii -= npPrimeM;
+  return (number)ii;
 }
 
 /*2
@@ -70,8 +71,8 @@ number npInit (int i)
 */
 int npInt(number &n)
 {
-  if ((int)n > (npPrimeM >>1)) return ((int)n -npPrimeM);
-  else                     return (int)n;
+  if ((long)n > (npPrimeM >>1)) return (int)((long)n -npPrimeM);
+  else                          return (int)n;
 }
 
 number npAdd (number a, number b)
@@ -86,17 +87,17 @@ number npSub (number a, number b)
 
 BOOLEAN npIsZero (number  a)
 {
-  return 0 == (int)a;
+  return 0 == (long)a;
 }
 
 BOOLEAN npIsOne (number a)
 {
-  return 1 == (int)a;
+  return 1 == (long)a;
 }
 
 BOOLEAN npIsMOne (number a)
 {
-  return ((npPminus1M == (int)a)&&(1!=(int)a));
+  return ((npPminus1M == (long)a)&&((long)1!=(long)a));
 }
 
 #ifdef HAVE_DIV_MOD
@@ -164,13 +165,13 @@ long InvMod(long a)
 inline number npInversM (number c)
 {
 #ifndef HAVE_DIV_MOD
-  return (number)npExpTable[npPminus1M - npLogTable[(int)c]];
+  return (number)npExpTable[npPminus1M - npLogTable[(long)c]];
 #else
-  CARDINAL inv=npInvTable[(int)c];
+  long inv=npInvTable[(long)c];
   if (inv==0)
   {
     inv=InvMod((long)c);
-    npInvTable[(int)c]=inv;
+    npInvTable[(long)c]=inv;
   }
   return (number)inv;
 #endif
@@ -178,17 +179,17 @@ inline number npInversM (number c)
 
 number npDiv (number a,number b)
 {
-  if ((int)a==0)
+  if ((long)a==0)
     return (number)0;
 #ifndef HAVE_DIV_MOD
-  else if ((int)b==0)
+  else if ((long)b==0)
   {
     WerrorS("div by 0");
     return (number)0;
   }
   else
   {
-    int s = npLogTable[(int)a] - npLogTable[(int)b];
+    int s = npLogTable[(long)a] - npLogTable[(long)b];
     if (s < 0)
       s += npPminus1M;
     return (number)npExpTable[s];
@@ -200,7 +201,7 @@ number npDiv (number a,number b)
 }
 number  npInvers (number c)
 {
-  if ((int)c==0)
+  if ((long)c==0)
   {
     WerrorS("1/0");
     return (number)0;
@@ -210,25 +211,26 @@ number  npInvers (number c)
 
 number npNeg (number c)
 {
-  if ((int)c==0) return c;
+  if ((long)c==0) return c;
   return npNegM(c);
 }
 
 BOOLEAN npGreater (number a,number b)
 {
-  return (int)a != (int)b;
+  //return (long)a != (long)b;
+  return (long)a > (long)b;
 }
 
 BOOLEAN npEqual (number a,number b)
 {
-//  return (int)a == (int)b;
+//  return (long)a == (long)b;
   return npEqualM(a,b);
 }
 
 void npWrite (number &a)
 {
-  if ((int)a > (npPrimeM >>1)) StringAppend("-%d",npPrimeM-((int)a));
-  else                     StringAppend("%d",(int)a);
+  if ((long)a > (npPrimeM >>1)) StringAppend("-%d",(int)(npPrimeM-((long)a)));
+  else                          StringAppend("%d",(int)a);
 }
 
 void npPower (number a, int i, number * result)
@@ -236,7 +238,7 @@ void npPower (number a, int i, number * result)
   if (i==0)
   {
     //npInit(1,result);
-    *(int *)result = 1;
+    *(long *)result = 1;
   }
   else if (i==1)
   {
@@ -394,7 +396,7 @@ void npInitChar(int c, ring r)
 #ifdef LDEBUG
 BOOLEAN npDBTest (number a, char *f, int l)
 {
-  if (((int)a<0) || ((int)a>npPrimeM))
+  if (((long)a<0) || ((long)a>npPrimeM))
   {
     return FALSE;
   }
@@ -409,7 +411,7 @@ number npMap0(number from)
 
 number npMapP(number from)
 {
-  int i = (int)from;
+  long i = (long)from;
   if (i>npMapPrime/2)
   {
     i-=npMapPrime;
@@ -521,7 +523,7 @@ nMapFunc npSetMap(ring src, ring dst)
 
 number nvMult (number a,number b)
 {
-  if (((int)a == 0) || ((int)b == 0))
+  if (((long)a == 0) || ((long)b == 0))
     return (number)0;
   else
     return nvMultM(a,b);
@@ -566,9 +568,9 @@ inline number nvInversM (number c)
 
 number nvDiv (number a,number b)
 {
-  if ((int)a==0)
+  if ((long)a==0)
     return (number)0;
-  else if ((int)b==0)
+  else if ((long)b==0)
   {
     WerrorS("div by 0");
     return (number)0;
@@ -581,7 +583,7 @@ number nvDiv (number a,number b)
 }
 number  nvInvers (number c)
 {
-  if ((int)c==0)
+  if ((long)c==0)
   {
     WerrorS("1/0");
     return (number)0;
