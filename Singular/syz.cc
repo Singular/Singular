@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.cc,v 1.19 1999-08-19 16:57:11 Singular Exp $ */
+/* $Id: syz.cc,v 1.20 1999-08-26 12:50:13 siebert Exp $ */
 
 /*
 * ABSTRACT: resolutions
@@ -709,13 +709,13 @@ resolvente syMinRes(ideal arg, int maxlength, int * length, BOOLEAN minim)
   return res;
 }
 
-void syDetect(ideal id,int index,BOOLEAN homog,int * degrees,int * tocancel)
+int syDetect(ideal id,int index,BOOLEAN homog,int * degrees,int * tocancel)
 {
-  int i, j, k, ModComp;
+  int i, j, k, ModComp,subFromRank=0;
   poly p, q, qq, Unit1, Unit2;
   ideal temp;
 
-  if (idIs0(id)) return;
+  if (idIs0(id)) return 0;
   temp = idInit(IDELEMS(id),id->rank);
   for (i=0;i<IDELEMS(id);i++)
   {
@@ -743,7 +743,7 @@ void syDetect(ideal id,int index,BOOLEAN homog,int * degrees,int * tocancel)
   if (i==0)
   {
     idDelete(&temp);
-    return;
+    return 0;
   }
   j = 0;
   while ((j<i) && (temp->m[j]==NULL)) j++;
@@ -762,7 +762,7 @@ void syDetect(ideal id,int index,BOOLEAN homog,int * degrees,int * tocancel)
     {
       k = pFDeg(id->m[j])+degrees[pGetComp(id->m[j])];
       if (k>=index) tocancel[k-index]++;
-      if ((k>0) && (index==0)) tocancel[0]++;
+      if ((k>=0) && (index==0)) subFromRank++;
     }
     else
     {
@@ -800,12 +800,13 @@ void syDetect(ideal id,int index,BOOLEAN homog,int * degrees,int * tocancel)
     if (j>=i)
     {
       idDelete(&temp);
-      return;
+      return  subFromRank;
     }
     p = temp->m[j];
     temp->m[j] = NULL;
   }
   idDelete(&temp);
+  return subFromRank;
 }
 
 void syDetect(ideal id,int index,int rsmin, BOOLEAN homog,
@@ -821,7 +822,7 @@ void syDetect(ideal id,int index,int rsmin, BOOLEAN homog,
     for (i=degrees->length();i>0;i--)
       deg[i-1] = (*degrees)[i-1]-rsmin;
   }
-  syDetect(id,index,homog,deg,tocan);
+  int dummy=syDetect(id,index,homog,deg,tocan);
   for (i=tocancel->length();i>0;i--)
     (*tocancel)[i-1] = tocan[i-1];
   if (homog)
@@ -916,9 +917,9 @@ intvec * syBetti(resolvente res,int length, int * regularity,
   tocancel = (int*)Alloc0((rows+1)*sizeof(int));
   memset(temp2,0,l*sizeof(int));
   memset(temp1,0,(l+1)*sizeof(int));
+  int dummy = syDetect(res[0],0,TRUE,temp2,tocancel);
   if (tomin)
-    syDetect(res[0],0,TRUE,temp2,tocancel);
-  (*result)[(-mr)*cols] -= tocancel[0];
+    (*result)[(-mr)*cols] -= dummy;
   for (i=0;i<cols-1;i++)
   {
     if ((i==0) && (weights!=NULL)) pSetModDeg(weights);
@@ -936,15 +937,15 @@ intvec * syBetti(resolvente res,int length, int * regularity,
   /*------ computation betti numbers, if res not minimal --------------*/
     if (tomin)
     {
-      for (j=0;j<rows-1;j++)
+      for (j=mr;j<rows+mr;j++)
       {
         //(*result)[i+1+j*cols] -= tocancel[j+1];
-        IMATELEM((*result),j+1,i+2) -= tocancel[j+1];
+        IMATELEM((*result),j+1-mr,i+2) -= tocancel[j+1];
       }
       if ((i<length-1) && (res[i+1]!=NULL))
       {
         memset(tocancel,0,(rows+1)*sizeof(int));
-        syDetect(res[i+1],i+1,TRUE,temp2,tocancel);
+        dummy = syDetect(res[i+1],i+1,TRUE,temp2,tocancel);
         for (j=0;j<rows;j++)
         {
           //(*result)[i+1+j*cols] -= tocancel[j];
@@ -966,6 +967,23 @@ intvec * syBetti(resolvente res,int length, int * regularity,
   Free((ADDRESS)tocancel,(rows+1)*sizeof(int));
   Free((ADDRESS)temp1,(l+1)*sizeof(int));
   Free((ADDRESS)temp2,(l+1)*sizeof(int));
+  if ((tomin) && (mr<0))  // deletes the first (zero) line
+  {
+    for (j=1;j<=rows+mr;j++)
+    {
+      for (k=1;k<=cols;k++)
+      {
+        IMATELEM((*result),j,k) = IMATELEM((*result),j-mr,k);
+      }
+    }
+    for (j=rows+mr+1;j<=rows;j++)
+    {
+      for (k=1;k<=cols;k++)
+      {
+        IMATELEM((*result),j,k) = 0;
+      }
+    }
+  }
   j = 0;
   k = 0;
   for (i=0;i<rows*cols;i++)

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.53 1999-08-19 15:26:12 pohl Exp $ */
+/* $Id: ideals.cc,v 1.54 1999-08-26 12:50:12 siebert Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1336,7 +1336,7 @@ ideal  idPrepare (ideal  h1,ideal  quot, tHomog h,
 #endif
   h3=kStd(h2,quot,h,w,NULL,*syzcomp);
   //h3->rank = h2->rank; done by kStd -> initBuchMora -> initS
-  h3->rank-=*syzcomp;
+  //h3->rank-=*syzcomp;
   idDelete(&h2);
   if (orderChanged) pSetSyzComp(0);
   return h3;
@@ -1370,7 +1370,7 @@ ideal idSyzygies (ideal  h1,ideal  quot, tHomog h,intvec **w,
   if (h3==NULL)
     return idFreeModule(IDELEMS(h1));
   i = -1;
-  e=idInit(16,h3->rank);
+  e=idInit(16,h3->rank-k);
   for (j=0; j<IDELEMS(h3); j++)
   {
     if (h3->m[j] != NULL)
