@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.l,v 1.53 2004-05-13 16:52:02 Singular Exp $ */
+/* $Id: libparse.l,v 1.54 2005-01-13 15:24:37 Singular Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -12,6 +12,7 @@
   #include "utils.h"
   #define HAVE_LIBPARSER
   #define YYLPDEBUG 1
+  #include "../kernel/febase.cc"
 #else
   #include "subexpr.h"
   #include "grammar.h"
