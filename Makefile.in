@@ -17,50 +17,54 @@ bindir		= @bindir@
 TEMPDIR		= /tmp
 
 
-${SINGULAR} :
+# default target
+${SINGULAR}:
 	${MAKE} install
 
-all install uninstall : Makefile 
+# simply descend for these targets
+all install uninstall: Makefile 
 	for SUBDIR in ${BUILD_SUBDIRS}; \
 	do \
-		echo ${MAKE} $@ in $${SUBDIR}; \
-		cd $${SUBDIR}; \
-		${MAKE} $@; \
-		cd .. ;\
+	  echo ${MAKE} $@ in $${SUBDIR}; \
+	  cd $${SUBDIR}; \
+	  ${MAKE} $@; \
+	  cd .. ;\
 	done
 
+# clean up in all subdirectories known to us
 clean distclean mostlyclean maintainer-clean: 
 	for SUBDIR in ${SUBDIRS}; \
 	do \
-		echo ${MAKE} $@ in $${SUBDIR}; \
-		cd $${SUBDIR}; \
-		${MAKE} $@; \
-		cd .. ;\
+	  echo ${MAKE} $@ in $${SUBDIR}; \
+	  cd $${SUBDIR}; \
+	  ${MAKE} $@; \
+	  cd .. ;\
 	done; \
-	rm -rf *~ a.out core *.o .log; \
+	rm -rf *~ a.out core *.o *.log; \
 	if test "$@" = distclean || test "$@" = maintainer-clean; then \
-	  rm -rf Makefile config.cache config.log config.status TAGS* *.gz *.tar;\
+	  rm -rf Makefile config.cache config.log config.status TAGS* *.gz *.tar; \
 	fi; \
 	if test "$@" = maintainer-clean; then \
-	  echo "This command is intended for maintainer use, only" ; \
+	  echo "This command is intended for maintainer use, only"; \
 	  rm -rf configure;\
 	fi
 
-
+# some extra targets for the specific packages
 Singular factory libfac MP gmp:
 	cd $@; ${MAKE} all
 
-
+# documentation
 info dvi ps doc doc/singular.hlp: ${SINGULAR} 
 	cd doc; ${MAKE} $@
 
 info/singular.hlp:
 	cd doc; ${MAKE} install
 
-Makefile : Makefile.in config.status
+# remaking Makefile
+Makefile: Makefile.in config.status
 	./config.status
 
-config.status : configure
+config.status: configure
 	./config.status --recheck
 
 configure: configure.in
