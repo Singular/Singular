@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: plutypes.doc,v 1.9 2003-03-20 15:16:57 levandov Exp $
+@comment $Id: plutypes.doc,v 1.10 2003-04-01 13:46:53 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -300,14 +300,14 @@ R^n/M,
 @tex
 R$^n$/M,
 @end tex
- i.e., the columns of A are the vectors
+i.e., the columns of A are the vectors
 @ifinfo
 v_1, @dots{}, v_k
 @end ifinfo
 @tex
 $v_1, \ldots, v_k$
 @end tex
-which generate M 
+which generate M. 
 
 @menu
 * module declarations@value{PSUFFIX}::
