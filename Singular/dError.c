@@ -6,7 +6,7 @@
  *  Purpose: implementation for debug error handling
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
- *  Version: $Id: dError.c,v 1.4 2000-09-25 12:26:30 obachman Exp $
+ *  Version: $Id: dError.c,v 1.5 2000-11-06 15:20:37 obachman Exp $
  *******************************************************************/
 #ifndef DERROR_C
 #define DERROR_C
@@ -23,6 +23,8 @@ extern "C"
 {
 #endif
 
+extern unsigned long feVersionId;
+
 int dReportError(const char* fmt, ...)
 {
   va_list ap;
@@ -38,8 +40,8 @@ int dReportError(const char* fmt, ...)
 #else
   fprintf(stderr, "\n// !!! YOU HAVE FOUND A BUG IN SINGULAR.");
   fprintf(stderr, "// !!! Please, email the following output to singular@mathematik.uni-kl.de");
-  fprintf(stderr, "// !!! Singular Version: " S_UNAME S_VERSION1 " (%lu) %s \n",
-          feVersionId, singular_date);
+  fprintf(stderr, "// !!! Singular Version: " S_UNAME S_VERSION1 " (%lu)\n",
+          feVersionId);
   vfprintf(stderr, fmt, ap);
 #endif
   return 0;
