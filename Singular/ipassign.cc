@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.68 2003-03-10 16:43:50 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.69 2003-07-25 15:05:55 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -466,9 +466,12 @@ static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
 
   assumeStdFlag(a);
   #ifdef HAVE_PLURAL
-  if (!hasFlag(a,FLAG_TWOSTD))
+  if(rIsPluralRing())
   {
-    Warn("%s is no twosided standard basis",a->Name());
+    if (!hasFlag(a,FLAG_TWOSTD))
+    {
+      Warn("%s is no twosided standard basis",a->Name());
+    }
   }
   #endif
   qr=(ring)res->Data();
