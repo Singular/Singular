@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.75 2002-05-02 15:15:58 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.76 2002-05-03 08:50:34 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1170,7 +1170,7 @@ void iiCheckPack(package &p)
 
   idhdl t=basePack->idroot;
 
-  while ((t!=NULL) && (t->rtyp!=PACKAGE_CMD) && (IDPACKAGE(t)!=p)) t=t->next;
+  while ((t!=NULL) && (IDTYP(t)!=PACKAGE_CMD) && (IDPACKAGE(t)!=p)) t=t->next;
 
   if (t==NULL)
   {
