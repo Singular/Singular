@@ -21,7 +21,7 @@ ac_help="$ac_help
 ac_help="$ac_help
   --with-Singular         build for use with computer algebra system Singular."
 ac_help="$ac_help
-  --disable-streamio      build factory whithout streamio"
+  --disable-streamio      build factory without streamio"
 ac_help="$ac_help
   --enable-memdebug=<level> switch on memory managment debugging.  Meaningful
                           with --with-memman=new only.  <level> may be either
@@ -1314,8 +1314,7 @@ EOF
  
 else
   echo "$ac_t""no" 1>&6
-{ echo "configure: error: gmp.h not found.  Use option --with-gmp or --with-builtingmp
-                  to specify path" 1>&2; exit 1; } 
+{ echo "configure: error: gmp.h not found.  Use option --with-gmp to specify path" 1>&2; exit 1; } 
 fi
 done
 
@@ -1329,12 +1328,12 @@ if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 1333 "configure"
+#line 1332 "configure"
 #include "confdefs.h"
 #include <$ac_hdr>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:1338: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:1337: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -1369,12 +1368,12 @@ if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 1373 "configure"
+#line 1372 "configure"
 #include "confdefs.h"
 #include <$ac_hdr>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:1378: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:1377: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -1407,12 +1406,12 @@ if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 1411 "configure"
+#line 1410 "configure"
 #include "confdefs.h"
 #include <$ac_hdr>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:1416: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:1415: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -1448,12 +1447,12 @@ if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 1452 "configure"
+#line 1451 "configure"
 #include "confdefs.h"
 #include <$ac_hdr>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:1457: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:1456: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -1495,14 +1494,14 @@ else
   ac_cv_c_cross=yes
 else
 cat > conftest.$ac_ext <<EOF
-#line 1499 "configure"
+#line 1498 "configure"
 #include "confdefs.h"
 #ifdef __cplusplus
 extern "C" void exit(int);
 #endif
 main(){return(0);}
 EOF
-{ (eval echo configure:1506: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }
+{ (eval echo configure:1505: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }
 if test -s conftest && (./conftest; exit) 2>/dev/null; then
   ac_cv_c_cross=no
 else
@@ -1525,7 +1524,7 @@ if eval "test \"`echo '$''{'ac_cv_c_const'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 1529 "configure"
+#line 1528 "configure"
 #include "confdefs.h"
 
 int main() { return 0; }
@@ -1575,7 +1574,7 @@ ccp = (char const *const *) p;
 
 ; return 0; }
 EOF
-if { (eval echo configure:1579: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:1578: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   ac_cv_c_const=yes
 else
@@ -1601,7 +1600,7 @@ else
   ac_cv_c_inline=no
 for ac_kw in inline __inline__ __inline; do
   cat > conftest.$ac_ext <<EOF
-#line 1605 "configure"
+#line 1604 "configure"
 #include "confdefs.h"
 
 int main() { return 0; }
@@ -1609,7 +1608,7 @@ int t() {
 } $ac_kw foo() {
 ; return 0; }
 EOF
-if { (eval echo configure:1613: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:1612: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   ac_cv_c_inline=$ac_kw; break
 fi
@@ -1642,14 +1641,14 @@ else
   ac_cv_shift=no
 else
 cat > conftest.$ac_ext <<EOF
-#line 1646 "configure"
+#line 1645 "configure"
 #include "confdefs.h"
 #ifdef __cplusplus
 extern "C" void exit(int);
 #endif
  int main() { if (-2 >> 1 == -1) exit(0); else exit(1); } 
 EOF
-{ (eval echo configure:1653: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }
+{ (eval echo configure:1652: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }
 if test -s conftest && (./conftest; exit) 2>/dev/null; then
   ac_cv_shift=yes
 else
@@ -1678,11 +1677,11 @@ prefix="$save_prefix"
 if test "x$with_Singular" = xyes; then
   gftabledir='${datadir}/Singular/gftables'
   expl_gftabledir="$expl_datadir/Singular/gftables"
-  templatedir="\${includedir}/templates"
+  templatedir='${includedir}/templates'
 else
   gftabledir='${datadir}/factory/gftables'
   expl_gftabledir="$expl_datadir/factory/gftables"
-  templatedir="\${includedir}/templates"
+  templatedir='${includedir}/templates'
 fi
 
 #
@@ -1690,9 +1689,6 @@ fi
 #
 if test "x$with_Singular" = xyes; then
   libfactory=libsingcf.a
-  libmem=libcfmem.a
-  headerfactory=factory.h
-  factoryconf=factoryconf.h
 
   factorysrc='$(basefactorysrc) $(singfactorysrc)'
   factoryincl='$(basefactoryincl) $(singfactoryincl)'
@@ -1704,9 +1700,6 @@ if test "x$with_Singular" = xyes; then
   uninstalltargets=uninstallcf
 else
   libfactory=libcf.a
-  libmem=libcfmem.a
-  headerfactory=factory.h
-  factoryconf=factoryconf.h
 
   factorysrc='$(basefactorysrc)'
   factoryincl='$(basefactoryincl)'
@@ -1909,9 +1902,6 @@ fi
 
 
 
-
-
-
 cat >> confdefs.h <<EOF
 #define FACTORYVERSION "$factory_version"
 EOF
@@ -2053,9 +2043,6 @@ s%@gftabledir@%$gftabledir%g
 s%@templatedir@%$templatedir%g
 s%@factory_version@%$factory_version%g
 s%@libfactory@%$libfactory%g
-s%@libmem@%$libmem%g
-s%@headerfactory@%$headerfactory%g
-s%@factoryconf@%$factoryconf%g
 s%@ARFLAGS@%$ARFLAGS%g
 s%@MAKEHEADERFLAGS@%$MAKEHEADERFLAGS%g
 s%@factorysrc@%$factorysrc%g
