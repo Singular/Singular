@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.10 1997-07-04 13:46:43 Singular Exp $
+// $Id: clapsing.cc,v 1.11 1997-08-14 13:10:42 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -296,7 +296,6 @@ void singclap_divide_content ( poly f )
   else  if ( pNext( f ) == NULL )
   {
     pSetCoeff( f, nInit( 1 ) );
-      pTest(f);
     return;
   }
   else
@@ -304,10 +303,12 @@ void singclap_divide_content ( poly f )
     CFList L;
     CanonicalForm g, h;
     poly p = pNext(f);
+    nTest(pGetCoeff(f));
     g = convSingTrClapP( ((lnumber)pGetCoeff(f))->z );
     L.append( g );
     while ( p && (g != 1) )
     {
+      nTest(pGetCoeff(p));
       h = convSingTrClapP( ((lnumber)pGetCoeff(p))->z );
       p = pNext( p );
       g = gcd( g, h );
@@ -317,7 +318,16 @@ void singclap_divide_content ( poly f )
     {
       pTest(f);
       return;
-    }  
+    }
+    #ifdef LDEBUG
+    else if ( g == 0 )
+    {
+      pTest(f);
+      pWrite(f);
+      PrintS("=> gcd 0 in divide_content\n");
+      return;
+    }
+    #endif
     else
     {
       CFListIterator i;
@@ -326,6 +336,7 @@ void singclap_divide_content ( poly f )
         lnumber c=(lnumber)pGetCoeff(p);
         napDelete(&c->z);
         c->z=convClapPSingTr( i.getItem() / g );
+        nTest((number)c);
       }
     }
     pTest(f);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: spolys0.cc,v 1.4 1997-08-01 10:53:08 Singular Exp $ */
+/* $Id: spolys0.cc,v 1.5 1997-08-14 13:10:46 Singular Exp $ */
 
 /*
 * ABSTRACT - s-polynomials and reduction in general
@@ -31,7 +31,10 @@
 static int spCheckCoeff(number *a, number *b)
 {
   int c = 0;
-  number an = *a, bn = *b, cn = nGcd(an, bn);
+  number an = *a, bn = *b;
+  nTest(an);
+  nTest(bn);
+  number cn = nGcd(an, bn);
 
   if(nIsOne(cn))
   {

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.7 1997-06-25 07:58:08 Singular Exp $ */
+/* $Id: longalg.cc,v 1.8 1997-08-14 13:10:44 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -2368,8 +2368,7 @@ BOOLEAN naDBTest(number a, char *f,int l)
   if (x == NULL)
     return TRUE;
 #ifdef MDEBUG
-  if (!mmDBTestBlock(a,sizeof(rnumber),f,l))
-    return FALSE;
+  mmDBTestBlock(a,sizeof(rnumber),f,l);
 #endif
   alg p = x->z;
   if (p==NULL)
@@ -2379,6 +2378,11 @@ BOOLEAN naDBTest(number a, char *f,int l)
   }
   while(p!=NULL)
   {
+    if (nIsZero(p->ko))
+    {
+      Print("coeff 0 in %s:%d\n",f,l);
+      return FALSE;
+    }
     if((naMinimalPoly!=NULL)&&(p->e[0]>naMinimalPoly->e[0])
     &&(p!=naMinimalPoly))
     {
@@ -2393,8 +2397,7 @@ BOOLEAN naDBTest(number a, char *f,int l)
     if (naIsChar0 && nlDBTest(p->ko,f,l))
       return FALSE;
 #ifdef MDEBUG
-    if (!mmDBTestBlock(p,RECA_SIZE+naNumbOfPar*sizeof(int),f,l))
-      return FALSE;
+    mmDBTestBlock(p,RECA_SIZE+naNumbOfPar*sizeof(int),f,l);
 #endif
     p = p->ne;
   }

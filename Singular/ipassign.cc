@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.16 1997-07-09 15:53:59 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.17 1997-08-14 13:10:43 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -461,8 +461,8 @@ struct sValAssign dAssign[]=
 {
 // proc         res             arg
  {jiA_IDEAL,    IDEAL_CMD,      IDEAL_CMD }
-,{jiA_RESOLUTION,RESOLUTION_CMD,RESOLUTION_CMD }
 ,{jiA_IDEAL_M,  IDEAL_CMD,      MATRIX_CMD }
+,{jiA_RESOLUTION,RESOLUTION_CMD,RESOLUTION_CMD }
 ,{jiA_INT,      INT_CMD,        INT_CMD }
 ,{jiA_IDEAL,    MATRIX_CMD,     MATRIX_CMD }
 ,{jiA_MAP_ID,   MAP_CMD,        IDEAL_CMD }

@@ -1,4 +1,4 @@
-// $Id: all.lib,v 1.2 1997-06-04 19:45:25 obachman Exp $
+// $Id: all.lib,v 1.3 1997-08-14 13:10:47 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
 
 LIBRARY:  all.lib   Load all libraries
@@ -19,3 +19,4 @@ LIB "prim_dec.lib";
 LIB "random.lib";
 LIB "ring.lib";
 LIB "sing.lib";
+LIB "hnoether.lib";
