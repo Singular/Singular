@@ -5,6 +5,13 @@
 * ABSTRACT
 */
 /* $Log: not supported by cvs2svn $
+// Revision 1.4  1997/03/26  14:58:05  obachman
+// Wed Mar 26 14:02:15 1997  Olaf Bachmann
+// <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+//
+// 	* added reference counter to links, updated slKill, slCopy, slInit
+// 	* various small bug fixes for Batch mode
+//
 // Revision 1.2  1997/03/20  16:59:58  obachman
 // Various minor bug-fixes in mpsr interface
 //
@@ -160,46 +167,6 @@ BOOLEAN slOpenWriteMPFile(si_link l)
   }
   else
     return TRUE;
-}
-
-MP_Link_pt OpenMPFile(char *fn, short mode)
-{
-  char **argv;
-  int argc;
-  MP_Link_pt link = NULL;
-
-  GetCmdArgs(&argc, &argv, "-MPtransp FILE -MPmode write -MPfile /tmp/mpout");
-
-  if (fn != NULL)
-  {
-    FreeL(argv[5]);
-    argv[5] = mstrdup(fn);
-  }
-
-  if (mode)
-  {
-    FreeL(argv[3]);
-    argv[3] = mstrdup("read");
-  }
-  
-  if (mp_Env == NULL)
-    mp_Env = MP_InitializeEnv(MP_AllocateEnv());
-
-  if (mp_Env == NULL)
-  {
-    Werror("Initialization of MP Environment");
-    FreeCmdArgs(argc, argv);
-    return NULL;
-  }
-
-  if ((link = MP_OpenLink(mp_Env, argc, argv)) == NULL)
-  {
-    Werror("Opening of MP file %s for %s", fn, (mode ? "writing" : "reading"));
-  }
-  MP_SET_LINK_OPTIONS(link);
-  
-  FreeCmdArgs(argc, argv);
-  return link;
 }
 
   
@@ -438,7 +405,7 @@ leftv slReadMP(si_link l)
   mpsr_ClearError();
   if (mpsr_GetMsg((MP_Link_pt) l->data, v) != mpsr_Success)
   {
-    mpsr_PrintError();
+    mpsr_PrintError((MP_Link_pt) l->data);
     return NULL;
   }
   else
@@ -452,6 +419,31 @@ BOOLEAN slInitMP(si_link l,si_link_extension s)
   }
   return TRUE;
 }
+
+BOOLEAN slDumpMP(si_link l)
+{
+  mpsr_ClearError();
+  if (mpsr_PutDump((MP_Link_pt) l->data) != mpsr_Success)
+  {
+    mpsr_PrintError((MP_Link_pt) l->data);
+    return TRUE;
+  }
+  else
+    return FALSE;
+}
+
+BOOLEAN slGetDumpMP(si_link l)
+{
+  mpsr_ClearError();
+  if (mpsr_GetDump((MP_Link_pt) l->data) != mpsr_Success)
+  {
+    mpsr_PrintError((MP_Link_pt) l->data);
+    return TRUE;
+  }
+  else
+    return FALSE;
+}
+
 si_link_extension slInitMPFile()
 {
   si_link_extension s=(si_link_extension)Alloc0(sizeof(*s));
@@ -461,6 +453,8 @@ si_link_extension slInitMPFile()
   s->Close=slCloseMP;
   s->Read=slReadMP;
   //s->Read2=NULL;
+  s->Dump=slDumpMP;
+  s->GetDump=slGetDumpMP;
   s->Write=slWriteMP;
   s->name="MP:file";
   return s;
@@ -474,6 +468,8 @@ si_link_extension slInitMPTcp()
   s->Close=slCloseMP;
   s->Read=slReadMP;
   //s->Read2=NULL;
+  s->Dump=slDumpMP;
+  s->GetDump=slGetDumpMP;
   s->Write=slWriteMP;
   s->name="MP:tcp";
   return s;
@@ -486,7 +482,7 @@ BOOLEAN mpsr_IsMPLink(si_link l)
 #endif
 
 #ifdef MPSR_BATCH_DEBUG
-BOOLEAN stop = 1;
+static BOOLEAN stop = 1;
 #endif
 
 int Batch_do(int argc, char **argv)

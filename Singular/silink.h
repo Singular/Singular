@@ -7,6 +7,13 @@
 * ABSTRACT
 */
 /* $Log: not supported by cvs2svn $
+ * Revision 1.3  1997/03/26  14:58:03  obachman
+ * Wed Mar 26 14:02:15 1997  Olaf Bachmann
+ * <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+ *
+ * 	* added reference counter to links, updated slKill, slCopy, slInit
+ * 	* various small bug fixes for Batch mode
+ *
  * Revision 1.1.1.1  1997/03/19  13:18:41  obachman
  * Imported Singular sources
  *
@@ -22,6 +29,8 @@ typedef BOOLEAN    (*slCloseProc)(si_link l);
 typedef leftv      (*slReadProc)(si_link l);
 typedef leftv      (*slRead2Proc)(si_link l,leftv a);
 typedef BOOLEAN    (*slWriteProc)(si_link l,leftv v);
+typedef BOOLEAN    (*slDumpProc)(si_link l);
+typedef BOOLEAN    (*slGetDumpProc)(si_link l);
 
 struct s_si_link_extension
 {
@@ -33,6 +42,8 @@ struct s_si_link_extension
   slReadProc       Read;
   slRead2Proc      Read2;
   slWriteProc      Write;
+  slDumpProc       Dump;
+  slGetDumpProc    GetDump;
   char             *name;
   int              index;
 };
@@ -75,6 +86,8 @@ BOOLEAN slOpenRead(si_link l);
 BOOLEAN slClose(si_link l);
 leftv   slRead(si_link l,leftv a=NULL);
 BOOLEAN slWrite(si_link l, leftv v);
+BOOLEAN slDump(si_link l);
+BOOLEAN slGetDump(si_link l);
 BOOLEAN slInit(si_link l, char *str);
 void slKill(si_link l);
 void slCleanUp(si_link l);

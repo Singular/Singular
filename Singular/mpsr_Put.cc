@@ -490,20 +490,7 @@ mpsr_Status_t mpsr_PutMap(MP_Link_pt link, map m, ring cring)
  * A routine which dumps the content of Singular to a file
  *
  ***************************************************************/
-BOOLEAN mpsr_PutDump(char *fn)
-{
-  MP_Link_pt link = OpenMPFile(fn, 0);
-  BOOLEAN status;
-
-  if (link == NULL) return FALSE;
-  else status = mpsr_PutDump(link);
-
-  MP_CloseLink(link);
-  return status;
-}
-
-
-BOOLEAN mpsr_PutDump(MP_Link_pt link)
+mpsr_Status_t mpsr_PutDump(MP_Link_pt link)
 {
   idhdl h = idroot, h2 = NULL, rh = currRingHdl;
   ring r;
@@ -563,39 +550,11 @@ BOOLEAN mpsr_PutDump(MP_Link_pt link)
   if (rh != NULL && rh != currRingHdl) rSetHdl(rh, TRUE);
   
   if (h == NULL && h2 == NULL)
-    return TRUE;
+    return mpsr_Success;
   else
-  {
-    mpsr_PrintError();
-    return FALSE;
-  }
+    return mpsr_Failure;
 }
   
-BOOLEAN mpsr_PutDump(leftv h)
-{
-  if (h == NULL)
-  {
-    Print("Using file %s for dump\n", MPSR_DEFAULT_DUMP_FILE);
-    return mpsr_PutDump(MPSR_DEFAULT_DUMP_FILE);
-  }
-  else if (h->Typ() == STRING_CMD)
-  {
-    return mpsr_PutDump((char *) h->Data());
-  }
-  else if (h->Typ() == LINK_CMD)
-  {
-    si_link l = (si_link) h->Data();
-    if (SI_LINK_W_OPEN_P(l) && mpsr_IsMPLink(l))
-      return mpsr_PutDump((MP_Link_pt) l->data);
-    else
-      Werror("Can only dump data to an already opened MP link");
-  }
-  else
-  {
-    Werror("Need string or opened MP Link");
-  }
-  return FALSE;
-}
 #endif // HAVE_MPSR
 
 

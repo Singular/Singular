@@ -5,6 +5,13 @@
 * ABSTRACT
 */
 /* $Log: not supported by cvs2svn $
+// Revision 1.3  1997/03/26  14:58:02  obachman
+// Wed Mar 26 14:02:15 1997  Olaf Bachmann
+// <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+//
+// 	* added reference counter to links, updated slKill, slCopy, slInit
+// 	* various small bug fixes for Batch mode
+//
 // Revision 1.1.1.1  1997/03/19  13:18:42  obachman
 // Imported Singular sources
 //
@@ -19,6 +26,17 @@
 #include "subexpr.h"
 #include "ipid.h"
 #include "silink.h"
+#include "ipshell.h"
+#include "ring.h"
+#include "lists.h"
+#include "ideals.h"
+#include "numbers.h"
+
+/* declarations */
+static BOOLEAN DumpAscii(FILE *fd, idhdl h);
+static BOOLEAN DumpAsciiIdhdl(FILE *fd, idhdl h);
+static char* GetIdString(idhdl h);
+static int DumpRhs(FILE *fd, idhdl h);
 
 /* =============== general utilities ====================================== */
 void GetCmdArgs(int *argc, char ***argv, char *str)
@@ -235,6 +253,34 @@ BOOLEAN slWrite(si_link l, leftv v)
   return TRUE;
 }
 
+BOOLEAN slDump(si_link l)
+{
+  if(! SI_LINK_W_OPEN_P(l)) // open w ?
+  {
+    if (slOpenWrite(l)) return TRUE;
+  }
+  if((SI_LINK_W_OPEN_P(l))&&(l->m!=NULL))
+  { // now open w
+    if (l->m->Dump!=NULL)
+      return l->m->Dump(l);
+  }
+  return TRUE;
+}
+
+BOOLEAN slGetDump(si_link l)
+{
+  if(! SI_LINK_R_OPEN_P(l)) // open w ?
+  {
+    if (slOpenRead(l)) return TRUE;
+  }
+  if((SI_LINK_R_OPEN_P(l))&&(l->m!=NULL))
+  { // now open w
+    if (l->m->GetDump!=NULL)
+      return l->m->GetDump(l);
+  }
+  return TRUE;
+}
+
 /* =============== ASCII ============================================= */
 BOOLEAN slOpenWriteAscii(si_link l)
 {
@@ -386,6 +432,203 @@ BOOLEAN slInitALink(si_link l,si_link_extension s)
   return TRUE;
 }
 
+BOOLEAN slDumpAscii(si_link l)
+{
+  FILE *fd = (FILE *) l->data;
+  idhdl h = idroot, rh = currRingHdl;
+  BOOLEAN status = DumpAscii(fd, h);
+
+  if (currRingHdl != rh) rSetHdl(rh, TRUE);
+  fflush(fd);
+  
+  return status;
+}
+
+// we do that recursively, to dump ids in the the order in which they 
+// were actually defined
+static BOOLEAN DumpAscii(FILE *fd, idhdl h)
+{
+  if (h == NULL) return FALSE;
+
+  if (DumpAscii(fd, IDNEXT(h))) return TRUE;
+
+  // need to set the ring before writing it, othersie we get in
+  // trouble with minpoly
+  if (IDTYP(h) == RING_CMD || IDTYP(h) == QRING_CMD)
+    rSetHdl(h, TRUE);
+
+  if (DumpAsciiIdhdl(fd, h)) return TRUE;
+
+  if (IDTYP(h) == RING_CMD || IDTYP(h) == QRING_CMD)
+  {
+    rSetHdl(h, TRUE);
+    return DumpAscii(fd, IDRING(h)->idroot);
+  }
+  else
+    return FALSE;
+}
+
+static BOOLEAN DumpAsciiIdhdl(FILE *fd, idhdl h)
+{
+  char *type_str = GetIdString(h);
+  idtyp type_id = IDTYP(h);
+
+  // we do not throw an error if a wrong type was attempted to be dumped
+  if (type_str == NULL) return FALSE;
+
+  // put type and name 
+  if (fprintf(fd, "%s %s", type_str, IDID(h)) == EOF) return TRUE;
+
+  // for matricies, append the dimension
+  if (type_id == MATRIX_CMD)
+  {
+    ideal id = IDIDEAL(h);
+    if (fprintf(fd, "[%d][%d]", id->nrows, id->ncols)== EOF) return TRUE;
+  }
+
+  // check for empty list;
+  if ( ! (type_id == LIST_CMD && IDLIST(h)->nr < 0))
+  {
+    // write the equal sign
+    if (fprintf(fd, " = ") == EOF) return TRUE;
+    // and the right hand side
+    if (DumpRhs(fd, h) == EOF) return TRUE;
+  }
+  
+  // semicolon und tschuess
+  if (fprintf(fd, ";\n") == EOF) return TRUE;
+
+  return FALSE;
+}
+
+static char* GetIdString(idhdl h)
+{
+  idtyp type = IDTYP(h);
+  
+  switch(type)
+  {
+      case LIST_CMD:
+      {
+        lists l = IDLIST(h);
+        int i, nl = l->nr + 1;
+        char *name;
+
+        for (i=0; i<nl; i++)
+          if (GetIdString((idhdl) &(l->m[i])) == NULL) return NULL;
+      }
+      case INT_CMD:
+      case INTVEC_CMD:
+      case INTMAT_CMD:
+      case STRING_CMD:
+      case RING_CMD:
+      case PROC_CMD:
+      case NUMBER_CMD:
+      case POLY_CMD:
+      case IDEAL_CMD:
+      case VECTOR_CMD:
+      case MODUL_CMD:
+      case MATRIX_CMD:
+      case MAP_CMD:
+        return Tok2Cmdname(type);
+
+      case QRING_CMD:
+        return Tok2Cmdname(RING_CMD);
+        
+      case LINK_CMD:
+        return NULL;
+
+      default:
+       Warn("Can not dump data of type %s", Tok2Cmdname(IDTYP(h)));
+       return NULL;
+  }
+}
+
+static int DumpRhs(FILE *fd, idhdl h)
+{
+  idtyp type_id = IDTYP(h);
+
+  if (type_id == LIST_CMD)
+  {
+    lists l = IDLIST(h);
+    int i, nl = l->nr;
+    idhdl h2;
+
+    for (i=0; i<nl; i++)
+    {
+      h2 = (idhdl) &(l->m[i]);
+      
+      if ( ! (IDTYP(h2) == LIST_CMD && IDLIST(h2)->nr < 0))
+      {
+        if (DumpRhs(fd, h2) == EOF) return EOF;
+        fprintf(fd,", ");
+      }
+    }
+    h2 = (idhdl) &(l->m[i]);
+    if ( ! (IDTYP(h2) == LIST_CMD && IDLIST(h2)->nr < 0))
+    { 
+      if (DumpRhs(fd, h2) == EOF) return EOF;
+    }
+  }
+  else  if (type_id == PROC_CMD)
+  {
+    char *pstr = IDSTRING(h), c;
+    fputc('"', fd);
+    while (*pstr != '\0')
+    {
+      if (*pstr == '"') fputc('\\', fd);
+      fputc(*pstr, fd);
+      pstr++;
+    }
+    fputc('"', fd);
+  }
+  else
+  {
+    char *rhs = ((leftv) h)->String();
+
+    if (rhs == NULL) return EOF;
+
+    if (type_id == STRING_CMD) fprintf(fd,"\"");
+    if (type_id == MAP_CMD) fprintf(fd, "%s,", IDMAP(h)->preimage);
+
+    if (fprintf(fd, "%s", rhs) == EOF) return EOF;
+    FreeL(rhs);
+
+    if (type_id == STRING_CMD) fprintf(fd,"\"");
+    if ((type_id == RING_CMD || type_id == QRING_CMD) &&
+        IDRING(h)->minpoly != NULL)
+    {
+      StringSetS("");
+      nWrite(IDRING(h)->minpoly);
+      rhs = StringAppend("");
+      if (fprintf(fd, "; minpoly = %s", rhs) == EOF) return EOF;
+    }
+  }
+  return 1;
+}
+    
+BOOLEAN slGetDumpAscii(si_link l)
+{
+  if (l->name[0] == '\0')
+  {
+    Werror("Can not get dump from stdin");
+    return TRUE;
+  }
+  else
+  {
+    BOOLEAN status = iiPStart(NULL, l->name, NULL);
+
+    if (status)
+      return TRUE;
+    else
+    {
+      // lets reset the file pointer to the beginning to reflect that
+      // we are finished with reading
+      FILE *f = (FILE *) l->data;
+      fseek(f, 0L, SEEK_END);
+      return FALSE;
+    }
+  }
+}
 
 /*-------------------------------------------------------------------*/
 void slExtensionInit(si_link_extension s)
@@ -413,6 +656,8 @@ void slStandardInit()
   si_link_root->Read=slReadAscii;
   //si_link_root->Read2=NULL;
   si_link_root->Write=slWriteAscii;
+  si_link_root->Dump=slDumpAscii;
+  si_link_root->GetDump=slGetDumpAscii;
   si_link_root->name="ascii";
   si_link_root->index=1;
 #ifdef HAVE_DBM

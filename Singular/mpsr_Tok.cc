@@ -254,6 +254,8 @@ short sr_cmds[] =
   WRITE_CMD,
   QRING_CMD,
   FGLM_CMD,
+  DUMP_CMD,
+  GETDUMP_CMD
 };
 
 // struct used for specifying the cmd <-> cop relations

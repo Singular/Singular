@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Id: ipconv.cc,v 1.2 1997-03-24 14:24:54 Singular Exp $";
+static char rcsid[] = "$Id: ipconv.cc,v 1.3 1997-03-28 21:44:31 obachman Exp $";
 /*
 * ABSTRACT: automatic type conversions
 */
@@ -183,6 +183,8 @@ struct sConvertTypes dConvertTypes[] =
    { INT_CMD,         IDEAL_CMD,      iiI2Id },
 //  int -> matrix
    { INT_CMD,         MATRIX_CMD,     iiI2Id },
+//  int -> module
+   { INT_CMD,         MODUL_CMD,     iiI2Id },
 //  int -> intvec
    { INT_CMD,         INTVEC_CMD,     iiI2Iv },
 //  intvec -> intmat

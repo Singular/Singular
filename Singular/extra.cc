@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-static char rcsid[] = "$Id: extra.cc,v 1.4 1997-03-27 20:23:35 obachman Exp $";
+static char rcsid[] = "$Id: extra.cc,v 1.5 1997-03-28 21:44:26 obachman Exp $";
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -37,12 +37,6 @@ static char rcsid[] = "$Id: extra.cc,v 1.4 1997-03-27 20:23:35 obachman Exp $";
 #include "clapsing.h"
 #include "clapconv.h"
 #include "kstdfac.h"
-#endif
-
-
-#ifdef HAVE_MPSR
-extern BOOLEAN mpsr_GetDump(leftv h);
-extern BOOLEAN mpsr_PutDump(leftv h);
 #endif
 
 //void emStart();
@@ -422,22 +416,6 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
         WerrorS("ideal expected");
     }
     else
-/*========================= dump ===============================*/
-#ifdef HAVE_MPSR
-    if (strcmp((char*)(h->Data()),"dump")==0)
-    {
-      res->rtyp = NONE;
-      res->data = NULL;
-      return ! mpsr_PutDump(h->next);
-    }
-    else if (strcmp((char*)(h->Data()),"getdump")==0)
-    {
-      res->rtyp = NONE;
-      res->data = NULL;
-      return ! mpsr_GetDump(h->next);
-    }
-    else
-#endif      
 /*============================================================*/
       WerrorS("not implemented\n");
   }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Id: iparith.cc,v 1.12 1997-03-27 20:23:40 obachman Exp $";
+static char rcsid[] = "$Id: iparith.cc,v 1.13 1997-03-28 21:44:28 obachman Exp $";
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
 */
@@ -150,6 +150,7 @@ cmdnames cmds[] =
 #ifdef DRING
   { "dring",       0, DRING_CMD ,         DRING_CMD},
 #endif
+  { "dump",        0, DUMP_CMD,           CMD_1},
   { "EXTGCD",      0, EXTGCD_CMD ,        CMD_2},
   { "eliminate",   0, ELIMINATION_CMD,    CMD_23},
   { "else",        0, ELSE_CMD ,          ELSE_CMD},
@@ -165,6 +166,7 @@ cmdnames cmds[] =
   { "freemodule",  0, FREEMODULE_CMD ,    CMD_1},
   { "facstd",      0, FACSTD_CMD ,        CMD_12},
   { "gen",         0, E_CMD ,             CMD_1},
+  { "getdump",     0, GETDUMP_CMD,        CMD_1},
   { "GCD",         0, GCD_CMD ,           CMD_2},
   { "hilb",        0, HILBERT_CMD ,       CMD_12},
   { "homog",       0, HOMOG_CMD ,         CMD_12},
@@ -1302,6 +1304,7 @@ static BOOLEAN jjDIFF_ID_ID(leftv res, leftv u, leftv v)
   res->data=(char *)idDiffOp((ideal)u->Data(),(ideal)v->Data());
   return FALSE;
 }
+  
 static BOOLEAN jjELIMIN(leftv res, leftv u, leftv v)
 {
   res->data=(char *)idElimination((ideal)u->Data(),(poly)v->Data());
@@ -2256,11 +2259,39 @@ static BOOLEAN jjDIM(leftv res, leftv v)
   res->data = (char *)scDimInt((ideal)(v->Data()),currQuotient);
   return FALSE;
 }
+static BOOLEAN jjDUMP(leftv res, leftv v)
+{
+  si_link l = (si_link)v->Data();
+  if (slDump(l))
+  {
+    const char *s;
+    if ((l!=NULL)&&(l->name!=NULL)) s=l->name;
+    else                            s=sNoName;
+    Werror("cannot dump to `%s`",s);
+    return TRUE;
+  }
+  else
+    return FALSE;
+}
 static BOOLEAN jjE(leftv res, leftv v)
 {
   res->data = (char *)pOne();
   pSetComp((poly)res->data,(int)v->Data());
   return FALSE;
+}
+static BOOLEAN jjGETDUMP(leftv res, leftv v)
+{
+  si_link l = (si_link)v->Data();
+  if (slGetDump(l))
+  {
+    const char *s;
+    if ((l!=NULL)&&(l->name!=NULL)) s=l->name;
+    else                            s=sNoName;
+    Werror("cannot get dump from `%s`",s);
+    return TRUE;
+  }
+  else
+    return FALSE;
 }
 #ifdef HAVE_LIBFACTORY
 static BOOLEAN jjFACSTD(leftv res, leftv v)
@@ -2666,6 +2697,7 @@ static BOOLEAN jjTYPEOF(leftv res, leftv v)
     case NUMBER_CMD:  res->data=mstrdup("number"); break;
     case LIST_CMD:   res->data=mstrdup("list"); break;
     case PACKAGE_CMD: res->data=mstrdup("package"); break;
+    case LINK_CMD:   res->data=mstrdup("link"); break; 
     case DEF_CMD:
     case NONE:    res->data=mstrdup("none"); break;
     default:       res->data=mstrdup("?unknown type?");
@@ -2873,6 +2905,7 @@ struct sValCmd1 dArith1[]=
 #endif
 ,{jjDIM,        DIM_CMD,         INT_CMD,        IDEAL_CMD }
 ,{jjDIM,        DIM_CMD,         INT_CMD,        MODUL_CMD }
+,{jjDUMP,       DUMP_CMD,        NONE,           LINK_CMD }
 ,{jjE,          E_CMD,           VECTOR_CMD,     INT_CMD }
 #ifdef HAVE_LIBFACTORY
 ,{jjFAC_P,      FAC_CMD,         LIST_CMD,       POLY_CMD }
@@ -2885,6 +2918,7 @@ struct sValCmd1 dArith1[]=
 #else
 ,{jjWRONG,      FACSTD_CMD,      LIST_CMD,       IDEAL_CMD }
 #endif
+,{jjGETDUMP,    GETDUMP_CMD,     NONE,           LINK_CMD } 
 ,{jjHILBERT,    HILBERT_CMD,     NONE,           IDEAL_CMD }
 ,{jjHILBERT,    HILBERT_CMD,     NONE,           MODUL_CMD }
 ,{jjHILBERT_IV, HILBERT_CMD,     INTVEC_CMD,     INTVEC_CMD }

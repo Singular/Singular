@@ -58,19 +58,17 @@ extern mpsr_Status_t mpsr_SetError(mpsr_Status_t error);
 extern mpsr_Status_t mpsr_SetError(MP_Link_pt link);
 extern void mpsr_PrintError(mpsr_Status_t error);
 extern void mpsr_PrintError();
+extern void mpsr_PrintError(MP_Link_pt link);
+extern void mpsr_PrintError(mpsr_Status_t error, MP_Link_pt link);
 extern mpsr_Status_t mpsr_GetError();
 extern void mpsr_ClearError();
 
 // from mpsr_Get.cc
 extern mpsr_Status_t mpsr_GetMsg(MP_Link_pt link, leftv &lv);
-extern BOOLEAN mpsr_GetDump(char *fn);
-extern BOOLEAN mpsr_GetDump(MP_Link_pt link);
-extern BOOLEAN mpsr_GetDump(leftv h);
+extern mpsr_Status_t mpsr_GetDump(MP_Link_pt link);
 // from mpsr_Put.cc
 extern mpsr_Status_t mpsr_PutMsg(MP_Link_pt link, leftv lv);
-extern BOOLEAN mpsr_PutDump(char *fn);
-extern BOOLEAN mpsr_PutDump(MP_Link_pt link);
-extern BOOLEAN mpsr_PutDump(leftv h);
+extern mpsr_Status_t mpsr_PutDump(MP_Link_pt link);
 
 
 /***************************************************************

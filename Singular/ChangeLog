@@ -1,3 +1,13 @@
+Fri Mar 28 14:12:05 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* Added routines dump(link) and getdump(link) for ascii and MP
+	  links 
+
+	* ipconv.cc (dConvertTypes): added int->module conversion so that
+	  'module m = 0' works
+
+	* iparith.cc (jjVAR1): added LINK_CMD to list of typeof(...)
+
 Thu Mar 27 21:20:20 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
 	* added real time timer (rtimer) analog to timer

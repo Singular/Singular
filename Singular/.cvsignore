@@ -1,3 +1,3 @@
 Makefile *.dd *.d depend scanner.cc grammar.cc grammar version.h
 Singular Singularg t.mp .gdb_history
-.gdbinit grammar.h
+.gdbinit grammar.h *.sv

@@ -61,28 +61,39 @@ mpsr_Status_t mpsr_SetError(MP_Link_pt link)
   return mpsr_MP_Failure;
 }
 
-void mpsr_PrintError(mpsr_Status_t error)
+void mpsr_PrintError(mpsr_Status_t error, MP_Link_pt link)
 {
   if (error != mpsr_Success)
   {
     if (error == mpsr_MP_Failure)
       Werror("%s : %s", mpsr_errlist[error],
-             (mpsr_MP_errno < MP_MaxError ? MP_errlist[mpsr_MP_errno] :
-              "Unknown MP error"));
+             (link != NULL ? MP_ErrorStr(link) :
+              (mpsr_MP_errno < MP_MaxError ? MP_errlist[mpsr_MP_errno] :
+               "Unknown MP error")));
     else if (error == mpsr_MPT_Failure)
       Werror("%s : %s", mpsr_errlist[error],
-             (MPT_errno < MPT_MaxError ? MPT_errlist[MPT_errno] :
-              "Unknown MPT error"));
-    else Werror("MP<->Singular semantic error : %s",
+             ((MPT_errno == MPT_MP_Failure && link != NULL) ?
+              MP_ErrorStr(link) : MPT_ErrorStr(MPT_errno)));
+    else Werror("MP<->Singular interface error : %s",
                 (mpsr_errno < mpsr_MaxError ? mpsr_errlist[mpsr_errno] :
                  "Unknown mpsr error"));
   }
   
 }
+void mpsr_PrintError(MP_Link_pt link)
+{
+  mpsr_PrintError(mpsr_errno, link);
+}
+
+void mpsr_PrintError(mpsr_Status_t error)
+{
+  mpsr_PrintError(error, NULL);
+}
+
 
 void mpsr_PrintError()
 {
-  mpsr_PrintError(mpsr_errno);
+  mpsr_PrintError(mpsr_errno, NULL);
 }
 
 mpsr_Status_t mpsr_GetError()

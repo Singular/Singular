@@ -794,22 +794,11 @@ MPT_Status_t mpsr_GetExternalData(MP_Link_pt link,
     
 /***************************************************************
  *  
- * A routine which get the previous dump of Singular
+ * A routine which gets the previous dump of Singular
  *
  ***************************************************************/
-BOOLEAN mpsr_GetDump(char *fn)
-{
-  MP_Link_pt link = OpenMPFile(fn, 1);
-  BOOLEAN status;
 
-  if (link == NULL) return FALSE;
-  else status = mpsr_GetDump(link);
-
-  MP_CloseLink(link);
-  return status;
-}
-
-BOOLEAN mpsr_GetDump(MP_Link_pt link)
+mpsr_Status_t mpsr_GetDump(MP_Link_pt link)
 {
   mpsr_sleftv mlv;
   mpsr_Status_t status = mpsr_Success;
@@ -836,34 +825,6 @@ BOOLEAN mpsr_GetDump(MP_Link_pt link)
     else
       mpsr_PrintError(status);
   }
-
-
-  return (status == mpsr_Success);
-}
-
-BOOLEAN mpsr_GetDump(leftv h)
-{
-  if (h == NULL)
-  {
-    Print("Using file %s to get dump\n", MPSR_DEFAULT_DUMP_FILE);
-    return mpsr_GetDump(MPSR_DEFAULT_DUMP_FILE);
-  }
-  else if (h->Typ() == STRING_CMD)
-  {
-    return mpsr_GetDump((char *) h->Data());
-  }
-  else if (h->Typ() == LINK_CMD)
-  {
-    si_link l = (si_link) h->Data();
-    if (SI_LINK_R_OPEN_P(l) && mpsr_IsMPLink(l))
-      return mpsr_GetDump((MP_Link_pt) l->data);
-    else
-      Werror("Can only get dump data from an already opened MP link");
-  }
-  else
-  {
-    Werror("Need string or opened MP Link");
-  }
-  return FALSE;
+  return status;
 }
 #endif

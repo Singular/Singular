@@ -6,7 +6,7 @@
 /*
 * ABSTRACT
 */
-/* $Id: sing_mp.h,v 1.2 1997-03-24 14:25:51 Singular Exp $ */
+/* $Id: sing_mp.h,v 1.3 1997-03-28 21:44:39 obachman Exp $ */
 
 #include "subexpr.h"
 #include "silink.h"
@@ -18,9 +18,6 @@ void slInitBatchLink(si_link l, int argc, char** argv);
 si_link_extension slInitMPFile();
 si_link_extension slInitMPTcp();
 extern BOOLEAN mpsr_IsMPLink(si_link l);
-typedef struct MP_Link_t;
-typedef MP_Link_t * MP_Link_pt;
-extern MP_Link_pt OpenMPFile(char *fn, short mode);
 #endif
 
 int Batch_do(int argc, char **argv);

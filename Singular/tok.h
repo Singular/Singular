@@ -6,7 +6,7 @@
 /*
 * ABSTRACT
 */
-/* $Id: tok.h,v 1.4 1997-03-27 20:26:06 obachman Exp $ */
+/* $Id: tok.h,v 1.5 1997-03-28 21:44:40 obachman Exp $ */
 
 #ifndef MYYSTYPE
 #include "structs.h"
@@ -59,12 +59,14 @@ enum {
   DEF_CMD,
   DEFINED_CMD,
   DELETE_CMD,
+  DUMP_CMD,
   EXTGCD_CMD,
   FAC_CMD,
   FIND_CMD,
   FACSTD_CMD,
   FGLM_CMD,
   GCD_CMD,
+  GETDUMP_CMD,
   INSERT_CMD,
   INT_CMD,
   INTVEC_CMD,
