@@ -1,0 +1,1349 @@
+// $Id: equising.lib,v 1.1 2000-11-16 14:40:31 Singular Exp $
+info="
+LIBRARY:  Equising.lib
+AUTHOR:   Andrea Mindnich, e-mail:mindnich@mathematik.uni-kl.de
+PROCEDURES:
+ esStratum   computes the equisingularity stratum of a deformation.
+ isEquising  tests, if a given deformation is equisingular.
+"
+
+LIB "poly.lib";
+LIB "elim.lib";
+LIB "hnoether.lib";
+
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
+
+// COMPUTES  a weight vector. x and y get weight 1 and all other
+//           variables get weight 0.
+static proc xyVector()
+{
+  intvec iv ;
+  iv[nvars(basering)]=0 ;
+  iv[rvar(x)] =1;
+  iv[rvar(y)] =1;
+  return (iv);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+// exchanges the variables x and y in the polynomial p_f
+static proc swapXY(poly f)
+{
+  def r_base = basering;
+  ideal MI = maxideal(1);
+  MI[rvar(x)]=y;
+  MI[rvar(y)]=x;
+  map phi = r_base, MI;
+  f=phi(f);
+  return (f);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+// ASSUME:   p_mon is a monomial
+//            and p_g is the product of the variables in p_mon.
+// COMPUTES the coefficient of p_mon in p_h.
+static proc coefficient(poly p_h, poly p_mon, poly p_g)
+{
+  matrix coefMatrix = coef(p_h,p_g);
+  int nc = ncols(coefMatrix);
+  int ii=1;
+  poly p_c=0;
+  while(ii<=nc)
+  {
+    if (coefMatrix[1,ii] == p_mon)
+    {
+      p_c = coefMatrix[2,ii];
+      break;
+    }
+    ii++;
+  }
+  return (p_c);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+// in p_F the variable p_vari is substituted by the polynomial p_g.
+static proc eSubst(poly p_F, poly p_vari, poly p_g)
+{
+  def r_base = basering;
+  ideal MI;
+  map phi;
+  int ii = rvar(p_vari);
+  if (ii != 0)
+  {
+    MI = maxideal(1);
+    MI[ii] = p_g;
+    phi = r_base, MI;
+    p_F = phi(p_F);
+  }
+  return (p_F);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+// All ring variables of p_F which occur in (the set of generators of) the
+// ideal  Id, are substituted by 0
+static proc SimplifyF(poly p_F, ideal Id)
+{
+  int i=1;
+  int si = size(Id);
+  for (i=1; i <= si; i++)
+  {
+    if (rvar(Id[i]))
+    {
+      p_F = subst(p_F, Id[i], 0);
+    }
+  }
+  return(p_F);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+// Checks, if the basering is admissible.
+static proc checkBasering ()
+{
+  int error = 0;
+  if(find(charstr(basering),"real"))
+  {
+    ERROR ("cannot compute esStratum with 'real' as coefficient field");
+  }
+  if (nvars(basering) <= 2)
+  {
+   ERROR ("there are to less ringvariables to compute esStratum")
+  }
+  error = checkQIdeal(ideal(basering));
+  return(error);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+static  proc getInput (list #)
+{
+  def r_base = basering;
+
+  int maxStep = -1;
+
+  if (size(#) >= 1)
+  {
+    if (typeof(#[1]) == "int")
+    {
+      maxStep = #[1];
+    }
+
+    else
+    {
+      ERROR("expected esStratum('poly', 'int') ");
+    }
+  }
+
+  return(maxStep);
+}
+
+
+//////////////////////////////////////////////////////////////////////////////
+
+
+// RETURNS: 0, if the ideal cond only depends on the deformation parameters
+//          1, otherwise.
+static proc checkQIdeal (ideal cond)
+{
+  def r_base = basering;
+
+  int i_print = printlevel-voice + 4;
+  int i_nvars = nvars(basering);
+
+  ideal id_help = subst(cond,var(i_nvars),0,var(i_nvars-1),0) - cond;
+
+  // cond depends only on the first i_nvars-2 variables <=>
+  //  id_help == <0>
+  if ( simplify(id_help, 2) != 0)
+  {
+    dbprint(i_print,
+    "ideal(basering) must only depend on the deformation parameters");
+    return(1);
+  }
+
+  return(0);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+// COMPUTES string(minpoly) and substitutes the parameter by newParName
+static proc makeMinPolyString (string newParName)
+{
+  int i;
+  string parName = parstr(basering);
+  int parNameSize = size(parName);
+
+  string oldMinPolyStr = string (minpoly);
+  int minPolySize = size(oldMinPolyStr);
+
+  string newMinPolyStr = "";
+
+  for (i=1;i <= minPolySize; i++)
+  {
+    if (oldMinPolyStr[i,parNameSize] == parName)
+    {
+      newMinPolyStr = newMinPolyStr + newParName;
+      i = i + parNameSize-1;
+    }
+    else
+    {
+      newMinPolyStr = newMinPolyStr + oldMinPolyStr[i];
+    }
+  }
+
+  return(newMinPolyStr);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+// Defines a new ring without deformation-parameters.
+static proc createHNERing()
+{
+  string str;
+  string minpolyStr = string(minpoly);
+
+  str = " ring HNERing = (" + charstr(basering) + "), (x,y), ls;";
+  execute (str);
+
+  str = "minpoly ="+ minpolyStr+";";
+  execute(str);
+
+  keepring(HNERing);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+// RETURNS: 1, if p_f = 0 or char(basering) divides the order of p_f
+//             or p_f is not squarefree.
+//          0, otherwise
+static proc checkPoly (poly p_f)
+{
+  int i_print = printlevel - voice + 3;
+  int i_ord;
+
+  if (p_f == 0)
+  {
+    dbprint(i_print,"The Input is a 'deformation'  of the zero polynomial");
+    return(1);
+  }
+
+  i_ord = mindeg1(p_f);
+
+  if (number(i_ord) == 0)
+  {
+    dbprint(i_print,
+            "The characteristic of the coefficient field
+             divides the order of the equation");
+    return(1);
+  }
+
+  if (squarefree(p_f) != p_f)
+  {
+    dbprint(i_print, "The curve is reducible");
+    return(1);
+  }
+
+  return(0);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+// COMPUTES  the multiplicity sequence of p_f
+static proc calcMultSequence (poly p_f)
+{
+  int i_print = printlevel-voice + 3;
+  intvec multSeq=0;
+  list hneList;
+  int xNotTransversal;
+  int fIrreducible = 1;
+
+  // if basering =  (p,a) or (p,a(1..s)),
+  //            p prime, a algebraic, a(1..s) transcendent use reddevelop
+  // otherwise use develop
+  if (char(basering) != 0
+      && npars(basering) !=0
+      && charstr(basering) == string(char(basering)) + "," + parstr(basering))
+  {
+    hneList = reddevelop(p_f, -1);
+    if ( size(hneList)>=2)
+    {
+      fIrreducible = 0;
+      dbprint(i_print, "The curve is reducible");
+      return(multSeq, xNotTransversal, fIrreducible);
+    }
+
+    hneList = hneList[1];
+
+    xNotTransversal= hneList[3];
+  }
+  else
+  {
+    hneList = develop(p_f, -1);
+
+    xNotTransversal= hneList[3];
+    fIrreducible = hneList[5];
+  }
+
+  if ( ! fIrreducible)
+  {
+    dbprint(i_print, "The curve is reducible");
+    return(multSeq, xNotTransversal, fIrreducible);
+  }
+
+  multSeq = multsequence (hneList);
+  return(multSeq, xNotTransversal, fIrreducible);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+// ASSUME:  The basering is no qring and has at least 3 variables
+// DEFINES: A new basering, "myRing",
+//          with new names for the parameters and variables.
+//          The new names for the parameters are a(1..k),
+//          and t(1..s),x,y for the variables
+//          The ring ordering is ordStr.
+// NOTE:    This proc uses 'execute'.
+static proc createMyRing(poly p_F, string ordStr )
+{
+  def r_old = basering;
+
+  int chara = char(basering);
+  string charaStr;
+  int i;
+  string minPolyStr = "";
+  string helpStr;
+  int nDefParams = nvars(r_old)-2;
+
+
+  ideal qIdeal = ideal(basering);
+
+  if (npars(basering) == 0)
+  {
+    helpStr = "ring myRing ="
+              + string(chara)+ ", (t(1..nDefParams), x, y),"+ ordStr +";";
+    execute(helpStr);
+  }
+
+  else
+  {
+    charaStr = charstr(basering);
+    if (charaStr == string(chara) + "," + parstr(basering))
+    {
+      if (minpoly !=0)
+      {
+        minPolyStr = makeMinPolyString("a");
+
+        helpStr = "ring myRing =
+                 (" + string(chara) + ",a),
+                 (t(1..nDefParams), x, y)," + ordStr + ";";
+        execute(helpStr);
+
+        helpStr = "minpoly =" + minPolyStr + ";";
+        execute (helpStr);
+      }
+      else
+      {
+        helpStr = "ring myRing =
+                  (" + string(chara) + ",a(1..npars(basering)) ),
+                  (t(1..nDefParams), x, y)," + ordStr + ";";
+        execute(helpStr);
+      }
+    }
+    else
+    {
+      i = find (charaStr,",");
+
+      helpStr = " ring myRing =
+              (" + charaStr[1,i] + "a),
+              (t(1..nDefParams), x, y)," + ordStr + ";";
+
+      execute (helpStr);
+    }
+  }
+
+  ideal qIdeal = fetch(r_old, qIdeal);
+
+  if(qIdeal != 0)
+  {
+    def r_base = basering;
+    kill myRing;
+    qring myRing = std(qIdeal);
+  }
+
+  poly p_F = fetch(r_old, p_F);
+  ideal ES;
+
+  keepring(myRing);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+/////////// procedures to compute the equisingularity stratum /////////////////
+///////////////////////////////////////////////////////////////////////////////
+
+
+// DEFINES a new basering, myRing,  which has one variable
+//         more than the old ring.
+//         The name for the new variable is "H(nhelpV)".
+//         p_F and ES are "imaped" into the new ring.
+static proc extendRing (poly p_F,  ideal ES, int nHelpV, ideal HCond)
+{
+  def r_old = basering;
+
+  string helpStr;
+  string minPolyStr = "";
+
+  ideal qIdeal = ideal(basering);
+
+  if (minpoly != 0)
+  {
+    if (charstr(basering) == string(char(basering)) + "," + parstr(basering))
+    {
+      minPolyStr = string(minpoly);
+    }
+  }
+
+  string str =
+ "ring myRing = (" + charstr(r_old) + "),
+                (H(" + string(nHelpV)+ ")," + string(maxideal(1)) + "),
+                (dp(" + string(nHelpV) + "),dp);";
+  execute (str);
+
+  if (minPolyStr != "")
+  {
+    helpStr = "minpoly =" + minPolyStr + ";";
+    execute(helpStr);
+  }
+
+  ideal qIdeal = imap(r_old, qIdeal);
+  if(qIdeal != 0)
+  {
+    def r_base = basering;
+
+    kill myRing;
+
+    attrib(qIdeal,"isSB",1);
+    qring myRing = qIdeal;
+  }
+
+
+  poly p_F = imap(r_old, p_F);
+  ideal ES = imap(r_old, ES);
+  ideal HCond = imap(r_old, HCond);
+
+  keepring(myRing);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+// COMPUTES an ideal equimultCond, such that F_(n-1) mod equimultCond =0,
+//          where F_(n-1) is the (nNew-1)-jet of p_F with respect to x,y.
+static proc calcEquimultCond(poly p_F, int nNew)
+{
+  ideal equimultCond = 0;
+  poly p_FnMinus1;
+  matrix coefMatrix;
+  int nc;
+  int ii = 1;
+
+  p_FnMinus1 = jet(p_F, nNew-1, xyVector());
+
+  coefMatrix = coef(p_FnMinus1, xy);
+
+  nc = ncols(coefMatrix);
+
+  for (ii=1; ii<=nc; ii++)
+  {
+    equimultCond[ii] = NF(coefMatrix[2,ii],std(0));
+  }
+
+  p_F = p_F - p_FnMinus1;
+  p_F = SimplifyF(p_F, equimultCond);
+
+  return(equimultCond, p_F);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+// COMPUTES smallest integer >= nNew/nOld -1
+static proc calcNZeroSteps (int nOld,int nNew)
+{
+ int nZeroSteps;
+
+ if (nOld mod nNew == 0)
+ {
+   nZeroSteps = nOld div nNew -1;
+ }
+
+ else
+ {
+  nZeroSteps  = nOld div nNew;
+ }
+
+ return(nZeroSteps);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+// ASSUME: ord_(X,Y)(F)=nNew
+// COMPUTES an ideal I such that (p_F mod I)_nNew  = p_c*y^nNew.
+static proc purePowerOfY (poly p_F, int nNew)
+{
+  ideal id_help = 0;
+  poly  p_Fn;
+  matrix coefMatrix;
+  int nc;
+  poly p_c;
+  int ii=1;
+
+  p_Fn = jet(p_F, nNew, xyVector());
+
+  coefMatrix = coef(p_Fn, xy);
+  nc = ncols(coefMatrix);
+
+  p_c = coefMatrix[2,nc];
+
+  for (ii=1; ii <= nc-1; ii++)
+  {
+    id_help[ii] = NF(coefMatrix[2,ii],std(0));
+  }
+
+  p_F = p_F - p_Fn + p_c*y^nNew;
+
+  p_F = SimplifyF(p_F, id_help);
+
+  return(id_help, p_F, p_c);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+// ASSUME: ord_(X,Y)(F)=nNew
+// COMPUTES an ideal I such that p_Fn mod I = p_c*(y-p_a*x)^nNew,
+//          where p_Fn is the homogeneous part of p_F of order nNew.
+static proc purePowerOfLin (poly p_F, ideal HCond, int nNew, int nHelpV)
+{
+  ideal id_help = 0;
+  poly p_Fn;
+  matrix coefMatrix;
+  poly p_c;
+  poly p_ca;
+  poly p_help;
+  poly p_a;
+  int ii;
+  int jj;
+  int bico;
+
+  p_Fn = jet(p_F, nNew, xyVector());
+
+  coefMatrix = coeffs(subst(p_Fn,x,1),y);
+
+  p_c = coefMatrix[nNew+1,1];
+  p_ca = coefMatrix[nNew,1]/(-nNew);
+
+  if (npars(basering)==1 && charstr(basering) != string(char(basering)) + "," + parstr(basering))
+  {
+    p_a = H(nHelpV);
+    HCond = HCond + ideal(p_ca - p_a*p_c);
+  }
+  else
+  {
+    p_help = p_ca/p_c;
+    if (p_help * p_c == p_ca)
+    {
+      p_a = p_help;
+    }
+    else
+    {
+      p_a = H(nHelpV);
+      HCond = HCond + ideal(p_ca - p_a*p_c);
+    }
+  }
+
+  bico = (nNew*(nNew-1))/2;
+
+  for (ii = 2; ii <= nNew ; ii++)
+  {
+
+    if (coefMatrix[nNew+1-ii,1] == 0)
+    {
+      if (number(bico) != 0)
+      // Then a^i=0 since c is a unit
+      {
+        id_help = id_help + ideal(NF(p_a^(ii),std(0)));
+        for (jj = ii+1; jj <= nNew; jj++)
+        // the remaining coefficients (of y^(nnew-k)*x^k with k>i)
+        // are also zero.
+        {
+          id_help = id_help
+                    + ideal(NF(coefMatrix[nNew+1-jj,1],std(0)));
+        }
+        break;
+      }
+    }
+
+    else
+    {
+      id_help = id_help +
+            ideal(NF(coefMatrix[nNew+1-ii,1] - bico*p_c*(-p_a)^ii,std(0)));
+    }
+
+    bico = (bico*(nNew-ii))/(ii+1);
+  }
+
+  p_F = SimplifyF(p_F, id_help);
+
+  return(id_help, HCond, p_F, p_c, p_a);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+// eliminates the variables H(1),..,H(nHelpV) from the ideal ES + HCond
+static proc helpVarElim(ideal ES, ideal HCond, int nHelpV)
+{
+  ES = ES + HCond;
+  ES = std(ES);
+  ES = nselect(ES,1,nHelpV);
+
+  return(ES);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+// ASSUME:   ord(F)=nNew and p_c(y-p_a*x)^n is the nNew-jet of F with respect
+//           to X,Y
+// COMPUTES  F(x,yx+a*x)/x^n
+static proc formalBlowUp(poly p_F, poly p_c, poly p_a, int nNew)
+{
+
+  p_F = p_F - jet(p_F, nNew, xyVector());
+
+  if (p_a != 0)
+  {
+    p_F = eSubst(p_F, y , yx + p_a*x);
+  }
+  else
+  {
+    p_F = subst(p_F, y, xy);
+  }
+
+  p_F = p_F/(x^nNew);
+
+  p_F = p_F + p_c * y^nNew;
+
+  return (p_F);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+// ASSUME:  p_F in K[t(1)..t(s),x,y]
+// COMPUTES the minimal ideal ES, such that the deformation p_F mod ES is
+//          equisingular.
+//          The computation is done up to iteration step 'maxstep'.
+// RETURNS: list l, such that
+//          l[1]=1 if some error has occured,
+//          l[1]=0 otherwise and then l[2] = es_cond.
+static proc calcEsCond(poly p_F, intvec multSeq, int maxStep)
+{
+  def r_old = basering;
+
+  ideal ES = 0;
+
+  int ii;
+  int step = 1;
+  int nNew = multSeq[step];
+  int nOld = nNew;
+  int nZeroSteps;
+  int nHelpV = 1;
+  ideal HCond = 0;
+  int maxDeg = 0;
+  int z = printlevel - voice + 3;
+  string str;
+
+  extendRing(p_F, ES, nHelpV, HCond);
+
+  poly p_c;
+  poly p_a;
+  ideal I;
+
+  for (ii = 1; ii <= size(multSeq); ii++)
+  {
+    maxDeg = maxDeg + multSeq[ii];
+  }
+
+  while (step <= maxStep)
+  {
+
+    nOld = nNew;
+    nNew = multSeq[step];
+
+    p_F = jet(p_F, maxDeg, xyVector());
+    maxDeg = maxDeg - nNew;
+
+    if (nNew<nOld)
+    //start a new line in the HNE of F
+    //               _            _
+    // for the next | nold/nnew -1 | iteration steps the coefficient 'a'
+    // in the leading form Fn = c(y-ax)^n should  be zero.
+    {
+      p_F = swapXY(p_F);
+      nZeroSteps = calcNZeroSteps (nOld, nNew);
+    }
+
+    I, p_F = calcEquimultCond (p_F, nNew);
+    ES = ES + I;
+
+    if (z>1)
+    {
+      "// conditions for equimultiplicity in step:", step;
+      I;
+      if (nHelpV >1)
+      {
+        str = string(nHelpV);
+        "// conditions for help variables H(1),..,H("+str+"):";
+        HCond;
+      }
+      pause("press <return> to continue");
+    }
+
+    if (nZeroSteps > 0)
+    {
+      nZeroSteps--;
+
+      // compute conditions, s.th. Fn = c*y^nnew ?
+      I, p_F, p_c = purePowerOfY (p_F, nNew);
+      ES = ES + I;
+
+      if (z>1)
+      {
+        "// conditions for pure power in step:", step;
+        I;
+        if (nHelpV > 1)
+        {
+          str = string(nHelpV);
+          "// conditions for help variables H(1),..,H("+str+"):";
+          HCond;
+        }
+        pause("press <return> to continue");
+      }
+      p_a =0;
+    }
+
+    else
+    {
+      I, HCond, p_F, p_c, p_a = purePowerOfLin (p_F, HCond, nNew, nHelpV);
+
+      ES = ES + I;
+
+      if (z>1)
+      {
+        "// conditions for pure power in step:", step;
+        I;
+        str = string(nHelpV);
+        "// conditions for help variables H(1),..,H("+str+"):";
+        HCond;
+        pause("press <return> to continue");
+      }
+    }
+
+    p_F = formalBlowUp (p_F, p_c, p_a, nNew);
+
+    if (p_a == H(nHelpV))
+    {
+      nHelpV++;
+
+      def r_base = basering;
+      kill myRing;
+
+      extendRing(p_F, ES, nHelpV, HCond);
+
+      kill r_base;
+
+      poly p_a;
+      poly p_c;
+      ideal I;
+    }
+    step++;
+  }
+  if (nHelpV > 1)
+  {
+    ES = helpVarElim(ES, HCond, nHelpV);
+  }
+
+  if (nameof(basering)=="myRing")
+  {
+    setring r_old;
+    ES = imap(myRing, ES);
+  }
+
+  return(ES);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+proc esStratum (poly p_F, list #)
+"USAGE:   esStratum(F[,m]); F a polynomial, m an integer
+ASSUME:  F defines a deformation of an irreducible bivariate polynomial f
+         and that char(basering) does not divide mult(f).
+         If nv is the number of variables of the basering, then the first nv-2
+         ringvariables are the deformation parameters.
+         If the basering is a qring, ideal(basering) must only depend
+         on the deformation parameters.
+RETURN:  A list l of an ideal and an integer, where
+         l[1] is the ideal in the deformation parameters, defining the
+         equisingularity stratum of F,
+         l[2] = 1 if some error has occured, l[2] = 0 otherwise.
+         If m is given, the computation stops after m steps of the iteration.
+NOTE:    printlevel > 0 displays comments and pauses after intermediate
+         computations (default: printlevel=0)
+         This proc uses 'execute' or calls a procedure using 'execute'.
+EXAMPLE: example esStratum; shows an example
+"
+{
+  def r_user = basering;
+
+  int ii = 1;
+  int i_nvars = nvars(basering);
+  int error = 0;
+  int xNotTransversal;
+  int fIrreducible;
+  int maxStep;
+  int userMaxStep;
+  ideal cond;
+  intvec multSeq;
+  ideal ES = 0;
+
+  error = checkBasering();
+  if (error)
+  {
+    return(list(ES,error));
+  }
+
+  userMaxStep = getInput(#);
+
+  // define a new basering "myRing" with new names for parameters
+  // and variables.
+  // The new names are 'a(1)', ..., 'a(npars)' for the parameters
+  // and 't(1)', ..., 't(nvars-2)', 'x', 'y' for the variables.
+  createMyRing(p_F, "dp");
+
+  // define a ring without deformation parameters, to compute the HNE
+  // of F mod <t_1,..,t_s>
+  createHNERing();
+
+  poly p_f = imap(myRing,p_F);
+
+  error = checkPoly(p_f);
+  if (error)
+  {
+    setring r_user;
+    return(list( ideal(0),error));
+  }
+
+  // compute the multiplicitysequence of p_f.
+  multSeq, xNotTransversal, fIrreducible = calcMultSequence(p_f);
+
+  if ( ! fIrreducible)
+  {
+    setring r_user;
+    return(list(ideal(0),1));
+  }
+
+  setring myRing;
+
+  if (xNotTransversal)
+  {
+    p_F = swapXY(p_F);
+  }
+
+  if (userMaxStep != -1 && userMaxStep <  size(multSeq)-1)
+  {
+    maxStep = userMaxStep;
+  }
+  else
+  {
+    maxStep = size(multSeq)-1;
+  }
+
+  ES = calcEsCond(p_F, multSeq, maxStep);
+
+  setring r_user;
+  ES = fetch(myRing, ES);
+
+  return(list(ES, error));
+}
+
+example
+{
+   "EXAMPLE:"; echo=2;
+   ring r = 11,(a,b,c,d,e,f,g,x,y),ds;
+   poly F =
+   xa+yb+x2+2xy+y2c+y^2+y3d+y4e+y5f+y6g+x^7;
+   esStratum(F);
+   esStratum(F,2);
+   ideal I  = f-fa,e+b;
+   qring q = std(I);
+   poly F = imap(r,F);
+   esStratum(F);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//////////////////// procedures for equisingularity test///////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
+
+
+// DEFINES a new basering, myRing,  which has one variable
+//         more than the old ring.
+//         The name for the new variable is "H(nhelpV)".
+static proc T_extendRing(poly p_F, int nHelpV, ideal HCond)
+{
+  def r_old = basering;
+
+  ideal qIdeal = ideal(basering);
+
+  string helpStr;
+  string minPolyStr = "";
+
+  if(minpoly != 0)
+  {
+    if (charstr(basering) == string(char(basering)) + "," + parstr(basering))
+    {
+      minPolyStr = string(minpoly);
+    }
+  }
+
+  string str = "ring myRing =
+               (" + charstr(r_old) + "),
+               (H(" + string( nHelpV)+ ")," + string(maxideal(1)) + "),
+               (dp(" + string( nHelpV) + "), ds);";
+  execute (str);
+
+  if (minPolyStr != "")
+  {
+    helpStr = "minpoly =" + minPolyStr + ";";
+    execute(helpStr);
+  }
+
+  ideal qIdeal = imap(r_old, qIdeal);
+  if(qIdeal != 0)
+  {
+    def r_base = basering;
+    kill myRing;
+    qring myRing = std(qIdeal);
+  }
+
+  poly p_F =imap(r_old, p_F);
+  ideal HCond = imap(r_old, HCond);
+
+  keepring(myRing);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+// tests, if ord p_F = nNew.
+static proc equimultTest (poly p_F, int nHelpV, int nNew, ideal HCond)
+{
+  poly p_FnMinus1;
+  ideal id_help;
+  matrix coefMatrix;
+  int i;
+  int nc;
+
+  p_FnMinus1 = jet(p_F, nNew-1, xyVector());
+
+  coefMatrix = coef(p_FnMinus1, xy);
+  nc = ncols(coefMatrix);
+
+  for (i=1; i<=nc; i++)
+  {
+    id_help[i] = coefMatrix[2,i];
+  }
+
+  id_help = T_helpVarElim(id_help, HCond, nHelpV);
+
+  if (reduce(id_help, std(0)) !=0 )
+  {
+    return(0, p_F);
+  }
+
+  p_F = p_F - p_FnMinus1;
+
+  return(1, p_F);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+// ASSUME: ord(p_F)=nNew
+// tests, if p_F =  p_c*y^nNew for some p_c.
+static proc pPOfYTest (poly p_F, int nHelpV, int nNew, ideal HCond)
+{
+  poly  p_Fn;
+  poly p_c;
+  ideal id_help;
+  int nc;
+  int i=1;
+  matrix coefMatrix;
+
+  p_Fn = jet(p_F, nNew, xyVector());
+
+  coefMatrix = coef(p_Fn, xy);
+  nc = ncols(coefMatrix);
+
+  p_c = coefMatrix[2,1];
+
+  for (i = 2; i <= nc; i++)
+  {
+    id_help[i] = coefMatrix[2,i];
+  }
+
+  id_help = T_helpVarElim(id_help, HCond, nHelpV);
+
+  if (reduce(id_help, std(0)) !=0 )
+  {
+    return(0, p_c);
+  }
+
+  return(1, p_c);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+// ASSUME: ord(p_F)=nNew
+// tests, if p_F =  p_c*(y - p_a*x)^nNew for some p_a, p_c.
+static proc pPOfLinTest(poly p_F, int nNew, int nHelpV, ideal HCond)
+{
+  poly p_Fn;
+  poly p_c;
+  poly p_ca;
+  poly p_help;
+  poly p_a;
+  ideal id_help;
+
+  p_Fn = jet(p_F, nNew, xyVector());
+
+  p_c  = coefficient(p_Fn,y^nNew,y);
+  p_ca = coefficient(p_Fn,y^(nNew-1)*x,xy)/-nNew;
+
+  if (npars(basering)==1
+  && charstr(basering) != string(char(basering)) + "," + parstr(basering))
+  {
+    p_a = H(nHelpV);
+    HCond = HCond + ideal(p_ca - p_a*p_c);
+  }
+  else
+  {
+    p_help = p_ca/p_c;
+    if (p_help * p_c == p_ca)
+    {
+      p_a = p_help;
+    }
+    else
+    {
+      p_a = H(nHelpV);
+      HCond = HCond + ideal(p_ca - p_a*p_c);
+    }
+  }
+
+  id_help = ideal(p_Fn - p_c *(y - p_a *x)^nNew);
+  id_help = T_helpVarElim(id_help, HCond, nHelpV);
+
+  if (reduce(id_help, std(0)) != 0 )
+  {
+    return(0, p_F, p_c, p_a, HCond);
+  }
+
+  return(1, p_F, p_c, p_a, HCond);
+}
+
+
+//////////////////////////////////////////////////////////////////////////////
+
+
+// eliminates the variables H(1),..,H(nHelpV) from the ideal ES + HCond
+static proc T_helpVarElim(ideal ES, ideal HCond, int nHelpV)
+{
+
+  def r_old = basering;
+
+  ideal qIdeal = ideal(basering);
+
+  string helpStr;
+  string minPolyStr = "";
+
+  if(minpoly != 0)
+  {
+    if (charstr(basering) == string(char(basering)) + "," + parstr(basering))
+    {
+      minPolyStr = string(minpoly);
+    }
+  }
+
+  string str = "ring myRing =
+               (" + charstr(r_old) + "),(" + string(maxideal(1)) + "),
+               (dp(" + string( nHelpV) + "), dp);";
+  execute (str);
+
+  if (minPolyStr != "")
+  {
+    helpStr = "minpoly =" + minPolyStr + ";";
+    execute(helpStr);
+  }
+
+  ideal qIdeal = imap(r_old, qIdeal);
+  if(qIdeal != 0)
+  {
+    def r_base = basering;
+    kill myRing;
+    qring myRing = std(qIdeal);
+  }
+
+  ideal ES = imap(r_old, ES);
+  ideal HCond = imap(r_old, HCond);
+
+  ES = ES + HCond;
+  ES = std(ES);
+  ES = nselect(ES,1,nHelpV);
+
+  setring r_old;
+  ES = imap (myRing,ES);
+
+  return(ES);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+
+// ASSUME:  F in K[t(1)..t(s),x,y],
+//          the ringordering is ds
+// RETURNS: list l, such that
+//          l[1]=1 if some error has occured,
+//          l[1]=0 otherwise and then
+//          l[2] = 1, if the deformation is equisingular and
+//          l[2] = 0 otherwise.
+static proc equisingTest (poly p_F, intvec multSeq, int maxStep)
+{
+  def r_old = basering;
+
+  ideal id_Es = 0;
+
+  int isES = 1;
+  int step = 1;
+  int nNew = multSeq[step];
+  int nOld = nNew;
+  int zeroSteps;
+  ideal  HCond = 0;
+  int  nHelpV = 1;
+
+  T_extendRing (p_F, nHelpV, HCond);
+
+  poly p_c;
+  poly p_a;
+
+  while (step <= maxStep)
+  {
+    nOld = nNew;
+    nNew = multSeq[step];
+
+    if (nNew < nOld)
+    //start a new line in the HNE of F
+    //               _            _
+    // for the next | nold/nnew -1 | iteration steps the coefficient 'a'
+    // in the leading form Fn = c(y-ax) should  be zero
+    {
+      p_F = swapXY(p_F);
+      zeroSteps = calcNZeroSteps (nOld, nNew);
+    }
+
+    isES, p_F = equimultTest (p_F, nHelpV, nNew, HCond);
+
+    if (! isES)
+    {
+      return(0);
+    }
+
+    if (zeroSteps > 0)
+    {
+      zeroSteps--;
+
+      isES, p_c = pPOfYTest (p_F,  nHelpV, nNew, HCond);
+      p_a = 0;
+    }
+    else
+    {
+      isES, p_F, p_c, p_a, HCond = pPOfLinTest (p_F, nNew, nHelpV, HCond);
+    }
+
+    if (! isES)
+    {
+      return(0);
+    }
+
+    p_F = formalBlowUp (p_F, p_c, p_a, nNew);
+
+    if (p_a == H(nHelpV))
+    {
+      nHelpV++;
+
+      def r_base = basering;
+      kill myRing;
+
+      T_extendRing(p_F, nHelpV, HCond);
+
+      kill r_base;
+
+      poly p_a;
+      poly p_c;
+    }
+
+    step++;
+  }
+
+  return(1);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+proc isEquising (poly p_F, list #)
+"USAGE:   esStratum(F[,m]); F a polynomial, m an integer
+ASSUME:  F defines a deformation of an irreducible bivariate polynomial f
+         and that char(basering) does not divide mult(f).
+         If nv is the number of variables of the basering, then the first nv-2
+         ringvariables are the deformation parameters.
+         If the basering is a qring, ideal(basering) must only depend
+         on the deformation parameters.
+RETURN:  A list l of two integers, where
+         l[1] = 1 if F is an equisingular deformation,l[1] = 0 otherwise.
+         l[2] = 1 if some error has occured, l[2] = 0 otherwise.
+         If m is given, the computation stops after m steps of the iteration.
+NOTE:    This proc uses 'execute' or calls a procedure using 'execute'.
+EXAMPLE: example isEquising; shows an example
+"
+{
+  def r_user = basering;
+
+  int ii = 1;
+  int i_nvars = nvars(basering);
+  int error = 0;
+  int maxStep;
+  int userMaxStep;
+  int xNotTransversal = 0;
+  int fIrreducible = 1;
+  intvec multSeq;
+  ideal isES = 1;
+
+  error = checkBasering();
+  if (error)
+  {
+    return(0,1);
+  }
+
+  userMaxStep = getInput(#);
+
+  // define a new basering "myRing" with new names for parameters
+  // and variables.
+  // The new names are 'a(1)', ..., 'a(npars)' for the parameters
+  // and 't(1)', ..., 't(nvars-2)', 'x', 'y' for the variables.
+  createMyRing(p_F, "ds");
+
+  createHNERing();
+
+  poly p_f = imap(myRing,p_F);
+
+  error = checkPoly(p_f);
+  if (error)
+  {
+    return(0,1);
+  }
+
+  // compute the multiplicity sequence of p_f.
+  multSeq, xNotTransversal, fIrreducible = calcMultSequence(p_f);
+
+   if ( ! fIrreducible)
+   {
+     return(list(0,1));
+   }
+
+  setring myRing;
+
+  if (xNotTransversal)
+  {
+    p_F = swapXY(p_F);
+  }
+
+  if (userMaxStep != -1 && userMaxStep <  size(multSeq)-1)
+  {
+    maxStep = userMaxStep;
+  }
+  else
+  {
+    maxStep = size(multSeq)-1;
+  }
+
+  int isES = equisingTest(p_F, multSeq, maxStep);
+
+  return(list(isES, error));
+}
+
+example
+{
+   "EXAMPLE:"; echo=2;
+   ring r = 11,(T,x,y),ds;
+   poly F = (x+y)^2+y^3*T+x^7;
+   isEquising(F);
+   isEquising(F,1);
+   isEquising(F,2);
+   ideal I  = ideal(T);
+   qring q = std(I);
+   poly F = imap(r,F);
+   isEquising(F,2);
+}
+
