@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.126 1999-07-23 12:32:39 obachman Exp $
+@comment $Id: reference.doc,v 1.127 1999-07-23 13:07:06 obachman Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -2161,7 +2161,7 @@ $(f_1,...,f_n) = (g_1,...,g_s)$
 L(g_i)<>L(g_j) for all i<>j
 @end ifinfo
 @tex
-L($g_i)\ne $L($g_j$) for all $i\ne j$
+L($g_i)\neq $L($g_j$) for all $i\neq j$
 @end tex
 @item
 in the case of a global ordering (polynomial ring):
@@ -2186,7 +2186,7 @@ in the case of a local or mixed ordering (localization of polynomial ring):
 i<>j, L(gi) | L(gj)
 @end ifinfo
 @tex
-i \ne j, \quad $L(g_i) | L(g_j)$
+$i \neq j, \quad L(g_i) | L(g_j)$
 @end tex
 then
 @ifinfo
@@ -3282,7 +3282,7 @@ consists of a minimal set of generators of the first syzygy module of
 !=0 for i<=p
 @end ifinfo
 @tex
-$\ne 0$ for $i \le p$
+$\neq 0$ for $i \le p$
 @end tex
  but @code{L[p+1]}, the
 first syzygy module of @code{L[p]}, is 0 (if the basering is not a qring).
@@ -5858,10 +5858,6 @@ See @ref{if}; @ref{boolean expressions}; @ref{Control structures}.
 @*@code{export} list_of_names @code{;}
 @item @strong{Purpose:}
 converts a local variable of a procedure to a global one.
-@ifset namespaces
-@item @strong{Note:} obsoleted by @code{exportto}.
-@end ifset
-@ifclear namespaces
 @item @strong{Note:} 
 Objects defined in a ring are not automatically exported
 when exporting the ring (use @code{keepring} instead).
@@ -5884,7 +5880,6 @@ listvar();
 @expansion{} // i                    [0]  int 0
 @end smallexample
 @end table
-@end ifclear
 
 @ifset namespaces
 @c ref
