@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.h,v 1.5 1997-07-09 15:54:06 Singular Exp $ */
+/* $Id: syz.h,v 1.6 1997-09-29 08:51:44 siebert Exp $ */
 /*
 * ABSTRACT: Resolutions
 */
@@ -42,6 +42,7 @@ class ssyStrategy{
   int * binom;
   int highdeg_1;
   intvec * resolution;
+  intvec * cw;
 };
 
 void sySchreyersSyzygiesM(polyset F,int Fmax,polyset* Shdl,int* Smax,
