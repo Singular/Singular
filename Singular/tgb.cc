@@ -134,7 +134,30 @@ void now_t_rep(const int & arg_i, const int & arg_j, calc_dat* c);
 void soon_t_rep(const int & arg_i, const int & arg_j, calc_dat* c);
 int pLcmDeg(poly a, poly b);
 int simple_posInS (kStrategy strat, poly p,int len);
+void add_to_reductors(calc_dat* c, poly h, int len){
+  int i=simple_posInS(c->strat,h,len);
 
+  LObject P; memset(&P,0,sizeof(P));
+  P.tailRing=c->r;
+  P.p=h; /*p_Copy(h,c->r);*/
+  P.FDeg=pFDeg(P.p,c->r);
+  if (!rField_is_Zp(c->r)) pCleardenom(P.p);
+ 
+  c->strat->enterS(P,i,c->strat);
+  c->strat->lenS[i]=len;
+  pNorm(c->strat->S[i]);
+//   if (0 /*R_found && (i<c->strat->sl)*/)
+//   {
+//     i++;
+//     unsigned long h_sev = pGetShortExpVector(h);
+// 	loop
+// 	  {
+// 	    if (i>c->strat->sl) break;
+// 	    clearS(h,h_sev,len, &i,&(c->strat->sl),c->strat);
+// 	    i++;
+// 	  }
+//   }
+}
 BOOLEAN find_next_pair(calc_dat* c)
 {
   int start_i,start_j,i,j;
@@ -808,34 +831,13 @@ void add_to_basis(poly h, int i_pos, int j_pos,calc_dat* c)
     c->continue_j=0;
     c->skipped_i=-1;
   }
-
+  add_to_reductors(c, h, c->lengths[c->n-1]);
   //i=posInS(c->strat,c->strat->sl,h,0 /*ecart*/);
-    i=simple_posInS(c->strat,h,c->lengths[c->n-1]);
-
-    LObject P; memset(&P,0,sizeof(P));
-    P.tailRing=c->r;
-    P.p=h; /*p_Copy(h,c->r);*/
-    P.FDeg=pFDeg(P.p,c->r);
-    if (!rField_is_Zp(c->r)) pCleardenom(P.p);
-    //enterT(P,c->strat,-1);
-    c->strat->enterS(P,i,c->strat);
-    c->strat->lenS[i]=/*pLength(c->strat->S[i]);*/ c->lengths[c->n-1];
-    pNorm(c->strat->S[i]);
-    if (0 /*R_found && (i<c->strat->sl)*/)
-      {
-	i++;
-	unsigned long h_sev = pGetShortExpVector(h);
-	loop
-	  {
-	    if (i>c->strat->sl) break;
-	    clearS(h,h_sev,c->lengths[c->n-1], &i,&(c->strat->sl),c->strat);
-	    i++;
-	  }
-      }
-    if (c->lengths[c->n-1]==1)
-      shorten_tails(c,c->S->m[c->n-1]);
-    // if (corr){
-    
+  
+  if (c->lengths[c->n-1]==1)
+    shorten_tails(c,c->S->m[c->n-1]);
+  // if (corr){
+  
 //     corr=lenS_correct(c->strat);
 //     if(!corr){
 //       PrintS("korupted in shorten tails");
@@ -1012,20 +1014,8 @@ static poly redNF2 (poly h,calc_dat* c , int &len)
 	      //not in c->S
 	      //LEAVE
 	      deleteInS(j,c->strat);
-	      //remember destroying poly
-	      //ENTER
-	       int mlength=pLength(sec_copy);
-	    int mi=simple_posInS(c->strat,sec_copy,mlength);
-	    
-	    LObject mP; memset(&mP,0,sizeof(mP));
-	    mP.tailRing=c->r;
-	    mP.p=sec_copy; /*p_Copy(h,c->r);*/
-	    mP.FDeg=pFDeg(mP.p,c->r);
-	    if (!rField_is_Zp(c->r)) pCleardenom(mP.p);
-	    //enterT(P,c->strat,-1);
-	    c->strat->enterS(mP,mi,c->strat);
-	    c->strat->lenS[mi]=mlength;
-	    pNorm(c->strat->S[mi]);
+	  
+	      add_to_reductors(c,sec_copy,pLength(sec_copy));
 	    } 
 	    else {
 //shorten_tails may alter position (not the length, even not by recursion in GLOBAL case)
@@ -1078,20 +1068,8 @@ static poly redNF2 (poly h,calc_dat* c , int &len)
 	    }
 	  }
 	  if(must_expand){
-	    //i=posInS(c->strat,c->strat->sl,h,0 /*ecart*/);
-	    int mlength=pLength(sec_copy);
-	    int mi=simple_posInS(c->strat,sec_copy,mlength);
-	    
-	    LObject mP; memset(&mP,0,sizeof(mP));
-	    mP.tailRing=c->r;
-	    mP.p=sec_copy; /*p_Copy(h,c->r);*/
-	    mP.FDeg=pFDeg(mP.p,c->r);
-	    if (!rField_is_Zp(c->r)) pCleardenom(mP.p);
-	    //enterT(P,c->strat,-1);
-	    c->strat->enterS(mP,mi,c->strat);
-	    c->strat->lenS[mi]=mlength;
-	    pNorm(c->strat->S[mi]);
-	
+
+	    add_to_reductors(c,sec_copy,pLength(sec_copy));
 	  }
 	  if (h==NULL) return NULL;
 	  P.p=h;
@@ -1519,11 +1497,5 @@ void shorten_tails(calc_dat* c, poly monom)
 	}
       
     }
-//   if (corr){
-    
-//     corr=lenS_correct(c->strat);
-//     if(!corr){
-//       PrintS("korupted in shorten tails");
-//     }
-//   }
+
 }
