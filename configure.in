@@ -21,9 +21,25 @@ export SINGULAR_VERSION
 export VERSION_DATE
 
 dnl substitue them into the Makefiles
-AC_SUBST(SINGULAR_MAJOR_VERSION)
-AC_SUBST(SINGULAR_MINOR_VERSION)
-AC_SUBST(SINGULAR_SUB_VERSION)
+AC_SUBST(SINGULAR_VERSION)
+
+dnl determine singuname
+AC_MSG_CHECKING(uname for singular)
+AC_CACHE_VAL(ac_cv_singuname,
+ac_cv_singuname="unknown"
+if test -r "singuname.sh"; then
+  if (/bin/sh singuname.sh >/dev/null 2>&1) then
+    ac_cv_singuname=`/bin/sh singuname.sh`
+  fi
+fi
+)
+AC_MSG_RESULT($ac_cv_singuname)
+if test "$ac_cv_singuname" = unknown; then
+  AC_MSG_ERROR(Unknown architecture: Check singuname.sh)
+else
+  SINGUNAME=$ac_cv_singuname
+  AC_SUBST(SINGUNAME)
+fi
 
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
@@ -34,6 +50,7 @@ AC_PROG_CPP
 AC_AIX
 
 AC_CHECK_PROGS(PERL, perl5 perl)
+AC_PROG_LN_S
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl Set exec_prefix, bindir, libdir, includedir to some sensible values
@@ -46,16 +63,8 @@ fi
 
 # expand exec_prefix
 if test "x$exec_prefix" = xNONE; then
-  if test -r "singuname.sh"; then
-    if (/bin/sh singuname.sh >/dev/null 2>&1) then
-	exec_prefix=${prefix}/`/bin/sh singuname.sh`
-        ac_configure_args="$ac_configure_args --exec_prefix=${exec_prefix}"
-    else
-      AC_MSG_ERROR(Unknown architecture: Check singuname.sh)
-    fi
-  else
-    AC_MSG_ERROR(Need singuname.sh)
-  fi
+ exec_prefix=${prefix}/${ac_cv_singuname}
+ ac_configure_args="$ac_configure_args --exec_prefix=${exec_prefix}"
 fi
 
 # expand bindir

@@ -22,6 +22,25 @@ AC_DEFINE_UNQUOTED(S_VERSION1, "${SINGULAR_MAJOR_VERSION}.${SINGULAR_MINOR_VERSI
 AC_DEFINE_UNQUOTED(S_VERSION2, "${VERSION_DATE}")
 AC_DEFINE_UNQUOTED(SINGULAR_SUB_VERSION, ${SINGULAR_SUB_VERSION})
 
+dnl determine singuname
+AC_MSG_CHECKING(uname for singular)
+AC_CACHE_VAL(ac_cv_singuname,
+ac_cv_singuname="unknown"
+if test -r "singuname.sh"; then
+  if (/bin/sh singuname.sh >/dev/null 2>&1) then
+    ac_cv_singuname=`/bin/sh singuname.sh`
+  fi
+fi
+if test -r "../singuname.sh"; then
+  if (/bin/sh ../singuname.sh >/dev/null 2>&1) then
+    ac_cv_singuname=`/bin/sh singuname.sh`
+  fi
+fi
+)
+AC_MSG_RESULT($ac_cv_singuname)
+if test "$ac_cv_singuname" = unknown; then
+  AC_MSG_ERROR(Unknown architecture: Check singuname.sh)
+fi
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl compiler stuff
@@ -129,19 +148,7 @@ fi
 
 # expand exec_prefixad
 if test "x$exec_prefix" = xNONE; then
-  if test -x "singuname.sh"; then
-    singuname="/bin/sh singuname.sh"
-  elif test -x "../singuname.sh"; then
-    singuname="/bin/sh ../singuname.sh"
-  else
-    AC_MSG_WARN(did not find singuname.sh use uname, instead)
-    singuname="uname"
-  fi
-  if ($singuname >/dev/null 2>&1) then
-    exec_prefix=${prefix}/`$singuname`
-  else
-    AC_MSG_ERROR(Unknown architecture: Check $singuname)
-  fi
+ exec_prefix=${prefix}/${ac_cv_singuname}
 fi
 
 # expand bindir
@@ -172,7 +179,7 @@ if test "${with_lex+set}" != set; then
   AC_CACHE_VAL(ac_cv_prog_flex,
   if (flex --version >/dev/null 2>&1)
   then
-    if (flex --version | egrep "[2-9]\.[4-9]" >/dev/null 2>&1) 
+    if (flex --version | egrep "[2-9]\.[5-9]" >/dev/null 2>&1) 
     then
       ac_cv_prog_flex=flex
     fi

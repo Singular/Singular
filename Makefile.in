@@ -76,9 +76,9 @@ Singular factory libfac MP gmp smallgmp:
 
 ##############################################################
 # documentation
-.PHONY: info dvi ps doc doc/singular.hlp
+.PHONY: info dvi ps doc doc/singular.hlp html
 
-info dvi ps doc/singular.hlp: ${SINGULAR} 
+info dvi ps doc/singular.hlp html: ${SINGULAR} 
 	cd doc; ${MAKE} $@
 
 doc info/singular.hlp:
@@ -99,6 +99,61 @@ Tst-Short: ${SINGULAR} Tst/Short Tst/regress.cmd
 
 Tst-Long:  ${SINGULAR} Tst/Short Tst/regress.cmd
 	${PERL} Tst/regress.cmd -s ${SINGULAR} Tst/Long/*.tst
+
+
+##############################################################
+# distribution targets
+LN_S		= @LN_S@
+MKINSTALLDIRS 	= ./mkinstalldirs
+TMPDIR		= /tmp/sing_dist
+SINGUNAME 	= @SINGUNAME@
+SINGULAR_VERSION= @SINGULAR_VERSION@
+DISTROOT_NAME	= Singular-${SINGULAR_VERSION}
+BINDIST_NAME	= ${DISTROOT_NAME}-${SINGUNAME}
+SHAREDIST_NAME  = ${DISTROOT_NAME}-share
+
+.PHONY: sharedist bindist static-bindist
+sharedist: ${SINGULAR}
+	cd doc; ${MAKE} all; ${MAKE} ps
+	rm -rf ${TMPDIR}
+	${MKINSTALLDIRS} ${TMPDIR}/Singular/LIB/${SINGULAR_VERSION}
+	cp Singular/LIB/*.lib ${TMPDIR}/Singular/LIB/${SINGULAR_VERSION}
+	cp -R Singular/LIB/gftables ${TMPDIR}/Singular/LIB/
+	${MKINSTALLDIRS} ${TMPDIR}/info
+	cp doc/singular.hlp ${TMPDIR}/info
+	${MKINSTALLDIRS} ${TMPDIR}/doc
+	cd ${TMPDIR}/doc; ${LN_S} ../info/singular.hlp .
+	cp doc/singular.ps doc/usercard.ps \
+           doc/singular.dvi doc/usercard.dvi ${TMPDIR}/doc
+	cp -R doc/html ${TMPDIR}
+	cd ${TMPDIR}; tar -cf ${SHAREDIST_NAME}.tar *; \
+	              gzip ${SHAREDIST_NAME}.tar
+	cp ${TMPDIR}/${SHAREDIST_NAME}.tar.gz .
+	rm -rf ${TMPDIR}
+
+bindist: ${SINGULAR}
+	cd Singular; ${MAKE} Singular-$@; ${MAKE} libparse
+	rm -rf ${TMPDIR}
+	${MKINSTALLDIRS} ${TMPDIR}/${SINGUNAME}/bin/
+	cp Singular/Singular-$@ ${TMPDIR}/${SINGUNAME}/bin/Singular-${SINGULAR_VERSION}
+	cd ${TMPDIR}/${SINGUNAME}/bin; ${LN_S} Singular-${SINGULAR_VERSION} Singular
+	cp Singular/libparse ${TMPDIR}/${SINGUNAME}/bin/
+	cd ${TMPDIR}; tar cf ${BINDIST_NAME}.tar ${SINGUNAME}; \
+                      gzip ${BINDIST_NAME}.tar
+	cp ${TMPDIR}/${BINDIST_NAME}.tar.gz .
+	rm -rf ${TMPDIR}
+
+static-bindist: ${SINGULAR}
+	cd Singular; ${MAKE} Singular-$@; ${MAKE} libparse
+	rm -rf ${TMPDIR}
+	${MKINSTALLDIRS} ${TMPDIR}/${SINGUNAME}/bin/
+	cp Singular/Singular-$@ ${TMPDIR}/${SINGUNAME}/bin/Singular-${SINGULAR_VERSION}-static
+	cd ${TMPDIR}/${SINGUNAME}/bin; ${LN_S} Singular-${SINGULAR_VERSION}-static Singular
+	cp Singular/libparse ${TMPDIR}/${SINGUNAME}/bin/
+	cd ${TMPDIR}; tar cf ${BINDIST_NAME}-static.tar ${SINGUNAME}; \
+                      gzip ${BINDIST_NAME}-static.tar
+	cp ${TMPDIR}/${BINDIST_NAME}-static.tar.gz .
+	rm -rf ${TMPDIR}
 
 
 ##############################################################
