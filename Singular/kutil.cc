@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.21 1998-05-20 10:08:41 pfister Exp $ */
+/* $Id: kutil.cc,v 1.22 1998-05-20 13:06:48 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -3201,7 +3201,7 @@ void updateS(BOOLEAN toT,kStrategy strat)
     }
     if (toT)
     {
-      for (i=1; i<=strat->sl; i++)
+      for (i=0; i<=strat->sl; i++)
       {
         if (((strat->fromQ==NULL) || (strat->fromQ[i]==0))
 #ifdef SDRING
