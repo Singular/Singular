@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.314 2004-03-19 17:37:29 levandov Exp $ */
+/* $Id: iparith.cc,v 1.315 2004-04-05 17:37:26 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -4603,7 +4603,9 @@ static BOOLEAN jjSUBST_P(leftv res, leftv u, leftv v,leftv w)
   if ((monomexpr==NULL)||(pNext(monomexpr)==NULL))
     res->data = pSubst((poly)u->CopyD(res->rtyp),ringvar,monomexpr);
   else
-    res->data = idSubstPoly((ideal)u->Data(),ringvar,monomexpr);
+  {
+    res->data= pSubstPoly((poly)u->Data(),ringvar,monomexpr);
+  }
   return FALSE;
 }
 static BOOLEAN jjSUBST_Id(leftv res, leftv u, leftv v,leftv w)
