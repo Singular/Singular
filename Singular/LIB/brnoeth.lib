@@ -1,4 +1,4 @@
-version="$Id: brnoeth.lib,v 1.9 2001-01-16 14:46:01 lossen Exp $";
+version="$Id: brnoeth.lib,v 1.10 2001-01-17 09:07:28 lossen Exp $";
 info="
 LIBRARY:   brnoeth.lib  Brill-Noether Algorithm, Weierstrass-SG and AG-codes
 AUTHORS:   Jose Ignacio Farran Martin, ignfar@eis.uva.es
@@ -157,6 +157,7 @@ static proc pd2 (poly g1,poly g2)
       setring raux2;
     }
     setring BR;
+    kill(raux1,raux2);
   }
   return(L);
 }
@@ -397,6 +398,7 @@ static proc inf_P (poly f)
       }
     }
   }
+  kill(r_auxz);
   return(list(IP_S,IP_NS));
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -786,6 +788,7 @@ static proc subfield (sf)
       mpol=subst(mpol,a,x);
       setring base_r;
       poly mpol=imap(auxring,mpol);
+      kill(auxring);
       string answer="? error : non-primitive element";
       int r=res_deg();
       int q=char(basering)^r;
@@ -891,6 +894,7 @@ static proc importdatum (sf,string datum,string rel)
     string snewdatum=string(pdatum);
     setring base_r;
     execute("poly pdatum="+snewdatum+";");
+    kill(auxring);
     return(pdatum);
   }
 }
@@ -929,6 +933,7 @@ static proc rationalize (lf,string datum,string rel)
     string snewdatum=string(newdatum);
     setring base_r;
     execute("poly newdatum="+snewdatum+";");
+    kill(auxring);
     return(newdatum);
   }
 }
@@ -1742,6 +1747,7 @@ static proc place (intvec Pp,int sing,list CURVE)
   }
   update_CURVE[1][1]=base_r;
   kill(HNEring);
+  kill(local_aux);
   return(update_CURVE);
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -2889,6 +2895,7 @@ static proc extra_place (ideal P)
   list answer=list();
   answer[1]=ES;
   answer[2]=ext;
+  kill(ES);
   return(answer);
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -3161,6 +3168,7 @@ NOTE:       The procedure must be called from the ring Proj_R=CURVE[1][2]
   }
   setring BRing;
   kill(h);
+  kill(aff_r);
   list answer=list();
   answer[1]=interdiv;
   answer[2]=update_CURVE;
@@ -4035,6 +4043,7 @@ EXAMPLE:  example extcurve; shows an example
     dbprint(printlevel+1,"");
     dbprint(printlevel+2,"Total number of rational places : "+string(NrRatPl));
     dbprint(printlevel+1,"");
+    kill(RatPl);
     return(ext_CURVE);
   }
   else
@@ -4042,20 +4051,16 @@ EXAMPLE:  example extcurve; shows an example
     if (size(CURVE[5])>=d)
     {
       int i,j,k;
-      for (i=1;i<=d;i=i+1)
+      if (typeof(CURVE[5][d])=="list")
       {
-        if (typeof(CURVE[5][i])=="list")
-        {
-          def S(i)=CURVE[5][i][1];
-        }
-        else
-        {
-          ring S(i)=char(basering),t,ls;
-          list POINTS=list();
-          setring BR;
-        }
+        def S(d)=CURVE[5][d][1];
+        setring S(d);
       }
-      setring S(d);
+      else
+      {
+        ring S(d)=char(basering),t,ls;
+        list POINTS=list();
+      }
       string smin=string(minpoly);
       setring BR;
       ring RatPl=(char(basering),a),(x,y,t),ls;
@@ -4064,6 +4069,7 @@ EXAMPLE:  example extcurve; shows an example
       list LOC_EQS=imap(S(d),LOC_EQS);
       list BRANCHES=imap(S(d),BRANCHES);
       list PARAMETRIZATIONS=imap(S(d),PARAMETRIZATIONS);
+      kill(S(d));
       int s=size(POINTS);
       int counter=0;
       int piv=0;
@@ -4090,6 +4096,16 @@ EXAMPLE:  example extcurve; shows an example
       {
         if ( (d mod i)==0 )
         {
+          if (typeof(CURVE[5][i])=="list")
+          {
+            def S(i)=CURVE[5][i][1];
+          }
+          else
+          {
+            ring S(i)=char(basering),t,ls;
+            list POINTS=list();
+            setring BR;
+           }
           olda=subfield(S(i));
           setring S(i);
           s=size(POINTS);
@@ -4154,10 +4170,21 @@ EXAMPLE:  example extcurve; shows an example
             kill(par@1,par@2);
             setring RatPl;
           }
+          kill(S(i));
         }
       }
       kill(iw);
       kill(paux);
+      if (typeof(CURVE[5][1])=="list")
+      {
+        def S(1)=CURVE[5][1][1];
+      }
+      else
+      {
+        ring S(1)=char(basering),t,ls;
+        list POINTS=list();
+        setring RatPl;
+      }
       POINTS=imap(S(1),POINTS)+POINTS;
       LOC_EQS=imap(S(1),LOC_EQS)+LOC_EQS;
       BRANCHES=imap(S(1),BRANCHES)+BRANCHES;
@@ -4182,6 +4209,9 @@ EXAMPLE:  example extcurve; shows an example
       dbprint(printlevel+2,"Total number of rational places : NrRatPl = "
                                    +string(NrRatPl));
       dbprint(printlevel+1,"");
+      kill(S(1));
+      kill(R(d));
+      kill(RatPl);
       return(ext_CURVE);
     }
     else
