@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_chinese.cc,v 1.9 1998-02-02 08:57:29 schmidt Exp $ */
+/* $Id: cf_chinese.cc,v 1.10 2005-02-08 10:28:46 Singular Exp $ */
 
 //{{{ docu
 //
@@ -72,6 +72,7 @@ chineseRemainder ( const CanonicalForm & x1, const CanonicalForm & q1, const Can
     if ( d.isZero() ) {
 	xnew = v1;
 	qnew = q1 * q2;
+        DEBDECLEVEL( cerr, "chineseRemainder" );
 	return;
     }
     (void)bextgcd( q1, q2, s, dummy );
