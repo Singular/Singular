@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.219 2003-07-03 08:26:03 Singular Exp $
+@comment $Id: reference.doc,v 1.220 2003-07-03 08:37:51 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -1906,6 +1906,7 @@ otherwise it is not defined.
 See
 @ref{extgcd};
 @ref{int};
+@ref{number};
 @ref{poly}
 @c ref
 @c ----------------------------------------
