@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: lists.cc,v 1.8 1998-05-12 10:01:08 Singular Exp $ */
+/* $Id: lists.cc,v 1.9 1998-06-17 18:13:44 Singular Exp $ */
 /*
 * ABSTRACT: handling of the list type
 */
@@ -230,8 +230,8 @@ lists liMakeResolv(resolvente r, int length, int reallen,
           {
             r[i]->rank=max(rank,idRankFreeModule(r[i]));
           }
-          idSkipZeroes(r[i]);
         }
+        idSkipZeroes(r[i]);
         L->m[i].data=(void *)r[i];
         if ((weights!=NULL) && (weights[i]!=NULL))
         {
@@ -239,12 +239,14 @@ lists liMakeResolv(resolvente r, int length, int reallen,
           weights[i] = NULL;
         }
       }
+      #ifdef TEST
       else
       {
         // should not happen:
         Warn("internal NULL in resolvente");
         L->m[i].data=(void *)idInit(1,1);
       }
+      #endif
       i++;
     }
     Free((ADDRESS)r,oldlength*sizeof(ideal));
