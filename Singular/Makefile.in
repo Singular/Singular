@@ -403,7 +403,7 @@ CXXP		= gcc
 CFLAGSP		= -pg -O3 -pipe  
 CXXFLAGSP	= -pg -O3 -pipe 
 CXXTEMPLFLAGSP	= -fno-implicit-templates
-DEFSP		= @DEFS@ -DNDEBUG -DDO_PROFIL
+DEFSP		= @DEFS@ -DNDEBUG -DDO_PROFILE
 LDFLAGSP	= -static @LDFLAGS@
 
 ##
