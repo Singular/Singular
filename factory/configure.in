@@ -1,5 +1,5 @@
 dnl emacs edit mode for this file is -*- sh -*-
-dnl $Id: configure.in,v 1.12 1997-10-29 16:57:32 schmidt Exp $
+dnl $Id: configure.in,v 1.13 1997-11-05 15:42:23 schmidt Exp $
 
 dnl #
 dnl # configure.in - process this file with `autoconf' to generate
@@ -12,7 +12,7 @@ dnl #
 #
 # - initialisation.
 #
-AC_REVISION($Id: configure.in,v 1.12 1997-10-29 16:57:32 schmidt Exp $)
+AC_REVISION($Id: configure.in,v 1.13 1997-11-05 15:42:23 schmidt Exp $)
 AC_INIT(canonicalform.cc)
 AC_CONFIG_HEADER(config.h)
 AC_CONFIG_AUX_DIR(bin)
@@ -167,9 +167,14 @@ AC_PATH_PROG(MAKEHEADER, makeheader, , $abssrcdir/bin:$PATH)
 # - check for libraries.
 #
 if test "x$gmp_in_installation" != xyes; then
-  AC_CHECK_LIB(gmp, mpz_init)
+  AC_CHECK_LIB(gmp, mpz_init, ,
+    [ AC_MSG_ERROR(libgmp.a not found.  Use option --with-gmp to specify path) ])
 fi
-AC_CHECK_LIB(m, sqrt)
+AC_CHECK_LIB(m, sqrt, , [ AC_MSG_ERROR(libm.a not found) ])
+AC_CHECK_LIB(g++, strsignal, ,
+    [ AC_MSG_WARN(libg++ not found.
+                    You will not be able to build the Factory Test Environment
+                    (though Factory itself should compile)) ])
 
 #
 # - check for header files.
@@ -191,7 +196,7 @@ if test "x$enable_streamio" != xno; then
 
   # since the FTE will compile only with stream IO enabled we will not
   # check for the necessary header files if stream IO is disabled
-  AC_CHECK_HEADERS(stdarg.h signal.h errno.h GetOpt.h, ,
+  AC_CHECK_HEADERS(stdarg.h signal.h errno.h unistd.h GetOpt.h, ,
     [ AC_MSG_WARN(C/C++ header files not found.
                     You will not be able to build the Factory Test Environment
                     (though Factory itself should compile)) ])
