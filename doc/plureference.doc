@@ -1,5 +1,5 @@
   @comment -*-texinfo-*-
-@comment $Id: plureference.doc,v 1.6 2003-03-13 17:33:12 levandov Exp $
+@comment $Id: plureference.doc,v 1.7 2003-03-13 18:13:23 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -370,7 +370,6 @@ resolution F=nres(i,0);
 F;
 for (int a=1;a<=size(list(F));a++)
 {print(matrix(F[a]));}
-print(betti(F),"betti"); 
 @c example
 @end smallexample
 @end table

@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: plutypes.doc,v 1.7 2003-03-13 17:33:13 levandov Exp $
+@comment $Id: plutypes.doc,v 1.8 2003-03-13 18:13:24 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -708,9 +708,8 @@ none
 @c example
   ring R;
   ideal i=z2,x;
-  resolution re=res(i,0);
+  resolution re=nres(i,0);
   re;
-  betti(re);
   list l = re;
   l;
 @c example
@@ -865,17 +864,7 @@ following guide lines into consideration:
   ring R1=0,(x,y),dp;
   ring R2=32003,(a,b),dp;
   def R=R1+R2;
-  R
- 
-         ==> //   characteristic : 32003
-         ==> //   number of vars : 4
-         ==> //        block   1 : ordering dp
-         ==> //                  : names    x y 
-         ==> //        block   2 : ordering dp
-         ==> //                  : names    a b 
-         ==> //        block   3 : ordering C
-
-
+  R;
 @c example
 @end smallexample
 
