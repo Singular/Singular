@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.5 1998-04-27 13:39:53 Singular Exp $
+@comment $Id: types.doc,v 1.6 1998-04-27 14:38:58 Singular Exp $
 @comment this file contains the type definitions
 @menu
 * boolean::
@@ -8,7 +8,7 @@
 * intmat::
 * intvec::
 * link::
-* maps::
+* map::
 * matrix::
 * module::
 * number::
@@ -831,7 +831,7 @@ returns weights for the weigted ecart method (see @ref{weight})
 @c <--
 
 @c ---------------------------------------
-@node list, maps, Data types, Data types
+@node list, map, Data types, Data types
 @section list
 @cindex list
 
@@ -968,30 +968,30 @@ Brackets may be used to access elements of lists:
 @c <--
 
 @c ---------------------------------------
-@node maps, matrix, Data types, Data types
-@section maps
-@cindex maps
+@node map, matrix, Data types, Data types
+@section map
+@cindex map
 
-@c --> section maps
+@c --> section map
 @c ------------------------------
-@node maps declarations, maps expressions, maps, maps
-@subsection maps declarations
-@cindex maps declarations
-
-@c ------------------------------
-@node maps expressions, maps operations, maps declarations, maps
-@subsection maps expressions
-@cindex maps expressions
+@node map declarations, map expressions, map, map
+@subsection map declarations
+@cindex map declarations
 
 @c ------------------------------
-@node maps operations, maps related functions, maps expressions, maps 
-@subsection maps operations
-@cindex maps operations
+@node map expressions, map operations, map declarations, map
+@subsection map expressions
+@cindex map expressions
 
 @c ------------------------------
-@node maps related functions, ,maps operations, maps
-@subsection maps related functions
-@cindex maps related functions
+@node map operations, map related functions, map expressions, map
+@subsection map operations
+@cindex map operations
+
+@c ------------------------------
+@node map related functions, ,map operations, map
+@subsection map related functions
+@cindex map related functions
 @c <--
 
 @c ---------------------------------------
