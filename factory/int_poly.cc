@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_poly.cc,v 1.8 1997-12-17 14:09:05 schmidt Exp $ */
+/* $Id: int_poly.cc,v 1.9 1997-12-17 14:15:06 schmidt Exp $ */
 
 #include <config.h>
 
@@ -629,6 +629,8 @@ InternalPoly::divremsamet( InternalCF* acoeff, InternalCF*& quot, InternalCF*& r
 // See the respective `CanonicalForm'-methods for an explanation
 // why we define such a strange (but total) ordering on
 // polynomials.
+//
+// See also: CanonicalForm::operator <(), CanonicalForm::operator ==()
 //
 //}}}
 int
