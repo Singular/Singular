@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.24 1997-07-11 11:10:12 obachman Exp $ */
+/* $Id: tesths.cc,v 1.25 1997-07-11 14:27:57 Singular Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -26,24 +26,11 @@
 #include "mmemory.h"
 #include "silink.h"
 #include "timer.h"
-
-/* version strings */
 #ifdef HAVE_FACTORY
 #define SI_DONT_HAVE_GLOBAL_VARS
 #include <factory.h>
 #endif
-#ifdef HAVE_LIBFAC_P
-  extern const char * libfac_version;
-  extern const char * libfac_date;
-#endif
-#ifdef HAVE_GMP
-extern "C" {
-#include <gmp.h>
-}
-#endif
-#ifdef HAVE_MPSR
-#include <MP_Config.h>
-#endif
+
 
 /*0 implementation*/
 int main(          /* main entry to Singular */
@@ -68,6 +55,7 @@ int main(          /* main entry to Singular */
 #else
   int i;
   thisfile = argv[0];
+  BOOLEAN load_std_lib=TRUE;
   /*. process parameters */
   for (;(argc > 1) && (!feBatch); --argc, ++argv)
   {
@@ -77,7 +65,7 @@ int main(          /* main entry to Singular */
         if (argc > 2)
         {
           char* ptr = NULL;
-#ifdef HAVE_STRTOD          
+#ifdef HAVE_STRTOD
           double mintime = strtod(argv[2], &ptr);
           if (errno != ERANGE && ptr != argv[2])
 #else
@@ -101,7 +89,7 @@ int main(          /* main entry to Singular */
     }
     else
     {
-    
+
       if ((argv[1][0] != '-') ||(argv[1][1] == '-'))
         break;
       for (i=1;argv[1][i]!='\0';i++)
@@ -114,66 +102,8 @@ int main(          /* main entry to Singular */
                      S_VERSION1,S_VERSION2,
                      SINGULAR_VERSION_ID,__DATE__,__TIME__);
               printf("with\n");
-#ifdef HAVE_FACTORY
-              printf("\tfactory (%s),\n", factoryVersion);
-#endif
-#ifdef HAVE_LIBFAC_P
-              printf("\tlibfac(%s,%s),\n",libfac_version,libfac_date);
-#endif
-#ifdef SRING
-              printf("\tsuper algebra,\n");
-#endif
-#ifdef DRING
-              printf("\tWeyl algebra,\n");
-#endif
-#ifdef HAVE_GMP
-#if defined (__GNU_MP_VERSION) && defined (__GNU_MP_VERSION_MINOR)
-              printf("\tGMP(%d.%d),\n",__GNU_MP_VERSION,__GNU_MP_VERSION_MINOR);
-#elif defined (HAVE_SMALLGMP)
-              printf("\tSmallGMP(2.0.2.0),\n");
-#else                
-              printf("\tGMP(1.3),\n");
-#endif              
-#endif
-#ifdef HAVE_DBM
-              printf("\tDBM,\n");
-#endif
-#ifdef HAVE_MPSR
-              printf("\tMP(%s),\n",MP_VERSION);
-#endif
-#if defined(HAVE_READLINE) && !defined(FEREAD)
-              printf("\tlibreadline,\n");
-#endif
-#ifdef HAVE_FEREAD
-              printf("\temulated libreadline,\n");
-#endif
-#ifdef HAVE_INFO
-              printf("\tinfo,\n");
-#else              
-              printf("\twithout info,\n");
-#endif
-#ifdef TEST
-              printf("\tTESTs,\n");
-#endif
-#if YYDEBUG
-              printf("\tYYDEBUG=1,\n");
-#endif
-#ifdef MDEBUG
-              printf("\tMDEBUG=%d,\n",MDEBUG);
-#endif
-#ifndef __OPTIMIZE__
-              printf("\t-g,\n");
-#endif
-              printf("\trandom=%d\n",siRandomStart);
-#ifdef MSDOS
-              char *p=getenv("SPATH");
-#else
-              char *p=getenv("SINGULARPATH");
-#endif
-              if (p!=NULL)
-                printf("search path:%s:%s\n\n",p,SINGULAR_DATADIR);
-              else
-                printf("search path:%s\n\n", SINGULAR_DATADIR);
+              printf(versionString());
+              printf("\n\n");
               break;
             }
             case 'd':
@@ -181,14 +111,14 @@ int main(          /* main entry to Singular */
               if (argc > 2)
               {
                 char* ptr = NULL;
-#ifdef HAVE_STRTOL        
+#ifdef HAVE_STRTOL
                 long res = strtol(argv[2], &ptr, 10);
                 if (errno != ERANGE && ptr != argv[2] && res > 0)
 #else
                 long res = 0;
                 sscanf(argv[2],"%d", &res);
                 if (res > 0)
-#endif          
+#endif
                 {
                   argc--;
                   argv++;
@@ -223,7 +153,7 @@ int main(          /* main entry to Singular */
               #endif
               #ifdef HAVE_FACTORY
                 factoryseed(siRandomStart);
-              #endif  
+              #endif
               break;
             case 'x': tclmode=TRUE;
               break;
@@ -237,6 +167,9 @@ int main(          /* main entry to Singular */
               fe_use_fgets=TRUE;
 #endif
               break;
+            case 'n':
+              load_std_lib=FALSE;
+              break;
             default : printf("Unknown option -%c\n",argv[1][i]);
               printf("Usage: %s [-bemqtvx] [file]\n",thisfile);
               exit(1);
@@ -244,7 +177,7 @@ int main(          /* main entry to Singular */
       }
     }
   }
-  
+
 
   /*. say hello */
   if (BVERBOSE(0))
@@ -274,7 +207,9 @@ int main(          /* main entry to Singular */
   slStandardInit();
   dlInit(thisfile);
   myynest=0;
-  iiLibCmd(mstrdup("standard.lib"),TRUE);
+  if (load_std_lib)
+    iiLibCmd(mstrdup("standard.lib"),TRUE);
+  errorreported = 0;
 #ifndef macintosh
 #if defined(HAVE_FEREAD) || defined(HAVE_READLINE)
   fe_set_input_mode();

@@ -32,6 +32,20 @@
 #include <factory.h>
 #endif
 
+/* version strings */
+#ifdef HAVE_LIBFAC_P
+  extern const char * libfac_version;
+  extern const char * libfac_date;
+#endif
+#ifdef HAVE_GMP
+extern "C" {
+#include <gmp.h>
+}
+#endif
+#ifdef HAVE_MPSR
+#include <MP_Config.h>
+#endif
+
 /*0 implementation*/
 
 /*2
@@ -56,7 +70,7 @@ int inits(void)
 #endif
 #ifdef HAVE_FACTORY
   factoryseed(t);
-#endif  
+#endif
 /*4 private data of other modules*/
   I_FEbase();
   memset(&sLastPrinted,0,sizeof(sleftv));
@@ -381,7 +395,7 @@ void singular_help(char *str,BOOLEAN example)
       if (strcmp(str,"index")==0)
          strstr[0]='\0';
        else
-         sprintf(strstr," Index \"%s\"",str);  
+         sprintf(strstr," Index \"%s\"",str);
       if (!access(tmp, R_OK))
       {
         sprintf(tmp, "info -f %s/singular.hlp %s", SINGULAR_INFODIR, strstr);
@@ -492,23 +506,23 @@ BOOLEAN setOption(leftv res, leftv v)
       &&(v->next->Typ()==INTVEC_CMD))
       {
         v=v->next;
-        intvec *w=(intvec*)v->Data();  
+        intvec *w=(intvec*)v->Data();
         test=(*w)[0];
         verbose=(*w)[1];
-        
+
         if (TEST_OPT_INTSTRATEGY && (currRing!=NULL) && (currRing->ch>=2))
         {
           test &=~Sy_bit(OPT_INTSTRATEGY);
         }
         goto okay;
-      }  
+      }
     }
     if(strcmp(n,"none")==0)
     {
       test=0;
       verbose=0;
       goto okay;
-    }  
+    }
     for (i=0; (i==0) || (optionStruct[i-1].setval!=0); i++)
     {
       if (strcmp(n,optionStruct[i].name)==0)
@@ -565,7 +579,7 @@ BOOLEAN setOption(leftv res, leftv v)
   okay:
     FreeL((ADDRESS)n);
     v=v->next;
-  } while (v!=NULL);    
+  } while (v!=NULL);
   return FALSE;
 }
 
@@ -629,3 +643,68 @@ char *strstr(const char *haystack, const char *needle)
   return found;
 }
 #endif
+
+char * versionString()
+{
+  StringSet("");
+#ifdef HAVE_FACTORY
+              StringAppend("\tfactory (%s),\n", factoryVersion);
+#endif
+#ifdef HAVE_LIBFAC_P
+              StringAppend("\tlibfac(%s,%s),\n",libfac_version,libfac_date);
+#endif
+#ifdef SRING
+              StringAppend("\tsuper algebra,\n");
+#endif
+#ifdef DRING
+              StringAppend("\tWeyl algebra,\n");
+#endif
+#ifdef HAVE_GMP
+#if defined (__GNU_MP_VERSION) && defined (__GNU_MP_VERSION_MINOR)
+              StringAppend("\tGMP(%d.%d),\n",__GNU_MP_VERSION,__GNU_MP_VERSION_MINOR);
+#elif defined (HAVE_SMALLGMP)
+              StringAppend("\tSmallGMP(2.0.2.0),\n");
+#else
+              StringAppend("\tGMP(1.3),\n");
+#endif
+#endif
+#ifdef HAVE_DBM
+              StringAppend("\tDBM,\n");
+#endif
+#ifdef HAVE_MPSR
+              StringAppend("\tMP(%s),\n",MP_VERSION);
+#endif
+#if defined(HAVE_READLINE) && !defined(FEREAD)
+              StringAppend("\tlibreadline,\n");
+#endif
+#ifdef HAVE_FEREAD
+              StringAppend("\temulated libreadline,\n");
+#endif
+#ifdef HAVE_INFO
+              StringAppend("\tinfo,\n");
+#else
+              StringAppend("\twithout info,\n");
+#endif
+#ifdef TEST
+              StringAppend("\tTESTs,\n");
+#endif
+#if YYDEBUG
+              StringAppend("\tYYDEBUG=1,\n");
+#endif
+#ifdef MDEBUG
+              StringAppend("\tMDEBUG=%d,\n",MDEBUG);
+#endif
+#ifndef __OPTIMIZE__
+              StringAppend("\t-g,\n");
+#endif
+              StringAppend("\trandom=%d\n",siRandomStart);
+#ifdef MSDOS
+              char *p=getenv("SPATH");
+#else
+              char *p=getenv("SINGULARPATH");
+#endif
+              if (p!=NULL)
+                return StringAppend("search path:%s:%s",p,SINGULAR_DATADIR);
+              else
+                return StringAppend("search path:%s", SINGULAR_DATADIR);
+}

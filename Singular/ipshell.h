@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.h,v 1.8 1997-07-09 15:54:02 Singular Exp $ */
+/* $Id: ipshell.h,v 1.9 1997-07-11 14:27:55 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -148,5 +148,6 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl);
 void   showOption();
 BOOLEAN setOption(leftv res, leftv v);
 /* ================================================================== */
+char * versionString();
 #endif
 

@@ -1164,7 +1164,7 @@ static BOOLEAN jjINDEX_V_IV(leftv res, leftv u, leftv v)
       {
         pDelete1(&p);
         if (p==NULL) break;
-      }  
+      }
     }
     pDelete1(&r);
     res->data=(char *)r;
@@ -2003,7 +2003,7 @@ struct sValCmd2 dArith2[]=
 #ifdef HAVE_FGLM
 ,{fglmProc,    FGLM_CMD,       IDEAL_CMD,      RING_CMD,   DEF_CMD PROFILER}
 ,{fglmProc,    FGLM_CMD,       IDEAL_CMD,      QRING_CMD,  DEF_CMD PROFILER}
-#else 
+#else
 ,{jjWRONG2,    FGLM_CMD,       IDEAL_CMD,      RING_CMD,   DEF_CMD PROFILER}
 ,{jjWRONG2,    FGLM_CMD,       IDEAL_CMD,      QRING_CMD,  DEF_CMD PROFILER}
 #endif
@@ -2297,11 +2297,11 @@ static BOOLEAN jjDET_I(leftv res, leftv v)
   i=m->rows();j=m->cols();
   if(i==j)
     res->data = (char *)singclap_det_i(m);
-  else  
+  else
   {
     Werror("det of %d x %d intmat",i,j);
     return TRUE;
-  }  
+  }
   return FALSE;
 }
 #endif
@@ -2474,7 +2474,7 @@ static BOOLEAN jjL2R(leftv res, leftv v)
 {
   res->data=(char *)syConvList((lists)v->Data());
   return FALSE;
-}  
+}
 static BOOLEAN jjLEADCOEF(leftv res, leftv v)
 {
   poly p=(poly)v->Data();
@@ -3383,7 +3383,7 @@ static BOOLEAN jjPROC3(leftv res, leftv u, leftv v, leftv w)
   v->next=(leftv)Alloc(sizeof(sleftv));
   memcpy(v->next,w,sizeof(sleftv));
   BOOLEAN r=iiExprArith2(res,u,'(',v);
-  v->rtyp=0; v->data=NULL; 
+  v->rtyp=0; v->data=NULL;
   w->rtyp=0; w->data=NULL;
   return r;
 }
@@ -4008,7 +4008,7 @@ static BOOLEAN jjLIST_PL(leftv res, leftv v)
     leftv h=NULL;
     int i;
     int rt;
-  
+
     L->Init(sl);
     for (i=0;i<sl;i++)
     {
@@ -4037,7 +4037,7 @@ static BOOLEAN jjLIST_PL(leftv res, leftv v)
       else
         L->m[i].Copy(h);
     }
-  }  
+  }
   res->data=(char *)L;
   return FALSE;
 }
@@ -4062,7 +4062,7 @@ static BOOLEAN jjRESERVED0(leftv res, leftv v)
   {
     Print("%-20s",cmds[i].name);
     i++;
-    if(cmds[i].name==NULL) 
+    if(cmds[i].name==NULL)
       break;
     if ((i%3)==1) PrintLn();
   }

@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.15 1997-07-10 13:02:35 Singular Exp $ */
+/* $Id: extra.cc,v 1.16 1997-07-11 14:27:52 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -122,42 +122,8 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
     {
       if (h->next==NULL)
       {
-        char with_str[]=""
-        #ifdef DRING
-          "DRING "
-        #endif
-        #ifdef HAVE_DBM
-          "DBM "
-        #endif
-        #ifdef HAVE_DLD
-          "DLD "
-        #endif
-        #ifdef HAVE_GMP
-          "gmp "
-        #endif
-        #ifdef HAVE_FACTORY
-          "factory "
-        #endif
-        #ifdef HAVE_LIBFAC_P
-          "libfac "
-        #endif
-        #ifdef HAVE_MPSR
-          "MP "
-        #endif
-        #ifdef HAVE_READLINE
-          "readline "
-        #endif
-        #ifdef HAVE_TCL
-          "tcl "
-        #endif
-        #ifdef SRING
-          "SRING "
-        #endif
-        ;
         res->rtyp=STRING_CMD;
-        char *s=mstrdup(with_str);
-        s[strlen(s)-1]='\0';
-        res->data=(void *)s;
+        res->data=(void *)mstrdup(versionString());
         return FALSE;
       }
       else if (h->next->Typ()==STRING_CMD)
