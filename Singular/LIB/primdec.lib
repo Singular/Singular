@@ -1,4 +1,4 @@
-// $Id: primdec.lib,v 1.66 2000-05-16 12:19:05 pfister Exp $
+// $Id: primdec.lib,v 1.67 2000-05-19 10:07:06 pfister Exp $
 ///////////////////////////////////////////////////////////////////////////////
 // primdec.lib                                                               //
 // algorithms for primary decomposition based on                             //
@@ -10,7 +10,7 @@
 // written by Wolfram Decker and Hans Schoenemann                            //
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: primdec.lib,v 1.66 2000-05-16 12:19:05 pfister Exp $";
+version="$Id: primdec.lib,v 1.67 2000-05-19 10:07:06 pfister Exp $";
 info="
 LIBRARY: primdec.lib   PROCEDURES FOR PRIMARY DECOMPOSITION
 AUTHORS:  Gerhard Pfister, email: pfister@mathematik.uni-kl.de (GTZ)
@@ -42,6 +42,7 @@ LIB "elim.lib";
 LIB "poly.lib";
 LIB "random.lib";
 LIB "inout.lib";
+LIB "matrix.lib";
 ///////////////////////////////////////////////////////////////////////////////
 //
 //                      Gianni/Trager/Zacharias
@@ -4579,4 +4580,73 @@ example
    list pr = primdecGTZ(i);
    testPrimary(pr,i);
 }
+
+proc zerodec(ideal I)
+"USAGE:   zerodec(I); I ideal
+ RETURN:  a list of primary ideals, the zero-dimensional decomposition of I
+ NOTE:    the algorithm of C. Monico, works only good for small vdim(std(I))
+          (<=100) and without parameters
+ EXAMPLE: example zerodec; shows an example
+"
+{
+   def R=basering;
+   poly q;
+   poly va=var(1);
+   int j;
+   ideal J=groebner(I);
+   int d=vdim(J);
+   ideal ba=kbase(J);
+   ideal jmap=randomLast(100);
+   poly p=jmap[size(jmap)]+random(-50,50);
+   matrix m;
+   matrix n[d][d];
+   list re;
+
+   for(j=2;j<=nvars(basering);j++)
+   {
+      va=va*var(j);
+   }
+   for(j=1;j<=d;j++)
+   {
+      q=reduce(p*ba[j],J);
+      m=coeffs(q,ba,va);
+      n[j,1..d]=m[1..d,1];
+   }
+   execute("ring P=("+charstr(R)+"),T,dp;");
+   map phi=R,T;
+   matrix n=phi(n);
+   matrix E=unitmat(d);
+   poly charpol=det(n-T*E);
+   if(charpol[size(charpol)]!=0)
+   {
+     list fac=factorize(charpol);
+     setring R;
+     map psi=P,p;
+     list rfac=psi(fac);
+     list re;
+
+     option(redSB);
+     for(j=2;j<=size(rfac[1]);j++)
+     {
+        re[j-1]=interred(I+ideal(rfac[1][j]^rfac[2][j])); 
+     }
+     option(noredSB);
+     return(re);
+  }
+  else
+  {
+    setring R;
+    return(zerodec(I));
+  }
+}
+
+example
+{ "EXAMPLE:";  echo = 2;
+   ring r=0,(x,y),dp;
+   ideal i=x2-2,y2-2;
+   list pr=zerodec(i);
+   pr;
+}
+
+
 
