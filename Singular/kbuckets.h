@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.h,v 1.3 1999-05-26 16:20:18 obachman Exp $ */
+/* $Id: kbuckets.h,v 1.4 1999-09-27 14:34:18 obachman Exp $ */
 #include "mod2.h"
 #include "mmheap.h"
 #include "kbPolyProcs.h"
@@ -34,9 +34,7 @@ void kBucketDestroy(kBucket_pt *bucket);
 // Assumes length <= 0 || pLength(p) == length
 //         Monoms of p are from heap
 //         Uses heap for intermediate monom allocations
-//              pprocs for polynomial operations
-void kBucketInit(kBucket_pt bucket, poly p, int length, kbPolyProcs_pt pprocs,
-                 memHeap heap = NULL);
+void kBucketInit(kBucket_pt bucket, poly p, int length, memHeap heap = NULL);
 
 // Converts Bpoly into a poly and clears bucket 
 // i.e., afterwards Bpoly == 0
@@ -121,7 +119,6 @@ public:
   int  buckets_length[MAX_BUCKET + 1]; // length if i-th poly
   int buckets_used;                    // max number of used bucket
 #endif
-  kbPolyProcs_pt pprocs;               // procs for poly arithmetic
   memHeap heap;                        // used heap
 };
 
