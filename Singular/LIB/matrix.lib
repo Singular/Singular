@@ -1,8 +1,8 @@
-// $Id: matrix.lib,v 1.10 1998-10-09 12:28:57 Singular Exp $
-// GMG/BM, last modified: 08.10.98
+// $Id: matrix.lib,v 1.11 1999-02-11 12:36:47 greuel Exp $
+// GMG/BM, last modified: 8.10.98
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: matrix.lib,v 1.10 1998-10-09 12:28:57 Singular Exp $";
+version="$Id: matrix.lib,v 1.11 1999-02-11 12:36:47 greuel Exp $";
 info="
 LIBRARY:  matrix.lib    PROCEDURES FOR MATRIX OPERATIONS
                         Authors: GMG/BM
