@@ -235,12 +235,7 @@ void singular_example(char *str)
     *ss='\0';
     ss--;
   }
-#ifdef HAVE_NAMESPACES
-  idhdl h, ns;
-  iiname2hdl(s, &ns, &h);
-#else /* HAVE_NAMESPACES */
   idhdl h=IDROOT->get(s,myynest);
-#endif /* HAVE_NAMESPACES */
   if ((h!=NULL) && (IDTYP(h)==PROC_CMD))
   {
     char *lib=iiGetLibName(IDPROC(h));
@@ -634,9 +629,6 @@ char * versionString()
 #else
               StringAppendS("\n\t");
 #endif
-#ifdef HAVE_NAMESPACES
-              StringAppendS("Namespaces,");
-#endif
 #ifdef HAVE_NS
               StringAppendS("namespaces,");
 #endif
@@ -743,6 +735,7 @@ void listall(int showproc)
         hh=IDNEXT(hh);
       }
       Print("currRing:%x, currPack:%x,basePack:%x\n",currRing,currPack,basePack);
+      iiCheckPack(currPack);
 }
 void checkall()
 {

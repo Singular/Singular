@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.190 2002-04-30 13:35:12 levandov Exp $ */
+/* $Id: ring.cc,v 1.191 2002-05-02 15:16:01 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -954,7 +954,6 @@ void rKill(ring r)
 
 void rKill(idhdl h)
 {
-#ifndef HAVE_NAMESPACES
   ring r = IDRING(h);
   int ref=0;
   if (r!=NULL)
@@ -970,32 +969,6 @@ void rKill(idhdl h)
       currRingHdl=rFindHdl(r,NULL,NULL);
     }
   }
-#endif /* NOT HAVE_NAMESPACES */
-
-#ifdef HAVE_NAMESPACES
-  ring r = IDRING(h);
-  if (r!=NULL) rKill(r);
-  if (h==currRingHdl)
-  {
-    namehdl nsHdl = namespaceroot;
-    while(nsHdl!=NULL) {
-      currRingHdl=NSROOT(nsHdl);
-      while (currRingHdl!=NULL)
-      {
-        if ((currRingHdl!=h)
-            && (IDTYP(currRingHdl)==IDTYP(h))
-            && (h->data.uring==currRingHdl->data.uring))
-          break;
-        currRingHdl=IDNEXT(currRingHdl);
-      }
-      if ((currRingHdl != NULL) && (currRingHdl!=h)
-          && (IDTYP(currRingHdl)==IDTYP(h))
-          && (h->data.uring==currRingHdl->data.uring))
-        break;
-      nsHdl = nsHdl->next;
-    }
-  }
-#endif /* HAVE_NAMESPACES */
 }
 
 idhdl rSimpleFindHdl(ring r, idhdl root)
@@ -1013,47 +986,6 @@ idhdl rSimpleFindHdl(ring r, idhdl root)
 
 idhdl rFindHdl(ring r, idhdl n, idhdl w)
 {
-#ifdef HAVE_NAMESPACES
-  idhdl h;
-  namehdl ns = namespaceroot;
-
-  while(!ns->isroot) {
-    h = NSROOT(ns);
-    if(w != NULL) h = w;
-    while (h!=NULL)
-    {
-      if (((IDTYP(h)==RING_CMD)||(IDTYP(h)==QRING_CMD))
-          && (h->data.uring==r)
-          && (h!=n))
-        return h;
-      h=IDNEXT(h);
-    }
-    ns = ns->next;
-  }
-  h = NSROOT(ns);
-  if(w != NULL) h = w;
-  while (h!=NULL)
-  {
-    if (((IDTYP(h)==RING_CMD)||(IDTYP(h)==QRING_CMD))
-        && (h->data.uring==r)
-        && (h!=n))
-      return h;
-    h=IDNEXT(h);
-  }
-#if 0
-  if(namespaceroot->isroot) h = IDROOT;
-  else h = NSROOT(namespaceroot->next);
-  if(w != NULL) h = w;
-  while (h!=NULL)
-  {
-    if (((IDTYP(h)==RING_CMD)||(IDTYP(h)==QRING_CMD))
-        && (h->data.uring==r)
-        && (h!=n))
-      return h;
-    h=IDNEXT(h);
-  }
-#endif
-#else
   idhdl h=rSimpleFindHdl(r,IDROOT);
   if (h!=NULL)  return h;
 #ifdef HAVE_NS
@@ -1076,7 +1008,6 @@ idhdl rFindHdl(ring r, idhdl n, idhdl w)
     if (h!=NULL)  return h;
     tmp=IDNEXT(tmp);
   }
-#endif
 #endif
   return NULL;
 }

@@ -4,7 +4,7 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id: subexpr.cc,v 1.80 2002-01-18 16:35:40 Singular Exp $ */
+/* $Id: subexpr.cc,v 1.81 2002-05-02 15:16:02 Singular Exp $ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -109,30 +109,7 @@ void sleftv::Print(leftv store, int spaces)
           ::Print("%-*.*s`%s`",spaces,spaces," ",n);
           break;
         case PACKAGE_CMD:
-#ifdef HAVE_NAMESPACES
-          {
-            char *typ;
-            language_defs lang = ((package)d)->language;
-            ::Print("// Package : %-*.*s`%s`, ref=%d\n",spaces,spaces," ",n,
-                    ((package)d)->ref);
-            switch (lang) {
-                case LANG_TOP:      typ="Toplevel"; break;
-                case LANG_SINGULAR: typ="singular"; break;
-                case LANG_C:        typ="object";   break;
-                case LANG_NONE:     typ="none";     break;
-                default:            typ="unknow language";
-            }
-            if(((package)d)->libname!=NULL)
-              ::Print("// libname : %s\n", ((package)d)->libname);
-
-            ::Print("// language: %-*.*s%s",spaces,spaces," ",typ);
-            if(lang != LANG_NONE)
-              ::Print("\n// loaded  : %-*.*s%s",spaces,spaces," ",
-                      ((package)d)->loaded ? "yes" : "no");
-          }
-#else /* HAVE_NAMESPACES */
           ::Print("%-*.*s`%s`",spaces,spaces," ",n);
-#endif /* HAVE_NAMESPACES */
           break;
         case NONE:
           return;
@@ -287,10 +264,6 @@ void sleftv::CleanUp(ring r)
   }
   //name=NULL;
   //flag=0;
-#ifdef HAVE_NAMESPACES
-  //packhdl = NULL;
-  //req_packhdl = NULL;
-#endif /* HAVE_NAMESPACES */
   if (data!=NULL)
   {
     switch (rtyp)
@@ -602,10 +575,6 @@ void sleftv::Copy(leftv source)
         Warn("Copy: cannot copy type %s(%d)",Tok2Cmdname(rtyp),rtyp);
       #endif
     }
-#ifdef HAVE_NAMESPACES
-    packhdl = source->packhdl;
-    req_packhdl = source->req_packhdl;
-#endif /* HAVE_NAMESPACES */
     if ((source->attribute!=NULL)||(source->e!=NULL))
       attribute=source->CopyA();
     if(source->e==NULL)
@@ -1031,11 +1000,13 @@ void * sleftv::Data()
                          return (void *)nNULL;
       case VNOETHER:   return (void *) ppNoether;
 #ifndef HAVE_NAMESSPACES
+#ifndef HAVE_NS
       case LIB_CMD:    {
                          idhdl h = ggetid( "LIB" );
                          if(h==NULL) return (void *)sNoName;
                          return IDSTRING(h);
                        }
+#endif
 #endif
       case IDHDL:
         return IDDATA((idhdl)data);
@@ -1309,12 +1280,6 @@ void syMake(leftv v,char * id, idhdl packhdl)
   }
 #endif
   v->Init();
-#ifdef HAVE_NAMESPACES
-  v->packhdl = NULL;
-  if(packhdl != NULL)
-    v->req_packhdl = packhdl;
-  else v->req_packhdl = namespaceroot->get(namespaceroot->name, 0, TRUE);
-#endif /* HAVE_NAMESPACES */
 #ifdef HAVE_NS
   v->packhdl = NULL;
   if(packhdl != NULL)
@@ -1347,30 +1312,6 @@ void syMake(leftv v,char * id, idhdl packhdl)
           return; /* undefined */
         }
       }
-#ifdef HAVE_NAMESPACES
-      if (strcmp(id,"Current")==0)
-      {
-        h = namespaceroot->get(namespaceroot->name,0, TRUE);
-        if (id!=IDID(h)) omFree((ADDRESS)id);
-        v->rtyp = IDHDL;
-        v->data = (char *)h;
-        v->flag = IDFLAG(h);
-        v->name = IDID(h);
-        v->attribute=IDATTR(h);
-        return;
-      }
-      if (strcmp(id,"Up")==0)
-      { namehdl ns=namespaceroot;
-        if (!ns->isroot) ns=ns->next;
-        if (id!=ns->name) omFree((ADDRESS)id);
-        v->rtyp = NSHDL;
-        v->data = (char *)ns;
-        v->name = omStrDup(ns->name);
-        return;
-      }
-      h=ggetid(id, packhdl==NULL ? FALSE : TRUE, &(v->packhdl));
-      //if(h==NULL) Print("syMake: h is null\n");
-#else /* HAVE_NAMESPACES */
 #ifdef HAVE_NS
       if(v->req_packhdl!=currPack)
       {
@@ -1379,7 +1320,6 @@ void syMake(leftv v,char * id, idhdl packhdl)
       else
 #endif
       h=ggetid(id);
-#endif /* HAVE_NAMESPACES */
       /* 3) existing identifier, local */
       if ((h!=NULL) && (IDLEV(h)==myynest))
       {
@@ -1550,15 +1490,11 @@ int sleftv::Eval()
         nok=d->arg2.Eval();
         if(!nok)
         {
-#ifdef HAVE_NAMESPACES
-          leftv r=iiMake_proc(h,(sleftv*)NULL,&d->arg2);
-#else /* HAVE_NAMESPACES */
 #ifdef HAVE_NS
           leftv r=iiMake_proc(h,req_packhdl,&d->arg2);
 #else /* HAVE_NS */
           leftv r=iiMake_proc(h,&d->arg2);
 #endif /* HAVE_NS */
-#endif /* HAVE_NAMESPACES */
           if (r!=NULL)
             memcpy(this,r,sizeof(sleftv));
           else
@@ -1582,11 +1518,7 @@ int sleftv::Eval()
           int save_typ=d->arg1.rtyp;
           omCheckAddr(n);
           if (d->arg1.rtyp!=IDHDL)
-#ifdef HAVE_NAMESPACES
-          syMake(&d->arg1,n, d->arg1.req_packhdl); //assume  type of arg1==DEF_CMD
-#else
           syMake(&d->arg1,n);
-#endif
           omCheckAddr(d->arg1.name);
           if (d->arg1.rtyp==IDHDL)
           {
@@ -1681,20 +1613,5 @@ int sleftv::Eval()
 
 char *iiSleftv2name(leftv v)
 {
-#ifdef HAVE_NAMESPACES
-  char *name;
-  if((v->packhdl != NULL)&&(IDPACKAGE(v->packhdl)!=namespaceroot->pack))
-  {
-    // MEMORY LEAK ??
-    name = (char *)omAlloc(strlen(v->name) + strlen(IDID(v->packhdl)) + 3);
-    sprintf(name, "%s::%s", IDID(v->packhdl), v->name);
-    return(name);
-  }
-  else
-  {
-    return(v->name);
-  }
-#else /* HAVE_NAMESPACES */
   return(v->name);
-#endif /* HAVE_NAMESPACES */
 }

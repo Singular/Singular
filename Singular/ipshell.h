@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.h,v 1.27 2002-01-07 17:18:11 Singular Exp $ */
+/* $Id: ipshell.h,v 1.28 2002-05-02 15:15:57 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -55,19 +55,11 @@ BOOLEAN iiExport(leftv v, int toLev);
 BOOLEAN iiExport(leftv v, int toLev, idhdl roothdl);
 BOOLEAN iiInternalExport (leftv v, int toLev, idhdl roothdl);
 #endif /* HAVE_NS */
-#ifdef HAVE_NAMESPACES
-BOOLEAN iiExport(leftv v, int toLev, idhdl roothdl);
-BOOLEAN iiInternalExport (leftv v, int toLev, idhdl roothdl);
-#endif /* HAVE_NAMESPACES */
 char *  iiGetLibName(procinfov v);
 char *  iiGetLibProcBuffer( procinfov pi, int part=1 );
 char *  iiProcName(char *buf, char & ct, char* &e);
 char *  iiProcArgs(char *e,BOOLEAN withParenth);
-#ifdef HAVE_NAMESPACES
-BOOLEAN iiLibCmd( char *newlib, BOOLEAN autoexport=TRUE, BOOLEAN tellerror=TRUE );
-#else /* HAVE_NAMESPACES */
 BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror=TRUE );
-#endif /* HAVE_NAMESPACES */
 /* sees wheter library lib has already been loaded
    if yes, writes filename of lib into where and returns TRUE,
    if  no, returns FALSE
@@ -167,15 +159,11 @@ BOOLEAN iiParameter(leftv p);
 /* ================================================================== */
 int     iiDeclCommand(leftv sy, leftv name, int lev, int t, idhdl* root,
   BOOLEAN isring = FALSE, BOOLEAN init_b=TRUE);
-#ifdef HAVE_NAMESPACES
-sleftv * iiMake_proc(idhdl pn, sleftv* slpn, sleftv* sl);
-#else /* HAVE_NAMESPACES */
 #ifdef HAVE_NS
 sleftv * iiMake_proc(idhdl pn, package pack, sleftv* sl);
 #else /* HAVE_NS */
 sleftv * iiMake_proc(idhdl pn, sleftv* sl);
 #endif /* HAVE_NS */
-#endif /* HAVE_NAMESPACES */
 // from misc.cc:
 char *  showOption();
 BOOLEAN setOption(leftv res, leftv v);
@@ -187,6 +175,7 @@ void  singular_example(char *str);
 #ifdef HAVE_NS
 void listall(int showproc=1);
 void checkall();
+void iiCheckPack(package &p);
 #endif
 #endif
 

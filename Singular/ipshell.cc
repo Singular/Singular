@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.74 2002-02-05 16:53:45 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.75 2002-05-02 15:15:58 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -278,7 +278,6 @@ void killlocals(int v)
   idhdl sh=currRingHdl;
   ring sr=currRing;
   BOOLEAN changed=FALSE;
-#ifndef HAVE_NAMESPACES
   idhdl h = IDROOT;
 
 //  Print("killlocals in %s\n",IDID(currPackHdl));
@@ -296,39 +295,6 @@ void killlocals(int v)
     }
     h = IDNEXT(h);
   }
-#else
-  idhdl h = NSROOT(namespaceroot->root);
-
-  while (h!=NULL)
-  {
-    if (((IDTYP(h)==QRING_CMD) || (IDTYP(h) == RING_CMD))
-    && (IDRING(h)->idroot!=NULL))
-    {
-      //Print("=====> Toplevel: ring %s, lev: %d:\n",IDID(h),IDLEV(h));
-      if (h!=currRingHdl) {changed=TRUE;rSetHdl(h);}
-      killlocals0(v,&(IDRING(h)->idroot));
-    }
-    if (IDTYP(h)==PACKAGE_CMD && (IDPACKAGE(h)->idroot!=NULL))
-    {
-      idhdl h0 = (IDPACKAGE(h))->idroot;
-
-      //Print("=====> package: %s, lev: %d:\n",IDID(h),IDLEV(h));
-      while (h0!=NULL)
-      {
-        if (((IDTYP(h0)==QRING_CMD) || (IDTYP(h0) == RING_CMD))
-            && (IDRING(h0)->idroot!=NULL))
-        {
-          //Print("=====> '%s': ring %s, lev: %d:\n",IDID(h),IDID(h0),IDLEV(h0));
-          if (h0!=currRingHdl) {changed=TRUE;rSetHdl(h0);}
-          killlocals0(v,&(IDRING(h0)->idroot));
-        }
-        h0 = IDNEXT(h0);
-      }
-      killlocals0(v,&((IDPACKAGE(h))->idroot));
-    }
-    h = IDNEXT(h);
-  }
-#endif /* HAVE_NAMESPACES */
   if (changed)
   {
     currRing=NULL;
@@ -432,14 +398,7 @@ void list_cmd(int typ, const char* what, char *prefix,BOOLEAN iterate, BOOLEAN f
     }
     else
     {
-#ifdef HAVE_NAMESPACES
-      idhdl pack;
-      if(strchr(what, ':')!= NULL)
-        iiname2hdl(what, &pack, &h);
-      else h = ggetid(what);
-#else /* HAVE_NAMESPACES */
       h = ggetid(what);
-#endif /* HAVE_NAMESPACES */
       if (h!=NULL)
       {
         if (iterate) list1(prefix,h,TRUE,fullname);
@@ -455,7 +414,7 @@ void list_cmd(int typ, const char* what, char *prefix,BOOLEAN iterate, BOOLEAN f
         else if((IDTYP(h)==PACKAGE_CMD) || (IDTYP(h)==POINTER_CMD))
         {
           Print("list_cmd:package or pointer\n");
-	  all=TRUE;typ=PROC_CMD;fullname=TRUE;really_all=TRUE;
+          all=TRUE;typ=PROC_CMD;fullname=TRUE;really_all=TRUE;
           h=IDPACKAGE(h)->idroot;
         }
         else
@@ -489,14 +448,6 @@ void list_cmd(int typ, const char* what, char *prefix,BOOLEAN iterate, BOOLEAN f
       {
         list_cmd(0,IDID(h),"//      ",FALSE);
       }
-#ifdef HAVE_NAMESPACES
-      if (IDTYP(h)==PACKAGE_CMD && really_all && strcmp(IDID(h), "Top"))
-      {
-        namespaceroot->push(IDPACKAGE(h), IDID(h));
-        list_cmd(0,IDID(h),"//      ",FALSE);
-        namespaceroot->pop();
-      }
-#endif /* HAVE_NAMESPACES */
 #ifdef HAVE_NS
       if (IDTYP(h)==PACKAGE_CMD && really_all)
       {
@@ -506,13 +457,6 @@ void list_cmd(int typ, const char* what, char *prefix,BOOLEAN iterate, BOOLEAN f
     }
     h = IDNEXT(h);
   }
-#ifdef HAVE_NAMESPACES
-  if(!namespaceroot->isroot && do_packages) {
-    namespaceroot->push(namespaceroot->root->pack, "Top", myynest);
-    list_cmd(PACKAGE_CMD,"Top","// ",FALSE, TRUE);
-    namespaceroot->pop();
-  }
-#endif /* HAVE_NAMESPACES */
 }
 
 void test_cmd(int i)
@@ -692,18 +636,12 @@ leftv iiMap(map theMap, char * what)
   int i;
   nMapFunc nMap;
 
-#ifdef HAVE_NAMESPACES
-  idhdl pack;
-  //r=namespaceroot->get(theMap->preimage,myynest);
-  iiname2hdl(theMap->preimage,&pack,&r);
-#else
   r=IDROOT->get(theMap->preimage,myynest);
 #ifdef HAVE_NS
   if ((currPack!=basePack)
   &&((r==NULL) || ((r->typ != RING_CMD) && (r->typ != QRING_CMD))))
     r=basePack->idroot->get(theMap->preimage,myynest);
 #endif /* HAVE_NS */
-#endif /* HAVE_NAMESPACES */
   if ((r!=NULL) && ((r->typ == RING_CMD) || (r->typ== QRING_CMD)))
   {
     //if ((nMap=nSetMap(rInternalChar(IDRING(r)),
@@ -747,7 +685,7 @@ leftv iiMap(map theMap, char * what)
       if ((tmpW.rtyp==IDEAL_CMD) && (nMap==nCopy))
       {
         v->rtyp=IDEAL_CMD;
-	v->data=fast_map(IDIDEAL(w), IDRING(r), (ideal)theMap, currRing);
+        v->data=fast_map(IDIDEAL(w), IDRING(r), (ideal)theMap, currRing);
       }
       else
       #endif
@@ -967,23 +905,6 @@ int iiDeclCommand(leftv sy, leftv name, int lev,int t, idhdl* root,BOOLEAN isrin
     //{
     //  Warn("`%s` is already in use",name->name);
     //}
-#ifdef HAVE_NAMESPACES
-    if(name->req_packhdl != NULL && name->packhdl != NULL &&
-       name->req_packhdl != name->packhdl)
-      id = omStrDup(name->name);
-
-    //if(name->req_packhdl != NULL /*&& !isring*/) {
-    if(name->req_packhdl != NULL && !isring &&
-       IDPACKAGE(name->req_packhdl)->idroot != (*root)) {
-      //Print("iiDeclCommand: PUSH(%s)\n",IDID(name->req_packhdl));
-      namespaceroot->push( IDPACKAGE(name->req_packhdl) ,
-                           IDID(name->req_packhdl));
-      sy->data = (char *)enterid(id,lev,t,
-                                 &IDPACKAGE(name->req_packhdl)->idroot,init_b);
-      namespaceroot->pop();
-    }
-    else
-#endif /* HAVE_NAMESPACES */
     {
       sy->data = (char *)enterid(id,lev,t,root,init_b);
     }
@@ -1051,9 +972,6 @@ static BOOLEAN iiInternalExport (leftv v, int toLev)
         {
           Warn("redefining %s",IDID(h));
         }
-#ifdef HAVE_NAMESPACES
-        //if (namespaceroot->currRing==IDRING(h)) namespaceroot->currRing=NULL;
-#endif /* HAVE_NAMESPACES */
 #ifdef USE_IILOCALRING
             if (iiLocalRing[0]==IDRING(h)) iiLocalRing[0]=NULL;
 #else
@@ -1080,75 +998,6 @@ static BOOLEAN iiInternalExport (leftv v, int toLev)
   return FALSE;
 }
 
-#ifdef HAVE_NAMESPACES
-BOOLEAN iiInternalExport (leftv v, int toLev, idhdl roothdl)
-{
-  idhdl h=(idhdl)v->data;
-  if(h==NULL)
-  {
-    Warn("'%s': no such identifier\n", v->name);
-    return FALSE;
-  }
-  package rootpack = IDPACKAGE(roothdl);
-  //Print("iiInternalExport('%s',%d,%s) typ:%d\n", v->name, toLev, IDID(roothdl),v->Typ());
-#if 0
-  if( (IDTYP(h) == RING_CMD) || (IDTYP(h) == QRING_CMD))
-  {
-    sleftv tmp_expr;
-    //Print("// ==> Ring set nesting to 0\n");
-    //Print("// ++> make a copy of ring\n");
-    if(iiInternalExport(v, toLev)) return TRUE;
-    if(IDPACKAGE(roothdl) != NSPACK(namespaceroot)) {
-      namespaceroot->push(rootpack, IDID(roothdl));
-      //namespaceroot->push(NSPACK(namespaceroot->root), "Top");
-      idhdl rl=enterid(v->name, toLev, IDTYP(h),
-                       &(rootpack->idroot), FALSE);
-      namespaceroot->pop();
-
-      if( rl == NULL) return TRUE;
-      ring r=(ring)v->Data();
-      if(r != NULL) {
-        if (&IDRING(rl)!=NULL) rKill(rl);
-        r->ref++;
-        IDRING(rl)=r;
-      }
-      else PrintS("! ! ! ! ! r is empty!!!!!!!!!!!!\n");
-    }
-  }
-  else
-#endif
-  if (RingDependend(IDTYP(h)))
-  {
-    //Print("// ==> Ringdependent set nesting to 0\n");
-    if(iiInternalExport(v, toLev)) return TRUE;
-  }
-  else
-  {
-    if (h==IDROOT)
-    {
-      IDROOT=h->next;
-    }
-    else
-    {
-      idhdl hh=IDROOT;
-      while ((hh->next!=h)&&(hh->next!=NULL))
-        hh=hh->next;
-      if (hh->next==h)
-        hh->next=h->next;
-      else
-      {
-        PrintS("not found:\n");
-        //list_cmd(0,"all","// ",TRUE);
-        return TRUE;
-      }
-    }
-    h->next=rootpack->idroot;
-    rootpack->idroot=h;
-  }
-  IDLEV(h)=toLev;
-  return FALSE;
-}
-#endif /* HAVE_NAMESAPCES */
 #ifdef HAVE_NS
 BOOLEAN iiInternalExport (leftv v, int toLev, idhdl roothdl)
 {
@@ -1223,50 +1072,6 @@ BOOLEAN iiExport (leftv v, int toLev)
 }
 
 /*assume root!=idroot*/
-#ifdef HAVE_NAMESPACES
-BOOLEAN iiExport (leftv v, int toLev, idhdl root)
-{
-  BOOLEAN nok=FALSE;
-  leftv rv=v;
-  while (v!=NULL)
-  {
-    if ((v->name==NULL)||(v->rtyp==0)||(v->e!=NULL)
-    )
-    {
-      WerrorS("cannot export");
-      nok=TRUE;
-    }
-    else
-    {
-      idhdl old=root->get(v->name,toLev);
-      if (old!=NULL)
-      {
-        if (IDTYP(old)==v->Typ())
-        {
-          if (BVERBOSE(V_REDEFINE))
-          {
-            Warn("redefining %s",IDID(old));
-          }
-          killhdl2(old,&root,currRing);
-        }
-        else
-        {
-          rv->CleanUp();
-          return TRUE;
-        }
-      }
-      if(iiInternalExport(v, toLev, root))
-      {
-        rv->CleanUp();
-        return TRUE;
-      }
-    }
-    v=v->next;
-  }
-  rv->CleanUp();
-  return nok;
-}
-#endif /* HAVE_NAMESPACES */
 #ifdef HAVE_NS
 BOOLEAN iiExport (leftv v, int toLev, idhdl root)
 {
@@ -1357,3 +1162,21 @@ poly    iiHighCorner(ideal I, int ak)
     po=pOne();
   return po;
 }
+
+#ifdef HAVE_NS
+void iiCheckPack(package &p)
+{
+  if (p==basePack) return;
+
+  idhdl t=basePack->idroot;
+
+  while ((t!=NULL) && (t->rtyp!=PACKAGE_CMD) && (IDPACKAGE(t)!=p)) t=t->next;
+
+  if (t==NULL)
+  {
+    WarnS("package not found\n");
+    p=basePack;
+  }
+  return;
+}
+#endif

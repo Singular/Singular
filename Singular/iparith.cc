@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.281 2002-03-12 10:07:17 mschulze Exp $ */
+/* $Id: iparith.cc,v 1.282 2002-05-02 15:15:58 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -166,9 +166,6 @@ cmdnames cmds[] =
   { "example",     0, EXAMPLE_CMD ,       EXAMPLE_CMD},
   { "execute",     0, EXECUTE_CMD ,       CMD_1},
   { "export",      0, EXPORT_CMD ,        EXPORT_CMD},
-#ifdef HAVE_NAMESPACES
-  { "exportto",    0, EXPORTTO_CMD ,      CMD_M},
-#endif
   { "factorize",   0, FAC_CMD ,           CMD_12},
   { "fetch",       0, FETCH_CMD ,         CMD_2},
   { "fglm",        0, FGLM_CMD ,          CMD_2},
@@ -190,9 +187,6 @@ cmdnames cmds[] =
   { "if",          0, IF_CMD ,            IF_CMD},
   { "imap",        0, IMAP_CMD ,          CMD_2},
   { "impart",      0, IMPART_CMD ,        CMD_1},
-#ifdef HAVE_NAMESPACES
-  { "importfrom",  0, IMPORTFROM_CMD ,    CMD_M},
-#endif
   { "indepSet",    0, INDEPSET_CMD ,      CMD_12},
   { "insert",      0, INSERT_CMD ,        CMD_23},
   { "int",         0, INT_CMD ,           ROOT_DECL},
@@ -307,9 +301,6 @@ cmdnames cmds[] =
   { "transpose",   0, TRANSPOSE_CMD ,     CMD_1},
   { "type",        0, TYPE_CMD ,          TYPE_CMD},
   { "typeof",      0, TYPEOF_CMD ,        CMD_1},
-#ifdef HAVE_NAMESPACES
-  { "unload",      0, UNLOAD_CMD ,        CMD_M},
-#endif
   { "uressolve",   0, URSOLVE_CMD,        CMD_M},
   { "vandermonde", 0, VANDER_CMD,         CMD_3},
   { "var",         0, VAR_CMD ,           CMD_1},
@@ -702,49 +693,6 @@ static BOOLEAN jjPLUSMINUS_Gen(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjCOLCOL(leftv res, leftv u, leftv v)
 {
-#ifdef HAVE_NAMESPACES
-  BOOLEAN iiReLoadLib(idhdl packhdl);
-  BOOLEAN iiTryLoadLib(leftv v, char *id);
-  idhdl packhdl;
-
-  switch(u->Typ())
-  {
-      case 0:
-        //Print("%s of type 'ANY'. Trying load.\n", v->name);
-        if(iiTryLoadLib(u, u->name))
-        {
-          Werror("'%s' no such package", u->name);
-          return TRUE;
-        }
-        syMake(u,u->name,NULL);
-        // else: use next case !!! no break !!!
-
-      case PACKAGE_CMD:
-        packhdl = (idhdl)u->data;
-        if(!IDPACKAGE(packhdl)->loaded)
-        {
-          //if(iiReLoadLib(packhdl))
-          //  Werror("unable to reload package '%s'", IDID(packhdl));
-        }
-        if(v->rtyp == IDHDL)
-        {
-          v->name = omStrDup(v->name);
-        }
-        namespaceroot->push( IDPACKAGE(packhdl), IDID(packhdl));
-        syMake(v, v->name, packhdl);
-        memcpy(res, v, sizeof(sleftv));
-        memset(v, 0, sizeof(sleftv));
-        namespaceroot->pop();
-        break;
-
-      case DEF_CMD:
-        break;
-
-      default:
-        WerrorS("<package>::<id> expected");
-        return TRUE;
-  }
-#else /* HAVE_NAMESPACES */
 #ifdef HAVE_NS
   idhdl packhdl;
 
@@ -789,7 +737,6 @@ static BOOLEAN jjCOLCOL(leftv res, leftv u, leftv v)
 #else
   WerrorS("package is not supported in this version");
 #endif /* HAVE_NS */
-#endif /* HAVE_NAMESPACES */
   return FALSE;
 }
 static BOOLEAN jjPLUS_I(leftv res, leftv u, leftv v)
@@ -1262,10 +1209,6 @@ static BOOLEAN jjINDEX_I(leftv res, leftv u, leftv v)
   res->rtyp=u->rtyp; u->rtyp=0;
   res->data=u->data; u->data=NULL;
   res->name=u->name; u->name=NULL;
-#ifdef HAVE_NAMESPACES
-  res->packhdl=u->packhdl; u->packhdl=NULL;
-  res->req_packhdl=u->req_packhdl; u->req_packhdl=NULL;
-#endif /* HAVE_NAMESPACES */
   res->e=u->e;       u->e=NULL;
   if (res->e==NULL) res->e=jjMakeSub(v);
   else
@@ -1305,9 +1248,6 @@ static BOOLEAN jjINDEX_IV(leftv res, leftv u, leftv v)
     p->rtyp=IDHDL;
     p->data=u->data;
     p->name=u->name;
-#ifdef HAVE_NAMESPACES
-    p->packhdl=u->packhdl;
-#endif /* HAVE_NAMESPACES */
     p->flag|=u->flag;
     p->e=jjMakeSub(&t);
   }
@@ -1435,16 +1375,7 @@ static BOOLEAN jjKLAMMER(leftv res, leftv u, leftv v)
   u->name=NULL;
   char *n=omStrDup(nn);
   omFree((ADDRESS)nn);
-#ifdef HAVE_NAMESPACES
-  if(u->req_packhdl != NULL)
-  {
-    namespaceroot->push( IDPACKAGE(u->req_packhdl), IDID(u->req_packhdl));
-    syMake(res,n);
-    namespaceroot->pop();
-  }
-  else
-#endif /* HAVE_NAMESPACES */
-    syMake(res,n);
+  syMake(res,n);
   return FALSE;
 }
 static BOOLEAN jjKLAMMER_IV(leftv res, leftv u, leftv v)
@@ -1454,15 +1385,6 @@ static BOOLEAN jjKLAMMER_IV(leftv res, leftv u, leftv v)
   int i;
   int slen = strlen(u->name) + 14;
   char *n = (char*) omAlloc(slen);
-#ifdef HAVE_NAMESPACES
-  BOOLEAN needpop=FALSE;
-
-  if(u->req_packhdl != NULL)
-  {
-    namespaceroot->push( IDPACKAGE(u->req_packhdl), IDID(u->req_packhdl));
-    needpop = TRUE;
-  }
-#endif /* HAVE_NAMESPACES */
 
   for (i=0;i<iv->length(); i++)
   {
@@ -1481,16 +1403,10 @@ static BOOLEAN jjKLAMMER_IV(leftv res, leftv u, leftv v)
   omFree((ADDRESS)u->name);
   u->name = NULL;
   omFreeSize(n, slen);
-#ifdef HAVE_NAMESPACES
-  if(needpop) namespaceroot->pop();
-#endif /* HAVE_NAMESPACES */
   return FALSE;
 }
 static BOOLEAN jjPROC(leftv res, leftv u, leftv v)
 {
-#ifdef HAVE_NAMESPACES
-  leftv sl = iiMake_proc((idhdl)u->data,u,v);
-#else /* HAVE_NAMESPACES */
 #ifdef HAVE_NS
   leftv sl;
   if (u->req_packhdl==currPack)
@@ -1500,7 +1416,6 @@ static BOOLEAN jjPROC(leftv res, leftv u, leftv v)
 #else /* HAVE_NS */
   leftv sl = iiMake_proc((idhdl)u->data,v);
 #endif /* HAVE_NS */
-#endif /* HAVE_NAMESPACES */
   if (sl==NULL)
   {
     return TRUE;
@@ -2599,15 +2514,11 @@ static BOOLEAN jjPROC1(leftv res, leftv u)
 {
   if ((u->rtyp!=IDHDL) || (u->e!=NULL))
     return TRUE;
-#ifdef HAVE_NAMESPACES
-  leftv sl = iiMake_proc((idhdl) u->data,u,NULL);
-#else /* HAVE_NAMESPACES */
 #ifdef HAVE_NS
   leftv sl = iiMake_proc((idhdl) u->data,u->req_packhdl,NULL);
 #else /* HAVE_NS */
   leftv sl = iiMake_proc((idhdl) u->data,NULL);
 #endif /* HAVE_NS */
-#endif /* HAVE_NAMESPACES */
   if (sl==NULL)
   {
     return TRUE;
@@ -3411,11 +3322,7 @@ static BOOLEAN jjLOAD(leftv res, leftv v, BOOLEAN autoexport)
         break;
 
       case LT_SINGULAR:
-#ifdef HAVE_NAMESPACES
-        return iiLibCmd(s, autoexport);
-#else
         return iiLibCmd(s);
-#endif
 
       case LT_ELF:
       case LT_HPUX:
@@ -5413,89 +5320,6 @@ static BOOLEAN jjSUBST_M(leftv res, leftv u)
   return b;
 }
 
-#ifdef HAVE_NAMESPACES
-static BOOLEAN jjIMPORTFROM(leftv res, leftv v);
-
-static BOOLEAN jjEXPORTTO(leftv res, leftv v)
-{
-  BOOLEAN nok=TRUE;
-  leftv u=v;
-  if(u->rtyp==NSHDL)
-  {
-    namehdl ns = (namehdl)(u->data);
-    idhdl h = namespaceroot->root->get(ns->name, 0, TRUE);
-    //Print("Export to '%s', lev %d\n", ns->name, ns->myynest);
-    while(v->next!=NULL)
-    {
-      nok = iiInternalExport(v->next, ns->myynest, h);
-      if(nok) { return nok; }
-
-      v = v->next;
-    }
-    return FALSE;
-  }
-  if(u->Typ()==PACKAGE_CMD)
-  {
-    //PrintS("export to package\n");
-    while(v->next!=NULL)
-    {
-      nok = iiInternalExport(v->next, 0, (idhdl)u->data);
-      if(nok) return nok;
-      v = v->next;
-    }
-    return FALSE;
-  }
-  return TRUE;
-}
-#endif /* HAVE_NAMESPACES */
-#ifdef HAVE_NAMESPACES
-static BOOLEAN jjIMPORTFROM(leftv res, leftv v)
-{
-  BOOLEAN nok=FALSE;
-  PrintS("jjIMPORT_FROM()\n");
-  if(v->rtyp==NSHDL)
-  {
-    PrintS("Import from toplevel\n");
-//While-schleife!!!
-    return FALSE;
-  }
-  if(v->Typ()==PACKAGE_CMD)
-  {
-    Print("Import from package %s\n", v->name);
-    while(v->next!=NULL)
-    {
-      //nok = iiInternalImport(v->next, 0, v->data);
-      if(nok) return nok;
-      v = v->next;
-    }
-    return FALSE;
-  }
-  return TRUE;
-}
-#endif
-#ifdef HAVE_NAMESPACES
-static BOOLEAN jjUNLOAD(leftv res, leftv v)
-{
-  if(v->Typ()==PACKAGE_CMD)
-  {
-    char *typ;
-    idhdl h = (idhdl)v->data;
-    package d=(package)v->Data();
-    switch (d->language)
-    {
-      case LANG_C:
-        typ="object";
-        break;
-      case LANG_SINGULAR:
-      case LANG_NONE:
-      default:
-        killhdl(h);
-    }
-    return FALSE;
-  }
-  return TRUE;
-}
-#endif
 /*=================== operations with many arg.: table =================*/
 /* number_of_args:  -1: any, -2: any >0, .. */
 struct sValCmdM dArithM[]=
@@ -5543,11 +5367,6 @@ struct sValCmdM dArithM[]=
 #ifndef __MWERKS__
 ,{jjSTATUS_M,  STATUS_CMD,      INT_CMD,             4 }
 #endif
-#ifdef HAVE_NAMESPACES
-,{jjIMPORTFROM,IMPORTFROM_CMD,  ANY_TYPE,           -2 }
-,{jjEXPORTTO,  EXPORTTO_CMD,    NONE,               -2 }
-,{jjUNLOAD,    UNLOAD_CMD,      NONE,               -2 }
-#endif /* HAVE_NAMESPACES */
 ,{loSimplex,   SIMPLEX_CMD,     LIST_CMD,            6 }
 ,{nuUResSolve, URSOLVE_CMD,     LIST_CMD,            4 }
 ,{NULL,        0,               0,                   0 }
