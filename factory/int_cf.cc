@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_cf.cc,v 1.10 1998-01-22 10:54:00 schmidt Exp $ */
+/* $Id: int_cf.cc,v 1.11 1998-06-26 16:13:42 schmidt Exp $ */
 
 #include <config.h>
 
@@ -9,6 +9,21 @@
 #include "int_cf.h"
 #include "canonicalform.h"
 #include "cf_factory.h"
+
+//{{{ bool InternalCF::isOne, isZero () const
+// docu: see CanonicalForm::isOne(), CanonicalForm::isZero()
+bool
+InternalCF::isOne () const
+{
+    return false;
+}
+
+bool
+InternalCF::isZero () const
+{
+    return false;
+}
+//}}}
 
 //{{{ CanonicalForm InternalCF::lc (), Lc (), LC ()
 // docu: see CanonicalForm::lc(), Lc(), LC()

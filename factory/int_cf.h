@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_cf.h,v 1.9 1998-01-22 10:54:07 schmidt Exp $ */
+/* $Id: int_cf.h,v 1.10 1998-06-26 16:13:49 schmidt Exp $ */
 
 #ifndef INCL_INT_CF_H
 #define INCL_INT_CF_H
@@ -49,8 +49,8 @@ public:
     virtual bool inCoeffDomain() const { return true; }
     virtual bool inPolyDomain() const { return false; }
     virtual bool inQuotDomain() const { return false; }
-    virtual bool isZero() const PVIRT_BOOL("isZero");
-    virtual bool isOne() const PVIRT_BOOL("isOne");
+    virtual bool isZero() const;
+    virtual bool isOne() const;
     virtual bool isUnivariate() const { return false; }
     virtual int intval() const;
     virtual int intmod( int ) const { return 0; }
