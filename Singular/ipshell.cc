@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.59 2000-12-15 18:49:31 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.60 2001-01-16 13:26:57 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1132,9 +1132,9 @@ poly    iiHighCorner(ideal I, int ak)
   {
     if(UsedAxis[i]==FALSE) return NULL; // not zero-dim.
   }
+  po=NULL;
   if (currRing->OrdSgn== -1)
   {
-    po=NULL;
     scComputeHC(I,ak,po);
     if (po!=NULL)
     {
@@ -1143,12 +1143,11 @@ poly    iiHighCorner(ideal I, int ak)
       {
         if (pGetExp(po, i) > 0) pDecrExp(po,i);
       }
+      pSetComp(po,ak);
+      pSetm(po);
     }
   }
-  if (po!=NULL)
-  {
-    pSetComp(po,ak);
-    pSetm(po);
-  }
+  else
+    po=pOne();
   return po;
 }
