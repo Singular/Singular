@@ -524,7 +524,7 @@ spectrumState   spectrumPolyList::spectrum( lists *L,int fast )
             //  principal part
             // ---------------------------------------------
 
-            *L = (lists)omAllocBin( slists _bin);
+            *L = (lists)omAllocBin( slists_bin);
             (*L)->Init( 1 );
             (*L)->m[0].rtyp = INT_CMD;    //  milnor number
             (*L)->m[0].data = (void*)mu;
@@ -533,7 +533,7 @@ spectrumState   spectrumPolyList::spectrum( lists *L,int fast )
         }
     }
 
-    *L = (lists)omAllocBin( slists _bin);
+    *L = (lists)omAllocBin( slists_bin);
 
     (*L)->Init( 6 );
 

@@ -175,7 +175,7 @@ spectrum spectrum::operator = ( const spectrum &spec )
 
 lists   spectrum::thelist( void )
 {
-    lists   L  = (lists)omAllocBin( slists _bin);
+    lists   L  = (lists)omAllocBin( slists_bin);
 
     L->Init( 6 );
 
