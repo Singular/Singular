@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstdfac.cc,v 1.14 1998-04-06 17:59:31 obachman Exp $ */
+/* $Id: kstdfac.cc,v 1.15 1998-04-07 17:00:59 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
@@ -257,6 +257,14 @@ static void completeReduceFac (kStrategy strat, lists FL)
       wrp(strat->S[si]);
       Print(" (=S[%d]) -> %d factors\n",si,IDELEMS(fac));
     }
+    else if (TEST_OPT_PROT)
+    {
+      int ii=IDELEMS(fac);
+      if (ii>1)
+      {
+        while(ii>0) { PrintS("F"); ii--; }
+      }
+    }
     ideal fac_copy=idInit(IDELEMS(fac),1);
     deleteInS(si,strat);
     int i;
@@ -313,8 +321,6 @@ static void completeReduceFac (kStrategy strat, lists FL)
       /* construct D */
       if (IDELEMS(fac)>1)
       {
-        idTest(fac_copy);
-        idTest(n->D);
         if (n->D==NULL)
         {
           n->D=idCopy(fac_copy);
@@ -322,26 +328,21 @@ static void completeReduceFac (kStrategy strat, lists FL)
         }
         else
         {
+          idTest(n->D);
           ideal r=idAdd(n->D,fac_copy);
           idDelete(&n->D);
           n->D=r;
         }
-        idTest(n->D);
         if (TEST_OPT_DEBUG)
         {
           PrintS("new D:\n");
           iiWriteMatrix((matrix)n->D,"D",1,0);
           PrintLn();
         }
-        idTest(n->D);
       }
-
-      idTest(fac_copy);
 
       fac_copy->m[i]=pCopy(fac->m[i]);
       fac->m[i]=NULL;
-
-      idTest(fac_copy);
 
       /* check for empty sets */
       if (n->D!=NULL)
@@ -483,6 +484,14 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
       {
         Print("-> %d factors\n",IDELEMS(fac));
       }
+      else if (TEST_OPT_PROT)
+      {
+        int ii=IDELEMS(fac);
+        if (ii>1)
+        {
+          while(ii>0) { PrintS("F"); ii--; }
+        }
+      }
       if ((IDELEMS(fac)==1)&&(facdeg==pFDeg(fac->m[0])))
       {
         pDelete(&(fac->m[0]));
@@ -513,7 +522,7 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
         }
         facdeg=pFDeg(fac->m[i]);
         ideal fac2=singclap_factorize(fac->m[i],NULL,1);
-#ifndef HAVE_LIBFAC_P 
+#ifndef HAVE_LIBFAC_P
         if ((fac2!=NULL)&&(IDELEMS(fac2)>1)&&(facdeg!=pFDeg(fac2->m[0])))
 #else
         if ((IDELEMS(fac2)>1)&&(facdeg!=pFDeg(fac2->m[0])))
@@ -525,12 +534,22 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
             Print("-> %d factors, again\n",IDELEMS(fac2));
             //jjPRINT_MA0((matrix)fac2,"");
           }
+          else if (TEST_OPT_PROT)
+          {
+            int ii=IDELEMS(fac2);
+            if (ii>1)
+            {
+              while(ii>0) { PrintS("F"); ii--; }
+            }
+          }
           pDelete(&(fac->m[i]));
           fac->m[i]=fac2->m[0];
           pEnlargeSet(&(fac->m),IDELEMS(fac),IDELEMS(fac2)-1);
+          pEnlargeSet(&(fac_copy->m),IDELEMS(fac),IDELEMS(fac2)-1);
           memcpy(fac->m+IDELEMS(fac),&(fac2->m[1]),(IDELEMS(fac2)-1)*sizeof(poly
 ));
           IDELEMS(fac)+=(IDELEMS(fac2)-1);
+	  IDELEMS(fac_copy)=IDELEMS(fac);
          }
       }
 
@@ -553,7 +572,7 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
         if (n->sl==-1) pos=0;
         else pos=posInS(n->S,n->sl,n->P.p);
         // we have already reduced all elements from fac....
-	//if (TEST_OPT_INTSTRATEGY)
+        //if (TEST_OPT_INTSTRATEGY)
         //{
         //  if (!TEST_OPT_MINRES||(n->syzComp==0)||(!n->homog))
         //  {
@@ -589,8 +608,6 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
         /* construct D */
         if (IDELEMS(fac)>1)
         {
-          idTest(fac_copy);
-          idTest(n->D);
           if (n->D==NULL)
           {
             n->D=idCopy(fac_copy);
@@ -598,26 +615,21 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
           }
           else
           {
+            idTest(n->D);
             ideal r=idAdd(n->D,fac_copy);
             idDelete(&n->D);
             n->D=r;
           }
-          idTest(n->D);
           if (TEST_OPT_DEBUG)
           {
             PrintS("new D:\n");
             iiWriteMatrix((matrix)n->D,"D",1,0);
             PrintLn();
           }
-          idTest(n->D);
         }
-
-        idTest(fac_copy);
 
         fac_copy->m[i]=pCopy(fac->m[i]);
         fac->m[i]=NULL;
-
-        idTest(fac_copy);
 
         /* check for empty sets */
         if (n->D!=NULL)
@@ -651,6 +663,7 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
             j--;
           }
         }
+
         /* check for empty sets */
         {
           int j=FL->nr;
@@ -809,9 +822,9 @@ lists stdfac(ideal F, ideal Q, tHomog h,intvec ** w,ideal D)
           {
             Print("empty set L[%d] because:L[%d]\n",j,i);
           }
-          // delete L[j], 
+          // delete L[j],
           i=0; j--;
-        }  
+        }
         else
         {
           i++;
