@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.315 2004-04-05 17:37:26 Singular Exp $ */
+/* $Id: iparith.cc,v 1.316 2004-04-19 10:40:40 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -4304,7 +4304,7 @@ static BOOLEAN jjBAREISS3(leftv res, leftv u, leftv v, leftv w)
   int k=(int)w->Data();
   if (k>=0)
   {
-    smCallNewBareiss((ideal)v->Data(),(int)v->Data(),(int)w->Data(),m,&iv);
+    smCallNewBareiss((ideal)u->Data(),(int)v->Data(),(int)w->Data(),m,&iv);
     l->Init(2);
     l->m[0].rtyp=MODUL_CMD;
     l->m[1].rtyp=INTVEC_CMD;
