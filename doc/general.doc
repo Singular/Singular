@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.70 1998-05-14 17:55:36 Singular Exp $
+@comment $Id: general.doc,v 1.71 1998-05-15 06:45:25 wichmann Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -925,13 +925,15 @@ For matrices with integer entries a modular algorithm is used.
 @section The SINGULAR language
 @cindex The SINGULAR language
 
-@sc{Singular} has a comfortable programming language similar to C
-with @code{for}, @code{if} ... @code{else}, @code{while}   etc.
+@sc{Singular} has a convenient programming language similar to C
+allowing the user to extend the set of predefined functions. However,
+@sc{Singular} interprets commands given interactiveley on the command
+line as well as given in the context of user defined procedures. In
+particular, the control structures @code{for}, @code{if} .. @code{else}
+and @code{while} are not restricted to the use in procedures.
 
-It is interpreted. Therefore every user may write procedures (or libraries) 
-for his own purposes, using
-the implemented commands of the kernel of @sc{Singular} and 
-those from other libraries.
+@xref{Procedures} for a detailed description of how to write
+procedures. 
 
 @menu
 * General command syntax::      
@@ -947,12 +949,33 @@ those from other libraries.
 @subsection General command syntax
 @cindex General command syntax
 
-The general form of a command is (with optional parts in square brackets):
-@itemize @bullet
-@item
-a @strong{definition}:
-@*   type_name name [ @code{=} expression ] @code{;}
-@* @strong{Example:}
+In @sc{Singular} a command is either a declaration, an assignment, a
+call to a function without return type, or a print command. The general
+form of a command is described in the following subsections.
+@subsubheading Declaration
+@c ------------------------------------------------------------
+@c   This piece of text exists also in the file types.doc, 
+@c   chapter "Data types".
+@c   If you change something here, change it there, too!
+@c ------------------------------------------------------------
+@enumerate
+@item 
+type name @code{=} expression @code{;}
+@* declares a variable with the given name of the given type and assigns
+the expression as initial value to it.
+
+@item 
+type name @code{;}
+@* declares a variable with the given name of the given type and assigns
+the default value of the specific type to it.
+@end enumerate
+@c ------------------------------------------------------------
+@c   End of duplicate piece of text.
+@c ------------------------------------------------------------
+
+@xref{Names} for more information on declarations and @ref{Data types}
+for a description on all data types known by @sc{Singular}.
+
 @example
   ring r;              // creates the default ring
   poly f = x^2 + y^3 ; // define polynomial f=x^2+y^3
@@ -962,43 +985,71 @@ a @strong{definition}:
   int i=2;             // define the integer i and set i to 2
 @end example
 
-@xref{Names} for more information on declarations.
-@item
-an @strong{assignment}:
-@*   name  @code{=} expression @code{;}
-@*   name @code{=} expression_list @code{;}
-@* @strong{Example:}
+@subsubheading Assignment
+@enumerate 3
+@item 
+name @code{=} expression @code{;}
+@* assigns expression to name.
+
+@item 
+name_list @code{=} expression_list @code{;}
+@* assigns successively each expression of expression_list to the
+corresponding name of name_list. Both lists must be of same length. Note 
+that this is not a simultaneous assignment.
+@end enumerate
+
+There must be a type conversion of the type of expression to the type of 
+name. @xref{Type conversion and casting}.
+
+An assignment itself does not yield a value. Hence, compound assignments
+like @code{i = j = k;} are not allowed and result in an error.
+
 @example
   f = x^2 + y^2 ;      //overwrites the old value of f
   I = jacob(f);
   f,g = I[1],x^2+y^2 ; //overwrites the old values of f and g
 @end example
-@*@strong{Note:}
-An assignment itself does not yield a value. Hence, compound assignments
-like @code{i = j = k;} are not allowed and result in an error.
 
-@item
-a @strong{command}:
-@*   command_name [ @code{(} argument_list @code{)} ] @code{.}
-@* @strong{Example:}
-@example
-  degree(I);
-@end example
-@item
-a @strong{print command}:
-@*   expression @code{;}
-@*   @code{type} name @code{;}
-@*   @code{print(} expression @code{);}
-@* @strong{Example:}
+@subsubheading Function without return type
+@enumerate 5
+@item 
+function_name [ @code{(} argument_list @code{)} ] @code{;}
+@* calls function function_name with arguments argument_list. 
+@end enumerate
+
+The function may have output (not to be confused with a return value of
+type string). @xref{Functions}. Functions without a return type are
+specified there to have a return type 'none'.
+
+Note that some of these function have to be called without parentheses,
+e.g., @code{help}, @code{LIB}.
+
 @example
 @c example
-  int i=2; i;
-  type i;              // name [ level ] type value
-  print(i);
+  ring r; 
+  ideal i=x2+y2,x; i=std(i);
+  degree(i);  // degree has no return value but prints output
 @c example
 @end example
-@end itemize
 
+@subsubheading Print command
+@enumerate 6
+@item
+expression @code{;}
+@* prints the value of an expression, for example, of a variable. 
+@end enumerate
+
+Use the function @code{print} to get a pretty output of various data
+types, e.g., matrix or intmat. @xref{print}.  
+
+@example
+@c example
+  int i=2; 
+  i;
+  intmat m[2][2]=1,7,10,0;
+  print(m);
+@c example
+@end example
 
 @c ------------------------------------------------------------
 @node Special characters, Names, General command syntax, The SINGULAR language
