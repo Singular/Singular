@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.114 2003-01-07 09:07:07 bricken Exp $ */
+/* $Id: kutil.cc,v 1.115 2003-02-06 15:53:34 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -251,10 +251,10 @@ void cancelunit (LObject* L)
 
   if (L->ecart != 0)
   {
-    for(i=r->N;i>0;i--)
-    {
-      if ((p_GetExp(p,i,r)>0) && (rIsPolyVar(i, r)==TRUE)) return;
-    }
+//    for(i=r->N;i>0;i--)
+//    {
+//      if ((p_GetExp(p,i,r)>0) && (rIsPolyVar(i, r)==TRUE)) return;
+//    }
     h = pNext(p);
     loop
     {
