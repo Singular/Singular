@@ -1,5 +1,5 @@
 dnl # emacs edit mode for this file is -*- sh -*-
-dnl # $Id: configure.in,v 1.22 1998-06-15 14:24:06 schmidt Exp $
+dnl # $Id: configure.in,v 1.23 1998-06-15 14:28:48 schmidt Exp $
 
 dnl #
 dnl # configure.in - process this file with `autoconf' to generate
@@ -12,7 +12,7 @@ dnl #
 #
 # - initialisation.
 #
-AC_REVISION($Id: configure.in,v 1.22 1998-06-15 14:24:06 schmidt Exp $)
+AC_REVISION($Id: configure.in,v 1.23 1998-06-15 14:28:48 schmidt Exp $)
 AC_INIT(canonicalform.cc)
 AC_CONFIG_HEADER(config.h)
 AC_CONFIG_AUX_DIR(bin)
@@ -131,11 +131,11 @@ if test "x$GCC" != xyes && test "x$GXX" != xyes; then
   AC_MSG_WARN(you better use gcc to compile Factory)
 else
   if test "x$GXX" = xyes && test "x$cxxflags_expl_set" = xno; then
-    AC_MSG_WARN([we will use \`-O2 -fomit-frame-pointer' as default for \`CXXFLAGS'
+    AC_MSG_WARN([we use \`-O2 -fomit-frame-pointer' as default for \`CXXFLAGS'
                     (instead of the configure default \`-g -O')])
   fi
   if test "x$GCC" = xyes && test "x$cflags_expl_set" = xno; then
-    AC_MSG_WARN([we will use \`-O2 -fomit-frame-pointer' as default for \`CFLAGS'
+    AC_MSG_WARN([we use \`-O2 -fomit-frame-pointer' as default for \`CFLAGS'
                     (instead of the configure default \`-g -O')])
   fi
 fi
@@ -171,6 +171,8 @@ PATH="$save_path"
 #
 
 AC_MSG_CHECKING(and generating explicit install paths)
+
+# generate Makefile
 save_prefix="$prefix"
 save_exec_prefix="$exec_prefix"
 test "x$prefix" = xNONE && prefix=$ac_default_prefix
@@ -191,6 +193,7 @@ done
 prefix="$save_prefix"
 exec_prefix="$save_exec_prefix"
 
+# generate the explicit paths
 make >&5 2>&1 -f ./conftest.mk explicit_datadir
 explicit_datadir=`cat ./conftest.dir`
 make >&5 2>&1 -f ./conftest.mk explicit_libdir
@@ -198,6 +201,7 @@ explicit_libdir=`cat ./conftest.dir`
 make >&5 2>&1 -f ./conftest.mk explicit_includedir
 explicit_includedir=`cat ./conftest.dir`
 
+# clean up
 rm -f ./conftest.mk ./conftest.dir
 
 AC_MSG_RESULT(done)
