@@ -8,24 +8,13 @@
 ###
 #################################################################
 
+@SET_MAKE@
 SHELL		= /bin/sh
 
-SINGULAR_MAJOR_VERSION	= @SINGULAR_MAJOR_VERSION@
-SINGULAR_MINOR_VERSION	= @SINGULAR_MINOR_VERSION@
-SINGULAR_SUB_VERSION	= @SINGULAR_SUB_VERSION@
-SINGULAR		= @SINGULAR@
+SINGULAR	= @SINGULAR@
 
-
-@SET_MAKE@
 BUILD_SUBDIRS	= @CONFIG_SUBDIRS@
 SUBDIRS		= @SUBDIRS@
-
-prefix 		= @prefix@
-exec_prefix	= @exec_prefix@
-bindir		= @bindir@
-
-TEMPDIR		= /tmp
-
 
 ##############################################################
 # default target
@@ -34,45 +23,57 @@ ${SINGULAR}:
 
 # general targets
 # simply descend for these targets
-all install uninstall: Makefile 
-	for SUBDIR in ${BUILD_SUBDIRS}; \
+all install uninstall:
+	@ for SUBDIR in ${BUILD_SUBDIRS}; \
 	do \
 	  echo ${MAKE} $@ in $${SUBDIR}; \
-	  cd $${SUBDIR}; \
-	  ${MAKE} $@; \
-	  cd .. ;\
+	  ( cd $${SUBDIR} && ${MAKE} $@; ) \
 	done
 
-# clean up in all subdirectories known to us
-clean distclean mostlyclean maintainer-clean: uninstall
-	for SUBDIR in ${SUBDIRS}; \
-	do \
-	  echo ${MAKE} $@ in $${SUBDIR}; \
-	  cd $${SUBDIR}; \
-	  ${MAKE} $@; \
-	  cd .. ;\
-	done; \
-	rm -rf *~ a.out core *.o *.log; \
-	if test "$@" = distclean || test "$@" = maintainer-clean; then \
-	  rm -rf Makefile config.cache config.log config.status TAGS* *.gz *.tar;\
-	fi 
-	if test "$@" = maintainer-clean; then \
-	  echo "This command is intended for maintainer use, only"; \
-	  rm -rf configure;\
-	fi
+##############################################################
+# cleaning up
+
+# we use a canned sequence to avoid code redundancy
+define recurse
+@ for SUBDIR in ${SUBDIRS}; \
+do \
+  echo ${MAKE} $@ in $${SUBDIR}; \
+  ( cd $${SUBDIR} && ${MAKE} $@; ) \
+done
+endef
+
+local-clean:
+	rm -rf *~ a.out core *.o *.log
+
+local-distclean: local-clean
+	rm -rf Makefile config.cache config.log config.status TAGS* *.gz *.tar;\
+
+local-maintainer-clean: local-distclean
+	@ echo "This command is intended for maintainer use, only"
+	rm -rf configure
+
+clean mostlyclean: uninstall local-clean
+	$(recurse)
+
+distclean: uninstall local-distclean
+	$(recurse)
+
+maintainer-clean: uninstall local-maintainer-clean
+	$(recurse)
 
 ##############################################################
 # some extra targets for the specific packages
-
 Singular factory libfac MP gmp:
 	cd $@; ${MAKE} all
 
 ##############################################################
 # documentation
-info dvi ps doc/singular.hlp: ${SINGULAR} 
+.PHONY: info dvi ps
+info dvi ps doc/singular.hlp:
 	cd doc; ${MAKE} $@
 
-doc info/singular.hlp: ${SINGULAR}		
+.PHONY: doc info/singular.hlp
+doc info/singular.hlp:
 	cd doc; ${MAKE} install
 
 ##############################################################
