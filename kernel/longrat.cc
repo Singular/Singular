@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.4 2004-08-04 13:58:06 levandov Exp $ */
+/* $Id: longrat.cc,v 1.5 2004-09-14 10:27:20 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -1957,7 +1957,7 @@ number _nlMult_aImm_bImm_rNoImm(number a, number b)
 #endif
   u->s=3;
   mpz_init_set_si(&u->z,(long)SR_TO_INT(a));
-  mpz_mul_si(&u->z,&u->z,(unsigned long)SR_TO_INT(b));
+  mpz_mul_si(&u->z,&u->z,(long)SR_TO_INT(b));
 #ifdef LDEBUG
   nlTest(u);
 #endif
