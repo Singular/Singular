@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys0.cc,v 1.13 1999-11-15 17:20:41 obachman Exp $ */
+/* $Id: polys0.cc,v 1.14 2000-03-31 13:20:00 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to convert polynomials to strings
@@ -150,9 +150,27 @@ void pWrite(poly p)
 
 /*2
 *the standard debugging output:
-*print the first two monomials of the poly,
+*print the first two monomials of the poly (wrp) or only the lead ter (wrp0),
 *possibly followed by the string "+..."
 */
+void wrp0(poly p)
+{
+  poly r;
+
+  if (p==NULL) PrintS("NULL");
+  else if (pNext(p)==NULL) pWrite0(p);
+  else
+  {
+    r = pNext(p);
+    pNext(p) = NULL;
+    pWrite0(p);
+    if (r!=NULL)
+    {
+      PrintS("+...");
+      pNext(p) = r;
+    }
+  }
+}
 void wrp(poly p)
 {
   poly r;
