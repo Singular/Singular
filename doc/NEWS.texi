@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.10 2000-02-01 14:02:59 obachman Exp $
+@comment $Id: NEWS.texi,v 1.11 2000-03-03 15:45:12 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -143,7 +143,7 @@ run example for all kernel commands.
 TBC
 @item @nref{print}
 Finer-grained control for formatted output.
-@item @nref{pause}
+@item @code{pause}
 can be called with argument, must be called with parenthesis.
 @item TBC
 @end table
