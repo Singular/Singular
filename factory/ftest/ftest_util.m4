@@ -1,4 +1,4 @@
-dnl $Id: ftest_util.m4,v 1.2 1997-09-24 07:28:21 schmidt Exp $
+dnl $Id: ftest_util.m4,v 1.3 1997-09-29 13:08:46 schmidt Exp $
 dnl
 dnl ftest_util.m4 - m4 macros used by the factory test environment.
 dnl
@@ -110,7 +110,8 @@ define(`_ftestOutType_'_qstripTWS(`$2'), `$1')dnl
 #
 define(`ftestInVar', `dnl
 define(`_ftestInType_'_qstripTWS(`$2'), `$1')dnl
-`$1 '_qstripTWS(`$2')')
+`$1 '_qstripTWS(`$2')`;
+    bool ftestArgGiven$2= false'')
 
 #
 # ftestGetOpts() - read options.
@@ -128,16 +129,26 @@ define(`ftestGetEnv', `dnl
 #
 # ftestGetInVar() - read variable from command line.
 #
-# $1: name of input variable.
+# $1: name of input variable
 # $2: default for optional command line arguments
 #
 define(`ftestGetInVar', `dnl
 ifelse(`$#', `1',
-  ``$1= ftestGet'_stripTWS(`_ftestInType_$1')`( argv[ optind++ ] )'',
-  ``if ( argv[ optind ] )
+  ``ftestArgGiven$1= true;
+    $1= ftestGet'_stripTWS(`_ftestInType_$1')`( argv[ optind++ ] )'',
+  ``if ( argv[ optind ] ) {
+	ftestArgGiven$1 = true;
 	$1 = ftestGet'_stripTWS(`_ftestInType_$1')`( argv[ optind++ ] );
-    else
+    } else
 	$1 = '_qstripTWS(`$2')')')
+
+#
+# ftestArgGiven() - check whether an argument was given.
+#
+# $1: name of input variable
+#
+define(`ftestArgGiven', `dnl
+`ftestArgGiven'_qstripTWS(`$1')')
 
 #
 # ftestSetEnv() - set factory environment.
@@ -172,13 +183,21 @@ define(`ftestCheck', `dnl
 #
 # ftestOuput() - print results.
 #
-# $1: name of result (printed immediately before result)
-# $2: result variable to print
+# Expands to code to print timer and check.  Then, for each
+# argument pair `resultName, result', expands to print this
+# pair.
 #
+
+# internal auxiliary function
+define(`_ftestOutput', `dnl
+ifelse(`$#', `0', ,
+  `$#', `1', ,
+``;
+    ftestPrintResult( $1, $2)'_ftestOutput(shift(shift($@)))')')
+
 define(`ftestOutput', `dnl
 `ftestPrintTimer( timing_ftestTimer_time );
-    ftestPrintCheck( check );
-    ftestPrint'_stripTWS(`_ftestOutType_$2')`( $1, $2)'')
+    ftestPrintCheck( check )'_ftestOutput($@)')
 
 dnl switch on output again
 divert`'dnl
