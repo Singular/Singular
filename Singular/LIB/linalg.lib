@@ -1,6 +1,6 @@
 //GMG last modified: 04/25/2000
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: linalg.lib,v 1.32 2002-04-11 14:48:43 westenb Exp $";
+version="$Id: linalg.lib,v 1.33 2002-08-06 10:05:21 mschulze Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  linalg.lib  Algorithmic Linear Algebra
@@ -27,6 +27,7 @@ PROCEDURES:
  hessenberg(M);       Hessenberg form of M
  evnf(e[,m]);         eigenvalues normal form of (e[,m])
  eigenvals(M);        eigenvalues with multiplicities of M
+ minipoly(M);         minimal polynomial of M
  jordan(M);           Jordan data of M
  jordanbasis(M);      Jordan basis and weight filtration of M
  jordanmatrix(e,s,m); Jordan matrix with Jordan data (e,s,m)
@@ -1480,6 +1481,62 @@ example
   matrix M[3][3]=3,2,1,0,2,1,0,0,3;
   print(M);
   eigenvals(M);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc minipoly(matrix M,list #)
+"USAGE:   minpoly(M); matrix M
+ASSUME:  eigenvalues of M in basefield
+RETURN:
+@format
+list l;  minimal polynomial of M
+  ideal l[1]; 
+    number l[1][i];  i-th root of minimal polynomial of M
+  intvec l[2]; 
+    int l[2][i];  multiplicity of i-th root of minimal polynomial of M
+@end format
+EXAMPLE: example minipoly; shows examples
+"
+{
+  if(nrows(M)==0)
+  {
+    ERROR("non empty expected");
+  }
+  if(ncols(M)!=nrows(M))
+  {
+    ERROR("square matrix expected");
+  }
+
+  M=jet(M,0);
+
+  if(size(#)==0)
+  {
+    #=eigenvals(M);
+  }
+  def e0,m0=#[1..2];
+
+  intvec m1;
+  matrix N0,N1;
+  for(int i=1;i<=ncols(e0);i++)
+  {
+    m1[i]=1;
+    N0=M-e0[i];
+    N1=N0;
+    while(size(syz(N1))<m0[i])
+    {
+      m1[i]=m1[i]+1;
+      N1=N1*N0;
+    }
+  }
+
+  return(list(e0,m1));
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring R=0,x,dp;
+  matrix M[3][3]=3,2,1,0,2,1,0,0,3;
+  print(M);
+  minipoly(M);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
