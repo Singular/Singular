@@ -132,7 +132,7 @@ MPT_Tree_pt MPT_GetVarNamesTree(MPT_Node_pt node,
     vtree->node->dict = MP_BasicDict;
     vtree->node->numannot = 0;
     vtree->node->annots = NULL;
-    MP_COMMON_T(vtree->node->nvalue) = MP_CopBasicList;
+    vtree->node->nvalue = MP_ARG_COMMON_T(MP_CopBasicList);
     if (temp_tree != NULL)
     {
       vtree->node->numchild = 1;
@@ -174,7 +174,7 @@ MPT_Tree_pt MPT_GetVarNamesTree(MPT_Node_pt node,
       nnode->annots = NULL;
       nnode->nvalue = (MPT_Arg_t) IMP_RawMemAllocFnc(12*sizeof(char));
       sprintf((char *) nnode->nvalue, "x%ld", i);
-      MPT_TREE_PT(nargs[i]) = ntree;
+      nargs[i] = MPT_ARG_T(ntree);
     }
 
     IMP_MemFreeFnc(vtree->args, (vtree->node->numchild)*sizeof(MPT_Arg_t));

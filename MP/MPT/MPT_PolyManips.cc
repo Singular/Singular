@@ -207,7 +207,7 @@ static MPT_Tree_pt MPT_DDP_2_ExpTree_Data(MPT_Arg_pt args,
                            0,
                            non_zero + 1);
       margs = mtree->args;
-      MPT_TREE_PT(margs[0]) = ctree;
+      margs[0] = MPT_ARG_T(ctree);
 
       for (j=0, k=1; k<=non_zero; j++)
       {

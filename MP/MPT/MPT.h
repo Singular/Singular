@@ -102,12 +102,19 @@ struct MPT_Annot_t
 /* First of all, an argument may have one of the basic types */
 /* For the following, we assume that sizeof(void *) >= sizeof(type) */
 #define MP_BOOLEAN_T(arg)      ((MP_Boolean_t) (MP_UINT32_T(arg)))
+#define MP_ARG_BOOLEAN_T(arg)  ((MPT_Arg_t)((MP_Boolean_t) (MP_UINT32_T(arg))))
 #define MP_COMMON_T(arg)       ((MP_Common_t)  (MP_UINT32_T(arg)))
+#define MP_ARG_COMMON_T(arg)   ((MPT_Arg_t)((MP_Common_t)  (MP_UINT32_T(arg))))
 #define MP_SINT8_T(arg)        ((MP_Sint8_t)  (MP_SINT32_T(arg)))
+#define MP_ARG_SINT8_T(arg)    ((MPT_Arg_t)((MP_Sint8_t)  (MP_SINT32_T(arg))))
 #define MP_UINT8_T(arg)        ((MP_Uint8_t) (MP_UINT32_T(arg)))
+#define MP_ARG_UINT8_T(arg)    ((MPT_Arg_t)((MP_Uint8_t) (MP_UINT32_T(arg))))
 #define MP_SINT32_T(arg)       ((MP_Sint32_t) (arg))
+#define MP_ARG_SINT32_T(arg)   ((MPT_Arg_t)((MP_Sint32_t) (arg)))
 #define MP_UINT32_T(arg)       ((MP_Uint32_t) (arg))
+#define MP_ARG_UINT32_T(arg)   ((MPT_Arg_t)((MP_Uint32_t) (arg)))
 #define MP_REAL32_T(arg)       ((MP_Real32_t)  (arg))
+#define MP_ARG_REAL32_T(arg)   ((MPT_Arg_t)((MP_Real32_t)  (arg)))
 #ifndef __64_BIT__
 /* sizeof(void *) < sizeof(MP_Real64_t) */
 #define MP_REAL64_T(arg)       (*((MP_Real64_t *) (arg)))
@@ -115,9 +122,13 @@ struct MPT_Annot_t
 /* sizeof(void *) >= sizeof(MP_Real64_t) */
 #define MP_REAL64_T(arg)       ((MP_Real64_t)  (arg))
 #endif
+#define MP_ARG_REAL64_T(arg)   ((MPT_Arg_t)MP_REAL64_T(arg))
 #define MP_APINT_T(arg)        ((MP_ApInt_t) (arg))
+#define MP_ARG_APINT_T(arg)    ((MPT_Arg_t)((MP_ApInt_t) (arg)))
 #define MP_APREAL_T(arg)       ((MP_ApReal_t) (arg))
+#define MP_ARG_APREAL_T(arg)   ((MPT_Arg_t)((MP_ApReal_t) (arg)))
 #define MP_STRING_T(arg)       ((char *)   (arg))
+#define MP_ARG_STRING_T(arg)   ((MPT_Arg_t)((char *)   (arg)))
 #define MPT_ARG_T(arg)         ((MPT_Arg_t) (arg))
 
 /* Now we come to "structured" or composite types */
@@ -129,7 +140,6 @@ struct MPT_Annot_t
 #define MPT_ARG_PT(arg)        ((MPT_Arg_pt) arg)
 /* For user defined Meta types or unspecified types */
 #define MPT_TREE_PT(arg)       ((MPT_Tree_pt) arg)
-
 
 /* And here are Macros tofor dealing with MPT_Arg_pt's */
 
@@ -537,7 +547,7 @@ do {                                                 \
 #define mp_failr(cond)                                              \
 do                                                                  \
 {                                                                   \
-  if ((cond) != MP_Success) return MPT_SetError(MPT_MP_Failure);    \
+  if (((MP_Status_t) (cond)) != MP_Success) return MPT_SetError(MPT_MP_Failure);    \
 } while (0)
 
 

@@ -127,7 +127,7 @@ MPT_Status_t MPT_GetNode(MP_Link_pt link, MPT_Node_pt *onode)
                              &(node->numannot),
                              &(node->numchild)));
 
-  MP_COMMON_T(node->nvalue) = cvalue;
+  node->nvalue = MP_ARG_COMMON_T(cvalue);
   /* Get the node value, if necessary */
   type = node->type;
 

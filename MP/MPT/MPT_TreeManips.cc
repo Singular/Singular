@@ -219,13 +219,13 @@ MPT_Arg_pt MPT_UntypespecArgs(MPT_Arg_pt args,
       if (IMP_Is32BitNumericMetaType(metatype))
       {
         MP_Uint32_t *uint32_array = MP_UINT32_PT(args);
-        MP_UINT32_T(new_tree->node->nvalue) = uint32_array[0];
-        MPT_TREE_PT(args[0]) = new_tree;
+        new_tree->node->nvalue = MP_ARG_UINT32_T(uint32_array[0]);
+        args[0] = MPT_ARG_T(new_tree);
         for (i=1; i<nc; i++)
         {
           MPT_CpyTree(&n_tree, new_tree);
-          MP_UINT32_T(n_tree->node->nvalue) = uint32_array[i];
-          MPT_TREE_PT(args[i]) = n_tree;
+          n_tree->node->nvalue = MP_ARG_UINT32_T(uint32_array[i]);
+          args[i] = MPT_ARG_T(n_tree);
         }
         return args;
       }
@@ -234,13 +234,13 @@ MPT_Arg_pt MPT_UntypespecArgs(MPT_Arg_pt args,
         MP_Uint8_t *uint8_array = MP_UINT8_PT(args);
         MPT_Arg_pt new_args
           = (MPT_Arg_pt) IMP_MemAllocFnc(nc*sizeof(MPT_Arg_t));
-        MP_UINT8_T(new_tree->node->nvalue) = uint8_array[0];
-        MPT_TREE_PT(new_args[0]) = new_tree;
+        new_tree->node->nvalue = MP_ARG_UINT8_T(uint8_array[0]);
+        new_args[0] = MPT_ARG_T(new_tree);
         for (i=1; i<nc; i++)
         {
           MPT_CpyTree(&n_tree, new_tree);
-          MP_UINT8_T(n_tree->node->nvalue) = uint8_array[i];
-          MPT_TREE_PT(new_args[i]) = n_tree;
+          n_tree->node->nvalue = MP_ARG_UINT8_T(uint8_array[i]);
+          new_args[i] = MPT_ARG_T(n_tree);
         }
         IMP_MemFreeFnc(args, nc*sizeof(MP_Uint8_t));
         return new_args;
@@ -255,12 +255,12 @@ MPT_Arg_pt MPT_UntypespecArgs(MPT_Arg_pt args,
           = (MPT_Arg_t) IMP_MemAllocFnc(sizeof(MP_Real64_t));
 #endif
         MP_REAL64_T(new_tree->node->nvalue) = real64_array[i];
-        MPT_TREE_PT(new_args[0]) = new_tree;
+        new_args[0] = MPT_ARG_T(new_tree);
         for (i=1; i<nc; i++)
         {
           MPT_CpyTree(&n_tree, new_tree);
           MP_REAL64_T(n_tree->node->nvalue) = real64_array[i];
-          MPT_TREE_PT(args[i]) = n_tree;
+          args[i] = MPT_ARG_T(n_tree);
         }
         IMP_MemFreeFnc(args, nc*sizeof(MP_Real64_t));
         return new_args;
@@ -269,7 +269,7 @@ MPT_Arg_pt MPT_UntypespecArgs(MPT_Arg_pt args,
     
     /* else we go step by step */
     for (i=0; i<nc; i++)
-      MPT_TREE_PT(args[i]) = MPT_UntypespecArg(args[i], typespec);
+      args[i] = MPT_ARG_T(MPT_UntypespecArg(args[i], typespec));
 
     return args;
   }
