@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.113 2001-08-27 14:40:09 Singular Exp $
+@comment $Id: singular.doc,v 1.114 2001-08-27 16:25:48 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -232,7 +232,7 @@ LIB "all.lib";
 @c ----------------------------------------------------------
 @node general_lib, inout_lib, all_lib, General purpose
 @subsection general_lib
-@c lib  general.lib
+@c lib  general.lib no_ex
 @c ----------------------------------------------------------
 @node inout_lib, poly_lib, general_lib, General purpose
 @subsection inout_lib
@@ -363,7 +363,7 @@ LIB "all.lib";
 @c ----------------------------------------------------------
 @node gaussman_lib, hnoether_lib, equising_lib, Singularities
 @subsection gaussman_lib
-@c lib gaussman.lib
+@c lib gaussman.lib no_ex
 @c ---------------------------------------------------------
 @node hnoether_lib, mondromy_lib, gaussman_lib, Singularities
 @subsection hnoether_lib
@@ -371,11 +371,11 @@ LIB "all.lib";
 @c ---------------------------------------------------------
 @node mondromy_lib, qhmoduli_lib, hnoether_lib, Singularities
 @subsection mondromy_lib
-@c lib mondromy.lib
+@c lib mondromy.lib no_ex
 @c ---------------------------------------------------------
 @node qhmoduli_lib, sing_lib, mondromy_lib, Singularities
 @subsection qhmoduli_lib
-@c lib qhmoduli.lib
+@c lib qhmoduli.lib no_ex
 @c ----------------------------------------------------------
 @node sing_lib, spcurve_lib, qhmoduli_lib, Singularities
 @subsection sing_lib
@@ -403,7 +403,7 @@ LIB "all.lib";
 @c ----------------------------------------------------------
 @node finvar_lib, ainvar_lib, Invariant theory, Invariant theory
 @subsection finvar_lib
-@c lib finvar.lib
+@c lib finvar.lib no_ex
 @c ----------------------------------------------------------
 @node ainvar_lib, rinvar_lib, finvar_lib, Invariant theory
 @subsection ainvar_lib
@@ -415,7 +415,7 @@ LIB "all.lib";
 @c ----------------------------------------------------------
 @node stratify_lib, ,rinvar_lib, Invariant theory
 @subsection stratify_lib
-@c lib stratify.lib
+@c lib stratify.lib no_ex
 @c ----------------------------------------------------------------------------
 @node Symbolic-numerical solving, Visualization, Invariant theory, SINGULAR libraries
 @section Symbolic-numerical solving
@@ -491,7 +491,7 @@ LIB "all.lib";
 @c ---------------------------------------------------------
 @node brnoeth_lib, , , Coding theory
 @subsection brnoeth_lib
-@c lib brnoeth.lib
+@c lib brnoeth.lib no_ex
 @c ----------------------------------------------------------
 @node Release Notes, Index, SINGULAR libraries, Top
 @chapter Release Notes

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.52 2001-08-25 14:56:55 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.53 2001-08-27 16:25:32 Singular Exp $";
 category="Singularities";
 
 info="
@@ -25,7 +25,7 @@ PROCEDURES:
  spadd(Sp1,Sp2);            sum of spectra Sp1 and Sp2
  spsub(Sp1,Sp2);            difference of spectra Sp1 and Sp2
  spmul(Sp,k);               product of spectrum Sp and integer k
- spmul(Sp,k);               linear combination of spectra Sp with coeffs k
+                            linear combination of spectra Sp with coeffs k
  spissemicont(Sp[,opt]);    test spectrum Sp for semicontinuity
  spsemicont(Sp0,Sp[,opt]);  semicontinuity of spectra Sp0 and Sp
  spmilnor(Sp);              milnor number of spectrum Sp
@@ -110,7 +110,7 @@ ASSUME:   basering with characteristic 0 and local degree ordering,
           t with isolated citical point 0
 RETURN:
 @format
-ring G: C{{s}}*basering,
+ring G: C@{@{s@}@}*basering,
   poly gmspoly: image of t
   ideal gmsjacob: image of Jacobian ideal
   ideal gmsstd: image of standard basis of Jacobian ideal
@@ -149,7 +149,7 @@ EXAMPLE:  example gms; shows examples
     {
       ERROR("isolated citical point 0 expected");
     }
-  }  
+  }
   matrix a=l[2];
   ideal m=kbase(g);
 
@@ -216,7 +216,7 @@ ASSUME:   basering constructed by gmsring, K<=Kmax
 RETURN:
 @format
 list l:
-  ideal l[1]: projection of p to H''=C{{s}}*gmsbasis mod s^{K+1}
+  ideal l[1]: projection of p to H''=C@{@{s@}@}*gmsbasis mod s^@{K+1@}
   ideal l[2]: p=l[1]+l[2] mod s^(Kmax+1)
 @end format
 NOTE:     by setting p=l[2] the computation can be continued up to order
@@ -319,10 +319,10 @@ ASSUME:   basering constructed by gmsring, K<=Kmax
 RETURN:
 @format
 list l:
-  matrix l[1]: projection of p to H''=C{{s}}*gmsbasis=C{{s}}^mu mod s^(K+1)
+  matrix l[1]: projection of p to H''=C@{@{s@}@}*gmsbasis=C@{@{s@}@}^mu mod s^(K+1)
   ideal l[2]: p=matrix(gmsbasis)*l[1]+l[2] mod s^(Kmax+1)
 @end format
-NOTE:     by setting p=l[2] the computation can be continued up to order 
+NOTE:     by setting p=l[2] the computation can be continued up to order
           at most Kmax, by default Kmax=infinity
 KEYWORDS: singularities; Gauss-Manin connection; Brieskorn lattice
 EXAMPLE:  example gmscoeffs; shows examples
@@ -500,7 +500,7 @@ static proc transform(ideal e,intvec m,matrix A,matrix A0,ideal r,module H,modul
                 A[i,j]=A[i,j]*s;
               }
             }
-	  }
+          }
         }
       }
 
@@ -652,7 +652,7 @@ EXAMPLE:  example sppnormalize; shows examples
       for(j=i-1;j>=1;j--)
       {
         if(m[j]!=0)
-	{
+        {
           if(number(a[i])>number(a[j])||
             (number(a[i])==number(a[j])&&w[i]<w[j]))
           {
@@ -1459,7 +1459,7 @@ proc spsemicont(list Sp0,list Sp,list #)
 RETURN:  list of intvecs l:
          spissemicont(sub(Sp0,spmul(Sp,k)),opt)==1 iff k<=l[i] for some i
 NOTE:    if the spectra Sp occur with multiplicities k in a deformation
-         of the [quasihomogeneous] spectrum Sp0 then 
+         of the [quasihomogeneous] spectrum Sp0 then
          spissemicont(sub(Sp0,spmul(Sp,k))[,1])==1
 EXAMPLE: example spsemicont; shows examples
 "
@@ -1474,26 +1474,26 @@ EXAMPLE: example spsemicont; shows examples
       for(i=1;i<=size(l0);i++)
       {
         if(size(l)>0)
-	{
+        {
           j=1;
           while(j<size(l)&&l[j]!=l0[i])
-	  {
+          {
             j++;
           }
           if(l[j]==l0[i])
-	  {
+          {
             l[j][size(Sp)]=k;
           }
           else
-	  {
+          {
             l0[i][size(Sp)]=k;
             l=l+list(l0[i]);
           }
-	}
+        }
         else
-	{
+        {
           l=l0;
-	}
+        }
       }
     }
     Sp0=spsub(Sp0,Sp[size(Sp)]);

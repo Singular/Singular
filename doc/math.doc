@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.66 2001-02-13 17:30:09 mschulze Exp $
+@comment $Id: math.doc,v 1.67 2001-08-27 16:25:47 Singular Exp $
 @comment this file contains the mathematical background of Singular
 
 @c The following directives are necessary for proper compilation
@@ -502,18 +502,17 @@ exp(-2*pi*i*M)
 @end ifinfo
 is a monodromy matrix of @math{f} and the Jordan normal form of @math{M}:
 @smallexample
-@c example
+  // not computed !!
   LIB "gaussman.lib";
   ring R=0,(x,y),ds;
   poly f=x5+x2y2+y5;
   matrix M=monodromy(f);
   print(jordanform(M));
-@c example
 @end smallexample
 
 Now, we compute the V-fitration on @math{H''/H'} and the spectrum:
 @smallexample
-@c example
+  // not computed !!
   LIB "gaussman.lib";
   ring R=0,(x,y),ds;
   poly f=x5+x2y2+y5;
@@ -522,7 +521,6 @@ Now, we compute the V-fitration on @math{H''/H'} and the spectrum:
   print(l[2]);
   print(l[3]);
   print(l[4]);
-@c example
 @end smallexample
 Here @code{l[1]} contains the spectral numbers, @code{l[2]} the corresponding multiplicities, @code{l[3]} a @math{C}-basis of the V-filtration on @math{H''/H'} in terms of the monomial basis of
 @tex

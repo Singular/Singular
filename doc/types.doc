@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.116 2001-08-27 14:40:11 Singular Exp $
+@comment $Id: types.doc,v 1.117 2001-08-27 16:25:48 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -1598,7 +1598,8 @@ is data to read.
 
 @*@strong{Example:}
 @smallexample
-@c example unix_only
+@c @c example unix_only
+  // not computed !!
   LIB "general.lib"; // needed for "killall" command
   link l="MPtcp:launch";
   open(l); l;        // l is ready for writing but not for reading
@@ -1628,7 +1629,6 @@ is data to read.
   write(l,quote(i)); // Child inherited vars and their values
   read(l);
   close(l);          // shut down forked child
-@c example
 @end smallexample
 
 @c ------------------------------
