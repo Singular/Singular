@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.80 1999-09-02 13:06:11 Singular Exp $
+@comment $Id: singular.doc,v 1.81 1999-09-08 13:08:10 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -174,6 +174,7 @@ Use the @ref{LIB} command for loading of single libraries, and the
 command @code{LIB "all.lib";} for loading all libraries.
 
 @menu
+* standard_lib:: extensions of singular kernel
 * General purpose::
 * Linear algebra::
 * Commutative algebra::
@@ -182,13 +183,24 @@ command @code{LIB "all.lib";} for loading all libraries.
 * Symbolic-numerical solving::
 * Visualization::
 @end menu
+@c ----------------------------------------------------------
+@node standard_lib, General purpose, SINGULAR libraries, SINGULAR libraries
+@section standard_lib
+
+The library @code{standard.lib} provides extensions to the
+set of built-in commands and is automatically loaded
+during the start of @sc{Singular}, unless @sc{Singular} is started up
+with the @code{--no-stdlib} command line option (see
+@ref{Command line options}).
+
+@c lib standard.lib:LibInfo lib_fun lib_ex section
+
 @c ----------------------------------------------------------------------------
-@node General purpose, Linear algebra, SINGULAR libraries, SINGULAR libraries
+@node General purpose, Linear algebra, standard_lib, SINGULAR libraries
 @section General purpose
 @cindex General purpose
 
 @menu
-* standard_lib:: extensions of singular kernel
 * all_lib:: load all other libraries
 * general_lib:: procedures of general type
 * inout_lib:: procedures for manipulating in- and output
@@ -198,19 +210,7 @@ command @code{LIB "all.lib";} for loading all libraries.
 @end menu
 
 @c ----------------------------------------------------------
-@node standard_lib, all_lib, General purpose, General purpose
-@subsection standard_lib
-
-The library @code{standard.lib} provides extensions to the
-set of built-in commands and is automatically loaded
-during the start of @sc{Singular}, unless @sc{Singular} is started up
-with the @code{--no-stdlib} command line option (see
-@ref{Command line options}).
-
-@c lib standard.lib:LibInfo lib_fun lib_ex
-
-@c ----------------------------------------------------------
-@node all_lib, general_lib, standard_lib, General purpose
+@node all_lib, general_lib, General purpose, General purpose
 @subsection all_lib
 @cindex all_lib
 @cindex all.lib
@@ -383,6 +383,7 @@ LIB "all.lib";
 @menu
 * graphics_lib:: procedures to draw  with Mathematica
 * latex_lib:: procedures for typesetting in TeX
+* surf_lib:: interface to the surf programm::
 @end menu
 
 @c ---------------------------------------------------------
@@ -390,9 +391,13 @@ LIB "all.lib";
 @subsection graphics_lib
 @c lib graphics.lib no_ex
 @c ---------------------------------------------------------
-@node latex_lib, , graphics_lib, Visualization
+@node latex_lib, surf_lib, graphics_lib, Visualization
 @subsection latex_lib
 @c lib latex.lib no_ex
+@c ---------------------------------------------------------
+@node surf_lib,, latex_lib, Visualization
+@subsection surf_lib
+@c lib surf.lib no_ex
 
 @c ----------------------------------------------------------
 @node Installation and Platform Specifics, Index, SINGULAR libraries, Top
