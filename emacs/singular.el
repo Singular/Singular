@@ -1,6 +1,6 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.8 1998-07-28 14:44:57 schmidt Exp $
+;; $Id: singular.el,v 1.9 1998-07-28 15:54:04 schmidt Exp $
 
 ;;; Commentary:
 
@@ -264,14 +264,51 @@ Singular interactive mode starts up.")
 
 ;; Note:
 ;;
-;; NOT READY[was sind und wollen simple sections]!
+;; Sections and simple sections are used to mark Singular's input and
+;; output for further access.  Here are some general notes on simple
+;; sections.  Sections are explained in the respective folding.
+;;
+;; In general, simple sections are more or less Emacs' overlays or XEmacs
+;; extents, resp.  But they are more than simply an interface to overlays
+;; or sections.
+;;
+;; - Simple sections are non-empty portions of text.  They are interpreted
+;;   as left-closed, right-opened intervals, i.e., the start point of a
+;;   simple sections belongs to it whereas the end point does not.
+;; - Simple sections start and end at line borders only.
+;; - Simple sections do not overlap.  Thus, any point in the buffer may be
+;;   covered by at most one simple section.
+;; - Besides from their start and their end, simple sections have some type
+;;   associated. 
+;; - Simple sections are realized using overlays (extents for XEmacs)
+;;   which define the start and, end, and type (via properties) of the
+;;   simple section.  Actually, as a lisp object a simple section is
+;;   nothing else but the underlying overlay.
+;; - There may be so-called clear simple sections.  Clear simple sections
+;;   have not an underlying overlay.  Instead, they start at the end of the
+;;   preceding non-clear simple section, end at the beginning of the next
+;;   non-clear simple section, and have the type defined by
+;;   `singular-simple-sec-clear-type'.  Clear simple sections are
+;;   represented by nil.
+;; - Buffer narrowing does not restrict the extent of completely or
+;;   partially inaccessible simple sections.
+;; - After creation, simple sections are not modified any further.
+;;
+;; - In `singular-interactive-mode', the whole buffer is covered with
+;;   simple sections from the very beginning of the file up to the
+;;   beginning of the line containing the last input or output.  The
+;;   remaining text up to `(point-max)' may be interpreted as covered by
+;;   one clear simple section.  Thus, it is most reasonable to define
+;;   `input' to be the type of clear simple sections.
 
 (defvar singular-simple-sec-clear-type 'input
   "Type of clear simple sections.
 If nil no clear simple sections are used.")
 
 (defvar singular-simple-sec-last-end nil
-  "Marker at the end of the last simple section.")
+  "Marker at the end of the last simple section.
+Should be initialized by `singular-simple-sec-init' before any calls to
+`singular-simple-sec-create' are done.")
 
 (defun singular-simple-sec-init (pos)
   "Initialize global variables belonging to simple section management.
@@ -335,6 +372,7 @@ initializes it to POS."
 (defun singular-emacs-simple-sec-create (type end)
   "Create a new simple section of type TYPE.
 Creates the section from end of previous simple section up to END.
+END should be larger than `singular-simple-sec-last-end'.
 Returns the new simple section or `empty' if no simple section has
 been created.
 Assumes that no narrowing is in effect.
@@ -457,8 +495,16 @@ order in that the appear in the region."
 
 ;; Note:
 ;;
-;; NOT READY[was sind und wollen sections im Gegensatz zu simple
-;; sections?]!
+;; Sections are built on simple sections.  Their purpose is to cover the
+;; difference between clear and non-clear simple sections.
+;;
+;; - Sections consist of a simple section, its type, and its start and end
+;;   points.  This is redundant information only in the case of non-clear
+;;   simple section.
+;; - Sections are read-only objects, neither are they modified nor are they
+;;   created.
+;; - Sections are independent from implementation dependencies.  There are
+;;   no different versions of the functions for Emacs and XEmacs.
 
 (defun singular-section-at (pos &optional restricted)
   "Return section at position POS.
@@ -542,7 +588,9 @@ section if called interactively."
 	;; outside the restriction.  Note that we do not use a marker for
 	;; `old-point-min'.  This way, even partial narrowed sections are
 	;; folded properly if they have been narrowed at bol.  Nice but
-	;; dirty trick.
+	;; dirty trick: The insertion of a `?\r' at beginning of section
+	;; advances the beginning of the restriction such that it displays
+	;; the `?\r' immediately before bol.  Seems worth it.
 	(old-point-min (point-min))
 	(old-point-max (point-max-marker)))
     (unwind-protect
