@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.cc,v 1.25 1998-01-22 10:56:12 schmidt Exp $ */
+/* $Id: canonicalform.cc,v 1.26 1998-03-12 10:28:56 schmidt Exp $ */
 
 #include <config.h>
 
@@ -1688,6 +1688,15 @@ bextgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, C
 	return f.value->bextgcdcoeff( g.value, a, b );
 }
 //}}}
+
+CanonicalForm
+blcm ( const CanonicalForm & f, const CanonicalForm & g )
+{
+    if ( f.isZero() || g.isZero() )
+	return CanonicalForm( 0 );
+    else
+	return (f / bgcd( f, g )) * g;
+}
 
 //{{{ input/output
 #ifndef NOSTREAMIO
