@@ -5,7 +5,7 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id: mod2.h.in,v 1.102 2001-09-25 16:07:30 Singular Exp $
+ *  Version: $Id: mod2.h.in,v 1.103 2002-02-12 18:25:40 mschulze Exp $
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H
@@ -163,6 +163,9 @@
 /* works around a quirk in gcc in the generation of parser tables */
 #define INIT_BUG
 #endif
+
+/* Gauss-Manin system */
+#define HAVE_GMS 1
 
 /* linear algebra extensions from pcv.h/pcv.cc */
 #define HAVE_PCV 1
