@@ -1,15 +1,11 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sparsmat.cc,v 1.37 2000-09-18 13:37:41 pohl Exp $ */
+/* $Id: sparsmat.cc,v 1.38 2000-09-19 12:18:34 pohl Exp $ */
 
 /*
 * ABSTRACT: operations with sparse matrices (bareiss, ...)
 */
-
-// Wilfried: make sure that you pass all tests (e.g., primdec3),
-// and then delete this line 
-#define PDEBUG 2
 
 #include "mod2.h"
 #include "structs.h"
@@ -2008,8 +2004,8 @@ static void smComplete(poly t, const poly b, const poly c)
     {
       pAddExp(t,i,pGetExp(b,i));
       pSubExp(t,i,pGetExp(c,i));
-      pSetm(t);
     }
+    pSetm(t);
     pIter(t);
   }
 }
