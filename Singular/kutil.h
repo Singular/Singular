@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.48 2000-12-18 13:30:38 obachman Exp $ */
+/* $Id: kutil.h,v 1.49 2000-12-18 17:26:41 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -23,7 +23,8 @@
 // define if you want std computations as in Singular version < 2
 // This disbales RedThrough, tailReductions against T (bba), 
 // sets posInT = posInT15 (bba, strat->honey), and enables redFirst with LDeg
-#define HAVE_OLD_STD 
+// NOTE: the same effect can be achieved with option(oldStd)
+// #define HAVE_OLD_STD 
 
 #ifdef HAVE_OLD_STD
 #define K_TEST_OPT_REDTHROUGH 0
@@ -305,10 +306,14 @@ int posInT13 (const TSet set,const int length,const LObject &p);
 int posInT15 (const TSet set,const int length,const LObject &p);
 int posInT17 (const TSet set,const int length,const LObject &p);
 int posInT19 (const TSet set,const int length,const LObject &p);
+int posInT_EcartpLength(const TSet set,const int length,const LObject &p);
+
+#ifdef HAVE_MORE_POS_IN_T
+int posInT_pLength(const TSet set,const int length,const LObject &p);
 int posInT_EcartFDegpLength(const TSet set,const int length,const LObject &p);
 int posInT_FDegpLength(const TSet set,const int length,const LObject &p);
-int posInT_EcartpLength(const TSet set,const int length,const LObject &p);
-int posInT_pLength(const TSet set,const int length,const LObject &p);
+#endif
+
 
 void reorderS (int* suc,kStrategy strat);
 int posInL0 (const LSet set, const int length,

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.84 2000-12-18 13:30:37 obachman Exp $ */
+/* $Id: kutil.cc,v 1.85 2000-12-18 17:26:40 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -27,9 +27,6 @@
 // define, if the my_memmove inlines should be used instead of 
 // system memmove -- it does not seem to pay off, though
 // #define ENTER_USE_MYMEMMOVE
-
-// define if redtailBba should use buckets
-#define HAVE_REDTAIL_BUCKETS
 
 #include "tok.h"
 #include "kutil.h"
@@ -1885,96 +1882,6 @@ int posInT13 (const TSet set,const int length,const LObject &p)
   }
 }
 
-// determines the position based on: 1.) Ecart 2.) FDeg 3.) pLength
-int posInT_EcartFDegpLength(const TSet set,const int length,const LObject &p)
-{
-
-  if (length==-1) return 0;
-
-  int o = p.ecart;
-  int op=p.GetpFDeg();
-  int ol = p.GetpLength();
-
-  if (set[length].ecart < o)
-    return length+1;
-  if (set[length].ecart == o)
-  {
-     int oo=set[length].GetpFDeg();
-     if ((oo < op) || ((oo==op) && (set[length].length < ol)))
-       return length+1;
-  }
-
-  int i;
-  int an = 0;
-  int en= length;
-  loop
-  {
-    if (an >= en-1)
-    {
-      if (set[an].ecart > o)
-        return an;
-      if (set[an].ecart == o)
-      {
-         int oo=set[an].GetpFDeg();
-         if((oo > op)
-         || ((oo==op) && (set[an].pLength > ol)))
-           return an;
-      }
-      return en;
-    }
-    i=(an+en) / 2;
-    if (set[i].ecart > o)
-      en=i;
-    else if (set[i].ecart == o)
-    {
-       int oo=set[i].GetpFDeg();
-       if ((oo > op)
-       || ((oo == op) && (set[i].pLength > ol)))
-         en=i;
-       else
-        an=i;
-    }
-    else
-      an=i;
-  }
-}
-
-// determines the position based on: 1.) FDeg 2.) pLength
-int posInT_FDegpLength(const TSet set,const int length,const LObject &p)
-{
-
-  if (length==-1) return 0;
-
-  int op=p.GetpFDeg();
-  int ol = p.GetpLength();
-
-  int oo=set[length].GetpFDeg();
-  if ((oo < op) || ((oo==op) && (set[length].length < ol)))
-    return length+1;
-
-  int i;
-  int an = 0;
-  int en= length;
-  loop
-    {
-      if (an >= en-1)
-      {
-        int oo=set[an].GetpFDeg();
-        if((oo > op)
-           || ((oo==op) && (set[an].pLength > ol)))
-          return an;
-        return en;
-      }
-      i=(an+en) / 2;
-      int oo=set[i].GetpFDeg();
-      if ((oo > op)
-          || ((oo == op) && (set[i].pLength > ol)))
-        en=i;
-      else
-        an=i;
-    }
-}
-
 // determines the position based on: 1.) Ecart 2.) pLength
 int posInT_EcartpLength(const TSet set,const int length,const LObject &p)
 {
@@ -2008,32 +1915,6 @@ int posInT_EcartpLength(const TSet set,const int length,const LObject &p)
       else
         an=i;
     }
-}
-
-// determines the position based on: 1.) Ecart 2.) FDeg 3.) pLength
-int posInT_pLength(const TSet set,const int length,const LObject &p)
-{
-  if (length==-1)
-    return 0;
-  if (set[length].length<p.length)
-    return length+1;
-
-  int i;
-  int an = 0;
-  int en= length;
-  int ol = p.GetpLength();
-
-  loop
-  {
-    if (an >= en-1)
-    {
-      if (set[an].pLength>ol) return an;
-      return en;
-    }
-    i=(an+en) / 2;
-    if (set[i].pLength>ol) en=i;
-    else                        an=i;
-  }
 }
   
 /*2
@@ -2817,7 +2698,6 @@ poly redtail (poly p, int pos, kStrategy strat)
 }
 
 
-#ifndef OLD_REDTAIL_BBA
 poly redtailBba (LObject* L, int pos, kStrategy strat, BOOLEAN withT)
 {
   strat->redTailChange=FALSE;
@@ -2837,9 +2717,7 @@ poly redtailBba (LObject* L, int pos, kStrategy strat, BOOLEAN withT)
   if (L->p != NULL) pNext(L->p) = NULL;
   L->pLength = 1;
 
-#ifdef HAVE_REDTAIL_BUCKETS  
   Ln.PrepareRed(strat->use_buckets);
-#endif
 
   while(!Ln.IsNull())
   {
@@ -2891,72 +2769,7 @@ poly redtailBba (LObject* L, int pos, kStrategy strat, BOOLEAN withT)
   kTest_L(L);
   return L->GetLmCurrRing();
 }
-#else
-poly redtailBba (LObject* L, int pos, kStrategy strat, BOOLEAN withT)
-{
-  poly h, hn;
-  int j;
-  unsigned long not_sev;
-  strat->redTailChange=FALSE;
-  poly p = L->p;
-  LObject Ln(strat->tailRing);
-  TObject* With;
-  // placeholder in case strat->tl < 0
-  TObject  With_s(strat->tailRing);
 
-  if (strat->noTailReduction)
-    return p;
-  h = p;
-  hn = pNext(h);
-  while(hn != NULL)
-  {
-    while (1)
-    {
-      Ln.Set(hn, strat->tailRing);
-      Ln.sev = p_GetShortExpVector(hn, strat->tailRing);
-      if (! withT)
-      {
-        With = kFindDivisibleByInS(strat, pos, &Ln, &With_s);
-        if (With == NULL) break;
-      }
-      else
-      {
-        int j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, &Ln);
-        if (j < 0) break;
-        With = &(strat->T[j]);
-      }
-      if (ksReducePolyTail(L, With, h, strat->kNoether))
-      {
-        // reducing the tail would violate the exp bound
-        if (kStratChangeTailRing(strat, L))
-        {
-          p = redtailBba(L, pos, strat);
-          goto all_done;
-        }
-        else
-        {
-          assume(0);
-          return NULL;
-        }
-      }
-      strat->redTailChange=TRUE;
-      hn = pNext(h);
-      if (hn == NULL) goto all_done;
-    }
-    h = hn;
-    hn = pNext(h);
-  }
-
-  all_done:
-  if (strat->redTailChange)
-  {
-    L->last = NULL;
-    L->pLength = 0;
-    L->length = 0;
-  }
-  return p;
-}
-#endif
 /*2
 *checks the change degree and write progress report
 */
@@ -2989,7 +2802,7 @@ void message (int i,int* reduc,int* olddeg,kStrategy strat, int red_result)
       PrintS(".");
     else
     {
-      if (strat->Ll != *reduc)
+      if (strat->Ll != *reduc && strat->Ll > 0)
       {
         Print("(%d)",strat->Ll+1);
         *reduc = strat->Ll;
@@ -3944,7 +3757,14 @@ void initBuchMoraPos (kStrategy strat)
     if (strat->honey)
     {
       strat->posInL = posInL15;
-      strat->posInT = posInT15;
+      // ok -- here is the deal: from my experiments for Singular-2-0 
+      // I conclude that that posInT_EcartpLength is the best of
+      // posInT15, posInT_EcartFDegpLength, posInT_FDegLength, posInT_pLength
+      // see the table at the end of this file
+      if (K_TEST_OPT_OLDSTD)
+        strat->posInT = posInT15;
+      else
+        strat->posInT = posInT_EcartpLength;
     }
     else if (pLexOrder && !TEST_OPT_INTSTRATEGY)
     {
@@ -4352,3 +4172,155 @@ void kStratInitChangeTailRing(kStrategy strat)
 }
 
 #endif // KUTIL_CC
+
+#if 0
+Timings for the different possibilities of posInT:
+            T15	    EDL	    DL	    EL	    L	    1-2-3
+Gonnet		43.26	42.30	38.34	41.98	38.40	100.04
+Hairer_2_1	1.11	1.15	1.04	1.22	1.08	4.7
+Twomat3		1.62	1.69	1.70	1.65	1.54	11.32
+ahml		4.48	4.03	4.03	4.38	4.96	26.50
+c7		    15.02	13.98	15.16	13.24	17.31	47.89
+c8		    505.09	407.46	852.76	413.21	499.19  n/a
+f855		12.65	9.27	14.97	8.78	14.23	33.12
+gametwo6	11.47	11.35	14.57	11.20	12.02	35.07
+gerhard_3	2.73	2.83	2.93	2.64	3.12	6.24
+ilias13		22.89	22.46	24.62	20.60	23.34	53.86
+noon8		40.68	37.02	37.99	36.82	35.59	877.16
+rcyclic_19	48.22	42.29	43.99	45.35	51.51	204.29
+rkat9		82.37	79.46	77.20	77.63	82.54	267.92
+schwarz_11	16.46	16.81	16.76	16.81	16.72   35.56
+test016		16.39	14.17	14.40	13.50	14.26	34.07
+test017		34.70	36.01	33.16	35.48	32.75	71.45
+test042		10.76	10.99	10.27	11.57	10.45	23.04
+test058		6.78	6.75	6.51	6.95	6.22	9.47
+test066		10.71	10.94	10.76	10.61	10.56	19.06
+test073		10.75	11.11	10.17	10.79	8.63	58.10
+test086		12.23	11.81	12.88	12.24	13.37	66.68
+test103		5.05	4.80	5.47	4.64	4.89	11.90
+test154		12.96	11.64	13.51	12.46	14.61	36.35
+test162		65.27	64.01	67.35	59.79	67.54	196.46
+test164		7.50	6.50	7.68	6.70	7.96	17.13
+virasoro	3.39	3.50	3.35	3.47	3.70	7.66
+#endif
+
+
+#ifdef HAVE_MORE_POS_IN_T
+// determines the position based on: 1.) Ecart 2.) FDeg 3.) pLength
+int posInT_EcartFDegpLength(const TSet set,const int length,const LObject &p)
+{
+
+  if (length==-1) return 0;
+
+  int o = p.ecart;
+  int op=p.GetpFDeg();
+  int ol = p.GetpLength();
+
+  if (set[length].ecart < o)
+    return length+1;
+  if (set[length].ecart == o)
+  {
+     int oo=set[length].GetpFDeg();
+     if ((oo < op) || ((oo==op) && (set[length].length < ol)))
+       return length+1;
+  }
+
+  int i;
+  int an = 0;
+  int en= length;
+  loop
+  {
+    if (an >= en-1)
+    {
+      if (set[an].ecart > o)
+        return an;
+      if (set[an].ecart == o)
+      {
+         int oo=set[an].GetpFDeg();
+         if((oo > op)
+         || ((oo==op) && (set[an].pLength > ol)))
+           return an;
+      }
+      return en;
+    }
+    i=(an+en) / 2;
+    if (set[i].ecart > o)
+      en=i;
+    else if (set[i].ecart == o)
+    {
+       int oo=set[i].GetpFDeg();
+       if ((oo > op)
+       || ((oo == op) && (set[i].pLength > ol)))
+         en=i;
+       else
+        an=i;
+    }
+    else
+      an=i;
+  }
+}
+
+// determines the position based on: 1.) FDeg 2.) pLength
+int posInT_FDegpLength(const TSet set,const int length,const LObject &p)
+{
+
+  if (length==-1) return 0;
+
+  int op=p.GetpFDeg();
+  int ol = p.GetpLength();
+
+  int oo=set[length].GetpFDeg();
+  if ((oo < op) || ((oo==op) && (set[length].length < ol)))
+    return length+1;
+
+  int i;
+  int an = 0;
+  int en= length;
+  loop
+    {
+      if (an >= en-1)
+      {
+        int oo=set[an].GetpFDeg();
+        if((oo > op)
+           || ((oo==op) && (set[an].pLength > ol)))
+          return an;
+        return en;
+      }
+      i=(an+en) / 2;
+      int oo=set[i].GetpFDeg();
+      if ((oo > op)
+          || ((oo == op) && (set[i].pLength > ol)))
+        en=i;
+      else
+        an=i;
+    }
+}
+
+
+// determines the position based on: 1.) Ecart 2.) FDeg 3.) pLength
+int posInT_pLength(const TSet set,const int length,const LObject &p)
+{
+  if (length==-1)
+    return 0;
+  if (set[length].length<p.length)
+    return length+1;
+
+  int i;
+  int an = 0;
+  int en= length;
+  int ol = p.GetpLength();
+
+  loop
+  {
+    if (an >= en-1)
+    {
+      if (set[an].pLength>ol) return an;
+      return en;
+    }
+    i=(an+en) / 2;
+    if (set[i].pLength>ol) en=i;
+    else                        an=i;
+  }
+}
+
+#endif

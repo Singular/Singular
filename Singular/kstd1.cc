@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.73 2000-12-18 13:30:35 obachman Exp $ */
+/* $Id: kstd1.cc,v 1.74 2000-12-18 17:26:39 obachman Exp $ */
 /*
 * ABSTRACT:
 */
@@ -437,7 +437,7 @@ int redFirst (LObject* h,kStrategy strat)
           if (TEST_OPT_DEBUG) Print(" degree jumped; ->L%d\n",at);
 #endif
           h->Clear();
-          return 0;
+          return -1;
         }
       }
       if ((TEST_OPT_PROT) && (strat->Ll < 0) && (d >= reddeg))
