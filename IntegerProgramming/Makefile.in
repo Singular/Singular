@@ -42,17 +42,21 @@ OBJECTS3:= $(MAIN3).o
 MAIN4   := gen_test
 OBJECTS4:= $(MAIN4).o
 
+LLL   := LLL
+OBJECTS_LLL:= LLL_lattice_to_send.o
+
 %.o: %.cc
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
-all: $(MAIN1) $(MAIN2) $(MAIN3) $(MAIN4)
+all: $(MAIN1) $(MAIN2) $(MAIN3) $(MAIN4) $(LLL)
 
-install: $(MAIN1) $(MAIN2) $(MAIN3) $(MAIN4)
+install: $(MAIN1) $(MAIN2) $(MAIN3) $(MAIN4) $(LLL)
 	${MKINSTALLDIRS} ${bindir}
 	${INSTALL_PROGRAM} $(MAIN1) ${bindir}
 	${INSTALL_PROGRAM} $(MAIN2) ${bindir}
 	${INSTALL_PROGRAM} $(MAIN3) ${bindir}
 	${INSTALL_PROGRAM} $(MAIN4) ${bindir}
+	${INSTALL_PROGRAM} $(LLL) ${bindir}
 
 install-bindist: $(MAIN1) $(MAIN2) $(MAIN3) $(MAIN4)
 	${MKINSTALLDIRS} ${install_bindir}
@@ -60,6 +64,7 @@ install-bindist: $(MAIN1) $(MAIN2) $(MAIN3) $(MAIN4)
 	${INSTALL_PROGRAM} -s $(MAIN2) ${install_bindir}
 	${INSTALL_PROGRAM} -s $(MAIN3) ${install_bindir}
 	${INSTALL_PROGRAM} -s $(MAIN4) ${install_bindir}
+	${INSTALL_PROGRAM} -s $(LLL) ${bindir}
 
 clean: 
 	rm -f *.o *~ 
@@ -70,6 +75,7 @@ distclean: clean
 	-rm -f ${bindir}/$(MAIN2)
 	-rm -f ${bindir}/$(MAIN3)
 	-rm -f ${bindir}/$(MAIN4)
+	-rm -f ${bindir}/$(LLL)
 
 $(MAIN1): term_ordering.o binomial.o list.o BigInt.o LLL.o matrix.o \
 	ideal.o \
@@ -98,6 +104,10 @@ $(MAIN4): term_ordering.o binomial.o list.o BigInt.o LLL.o matrix.o \
 	$(OBJECTS4)
 	$(CXX)  $^ -o $@ $(LDFLAGS)
 	strip $(MAIN4)
+
+$(LLL): $(OBJECTS_LLL)
+	$(CXX)  $^ -o $@ $(LDFLAGS)
+	strip $(LLL)
 
 Makefile: Makefile.in 
 	cd ..; 	CONFIG_FILES="IntegerProgramming/Makefile" CONFIG_HEADERS= ./config.status
