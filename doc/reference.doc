@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.198 2000-12-18 14:22:56 obachman Exp $
+@comment $Id: reference.doc,v 1.199 2001-01-11 17:40:25 lossen Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -41,9 +41,10 @@ and are written
 in the  @sc{Singular} programming language.
 
 The general syntax of a function is
-@* [target =] function_name (<arguments>);
-@* If no target is specified, the result is printed.
-
+@format
+                        [target =] function_name (<arguments>);
+@end format 
+If no target is specified, the result is printed.
 In some cases (e.g., @code{export, keepring, kill, setring,
 type}) the brackets are optional. For the commands
 @code{help}, @code{break}, @code{quit}, @code{exit} and @code{LIB} no
@@ -201,7 +202,7 @@ brackets are allowed.
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
-displays the attribute list of the object called @emph{name}.
+displays the attribute list of the object called name.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -215,8 +216,9 @@ displays the attribute list of the object called @emph{name}.
 @item @strong{Type:}
 any
 @item @strong{Purpose:}
-returns the value of the attribute @emph{string_expression} of the @emph{name}.
-If the attribute is not defined for this variable, attrib returns the empty string.
+returns the value of the attribute string_expression of the 
+variable name. If the attribute is not defined for this variable, 
+@code{attrib} returns the empty string.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -233,8 +235,8 @@ If the attribute is not defined for this variable, attrib returns the empty stri
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
-sets the attribute @emph{string_expression} of the @emph{name}
-to the value @emph{expression}.
+sets the attribute string_expression of the variable name
+to the value expression.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -302,49 +304,37 @@ value of type int is the multiplicity (see @ref{mult})
 @item @strong{Type:}
 list of module and intvec
 @item @strong{Purpose:}
-applies sparse Gauss-Bareiss algorithm (see @ref{References}, Lee and Saunders)
-to a module (or with type conversion to a matrix) with an 'optimal' pivotstrategy.
-The vectors of the module are the columns of the matrix, hence the rows are eliminated.
-With only one parameter a complete elimination is done.
-Result is a list: the first entry is a module with a minimal independent set of vectors
-(as a matrix lower triangular),
+applies the sparse Gauss-Bareiss algorithm (see @ref{References}, Lee and 
+Saunders) to a module (or with type conversion to a matrix) with an 'optimal' 
+pivot strategy. The vectors of the module are the columns of the matrix, 
+hence elimination takes place w.r.t.@: rows. 
+@* With only one parameter a complete elimination is done.
+Result is a list: the first entry is a module with a minimal independent set 
+of vectors (as a matrix lower triangular),
 the second entry an intvec with the permutations of the rows
-w.r.t. the original matrix, that is a k at position l indicates that
+w.r.t.@: the original matrix, that is, a k at position l indicates that
 row l became row k.
-The further parameters control the algorithm:
-the second is the number of last rows out of the elimination and the third is
-as follows, if the vectors to reduce in the algorithm
-are smaller than or equal to this number the method stops.
+@* The further parameters control the algorithm. @code{bareiss(M,i,j);} 
+does not consider the last i rows in the elimination procedure and stops 
+computing when the remaining number of vectors (columns) to reduce is at 
+most j.
 @item @strong{Example:}
 @smallexample
 @c example
   ring r=0,(x,y,z),(c,dp);
   module mm;
+  // ** generation of the module mm **
   int d=7;
   int b=2;
   int db=d-b;
   int i;
-  for(i=d;i>0;i--)
-  {
-    mm[i]=3*x*gen(i);
-  }
-  for(i=db;i;i--)
-  {
-    mm[i]=mm[i]+7*y*gen(i+b);
-  }
-  for(i=d;i>db;i--)
-  {
-    mm[i]=mm[i]+7*y*gen(i-db);
-  }
-  for(i=d;i>b;i--)
-  {
-    mm[i]=mm[i]+11*z*gen(i-b);
-  }
-  for(i=b;i;i--)
-  {
-    mm[i]=mm[i]+11*z*gen(i+db);
-  }
-  print(mm);
+  for(i=d;i>0;i--){ mm[i]=3*x*gen(i); }
+  for(i=db;i;i--){ mm[i]=mm[i]+7*y*gen(i+b); }
+  for(i=d;i>db;i--){ mm[i]=mm[i]+7*y*gen(i-db); }
+  for(i=d;i>b;i--){ mm[i]=mm[i]+11*z*gen(i-b); }
+  for(i=b;i;i--){ mm[i]=mm[i]+11*z*gen(i+db); }
+  // ** the generating matrix of mm **
+  print(mm);  
   // complete elimination
   list ss=bareiss(mm);
   print(ss[1]);
@@ -448,8 +438,8 @@ module @code{T[2]} has 4 generators (all in degree 4)
 @end itemize
 
 where the generators are the columns of the
-shown matrix and degrees are assigned such that the corresponding maps
-have degree 0 as is shown in the resolution below:
+displayed matrix and degrees are assigned such that the corresponding maps
+have degree 0:
 @tex
 $$
 0 \longleftarrow r/j \longleftarrow r(1)
@@ -521,7 +511,7 @@ See
 matrix
 @item @strong{Purpose:}
 the rows of the matrix represent the irreducible characteristic series of the
-ideal with respect to the current variable ordering.
+ideal with respect to the current ordering of variables.
 @*One application is the decomposition of the zero-set.
 @item @strong{Example:}
 @smallexample
@@ -660,8 +650,8 @@ all denominators from its coefficients and then divide it by its content.
 @c example
   ring r=0,(x,y,z),dp;
   poly f=(3x+6y)^5;
-  f;
-  cleardenom(f);
+  f/5;
+  cleardenom(f/5);
 @c example
 @end smallexample
 @end table
@@ -714,10 +704,10 @@ First case:  returns a 2 x n matrix M, n being the number
 of the determined monomials.
 The first row consists of these monomials, the second row
 of the corresponding coefficients of the monomials in f.
-Thus f = M[1,1]*M[2,1]+..+M[1,n]*M[2,n].
+Thus, f = M[1,1]*M[2,1]+..+M[1,n]*M[2,n].
 
-Second case: the second matrix (i.e., the 4rd argument) contains the
-monomials, the first matrix (i.e., the 3th argument) the corresponding
+Second case: the second matrix (i.e., the 4th argument) contains the
+monomials, the first matrix (i.e., the 3rd argument) the corresponding
 coefficients of the monomials in the vector.
 
 @item @strong{Note:}
@@ -765,28 +755,28 @@ See
 @item @strong{Type:}
 matrix
 @item @strong{Purpose:}
-develops each polynomial from the first argument, say @code{J},
-(poly_expression/ .. /module_expression) as a univariate polynomial
-in the given ring_variable,
-say @code{z}, and returns the coefficients as a @code{k} x @code{d}
-matrix @code{M},
+develops each polynomial of the first argument, say J,
+as a univariate polynomial in the given ring_variable,
+say z, and returns the coefficients as a k x d
+matrix M,
 where:
-@* @code{d-1} = maximum @code{z}-degree of all occurring polynomials
-@* @code{k}   = 1 if J is a polynomial,
-@* @code{k} = number of generators  if J is an ideal
-@* If J is a vector or a module this procedure is repeated for each
+@format
+    d-1 = maximum z-degree of all occurring polynomials
+      k = 1 if J is a polynomial,
+      k = number of generators  if J is an ideal
+@end format
+If J is a vector or a module this procedure is repeated for each
 component and the resulting matrices are appended.
-@*If a third argument is present, say @code{T},
-it contains the coefficients such that
-@*  @code{matrix(J) = T*M}.
-@*Thus if
+@* The third argument, say T, is used to return the matrix of coefficients
+such that matrix(J) = T*M.
+@*If
 @tex
-$M=(m_{ij})$,
+$M=(m_{ij})$
 @end tex
 @ifinfo
-M=(M[i,j]),
+M=(M[i,j])
 @end ifinfo
-the j-th generator of an ideal @code{J} is equal to
+then the j-th generator of an ideal J is equal to
 @tex
 $$J_j = z^0 \cdot m_{1j} + z^1 \cdot m_{2j} + ... + z^{d-1} \cdot m_{dj},$$
 @end tex
@@ -797,10 +787,11 @@ J[j] = z^0*M[1,j] + z^1*M[2,j] + ... + z^(d-1)*M[d,j],
 @*
 @*
 @end ifinfo
-while for a module @code{J} the i-th component of the j-th generator is equal to the
-entry [i,j] of matrix(@code{J}) and we get
+while for a module J the i-th component of the j-th generator is 
+equal to the entry _[i,j] of matrix(J), and we get
 @tex
-$$[i,j] = z^0 \cdot m_{(i-1)d+1,j} + z^1 \cdot m_{(i-1)d+2,j} + ... + z^{d-1} \cdot m_{id,j}.$$
+$$\_[i,j] = z^0 \cdot m_{(i-1)d+1,j} + z^1 \cdot m_{(i-1)d+2,j} + ... + 
+z^{d-1} \cdot m_{id,j}.$$
 @end tex
 @ifinfo
 @*
@@ -816,30 +807,31 @@ given expression.
 @smallexample
 @c example
   ring r;
-  poly f=(x+y)^5;
+  poly f=(x+y)^3;
   matrix M=coeffs(f,y);
   print(M);
-  ideal i=f,xyz+z^10*y^7;
+  ideal i=f,xyz+z^10*y^4;
   print(coeffs(i,y));
 @c example
 @end smallexample
 @item @strong{Syntax:}
 @code{coeffs (} ideal_expression@code{,} ideal_expression @code{)}
 @*@code{coeffs (} module_expression@code{,} module_expression @code{)}
-@code{coeffs (} ideal_expression@code{,} ideal_expression@code{,} product_of_ringvars @code{)}
+@*@code{coeffs (} ideal_expression@code{,} ideal_expression@code{,} product_of_ringvars @code{)}
 @*@code{coeffs (} module_expression@code{,} module_expression@code{,} product_of_ringvars @code{)}
 @item @strong{Type:}
 matrix
 @item @strong{Purpose:}
 let the first argument be M,
-the second argument  be K (a set of monomials in P),
+the second argument  be K (a set of monomials, resp.@: vectors with monomial 
+entries, in the variables appearing in P),
 the third argument be the product P of variables to consider (if this
 argument is not given, then the product of all ring variables is taken
 as default argument).
 @*M is supposed to consist of elements of (resp.@: have entries in)
 a finitely generated module
 over a ring in the variables not appearing in P. K should contain the
-generators of the module over this smaller ring.
+generators of M over this smaller ring.
 Then @code{coeffs(M,K,P)} returns a matrix A of coefficients with K*A=M
 such that the entries of A do not contain any variable from P.
 @*If K does not contain all generators that are necessary to express
@@ -877,10 +869,11 @@ producing a m x n matrix.
 @*Contraction is defined on monomials by:
 @*
 @ifinfo
-contract( x^A , x^B) := x^(B-A) (if B>=A elementwise), 0 otherwise
+contract( x^A , x^B) := x^(B-A) (if B>=A componentwise), 0 otherwise
 @end ifinfo
 @tex
-$${\rm contract}(x^A ,  x^B) := \cases{ x^{(B-A)}, &if $B\ge A$ elementwise\cr 0,&otherwise.\cr}$$
+$${\rm contract}(x^A ,  x^B) := \cases{ x^{(B-A)}, &if $B\ge A$ 
+componentwise\cr 0,&otherwise.\cr}$$
 @end tex
 where A and B are the multiexponents of the ring variables represented by
 @tex
@@ -914,7 +907,7 @@ See
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
-applies the print command to each expression in the expression_list, if
+applies the print command to each expression in the expression_list if
 int_expression is positive.
 @code{dbprint} may also be used in procedures
 in order to print results subject to certain
@@ -924,8 +917,8 @@ conditions.
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
-The print command is applied to the expression,
-if @code{printlevel=>voice}.
+The print command is applied to the expression
+if @code{printlevel>=voice}.
 @item @strong{Note:}
 @xref{Guidelines for writing a library}, for an example how this is used
 for displaying comments while procedures are executed.
@@ -961,7 +954,7 @@ See
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
-returns a value <>0 (TRUE) if there is a userdefined object with this name,
+returns a value <>0 (TRUE) if there is a user-defined object with this name,
 and 0 (FALSE) otherwise.
 @*A non-zero return value is the level where the object is defined (level
 1 denotes the top level, level 2 the level of a first procedure, level 3
@@ -977,7 +970,7 @@ A local object @code{m} may be identified by @code{if
   matrix m[5][6]= x,y,1,2,0,x+y;
   defined(mm);
   defined(r) and defined(m);
-  defined(m)==voice;             // m is defined in the current level
+  defined(m)==voice;   // m is defined in the current level
   defined(x);
   defined(z);
   defined(t);
@@ -1237,7 +1230,7 @@ standard basis.
 @* That is, if  @code{m} is the
 module (or ideal), @code{sm} the submodule (or ideal),
 @code{U} a diagonal matrix of units,
-@code{R} the normal form of @code{sm} w.r.t. @code{m},
+@code{R} the normal form of @code{sm} w.r.t.@: @code{m},
 and @code{T} the transformation matrix returned by
 lift, then @code{matrix(sm)*U+matrix(R)=matrix(m)*T}
 and @code{module(sm*U+matrix(R))=module(matrix(m)*T)}
@@ -2022,7 +2015,7 @@ uniquely matched) a warning is displayed and no help information is
 provided.
 @item
 If @code{topic} is the name of a (loaded) procedure whose help
-section has changed w.r.t. the help availble in the manual, then ,
+section has changed w.r.t.@: the help availble in the manual, then ,
 instead of displaying the respective help section of the manual in the
 help browser, the "newer" help section of the procedure is simply
 printed to the terminal.
@@ -2128,9 +2121,9 @@ none (if called with one argument)
 computes the Hilbert series of the ideal, resp.@: module,
 defined by the leading terms of the generators
 of the given ideal resp.@: module. If weights w are given as third argument,
-the Hilbert series is computed w.r.t. these weights w.
+the Hilbert series is computed w.r.t.@: these weights w.
 In the other cases all weights are one. If the input is
-homogeneous w.r.t. the weights and a standard basis,
+homogeneous w.r.t.@: the weights and a standard basis,
 this is the (weighted) Hilbert series of the original
 ideal, resp.@: module.
 
@@ -2220,29 +2213,23 @@ See
 @item @strong{Type:}
 resolution
 @item @strong{Purpose:}
-computes a free resolution of an ideal using Hilbert-driven algorithm.
+computes a free resolution of an ideal using the Hilbert-driven 
+algorithm.
 
 The ideal_expression has to be homogeneous.
 
-More precisely, let M  be a cyclic module and
-@tex
-$A_1=$matrix$(M)$.
-@end tex
+More precisely, let R be the basering and I be the given ideal.
+Then @code{hres} computes a minimal free resolution of R/I
 @ifinfo
-A1=matrix(M).
-@end ifinfo
-Then A1 is an ideal in the basering R and @code{hres}
-computes a minimal free resolution of
-@ifinfo
-M1=coker(A1)
-@*...--> F2 --A2-> F1 --A1-> R-->M1-->0.
+@*...--> F2 --A2-> F1 --A1-> R --> R/I -->0.
 @end ifinfo
 @tex
-$M_1=coker(A_1)$
-$$...\longrightarrow F_2 \buildrel{A_2}\over{\longrightarrow} F_1 \buildrel{A_1}\over{\longrightarrow} F_0\longrightarrow M_1\longrightarrow 0.$$
+$$...\longrightarrow F_2 \buildrel{A_2}\over{\longrightarrow} F_1 
+\buildrel{A_1}\over{\longrightarrow} F_0\longrightarrow R/I
+\longrightarrow 0.$$
 @end tex
-The computation stops after k steps, if the int expression k
-is not zero, and returns a list of modules
+If the int_expression k is not zero then the computation stops after 
+k steps and returns a list of modules
 @tex
 $M_i={\tt module}(A_i)$, i=1..k.
 @end tex
@@ -2250,21 +2237,16 @@ $M_i={\tt module}(A_i)$, i=1..k.
 Mi=module(Ai), i=1..k.
 @end ifinfo
 
-If k=0, @code{hres(M,0)} returns a list of n modules where n is the
-number of variables of the basering.
-
-Let @code{list L=hres(M,0);} then @code{L[1]} generates M,
-@code{L[2]} generates
-the first syzygy
-module of @code{L[1]}, etc.
-( @code{L[i]}
+@code{list L=hres(M,0);} returns a list L of n modules (where n is the
+number of variables of the basering) such that  
+@code{L[i]}
 @tex
 $=M_i$
 @end tex
 @ifinfo
 =M_i
 @end ifinfo
-) in the notation from above).
+) in the above notation.
 @item @strong{Note:}
 To access the elements of a resolution, it has to be assigned to a list,
 which also completes computations and may therefore take some time.
@@ -2272,11 +2254,13 @@ which also completes computations and may therefore take some time.
 @smallexample
 @c example
   ring r=0,(x,y,z),dp;
-  ideal i=xz,yz,x^3-y^3;
-  def l=hres(i,0);
-  print(betti(l),"betti");// input to betti may be of type resolution
-  list ll=l;
-  l[2];                   // elements can only be accessed in the list
+  ideal I=xz,yz,x^3-y^3;
+  def l=hres(I,0); 
+  // input to betti may have type resolution
+  print(betti(l),"betti");
+  // the elements of a resolution can only be accessed in a list 
+  list L=l; 
+  L[2];     // the first syzygy module of R/I
 @c example
 @end smallexample
 @end table
@@ -3741,7 +3725,7 @@ list
 returns a list whose first entry is a standard basis and whose second
 entry is both a minimal generating set for the ideal resp. module
 and a subset of the
-standard basis for homogeneous input (w.r.t. any monomial ordering).
+standard basis for homogeneous input (w.r.t.@: any monomial ordering).
 @item @strong{Example:}
 @smallexample
 @c example
@@ -3844,7 +3828,7 @@ See
 @item @strong{Type:}
 list of strings
 @item @strong{Purpose:}
-returns the names of all user defined variables which are ring independent
+returns the names of all user-defined variables which are ring independent
 (this includes the names of  procedures) or, in the second case, which
 belong to the given ring.
 
@@ -5595,7 +5579,7 @@ second argument of type intvec as Hilbert series
 if the ideal, resp.@: module, is homogeneous,
 (Hilbert driven standard basis computation, @ref{stdhilb}).
 If the ideal is quasihomogeneous with some weights w and if the Hilbert series
-is computed w.r.t. to this weights, then use w as third argument.
+is computed w.r.t.@: to this weights, then use w as third argument.
 @*Use an optional second argument of type @code{poly}, resp.@ @code{vector}
 to construct the standard basis from an already computed one (given as the
 first argument) and one additional generator (the second argument).
