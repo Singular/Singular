@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.cc,v 1.13 1998-11-02 09:05:41 Singular Exp $ */
+/* $Id: syz.cc,v 1.14 1998-11-21 13:55:41 siebert Exp $ */
 
 /*
 * ABSTRACT: resolutions
@@ -860,6 +860,12 @@ intvec * syBetti(resolvente res,int length, int * regularity,
       result = new intvec(1,1,res[0]->rank);
     return result;
   }
+  intvec *w=NULL;
+  if (idHomModule(res[0],currQuotient,&w)!=isHomog)
+  {
+    Warn("betti-command: Input is not homogeneous!");
+  }
+  delete w;
   l = max(idRankFreeModule(res[0]),res[0]->rank);
   i = 0;
   while ((i<length) && (res[i]!=NULL))

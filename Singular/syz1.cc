@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.35 1998-11-12 14:44:38 siebert Exp $ */
+/* $Id: syz1.cc,v 1.36 1998-11-21 13:55:43 siebert Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -2072,7 +2072,7 @@ intvec * syBettiOfComputation(syStrategy syzstr)
     {
       i = 0;
       while ((i<(*syzstr->Tl)[l]) &&
-        ((rP[l][i].lcm!=NULL) || (rP[l][i].syz!=NULL)))
+        ((rP[l][i].lcm!=NULL) || (rP[l][i].syz!=NULL) || (rP[l][i].syzind==-1)))
       {
         if (rP[l][i].isNotMinimal==NULL)
         {
@@ -2091,10 +2091,10 @@ intvec * syBettiOfComputation(syStrategy syzstr)
     for (i=0;i<jj;i++)
     {
       j = 0;
-      while ((j<(*syzstr->Tl)[i]) &&
-        ((rP[i][j].lcm!=NULL) || (rP[i][j].syz!=NULL)))
+      while ((j<(*syzstr->Tl)[i]))
       {
-        if (rP[i][j].isNotMinimal==NULL)
+        if ((rP[i][j].isNotMinimal==NULL) &&
+            ((rP[i][j].lcm!=NULL) || (rP[i][j].syz!=NULL)))
           IMATELEM(*result,rP[i][j].order-i,i+2)++;
         j++;
       }
