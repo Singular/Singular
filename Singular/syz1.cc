@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.74 2002-01-10 12:33:24 Singular Exp $ */
+/* $Id: syz1.cc,v 1.75 2003-02-20 13:50:39 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -897,6 +897,8 @@ static void syRedNextPairs(SSet nextPairs, syStrategy syzstr,
     tso = nextPairs[(*spl1)[i]-1];
     if ((tso.p1!=NULL) && (tso.p2!=NULL))
     {
+      nNormalize(pGetCoeff(tso.p1));
+      nNormalize(pGetCoeff(tso.p2));
       coefgcd =
         nGcd(pGetCoeff(tso.p1),pGetCoeff(tso.p2),currRing);
       tso.syz = pHead(tso.lcm);
@@ -951,7 +953,7 @@ static void syRedNextPairs(SSet nextPairs, syStrategy syzstr,
       }
       if (tso.p != NULL)
       {
-        if (TEST_OPT_PROT) Print("g");
+        if (TEST_OPT_PROT) PrintS("g");
         if (k==IDELEMS((syzstr->res)[index]))
         {
           syEnlargeFields(syzstr,index);
@@ -979,7 +981,7 @@ static void syRedNextPairs(SSet nextPairs, syStrategy syzstr,
       }
       else
       {
-        if (TEST_OPT_PROT) Print(".");
+        if (TEST_OPT_PROT) PrintS(".");
         //if (index % 2==0)
           //euler++;
         //else
@@ -1056,9 +1058,9 @@ static void syRedGenerOfCurrDeg(syStrategy syzstr, int deg, int index)
           if ((sPairs)[i].isNotMinimal==NULL)
           {
             PrintLn();
-            Print("minimal generator: ");pWrite((syzstr->resPairs[index-1])[i].syz);
-            Print("comes from: ");pWrite((syzstr->resPairs[index-1])[i].p1);
-            Print("and: ");pWrite((syzstr->resPairs[index-1])[i].p2);
+            PrintS("minimal generator: ");pWrite((syzstr->resPairs[index-1])[i].syz);
+            PrintS("comes from: ");pWrite((syzstr->resPairs[index-1])[i].p1);
+            PrintS("and: ");pWrite((syzstr->resPairs[index-1])[i].p2);
           }
         }
         //res->m[k] = (sPairs)[i].syz;
@@ -1115,7 +1117,7 @@ void syEnterPair(SSet sPairs, SObject * so, int * sPlength,int index)
         }
         else
         {
-          Print("Hier ist was faul!\n");
+          PrintS("Hier ist was faul!\n");
           break;
         }
       }
@@ -1914,7 +1916,7 @@ static void syPrintEmptySpaces(int i)
 {
   if (i!=0)
   {
-    Print(" ");
+    PrintS(" ");
     syPrintEmptySpaces(i/10);
   }
 }
@@ -1926,7 +1928,7 @@ static void syPrintEmptySpaces1(int i)
 {
   if (i!=0)
   {
-    Print(" ");
+    PrintS(" ");
     syPrintEmptySpaces1(i-1);
   }
 }
@@ -1955,7 +1957,7 @@ void syPrint(syStrategy syzstr)
   if ((syzstr->resPairs==NULL) && (syzstr->fullres==NULL)
      && (syzstr->minres==NULL))
   {
-    Print("No resolution defined\n");
+    PrintS("No resolution defined\n");
     return;
   }
   int l=0;
@@ -2022,7 +2024,7 @@ void syPrint(syStrategy syzstr)
     if ((l>=syzstr->resolution->length()) || ((*syzstr->resolution)[l]==0))
       break;
     syPrintEmptySpaces((*syzstr->resolution)[l]);
-    Print(" <-- ");
+    PrintS(" <-- ");
     l++;
   }
   PrintLn();
@@ -2040,7 +2042,7 @@ void syPrint(syStrategy syzstr)
   PrintLn();
   if (syzstr->minres==NULL)
   {
-    Print("resolution not minimized yet");
+    PrintS("resolution not minimized yet");
     PrintLn();
   }
 }
