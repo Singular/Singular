@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.18 1998-02-16 14:22:19 obachman Exp $ */
+/* $Id: longalg.cc,v 1.19 1998-02-17 15:06:40 obachman Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -702,7 +702,7 @@ static int  napDeg(alg p)
 /*3
 *writes a polynomial number
 */
-static void napWrite(alg p)
+void napWrite(alg p)
 {
   if (p==NULL)
     StringAppendS("0");
