@@ -1,3 +1,7 @@
+Fri Apr 17 09:53:53 MET DST 1998 hannes
+ * fixed a minor but very nasty bug: nlSetMap was resetting npPrimeM
+    (longrat.cc)
+
 1998-04-16  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
 	* mpsr_PutPoly.cc: Took out normalization of rational numbers
