@@ -282,9 +282,12 @@ prCopy.inc : prCopyMacros.h prCopyTemplate.cc prCopy.pl
 p_Procs.inc: p_Procs.cc p_Procs.h mod2.h 
 	$(CXX) -g -Wall -DNDEBUG -DGENERATE_P_PROCS p_Procs.cc -o p_Procs
 	./p_Procs > p_Procs.inc
+	/bin/rm -f p_Procs p_Procs.exe
+
 p_Procs_debug.inc: p_Procs.cc p_Procs.h mod2.h 
 	$(CXX) -g -Wall -DGENERATE_P_PROCS p_Procs.cc -o p_Procs
 	./p_Procs > p_Procs_debug.inc
+	/bin/rm -f p_Procs p_Procs.exe
 
 p_Procs.o: p_Procs.inc p_Procs_debug.inc
 
