@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gmspoly.lib,v 1.5 2003-06-27 10:43:44 mschulze Exp $";
+version="$Id: gmspoly.lib,v 1.6 2003-11-20 16:53:59 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -12,7 +12,7 @@ OVERVIEW: A library to compute invariants related to the the Gauss-Manin system
 
 PROCEDURES:
   istame(f);  test if the polynomial f is tame
-  gbasis(f);  a good basis of the Brieskorn lattice of a tame polynomial t 
+  gbasis(f);  a good basis of the Brieskorn lattice of a cohomologically tame f
 
 SEE ALSO: gmssing_lib
 
@@ -28,18 +28,11 @@ LIB "ring.lib";
 
 static proc mindegree(matrix A)
 {
-  int d=-1;
+  int d=0;
 
-  int i,j;
-  for(i=nrows(A);i>=1;i--)
+  while(A/var(1)^(d+1)*var(1)^(d+1)==A)
   {
-    for(j=ncols(A);j>=1;j--)
-    {
-      if(d==-1||(deg(A[i,j])<d&&deg(A[i,j])>-1))
-      {
-        d=deg(A[i,j]);
-      }
-    }
+    d++;
   }
 
   return(d);
@@ -48,18 +41,12 @@ static proc mindegree(matrix A)
 
 static proc maxdegree(matrix A)
 {
-  int d=-1;
+  int d=0;
+  matrix N[nrows(A)][ncols(A)];
 
-  int i,j;
-  for(i=nrows(A);i>=1;i--)
+  while(A/var(1)^(d+1)!=N)
   {
-    for(j=ncols(A);j>=1;j--)
-    {
-      if(deg(A[i,j])>d)
-      {
-        d=deg(A[i,j]);
-      }
-    }
+    d++;
   }
 
   return(d);
