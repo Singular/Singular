@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_berlekamp.cc,v 1.4 1997-06-19 12:23:47 schmidt Exp $ */
+/* $Id: fac_berlekamp.cc,v 1.5 1997-09-09 07:11:05 schmidt Exp $ */
 
 #include <config.h>
 
@@ -15,7 +15,6 @@
 #include "cf_iter.h"
 #include "cf_generator.h"
 #include "fac_sqrfree.h"
-#include "cf_util.h"
 
 #ifdef DEBUGOUTPUT
 void QprintFF( int ** Q, int n )
