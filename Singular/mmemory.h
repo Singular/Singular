@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmemory.h,v 1.28 1999-10-25 08:32:16 obachman Exp $ */
+/* $Id: mmemory.h,v 1.29 1999-10-25 16:07:35 obachman Exp $ */
 /*
 * ABSTRACT
 */
@@ -154,12 +154,20 @@ BOOLEAN mmDBTestBlock(const void* adr, const size_t size,
                       const char * fname, const int lineno );
 BOOLEAN mmDBTest(const void* adr, const char * fname, const int lineno);
 
+#if MDEBUG >= 0
 #define mmTestHeap(a, h)\
   mmDBTestHeapBlock(a, h, __FILE__, __LINE__)
 #define mmTest(A,B)     mmDBTestBlock(A,B,__FILE__,__LINE__)
 #define mmTestL(A)      mmDBTest(A,__FILE__,__LINE__)
 #define mmTestP(A,B)    mmDBTestBlock(A,B,__FILE__,__LINE__)
 #define mmTestLP(A)     mmDBTest(A,__FILE__,__LINE__)
+#else /* MDEBUG < 0 */
+#define mmTestHeap(addr, heap) mmCheckHeapAddr(addr, heap)
+#define mmTest(A,B) TRUE
+#define mmTestL(A)  TRUE
+#define mmTestP(A,B) TRUE
+#define mmTestLP(A)  TRUE
+#endif /* MDEBUG >= 0 */
 
 int mmTestMemory();
 int mmTestHeaps();
@@ -180,10 +188,10 @@ void mmTestList(FILE *fd, int all);
 #define mmTestHeap(addr, heap) mmCheckHeapAddr(addr, heap)
 #define mmTest(A,B) TRUE
 #define mmTestL(A)  TRUE
-#define mmTestP(A,B)
-#define mmTestLP(A)
-#define mmTestMemory 1
-#define mmTestHeaps 1
+#define mmTestP(A,B) TRUE
+#define mmTestLP(A)  TRUE
+#define mmTestMemory() TRUE
+#define mmTestHeaps()  TRUE
 #define mmMarkInitDBMCB()
 #define mmTestList(a) 
 
@@ -210,7 +218,7 @@ extern void mmUnGetTempHeap(memHeap *heap_p);
 extern void mmUnGetTempHeap(memHeap *heap);
 #endif /* HEAP_DEBUG */
 
-// #define HAVE_AUTOMATIC_GC
+// #define HAVE_AUTOMATIC_GC 
 #ifndef HAVE_AUTOMATIC_GC
 /* removes chunks in freelist which fill one page */
 /* if strict & 1, does it even if free ptr  has not changed w.r.t. last gc */
@@ -340,7 +348,9 @@ struct sip_memHeapPage
 struct sip_memHeap
 {
   memHeapPage current_page;   /* page of current freelist */
-  long size;                  /* size of blocks */
+  memHeapPage last_page;      /* pointer to last page of freelist */
+  int size;                   /* size of blocks */
+  int max_blocks;             /* max(SIZE_OF_HEAP_PAGE / size, 1) */
 };
 
 extern memHeapPage  mmGetNewCurrentPage(memHeap heap);
