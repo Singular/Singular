@@ -159,7 +159,15 @@ static inline int pQuality(poly p, calc_dat* c, int l=-1){
   if((pLexOrder) &&(!c->is_homog)) return pELength(p,c,l);
   return l;
 }
-
+static inline int pTotaldegree_full(poly p){
+  int r=0;
+  while(p){
+    int d=pTotaldegree(p);
+    r=max(r,d);
+    pIter(p);
+  }
+  return r;
+}
 
 int red_object::guess_quality(calc_dat* c){
     //works at the moment only for lenvar 1, because in different
@@ -1013,6 +1021,11 @@ static sorted_pair_node** add_to_basis(poly h, int i_pos, int j_pos,calc_dat* c,
   int spc=0;
   c->T_deg=(int*) omrealloc(c->T_deg,c->n*sizeof(int));
   c->T_deg[i]=pTotaldegree(h);
+  if(c->T_deg_full){
+    c->T_deg_full=(int*) omrealloc(c->T_deg_full,c->n*sizeof(int));
+    c->T_deg_full[i]=pTotaldegree_full(h);
+  }
+  
   c->tmp_pair_lm=(poly*) omrealloc(c->tmp_pair_lm,c->n*sizeof(poly));
   c->tmp_pair_lm[i]=pOne_Special(c->r);
   c->tmp_spn=(sorted_pair_node**) omrealloc(c->tmp_spn,c->n*sizeof(sorted_pair_node*));
@@ -1118,6 +1131,12 @@ static sorted_pair_node** add_to_basis(poly h, int i_pos, int j_pos,calc_dat* c,
         pLcm(c->S->m[i], c->S->m[j], lm);
         pSetm(lm);
 	s->deg=pTotaldegree(lm);
+	if(c->T_deg_full)
+	{
+	  int t_i=c->T_deg_full[s->i]-c->T_deg[s->i];
+	  int t_j=c->T_deg_full[s->j]-c->T_deg[s->j];
+	  s->deg+=max(t_i,t_j);
+	}
         s->lcm_of_lm=lm;
 //          pDelete(&short_s);
         //assume(lm!=NULL);
@@ -1200,6 +1219,10 @@ static sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_p
   int spc=0;
   c->T_deg=(int*) omrealloc(c->T_deg,c->n*sizeof(int));
   c->T_deg[i]=pTotaldegree(h);
+  if(c->T_deg_full){
+    c->T_deg_full=(int*) omrealloc(c->T_deg_full,c->n*sizeof(int));
+    c->T_deg_full[i]=pTotaldegree_full(h);
+  }
   c->tmp_pair_lm=(poly*) omrealloc(c->tmp_pair_lm,c->n*sizeof(poly));
   c->tmp_pair_lm[i]=pOne_Special(c->r);
   c->tmp_spn=(sorted_pair_node**) omrealloc(c->tmp_spn,c->n*sizeof(sorted_pair_node*));
@@ -1283,6 +1306,13 @@ static sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_p
     pLcm(c->S->m[i], c->S->m[j], lm);
     pSetm(lm);
     s->deg=pTotaldegree(lm);
+    if(c->T_deg_full)
+    {
+      int t_i=c->T_deg_full[s->i]-c->T_deg[s->i];
+      int t_j=c->T_deg_full[s->j]-c->T_deg[s->j];
+      s->deg+=max(t_i,t_j);
+      //Print("\n max: %d\n",max(t_i,t_j));
+    }
     s->lcm_of_lm=lm;
     //          pDelete(&short_s);
     //assume(lm!=NULL);
@@ -3906,6 +3936,10 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
   i=0;
   c->n=0;
   c->T_deg=(int*) omalloc(n*sizeof(int));
+  if((!(c->is_homog)) &&(pLexOrder))
+    c->T_deg_full=(int*) omalloc(n*sizeof(int));
+  else
+    c->T_deg_full=NULL;
   c->tmp_pair_lm=(poly*) omalloc(n*sizeof(poly));
   c->tmp_spn=(sorted_pair_node**) omalloc(n*sizeof(sorted_pair_node*));
   lm_bin=omGetSpecBin(POLYSIZE + (r->ExpL_Size)*sizeof(long));
@@ -4027,16 +4061,18 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
   omfree(c->tmp_spn);
   omfree(c->short_Exps);
   omfree(c->T_deg);
+  if(c->T_deg_full)
+    omfree(c->T_deg_full);
 
-     omFree(c->strat->ecartS);
-     omFree(c->strat->sevS);
+  omFree(c->strat->ecartS);
+  omFree(c->strat->sevS);
 //   initsevS(i);
-   omFree(c->strat->S_2_R);
+  omFree(c->strat->S_2_R);
    
 
   omFree(c->strat->lenS);
 
-   if(c->strat->lenSw)  omFree(c->strat->lenSw);
+  if(c->strat->lenSw)  omFree(c->strat->lenSw);
 
 
 
@@ -4111,7 +4147,7 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
   
   IDELEMS(I)=c->n;
 
-  idSkipZeroes(c->S);
+  idSkipZeroes(I);
   for(i=0;i<=c->strat->sl;i++)
     c->strat->S[i]=NULL;
   id_Delete(&c->strat->Shdl,c->r);

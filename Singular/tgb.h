@@ -184,6 +184,7 @@ struct calc_dat
   long* short_Exps;
   kStrategy strat;
   int* T_deg;
+  int* T_deg_full;
   poly tmp_lm;
   poly* tmp_pair_lm;
   sorted_pair_node** tmp_spn;
