@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.27 1999-07-14 13:16:06 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.28 1999-09-27 12:52:49 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -29,6 +29,8 @@
 #include "spSpolyLoop.h"
 
 // #include "timer.h"
+
+#define HAVE_HOMOG_T
 
 /*2
 * consider the part above syzComp:
@@ -84,12 +86,28 @@ static void redSyz (LObject* h,kStrategy strat)
     PrintS("red:");
     wrp(h->p);
   }
+  i = 0;
+  j = 0;
   loop
   {
+#ifdef HAVE_HOMOG_T
+    if (pDivisibleBy(strat->T[i].p,(*h).p))
+    {
+      if ((!exchanged) && (pEqual((*h).p,strat->T[j].p)))
+      {
+        j = 0;
+        while (j<= strat->sl)
+        {
+          if (strat->S[j] == strat->T[i].p) break;
+          j++;
+        }
+        if (j > strat->sl) goto NOTFOUND;
+#else
     if (pDivisibleBy(strat->S[j],(*h).p))
     {
       if ((!exchanged) && (pEqual((*h).p,strat->S[j])))
       {
+#endif
         q = kFromInput(strat->S[j],strat);
         if (q!=NULL)
         {
@@ -104,12 +122,15 @@ static void redSyz (LObject* h,kStrategy strat)
           }
           strat->S[j] = (*h).p;
           (*h).p = p;
+#ifndef HAVE_HOMOG_T
           while ((i<=strat->tl) && (strat->T[i].p!=p)) i++;
+#endif
           if (i<=strat->tl) strat->T[i].p = strat->S[j];
-          for (i=0;i<=strat->Ll;i++)
+          int k;
+          for (k=0;k<=strat->Ll;k++)
           {
-            if (strat->L[i].p1==p) strat->L[i].p1=strat->S[j];
-            if (strat->L[i].p2==p) strat->L[i].p2=strat->S[j];
+            if (strat->L[k].p1==p) strat->L[k].p1=strat->S[j];
+            if (strat->L[k].p2==p) strat->L[k].p2=strat->S[j];
           }
         }
       }
@@ -120,8 +141,13 @@ static void redSyz (LObject* h,kStrategy strat)
         PrintS(" with ");
         wrp(strat->S[j]);
       }
+#ifdef HAVE_HOMOG_T
+      (*h).p = spSpolyRed(strat->T[i].p,(*h).p,strat->kNoether,
+                          strat->spSpolyLoop);
+#else
       (*h).p = spSpolyRed(strat->S[j],(*h).p,strat->kNoether,
                           strat->spSpolyLoop);
+#endif
       if (TEST_OPT_DEBUG)
       {
         PrintS("\nto "); wrp((*h).p);PrintLn();
@@ -135,11 +161,20 @@ static void redSyz (LObject* h,kStrategy strat)
         return;
       }
 /*- try to reduce the s-polynomial -*/
+#ifdef HAVE_HOMOG_T
+      i = 0;
+#else
       j = 0;
+#endif
     }
     else
     {
+#ifdef HAVE_HOMOG_T
+NOTFOUND:
+      if (i >= strat->tl)
+#else
       if (j >= strat->sl)
+#endif
       {
         if (exchanged)
         {
@@ -172,7 +207,11 @@ static void redSyz (LObject* h,kStrategy strat)
         enterTBba((*h),strat->tl+1,strat);
         return;
       }
+#ifdef HAVE_HOMOG_T
+      i++;
+#else
       j++;
+#endif
     }
   }
 }
@@ -181,6 +220,8 @@ static void redSyz (LObject* h,kStrategy strat)
 *  reduction procedure for the homogeneous case
 *  and the case of a degree-ordering
 */
+
+// #define HAVE_HOMOG_T
 
 static void redHomog (LObject* h,kStrategy strat)
 {
@@ -196,7 +237,11 @@ static void redHomog (LObject* h,kStrategy strat)
   {
     loop
       {
+#ifdef HAVE_HOMOG_T
+        if (pDivisibleBy1(strat->T[j].p,(*h).p))
+#else
         if (pDivisibleBy1(strat->S[j],(*h).p))
+#endif
         {
           //if (strat->interpt) test_int_std(strat->kIdeal);
           /*- compute the s-polynomial -*/
@@ -205,10 +250,19 @@ static void redHomog (LObject* h,kStrategy strat)
             PrintS("red:");
             wrp(h->p);
             PrintS(" with ");
+#ifdef HAVE_HOMOG_T
+            wrp(strat->T[j].p);
+#else
             wrp(strat->S[j]);
+#endif
           }
+#ifdef HAVE_HOMOG_T
+          (*h).p = spSpolyRed(strat->T[j].p,(*h).p,strat->kNoether,
+                              strat->spSpolyLoop);
+#else
           (*h).p = spSpolyRed(strat->S[j],(*h).p,strat->kNoether,
                               strat->spSpolyLoop);
+#endif
           if (TEST_OPT_DEBUG)
           {
             PrintS("\nto ");
@@ -227,9 +281,19 @@ static void redHomog (LObject* h,kStrategy strat)
         }
         else
         {
+#ifdef HAVE_HOMOG_T
+          if (j >= strat->tl)
+#else
           if (j >= strat->sl)
+#endif            
           {
-            enterTBba((*h),strat->tl+1,strat);
+            if (TEST_OPT_INTSTRATEGY && strat->homog)
+            {
+              pCleardenom(h->p);
+              enterTBba((*h), strat->posInT(strat->T,strat->tl,(*h)), strat);
+            }
+            else
+              enterTBba((*h),strat->tl+1,strat);
             return;
           }
           j++;
@@ -241,7 +305,11 @@ static void redHomog (LObject* h,kStrategy strat)
     // no module component
     loop
       {
+#ifdef HAVE_HOMOG_T
+        if (pDivisibleBy2(strat->T[j].p,(*h).p))
+#else
         if (pDivisibleBy2(strat->S[j],(*h).p))
+#endif
         {
           //if (strat->interpt) test_int_std(strat->kIdeal);
           /*- compute the s-polynomial -*/
@@ -250,10 +318,19 @@ static void redHomog (LObject* h,kStrategy strat)
             PrintS("red:");
             wrp(h->p);
             PrintS(" with ");
+#ifdef HAVE_HOMOG_T
+            wrp(strat->T[j].p);
+#else
             wrp(strat->S[j]);
+#endif
           }
+#ifdef HAVE_HOMOG_T
+          (*h).p = spSpolyRed(strat->T[j].p,(*h).p,strat->kNoether,
+                              strat->spSpolyLoop);
+#else
           (*h).p = spSpolyRed(strat->S[j],(*h).p,strat->kNoether,
                               strat->spSpolyLoop);
+#endif
           if (TEST_OPT_DEBUG)
           {
             PrintS("\nto ");
@@ -272,9 +349,19 @@ static void redHomog (LObject* h,kStrategy strat)
         }
         else
         {
+#ifdef HAVE_HOMOG_T
+          if (j >= strat->tl)
+#else
           if (j >= strat->sl)
+#endif            
           {
-            enterTBba((*h),strat->tl+1,strat);
+            if (TEST_OPT_INTSTRATEGY && strat->homog)
+            {
+              pCleardenom(h->p);
+              enterTBba((*h), strat->posInT(strat->T,strat->tl,(*h)), strat);
+            }
+            else
+              enterTBba((*h),strat->tl+1,strat);
             return;
           }
           j++;
@@ -283,6 +370,7 @@ static void redHomog (LObject* h,kStrategy strat)
   }
 }
 
+#ifdef KEEP_GARBAGE
 /*2
 *  reduction procedure for the homogeneous case
 *  and the case of a degree-ordering
@@ -385,7 +473,11 @@ static void redHomog0 (LObject* h,kStrategy strat)
         }
         else
         {
+#ifdef HAVE_HOMOG_T
           if (j >= strat->tl)
+#else
+          if (j >= strat->sl)
+#endif            
           {
             //pContent((*h).p);
             pCleardenom((*h).p);// also does a pContent
@@ -457,7 +549,11 @@ static void redLazy (LObject* h,kStrategy strat)
         at = posInL11(strat->L,strat->Ll,*h,strat);
         if (at <= strat->Ll)
         {
+#ifdef HAVE_HOMOG_T
+          i=strat->tl+1;
+#else
           i=strat->sl+1;
+#endif
           do
           {
             i--;
@@ -467,7 +563,11 @@ static void redLazy (LObject* h,kStrategy strat)
               return;
             }
           }
-          while (!pDivisibleBy1(strat->S[i],(*h).p));
+#ifdef HAVE_HOMOG_T
+          } while (!pDivisibleBy1(strat->T[i],(*h).p));
+#else
+          } while (!pDivisibleBy1(strat->S[i],(*h).p));
+#endif        
           if (TEST_OPT_DEBUG) Print(" ->L[%d]\n",at);
           enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
           (*h).p = NULL;
@@ -497,6 +597,8 @@ static void redLazy (LObject* h,kStrategy strat)
     }
   }
 }
+
+#endif // KEEP_GARBAGE
 
 /*2
 *  reduction procedure for the sugar-strategy (honey)
@@ -637,7 +739,11 @@ static void redHoney (LObject*  h,kStrategy strat)
         if (at <= strat->Ll)
         {
           /*test if h is already standardbasis element*/
+#ifdef HAVE_HOMOG_T
+          i=strat->tl+1;
+#else
           i=strat->sl+1;
+#endif
           do
           {
             i--;
@@ -647,7 +753,12 @@ static void redHoney (LObject*  h,kStrategy strat)
               enterTBba((*h),at,strat);
               return;
             }
+#ifdef HAVE_HOMOG_T
+          } while (!pDivisibleBy1(strat->T[i].p,(*h).p));
+#else
           } while (!pDivisibleBy1(strat->S[i],(*h).p));
+#endif        
+
           enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
           if (TEST_OPT_DEBUG)
             Print(" degree jumped: -> L%d\n",at);
@@ -899,10 +1010,12 @@ void initBba(ideal F,kStrategy strat)
     strat->red = redBest;
   else if (strat->honey)
     strat->red = redHoney;
+#ifdef KEEP_GARBAGE
   else if (pLexOrder && !strat->homog)
     strat->red = redLazy;
   else if (TEST_OPT_INTSTRATEGY && strat->homog)
     strat->red = redHomog0;
+#endif
   else
     strat->red = redHomog;
   if (TEST_OPT_MINRES && strat->homog && (strat->syzComp >0))
