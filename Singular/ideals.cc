@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.79 1999-11-25 13:12:24 siebert Exp $ */
+/* $Id: ideals.cc,v 1.80 1999-12-16 13:35:20 pohl Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -2309,14 +2309,14 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
 /*2
 * compute all ar-minors of the matrix a
 */
-ideal idMinors(matrix a, int ar)
+ideal idMinors(matrix a, int ar, ideal R)
 {
   int     i,j,k,size;
   int *rowchoise,*colchoise;
   BOOLEAN rowch,colch;
   ideal result;
   matrix tmp;
-  poly p;
+  poly p,q;
 
   i = binom(a->rows(),ar);
   j = binom(a->cols(),ar);
@@ -2344,13 +2344,22 @@ ideal idMinors(matrix a, int ar)
       p = mpDetBareiss(tmp);
       if (p!=NULL)
       {
-        if (k>=size)
+        if (R!=NULL)
         {
-          pEnlargeSet(&result->m,size,32);
-          size += 32;
+          q = p;
+          p = kNF(R,currQuotient,q);
+          pDelete(&q);
         }
-        result->m[k] = p;
-        k++;
+        if (p!=NULL)
+        { 
+          if (k>=size)
+          {
+            pEnlargeSet(&result->m,size,32);
+            size += 32;
+          }
+          result->m[k] = p;
+          k++;
+        }
       }
       idGetNextChoise(ar,a->cols(),&colch,colchoise);
     }
@@ -2377,8 +2386,9 @@ ideal idMinors(matrix a, int ar)
 /*2
 * compute all ar-minors of the matrix a
 * the caller of mpRecMin
+* the elements of the result are not in R (if R!=NULL)
 */
-ideal idMinors(matrix a, int ar)
+ideal idMinors(matrix a, int ar, ideal R)
 {
   ideal result;
   int elems=0;
@@ -2390,8 +2400,8 @@ ideal idMinors(matrix a, int ar)
   }
   a = mpCopy(a);
   result=idInit(32,1);
-  if(ar>1) mpRecMin(ar-1,result,elems,a,a->nrows,a->ncols,NULL);
-  else mpMinorToResult(result,elems,a,a->nrows,a->ncols);
+  if(ar>1) mpRecMin(ar-1,result,elems,a,a->nrows,a->ncols,NULL,R);
+  else mpMinorToResult(result,elems,a,a->nrows,a->ncols,R);
   idDelete((ideal *)&a);
   idSkipZeroes(result);
   idTest(result);

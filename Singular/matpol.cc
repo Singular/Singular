@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.cc,v 1.29 1999-11-15 17:20:22 obachman Exp $ */
+/* $Id: matpol.cc,v 1.30 1999-12-16 13:35:19 pohl Exp $ */
 
 /*
 * ABSTRACT:
@@ -15,6 +15,8 @@
 #include "structs.h"
 #include "tok.h"
 #include "lists.h"
+#include "ipid.h"
+#include "kstd1.h"
 #include "polys.h"
 #include "mmemory.h"
 #include "febase.h"
@@ -348,14 +350,26 @@ class mp_permmatrix
 };
 
 /*2
-* entries of a are minors and go to result
+* entries of a are minors and go to result (only if not in R) 
 */
-void mpMinorToResult(ideal result, int &elems, matrix a, int r, int c)
+void mpMinorToResult(ideal result, int &elems, matrix a, int r, int c,
+                     ideal &R)
 {
   poly *q1;
   int e=IDELEMS(result);
   int i,j;
 
+  if (R != NULL)
+  {
+    for (i=r-1;i>=0;i--)
+    {
+      q1 = &(a->m)[i*a->ncols];
+      for (j=c-1;j>=0;j--)
+      {
+        if (q1[j]!=NULL) q1[j] = kNF(R,currQuotient,q1[j]);
+      }
+    }
+  }
   for (i=r-1;i>=0;i--)
   {
     q1 = &(a->m)[i*a->ncols];
@@ -388,7 +402,8 @@ void mpMinorToResult(ideal result, int &elems, matrix a, int r, int c)
 /*2
 * produces recursively the ideal of all arxar-minors of a
 */
-void mpRecMin(int ar,ideal result,int &elems,matrix a,int lr,int lc,poly barDiv)
+void mpRecMin(int ar,ideal result,int &elems,matrix a,int lr,int lc,
+              poly barDiv, ideal &R)
 {
   int k;
   int kr=lr-1,kc=lc-1;
@@ -407,10 +422,10 @@ void mpRecMin(int ar,ideal result,int &elems,matrix a,int lr,int lc,poly barDiv)
       k--;
       if (ar>1)
       {
-        mpRecMin(ar-1,result,elems,nextLevel,kr,k,a->m[kr*a->ncols+k]);
+        mpRecMin(ar-1,result,elems,nextLevel,kr,k,a->m[kr*a->ncols+k],R);
         mpPartClean(nextLevel,kr,k);
       }
-      else mpMinorToResult(result,elems,nextLevel,kr,k);
+      else mpMinorToResult(result,elems,nextLevel,kr,k,R);
       if (ar>k-1) break;
     }
     if (ar>=kr) break;

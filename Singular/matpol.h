@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.h,v 1.10 1999-11-15 17:20:22 obachman Exp $ */
+/* $Id: matpol.h,v 1.11 1999-12-16 13:35:19 pohl Exp $ */
 /*
 * ABSTRACT
 */
@@ -73,7 +73,7 @@ the second row of co contains the respective factors in f.
 Thus f = sum co[1,i]*co[2,i], i = 1..cols, rows equals 2. */
 void mpCoef2(poly v, poly vars, matrix *c, matrix *m);
 /* for minors with Bareiss */
-void mpRecMin(int, ideal, int &, matrix, int, int, poly);
-void mpMinorToResult(ideal, int &, matrix, int, int);
+void mpRecMin(int, ideal, int &, matrix, int, int, poly, ideal&);
+void mpMinorToResult(ideal, int &, matrix, int, int, ideal&);
 
 #endif
