@@ -462,8 +462,8 @@ void sleftv::Copy(leftv source)
       data= (void *)idCopy((ideal)d);
       break;
     case STRING_CMD:
-      data= (void *)mstrdup((char *)d);
-      break;
+    //  data= (void *)mstrdup((char *)d);
+    //  break;
     case PROC_CMD:
       data= (void *)mstrdup((char *)d);
       break;
@@ -484,14 +484,21 @@ void sleftv::Copy(leftv source)
       data= (void *)lCopy((lists)d);
       break;
     case LINK_CMD:
-      data = (void *)slCopy((si_link) d);
+      data = (void *)slCopy((si_link)d);
       break;
     case RING_CMD:
     case QRING_CMD:
       {
-        ring r=(ring)d;
-        r->ref++;
-        data=d;
+        if (d!=NULL)
+        {
+          ring r=(ring)d;
+          r->ref++;
+          data=d;
+        }  
+        else
+        {
+          WerrorS("invalid ring description");
+        }  
         break;
       }
 #ifdef TEST

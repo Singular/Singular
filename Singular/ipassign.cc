@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.17 1997-08-14 13:10:43 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.18 1997-10-13 15:39:02 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -417,6 +417,8 @@ static BOOLEAN jiA_MAP_ID(leftv res, leftv a, Subexpr e)
 }
 static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
 {
+  // the follwing can only happen, if:
+  //   - the left side is of type qring AND not an id
   if ((e!=NULL)||(res->rtyp!=IDHDL))
   {
     WerrorS("qring_id expected");
@@ -734,6 +736,45 @@ static BOOLEAN jiA_INTVEC_L(leftv l,leftv r)
     i++;
     l=h;
   }
+  l1->CleanUp();
+  r->CleanUp();
+  return FALSE;
+}
+static BOOLEAN jiA_VECTOR_L(leftv l,leftv r)
+{
+  /* right side is vector, left side is list (of poly)*/
+  BOOLEAN nok;
+  leftv l1=l;
+  ideal I=idVec2Ideal((poly)r->Data());
+  leftv h;
+  sleftv t;
+  int i=0;
+  while (l!=NULL)
+  {
+    memset(&t,0,sizeof(sleftv));
+    t.rtyp=POLY_CMD;
+    if (i>=IDELEMS(I))
+    {
+      t.data=NULL;
+    }
+    else
+    {
+      t.data=(char *)I->m[i];
+      I->m[i]=NULL;
+    }
+    h=l->next;
+    l->next=NULL;
+    nok=jiAssign_1(l,&t);
+    t.CleanUp();
+    if (nok)
+    {
+      idDelete(&I);
+      return TRUE;
+    }
+    i++;
+    l=h;
+  }
+  idDelete(&I);
   l1->CleanUp();
   r->CleanUp();
   return FALSE;
@@ -1217,6 +1258,8 @@ BOOLEAN iiAssign(leftv l, leftv r)
     if (rt==NONE) rt=r->Typ();
     if (rt==INTVEC_CMD)
       return jiA_INTVEC_L(l,r);
+    else if (rt==VECTOR_CMD)
+      return jiA_VECTOR_L(l,r);
     else if ((rt==IDEAL_CMD)||(rt==MATRIX_CMD))
       return jiA_MATRIX_L(l,r);
     else if ((rt==STRING_CMD)&&(rl==1))
