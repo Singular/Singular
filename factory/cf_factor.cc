@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_factor.cc,v 1.20 2003-08-28 11:54:32 Singular Exp $ */
+/* $Id: cf_factor.cc,v 1.21 2003-08-28 14:13:12 Singular Exp $ */
 
 //{{{ docu
 //
@@ -165,19 +165,6 @@ static bool isPurePoly(const CanonicalForm & f)
   for (CFIterator i=f;i.hasTerms();i++)
   {
     if (!(i.coeff().inBaseDomain())) return false;
-  }
-  return true;
-}
-
-static bool isPurePoly(const CanonicalForm & f, const Variable alpha)
-{
-  if (f.level()<=0) return (f.mvar() == alpha);
-  for (CFIterator i=f;i.hasTerms();i++)
-  {
-    if (!(i.coeff().inBaseDomain()))
-    {
-      if (f.mvar() != alpha) return false;
-    }
   }
   return true;
 }
@@ -371,8 +358,7 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
   ASSERT( f.isUnivariate(), "multivariate factorization not implemented" );
   ASSERT( getCharacteristic() > 0, "char 0 factorization not implemented" );
   #ifdef HAVE_NTL
-  //if  (isOn(SW_USE_NTL))
-  if (isOn(SW_USE_NTL) /*&& (isPurePoly(f,alpha))*/)
+  if  (isOn(SW_USE_NTL))
   {
     //USE NTL
     if (getCharacteristic()!=2)
