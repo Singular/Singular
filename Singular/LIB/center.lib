@@ -1,23 +1,21 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: center.lib,v 1.12 2004-12-15 19:02:33 plural Exp $";
+version="$Id: center.lib,v 1.13 2005-02-23 18:10:44 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY:  center.lib      computation of central elements of G-algebras and Q-algebras.
 AUTHOR:  Oleksandr Motsak,        motsak@mathematik.uni-kl.de.
 OVERVIEW:
- This is a library for computing the central elements and centralisators of elements in various noncommutative algebras. 
- Implementation is mainly based on algorithms, written in the frame of the diploma thesis by Oleksandr Motsak (advisor: Prof. S.A. Ovsienko, using the definitions from diploma thesis by V.Levandovskyy), at Kyiv Taras Shevchenko University:  'An algorithm for the computation of the center of noncommutative polynomial algebra'.
- @* The last version of this library can be found via internet at author's home page.
+ This is a library for computing the central elements and centralizers of elements in various noncommutative algebras. 
+ Implementation is based on algorithms, written in the frame of the diploma thesis by O. Motsak (advisor: Prof. S.A. Ovsienko, support: V. Levandovskyy), at Kyiv Taras Shevchenko University (Ukraine) with the title 'An algorithm for the computation of the center of noncommutative polynomial algebra'.
 
 SUPPORT: Forschungsschwerpunkt 'Mathematik und Praxis'
 
 PROCEDURES:
-	center(MaxDeg[,N]);             returns the center of basering,
-	centralizer(f, MaxDeg[,N]);     returns the centralizer of f in basering,
+	center(MaxDeg[,N]);             computes the generators of the center of a basering,
+	centralizer(f, MaxDeg[,N]);     computes the generators of the centralizer of f in a basering,
 	inCenter(l);                    checks the centrality of elements of list/ideal/poly l
-	inCentralizer(l, f);            checks the commutativity wrt polynomialf of polynomials of list/ideal/poly l
+	inCentralizer(l, f);            checks the commutativity wrt polynomial f of polynomials of list/ideal/poly l
 
-SEE ALSO:  ncalg_lib, nctools_lib
 KEYWORDS:  inCenter; inCentralizer; center; centralizer
 ";
 
@@ -155,7 +153,7 @@ static proc maxDeg( def z )
 };
 
 /******************************************************/
-// some bisiness for my_var
+// some business for my_var
 
 /******************************************************/
 static proc myCoeff ( poly f, poly m )
@@ -812,7 +810,7 @@ static proc zRefine ( list @z )
 /******************************************************/
 static proc checkPolyUniq( list l, poly p )
   "
-	check wheather p sits already in l, assume l to be size-sorted <
+	check whether p sits already in l, assume l to be size-sorted <
 	return: -1 if present
 		 1 if we need to add
 "
@@ -1091,7 +1089,7 @@ static proc mergeRecordsUniq ( list old, list new, int kind )
 /******************************************************/
 static proc init_bads(int @deg)
 "
-    initialistion of an empty 'badleads' list
+    initialization of an empty 'badleads' list
 "
 {
   list @l = list();
@@ -1118,7 +1116,7 @@ static proc zAddBad ( list @leads, list @newz, int @maxDeg, int kind )
 					rec:
 					{ 
 						[1] - leadexp. 
-						[2] - loeadmonom([1])
+						[2] - leadmonom([1])
 					if kind != 0 (for zReduce) =>
 						[3] - !list! of all possible products which give this leadexp
 					}, 
@@ -1597,7 +1595,7 @@ static proc PBW_base( int MaxDeg, poly p )
 static proc FSS (list @given, poly @BASE_POLY) 
 "
     Gauss with computation of kernel v.s basis
-    to be optimizes
+    to be optimized
 "
 {
   BCall( "FSS", "list", "basepoly: ", @BASE_POLY);
@@ -2253,7 +2251,7 @@ static proc inCentralizer_list( def l, poly f )
 
 	
   list @z = list (); 					// center list
-  list @l = init_bads( MaxDeg ); 	// verbotten loeadexps...
+  list @l = init_bads( MaxDeg ); 	// verbotten leadexps...
 	
   @q = PBW[ index(0) ];
 
@@ -2319,7 +2317,7 @@ static proc inCentralizer_list( def l, poly f )
 /******************************************************/
 static proc center_vectorspace( int MaxDeg )
   "
-	pure calculation of center as a finitely dimmensional Vector Space (deg <= MaxDeg )
+	pure calculation of center as a finitely dimensional Vector Space (deg <= MaxDeg )
 "
 {
   my_var_init();
@@ -2471,7 +2469,7 @@ static proc centralizer_vectorspace( poly p, int MaxDeg )
 /******************************************************/
 proc inCenter( def a )
   "USAGE:   inCenter(a); a poly/list/ideal
-RETURN:  integer (1 if a in center, 0 otherwise)
+RETURN:  integer (1 if a in the center, 0 otherwise)
 EXAMPLE: example inCenter; shows examples"
 {
   QNF_init();
@@ -2516,8 +2514,8 @@ example
 
 /******************************************************************************/ 
 proc inCentralizer( def a, poly f )
-  "USAGE:   inCentralizer(a, f); a poly/list/ideal, f poly
-RETURN:  integer (1 if a in centralizer(f), 0 otherwise)
+"USAGE:   inCentralizer(a, f); a poly/list/ideal, f poly
+RETURN:  integer (1 if a in the centralizer(f), 0 otherwise)
 EXAMPLE: example inCentralizer; shows examples"
 {
   QNF_init();
@@ -2546,9 +2544,7 @@ example
   ring r=0,(x,y,z),dp;
   matrix D[3][3]=0;
   D[1,2]=-z;
-  D[1,3]=0;
-  D[2,3]=0;
-  ncalgebra(1,D); // this is U(sl_2)
+  ncalgebra(1,D); // the Heisenberg algebra
   poly f = x^2;
   poly a = z; // lies in center
   poly b = y^2;
@@ -2560,11 +2556,9 @@ example
   inCentralizer(I, f);
 };
 
-
-
 /******************************************************/
 proc center(int MaxDeg, list # )
-  "USAGE:      center(MaxDeg[, N]); int MaxDeg, int N
+"USAGE:      center(MaxDeg[, N]); int MaxDeg, int N
 RETURN:     ideal generated by found elements
 NOTE:       computes the 'minimal' set of central elements.
             Since in general algorithms knows nothing about the number and degrees of
@@ -2572,9 +2566,9 @@ NOTE:       computes the 'minimal' set of central elements.
             1. MaxDeg - maximal degree of desired elements or/and
             2. n - the minimal number of desired elements to find.
 SEE ALSO:   centralizer; inCenter
-EXAMPLE:    example center; shows an example"
+EXAMPLE:    example center; shows an example
+"
 {
-
   if ( myInt(#) > 0 ) // given a number of central elements to compute
     {
       return ( center_min_iterative( MaxDeg, # ) );
@@ -2609,7 +2603,7 @@ example
 
 /******************************************************/
 proc centralizer( poly p, int MaxDeg, list # )
-  "USAGE:      centralizer(F, MaxDeg[, N]); poly F, int MaxDeg, int N
+"USAGE:      centralizer(F, MaxDeg[, N]); poly F, int MaxDeg, int N
 RETURN:     ideal generated by found elements
 NOTE:       computes the 'minimal' set of elements of centralizer(F).
             Since in general algorithms knows nothing about the number and degrees of

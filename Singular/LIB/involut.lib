@@ -1,32 +1,31 @@
-version="$Id: involut.lib,v 1.1 2004-12-22 21:15:20 levandov Exp $";
+version="$Id: involut.lib,v 1.2 2005-02-23 18:10:45 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY:  involution.lib  Procedures for Computations and Operations with Involutions 
-AUTHORS:  Oleksandr Iena       yena@mathematik.uni-kl.de
-@*        Markus Becker        mbecker@mathematik.uni-kl.de
-@*        Viktor Levandovskyy  levandov@mathematik.uni-kl.de
+AUTHORS:  Oleksandr Iena,       yena@mathematik.uni-kl.de,
+@*        Markus Becker,        mbecker@mathematik.uni-kl.de,
+@*        Viktor Levandovskyy,  levandov@mathematik.uni-kl.de
 
 SUPPORT: Forschungsschwerpunkt 'Mathematik und Praxis' (Project of Dr. E. Zerz
 and V. Levandovskyy), Uni Kaiserslautern
 
 NOTE: This library provides algebraic tools for computations and operations
-with algebraic involutions
+with algebraic involutions and linear automorphisms of noncommutative algebras
 
 PROCEDURES:
-find_invo();          describes a variety of involutions on a basering;
+find_invo();          describes a variety of linear involutions on a basering;
 find_invo_diag();     describes a variety of homothetic (diagonal) involutions on a basering;
-find_auto();          describes a variety of automorphisms of a basering;
+find_auto();          describes a variety of linear automorphisms of a basering;
 ncdetection(ring r);  computes an ideal, presenting an involution map on some classical noncommutative algebras;
-involution(m, map theta);  applies the involution, presented by theta to m of type poly, vector, ideal, module, matrix;
-
+involution(m, map theta);  applies the involution, presented by theta, to the object m =
 ";
 
 LIB "ncalg.lib";
 LIB "poly.lib";
 LIB "primdec.lib";
-
+///////////////////////////////////////////////////////////////////////////////
 proc ncdetection(def r)
-"USAGE:  ncdetection(r); r a ring
+"USAGE:  ncdetection(r), r a ring
 RETURN:  ideal, presenting an involution map on a noncommutative algebra r
 NOTE:    returns optimized involutions for some classical noncomm algebras,
 arising in the Control Theory, namely algebras with 
@@ -155,9 +154,7 @@ example
   "EXAMPLE:"; echo = 2;
   ring r=0,(x,y,z,D(1..3)),dp;
   matrix D[6][6];
-  D[1,4]=1;
-  D[2,5]=1;
-  D[3,6]=1;
+  D[1,4]=1; D[2,5]=1;  D[3,6]=1;
   ncalgebra(1,D);
   ncdetection(r);
   kill r;
@@ -169,8 +166,7 @@ example
   //----------------------------------------
   ring r=0,(x,D(1),S),dp;
   matrix D[3][3];
-  D[1,2]=1;
-  D[1,3]=-S;
+  D[1,2]=1;  D[1,3]=-S;
   ncalgebra(1,D);
   ncdetection(r);
 }
@@ -269,10 +265,11 @@ static proc invo_poly(poly m, map theta)
 //   }
 //   return(n);
 }
-
+///////////////////////////////////////////////////////////////////////////////////
 proc involution(m, map theta)
 "USAGE:  involution(m, theta); m is a poly/vector/ideal/matrix/module, theta is a map
-RETURN:  object of the same type as m, involuted under theta
+PURPOSE: applies the involution, presented by theta to the input m
+RETURN:  object of the same type as m
 EXAMPLE: example involution; shows an example
 "
 {
@@ -352,7 +349,7 @@ example
   print(IM);
   print(M - involution(IM,F));  
 }
-
+///////////////////////////////////////////////////////////////////////////////////
 static proc new_var()
 //generates a string of new variables
 {
@@ -377,7 +374,7 @@ static proc NVAR(int i, int j)
 {
   return("@_"+string(i)+"_"+string(j));
 };
-
+///////////////////////////////////////////////////////////////////////////////////
 static proc new_var_special()
 //generates a string of new variables
 {
@@ -390,8 +387,7 @@ static proc new_var_special()
   };
   return(s);
 };
-
-
+///////////////////////////////////////////////////////////////////////////////////
 static proc RelMatr()
 // returns the matrix of relations
 // only Lie-type relations x_j x_i= x_i x_j + .. are taken into account
@@ -408,15 +404,15 @@ static proc RelMatr()
   };
   return(Rel); 
 };
-
-
+/////////////////////////////////////////////////////////////////
 proc find_invo()
 "USAGE: find_invo(); 
+PURPOSE: describes a variety of linear involutions on a basering
 RETURN: a ring together with a list of pairs L, where
-L[i][1] = GB of an i-th component of ass.primes.
-L[i][2] = multiplication matrix, reduced wrt L[i][1].
-NOTE: for convenience, the full ideal of relation @@J
-and the matrix @@D are returned.
+@*        L[i][1]  =  Groebner Basis of an i-th associated prime,
+@*        L[i][2]  =  multiplication matrix, reduced wrt L[i][1]
+NOTE: for convenience, the full ideal of relations 'idJ' 
+and the matrix with indeterminates 'matD' are exported in the output ring.
 "
 {
   def @B    = basering; //save the name of basering
@@ -515,9 +511,10 @@ and the matrix @@D are returned.
     L[i]  = TL;
   }
   export(L); // main export
-  ideal @@J = J; // debug-comfortable exports
-  export(@@J);
-  export(@@D);
+  ideal idJ = J; // debug-comfortable exports
+  matrix matD = @@D;
+  export(idJ);
+  export(matD);
   return(@@KK);
 }
 example
@@ -528,14 +525,15 @@ example
  setring X;
  L;
 }
-
+///////////////////////////////////////////////////////////////////////////
 proc find_invo_diag()
 "USAGE: find_invo_diag();
+PURPOSE: describes a variety of homothetic (diagonal) involutions on a basering
 RETURN: a ring together with a list of pairs L, where
-L[i][1] = GB of an i-th component of prim.dec.
-L[i][2] = multiplication matrix, reduced wrt L[i][1].
-NOTE: for convenience, the full ideal of relation @@J
-and the matrix @@D are returned.
+@*        L[i][1]  =  Groebner Basis of an i-th associated prime,
+@*        L[i][2]  =  multiplication matrix, reduced wrt L[i][1]
+NOTE: for convenience, the full ideal of relations 'idJ' 
+and the matrix with indeterminates 'matD' are exported in the output ring.
 "
 {
   def @B    = basering; //save the name of basering
@@ -635,9 +633,10 @@ and the matrix @@D are returned.
     L[i]  = TL;
   }  
   export(L);
-  ideal @@J = J;
-  export(@@J);
-  export(@@D);
+  ideal idJ = J; // debug-comfortable exports
+  matrix matD = @@D;
+  export(idJ);
+  export(matD);
   return(@@KK);
 }
 example
@@ -648,14 +647,15 @@ example
  setring X;
  L;
 }
-
+/////////////////////////////////////////////////////////////////////
 proc find_auto()
 "USAGE: find_auto();
+PURPOSE: describes a variety of linear automorphisms of a basering
 RETURN: a ring together with a list of pairs L, where
-L[i][1] = GB of an i-th component of prim.dec.
-L[i][2] = multiplication matrix, reduced wrt L[i][1].
-NOTE: for convenience, the full ideal of relations @@J 
-and the matrix @@D are returned.
+@*           L[i][1]  =  Groebner Basis of an i-th associated prime,
+@*           L[i][2] = multiplication matrix, reduced wrt L[i][1]
+NOTE: for convenience, the full ideal of relations 'idJ' 
+and the matrix with indeterminates 'matD' are exported in the output ring.
 "
 {
   def @B    = basering; //save the name of basering
@@ -754,9 +754,10 @@ and the matrix @@D are returned.
     L[i]  = TL;
   }
   export(L);
-  ideal @@J = J;
-  export(@@J);
-  export(@@D);
+  ideal idJ = J; // debug-comfortable exports
+  matrix matD = @@D;
+  export(idJ);
+  export(matD);
   return(@@KK);
 }
 example
