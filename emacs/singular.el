@@ -1,6 +1,6 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.13 1998-07-30 16:22:55 schmidt Exp $
+;; $Id: singular.el,v 1.14 1998-07-31 08:04:32 wichmann Exp $
 
 ;;; Commentary:
 
@@ -580,6 +580,121 @@ A simple section intersects the region if the section and the region
 have at least one character in common.
 The result contains both clear and non-clear simple sections in the
 order in that the appear in the region."
+  ;; NOT READY
+  nil)
+;;}}}
+
+;;{{{ Simple section stuff for XEmacs
+(defun singular-xemacs-simple-sec-create (type end)
+  "Create a new simple section of type TYPE.
+Creates the section from end of previous simple section up to END.
+END should be larger than `singular-simple-sec-last-end'.
+Returns the new simple section or `empty' if no simple section has
+been created.
+Assumes that no narrowing is in effect.
+Updates `singular-simple-sec-last-end'."
+  (let ((last-end (marker-position singular-simple-sec-last-end))
+	;; `simple-sec' is the new simple section or `empty'
+	simple-sec)
+
+    ;; get beginning of line before END.  At this point we need that there
+    ;; are no restrictions.
+    (setq end (let ((old-point (point)))
+		(goto-char end) (beginning-of-line)
+		(prog1 (point) (goto-char old-point))))
+
+    (cond
+     ;; do not create empty sections
+     ((eq end last-end) (setq simple-sec 'empty))
+     ;; create only non-clear simple sections
+     ((not (eq type singular-simple-sec-clear-type))
+      ;; if type has not changed we only have to extend the previous
+      ;; simple section
+      (setq simple-sec (singular-xemacs-simple-sec-before last-end))
+      (if (eq type (singular-xemacs-simple-sec-type simple-sec))
+	  ;; move existing extent
+	  (setq simple-sec (set-extent-endpoints simple-sec 
+						 (extent-start-position simple-sec) end))
+	;; create new extent
+	(setq simple-sec (make-extent last-end end))
+	;; set type property
+	(set-extent-property simple-sec 'singular-type type)
+	;; set face
+	(set-extent-property simple-sec 'face (singular-lookup-face type)))))
+	    
+    ;; update end of last simple section
+    (set-marker singular-simple-sec-last-end end)
+    simple-sec))
+
+(defun singular-xemacs-simple-sec-reset-last (pos)
+  "Reset end of last simple section to POS after accidental extension.
+Updates `singular-simple-sec-last-end', too."
+  (let ((simple-sec (singular-xemacs-simple-sec-at pos)))
+    (if simple-sec 
+	(set-extent-endpoints simple-sec (extent-start-position simple-sec) pos))
+    (set-marker singular-simple-sec-last-end pos)))
+
+(defun singular-xemacs-simple-sec-start (simple-sec)
+  "Return start of non-clear simple section SIMPLE-SEC."
+  (extent-start-position simple-sec))
+
+(defun singular-xemacs-simple-sec-end (simple-sec)
+  "Return end of non-clear simple section SIMPLE-SEC."
+  (extent-end-position simple-sec))
+
+(defun singular-xemacs-simple-sec-start-at (pos)
+  "Return start of clear section at position POS.
+Assumes that no narrowing is in effect."
+  (let ((previous-extent-change (1+ (point))))
+    ;; this `while' loop at last will run into the end of the next
+    ;; non-clear extent or stop at bob.  Since POS may be right at the end
+    ;; of a previous non-clear location, we have to search at least one
+    ;; time from POS+1 backwards.
+    (while (not (or (singular-xemacs-simple-sec-before previous-extent-change)
+		    (eq previous-extent-change (point-min))))
+      (setq previous-extent-change
+	    (previous-extent-change previous-extent-change)))
+    previous-extent-change))
+
+(defun singular-xemacs-simple-sec-end-at (pos)
+  "Return end of clear section at position POS.
+Assumes that no narrowing is in effect."
+  (let ((next-extent-change (next-extent-change (point))))
+    ;; this `while' loop at last will run into the beginning of the next
+    ;; non-clear extent or stop at eob.  Since POS may not be at the
+    ;; beginning of a non-clear simple section we may start searching
+    ;; immediately.
+    (while (not (or (singular-xemacs-simple-sec-at next-extent-change)
+		    (eq next-extent-change (point-max))))
+      (setq next-extent-change
+	    (next-extent-change next-extent-change)))
+    next-extent-change))
+
+(defun singular-xemacs-simple-sec-type (simple-sec)
+  "Return type of SIMPLE-SEC."
+  (if simple-sec
+      (extent-property simple-sec 'singular-type)
+    singular-simple-sec-clear-type))
+
+(defun singular-xemacs-simple-sec-at (pos)
+  "Return simple section at position POS."
+  (map-extents (function (lambda (ext args) ext))
+	       ;; is this pos-pos-region OK? I think so.
+	       (current-buffer) pos pos nil nil 'singular-type))
+
+(defun singular-xemacs-simple-sec-before (pos)
+  "Return simple section before position POS.
+This is the same as `singular-simple-section-at' except if POS falls
+on a section border.  In this case `singular-simple-section-before'
+returns the previous simple section instead of the current one."
+  (singular-xemacs-simple-sec-at (max 1 (1- pos))))
+
+(defun singular-xemacs-simple-sec-in (beg end)
+  "Return a list of all simple sections intersecting with the region from BEG to END.
+A simple section intersects the region if the section and the region
+have at least one character in common.
+The result contains both clear and non-clear simple sections in the
+order they appear in the region."
   ;; NOT READY
   nil)
 ;;}}}
