@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: COPYING.texi,v 1.14 2002-11-11 18:48:32 Singular Exp $
+@comment $Id: COPYING.texi,v 1.15 2003-05-20 16:00:50 Singular Exp $
 @comment this file contains the copyright notice on Singular
 @ifclear VERSION
 @include version.texi
@@ -15,9 +15,9 @@
 @center @sc{Singular} version @value{VERSION}
 @center @uref{http://www.uni-kl.de/,,University of Kaiserslautern}
 @center @uref{http://www.mathematik.uni-kl.de/,,Department of Mathematics} and  @uref{http://www.mathematik.uni-kl.de/~zca/,,Centre for Computer Algebra}
-@center Authors: @uref{http://www.mathematik.uni-kl.de/~wwwagag/E/Greuel,,G.-M. Greuel}, @uref{http://www.mathematik.uni-kl.de/~wwwagag/E/Pfister,,G. Pfister}, @uref{http://www.mathematik.uni-kl.de/~hannes,,H. Schoenemann}
+@center Authors: @uref{http://www.mathematik.uni-kl.de/~greuel,,G.-M. Greuel}, @uref{http://www.mathematik.uni-kl.de/~pfister,,G. Pfister}, @uref{http://www.mathematik.uni-kl.de/~hannes,,H. Schoenemann}
 
-@center Copyright @copyright{} 1986-2002
+@center Copyright @copyright{} 1986-2003
 @sp 2
 @center @strong{NOTICE}
 
@@ -30,12 +30,13 @@ restrictions in the GPL):
 The following software used with @sc{Singular} have their own copyright:
 the omalloc library, the readline library,
 the Gnu Multiple Precision Library (GMP),
+NTL: A Library for doing Number Theory (NTL),
 the Multi Protocol library (MP), the
 Singular-Factory library, the Singular-libfac library, and,
 for the Windows distributions the Cygwin DLL and the Cygwin tools (Cygwin), and the
 XEmacs editor (XEmacs).
 
-Their copyrights and licences can be found in the accompanying files
+Their copyrights and licenses can be found in the accompanying files
 which are distributed along with these packages.
 
 This program is distributed in the hope that it will be useful,
@@ -59,6 +60,7 @@ can also register by sending an email to
               @email{singular@@mathematik.uni-kl.de}
 with subject line @code{register} and body containing the following data:
      your name, email address, organisation, country and platform(s).
+
 
 If you use Singular or parts thereof in a project and/or publish
 results that were partly obtained using @sc{Singular}, we ask you to
@@ -94,7 +96,7 @@ anonymous ftp through the following addresses:
 WWW brow@-ser from
 @uref{http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/}
 @item Cygwin
-@uref{http://sourceware.cygnus.com/cygwin/}
+@uref{http://www.cygwin.com/}
 @item Xemacs
 @uref{http://www.xemacs.org}
 @end table
@@ -116,18 +118,18 @@ Anne Fr@"ubis-Kr@"uger,
 Thomas Keilen,
 Kai Kr@"uger,
 Christoph Lossen,
-Victor Levandovskyy,
+Viktor Levandovskyy,
 Wilfred Pohl,
 Mathias Schulze,
 Eric Westenberger,
 and
 Tim Wichmann.
 @cindex Bachmann, Olaf
-@cindex Fr@"ubis-Kr@"uge,r Anne
+@cindex Fr@"ubis-Kr@"uger, Anne
 @cindex Keilen, Thomas
 @cindex Kr@"uger, Kai
 @cindex Lossen, Christoph
-@cindex Levandovskyy, Victor
+@cindex Levandovskyy, Viktor
 @cindex Pohl, Wilfred
 @cindex Schulze, Mathias
 @cindex Westenberger, Eric
