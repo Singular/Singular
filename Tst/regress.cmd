@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 #################################################################
-# $Id: regress.cmd,v 1.29 1999-12-08 23:45:20 obachman Exp $
+# $Id: regress.cmd,v 1.30 1999-12-08 23:51:20 obachman Exp $
 # FILE:    regress.cmd
 # PURPOSE: Script which runs regress test of Singular
 # CREATED: 2/16/98
@@ -419,9 +419,13 @@ sub tst_check
 
   if (%checks && ! $exit_status && $generate ne "yes" && ! $mtrack)
   {
-    & mysystem("$cp tst_status.out $root.new.stat");
-    # do status checks
-    ($exit_status, $error_cause) = & tst_status_check($root);
+    if (-e "tst_status.out")
+    {
+      & mysystem("$cp tst_status.out $root.new.stat");
+      # do status checks
+      ($exit_status, $error_cause) = & tst_status_check($root);
+    }
+    print "Warning: no file tst_status.out\n";
   }
 
 
