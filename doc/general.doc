@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.138 1999-07-27 09:10:35 Singular Exp $
+@comment $Id: general.doc,v 1.139 1999-07-28 09:13:35 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -2496,7 +2496,7 @@ in printed documents) are
 appear in the summary description of a library.
 @item
 The content-string of an item is typeset as follows:
-@itemize
+@itemize @minus
 @item
 If the content-string starts with an @code{@@} sign, then no parsing is
 done, but the content-string is assumed to be in the texinfo format.
@@ -2619,7 +2619,7 @@ quit debugger, set debugger flags(0,1,2)
 @* 2: throw an error, return to toplevel
 @end table
 @subsubsection Syntactical errors in procedures
-If @sc{Singular} was started with the command line option @code{-d} or 
+If @sc{Singular} was started with the command line option @code{-d} or
 @code{--sdb} an syntactical error in a procedure will start the
 source code debugger instead of returning to the top level with an
 error message. The commands @code{q 1} and @code{q 2} are equivalent in this
