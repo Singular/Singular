@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.209 2001-03-05 17:29:21 mschulze Exp $
+@comment $Id: reference.doc,v 1.210 2001-05-17 14:15:02 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -4196,19 +4196,23 @@ computations and act like boolean switches. Use the prefix @code{no} to
 disable an option. Notice that some options are ring dependent and reset
 to their default values on a change of the current basering.
 @table @asis
+@c ---------
 @item @code{none}
 @cindex none, option
 turns off all options (including the @code{prompt} option).
+@c ---------
 @item @code{returnSB}
 @cindex returnSB, option
 the functions @code{syz}, @code{intersect}, @code{quotient},
 @code{modulo} return a standard base instead of a generating set if
 @code{returnSB} is set. This option should not be used for @code{lift}.
+@c ---------
 @item @code{fastHC}
 @cindex fastHC, option
 tries to the find the highest corner of the staircase (HC) as fast as
 possible during a standard basis computation (only used for local
 orderings).
+@c ---------
 @c @item @code{interrupt}
 @c allows fast interruption of standard basis computation
 @item @code{intStrategy}
@@ -4216,24 +4220,35 @@ orderings).
 avoids division of coefficients during standard basis
 computations. This option is ring dependent. By default, it is set for
 rings with characteristic 0 and not set for all other rings.
+@c ---------
+@item @code{lazy}
+@cindex lazy, option
+uses a more lazy approach in std computations,
+which was used in Singular version before 2-0
+(and which may lead to faster or slower computations, depending on the example)
+@c ---------
 @item @code{minRes}
 @cindex minRes, option
 special (additional) minimizing during computations (@code{res}, @code{mres}),
 @*assumes homogeneous case and degree-compatible ordering.
+@c ---------
 @item @code{notRegularity}
 @cindex notRegularity, option
 disables the regularity bound for @code{res} and @code{mres} (see
 @ref{regularity}).
+@c ---------
 @item @code{notSugar}
 @cindex notSugar, option
 disables the sugar strategy during standard basis computation.
 @anchor{option(prot)}
+@c ---------
 @item @code{notBuckets}
 @cindex notBuckets, option
 disables the bucket representation of polynomials during standard basis
 computations. This option usually decreases the memory usage but
 increases the computation time. It should only be set for
 memory-critical standard basis computations.
+@c ---------
 @item @code{prot}
 @cindex prot, option
 @cindex protocoll of computations
@@ -4254,28 +4269,34 @@ progress during the following computations:
 @code{stdhilb},
 @code{syz}.
 See below for more details.
+@c ---------
 @item @code{redSB}
 @cindex redSB, option
 @cindex reduced standard basis
 computes a reduced standard basis in any standard basis computation.
+@c ---------
 @item @code{redTail}
 @cindex redTail, option
 reduction of the tails of polynomials during standard basis
 computations. This option is ring dependent. By default, it is set for
 rings with global degree orderings and not set for all other rings.
+@c ---------
 @item @code{redThrough}
 @cindex redThrough, option
 for inhomogenous input, polynomial reductions during standard basis
 computations are never postponed, but always finished through. This option
 is ring   dependent. By default, it is set for rings with global degree
 orderings and not set for all other rings.
+@c ---------
 @item @code{sugarCrit}
 @cindex sugarCrit, option
 uses criteria similar to the homogeneous case to keep more useless pairs.
+@c ---------
 @item @code{weightM}
 @cindex weightM, option
 automatically computes suitable weights for the weighted ecart and the
 weighted sugar method.
+@c ---------
 @end table
 @*
 The following options, which also control computations, are special,
