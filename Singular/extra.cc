@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.61 1998-06-16 08:29:10 obachman Exp $ */
+/* $Id: extra.cc,v 1.62 1998-06-18 13:35:50 obachman Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -153,7 +153,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
       #endif
       #endif
       res->rtyp=INT_CMD;
-      if (h->next==NULL) res->data = (void *)system("/bin/sh");
+      if (h->next==NULL) res->data = (void *)system("sh");
       else res->data = (void*) system((char*)(h->next->Data()));
       #ifndef MSDOS
       #ifdef HAVE_FEREAD
