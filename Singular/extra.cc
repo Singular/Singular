@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.195 2003-01-29 19:13:35 levandov Exp $ */
+/* $Id: extra.cc,v 1.196 2003-03-10 11:03:00 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -1317,52 +1317,52 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 /*==================== PrintMat  =================*/
       if (strcmp(sys_cmd, "PrintMat") == 0)
       {
-	int a;
-	int b;
-	ring r;
-	int metric;
-	if ((h!=NULL) && (h->Typ()==INT_CMD))
-	{
-	  a=(int)h->CopyD();
-	  h=h->next;
-	}
-	else return TRUE;
-	if ((h!=NULL) && (h->Typ()==INT_CMD))
-	{
-	  b=(int)h->CopyD();
-	  h=h->next;
-	}
-	else return TRUE;
-	if ((h!=NULL) && (h->Typ()==RING_CMD))
-	{
-	  r=(ring)h->Data();
-	  h=h->next;
-	}
-	else return TRUE;
-	if ((h!=NULL) && (h->Typ()==INT_CMD))
-	{
-	  metric=(int)h->CopyD();
-	}
-	res->rtyp=MATRIX_CMD;
-	if (rIsPluralRing(r)) res->data=nc_PrintMat(a,b,r,metric);
-	else res->data=NULL;
-	return FALSE;
+        int a;
+        int b;
+        ring r;
+        int metric;
+        if ((h!=NULL) && (h->Typ()==INT_CMD))
+        {
+          a=(int)h->CopyD();
+          h=h->next;
+        }
+        else return TRUE;
+        if ((h!=NULL) && (h->Typ()==INT_CMD))
+        {
+          b=(int)h->CopyD();
+          h=h->next;
+        }
+        else return TRUE;
+        if ((h!=NULL) && (h->Typ()==RING_CMD))
+        {
+          r=(ring)h->Data();
+          h=h->next;
+        }
+        else return TRUE;
+        if ((h!=NULL) && (h->Typ()==INT_CMD))
+        {
+          metric=(int)h->CopyD();
+        }
+        res->rtyp=MATRIX_CMD;
+        if (rIsPluralRing(r)) res->data=nc_PrintMat(a,b,r,metric);
+        else res->data=NULL;
+        return FALSE;
       }
 /*==================== twostd  =================*/
       if (strcmp(sys_cmd, "twostd") == 0)
       {
-	ideal I;
-	if ((h!=NULL) && (h->Typ()==IDEAL_CMD))
-	{
-	  I=(ideal)h->CopyD();
-	  res->rtyp=IDEAL_CMD;
-	  if (rIsPluralRing(currRing)) res->data=twostd(I);
-	  else res->data=I;  
-	  setFlag(res,FLAG_TWOSTD);
+        ideal I;
+        if ((h!=NULL) && (h->Typ()==IDEAL_CMD))
+        {
+          I=(ideal)h->CopyD();
+          res->rtyp=IDEAL_CMD;
+          if (rIsPluralRing(currRing)) res->data=twostd(I);
+          else res->data=I;
+          setFlag(res,FLAG_TWOSTD);
           setFlag(res,FLAG_STD);
-	}
-	else return TRUE;
-	return FALSE;
+        }
+        else return TRUE;
+        return FALSE;
       }
 /*==================== lie bracket =================*/
     if (strcmp(sys_cmd, "bracket") == 0)
@@ -1382,7 +1382,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       else return TRUE;
       res->rtyp=POLY_CMD;
       if (rIsPluralRing(currRing))  res->data=nc_p_Bracket_qq(p,q);
-      else res->data=NULL;     
+      else res->data=NULL;
       return FALSE;
     }
 /*==================== PLURAL =================*/
@@ -1399,19 +1399,19 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       if (currRing->nc==NULL)
       {
         currRing->nc=(nc_struct *)omAlloc0(sizeof(nc_struct));
-	currRing->nc->ref=1;
-	currRing->nc->basering=currRing;
+        currRing->nc->ref=1;
+        currRing->nc->basering=currRing;
       }
       else
       {
         WarnS("redefining algebra structure");
-	if (currRing->nc->ref>1) // in use by somebody else
-	  currRing->nc->ref--;
-	else
-	  ncKill(currRing); /* kill the previous nc data */
-	currRing->nc=(nc_struct *)omAlloc0(sizeof(nc_struct));
-	currRing->nc->ref=1;
-	currRing->nc->basering=currRing;
+        if (currRing->nc->ref>1) // in use by somebody else
+          currRing->nc->ref--;
+        else
+          ncKill(currRing); /* kill the previous nc data */
+        currRing->nc=(nc_struct *)omAlloc0(sizeof(nc_struct));
+        currRing->nc->ref=1;
+        currRing->nc->basering=currRing;
       }
       currRing->nc->type=nc_general;
       /* C is either a poly (coeff - an int or a number) or a  matrix */
@@ -1421,96 +1421,104 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       switch(h->Typ())
       {
         case MATRIX_CMD: { C=(matrix)h->CopyD(); break; }
-	
+
         case INT_CMD: case NUMBER_CMD:
-	{
-	  i=iiTestConvert(h->Typ(), POLY_CMD);
-	  if (i==0) 
-	  { 
-	    Werror("cannot convert to poly");
-	    return TRUE;
-	  }
-	  iiConvert(h->Typ(), POLY_CMD, i, h, &tmp_v);
-	  pN=(poly)tmp_v.Data();
-	  break;
-	}
-	
+        {
+          i=iiTestConvert(h->Typ(), POLY_CMD);
+          if (i==0)
+          {
+            Werror("cannot convert to poly");
+            return TRUE;
+          }
+          iiConvert(h->Typ(), POLY_CMD, i, h, &tmp_v);
+          pN=(poly)tmp_v.Data();
+          break;
+        }
+
         case POLY_CMD:  {pN=(poly)h->Data(); break;}
 
-        default: return TRUE;	
+        default: return TRUE;
       }
-      if (h->Typ()==MATRIX_CMD) 
+      if (h->Typ()==MATRIX_CMD)
       {
-	currRing->nc->type=nc_undef; /* to analyze later ! */
+        currRing->nc->type=nc_undef; /* to analyze later ! */
       }
       else
       {
-	nN=pGetCoeff(pN);
-	if (nIsOne(nN)) currRing->nc->type=nc_lie; 
-	else currRing->nc->type=nc_skew;
-	/* create matrix C */
-	C=mpNew(currRing->N,currRing->N);
-	for(i=1;i<currRing->N;i++)
-	{
-	  for(j=i+1;j<=currRing->N;j++)
-	  {
-	    MATELEM(C,i,j) = nc_p_CopyPut(pN,currRing);
-	    //  MATELEM(C,i,j)=pCopy(pN);
-	  }
-	}
+        nN=pGetCoeff(pN);
+        if (nIsOne(nN)) currRing->nc->type=nc_lie;
+        else currRing->nc->type=nc_skew;
+        /* create matrix C */
+        C=mpNew(currRing->N,currRing->N);
+        for(i=1;i<currRing->N;i++)
+        {
+          for(j=i+1;j<=currRing->N;j++)
+          {
+            MATELEM(C,i,j) = nc_p_CopyPut(pN,currRing);
+            //  MATELEM(C,i,j)=pCopy(pN);
+          }
+        }
       }
       pN=NULL;
       h=hh;
       /* D is either a poly or a matrix */
-      if (h==NULL) { pN=NULL;}  /* D is zero matrix */ 
-      else 
+      if (h==NULL) { pN=NULL;}  /* D is zero matrix */
+      else
       {
-	switch(h->Typ())
-	{
-	  case MATRIX_CMD: { D=(matrix)h->CopyD(); break;}
-	
-	  case INT_CMD: case NUMBER_CMD:
-	  {
-	    i=iiTestConvert(h->Typ(), POLY_CMD);
-	    if (i==0) 
-	    { 
-	      Werror("cannot convert to poly");
-	      return TRUE;
-	    }
-	    iiConvert(h->Typ(), POLY_CMD, i, h, &tmp_v);
-	    pN=(poly)tmp_v.Data();
-	    break;
-	  }
-	  
-	  case POLY_CMD:  { pN=(poly)h->Data();break;}
-	  
+        switch(h->Typ())
+        {
+          case MATRIX_CMD: { D=(matrix)h->CopyD(); break;}
+
+          case INT_CMD: case NUMBER_CMD:
+          {
+            i=iiTestConvert(h->Typ(), POLY_CMD);
+            if (i==0)
+            {
+              Werror("cannot convert to poly");
+              return TRUE;
+            }
+            iiConvert(h->Typ(), POLY_CMD, i, h, &tmp_v);
+            pN=(poly)tmp_v.Data();
+            break;
+          }
+
+          case POLY_CMD:  { pN=(poly)h->Data();break;}
+
           default: return TRUE;
-	}
+        }
       } /* end else h==NULL */
-      if (pN==NULL) 
+      if (pN==NULL)
       {
-	if (currRing->nc->type==nc_lie) currRing->nc->type=nc_skew; /* even commutative! */
-	/* if (currRing->nc->type==nc_skew)  NOP */
+        if (currRing->nc->type==nc_lie) currRing->nc->type=nc_skew; /* even commutative! */
+        /* if (currRing->nc->type==nc_skew)  NOP */
       }
       else  { if (currRing->nc->type==nc_skew) currRing->nc->type=nc_general; }
+      if (h==NULL)
+      {
+         WerrorS("expected `system(\"PLURAL\",<matrix>,<matrix>)`");
+         idDelete((ideal *)&(currRing->nc->C));
+         omFreeSize((ADDRESS)currRing->nc,sizeof(nc_struct));
+         currRing->nc=NULL;
+         return TRUE;
+      }
       if (h->Typ()!=MATRIX_CMD)
       {
-	D=mpNew(currRing->N,currRing->N);
-	/* create matrix D */
-	for(i=1;i<currRing->N;i++)
-	{
-	  for(j=i+1;j<=currRing->N;j++)
-	  {
-	    MATELEM(D,i,j) = nc_p_CopyPut(pN,currRing);
-	    //	    MATELEM(D,i,j)=pCopy(pN);
-	  }
-	}
+        D=mpNew(currRing->N,currRing->N);
+        /* create matrix D */
+        for(i=1;i<currRing->N;i++)
+        {
+          for(j=i+1;j<=currRing->N;j++)
+          {
+            MATELEM(D,i,j) = nc_p_CopyPut(pN,currRing);
+            //            MATELEM(D,i,j)=pCopy(pN);
+          }
+        }
       }
       else currRing->nc->type=nc_undef;
       tmp_v.CleanUp();
       pN=NULL;
       /* Now we proceed with C and D */
-      matrix COM;      
+      matrix COM;
       currRing->nc->MT=(matrix *)omAlloc0(currRing->N*(currRing->N-1)/2*sizeof(matrix));
       currRing->nc->MTsize=(int *)omAlloc0(currRing->N*(currRing->N-1)/2*sizeof(int));
       currRing->nc->C=C;
@@ -1522,53 +1530,53 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       int IsNonComm=0;
       pN=nc_p_CopyGet(MATELEM(currRing->nc->C,1,2),currRing);
       //      pN=MATELEM(currRing->nc->C,1,2);
-		   
+
       for(i=1;i<currRing->N;i++)
       {
         for(j=i+1;j<=currRing->N;j++)
         {
-	  if (MATELEM(currRing->nc->C,i,j)==NULL)
-	  {
-	    Werror("Incorrect input : matrix of coefficients contains zeros in the upper triangle!");
-	    return TRUE;
-	  }
-	  if (!nEqual(pGetCoeff(pN),pGetCoeff(MATELEM(currRing->nc->C,i,j)))) IsSkewConstant=0; 
+          if (MATELEM(currRing->nc->C,i,j)==NULL)
+          {
+            Werror("Incorrect input : matrix of coefficients contains zeros in the upper triangle!");
+            return TRUE;
+          }
+          if (!nEqual(pGetCoeff(pN),pGetCoeff(MATELEM(currRing->nc->C,i,j)))) IsSkewConstant=0;
           if (MATELEM(currRing->nc->D,i,j)==NULL) /* quasicommutative case */
           {
-	    currRing->nc->MTsize[UPMATELEM(i,j,currRing->N)]=1; 
-	    /* 1x1 mult.matrix */
+            currRing->nc->MTsize[UPMATELEM(i,j,currRing->N)]=1;
+            /* 1x1 mult.matrix */
             currRing->nc->MT[UPMATELEM(i,j,currRing->N)]=mpNew(1,1);
           }
           else /* pure noncommutative case*/
           {
-	    IsNonComm=1;
+            IsNonComm=1;
             MATELEM(COM,i,j)=NULL;
             currRing->nc->MTsize[UPMATELEM(i,j,currRing->N)]=DefMTsize; /* default sizes */
             currRing->nc->MT[UPMATELEM(i,j,currRing->N)]=mpNew(DefMTsize,DefMTsize);
-	  }
-	  p=pOne();
-	  pSetCoeff(p,nCopy(pGetCoeff(MATELEM(currRing->nc->C,i,j))));
-	  pSetExp(p,i,1);
-	  pSetExp(p,j,1);
-	  pSetm(p);
-	  //	  p=pAdd(p,pCopy(MATELEM(currRing->nc->D,i,j)));
-	  p=pAdd(p,nc_p_CopyGet(MATELEM(currRing->nc->D,i,j),currRing));
-	  //	  MATELEM(currRing->nc->MT[UPMATELEM(i,j,currRing->N)],1,1)=p;
-	  MATELEM(currRing->nc->MT[UPMATELEM(i,j,currRing->N)],1,1)=nc_p_CopyPut(p,currRing);
-	  pDelete(&p);
-	  p=NULL;
-	}
-	/* set MT[i,j,1,1] to c_i_j*x_i*x_j + D_i_j */
+          }
+          p=pOne();
+          pSetCoeff(p,nCopy(pGetCoeff(MATELEM(currRing->nc->C,i,j))));
+          pSetExp(p,i,1);
+          pSetExp(p,j,1);
+          pSetm(p);
+          //          p=pAdd(p,pCopy(MATELEM(currRing->nc->D,i,j)));
+          p=pAdd(p,nc_p_CopyGet(MATELEM(currRing->nc->D,i,j),currRing));
+          //          MATELEM(currRing->nc->MT[UPMATELEM(i,j,currRing->N)],1,1)=p;
+          MATELEM(currRing->nc->MT[UPMATELEM(i,j,currRing->N)],1,1)=nc_p_CopyPut(p,currRing);
+          pDelete(&p);
+          p=NULL;
+        }
+        /* set MT[i,j,1,1] to c_i_j*x_i*x_j + D_i_j */
       }
       if (currRing->nc->type==nc_undef)
       {
-	if (IsNonComm==1) 
-	{
+        if (IsNonComm==1)
+        {
           assume(pN!=NULL);
-	  if ((IsSkewConstant==1) && (nIsOne(pGetCoeff(pN)))) currRing->nc->type=nc_lie;
-	  else currRing->nc->type=nc_general;
-	}
-	if (IsNonComm==0) currRing->nc->type=nc_skew; /* could be also commutative */
+          if ((IsSkewConstant==1) && (nIsOne(pGetCoeff(pN)))) currRing->nc->type=nc_lie;
+          else currRing->nc->type=nc_general;
+        }
+        if (IsNonComm==0) currRing->nc->type=nc_skew; /* could be also commutative */
       }
       currRing->nc->COM=COM;
       return FALSE;
@@ -1627,29 +1635,29 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 /* testing the DLL functionality under Win32 */
       if (strcmp(sys_cmd, "DLL") == 0)
       {
-	typedef void  (*Void_Func)();
-	typedef int  (*Int_Func)(int);
-	void *hh=dynl_open("WinDllTest.dll");
-	if ((h!=NULL) && (h->Typ()==INT_CMD))
-	{
-	  int (*f)(int);
-	  if (hh!=NULL)
-	  {
-	    int (*f)(int);
-	    f=(Int_Func)dynl_sym(hh,"PlusDll");
-	    int i=10;
-	    if (f!=NULL) printf("%d\n",f(i));
-	    else PrintS("cannot find PlusDll\n");
-	  }
-	}
-	else
-	{
-	  void (*f)();
-	  f= (Void_Func)dynl_sym(hh,"TestDll");
-	  if (f!=NULL) f();
-	  else PrintS("cannot find TestDll\n");
-	}
-	return FALSE;
+        typedef void  (*Void_Func)();
+        typedef int  (*Int_Func)(int);
+        void *hh=dynl_open("WinDllTest.dll");
+        if ((h!=NULL) && (h->Typ()==INT_CMD))
+        {
+          int (*f)(int);
+          if (hh!=NULL)
+          {
+            int (*f)(int);
+            f=(Int_Func)dynl_sym(hh,"PlusDll");
+            int i=10;
+            if (f!=NULL) printf("%d\n",f(i));
+            else PrintS("cannot find PlusDll\n");
+          }
+        }
+        else
+        {
+          void (*f)();
+          f= (Void_Func)dynl_sym(hh,"TestDll");
+          if (f!=NULL) f();
+          else PrintS("cannot find TestDll\n");
+        }
+        return FALSE;
       }
       else
 #endif

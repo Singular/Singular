@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.200 2003-02-07 12:34:02 Singular Exp $ */
+/* $Id: ring.cc,v 1.201 2003-03-10 11:03:03 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -795,7 +795,7 @@ void rWrite(ring r)
   if ((r->nc!=NULL) && (r==currRing))
   {
     poly pl=NULL;
-    PrintS("\n//   noncommutative relations:");
+    Print("\n//   noncommutative relations (type %d):",(int)r->nc->type);
     for (int i = 1; i<r->N; i++)
     {
       for (int j = i+1; j<=r->N; j++)

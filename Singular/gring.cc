@@ -6,7 +6,7 @@
  *  Purpose: p_Mult family of procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.24 2003-02-26 15:40:51 levandov Exp $
+ *  Version: $Id: gring.cc,v 1.25 2003-03-10 11:03:02 Singular Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -225,8 +225,8 @@ poly nc_mm_Mult_nn(Exponent_t *F0, Exponent_t *G0, const ring r)
   // pExpVectorCopy(F,F0);
   memcpy(G, G0,(r->N+1)*sizeof(Exponent_t));
   //  pExpVectorCopy(G,G0);
-  F[0]=0;
-  G[0]=0;
+  // F[0]=0; done by omAlloc0
+  // G[0]=0; done by omAlloc0
 
   iF=r->N;
   while ((F[iF]==0)&&(iF>=1)) iF--; /* last exp_num of F */
@@ -451,9 +451,9 @@ poly nc_mm_Mult_uu(Exponent_t *F,int jG,int bG, const ring r)
     if (cnf!=0) { Prv[i]=0;}
     if (F[i]!=0)
     {
-     cnt++;
-     lF[cnt]=i;
-     }                 /* eff_part,lF_for_F */
+      cnt++;
+      lF[cnt]=i;
+    }                 /* eff_part,lF_for_F */
   }
 
   if (cnt==1) /* Nxt consists of 1 nonzero el-t only */
@@ -649,9 +649,9 @@ poly nc_uu_Mult_ww_vert (int i, int a, int j, int b, const ring r)
   p_Delete(&y,r);
   //  t=MATELEM(cMT,a,b);
   t= nc_p_CopyGet(MATELEM(cMT,a,b),r);
-  //  return(p_Copy(t,r));  
+  //  return(p_Copy(t,r));
   /* since the last computed element was cMT[a,b] */
-  return(t);     
+  return(t);
 }
 
 poly nc_uu_Mult_ww (int i, int a, int j, int b, const ring r)
@@ -674,6 +674,9 @@ poly nc_uu_Mult_ww (int i, int a, int j, int b, const ring r)
   if (MATELEM(r->nc->COM,j,i)!=NULL)
     /* commutative or quasicommutative case */
   {
+    p_SetExp(out,i,a,r);
+    p_AddExp(out,j,b,r);
+    p_Setm(out,r);
     if (r->cf->nIsOne(p_GetCoeff(MATELEM(r->nc->COM,j,i),r))) /* commutative case */
     {
       return(out);
@@ -695,7 +698,7 @@ poly nc_uu_Mult_ww (int i, int a, int j, int b, const ring r)
   int vik = UPMATELEM(j,i,r->N);
   int cMTsize=r->nc->MTsize[vik];
   int newcMTsize=0;
-  if (a>b) {newcMTsize=a;} else {newcMTsize=b;}
+  newcMTsize=max(a,b);
 
   if (newcMTsize<=cMTsize)
   {
@@ -708,25 +711,8 @@ poly nc_uu_Mult_ww (int i, int a, int j, int b, const ring r)
   int k,m;
   if (newcMTsize > cMTsize)
   {
-    number nM = nInit(newcMTsize);
-    number cM = nInit(7);
-    int inM;
-    number nM2 = nDiv(nM,cM);
-    nDelete(&nM);
-    nDelete(&cM);
-    if (nIsZero(nM2))
-    {
-      /* Indicates |nM/cM| > MAXINT */
-      /* Should never get there */
-      WarnS("too big matrix in nc_uu_Mult_ww");
-    }
-    else
-    {
-      inM = nInt(nM2);
-      inM=inM*7;/* 7=DefMTSize in extra.cc */
-      if (inM<newcMTsize) inM=inM+7;
-    }
-    nDelete(&nM2);
+    int inM=(((newcMTsize+6)/7)*7);
+    assume (inM>=newcMTsize);
     newcMTsize = inM;
     //    matrix tmp = (matrix)omAlloc0(inM*inM*sizeof(poly));
     matrix tmp = mpNew(newcMTsize,newcMTsize);
@@ -748,7 +734,7 @@ poly nc_uu_Mult_ww (int i, int a, int j, int b, const ring r)
     r->nc->MT[UPMATELEM(j,i,r->N)] = tmp;
     tmp=NULL;
     r->nc->MTsize[UPMATELEM(j,i,r->N)] = newcMTsize;
-  }  
+  }
   /* The update of multiplication matrix is finished */
     pDelete(&out);
     out = nc_uu_Mult_ww_vert(i, a, j, b, r);
@@ -765,7 +751,7 @@ poly nc_uu_Mult_ww_horvert (int i, int a, int j, int b, const ring r)
   poly x=pOne();p_SetExp(x,j,1,r);p_Setm(x,r);/* var(j); */
   poly y=pOne();p_SetExp(y,i,1,r);p_Setm(y,r); /*var(i);  for convenience */
 #ifdef PDEBUG
-  p_Test(x,r); 
+  p_Test(x,r);
   p_Test(y,r);
 #endif
 
