@@ -1,6 +1,6 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.48 1999-11-05 14:09:16 obachman Exp $
+;; $Id: singular.el,v 1.49 1999-12-03 08:08:50 wichmann Exp $
 
 ;;; Commentary:
 
@@ -522,7 +522,8 @@ For Emacs, this function is called  at mode initialization time."
   (define-key singular-interactive-mode-map [(control c) (<)] 'singular-load-file)
 
   (define-key singular-interactive-mode-map [?\C-c ?\C-r]     'singular-restart)
-  (define-key singular-interactive-mode-map [?\C-c ?\$] 'singular-exit-singular))
+  (define-key singular-interactive-mode-map [?\C-c ?\$] 'singular-exit-singular)
+  (define-key singular-interactive-mode-map [?\C-c ?\C-c] 'singular-control-c))
 
 (defun singular-cursor-key-model-set (key-model)
   "Set keys according to KEY-MODEL.
@@ -683,6 +684,7 @@ Sets the submenu (\"Commands\" \"Libraries\") to the value of
 			["Start..." singular-other t]
 			["Restart" singular-restart t]
 			"---"
+			["Interrupt" singular-control-c t]
 			["Exit" singular-exit-singular t]
 			"---"
 			["Preferences" (customize-group 'singular-interactive) t]
@@ -3821,7 +3823,7 @@ exit procedures.
 Assumes that the current buffer is a Singular buffer.
 Sets the variable `singular-exit-cleanup-done' to t.
 
-This function is called by `singular-interrupt-singular' or by
+This function is called by `singular-kill-singular' or by
 `singular-exit-sentinel'."
   (singular-debug 'interactive
 		  (message "exit-cleanup called"))
@@ -3847,7 +3849,7 @@ Calls `singular-exit-cleanup' if `singular-exit-cleanup-done' is nil."
 	      (singular-exit-cleanup))))
     (setq singular-exit-cleanup-done nil)))
 
-(defun singular-interrupt-singular ()
+(defun singular-kill-singular ()
   "Delete the Singular process running in the current buffer.
 Calls `singular-exit-cleanup' and deletes the Singular process.
 Inserts a string indicating that the Singular process is killed."
@@ -3863,6 +3865,30 @@ Inserts a string indicating that the Singular process is killed."
       ;; associated buffer!
       (goto-char mark)
       (insert "// ** Singular process killed **\n"))))
+
+(defun singular-control-c (mode)
+  "Interrupt the Singular process running in the current buffer.
+If called interactiveley, asks wether to (a)bort the current Singular
+command, (q)uit the current Singular process, or (c)ontinue without doing
+anything (default).
+
+If called non-interactiveley, MODE should be one of 'abort, 'quit, or
+'continue."
+  (interactive
+   (let (answer)
+     (while (not answer) 
+       (setq answer (read-from-minibuffer
+		   "(a)bort current command, (q)uit Singular or (c)ontinue? "))
+       (setq answer
+	     (cond ((equal answer "a") 'abort)
+		   ((equal answer "c") 'continue)
+		   ((equal answer "q") 'quit)
+		   ((equal answer "") 'continue) ; default: continue
+		   (t nil))))
+     (list answer)))
+   (cond
+    ((eq mode 'quit) (singular-kill-singular))
+    ((eq mode 'abort) (interrupt-process (singular-process)))))
 
 (defun singular-exec (buffer name executable start-file switches)
   "Start a new Singular process NAME in BUFFER, running EXECUTABLE.
@@ -4059,7 +4085,7 @@ Type \\[describe-mode] in the Singular buffer for a list of commands."
 			  singular-name-default))
 	     (current-buffer))
 	 process
-	 (singular-interrupt-singular)))
+	 (singular-kill-singular)))
       
   (singular-internal singular-executable-last
 		     singular-directory-last
@@ -4150,7 +4176,7 @@ If called with prefix argument, kills the Singular buffer."
   (singular-debug 'interactive
 		  (message "exit singular called"))
   
-  (singular-interrupt-singular)
+  (singular-kill-singular)
   (if kill-singular-buffer
       (kill-buffer (current-buffer))))
 ;;}}}
