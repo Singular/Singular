@@ -1,5 +1,5 @@
 ;;; Emacs edit mode for this file is  -*- Emacs-Lisp -*-
-;;; $Id: .emacs-singular,v 1.2 1999-08-31 18:53:53 wichmann Exp $
+;;; $Id: .emacs-singular,v 1.3 1999-08-31 19:16:27 wichmann Exp $
 
 ;;;
 ;;; .emacs-singular - Emacs initialization file to use for
@@ -49,6 +49,9 @@
 ;;;
 ;;; ;; add global menus for Singular
 ;;; <... choose your version for either Emacs or XEmacs, see below ...>
+;;;
+;;; ;; add Singular toolbar for XEmacs
+;;; <... insert the code below if you are running XEmacs ...>
 ;;;
 ;;; ;; add Singular Emacs home directory to `load-path'
 ;;; (setq load-path (cons "<your-singular-emacs-home-directory>" load-path))
@@ -108,6 +111,17 @@
 
 )
 
+;; update singular-emacs-home-directory
+(setq singular-emacs-home-directory 
+      (concat singular-emacs-home-directory
+	      ;; we check for trailing slash and backslash
+	      ;; but unconditionally insert a slash.
+	      ;; Hopefully that works on NT, too.
+	      (if (memq (aref singular-emacs-home-directory
+			      (1- (length singular-emacs-home-directory)))
+			'(?/ ?\\))
+		  "" "/")))
+
 ;; add global menus for Singular, Emacs version
 (unless (fboundp 'add-submenu)
   (setq singular-start-map (make-sparse-keymap))
@@ -127,6 +141,15 @@
 		   ["Start default" singular t]
 		   ["Start..." singular-other t])))
 
+;; add Singular button to toolbar for XEmacs
+(if (fboundp 'toolbar-add-item)
+    (toolbar-add-item 
+     (vector 
+      (toolbar-make-button-list (concat singular-emacs-home-directory 
+					"singular.xpm"))
+      'singular t "Start Singular")
+     (length (specifier-instance default-toolbar))))
+
 ;;;
 ;;; - load singular.el.
 ;;;
@@ -139,12 +162,4 @@
     (set-default 'current-menubar current-menubar)))
 
 ;; load singular.el from `singular-emacs-home-directory'
-(load-file (concat singular-emacs-home-directory
-		   ;; we check for trailing slash and backslash
-		   ;; but unconditionally insert a slash.
-		   ;; Hopefully that works on NT, too.
-		   (if (memq (aref singular-emacs-home-directory
-				   (1- (length singular-emacs-home-directory)))
-			     '(?/ ?\\))
-		       "" "/")
-		   "singular.el"))
+(load-file (concat singular-emacs-home-directory "singular.el"))
