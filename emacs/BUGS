@@ -1,0 +1,4 @@
+o singular-restart funktioniert nicht bei singular-other
+o Wenn beim Starten von Singular ein Fehler passiert, sollte der Buffer 
+  trotzdem sichtbar bleiben (->Fehlermeldungen)
+o singular-cursor-key-model aus customize speichern hat nicht funktioniert
