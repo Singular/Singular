@@ -1,6 +1,6 @@
 // GMG/BM, last modified: 8.10.98
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: matrix.lib,v 1.24 2001-01-17 14:03:26 Singular Exp $";
+version="$Id: matrix.lib,v 1.25 2001-01-17 20:56:17 greuel Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  matrix.lib    Elementary Matrix Operations
@@ -528,7 +528,7 @@ EXAMPLE: example gauss_col; shows an example
    module M = A;
    intvec v = option(get);
 //------------------------ change ordering if necessary ----------------------
-   if( ordstr(R) != "C,dp(nvars(R))" )
+   if( ordstr(R) != "C,dp("+string(nvars(R))+")"; )
    {
      changeord("@R","C,dp",R); u=1;
      execute("minpoly="+mp+";");
