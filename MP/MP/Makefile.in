@@ -43,7 +43,7 @@ MKINSTALLDIRS   = ../mkinstalldirs
 ## compiler and linker options
 ##
 CFLAGS		= @CFLAGS@
-CPPFLAGS	= -I. @CPPFLAGS@ 
+CPPFLAGS	= -I./h -I. @CPPFLAGS@ 
 DEFS		= @DEFS@ 
 
 ##
