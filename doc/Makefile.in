@@ -1,7 +1,7 @@
 #####################################################################
 ### 
 ### Makefile for Singular documentation 
-### $Id: Makefile.in,v 1.61 2000-03-07 14:40:45 Singular Exp $
+### $Id: Makefile.in,v 1.62 2000-03-13 15:51:27 obachman Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -182,15 +182,19 @@ STANDALONE_TXT_FILES := $(STANDALONE_TEXI_FILES:.texi=.txt)
 STANDALONE_HTML_FILES := $(STANDALONE_TEXI_FILES:.texi=.html)
 STANDALONE_FILES      := $(STANDALONE_TEXI_FILES:.texi=)
 
+ifeq ($(SINGUNAME),@SINGUNAME@)
+UNAME_OPT = -D UNAME
+endif
+
 # targets which produce stand-alone documents
 %.${SINGUNAME}.txt : %.texi
-	${MAKEINFO} -D UNAME --no-header --paragraph-indent none  -o $@ $<
+	${MAKEINFO} $(UNAME_OPT) --no-header --paragraph-indent none  -o $@ $<
 
 %.txt :  %.texi
 	${MAKEINFO} --no-header --paragraph-indent none -o $@ $<
 
 %.${SINGUNAME}.html : %.texi
-	${PERL5} ${TEXI2HTML} -D UNAME -init_file t2h_standalone.init -verbose -split none -o $@ $<
+	${PERL5} ${TEXI2HTML} $(UNAME_OPT) -init_file t2h_standalone.init -verbose -split none -o $@ $<
 
 %.html : %.texi
 	${PERL5} ${TEXI2HTML} -init_file t2h_standalone.init -verbose -split none -o $@ $<
@@ -293,7 +297,8 @@ install-sharedist: singular.hlp html singular.idx \
 	${INSTALL_DATA} README_distribution.txt ${install_prefix}/README
 	${INSTALL_DATA} README_distribution.html ${install_prefix}/README.html
 
-
+# use 'make INSTALL_unix.olaf.txt INSTALL_unix.olaf.html SINGUNAME=olaf'
+# to generate these files for uname 'olaf'
 install-bindist: INSTALL_unix.${SINGUNAME}.txt INSTALL_unix.${SINGUNAME}.html
 	${MKINSTALLDIRS} ${install_prefix}
 	${INSTALL_DATA} INSTALL_unix.${SINGUNAME}.txt ${install_prefix}/INSTALL
