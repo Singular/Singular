@@ -510,6 +510,9 @@ void sleftv::Copy(leftv source)
         }  
         break;
       }
+    case RESOLUTION_CMD:
+      data=(void*)syCopy((syStrategy)d);
+      break;
 #ifdef TEST
     case DEF_CMD:
     case NONE:

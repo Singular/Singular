@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.12 1998-03-16 16:21:55 Singular Exp $ */
+/* $Id: iplib.cc,v 1.13 1998-04-03 17:38:40 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -241,13 +241,13 @@ BOOLEAN iiPStart(idhdl pn, sleftv  * v)
     iiCurrArgs=NULL;
   }
   /* start interpreter ======================================*/
-  //Print("PStart <<%s>>\n",IDID(pn));
   myynest++;
+  //Print("%-*.*s PStart <<%s>>, level:%d\n",2*myynest,2*myynest," ",IDID(pn),myynest);
   err=yyparse();
   killlocals(myynest);
   myynest--;
   si_echo=old_echo;
-  //Print("PEnd <<%s>>\n",IDID(pn));
+  //Print("%-*.*s PEnd  <<%s>>, level:%d\n",2*myynest,2*myynest," ",IDID(pn),myynest);
 
   return err;
 }
@@ -302,8 +302,8 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
   iiRETURNEXPR[myynest+1].Init();
   if (traceit&TRACE_SHOW_PROC)
   {
-    if (traceit&TRACE_SHOW_LINENO) printf("\n");
-    printf("entering %s (level %d)\n",IDID(pn),myynest);
+    if (traceit&TRACE_SHOW_LINENO) PrintLn();
+    Print("entering%-*.*s %s (level %d)\n",myynest*2,myynest*2," ",IDID(pn),myynest);
   }
 #ifdef RDEBUG
   if (traceit&TRACE_SHOW_RINGS) iiShowLevRings();
@@ -331,8 +331,8 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
 #endif
   if (traceit&TRACE_SHOW_PROC)
   {
-    if (traceit&TRACE_SHOW_LINENO) printf("\n");
-    printf("leaving  %s (level %d)\n",IDID(pn),myynest);
+    if (traceit&TRACE_SHOW_LINENO) PrintLn();
+    Print("leaving %-*.*s %s (level %d)\n",myynest*2,myynest*2," ",IDID(pn),myynest);
   }
 #ifdef RDEBUG
   if (traceit&TRACE_SHOW_RINGS) iiShowLevRings();
@@ -721,7 +721,7 @@ char *iiConvName(char *libname)
 }
 
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
-int piShowProcList()
+void piShowProcList()
 {
   idhdl h;
   procinfo *proc;
@@ -753,17 +753,17 @@ int piShowProcList()
 }
 
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
-char *iiLineNo(char *procname, int lineno)
-{
-  char buf[256];
-  idhdl pn = ggetid(procname);
-  procinfo *pi = IDPROC(pn);
-
-  sprintf(buf, "%s %3d\0", procname, lineno);
-  //sprintf(buf, "%s::%s %3d\0", pi->libname, pi->procname,
-  //  lineno + pi->data.s.body_lineno);
-  return(buf);
-}
+//char *iiLineNo(char *procname, int lineno)
+//{
+//  char buf[256];
+//  idhdl pn = ggetid(procname);
+//  procinfo *pi = IDPROC(pn);
+//
+//  sprintf(buf, "%s %3d\0", procname, lineno);
+//  //sprintf(buf, "%s::%s %3d\0", pi->libname, pi->procname,
+//  //  lineno + pi->data.s.body_lineno);
+//  return(buf);
+//}
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 #ifdef HAVE_LIBPARSER
 void libstack::push(char *p, char *libname)

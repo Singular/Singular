@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.11 1998-03-23 22:51:07 obachman Exp $ */
+/* $Id: ring.h,v 1.12 1998-04-03 17:38:42 Singular Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -80,7 +80,7 @@ BOOLEAN rHasSimpleLexOrder(ring r);
 rOrderType_t    rGetOrderType(ring r);
 
 #ifdef RDEBUG
-extern short rNumber;
+extern short rNumber; /* current ring id (r->no) */
 #endif
 
 #endif

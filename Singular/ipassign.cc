@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.24 1998-03-13 15:18:16 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.25 1998-04-03 17:38:38 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -232,6 +232,14 @@ static BOOLEAN jiA_NUMBER(leftv res, leftv a, Subexpr e)
   nNormalize(p);
   res->data=(void *)p;
   jiAssignAttr(res,a);
+  return FALSE;
+}
+static BOOLEAN jiA_LIST_RES(leftv res, leftv a,Subexpr e)
+{
+  syStrategy r=(syStrategy)a->CopyD();
+  if (res->data!=NULL) ((lists)res->data)->Clean();
+  res->data=(void *)syConvRes(r);
+  //jiAssignAttr(res,a);
   return FALSE;
 }
 static BOOLEAN jiA_LIST(leftv res, leftv a,Subexpr e)
@@ -504,6 +512,7 @@ struct sValAssign dAssign[]=
 ,{jiA_INTVEC,   INTVEC_CMD,     INTVEC_CMD }
 ,{jiA_INTVEC,   INTMAT_CMD,     INTMAT_CMD }
 ,{jiA_NUMBER,   NUMBER_CMD,     NUMBER_CMD }
+,{jiA_LIST_RES, LIST_CMD,       RESOLUTION_CMD }
 ,{jiA_LIST,     LIST_CMD,       LIST_CMD }
 ,{jiA_LINK,     LINK_CMD,       STRING_CMD }
 ,{jiA_LINK,     LINK_CMD,       LINK_CMD }
@@ -1221,10 +1230,10 @@ BOOLEAN iiAssign(leftv l, leftv r)
       if(((l->rtyp>=VECHO)&&(l->rtyp<=VPRINTLEVEL))
       ||((l->rtyp>=VALTVARS)&&(l->rtyp<=VMINPOLY)))
       {
-         b=iiAssign_sys(l,r);
-         r->CleanUp();
-         //l->CleanUp();
-         return b;
+        b=iiAssign_sys(l,r);
+        r->CleanUp();
+        //l->CleanUp();
+        return b;
       }
       rt=r->Typ();
       /* a = ... */
@@ -1232,39 +1241,42 @@ BOOLEAN iiAssign(leftv l, leftv r)
       &&(lt!=INTMAT_CMD)
       &&((lt==rt)||(lt!=LIST_CMD)))
       {
-         b=jiAssign_1(l,r);
-         if (l->rtyp==IDHDL)
-         {
-           if ((lt==DEF_CMD)||(lt=LIST_CMD)) ipMoveId((idhdl)l->data);
-           l->attribute=IDATTR((idhdl)l->data);
-           l->flag=IDFLAG((idhdl)l->data);
-           l->CleanUp();
-         }
-         r->CleanUp();
-         return b;
+        b=jiAssign_1(l,r);
+        if (l->rtyp==IDHDL)
+        {
+          if ((lt==DEF_CMD)||(lt=LIST_CMD)) ipMoveId((idhdl)l->data);
+          l->attribute=IDATTR((idhdl)l->data);
+          l->flag=IDFLAG((idhdl)l->data);
+          l->CleanUp();
+        }
+        r->CleanUp();
+        return b;
       }
-      if ((lt!=LIST_CMD)
-      &&((rt==MATRIX_CMD)
-        ||(rt==INTMAT_CMD)
-        ||(rt==INTVEC_CMD)
-        ||(rt==MODUL_CMD)))
+      if (((lt!=LIST_CMD)
+        &&((rt==MATRIX_CMD)
+          ||(rt==INTMAT_CMD)
+          ||(rt==INTVEC_CMD)
+          ||(rt==MODUL_CMD)))
+      ||((lt==LIST_CMD)
+        &&(rt==RESOLUTION_CMD))
+      )
       {
-         b=jiAssign_1(l,r);
-         if((l->rtyp==IDHDL)&&(l->data!=NULL))
-         {
-           if (lt==DEF_CMD) ipMoveId((idhdl)l->data);
-           l->attribute=IDATTR((idhdl)l->data);
-           l->flag=IDFLAG((idhdl)l->data);
-         }
-         r->CleanUp();
-         Subexpr h;
-         while (l->e!=NULL)
-         {
-           h=l->e->next;
-           Free((ADDRESS)l->e,sizeof(*(l->e)));
-           l->e=h;
-         }
-         return b;
+        b=jiAssign_1(l,r);
+        if((l->rtyp==IDHDL)&&(l->data!=NULL))
+        {
+          if (lt==DEF_CMD) ipMoveId((idhdl)l->data);
+          l->attribute=IDATTR((idhdl)l->data);
+          l->flag=IDFLAG((idhdl)l->data);
+        }
+        r->CleanUp();
+        Subexpr h;
+        while (l->e!=NULL)
+        {
+          h=l->e->next;
+          Free((ADDRESS)l->e,sizeof(*(l->e)));
+          l->e=h;
+        }
+        return b;
       }
     }
     if (rt==NONE) rt=r->Typ();

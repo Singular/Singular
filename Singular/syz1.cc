@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.23 1998-04-01 19:01:42 Singular Exp $ */
+/* $Id: syz1.cc,v 1.24 1998-04-03 17:38:45 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -2264,6 +2264,46 @@ syStrategy syConvList(lists li)
       result->fullres[i] = idCopy(fr[i]);
   }
   Free((ADDRESS)fr,(result->length)*sizeof(ideal));
+  return result;
+}
+
+syStrategy syMakeResolution(resolvente r, int length, 
+           intvec ** weights)
+{
+  syStrategy result=(syStrategy)Alloc0(sizeof(ssyStrategy));
+
+  length = max(length,0);
+  int i=0;
+  
+  while (i<length)
+  {
+    if (r[i]!=NULL)
+    {
+      if (i!=0)
+      {
+        int rank=IDELEMS(r[i-1]);
+        if (idIs0(r[i-1]))
+        {
+          idDelete(&(r[i]));
+          r[i]=idFreeModule(rank);
+        }
+        else
+        {
+          r[i]->rank=max(rank,idRankFreeModule(r[i]));
+        }
+        idSkipZeroes(r[i]);
+      }
+    }
+    else
+    {
+      // should not happen:
+      Warn("internal NULL in resolvente");
+      r[i]=idInit(1,1);
+    }
+    i++;
+  }
+  result->fullres = r;
+  result->length = length;
   return result;
 }
 

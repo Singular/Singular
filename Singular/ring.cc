@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.20 1998-03-31 12:18:46 obachman Exp $ */
+/* $Id: ring.cc,v 1.21 1998-04-03 17:38:41 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -187,7 +187,8 @@ idhdl rDefault(char *s)
   currRing->N     = 3;
   /*currRing->P     = 0; Alloc0 in idhdl::set, ipid.cc*/
 #ifdef RDEBUG
-  currRing->no    =rNumber; rNumber++;
+  rNumber++;
+  currRing->no    =rNumber;
 #endif
 #ifdef SRING
   currRing->partN = 4;
@@ -652,8 +653,9 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
   rSetHdl(tmp,TRUE);
   
 #ifdef RDEBUG
-  currRing->no    =rNumber; rNumber++;
-#endif
+  rNumber++;
+  currRing->no    =rNumber;
+#endif  
   
   return currRingHdl;
 }
@@ -1650,9 +1652,12 @@ ring rCopy(ring r)
   }
   res->idroot = NULL;
   if (r->qideal!=NULL) res->qideal= idCopy(r->qideal);
+
 #ifdef RDEBUG
-  res->no=rNumber; rNumber++;
+  rNumber++;
+  res->no=rNumber;
 #endif
+
   return res;
 }
 

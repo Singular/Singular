@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.h,v 1.10 1998-03-23 22:50:58 obachman Exp $ */
+/* $Id: ipid.h,v 1.11 1998-04-03 17:38:39 Singular Exp $ */
 /*
 * ABSTRACT: identfier handling
 */
@@ -40,8 +40,8 @@ struct sip_sring
   short     VarCompIndex; /* controls locations of component in exp vector */
 
 #ifdef RDEBUG
-  short      no;
-#endif
+  short      no; /* unique id for rings */
+#endif  
 };
 
 struct sip_sideal

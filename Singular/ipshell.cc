@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.16 1998-02-27 14:06:20 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.17 1998-04-03 17:38:41 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -193,23 +193,32 @@ static void killlocals0(int v, idhdl * localhdl)
   while (h!=NULL)
   {
     int vv;
+    //Print("consider %s, lev: %d:",IDID(h),IDLEV(h));
     if ((vv=IDLEV(h))>0)
     {
       if (vv < v)
       {
-        if (iiNoKeepRing) return;
+        if (iiNoKeepRing) 
+	{
+          //PrintS(" break\n");
+	  return;
+	}  
         h = IDNEXT(h);
+        //PrintLn();
       }
       else if (vv >= v)
       {
         idhdl nexth = IDNEXT(h);
-        //Print("kill %s, lev: %d\n",IDID(h),IDLEV(h));
         killhdl(h,localhdl);
         h = nexth;
+        //PrintS("kill\n");
       }
     }
     else
+    {
       h = IDNEXT(h);
+      //PrintLn();
+    }
   }
 }
 
@@ -237,7 +246,7 @@ void killlocals(int v)
     currRingHdl=NULL;
     rSetHdl(sh,TRUE);
   }
-  iiNoKeepRing=TRUE;
+  if (myynest<=1) iiNoKeepRing=TRUE;
 }
 
 void list_cmd(int typ, const char* what, char *prefix,BOOLEAN iterate)

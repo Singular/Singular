@@ -208,7 +208,11 @@ cmdnames cmds[] =
   { "modulo",      0, MODULO_CMD ,        CMD_2},
   { "monitor",     0, MONITOR_CMD ,       CMD_12},
   { "mult",        0, MULTIPLICITY_CMD ,  CMD_1},
+  #ifdef OLD_RES
   { "mres",        0, MRES_CMD ,          CMD_23},
+  #else
+  { "mres",        0, MRES_CMD ,          CMD_2},
+  #endif
   { "mstd",        0, MSTD_CMD ,          CMD_1},
   { "nameof",      0, NAMEOF_CMD ,        CMD_1},
   { "names",       0, NAMES_CMD ,         CMD_M},
@@ -242,7 +246,11 @@ cmdnames cmds[] =
   { "read",        0, READ_CMD ,          CMD_12},
   { "reduce",      0, REDUCE_CMD ,        CMD_23},
   { "regularity",  0, REGULARITY_CMD ,    CMD_1},
+  #ifdef OLD_RES
   { "res",         0, RES_CMD ,           CMD_23},
+  #else
+  { "res",         0, RES_CMD ,           CMD_2},
+  #endif
   { "reservedName",0, RESERVEDNAME_CMD ,  CMD_M},
   { "resolution",  0, RESOLUTION_CMD ,    RING_DECL},
   { "resultant",   0, RESULTANT_CMD,      CMD_3},
@@ -254,7 +262,11 @@ cmdnames cmds[] =
   { "simplify",    0, SIMPLIFY_CMD ,      CMD_2},
   { "size",        0, COUNT_CMD ,         CMD_1},
   { "sortvec",     0, SORTVEC_CMD ,       CMD_1},
+  #ifdef OLD_RES
   { "sres",        0, SRES_CMD ,          CMD_23},
+  #else
+  { "sres",        0, SRES_CMD ,          CMD_2},
+  #endif
   { "status",      0, STATUS_CMD,         CMD_23},
   { "std",         0, STD_CMD ,           CMD_12},
   { "string",      0, STRING_CMD ,        ROOT_DECL_LIST},
@@ -1698,6 +1710,7 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
     r=sySchreyerResolvente((ideal)u->Data(),maxl+1,&l);
   if (r==NULL) return TRUE;
   res->data=(void *)liMakeResolv(r,l,wmaxl,u->Typ(),weights);
+  //res->data=(void *)syMakeResolution(r,l);
   return FALSE;
 }
 static BOOLEAN jjRSUM(leftv res, leftv u, leftv v)
@@ -2040,6 +2053,8 @@ struct sValCmd2 dArith2[]=
 ,{jjMONITOR2,  MONITOR_CMD,    NONE,           STRING_CMD, STRING_CMD PROFILER}
 ,{jjRES,       MRES_CMD,       LIST_CMD,       IDEAL_CMD,  INT_CMD PROFILER}
 ,{jjRES,       MRES_CMD,       LIST_CMD,       MODUL_CMD,  INT_CMD PROFILER}
+//,{jjRES,       MRES_CMD,       RESOLUTION_CMD, IDEAL_CMD,  INT_CMD PROFILER}
+//,{jjRES,       MRES_CMD,       RESOLUTION_CMD, MODUL_CMD,  INT_CMD PROFILER}
 ,{jjPARSTR2,   PARSTR_CMD,     STRING_CMD,     RING_CMD,   INT_CMD PROFILER}
 ,{jjPARSTR2,   PARSTR_CMD,     STRING_CMD,     QRING_CMD,  INT_CMD PROFILER}
 ,{jjPRINT_FORMAT, PRINT_CMD,   NONE,           DEF_CMD,    STRING_CMD PROFILER}
@@ -2056,6 +2071,8 @@ struct sValCmd2 dArith2[]=
 ,{jjREDUCE_ID, REDUCE_CMD,     MODUL_CMD,      MODUL_CMD,  IDEAL_CMD PROFILER}
 ,{jjRES,       RES_CMD,        LIST_CMD,       IDEAL_CMD,  INT_CMD PROFILER}
 ,{jjRES,       RES_CMD,        LIST_CMD,       MODUL_CMD,  INT_CMD PROFILER}
+//,{jjRES,       RES_CMD,        RESOLUTION_CMD, IDEAL_CMD,  INT_CMD PROFILER}
+//,{jjRES,       RES_CMD,        RESOLUTION_CMD, MODUL_CMD,  INT_CMD PROFILER}
 ,{jjSTATUS2,   STATUS_CMD,     STRING_CMD,     LINK_CMD,   STRING_CMD PROFILER}
 ,{jjSIMPL_P,   SIMPLIFY_CMD,   POLY_CMD,       POLY_CMD,   INT_CMD PROFILER}
 ,{jjSIMPL_P,   SIMPLIFY_CMD,   VECTOR_CMD,     VECTOR_CMD, INT_CMD PROFILER}
@@ -2063,6 +2080,8 @@ struct sValCmd2 dArith2[]=
 ,{jjSIMPL_ID,  SIMPLIFY_CMD,   MODUL_CMD,      MODUL_CMD,  INT_CMD PROFILER}
 ,{jjRES,       SRES_CMD,       LIST_CMD,       IDEAL_CMD,  INT_CMD PROFILER}
 ,{jjRES,       SRES_CMD,       LIST_CMD,       MODUL_CMD,  INT_CMD PROFILER}
+//,{jjRES,       SRES_CMD,       RESOLUTION_CMD, IDEAL_CMD,  INT_CMD PROFILER}
+//,{jjRES,       SRES_CMD,       RESOLUTION_CMD, MODUL_CMD,  INT_CMD PROFILER}
 ,{jjCALL2MANY, SYSTEM_CMD,     ANY_TYPE/*set by p*/,STRING_CMD, DEF_CMD PROFILER}
 ,{jjSTD_1,     STD_CMD,        IDEAL_CMD,      IDEAL_CMD,  POLY_CMD PROFILER}
 ,{jjSTD_1,     STD_CMD,        MODUL_CMD,      MODUL_CMD,  VECTOR_CMD PROFILER}
@@ -3123,7 +3142,6 @@ struct sValCmd1 dArith1[]=
 ,{jjKBASE,      KBASE_CMD,       IDEAL_CMD,      IDEAL_CMD }
 ,{jjKBASE,      KBASE_CMD,       MODUL_CMD,      MODUL_CMD }
 ,{atKILLATTR1,  KILLATTR_CMD,    NONE,           IDHDL }
-,{jjCALL1MANY,  LIST_CMD,        LIST_CMD,       DEF_CMD }
 #ifdef MDEBUG
 ,{jjpHead,      LEAD_CMD,        POLY_CMD,       POLY_CMD }
 #else
@@ -3140,6 +3158,7 @@ struct sValCmd1 dArith1[]=
 ,{jjLEADCOEF,   LEADCOEF_CMD,    NUMBER_CMD,     VECTOR_CMD }
 ,{jjLEADEXP,    LEADEXP_CMD,     INTVEC_CMD,     POLY_CMD }
 ,{jjLEADEXP,    LEADEXP_CMD,     INTVEC_CMD,     VECTOR_CMD }
+,{jjCALL1MANY,  LIST_CMD,        LIST_CMD,       DEF_CMD }
 ,{jjWRONG,      MAP_CMD,         0,              ANY_TYPE}
 ,{jjDUMMY,      MATRIX_CMD,      MATRIX_CMD,     MATRIX_CMD }
 ,{jjidMaxIdeal, MAXID_CMD,       XS(IDEAL_CMD),  INT_CMD }
@@ -3742,9 +3761,9 @@ static BOOLEAN jjREDUCE3_ID(leftv res, leftv u, leftv v, leftv w)
     0,(int)w->Data());
   return FALSE;
 }
+#ifdef OLD_RES
 static BOOLEAN jjRES3(leftv res, leftv u, leftv v, leftv w)
 {
-#ifdef OLD_RES
   int maxl=(int)v->Data();
   int l=0;
   resolvente r;
@@ -3777,10 +3796,9 @@ static BOOLEAN jjRES3(leftv res, leftv u, leftv v, leftv w)
   int t3=u->Typ();
   iiMakeResolv(r,l,wmaxl,w->name,t3,weights);
   return FALSE;
-#else
   return TRUE;
-#endif
 }
+#endif
 static BOOLEAN jjSTATUS3(leftv res, leftv u, leftv v, leftv w)
 {
   int yes;
@@ -3829,8 +3847,10 @@ struct sValCmd3 dArith3[]=
 ,{jjMATRIX_Mo,      MATRIX_CMD, MATRIX_CMD, MODUL_CMD,  INT_CMD,    INT_CMD }
 ,{jjMATRIX_Ma,      MATRIX_CMD, MATRIX_CMD, MATRIX_CMD, INT_CMD,    INT_CMD }
 ,{jjCALL3MANY,      MODUL_CMD,  MODUL_CMD,  DEF_CMD,    DEF_CMD,    DEF_CMD }
+#ifdef OLD_RES
 ,{jjRES3,           MRES_CMD,   NONE,       IDEAL_CMD,  INT_CMD,    ANY_TYPE }
 ,{jjRES3,           MRES_CMD,   NONE,       MODUL_CMD,  INT_CMD,    ANY_TYPE }
+#endif
 ,{jjPREIMAGE,       PREIMAGE_CMD, IDEAL_CMD, RING_CMD,  ANY_TYPE,   ANY_TYPE }
 ,{jjPREIMAGE,       PREIMAGE_CMD, IDEAL_CMD, QRING_CMD, ANY_TYPE,   ANY_TYPE }
 ,{jjRANDOM_Im,      RANDOM_CMD, INTMAT_CMD, INT_CMD,    INT_CMD,    INT_CMD }
@@ -3840,15 +3860,19 @@ struct sValCmd3 dArith3[]=
 ,{jjREDUCE3_ID,     REDUCE_CMD, IDEAL_CMD,  IDEAL_CMD,  IDEAL_CMD,  INT_CMD }
 ,{jjREDUCE3_ID,     REDUCE_CMD, MODUL_CMD,  MODUL_CMD,  MODUL_CMD,  INT_CMD }
 ,{jjREDUCE3_ID,     REDUCE_CMD, MODUL_CMD,  MODUL_CMD,  IDEAL_CMD,  INT_CMD }
+#ifdef OLD_RES
 ,{jjRES3,           RES_CMD,    NONE,       IDEAL_CMD,  INT_CMD,    ANY_TYPE }
 ,{jjRES3,           RES_CMD,    NONE,       MODUL_CMD,  INT_CMD,    ANY_TYPE }
+#endif
 #ifdef HAVE_FACTORY
 ,{jjRESULTANT,      RESULTANT_CMD, POLY_CMD,POLY_CMD,   POLY_CMD,   POLY_CMD }
 #else
 ,{jjWRONG3,         RESULTANT_CMD, POLY_CMD,POLY_CMD,   POLY_CMD,   POLY_CMD }
 #endif
+#ifdef OLD_RES
 ,{jjRES3,           SRES_CMD,   NONE,       IDEAL_CMD,  INT_CMD,    ANY_TYPE }
 ,{jjRES3,           SRES_CMD,   NONE,       MODUL_CMD,  INT_CMD,    ANY_TYPE }
+#endif
 ,{jjSTATUS3,        STATUS_CMD, INT_CMD,    LINK_CMD,   STRING_CMD, STRING_CMD}
 ,{jjSUBST_P,        SUBST_CMD,  POLY_CMD,   POLY_CMD,   POLY_CMD,   POLY_CMD }
 ,{jjSUBST_P,        SUBST_CMD,  VECTOR_CMD, VECTOR_CMD, POLY_CMD,   POLY_CMD }

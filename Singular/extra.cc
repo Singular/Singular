@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.31 1998-03-27 15:43:27 obachman Exp $ */
+/* $Id: extra.cc,v 1.32 1998-04-03 17:38:35 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -73,16 +73,6 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
 {
   if(h->Typ() == STRING_CMD)
   {
-/*==================== test ==================================*/
-    if(strcmp((char*)(h->Data()),"x")==0)
-    {
-     int i=3;
-     int j=2;
-     j=i/(j-j);
-     res->data=(void *)j;
-     return FALSE;
-    }
-    else
 /*==================== lib ==================================*/
     if(strcmp((char*)(h->Data()),"LIB")==0)
     {
@@ -101,9 +91,9 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
 /*==================== proclist =================================*/
     if(strcmp((char*)(h->Data()),"proclist")==0)
     {
-      int piShowProcList();
-      res->rtyp=STRING_CMD;
-      res->data=(void *)mstrdup("");
+      void piShowProcList();
+      //res->rtyp=STRING_CMD;
+      //res->data=(void *)mstrdup("");
       piShowProcList();
       return FALSE;
     }
