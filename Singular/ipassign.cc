@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.42 1998-11-09 14:16:06 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.43 1999-01-18 17:25:25 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -463,8 +463,7 @@ static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
   qr=(ring)res->Data();
   ring qrr=rCopy(currRing);
   memcpy4(qr,qrr,sizeof(ip_sring));
-  qrr->ref++;
-  rKill(qrr);
+  Free((ADDRESS)qrr,sizeof(ip_sring));
   if (qr->qideal!=NULL) idDelete(&qr->qideal);
   qr->qideal = (ideal)a->CopyD(IDEAL_CMD);
   //currRing=qr;
