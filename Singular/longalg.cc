@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.31 1999-04-17 12:30:20 Singular Exp $ */
+/* $Id: longalg.cc,v 1.32 1999-04-23 15:22:25 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -612,6 +612,10 @@ static alg napInvers(alg x, const alg c)
 
   if (x->e[0] >= c->e[0])
     x = napRemainder(x, c);
+  if (x==NULL)
+  {
+    goto zero_divisor;
+  }
   if (x->e[0]==0)
   {
     if (!nacIsOne(x->ko))
@@ -626,6 +630,10 @@ static alg napInvers(alg x, const alg c)
   }
   y = napCopy(c);
   napDivMod(y, x, &qa, &r);
+  if (r==NULL)
+  {
+    goto zero_divisor;
+  }
   if (r->e[0]==0)
   {
     h = nacInit(-1);
@@ -641,6 +649,10 @@ static alg napInvers(alg x, const alg c)
   y = x;
   x = r;
   napDivMod(y, x, &q, &r);
+  if (r==NULL)
+  {
+    goto zero_divisor;
+  }
   if (r->e[0]==0)
   {
     q = napMult(q, qa);
@@ -664,6 +676,10 @@ static alg napInvers(alg x, const alg c)
     y = x;
     x = r;
     napDivMod(y, x, &qn, &r);
+    if (r==NULL)
+    {
+      break;
+    }
     if (r->e[0]==0)
     {
       q = napMult(q, qn);
@@ -686,6 +702,10 @@ static alg napInvers(alg x, const alg c)
     q = napAdd(q, qa);
     qa = y;
   }
+// zero divisor found:
+zero_divisor:
+  Werror("zero divisor found - your minpoly is not irreducible");
+  return x;
 }
 
 /*3
