@@ -86,15 +86,6 @@ if test -z "$AR"; then
 fi
 
 dnl
-dnl programs for installation
-dnl
-ac_save_path=${PATH}
-PATH="$PATH:.."  
-AC_PROG_INSTALL
-AC_PATH_PROG(MKINSTALLDIRS, mkinstalldirs, -mkdir -p)
-PATH="$ac_save_path"
-
-dnl
 dnl Checks for header files.
 dnl
 AC_CHECK_HEADER(factory.h,,AC_MSG_WARN(factory.h not found!))

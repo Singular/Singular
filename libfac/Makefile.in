@@ -1,4 +1,4 @@
-# $Id: Makefile.in,v 1.2 1997-05-05 13:44:19 obachman Exp $
+# $Id: Makefile.in,v 1.3 1997-05-06 17:17:54 obachman Exp $
 #################################################
 SHELL		= /bin/sh
 RM		= rm -f
@@ -27,10 +27,10 @@ templatedir	= ${includedir}/templates
 AR		= @AR@ cr
 RANLIB		= @RANLIB@
 CXX		= @CXX@
-INSTALL		= @INSTALL@
-INSTALL_DATA	= @INSTALL_DATA@
-INSTALL_PROGRAM = @INSTALL_PROGRAM@
-MKINSTALLDIRS	= @MKINSTALLDIRS@
+INSTALL		= ./install-sh -c
+INSTALL_PROGRAM	= ${INSTALL}
+INSTALL_DATA	= ${INSTALL} -m 644
+MKINSTALLDIRS   = ./mkinstalldirs
 
 ##
 ## compiler and linker options

@@ -1,0 +1,12 @@
+Tue May  6 09:30:51 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* configure.in: Manuallu put INSTALL into Makefile.in
+
+Mon May  5 15:43:58 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* added installation of templates
+
+Sat May  3 19:58:53 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* Makefile.in (CPPFLAGS): Put -I. before other CPPFLAGS
+
