@@ -1,4 +1,4 @@
-// $Id: primdec.lib,v 1.58 2000-05-08 15:51:55 pfister Exp $
+// $Id: primdec.lib,v 1.59 2000-05-09 13:26:10 pfister Exp $
 ///////////////////////////////////////////////////////////////////////////////
 // primdec.lib                                                               //
 // algorithms for primary decomposition based on                             //
@@ -10,7 +10,7 @@
 // written by Wolfram Decker and Hans Schoenemann                            //
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: primdec.lib,v 1.58 2000-05-08 15:51:55 pfister Exp $";
+version="$Id: primdec.lib,v 1.59 2000-05-09 13:26:10 pfister Exp $";
 info="
 LIBRARY: primdec.lib   PROCEDURES FOR PRIMARY DECOMPOSITION
 AUTHORS:  Gerhard Pfister, email: pfister@mathematik.uni-kl.de (GTZ)
@@ -1806,6 +1806,7 @@ proc equidim(ideal i,list #)
   
   ideal te=imap(P,te);
   list equ,equi,indep;
+  int b;
   if(homo==1)
   {
      for(n=1;n<=nvars(basering);n++)
@@ -1816,7 +1817,13 @@ proc equidim(ideal i,list #)
   }
   if ((dim(j)==-1)||(size(j)==0)||(nvars(basering)==1)||(dim(j)==0))
   {
+    if((size(reduce(te,j))==0)&&(deg(te[1])>0))
+    {
+      setring P;
+      return(eq);
+    }
     setring P;
+    i=imap(gnir,j);
     eq=i;
     return(eq);
   }
@@ -1854,41 +1861,32 @@ proc equidim(ideal i,list #)
   kill quring;
   list l=minSat(j,h);
 
-  equ[1]=l[1];
-  attrib(equ[1],"isSB",1);
-
-  if(size(reduce(te,equ[1]))==0)
-  {
-    equ[1]=ideal(1);
-    attrib(equ[1],"isSB",1);
-  } 
-  else
-  {
-     te=intersect(te,equ[1]);
-  }
- 
   j=std(j,l[2]);
-
-  equi=equidim(j,te);
-  attrib(equi[1],"isSB",1);
-
-  if(dim(equ[1])==dim(equi[1]))
+  attrib(l[1],"isSB",1);
+  if(size(reduce(te,l[1]))!=0)
   {
-    equi[1]=intersect(equ[1],equi[1]);
-    equ=equi;
-  }
-  else
-  {
-     for(n=1;n<=size(equi);n++)
-     {
-       if(deg(equi[n][1])>0)
-       {
-         equ[size(equ)+1]=equi[n];
-       }
+    te=intersect(te,l[1]);
+    equi=equidim(j,te);  
+    if(dim(l[1])==dim(j))
+    {
+      equi[size(equi)]=intersect(l[1],equi[size(equi)]);
+    }
+    else
+    {
+      equi[size(equi)+1]=l[1];
     }
   }
+  else
+  {
+    equi=equidim(j,te);
+  }
+  b=size(equi);
+
   setring P;
-  eq=imap(gnir,equ);
+  if(b!=0)
+  {
+    eq=imap(gnir,equi);
+  }
   kill gnir;
   return(eq);
 }
