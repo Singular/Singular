@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.cc,v 1.31 2003-06-14 14:55:57 Singular Exp $ */
+/* $Id: modulop.cc,v 1.32 2003-06-20 14:40:38 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
@@ -20,7 +20,7 @@
 
 long npPrimeM=0;
 int npGen=0;
-int npPminus1M=0;
+long npPminus1M=0;
 long npMapPrime;
 
 #ifdef HAVE_DIV_MOD
