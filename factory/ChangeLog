@@ -1,3 +1,19 @@
+Tue Jul  1 14:26:29 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* GNUmakefile.in (dist): use ln instead of cp to build
+	  distribution
+
+	* canonicalform.cc (initCanonicalForm, mmInit): initialize memory
+	  managment if compiled with Singular.  Declaration of mmInit()
+	  added.
+
+	* cf_random.cc (RandomGenerator): removed definitions of const
+	  long int in class for mac.  Instead, they are initialized in
+	  the constructor.
+
+	* cf_random.h (factoryrandom, factoryseed): declarations marked as
+	  public
+
 Mon Jun 30 15:38:08 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* GNUmakefile.in (LIBCFLAGS, LIBCXXFLAGS, TMPLCXXFLAGS): option
