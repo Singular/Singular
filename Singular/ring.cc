@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.16 1998-03-16 14:56:40 obachman Exp $ */
+/* $Id: ring.cc,v 1.17 1998-03-18 14:28:52 obachman Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -664,15 +664,13 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
 
 #ifdef COMP_FAST
 // set those fields of the ring, which can be computed from other fields:
-// More particularly, set:
-// r->VarOffset, r->CompIndex
+// More particularly, sets r->VarOffset 
 
 void rComplete(ring r)
 {
-  int dummy, VarOffset, CompIndex;
-  pGetVarIndicies(r, VarOffset, CompIndex, dummy, dummy);
+  int dummy, VarOffset;
+  pGetVarIndicies(r, VarOffset, dummy, dummy);
   r->VarOffset = (short) VarOffset;
-  r->CompIndex = (short) CompIndex;
 }
 #endif
   

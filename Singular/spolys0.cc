@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: spolys0.cc,v 1.9 1998-03-16 14:56:46 obachman Exp $ */
+/* $Id: spolys0.cc,v 1.10 1998-03-18 14:28:54 obachman Exp $ */
 
 /*
 * ABSTRACT - s-polynomials and reduction in general
@@ -796,7 +796,7 @@ x1:
     }
     pSetm(m1);
     pSetm(m2);
-    cm = t_pComp0(m1, m2);
+    cm = pComp0(m1, m2);
     if (cm!=0)
     {
       if(cm==1)

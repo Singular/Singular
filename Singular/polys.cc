@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.16 1998-03-16 14:56:39 obachman Exp $ */
+/* $Id: polys.cc,v 1.17 1998-03-18 14:28:50 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -413,8 +413,6 @@ static int f_comp_otCOMPEXP_nwODD(poly p1, poly p2)
  *
  ***************************************************************/
 #ifdef COMP_TRADITIONAL
-
-pCompProc t_pComp0;
 
 static int t_comp_otCOMPEXP_nwONE(poly p1, poly p2);
 static int t_comp_otEXPCOMP_nwONE(poly p1, poly p2);
@@ -998,13 +996,8 @@ void pSetSchreyerOrdM(polyset nextOrder, int length,int comps)
         SchreyerOrd[i] = i;
       for (i=indexShift;i<maxSchreyer;i++)
         SchreyerOrd[i] = pGetComp(nextOrder[i-indexShift]);
-#ifdef COMP_DEBUG      
-      pCompOld = t_pComp0;
-#else
       pCompOld = pComp0;
-#endif      
       pComp0 = mcompSchrM;
-      t_pComp0 = mcompSchrM;
       pLDegOld = pLDeg;
       pLDeg = ldegSchrM;
     }
@@ -1016,12 +1009,7 @@ void pSetSchreyerOrdM(polyset nextOrder, int length,int comps)
       Free((ADDRESS)SchreyerOrd,maxSchreyer*sizeof(int));
       maxSchreyer = 0;
       indexShift = 0;
-#ifdef COMP_DEBUG
-      pComp0 = debug_comp;
-#else
       pComp0 = pCompOld;
-#endif      
-      t_pComp0 = pCompOld;
       pLDeg = pLDegOld;
     }
   }
@@ -1051,15 +1039,8 @@ void pSetSyzComp(int k)
   {
     if (maxBound==0)
     {
-#ifdef COMP_DEBUG
-      pCompOld = t_pComp0;
-      pComp0 = mcompSyz;
-      t_pComp0 = mcompSyz;
-#else
       pCompOld = pComp0;
       pComp0 = mcompSyz;
-      t_pComp0 = mcompSyz;
-#endif
     }
     maxBound = k;
   }
@@ -1067,12 +1048,7 @@ void pSetSyzComp(int k)
   {
     if (maxBound!=0)
     {
-#ifdef COMP_DEBUG
-      pComp0 = debug_comp;
-#else
       pComp0 = pCompOld;
-#endif      
-      t_pComp0 = pCompOld;
       maxBound = 0;
     }
   }
@@ -1293,53 +1269,6 @@ static void SimpleChoose(int o_r, int comp_order, pCompProc *p)
 static void SimpleChoose(int o_r, pCompProc *p)
 #endif  
 {
-#ifdef COMP_TRADITIONAL
-  if (pVariables <= 1)
-  {
-    t_pComp0 = t_comp_otEXPCOMP_nwONE;
-  }
-  else
-  {
-    switch(o_r)
-    {
-        case ringorder_lp:
-        case ringorder_Dp:
-        case ringorder_Wp:
-        case ringorder_Ds:
-        case ringorder_Ws:
-        case ringorder_ls:
-          t_pComp0 = t_comp_otEXPCOMP_lex_i;
-          pLexSgn = 1;
-          break;
-
-#ifdef PDEBUG
-        case ringorder_unspec:
-        case ringorder_dp:
-        case ringorder_wp:
-        case ringorder_ds:
-        case ringorder_ws:
-#else
-        default:
-#endif      
-          t_pComp0 = t_comp_otEXPCOMP_revlex_i;
-          pLexSgn = -1;
-          break;
-#ifdef PDEBUG
-        default:
-          Werror("wrong internal ordering:%d at %s, l:%d\n",o_r,__FILE__,__LINE__);
-#endif
-    }
-  }
-  if (o_r == ringorder_lp || o_r == ringorder_ls)
-  {
-      pLexOrder=TRUE;
-      pFDeg = pTotaldegree;
-      pLDeg = ldeg1c;
-      if (o_r == ringorder_ls) pLexSgn = -1;
-  }
-  
-  *p = t_pComp0;
-#endif
 #ifdef COMP_FAST
   switch(o_r)
   {
@@ -1426,9 +1355,6 @@ static void SimpleChoose(int o_r, pCompProc *p)
   *p = f_pComp0;
 #endif // COMP_FAST  
 
-#ifdef COMP_DEBUG
-    *p = debug_comp;
-#endif  
 }
 
 /*2
@@ -1484,53 +1410,6 @@ static void SimpleChooseC(int o_r, int comp_order, pCompProc *p)
 static void SimpleChooseC(int o_r, pCompProc *p)
 #endif  
 {
-#ifdef COMP_TRADITIONAL
-  if (pVariables <= 1)
-  {
-    t_pComp0 = t_comp_otCOMPEXP_nwONE;
-  }
-  else
-  {
-    switch(o_r)
-    {
-        case ringorder_lp:
-        case ringorder_Dp:
-        case ringorder_Wp:
-        case ringorder_Ds:
-        case ringorder_Ws:
-        case ringorder_ls:
-          t_pComp0 = t_comp_lex_otCOMPEXP_i;
-          pLexSgn = 1;
-          break;
-
-#ifdef PDEBUG
-        case ringorder_unspec:
-        case ringorder_dp:
-        case ringorder_wp:
-        case ringorder_ds:
-        case ringorder_ws:
-#else
-        default:
-#endif      
-          t_pComp0 = t_comp_revlex_otCOMPEXP_i;
-          pLexSgn = -1;
-          break;
-#ifdef PDEBUG
-        default:
-          Werror("wrong internal ordering:%d at %s, l:%d\n",o_r,__FILE__,__LINE__);
-#endif
-    }
-  }
-  if (o_r == ringorder_lp || o_r == ringorder_ls)
-  {
-      pLexOrder=TRUE;
-      pFDeg = pTotaldegree;
-      pLDeg = ldeg1c;
-      if (o_r == ringorder_ls) pLexSgn = -1;
-  }
-  
-  *p = t_pComp0;
-#endif
 #ifdef COMP_FAST
   switch(o_r)
   {
@@ -1949,7 +1828,6 @@ void pSetGlobals(ring r, BOOLEAN complete)
   pSRING=FALSE;
   pAltVars=r->N+1;
 #endif
-  t_pComp0 = NULL;
 #ifdef COMP_FAST
   f_pComp0 = NULL;
 #endif  
@@ -2076,10 +1954,6 @@ void pSetGlobals(ring r, BOOLEAN complete)
   {
     test &= ~Sy_bit(OPT_REDTAIL); /* noredTail */
   }
-#ifdef COMP_TRADITIONAL  
-  if (t_pComp0 == NULL)
-    t_pComp0 = pComp0;
-#endif
 
 #ifdef COMP_FAST
   if (f_pComp0 == NULL)
@@ -3123,21 +2997,6 @@ int pWeight(int i)
   return firstwv[i-1];
 }
 
-#ifdef COMP_DEBUG
-static int debug_comp(poly p1, poly p2)
-{
-  int t_d = t_pComp0(p1, p2);
-  int f_d = f_pComp0(p1, p2);
-
-  if (t_d != f_d)
-  {
-    fprintf(stderr, "Error in comp1lpc\n");
-    t_pComp0(p1, p2);
-    f_pComp0(p1, p2);
-  }
-  return t_d;
-}
-#endif
 
 #ifdef COMP_STATISTICS
 static int s_comp_lp_otCOMPEXP_1(poly p1, poly p2)  

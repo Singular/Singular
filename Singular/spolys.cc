@@ -613,7 +613,7 @@ x1:
     }
     pSetm(m1);
     pSetm(m2);
-    cm = t_pComp0(m1, m2);
+    cm = pComp0(m1, m2);
     if (cm!=0)
     {
       if(cm==1)

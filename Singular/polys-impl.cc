@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.cc,v 1.9 1998-01-27 18:51:20 Singular Exp $ */
+/* $Id: polys-impl.cc,v 1.10 1998-03-18 14:28:48 obachman Exp $ */
 
 /***************************************************************
  *
@@ -55,8 +55,7 @@ int pLexSgn;
  ***************************************************************/
 #ifdef COMP_FAST
 // gets var indicies w.r.t. the ring r
-void pGetVarIndicies(ring r,
-                     int &VarOffset, int &VarCompIndex,
+void pGetVarIndicies(ring r, int &VarOffset, 
                      int &VarLowIndex, int &VarHighIndex)
 {
   // at the moment, non-default var indicies are only used for simple orderings
@@ -77,8 +76,7 @@ void pGetVarIndicies(ring r,
         case ringorder_ds:
         case ringorder_ws:
         case ringorder_unspec:
-          pGetVarIndicies_RevLex(r->N, VarOffset, VarCompIndex,
-                                 VarLowIndex, VarHighIndex);
+          pGetVarIndicies_RevLex(r->N, VarOffset, VarLowIndex, VarHighIndex);
           break;
 
 #ifdef PDEBUG
@@ -91,8 +89,7 @@ void pGetVarIndicies(ring r,
 #else
         default:
 #endif
-          pGetVarIndicies_Lex(r->N, VarOffset, VarCompIndex,
-                                 VarLowIndex, VarHighIndex);
+          pGetVarIndicies_Lex(r->N, VarOffset, VarLowIndex, VarHighIndex);
 #ifdef PDEBUG
           break;
         default:
@@ -103,7 +100,7 @@ void pGetVarIndicies(ring r,
   }
   else
     // default var indicies are used
-    pGetVarIndicies(r->N, VarOffset, VarCompIndex, VarLowIndex, VarHighIndex);
+    pGetVarIndicies(r->N, VarOffset, VarLowIndex, VarHighIndex);
 }
 
 

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.9 1998-01-17 18:08:00 Singular Exp $ */
+/* $Id: polys.h,v 1.10 1998-03-18 14:28:52 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
 */
@@ -185,12 +185,13 @@ extern  poly pHeadProc(poly p);
 #define pFetchCopy(r,p)     _pFetchCopy(r,p)
 
 
+// Adds exponents of p2 to exponents of p1; updates Order field
+// assumes that exponents > 0 and < MAX_EXPONENT / 2
+#define pMonAddFast(p1, p2) _pMonAddFast(p1, p2)
 // Is equivalent to pCopy2(p1, p2);pMonAddFast(p1, p3);
 #define pCopyAddFast(p1, p2, p3)    _pCopyAddFast(p1, p2, p3)
-#define pbCopyAddFast(p1, p2, p3)   _pbCopyAddFast(p1, p2, p3)
-#define pbCopyAddFast0(p1, p2, p3)  _pbCopyAddFast0(p1, p2, p3)
-// Similar to pCopyAddFast, except that components of p2, and p3 must be 0
-#define pCopyAddFast1(p1, p2, p3)    _pCopyAddFast1(p1, p2, p3)
+// Similar to pCopyAddFast, except that we do not care about the next field
+#define pCopyAddFast0(p1, p2, p3)  _pCopyAddFast0(p1, p2, p3)
 
 poly      pmInit(char *s, BOOLEAN &ok);   /* monom -> poly */
 void      ppDelete(poly * a, ring r);
@@ -208,16 +209,16 @@ poly      pPower(poly p, int i);
 // FALSE otherwise
 #define pEqual(p1, p2) _pEqual(p1, p2)
 
-// returns TRUE, if leading monom of a is dividble be leading monom of b
-#if defined(macintosh) || defined(DIV_COUNT)
+// returns TRUE, if leading monom of a divides leading monom of b
+// i.e., if there exists a expvector c > 0, s.t. b = a + c
+#if defined(macintosh) 
 BOOLEAN   pDivisibleBy(poly a, poly b);
 #else
 #define pDivisibleBy(a, b)  _pDivisibleBy(a,b)
 #endif
 // like pDivisibleBy, except that it is assumed that a!=NULL
 #define pDivisibleBy1(a,b)   _pDivisibleBy1(a,b)
-// returns TRUE, if leading monom of a is dividble be leading monom of b
-// assumes a != NULL, b != NULL, and does not check components
+// like pDivisibleBy, assumes a != NULL, does not check components
 #define pDivisibleBy2(a, b) _pDivisibleBy2(a,b)
 
 
