@@ -1,12 +1,17 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fac_berlekamp.cc,v 1.0 1996-05-17 10:59:45 stobbe Exp $
+// $Id: fac_berlekamp.cc,v 1.1 1997-03-27 09:34:59 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
-*/
+Revision 1.0  1996/05/17 10:59:45  stobbe
+Initial revision
 
+*/
 #include "assert.h"
+#include "debug.h"
+
 #include "cf_defs.h"
+
 #include "fac_berlekamp.h"
 #include "ffops.h"
 #include "gfops.h"
@@ -16,6 +21,32 @@ $Log: not supported by cvs2svn $
 #include "cf_generator.h"
 #include "fac_sqrfree.h"
 #include "cf_util.h"
+
+#ifdef DEBUGOUTPUT
+void QprintFF( int ** Q, int n )
+{
+    for ( int i = 0; i < n; i++ ) {
+	for ( int j = 0; j < n; j++ )
+	    cerr << Q[i][j] << "  ";
+	cerr << endl;
+    }
+    cerr << endl;
+}
+#endif /* DEBUGOUTPUT */
+
+#ifdef DEBUGOUTPUT
+void QprintGF( int ** Q, int n )
+{
+    for ( int i = 0; i < n; i++ ) {
+	for ( int j = 0; j < n; j++ ) {
+	    gf_print( cerr, Q[i][j] );
+	    cerr << "  ";
+	}
+	cerr << endl;
+    }
+    cerr << endl;
+}
+#endif /* DEBUGOUTPUT */
 
 void QmatFF ( const CanonicalForm & f, int ** Q, int p )
 {
@@ -175,28 +206,6 @@ int nullSpaceGF ( int ** Q, int ** b, int n )
     return r;
 }
 
-void QprintFF( int ** Q, int n )
-{
-    for ( int i = 0; i < n; i++ ) {
-	for ( int j = 0; j < n; j++ )
-	    cerr << Q[i][j] << "  ";
-	cerr << endl;
-    }
-    cerr << endl;
-}
-
-void QprintGF( int ** Q, int n )
-{
-    for ( int i = 0; i < n; i++ ) {
-	for ( int j = 0; j < n; j++ ) {
-	    gf_print( cerr, Q[i][j] );
-	    cerr << "  ";
-	}
-	cerr << endl;
-    }
-    cerr << endl;
-}
-
 CanonicalForm cfFromIntVec( int * a, int n, const Variable & x )
 {
     CanonicalForm result = power( x, n-1 ) * a[n-1];
@@ -229,9 +238,15 @@ CFFList BerlekampFactorFF ( const CanonicalForm & f )
     for ( i = 0; i < n; i++ )
 	Q[i] = new int[n];
     QmatFF( f, Q, p );
-//    QprintFF( Q, n );
+#ifdef DEBUGOUTPUT
+    DEBOUTLN( cerr, "Q = ", ' ' );
+    QprintFF( Q, n );
+#endif /* DEBUGOUTPUT */
     k = nullSpaceFF( Q, B, n );
-//    QprintFF( Q, n );
+#ifdef DEBUGOUTPUT
+    DEBOUTLN( cerr, "Q = ", ' ' );
+    QprintFF( Q, n );
+#endif /* DEBUGOUTPUT */
     F.insert( CFFactor( f, 1 ) );
     r = 1;
     len = 1;
@@ -274,9 +289,15 @@ CFFList BerlekampFactorGF ( const CanonicalForm & f )
     for ( i = 0; i < n; i++ )
 	Q[i] = new int[n];
     QmatGF( f, Q, gf_q );
-//    QprintGF( Q, n );
+#ifdef DEBUGOUTPUT
+    DEBOUTLN( cerr, "Q = ", ' ' );
+    QprintGF( Q, n );
+#endif /* DEBUGOUTPUT */
     k = nullSpaceGF( Q, B, n );
-//    QprintFF( Q, n );
+#ifdef DEBUGOUTPUT
+    DEBOUTLN( cerr, "Q = ", ' ' );
+    QprintFF( Q, n );
+#endif /* DEBUGOUTPUT */
     F.insert( CFFactor( f, 1 ) );
     r = 1;
     len = 1;
