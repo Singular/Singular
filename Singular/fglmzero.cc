@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmzero.cc,v 1.2 1997-03-27 10:34:49 Singular Exp $
+// $Id: fglmzero.cc,v 1.3 1997-03-27 16:11:10 Singular Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -64,7 +64,7 @@ public:
 
     int dimen() const { fglmASSERT( _size>0, "called to early"); return _size; } 
     void endofConstruction();
-    void map( int * perm, ring source );
+    void map( ring source );
     void insertCols( int * divisors, int to );
     void insertCols( int * divisors, const fglmVector to );
     fglmVector addCols( const int var, int basisSize, const fglmVector v ) const;
@@ -116,16 +116,16 @@ idealFunctionals::endofConstruction()
 }
 
 void
-idealFunctionals::map( int * perm, ring source ) 
+idealFunctionals::map( ring source ) 
 {
-    // assumes that perm has size _nfunc+1, i.e it runs
-    // from perm[1]..perm[_nfunc]
-    // assumes that currRing is dest, so maps from source to dest
+    // maps from ring source to currentRing.
     int var, col, row;
     matHeader * colp;
     matElem * elemp;
     number newelem;
 
+    int * perm = (int *)Alloc0( (_nfunc+1)*sizeof( int ) );
+    maFindPerm( source->names, source->N, NULL, 0, currRing->names, currRing->N, NULL, 0, perm, NULL );
     nSetMap( source->ch, source->parameter, source->P, source->minpoly );
     
     matHeader ** temp = (matHeader **)Alloc( _nfunc*sizeof( matHeader * ));
@@ -142,6 +142,7 @@ idealFunctionals::map( int * perm, ring source )
 	temp[ perm[var+1]-1 ]= func[var];
     }
     Free( (ADDRESS)func, _nfunc*sizeof( matHeader * ) );
+    Free( (ADDRESS)perm, (_nfunc+1)*sizeof( int ) );
     func= temp;
 }
 
@@ -972,6 +973,7 @@ fglmzero( idhdl sourceRingHdl, ideal & sourceIdeal, idhdl destRingHdl, ideal & d
 	idDelete( & sourceIdeal );
     rSetHdl( destRingHdl, TRUE );
     if ( fglmok == TRUE ) {
+	L.map( IDRING( sourceRingHdl ) );
 	destIdeal= GroebnerViaFunctionals( L );
     }
     if ( (switchBack == TRUE) && (currRingHdl != initialRingHdl) )
