@@ -1,3 +1,6 @@
+Sat Jan 17 18:21:15 MET 1998 hannes
+	* removed duplicate _memcpyW from mmalloc.c
+
 Fri Jan 16 15:30:07 MET 1998 Kai Krueger <krueger@mathematik.uni-kl.de>
 	* extra.cc,febase.cc,febase.inc,grammar.y,iparith.cc
 	* ipassign.cc,ipid.cc,ipid.h,iplib.cc,ipshell.h,misc.cc
