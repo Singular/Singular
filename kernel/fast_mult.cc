@@ -479,12 +479,30 @@ static void buildTermAndAdd(int n,number* facult,poly* f_terms,int* exp,int f_le
 
 static void MC_iterate(poly f, int n, ring r, int f_len,number* facult, int* exp,poly* f_terms,kBucket_pt erg_bucket,int pos,int sum, number coef, poly & zw, poly tmp, poly** term_pot){
   int i;
-
+  
   if (pos<f_len-1){
     poly zw_l=NULL;
+    number new_coef;
     for(i=0;i<=n-sum;i++){
       exp[pos]=i;
-      number new_coef=n_IntDiv(coef,facult[i],r);
+      if(i==0){
+	new_coef=n_Copy(coef,r);
+      }
+      else {
+	number old=new_coef;
+	number old_rest=n_Init(n-sum-(i-1),r);
+	new_coef=n_Mult(new_coef,old_rest,r);
+	n_Delete(&old_rest,r);
+	n_Delete(&old,r);
+	number i_number=n_Init(i,r);
+	old=new_coef;
+	new_coef=n_IntDiv(new_coef,i_number,r);
+	n_Delete(&old,r);
+	n_Delete(&i_number,r);
+      }
+      //new_coef is 
+      //(n                          )
+      //(exp[0]..exp[pos] 0 0 0 rest)
       poly zw_real=NULL;
       MC_iterate(f, n, r, f_len,facult, exp,f_terms,erg_bucket,pos+1,sum+i,new_coef,zw_real,tmp,term_pot);
       if (pos==f_len-2){
@@ -493,8 +511,9 @@ static void MC_iterate(poly f, int n, ring r, int f_len,number* facult, int* exp
 	zw_real->next=zw_l;
 	zw_l=zw_real;
       }
-      n_Delete(& new_coef,r);
+      //n_Delete(& new_coef,r);
     }
+    n_Delete(&new_coef,r);
     if (pos==f_len-2){
       int len=n-sum+1;
       kBucket_Add_q(erg_bucket,zw_l,&len);
@@ -504,7 +523,7 @@ static void MC_iterate(poly f, int n, ring r, int f_len,number* facult, int* exp
   if(pos==f_len-1){
     i=n-sum;
     exp[pos]=i;
-    number new_coef=n_IntDiv(coef,facult[i],r);
+    number new_coef=nCopy(coef);//n_IntDiv(coef,facult[i],r); //really consumed???????
     buildTermAndAdd(n,facult,f_terms,exp,f_len,erg_bucket,r, new_coef,zw, tmp,term_pot);
     // n_Delete(& new_coef,r);
   }
@@ -553,10 +572,11 @@ poly pFastPowerMC(poly f, int n, ring r){
   assume(f_iter==NULL);
   poly zw=NULL;
   poly tmp=p_Init(r);
-  MC_iterate(f,n,r,f_len,&facult[0], &exp[0], &f_terms[0],erg_bucket,0,0,facult[n],zw,tmp, term_potences);
+  number one=n_Init(1,r);
+  MC_iterate(f,n,r,f_len,&facult[0], &exp[0], &f_terms[0],erg_bucket,0,0,one/*facult[n]*/,zw,tmp, term_potences);
 
 
-
+  n_Delete(&one,r);
 
 
   
