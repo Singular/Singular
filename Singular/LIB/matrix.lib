@@ -1,4 +1,4 @@
-// $Id: matrix.lib,v 1.2 1997-04-28 19:27:22 obachman Exp $
+// $Id: matrix.lib,v 1.3 1997-08-12 14:01:08 Singular Exp $
 // (GMG/BM, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
 LIBRARY:  matrix.lib    PROCEDURES FOR MATRIX OPERATIONS
@@ -294,7 +294,7 @@ example
    matrix A=skewmat(6,maxideal(1)^2);
    print(A);
    int n=4;
-   ideal i = ideal(randommat(1,n*(n-1)/2,maxideal(1),9));
+   ideal i = ideal(randommat(1,n*(n-1) div 2,maxideal(1),9));
    print(skewmat(n,i));  // skew matrix of generic linear forms
    kill R1;
 }
@@ -350,7 +350,7 @@ example
    matrix A=symmat(5,maxideal(1)^2);
    print(A);
    int n=3;
-   ideal i = ideal(randommat(1,n*(n+1)/2,maxideal(1),9));
+   ideal i = ideal(randommat(1,n*(n+1) div 2,maxideal(1),9));
    print(symmat(n,i));  // symmetric matrix of generic linear forms
    kill R1;
 }

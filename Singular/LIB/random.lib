@@ -1,4 +1,4 @@
-// $Id: random.lib,v 1.2 1997-04-28 19:27:23 obachman Exp $
+// $Id: random.lib,v 1.3 1997-08-12 14:01:11 Singular Exp $
 //system("random",787422842);
 //(GMG/BM, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
@@ -212,7 +212,7 @@ RETURN:  nxm lower triagonal integer matrix, diagonal entries equal to 1, about
 EXAMPLE: example sparsetriag; shows an example
 {
    int ii,min,l,r; intmat M[n][m];
-   int t=(n*(n-1))/2;
+   int t=(n*(n-1)) div 2;
 //----------------------------- set defaults ----------------------------------
    if( size(#)>=2 ) { int p=#[1]; int b=#[2]; }
    if( size(#)==1 ) { int p=#[1]; int b=1; }

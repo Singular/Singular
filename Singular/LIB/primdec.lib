@@ -1,4 +1,4 @@
-// $Id: primdec.lib,v 1.2 1997-08-04 15:14:21 Singular Exp $
+// $Id: primdec.lib,v 1.3 1997-08-12 14:01:10 Singular Exp $
 ///////////////////////////////////////////////////////
 // primdec.lib
 // algorithms for primary decomposition based on
@@ -9,18 +9,18 @@
 LIBRARY: primdec.lib: PROCEDURE FOR PRIMARY DECOMPOSITION (I)
 
   minAssPrimes (ideal I, list choose)
-  // minimal associated primes 
+  // minimal associated primes
   // The list choose must be either emty (minAssPrimes(I)) or 1
   // (minAssPrimes(I,1))
   // In the second case the factorizing Buchberger Algorithm is used
   // which in most cases may considerably speed up the algorithm
-    
+
   primdec (ideal I)
-  
+
   // Computes a complete primary decomposition via
 
   radical(ideal I)
-  //computes the radical of the ideal I 
+  //computes the radical of the ideal I
 
 LIB "random.lib";
 LIB "poly.lib";
@@ -75,14 +75,14 @@ EXAMPLE: example sat2; shows an example
    {
      if(deg(@h[@i])>0)
      {
-        fac=fac+factorize(@h[@i],1); 
+        fac=fac+factorize(@h[@i],1);
      }
    }
    fac=simplify(fac,4);
    poly @f=1;
    if(deg(fac[1])>0)
    {
-      ideal iold;     
+      ideal iold;
 
       for(@i=1;@i<=size(fac);@i++)
       {
@@ -129,25 +129,25 @@ proc minSat(ideal inew, ideal h)
    {
       if(deg(h[i])>0)
       {
-         fac=fac+factorize(h[i],1); 
+         fac=fac+factorize(h[i],1);
       }
    }
    fac=simplify(fac,4);
    if(size(fac)==0)
    {
       l=inew,1;
-      return(l);  
+      return(l);
    }
    fac=sort(fac)[1];
    for(i=1;i<=size(fac);i++)
    {
       f=f*fac[i];
    }
-   quotM[1]=inew;   
+   quotM[1]=inew;
    quotM[2]=fac;
    quotM[3]=f;
    f=1;
-   option(returnSB);   
+   option(returnSB);
    while(specialIdealsEqual(iold,quotM[1])==0)
    {
       if(k>0)
@@ -161,7 +161,7 @@ proc minSat(ideal inew, ideal h)
    option(noreturnSB);
    l=quotM[1],f;
    return(l);
-} 
+}
 
 proc quotMin(list tsil)
 {
@@ -177,7 +177,7 @@ proc quotMin(list tsil)
    ideal star=quotient(laedi,f);
 
    action=1;
- 
+
    while(action==1)
    {
       if(size(fac)==1)
@@ -191,14 +191,14 @@ proc quotMin(list tsil)
          for(j=1;j<=size(fac);j++)
          {
             if(i!=j)
-            { 
+            {
                g=g*fac[j];
-            }   
+            }
          }
          verg=quotient(laedi,g);
          if(specialIdealsEqual(verg,star)==1)
          {
-            f=g; 
+            f=g;
             fac[i]=0;
             fac=simplify(fac,2);
             break;
@@ -209,8 +209,8 @@ proc quotMin(list tsil)
          }
       }
    }
-   l=star,fac,f; 
-   return(l);  
+   l=star,fac,f;
+   return(l);
 }
 
 
@@ -239,10 +239,10 @@ proc testFactor(list act,poly p)
 proc factor(poly p)
 USAGE:   factor(p) p poly
 RETURN:  list=;
-NOTE:    
+NOTE:
 EXAMPLE: example factor; shows an example
 {
-  
+
   ideal @i;
   list @l;
   intvec @v,@w;
@@ -343,7 +343,7 @@ example
 ////////////////////////////////////////////////////////////////////////////////
 
 proc idealsEqual( ideal k, ideal j)
-{ 
+{
    return(stdIdealsEqual(std(k),std(j)));
 }
 
@@ -393,12 +393,12 @@ proc stdIdealsEqual( ideal k1, ideal k2)
 proc testPrimary(list pr, ideal k)
 USAGE:   testPrimary(pr,k) pr list, k ideal;
 RETURN:  int = 1, if the intersection of the ideals in pr is k, 0 if not
-NOTE:     
+NOTE:
 EEXAMPLE: example testPrimary ; shows an example
 {
    int i;
    ideal j=pr[1];
-   for (i=2;i<=size(pr)/2;i++)
+   for (i=2;i<=size(pr) div 2;i++)
    {
        j=intersect(j,pr[2*i-1]);
    }
@@ -424,7 +424,7 @@ example
 proc printPrimary( list l, list #)
 USAGE:   printPrimary(l) l list;
 RETURN:  nothing
-NOTE:   
+NOTE:
 EXAMPLE: example printPrimary; shows an example
 {
    if(size(#)>0)
@@ -437,7 +437,7 @@ EXAMPLE: example printPrimary; shows an example
       "                                            ";
    }
    int k;
-   for (k=1;k<=size(l)/2;k=k+1)
+   for (k=1;k<=size(l) div 2;k=k+1)
    {
       "                                            ";
       "primary ideal:                              ";
@@ -460,7 +460,7 @@ USAGE:   randomLast
 RETURN:  ideal = maxideal(1) but the last variable exchanged by
          a sum of it with a linear random combination of the other
          variables
-NOTE:   
+NOTE:
 EXAMPLE: example randomLast; shows an example
 {
 
@@ -501,7 +501,7 @@ EXAMPLE: example primaryTest; shows an example
    ideal h;
 
    //the first generator of the prim ideal for the result
-   ideal prm=p; 
+   ideal prm=p;
    attrib(prm,"isSB",1);
 
    while (n>1)
@@ -522,10 +522,10 @@ EXAMPLE: example primaryTest; shows an example
          }
          m=m-1;
       }
-      //check whether i[m] =(c*var(n)+h)^e modulo prm for some 
+      //check whether i[m] =(c*var(n)+h)^e modulo prm for some
       //h in K[var(n+1),...,var(nvars(basering))], c in K
       //if not (0) is returned, else var(n)+h is added to prm
-     
+
       e=deg(lead(i[m]));
       t=leadcoef(i[m])*e*var(n)+(i[m]-lead(i[m]))/var(n)^(e-1);
       i[m]=poly(e)^e*leadcoef(i[m])^(e-1)*i[m];
@@ -568,7 +568,7 @@ proc splitPrimary(list l,ideal ser,int @wr,list sact)
    poly @f;
    int sl=size(l);
 
-   for(i=1;i<=sl/2;i++)
+   for(i=1;i<=sl div 2;i++)
    {
       if(sact[2][i]>1)
       {
@@ -580,7 +580,7 @@ proc splitPrimary(list l,ideal ser,int @wr,list sact)
       }
    }
    i=0;
-   while(i<size(l)/2)
+   while(i<size(l) div 2)
    {
       i++;
       if((size(ser)>0)&&(size(reduce(ser,l[2*i-1]))==0))
@@ -599,7 +599,7 @@ proc splitPrimary(list l,ideal ser,int @wr,list sact)
             continue;
          }
          j=0;
-         if(i<=sl/2)
+         if(i<=sl div 2)
          {
             j=1;
          }
@@ -624,10 +624,10 @@ proc splitPrimary(list l,ideal ser,int @wr,list sact)
                }
             }
             if(gcdTest(act[1])==1)
-            { 
+            {
                for(k=2;k<=r;k++)
                {
-                  keepprime[size(l)/2+k-1]=interred(keepprime[i]+ideal(act[1][k]));
+                  keepprime[size(l) div 2+k-1]=interred(keepprime[i]+ideal(act[1][k]));
                }
                keepprime[i]=interred(keepprime[i]+ideal(act[1][1]));
                for(k=1;k<=r;k++)
@@ -654,7 +654,7 @@ proc splitPrimary(list l,ideal ser,int @wr,list sact)
                for(k=2;k<=r;k++)
                {
                   l[s+2*k-1]=keepresult[k];
-                  keepprime[s/2+k]=interred(keepresult[k]+ideal(act[1][k]));
+                  keepprime[s div 2+k]=interred(keepresult[k]+ideal(act[1][k]));
                   if(vdim(keepresult[k])==deg(act[1][k]))
                   {
                      l[s+2*k]=keepresult[k];
@@ -663,13 +663,13 @@ proc splitPrimary(list l,ideal ser,int @wr,list sact)
                   {
                      l[s+2*k]=ideal(0);
                   }
-                  if((homog(keepresult[k])==1)||(homog(keepprime[s/2+k])==1))
+                  if((homog(keepresult[k])==1)||(homog(keepprime[s div 2+k])==1))
                   {
                     l[s+2*k]=maxideal(1);
                   }
                }
                i--;
-               break;              
+               break;
             }
             if(r>=2)
             {
@@ -685,21 +685,21 @@ proc splitPrimary(list l,ideal ser,int @wr,list sact)
                   }
                   else
                   {
-                     l[s+2]=ideal(0); 
+                     l[s+2]=ideal(0);
                   }
-                  keepprime[s/2+1]=interred(keepprime[i]+ideal(@f));
-                  if(homog(keepprime[s/2+1])==1)
+                  keepprime[s div 2+1]=interred(keepprime[i]+ideal(@f));
+                  if(homog(keepprime[s div 2+1])==1)
                   {
                      l[s+2]=maxideal(1);
                   }
-                  keepprime[i]=act[1];                
+                  keepprime[i]=act[1];
                   l[2*i-1]=act[1];
                   attrib(l[2*i-1],"isSB",1);
                   if(homog(l[2*i-1])==1)
                   {
                      l[2*i]=maxideal(1);
                   }
-                  
+
                   i--;
                   break;
                }
@@ -711,13 +711,13 @@ proc splitPrimary(list l,ideal ser,int @wr,list sact)
    {
       return(l);
    }
-   for(i=1;i<=size(l)/2;i++)
+   for(i=1;i<=size(l) div 2;i++)
    {
       if((size(l[2*i])==0)&&(specialIdealsEqual(keepprime[i],l[2*i-1])!=1))
       {
-         keepprime[i]=std(keepprime[i]);  
+         keepprime[i]=std(keepprime[i]);
          if(homog(keepprime[i])==1)
-         {      
+         {
              l[2*i]=maxideal(1);
          }
          else
@@ -766,7 +766,7 @@ EXAMPLE: example zero_decomp; shows an example
   intvec @vh,@hilb;
   string @ri;
   poly @f;
-  
+
   if (dim(j)>0)
   {
      primary[1]=ideal(1);
@@ -793,7 +793,7 @@ EXAMPLE: example zero_decomp; shows an example
        }
        else
        {
-          @qh[1]=act[1][@k];    
+          @qh[1]=act[1][@k];
        }
        primary[2*@k-1]=interred(@qh);
        @qh=j;
@@ -813,7 +813,7 @@ EXAMPLE: example zero_decomp; shows an example
           return(primary);
      }
      if(dim(j)==-1)
-     { 
+     {
         primary[1]=ideal(1);
         primary[2]=ideal(1);
      }
@@ -823,7 +823,7 @@ EXAMPLE: example zero_decomp; shows an example
      }
      return(primary);
   }
-  
+
 //the first element in the standardbase is factorized
   if(deg(j[1])>0)
   {
@@ -878,7 +878,7 @@ EXAMPLE: example zero_decomp; shows an example
         act[2]=1;
         primary[1]=std(primary[1],act[1][1]);
      }
-     
+
      if((act[2][1]==1)&&(vdim(primary[1])==deg(act[1][1])))
      {
         primary[2]=primary[1];
@@ -899,7 +899,7 @@ EXAMPLE: example zero_decomp; shows an example
 //variable the corresponding ideal is decomposed again.
 
   @k=0;
-  while(@k<(size(primary)/2))
+  while(@k<(size(primary) div 2))
   {
     @k++;
     if (size(primary[2*@k])==0)
@@ -914,7 +914,7 @@ EXAMPLE: example zero_decomp; shows an example
        }
        phi=@P,jmap;
        jmap[nva]=-(jmap[nva]-2*var(nva));
-       psi=@P,jmap;    
+       psi=@P,jmap;
        @qht=primary[2*@k-1];
        @qh=phi(@qht);
        if(npars(@P)>0)
@@ -943,7 +943,7 @@ EXAMPLE: example zero_decomp; shows an example
        @qh=imap(@Phelp1,@qh);
        kill @Phelp1;
        @qh=clearSB(@qh);
-       attrib(@qh,"isSB",1);      
+       attrib(@qh,"isSB",1);
 
        @lh=zero_decomp (@qh,psi(ser),@wr);
 
@@ -992,35 +992,35 @@ EXAMPLE: example zero_decomp; shows an example
        list @lvec;
        list @lr=imap(@P,lres);
        ideal @lr1;
-       
+
        if(size(@lr)==2)
        {
           @lr[2]=homog(@lr[2],@t);
           @lr1=std(@lr[2]);
-          @lvec[2]=hilb(@lr1,1);      
+          @lvec[2]=hilb(@lr1,1);
        }
        else
        {
-          for(@n=1;@n<=size(@lr)/2;@n++)
+          for(@n=1;@n<=size(@lr) div 2;@n++)
           {
              if(specialIdealsEqual(@lr[2*@n-1],@lr[2*@n])==1)
              {
                 @lr[2*@n-1]=homog(@lr[2*@n-1],@t);
                 @lr1=std(@lr[2*@n-1]);
-                @lvec[2*@n-1]=hilb(@lr1,1); 
-                @lvec[2*@n]=@lvec[2*@n-1]; 
+                @lvec[2*@n-1]=hilb(@lr1,1);
+                @lvec[2*@n]=@lvec[2*@n-1];
              }
              else
              {
                 @lr[2*@n-1]=homog(@lr[2*@n-1],@t);
                 @lr1=std(@lr[2*@n-1]);
-                @lvec[2*@n-1]=hilb(@lr1,1); 
+                @lvec[2*@n-1]=hilb(@lr1,1);
                 @lr[2*@n]=homog(@lr[2*@n],@t);
                 @lr1=std(@lr[2*@n]);
-                @lvec[2*@n]=hilb(@lr1,1); 
+                @lvec[2*@n]=hilb(@lr1,1);
 
              }
-         } 
+         }
        }
        @ri= "ring @Phelp1 ="
                   +string(char(@P))+",("+varstr(@Phelp)+"),lp;";
@@ -1032,11 +1032,11 @@ EXAMPLE: example zero_decomp; shows an example
        {
           @lr[2]=std(@lr[2],@lvec[2]);
           @lr[2]=subst(@lr[2],@t,1);
-      
+
        }
        else
        {
-          for(@n=1;@n<=size(@lr)/2;@n++)
+          for(@n=1;@n<=size(@lr) div 2;@n++)
           {
              if(specialIdealsEqual(@lr[2*@n-1],@lr[2*@n])==1)
              {
@@ -1063,11 +1063,11 @@ EXAMPLE: example zero_decomp; shows an example
           lres[@n]=clearSB(lres[@n]);
           attrib(lres[@n],"isSB",1);
        }
-       
+
        primary[2*@k-1]=lres[1];
        primary[2*@k]=lres[2];
-       @s=size(primary)/2;
-       for(@n=1;@n<=size(lres)/2-1;@n++)
+       @s=size(primary) div 2;
+       for(@n=1;@n<=size(lres) div 2-1;@n++)
        {
          primary[2*@s+2*@n-1]=lres[2*@n+1];
          primary[2*@s+2*@n]=lres[2*@n+2];
@@ -1093,7 +1093,7 @@ example
 proc ggt (ideal i)
 USAGE:   ggt(i); i list of polynomials
 RETURN:  poly = ggt(i[1],...,i[size(i)])
-NOTE:    
+NOTE:
 EXAMPLE: example ggt; shows an example
 {
   int k;
@@ -1103,7 +1103,7 @@ EXAMPLE: example ggt; shows an example
     return(1);
   }
 
- 
+
   for (k=2;k<=size(i);k++)
   {
      if(deg(i[k])==0)
@@ -1167,7 +1167,7 @@ proc coeffLcm(ideal h)
    return(@p);
 }
 example
-{ 
+{
    "EXAMPLE:"; echo = 2;
    ring  r =( 0,a,b),(x,y,z),lp;
    poly  p = (a+b)*(y-z);
@@ -1181,13 +1181,13 @@ example
 proc clearSB (ideal i,list #)
 USAGE:   clearSB(i); i ideal which is SB ordered by monomial ordering
 RETURN:  ideal = minimal SB
-NOTE:    
+NOTE:
 EXAMPLE: example clearSB; shows an example
 {
   int k,j;
   poly m;
   int c=size(i);
-  
+
   if(size(#)==0)
   {
     for(j=1;j<c;j++)
@@ -1196,7 +1196,7 @@ EXAMPLE: example clearSB; shows an example
       {
         i=ideal(1);
         return(i);
-      }    
+      }
       if(deg(i[j])>0)
       {
         m=lead(i[j]);
@@ -1220,7 +1220,7 @@ EXAMPLE: example clearSB; shows an example
       {
         i=ideal(1);
         return(i);
-      }    
+      }
       if(deg(i[j])>0)
       {
         m=lead(i[j]);
@@ -1235,7 +1235,7 @@ EXAMPLE: example clearSB; shows an example
              else
              {
                 i[j]=0;
-                break;  
+                break;
              }
            }
         }
@@ -1261,14 +1261,14 @@ USAGE:   independentSet(i); i ideal
 RETURN:  list = new varstring with the independent set at the end,
                 ordstring with the corresponding block ordering,
                 the integer where the independent set starts in the varstring
-NOTE:    
+NOTE:
 EXAMPLE: example independentSet; shows an example
 {
    int n,k,di;
    list resu,hilf;
    string var1,var2;
    list v=system("indsetall",j,1);
-    
+
    for(n=1;n<=size(v);n++)
    {
       di=0;
@@ -1276,7 +1276,7 @@ EXAMPLE: example independentSet; shows an example
       var2="";
       for(k=1;k<=size(v[n]);k++)
       {
-         if(v[n][k]!=0) 
+         if(v[n][k]!=0)
          {
             di++;
             var2=var2+"var("+string(k)+"),";
@@ -1328,14 +1328,14 @@ USAGE:   maxIndependentSet(i); i ideal
 RETURN:  list = new varstring with the maximal independent set at the end,
                 ordstring with the corresponding block ordering,
                 the integer where the independent set starts in the varstring
-NOTE:    
+NOTE:
 EXAMPLE: example maxIndependentSet; shows an example
 {
    int n,k,di;
    list resu,hilf;
    string var1,var2;
    list v=system("indsetall",j,0);
-    
+
    for(n=1;n<=size(v);n++)
    {
       di=0;
@@ -1343,7 +1343,7 @@ EXAMPLE: example maxIndependentSet; shows an example
       var2="";
       for(k=1;k<=size(v[n]);k++)
       {
-         if(v[n][k]!=0) 
+         if(v[n][k]!=0)
          {
             di++;
             var2=var2+"var("+string(k)+"),";
@@ -1393,20 +1393,20 @@ example
 proc prepareQuotientring (int nnp)
 USAGE:   prepareQuotientring(nnp); nnp int
 RETURN:  string = to define Kvar(nnp+1),...,var(nvars)[..rest ]
-NOTE:    
+NOTE:
 EXAMPLE: example independentSet; shows an example
-{  
+{
   ideal @ih,@jh;
   int npar=npars(basering);
   int @n;
-  
+
   string quotring= "ring quring = ("+charstr(basering);
   for(@n=nnp+1;@n<=nvars(basering);@n++)
   {
      quotring=quotring+",var("+string(@n)+")";
      @ih=@ih+var(@n);
   }
- 
+
   quotring=quotring+"),(var(1)";
   @jh=@jh+var(1);
   for(@n=2;@n<=nnp;@n++)
@@ -1415,7 +1415,7 @@ EXAMPLE: example independentSet; shows an example
     @jh=@jh+var(@n);
   }
   quotring=quotring+"),lp;";
-  
+
   return(quotring);
 
 }
@@ -1430,7 +1430,7 @@ example
    basering;
    phi;
    setring @Q;
-   
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1438,7 +1438,7 @@ proc cleanPrimary(list l)
 {
    int i,j;
    list lh;
-   for(i=1;i<=size(l)/2;i++)
+   for(i=1;i<=size(l) div 2;i++)
    {
       if(deg(l[2*i-1][1])>0)
       {
@@ -1456,7 +1456,7 @@ proc minAssPrimes(ideal i, list #)
 USAGE:   minAssPrimes(i); i ideal
          minAssPrimes(i,1); i ideal  (to use also the factorizing Groebner)
 RETURN:  list = the minimal associated prime ideals of i
-NOTE:    
+NOTE:
 EXAMPLE: example minAssPrimes; shows an example
 {
    def @P=basering;
@@ -1480,7 +1480,7 @@ EXAMPLE: example minAssPrimes; shows an example
    option(redSB);
    list @pr=facstd(i);
    option(noredSB);
-   int j,k,odim,ndim,count; 
+   int j,k,odim,ndim,count;
    attrib(@pr[1],"isSB",1);
    if(#[1]==77)
    {
@@ -1501,11 +1501,11 @@ EXAMPLE: example minAssPrimes; shows an example
            count=j;
            odim=ndim;
         }
-        if(ndim<odim)      
+        if(ndim<odim)
         {
            pos[j]=1;
         }
-     } 
+     }
      for(j=1;j<=size(@pr);j++)
      {
         if(pos[j]!=1)
@@ -1523,7 +1523,7 @@ EXAMPLE: example minAssPrimes; shows an example
      for(j=1;j<=size(@pr);j++)
      {
        @res[j]=decomp(@pr[j],2);
-     }     
+     }
    }
 
    @res=union(@res);
@@ -1553,7 +1553,7 @@ proc union(list l)
 
   for(k=1;k<=size(l);k++)
   {
-     for(j=1;j<=size(l[k])/2;j++)
+     for(j=1;j<=size(l[k]) div 2;j++)
      {
         if(deg(l[k][2*j][1])!=0)
         {
@@ -1589,15 +1589,15 @@ proc union(list l)
            if(size(reduce(@erg[i],@erg[k]))==0)
            {
               @erg[k]=ideal(1);
-              i2=ideal(1); 
-           }         
+              i2=ideal(1);
+           }
         }
         if(size(reduce(i2,i1,1))==0)
         {
            if(size(reduce(@erg[k],@erg[i]))==0)
            {
               break;
-           }          
+           }
         }
         k++;
         if(k>size(@erg))
@@ -1627,7 +1627,7 @@ proc radical(ideal i)
 ///////////////////////////////////////////////////////////////////////////////
 proc decomp (ideal i,list #)
 USAGE:   decomp(i); i ideal  (for primary decomposition)   (resp.
-         decomp(i,1);        (for the minimal associated primes) )         
+         decomp(i,1);        (for the minimal associated primes) )
 RETURN:  list = list of primary ideals and their associated primes
          (at even positions in the list)
          (resp. a list of the minimal associated primes)
@@ -1640,9 +1640,9 @@ EXAMPLE: example decomp; shows an example
   int @wr,@k,@n,@m,@n1,@n2,@n3,homo;
   ideal peek=i;
   ideal ser,tras;
-  
+
   int @aa=timer;
- 
+
   homo=homog(i);
   if(size(#)>0)
   {
@@ -1680,28 +1680,28 @@ EXAMPLE: example decomp; shows an example
      }
      intvec @hilb=hilb(tras,1);
   }
-  
+
   //----------------------------------------------------------------
   //i is the zero-ideal
   //----------------------------------------------------------------
- 
+
   if(size(i)==0)
   {
      primary=i,i;
      return(primary);
   }
- 
+
   //----------------------------------------------------------------
   //pass to the lexicographical ordering and compute a standardbasis
   //----------------------------------------------------------------
 
   execute "ring gnir = ("+charstr(basering)+"),("+varstr(basering)+"),lp;";
- 
+
   option(redSB);
   ideal ser=fetch(@P,ser);
   ideal peek=std(fetch(@P,peek));
-  homo=homog(peek); 
-   
+  homo=homog(peek);
+
   if(homo==1)
   {
      if(ordstr(@P)[1,2]!="lp")
@@ -1729,7 +1729,7 @@ EXAMPLE: example decomp; shows an example
      option(noredSB);
      return(ideal(0));
   }
-  
+
   //----------------------------------------------------------------
   //  the case of one variable
   //----------------------------------------------------------------
@@ -1780,7 +1780,7 @@ EXAMPLE: example decomp; shows an example
   //------------------------------------------------------------------
   //search for a maximal independent set indep,i.e.
   //look for subring such that the intersection with the ideal is zero
-  //j intersected with K[var(indep[3]+1),...,var(nvar] is zero, 
+  //j intersected with K[var(indep[3]+1),...,var(nvar] is zero,
   //indep[1] is the new varstring and indep[2] the string for the block-ordering
   //------------------------------------------------------------------
 
@@ -1790,7 +1790,7 @@ EXAMPLE: example decomp; shows an example
   ideal @h;
   int jdim=dim(@j);
   list fett;
-  int lauf,di;  
+  int lauf,di;
 
   if(@wr!=1)
   {
@@ -1813,7 +1813,7 @@ EXAMPLE: example decomp; shows an example
    {
       indep=maxIndependSet(@j);
    }
- 
+
   ideal jkeep=@j;
 
   if(ordstr(@P)[1]=="w")
@@ -1856,7 +1856,7 @@ EXAMPLE: example decomp; shows an example
         {
           ideal @j=std(phi(@j));
         }
-      } 
+      }
      if((deg(@j[1])==0)||(dim(@j)<jdim))
      {
        setring gnir;
@@ -1876,14 +1876,14 @@ EXAMPLE: example decomp; shows an example
      //let (j:gh^n)=(j:gh^infinity) then j*K(var(nnp+1),..,var(nva))[..the rest..]
      //intersected with K[var(1),...,var(nva)] is (j:gh^n)
      //on the other hand j=(j,gh^n) intersected with (j:gh^n)
- 
+
      //------------------------------------------------------------------------------------
 
      //the arrangement for the quotientring K(var(nnp+1),..,var(nva))[..the rest..]
      //and the map phi:K[var(1),...,var(nva)] ----->K(var(nnpr+1),..,var(nva))[..the rest..]
      //-------------------------------------------------------------------------------------
 
-     quotring=prepareQuotientring(nvars(basering)-indep[@m][3]); 
+     quotring=prepareQuotientring(nvars(basering)-indep[@m][3]);
 
      //---------------------------------------------------------------------
      //we pass to the quotientring   K(var(nnp+1),..,var(nva))[..the rest..]
@@ -1896,7 +1896,7 @@ EXAMPLE: example decomp; shows an example
      ideal ser=imap(gnir,ser);
 
      kill gnir1;
- 
+
      //j is a standardbasis in the quotientring but usually not minimal
      //here it becomes minimal
 
@@ -1912,7 +1912,7 @@ EXAMPLE: example decomp; shows an example
            @h[@n]=leadcoef(@j[@n]);
         }
         //the primary decomposition of j*K(var(nnp+1),..,var(nva))[..the rest..]
-   
+
         list uprimary= zero_decomp(@j,ser,@wr);
 
      }
@@ -1932,12 +1932,12 @@ EXAMPLE: example decomp; shows an example
 
      list saturn;
      ideal hpl;
-  
+
      for(@n=1;@n<=size(uprimary);@n++)
      {
         hpl=0;
         for(@n1=1;@n1<=size(uprimary[@n]);@n1++)
-        { 
+        {
            hpl=hpl,leadcoef(uprimary[@n][@n1]);
         }
         saturn[@n]=hpl;
@@ -1947,18 +1947,18 @@ EXAMPLE: example decomp; shows an example
      //back to the polynomialring
      //---------------------------------------------------------------------
      setring gnir;
-       
+
      collectprimary=imap(quring,uprimary);
      lsau=imap(quring,saturn);
-     @h=imap(quring,@h);  
+     @h=imap(quring,@h);
 
      kill quring;
 
 
      @n2=size(quprimary);
      @n3=@n2;
-    
-     for(@n1=1;@n1<=size(collectprimary)/2;@n1++)
+
+     for(@n1=1;@n1<=size(collectprimary) div 2;@n1++)
      {
         if(deg(collectprimary[2*@n1][1])>0)
         {
@@ -1969,12 +1969,12 @@ EXAMPLE: example decomp; shows an example
            lnew[@n2]=lsau[2*@n1];
            quprimary[@n2]=collectprimary[2*@n1];
         }
-     }  
+     }
 
-     //here the intersection with the polynomialring 
+     //here the intersection with the polynomialring
      //mentioned above is really computed
 
-    for(@n=@n3/2+1;@n<=@n2/2;@n++)
+    for(@n=@n3 div 2+1;@n<=@n2 div 2;@n++)
      {
         if(specialIdealsEqual(quprimary[2*@n-1],quprimary[2*@n]))
         {
@@ -2009,7 +2009,7 @@ EXAMPLE: example decomp; shows an example
            {
               if(deg(@h[lauf])>0)
               {
-                 fac=fac+factorize(@h[lauf],1); 
+                 fac=fac+factorize(@h[lauf],1);
               }
            }
            fac=simplify(fac,4);
@@ -2030,10 +2030,10 @@ EXAMPLE: example decomp; shows an example
         {
               @hilb=hilb(jwork,1);
         }
-       
+
         setring gnir;
         @j=imap(@Phelp,jwork);
-     }    
+     }
   }
   if((size(quprimary)==0)&&(@wr>0))
   {
@@ -2054,7 +2054,7 @@ EXAMPLE: example decomp; shows an example
         {
            ideal htest=quprimary[1];
 
-           for (@n1=2;@n1<=size(quprimary)/2;@n1++)
+           for (@n1=2;@n1<=size(quprimary) div 2;@n1++)
            {
               htest=intersect(htest,quprimary[2*@n1-1]);
            }
@@ -2063,7 +2063,7 @@ EXAMPLE: example decomp; shows an example
         {
            ideal htest=quprimary[2];
 
-           for (@n1=2;@n1<=size(quprimary)/2;@n1++)
+           for (@n1=2;@n1<=size(quprimary) div 2;@n1++)
            {
               htest=intersect(htest,quprimary[2*@n1]);
            }
@@ -2105,7 +2105,7 @@ EXAMPLE: example decomp; shows an example
                 ideal @j=std(phi(jkeep));
               }
            }
-            
+
            for (lauf=1;lauf<=size(@j);lauf++)
            {
               fett[lauf]=size(@j[lauf]);
@@ -2120,19 +2120,19 @@ EXAMPLE: example decomp; shows an example
            //let (j:gh^n)=(j:gh^infinity) then j*K(var(nnp+1),..,var(nva))[..the rest..]
            //intersected with K[var(1),...,var(nva)] is (j:gh^n)
            //on the other hand j=(j,gh^n) intersected with (j:gh^n)
- 
+
            //------------------------------------------------------------------------------------
 
            //the arrangement for the quotientring K(var(nnp+1),..,var(nva))[..the rest..]
            //and the map phi:K[var(1),...,var(nva)] ----->K(var(nnpr+1),..,var(nva))[..the rest..]
            //-------------------------------------------------------------------------------------
 
-           quotring=prepareQuotientring(nvars(basering)-restindep[@m][3]); 
+           quotring=prepareQuotientring(nvars(basering)-restindep[@m][3]);
 
            //---------------------------------------------------------------------
            //we pass to the quotientring   K(var(nnp+1),..,var(nva))[..the rest..]
            //---------------------------------------------------------------------
-           
+
            execute quotring;
 
            // @j considered in the quotientring
@@ -2140,7 +2140,7 @@ EXAMPLE: example decomp; shows an example
            ideal ser=imap(gnir,ser);
 
            kill gnir1;
- 
+
            //j is a standardbasis in the quotientring but usually not minimal
            //here it becomes minimal
            @j=clearSB(@j,fett);
@@ -2154,9 +2154,9 @@ EXAMPLE: example decomp; shows an example
               @h[@n]=leadcoef(@j[@n]);
            }
            //the primary decomposition of j*K(var(nnp+1),..,var(nva))[..the rest..]
-   
+
             list uprimary= zero_decomp(@j,ser,@wr);
-        
+
            //we need the intersection of the ideals in the list quprimary with the
            //polynomialring, i.e. let q=(f1,...,fr) in the quotientring such an ideal
            //but fi polynomials, then the intersection of q with the polynomialring
@@ -2166,12 +2166,12 @@ EXAMPLE: example decomp; shows an example
 
            list saturn;
            ideal hpl;
-  
+
            for(@n=1;@n<=size(uprimary);@n++)
            {
               hpl=0;
               for(@n1=1;@n1<=size(uprimary[@n]);@n1++)
-              { 
+              {
                  hpl=hpl,leadcoef(uprimary[@n][@n1]);
               }
                saturn[@n]=hpl;
@@ -2181,18 +2181,18 @@ EXAMPLE: example decomp; shows an example
            //back to the polynomialring
            //---------------------------------------------------------------------
            setring gnir;
-       
+
            collectprimary=imap(quring,uprimary);
            lsau=imap(quring,saturn);
-           @h=imap(quring,@h);  
+           @h=imap(quring,@h);
 
            kill quring;
 
 
            @n2=size(quprimary);
            @n3=@n2;
-    
-           for(@n1=1;@n1<=size(collectprimary)/2;@n1++)
+
+           for(@n1=1;@n1<=size(collectprimary) div 2;@n1++)
            {
               if(deg(collectprimary[2*@n1][1])>0)
               {
@@ -2203,12 +2203,12 @@ EXAMPLE: example decomp; shows an example
                  lnew[@n2]=lsau[2*@n1];
                  quprimary[@n2]=collectprimary[2*@n1];
               }
-           }  
+           }
 
-           //here the intersection with the polynomialring 
+           //here the intersection with the polynomialring
            //mentioned above is really computed
 
-           for(@n=@n3/2+1;@n<=@n2/2;@n++)
+           for(@n=@n3 div 2+1;@n<=@n2 div 2;@n++)
            {
               if(specialIdealsEqual(quprimary[2*@n-1],quprimary[2*@n]))
               {
@@ -2243,10 +2243,10 @@ EXAMPLE: example decomp; shows an example
            else
            {
               htprimary=decomp(@j,peek,ser);
-           }    
+           }
            // here we collect now both results primary(sat(j,gh))
            // and primary(j,gh^n)
-    
+
            @n=size(quprimary);
            for (@k=1;@k<=size(htprimary);@k++)
            {
@@ -2276,5 +2276,5 @@ example
    LIB "primdec.lib";
    list pr= decomp(i);
    pr;
-   testPrimary( pr, i); 
+   testPrimary( pr, i);
 }
