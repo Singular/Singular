@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.95 1999-07-08 10:18:07 wenk Exp $ */
+/* $Id: extra.cc,v 1.96 1999-07-12 11:05:57 pohl Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -657,32 +657,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 #endif
-/*==================== barstep =============================*/
-    if(strcmp(sys_cmd,"barstep")==0)
-    {
-      if ((h!=NULL) &&(h->Typ()==MATRIX_CMD))
-      {
-        if (h->next!=NULL)
-        {
-          if (h->next->Typ()!=POLY_CMD)
-          {
-            Warn("Wrong types for barstep(matrix,poly)");
-          }
-        }
-        int r,c;
-        poly div=(poly)h->next->Data();
-        res->rtyp=MATRIX_CMD;
-        res->data=(void *)mpOneStepBareiss((matrix)h->Data(),
-                                           &div,&r,&c);
-        PrintS("div: ");pWrite(div);
-        Print("rows: %d, cols: %d\n",r,c);
-        pDelete(&div);
-        return FALSE;
-      }
-      else
-        WerrorS("matrix expected");
-    }
-    else
 #ifdef FACTORY_GCD_TEST
 /*=======================gcd Testerei ================================*/
     if ( ! strcmp( sys_cmd, "setgcd" ) ) {
