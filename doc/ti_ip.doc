@@ -57,11 +57,10 @@ I= < x^v(i)+ - x^v(i)- | i=1,@dots{},r >.
 @end display 
 @end ifinfo
 
-The required lattice basis can be computed using the LLL-algorithm (see
-[Coh93]). For the computation of the saturation, there are various
+The required lattice basis can be computed using the LLL-algorithm (@pxref{[Coh93]}). For the computation of the saturation, there are various 
 possibilities described in the 
 @tex
-following paragraphs.
+section Algorithms.
 @end tex
 @ifinfo
 menu entry Algorithms.
@@ -74,6 +73,8 @@ menu entry Algorithms.
 
 @node Algorithms, Buchberger algorithm, , Toric ideals
 @subsection Algorithms
+
+The following algorithms are implemented in @ref{toric_lib}.  
 
 @menu
 * Conti and Traverso::                 
@@ -89,8 +90,10 @@ menu entry Algorithms.
 @cindex Conti-Traverso algorithm
 @cindex algorithm of Conti and Traverso
 
+
+The algorithm of Conti and Traverso (@pxref{[CoTr91]}) 
 @tex
-The algorithm of Conti and Traverso ([CoTr91]) computes $I_A$ via the 
+computes $I_A$ via the 
 extended matrix $B=(I_m|A)$,
 where $I_m$ is the $m\times m$ unity matrix. A lattice basis of $B$ is
 given by the set of vectors $(a^j,-e_j)\in Z\!\!\! Z^{m+n}$, where $a^j$ 
@@ -101,15 +104,13 @@ $$ I_1=<y^{a_j^+}- x_j y^{a_j^-} | j=1,\ldots, n>.$$
 We introduce a further variable $t$ and adjoin the binomial $t\cdot
 y_1\cdot\ldots\cdot y_m -1$ to the generating set of $I_1$, obtaining
 an ideal $I_2$ in the polynomial ring $K[t,
-y_1,\ldots,y_m,x_1,\ldots,x_n]$. $I_2$ is saturated w.r.t.@: all
+y_1,\ldots,y_m,x_1,\ldots,x_n]$. $I_2$ is saturated w.r.t. all
 variables because all variables are invertible modulo $I_2$. Now $I_A$
 can be computed from $I_2$ by eliminating the variables
 $t,y_1,\ldots,y_m$.  
 @end tex
-
 @ifinfo
-The algorithm of Conti and Traverso ([CoTr91]) computes I(A) via the 
-extended matrix B= ( I | A ),
+computes I(A) via the extended matrix B= ( I | A ),
 where I is the mxm unity matrix. A lattice basis of B is given by the
 set of vectors (a^j,-e_j) in Z^(m+n), where a^j is the j-th row of A and 
 e_j the j-th coordinate vector. We look at the ideal in
@@ -137,9 +138,10 @@ a special importance in the application to integer programming
 @cindex Pottier algorithm
 @cindex algorithm of Pottier
 
+
+The algorithm of Pottier (@pxref{[Pot94]}) starts by computing a lattice 
 @tex
-The algorithm of Pottier ([Pot94]) starts by computing a lattice basis
-$v_1,\ldots,v_r$ for the integer kernel of $A$ using the
+basis $v_1,\ldots,v_r$ for the integer kernel of $A$ using the
 LLL-algorithm. The ideal corresponding to the lattice basis vectors 
 $$ I_1=<x^{v_i^+}-x^{v_i^-}|i=1,\ldots,r> $$
 is saturated -- as in the algorithm of Conti and Traverso -- by
@@ -148,10 +150,8 @@ generator $t\cdot x_1\cdot\ldots\cdot x_n -1$ to obtain an ideal $I_2$
 in $K[t,x_1,\ldots,x_n]$ from which one computes $I_A$ by elimination of
 $t$. 
 @end tex
-
 @ifinfo
-The algorithm of Pottier ([Pot94]) starts by computing a lattice basis
-v(1),@dots{},v(r) for the integer kernel of A using the
+basis v(1),@dots{},v(r) for the integer kernel of A using the
 LLL-algorithm. The ideal corresponding to the lattice basis vectors @*
 @display
 I1= < x^v(i)+ - x^v(i)- | i=1,@dots{},r > 
@@ -170,22 +170,23 @@ t.
 @cindex Hosten-Sturmfels algorithm
 @cindex algorithm of Hosten and Sturmfels 
 
+
+The algorithm of Hosten and Sturmfels (@pxref{[HoSt95]}) allows to  
 @tex
-The algorithm of Hosten and Sturmfels ([HoSt95]) allows to compute $I_A$
-without any auxiliary variables, provided that $A$ contains a vector $w$
+compute $I_A$ without any auxiliary variables, provided that $A$ contains a vector $w$
 with positive coefficients in its row space. This is a real restriction,
 i.e., the algorithm will not necessarily work in the general case.  
 
 A lattice basis $v_1,\ldots,v_r$ is again computed via the
 LLL-algorithm. The saturation step is performed in the following way:
-First note that $w$ induces a positive grading w.r.t.@: which the ideal 
+First note that $w$ induces a positive grading w.r.t. which the ideal 
 $$ I=<x^{v_i^+}-x^{v_i^-}|i=1,\ldots,r> $$
 corresponding to our lattice basis is homogeneous. We use the following
 lemma: 
 
-Let $I$ be a homogeneous ideal w.r.t.@: the weighted reverse
+Let $I$ be a homogeneous ideal w.r.t. the weighted reverse
 lexicographical ordering with weight vector $w$ and variable order $x_1
-> x_2 > \ldots > x_n$. Let $G$ denote a Groebner basis of $I$ w.r.t.@: to
+> x_2 > \ldots > x_n$. Let $G$ denote a Groebner basis of $I$ w.r.t. to
 this ordering.  Then a Groebner basis of $(I:x_n^\infty)$ is obtained by
 dividing each element of $G$ by the highest possible power of $x_n$. 
 
@@ -196,14 +197,10 @@ in the $i$-th step we take $x_i$ as the cheapest variable and apply the
 lemma with $x_i$ instead of $x_n$.  
 
 This procedure involves $n$ Groebner basis computations. Actually, this
-number can be reduced to at most $n/2$ (see [HoSh98]), and the single
-computations -- except from the first one -- show to be easy and fast in
-practice. 
+number can be reduced to at most $n/2$
 @end tex
-
 @ifinfo
-The algorithm of Hosten and Sturmfels ([HoSt95]) allows to compute I(A)
-without any auxiliary variables, provided that A contains a vector w
+compute I(A) without any auxiliary variables, provided that A contains a vector w
 with positive coefficients in its row space. This is a real restriction,
 i.e., the algorithm will not necessarily work in the general case.  
 
@@ -231,10 +228,11 @@ in the i-th step we take x(i) as the cheapest variable and apply the
 lemma with x(i) instead of x(n).  
 
 This procedure involves n Groebner basis computations. Actually, this
-number can be reduced to at most n/2 (see [HoSh98]), and the single
+number can be reduced to at most n/2 
+@end ifinfo
+(@pxref{[HoSh98]}), and the single
 computations -- except from the first one -- show to be easy and fast in
 practice. 
-@end ifinfo
       
 @node Di Biase and Urbanke, Bigatti and La Scala and Robbiano, Hosten and Sturmfels, Algorithms 
 
@@ -242,9 +240,10 @@ practice.
 @cindex Di Biase-Urbanke algorithm
 @cindex algorithm of Di Biase and Urbanke
 
-@tex
 Like the algorithm of Hosten and Sturmfels, the algorithm of Di Biase
-and Urbanke ([DBUr95]) performs up to $n/2$ Groebner basis
+and Urbanke (@pxref{[DBUr95]}) performs up  
+@tex
+to $n/2$ Groebner basis
 computations. It needs no auxiliary variables, but a supplementary
 precondition; namely, the existence of a vector without zero components
 in the kernel of $A$.  
@@ -255,7 +254,7 @@ Let $B$ be an integer matrix, $u_1,\ldots,u_r$ a lattice basis of the
 integer kernel of $B$. Assume that all components of $u_1$ are
 positive. Then  
 $$ I_B=<x^{u_i^+}-x^{u_i^-}|i=1,\ldots,r>, $$ 
-i.e., the ideal on the right is already saturated w.r.t.@: all variables.
+i.e., the ideal on the right is already saturated w.r.t. all variables.
 
 The algorithm starts by finding a lattice basis $v_1,\ldots,v_r$ of the
 kernel of $A$ such that $v_1$ has no zero component. Let
@@ -270,15 +269,13 @@ to compute a generating set of $I_A$ by applying the following
 Let $>$ be an elimination ordering for $x_i$. Let $A_i$ be the matrix
 obtained by multiplying the $i$-th column of $A$ with $-1$. Let  
 $$\{x_i^{r_j} x^{a_j} - x^{b_j} | j\in J \}$$ 
-be a Groebner basis of $I_{A_i}$ w.r.t.@: $>$ (where $x_i$ is neither
+be a Groebner basis of $I_{A_i}$ w.r.t. $>$ (where $x_i$ is neither
 involved in $x^{a_j}$ nor in $x^{b_j}$). Then  
 $$\{x^{a_j} - x_i^{r_j} x^{b_j} | j\in J \}$$
 is a generating set for $I_A$. 
 @end tex
-
 @ifinfo
-Like the algorithm of Hosten and Sturmfels, the algorithm of Di Biase
-and Urbanke ([DBUr95]) performs up to n/2 Groebner basis
+to n/2 Groebner basis
 computations. It needs no auxiliary variables, but a supplementary
 precondition; namely, the existence of a vector without zero components
 in the kernel of A.  
@@ -321,18 +318,17 @@ is a generating set for I(A).
 @cindex Bigatti-La Scala-Robbiano algorithm
 @cindex algorithm of Bigatti, La Scala and Robbiano
 
-The algorithm of Bigatti, La Scala and Robbiano ([BLR98]) combines the ideas of
+The algorithm of Bigatti, La Scala and Robbiano (@pxref{[BLR98]}) combines the ideas of
 the algorithms of Pottier and of Hosten and Sturmfels. The
 computations are performed on a graded ideal with one auxiliary
-variable 
 @tex
-$u$ and one supplementary generator $x_1\cdot\ldots\cdot x_n - 
+variable $u$ and one supplementary generator $x_1\cdot\ldots\cdot x_n - 
 u$ (instead of the generator $t\cdot x_1\cdot\ldots\cdot x_n -1$ in
 the algorithm of Pottier). The algorithm uses a quite unusual technique to
 get rid of the variable $u$ again.
 @end tex
 @ifinfo
-u and one supplementary generator x(1) *@dots{}* x(n) -u (instead of the
+variable u and one supplementary generator x(1) *@dots{}* x(n) -u (instead of the
 generator t * x(1) *@dots{}* x(n) -1 in 
 the algorithm of Pottier). The algorithm uses a quite unusual technique to
 get rid of the variable u again.
@@ -351,8 +347,8 @@ the Buchberger algorithm in many respects: They are prime ideals and
 generated by binomials. Pottier used this fact to describe all
 operations of the Buchberger algorithm on the ideal generators in terms
 of vector additions and subtractions. Some other strategies like
-multiple reduction ([CoTr91]) or the use of bit 
-vectors to represent the support of a monomial ([Big97]) may be
+multiple reduction (@pxref{[CoTr91]}) or the use of bit 
+vectors to represent the support of a monomial (@pxref{[Big97]}) may be
 applied to more general ideals, but show to 
 be especially useful in the toric case.
 
@@ -362,6 +358,7 @@ be especially useful in the toric case.
 @cindex integer programming
 
 @tex
+
 Let $A$ be an $m\times n$ matrix with integral coefficients, $b\in
 Z\!\!\! Z^m$ and $c\in Z\!\!\! Z^n$. The problem
 $$ \min\{c^T x | x\in Z\!\!\! Z^n, Ax=b, x\geq 0\hbox{
@@ -380,15 +377,15 @@ First we assume that an initial solution $v$ (i.e., $v\in Z\!\!\!
 Z^n, v\geq 0, Av=b$) is already known. We obtain the optimal solution
 $v_0$ (i.e., with $c^T v_0$ minimal) by the following procedure:
 
-@itemize
-\item {(1)} Compute the toric ideal $I_A$ using one of the algorithms in the 
+\begin{itemize}
+\item (1) Compute the toric ideal $I_A$ using one of the algorithms in the 
       previous section.
-\item {(2)} Compute the reduced Groebner basis $G_c$ of $I_A$ w.r.t.@:
+\item (2) Compute the reduced Groebner basis $G_c$ of $I_A$ w.r.t.
       $>_c$. 
-\item {(3)} Reduce $x^v$ modulo $G_c$ using the Hironaka division algorithm.
+\item (3) Reduce $x^v$ modulo $G_c$ using the Hironaka division algorithm.
       If the result of this reduction is $x^{v_0}$, then $v_0$ is an
       optimal solution of the given instance.  
-@end itemize
+\end{itemize}
 @end tex
 
 @ifinfo
@@ -424,8 +421,10 @@ instance by an extended instance with the matrix used
 in the Conti-Traverso algorithm. Indeed, the Conti-Traverso
 algorithm offers the possibility to verify solvability of a given
 instance and to find an initial solution in the case of existence (but 
-none of the other algorithms does!). Details can be found in [CoTr91]
-and [The99].
+none of the other algorithms does!). Details can be found in @ref{[CoTr91]}
+and @ref{[The99]}.
+
+An implementation of the above algorithm and some examples can be found in @ref{ip_lib}.
 
 Classical methods for solving IP instances like Branch-and-Bound
 methods seem to be faster in general than the methods using toric
@@ -435,56 +434,49 @@ perform steps (1) and (2) above only once. As the running time of step (3)
 is very short, solving all the instances is not much harder than
 solving one single instance. 
 
-For a detailed discussion see [The99].
+For a detailed discussion see @ref{[The99]}.
 
-@node Relevant References
+@node Relevant References, , Integer programming, Toric ideals and integer programming
 @subsection Relevant References
 
 @display
-[Big97]  Bigatti, A.M.:
+@itemize @bullet
+@item [Big97]  Bigatti, A.M.: @anchor{[Big97]} 
    Computation of Hilbert-Poincare series.
    Journal of Pure and Applied Algebra (1997) 199, 237-253
-
-[BLR98]  Bigatti, A.M.; La Scala, R.; Robbiano, L.:
+@item [BLR98]  Bigatti, A.M.; La Scala, R.; Robbiano, L.: @anchor{[BLR98]}
    Computing toric ideals.
    Journal of Symbolic Computation (to appear) 
-
-[Coh93]  Cohen, H.:
+@item [Coh93]  Cohen, H.: @anchor{[Coh93]}
    A Course in Computational Algebraic Number Theory.
    Springer (1997)
-
-[CoTr91]  Conti, P.; Traverso, C.:
+@item [CoTr91]  Conti, P.; Traverso, C.: @anchor{[CoTr91]}
    Buchberger algorithm and integer programming.
    Proceedings AAECC-9 (new Orleans), Springer LNCS (1991) 539,
    130-139
-
-[DBUr95]  Di Biase, F.; Urbanke, R.:
+@item [DBUr95]  Di Biase, F.; Urbanke, R.: @anchor{[DBUr95]}
    An algorithm to calculate the kernel of certain polynomial ring
    homomorphisms.
    Experimental Mathematics (1995) 4, 227-234
-
-[HoSh98]  Hosten, S.; Shapiro, J.:
+@item [HoSh98]  Hosten, S.; Shapiro, J.: @anchor{[HoSh98]}
    Primary decomposition of lattice basis ideals. 
    (to appear)
-  
-[HoSt95]  Hosten, S.; Sturmfels, B.:
+@item [HoSt95]  Hosten, S.; Sturmfels, B.: @anchor{[HoSt95]}
    GRIN: An implementation of Groebner bases for integer programming.
    in Balas, E.; Clausen, J. (editors): Integer Programming and
    Combinatorial Optimization. 
    Springer LNCS (1995) 920, 267-276
-
-[Pot94]  Pottier, L.:
+@item [Pot94]  Pottier, L.: @anchor{[Pot94]}
    Groebner bases of toric ideals.
    Rapport de recherche 2224 (1997), INRIA Sophia Antipolis
-
-[Stu96]  Sturmfels, B.:
+@item [Stu96]  Sturmfels, B.: @anchor{[Stu96]}
    Groebner Bases and Convex Polytopes.
    University Lecture Series, Volume 8 (1996), American Mathematical
    Society 
-
-[The99]  Theis, C.:
+@item [The99]  Theis, C.: @anchor{[The99]}
    Der Buchberger-Algorithmus fuer torische Ideale und seine Anwendung 
    in der ganzzahligen Optimierung.
    Diplomarbeit, Universitaet des Saarlandes (1999), Saarbruecken
    (Germany)
+@end itemize
 @end display
