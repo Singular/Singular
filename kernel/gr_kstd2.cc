@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gr_kstd2.cc,v 1.5 2005-02-17 09:42:18 Singular Exp $ */
+/* $Id: gr_kstd2.cc,v 1.6 2005-02-25 15:07:05 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: noncomm. alg. of Buchberger
 */
@@ -89,7 +89,8 @@ int redGrFirst (LObject* h,kStrategy strat)
       }
       if (TEST_OPT_INTSTRATEGY)
       {
-        pCleardenom((*h).p);
+        if (rField_is_Zp_a()) pContent(h->p);
+        else pCleardenom(h->p);// also does a pContent
       }
       /*computes the ecart*/
       d = pLDeg((*h).p,&((*h).length),currRing);
@@ -249,17 +250,23 @@ static int nc_redHomog0 (LObject* h,kStrategy strat)
         (*h).lcm=NULL;
         return 0;
       }
-      else if (strat->syzComp!=0)
+      else
       {
-        if ((strat->syzComp>0) && (pMinComp((*h).p) > strat->syzComp))
+        if (TEST_OPT_INTSTRATEGY)
         {
-          //pContent((*h).p);
-          pCleardenom((*h).p);// also does a pContent
+          if (rField_is_Zp_a()) pContent(h->p);
+          else pCleardenom(h->p);// also does a pContent
+        }
+        if (strat->syzComp!=0)
+        {
+          if ((strat->syzComp>0) && (pMinComp((*h).p) > strat->syzComp))
+          {
 /*
-*         (*h).length=pLength0((*h).p);
+*           (*h).length=pLength0((*h).p);
 */
-          enterT((*h),strat);
-          return 0;
+            enterT((*h),strat);
+            return 0;
+          }
         }
       }
       /*- try to reduce the s-polynomial -*/
@@ -269,8 +276,11 @@ static int nc_redHomog0 (LObject* h,kStrategy strat)
     {
       if (j >= strat->tl)
       {
-        //pContent((*h).p);
-        pCleardenom((*h).p);// also does a pContent
+        if (TEST_OPT_INTSTRATEGY)
+        {
+          if (rField_is_Zp_a()) pContent(h->p);
+          else pCleardenom(h->p);// also does a pContent
+        }
 /*
 *       (*h).length=pLength0((*h).p);
 */
@@ -334,11 +344,19 @@ static int nc_redLazy (LObject* h,kStrategy strat)
 //          return;
 //        }
 //      }
-      else if (TEST_OPT_DEBUG)
+      else
       {
-        PrintS("to:");
-        wrp((*h).p);
-        PrintLn();
+        if (TEST_OPT_DEBUG)
+        {
+          PrintS("to:");
+          wrp((*h).p);
+          PrintLn();
+        }
+        if (TEST_OPT_INTSTRATEGY)
+        {
+          pContent(h->p);
+          //pCleardenom(h->p);// also does a pContent
+        }
       }
       /*- try to reduce the s-polynomial -*/
       pass++;
@@ -358,7 +376,7 @@ static int nc_redLazy (LObject* h,kStrategy strat)
               return 0;
             }
           }
-           while (!pDivisibleBy(strat->S[i],(*h).p));
+          while (!pDivisibleBy(strat->S[i],(*h).p));
           if (TEST_OPT_DEBUG) Print(" ->L[%d]\n",at);
           enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
           (*h).p = NULL;
@@ -380,8 +398,8 @@ static int nc_redLazy (LObject* h,kStrategy strat)
         if (TEST_OPT_DEBUG) PrintLn();
         if (TEST_OPT_INTSTRATEGY)
         {
-          //pContent(h->p);
-          pCleardenom(h->p);// also does a pContent
+          if (rField_is_Zp_a()) pContent(h->p);
+          else pCleardenom(h->p);// also does a pContent
         }
         enterT((*h),strat);
         return 0;
@@ -494,6 +512,11 @@ static int nc_redHoney (LObject*  h,kStrategy strat)
         if (h->lcm!=NULL) pLmFree((*h).lcm);
         (*h).lcm=NULL;
         return 0;
+      }
+      if (TEST_OPT_INTSTRATEGY)
+      {
+        //pContent(h->p);
+        pCleardenom(h->p);// also does a pContent
       }
       /* compute the ecart */
       if (ei <= (*h).ecart)
