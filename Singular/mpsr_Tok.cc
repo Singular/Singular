@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_Tok.cc,v 1.12 1998-04-27 12:34:19 obachman Exp $ */
+/* $Id: mpsr_Tok.cc,v 1.13 1998-05-12 14:59:21 Singular Exp $ */
 
 /***************************************************************
  *
@@ -33,11 +33,11 @@
 // Singular token <-> (Dict, OP)
 typedef struct mpsr_cmd
 {
-  
+
   short         tok;    // The Singular token encoding
 
   // The MP Dict tag in which this token is defined,
-  MP_DictTag_t  dict;   
+  MP_DictTag_t  dict;
 
   // The MP operator corresponding to this token
   MP_Common_t   cop; // operator
@@ -166,8 +166,8 @@ short mpsr_mp2ord(MP_Common_t mp_ord)
 
   return ringorder_unspec;
 }
-  
-  
+
+
 #ifdef GENTABLE
 
 // This returns 1 if tok is a token which can appear in a Singular
@@ -187,8 +187,8 @@ short ExtraCmds[] =
   '=',
   0
 };
-  
-  
+
+
 // This the list of all tokens which have an MP representation as a
 // cop in the Singular dictionary
 short sr_cmds[] =
@@ -225,7 +225,7 @@ short sr_cmds[] =
   PRINT_CMD,
   READ_CMD,
   SORTVEC_CMD,
-  STRING_CMD, 
+  STRING_CMD,
   SYSTEM_CMD,
   TYPEOF_CMD,
   VECTOR_CMD,
@@ -357,7 +357,7 @@ cmd_dictcop cmd_dictcops[] =
     {
       {PLUSPLUS, MP_CopBasicInc},
       {MINUSMINUS,  MP_CopBasicDec},
-      {COUNT_CMD, MP_CopBasicSize}, 
+      {COUNT_CMD, MP_CopBasicSize},
       {LIST_CMD, MP_CopBasicList},
       {'+', MP_CopBasicAdd},
       {'-', MP_CopBasicMinus},
@@ -393,7 +393,7 @@ static short IsCmdToken(short tok)
   while (dArith1[i].cmd != 0)
     if (dArith1[i].cmd == tok) return 1;
     else i++;
-  
+
   // cmds with two args
   i=0;
   while (dArith2[i].cmd != 0)
@@ -443,7 +443,7 @@ static short GetMPDictTok(short tok, MP_DictTag_t *dict, MP_Common_t *cop)
       *cop = i;
       return 1;
     }
-  
+
   // look through all the other dicts
   for (j=0; j<MAX_SR_DICT-1; j++)
   {
@@ -466,7 +466,7 @@ static short GetMPDictTok(short tok, MP_DictTag_t *dict, MP_Common_t *cop)
   }
   return 0;
 }
-  
+
 
 // This actually generates the tables of mpsr_tok.inc
 void mpsr_ttGen()
@@ -478,8 +478,8 @@ void mpsr_ttGen()
   MP_Common_t cop;
   FILE *outfile;
   MP_DictTag_t dict;
-  
-  
+
+
   // init all arrays
   for (i=0; i<MAX_TOK; i++)
   {
@@ -489,7 +489,7 @@ void mpsr_ttGen()
   for (i=0; i<MAX_SR_DICT; i++)
     for (j=0; j<MAX_COP; j++)
       mp2tok[i][j] = MAX_TOK;
-  
+
   // Now go through all the token and test them
   for (i=0; i<MAX_TOK; i++)
   {
@@ -507,7 +507,7 @@ void mpsr_ttGen()
       else
       {
         fprintf(stderr, "Warning: mpsr_ttGen: Unknown Cmd Token: %d(%s)\n",
-	                i, Tok2Cmdname(i));
+                        i, Tok2Cmdname(i));
       }
     }
   }

@@ -1717,7 +1717,7 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
   else if (iiOp==SRES_CMD)
   //  r=sySchreyerResolvente((ideal)u->Data(),maxl+1,&l);
     r=sySchreyer((ideal)u->Data(),maxl+1);
-  else
+  else /* LRES */
   { 
     int dummy;
     r=syLaScala3((ideal)u->Data(),&dummy);
@@ -2062,6 +2062,8 @@ struct sValCmd2 dArith2[]=
 ,{jjLIFTSTD,   LIFTSTD_CMD,    IDEAL_CMD,      IDEAL_CMD,  MATRIX_CMD PROFILER}
 ,{jjLIFTSTD,   LIFTSTD_CMD,    MODUL_CMD,      MODUL_CMD,  MATRIX_CMD PROFILER}
 ,{jjCALL2MANY, LIST_CMD,       LIST_CMD,       DEF_CMD,    DEF_CMD PROFILER}
+,{jjRES,       LRES_CMD,       RESOLUTION_CMD, IDEAL_CMD,  INT_CMD PROFILER}
+,{jjRES,       LRES_CMD,       RESOLUTION_CMD, MODUL_CMD,  INT_CMD PROFILER}
 ,{jjMINOR,     MINOR_CMD,      IDEAL_CMD,      MATRIX_CMD, INT_CMD PROFILER}
 ,{jjCALL2MANY, MODUL_CMD,      MODUL_CMD,      DEF_CMD,    DEF_CMD PROFILER}
 ,{jjMODULO,    MODULO_CMD,     MODUL_CMD,      IDEAL_CMD,  IDEAL_CMD PROFILER}
@@ -4180,9 +4182,10 @@ static BOOLEAN jjOPTION_PL(leftv res, leftv v)
 {
   if(v==NULL)
   {
-    showOption();
+    res->data=(char *)showOption();
     return FALSE;
   }
+  res->rtyp=NONE;
   return setOption(res,v);
 }
 static BOOLEAN jjRESERVED0(leftv res, leftv v)
@@ -4278,7 +4281,7 @@ struct sValCmdM dArithM[]=
 ,{jjIDEAL_PL,  MODUL_CMD,       MODUL_CMD,          -1 }
 ,{jjCALL1ARG,  NAMES_CMD,       LIST_CMD,            1 }
 ,{jjNAMES0,    NAMES_CMD,       LIST_CMD,            0 }
-,{jjOPTION_PL, OPTION_CMD,      NONE/*or set by p*/,-1 }
+,{jjOPTION_PL, OPTION_CMD,      STRING_CMD/*or set by p*/,-1 }
 ,{jjCALL1ARG,  RESERVEDNAME_CMD, INT_CMD,            1 }
 ,{jjRESERVED0, RESERVEDNAME_CMD, NONE,               0 }
 ,{jjSTRING_PL, STRING_CMD,      STRING_CMD,         -1 }

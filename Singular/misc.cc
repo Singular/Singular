@@ -614,12 +614,12 @@ BOOLEAN setOption(leftv res, leftv v)
   return FALSE;
 }
 
-void showOption()
+char * showOption()
 {
   int i;
   BITSET tmp;
 
-  PrintS("//options:");
+  StringSet("//options:");
   if ((test!=0)||(verbose!=0))
   {
     tmp=test;
@@ -629,13 +629,13 @@ void showOption()
       {
         if (optionStruct[i].setval & test)
         {
-          Print(" %s",optionStruct[i].name);
+          StringAppend(" %s",optionStruct[i].name);
           tmp &=optionStruct[i].resetval;
         }
       }
       for (i=0; i<32; i++)
       {
-        if (tmp & Sy_bit(i)) Print(" %d",i);
+        if (tmp & Sy_bit(i)) StringAppend(" %d",i);
       }
     }
     tmp=verbose;
@@ -645,19 +645,19 @@ void showOption()
       {
         if (verboseStruct[i].setval & tmp)
         {
-          Print(" %s",verboseStruct[i].name);
+          StringAppend(" %s",verboseStruct[i].name);
           tmp &=verboseStruct[i].resetval;
         }
       }
       for (i=1; i<32; i++)
       {
-        if (tmp & Sy_bit(i)) Print(" %d",i+32);
+        if (tmp & Sy_bit(i)) StringAppend(" %d",i+32);
       }
     }
-    PrintLn();
+    return mstrdup(StringAppend(""));
   }
   else
-    PrintS(" none\n");
+    return mstrdup(StringAppend(" none"));
 }
 
 char * versionString()
