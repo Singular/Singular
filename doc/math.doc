@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.47 1999-09-14 18:13:07 wichmann Exp $
+@comment $Id: math.doc,v 1.48 1999-11-12 16:03:47 Singular Exp $
 @comment this file contains the mathematical background of Singular
 
 @c The following directives are necessary for proper compilation
@@ -30,6 +30,7 @@ some articles or text books (see @ref{References}).
 * Hilbert function::
 * Syzygies and resolutions::
 * Characteristic sets::
+* The spectrum::
 * References::
 @end menu
 @c ---------------------------------------------------------------------------
@@ -89,7 +90,7 @@ f in I if and only if NF(f,std(I)) = 0 (for I in R, resp.@: I in R^r).
 Let \hbox{$I \subseteq K[\underline{x}]^r$} be a homogeneous ideal, then the Hilbert function
 $H_I$ of $I$ (see below)
 and the Hilbert function $H_{L(I)}$ of the leading ideal $L(I)$
-coincide, i.e., 
+coincide, i.e.,
 $H_I=H_{L(I)}$.
 @end tex
 @ifinfo
@@ -114,8 +115,8 @@ It turns out that $\hbox{HP}_M(t)$ can be written in two useful ways:
 $$\hbox{HP}_M(t)={Q(t)\over (1-t)^n}={P(t)\over (1-t)^{dim(M)}}$$
 where $Q(t)$ and $P(t)$ are polynomials in ${\bf Z}[t]$.
 $Q(t)$ is called the {\bf first Hilbert series},
-and $P(t)$ the {\bf second Hilbert series}. 
-If \hbox{$P(t)=\sum_{k=0}^N a_k t^k$}, and \hbox{$d = dim(M)$}, 
+and $P(t)$ the {\bf second Hilbert series}.
+If \hbox{$P(t)=\sum_{k=0}^N a_k t^k$}, and \hbox{$d = dim(M)$},
 then \hbox{$H_M(s)=\sum_{k=0}^N a_k$ ${d+s-k-1}\choose{d-1}$}
 (the {\bf Hilbert polynomial}) for $s \ge N$.
 @end tex
@@ -135,7 +136,7 @@ H_M(t)=Q(t)/(1-t)^n=P(t)/(1-t)^dim(M).
 @end display
 where Q(t) and P(t) are polynomials in Z[t].
 Q(t) is called the first Hilbert series, and P(t) the second Hilbert series.
-If P(t)=sum_(k=0)^N a_k t^k, and d=dim(M), 
+If P(t)=sum_(k=0)^N a_k t^k, and d=dim(M),
 then
 @display
 H_M(s)=sum_(k=0)^N a_k binomial(d+s-k-1,d-1) (the Hilbert polynomial)
@@ -160,7 +161,7 @@ Let R=Loc K[x] and let I=(g_1, ..., g_s) in R^r. Then, the @strong{module
 of syzygies} (or @strong{1st syzygy module}, @strong{module of relations})
 of I, syz(I), is defined to be the kernel of the map
 @display
-R^s --> R^r, 
+R^s --> R^r,
 w_1*e_1 + ... + w_s*e_s -> w_1*g_1 + ... + w_s*g_s.
 @end display
 @end ifinfo
@@ -195,7 +196,7 @@ Let $I=(g_1,...,g_s)\subseteq R^r$ and $M= R^r/I$.
 A {\bf free resolution of $M$} is a long exact sequence
 $$...\longrightarrow F_2 \buildrel{A_2}\over{\longrightarrow} F_1
 \buildrel{A_1}\over{\longrightarrow} F_0\longrightarrow M\longrightarrow
-0,$$ 
+0,$$
 @end tex
 @ifinfo
 Let I=(g_1,...,g_s) in R^r and M=R^r/I.  A free resolution of M is a
@@ -206,7 +207,7 @@ long exact sequence
 @end ifinfo
 @*where the columns of the matrix
 @tex
-$A_1$ 
+$A_1$
 @end tex
 @ifinfo
 A_1
@@ -247,7 +248,7 @@ variables of @math{R}.
 Let $R$ be a graded ring (e.g., $R = \hbox{Loc}_< K[\underline{x}]$) and
 let $I \subset R^r$ be a graded submodule. Let
 $$
-  R^r = \bigoplus_a R\cdot e_{a,0} \buildrel A_1 \over \longleftarrow 
+  R^r = \bigoplus_a R\cdot e_{a,0} \buildrel A_1 \over \longleftarrow
         \bigoplus_a R\cdot e_{a,1} \longleftarrow \ldots \longleftarrow
         \bigoplus_a R\cdot e_{a,n} \longleftarrow 0
 $$
@@ -262,7 +263,7 @@ and the 1st syzygy module of $R^r/I$ is $I$.
 Let R be a graded ring (e.g., R = K[x]) and let I in R^r be a graded
 submodule. Let
 @display
-R^r = (+) K[x]e(a,0) <--- (+) K[x]e(a,1) 
+R^r = (+) K[x]e(a,0) <--- (+) K[x]e(a,1)
             <--- @dots{} <--- (+) K[x]e(a,n) <--- 0
 @end display
 be a minimal free resolution of R^n/I considered with homogeneous maps
@@ -301,53 +302,53 @@ deg(e(a,j)) <= s+j-1    for all j.
 @end smallexample
 @end table
 @c ---------------------------------------------------------------------------
-@node Characteristic sets, References, Syzygies and resolutions, Mathematical background
+@node Characteristic sets, The spectrum, Syzygies and resolutions, Mathematical background
 @section Characteristic sets
 @cindex Characteristic sets
 
 @tex
 Let $<$ be the lexicographical ordering on $R=K[x_1,...,x_n]$ with $x_1
-< ... < x_n$. 
+< ... < x_n$.
 For $f \in R$ let lvar($f$) (the leading variable of $f$) be the largest
 variable in $f$,
 i.e., if $f=a_s(x_1,...,x_{k-1})x_k^s+...+a_0(x_1,...,x_{k-1})$ for some
-$k \leq n$ then lvar$(f)=x_k$. 
+$k \leq n$ then lvar$(f)=x_k$.
 
 Moreover, let
 \hbox{ini}$(f):=a_s(x_1,...,x_{k-1})$. The pseudoremainder
-$r=\hbox{prem}(g,f)$ of $g$ with respect to $f$ is 
-defined by the equality $\hbox{ini}(f)^a\cdot g = qf+r$ with 
+$r=\hbox{prem}(g,f)$ of $g$ with respect to $f$ is
+defined by the equality $\hbox{ini}(f)^a\cdot g = qf+r$ with
 $\hbox{deg}_{lvar(f)}(r)<\hbox{deg}_{lvar(f)}(f)$ and $a$
-minimal. 
+minimal.
 
 A set $T=\{f_1,...,f_r\} \subset R$ is called triangular if
 $\hbox{lvar}(f_1)<...<\hbox{lvar}(f_r)$. Moreover, let $ U \subset T $,
 then $(T,U)$ is called a triangular system, if $T$ is a triangular set
 such that $\hbox{ini}(T)$ does not vanish on $V(T) \setminus V(U)
-(=:V(T\setminus U))$. 
+(=:V(T\setminus U))$.
 
 $T$ is called irreducible if for every $i$ there are no
 $d_i$,$f_i'$,$f_i''$ such that
 $$   \hbox{lvar}(d_i)<\hbox{lvar}(f_i) =
-\hbox{lvar}(f_i')=\hbox{lvar}(f_i''),$$ 
+\hbox{lvar}(f_i')=\hbox{lvar}(f_i''),$$
 $$   0 \not\in \hbox{prem}(\{ d_i, \hbox{ini}(f_i'),
-\hbox{ini}(f_i'')\},\{ f_1,...,f_{i-1}\}),$$ 
+\hbox{ini}(f_i'')\},\{ f_1,...,f_{i-1}\}),$$
 $$\hbox{prem}(d_if_i-f_i'f_i'',\{f_1,...,f_{i-1}\})=0.$$
 Furthermore, $(T,U)$ is called irreducible if $T$ is irreducible.
 
 The main result on triangular sets is the following:
 let $G=\{g_1,...,g_s\} \subset R$ then there are irreducible triangular sets $T_1,...,T_l$
 such that $V(G)=\bigcup_{i=1}^{l}(V(T_i\setminus I_i))$
-where $I_i=\{\hbox{ini}(f) \mid f \in T_i \}$. Such a set 
+where $I_i=\{\hbox{ini}(f) \mid f \in T_i \}$. Such a set
 $\{T_1,...,T_l\}$ is called an {\bf irreducible characteristic series} of
 the ideal $(G)$.
 @end tex
 @ifinfo
-Let > be the lexicographical ordering on R=K[x_1,...,x_n] with x_1<...<x_n . 
+Let > be the lexicographical ordering on R=K[x_1,...,x_n] with x_1<...<x_n .
 For f in R let lvar(f) (the leading variable of f) be the largest
 variable in lead(f) (the leading term of f with respect to >),
 i.e., if f=a_s(x_1,...,x_(k-1))x_k^s+...+a_0(x_1,...,x_(k-1)) for some
-k<=n then lvar(f)=x_k. 
+k<=n then lvar(f)=x_k.
 
 Moreover, let ini(f):=a_s(x_1,...,x_(k-1)). The pseudoremainder
 r=prem(g,f) of g with respect to f is defined by ini(f)^a*g=q*f+r with
@@ -391,7 +392,257 @@ characteristic series} of the ideal (G).
 @end smallexample
 @end table
 @c ---------------------------------------------------------------------------
-@node References,  , Characteristic sets, Mathematical background
+@node The spectrum, References, Characteristic sets, Mathematical background
+@section The spectrum
+@cindex The spectrum
+
+@c the following text contain too much math code, so there are
+@c tex and info versions of it. It end just before the introducing text
+@c to the first example.
+
+@tex
+Let $f\colon(C^n,0)\rightarrow(C,0)$ be an isolated
+hypersurface singularity given by a polynomial wich we also
+denote by $f$. Let $O=C[x_1,\ldots,x_n]_{(x_1,\ldots,x_n)}$
+be the local ring at the origin and $J_f$ the jacobian ideal of $f$.
+If the coefficients of $f$ are algebraic numbers,
+{\sc Singular} can be used to compute invariants of $f$ such as
+the Milnor number $\mu(f)=\dim_CO/J_f$ and
+the Tjurina number $\tau(f)=\dim_CO/(J_f,f)$.
+
+If in addition the principal part of $f$ is $C$-nondegenerate,
+then also the spectrum of $f$ and the geometric genus $p_g(f)$
+can be computed.
+
+The spectrum of $f$ consists of $\mu(f)$ rational numbers
+{\tt spectrum}$(f)=[\alpha_1,\ldots,\alpha_{\mu}]$ such that
+$e^{2\pi i\alpha_1},\ldots,e^{2\pi i\alpha_\mu}$ are the eigenvalues
+of the monodromy of $f$. These numbers are logarithms of the eigenvalues
+determined by the mixed Hodge Structure on the cohomology of
+the Milnor fibre of $f$. The spectrum numbers lie in the open interval
+$(0,n)$, symmetric about the midpoint $n/2$. It is very interesting
+how the spectrum behaves under deformations. To start with, it
+is constant under $\mu$-constant deformations.
+
+Then there is the so called semicontinuity.
+If $F(x,t)$ is a deformation of $f$
+(i.e.~$F(x,0)=f(x)$), then every half open
+interval of length one $I=(a,a+1]$ is a semicontinuity domain
+in the following sense: the number of spectrum numbers of $f$
+in $I$ is greater or equal the number of spectrum numbers
+of a small deformation $F(\ ,\varepsilon)$ in $I$:
+
+
+$|{\tt spectrum}(f)\cap I| \geq \sum_{P\in Sing(F(\ ,\epsilon))}
+    |{\tt spectrum}_P(F(\ ,\epsilon))\cap I| $
+
+Note that on the right hand side we sum over all
+singularities of the small deformation $F(\ ,\varepsilon)$.
+Furthermore if $f$ is
+semiquasihomogeneous, then also every open interval of length
+one $I=(a,a+1)$ is a semicontinuity domain as above.
+
+Two given isolated singularities $f$ and $g$ determine two spectra and from
+these spectra we get an integer. This integer is the maximal number
+$k\in{N}_0$
+such that the semicontinuity holds for the spectrum of $f$ and
+$k$ times the spectrum of $g$.
+These numbers give bounds for the maximal number of isolated
+singularties of a specific type on a hypersurface
+$X\subset{P}^n$ of degree $d$: such a surface has a
+smooth hyperplane section, and the complement is a small deformation
+of a cone over this hyperplane section.
+The cone itself being a $\mu$-constant deformation of
+$x_1^d+\ldots+x_n^d=0$, the singularities are bounded
+by the spectrum of $x_1^d+\ldots+x_n^d$.
+@end tex
+
+@ifinfo
+Let f:(C^n,0) -> (C,0) be an isolated
+hypersurface singularity given by a polynomial wich we also
+denote by f. Let O = C[x_1, @dots{}, x_n]_(x_1, @dots{}, x_n)
+be the local ring at the origin and J_f the jacobian ideal of f.
+If the coefficients of f are algebraic numbers,
+@sc{Singular} can be used to compute invariants of f such as
+the Milnor number mu(f) = dim_C ( O/J_f ) and
+the Tjurina number tau(f) = dim_C ( O/(J_f,f) ).
+
+If in addition the principal part of f is C-nondegenerate,
+then also the spectrum of f and the geometric genus p_g(f)
+can be computed.
+
+The spectrum of f consists of mu(f) rational numbers
+spectrum(f) = [alpha_1, @dots{}, alpha_mu] such that
+e^(2*pi*i*alpha_1), @dots{}, e^(2*pi*i*alpha_mu) are the eigenvalues
+of the monodromy of f. These numbers are logarithms of the eigenvalues
+determined by the mixed Hodge Structure on the cohomology of
+the Milnor fibre of f. The spectrum numbers lie in the open interval
+(0,n), symmetric about the midpoint n/2. It is very interesting
+how the spectrum behaves under deformations. To start with, it
+is constant under mu-constant deformations.
+
+Then there is the so called semicontinuity.
+If F(x,t) is a deformation of f
+(i.e. F(x,0) = f(x)), then every half open
+interval of length one I = (a,a+1] is a semicontinuity domain
+in the following sense: the number of spectrum numbers of f
+in I is greater or equal the number of spectrum numbers
+of a small deformation F( ,epsilon) in I:
+
+
+| spectrum(f) intersect I | >= sum | spectrum_P (F( ,epsilon)) intersect I |
+over all P in Sing(F( ,epsilon))
+
+Note that on the right hand side we sum over all
+singularities of the small deformation F( ,epsilon).
+Furthermore if f is
+semiquasihomogeneous, then also every open interval of length
+one I=(a,a+1) is a semicontinuity domain as above.
+
+Two given isolated singularities f and g determine two spectra and from
+these spectra we get an integer. This integer is the maximal number
+k in N such that the semicontinuity holds for the spectrum of f and
+k times the spectrum of g.
+These numbers give bounds for the maximal number of isolated
+singularties of a specific type on a hypersurface X in P^n of degree d:
+such a surface has a smooth hyperplane section,
+and the complement is a small deformation of a cone over this hyperplane
+section. The cone itself being a mu-constant deformation of
+x_1^d+@dots{}+x_n^d=0, the singularities are bounded
+by the spectrum of x_1^d+@dots{}+x_n^d.
+@end ifinfo
+
+Let us calculate one specific example, the maximal number of
+triple points of type
+@tex
+$\tilde{E}_6$ on a surface $X\subset{P}^3$
+@end tex
+@ifinfo
+E~_6 on a surface X in P^3
+@end ifinfo
+of degree seven.
+This calculation can be done over the rationals.
+So choose a local ordering on @math{Q[x,y,z]}. Here we take the
+negative degree lexicographical ordering which is denoted
+@code{ds} in @sc{Singular}:
+
+@smallexample
+@c example
+ring r=0,(x,y,z),ds;
+poly f=x^7+y^7+z^7;
+list s1=spectrum( f );
+s1;
+@c example
+@end smallexample
+
+The command @code{spectrum(f)} computes the spectrum of @math{f} and
+returns a list with six entries:
+The Milnor number
+@tex
+$\mu(f)$, the geometric genus $p_g(f)$
+@end tex
+@ifinfo
+mu(f), the geometric genus p_g(f)
+@end ifinfo
+and the number of different spectrum numbers.
+The other three entries are of type @code{intvec}.
+They contain the numerators, denominators and
+multiplicities of the spectrum numbers. So
+@tex
+$x^7+y^7+z^7=0$
+@end tex
+@ifinfo
+x^7+y^7+z^7=0
+@end ifinfo
+has Milnor number 216 and geometrical
+genus 35. Its spectrum consists of the 16 different rationals
+@*@tex
+${3 \over 7}, {4 \over 7}, {5 \over 7}, {6 \over 7}, {1 \over 1},
+{8 \over 7}, {9 \over 7}, {10 \over 7}, {11 \over 7}, {12 \over 7},
+{13 \over 7}, {2 \over 1}, {15 \over 7}, {16 \over 7}, {17 \over 7},
+{18 \over 7}$
+@end tex
+@ifinfo
+3/7, 4/7, 5/7, 6/7, 1, 8/7, 9/7, 10/7, 11/7, 12/7, 13/7, 2, 15/7, 16/7, 17/7, 
+18/7
+@end ifinfo
+@*appearing with multiplicities
+@*1,3,6,10,15,21,25,27,27,25,21,15,10,6,3,1.
+
+@tex
+The singularities of type $\tilde{E}_6$ form a
+$\mu$-constant one parameter family given by
+$x^3+y^3+z^3+\lambda xyz=0,\quad \lambda^3\neq-27$.
+@end tex
+@ifinfo
+The singularities of type E~_6 form a
+mu-constant one parameter family given by
+x^3+y^3+z^3+lambda xyz=0, lambda^3 <> -27.
+@end ifinfo
+Therefore they have all the same spectrum, which we compute
+for 
+@tex
+$x^3+y^3+z^3$.
+@end tex
+@ifinfo
+@math{x^3+y^3+z^3}.
+@end ifinfo
+
+@smallexample
+poly g=x^3+y^3+z^3;
+list s2=spectrum(g);
+s2;
+@expansion{} [1]:
+@expansion{}    8
+@expansion{} [2]:
+@expansion{}    1
+@expansion{} [3]:
+@expansion{}    4
+@expansion{} [4]:
+@expansion{}    1,4,5,2
+@expansion{} [5]:
+@expansion{}    1,3,3,1
+@expansion{} [6]:
+@expansion{}    1,3,3,1
+@end smallexample
+Evaluating semicontinuity is very easy:
+@smallexample
+semic(s1,s2);
+@expansion{} 18
+@end smallexample
+
+This tells us that there are at most 18 singularities of type
+@tex
+$\tilde{E}_6$ on a septic in $P^3$. But $x^7+y^7+z^7$
+@end tex
+@ifinfo
+E~_6 on a septic in P^3. But x^7+y^7+z^7
+@end ifinfo
+is semiquasihomogeneous (sqh), so we can also apply the stronger
+form of semicontinuity:
+
+@smallexample
+semicsqh(s1,s2);
+@expansion{} 17
+@end smallexample
+
+So in fact a septic has at most 17 triple points of type
+@tex
+$\tilde{E}_6$.
+@end tex
+@ifinfo
+E~_6.
+@end ifinfo
+
+Note that @code{spectrum(f)} works only if @math{f} has nondegenerate
+principal part. In fact @code{spectrum} will detect a degenerate
+principal part in many cases and print out an error message.
+However if it is known in advance that @math{f} has nondegenerate
+principal part, then the spectrum may be computed much faster
+using @code{spectrum(f,1)}.
+
+@c ---------------------------------------------------------------------------
+@node References,  , The spectrum, Mathematical background
 @section References
 @cindex References
 
@@ -480,7 +731,7 @@ of zero-dimensional
 Gr@"obner bases by change of ordering. Journal of Symbolic Computation, 1989
 
 @item
-Gr@"abe, H.-G.: On factorized Gr@"obner bases, Univ. Leipzig, Inst. f@"ur 
+Gr@"abe, H.-G.: On factorized Gr@"obner bases, Univ. Leipzig, Inst. f@"ur
 Informatik, 1994
 
 @item

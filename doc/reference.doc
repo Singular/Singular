@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.157 1999-10-25 12:45:27 obachman Exp $
+@comment $Id: reference.doc,v 1.158 1999-11-12 16:03:48 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -164,6 +164,7 @@ brackets are allowed.
 * simplify::
 * size::
 * sortvec::
+* spectrum::
 * sprintf::
 * sres::
 * status::
@@ -5116,7 +5117,7 @@ See
 @ref{nrows}.
 @c ref
 @c ---------------------------------------
-@node sortvec, sprintf, size, Functions
+@node sortvec, spectrum, size, Functions
 @subsection sortvec
 @cindex sortvec
 @table @code
@@ -5149,7 +5150,51 @@ See
 @ref{general_lib}.
 @c ref
 @c ---------------------------------------
-@node sprintf, sres, sortvec, Functions
+@node spectrum, sprintf, sortvec, Functions
+@subsection spectrum
+@cindex spectrum
+@table @code
+@item @strong{Syntax:}
+@code{spectrum (} poly_expression @code{)}
+@*@code{spectrum (} poly_expression, int_expression @code{)}
+@item @strong{Type:}
+list
+@item @strong{Purpose:}
+computes the spectrum of an isolated hypersurface singularity given by 
+the poly_expression f.
+Requires that the principal part of f is C-nondegenerate.@*
+This routine will do some tests to detect a degenerate principal part.@*
+The return list contains
+  @enumerate
+  @item
+  the Milnor number
+  @item
+  the geometric genus
+  @item
+  an intvec a
+  @item
+  an intvec b
+  @item
+  an intvec m
+  @end enumerate
+The spectrum numbers are a[i]/b[i], appearing with multiplicity m[i].
+@item @strong{Note:}
+This command will become part of a library in future versions of @sc{Singular}.
+@item @strong{Example:}
+@smallexample
+@c example
+  ring r=0,(x,y,z),ds;
+  poly f=x^7+y^7+z^7;
+  list s1=spectrum(f);
+  s1;
+@c example
+@end smallexample
+@end table
+@c @c ref
+@c See
+@c @c ref
+@c ---------------------------------------
+@node sprintf, sres, spectrum, Functions
 @subsection sprintf
 @cindex sprintf
 @c lib standard.lib:sprintf lib_fun lib_ex subsection
@@ -5491,7 +5536,7 @@ returns the version number of  @sc{Singular} as int
 @cindex system, contributors
 returns names of people who contributed to the Singular kernel as string
 @item @code{system("gen")}
-@cindex gen
+@c gen is reserved id: @cindex gen
 @cindex system, gen
 returns the generating element of the multiplicative
 group of Z/p\@{0@} (as int) where p is the characteristic of the
