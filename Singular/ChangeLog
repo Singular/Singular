@@ -1,3 +1,9 @@
+Wed Jun  3 16:20:22 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* Makefile.in (DOCS): target removed
+	  (DISTFILES): reference to `$(DOC)' removed
+	  (distclean): reference to `$(docdir)' removed
+
 Wed Jun 03 16:46:06 1998    <pohl@FUECHSE>
 
 	* claptmpl.cc: instantiation for operator == (CFFactor, CFFactor)
