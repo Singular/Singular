@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mod_raw.cc,v 1.17 2001-08-27 14:47:12 Singular Exp $ */
+/* $Id: mod_raw.cc,v 1.18 2003-02-18 17:44:31 Singular Exp $ */
 /*
  * ABSTRACT: machine depend code for dynamic modules
  *
@@ -26,7 +26,7 @@
 /*****************************************************************************
  *
  * General section
- * These are just wrappers around the repsective dynl_* calls
+ * These are just wrappers around the repsective dynl_* calls 
  * which look for the binary in the bin_dir of Singular and ommit warnings if
  * somethings goes wrong
  *
@@ -44,7 +44,7 @@ void* dynl_open_binary_warn(char* binary_name, const char* msg)
   if (bin_dir != NULL)
   {
     char path_name[MAXPATHLEN];
-    sprintf(path_name, "%s%s%s.%s", bin_dir, DIR_SEPP, binary_name,
+    sprintf(path_name, "%s%s%s.%s", bin_dir, DIR_SEPP, binary_name, 
             DL_TAIL);
     handle = dynl_open(path_name);
     if (handle == NULL && ! warn_handle)
@@ -132,10 +132,10 @@ void *dynl_open(char *filename)
 void *dynl_sym(void *handle, char *symbol)
 {
   func_ptr        f;
-
+  
   if (handle == DYNL_KERNEL_HANDLE)
     handle = PROG_HANDLE;
-
+  
   if (shl_findsym((shl_t *) & handle, symbol, TYPE_PROCEDURE, &f) == -1)
   {
     if (shl_findsym((shl_t *) & handle, symbol, TYPE_UNDEFINED, &f) == -1)
@@ -143,7 +143,7 @@ void *dynl_sym(void *handle, char *symbol)
       f = (func_ptr) NULL;
     }
   }
-  return (f);
+  return ((void *)f);
 }
 
 int dynl_close (void *handle)
@@ -309,7 +309,7 @@ const char *dynl_error()
   return errmsg;
 }
 #endif /* SunOS_4 */
-
+ 
 /*****************************************************************************
  * SECTION SunOs-5
  *****************************************************************************/
