@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.98 2002-07-03 13:15:34 anne Exp $ */
+/* $Id: iplib.cc,v 1.99 2002-07-04 15:54:12 levandov Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -1061,14 +1061,18 @@ BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN tellerror)
   }
   else
   {
+#ifdef HAVE_NS
     package s=currPack;
     currPack=IDPACKAGE(pl);
+#endif
     fktn = (fktn_t)dynl_sym(IDPACKAGE(pl)->handle, "mod_init");
     if( fktn!= NULL) (*fktn)(iiAddCproc);
     else Werror("mod_init: %s\n", dynl_error());
     if (BVERBOSE(V_LOAD_LIB)) Print( "// ** loaded %s \n", fullname);
+#ifdef HAVE_NS
     currPack->loaded=1;
     currPack=s;
+#endif
   }
   RET=FALSE;
 
