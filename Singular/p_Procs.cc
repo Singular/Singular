@@ -6,7 +6,7 @@
  *  Purpose: implementation of primitive procs for polys
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Procs.cc,v 1.8 2000-09-18 09:19:27 obachman Exp $
+ *  Version: $Id: p_Procs.cc,v 1.9 2000-09-18 10:26:13 obachman Exp $
  *******************************************************************/
 #include <string.h>
 #include "mod2.h"
@@ -18,8 +18,6 @@
  * 
  *******************************************************************/
 // define to enable/disable ptest in p_Procs
-#undef TEST_P_PROCS
-// #define TEST_P_PROCS
 
 /***************************************************************
  Here is how it works:
@@ -45,7 +43,11 @@
 //   2 -- plus FieldZp_Length*_Ord* procs
 //   3 -- plus Field*_Length*_OrdGeneral procs
 //   4 -- all Field*_Length*_Ord* procs
+#ifdef NDEBUG
+const int HAVE_FAST_P_PROCS = 4;
+#else
 const int HAVE_FAST_P_PROCS = 0;
+#endif
 
 // Set HAVE_FAST_FIELD to:
 //   0 -- only FieldGeneral
@@ -59,7 +61,7 @@ const int HAVE_FAST_FIELD = 1;
 //   2 -- special cases for length <= 2
 //   3 -- special cases for length <= 4
 //   4 -- special cases for length <= 8
-const int HAVE_FAST_LENGTH = 2;
+const int HAVE_FAST_LENGTH = 4;
 
 // Set HAVE_FAST_ORD to:
 //  0  -- only OrdGeneral
@@ -505,8 +507,11 @@ static void SetProcs(p_Field field, p_Length length, p_Ord ord);
 #include "p_MemCmp.h"
 #include "p_MemAdd.h"
 #include "p_MemCopy.h"
-
+#ifdef NDEBUG
 #include "p_Procs.inc"
+#else
+#include "p_Procs_debug.inc"
+#endif
 
 // the rest is related to getting the procs
 static inline p_Field p_FieldIs(ring r)
