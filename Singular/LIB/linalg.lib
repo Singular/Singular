@@ -1,6 +1,6 @@
 //GMG last modified: 04/25/2000
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: linalg.lib,v 1.33 2002-08-06 10:05:21 mschulze Exp $";
+version="$Id: linalg.lib,v 1.34 2003-02-19 15:56:54 Singular Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  linalg.lib  Algorithmic Linear Algebra
@@ -1745,7 +1745,7 @@ matrix J;  Jordan matrix with list(e,s,m)==jordan(J)
 EXAMPLE: example jordanmatrix; shows examples
 "
 {
-  if(ncols(e)!=size(s)||size(e)!=size(m))
+  if(ncols(e)!=size(s)||ncols(e)!=size(m))
   {
     ERROR("arguments of equal size expected");
   }
