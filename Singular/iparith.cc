@@ -1209,7 +1209,8 @@ static BOOLEAN jjKLAMMER(leftv res, leftv u, leftv v)
   FreeL((ADDRESS)u->name);
   u->name=NULL;
 #ifdef HAVE_NAMESPACES
-  if(u->req_packhdl != NULL) {
+  if(u->req_packhdl != NULL)
+  {
     namespaceroot->push( IDPACKAGE(u->req_packhdl), IDID(u->req_packhdl));
     syMake(res,n);
     namespaceroot->pop();
@@ -1227,13 +1228,14 @@ static BOOLEAN jjKLAMMER_IV(leftv res, leftv u, leftv v)
   char *n;
 #ifdef HAVE_NAMESPACES
   BOOLEAN needpop=FALSE;
-  
-  if(u->req_packhdl != NULL) {
+
+  if(u->req_packhdl != NULL)
+  {
     namespaceroot->push( IDPACKAGE(u->req_packhdl), IDID(u->req_packhdl));
     needpop = TRUE;
   }
 #endif /* HAVE_NAMESPACES */
-  
+
   for (i=0;i<iv->length(); i++)
   {
     if (p==NULL)
@@ -4435,17 +4437,20 @@ static BOOLEAN jjEXPORTTO(leftv res, leftv v)
     namehdl ns = (namehdl)(u->data);
     idhdl h = namespaceroot->root->get(ns->name, 0, TRUE);
     Print("Export to '%s', lev %d\n", ns->name, ns->myynest);
-    while(v->next!=NULL) {
+    while(v->next!=NULL)
+    {
       nok = iiInternalExport(v->next, ns->myynest, h);
       if(nok) { return nok; }
-      
+
       v = v->next;
     }
     return FALSE;
   }
-  if(u->Typ()==PACKAGE_CMD) {
+  if(u->Typ()==PACKAGE_CMD)
+  {
     Print("export to package\n");
-    while(v->next!=NULL) {
+    while(v->next!=NULL)
+    {
       nok = iiInternalExport(v->next, 0, u->data);
       if(nok) return nok;
       v = v->next;
@@ -4461,14 +4466,17 @@ static BOOLEAN jjIMPORTFROM(leftv res, leftv v)
 {
   BOOLEAN nok=FALSE;
   Print("jjIMPORT_FROM()\n");
-  if(v->rtyp==NSHDL) {
+  if(v->rtyp==NSHDL)
+  {
     Print("Import from toplevel\n");
 //While-schleife!!!
     return FALSE;
   }
-  if(v->Typ()==PACKAGE_CMD) {
+  if(v->Typ()==PACKAGE_CMD)
+  {
     Print("Import from package %s\n", v->name);
-    while(v->next!=NULL) {
+    while(v->next!=NULL)
+    {
       //nok = iiInternalImport(v->next, 0, v->data);
       if(nok) return nok;
     }
@@ -4477,24 +4485,29 @@ static BOOLEAN jjIMPORTFROM(leftv res, leftv v)
   return TRUE;
 }
 
+#ifdef HAVE_NAMESPACES
 static BOOLEAN jjUNLOAD(leftv res, leftv v)
 {
-  if(v->Typ()==PACKAGE_CMD) {
+  if(v->Typ()==PACKAGE_CMD)
+  {
     char *typ;
     idhdl h = (idhdl)v->data;
-    package d=v->Data();
-    switch (d->language) {
-        case LANG_C:        typ="object";   break;
-        case LANG_SINGULAR: 
-        case LANG_NONE:     
-        default:
-          killhdl(h);
+    package d=(package)v->Data();
+    switch (d->language)
+    {
+      case LANG_C:
+        typ="object";
+        break;
+      case LANG_SINGULAR:
+      case LANG_NONE:
+      default:
+        killhdl(h);
     }
     return FALSE;
   }
   return TRUE;
 }
-
+#endif
 /*=================== operations with many arg.: table =================*/
 /* number_of_args:  -1: any, -2: any >0, .. */
 struct sValCmdM dArithM[]=

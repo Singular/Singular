@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.22 1998-10-26 11:11:16 krueger Exp $ */
+/* $Id: ipid.cc,v 1.23 1998-10-28 12:05:29 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -744,7 +744,7 @@ char *idhdl2id(idhdl pck, idhdl h)
 
 void iiname2hdl(char *name, idhdl *pck, idhdl *h)
 {
-  char *q = index(name, ':');
+  char *q = strchr(name, ':');
   char *p, *i;
 
   if(q==NULL)
@@ -791,12 +791,15 @@ void iiname2hdl(char *name, idhdl *pck, idhdl *h)
   FreeL(i);
 }
 
+#if 0
 char *getnamelev()
 {
   char buf[256];
   sprintf(buf, "(%s:%d)", namespaceroot->name,namespaceroot->lev);
   return(buf);
 }
+// warning: address of local variable `buf' returned
+#endif
 
 namehdl namerec::push(package pack, char *name, int nesting, BOOLEAN init)
 {

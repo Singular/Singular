@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.28 1998-10-22 13:11:12 krueger Exp $ */
+/* $Id: ipshell.cc,v 1.29 1998-10-28 12:05:30 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -327,7 +327,7 @@ void list_cmd(int typ, const char* what, char *prefix,BOOLEAN iterate, BOOLEAN f
     {
 #ifdef HAVE_NAMESPACES
       idhdl pack;
-      if(index(what, ':')!= NULL)
+      if(strchr(what, ':')!= NULL)
         iiname2hdl(what, &pack, &h);
       else h = ggetid(what);
 #else /* HAVE_NAMESPACES */
