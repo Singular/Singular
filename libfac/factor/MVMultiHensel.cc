@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// static char * rcsid = "$Id: MVMultiHensel.cc,v 1.5 2001-08-08 11:59:12 Singular Exp $";
+// static char * rcsid = "$Id: MVMultiHensel.cc,v 1.6 2001-08-08 14:26:55 Singular Exp $";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -15,7 +15,10 @@
 #include "MVMultiHensel.h"
 
 #ifdef SINGULAR
-#  define HAVE_SINGULAR
+#define HAVE_SINGULAR_ERROR
+#endif
+
+#ifdef HAVE_SINGULAR_ERROR
    extern "C" { void WerrorS(char *); }
 #endif
 
@@ -108,11 +111,15 @@ diophant( int levelU , const CanonicalForm & F1 , const CanonicalForm & F2 , int
 
   // Degrees ok? degree(F1,mainvar) + degree(F2,mainvar) <= i ?
   if ( (degree(F1,levelU) + degree(F2,levelU) ) <= i ) {
-#ifdef HAVE_SINGULAR
+#ifdef factor/MVMultiHensel.cc
     WerrorS("libfac: diophant ERROR: degree too large!  ");
 #else
+#ifndef NOSTREAMIO
     cerr << "libfac: diophant ERROR: degree too large!  "
          << (degree(F1,levelU) + degree(F2,levelU) ) <<endl;
+#else
+    ;
+#endif
 #endif
     Retvalue.One=F1;Retvalue.Two=F2;
     return Retvalue;
@@ -122,15 +129,14 @@ diophant( int levelU , const CanonicalForm & F1 , const CanonicalForm & F2 , int
     r=extgcd(F1,F2,s,t);
     // check if gcd(F1,F2) <> 1 , i.e. F1 and F2 are not relatively prime
     if ( ! r.isOne() ){
-#ifdef HAVE_SINGULAR
+#ifdef HAVE_SINGULAR_ERROR
       WerrorS("libfac: diophant ERROR: F1 and F2 are not relatively prime! ");
 #else
 #ifndef NOSTREAMIO
       cerr << "libfac: diophant ERROR: " << F1 << "  and  " << F2
            << "  are not relatively prime!" << endl;
 #else
-     cerr << "libfac: diophant ERROR: F1 and F2 are not relatively prime!"
-          << endl;
+     ;
 #endif
 #endif
       Retvalue.One=F1;Retvalue.Two=F2;
@@ -404,6 +410,9 @@ MultiHensel( const CanonicalForm & mF, const CFFList & Factorlist,
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.5  2001/08/08 11:59:12  Singular
+*hannes: Dan's NOSTREAMIO changes
+
 Revision 1.4  1997/11/18 16:39:05  Singular
 * hannes: moved WerrorS from C++ to C
      (Factor.cc MVMultiHensel.cc SqrFree.cc Truefactor.cc)

@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-static char * rcsid = "$Id: charset.cc,v 1.8 2001-08-06 08:32:53 Singular Exp $";
+static char * rcsid = "$Id: charset.cc,v 1.9 2001-08-08 14:26:54 Singular Exp $";
 /////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -38,9 +38,12 @@ static CFList     irras(CFList & AS, int &ja, CanonicalForm & reducible);
 #include "debug.h"
 
 #ifdef SINGULAR
-       extern void WarnS(const char *);
-       #include "../../Singular/mod2.h"
-       #include "../../Singular/febase.h"
+#define HAVE_SINGULAR_ERROR
+#endif
+
+#ifdef HAVE_SINGULAR_ERROR
+   extern "C" { void WerrorS(char *); }
+   extern "C" { void WarnS(const char *); }
 #endif
 
 // the next computes a characteristic set (a basic set in Wang's sense)
@@ -579,8 +582,8 @@ irras( CFList & AS, int & ja, CanonicalForm & reducible){
           }
           else
           {
-#ifdef SINGULAR
-            //WarnS("libfac: Factoring over algebraic function field required!");
+#ifdef HAVE_SINGULAR_ERROR
+            WarnS("libfac: Factoring over algebraic function field required!");
 #else
 #ifndef NOSTREAMIO
             cerr << "libfac: Factoring over algebraic function field!" << endl;
@@ -598,6 +601,9 @@ irras( CFList & AS, int & ja, CanonicalForm & reducible){
 ///////////////////////////////////////////////////////////////////////////////
 /*
 $Log: not supported by cvs2svn $
+Revision 1.8  2001/08/06 08:32:53  Singular
+* hannes: code cleanup
+
 Revision 1.7  2001/06/27 13:58:06  Singular
 *hannes/GP: debug newfactoras, char_series, ...
 

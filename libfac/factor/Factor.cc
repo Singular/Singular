@@ -1,6 +1,6 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: Factor.cc,v 1.9 2001-08-08 11:59:12 Singular Exp $ ";
+static char * rcsid = "$Id: Factor.cc,v 1.10 2001-08-08 14:26:55 Singular Exp $ ";
 static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) michael@math.uni-sb.de \nPlease include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -22,9 +22,12 @@ static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) mi
 #include "alg_factor.h"
 
 #ifdef SINGULAR
-#  define HAVE_SINGULAR
+#define HAVE_SINGULAR_ERROR
+#endif
+
+#ifdef HAVE_SINGULAR_ERROR
    extern "C" { void WerrorS(char *); }
-   extern  void WarnS(const char *);
+   extern "C" { void WarnS(const char *); }
 #endif
 
 #ifdef FACTORDEBUG
@@ -217,11 +220,13 @@ not_monic( const CFFList & TheList, const CanonicalForm & ltt, const CanonicalFo
             Returnlist.append(CFFactor(numerator/test ,1));
           }
           else {
-#ifdef HAVE_SINGULAR
+#ifdef HAVE_SINGULAR_ERROR
             WerrorS("libfac: ERROR: not_monic1: case lt is a sum.");
 #else
+#ifndef NOSTREAMIO
             cerr << "libfac: ERROR: not_monic1: case lt is a sum.\n"
                  << rcsid << errmsg << endl;
+#endif
 #endif
           }
         }
@@ -234,11 +239,13 @@ not_monic( const CFFList & TheList, const CanonicalForm & ltt, const CanonicalFo
           // the following will do what we want
           Returnlist= myUnion( CFFList(CFFactor(1/a,1)),Returnlist) ;
         else {
-#ifdef HAVE_SINGULAR
+#ifdef HAVE_SINGULAR_ERROR
           WerrorS("libfac: ERROR: not_monic2: case lt is a sum.");
 #else
+#ifndef NOSTREAMIO
           cerr << "libfac: ERROR: not_monic2: case lt is a sum.\n"
                << rcsid << errmsg << endl;
+#endif
 #endif
         }
       }
@@ -323,7 +330,7 @@ generate_mipo( int degree_of_Extension , const Variable & Extension ){
   else {
     if ( degree(Extension) == 0 ) FFRandom gen;
     else {
-#ifdef HAVE_SINGULAR
+#ifdef HAVE_SINGULAR_ERROR
     WerrorS("libfac: evaluate: Extension not inFF() or inGF() !");
 #else
 #ifndef NOSTREAMIO
@@ -396,11 +403,13 @@ specializePoly(const CanonicalForm & f, Variable & Extension, int deg, SFormList
       ok= try_specializePoly(f,minpoly,deg,Substitutionlist,i,j);
     }
     else {
-#ifdef HAVE_SINGULAR
+#ifdef HAVE_SINGULAR_ERROR
       WerrorS("libfac: spezializePoly ERROR: Working over given extension-field not yet implemented!");
 #else
+#ifndef NOSTREAMIO
       cerr << "libfac: spezializePoly ERROR: Working over given extension-field not yet implemented!\n"
            << rcsid << errmsg << endl;
+#endif
 #endif
       return 0;
     }
@@ -430,11 +439,13 @@ evaluate( int maxtries, int sametries, int failtries, const CanonicalForm &f , c
   if ( degree(Extension) >0 ) GFRandom gen;
   else { if ( degree(Extension) == 0 ) FFRandom gen;
   else {
-#ifdef HAVE_SINGULAR
+#ifdef HAVE_SINGULAR_ERROR
     WerrorS("libfac: evaluate: Extension not inFF() or inGF() !");
 #else
+#ifndef NOSTREAMIO
     cerr << "libfac: evaluate: " << Extension << " not inFF() or inGF() !"
          << endl;
+#endif
 #endif
     FFRandom gen; }}
   REvaluation k(1,n,gen);
@@ -618,11 +629,15 @@ Factorized( const CanonicalForm & F, const Variable & alpha, int Mainvar){
     success= specializePoly(ffuni,Extension,degree(ff),Substitutionlist,1,getNumVars(compress(ff,m)));
     DEBOUTLN(cout,  "Returned from specializePoly: success: ", success);
     if (success == 0 ){ // No spezialisation could be found
-#ifdef SINGULAR
+#ifdef HAVE_SINGULAR_ERROR
       WarnS("libfac: Factorize: ERROR: Not able to find a valid specialization!");
 #else
+#ifndef NOSTREAMIO
       cerr << "libfac: Factorize: ERROR: Not able to find a valid specialization!\n"
            << rcsid << errmsg << endl;
+#else
+       ;
+#endif
 #endif
       Outputlist.append(CFFactor(F,1));
       return Outputlist;
@@ -827,6 +842,9 @@ Factorize( const CanonicalForm & F, int is_SqrFree ){
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.9  2001/08/08 11:59:12  Singular
+*hannes: Dan's NOSTREAMIO changes
+
 Revision 1.8  2001/08/06 08:32:54  Singular
 * hannes: code cleanup
 

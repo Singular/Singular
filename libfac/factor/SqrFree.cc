@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-static char * rcsid = "$Id: SqrFree.cc,v 1.5 2001-08-08 11:59:13 Singular Exp $";
+static char * rcsid = "$Id: SqrFree.cc,v 1.6 2001-08-08 14:26:56 Singular Exp $";
 static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) michael@math.uni-sb.de .\n Please include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -16,7 +16,10 @@ static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) mi
 #include "SqrFree.h"
 
 #ifdef SINGULAR
-#  define HAVE_SINGULAR
+#define HAVE_SINGULAR_ERROR
+#endif
+
+#ifdef HAVE_SINGULAR_ERROR
    extern "C" { void WerrorS(char *); }
 #endif
 
@@ -127,11 +130,13 @@ SqrFreeTest( const CanonicalForm & r, int opt){
     if ( g.isOne() || (-g).isOne() || (g==f) || (getNumVars(g)==0) ) return 1 ;
     else return 0 ;
   }
-#ifdef HAVE_SINGULAR
+#ifdef HAVE_SINGULAR_ERROR
   WerrorS("libfac: ERROR: SqrFreeTest: we should never fall trough here!");
 #else
+#ifndef NOSTREAMIO
   cerr << "\nlibfac: ERROR: SqrFreeTest: we should never fall trough here!\n"
        << rcsid << errmsg << endl;
+#endif
 #endif
   return 0;
 }
@@ -253,11 +258,13 @@ SqrFreed( const CanonicalForm & r ){
     DEBDECLEVEL(cout, "SqrFreed");
     return Outputlist ;
   }
-#ifdef HAVE_SINGULAR
+#ifdef HAVE_SINGULAR_ERROR
   WerrorS("libfac: ERROR: SqrFreed: we should never fall trough here!");
 #else
+#infdef NOSTREAMIO
   cerr << "\nlibfac: ERROR: SqrFreed: we should never fall trough here!\n"
        << rcsid << errmsg << endl;
+#endif
 #endif
   DEBDECLEVEL(cout, "SqrFreed");
   return Outputlist; // for safety purpose
@@ -333,6 +340,9 @@ SqrFree(const CanonicalForm & r ){
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.5  2001/08/08 11:59:13  Singular
+*hannes: Dan's NOSTREAMIO changes
+
 Revision 1.4  1997/11/18 16:39:06  Singular
 * hannes: moved WerrorS from C++ to C
      (Factor.cc MVMultiHensel.cc SqrFree.cc Truefactor.cc)
