@@ -1,7 +1,7 @@
 //GMG, last modified 18.6.99
 //anne, added deleteSublist and watchdog 12.12.2000
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: general.lib,v 1.30 2000-12-22 13:52:31 greuel Exp $";
+version="$Id: general.lib,v 1.31 2000-12-29 01:52:42 greuel Exp $";
 category="General purpose";
 info="
 LIBRARY:  general.lib   Elementary Computations of General Type
@@ -87,11 +87,10 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 proc ASCII (list #)
 "USAGE:   ASCII([n,m]); n,m= integers (32 <= n <= m <= 126)
-RETURN:   printable ASCII characters (no native language support)
+RETURN:   string of printable ASCII characters (no native language support)
           ASCII():    string of  all ASCII characters with its numbers,
-                      no return value
-          ASCII(n):   string, n-th ASCII character
-          ASCII(n,m): list, n-th up to m-th ASCII character (inclusive)
+          ASCII(n):   n-th ASCII character
+          ASCII(n,m): n-th up to m-th ASCII character (inclusive)
 EXAMPLE: example ASCII; shows an example
 "
 {
@@ -137,12 +136,14 @@ example
 
 proc binomial (int n, int k, list #)
 "USAGE:   binomial(n,k[,p]); n,k,p integers
-RETURN:  binomial(n,k); binomial coefficient n choose k,
-@*         - of type string (computed in characteristic 0)
-         binomial(n,k,p); n choose k, computed in characteristic prime(p)
-@*         - of type number if a basering is present and prime(p)=char(basering)
-@*         - of type string else
+RETURN:  binomial(n,k); binomial coefficient n choose k
+@*       - of type string (computed in characteristic 0)
+@*       binomial(n,k,p); n choose k, computed in characteristic 0 or prime(p)
+@*       - of type number if a basering, say R, is present and p=0=char(R)
+           or if prime(p)=char(R)
+@*       - of type string else
 NOTE:    In any characteristic, binomial(n,k) = coefficient of x^k in (1+x)^n
+SEE ALSO: prime
 EXAMPLE: example binomial; shows an example
 "
 {
@@ -260,12 +261,14 @@ static proc binomp (int n, int k, int p)
 ///////////////////////////////////////////////////////////////////////////////
 
 proc factorial (int n, list #)
-"USAGE:   factorial(n[,p]);  n,p integers
-RETURN:  factorial(n):   n! (computed in characteristic 0), of type string
-         factorial(n,p): n! computed in characteristic prime(p)
-         - of type number if a basering is present and prime(p)=char(basering)
-         - of type string else
-EXAMPLE: example factorial; shows an example
+"USAGE:    factorial(n[,p]);  n,p integers
+RETURN:   factorial(n):   n! (computed in characteristic 0), of type string.
+@*        factorial(n,p): n! computed in characteristic 0 or prime(p)
+@*        - of type number if a basering is present and 0=p=char(basering)
+            or if prime(p)=char(basering)
+@*        - of type string else
+SEE ALSO: prime
+EXAMPLE:  example factorial; shows an example
 "
 {   int str,l,p;
 //---------------------------- initialization -------------------------------
@@ -312,13 +315,14 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc fibonacci (int n, list #)
-"USAGE:   fibonacci(n);  n,p integers
-RETURN:  fibonacci(n): nth Fibonacci number, f(0)=f(1)=1, f(i+1)=f(i-1)+f(i)
-         - computed in characteristic 0, of type string
-         of type number computed in char(basering) if n is of type number
-         fibonacci(n,p): f(n) computed in characteristic prime(p)
-         - of type number if a basering is present and prime(p)=char(basering)
-         - of type string else
+"USAGE:    fibonacci(n);  n,p integers
+RETURN:   fibonacci(n): nth Fibonacci number, f(0)=f(1)=1, f(i+1)=f(i-1)+f(i)
+@*        - computed in characteristic 0, of type string
+@*        fibonacci(n,p): f(n) computed in characteristic 0 or prime(p)
+@*        - of type number if a basering is present and p=0=char(basering)
+            or if prime(p)=char(basering)
+@*        - of type string else
+SEE ALSO: prime
 EXAMPLE: example fibonacci; shows an example
 "
 {   int str,ii,p;
@@ -358,20 +362,20 @@ EXAMPLE: example fibonacci; shows an example
 }
 example
 { "EXAMPLE:"; echo = 2;
-   fibonacci(333); "";              //f(333) of type string (as long integer)
-   ring r = 17,x,dp;
-   number b = fibonacci(333,17);    //f(333) of type number, computed in r
+   fibonacci(42); "";             //f(42) of type string (as long integer)
+   ring r = 2,x,dp;
+   number b = fibonacci(42,2);    //f(42) of type number, computed in r
    b;
 }
 ///////////////////////////////////////////////////////////////////////////////
 
 proc kmemory (list #)
-"USAGE:   kmemory([n,[v]]); n = int
+"USAGE:   kmemory([n,[v]]); n,v integers
 RETURN:  memory in kilobyte of type int
-         n=0: memory used by active variables (same as no parameters)
-         n=1: total memory allocated by Singular
-         n=2: difference between top and init memory adress (sbrk memory)
-         n!=0,1,2: 0
+@*       n=0: memory used by active variables (same as no parameters)
+@*       n=1: total memory allocated by Singular
+@*       n=2: difference between top and init memory adress (sbrk memory)
+@*       n!=0,1,2: 0
 DISPLAY: detailed information about allocated and used memory if v!=0
 NOTE:    kmemory uses internal function 'memory' to compute kilobyte, and
          is the same as 'memory' for n!=0,1,2
@@ -409,35 +413,36 @@ proc killall
 "USAGE:   killall(); (no parameter)
          killall(\"type_name\");
          killall(\"not\", \"type_name\");
-COMPUTE: killall(); kills all user-defined variables but not loaded procedures
-         killall(\"type_name\"); kills all user-defined variables,
-         of type \"type_name\"
-         killall(\"not\", \"type_name\"); kills all user-defined variables,
-         except those of type \"type_name\" and except loaded procedures
-         killall(\"not\", \"name_1\", \"name_2\", ...); 
-         kills all user-defined variables, except those of name \"name_i\" 
-         and except loaded procedures
-RETURN:  no return value
+RETURN:  killall(); kills all user-defined variables except loaded procedures,
+         no return value.
+@*       - killall(\"type_name\"); kills all user-defined variables,
+           of type \"type_name\"
+@*       - killall(\"not\", \"type_name\"); kills all user-defined variables,
+           except those of type \"type_name\" and except loaded procedures
+@*       - killall(\"not\", \"name_1\", \"name_2\", ...); 
+           kills all user-defined variables, except those of name \"name_i\" 
+           and except loaded procedures
 NOTE:    killall should never be used inside a procedure
 EXAMPLE: example killall; shows an example AND KILLS ALL YOUR VARIABLES
 "
 {
-  list L=names(); int joni=size(L);
-  int no_kill, j;
-  for (j=1; j<=size(#); j++)
+  list @marie=names();
+  int no_kill, @joni;
+  for ( @joni=1; @joni<=size(#);  @joni++)
   {
-    if (typeof(#[j]) != "string")
+    if (typeof(#[@joni]) != "string")
     {
-      ERROR("Need string as " + string(j) + "th argument");
+      ERROR("Need string as " + string(@joni) + "th argument");
     }
   }
   
   // kills all user-defined variables but not loaded procedures
   if( size(#)==0 )
   {
-    for ( ; joni>0; joni-- )
+    for ( @joni=size(@marie); @joni>0; @joni-- )
     {
-      if( L[joni]!="LIB" and typeof(`L[joni]`)!="proc" ) { kill `L[joni]`; }
+      if( @marie[@joni]!="LIB" and typeof(`@marie[@joni]`)!="proc" ) 
+      { kill `@marie[@joni]`; }
     }
   }
   else
@@ -448,32 +453,35 @@ EXAMPLE: example killall; shows an example AND KILLS ALL YOUR VARIABLES
       // of type proc
       if( #[1] == "proc" )
       {
-        for ( joni=size(L); joni>0; joni-- )
+        for ( @joni=size(@marie); @joni>0; @joni-- )
         {
-          if((L[joni]!="killall") and (L[joni]=="LIB" or typeof(`L[joni]`)=="proc"))
-          { kill `L[joni]`; }
+          if((@marie[@joni]!="killall") and (@marie[@joni]=="LIB" or 
+                                       typeof(`@marie[@joni]`)=="proc"))
+          { kill `@marie[@joni]`; }
         }
       }
       else
       {  
         // other types
-        for ( ; joni>2; joni-- )
+        for ( @joni=size(@marie); @joni>2; @joni-- )
         {
-          if(typeof(`L[joni]`)==#[1] and L[joni]!="LIB" and typeof(`L[joni]`)!="proc") { kill `L[joni]`; }
+          if(typeof(`@marie[@joni]`)==#[1] and @marie[@joni]!="LIB" 
+             and typeof(`@marie[@joni]`)!="proc") 
+          { kill `@marie[@joni]`; }
         }
       }
     }
     else
     {
       // kills all user-defined variables whose name or type is not #i 
-      for ( ; joni>2; joni-- )
+      for ( @joni=size(@marie); @joni>2; @joni-- )
       {
-        if ( L[joni] != "LIB" && typeof(`L[joni]`) != "proc")
+        if ( @marie[@joni] != "LIB" && typeof(`@marie[@joni]`) != "proc")
         {
           no_kill = 0;
           for (j=2; j<= size(#); j++)
           {
-            if (typeof(`L[joni]`)==#[j] or L[joni] == #[j])
+            if (typeof(`@marie[@joni]`)==#[j] or @marie[@joni] == #[j])
             {
               no_kill = 1;
               break;
@@ -481,7 +489,7 @@ EXAMPLE: example killall; shows an example AND KILLS ALL YOUR VARIABLES
           }
           if (! no_kill)
           {
-            kill `L[joni]`;
+            kill `@marie[@joni]`;
           }
         }
       }
@@ -504,11 +512,11 @@ example
 
 proc number_e (int n)
 "USAGE:   number_e(n);  n integer
-COMPUTE: Euler number e=exp(1) up to n decimal digits (no rounding)
-         by A.H.J. Sale's algorithm
-RETURN:  - string of exp(1) if no basering of char 0 is defined;
-         - exp(1), type number, if a basering of char 0 is defined, display its
-         decimal format if printlevel >= voice (default:printlevel=voice-1 )
+RETURN:  Euler number e=exp(1) up to n decimal digits (no rounding)
+@*       - of type string if no basering of char 0 is defined
+@*       - of type number if a basering of char 0 is defined
+DISPLAY: decimal format of e if printlevel > 0 (default:printlevel=0 )
+NOTE:    procedure uses algorithm of A.H.J. Sale
 EXAMPLE: example number_e; shows an example
 "
 {
@@ -549,11 +557,11 @@ example
 
 proc number_pi (int n)
 "USAGE:   number_pi(n);  n positive integer
-COMPUTE: pi (area of unit circle) up to n decimal digits (no rounding)
-         by algorithm of S. Rabinowitz
-RETURN:  - string of pi if no basering of char 0 is defined,
-         - pi, of type number, if a basering of char 0 is defined, display its
-         decimal format if printlevel >= voice (default:printlevel=voice-1 )
+RETURN:  pi (area of unit circle) up to n decimal digits (no rounding)
+@*       - of type string if no basering of char 0 is defined,
+@*       - of type number, if a basering of char 0 is defined
+DISPLAY: decimal format of pi if printlevel > 0 (default:printlevel=0 )
+NOTE:    procedure uses algorithm of S. Rabinowitz
 EXAMPLE: example number_pi; shows an example
 "
 {
@@ -623,8 +631,9 @@ example
 proc primes (int n, int m)
 "USAGE:   primes(n,m);  n,m integers
 RETURN:  intvec, consisting of all primes p, prime(n)<=p<=m, in increasing
-         order if n<=m, resp. prime(m)<=p<=n, in decreasing order if m<n
-NOTE:    prime(n); returns the biggest prime number <= n (if n>=2, else 2)
+         order if n<=m, resp. prime(m)<=p<=n, in decreasing order if m<n.
+NOTE:    prime(n); returns the biggest prime number <= min(n,32003)
+         if n>=2, else 2
 EXAMPLE: example primes; shows an example
 "
 {  int change;
@@ -643,13 +652,13 @@ example
 
 proc product (id, list #)
 "USAGE:    product(id[,v]); id ideal/vector/module/matrix/intvec/intmat/list,
-          v intvec  (default: v=1.. number of entries of id)
-RETURN:   - if id is not a list: poly resp. int, the product of all entries of
-          id with index given by v.
-          id is treated as a list of polys resp. integers. A module m is
-          identified with corresponding matrix M (columns of M generate m)
-          - if id is a list: product of list entries, with index given by v.
-          Assume that list members can be multiplied
+          v intvec  (default: v=1..number of entries of id)
+ASSUME:   list members can be multiplied.
+RETURN:   The product of all entries of id [with index given by v] of type 
+          depending on the entries of id.
+NOTE:     If id is not a list, id is treated as a list of polys resp. integers.
+          A module m is identified with the corresponding matrix M (columns
+          of M generate m).
 EXAMPLE:  example product; shows an example
 "
 {
@@ -720,11 +729,12 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 proc ringweights (list # )
-"USAGE:   ringweights (P); P=name of an existing ring (true name, not a string)
-RETURN:  intvec, size=nvars(P), consisting of the weights of the variables of P
+"USAGE:   ringweights(P); P=name of an existing ring (true name, not a string)
+RETURN:  intvec consisting of the weights of the variables of P, as they 
+         appear when typing P;.
 NOTE:    This is useful when enlarging P but keeping the weights of the old
-         variables
-EXAMPLE: example ringweights;  shows an example
+         variables.
+EXAMPLE: example ringweights; shows an example
 "
 {
    int ii,q,fi,fo,fia;
@@ -789,32 +799,29 @@ example
   ring r0 = 0,(x,y,z),dp;
   ringweights(r0);
   ring r1 = 0,x(1..5),(ds(3),wp(2,3));
-  ringweights(r1);
-  ring r2 = 0,x(1..5),(a(1,2,3,0),dp);
-  ringweights(r2);
-  ring r3 = 0,x(1..10),(a(1..5),dp(5),a(10..13),Wp(5..9));
-  ringweights(r3);
-  // an example for enlarging the ring:
-  intvec v = 6,2,3,4,5;
-  ring R = 0,x(1..10),(a(ringweights(r1),v),dp);
+  ringweights(r1);"";
+  // an example for enlarging the ring, keeping the first weights:
+  intvec v = ringweights(r1),6,2,3,4,5;
+  ring R = 0,x(1..10),(a(v),dp);
   ordstr(R);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 proc sort (id, list #)
-"USAGE:   sort(id[v,o,n]); id=ideal/module/intvec/list (of intvec's or int's)
-         sort may be called with 1, 2 or 3 arguments in the following way:
-         sort(id[v,n]); v=intvec of positive integers, n=integer,
-         sort(id[o,n]); o=string (any allowed ordstr of a ring), n=integer
-RETURN:  a list of two elements:
-         [1]: object of same type as input but sorted in the following manner:
+"USAGE:   sort(id[v,o,n]); id=ideal/module/intvec/list(of intvec's or int's)
+@*       sort may be called with 1, 2 or 3 arguments in the following way:
+@*       sort(id[v,n]); v=intvec of positive integers, n=integer,
+@*       sort(id[o,n]); o=string (any allowed ordstr of a ring), n=integer
+RETURN:  a list l of two elements:
+@format
+        l[1]: object of same type as input but sorted in the following way:
            - if id=ideal/module: generators of id are sorted w.r.t. intvec v
              (id[v[1]] becomes 1-st, id[v[2]]  2-nd element, etc.). If no v is
              present, id is sorted w.r.t. ordering o (if o is given) or w.r.t.
              actual monomial ordering (if no o is given):
-                    generators with smaller leading term come first
-             (e.g. sort(id); sorts w.r.t actual monomial ordering)
+             NOTE: generators with SMALLER(!) leading term come FIRST
+             (e.g. sort(id); sorts backwards to actual monomial ordering)
            - if id=list of intvec's or int's: consider a list element, say
              id[1]=3,2,5, as exponent vector of the monomial x^3*y^2*z^5;
              the corresponding monomials are ordered w.r.t. intvec v (s.a.).
@@ -829,8 +836,9 @@ RETURN:  a list of two elements:
            - if id=intvec: id is treated as list of integers
            - if n!=0 the ordering is inverse, i.e. w.r.t. v(size(v)..1)
              default: n=0
-         [2]: intvec, describing the permutation of the input (hence [2]=v if
-             v is given (with positive integers)
+         l[2]: intvec, describing the permutation of the input (hence l[2]=v
+             if v is given (with positive integers))
+@end format
 NOTE:    If v is given id may be any simply indexed object (e.g. any list or
          string); if v[i]<0 and i<=size(id) v[i] is set internally to i;
          entries of v must be pairwise distinct to get a permutation if id.
@@ -920,43 +928,79 @@ example
 {  "EXAMPLE:"; echo = 2;
    ring r0 = 0,(x,y,z,t),lp;
    ideal i = x3,z3,xyz;
-   sort(i);                // sort w.r.t. lex ordering
+   sort(i);               //sorts using lex ordering,smaller polys come first
+ 
    sort(i,3..1);
-   sort(i,"ls")[1];        // sort w.r.t. negative lex ordering
-   list L =1,8..5,3..10;
-   sort(L)[1];             // sort L lexicographically
-   sort(L,"Dp",1)[1];      // sort L w.r.t (total sum, reverse lex)
+
+   sort(i,"ls")[1];        //sort w.r.t. negative lex ordering
+
+   intvec v =1,10..5,2..4;v;
+   sort(v)[1];             // sort v lexicographically
+
+   sort(v,"Dp",1)[1];      // sort v w.r.t (total sum, reverse lex)
 }
 ///////////////////////////////////////////////////////////////////////////////
-
 proc sum (id, list #)
-"USAGE:    sum(id[,v]); id=ideal/vector/module/matrix resp. id=intvec/intmat,
-                       v=intvec (e.g. v=1..n, n=integer)
-RETURN:   poly resp. int which is the sum of all entries of id, with index
-          given by v (default: v=1..number of entries of id)
-NOTE:     id is treated as a list of polys resp. integers. A module m is
-          identified with corresponding matrix M (columns of M generate m)
+"USAGE:    sum(id[,v]); id ideal/vector/module/matrix/intvec/intmat/list,
+          v intvec  (default: v=1..number of entries of id)
+ASSUME:   list members can be added.
+RETURN:   The sum of all entries of id [with index given by v] of type 
+          depending on the entries of id.
+NOTE:      If id is not a list, id is treated as a list of polys resp. integers.
+          A module m is identified with the corresponding matrix M (columns
+          of M generate m).
 EXAMPLE:  example sum; shows an example
 "
 {
-   if( typeof(id)=="poly" or typeof(id)=="ideal" or typeof(id)=="vector"
-       or typeof(id)=="module" or typeof(id)=="matrix" )
+   int n,j,tt;
+   string ty;
+   list l;
+   int s = size(#);
+   if( s!=0 )
+   {  if ( typeof(#[s])=="intvec" )
+      {  intvec v = #[s];
+         tt=1; s=s-1;
+         if ( s>0 ) { # = #[1..s]; }
+      }
+   }
+   if ( s>0 )
+   {
+     l = list(id)+#;
+     kill id;
+     list id = l;
+     ty = "list";
+   }
+   else
+   { ty = typeof(id);
+   }
+   if( ty=="list" )
+   { n = size(id);
+     def f(1) = id[1];
+     for( j=2; j<=n; j=j+1 ) { def f(j)=f(j-1)+id[j]; }
+     return(f(n));
+   }
+   if( ty=="poly" or ty=="ideal" or ty=="vector"
+       or ty=="module" or ty=="matrix" )
    {
       ideal i = ideal(matrix(id));
-      if( size(#)!=0 ) { i = i[#[1]]; }
-      matrix Z = matrix(i);
+      kill id;
+      ideal id = i;
+      if( tt!=0 ) { id = id[v]; }
+      n = ncols(id); poly f(1)=id[1];
    }
-   if( typeof(id)=="int" or typeof(id)=="intvec" or typeof(id)=="intmat" )
+   if( ty=="int" or ty=="intvec" or ty=="intmat" )
    {
-      if ( typeof(id) == "int" ) { intmat S =id; }
+      if ( ty == "int" ) { intmat S =id; }
       else { intmat S = intmat(id); }
       intvec i = S[1..nrows(S),1..ncols(S)];
-      if( size(#)!=0 ) { i = i[#[1]]; }
-      intmat Z=transpose(i);
+      kill id;
+      intvec id = i;
+      if( tt!=0 ) { id = id[v]; }
+      n = size(id); int f(1)=id[1];
    }
-   intvec v; v[ncols(Z)]=0; v=v+1;
-   return((Z*v)[1,1]);
- }
+   for( j=2; j<=n; j=j+1 ) { def f(j)=f(j-1)+id[j]; }
+   return(f(n));   int n,j,tt;
+}
 example
 {  "EXAMPLE:"; echo = 2;
    ring r= 0,(x,y,z),dp;
@@ -1030,13 +1074,14 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc watchdog(int i, string cmd)
-"USAGE  : watchdog(i,cmd); i integer; cmd string
-RETURNS: Result of cmd, if the result can be computed in 
-         i seconds. Otherwise the computation is interrupted after
-         i seconds, the string "Killed" is returned and the global
-         variable 'watchdog_interrupt' is defined.
+"USAGE:   watchdog(i,cmd); i integer; cmd string
+RETURN:  Result of cmd, if the result can be computed in i seconds.
+         Otherwise the computation is interrupted after i seconds,
+         the string "Killed" is returned and the global variable
+         'watchdog_interrupt' is defined.
 NOTE:    * the MP package must be enabled 
-         * the current basering should not be watchdog_rneu
+         * the current basering should not be watchdog_rneu, since 
+           watchdog_rneu will be killed
          * if there are variable names of the structure x(i) all
            polynomials have to be put into eval(...) in order to be
            interpreted correctly
