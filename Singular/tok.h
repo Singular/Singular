@@ -6,7 +6,7 @@
 /*
 * ABSTRACT: tokens, types for interpreter; general macros
 */
-/* $Id: tok.h,v 1.39 2000-02-10 16:09:03 Singular Exp $ */
+/* $Id: tok.h,v 1.40 2000-03-31 13:46:37 Singular Exp $ */
 
 #ifndef MYYSTYPE
 #include "structs.h"
@@ -186,12 +186,14 @@ enum {
 #define OPT_MOREPAIRS      8
 #define OPT_RETURN_SB      9
 #define OPT_FASTHC        10
+#define OPT_REDBEST       20
 #define OPT_KEEPVARS      21
 #define OPT_STAIRCASEBOUND 22
 #define OPT_MULTBOUND     23
 #define OPT_DEGBOUND      24
 #define OPT_REDTAIL       25
 #define OPT_INTSTRATEGY   26
+#define OPT_INFREDTAIL    28
 #define OPT_SB_1          29
 #define OPT_NOTREGULARITY 30
 #define OPT_WEIGHTM       31
@@ -203,6 +205,7 @@ enum {
 #define TEST_OPT_DEBUG             BTEST1(OPT_DEBUG)
 #define TEST_OPT_MOREPAIRS         BTEST1(OPT_MOREPAIRS)
 #define TEST_OPT_FASTHC            BTEST1(OPT_FASTHC)
+#define TEST_OPT_REDBEST           BTEST1(OPT_REDBEST)
 #define TEST_OPT_INTSTRATEGY       BTEST1(OPT_INTSTRATEGY)
 #define TEST_OPT_CANCELUNIT        BTEST1(OPT_CANCELUNIT)
 #define TEST_OPT_RETURN_SB         BTEST1(OPT_RETURN_SB)
@@ -211,6 +214,7 @@ enum {
 #define TEST_OPT_MULTBOUND         BTEST1(OPT_MULTBOUND)
 #define TEST_OPT_STAIRCASEBOUND    BTEST1(OPT_STAIRCASEBOUND)
 #define TEST_OPT_REDTAIL           BTEST1(OPT_REDTAIL)
+#define TEST_OPT_INFREDTAIL        BTEST1(OPT_INFREDTAIL)
 #define TEST_OPT_SB_1              BTEST1(OPT_SB_1)
 #define TEST_OPT_NOTREGULARITY     BTEST1(OPT_NOTREGULARITY)
 #define TEST_OPT_WEIGHTM           BTEST1(OPT_WEIGHTM)

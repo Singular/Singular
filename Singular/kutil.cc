@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.52 2000-03-31 13:18:22 Singular Exp $ */
+/* $Id: kutil.cc,v 1.53 2000-03-31 13:45:27 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -2248,7 +2248,8 @@ poly redtail (poly p, int pos, kStrategy strat)
     poly hn = pNext(h); // !=NULL
     int op = pFDeg(hn);
     BOOLEAN save_HE=strat->kHEdgeFound;
-    strat->kHEdgeFound |= ((Kstd1_deg>0) && (op<=Kstd1_deg));
+    strat->kHEdgeFound |= ((Kstd1_deg>0) && (op<=Kstd1_deg))
+                          || TEST_OPT_INFREDTAIL;
     loop
     {
       not_sev = ~ pGetShortExpVector(hn);
@@ -2261,6 +2262,7 @@ poly redtail (poly p, int pos, kStrategy strat)
           || strat->kHEdgeFound)
         )
         {
+          strat->redTailChange=TRUE;
           ksOldSpolyTail(strat->S[j], p, h, strat->kNoether);
           hn = pNext(h);
           if (hn == NULL) goto all_done;
