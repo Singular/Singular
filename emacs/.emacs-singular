@@ -1,5 +1,5 @@
 ;;; Emacs edit mode for this file is  -*- Emacs-Lisp -*-
-;;; $Id: .emacs-singular,v 1.9 1999-12-08 17:00:40 obachman Exp $
+;;; $Id: .emacs-singular,v 1.10 1999-12-10 13:54:25 wichmann Exp $
 
 ;;;
 ;;; .emacs-singular - Emacs initialization file to use for
@@ -104,9 +104,12 @@
 
 ; a handy function for customizing face of point
 (defun customize-face-at-point ()
-"Customize face which point is at"
+  "Customize face which point is at."
   (interactive)
-  (customize-face (get-text-property (point) 'face)))
+  (let ((face (get-text-property (point) 'face)))
+    (if face
+	(customize-face face)
+      (message "No face defined at point"))))
 
 ;; tricky stuff: these customization settings are not used any
 ;; longer as soon as user saved her own to ~/.emacs-singular-cust
