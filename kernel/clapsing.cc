@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.1.1.1 2003-10-06 12:15:50 Singular Exp $
+// $Id: clapsing.cc,v 1.2 2004-02-17 17:40:33 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -780,7 +780,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
         }
         else
         {
-          L = factorize( F, a );
+          L = factorize( G, a );
         }
 #endif
       }
@@ -788,15 +788,15 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
     else
     {
       CanonicalForm F( convSingTrPClapP( f ) );
-      if ((rField_is_Q_a())&&(currRing->minpoly!=NULL))
+      if (rField_is_Q_a())
       {
-        WarnS("factorization may be incomplete");
         L = factorize( F );
       }
       else /* Fp(a) */
       {
 #ifdef HAVE_LIBFAC_P
         L = Factorize( F );
+        //L = factorize( F );
 #else
         goto notImpl;
 #endif
@@ -868,6 +868,11 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
           }
           else if (i!=0)
           {
+            while ((v!=NULL) && ((*v)!=NULL) && ((**v)[i]>1))
+            {
+              res->m[0]=pMult(res->m[0],pCopy(res->m[i]));
+              (**v)[i]--;
+            }
             res->m[0]=pMult(res->m[0],res->m[i]);
             res->m[i]=NULL;
             if ((v!=NULL) && ((*v)!=NULL))
