@@ -1,4 +1,4 @@
-version="$Id: control.lib,v 1.4 2004-08-03 14:13:31 plural Exp $";
+version="$Id: control.lib,v 1.5 2004-08-04 13:31:49 levandov Exp $";
 category="System and Control Theory";
 info="
 LIBRARY:  control.lib Procedures for System and Control Theory 
@@ -32,6 +32,204 @@ LIB "homolog.lib";
 LIB "poly.lib";
 LIB "primdec.lib";
 //---------------------------------------------------------------
+
+
+proc ncdetection( r )
+//in dieser proc. wird eine matrix erzeugt, die in der i-ten zeile die indices
+//der differential-,shift- oder advance-operatoren enthaelt mit denen die i-te
+//variable nicht kommutiert.
+
+{
+  int i,j,k,LExp;
+  int NVars=nvars(r);
+  matrix rel = NCRelations(r)[2];
+  intmat M[NVars][3];
+  int NRows = nrows(rel);
+  intvec v,w;
+  poly d;
+  poly d2;
+  ideal I;
+  map theta; 
+  for( j=NRows;j>=2;j-- )
+  {
+   if( rel[1..NRows,j] == w )       //the whole column is zero
+   {
+      j--;
+      continue;
+   }
+   for( i=1;i<j;i++ )
+   {
+     if( rel[i,j]==1 )        //relation of type var(j)*var(i) = var(i)*var(j) +1
+     {
+       M[i,1]=j;
+     }
+     if( rel[i,j] == -1 )    //relation of type var(i)*var(j) = var(j)*var(i) -1
+     {
+       M[j,1]=i;
+     }
+     d  = rel[i,j];
+     d2 = lead(d);
+     v=leadexp(d2);  //in the next lines we check wether we have a relation of differential or shift type
+     LExp=0;
+     for( k=1;k<=NVars;k++)
+     {
+       LExp = LExp + v[k];
+     }
+     if( d-d2!=0 || LExp > 1 )
+     {
+       return( "wrong input" );
+     }
+     v = leadexp(d);
+     if( v[j] == 1)  //relation of type var(j)*var(i) = var(i)*var(j) -lambda*var(j)
+     {
+       if (leadcoef(v) < 0)
+       {
+         M[i,2] = j;
+       } 
+       else
+       {
+         M[i,3] = j;
+       }
+      }
+     if(v[i]==1 ) //relation of type var(j)*var(i) = var(i)*var(j) -lambda*var(i)
+     {
+       if (leadcoef(v) > 0)
+       {
+         M[j,2] = i;
+       }
+       else
+       {
+          M[j,3] = i;
+       }
+      }
+     }
+   }
+  //ab hier wird die map ausgerechnet
+  for(i=1;i<=NVars;i++)
+  {
+    I=I+var(i);
+  }
+  for(i=1;i<=NVars;i++)
+  {
+    if( M[i,1..3]==(0,0,0) )
+    {
+      i++;
+      continue;
+    }
+    if( M[i,1]!=0 )    
+    {
+      if( ( (M[i,2]!=0) && (M[i,3]==0) ) || ( (M[i,2]==0) && (M[i,3]!=0) ) )
+      {
+        I[i]=-var(i);
+      }
+      else
+      {
+        I[M[i,1]]=-var(M[i,1]);
+      }
+    }
+    else
+    {
+      I[1] = -var(i);
+    }
+  }
+//  map theta = basering, I;
+  return(I);
+}
+
+proc invo_poly(poly m, map theta)
+//applies the involution map theta to m, where m=polynomial
+{
+  int i,j;
+  intvec v;
+  poly p,z;
+  poly n = 0;
+  i = 1;
+  while(m[i]!=0)
+  {
+    v = leadexp(m[i]);
+    z =1;
+    for(j=nvars(basering); j>=1; j--)
+    {
+      if (v[j]!=0)
+      { 
+        p = var(j); 
+        p = theta(p);
+        z = z*(p^v[j]);
+      }
+    }    
+    n = n + (leadcoef(m[i])*z);
+    i++;  
+  }
+  return(n);
+}
+
+proc involution(m, map theta)
+//applies the involution map theta to m, where m=vector, polynomial,
+//module,ideal
+{
+  int i,j;
+  intvec v;
+  poly p,z;
+  if (typeof(m)=="poly")
+  {
+    return (invo_poly(m,theta));  
+  }
+  if ( typeof(m)=="ideal" )
+  {
+    ideal n;
+    for (i=1; i<=size(m); i++)
+    {
+      n [i] = invo_poly(m[i],theta);
+    } 
+    return(n);
+  }
+  
+  
+  if ( (typeof(m)=="matrix") || (typeof(m)=="module"))
+  {  
+//    m=transpose(m);
+    matrix n = matrix(m);
+    int @R=nrows(n);
+    int @C=ncols(n);
+    for(i=1; i<=@R; i++)
+    {
+      for(j=1; j<=@C; j++)
+      {
+        n[i,j] = invo_poly( m[i,j], theta);
+      }
+    }
+   }
+  if (typeof(m)=="module")
+  {
+    return (module(n));
+  }
+  return(n);
+}
+example
+{ 
+  "EXAMPLE:";echo = 2;
+  ring r = 0,(x,d),dp;
+  ncalgebra(1,1); // Weyl-Algebra
+  map F = r,x,-d;
+  poly f =  x*d^2+d;
+  poly If = involution(f,F);
+  f-If;
+  poly g = x^2*d+2*x*d+3*x+7*d;
+  poly tg = -d*x^2-2*d*x+3*x-7*d;
+  poly Ig = involution(g,F);
+  tg-Ig;
+  ideal I = f,g;
+  ideal II = involution(I,F);
+  II;
+  I - involution(II,F);
+  module M  = [f,g,0],[g,0,x^2*d];
+  module IM = involution(M,F);
+  print(IM);
+  print(M - involution(IM,F));  
+}
+
+
+
 proc declare(string NameOfRing, string Variables, list #)
 {
   if(size(#)==0)
@@ -197,11 +395,18 @@ proc LeftInverse(module M)
 };
 example
 {"EXAMPLE:";echo =2;
-  ring r=0,(x,y,z),dp;
-  
-};
+  ring r=(0,m1,m2,M,g,L1,L2),Dt,dp;
+  module R;
+  R =  [m1*L1*Dt^2, m2*L2*Dt^2, -1, (M+m1+m2)*Dt^2], 
+       [m1*L1^2*Dt^2-m1*L1*g, 0, 0, m1*L1*Dt^2],
+       [0, m2*L2^2*Dt^2-m2*L2*g, 0, m2*L2*Dt^2];
+  R=transpose(R);
+  module RK =RightKernel(R);
+  RK = LeftInverse(RK);
+  print(RK);
+  };
 //-----------------------------------------------------------------------
-proc Ext_Our(int i, module R,list #)
+proc Ext_Our(int i, module R, list #)
 //copy of Ext_R;
 {
   if ( size(#)==0 )
@@ -324,6 +529,7 @@ example
   Rc=transpose(Rc);	    
   Print( Rc );
   Print( control(Rc) );
+  kill r;
   //----------------------------------
   //reflector antenna
   ring A = (0, K1, K2, Te, Kp, Kc),(Dt, delta), dp;
@@ -337,6 +543,7 @@ example
   R=transpose(R);
   Print(R);
   Print(control(R));
+  kill A;
   //----------------------------------
   //Flexible Rod
   ring A = 0,(D1, delta), dp;
@@ -346,6 +553,7 @@ example
   R=transpose(R);
   Print(R);
   Print(control(R));
+  kill A;
   //-------------------------------------
   //TwoPendula
   ring r=(0,m1,m2,M,g,L1,L2),Dt,dp;
@@ -356,6 +564,7 @@ example
   R=transpose(R);
   Print(R);
   Print(control(R));
+  kill r;
   //----------------------------------------
   //Wind Tunnel
   ring A = (0,a, omega, zeta, k),(D1, delta),dp;
@@ -460,6 +669,7 @@ example
   Rc=transpose(Rc);	    
   Print( Rc );
   Print( autonom2(Rc) );
+  kill r;
   //-----------------------------------
   ring r=0,(s1,s2),dp;
   module R= [s1,-s2],
@@ -476,6 +686,7 @@ example
   R=transpose(R);
   Print( R );
   Print( autonom2(R) );
+  kill r;
   //----------------------------------------
   ring r=0,(d1,d2),dp;
   module R=[d1^2-d2],
@@ -524,6 +735,7 @@ example
   Rc=transpose(Rc);	    
   Print( Rc );
   Print( autonom(Rc) );
+  kill r;
   //-----------------------------------
   ring r=0,(s1,s2),dp;
   module R= [s1,-s2],
@@ -540,6 +752,7 @@ example
   R=transpose(R);
   Print( R );
   Print( autonom(R) );
+  kill r;
   //----------------------------------------
   ring r=0,(d1,d2),dp;
   module R=[d1^2-d2],
