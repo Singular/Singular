@@ -50,12 +50,12 @@ primdec_s
 primitiv_s
 quotient_s
 rInit
-; DIFF res_s
+res_s
 resultantp_s
 ringsum
 sing_s
 spcurve
-; DIFF sres_s
+sres_s
 std_s
 string
 triang_s
