@@ -1,6 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
+/* $Id: ideals.cc,v 1.9 1997-06-17 09:44:22 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -580,11 +581,11 @@ ideal idMinBase (ideal h1)
   }
   pEnlargeSet(&(e->m),IDELEMS(e),15);
   IDELEMS(e) = 16;
-  h2 = std(h1,NULL,isNotHomog,NULL);
+  h2 = std(h1,currQuotient,isNotHomog,NULL);
   h3 = idMaxIdeal();
   h4=idMult(h2,h3);
   idDelete(&h3);
-  h3=std(h4,NULL,isNotHomog,NULL);
+  h3=std(h4,currQuotient,isNotHomog,NULL);
   k = IDELEMS(h3);
   while ((k > 0) && (h3->m[k-1] == NULL)) k--;
   j = -1;
@@ -613,9 +614,11 @@ ideal idMinBase (ideal h1)
   idDelete(&h2);
   idDelete(&h3);
   idDelete(&h4);
-  if (currQuotient)
+  if (currQuotient!=NULL)
   {
-    h2=kNF(e,NULL,currQuotient);
+    h3=idInit(1,e->rank);
+    h2=kNF(h3,currQuotient,e);
+    idDelete(&h3);
     idDelete(&e);
     e=h2;
   }
@@ -1420,7 +1423,6 @@ ideal idLiftStd (ideal  h1,ideal  quot, matrix* ma, tHomog h)
   *ma=mpNew(1,0);
   if (idIs0(h1))
     return idInit(1,h1->rank);
-  idSkipZeroes(h1);
   h3=idPrepare(h1,quot,h,&k,&quotgen,&i,&w);
   if (w!=NULL) delete w;
   i = 0;
@@ -1430,8 +1432,6 @@ ideal idLiftStd (ideal  h1,ideal  quot, matrix* ma, tHomog h)
       i++;
   }
   j = IDELEMS(h1);
-  while ((j>0) && (h1->m[j-1] == NULL))
-    j--;
   idDelete((ideal*)ma);
   *ma = mpNew(j,i);
   i = -1;

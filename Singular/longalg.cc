@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.5 1997-05-06 18:21:22 Singular Exp $ */
+/* $Id: longalg.cc,v 1.6 1997-06-17 09:44:27 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -230,19 +230,21 @@ void napDelete(alg *p)
 */
 static alg napCopy(alg p)
 {
-  alg w, a;
-
   if (p==NULL) return NULL;
+
+  alg w, a;
+  int s=RECA_SIZE + naNumbOfPar * sizeof(int);
+
   mmTestP(p,RECA_SIZE+naNumbOfPar*sizeof(int));
-  a = w = (alg)Alloc(RECA_SIZE + naNumbOfPar * sizeof(int));
+  a = w = (alg)Alloc(s);
   memcpy(w->e, p->e, naNumbOfPar * sizeof(int));
   w->ko = nacCopy(p->ko);
   loop
   {
     p=p->ne;
     if (p==NULL) break;
-    mmTestP(p,RECA_SIZE+naNumbOfPar*sizeof(int));
-    a->ne = (alg)Alloc(RECA_SIZE + naNumbOfPar * sizeof(int));
+    mmTestP(p,s);
+    a->ne = (alg)Alloc(s);
     a = a->ne;
     memcpy(a->e, p->e, naNumbOfPar * sizeof(int));
     a->ko = nacCopy(p->ko);
@@ -465,7 +467,6 @@ static void napMultT(alg a, alg exp)
 /*3
 * multiplication of alg. polys
 * multiply p1 with p2, p1 and p2 are destroyed
-* do not put attention on speed: the procedure is only used in the interpreter
 */
 static alg napMult(alg p1, alg p2)
 {
@@ -1316,10 +1317,38 @@ number naMult(number la, number lb)
   lnumber lo;
   alg x;
 
+  naTest(la);
+  naTest(lb);
   mmTestP(a,sizeof(rnumber));
   mmTestP(b,sizeof(rnumber));
+  naTest(la);
+  naTest(lb);
+  alg tp=napCopy(a->z);
+  naTest(la);
+  naTest(lb);
+  napDelete(&tp);
+  naTest(la);
+  naTest(lb);
+  tp=napCopy(b->z);
+  naTest(la);
+  naTest(lb);
+  napDelete(&tp);
+  tp=napCopy(a->z);
+  naTest(la);
+  naTest(lb);
+  napDelete(&tp);
+  naTest(la);
+  naTest(lb);
+  tp=napCopy(b->z);
+  naTest(la);
+  naTest(lb);
+  napDelete(&tp);
+  naTest(la);
+  naTest(lb);
   lo = (lnumber)Alloc(sizeof(rnumber));
   lo->z = napMult(napCopy(a->z), napCopy(b->z));
+  naTest(la);
+  naTest(lb);
   if (a->n==NULL)
   {
     if (b->n==NULL)
@@ -1330,9 +1359,13 @@ number naMult(number la, number lb)
   else
   {
     if (b->n==NULL)
+    {
       x = napCopy(a->n);
+    }
     else
+    {
       x = napMult(napCopy(b->n), napCopy(a->n));
+    }
   }
   if (naMinimalPoly!=NULL)
   {
@@ -1364,6 +1397,8 @@ number naMult(number la, number lb)
     Free((ADDRESS)lo,sizeof(rnumber));
     lo=NULL;
   }
+  naTest(la);
+  naTest(lb);
   naTest((number)lo);
   return (number)lo;
 }

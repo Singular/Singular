@@ -1,6 +1,8 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
+/* $Id: ipassign.cc,v 1.13 1997-06-17 09:44:25 Singular Exp $ */
+
 /*
 * ABSTRACT: interpreter:
 *           assignment of expressions and lists to objects or lists
@@ -106,7 +108,7 @@ static BOOLEAN jjTRACE(leftv res, leftv a)
 static BOOLEAN jjSHORTOUT(leftv res, leftv a)
 {
 #ifdef HAVE_TCL
-  if (!tclmode) 
+  if (!tclmode)
 #endif
     pShortOut=(int)a->Data();
   return FALSE;
@@ -270,7 +272,7 @@ static BOOLEAN jiA_POLY(leftv res, leftv a,Subexpr e)
           Werror("index[%d] must be positive",j/*e->start*/);
           return TRUE;
         }
-      }  
+      }
     }
     else
     {
@@ -466,6 +468,7 @@ struct sValAssign dAssign[]=
 ,{jiA_RING,     QRING_CMD,      QRING_CMD }
 ,{jiA_STRING,   STRING_CMD,     STRING_CMD }
 ,{jiA_STRING,   PROC_CMD,       STRING_CMD }
+,{jiA_STRING,   PROC_CMD,       PROC_CMD }
 ,{jiA_POLY,     VECTOR_CMD,     VECTOR_CMD }
 ,{jiA_INTVEC,   INTVEC_CMD,     INTVEC_CMD }
 ,{jiA_INTVEC,   INTMAT_CMD,     INTMAT_CMD }
@@ -489,7 +492,7 @@ struct sValAssign_sys dAssign_sys[]=
 ,{jjTIMER,      VTIMER,         INT_CMD }
 #ifdef HAVE_RTIMER
 ,{jjRTIMER,     VRTIMER,        INT_CMD }
-#endif 
+#endif
 ,{jjMAXDEG,     VMAXDEG,        INT_CMD }
 ,{jjMAXMULT,    VMAXMULT,       INT_CMD }
 ,{jjTRACE,      TRACE,          INT_CMD }
@@ -500,7 +503,7 @@ struct sValAssign_sys dAssign_sys[]=
 };
 /*=================== operations ============================*/
 /*2
-* assign a = b 
+* assign a = b
 */
 static BOOLEAN jiAssign_1(leftv l, leftv r)
 {
@@ -510,7 +513,7 @@ static BOOLEAN jiAssign_1(leftv l, leftv r)
     if (!errorreported) Werror("`%s` is undefined",r->name);
     return TRUE;
   }
-  
+
   int lt=l->Typ();
   if((lt==0)&&(l->name!=NULL))
   {
@@ -522,7 +525,7 @@ static BOOLEAN jiAssign_1(leftv l, leftv r)
     if (!errorreported) WerrorS("right side is not a datum");
     return TRUE;
   }
-  
+
   int i=0;
   BOOLEAN nok=FALSE;
 
@@ -548,17 +551,22 @@ static BOOLEAN jiAssign_1(leftv l, leftv r)
   {
     if ((l->data==r->data)&&(l->e==NULL)&&(r->e==NULL))
       return FALSE;
-  }    
+  }
+  leftv ld=l;
+  if ((l->rtyp==IDHDL)&&(lt!=QRING_CMD)&&(lt!=RING_CMD))
+    ld=(leftv)l->data;
   while (((dAssign[i].res!=lt)
       || (dAssign[i].arg!=rt))
     && (dAssign[i].res!=0)) i++;
   if (dAssign[i].res!=0)
   {
     BOOLEAN b;
-    leftv ld=l;
-    if ((l->rtyp==IDHDL)&&(lt!=QRING_CMD)&&(lt!=RING_CMD))
-      ld=(leftv)l->data;
     b=dAssign[i].p(ld,r,l->e);
+    if(l!=ld) /* i.e. l is IDHDL, l->data is ld */
+    {
+      l->flag=ld->flag;
+      l->attribute=ld->attribute;
+    }
     return b;
   }
   // implicite type conversion ----------------------------------------------
@@ -577,11 +585,8 @@ static BOOLEAN jiAssign_1(leftv l, leftv r)
         failed= iiConvert(rt,dAssign[i].arg,ri,r,rn);
         if(!failed)
         {
-          if((l->rtyp==IDHDL)&&(lt!=QRING_CMD)&&(lt!=RING_CMD))
-            failed=dAssign[i].p((leftv)l->data,rn,l->e);
-          else
-            failed= dAssign[i].p(l,rn,l->e);
-        }    
+          failed= dAssign[i].p(ld,rn,l->e);
+        }
         // everything done, clean up temp. variables
         rn->CleanUp();
         Free((ADDRESS)rn,sizeof(sleftv));
@@ -592,6 +597,11 @@ static BOOLEAN jiAssign_1(leftv l, leftv r)
         }
         else
         {
+          if(l!=ld) /* i.e. l is IDHDL, l->data is ld */
+          {
+            l->flag=ld->flag;
+            l->attribute=ld->attribute;
+          }
           // everything ok, return
           return FALSE;
         }
@@ -921,7 +931,7 @@ static BOOLEAN jiA_MATRIX_L(leftv l,leftv r)
       l->next=NULL;
       nok=jiAssign_1(l,&t);
       l->next=h;
-      if (nok) 
+      if (nok)
       {
         idDelete((ideal *)&m);
         goto ende;
@@ -958,9 +968,9 @@ static BOOLEAN jiA_MATRIX_L(leftv l,leftv r)
     {
       nok=TRUE;
       break;
-    }  
+    }
   }
-ende:  
+ende:
   or->CleanUp();
   ol->CleanUp();
   return nok;
@@ -992,7 +1002,7 @@ static BOOLEAN jiA_STRING_L(leftv l,leftv r)
     h=l->next;
     l->next=NULL;
     nok=jiAssign_1(l,&t);
-    if (nok) 
+    if (nok)
     {
       break;
     }
@@ -1015,13 +1025,13 @@ static BOOLEAN jiAssign_list(leftv l, leftv r)
   {
     atKillAll((idhdl)l);
     l->attribute=NULL;
-  }  
+  }
   l->flag=0;
   lists li;
-  if (l->rtyp==IDHDL) 
+  if (l->rtyp==IDHDL)
   {
     li=IDLIST((idhdl)l->data);
-  }  
+  }
   else
   {
     li=(lists)l->data;
@@ -1053,7 +1063,7 @@ static BOOLEAN jiAssign_list(leftv l, leftv r)
   {
     b=iiAssign(ld,r);
     l->e->next=ld->e;
-  }  
+  }
   return b;
 }
 static BOOLEAN jiAssign_rec(leftv l, leftv r)
@@ -1100,25 +1110,25 @@ BOOLEAN iiAssign(leftv l, leftv r)
   if(l->rtyp==IDHDL)
   {
     IDFLAG((idhdl)l->data)=0;
-  }  
+  }
   l->flag=0;
   if (ll==1)
   {
     /* l[..] = ... */
     if((l->e!=NULL)
     && (((l->rtyp==IDHDL) && (IDTYP((idhdl)l->data)==LIST_CMD))
-      || (l->rtyp==LIST_CMD)))   
+      || (l->rtyp==LIST_CMD)))
     {
        if(r->next!=NULL)
          b=jiA_L_LIST(l,r);
-       else  
+       else
          b=jiAssign_list(l,r);
        if((l->rtyp==IDHDL) && (l->data!=NULL))
        {
          ipMoveId((idhdl)l->data);
          l->attribute=IDATTR((idhdl)l->data);
          l->flag=IDFLAG((idhdl)l->data);
-       }  
+       }
        r->CleanUp();
        Subexpr h;
        while (l->e!=NULL)
@@ -1154,23 +1164,23 @@ BOOLEAN iiAssign(leftv l, leftv r)
            l->attribute=IDATTR((idhdl)l->data);
            l->flag=IDFLAG((idhdl)l->data);
            l->CleanUp();
-         }  
+         }
          r->CleanUp();
          return b;
-      } 
+      }
       if ((lt!=LIST_CMD)
       &&((rt==MATRIX_CMD)
         ||(rt==INTMAT_CMD)
         ||(rt==INTVEC_CMD)
         ||(rt==MODUL_CMD)))
-      {   
+      {
          b=jiAssign_1(l,r);
          if((l->rtyp==IDHDL)&&(l->data!=NULL))
          {
            if (lt==DEF_CMD) ipMoveId((idhdl)l->data);
            l->attribute=IDATTR((idhdl)l->data);
            l->flag=IDFLAG((idhdl)l->data);
-         }  
+         }
          r->CleanUp();
          Subexpr h;
          while (l->e!=NULL)

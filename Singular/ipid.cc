@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.4 1997-04-02 15:07:10 Singular Exp $ */
+/* $Id: ipid.cc,v 1.5 1997-06-17 09:44:26 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -93,6 +93,9 @@ idhdl idrec::set(char * s, int lev, idtyp t, BOOLEAN init)
         IDIDEAL(h) = idInit(1,1);
         IDMAP(h)->preimage = mstrdup(IDID(currRingHdl));
         break;
+      case PROC_CMD:
+        IDSTRING(h) = mstrdup("parameter list #;\nreturn();\n\n");
+        break;
       case STRING_CMD:
       #ifdef HAVE_DLD
       case BINARY_CMD:
@@ -114,7 +117,7 @@ idhdl idrec::set(char * s, int lev, idtyp t, BOOLEAN init)
       case PACKAGE_CMD:
         len = sizeof(ip_package);
         break;
-    //other types: without init (int,proc,script,poly,def,package)
+    //other types: without init (int,script,poly,def,package)
     }
     if (len!=0)
     {

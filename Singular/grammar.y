@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.11 1997-06-11 13:26:10 Singular Exp $ */
+/* $Id: grammar.y,v 1.12 1997-06-17 09:44:20 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -306,6 +306,11 @@ lines:
             #endif
             prompt_char = '>';
             currid = NULL;
+            if(siCntrlc)
+            {
+              siCntrlc=FALSE;
+              MYYERROR("abort...");
+            }  
             if (errorreported)
             {
               yyerror("");
@@ -315,11 +320,12 @@ lines:
             lastreserved=NULL;
             expected_parms=FALSE;
             noringvars = FALSE;
+            siCntrlc = FALSE;
           }
         ;
 
 pprompt:
-        flowctrl                       /* if, while, for etc */
+        flowctrl                       /* if, while, for, proc */
         | command ';'                  /* commands returning no value */
           {ifswitch[voice]=0;}
         | assign  ';'                  /* general assignment */
@@ -328,7 +334,7 @@ pprompt:
           {yylineno--;ifswitch[voice]=0;}
         | declare_ip_variable ';'      /* default initialization */
           { $1.CleanUp(); ifswitch[voice]=0;}
-        | filecmd
+        | filecmd ';'
           {ifswitch[voice]=0;}
         | returncmd
           {
@@ -918,6 +924,17 @@ declare_ip_variable:
             memcpy(v->next,&r,sizeof(sleftv));
             $$=$1;
           }
+        | PROC_CMD elemexpr
+          {
+            #ifdef SIC
+            if (sic)
+            {
+              FreeL((ADDRESS)$2);
+              MYYERROR("not implemented");
+            }
+            #endif
+            if (iiDeclCommand(&$$,&$2,myynest,PROC_CMD,&idroot,TRUE)) YYERROR;
+          }
         ;
 
 stringexpr:
@@ -1058,7 +1075,7 @@ executecmd:
         ;
 
 filecmd:
-        '<' stringexpr ';'
+        '<' stringexpr 
           { if (iiPStart(NULL,$2,NULL)) YYERROR; }
         ;
 
@@ -1525,20 +1542,6 @@ proccmd:
             IDSTRING(h) = (char *)AllocL(strlen($3)+31);
             sprintf(IDSTRING(h),"parameter list #;\n%s;return();\n\n",$3);
             FreeL((ADDRESS)$3);
-          }
-        | PROC_CMD elemexpr '=' expr ';'
-          {
-            #ifdef SIC
-            if (sic)
-            {
-              $4.CleanUp();
-              FreeL((ADDRESS)$2);
-              MYYERROR("not implemented");
-            }
-            #endif
-            sleftv v;
-            if ((iiDeclCommand(&v,&$2,myynest,PROC_CMD,&idroot,FALSE))
-            || (iiAssign(&v,&($4)))) YYERROR;
           }
         | PROC_DEF STRINGTOK BLOCKTOK
           {

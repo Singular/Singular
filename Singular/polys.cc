@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.4 1997-06-04 19:45:23 obachman Exp $ */
+/* $Id: polys.cc,v 1.5 1997-06-17 09:44:32 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -2713,6 +2713,7 @@ void pNormalize(poly p)
 {
   while (p!=NULL)
   {
+    nTest(pGetCoeff(p));
     nNormalize(pGetCoeff(p));
     pIter(p);
   }
