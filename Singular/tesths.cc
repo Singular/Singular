@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.93 2004-02-12 13:07:24 Singular Exp $ */
+/* $Id: tesths.cc,v 1.94 2004-08-13 10:39:38 Singular Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -128,27 +128,15 @@ int main(          /* main entry to Singular */
   if (BVERBOSE(0))
   {
     (printf)(
-#ifdef HAVE_PLURAL
-"                     SINGULAR::PLURAL                      "
-#else
 "                     SINGULAR                             /"
-#endif
 #ifndef MAKE_DISTRIBUTION
 "  Development"
 #endif
 "\n"
-#ifdef HAVE_PLURAL
-" A Computer Algebra System for Polynomial Computations    /   version %s\n"
-"        in Noncommutative Polynomial Algebras            /\n"
-"                                                       0<\n"
-"     by: G.-M. Greuel, V. Levandovskyy, H. Schoenemann   \\   %s\n"
-"FB Mathematik der Universitaet, D-67653 Kaiserslautern    \\\n"
-#else 
 " A Computer Algebra System for Polynomial Computations   /   version %s\n"
 "                                                       0<\n"
 "     by: G.-M. Greuel, G. Pfister, H. Schoenemann        \\   %s\n"
 "FB Mathematik der Universitaet, D-67653 Kaiserslautern    \\\n"
-#endif
 , S_VERSION1,S_VERSION2);
   }
   else
