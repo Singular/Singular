@@ -1,6 +1,6 @@
 // (GMG/BM, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: inout.lib,v 1.21 2001-01-16 13:48:31 Singular Exp $";
+version="$Id: inout.lib,v 1.22 2002-06-10 18:38:09 keilen Exp $";
 category="General purpose";
 info="
 LIBRARY:  inout.lib     Printing and Manipulating In- and Output
@@ -455,6 +455,7 @@ EXAMPLE: example show; shows an example
       string s="("+charstr(@id@)+"),("+varstr(@id@)+"),("+ordstr(@id@)+");";
       if( typeof(@id@)=="ring" )
       {
+         list na@me@s=names(@id@);
          kill @id@;
          @@s = tab(@li@)+"// ring:"; @@s,s;
          @@s = tab(@li@)+"// minpoly ="; @@s,minpoly;
@@ -463,9 +464,26 @@ EXAMPLE: example show; shows an example
          listvar(vector);listvar(module);
          listvar(map);listvar(matrix);
          listvar(number);listvar(resolution);
+         for(int names@i=1;names@i<=size(na@me@s);names@i++)
+         {
+           execute("def @hi@lf@="+na@me@s[names@i]+";");
+           if ((typeof(@hi@lf@)!="poly") and
+               (typeof(@hi@lf@)!="ideal") and
+               (typeof(@hi@lf@)!="vector") and
+               (typeof(@hi@lf@)!="module") and
+               (typeof(@hi@lf@)!="map") and
+               (typeof(@hi@lf@)!="matrix") and
+               (typeof(@hi@lf@)!="number") and
+               (typeof(@hi@lf@)!="resolution"))
+           {
+             execute("listvar("+na@me@s[names@i]+");");             
+           }
+           kill(@hi@lf@);
+         }
       }
       if( typeof(@id@)=="qring" )
       {
+         list na@me@s=names(@id@);
          @@s = tab(@li@)+"// qring:"; @@s,s;
          @@s = tab(@li@)+"// minpoly ="; @@s, minpoly;
          @@s = tab(@li@)+"// quotient ring from ideal:"; @@s;
@@ -474,6 +492,22 @@ EXAMPLE: example show; shows an example
          listvar(vector);listvar(module);
          listvar(map);listvar(matrix);
          listvar(number);listvar(resolution);
+         for(int names@i=1;names@i<=size(na@me@s);names@i++)
+         {
+           execute("def @hi@lf@="+na@me@s[names@i]+";");
+           if ((typeof(@hi@lf@)!="poly") and
+               (typeof(@hi@lf@)!="ideal") and
+               (typeof(@hi@lf@)!="vector") and
+               (typeof(@hi@lf@)!="module") and
+               (typeof(@hi@lf@)!="map") and
+               (typeof(@hi@lf@)!="matrix") and
+               (typeof(@hi@lf@)!="number") and
+               (typeof(@hi@lf@)!="resolution"))
+           {
+             execute("listvar("+na@me@s[names@i]+");");             
+           }
+           kill(@hi@lf@);
+         }
       }
       short=@short@; //return();
    }
