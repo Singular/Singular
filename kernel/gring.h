@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gring.h,v 1.3 2003-12-16 18:30:31 levandov Exp $ */
+/* $Id: gring.h,v 1.4 2004-03-25 21:18:57 levandov Exp $ */
 /*
 * ABSTRACT additional defines etc for --with-plural
 */
@@ -22,11 +22,11 @@ BOOLEAN nc_InitMultiplication(ring r);
 void ncKill(ring r);
 void ncCleanUp(ring r); /* smaller than kill */
 
-// poly functions defined in p_Procs :
+/* poly functions defined in p_Procs : */
 poly nc_pp_Mult_mm(poly p, poly m, const ring r, poly &last);
 poly nc_p_Mult_mm(poly p, poly m, const ring r);
 poly nc_p_Minus_mm_Mult_qq(poly p, const poly m, poly q, const ring r);
-// other routines we need in addition :
+/* other routines we need in addition : */
 poly nc_p_Mult_mm_Common(poly p, const poly m, int side, const ring r);
 poly nc_mm_Mult_p(const poly m, poly p, const ring r);
 poly nc_mm_Mult_nn (int *F, int *G, const ring r); 
@@ -41,35 +41,37 @@ poly nc_uu_Mult_ww (int i, int a, int j, int b, const ring r);
 
 poly _nc_p_Mult_q(poly p, poly q, const int copy, const ring r);
 
-//copy :
+/* subst: */
+poly nc_pSubst(poly p, int n, poly e);
+
+/* copy : */
 poly nc_p_CopyGet(poly a, ring r);
 poly nc_p_CopyPut(poly a, ring r);
 
-//syzygies :
-// former nc_spGSpolyCreate
+/* syzygies : */
+/* former nc_spGSpolyCreate */
 poly nc_CreateSpoly(poly p1, poly p2, poly spNoether, const ring r);
-// former nc_spGSpolyRed
+/* former nc_spGSpolyRed */
 poly nc_ReduceSpoly(poly p1, poly p2, poly spNoether, const ring r);
-// former nc_spGSpolyRedNew
+/* former nc_spGSpolyRedNew */
 poly nc_ReduceSpolyNew(poly p1, poly p2, poly spNoether, const ring r);
-// former nc_spGSpolyRedTail
+/* former nc_spGSpolyRedTail */
 void nc_ReduceSpolyTail(poly p1, poly q, poly q2, poly spNoether, const ring r);
-// former nc_spShort
+/* former nc_spShort */
 poly nc_CreateShortSpoly(poly p1, poly p2, const ring r=currRing);
 
 ideal gr_bba (ideal F, ideal Q,kStrategy strat);
 
-// brackets:
+/* brackets: */
 poly nc_p_Bracket_qq(poly p, poly q);
 poly nc_mm_Bracket_nn(poly m1, poly m2);
 
-//twostd:
-
+/* twostd: */
 ideal twostd(ideal I);
 
-// complete reduction routines
+/* complete reduction routines */
 
-//void nc_kBucketPolyRed(kBucket_pt b, poly p);
+/* void nc_kBucketPolyRed(kBucket_pt b, poly p); */
 void nc_kBucketPolyRed(kBucket_pt b, poly p, number *c);
 void nc_PolyPolyRed(poly &b, poly p, number *c);
 
@@ -78,7 +80,7 @@ matrix nc_PrintMat(int a, int b, ring r, int metric);
 int nc_CheckSubalgebra(poly PolyVar, ring r);
 
 #else
-// dummy definition to make gcc happy
+/* dummy definition to make gcc happy */
 #define nc_kBucketPolyRed(A,B,C) 0
 #define nc_PolyPolyRed(A,B,C) 0
 

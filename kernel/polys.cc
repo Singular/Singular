@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.1.1.1 2003-10-06 12:15:55 Singular Exp $ */
+/* $Id: polys.cc,v 1.2 2004-03-25 21:16:15 levandov Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -18,6 +18,10 @@
 #include "numbers.h"
 #include "polys.h"
 #include "ring.h"
+
+#ifdef HAVE_PLURAL
+#include "gring.h"
+#endif
 
 /* ----------- global variables, set by pSetGlobals --------------------- */
 /* computes length and maximal degree of a POLYnomial */
@@ -834,6 +838,13 @@ poly pSubst(poly p, int n, poly e)
     if (nIsOne(pGetCoeff(e))) return pSubst1(p,n);
     else return pSubst2(p, n, pGetCoeff(e));
   }
+
+#ifdef HAVE_PLURAL
+  if (rIsPluralRing(currRing))
+  {
+    return nc_pSubst(p,n,e);
+  }
+#endif
 
   int exponent,i;
   poly h, res, m;

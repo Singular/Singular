@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.4 2003-12-17 19:40:41 levandov Exp $
+ *  Version: $Id: gring.cc,v 1.5 2004-03-25 21:19:12 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -1392,6 +1392,7 @@ poly nc_mm_Bracket_nn(poly m1, poly m2)
             if (!pLmIsConstant(suffix)) bres = nc_p_Mult_mm(bres, suffix,currRing);
             ares=p_Add_q(ares, bres,currRing);
             /* What to give free? */
+	    /* Do we have to free PREFIX/SUFFIX? it seems so */
             pDelete(&prefix);
             pDelete(&suffix);
           }
@@ -1943,6 +1944,57 @@ BOOLEAN nc_InitMultiplication(ring r)
   }
   r->nc->COM=COM;
   return FALSE;
+}
+
+/* substitute the n-th variable by e in p
+* destroy p
+* e is not a constant
+*/
+poly nc_pSubst(poly p, int n, poly e)
+{
+  int rN=currRing->N;
+  int *PRE = (int *)omAlloc0((rN+1)*sizeof(int));
+  int *SUF = (int *)omAlloc0((rN+1)*sizeof(int));
+  int i,j,pow;
+  poly suf,pre;
+  poly res = NULL;
+  poly out = NULL;
+  while ( p!= NULL )
+  {
+    pGetExpV(p, PRE); /* faster splitting? */
+    pow = PRE[n]; PRE[n]=0;
+    res = NULL;
+    if (pow!=0)
+    {
+      for (i=n+1; i<=rN; i++)
+      {
+	SUF[i] = PRE[i];
+	PRE[i] = 0;
+      }
+      res =  pPower(pCopy(e),pow);
+      /* multiply with prefix */
+      pre = pOne();
+      pSetExpV(pre,PRE);
+      pSetm(pre);
+      pSetComp(pre,PRE[0]);
+      res = nc_mm_Mult_p(pre,res,currRing);
+      /* multiply with suffix */
+      suf = pOne();
+      pSetExpV(suf,SUF);
+      pSetm(suf);
+      pSetComp(suf,PRE[0]);
+      res = nc_p_Mult_mm(res,suf,currRing);
+    }
+    else /* pow==0 */
+    {
+      res = pHead(p);
+    }
+    p   = pLmDeleteAndNext(p);
+    out = pAdd(out,res);
+  }
+  freeT(PRE,rN);
+  freeT(SUF,rN);
+  return(out);
 }
 
 #endif
