@@ -311,11 +311,8 @@ void sleftv::CleanUp()
       case INT_CMD:
         break;
       default:
-#ifdef SIC
-        if (rtyp<SIC_MASK)
-#endif
         ::Print("CleanUp: unknown type %d\n",rtyp);  /* DEBUG */
-#endif
+#endif          
     } /* end switch: (rtyp) */
     data=NULL;
   }
@@ -448,14 +445,6 @@ void * slInternalCopy(leftv source, int t, void *d, Subexpr e)
 void sleftv::Copy(leftv source)
 {
   memset(this,0,sizeof(*this));
-#ifdef SIC
-  if (source->rtyp>SIC_MASK)
-  {
-    rtyp=source->rtyp;
-    return;
-  }
-  else
-#endif
   rtyp=source->Typ();
   void *d=source->Data();
   if(!errorreported)

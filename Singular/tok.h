@@ -6,7 +6,7 @@
 /*
 * ABSTRACT: token for interpreter, as types; general macros
 */
-/* $Id: tok.h,v 1.9 1997-06-24 16:52:45 Singular Exp $ */
+/* $Id: tok.h,v 1.10 1997-08-11 15:53:22 Singular Exp $ */
 
 #ifndef MYYSTYPE
 #include "structs.h"
@@ -126,7 +126,6 @@ enum {
 
 #define NONE END_RING
 #define UNKNOWN 0
-#define SIC_MASK 1024
 
 /*
 **  Set operations (small sets only)

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipconv.cc,v 1.6 1997-07-09 15:54:00 Singular Exp $ */
+/* $Id: ipconv.cc,v 1.7 1997-08-11 15:53:18 Singular Exp $ */
 /*
 * ABSTRACT: automatic type conversions
 */
@@ -339,9 +339,6 @@ BOOLEAN iiConvert (int inputType, int outputType, int index, leftv input, leftv 
 int iiTestConvert (int inputType, int outputType)
 {
   if ((inputType==outputType)
-#ifdef SIC
-  || (inputType==0)
-#endif
   || (outputType==DEF_CMD)
   || (outputType==IDHDL)
   || (outputType==ANY_TYPE))

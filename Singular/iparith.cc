@@ -247,7 +247,7 @@ cmdnames cmds[] =
   { "resolution",  0, RESOLUTION_CMD ,    RING_DECL},
   { "resultant",   0, RESULTANT_CMD,      CMD_3},
   { "return",      0, RETURN ,            RETURN},
-#ifdef SIC
+#if 0
   { "RETURN",      0, END_PROC ,          RETURN},
 #else
   { "RETURN",      1, RETURN ,            RETURN},
@@ -2728,9 +2728,6 @@ static BOOLEAN jjSort_Id(leftv res, leftv v)
 }
 static BOOLEAN jjSTRING_PROC(leftv res, leftv v)
 {
-#ifdef SIC
-  if (sic) { MYYERROR("not implemented"); return TRUE;}
-#endif
   res->data=mstrdup(IDSTRING((idhdl)v->data));
   return FALSE;
 }
@@ -2891,6 +2888,124 @@ void jjInitTab1()
       }
     }
   }
+}
+#elif defined(PROC_BUG)
+static BOOLEAN jjstrlen(leftv res, leftv v)
+{
+  res->data = (char *)strlen(v->Data());
+  return FALSE;
+}
+static BOOLEAN jjpLength(leftv res, leftv v)
+{
+  res->data = (char *)pLength((poly)v->Data());
+  return FALSE;
+}
+static BOOLEAN jjidElem(leftv res, leftv v)
+{
+  res->data = (char *)idElem((ideal)v->Data());
+  return FALSE;
+}
+static BOOLEAN jjmpDet(leftv res, leftv v)
+{
+  res->data = (char *)mpDet((matrix)v->Data());
+  return FALSE;
+}
+static BOOLEAN jjidFreeModule(leftv res, leftv v)
+{
+  res->data = (char *)idFreeModule((int)v->Data());
+  return FALSE;
+}
+static BOOLEAN jjidVec2Ideal(leftv res, leftv v)
+{
+  res->data = (char *)idVec2Ideal((poly)v->Data());
+  return FALSE;
+}
+static BOOLEAN jjrCharStr(leftv res, leftv v)
+{
+  res->data = rCharStr((ring)v->Data());
+  return FALSE;
+}
+#ifndef MDEBUG
+static BOOLEAN jjpHead(leftv res, leftv v)
+{
+  res->data = (char *)pHead((poly)v->Data());
+  return FALSE;
+}
+#endif
+static BOOLEAN jjidHead(leftv res, leftv v)
+{
+  res->data = (char *)idHead((ideal)v->Data());
+  return FALSE;
+}
+static BOOLEAN jjidMaxIdeal(leftv res, leftv v)
+{
+  res->data = (char *)idMaxIdeal((int)v->Data());
+  return FALSE;
+}
+static BOOLEAN jjidMinBase(leftv res, leftv v)
+{
+  res->data = (char *)idMinBase((ideal)v->Data());
+  return FALSE;
+}
+static BOOLEAN jjsyMinBase(leftv res, leftv v)
+{
+  res->data = (char *)syMinBase((ideal)v->Data());
+  return FALSE;
+}
+static BOOLEAN jjpMaxComp(leftv res, leftv v)
+{
+  res->data = (char *)pMaxComp((poly)v->Data());
+  return FALSE;
+}
+static BOOLEAN jjmpTrace(leftv res, leftv v)
+{
+  res->data = (char *)mpTrace((matrix)v->Data());
+  return FALSE;
+}
+static BOOLEAN jjmpTransp(leftv res, leftv v)
+{
+  res->data = (char *)mpTransp((matrix)v->Data());
+  return FALSE;
+}
+static BOOLEAN jjrOrdStr(leftv res, leftv v)
+{
+  res->data = rOrdStr((ring)v->Data());
+  return FALSE;
+}
+static BOOLEAN jjrVarStr(leftv res, leftv v)
+{
+  res->data = rVarStr((ring)v->Data());
+  return FALSE;
+}
+static BOOLEAN jjrParStr(leftv res, leftv v)
+{
+  res->data = rParStr((ring)v->Data());
+  return FALSE;
+}
+static BOOLEAN jjidMinEmbedding(leftv res, leftv v)
+{
+  res->data = (char *)idMinEmbedding((ideal)v->Data());
+  return FALSE;
+}
+static BOOLEAN jjBETTI_R(leftv res, leftv v)
+{
+  res->data = (char *)BETTI_R((resolvente)v->Data());
+  return FALSE;
+}
+static BOOLEAN jjCOUNT_R(leftv res, leftv v)
+{
+  res->data = (char *)COUNT_R((resolvente)v->Data());
+  return FALSE;
+}
+static BOOLEAN jjDIM_R(leftv res, leftv v)
+{
+  res->data = (char *)DIM_R((resolvente)v->Data());
+  return FALSE;
+}
+static BOOLEAN jjMINRES_R(leftv res, leftv v)
+{
+  res->data = (char *)MINRES_R((resolvente)v->Data());
+  return FALSE;
 }
 #else
 #define jjstrlen       (proc1)strlen
@@ -4537,16 +4652,6 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
 
   if (!errorreported)
   {
-#ifdef SIC
-    if (sic)
-    {
-      emStoreExpr(a);
-      emStoreExpr(b);
-      emStoreOp(op,2);
-      res->rtyp=SIC_MASK;
-      return FALSE;
-    }
-#endif
 #ifdef SIQ
     if (siq>0)
     {
@@ -4694,14 +4799,6 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
 
   if (!errorreported)
   {
-#ifdef SIC
-    if (sic && (a->rtyp==SIC_MASK))
-    {
-      emStoreOp(op,1);
-      res->rtyp=SIC_MASK;
-      return FALSE;
-    }
-#endif
 #ifdef SIQ
     if (siq>0)
     {
@@ -4725,20 +4822,14 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
       if (at==dArith1[i].arg)
       {
         res->rtyp=dArith1[i].res;
-#ifdef SIC
-        if (sic)
-        {
-          emStoreExpr(a);
-          emStoreOp(op,1);
-          res->rtyp=ABS(res->rtyp)|SIC_MASK;
-          a->CleanUp();
-          return FALSE;
-        }
-#endif
         if (dArith1[i].res<0)
         {
           res->rtyp=-res->rtyp;
+          #ifdef PROC_BUG
+          dArith1[i].p(res,a);
+          #else
           res->data=(char *)((Proc1)dArith1[i].p)((char *)a->Data());
+          #endif
         }
         else if (dArith1[i].p(res,a))
         {
@@ -4767,22 +4858,18 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
         if ((ai=iiTestConvert(at,dArith1[i].arg))!=0)
         {
           res->rtyp=dArith1[i].res;
-#ifdef SIC
-          if (sic)
-          {
-            emStoreExpr(a);
-            emStoreOp(op,1);
-            res->rtyp=ABS(res->rtyp)|SIC_MASK;
-            a->CleanUp();
-            return FALSE;
-          }
-#endif
           if (dArith1[i].res<0)
           {
             res->rtyp=-res->rtyp;
             failed= iiConvert(at,dArith1[i].arg,ai,a,an);
             if (!failed)
+            {
+              #ifdef PROC_BUG
+              dArith1[i].p(res,a);
+              #else
               res->data=(char *)((Proc1)dArith1[i].p)((char *)an->Data());
+              #endif
+            }
           }
           else
           {
@@ -4851,17 +4938,6 @@ BOOLEAN iiExprArith3(leftv res, int op, leftv a, leftv b, leftv c)
 
   if (!errorreported)
   {
-#ifdef SIC
-    if (sic)
-    {
-      emStoreExpr(a);
-      emStoreExpr(b);
-      emStoreExpr(c);
-      emStoreOp(op,3);
-      res->rtyp=SIC_MASK;
-      return FALSE;
-    }
-#endif
 #ifdef SIQ
     if (siq>0)
     {
@@ -5020,15 +5096,6 @@ BOOLEAN iiExprArithM(leftv res, leftv a, int op)
 
   if (!errorreported)
   {
-#ifdef SIC
-    if (sic)
-    {
-      emStoreExpr(a);
-      emStoreOp(op,a->listLength());
-      res->rtyp=SIC_MASK;
-      return FALSE;
-    }
-#endif
 #ifdef SIQ
     if (siq>0)
     {
@@ -5165,7 +5232,6 @@ int IsCmd(char *n, int & tok)
     cmds[i].name);
     cmds[i].alias=1;
   }
-  #ifndef SIC
   if (currRingHdl==NULL)
   {
     #ifdef SIQ
@@ -5181,7 +5247,6 @@ int IsCmd(char *n, int & tok)
     }
     #endif
   }
-  #endif
   if (!expected_parms)
   {
     switch (tok)

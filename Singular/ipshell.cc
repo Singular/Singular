@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.12 1997-07-04 14:14:51 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.13 1997-08-11 15:53:19 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -36,11 +36,7 @@ leftv iiCurrArgs=NULL;
 int  traceit = 0;
 char *lastreserved=NULL;
 
-#ifdef SIC
-int  myynest = 0;
-#else
 int  myynest = -1;
-#endif
 
 static BOOLEAN iiNoKeepRing=TRUE;
 
@@ -687,19 +683,6 @@ int iiDeclCommand(leftv sy, leftv name, int lev,int t, idhdl* root,BOOLEAN init_
   }
   else
   {
-    #ifdef SIC
-    if (root==NULL)
-    {
-      idhdl h=rDefault(mstrdup("? default_ring"));
-      ring r=IDRING(h);
-      char **n=r->names;
-      int a=r->N;
-      while ((*n!=NULL)&&(a>0)) { *n[0]='?'; n++;a--; }
-      root=&(IDRING(h)->idroot);
-    }
-    //egPrint(DEFINE_VAR,t,"def %s type=%d,lev=%d\n",name->name,t,lev);
-    //egPrint(name);
-    #endif
     sy->data = (char *)enterid(name->name,lev,t,root,init_b);
     if (sy->data!=NULL)
     {
@@ -848,7 +831,6 @@ BOOLEAN iiExport (leftv v, int toLev, idhdl &root)
 
 BOOLEAN iiCheckRing(int i)
 {
-  #ifndef SIC
   if (currRingHdl==NULL)
   {
     #ifdef SIQ
@@ -864,6 +846,5 @@ BOOLEAN iiCheckRing(int i)
     }
     #endif
   }
-  #endif
   return FALSE;
 }

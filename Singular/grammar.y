@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.17 1997-08-08 10:58:07 Singular Exp $ */
+/* $Id: grammar.y,v 1.18 1997-08-11 15:53:15 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -285,21 +285,13 @@ lines:
         /**/
         | lines pprompt
           {
-            if (timerv
-            #ifdef SIC
-            && (!sic)
-            #endif
-            )
+            if (timerv)
             {
               writeTime("used time:");
               startTimer();
             }
             #ifdef HAVE_RTIMER
-            if (rtimerv
-            #ifdef SIC
-            && (!sic)
-            #endif
-            )
+            if (rtimerv)
             {
               writeRTime("used real time:");
               startRTimer();
@@ -339,22 +331,12 @@ pprompt:
           {ifswitch[voice]=0;}
         | returncmd
           {
-            #ifdef SIC
-            if (!sic)
-            #endif
             YYACCEPT;
           }
         | SYS_BREAK
           {
-            #ifdef SIC
-            if (sic)
-              emStoreOp(SYS_BREAK,0);
-            else
-            #endif
-            {
-              ifswitch[voice]=0;
-              iiDebug();
-            }
+            ifswitch[voice]=0;
+            iiDebug();
           }
         | ';'                    /* ignore empty statements */
           {ifswitch[voice]=0;}
@@ -375,9 +357,6 @@ pprompt:
             if (!errorreported) WerrorS("...parse error");
             yyerror("");
             yyerrok;
-            #ifdef SIC
-            if (sic) YYABORT;
-            #endif
             if (myynest>0)
             {
               //WerrorS("leaving yyparse");
@@ -413,10 +392,7 @@ assign: left_value exprlist
 elemexpr:
         RINGVAR
           {
-            #ifdef SIC
-            if (!sic)
-            #endif
-              if (currRing==NULL) MYYERROR("no ring active");
+            if (currRing==NULL) MYYERROR("no ring active");
             syMake(&$$,$1);
           }
         | extendedid
@@ -828,53 +804,27 @@ declare_ip_variable:
           }
         | RING_DECL elemexpr
           {
-            #ifdef SIC
-            if ((sic) && (currRing==NULL))
-            {
-              if (iiDeclCommand(&$$,&$2,myynest,$1,NULL)) YYERROR;
-            }
-            else
-            #endif
-            {
-              if (iiDeclCommand(&$$,&$2,myynest,$1,&(currRing->idroot))) YYERROR;
-            }
+            if (iiDeclCommand(&$$,&$2,myynest,$1,&(currRing->idroot))) YYERROR;
           }
         | currring_lists elemexpr
           {
-            #ifdef SIC
-            if ((sic) && (currRing==NULL))
-            {
-              if (iiDeclCommand(&$$,&$2,myynest,$1,NULL)) YYERROR;
-            }
-            else
-            #endif
-            {
-              if (iiDeclCommand(&$$,&$2,myynest,$1,&(currRing->idroot))) YYERROR;
-            }
+            if (iiDeclCommand(&$$,&$2,myynest,$1,&(currRing->idroot))) YYERROR;
           }
         | MATRIX_CMD elemexpr '[' expr ']' '[' expr ']'
           {
             if (iiDeclCommand(&$$,&$2,myynest,$1,&(currRing->idroot))) YYERROR;
-            #ifdef SIC
-            if (sic)
-            {
-            }
-            else
-            #endif
-            {
-              int r; TESTSETINT($4,r);
-              int c; TESTSETINT($7,c);
-              if (r < 1)
-                MYYERROR("rows must be greater than 0");
-              if (c < 0)
-                MYYERROR("cols must be greater than -1");
-              leftv v=&$$;
-              //while (v->next!=NULL) { v=v->next; }
-              idhdl h=(idhdl)v->data;
-              idDelete(&IDIDEAL(h));
-              IDMATRIX(h) = mpNew(r,c);
-              if (IDMATRIX(h)==NULL) YYERROR;
-            }
+            int r; TESTSETINT($4,r);
+            int c; TESTSETINT($7,c);
+            if (r < 1)
+              MYYERROR("rows must be greater than 0");
+            if (c < 0)
+              MYYERROR("cols must be greater than -1");
+            leftv v=&$$;
+            //while (v->next!=NULL) { v=v->next; }
+            idhdl h=(idhdl)v->data;
+            idDelete(&IDIDEAL(h));
+            IDMATRIX(h) = mpNew(r,c);
+            if (IDMATRIX(h)==NULL) YYERROR;
           }
         | MATRIX_CMD elemexpr
           {
@@ -883,26 +833,18 @@ declare_ip_variable:
         | INTMAT_CMD elemexpr '[' expr ']' '[' expr ']'
           {
             if (iiDeclCommand(&$$,&$2,myynest,$1,&idroot)) YYERROR;
-            #ifdef SIC
-            if (sic)
-            {
-            }
-            else
-            #endif
-            {
-              int r; TESTSETINT($4,r);
-              int c; TESTSETINT($7,c);
-              if (r < 1)
-                MYYERROR("rows must be greater than 0");
-              if (c < 0)
-                MYYERROR("cols must be greater than -1");
-              leftv v=&$$;
-              //while (v->next!=NULL) { v=v->next; }
-              idhdl h=(idhdl)v->data;
-              delete IDINTVEC(h);
-              IDINTVEC(h) = new intvec(r,c,0);
-              if (IDINTVEC(h)==NULL) YYERROR;
-            }
+            int r; TESTSETINT($4,r);
+            int c; TESTSETINT($7,c);
+            if (r < 1)
+              MYYERROR("rows must be greater than 0");
+            if (c < 0)
+              MYYERROR("cols must be greater than -1");
+            leftv v=&$$;
+            //while (v->next!=NULL) { v=v->next; }
+            idhdl h=(idhdl)v->data;
+            delete IDINTVEC(h);
+            IDINTVEC(h) = new intvec(r,c,0);
+            if (IDINTVEC(h)==NULL) YYERROR;
           }
         | INTMAT_CMD elemexpr
           {
@@ -938,13 +880,6 @@ declare_ip_variable:
           }
         | PROC_CMD elemexpr
           {
-            #ifdef SIC
-            if (sic)
-            {
-              FreeL((ADDRESS)$2);
-              MYYERROR("not implemented");
-            }
-            #endif
             if (iiDeclCommand(&$$,&$2,myynest,PROC_CMD,&idroot,TRUE)) YYERROR;
           }
         ;
@@ -1062,9 +997,6 @@ cmdeq:  '='
 executecmd:
         EXECUTE_CMD expr
           {
-            #ifdef SIC
-            if (sic) MYYERROR("execute not supported");
-            #endif
             if ($2.Typ() == STRING_CMD)
             {
               char * s = (char *)AllocL(strlen((char *)$2.Data()) + 4);
@@ -1187,45 +1119,27 @@ listcmd:
           }
         | LISTVAR_CMD '(' RING_CMD ')'
           {
-            #ifdef SIC
-            if (sic) MYYERROR("not implemented yet");
-            #endif
             list_cmd(RING_CMD,NULL,"// ",TRUE);
           }
         | LISTVAR_CMD '(' MATRIX_CMD ')'
           {
-            #ifdef SIC
-            if (sic) MYYERROR("not implemented yet");
-            #endif
             list_cmd(MATRIX_CMD,NULL,"// ",TRUE);
            }
         | LISTVAR_CMD '(' INTMAT_CMD ')'
           {
-            #ifdef SIC
-            if (sic) MYYERROR("not implemented yet");
-            #endif
             list_cmd(INTMAT_CMD,NULL,"// ",TRUE);
           }
         | LISTVAR_CMD '(' PROC_CMD ')'
           {
-            #ifdef SIC
-            if (sic) MYYERROR("not implemented yet");
-            #endif
             list_cmd(PROC_CMD,NULL,"// ",TRUE);
           }
         | LISTVAR_CMD '(' elemexpr ')'
           {
-            #ifdef SIC
-            if (sic) MYYERROR("not implemented yet");
-            #endif
             list_cmd(0,$3.Name(),"// ",TRUE);
             $3.CleanUp();
           }
         | LISTVAR_CMD '(' ')'
           {
-            #ifdef SIC
-            if (sic) MYYERROR("not implemented yet");
-            #endif
             list_cmd(-1,NULL,"// ",TRUE);
           }
         ;
@@ -1241,11 +1155,6 @@ ringcmd:
           rlist     ','      /* var names */
           ordering           /* list of (multiplier ordering (weight(s))) */
           {
-            #ifdef SIC
-            if (sic)
-            {
-            }
-            #endif
             //noringvars = FALSE;
             if(!rInit($2.name,        /* ringname */
                      &$4,            /* characteristik and list of parameters*/
@@ -1359,16 +1268,8 @@ typecmd:
         TYPE_CMD expr
           {
             if ($2.rtyp!=IDHDL) MYYERROR("identifier expected");
-            #ifdef SIC
-            if (sic)
-            {
-            }
-            else
-            #endif
-            {
-              idhdl h = (idhdl)$2.data;
-              type_cmd(h);
-            }
+            idhdl h = (idhdl)$2.data;
+            type_cmd(h);
           }
         | exprlist
           {
@@ -1400,104 +1301,57 @@ typecmd:
 
 ifcmd: IF_CMD '(' expr ')' BLOCKTOK
           {
-            #ifdef SIC
-            if (sic)
+            int i; TESTSETINT($3,i);
+            if (i!=0)
             {
-              //egPrint(IF_CMD,1,"if, 1\n");
-              //egPrint(&$3);
               newBuffer( $5, BT_if);
+              //printf("if:new level %d\n",voice);
             }
             else
-            #endif
             {
-              int i; TESTSETINT($3,i);
-              if (i!=0)
-              {
-                newBuffer( $5, BT_if);
-                //printf("if:new level %d\n",voice);
-              }
-              else
-              {
-                FreeL((ADDRESS)$5);
-                ifswitch[voice]=1;
-                //printf("if:(0):set ifsw=1 in voice %d\n",voice);
-              }
+              FreeL((ADDRESS)$5);
+              ifswitch[voice]=1;
+              //printf("if:(0):set ifsw=1 in voice %d\n",voice);
             }
           }
         | ELSE_CMD BLOCKTOK
           {
-            #ifdef SIC
-            if (sic)
+            if (ifswitch[voice]==1)
             {
-            //egPrint(ELSE_CMD,0,"op: else, 0\n");
-            newBuffer( $2, BT_else);
+              ifswitch[voice]=0;
+              newBuffer( $2, BT_else);
             }
             else
-            #endif
             {
-              if (ifswitch[voice]==1)
+              if (ifswitch[voice]!=2)
               {
-                ifswitch[voice]=0;
-                newBuffer( $2, BT_else);
+                char *s=$2+strlen($2)-1;
+                while ((*s=='\0')||(*s=='\n')) s--;
+                s[1]='\0';
+                Warn("`else` without `if` in level %d",myynest);
               }
-              else
-              {
-                if (ifswitch[voice]!=2)
-                {
-                  char *s=$2+strlen($2)-1;
-                  while ((*s=='\0')||(*s=='\n')) s--;
-                  s[1]='\0';
-                  Warn("`else` without `if` in level %d",myynest);
-                }
-                FreeL((ADDRESS)$2);
-              }
-              ifswitch[voice]=0;
+              FreeL((ADDRESS)$2);
             }
+            ifswitch[voice]=0;
           }
         | IF_CMD '(' expr ')' BREAK_CMD
           {
-            #ifdef SIC
-            if (sic)
+            int i; TESTSETINT($3,i);
+            if (i)
             {
-              //egPrint(IFBREAK,1,"ifbreak, 1\n");
-              //egPrint(&$3);
+              if (exitBuffer(BT_break)) YYERROR;
             }
-            else
-            #endif
-            {
-              int i; TESTSETINT($3,i);
-              if (i)
-              {
-                if (exitBuffer(BT_break)) YYERROR;
-              }
-              ifswitch[voice]=0;
-            }
+            ifswitch[voice]=0;
           }
         | BREAK_CMD
           {
-            #ifdef SIC
-            if (sic)
-            {
-            }
-            else
-            #endif
-            {
-              if (exitBuffer(BT_break)) YYERROR;
-              ifswitch[voice]=0;
-            }
+            if (exitBuffer(BT_break)) YYERROR;
+            ifswitch[voice]=0;
           }
         | CONTINUE_CMD
           {
-            #ifdef SIC
-            if (sic)
-            {
-            }
-            else
-            #endif
-            {
-              contBuffer(BT_break);
-              ifswitch[voice]=0;
-            }
+            contBuffer(BT_break);
+            ifswitch[voice]=0;
           }
       ;
 
@@ -1535,14 +1389,6 @@ forcmd:
 proccmd:
         PROC_CMD extendedid BLOCKTOK
           {
-            #ifdef SIC
-            if (sic)
-            {
-              FreeL((ADDRESS)$2);
-              FreeL((ADDRESS)$3);
-              MYYERROR("not implemented");
-            }
-            #endif
             idhdl h = enterid($2,myynest,PROC_CMD,&idroot,FALSE);
             if (h==NULL) {FreeL((ADDRESS)$3); YYERROR;}
             IDSTRING(h) = (char *)AllocL(strlen($3)+31);
@@ -1573,35 +1419,15 @@ parametercmd:
           {
             //Print("par:%s, %d\n",$2.Name(),$2.Typ());
             yylineno--;
-            #ifdef SIC
-            if (sic)
-            {
-              //egParameter(&$2);
-            }
-            else
-            #endif
-            {
-              if (iiParameter(&$2)) YYERROR;
-            }
+            if (iiParameter(&$2)) YYERROR;
           }
         | PARAMETER expr
           {
             //Print("par:%s, %d\n",$2.Name(),$2.Typ());
             sleftv tmp_expr;
-            #ifdef SIC
-            if (sic)
-            {
-              if (iiDeclCommand(&tmp_expr,&$2,myynest,DEF_CMD,&idroot))
-                YYERROR;
-              //egParameter(&$2);
-            }
-            else
-            #endif
-            {
-              if ((iiDeclCommand(&tmp_expr,&$2,myynest,DEF_CMD,&idroot))
-              || (iiParameter(&tmp_expr)))
-                YYERROR;
-            }
+            if ((iiDeclCommand(&tmp_expr,&$2,myynest,DEF_CMD,&idroot))
+            || (iiParameter(&tmp_expr)))
+              YYERROR;
           }
         ;
 

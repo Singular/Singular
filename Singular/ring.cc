@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.10 1997-07-11 11:10:09 obachman Exp $ */
+/* $Id: ring.cc,v 1.11 1997-08-11 15:53:20 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -439,12 +439,10 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
       }
       if (h==sNoName)
       {
-        #ifndef SIC
         WerrorS("expected name of ring variable");
         sl->CleanUp();
         ord->CleanUp();
         return NULL;
-        #endif
       }
       tmpR.names[i] = mstrdup(h);
       if (hs!=NULL)
@@ -599,7 +597,6 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
         (tmpR.order[n]==ringorder_ls))
       {
         tmpR.block1[n]=tmpR.N;
-        #ifndef SIC
         if (tmpR.block0[n]>tmpR.N/*tmpR.block1[n]*/)
         {
           tmpR.block1[n]=tmpR.block0[n];
@@ -608,9 +605,7 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
           //  tmpR.N,tmpR.block0[n]);
           //return NULL;
         }
-        #endif
       }
-      #ifndef SIC
       else
       {
 ord_mismatch:
@@ -618,7 +613,6 @@ ord_mismatch:
           tmpR.N,tmpR.block1[n]);
         return NULL;
       }
-      #endif
     }
   }
   tmpR.OrdSgn = typ;
