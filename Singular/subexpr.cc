@@ -114,7 +114,7 @@ void sleftv::Print(leftv store, int spaces)
             }
             if(((package)d)->libname!=NULL)
               ::Print("// libname : %s\n", ((package)d)->libname);
-            
+
             ::Print("// language: %-*.*s%s",spaces,spaces," ",typ);
           }
 #else /* HAVE_NAMESPACES */
@@ -250,6 +250,17 @@ void sleftv::Print(leftv store, int spaces)
     {
       store->rtyp=t/*Typ()*/;
       store->data=CopyD();
+      if((e!=NULL)||(attribute!=NULL))
+      {
+        store->attribute=CopyA();
+      }
+      if (e==NULL)
+      {
+        store->flag=flag;
+      }
+      //else
+      //{
+      //}
     }
   }
 }
@@ -262,6 +273,7 @@ void sleftv::CleanUp()
     FreeL((ADDRESS)name);
   }
   name=NULL;
+  flag=0;
 #ifdef HAVE_NAMESPACES
   packhdl = NULL;
   req_packhdl = NULL;
@@ -560,13 +572,19 @@ void sleftv::Copy(leftv source)
         Warn("Copy: cannot copy type %s(%d)",Tok2Cmdname(rtyp),rtyp);
       #endif
     }
-    flag=source->flag;
 #ifdef HAVE_NAMESPACES
     packhdl = source->packhdl;
     req_packhdl = source->req_packhdl;
 #endif /* HAVE_NAMESPACES */
     if ((source->attribute!=NULL)||(source->e!=NULL))
       attribute=source->CopyA();
+    if(source->e==NULL)
+    {
+      flag=source->flag;
+    }
+    //else
+    //{
+    //}
     if (source->next!=NULL)
     {
       next=(leftv)Alloc(sizeof(sleftv));
