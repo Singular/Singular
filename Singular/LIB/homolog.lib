@@ -1,47 +1,58 @@
-//(BM/GMG)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: homolog.lib,v 1.15 2001-01-16 13:48:31 Singular Exp $";
+version="$Id: homolog.lib,v 1.16 2004-11-04 16:51:28 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  homolog.lib   Procedures for Homological Algebra
 AUTHORS:  Gert-Martin Greuel, greuel@mathematik.uni-kl.de,
 @*        Bernd Martin,  martin@math.tu-cottbus.de
+@*        Christoph Lossen,  lossen@mathematik.uni-kl.de
 
 PROCEDURES:
  cup(M);                cup: Ext^1(M',M') x Ext^1() --> Ext^2()
  cupproduct(M,N,P,p,q); cup: Ext^p(M',N') x Ext^q(N',P') --> Ext^p+q(M',P')
+ depth(I,M);            depth(I,M'),    I ideal, M module, M'=coker(M)
  Ext_R(k,M);            Ext^k(M',R),    M module, R basering, M'=coker(M)
  Ext(k,M,N);            Ext^k(M',N'),   M,N modules, M'=coker(M), N'=coker(N)
+ fitting(M,n);          n-th Fitting ideal of M'=coker(M), M module, n int
+ flatteningStrat(M);    Flattening stratification of M'=coker(M), M module
  Hom(M,N);              Hom(M',N'),     M,N modules, M'=coker(M), N'=coker(N)
- homology(A,B,M,N)      ker(B)/im(A),   homology of complex R^k--A->M'--B->N'
+ homology(A,B,M,N);     ker(B)/im(A),   homology of complex R^k--A->M'--B->N'
+ isCM(M);               test if coker(M) is Cohen-Macaulay, M module
+ isFlat(M);             test if coker(M) is flat, M module
+ isLocallyFree(M,r);    test if coker(M) is locally free of constant rank r
+ isReg(I,M);            test if I is coker(M)-sequence, I ideal, M module
  kernel(A,M,N);         ker(M'--A->N')  M,N modules, A matrix
  kohom(A,k);            Hom(R^k,A),     A matrix over basering R
  kontrahom(A,k);        Hom(A,R^k),     A matrix over basering R
+ KoszulHomology(I,M,n); n-th Koszul homology H_n(I,coker(M)), I=ideal
+ tensorMod(M,N);        Tensor product of modules M'=coker(M), N'=coker(N)
+ Tor(k,M,N);            Tor_k(M',N'),   M,N modules, M'=coker(M), N'=coker(N)
 ";
 
 LIB "general.lib";
 LIB "deform.lib";
 LIB "matrix.lib";
 LIB "poly.lib";
+LIB "primdec.lib";
 ///////////////////////////////////////////////////////////////////////////////
 
 proc cup (module M,list #)
 "USAGE:   cup(M,[,any,any]);  M=module
-COMPUTE: cup-product Ext^1(M',M') x Ext^1(M',M') ---> Ext^2(M',M'),
-         where M':=R^m/M, if M in R^m, R basering (i.e. M':=coker(matrix(M))).
+COMPUTE: cup-product Ext^1(M',M') x Ext^1(M',M') ---> Ext^2(M',M'), where
+         M':=R^m/M, if M in R^m, R basering (i.e. M':=coker(matrix(M))).
 @*       If called with >= 2 arguments: compute symmetrized cup-product
 ASSUME:  all Ext's  are finite dimensional
-RETURN:
+RETURN:  - if called with 1 argument: matrix, the columns of the output present
+         the coordinates of b_i&b_j with respect to a kbase of Ext^2, where
+         b_1,b_2,... is a kbase of Ext^1 and & denotes cup product;@*
+         - if called with 2 arguments: matrix, the columns of the output
+         present the coordinates of (1/2)(b_i&b_j + b_j&b_i) with respect to
+         a kbase of Ext^2;
+         - if called with 3 arguments: list,
 @format
-         matrix of the associated linear map,
-         i.e. the columns of <matrix> present the coordinates of b_i & b_j
-         (resp. (1/2)(b_i & b_j + b_j & b_i) in the symmetric version)
-         with respect to a kbase of Ext^2,
-         where b_1,b_2,... is a kbase of Ext^1 and & denotes cup product.
-         In case of  a third argument return a list:
-               L[1] = matrix see above (symmetric case, for >=2 arguments)
-               L[2] = matrix of kbase of Ext^1
-               L[3] = matrix of kbase of Ext^2
+      L[1] = matrix see above (symmetric case, for >=2 arguments)
+      L[2] = matrix of kbase of Ext^1
+      L[3] = matrix of kbase of Ext^2
 @end format
 NOTE:    printlevel >=1;  shows what is going on.
          printlevel >=2;  shows result in another representation.
@@ -124,8 +135,8 @@ EXAMPLE: example cup; shows examples
    kb2 = kbase(ext20);
    kb2 = matrix(ker)*kb2;
    dbprint(p-1,"// kbase of Ext^2(M,M)",
-               "//  - the columns present the kbase elements in Hom(F(2),F(0))",
-               "//  - F(*) is a a free resolution of M ",kb2);
+             "//  - the columns present the kbase elements in Hom(F(2),F(0))",
+             "//  - F(*) is a a free resolution of M ",kb2);
 //-------  compute: cup-products of base-elements -----------------------------
    for (i=1;i<=e1;i=i+1)
    {
@@ -155,8 +166,9 @@ EXAMPLE: example cup; shows examples
        }
      }
    }
-   dbprint(p-1,"// matrix of cup-products (in Ext^2)",cup,"////// end level 2 //////");
-//------- comptute: presentation of base-elements -----------------------------
+   dbprint(p-1,"// matrix of cup-products (in Ext^2)",cup,
+               "////// end level 2 //////");
+//------- compute: presentation of base-elements -----------------------------
    cup = lift(ker,cup);
    cup = lift_kbase(cup,ext20);
    if( p>2 )
@@ -168,7 +180,7 @@ EXAMPLE: example cup; shows examples
      matrix BL[e1][e1];
      for (k=1;k<=e2;k=k+1)
      {
-       "//_____"+string(k)+". component:";
+       "//-----component "+string(k)+":";
        for (i=1;i<=e1;i=i+1)
        {
          for (j=1;j<=e1;j=j+1)
@@ -216,22 +228,22 @@ proc cupproduct (module M,N,P,int p,q,list #)
 COMPUTE: cup-product Ext^p(M',N') x Ext^q(N',P') ---> Ext^p+q(M',P'),
          where M':=R^m/M, if M in R^m, R basering (i.e. M':=coker(matrix(M)))
 ASSUME:  all Ext's  are of finite dimension
-RETURN:
+RETURN:  - if called with 5 arguments: matrix of the associated linear map
+         Ext^p (tensor) Ext^q --> Ext^p+q,  i.e. the columns of <matrix>
+         present the coordinates of the cup products (b_i & c_j) with respect
+         to a kbase of Ext^p+q  (b_i resp. c_j are the choosen bases of Ext^p,
+         resp. Ext^q).@*
+         - if called with 6 arguments: list L,
 @format
-         matrix of the associated linear map Ext^p(tensor)Ext^q-->Ext^p+q
-         i.e. the columns of <matrix> present the coordinates of
-         the cup products (b_i & c_j) with respect to a kbase of Ext^p+q
-         (b_i resp. c_j are choosen bases of Ext^p resp. Ext^q).
-         In case of a 6th argument:
-            return a list
-            L[1] = matrix (see above)
-            L[2] = matrix of kbase of Ext^p(M',N')
-            L[3] = matrix of kbase of Ext^q(N',P')
-            L[4] = matrix of kbase of Ext^p+q(N',P')
+      L[1] = matrix (see above)
+      L[2] = matrix of kbase of Ext^p(M',N')
+      L[3] = matrix of kbase of Ext^q(N',P')
+      L[4] = matrix of kbase of Ext^p+q(N',P')
 @end format
-NOTE:    printlevel >=1;  shows what is going on
-         printlevel >=2;  shows result in another representation
-         For computing cupproduct of M,N itself, apply proc to syz(M),syz(N)!
+NOTE:    printlevel >=1;  shows what is going on.
+         printlevel >=2;  shows the result in another representation.@*
+         For computing the cupproduct of M,N itself, apply proc to syz(M),
+         syz(N)!
 EXAMPLE: example cupproduct; shows examples
 "
 {
@@ -361,7 +373,8 @@ EXAMPLE: example cupproduct; shows examples
      lift1 = lift(mB,mA*lift1);
    }
    dbprint(pp-1,"// lifting of kbase of Ext^p(M,N)",
-   "//  - the columns present the lifting of kbase elements in Hom(F(p+q),G(q))",lift1);
+   "//  - the columns present liftings of kbase elements"+
+   " in Hom(F(p+q),G(q))",lift1);
 //-------  compute: cup-products of base-elements -----------------------------
    f0 = nrows(P);
    f1 = ncols(N1);
@@ -377,8 +390,9 @@ EXAMPLE: example cupproduct; shows examples
        cup= concat(cup,mC);
      }
    }
-   dbprint(pp-1,"// matrix of cup-products (in Ext^p+q)",cup,"////// end level 2 //////");
-//------- comptute: presentation of base-elements -----------------------------
+   dbprint(pp-1,"// matrix of cup-products (in Ext^p+q)",cup,
+                "////// end level 2 //////");
+//------- compute: presentation of base-elements -----------------------------
    cup = lift(ker,cup);
    cup = lift_kbase(cup,extMP0);
 //------- special output ------------------------------------------------------
@@ -391,7 +405,7 @@ EXAMPLE: example cupproduct; shows examples
      matrix BL[e1][e2];
      for (k=1;k<=e3;k=k+1)
      {
-       "//----"+string(k)+". component:";
+       "//----component "+string(k)+":";
        for (i=1;i<=e1;i=i+1)
        {
          for (j=1;j<=e2;j=j+1)
@@ -423,30 +437,32 @@ example
 
 proc Ext_R (intvec v, module M, list #)
 "USAGE:   Ext_R(v,M[,p]);  v int resp. intvec , M module, p int
-COMPUTE:
-@format
-         A presentation of Ext^k(M',R); for k=v[1],v[2],..., M'=coker(M).
-         Let      ...--> F2 --> F1 --M-> F0-->M'-->0
+COMPUTE: A presentation of Ext^k(M',R); for k=v[1],v[2],..., M'=coker(M).
+         Let
+@example
+  0 <-- M' <-- F0 <-M-- F1 <-- F2 <-- ...
+@end example
          be a free resolution of M'. If
-                    0 <-- F0* <-A1-- F1* <-A2-- F2* <-A3--...
-         denotes the dual sequence, with Fi*=Hom(Fi,R),
-         then Ext^k = ker(Ak)/im(Ak+1) is presented as in the following
-         exact sequences:
-                 Fk-1* <-Ak-- Fk* <-syz(Ak)-- R^p
-                 Fk*/im(Ak+1) <-syz(Ak)-- R^p <-Ext^k-- R^q
-         Hence Ext^k=modulo(syz(Ak),Ak+1) presents Ext^k(M',R).
-@end format
-RETURN:
+@example
+        0 --> F0* -A1-> F1* -A2-> F2* -A3-> ...
+@end example
+         is the dual sequence, Fi*=Hom(Fi,R), then Ext^k = ker(Ak+1)/im(Ak)
+         is presented as in the following exact sequences:
+@example
+    R^p --syz(Ak+1)-> Fk* ---Ak+1---->  Fk+1* ,
+    R^q ----Ext^k---> R^p --syz(Ak+1)-> Fk*/im(Ak).
+@end example
+         Hence, Ext^k=modulo(syz(Ak+1),Ak) presents Ext^k(M',R).
+RETURN:  - module Ext, a presentation of Ext^k(M',R) if v is of type int@*
+         - a list of Ext^k (k=v[1],v[2],...) if v is of type intvec.@*
+         - In case of a third argument of type int return a list l:
 @format
-         Ext^k, of type module, a presentation of Ext^k(M',R) if v is of type
-         int, resp. a list of Ext^k (k=v[1],v[2],...) if v is of type intvec.
-         In case of a third argument of type int return a list l:
-           l[1] = module Ext^k resp. list of Ext^k
-           l[2] = SB of Ext^k resp. list of SB of Ext^k
-           l[3] = matrix resp.list of matrices,
-                  each representing kbase of Ext^k (if finite dimensional)
+     l[1] = module Ext^k resp. list of Ext^k
+     l[2] = SB of Ext^k resp. list of SB of Ext^k
+     l[3] = matrix resp. list of matrices, each representing a kbase of Ext^k
+              (if finite dimensional)
 @end format
-DISPLAY: printlevel >=0: degree of Ext^k for each k  (default)
+DISPLAY: printlevel >=0: (affine) dimension of Ext^k for each k  (default)
          printlevel >=1: Ak, Ak+1 and kbase of Ext^k in Fk*
 NOTE:    In order to compute Ext^k(M,R) use the command Ext_R(k,syz(M));
          or the 2 commands: list L=mres(M,2);  Ext_R(k,L[2]);
@@ -460,10 +476,10 @@ EXAMPLE: example Ext_R; shows an example
   module m1,m2,ret,ret0;
   matrix ker,kb;
   list L1,L2,L3,L,resl,K;
-  int k,max,ii,t1,t2;
+  int k,max,ii,t1,t2,di;
   int s = size(v);
   intvec v1 = sort(v)[1];
-  max = v1[s];                 // the maximum integer occuring in intvec v
+  max = v1[s];                 // the maximum integer occurring in intvec v
   int p = printlevel-voice+3;  // p=printlevel+1 (default: p=1)
   // --------------- Variante mit sres
   for( ii=1; ii<=size(#); ii++ )
@@ -494,8 +510,13 @@ EXAMPLE: example Ext_R; shows an example
       L1[ii] = ret;
       L2[ii] = ret0;
       L3[ii] = matrix(kbase(ret0));
-      dbprint(p,"// degree of Ext^"+string(k)+":");
-      if( p>=0 ) { degree(ret0);"";}
+      di=dim(ret0);
+      dbprint(p,"// dimension of Ext^"+string(k)+":  "+string(di));
+      if (di==0)
+      {
+        dbprint(p,"// vdim of Ext^"+string(k)+":       "+string(vdim(ret0)));
+      }
+      dbprint(p,"");
     }
     else
     {
@@ -510,8 +531,13 @@ EXAMPLE: example Ext_R; shows an example
          "// then F"+string(k)+"*-->F"+string(k+1)+"* is given by:",m2,
          "// and F"+string(k-1)+"*-->F"+string(k)+"* is given by:",m1,"");
       ret0 = std(ret);
-      dbprint(p,"// degree of Ext^"+string(k)+":");
-      if( p>0 ) { degree(ret0);"";}
+      di=dim(ret0);
+      dbprint(p,"// dimension of Ext^"+string(k)+":  "+string(di));
+      if (di==0)
+      {
+        dbprint(p,"// vdim of Ext^"+string(k)+":       "+string(vdim(ret0)));
+      }
+      dbprint(p,"");
       if( t2 )
       {
          if( vdim(ret0)>=0 )
@@ -519,7 +545,8 @@ EXAMPLE: example Ext_R; shows an example
             kb = kbase(ret0);
             if ( size(ker)!=0 ) { kb = matrix(ker)*kb; }
             dbprint(p-1,
-            "// columns of matrix are kbase of Ext^"+string(k)+" in F"+string(k)+"*:",kb,"");
+              "// columns of matrix are kbase of Ext^"+string(k)+" in F"
+              +string(k)+"*:",kb,"");
             L3[ii] = kb;
          }
          L2[ii] = ret0;
@@ -546,13 +573,11 @@ example
   ideal i    = x2y,y2z,z3x;
   module E   = Ext_R(1,i);    //computes Ext^1(r/i,r)
   is_zero(E);
-  module m   = [x],[0,y];
-  list L     = Ext_R(2..3,m); //computes Ext^i(r^2/m,r), i=2,3
-  show(L);"";
+
   qring R    = std(x2+yz);
-  intvec v   = 0,2,4;
+  intvec v   = 0,2;
   printlevel = 2;             //shows what is going on
-  ideal i    = x,y,z;         //computes Ext^i(r/(x,y,z),r/(x2+yz)), i=0,2,4
+  ideal i    = x,y,z;         //computes Ext^i(r/(x,y,z),r/(x2+yz)), i=0,2
   list L     = Ext_R(v,i,1);  //over the qring R=r/(x2+yz), std and kbase
   printlevel = p;
 }
@@ -560,43 +585,44 @@ example
 
 proc Ext (intvec v, module M, module N, list #)
 "USAGE:   Ext(v,M,N[,any]);  v int resp. intvec, M,N modules
-COMPUTE:
-@format
-         A presentation of Ext^k(M',N'); for k=v[1],v[2],... where
+COMPUTE: A presentation of Ext^k(M',N'); for k=v[1],v[2],... where
          M'=coker(M) and N'=coker(N). Let
-              0<--M'<-- F0 <-M-- F1 <-- F2 <--...  resp.
-              0<--N'<-- G0 <--N- G1                be
-         a free resolution of M' resp. a presentations of N'. Consider
+@example
+       0 <-- M' <-- F0 <-M-- F1 <-- F2 <--... ,
+       0 <-- N' <-- G0 <--N- G1
+@end example
+         be a free resolution of M', resp. a presentation of N'. Consider
+         the commutative diagram
+@example
+           0                  0                  0
+           |^                 |^                 |^
+   --> Hom(Fk-1,N') -Ak-> Hom(Fk,N') -Ak+1-> Hom(Fk+1,N')
+           |^                 |^                 |^
+   --> Hom(Fk-1,G0) -Ak-> Hom(Fk,G0) -Ak+1-> Hom(Fk+1,G0)
+                              |^                 |^
+                              |C                 |B
+                          Hom(Fk,G1) ------> Hom(Fk+1,G1)
 
-                      0                  0                  0
-                      |^                 |^                 |^
-               --> Hom(Fk-1,N') -Ak-> Hom(Fk,N') -Ak+1-> Hom(Fk+1,N')
-                      |^                 |^                 |^
-               --> Hom(Fk-1,G0) -Ak-> Hom(Fk,G0) -Ak+1-> Hom(Fk+1,G0)
-                                         |^                 |^
-                                         |C                 |B
-                                      Hom(Fk,G1) -----> Hom(Fk+1,G1)
-         (Ak,Ak+1 induced by M and B,C induced by N).
-
+      (Ak,Ak+1 induced by M and B,C induced by N).
+@end example
          Let K=modulo(Ak+1,B), J=module(Ak)+module(C) and Ext=modulo(K,J),
          then we have exact sequences
+@example
+    R^p --K-> Hom(Fk,G0) --Ak+1-> Hom(Fk+1,G0)/im(B),
 
-                  R^p  --K-> Hom(Fk,G0) --Ak+1-> Hom(Fk+1,G0)/im(B)
-         R^q -Ext-> R^p --K->Hom(Fk,G0)/im(Ak)+im(C) --Ak+1->Hom(Fk+1,G0)/im(B)
-
-         Hence Ext presents Ext^k(M',N').
-@end format
-RETURN:
-@format
-         - module Ext, a presentation of Ext^k(M',N') if v is of type int
-         - a list of Ext^k (k=v[1],v[2],...) if v is of type intvec.
+    R^q -Ext-> R^p --K-> Hom(Fk,G0)/(im(Ak)+im(C)).
+@end example
+         Hence, Ext presents Ext^k(M',N').
+RETURN:  - module Ext, a presentation of Ext^k(M',N') if v is of type int@*
+         - a list of Ext^k (k=v[1],v[2],...) if v is of type intvec.@*
          - In case of a third argument of any type return a list l:
+@format
              l[1] = module Ext/list of Ext^k
              l[2] = SB of Ext/list of SB of Ext^k
              l[3] = matrix/list of matrices, each representing a kbase of Ext^k
-                    (if finite dimensional)
+                       (if finite dimensional)
 @end format
-DISPLAY: printlevel >=0: degree of Ext^k for each k  (default).
+DISPLAY: printlevel >=0: dimension, vdim of Ext^k for each k  (default).
 @*       printlevel >=1: matrices Ak, Ak+1 and kbase of Ext^k in Hom(Fk,G0)
          (if finite dimensional)
 NOTE:    In order to compute Ext^k(M,N) use the command Ext(k,syz(M),syz(N));
@@ -605,7 +631,7 @@ EXAMPLE: example Ext; shows an example
 "
 {
 //---------- initialisation ---------------------------------------------------
-  int k,max,ii,l,row,col;
+  int k,max,ii,l,row,col,di;
   module A,B,C,D,M1,M2,N1,ker,imag,extMN,extMN0;
   matrix kb;
   list L1,L2,L3,L,resM,K;
@@ -613,8 +639,8 @@ EXAMPLE: example Ext; shows an example
   intmat Be;
   int s = size(v);
   intvec v1 = sort(v)[1];
-  max = v1[s];                      // the maximum integer occuring in intvec v
-  int p = printlevel-voice+3;       // p=printlevel+1 (default: p=1)
+  max = v1[s];                    // the maximum integer occurring in intvec v
+  int p = printlevel-voice+3;     // p=printlevel+1 (default: p=1)
 //---------- test: coker(N)=basering, coker(N)=0 ? ----------------------------
   if( max<0 ) { dbprint(p,"// Ext^i=0 for i<0!"); return([1]); }
   N1 = std(N);
@@ -640,7 +666,13 @@ EXAMPLE: example Ext; shows an example
       L1[ii] = extMN;
       L2[ii] = extMN0;
       L3[ii] = matrix(kbase(extMN0));
-      if( p>0 ) { "// degree of Ext^"+string(k)+":"; degree(extMN0);""; }
+      di=dim(extMN0);
+      dbprint(p,"// dimension of Ext^"+string(k)+":  "+string(di));
+      if (di==0)
+      {
+        dbprint(p,"// vdim of Ext^"+string(k)+":       "+string(vdim(extMN0)));
+      }
+      dbprint(p,"");
     }
   }
   else
@@ -658,13 +690,20 @@ EXAMPLE: example Ext; shows an example
         L1[ii] = extMN;
         L2[ii] = extMN0;
         L3[ii] = matrix(kbase(extMN0));
-        if( p>0 ) { "// degree of Ext^"+string(k)+":"; degree(extMN0);""; }
+        di=dim(extMN0);
+        dbprint(p,"// dimension of Ext^"+string(k)+":  "+string(di));
+        if (di==0)
+        {
+          dbprint(p,"// vdim of Ext^"+string(k)+":       "
+                  +string(vdim(extMN0)));
+        }
+        dbprint(p,"");
       }
       else
       { M2 = resM[k+1];
-        if( k==0 ) { M1=0*gen(nrows(M2)); }
+        if( k==0 ) { M1=0; }
         else { M1 = resM[k]; }
-        col = ncols(M1);
+        col = nrows(M2);
         D = kohom(N,col);
 //---------- computing homology ----------------------------------------------
         imag  = kontrahom(M1,row);
@@ -673,13 +712,24 @@ EXAMPLE: example Ext; shows an example
         ker   = modulo(A,B);
         imag  = imag,D;
         extMN = modulo(ker,imag);
-        dbprint(p-1,"// Computing Ext^"+string(k)+" (help Ext; gives an explanation):",
-    "// Let 0<--coker(M)<--F0<--F1<--F2<--... be a resolution of coker(M),",
-    "// and 0<--coker(N)<--G0<--G1 a presentation of coker(N),",
-    "// then Hom(F"+string(k)+",G0)-->Hom(F"+string(k+1)+",G0) is given by:",A,
-    "// and Hom(F"+string(k-1)+",G0) + Hom(F"+string(k)+",G1)-->Hom(F"+string(k)+",G0) is given by:",imag,"");
+        dbprint(p-1,"// Computing Ext^"+string(k)+
+         " (help Ext; gives an explanation):",
+      "// Let 0<--coker(M)<--F0<--F1<--F2<--... be a resolution of coker(M),",
+      "// and 0<--coker(N)<--G0<--G1 a presentation of coker(N),",
+      "// then Hom(F"+string(k)+",G0)-->Hom(F"+string(k+1)+
+      ",G0) is given by:",A,
+      "// and Hom(F"+string(k-1)+",G0) + Hom(F"+string(k)+",G1)-->Hom(F"
+                                      +string(k)+",G0) is given by:",imag,"");
         extMN0 = std(extMN);
-        if( p>0 ) { "// degree of Ext^"+string(k)+":"; degree(extMN0);""; }
+        di=dim(extMN0);
+        dbprint(p,"// dimension of Ext^"+string(k)+":  "+string(di));
+        if (di==0)
+        {
+          dbprint(p,"// vdim of Ext^"+string(k)+":       "
+                  +string(vdim(extMN0)));
+        }
+        dbprint(p,"");
+
 //---------- more information -------------------------------------------------
         if( size(#)>0 )
         { if( vdim(extMN0) >= 0 )
@@ -733,35 +783,39 @@ example
 
 proc Hom (module M, module N, list #)
 "USAGE:   Hom(M,N,[any]);  M,N=modules
-COMPUTE:
-@format
-         A presentation of Hom(M',N'), M'=coker(M), N'=coker(N) as follows:
-         Let ...-->F1 --M-> F0-->M'-->0 and ...-->G1 --N-> G0-->N'-->0  be
-         presentations of M' and N'. Consider
+COMPUTE: A presentation of Hom(M',N'), M'=coker(M), N'=coker(N) as follows:
+         let
+@example
+   F1 --M-> F0 -->M' --> 0,    G1 --N-> G0 --> N' --> 0
+@end example
+         be presentations of M' and N'. Consider
+@example
+                                  0               0
+                                  |^              |^
+       0 --> Hom(M',N') ----> Hom(F0,N') ----> Hom(F1,N')
+                                  |^              |^
+  (A:  induced by M)          Hom(F0,G0) --A-> Hom(F1,G0)
+                                  |^              |^
+  (B,C:induced by N)              |C              |B
+                              Hom(F0,G1) ----> Hom(F1,G1)
 
-                                         0               0
-                                         |^              |^
-              0 --> Hom(M',N') ----> Hom(F0,N') ----> Hom(F1,N')
-                                         |^              |^
-         (A:  induced by M)          Hom(F0,G0) --A-> Hom(F1,G0)
-                                         |^              |^
-         (B,C:induced by N)              |C              |B
-                                     Hom(F0,G1) ----> Hom(F1,G1)
-
+@end example
          Let D=modulo(A,B) and Hom=modulo(D,C), then we have exact sequences
+@example
+   R^p  --D-> Hom(F0,G0) --A-> Hom(F1,G0)/im(B),
 
-              R^p  --D-> Hom(F0,G0) --A-> Hom(F1,G0)/im(B)
-              R^q -Hom-> R^p --D-> Hom(F0,G0)/im(C) --A-> Hom(F1,G0)/im(B).
-
+ R^q -Hom-> R^p --D-> Hom(F0,G0)/im(C) --A-> Hom(F1,G0)/im(B).
+@end example
          Hence Hom presents Hom(M',N')
-@end format
 RETURN:  module Hom, a presentation of Hom(M',N'), resp., in case of
-         3 arguments, a list l:
+         3 arguments, a list l (of size <=3):
+@format
            - l[1] = Hom
            - l[2] = SB of Hom
-           - l[3] = kbase of coker(Hom) (if finite dimensional),
+           - l[3] = kbase of coker(Hom) (if finite dimensional, not 0),
                     represented by elements in Hom(F0,G0) via mapping D
-DISPLAY: printlevel >=0: degree of Hom  (default)
+@end format
+DISPLAY: printlevel >=0: (affine) dimension of Hom  (default)
 @*       printlevel >=1: D and C and kbase of coker(Hom) in Hom(F0,G0)
 @*       printlevel >=2: elements of kbase of coker(Hom) as matrix :F0-->G0
 NOTE:    DISPLAY is as described only for a direct call of 'Hom'. Calling 'Hom'
@@ -770,7 +824,7 @@ EXAMPLE: example Hom;  shows examples
 "
 {
 //---------- initialisation ---------------------------------------------------
-  int l,p;
+  int l,p,di;
   matrix kb;
   module A,B,C,D,homMN,homMN0;
   list L;
@@ -782,27 +836,42 @@ EXAMPLE: example Hom;  shows examples
   homMN = modulo(D,C);
   homMN0= std(homMN);
   p = printlevel-voice+3;       // p=printlevel+1 (default: p=1)
-  if( p>=0 ) { "// degree of Hom:"; degree(homMN0); ""; }
-  dbprint(p-1,"// given ...--> F1 --M-> F0 -->M'--> 0 and ...--> G1 --N-> G0 -->N'--> 0,",
-         "// show D=ker(Hom(F0,G0) --> Hom(F1,G0)/im(Hom(F1,G1) --> Hom(F1,G0)))",D,
-         "// show C=im(Hom(F0,G1) --> Hom(F0,G0))",C,"");
+  di= dim(homMN0);
+  dbprint(p,"// dimension of Hom:  "+string(di));
+  if (di==0)
+  {
+    dbprint(p,"// vdim of Hom:       "+string(vdim(homMN0)));
+  }
+  dbprint(p,"");
+  dbprint(p-1,
+   "// given  F1 --M-> F0 -->M'--> 0 and  G1 --N-> G0 -->N'--> 0,",
+   "// show D = ker( Hom(F0,G0) --> Hom(F1,G0)/im(Hom(F1,G1)->Hom(F1,G0)) )",D,
+   "// show C = im ( Hom(F0,G1) --> Hom(F0,G0) )",C,"");
 //---------- extra output if size(#)>0 ----------------------------------------
   if( size(#)>0 )
-  {  if( vdim(homMN0)>0 )
-     {  kb = kbase(homMN0);
+  {
+     if( vdim(homMN0)>0 )
+     {
+        kb = kbase(homMN0);
         kb = matrix(D)*kb;
         if( p>2 )
-        {  for (l=1;l<=ncols(kb);l=l+1)
-           {
+        {
+          for (l=1;l<=ncols(kb);l=l+1)
+          {
             "// element",l,"of kbase of Hom in Hom(F0,G0) as matrix: F0-->G0:";
              print(matrix(ideal(kb[l]),nrows(N),nrows(M)));
-           }
+          }
         }
         else
-       {dbprint(p-1,"// columns of matrix are kbase of Hom in Hom(F0,G0)",kb);}
-        L=homMN,homMN0,kb; return(L);
+        {
+          dbprint(p-1,"// columns of matrix are kbase of Hom in Hom(F0,G0)",
+                      kb);
+        }
+        L=homMN,homMN0,kb;
+        return(L);
      }
-     L=homMN,homMN0; return(L);
+     L=homMN,homMN0;
+     return(L);
   }
   return(homMN);
 }
@@ -817,8 +886,11 @@ example
   module M  = [-x,y],[-y2,x],[x3];
   module H  = Hom(M,i);
   print(H);
+
   printlevel= 2;
   list L    = Hom(M,i,1);"";
+
+  printlevel=1;
   ring s    = 3,(x,y,z),(c,dp);
   ideal i   = jacob(ideal(x2+y5+z4));
   qring rq=std(i);
@@ -834,13 +906,22 @@ example
 proc homology (matrix A,matrix B,module M,module N,list #)
 "USAGE:   homology(A,B,M,N);
 COMPUTE: Let M and N be submodules of R^m and R^n presenting M'=R^m/M, N'=R^n/N
-         (R=basering) and let A,B matrices inducing maps R^k--A-->R^m--B-->R^n.
-         Compute a presentation R^q --H-> R^m of the module
-@*              ker(B)/im(A) := ker(M'/im(A) --B--> N'/im(BM)+im(BA)).
-@*       If B induces a map M'--B-->N' (i.e BM=0) and if R^k--A-->M'--B-->N' is
-         a complex (i.e. BA=0) then ker(B)/im(A) is the homology of the complex
-RETURN:  module H, a presentation of ker(B)/im(A)
-NOTE:    homology returns a free module of rank m if ker(B)=im(A)
+         (R=basering) and let A,B matrices inducing maps
+@example
+    R^k --A--> R^m --B--> R^n.
+@end example
+         Compute a presentation of the module
+@example
+    ker(B)/im(A) := ker(M'/im(A) --B--> N'/im(BM)+im(BA)).
+@end example
+         If B induces a map M'-->N' (i.e BM=0) and if im(A) is contained in
+         ker(B) (that is, BA=0) then ker(B)/im(A) is the homology of the
+         complex
+@example
+    R^k--A-->M'--B-->N'.
+@end example
+RETURN:  module H, a presentation of ker(B)/im(A).
+NOTE:    homology returns a free module of rank m if ker(B)=im(A).
 EXAMPLE: example homology; shows examples
 "
 {
@@ -858,32 +939,41 @@ example
   module M=maxideal(2)*freemodule(2);
   module B=[2x,0],[x,y],[z2,y];
   module A=M;
-  degree(std(homology(A,B,M,N)));"";
+  module H=homology(A,B,M,N);
+  H=std(H);
+  // dimension of homology:
+  dim(H);
+  // vector space dimension:
+  vdim(H);
+
   ring s=0,x,ds;
   qring qs=std(x4);
-  module A=[x];module B=A;
-  module M=[x3];module N=M;
+  module A=[x];
+  module B=A;
+  module M=[x3];
+  module N=M;
   homology(A,B,M,N);
 }
 //////////////////////////////////////////////////////////////////////////////
 
 proc kernel (matrix A,module M,module N)
 "USAGE:   kernel(A,M,N);
-COMPUTE: Let M and N be submodules of R^m and R^n presenting M'=R^m/M, N'=R^n/N
-         (R=basering) and let A:R^m-->R^n a matrix inducing a map A':M'-->N'.
-         Compute a presentation K of ker(A') as in the commutative diagram:
-@format
-                       ker(A') --->  M' --A'--> N'
-                           |^        |^         |^
-                           |         |          |
-                          R^r  ---> R^m --A--> R^n
-                           |^        |^         |^
-                           |K        |M         |N
-                           |         |          |
-                          R^s  ---> R^p -----> R^q
-@end format
-RETURN:  module K, a presentation of ker(A')
-EXAMPLE: example kernel; shows examples
+COMPUTE: Let M and N be submodules of R^m and R^n, presenting M'=R^m/M,
+         N'=R^n/N (R=basering), and let A:R^m-->R^n be a matrix inducing a
+         map A':M'-->N'. Then kernel(A,M,N); computes a presentation K of
+         ker(A') as in the commutative diagram:
+@example
+          ker(A') --->  M' --A'--> N'
+             |^         |^         |^
+             |          |          |
+             R^r  ---> R^m --A--> R^n
+             |^         |^         |^
+             |K         |M         |N
+             |          |          |
+             R^s  ---> R^p -----> R^q
+@end example
+RETURN:  module K, a presentation of ker(A':coker(M)->coker(N)).
+EXAMPLE: example kernel; shows examples.
 "
 {
   module M1 = modulo(A,N);
@@ -896,17 +986,20 @@ example
   module M=maxideal(1)*freemodule(2);
   matrix A[2][2]=2x,0,x,y,z2,y;
   module K=kernel(A,M,N);
-  degree(std(K));
+  // dimension of kernel:
+  dim(std(K));
+  // vector space dimension of kernel:
+  vdim(std(K));
   print(K);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
 proc kohom (matrix M, int j)
 "USAGE:   kohom(A,k); A=matrix, k=integer
-RETURN:  matrix Hom(R^k,A), i.e. let A be a matrix defining a map: F1 --> F2
-         of free R-modules, then  matrix of Hom(R^k,F1)-->Hom(R^k,F2)
-         is computed.
-EXAMPLE: example kohom; shows an example
+RETURN:  matrix Hom(R^k,A), i.e. let A be a matrix defining a map F1-->F2
+         of free R-modules, then the matrix of Hom(R^k,F1)-->Hom(R^k,F2)
+         is computed (R=basering).
+EXAMPLE: example kohom; shows an example.
 "
 {
   if (j==1)
@@ -925,9 +1018,10 @@ example
 
 proc kontrahom (matrix M, int j)
 "USAGE:   kontrahom(A,k); A=matrix, k=integer
-RETURN:  matrix Hom(A,R^k), i.e. let A be a matrix defining a map: F1 --> F2 of
-         free  R-modules, the matrix of Hom(F2,R^k)-->Hom(F1,R^k) is computed
-EXAMPLE: example kontrahom; shows an example
+RETURN:  matrix Hom(A,R^k), i.e. let A be a matrix defining a map F1-->F2 of
+         free  R-modules, then the matrix of Hom(F2,R^k)-->Hom(F1,R^k) is
+         computed (R=basering).
+EXAMPLE: example kontrahom; shows an example.
 "
 {
 if (j==1)
@@ -943,3 +1037,662 @@ example
   print(kontrahom(n,3));
 }
 ///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
+proc tensorMod(module Phi, module Psi)
+"USAGE:   tensorMod(M,N);  M,N modules
+COMPUTE: presentation matrix A of the tensor product T of the modules
+         M'=coker(M), N'=coker(N): if matrix(M) defines a map M: R^r-->R^s and
+         matrix(N) defines a map N: R^p-->R^q, then A defines a presentation
+@example
+         R^(sp+rq) --A-> R^(sq)  --> T --> 0 .
+@end example
+RETURN:  matrix A satisfying coker(A) = tensorprod(coker(M),coker(N)) .
+EXAMPLE: example tensorMod; shows an example.
+"
+{
+   int s=nrows(Phi);
+   int q=nrows(Psi);
+   matrix A=tensor(unitmat(s),Psi);
+   matrix B=tensor(Phi,unitmat(q));
+   matrix R=concat(A,B);
+   return(R);
+}
+example
+{"EXAMPLE:";  echo=2;
+  ring A=0,(x,y,z),dp;
+  matrix M[3][3]=1,2,3,4,5,6,7,8,9;
+  matrix N[2][2]=x,y,0,z;
+  print(M);
+  print(N);
+  print(tensorMod(M,N));
+}
+///////////////////////////////////////////////////////////////////////////////
+proc Tor(intvec v, module M, module N, list #)
+"USAGE:   Tor(v,M,N[,any]);  v int resp. intvec, M,N modules
+COMPUTE: a presentation of Tor_k(M',N'), for k=v[1],v[2],... , where
+         M'=coker(M) and N'=coker(N): let
+@example
+       0 <-- M' <-- G0 <-M-- G1
+       0 <-- N' <-- F0 <--N- F1 <-- F2 <--...
+@end example
+         be a presentation of M', resp. a free resolution of N', and consider
+         the commutative diagram
+@example
+          0                    0                    0
+          |^                   |^                   |^
+  Tensor(M',Fk+1) -Ak+1-> Tensor(M',Fk) -Ak-> Tensor(M',Fk-1)
+          |^                   |^                   |^
+  Tensor(G0,Fk+1) -Ak+1-> Tensor(G0,Fk) -Ak-> Tensor(G0,Fk-1)
+                               |^                   |^
+                               |C                   |B
+                          Tensor(G1,Fk) ----> Tensor(G1,Fk-1)
+
+       (Ak,Ak+1 induced by N and B,C induced by M).
+@end example
+         Let K=modulo(Ak,B), J=module(C)+module(Ak+1) and Tor=modulo(K,J),
+         then we have exact sequences
+@example
+    R^p  --K-> Tensor(G0,Fk) --Ak-> Tensor(G0,Fk-1)/im(B),
+
+    R^q -Tor-> R^p --K-> Tensor(G0,Fk)/(im(C)+im(Ak+1)).
+@end example
+         Hence, Tor presents Tor_k(M',N').
+RETURN:  - if v is of type int: module Tor, a presentation of Tor_k(M',N');@*
+         - if v is of type intvec: a list of Tor_k(M',N') (k=v[1],v[2],...);@*
+         - in case of a third argument of any type: list l with
+@format
+     l[1] = module Tor/list of Tor_k(M',N'),
+     l[2] = SB of Tor/list of SB of Tor_k(M',N'),
+     l[3] = matrix/list of matrices, each representing a kbase of Tor_k(M',N')
+                (if finite dimensional), or 0.
+@end format
+DISPLAY: printlevel >=0: (affine) dimension of Tor_k for each k  (default).
+@*       printlevel >=1: matrices Ak, Ak+1 and kbase of Tor_k in Tensor(G0,Fk)
+         (if finite dimensional).
+NOTE:    In order to compute Tor_k(M,N) use the command Tor(k,syz(M),syz(N));
+         or: list P=mres(M,2); list Q=mres(N,2); Tor(k,P[2],Q[2]);
+EXAMPLE: example Tor; shows an example
+{
+//---------- initialisation ---------------------------------------------------
+  int k,max,ii,l,row,col,di;
+  module A,B,C,D,N1,N2,M1,ker,imag,Im,Im1,Im2,f,torMN,torMN0;
+  matrix kb;
+  list L1,L2,L3,L,resN,K;
+  ideal  test1;
+  intmat Be;
+  int s = size(v);
+  intvec v1 = sort(v)[1];
+  max = v1[s];                   // maximum integer occurring in intvec v
+  int p = printlevel-voice+3;    // p=printlevel+1 (default: p=1)
+
+//---------- test: coker(M)=basering, coker(M)=0 ? ----------------------------
+  if( max<0 ) { dbprint(p,"// Tor_i=0 for i<0!"); return([1]); }
+  M1 = std(M);
+
+  if( size(M1)==0 or size(N)==0 )  // coker(M)=basering ==> Tor_i=0 for i>0
+  {
+    dbprint(p-1,"// one of the modules M',N' is free, hence Tor_i=0 for i<>0");
+    for( ii=1; ii<=s; ii++ )
+    {
+      k=v[ii];
+      if (k==0) { torMN=module(tensorMod(M1,N)); }
+      else { torMN  = gen(1); }
+      torMN0 = std(torMN);
+      L1[ii] = torMN;
+      L2[ii] = torMN0;
+      L3[ii] = matrix(kbase(torMN0));
+      di=dim(torMN0);
+      dbprint(p,"// dimension of Tor_"+string(k)+":  "+string(di));
+      if (di==0)
+      {
+        dbprint(p,"// vdim of Tor_"+string(k)+":       "
+                  +string(vdim(torMN0)));
+      }
+      dbprint(p,"");
+    }
+
+    if( size(#) )
+    {  if( s>1 ) { L = L1,L2,L3; return(L); }
+       else { L = torMN,torMN0,L3[1]; return(L); }
+    }
+    else
+    {  if( s>1 ) { return(L1); }
+       else { return(torMN); }
+    }
+  }
+
+  if( dim(M1)==-1 )              // coker(M)=0, all Tor's are 0
+  { dbprint(p-1,"2nd module presents 0, hence Tor_k=0, for all k");
+    for( ii=1; ii<=s; ii++ )
+    { k=v[ii];
+      torMN    = gen(1);
+      torMN0   = std(torMN);
+      L1[ii] = torMN;
+      L2[ii] = torMN0;
+      L3[ii] = matrix(kbase(torMN0));
+      di=dim(torMN0);
+      dbprint(p,"// dimension of Tor_"+string(k)+":  "+string(di));
+      if (di==0)
+      {
+        dbprint(p,"// vdim of Tor_"+string(k)+":       "
+                  +string(vdim(torMN0)));
+      }
+      dbprint(p,"");
+    }
+  }
+  else
+  {
+    if( size(M1) < size(M) ) { M=M1;}
+    row = nrows(M);
+//---------- resolution of N -------------------------------------------------
+    resN = mres(N,max+1);
+    for( ii=1; ii<=s; ii++ )
+    { k=v[ii];
+      if( k<0  )                             // Tor_k is 0 for negative k
+      { dbprint(p-1,"// Tor_k=0 for k<0!");
+        torMN  = gen(1);
+        torMN0 = std(torMN);
+        L1[ii] = torMN;
+        L2[ii] = torMN0;
+        L3[ii] = matrix(kbase(torMN0));
+        di=dim(torMN0);
+        dbprint(p,"// dimension of Tor_"+string(k)+":  "+string(di));
+        if (di==0)
+        {
+          dbprint(p,"// vdim of Tor_"+string(k)+":       "
+                    +string(vdim(torMN0)));
+        }
+        dbprint(p,"");
+      }
+      else
+      {
+        N2 = resN[k+1];
+        if( k==0 ) { torMN=module(tensorMod(M,N)); }
+        else
+        {
+          N1 = resN[k];
+          col = ncols(N1);
+
+//---------- computing homology ----------------------------------------------
+          imag = tensor(unitmat(nrows(N1)),M);
+          f = tensor(matrix(N1),unitmat(row));
+          Im1 = tensor(unitmat(col),M);
+          Im2 = tensor(matrix(N2),unitmat(row));
+          ker = modulo(f,imag);
+          Im  = Im2,Im1;
+          torMN = modulo(ker,Im);
+          dbprint(p-1,"// Computing Tor_"+string(k)+
+                      " (help Tor; gives an explanation):",
+          "// Let 0 <- coker(M) <- G0 <-M- G1 be the present. of coker(M),",
+          "// and 0 <- coker(N) <- F0 <-N- F1 <- F2 <- ... a resolution of",
+          "// coker(N), then Tensor(G0,F"+string(k)+")-->Tensor(G0,F"+
+          string(k-1)+") is given by:",f,
+          "// and Tensor(G0,F"+string(k+1)+") + Tensor(G1,F"+string(k)+
+          ")-->Tensor(G0,F"+string(k)+") is given by:",Im,"");
+        }
+
+        torMN0 = std(torMN);
+        di=dim(torMN0);
+        dbprint(p,"// dimension of Tor_"+string(k)+":  "+string(di));
+        if (di==0)
+        {
+          dbprint(p,"// vdim of Tor_"+string(k)+":       "
+                    +string(vdim(torMN0)));
+        }
+        dbprint(p,"");
+
+//---------- more information -------------------------------------------------
+        if( size(#)>0 )
+        { if( vdim(torMN0) >= 0 )
+          { kb = kbase(torMN0);
+            if ( size(ker)!=0) { kb = matrix(ker)*kb; }
+            dbprint(p-1,"// columns of matrix are kbase of Tor_"+
+                     string(k)+" in Tensor(G0,F"+string(k)+")",kb,"");
+            L3[ii] = matrix(kb);
+          }
+          L2[ii] = torMN0;
+        }
+        L1[ii] = torMN;
+      }
+    }
+  }
+  if( size(#) )
+  {  if( s>1 ) { L = L1,L2,L3; return(L); }
+     else { L = torMN,torMN0,matrix(kb); return(L); }
+  }
+  else
+  {  if( s>1 ) { return(L1); }
+     else { return(torMN); }
+  }
+}
+example
+{"EXAMPLE:";   echo=2;
+  int p      = printlevel;
+  printlevel = 1;
+  ring r     = 0,(x,y),dp;
+  ideal i    = x2,y;
+  ideal j    = x;
+  list E     = Tor(0..2,i,j);    // Tor_k(r/i,r/j) for k=0,1,2 over r
+
+  qring R    = std(i);
+  ideal j    = fetch(r,j);
+  module M   = [x,0],[0,x];
+  printlevel = 2;
+  module E1  = Tor(1,M,j);       // Tor_1(R^2/M,R/j) over R=r/i
+
+  list l     = Tor(3,M,M,1);     // Tor_3(R^2/M,R^2/M) over R=r/i
+  printlevel = p;
+}
+///////////////////////////////////////////////////////////////////////////////
+proc fitting(module M, int n)
+"USAGE:   fitting (M,n);  M module, n int
+RETURN:  ideal, (standard basis of) n-th Fitting ideal of M'=coker(M).
+EXAMPLE: example fitting; shows an example
+"
+{
+  n=nrows(M)-n;
+  if(n<=0){return(ideal(1));}
+  if((n>nrows(M))||(n>ncols(M))){return(ideal(0));}
+  return(std(minor(M,n)));
+}
+example
+{"EXAMPLE:";   echo=2;
+  ring R=0,x(0..4),dp;
+  matrix M[2][4]=x(0),x(1),x(2),x(3),x(1),x(2),x(3),x(4);
+  print(M);
+  fitting(M,-1);
+  fitting(M,0);
+  fitting(M,1);
+  fitting(M,2);
+}
+///////////////////////////////////////////////////////////////////////////////
+proc isLocallyFree(matrix S, int r)
+"USAGE:   isLocallyFree(M,r);  M module, r int
+RETURN:  1 if M'=coker(M) is locally free of constant rank r;@*
+         0 if this is not the case.
+EXAMPLE: example isLocallyFree; shows an example.
+"
+{
+   ideal F=fitting(S,r);
+   ideal G=fitting(S,r-1);
+   if((deg(F[1])==0)&&(size(G)==0)){return(1);}
+   return(0);
+}
+example
+{"EXAMPLE:";   echo=2;
+  ring R=0,(x,y,z),dp;
+  matrix M[2][3];     // the presentation matrix
+  M=x-1,y-1,z,y-1,x-2,x;
+  ideal I=fitting(M,0); // 0-th Fitting ideal of coker(M)
+  qring Q=I;
+  matrix M=fetch(R,M);
+  isLocallyFree(M,1); // as R/I-module, coker(M) is locally free of rk 1
+  isLocallyFree(M,0);
+}
+///////////////////////////////////////////////////////////////////////////////
+proc flatteningStrat (module M)
+"USAGE:   flatteningStrat(M);  M module
+RETURN:  list of ideals.
+         The list entries L[1],...,L[r] describe the flattening stratification
+         of M'=coker(M): setting L[0]=0, L[r+1]=1, the flattening
+         stratification is given by the open sets Spec(A/V(L[i-1])) \ V(L[i]),
+         i=1,...,r+1  (A = basering).
+NOTE:    for more information see the book 'A Singular Introduction to
+         Commutative Algebra' (by Greuel/Pfister, Springer 2002).
+EXAMPLE: example flatteningStrat; shows an example
+"
+{
+   list l;
+   int v,w;
+   ideal F;
+   while(1)
+   {
+      F=interred(fitting(M,w));
+      if(F[1]==1){return(l);}
+      if(size(F)!=0){v++;l[v]=F;}
+      w++;
+   }
+   return(l);
+}
+example
+{"EXAMPLE:";   echo=2;
+  ring A = 0,x(0..4),dp;
+  // presentation matrix:
+  matrix M[2][4] = x(0),x(1),x(2),x(3),x(1),x(2),x(3),x(4);
+  list L = flatteningStrat(M);
+  L;
+}
+///////////////////////////////////////////////////////////////////////////////
+proc isFlat(module M)
+"USAGE:   isFlat(M);  M module
+RETURN:  1 if M'=coker(M) is flat;@*
+         0 if this is not the case.
+EXAMPLE: example isFlat; shows an example.
+"
+{
+   if (size(ideal(M))==0) {return(1);}
+   int w;
+   ideal F=fitting(M,0);
+   while(size(F)==0)
+   {
+      w++;
+      F=fitting(M,w);
+   }
+   if (deg(std(F)[1])==0) {return(1);}
+   return(0);
+}
+example
+{"EXAMPLE:";   echo=2;
+  ring A = 0,(x,y),dp;
+  matrix M[3][3] = x-1,y,x,x,x+1,y,x2,xy+x+1,x2+y;
+  print(M);
+  isFlat(M);             // coker(M) is not flat over A=Q[x,y]
+
+  qring B = std(x2+x-y);   // the ring B=Q[x,y]/<x2+x-y>
+  matrix M = fetch(A,M);
+  isFlat(M);             // coker(M) is flat over B
+
+  setring A;
+  qring C = std(x2+x+y);   // the ring C=Q[x,y]/<x2+x+y>
+  matrix M = fetch(A,M);
+  isFlat(M);             // coker(M) is not flat over C
+}
+///////////////////////////////////////////////////////////////////////////////
+proc flatLocus(module M)
+"USAGE:   flatLocus(M);  M module
+RETURN:  ideal I, s.th. complement of V(I) is flat locus of coker(M).
+NOTE:    computation is based on Fitting ideals;@*
+         output is not radical (in general)
+EXAMPLE: example flatLocus; shows an example
+"
+{
+   if (size(ideal(M))==0) {return(ideal(1));}
+   int v,w;
+   ideal F=fitting(M,0);
+   while(size(F)==0)
+   {
+      w++;
+      F=fitting(M,w);
+   }
+   if(typeof(basering)=="qring")
+   {
+      for(v=w+1;v<=nrows(M);v++)
+      {
+         F=F+intersect(fitting(M,v),quotient(ideal(0),fitting(M,v-1)));
+      }
+   }
+   return(interred(F));
+}
+example
+{"EXAMPLE:";   echo=2;
+  ring R=0,(x,y,z),dp;
+  matrix M[2][3]=x,y,z,0,x3,z3;
+  ideal I=flatLocus(M); // coker(M) is flat outside V(x,yz)
+  I;                    // computed ideal not radical
+  ideal J=radical(I);
+  J;
+
+  qring r=std(J);
+  matrix M=fetch(r,M);
+  flatLocus(M);         // coker(M) is flat over Spec(Q[x,y,z]/<x,yz>)
+
+  isFlat(M);            // flatness test
+}
+///////////////////////////////////////////////////////////////////////////////
+proc isReg(ideal I, module N)
+"USAGE:   isReg(I,M);  I ideal, M module
+RETURN:  1 if given (ordered) list of generators for I is coker(M)-sequence;@*
+         0 if this is not the case.
+EXAMPLE: example isReg; shows an example.
+"
+{
+  int n=nrows(N);
+  int i;
+  while(i<ncols(I))
+  {
+     i++;
+     N=std(N);
+     if(size(reduce(quotient(N,I[i]),N))!=0){return(0);}
+     N=N+I[i]*freemodule(n);
+  }
+  if (size(reduce(freemodule(n),std(N)))==0){return(0);}
+  return(1);
+}
+example
+{"EXAMPLE:";   echo=2;
+  ring R = 0,(x,y,z),dp;
+  ideal I = x*(y-1),y,z*(y-1);
+  isReg(I,0);             // given list of generators is Q[x,y,z]-sequence
+
+  I = x*(y-1),z*(y-1),y;  // change sorting of generators
+  isReg(I,0);
+
+  ring r = 0,(x,y,z),ds;  // local ring
+  ideal I=fetch(R,I);
+  isReg(I,0);             // result independent of sorting of generators
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// the following static procedures are used by KoszulHomology:
+//  * binom_int  (binomial coeff. as integer, or -1 if too large)
+//  * basisNumber
+//  * basisElement
+//  * KoszulMap
+// for details, see 'A Singular Introduction to Commutative Algebra' (by
+// Greuel/Pfister, Springer 2002), Chapter 7
+
+static proc binom_int(int n, int p)
+{
+  string s = binomial(n,p);
+  if (size(s) > 9) { return(-1); } // result too large for integer
+  execute("int a ="+s);
+  return(a);
+}
+
+static proc basisNumber(int n,intvec v)
+{
+  int p=size(v);
+  if(p==1){return(v[1]);}
+  int j=n-1;
+  int b;
+  while(j>=n-v[1]+1)
+  {
+    b=b+binom_int(j,p-1);
+    j--;
+  }
+  intvec w=v-v[1];
+  w=w[2..size(w)];
+  b=b+basisNumber(n-v[1],w);
+  return(b);
+}
+
+static proc basisElement(int n,int p,int N)
+{
+  if(p==1){return(N);}
+  int s,R;
+  while(R<N)
+  {
+     s++;
+     R=R+binom_int(n-s,p-1);
+  }
+  R=N-R+binom_int(n-s,p-1);
+  intvec v=basisElement(n-s,p-1,R);
+  intvec w=s,v+s;
+  return(w);
+}
+
+proc KoszulMap(ideal x,int p)
+{
+  int n=size(x);
+  int a=binom_int(n,p-1);
+  int b=binom_int(n,p);
+
+  matrix M[a][b];
+
+  if(p==1){M=x;return(M);}
+  int j,k;
+  intvec v,w;
+  for(j=1;j<=b;j++)
+  {
+    v=basisElement(n,p,j);
+    w=v[2..p];
+    M[basisNumber(n,w),j]=x[v[1]];
+    for(k=2;k<p;k++)
+    {
+      w=v[1..k-1],v[k+1..p];
+      M[basisNumber(n,w),j]=(-1)^(k-1)*x[v[k]];
+    }
+    w=v[1..p-1];
+    M[basisNumber(n,w),j]=(-1)^(p-1)*x[v[p]];
+  }
+  return(M);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc KoszulHomology(ideal x, module M, int p)
+"USAGE:   KoszulHomology(I,M,p);  I ideal, M module, p int
+COMPUTE: A presentation of the p-th Koszul homology module H_p(f_1,...,f_k;M'),
+         where M'=coker(M) and f_1,...,f_k are the given (ordered list
+         of non-zero generators of the) ideal I.
+         The computed presentation is minimized via prune.
+         In particular, if H_p(f_1,...,f_k;M')=0 then the return value is 0.
+RETURN:  module H, s.th. coker(H) = H_p(f_1,...,f_k;M').
+NOTE:    size of input ideal has to be <= 20.
+EXAMPLE: example KoszulHomology; shows an example.
+{
+  x=simplify(x,2);
+  int n     = size(x);
+  if (n==0)
+  {
+    ERROR("// KoszulHomology only for non-zero ideals");
+  }
+  if (n>20)
+  {
+    ERROR("// too many generators in input ideal");
+  }
+  if (p>n)
+  {
+    module hom=0;
+    return(hom);
+  }
+
+  int a     = binom_int(n,p-1);  // n over p-1 independent of char(basering)
+  int b     = binom_int(n,p);
+
+  matrix N  = matrix(M);
+  module ker= freemodule(nrows(N));
+  if(p!=0)
+  {
+    module im= tensor(unitmat(a),N);
+    module f = tensor(KoszulMap(x,p),unitmat(nrows(N)));
+    ker      = modulo(f,im);
+  }
+  module im1 = tensor(unitmat(b),N);
+  module im2 = tensor(KoszulMap(x,p+1),unitmat(nrows(N)));
+  module hom = modulo(ker,im1+im2);
+  hom        = prune(hom);
+  return(hom);
+}
+example
+{"EXAMPLE:";   echo=2;
+  ring R=0,x(1..3),dp;
+  ideal x=maxideal(1);
+  module M=0;
+  KoszulHomology(x,M,0);  // H_0(x,R), x=(x_1,x_2,x_3)
+
+  KoszulHomology(x,M,1);  // H_1(x,R), x=(x_1,x_2,x_3)
+
+  qring S=std(x(1)*x(2));
+  module M=0;
+  ideal x=maxideal(1);
+  KoszulHomology(x,M,1);
+
+  KoszulHomology(x,M,2);
+}
+///////////////////////////////////////////////////////////////////////////////
+proc depth(module M,ideal #)
+"USAGE:   depth(M,[I]);  M module, I ideal
+RETURN:  int,
+         - if called with 1 argument: the depth of M'=coker(M) w.r.t. the
+         maxideal in the basering (which is then assumed to be local)@*
+         - if called with 2 arguments: the depth of M'=coker(M) w.r.t. the
+         ideal I.
+NOTE:    procedure makes use of KoszulHomology.
+EXAMPLE: example depth; shows an example.
+"
+{
+  ideal m=maxideal(1);
+  int n=size(m);
+  int i;
+
+  if (size(#)==0)
+  {
+    // depth(M') over local basering
+    while(i<n)
+    {
+      i++;
+      if(size(KoszulHomology(m,M,i))==0){return(n-i+1);}
+    }
+    return(0);
+  }
+
+  ideal I=simplify(#,2);
+  while(i<size(I))
+  {
+    i++;
+    if(size(KoszulHomology(I,M,i))==0){return(size(I)-i+1);}
+  }
+  return(0);
+}
+example
+{"EXAMPLE:";   echo=2;
+  ring R=0,(x,y,z),dp;
+  ideal I=x2,xy,yz;
+  module M=0;
+  depth(M,I);   // depth(<x2,xy,yz>,Q[x,y,z])
+  ring r=0,(x,y,z),ds;  // local ring
+  matrix M[2][2]=x,xy,1+yz,0;
+  print(M);
+  depth(M);     // depth(maxideal,coker(M))
+  ideal I=x;
+  depth(M,I);   // depth(<x>,coker(M))
+  I=x+z;
+  depth(M,I);   // depth(<x+z>,coker(M))
+}
+
+///////////////////////////////////////////////////////////////////////////////
+proc isCM(module M)
+"USAGE:   isCM(M);  M module
+RETURN:  1 if M'=coker(M) is Cohen-Macaulay;@*
+         0 if this is not the case.
+ASSUME:  basering is local.
+EXAMPLE: example isCM; shows an example
+"
+{
+  // test if basering is local:
+  ideal m=maxideal(1);
+  int i;
+  poly f=1;
+  for (i=1; i<=size(m); i++)
+  {
+    f=f+m[i];
+  }
+  if (ord(f)>0)
+  {
+    print("// basering must be local -- result has no meaning");
+    return(0);
+  }
+
+  return(depth(M)==dim(std(Ann(M))));
+}
+example
+{"EXAMPLE:";   echo=2;
+  ring R=0,(x,y,z),ds;  // local ring R = Q[x,y,z]_<x,y,z>
+  module M=xz,yz,z2;
+  isCM(M);             // test if R/<xz,yz,z2> is Cohen-Macaulay
+
+  M=x2+y2,z7;          // test if R/<x2+y2,z7> is Cohen-Macaulay
+  isCM(M);
+}
+
