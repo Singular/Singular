@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapconv.cc,v 1.18 1998-09-24 09:59:34 Singular Exp $
+// $Id: clapconv.cc,v 1.19 1999-03-15 15:43:06 Singular Exp $
 /*
 * ABSTRACT: convert data between Singular and factory
 */
@@ -113,6 +113,8 @@ convClapPSingP ( const CanonicalForm & f )
 static void
 convRecPP ( const CanonicalForm & f, int * exp, poly & result )
 {
+  if (f == 0)
+    return;
   if ( ! f.inCoeffDomain() )
   {
     int l = f.level();
@@ -246,6 +248,8 @@ convClapPSingTr ( const CanonicalForm & f )
 static void
 convRecPTr ( const CanonicalForm & f, int * exp, alg & result )
 {
+  if (f == 0)
+    return;
   if ( ! f.inCoeffDomain() )
   {
     int l = f.level();
@@ -338,6 +342,8 @@ poly convClapAPSingAP ( const CanonicalForm & f )
 static void
 convRecAP ( const CanonicalForm & f, int * exp, poly & result )
 {
+  if (f == 0)
+    return;
   if ( ! f.inCoeffDomain() )
   {
     int l = f.level();
@@ -508,6 +514,8 @@ poly convClapPSingTrP ( const CanonicalForm & f )
 static void
 convRecTrP ( const CanonicalForm & f, int * exp, poly & result , int offs)
 {
+  if (f == 0)
+    return;
   if ( f.level() > offs )
   {
     int l = f.level();
@@ -572,6 +580,8 @@ convClapGFSingGF ( const CanonicalForm & f )
 static void
 convRecGFGF ( const CanonicalForm & f, int * exp, poly & result )
 {
+  if (f == 0)
+    return;
   if ( ! f.inCoeffDomain() )
   {
     int l = f.level();
