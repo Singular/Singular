@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: start.doc,v 1.19 1998-05-20 11:44:51 pohl Exp $
+@comment $Id: start.doc,v 1.20 1998-05-20 12:33:57 Singular Exp $
 @comment this file contains the "Introduction" chapter.
 
 @c The following directives are necessary for proper compilation
@@ -154,7 +154,7 @@ and system variables.  Each entry includes a description of the syntax
 and semantics of the item being explained as well as one or more
 examples on how to use it.
 
-@subsubheading Miscellay
+@subsubheading Miscellaneous
 @ref{Tricks and pitfalls}, is a loose collection of limitations and
 features which may be unexpected by those who expect to be the
 @sc{Singular} language an exact copy of the C programming language or of
@@ -548,7 +548,11 @@ We may calculate the determinat and minors of differents size.
 det(H);
 @expansion{72xy+24x4-72x3y+72xy3-24y4-48x4y2+64x3y3-48x2y4}
 minor(H,1);
-@expansion{}
+@expansion{} _[1]=2
+@expansion{} _[2]=6y+2x3-6x2y
+@expansion{} _[3]=6x2y-6xy2
+@expansion{} _[4]=6x2y-6xy2
+@expansion{} _[5]=6x+6xy2-2y3
 @end example
 
 The variety defined by the one dimensional minors is empty.
@@ -557,8 +561,8 @@ may be affected. For instance a reduced standard basis is obtained
 in the following way  
 @example
 option(redSB);
-std(_);
-@expansion{}
+std(minor(H,1));
+@expansion{} _[1]=1
 @end example
 
 @c Coming back to some mathematical considerations, we study the problem how
@@ -592,7 +596,7 @@ print(freemodule(4));
 @expansion{} 1,0,0,0,
 @expansion{} 0,1,0,0,
 @expansion{} 0,0,1,0,
-  @expansion{} 0,0,0,1 
+@expansion{} 0,0,0,1 
 @end example
 
 There are two possibilities to define a module. First a submodule can be
@@ -657,7 +661,11 @@ module with smaller rank, i.e. the matrix has less rows.
 
 @example
 prune(U);
-@expansion{}
+@expansion{} _[1]=x3*gen(3)+xy2*gen(2)+z3*gen(1)
+@expansion{} _[2]=xy5z*gen(3)+yz2*gen(1)+z3*gen(3)+gen(2)
+@expansion{} _[3]=x3*gen(3)+y2z*gen(1)
+@expansion{} _[4]=xyz*gen(1)+x2*gen(1)+y2*gen(2)
+@expansion{} _[5]=x2y*gen(2)+xyz*gen(1)+gen(3)
 timer=0;
 I =  quotient(prune(U),freemodule(nrows(prune(U))));
 timer;
