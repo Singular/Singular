@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.6 2005-02-17 09:42:19 Singular Exp $ */
+/* $Id: ideals.cc,v 1.7 2005-03-14 16:17:07 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -330,35 +330,43 @@ BOOLEAN idIsConstant(ideal id)
 */
 #ifdef PDEBUG
 ideal idDBCopy(ideal h1,char *f,int l)
-#else
-ideal idCopy (ideal h1)
-#endif
 {
   int i;
   ideal h2;
 
-#ifdef PDEBUG
   idDBTest(h1,PDEBUG,f,l);
-#endif
 //#ifdef TEST
   if (h1 == NULL)
   {
-#ifdef PDEBUG
     h2=idDBInit(1,1,f,l);
-#else
-    h2=idInit(1,1);
-#endif
   }
   else
 //#endif
   {
-#ifdef PDEBUG
     h2=idDBInit(IDELEMS(h1),h1->rank,f,l);
-#else
-    h2=idInit(IDELEMS(h1),h1->rank);
-#endif
     for (i=IDELEMS(h1)-1; i>=0; i--)
       h2->m[i] = pCopy(h1->m[i]);
+  }
+  return h2;
+}
+#endif
+
+ideal id_Copy (ideal h1, const ring r)
+{
+  int i;
+  ideal h2;
+
+//#ifdef TEST
+  if (h1 == NULL)
+  {
+    h2=idInit(1,1);
+  }
+  else
+//#endif
+  {
+    h2=idInit(IDELEMS(h1),h1->rank);
+    for (i=IDELEMS(h1)-1; i>=0; i--)
+      h2->m[i] = p_Copy(h1->m[i],r);
   }
   return h2;
 }

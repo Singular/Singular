@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.h,v 1.2 2004-07-16 08:43:00 Singular Exp $ */
+/* $Id: ideals.h,v 1.3 2005-03-14 16:17:07 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -43,11 +43,12 @@ void idDBTest(ideal h1, int level, char *f,int l);
 #define idPrint(A) ((void)0)
 #endif
 
+ideal id_Copy (ideal h1,const ring r);
 #ifdef PDEBUG
 ideal idDBCopy(ideal h1,char *f,int l);
 #define idCopy(A) idDBCopy(A,__FILE__,__LINE__)
 #else
-ideal idCopy (ideal h1);
+#define idCopy(A) id_Copy(A,currRing)
 #endif
   /*adds two ideals without simplifying the result*/
 ideal idSimpleAdd (ideal h1,ideal h2);
