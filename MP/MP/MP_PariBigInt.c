@@ -31,6 +31,41 @@ MP_BigIntOps_t imp_default_bigint_ops =
 MP_BigNumFormat_t imp_default_bigint_format = MP_PARI;
 #endif
 
+/**************************************************************************
+ *
+ * Memory management routines 
+ *
+ *************************************************************************/
+
+/* By default, simply use cgeti, on alloc */
+GEN IMP_DefaultAllocCgeti(long l)
+{
+  return cgeti(l);
+}
+/* and, do nothing on free */
+void IMP_DefaultFreeCgeti(GEN number)
+{}
+/* However, you might also use IMP_RawMemAlloc */
+GEN IMP_RawMemAllocCgeti(long length)
+{
+  GEN z = (GEN) IMP_RawMemAllocFnc( ((ulong)length)<<TWOPOTBYTES_IN_LONG );
+  z[0]=evaltyp(1)+evalpere(1)+evallg(length);
+  return( z );
+}
+void IMP_RawMemFreeCgeti(GEN number)
+{
+  IMP_RawMemFreeFnc(number);
+}
+
+GEN (*IMP_AllocCgeti)(long) = IMP_DefaultAllocCgeti;
+void (*IMP_FreeCgeti)(GEN) = IMP_DefaultFreeCgeti;
+
+/**************************************************************************
+ *
+ * Put/Get
+ *
+ *************************************************************************/
+
 MP_Status_t IMP_PutPariBigInt(MP_Link_pt link, MP_ApInt_t mp_number) 
 {
   GEN number = (GEN) mp_number;
@@ -80,7 +115,7 @@ MP_Status_t IMP_GetPariBigInt(MP_Link_pt link, MP_ApInt_t *mp_number)
   }
 
   /* Initialize the number */
-  number = cgeti(length+2);
+  number = IMP_AllocCgeti(length+2);
   setlgef(number, length+2);
   setsigne(number, sign);
 
@@ -163,7 +198,7 @@ GEN _gmp_to_pari(mpz_ptr gnum)
 
   if (length < 0 ) length = -length;
 
-  pnum = cgeti(length + 2);
+  pnum = IMP_AllocCgeti(length + 2);
   setlgef(pnum, length + 2);
   setsigne(pnum, sign);
 

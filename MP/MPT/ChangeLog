@@ -1,3 +1,9 @@
+1998-10-14  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
+
+	* MPT_ApNumber.c: MPT_DeleteApInt, MPT_InitCpyApInt is determined
+	w.r.t. MP_DEFAULT_APINT_FORMAT and extended to
+	MP_DEFAULT_APINT_FORMAT == MP_PARI
+
 Sat Jun 28 15:27:59 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
 	* Many Changes to MPT lib while working with Andi

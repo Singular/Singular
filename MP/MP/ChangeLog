@@ -1,5 +1,8 @@
 1998-10-14  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
+	* MP_PariBigInt.[c,h]: Added memory management functions for Pari
+	Bigints 
+
 	* MP_TcpTransp.c: added MP_KillLink, -MPrsh option to MP_OpenLink
 
 	* MP_Util.c: Added IMP_StrDup function
