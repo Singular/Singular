@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.87 2004-04-20 16:17:51 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.88 2004-04-30 09:59:50 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -359,26 +359,55 @@ void killlocals_rec(idhdl *root,int v, ring r)
     }
   }
 }
+BOOLEAN killlocals_list(int v, lists L)
+{
+  if (L==NULL) return FALSE;
+  BOOLEAN changed=FALSE;
+  int n=L->nr;
+  for(;n>=0;n--)
+  {
+    leftv h=&(L->m[n]);
+    void *d=h->data;
+    if (((h->rtyp==RING_CMD) || (h->rtyp==QRING_CMD))
+    && (((ring)d)->idroot!=NULL))
+    {
+      if (d!=currRing) {changed=TRUE;rChangeCurrRing((ring)d);}
+      killlocals0(v,&(((ring)h->data)->idroot));
+    }
+    else if (h->rtyp==LIST_CMD)
+      changed|=killlocals_list(v,(lists)d);
+  }
+  return changed;
+}
 void killlocals(int v)
 {
   BOOLEAN changed=FALSE;
   idhdl sh=currRingHdl;
+  ring cr=currRing;
   if (sh!=NULL) changed=((IDLEV(sh)<v) || (IDRING(sh)->ref>0));
   //if (changed) Print("currRing=%s(%x), lev=%d,ref=%d\n",IDID(sh),IDRING(sh),IDLEV(sh),IDRING(sh)->ref);
 
   killlocals_rec(&(basePack->idroot),v,currRing);
 
-  if ((iiRETURNEXPR_len > myynest)
-  && ((iiRETURNEXPR[myynest].Typ()==RING_CMD)
-    || (iiRETURNEXPR[myynest].Typ()==QRING_CMD)))
+  if (iiRETURNEXPR_len > myynest)
   {
-    leftv h=&iiRETURNEXPR[myynest];
-    killlocals0(v,&(((ring)h->data)->idroot));
+    int t=iiRETURNEXPR[myynest].Typ();
+    if ((/*iiRETURNEXPR[myynest].Typ()*/ t==RING_CMD)
+    || (/*iiRETURNEXPR[myynest].Typ()*/ t==QRING_CMD))
+    {
+      leftv h=&iiRETURNEXPR[myynest];
+      if (((ring)h->data)->idroot!=NULL)
+        killlocals0(v,&(((ring)h->data)->idroot));
+    }
+    else if (/*iiRETURNEXPR[myynest].Typ()*/ t==LIST_CMD)
+    {
+      leftv h=&iiRETURNEXPR[myynest];
+      changed |=killlocals_list(v,(lists)h->data);
+    }
   }
-
   if (changed)
   {
-    currRingHdl=rFindHdl(currRing,NULL,NULL);
+    currRingHdl=rFindHdl(cr,NULL,NULL);
   }
 
   if (myynest<=1) iiNoKeepRing=TRUE;
