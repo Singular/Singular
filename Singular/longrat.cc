@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.38 2001-03-22 19:11:06 Singular Exp $ */
+/* $Id: longrat.cc,v 1.39 2001-08-24 13:41:35 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -101,13 +101,15 @@ BOOLEAN nlDBTest(number a, char *f,int l);
 
 
 /***************************************************************
- *  
+ *
  * Routines which are never inlined by p_Numbers.h
  *
  *******************************************************************/
 #ifndef P_NUMBERS_H
 
 omBin rnumber_bin = omGetSpecBin(sizeof(rnumber));
+
+number nlOne=nlInit(1);
 
 static int nlPrimeM;
 static number nlMapP(number from)
@@ -486,9 +488,24 @@ int nlInt(number &i)
   nlNormalize(i);
   if (SR_HDL(i) &SR_INT) return SR_TO_INT(i);
   nlGmpSimple(&i->z);
-  if ((i->s!=3)||(mpz_size1(&i->z)>MP_SMALL)) return 0;
-  int ul=(int)mpz_get_si(&i->z);
-  if (mpz_cmp_si(&i->z,(long)ul)!=0) return 0;
+  if (i->s==3)
+  {
+    if(mpz_size1(&i->z)>MP_SMALL) return 0;
+    int ul=(int)mpz_get_si(&i->z);
+    if (mpz_cmp_si(&i->z,(long)ul)!=0) return 0;
+    return ul;
+  }
+  lint tmp;
+  int ul;
+  mpz_init(&tmp);
+  MPZ_DIV(&tmp,&i->z,&i->n);
+  if(mpz_size1(&tmp)>MP_SMALL) ul=0;
+  else
+  {
+    ul=(int)mpz_get_si(&tmp);
+    if (mpz_cmp_si(&tmp,(long)ul)!=0) ul=0;
+  }
+  mpz_clear(&tmp);
   return ul;
 }
 
@@ -515,7 +532,7 @@ number nlInvers(number a)
       return INT_TO_SR(0);
     }
     n=(number)omAllocBin(rnumber_bin);
-#if defined(LDEBUG) 
+#if defined(LDEBUG)
     n->debug=123456;
 #endif
     n->s=1;
@@ -538,7 +555,7 @@ number nlInvers(number a)
     return n;
   }
   n=(number)omAllocBin(rnumber_bin);
-#if defined(LDEBUG) 
+#if defined(LDEBUG)
   n->debug=123456;
 #endif
   {
@@ -623,7 +640,7 @@ number   nlExactDiv(number a, number b)
     b=bb;
   }
   u=(number)omAllocBin(rnumber_bin);
-#if defined(LDEBUG) 
+#if defined(LDEBUG)
   u->debug=123456;
 #endif
   mpz_init(&u->z);
@@ -719,7 +736,7 @@ number nlIntDiv (number a, number b)
     b=bb;
   }
   u=(number)omAllocBin(rnumber_bin);
-#if defined(LDEBUG) 
+#if defined(LDEBUG)
   u->debug=123456;
 #endif
   mpz_init_set(&u->z,&a->z);
@@ -837,7 +854,7 @@ number nlIntMod (number a, number b)
     b=bb;
   }
   u=(number)omAllocBin(rnumber_bin);
-#if defined(LDEBUG) 
+#if defined(LDEBUG)
   u->debug=123456;
 #endif
   mpz_init(&u->z);
@@ -886,7 +903,7 @@ number nlDiv (number a, number b)
   }
   u=(number)omAllocBin(rnumber_bin);
   u->s=0;
-#if defined(LDEBUG) 
+#if defined(LDEBUG)
   u->debug=123456;
 #endif
 // ---------- short / short ------------------------------------
@@ -1038,7 +1055,7 @@ void nlPower (number x,int exp,number * u)
       x=aa;
     }
     *u=(number)omAllocBin(rnumber_bin);
-#if defined(LDEBUG) 
+#if defined(LDEBUG)
     (*u)->debug=123456;
 #endif
     mpz_init(&(*u)->z);
@@ -1175,7 +1192,7 @@ number nlGcd(number a, number b, const ring r)
     b=aa;
   }
   result=(number)omAllocBin(rnumber_bin);
-#if defined(LDEBUG) 
+#if defined(LDEBUG)
   result->debug=123456;
 #endif
   mpz_init(&result->z);
@@ -1267,7 +1284,7 @@ void nlNormalize (number &x)
         && (mpz_cmp_si(&x->z,(long)ui)==0))
         {
           mpz_clear(&x->z);
-#if defined(LDEBUG) 
+#if defined(LDEBUG)
           x->debug=654324;
 #endif
           omFreeBin((ADDRESS)x, rnumber_bin);
@@ -1311,7 +1328,7 @@ number nlLcm(number a, number b, const ring r)
     a=aa;
   }
   result=(number)omAllocBin(rnumber_bin);
-#if defined(LDEBUG) 
+#if defined(LDEBUG)
   result->debug=123456;
 #endif
   result->s=3;
@@ -1387,7 +1404,7 @@ number   nlGetDenom(number &n)
       {
         number u=(number)omAllocBin(rnumber_bin);
         u->s=3;
-#if defined(LDEBUG) 
+#if defined(LDEBUG)
         u->debug=123456;
 #endif
 
@@ -1410,7 +1427,7 @@ number   nlGetDenom(number &n)
 }
 
 /***************************************************************
- *  
+ *
  * routines which are needed by Inline(d) routines
  *
  *******************************************************************/
@@ -1482,7 +1499,7 @@ number _nlCopy_NoImm(number a)
   nlTest(a);
 #endif
   number b=(number)omAllocBin(rnumber_bin);
-#if defined(LDEBUG) 
+#if defined(LDEBUG)
   b->debug=123456;
 #endif
   switch (a->s)
@@ -1542,7 +1559,7 @@ number _nlNeg_NoImm(number a)
 number _nlAdd_aNoImm_OR_bNoImm(number a, number b)
 {
   number u=(number)omAllocBin(rnumber_bin);
-#if defined(LDEBUG) 
+#if defined(LDEBUG)
   u->debug=123456;
 #endif
   mpz_init(&u->z);
@@ -1754,7 +1771,7 @@ number _nlAdd_aNoImm_OR_bNoImm(number a, number b)
 number _nlSub_aNoImm_OR_bNoImm(number a, number b)
 {
   number u=(number)omAllocBin(rnumber_bin);
-#if defined(LDEBUG) 
+#if defined(LDEBUG)
   u->debug=123456;
 #endif
   mpz_init(&u->z);
@@ -2033,7 +2050,7 @@ number _nlSub_aNoImm_OR_bNoImm(number a, number b)
 number _nlMult_aImm_bImm_rNoImm(number a, number b)
 {
   number u=(number)omAllocBin(rnumber_bin);
-#if defined(LDEBUG) 
+#if defined(LDEBUG)
   u->debug=123456;
 #endif
   u->s=3;
@@ -2053,12 +2070,12 @@ number _nlMult_aImm_bImm_rNoImm(number a, number b)
   return u;
 }
 
-// a or b are not immediate 
+// a or b are not immediate
 number _nlMult_aNoImm_OR_bNoImm(number a, number b)
 {
   assume(! (SR_HDL(a) & SR_HDL(b) & SR_INT));
   number u=(number)omAllocBin(rnumber_bin);
-#if defined(LDEBUG) 
+#if defined(LDEBUG)
   u->debug=123456;
 #endif
   mpz_init(&u->z);
@@ -2175,11 +2192,27 @@ number _nlMult_aNoImm_OR_bNoImm(number a, number b)
 number nlRInit (int i)
 {
   number z=(number)omAllocBin(rnumber_bin);
-#if defined(LDEBUG) 
+#if defined(LDEBUG)
   z->debug=123456;
 #endif
   mpz_init_set_si(&z->z,(long)i);
   z->s = 3;
+  return z;
+}
+
+/*2
+* z := i/j
+*/
+number nlInit2 (int i, int j)
+{
+  number z=(number)omAllocBin(rnumber_bin);
+#if defined(LDEBUG)
+  z->debug=123456;
+#endif
+  mpz_init_set_si(&z->z,(long)i);
+  mpz_init_set_si(&z->n,(long)j);
+  z->s = 0;
+  nlNormalize(z);
   return z;
 }
 
@@ -2200,7 +2233,7 @@ number  _nlMult_aImm_bImm_rNoImm(number a, number b);
 
 
 /***************************************************************
- *  
+ *
  * Routines which might be inlined by p_Numbers.h
  *
  *******************************************************************/
@@ -2257,15 +2290,6 @@ LINLINE BOOLEAN nlIsZero (number a)
 * copy a to b
 */
 LINLINE number nlCopy(number a)
-{
-  if ((SR_HDL(a) & SR_INT)||(a==NULL))
-  {
-    return a;
-  }
-  return _nlCopy_NoImm(a);
-}
-
-LINLINE number nl_Copy(number a, ring r)
 {
   if ((SR_HDL(a) & SR_INT)||(a==NULL))
   {
