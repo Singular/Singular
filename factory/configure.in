@@ -1,4 +1,4 @@
-dnl $Id: configure.in,v 1.5 1997-07-21 14:56:49 schmidt Exp $
+dnl $Id: configure.in,v 1.6 1997-07-22 09:14:54 schmidt Exp $
 
 dnl
 dnl configure.in - process this file with autoconf to generate
@@ -11,7 +11,7 @@ dnl
 #
 # - initialisation.
 #
-AC_REVISION($Id: configure.in,v 1.5 1997-07-21 14:56:49 schmidt Exp $)
+AC_REVISION($Id: configure.in,v 1.6 1997-07-22 09:14:54 schmidt Exp $)
 AC_INIT(canonicalform.cc)
 AC_CONFIG_HEADER(config.h)
 AC_CONFIG_AUX_DIR(bin)
@@ -30,7 +30,7 @@ factory_version="1.3a"
 #
 AC_ARG_WITH(
   memman,
-  [  --with-memman(=<memman>) specify factory memory manager.
+  [  --with-memman(=<memman>) specify Factory memory manager.
                           <memman> is either 'old' (default), 'new', or 'no'.],
   ,
   [ if test "x$with_Singular" = xyes; then
@@ -52,7 +52,7 @@ AC_ARG_WITH(
 
 AC_ARG_ENABLE(
   streamio,
-  [  --disable-streamio      build factory without streamio],
+  [  --disable-streamio      build Factory without stream IO],
   ,
   [ if test "x$with_Singular" = xyes; then
       enable_streamio=no
@@ -62,7 +62,7 @@ AC_ARG_ENABLE(
 
 AC_ARG_ENABLE(
   memdebug,
-  [  --enable-memdebug=<level> switch on memory managment debugging.  Meaningful
+  [  --enable-memdebug=<level> switch on memory management debugging.  Meaningful
                           with --with-memman=new only.  <level> may be either
                           'no' (default), 'normal', or 'full'.],
   ,
@@ -70,19 +70,19 @@ AC_ARG_ENABLE(
 
 AC_ARG_ENABLE(
   assertions,
-  [  --enable-assertions     build factory with assertions activated],
+  [  --enable-assertions     build Factory with assertions activated],
   ,
   enable_assertions=no)
 
 AC_ARG_ENABLE(
   timing,
-  [  --enable-timing         build factory so it will print timing information],
+  [  --enable-timing         build Factory so it will print timing information],
   ,
   enable_timing=no)
 
 AC_ARG_ENABLE(
   debugoutput,
-  [  --enable-debugoutput    build factory so it will print debugging information],
+  [  --enable-debugoutput    build Factory so it will print debugging information],
   ,
   enable_debugoutput=no)
 
@@ -124,7 +124,7 @@ AC_PROG_CC
 test "${CXXFLAGS+set}" = set || cxxflags_expl_set=no
 AC_PROG_CXX
 if test "x$GCC" != xyes && test "x$GXX" != xyes; then
-  AC_MSG_WARN(you better use gcc to compile factory)
+  AC_MSG_WARN(you better use gcc to compile Factory)
 else
   if test "x$GXX" = xyes && test "x$cxxflags_expl_set" = xno; then
     AC_MSG_WARN([we will use '-O2 -fomit-frame-pointer' as default for CXXFLAGS
