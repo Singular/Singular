@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.170 2001-09-25 16:07:32 Singular Exp $ */
+/* $Id: ring.cc,v 1.171 2001-10-23 14:04:25 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -116,6 +116,7 @@ void rSetHdl(idhdl h)
   ring rg = NULL;
   if (h!=NULL)
   {
+//   Print(" new ring:%s (l:%d)\n",IDID(h),IDLEV(h));
     rg = IDRING(h);
     omCheckAddrSize((ADDRESS)h,sizeof(idrec));
     if (IDID(h))  // OB: ????
@@ -902,8 +903,8 @@ void rKill(ring r)
         iiLocalRing[j]=NULL;
       }
     }
-// #else /* USE_IILOCALRING */
-#endif /* USE_IILOCALRING */
+#else /* USE_IILOCALRING */
+//#endif /* USE_IILOCALRING */
     {
       proclevel * nshdl = procstack;
       int lev=myynest-1;
@@ -918,7 +919,7 @@ void rKill(ring r)
         }
       }
     }
-//#endif /* USE_IILOCALRING */
+#endif /* USE_IILOCALRING */
 
     rDelete(r);
     return;
@@ -1058,6 +1059,33 @@ idhdl rFindHdl(ring r, idhdl n, idhdl w)
       return h;
     h=IDNEXT(h);
   }
+#ifdef HAVE_NS
+  if (IDROOT!=basePack->idroot) h=basePack->idroot;
+  while (h!=NULL)
+  {
+    if (((IDTYP(h)==RING_CMD)||(IDTYP(h)==QRING_CMD))
+        && (h->data.uring==r)
+        && (h!=n))
+      return h;
+    h=IDNEXT(h);
+  }
+  proclevel *p=procstack;
+  while(p!=NULL)
+  {
+    if ((p->currPack!=basePack)
+    && (p->currPack!=currPack))
+      h=p->currPack->idroot;
+    while (h!=NULL)
+    {
+      if (((IDTYP(h)==RING_CMD)||(IDTYP(h)==QRING_CMD))
+        && (h->data.uring==r)
+        && (h!=n))
+      return h;
+      h=IDNEXT(h);
+    }
+    p=p->next;
+  }
+#endif
 #endif
   return NULL;
 }

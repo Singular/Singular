@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.92 2001-10-09 16:36:05 Singular Exp $ */
+/* $Id: iplib.cc,v 1.93 2001-10-23 14:04:22 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -327,14 +327,18 @@ BOOLEAN iiPStart(idhdl pn, sleftv  * v)
   /* start interpreter ======================================*/
   myynest++;
   err=yyparse();
+#ifdef HAVE_NS
   checkall();
+#endif
   if (sLastPrinted.rtyp!=0)
   {
     sLastPrinted.CleanUp();
   }
   //Print("kill locals for %s (level %d)\n",IDID(pn),myynest);
   killlocals(myynest);
+#ifdef HAVE_NS
   checkall();
+#endif
   //Print("end kill locals for %s (%d)\n",IDID(pn),myynest);
   myynest--;
   si_echo=old_echo;
@@ -362,7 +366,8 @@ static void iiShowLevRings()
     PrintLn();
   }
 #endif
-#ifdef HAVE_NS
+#if  0
+//#ifdef HAVE_NS
   i=myynest;
   proclevel *p=procstack;
   while (p!=NULL)
@@ -503,7 +508,9 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
     //iiRETURNEXPR[myynest+1].Init(); //done by CleanUp
   }
 #ifdef USE_IILOCALRING
+#if 0
   if(procstack->currRing != iiLocalRing[myynest]) Print("iiMake_proc: 1 ring not saved procs:%x, iiLocal:%x\n",procstack->currRing, iiLocalRing[myynest]);
+#endif
   if (iiLocalRing[myynest] != currRing)
   {
     if (((iiRETURNEXPR[myynest+1].Typ()>BEGIN_RING)
@@ -522,13 +529,12 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
       iiRETURNEXPR[myynest+1].CleanUp();
       err=TRUE;
     }
-    if (iiLocalRing[myynest]!=NULL)
-    {
-      rSetHdl(rFindHdl(iiLocalRing[myynest],NULL, NULL));
-      iiLocalRing[myynest]=NULL;
-    }
-    else
-    { currRingHdl=NULL; currRing=NULL; }
+  }
+  if ((currRing!=NULL) &&
+    ((currRingHdl==NULL)||(IDRING(currRingHdl)!=currRing)))
+  {
+    rSetHdl(rFindHdl(currRing,NULL, NULL));
+    iiLocalRing[myynest]=NULL;
   }
 #else /* USE_IILOCALRING */
   if (procstack->currRing != currRing)
@@ -876,7 +882,7 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
   hl = idroot->get("LIB",0);
   if (hl==NULL)
   {
-    hl = enterid( omStrDup("LIB"),0, STRING_CMD, &idroot, FALSE );
+    hl = enterid( "LIB",0, STRING_CMD, &idroot, FALSE );
     IDSTRING(hl) = omStrDup(newlib);
   }
   else
@@ -935,7 +941,7 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
   pl = namespaceroot->get(plib,0, TRUE);
   if (pl==NULL)
   {
-    pl = enterid( omStrDup(plib),0, PACKAGE_CMD,
+    pl = enterid( plib,0, PACKAGE_CMD,
                   &NSROOT(namespaceroot->root), TRUE );
     IDPACKAGE(pl)->language = LANG_SINGULAR;
     IDPACKAGE(pl)->libname=omStrDup(newlib);
@@ -956,7 +962,7 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
   pl = basePack->idroot->get(plib,0);
   if (pl==NULL)
   {
-    pl = enterid( omStrDup(plib),0, PACKAGE_CMD,
+    pl = enterid( plib,0, PACKAGE_CMD,
                   &(basePack->idroot), TRUE );
     IDPACKAGE(pl)->language = LANG_SINGULAR;
     IDPACKAGE(pl)->libname=omStrDup(newlib);
@@ -1139,7 +1145,9 @@ procinfo *iiInitSingularProcinfo(procinfov pi, char *libname, char *procname,
     pi->procname = omStrDup(procname);
   pi->language = LANG_SINGULAR;
   pi->ref = 1;
+#ifdef HAVE_NS
   pi->pack = NULL;
+#endif
   pi->is_static = pstatic;
   pi->data.s.proc_start = pos;
   pi->data.s.def_end    = 0L;
@@ -1164,7 +1172,7 @@ int iiAddCproc(char *libname, char *procname, BOOLEAN pstatic,
   procinfov pi;
   idhdl h;
 
-  h = enterid(omStrDup(procname),0, PROC_CMD, &IDROOT, TRUE);
+  h = enterid(procname,0, PROC_CMD, &IDROOT, TRUE);
   if ( h!= NULL )
   {
     pi = IDPROC(h);
@@ -1216,10 +1224,10 @@ BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN tellerror)
   if (pl==NULL)
   {
 #ifdef HAVE_NAMESPACES
-    pl = enterid( omStrDup(plib),0, PACKAGE_CMD,
+    pl = enterid( plib,0, PACKAGE_CMD,
                   &NSROOT(namespaceroot->root), TRUE );
 #else
-    pl = enterid( omStrDup(plib),0, PACKAGE_CMD, &IDROOT,
+    pl = enterid( plib,0, PACKAGE_CMD, &IDROOT,
                   TRUE );
 #endif
     IDPACKAGE(pl)->language = LANG_C;

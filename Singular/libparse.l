@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.l,v 1.48 2001-10-09 16:36:08 Singular Exp $ */
+/* $Id: libparse.l,v 1.49 2001-10-23 14:04:23 Singular Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -306,7 +306,7 @@ eqnl           ([ \t\n]*+=[ \t\n]*)
                  printf("Version:%s;\n", libnamebuf);
                #else
                //#ifdef HAVE_NAMESPACES
-               //h0 = enterid( omStrDup("version"), myynest, STRING_CMD,
+               //h0 = enterid( "version", myynest, STRING_CMD,
                //                   &IDPACKAGE(pl)->idroot, FALSE );
                //if (h0!=NULL)
                //{
@@ -350,26 +350,26 @@ static     { p_static=TRUE; }
              if( mode == LOAD_LIB)
              {
                #ifdef HAVE_NAMESPACES
-               h0 = enterid( omStrDup(proc), 0 /*myynest*/, PROC_CMD,
+               h0 = enterid( proc, 0 /*myynest*/, PROC_CMD,
                                  &IDPACKAGE(pl)->idroot, TRUE);
                if(!p_static && autoexport)
                {
                   namespaceroot->push( NSPACK(namespaceroot->root) ,"");
-                  h_top = enterid( omStrDup(proc), myynest, PROC_CMD,
+                  h_top = enterid( proc, myynest, PROC_CMD,
                                  &NSROOT(namespaceroot->root), FALSE );
                   namespaceroot->pop();
                }
                #else /* HAVE_NAMESPACES */
                #ifdef HAVE_NS
-               h0 = enterid( omStrDup(proc), 0 /*myynest*/, PROC_CMD,
+               h0 = enterid( proc, 0 /*myynest*/, PROC_CMD,
                                  &(IDPACKAGE(pl)->idroot), TRUE);
                if(!p_static && autoexport)
                {
-                  h_top = enterid( omStrDup(proc), 0 /*myynest*/, PROC_CMD,
+                  h_top = enterid( proc, 0 /*myynest*/, PROC_CMD,
                                  &(basePack->idroot), FALSE );
                }
                #else
-               h0 = enterid( omStrDup(proc), 0 /*myynest*/, PROC_CMD,
+               h0 = enterid( proc, 0 /*myynest*/, PROC_CMD,
                                    &IDROOT, TRUE );
                #endif /* HAVE_NS */
                #endif /* HAVE_NAMESPACES */
@@ -393,7 +393,7 @@ static     { p_static=TRUE; }
                    IDPROC(h_top)=IDPROC(h0);
                    IDPROC(h_top)->ref++;
                  }
-		 IDPROC(h0)->pack=IDPACKAGE(pl);
+                 IDPROC(h0)->pack=IDPACKAGE(pl);
                  #endif /* HAVE_NS */
                  if (BVERBOSE(V_LOAD_PROC))
                    Warn( "     proc '%s' registered", proc );
@@ -994,7 +994,7 @@ void copy_string(lp_modes mode)
     }
     #ifdef HAVE_NAMESPACES
     if( mode != GET_INFO ) {
-      h0 = enterid( omStrDup("info"), myynest, STRING_CMD,
+      h0 = enterid( "info", myynest, STRING_CMD,
                           &IDPACKAGE(pl)->idroot, FALSE );
       if (h0!=NULL)
       {

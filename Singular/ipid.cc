@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.54 2001-10-09 16:36:04 Singular Exp $ */
+/* $Id: ipid.cc,v 1.55 2001-10-23 14:04:22 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -331,24 +331,16 @@ char * idrec::String()
 idhdl enterid(char * s, int lev, idtyp t, idhdl* root, BOOLEAN init)
 {
   idhdl h;
-  // is it the currRing - id ?
 #ifdef HAVE_NAMESPACES
   namehdl topnsroot = namespaceroot->root;
 #endif
-  if ((currRingHdl!=NULL)
-  &&(IDLEV(currRingHdl)!=lev)
-  &&(s==IDID(currRingHdl)))
-  {
-    s=omStrDup(s);
-  }
+  s=omStrDup(s);
   // is it already defined in root ?
-  else if ((h=(*root)->get(s,lev))!=NULL)
+  if ((h=(*root)->get(s,lev))!=NULL)
   {
-    if (IDLEV(h)!=lev)
+    if (IDLEV(h)==lev)
     {
-      s=omStrDup(s);
-    }
-    else if ((IDTYP(h) == t)||(t==DEF_CMD))
+    if ((IDTYP(h) == t)||(t==DEF_CMD))
     {
       if ((IDTYP(h)==PACKAGE_CMD)
       && (strcmp(s,"Top")==0))
@@ -356,11 +348,7 @@ idhdl enterid(char * s, int lev, idtyp t, idhdl* root, BOOLEAN init)
         goto errlabel;
       }	
       if (BVERBOSE(V_REDEFINE))
-#ifdef KAI
-        Warn("1 redefining %s **",s);
-#else
         Warn("redefining %s **",s);
-#endif
 #ifdef HAVE_NAMESPACES
       if(t==PACKAGE_CMD && strcmp(s,"Top")==0)
       {
@@ -373,27 +361,25 @@ idhdl enterid(char * s, int lev, idtyp t, idhdl* root, BOOLEAN init)
     }
     else
       goto errlabel;
+    }
   }
   // is it already defined in idroot ?
   else if (*root != IDROOT)
   {
     if ((h=IDROOT->get(s,lev))!=NULL)
     {
-      if (IDLEV(h)!=lev)
-        s=omStrDup(s);
-      else if ((IDTYP(h) == t)||(t==DEF_CMD))
+      if (IDLEV(h)==lev)
+      {
+      if ((IDTYP(h) == t)||(t==DEF_CMD))
       {
         if (BVERBOSE(V_REDEFINE))
-#ifdef KAI
-          Warn("2 redefining %s **",s);
-#else
           Warn("redefining %s **",s);
-#endif
         if (s==IDID(h)) IDID(h)=NULL;
         killhdl2(h,&IDROOT);
       }
       else
         goto errlabel;
+      }
     }
   }
 #ifdef HAVE_NAMESPACES
@@ -402,7 +388,6 @@ idhdl enterid(char * s, int lev, idtyp t, idhdl* root, BOOLEAN init)
   {
     if ((h=topnsroot->get(s,lev))!=NULL)
     {
-        s=omStrDup(s);
     }
   }
 #endif /* HAVE_NAMESPACES */
@@ -411,33 +396,32 @@ idhdl enterid(char * s, int lev, idtyp t, idhdl* root, BOOLEAN init)
   {
     if ((h=currRing->idroot->get(s,lev))!=NULL)
     {
-      if (IDLEV(h)!=lev)
+      if (IDLEV(h)==lev)
       {
-        s=omStrDup(s);
-      }
-      else if ((IDTYP(h) == t)||(t==DEF_CMD))
+      if ((IDTYP(h) == t)||(t==DEF_CMD))
       {
         if (BVERBOSE(V_REDEFINE))
-#ifdef KAI
-          Warn("3 redefining %s **",s);
-#else
           Warn("redefining %s **",s);
-#endif
         IDID(h)=NULL;
         killhdl2(h,&currRing->idroot);
       }
       else
-      {
         goto errlabel;
       }
     }
   }
   *root = (*root)->set(s, lev, t, init);
+#ifdef HAVE_NS
   checkall();
+#endif
   return *root;
 
   errlabel:
-    Werror("identifier `%s` in use",s);
+    Werror("identifier `%s` in use(lev h=%d,typ=%d,t=%d, curr=%d)",s,IDLEV(h),IDTYP(h),t,lev);
+#ifdef HAVE_NS
+    listall();
+#endif
+    omFree(s);
     return NULL;
 }
 
@@ -526,12 +510,12 @@ void killhdl2(idhdl h, idhdl * ih)
     atKillAll(h);
     //h->attribute=NULL;
   }
-  // ring / qring  --------------------------------------------------------
   if ((IDTYP(h) == PACKAGE_CMD) && (strcmp(IDID(h),"Top")==0))
   {
     WarnS("can not kill `Top`");
     return;
   }
+  // ring / qring  --------------------------------------------------------
   if ((IDTYP(h) == RING_CMD) || (IDTYP(h) == QRING_CMD))
   {
     idhdl savecurrRingHdl = currRingHdl;
@@ -691,9 +675,10 @@ void killhdl2(idhdl h, idhdl * ih)
   {
     slKill(IDLINK(h));
   }
-  else if((IDTYP(h)==RESOLUTION_CMD)&&(IDDATA(h)!=NULL))
+  else if(IDTYP(h)==RESOLUTION_CMD)
   {
-    syKillComputation((syStrategy)IDDATA(h));
+    if (IDDATA(h)!=NULL)
+      syKillComputation((syStrategy)IDDATA(h));
   }
 #ifdef TEST
   else if ((IDTYP(h)!= INT_CMD)&&(IDTYP(h)!=DEF_CMD) && (IDTYP(h)!=NONE))
@@ -1082,12 +1067,12 @@ void proclevel::push(char *n)
 void proclevel::pop()
 {
   //Print("pop %s\n",name);
-  if (currRing!=::currRing) PrintS("currRing wrong\n");;
-  ::currRing=this->currRing;
+  //if (currRing!=::currRing) PrintS("currRing wrong\n");;
+  //::currRing=this->currRing;
   //if (r==NULL) Print("set ring to NULL at lev %d(%s)\n",myynest,name);
-  ::currRingHdl=this->currRingHdl;
-  if((::currRingHdl==NULL)||(IDRING(::currRingHdl)!=(::currRing)))
-    ::currRingHdl=rFindHdl(::currRing,NULL,NULL);
+  //::currRingHdl=this->currRingHdl;
+  //if((::currRingHdl==NULL)||(IDRING(::currRingHdl)!=(::currRing)))
+  //  ::currRingHdl=rFindHdl(::currRing,NULL,NULL);
   #ifdef HAVE_NS
   //Print("restore pack=%s,1.obj=%s\n",IDID(currPackHdl),IDID(currPack->idroot));
   ::currPackHdl=this->currPackHdl;
@@ -1136,7 +1121,7 @@ namehdl namerec::push(package pack, char *name, int nesting, BOOLEAN init)
   namespaceroot = ns;
 #if 0
   if(init && ns->isroot) {
-    idhdl pl = enterid( omStrDup("Top"),0, PACKAGE_CMD,
+    idhdl pl = enterid( "Top",0, PACKAGE_CMD,
                       &NSROOT(namespaceroot), TRUE );
     if(pl != NULL) {
       omFreeBin((ADDRESS)IDPACKAGE(pl),  ip_package_bin);

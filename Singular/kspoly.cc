@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kspoly.cc,v 1.25 2001-10-09 16:36:07 Singular Exp $ */
+/* $Id: kspoly.cc,v 1.26 2001-10-23 14:04:23 Singular Exp $ */
 /*
 *  ABSTRACT -  Routines for Spoly creation and reductions
 */

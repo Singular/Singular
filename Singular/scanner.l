@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: scanner.l,v 1.30 2001-10-09 16:36:21 Singular Exp $ */
+/* $Id: scanner.l,v 1.31 2001-10-23 14:04:26 Singular Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -345,23 +345,23 @@ newline                  {
 
 .                       {
                            /*if (*yytext == '\n') REJECT;*/
-			   register char ch= *yytext;
+                           register char ch= *yytext;
                            lvalp->i = ch;
-			   switch(ch)
-			   {
-			     /* case '&': */
-			     case '|':
+                           switch(ch)
+                           {
+                             /* case '&': */
+                             case '|':
                                return LOGIC_OP;
-			     /* case '/': */
-			     case '%':
-			     case '*':
+                             /* case '/': */
+                             case '%':
+                             case '*':
                                return MULDIV_OP;
-			     /* case '<': */
-			     case '>':
-			       return COMP_OP;
-			     default:
-			       break;
-			    }
+                             /* case '<': */
+                             case '>':
+                               return COMP_OP;
+                             default:
+                               break;
+                            }
                             return ch;
                          }
 %%

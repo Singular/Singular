@@ -6,7 +6,7 @@
  *  Purpose: implementation of sl_link routines for MP
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: mpsr_sl.cc,v 1.4 2001-10-09 16:36:11 Singular Exp $
+ *  Version: $Id: mpsr_sl.cc,v 1.5 2001-10-23 14:04:24 Singular Exp $
  *******************************************************************/
 
 #include "mod2.h"
@@ -475,7 +475,7 @@ static int Batch_ReadEval(si_link silink)
 {
   leftv v = NULL;
   // establish top-level identifier for link
-  idhdl id = enterid(omStrDup("mp_ll"), 0, LINK_CMD, &IDROOT, FALSE);
+  idhdl id = enterid("mp_ll", 0, LINK_CMD, &IDROOT, FALSE);
   IDLINK(id) = silink;
 
   // the main read-eval-write loop

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.94 2001-10-09 16:36:01 Singular Exp $ */
+/* $Id: grammar.y,v 1.95 2001-10-23 14:04:21 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -1363,6 +1363,7 @@ ringcmd:
             if (b!=NULL)
             {
               newRingHdl=enterid(ring_name, myynest, RING_CMD, &IDROOT);
+              $2.CleanUp();
               if (newRingHdl!=NULL)
               {
                 omFreeSize(IDRING(newRingHdl),sizeof(ip_sring));
@@ -1405,6 +1406,7 @@ ringcmd:
               if(do_pop) namespaceroot->pop();
             #endif /* HAVE_NAMESPACES */
             yyInRingConstruction = FALSE;
+            $2.CleanUp();
           }
         ;
 
@@ -1467,7 +1469,7 @@ setringcmd:
                         }
                         p=IDNEXT(p);
                       }
-		      IDRING(h)->idroot=root;
+                      IDRING(h)->idroot=root;
                     //}
                   }
 #ifdef USE_IILOCALRING
@@ -1624,17 +1626,19 @@ proccmd:
           {
             procinfov pi;
             idhdl h = enterid($2,myynest,PROC_CMD,&IDROOT,TRUE);
-            if (h==NULL) {omFree((ADDRESS)$3); YYERROR;}
+            if (h==NULL) {omFree((ADDRESS)$2);omFree((ADDRESS)$3); YYERROR;}
             iiInitSingularProcinfo(IDPROC(h),"", $2, 0, 0);
             IDPROC(h)->data.s.body = (char *)omAlloc(strlen($3)+31);;
             sprintf(IDPROC(h)->data.s.body,"parameter list #;\n%s;return();\n\n",$3);
             omFree((ADDRESS)$3);
+            omFree((ADDRESS)$2);
           }
         | PROC_DEF STRINGTOK BLOCKTOK
           {
             idhdl h = enterid($1,myynest,PROC_CMD,&IDROOT,TRUE);
             if (h==NULL)
             {
+              omFree((ADDRESS)$1);
               omFree((ADDRESS)$2);
               omFree((ADDRESS)$3);
               YYERROR;
@@ -1647,6 +1651,7 @@ proccmd:
             sprintf(IDPROC(h)->data.s.body,"%s\n%s;return();\n\n",args,$3);
             omFree((ADDRESS)args);
             omFree((ADDRESS)$3);
+            omFree((ADDRESS)$1);
           }
         | PROC_DEF STRINGTOK STRINGTOK BLOCKTOK
           {
@@ -1654,6 +1659,7 @@ proccmd:
             idhdl h = enterid($1,myynest,PROC_CMD,&IDROOT,TRUE);
             if (h==NULL)
             {
+              omFree((ADDRESS)$1);
               omFree((ADDRESS)$2);
               omFree((ADDRESS)$4);
               YYERROR;
@@ -1662,6 +1668,7 @@ proccmd:
             omFree((ADDRESS)$2);
             procinfov pi;
             iiInitSingularProcinfo(IDPROC(h),"", $1, 0, 0);
+            omFree((ADDRESS)$1);
             IDPROC(h)->data.s.body = (char *)omAlloc(strlen($4)+strlen(args)+14);;
             sprintf(IDPROC(h)->data.s.body,"%s\n%s;return();\n\n",args,$4);
             omFree((ADDRESS)args);
