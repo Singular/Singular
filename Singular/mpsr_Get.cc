@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_Get.cc,v 1.23 1999-03-08 17:30:45 Singular Exp $ */
+/* $Id: mpsr_Get.cc,v 1.24 1999-06-08 08:02:35 Singular Exp $ */
 /***************************************************************
  *
  * File:       mpsr_Get.cc
@@ -93,7 +93,7 @@ inline BOOLEAN IsRingNode(MPT_Node_pt node, ring &r, BOOLEAN &IsUnOrdered)
   BOOLEAN mv;
   return
     NodeCheck(node, MP_PolyDict, MP_CopPolyRing) &&
-    mpsr_GetRingAnnots(node, r, mv, IsUnOrdered) == MP_Success;
+    mpsr_GetRingAnnots(node, r, mv, IsUnOrdered) == mpsr_Success;
 }
 
 inline BOOLEAN IsPolyNode(MPT_Node_pt node, ring &r, BOOLEAN &IsUnOrdered)
@@ -104,7 +104,7 @@ inline BOOLEAN IsPolyNode(MPT_Node_pt node, ring &r, BOOLEAN &IsUnOrdered)
   return
     NodeCheck(node, MP_PolyDict, MP_CopPolyDenseDistPoly) &&
     MPT_Annot(node, MP_PolyDict, MP_AnnotPolyModuleVector) == NULL &&
-    mpsr_GetRingAnnots(node, r, mv, IsUnOrdered) == MP_Success;
+    mpsr_GetRingAnnots(node, r, mv, IsUnOrdered) == mpsr_Success;
 }
 
 inline BOOLEAN IsPolyVectorNode(MPT_Node_pt node, ring &r, 
@@ -116,7 +116,7 @@ inline BOOLEAN IsPolyVectorNode(MPT_Node_pt node, ring &r,
   return
     NodeCheck(node, MP_PolyDict, MP_CopPolyDenseDistPoly) &&
     MPT_Annot(node, MP_PolyDict, MP_AnnotPolyModuleVector) != NULL &&
-    mpsr_GetRingAnnots(node, r, mv, IsUnOrdered) == MP_Success;
+    mpsr_GetRingAnnots(node, r, mv, IsUnOrdered) == mpsr_Success;
 }
 
 inline BOOLEAN IsIdealNode(MPT_Node_pt node, ring &r, 
