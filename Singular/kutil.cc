@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.53 2000-03-31 13:45:27 Singular Exp $ */
+/* $Id: kutil.cc,v 1.54 2000-05-09 14:34:49 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -28,8 +28,8 @@ static poly redBba (poly h,int maxIndex,kStrategy strat);
 
 BITSET  test=(BITSET)0;
 int     HCord;
-int        Kstd1_deg;
-int        mu=32000;
+int     Kstd1_deg;
+int     mu=32000;
 
 /*2
 *deletes higher monomial of p, re-compute ecart and length
