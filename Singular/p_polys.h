@@ -7,7 +7,7 @@
  *           currRing
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
- *  Version: $Id: p_polys.h,v 1.16 2000-11-23 17:41:32 Singular Exp $
+ *  Version: $Id: p_polys.h,v 1.17 2000-11-24 16:24:42 Singular Exp $
  *******************************************************************/
 #ifndef P_POLYS_H
 #define P_POLYS_H
@@ -217,6 +217,8 @@ int       p_IsPurePower(const poly p, const ring r);
 
 // returns the poly representing the integer i
 poly      p_ISet(int i, ring r);
+// returns the poly representing the number n, destroys n
+poly      p_NSet(number n, ring r);
 
 /***************************************************************
  *

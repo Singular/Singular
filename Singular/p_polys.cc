@@ -6,7 +6,7 @@
  *  Purpose: implementation of currRing independent poly procedures
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_polys.cc,v 1.11 2000-11-23 17:42:30 Singular Exp $
+ *  Version: $Id: p_polys.cc,v 1.12 2000-11-24 16:24:43 Singular Exp $
  *******************************************************************/
 
 #include "mod2.h"
@@ -744,5 +744,24 @@ poly p_ISet(int i, ring r)
       p_DeleteLm(&rc,r);
   }
   return rc;
+}
+
+/*2
+* returns a polynomial representing the number n
+* destroys n
+*/
+poly p_NSet(number n, ring r)
+{
+  if (r->cf->nIsZero(n))
+  {
+    r->cf->nDelete(&n);
+    return NULL;
+  }
+  else
+  {
+    poly rc = p_Init(r);
+    pSetCoeff0(rc,n);
+    return rc;
+  }
 }
 
