@@ -1,15 +1,15 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: feval.m4,v 1.3 1997-11-05 16:26:37 schmidt Exp $ */
+/* $Id: feval.m4,v 1.4 1997-11-21 11:18:08 schmidt Exp $ */
 
 ftestSetNameOfGame( feval, `"
 Usage: feval [<options>] [<envSpec>] <f>
   evaluates canonical form <f>.
   In contrast to the other programs of the Factory Test
   Environment, f may span more than one argument.  More
-  precisely, all arguments are pasted together and are then
-  evaluated as one canonical form.  If there are not any
-  arguments, neither time nor status nor result nor data
-  information is printed.
+  precisely, all arguments are textually pasted together and are
+  then evaluated as one canonical form.  If there are not any
+  arguments (except options), neither time nor status nor result
+  nor data information is printed.
 "'`' )
 dnl // the trailing quotes at the end of the second argument
 dnl // are for font-lock only (another font-lock-trick)
@@ -39,6 +39,14 @@ main ( int argc, char ** argv )
     // initialization
     ftestMainInit();
     check = Passed;
+
+    // print long usage if called with exactly one argument `-?'
+    if ( argc == 2 && strcmp( "-?", argv[1] ) == 0 ) {
+	ftestUsagePrint( "
+Long usage not yet written, sorry.
+" );
+	exit( 0 );
+    }
 
     // declare input and output variables
     ftestOutVar( CanonicalForm, f );
