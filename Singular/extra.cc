@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.171 2001-11-13 14:22:26 Singular Exp $ */
+/* $Id: extra.cc,v 1.172 2002-01-19 14:48:14 obachman Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -640,7 +640,6 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 }
 
 
-
 #ifdef HAVE_EXTENDED_SYSTEM
 // You can put your own system calls here
 #include "fglmcomb.cc"
@@ -651,7 +650,8 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 #include "mpsr.h"
 
 #include "mod_raw.h"
-
+#include "fast_maps.cc"
+   
 static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 {
   if(h->Typ() == STRING_CMD)
@@ -661,6 +661,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 /*==================== locNF ======================================*/
     if(strcmp(sys_cmd,"locNF")==0)
     {
+#if 0
       if (h != NULL && h->Typ() == VECTOR_CMD)
       {
         poly f=(poly)h->Data();
@@ -753,6 +754,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         Warn("1st argument must be a vector!");
       }
       return FALSE;
+#endif
     }
     else
 /*==================== interred ==================================*/
@@ -777,6 +779,25 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     if(strcmp(sys_cmd,"r")==0)
     {
       rDebugPrint((ring)h->Data());
+      return FALSE;
+    }
+    else
+/*==================== ring debug ==================================*/
+    if(strcmp(sys_cmd,"map")==0)
+    {
+      ring image_r = currRing;
+      map theMap = (map)h->Data();
+      ideal image_id = (ideal) theMap;
+      ring map_r = IDRING(idroot->get(theMap->preimage, myynest));
+      ideal map_id = IDIDEAL(map_r->idroot->get(h->Next()->Name(), myynest));
+
+      ring src_r, dest_r;
+      maMap_CreateRings(map_id, map_r, image_id, image_r, src_r, dest_r);
+      mapoly mp;
+      maideal mideal;
+          
+      maMap_CreatePolyIdeal(map_id, map_r, src_r, dest_r, mp, mideal);
+      maPoly_Out(mp, src_r);
       return FALSE;
     }
     else

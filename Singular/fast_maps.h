@@ -7,7 +7,7 @@
  *  Author:  obachman (Olaf Bachmann), hannes (Hannes Schoenemann),
  *           bricken (Michael Brickenstein) 
  *  Created: 01/02
- *  Version: $Id: fast_maps.h,v 1.11 2002-01-19 14:35:17 Singular Exp $
+ *  Version: $Id: fast_maps.h,v 1.12 2002-01-19 14:48:15 obachman Exp $
  *******************************************************************/
 
 /*******************************************************************************
@@ -74,8 +74,11 @@ inline mapoly maMonomial_Free(mapoly monomial, ring src_r, ring dest_r = NULL)
 }
 
 // inserts ("adds") monomial what into poly into
-mapoly maPoly_InsertMonomial(mapoly into, mapoly what, ring src_r);
-mapoly maPoly_InsertMonomial(mapoly into, poly p, ring src_r, sBucket_pt bucket = NULL);
+// returns the maMonomial which was inserted, or, if an equal one was found,
+// the monomial which "swalloed" the monomial
+// It furthermore might reset into
+mapoly maPoly_InsertMonomial(mapoly &into, mapoly what, ring src_r);
+mapoly maPoly_InsertMonomial(mapoly &into, poly p, ring src_r, sBucket_pt bucket = NULL);
 
 // optimizes mpoly for later evaluation
 mapoly maPoly_Optimize(mapoly mpoly, ring src_r);
@@ -87,7 +90,8 @@ void maPoly_Eval(mapoly mpoly, ring src_r, ideal dest_id, ring dest_r);
 void maMap_CreatePolyIdeal(ideal map_id, ring map_r, 
                            ring src_r, ring dest_r,
                            mapoly &mp, maideal &mideal);
-
+// creates src_r: rings with weights
+//         dest_r: where we do our computations
 void maMap_CreateRings(ideal map_id, ring map_r, 
                        ideal image_id, ring image_r, 
                        ring &src_r, ring &dest_r);

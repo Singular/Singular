@@ -7,7 +7,7 @@
  *           currRing
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
- *  Version: $Id: p_polys.h,v 1.20 2001-10-09 16:36:17 Singular Exp $
+ *  Version: $Id: p_polys.h,v 1.21 2002-01-19 14:48:17 obachman Exp $
  *******************************************************************/
 #ifndef P_POLYS_H
 #define P_POLYS_H
@@ -241,11 +241,15 @@ PINLINE2 poly p_Copy(poly p, const ring lmRing, const ring tailRing);
 PINLINE2 void p_Delete(poly *p, const ring r);
 PINLINE2 void p_Delete(poly *p, const ring lmRing, const ring tailRing);
 
-// copys monomials of p, allocates nwe monomials from bin,
+// copys monomials of p, allocates new monomials from bin,
 // deletes monomoals of p
 PINLINE2 poly p_ShallowCopyDelete(poly p, const ring r, omBin bin);
 // simial but does it only for leading monomial
 PINLINE1 poly p_LmShallowCopyDelete(poly p, const ring r, omBin bin);
+// simply deletes monomials, does not free coeffs
+void p_ShallowDelete(poly *p, const ring r);
+
+  
 
 /***************************************************************
  *

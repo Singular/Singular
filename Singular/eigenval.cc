@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: eigenval.cc,v 1.4 2001-03-26 21:15:26 Singular Exp $ */
+/* $Id: eigenval.cc,v 1.5 2002-01-19 14:48:14 obachman Exp $ */
 /*
 * ABSTRACT: eigenvalues of constant square matrices
 */
@@ -197,7 +197,11 @@ lists eigenval(matrix M)
       }
       pDelete(&d1);
       intvec *m0=NULL;
+#ifdef HAVE_FACTORY
       ideal e0=singclap_factorize(d0,&m0,0);
+#else 
+      ideal e0 = NULL;
+#endif
       pDelete(&d0);
       for(int i=IDELEMS(e0)-1;i>=1;i--)
       {

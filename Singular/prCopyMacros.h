@@ -4,7 +4,7 @@
 do                                              \
 {                                               \
   PR_NDELETE(&pGetCoeff(src), r_src);           \
-  omFreeBin(src, r_src->PolyBin);            \
+  p_LmFree(src, r_src);            \
 }                                               \
 while (0)
 #else
@@ -20,12 +20,12 @@ while (0)
 #define PR_INIT_EVECTOR_COPY(r_src, r_dest) ((void)0)
 #define PR_CPY_EVECTOR(dest, dest_r, src, src_r) \
   omMemcpyW(dest->exp, src->exp, dest_r->ExpL_Size)
-#define PR_ALLOC_MONOM(r) omAllocBin(r->PolyBin)
+#define PR_ALLOC_MONOM(r) p_New(r) 
 #else
 #define  PR_INIT_EVECTOR_COPY(r_src, r_dest) int _min = min(r_dest->N, r_src->N)
 #define  PR_CPY_EVECTOR(dest, dest_r, src, src_r) \
   prCopyEvector(dest, dest_r, src, src_r, _min)
-#define PR_ALLOC_MONOM(r) omAlloc0Bin(r->PolyBin)
+#define PR_ALLOC_MONOM(r) p_Init(r) 
 #endif
 
 #undef PR_NCOPY

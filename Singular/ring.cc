@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.174 2002-01-18 16:34:43 Singular Exp $ */
+/* $Id: ring.cc,v 1.175 2002-01-19 14:48:18 obachman Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -2626,12 +2626,54 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
   return res;
 }
 
+// construct Wp,C ring
+ring rModifyRing_Wp(ring r, int* weights)
+{
+  ring res=(ring)omAlloc0Bin(ip_sring_bin);
+  *res = *r;
+  /*weights: entries for 3 blocks: NULL*/
+  res->wvhdl = (int **)omAlloc0(3 * sizeof(int_ptr));
+  /*order: dp,C,0*/
+  res->order = (int *) omAlloc(3 * sizeof(int *));
+  res->block0 = (int *)omAlloc0(3 * sizeof(int *));
+  res->block1 = (int *)omAlloc0(3 * sizeof(int *));
+  /* ringorder dp for the first block: var 1..3 */
+  res->order[0]  = ringorder_Wp;
+  res->block0[0] = 1;
+  res->block1[0] = r->N;
+  res->wvhdl[0] = weights;
+  /* ringorder C for the second block: no vars */
+  res->order[1]  = ringorder_C;
+  /* the last block: everything is 0 */
+  res->order[2]  = 0;
+  /*polynomial ring*/
+  res->OrdSgn    = 1;
+  
+  int tmpref=r->cf->ref;
+  rComplete(res, 1);
+  r->cf->ref=tmpref;
+  
+  return res;
+}
+
+  
 void rKillModifiedRing(ring r)
 {
   rUnComplete(r);
   omFree(r->order);
   omFree(r->block0);
   omFree(r->block1);
+  omFree(r->wvhdl);
+  omFreeBin(r,ip_sring_bin);
+}
+
+void rKillModified_Wp_Ring(ring r)
+{
+  rUnComplete(r);
+  omFree(r->order);
+  omFree(r->block0);
+  omFree(r->block1);
+  omFree(r->wvhdl[0]);
   omFree(r->wvhdl);
   omFreeBin(r,ip_sring_bin);
 }

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.h,v 1.35 2001-10-09 16:36:02 Singular Exp $ */
+/* $Id: ideals.h,v 1.36 2002-01-19 14:48:16 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -19,6 +19,7 @@ ideal idInit (int size, int rank=1);
 /*- deletes an ideal -*/
 #define idDelete(h) id_Delete(h, currRing)
 void id_Delete (ideal* h, ring r);
+void id_ShallowDelete (ideal* h, ring r);
 /* Shows an ideal -- mainly for debugging */
 void idShow(ideal id);
   /*- initialise an ideal -*/
@@ -61,7 +62,8 @@ BOOLEAN idIs0 (ideal h);
 long idRankFreeModule(ideal m, ring lmRing, ring tailRing);
 inline long idRankFreeModule(ideal m, ring r = currRing)
 {return idRankFreeModule(m, r, r);}
-
+// returns TRUE, if idRankFreeModule(m) > 0
+BOOLEAN idIsModule(ideal m, ring r = currRing);
 BOOLEAN idHomIdeal (ideal id, ideal Q=NULL);
 BOOLEAN idHomModule(ideal m, ideal Q,intvec **w);
 

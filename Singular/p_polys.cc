@@ -6,7 +6,7 @@
  *  Purpose: implementation of currRing independent poly procedures
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_polys.cc,v 1.17 2001-08-27 14:47:32 Singular Exp $
+ *  Version: $Id: p_polys.cc,v 1.18 2002-01-19 14:48:17 obachman Exp $
  *******************************************************************/
 
 #include "mod2.h"
@@ -839,3 +839,18 @@ poly p_NSet(number n, ring r)
     return rc;
   }
 }
+
+/***************************************************************
+ *
+ * p_ShallowDelete
+ *
+ ***************************************************************/
+#undef LINKAGE
+#define LINKAGE
+#undef p_Delete
+#define p_Delete p_ShallowDelete
+#undef n_Delete
+#define n_Delete(n, r) ((void)0)
+
+#include "p_Delete__T.cc"
+

@@ -6,7 +6,7 @@
  *  Purpose: implementation of fast maps
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 02/01
- *  Version: $Id: fast_maps.cc,v 1.12 2002-01-19 14:16:53 obachman Exp $
+ *  Version: $Id: fast_maps.cc,v 1.13 2002-01-19 14:48:15 obachman Exp $
  *******************************************************************/
 #include "mod2.h"
 #include <omalloc.h>
@@ -132,7 +132,7 @@ void maMonomial_Destroy(mapoly mp, ring src_r, ring dest_r = NULL)
 **
 *F  maPoly_InsertMonomial . . . . . . . . .insertion of a monomial into mapoly
 */
-mapoly maPoly_InsertMonomial(mapoly into, mapoly what, ring src_r)
+mapoly maPoly_InsertMonomial(mapoly &into, mapoly what, ring src_r)
 {
   if (into == NULL)
   {
@@ -151,7 +151,7 @@ mapoly maPoly_InsertMonomial(mapoly into, mapoly what, ring src_r)
   if (iter->next == NULL)
   {
     iter->next = what;
-    return into;
+    return what;
   }
   prev = iter;
   iter = iter->next;
@@ -160,12 +160,13 @@ mapoly maPoly_InsertMonomial(mapoly into, mapoly what, ring src_r)
   Smaller:
   if (prev == NULL)
   {
+    into = what;
     what->next = iter;
     return what;
   }
   prev->next = what;
   what->next = iter;
-  return into;
+  return what;
   
   Equal:
   iter->ref += what->ref;
@@ -178,25 +179,24 @@ mapoly maPoly_InsertMonomial(mapoly into, mapoly what, ring src_r)
     what->coeff = NULL;
   }
   maMonomial_Free(what, src_r);
-  return into;
+  return iter;
 }
 
-mapoly maPoly_InsertMonomial(mapoly into, poly p, ring src_r, sBucket_pt bucket = NULL)
+mapoly maPoly_InsertMonomial(mapoly &into, poly p, ring src_r, sBucket_pt bucket = NULL)
 {
   return maPoly_InsertMonomial(into, maMonomial_Create(p, src_r, bucket), src_r);
 }
 
-static mapoly maPoly_InsertPoly(mapoly into, poly what, ring src_r, sBucket_pt bucket)
+static void maPoly_InsertPoly(mapoly &into, poly what, ring src_r, sBucket_pt bucket)
 {
   poly next;
   
   while (what != NULL)
   {
     next = what->next;
-    into = maPoly_InsertMonomial(into, what, src_r, bucket);
+    maPoly_InsertMonomial(into, what, src_r, bucket);
     what = next;
   }
-  return into;
 }
 
 void maMap_CreatePolyIdeal(ideal map_id, ring map_r, ring src_r, ring dest_r,
@@ -213,10 +213,10 @@ void maMap_CreatePolyIdeal(ideal map_id, ring map_r, ring src_r, ring dest_r,
     if (map_id->m[i] != NULL)
     {
       mideal->buckets[i] = sBucketCreate(dest_r);
-      mp = maPoly_InsertPoly(mp, 
-                             prShallowCopyR_NoSort(map_id->m[i], map_r, src_r),
-                             src_r,                     
-                             mideal->buckets[i]);
+      maPoly_InsertPoly(mp, 
+                        prShallowCopyR_NoSort(map_id->m[i], map_r, src_r),
+                        src_r,                     
+                        mideal->buckets[i]);
     }
   }
 }

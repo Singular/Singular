@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.125 2001-09-25 15:43:44 Singular Exp $ */
+/* $Id: ideals.cc,v 1.126 2002-01-19 14:48:16 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -109,6 +109,29 @@ void id_Delete (ideal * h, ring r)
     do
     {
       p_Delete(&((*h)->m[--j]), r);
+    }
+    while (j>0);
+    omFreeSize((ADDRESS)((*h)->m),sizeof(poly)*elems);
+  }
+  omFreeBin((ADDRESS)*h, sip_sideal_bin);
+  *h=NULL;
+}
+
+
+/*2
+* Shallowdeletes an ideal/matrix
+*/
+void id_ShallowDelete (ideal *h, ring r)
+{
+  int j,elems;
+  if (*h == NULL)
+    return;
+  elems=j=(*h)->nrows*(*h)->ncols;
+  if (j>0)
+  {
+    do
+    {
+      p_ShallowDelete(&((*h)->m[--j]), r);
     }
     while (j>0);
     omFreeSize((ADDRESS)((*h)->m),sizeof(poly)*elems);
@@ -622,6 +645,20 @@ long idRankFreeModule (ideal s, ring lmRing, ring tailRing)
   return -1;
 }
 
+BOOLEAN idIsModule(ideal id, ring r)
+{
+  if (id != NULL && rRing_has_Comp(r))
+  {
+    int j, l = IDELEMS(id);
+    for (j=0; j<l; j++)
+    {
+      if (id->m[j] != NULL && p_GetComp(id->m[j], r) > 0) return TRUE;
+    }
+  }
+  return FALSE;
+}
+
+    
 /*2
 *returns true if id is homogenous with respect to the aktual weights
 */
