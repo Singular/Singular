@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.116 1999-05-25 07:35:35 krueger Exp $
+@comment $Id: general.doc,v 1.117 1999-06-21 17:38:19 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -1425,6 +1425,7 @@ This feature is referred to as name substitution.
 @c example
 @end example
 
+@ifset namespaces
 Names are grouped into namespaces (= packages) @xref{Namespaces}.
 Defined variables cannot interfere with names in other
 packages. 
@@ -1438,6 +1439,7 @@ packages.
   listvar(all);
 @c example
 @end example
+@end ifset
 
 @c ------------------------------------------------------------
 @node Objects, Type conversion and casting, Names, The SINGULAR language

@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.81 1999-05-25 07:35:42 krueger Exp $
+@comment $Id: types.doc,v 1.82 1999-06-21 17:39:32 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -2523,7 +2523,12 @@ of leading terms (see @ref{vdim})
 @c @end example
 
 @c ---------------------------------------
+@ifset namespaces
 @node number, package, module, Data types
+@end ifset
+@ifclear namespaces
+@node number, package, module, Data types
+@end ifclear
 @section number
 @cindex number
 
@@ -2697,6 +2702,7 @@ string form of ring parameter (see @ref{parstr})
 @end table
 
 @c ---------------------------------------
+@ifset namespaces
 @node package, poly, number, Data types
 @section package
 @cindex package
@@ -2765,9 +2771,15 @@ defines a package
 @code{system("nspush",}package @code{)}
 (see @ref{system})
 @end table
+@end ifset
 
 @c ---------------------------------------
+@ifset namespaces
 @node poly, proc, package, Data types
+@end ifset
+@ifclear namespaces
+@node poly, proc, number, Data types
+@end ifclear
 @section poly
 @cindex poly
 
