@@ -72,9 +72,10 @@ class reduction_accumulator{
   
 };
 struct formal_sum_descriptor{
-  number c_my;
+ 
   number c_ac;
   reduction_accumulator* ac;
+  formal_sum_descriptor* next;
 };
 struct int_pair_node{
   int_pair_node* next;
@@ -113,7 +114,8 @@ struct calc_dat
 class red_object{
  public:
   kBucket_pt bucket;
-  poly p;
+  poly lt;
+  // number coef;
   formal_sum_descriptor* sum;
   unsigned long sev;
   void flatten();
@@ -122,6 +124,7 @@ class red_object{
   int guess_quality(calc_dat* c);
   int clear_to_poly();
   void canonicalize();
+  void execute_addition(formal_sum_descriptor* s);
 };
 
 
@@ -195,7 +198,7 @@ class simple_reducer:public reduction_step{
   ~simple_reducer();
 
   virtual void target_is_a_sum_reduce(red_object & ro);
-  virtual void target_is_no_sum_reduce(red_object & ro);
+  virtual void target_lt_lies_in_privat(red_object & ro);
 };
 class join_simple_reducer:public simple_reducer{
  public:
@@ -206,7 +209,7 @@ class join_simple_reducer:public simple_reducer{
   }
     ~join_simple_reducer();
    void pre_reduce(red_object* r, int l, int u);
-  void target_is_no_sum_reduce(red_object & ro);
+  void target_lt_lies_in_privat(red_object & ro);
   reduction_accumulator* ac;
 };
 //class sum_canceling_reducer:public reduction_step {
