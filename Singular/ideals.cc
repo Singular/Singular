@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.18 1998-02-19 12:45:38 siebert Exp $ */
+/* $Id: ideals.cc,v 1.19 1998-02-24 09:52:22 siebert Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -2234,6 +2234,7 @@ static void idRecMin(matrix a,int ar,poly *barDiv,ideal result,
         }
       }
     }
+    idTest(result);
     idDelete((ideal*)&a);
     return;
   }
@@ -2241,6 +2242,13 @@ static void idRecMin(matrix a,int ar,poly *barDiv,ideal result,
   p = pCopy(*barDiv);   //we had to store barDiv for the remaining loops
   pp = pCopy(p);   //we had to store barDiv for the remaining loops
   matrix nextStep = mpOneStepBareiss(a,barDiv,&r,&c);
+//Print("next row is: %d, next col: %d\n",r,c);
+/*--- there is no pivot - the matrix is zero -------------*/
+  if (r*c==0)
+  {
+    idDelete((ideal*)&a);
+    return;
+  }
 /*--- we read out the r-1 x c-1 matrix for the next step--*/
   if ((a->nrows-1)*(a->ncols-1)>0)
   {
@@ -2259,7 +2267,6 @@ static void idRecMin(matrix a,int ar,poly *barDiv,ideal result,
     next = NULL;
   }
 /*--- now we have to take out the r-th row...------------*/
-//Print("back for rows on Level: %d\n",ar);
   if (((a->nrows)>1) && (rowToChose==0))
   {
     nextStep = mpNew(a->nrows-1,a->ncols);
@@ -2282,7 +2289,6 @@ static void idRecMin(matrix a,int ar,poly *barDiv,ideal result,
     nextStep = NULL;
   }
 /*--- now we have to take out the c-th col...------------*/
-//Print("back for cols on Level: %d\n",ar);
   if ((a->nrows)>1)
   {
     nextStep = mpNew(a->nrows,a->ncols-1);
@@ -2302,8 +2308,8 @@ static void idRecMin(matrix a,int ar,poly *barDiv,ideal result,
         MATELEM(a,i,j) = NULL;
       }
     }
-    idDelete((ideal*)&a);
 /*--- and to perform the algorithm with the rest---------*/
+    idDelete((ideal*)&a);
     idRecMin(nextStep,ar,&p,result,nextPlace,r);
     nextStep = NULL;
   }
@@ -2328,6 +2334,7 @@ ideal idMinors(matrix a, int ar)
   int i=0;
   poly barDiv=NULL;
   ideal result=idInit(16,0);
+  idTest(result);
 
   idRecMin(mpCopy(a),ar-1,&barDiv,result,&i);
   idSkipZeroes(result);
