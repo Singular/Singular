@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.35 1998-12-01 17:23:32 Singular Exp $ */
+/* $Id: polys.cc,v 1.36 1998-12-02 08:41:56 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -848,7 +848,7 @@ int pWDegree(poly p)
     j+=pGetExp(p,i)*pWeight(i);
   return j;
 }
-#if 0
+
 /* ---------------------------------------------------------------------*/
 /* several possibilities for pLDeg: the maximal degree of a monomial in p*/
 /*  compute in l also the pLength of p                                   */
