@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: start.doc,v 1.41 1999-07-28 14:46:21 anne Exp $
+@comment $Id: start.doc,v 1.42 1999-08-10 16:23:23 Singular Exp $
 @comment this file contains the "Introduction" chapter.
 @c * wichmann: + added changes by GMG.
 
@@ -92,12 +92,13 @@ and @sc{Singular} was ported to Unix, MS-DOS, Windows NT, and MacOS.
 
 Continuous extensions (like polynomial factorization, gcd computations,
 links) and refinements led in 1997 to the release of @sc{Singular}
-version 1.0.
+version 1.0 and in 1998 to the release of version 1.2
+(much faster standard and Groebner bases computations based on Hilbert series
+and on improved implementations of the algorithms,
+libraries for primary decomposition, ring normalization, etc.)
 
-The highlights of the new @sc{Singular} version 1.2. include: much
-faster standard and Groebner bases computations based on Hilbert series
-and on improved implementations of the algorithms and the addition of
-libraries for primary decomposition, ring normalization, etc.
+For the highlights of the new @sc{Singular} version 1.4 see ...
+(TBC)
 
 @c Thus, we hope to offer a useful system
 @c for dealing with local and global computational aspects
