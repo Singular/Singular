@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: standard.lib,v 1.62 2001-11-14 17:15:19 greuel Exp $";
+version="$Id: standard.lib,v 1.63 2003-06-16 15:43:23 Singular Exp $";
 category="Miscellaneous";
 info="
 LIBRARY: standard.lib   Procedures which are always loaded at Start-up
@@ -291,9 +291,9 @@ EXAMPLE: example groebner;  shows an example"
     p_opt = 1;
   }
   if (find(s_opt, "mem"))
-  {
-    option(mem);
-  }
+  { option(mem); }
+  if (find(s_opt, "intStrategy"))
+  { option(intStrategy); }
 
   // construct ring in which first std computation is done
   string varstr_P = varstr(P);
