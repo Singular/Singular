@@ -1,6 +1,6 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.18 1998-08-05 20:42:58 wichmann Exp $
+;; $Id: singular.el,v 1.19 1998-08-06 12:24:46 wichmann Exp $
 
 ;;; Commentary:
 
@@ -327,7 +327,6 @@ NOT READY [should be rewritten completely.  Interface should stay the same.]!"
     (cond
      ;; XEmacs
      ((eq singular-emacs-flavor 'xemacs)
-      (message "installing main-menu")
       (add-submenu nil 
 		   '("Singular"
 		     ["start default" singular-other t]
@@ -419,9 +418,19 @@ WHERE= 'at-point --> whatever is at point"
      ((eq where 'at-point)
       (setq which (list (singular-section-at (point)))))
      ((eq where 'all)
-      (setq which (singular-section-in (point-min) (point-max))))
+      (setq which (singular-section-in (point-min) (point-max)))
+
+      ;; just use the output sections:
+      (let (newwhich)
+	(while which
+	  (if (eq (singular-section-type (car which)) 'output)
+	      (setq newwhich (append (list (car which)) newwhich)))
+	  (setq which (cdr which)))
+	(setq which newwhich)))
+
      (t 
-      (message "singular-do-folding: wrong argument")))
+      (singular-debug 'interactive
+		      (message "singular-do-folding: wrong argument"))))
     (while which
       (let* ((current (car which))
 	    (is-folded (singular-section-foldedp current)))
@@ -737,7 +746,7 @@ Updates `singular-simple-sec-last-end', too."
 (defun singular-emacs-simple-sec-start-at (pos)
   "Return start of clear section at position POS.
 Assumes that no narrowing is in effect."
-  (let ((previous-overlay-change (1+ (point))))
+  (let ((previous-overlay-change (1+ pos)))
     ;; this `while' loop at last will run into the end of the next
     ;; non-clear overlay or stop at bob.  Since POS may be right at the end
     ;; of a previous non-clear location, we have to search at least one
@@ -751,7 +760,7 @@ Assumes that no narrowing is in effect."
 (defun singular-emacs-simple-sec-end-at (pos)
   "Return end of clear section at position POS.
 Assumes that no narrowing is in effect."
-  (let ((next-overlay-change (next-overlay-change (point))))
+  (let ((next-overlay-change (next-overlay-change pos)))
     ;; this `while' loop at last will run into the beginning of the next
     ;; non-clear overlay or stop at eob.  Since POS may not be at the
     ;; beginning of a non-clear simple section we may start searching
@@ -858,9 +867,9 @@ Updates `singular-simple-sec-last-end', too."
 Assumes that no narrowing is in effect."
   ;; if previous-extent-change is called with an argument bigger
   ;; than (1+ (buffer-size))  (not (point-max)!), we get an error!
-  (let ((previous-extent-change (if (> (point) (buffer-size))
-				    (point)
-				  (1+ (point)))))
+  (let ((previous-extent-change (if (> pos (buffer-size))
+				    pos
+				  (1+ pos))))
     ;; this `while' loop at last will run into the end of the next
     ;; non-clear extent or stop at bob.  Since POS may be right at the end
     ;; of a previous non-clear location, we have to search at least one
@@ -874,7 +883,7 @@ Assumes that no narrowing is in effect."
 (defun singular-xemacs-simple-sec-end-at (pos)
   "Return end of clear section at position POS.
 Assumes that no narrowing is in effect."
-  (let ((next-extent-change (next-extent-change (point))))
+  (let ((next-extent-change (next-extent-change pos)))
     ;; this `while' loop at last will run into the beginning of the next
     ;; non-clear extent or stop at eob.  Since POS may not be at the
     ;; beginning of a non-clear simple section we may start searching
@@ -910,8 +919,44 @@ A simple section intersects the region if the section and the region
 have at least one character in common.
 The result contains both clear and non-clear simple sections in the
 order they appear in the region."
-  ;; NOT READY
-  nil)
+  ;; NOT READY [order of sections???]
+  (let ((extent-list))
+    (map-extents 
+     (function (lambda (ext arg)
+
+		 ;; if start of first extent is not point-min, insert
+		 ;; a clear-simple-sec first:
+		 (or extent-list 
+		     (= (extent-start-position ext) (point-min))
+		     (setq extent-list (append (list nil) extent-list)))
+
+		 ;; if end of previous simple-sec is not equal start of
+		 ;; current simple-sec than we have to insert a
+		 ;; clear-simple-sec first:
+		 (and (car extent-list)
+		      (not (= (extent-end-position (car extent-list))
+			      (extent-start-position ext)))
+		      (setq extent-list (append (list nil) extent-list)))
+
+		 ;; finally insert this non-clear simple-sec:
+		 (setq extent-list (append (list ext) extent-list))
+		 nil))
+     (current-buffer) beg end nil nil 'singular-type)
+
+    ;; if extent-list is still nil at this point, then no non-clear
+    ;; simple-sec intersects with region (BEG END). 
+    ;; Then insert a clear simple-sec:
+    (or extent-list
+	(setq extent-list '(nil)))
+
+    ;; if last inserted simple-sec is non-clear and its end is smaller
+    ;; than END, then insert another clear simple sec:
+    (and (car extent-list)
+	 (<= (extent-end-position (car extent-list)) end)
+	 (setq extent-list (append (list nil) extent-list)))
+
+    ;; we set up the list in decreasing order, so reverse the list
+    (reverse extent-list)))
 ;;}}}
 
 ;;{{{ Section stuff
@@ -960,6 +1005,31 @@ previous section instead of the current one.
 Returns section intersected with current restriction if RESTRICTED is
 non-nil."
   (singular-section-at (max 1 (1- pos)) restricted))
+
+(defun singular-section-in (reg-beg reg-end)
+  "NOT READY [docu]"
+  (let ((simple-secs (singular-simple-sec-in reg-beg reg-end))
+	sections current last-end 
+	type beg end)
+    (save-restriction
+      (widen)
+      (while simple-secs
+	(setq current (car simple-secs))
+	(setq type (singular-simple-sec-type current))
+	(if current
+	    ;; current is a non-clear simple-sec
+	    (setq beg (singular-simple-sec-start current)
+		  end (singular-simple-sec-end current)
+		  last-end end)
+	  ;; current is a clear simple-sec
+	  (setq beg (singular-simple-sec-start-at (or last-end
+							(point-min)))
+		end (singular-simple-sec-end-at (or last-end
+						    (point-min)))))
+        ;; NOT READY [RESTRICTED]
+	(setq sections (append sections (list (vector current type beg end))))
+	(setq simple-secs (cdr simple-secs))))
+    sections))
 
 (defmacro singular-section-simple-sec (section)
   "Return underlying simple section of SECTION."
