@@ -6,9 +6,8 @@
 			  README file for Factory
 			  =======================
 
-NOTE: The copyright state of Factory is still unclear.  Sooner or later it
-will be free software, but by now please do *not* distribute the sources.
-
+NOTE: The copyright state of Singular-factory is described in the
+      file COPYRIGHT
 
 Overview
 ========
@@ -113,7 +112,7 @@ too.
 ===============
   The latest version of Factory is always available by anonymous ftp from
 
-		www.mathematik.uni-kl.de:/pub/Math/Factory
+		www.mathematik.uni-kl.de:/pub/Math/Singular/Factory
 
 The Factory distribution consists of three archives:
 
