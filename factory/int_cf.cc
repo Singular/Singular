@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_cf.cc,v 1.7 1997-10-10 10:33:01 schmidt Exp $ */
+/* $Id: int_cf.cc,v 1.8 1997-10-10 10:49:53 schmidt Exp $ */
 
 #include <config.h>
 
@@ -58,15 +58,15 @@ InternalCF::taildegree ()
 }
 //}}}
 
-//{{{ InternalCF* InternalCF::num (), den ()
+//{{{ InternalCF * InternalCF::num (), den ()
 // docu: see CanonicalForm::num(), den()
-InternalCF*
+InternalCF *
 InternalCF::num ()
 {
     return copyObject();
 }
 
-InternalCF*
+InternalCF *
 InternalCF::den ()
 {
     return CFFactory::basic( 1 );
@@ -83,9 +83,9 @@ InternalCF::sign () const
 }
 //}}}
 
-//{{{ InternalCF* InternalCF::sqrt ()
+//{{{ InternalCF * InternalCF::sqrt ()
 // docu: see CanonicalForm::sqrt()
-InternalCF*
+InternalCF *
 InternalCF::sqrt ()
 {
     ASSERT1( 0, "fatal error: not implemented for class %s", this->classname() );
