@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftest_io.cc,v 1.5 1997-10-01 16:33:41 schmidt Exp $ */
+/* $Id: ftest_io.cc,v 1.6 1997-10-08 09:17:34 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -139,6 +139,7 @@ ftestPrintResult ( const char * resultName, const CanonicalForm & result )
     if ( ftestPrintResultFlag ) {
 	ftestPrint( "result: %s\n", "@@%s\n", resultName );
 	cout << result << endl;
+	ftestPrint( (char *)0, "@@\n" );
     } else if ( ! ftestPrintFlag )
 	cout << result << endl;
 }
@@ -156,6 +157,7 @@ ftestPrintResult ( const char * resultName, const int result )
     if ( ftestPrintResultFlag ) {
 	ftestPrint( "result: %s\n", "@@%s\n", resultName );
 	cout << result << endl;
+	ftestPrint( (char *)0, "@@\n" );
     } else if ( ! ftestPrintFlag )
 	cout << result << endl;
 }
