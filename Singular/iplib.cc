@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.43 1998-11-19 16:19:54 krueger Exp $ */
+/* $Id: iplib.cc,v 1.44 1998-12-09 11:20:54 krueger Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -48,6 +48,8 @@ extern char *yylp_errlist[];
 void print_init();
 libstackv library_stack;
 #endif
+
+char mytolower(char c);
 
 
 /*2
@@ -418,7 +420,8 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
 #endif
   switch (pi->language)
   {
-    case LANG_NONE:
+      default:
+      case LANG_NONE:
                  err=TRUE;
                  break;
 
@@ -588,6 +591,61 @@ BOOLEAN iiEStart(char* example, procinfo *pi)
 }
 
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+static BOOLEAN iiLoadLIB(FILE *fp, char *libnamebuf,
+                         idhdl pl, BOOLEAN autoexport, BOOLEAN tellerror);
+
+BOOLEAN iiTryLoadLib(leftv v, char *id)
+{
+  BOOLEAN LoadResult = TRUE;
+#ifdef HAVE_NAMESPACES
+  char libnamebuf[128];
+  char *libname = (char *)AllocL(strlen(id)+5);
+  char *suffix[] = { "", ".lib", ".so", ".sl", NULL };
+  int i = 0;
+  FILE *fp;
+  package pack;
+  idhdl packhdl;
+  lib_types LT;
+
+  for(i=0; suffix[i] != NULL; i++) {
+    sprintf(libname, "%s%s", id, suffix[i]);
+    *libname = mytolower(*libname);
+    Print("Trying to load '%s'\n", libname);
+    if((LT = type_of_LIB(libname, libnamebuf)) != LT_NONE) {
+      Print("    Found lib'%s'\n", libnamebuf);
+      if(!(LoadResult = iiLibCmd(mstrdup(libname), FALSE))) {
+        v->name = iiConvName(libname);
+        break;
+      }
+    }
+  }
+#else /* HAVE_NAMESPACES */
+#endif /* HAVE_NAMESPACES */
+  FreeL(libname);
+  return LoadResult;
+}
+
+BOOLEAN iiReLoadLib(idhdl packhdl)
+{
+  BOOLEAN LoadResult = TRUE;
+#ifdef HAVE_NAMESPACES
+  char libnamebuf[128];
+  package pack = IDPACKAGE(packhdl);
+  
+  FILE * fp = feFopen( pack->libname, "r", libnamebuf, FALSE);
+  if (fp==NULL)
+  {
+    return TRUE;
+  }
+  namespaceroot->push(IDPACKAGE(packhdl), IDID(packhdl));
+  LoadResult = iiLoadLIB(fp, libnamebuf, packhdl, FALSE, FALSE);
+  namespaceroot->pop();
+#else /* HAVE_NAMESPACES */
+#endif /* HAVE_NAMESPACES */
+  return LoadResult;
+}
+
+/*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 #ifdef HAVE_NAMESPACES
 BOOLEAN iiLibCmd( char *newlib, BOOLEAN autoexport, BOOLEAN tellerror )
 #else /* HAVE_NAMESPACES */
@@ -597,6 +655,7 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
   char buf[256];
   char libnamebuf[128];
   idhdl h,hl;
+  BOOLEAN LoadResult = TRUE;
 #ifdef HAVE_NAMESPACES
   idhdl pl;
 #endif /* HAVE_NAMESPACES */
@@ -612,7 +671,7 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
     return TRUE;
   }
 #ifdef HAVE_NAMESPACES
-  int token;
+  int token = 0;
 
   if(IsCmd(plib, &token))
   {
@@ -701,9 +760,30 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
     }
   }
   namespaceroot->push(IDPACKAGE(pl), IDID(pl));
+  LoadResult = iiLoadLIB(fp, libnamebuf, pl, autoexport, tellerror);
+#else /* HAVE_NAMESPACES */
+  LoadResult = iiLoadLIB(fp, libnamebuf, NULL, FALSE, tellerror);
+#endif /* HAVE_NAMESPACES */
+  
+#ifdef HAVE_NAMESPACES
+  if(!LoadResult) IDPACKAGE(pl)->loaded = TRUE;
+  close(fp);
+  namespaceroot->pop();
 #endif /* HAVE_NAMESPACES */
 
-#ifdef HAVE_LIBPARSER
+  FreeL((ADDRESS)newlib);
+#ifdef HAVE_NAMESPACES
+   FreeL((ADDRESS)plib);
+#endif /* HAVE_LIBPARSER */
+  return LoadResult;
+}
+
+/*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+static BOOLEAN iiLoadLIB(FILE *fp, char *libnamebuf,
+             idhdl pl, BOOLEAN autoexport, BOOLEAN tellerror)
+{
+  char buf[256];
+  char *newlib = IDPACKAGE(pl)->libname;
   extern FILE *yylpin;
   libstackv ls_start = library_stack;
   lib_style_types lib_style;
@@ -734,9 +814,6 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
     reinit_yylp();
     fclose( yylpin );
     FreeL((ADDRESS)newlib);
-# ifdef HAVE_NAMESPACES
-    FreeL((ADDRESS)plib);
-# endif /* HAVE_NAMESPACES */
     return TRUE;
   }
   if (BVERBOSE(V_LOAD_LIB)) Print( "// ** loaded %s %s\n", libnamebuf,
@@ -779,172 +856,9 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
     PrintS("--------------------\n");
 #endif
   }
-#else /* HAVE_LIBPARSER */
-  // processing head section
-  if (fgets( buf, sizeof(buf), fp))
-  {
-    if (BVERBOSE(V_LOAD_LIB))
-    {
-      if (strncmp( buf, "// $Id", 5) == 0)
-      {
-        char ver[10];
-        char date[16];
-        ver[0]='?'; ver[1]='.'; ver[2]='?'; ver[3]='\0';
-        date[0]='?'; date[1]='\0';
-        sscanf(buf,"// %*s %*s %10s %16s",ver,date);
-        strcat(libnamebuf,"(");
-        strcat(libnamebuf,ver);
-        strcat(libnamebuf,",");
-        strcat(libnamebuf,date);
-        strcat(libnamebuf,")");
-      }
-      else
-      {
-        strcat(libnamebuf,"(**unknown version**)");
-      }
-      Warn( "loading %s", libnamebuf );
-    }
-  }
-
-  #define IN_HEADER 1
-  #define IN_BODY   2
-  #define IN_EXAMPLE      3
-  #define IN_EXAMPLE_BODY 4
-  #define IN_LIB_HEADER   5
-  int v=-1,otherLines=0,inBlock=IN_LIB_HEADER;
-  do /*while (fgets( buf, sizeof(buf), fp))*/
-  {
-    int  offset;
-    if (buf[0]!='\n')
-    {
-      if ((inBlock==0)||(inBlock==IN_LIB_HEADER))
-      {
-        if (strncmp( buf, "LIB ", 4) == 0)
-        {
-          char *s=buf+5;
-          char *f=strchr(s,'"');
-          if (f!=NULL)
-            *f='\0';
-          else
-            return TRUE;
-          // if (BVERBOSE(V_LOAD_LIB)) Print("// requires %s",s);
-          f=strstr(IDSTRING(hl),s);
-          if (f == NULL)
-          {
-            // if (BVERBOSE(V_LOAD_LIB)) PrintLn();
-            iiLibCmd(mstrdup(s));
-            // if (BVERBOSE(V_LOAD_LIB)) Print( "// loading %s\n", newlib);
-          }
-          //else if (BVERBOSE(V_LOAD_LIB)) PrintS(" -> already loaded\n");
-        }
-        else if (strncmp( buf, "proc ", 5) == 0)
-        {
-          char proc[256];
-          char ct1, *e;
-          sscanf( buf, "proc %s", proc);
-          offset = 2;
-          char *ct=strchr(proc,'(');
-          if (ct!=NULL) { *ct='\0'; offset=3; }
-          sprintf( buf, "LIB:%s", newlib);
-#if 0
-          if(strcmp(proc, "_init")==0)
-          {
-            char *p =  iiConvName(newlib);
-            Print("Init found:%s;\n", p);
-#ifdef HAVE_NAMESPACES
-             h = enterid( mstrdup(p), myynest, PROC_CMD, IDPACKAGE(pl), FALSE );
-#else /* HAVE_NAMESPACES */
-             h = enterid( mstrdup(p), myynest, PROC_CMD, &idroot, FALSE );
-#endif /* HAVE_NAMESPACES */
-            FreeL((ADDRESS)p);
-          }
-          else
-#endif
-#ifdef HAVE_NAMESPACES
-            h = enterid(mstrdup(proc), myynest, PROC_CMD,
-                      &IDPACKAGE(pl)->idroot, FALSE);
-#else /* HAVE_NAMESPACES */
-            h = enterid( mstrdup(proc), myynest, PROC_CMD, &idroot, FALSE);
-#endif /* HAVE_NAMESPACES */
-          if (h!=NULL)
-          {
-            iiInitSingularProcinfo(IDPROC(h),newlib,proc,lines,pos);
-            if (BVERBOSE(V_LOAD_PROC)) Warn( "     proc %s loaded", proc );
-          }
-          inBlock=IN_HEADER;
-        }
-        else if (strncmp( buf, "// ver:", 7) == 0)
-        {
-          v=0;
-          sscanf( buf+7, "%d", &v);
-          if(v!=(SINGULAR_VERSION/100))
-            Warn("version mismatch - library `%s` requires:%d.%d",
-                  newlib,v/1000,(v%1000)/100);
-        }
-        else if (strncmp( buf, "example", 7) == 0)
-        {
-          IDPROC(h)->data.s.example_start = pos;
-          IDPROC(h)->data.s.example_lineno = lines;
-          inBlock=IN_EXAMPLE;
-        }
-        else if (strncmp( buf, "//", 2) != 0)
-        {
-          if (inBlock==0)
-          {
-            otherLines++;
-          }
-        }
-      }
-      else if ((inBlock==IN_HEADER) || (inBlock==IN_EXAMPLE))
-      {
-        if (buf[0]=='{')
-        {
-          if(inBlock==IN_HEADER)
-          {
-            IDPROC(h)->data.s.body_start = pos;
-            IDPROC(h)->data.s.body_lineno = lines-offset;
-            // Print("%s: %d-%d\n", pi->procname, lines, offset);
-          }
-          inBlock=IN_BODY;
-        }
-      }
-      else if ((inBlock==IN_BODY) || (inBlock==IN_EXAMPLE_BODY))
-      {
-        if (buf[0]=='}')
-        {
-          if(IDPROC(h)->data.s.example_start==0)
-            IDPROC(h)->data.s.example_start=pos;
-          if(IDPROC(h)->data.s.body_end==0) IDPROC(h)->data.s.body_end=pos;
-          IDPROC(h)->data.s.proc_end = pos;
-          inBlock=0;
-        }
-      }
-    }
-    lines++;
-    pos = ftell(fp);
-  } while (fgets( buf, sizeof(buf), fp));
-  fclose( fp );
-#ifdef HAVE_NAMESPACES
-  namespaceroot->pop();
-#endif /* HAVE_NAMESPACES */
-
-  //if (h!=NULL) IDPROC(h) = pi;
-  if (BVERBOSE(V_DEBUG_LIB))
-  {
-    if (inBlock!=0)
-      Warn("LIB `%s` ends within block",newlib);
-    if (otherLines!=0)
-      Warn("%d lines not recognised in LIB `%s`",otherLines,newlib);
-    if(v==-1)
-      Warn("LIB `%s` has no version flag",newlib);
-  }
-#endif /* HAVE_LIBPARSER */
-  FreeL((ADDRESS)newlib);
-#ifdef HAVE_NAMESPACES
-   FreeL((ADDRESS)plib);
-#endif /* HAVE_LIBPARSER */
   return FALSE;
 }
+
 
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 procinfo *iiInitSingularProcinfo(procinfov pi, char *libname, char *procname,
@@ -1071,6 +985,12 @@ BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN tellerror)
 char mytoupper(char c)
 {
   if(c>=97 && c<=(97+26)) c-=32;
+  return(c);
+}
+
+char mytolower(char c)
+{
+  if(c>=65 && c<=(65+26)) c+=32;
   return(c);
 }
 
