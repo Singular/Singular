@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.28 1998-05-18 14:52:31 wichmann Exp $
+@comment $Id: singular.doc,v 1.29 1998-05-18 15:19:44 Singular Exp $
 @comment this file contains the main structure of the manual
 @c ------------------------
 @comment %**start of header
@@ -526,7 +526,6 @@ have the same name(s) as ring variables
 * deform_lib:: procedures for computing miniversal deformation
 * homolog_lib:: procedures for homological algebra
 * poly_lib:: procedures for manipulating polynomials and ideals
-* factor_lib:: procedures for calling external factorizer (UNIX)
 * ring_lib:: procedures for manipulating rings and maps
 * finvar_lib:: procedures to calculate invariant rings & more
 * primdec_lib:: procedures for primary decomposition
@@ -595,17 +594,17 @@ see @ref{stdhilb}.
 @cindex homolog_lib
 @c lib homolog.lib
 @c ----------------------------------------------------------
-@node poly_lib,factor_lib,homolog_lib, SINGULAR libraries
+@node poly_lib,ring_lib,homolog_lib, SINGULAR libraries
 @section poly_lib
 @cindex poly_lib
 @c lib poly.lib
 @c ----------------------------------------------------------
-@node factor_lib,ring_lib,poly_lib, SINGULAR libraries
-@section factor_lib
-@cindex factor_lib
-@c lib factor.lib
+@c @node factor_lib,ring_lib,poly_lib, SINGULAR libraries
+@c @section factor_lib
+@c @cindex factor_lib
+@c @c lib factor.lib
 @c ----------------------------------------------------------
-@node ring_lib,finvar_lib,factor_lib, SINGULAR libraries
+@node ring_lib,finvar_lib,poly_lib, SINGULAR libraries
 @section ring_lib
 @cindex ring_lib
 @c lib ring.lib
