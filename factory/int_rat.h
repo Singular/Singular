@@ -1,11 +1,14 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: int_rat.h,v 1.2 1997-04-15 09:18:30 schmidt Exp $
+// $Id: int_rat.h,v 1.3 1997-05-14 15:35:02 schmidt Exp $
 
 #ifndef INCL_INTERNALRATIONAL_H
 #define INCL_INTERNALRATIONAL_H
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.2  1997/04/15 09:18:30  schmidt
+#include <config.h> added
+
 Revision 1.1  1997/03/27 10:11:36  schmidt
 stream-io wrapped by NOSTREAMIO
 
@@ -101,10 +104,6 @@ public:
     friend MP_INT gmp_numerator ( const CanonicalForm & f );
     friend MP_INT gmp_denominator ( const CanonicalForm & f );
 #endif /* SINGULAR */
-#ifdef MULTIPROTOCOL
-    friend MP_INT gmp_numerator_mp ( const CanonicalForm & f );
-    friend MP_INT gmp_denominator_mp ( const CanonicalForm & f );
-#endif /* MULTIPROTOCOL */
     friend CanonicalForm make_cf ( const MP_INT & n, const MP_INT & d );
 };
 
