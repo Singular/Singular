@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.18 1998-04-22 09:14:07 krueger Exp $ */
+/* $Id: iplib.cc,v 1.19 1998-04-22 10:37:44 krueger Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -22,6 +22,10 @@
 #include "lists.h"
 #ifdef HAVE_LIBPARSER
 #  include "libparse.h"
+#else /* HAVE_LIBPARSER */
+   procinfo *iiInitSingularProcinfo(procinfov pi, char *libname,
+				    char *procname, int line, long pos,
+				    BOOLEAN pstatic = FALSE);
 #endif /* HAVE_LIBPARSER */
 
 char *iiConvName(char *p);

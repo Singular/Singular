@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.l,v 1.8 1998-04-22 08:40:55 krueger Exp $ */
+/* $Id: libparse.l,v 1.9 1998-04-22 10:37:46 krueger Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -24,7 +24,7 @@
 #include "libparse.h"
 
 #ifdef HAVE_LIBPARSER
-#define YY_SKIP_YYWRAP
+#  define YY_SKIP_YYWRAP
 
 typedef enum { LP_NONE, LP_INFO, LP_VERSION} lib_cmds;
 
@@ -68,25 +68,25 @@ char *yylp_errlist[]= {
 };
 int yylp_errno = 0;
 
-#define YYLP_ERR_NONE    0
-#define YYLP_DEF_BR2     1
-#define YYLP_BODY_BR2    2
-#define YYLP_BODY_BR3    3
-#define YYLP_BODY_TMBR2  4
-#define YYLP_BODY_TMBR3  5
-#define YYLP_EX_BR2      6
-#define YYLP_EX_BR3      7
-#define YYLP_BAD_CHAR    8
-#define YYLP_MISSQUOT    9
-#define YYLP_MISS_BR1   10
-#define YYLP_MISS_BR2   11
-#define YYLP_MISS_BR3   12
+#  define YYLP_ERR_NONE    0
+#  define YYLP_DEF_BR2     1
+#  define YYLP_BODY_BR2    2
+#  define YYLP_BODY_BR3    3
+#  define YYLP_BODY_TMBR2  4
+#  define YYLP_BODY_TMBR3  5
+#  define YYLP_EX_BR2      6
+#  define YYLP_EX_BR3      7
+#  define YYLP_BAD_CHAR    8
+#  define YYLP_MISSQUOT    9
+#  define YYLP_MISS_BR1   10
+#  define YYLP_MISS_BR2   11
+#  define YYLP_MISS_BR3   12
 
-#ifdef __MWERKS__
-#ifdef __cplusplus
+#  ifdef __MWERKS__
+#    ifdef __cplusplus
 extern "C" {
-#endif
-#ifdef macintosh
+#    endif
+#    ifdef macintosh
 int    fileno(FILE *stream);
 FILE   *fdopen(int filedes, char *type);
 long   ftell(FILE *fp);
@@ -98,73 +98,73 @@ FILE   *_fdopen(int filedes, char *type);
 long   _ftell(FILE *fp);
 long   _tell(int filedes);
 int    _isatty(int filedes);
-#define fileno  _fileno
-#define fdopen  _fdopen
-#define ftell    _ftell
-#define tell    _tell
-#define isatty  _isatty
-#endif /* macintosh */
-#ifdef __cplusplus
+#      define fileno  _fileno
+#      define fdopen  _fdopen
+#      define ftell    _ftell
+#      define tell    _tell
+#      define isatty  _isatty
+#    endif /* macintosh */
+#    ifdef __cplusplus
 }
-#endif
-#endif
+#    endif
+#  endif
 
-#ifdef STANDALONE_PARSER
+#  ifdef STANDALONE_PARSER
 procinfov pi;
 printpi(procinfov pi);
 pi_clear(procinfov pi);
 extern "C" {
   int yylpwrap();
 }
-#else /* STANDALONE_PARSER */
+#  else /* STANDALONE_PARSER */
 idhdl h0;
-#  define pi IDPROC(h0)
+#    define pi IDPROC(h0)
 extern "C"
 {
   int yylpwrap();
 }
 extern libstackv library_stack;
-#endif /* STANDALONE_PARSER */
+#  endif /* STANDALONE_PARSER */
 
-#define SET_DEF_END(mode, pi, p) \
-   if ( mode == LOAD_LIB) pi->data.s.def_end = p;
-#define SET_HELP_START(mode, pi, p) \
-   if ( mode == LOAD_LIB) pi->data.s.help_start = p; \
+#  define SET_DEF_END(mode, pi, p) \
+     if ( mode == LOAD_LIB) pi->data.s.def_end = p;
+#  define SET_HELP_START(mode, pi, p) \
+     if ( mode == LOAD_LIB) pi->data.s.help_start = p; \
 
-#define SET_BODY_START(mode, pi, l, p) \
-   if ( mode == LOAD_LIB) { \
-     pi->data.s.body_lineno = l; \
-     pi->data.s.body_start = p; \
-   }
-#define SET_BODY_END(mode, pi, p) \
-   if ( mode == LOAD_LIB) { \
-     pi->data.s.body_end = p-1; \
-     pi->data.s.proc_end = p-1; \
-   }
+#  define SET_BODY_START(mode, pi, l, p) \
+     if ( mode == LOAD_LIB) { \
+       pi->data.s.body_lineno = l; \
+       pi->data.s.body_start = p; \
+     }
+#  define SET_BODY_END(mode, pi, p) \
+     if ( mode == LOAD_LIB) { \
+       pi->data.s.body_end = p-1; \
+       pi->data.s.proc_end = p-1; \
+     }
 
-#define SET_EXAMPLE_START(mode, pi, l, p) \
-   if ( mode == LOAD_LIB) { \
-     pi->data.s.example_lineno = l; \
-     pi->data.s.example_start = p; \
-   }
-#define SET_PROC_END(mode, pi, p) \
-   if ( mode == LOAD_LIB) { \
-     pi->data.s.proc_end = p-1; \
-     if(pi->data.s.body_end==0) pi->data.s.body_end = p-1; \
-   }
+#  define SET_EXAMPLE_START(mode, pi, l, p) \
+     if ( mode == LOAD_LIB) { \
+       pi->data.s.example_lineno = l; \
+       pi->data.s.example_start = p; \
+     }
+#  define SET_PROC_END(mode, pi, p) \
+     if ( mode == LOAD_LIB) { \
+       pi->data.s.proc_end = p-1; \
+       if(pi->data.s.body_end==0) pi->data.s.body_end = p-1; \
+     }
 
-  #undef YY_DECL
-  #define YY_DECL int yylex(char *newlib, char *libfile, \
+#  undef YY_DECL
+#  define YY_DECL int yylex(char *newlib, char *libfile, \
 				 lib_style_types *lib_style, \
 				 lp_modes mode)
 
-  #undef YY_INPUT
-  #define YY_INPUT(buf,result,max_size) \
+#  undef YY_INPUT
+#  define YY_INPUT(buf,result,max_size) \
           if ( ((result = libread( (yyin), (char *) buf, max_size )) < 0 ) \
 		  && ferror( yyin ) ) \
 		YY_FATAL_ERROR( "read in flex scanner failed" );
 
-  #define YY_USER_INIT { \
+#  define YY_USER_INIT { \
        BEGIN(header); \
        yylplineno = 1; \
        yylp_errno = 0; \
@@ -172,13 +172,13 @@ extern libstackv library_stack;
        strcpy(libnamebuf,"(**unknown version**)"); \
      }
 
-#if 0
+#  if 0
 <pbody>proc[ \t]+{name}  { 
                            printf("MISSING: PROC-cmd found. ERROR!\n"); }
 <pbody>example[ \t]*\n   { 
                            yylplineno++;
                            printf("MISSING: EXAMPLE-cmd found. ERROR!\n"); }
-#endif
+#  endif
 %}
 
 digit          [0-9]
@@ -623,7 +623,7 @@ void make_version(char *p,int what)
 
 void copy_string(lp_modes mode)
 {
-#ifndef STANDALONE_PARSER
+#  ifndef STANDALONE_PARSER
   if((last_cmd == LP_INFO)&&(mode == GET_INFO)) {
     long current_location = ftell(yylpin);
     int len = (int)(current_pos(0) - string_start);
@@ -632,7 +632,7 @@ void copy_string(lp_modes mode)
     fread(text_buffer, len, 1, yylpin);
     fseek(yylpin, current_location, SEEK_SET);
   }
-#endif /* STANDALONE_PARSER */
+#  endif /* STANDALONE_PARSER */
 }
 
 void print_init()
@@ -642,17 +642,17 @@ void print_init()
 
 void print_version(lp_modes mode, char *p)
 {
-#ifdef STANDALONE_PARSER
+#  ifdef STANDALONE_PARSER
   //printf("loading %s%s", p, libnamebuf);
-#else
+#  else
   if ( mode == LOAD_LIB ) {
     if (BVERBOSE(V_LOAD_LIB) && p!=NULL ) Print(" %s...", p);
        //Warn( "loading %s%s", p, libnamebuf);
   }
-#endif
+#  endif
 }
 
-#ifdef STANDALONE_PARSER
+#  ifdef STANDALONE_PARSER
 main( int argc, char *argv[] )
 {
   lib_style_types lib_style;
@@ -674,5 +674,5 @@ main( int argc, char *argv[] )
   else if(pi!=NULL) printpi(pi);
 }
 
-#endif /* STANDALONE_PARSER */
+#  endif /* STANDALONE_PARSER */
 #endif /* HAVE_LIBPARSE */

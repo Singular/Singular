@@ -402,11 +402,14 @@ void singular_help(char *str,BOOLEAN example)
 		PrintS(buf);
 	      }
 	  }
-      } else {
+      }
+#ifdef HAVE_LIBPARSER
+      else {
 	fclose( yylpin );
 	PrintS(text_buffer);
 	FreeL(text_buffer);
       }
+#endif /* HAVE_LIBPARSER */
     }
   /* --------- everything else is for the manual ----------------*/
     else
