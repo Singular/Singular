@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: scanner.l,v 1.14 1998-12-14 14:27:43 Singular Exp $ */
+/* $Id: scanner.l,v 1.15 1999-03-19 17:42:33 obachman Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -280,7 +280,7 @@ newline                  {
                            #endif
                            #ifdef MDEBUG
                              #ifdef MLIST
-                             mmTestList();
+                             mmTestList(0);
                              #endif
                            #endif
                            m2_end(0);

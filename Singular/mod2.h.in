@@ -332,8 +332,6 @@ extern int pShortOut;
 #undef PAGE_DEBUG
 #endif
 
-/* define MTRACK for allowing to keep track of Alloc/Free with a backtrace */
-/* #define MTRACK */
 
 
 /* define PDEBUG checking polys, undefine otherwise */
@@ -349,6 +347,8 @@ extern int pShortOut;
 #define TEST
 /* define MLIST for printing block of used memory on exit */
 #define MLIST 1
+/* define MTRACK for allowing to keep track of Alloc/Free with a backtrace */
+/* #define MTRACK */
 
 /* #define PAGE_TEST */
 

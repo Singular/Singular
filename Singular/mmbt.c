@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmbt.c,v 1.7 1999-03-19 16:00:05 Singular Exp $ */
+/* $Id: mmbt.c,v 1.8 1999-03-19 17:42:28 obachman Exp $ */
 /*
 * ABSTRACT: backtrace: part of memory subsystem (for linux/elf)
 * needed programs: - mprpc to set the variable MPRPC
@@ -100,8 +100,11 @@ void mmP2cNameInit()
   {
     j=fscanf(f,"%d %s\n",(int *)&p2n[i].p,n);
     if (j!=2) break;
-    p2n[i].name=strdup(n);
-    i++;
+    if (strcmp(n, "___crt_dummy__") != 0 && strcmp(n, "_start") != 0)
+    {
+      p2n[i].name=strdup(n);
+      i++;
+    }
   }
   fclose(f);
   unlink("nm.log");
@@ -111,11 +114,11 @@ void mmP2cNameInit()
 }
 char * mmP2cName(unsigned long p)
 {
+  int i, e;
   int a=0;
-  int e=mm_p2n_max;
-  int i;
   if (mm_p2n_max == -1)
     mmP2cNameInit();
+  e=mm_p2n_max;
   loop
   {
     if (a>=e-1) 
@@ -147,19 +150,41 @@ char * mmP2cName(unsigned long p)
 #endif
 }
 
-void mmPrintStack(unsigned long *bt_stack) /* print stack */
+void mmPrintStack(unsigned long *stack, int all)
 {
-  int i=0;
+  mmPrintStackFrames(stack, 0, BT_MAXSTACK, all);
+}
+
+void mmDBPrintStack(void* memblock, int all)
+{
+  mmPrintStackFrames(((DBMCB*) memblock)->bt_stack, 0, BT_MAXSTACK, all);
+}
+
+void mmDBPrintStackFrames(void* memblock, int start, int end)
+{
+  mmPrintStackFrames(((DBMCB*) memblock)->bt_stack, start, end, 
+                     MM_PRINT_ALL_STACK);
+}
+
+/* print stack */
+void mmPrintStackFrames(unsigned long *bt_stack, int start, int end, int mm) 
+{
+  int i=start;
   PrintS(" ");
   do
   {
     char *s;
-    fprintf( stderr,":%x",bt_stack[i]);
     s=mmP2cName(bt_stack[i]); 
     if (s!=NULL)
-      fprintf( stderr,"/%s",s);
+    {
+      if ((mm & MM_PRINT_ALL_STACK) || strncmp(s, "mm", 2) !=0)
+        fprintf( stderr,":%s",s);
+      if (strcmp(s, "main") == 0) break;
+    }
+    else
+      fprintf( stderr,":%x",bt_stack[i]);
     i++;
-  } while ((i<BT_MAXSTACK) && (bt_stack[i]!=0));
+  } while ((i<end) && (bt_stack[i]!=0));
   fprintf( stderr,"\n");
 }
 #endif /* linux, i386 */

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.57 1998-10-30 17:13:32 Singular Exp $ */
+/* $Id: tesths.cc,v 1.58 1999-03-19 17:42:33 obachman Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -530,6 +530,7 @@ int main(          /* main entry to Singular */
     verbose=vv;
   }
   errorreported = 0;
+  mmMarkInitDBMCB();
 #ifndef macintosh
 #if defined(HAVE_READLINE)
   fe_set_input_mode();

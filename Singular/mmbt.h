@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmbt.h,v 1.2 1999-03-19 16:00:05 Singular Exp $ */
+/* $Id: mmbt.h,v 1.3 1999-03-19 17:42:29 obachman Exp $ */
 /*
 * ABSTRACT: backtrace: part of memory subsystem (for linux/elf)
 * needed programs: - mprpc to set the variable MPRPC
@@ -25,7 +25,10 @@ void mmTrack (unsigned long *bt_stack); /* store the current stack into bt_stack
 
 void mmP2cNameInit(); /* init. of PC -> Name resolution */
 char * mmP2cName(unsigned long p); /* PC -> Name resolution */
-void mmPrintStack(unsigned long *bt_stack); /* print stack */
+void mmPrintStack(unsigned long *stack, int mm);
+void mmDBPrintStack(void* memblock, int mm);
+void mmDBPrintStackFrames(void* memblock, int start, int end);
+void mmPrintStackFrames(unsigned long *bt_stack, int start, int end, int mm); 
 
 #endif /* linux, i386 */
 #endif /* not optimize */

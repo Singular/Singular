@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmalloc.c,v 1.13 1999-03-19 16:00:04 Singular Exp $ */
+/* $Id: mmalloc.c,v 1.14 1999-03-19 17:42:27 obachman Exp $ */
 
 /*
 * ABSTRACT:
@@ -226,6 +226,10 @@ static void mmDBFreeHeapS(void* addr, memHeap heap, size_t size,
   mmMoveDBMCB( &mm_theDBused, &mm_theDBfree, what );
   mmFillDBMCB(what, SizeFromRealSize(mmGetHeapBlockSize(heap)),
               heap, MM_FREEFLAG, fname, lineno);
+
+#ifdef MTRACK
+  mmTrack(what->bt_stack);
+#endif  
 }
 
 void * mmDBAllocHeap(memHeap heap, char* f, int l)

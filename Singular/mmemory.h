@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmemory.h,v 1.16 1999-03-19 14:18:01 obachman Exp $ */
+/* $Id: mmemory.h,v 1.17 1999-03-19 17:42:30 obachman Exp $ */
 /*
 * ABSTRACT
 */
@@ -116,6 +116,8 @@ int mmTestMemory();
 int mmTestHeaps();
 
 void mmPrintUsedList();
+void mmMarkInitDBMCB();
+void mmTestList (int all);
 
 #else
 
@@ -127,6 +129,8 @@ void mmPrintUsedList();
 #define mmTestLP(A)
 #define mmTestMemory 1
 #define mmTestHeaps 1
+#define mmMarkInitDBMCB()
+#define mmTestList(a) 
 
 #endif /* MDEBUG */
 

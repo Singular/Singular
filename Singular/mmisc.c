@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmisc.c,v 1.4 1999-03-19 16:00:07 Singular Exp $ */
+/* $Id: mmisc.c,v 1.5 1999-03-19 17:42:31 obachman Exp $ */
 
 /*
 * ABSTRACT:
@@ -139,19 +139,22 @@ void mmPrintStat()
 #endif
 
 #ifdef MLIST
-void mmTestList ( )
+void mmTestList (int all)
 {
   DBMCB * what=mm_theDBused.next;
   fprintf(stderr,"list of used blocks:\n");
   while (what!=NULL)
   {
-    fprintf( stderr, "%d bytes at %p in: %s:%d",
-      (int)what->size, what, what->fname, what->lineno);
+    if ((all & MM_PRINT_ALL_ADDR) || what->init == 0)
+    {
+      fprintf( stderr, "%d bytes at %p in: %s:%d",
+               (int)what->size, what, what->fname, what->lineno);
 #ifdef MTRACK
-    mmPrintStack(what->bt_stack);
+      mmDBPrintStack(what, all);
 #else
-    fprintf( stderr, "\n");
+      fprintf( stderr, "\n");
 #endif
+    }
     what=what->next;
   }
 }

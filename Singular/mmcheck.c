@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmcheck.c,v 1.5 1999-03-19 16:00:06 Singular Exp $ */
+/* $Id: mmcheck.c,v 1.6 1999-03-19 17:42:29 obachman Exp $ */
 
 /*
 * ABSTRACT:
@@ -115,8 +115,15 @@ void mmDBInitNewHeapPage(memHeap heap)
 static int mmPrintDBMCB ( DBMCB * what, char* msg , int given_size)
 {
   (void)fprintf( stderr, "warning: %s\n", msg );
-  (void)fprintf( stderr, "block %x allocated in: %s:%d\n",
-     (int)&(what->data), what->fname, what->lineno );
+  (void)fprintf( stderr, "block %x %s in: %s:%d",
+                 (int)&(what->data), 
+                 (what->flags & MM_FREEFLAG ? "freed" : "allocated" ),
+                 what->fname, what->lineno );
+#ifdef MTRACK
+  mmDBPrintStack(what, MM_PRINT_ALL_STACK);
+#else
+  fprintf( stderr,"\n");
+#endif  
   if (strcmp(msg,"size")==0)
     (void)fprintf( stderr, "size is: %d, but check said %d \n",
       (int)what->size, given_size );
@@ -164,12 +171,23 @@ void mmFillDBMCB(DBMCB* what, size_t size, memHeap heap,
   what->fname = fname;
   what->lineno = lineno;
   what->flags = flags;
+  what->init = 0;
   
   if (flags & MM_FREEFLAG)
     memset(addr, MM_FREE_PATTERN, size);
 
   memset(what->front_pattern, MM_FRONT_PATTERN, MM_NUMBER_OF_FRONT_PATTERNS);
   memset((char*) addr + size, MM_BACK_PATTERN, DebugOffsetBack);
+}
+
+void mmMarkInitDBMCB()
+{
+  DBMCB * what=mm_theDBused.next;
+  while (what != NULL)
+  {
+    what->init = 1;
+    what = what->next;
+  }
 }
 
 /**********************************************************************
