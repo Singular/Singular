@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.60 2000-11-14 16:04:55 obachman Exp $ */
+/* $Id: kstd2.cc,v 1.61 2000-11-16 09:54:50 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -137,9 +137,9 @@ static int redHomog (LObject* h,kStrategy strat)
 #endif
     if (h->GetLmTailRing() == NULL)
     {
-      if (h->lcm!=NULL) pLmFree((*h).lcm);
+      if (h->lcm!=NULL) pLmFree(h->lcm);
 #ifdef KDEBUG
-      (*h).lcm=NULL;
+      h->lcm=NULL;
 #endif
       return 0;
     }
@@ -157,7 +157,8 @@ static int redLazy (LObject* h,kStrategy strat)
   int at,d,i;
   int j = 0;
   int pass = 0;
-  int reddeg = h->pFDeg();
+  assume(h->pFDeg() == h->FDeg);
+  int reddeg = h->FDeg;
 
   h->SetShortExpVector();
   while (1)
@@ -188,14 +189,14 @@ static int redLazy (LObject* h,kStrategy strat)
     
     if (h->GetLmTailRing() == NULL)
     {
-      if (h->lcm!=NULL) pLmFree((*h).lcm);
+      if (h->lcm!=NULL) pLmFree(h->lcm);
 #ifdef KDEBUG
-      (*h).lcm=NULL;
+      h->lcm=NULL;
 #endif
       return 0;
     }
     h->SetShortExpVector();
-    d = h->pFDeg();
+    d = h->SetpFDeg();
     /*- try to reduce the s-polynomial -*/
     pass++;
     if ((strat->Ll >= 0) && ((d > reddeg) || (pass > strat->LazyPass)))
@@ -231,13 +232,14 @@ static int redLazy (LObject* h,kStrategy strat)
 static int redHoney (LObject* h, kStrategy strat)
 {
   if (strat->tl<0) return 1;
+  assume(h->FDeg == h->pFDeg());
 
-  poly pi, h_p;
+  poly h_p;
   int i,j,at,reddeg,d,pass,ei, ii, h_d;
   unsigned long not_sev;
 
   pass = j = 0;
-  d = reddeg = h->pFDeg() + h->ecart;
+  d = reddeg = h->FDeg + h->ecart;
   h->SetShortExpVector();
   h_p = h->GetLmTailRing();
   not_sev = ~ h->sev;
@@ -246,7 +248,6 @@ static int redHoney (LObject* h, kStrategy strat)
     j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h);
     if (j < 0) return 1;
 
-    pi = strat->T[j].p;
     ei = strat->T[j].ecart;
     ii = j;
     /*
@@ -260,7 +261,7 @@ static int redHoney (LObject* h, kStrategy strat)
       i++;
       if (i > strat->tl)
         break;
-      if (ei <= (*h).ecart)
+      if (ei <= h->ecart)
         break;
       if ((strat->T[i].ecart < ei) && 
           p_LmShortDivisibleBy(strat->T[i].GetLmTailRing(), strat->sevT[i], 
@@ -269,7 +270,6 @@ static int redHoney (LObject* h, kStrategy strat)
         /*
          * the polynomial to reduce with is now;
          */
-        pi = strat->T[i].p;
         ei = strat->T[i].ecart;
         ii = i;
       }
@@ -278,7 +278,7 @@ static int redHoney (LObject* h, kStrategy strat)
     /*
      * end of search: have to reduce with pi
      */
-    if ((pass!=0) && (ei > (*h).ecart))
+    if ((pass!=0) && (ei > h->ecart))
     {
       h->SetLmCurrRing();
       /*
@@ -328,20 +328,20 @@ static int redHoney (LObject* h, kStrategy strat)
     h_p = h->GetLmTailRing();
     if (h_p == NULL)
     {
-      if (h->lcm!=NULL) pLmFree((*h).lcm);
+      if (h->lcm!=NULL) pLmFree(h->lcm);
 #ifdef KDEBUG
-      (*h).lcm=NULL;
+      h->lcm=NULL;
 #endif
       return 0;
     }
     h->SetShortExpVector();
     not_sev = ~ h->sev;
-    h_d = h->pFDeg();
+    h_d = h->SetpFDeg();
     /* compute the ecart */
-    if (ei <= (*h).ecart)
-      (*h).ecart = d-h_d;
+    if (ei <= h->ecart)
+      h->ecart = d-h_d;
     else
-      (*h).ecart = d-h_d+ei-(*h).ecart;
+      h->ecart = d-h_d+ei-h->ecart;
     /*
      * try to reduce the s-polynomial h
      *test first whether h should go to the lazyset L
@@ -349,7 +349,7 @@ static int redHoney (LObject* h, kStrategy strat)
      *-if the number of pre-defined reductions jumps
      */
     pass++;
-    d = h_d +(*h).ecart;
+    d = h_d + h->ecart;
     if ((strat->Ll >= 0) && ((d > reddeg) || (pass > strat->LazyPass)))
     {
       h->SetLmCurrRing();

@@ -6,7 +6,7 @@
  *  Purpose: implementation of std related inline routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: kInline.cc,v 1.15 2000-11-14 16:04:53 obachman Exp $
+ *  Version: $Id: kInline.cc,v 1.16 2000-11-16 09:54:49 obachman Exp $
  *******************************************************************/
 #ifndef KINLINE_CC
 #define KINLINE_CC
@@ -180,6 +180,8 @@ KINLINE void sTObject::Clear()
   ecart = 0;
   length = 0;
   pLength = 0;
+  FDeg = 0;
+  is_normalized = FALSE;
 }
 
 KINLINE void sTObject::Copy()
@@ -350,16 +352,25 @@ KINLINE long sTObject::pFDeg() const
   if (p != NULL) return ::pFDeg(p, currRing);
   return tailRing->pFDeg(t_p, tailRing);
 }
-
+KINLINE long sTObject::SetpFDeg()
+{
+  FDeg = this->pFDeg();
+  return FDeg;
+}
+KINLINE long sTObject::GetpFDeg() const
+{
+  assume(FDeg == this->pFDeg());
+  return FDeg;
+}
 KINLINE long sTObject::pLDeg()
 {
   return ::pLDeg(GetLmTailRing(), &length, tailRing);
 }
-
-KINLINE long sTObject::SetLengthEcartReturnLDeg()
+KINLINE long sTObject::SetDegStuffReturnLDeg()
 {
+  FDeg = this->pFDeg();
   long d = this->pLDeg();
-  ecart = d - this->pFDeg();
+  ecart = d - FDeg;
   return d;
 }
 
@@ -377,9 +388,13 @@ KINLINE void  sTObject::pCleardenom()
 KINLINE void  sTObject::pNorm()
 {
   assume(p != NULL);
-  ::pNorm(p);
-  if (t_p != NULL)
-    pSetCoeff0(t_p, pGetCoeff(p));
+  if (! is_normalized)
+  {
+    ::pNorm(p);
+    if (t_p != NULL)
+      pSetCoeff0(t_p, pGetCoeff(p));
+    is_normalized = TRUE;
+  }
 }
   
 
@@ -536,6 +551,50 @@ KINLINE void sLObject::SetShortExpVector()
   {
     sev = p_GetShortExpVector(p, currRing);
   }
+}
+
+KINLINE long sLObject::pLDeg()
+{
+  poly tp = GetLmTailRing();
+  assume(tp != NULL);
+  if (bucket != NULL)
+  {
+    int i = kBucketCanonicalize(bucket);
+    pNext(tp) = bucket->buckets[i];
+    long ldeg = ::pLDeg(tp, &length, tailRing);
+    pNext(tp) = NULL;
+    return ldeg;
+  }
+  else
+    return ::pLDeg(tp, &length, tailRing);
+}
+KINLINE long sLObject::SetDegStuffReturnLDeg()
+{
+  FDeg = this->pFDeg();
+  long d = this->pLDeg();
+  ecart = d - FDeg;
+  return d;
+}
+KINLINE long sLObject::SetLength()
+{
+  // this can be improved
+  this->pLDeg();
+  return length;
+}
+KINLINE long sLObject::MinComp()
+{
+  poly tp = GetLmTailRing();
+  assume(tp != NULL);
+  if (bucket != NULL)
+  {
+    int i = kBucketCanonicalize(bucket);
+    pNext(tp) = bucket->buckets[i];
+    long m = p_MinComp(tp, tailRing);
+    pNext(tp) = NULL;
+    return m;
+  }
+  else
+    return p_MinComp(tp, tailRing);
 }
 
 KINLINE sLObject& sLObject::operator=(const sTObject& t)

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.43 2000-11-14 16:04:57 obachman Exp $ */
+/* $Id: kutil.h,v 1.44 2000-11-16 09:54:52 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -38,11 +38,15 @@ class sTObject
 {
 public:
   poly p;       // Lm(p) \in currRing Tail(p) \in tailRing
-  poly t_p;     // t_p \in tailRing
+  poly t_p;     // t_p \in tailRing: as monomials Lm(t_p) == Lm(p)
   ring tailRing;
-  int ecart, length, pLength, i_r;
-  poly max; // p_MaxExp(pNext(p))
-  
+  poly max;     // p_MaxExpP(pNext(p))
+  long FDeg;    // pFDeg(p)
+  int ecart, 
+    length,     // as of pLDeg
+    pLength,    // either == 0, or == pLength(p)
+    i_r;        // index of TObject in R set
+  BOOLEAN is_normalized; // true, if pNoram was called on p, false otherwise
 
   // initialization
   KINLINE void Init(ring r = currRing);
@@ -80,9 +84,17 @@ public:
   KINLINE void LmDeleteAndIter();
 
   // deg stuff
+  // computes pFDeg
   KINLINE long pFDeg() const;
+  // computes and sets FDeg
+  KINLINE long SetpFDeg();
+  // gets stored FDeg
+  KINLINE long GetpFDeg() const;
+  
+  // computes pLDeg
   KINLINE long pLDeg();
-  KINLINE long SetLengthEcartReturnLDeg();
+  // sets length, FDeg, returns LDeg
+  KINLINE long SetDegStuffReturnLDeg();
   
   // arithmetic
   KINLINE void Mult_nn(number n);
@@ -96,7 +108,6 @@ public:
 #ifdef KDEBUG
   void wrp();
 #endif
-  
 };
 
 class sLObject : public sTObject
@@ -128,6 +139,12 @@ public:
   KINLINE void Tail_Mult_nn(number n);
   KINLINE poly GetP(omBin lmBin = NULL);
   KINLINE void CanonicalizeP();
+  
+  KINLINE long pLDeg();
+  KINLINE long SetLength();
+  KINLINE long SetDegStuffReturnLDeg();
+
+  KINLINE long MinComp();
 
   KINLINE void ShallowCopyDelete(ring new_tailRing,  
                                  pShallowCopyDeleteProc p_shallow_copy_delete);

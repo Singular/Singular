@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.77 2000-11-14 16:04:56 obachman Exp $ */
+/* $Id: kutil.cc,v 1.78 2000-11-16 09:54:51 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -140,7 +140,7 @@ void cancelunit (LObject* L)
         p_Delete(&pNext(p), r);
         L->ecart = 0;
         L->length = 1;
-        L->pLength = 1;
+        L->pLength = 1; // let pLength be determined dynamically
         if (L->t_p != NULL && pNext(L->t_p) != NULL)
           pNext(L->t_p) = NULL;
         if (L->p != NULL && pNext(L->p) != NULL)
@@ -462,8 +462,25 @@ BOOLEAN kTest_T(TObject * T, ring strat_tailRing, int i, char TN)
   if (T->pLength != 0 &&
       T->pLength != pLength(p))
   {
-    return dReportError("%c[%d] length error: has %d, specified to have %d",
+    return dReportError("%c[%d] pLength error: has %d, specified to have %d",
                         TN, i , pLength(p), T->pLength);
+  }
+
+  // check FDeg,  for elements in L and T
+  if (i >= 0 && (TN == 'T' || TN == 'L'))
+  {
+    // FDeg has ir element from T of L set
+    if (T->FDeg  != T->pFDeg())
+      return dReportError("%c[%d] FDeg error: has %d, specified to have %d",
+                          TN, i , T->pFDeg(), T->FDeg);
+  }
+
+  // check is_normalized for elements in T
+  if (i >= 0 && TN == 'T')
+  {
+    if (T->is_normalized && ! nIsOne(pGetCoeff(p)))
+      return dReportError("T[%d] is_normalized error", i);
+
   }
   return TRUE;
 }
@@ -482,13 +499,11 @@ BOOLEAN kTest_L(LObject *L, ring strat_tailRing,
     ring r;
     poly p;
     L->GetLm(p, r);
-#if 0
     if (L->sev != 0 && p_GetShortExpVector(p, r) != L->sev)
     {
       return dReportError("L[%d] wrong sev: has %o, specified to have %o",
                           lpos, p_GetShortExpVector(p, r), L->sev);
     }
-#endif
   }
   r_assume(L->max == NULL);
   if (L->p1 == NULL)
@@ -734,7 +749,8 @@ inline void clearS (poly p, unsigned long p_sev, int* at, int* k,
 void enterL (LSet *set,int *length, int *LSetmax, LObject p,int at)
 {
   int i;
-
+  // this should be corrected
+  p.FDeg = p.pFDeg();
   if ((*length)>=0)
   {
     if ((*length) == (*LSetmax)-1) enlargeL(set,LSetmax,setmax);
@@ -751,40 +767,30 @@ void enterL (LSet *set,int *length, int *LSetmax, LObject p,int at)
 */
 void initEcartNormal (LObject* h)
 {
-  poly h_p = h->GetLmTailRing();
-  if (h->bucket != NULL)
-  {
-    assume(pNext(h_p) == NULL);
-    int i = kBucketCanonicalize(h->bucket);
-    pNext(h_p) = h->bucket->buckets[i];
-  }
-  h->ecart = pLDeg(h_p,&(h->length), h->tailRing)-pFDeg(h_p, h->tailRing);
-  if (h->bucket != NULL) pNext(h_p) = NULL;
+  h->FDeg = h->pFDeg();
+  h->ecart = h->pLDeg() - h->FDeg;
 }
 
 void initEcartBBA (LObject* h)
 {
+  h->FDeg = h->pFDeg();
   (*h).ecart = 0;
-//#ifdef KDEBUG
   (*h).length = 0;
-//#endif
 }
 
 void initEcartPairBba (LObject* Lp,poly f,poly g,int ecartF,int ecartG)
 {
-//#ifdef KDEBUG
+  Lp->FDeg = Lp->pFDeg();
   (*Lp).ecart = 0;
   (*Lp).length = 0;
-//#endif
 }
 
 void initEcartPairMora (LObject* Lp,poly f,poly g,int ecartF,int ecartG)
 {
+  Lp->FDeg = Lp->pFDeg();
   (*Lp).ecart = max(ecartF,ecartG);
-  (*Lp).ecart = (*Lp).ecart-(pFDeg((*Lp).p)-pFDeg((*Lp).lcm));
-//#ifdef KDEBUG
+  (*Lp).ecart = (*Lp).ecart- (Lp->FDeg -pFDeg((*Lp).lcm));
   (*Lp).length = 0;
-//#endif
 }
 
 /*2
@@ -1645,7 +1651,7 @@ int posInT11 (const TSet set,const int length,const LObject &p)
   if (length==-1) return 0;
 
   int o = pFDeg(p.p);
-  int op = pFDeg(set[length].p);
+  int op = set[length].GetpFDeg();
 
   if ((op < o)
   || ((op == o) && (pLmCmp(set[length].p,p.p) != pOrdSgn)))
@@ -1659,14 +1665,14 @@ int posInT11 (const TSet set,const int length,const LObject &p)
   {
     if (an >= en-1)
     {
-      op= pFDeg(set[an].p);
+      op= set[an].GetpFDeg();
       if ((op > o)
       || (( op == o) && (pLmCmp(set[an].p,p.p) == pOrdSgn)))
         return an;
       return en;
     }
     i=(an+en) / 2;
-    op = pFDeg(set[i].p);
+    op = set[i].GetpFDeg();
     if (( op > o)
     || (( op == o) && (pLmCmp(set[i].p,p.p) == pOrdSgn)))
       en=i;
@@ -1685,7 +1691,7 @@ int posInT110 (const TSet set,const int length,const LObject &p)
   if (length==-1) return 0;
 
   int o = pFDeg(p.p);
-  int op = pFDeg(set[length].p);
+  int op = set[length].GetpFDeg();
 
   if (( op < o)
   || (( op == o) && (set[length].length<p.length))
@@ -1700,7 +1706,7 @@ int posInT110 (const TSet set,const int length,const LObject &p)
   {
     if (an >= en-1)
     {
-      op = pFDeg(set[an].p);
+      op = set[an].GetpFDeg();
       if (( op > o)
       || (( op == o) && (set[an].length > p.length))
       || (( op == o) && (set[an].length == p.length)
@@ -1709,7 +1715,7 @@ int posInT110 (const TSet set,const int length,const LObject &p)
       return en;
     }
     i=(an+en) / 2;
-    op = pFDeg(set[i].p);
+    op = set[i].GetpFDeg();
     if (( op > o)
     || (( op == o) && (set[i].length > p.length))
     || (( op == o) && (set[i].length == p.length)
@@ -1731,7 +1737,7 @@ int posInT13 (const TSet set,const int length,const LObject &p)
 
   int o = pFDeg(p.p);
 
-  if (pFDeg(set[length].p) <= o)
+  if (set[length].GetpFDeg() <= o)
     return length+1;
 
   int i;
@@ -1741,12 +1747,12 @@ int posInT13 (const TSet set,const int length,const LObject &p)
   {
     if (an >= en-1)
     {
-      if (pFDeg(set[an].p) > o)
+      if (set[an].GetpFDeg() > o)
         return an;
       return en;
     }
     i=(an+en) / 2;
-    if (pFDeg(set[i].p) > o)
+    if (set[i].GetpFDeg() > o)
       en=i;
     else
       an=i;
@@ -1766,8 +1772,8 @@ int posInT15 (const TSet set,const int length,const LObject &p)
  * o = pFDeg(p.p)+p.ecart;
  * loop
  * {
- *   if ((pFDeg(set[j].p)+set[j].ecart > o)
- *   || ((pFDeg(set[j].p)+set[j].ecart == o)
+ *   if ((set[j].GetpFDeg()+set[j].ecart > o)
+ *   || ((set[j].GetpFDeg()+set[j].ecart == o)
  *     && (pLmCmp(set[j].p,p.p) == pOrdSgn)))
  *   {
  *     return j;
@@ -1781,7 +1787,7 @@ int posInT15 (const TSet set,const int length,const LObject &p)
   if (length==-1) return 0;
 
   int o = pFDeg(p.p) + p.ecart;
-  int op = pFDeg(set[length].p)+set[length].ecart;
+  int op = set[length].GetpFDeg()+set[length].ecart;
 
   if ((op < o)
   || ((op == o)
@@ -1795,14 +1801,14 @@ int posInT15 (const TSet set,const int length,const LObject &p)
   {
     if (an >= en-1)
     {
-      op = pFDeg(set[an].p)+set[an].ecart;
+      op = set[an].GetpFDeg()+set[an].ecart;
       if (( op > o)
       || (( op  == o) && (pLmCmp(set[an].p,p.p) == pOrdSgn)))
         return an;
       return en;
     }
     i=(an+en) / 2;
-    op = pFDeg(set[i].p)+set[i].ecart;
+    op = set[i].GetpFDeg()+set[i].ecart;
     if (( op > o)
     || (( op == o) && (pLmCmp(set[i].p,p.p) == pOrdSgn)))
       en=i;
@@ -1841,7 +1847,7 @@ int posInT17 (const TSet set,const int length,const LObject &p)
   if (length==-1) return 0;
 
   int o = pFDeg(p.p) + p.ecart;
-  int op = pFDeg(set[length].p)+set[length].ecart;
+  int op = set[length].GetpFDeg()+set[length].ecart;
 
   if ((op < o)
   || (( op == o) && (set[length].ecart > p.ecart))
@@ -1856,7 +1862,7 @@ int posInT17 (const TSet set,const int length,const LObject &p)
   {
     if (an >= en-1)
     {
-      op = pFDeg(set[an].p)+set[an].ecart;
+      op = set[an].GetpFDeg()+set[an].ecart;
       if (( op > o)
       || (( op == o) && (set[an].ecart < p.ecart))
       || (( op  == o) && (set[an].ecart==p.ecart)
@@ -1865,7 +1871,7 @@ int posInT17 (const TSet set,const int length,const LObject &p)
       return en;
     }
     i=(an+en) / 2;
-    op = pFDeg(set[i].p)+set[i].ecart;
+    op = set[i].GetpFDeg()+set[i].ecart;
     if ((op > o)
     || (( op == o) && (set[i].ecart < p.ecart))
     || (( op == o) && (set[i].ecart == p.ecart)
@@ -1893,7 +1899,7 @@ int posInT17_c (const TSet set,const int length,const LObject &p)
     return length+1;
   if (pGetComp(set[length].p)*cc == c)
   {
-    int op = pFDeg(set[length].p)+set[length].ecart;
+    int op = set[length].GetpFDeg()+set[length].ecart;
     if ((op < o)
     || ((op == o) && (set[length].ecart > p.ecart))
     || ((op == o) && (set[length].ecart==p.ecart)
@@ -1912,7 +1918,7 @@ int posInT17_c (const TSet set,const int length,const LObject &p)
         return en;
       if (pGetComp(set[an].p)*cc == c)
       {
-        int op = pFDeg(set[an].p)+set[an].ecart;
+        int op = set[an].GetpFDeg()+set[an].ecart;
         if ((op > o)
         || ((op == o) && (set[an].ecart < p.ecart))
         || ((op == o) && (set[an].ecart==p.ecart)
@@ -1926,7 +1932,7 @@ int posInT17_c (const TSet set,const int length,const LObject &p)
       en=i;
     else if (pGetComp(set[i].p)*cc == c)
     {
-      int op = pFDeg(set[i].p)+set[i].ecart;
+      int op = set[i].GetpFDeg()+set[i].ecart;
       if ((op > o)
       || ((op == o) && (set[i].ecart < p.ecart))
       || ((op == o) && (set[i].ecart == p.ecart)
@@ -1950,13 +1956,13 @@ int posInT19 (const TSet set,const int length,const LObject &p)
   if (length==-1) return 0;
 
   int o = p.ecart;
+  int op=pFDeg(p.p);
 
   if (set[length].ecart < o)
     return length+1;
   if (set[length].ecart == o)
   {
-     int oo=pFDeg(set[length].p);
-     int op=pFDeg(p.p);
+     int oo=set[length].GetpFDeg();
      if ((oo < op) || ((oo==op) && (set[length].length < p.length)))
        return length+1;
   }
@@ -1972,8 +1978,7 @@ int posInT19 (const TSet set,const int length,const LObject &p)
         return an;
       if (set[an].ecart == o)
       {
-         int oo=pFDeg(set[an].p);
-         int op=pFDeg(p.p);
+         int oo=set[an].GetpFDeg();
          if((oo > op)
          || ((oo==op) && (set[an].length > p.length)))
            return an;
@@ -1985,8 +1990,7 @@ int posInT19 (const TSet set,const int length,const LObject &p)
       en=i;
     else if (set[i].ecart == o)
     {
-       int oo=pFDeg(set[i].p);
-       int op=pFDeg(p.p);
+       int oo=set[i].GetpFDeg();
        if ((oo > op)
        || ((oo == op) && (set[i].length > p.length)))
          en=i;
@@ -2009,7 +2013,7 @@ int posInLSpecial (const LSet set, const int length,
   if (length<0) return 0;
 
   int d=pFDeg(p.p);
-  int op=pFDeg(set[length].p);
+  int op=set[length].GetpFDeg();
 
   if ((op > d)
   || ((op == d) && (p.p1!=NULL)&&(set[length].p1==NULL))
@@ -2023,7 +2027,7 @@ int posInLSpecial (const LSet set, const int length,
   {
     if (an >= en-1)
     {
-      op=pFDeg(set[an].p);
+      op=set[an].GetpFDeg();
       if ((op > d)
       || ((op == d) && (p.p1!=NULL) && (set[an].p1==NULL))
       || (pLmCmp(set[an].p,p.p)== pOrdSgn))
@@ -2031,7 +2035,7 @@ int posInLSpecial (const LSet set, const int length,
       return an;
     }
     i=(an+en) / 2;
-    op=pFDeg(set[i].p);
+    op=set[i].GetpFDeg();
     if ((op>d)
     || ((op==d) && (p.p1!=NULL) && (set[i].p1==NULL))
     || (pLmCmp(set[i].p,p.p) == pOrdSgn))
@@ -2087,8 +2091,8 @@ int posInL11 (const LSet set, const int length,
  * loop
  * {
  *   if (j > length)            return j;
- *   if ((pFDeg(set[j].p) < o)) return j;
- *   if ((pFDeg(set[j].p) == o) && (pLmCmp(set[j].p,p.p) == -pOrdSgn))
+ *   if ((set[j].GetpFDeg() < o)) return j;
+ *   if ((set[j].GetpFDeg() == o) && (pLmCmp(set[j].p,p.p) == -pOrdSgn))
  *   {
  *     return j;
  *   }
@@ -2100,7 +2104,7 @@ int posInL11 (const LSet set, const int length,
   if (length<0) return 0;
 
   int o = pFDeg(p.p);
-  int op = pFDeg(set[length].p);
+  int op = set[length].GetpFDeg();
 
   if ((op > o)
   || ((op == o) && (pLmCmp(set[length].p,p.p) != -pOrdSgn)))
@@ -2112,14 +2116,14 @@ int posInL11 (const LSet set, const int length,
   {
     if (an >= en-1)
     {
-      op = pFDeg(set[an].p);
+      op = set[an].GetpFDeg();
       if ((op > o)
       || ((op == o) && (pLmCmp(set[an].p,p.p) != -pOrdSgn)))
         return en;
       return an;
     }
     i=(an+en) / 2;
-    op = pFDeg(set[i].p);
+    op = set[i].GetpFDeg();
     if ((op > o)
     || ((op == o) && (pLmCmp(set[i].p,p.p) != -pOrdSgn)))
       an=i;
@@ -2139,7 +2143,7 @@ int posInL110 (const LSet set, const int length,
   if (length<0) return 0;
 
   int o = pFDeg(p.p);
-  int op = pFDeg(set[length].p);
+  int op = set[length].GetpFDeg();
 
   if ((op > o)
   || ((op == o) && (set[length].length >2*p.length))
@@ -2153,7 +2157,7 @@ int posInL110 (const LSet set, const int length,
   {
     if (an >= en-1)
     {
-      op = pFDeg(set[an].p);
+      op = set[an].GetpFDeg();
       if ((op > o)
       || ((op == o) && (set[an].length >2*p.length))
       || ((op == o) && (set[an].length <=2*p.length)
@@ -2162,7 +2166,7 @@ int posInL110 (const LSet set, const int length,
       return an;
     }
     i=(an+en) / 2;
-    op = pFDeg(set[i].p);
+    op = set[i].GetpFDeg();
     if ((op > o)
     || ((op == o) && (set[i].length > 2*p.length))
     || ((op == o) && (set[i].length <= 2*p.length)
@@ -2186,7 +2190,7 @@ int posInL13 (const LSet set, const int length,
 
   int o = pFDeg(p.p);
 
-  if (pFDeg(set[length].p) > o)
+  if (set[length].GetpFDeg() > o)
     return length+1;
 
   int i;
@@ -2196,12 +2200,12 @@ int posInL13 (const LSet set, const int length,
   {
     if (an >= en-1)
     {
-      if (pFDeg(set[an].p) >= o)
+      if (set[an].GetpFDeg() >= o)
         return en;
       return an;
     }
     i=(an+en) / 2;
-    if (pFDeg(set[i].p) >= o)
+    if (set[i].GetpFDeg() >= o)
       an=i;
     else
       en=i;
@@ -2224,8 +2228,8 @@ int posInL15 (const LSet set, const int length,
  * loop
  * {
  *   if (j > length)                       return j;
- *   if (pFDeg(set[j].p)+set[j].ecart < o) return j;
- *   if ((pFDeg(set[j].p)+set[j].ecart == o)
+ *   if (set[j].GetpFDeg()+set[j].ecart < o) return j;
+ *   if ((set[j].GetpFDeg()+set[j].ecart == o)
  *   && (pLmCmp(set[j].p,p.p) == -pOrdSgn))
  *   {
  *     return j;
@@ -2238,7 +2242,7 @@ int posInL15 (const LSet set, const int length,
   if (length<0) return 0;
 
   int o = pFDeg(p.p) + p.ecart;
-  int op = pFDeg(set[length].p) + set[length].ecart;
+  int op = set[length].GetpFDeg() + set[length].ecart;
 
   if ((op > o)
   || ((op == o) && (pLmCmp(set[length].p,p.p) != -pOrdSgn)))
@@ -2250,14 +2254,14 @@ int posInL15 (const LSet set, const int length,
   {
     if (an >= en-1)
     {
-      op = pFDeg(set[an].p) + set[an].ecart;
+      op = set[an].GetpFDeg() + set[an].ecart;
       if ((op > o)
       || ((op == o) && (pLmCmp(set[an].p,p.p) != -pOrdSgn)))
         return en;
       return an;
     }
     i=(an+en) / 2;
-    op = pFDeg(set[i].p) + set[i].ecart;
+    op = set[i].GetpFDeg() + set[i].ecart;
     if ((op > o)
     || ((op == o) && (pLmCmp(set[i].p,p.p) != -pOrdSgn)))
       an=i;
@@ -2280,10 +2284,10 @@ int posInL17 (const LSet set, const int length,
 
   int o = pFDeg(p.p) + p.ecart;
 
-  if ((pFDeg(set[length].p) + set[length].ecart > o)
-  || ((pFDeg(set[length].p) + set[length].ecart == o)
+  if ((set[length].GetpFDeg() + set[length].ecart > o)
+  || ((set[length].GetpFDeg() + set[length].ecart == o)
      && (set[length].ecart > p.ecart))
-  || ((pFDeg(set[length].p) + set[length].ecart == o)
+  || ((set[length].GetpFDeg() + set[length].ecart == o)
      && (set[length].ecart == p.ecart)
      && (pLmCmp(set[length].p,p.p) != -pOrdSgn)))
     return length+1;
@@ -2294,20 +2298,20 @@ int posInL17 (const LSet set, const int length,
   {
     if (an >= en-1)
     {
-      if ((pFDeg(set[an].p) + set[an].ecart > o)
-      || ((pFDeg(set[an].p) + set[an].ecart == o)
+      if ((set[an].GetpFDeg() + set[an].ecart > o)
+      || ((set[an].GetpFDeg() + set[an].ecart == o)
          && (set[an].ecart > p.ecart))
-      || ((pFDeg(set[an].p) + set[an].ecart == o)
+      || ((set[an].GetpFDeg() + set[an].ecart == o)
          && (set[an].ecart == p.ecart)
          && (pLmCmp(set[an].p,p.p) != -pOrdSgn)))
         return en;
       return an;
     }
     i=(an+en) / 2;
-    if ((pFDeg(set[i].p) + set[i].ecart > o)
-    || ((pFDeg(set[i].p) + set[i].ecart == o)
+    if ((set[i].GetpFDeg() + set[i].ecart > o)
+    || ((set[i].GetpFDeg() + set[i].ecart == o)
        && (set[i].ecart > p.ecart))
-    || ((pFDeg(set[i].p) +set[i].ecart == o)
+    || ((set[i].GetpFDeg() +set[i].ecart == o)
        && (set[i].ecart == p.ecart)
        && (pLmCmp(set[i].p,p.p) != -pOrdSgn)))
       an=i;
@@ -2315,69 +2319,6 @@ int posInL17 (const LSet set, const int length,
       en=i;
   }
 }
-#if 0
-{
-  if (length<0) return 0;
-
-  int o = pFDeg(p.p) + p.ecart;
-  int ol = pFDeg(set[length].p) + set[length].ecart;
-
-  if ((ol > o)
-  || ((ol == o)
-     && (set[length].ecart > p.ecart))
-  || ((ol == o)
-     && (set[length].ecart == p.ecart)
-     //&& (set[length].lp+set[length].length > p.lp+p.length))
-     && (set[length].length > p.length))
-  || ((ol == o)
-     && (set[length].ecart == p.ecart)
-     //&& (set[length].lp+set[length].length == p.lp+p.length)
-     && (set[length].length == p.length)
-     && (pLmCmp(set[length].p,p.p) != -pOrdSgn)))
-    return length+1;
-  int i;
-  int an = 0;
-  int en= length;
-  loop
-  {
-    if (an >= en-1)
-    {
-      ol = pFDeg(set[an].p) + set[an].ecart;
-      if ((ol > o)
-      || ((ol == o)
-         && (set[an].ecart > p.ecart))
-      || ((ol == o)
-         && (set[an].ecart == p.ecart)
-         //&& (set[length].lp+set[length].length > p.lp+p.length))
-         && (set[length].length > p.length))
-      || ((ol == o)
-         && (set[an].ecart == p.ecart)
-         //&& (set[length].lp+set[length].length == p.lp+p.length)
-         && (set[length].length == p.length)
-         && (pLmCmp(set[an].p,p.p) != -pOrdSgn)))
-        return en;
-      return an;
-    }
-    i=(an+en) / 2;
-    ol = pFDeg(set[i].p) + set[i].ecart;
-    if ((ol > o)
-    || ((ol == o)
-       && (set[i].ecart > p.ecart))
-    || ((ol == o)
-       && (set[i].ecart == p.ecart)
-       //&& (set[i].lp+set[i].length > p.lp+p.length))
-       && (set[i].length > p.length))
-    || ((ol == o)
-       && (set[i].ecart == p.ecart)
-       //&& (set[i].lp+set[i].length == p.lp+p.length)
-       && (set[i].length == p.length)
-       && (pLmCmp(set[i].p,p.p) != -pOrdSgn)))
-      an=i;
-    else
-      en=i;
-  }
-}
-#endif
 /*2
 * looks up the position of polynomial p in set
 * e is the ecart of p
@@ -2398,10 +2339,10 @@ int posInL17_c (const LSet set, const int length,
     return length+1;
   if (pGetComp(set[length].p)*cc == c)
   {
-    if ((pFDeg(set[length].p) + set[length].ecart > o)
-    || ((pFDeg(set[length].p) + set[length].ecart == o)
+    if ((set[length].GetpFDeg() + set[length].ecart > o)
+    || ((set[length].GetpFDeg() + set[length].ecart == o)
        && (set[length].ecart > p.ecart))
-    || ((pFDeg(set[length].p) + set[length].ecart == o)
+    || ((set[length].GetpFDeg() + set[length].ecart == o)
        && (set[length].ecart == p.ecart)
        && (pLmCmp(set[length].p,p.p) != -pOrdSgn)))
       return length+1;
@@ -2417,10 +2358,10 @@ int posInL17_c (const LSet set, const int length,
         return en;
       if (pGetComp(set[an].p)*cc == c)
       {
-        if ((pFDeg(set[an].p) + set[an].ecart > o)
-        || ((pFDeg(set[an].p) + set[an].ecart == o)
+        if ((set[an].GetpFDeg() + set[an].ecart > o)
+        || ((set[an].GetpFDeg() + set[an].ecart == o)
            && (set[an].ecart > p.ecart))
-        || ((pFDeg(set[an].p) + set[an].ecart == o)
+        || ((set[an].GetpFDeg() + set[an].ecart == o)
            && (set[an].ecart == p.ecart)
            && (pLmCmp(set[an].p,p.p) != -pOrdSgn)))
           return en;
@@ -2432,10 +2373,10 @@ int posInL17_c (const LSet set, const int length,
       an=i;
     else if (pGetComp(set[i].p)*cc == c)
     {
-      if ((pFDeg(set[i].p) + set[i].ecart > o)
-      || ((pFDeg(set[i].p) + set[i].ecart == o)
+      if ((set[i].GetpFDeg() + set[i].ecart > o)
+      || ((set[i].GetpFDeg() + set[i].ecart == o)
          && (set[i].ecart > p.ecart))
-      || ((pFDeg(set[i].p) +set[i].ecart == o)
+      || ((set[i].GetpFDeg() +set[i].ecart == o)
          && (set[i].ecart == p.ecart)
          && (pLmCmp(set[i].p,p.p) != -pOrdSgn)))
         an=i;
@@ -2705,10 +2646,8 @@ void messageSets (kStrategy strat)
 */
 void initS (ideal F, ideal Q,kStrategy strat)
 {
-  LObject h;
   int   i,pos;
 
-  h.ecart=0; h.length=0;
   if (Q!=NULL) i=IDELEMS(Q);
   else i=0;
   i=((i+IDELEMS(F)+15)/16)*16;
@@ -2727,6 +2666,7 @@ void initS (ideal F, ideal Q,kStrategy strat)
     {
       if (Q->m[i]!=NULL)
       {
+        LObject h;
         h.p = pCopy(Q->m[i]);
         if (TEST_OPT_INTSTRATEGY)
         {
@@ -2761,27 +2701,28 @@ void initS (ideal F, ideal Q,kStrategy strat)
   {
     if (F->m[i]!=NULL)
     {
+      LObject h;
       h.p = pCopy(F->m[i]);
-        if (TEST_OPT_INTSTRATEGY)
-        {
-          //pContent(h.p);
-          pCleardenom(h.p); // also does a pContent
-        }
-        else
-        {
-          pNorm(h.p);
-        }
-        strat->initEcart(&h);
-        if (pOrdSgn==-1)
-        {
-          cancelunit(&h);  /*- tries to cancel a unit -*/
-          deleteHC(&h.p, &h.ecart, &h.length,strat);
-        }
-        if (TEST_OPT_DEGBOUND
-        && (((strat->honey) && (h.ecart+pFDeg(h.p)>Kstd1_deg))
-          || ((!(strat->honey)) && (pFDeg(h.p)>Kstd1_deg))))
-          pDelete(&h.p);
-        else
+      if (TEST_OPT_INTSTRATEGY)
+      {
+        //pContent(h.p);
+        pCleardenom(h.p); // also does a pContent
+      }
+      else
+      {
+        pNorm(h.p);
+      }
+      strat->initEcart(&h);
+      if (pOrdSgn==-1)
+      {
+        cancelunit(&h);  /*- tries to cancel a unit -*/
+        deleteHC(&h.p, &h.ecart, &h.length,strat);
+      }
+      if (TEST_OPT_DEGBOUND
+          && (((strat->honey) && (h.ecart+pFDeg(h.p)>Kstd1_deg))
+              || ((!(strat->honey)) && (pFDeg(h.p)>Kstd1_deg))))
+        pDelete(&h.p);
+      else
         if (h.p!=NULL)
         {
           if (strat->sl==-1)
@@ -2804,7 +2745,6 @@ void initS (ideal F, ideal Q,kStrategy strat)
 
 void initSL (ideal F, ideal Q,kStrategy strat)
 {
-  LObject h;
   int   i,pos;
 
   if (Q!=NULL) i=IDELEMS(Q);
@@ -2825,6 +2765,7 @@ void initSL (ideal F, ideal Q,kStrategy strat)
     {
       if (Q->m[i]!=NULL)
       {
+        LObject h;
         h.p = pCopy(Q->m[i]);
         if (TEST_OPT_INTSTRATEGY)
         {
@@ -2859,30 +2800,28 @@ void initSL (ideal F, ideal Q,kStrategy strat)
   {
     if (F->m[i]!=NULL)
     {
+      LObject h;
       h.p = pCopy(F->m[i]);
-      h.p1=NULL;
-      h.p2=NULL;
-      h.lcm=NULL;
-        if (TEST_OPT_INTSTRATEGY)
-        {
-          //pContent(h.p);
-          pCleardenom(h.p); // also does a pContent
-        }
-        else
-        {
-          pNorm(h.p);
-        }
-        strat->initEcart(&h);
-        if (pOrdSgn==-1)
-        {
-          cancelunit(&h);  /*- tries to cancel a unit -*/
-          deleteHC(&h.p, &h.ecart, &h.length,strat);
-        }
-        if (TEST_OPT_DEGBOUND
-        && (((strat->honey) && (h.ecart+pFDeg(h.p)>Kstd1_deg))
-          || ((!(strat->honey)) && (pFDeg(h.p)>Kstd1_deg))))
-          pDelete(&h.p);
-        else
+      if (TEST_OPT_INTSTRATEGY)
+      {
+        //pContent(h.p);
+        pCleardenom(h.p); // also does a pContent
+      }
+      else
+      {
+        pNorm(h.p);
+      }
+      strat->initEcart(&h);
+      if (pOrdSgn==-1)
+      {
+        cancelunit(&h);  /*- tries to cancel a unit -*/
+        deleteHC(&h.p, &h.ecart, &h.length,strat);
+      }
+      if (TEST_OPT_DEGBOUND
+          && (((strat->honey) && (h.ecart+pFDeg(h.p)>Kstd1_deg))
+              || ((!(strat->honey)) && (pFDeg(h.p)>Kstd1_deg))))
+        pDelete(&h.p);
+      else
         if (h.p!=NULL)
         {
           if (strat->Ll==-1)
@@ -2909,10 +2848,8 @@ void initSL (ideal F, ideal Q,kStrategy strat)
 */
 void initSSpecial (ideal F, ideal Q, ideal P,kStrategy strat)
 {
-  LObject h;
   int   i,pos;
 
-  h.ecart=0; h.length=0;
   if (Q!=NULL) i=IDELEMS(Q);
   else i=0;
   i=((i+IDELEMS(F)+15)/16)*16;
@@ -2932,6 +2869,7 @@ void initSSpecial (ideal F, ideal Q, ideal P,kStrategy strat)
     {
       if (Q->m[i]!=NULL)
       {
+        LObject h;
         h.p = pCopy(Q->m[i]);
         //if (TEST_OPT_INTSTRATEGY)
         //{
@@ -2968,6 +2906,7 @@ void initSSpecial (ideal F, ideal Q, ideal P,kStrategy strat)
   {
     if (F->m[i]!=NULL)
     {
+      LObject h;
       h.p = pCopy(F->m[i]);
       if (pOrdSgn==1)
       {
@@ -3002,6 +2941,7 @@ void initSSpecial (ideal F, ideal Q, ideal P,kStrategy strat)
   {
     if (P->m[i]!=NULL)
     {
+      LObject h;
       h.p=pCopy(P->m[i]);
       strat->initEcart(&h);
       h.length = pLength(h.p);
@@ -3486,17 +3426,17 @@ void enterT(LObject p, kStrategy strat, int atT = -1)
     if (p.t_p != NULL) pNext(p.t_p) = pNext(p.p);
   }
   strat->T[atT] = (TObject) p;
-  if (strat->use_buckets && p.pLength <= 0)
-    strat->T[atT].pLength = pLength(p.p);
 
   if (strat->tailRing != currRing && pNext(p.p) != NULL)
     strat->T[atT].max = p_GetMaxExpP(pNext(p.p), strat->tailRing);
   else
     strat->T[atT].max = NULL;
 
+  strat->T[atT].FDeg = p.pFDeg();
   strat->tl++;
   strat->R[strat->tl] = &(strat->T[atT]);
   strat->T[atT].i_r = strat->tl;
+  assume(p.sev == 0 || pGetShortExpVector(p.p) == p.sev);
   strat->sevT[atT] = (p.sev == 0 ? pGetShortExpVector(p.p) : p.sev);
   kTest_T(&(strat->T[atT]));
 }
@@ -3931,9 +3871,6 @@ void kStratInitChangeTailRing(kStrategy strat)
   
   assume(strat->tailRing == currRing);
 
-  // for the time being, let's not do anything for syzComp and minim
-  // if (strat->syzComp) return;
-  
   for (i=0; i<= strat->Ll; i++)
   {
     l = p_GetMaxExpL(strat->L[i].p, currRing, l);
@@ -3945,7 +3882,6 @@ void kStratInitChangeTailRing(kStrategy strat)
   }
   e = p_GetMaxExp(l, currRing);
   if (e <= 1) e = 2;
-  
   
   kStratChangeTailRing(strat, NULL, NULL, e);
 }

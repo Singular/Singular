@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.62 2000-11-14 16:24:47 obachman Exp $ */
+/* $Id: kstd1.cc,v 1.63 2000-11-16 09:54:50 obachman Exp $ */
 /*
 * ABSTRACT:
 */
@@ -99,6 +99,7 @@ void deleteHCs (TObject* p,kStrategy strat)
       {
         pDelete(&(pNext(p1)));
         (*p).ecart = pLDeg((*p).p,&((*p).length))-o;
+        p->pLength = 0;
       }
       else
       {
@@ -132,6 +133,7 @@ static int doRed (LObject* h, TObject* with,BOOLEAN intoT,kStrategy strat)
     // we might get errors
     LObject L= *h;
     L.Copy();
+    h->GetP();
     ret = ksReducePoly(&L, with, strat->kNoether, NULL, strat);
     if (ret)
     {
@@ -141,7 +143,6 @@ static int doRed (LObject* h, TObject* with,BOOLEAN intoT,kStrategy strat)
                              pGetShallowCopyDeleteProc(h->tailRing,
                                                        strat->tailRing));
     }
-    h->CanonicalizeP();
     enterT(*h,strat);
     *h = L;
   }
@@ -156,7 +157,7 @@ static int doRed (LObject* h, TObject* with,BOOLEAN intoT,kStrategy strat)
   return ret;
 }
 
-#if 1
+#if 0
 /*2
 * reduces h with elements from T choosing first possible
 * element in T with respect to the given ecart
@@ -177,6 +178,7 @@ int redEcart (LObject* h,kStrategy strat)
   {
     if (j > strat->tl)
     {
+      if (strat->honey) pLDeg((*h).p,&((*h).length));
       return 1;
     }
     if (pLmShortDivisibleBy(strat->T[j].p, strat->sevT[j], (*h).p, not_sev))
@@ -226,6 +228,7 @@ int redEcart (LObject* h,kStrategy strat)
         strat->fromT = TRUE;
         if (strat->Ll >= 0) /*- L is not empty -*/
         {
+          if (strat->honey) pLDeg((*h).p,&((*h).length));
           at = strat->posInL(strat->L,strat->Ll,(*h),strat);
           if (at <= strat->Ll)
           {
@@ -254,7 +257,7 @@ int redEcart (LObject* h,kStrategy strat)
           (*h).ecart = d-pFDeg((*h).p);
         else
           (*h).ecart = d-pFDeg((*h).p)+ei-(*h).ecart;
-        pLDeg((*h).p,&((*h).length));
+        // pLDeg((*h).p,&((*h).length));
         //(*h).length = pLength((*h).p);
       }
       else
@@ -279,6 +282,7 @@ int redEcart (LObject* h,kStrategy strat)
       if ((strat->Ll >= 0)
       && ((d >= reddeg) || (pass > strat->LazyPass)))
       {
+        if (strat->honey) pLDeg((*h).p,&((*h).length));
         at = strat->posInL(strat->L,strat->Ll,*h,strat);
         if (at <= strat->Ll)
         {
@@ -309,7 +313,6 @@ int redEcart (LObject* h,kStrategy strat)
   }
 }
 #else
-
 int redEcart (LObject* h,kStrategy strat)
 {
   poly pi;
@@ -317,14 +320,17 @@ int redEcart (LObject* h,kStrategy strat)
   int j = 0;
   int pass = 0;
 
-  d = h->pFDeg()+ h->ecart;
+  d = h->GetpFDeg()+ h->ecart;
   reddeg = strat->LazyDegree+d;
   h->SetShortExpVector();
   while (1)
   {
     j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h);
     if (j < 0)
+    {
+      if (strat->honey) h->SetLength();
       return 1;
+    }
 
     ei = strat->T[j].ecart;
     ii = j;
@@ -340,10 +346,12 @@ int redEcart (LObject* h,kStrategy strat)
       {
         /*- takes the first possible with respect to ecart -*/
         i++;
-        i = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h, i);
-        if (i < 0) break;
-        if (strat->T[i].ecart < ei || (strat->T[i].ecart == ei &&
-                                       strat->T[i].length < li))
+//        i = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h, i);
+        if (i > strat->tl) break;
+        if ((strat->T[i].ecart < ei || (strat->T[i].ecart == ei &&
+                                        strat->T[i].length < li)) 
+            &&
+            pLmShortDivisibleBy(strat->T[i].p, strat->sevT[i], h->p, ~h->sev))
         {
           // the polynomial to reduce with is now
           ii = i;
@@ -363,11 +371,14 @@ int redEcart (LObject* h,kStrategy strat)
       strat->fromT = TRUE;
       if (strat->Ll >= 0) /*- L is not empty -*/
       {
-        h->SetLmCurrentRing();
+        h->SetLmCurrRing();
+        if (strat->honey) h->SetLength();
+        assume(h->FDeg == h->pFDeg());
         at = strat->posInL(strat->L,strat->Ll,(*h),strat);
         if (at <= strat->Ll)
         {
           /*- h will not become the next element to reduce -*/
+          h->CanonicalizeP();
           enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
 #ifdef KDEBUG
           if (TEST_OPT_DEBUG) Print(" ecart too big; -> L%d\n",at);
@@ -379,44 +390,46 @@ int redEcart (LObject* h,kStrategy strat)
       }
     }
         
-    // now we fiannly can reduce
+    // now we fianlly can reduce
     doRed(h,&(strat->T[ii]),strat->fromT,strat);
     strat->fromT=FALSE;
 
     // are we done ???
     if (h->IsNull())
     {
-      if (h->lcm!=NULL) pLmFree((*h).lcm);
+      if (h->lcm!=NULL) pLmFree(h->lcm);
       h->Clear();
       return 0;
     }
 
     // NO!
     h->SetShortExpVector();
-    /*computes the ecart*/
+    h->SetpFDeg();
     if (strat->honey)
     {
-      if (ei <= (*h).ecart)
-        (*h).ecart = d-pFDeg((*h).p);
+      if (ei <= h->ecart)
+        h->ecart = d-h->GetpFDeg();
       else
-        (*h).ecart = d-pFDeg((*h).p)+ei-(*h).ecart;
-      pLDeg((*h).p,&((*h).length));
-      //(*h).length = pLength((*h).p);
+        h->ecart = d-h->GetpFDeg()+ei-h->ecart;
     }
     else
-      (*h).ecart = pLDeg((*h).p,&((*h).length))-pFDeg((*h).p);
+      // this has the side effect of setting h->length
+      h->ecart = h->pLDeg() - h->GetpFDeg();
+
     if (strat->syzComp!=0)
     {
-      if ((strat->syzComp>0) && (pMinComp((*h).p) > strat->syzComp))
+      if ((strat->syzComp>0) && (h->MinComp() > strat->syzComp))
       {
+        if (strat->honey) h->SetLength();
+#ifdef KDEBUG
         if (TEST_OPT_DEBUG) PrintS(" > syzComp\n");
+#endif
         return -2;
       }
-
     }
     /*- try to reduce the s-polynomial -*/
     pass++;
-    d = pFDeg((*h).p)+(*h).ecart;
+    d = h->GetpFDeg()+h->ecart;
     /*
      *test whether the polynomial should go to the lazyset L
      *-if the degree jumps
@@ -425,19 +438,20 @@ int redEcart (LObject* h,kStrategy strat)
     if ((strat->Ll >= 0)
         && ((d >= reddeg) || (pass > strat->LazyPass)))
     {
+      h->SetLmCurrRing();
+      if (strat->honey) h->SetLength();
+      assume(h->FDeg == h->pFDeg());
       at = strat->posInL(strat->L,strat->Ll,*h,strat);
       if (at <= strat->Ll)
       {
-        i=strat->sl+1;
-        do
-        {
-          i--;
-          if (i<0) return 1;
-        } while (!pLmShortDivisibleBy(strat->S[i], strat->sevS[i],
-                                      (*h).p, not_sev));
+        if (kFindDivisibleByInS(strat->S, strat->sevS, strat->sl, h) < 0)
+          return 1;
+        h->CanonicalizeP();
         enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
+#ifdef KDEBUG
         if (TEST_OPT_DEBUG) Print(" degree jumped; ->L%d\n",at);
-        (*h).p = NULL;
+#endif
+        h->Clear();
         return -1;
       }
     }
@@ -464,7 +478,7 @@ int redFirst (LObject* h,kStrategy strat)
 
   if (! strat->homog)
   {
-    d = h->pFDeg() + h->ecart;
+    d = h->GetpFDeg() + h->ecart;
     reddeg = strat->LazyDegree+d;
   }
   h->SetShortExpVector();
@@ -472,7 +486,11 @@ int redFirst (LObject* h,kStrategy strat)
   {
     j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h);
     if (j < 0)
+    {
+      if (! strat->homog) 
+        h->SetDegStuffReturnLDeg();
       return 1;
+    }
 
     if (!TEST_OPT_INTSTRATEGY)
       strat->T[j].pNorm();
@@ -496,7 +514,7 @@ int redFirst (LObject* h,kStrategy strat)
 #endif
     if (h->IsNull())
     {
-      if (h->lcm!=NULL) pLmFree((*h).lcm);
+      if (h->lcm!=NULL) pLmFree(h->lcm);
       h->Clear();
       return 0;
     }
@@ -505,7 +523,7 @@ int redFirst (LObject* h,kStrategy strat)
     if ((strat->syzComp!=0) && !strat->honey)
     {
       if ((strat->syzComp>0) && 
-          (p_MinComp(h->GetLmTailRing(), h->tailRing) > strat->syzComp))
+          (h->MinComp() > strat->syzComp))
       {
 #ifdef KDEBUG
         if (TEST_OPT_DEBUG) PrintS(" > syzComp\n");
@@ -515,7 +533,7 @@ int redFirst (LObject* h,kStrategy strat)
     }
     if (!strat->homog)
     {
-      d = h->SetLengthEcartReturnLDeg();
+      d = h->SetDegStuffReturnLDeg();
       /*- try to reduce the s-polynomial -*/
       pass++;
       /*
@@ -870,8 +888,9 @@ void updateLHC(kStrategy strat)
         strat->L[i].p = ksOldCreateSpoly(strat->L[i].p1,
                                          strat->L[i].p2,
                                          strat->kNoether);
+        strat->L[i].SetpFDeg();
         strat->L[i].ecart = pLDeg(strat->L[i].p,&strat->L[i].length)
-                           -pFDeg(strat->L[i].p);
+                           -strat->L[i].GetpFDeg();
       }
     }
     else
@@ -897,7 +916,11 @@ void updateT(kStrategy strat)
     deleteHCs(&p,strat);
     /*- tries to cancel a unit: -*/
     cancelunit(&p);
-    if (p.p != strat->T[i].p) strat->sevT[i] = pGetShortExpVector(p.p);
+    if (p.p != strat->T[i].p) 
+    {
+      strat->sevT[i] = pGetShortExpVector(p.p);
+      p.SetpFDeg();
+    }
     strat->T[i] = p;
     i++;
   }
@@ -913,7 +936,19 @@ void firstUpdate(kStrategy strat)
     strat->update = (strat->tl == -1);
     if (TEST_OPT_WEIGHTM)
     {
-      pFDeg=pFDegOld;
+      if (pFDegOld != pFDeg)
+      {
+        pFDeg=pFDegOld;
+        int i;
+        for (i =0; i<=strat->Ll; i++)
+        {
+          strat->L[i].SetpFDeg();
+        }
+        for (i=0; i<=strat->tl; i++)
+        {
+          strat->T[i].SetpFDeg();
+        }
+      }
       pLDeg=pLDegOld;
       if (ecartWeights)
       {
