@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.78 2002-12-13 16:20:06 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.79 2003-01-31 09:04:38 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <math.h>
 
 #include "mod2.h"
 #include "tok.h"
@@ -577,29 +578,50 @@ int IsPrime(int p)  /* brute force !!!! */
   else if (p == 1)    return 1/*1*/;
   else if (p == 2)    return p;
   else if (p < 0)     return (-IsPrime(-p));
-  else if (p > 32002) return 32003; // without this line, max prime is 32749
   else if (!(p & 1)) return IsPrime(p-1);
 #ifdef HAVE_FACTORY
-  int a=0;
-  int e=cf_getNumSmallPrimes()-1;
-  i=e/2;
-  do
+  else if (p<=32749) // max. small prime in factory
   {
-    if (p==(j=cf_getSmallPrime(i))) return p;
-    if (p<j) e=i-1;
-    else     a=i+1;
-    i=a+(e-a)/2;
-  } while ( a<= e);
-  if (p>j) return j;
-  else     return cf_getSmallPrime(i-1);
+    int a=0;
+    int e=cf_getNumSmallPrimes()-1;
+    i=e/2;
+    do
+    {
+      if (p==(j=cf_getSmallPrime(i))) return p;
+      if (p<j) e=i-1;
+      else     a=i+1;
+      i=a+(e-a)/2;
+    } while ( a<= e);
+    if (p>j) return j;
+    else     return cf_getSmallPrime(i-1);
+  }
+#endif
+#ifdef HAVE_FACTORY
+  int end_i=cf_getNumSmallPrimes()-1;
 #else
-  for (j=p/2+1,i=3; i<p; i+=2)
+  int end_i=p/2;
+#endif  
+  int end_p=(int)sqrt((double)p);
+restart:
+  for (i=0; i<end_i; i++)
   {
-    if ((p%i) == 0) return IsPrime(p-2);
-    if (j < i) return p;
+#ifdef HAVE_FACTORY
+    j=cf_getSmallPrime(i);
+#else
+    if (i==0) j=2;
+    else j=2*i-1;
+#endif    
+    if ((p%j) == 0)
+    {
+    #ifdef HAVE_FACTORY
+      if (p<=32751) return IsPrime(p-2);
+    #endif  
+      p-=2;
+      goto restart;
+    }
+    if (j > end_p) return p;
   }
   return p;
-#endif
 }
 
 BOOLEAN iiWRITE(leftv res,leftv v)
