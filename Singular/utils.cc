@@ -3,13 +3,15 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include "utils.h"
+#define __GNU_LIBRARY__
+#include "getopt.h"
 
 extern FILE *yylpin;
 extern char *optarg;
 extern int optind, opterr, optopt;
 extern int lpverbose, check;
 extern int found_version, found_info, found_oldhelp, found_proc_in_proc;
-warning_info = 0, warning_version = 0;
+int warning_info = 0, warning_version = 0;
 
 static usage(char *progname)
 {
