@@ -152,12 +152,13 @@ all:	Singular
 
 Singular: mod2.h si_paths.h Makefile version.h scanner.cc ${OBJS} iparith.o \
 	  mpsr_Tok.o tesths.cc libparse.cc
-	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${DEFS} -o Singular \
+	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} -o Singular \
 	tesths.cc iparith.o mpsr_Tok.o ${OBJS} ${LDFLAGS} ${LIBS}
 
 Singular-static: mod2.h si_paths.h Makefile version.h scanner.cc ${OBJS} \
                  iparith.o mpsr_Tok.o tesths.cc
-	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${DEFS} -o Singular-static \
+	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} \
+	-o Singular-static \
 	tesths.cc iparith.o mpsr_Tok.o \
 	${OBJS} ${STATIC_LDFLAGS} ${LDFLAGS} ${LIBS}
 
@@ -167,7 +168,7 @@ claptmpl.o: claptmpl.cc mod2.h
 	${CXX} ${CXXFLAGS}  ${CPPFLAGS} ${DEFS} -c $<	
 
 iparith.inc mpsr_Tok.inc: iparith.cc ipconv.cc tok.h mpsr_Tok.cc grammar.h mod2.h
-	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${DEFS} -DGENTABLE \
+	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} -DGENTABLE \
 	     -o gentable iparith.cc tesths.cc mpsr_Tok.cc \
 	     ${OBJS} ${LDFLAGS} ${LIBS}
 	./gentable

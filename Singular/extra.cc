@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.70 1998-10-21 10:25:26 krueger Exp $ */
+/* $Id: extra.cc,v 1.71 1998-10-28 12:43:28 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -757,10 +757,12 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         Warn("`%s` not found",(char*)h->Data());
     }
     else
+#ifdef HAVE_NAMESPACES
 /*==================== lib ==================================*/
     if(strcmp(sys_cmd,"nn")==0)
     {
-      if ((h!=NULL) && (h->Typ()==STRING_CMD)) {
+      if ((h!=NULL) && (h->Typ()==STRING_CMD))
+      {
         idhdl pck = NULL, id = NULL;
         iiname2hdl(h->Data(), &pck, &id);
         if(pck != NULL) Print("Pack: '%s'\n", pck->id);
@@ -771,7 +773,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         Warn("`%s` not found",(char*)h->Data());
     }
     else
-#ifdef HAVE_NAMESPACES
 /*==================== nspush ===================================*/
     if(strcmp(sys_cmd,"nspush")==0)
     {

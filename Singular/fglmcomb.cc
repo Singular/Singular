@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmcomb.cc,v 1.13 1998-09-24 09:59:38 Singular Exp $
+// $Id: fglmcomb.cc,v 1.14 1998-10-28 12:43:29 Singular Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -495,7 +495,7 @@ fglmLinearCombination( ideal source, poly monset )
     // get the vector representation
     STICKYPROT2( "(%i)", basisSize );
     for ( k= 0; k < numMonoms; k++ ) {
-#ifdef __NO_CONSTR__
+#ifndef HAVE_EXPLICIT_CONSTR
         v[k].mac_constr_i( basisSize );
 #else
         v[k].fglmVector( basisSize );
