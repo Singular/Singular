@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.21 1998-03-16 14:56:48 obachman Exp $ */
+/* $Id: syz1.cc,v 1.22 1998-03-27 11:41:00 obachman Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -54,7 +54,8 @@ static int *binomials;
 static int highdeg;
 static int highdeg_1;
 
-#include "syzvector.cc"
+// uncomment to play around with new spolys for syzygies
+// #include "syzvector.cc"
 
 /*3
 * deletes all entres of a pair

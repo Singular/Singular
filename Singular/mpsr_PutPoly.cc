@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_PutPoly.cc,v 1.9 1997-12-03 16:58:56 obachman Exp $ */
+/* $Id: mpsr_PutPoly.cc,v 1.10 1998-03-27 11:40:59 obachman Exp $ */
 
 /***************************************************************
  *
@@ -251,8 +251,6 @@ static mpsr_Status_t PutAlgPoly(MP_Link_pt link, alg a)
  ***************************************************************/
 mpsr_Status_t mpsr_PutPolyData(MP_Link_pt link, poly p, ring cring)
 {
-  monomial exp;
-
   if (cring != CurrPutRing)
     SetPutFuncs(cring);
 
@@ -269,8 +267,8 @@ mpsr_Status_t mpsr_PutPolyData(MP_Link_pt link, poly p, ring cring)
     while (p != NULL)
     {
       failr(PutCoeff(link, pGetCoeff(p)));
-      for (i=1, exp = p->exp; i<=gNvars; i++)
-        gTa[i] = (MP_Sint32_t) exp[i];
+      for (i=1; i<=gNvars; i++)
+        gTa[i] = (MP_Sint32_t) pGetExp(p, i);
       mp_failr(IMP_PutSint32Vector(link, ta1, gNvars));
       pIter(p);
     }
@@ -288,7 +286,6 @@ mpsr_Status_t mpsr_PutPolyData(MP_Link_pt link, poly p, ring cring)
 mpsr_Status_t mpsr_PutPolyVectorData(MP_Link_pt link, poly p, ring cring)
 {
   short i, n1;
-  monomial exp;
 
   if (cring != CurrPutRing)
     SetPutFuncs(cring);
@@ -299,8 +296,9 @@ mpsr_Status_t mpsr_PutPolyVectorData(MP_Link_pt link, poly p, ring cring)
     while (p != NULL)
     {
       failr(PutCoeff(link, pGetCoeff(p)));
-      for (i=0, exp = p->exp; i< n1; i++)
-        gTa[i] = (MP_Sint32_t) exp[i];
+      gTa[0] = pGetComp(p);
+      for (i=1; i< n1; i++)
+        gTa[i] = (MP_Sint32_t) pGetExp(p,i);
       mp_failr(IMP_PutSint32Vector(link, gTa, n1));
       pIter(p);
     }
