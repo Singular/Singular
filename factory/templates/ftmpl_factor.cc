@@ -1,10 +1,13 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftmpl_factor.cc,v 1.5 1997-06-20 10:45:21 schmidt Exp $ */
+/* $Id: ftmpl_factor.cc,v 1.6 1997-06-30 15:44:14 schmidt Exp $ */
 
 #include <factoryconf.h>
 
+#ifdef macintosh
+#include <::templates:ftmpl_factor.h>
+#else
 #include <templates/ftmpl_factor.h>
-
+#endif
 
 template <class T>
 Factor<T>& Factor<T>::operator= ( const Factor<T>& f )
