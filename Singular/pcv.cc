@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: pcv.cc,v 1.22 1999-06-11 12:29:49 mschulze Exp $ */
+/* $Id: pcv.cc,v 1.23 1999-06-11 14:25:59 mschulze Exp $ */
 /*
 * ABSTRACT: conversion between polys and coef vectors
 */
@@ -179,11 +179,11 @@ void pcvInit(int d)
     for(int j=0;j<pcvMaxDegree;j++)
     {
       unsigned y=pcvIndex[i-1][j];
-      if(y>MAX_COMPONENT-x)
+      if(y>(unsigned)~0-x)
       {
         j=pcvMaxDegree;
         i=pVariables;
-        WerrorS("component overflow");
+        WerrorS("unsigned overflow");
       }
       pcvIndex[i][j]=x+=y;
     }
