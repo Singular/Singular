@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sparsmat.cc,v 1.26 2000-04-19 15:45:00 pohl Exp $ */
+/* $Id: sparsmat.cc,v 1.27 2000-04-27 12:27:43 pohl Exp $ */
 
 /*
 * ABSTRACT: operations with sparse matrices (bareiss, ...)
@@ -84,7 +84,7 @@ private:
   int inred;           // unreducable part
   int rpiv, cpiv;      // position of the pivot
   int normalize;       // Normalization flag
-  Exponent_t *perm;    // permutation of rows
+  int *perm;           // permutation of rows
   float wpoints;       // weight of all points
   float *wrw, *wcl;    // weights of rows and columns
   smpoly * m_act;      // unreduced columns
@@ -345,7 +345,7 @@ sparse_mat::sparse_mat(ideal smat)
   crd = 0;
   tored = nrows; // without border
   i = tored+1;
-  perm = (Exponent_t *)Alloc(sizeof(Exponent_t)*(i+1));
+  perm = (int *)Alloc(sizeof(int)*(i+1));
   perm[i] = 0;
   m_row = (smpoly *)Alloc0(sizeof(smpoly)*i);
   wrw = (float *)Alloc(sizeof(float)*i);
@@ -382,7 +382,7 @@ sparse_mat::~sparse_mat()
   i = nrows+1;
   Free((ADDRESS)wrw, sizeof(float)*i);
   Free((ADDRESS)m_row, sizeof(smpoly)*i);
-  Free((ADDRESS)perm, sizeof(Exponent_t)*(i+1));
+  Free((ADDRESS)perm, sizeof(int)*(i+1));
 }
 
 /*
