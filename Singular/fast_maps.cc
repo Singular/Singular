@@ -6,7 +6,7 @@
  *  Purpose: implementation of fast maps
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 02/01
- *  Version: $Id: fast_maps.cc,v 1.27 2002-01-20 10:01:48 Singular Exp $
+ *  Version: $Id: fast_maps.cc,v 1.28 2002-01-20 11:44:48 Singular Exp $
  *******************************************************************/
 #include "mod2.h"
 #include <omalloc.h>
@@ -29,15 +29,15 @@
 *F  maMaxExp  . . . . . . . .  returns bound on maximal exponent of result of map
 */
 // return maximal monomial if max_map_monomials are substituted into pi_m
-static poly maGetMaxExpP(poly* max_map_monomials, 
-                         int n_max_map_monomials, ring map_r, 
+static poly maGetMaxExpP(poly* max_map_monomials,
+                         int n_max_map_monomials, ring map_r,
                          poly pi_m, ring pi_r)
 {
   int n = min(pi_r->N, n_max_map_monomials);
   int i, j;
   Exponent_t e_i, e_j;
   poly m_i, map_j = p_Init(map_r);
-  
+
   for (i=1; i <= n; i++)
   {
     e_i = p_GetExp(pi_m, i, pi_r);
@@ -58,22 +58,22 @@ static poly maGetMaxExpP(poly* max_map_monomials,
 }
 
 // returns maximal exponent if map_id is applied to pi_id
-static Exponent_t maGetMaxExp(ideal map_id, ring map_r, ideal pi_id, ring pi_r)
+static Exponent_t maGetMaxExp(ideal pi_id, ring pi_r, ideal map_id, ring map_r)
 {
   Exponent_t max=0;
   poly* max_map_monomials = (poly*) omAlloc(IDELEMS(map_id)*sizeof(poly));
   poly max_pi_i, max_map_i;
-  
+
   int i, j;
   for (i=0; i<IDELEMS(map_id); i++)
   {
     max_map_monomials[i] = p_GetMaxExpP(map_id->m[i], map_r);
   }
-  
+
   for (i=0; i<IDELEMS(pi_id); i++)
   {
     max_pi_i = p_GetMaxExpP(pi_id->m[i], pi_r);
-    max_map_i = maGetMaxExpP(max_map_monomials, IDELEMS(map_id), map_r, 
+    max_map_i = maGetMaxExpP(max_map_monomials, IDELEMS(map_id), map_r,
                               max_pi_i, pi_r);
     Exponent_t temp = p_GetMaxExp(max_map_i, map_r);
     if (temp > max){
@@ -101,12 +101,12 @@ void maMonomial_Out(mapoly monomial, ring src_r, ring dest_r = NULL)
     printf(" dest:");
     p_wrp(monomial->dest, dest_r);
   }
-  if (monomial->f1!=NULL) { printf(" f1:%x", (unsigned int)monomial->f1->src); 
+  if (monomial->f1!=NULL) { printf(" f1:%x", (unsigned int)monomial->f1->src);
                             // p_wrp(monomial->f1->src, src_r);
-			  }
-  if (monomial->f2!=NULL) { printf(" f2:%x",(unsigned int)monomial->f2->src); 
+                          }
+  if (monomial->f2!=NULL) { printf(" f2:%x",(unsigned int)monomial->f2->src);
                             // p_wrp(monomial->f2->src, src_r);
-			  }
+                          }
   printf("\n");
   fflush(stdout);
 }
@@ -160,7 +160,7 @@ void maMonomial_Destroy(mapoly mp, ring src_r, ring dest_r = NULL)
         omFreeBin(coeff, macoeffBin);
       }
       while (next != NULL);
-      if (mp->dest != NULL) 
+      if (mp->dest != NULL)
       {
         assume(dest_r != NULL);
         p_Delete(&(mp->dest), dest_r);
@@ -181,13 +181,13 @@ mapoly maPoly_InsertMonomial(mapoly &into, mapoly what, ring src_r)
     into = what;
     return what;
   }
-  
+
   mapoly iter = into;
   mapoly prev = NULL;
-  
+
   Top:
   p_LmCmpAction(iter->src, what->src, src_r, goto Equal, goto Greater, goto Smaller);
-  
+
   Greater:
   if (iter->next == NULL)
   {
@@ -197,7 +197,7 @@ mapoly maPoly_InsertMonomial(mapoly &into, mapoly what, ring src_r)
   prev = iter;
   iter = iter->next;
   goto Top;
-  
+
   Smaller:
   if (prev == NULL)
   {
@@ -208,11 +208,11 @@ mapoly maPoly_InsertMonomial(mapoly &into, mapoly what, ring src_r)
   prev->next = what;
   what->next = iter;
   return what;
-  
+
   Equal:
   iter->ref += what->ref;
   macoeff coeff = what->coeff;
-  if (coeff != NULL) 
+  if (coeff != NULL)
   {
     while (coeff->next != NULL) coeff = coeff->next;
     coeff->next = iter->coeff;
@@ -231,7 +231,7 @@ mapoly maPoly_InsertMonomial(mapoly &into, poly p, ring src_r, sBucket_pt bucket
 static void maPoly_InsertPoly(mapoly &into, poly what, ring src_r, sBucket_pt bucket)
 {
   poly next;
-  
+
   while (what != NULL)
   {
     next = what->next;
@@ -253,27 +253,27 @@ void maMap_CreatePolyIdeal(ideal map_id, ring map_r, ring src_r, ring dest_r,
   mideal->buckets = (sBucket_pt*) omAlloc0(mideal->n*sizeof(sBucket_pt));
   int i;
   mp = NULL;
-  
+
   for (i=0; i<mideal->n; i++)
   {
     if (map_id->m[i] != NULL)
     {
       mideal->buckets[i] = sBucketCreate(dest_r);
-      maPoly_InsertPoly(mp, 
+      maPoly_InsertPoly(mp,
 #ifdef PDEBUG
                         prShallowCopyR(map_id->m[i], map_r, src_r),
 #else
                         prShallowCopyR_NoSort(map_id->m[i], map_r, src_r),
 #endif
-                        src_r,                     
+                        src_r,
                         mideal->buckets[i]);
     }
   }
 }
 
 
-void maMap_CreateRings(ideal map_id, ring map_r, 
-                       ideal image_id, ring image_r, 
+void maMap_CreateRings(ideal map_id, ring map_r,
+                       ideal image_id, ring image_r,
                        ring &src_r, ring &dest_r, BOOLEAN &simple)
 {
 #if HAVE_SRC_R > 0
@@ -293,7 +293,7 @@ void maMap_CreateRings(ideal map_id, ring map_r,
 #if HAVE_DEST_R > 0
   Exponent_t maxExp = maGetMaxExp(map_id, map_r, image_id, image_r);
   if (maxExp <=  1) maxExp = 2;
-  else if (maxExp > (Exponent_t) image_r->bitmask) 
+  else if (maxExp > (Exponent_t) image_r->bitmask)
     maxExp = (Exponent_t) image_r->bitmask;
   dest_r = rModifyRing_Simple(image_r, TRUE, TRUE, maxExp,  simple);
 #else
@@ -313,12 +313,12 @@ static void maMap_KillRings(ring map_r, ring image_r, ring src_r, ring dest_r)
 **
 *F  misc  . . . . . . . . . . . . . . . . . . . . . . . . . . . .  misc  stuff
 */
-    
+
 ideal maIdeal_2_Ideal(maideal m_id, ring dest_r)
 {
   ideal res = idInit(m_id->n, 1);
   int l;
-  
+
   for (int i= 0; i < m_id->n; i++)
   {
     sBucketDestroyAdd(m_id->buckets[i], &(res->m[i]), &l);
@@ -337,7 +337,7 @@ void maPoly_GetLength(mapoly mp, int &length)
   }
 }
 
-  
+
 /*******************************************************************************
 **
 *F  fast_map  . . . . . . . . . . . . . . . . . . . . . . . . . .the real thing
@@ -350,11 +350,11 @@ ideal fast_map(ideal map_id, ring map_r, ideal image_id, ring image_r)
   int length = 0;
   BOOLEAN no_sort;
 
-  // construct rings we work in: 
+  // construct rings we work in:
   // src_r: Wp with Weights set to length of poly in image_id
   // dest_r: Simple ring without degree ordering and short exponents
   maMap_CreateRings(map_id, map_r, image_id, image_r, src_r, dest_r, no_sort);
-  
+
   // construct dest_id
   if (dest_r != image_r)
     dest_id = idrShallowCopyR(image_id, image_r, dest_r);
@@ -365,13 +365,13 @@ ideal fast_map(ideal map_id, ring map_r, ideal image_id, ring image_r)
   mapoly mp;
   maideal mideal;
   maMap_CreatePolyIdeal(map_id, map_r, src_r, dest_r, mp, mideal);
-  
+
   if (TEST_OPT_PROT)
   {
     maPoly_GetLength(mp, length);
     Print("map[%d:%d]{%d:", dest_r->bitmask, dest_r->ExpL_Size, length);
   }
-  
+
   // do the optimization step
 #if HAVE_MAP_OPTIMIZE > 0
   maPoly_Optimize(mp, src_r);
@@ -381,11 +381,11 @@ ideal fast_map(ideal map_id, ring map_r, ideal image_id, ring image_r)
     maPoly_GetLength(mp, length);
     Print("%d}", length);
   }
-      
+
   // do the actual evaluation
   maPoly_Eval(mp, src_r, dest_id, dest_r, length);
   if (TEST_OPT_PROT) Print(".");
-  
+
   // collect the results back into an ideal
   ideal res_dest_id = maIdeal_2_Ideal(mideal, dest_r);
   if (TEST_OPT_PROT) Print(".");
@@ -396,13 +396,13 @@ ideal fast_map(ideal map_id, ring map_r, ideal image_id, ring image_r)
   {
     if (no_sort)
       res_image_id = idrShallowCopyR_NoSort(res_dest_id, dest_r, image_r);
-    else  
+    else
       res_image_id = idrShallowCopyR(res_dest_id, dest_r, image_r);
     id_ShallowDelete(&res_dest_id, dest_r);
   }
   else
     res_image_id = res_dest_id;
-  
+
   if (TEST_OPT_PROT) Print(".");
   // clean-up the rings
   maMap_KillRings(map_r, image_r, src_r, dest_r);
@@ -414,25 +414,305 @@ ideal fast_map(ideal map_id, ring map_r, ideal image_id, ring image_r)
 }
 
 
+/**********************************************************************
+* Evaluation stuff                                                    *
+**********************************************************************/
+
+// substitute p everywhere the monomial occours,
+// return the number of substitutions
+static int maPoly_Substitute(macoeff c, poly p, ring dest_r)
+{
+  // substitute the monomial: go through macoeff
+  int len=pLength(p);
+  int done=0;
+  while (c!=NULL)
+  {
+    done++;
+    poly t=pp_Mult_nn(p,c->n,dest_r);
+    sBucket_Add_p(c->bucket, t, len);
+    c=c->next;
+  }
+  return done;
+}
+
+static poly maPoly_EvalMon(poly src, ring src_r, poly* dest_id, ring dest_r)
+{
+  int i;
+  int e;
+  poly p=NULL;
+  poly pp;
+  for(i=1;i<=src_r->N;i++)
+  {
+    e=p_GetExp(src,i,src_r);
+    if (e>0)
+    {
+      pp=dest_id[i-1];
+      if (pp==NULL)
+      {
+        p_Delete(&p,dest_r);
+        return NULL;
+      }
+      if ((p==NULL) /* && (e>0)*/)
+      {
+        p=p_Copy(pp /*dest_id[i-1]*/,dest_r);
+        e--;
+      }
+      while (e>0)
+      {
+        p=p_Mult_q(p,p_Copy(pp /*dest_id[i-1]*/,dest_r),dest_r);
+        e--;
+      }
+    }
+  }
+  if (p==NULL) p=p_ISet(1,dest_r);
+  return p;
+}
+
+void maPoly_Eval(mapoly root, ring src_r, ideal dest_id, ring dest_r, int total_cost)
+{
+  // invert the list rooted at root:
+  if ((root!=NULL) && (root->next!=NULL))
+  {
+    mapoly q=root->next;
+    mapoly qn;
+    root->next=NULL;
+    do
+    {
+      qn=q->next;
+      q->next=root;
+      root=q;
+      q=qn;
+    }
+    while (qn !=NULL);
+  }
+
+  total_cost /= 10;
+  int next_print_cost = total_cost;
+
+  // the evaluation -----------------------------------------
+  mapoly p=root;
+  int cost = 0;
+
+  while (p!=NULL)
+  {
+    // look at each mapoly: compute its value in ->dest
+    assume (p->dest==NULL);
+    {
+      if ((p->f1!=NULL)&&(p->f2!=NULL))
+      {
+#if 0
+        printf("found prod:");
+        p_wrp(p->src,src_r);printf("=");
+        p_wrp(p->f1->src,src_r);printf(" * ");
+        p_wrp(p->f2->src,src_r);printf("\n");
+#endif
+        poly f1=p->f1->dest;
+        poly f2=p->f2->dest;
+        if (p->f1->ref>0) f1=p_Copy(f1,dest_r);
+        else
+        {
+          // we own p->f1->dest now (in f1)
+          p->f1->dest=NULL;
+        }
+        if (p->f2->ref>0) f2=p_Copy(f2,dest_r);
+        else
+        {
+          // we own p->f2->dest now (in f2)
+          p->f2->dest=NULL;
+        }
+        maMonomial_Free(p->f1,src_r, dest_r);
+        maMonomial_Free(p->f2,src_r, dest_r);
+        p->dest=p_Mult_q(f1,f2,dest_r);
+      } /* factors : 2 */
+      else
+      {
+        //printf("compute "); p_wrp(p->src,src_r);printf("\n");
+        assume((p->f1==NULL) && (p->f2==NULL));
+        //if(p->f1!=NULL) { printf(" but f1="); p_wrp(p->f1->src,src_r);printf("\n"); }
+        //if(p->f2!=NULL) { printf(" but f2="); p_wrp(p->f2->src,src_r);printf("\n"); }
+        // no factorization provided, use the classical method:
+        p->dest=maPoly_EvalMon(p->src,src_r,dest_id->m,dest_r);
+        //p_wrp(p->dest, dest_r); printf(" is p->dest\n");
+      }
+    } /* p->dest==NULL */
+    // substitute the monomial: go through macoeff
+    p->ref -= maPoly_Substitute(p->coeff, p->dest, dest_r);
+    //printf("subst done\n");
+    if (total_cost)
+    {
+      assume(TEST_OPT_PROT);
+      cost++;
+      if (cost > next_print_cost)
+      {
+        Print("-");
+        next_print_cost += total_cost;
+      }
+    }
+
+    mapoly pp=p;
+    p=p->next;
+    //p_wrp(pp->src, src_r);
+    if (pp->ref<=0)
+    {
+      //printf(" (%x) killed\n",pp);
+      maMonomial_Destroy(pp, src_r, dest_r);
+    }
+    //else
+    //  printf(" (%x) not killed, ref=%d\n",pp,pp->ref);
+  }
+}
 
 
-    
-    
-                    
-  
-    
+/*******************************************************************************
+**
+*F  maEggt  . . . . . . . . . . . . . . . . . . . . . . . .  returns extended ggt
+*/
+// return NULL if deg(ggt(m1, m2)) < 2
+// else return m = ggT(m1, m2) and q1, q2 such that m1 = q1*m m2 = q2*m
+static poly maEggT(const poly m1, const poly m2, poly &q1, poly &q2,const ring r)
+{
+
+  int i;
+  int dg = 0;
+  poly ggt = NULL;
+  q1 = p_Init(r);
+  q2 = p_Init(r);
+  ggt=p_Init(r);
+
+  for (i=1;i<=r->N;i++) {
+    Exponent_t e1 = p_GetExp(m1, i, r);
+    Exponent_t e2 = p_GetExp(m2, i, r);
+    if (e1 > 0 && e2 > 0){
+      Exponent_t em = (e1 > e2 ? e2 : e1);
+      dg += em;
+      p_SetExp(ggt, i, em, r);
+      p_SetExp(q1, i, e1 - em, r);
+      p_SetExp(q2, i, e2 - em, r);
+    }
+    else {
+      p_SetExp(q1, i, e1, r);
+      p_SetExp(q2, i, e2, r);
+    }
+  }
+  if (dg>1)
+  {
+    p_Setm(ggt, r);
+    p_Setm(q1, r);
+    p_Setm(q2, r);
 
 
+  }
+  else {
+    p_LmFree(ggt, r);
+    p_LmFree(q1, r);
+    p_LmFree(q2, r);
+    ggt = NULL;
+  }
+  return ggt;
+}
+
+/********************************************************************
+ **                                                                 *
+ * maFindBestggT                                                    *
+ * finds ggT with the highest cost                                  *
+ *******************************************************************/
+
+static mapoly maFindBestggT(mapoly mp, mapoly & choice, mapoly & fp, mapoly & fq,const ring r)
+{
+  int ggt_deg = 0;
+  poly p = mp->src;
+  mapoly iter = choice;
+  poly ggT = NULL;
+  fp = NULL;
+  fq = NULL;
+  poly fp_p=NULL;
+  poly fq_p=NULL;
+  choice=NULL;
+  while ((iter != NULL) && (pDeg(iter->src, r) > ggt_deg))
+  {
+    //    maMonomial_Out(iter, r, NULL);
+    poly q1, q2, q;
+
+    q = maEggT(p, iter->src, q1, q2,r);
+    if (q != NULL)
+    {
+      assume((q1!=NULL)&&(q2!=NULL));
+      if (pDeg(q,r) > ggt_deg)
+      {
+        choice=iter;
+        if (ggT != NULL)
+        {
+          p_LmFree(ggT, r);
+          p_LmFree(fp_p, r);
+          p_LmFree(fq_p, r);
+
+        }
+        ggt_deg = pDeg(q, r);
+        ggT = q;
+        fp_p = q1;
+        fq_p = q2;
+      }
+      else
+      {
+        p_LmFree(q, r);
+        p_LmFree(q1, r);
+        p_LmFree(q2, r);
+      }
+    }
+    iter=iter->next;
+  }
+  if(ggT!=NULL){
+
+    int dq =pTotaldegree(fq_p,r);
+    if (dq!=0){
+      fq=maPoly_InsertMonomial(mp, fq_p, r, NULL);
+      fp=maPoly_InsertMonomial(mp, fp_p, r, NULL);
+      return maPoly_InsertMonomial(mp, ggT, r, NULL);
+    }
+    else {
+      fq=NULL;
+      p_LmFree(fq_p, r);
+      p_LmFree(ggT, r);
+      fp=maPoly_InsertMonomial(mp, fp_p, r, NULL);
+      choice->ref++;
+      return choice;
+    }
+  }
+  else {
+    return NULL;
+  }
 
 
+}
 
+/********************************************************************
+ **                                                                 *
+ * maPoly_Optimize                                                  *
+ * adds and integrates subexpressions                               *
+ *******************************************************************/
 
+void maPoly_Optimize(mapoly mpoly, ring src_r){
+  assume(mpoly!=NULL && mpoly->src!=NULL);
+  mapoly iter = mpoly;
+  mapoly choice;
+  mapoly ggT=NULL;
+  mapoly fp=NULL;
+  mapoly fq=NULL;
+  while (iter->next!=NULL){
+    choice=iter->next;
+    if ((iter->f1==NULL)){
+      ggT=maFindBestggT(iter, choice, fp, fq,src_r);
+      if (choice!=NULL){
+        iter->f1=fp;
+        iter->f2=ggT;
+        if (fq!=NULL){
+          ggT->ref++;
+          choice->f1=fq;
+          choice->f2=ggT;
+        }
+      }
 
-
-  
-  
-  
-  
-
- 
-      
+    }
+    iter=iter->next;
+  }
+}

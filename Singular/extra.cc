@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.173 2002-01-19 17:20:58 obachman Exp $ */
+/* $Id: extra.cc,v 1.174 2002-01-20 11:44:47 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -87,6 +87,8 @@
 
 #include "silink.h"
 #include "walk.h"
+
+#include "fast_maps.h"
 
 /*
  *   New function/system-calls that will be included as dynamic module
@@ -650,7 +652,6 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 #include "mpsr.h"
 
 #include "mod_raw.h"
-// #include "fast_maps.cc"
    
 static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 {
@@ -779,26 +780,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     if(strcmp(sys_cmd,"r")==0)
     {
       rDebugPrint((ring)h->Data());
-      return FALSE;
-    }
-    else
-/*==================== ring debug ==================================*/
-    if(strcmp(sys_cmd,"map")==0)
-    {
-      ring image_r = currRing;
-      map theMap = (map)h->Data();
-      ideal image_id = (ideal) theMap;
-      ring map_r = IDRING(idroot->get(theMap->preimage, myynest));
-      ideal map_id = IDIDEAL(map_r->idroot->get(h->Next()->Name(), myynest));
-#if 0
-      ring src_r, dest_r;
-      maMap_CreateRings(map_id, map_r, image_id, image_r, src_r, dest_r);
-      mapoly mp;
-      maideal mideal;
-          
-      maMap_CreatePolyIdeal(map_id, map_r, src_r, dest_r, mp, mideal);
-      maPoly_Out(mp, src_r);
-#endif
       return FALSE;
     }
     else
