@@ -1,3 +1,6 @@
+Tue May 19 16:30:34 MET DST 1998 hannes
+	* new appendix: Polynomial data (pdata.doc)
+	  introduced, moved "monomial orderings" to it
 Fri May 15 09:00:30 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* general.doc (Objects): section reviewed

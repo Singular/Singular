@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.31 1998-05-18 20:29:33 wichmann Exp $
+@comment $Id: singular.doc,v 1.32 1998-05-19 14:32:12 Singular Exp $
 @comment this file contains the main structure of the manual
 @c ------------------------
 @comment %**start of header
@@ -497,13 +497,19 @@ For these reasons, we strongly disrecommend the usage of variables which
 have the same name(s) as ring variables
 
 @c ----------------------------------------------------------------------------
-@node Examples, Mathematical background, Tricks and pitfalls, Top
+@node Examples, Polynomial data, Tricks and pitfalls, Top
 @appendix Examples
 @cindex Examples
 @include examples.tex
 
 @c ----------------------------------------------------------------------------
-@node Mathematical background, SINGULAR libraries, Examples, Top
+@node Polynomial data,Mathematical background, Examples, Top
+@appendix Polynomial data
+@cindex Polynomial data
+@include pdata.tex
+
+@c ----------------------------------------------------------------------------
+@node Mathematical background, SINGULAR libraries, Polynomial data, Top
 @appendix Mathematical background
 @cindex Mathematical background
 @include math.tex

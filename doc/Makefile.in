@@ -41,7 +41,7 @@ SINGULARDIR	= ..
 #SINGULAR_OBJS= copyright.tex proc.tex
 TEX_FILES = copyright.tex # proc.tex
 SINGULAR_OBJS= examples.tex general.tex math.tex reference.tex \
-	singular.tex start.tex types.tex
+	singular.tex start.tex types.tex pdata.tex
 
 all: info dvi
 
@@ -125,3 +125,4 @@ Makefile: Makefile.in
 #singular.tex: singular.doc
 #start.tex: start.doc
 #types.tex: types.doc
+#pdata.tex: pdata.doc
