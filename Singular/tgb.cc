@@ -727,7 +727,7 @@ void add_to_basis(poly h, int i_pos, int j_pos,calc_dat* c)
   P.p=h; /*p_Copy(h,c->r);*/
   P.FDeg=pFDeg(P.p,c->r);
   if (!rField_is_Zp(c->r)) pCleardenom(P.p);
-  enterT(P,c->strat,-1);
+  //enterT(P,c->strat,-1);
   c->strat->enterS(P,i,c->strat);
   c->strat->lenS[i]=/*pLength(c->strat->S[i]);*/ c->lengths[c->n-1];
   pNorm(c->strat->S[i]);
