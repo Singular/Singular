@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.71 1998-05-19 17:47:18 pohl Exp $
+@comment $Id: reference.doc,v 1.72 1998-05-19 21:14:36 wichmann Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -3489,41 +3489,57 @@ shows correct usage in error messages (default)
 @end table
 
 @*The output reported on @code{option(prot)} has the following meaning:
-@multitable @columnfractions .01 .15 .1 .65
+@multitable @columnfractions .01 .14 .1 .65
 @item @tab @code{facstd} @tab @code{F} @tab found a new factor
 @item @tab @tab @tab all other characters: like the output of @code{std}
 
 @item @tab @code{fglm} @tab @code{.} @tab basis monom found
-@item @tab @tab @code{+} @tab egde monom found
+@item @tab @tab @code{+} @tab edge monom found
 @item @tab @tab @code{-} @tab border monom found
 
 @item @tab @code{lres}
 
-@item @tab @code{mres} @tab @code{[c]} @tab computations of the @code{d}-th
-syzygy module 
+@item @tab @code{mres} 
+@tab @code{[}@math{d}@code{]} 
+@tab computations of the @math{d}-th syzygy module 
 @item @tab @tab @tab all other characters: like the output of @code{std}  
 
-@item @tab @code{minres} @tab @code{[c]} @tab minimizing of the @code{d}-th
-syzygy module 
+@item @tab @code{minres} 
+@tab @code{[}@math{d}@code{]} 
+@tab minimizing of the @math{d}-th syzygy module 
 
-@item @tab @code{res} @tab @code{[c]} @tab computations of the @code{d}-th
-syzygy module 
+@item @tab @code{res} 
+@tab @code{[}@math{d}@code{]} 
+@tab computations of the @math{d}-th syzygy module 
 @item @tab @tab @tab all other characters: like the output of @code{std}
 
 @item @tab @code{sres}
 
-@item @tab @code{std} @tab @code{s} @tab found a new element of the standard
-basis 
-@item @tab @tab @code{-} @tab reduced a pair/S-polynomial to 0
-@item @tab @tab @code{.} @tab postponed a reduction of an pair/S-polynomial
-@item @tab @tab @code{H(d)} @tab found a 'highest corner' of degree @code{d},
-no need to consider higher degrees 
-@item @tab @tab @code{(n)} @tab @code{n} critical pairs are still to be
-reduced 
-@item @tab @tab @code{(S:n)} @tab doing complete reduction of @code{n}
-elements 
-@item @tab @tab @code{d} @tab the degree of the leading terms is currently
-@code{n} 
+@item @tab @code{std} 
+@tab @code{s} 
+@tab found a new element of the standard basis 
+@item @tab 
+@tab @code{-} 
+@tab reduced a pair/S-polynomial to 0
+@item @tab 
+@tab @code{.} 
+@tab postponed a reduction of a pair/S-polynomial
+@item @tab 
+@tab @code{h} 
+@tab used Hilbert series criterion
+@item @tab 
+@tab @code{H(}@math{d}@code{)} 
+@tab found a 'highest corner' of degree @math{d}, no need to consider
+higher degrees  
+@item @tab 
+@tab @code{(}@math{n}@code{)} 
+@tab @math{n} critical pairs are still to be reduced 
+@item @tab 
+@tab @code{(S:}@math{n}@code{)} 
+@tab doing complete reduction of @math{n} elements 
+@item @tab 
+@tab @math{d} @tab the degree of the leading terms is currently
+@math{d} 
 @item @tab @code{syz} @tab @tab all characters: like the output of @code{std}
 @end multitable
 
