@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.67 1999-07-19 12:06:17 obachman Exp $
+@comment $Id: singular.doc,v 1.68 1999-07-19 14:07:41 obachman Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -198,6 +198,7 @@ command @code{LIB "all.lib";} for loading all libraries.
 * presolve_lib:: procedures for pre-solving polynomial equations
 * solve_lib:: procedures to solve polynomial systems
 * spcurve_lib:: procedures for cm codimension 2 singularities
+* algebra_lib:: procedures for computing with algbras and maps
 @end menu
 
 
@@ -357,10 +358,16 @@ LIB "all.lib";
 @c lib solve.lib no_ex
 
 @c ---------------------------------------------------------
-@node spcurve_lib,, solve_lib, SINGULAR libraries
+@node spcurve_lib, algebra_lib, solve_lib, SINGULAR libraries
 @section spcurve_lib
 @cindex spcurve_lib
 @c lib spcurve.lib
+
+@c ---------------------------------------------------------
+@node algebra_lib, , spcurve_lib, SINGULAR libraries
+@section algebra_lib
+@cindex algebra_lib
+@c lib algebra.lib
 
 @c ----------------------------------------------------------
 @node Index, ,SINGULAR libraries, Top

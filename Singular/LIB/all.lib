@@ -1,7 +1,7 @@
-// $Id: all.lib,v 1.19 1999-07-07 14:39:05 obachman Exp $
+// $Id: all.lib,v 1.20 1999-07-19 14:07:27 obachman Exp $
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: all.lib,v 1.19 1999-07-07 14:39:05 obachman Exp $";
+version="$Id: all.lib,v 1.20 1999-07-19 14:07:27 obachman Exp $";
 info="
 LIBRARY:  all.lib   Load all libraries
 
@@ -31,7 +31,8 @@ LIBRARY:  all.lib   Load all libraries
   paramet.lib   PROCEDURES FOR PARAMETRIZATION OF PRIMARY DECOMPOSITION
   mondromy.lib  PROCEDURES TO COMPUTE THE MONODROMY OF A SINGULARITY
   jordan.lib    PROCEDURES TO COMPUTE THE JORDAN NORMAL FORM
-  spcurve.lib    PROCEDURES FOR CM CODIMENSION 2 SINGULARITIES
+  spcurve.lib   PROCEDURES FOR CM CODIMENSION 2 SINGULARITIES
+  algebra.lib    PROCEDURES FOR COMPUTING WITH ALGBRAS AND MAPS
 ";
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -63,5 +64,5 @@ LIB "paramet.lib";
 LIB "mondromy.lib"
 LIB "jordan.lib";
 LIB "spcurve.lib";
-
+LIB "algebra.lib";
 // LIB "tools.lib";

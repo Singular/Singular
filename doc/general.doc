@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.128 1999-07-19 12:06:16 obachman Exp $
+@comment $Id: general.doc,v 1.129 1999-07-19 14:07:37 obachman Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -2480,9 +2480,14 @@ appear in the summary description of a library.
 The content-string of an item is typeset as follows:
 @itemize 
 @item 
+If the content-string starts with an @code{@@} sign, then no parsing is
+done, but the content-string is assumed to be in the texinfo format.
+
+@item 
 The texinfo commands @code{@@*}, @code{@@code@{..@}},
 @code{@@math@{..@}} may be used to enforce linebreaks, and typesetting
-in typewriter font resp. math mode.
+in typewriter font resp. math mode. Text inside @code{@@math@{..@}}
+need to be valid latex math markup.
 
 @item 
 Words which are followed by matching round parenthesis (i.e., by
