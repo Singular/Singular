@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.130 2000-10-26 06:39:30 obachman Exp $ */
+/* $Id: ring.cc,v 1.131 2000-10-26 09:49:43 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -2436,9 +2436,9 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
         order[j]=r->order[i];
         break;
     }
-    block0[i]=r->block0[j];
-    block1[i]=r->block1[j];
-    wvhdl[i]=r->wvhdl[j];
+    block0[j]=r->block0[i];
+    block1[j]=r->block1[i];
+    wvhdl[j]=r->wvhdl[i];
     i++;j++;
     // order[j]=ringorder_no; //  done by omAlloc0
     if (i==nblocks) break;
@@ -3102,7 +3102,7 @@ static unsigned long rGetDivMask(int bits)
 {
   unsigned long divmask = 0;
   int i = BIT_SIZEOF_LONG - bits;
-  
+
   while (i >= 0)
   {
     divmask |= (1 << (unsigned long) i);
