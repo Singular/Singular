@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.26 1998-03-31 09:00:43 Singular Exp $
+// $Id: clapsing.cc,v 1.27 1998-04-15 16:15:01 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -25,8 +25,15 @@
 
 poly singclap_gcd ( poly f, poly g )
 {
-  if ((f==NULL)||(g==NULL))
-    return pOne();
+  if (f==NULL)
+  {
+    if(g==NULL)
+      return NULL;
+    else
+      return pCopy(g);
+  }
+  else if (g==NULL)
+    return pCopy(f);
 
   poly res=NULL;
   
@@ -76,7 +83,7 @@ poly singclap_gcd ( poly f, poly g )
   }
   #endif
   else
-    WerrorS( "not implemented" );
+    WerrorS( feNotImplemented );
 
   pDelete(&f);
   pDelete(&g);
@@ -91,12 +98,12 @@ poly singclap_resultant ( poly f, poly g , poly x)
     WerrorS("3rd argument must be a ring variable");
     return NULL;
   }
-  Variable X(i);
   // for now there is only the possibility to handle polynomials over
   // Q and Fp ...
   if (( nGetChar() == 0 || nGetChar() > 1 )
   && (currRing->parameter==NULL))
   {
+    Variable X(i);
     setCharacteristic( nGetChar() );
     CanonicalForm F( convSingPClapP( f ) ), G( convSingPClapP( g ) );
     poly res=convClapPSingP( resultant( F, G, X ) );
@@ -112,6 +119,7 @@ poly singclap_resultant ( poly f, poly g , poly x)
     poly res;
     if (currRing->minpoly!=NULL)
     {
+      Variable X(i);
       CanonicalForm mipo=convSingTrClapP(((lnumber)currRing->minpoly)->z);
       Variable a=rootOf(mipo);
       CanonicalForm F( convSingAPClapAP( f,a ) ), G( convSingAPClapAP( g,a ) );
@@ -119,6 +127,7 @@ poly singclap_resultant ( poly f, poly g , poly x)
     }
     else
     {
+      Variable X(i+rPar(currRing));
       CanonicalForm F( convSingTrPClapP( f ) ), G( convSingTrPClapP( g ) );
       res= convClapPSingTrP( resultant( F, G, X ) );
     }
@@ -126,7 +135,7 @@ poly singclap_resultant ( poly f, poly g , poly x)
     return res;
   }
   else
-    WerrorS( "not implemented" );
+    WerrorS( feNotImplemented );
   return NULL;
 }
 //poly singclap_resultant ( poly f, poly g , poly x)
@@ -251,7 +260,7 @@ lists singclap_extgcd ( poly f, poly g )
   }
   else
   {
-    WerrorS( "not implemented" );
+    WerrorS( feNotImplemented );
     return NULL;
   }
   lists L=(lists)Alloc(sizeof(slists));
@@ -298,7 +307,7 @@ poly singclap_pdivide ( poly f, poly g )
     }
   }
   else
-    WerrorS( "not implemented" );
+    WerrorS( feNotImplemented );
   Off(SW_RATIONAL);
   return res;
 }
@@ -444,7 +453,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
     {
       //if (nGetChar()==1)
       //{
-      //  WerrorS("not implemented");
+      //  WerrorS( feNotImplemented );
       //  return NULL;
       //}
       CanonicalForm mipo=convSingTrClapP(((lnumber)currRing->minpoly)->z);
@@ -471,7 +480,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
   }
   else
   {
-    WerrorS( "not implemented" );
+    WerrorS( feNotImplemented );
     goto end;
   }
   {
@@ -585,7 +594,7 @@ matrix singclap_irrCharSeries ( ideal I)
   }
   else
   {
-    WerrorS("not implemented");
+    WerrorS( feNotImplemented );
     return res;
   }
 
@@ -650,7 +659,7 @@ char* singclap_neworder ( ideal I)
   }
   else
   {
-    WerrorS("not implemented");
+    WerrorS( feNotImplemented );
     return NULL;
   }
 
@@ -724,7 +733,7 @@ BOOLEAN singclap_isSqrFree(poly f)
   else
   {
 err:
-    WerrorS( "not implemented" );
+    WerrorS( feNotImplemented );
   }
   return b;
 }
@@ -789,7 +798,7 @@ poly singclap_det( const matrix m )
     }
   }
   else
-    WerrorS( "not implemented" );
+    WerrorS( feNotImplemented );
   Off(SW_RATIONAL);
   return res;
 }
@@ -879,7 +888,7 @@ BOOLEAN jjEXTGCD_P(leftv res, leftv u, leftv v)
 BOOLEAN jjRESULTANT(leftv res, leftv u, leftv v, leftv w)
 {
   res->data=singclap_resultant((poly)u->Data(),(poly)v->Data(), (poly)w->Data());
-  return (res->data==NULL);
+  return errorreported;
 }
 BOOLEAN jjCHARSERIES(leftv res, leftv u)
 {
