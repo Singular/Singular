@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: silink.cc,v 1.10 1997-04-18 11:25:01 obachman Exp $ */
+/* $Id: silink.cc,v 1.11 1997-04-29 12:02:23 Singular Exp $ */
 
 /*
 * ABSTRACT: general interface to links
@@ -346,7 +346,7 @@ BOOLEAN slOpenAscii(si_link l, short flag)
         mode="w";
       }
     }
-    outfile=fopen(filename,mode);
+    outfile=feFopen(filename,mode);
     if (outfile!=NULL) l->data = (void *) outfile;
     else return TRUE;
   }
