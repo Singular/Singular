@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.58 1998-05-18 16:12:15 obachman Exp $
+@comment $Id: reference.doc,v 1.59 1998-05-18 16:42:48 schmidt Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -1394,8 +1394,9 @@ May also be written with only one argument
 @*1: returns non-constant factors
 @*2: returns non-constant factors and multiplicities
 @item @strong{Note:}
-Not implemented for basering real, galoisfields with gftables and algebraic
-extensions over the rational numbers.
+Not implemented for the coefficient fields real, finite fields of the
+type @code{(p^n, a)}, and algebraic extensions over the rational
+numbers.
 @item @strong{Example:}
 @example
 @c example
@@ -1648,6 +1649,10 @@ See @ref{gen}; @ref{module expressions}.
 the same as the type of the arguments
 @item @strong{Purpose:}
 computes the greatest common divisor.
+@item @strong{Note:}
+Not implemented for the coefficient fields real, finite fields of the
+type @code{(p^n, a)}, and algebraic extensions over the rational
+numbers.
 @item @strong{Example:}
 @example
 @c example
@@ -1803,32 +1808,15 @@ returns the n-th (n=1, 2) Hilbert series as intvec with two arguments.
   hilb(s,2);
 @c example
 @end example
-@item @strong{Background:}
-@tex
-Let M $=\bigoplus M_i$ be a graded module over $K[x_1,...,x_n]$.
-The Hilbert series  of M is the power series
-$$H_M(t)=\sum_{i=-\infty}^\infty dim_K M_i t^i$$
-It turns out that $H_M(t)$ can be written in two useful ways:
-$$H_M(t)={Q(t)\over (1-t)^n}={P(t)\over (1-t)^{dim(M)}}$$
-where Q(t) and P(t) are polynomials from Z[t].
-Q(t) is called first Hilbert series, and P(t) the second Hilbert series.
-@end tex
-@ifinfo
-Let M =(+) M_i be a graded module over K[x_1,...,x_n].
-The Hilbert series  of M is the power series
-H_M(t)=sum_i dim_K (M_i)*t^i.
-It turns out that H_M(t) can be written in two useful ways:
-H_M(t)=Q(t)/(1-t)^n=P(t)/(1-t)^dim(M).
-where Q(t) and P(t) are polynomials from Z[t].
-Q(t) is called first Hilbert series, and P(t) the second Hilbert series.
-@end ifinfo
 @end table
 @c ref
-See @ref{ideal expressions};
+See
+@ref{Hilbert function};
+@ref{ideal expressions};
 @ref{intvec};
 @ref{module expressions};
-@ref{std}.
 @ref{stdhilb};
+@ref{std}.
 @c ref
 @c ---------------------------------------
 @node homog, imap, hilb, Functions
@@ -2486,18 +2474,20 @@ See
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
-reads a library of procedures from a file. If the given
-filename does not start with @kbd{.} or @kbd{/}, the following directories are
-searched for the file: the current directory,
-the directories given in the environment variable
-@code{SINGULARPATH}@footnote{@code{SPATH} on MS-DOS},
-and finally some default directory (like @code{/usr/local/share/Singular}).
+reads a library of procedures from a file. If the given filename does
+not start with @kbd{.} or @kbd{/}, the following directories are
+searched for the file: the current directory, the directories given in
+the environment variable @code{SINGULARPATH}@footnote{@code{SPATH} on
+MS-DOS}, and finally some default directory (like
+@code{/usr/local/share/Singular}).
+
 Only the names of the procedures in the library are loaded, the body of
-the proc
-is read during the first call of this proc. This minimizes
-the memory consumption by unused procedures. When @sc{Singular} is
-started with the @code{-q} or @code{--quiet} option, no message about
-the loading of a library is displayed.
+the proc is read during the first call of this proc. This minimizes
+memory consumption by unused procedures.  When @sc{Singular} is started
+with the @code{-q} or @code{--quiet} option, no message about the
+loading of a library is displayed.  More exactly, option @code{-q} (and
+likewise @code{--quiet}) unsets option @code{loadLib} to inhibit
+monitoring of library loading (@pxref{option}).
 @item @strong{Syntax:}
 @code{LIB;}
 @item @strong{Type:}
@@ -2506,20 +2496,23 @@ string
 shows all loaded libraries.
 @item @strong{Example:}
 @example
-  LIB "inout.lib"; // the names of the procedures of inout.lib
-                   // are now known to Singular
-  @expansion{}// ** loaded ./inout.lib (1.5,1998/05/05)
+@c example
+  option(loadLib); // show loading of libraries
   LIB;
-  @expansion{} standard.lib,inout.lib
+                   // the names of the procedures of inout.lib
+  LIB "inout.lib"; // are now known to Singular
+  LIB;
+@c example
 @end example
 @end table
 @c ref
-See @ref{Commandline options}; 
+See
+@ref{Commandline options}; 
 @ref{LIB in a library}; 
-@ref{proc}; 
 @ref{Procedures and libraries};
-@ref{string expressions}; 
-@ref{SINGULAR libraries}.
+@ref{SINGULAR libraries};
+@ref{proc}; 
+@ref{string expressions}.
 @c ref
 @c -------------------------------------------------
 @node lift, liftstd, LIB, Functions
@@ -2664,6 +2657,9 @@ resolution
 @item @strong{Purpose:}
 computes a free resolution of an ideal or module with LaScala's
 method.
+
+The ideal_expression resp.@: module_expression has to be homogeneous.
+
 More precisely, let M be given by a a generating set and
 @tex
 $A_1=matrix(M)$.
@@ -2689,8 +2685,9 @@ $M_i={\tt module}(A_i)$, i=1..k.
 @ifinfo
 Mi=module(Ai), i=1..k.
 @end ifinfo
-@*If k=0, @code{lres(M,0)}
-returns a list of n modules where n is the number of variables of the basering.
+
+If k=0, @code{lres(M,0)} returns a list of n modules where n is the
+number of variables of the basering.
 
 Let @code{list l=lres(M,0);} then L[1] generates M,
 L[2] generates
@@ -2708,20 +2705,17 @@ $=M_i$
 @example
 @end example
 @end table
-@menu
-* ideal expressions::
-* module expressions::
-* int expressions::
-* mres::
-* res::
-* sres::
-* minres::
-* betti::
-@end menu
-@iftex
-See @ref{ideal expressions}; @ref{module expressions}; @ref{int expressions};
-@ref{mres}; @ref{res}; @ref{sres}; @ref{minres}; @ref{betti}.
-@end iftex
+@c ref
+See
+@ref{betti};
+@ref{ideal expressions};
+@ref{int expressions};
+@ref{minres};
+@ref{module expressions};
+@ref{mres};
+@ref{res};
+@ref{sres}.
+@c ref
 @c ---------------------------------------
 @node maxideal, memory, lres, Functions
 @subsection maxideal
