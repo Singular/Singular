@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.280 2002-03-07 18:32:08 mschulze Exp $ */
+/* $Id: iparith.cc,v 1.281 2002-03-12 10:07:17 mschulze Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -4820,6 +4820,7 @@ static BOOLEAN jjDIVISION4(leftv res, leftv v)
   leftv v2=v1->next;
   leftv v3=v2->next;
   leftv v4=v3->next;
+  assumeStdFlag(v2);
 
   int i1=iiTestConvert(v1->Typ(),MODUL_CMD);
   int i2=iiTestConvert(v2->Typ(),MODUL_CMD);
