@@ -1,4 +1,4 @@
-version="$Id: control.lib,v 1.24 2005-03-16 16:15:14 levandov Exp $";
+version="$Id: control.lib,v 1.25 2005-03-16 22:16:53 levandov Exp $";
 category="Applications";
 info="
 LIBRARY:  control.lib Procedures for System and Control Theory 
@@ -576,6 +576,10 @@ EXAMPLE:  example control2; shows an example
 NOTE: same as control(R); but using dimensions
 "
 {
+  if( nrows(R) != rank(transpose(R)) )
+  {
+    return ("control2 cannot be applied, since R does not have full row rank");
+  }  
   intvec v=option(get);
   module R_std=std(R);
   int d=dim_Our(R_std);
@@ -606,20 +610,40 @@ example
 };
 //------------------------------------------------------------------------
 proc rank(module M)
+"USAGE: proc rank(M), M a matrix/module
+PURPOSE: compute the column rank of M as of matrix
+RETURN: int
+NOTE: this procedure uses bareiss-algorithm which might not terminate
+"
 {
-  module M_red=bareiss(M)[1];
-  int NCols_red=ncols(M_red);
+  module M_red  = bareiss(M)[1];
+  int NCols_red = ncols(M_red);
   return (NCols_red);
 }
+example
+{"EXAMPLE: ";echo = 2;
+  //deRham complex
+  ring r=0,(D(1..3)),dp;
+  module R;
+  R=[0,-D(3),D(2)],
+    [D(3),0,-D(1)],
+    [-D(2),D(1),0];
+  R=transpose(R);
+  rank(R); 
+};
+  
 //------------------------------------------------------------------------
 static proc autonom_output( int i, int NVars, module RC, int R_rank ) 
 //static proc autonom_output( int i, int NVars, module RC ) 
 //static proc autonom_output( int i, int NVars ) 
-"USAGE:  proc autonom_output(i, NVars)
+"USAGE:  proc autonom_output(i, NVars, RC, R_rank)
            i:  integer, number of first nonzero Ext or 
 	       just number of variables in a base ring + 1 in case that all the Exts are zero
 	   NVars:  integer, number of variables in a base ring  
-RETURN:  list with all the autonomy properties of the system which is to be returned in 'autonom' procedure
+	   RC: module, kernel-representation of controllable part of the system
+	   R_rank: integer, rank of the representation matrix
+PURPOSE: compute all the autonomy properties of the system which is to be returned in 'autonom' procedure
+RETURN:  list 
 NOTE:  this procedure is used in 'autonom' procedure
 "
 {
@@ -704,9 +728,9 @@ EXAMPLE:  example autonom2; shows an example
 //   return( autonom_output(NVars-d,NVars) );
   module RT = transpose(R);
   module RC;  //for computation of controllable part if if exists
-  d = dim_Our( std(RT) );  //this is the dimension of the system 
-  int i=NVars-d;  //First non-zero Ext
-  if(d==0)
+  d     = dim_Our( std(RT) );  //this is the dimension of the system 
+  int i = NVars-d;  //First non-zero Ext
+  if( d==0 )
     {
       RC=LeftKernel(RightKernel(R));
     }
@@ -727,8 +751,9 @@ example
 //----------------------------------------------------------
 proc autonom(module R)
 "USAGE:  autonom(R);   R a module (R is a matrix of the system of equations which is to be investigated)
-RETURN:  list of all the properties concerning autonomy of the system (behavior) represented by the  matrix R
-EXAMPLE:  example autonom; shows an example
+PURPOSE: find all the properties concerning autonomy of the system (behavior) represented by the  matrix R
+RETURN:  list
+EXAMPLE: example autonom; shows an example
 "
 {
   int NVars=nvars(basering);
@@ -907,8 +932,45 @@ proc exWindTunnel()
   return(@r);  
 };
 //----------------------------------------------------------
-
 proc genericity(matrix M)
+"USAGE:  genericity(M), M is a module/matrix
+PURPOSE: determine parametric expressions which have been assumed to be non-zero in the process of computing the Groebner basis
+RETURN:  list (of strings) 
+NOTE: we strongly recommend to switch on the redSB and redTail options; 
+@*    the procedure is effective with the lift procedure for modules with parameters
+EXAMPLE:  example genericity; shows an example
+"
+{
+  // returns "-", if there are no parameters!
+  if (npars(basering)==0)
+  {
+    return("-");
+  }
+  list RT = evas_genericity(M);
+  return(RT);
+}
+example
+{  // TwoPendula
+  "EXAMPLE:"; echo = 2;
+  ring r=(0,m1,m2,M,g,L1,L2),Dt,dp;
+  module RR = 
+    [m1*L1*Dt^2, m2*L2*Dt^2, -1, (M+m1+m2)*Dt^2], 
+    [m1*L1^2*Dt^2-m1*L1*g, 0, 0, m1*L1*Dt^2],
+    [0, m2*L2^2*Dt^2-m2*L2*g, 0, m2*L2*Dt^2];
+  module R = transpose(RR);
+  module SR = std(R);
+  matrix T = lift(R,SR);
+  genericity(T);
+  //-- The result might be different when computing reduced bases:
+  matrix T2;
+  option(redSB);
+  option(redTail);
+  module SR2 = std(R);
+  T2 =  lift(R,SR2);
+  genericity(T2);
+}
+//---------------------------------------------------------------
+proc victors_genericity(matrix M)
 "USAGE:  genericity(M), M is a module/matrix
 PURPOSE: determine parametric expressions which have been assumed to be non-zero in the process of computing the Groebner basis
 RETURN:  list (of strings) 
@@ -1088,7 +1150,6 @@ example
   list CC = canonize(C);
   view(CC);
 }
-
 //---------------------------------------------------------------
 static proc smdeg(matrix N)  
 // returns an intvec of length 2 with the index of an element of N with smallest degree
@@ -1434,4 +1495,49 @@ example
   module Tr  = FindTorsion(RR,LAnn);
   print(RR);  // the module itself
   print(Tr); // generators of the torsion submodule
+}
+//---------------------------------------------------------------
+proc evas_genericity(matrix M)
+{
+ideal I=ideal(M);
+I=simplify(I,2+4);
+int s = size(I);
+ideal Den;
+poly p;
+int i;
+for (i=1; i<=s; i++)
+ {
+   p=I[i];
+   while (p !=0) 
+   { Den=Den,denominator(leadcoef(p)); 
+     p=p-lead(p); 
+   }
+ }
+Den=simplify(Den,2+4);  
+string newvars = parstr(basering);
+def save = basering;
+string NewRing = "ring @NR =" +string(char(basering))+",("+newvars+"),Dp;";
+execute(NewRing);
+ideal F;
+ideal Den = imap(save,Den);
+Den=simplify(Den,1);
+int s1=size(Den);
+for (i=1;i<=s1; i++)
+{ 
+  if (Den[i] !=1)
+  { 
+    F=F,factorize(Den[i],1); 
+  } 
+ }
+ F=simplify(F,2+4+8); 
+ // print(F);
+ ideal @L = F;
+ list SL;
+ int j;
+ for (j=1; j<=size(@L);j++)
+ {
+   SL[j] = string(@L[j]);
+ }
+ setring save;
+ return(SL);
 }
