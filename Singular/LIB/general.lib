@@ -1,9 +1,9 @@
-// $Id: general.lib,v 1.12 1999-06-18 13:47:27 greuel Exp $
+// $Id: general.lib,v 1.13 1999-06-21 17:34:15 Singular Exp $
 //system("random",787422842);
 //GMG, last modified 18.6.99
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: general.lib,v 1.12 1999-06-18 13:47:27 greuel Exp $";
+version="$Id: general.lib,v 1.13 1999-06-21 17:34:15 Singular Exp $";
 info="
 LIBRARY:  general.lib   PROCEDURES OF GENERAL TYPE
 
@@ -12,7 +12,7 @@ LIBRARY:  general.lib   PROCEDURES OF GENERAL TYPE
  binomial(n,m[,../..]); n choose m (type int), [type string/type number]
  factorial(n[,../..]);  n factorial (=n!) (type int), [type string/number]
  fibonacci(n[,p]);      nth Fibonacci number [char p]
- kmemory([n]);          active [allocated] memory in kilobyte
+ kmemory([n[,v]]);      active [allocated] memory in kilobyte
  killall();             kill all user-defined variables
  number_e(n);           compute exp(1) up to n decimal digits
  number_pi(n);          compute pi (area of unit circle) up to n digits
@@ -230,36 +230,42 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc kmemory (list #)
-"USAGE:   kmemory([n]); n = int
+"USAGE:   kmemory([n,[v]]); n = int
 RETURN:  memory in kilobyte of type int
          n=0: memory used by active variables (same as no parameters)
          n=1: total memory allocated by Singular
          n=2: difference between top and init memory adress (sbrk memory)
          n!=0,1,2: 0
-DISPLAY: detailed information about allocated and used memory if n!=0,1,2
+DISPLAY: detailed information about allocated and used memory if v!=0
 NOTE:    kmemory uses internal function 'memory' to compute kilobyte, and
          is the same as 'memory' for n!=0,1,2
 EXAMPLE: example kmemory; shows an example
 "
 { 
    int n;
+   int verb;
    if (size(#) != 0)
    {
      n=#[1];
+     if (size(#) >1)
+     { verb=#[2]; }
    }
    
-  if ( n==0)
-  { dbprint(printlevel-voice+3,
-    "// memory used, at the moment, by active variables (kilobyte):"); }
-  if ( n==1 )
-  { dbprint(printlevel-voice+3,
-    "// total memory allocated, at the moment, by SINGULAR (kilobyte):"); }
+  if ( verb != 0)
+  {
+    if ( n==0)
+    { dbprint(printlevel-voice+3,
+      "// memory used, at the moment, by active variables (kilobyte):"); }
+    if ( n==1 )
+    { dbprint(printlevel-voice+3,
+      "// total memory allocated, at the moment, by SINGULAR (kilobyte):"); }
+   }
    return ((memory(n)+1023)/1024);
 }
 example
 { "EXAMPLE:"; echo = 2;
    kmemory();
-   kmemory(1);
+   kmemory(1,1);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
