@@ -439,8 +439,17 @@ CXXTEMPLFLAGSP	= -fno-implicit-templates
 DEFSP		= @DEFS@ -DNDEBUG -DDO_PROFILE
 LDFLAGSP	= -static @LDFLAGS@
 
+CFLAGSB		= -g -O3 -pipe  
+CXXFLAGSB	= -g -O3 -pipe 
+CXXTEMPLFLAGSB	= -fno-implicit-templates
+DEFSB		= @DEFS@ -DNDEBUG 
+LDFLAGSB	= -static @LDFLAGS@
+# bprof object  file to link with
+BPROFOBJ	= /usr/local/lib/bmon.o
+
+
 ##
-## .op files for 
+## .op files for gprof
 ## 
 
 OBJP1=	grammar.op scanner.op matpol.op binom.op\
@@ -465,11 +474,38 @@ OBJP2= mmalloc.op mmallocb.op mmallocs.op mmblock.op mmheap.op \
 OBJP=$(OBJP1) $(OBJP2) claptmpl.op
 
 ##
-## Debug Targets
+## .ob files for bprof
+## 
+
+OBJB1=	grammar.ob scanner.ob matpol.ob binom.ob\
+     febase.ob feread.ob timer.ob intvec.ob attrib.ob lists.ob\
+     longrat.ob longrat0.ob misc.ob ring.ob numbers.ob maps.ob\
+     hilb.ob comm.ob kstd1.ob kstd2.ob kutil.ob khstd.ob kstdfac.ob modulop.ob \
+     spolys.ob ideals.ob subexpr.ob hdegree.ob hutil.ob ffields.ob shortfl.ob \
+     longalg.ob spolys0.ob syz.ob syz0.ob syz1.ob weight.ob \
+     ipid.ob ipshell.ob iplib.ob ipassign.ob ipconv.ob ipprint.ob\
+     polys.ob polys0.ob polys1.ob polys-impl.ob extra.ob\
+     mminit.ob sing_dld.ob sing_dbm.ob silink.ob \
+     sing_mp.ob fglm.ob fglmzero.ob fglmvec.ob fglmgauss.ob fglmhom.ob\
+     algmap.ob clapconv.ob  clapmem.ob clapsing.ob \
+     cntrlc.ob  \
+     mpsr_Error.ob mpsr_Put.ob mpsr_PutPoly.ob mpsr_GetPoly.ob \
+     mpsr_Get.ob mpsr_GetMisc.ob \
+     ndbm.ob spSpolyLoop.ob libparse.ob
+
+OBJB2= mmalloc.ob mmallocb.ob mmallocs.ob mmblock.ob mmheap.ob \
+     mmspec.ob mmutil.ob weight0.ob
+
+OBJB=$(OBJB1) $(OBJB2) claptmpl.ob
+
+##
+## profile targets
 ##
 
+## for gprof
 claptmpl.op: claptmpl.cc mod2.h
 	$(CXXP)  ${CXXFLAGSP} ${CPPFLAGS} ${DEFSP} -c $< -o $@
+
 $(OBJP1): %.op: %.cc
 	$(CXXP) ${CXXFLAGSP} ${CXXTEMPLFLAGSP} ${CPPFLAGS} ${DEFSP} -c $< -o $@
 
@@ -486,6 +522,28 @@ iparith.op: iparith.inc iparith.cc
 mpsr_Tok.op: iparith.inc mpsr_Tok.cc
 	$(CXXP) ${CXXFLAGSP} ${CPPFLAGS} ${DEFSP} -c mpsr_Tok.cc -o mpsr_Tok.op
 
+## for pbrof
+claptmpl.ob: claptmpl.cc mod2.h
+	$(CXXP)  ${CXXFLAGSB} ${CPPFLAGS} ${DEFSB} -c $< -o $@
+
+$(OBJB1): %.ob: %.cc
+	$(CXXP) ${CXXFLAGSB} ${CXXTEMPLFLAGSB} ${CPPFLAGS} ${DEFSB} -c $< -o $@
+
+$(OBJB2): %.ob: %.c
+	$(CCP)  ${CFLAGSB} ${CPPFLAGS} ${DEFSB} -c $< -o $@
+
+Singularb: scanner.cc $(OBJB) iparith.ob mpsr_Tok.ob tesths.cc version.h 
+	$(CXXP) ${CXXFLAGSB} ${CPPFLAGS} ${DEFSB} -o Singularb \
+	tesths.cc iparith.ob mpsr_Tok.ob $(OBJB)  $(BPROFOBJ) \
+        ${LDFLAGSB} ${LIBS}
+
+iparith.ob: iparith.inc iparith.cc
+	$(CXXP)  ${CXXFLAGSB} ${CPPFLAGS} ${DEFSB} -c iparith.cc -o iparith.ob
+
+mpsr_Tok.ob: iparith.inc mpsr_Tok.cc
+	$(CXXP) ${CXXFLAGSB} ${CPPFLAGS} ${DEFSB} -c mpsr_Tok.cc -o mpsr_Tok.ob
+
+
 installp: Singularp
 	${MKINSTALLDIRS} ${bindir}
 	${INSTALL_PROGRAM} Singularp ${bindir}	
@@ -495,11 +553,11 @@ installp: Singularp
 ## dependencies
 ##
 %.dd: %.cc mod2.h
-	echo $(@:.dd=.og) $(@:.dd=.op) " " \\ > $@
+	echo $(@:.dd=.og) $(@:.dd=.op) $(@:.dd=.ob) " " \\ > $@
 	$(CXXM) -DGENTABLE ${CPPFLAGS} ${DEFSG} $< >> $@
 
 %.d: %.c mod2.h
-	echo $(@:.d=.og) $(@:.d=.op) " " \\ > $@
+	echo $(@:.d=.og) $(@:.d=.op) $(@:.dd=.ob) " " \\ > $@
 	$(CCM) ${CPPFLAGS} ${DEFSG} $< >> $@
 
 depend: $(CXXSOURCES:.cc=.dd) $(CSOURCES:.c=.d) mod2.h
