@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.43 1999-09-29 10:59:36 obachman Exp $ */
+/* $Id: polys.cc,v 1.44 1999-10-01 16:24:39 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -245,13 +245,7 @@ int pComp(poly p1, poly p2)
 
 int rComp0(poly p1, poly p2)
 {
-  register long d;
-
-  _pMonComp(p1, p2, d, goto NotEquals, return 0);
-
-  NotEquals:
-  if (d < 0) return -1;
-  return 1;
+  _pMonCmp(p1, p2, return 0, return 1, return -1);
 }
 
 /*----------pComp handling for syzygies---------------------*/

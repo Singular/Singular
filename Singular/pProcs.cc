@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: pProcs.cc,v 1.4 1999-09-30 16:27:46 obachman Exp $ */
+/* $Id: pProcs.cc,v 1.5 1999-10-01 16:24:38 obachman Exp $ */
 /*
 *  ABSTRACT -  Routines for primitive poly arithmetic
 */
@@ -13,7 +13,7 @@
 #include "numbers.h"
 
 // Define to us COMP_MACROS
-#define HAVE_COMP_MACROS
+// #define HAVE_COMP_MACROS
 
 // Define to enable tests in this file 
 #define DEBUG_THIS
