@@ -36,8 +36,8 @@ void spSpolyLoop_General
        c;                                 // used for temporary storage
   number tm   = pGetCoeff(monom),         // coefficient of monom
          tneg = nNeg(nCopy(tm)), // - (coefficient of monom)
-         tb;                              // used for tm*coeff(a1)
-
+         tb,                              // used for tm*coeff(a1)
+         tc;                    // used as intermediate number
   
   if (a2==NULL) goto Finish; // we are done if a2 is 0
 
@@ -51,9 +51,11 @@ void spSpolyLoop_General
 
   Equal:   // b equals a2
     tb = nMult(pGetCoeff(a1), tm);
-    if (!nEqual(pGetCoeff(a2), tb))
+    tc = pGetCoeff(a2);
+    if (!nEqual(tc, tb))
     {
-      pSetCoeff0(a2,nSub(pGetCoeff(a2), tb)); // adjust coeff of a2
+      tc = nSub(tc, tb);
+      pSetCoeff(a2,tc); // adjust coeff of a2
       a = pNext(a) = a2; // append a2 to result and advance a2
       pIter(a2);
     }
@@ -61,7 +63,7 @@ void spSpolyLoop_General
     { // coeffs are equal, so their difference is 0: 
       c = a2;  // do not append anything to result: Delete a2 and advance
       pIter(a2);
-      nDelete(&pGetCoeff(c));
+      nDelete(&tc);
       pFree1(c);
     }
     nDelete(&tb);
@@ -102,7 +104,6 @@ void spSpolyLoop_General
    if (b != NULL) pFree1(b);
 } 
 
-
 /***************************************************************
  *
  * Fst spoly loops 
@@ -142,7 +143,7 @@ spSpolyLoopProc spGetSpolyLoop(ring r, rOrderType_t rot, BOOLEAN homog)
   int Variables1W;
 
   // set characterisic
-  if (r->ch > 0) ch = chMODP;
+  if (r->ch > 1) ch = chMODP;
   
   // set Ordering Type
   switch (rot)

@@ -1,3 +1,10 @@
+1998-06-12  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
+
+	* polys.cc: pComp for simple orderings based on only three
+	routines (no variation for # of variables)
+
+	* spolys0.cc (spGSpolyLoop): globally replaced by spSpolyLoop_General
+
 Fri Jun 12 12:11:06 MET DST 1998 hannes
 	* minor optimizations in polys.cc, kutil.* kstd1.cc:
 	  pass pointers, not structures to posIn[LT],

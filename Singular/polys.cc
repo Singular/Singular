@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.29 1998-06-12 10:13:36 Singular Exp $ */
+/* $Id: polys.cc,v 1.30 1998-06-12 17:41:33 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -163,182 +163,49 @@ while(0)
   return -multiplier;                               \
 }
 
-static int pComp_otEXP_nwONE(poly p1, poly p2);
-static int pComp_otCOMPEXP_nwONE(poly p1, poly p2);
-static int pComp_otEXPCOMP_nwONE(poly p1, poly p2);
-static int pComp_otEXP_nwTWO(poly p1, poly p2);
-static int pComp_otCOMPEXP_nwTWO(poly p1, poly p2);
-static int pComp_otEXPCOMP_nwTWO(poly p1, poly p2);
-static int pComp_otEXP_nwEVEN(poly p1, poly p2);
-static int pComp_otCOMPEXP_nwEVEN(poly p1, poly p2);
-static int pComp_otEXPCOMP_nwEVEN(poly p1, poly p2);
-static int pComp_otEXP_nwODD(poly p1, poly p2);
-static int pComp_otCOMPEXP_nwODD(poly p1, poly p2);
-static int pComp_otEXPCOMP_nwODD(poly p1, poly p2);
 
+static int pComp_otEXP(poly p1, poly p2);
+static int pComp_otCOMPEXP(poly p1, poly p2);
+static int pComp_otEXPCOMP(poly p1, poly p2);
 
-// comp_nwONE is used if pVariables1W == 1 and component is compatible
-// with ordering
-static int pComp_otEXP_nwONE(poly p1, poly p2)
+static int pComp_otEXP(poly p1, poly p2)
 {
   register long d = pGetOrder(p1) - pGetOrder(p2);
-
   if (d) Mreturn(d, pOrdSgn);
-  _pMonComp_otEXP_nwONE(p1, p2, d, goto NotEqual, return 0);
 
+  _pMonComp_otEXP_nwGEN(p1, p2,  pVariables1W, d, goto NotEqual , return 0);
+  
   NotEqual:
   Mreturn(d, pLexSgn);
 }
 
-// comp_otEXPCOMP_nwONE :  pVariables1W == 1, priority is
-// given to exponents, component is incompatible with ordering
-static int pComp_otEXPCOMP_nwONE(poly p1, poly p2)
-{
-  register long d = pGetOrder(p1) - pGetOrder(p2);
-
-  if (d) Mreturn(d, pOrdSgn);
-  _pMonComp_otEXPCOMP_nwONE(p1, p2, d, goto NotEqual , return 0);
-
-  NotEqual:
-  Mreturn(d, pLexSgn)
-}
-
-// comp_otEXPCOMP_nwONE :  pVariables1W == 1, priority is given to component,
-// component is incompatible with ordering
-static int pComp_otCOMPEXP_nwONE(poly p1, poly p2)
+static int pComp_otCOMPEXP(poly p1, poly p2)
 {
   register long d = pGetComp(p2) - pGetComp(p1);
   if (d) Mreturn(d, pComponentOrder);
+
   d = pGetOrder(p1) - pGetOrder(p2);
   if (d) Mreturn(d, pOrdSgn);
-  _pMonComp_otEXP_nwONE(p1, p2, d, goto NotEqual , return 0);
 
+  _pMonComp_otEXP_nwGEN(p1, p2,  pVariablesW, d, goto NotEqual , return 0);
+  
   NotEqual:
   Mreturn(d, pLexSgn);
 }
 
-// comp_nwTWO :  pVariables1W == 2 and component is compatible with ordering
-static int pComp_otEXP_nwTWO(poly p1, poly p2)
+static int pComp_otEXPCOMP(poly p1, poly p2)
 {
   register long d = pGetOrder(p1) - pGetOrder(p2);
-
   if (d) Mreturn(d, pOrdSgn);
-  _pMonComp_otEXP_nwTWO(p1, p2, d, goto NotEqual , return 0);
 
+  _pMonComp_otEXPCOMP_nwGEN(p1, p2,  pVariables1W, d, goto NotEqual , return 0);
+  
   NotEqual:
   Mreturn(d, pLexSgn);
 }
 
-// comp_otEXPCOMP_nwTWO :  pVariables1W == 2, priority is given to exponents,
-// component is incompatible with ordering
-static int pComp_otEXPCOMP_nwTWO(poly p1, poly p2)
-{
-  register long d = pGetOrder(p1) - pGetOrder(p2);
+/*---------------------------------------------------*/
 
-  if (d) Mreturn(d, pOrdSgn);
-  _pMonComp_otEXPCOMP_nwTWO(p1, p2, d, goto NotEqual, return 0);
-
-  NotEqual:
-  Mreturn(d, pLexSgn);
-}
-
-// comp_otEXPCOMP_nwTWO :  pVariables1W == 2, priority is given to component,
-// component is incompatible with ordering
-static int pComp_otCOMPEXP_nwTWO(poly p1, poly p2)
-{
-  register long d = pGetComp(p2) - pGetComp(p1);
-  if (d) Mreturn(d, pComponentOrder);
-  d = pGetOrder(p1) - pGetOrder(p2);
-  if (d) Mreturn(d, pOrdSgn);
-  _pMonComp_otEXP_nwTWO(p1, p2, d, goto NotEqual , return 0);
-
-  NotEqual:
-  Mreturn(d, pLexSgn);
-}
-
-// comp_nwEVEN :  pVariables1W == 2*i and component is compatible
-// with ordering
-static int pComp_otEXP_nwEVEN(poly p1, poly p2)
-{
-  register long d = pGetOrder(p1) - pGetOrder(p2);
-
-  if (d) Mreturn(d, pOrdSgn);
-  _pMonComp_otEXP_nwEVEN(p1, p2, pVariables1W, d, goto NotEqual , return 0);
-
-  NotEqual:
-  Mreturn(d, pLexSgn);
-}
-
-// comp_otEXPCOMP_nwEVEN : pVariables1W == 2*i, priority is given to exponents,
-// component is incompatible with ordering
-static int pComp_otEXPCOMP_nwEVEN(poly p1, poly p2)
-{
-  register long d = pGetOrder(p1) - pGetOrder(p2);
-
-  if (d) Mreturn(d, pOrdSgn);
-  _pMonComp_otEXPCOMP_nwEVEN(p1, p2, pVariables1W, d, goto NotEqual , return 0);
-
-  NotEqual:
-  Mreturn(d, pLexSgn);
-}
-
-// comp_otEXPCOMP_nwEVEN : pVariables1W == 2*i, priority is given to component,
-// component is incompatible with ordering
-static int pComp_otCOMPEXP_nwEVEN(poly p1, poly p2)
-{
-  register long d = pGetComp(p2) - pGetComp(p1);
-  if (d) Mreturn(d, pComponentOrder);
-  d = pGetOrder(p1) - pGetOrder(p2);
-  if (d) Mreturn(d, pOrdSgn);
-  _pMonComp_otEXP_nwEVEN(p1, p2, pVariablesW, d, goto NotEqual, return 0);
-
-  NotEqual:
-  Mreturn(d, pLexSgn);
-}
-
-// comp_nwODD : pVariables1W == 2*i and component is compatible
-// with ordering
-static int pComp_otEXP_nwODD(poly p1, poly p2)
-{
-  register long d = pGetOrder(p1) - pGetOrder(p2);
-
-  if (d) Mreturn(d, pOrdSgn);
-  _pMonComp_otEXP_nwODD(p1, p2, pVariables1W, d, goto NotEqual, return 0);
-
-  NotEqual:
-  Mreturn(d, pLexSgn);
-}
-
-// comp_otEXPCOMP_nwODD : pVariables1W == 2*i, priority is given to exponents,
-// component is incompatible with ordering
-static int pComp_otEXPCOMP_nwODD(poly p1, poly p2)
-{
-  register long d = pGetOrder(p1) - pGetOrder(p2);
-  if (d)
-  {
-    if (d > 0) return pOrdSgn;
-    return -pOrdSgn;
-  }
-
-  _pMonComp_otEXPCOMP_nwODD(p1, p2, pVariables1W, d, goto NotEqual , return 0);
-
-  NotEqual:
-  Mreturn(d, pLexSgn);
-}
-
-// comp_otCOMPEXP_nwODD : pVariables1W == 2*i, priority is given to component,
-// component is incompatible with ordering
-static int pComp_otCOMPEXP_nwODD(poly p1, poly p2)
-{
-  register long d = pGetComp(p2) - pGetComp(p1);
-  if (d) Mreturn(d, pComponentOrder);
-  d = pGetOrder(p1) - pGetOrder(p2);
-  if (d) Mreturn(d, pOrdSgn);
-  _pMonComp_otEXP_nwODD(p1, p2, pVariablesW, d, goto NotEqual, return 0);
-
-  NotEqual:
-  Mreturn(d, pLexSgn);
-}
 /*2
 * compare the head monomial of p1 and p2 with weight vector
 */
@@ -352,7 +219,6 @@ static int comp1a  ( poly p1, poly p2, int f, int l, short * w )
   return 0;
 }
 
-/*---------------------------------------------------*/
 
 /* These functions could be made faster if you use pointers to the
 * exponent vectors and pointer arithmetic instead of using the
@@ -1118,18 +984,12 @@ static void SimpleChoose(int o_r, int comp_order, pCompProc *p)
         pLexSgn = -1;
         if (comp_order == ringorder_C || o_r == ringorder_unspec)
         {
-          if (pVariables1W == 1)        *p = pComp_otEXPCOMP_nwONE;
-          else if (pVariables1W == 2)   *p = pComp_otEXPCOMP_nwTWO;
-          else if (pVariables1W & 1)    *p = pComp_otEXPCOMP_nwODD;
-          else                          *p = pComp_otEXPCOMP_nwEVEN;
+          *p = pComp_otEXPCOMP;
         }
         else
         {
           // component is compatible with exponent vector
-          if (pVariables1W == 1)        *p = pComp_otEXP_nwONE;
-          else if (pVariables1W == 2)   *p = pComp_otEXP_nwTWO;
-          else if (pVariables1W & 1)    *p = pComp_otEXP_nwODD;
-          else                          *p = pComp_otEXP_nwEVEN;
+          *p = pComp_otEXP;
         }
         break;
 
@@ -1146,18 +1006,12 @@ static void SimpleChoose(int o_r, int comp_order, pCompProc *p)
         pLexSgn = 1;
         if (comp_order == ringorder_c)
         {
-          if (pVariables1W == 1)        *p = pComp_otEXPCOMP_nwONE;
-          else if (pVariables1W == 2)   *p = pComp_otEXPCOMP_nwTWO;
-          else if (pVariables1W & 1)    *p = pComp_otEXPCOMP_nwODD;
-          else                          *p = pComp_otEXPCOMP_nwEVEN;
+          *p = pComp_otEXPCOMP;
         }
         else
         {
           // component is compatible with exponent vector
-          if (pVariables1W == 1)        *p = pComp_otEXP_nwONE;
-          else if (pVariables1W == 2)   *p = pComp_otEXP_nwTWO;
-          else if (pVariables1W & 1)    *p = pComp_otEXP_nwODD;
-          else                          *p = pComp_otEXP_nwEVEN;
+          *p = pComp_otEXP;
         }
 #ifdef PDEBUG
         break;
@@ -1191,14 +1045,7 @@ static void SimpleChooseC(int o_r, pCompProc *p)
       case ringorder_ws:
         pSetVarIndicies_RevLex(pVariables);
         pLexSgn = -1;
-        if (pVariablesW == 1)
-          *p = pComp_otCOMPEXP_nwONE;
-        else if (pVariablesW == 2)
-          *p = pComp_otCOMPEXP_nwTWO;
-        else if (pVariablesW & 1)
-          *p = pComp_otCOMPEXP_nwODD;
-        else
-          *p = pComp_otCOMPEXP_nwEVEN;
+        *p = pComp_otCOMPEXP;
         break;
 
 #ifdef PDEBUG
@@ -1212,14 +1059,7 @@ static void SimpleChooseC(int o_r, pCompProc *p)
 #endif
         pSetVarIndicies_Lex(pVariables);
         pLexSgn = 1;
-        if (pVariablesW == 1)
-          *p = pComp_otCOMPEXP_nwONE;
-        else if (pVariablesW == 2)
-          *p = pComp_otCOMPEXP_nwTWO;
-        else if (pVariablesW & 1)
-          *p = pComp_otCOMPEXP_nwODD;
-        else
-          *p = pComp_otCOMPEXP_nwEVEN;
+        *p = pComp_otCOMPEXP;
 #ifdef PDEBUG
         break;
       default:

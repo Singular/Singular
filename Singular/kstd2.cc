@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.18 1998-04-28 08:39:40 obachman Exp $ */
+/* $Id: kstd2.cc,v 1.19 1998-06-12 17:41:30 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -1383,7 +1383,10 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       /* deletes the short spoly and computes */
       pFree1(strat->P.p);
       /* the real one */
-      strat->P.p = spSpolyCreate(strat->P.p1,strat->P.p2,strat->kNoether);
+      strat->P.p = spSpolyCreate(strat->P.p1,
+                                 strat->P.p2,
+                                 strat->kNoether,
+                                 strat->spSpolyLoop);
     }
     kTest(strat);
     if((strat->P.p1==NULL) && (strat->minim>0))

@@ -6,7 +6,7 @@
 /*
 * ABSTRACT: s-polynomials
 */
-/* $Id: spolys.h,v 1.5 1998-03-16 14:56:45 obachman Exp $ */
+/* $Id: spolys.h,v 1.6 1998-06-12 17:41:39 obachman Exp $ */
 #include "structs.h"
 #include "spSpolyLoop.h"
 
@@ -19,7 +19,8 @@ extern poly (*spSpolyRedNew)(poly p1, poly p2,poly spNoether,
                              spSpolyLoopProc spSpolyLoop);
 
 /* s-polynomial */
-extern poly (*spSpolyCreate)(poly p1, poly p2,poly spNoether);
+extern poly (*spSpolyCreate)(poly p1, poly p2,poly spNoether,
+                             spSpolyLoopProc spSpolyLoop);
 
 /* short s-polynomial for ordering in Bba and Mora */
 extern poly (*spSpolyShortBba)(poly p1, poly p2);

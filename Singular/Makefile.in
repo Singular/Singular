@@ -128,8 +128,6 @@ OBJS=grammar.o scanner.o matpol.o binom.o\
 ##
 ## Build Targets
 ##
-
-
 .l.cc:
 	@if test "x${LEX}" = x; then \
 		echo Error: no lex given, could not rebuilt scanner.cc;\
@@ -210,6 +208,8 @@ libparse.cc: libparse.l
 	fi
 	${LEX} -I -Pyylp -olibparse.cc libparse.l
 
+src: scanner.cc grammar.h grammar.cc libparse.cc spSpolyLoop.inc
+
 mod2.h: stamp-h
 
 stamp-h : config.status mod2.h.in 
@@ -254,18 +254,25 @@ uninstallbin:
 mostlyclean: clean
 
 clean:
-	-rm -f Singular Singularg Singularp Singularb *.o *.og core *.op *.ob 
+	-rm -f Singular Singularg Singularp Singularb libparse \
+            *.o *.og core *.op *.ob 
 
 distclean: clean
 	-rm -f depend iparith.inc mpsr_Tok.inc stamp.h *.d *.dd 
 	-rm -f Singular* *.gprof *.bprof *~ .\#* version.h
 	-rm -f mod2.h Makefile TAGS* config.status config.cache config.log
 
-maintainer-clean: distclean
+srcclean:
+	@echo "This command is intended for maintainers to use;"
+	@echo "Rebuilding the deleted files requires flex"
+	@echo "bison, perl"
+	-rm -f scanner.cc grammar.h grammar.cc libparse.cc spSpolyLoop.inc
+
+maintainer-clean: distclean srcclean
 	@echo "This command is intended for maintainers to use;"
 	@echo "Rebuilding the deleted files requires flex"
 	@echo "bison, perl and autoconf"
-	-rm configure scanner.cc grammar.h grammar.cc libparse.cc spSpolyLoop.inc
+	-rm configure 
 
 ##
 ## miscellanous targets

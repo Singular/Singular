@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.23 1998-06-12 10:13:32 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.24 1998-06-12 17:41:29 obachman Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1066,7 +1066,10 @@ void updateL(kStrategy strat)
       if (pNext(strat->L[j].p) == strat->tail)
       {
         pFree1(strat->L[j].p);    /*deletes the short spoly and computes*/
-        strat->L[j].p=spSpolyCreate(strat->L[j].p1,strat->L[j].p2,strat->kNoether);   /*the real one*/
+        strat->L[j].p=spSpolyCreate(strat->L[j].p1,
+                                    strat->L[j].p2,
+                                    strat->kNoether,
+                                    strat->spSpolyLoop);   /*the real one*/
         if (!strat->honey)
           strat->initEcart(&strat->L[j]);
         else
@@ -1104,7 +1107,10 @@ void updateLHC(kStrategy strat)
       else
       {
         pFree1(strat->L[i].p);
-        strat->L[i].p = spSpolyCreate(strat->L[i].p1,strat->L[i].p2,strat->kNoether);
+        strat->L[i].p = spSpolyCreate(strat->L[i].p1,
+                                      strat->L[i].p2,
+                                      strat->kNoether,
+                                      strat->spSpolyLoop);
         strat->L[i].ecart = pLDeg(strat->L[i].p,&strat->L[i].length)-pFDeg(strat->L[i].p);
       }
     }
@@ -1460,7 +1466,10 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     if (pNext(strat->P.p) == strat->tail)
     {
       pFree1(strat->P.p);/*- deletes the short spoly and computes -*/
-      strat->P.p = spSpolyCreate(strat->P.p1,strat->P.p2,strat->kNoether);/*- the real one -*/
+      strat->P.p = spSpolyCreate(strat->P.p1,
+                                 strat->P.p2,
+                                 strat->kNoether,
+                                 strat->spSpolyLoop);/*- the real one -*/
       if (!strat->honey)
         strat->initEcart(&strat->P);
       else

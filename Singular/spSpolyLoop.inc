@@ -10,7 +10,9 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homGEN_nwEVEN
        c;                                 // used for temporary storage
   number tm   = pGetCoeff(monom),         // coefficient of monom
          tneg = npNegM(tm),        // - (coefficient of monom)
-         tb;                              // used for tm*coeff(a1)
+         tb,                              // used for tm*coeff(a1)
+         tc;                              // used for intermediate coeff
+
   Order_t order;                          // used for homog case
 
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
@@ -33,9 +35,12 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homGEN_nwEVEN
   Equal:   // b equals a2
     assume(pComp0(b, a2) == 0);
     tb = npMultM(pGetCoeff(a1), tm);
-    if (!npEqualM(pGetCoeff(a2), tb))
+    tc = pGetCoeff(a2);
+    if (!npEqualM(tc, tb))
     {
-      pSetCoeff0(a2,npSubM(pGetCoeff(a2), tb)); // adjust coeff of a2
+      tc=npSubM(tc, tb);
+      ;
+      pSetCoeff0(a2,tc); // adjust coeff of a2
       a = pNext(a) = a2; // append a2 to result and advance a2
       pIter(a2);
     }
@@ -94,7 +99,9 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homGEN_nwODD
        c;                                 // used for temporary storage
   number tm   = pGetCoeff(monom),         // coefficient of monom
          tneg = npNegM(tm),        // - (coefficient of monom)
-         tb;                              // used for tm*coeff(a1)
+         tb,                              // used for tm*coeff(a1)
+         tc;                              // used for intermediate coeff
+
   Order_t order;                          // used for homog case
 
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
@@ -117,9 +124,12 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homGEN_nwODD
   Equal:   // b equals a2
     assume(pComp0(b, a2) == 0);
     tb = npMultM(pGetCoeff(a1), tm);
-    if (!npEqualM(pGetCoeff(a2), tb))
+    tc = pGetCoeff(a2);
+    if (!npEqualM(tc, tb))
     {
-      pSetCoeff0(a2,npSubM(pGetCoeff(a2), tb)); // adjust coeff of a2
+      tc=npSubM(tc, tb);
+      ;
+      pSetCoeff0(a2,tc); // adjust coeff of a2
       a = pNext(a) = a2; // append a2 to result and advance a2
       pIter(a2);
     }
@@ -178,7 +188,9 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homGEN_nwONE
        c;                                 // used for temporary storage
   number tm   = pGetCoeff(monom),         // coefficient of monom
          tneg = npNegM(tm),        // - (coefficient of monom)
-         tb;                              // used for tm*coeff(a1)
+         tb,                              // used for tm*coeff(a1)
+         tc;                              // used for intermediate coeff
+
   Order_t order;                          // used for homog case
 
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
@@ -201,9 +213,12 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homGEN_nwONE
   Equal:   // b equals a2
     assume(pComp0(b, a2) == 0);
     tb = npMultM(pGetCoeff(a1), tm);
-    if (!npEqualM(pGetCoeff(a2), tb))
+    tc = pGetCoeff(a2);
+    if (!npEqualM(tc, tb))
     {
-      pSetCoeff0(a2,npSubM(pGetCoeff(a2), tb)); // adjust coeff of a2
+      tc=npSubM(tc, tb);
+      ;
+      pSetCoeff0(a2,tc); // adjust coeff of a2
       a = pNext(a) = a2; // append a2 to result and advance a2
       pIter(a2);
     }
@@ -262,7 +277,9 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homGEN_nwTWO
        c;                                 // used for temporary storage
   number tm   = pGetCoeff(monom),         // coefficient of monom
          tneg = npNegM(tm),        // - (coefficient of monom)
-         tb;                              // used for tm*coeff(a1)
+         tb,                              // used for tm*coeff(a1)
+         tc;                              // used for intermediate coeff
+
   Order_t order;                          // used for homog case
 
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
@@ -285,9 +302,12 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homGEN_nwTWO
   Equal:   // b equals a2
     assume(pComp0(b, a2) == 0);
     tb = npMultM(pGetCoeff(a1), tm);
-    if (!npEqualM(pGetCoeff(a2), tb))
+    tc = pGetCoeff(a2);
+    if (!npEqualM(tc, tb))
     {
-      pSetCoeff0(a2,npSubM(pGetCoeff(a2), tb)); // adjust coeff of a2
+      tc=npSubM(tc, tb);
+      ;
+      pSetCoeff0(a2,tc); // adjust coeff of a2
       a = pNext(a) = a2; // append a2 to result and advance a2
       pIter(a2);
     }
@@ -346,7 +366,9 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homYES_nwEVEN
        c;                                 // used for temporary storage
   number tm   = pGetCoeff(monom),         // coefficient of monom
          tneg = npNegM(tm),        // - (coefficient of monom)
-         tb;                              // used for tm*coeff(a1)
+         tb,                              // used for tm*coeff(a1)
+         tc;                              // used for intermediate coeff
+
   Order_t order;                          // used for homog case
 
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
@@ -367,9 +389,12 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homYES_nwEVEN
   Equal:   // b equals a2
     assume(pComp0(b, a2) == 0);
     tb = npMultM(pGetCoeff(a1), tm);
-    if (!npEqualM(pGetCoeff(a2), tb))
+    tc = pGetCoeff(a2);
+    if (!npEqualM(tc, tb))
     {
-      pSetCoeff0(a2,npSubM(pGetCoeff(a2), tb)); // adjust coeff of a2
+      tc=npSubM(tc, tb);
+      ;
+      pSetCoeff0(a2,tc); // adjust coeff of a2
       a = pNext(a) = a2; // append a2 to result and advance a2
       pIter(a2);
     }
@@ -428,7 +453,9 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homYES_nwODD
        c;                                 // used for temporary storage
   number tm   = pGetCoeff(monom),         // coefficient of monom
          tneg = npNegM(tm),        // - (coefficient of monom)
-         tb;                              // used for tm*coeff(a1)
+         tb,                              // used for tm*coeff(a1)
+         tc;                              // used for intermediate coeff
+
   Order_t order;                          // used for homog case
 
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
@@ -449,9 +476,12 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homYES_nwODD
   Equal:   // b equals a2
     assume(pComp0(b, a2) == 0);
     tb = npMultM(pGetCoeff(a1), tm);
-    if (!npEqualM(pGetCoeff(a2), tb))
+    tc = pGetCoeff(a2);
+    if (!npEqualM(tc, tb))
     {
-      pSetCoeff0(a2,npSubM(pGetCoeff(a2), tb)); // adjust coeff of a2
+      tc=npSubM(tc, tb);
+      ;
+      pSetCoeff0(a2,tc); // adjust coeff of a2
       a = pNext(a) = a2; // append a2 to result and advance a2
       pIter(a2);
     }
@@ -510,7 +540,9 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homYES_nwONE
        c;                                 // used for temporary storage
   number tm   = pGetCoeff(monom),         // coefficient of monom
          tneg = npNegM(tm),        // - (coefficient of monom)
-         tb;                              // used for tm*coeff(a1)
+         tb,                              // used for tm*coeff(a1)
+         tc;                              // used for intermediate coeff
+
   Order_t order;                          // used for homog case
 
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
@@ -531,9 +563,12 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homYES_nwONE
   Equal:   // b equals a2
     assume(pComp0(b, a2) == 0);
     tb = npMultM(pGetCoeff(a1), tm);
-    if (!npEqualM(pGetCoeff(a2), tb))
+    tc = pGetCoeff(a2);
+    if (!npEqualM(tc, tb))
     {
-      pSetCoeff0(a2,npSubM(pGetCoeff(a2), tb)); // adjust coeff of a2
+      tc=npSubM(tc, tb);
+      ;
+      pSetCoeff0(a2,tc); // adjust coeff of a2
       a = pNext(a) = a2; // append a2 to result and advance a2
       pIter(a2);
     }
@@ -592,7 +627,9 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homYES_nwTWO
        c;                                 // used for temporary storage
   number tm   = pGetCoeff(monom),         // coefficient of monom
          tneg = npNegM(tm),        // - (coefficient of monom)
-         tb;                              // used for tm*coeff(a1)
+         tb,                              // used for tm*coeff(a1)
+         tc;                              // used for intermediate coeff
+
   Order_t order;                          // used for homog case
 
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
@@ -613,9 +650,12 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homYES_nwTWO
   Equal:   // b equals a2
     assume(pComp0(b, a2) == 0);
     tb = npMultM(pGetCoeff(a1), tm);
-    if (!npEqualM(pGetCoeff(a2), tb))
+    tc = pGetCoeff(a2);
+    if (!npEqualM(tc, tb))
     {
-      pSetCoeff0(a2,npSubM(pGetCoeff(a2), tb)); // adjust coeff of a2
+      tc=npSubM(tc, tb);
+      ;
+      pSetCoeff0(a2,tc); // adjust coeff of a2
       a = pNext(a) = a2; // append a2 to result and advance a2
       pIter(a2);
     }
@@ -674,7 +714,9 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homGEN_nwEVEN
        c;                                 // used for temporary storage
   number tm   = pGetCoeff(monom),         // coefficient of monom
          tneg = npNegM(tm),        // - (coefficient of monom)
-         tb;                              // used for tm*coeff(a1)
+         tb,                              // used for tm*coeff(a1)
+         tc;                              // used for intermediate coeff
+
   Order_t order;                          // used for homog case
 
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
@@ -695,9 +737,12 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homGEN_nwEVEN
   Equal:   // b equals a2
     assume(pComp0(b, a2) == 0);
     tb = npMultM(pGetCoeff(a1), tm);
-    if (!npEqualM(pGetCoeff(a2), tb))
+    tc = pGetCoeff(a2);
+    if (!npEqualM(tc, tb))
     {
-      pSetCoeff0(a2,npSubM(pGetCoeff(a2), tb)); // adjust coeff of a2
+      tc=npSubM(tc, tb);
+      ;
+      pSetCoeff0(a2,tc); // adjust coeff of a2
       a = pNext(a) = a2; // append a2 to result and advance a2
       pIter(a2);
     }
@@ -756,7 +801,9 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homGEN_nwODD
        c;                                 // used for temporary storage
   number tm   = pGetCoeff(monom),         // coefficient of monom
          tneg = npNegM(tm),        // - (coefficient of monom)
-         tb;                              // used for tm*coeff(a1)
+         tb,                              // used for tm*coeff(a1)
+         tc;                              // used for intermediate coeff
+
   Order_t order;                          // used for homog case
 
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
@@ -777,9 +824,12 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homGEN_nwODD
   Equal:   // b equals a2
     assume(pComp0(b, a2) == 0);
     tb = npMultM(pGetCoeff(a1), tm);
-    if (!npEqualM(pGetCoeff(a2), tb))
+    tc = pGetCoeff(a2);
+    if (!npEqualM(tc, tb))
     {
-      pSetCoeff0(a2,npSubM(pGetCoeff(a2), tb)); // adjust coeff of a2
+      tc=npSubM(tc, tb);
+      ;
+      pSetCoeff0(a2,tc); // adjust coeff of a2
       a = pNext(a) = a2; // append a2 to result and advance a2
       pIter(a2);
     }
@@ -838,7 +888,9 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homGEN_nwONE
        c;                                 // used for temporary storage
   number tm   = pGetCoeff(monom),         // coefficient of monom
          tneg = npNegM(tm),        // - (coefficient of monom)
-         tb;                              // used for tm*coeff(a1)
+         tb,                              // used for tm*coeff(a1)
+         tc;                              // used for intermediate coeff
+
   Order_t order;                          // used for homog case
 
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
@@ -859,9 +911,12 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homGEN_nwONE
   Equal:   // b equals a2
     assume(pComp0(b, a2) == 0);
     tb = npMultM(pGetCoeff(a1), tm);
-    if (!npEqualM(pGetCoeff(a2), tb))
+    tc = pGetCoeff(a2);
+    if (!npEqualM(tc, tb))
     {
-      pSetCoeff0(a2,npSubM(pGetCoeff(a2), tb)); // adjust coeff of a2
+      tc=npSubM(tc, tb);
+      ;
+      pSetCoeff0(a2,tc); // adjust coeff of a2
       a = pNext(a) = a2; // append a2 to result and advance a2
       pIter(a2);
     }
@@ -920,7 +975,9 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homGEN_nwTWO
        c;                                 // used for temporary storage
   number tm   = pGetCoeff(monom),         // coefficient of monom
          tneg = npNegM(tm),        // - (coefficient of monom)
-         tb;                              // used for tm*coeff(a1)
+         tb,                              // used for tm*coeff(a1)
+         tc;                              // used for intermediate coeff
+
   Order_t order;                          // used for homog case
 
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
@@ -941,9 +998,12 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homGEN_nwTWO
   Equal:   // b equals a2
     assume(pComp0(b, a2) == 0);
     tb = npMultM(pGetCoeff(a1), tm);
-    if (!npEqualM(pGetCoeff(a2), tb))
+    tc = pGetCoeff(a2);
+    if (!npEqualM(tc, tb))
     {
-      pSetCoeff0(a2,npSubM(pGetCoeff(a2), tb)); // adjust coeff of a2
+      tc=npSubM(tc, tb);
+      ;
+      pSetCoeff0(a2,tc); // adjust coeff of a2
       a = pNext(a) = a2; // append a2 to result and advance a2
       pIter(a2);
     }
@@ -1002,7 +1062,9 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homYES_nwEVEN
        c;                                 // used for temporary storage
   number tm   = pGetCoeff(monom),         // coefficient of monom
          tneg = npNegM(tm),        // - (coefficient of monom)
-         tb;                              // used for tm*coeff(a1)
+         tb,                              // used for tm*coeff(a1)
+         tc;                              // used for intermediate coeff
+
   Order_t order;                          // used for homog case
 
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
@@ -1021,9 +1083,12 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homYES_nwEVEN
   Equal:   // b equals a2
     assume(pComp0(b, a2) == 0);
     tb = npMultM(pGetCoeff(a1), tm);
-    if (!npEqualM(pGetCoeff(a2), tb))
+    tc = pGetCoeff(a2);
+    if (!npEqualM(tc, tb))
     {
-      pSetCoeff0(a2,npSubM(pGetCoeff(a2), tb)); // adjust coeff of a2
+      tc=npSubM(tc, tb);
+      ;
+      pSetCoeff0(a2,tc); // adjust coeff of a2
       a = pNext(a) = a2; // append a2 to result and advance a2
       pIter(a2);
     }
@@ -1082,7 +1147,9 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homYES_nwODD
        c;                                 // used for temporary storage
   number tm   = pGetCoeff(monom),         // coefficient of monom
          tneg = npNegM(tm),        // - (coefficient of monom)
-         tb;                              // used for tm*coeff(a1)
+         tb,                              // used for tm*coeff(a1)
+         tc;                              // used for intermediate coeff
+
   Order_t order;                          // used for homog case
 
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
@@ -1101,9 +1168,12 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homYES_nwODD
   Equal:   // b equals a2
     assume(pComp0(b, a2) == 0);
     tb = npMultM(pGetCoeff(a1), tm);
-    if (!npEqualM(pGetCoeff(a2), tb))
+    tc = pGetCoeff(a2);
+    if (!npEqualM(tc, tb))
     {
-      pSetCoeff0(a2,npSubM(pGetCoeff(a2), tb)); // adjust coeff of a2
+      tc=npSubM(tc, tb);
+      ;
+      pSetCoeff0(a2,tc); // adjust coeff of a2
       a = pNext(a) = a2; // append a2 to result and advance a2
       pIter(a2);
     }
@@ -1162,7 +1232,9 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homYES_nwONE
        c;                                 // used for temporary storage
   number tm   = pGetCoeff(monom),         // coefficient of monom
          tneg = npNegM(tm),        // - (coefficient of monom)
-         tb;                              // used for tm*coeff(a1)
+         tb,                              // used for tm*coeff(a1)
+         tc;                              // used for intermediate coeff
+
   Order_t order;                          // used for homog case
 
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
@@ -1181,9 +1253,12 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homYES_nwONE
   Equal:   // b equals a2
     assume(pComp0(b, a2) == 0);
     tb = npMultM(pGetCoeff(a1), tm);
-    if (!npEqualM(pGetCoeff(a2), tb))
+    tc = pGetCoeff(a2);
+    if (!npEqualM(tc, tb))
     {
-      pSetCoeff0(a2,npSubM(pGetCoeff(a2), tb)); // adjust coeff of a2
+      tc=npSubM(tc, tb);
+      ;
+      pSetCoeff0(a2,tc); // adjust coeff of a2
       a = pNext(a) = a2; // append a2 to result and advance a2
       pIter(a2);
     }
@@ -1242,7 +1317,9 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homYES_nwTWO
        c;                                 // used for temporary storage
   number tm   = pGetCoeff(monom),         // coefficient of monom
          tneg = npNegM(tm),        // - (coefficient of monom)
-         tb;                              // used for tm*coeff(a1)
+         tb,                              // used for tm*coeff(a1)
+         tc;                              // used for intermediate coeff
+
   Order_t order;                          // used for homog case
 
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
@@ -1261,9 +1338,12 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homYES_nwTWO
   Equal:   // b equals a2
     assume(pComp0(b, a2) == 0);
     tb = npMultM(pGetCoeff(a1), tm);
-    if (!npEqualM(pGetCoeff(a2), tb))
+    tc = pGetCoeff(a2);
+    if (!npEqualM(tc, tb))
     {
-      pSetCoeff0(a2,npSubM(pGetCoeff(a2), tb)); // adjust coeff of a2
+      tc=npSubM(tc, tb);
+      ;
+      pSetCoeff0(a2,tc); // adjust coeff of a2
       a = pNext(a) = a2; // append a2 to result and advance a2
       pIter(a2);
     }
@@ -1322,7 +1402,9 @@ static void spSpolyLoop_chMODP_otEXP_homGEN_nwEVEN
        c;                                 // used for temporary storage
   number tm   = pGetCoeff(monom),         // coefficient of monom
          tneg = npNegM(tm),        // - (coefficient of monom)
-         tb;                              // used for tm*coeff(a1)
+         tb,                              // used for tm*coeff(a1)
+         tc;                              // used for intermediate coeff
+
   Order_t order;                          // used for homog case
 
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
@@ -1343,9 +1425,12 @@ static void spSpolyLoop_chMODP_otEXP_homGEN_nwEVEN
   Equal:   // b equals a2
     assume(pComp0(b, a2) == 0);
     tb = npMultM(pGetCoeff(a1), tm);
-    if (!npEqualM(pGetCoeff(a2), tb))
+    tc = pGetCoeff(a2);
+    if (!npEqualM(tc, tb))
     {
-      pSetCoeff0(a2,npSubM(pGetCoeff(a2), tb)); // adjust coeff of a2
+      tc=npSubM(tc, tb);
+      ;
+      pSetCoeff0(a2,tc); // adjust coeff of a2
       a = pNext(a) = a2; // append a2 to result and advance a2
       pIter(a2);
     }
@@ -1404,7 +1489,9 @@ static void spSpolyLoop_chMODP_otEXP_homGEN_nwODD
        c;                                 // used for temporary storage
   number tm   = pGetCoeff(monom),         // coefficient of monom
          tneg = npNegM(tm),        // - (coefficient of monom)
-         tb;                              // used for tm*coeff(a1)
+         tb,                              // used for tm*coeff(a1)
+         tc;                              // used for intermediate coeff
+
   Order_t order;                          // used for homog case
 
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
@@ -1425,9 +1512,12 @@ static void spSpolyLoop_chMODP_otEXP_homGEN_nwODD
   Equal:   // b equals a2
     assume(pComp0(b, a2) == 0);
     tb = npMultM(pGetCoeff(a1), tm);
-    if (!npEqualM(pGetCoeff(a2), tb))
+    tc = pGetCoeff(a2);
+    if (!npEqualM(tc, tb))
     {
-      pSetCoeff0(a2,npSubM(pGetCoeff(a2), tb)); // adjust coeff of a2
+      tc=npSubM(tc, tb);
+      ;
+      pSetCoeff0(a2,tc); // adjust coeff of a2
       a = pNext(a) = a2; // append a2 to result and advance a2
       pIter(a2);
     }
@@ -1486,7 +1576,9 @@ static void spSpolyLoop_chMODP_otEXP_homGEN_nwONE
        c;                                 // used for temporary storage
   number tm   = pGetCoeff(monom),         // coefficient of monom
          tneg = npNegM(tm),        // - (coefficient of monom)
-         tb;                              // used for tm*coeff(a1)
+         tb,                              // used for tm*coeff(a1)
+         tc;                              // used for intermediate coeff
+
   Order_t order;                          // used for homog case
 
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
@@ -1507,9 +1599,12 @@ static void spSpolyLoop_chMODP_otEXP_homGEN_nwONE
   Equal:   // b equals a2
     assume(pComp0(b, a2) == 0);
     tb = npMultM(pGetCoeff(a1), tm);
-    if (!npEqualM(pGetCoeff(a2), tb))
+    tc = pGetCoeff(a2);
+    if (!npEqualM(tc, tb))
     {
-      pSetCoeff0(a2,npSubM(pGetCoeff(a2), tb)); // adjust coeff of a2
+      tc=npSubM(tc, tb);
+      ;
+      pSetCoeff0(a2,tc); // adjust coeff of a2
       a = pNext(a) = a2; // append a2 to result and advance a2
       pIter(a2);
     }
@@ -1568,7 +1663,9 @@ static void spSpolyLoop_chMODP_otEXP_homGEN_nwTWO
        c;                                 // used for temporary storage
   number tm   = pGetCoeff(monom),         // coefficient of monom
          tneg = npNegM(tm),        // - (coefficient of monom)
-         tb;                              // used for tm*coeff(a1)
+         tb,                              // used for tm*coeff(a1)
+         tc;                              // used for intermediate coeff
+
   Order_t order;                          // used for homog case
 
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
@@ -1589,9 +1686,12 @@ static void spSpolyLoop_chMODP_otEXP_homGEN_nwTWO
   Equal:   // b equals a2
     assume(pComp0(b, a2) == 0);
     tb = npMultM(pGetCoeff(a1), tm);
-    if (!npEqualM(pGetCoeff(a2), tb))
+    tc = pGetCoeff(a2);
+    if (!npEqualM(tc, tb))
     {
-      pSetCoeff0(a2,npSubM(pGetCoeff(a2), tb)); // adjust coeff of a2
+      tc=npSubM(tc, tb);
+      ;
+      pSetCoeff0(a2,tc); // adjust coeff of a2
       a = pNext(a) = a2; // append a2 to result and advance a2
       pIter(a2);
     }
@@ -1650,7 +1750,9 @@ static void spSpolyLoop_chMODP_otEXP_homYES_nwEVEN
        c;                                 // used for temporary storage
   number tm   = pGetCoeff(monom),         // coefficient of monom
          tneg = npNegM(tm),        // - (coefficient of monom)
-         tb;                              // used for tm*coeff(a1)
+         tb,                              // used for tm*coeff(a1)
+         tc;                              // used for intermediate coeff
+
   Order_t order;                          // used for homog case
 
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
@@ -1669,9 +1771,12 @@ static void spSpolyLoop_chMODP_otEXP_homYES_nwEVEN
   Equal:   // b equals a2
     assume(pComp0(b, a2) == 0);
     tb = npMultM(pGetCoeff(a1), tm);
-    if (!npEqualM(pGetCoeff(a2), tb))
+    tc = pGetCoeff(a2);
+    if (!npEqualM(tc, tb))
     {
-      pSetCoeff0(a2,npSubM(pGetCoeff(a2), tb)); // adjust coeff of a2
+      tc=npSubM(tc, tb);
+      ;
+      pSetCoeff0(a2,tc); // adjust coeff of a2
       a = pNext(a) = a2; // append a2 to result and advance a2
       pIter(a2);
     }
@@ -1730,7 +1835,9 @@ static void spSpolyLoop_chMODP_otEXP_homYES_nwODD
        c;                                 // used for temporary storage
   number tm   = pGetCoeff(monom),         // coefficient of monom
          tneg = npNegM(tm),        // - (coefficient of monom)
-         tb;                              // used for tm*coeff(a1)
+         tb,                              // used for tm*coeff(a1)
+         tc;                              // used for intermediate coeff
+
   Order_t order;                          // used for homog case
 
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
@@ -1749,9 +1856,12 @@ static void spSpolyLoop_chMODP_otEXP_homYES_nwODD
   Equal:   // b equals a2
     assume(pComp0(b, a2) == 0);
     tb = npMultM(pGetCoeff(a1), tm);
-    if (!npEqualM(pGetCoeff(a2), tb))
+    tc = pGetCoeff(a2);
+    if (!npEqualM(tc, tb))
     {
-      pSetCoeff0(a2,npSubM(pGetCoeff(a2), tb)); // adjust coeff of a2
+      tc=npSubM(tc, tb);
+      ;
+      pSetCoeff0(a2,tc); // adjust coeff of a2
       a = pNext(a) = a2; // append a2 to result and advance a2
       pIter(a2);
     }
@@ -1810,7 +1920,9 @@ static void spSpolyLoop_chMODP_otEXP_homYES_nwONE
        c;                                 // used for temporary storage
   number tm   = pGetCoeff(monom),         // coefficient of monom
          tneg = npNegM(tm),        // - (coefficient of monom)
-         tb;                              // used for tm*coeff(a1)
+         tb,                              // used for tm*coeff(a1)
+         tc;                              // used for intermediate coeff
+
   Order_t order;                          // used for homog case
 
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
@@ -1829,9 +1941,12 @@ static void spSpolyLoop_chMODP_otEXP_homYES_nwONE
   Equal:   // b equals a2
     assume(pComp0(b, a2) == 0);
     tb = npMultM(pGetCoeff(a1), tm);
-    if (!npEqualM(pGetCoeff(a2), tb))
+    tc = pGetCoeff(a2);
+    if (!npEqualM(tc, tb))
     {
-      pSetCoeff0(a2,npSubM(pGetCoeff(a2), tb)); // adjust coeff of a2
+      tc=npSubM(tc, tb);
+      ;
+      pSetCoeff0(a2,tc); // adjust coeff of a2
       a = pNext(a) = a2; // append a2 to result and advance a2
       pIter(a2);
     }
@@ -1890,7 +2005,9 @@ static void spSpolyLoop_chMODP_otEXP_homYES_nwTWO
        c;                                 // used for temporary storage
   number tm   = pGetCoeff(monom),         // coefficient of monom
          tneg = npNegM(tm),        // - (coefficient of monom)
-         tb;                              // used for tm*coeff(a1)
+         tb,                              // used for tm*coeff(a1)
+         tc;                              // used for intermediate coeff
+
   Order_t order;                          // used for homog case
 
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
@@ -1909,9 +2026,12 @@ static void spSpolyLoop_chMODP_otEXP_homYES_nwTWO
   Equal:   // b equals a2
     assume(pComp0(b, a2) == 0);
     tb = npMultM(pGetCoeff(a1), tm);
-    if (!npEqualM(pGetCoeff(a2), tb))
+    tc = pGetCoeff(a2);
+    if (!npEqualM(tc, tb))
     {
-      pSetCoeff0(a2,npSubM(pGetCoeff(a2), tb)); // adjust coeff of a2
+      tc=npSubM(tc, tb);
+      ;
+      pSetCoeff0(a2,tc); // adjust coeff of a2
       a = pNext(a) = a2; // append a2 to result and advance a2
       pIter(a2);
     }

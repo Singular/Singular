@@ -1,8 +1,8 @@
-// $Id: tst.lib,v 1.7 1998-05-24 09:04:13 obachman Exp $
+// $Id: tst.lib,v 1.8 1998-06-12 17:41:42 obachman Exp $
 //(obachman, last modified 2/13/98)
 /////////////////////////////////////////////////////////////////////////////
 
-version="$Id: tst.lib,v 1.7 1998-05-24 09:04:13 obachman Exp $";
+version="$Id: tst.lib,v 1.8 1998-06-12 17:41:42 obachman Exp $";
 info="
 LIBRARY:  tst.lib      PROCEDURES FOR RUNNING AUTOMATIC TST TESTS
 
@@ -165,7 +165,7 @@ RETURN: 1, if groebner command produced \"equal\" std as std command
         On success, times of std - groebner is written with tst_ignore, and
         times are added to global variables tst_std_time and 
         tst_groebner_time. If v given, and <= 0, short ideal 
-        characteristic is print, if v > 0, ideals are printed.
+        characteristic is printed, if v > 0, ideals are printed.
         On failure, Error message and ideals are printed.
 EXAMPLE: example tst_groebner; shows an example
 "

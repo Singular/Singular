@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz0.cc,v 1.15 1998-04-29 07:05:31 siebert Exp $ */
+/* $Id: syz0.cc,v 1.16 1998-06-12 17:41:41 obachman Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -120,7 +120,7 @@ static void syCreatePairs(polyset F,int lini,int wend,int k,int j,int i,
   }
 }
 
-static poly syRedtail2(poly p, polyset redWith, intvec *modcomp, spSpolyLoopProc SpolyLoop)
+static poly syRedtail2(poly p, polyset redWith, intvec *modcomp, spSpolyLoopProc SpolyLoop = NULL)
 {
   poly h, hn;
   int hncomp,nxt;
@@ -281,7 +281,7 @@ void sySchreyersSyzygiesFM(polyset F,int Fmax,polyset* Shdl,int* Smax,
         }
         tl = smax;
 /*--------------begin to reduce-----------------------------*/
-        toRed = spSpolyCreate(S[j],S[k],NULL);
+        toRed = spSpolyCreate(S[j],S[k],NULL, NULL);
         ecartToRed = 1;
         bestEcart = 1;
         if (BTEST1(6))
@@ -570,7 +570,7 @@ void sySchreyersSyzygiesFB(polyset *FF,int Fmax,polyset* Shdl,int* Smax,
           }
         }
         if (k<Fl)
-          toRed = spSpolyCreate(F[j],F[k],NULL);
+          toRed = spSpolyCreate(F[j],F[k],NULL, NULL);
         else
         {
           q = pMultT(pCopy(F[j]),multWith);

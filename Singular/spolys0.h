@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: spolys0.h,v 1.9 1998-03-23 22:51:10 obachman Exp $ */
+/* $Id: spolys0.h,v 1.10 1998-06-12 17:41:40 obachman Exp $ */
 /*
 * ABSTRACT: s-polynomials, internal header
 */
@@ -34,7 +34,8 @@ poly spGSpolyRedNew(poly p1, poly p2,poly spNoether,
                     spSpolyLoopProc spSpolyLoop);
 
 /* s-polynomial */
-poly spGSpolyCreate(poly p1, poly p2,poly spNoether);
+poly spGSpolyCreate(poly p1, poly p2,poly spNoether,
+                    spSpolyLoopProc spSpolyLoop);
 
 /* short s-polynomial for ordering in Bba and Mora */
 poly spGSpolyShortBba(poly p1, poly p2);

@@ -1,6 +1,6 @@
 #!/usr/local/bin/perl
 ###########################################################################
-# $Id: spSpolyLoop.pl,v 1.7 1998-04-30 15:27:25 obachman Exp $
+# $Id: spSpolyLoop.pl,v 1.8 1998-06-12 17:41:37 obachman Exp $
 
 ###########################################################################
 ##
@@ -253,7 +253,9 @@ $spSpolyLoopBodyTemplate = <<_EOT_
        c;                                 // used for temporary storage
   number tm   = pGetCoeff(monom),         // coefficient of monom
          tneg = CALL_NCOPYNEG(tm),        // - (coefficient of monom)
-         tb;                              // used for tm*coeff(a1)
+         tb,                              // used for tm*coeff(a1)
+         tc;                              // used for intermediate coeff
+
   Order_t order;                          // used for homog case
 
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
@@ -272,9 +274,12 @@ $spSpolyLoopBodyTemplate = <<_EOT_
   Equal:   // b equals a2
     assume(pComp0(b, a2) == 0);
     tb = CALL_NMULT("pGetCoeff(a1)",tm);
-    if (!CALL_NEQUAL("pGetCoeff(a2)",tb))
+    tc = pGetCoeff(a2);
+    if (!CALL_NEQUAL(tc,tb))
     {
-      pSetCoeff0(a2,CALL_NSUB("pGetCoeff(a2)",tb)); // adjust coeff of a2
+      tc=CALL_NSUB(tc, tb);
+      CALL_NDELETE("&pGetCoeff(a2)");
+      pSetCoeff0(a2,tc); // adjust coeff of a2
       a = pNext(a) = a2; // append a2 to result and advance a2
       pIter(a2);
     }
@@ -282,7 +287,7 @@ $spSpolyLoopBodyTemplate = <<_EOT_
     { // coeffs are equal, so their difference is 0: 
       c = a2;  // do not append anything to result: Delete a2 and advance
       pIter(a2);
-      CALL_NDELETE("&pGetCoeff(c)");
+      CALL_NDELETE("&tc");
       pFree1(c);
     }
     CALL_NDELETE("&tb");
@@ -667,7 +672,13 @@ sub Generate_GetSpolyLoop
 @input = ("chMODP".
           "_otEXP,otCOMPEXP,otEXPCOMP".
 	  "_homGEN,homYES".
-	  "_nwONE,nwTWO,nwEVEN,nwODD");
+	  "_nwONE,nwTWO,nwEVEN,nwODD",
+# this does not seem to pay off -- general loop seems to be better
+#           "chGEN".
+#           "_otEXP,otCOMPEXP,otEXPCOMP".
+#  	  "_homGEN".
+#           "_nwGEN"
+	 );
 
 
 ###########################################################################

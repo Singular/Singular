@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: spolys0.cc,v 1.11 1998-05-04 17:18:23 obachman Exp $ */
+/* $Id: spolys0.cc,v 1.12 1998-06-12 17:41:39 obachman Exp $ */
 
 /*
 * ABSTRACT - s-polynomials and reduction in general
@@ -313,6 +313,7 @@ void spGMultCopyX(poly p, poly m, poly n, number exp, poly spNoether)
 * pNext(m) = result = a2-a1*m
 * do not destroy a1, but a2
 */
+#if 0
 void spGSpolyLoop(poly a1, poly a2, poly m,poly spNoether)
 {
   poly a, b, s;
@@ -404,6 +405,7 @@ void spGSpolyLoop(poly a1, poly a2, poly m,poly spNoether)
     }
   }
 }
+#endif
 
 /*2
 * reduction of p2 with p1
@@ -437,7 +439,10 @@ poly spGSpolyRed(poly p1, poly p2,poly spNoether, spSpolyLoopProc spSpolyLoop)
   spMonSub(p2,p1);
   if (ct < 2)
   {
-    spGSpolyLoop(a1, a2, p2,spNoether);
+    if (spSpolyLoop != NULL)
+      spSpolyLoop(a1, a2, p2,spNoether);
+    else
+      spSpolyLoop_General(a1, a2, p2,spNoether);
   }
   else
   {
@@ -502,7 +507,10 @@ void spGSpolyTail(poly p1, poly q, poly q2, poly spNoether,
   spMonSub(m,p1);
   if (ct < 2)
   {
-    spGSpolyLoop(a1, a2, m,spNoether);
+    if (spSpolyLoop != NULL)
+      spSpolyLoop(a1, a2, m,spNoether);
+    else
+      spSpolyLoop_General(a1, a2, m,spNoether);
   }
   else
   {
@@ -536,7 +544,7 @@ void spGSpolyTail(poly p1, poly q, poly q2, poly spNoether,
 * reduction of p2 with p1
 * do not destroy p1 and p2
 */
-poly spGSpolyRedNew(poly p1, poly p2,poly spNoether,
+poly spGSpolyRedNew(poly p1, poly p2,poly spNoether, 
                     spSpolyLoopProc spSpolyLoop)
 {
   poly m;
@@ -573,7 +581,10 @@ poly spGSpolyRedNew(poly p1, poly p2,poly spNoether,
   if (ct < 2)
   {
     pSetCoeff0(m,bn);
-    spGSpolyLoop(a1, a2, m,spNoether);
+    if (spSpolyLoop != NULL)
+      spSpolyLoop(a1, a2, m,spNoether);
+    else
+      spSpolyLoop_General(a1, a2, m,spNoether);
   }
   else
   {
@@ -597,7 +608,8 @@ poly spGSpolyRedNew(poly p1, poly p2,poly spNoether,
 * creates the S-polynomial of p1 and p2
 * do not destroy p1 and p2
 */
-poly spGSpolyCreate(poly p1, poly p2,poly spNoether)
+poly spGSpolyCreate(poly p1, poly p2,poly spNoether, 
+                    spSpolyLoopProc spSpolyLoop)
 {
   Exponent_t x;
   poly m, b;
@@ -655,7 +667,10 @@ poly spGSpolyCreate(poly p1, poly p2,poly spNoether)
     if (ct < 2)
     {
       pSetCoeff0(m,bn);
-      spGSpolyLoop(a1, a2, m,spNoether);
+    if (spSpolyLoop != NULL)
+      spSpolyLoop(a1, a2, m,spNoether);
+    else
+      spSpolyLoop_General(a1, a2, m,spNoether);
     }
     else
     {

@@ -35,7 +35,8 @@ void (*spSpolyTail)(poly p1, poly q, poly q2, poly spNoether,
                     spSpolyLoopProc spSpolyLoop);
 poly (*spSpolyRedNew)(poly p1, poly p2,poly spNoether,
                       spSpolyLoopProc spSpolyLoop);
-poly (*spSpolyCreate)(poly p1, poly p2,poly spNoether);
+poly (*spSpolyCreate)(poly p1, poly p2,poly spNoether, 
+                      spSpolyLoopProc SpolyLoop);
 poly (*spSpolyShortBba)(poly p1, poly p2);
 
 /*2
@@ -252,97 +253,11 @@ void spMultCopyX(poly p, poly m, poly n, number exp, poly spNoether)
 }
 
 /*2
-* assume m = L(m)
-* pNext(m) = result = a2-a1*m
-* do not destroy a1, but a2
-*/
-#ifdef OLD_SPOLY_LOOP
-static void spSpolyLoop(poly a1, poly a2, poly m,poly spNoether)
-{
-  poly a, b, s;
-  number tm = pGetCoeff(m);
-  number tneg,tb;
-  int c;
-
-  tneg = npNegM(tm);
-  if (a2==NULL)
-  {
-    spMultCopyX(a1, m, m, tneg,spNoether);
-    return;
-  }
-  a = m;
-  b = pNew();
-  pCopyAddFast(b,a1,m);
-  loop
-  {
-    c = pComp0(b, a2);
-    if (c == 1)
-    {
-      pSetCoeff0(b,npMultM(pGetCoeff(a1),tneg));
-      a = pNext(a) = b;
-      pIter(a1);
-      if (a1!=NULL)
-      {
-        b = pNew();
-        pCopyAddFast(b, a1,m);
-      }
-      else
-      {
-        pNext(a) = a2;
-        return;
-      }
-    }
-    else if (c == -1)
-    {
-      a = pNext(a) = a2;
-      pIter(a2);
-      if (a2==NULL)
-      {
-        pFree1(b);
-        spMultCopyX(a1, m, a, tneg,spNoether);
-        return;
-      }
-    }
-    else
-    {
-      tb = npMultM(pGetCoeff(a1),tm);
-      if (!npEqualM(pGetCoeff(a2),tb))
-      {
-        pSetCoeff0(a2,npSubM(pGetCoeff(a2),tb));
-        a = pNext(a) = a2;
-        pIter(a2);
-      }
-      else
-      {
-        s = a2;
-        pIter(a2);
-        pFree1(s);
-      }
-      pIter(a1);
-      if (a1==NULL)
-      {
-        pFree1(b);
-        pNext(a) = a2;
-        return;
-      }
-      if (a2==NULL)
-      {
-        pFree1(b);
-        spMultCopyX(a1, m, a, tneg,spNoether);
-        return;
-      }
-      spMemcpy(b,a1);
-      pMonAddFast(b,m);
-    }
-  }
-}
-#endif // OLD_SPOLY_LOOP
-
-/*2
 * reduction of p2 with p1
 * do not destroy p1, but p2
 */
-static poly spPSpolyRed(poly p1, poly p2,poly spNoether, spSpolyLoopProc SpolyLoop)
+static poly spPSpolyRed(poly p1, poly p2,poly spNoether, 
+                        spSpolyLoopProc SpolyLoop)
 {
   poly a1 = pNext(p1), a2 = pNext(p2);
   if(a1==NULL)
@@ -357,17 +272,15 @@ static poly spPSpolyRed(poly p1, poly p2,poly spNoether, spSpolyLoopProc SpolyLo
     reset_vec=TRUE;
   }
   spMonSub(p2,p1);
-#ifndef OLD_SPOLY_LOOP
-  if (SpolyLoop != NULL) 
-    SpolyLoop(a1, a2, p2, spNoether);
-  else 
-    spSpolyLoop_General(a1, a2, p2,spNoether);
-#else
   if (1!=(int)pGetCoeff(p2))
-    spSpolyLoop(a1, a2, p2,spNoether);
+  {
+    if (SpolyLoop != NULL)
+      SpolyLoop(a1, a2, p2,spNoether);
+    else
+      spSpolyLoop_General(a1, a2, p2,spNoether);
+  }
   else
     spSpolyLoop1(a1, a2, p2,spNoether);
-#endif  
   a2 = pNext(p2);
   if (reset_vec)
     spModuleToPoly(a1);
@@ -417,17 +330,15 @@ static poly spPSpolyRedNew(poly p1, poly p2,poly spNoether,
   m = pNew();
   spMemcpy(m,p2);
   spMonSub(m,p1);
-#ifndef OLD_SPOLY_LOOP
-  if (SpolyLoop != NULL)
-    SpolyLoop(a1, a2, m , spNoether);
-  else
-    spSpolyLoop_General(a1, a2, m,spNoether); 
-#else  
   if (1!=(int)pGetCoeff(m))
-    spSpolyLoop(a1, a2, m,spNoether);
+  {
+    if (SpolyLoop != NULL)
+      SpolyLoop(a1, a2, m,spNoether);
+    else
+      spSpolyLoop_General(a1, a2, m,spNoether);
+  }
   else
     spSpolyLoop1(a1, a2, m,spNoether);
-#endif  // OLD_SPOLY_LOOP  
   a2 = pNext(m);
   if (reset_vec)
     spModuleToPoly(a1);
@@ -439,7 +350,8 @@ static poly spPSpolyRedNew(poly p1, poly p2,poly spNoether,
 * creates the S-polynomial of p1 and p2
 * do not destroy p1 and p2
 */
-static poly spPSpolyCreate(poly p1, poly p2,poly spNoether)
+static poly spPSpolyCreate(poly p1, poly p2,poly spNoether, 
+                           spSpolyLoopProc SpolyLoop)
 {
   poly a1 = pNext(p1), a2 = pNext(p2);
   poly m, b;

@@ -252,7 +252,7 @@ extern int pShortOut;
 #ifdef DO_PROFILE
 /* define to enable explicit profiling of some crucial inline 
  * routines and defines  */
-#define DO_DEEP_PROFILE
+#undef DO_DEEP_PROFILE
 #endif
 
 /*******************************************************************

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-comp.h,v 1.8 1998-06-02 15:30:01 Singular Exp $ */
+/* $Id: polys-comp.h,v 1.9 1998-06-12 17:41:32 obachman Exp $ */
 
 /***************************************************************
  *
@@ -199,18 +199,17 @@ do                                                                      \
 {                                                                       \
   const long* s1 = (long*) &(p1->exp[0]);                               \
   const long* s2 = (long*) &(p2->exp[0]);                               \
-  const long* const lb = s1 + length      -1;                           \
+  const long* const lb = s1 + length -1;                                \
                                                                         \
   for (;;)                                                              \
   {                                                                     \
     d = *s1 - *s2;                                                      \
+    if (s1 == lb) break;                                                \
     if (d) actionD;                                                     \
     s1++;                                                               \
-    if (s1 == lb) break;                                                \
     s2++;                                                               \
   }                                                                     \
                                                                         \
-  d = *s1 - *(s2 + 1);                                                  \
   if (d)                                                                \
   {                                                                     \
     if (((long) (pGetComp(p1) - pGetComp(p2))) == d)                    \
@@ -413,13 +412,13 @@ do                                                                      \
   for (;;)                                                              \
   {                                                                     \
     d = *s1 - *s2;                                                      \
+    if (s1 == lb) break;                                                \
     if (d) actionD;                                                     \
     s1--;                                                               \
-    if (s1 == lb) break;                                                \
     s2--;                                                               \
   }                                                                     \
                                                                         \
-  d = *s1 - *(s2 - 1);                                                  \
+  d = *s1 - *s2;                                                  \
   if (d)                                                                \
   {                                                                     \
     if (((long) (pGetComp(p1) - pGetComp(p2))) == d)                    \

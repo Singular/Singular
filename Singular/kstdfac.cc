@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstdfac.cc,v 1.18 1998-05-14 13:04:17 Singular Exp $ */
+/* $Id: kstdfac.cc,v 1.19 1998-06-12 17:41:30 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
@@ -452,7 +452,10 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
       /* deletes the short spoly and computes */
       pFree1(strat->P.p);
       /* the real one */
-      strat->P.p = spSpolyCreate(strat->P.p1,strat->P.p2,strat->kNoether);
+      strat->P.p = spSpolyCreate(strat->P.p1,
+                                 strat->P.p2,
+                                 strat->kNoether,
+                                 strat->spSpolyLoop);
     }
     if (strat->honey)
     {
