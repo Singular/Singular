@@ -1,5 +1,5 @@
 /*
- * $Id: locals.h,v 1.1 1998-11-19 16:16:06 krueger Exp $
+ * $Id: locals.h,v 1.2 1999-03-17 13:06:21 krueger Exp $
  */
 
 #include <mod2.h>
@@ -10,6 +10,9 @@
 #include <subexpr.h>
 //#include <utils.h>
 #include <structs.h>
+#include <ipconv.h>
+
+BOOLEAN jjANY2LIST(leftv res, leftv v, int cnt);
 
 #if 0
 extern "C" 
