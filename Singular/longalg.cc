@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.56 2001-01-20 11:55:32 Singular Exp $ */
+/* $Id: longalg.cc,v 1.57 2001-01-20 12:14:18 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -1877,9 +1877,6 @@ char  *naRead(char *s, number *p)
     a->n = NULL;
     a->s = 0;
     naTest(*p);
-#ifdef LONGALGNEW
-    naNormalize(*p);
-#endif /* LONGALGNEW */
   }
   return s;
 }
