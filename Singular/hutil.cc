@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hutil.cc,v 1.6 1998-04-07 17:51:02 Singular Exp $ */
+/* $Id: hutil.cc,v 1.7 1998-04-27 10:19:04 pohl Exp $ */
 /*
 * ABSTRACT: Utilities for staircase operations
 */
@@ -992,14 +992,25 @@ scfmon hGetmem(int lm, scfmon old, monp monmem)
   return x;
 }
 
-
+/*
+* a bug in Metrowerks with "lifetime analysis"
+*scmon hGetpure(scmon p)
+*{
+*  scmon p1, pn;
+*  p1 = p + 1;
+*  pn = p1 + pVariables;
+*  memcpy(pn, p1, pVariables * sizeof(Exponent_t));
+*  return pn - 1;
+*}
+*/
 scmon hGetpure(scmon p)
 {
-  scmon p1, pn;
-  p1 = p + 1;
-  pn = p1 + pVariables;
+  scmon p1 = p;
+  scmon pn;
+  p1++;
+  pn = p1;
+  pn += pVariables;
   memcpy(pn, p1, pVariables * sizeof(Exponent_t));
   return pn - 1;
 }
-
 
