@@ -1,6 +1,6 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.38 1999-08-30 20:05:14 wichmann Exp $
+;; $Id: singular.el,v 1.39 1999-08-31 19:17:22 wichmann Exp $
 
 ;;; Commentary:
 
@@ -492,33 +492,33 @@ For Emacs, this function is called  at mode initialization time."
 		     'singular-interactive-mode-map)))
 
   ;; global settings
-  (define-key help-map [?\C-s]                            'singular-help)
+  (define-key help-map [?\C-s]                                'singular-help)
 
   ;; settings for `singular-interactive-map'
   (substitute-key-definition 'beginning-of-line 'singular-beginning-of-line
 			     singular-interactive-mode-map global-map)
 
-  (define-key singular-interactive-mode-map "\t"        'singular-dynamic-complete)
-  (define-key singular-interactive-mode-map [?\C-m]	  'singular-send-or-copy-input)
-  (define-key singular-interactive-mode-map [?\C-l]       'singular-recenter)
+  (define-key singular-interactive-mode-map "\t"              'singular-dynamic-complete)
+  (define-key singular-interactive-mode-map [?\C-m]	      'singular-send-or-copy-input)
+  (define-key singular-interactive-mode-map [?\C-l]           'singular-recenter)
 
   ;; Comint functions
-  (define-key singular-interactive-mode-map [?\M-r]	  'comint-previous-matching-input)
-  (define-key singular-interactive-mode-map [?\M-s]	  'comint-next-matching-input)
+  (define-key singular-interactive-mode-map [?\M-r]	      'comint-previous-matching-input)
+  (define-key singular-interactive-mode-map [?\M-s]	      'comint-next-matching-input)
 
   ;; C-c prefix
-  (define-key singular-interactive-mode-map [?\C-c ?\C-t] 'singular-toggle-truncate-lines)
+  (define-key singular-interactive-mode-map [?\C-c ?\C-t]     'singular-toggle-truncate-lines)
 
-  (define-key singular-interactive-mode-map [?\C-c ?\C-f] 'singular-folding-toggle-fold-at-point-or-all)
-  (define-key singular-interactive-mode-map [?\C-c ?\C-o] 'singular-folding-toggle-fold-latest-output)
-  (define-key singular-interactive-mode-map [?\C-c ?\C-w] 'singular-section-kill)
+  (define-key singular-interactive-mode-map [?\C-c ?\C-f]     'singular-folding-toggle-fold-at-point-or-all)
+  (define-key singular-interactive-mode-map [?\C-c ?\C-o]     'singular-folding-toggle-fold-latest-output)
+  (define-key singular-interactive-mode-map [?\C-c ?\C-w]     'singular-section-kill)
 
-  (define-key singular-interactive-mode-map [?\C-c ?\C-d] 'singular-demo-load)
-  (define-key singular-interactive-mode-map [?\C-c ?\C-l] 'singular-load-library)
-  (define-key singular-interactive-mode-map [?\C-c <]	  'singular-load-file)
+  (define-key singular-interactive-mode-map [?\C-c ?\C-d]     'singular-demo-load)
+  (define-key singular-interactive-mode-map [?\C-c ?\C-l]     'singular-load-library)
+  (define-key singular-interactive-mode-map [(control c) (<)] 'singular-load-file)
 
-  (define-key singular-interactive-mode-map [?\C-c ?\C-r] 'singular-restart)
-  (define-key singular-interactive-mode-map [?\C-c $]	  'singular-exit-singular))
+  (define-key singular-interactive-mode-map [?\C-c ?\C-r]     'singular-restart)
+  (define-key singular-interactive-mode-map [(control c) ($)] 'singular-exit-singular))
 
 (defun singular-cursor-key-model-set (key-model)
   "Set keys according to KEY-MODEL.
@@ -633,15 +633,15 @@ each entry add a new menu element in the submenu
 					  t))
 			    menudef))
       (setq libs (cdr libs)))
-    (easy-menu-change '("Commands") "libraries" menudef)))
+    (easy-menu-change '("Commands") "Libraries" menudef)))
 
 (defun singular-menu-deinstall-libraries ()
   "Initialize library submenu from singular command menu.
-Sets the submenu (\"Commands\" \"libraries\") to the value of
+Sets the submenu (\"Commands\" \"Libraries\") to the value of
 `singular-menu-initial-library-menu'."
   (singular-debug 'interactive 
 		  (message "Removing libraries from menu"))
-  (easy-menu-change '("Commands") "libraries" singular-menu-initial-library-menu))
+  (easy-menu-change '("Commands") "Libraries" singular-menu-initial-library-menu))
 
 ;; For some reasons emacs inserts new menus in the oppsite order.
 ;; Defining menu-2 prior to menu-1 will result in the follwoing menu:
@@ -653,34 +653,42 @@ Sets the submenu (\"Commands\" \"libraries\") to the value of
      singular-interactive-mode-map ""
      (list 
       "Commands"
-      ["load file..." singular-load-file t]
-      (append
-       '("libraries")
-       singular-menu-initial-library-menu)
+      ["Fold Latest Output" singular-folding-fold-latest-output t]
+      ["Fold All Output" singular-folding-fold-all-output t]
+      ["Fold At Point" singular-folding-fold-at-point t]
       "---"
-      ["load demo" singular-demo-load (not singular-demo-mode)]
-      ["exit demo" singular-demo-exit singular-demo-mode]
+      ["Unfold Latest Output" singular-folding-unfold-latest-output t]
+      ["Unfold All Output" singular-folding-unfold-all-output t]
+      ["Unfold At Point" singular-folding-unfold-at-point t]
       "--"
-      ["truncate lines" singular-toggle-truncate-lines
+      (append
+       '("Libraries")
+       singular-menu-initial-library-menu)
+      ["Load File..." singular-load-file t]
+      "---"
+      ["Load Demo" singular-demo-load (not singular-demo-mode)]
+      ["Exit Demo" singular-demo-exit singular-demo-mode]
+      "---"
+      ["Truncate Lines" singular-toggle-truncate-lines
        :style toggle :selected truncate-lines]
-      "---"
-      ["fold last output" singular-fold-last-output t]
-      ["fold all output" singular-fold-all-output t]
-      ["fold at point" singular-fold-at-point t]
-      "---"
-      ["unfold last output" singular-unfold-last-output t]
-      ["unfold all output" singular-unfold-all-output t]
-      ["unfold at point" singular-unfold-at-point t]
       )))
 
 (or singular-interactive-mode-menu-1
     (easy-menu-define singular-interactive-mode-menu-1
 		      singular-interactive-mode-map ""
 		      '("Singular"
-			["start default" singular t]
-			["start..." singular-other t]
-			["restart" singular-restart t]
-			["exit" singular-exit-singular t])))
+			["Start Default" singular t]
+			["Start..." singular-other t]
+			["Restart" singular-restart t]
+			"---"
+			["Exit" singular-exit-singular t]
+			"---"
+			["Preferences" (customize-group 'singular-interactive) t]
+			["Help" singular-help t])))
+
+(defun customize-singular-interactive ()
+  (interactive)
+  (customize-group 'singular-interactive))
 
 (defun singular-interactive-mode-menu-init ()
   "Initialize menus for Singular interactive mode.
@@ -1004,14 +1012,16 @@ the user, otherwise it is expanded using `expand-file-name'."
     (singular-input-filter process string)
     (singular-send-string process string)))
 
-(defun singular-load-library (file &optional noexpand)
-  "Read a Singular library (via 'LIB \"FILE\";').
-If optional argument NOEXPAND is non-nil, FILE is left as it is entered by
-the user, otherwise it is expanded using `expand-file-name'."
-  (interactive "fLoad Library: ")
-  (let* ((filename (if noexpand file (expand-file-name file)))
-	 (string (concat "LIB \"" filename "\";"))
-	 (process (singular-process)))
+(defun singular-load-library (nonstdlib &optional file)
+  "Read a Singular library (via 'LIB \"FILE\";')."
+  (interactive "P")
+  (let ((string (or file
+		    (if nonstdlib
+			(read-file-name "Library file: ")
+		      (completing-read "Library: " singular-standard-libraries-alist
+				       nil nil nil 'singular-load-library-history))))
+	(process (singular-process)))
+    (setq string (concat "LIB \"" string "\";"))
     (singular-input-filter process string)
     (singular-send-string process string)))
 ;;}}}
@@ -2092,7 +2102,7 @@ Does not unfold sections that are restricted either in part or as a whole.
 Rather fails with an error in such cases or silently fails if optional
 argument NO-ERROR is non-nil.
 This is for safety only: The result may be confusing to the user.
-If optional argument INVISIBILITY-OVERLAY-OR_EXTENT is non-nil it should be
+If optional argument INVISIBILITY-OVERLAY-OR-EXTENT is non-nil it should be
 the invisibility overlay or extent, respectively, of the section to
 unfold."
   (let* ((start (singular-section-start section))
@@ -2723,7 +2733,12 @@ Adds the content of `singular-emacs-home-directory' to the string FILE.
 If `singular-emacs-home-directory' is nil, return nil and signal
 an error unless optional argument NOERROR is not nil."
   (if singular-emacs-home-directory
-      (concat singular-emacs-home-directory "/" file)
+      (concat singular-emacs-home-directory
+	      (if (memq (aref singular-emacs-home-directory
+			      (1- (length singular-emacs-home-directory)))
+			'(?/ ?\\))
+		  "" "/")
+	      file)
     (if noerror
 	nil
       (error "Variable singular-emacs-home-directory not set"))))
@@ -2779,9 +2794,8 @@ Otherwise perform completion of Singular commands."
 	  beg)
       (if (save-excursion
 	    (beginning-of-line)
-	    (re-search-forward (concat singular-prompt-regexp
-				       "[ \t]*\\([\\?]\\|help \\)[ \t]*\\(.*\\)")
-			       end t))
+	    (singular-prompt-skip-forward)
+	    (looking-at "[ \t]*\\([\\?]\\|help \\)[ \t]*\\(.*\\)"))
 	  ;; then: help completion
 	  (if singular-help-topics-alist
 	      (singular-completion-do (match-string 2) (match-beginning 2)
@@ -3631,10 +3645,6 @@ NOT READY [much more to come.  See shell.el.]!"
   (singular-help-init)
   (singular-prompt-init)
 
-  ;; other input or output filters
-  (add-hook 'singular-post-output-filter-functions
-	    'singular-remove-prompt-filter nil t)
-
   ;; Font Lock mode initialization for Emacs.  For XEmacs, it is done at
   ;; singular.el loading time.
   (cond
@@ -3650,6 +3660,19 @@ NOT READY [much more to come.  See shell.el.]!"
 ;;}}}
 
 ;;{{{ Starting singular
+(defcustom singular-same-window t
+  "*Specifies how to open the window for Singular sessions.
+If this variable equals t, Singular comes up in the selected window.
+If this variable equals nil, Singular comes up in another window.
+If this variable equals neither t nor nil, the standard Emacs behaviour to
+open the window is adopted (which very much depends on the settings of
+`same-window-buffer-names')."
+  :initialize 'custom-initialize-default
+  :type '(choice (const :tag "This window" t)
+		 (const :tag "Other window" nil)
+		 (const :tag "Default" default))
+  :group 'singular-interactive-miscellaneous)
+
 (defcustom singular-start-file "~/.emacs_singularrc"
   "*Name of start-up file to pass to Singular.
 If the file named by this variable exists it is given as initial input
@@ -3721,7 +3744,7 @@ This string surrounded by \"*\" will also be the buffer name."
   :group 'singular-interactive-miscellaneous)
 
 (defvar singular-name-last singular-name-default
-  "provess name of the last Singular command used.
+  "process name of the last Singular command used.
 
 This variable is buffer-local.")
 
@@ -3869,7 +3892,7 @@ Sets singular-*-last values."
     
     ;; pop to buffer
     (singular-debug 'interactive (message "Calling `pop-to-buffer'"))
-    (singular-pop-to-buffer singular-same-window buffer)))
+    (singular-pop-to-buffer singular-same-window buffer))
 
   ;; Set buffer local singular-*-last-values
   (setq singular-executable-last executable)
@@ -3944,7 +3967,7 @@ Type \\[describe-mode] in the Singular buffer for a list of commands."
 		     singular-switches-last
 		     singular-name-last))
 
-(defun singular-other ()
+(defun singular-other (executable directory switches name)
   "Run an inferior Singular process.
 Starts a Singular process, with I/O through an Emacs buffer.
 
