@@ -54,7 +54,9 @@ APPLLDFLAGS =	$(LIBS) $(LDFLAGS)
 # - files.
 #
 applications := \
-		application
+		application \
+		factorize \
+		gcd
 
 #
 # - phony targets.
@@ -79,6 +81,15 @@ ftmpl_inst.o:	$(FACTORYPREFIX)/include/templates/ftmpl_inst.cc
 
 application:	application.o ftmpl_inst.o
 		$(CXX) $^ $(APPLLDFLAGS) -o $@
+		strip $@
+
+factorize:	factorize.o ftmpl_inst.o
+		$(CXX) $^ $(APPLLDFLAGS) -o $@
+		strip $@
+
+gcd:		gcd.o ftmpl_inst.o
+		$(CXX) $^ $(APPLLDFLAGS) -o $@
+		strip $@
 
 # clean up this directory
 clean:
