@@ -1,5 +1,5 @@
 # @configure_input@
-# $Id: GNUmakefile.in,v 1.27 1998-02-03 13:05:52 schmidt Exp $
+# $Id: GNUmakefile.in,v 1.28 1998-02-05 15:56:25 schmidt Exp $
 
 #
 # GNUmakefile.in - used by `configure' to create `GNUmakefile', the
@@ -670,10 +670,3 @@ ftest/GNUmakefile: ftest/GNUmakefile.in config.status
 
 config.status:	configure
 		./config.status --recheck
-
-#
-# - some extra targets inserted by configure.
-#
-@timingtargets@
-@debouttargets@
-@debtimingtargets@
