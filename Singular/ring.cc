@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.158 2001-01-31 19:08:26 Singular Exp $ */
+/* $Id: ring.cc,v 1.159 2001-02-08 12:55:52 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -124,12 +124,11 @@ void rSetHdl(idhdl h)
   }
 
   // clean up history
-    if (((sLastPrinted.rtyp>BEGIN_RING) && (sLastPrinted.rtyp<END_RING))
-        || ((sLastPrinted.rtyp==LIST_CMD)&&(lRingDependend((lists)sLastPrinted.data))))
-    {
-      sLastPrinted.CleanUp();
-      memset(&sLastPrinted,0,sizeof(sleftv));
-    }
+  if (sLastPrinted.RingDependend())
+  {
+    sLastPrinted.CleanUp();
+    memset(&sLastPrinted,0,sizeof(sleftv));
+  }
 
    /*------------ change the global ring -----------------------*/
   rChangeCurrRing(rg);
@@ -144,9 +143,7 @@ idhdl rDefault(char *s)
   if (tmp==NULL) return NULL;
 
   if (ppNoether!=NULL) pDelete(&ppNoether);
-  if (((sLastPrinted.rtyp>BEGIN_RING) && (sLastPrinted.rtyp<END_RING)) ||
-      ((sLastPrinted.rtyp==LIST_CMD)&&(lRingDependend((lists)sLastPrinted.data))))
-
+  if (sLastPrinted.RingDependend())
   {
     sLastPrinted.CleanUp();
     memset(&sLastPrinted,0,sizeof(sleftv));
@@ -595,7 +592,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   {
     R->float_len = SHORT_REAL_LENGTH;
     R->float_len2 = SHORT_REAL_LENGTH;
-  }  
+  }
 
   /* names and number of variables-------------------------------------*/
   R->N = rv->listLength();
@@ -875,11 +872,15 @@ void rKill(ring r)
         currQuotient=NULL;
       }
       if (ppNoether!=NULL) pDelete(&ppNoether);
-      if (((sLastPrinted.rtyp>BEGIN_RING) && (sLastPrinted.rtyp<END_RING)) ||
-          ((sLastPrinted.rtyp==LIST_CMD)&&(lRingDependend((lists)sLastPrinted.data))))
+      if (sLastPrinted.RingDependend())
       {
         sLastPrinted.CleanUp();
         memset(&sLastPrinted,0,sizeof(sleftv));
+      }
+      if ((myynest>0) && (iiRETURNEXPR[myynest].RingDependend()))
+      {
+        WerrorS("return value depends on local ring variable (export missing ?)");
+        iiRETURNEXPR[myynest].CleanUp();
       }
       currRing=NULL;
       currRingHdl=NULL;

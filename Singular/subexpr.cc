@@ -4,7 +4,7 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id: subexpr.cc,v 1.70 2000-10-19 15:00:23 obachman Exp $ */
+/* $Id: subexpr.cc,v 1.71 2001-02-08 12:55:51 Singular Exp $ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -442,6 +442,16 @@ void sleftv::CleanUp()
       next=tmp_n;
     } while (next!=NULL);
   }
+}
+
+BOOLEAN sleftv::RingDependend()
+{
+  int rt=Typ();
+  if((BEGIN_RING<rt) && (rt<END_RING) && (rt!=QRING_CMD))
+    return TRUE;
+  if (rt==LIST_CMD)
+    return lRingDependend((lists)Data());
+  return FALSE;  
 }
 
 void * slInternalCopy(leftv source, int t, void *d, Subexpr e)

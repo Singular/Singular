@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: subexpr.h,v 1.26 2000-11-21 15:33:12 Singular Exp $ */
+/* $Id: subexpr.h,v 1.27 2001-02-08 12:55:51 Singular Exp $ */
 /*
 * ABSTRACT: handling of leftv
 */
@@ -84,6 +84,7 @@ class sleftv
     inline leftv Next() { return next; }
     int listLength();
     int Eval(); /*replace a COMMAND by its result otherwise by CopyD*/
+    BOOLEAN RingDependend();
 };
 
 extern sleftv sLastPrinted;
