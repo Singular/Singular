@@ -1,7 +1,7 @@
 #####################################################################
 ### 
 ### Makefile for Singular documentation 
-### $Id: Makefile.in,v 1.64 2000-05-08 15:41:03 Singular Exp $
+### $Id: Makefile.in,v 1.65 2000-05-23 11:26:08 obachman Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -84,7 +84,9 @@ HTML_TUTOR_TOP     = tutor.htm
 #
 STANDALONE_TEXI_FILES	= COPYING.texi INSTALL_unix.texi NEWS.texi \
 			  README_download.texi README_ftp.texi \
-			  README_distribution.texi
+			  README_distribution.texi \
+			  DOWNLOAD_win.texi INSTALL_win.texi \
+			  PROBLEMS_win.texi
 
 DOC2TEX_FILES	= \
 		examples.tex general.tex math.tex reference.tex \
