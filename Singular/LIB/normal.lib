@@ -4,7 +4,7 @@
 // the criterion of Grauert/Remmert and ideas of De Jong & Vasconcelos
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: normal.lib,v 1.20 1999-09-23 12:13:39 Singular Exp $";
+version="$Id: normal.lib,v 1.21 1999-11-17 13:53:15 pfister Exp $";
 info="
 LIBRARY:  normal.lib     PROCEDURES FOR NORMALIZATION
 AUTHORS:  Gert-Martin Greuel, email: greuel@mathematik.uni-kl.de,
@@ -648,8 +648,7 @@ EXAMPLE: example normalizationPrimes; shows an example
 
    if(size(#)>0)
    {
-      list JM=#[1],#[1];
-      attrib(JM[1],"isSB",1);
+      list JM=mstd(#[1]);
       if( typeof(attrib(#[1],"isRad"))!="int" )
       {
          attrib(JM[2],"isRad",0);
@@ -815,6 +814,7 @@ write (":a normal-fehler" ,
     //kills the embeded components
 
       list JM=mstd(sin);
+
       if(y>=1)
       {
          "//   the dimension of the singular locus is:";"";
@@ -958,7 +958,6 @@ write (":a normal-fehler" ,
    {
       list RR;
       list RS;
-
       //now we have to compute the radical
       if(y>=1)
       {
@@ -978,7 +977,7 @@ write (":a normal-fehler" ,
          // evtl. test auf J=SM[2]+ideal(SL[1]) dann schon normal
           if(attrib(SM[2],"isCompleteIntersection")==0)
           {
-             J=equiRadical(JM[2]);
+            J=equiRadical(JM[2]);
              //J=equiRadical(JJ);
           }
           else
@@ -987,7 +986,6 @@ write (":a normal-fehler" ,
              J=quotient(JJ,minor(jacob(JJ),size(JJ)));
           }
       }
-
       if(y>=1)
       {
         "//   radical is equal to:";"";
@@ -1023,11 +1021,11 @@ write (":a normal-fehler" ,
       }
       int n=nvars(basering);
       ideal MJ=JM[2];
+
       def newR=RS[1];
       setring newR;
 
       map psi=BAS,endphi;
-
       list tluser=
              normalizationPrimes(endid,psi(ihp),simplify(psi(MJ)+endid,4));
       setring BAS;
