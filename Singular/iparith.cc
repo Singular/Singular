@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.201 2000-01-27 16:53:47 Singular Exp $ */
+/* $Id: iparith.cc,v 1.202 2000-01-28 09:43:38 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1489,7 +1489,7 @@ static BOOLEAN jjDIVISION(leftv res, leftv u, leftv v)
   ideal vi=(ideal)v->Data();
   int vl= IDELEMS(vi);
   ideal R; matrix U;
-  ideal m = idLift(ui,vi,&R, FALSE,hasFlag(u,FLAG_STD),FALSE,&U);
+  ideal m = idLift(ui,vi,&R, FALSE,hasFlag(u,FLAG_STD),TRUE,&U);
   matrix T = idModule2formatedMatrix(m,ul,vl);
   lists L=(lists)AllocSizeOf(slists);
   L->Init(3);
