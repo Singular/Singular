@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.175 2000-02-04 13:21:15 obachman Exp $
+@comment $Id: general.doc,v 1.176 2000-03-08 16:06:56 obachman Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -2760,22 +2760,23 @@ Links are the communication channels of @sc{Singular}, i.e., something
 @sc{Singular} can write to and read from.  In this section, a short
 overview of the usage of links and of the different link types is given.
 
-Even though library loading may be considered to be an I/O operation, too,
-this section does not treat loading of libraries
-(@pxref{LIB}).
+For loading of libraries, see @ref{LIB}. For executing program scripts,
+see @ref{filecmd}.
 
 @subheading Monitoring
 A special form of I/O is monitoring.  When monitoring is enabled,
 @sc{Singular} makes a typescript of everything printed on your terminal
-to a file.  It is useful for students who need a hardcopy record of an
-interactive session as proof of an assignment.  More generally, it is
+to a file.  This is
 useful to create a protocol of a @sc{Singular} session.  The
 @code{monitor} command enables and disables this feature
 (@pxref{monitor}).
 
+
 @subheading How to use links
-Besides the usual I/O functions @code{write} and @code{read}, there are
-also the functions @code{dump} and @code{getdump} which store resp.@:
+Recall that links are the communication channels of @sc{Singular}, i.e.,
+something @sc{Singular} can write to and read from using the functions
+@code{write} and @code{read}. There are furthermore
+the functions @code{dump} and @code{getdump} which store resp.@:
 retrieve the content of an entire @sc{Singular} session to, resp.@: from,
 a link.  The @code{dump} and @code{getdump} commands are not available
 for DBM links.
