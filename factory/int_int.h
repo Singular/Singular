@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_int.h,v 1.4 1997-06-19 12:22:44 schmidt Exp $ */
+/* $Id: int_int.h,v 1.5 1997-07-16 10:19:03 schmidt Exp $ */
 
 #ifndef INCL_INT_INT_H
 #define INCL_INT_INT_H
@@ -78,6 +78,10 @@ public:
 
     InternalCF* sqrt();
 
+#ifdef RS_NEW
+    int ilog2();
+#endif /* RS_NEW */
+    
     friend class InternalRational;
 #ifdef SINGULAR
     friend MP_INT gmp_numerator ( const CanonicalForm & f );
