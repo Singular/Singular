@@ -64,7 +64,7 @@ install-bindist: $(MAIN1) $(MAIN2) $(MAIN3) $(MAIN4)
 	${INSTALL_PROGRAM} -s $(MAIN2) ${install_bindir}
 	${INSTALL_PROGRAM} -s $(MAIN3) ${install_bindir}
 	${INSTALL_PROGRAM} -s $(MAIN4) ${install_bindir}
-	${INSTALL_PROGRAM} -s $(LLL) ${bindir}
+	${INSTALL_PROGRAM} -s $(LLL) ${install_bindir}
 
 clean: 
 	rm -f *.o *~ 
