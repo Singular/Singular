@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which are of constant time
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline2.h,v 1.14 2000-10-30 13:40:21 obachman Exp $
+ *  Version: $Id: pInline2.h,v 1.15 2000-10-30 16:54:55 obachman Exp $
  *******************************************************************/
 #ifndef PINLINE2_H
 #define PINLINE2_H
@@ -303,6 +303,62 @@ PINLINE2 int p_Cmp(poly p1, poly p2, ring r)
 PINLINE2 Exponent_t p_GetMaxExp(poly p, ring r)
 {
   return p_GetMaxExp(p_GetMaxExpL(p, r), r);
+}
+
+PINLINE2 Exponent_t 
+p_GetMaxExp(const unsigned long l, const ring r, const int number_of_exps)
+{
+  unsigned long bitmask = r->bitmask;
+  unsigned long max = (l & bitmask);
+  unsigned long j = number_of_exps - 1;
+  
+  if (j > 0)
+  {
+    unsigned long i = r->BitsPerExp;
+    Exponent_t e;
+    while(1)
+    {
+      e = ((l >> i) & bitmask);
+      if ((unsigned long) e > max) 
+        max = e;
+      j--;
+      if (j==0) break;
+      i += r->BitsPerExp;
+    }
+  }
+  return max;
+}
+
+PINLINE2 Exponent_t p_GetMaxExp(const unsigned long l, const ring r)
+{
+  return p_GetMaxExp(l, r, r->ExpPerLong);
+}
+
+PINLINE2 unsigned long 
+p_GetTotalDegree(const unsigned long l, const ring r, const int number_of_exps)
+{
+  const unsigned long bitmask = r->bitmask;
+  unsigned long sum = (l & bitmask);
+  unsigned long j = number_of_exps - 1;
+  
+  if (j > 0)
+  {
+    unsigned long i = r->BitsPerExp;
+    while(1)
+    {
+      sum += ((l >> i) & bitmask);
+      j--;
+      if (j==0) break;
+      i += r->BitsPerExp;
+    }
+  }
+  return sum;
+}
+
+PINLINE2 unsigned long 
+p_GetTotalDegree(const unsigned long l, const ring r)
+{
+  return p_GetTotalDegree(l, r, r->ExpPerLong);
 }
 
 /***************************************************************

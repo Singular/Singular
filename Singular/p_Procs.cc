@@ -6,7 +6,7 @@
  *  Purpose: implementation of primitive procs for polys
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Procs.cc,v 1.17 2000-10-30 13:40:23 obachman Exp $
+ *  Version: $Id: p_Procs.cc,v 1.18 2000-10-30 16:54:56 obachman Exp $
  *******************************************************************/
 #include <string.h>
 
@@ -542,6 +542,8 @@ static inline p_Field p_FieldIs(ring r)
 static inline p_Length p_LengthIs(ring r)
 {
   assume(r->ExpL_Size > 0);
+  // here is a quick hack to take care of p_MemAddAdjust
+  if (r->NegWeightL_Offset != NULL) return LengthGeneral;
   if (r->ExpL_Size == 1) return LengthOne;
   if (r->ExpL_Size == 2) return LengthTwo;
   if (r->ExpL_Size == 3) return LengthThree;
@@ -745,10 +747,17 @@ void AddProc(const char* s_what, p_Proc proc, p_Field field, p_Length length, p_
 
   // define DECLARE_LENGTH
   printf("#undef DECLARE_LENGTH\n");
+  printf("#undef p_MemAddAdjust\n");
   if (length != LengthGeneral)
+  {
     printf("#define DECLARE_LENGTH(what) ((void)0)\n");
+    printf("#define p_MemAddAdjust(p, r) ((void)0)\n");
+  }
   else
+  {
     printf("#define DECLARE_LENGTH(what) what\n");
+    printf("#define p_MemAddAdjust(p, r) p_MemAdd_NegWeightAdjust(p, r)\n");
+  }
   
   // define DECLARE_ORDSGN
   printf("#undef DECLARE_ORDSGN\n");

@@ -7,7 +7,7 @@
  *           currRing
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
- *  Version: $Id: p_polys.h,v 1.10 2000-10-30 13:40:23 obachman Exp $
+ *  Version: $Id: p_polys.h,v 1.11 2000-10-30 16:54:56 obachman Exp $
  *******************************************************************/
 #ifndef P_POLYS_H
 #define P_POLYS_H
@@ -119,6 +119,9 @@ PINLINE2 poly p_LmDeleteAndNext(poly p, ring r);
  ***************************************************************/
 // ExpVextor(d_p) = ExpVector(s_p)
 PINLINE1 void p_ExpVectorCopy(poly d_p, poly s_p, ring r);
+// adjustments for negative weights
+PINLINE1 void p_MemAdd_NegWeightAdjust(poly p, ring r);
+PINLINE1 void p_MemSub_NegWeightAdjust(poly p, ring r);
 // ExpVector(p1) += ExpVector(p2)
 PINLINE1 void p_ExpVectorAdd(poly p1, poly p2, ring r);
 // ExpVector(p1) -= ExpVector(p2)
@@ -199,14 +202,14 @@ unsigned long p_GetMaxExpL(poly p, ring r, unsigned long l_max = 0);
 poly p_GetMaxExpP(poly p, ring r);
 
 // suppose that l is a long var in r, return maximal exponent of l
-PINLINE1 Exponent_t p_GetMaxExp(unsigned long l, ring r);
+PINLINE2 Exponent_t p_GetMaxExp(unsigned long l, ring r);
 // similar, except assume that l constains number_of_exps exponents
-PINLINE1 Exponent_t p_GetMaxExp(const unsigned long l, const ring r, const number_of_exps);
+PINLINE2 Exponent_t p_GetMaxExp(const unsigned long l, const ring r, const int number_of_exps);
 
 // return the TotalDegree of the long var l
-PINLINE1 unsigned long p_GetTotalDegree(const unsigned long l, const ring r);
+PINLINE2 unsigned long p_GetTotalDegree(const unsigned long l, const ring r);
 // return the total degree of the long var l containing number_of_exp exponents
-PINLINE1 unsigned long p_GetTotalDegree(const unsigned long l, const ring r, const number_of_exps);
+PINLINE2 unsigned long p_GetTotalDegree(const unsigned long l, const ring r, const int number_of_exps);
 
 /***************************************************************
  *

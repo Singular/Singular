@@ -6,7 +6,7 @@
  *  Purpose: template for p_Minus_m_Mult_q
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Minus_mm_Mult_qq__Template.cc,v 1.4 2000-10-30 13:40:22 obachman Exp $
+ *  Version: $Id: p_Minus_mm_Mult_qq__Template.cc,v 1.5 2000-10-30 16:54:55 obachman Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -58,6 +58,8 @@ poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int& Shorter, const poly spNoeth
   p_AllocBin(qm, bin, r);
   SumTop:
   p_MemSum(qm->exp, q->exp, m_e, length);
+  p_MemAddAdjust(qm, r);
+  
   CmpTop:     
   // compare qm = m*q and p w.r.t. monomial ordering
   p_MemCmp(qm->exp, p->exp, length, ordsgn, goto Equal, goto Greater, goto Smaller );

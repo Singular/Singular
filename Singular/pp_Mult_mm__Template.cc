@@ -6,7 +6,7 @@
  *  Purpose: template for p_Mult_n
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pp_Mult_mm__Template.cc,v 1.5 2000-10-30 13:40:26 obachman Exp $
+ *  Version: $Id: pp_Mult_mm__Template.cc,v 1.6 2000-10-30 16:54:56 obachman Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -40,6 +40,7 @@ poly pp_Mult_mm(poly p, const poly m, const poly spNoether, const ring ri)
       q = pNext(q);
       pSetCoeff0(q, n_Mult(ln, pGetCoeff(p), ri));
       p_MemSum(q->exp, p->exp, m_e, length);
+      p_MemAddAdjust(q, ri);
       p = pNext(p);
     }
     while (p != NULL);
@@ -51,7 +52,7 @@ poly pp_Mult_mm(poly p, const poly m, const poly spNoether, const ring ri)
     {
       p_AllocBin( r, bin, ri);
       p_MemSum(r->exp, p->exp, m_e, length);
-
+      p_MemAddAdjust(r, ri);
       if (p_LmCmp(r, spNoether, ri) == -1)
       {
         p_FreeBinAddr(r, ri);

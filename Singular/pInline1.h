@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which iter over ExpVector
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline1.h,v 1.11 2000-10-30 13:40:21 obachman Exp $
+ *  Version: $Id: pInline1.h,v 1.12 2000-10-30 16:54:54 obachman Exp $
  *******************************************************************/
 #ifndef PINLINE1_H
 #define PINLINE1_H
@@ -139,6 +139,27 @@ PINLINE1 poly p_LmShallowCopyDelete(poly p, const ring r, omBin bin)
  * Operation on ExpVectors
  *
  ***************************************************************/
+// adjustments for negative weights
+PINLINE1 void p_MemAdd_NegWeightAdjust(poly p, ring r)
+{
+  if (r->NegWeightL_Offset != NULL)
+  {
+    for (int i=0; i<r->NegWeightL_Size; i++)
+    {
+      p->exp[r->NegWeightL_Offset[i]] -= POLY_NEGWEIGHT_OFFSET;
+    }
+  }
+}
+PINLINE1 void p_MemSub_NegWeightAdjust(poly p, ring r)
+{
+  if (r->NegWeightL_Offset != NULL)
+  {
+    for (int i=0; i<r->NegWeightL_Size; i++)
+    {
+      p->exp[r->NegWeightL_Offset[i]] += POLY_NEGWEIGHT_OFFSET;
+    }
+  }
+}
 // ExpVextor(d_p) = ExpVector(s_p)
 PINLINE1 void p_ExpVectorCopy(poly d_p, poly s_p, ring r)
 {
@@ -158,6 +179,7 @@ PINLINE1 void p_ExpVectorAdd(poly p1, poly p2, ring r)
 #endif 
  
   p_MemAdd_LengthGeneral(p1->exp, p2->exp, r->ExpL_Size);
+  p_MemAdd_NegWeightAdjust(p1, r);
 }
 // ExpVector(p1) -= ExpVector(p2)
 PINLINE1 void p_ExpVectorSub(poly p1, poly p2, ring r)
@@ -172,6 +194,8 @@ PINLINE1 void p_ExpVectorSub(poly p1, poly p2, ring r)
 #endif 
  
   p_MemSub_LengthGeneral(p1->exp, p2->exp, r->ExpL_Size);
+  p_MemSub_NegWeightAdjust(p1, r);
+  
 }
 // ExpVector(p1) += ExpVector(p2) - ExpVector(p3)
 PINLINE1 void p_ExpVectorAddSub(poly p1, poly p2, poly p3, ring r)
@@ -188,7 +212,9 @@ PINLINE1 void p_ExpVectorAddSub(poly p1, poly p2, poly p3, ring r)
 #endif 
  
   p_MemAddSub_LengthGeneral(p1->exp, p2->exp, p3->exp, r->ExpL_Size);
+  // no need to adjust in case of NegWeights
 }
+
 // ExpVector(pr) = ExpVector(p1) + ExpVector(p2)
 PINLINE1 void p_ExpVectorSum(poly pr, poly p1, poly p2, ring r)
 {
@@ -202,6 +228,7 @@ PINLINE1 void p_ExpVectorSum(poly pr, poly p1, poly p2, ring r)
 #endif  
 
   p_MemSum_LengthGeneral(pr->exp, p1->exp, p2->exp, r->ExpL_Size);
+  p_MemAdd_NegWeightAdjust(p1, r);
 }
 // ExpVector(pr) = ExpVector(p1) - ExpVector(p2)
 PINLINE1 void p_ExpVectorDiff(poly pr, poly p1, poly p2, ring r)
@@ -216,6 +243,7 @@ PINLINE1 void p_ExpVectorDiff(poly pr, poly p1, poly p2, ring r)
 #endif 
  
   p_MemDiff_LengthGeneral(pr->exp, p1->exp, p2->exp, r->ExpL_Size);
+  p_MemSub_NegWeightAdjust(p1, r);
 }
 
 PINLINE1 BOOLEAN p_ExpVectorEqual(poly p1, poly p2, ring r)
@@ -482,63 +510,6 @@ PINLINE1 BOOLEAN p_LmExpVectorAddIsOk(const poly p1, const poly p2,
   return TRUE;
 }
 
-
-PINLINE1 Exponent_t 
-p_GetMaxExp(const unsigned long l, const ring r, const number_of_exps)
-{
-  unsigned long bitmask = r->bitmask;
-  unsigned long max = (l & bitmask);
-  unsigned long j = number_of_exps - 1;
-  
-  if (j > 0)
-  {
-    unsigned long i = r->BitsPerExp;
-    Exponent_t e;
-    while(1)
-    {
-      e = ((l >> i) & bitmask);
-      if ((unsigned long) e > max) 
-        max = e;
-      j--;
-      if (j==0) break;
-      i += r->BitsPerExp;
-    }
-  }
-  return max;
-}
-
-PINLINE1 Exponent_t p_GetMaxExp(const unsigned long l, const ring r)
-{
-  return p_GetMaxExp(l, r, r->ExpPerLong);
-}
-
-PINLINE1 unsigned long 
-p_GetTotalDegree(const unsigned long l, const ring r, const number_of_exps)
-{
-  const unsigned long bitmask = r->bitmask;
-  unsigned long sum = (l & bitmask);
-  unsigned long j = number_of_exps - 1;
-  
-  if (j > 0)
-  {
-    unsigned long i = r->BitsPerExp;
-    while(1)
-    {
-      sum += ((l >> i) & bitmask);
-      j--;
-      if (j==0) break;
-      i += r->BitsPerExp;
-    }
-  }
-  return sum;
-}
-
-PINLINE1 unsigned long 
-p_GetTotalDegree(const unsigned long l, const ring r)
-{
-  return p_GetTotalDegree(l, r, r->ExpPerLong);
-}
-  
 #endif // !defined(NO_PINLINE1) || defined(PINLINE1_CC)
 #endif // PINLINE1_CC
 
