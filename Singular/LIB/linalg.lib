@@ -1,6 +1,6 @@
 //GMG last modified: 04/25/2000
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: linalg.lib,v 1.13 2001-05-30 18:07:52 mschulze Exp $";
+version="$Id: linalg.lib,v 1.14 2001-06-01 12:58:41 mschulze Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  linalg.lib        Algorithmic Linear Algebra
@@ -8,7 +8,7 @@ AUTHORS:  Ivor Saynisch (ivs@math.tu-cottbus.de)
 @*        Mathias Schulze (mschulze@mathematik.uni-kl.de)
 
 PROCEDURES:
- inverse(A);            matrix, the inverse of A
+ inverse(A);        matrix, the inverse of A
  inverse_B(A);      list(matrix Inv,poly p),Inv*A=p*En ( using busadj(A) )
  inverse_L(A);      list(matrix Inv,poly p),Inv*A=p*En ( using lift )
  sym_gauss(A);      symmetric gaussian algorithm
@@ -1623,13 +1623,13 @@ RETURN:  matrix J in Jordan normal form
 EXAMPLE: example jordanmatrix; shows examples
 "
 {
-  if(size(e)!=size(b))
+  if(ncols(e)!=size(b))
   {
     ERROR("arguments of equal size expected");
   }
 
   int i,j,k,n;
-  for(i=size(e);i>=1;i--)
+  for(i=ncols(e);i>=1;i--)
   {
     if(typeof(b[i])!="intvec")
     {
@@ -1650,7 +1650,7 @@ EXAMPLE: example jordanmatrix; shows examples
   matrix J[n][n];
 
   int l=1;
-  for(i=1;i<=size(e);i++)
+  for(i=1;i<=ncols(e);i++)
   {
     for(j=1;j<=size(b[i]);j++)
     {
