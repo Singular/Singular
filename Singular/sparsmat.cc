@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sparsmat.cc,v 1.15 1999-10-22 11:14:17 obachman Exp $ */
+/* $Id: sparsmat.cc,v 1.16 1999-10-26 12:38:57 pohl Exp $ */
 
 /*
 * ABSTRACT: operations with sparse matrices (bareiss, ...)
@@ -1007,7 +1007,7 @@ void sparse_mat::smHElim()
   smpoly c = m_act[act];  // pivotcolumn
   smpoly r = red;         // row to reduce
   smpoly res, a, b;
-  poly ha, hr, gc, x, y;
+  poly ha, hr, x, y;
   int e, ip, ir, ia, lev;
 
   if ((c == NULL) || (r == NULL))
@@ -1045,55 +1045,57 @@ void sparse_mat::smHElim()
       }      
       else
       {
-        y = NULL;
-        x = hr;
         ha = a->m;
         ia = a->e;
-        if (ir > ia)
+        if (ir >= ia)
         {
-          gc = SM_MULT(ha, m_res[ir]->m, m_res[ia]->m);
-          pDelete(&ha);
-          ha = gc;
-          if (ia) SM_DIV(ha, m_res[ia]->m);
-          ia = ir;
-        }
-        else if (ir < ia)
-        {
-          if (ip < ia)
+          if (ir > ia)
           {
-            gc = SM_MULT(ha, m_res[crd]->m, m_res[ia]->m);
+            x = SM_MULT(ha, m_res[ir]->m, m_res[ia]->m);
             pDelete(&ha);
-            ha = gc;
+            ha = x;
             if (ia) SM_DIV(ha, m_res[ia]->m);
-            y = hp;
-            ia = ip;
-            if (ir > ia)
-            {
-              y = SM_MULT(y, m_res[ir]->m, m_res[ia]->m);
-              if (ia) SM_DIV(y, m_res[ia]->m);
-              ia = ir;
-            }
-            else if (ir < ia)
-            {
-              x = SM_MULT(x, m_res[ia]->m, m_res[ir]->m);
-              if (ir) SM_DIV(x, m_res[ir]->m);
-            }
+            ia = ir;
           }
-          else
-          {
-            x = SM_MULT(x, m_res[ia]->m, m_res[ir]->m);
-            if (ir) SM_DIV(x, m_res[ir]->m);
-          }
+          x = SM_MULT(ha, gp, m_res[ia]->m);
+          pDelete(&ha);
+          y = SM_MULT(b->m, hr, m_res[ia]->m);
         }
-        if (y == NULL) y = gp;
-        gc = SM_MULT(ha, y, m_res[ia]->m);
-        pDelete(&ha);
-        x = SM_MULT(x, b->m, m_res[ia]->m);
-        x = pAdd(x, gc);
-        if (x != NULL)
+        else if (ir >= ip)
         {
-          if (ia) SM_DIV(x, m_res[ia]->m);
-          a->m = x;
+          if (ia < crd)
+          {
+            x = SM_MULT(ha, m_res[crd]->m, m_res[ia]->m);
+            pDelete(&ha);
+            ha = x;
+            SM_DIV(ha, m_res[ia]->m);
+          }
+          y = hp;
+          if(ir > ip)
+          {
+            y = SM_MULT(y, m_res[ir]->m, m_res[ip]->m);
+            if (ip) SM_DIV(y, m_res[ip]->m);
+          }
+          ia = ir;
+          x = SM_MULT(ha, y, m_res[ia]->m);
+          if (y != hp) pDelete(&y);
+          pDelete(&ha);
+          y = SM_MULT(b->m, hr, m_res[ia]->m);
+        }
+        else
+        {
+          x = SM_MULT(hr, m_res[ia]->m, m_res[ir]->m);
+          if (ir) SM_DIV(x, m_res[ir]->m);
+          y = SM_MULT(b->m, x, m_res[ia]->m);
+          pDelete(&x);
+          x = SM_MULT(ha, gp, m_res[ia]->m);
+          pDelete(&ha);
+        }
+        ha = pAdd(x, y);
+        if (ha != NULL)
+        {
+          if (ia) SM_DIV(ha, m_res[ia]->m);
+          a->m = ha;
           a->e = e;
           a->f = smPolyWeight(a);
           res = res->n = a;
