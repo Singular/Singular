@@ -1,0 +1,152 @@
+@comment -*-texinfo-*-
+@comment $Id: INSTALL_rpm.texi,v 1.1 2002-03-08 15:22:14 mschulze Exp $
+@c FILE: INSTALL_rpm.texi
+@c PURPOSE: Installation instruction for Singular on RPM based Linux systems
+@c
+
+@ifclear VERSION
+@include version.texi
+@end ifclear
+
+@ifclear singularmanual
+@majorheading Installation of @sc{Singular} @value{VERSION} on @sc{rpm} based Linux systems
+@end ifclear
+
+@heading @sc{Singular} @sc{rpm} packages
+
+There are the following @sc{Singular} @sc{rpm} packages.
+
+@table @code
+@item Singular-@value{RPM_VERSION}-@value{1}.i386.rpm
+contains architecture dependend executables like the Singular program.
+@item Singular-static-@value{RPM_VERSION}-@value{1}.i386.rpm
+contains the static version of the architecture dependend executables.
+@item Singular-share-@value{RPM_VERSION}-@value{1}.noarch.rpm
+contains architecture independend data like documentation and libraries.
+@item Singular-kde-redhat-@value{RPM_VERSION}-@value{1}.noarch.rpm
+contains KDE icons and menues for RedHat Linux.
+@item Singular-kde-suse-@value{RPM_VERSION}-@value{1}.noarch.rpm
+contains KDE icons and menues for SuSE Linux.
+@end table
+
+The above @sc{rpm} packages are available at
+@display
+@uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular}.
+@end display
+
+@include register.texi
+
+@heading Usage of @sc{rpm} packages
+@enumerate
+@item
+You can only use the @sc{Singular} @sc{rpm} packages for an @sc{rpm} based Linux system like @sc{RedHat Linux} or @sc{SuSE Linux}.
+You can check this by typing 
+@smallexample
+rpm
+@end smallexample
+in a command shell. This should produce an output like
+@smallexample
+RPM Version 4.0.3
+Copyright (C) 1998-2000 - Red Hat, Inc.
+This program may be freely redistributed under the terms of the GNU GPL
+
+Usage: rpm {--help}
+       rpm {--version}
+@end smallexample
+@item
+To deal with @sc{rpm} packages you can either use the @sc{rpm} command line tool @code{rpm} or a graphical @sc{rpm} frontend like e.g. @code{kpackage} under @sc{kde}.
+For a description of the usage of @code{rpm}, type 
+@smallexample
+rpm -h
+@end smallexample
+in a command shell.
+@item
+To install or deinstall @sc{rpm} packages you have to be superuser.
+To become superuser type
+@smallexample
+su
+@end smallexample
+in a command shell and enter the root password.
+@end enumerate
+
+
+@heading Installation of @sc{Singular} @sc{rpm} packages
+
+@enumerate
+@item
+The installation requires about 18MB of free disk space under @code{/opt}.
+You can check the free disk space by typing
+@smallexample
+df
+@end smallexample
+in a command shell.
+@item
+Different versions of @sc{Singular} @sc{rpm} packages coexist without conflicts.
+@item
+To install the @sc{Singular} binary @sc{rpm} package, type
+@smallexample
+rpm -ivh Singular-@value{RPM_VERSION}-@value{1}.i386.rpm
+@end smallexample
+in a command shell.
+This requires several shared libraries.
+If these are not present in your system, @code{rpm} will give an error report.
+Then you have to install @sc{rpm} packages providing these shared libraries and retry.
+Alternatively, you can install the @sc{Singular} static binary @sc{rpm} package by typing
+@smallexample
+rpm -ivh Singular-@value{RPM_VERSION}-@value{1}.i386.rpm
+@end smallexample
+in a command shell.
+@item
+To install the @sc{Singular} shared @sc{rpm} package, type
+@smallexample
+rpm -ivh Singular-shared-@value{RPM_VERSION}-@value{1}.noarch.rpm
+@end smallexample
+in a command shell.
+@item
+To install a @sc{Singular} kde @sc{rpm} package, @sc{kde} has to be installed under @code{/usr/share} like for @sc{RedHat Linux} or under @code{/opt/kde} like for @sc{SuSE Linux}.
+You can check this by typing
+@smallexample
+rpm -ql kdebase
+@end smallexample
+in a command shell.
+In the first case, you type
+@smallexample
+rpm -ivh Singular-kde-redhat-@value{RPM_VERSION}-@value{1}.noarch.rpm
+@end smallexample
+and in the second case
+@smallexample
+rpm -ivh Singular-kde-suse-@value{RPM_VERSION}-@value{1}.noarch.rpm
+@end smallexample
+in a command shell.
+@item
+To deinstall a @sc{Singular} @sc{rpm} package, type
+@smallexample
+rpm -e Singular-...-@value{RPM_VERSION}
+@end smallexample
+in a command shell.
+@end enumerate
+
+@heading Starting @sc{Singular}
+@enumerate
+@item
+To run @sc{Singular}, type
+@smallexample
+Singular-@value{VERSION}
+@end smallexample
+in a command shell.
+To run @sc{Singular} inside @sc{Emacs}, type
+@smallexample
+ESingular-@value{VERSION}
+@end smallexample
+in a command shell.
+@item
+There is a menu @code{Singular @value{VERSION}} in the @sc{kde} menu with menu items @code{Singular}, @code{ESingular}, and @code{Manual}.
+Click on the menu items @code{Singular} to run @sc{Singular} in a terminal, on the menu item @code{ESingular} to run @sc{Singular} inside @sc{Emacs}, and on the menu item @code{Manual} to read the @sc{Singular} manual.
+@end enumerate
+
+
+@include info.texi
+
+@ifclear singularmanual
+Good luck and enjoy! Your @sc{Singular} team.
+@end ifclear
