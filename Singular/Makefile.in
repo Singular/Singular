@@ -13,6 +13,7 @@ SINGULAR_VERSION	= @SINGULAR_VERSION@
 SINGULAR		= @SINGULAR@
 SINGUNAME		= @SINGUNAME@
 EXEC_EXT		= @EXEC_EXT@
+HAVE_PLURAL             = @PLURAL@
 ##
 ## various paths
 ##
@@ -205,7 +206,7 @@ endif
 # MAKE SURE THAT THIS IS UP_TO_DATE
 #
 
-SLIBS = COPYING \
+SLIB0 = COPYING \
 	ainvar.lib   alexpoly.lib  algebra.lib   all.lib       brnoeth.lib \
         classify.lib \
         deform.lib   elim.lib      equising.lib  finvar.lib     gmssing.lib \
@@ -222,9 +223,13 @@ SLIBS = COPYING \
 
 PLIBS = ncalg.lib ncdecomp.lib nctools.lib gkdim.lib qmatrix.lib
 
-SLIBS_FILES = $(addprefix LIB/,${SLIBS})
+ifdef HAVE_PLURAL
+SLIBS = ${SLIB0} ${PLIBS}
+else
+SLIBS = ${SLIB0}
+endif
 
-PLIBS_FILES = $(addprefix LIB/,${PLIBS})
+SLIBS_FILES = $(addprefix LIB/,${SLIBS})
 
 GFTABLES = $(wildcard LIB/gftables/[1-9]*)
 
@@ -476,11 +481,6 @@ install-sharedist: ${SLIBS_FILES} LIB/gftables
 	cp ${SLIBS_FILES} ${install_slibdir}
 	${MKINSTALLDIRS} ${install_slibdir}/gftables
 	cp ${GFTABLES} ${install_slibdir}/gftables
-	chmod -R +rX ${install_slibdir}/*
-
-install-sharedist-plural: ${PLIBS_FILES} install-sharedist
-	${MKINSTALLDIRS} ${install_slibdir}
-	cp ${PLIBS_FILES} ${install_slibdir}
 	chmod -R +rX ${install_slibdir}/*
 
 tar:
