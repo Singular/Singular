@@ -1,13 +1,13 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.56 1998-05-13 06:42:54 wichmann Exp $
+@comment $Id: general.doc,v 1.57 1998-05-13 07:18:41 schmidt Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
 @c with emacs (C-c C-e C-r).  Please keep it as it is.  Since it
-@c is wrapped in `@ifset' and `@end' it does not harm `tex' or
+@c is wrapped in `@ignore' and `@end ignore' it does not harm `tex' or
 @c `makeinfo' but is a great help in editing this file (emacs
-@c ignores the conditionals).
-@ifset thisVariableShouldNeverBeSet
+@c ignores the `@ignore').
+@ignore
 %**start
 \input texinfo.tex
 @setfilename general.info
@@ -18,7 +18,7 @@
 @node General concepts, Data types, Introduction, Top
 @chapter General concepts
 %**end
-@end ifset
+@end ignore
 
 
 @menu
@@ -57,24 +57,25 @@
 @cindex How to enter and exit
 
 To start @sc{Singular}, enter @code{Singular} at the system prompt.
-@*You get a header which, among others, reports the version name and
+You get a header which, among others, reports the version name and
 compilation date.
 Enter @code{help;} to get the online manual at the @sc{Singular} prompt
 @code{>}.
 Commands are always need to be ended by a @code{;} (semicolon) and
-@code{<ENTER>}. @*To exit @sc{Singular} type @code{quit;}, @code{exit;}
-or @code{$}. 
+@code{<ENTER>}.
 
+To exit @sc{Singular} type @code{quit;}, @code{exit;} or @code{$}.
 
 @sc{Singular} may also be started with command-line options and with
 filenames as arguments. More generally, the synopsis of @sc{Singular} is
-@*@code{  Singular  [options] [file1 [file2 ...]] }
-
+@example
+Singular  [options] [file1 [file2 ...]]
+@end example
 @c ref
-See @ref{Commandline options}.
+@xref{Commandline options}.
 @c ref
 
-@*On start-up, @sc{Singular}
+On start-up, @sc{Singular}
 @enumerate
 @item
 loads the library @code{standard.lib} (provided the @code{--no-stdlib}
@@ -104,14 +105,13 @@ systems), and, finally, by searching through some default directories
 @cindex SINGULAR prompt
 @cindex prompt
 @cindex error recovery
-The @sc{Singular} prompt @code{>}
-asks the user for input of a command, while the prompt @code{.}
-asks the user for input of missing parts of a command (remember the
-semicolon @code{;} at the end of every command). If your input
-is erroneous @sc{Singular} may miss the semicolon.
-(It may be missed because @sc{Singular} needs first a @code{"} or @code{@}}.)
-On the other hand additional @code{;} will not harm @sc{Singular}:
-extra semicolons are interpreted as empty statements.
+The @sc{Singular} prompt @code{>} asks the user for input of a command, while
+the prompt @code{.}  asks the user for input of missing parts of a command
+(remember the semicolon @code{;} at the end of every command).  If your input is
+erroneous @sc{Singular} may miss the semicolon (it may be missed because
+@sc{Singular} needs first a @code{"} or @code{@}}).  On the other hand
+additional @code{;} will not harm @sc{Singular} since extra semicolons are
+interpreted as empty statements.
 
 @c --------------------------------------------------------------------------
 @node The online help system,Interrupting SINGULAR,SINGULAR prompt,Interactive use
@@ -159,10 +159,10 @@ scroll forward a page
 @item DEL
 scroll backward a page
 @item h
-invoke info tutorial (use @code{l} to come back or @code{CTL-X 0} to remove
+invoke info tutorial (use @code{l} to come back or @code{CTRL-X 0} to remove
 extra window)
 @item CTRL-H
-show help on info system (use @code{l} to come back or @code{CTL-X 0} to remove
+show help on info system (use @code{l} to come back or @code{CTRL-X 0} to remove
 extra window)
 @item s
 search through this Info file for a specified string,
@@ -174,7 +174,7 @@ and select the node in which the next occurrence is found
 @subsection Interrupting SINGULAR
 @cindex Interrupting SINGULAR
 
-Typing @code{CTL-C} (control C) interrupts Singular (system dependend).
+Typing @code{CTRL-C} (control C) interrupts Singular (system dependend).
 @sc{Singular} prints the current command and the current line.
 You have the following choices:
 @table @code
@@ -191,49 +191,44 @@ quits  @sc{Singular}
 @subsection Editing input
 @cindex Editing input
 
-If the command line option @code{-t} is not given,
-@sc{Singular} redefines the terminal characteristics
-@footnote{
-therefore the comandline option @code{-t} must be given if @sc{Singular} should
-run in the background
-}
-and the following keys can be used for editing
-the input and retrieving previous input lines
-(CTL denotes the control key):
-@table @kbd
-@item CTL-A
-go to the start of the line
-@item CTL-B
-go one character to the left
-@item CTL-D
-erase the character under the cursor
+On U*ix operating systems, the following keys can be used for editing the input
+and retrieving previous input lines (@code{CTRL} denotes the control key):
+@table @code
+@item CTRL-B
+move cursor left
+@item CTRL-F
+move cursor right
+@item CTRL-A
+move cursor to beginning of line
+@item CTRL-E
+move cursor to end of line
+@item CTRL-D
+delete character under cursor
 (or return @kbd{EOF}, if the current line is empty)
-@item CTL-E
-go to to the end of the line
-@item CTL-F
-go one character to the right
 @item BACKSPACE
 @itemx DELETE
-@itemx CTL-H
-erase the character before the cursor
-@item CTL-K
-kill the rest of the line
-@item CTL-N
-save the current line to the history and get the next line
-@item CTL-P
-save the current line to the history and get the previous line
-@item CTL-U
-kill the whole line
+@itemx CTRL-H
+delete character before cursor
+@item CTRL-K
+kill from cursor to end of line
+@item CTRL-U
+kill from cursor to beginning of line
+@item CTRL-N
+save current line on history and get next line
+@item CTRL-P
+save current line on history and get previous line
 @item RETURN
 save the current line to the history and
 send it to the @sc{Singular} parser for interpretation
 @end table
-@* @strong{Remarks:}
-@* This section does not apply to the MPW-Macintosh version of
-@sc{Singular}.
-@* This section describes only a subset of the key bindings of
-@sc{Singular} binaries built with GNU @code{Readline} library. 
-See the @code{RXSeadline} manual for the key bindings.
+
+On Windows-NT, the cursor keys may be used to edit the commandline and
+to retrieve previous input.
+
+This section describes only a subset of the key bindings of @sc{Singular}
+binaries built with the GNU Readline library.  @xref{Command Line Editing, GNU
+Readline Library, Command Line Editing, readline, The GNU Readline Library
+Manual}.
 
 @c --------------------------------------------------------------------------
 @node Control parameters, Startup sequence, Editing input, Interactive use
