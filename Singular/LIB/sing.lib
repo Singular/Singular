@@ -1,8 +1,8 @@
-// $Id: sing.lib,v 1.19 1999-12-13 15:33:50 obachman Exp $
+// $Id: sing.lib,v 1.20 2000-05-23 23:01:38 greuel Exp $
 //(GMG/BM, last modified 26.06.96)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: sing.lib,v 1.19 1999-12-13 15:33:50 obachman Exp $";
+version="$Id: sing.lib,v 1.20 2000-05-23 23:01:38 greuel Exp $";
 info="
 LIBRARY:  sing.lib      PROCEDURES FOR SINGULARITIES
 AUTHORS:  Gert-Martin Greuel, email: greuel@mathematik.uni-kl.de
@@ -359,9 +359,12 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc slocus (ideal i)
-"USAGE:   slocus(i);  i dieal
-RETURN:  ideal of singular locus of i
-NOTE:    this proc considers lower dimensional components as singular
+"USAGE:   slocus(i);  i ideal
+RETURN:  ideal of singular locus of i if i is pure dimensional
+NOTE:    this proc returns i and c-minors of jacobian ideal of i where c is the
+         codimension of i. Hence, if i is not pure dimensional, slocus may 
+         return an ideal such that its 0-locus is strictly contained in the 
+         singular locus of i
 EXAMPLE: example slocus; shows an example
 "
 {
@@ -371,9 +374,9 @@ EXAMPLE: example slocus; shows an example
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring r  = 32003,(x,y,z),ds;
+   ring r  = 0,(x,y,z),ds;
    ideal i = x5+y6+z6,x2+2y2+3z2;
-   dim(std(slocus(i)));
+   slocus(i);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
