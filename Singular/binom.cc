@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: binom.cc,v 1.9 1998-01-17 18:56:45 Singular Exp $ */
+/* $Id: binom.cc,v 1.10 1998-01-24 17:22:04 Singular Exp $ */
 
 /*
 * ABSTRACT - set order (=number of monomial) for dp
@@ -40,7 +40,7 @@ void bSetm(poly p)
   int ord = pTotaldegree(p);
   p->Order=ord;
 
-  if (ord<=bHighdeg)
+  if (ord<bHighdeg)
   {
     int i=1;
     ord = -INT_MAX;
@@ -66,7 +66,11 @@ void bSetm(poly p)
       ip+=bHighdeg_1+pGetExp(p,i);
     }
     if (ord>=0)
-      PrintS("****************\n");
+    {
+      wrp(p);
+      Print("maxdeg exceeded in bSetm:bHighdeg=%d, ord=%d,deg=%d,B[%d]i,Bsize=%d\n",
+      bHighdeg,ord,pTotaldegree(p),ip-bBinomials,bSize/sizeof(int));
+    }
   }
   p->MOrder=ord;
 #else
@@ -103,8 +107,12 @@ void bSetm0(poly p)
     #endif
     ip+=bHighdeg_1+pGetExp(p,i);
   }
-    if (ord>=0)
-      PrintS("****************\n");
+  if (ord>=0)
+  {
+    wrp(p);
+    Print("maxdeg exceeded in bSetm0:bHighdeg=%d, ord=%d,deg=%d,B[%d],Bsize:%d\n",
+    bHighdeg,ord,pTotaldegree(p),ip-bBinomials,bSize/sizeof(int));
+  }
   p->MOrder=ord;
 #else
   _bSetm0(p);
@@ -128,7 +136,7 @@ int bComp1dpc(poly p1, poly p2)
    {
      if(d>0) return 1;
      else    return -1;
-   }  
+   }
 
   /* now o1==o2: */
   if (o1>0)
@@ -138,13 +146,13 @@ int bComp1dpc(poly p1, poly p2)
       if (pVariablesW & 1)
       {
         _pMonCmp_2i_1(p1,p2, pVariablesW, d, goto NotEqual, return 0);
-      }	
+      }
       _pMonCmp_2i(p1,p2, pVariablesW, d, goto NotEqual, return 0);
     }
     if (pVariablesW == 1)
     {
       _pMonCmp_1(p1,p2, d, goto NotEqual, return 0);
-    }  
+    }
     _pMonCmp_2(p1,p2, d, goto NotEqual, return 0);
 
     NotEqual:
@@ -171,9 +179,9 @@ int bComp1dpc(poly p1, poly p2)
     Print(" ");
     wrp(p2);
     Print("mac:%d, org:%d\n",m,c);
-  }  
+  }
   return c;
-}  
+}
 #endif
 
 int bComp1cdp(poly p1, poly p2)
@@ -267,26 +275,32 @@ void bBinomSet(int * orders)
     bHighdeg=bbHighdeg;
     bHighdeg_1=bbHighdeg;
     bHighdeg--;
-  
+
     if(bBinomials!=NULL) Free((ADDRESS)bBinomials,bSize);
     bSize = pVariables*bHighdeg_1*sizeof(int);
     bBinomials = (int*)Alloc(bSize);
-  
+
     //Print("max deg=%d, table size=%d bytes\n",bHighdeg,bSize);
-  
+
     for(int j=1;j<=bHighdeg;j++)
     {
       bBinomials[j/*0,j*/] = j;
       for (int i=1;i<pVariables;i++)
       {
         bBinomials[i*(bHighdeg_1)+j/*i,j*/]
-        = bBinomials[(i-1)*(bHighdeg_1)+j/*i-1,j*/]*(j+i)/(i+1);
+        = ((long long)bBinomials[(i-1)*(bHighdeg_1)+j/*i-1,j*/])
+           *((long long)(j+i))/((long long)(i+1));
+        if (bBinomials[i*(bHighdeg_1)+j/*i,j*/]<=0)
+        {
+          Print("overflow in bBinomials:i=%s,j=%d\n",i,j);
+        }
       }
     }
     for (int i=0;i<pVariables;i++)
     {
       bBinomials[i*(bHighdeg_1)/*i,0*/]=0;
     }
+    Print("last table entry:%d,%d - %d\n", pVariables,bHighdeg,pVariables*(bHighdeg_1)+bHighdeg);
   }
 #else
   bHighdeg=1;
@@ -301,27 +315,33 @@ void bBinomSet(int * orders)
   bHighdeg-=2;
   bHighdeg_1=bHighdeg;
   bHighdeg--;
-  
+
   if(bBinomials!=NULL) Free((ADDRESS)bBinomials,bSize);
   bSize = pVariables*bHighdeg_1*sizeof(int);
   bBinomials = (int*)Alloc(bSize);
-  
+
   // Print("max deg=%d, table size=%d bytes\n",bHighdeg,bSize);
-  
+
   for(int j=1;j<=bHighdeg;j++)
   {
     bBinomials[j/*0,j*/] = j;
-    for (int i=1;i<pVariables;i++)
+    for (int i=1;i<=pVariables;i++)
     {
       bBinomials[i*(bHighdeg_1)+j/*i,j*/]
-      = bBinomials[(i-1)*(bHighdeg_1)+j/*i-1,j*/]*(j+i)/(i+1);
+      = ((long long)bBinomials[(i-1)*(bHighdeg_1)+j/*i-1,j*/])
+      *((long long)(j+i))/((long long)(i+1));
+      //if (bBinomials[i*(bHighdeg_1)+j/*i,j*/]<=0)
+      //{
+      //  Print("overflow in bBinomials:i=%s,j=%d\n",i,j);
+      //}
     }
   }
   for (int i=0;i<pVariables;i++)
   {
     bBinomials[i*(bHighdeg_1)/*i,0*/]=0;
   }
-#endif  
+  //  Print("last table entry:%d,%d - %d\n", pVariables,bHighdeg,pVariables*(bHighdeg_1)+bHighdeg);
+#endif
   pSetm =bSetm;
   if (orders[0]==ringorder_dp)
     pComp0=bComp1dpc;

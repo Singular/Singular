@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.14 1998-01-17 18:07:59 Singular Exp $ */
+/* $Id: polys-impl.h,v 1.15 1998-01-24 17:22:06 Singular Exp $ */
 
 /***************************************************************
  *
@@ -922,7 +922,7 @@ DECLARE(void, _bSetm(poly p))
 {
   int ord = _pExpQuerSum(p);
 
-  if (ord<=bHighdeg)
+  if (ord<bHighdeg)
     _bSetm0(p);
   else
     p->Order=ord;

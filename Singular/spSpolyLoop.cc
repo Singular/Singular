@@ -3127,7 +3127,7 @@ void spLoop_mac_1(poly a1, poly a2, poly m,poly spNoether)
   Top:
   register long d;
 
-  if (pGetOrder(b)<0) goto Top0;
+  if (((pGetOrder(b)&(pGetOrder(a2))<0))) goto Top0;
 
   d = pGetOrder(b) - pGetOrder(a2);
   NonZeroTestA(d, 1 /*pOrdSgn*/, goto NotEqual);
@@ -3283,7 +3283,7 @@ void spLoop_mac_2(poly a1, poly a2, poly m,poly spNoether)
   Top:
   register long d;
 
-  if (pGetOrder(b)<0) goto Top0;
+  if (((pGetOrder(b)&(pGetOrder(a2))<0))) goto Top0;
 
   d = pGetOrder(b) - pGetOrder(a2);
   NonZeroTestA(d, 1 /*pOrdSgn*/, goto NotEqual);
@@ -3438,7 +3438,7 @@ void spLoop_mac_2i(poly a1, poly a2, poly m,poly spNoether)
   Top:
   register long d;
 
-  if (pGetOrder(b)<0) goto Top0;
+  if (((pGetOrder(b)&(pGetOrder(a2))<0))) goto Top0;
 
   d = pGetOrder(b) - pGetOrder(a2);
   NonZeroTestA(d, 1 /*pOrdSgn*/, goto NotEqual);
@@ -3594,7 +3594,7 @@ void spLoop_mac_2i_1(poly a1, poly a2, poly m,poly spNoether)
   Top:
   register long d;
 
-  if (pGetOrder(b)<0) goto Top0;
+  if (((pGetOrder(b)&(pGetOrder(a2))<0))) goto Top0;
   //if (pGetOrder(a2)<0) goto Top0;
 
   d = pGetOrder(b) - pGetOrder(a2);

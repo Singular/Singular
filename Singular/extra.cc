@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.27 1998-01-16 14:29:47 krueger Exp $ */
+/* $Id: extra.cc,v 1.28 1998-01-24 17:22:05 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -221,6 +221,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
 /*==================== tty ==================================*/
     #ifndef macintosh
     #ifndef MSDOS
+    #if defined(HAVE_FEREAD) || defined(HAVE_READLINE)
     if (strcmp((char*)(h->Data()),"tty")==0)
     {
       #ifdef HAVE_FEREAD
@@ -240,6 +241,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
       return FALSE;
     }
     else
+    #endif
     #endif
     #endif
 /*==================== HC ==================================*/
