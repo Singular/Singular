@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftest_io.cc,v 1.1 1997-09-24 07:29:17 schmidt Exp $ */
+/* $Id: ftest_io.cc,v 1.2 1997-09-29 13:10:31 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -84,34 +84,36 @@ ftestGetVariable ( const char * stringVariable )
 }
 //}}}
 
-//{{{ void ftestPrintCanonicalForm ( const char * resultName, const CanonicalForm & result )
+//{{{ void ftestPrintResult ( const char * resultName, const CanonicalForm & result )
 //{{{ docu
 //
-// ftestPrintCanonicalForm() - print a canonical form.
+// ftestPrintResult() - print a canonical form.
 //
 //}}}
 void
-ftestPrintCanonicalForm ( const char * resultName, const CanonicalForm & result )
+ftestPrintResult ( const char * resultName, const CanonicalForm & result )
 {
     if ( ftestPrintResultFlag ) {
-	ftestPrint( "result: %s\n", 0, resultName );
+	ftestPrint( "result: %s\n", "@@%s\n", resultName );
 	cout << result << endl;
-    }
+    } else if ( ! ftestPrintFlag )
+	cout << result << endl;
 }
 //}}}
 
-//{{{ void ftestPrintInt ( const char * resultName, const int result )
+//{{{ void ftestPrintResult ( const char * resultName, const int result )
 //{{{ docu
 //
-// ftestPrintInt() - print an integer.
+// ftestPrintResult() - print an integer.
 //
 //}}}
 void
-ftestPrintInt ( const char * resultName, const int result )
+ftestPrintResult ( const char * resultName, const int result )
 {
     if ( ftestPrintResultFlag ) {
-	ftestPrint( "result: %s\n", 0, resultName );
+	ftestPrint( "result: %s\n", "@@%s\n", resultName );
 	cout << result << endl;
-    }
+    } else if ( ! ftestPrintFlag )
+	cout << result << endl;
 }
 //}}}
