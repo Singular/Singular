@@ -1,7 +1,7 @@
-// $Id: standard.lib,v 1.23 1998-06-18 18:03:19 Singular Exp $
+// $Id: standard.lib,v 1.24 1998-06-18 18:15:20 Singular Exp $
 //////////////////////////////////////////////////////////////////////////////
 
-version="$Id: standard.lib,v 1.23 1998-06-18 18:03:19 Singular Exp $";
+version="$Id: standard.lib,v 1.24 1998-06-18 18:15:20 Singular Exp $";
 info="
 LIBRARY: standard.lib   PROCEDURES WHICH ARE ALWAYS LOADED AT START-UP
 
@@ -459,7 +459,7 @@ proc res(list #)
    return(result);
 }
 
-proc quotient (any m1,any m2,list #)
+proc quotient (m1,m2,list #)
 "USAGE:   quotient(m1, m2[, n]); m1, m2 two submodules of k^s,
          n (optional) integer (1<= n <=5)
 RETURN:  the quotient of m1 and m2
@@ -468,7 +468,7 @@ EXAMPLE: example quot; shows an example"
   if (((typeof(m1)!="ideal") and (typeof(m1)!="module"))
      or ((typeof(m2)!="ideal") and (typeof(m2)!="module")))
   {
-    "USAGE:   quot(m1, m2[, n]); m1, m2 two submodules of k^s,";
+    "USAGE:   quotient(m1, m2[, n]); m1, m2 two submodules of k^s,";
     "         n (optional) integer (1<= n <=5)";
     "RETURN:  the quotient of m1 and m2";
     "EXAMPLE: example quot; shows an example";
@@ -476,18 +476,18 @@ EXAMPLE: example quot; shows an example"
   }
   if (typeof(m1)!=typeof(m2))
   {
-    return quot(m1,m2);
+    return(quot(m1,m2));
   }
   if (size(#)>0)
   {
     if (typeof(#[1])=="int" )
     {
-      return quot1(m1,m2,#[1]);
+      return(quot1(m1,m2,#[1]));
     }
   }
   else
   {
-    return quot1(m1,m2,2);
+    return(quot1(m1,m2,2));
   }
 }
 example
