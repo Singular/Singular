@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.6 2005-02-24 17:45:46 Singular Exp $ */
+/* $Id: longalg.cc,v 1.7 2005-02-25 16:10:52 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -1591,9 +1591,9 @@ number naGcd(number a, number b, const ring r)
   {
     if (naMinimalPoly!=NULL)
     {
-      //if (napNext(x->z)!=NULL)
-      //  result->z = napCopy(x->z);
-      //else
+      if (napNext(x->z)!=NULL)
+        result->z = napCopy(x->z);
+      else
         result->z = napGcd0(x->z, y->z);
     }
     else
