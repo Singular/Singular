@@ -2,7 +2,6 @@ LIB "tst.lib";
 tst_init();
 
 LIB"primdec.lib";
-option(prot);
 
 ring r=32003,(a,b,c,d,e,f,g,h,j),(C,dp);
 ideal i=
