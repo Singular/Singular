@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.83 1998-05-19 07:51:02 schmidt Exp $
+@comment $Id: general.doc,v 1.84 1998-05-19 08:53:19 schmidt Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -106,63 +106,73 @@ are interpreted as empty statements.
 @subsection The online help system
 @cindex The online help system
 
-As online help system the program @code{info} (Gnu @code{texinfo} package)
-is used.
-@xref{Top, An Introduction to Info, Getting started, info, The Info Manual}.
+The online help system is invoked with the @code{help} command.
+@code{?} may be used as a synonym for @code{help}.  Simply typing
+@code{help;} displays the ``top'' of the help system which offers a
+short table of content.  Typing @code{help} topic@code{;} shows the
+available documentation on topic.  Here, topic may be either a function
+name or, more generally, the name of any section of the printed manual.
+@xref{help}, for more information.
 
-The whole manual is decomposed into ``nodes'' of information, closely related
-to the division of the printed manual into sections and subsections.
-A node contains text describing a specific topic at a specific level of
-detail. The top line of a node is its ``header''.  This node's header
-(the upper most line) tells the name of this node (@code{Node:}),
-the name of the next node (@code{Next:}),
-the name of the previous node (@code{Prev:}),
-and the name of an ``Up'' node (@code{Up:}).
+On Unix-like operating systems, the online help system is based on the
+@code{info} program from the Gnu @code{texinfo} package.  @xref{Top,
+An Introduction to Info, Getting started, info, The Info Manual}, for
+more information.
+
+On Windows NT, the online help system is not interactively as described
+below.  Instead, after displaying the information @sc{Singular}
+immediately returns to the input prompt.
+
+The whole manual is decomposed into ``nodes'' of information, closely
+related to the division of the printed manual into sections and
+subsections.  A node contains text describing a specific topic at a
+specific level of detail.  The top line of a node is its ``header''.
+The node's header tells the name of the current node (@code{Node:}), the
+name of the next node (@code{Next:}), the name of the previous node
+(@code{Prev:}), and the name of the upper node (@code{Up:}).
 
 To move within info, type commands consisting of single characters.  Do
-not type @code{RETURN}.  Do not use cursor keys, either. Using some of
+not type @code{RETURN}.  Do not use cursor keys, either.  Using some of
 the cursor keys by accident might pop to some totally different node.
-Type @code{l} to return to the original node.
+Type @code{l} to return to the original node.  Some of the @code{info}
+commands read input from the command line at the bottom line.  The
+@code{TAB} key may be used to complete partially entered input.
 
 The most important commands are:
-@table @code
-@item q
-leave info
-@item n
-go to the ``next'' node
-@item p
-go to the ``previous'' node
-@item u
-go to the ``up'' node
-@item m
-pick a menu item specified by name. Reads name of menu entry
-@item TAB
-completes names of subtopics selected by @code{m}
-@item f
-follow a cross reference.  Reads name of reference
-@item l
-go to the previous visited node
-@item b
-go to the begining of the current node
-@item e
-go to the end of the current node
-@item SPACE
-scroll forward a page
-@item DEL
-scroll backward a page
-@item h
-invoke info tutorial (use @code{l} to come back or @code{CTRL-X 0} to remove
-extra window)
-@item CTRL-H
-show help on info system (use @code{l} to come back or @code{CTRL-X 0} to remove
-extra window)
-@item s
-search through this info file for a specified string,
-and select the node in which the next occurrence is found
-@item 1,..,9
-pick i-th subtopic from a menu
-@item 0
-pick last subtopic from a menu
+@table @asis
+@item @code{q}
+leaves the online help system
+@item @code{n}
+goes to the next node
+@item @code{p}
+goes to the previous node
+@item @code{u}
+goes to the upper node
+@item @code{m}
+picks a menu item specified by name
+@item @code{f}
+follows a cross reference
+@item @code{l}
+goes to the previously visited node
+@item @code{b}
+goes to the begining of the current node
+@item @code{e}
+goes to the end of the current node
+@item @code{SPACE}
+scrolls forward a page
+@item @code{DEL}
+scrolls backward a page
+@item @code{h}
+invokes info tutorial (use @code{l} to return to the manual or
+@code{CTRL-X 0} to remove extra window)
+@item @code{CTRL-H}
+shows a short overview on the online help system (use @code{l} to return
+to the manual or @code{CTRL-X 0} to remove extra window)
+@item @code{s}
+searches through the manual for a specified string, and select the node in
+which the next occurrence is found
+@item @code{1}, @dots, @code{9}
+picks i-th subtopic from a menu
 @end table
 
 @c --------------------------------------------------------------------------
@@ -359,13 +369,17 @@ On start-up, @sc{Singular}
 @enumerate
 @item
 loads the library @code{standard.lib} (provided the @code{--no-stdlib}
-was not given)
+was not given),
 
 @item
 searches the current directory and then the
 home directory of the user for a file named @code{.singularrc} and
 executes it, if found (provided the @code{--no-rc} options was not
-given)
+given),
+
+@item
+executes the string specified with the @code{--execute} command line
+option,
 
 @item
 executes the files @code{file1}, @code{file2} ...  (given on the command
@@ -376,8 +390,7 @@ Unless specified otherwise, @sc{Singular} locates all libraries and ASCII
 data files by first searching the current working directory, and then by
 searching through all the directories specified by the environment
 variable @code{SINGULARPATH} (@code{SPATH} on DOS-based systems), and,
-finally, by searching through some default directories (e.g.,
-@code{/usr/local/share/Singular}).
+finally, by searching through some default directories.
 
 @c --------------------------------------------------------------------------
 @c ---------------------------------------------------------------------------
