@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftmpl_matrix.h,v 1.6 1997-06-19 13:11:26 schmidt Exp $ */
+/* $Id: ftmpl_matrix.h,v 1.7 2000-05-29 08:03:54 pohl Exp $ */
 
 #ifndef INCL_MATRIX_H
 #define INCL_MATRIX_H
@@ -39,11 +39,6 @@ public:
     const SubMatrix<T> operator() ( int rmin, int rmax, int cmin, int cmax ) const;
     void swapRow( int i, int j );
     void swapColumn( int i, int j );
-    friend Matrix<T> operator+ ( const Matrix<T>& lhs, const Matrix<T>& rhs );
-    friend Matrix<T> operator- ( const Matrix<T>& lhs, const Matrix<T>& rhs );
-    friend Matrix<T> operator* ( const Matrix<T>& lhs, const Matrix<T>& rhs );
-    friend Matrix<T> operator* ( const Matrix<T>& lhs, const T& rhs );
-    friend Matrix<T> operator* ( const T& lhs, const Matrix<T>& rhs );
 #ifndef NOSTREAMIO
     void print( ostream& s ) const;
     friend ostream & operator<< ( ostream & s, const Matrix<T>& M )
@@ -54,6 +49,16 @@ public:
 #endif /* NOSTREAMIO */
     friend class SubMatrix<T>;
 };
+    template <class T>
+    Matrix<T> operator+ ( const Matrix<T>& lhs, const Matrix<T>& rhs );
+    template <class T>
+    Matrix<T> operator- ( const Matrix<T>& lhs, const Matrix<T>& rhs );
+    template <class T>
+    Matrix<T> operator* ( const Matrix<T>& lhs, const Matrix<T>& rhs );
+    template <class T>
+    Matrix<T> operator* ( const Matrix<T>& lhs, const T& rhs );
+    template <class T>
+    Matrix<T> operator* ( const T& lhs, const Matrix<T>& rhs );
 
 template <class T>
 class SubMatrix
