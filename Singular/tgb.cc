@@ -2230,6 +2230,7 @@ static void go_on_F4 (calc_dat* c){
       poly_list_node* next=c->to_destroy;
       
       c->to_destroy=(poly_list_node*) omalloc(sizeof(poly_list_node));
+      c->to_destroy->p=h.f;
       c->to_destroy->next=next;
       only_free=TRUE;
     }
@@ -2471,12 +2472,12 @@ static void go_on_F4 (calc_dat* c){
   assume(p_index==chosen_index);
   
   tgb_matrix* mat=build_matrix(p,p_index,done, done_index,c);
-  
+ 
   //next Step Gauss
   simple_gauss(mat);
   //next Step retranslate
 
-  assume(mat->get_rows()<=p_index);
+ 
   //new meaning of m
   m_size=mat->get_rows();
   m=(poly*) omalloc(m_size*sizeof(poly));
@@ -2522,18 +2523,20 @@ static void go_on_F4 (calc_dat* c){
   p=NULL;
   omfree(m);
   m=NULL;
+
   //the F_minus list must be cleared separately at the end
   mp_array_list** F_i;
   poly_array_list** F_m_i;
   F_i=&(c->F);
   F_m_i=&(c->F_minus);
+
   while((*F_i)!=NULL)
   {
-    assume((*F_minus)!=NULL);
+    assume((*F_m_i)!=NULL);
     F_i=(&((*F_i)->next));
     F_m_i=(&((*F_m_i)->next));
   }
-  assume((*F_minus)==NULL);
+  assume((*F_m_i)==NULL);
   //should resize the array to save memory
   //F and F_minus
   (*F_m_i)=(poly_array_list*) omalloc(sizeof(poly_array_list));
