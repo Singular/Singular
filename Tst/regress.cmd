@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 #################################################################
-# $Id: regress.cmd,v 1.21 1998-07-13 09:14:54 obachman Exp $
+# $Id: regress.cmd,v 1.22 1998-07-14 11:58:22 obachman Exp $
 # FILE:    regress.cmd 
 # PURPOSE: Script which runs regress test of Singular
 # CREATED: 2/16/98
@@ -348,6 +348,7 @@ sub tst_check
   }
 
   # prepare Singular run
+  &mysystem("$rm -f tst_status.out");
   if ($verbosity > 2 && !$WINNT)
   {
     $system_call = "$cat $root.tst | $singular $singularOptions | $tee $root.new.res";
@@ -440,7 +441,7 @@ sub tst_check
 
     if ($keep ne "yes")
     {
-      &mysystem("$rm -f tst_status.out $root.new.res $root.res $root.diff $root.new.stat");
+      &mysystem("$rm -f tst_status.out $root.new.res $root.res $root.*diff $root.new.stat");
     } 
   }
   
