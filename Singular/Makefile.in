@@ -218,6 +218,7 @@ endif
 # Singular libraries which go into distribution
 # MAKE SURE THAT THIS IS UP_TO_DATE
 #
+
 SLIBS = COPYING \
 	ainvar.lib   algebra.lib   all.lib       brnoeth.lib    classify.lib \
         deform.lib   elim.lib      equising.lib  finvar.lib     gmssing.lib \
@@ -228,7 +229,7 @@ SLIBS = COPYING \
         poly.lib     presolve.lib  primdec.lib   primitiv.lib   qhmoduli.lib \
         random.lib   reesclos.lib  ring.lib      rinvar.lib     sing.lib \
         solve.lib    spcurve.lib   spectrum.lib  standard.lib   stratify.lib \
-        surf.lib     toric.lib     triang.lib    zeroset.lib
+        surf.lib     toric.lib     triang.lib    zeroset.lib    help.cnf
 
 PLIBS = lieA.lib
 
