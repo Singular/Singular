@@ -32,6 +32,10 @@ Tue Jan 13 14:56:42 1998  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 	  -lgmp); check for atof in -lm check, to work around a bug on
  	  some linux machines.
 
+Tue Jan  6 11:01:23 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* .cvsignore (stamp-h): entry removed
+
 Wed Dec 17 09:56:25 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* canonicalform.cc (operator ==, operator !=): rewritten and
