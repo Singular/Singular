@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.80 2002-03-26 12:57:54 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.81 2002-05-16 10:37:22 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -218,7 +218,7 @@ ASSUME:   basering returned by gmsring
 RETURN:
 @format
 list nf;
-  ideal nf[1];  projection of p to C[[s]]*gmsbasis mod s^(K+1)
+  ideal nf[1];  projection of p to <gmsbasis>C[[s]] mod s^(K+1)
   ideal nf[2];  p==nf[1]+nf[2]
 @end format
 NOTE:     computation can be continued by setting p=nf[2]
@@ -1613,28 +1613,33 @@ EXAMPLE: example spissemicont; shows examples
     }
   }
   int i,j,k=1,1,0;
-  while(j<=size(sp[2]))
+  while(i<=size(sp[2])-1)
   {
-    while(j+1<=size(sp[2])&&sp[1][j]<sp[1][i]+1)
+    while(sp[1][j]<=sp[1][i])
     {
-      k=k+sp[2][j];
       j++;
     }
-    if(j==size(sp[2])&&sp[1][j]<sp[1][i]+1)
+    while(j+1<=size(sp[2])&&sp[1][j]<=sp[1][i]+1)
     {
-      k=k+sp[2][j];
+      if(opt==0||sp[1][j]<sp[1][i]+1)
+      {
+        k=k+sp[2][j];
+      }
+      j++;
+    }
+    if(j==size(sp[2])&&sp[1][j]<=sp[1][i]+1)
+    {
+      if(opt==0||sp[1][j]<sp[1][i]+1)
+      {
+        k=k+sp[2][j];
+      }
       j++;
     }
     if(k<0)
     {
       return(0);
     }
-    k=k-sp[2][i];
-    if(k<0&&opt==1)
-    {
-      return(0);
-    }
-    i++;
+    i,j,k=i+1,1,0;
   }
   return(1);
 }
@@ -1645,9 +1650,8 @@ example
   spprint(sp1);
   list sp2=list(ideal(-1/6,1/6),intvec(1,1));
   spprint(sp2);
-  spissemicont(spsub(sp1,spmul(sp2,5)));
-  spissemicont(spsub(sp1,spmul(sp2,5)),1);
-  spissemicont(spsub(sp1,spmul(sp2,6)));
+  spissemicont(spsub(sp1,spmul(sp2,3)));
+  spissemicont(spsub(sp1,spmul(sp2,4)));
 }
 ///////////////////////////////////////////////////////////////////////////////
 
