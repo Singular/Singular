@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_linsys.cc,v 1.8 1997-06-19 12:24:21 schmidt Exp $ */
+/* $Id: cf_linsys.cc,v 1.9 1997-07-30 15:23:19 schmidt Exp $ */
 
 #include <config.h>
 
@@ -132,18 +132,20 @@ linearSystemSolve( CFMatrix & M )
 	    DEBOUTENDL( cerr );
 	    setCharacteristic( p );
 	    // map matrix into char p
-	    for ( i = 0; i < rows; i++ )
-		for ( j = 0; j < cols; j++ )
-		    mm[i][j] = mapinto( M(i,j) ).intval();
+	    for ( i = 1; i <= rows; i++ )
+		for ( j = 1; j <= cols; j++ )
+		    mm[i-1][j-1] = mapinto( M(i,j) ).intval();
 	    // solve mod p
 	    ok = solve( mm, rows, cols );
 	    pno++;
 	} while ( ! ok );
+
 	// initialize the result matrix with first solution
 	setCharacteristic( 0 );
-	for ( i = 0; i < rows; i++ )
-	    for ( j = rows; j < cols; j++ )
-		MM(i,j) = mm[i][j];
+	for ( i = 1; i <= rows; i++ )
+	    for ( j = rows+1; j <= cols; j++ )
+		MM(i,j) = mm[i-1][j-1];
+
 	// Q so far
 	Q = p;
 	while ( Q < B && pno < cf_getNumBigPrimes() ) {
@@ -154,9 +156,9 @@ linearSystemSolve( CFMatrix & M )
 		DEBOUT( cerr, p );
 		DEBOUTENDL( cerr );
 		setCharacteristic( p );
-		for ( i = 0; i < rows; i++ )
-		    for ( j = 0; j < cols; j++ )
-			mm[i][j] = mapinto( M(i,j) ).intval();
+		for ( i = 1; i <= rows; i++ )
+		    for ( j = 1; j <= cols; j++ )
+			mm[i-1][j-1] = mapinto( M(i,j) ).intval();
 		// solve mod p
 		ok = solve( mm, rows, cols );
 		pno++;
@@ -164,10 +166,10 @@ linearSystemSolve( CFMatrix & M )
 	    // found a solution mod p
 	    // now chinese remainder it to a solution mod Q*p
 	    setCharacteristic( 0 );
-	    for ( i = 0; i < rows; i++ )
-		for ( j = rows; j < cols; j++ ) {
-		    chineseRemainder( MM[i][j], Q, CanonicalForm(mm[i][j]), CanonicalForm(p), mnew, qnew );
-		    MM(i,j) = mnew;
+	    for ( i = 1; i <= rows; i++ )
+		for ( j = rows+1; j <= cols; j++ ) {
+		    chineseRemainder( MM[i][j], Q, CanonicalForm(mm[i-1][j-1]), CanonicalForm(p), mnew, qnew );
+		    MM(i, j) = mnew;
 		}
 	    Q = qnew;
 	}
@@ -177,13 +179,13 @@ linearSystemSolve( CFMatrix & M )
 	    fuzzy_result = false;
 	// store the result in M
 	Qhalf = Q / 2;
-	for ( i = 0; i < rows; i++ ) {
-	    for ( j = rows; j < cols; j++ )
+	for ( i = 1; i <= rows; i++ ) {
+	    for ( j = rows+1; j <= cols; j++ )
 		if ( MM(i,j) > Qhalf )
 		    M(i,j) = MM(i,j) - Q;
 		else
 		    M(i,j) = MM(i,j);
-	    delete [] mm[i];
+	    delete [] mm[i-1];
 	}
 	delete [] mm;
 	return ! fuzzy_result;
@@ -440,21 +442,26 @@ determinant2( const CFMatrix & M, int rows )
 static CanonicalForm
 bound ( const CFMatrix & M )
 {
+    DEBINCLEVEL( cerr, "bound" );
     int rows = M.rows(), cols = M.columns();
     CanonicalForm sum = 0;
     int i, j;
-    for ( i = 0; i < rows; i++ )
-	for ( j = 0; j < rows; j++ )
+    for ( i = 1; i <= rows; i++ )
+	for ( j = 1; j <= rows; j++ )
 	    sum += M(i,j) * M(i,j);
+    DEBOUTLN( cerr, "bound(matrix)^2 = " << sum );
     CanonicalForm vmax = 0, vsum;
-    for ( j = rows; j < cols; j++ ) {
+    for ( j = rows+1; j <= cols; j++ ) {
 	vsum = 0;
-	for ( i = 0; i < rows; i++ )
+	for ( i = 1; i <= rows; i++ )
 	    vsum += M(i,j) * M(i,j);
 	if ( vsum > vmax ) vmax = vsum;
     }
+    DEBOUTLN( cerr, "bound(lhs)^2 = " << vmax );
     sum += vmax;
-    return sqrt( sum );
+    DEBOUTLN( cerr, "bound(overall)^2 = " << sum );
+    DEBDECLEVEL( cerr, "bound" );
+    return sqrt( sum ) + 1;
 }
 
 
@@ -479,6 +486,7 @@ detbound ( const CFMatrix & M, int rows )
 bool
 solve ( int **extmat, int nrows, int ncols )
 {
+    DEBINCLEVEL( cerr, "solve" );
     int i, j, k;
     int rowpivot, pivotrecip; // all FF
     int * rowi; // FF
@@ -489,7 +497,11 @@ solve ( int **extmat, int nrows, int ncols )
 	//find "pivot"
 	for (j = i; j < nrows; j++ )
 	    if ( extmat[j][i] != 0 ) break;
-	if ( j == nrows ) return false;
+	if ( j == nrows ) {
+	    DEBOUTLN( cerr, "solve failed" );
+	    DEBDECLEVEL( cerr, "solve" );
+	    return false;
+	}
 	if ( j != i ) {
 	    swap = extmat[i]; extmat[i] = extmat[j]; extmat[j] = swap;
 	}
@@ -518,6 +530,8 @@ solve ( int **extmat, int nrows, int ncols )
 	    // for (k=nrows; k<ncols; k++) rowj[k] = ff_sub(rowj[k], ff_mul(rowpivot, rowi[k]));
 	}
     }
+    DEBOUTLN( cerr, "solve succeeded" );
+    DEBDECLEVEL( cerr, "solve" );
     return true;
 }
 
