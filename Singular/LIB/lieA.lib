@@ -1,17 +1,17 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: lieA.lib,v 1.1 2003-05-21 13:26:43 levandov Exp $";
+version="$Id: lieA.lib,v 1.2 2003-05-22 13:56:11 levandov Exp $";
 category="Plural: Lie Theory";
 info="
-LIBRARY:  lieA.lib      some enveloping algebras
+LIBRARY:  lieA.lib      definitions of several enveloping algebras
 AUTHORS:  Viktor Levandovskyy,     levandov@mathematik.uni-kl.de,
 @*        Oleksander Motsak
 
 PROCEDURES:
  sl(n);                 returns U(sl_n)
- A(n);                  returns U(sl_{n+1})
- sl2();                 returns U(sl_2) in (e,f,h) presentation
- g2();                  returns U(g_2) in (x(i),y(i),Ha,Hb) presentation
- gl3();                 returns U(gl_3) as enveloping algebra of a Lie algebra over e_ij (1<i,j<3)
+ A(n);                  returns U(A(n1))=U(sl_{n+1})
+ sl2();                 returns U(sl_2) in the {e,f,h} presentation
+ g2();                  returns U(g_2) in the {x(i),y(i),Ha,Hb} presentation
+ gl3();                 returns U(gl_3) in the {e_ij (1<i,j<3)} presentation
 ";
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -20,7 +20,7 @@ proc sl2()
 "USAGE:   sl2()
 RETURN:  ring, corresponding to the U(sl_2) in (e,f,h) presentation
 NOTE:    you have to activate this ring with the "setring" command
-SEE ALSO: sl;
+SEE ALSO: sl, g2, gl3
 EXAMPLE: example sl2; shows examples
 "{
    ring rrr=0,(e,f,h),dp;
@@ -50,7 +50,7 @@ NOTE:    You have to activate this ring with the "setring" command.
          resp. negative roots are denoted by x(i) resp. y(i),
          the Cartan elements are denoted by h(i).
 
-SEE ALSO: sl2;
+SEE ALSO: sl2
 EXAMPLE: example sl; shows examples
 "{
   if (n<2)
@@ -143,8 +143,17 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-
 proc A(int n)
+"USAGE:   A(n); n an integer, n>1
+RETURN:  a ring, describing U(A(n))
+NOTE:    You have to activate this ring with the "setring" command.
+         The presentation of U(A(n)) is derived from the 
+         standard representation of sl(n+1), positive
+         resp. negative roots are denoted by x(i) resp. y(i),
+         the Cartan elements are denoted by h(i).
+
+SEE ALSO: sl2, g2, gl3
+EXAMPLE: example A; shows examples
 {
   if (n<1) 
   {
@@ -154,7 +163,12 @@ proc A(int n)
   def a=sl(n+1);
   return(a);
 }
-
+example
+{ "EXAMPLE:"; echo = 2;
+   def a2=A(2);
+   setring a2;
+   a2;
+}
 ///////////////////////////////////////////////////////////////////////////////
 
 
@@ -162,7 +176,7 @@ proc g2()
 "USAGE:   g2()
 RETURN:  ring, corresponding to the U(g_2) in (x(i),y(i),Ha,Hb) presentation
 NOTE:    you have to activate this ring with the "setring" command
-SEE ALSO: sl;
+SEE ALSO: sl, gl3
 EXAMPLE: example g2; shows examples
 "{
 ring rrr=0,(x(1..6),y(1..6),Ha,Hb),dp;
@@ -235,11 +249,12 @@ example
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+
 proc gl3()
 "USAGE:   gl3()
-RETURN:  ring, corresponding to the U(gl_2) as enveloping algebra of a Lie algebra over e_ij (1<i,j<3)
+RETURN:  ring, corresponding to the U(gl_3) in the (e_ij (1<i,j<3)) presentation
 NOTE:    you have to activate this ring with the "setring" command
-SEE ALSO: sl;
+SEE ALSO: sl, g2
 EXAMPLE: example gl3; shows examples
 "{
 ring rrr=0,(e11, e12, e13, e21, e22, e23, e31, e32, e33),dp;
@@ -268,4 +283,10 @@ D[7, 9]=e31;
 D[8, 9]=e32;
 system("PLURAL",1,D);
 return(rrr);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   def g=gl3();
+   setring g;
+   g;
 }
