@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_Put.cc,v 1.28 2002-06-03 12:15:33 Singular Exp $ */
+/* $Id: mpsr_Put.cc,v 1.29 2002-11-26 14:25:38 Singular Exp $ */
 
 /***************************************************************
  *
@@ -501,7 +501,11 @@ mpsr_Status_t mpsr_PutMap(MP_Link_pt link, map m, ring cring)
                                       0,
                                       3));
   // First, is the ring
+#ifdef HAVE_NAMESPACES
+  failr(mpsr_PutRingLeftv(link, (leftv) namespaceroot->get(m->preimage, 1)));
+#else /* HAVE_NAMESPACES */
   failr(mpsr_PutRingLeftv(link, (leftv) IDROOT->get(m->preimage, 1)));
+#endif /* HAVE_NAMESPACES */
 
   // Second, the name of the ring
   mp_failr(MP_PutStringPacket(link, m->preimage,0));
@@ -573,12 +577,27 @@ mpsr_Status_t mpsr_PutDump(MP_Link_pt link)
              IDTYP(h) != LINK_CMD &&
              ! (IDTYP(h) == PACKAGE_CMD && strcmp(IDID(h), "Top") == 0))
     {
+#ifdef HAVE_NAMESPACES
+      cmd.arg1.name = (char*)
+        omAlloc(strlen(IDID(h)) + strlen(namespaceroot->name) + 3);
+      sprintf(cmd.arg1.name, "%s::%s", namespaceroot->name, IDID(h));
+#else
       cmd.arg1.name = IDID(h);
+#endif
       cmd.arg2.data=IDDATA(h);
       cmd.arg2.flag=h->flag;
       cmd.arg2.attribute=h->attribute;
       cmd.arg2.rtyp=h->typ;
+#ifdef HAVE_NAMESPACES
+      if (mpsr_PutLeftv(link, lv , r) != mpsr_Success)
+      {
+        omFree(cmd.arg1.name);
+        break;
+      }
+      omFree(cmd.arg1.name);
+#else
       if (mpsr_PutLeftv(link, lv, r) != mpsr_Success) break;
+#endif
 
 #ifdef MPSR_DEBUG_DUMP
       Print("Dumped %s\n", IDID(h));
@@ -600,12 +619,27 @@ mpsr_Status_t mpsr_PutDump(MP_Link_pt link)
         }
         while (h2 != NULL)
         {
+#ifdef HAVE_NAMESPACES
+          cmd.arg1.name = (char*)
+            omAlloc(strlen(IDID(h2)) + strlen(namespaceroot->name) + 3);
+          sprintf(cmd.arg1.name, "%s::%s", namespaceroot->name, IDID(h2));
+#else
           cmd.arg1.name = IDID(h2);
+#endif
           cmd.arg2.data=IDDATA(h2);
           cmd.arg2.flag = h2->flag;
           cmd.arg2.attribute = h2->attribute;
           cmd.arg2.rtyp = h2->typ;
+#ifdef HAVE_NAMESPACES
+          if (mpsr_PutLeftv(link, lv , r) != mpsr_Success)
+          {
+            omFree(cmd.arg1.name);
+            break;
+          }
+          omFree(cmd.arg1.name);
+#else
           if (mpsr_PutLeftv(link, lv, r) != mpsr_Success) break;
+#endif
 #ifdef MPSR_DEBUG_DUMP
           Print("Dumped %s\n", IDID(h2));
 #endif

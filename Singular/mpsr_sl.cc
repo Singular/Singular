@@ -6,7 +6,7 @@
  *  Purpose: implementation of sl_link routines for MP
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: mpsr_sl.cc,v 1.5 2001-10-23 14:04:24 Singular Exp $
+ *  Version: $Id: mpsr_sl.cc,v 1.6 2002-11-26 14:25:38 Singular Exp $
  *******************************************************************/
 
 #include "mod2.h"
@@ -403,14 +403,14 @@ LINKAGE BOOLEAN slCloseMP(si_link l)
 {
 #ifdef HPUX_9
   signal(SIGCHLD, (void (*)(int))SIG_DFL);
-#endif
+#endif  
   if ((strcmp(l->mode, "launch") == 0 || strcmp(l->mode, "fork") == 0) &&
       (MP_GetLinkStatus((MP_Link_pt)l->data,MP_LinkReadyWriting) == MP_TRUE))
     SentQuitMsg(l);
   MP_CloseLink((MP_Link_pt) l->data);
 #ifdef HPUX_9
   signal(SIGCHLD, (void (*)(int))SIG_IGN);
-#endif
+#endif  
   SI_LINK_SET_CLOSE_P(l);
   return FALSE;
 }
@@ -475,7 +475,7 @@ static int Batch_ReadEval(si_link silink)
 {
   leftv v = NULL;
   // establish top-level identifier for link
-  idhdl id = enterid("mp_ll", 0, LINK_CMD, &IDROOT, FALSE);
+  idhdl id = enterid(omStrDup("mp_ll"), 0, LINK_CMD, &IDROOT, FALSE);
   IDLINK(id) = silink;
 
   // the main read-eval-write loop
