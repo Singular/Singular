@@ -1,9 +1,9 @@
-// $Id: surf.lib,v 1.11 2000-07-11 13:19:05 obachman Exp $
+// $Id: surf.lib,v 1.12 2000-12-04 13:05:57 Singular Exp $
 //
 // author : Hans Schoenemann
 //
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: surf.lib,v 1.11 2000-07-11 13:19:05 obachman Exp $";
+version="$Id: surf.lib,v 1.12 2000-12-04 13:05:57 Singular Exp $";
 info="
 LIBRARY: surf.lib    PROCEDURES FOR GRAPHICS WITH SURF
 
@@ -14,7 +14,7 @@ NOTE:
 To use this library requires the program @code{surf} to be installed.
 @code{surf} is only available for Linux PCs and Sun workstations.
 You can download @code{surf} either from
- @uref{http://enriques.mathematik.uni-mainz.de/kon/surf/surf.shtml}
+ @uref{http://sourceforge.net/projects/surf}
  or from @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/utils/}.
 @end texinfo
 
@@ -57,8 +57,7 @@ EXAMPLE: example plot; shows an example
   }
   if (n==0 or n>3)
   {
-    "Cannot plot equations with", n, "variables";
-    return();
+    ERROR("Cannot plot equations with", n, "variables");
   }
   ring r=0,(x,y,z),dp;
   short=0;
@@ -97,8 +96,8 @@ EXAMPLE: example plot; shows an example
     }
     else
     {
-      "cannot plot",ncols(I),"equations in",n,"variables";
-      return();
+      ERROR("cannot plot"+string(ncols(I))+"equations in"
+             +string(n)+"variables");
     }
   }
   string surf_call = "surf ";
@@ -110,8 +109,9 @@ EXAMPLE: example plot; shows an example
   i=system("sh",surf_call + l +" >/dev/null 2>&1");
   if (i!=0)
   {
-    "calling `surf` failed. (the shell return the error code",i,").";
-    "probably the executable `surf` is not found.";
+    ERROR("calling `surf` failed. (the shell return the error code"
+          +string(i)+")."+newline+
+    "probably the executable `surf` is not found.");
   }
   i=system("sh","/bin/rm "+l);
 }
@@ -180,5 +180,3 @@ example
 
 }
 ///////////////////////////////////////////////////////////////////////////////
-
-
