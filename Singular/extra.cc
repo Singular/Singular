@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.217 2005-02-14 15:29:54 bricken Exp $ */
+/* $Id: extra.cc,v 1.218 2005-02-14 16:16:20 bricken Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -1739,7 +1739,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       h=h->next;
       poly g=(poly)h->Data();
       res->rtyp=POLY_CMD;
-      res->data=unifastmult(f,g);
+      res->data=unifastmult(f,g,currRing);
       return(FALSE);
     }
     else
@@ -1750,7 +1750,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       h=h->next;
       poly g=(poly)h->Data();
       res->rtyp=POLY_CMD;
-      res->data=multifastmult(f,g);
+      res->data=multifastmult(f,g,currRing);
       return(FALSE);
     }
     else
