@@ -1,11 +1,14 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: canonicalform.h,v 1.0 1996-05-17 10:59:37 stobbe Exp $
+// $Id: canonicalform.h,v 1.1 1996-06-24 11:26:36 stobbe Exp $
 
 #ifndef INCL_CANONICALFORM_H
 #define INCL_CANONICALFORM_H
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.0  1996/05/17 10:59:37  stobbe
+Initial revision
+
 */
 
 #include <iostream.h>
@@ -15,6 +18,7 @@ $Log: not supported by cvs2svn $
 #include "templates/list.h"
 #include "templates/array.h"
 #include "templates/factor.h"
+#include "templates/matrix.h"
 
 /*BEGINPUBLIC*/
 
@@ -275,7 +279,7 @@ typedef ListIterator<CFFactor> CFFListIterator;
 typedef List<CanonicalForm> CFList;
 typedef ListIterator<CanonicalForm> CFListIterator;
 typedef Array<CanonicalForm> CFArray;
-
+typedef Matrix<CanonicalForm> CFMatrix;
 
 CFFList sqrFree( const CanonicalForm & f );
 
@@ -285,6 +289,10 @@ CFFList factorize( const CanonicalForm & f, bool issqrfree = false );
 
 CFFList factorize( const CanonicalForm & f, const Variable & alpha );
 
+// calculate the determinant of the n'th minor of M
+
+CanonicalForm determinant( const CFMatrix & M, int n );
+
 void On( int );
 void Off( int );
 bool isOn( int );
@@ -292,4 +300,3 @@ bool isOn( int );
 /*ENDPUBLIC*/
 
 #endif /* INCL_CANONICALFORM_H */
-
