@@ -1,7 +1,7 @@
 #####################################################################
 ### 
 ### Makefile for Singular documentation 
-### $Id: Makefile.in,v 1.71 2000-07-04 17:16:47 obachman Exp $
+### $Id: Makefile.in,v 1.72 2000-07-05 12:04:20 obachman Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -69,7 +69,7 @@ else
 T2H_VERBOSE     = -verbose
 endif
 TEXI2HTML_OPTS  = -init_file ${TEXI2HTML_INIT} @TEXI2HTML_OPTS@ \
-	          -short_extn -l2h_tmp ${TMP_DIR} -subdir ${HTML_SUBDIR} \
+	          -short_ext -l2h_tmp ${TMP_DIR} -subdir ${HTML_SUBDIR} \
                   ${T2H_VERBOSE}
 HTML_MANUAL_PREFIX = sing
 HTML_TUTOR_PREFIX  = tut
