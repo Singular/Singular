@@ -293,6 +293,7 @@ class simple_reducer:public reduction_step{
   int p_len;
   simple_reducer(poly p, int p_len, calc_dat* c =NULL){
     this->p=p;
+    assume(p_len==pLength(p));
     this->p_len=p_len;
     this->c=c;
   }

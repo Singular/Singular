@@ -603,7 +603,7 @@ static int bucket_guess(kBucket* bucket){
 static int add_to_reductors(calc_dat* c, poly h, int len){
   //inDebug(h);
   assume(lenS_correct(c->strat));
- 
+  assume(len==pLength(h));
   int i;
 //   if (c->is_char0)
 //        i=simple_posInS(c->strat,h,pSLength(h,len),c->is_char0);
@@ -630,7 +630,7 @@ static int add_to_reductors(calc_dat* c, poly h, int len){
  
 
   c->strat->lenS[i]=len;
- 
+  assume(pLength(c->strat->S[i])==c->strat->lenS[i]);
   if(c->strat->lenSw)
     c->strat->lenSw[i]=pq;
   return i;
@@ -669,6 +669,7 @@ static void move_forward_in_S(int old_pos, int new_pos,kStrategy strat)
   long sev=strat->sevS[old_pos];
   int s_2_r=strat->S_2_R[old_pos];
   int length=strat->lenS[old_pos];
+  assume(length==pLength(strat->S[old_pos]));
   int length_w;
   if(strat->lenSw)
     length_w=strat->lenSw[old_pos];
@@ -3835,6 +3836,7 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
   //if (debug_Ideal) PrintS("DebugIdeal received\n");
   // Print("Idelems %i \n----------\n",IDELEMS(arg_I));
   ideal I=idCompactify(arg_I);
+  if (IDELEMS(I)==0) return I;
   qsort(I->m,IDELEMS(I),sizeof(poly),poly_crit);
   //Print("Idelems %i \n----------\n",IDELEMS(I));
   calc_dat* c=(calc_dat*) omalloc(sizeof(calc_dat));
@@ -4648,8 +4650,9 @@ static void multi_reduction_lls_trick(red_object* los, int losl,calc_dat* c,find
     }
     c->strat->S[j]=clear_into;
     c->strat->lenS[j]=new_length;
+    assume(pLength(clear_into)==new_length);
     if(c->strat->lenSw)
-      c->strat->lenS[j]=qal;
+      c->strat->lenSw[j]=qal;
     if (!rField_is_Zp(c->r))
     {
       pContent(clear_into);
@@ -5152,7 +5155,7 @@ void multi_reduce_step(find_erg & erg, red_object* r, calc_dat* c){
   if(erg.fromS){
     red=c->strat->S[rn];
     red_len=c->strat->lenS[rn];
-    
+    assume(red_len==pLength(red));
   }
   else
   {
@@ -5165,6 +5168,7 @@ void multi_reduce_step(find_erg & erg, red_object* r, calc_dat* c){
      
     }
     pNormalize(red);
+    red_len=pLength(red);
   }
   if (erg.to_reduce_u-erg.to_reduce_l>5){
     woc=TRUE;
@@ -5202,6 +5206,7 @@ void multi_reduce_step(find_erg & erg, red_object* r, calc_dat* c){
       if((r[i].sum==NULL) ||(r[i].sum->ac->counter<=AC_FLATTEN)) red_c++;
     }
   }
+  assume(red_len==pLength(red));
   if (red_c>=AC_NEW_MIN)
     pointer=new join_simple_reducer(red,red_len,r[erg.to_reduce_l].p);
   else
@@ -5221,7 +5226,7 @@ void multi_reduce_step(find_erg & erg, red_object* r, calc_dat* c){
 };
 
 void join_simple_reducer::target_is_no_sum_reduce(red_object & ro){
-  
+  kbTest(ro.bucket);
   ro.sum=new formal_sum_descriptor();
   ro.sum->ac=ac;
   ac->counter++;
