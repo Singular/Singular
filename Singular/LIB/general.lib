@@ -1,7 +1,7 @@
 //GMG, last modified 18.6.99
 //anne, added deleteSublist and watchdog 12.12.2000
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: general.lib,v 1.35 2001-01-07 01:50:32 greuel Exp $";
+version="$Id: general.lib,v 1.36 2001-01-10 16:34:21 Singular Exp $";
 category="General purpose";
 info="
 LIBRARY:  general.lib   Elementary Computations of General Type
@@ -478,7 +478,7 @@ EXAMPLE: example killall; shows an example AND KILLS ALL YOUR VARIABLES
         if ( @marie[@joni] != "LIB" && typeof(`@marie[@joni]`) != "proc")
         {
           no_kill = 0;
-          for (j=2; j<= size(#); j++)
+          for (int j=2; j<= size(#); j++)
           {
             if (typeof(`@marie[@joni]`)==#[j] or @marie[@joni] == #[j])
             {
