@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.158 1999-11-12 16:03:48 Singular Exp $
+@comment $Id: reference.doc,v 1.159 1999-11-24 14:07:00 obachman Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -1378,7 +1378,7 @@ provide in the future).
 @c example
   ring r=32003,(x,y,z),dp;
   ideal i=x+y,z3+22y;
-  write(">save_i",i);
+  write("save_i",i);
   ring r0=0,(x,y,z),Dp;
   string s="ideal k="+read("save_i")+";";
   s;
@@ -1904,7 +1904,7 @@ printed to the terminal.
 The browser in which the help information is displayed can be either set
 with the command-line option @code{--browser=<browser>} (@pxref{Command
 line options}), or with the command @code{system("--browser",
-"<browser>")}. Use the command @code{system("browserws");} for a list of
+"<browser>")}. Use the command @code{system("browsers");} for a list of
 all available browsers. @xref{The online help system}, for more details
 about help browsers.
 
@@ -2136,14 +2136,22 @@ To access the elements of a resolution, it has to be assigned to a list,
 which also completes computations and may therefore take some time.
 @item @strong{Example:}
 @smallexample
+<<<<<<< reference.doc
+@c only_example_only_new
+=======
 @c CHANGE @c example
+>>>>>>> 1.157
   ring r=0,(x,y,z),dp;
   ideal i=xz,yz,x^3-y^3;
   def l=hres(i,0);
   print(betti(l),"betti");// input to betti may be of type resolution
   list ll=l;
   l[2];                   // elements can only be accessed in the list
+<<<<<<< reference.doc
+@c only_example_only_new
+=======
 @c CHANGE example
+>>>>>>> 1.157
 @end smallexample
 @end table
 @c ref
@@ -3225,8 +3233,6 @@ immediate garbage collection can be enforced with the command
   ReportMemoryUsage();
   kill p;
   ReportMemoryUsage(); // less memory used: p killed
-//  system("gc");
-  ReportMemoryUsage(); // less memory allocated: garbage collect
   kill r;
   ReportMemoryUsage(); // even less memory: r killed and implicit gc
 @c example
@@ -5182,12 +5188,12 @@ The spectrum numbers are a[i]/b[i], appearing with multiplicity m[i].
 This command will become part of a library in future versions of @sc{Singular}.
 @item @strong{Example:}
 @smallexample
-@c example
+@c STILL BROKEN example
   ring r=0,(x,y,z),ds;
   poly f=x^7+y^7+z^7;
   list s1=spectrum(f);
   s1;
-@c example
+@c STILL BROKEN example
 @end smallexample
 @end table
 @c @c ref
@@ -5875,7 +5881,7 @@ solves the Vandermonde linear system sum_(i=1)^N x_i^(k-1)z_i = w_k, k=1,@dots{}
 @c example
 ring r2 = 0,(x,y),dp;
 // determine f with deg(f) = 3 and
-// v = values of f at 16 points (2,3)^0=(1,1),...,(2,3)^15=(2^15,3^15)
+// v = values of f at 16 points (2,3)^0=(1,1),..,(2,3)^15=(2^15,3^15)
 // valuation point (2,3)
 ideal p = 2,3;
 ideal v= 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16;
