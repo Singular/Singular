@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.47 2000-11-23 17:40:02 Singular Exp $ */
+/* $Id: polys.h,v 1.48 2000-11-30 16:46:08 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials of the
              currRing
@@ -19,10 +19,10 @@
           - implemented in: pInline2.h
           - debugging only if PDEBUG >= 2
           - normally inlined, unless PDEBUG >= 2 || NO_INLINE2
- Level 1: operations on monomials with time proportional to length 
+ Level 1: operations on monomials with time proportional to length
           - implemented in: pInline1.h
           - debugging only if PDEBUG >= 1
-          - normally inlined, unless PDEBUG >= 1 || NO_INLINE1 
+          - normally inlined, unless PDEBUG >= 1 || NO_INLINE1
  Level 0: short operations on polynomials with time proportional to
           length of poly
           - implemented in pInline0.cc
@@ -30,7 +30,7 @@
           - normally _not_ inlined: can be forced with
             #define DO_PINLINE0
             #include "pInline0.h"
- Misc   : operations on polynomials which do not fit in any of the 
+ Misc   : operations on polynomials which do not fit in any of the
           above categories
           - implemented in: polys*.cc
           - never inlined
@@ -41,8 +41,8 @@
    #include "mod2.h"
  However, PDEBUG will only be in effect, if !NDEBUG.
 
- All p_* operations take as last argument a ring 
- and are ring independent. Their corresponding p* operations are usually 
+ All p_* operations take as last argument a ring
+ and are ring independent. Their corresponding p* operations are usually
  just macros to the respective p_*(..,currRing).
 
 */
@@ -61,7 +61,7 @@
 // don't use this
 #define pSetOrder(p, o)     p_SetOrder(p, o, currRing)
 
-// Component 
+// Component
 #define pGetComp(p)         _p_GetComp(p, currRing)
 #define pSetComp(p,v)       p_SetComp(p,v, currRing)
 #define pIncrComp(p)        p_IncrComp(p,currRing)
@@ -82,7 +82,7 @@
 
 /***************************************************************
  *
- * Allocation/Initalization/Deletion 
+ * Allocation/Initalization/Deletion
  * except for pDeleteLm and pHead, all polys must be != NULL
  *
  ***************************************************************/
@@ -90,13 +90,13 @@
 #define pNew()          p_New(currRing)
 // allocates a new monomial and initializes everything to 0
 #define pInit()         p_Init(currRing)
-// like pInit, except that expvector is initialized to that of p, 
+// like pInit, except that expvector is initialized to that of p,
 // p must be != NULL
 #define pLmInit(p)  p_LmInit(p, currRing)
-// returns newly allocated copy of Lm(p), coef is copied, next=NULL, 
+// returns newly allocated copy of Lm(p), coef is copied, next=NULL,
 // p might be NULL
 #define pHead(p)        p_Head(p, currRing)
-// if *p_ptr != NULL, delete p_ptr->coef, *p_ptr, and set *p_ptr to 
+// if *p_ptr != NULL, delete p_ptr->coef, *p_ptr, and set *p_ptr to
 // pNext(*p_ptr)
 static inline void pDeleteLm(poly *p) {p_DeleteLm(p, currRing);}
 // if (p!=NULL) delete p-coef and p
@@ -154,15 +154,15 @@ extern poly pHeadProc(poly p);
 // returns: (p2==NULL ? 1 : (p1 == NULL ? -1 : p_LmCmp(p1, p2)))
 #define pCmp(p1, p2)    p_Cmp(p1, p2, currRing)
 
-  
+
 /***************************************************************
  *
- * Divisiblity tests, args must be != NULL, except for 
+ * Divisiblity tests, args must be != NULL, except for
  * pDivisbleBy
  *
  ***************************************************************/
 // returns TRUE, if leading monom of a divides leading monom of b
-// i.e., if there exists a expvector c > 0, s.t. b = a + c; 
+// i.e., if there exists a expvector c > 0, s.t. b = a + c;
 #define pDivisibleBy(a, b)  p_DivisibleBy(a,b,currRing)
 // like pDivisibleBy, except that it is assumed that a!=NULL, b!=NULL
 #define pLmDivisibleBy(a,b)  p_LmDivisibleBy(a,b,currRing)
@@ -281,7 +281,8 @@ void pSetModDeg(intvec *w);
 
 
 
-poly      pmInit(char *s, BOOLEAN &ok);   /* monom -> poly */
+poly      pmInit(char *s, BOOLEAN &ok);     /* monom -> poly, interpreter */
+char *    p_Read(char *s, poly &p, ring r); /* monom -> poly */
 void      ppDelete(poly * a, ring r);
 
 /*-------------operations on polynomials:------------*/
@@ -300,7 +301,7 @@ poly      pDiffOp(poly a, poly b,BOOLEAN multiply);
 #define   pMinComp(p)   p_MinComp(p, currRing)
 int pMaxCompProc(poly p);
 
-#define   pOneComp(p)       p_OneComp(p, currRing) 
+#define   pOneComp(p)       p_OneComp(p, currRing)
 #define   pSetCompP(a,i)    p_SetCompP(a, i, currRing)
 
 // let's inline those, so that we can call them from the debugger

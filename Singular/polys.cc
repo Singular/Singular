@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.68 2000-11-09 16:32:53 obachman Exp $ */
+/* $Id: polys.cc,v 1.69 2000-11-30 16:46:09 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -54,7 +54,7 @@ void pSetGlobals(ring r, BOOLEAN complete)
   pFDeg=r->pFDeg;
   pLDeg=r->pLDeg;
   pLexOrder=r->LexOrder;
-  
+
   if (complete)
   {
     if ((r->LexOrder) || (r->OrdSgn==-1))
@@ -139,13 +139,11 @@ void pLcm(poly a, poly b, poly m)
 /*2
 * convert monomial given as string to poly, e.g. 1x3y5z
 */
-poly pmInit(char *st, BOOLEAN &ok)
+char * p_Read(char *st, poly &rc, ring r)
 {
   int i,j;
-  ok=FALSE;
-  BOOLEAN b=FALSE;
-  poly rc = pInit();
-  char *s = nRead(st,&(rc->coef));
+  rc = p_Init(r);
+  char *s = r->cf->nRead(st,&(rc->coef));
   if (s==st)
   /* i.e. it does not start with a coeff: test if it is a ringvar*/
   {
@@ -153,40 +151,52 @@ poly pmInit(char *st, BOOLEAN &ok)
     if (j >= 0)
     {
       pIncrExp(rc,1+j);
+      while (*s!='\0') s++;
       goto done;
     }
   }
-  else
-    b=TRUE;
   while (*s!='\0')
   {
     char ss[2];
     ss[0] = *s++;
     ss[1] = '\0';
-    j = rIsRingVar(ss);
+    j = r_IsRingVar(ss,r);
     if (j >= 0)
     {
       s = eati(s,&i);
-      pAddExp(rc,1+j, (Exponent_t)i);
+      p_AddExp(rc,1+j, (Exponent_t)i, r);
     }
     else
     {
-      if ((s!=st)&&isdigit(st[0]))
-      {
-        errorreported=TRUE;
-      }
-      pDelete(&rc);
-      return NULL;
+      s--;
+      return s;
     }
   }
 done:
-  ok=!errorreported;
-  if (nIsZero(pGetCoeff(rc))) pDeleteLm(&rc);
+  if (r->cf->nIsZero(pGetCoeff(rc))) p_DeleteLm(&rc,r);
   else
   {
-    pSetm(rc);
+    p_Setm(rc,r);
   }
-  return rc;
+  return s;
+}
+
+poly pmInit(char *st, BOOLEAN &ok)
+{
+  poly p;
+  char *s=p_Read(st,p,currRing);
+  if (*s!='\0')
+  {
+    if ((s!=st)&&isdigit(st[0]))
+    {
+      errorreported=TRUE;
+    }
+    ok=FALSE;
+    pDelete(&p);
+    return NULL;
+  }
+  ok=!errorreported;
+  return p;
 }
 
 /*2
@@ -228,7 +238,6 @@ poly pHomogen (poly p, int varnum)
   }
   return q;
 }
-
 
 /*2
 *replaces the maximal powers of the leading monomial of p2 in p1 by
