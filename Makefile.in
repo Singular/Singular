@@ -156,22 +156,24 @@ install-sharedist: ${SINGULAR}
 dist: ${SHAREDIST_NAME}.tgz  ${BINDIST_NAME}.tgz 
 
 sharedist ${SHAREDIST_NAME}.tgz:
-	if test -e ${TMPDIR}; then rm -rf ${TMPDIR}; fi
+	if test -d ${TMPDIR}; then rm -rf ${TMPDIR}; fi
 	${MAKE} install-sharedist localdir=${TMPDIR}
-	cd ${TMPDIR}; tar czf ${SHAREDIST_NAME}.tgz Singular
+	cd ${TMPDIR}; tar cf - Singular| gzip -c > ${SHAREDIST_NAME}.tgz
 	mv ${TMPDIR}/${SHAREDIST_NAME}.tgz .
 	rm -rf ${TMPDIR}
 
 bindist ${BINDIST_NAME}.tgz: 
-	if test -e ${TMPDIR}; then rm -fr ${TMPDIR}; fi
+	if test -d ${TMPDIR}; then rm -fr ${TMPDIR}; fi
 	${MAKE} install-bindist localdir=${TMPDIR}
-	cd ${TMPDIR}; tar czf ${BINDIST_NAME}.tgz  Singular
+	cd ${TMPDIR}; tar cf - Singular | gzip -c > ${BINDIST_NAME}.tgz
 	mv ${TMPDIR}/Singular-${S_VERSION}-${SINGUNAME}.tgz .
 	rm -rf ${TMPDIR}
 
 install-local-dist: ${SHAREDIST_NAME}.tgz ${BINDIST_NAME}.tgz
 	cp ${SHAREDIST_NAME}.tgz ${BINDIST_NAME}.tgz ${localdir}
-	cd ${localdir}; tar xzf ${SHAREDIST_NAME}.tgz; tar xzf ${BINDIST_NAME}.tgz
+	cd ${localdir}
+	gunzip -c ${SHAREDIST_NAME}.tgz | tar xf - 
+	gunzip -c ${BINDIST_NAME}.tgz | tar xf -
 	rm -rf ${localdir}/${SHAREDIST_NAME}.tgz ${localdir}/${BINDIST_NAME}.tgz
 	${MKINSTALLDIRS} ${localdir}/bin
 	${LN_S} ${localdir}/Singular/${S_VERSION}/${SINGUNAME}/Singular ${localdir}/bin/Singular-${S_VERSION}
