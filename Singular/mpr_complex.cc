@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_complex.cc,v 1.2 1999-05-04 13:49:49 wenk Exp $ */
+/* $Id: mpr_complex.cc,v 1.3 1999-05-10 15:10:52 Singular Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - real floating-point numbers using gmp
@@ -343,25 +343,38 @@ gmp_float numberToFloat( number num )
 
   //Print("numberToFloat: ");nPrint(num);
 
-  if ( num != NULL ) {
-    if (SR_HDL(num) & SR_INT) {
+  if ( num != NULL )
+  {
+    if (SR_HDL(num) & SR_INT)
+    {
       r= SR_TO_INT(num);
-    } else {
-      if ( num->s == 0 ) {
+    }
+    else
+    {
+      if ( num->s == 0 )
+      {
         nlNormalize( num );
       }
-      if (SR_HDL(num) & SR_INT) {
+      if (SR_HDL(num) & SR_INT)
+      {
         r= SR_TO_INT(num);
-      } else {
-        if ( num->s != 3 ) {
+      }
+      else
+      {
+        if ( num->s != 3 )
+        {
           r= &num->z;
           r/= (mprfloat_g)&num->n;
-        } else {
+        }
+        else
+        {
           r= &num->z;
         }
       }
     }
-  } else {
+  }
+  else
+  {
     r= 0.0;
   }
 
@@ -480,7 +493,10 @@ char *floatToStr( const gmp_float & r, const size_t oprec )
   in= (char*)Alloc0( insize );
 
   mpf_get_str(in,&exponent,10,oprec,*(r.mpfp()));
-  if ( (exponent > 0) && (exponent < (int)oprec) && (strlen(in)-(in[0]=='-'?1:0) == oprec) ) {
+  if ( (exponent > 0)
+  && (exponent < (int)oprec)
+  && (strlen(in)-(in[0]=='-'?1:0) == oprec) )
+  {
     in= (char*)ReAlloc( in, insize, (exponent+oprec+2) * sizeof(char) );
     insize= (exponent+oprec+2) * sizeof(char);
     int newprec= exponent+oprec;
@@ -549,12 +565,15 @@ complex operator / ( const complex & a, const complex & b )
   mprfloat_g ar = abs(b.real());
   mprfloat_g ai = abs(b.imag());
   mprfloat_g nr, ni, t, d;
-  if (ar <= ai) {
+  if (ar <= ai)
+  {
     t = b.real() / b.imag();
     d = b.imag() * ((mprfloat_g)1 + t*t);
     nr = (a.real() * t + a.imag()) / d;
     ni = (a.imag() * t - a.real()) / d;
-  } else {
+  }
+  else
+  {
     t = b.imag() / b.real();
     d = b.real() * ((mprfloat_g)1 + t*t);
     nr = (a.real() + a.imag() * t) / d;
@@ -608,12 +627,15 @@ complex & complex::operator /= ( const complex & b )
   mprfloat_g ar = abs(b.r);
   mprfloat_g ai = abs(b.i);
   mprfloat_g nr, ni, t, d;
-  if (ar <= ai) {
+  if (ar <= ai)
+  {
     t = b.r / b.i;
     d = b.i * ((mprfloat_g)1 + t*t);
     nr = (r * t + i) / d;
     ni = (i * t - r) / d;
-  } else {
+  }
+  else
+  {
     t = b.i / b.r;
     d = b.r * ((mprfloat_g)1 + t*t);
     nr = (r + i * t) / d;
@@ -669,14 +691,20 @@ complex sqrt( const complex & x )
 {
   mprfloat_g r = abs(x);
   mprfloat_g nr, ni;
-  if (r == (mprfloat_g) 0.0) {
+  if (r == (mprfloat_g) 0.0)
+  {
     nr = ni = r;
-  } else if ( x.real() > (mprfloat_g)0) {
+  }
+  else if ( x.real() > (mprfloat_g)0)
+  {
     nr = sqrt((mprfloat_g)0.5 * (r + x.real()));
     ni = x.imag() / nr / (mprfloat_g)2;
-  } else {
+  }
+  else
+  {
     ni = sqrt((mprfloat_g)0.5 * (r - x.real()));
-    if (x.imag() < (mprfloat_g)0) {
+    if (x.imag() < (mprfloat_g)0)
+    {
       ni = - ni;
     }
     nr = x.imag() / ni / (mprfloat_g)2;
@@ -696,14 +724,17 @@ char *complexToStr( const complex & c, const size_t oprec )
 {
   char *out,*in_imag,*in_real;
 
-  if ( !c.imag().isZero() ) {
+  if ( !c.imag().isZero() )
+  {
     in_real=floatToStr( c.real(), oprec );         // get real part
     in_imag=floatToStr( abs(c.imag()), oprec );    // get imaginary part
     out= (char*)Alloc0( (strlen(in_real)+strlen(in_imag)+6) * sizeof(char) );
     sprintf(out,"%s%s%s",in_real,c.imag().sign() >= 0 ? " + i ":" - i ",in_imag);
     Free( in_real, (strlen(in_real)+1)*sizeof(char) );
     Free( in_imag, (strlen(in_imag)+1)*sizeof(char) );
-  } else {
+  }
+  else
+  {
     out= floatToStr( c.real(), oprec );
   }
   return out;

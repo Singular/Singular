@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: shortfl.cc,v 1.7 1997-11-24 15:35:39 pohl Exp $ */
+/* $Id: shortfl.cc,v 1.8 1999-05-10 15:10:55 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -272,14 +272,6 @@ char * nrRead (char *s, number *a)
   }
   *a = nf(z1).N();
   return s;
-}
-
-/*2
-* modulus for reals: 0.0
-*/
-number nrIntMod (number a, number b)
-{
-  return nf((float)0.0).N();
 }
 
 /*2

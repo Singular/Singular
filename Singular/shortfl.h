@@ -6,7 +6,7 @@
 /*
 * ABSTRACT
 */
-/* $Id: shortfl.h,v 1.2 1997-03-24 14:25:44 Singular Exp $ */
+/* $Id: shortfl.h,v 1.3 1999-05-10 15:10:56 Singular Exp $ */
 #include "structs.h"
 
 BOOLEAN nrGreaterZero (number k);
@@ -21,7 +21,6 @@ BOOLEAN nrIsZero      (number a);
 BOOLEAN nrIsOne       (number a);
 BOOLEAN nrIsMOne      (number a);
 number  nrDiv         (number a, number b);
-number  nrIntMod      (number a, number b);
 number  nrNeg         (number c);
 number  nrInvers      (number c);
 BOOLEAN nrGreater     (number a, number b);

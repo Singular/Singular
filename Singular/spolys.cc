@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: spolys.cc,v 1.19 1999-04-29 11:38:57 Singular Exp $ */
+/* $Id: spolys.cc,v 1.20 1999-05-10 15:10:56 Singular Exp $ */
 
 /*
 * ABSTRACT - s-polynomials and reduction for char p
@@ -794,7 +794,7 @@ poly spDSpolyCreate(poly p1,poly p2,poly spNoether, spSpolyLoopProc dummy)
 void spSet(ring r)
 {
   if ((TEST_OPT_INTSTRATEGY   /* Q, Q(a), Fp(a) */
-  || (rField_is_R()) || (rField_is_long_R()))
+  || (rField_is_R()) || (rField_is_long_R()) || (rField_is_long_C()))
 #ifdef SRING
   && (pSRING==0)
 #endif

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.52 1999-04-29 11:38:56 Singular Exp $ */
+/* $Id: ring.cc,v 1.53 1999-05-10 15:10:53 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -519,6 +519,7 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
   /* input: 0 ch=0 : Q     parameter=NULL    ffChar=FALSE
    *         0    1 : Q(a,...)        *names         FALSE
    *         0   -1 : R               NULL           FALSE
+   *         0   -1 : C               *names         FALSE
    *         p    p : Fp              NULL           FALSE
    *         p   -p : Fp(a)           *names         FALSE
    *         q    q : GF(q=p^n)       *names         TRUE
@@ -560,7 +561,7 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
   if (pn!=NULL)
   {
     R->P=pn->listLength();
-    if (ffChar && (R->P > 1) || ch == -1)
+    if ((ffChar|| (ch == 1)) && (R->P > 1))
     {
       WerrorS("too many parameters");
       goto rInitError;
@@ -702,9 +703,11 @@ void rWrite(ring r)
   else
   {
     PrintS("//   characteristic : ");
-    if ( rField_is_R(r) )        PrintS("0 (real)\n");  /* R */
+    if ( rField_is_R(r) )             PrintS("0 (real)\n");  /* R */
     else if ( rField_is_long_R(r) )
       Print("0 (real:%d digits)\n",r->ch_flags);  /* long R */
+    else if ( rField_is_long_C(r) )
+      Print("0 (complex:%d digits)\n",r->ch_flags);  /* long C */
     else
       Print ("%d\n",rChar(r)); /* Fp(a) */
     if (r->parameter!=NULL)
@@ -719,13 +722,13 @@ void rWrite(ring r)
         sp++; nop++;
       }
       PrintS("\n//   minpoly        : ");
-      if (r==currRing)
-      {
-        StringSetS(""); nWrite(r->minpoly); PrintS(StringAppendS("\n"));
-      }
-      else if (r->minpoly==NULL)
+      if (r->minpoly==NULL)
       {
         PrintS("0\n");
+      }
+      else if (r==currRing)
+      {
+        StringSetS(""); nWrite(r->minpoly); PrintS(StringAppendS("\n"));
       }
       else
       {

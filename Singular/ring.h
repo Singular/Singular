@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.24 1999-04-29 11:38:57 Singular Exp $ */
+/* $Id: ring.h,v 1.25 1999-05-10 15:10:54 Singular Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -68,9 +68,11 @@ inline BOOLEAN rField_is_Zp_a(ring r, int p)
 inline BOOLEAN rField_is_Q_a(ring r=currRing)
 { return (r->ch == 1); }
 inline BOOLEAN rField_is_long_R(ring r=currRing)
-{ return (r->ch == -1) && (r->ch_flags!=0); }
+{ return (r->ch == -1) && (r->ch_flags!=0) &&(r->parameter==NULL); }
+inline BOOLEAN rField_is_long_C(ring r=currRing)
+{ return (r->ch == -1) && (r->ch_flags!=0) &&(r->parameter!=NULL); }
 inline BOOLEAN rField_has_simple_inverse(ring r=currRing)
-{ return (r->ch>1) || (r->ch== -1); } /* Z/p and GF(p,n) and R and long_R*/
+{ return (r->ch>1) || (r->ch== -1); } /* Z/p, GF(p,n), R, long_R, long_C*/
 inline BOOLEAN rField_is_Extension(ring r=currRing)
 { return (rField_is_Q_a(r)) || (rField_is_Zp_a(r)); } /* Z/p(a) and Q(a)*/
 

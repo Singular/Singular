@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.cc,v 1.9 1999-02-26 15:30:49 Singular Exp $ */
+/* $Id: modulop.cc,v 1.10 1999-05-10 15:10:50 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
@@ -327,12 +327,4 @@ BOOLEAN npSetMap(int c, char ** par, int nop, number minpol)
     return FALSE;   /* Q(a) -> Z/p */
   }
   return FALSE;      /* default */
-}
-
-/*2
-* dummy modulus: return 0
-*/
-number npIntMod(number a, number b)
-{
-  return (number)0;
 }

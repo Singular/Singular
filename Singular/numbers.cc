@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.9 1999-04-29 11:38:52 Singular Exp $ */
+/* $Id: numbers.cc,v 1.10 1999-05-10 15:10:53 Singular Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -18,6 +18,7 @@
 #include "longalg.h"
 #include "modulop.h"
 #include "gnumpfl.h"
+#include "gnumpc.h"
 #include "ring.h"
 #ifndef FAST_AND_DIRTY
 #undef npMultM
@@ -82,6 +83,8 @@ int    ndParDeg(number n) { return 0; }
 
 number ndGcd(number a, number b) { return nInit(1); }
 
+number ndIntMod(number a, number b) { return nInit(0); }
+
 int    nGetChar() { return nChar; }
 
 int ndSize(number a) {return (int)nIsZero(a)==FALSE; }
@@ -131,7 +134,7 @@ void nSetChar(ring r, BOOLEAN complete)
       nDiv   = naDiv;
       nExactDiv= naDiv;
       nIntDiv= naIntDiv;
-      nIntMod= npIntMod; /* dummy !! */
+      nIntMod= ndIntMod; /* dummy !! */
       nNeg   = naNeg;
       nInvers= naInvers;
       nCopy  = naCopy;
@@ -220,7 +223,7 @@ void nSetChar(ring r, BOOLEAN complete)
       nDiv   = npDiv;
       nExactDiv= npDiv;
       nIntDiv= npDiv;
-      nIntMod= npIntMod;
+      nIntMod= ndIntMod; /* dummy !! */
       nNeg   = npNeg;
       nInvers= npInvers;
       nCopy  = npCopy;
@@ -268,7 +271,7 @@ void nSetChar(ring r, BOOLEAN complete)
       nDiv   = nfDiv;
       nExactDiv= nfDiv;
       nIntDiv= nfDiv;
-      nIntMod= nfIntMod;
+      nIntMod= ndIntMod; /* dummy !! */
       nNeg   = nfNeg;
       nInvers= nfInvers;
       nCopy  = nfCopy;
@@ -313,7 +316,7 @@ void nSetChar(ring r, BOOLEAN complete)
       nDiv   = nrDiv;
       nExactDiv= nrDiv;
       nIntDiv= nrDiv;
-      nIntMod= nrIntMod;
+      nIntMod= ndIntMod; /* dummy !! */
       nNeg   = nrNeg;
       nInvers= nrInvers;
       nCopy  = nrCopy;
@@ -358,7 +361,7 @@ void nSetChar(ring r, BOOLEAN complete)
       nDiv   = ngfDiv;
       nExactDiv= ngfDiv;
       nIntDiv= ngfDiv;
-      nIntMod= ngfIntMod;
+      nIntMod= ndIntMod; /* dummy !! */
       nNeg   = ngfNeg;
       nInvers= ngfInvers;
       nCopy  = ngfCopy;
@@ -378,6 +381,51 @@ void nSetChar(ring r, BOOLEAN complete)
       /*nSize  = ndSize;*/
 #ifdef LDEBUG
       nDBTest=ngfDBTest;
+#endif
+    }
+  }
+  /* -------------- long C -----------------------*/
+  if (rField_is_long_C(r))
+  {
+    setGMPFloatPrecBytes(r->ch_flags);
+#ifdef LDEBUG
+    nDBDelete= ngcDBDelete;
+#else
+    nDelete= ngcDelete;
+#endif
+    if (complete)
+    {
+      nNew=ngcNew;
+      nNormalize=nDummy2;
+      nInit  = ngcInit;
+      nInt   = ngcInt;
+      nAdd   = ngcAdd;
+      nSub   = ngcSub;
+      nMult  = ngcMult;
+      nDiv   = ngcDiv;
+      nExactDiv= ngcDiv;
+      nIntDiv= ngcDiv;
+      nIntMod= ndIntMod; /* dummy !! */
+      nNeg   = ngcNeg;
+      nInvers= ngcInvers;
+      nCopy  = ngcCopy;
+      nGreater = ngcGreater;
+      nEqual = ngcEqual;
+      nIsZero = ngcIsZero;
+      nIsOne = ngcIsOne;
+      nIsMOne = ngcIsMOne;
+      nGreaterZero = ngcGreaterZero;
+      nWrite = ngcWrite;
+      nRead = ngcRead;
+      nPower = ngcPower;
+      nGcd  = ndGcd;
+      nLcm  = ndGcd; /* tricky, isn't it ?*/
+      nSetMap=ngcSetMap;
+      nName=ndName;
+      nPar=ngcPar;
+      /*nSize  = ndSize;*/
+#ifdef LDEBUG
+      nDBTest=ngcDBTest;
 #endif
     }
   }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpfl.cc,v 1.2 1999-05-04 13:49:45 wenk Exp $ */
+/* $Id: gnumpfl.cc,v 1.3 1999-05-10 15:10:49 Singular Exp $ */
 /*
 * ABSTRACT: computations with GMP floating-point numbers
 *
@@ -100,7 +100,8 @@ void ngfDBDelete (number * a,char *f, int l)
 void ngfDelete (number * a)
 #endif
 {
-  if ( *a != NULL ) {
+  if ( *a != NULL )
+  {
     delete *(gmp_float**)a;
     *a=NULL;
   }
@@ -112,7 +113,8 @@ void ngfDelete (number * a)
 number ngfCopy(number a)
 {
   gmp_float* b= NULL;
-  if ( a !=  NULL ) {
+  if ( a !=  NULL )
+  {
     b= new gmp_float( *(gmp_float*)a );
   }
   return (number)b;
@@ -134,9 +136,12 @@ number ngfNeg (number a)
 number ngfInvers(number a)
 {
   gmp_float* r= NULL;
-  if ( (a==NULL) /*|| ((gmp_float*)a)->isZero()*/ ) {
+  if ( (a==NULL) /*|| ((gmp_float*)a)->isZero()*/ )
+  {
     WerrorS("div. 1/0");
-  } else {
+  }
+  else
+  {
     r= new gmp_float( (gmp_float)1 / (*(gmp_float*)a) );
   }
   return (number)r;
@@ -148,13 +153,20 @@ number ngfInvers(number a)
 number ngfAdd (number a, number b)
 {
   gmp_float* r= NULL;
-  if ( a==NULL && b==NULL ) {
+  if ( a==NULL && b==NULL )
+  {
     return NULL;
-  } else if ( a == NULL ) {
+  }
+  else if ( a == NULL )
+  {
     r= new gmp_float( *(gmp_float*)b );
-  } else if ( b == NULL ) {
+  }
+  else if ( b == NULL )
+  {
     r= new gmp_float( *(gmp_float*)a );
-  } else {
+  }
+  else
+  {
     r= new gmp_float( (*(gmp_float*)a) + (*(gmp_float*)b) );
   }
   return (number)r;
@@ -166,13 +178,20 @@ number ngfAdd (number a, number b)
 number ngfSub (number a, number b)
 {
   gmp_float* r= NULL;
-  if ( a==NULL && b==NULL ) {
+  if ( a==NULL && b==NULL )
+  {
     return NULL;
-  } else if ( a == NULL ) {
+  }
+  else if ( a == NULL )
+  {
     r= new gmp_float( -(*(gmp_float*)b) );
-  } else if ( b == NULL ) {
+  }
+  else if ( b == NULL )
+  {
     r= new gmp_float( *(gmp_float*)a );
-  } else {
+  }
+  else
+  {
     r= new gmp_float( (*(gmp_float*)a) - (*(gmp_float*)b) );
   }
   return (number)r;
@@ -184,9 +203,12 @@ number ngfSub (number a, number b)
 number ngfMult (number a, number b)
 {
   gmp_float* r= NULL;
-  if ( a==NULL || b==NULL ) {
+  if ( a==NULL || b==NULL )
+  {
     return NULL;
-  } else {
+  }
+  else
+  {
     r= new gmp_float( (*(gmp_float*)a) * (*(gmp_float*)b) );
   }
   return (number)r;
@@ -197,11 +219,14 @@ number ngfMult (number a, number b)
 */
 number ngfDiv (number a, number b)
 {
-  if ( b==NULL /*|| ((gmp_float*)b)->isZero()*/ ) {
+  if ( b==NULL /*|| ((gmp_float*)b)->isZero()*/ )
+  {
     // a/0 = error
     WerrorS("div. 1/0");
     return NULL;
-  } else if ( a==NULL ) {
+  }
+  else if ( a==NULL )
+  {
     // 0/b = 0
     return NULL;
   }
@@ -214,14 +239,19 @@ number ngfDiv (number a, number b)
 */
 void ngfPower ( number x, int exp, number * u )
 {
-  if ( exp == 0 ) {
+  if ( exp == 0 )
+  {
     *(gmp_float*)u= 1.0;
     return;
   }
-  if ( exp == 1 ) {
-    if ( x == NULL ) {
+  if ( exp == 1 )
+  {
+    if ( x == NULL )
+    {
       *(gmp_float*)u= 0.0;
-    } else {
+    }
+    else
+    {
       *(gmp_float*)u= *(gmp_float*)x;
     }
     return;
@@ -250,10 +280,12 @@ BOOLEAN ngfGreaterZero (number a)
 */
 BOOLEAN ngfGreater (number a, number b)
 {
-  if ( a==NULL ) {
+  if ( a==NULL )
+  {
     return (((gmp_float*)b)->sign() < 0);
   }
-  if ( b==NULL ) {
+  if ( b==NULL )
+  {
     return (((gmp_float*)a)->sign() < 0);
   }
   return ( (*(gmp_float*)a) > (*(gmp_float*)b) );
@@ -264,9 +296,12 @@ BOOLEAN ngfGreater (number a, number b)
 */
 BOOLEAN ngfEqual (number a, number b)
 {
-  if ( a == NULL && b == NULL ) {
+  if ( a == NULL && b == NULL )
+  {
     return TRUE;
-  } else if ( a == NULL || b == NULL ) {
+  }
+  else if ( a == NULL || b == NULL )
+  {
     return FALSE;
   }
   return ( (*(gmp_float*)a) == (*(gmp_float*)b) );
@@ -288,13 +323,6 @@ BOOLEAN ngfIsMOne (number a)
 {
   if ( a == NULL ) return FALSE;
   return ((gmp_float*)a)->isMOne();
-}
-
-/*2
-* simplify x, dummy
-*/
-void ngfNormalize (number &x)
-{
 }
 
 /*2
@@ -376,55 +404,12 @@ void ngfWrite (number &a)
   Free((ADDRESS)out, (strlen(out)+1)* sizeof(char) );
 }
 
-number ngfIntMod(number a, number b)
-{
-  return ngfInit(0);
-}
-
 #ifdef LDEBUG
 BOOLEAN ngfDBTest(number a, char *f, int l)
 {
   return TRUE;
 }
 #endif
-
-/*
-void ngfSetChar(int c, BOOLEAN complete, char ** param, int pars)
-{
-#ifdef LDEBUG
-  nDBDelete= ngfDBDelete;
-  nDBTest= ngfDBTest;
-#else
-  nDelete= ngfDelete;
-#endif
-  nNew   = ngfNew; // nDummy1;
-  nNormalize=ngfNormalize; // nDummy2;
-  nInit  = ngfInit;
-  nInt   = ngfInt;
-  nAdd   = ngfAdd;
-  nSub   = ngfSub;
-  nMult  = ngfMult;
-  nDiv   = ngfDiv;
-  nIntDiv= ngfDiv;
-  nExactDiv= ngfDiv;
-  nNeg   = ngfNeg;
-  nInvers= ngfInvers;
-  nCopy  = ngfCopy;
-  nEqual = ngfEqual;
-  nIsZero = ngfIsZero;
-  nIsOne = ngfIsOne;
-  nIsMOne= ngfIsMOne;
-  nGreaterZero = ngfGreaterZero;
-  nWrite = ngfWrite;
-  nRead = ngfRead;
-  nPower = ngfPower;
-  nIntMod= ngfGcd;
-  nGcd  = ngfGcd;
-  nLcm  = ngfGcd;
-  //nName = ndName;
-  nSetMap = ngfSetMap;
-}
-*/
 
 // local Variables: ***
 // folded-file: t ***

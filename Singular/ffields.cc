@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ffields.cc,v 1.18 1998-10-15 11:45:54 obachman Exp $ */
+/* $Id: ffields.cc,v 1.19 1999-05-10 15:10:48 Singular Exp $ */
 /*
 * ABSTRACT: finite fields with a none-prime number of elements (via tables)
 */
@@ -719,12 +719,4 @@ BOOLEAN nfSetMap(int c, char ** par, int nop, number minpol)
     return TRUE;
   }
   return FALSE;     /* default */
-}
-
-/*2
-* dummy modulus: return 0
-*/
-number nfIntMod(number a, number b)
-{
-  return (number)nfCharQ;
 }
