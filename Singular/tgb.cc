@@ -7,14 +7,31 @@
 #include "febase.h"
 #include "structs.h"
 #include "polys.h"
-
+#include "stdlib.h"
 
 
 #include "kutil.h"
 #include "kInline.cc"
 #include "kstd1.h"
+
 #define FULLREDUCTIONS
 
+//#define QUICK_SPOLY_TEST
+//#define DIAGONAL_GOING
+//#define RANDOM_WALK
+struct int_pair_node{
+  int_pair_node* next;
+  int a;
+  int b;
+};
+#ifdef RANDOM_WALK
+int my_rand(int n){
+  //RANDOM integer beetween 0,..,n-1
+  int erg=(double(rand())/RAND_MAX) *n;
+  return ((erg>=n)?erg-1:erg);
+
+}
+#endif
 enum calc_state 
 {
   UNCALCULATED,
@@ -24,14 +41,16 @@ enum calc_state
 struct calc_dat
 {
   int* rep;
-  int** states;
+  char** states;
   ideal S;
   ring r;
   int* lengths;
   long* short_Exps;
   kStrategy strat;
   int** deg;
+  int* T_deg;
   int* misses;
+  int_pair_node* soon_free;
   int max_misses;
   int found_i;
   int found_j;
@@ -43,6 +62,7 @@ struct calc_dat
   int skipped_pairs;
   int current_degree;
   int misses_counter;
+  int misses_series;
 };
 bool find_next_pair(calc_dat* c);
 void replace_pair(int & i, int & j, calc_dat* c);
@@ -60,24 +80,63 @@ bool find_next_pair(calc_dat* c)
   int start_i,start_j,i,j;
   start_i=0;
   start_j=-1;
-
+#ifndef HOMOGENEOUS_EXAMPLE
+   if (c->misses_series>80){
+     c->current_degree++;
+     c->misses_series=0;
+   }
+#endif
   start_i=c->continue_i;
   start_j=c->continue_j;
-
-    for (int i=start_i;i<c->n;i++){
-      if (pFDeg(c->S->m[i])>c->current_degree)
-      {
+#ifndef DIAGONAL_GOING
+  for (int i=start_i;i<c->n;i++){
+    if (c->T_deg[i]>c->current_degree)
+    {
+      c->skipped_pairs++;
+      continue;
+    }
+    for(int j=(i==start_i)?start_j+1:0;j<i;j++){
+      // printf("searching at %d,%d",i,j);
+      if (c->misses_counter>=2) {
 	c->skipped_pairs++;
-	continue;
-      }
-      for(int j=(i==start_i)?start_j+1:0;j<i;j++){
-	// printf("searching at %d,%d",i,j);
-	if (c->misses_counter>=2) {
-	  c->skipped_pairs++;
-	  break;
+	break;
 	}
-	if (c->states[i][j]==UNCALCULATED){
-	  if(c->deg[i][j]<=c->current_degree)
+      if (c->states[i][j]==UNCALCULATED){
+	if(c->deg[i][j]<=c->current_degree)
+	{
+	  c->continue_i=c->found_i=i;
+	  c->continue_j=c->found_j=j;
+	  return true;
+	}
+	  else
+	  {
+	    ++(c->skipped_pairs);
+	  }
+      }
+    }
+      c->misses_counter=0;
+  }
+
+
+  if (!((start_i==1) &&(start_j==0))){
+    c->continue_i=1;
+    c->continue_j=0;
+    return find_next_pair(c);
+  }
+
+#else
+  int z=0;
+  i=start_i;
+  j=start_j;
+  z=start_i+start_j;
+  while(z<=(2*c->n-3)){
+   
+    while(i>j){
+      if(i>=c->n) {
+        if (c->skipped_i<0) c->skipped_i=i;
+      } else{
+        if(c->states[i][j]==UNCALCULATED){
+	  if (c->deg[i][j]<=c->current_degree)
 	  {
 	    c->continue_i=c->found_i=i;
 	    c->continue_j=c->found_j=j;
@@ -87,40 +146,16 @@ bool find_next_pair(calc_dat* c)
 	  {
 	    ++(c->skipped_pairs);
 	  }
-	}
+        }
       }
-      c->misses_counter=0;
+      --i;
+      ++j;
     }
-//   int z=0;
-//   i=start_i;
-//   j=start_j;
-//   z=start_i+start_j;
-//   while(z<=(2*c->n-3)){
-   
-//     while(i>j){
-//       if(i>=c->n) {
-//         if (c->skipped_i<0) c->skipped_i=i;
-//       } else{
-//         if(c->states[i][j]==UNCALCULATED){
-// 	  if (c->deg[i][j]<=c->current_degree)
-// 	  {
-// 	    c->continue_i=c->found_i=i;
-// 	    c->continue_j=c->found_j=j;
-// 	    return true;
-// 	  }
-// 	  else
-// 	  {
-// 	    ++(c->skipped_pairs);
-// 	  }
-//         }
-//       }
-//       --i;
-//       ++j;
-//     }
-//     ++z;
-//     i=z;
-//     j=0;
-//   }
+    ++z;
+    i=z;
+    j=0;
+  }
+#endif
   if (c->skipped_pairs>0){
     ++(c->current_degree);
     c->skipped_pairs=0;
@@ -132,13 +167,16 @@ bool find_next_pair(calc_dat* c)
 }
 void replace_pair(int & i, int & j, calc_dat* c)
 {
+  c->soon_free=NULL;
   int curr_deg;
   poly lm=pOne();
   
   pLcm(c->S->m[i], c->S->m[j], lm);
   pSetm(lm);
+  int deciding_deg= pFDeg(lm);
   int* i_con =make_connections(i,lm,c);
-
+  int z=0;
+  
   for (int n=0;((n<c->n) && (i_con[n]>=0));n++){
     if (i_con[n]==j){
 //       curr_deg=pFDeg(lm);
@@ -172,19 +210,41 @@ void replace_pair(int & i, int & j, calc_dat* c)
   pSetm(lm);
   poly short_s;
   curr_deg=pFDeg(lm);
+  int_pair_node* last=NULL;
+  
   for (int n=0;((n<c->n) && (j_con[n]>=0));n++){
     for (int m=0;((m<c->n) && (i_con[m]>=0));m++){
       pLcm(c->S->m[i_con[m]], c->S->m[j_con[n]], lm);
       pSetm(lm);
-      int comp_deg=pFDeg(lm);
+      if (pFDeg(lm)>=deciding_deg)
+      {
+	int_pair_node* h= (int_pair_node*)omalloc(sizeof(int_pair_node));
+	if (last!=NULL)
+	  last->next=h;
+	else
+	  c->soon_free=h;
+	h->next=NULL;
+	h->a=i_con[m];
+	h->b=j_con[n];
+	last=h;
+      }
       //      if ((comp_deg<curr_deg)
       //  ||
       //  ((comp_deg==curr_deg) &&
       short_s=ksCreateShortSpoly(c->S->m[i_con[m]],c->S->m[j_con[n]],c->r);
       if (short_s==NULL) {
-        p_Delete(&short_s,c->r);
-        continue;
+	i=i_con[m];
+	j=j_con[n];
+	now_t_rep(i_con[m],j_con[n],c);
+	p_Delete(&lm,c->r);
+	omfree(i_con);
+	omfree(j_con);
+	
+	return;
+        
       }
+#ifdef QUICK_SPOLY_TEST
+	 
       for (int dz=0;dz<=c->n;dz++){
         if (dz==c->n) {
           //have found not head reducing pair
@@ -199,6 +259,8 @@ void replace_pair(int & i, int & j, calc_dat* c)
         }
         if (p_LmDivisibleBy(c->S->m[dz],short_s,c->r)) break;
       }
+#endif
+      int comp_deg(pFDeg(short_s));
       p_Delete(&short_s,c->r);
       if ((comp_deg<curr_deg)
           ||
@@ -228,6 +290,7 @@ void replace_pair(int & i, int & j, calc_dat* c)
 int* make_connections(int from, poly bound, calc_dat* c)
 {
   ideal I=c->S;
+  int s=pFDeg(bound);
   int* cans=(int*) omalloc(c->n*sizeof(int));
   int* connected=(int*) omalloc(c->n*sizeof(int));
   int cans_length=0;
@@ -235,6 +298,7 @@ int* make_connections(int from, poly bound, calc_dat* c)
   int connected_length=1;
   long neg_bounds_short= ~p_GetShortExpVector(bound,c->r);
   for (int i=0;i<c->n;i++){
+    if (c->T_deg[i]>s) continue;
     if (i!=from){
       if(p_LmShortDivisibleBy(I->m[i],c->short_Exps[i],bound,neg_bounds_short,c->r)){
         cans[cans_length]=i;
@@ -269,6 +333,8 @@ int* make_connections(int from, poly bound, calc_dat* c)
 void initial_data(calc_dat* c){
   void* h;
   int i,j;
+  c->misses_series=0;
+  c->soon_free=NULL;
   c->misses_counter=0;
   c->max_misses=0;
   c->normal_forms=0;
@@ -276,12 +342,13 @@ void initial_data(calc_dat* c){
   c->skipped_pairs=0;
   int n=c->S->idelems();
   c->n=n;
+  c->T_deg=(int*) omalloc(n*sizeof(int));
   c->continue_i=0;
   c->continue_j=0;
   c->skipped_i=-1;
-  h=omalloc(n*sizeof(int*));
+  h=omalloc(n*sizeof(char*));
   if (h!=NULL){
-    c->states=(int**) h;
+    c->states=(char**) h;
   } else {
     exit(1);
   }
@@ -302,11 +369,12 @@ void initial_data(calc_dat* c){
   }
   c->short_Exps=(long*) omalloc(n*sizeof(long));
   for (i=0;i<n;i++){
+    c->T_deg[i]=pFDeg(c->S->m[i]);
     c->lengths[i]=pLength(c->S->m[i]);
     c->misses[i]=0;
-    h=omalloc(i*sizeof(int));
+    h=omalloc(i*sizeof(char));
     if (h!=NULL){
-      c->states[i]=(int*) h;
+      c->states[i]=(char*) h;
     } else {
       exit(1);
     }
@@ -324,7 +392,7 @@ void initial_data(calc_dat* c){
       c->states[i][j]=HASTREP;
     c->rep[i]=i;
     c->short_Exps[i]=p_GetShortExpVector(c->S->m[i],c->r);
-
+    
   }
 
 
@@ -347,6 +415,8 @@ void add_to_basis(poly h, int i_pos, int j_pos,calc_dat* c){
   ++(c->S->ncols);
   int i,j;
   i=c->n-1;
+  c->T_deg=(int*) omrealloc(c->T_deg,c->n*sizeof(int));
+  c->T_deg[i]=pFDeg(h);
   hp=omrealloc(c->rep, c->n *sizeof(int));
   if (hp!=NULL){
     c->rep=(int*) hp;
@@ -364,17 +434,17 @@ void add_to_basis(poly h, int i_pos, int j_pos,calc_dat* c){
   c->misses=(int*) omrealloc(c->misses,c->n*sizeof(int));
   c->misses[i]=0;
   c->lengths[i]=pLength(h);
-  hp=omrealloc(c->states, c->n * sizeof(int*));
+  hp=omrealloc(c->states, c->n * sizeof(char*));
   if (hp!=NULL){
-    c->states=(int**) hp;
+    c->states=(char**) hp;
   } else {
     exit(1);
   }
   c->deg=(int**) omrealloc(c->deg, c->n * sizeof(int*));
   c->rep[i]=i;
-  hp=omalloc(i*sizeof(int));
+  hp=omalloc(i*sizeof(char));
   if (hp!=NULL){
-    c->states[i]=(int*) hp;
+    c->states[i]=(char*) hp;
   } else {
     exit(1);
   }
@@ -520,8 +590,9 @@ void do_this_spoly_stuff(int i,int j,calc_dat* c){
     c->misses_counter++;
     c->misses[i]++;
     c->misses[j]++;
+    c->misses_series++;
   } else {
-    
+    c->misses_series=0;
     add_to_basis(hr, i,j,c);
   }
 }
@@ -536,6 +607,7 @@ ideal t_rep_gb(ring r,ideal arg_I){
   initial_data(c);
   while (find_next_pair(c)){
     int i,j;
+    int z;
     i=c->found_i;
     j=c->found_j;
     replace_pair(i,j,c);
@@ -547,6 +619,21 @@ ideal t_rep_gb(ring r,ideal arg_I){
     
     now_t_rep(i,j,c);
     now_t_rep(c->found_i,c->found_j,c);
+#ifdef RANDOM_WALK
+    c->continue_i=my_rand(c->n-1)+1;
+    c->continue_j=my_rand(c->continue_i);
+#endif
+    int_pair_node* h=c->soon_free;
+    while(h!=NULL)
+    {
+      int_pair_node* s=h;
+      now_t_rep(h->a,h->b,c);
+      
+      h=h->next;
+      omfree(s);
+    }
+  
+
   }
   omfree(c->rep);
   for(int z=0;z<c->n;z++){
@@ -597,3 +684,26 @@ int pLcmDeg(poly a, poly b)
   return n;
 
 }
+int pMinDeg3(poly f){
+  if (f==NULL){
+    return(-1);
+    
+  }
+  
+  poly h=f->next;
+  int n=pFDeg(h);
+  int i=0;
+  while((i<2)){
+    if (h==NULL)
+      return(n);
+    h=h->next;
+    if (h!=NULL){
+      n=min(n,pFDeg(h));
+    }
+    i++;
+  }
+    
+  return n;
+}
+
+
