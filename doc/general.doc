@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.45 1998-05-08 16:03:17 obachman Exp $
+@comment $Id: general.doc,v 1.46 1998-05-11 07:47:08 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -941,6 +941,20 @@ minimizes a free resolution of an ideal or module
 @ref{factorize}@*
 @item @code{gcd}
 @ref{gcd}@*
+@end table
+@item @strong{Commands for matrices}
+@table @asis
+@item @code{bareiss}
+@ref{bareiss}@*
+@item @code{det}
+@ref{det}@*
+@item @code{resultant}
+@ref{resultant}@*
+@end table
+@item @strong{Commands to compute characteristic sets}
+@table @asis
+@item @code{char_series}
+@ref{char_series}@*
 @end table
 @end table
 
