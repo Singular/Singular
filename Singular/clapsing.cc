@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.41 1998-10-05 17:24:04 Singular Exp $
+// $Id: clapsing.cc,v 1.42 1998-10-09 12:29:37 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -510,8 +510,8 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
         if (with_exps==0)
           N=nCopy(n0);
         pCleardenom(f);
-	NN=nDiv(n0,pGetCoeff(f));
-	nDelete(&n0);
+        NN=nDiv(n0,pGetCoeff(f));
+        nDelete(&n0);
         if (with_exps==0)
         {
           nDelete(&N);
@@ -772,24 +772,39 @@ char* singclap_neworder ( ideal I)
   ListIterator<int> Li;
   StringSet("");
   Li = IL;
-  int* mark=(int*)Alloc0(pVariables*sizeof(int));
-  int cnt=pVariables;
+  int offs=rPar(currRing);
+  int* mark=(int*)Alloc0((pVariables+offs)*sizeof(int));
+  int cnt=pVariables+offs;
   loop
   {
     i=Li.getItem()-1;
     mark[i]=1;
-    StringAppend(currRing->names[i]);
+    if (i<offs)
+    {
+      StringAppend(currRing->parameter[i]);
+    }
+    else
+    {
+      StringAppend(currRing->names[i-offs]);
+    }
     Li++;
     cnt--;
     if(cnt==0) break;
     StringAppend(",");
     if(! Li.hasItem()) break;
   }
-  for(i=0;i<pVariables;i++)
+  for(i=0;i<pVariables+offs;i++)
   {
     if(mark[i]==0)
     {
-      StringAppend(currRing->names[i]);
+      if (i<offs)
+      {
+        StringAppend(currRing->parameter[i]);
+      }
+      else
+      {
+        StringAppend(currRing->names[i-offs]);
+      }
       cnt--;
       if(cnt==0) break;
       StringAppend(",");
