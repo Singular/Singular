@@ -1718,10 +1718,10 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
   //  r=sySchreyerResolvente((ideal)u->Data(),maxl+1,&l);
     r=sySchreyer((ideal)u->Data(),maxl+1);
   else /* LRES */
-  { 
+  {
     int dummy;
     r=syLaScala3((ideal)u->Data(),&dummy);
-  } 
+  }
   if (r==NULL) return TRUE;
   //res->data=(void *)liMakeResolv(r,l,wmaxl,u->Typ(),weights);
   r->list_length=wmaxl;
@@ -2515,9 +2515,9 @@ static BOOLEAN jjLEADEXP(leftv res, leftv v)
   intvec *iv=new intvec(pVariables);
   if (p!=NULL)
   {
-    for(int i=0;i<pVariables;i++)
+    for(int i=pVariables;i>0;i--)
     {
-      (*iv)[i]=pGetExp(p,i+1);
+      (*iv)[i]=pGetExp(p,i);
     }
   }
   res->data=(char *)iv;
@@ -2535,10 +2535,10 @@ static BOOLEAN jjMEMORY(leftv res, leftv v)
     res->data = (char *)mmMemReal();
     break;
 #ifdef HAVE_SBRK
-      case 2:
-        res->data = (char *)mmMemPhysical();
-        break;
-#endif       
+  case 2:
+    res->data = (char *)mmMemPhysical();
+    break;
+#endif
   default:
 #ifdef MM_STAT
     mmStat((int)v->Data());
@@ -3090,7 +3090,7 @@ struct sValCmd1 dArith1[]=
 // and the procedures with 1 argument:
 ,{atATTRIB1,    ATTRIB_CMD,      NONE,           DEF_CMD }
 ,{jjBAREISS_IM, BAREISS_CMD,     INTMAT_CMD,     INTMAT_CMD }
-,{jjBAREISS,    BAREISS_CMD,     LIST_CMD,     MATRIX_CMD }
+,{jjBAREISS,    BAREISS_CMD,     LIST_CMD,       MATRIX_CMD }
 ,{jjBETTI,      BETTI_CMD,       INTMAT_CMD,     LIST_CMD }
 ,{jjBETTI_R,    BETTI_CMD,       XS(INTMAT_CMD), RESOLUTION_CMD }
 ,{jjCHAR,       CHARACTERISTIC_CMD, INT_CMD,     RING_CMD }
