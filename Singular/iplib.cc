@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.45 1998-12-09 16:40:23 Singular Exp $ */
+/* $Id: iplib.cc,v 1.46 1998-12-10 08:50:34 krueger Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -9,7 +9,7 @@
 //#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-//#include <ctype.h>
+#include <ctype.h>
 #include <sys/stat.h>
 
 #include "mod2.h"
@@ -49,6 +49,7 @@ void print_init();
 libstackv library_stack;
 #endif
 
+//int IsCmd(char *n, int tok);
 char mytolower(char c);
 
 
@@ -591,7 +592,7 @@ BOOLEAN iiEStart(char* example, procinfo *pi)
 }
 
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
-static BOOLEAN iiLoadLIB(FILE *fp, char *libnamebuf,
+static BOOLEAN iiLoadLIB(FILE *fp, char *libnamebuf, char *newlib,
                          idhdl pl, BOOLEAN autoexport, BOOLEAN tellerror);
 
 BOOLEAN iiTryLoadLib(leftv v, char *id)
@@ -638,7 +639,8 @@ BOOLEAN iiReLoadLib(idhdl packhdl)
     return TRUE;
   }
   namespaceroot->push(IDPACKAGE(packhdl), IDID(packhdl));
-  LoadResult = iiLoadLIB(fp, libnamebuf, packhdl, FALSE, FALSE);
+  LoadResult = iiLoadLIB(fp, libnamebuf, IDPACKAGE(packhdl)->libname,
+                         packhdl, FALSE, FALSE);
   namespaceroot->pop();
 #else /* HAVE_NAMESPACES */
 #endif /* HAVE_NAMESPACES */
@@ -760,14 +762,14 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
     }
   }
   namespaceroot->push(IDPACKAGE(pl), IDID(pl));
-  LoadResult = iiLoadLIB(fp, libnamebuf, pl, autoexport, tellerror);
+  LoadResult = iiLoadLIB(fp, libnamebuf, newlib, pl, autoexport, tellerror);
 #else /* HAVE_NAMESPACES */
-  LoadResult = iiLoadLIB(fp, libnamebuf, NULL, FALSE, tellerror);
+  LoadResult = iiLoadLIB(fp, libnamebuf, newlib, NULL, FALSE, tellerror);
 #endif /* HAVE_NAMESPACES */
   
 #ifdef HAVE_NAMESPACES
   if(!LoadResult) IDPACKAGE(pl)->loaded = TRUE;
-  close(fp);
+  fclose(fp);
   namespaceroot->pop();
 #endif /* HAVE_NAMESPACES */
 
@@ -779,11 +781,10 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
 }
 
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
-static BOOLEAN iiLoadLIB(FILE *fp, char *libnamebuf,
+static BOOLEAN iiLoadLIB(FILE *fp, char *libnamebuf, char*newlib,
              idhdl pl, BOOLEAN autoexport, BOOLEAN tellerror)
 {
   char buf[256];
-  char *newlib = IDPACKAGE(pl)->libname;
   extern FILE *yylpin;
   libstackv ls_start = library_stack;
   lib_style_types lib_style;
@@ -1125,7 +1126,7 @@ libstackv libstack::pop(char *p)
 
 lib_types type_of_LIB(char *newlib, char *libnamebuf)
 {
-  unsigned char	buf[HOWMANY+1];	/* one extra for terminating '\0' */
+  char	buf[HOWMANY+1];	/* one extra for terminating '\0' */
   struct stat sb;
   int nbytes = 0;
   int ret;
@@ -1159,7 +1160,7 @@ lib_types type_of_LIB(char *newlib, char *libnamebuf)
   if(isprint(buf[0])) { LT = LT_SINGULAR; goto lib_type_end; }
   
   lib_type_end:
-  close(fp);
+  fclose(fp);
   return LT;
 }
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
