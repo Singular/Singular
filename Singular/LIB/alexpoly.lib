@@ -2,7 +2,7 @@ version="$I@comment d:$";
 category="Singularities";
 info="
 LIBRARY:  alexpoly.lib   Resolution Graph and Alexander Polynomial
-AUTHOR:   Fernando Hernando Carrillo, hernando@mathematik.uni-kl.de
+AUTHOR:   Fernando Hernando Carrillo, hernando@agt.uva.es
           Thomas Keilen,   keilen@mathematik.uni-kl.de
 
 OVERVIEW:
@@ -15,8 +15,12 @@ PROCEDURES:
  resolutiongraph(f);        resolution graph f
  totalmultiplicities(f);    resolution graph, total multiplicities and strict multiplicities of f
  alexpoly(f);               Alexander polynomial of f
- charexp2multseq(v);        converts characteristical exponents to multiplicity sequence 
- multseq2charexp (v);       converts multiplicity sequence to characteristical exponents
+ semigroup(f);              calculates generators for the semigroup of f
+ multseq2charexp(v);        converts multiplicity sequence to characteristic exponents
+ charexp2multseq(v);        converts characteristic exponents to multiplicity sequence 
+ charexp2generators(v);     converts characteristic exponents to generators of the semigroup
+ charexp2inter(c,e);        converts contact matrix and charact. exp. to intersection matrix
+ charexp2conductor(v);      converts characteristic exponents to conductor 
  charexp2poly(v,a);         calculates a polynomial f with characteristic exponents v
  tau_es(f);                 equsingular Tjurina number of f
 
@@ -35,9 +39,9 @@ ASSUME:  INPUT is either a bivariate polynomial defining a plane curve singulari
          or the output of @code{hnexpansion(f[,\"ess\"])}, or the list @code{hne} in
          the ring created by @code{hnexpansion(f[,\"ess\"])}, or the output of
          @code{develop(f)} resp. of @code{extdevelop(f,n)}, or a list containing 
-         the contact matrix and a list of integer vectors with the characteristical exponents 
+         the contact matrix and a list of integer vectors with the characteristic exponents 
          of the branches of a plane curve singularity, or an integer vector containing the
-         characteristical exponents of an irreducible plane curve singularity.
+         characteristic exponents of an irreducible plane curve singularity.
 RETURN:  intmat, the incidence matrix of the resolution graph of the plane curve 
          defined by INPUT, where the entries on the diagonal are the weights of the 
          vertices of the graph and a negative entry corresponds to the strict transform 
@@ -70,9 +74,9 @@ ASSUME:  INPUT is either a bivariate polynomial defining a plane curve singulari
          or the output of @code{hnexpansion(f[,\"ess\"])}, or the list @code{hne} in
          the ring created by @code{hnexpansion(f[,\"ess\"])}, or the output of
          @code{develop(f)} resp. of @code{extdevelop(f,n)}, or a list containing 
-         the contact matrix and a list of integer vectors with the characteristical exponents 
+         the contact matrix and a list of integer vectors with the characteristic exponents 
          of the branches of a plane curve singularity, or an integer vector containing the
-         characteristical exponents of an irreducible plane curve singularity.
+         characteristic exponents of an irreducible plane curve singularity.
 RETURN:  list @code{L} of three integer matrices. @code{L[1]} is the incidence matrix of 
          the resolution graph of the plane curve defined by INPUT, where the entries on the 
          diagonal are the weights of the vertices of the graph and a negative entry corresponds
@@ -111,7 +115,7 @@ EXAMPLE: example totalmultiplicities;  shows an example
   else
   {
     ///////////////////////////////////////////////////////////////////////////////////
-    // Input: the vector of characteristical exponents of an irreducible plane curve
+    // Input: the vector of characteristic exponents of an irreducible plane curve
     ///////////////////////////////////////////////////////////////////////////////////
     if (typeof(INPUT)=="intvec")
     {
@@ -124,7 +128,7 @@ EXAMPLE: example totalmultiplicities;  shows an example
       if (typeof(INPUT)=="list")
       {
         /////////////////////////////////////////////////////////////////////////////////
-        // Input: intersection-matrix and characteristical exponents.
+        // Input: intersection-matrix and characteristic exponents.
         //////////////////////////////////////////////////////////////////////////////
         if (typeof(INPUT[1])=="intmat")    
         { 
@@ -169,7 +173,7 @@ EXAMPLE: example totalmultiplicities;  shows an example
   if (defined(I@N@V))
   {
     intmat contact=I@N@V[size(I@N@V)][1];   // contact numbers
-    list charexp;                       // characteristical exponents
+    list charexp;                       // characteristic exponents
     for (i=1;i<=size(I@N@V)-1;i++)
     {
       charexp[i]=I@N@V[i][1];
@@ -393,9 +397,9 @@ ASSUME:  INPUT is either a bivariate polynomial defining a plane curve singulari
          or the output of @code{hnexpansion(f[,\"ess\"])}, or the list @code{hne} in
          the ring created by @code{hnexpansion(f[,\"ess\"])}, or the output of
          @code{develop(f)} resp. of @code{extdevelop(f,n)}, or a list containing 
-         the contact matrix and a list of integer vectors with the characteristical exponents 
+         the contact matrix and a list of integer vectors with the characteristic exponents 
          of the branches of a plane curve singularity, or an integer vector containing the
-         characteristical exponents of an irreducible plane curve singularity.
+         characteristic exponents of an irreducible plane curve singularity.
 CREATE:  a ring with variables t, t(1), ..., t(r) (where r is the number of branches of
          the plane curve singularity f defined by INPUT) and ordering ls over the
          ground field of the basering. @*
@@ -508,15 +512,304 @@ example
   zeta_monodromy;
 }
 
+proc semigroup (def INPUT)    
+"USAGE:    semigroup(INPUT); INPUT poly or list
+ASSUME:   INPUT is either a bivariate polynomial defining a plane curve singularity,
+          or the output of @code{hnexpansion(f[,\"ess\"])}, or the list @code{hne} in
+          the ring created by @code{hnexpansion(f[,\"ess\"])}, or the output of
+          @code{develop(f)} resp. of @code{extdevelop(f,n)}, or a list containing 
+          the contact matrix and a list of integer vectors with the characteristic exponents 
+          of the branches of a plane curve singularity, or an integer vector containing 
+          the characteristic exponents of an irreducible plane curve singularity.
+RETURN:   a list with three entries. The first and the second are lists @code{\{v_1,...,v_s\}}
+          and @code{\{w_1,...,w_r\}} respectively of integer vectors such that the semigroup
+          of the plane curve defined by the INPUT is generated by the vectors
+          @code{v_1,...,v_s,w_1+k*e_1,...,w_r+k*e_r}, where e_i denotes the i-th standard
+          basis vector and k runs through all natural numbers. The thrid entry is the conductor
+          of the plane curve singularity. Note that r is the number of branches of the plane curve
+          singularity and integer vectors thus have size r.
+NOTE:     If the output is zero this means that the curve has one branch and is regular.
+          In the reducible case the set of generators may not be minimal.
+SEE ALSO: resolutiongraph, totalmultiplicities
+EXAMPLE:  example semigroup;  shows an example
+"  
+{
+  // Procedure mainly by Fernando
+  intvec conductor;
+  list charexp;
+  int i,j;
+  /////////////////////////////////////////////////////////////////////////////////
+  // Decide, which kind of input we have, and define the contact matrix
+  /////////////////////////////////////////////////////////////////////////////////
+  // Input: a polynomial defining a plane curve singularity.
+  //////////////////////////////////////////////////////////////////////////////
+  if (typeof(INPUT)=="poly")
+  {
+    list I@N@V=invariants(INPUT);
+  }
+  else
+  {
+    ///////////////////////////////////////////////////////////////////////////////////
+    // Input: the vector of characteristic exponents of an irreducible plane curve
+    ///////////////////////////////////////////////////////////////////////////////////
+    if (typeof(INPUT)=="intvec")
+    {
+      // Calculate the semigroup and the conductor directly.
+      conductor[1]=charexp2conductor(INPUT);
+      intvec gener=charexp2generators(INPUT);
+      list genera;
+      for (i=1;i<=size(gener);i++)
+      {
+        genera[i]=gener[i];
+      }
+      return(list(genera,list(),conductor));
+    }
+    else
+    {      
+      if (typeof(INPUT)=="list")
+      {
+        /////////////////////////////////////////////////////////////////////////////////
+        // Input: intersection-matrix and characteristic exponents.
+        //////////////////////////////////////////////////////////////////////////////
+        if (typeof(INPUT[1])=="intmat")    
+        { 
+          intmat contact=INPUT[1];
+          charexp=INPUT[2];
+          int n=ncols(contact); // to know how many branches we have	 
+          intmat intersecmult=charexp2inter(contact,charexp);
+          for(i=1;i<=ncols(contact);i++)
+          {
+            conductor[i]=charexp2conductor(charexp[i]);//list with the characteristic exponents
+          }
+        }
+        else
+        {
+          /////////////////////////////////////////////////////////////////////////////////
+          // Input: output of hnexpansion or hne in the ring created by hnexpansion
+          //////////////////////////////////////////////////////////////////////////////
+          if ((typeof(INPUT[1])=="ring") or (typeof(INPUT[1])=="list"))
+          {
+            list I@N@V=invariants(INPUT);
+          }
+          else
+          {
+            ////////////////////////////////////////////////////////////////////////////////////
+            // Input: output of develop or extdevelop -- irreducible plane curve singularity
+            ////////////////////////////////////////////////////////////////////////////////////
+            if (typeof(INPUT[1])=="matrix")
+            {
+              return(semigroup(invariants(INPUT)[1]));
+            }
+            else
+            {
+              ERROR("The input is invalid!");
+            }
+          }
+        }
+      }
+      else
+      {
+        ERROR("The input is invalid!");
+      }
+    }
+  }
+  ///////////////////////////////////////////////////////////////////////////////////////////////////
+  // If the input was a poly or an HN-Expansion, then calculate the contact matrix and char.exponents.
+  ///////////////////////////////////////////////////////////////////////////////////////////////////
+  if (defined(I@N@V))
+  {
+    int n =size(I@N@V)-1;// number of branches
+    // If the singularity is irreducible, then we calculate the semigroup directly.
+    if (n==1)
+    {
+      return(semigroup(I@N@V[1][1]));
+    }
+    // If the singularity is not irreducible, then we go on.
+    intmat contact=I@N@V[size(I@N@V)][1];   // contact numbers
+    intmat intersecmult=I@N@V[size(I@N@V)][2];   // intersection multiplicities
+    for(i=1;i<=n;i++)
+	{
+	  conductor[i]=I@N@V[i][5];
+      charexp[i]=I@N@V[i][1];
+	}
+  }
+  /////////////////////////////////////////////////////////////////////////////////////
+  //compute the conductor of the curve, in the case of one branch is already calculated
+  /////////////////////////////////////////////////////////////////////////////////////
+  for(i=1;i<=size(conductor);i++)
+  {
+    for(j=1;j<=size(conductor);j++)
+	{
+	  conductor[i]=conductor[i]+intersecmult[i,j];
+	}
+  }
+  ///////////////////////////////////////////////////////////////////////
+  list L=totalmultiplicities(list(contact,charexp));//save in L the incidence matrix and the matrix of totalmultiplicities
+  intmat M=L[1];//incidence matrix
+  intmat multi=L[2];//totalmultipicities
+  //define variables
+  list S,S1,result;
+  int a,b,posicion,temp,boolean;
+  intvec vect;
+  if(nrows(M)==1)
+  {
+    return(S);
+  }
+  else
+  {
+    /////////////include the first rows, because always is different to zero
+    for(j=1;j<=ncols(multi);j++)
+    {
+      vect[j]=multi[1,j];
+    }
+    S[1]=vect;
+    ////////////////////////////////
+    a=2;//the position in the output 
+    // we include in the list the nonzero elements of the matrix totalmultiplicities
+    // iff they are not multiple of one of the other nonzero elements.     
+    for(i=1;i<=nrows(multi);i++)//for each row in the totalmultiplicities
+    {
+      for(j=1;j<=ncols(multi);j++)
+      {
+        vect[j]=multi[i,j];//save in vect the vector of totalmultiplicities 
+        //of each divisor
+      }
+      if(vect<>0)// if such a vector is different to zero
+      {
+        j=1;
+        boolean=0;
+        while(boolean==0 and j<a)
+        {
+          temp=comparevectors(vect,S[j]);// compare if the vector is multiple of another  one
+          if(temp==0)
+          {
+            j=j+1;
+          }
+          else
+          {
+            boolean=1;
+          }
+        }
+        if(boolean==0)
+        {
+          S[a]=vect;// if it is not multiple we include it in our list
+          a=a+1;
+        }
+      }    
+    }     
+    //Now we have to include the totalmultiplicities of the divisor which intersect the curves
+    //adding  them the vectors(0,...,0,k,0,...,0), but in other list S1
+    a=1;//initialize the new list S1 to the first position
+    if(ncols(multi)>=2)// only if we have more than one branch
+    {
+      b=1;
+      for(i=1;i<=nrows(M);i++)
+      {
+        j=1;
+        if(M[i,i]<0)//check which are the curves
+        {
+          while(1)
+          {
+            if(M[i,j]==1)// wheck with which divisor is joined
+            {
+              posicion=j;// save the position of such a divisor
+              break;
+            }
+            else
+            {
+              j=j+1;
+            }
+          }
+          for(j=1;j<=ncols(multi);j++)
+          {
+            vect[j]=multi[posicion,j];//save in vect the totalmultiplicities
+            //of the divisor we have detected.
+          }		
+          S1[a]=vect;
+          a=a+1;
+          b=b+1;
+        }
+      }
+    }
+  }
+  //////////////////////////////////////////////
+  //put in the final list the semigroup together with the conductor
+  result[1]=S;
+  result[2]=S1;
+  result[3]=conductor;
+  ///////////////////////////////////////////////
+  return(result);
+}
+example
+{
+  "EXAMPLE:";
+  echo=2;
+  ring r=0,(x,y),ls;
+  // Irreducible Case 
+  semigroup((x2-y3)^2-4x5y-x7);
+  // In the irreducible case, invariants() also calculates a minimal set of 
+  // generators of the semigroup.
+  invariants((x2-y3)^2-4x5y-x7)[1][2];
+  // Reducible Case
+  poly f=(y2-x3)*(y2+x3)*(y4-2x3y2-4x5y+x6-x7);
+  semigroup(f);
+}
+
+proc charexp2generators (intvec charexp)
+"USAGE:      charexp2generators(v),  v intvec
+ASSUME:      v contains the characteristic exponents of an irreducible plane 
+             curve singularity
+RETURN:      intvec, the minimal set of generators of the semigroup of the plane curve singularity
+SEE ALSO:    invariants, resolutiongraph, totalmultiplicities, alexpoly
+KEYWORDS:    generators; semigroup; characteristic exponents; topological invariants
+EXAMPLE:     example charexp2generators;   shows an example"
+{
+  int end=size(charexp);
+  // If the singularity is smooth!
+  if (end==1)
+  {
+    return(1); 
+  }
+  int i,j;
+  intvec gener;
+  intvec GGT;   
+  for (i=1;i<=end;i++)
+  {
+    // Calculate the sequence of gcd's of the characteristic exponents.
+    if (i==1)
+    {
+      GGT[1]=charexp[1];
+    }
+    else
+    {
+      GGT[i]=gcd(GGT[i-1],charexp[i]);
+    }
+    // Calculate the generators.
+    gener[i]=charexp[i];
+    for (j=2;j<=i-1;j++)
+    {
+      gener[i]=gener[i]+((GGT[j-1]-GGT[j])/GGT[i-1])*charexp[j];
+    }    
+  }
+  return(gener);
+}
+example
+{
+  "EXAMPLE:";
+  echo=2;
+  charexp2generators(intvec(28,64,66,77));
+}
+
+
 proc charexp2multseq (intvec charexp)
 "USAGE:      charexp2multseq(v),  v intvec
-ASSUME:      v contains the charakteristical exponents of an irreducible plane 
+ASSUME:      v contains the characteristic exponents of an irreducible plane 
              curve singularity
 RETURN:      intvec, the multiplicity sequence of the plane curve singularity
 NOTE:        If the curve singularity is smooth, then the multiplicity sequence is empty.
              This is expressed by returning zero.
 SEE ALSO:    invariants, resolutiongraph, totalmultiplicities, alexpoly
-KEYWORDS:    characteristical exponents; multiplicity sequence; topological invariants
+KEYWORDS:    characteristic exponents; multiplicity sequence; topological invariants
 EXAMPLE:     example charexp2multseq;   shows an example"
 {
   int end=size(charexp);
@@ -673,12 +966,107 @@ EXAMPLE: example multseq2charexp; shows an example.
 example
 {
   "EXAMPLE:";echo=2;
-  ring A=0,(x,y),dp;
   intvec v=2,1,1;
   multseq2charexp(v);
   intvec v1=4,2,2,1,1;
   multseq2charexp(v1);
 }
+
+proc charexp2inter (intmat contact, list charexp)
+"USAGE:      charexp2inter(contact,charexp),  contact matrix, charexp list
+ASSUME:      charexp contains the integer vectors of characteristic exponents
+             of the branches of a plane curve singularity, and contact is their
+             contact matrix
+RETURN:      intmat, the matrix intersection multiplicities of the branches
+SEE ALSO:    invariants, resolutiongraph, totalmultiplicities, semigroup
+KEYWORDS:    contact matrix, characteristic exponents, intersection multiplicity, topological invariants
+EXAMPLE:     example charexp2inter;   shows an example"
+{
+  int n=ncols(contact);
+  int i,j,k;
+  list multpl;
+  intvec max=0;
+  intmat inters[n][n];
+  // Calculate the multiplicity sequences of the branches.
+  for (i=1;i<=n;i++)
+  {
+    multpl[i]=charexp2multseq(charexp[i]);
+    // Find the maximal length of a multiplicity sequence.
+    if (max<size(multpl[i]))
+    {
+      max=size(multpl[i]);
+    }
+  } 
+  // Prolong them by 1s, in order to take care of higher contact.
+  for (i=1;i<=n;i++)
+  {
+    for (j=size(multpl[i]+1);j<=max;j++)
+    {
+      multpl[i][j]=1;
+    }
+  }
+  // Calculate the intersection numbers of the branches: for two branches f_i and f_j
+  // this is the sum over mult_k(f_i)*mult_k(f_j), where k runs over all infinitely 
+  // near points which f_i and f_j share, i.e. from 1 to contact[i,j].
+  for (i=1;i<=n;i++)
+  {
+    for (j=i+1;j<=n;j++)
+    {
+      for (k=1;k<=contact[i,j];k++)
+      {
+        inters[i,j]=inters[i,j]+multpl[i][k]*multpl[j][k];
+      }
+      inters[j,i]=inters[i,j];
+    }
+  }
+  return(inters);
+}
+example
+{
+  "EXAMPLE:";echo=2;
+  ring r=0,(x,y),ds;
+  list INV=invariants((x2-y3)*(x3-y2)*((x2-y3)^2-4x5y-x7));
+  intmat contact=INV[4][1];
+  list charexp=INV[1][1],INV[2][1],INV[3][1];
+  // The intersection matrix is INV[4][2].
+  print(INV[4][2]);
+  // And it is calulated as ...
+  print(charexp2inter(contact,charexp));
+}
+
+
+proc charexp2conductor(intvec B)  // Procedure written by Fernando
+"USAGE:      charexp2conductor(v),  v intvec
+ASSUME:      v contains the characteristic exponents of an irreducible plane 
+             curve singularity
+RETURN:      int, the conductor of the plane curve singularity
+NOTE:        If the curve singularity is smooth, the conductor is zero.
+SEE ALSO:    invariants, resolutiongraph, totalmultiplicities, semigroup
+KEYWORDS:    conductor, characteristic exponents; multiplicity sequence; topological invariants
+EXAMPLE:     example charexp2conductor;   shows an example"
+{
+  intvec E;
+  int i,conductor;
+  E[1]=B[1];
+  for(i=2;i<=size(B);i++)
+    {
+      E[i]=gcd(E[i-1],B[i]);
+    }
+  conductor=1-E[1];
+  for(i=2;i<=size(B);i++)
+    {
+      conductor=conductor+(B[i]*(E[i-1]-E[i]));
+    }
+  return(conductor);
+}
+example
+{
+  "EXAMPLE:";
+  echo=2;
+  charexp2conductor(intvec(2,3));  // A1-Singularity
+  charexp2conductor(intvec(28,64,66,77));
+}
+
 
 proc charexp2poly(intvec v, vector a)  // Procedure written by Fernando.
 "USAGE:  charexp2poly(v,a); intvec v, vector a.
@@ -736,15 +1124,15 @@ example
   invariants(f)[1][1];  // The characteristic exponents of f.
 }
 
-proc tau_es (def INPUT)
+proc tau_es (def INPUT, list #)
 "USAGE:  tau_es(INPUT); INPUT poly or list
 ASSUME:  INPUT is either a bivariate polynomial defining a plane curve singularity,
          or the output of @code{hnexpansion(f[,\"ess\"])}, or the list @code{hne} in
          the ring created by @code{hnexpansion(f[,\"ess\"])}, or the output of
          @code{develop(f)} resp. of @code{extdevelop(f,n)}, or a list containing 
-         the contact matrix and a list of integer vectors with the characteristical exponents 
+         the contact matrix and a list of integer vectors with the characteristic exponents 
          of the branches of a plane curve singularity, or an integer vector containing the
-         characteristical exponents of an irreducible plane curve singularity, or
+         characteristic exponents of an irreducible plane curve singularity, or
          the output of @code{totalmultiplicities(f)}, or a list containing the resolution graph
          and the (strict) multiplicities as in output of @code{totalmultiplicities(f)}.
 RETURN:  int, the equisingular Tjurina number of f, i. e. the codimension of the mu-constant
@@ -759,6 +1147,20 @@ SEE ALSO: develop, hnexpansion, totalmultiplicities
 EXAMPLE: example tau_es;  shows an example
 "
 {
+  // If the input is a weighted homogeneous polnomial, then use a direct algorithm to 
+  // calculate the equisingular Tjurina number, by caluclating a K-basis of the
+  // Tjurina algebra and omitting those elements with weighted degree at least the
+  // weighted degree of the polynomial. -- If an additional input # is given, 
+  // the procedure always uses the recursive algorithm.
+  if ((typeof(INPUT)=="poly") and (size(#)==0))
+  {
+    if (qhweight(INPUT)[1]!=0)
+    {
+      return(tau_es_qh(INPUT));
+    }
+  }
+  // Else apply the recursive algorithm from Eugenii Shustin, On Manifolds of Singular 
+  // Algebraic Curves, Selecta Math. Sov. Vol 10, No. 1 (1991), p. 31.
   int i;                  // Laufvariable
   int tau,multi,tau_i;    // Variable for es-Tjurina no., multiplicitiy, and es-Tjurina at blow ups 
   intmat resgr, multseq;  // resolution graph and multiplicity sequence
@@ -997,7 +1399,7 @@ NOTE:     This procedure is only for internal use; it is called by irred_resgrap
 
 static proc irred_resgraph_totmult (intvec charexp)
 "USAGE:   irred_resgraph_totmult(charexp); charexp intvec
-ASSUME:   charexp is an integer vector containg the characteristical exponents of
+ASSUME:   charexp is an integer vector containg the characteristic exponents of
           an irreducible plane curve singularity
 RETURN:   list L, L[1] is the incidence matrix of the resolution graph of the plane curve
           singularity defined by INPUT, and L[2] is its sequence of total multiplicities
@@ -1348,7 +1750,69 @@ NOTE:     This procedure is only for internal use; it is called in tau_es.
 }
 
 
+static proc comparevectors(intvec w,intvec v)
+"USAGE:    comparevectors(w,v), intvec w,v 
+RETURN:   int, 1, if w is an integer multiple of v, 0 else
+NOTE:     This procedure is only for internal use; it is called in semigroup.
+"
+{
+  int i,j,cociente,resto,boolean,temp,temp1;
 
+  if(size(v)<>size(w))
+  {
+    return("error, do not have the same size");
+  }
+  else
+  {
+    resto=w[1] mod v[1];
+    cociente=w[1] div v[1];
+    boolean=1;
+    i=1;
+    while(boolean==1 and i<=size(v) )
+	{
+	  temp=w[i] mod v[i];
+	  temp1=w[i] div v[i];
+	  if(temp==0 and temp1==cociente)
+      {
+        i=i+1;
+      }
+	  else
+      {
+        boolean=0;
+      }
+	}
+  }
+  return(boolean);
+}
+
+
+static proc tau_es_qh (poly f)
+"USAGE:    tau_es_qh(f), poly f
+RETURN:   int, equisingular Tjurina number
+NOTE:     This procedure is only for internal use; it is called in tau_es.
+"
+{
+  intvec qh=qhweight(f);
+  if (qh[1]==0)
+  {
+    ERROR("Input is not quasi-homogenous.");
+  }
+  else
+  {
+    int d_f = deg(f,qh);
+    list Tj=Tjurina(f,1);
+    ideal tj=Tj[2];
+    int Taues=size(tj);
+    for (int i=1;i<=size(tj);i++)
+    {
+      if (deg(tj[i],qh)>=d_f)
+      {
+        Taues--;
+      }
+    }
+  }
+  return(Taues);
+}
 
 
 
