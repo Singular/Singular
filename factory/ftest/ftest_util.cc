@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftest_util.cc,v 1.4 1997-09-25 08:00:53 schmidt Exp $ */
+/* $Id: ftest_util.cc,v 1.5 1997-09-29 13:14:56 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -73,14 +73,19 @@ struct ftestEnvT
 //   main().  Number of test circles.
 // ftestAlarm: set by ftestGetOpts() from acommandline, read by
 //   main().
+// ftestPrintFlag: set by ftestParseOutputType() from
+//   commandline, read by ftestPrintResult().  True iff there was
+//   some output type specifier on commandline.
 // ftestPrintResultFlag: set by ftestParseOutputType() from
-//   commandline, read by output routines. Whether to print result
+//   commandline, read by output routines.  Whether to print result
 //   or not.
 //
 //}}}
 int ftestCircle = 1;
 int ftestAlarm = 0;
-int ftestPrintResultFlag = 1;
+
+int ftestPrintFlag = 0;
+int ftestPrintResultFlag = 0;
 //}}}
 
 //{{{ static variables
@@ -89,9 +94,9 @@ int ftestPrintResultFlag = 1;
 // - static variables.
 //
 // ftestPrint*Flag: set by ftestParseOutputType() from
-//   commandline, read by output routines. Things to print/not to
-//   print.  Note that we need `ftestPrintResultFlag' to be
-//   external.
+//   commandline, read by output routines.  Things to print/not to
+//   print.  Note that we need `ftestPrintFlag' and
+//   `ftestPrintResultFlag' to be external.
 // ftestExecName, ftestAlgorithmName: set by ftestSetName(), read
 //   by output routines.  Name of executable and algorithm.
 // ftestUsage: set by ftestSetName(), read by ftestUsage().
@@ -106,7 +111,7 @@ int ftestPrintResultFlag = 1;
 static int ftestPrintTimingFlag = 0;
 static int ftestPrintCheckFlag = 0;
 static int ftestPrintEnvFlag = 0;
-static int ftestPrintShortFlag = 1;
+static int ftestPrintShortFlag = 0;
 
 const char * ftestExecName = 0;
 const char * ftestAlgorithmName = 0;
@@ -483,8 +488,7 @@ ftestParseEnv ( const char * tokenString )
 static void
 ftestParseOutputType ( const char * outputType )
 {
-    ftestPrintResultFlag = 0;
-    ftestPrintShortFlag = 0;
+    ftestPrintFlag = 1;
     while ( *outputType ) {
 	switch ( *outputType ) {
 	case 'r': ftestPrintResultFlag = 1; break;
@@ -560,17 +564,12 @@ ftestError ( const ftestErrorT errno, const char * format ... )
 	    ftestPrint( "time  : > %.2f\n", "> %.2f\n", (float)ftestAlarm );
 	if ( ftestPrintCheckFlag )
 	    ftestPrint( "check : TmeOut\n", "TmeOut\n" );
-	if ( ftestPrintResultFlag )
-	    ftestPrint( "result: <timeout> =\n0\n", "0\n" );
 	break;
     default:
 	if ( ftestPrintTimingFlag )
 	    ftestPrint( "time  : -0.00\n", "-0.00\n" );
 	if ( ftestPrintCheckFlag )
 	    ftestPrint( "check : Sig.%0.2d\n", "Sig.%0.2d\n", (int)errno-(int)SignalError );
-	if ( ftestPrintResultFlag )
-	    ftestPrint( "result: <signal %s> =\n0\n", "0\n",
-			strsignal( (int)errno-(int)SignalError ) );
     }
     exit( errno );
 }
