@@ -1,6 +1,6 @@
 //GMG last modified: 04/25/2000
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: linalg.lib,v 1.28 2002-03-08 10:30:56 mschulze Exp $";
+version="$Id: linalg.lib,v 1.29 2002-03-20 14:03:00 mschulze Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  linalg.lib  Algorithmic Linear Algebra
@@ -1590,7 +1590,7 @@ ASSUME:  eigenvalues of M in basefield
 RETURN:
 @format
 list l:
-  module l[1];  inverse(l[1])*M*l[1] Jordan normal form
+  module l[1];  Jordan normal form inverse(l[1])*M*l[1]
   intvec l[2]; 
     int l[2][i];  weight filtration index of l[1][i]
 @end format
@@ -1689,7 +1689,7 @@ proc jordanmatrix(ideal e,intvec s,intvec m)
 ASSUME:  ncols(e)==size(s)==size(m)
 RETURN:
 @format
-matrix J;  list(e,s,m)==jordan(J)
+matrix J;  Jordan matrix with list(e,s,m)==jordan(J)
 @end format
 EXAMPLE: example jordanmatrix; shows examples
 "

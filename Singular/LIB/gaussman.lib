@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.77 2002-03-08 10:30:56 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.78 2002-03-20 14:03:00 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -11,9 +11,9 @@ OVERVIEW: A library to compute Hodge-theoretic invariants
           of isolated hypersurface singularities
 
 PROCEDURES:
- gmsring(t,s);              Gauss-Manin connection of t with variable s
- gmsnf(p,K);                Gauss-Manin connection normal form of p
- gmscoeffs(p,K);            Gauss-Manin connection basis representation of p
+ gmsring(t,s);              Gauss-Manin system of t with variable s
+ gmsnf(p,K);                Gauss-Manin system normal form of p
+ gmscoeffs(p,K);            Gauss-Manin system basis representation of p
  monodromy(t);              Jordan data of monodromy of t
  spectrum(t);               singularity spectrum of t
  sppairs(t);                spectral pairs of t
@@ -112,7 +112,7 @@ ASSUME:   characteristic 0; local degree ordering;
           isolated critical point 0 of t
 RETURN:
 @format
-ring G;  Gauss-Manin connection of t with variable s
+ring G;  Gauss-Manin system of t with variable s
   poly gmspoly=t;
   ideal gmsjacob;  Jacobian ideal of t
   ideal gmsstd;  standard basis of Jacobian ideal
@@ -220,7 +220,7 @@ list nf;
   ideal nf[1];  projection of p to gmsbasis mod s^(K+1)
   ideal nf[2];  p=nf[1]+nf[2]
 @end format
-NOTE:     by setting p=nf[2] the computation can be continued
+NOTE:     the computation can be continued by setting p=nf[2]
 KEYWORDS: singularities; Gauss-Manin connection; Brieskorn lattice
 EXAMPLE:  example gmsnf; shows examples
 "
@@ -300,7 +300,7 @@ list l;
   matrix l[1];  gmsbasis representation of p mod s^(K+1)
   ideal l[2];  p=matrix(gmsbasis)*l[1]+l[2]
 @end format
-NOTE:     by setting p=l[2] the computation can be continued
+NOTE:     the computation can be continued by setting p=l[2]
 KEYWORDS: singularities; Gauss-Manin connection; Brieskorn lattice
 EXAMPLE:  example gmscoeffs; shows examples
 "
@@ -563,7 +563,7 @@ ASSUME:   characteristic 0; local degree ordering;
           isolated critical point 0 of t
 RETURN:
 @format
-list l=jordan(M);  Jordan data of monodromy matrix exp(-2*pi*i*M)
+list l;  Jordan data jordan(M) of monodromy matrix exp(-2*pi*i*M)
   ideal l[1]; 
     number l[1][i];  eigenvalue of i-th Jordan block of M
   intvec l[2]; 
@@ -1067,7 +1067,7 @@ proc tmatrix(poly t,list #)
 "USAGE:    tmatrix(t); poly t
 ASSUME:   characteristic 0; local degree ordering;
           isolated critical point 0 of t
-RETURN:   list A;  t-matrix A[1]+s*A[2] on H''
+RETURN:   list A;  matrix A[1]+s*A[2] of t on H''
 KEYWORDS: singularities; Gauss-Manin connection; Brieskorn lattice;
           mixed Hodge structure; opposite Hodge filtration; V-filtration
 EXAMPLE:  example tmatrix; shows examples
@@ -1260,9 +1260,9 @@ RETURN:
 @format
 list ev;  V-filtration on Jacobian algebra
   ideal ev[1];
-    number ev[1][i];  V-filtration index of i-th spectral pair
+    number ev[1][i];  i-th V-filtration index
   intvec ev[2];
-    int ev[2][i];  multiplicity of i-th spectral pair
+    int ev[2][i];  i-th multiplicity
   list ev[3];
     module ev[3][i];  vector space of i-th graded part in terms of ev[4]
   ideal ev[4];  monomial vector space basis of Jacobian algebra
