@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.l,v 1.26 1998-06-18 06:57:18 obachman Exp $ */
+/* $Id: libparse.l,v 1.27 1998-07-21 17:28:31 Singular Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -284,10 +284,10 @@ static     { p_static=TRUE; }
              if( mode == LOAD_LIB) {
 #  ifdef HAVE_NAMESPACES
                 h0 = enterid( mstrdup(proc), myynest, PROC_CMD,
-                                  &IDPACKAGE(pl)->idroot, FALSE );
+                                  &IDPACKAGE(pl)->idroot, TRUE );
 #  else /* HAVE_NAMESPACES */
                h0 = enterid( mstrdup(proc), myynest, PROC_CMD,
-                                   &idroot, FALSE );
+                                   &idroot, TRUE );
 #  endif /* HAVE_NAMESPACES */
                if (h0!=NULL) {
                  iiInitSingularProcinfo(IDPROC(h0), newlib, proc,

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.13 1998-07-21 17:18:19 Singular Exp $ */
+/* $Id: ipid.cc,v 1.14 1998-07-21 17:28:32 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -132,16 +132,16 @@ idhdl idrec::set(char * s, int lev, idtyp t, BOOLEAN init)
     {
       IDSTRING(h) = (char *)Alloc0(len);
     }
-  }
-  // additional settings:--------------------------------------
-  if (t == QRING_CMD)
-  {
-    IDRING(h)=rCopy(currRing);
-    /* QRING_CMD is ring dep => currRing !=NULL */
-  }
-  else if (t == PROC_CMD)
-  {
-    IDPROC(h)->language=LANG_NONE;
+    // additional settings:--------------------------------------
+    if (t == QRING_CMD)
+    {
+      IDRING(h)=rCopy(currRing);
+      /* QRING_CMD is ring dep => currRing !=NULL */
+    }
+    else if (t == PROC_CMD)
+    {
+      IDPROC(h)->language=LANG_NONE;
+    }
   }
   // --------------------------------------------------------
   return  h;
