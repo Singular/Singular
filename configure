@@ -597,6 +597,7 @@ pwd=`pwd`
 SINGULAR_MAJOR_VERSION=1
 SINGULAR_MINOR_VERSION=3
 SINGULAR_SUB_VERSION=8
+VERSION_SEP="-"
 SINGULAR_SHORT_VERSION="${SINGULAR_MAJOR_VERSION}${VERSION_SEP}${SINGULAR_MINOR_VERSION}"
 SINGULAR_VERSION="${SINGULAR_SHORT_VERSION}${VERSION_SEP}${SINGULAR_SUB_VERSION}"
 VERSION_DATE="May 2000"
@@ -645,7 +646,7 @@ fi
 
 
 echo $ac_n "checking uname for singular""... $ac_c" 1>&6
-echo "configure:649: checking uname for singular" >&5
+echo "configure:650: checking uname for singular" >&5
 if eval "test \"`echo '$''{'ac_cv_singuname'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -669,7 +670,6 @@ fi
 SING_UNAME=`echo $SINGUNAME | tr '-' '_' `
 
 
-VERSION_SEP="-"
 
 
 # for gmp-3.0 to work for all ix86 processors, set generic target
