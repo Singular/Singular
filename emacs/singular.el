@@ -1,6 +1,6 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.27 1999-07-02 13:45:24 obachman Exp $
+;; $Id: singular.el,v 1.28 1999-07-15 07:03:09 wichmann Exp $
 
 ;;; Commentary:
 
@@ -214,39 +214,38 @@ NOT READY [should be rewritten completely.  Interface should stay the same.]!"
 ;	       "number" "poly" "proc" "qring" "resolution" 
 ;	       "ring" "string" "vector"))
 
-(defvar singular-font-lock-keywords-0
-  '(
-    ("^\\(> \\|. \\)" . font-lock-singular-prompt-face)
-    ("^   [\\?].*" 0 font-lock-singular-error-face t)
-    ("^// \\(\\*\\*.*\\)" 1 font-lock-singular-warn-face t)
-    )
-  "Subdued level for highlighting in singular-(interactive)-mode")
-
 (defvar singular-font-lock-keywords-1
   '(
-    ("\\<def\\|i\\(deal\\|nt\\(\\|mat\\|vec\\)\\)\\|li\\(nk\\|st\\)\\|m\\(a\\(p\\|trix\\)\\|odule\\)\\|number\\|p\\(oly\\|roc\\)\\|qring\\|r\\(esolution\\|ing\\)\\|string\\|vector\\>" . font-lock-type-face)
-    ("^\\(> \\|. \\)" . font-lock-singular-prompt-face)
+    ("^\\(> \\|\\. \\)" . font-lock-singular-prompt-face)
     ("^   [\\?].*" 0 font-lock-singular-error-face t)
     ("^// \\(\\*\\*.*\\)" 1 font-lock-singular-warn-face t)
     )
   "Subdued level for highlighting in singular-(interactive)-mode")
 
-(defvar singular-font-lock-keywords-2 
+(defvar singular-font-lock-keywords-2
   (append
    singular-font-lock-keywords-1
+   '(
+     ("\\<\\(def\\|i\\(deal\\|nt\\(\\|mat\\|vec\\)\\)\\|li\\(nk\\|st\\)\\|m\\(a\\(p\\|trix\\)\\|odule\\)\\|number\\|p\\(oly\\|roc\\)\\|qring\\|r\\(esolution\\|ing\\)\\|string\\|vector\\)\\>" . font-lock-type-face)
+     ))
+  "Medium level for highlighting in singular-(interactive)-mode")
+
+(defvar singular-font-lock-keywords-3 
+  (append
+   singular-font-lock-keywords-2
    '(
      ("^   [\\?].*`\\(\\sw\\sw+\\)`" 1 font-lock-reference-name-face t)
 ;;     ()))
      ))
   "Gaudy level for highlihgting in singular-(interactive)-mode") 
 
-(defvar singular-font-lock-keywords singular-font-lock-keywords-0
+(defvar singular-font-lock-keywords singular-font-lock-keywords-1
   "Default highlighting for singular-(interactive)-mode")
 
 (defvar singular-font-lock-defaults 
   '((singular-font-lock-keywords
-     singular-font-lock-keywords-0
-     singular-font-lock-keywords-0)
+     singular-font-lock-keywords-1 singular-font-lock-keywords-2
+     singular-font-lock-keywords-3)
     nil                   ;; KEYWORDS-ONLY 
     nil                   ;; CASE-FOLD (ignore case when non-nil)
     ((?_ . "w"))          ;; SYNTAX-ALIST
@@ -260,9 +259,11 @@ NOT READY [should be rewritten completely.  Interface should stay the same.]!"
   (put 'singular-interactive-mode 'font-lock-defaults
        singular-font-lock-defaults)))
 ;;}}}
+
 ;;}}}
 
 ;;{{{ Singular interactive mode
+
 ;;{{{ Key map and menus
 (defvar singular-interactive-mode-map ()
   "Key map to use in Singular interactive mode.")
@@ -281,6 +282,7 @@ NOT READY [should be rewritten completely.  Interface should stay the same.]!"
     (set-keymap-name singular-interactive-mode-map
 		     'singular-interactive-mode-map)))
   (define-key singular-interactive-mode-map "\C-m" 'singular-send-or-copy-input)
+  (define-key singular-interactive-mode-map "\t" 'singular-dynamic-complete)
   (define-key singular-interactive-mode-map "\C-c\C-f" 'singular-load-file)
   (define-key singular-interactive-mode-map "\C-c\C-l" 'singular-load-library)
   (define-key singular-interactive-mode-map "\C-c\C-d" 'singular-demo-load)
@@ -379,6 +381,7 @@ NOT READY [should be rewritten completely.  Interface should stay the same.]!"
      ((eq singular-emacs-flavor 'xemacs)
       (add-submenu nil 
 		   singular-start-menu-definition))))
+;;}}}
 
 ;;{{{ Syntax table
 (defvar singular-interactive-mode-syntax-table nil
@@ -549,6 +552,16 @@ consisting of white-space only is not added to the history.")
   "Predicate for filtering additions to input history.
 
 This variable is used to initialize `comint-input-filter' when
+Singular interactive mode starts up.")
+
+(defvar singular-completion-addsuffix '("/" . "")
+  "*Specifies suffixes to be added on completed file names and directories.
+If a cons pair, it should be of the form (DIRSUFFIX . FILESUFFIX) where
+DIRSUFFIX and FILESUFFIX are strings added on unambiguous or exact completion.
+If non-nil, add a `/' to completed directories, ` ' to file names.
+This mirrors the optional behavior of tcsh.
+
+This variable is used to initialize `comint-completion-addsuffix' when
 Singular interactive mode starts up.")
 ;;}}}
 
@@ -1865,6 +1878,57 @@ notes on input and output\" in singular.el."
 	    (set-buffer old-buffer))))))
 ;;}}}
 
+;;{{{ Filename, Command, and Help Completion
+;; NOT READY
+;; how to find and load the completion files?
+(load-file "cmd-cmpl.el")
+(load-file "hlp-cmpl.el")
+
+(defun singular-dynamic-complete ()
+  "NOT READY: docu"
+  (interactive)
+  (if (eq (buffer-syntactic-context) 'string)
+      ;; then: expand filename
+      (comint-dynamic-complete-as-filename)
+    ;; else: expand command or help
+    (let ((end (point))
+	  beg
+	  pattern
+	  completion-list
+	  completion)
+      (save-excursion
+	(beginning-of-line)
+	(if (re-search-forward (concat singular-prompt-regexp
+				       "[ \t]*\\([\\?]\\|help \\)[ \t]*\\(.*\\)")
+			       end t)
+	    (setq pattern (match-string 2)
+		  beg (match-beginning 2)
+		  completion-list singular-completion-help-list)
+	  (goto-char end)
+	  (skip-chars-backward "a-zA-Z0-9")
+	  (setq pattern (buffer-substring (point) end)
+		beg (point)
+		completion-list singular-completion-command-list)))
+      
+      (setq completion (try-completion pattern
+				       completion-list))
+      (cond ((eq completion t)
+	     (message "[Sole completion]"))  ;; nothing to complete
+	    ((null completion)               ;; no completion found
+	     (message "Can't find completion for \"%s\"" pattern)
+	     (ding))
+	    ((not (string= pattern completion))
+	     (delete-region beg end)
+	     (insert completion))
+	    (t
+	     (message "Making completion list...")
+	     (let ((list (all-completions pattern 
+					  completion-list)))
+	       (with-output-to-temp-buffer "*Completions*"
+		 (display-completion-list list)))
+	     (message "Making completion list...%s" "done"))))))
+;;}}}
+
 ;;{{{ Singular interactive mode
 (defun singular-interactive-mode ()
   "Major mode for interacting with Singular.
@@ -1917,6 +1981,7 @@ NOT READY [much more to come.  See shell.el.]!"
   (setq comint-buffer-maximum-size singular-buffer-maximum-size)
   (setq comint-input-ring-size singular-input-ring-size)
   (setq comint-input-filter singular-history-filter)
+  (setq comint-completion-addsuffix singular-completion-addsuffix)
 
   ;; get name of history file (if any)
   (setq comint-input-ring-file-name (getenv "SINGULARHIST"))
