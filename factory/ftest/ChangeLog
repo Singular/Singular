@@ -1,7 +1,11 @@
-Tue Feb 16 17:56:26 MET 1999  Jens Schmidt
+Tue Feb 16 17:13:47 1999  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* GNUmakefile.in, ChangeLog, gcd.ntl.m4, ntl_util.cc, ntl_util.h:
 	  ***** merge from branch `factory-gcd' to main trunk
+
+	* revert.m4: new file
+
+	* feval.m4 (main): long usage added
 
 Tue Jul  7 18:19:42 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
