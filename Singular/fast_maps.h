@@ -7,7 +7,7 @@
  *  Author:  obachman (Olaf Bachmann), hannes (Hannes Schoenemann),
  *           bricken (Michael Brickenstein) 
  *  Created: 01/02
- *  Version: $Id: fast_maps.h,v 1.1 2002-01-19 10:12:35 obachman Exp $
+ *  Version: $Id: fast_maps.h,v 1.2 2002-01-19 10:26:15 obachman Exp $
  *******************************************************************/
 
 /*******************************************************************************
@@ -61,9 +61,13 @@ mapoly maMonomial_Create(poly p, ring , sBucket_pt bucket);
 // src: LmFree 
 // dest: p_Delete 
 // coeffs: delete list
-mapoly maMonomial_Destroy(mapoly monomial, ring src_r, ring dest_r);
+void maMonomial_Destroy(mapoly monomial, ring src_r, ring dest_r);
 // decrements ref counter, if 0, calls Destroy
-mapoly maMonomial_Free(mapoly monomial, ring src_r, ring dest_r);
+inline mapoly maMonomial_Free(mapoly monomial, ring src_r, ring dest_r)
+{
+  monomial->ref--;
+  if (monomial->ref <= 0) maMonomial_Destroy(monomial, src_r, dest_r);
+}
 
 // inserts ("adds") monomial what into poly into
 mapoly maPoly_InsertMonomial(mapoly &into, mapoly what, ring src_r);
