@@ -1,9 +1,9 @@
 @c -*-texinfo-*-
 @ifclear singularmanual
 @c -----------------------Top node-----------------------------------
-@menu
-* PLURAL conventions::          
-@end menu
+@c @menu
+@c * PLURAL conventions::          
+@c @end menu
 
 @node Top, PLURAL conventions, (dir), (dir)
 @c @chapter PLURAL
@@ -41,7 +41,7 @@
 @c * General concepts::
 * PLURAL conventions::
 * Data types @value{PSUFFIX}::
-* Functions and system variables @value{PSUFFIX}::
+* Functions  @value{PSUFFIX}::
 @c * Tricks and pitfalls::
 @c * Examples::
 @c * Polynomial data::
@@ -98,7 +98,7 @@
 @end ifset 
 
 @ifclear singularmanual
-@node Data types @value{PSUFFIX}, Functions and system variables @value{PSUFFIX}, PLURAL conventions, Top
+@node Data types @value{PSUFFIX}, Functions  @value{PSUFFIX}, PLURAL conventions, Top
 @chapter Data types @value{PSUFFIX}
 @end ifclear 
 
@@ -108,23 +108,23 @@
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
 @menu
-* Functions and system variables @value{PSUFFIX}::  
+* Functions  @value{PSUFFIX}::  
 @end menu
 
-@node Functions and system variables @value{PSUFFIX},  , Data types @value{PSUFFIX}, Data types @value{PSUFFIX}
-@section Functions and system variables @value{PSUFFIX}
+@node Functions @value{PSUFFIX},  , Data types @value{PSUFFIX}, Data types @value{PSUFFIX}
+@section Functions @value{PSUFFIX}
 @end ifset
 
 @ifclear singularmanual
-@node Functions and system variables @value{PSUFFIX}, Mathematical background @value{PSUFFIX}, Data types @value{PSUFFIX}, Top
-@chapter Functions and system variables @value{PSUFFIX}
+@node Functions @value{PSUFFIX}, Mathematical background @value{PSUFFIX}, Data types @value{PSUFFIX}, Top
+@chapter Functions  @value{PSUFFIX}
 @end ifclear
 
 @cindex commands @value{PSUFFIX}
 @include plureference.tex
 
 @c @c ----------------------------------------------------------------------------
-@c @node Tricks and pitfalls, Examples, Functions and system variables,Top
+@c @node Tricks and pitfalls, Examples, Functions,Top
 @c @chapter Tricks and pitfalls
 @c @cindex Tricks and pitfalls
 @c @include tricks.tex
@@ -143,14 +143,14 @@
 
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
-@node Mathematical background @value{PSUFFIX},  , Functions and system variables @value{PSUFFIX}, Functions and system variables @value{PSUFFIX}
-variables @value{PSUFFIX}, PLURAL 
+@node Mathematical background @value{PSUFFIX},  , Functions
+@value{PSUFFIX}, PLURAL 
 @section Mathematical background @value{PSUFFIX}
 @end ifset
 
 
 @ifclear singularmanual
-@node Mathematical background @value{PSUFFIX}, PLURAL libraries, Functions and system variables @value{PSUFFIX}, Top
+@node Mathematical background @value{PSUFFIX}, PLURAL libraries, Functions @value{PSUFFIX}, Top
 @appendix Mathematical background @value{PSUFFIX}
 @end ifclear
 

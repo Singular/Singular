@@ -1,5 +1,5 @@
   @comment -*-texinfo-*-
-@comment $Id: plureference.doc,v 1.16 2004-03-23 20:02:55 levandov Exp $
+@comment $Id: plureference.doc,v 1.17 2004-05-27 20:04:03 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -13,29 +13,20 @@
 \input texinfo.tex
 @setfilename plureference.info
 @settitele PLURAL
-@node Top, Functions and system variables @value{PSUFFIX}, (dir), (dir)
+@node Top, Functions @value{PSUFFIX}, (dir), (dir)
 @menu
-* Functions and system variables @value{PSUFFIX}::
+* Functions @value{PSUFFIX}::
 @end menu
-@node  Functions and system variables @value{PSUFFIX},  , Top, Top
-@chapter Functions and system variables @value{PSUFFIX}
+
+@node Functions @value{PSUFFIX}, , Top, Top 
+@chapter  Functions @value{PSUFFIX}
 %**end
 @end ignore
 
 
-@c -----------------------------
-@menu
-* Functions @value{PSUFFIX}::
-* Control structures @value{PSUFFIX}::
-* System variables @value{PSUFFIX}::
-@end menu
 
-@c ---------------------------------------
-@node Functions @value{PSUFFIX}, Control structures @value{PSUFFIX}, Functions and system variables @value{PSUFFIX}, Functions and system variables @value{PSUFFIX}
-@section Functions @value{PSUFFIX}
 @cindex Functions @value{PSUFFIX}
-
-This section gives a complete reference of all functions, commands and
+This chapter gives a complete reference of all functions, commands and
 special variables of the @sc{Plural} kernel (i.e., all built-in
 commands).
 
@@ -46,8 +37,12 @@ The general syntax of a function is
 
 
 @menu
+* betti @value{PSUFFIX}::
 * bracket::
 * eliminate @value{PSUFFIX}::
+* fetch@value{PSUFFIX}::
+* imap@value{PSUFFIX}::
+* intersect @value{PSUFFIX}::
 * kbase @value{PSUFFIX}::
 * memory @value{PSUFFIX}::
 * minres @value{PSUFFIX}::
@@ -55,8 +50,11 @@ The general syntax of a function is
 * ncalgebra::
 * nres @value{PSUFFIX}::
 * option @value{PSUFFIX}::
+* preimage @value{PSUFFIX}::
+* quotient @value{PSUFFIX}::
 * reduce @value{PSUFFIX}::
 * std @value{PSUFFIX}::
+* subst @value{PSUFFIX}:: 
 * syz @value{PSUFFIX}:: 
 * twostd::
 * vdim @value{PSUFFIX}::
@@ -65,8 +63,115 @@ The general syntax of a function is
 
 
 @c -----------------------------
-@node bracket, eliminate @value{PSUFFIX}, Functions @value{PSUFFIX}, Functions @value{PSUFFIX}
-@subsection bracket
+@node betti @value{PSUFFIX}, bracket, Functions @value{PSUFFIX}, Functions @value{PSUFFIX}
+@section betti @value{PSUFFIX}
+@cindex betti @value{PSUFFIX}
+@table @code
+@table @code
+@item @strong{Syntax:}
+@code{betti (} list_expression @code{)}
+@*@code{betti (} resolution_expression @code{)}
+@*@code{betti (} list_expression @code{,} int_expression @code{)}
+@*@code{betti (} resolution_expression @code{,} int_expression @code{)}
+@item @strong{Type:}
+intmat
+@item @strong{Purpose:}
+with 1 argument: computes the graded Betti numbers of a minimal resolution of
+@tex
+$R^n/M$, if $R$ denotes the basering and
+$M$ a homogeneous submodule of $R^n$ and the argument represents a
+resolution of
+$R^n/M$.
+@end tex
+@iftex
+@*
+@end iftex
+@tex
+The entry d of the intmat at place (i,j) is the minimal number of
+generators in degree i+j of the j-th syzygy module (= module of
+relations) of $R^n/M$ (the 0th (resp.\ 1st) syzygy module of $R^n/M$ is
+$R^n$ (resp.\ $M$)).
+@end tex
+@ifinfo
+R^n/M, if R denotes the basering and
+M a homogeneous submodule of R^n and the argument represents a resolution of
+R^n/M:
+@*The entry d of the intmat at place (i,j) is the minimal number of
+generators in degree i+j of the j-th syzygy module (= module of
+relations) of R^n/M (the 0th (resp.@: 1st) syzygy module of R^n/M is R^n
+(resp.@: M)).
+@end ifinfo
+The argument is considered to be the result of a res/sres/mres/nres/lres
+command. This implies that a zero is only allowed (and counted) as a
+generator in the first module.
+@*For the computation betti uses only the initial monomials. This could lead
+to confusing results for a non-homogeneous input.
+
+The optional second argument is a switch for the minimization of the Betti
+numbers. If it is 0 then the Betti numbers correspond exactly to the input -
+otherwise the command is identical to the one-argument form.
+@item @strong{Example:}
+@smallexample
+@c example
+ // Uli Walther
+int N=2;
+int i;
+ring r=0,(x(1..N),d(1..N),q(1..N)),Dp;
+matrix D[3*N][3*N];
+for (i=1;i<=N;i++)
+{
+  D[i,N+i]=q(i)^2;
+}
+ncalgebra(1,D); // a kind of homogenized Weyl algebra
+r;
+ideal I= maxideal(1);
+I;
+option(redSB);
+option(redTail);
+resolution R = mres(I,0); // the full length resolution
+print(betti(R),"betti");
+kill r;
+// betti in qring
+LIB "nctools.lib";
+int N=1;
+int i;
+ring r=0,(x(1..N),d(1..N),q(1..N)),Dp;
+matrix C = UpOneMatrix(3*N);
+for (i=1;i<=N;i++)
+{
+  C[i,N+i]=-1;
+  C[i,2*N+i]=-1;
+  C[N+i,2*N+i]=-1;
+}
+ncalgebra(C,0);
+ideal I=0;
+for (i=1;i<=N;i++)
+{
+  I=I,x(i)^2,d(i)^2,x(i)*d(i)+q(i)^2;
+}
+option(redSB);
+option(redTail);
+I = twostd(I);
+qring QR=I;
+QR;
+ideal M= maxideal(1);
+resolution RM = mres(M,5); // only first 5 steps
+print(betti(RM),"betti");
+
+@c example
+@end smallexample
+@end table
+
+
+
+
+
+
+
+
+@c -----------------------------
+@node bracket, eliminate @value{PSUFFIX}, betti @value{PSUFFIX}, Functions @value{PSUFFIX}
+@section bracket
 @cindex bracket
 
 @table @code
@@ -105,8 +210,8 @@ bracket(p,q);
 @end table
 
 @c ---------------------------------------
-@node eliminate @value{PSUFFIX}, kbase @value{PSUFFIX}, bracket, Functions @value{PSUFFIX}
-@subsection eliminate @value{PSUFFIX}
+@node eliminate @value{PSUFFIX}, fetch @value{PSUFFIX}, bracket, Functions @value{PSUFFIX}
+@section eliminate @value{PSUFFIX}
 @cindex eliminate @value{PSUFFIX}
 
 @table @code
@@ -159,9 +264,165 @@ See
 @ref{module @value{PSUFFIX}};
 @ref{std @value{PSUFFIX}}.
 @c ref
+
+@c ---------------------------------------
+@node fetch@value{PSUFFIX}, imap@value{PSUFFIX}, eliminate @value{PSUFFIX}, Functions @value{PSUFFIX}
+@section fetch@value{PSUFFIX}
+@cindex fetch@value{PSUFFIX}
+
+@table @code
+@item @strong{Syntax:}
+@code{fetch (} ring_name@code{,} name @code{)}
+@item @strong{Type:}
+number, poly, vector, ideal, module, matrix or list
+(the same type as the second argument)
+@item @strong{Purpose:}
+maps objects between rings.
+@code{fetch} is the identity map between rings and qrings,
+the i-th variable of the source ring is mapped to the i-th
+variable of the basering.  The coefficient fields must be compatible.
+(See @ref{map} for a description of possible mapping between
+different ground fields).
+@*@code{fetch} offers a convenient way to change
+variable names or orderings, or to map objects from a ring to a quotient
+ring of that ring or vice versa.
+@item @strong{Note:}
+Compared with @code{imap}, @code{fetch} uses the position of the ring
+variables, not their names.
+@item @strong{Example:}
+@smallexample
+@c example
+LIB "ncalg.lib";
+def Usl2 = sl2();
+setring Usl2;
+poly  C  = 4*e*f+h^2-2*h; // the central element of U(sl2)
+ideal I  = e^3,f^3,h^3-4*h;
+ideal J  = twostd(I);
+J;
+ideal QC = twostd(C);
+qring Q  = QC;
+ideal QJ = fetch(Usl2,J);
+QJ = std(QJ);
+QJ; 
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{imap@value{PSUFFIX}};
+@ref{map@value{PSUFFIX}};
+@ref{qring@value{PSUFFIX}};
+@ref{ring@value{PSUFFIX}}.
+@c ref
+
+
+@c ---------------------------------------
+@node imap@value{PSUFFIX},intersect @value{PSUFFIX}, fetch@value{PSUFFIX}, Functions@value{PSUFFIX}
+@section imap@value{PSUFFIX}
+@cindex imap@value{PSUFFIX}
+
+@table @code
+@item @strong{Syntax:}
+@code{imap (} ring_name@code{,} name @code{)}
+@item @strong{Type:}
+number, poly, vector, ideal, module, matrix or list
+(the same type as the second argument)
+@item @strong{Purpose:}
+identity map on common subrings.  @code{imap} is the map between rings
+and qrings with compatible ground fields which is the identity on
+variables and parameters of the same name and 0 otherwise.
+(See @ref{map} for a description of possible mapping between
+different ground fields).
+Useful for mapping from a homogenized ring to the original ring or
+for mappings from/to rings with/without parameters. Compared with
+@code{fetch}, @code{imap} uses the names of variables and parameters.
+Unlike @code{map} and @code{fetch} @code{imap} can map parameters to variables.
+@item @strong{Example:}
+@smallexample
+@c example
+LIB "ncalg.lib";
+ring ABP=0,(p4,p5,a,b),dp;
+def Usl3 = sl(3);
+def BIG = Usl3+ABP;
+setring BIG;
+poly P4=3*x(1)*y(1)+3*x(2)*y(2)+3*x(3)*y(3)+h(1)^2+h(1)*h(2)+h(2)^2-3*h(1)-3*h(2);  // central element of U(sl_3) of degree 2
+poly P5=3/2*x(3)*y(1)*y(2)+3/2*x(1)*x(2)*y(3)+1/2*x(1)*y(1)*h(1)-1*x(2)*y(2)*h(1)+1/2*x(3)*y(3)*h(1)+1/9*h(1)^3+x(1)*y(1)*h(2)-1/2*x(2)*y(2)*h(2)-1/2*x(3)*y(3)*h(2)+1/6*h(1)^2*h(2)-1/6*h(1)*h(2)^2-1/9*h(2)^3-2*x(1)*y(1)+x(2)*y(2)-1/2*x(3)*y(3)-2/3*h(1)^2-1/6*h(1)*h(2)+1/3*h(2)^2+h(1);
+P5=18*P5; // central element of U(sl_3) of degree 3 with integer coefficients
+ideal J = x(1),x(2),h(1)-a,h(2)-b; // we are interested in the module U(sl_3)/J, depending on parameters a,b
+ideal I = p4-P4,p5-P5;
+ideal K = I,J;
+ideal E = eliminate(K,x(1)*x(2)*x(3)*y(1)*y(2)*y(3)*h(1)*h(2));
+E; // this is the ideal of central characters
+ring abP = (0,a,b),(p4,p5),dp; // what are the characters on nonzero a,b?
+ideal abE = imap(BIG, E);
+option(redSB);
+option(redTail);
+abE = std(abE);
+abE; // here they are - we have only one character  
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{fetch @value{PSUFFIX}};
+@ref{map @value{PSUFFIX}};
+@ref{qring @value{PSUFFIX}};
+@ref{ring @value{PSUFFIX}}.
+@c ref
+
+
+
 @c ------------------------------------------------
-@node kbase @value{PSUFFIX}, memory @value{PSUFFIX}, eliminate @value{PSUFFIX}, Functions @value{PSUFFIX}
-@subsection kbase @value{PSUFFIX}
+@node intersect @value{PSUFFIX}, kbase @value{PSUFFIX}, imap @value{PSUFFIX}, Functions @value{PSUFFIX}
+@section  intersect @value{PSUFFIX}
+@cindex  intersect   @value{PSUFFIX}
+
+@table @code
+@item @strong{Syntax:}
+@code{intersect (}expression_list of ideal_expression  @code{)}
+@*@code{intersect (}expression_list of module_expression  @code{)}
+
+@item @strong{Type:}
+ideal, resp. module 
+
+@item @strong{Purpose:}
+computes the intersection of ideals, resp. modules. 
+
+
+@item @strong{Example:}
+
+@smallexample
+@c example
+
+// from [BGV], p.213, Ex.2.5
+ring r2=0,(x,y),dp;
+ncalgebra(-1,0);
+module M=[x,x],[y,0];
+module N=[0,y^2],[y,x];
+option(redSB);
+module Res;
+Res=intersect(M,N);
+print(Res);
+kill r2;
+
+// from [BGV], p.148, Ex.3.8
+LIB "ncalg.lib";
+ring r=0,(x,d),dp;
+Weyl(); // supply r with the structure of the 1st Weyl algebra
+ideal I = x+d^2;
+ideal J = d-1;
+ideal H = intersect(I,J);
+H;
+@c example
+@c//answer: [0,xy^2],[y^2,-xy]
+@end smallexample
+@end table
+
+
+
+@c ------------------------------------------------
+@node kbase @value{PSUFFIX}, memory @value{PSUFFIX}, intersect @value{PSUFFIX}, Functions @value{PSUFFIX}
+@section kbase @value{PSUFFIX}
 @cindex kbase @value{PSUFFIX}
 @table @code
 @item @strong{Syntax:}
@@ -215,7 +476,7 @@ See
 @c ref
 @c ---------------------------------------
 @node  memory @value{PSUFFIX}, minres @value{PSUFFIX}, kbase @value{PSUFFIX}, Functions @value{PSUFFIX}
-@subsection memory @value{PSUFFIX}
+@section memory @value{PSUFFIX}
 @cindex memory @value{PSUFFIX}
 @cindex memory managment
 @table @code
@@ -266,7 +527,7 @@ kill r;
 
 @c ---------------------------------------
 @node  minres @value{PSUFFIX}, mres @value{PSUFFIX}, memory @value{PSUFFIX}, Functions @value{PSUFFIX}
-@subsection minres @value{PSUFFIX}
+@section minres @value{PSUFFIX}
 @cindex minres @value{PSUFFIX}
 
 @table @code
@@ -323,7 +584,7 @@ See
 
 @c ---------------------------------------
 @node  mres @value{PSUFFIX}, ncalgebra, minres @value{PSUFFIX}, Functions @value{PSUFFIX}
-@subsection mres @value{PSUFFIX}
+@section mres @value{PSUFFIX}
 @cindex mres @value{PSUFFIX}
 @table @code
 @item @strong{Syntax:}
@@ -418,7 +679,7 @@ See
 
 @c -----------------------------
 @node ncalgebra, nres @value{PSUFFIX}, mres @value{PSUFFIX}, Functions @value{PSUFFIX}
-@subsection ncalgebra
+@section ncalgebra
 @cindex ncalgebra
 
 
@@ -524,7 +785,7 @@ kill r4;
 
 @c ---------------------------------------
 @node  nres @value{PSUFFIX}, option @value{PSUFFIX}, ncalgebra, Functions @value{PSUFFIX}
-@subsection nres @value{PSUFFIX}
+@section nres @value{PSUFFIX}
 @cindex nres @value{PSUFFIX}
 @table @code
 @item @strong{Syntax:}
@@ -615,8 +876,8 @@ See
 
 
 @c ---------------------------------------
-@node option @value{PSUFFIX}, reduce @value{PSUFFIX}, nres @value{PSUFFIX}, Functions @value{PSUFFIX}
-@subsection option @value{PSUFFIX}
+@node option @value{PSUFFIX},preimage@value{PSUFFIX}, nres @value{PSUFFIX}, Functions @value{PSUFFIX}
+@section option @value{PSUFFIX}
 @cindex option @value{PSUFFIX}
 @table @code
 @item @strong{Syntax:}
@@ -748,11 +1009,145 @@ See
 @ref{std @value{PSUFFIX}}.
 @c ref
 
+@c ---------------------------------------
+@node preimage@value{PSUFFIX}, quotient @value{PSUFFIX}, 
+option @value{PSUFFIX}, Functions @value{PSUFFIX}
+@section preimage@value{PSUFFIX}
+@cindex preimage@value{PSUFFIX}
+
+@table @code
+@item @strong{Syntax:}
+@code{preimage (} ring_name@code{,} map_name@code{,} ideal_name @code{)}
+@*@code{preimage (} ring_name@code{,} ideal_expression@code{,} ideal_name @code{)}
+@item @strong{Type:}
+ideal
+@item @strong{Purpose:}
+returns the preimage of an ideal under a given map.
+@*
+The second argument has to be a map from the basering to the given ring
+(or an ideal defining such a map),
+and the ideal has to be an ideal in the given ring.
+@item @strong{Note:}
+To compute the kernel of a map, the preimage of zero has to be determined.
+Hence there is no special command for computing the kernel of a map in
+@sc{Singular}.
+@item @strong{Note:}
+at the moment it could be computed 
+only for maps A -> B, where A is commutative
+@item @strong{Example:}
+@smallexample
+@c example
+LIB "ncalg.lib";
+ring   R = 0,a,dp;
+def Usl2 = sl2();
+setring Usl2;
+poly  C = 4*e*f+h^2-2*h; // the central element of U(sl2)
+ideal I = e^3,f^3,h^3-4*h;
+ideal J = twostd(I); // two-sided GB
+ideal K = std(I);    // left GB
+map Phi = R,C;
+setring R;
+ideal PreJ = preimage(Usl2,Phi,J); // central character of J
+PreJ;
+factorize(PreJ[1],1); // two characters
+ideal PreK = preimage(Usl2,Phi,K); // central character of K
+PreK;
+factorize(PreK[1],1); // three characters
+ 
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{map@value{PSUFFIX}};
+@ref{ideal@value{PSUFFIX}};
+@ref{ring@value{PSUFFIX}}.
+@c ref
+
 
 
 @c ---------------------------------------
-@node reduce @value{PSUFFIX}, std @value{PSUFFIX}, option @value{PSUFFIX}, Functions @value{PSUFFIX}
-@subsection reduce @value{PSUFFIX}
+@node quotient@value{PSUFFIX},  reduce @value{PSUFFIX},preimage@value{PSUFFIX}, Functions@value{PSUFFIX}
+@section quotient@value{PSUFFIX}
+@cindex quotient@value{PSUFFIX}
+@table @code
+@item @strong{Syntax:}
+@code{quotient (} ideal_expression@code{,} ideal_expression @code{)}
+@*@code{quotient (} module_expression@code{,} module_expression @code{)}
+@item @strong{Type:}
+ideal
+@item @strong{Syntax:}
+@code{quotient (} module_expression@code{,} ideal_expression @code{)}
+@item @strong{Type:}
+module
+@item @strong{Purpose:}
+computes the ideal quotient, resp.@: module quotient. Let @code{R} be the
+basering, @code{I,J} ideals and @code{M} a module in
+@ifinfo
+R^n.
+@end ifinfo
+@tex
+${\tt R}^n$.
+@end tex
+Then
+@itemize
+@item
+@code{quotient(I,J)}=
+@ifinfo
+@{a in R | aJ in I @}
+@end ifinfo
+@tex
+$\{a \in R \mid aJ \subset I\}$,
+@end tex
+@item
+@code{quotient(M,J)}=
+@ifinfo
+@{b in R | bJ in M @}.
+@end ifinfo
+@tex
+$\{b \in R^n \mid bJ \subset M\}$.
+@end tex
+@end itemize
+@item @strong{Example:}
+@smallexample
+@c example
+// from [BGV], Ex.3.17, p.150
+ring r=0,(x,y),Dp;
+ncalgebra(2,0);
+option(returnSB);
+poly f1  = x^3+2*x*y^2+2*x^2*y;
+poly f2  = y;
+poly f1' = x^2;
+poly f2' = x+y;
+ideal i = f1,f2;
+ideal I = twostd(i);
+ideal j = f1',f2';
+ideal J = twostd(j);
+quotient(I,J);
+kill r;
+// a bit more complicated example
+LIB "ncalg.lib";
+def Usl2 =sl2();
+setring Usl2;
+ideal i = e3,f3,h3-4*h;
+ideal I = std(i);
+poly  C = 4*e*f+h^2-2*h;
+ideal H = C-8;
+option(returnSB);
+ideal Q = quotient(I,H);
+Q;
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{ideal @value{PSUFFIX}};
+@ref{module @value{PSUFFIX}}.
+@c ref
+
+@c ---------------------------------------
+@node reduce @value{PSUFFIX}, std @value{PSUFFIX}, quotient @value{PSUFFIX}, Functions @value{PSUFFIX}
+@section reduce @value{PSUFFIX}
 @cindex reduce @value{PSUFFIX}
 @cindex NF
 @table @code
@@ -823,8 +1218,8 @@ see also @code{vector} in @sc{Singular} manual.
 @end ifclear   
 
 @c ---------------------------------------
-@node std @value{PSUFFIX}, syz @value{PSUFFIX}, reduce @value{PSUFFIX}, Functions @value{PSUFFIX}
-@subsection std @value{PSUFFIX}
+@node std @value{PSUFFIX}, subst @value{PSUFFIX}, reduce @value{PSUFFIX}, Functions @value{PSUFFIX}
+@section std @value{PSUFFIX}
 @cindex std @value{PSUFFIX}
 @table @code
 @item @strong{Syntax:}
@@ -890,8 +1285,43 @@ See
 
 
 @c -------------------------------------------------
-@node syz @value{PSUFFIX}, twostd, std @value{PSUFFIX}, Functions @value{PSUFFIX}
-@subsection syz @value{PSUFFIX}
+@node subst  @value{PSUFFIX}, syz, std @value{PSUFFIX}, Functions @value{PSUFFIX}
+@section subst @value{PSUFFIX}
+@cindex subst @value{PSUFFIX}
+@table @code
+@item @strong{Syntax:}
+@code{subst (} poly_expression,ring_variable, poly_expression  @code{)}
+@*@code{subst (} vector _expression,ring_variable, poly_expression  @code{)}
+@*@code{subst (} ideal_expression,ring_variable, poly_expression  @code{)}
+@*@code{subst (} module _expression,ring_variable, poly_expression @code{)} 
+ 
+@item @strong{Type:}
+poly, vector, ideal or module (corresponding to the first argument)
+
+@item @strong{Purpose:}
+ substitutes a ring variable by a polynomial. 
+
+@item @strong{Example:}
+@smallexample
+@c example
+LIB "ncalg.lib";
+def a=sl2();
+setring a;
+poly C=e*f*h;
+poly C1=subst(C,e,h^3);
+C1;
+poly C2=subst(C,f,e+f);
+C2;
+@c example
+@end smallexample
+@end table
+@c ref
+@c ref
+
+
+@c -------------------------------------------------
+@node syz @value{PSUFFIX}, twostd, subst  @value{PSUFFIX}, Functions @value{PSUFFIX}
+@section syz @value{PSUFFIX}
 @cindex syz @value{PSUFFIX}
 @table @code
 @item @strong{Syntax:}
@@ -940,7 +1370,7 @@ See
 
 @c ------------------------------
 @node twostd, vdim @value{PSUFFIX}, syz @value{PSUFFIX}, Functions @value{PSUFFIX}
-@subsection twostd
+@section twostd
 @cindex twostd
 
 @table @code
@@ -989,7 +1419,7 @@ There are algebras with no two-sided ideals (like Weyl algebras).
 
 @c -------------------------------------------------------------------------
 @node vdim @value{PSUFFIX},  , twostd, Functions @value{PSUFFIX}
-@subsection vdim @value{PSUFFIX}
+@section vdim @value{PSUFFIX}
 @cindex vdim @value{PSUFFIX}
 @table @code
 @item @strong{Syntax:}
@@ -1050,28 +1480,28 @@ see also @sc{Singular} manual sections dim, degree, mult, kbase.
 
 
 
-@c ---------------------------------------
-@node Control structures @value{PSUFFIX}, System variables @value{PSUFFIX}, Functions @value{PSUFFIX}, Functions and system variables @value{PSUFFIX}
-@section Control structures @value{PSUFFIX}
-@cindex Control structures @value{PSUFFIX}
+@c @c ---------------------------------------
+@c @node Control structures @value{PSUFFIX}, System variables @value{PSUFFIX}, Functions @value{PSUFFIX}, Functions and system variables @value{PSUFFIX}
+@c @section Control structures @value{PSUFFIX}
+@c @cindex Control structures @value{PSUFFIX}
 
-See SINGULAR Manual
-@ifset singularmanual
-@c ref
-(@ref{Control structures})
-@c ref
-@end ifset
+@c See SINGULAR Manual
+@c @ifset singularmanual
+@c @c ref
+@c (@ref{Control structures})
+@c @c ref
+@c @end ifset
 
-@c ---------------------------------------
-@node System variables @value{PSUFFIX},  , Control structures @value{PSUFFIX}, Functions and system variables @value{PSUFFIX}
-@section System variables @value{PSUFFIX}
-@cindex System variables @value{PSUFFIX}
+@c @c ---------------------------------------
+@c @node System variables @value{PSUFFIX},  , Control structures @value{PSUFFIX}, Functions and system variables @value{PSUFFIX}
+@c @section System variables @value{PSUFFIX}
+@c @cindex System variables @value{PSUFFIX}
 
-See SINGULAR Manual
+@c See SINGULAR Manual
 
 
-@ifset singularmanual
-(@pxref{System variables})
-@end ifset
+@c @ifset singularmanual
+@c (@pxref{System variables})
+@c @end ifset
 
 

@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: plutypes.doc,v 1.17 2004-04-28 14:49:26 levandov Exp $
+@comment $Id: plutypes.doc,v 1.18 2004-05-27 20:04:07 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -37,6 +37,7 @@ For the general syntax of a declaration see
 
 @menu
 * ideal @value{PSUFFIX}::
+* map @value{PSUFFIX}::
 * module @value{PSUFFIX}::
 * poly @value{PSUFFIX}::
 * qring @value{PSUFFIX}::
@@ -241,6 +242,288 @@ normal form with respect to a Groebner basis (see @ref{reduce @value{PSUFFIX}})
 Groebner basis computation (see @ref{std @value{PSUFFIX}})
 @item twostd
 two-sided Groebner basis computation (see @ref{twostd})
+@end table
+
+
+@c ---------------------------------------
+@node map@value{PSUFFIX}, module @value{PSUFFIX}, ideal @value{PSUFFIX}, Data types @value{PSUFFIX}
+@section map@value{PSUFFIX}
+@cindex map@value{PSUFFIX}
+
+Maps are ring maps from a preimage ring into the basering.
+
+@strong{Note:}
+@itemize @bullet
+@item
+the target of a map is @strong{ALWAYS} the actual basering
+@item
+the preimage ring is stored "by name", that means, maps can only be
+used in such contexts, where the name of the preimage ring can be
+resolved (i.e., there might be problems for rings/maps defined in
+subprocedures). 
+@c See also @ref{Identifier resolution}, @ref{Names in procedures}.
+@end itemize
+
+Maps between rings with different coefficient fields are
+possible and listed below.
+
+Canonically realized are
+@itemize @bullet
+@item
+@tex
+$Q \rightarrow  Q(a, \ldots)$
+@end tex
+@ifinfo
+Q -> Q(a,..)
+@end ifinfo
+
+@item
+@tex
+$Q \rightarrow R$
+@end tex
+@ifinfo
+Q -> R
+@end ifinfo
+
+@item
+@tex
+$Q \rightarrow  C$
+@end tex
+@ifinfo
+Q -> C
+@end ifinfo
+
+@item
+@tex
+$Z/p \rightarrow  (Z/p)(a, \ldots)$
+@end tex
+@ifinfo
+Z/p ->(Z/p)(a,...)
+@end ifinfo
+
+@item
+@tex
+$Z/p \rightarrow  GF(p^n)$
+@end tex
+@ifinfo
+Z/p -> GF(p^n)
+@end ifinfo
+
+@item
+@tex
+$Z/p \rightarrow  R$
+@end tex
+@ifinfo
+Z/p -> R
+@end ifinfo
+
+@item
+@tex
+$R \rightarrow C$
+@end tex
+@ifinfo
+R -> C
+@end ifinfo
+@end itemize
+
+Possible are furthermore
+@itemize @bullet
+@item
+@tex
+% This is quite a hack, but for now it works.
+$Z/p \rightarrow Q,
+\quad
+[i]_p \mapsto i \in [-p/2, \, p/2]
+\subseteq Z$
+@end tex
+@ifinfo
+Z/p -> Q : [i]_p -> i in [-p/2, p/2] in Z
+@end ifinfo
+@item
+@tex
+$Z/p \rightarrow Z/p^\prime,
+\quad
+[i]_p \mapsto i \in [-p/2, \, p/2] \subseteq Z, \;
+i \mapsto [i]_{p^\prime} \in Z/p^\prime$
+@end tex
+@ifinfo
+Z/p -> Z/p' : [i]_p in Z/p -> i in [-p/2,p/2] in Z, i -> [i]_p' in Z/p'
+@end ifinfo
+@item
+@tex
+$C \rightarrow R, \quad$ the real part
+@end tex
+@ifinfo
+C -> R : the real part
+@end ifinfo
+@end itemize
+
+Finally, in Singular we allow the mapping from rings
+with coefficient field Q to rings whose ground fields
+have finite characteristic:
+
+@itemize @bullet
+@item
+@tex
+$Q \rightarrow Z/p$
+@end tex
+@ifinfo
+Q -> Z/p
+@end ifinfo
+
+@item
+@tex
+$Q \rightarrow (Z/p)(a, \ldots)$
+@end tex
+@ifinfo
+Q -> (Z/p)(a,..)
+@end ifinfo
+@end itemize
+In these cases the denominator and the numerator
+of a number are mapped separately by the usual
+map from Z to Z/p, and the image of the number
+is built again afterwards by division. It is thus
+not allowed to map numbers whose denominator is
+divisible by the characteristic of the target
+ground field, or objects containing such numbers.
+We, therefore, strongly recommend using such
+maps only to map objects with integer coefficients.
+
+
+@menu
+* map@value{PSUFFIX} declarations::
+* map@value{PSUFFIX} expressions::
+* map@value{PSUFFIX} operations::
+* map@value{PSUFFIX} related functions::
+@end menu
+@c @iftex
+@c See @ref{imap}; @ref{fetch}; @ref{subst}.
+@c @end iftex
+
+@c ------------------------------
+@node map@value{PSUFFIX} declarations, map@value{PSUFFIX} expressions, map@value{PSUFFIX}, map@value{PSUFFIX}
+@subsection map@value{PSUFFIX} declarations
+@cindex map@value{PSUFFIX} declarations
+
+@table @strong
+@item Syntax:
+@code{map} name @code{=} preimage_ring_name @code{,} ideal_expression @code{;}
+@*@code{map} name @code{=} preimage_ring_name @code{,} list_of_poly_and_ideal_expressions @code{;}
+@*@code{map} name @code{=} map_expression @code{;}
+
+@item Purpose:
+defines a ring map from preimage_ring to basering.
+@* Maps the variables of the preimage ring to the generators of the ideal.
+If the ideal contains less elements than variables in the
+preimage_ring the remaining variables are mapped to 0, if the ideal contains
+more elements these are ignored.
+The image ring is always the actual basering.
+For the mapping of coefficients from different fields see @ref{map}.
+
+@item Default:
+none
+
+@item Note:
+There are standard mappings for maps which are close to the identity
+map: @code{fetch@value{PSUFFIX}} and @code{imap@value{PSUFFIX}}.
+
+The name of a map serves as the function which maps objects from the
+preimage_ring into the basering.  These objects must be defined
+by names (no evaluation in the preimage ring is possible).
+
+@item Example:
+@smallexample
+@c example
+LIB "ncalg.lib";
+def Usl2 = sl2();
+setring Usl2;
+poly  C  = 4*e*f+h^2-2*h; // the central element of U(sl2)
+poly  D  = e^3*f-h^4;     // some polynomial
+ring W1  = 0,(D,X),dp;
+ncalgebra(1,-1); //opposite Weyl algebra
+option(redSB);
+option(redTail);
+map F = Usl2, -X, D*D*X, 2*D*X;
+F(C); // 0, because this map has a nonzero kernel
+F(D);
+ 
+@c example
+@end smallexample
+@end table
+
+@c ref
+See 
+ @ref{fetch@value{PSUFFIX}};
+@ref{ideal expressions @value{PSUFFIX}};
+@ref{imap@value{PSUFFIX}};
+@ref{map@value{PSUFFIX}};
+@ref{ring@value{PSUFFIX}}.
+@c ref
+@c ------------------------------
+@node map@value{PSUFFIX} expressions, map@value{PSUFFIX} operations, map@value{PSUFFIX} declarations, map@value{PSUFFIX}
+@subsection map@value{PSUFFIX} expressions
+@cindex map@value{PSUFFIX} expressions
+
+A map expression is:
+@enumerate
+@item
+an identifier of type map
+@item
+a function returning map
+@item
+map expressions combined by composition using parentheses (@code{(}, @code{)})
+@end enumerate
+
+@c ------------------------------
+@node map@value{PSUFFIX} operations, map@value{PSUFFIX} related functions, map expressions, map@value{PSUFFIX}
+@subsection map@value{PSUFFIX} operations
+
+@cindex map@value{PSUFFIX} operations
+
+@table @asis
+@item @code{( )}
+composition of maps. If, for example, @code{f} and @code{g} are maps,
+then @code{f(g)} is a map expression giving the composition of @code{f}
+and @code{g}.
+
+@item map_expression @code{[} int_expressions @code{]}
+is a map entry (the image of the corresponding variable)
+@end table
+
+@*@strong{Example:}
+@smallexample
+@c example
+ LIB "ncalg.lib";
+def Usl2 = sl2();
+setring Usl2;
+map F=Usl2,f,e,-h; // check the automorphism of U(sl_2)
+map G=F(F);
+poly p = (f+e*h)^2 + 3*h-e;
+p;
+F(p);
+G(p);
+(G(p) == p); // G is the identity
+@c example
+@end smallexample
+
+@c ------------------------------
+@node map@value{PSUFFIX} related functions,  , map@value{PSUFFIX} operations, map
+@subsection map@value{PSUFFIX} related functions
+
+@cindex map@value{PSUFFIX} related functions
+
+@table @code
+@item fetch@value{PSUFFIX} 
+the identity map between rings and qrings (see @ref{fetch@value{PSUFFIX}})
+
+@item imap@value{PSUFFIX}
+a convenient map procedure for inclusions and projections of rings (see @ref{imap@value{PSUFFIX}})
+
+@item preimage@value{PSUFFIX}
+preimage under a ring map (see @ref{preimage@value{PSUFFIX}})
+
+@item subst
+substitute a ring variable (see @ref{subst})
 @end table
 
 
@@ -652,6 +935,13 @@ in @sc{Singular} manual section Rings and orderings.
 * qring declaration @value{PSUFFIX}::
 @end menu
 
+@strong{Note:}
+we highly recommend to turn on 
+option(redSB);
+option(redTail);
+while computing in qrings. Otherwise results
+could have no meaning.
+
 @c ---------------------------------------
 
 @node qring declaration @value{PSUFFIX},  , qring @value{PSUFFIX}, qring @value{PSUFFIX}
@@ -881,7 +1171,35 @@ In order to create the non-commutative extention, see @ref{ncalgebra}.
 @cindex ring operations @value{PSUFFIX}
 @table @asis
 @item @code{+}
-construct a new ring @math{k[X,Y]} from @math{k_1[X]}  and @math{k_2[Y]}.
+construct an algebra 
+@ifinfo
+A\otimes_k B
+@end ifinfo
+@tex
+$A\otimes_{\bf{K} } B$
+@end tex 
+for two
+@ifinfo 
+G-algebras 
+@end ifinfo
+@tex
+$G$-algebras
+@end tex
+
+@ifinfo
+ A=k1<x_1,...,x_n | @{x_j x_i=c^1_@{ij@}x_i x_j + d^1_@{ij @} @}, 1 =<i <j =< n >,
+ and
+ B=k2<y_1,...,y_m | @{y_j y_i=c^2_@{ij@}y_i y_j + d^2_@{ij @} @}, 1 =<i <j =< m >.
+
+@end ifinfo
+
+@tex 
+$A= k_1 \langle x_1, \ldots ,x_n \mid$ 
+$\{ x_j x_i=c^1_{ij} \cdot x_i x_j + d^1_{ij}\}, 1 \leq i <j \leq n \rangle$,
+and
+$B= k_2 \langle y_1, \ldots ,y_m \mid
+\{ y_j y_i=c^2_{ij} \cdot y_i y_j + d^2_{ij}\}, 1 \leq i <j \leq m \rangle$.
+@end tex
 @end table
 
 Concerning the ground fields @math{k_1} and @math{k_2} take the
