@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: INSTALL_win.texi,v 1.8 2000-06-13 11:37:27 obachman Exp $
+@comment $Id: INSTALL_win.texi,v 1.9 2001-03-02 13:09:13 Singular Exp $
 @c FILE:    INSTALL.texi
 @c PURPOSE: Installation instructions for Singular on MSWindows
 @c          This file is displayed during installation and copied to
@@ -96,7 +96,7 @@ Minimal archive to download. Contains only the  component.
 
 You can obtain these (and other) archives from
 @display
-@uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/Development}. 
+@uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/}. 
 @end display
 
 @ifclear singularmanual
