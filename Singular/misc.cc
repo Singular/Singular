@@ -231,7 +231,44 @@ void singular_example(char *str)
       }
     }
   }
-  Werror("%s not found",str);
+  else
+  {
+    char sing_file[MAXPATHLEN];
+    FILE *fd;
+    sprintf(sing_file, "%s/%s.sing", feResource('m', 0), s);
+    fd = feFopen(sing_file, "r");
+    if (fd != NULL)
+    {
+      
+      int old_echo = si_echo;
+      int length, got;
+      char* s;
+      
+      fseek(fd, 0, SEEK_END);
+      length = ftell(fd);
+      fseek(fd, 0, SEEK_SET);
+      s = (char*) AllocL((length+20)*sizeof(char));
+      got = fread(s, sizeof(char), length, fd);
+      fclose(fd);
+      if (got != length)
+      {
+        Werror("Error while reading file %s", sing_file);
+        FreeL(s);
+      }
+      else
+      {
+        s[length] = '\0';
+        strcat(s, "\n;return();\n\n");
+        si_echo = 2;
+        iiEStart(s, NULL);
+        si_echo = old_echo;
+      }
+    }
+    else
+    {
+      Werror("no example for %s", str);
+    }
+  }
 }
 
 

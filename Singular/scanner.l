@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: scanner.l,v 1.24 1999-11-15 17:20:46 obachman Exp $ */
+/* $Id: scanner.l,v 1.25 1999-12-06 16:06:51 obachman Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -118,6 +118,11 @@ for                      { prompt_char='.';
 ("help"|"?")[ \t\n]*     { yy_noeof = noeof_asstring;
                            BEGIN(asstring);
                            return HELP_CMD;
+                         }
+
+example[ \t\n]*          { yy_noeof = noeof_asstring;
+                           BEGIN(asstring);
+                           return EXAMPLE_CMD;
                          }
 
 proc[ \t]+{name}[ \t]*\( {

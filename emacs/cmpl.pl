@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: cmpl.pl,v 1.6 1999-09-15 19:03:00 wichmann Exp $
+# $Id: cmpl.pl,v 1.7 1999-12-06 16:06:59 obachman Exp $
 ###################################################################
 #
 # FILE:    cmpl.pl
@@ -17,9 +17,11 @@ EOT
 $Singular = "../Singular/Singular";
 $hlp = "../doc/singular.hlp";
 $cmpl = "cmd";
+$ex_dir= "../examples";
 %symbol = (cmd=>"singular-commands-alist",
 	   hlp=>"singular-help-topics-alist",
-	   lib=>"singular-standard-libraries-alist");
+	   lib=>"singular-standard-libraries-alist",
+	    ex=>"singular-examples-alist");
 
 #
 # parse command line options
@@ -30,6 +32,7 @@ while (@ARGV && $ARGV[0] =~ /^-/)
   if (/^-S(ingular)?$/)  { $Singular = shift(@ARGV); next;}
   if (/^-hlp$/)          { $hlp = shift(@ARGV); next;}
   if (/^-c(mpl)?$/)      { $cmpl = shift(@ARGV); next;}
+  if (/^-e(x_dir)?$/)    { $ex_dir = shift(@ARGV); next;}
   if (/^-h(elp)?$/)      { print $Usage; exit;}
   die "Unrecognized option: $_\n$Usage";
 }
@@ -82,6 +85,11 @@ elsif ($cmpl eq 'hlp')
     }
   }
   close(FH);
+}
+elsif ($cmpl eq 'ex')
+{
+  @strings = <$ex_dir/*.sing>;
+  map {$_ =~ s|.*/(.*?).sing|(\"$1\")|;} @strings;
 }
 else
 {

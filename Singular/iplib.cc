@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.68 1999-11-15 17:20:11 obachman Exp $ */
+/* $Id: iplib.cc,v 1.69 1999-12-06 16:06:45 obachman Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -533,7 +533,9 @@ BOOLEAN iiEStart(char* example, procinfo *pi)
   FreeL((ADDRESS)plib);
 #endif /* HAVE_NAMESPACES */
 
-  newBuffer( example, BT_example, pi, pi->data.s.example_lineno );
+  newBuffer( example, BT_example, pi, 
+             (pi != NULL ? pi->data.s.example_lineno: 0));
+
   iiCheckNest();
 #ifdef HAVE_NAMESPACES
   if(ns != NULL)  namespaceroot->push(IDPACKAGE(ns), IDID(ns), myynest+1);

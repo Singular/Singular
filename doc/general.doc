@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.165 1999-12-03 11:20:45 obachman Exp $
+@comment $Id: general.doc,v 1.166 1999-12-06 16:06:55 obachman Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -612,7 +612,7 @@ further specified).  This option is mandatory when the @code{--batch}
 option is given.  @xref{MPtcp links}.
 
 Finally, the following options are only available when running
-@code{ESingular} (see @ref{ Running SINGULAR under Emacs} for details).
+@code{ESingular} (see @ref{Running SINGULAR under Emacs} for details).
 
 @table @code
 
@@ -743,7 +743,7 @@ Generally, we recommend to use the Emacs interface,
 instead of the ASCII-terminal interface: The Emacs interface does not
 only provide everything the ASCII-terminal interface provides, but
 offers much more. Among others, it offers
-@itemize
+@itemize @bullet
 @item
 color-highlighting
 @item
@@ -967,28 +967,28 @@ ready to start your @sc{Singular} session.
 off all these options, see @ref{Command line options}. Additionally
 there are the following options which are special to @code{ESingular}:
 
-@multitable @columnfractions .25 .65 .1
+@multitable @columnfractions .3 .7
 
-@item command-line option
+@item command-line option /
+@*environment variable
 @tab functionality
-@tab environment variable 
 
 @item @code{--emacs=EMACS}
+@*@code{ESINGULAR_EMACS}
 @tab Use @code{EMACS} as Emacs program to run the @sc{Singular} Emacs
 interface.
-@tab ESINGULAR_EMACS
 
 @item @code{--emacs-dir=DIR}
+@*@code{ESINGULAR_EMACS_DIR}
 @tab Set the singular-emacs-home-directory to @code{DIR}.
-@tab ESINGULAR_EMACS_DIR
 
 @item @code{--emacs-load=FILE}
+@*@code{ESINGULAR_EMACS_LOAD}
 @tab Load @code{FILE} on Emacs start-up, instead of the default load file.
-@tab ESINGULAR_EMACS_LOAD
 
 @item @code{--singular=PROG}
+@*@code{ESINGULAR_SINGULAR}
 @tab Start @code{PROG} as @sc{Singular} program within Emacs
-@tab ESINGULAR_SINGULAR
 
 @end multitable
 
@@ -1066,8 +1066,8 @@ default})
 
 Starts @sc{Singular} with default settings for the executable, the
 working directory, command line switches, and the buffer name. You can
-customize this default settings, see @ref{Customization of the Emacs
-interface}.
+customize this default settings, see 
+@ref{Customization of the Emacs interface}.
 
 @item @code{singular-exit-singular} (bound to @code{C-c $} or menu
 @code{Singular}, item @code{Exit})
@@ -1097,8 +1097,8 @@ Whenever a @sc{Singular} process is started within the Emacs interface,
 the contents of a special startup file (by default
 @code{~/.emacs-singularrc}) is pasted as input to @sc{Singular} at the
 very end of the usual startup sequence (see @ref{Startup sequence}). The
-name of the startup file can be changed, see @ref{Customization of the
-Emacs interface}.
+name of the startup file can be changed, see 
+@ref{Customization of the Emacs interface}.
 
 
 @c --------------------------------------------------------------------------
@@ -1128,8 +1128,8 @@ A @sc{Singular} demo can prematurely be exited by either starting
 another demo, or by executing the Emacs command
 @code{singular-demo-exit} (menu: @code{Commands->Exit Demo}). 
 
-Some aspects of running @sc{Singular} demos can be customized. @xref{
-Customization of the Emacs interface}, for more info.
+Some aspects of running @sc{Singular} demos can be customized. 
+@xref{Customization of the Emacs interface}, for more info.
 
 
 @c --------------------------------------------------------------------------
@@ -3228,7 +3228,7 @@ the directories contained in the environment variable
 the directories @code{$BinDir/LIB}, @code{$RootDir/LIB},
 @code{$RootDir/../LIB}, @code{$DefaultDir/LIB}, @code{$DefaultDir/../LIB}
 are appended, where 
-@itemize 
+@itemize @bullet
 @item @code{$BinDir} 
 is the value of the environment variable
 @code{SINGULAR_BIN_DIR}, if set, or, if not set, the directory in which the

@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.168 1999-12-03 11:20:48 obachman Exp $
+@comment $Id: reference.doc,v 1.169 1999-12-06 16:06:57 obachman Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -1926,7 +1926,7 @@ set help browser. If no @code{topic} is given, the title page of the
 manual is displayed.
 
 @item @strong{Note:}
-@itemize
+@itemize @bullet
 @cindex ?
 @item
 @code{?} may be used instead of @code{help}.
@@ -3488,8 +3488,9 @@ The second argument describes what to log: @code{"i"} means input,
 and opens the file given by the first string expression.
 @*@code{monitor ("")} turns off recording.
 @item @strong{Example:}
+@c TBC geht nicht
 @smallexample
-@c example
+@c example no_comp
   monitor("doe.tmp","io"); // log input and output to doe.tmp
   ring r;
   poly f=x+y+z;

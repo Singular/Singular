@@ -7,6 +7,7 @@ SHELL=/bin/sh
 
 prefix		= @prefix@
 docdir		= ${prefix}/doc
+examplesdir	= ${prefix}/examples
 SINGULAR	= @SINGULAR@
 emacsdir	= ${install_prefix}/emacs
 
@@ -17,13 +18,16 @@ MKINSTALLDIRS   = ../mkinstalldirs
 
 SINGULAR_HLP	= ${docdir}/singular.hlp
 
-all install: cmd-cmpl.el hlp-cmpl.el lib-cmpl.el
+all install: cmd-cmpl.el hlp-cmpl.el lib-cmpl.el ex-cmpl.el
 
 cmd-cmpl.el: ${SINGULAR} cmpl.pl
 	${PERL5} cmpl.pl -Singular ${SINGULAR} -cmpl cmd > cmd-cmpl.el
 
 hlp-cmpl.el: ${SINGULAR_HLP} cmpl.pl
 	${PERL5} cmpl.pl -hlp ${SINGULAR_HLP} -cmpl hlp > hlp-cmpl.el
+
+ex-cmpl.el: cmpl.pl ${examplesdir}
+		${PERL5} cmpl.pl -cmpl ex -ex_dir ${examplesdir} > ex-cmpl.el
 
 # this is weird, if I work directly with _one_ pipe, 
 # then things break from time to time
@@ -33,13 +37,14 @@ lib-cmpl.el: ${prefix}/Singular/Makefile cmpl.pl
 	rm lib-temp
 
 clean:
-	rm cmd-cmpl.el hlp-cmpl.el lib-cmpl.el
+	rm cmd-cmpl.el hlp-cmpl.el lib-cmpl.el ex-cmpl.el
 
 install-sharedist: all
 	${MKINSTALLDIRS} ${emacsdir}
 	${INSTALL_DATA} cmd-cmpl.el ${emacsdir}
 	${INSTALL_DATA} lib-cmpl.el ${emacsdir}
 	${INSTALL_DATA} hlp-cmpl.el ${emacsdir}
+	${INSTALL_DATA} ex-cmpl.el ${emacsdir}
 	${INSTALL_DATA} singular.el ${emacsdir}
 	${INSTALL_DATA} .emacs-singular ${emacsdir}
 	${INSTALL_DATA} sing.xpm	${emacsdir}

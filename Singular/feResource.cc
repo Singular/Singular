@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feResource.cc,v 1.17 1999-12-03 11:20:15 obachman Exp $ */
+/* $Id: feResource.cc,v 1.18 1999-12-06 16:06:44 obachman Exp $ */
 /*
 * ABSTRACT: management of resources
 */
@@ -49,7 +49,7 @@ typedef struct feResourceConfig_s
 } feResourceConfig_s;
 typedef feResourceConfig_s * feResourceConfig;
 
-// feSprintf transforms format strings as follows format string:
+// feSprintf transforms format strings as follows:
 // 1.) substrings of the form %c (c being a letter) are replaced by respective resource value
 // 2.) substrings of the form $string are replaced by value of resp. env variable
 
@@ -74,6 +74,7 @@ static feResourceConfig_s feResourceConfigs[20] =
   {"IdxFile",   'x',    feResFile,  "SINGULAR_IDX_FILE",    "%r/doc/singular.idx",  ""},
   {"HtmlDir",   'h',    feResDir,   "SINGULAR_HTML_DIR",    "%r/html",              ""},
   {"ManualUrl", 'u',    feResUrl,   "SINGULAR_URL",         "http://www.mathematik.uni-kl.de/~zca/Singular/Manual/"S_VERSION1,    ""},
+  {"ExDir",      'm',   feResDir,   "SINGULAR_EXAMPLES_DIR","%r/examples",              ""},
 #if !defined(macintosh)
   {"netscape",  'N',    feResBinary,"NETSCAPE",             "%b/netscape",          ""},
   {"info",      'I',    feResBinary,"INFO",                 "%b/info",              ""},

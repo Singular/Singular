@@ -1,5 +1,5 @@
 ;;; Emacs edit mode for this file is  -*- Emacs-Lisp -*-
-;;; $Id: .emacs-singular,v 1.7 1999-11-01 16:14:21 obachman Exp $
+;;; $Id: .emacs-singular,v 1.8 1999-12-06 16:06:59 obachman Exp $
 
 ;;;
 ;;; .emacs-singular - Emacs initialization file to use for
@@ -86,7 +86,7 @@
 (add-hook 'singular-interactive-mode-hook
 	  (function (lambda () (font-lock-mode 1))))
 
-;; turn on c++-mode for files ending in ".sing"
+;; turn on c++-mode for files ending in ".sing" and ".lib"
 (setq auto-mode-alist (cons '("\\.sing\\'" . c++-mode) auto-mode-alist))
 (setq auto-mode-alist (cons '("\\.lib\\'" .  c++-mode) auto-mode-alist))
 (add-hook 'c++-mode-hook
@@ -97,6 +97,12 @@
 ;; `custom-set-faces' to define the faces immediately.
 (make-face 'font-lock-comment-face)
 (make-face 'font-lock-string-face)
+
+; a handy function for customizing face of point
+(defun customize-face-at-point ()
+"Customize face which point is at"
+  (interactive)
+  (customize-face (get-text-property (point) 'face)))
 
 ;; tricky stuff: these customization settings are not used any
 ;; longer as soon as user saved her own to ~/.emacs-singular-cust

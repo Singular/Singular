@@ -1,7 +1,7 @@
 #####################################################################
 ### 
 ### Makefile for Singular documentation 
-### $Id: Makefile.in,v 1.46 1999-12-03 11:20:43 obachman Exp $
+### $Id: Makefile.in,v 1.47 1999-12-06 16:06:54 obachman Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -15,9 +15,11 @@ prefix		= @prefix@
 infodir		= ${prefix}/info
 bindir		= @bindir@
 htmldir         = ${prefix}/html
+exdir           = ${prefix}/examples
 install_infodir = ${install_prefix}/info
 install_htmldir = ${install_prefix}/html
 install_docdir  = ${install_prefix}/doc
+install_exdir   = ${install_prefix}/examples
 
 ##
 ## needed programs
@@ -44,10 +46,12 @@ SINGUNAME       = @SINGUNAME@
 SINGULAR	= @SINGULAR@
 SINGULAR_LIB_DIR= ../Singular/LIB
 LIBPARSE	= ${bindir}/libparse
-D2T_SUBDIR      = ./d2t_singular
-CHKSUM_DB       = ${D2T_SUBDIR}/chksum
-DOC2TEX		= ${PERL5} ./doc2tex.pl -subdir ${D2T_SUBDIR} \
-                  -Singular ${SINGULAR} -verbose ${VERBOSE} -make ${MAKE}
+DOC_SUBDIR      = ./d2t_singular
+EX_SUBDIR       = ./examples
+CHKSUM_DB       = ${DOC_SUBDIR}/chksum
+DOC2TEX		= ${PERL5} ./doc2tex.pl -docdir ${DOC_SUBDIR} \
+                  -Singular ${SINGULAR} -verbose ${VERBOSE} -make ${MAKE} \
+		  -exdir ${EX_SUBDIR}
 PL2DOC		= ${PERL5} ./pl2doc.pl -db  ${CHKSUM_DB}
 
 # t2h stuff
@@ -147,8 +151,8 @@ singular.tex: ${MANUAL_FILES} doc2tex.pl ${LIB_TEX_FILES} ${SINGULAR} ${LIBPARSE
 	${DOC2TEX} -o $@ $<
 
 # pattern rules for lib docus
-${D2T_SUBDIR}/%_lib.pl : ${SINGULAR_LIB_DIR}/%.lib ${LIBPARSE}
-	test -d ${D2T_SUBDIR} || mkdir ${D2T_SUBDIR}
+${DOC_SUBDIR}/%_lib.pl : ${SINGULAR_LIB_DIR}/%.lib ${LIBPARSE}
+	test -d ${DOC_SUBDIR} || mkdir ${DOC_SUBDIR}
 	${LIBPARSE} -i $< > $@
 
 %_noFun.doc : %.pl pl2doc.pl
@@ -158,7 +162,7 @@ ${D2T_SUBDIR}/%_lib.pl : ${SINGULAR_LIB_DIR}/%.lib ${LIBPARSE}
 	${PL2DOC} -o $@ $<
 
 # do not delete intermediate .pl and .doc files
-.PRECIOUS: %.doc %_noFun.doc ${D2T_SUBDIR}/%_lib.pl
+.PRECIOUS: %.doc %_noFun.doc ${DOC_SUBDIR}/%_lib.pl
 
 # index file for help
 singular.idx: singular.hlp ${HTML_SUBDIR}/${HTML_MANUAL_PREFIX}_cp.idx doc2idx.pl
@@ -235,6 +239,7 @@ install: singular.hlp html/index.htm singular.idx
 	${MKINSTALLDIRS} ${infodir}
 	${INSTALL_DATA} singular.hlp ${infodir}
 	test -r ${htmldir} || ln -s `pwd`/${HTML_SUBDIR} ${htmldir}
+	test -r ${exdir} || ln -s `pwd`/${EX_SUBDIR} ${exdir}
 
 uninstall: 
 	rm -f ${infodir}/singular.hlp
@@ -272,7 +277,7 @@ lib2doc.tar.gz:
 	gzip lib2doc.tar
 
 clean: mostlyclean
-	/bin/rm -rf singular.tex manual.tex  ${HTML_SUBDIR} ${D2T_SUBDIR}
+	/bin/rm -rf singular.tex manual.tex ${DOC_SUBDIR} ${EX_SUBDIR}
 
 mostlyclean: 
 	/bin/rm -f .singular_hist doe.tmp dump.ascii example.mp example.txt
@@ -287,6 +292,7 @@ mostlyclean:
 
 distclean: clean
 	/bin/rm -f Makefile
+	/bin/rm -f ${HTML_SUBDIR} 
 
 maintainer-clean: distclean
 
