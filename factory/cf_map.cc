@@ -1,14 +1,18 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_map.cc,v 1.0 1996-05-17 10:59:44 stobbe Exp $
+// $Id: cf_map.cc,v 1.1 1996-07-08 08:17:22 stobbe Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.0  1996/05/17 10:59:44  stobbe
+Initial revision
+
 */
 
 #include "assert.h"
 #include "cf_defs.h"
 #include "cf_map.h"
 #include "cf_iter.h"
+#include "templates/functions.h"
 
 
 static int cmpfunc ( const MapPair & p1, const MapPair & p2 );
@@ -135,6 +139,38 @@ compress ( const CFArray & a, CFMap & M, CFMap & N )
     }
     delete [] tmp;
     delete [] degs;
+}
+
+void compress ( const CanonicalForm & f, const CanonicalForm & g, CFMap & M, CFMap & N )
+{
+    int n = tmax( f.level(), g.level() );
+    int i, k, m;
+    int * degsf = new int[n+1];
+    int * degsg = new int[n+1];
+
+    for ( i = 0; i <= n; i++ ) {
+	degsf[i] = degsg[i] = 0;
+    }
+    degsf = degrees( f, degsf );
+    degsg = degrees( g, degsg );
+    i = 1; k = 1; m = n;
+    while ( i <= n ) {
+	if ( degsf[i] > 0 && degsg[i] > 0 ) {
+	    if ( i != k ) {
+		M.newpair( Variable(i), Variable(k) );
+		N.newpair( Variable(k), Variable(i) );
+	    }
+	    k++;
+	}
+	else {
+	    M.newpair( Variable(i), Variable(m) );
+	    N.newpair( Variable(m), Variable(i) );
+	    m--;
+	}
+	i++;
+    }
+    delete [] degsf;
+    delete [] degsg;
 }
 
 // static functions
