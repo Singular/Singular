@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: class.h,v 1.4 1997-09-12 07:19:54 Singular Exp $
+// $Id: class.h,v 1.5 2000-05-29 08:06:47 pohl Exp $
 ///////////////////////////////////////////////////////////////////////////////
 #ifndef INCL_CLASS_H
 #define INCL_CLASS_H
@@ -31,7 +31,6 @@ public:
 //     Factor<T>& operator+= ( int i ) { _exp += i; return *this; }
 //     Factor<T>& operator*= ( int i ) { _exp *= i; return *this; }
 //     Substitution<T>& operator*= ( const T & f ) { _factor *= f; _exp *= f; return *this; }
-    friend int operator== ( const Substitution<T>&, const Substitution<T>& );
 #ifndef NOSTREAMIO
     void print ( ostream& ) const;
     friend ostream& operator<< ( ostream & os, const Substitution<T> & f )
@@ -41,6 +40,8 @@ public:
     }
 #endif
 };
+template <class T>
+int operator== ( const Substitution<T>&, const Substitution<T>& );
 
 // #ifdef IMPL_CLASS_H
 // #include "class.cc"
@@ -51,6 +52,9 @@ public:
 ////////////////////////////////////////////////////////////
 /*
 $Log: not supported by cvs2svn $
+Revision 1.4  1997/09/12 07:19:54  Singular
+* hannes/michael: libfac-0.3.0
+
 Revision 1.2  1997/04/25 22:21:26  michael
 Version for libfac-0.2.1
 
