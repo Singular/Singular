@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.298 2003-04-09 20:43:09 levandov Exp $ */
+/* $Id: iparith.cc,v 1.299 2003-04-09 21:08:49 levandov Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2463,8 +2463,8 @@ struct sValCmd2 dArith2[]=
 ,{jjREDUCE_ID, REDUCE_CMD,     MODUL_CMD,      MODUL_CMD,  IDEAL_CMD ALLOW_PLURAL}
 //,{jjRES,       RES_CMD,        LIST_CMD,       IDEAL_CMD,  INT_CMD NO_PLURAL}
 //,{jjRES,       RES_CMD,        LIST_CMD,       MODUL_CMD,  INT_CMD NO_PLURAL}
-,{jjRES,       RES_CMD,        RESOLUTION_CMD, IDEAL_CMD,  INT_CMD NO_PLURAL}
-,{jjRES,       RES_CMD,        RESOLUTION_CMD, MODUL_CMD,  INT_CMD NO_PLURAL}
+,{jjRES,       RES_CMD,        RESOLUTION_CMD, IDEAL_CMD,  INT_CMD ALLOW_PLURAL}
+,{jjRES,       RES_CMD,        RESOLUTION_CMD, MODUL_CMD,  INT_CMD ALLOW_PLURAL}
 ,{jjSTATUS2,   STATUS_CMD,     STRING_CMD,     LINK_CMD,   STRING_CMD ALLOW_PLURAL}
 ,{jjSIMPL_P,   SIMPLIFY_CMD,   POLY_CMD,       POLY_CMD,   INT_CMD ALLOW_PLURAL}
 ,{jjSIMPL_P,   SIMPLIFY_CMD,   VECTOR_CMD,     VECTOR_CMD, INT_CMD ALLOW_PLURAL}
@@ -4680,8 +4680,8 @@ struct sValCmd3 dArith3[]=
 ,{jjREDUCE3_CID,    REDUCE_CMD, IDEAL_CMD,  IDEAL_CMD,  MATRIX_CMD, IDEAL_CMD ALLOW_PLURAL}
 ,{jjREDUCE3_CID,    REDUCE_CMD, MODUL_CMD,  MODUL_CMD,  MATRIX_CMD, MODUL_CMD ALLOW_PLURAL}
 #ifdef OLD_RES
-,{jjRES3,           RES_CMD,    NONE,       IDEAL_CMD,  INT_CMD,    ANY_TYPE NO_PLURAL}
-,{jjRES3,           RES_CMD,    NONE,       MODUL_CMD,  INT_CMD,    ANY_TYPE NO_PLURAL}
+,{jjRES3,           RES_CMD,    NONE,       IDEAL_CMD,  INT_CMD,    ANY_TYPE ALLOW_PLURAL}
+,{jjRES3,           RES_CMD,    NONE,       MODUL_CMD,  INT_CMD,    ANY_TYPE ALLOW_PLURAL}
 #endif
 #ifdef HAVE_FACTORY
 ,{jjRESULTANT,      RESULTANT_CMD, POLY_CMD,POLY_CMD,   POLY_CMD,   POLY_CMD NO_PLURAL}
