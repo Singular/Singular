@@ -361,6 +361,7 @@ distclean: clean
 	-rm -f iparith.inc mpsr_Tok.inc stamp.h 
 	-rm -f Singular* *.gprof *.bprof *~ .\#* version.h
 	-rm -f mod2.h Makefile TAGS* tags config.status config.cache config.log
+	-rm -f ${slibdir}
 
 srcclean:
 	@echo "This command is intended for maintainers to use;"

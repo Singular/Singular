@@ -1,7 +1,7 @@
 #####################################################################
 ### 
 ### Makefile for Singular documentation 
-### $Id: Makefile.in,v 1.63 2000-04-27 10:07:18 obachman Exp $
+### $Id: Makefile.in,v 1.64 2000-05-08 15:41:03 Singular Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -342,7 +342,7 @@ mostlyclean:
 
 distclean: clean
 	/bin/rm -f Makefile
-	/bin/rm -rf ${HTML_SUBDIR} 
+	/bin/rm -rf ${HTML_SUBDIR} ../html ../examples
 
 maintainer-clean: distclean
 
