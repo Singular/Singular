@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.36 2002-11-11 18:48:31 Singular Exp $
+@comment $Id: NEWS.texi,v 1.37 2005-03-10 16:57:14 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -107,7 +107,7 @@ Reorganisation of libraries into "Categories".
 @c procedures for primary decomposition of modules
 @item @nref{mondromy_lib}
 procedures for computing the monodromy of a singularity
-@item @nref{gaussman_lib}
+@item @nref{gmspoly_lib}, @nref{gmssing_lib}
 procedures for the Gauss-Manin connection of a singularity
 @item @nref{spcurve_lib}
 procedures for CM codimension 2 singularities

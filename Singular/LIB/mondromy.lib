@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: mondromy.lib,v 1.23 2002-01-10 12:28:37 Singular Exp $";
+version="$Id: mondromy.lib,v 1.24 2005-03-10 16:58:54 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  mondromy.lib  Monodromy of an Isolated Hypersurface Singularity
@@ -22,7 +22,7 @@ PROCEDURES:
 KEYWORDS: Monodromy; hypersurface singularity; Gauss-Manin connection;
           Brieskorn lattice
 
-SEE ALSO: gaussman_lib
+SEE ALSO: gmspoly_lib, gmssing_lib
 ";
 
 LIB "ring.lib";
