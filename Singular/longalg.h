@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.h,v 1.20 2000-12-08 13:42:07 Singular Exp $ */
+/* $Id: longalg.h,v 1.21 2000-12-08 14:42:37 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -93,6 +93,7 @@ poly naPermNumber(number z, int * par_perm, int P);
 #define napIter(p) ((p) = (p)->ne)
 #define napGetCoeff(p) (p->ko)
 #define napGetExp(p,i) ((p)->e[(i)-1])
+#define napGetExpFrom(p,i,r) ((p)->e[(i)-1])
 #define napSetExp(p,i,ee) ((p)->e[(i)-1]=ee)
 #define napNew() ((alg)omAlloc0(napMonomSize))
 #define nanumber lnumber
