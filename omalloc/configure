@@ -55,7 +55,7 @@ ac_help="$ac_help
 ac_help="$ac_help
  --with-track-backtrace track stack backtraces"
 ac_help="$ac_help
-"
+ --with-track-custom track custom values"
 ac_help="$ac_help
  --with-internal-debug       
                        turn on internal debugging"
@@ -669,9 +669,9 @@ if test "${with_track_backtrace+set}" = set; then
   :
 fi
 
-# Check whether --with- --with-track-custom track custom values or --without- --with-track-custom track custom values was given.
-if test "${with_ __with_track_custom track custom values+set}" = set; then
-  withval="$with_ __with_track_custom track custom values"
+# Check whether --with-track-custom or --without-track-custom was given.
+if test "${with_track_custom+set}" = set; then
+  withval="$with_track_custom"
   :
 fi
  

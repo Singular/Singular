@@ -3,7 +3,7 @@ dnl File: configure.in
 dnl Purpose: Process this file with autoconf to produce configure
 dnl Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
 dnl Created: 11/99
-dnl Version: $Id: configure.in,v 1.8 2000-09-12 16:02:17 obachman Exp $
+dnl Version: $Id: configure.in,v 1.9 2000-09-14 15:36:39 obachman Exp $
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 
 AC_INIT(omAlloc.c)
@@ -74,6 +74,7 @@ AC_ARG_WITH(
   track-backtrace,
   [ --with-track-backtrace track stack backtraces])
 AC_ARG_WITH(
+  track-custom,
   [ --with-track-custom track custom values]) 
 AC_ARG_WITH(
   internal_debug,
