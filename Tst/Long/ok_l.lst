@@ -1,14 +1,13 @@
 allres_l
 bug_4
 classify_l
-; DIFF deform_l
-deform_new_l
+deform_l
+det_minor
 fetch_l
 fglm1_l
 finvar_l
 gcd0_l
 gcdp_l
-groebner_l
 hnoether_l
 hres_l
 intdet_l
@@ -18,6 +17,8 @@ minor_l
 modulo_l
 monodromy_l
 mpsr_l
+mre
+mre_nonhom
 primdec_l
 primitiv_l
 res_l
