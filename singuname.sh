@@ -65,7 +65,12 @@ then
 # SunOS ########################################################
 elif (echo $uname_a | $egrep "SunOS" > $devnull)
 then
-    prefix=SunOS
+    if (echo $uname_a | $egrep "sun3" > $devnull)
+    then
+      prefix=Sun3OS
+    else
+      prefix= SunOS
+    fi
     if (echo $uname_a | $egrep "4\.[0-9]" > $devnull) 
     then
 	echo ${prefix}-4

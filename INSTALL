@@ -139,7 +139,7 @@ TROUBLES
   info program is executed if you call 'info' from your shell.
 
 * General: Singular can not find its libraries or info-file:
-  (1) Start up Singular, and issue the command `system("Singular");'.
+  (1) Start up Singulaar, and issue the command `system("Singular");'.
       If this does not return the correct and expanded location of the 
       Singular executable, then you found a bug in Singular, which we
       ask you to report (see below).

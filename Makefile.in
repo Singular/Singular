@@ -59,10 +59,10 @@ local-maintainer-clean: local-distclean
 	@ echo "This command is intended for maintainer use, only"
 	rm -rf configure
 
-clean mostlyclean: uninstall local-clean
+clean mostlyclean: local-clean
 	$(recurse)
 
-distclean: uninstall local-distclean
+distclean: local-distclean
 	$(recurse)
 
 maintainer-clean: uninstall local-maintainer-clean
@@ -128,6 +128,8 @@ sharedist: ${SINGULAR}
 	${MKINSTALLDIRS} ${TMPDIR}/info
 	${MKINSTALLDIRS} ${TMPDIR}/Singular/LIB/gftables
 	cp Singular/LIB/*.lib ${TMPDIR}/Singular/LIB/${S_VERSION}
+	rm -f ${TMPDIR}/Singular/LIB/${S_VERSION}/fastsolv.lib
+	rm -f ${TMPDIR}/Singular/LIB/${S_VERSION}/tst.lib
 	cp Singular/LIB/gftables/[0-9]* ${TMPDIR}/Singular/LIB/gftables
 	cd ${TMPDIR}/Singular/LIB/${S_VERSION}; \
 		${LN_S} ../gftables .
@@ -146,7 +148,7 @@ sharedist: ${SINGULAR}
            tar -cf sing.tar Singular info; \
            gzip sing.tar
 	cp ${TMPDIR}/sing.tar.gz ${SHAREDIST_NAME}.tar.gz
-#	rm -rf ${TMPDIR}
+	rm -rf ${TMPDIR}
 
 win-sharedist:
 	export SINGULAR_VERSION=${SINGULAR_DOS_VERSION} && ${MAKE} sharedist
