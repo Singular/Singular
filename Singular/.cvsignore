@@ -1,2 +1,2 @@
-*.dd *.d depend scanner.cc grammar.cc grammar Singular Singularg t.mp .gdb_history
+*.tst *.res *.dd *.d depend scanner.cc grammar.cc grammar Singular Singularg t.mp .gdb_history
 .gdbinit grammar.h
