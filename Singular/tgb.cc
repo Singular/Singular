@@ -1081,6 +1081,121 @@ static void c_S_element_changed_hook(int pos, calc_dat* c){
   length_one_crit(c,pos, c->lengths[pos]);
   line_of_extended_prod(pos,c);
 }
+class poly_tree_node {
+public:
+  poly p;
+  poly_tree_node* l;
+  poly_tree_node* r;
+  int n;
+  poly_tree_node(int sn):l(NULL),r(NULL),n(sn){}
+};
+class exp_number_builder{
+public:
+  poly_tree_node* top_level;
+  int n;
+  int get_n(poly p);
+  exp_number_builder():top_level(0),n(0){}
+};
+int exp_number_builder::get_n(poly p){
+  poly_tree_node** node=&top_level;
+  while(*node!=NULL){
+    int c=pLmCmp(p,(*node)->p);
+    if (c==0) return (*node)->n;
+    if (c==-1) node=&((*node)->l);
+    else
+      node=&((*node)->r);
+  }
+  (*node)= new poly_tree_node(n);
+  n++;
+  (*node)->p=pLmInit(p);
+  return (*node)->n;
+}
+class mac_poly_r{
+public:
+  number coef;
+  mac_poly_r* next;
+  int exp;
+  mac_poly_r():next(NULL){}
+};
+struct int_poly_pair{
+  poly p;
+  int n;
+};
+typedef mac_poly_r* mac_poly;
+  void t2ippa_rec(poly* ip,int* ia, poly_tree_node* k, int &offset){
+    if(!k) return;
+    t2ippa_rec(ip,ia,k->l,offset);
+    ip[offset]=k->p;
+    ia[k->n]=offset;
+    ++offset;
+
+    t2ippa_rec(ip,ia,k->r,offset);
+    delete k;
+  }
+void t2ippa(poly* ip,int* ia,exp_number_builder & e){
+
+  int o=0;
+  t2ippa_rec(ip,ia,e.top_level,o);
+}
+int anti_poly_order(const void* a, const void* b){
+  return -pLmCmp(((int_poly_pair*) a)->p,((int_poly_pair*) b)->p );
+}
+void pre_comp(poly* p,int pn,calc_dat* c){
+  if(!(pn))
+    return;
+  mac_poly* q=(mac_poly*) omalloc(pn*sizeof(mac_poly)); 
+  int i;
+  exp_number_builder e;
+  for(i=0;i<pn;i++){
+    assume(p[i]!=NULL);
+    q[i]=new mac_poly_r();
+    q[i]->exp=e.get_n(p[i]);
+    q[i]->coef=nCopy(p[i]->coef);
+    
+    mac_poly qa=q[i];
+    poly pa=p[i];
+    while(pa->next!=NULL){
+      qa->next = new mac_poly_r();
+      qa=qa->next;
+      pa=pa->next,
+      qa->exp=e.get_n(pa);
+      qa->coef=nCopy(pa->coef);
+     
+      
+    }
+    qa->next=NULL;
+    pDelete(&p[i]);
+  }
+  poly* ip= (poly*)omalloc (e.n*sizeof(poly));
+  int* ia=(int*) omalloc (e.n*sizeof(int));
+  t2ippa(ip,ia,e);
+  for(i=0;i<pn;i++){
+    mac_poly mp=q[i];
+    while(mp!=NULL){
+      mp->exp=ia[mp->exp];
+      mp=mp->next;
+    }
+    
+  }
+  
+  for(i=0;i<pn;i++){
+    poly pa;
+    mac_poly qa;
+    p[i]=pLmInit(ip[q[i]->exp]);
+    pSetCoeff(p[i],q[i]->coef);
+    pa=p[i];
+    qa=q[i];
+    while(qa->next!=NULL){
+      qa=qa->next;
+      pa->next=pLmInit(ip[qa->exp]);
+      pa=pa->next;
+      pa->coef=qa->coef;
+    }
+    pa->next=NULL;
+  }
+  omfree(ip);
+  omfree(ia);
+}
 
 static void go_on (calc_dat* c){
   //set limit of 1000 for multireductions, at the moment for
@@ -1127,7 +1242,7 @@ static void go_on (calc_dat* c){
     i++;
   }
   p[i]=NULL;
-  
+  pre_comp(p,i,c);
   red_object* buf=(red_object*) omalloc(i*sizeof(red_object));
   c->normal_forms+=i;
   int j;
