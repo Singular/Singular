@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.63 1999-09-22 14:58:36 obachman Exp $ */
+/* $Id: iplib.cc,v 1.64 1999-09-22 15:12:15 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -789,6 +789,7 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
 #ifndef HAVE_NAMESPACES
 static void iiCleanProcs(idhdl &root)
 {
+  idhdl prev=NULL;
   loop
   {
     if (root==NULL) return;
@@ -801,9 +802,17 @@ static void iiCleanProcs(idhdl &root)
         // procinfo data incorrect:
         // - no proc body can start at the beginning of the file
         killhdl(root);
+        if (prev==NULL)
+          root=idroot;
+        else
+        {
+          root=prev;
+          prev=NULL;
+        }
+        continue;
       }
-      continue;
     }
+    prev=root;
     root=IDNEXT(root);
   }
 }
@@ -843,7 +852,7 @@ static BOOLEAN iiLoadLIB(FILE *fp, char *libnamebuf, char*newlib,
     Werror("Cannot load library,... aborting.");
     reinit_yylp();
     fclose( yylpin );
-#ifdef HAVE_NAMESPACES
+#ifndef HAVE_NAMESPACES
     iiCleanProcs(idroot);
 #endif /* HAVE_NAMESPACES */
     return TRUE;
