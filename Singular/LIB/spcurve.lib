@@ -1,8 +1,8 @@
-// $Id: spcurve.lib,v 1.7 1999-07-21 09:55:35 anne Exp $
+// $Id: spcurve.lib,v 1.8 1999-07-21 10:10:36 Singular Exp $
 // (anne, last modified 31.5.99)
 /////////////////////////////////////////////////////////////////////////////
 
-version="$Id: spcurve.lib,v 1.7 1999-07-21 09:55:35 anne Exp $";
+version="$Id: spcurve.lib,v 1.8 1999-07-21 10:10:36 Singular Exp $";
 info="
 LIBRARY:  spcurve.lib    PROCEDURES FOR CM CODIMENSION 2 SINGULARITIES
 AUTHOR:   Anne Fruehbis-Krueger, anne@mathematik.uni-kl.de
@@ -762,8 +762,7 @@ NOTE:      * the initial basering should not contain variables with name
            @*  watchProgress[4]>0  => result of elimination step
            @*  watchProgress[4]>1  => trace output of multiplications with xyz
            @*                         and subsequent reductions
-           @*  watchProgress[5]>0  => matrix representing the kernel
-           @*                         using print
+           @*  watchProgress[5]>0  => matrix representing the kernel using print
 EXAMPLE:   @code{example KSpencerKernel}; shows an example
 "
 {
