@@ -160,10 +160,7 @@ OBJS=grammar.o scanner.o matpol.o binom.o mpr_complex.o gnumpfl.o gnumpc.o \
 .c.o:
 	${CC} ${CFLAGS} ${CPPFLAGS} ${DEFS} -c $<
 
-all:	Singular cksum
-
-cksum: cksum.c mod2.h
-	$(CC) $(CFLAGS) ${CPPFLAGS} cksum.c -o cksum
+all:	Singular
 
 Singular: mod2.h si_paths.h Makefile version.h scanner.cc gmalloc.o \
           ${OBJS} iparith.o mpsr_Tok.o tesths.cc libparse.cc 
@@ -257,11 +254,10 @@ configure: configure.in
 ##
 install: all installbin installslib
 
-installbin: Singular libparse cksum
+installbin: Singular libparse
 	${MKINSTALLDIRS} ${bindir}
 	${INSTALL_PROGRAM} Singular ${bindir}/Singular-${SINGULAR_VERSION}
 	${INSTALL_PROGRAM} libparse ${bindir}/libparse
-	${INSTALL_PROGRAM} cksum ${bindir}/cksum
 	chmod a+x ${bindir}/Singular-${SINGULAR_VERSION}
 	rm -f ${bindir}/Singular
 	cd ${bindir}; ${LN_S} Singular-${SINGULAR_VERSION} Singular;\
@@ -285,7 +281,7 @@ uninstallbin:
 mostlyclean: clean
 
 clean:
-	-rm -f Singular Singularg Singularp Singularb libparse cksum \
+	-rm -f Singular Singularg Singularp Singularb libparse \
             *.o *.og core *.op *.ob 
 
 distclean: clean
