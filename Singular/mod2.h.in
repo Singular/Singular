@@ -5,7 +5,7 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id: mod2.h.in,v 1.97 2000-12-18 14:22:54 obachman Exp $
+ *  Version: $Id: mod2.h.in,v 1.98 2001-02-01 13:22:18 mschulze Exp $
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H
@@ -166,6 +166,9 @@
 
 /* linear algebra extensions from pcv.h/pcv.cc */
 #define HAVE_PCV 1
+
+// procedures to compute with units
+#define HAVE_UNITS 0
 
 /* Define to use old mechanismen for saving currRing with procedures
  * Does not work with HAVE_NAMESPACES enabled
