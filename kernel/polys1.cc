@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.5 2004-07-16 08:43:01 Singular Exp $ */
+/* $Id: polys1.cc,v 1.6 2004-08-27 12:22:34 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -1054,7 +1054,7 @@ poly pPermPoly (poly p, int * perm, ring oldRing, nMapFunc nMap,
       }
       pTest(aq);
     }
-    pSetComp(qq, p_GetComp(p,oldRing));
+    if (rRing_has_Comp(currRing)) pSetComp(qq, p_GetComp(p,oldRing));
     if (nIsZero(pGetCoeff(qq)))
     {
       pDeleteLm(&qq);
