@@ -16,6 +16,9 @@
     compute w.r.t.@: a wellordering
     a Groebner resp.@: standard basis
 
++ Fuer Aestheten: anstatt der Quotes "..." die TeX Quotes verwenden
+  ``...''.
+
 + Die Zeichen @ und { und } muessen in texinfo mit @ "gequoted"
   werden (nicht mit Backslash!). 
   Der Backslash muss nicht gequoted werden:
@@ -39,6 +42,11 @@
   eingesetzt. Der Fehler ist im texinfo behoben. Man kann nun also auch
   mitten in einem Satz auf @tex umschalten, ohne etwas wie \noindent
   einsetzen zu muessen.
+
++ fuer Ellipsen (...) das Kommando @dots{} verwenden.  Eine Ellipse am Ende
+  eines Satzes mit @enddots{} schreiben.
+
++ Email Adressen in @email{...} notieren, URL's in @url{...}
 
 * Notationen *
 ==============
@@ -86,6 +94,8 @@
   
 + Meistens verwenden wir den Begriff "monomial ordering".
 
++ "Computer Algebra" statt "computer algebra"
+
 + Konstrukte wie "the ideal/module is..." vermeiden. Stattdessen etwa
   "the ideal resp.@: module is..." schreiben.
 
@@ -95,6 +105,9 @@
     @sc{Singular}, for example, has the ...
   Nach einem Doppelpunkt schreiben wir klein weiter:
     Purpose: computes the dimension.
+
++ Die pers"onliche Anrede des Lesers vermeiden.  Insbesondere die Worte
+  `you', `your', etc. vermeiden.
 
 * Singular Beispiele und libraries *
 ====================================
@@ -129,13 +142,49 @@
   werden. (Sonst bekommt man "overfull hbox"-Meldungen um die Ohren
   geschmissen.)
 
++ Kommando-Beschreibungen (Purpose:) fangen mit einem Kleinbuchstaben an,
+  sind in der dritten Person Singular gehalten und schliessen mit einem
+  Punkt.  Vollstaendige Saetze formulieren.  Beispiel:
+
+  Purpose:  returns the number of ring parameters.
+
 + Hilfe-Texte in Libraries: keine TAB's verwenden
 
 * Cross-Referenzen *
 ====================
 
-+ mit der neuen Version von doc2tex kann (soll) man Cross-Referenzen
-  wie folgt schreiben:
++ es gibt drei Type von Cross-Referenzen (erste Zeile - Beispiel,
+  zweite Zeile - Resultat in Info, dritte Zeile - Resultat in TeX):
+
+
+  @xref      fuer den Anfang eines Satzes
+
+   	     @xref{Tropical Storms}, for more info.
+   	     *Note Tropical Storms::, for more info.
+   	     See Section 3.1 [Tropical Storms], page 24, for more info.
+
+  @ref       fuer den Ende eines Satzes
+
+             For more information, see @ref{Hurricanes}.
+             For more information, see *Note Hurricanes::.
+             For more information, see Section 8.2 [Hurricanes], page 123.
+
+  @pxref     fuer geklammerte Referenzen
+
+             ... storms cause flooding (@pxref{Hurricanes}) ...
+             ... storms cause flooding (*Note Hurricanes::) ...
+             ... storms cause flooding (see Section 6.7 [Hurricanes], page 72) ...
+
++ @xref und @ref *muessen* immer von einem Komma oder einem Punkt
+  oder einem Semikolon abgeschlossen werden.  Wie oben aufgefuehrt, sollte
+  @xref immer am Satzanfang stehen, @ref dagegen immer am Satzende.
+  Ausnahmen sind Listen von @ref's, wie unten beschrieben.
+
++ @pxref darf nur innerhalb einer Klammer auftauchen.  Und zwar nur ein
+  einzelnes, keine Liste von @pxref's.
+
++ mit der neuen Version von doc2tex kann (soll) man Listen von 
+  Cross-Referenzen wie folgt schreiben:
     @c ref
     See
     @ref{std};
@@ -152,13 +201,6 @@
   Die Referenzen bitte alphabetisch sortieren und mit einem Semikolon
   trennen.
 
-+ Referenzen immer mit einem Komma oder Punkt abschliessen:
-    @xref{foo}, for a description of foo.
-
-+ Eher @xref als @ref verwenden, da @ref im Info-file nicht so toll
-  aussieht.  Folgendes ist aber ok:
-    blah blah blah (@ref{blahblahblah}).
-  
 ------------------------------------------------------------
-$Id: STYLEGUIDE,v 1.4 1998-05-18 12:53:39 wichmann Exp $
+$Id: STYLEGUIDE,v 1.5 1998-05-18 13:36:31 schmidt Exp $
 ------------------------------------------------------------
