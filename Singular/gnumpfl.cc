@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpfl.cc,v 1.7 1999-07-02 16:14:39 wenk Exp $ */
+/* $Id: gnumpfl.cc,v 1.8 1999-07-08 16:44:03 Singular Exp $ */
 /*
 * ABSTRACT: computations with GMP floating-point numbers
 *
@@ -240,9 +240,9 @@ number ngfDiv (number a, number b)
 void ngfPower ( number x, int exp, number * u )
 {
   if ( exp == 0 )
-  { 
+  {
     gmp_float* n = new gmp_float(1);
-    *u=(number)n; 
+    *u=(number)n;
     return;
   }
   if ( exp == 1 )
@@ -257,7 +257,7 @@ void ngfPower ( number x, int exp, number * u )
     {
       gmp_float* n = new gmp_float();
       *n= *(gmp_float*)x;
-      *u=(number)n; 
+      *u=(number)n;
     }
     return;
   }
@@ -388,16 +388,31 @@ char * ngfRead (char * s, number * a)
   }
   else
   {
-    if ( *s == '/' ) {
+    gmp_float divisor(1.0);
+    char *start2=s;
+    if ( *s == '/' )
+    {
+      s++;
+      s= ngfEatFloatNExp( s );
+      if (s!= start2+1)
+      {
+        char tmp_c=*s;
+        *s='\0';
+        divisor.setFromStr(start2+1);
+        *s=tmp_c;
+      }
+      else
+      {
+        Werror("wrong long real format: %s",start2);
+      }
     }
-    char c=*s;
-    *s='\0';
+    char c=*start2;
+    *start2='\0';
     if ( *(gmp_float**)a == NULL ) (*(gmp_float**)a)= new gmp_float();
     (*(gmp_float**)a)->setFromStr(start);
-    *s=c;
+    *start2=c;
+    (**(gmp_float**)a) /= divisor;
   }
-
- 
 
   return s;
 }
@@ -408,12 +423,15 @@ char * ngfRead (char * s, number * a)
 void ngfWrite (number &a)
 {
   char *out;
-  if ( a ) {
+  if ( a != NULL )
+  {
     out= floatToStr(*(gmp_float*)a,gmp_output_digits);
     StringAppend(out);
     //Free((ADDRESS)out, (strlen(out)+1)* sizeof(char) );
     FreeL( (ADDRESS)out );
-  } else {
+  }
+  else
+  {
     StringAppend("0");
   }
 }
