@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.178 2002-02-16 18:07:28 mschulze Exp $ */
+/* $Id: extra.cc,v 1.179 2002-02-16 18:26:07 mschulze Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -1462,9 +1462,9 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 #endif
 /*==================== eigenvalues ==================================*/
 #ifdef HAVE_EIGENVAL
-    if(strcmp(sys_cmd,"eigenvalues")==0)
+    if(strcmp(sys_cmd,"eigenvals")==0)
     {
-      return evEigenvalue(res,h);
+      return evEigenvals(res,h);
     }
     else
 #endif

@@ -1,6 +1,6 @@
 //GMG last modified: 04/25/2000
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: linalg.lib,v 1.24 2002-02-16 13:50:19 mschulze Exp $";
+version="$Id: linalg.lib,v 1.25 2002-02-16 18:26:08 mschulze Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  linalg.lib  Algorithmic Linear Algebra
@@ -1248,7 +1248,7 @@ list l;
 EXAMPLE: example eigenvals; shows examples
 "
 {
-  return(system("eigenvalues",M));
+  return(system("eigenvals",M));
 }
 example
 { "EXAMPLE:"; echo=2;

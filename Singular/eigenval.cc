@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: eigenval.cc,v 1.8 2002-02-16 18:07:49 mschulze Exp $ */
+/* $Id: eigenval.cc,v 1.9 2002-02-16 18:26:07 mschulze Exp $ */
 /*
 * ABSTRACT: eigenvalues of constant square matrices
 */
@@ -222,7 +222,7 @@ BOOLEAN evHessenberg(leftv res,leftv h)
 }
 
 
-lists evEigenvalue(matrix M)
+lists evEigenvals(matrix M)
 {
   lists l=(lists)omAllocBin(slists_bin);
   if(MATROWS(M)!=MATCOLS(M))
@@ -231,9 +231,7 @@ lists evEigenvalue(matrix M)
     return(l);
   }
 
-  M=(matrix)idJet((ideal)M,0);
-
-  M=evHessenberg(M);
+  M=evHessenberg((matrix)idJet((ideal)M,0));
 
   int n=MATROWS(M);
   ideal e=idInit(n,1);
@@ -365,7 +363,7 @@ lists evEigenvalue(matrix M)
 }
 
 
-BOOLEAN evEigenvalue(leftv res,leftv h)
+BOOLEAN evEigenvals(leftv res,leftv h)
 {
   if(currRingHdl)
   {
@@ -373,7 +371,7 @@ BOOLEAN evEigenvalue(leftv res,leftv h)
     {
       matrix M=(matrix)h->Data();
       res->rtyp=LIST_CMD;
-      res->data=(void*)evEigenvalue(mpCopy(M));
+      res->data=(void*)evEigenvals(mpCopy(M));
       return FALSE;
     }
     WerrorS("<matrix> expected");
