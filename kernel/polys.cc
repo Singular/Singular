@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.2 2004-03-25 21:16:15 levandov Exp $ */
+/* $Id: polys.cc,v 1.3 2004-08-13 10:04:21 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -661,6 +661,11 @@ void pNorm(poly p1)
 
   if (p1!=NULL)
   {
+    if (pNext(p1)==NULL)
+    {
+      pSetCoeff0(p1,nInit(1));
+      return;
+    }
     if (!nIsOne(pGetCoeff(p1)))
     {
       nNormalize(pGetCoeff(p1));
