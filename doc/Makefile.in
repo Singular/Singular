@@ -1,7 +1,7 @@
 #####################################################################
 ### 
 ### Makefile for Singular documentation 
-### $Id: Makefile.in,v 1.47 1999-12-06 16:06:54 obachman Exp $
+### $Id: Makefile.in,v 1.48 1999-12-08 12:47:55 obachman Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -20,6 +20,9 @@ install_infodir = ${install_prefix}/info
 install_htmldir = ${install_prefix}/html
 install_docdir  = ${install_prefix}/doc
 install_exdir   = ${install_prefix}/examples
+
+# directory where files for ftp site go
+ftpdir		= /tmp
 
 ##
 ## needed programs
@@ -77,7 +80,8 @@ HTML_TUTOR_TOP     = tutor.htm
 ###########################################################
 # File sets
 #
-STANDALONE_TEXI_FILES	= COPYING.texi INSTALL_unix.texi NEWS.texi
+STANDALONE_TEXI_FILES	= COPYING.texi INSTALL_unix.texi NEWS.texi \
+			  README_download.texi README_ftp.texi
 
 DOC2TEX_FILES	= \
 		examples.tex general.tex math.tex reference.tex \
@@ -264,6 +268,16 @@ install-bindist: INSTALL_unix.${SINGUNAME}.txt INSTALL_unix.${SINGUNAME}.html
 	${MKINSTALLDIRS} ${install_prefix}
 	${INSTALL_DATA} INSTALL_unix.${SINGUNAME}.txt ${install_prefix}/INSTALL
 	${INSTALL_DATA} INSTALL_unix.${SINGUNAME}.html ${install_prefix}/INSTALL.html
+
+install-ftp: ${STANDALONE_HTML_FILES} ${STANDALONE_TXT_FILES}
+	${INSTALL_DATA} NEWS.txt ${ftpdir}/NEWS
+	${INSTALL_DATA} NEWS.html ${ftpdir}
+	${INSTALL_DATA} COPYING.txt ${ftpdir}/COPYING
+	${INSTALL_DATA} COPYING.html ${ftpdir}
+	${INSTALL_DATA} INSTALL_unix.txt ${ftpdir}/INSTALL_unix
+	${INSTALL_DATA} INSTALL_unix.html ${ftpdir}
+	${INSTALL_DATA} README_ftp.txt ${ftpdir}/README
+	${INSTALL_DATA} README_ftp.html ${ftpdir}/README.html
 
 texi2html = $(TEXI2HTML:%.pl=%)
 

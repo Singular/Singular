@@ -1,7 +1,9 @@
 @comment -*-texinfo-*-
-@comment $Id: INSTALL_unix.texi,v 1.6 1999-12-06 17:02:12 obachman Exp $
-@comment this file contains the installation instruction for Singular on 
-@comment Unix
+@comment $Id: INSTALL_unix.texi,v 1.7 1999-12-08 12:47:55 obachman Exp $
+@c FILE: INSTALL_unix.texi
+@c PURPOSE: Installation instruction for Singular on  Unix 
+@c
+
 @ifclear VERSION
 @include version.texi
 @end ifclear
@@ -48,8 +50,7 @@ You can obtain these (and other) archives from
 @end display
 
 @ifclear singularmanual
-@heading Important
-Please see 
+@strong{Important:} Please see 
 @ifhtml
 @uref{COPYING.html, COPYING}
 @end ifhtml

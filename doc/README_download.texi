@@ -1,0 +1,76 @@
+@comment -*-texinfo-*-
+@comment $Id: README_download.texi,v 1.1 1999-12-08 12:47:56 obachman Exp $
+@c FILE: README_download.texi
+@c PURPOSE: downloading instructions, to be includeded in manual and README_ftp
+@c
+
+@ifclear VERSION
+@include version.texi
+@end ifclear
+
+@heading To download @sc{Singular} for a Unix platform
+
+Make sure that you have approximately 12MByte of free disk space and follow
+these steps.
+
+@enumerate
+@item
+You need to download two (archive) files:
+@table @code
+@item Singular-@value{VERSION}-share.tgz 
+contains architecture independent data like documentation and libraries
+(alternatively, you may also download 
+@code{Singular-@value{VERSION}-share.zip}).
+@item Singular-@value{VERSION}-<uname>.tgz
+contains architecture dependent executables, like the @sc{Singular}
+program.
+@end table
+@code{<uname>} is a description of the processor and operating
+system for which @sc{Singular} is compiled. Choose one of the following:
+@multitable @columnfractions .2 .8
+@item @code{ix86-Linux}
+@tab PC's running under Linux
+@item @code{HPUX-9}
+@tab HP workstations running under HPUX version 9
+@item @code{HPUX-10}
+@tab HP workstations running under HPUX version 10
+@end multitable
+Please contact us if
+you can not find an appropriate architecture dependent archive.
+
+@item
+Simply change to the directory in which you wish to install
+@sc{Singular} (usually wherever you install 3rd-party software):
+@smallexample
+cd /usr/local/	
+@end smallexample
+
+@sc{Singular} specific subdirectories will be created in such a way
+that multiple versions and multiple architecture dependent files
+of @sc{Singular} can peaceably coexist under the same @code{/usr/local/}
+tree.
+
+@item
+Unpack the archives:
+@smallexample
+gzip -dc Singular-@value{VERSION}-<uname>.tgz | tar -pxf -
+gzip -dc Singular-@value{VERSION}-share.tgz | tar -pxf -
+@end smallexample
+If you have downloaded @code{Singular-@value{VERSION}-share.zip},
+unpack with 
+@smallexample
+unzip -u Singular-@value{VERSION}-share.zip
+@end smallexample
+
+@item 
+After unpacking, see the created file
+@code{Singular/@value{VERSION}/INSTALL} for details on how to finish
+the installation.
+@end enumerate
+
+@heading To download @sc{Singular} for Windows 95/98/NT
+
+TBC
+
+@heading To download @sc{Singular} for the Macintosh
+TBC
