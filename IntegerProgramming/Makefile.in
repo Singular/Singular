@@ -13,8 +13,8 @@ install_bindir  = ${install_prefix}/${SINGUNAME}
 ##
 @SET_MAKE@
 CXX             = @CXX@
-INSTALL         = ../install-sh -c
-INSTALL_PROGRAM = ../install-sh -c
+INSTALL		= @INSTALL@
+INSTALL_PROGRAM	= @INSTALL_PROGRAM@ 
 MKINSTALLDIRS   = ../mkinstalldirs
 
 ##
