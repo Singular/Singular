@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.176 2000-01-28 17:53:18 obachman Exp $
+@comment $Id: reference.doc,v 1.177 2000-02-01 09:42:44 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -1217,7 +1217,8 @@ See
 list
 @item @strong{Purpose:}
 computes the transformation matrix which expresses the generators of a
-module @code{sm} in terms of the generators of a module @code{m}
+module @code{sm} (the second argument) in terms of the generators of a
+module @code{m} (the first argument)
 and a rest @code{R}.
 The first argument represent @code{m}, the second @code{sm}.
 Uses different
@@ -2275,8 +2276,6 @@ See
 @ref{lres};
 @ref{sres}.
 @c ref
-
-
 @c ---------------------------------------
 @node imap, indepSet, hres, Functions
 @subsection imap
