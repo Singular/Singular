@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: claptmpl.cc,v 1.13 1998-04-06 12:24:19 schmidt Exp $
+// $Id: claptmpl.cc,v 1.14 1998-04-08 13:18:18 pohl Exp $
 /*
 * ABSTRACT - instantiation of all templates
 */
@@ -15,32 +15,22 @@
 #endif
 
 #if defined(HAVE_FACTORY) || defined(HAVE_FGLM)
-  #ifdef macintosh
-    #include <:templates:ftmpl_list.cc>
-  #else
-    #include <templates/ftmpl_list.cc>
-  #endif
-
+  #include <templates/ftmpl_list.cc>
   #ifdef HAVE_FGLM
     #include "fglm.h"
   #endif
 
   #ifdef HAVE_FACTORY
-    #ifdef macintosh
-      #include <:templates:ftmpl_array.cc>
-      #include <:templates:ftmpl_factor.cc>
-      #include <:templates:ftmpl_functions.h>
-      #include <:templates:ftmpl_matrix.cc>
+    #include <templates/ftmpl_array.cc>
+    #include <templates/ftmpl_factor.cc>
+    #include <templates/ftmpl_functions.h>
+    #include <templates/ftmpl_matrix.cc>
+    #ifdef __MWERKS__
       template List<CanonicalForm> Difference<CanonicalForm>(const List<CanonicalForm>&,const List<CanonicalForm>&);
       template List<CanonicalForm> Union<CanonicalForm>(const List<CanonicalForm>&,const List<CanonicalForm>&);
       template List<CFFactor> Union<CFFactor>(const List<CFFactor>&,const List<CFFactor>&);
       template List<Variable> Union<Variable> ( const List<Variable>&, const List<Variable>& );
       template List<Variable> Difference<Variable> ( const List<Variable>&, const List<Variable>& );
-    #else
-      #include <templates/ftmpl_array.cc>
-      #include <templates/ftmpl_factor.cc>
-      #include <templates/ftmpl_functions.h>
-      #include <templates/ftmpl_matrix.cc>
     #endif
 
     template class Factor<CanonicalForm>;
@@ -58,7 +48,7 @@
     template class SubMatrix<CanonicalForm>;
     template class Array<REvaluation>;
 
-    #ifndef macintosh
+    #ifndef __MWERKS__
       template List<CFFactor> Union ( const List<CFFactor>&, const List<CFFactor>& );
 
       template CanonicalForm tmax ( const CanonicalForm&, const CanonicalForm& );
@@ -133,7 +123,7 @@ int operator== ( const Substitution<T> &f1, const Substitution<T> &f2 )
     template class List<Variable>;
     template class ListIterator<Variable> ;
 
-    #ifndef macintosh
+    #ifndef __MWERKS__
       template List<Variable> Union ( const List<Variable>&, const List<Variable>& );
       template List<Variable> Difference ( const List<Variable>&, const List<Variable>& );
 
