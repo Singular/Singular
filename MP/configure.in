@@ -62,6 +62,7 @@ fi
 
 AC_PROG_CC
 AC_PROG_CPP
+AC_PROG_CXX
 AC_AIX
 
 dnl compiler/system specific options
