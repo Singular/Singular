@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.192 2001-02-28 08:25:42 pohl Exp $
+@comment $Id: general.doc,v 1.193 2001-03-28 15:06:57 westenb Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -777,7 +777,7 @@ interactive customization of nearly all aspects of the user-interface.
 
 To use the @sc{Singular}-Emacs interface you need to have Emacs version
 20 or higher, or XEmacs
-version 20 or higher installed on your system. These
+version 20.3 or higher installed on your system. These
 editors can be downloaded for most hard- and software platforms
 (including Windows
 95/98/NT, but excluding the Macintosh), from either
