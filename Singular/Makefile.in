@@ -58,6 +58,14 @@ LD_LIBC	        = @LD_LIBC@
 STATIC_LDFLAGS	= @STATIC_LDFLAGS@
 LIBS		= -lm @NEED_LIBS@
 
+ifdef LD_STATIC
+LDFLAGS  := ${STATIC_LDFLAGS} ${LDFLAGS} 
+SING_EXEC = Singular-static
+else
+SING_EXEC = Singular
+endif
+
+
 ##
 ## End configuration dependend stuff
 #################################################################
@@ -187,24 +195,15 @@ GFTABLES = $(wildcard LIB/gftables/[1-9]*)
 %.aso: %.aso.o
 	./$< > $@
 
-all:	Singular
+all:	${SING_EXEC}
 
-Singular: mod2.h Makefile version.h scanner.cc gmalloc.o \
+${SING_EXEC}: mod2.h Makefile version.h scanner.cc gmalloc.o \
           ${ASO_OBJS} ${OBJS} \
           iparith.o tesths.cc libparse.cc claptmpl.o mpsr_Tok.o
 	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} \
-	  -o Singular \
+	  -o ${SING_EXEC} \
 	  tesths.cc iparith.o mpsr_Tok.o claptmpl.o\
 	  ${OBJS} ${LDFLAGS} ${LIBS} ${LD_DYN_FLAGS} \
-	  gmalloc.o ${LD_LIBC}
-
-Singular-static: mod2.h Makefile version.h scanner.cc  gmalloc.o \
-	        ${ASO_OBJS}  ${OBJS} \
-                iparith.o mpsr_Tok.o tesths.cc claptmpl.o
-	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} \
-	  -o Singular-static \
-	  tesths.cc iparith.o mpsr_Tok.o claptmpl.o\
-	  ${OBJS} ${STATIC_LDFLAGS} ${LDFLAGS} ${LIBS} ${LD_DYN_FLAGS} \
 	  gmalloc.o ${LD_LIBC}
 
 iparith.o mpsr_Tok.o : iparith.inc mpsr_Tok.inc
@@ -327,14 +326,14 @@ endif
 
 install: all installbin installslib
 
-installbin: Singular libparse ESingular TSingular ${RUN_SINGULARS}
+installbin: ${SING_EXEC} libparse ESingular TSingular ${RUN_SINGULARS}
 	${MKINSTALLDIRS} ${bindir}
-	${INSTALL_PROGRAM} Singular ${SINGULAR}
+	${INSTALL_PROGRAM} ${SING_EXEC} ${SINGULAR}
 	${INSTALL_PROGRAM} libparse ${RUN_SINGULARS} ${bindir}
 	${INSTALL_PROGRAM} ESingular ${bindir}
 	${INSTALL_PROGRAM} TSingular ${bindir}
 	chmod a+x ${SINGULAR}
-	rm -f ${bindir}/Singular${EXEC_EXT}
+	rm -f ${bindir}/${SING_EXEC}${EXEC_EXT}
 	cd ${bindir}; ${LN_S} ${SINGULAR} Singular${EXEC_EXT};\
 
 installslib: LIB
@@ -352,7 +351,7 @@ uninstallbin:
 ## clean targest
 ##
 mostlyclean: 
-	-rm -f Singular Singularg Singularp Singularb libparse feOpt*.inc
+	-rm -f Singular Singular-static Singularg Singularp Singularb libparse feOpt*.inc
 	-rm -f *.o *.og core *.op *.ob *.ot Singulart
 	-rm ESingular* TSingular*
 
@@ -381,29 +380,13 @@ maintainer-clean: distclean srcclean
 ## miscellanous targets
 ##
 
-Singular-bindist: $(HEADERS) $(SOURCES) Makefile depend
+install-bindist: $(HEADERS) $(SOURCES) Makefile depend
 	echo "#define MAKE_DISTRIBUTION	" > distrib.h
-	${MAKE} Singular ESingular TSingular
+	${MAKE} ${SING_EXEC} ESingular TSingular libparse ${RUN_SINGULARS}
 	${MKINSTALLDIRS} ${install_bindir} 
-	${INSTALL_PROGRAM} -s  Singular ESingular TSingular ${install_bindir}
+	${INSTALL_PROGRAM} -s  ${SING_EXEC} ${install_bindir}/Singular${EXEC_EXT}
+	${INSTALL_PROGRAM} -s  libparse ${RUN_SINGULARS} ESingular TSingular ${install_bindir}
 	echo "#undef MAKE_DISTRIBUTION " > distrib.h
-
-Singular-static-bindist: $(HEADERS) $(SOURCES) Makefile depend
-	echo "#define MAKE_DISTRIBUTION	" > distrib.h
-	${MAKE} Singular-static ESingular TSingular
-	${MKINSTALLDIRS} ${install_bindir} 
-	${INSTALL_PROGRAM} -s Singular-static Singular ${install_bindir}
-	echo "#undef MAKE_DISTRIBUTION " > distrib.h
-
-install-bindist: libparse ${RUN_SINGULARS} Singular-bindist 
-	${MKINSTALLDIRS} ${install_bindir} 
-	${INSTALL_PROGRAM} -s Singular ESingular TSingular ${install_bindir}
-	${INSTALL_PROGRAM} -s libparse ${RUN_SINGULARS} ${install_bindir}
-
-install-static-bindist: libparse ${RUN_SINGULARS} Singular-static-bindist 
-	${MKINSTALLDIRS} ${install_bindir} 
-	${INSTALL_PROGRAM} -s Singular ESingular TSingular ${install_bindir}
-	${INSTALL_PROGRAM} -s libparse ${RUN_SINGULARS} ${install_bindir}
 
 install-sharedist: ${SLIBS_FILES} LIB/gftables
 	${MKINSTALLDIRS} ${install_slibdir}
