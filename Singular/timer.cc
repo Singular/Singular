@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: timer.cc,v 1.9 1997-08-14 16:52:59 obachman Exp $ */
+/* $Id: timer.cc,v 1.10 1998-04-27 10:45:21 pohl Exp $ */
 
 /*
 *  ABSTRACT - get the computing time
@@ -10,7 +10,7 @@
 #include "mod2.h"
 
 //the mpw timer is quite the same as the dos timer:
-#ifdef macintosh
+#ifdef __MWERKS__
 #define MSDOS
 #endif
 
