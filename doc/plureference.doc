@@ -1,5 +1,5 @@
   @comment -*-texinfo-*-
-@comment $Id: plureference.doc,v 1.14 2003-05-23 11:26:19 levandov Exp $
+@comment $Id: plureference.doc,v 1.15 2003-10-02 18:07:25 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -13,27 +13,27 @@
 \input texinfo.tex
 @setfilename plureference.info
 @settitele PLURAL
-@node Top, Functions and system variables@value{PSUFFIX}, (dir), (dir)
+@node Top, Functions and system variables @value{PSUFFIX}, (dir), (dir)
 @menu
-* Functions and system variables@value{PSUFFIX}::
+* Functions and system variables @value{PSUFFIX}::
 @end menu
-@node  Functions and system variables@value{PSUFFIX},  , Top, Top
-@chapter Functions and system variables@value{PSUFFIX}
+@node  Functions and system variables @value{PSUFFIX},  , Top, Top
+@chapter Functions and system variables @value{PSUFFIX}
 %**end
 @end ignore
 
 
 @c -----------------------------
 @menu
-* Functions@value{PSUFFIX}::
-* Control structures@value{PSUFFIX}::
-* System variables@value{PSUFFIX}::
+* Functions @value{PSUFFIX}::
+* Control structures @value{PSUFFIX}::
+* System variables @value{PSUFFIX}::
 @end menu
 
 @c ---------------------------------------
-@node Functions@value{PSUFFIX}, Control structures@value{PSUFFIX}, Functions and system variables@value{PSUFFIX}, Functions and system variables@value{PSUFFIX}
-@section Functions@value{PSUFFIX}
-@cindex Functions@value{PSUFFIX}
+@node Functions @value{PSUFFIX}, Control structures @value{PSUFFIX}, Functions and system variables @value{PSUFFIX}, Functions and system variables @value{PSUFFIX}
+@section Functions @value{PSUFFIX}
+@cindex Functions @value{PSUFFIX}
 
 This section gives a complete reference of all functions, commands and
 special variables of the @sc{Plural} kernel (i.e., all built-in
@@ -47,25 +47,25 @@ The general syntax of a function is
 
 @menu
 * bracket::
-* eliminate@value{PSUFFIX}::
-* kbase@value{PSUFFIX}::
-* memory@value{PSUFFIX}::
-* minres@value{PSUFFIX}::
-* mres@value{PSUFFIX}::
-* nres@value{PSUFFIX}::
-* option@value{PSUFFIX}::
+* eliminate @value{PSUFFIX}::
+* kbase @value{PSUFFIX}::
+* memory @value{PSUFFIX}::
+* minres @value{PSUFFIX}::
+* mres @value{PSUFFIX}::
+* nres @value{PSUFFIX}::
+* option @value{PSUFFIX}::
 * plural::
-* reduce@value{PSUFFIX}::
-* std@value{PSUFFIX}::
-* syz@value{PSUFFIX}:: 
+* reduce @value{PSUFFIX}::
+* std @value{PSUFFIX}::
+* syz @value{PSUFFIX}:: 
 * twostd::
-* vdim@value{PSUFFIX}::
+* vdim @value{PSUFFIX}::
 @end menu
 
 
 
 @c -----------------------------
-@node bracket, eliminate@value{PSUFFIX}, Functions@value{PSUFFIX}, Functions@value{PSUFFIX}
+@node bracket, eliminate @value{PSUFFIX}, Functions @value{PSUFFIX}, Functions @value{PSUFFIX}
 @subsection bracket
 @cindex bracket
 
@@ -105,9 +105,9 @@ system("bracket",p,q);
 @end table
 
 @c ---------------------------------------
-@node eliminate@value{PSUFFIX}, kbase@value{PSUFFIX}, bracket, Functions@value{PSUFFIX}
-@subsection eliminate@value{PSUFFIX}
-@cindex eliminate@value{PSUFFIX}
+@node eliminate @value{PSUFFIX}, kbase @value{PSUFFIX}, bracket, Functions @value{PSUFFIX}
+@subsection eliminate @value{PSUFFIX}
+@cindex eliminate @value{PSUFFIX}
 
 @table @code
 @item @strong{Syntax:}
@@ -155,14 +155,14 @@ eliminate(I,a);
 @end table
 @c ref
 See
-@ref{ideal@value{PSUFFIX}};
-@ref{module@value{PSUFFIX}};
-@ref{std@value{PSUFFIX}}.
+@ref{ideal @value{PSUFFIX}};
+@ref{module @value{PSUFFIX}};
+@ref{std @value{PSUFFIX}}.
 @c ref
 @c ------------------------------------------------
-@node kbase@value{PSUFFIX}, memory@value{PSUFFIX}, eliminate@value{PSUFFIX}, Functions@value{PSUFFIX}
-@subsection kbase@value{PSUFFIX}
-@cindex kbase@value{PSUFFIX}
+@node kbase @value{PSUFFIX}, memory @value{PSUFFIX}, eliminate @value{PSUFFIX}, Functions @value{PSUFFIX}
+@subsection kbase @value{PSUFFIX}
+@cindex kbase @value{PSUFFIX}
 @table @code
 @item @strong{Syntax:}
 @code{kbase (} ideal_expression @code{)}
@@ -209,14 +209,14 @@ if the ideal is two-sided.
 @end table
 @c ref
 See
-@ref{ideal@value{PSUFFIX}};
-@ref{module@value{PSUFFIX}};
-@ref{vdim@value{PSUFFIX}}.
+@ref{ideal @value{PSUFFIX}};
+@ref{module @value{PSUFFIX}};
+@ref{vdim @value{PSUFFIX}}.
 @c ref
 @c ---------------------------------------
-@node  memory@value{PSUFFIX}, minres@value{PSUFFIX}, kbase@value{PSUFFIX}, Functions@value{PSUFFIX}
-@subsection memory@value{PSUFFIX}
-@cindex memory@value{PSUFFIX}
+@node  memory @value{PSUFFIX}, minres @value{PSUFFIX}, kbase @value{PSUFFIX}, Functions @value{PSUFFIX}
+@subsection memory @value{PSUFFIX}
+@cindex memory @value{PSUFFIX}
 @cindex memory managment
 @table @code
 @item @strong{Syntax:}
@@ -260,14 +260,14 @@ kill r;
 @end smallexample
 @end table
 @c ref
-@ref{option@value{PSUFFIX}};
+@ref{option @value{PSUFFIX}};
 @c ref
 
 
 @c ---------------------------------------
-@node  minres@value{PSUFFIX}, mres@value{PSUFFIX}, memory@value{PSUFFIX}, Functions@value{PSUFFIX}
-@subsection minres@value{PSUFFIX}
-@cindex minres@value{PSUFFIX}
+@node  minres @value{PSUFFIX}, mres @value{PSUFFIX}, memory @value{PSUFFIX}, Functions @value{PSUFFIX}
+@subsection minres @value{PSUFFIX}
+@cindex minres @value{PSUFFIX}
 
 @table @code
 @item @strong{Syntax:}
@@ -314,17 +314,17 @@ print(matrix(MF[a]));
 
 @c ref
 See
-@ref{mres@value{PSUFFIX}};
-@ref{nres@value{PSUFFIX}}.
+@ref{mres @value{PSUFFIX}};
+@ref{nres @value{PSUFFIX}}.
 @c ref
 
 
 
 
 @c ---------------------------------------
-@node  mres@value{PSUFFIX}, nres@value{PSUFFIX}, minres@value{PSUFFIX}, Functions@value{PSUFFIX}
-@subsection mres@value{PSUFFIX}
-@cindex mres@value{PSUFFIX}
+@node  mres @value{PSUFFIX}, nres @value{PSUFFIX}, minres @value{PSUFFIX}, Functions @value{PSUFFIX}
+@subsection mres @value{PSUFFIX}
+@cindex mres @value{PSUFFIX}
 @table @code
 @item @strong{Syntax:}
 @code{mres (} ideal_expression@code{,} int_expression @code{)}
@@ -406,19 +406,19 @@ print(matrix(M[a]));
 @end table
 @c ref
 See
-@ref{ideal@value{PSUFFIX}};
-@ref{minres@value{PSUFFIX}};
-@ref{nres@value{PSUFFIX}};
-@ref{module@value{PSUFFIX}};
+@ref{ideal @value{PSUFFIX}};
+@ref{minres @value{PSUFFIX}};
+@ref{nres @value{PSUFFIX}};
+@ref{module @value{PSUFFIX}};
 
 @c ref
 
 
 
 @c ---------------------------------------
-@node  nres@value{PSUFFIX}, option@value{PSUFFIX}, mres@value{PSUFFIX}, Functions@value{PSUFFIX}
-@subsection nres@value{PSUFFIX}
-@cindex nres@value{PSUFFIX}
+@node  nres @value{PSUFFIX}, option @value{PSUFFIX}, mres @value{PSUFFIX}, Functions @value{PSUFFIX}
+@subsection nres @value{PSUFFIX}
+@cindex nres @value{PSUFFIX}
 @table @code
 @item @strong{Syntax:}
 @code{nres (} ideal_expression@code{,} int_expression @code{)}
@@ -500,17 +500,17 @@ print(matrix(F[a]));
 @end table
 @c ref
 See
-@ref{ideal@value{PSUFFIX}};
-@ref{module@value{PSUFFIX}};
-@ref{minres@value{PSUFFIX}};
-@ref{mres@value{PSUFFIX}};
+@ref{ideal @value{PSUFFIX}};
+@ref{module @value{PSUFFIX}};
+@ref{minres @value{PSUFFIX}};
+@ref{mres @value{PSUFFIX}};
 @c ref
 
 
 @c ---------------------------------------
-@node option@value{PSUFFIX}, plural, nres@value{PSUFFIX}, Functions@value{PSUFFIX}
-@subsection option@value{PSUFFIX}
-@cindex option@value{PSUFFIX}
+@node option @value{PSUFFIX}, plural, nres @value{PSUFFIX}, Functions @value{PSUFFIX}
+@subsection option @value{PSUFFIX}
+@cindex option @value{PSUFFIX}
 @table @code
 @item @strong{Syntax:}
 @code{option ()}
@@ -592,7 +592,7 @@ The last set of options controls the output of @sc{Plural}:
 shows memory usage in square brackets (see @ref{memory}).
 @end ifset
 @ifclear singularmanual
-shows memory usage in square brackets (see @ref{memory@value{PSUFFIX}}).
+shows memory usage in square brackets (see @ref{memory @value{PSUFFIX}}).
 @end ifclear  
 
 @c @smallexample
@@ -638,7 +638,7 @@ shows memory usage in square brackets (see @ref{memory@value{PSUFFIX}}).
 
 @c ref
 See
-@ref{std@value{PSUFFIX}}.
+@ref{std @value{PSUFFIX}}.
 @c ref
 
 
@@ -649,7 +649,7 @@ See
 
 
 @c -----------------------------
-@node plural, reduce@value{PSUFFIX}, option@value{PSUFFIX}, Functions@value{PSUFFIX}
+@node plural, reduce @value{PSUFFIX}, option @value{PSUFFIX}, Functions @value{PSUFFIX}
 @subsection plural
 @cindex plural
 
@@ -685,9 +685,8 @@ D[1,2]=-Q*z;
 D[1,3]=1/Q*y;
 D[2,3]=-Q*x; 
 system("PLURAL",C,D);
-// it is quantum deformation U'_q(so_3)
-// specialized at the 3rd root of q=Q^2 is specialized at the 3rd root of
-// unity
+// it is quantum deformation U'_q(so_3),
+// with q=Q^2 specialized at the 3rd root of unity
 r1;
 kill r1;
 ring r2=0,(Xa,Xb,Xc,Ya,Yb,Yc,Ha,Hb),dp;
@@ -724,9 +723,9 @@ kill r4;
 
 
 @c ---------------------------------------
-@node reduce@value{PSUFFIX}, std@value{PSUFFIX}, plural, Functions@value{PSUFFIX}
-@subsection reduce@value{PSUFFIX}
-@cindex reduce@value{PSUFFIX}
+@node reduce @value{PSUFFIX}, std @value{PSUFFIX}, plural, Functions @value{PSUFFIX}
+@subsection reduce @value{PSUFFIX}
+@cindex reduce @value{PSUFFIX}
 @cindex NF
 @table @code
 @item @strong{Syntax:}
@@ -780,9 +779,9 @@ NF(z,J);
 
 @c ref
 See
-@ref{ideal@value{PSUFFIX}};
-@ref{module@value{PSUFFIX}};
-@ref{std@value{PSUFFIX}}.
+@ref{ideal @value{PSUFFIX}};
+@ref{module @value{PSUFFIX}};
+@ref{std @value{PSUFFIX}}.
 @c ref
 
 @ifset singularmanual
@@ -796,9 +795,9 @@ see also @code{vector} in @sc{Singular} manual.
 @end ifclear   
 
 @c ---------------------------------------
-@node std@value{PSUFFIX}, syz@value{PSUFFIX}, reduce@value{PSUFFIX}, Functions@value{PSUFFIX}
-@subsection std@value{PSUFFIX}
-@cindex std@value{PSUFFIX}
+@node std @value{PSUFFIX}, syz @value{PSUFFIX}, reduce @value{PSUFFIX}, Functions @value{PSUFFIX}
+@subsection std @value{PSUFFIX}
+@cindex std @value{PSUFFIX}
 @table @code
 @item @strong{Syntax:}
 @code{std (} ideal_expression@code{)}
@@ -856,16 +855,16 @@ J;
 @end table
 @c ref
 See
-@ref{ideal@value{PSUFFIX}};
-@ref{ring@value{PSUFFIX}};
-@ref{option@value{PSUFFIX}};
+@ref{ideal @value{PSUFFIX}};
+@ref{ring @value{PSUFFIX}};
+@ref{option @value{PSUFFIX}};
 @c ref
 
 
 @c -------------------------------------------------
-@node syz@value{PSUFFIX}, twostd, std@value{PSUFFIX}, Functions@value{PSUFFIX}
-@subsection syz@value{PSUFFIX}
-@cindex syz@value{PSUFFIX}
+@node syz @value{PSUFFIX}, twostd, std @value{PSUFFIX}, Functions @value{PSUFFIX}
+@subsection syz @value{PSUFFIX}
+@cindex syz @value{PSUFFIX}
 @table @code
 @item @strong{Syntax:}
 @code{syz (} ideal_expression @code{)}
@@ -901,18 +900,18 @@ print(a);
 @end table
 @c ref
 See
-@ref{ideal@value{PSUFFIX}};
-@ref{module@value{PSUFFIX}};
-@ref{mres@value{PSUFFIX}};
-@ref{nres@value{PSUFFIX}};
-@ref{minres@value{PSUFFIX}};
+@ref{ideal @value{PSUFFIX}};
+@ref{module @value{PSUFFIX}};
+@ref{mres @value{PSUFFIX}};
+@ref{nres @value{PSUFFIX}};
+@ref{minres @value{PSUFFIX}};
 @c ref
 
 
 
 
 @c ------------------------------
-@node twostd, vdim@value{PSUFFIX}, syz@value{PSUFFIX}, Functions@value{PSUFFIX}
+@node twostd, vdim @value{PSUFFIX}, syz @value{PSUFFIX}, Functions @value{PSUFFIX}
 @subsection twostd
 @cindex twostd
 
@@ -961,9 +960,9 @@ There are algebras with no two-sided ideals (like Weyl algebras).
 
 
 @c -------------------------------------------------------------------------
-@node vdim@value{PSUFFIX},  , twostd, Functions@value{PSUFFIX}
-@subsection vdim@value{PSUFFIX}
-@cindex vdim@value{PSUFFIX}
+@node vdim @value{PSUFFIX},  , twostd, Functions @value{PSUFFIX}
+@subsection vdim @value{PSUFFIX}
+@cindex vdim @value{PSUFFIX}
 @table @code
 @item @strong{Syntax:}
 @code{vdim (} ideal_expression @code{)}
@@ -1004,9 +1003,9 @@ vdim(I);
 @end table
 @c ref
 See
-@ref{ideal@value{PSUFFIX} };
-@ref{std@value{PSUFFIX} };
-@ref{kbase@value{PSUFFIX}}.
+@ref{ideal @value{PSUFFIX} };
+@ref{std @value{PSUFFIX} };
+@ref{kbase @value{PSUFFIX}}.
 @c ref
 
 @ifset singularmanual
@@ -1024,9 +1023,9 @@ see also @sc{Singular} manual sections dim, degree, mult, kbase.
 
 
 @c ---------------------------------------
-@node Control structures@value{PSUFFIX}, System variables@value{PSUFFIX}, Functions@value{PSUFFIX}, Functions and system variables@value{PSUFFIX}
-@section Control structures@value{PSUFFIX}
-@cindex Control structures@value{PSUFFIX}
+@node Control structures @value{PSUFFIX}, System variables @value{PSUFFIX}, Functions @value{PSUFFIX}, Functions and system variables @value{PSUFFIX}
+@section Control structures @value{PSUFFIX}
+@cindex Control structures @value{PSUFFIX}
 
 See SINGULAR Manual
 @ifset singularmanual
@@ -1036,9 +1035,9 @@ See SINGULAR Manual
 @end ifset
 
 @c ---------------------------------------
-@node System variables@value{PSUFFIX},  , Control structures@value{PSUFFIX}, Functions and system variables@value{PSUFFIX}
-@section System variables@value{PSUFFIX}
-@cindex System variables@value{PSUFFIX}
+@node System variables @value{PSUFFIX},  , Control structures @value{PSUFFIX}, Functions and system variables @value{PSUFFIX}
+@section System variables @value{PSUFFIX}
+@cindex System variables @value{PSUFFIX}
 
 See SINGULAR Manual
 

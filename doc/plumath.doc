@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: plumath.doc,v 1.14 2003-07-31 19:54:14 levandov Exp $
+@comment $Id: plumath.doc,v 1.15 2003-10-02 18:07:24 levandov Exp $
 @comment this file contains the mathematical background of Singular
 
 @c The following directives are necessary for proper compilation
@@ -14,46 +14,46 @@
 
 @c @menu
 @c * G-algebras::
-@c * Groebner bases@value{PSUFFIX}::  
-@c * Hilbert function@value{PSUFFIX}::  
-@c * Syzygies and resolutions@value{PSUFFIX}::  
-@c * References@value{PSUFFIX}::   
+@c * Groebner bases @value{PSUFFIX}::  
+@c * Hilbert function @value{PSUFFIX}::  
+@c * Syzygies and resolutions @value{PSUFFIX}::  
+@c * References @value{PSUFFIX}::   
 @c @end menu
 
-@node Top, Mathematical background@value{PSUFFIX},(dir), (dir)
+@node Top, Mathematical background @value{PSUFFIX},(dir), (dir)
 @menu
-* Mathematical background@value{PSUFFIX}::
+* Mathematical background @value{PSUFFIX}::
 @end menu
 
 @ifset singularmanual
-@node Mathematical background@value{PSUFFIX},,Functions and system variables@value{PSUFFIX},PLURAL 
+@node Mathematical background @value{PSUFFIX},,Functions and system variables @value{PSUFFIX},PLURAL 
 @end ifset
 
 @ifclear singularmanual
-@node Mathematical background@value{PSUFFIX}, G-algebras, PLURAL, PLURAL
+@node Mathematical background @value{PSUFFIX}, G-algebras, PLURAL, PLURAL
 @end ifclear
 
-@section Mathematical background@value{PSUFFIX}
+@section Mathematical background @value{PSUFFIX}
 %**end
 @end ignore 
 
 
 This chapter introduces some of the mathematical notions and definitions used
 throughout the @sc{Plural} manual. For details, please, refer to
-some articles or text books (see @ref{References@value{PSUFFIX}}).
+some articles or text books (see @ref{References @value{PSUFFIX}}).
 
 @menu
 * G-algebras::
 * Groebner bases::
-* Syzygies and resolutions@value{PSUFFIX}::
-* References@value{PSUFFIX}::
+* Syzygies and resolutions @value{PSUFFIX}::
+* References @value{PSUFFIX}::
 @end menu
 
 
 
 
 @c ---------------------------------------------------------------------------
-@node G-algebras, Groebner bases, ,Mathematical background@value{PSUFFIX} 
+@node G-algebras, Groebner bases, ,Mathematical background @value{PSUFFIX} 
 @section G-algebras
 @cindex G-algebra
 
@@ -94,9 +94,9 @@ there is a monomial well-ordering <_A such that
 
 @item @strong{non-degeneracy conditions hold}: 
 @tex
-$\forall \; 1 \leq i<j<k \leq n \; \; \mathcal{NDC}_{ijk} =0$, where
+$\forall \; 1 \leq i<j<k \leq n \; \; {\cal NDC}_{ijk} =0$, where
 $$
-\mathcal{NDC}_{ijk} = c_{ik}c_{jk} \cdot d_{ij}x_k - x_k d_{ij} + 
+{\cal NDC}_{ijk} = c_{ik}c_{jk} \cdot d_{ij}x_k - x_k d_{ij} + 
 c_{jk} \cdot x_j d_{ik} - c_{ij} \cdot d_{ik}x_j + d_{jk}x_i 
 - c_{ij}c_{ik} \cdot x_i d_{jk}.
 $$
@@ -243,9 +243,9 @@ and non-degeneracy conditions while setting an algebra.
 
 
 @c ---------------------------------------------------------------------------
-@node Groebner bases, Syzygies and resolutions@value{PSUFFIX}, G-algebras, Mathematical background@value{PSUFFIX} 
-@section Groebner bases@value{PSUFFIX}
-@cindex Groebner bases@value{PSUFFIX}
+@node Groebner bases, Syzygies and resolutions @value{PSUFFIX}, G-algebras, Mathematical background @value{PSUFFIX} 
+@section Groebner bases @value{PSUFFIX}
+@cindex Groebner bases @value{PSUFFIX}
 
 
 @tex
@@ -400,10 +400,10 @@ f is in I if and only if NF(f|G) = 0.
 @c ---------------------------------------------------------------------------
 
 
-@c @node Hilbert function@value{PSUFFIX}, Syzygies and resolutions@value{PSUFFIX}, Groebner bases@value{PSUFFIX}, Mathematical background@value{PSUFFIX} 
-@c @section Hilbert function@value{PSUFFIX}
-@c @cindex Hilbert function@value{PSUFFIX}
-@c @cindex Hilbert series@value{PSUFFIX}
+@c @node Hilbert function @value{PSUFFIX}, Syzygies and resolutions @value{PSUFFIX}, Groebner bases @value{PSUFFIX}, Mathematical background @value{PSUFFIX} 
+@c @section Hilbert function @value{PSUFFIX}
+@c @cindex Hilbert function @value{PSUFFIX}
+@c @cindex Hilbert series @value{PSUFFIX}
 @c @tex
 @c Let M $=\bigoplus_i M_i$ be a graded module over $K[x_1,..,x_n]$ with 
 @c respect to weights $(w_1,..w_n)$.
@@ -465,9 +465,9 @@ f is in I if and only if NF(f|G) = 0.
 @c @end ifinfo
 
 @c ---------------------------------------------------------------------------
-@node Syzygies and resolutions@value{PSUFFIX}, References@value{PSUFFIX}, Groebner bases, Mathematical background@value{PSUFFIX} 
-@section Syzygies and resolutions@value{PSUFFIX}
-@cindex Syzygies and resolutions@value{PSUFFIX}
+@node Syzygies and resolutions @value{PSUFFIX}, References @value{PSUFFIX}, Groebner bases, Mathematical background @value{PSUFFIX} 
+@section Syzygies and resolutions @value{PSUFFIX}
+@cindex Syzygies and resolutions @value{PSUFFIX}
 
 @subheading Syzygies
 @tex
@@ -573,9 +573,9 @@ print(matrix(resI[2]));
 
 
 @c ---------------------------------------------------------------------------
-@node References@value{PSUFFIX}, , Syzygies and resolutions@value{PSUFFIX}, Mathematical background@value{PSUFFIX}
-@section References@value{PSUFFIX}
-@cindex References@value{PSUFFIX}
+@node References @value{PSUFFIX}, , Syzygies and resolutions @value{PSUFFIX}, Mathematical background @value{PSUFFIX}
+@section References @value{PSUFFIX}
+@cindex References @value{PSUFFIX}
 
 The Centre for Computer Algebra Kaiserslautern publishes a series of preprints
 which are electronically available at
@@ -629,17 +629,15 @@ Graduate Studies in Mathematics. 30. Providence, RI: American Mathematical Socie
 
 @item
 @c{HKP} art
-
   Havlicek, M. and Klimyk, A. and Posta, S. 
    Central elements of the algebras
 @tex
  $U'_q({\rm so}_m)$ and $U'_q({\rm iso}_m)$.
-  {\em {arXiv. math. QA/9911130}}, (1999)
+  {arXiv. math. QA/9911130}, (1999)
 @end tex
 
 @item
 @c{AP} art
-
 J. Apel.
   Gr@"obnerbasen in nichtkommutativen algebren und ihre anwendung.
     Dissertation, Universit@"at Leipzig, 1988.
@@ -687,7 +685,7 @@ In   Proceedings of IV Int. Conf. "Symmetry in Nonlinear
 @item
 @c KW  art
 A. Kandri-Rody and V. Weispfenning.
-  Non--commutative gr@"obner bases in algebras of solvable type.
+  Non--commutative Gr@"obner bases in algebras of solvable type.
     J. Symbolic Computation, 9(1):1--26, 1990.
 
 

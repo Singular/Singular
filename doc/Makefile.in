@@ -1,7 +1,7 @@
 #####################################################################
 ###
 ### Makefile for Singular documentation
-### $Id: Makefile.in,v 1.90 2003-07-31 19:55:10 levandov Exp $
+### $Id: Makefile.in,v 1.91 2003-10-02 18:07:23 levandov Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -148,6 +148,17 @@ dvi: manual.dvi usercard.dvi
 
 singular.dvi: ${MANUAL_FILES} singular.tex
 	${TEXI2DVI} singular.tex
+
+plural.dvi: ${PLU_MANUAL_FILES} pluralmain.tex
+	touch ./xx
+	for PFILE in ${PLU_MANUAL_FILES};\
+	do \
+		sed 's/@value{PSUFFIX}//g' < $${PFILE}  >./xx ;\
+		cp ./xx $${PFILE};\
+	done; \
+	rm ./xx
+	${TEXI2DVI} pluralmain.tex
+	mv pluralmain.dvi plural.dvi
 
 manual.dvi: ${MANUAL_FILES} manual.tex
 	${TEXI2DVI} manual.tex

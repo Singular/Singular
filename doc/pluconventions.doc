@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: pluconventions.doc,v 1.4 2003-05-20 17:46:50 levandov Exp $
+@comment $Id: pluconventions.doc,v 1.5 2003-10-02 18:07:24 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -12,7 +12,7 @@
 %**start
 \input texinfo.tex
 @setfilename plureference.info
-@settitele PLURAL
+@settitel PLURAL
 @node Top, PLURAL conventions, (dir), (dir)
 @menu
 * PLURAL conventions ::
@@ -35,34 +35,33 @@
 
 @c ----------------------------------------------- 
 @table @strong
-@item *-multiplication@value{PSUFFIX}
+@item *-multiplication  @value{PSUFFIX}
 @itemize 
 
 in the non-commutative case,
 one should use @code{y*x} for the multiplication while @code{yx} is interpreted as
-commutative expression. See example in  @ref{poly expressions@value{PSUFFIX}}. 
+commutative expression. See example in  @ref{poly expressions @value{PSUFFIX}}. 
  
 
 @end itemize
 
 
 
-
-@item   @code{ideal}@value{PSUFFIX}
+@item   @code{ideal} @value{PSUFFIX}
 @itemize
                         
 Under an @code{ideal} @sc{Plural} understands a @strong{left} ideal.
-For more information see @ref{ideal@value{PSUFFIX}}. For the operations
+For more information see @ref{ideal @value{PSUFFIX}}. For the operations
 with two-sided ideals see @ref{twostd}. 
 @end itemize
 
-@item @code{module}@value{PSUFFIX}
+@item @code{module} @value{PSUFFIX}
 @itemize
 Under a @code{module} @sc{Plural} understands a @strong{left} submodule of a free module of a finite rank.
-For more information see @ref{module@value{PSUFFIX}}. 
+For more information see @ref{module @value{PSUFFIX}}. 
 @end itemize
 
-@item ordering@value{PSUFFIX}
+@item ordering @value{PSUFFIX}
 @itemize
 @sc{Plural} works with @strong{global} orderings  only.  
 @ifset singularmanual
@@ -74,7 +73,7 @@ See @sc{Singular} manual section General definitions for orderings.
 
 @end itemize
 
-@item @code{qring}@value{PSUFFIX}
+@item @code{qring} @value{PSUFFIX}
 
 @itemize
 In @sc{Plural} it is only possible to build factor-algebras modulo @strong{two-sided} ideals. 

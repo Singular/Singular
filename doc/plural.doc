@@ -5,6 +5,10 @@
 @c @chapter PLURAL
 @c @cindex PLURAL
 
+@ifclear PSUFFIX
+@set PSUFFIX
+@end ifclear
+
 @ifhtml
 @html
 <CENTER>
@@ -32,12 +36,12 @@
 @c * Introduction::
 @c * General concepts::
 * PLURAL conventions::
-* Data types@value{PSUFFIX}::
-* Functions and system variables@value{PSUFFIX}::
+* Data types @value{PSUFFIX}::
+* Functions and system variables @value{PSUFFIX}::
 @c * Tricks and pitfalls::
 @c * Examples::
 @c * Polynomial data::
-* Mathematical background@value{PSUFFIX}::
+* Mathematical background @value{PSUFFIX}::
 * PLURAL libraries::
 @c * Release Notes::
 @ifclear singularmanual
@@ -65,12 +69,12 @@
 @c @include general.tex
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
-@node PLURAL conventions, Data types@value{PSUFFIX},PLURAL, PLURAL
+@node PLURAL conventions, Data types @value{PSUFFIX},PLURAL, PLURAL
 @section  PLURAL conventions
 @end ifset 
 
 @ifclear singularmanual
-@node  PLURAL conventions, Data types@value{PSUFFIX}, Top, Top
+@node  PLURAL conventions, Data types @value{PSUFFIX}, Top, Top
 @chapter PLURAL conventions
 @end ifclear 
 
@@ -81,30 +85,30 @@
 @c ----------------------------------------------------------------------------
 
 @ifset singularmanual
-@node Data types@value{PSUFFIX}, Functions and system variables@value{PSUFFIX}  , PLURAL conventions, PLURAL
-@section Data types@value{PSUFFIX}
+@node Data types @value{PSUFFIX}, Functions and system variables @value{PSUFFIX}  , PLURAL conventions, PLURAL
+@section Data types @value{PSUFFIX}
 @end ifset 
 
 @ifclear singularmanual
-@node Data types@value{PSUFFIX}, Functions and system variables@value{PSUFFIX}, PLURAL conventions, Top
-@chapter Data types@value{PSUFFIX}
+@node Data types @value{PSUFFIX}, Functions and system variables @value{PSUFFIX}, PLURAL conventions, Top
+@chapter Data types @value{PSUFFIX}
 @end ifclear 
 
-@cindex Data types@value{PSUFFIX}
+@cindex Data types @value{PSUFFIX}
 @include plutypes.tex
 
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
-@node Functions and system variables@value{PSUFFIX},Mathematical background@value{PSUFFIX}, Data types@value{PSUFFIX}, PLURAL
-@section Functions and system variables@value{PSUFFIX}
+@node Functions and system variables @value{PSUFFIX},Mathematical background @value{PSUFFIX}, Data types @value{PSUFFIX}, PLURAL
+@section Functions and system variables @value{PSUFFIX}
 @end ifset
 
 @ifclear singularmanual
-@node Functions and system variables@value{PSUFFIX}, Mathematical background@value{PSUFFIX}, Data types@value{PSUFFIX}, Top
-@chapter Functions and system variables@value{PSUFFIX}
+@node Functions and system variables @value{PSUFFIX}, Mathematical background @value{PSUFFIX}, Data types @value{PSUFFIX}, Top
+@chapter Functions and system variables @value{PSUFFIX}
 @end ifclear
 
-@cindex commands@value{PSUFFIX}
+@cindex commands @value{PSUFFIX}
 @include plureference.tex
 
 @c @c ----------------------------------------------------------------------------
@@ -127,23 +131,23 @@
 
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
-@node Mathematical background@value{PSUFFIX},PLURAL libraries, Functions and system
-variables@value{PSUFFIX}, PLURAL 
-@section Mathematical background@value{PSUFFIX}
+@node Mathematical background @value{PSUFFIX},PLURAL libraries, Functions and system
+variables @value{PSUFFIX}, PLURAL 
+@section Mathematical background @value{PSUFFIX}
 @end ifset
 
 
 @ifclear singularmanual
-@node Mathematical background@value{PSUFFIX}, PLURAL libraries, Functions and system variables@value{PSUFFIX}, Top
-@appendix Mathematical background@value{PSUFFIX}
+@node Mathematical background @value{PSUFFIX}, PLURAL libraries, Functions and system variables @value{PSUFFIX}, Top
+@appendix Mathematical background @value{PSUFFIX}
 @end ifclear
 
 
-@cindex Mathematical background@value{PSUFFIX}
+@cindex Mathematical background @value{PSUFFIX}
 @include plumath.tex
 
 @c --------------------------------------------------------------------
-@node PLURAL libraries, Release Notes, Mathematical background@value{PSUFFIX}, Top
+@node PLURAL libraries, Release Notes, Mathematical background @value{PSUFFIX}, Top
 @appendix  PLURAL libraries
 @cindex  PLURAL libraries
 @cindex  PLURAL LIBs

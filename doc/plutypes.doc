@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: plutypes.doc,v 1.13 2003-05-20 16:43:52 levandov Exp $
+@comment $Id: plutypes.doc,v 1.14 2003-10-02 18:07:26 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -13,13 +13,13 @@
 \input texinfo.tex
 @setfilename plutypes.info
 
-@node Top, Data types@value{PSUFFIX}, (dir), (dir)
+@node Top, Data types @value{PSUFFIX}, (dir), (dir)
 @menu
-* Data types@value{PSUFFIX}::
+* Data types @value{PSUFFIX}::
 @end menu
 
-@node Data types@value{PSUFFIX},  , Top, Top
-@chapter Data types@value{PSUFFIX}
+@node Data types @value{PSUFFIX},  , Top, Top
+@chapter Data types @value{PSUFFIX}
 %**end
 @end ignore
 
@@ -36,12 +36,12 @@ For the general syntax of a declaration see
 @c @ref{General command syntax}.
 
 @menu
-* ideal@value{PSUFFIX}::
-* module@value{PSUFFIX}::
-* poly@value{PSUFFIX}::
-* qring@value{PSUFFIX}::
-* resolution@value{PSUFFIX}::
-* ring@value{PSUFFIX}::
+* ideal @value{PSUFFIX}::
+* module @value{PSUFFIX}::
+* poly @value{PSUFFIX}::
+* qring @value{PSUFFIX}::
+* resolution @value{PSUFFIX}::
+* ring @value{PSUFFIX}::
 @ifset namespaces
 @end ifset
 @end menu
@@ -49,8 +49,8 @@ For the general syntax of a declaration see
 
 @c ---------------------------------------
 
-@node ideal@value{PSUFFIX}, module@value{PSUFFIX}, Data types@value{PSUFFIX}, Data types@value{PSUFFIX}
-@section ideal@value{PSUFFIX}
+@node ideal @value{PSUFFIX}, module @value{PSUFFIX}, Data types @value{PSUFFIX}, Data types @value{PSUFFIX}
+@section ideal @value{PSUFFIX}
 @c @cindex ideal
 @cindex  untyped definitions 
 
@@ -67,18 +67,18 @@ whereas @code{ncols} counts all generators.
 
 
 @menu
-* ideal declarations@value{PSUFFIX}::
-* ideal expressions@value{PSUFFIX}::
-* ideal operations@value{PSUFFIX}::
-* ideal related functions@value{PSUFFIX}::
+* ideal declarations @value{PSUFFIX}::
+* ideal expressions @value{PSUFFIX}::
+* ideal operations @value{PSUFFIX}::
+* ideal related functions @value{PSUFFIX}::
 @end menu
 
 
 @c ---------------------------------------
 
-@node ideal declarations@value{PSUFFIX}, ideal expressions@value{PSUFFIX}, ideal@value{PSUFFIX}, ideal@value{PSUFFIX}
-@subsection ideal declarations@value{PSUFFIX}
-@cindex ideal declarations@value{PSUFFIX}
+@node ideal declarations @value{PSUFFIX}, ideal expressions @value{PSUFFIX}, ideal @value{PSUFFIX}, ideal @value{PSUFFIX}
+@subsection ideal declarations @value{PSUFFIX}
+@cindex ideal declarations @value{PSUFFIX}
 
 @table @strong
 @item Syntax:
@@ -111,9 +111,9 @@ defines a left ideal.
 
 @c ------------------------------
 
-@node ideal expressions@value{PSUFFIX}, ideal operations@value{PSUFFIX}, ideal declarations@value{PSUFFIX}, ideal@value{PSUFFIX}
-@subsection ideal expressions@value{PSUFFIX}
-@cindex ideal expressions@value{PSUFFIX}
+@node ideal expressions @value{PSUFFIX}, ideal operations @value{PSUFFIX}, ideal declarations @value{PSUFFIX}, ideal @value{PSUFFIX}
+@subsection ideal expressions @value{PSUFFIX}
+@cindex ideal expressions @value{PSUFFIX}
 
 An ideal expression is:
 @enumerate
@@ -161,9 +161,9 @@ ideal j = ideal(v);
 
 @c ------------------------------
 
-@node ideal operations@value{PSUFFIX}, ideal related functions@value{PSUFFIX}, ideal expressions@value{PSUFFIX}, ideal@value{PSUFFIX}
-@subsection ideal operations@value{PSUFFIX}
-@cindex ideal operations@value{PSUFFIX}
+@node ideal operations @value{PSUFFIX}, ideal related functions @value{PSUFFIX}, ideal expressions @value{PSUFFIX}, ideal @value{PSUFFIX}
+@subsection ideal operations @value{PSUFFIX}
+@cindex ideal operations @value{PSUFFIX}
 
 @table @asis
 @item @code{+}
@@ -218,9 +218,9 @@ II;
 
 @c ------------------------------
 
-@node ideal related functions@value{PSUFFIX},  , ideal operations@value{PSUFFIX}, ideal@value{PSUFFIX}
-@subsection ideal related functions@value{PSUFFIX}
-@cindex ideal related functions@value{PSUFFIX}
+@node ideal related functions @value{PSUFFIX},  , ideal operations @value{PSUFFIX}, ideal @value{PSUFFIX}
+@subsection ideal related functions @value{PSUFFIX}
+@cindex ideal related functions @value{PSUFFIX}
 
 
 @table @code
@@ -228,17 +228,17 @@ II;
 @item mres 
 minimal free resolution of an ideal resp.@: module w.r.t. a minimal set
 of generators of the given ideal resp.@: module
-(see @ref{mres@value{PSUFFIX}})
+(see @ref{mres @value{PSUFFIX}})
 @item nres 
 computes a free resolution of an ideal resp.@: module M which is
 minimized from the second module on
-(see @ref{nres@value{PSUFFIX}})          
+(see @ref{nres @value{PSUFFIX}})          
 @item reduce
-normal form with respect to a Groebner basis (see @ref{reduce@value{PSUFFIX}})
+normal form with respect to a Groebner basis (see @ref{reduce @value{PSUFFIX}})
 @c @item res
-@c free resolution of an ideal resp.@: module but not changing the given ideal resp.@: module(see @ref{res@value{PSUFFIX}})
+@c free resolution of an ideal resp.@: module but not changing the given ideal resp.@: module(see @ref{res @value{PSUFFIX}})
 @item std
-Groebner basis computation (see @ref{std@value{PSUFFIX}})
+Groebner basis computation (see @ref{std @value{PSUFFIX}})
 @item twostd
 two-sided Groebner basis computation (see @ref{twostd})
 @end table
@@ -246,9 +246,9 @@ two-sided Groebner basis computation (see @ref{twostd})
 
 @c ---------------------------------------
 
-@node module@value{PSUFFIX}, poly@value{PSUFFIX}, ideal@value{PSUFFIX}, Data types@value{PSUFFIX}
-@section module@value{PSUFFIX}
-@cindex module@value{PSUFFIX}
+@node module @value{PSUFFIX}, poly @value{PSUFFIX}, ideal @value{PSUFFIX}, Data types @value{PSUFFIX}
+@section module @value{PSUFFIX}
+@cindex module @value{PSUFFIX}
 
 Modules are left  submodules of a free module over the basering with basis
 @code{gen(1)}, @code{gen(2)}, @dots{} .
@@ -312,17 +312,17 @@ $v_1, \ldots, v_k$
 which generate M. 
 
 @menu
-* module declarations@value{PSUFFIX}::
-* module expressions@value{PSUFFIX}::
-* module operations@value{PSUFFIX}::
-* module related functions@value{PSUFFIX}::
+* module declarations @value{PSUFFIX}::
+* module expressions @value{PSUFFIX}::
+* module operations @value{PSUFFIX}::
+* module related functions @value{PSUFFIX}::
 @end menu
 
 @c ------------------------------
 
-@node module declarations@value{PSUFFIX}, module expressions@value{PSUFFIX}, module@value{PSUFFIX}, module@value{PSUFFIX}
-@subsection module declarations@value{PSUFFIX}
-@cindex module declarations@value{PSUFFIX}
+@node module declarations @value{PSUFFIX}, module expressions @value{PSUFFIX}, module @value{PSUFFIX}, module @value{PSUFFIX}
+@subsection module declarations @value{PSUFFIX}
+@cindex module declarations @value{PSUFFIX}
 
 @table @strong
 @item Syntax:
@@ -362,9 +362,9 @@ print(m);
 
 @c ------------------------------
 
-@node module expressions@value{PSUFFIX}, module operations@value{PSUFFIX}, module declarations@value{PSUFFIX}, module@value{PSUFFIX}
-@subsection module expressions@value{PSUFFIX}
-@cindex module expressions@value{PSUFFIX}
+@node module expressions @value{PSUFFIX}, module operations @value{PSUFFIX}, module declarations @value{PSUFFIX}, module @value{PSUFFIX}
+@subsection module expressions @value{PSUFFIX}
+@cindex module expressions @value{PSUFFIX}
 
 A module expression is:
 @enumerate
@@ -388,9 +388,9 @@ a type cast to module
 @c @end example
 
 @c ------------------------------
-@node module operations@value{PSUFFIX}, module related functions@value{PSUFFIX}, module expressions@value{PSUFFIX}, module@value{PSUFFIX}
-@subsection module operations@value{PSUFFIX}
-@cindex module operations@value{PSUFFIX}
+@node module operations @value{PSUFFIX}, module related functions @value{PSUFFIX}, module expressions @value{PSUFFIX}, module @value{PSUFFIX}
+@subsection module operations @value{PSUFFIX}
+@cindex module operations @value{PSUFFIX}
 
 
 @table @asis
@@ -424,9 +424,9 @@ print((x+y)*m);
 
 
 @c ------------------------------
-@node module related functions@value{PSUFFIX}, poly declarations@value{PSUFFIX}, module operations@value{PSUFFIX}, module@value{PSUFFIX}
-@subsection module related functions@value{PSUFFIX}
-@cindex module related functions@value{PSUFFIX}
+@node module related functions @value{PSUFFIX}, poly declarations @value{PSUFFIX}, module operations @value{PSUFFIX}, module @value{PSUFFIX}
+@subsection module related functions @value{PSUFFIX}
+@cindex module related functions @value{PSUFFIX}
 
 
 
@@ -434,17 +434,17 @@ print((x+y)*m);
 @item mres 
 computes minimal free resolution of an ideal resp. 
 module w.r.t. a minimal set of generators of the given ideal
-resp. module (see @ref{mres@value{PSUFFIX}})
+resp. module (see @ref{mres @value{PSUFFIX}})
 @item nres 
 computes a free resolution of an ideal resp.@: module M which is
 minimized from the second module on
-(see @ref{nres@value{PSUFFIX}})          
+(see @ref{nres @value{PSUFFIX}})          
 @item reduce
-normal form with respect to a Groebner basis (see @ref{reduce@value{PSUFFIX}})
+normal form with respect to a Groebner basis (see @ref{reduce @value{PSUFFIX}})
 @item std
-Groebner basis computation (see @ref{std@value{PSUFFIX}})
+Groebner basis computation (see @ref{std @value{PSUFFIX}})
 @item syz
-computation of the first syzygy module (see @ref{syz@value{PSUFFIX}})
+computation of the first syzygy module (see @ref{syz @value{PSUFFIX}})
 @end table
 
 
@@ -455,13 +455,13 @@ computation of the first syzygy module (see @ref{syz@value{PSUFFIX}})
 @c ---------------------------------------
 
 @ifset namespaces
-@node poly@value{PSUFFIX}, qring@value{PSUFFIX}, module@value{PSUFFIX}, Data types@value{PSUFFIX}
+@node poly @value{PSUFFIX}, qring @value{PSUFFIX}, module @value{PSUFFIX}, Data types @value{PSUFFIX}
 @end ifset
 @ifclear namespaces
-@node poly@value{PSUFFIX}, qring@value{PSUFFIX}, module@value{PSUFFIX}, Data types@value{PSUFFIX}
+@node poly @value{PSUFFIX}, qring @value{PSUFFIX}, module @value{PSUFFIX}, Data types @value{PSUFFIX}
 @end ifclear
-@section poly@value{PSUFFIX}
-@cindex poly@value{PSUFFIX}
+@section poly @value{PSUFFIX}
+@cindex poly @value{PSUFFIX}
 
 Polynomials are the basic data for all main algorithms in
 @sc{Plural}. They consist of finitely many terms
@@ -480,17 +480,17 @@ type, the names of the indeterminants and the monomial ordering.
 @end smallexample
 
 @menu
-* poly declarations@value{PSUFFIX}::
-* poly expressions@value{PSUFFIX}::
-* poly operations@value{PSUFFIX}::
-* poly related functions@value{PSUFFIX}::
+* poly declarations @value{PSUFFIX}::
+* poly expressions @value{PSUFFIX}::
+* poly operations @value{PSUFFIX}::
+* poly related functions @value{PSUFFIX}::
 @end menu
 
 @c ------------------------------
 
-@node poly declarations@value{PSUFFIX}, poly expressions@value{PSUFFIX}, module related functions@value{PSUFFIX}, poly@value{PSUFFIX}
-@subsection poly declarations@value{PSUFFIX}
-@cindex poly declarations@value{PSUFFIX}
+@node poly declarations @value{PSUFFIX}, poly expressions @value{PSUFFIX}, module related functions @value{PSUFFIX}, poly @value{PSUFFIX}
+@subsection poly declarations @value{PSUFFIX}
+@cindex poly declarations @value{PSUFFIX}
 
 @table @strong
 @item Syntax:
@@ -526,9 +526,9 @@ f;
 
 @c ----------------------------
 
-@node poly expressions@value{PSUFFIX}, poly operations@value{PSUFFIX}, poly declarations@value{PSUFFIX}, poly@value{PSUFFIX}
-@subsection poly expressions@value{PSUFFIX}
-@cindex poly expressions@value{PSUFFIX}
+@node poly expressions @value{PSUFFIX}, poly operations @value{PSUFFIX}, poly declarations @value{PSUFFIX}, poly @value{PSUFFIX}
+@subsection poly expressions @value{PSUFFIX}
+@cindex poly expressions @value{PSUFFIX}
 
 A poly expression is (optional parts in square brackets):
 @enumerate
@@ -590,9 +590,9 @@ y*x;     // correct input
 
 @c ------------------------------
 
-@node poly operations@value{PSUFFIX}, poly related functions@value{PSUFFIX}, poly expressions@value{PSUFFIX}, poly@value{PSUFFIX}
-@subsection poly operations@value{PSUFFIX}
-@cindex poly operations@value{PSUFFIX}
+@node poly operations @value{PSUFFIX}, poly related functions @value{PSUFFIX}, poly expressions @value{PSUFFIX}, poly @value{PSUFFIX}
+@subsection poly operations @value{PSUFFIX}
+@cindex poly operations @value{PSUFFIX}
 
 @table @asis
 @item @code{+}
@@ -620,9 +620,9 @@ the monomial at the indicated place w.r.t.@: the monomial ordering
 
 @c ------------------------------
 
-@node poly related functions@value{PSUFFIX},  , poly operations@value{PSUFFIX}, poly@value{PSUFFIX}
-@subsection poly related functions@value{PSUFFIX}
-@cindex poly related functions@value{PSUFFIX}
+@node poly related functions @value{PSUFFIX},  , poly operations @value{PSUFFIX}, poly @value{PSUFFIX}
+@subsection poly related functions @value{PSUFFIX}
+@cindex poly related functions @value{PSUFFIX}
 
 
 @table @code
@@ -633,9 +633,9 @@ Computes the Lie bracket of two polinomials
 
 @c ---------------------------------------
 
-@node qring@value{PSUFFIX}, resolution@value{PSUFFIX}, poly@value{PSUFFIX}, Data types@value{PSUFFIX}
-@section qring@value{PSUFFIX}
-@cindex qring@value{PSUFFIX}
+@node qring @value{PSUFFIX}, resolution @value{PSUFFIX}, poly @value{PSUFFIX}, Data types @value{PSUFFIX}
+@section qring @value{PSUFFIX}
+@cindex qring @value{PSUFFIX}
 
 @sc{Plural} offers the opportunity to calculate in 
 factor rings  modulo a two-sided ideal.  The ideal has to be given
@@ -649,14 +649,14 @@ in @sc{Singular} manual section Rings and orderings.
 @end ifclear
 
 @menu
-* qring declaration@value{PSUFFIX}::
+* qring declaration @value{PSUFFIX}::
 @end menu
 
 @c ---------------------------------------
 
-@node qring declaration@value{PSUFFIX},  , qring@value{PSUFFIX}, qring@value{PSUFFIX}
-@subsection qring declaration@value{PSUFFIX}
-@cindex qring declaration@value{PSUFFIX}
+@node qring declaration @value{PSUFFIX},  , qring @value{PSUFFIX}, qring @value{PSUFFIX}
+@subsection qring declaration @value{PSUFFIX}
+@cindex qring declaration @value{PSUFFIX}
 
 
 @table @strong
@@ -697,9 +697,9 @@ ek;
 
 @c ---------------------------------------
 
-@node resolution@value{PSUFFIX}, ring@value{PSUFFIX}, qring@value{PSUFFIX}, Data types@value{PSUFFIX}
-@section resolution@value{PSUFFIX}
-@cindex resolution@value{PSUFFIX}
+@node resolution @value{PSUFFIX}, ring @value{PSUFFIX}, qring @value{PSUFFIX}, Data types @value{PSUFFIX}
+@section resolution @value{PSUFFIX}
+@cindex resolution @value{PSUFFIX}
 
 The resolution type is intended as an intermediate representation which
 internally retains additional information obtained during computation of
@@ -714,16 +714,16 @@ which also completes computations and may therefore take time,
 implicitly a cast to a list).
 
 @menu
-* resolution declarations@value{PSUFFIX}::
-* resolution expressions@value{PSUFFIX}::
-* resolution related functions@value{PSUFFIX}::
+* resolution declarations @value{PSUFFIX}::
+* resolution expressions @value{PSUFFIX}::
+* resolution related functions @value{PSUFFIX}::
 @end menu
 
 @c ---------------------------------------
 
-@node resolution declarations@value{PSUFFIX}, resolution expressions@value{PSUFFIX}, resolution@value{PSUFFIX}, resolution@value{PSUFFIX}
-@subsection resolution declarations@value{PSUFFIX}
-@cindex resolution declarations@value{PSUFFIX}
+@node resolution declarations @value{PSUFFIX}, resolution expressions @value{PSUFFIX}, resolution @value{PSUFFIX}, resolution @value{PSUFFIX}
+@subsection resolution declarations @value{PSUFFIX}
+@cindex resolution declarations @value{PSUFFIX}
 
 @table @strong
 @item Syntax:
@@ -753,9 +753,9 @@ l;
 
 @c ------------------------------
 
-@node resolution expressions@value{PSUFFIX}, resolution related functions@value{PSUFFIX}, resolution declarations@value{PSUFFIX}, resolution@value{PSUFFIX}
-@subsection resolution expressions@value{PSUFFIX}
-@cindex resolution expressions@value{PSUFFIX}
+@node resolution expressions @value{PSUFFIX}, resolution related functions @value{PSUFFIX}, resolution declarations @value{PSUFFIX}, resolution @value{PSUFFIX}
+@subsection resolution expressions @value{PSUFFIX}
+@cindex resolution expressions @value{PSUFFIX}
 
 A resolution expression is:
 @enumerate
@@ -770,30 +770,30 @@ a type cast to resolution from a list of ideals, resp.@: modules..
 
 @c ------------------------------
 
-@node resolution related functions@value{PSUFFIX},  , resolution expressions@value{PSUFFIX}, resolution@value{PSUFFIX}
-@subsection resolution related functions@value{PSUFFIX}
-@cindex resolution related functions@value{PSUFFIX}
+@node resolution related functions @value{PSUFFIX},  , resolution expressions @value{PSUFFIX}, resolution @value{PSUFFIX}
+@subsection resolution related functions @value{PSUFFIX}
+@cindex resolution related functions @value{PSUFFIX}
 
 @table @code
 @item minres 
-minimize a free resolution  (see @ref{minres@value{PSUFFIX}})
+minimize a free resolution  (see @ref{minres @value{PSUFFIX}})
 @item mres 
 computes minimal free resolution of an ideal resp. 
 module w.r.t. a minimal set of generators of the given ideal
-resp. module (see @ref{mres@value{PSUFFIX}})
+resp. module (see @ref{mres @value{PSUFFIX}})
 @item nres 
 computes a free resolution of an ideal resp.@: module M which is
-minimized from the second module on (see @ref{nres@value{PSUFFIX}})          
+minimized from the second module on (see @ref{nres @value{PSUFFIX}})          
 @c @item res
-@c free resolution of an ideal resp.@: module but not changing the given ideal resp.@: module(see @ref{res@value{PSUFFIX}})
+@c free resolution of an ideal resp.@: module but not changing the given ideal resp.@: module(see @ref{res @value{PSUFFIX}})
 @end table
 
 
 @c ---------------------------------------
 
-@node ring@value{PSUFFIX},  , resolution@value{PSUFFIX}, Data types@value{PSUFFIX}
-@section ring@value{PSUFFIX}
-@cindex ring@value{PSUFFIX}
+@node ring @value{PSUFFIX},  , resolution @value{PSUFFIX}, Data types @value{PSUFFIX}
+@section ring @value{PSUFFIX}
+@cindex ring @value{PSUFFIX}
 
 Rings are used to describe properties of polynomials, ideals etc.
 Almost all computations in @sc{Plural} require a basering.
@@ -809,16 +809,16 @@ only
 (@pxref{PLURAL conventions}).
 
 @menu
-* ring declarations@value{PSUFFIX}::
-* ring operations@value{PSUFFIX}::
-* ring related functions@value{PSUFFIX}::
+* ring declarations @value{PSUFFIX}::
+* ring operations @value{PSUFFIX}::
+* ring related functions @value{PSUFFIX}::
 @end menu
 
 @c ---------------------------------------
 
-@node ring declarations@value{PSUFFIX}, ring operations@value{PSUFFIX}, ring@value{PSUFFIX}, ring@value{PSUFFIX}
-@subsection ring declarations@value{PSUFFIX}
-@cindex ring declarations@value{PSUFFIX}
+@node ring declarations @value{PSUFFIX}, ring operations @value{PSUFFIX}, ring @value{PSUFFIX}, ring @value{PSUFFIX}
+@subsection ring declarations @value{PSUFFIX}
+@cindex ring declarations @value{PSUFFIX}
 
 @table @strong
 @item Syntax:
@@ -876,9 +876,9 @@ In order to create the non-commutative extention, see @ref{plural}.
 
 @c ---------------------------------------
 
-@node ring operations@value{PSUFFIX}, ring related functions@value{PSUFFIX}, ring declarations@value{PSUFFIX}, ring@value{PSUFFIX}
-@subsection ring operations@value{PSUFFIX}
-@cindex ring operations@value{PSUFFIX}
+@node ring operations @value{PSUFFIX}, ring related functions @value{PSUFFIX}, ring declarations @value{PSUFFIX}, ring @value{PSUFFIX}
+@subsection ring operations @value{PSUFFIX}
+@cindex ring operations @value{PSUFFIX}
 @table @asis
 @item @code{+}
 construct a new ring @math{k[X,Y]} from @math{k_1[X]}  and @math{k_2[Y]}.
@@ -906,11 +906,11 @@ R;
 
 @c ---------------------------------------
 
-@node ring related functions@value{PSUFFIX},  , ring operations@value{PSUFFIX}, ring@value{PSUFFIX}
-@subsection ring related functions@value{PSUFFIX}
-@cindex ring related functions@value{PSUFFIX}
+@node ring related functions @value{PSUFFIX},  , ring operations @value{PSUFFIX}, ring @value{PSUFFIX}
+@subsection ring related functions @value{PSUFFIX}
+@cindex ring related functions @value{PSUFFIX}
 
 @table @code
 @item qring
-quotient ring (see @ref{qring@value{PSUFFIX}}) 
+quotient ring (see @ref{qring @value{PSUFFIX}}) 
 @end table
