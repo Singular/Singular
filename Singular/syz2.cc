@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz2.cc,v 1.12 2000-01-28 12:41:52 siebert Exp $ */
+/* $Id: syz2.cc,v 1.13 2000-02-03 12:27:33 siebert Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -40,6 +40,7 @@
 //#define SHOW_CRIT
 //#define SHOW_SPRFL
 #define USE_CHAINCRIT
+#define poly_write(p) wrp(p);PrintLn()
 /*--- some heuristics to optimize the pair sets---*/
 /*--- chose only one (!!!) at the same time ------*/
 //#define USE_HEURISTIC1
@@ -172,7 +173,7 @@ Print("Hier: %d, %d\n",j,i);
                       if (ti<l) 
                       {
 #ifdef SHOW_SPRFL
-Print("gefunden in Mod %d: ",index); pWrite((syzstr->resPairs[index])[ti].lcm);
+Print("gefunden in Mod %d: ",index); poly_write((syzstr->resPairs[index])[ti].lcm);
 #endif
                         syDeletePair(&(syzstr->resPairs[index])[ti]);
 #ifdef SHOW_CRIT
@@ -248,10 +249,10 @@ Print("gefunden in Mod %d: ",index); pWrite((syzstr->resPairs[index])[ti].lcm);
           pSetComp(tso.lcm,pGetComp((syzstr->resPairs[index])[r1].syz));
 #ifdef SHOW_PROT
 Print("erzeuge Paar im Modul %d,%d mit: \n",index,tso.order);
-Print("poly1: ");pWrite(tso.p1);
-Print("poly2: ");pWrite(tso.p2);
-Print("syz: ");pWrite(tso.syz);
-Print("sPoly: ");pWrite(tso.p);
+Print("poly1: ");poly_write(tso.p1);
+Print("poly2: ");poly_write(tso.p2);
+Print("syz: ");poly_write(tso.syz);
+Print("sPoly: ");poly_write(tso.p);
 PrintLn();
 #endif
           syEnterPair(syzstr,&tso,&l,index);
@@ -320,8 +321,8 @@ static void syHalfPair(poly syz, int newEl, syStrategy syzstr, int index)
   syOrder_Hilb(syz,syzstr,index);
 #ifdef SHOW_PROT
 Print("erzeuge Halbpaar im Module %d,%d mit: \n",index,tso.order);
-Print("syz: ");pWrite(tso.syz);
-Print("sPoly: ");pWrite(tso.p);
+Print("syz: ");poly_write(tso.syz);
+Print("sPoly: ");poly_write(tso.p);
 PrintLn();
 #endif
   syEnterPair(syzstr,&tso,&l,index);
@@ -366,10 +367,10 @@ static intvec* syLinStrat2(SSet nextPairs, syStrategy syzstr,
     {
 #ifdef SHOW_PROT
 Print("streiche Paar im Modul %d,%d mit: \n",index,nextPairs[i].order);
-Print("poly1: ");pWrite(nextPairs[i].p1);
-Print("poly2: ");pWrite(nextPairs[i].p2);
-Print("syz: ");pWrite(nextPairs[i].syz);
-Print("sPoly: ");pWrite(nextPairs[i].p);
+Print("poly1: ");poly_write(nextPairs[i].p1);
+Print("poly2: ");poly_write(nextPairs[i].p2);
+Print("syz: ");poly_write(nextPairs[i].syz);
+Print("sPoly: ");poly_write(nextPairs[i].p);
 PrintLn();
 #endif
       //syDeletePair(&nextPairs[i]);
@@ -497,6 +498,7 @@ static void syRedNextPairs_Hilb(SSet nextPairs, syStrategy syzstr,
   int ks1=IDELEMS(syzstr->orderedRes[index+1]);
   int kres=(*syzstr->Tl)[index];
   int toGo=0;
+  int il;
   number coefgcd,n;
   SSet redset=syzstr->resPairs[index];
   poly p=NULL,q,tp;
@@ -598,10 +600,10 @@ Print("<H%d>",toGo);
       tso.p = ksOldCreateSpoly(tso.p2, tso.p1);
 #ifdef SHOW_PROT
 Print("reduziere Paar mit: \n");
-Print("poly1: ");pWrite(tso.p1);
-Print("poly2: ");pWrite(tso.p2);
-Print("syz: ");pWrite(tso.syz);
-Print("sPoly: ");pWrite(tso.p);
+Print("poly1: ");poly_write(tso.p1);
+Print("poly2: ");poly_write(tso.p2);
+Print("syz: ");poly_write(tso.syz);
+Print("sPoly: ");poly_write(tso.p);
 #endif
       if (tso.p != NULL)
       {
@@ -615,10 +617,14 @@ Print("sPoly: ");pWrite(tso.p);
               && ((redset[j].ind1!=tso.ind1) || (redset[j].ind2!=tso.ind2)))
           {
 #ifdef SHOW_RED
-Print("reduziere: ");pWrite(tso.p);
-Print("syz: ");pWrite(tso.syz);
-Print("mit: ");pWrite(redset[j].p);
-Print("syz: ");pWrite(redset[j].syz);
+kBucketClear(syzstr->bucket,&tso.p,&tso.length);
+kBucketClear(syzstr->syz_bucket,&tso.syz,&il);
+Print("reduziere: ");poly_write(tso.p);
+Print("syz: ");poly_write(tso.syz);
+Print("mit: ");poly_write(redset[j].p);
+Print("syz: ");poly_write(redset[j].syz);
+kBucketInit(syzstr->bucket,tso.p,tso.length);
+kBucketInit(syzstr->syz_bucket,tso.syz,il);
 #endif
             sySPRedSyz(syzstr,redset[j],q);
             number up = kBucketPolyRed(syzstr->bucket,redset[j].p,
@@ -626,8 +632,12 @@ Print("syz: ");pWrite(redset[j].syz);
             nDelete(&up);
             q = kBucketGetLm(syzstr->bucket);
 #ifdef SHOW_RED
-Print("zu: ");pWrite(tso.p);
-Print("syz: ");pWrite(tso.syz);
+kBucketClear(syzstr->bucket,&tso.p,&tso.length);
+kBucketClear(syzstr->syz_bucket,&tso.syz,&il);
+Print("zu: ");poly_write(tso.p);
+Print("syz: ");poly_write(tso.syz);
+kBucketInit(syzstr->bucket,tso.p,tso.length);
+kBucketInit(syzstr->syz_bucket,tso.syz,il);
 PrintLn();
 #endif
             if (q==NULL) break;
@@ -639,13 +649,12 @@ PrintLn();
           }
         }
         kBucketClear(syzstr->bucket,&tso.p,&tso.length);
-        int il;
         kBucketClear(syzstr->syz_bucket,&tso.syz,&il);
       }
 #ifdef SHOW_PROT
 Print("erhalte Paar mit: \n");
-Print("syz: ");pWrite(tso.syz);
-Print("sPoly: ");pWrite(tso.p);
+Print("syz: ");poly_write(tso.syz);
+Print("sPoly: ");poly_write(tso.p);
 PrintLn();
 #endif
 #ifdef SHOW_SPRFL
@@ -778,6 +787,7 @@ void sySetNewHilb(syStrategy syzstr, int toSub,int index,int actord)
   int i;
   actord += index;
   intvec * temp_hilb = hHstdSeries(syzstr->res[index+1],NULL,NULL,NULL);
+  intvec * cont_hilb = hHstdSeries(syzstr->res[index],NULL,NULL,NULL);
   if (syzstr->hilb_coeffs[index+1]==NULL)
   {
     syzstr->hilb_coeffs[index+1] = NewIntvec1(16*((actord/16)+1));
@@ -814,6 +824,14 @@ Print("\nSubtrahiere im Modul %d im Grad %d den Wert: %d\n",index,actord-1,toSub
 #endif
     (*syzstr->hilb_coeffs[index])[actord-1]-=toSub;
   }
+  if (syzstr->hilb_coeffs[index]!=NULL)
+  {
+    if (cont_hilb->length()>syzstr->hilb_coeffs[index]->length())
+      syzstr->hilb_coeffs[index]->resize(cont_hilb->length());
+    for (int j=cont_hilb->length()-1;j>actord;j--)
+      (*(syzstr->hilb_coeffs[index]))[j-1] = (*cont_hilb)[j];
+  }
+  delete cont_hilb;
 #ifdef SHOW_HILB
 Print("<h,%d>",(*(syzstr->hilb_coeffs[index+1]))[actord]);
 #endif
@@ -844,12 +862,12 @@ static void syRedGenerOfCurrDeg_Hilb(syStrategy syzstr, int deg,int *maxindex,in
     {
 #ifdef SHOW_PROT
 Print("reduziere Erzeuger: \n");
-Print("syz: ");pWrite((sPairs)[i].syz);
+Print("syz: ");poly_write((sPairs)[i].syz);
 #endif
       (sPairs)[i].syz = syRed_Hilb((sPairs)[i].syz,syzstr,1);
 #ifdef SHOW_PROT
 Print("erhalte Erzeuger: \n");
-Print("syz: ");pWrite((sPairs)[i].syz);
+Print("syz: ");poly_write((sPairs)[i].syz);
 PrintLn();
 #endif
       if ((sPairs)[i].syz != NULL)
