@@ -1,0 +1,11 @@
+Status Output of tst_status.out
+init >> USER    :siebert
+init >> HOSTNAME:pitti
+init >> uname -a:Linux pitti 2.0.35 #130 Mon Jul 27 11:06:31 MEST 1998 i586 unknown
+init >> date    :Thu Nov 18 17:55:04 MET 1999
+init >> version :1306
+init >> ticks   :100
+1 >> tst_memory_0 :: pitti:3704056
+1 >> tst_memory_1 :: pitti:13410672
+1 >> tst_memory_2 :: pitti:13520896
+1 >> tst_timer_1 :: pitti:62616
