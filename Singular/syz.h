@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.h,v 1.25 2000-05-26 11:23:32 siebert Exp $ */
+/* $Id: syz.h,v 1.26 2000-07-09 16:22:42 siebert Exp $ */
 /*
 * ABSTRACT: Resolutions
 */
@@ -59,6 +59,7 @@ class ssyStrategy{
   resolvente minres;
   unsigned long ** sev;
   int length;
+  int regularity;
   short list_length;
   short references;
 };
