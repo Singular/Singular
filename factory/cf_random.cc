@@ -1,8 +1,11 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_random.cc,v 1.1 1997-04-07 16:10:17 schmidt Exp $
+// $Id: cf_random.cc,v 1.2 1997-04-18 13:35:59 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.1  1997/04/07 16:10:17  schmidt
+#include <config.h> added
+
 Revision 1.0  1996/05/17 10:59:44  stobbe
 Initial revision
 
@@ -10,8 +13,7 @@ Initial revision
 
 #include <config.h>
 
-#include <stdlib.h>
-#include <math.h>
+#include <time.h>
 
 #include "assert.h"
 
@@ -21,6 +23,40 @@ Initial revision
 #include "gfops.h"
 #include "imm.h"
 
+class RandomGenerator {
+private:
+    const long int
+	ia = 16807,
+	im = 2147483647,
+	iq = 127773,
+	ir = 2836,
+	deflt = 123459876;
+    
+    long s;
+
+    // s must not equal zero!
+    void seedInit( long ss ) { s = ((ss == 0) ? deflt : ss); }
+public:
+    RandomGenerator() { seedInit( (long)time( 0 ) ); }
+    RandomGenerator( long ss ) { seedInit( ss ); }
+    ~RandomGenerator() {}
+    long generate();
+    void seed( long ss ) { seedInit( ss ); }
+};
+
+long
+RandomGenerator::generate()
+{
+    long k;
+
+    k = s/iq;
+    s = ia*(s-k*iq)-ir*k;
+    if ( s < 0 ) s += im;
+
+    return s;
+}
+
+RandomGenerator ranGen;
 
 CanonicalForm FFRandom::generate () const
 {
@@ -134,10 +170,10 @@ CFRandom * CFRandomFactory::generate()
 
 int factoryrandom( int n )
 {
-    return rand() % n;
+    return ranGen.generate() % n;
 }
 
 void factoryseed ( int s )
 {
-    srand( s );
+    ranGen.seed( s );
 }
