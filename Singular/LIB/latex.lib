@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: latex.lib,v 1.17 2001-02-08 16:34:08 lossen Exp $";
-//category="Visualization";
+version="$Id: latex.lib,v 1.18 2001-02-08 16:35:05 lossen Exp $";
+category="Visualization";
 info="
 LIBRARY: latex.lib    Typesetting of Singular-Objects in LaTeX2e
 AUTHOR: Christian Gorzel, gorzelc@math.uni-muenster.de
