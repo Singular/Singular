@@ -302,6 +302,7 @@ case "$ac_cv_singuname" in
          	LD_DYN_FLAGS="-ldld -Xlinker -E"
 	  	SFLAGS="-fPIC -DPIC"
 	  	SLDFLAGS=-shared
+		LD=gcc
 		ac_lib_dl=yes
 	  fi
 	;;
@@ -311,6 +312,7 @@ case "$ac_cv_singuname" in
 	  	LD_DYN_FLAGS="-ldl -rdynamic"
 	  	SFLAGS="-fpic -DPIC"
 	  	SLDFLAGS=-shared
+		LD=ld
 	        ac_lib_dl=yes
 	  fi
 	;;
@@ -327,12 +329,14 @@ case "$ac_cv_singuname" in
           LD_DYN_FLAGS="-lc"
 	  SFLAGS="-fPIC -DPIC"
 	  SLDFLAGS="-w -no_unresolved -_SYSTYPE_SVR4 -n32 -shared"
+	  LD=ld
 	  ac_lib_dl=yes
         ;;
 esac
 AC_SUBST(LD_DYN_FLAGS)
 AC_SUBST(SFLAGS)
 AC_SUBST(SLDFLAGS)
+AC_SUBST(LD)
 LIBS=${SAVE_LIBS}
 
 
