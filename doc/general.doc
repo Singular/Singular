@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.95 1998-05-20 10:55:41 schmidt Exp $
+@comment $Id: general.doc,v 1.96 1998-05-20 11:50:51 pohl Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -117,7 +117,7 @@ name or, more generally, the name of any section of the printed manual.
 On Unix-like operating systems, the online help system is based on the
 @code{info} program from the Gnu @code{texinfo} package.  @xref{Top, An
 Introduction to Info, Getting started, info, The Info Manual}, for more
-information.  On Windows NT, the online help system is not interactively
+information.  On the other systems the online help system is not interactively
 as described in the remainder of this section.  Instead, after
 displaying the information @sc{Singular} immediately returns to the
 input prompt.
@@ -197,7 +197,7 @@ quits  @sc{Singular}
 @subsection Editing input
 @cindex Editing input
 
-On Unix-like operating systems, @sc{Singular} maintains a history of the
+On Unix-like operating systems and on Windows NT, @sc{Singular} maintains a history of the
 last lines of input.  The history is stored in a file named
 @code{.singular_hist} in the current working directory.  Thus it is
 possible to reuse input from a former @sc{Singular} session.
@@ -240,9 +240,6 @@ saves current line on history and get previous line
 saves the current line to the history and
 sends it to the @sc{Singular} parser for interpretation
 @end table
-
-On Windows NT, the cursor keys may be used to edit the command line and
-to retrieve previous input.
 
 @c --------------------------------------------------------------------------
 @node Command line options, Startup sequence, Editing input, Interactive use
@@ -2085,15 +2082,15 @@ reads a library of procedures (proc) from a file. If the given
 filename does not start with @kbd{.} or @kbd{/}, the following directories are
 searched for the file: the current directory,
 the directories given in the environment variable
-@code{SINGULARPATH}@footnote{@code{SPATH} on MS-DOS},
-@code{/usr/local/share/Singular}
+@code{SINGULARPATH}@footnote{@code{SPATH} on MS-DOS}.
 Only procedure names of the library are loaded, the body of the proc
 is read during the first call of this proc. This minimizes
 the memory consumption by unused procedures.
 @item @strong{Example:}
 @example
 LIB "general.lib"; // the names of the procedures in the
-                   // library "general.lib" are now known to SINGULAR
+                   // library "general.lib" are now known
+                   // to SINGULAR
 @end example
 @end table
 @menu
