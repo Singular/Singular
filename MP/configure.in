@@ -241,9 +241,7 @@ if test "${freebsd_problem}" != no; then
   grep -v "#warning" /usr/include/values.h > ./values.h
 elif test "${no_values_h}" != no; then
   cp ./values.h.subst ./values.h
-  AC_TRY_CPP( #include "values.h" , 
-              CPPFLAGS="-I. ${CPPFLAGS}",
-              echo "*** no values.h";exit)
+  CPPFLAGS="-I. ${CPPFLAGS}"
 fi
 
 AC_HEADER_CHECK(fcntl.h,:, echo "*** no fcntl.h";exit)
