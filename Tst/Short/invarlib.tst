@@ -4,7 +4,7 @@ tst_init();
 LIB "invar.lib";
 
 example sortier; newline;
-example der; newline;
+example derivate; newline;
 example actionIsProper; newline;
 example reduction; newline;
 example completeReduction; newline;

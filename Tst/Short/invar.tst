@@ -25,7 +25,7 @@ kill rf;
   m[3,1]=x(1);
   m[4,1]=x(2);
   m[5,1]=1+x(1)*x(4)^2;
-  ideal in=invariantRing(m,x(3),x(1));
+  ideal in=invariantRing(m,x(3),x(1),0);
   in;
   
   actionIsProper(m);
