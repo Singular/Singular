@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.h,v 1.6 1999-09-16 12:34:00 Singular Exp $ */
+/* $Id: modulop.h,v 1.7 1999-09-27 14:42:31 obachman Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
@@ -69,10 +69,12 @@ inline BOOLEAN npIsZeroM (number  a)
 *  return (number)(((int)a*(int)b) % npPrimeM);
 *}
 */
+
 #define npSubM(a,b)    (number)((int)a<(int)b ?\
                        npPrimeM-(int)b+(int)a : (int)a-(int)b)
+
 #define npNegM(A)      (number)(npPrimeM-(int)(A))
 #define npEqualM(A,B)  ((int)A==(int)B)
-
+#define npIsZeroM(a)   (0 == (int)a)
 #endif
 
