@@ -1,6 +1,6 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.30 1999-08-10 17:45:56 wichmann Exp $
+;; $Id: singular.el,v 1.31 1999-08-11 12:51:59 wichmann Exp $
 
 ;;; Commentary:
 
@@ -470,6 +470,7 @@ For Emacs, this function is called  at mode initialization time."
 		     'singular-interactive-mode-map)))
 
   ;; define keys
+  (define-key singular-interactive-mode-map "\t"        'singular-dynamic-complete)
   (define-key singular-interactive-mode-map [?\C-m]	'singular-send-or-copy-input)
   (define-key singular-interactive-mode-map [?\M-r]	'comint-previous-matching-input)
   (define-key singular-interactive-mode-map [?\M-s]	'comint-next-matching-input)
@@ -588,73 +589,76 @@ This function is called  at mode initialization time."
 (defvar singular-interactive-mode-menu-2 nil
   "NOT READY [docu]")
 
-(defvar singular-start-menu-definition
-  '("Singular"
-    ["start default" singular t]
-    ["start..." singular-other t]
-    ["exit" singular-exit-singular t])
-  "NOT READY [docu]")
+(or singular-interactive-mode-menu-1
+    (easy-menu-define singular-interactive-mode-menu-1
+		      singular-interactive-mode-map ""
+		      '("Singular"
+			["start default" singular t]
+			["start..." singular-other t]
+			["exit" singular-exit-singular t])))
 
-(if singular-interactive-mode-menu-1
-    ()
-  (cond
-   ;; XEmacs
-   ((eq singular-emacs-flavor 'xemacs)
-    (easy-menu-define
-     singular-interactive-mode-menu-1
-     singular-interactive-mode-map ""
-     singular-start-menu-definition))))
+;; XEmacs does not provide the function easy-menu-add-item, so define
+;; the new function singular-menu-add-item.
+(singular-fset 'singular-menu-add-item
+	       (function (lambda (map path-head path-sub element before)
+			   (easy-menu-add-item map (list path-sub) 
+					       element before)))
+	       (function (lambda (map path-head path-sub element before)
+			   (add-menu-button (list path-head path-sub)
+					    element before))))
 
-(if singular-interactive-mode-menu-2
-    ()
-  (cond
-   ;; XEmacs
-   ((eq singular-emacs-flavor 'xemacs)
+(defun singular-menu-install-libraries ()
+  "Updates the singular command menu with libraries.
+Go through the alist `singular-completion-library-list' and for 
+each entry add a new menu element in the submenu 
+(\"Commands\" \"libraries\")."		;" font-lock trick.
+  (let ((libs (sort singular-completion-library-list 
+		    (function (lambda (a b)
+				(string< (car b) (car a))))))
+	(last "other...")
+	current)
+    (while libs
+      (setq current (car (car libs)))
+      (singular-menu-add-item singular-interactive-mode-menu-2
+			      "Commands" "libraries" 
+			      (vector current
+				      (list 'singular-load-library current t)
+				      t)
+			      last)
+
+      (setq last current)
+      (setq libs (cdr libs)))
+    (singular-menu-add-item singular-interactive-mode-menu-2
+			    "Commands" "libraries"
+			    "--:singleLine" "other...")))
+;     (easy-menu-add-item singular-interactive-mode-menu-2
+; 			'("libraries") "---" "other...")))
+
+(or singular-interactive-mode-menu-2
     (easy-menu-define 
      singular-interactive-mode-menu-2
      singular-interactive-mode-map ""
-     '("Commands"
-       ["load file..." singular-load-file t]
-       ("load library"
-	["all.lib" (singular-load-library "all.lib" t) t]
-	["classify.lib" (singular-load-library "classify.lib" t) t]
-	["deform.lib" (singular-load-library "deform.lib" t) t]
-	["elim.lib" (singular-load-library "elim.lib" t) t]
-	["finvar.lib" (singular-load-library "finvar.lib" t) t]
-	["general.lib" (singular-load-library "general.lib" t) t]
-	["graphics.lib" (singular-load-library "graphics.lib" t) t]
-	["hnoether.lib" (singular-load-library "hnoether.lib" t) t]
-	["homolog.lib" (singular-load-library "homolog.lib" t) t]
-	["inout.lib" (singular-load-library "inout.lib" t) t]
-	["invar.lib" (singular-load-library "invar.lib" t) t]
-	["latex.lib" (singular-load-library "latex.lib" t) t]
-	["matrix.lib" (singular-load-library "matrix.lib" t) t]
-	["normal.lib" (singular-load-library "normal.lib" t) t]
-	["poly.lib" (singular-load-library "poly.lib" t) t]
-	["presolve.lib" (singular-load-library "presolve.lib" t) t]
-	["primdec.lib" (singular-load-library "primdec.lib" t) t]
-	["primitiv.lib" (singular-load-library "primitiv.lib" t) t]
-	["random.lib" (singular-load-library "random.lib" t) t]
-	["ring.lib" (singular-load-library "ring.lib" t) t]
-	["sing.lib" (singular-load-library "sing.lib" t) t]
-	["standard.lib" (singular-load-library "standard.lib" t) t]
-	"---"
-	["other..." singular-load-library t])
-       "---"
-       ["load demo" singular-demo-load (not singular-demo-mode)]
-       ["exit demo" singular-demo-exit singular-demo-mode]
-       "---"
-       ["truncate lines" singular-toggle-truncate-lines
-	:style toggle :selected truncate-lines]
-       "---"
-       ["fold last output" singular-fold-last-output t]
-       ["fold all output" singular-fold-all-output t]
-       ["fold at point" singular-fold-at-point t]
-       "---"
-       ["unfold last output" singular-unfold-last-output t]
-       ["unfold all output" singular-unfold-all-output t]
-       ["unfold at point" singular-unfold-at-point t]
-       )))))
+     (list 
+      "Commands"
+      ["load file..." singular-load-file t]
+      (list
+       "libraries"
+       ["other..." singular-load-library t])
+      "---"
+      ["load demo" singular-demo-load (not singular-demo-mode)]
+      ["exit demo" singular-demo-exit singular-demo-mode]
+      "---"
+      ["truncate lines" singular-toggle-truncate-lines
+       :style toggle :selected truncate-lines]
+      "---"
+      ["fold last output" singular-fold-last-output t]
+      ["fold all output" singular-fold-all-output t]
+      ["fold at point" singular-fold-at-point t]
+      "---"
+      ["unfold last output" singular-unfold-last-output t]
+      ["unfold all output" singular-unfold-all-output t]
+      ["unfold at point" singular-unfold-at-point t]
+      )))
 
 ;; NOT READY
 ;; This is just a temporary hack for XEmacs demo.
@@ -668,38 +672,15 @@ This function is called  at mode initialization time."
       (add-submenu nil 
 		   singular-start-menu-definition))))
 
-  ;; remove existing singular-start-menu from menu (XEmacs)
-  ;, NOT READY
-  ;; This is mayby just temporary
-;  (cond
-;   ;; XEmacs
-;   ((eq singular-emacs-flavor 'xemacs)
-;    (delete-menu-item '("Singular"))))
-
-	    ;; NOT READY: SINGULAR-LOGO
-;	    (cond 
-;	     ((eq singular-emacs-flavor 'xemacs)
-;	      (set-extent-begin-glyph (make-extent (point-min) (point-min)) 
-;				      singular-logo)
-;	      (insert "\n")))
-
-;; NOT READY: SINGULAR-LOGO
-;(cond
-; ((eq singular-emacs-flavor 'xemacs)
-;  (defvar singular-logo (make-glyph))
-;  (set-glyph-image singular-logo
-;		   (concat "~/" "singlogo.xpm")
-;		   'global 'x)))
-
 (defun singular-interactive-mode-menu-init ()
   "Initialize menus for Singular interactive mode.
 
 This function is called  at mode initialization time."
-  (cond
-   ;; XEmacs
-   ((eq singular-emacs-flavor 'xemacs)
-    (easy-menu-add singular-interactive-mode-menu-1)
-    (easy-menu-add singular-interactive-mode-menu-2))))
+  ;; Note: easy-menu-add is not necessary in emacs, since the menu
+  ;; is added automatically with the keymap. 
+  ;; See help on `easy-menu-add'
+  (easy-menu-add singular-interactive-mode-menu-1)
+  (easy-menu-add singular-interactive-mode-menu-2))
 ;;}}}
 
 ;;{{{ Skipping and stripping prompts and newlines and other things
@@ -2394,6 +2375,181 @@ This function is called at mode initialization time."
   (add-hook 'singular-post-output-filter-functions 'singular-help-post-output-filter))
 ;;}}}
 
+;;{{{ Scanning of header and handling of emacs home directory
+;;
+;; Scanning of header
+;;
+(defvar singular-scan-header-emacs-home-regexp "^// \\*\\* EmacsDir: \\(.+\\)\n"
+  "Regular expression matching the location of emacs home in Singular 
+header.")
+
+(defvar singular-scan-header-info-file-regexp "^// \\*\\* InfoFile: \\(.+\\)\n"
+  "Regular expression matching the location of Singular info file in 
+Singular header.")
+
+(defvar singular-scan-header-time-stamp 0
+  "A time stamp set by singular-scan-header.
+
+This variable is buffer-local.")
+
+(defvar singular-scan-header-scan-for '(emacs-home info-file)
+  "List of things to scan for in Singular header.
+If `singular-scan-header-pre-output-filter' finds one thing in the current
+output, it removes the corresponding value from the list.
+If this variable gets nil, `singular-scan-header-pre-output-filter' is
+removed from the pre-output-filter.
+
+This variable is buffer-local.")
+
+(defun singular-scan-header-init ()
+  "NOT READY: docu"
+  (make-local-variable 'singular-scan-header-time-stamp)
+  (setq singular-scan-header-time-stamp (current-time))
+  (make-local-variable 'singular-emacs-home-directory)
+  (setq singular-emacs-home-directory nil)
+  (make-local-variable 'singular-scan-header-scan-for)
+  (setq singular-scan-header-scan-for '(emacs-home info-file))
+  (add-hook 'singular-pre-output-filter-functions 'singular-scan-header-pre-output-filter))
+
+(defun singular-scan-header-pre-output-filter (output)
+  "NOT READY: docu"
+  (let ((changed nil))
+
+    ;; Search for emacs home directory
+    (when (string-match singular-scan-header-emacs-home-regexp output)
+      (setq singular-scan-header-scan-for (delq 'emacs-home singular-scan-header-scan-for))
+      (setq singular-emacs-home-directory (substring output (match-beginning 1) (match-end 1)))
+      (setq output (replace-match "" t t output))
+      (setq changed t)
+
+      (or (load (singular-expand-emacs-file-name "cmd-cmpl.el" t) t t t)
+	  (message "Can't find command completion file! Command completion disabled."))
+      (or (load (singular-expand-emacs-file-name "hlp-cmpl.el" t) t t t)
+	  (message "Can't find help topic completion file! Help completion disabled."))
+      (if (load (singular-expand-emacs-file-name "lib-cmpl.el" t) t t t)
+	  (singular-menu-install-libraries)
+	(message "Can't find library index file!")))
+
+    ;; Search for Singular info file
+    (when (string-match singular-scan-header-info-file-regexp output)
+      (setq singular-scan-header-scan-for (delq 'info-file singular-scan-header-scan-for))
+      (setq singular-help-file-name (substring output (match-beginning 1) (match-end 1)))
+      (setq output (replace-match "" t t output))
+      (setq changed t))
+
+    ;; Remove from hook if everything is found or if we already waited 
+    ;; too long.
+    (if (or (eq singular-scan-header-scan-for nil) 
+	    (> (singular-time-stamp-difference (current-time) singular-scan-header-time-stamp) 10))
+	(remove-hook 'singular-pre-output-filter-functions 'singular-scan-header-pre-output-filter))
+
+    ;; Return new output string if we changed it, nil otherwise
+    (and changed output)))
+
+;;
+;; handling of emacs home directory
+;;
+(defvar singular-emacs-home-directory nil
+  "Path to the emacs sub-directory of Singular as string.
+`singular-scan-header' searches the Singular header for the path and sets
+this variable to the corresponding value.
+Is initialized by `singular-scan-header-pre-output-filter'.
+
+This variable is buffer-local.")
+
+(defun singular-expand-emacs-file-name (file &optional noerror)
+  "Adds absolute path of emacs home directory.
+Adds the content of `singular-emacs-home-directory' to the string FILE.
+If `singular-emacs-home-directory' is nil, return nil and signal
+an error unless optional argument NOERROR is not nil."
+  (if singular-emacs-home-directory
+      (concat singular-emacs-home-directory "/" file)
+    (if noerror
+	nil
+      (error "Variable singular-emacs-home-directory not set"))))
+;;}}}
+
+;;{{{ Filename, Command, and Help Completion
+(defvar singular-completion-cmd-list nil
+  "An alist containing all Singular commands to complete.
+
+This variable is buffer-local.")
+
+(defvar singular-completion-hlp-list nil
+  "An alist containg all Singular help topics to complete.
+
+This variable is buffer-local.")
+
+(defun singular-completion-init ()
+  "Initialize completion of file names, commands and help topics
+for Singular interactive mode.
+
+This function is called at mode initialization time."
+  (make-local-variable 'singular-completion-cmd-list)
+  (setq singular-completion-cmd-list nil)
+  (make-local-variable 'singular-completion-hlp-list)
+  (setq singular-completion-hlp-list nil))
+
+(defun singular-completion-do (pattern beg end completion-alist)
+  "Try completion on string PATTERN using alist COMPLETION-ALIST.
+Insert completed version of PATTERN as new text between BEG and END.
+Assumes the COMPLETION-ALIST is not nil."
+  (let ((completion (try-completion pattern completion-alist)))
+    (cond ((eq completion t)
+	   (message "[Sole completion]"))  ;; nothing to complete
+	  ((null completion)               ;; no completion found
+	   (message "Can't find completion for \"%s\"" pattern)
+	   (ding))
+	  ((not (string= pattern completion))
+	   (delete-region beg end)
+	   (insert completion))
+	  (t
+	   (message "Making completion list...")
+	   (let ((list (all-completions pattern 
+					completion-alist)))
+	     (with-output-to-temp-buffer "*Completions*"
+	       (display-completion-list list)))
+	   (message "Making completion list...%s" "done")))))
+
+(defun singular-dynamic-complete ()
+  "Dynamic complete word before point.
+Perform file name completion if point is inside a string.
+Perform completion of Singular help topics if point is at the end of a 
+help command (\"help\" or \"?\").
+Otherwise perform completion of Singular commands."
+  (interactive)
+  ;; Check if we are inside a string. The search is done back to the
+  ;; process-mark which should be the beginning of the current input.
+  ;; No check at this point whether there is a process!
+  (if (save-excursion
+	(nth 3 (parse-partial-sexp (singular-process-mark) (point))))
+      ;; then: inside string, thus expand filename
+      (comint-dynamic-complete-as-filename)
+    ;; else: expand command or help
+    (let ((end (point))
+	  beg)
+      (if (save-excursion
+	    (beginning-of-line)
+	    (re-search-forward (concat singular-prompt-regexp
+				       "[ \t]*\\([\\?]\\|help \\)[ \t]*\\(.*\\)")
+			       end t))
+	  ;; then: help completion
+	  (if singular-completion-hlp-list
+	      (singular-completion-do (match-string 2) (match-beginning 2)
+				      end singular-completion-hlp-list)
+	    (message "Completion of Singular help topics disabled.")
+	    (ding))
+	;; else: command completion
+	(save-excursion
+	  (skip-chars-backward "a-zA-Z0-9")
+	  (setq beg (point)))
+	(if singular-completion-cmd-list
+	    (singular-completion-do (buffer-substring beg end) beg
+				    end singular-completion-cmd-list)
+	  (message "Completion of Singular commands disabled.")
+	  (ding))))))
+;;}}}
+
 ;;{{{ Debugging filters
 (defun singular-debug-pre-input-filter (string)
   "Display STRING and some markers in mini-buffer."
@@ -3107,7 +3263,9 @@ NOT READY [much more to come.  See shell.el.]!"
   ;; debugging filters
   (singular-debug 'interactive-filter (singular-debug-filter-init))
 
+  (singular-scan-header-init)
   (singular-help-init)
+  (singular-completion-init)
 
   ;; other input or output filters
   (add-hook 'singular-post-output-filter-functions
@@ -3137,7 +3295,7 @@ Used by `singular' when new Singular processes are started.")
   "Default process name for Singular process.
 Used by `singular' when new Singular processes are started.")
 
-(defvar singular-default-switches '("-t")
+(defvar singular-default-switches '("--emacs")
   "Default switches for Singular processes.
 Used by `singular' when new Singular processes are started.")
 
