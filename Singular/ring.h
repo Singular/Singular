@@ -6,11 +6,14 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.28 1999-07-01 16:40:44 Singular Exp $ */
+/* $Id: ring.h,v 1.29 1999-07-08 13:38:42 Singular Exp $ */
 
 /* includes */
 #include "structs.h"
 #include "polys-impl.h"
+
+#define SHORT_REAL_LENGTH 6 // use short reals for real <= 6 digits
+
 
 #ifdef DRING
 void   rChangeCurrRing(ring r, BOOLEAN complete = TRUE, idhdl h = NULL);
@@ -61,7 +64,8 @@ inline BOOLEAN rField_is_numeric(ring r=currRing) /* R, long R, long C */
 { return (r->ch ==  -1); }
 inline BOOLEAN rField_is_R(ring r=currRing)
 {
-  if (rField_is_numeric(r) && (r->ch_flags == (short)0)) return TRUE;
+  if (rField_is_numeric(r) && (r->ch_flags <= (short)SHORT_REAL_LENGTH))
+    return (r->parameter==NULL);
   return FALSE;
 }
 inline BOOLEAN rField_is_GF(ring r=currRing)
@@ -74,13 +78,13 @@ inline BOOLEAN rField_is_Q_a(ring r=currRing)
 { return (r->ch == 1); }
 inline BOOLEAN rField_is_long_R(ring r=currRing)
 {
-  if (rField_is_numeric(r) && (r->ch_flags != (short)0))
+  if (rField_is_numeric(r) && (r->ch_flags >(short)SHORT_REAL_LENGTH))
     return (r->parameter==NULL);
   return FALSE;
 }
 inline BOOLEAN rField_is_long_C(ring r=currRing)
 {
-  if (rField_is_numeric(r) && (r->ch_flags != (short)0))
+  if (rField_is_numeric(r))
     return (r->parameter!=NULL);
   return FALSE;
 }
@@ -120,7 +124,7 @@ typedef enum rOrderType_t
   rOrderType_Syz,         // syzygy ordering
   rOrderType_Schreyer,     // Schreyer ordering
   rOrderType_Syz2dpc,     // syzcomp2dpc
-  rOrderType_ExpNoComp    // simple ordering, differences in component are 
+  rOrderType_ExpNoComp    // simple ordering, differences in component are
                           // not considered
 } rOrderType_t;
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.56 1999-07-01 16:40:42 Singular Exp $ */
+/* $Id: ring.cc,v 1.57 1999-07-08 13:38:44 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -525,10 +525,11 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
   pn=pn->next;
 
   /* characteristic -----------------------------------------------*/
-  /* input: 0 ch=0 : Q     parameter=NULL    ffChar=FALSE
+  /* input: 0 ch=0 : Q     parameter=NULL    ffChar=FALSE   ch_flags
    *         0    1 : Q(a,...)        *names         FALSE
-   *         0   -1 : R               NULL           FALSE
-   *         0   -1 : C               *names         FALSE
+   *         0   -1 : R               NULL           FALSE  0
+   *         0   -1 : R               NULL           FALSE  prec. >6
+   *         0   -1 : C               *names         FALSE  prec. 0..?
    *         p    p : Fp              NULL           FALSE
    *         p   -p : Fp(a)           *names         FALSE
    *         q    q : GF(q=p^n)       *names         TRUE
@@ -590,6 +591,12 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
     WerrorS("need one parameter");
     goto rInitError;
   }
+  /* post-processing of field description */
+  // we have short reals, but no short complex
+  if ((R->ch == - 1)
+  && (R->parameter !=NULL)
+  && (R->ch_flags < SHORT_REAL_LENGTH))
+    R->ch_flags = SHORT_REAL_LENGTH;
 
   /* names and number of variables-------------------------------------*/
   R->N = rv->listLength();
@@ -732,7 +739,12 @@ void rWrite(ring r)
         sp++; nop++;
       }
       PrintS("\n//   minpoly        : ");
-      if (r->minpoly==NULL)
+      if ( rField_is_long_C(r) )
+      {
+        // i^2+1:
+        Print("(%s^2+1)\n",r->parameter[0]);
+      }
+      else if (r->minpoly==NULL)
       {
         PrintS("0\n");
       }
