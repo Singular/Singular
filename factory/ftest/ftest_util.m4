@@ -1,4 +1,4 @@
-dnl $Id: ftest_util.m4,v 1.6 1997-10-02 07:16:45 schmidt Exp $
+dnl $Id: ftest_util.m4,v 1.7 1997-10-02 10:36:41 schmidt Exp $
 dnl
 dnl ftest_util.m4 - m4 macros used by the factory test environment.
 dnl
@@ -85,8 +85,7 @@ define(`ftestMainInit', `dnl
 # ftestMainExit() - clean up in main().
 #
 define(`ftestMainExit', `dnl
-`ftestMainExit();
-    return check'')
+`return check'')
 
 #
 # ftestOutVar() - declare output variable.
@@ -168,8 +167,14 @@ define(`ftestSetEnv', `dnl
 # $1: code to execute
 #
 define(`ftestRun', `dnl
-`if ( ftestAlarm )
+`// set alarm
+    if ( ftestAlarm )
 	alarm( ftestAlarm );
+
+    // before starting the algorithm, save random generator seed
+    ftestWriteSeed();
+
+    // now run algorithm
     while ( ftestCircle > 0 ) {
 	TIMING_START(ftestTimer);
 	$1
