@@ -1,3 +1,75 @@
+Fri Nov 21 11:34:36 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* ftest_util.cc (CFSwitchesMax): const replaced by `#include
+	  <cd_switches.h>'
+
+	* ftest_util.cc (ftestParseRandom, ftestWriteSeed): uses stream io
+	  to read/write seed file
+
+	* ftest_io.cc (ftestPrintResult): adapted to new output format
+	* ftest_util.cc (ftestPrint): function removed.  All references
+	  adapted to new ouptut format.  Declaration removed, too.
+	  (ftestPrintEnv):  adapted to new output format
+	  (ftestPrintShortFlag): variable removed.  All references, too.
+
+	* ftest_util.cc (ftestCheckFlag): new external variable.
+	  Declaration added.
+	  (ftestGetOpts): sets `ftestCheckFlag'
+	* ftest_util.m4 (ftestCheck): check on `ftestCheckFlag' added
+
+	* fbinops.m4 (ftestCheckRelation): function renamed to
+	  `ftestCheckImplementation()'.  All caller changed.
+
+	* fbinops.m4: new file
+
+	* feval.m4 (main): prints long usage (well, not really)
+
+	* ftest_util.m4 (ftestRun): resets alarm timer after running
+	  algorithm
+
+	* ftest_util.m4 (ftestMainInit): calls `ftestUsagePrint()' if
+	  there are not any arguments
+	* ftest_util.cc (ftestError): call to `ftestUsagePrint()' added
+	  (ftestUsagePrint): new function.  Declaration added.
+
+	* ftest_util.h (ftestErrorT): new enumerator `CheckError'
+	* ftest_util.cc (ftestError): handling for `CheckError' added
+	* fbinops.m4 (ftestRelOpTest): error messages for checks added
+	* gcd.m4 (gcdCheck): error messages for checks added
+
+Thu Nov 13 09:20:42 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* insert.fex, ranMulGCD.fex: new files
+
+	* ftest_util.cc (ftestGetOpts): uses `getopt()' instead of `GetOpt'
+
+	* ftest_util.cc (ftestSignalHandler, ftestAlarmHandler): block new
+	  signals, flush cout before printing error message
+
+	* ftest_util.m4: cosmetic changes
+
+	* GNUmakefile.in (ftest_util.cc): rule slightly changed
+
+Wed Nov  5 15:59:13 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* GNUmakefile.in: new file
+
+	* insert.m4, factorize.m4: new files
+
+	* deriv.m4: cosmetic changes
+
+	* size.m4, degree.m4, deriv.m4, totaldegree.m4, resultant.m4,
+	  feval.m4, gcd.m4: doc fix
+
+Wed Oct 29 10:05:36 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* ftest_util.cc (ftestSignalCatch): parameter `block' added.
+	  Declaration adapted.
+
+	* ftest_io.cc (ftestPrintResult): adapted to new output format
+
+	* ftest_util.cc (ftestSignalCatch): catches `SIGTERM'
+
 Tue Oct 28 18:16:54 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* gcd.fex (univ0RanD, univ0RanC): new monster examples
