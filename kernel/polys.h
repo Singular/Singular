@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.1.1.1 2003-10-06 12:16:01 Singular Exp $ */
+/* $Id: polys.h,v 1.2 2004-04-23 13:56:40 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials of the
              currRing
@@ -357,6 +357,7 @@ void      pEnlargeSet(polyset *p, int length, int increment);
 #define   pOne()   pISet(1)
 
 void      pContent(poly p);
+void      pSimpleContent(poly p, int s);
 void      pCleardenom(poly p);
 void      p_Normalize(poly p, ring r);
 #define   pNormalize(p) p_Normalize(p,currRing)
