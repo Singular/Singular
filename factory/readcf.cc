@@ -23,6 +23,7 @@
 #include "assert.h"
 
 #include "cf_defs.h"
+#include "gfops.h"
 #include "canonicalform.h"
 #include "parseutil.h"
 #include "variable.h"
@@ -125,8 +126,8 @@ static const short yyrhs[] = {    -1,
 
 #if YYDEBUG != 0
 static const short yyrline[] = { 0,
-    55,    56,    59,    60,    63,    64,    65,    66,    67,    68,
-    69,    70,    71
+    56,    57,    60,    61,    64,    65,    66,    67,    68,    69,
+    70,    71,    72
 };
 
 static const char * const yytname[] = {   "$","error","$illegal.","NUM","'-'",
@@ -624,43 +625,43 @@ yyreduce:
   switch (yyn) {
 
 case 4:
-#line 60 "../factory/readcf.y"
+#line 61 "../factory/readcf.y"
 { *retvalue = yyvsp[-1].getval(); return 0; ;
     break;}
 case 5:
-#line 63 "../factory/readcf.y"
+#line 64 "../factory/readcf.y"
 { yyval = yyvsp[0]; ;
     break;}
 case 6:
-#line 64 "../factory/readcf.y"
+#line 65 "../factory/readcf.y"
 { yyval = yyvsp[-2].getval() + yyvsp[0].getval(); ;
     break;}
 case 7:
-#line 65 "../factory/readcf.y"
+#line 66 "../factory/readcf.y"
 { yyval = yyvsp[-2].getval() - yyvsp[0].getval(); ;
     break;}
 case 8:
-#line 66 "../factory/readcf.y"
+#line 67 "../factory/readcf.y"
 { yyval = yyvsp[-2].getval() * yyvsp[0].getval(); ;
     break;}
 case 9:
-#line 67 "../factory/readcf.y"
+#line 68 "../factory/readcf.y"
 { yyval = yyvsp[-2].getval() / yyvsp[0].getval(); ;
     break;}
 case 10:
-#line 68 "../factory/readcf.y"
+#line 69 "../factory/readcf.y"
 { yyval = -yyvsp[0].getval(); ;
     break;}
 case 11:
-#line 69 "../factory/readcf.y"
+#line 70 "../factory/readcf.y"
 { yyval = yyvsp[0].getval(); ;
     break;}
 case 12:
-#line 70 "../factory/readcf.y"
+#line 71 "../factory/readcf.y"
 { yyval = power( yyvsp[-2].getval(), yyvsp[0].getintval() ); ;
     break;}
 case 13:
-#line 71 "../factory/readcf.y"
+#line 72 "../factory/readcf.y"
 { yyval = yyvsp[-1].getval(); ;
     break;}
 }
@@ -857,7 +858,7 @@ yyerrhandle:
   yystate = yyn;
   goto yynewstate;
 }
-#line 74 "../factory/readcf.y"
+#line 75 "../factory/readcf.y"
 
 
 #ifdef BISONPP
@@ -884,7 +885,15 @@ int yylex()
 	return NUM;
     }
     else if ( isalpha( c ) ) {
-	if ( c == getDefaultVarName() ) {
+	// look for generators of GF(q)
+	if ( getCharacteristic() > 0 && getGFDegree() > 1 && c == gf_name ) {
+#ifdef BISONPP
+	    this->yylval = getGFGenerator();
+#else
+	    yylval = getGFGenerator();
+#endif
+	}
+	else if ( c == getDefaultVarName() ) {
 	    int cc;
 	    cc = defaultin->get();
 	    if ( cc == '_' ) {
