@@ -6,7 +6,7 @@
  *  Purpose: implementation of fast maps
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 02/01
- *  Version: $Id: fast_maps.cc,v 1.31 2003-03-05 11:07:53 bricken Exp $
+ *  Version: $Id: fast_maps.cc,v 1.32 2003-12-08 16:38:12 Singular Exp $
  *******************************************************************/
 #include "mod2.h"
 #include <omalloc.h>
@@ -33,7 +33,7 @@ static poly maGetMaxExpP(poly* max_map_monomials,
                          int n_max_map_monomials, ring map_r,
                          poly pi_m, ring pi_r)
 {
-  int n = min(pi_r->N, n_max_map_monomials);
+  int n = si_min(pi_r->N, n_max_map_monomials);
   int i, j;
   Exponent_t e_i, e_j;
   poly m_i, map_j = p_Init(map_r);
@@ -279,7 +279,7 @@ void maMap_CreateRings(ideal map_id, ring map_r,
 #if HAVE_SRC_R > 0
   int* weights = (int*) omAlloc0(map_r->N*sizeof(int));
   int i;
-  int n = min(map_r->N, IDELEMS(image_id));
+  int n = si_min(map_r->N, IDELEMS(image_id));
 
   for (i=0; i<n; i++)
   {
