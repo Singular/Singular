@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.9 2005-02-25 17:07:26 Singular Exp $ */
+/* $Id: polys1.cc,v 1.10 2005-03-08 14:45:33 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -506,7 +506,8 @@ void pContent(poly ph)
       h=pInitContent(ph);
       p=ph;
     }
-    else if (rField_is_Extension())
+    else if ((rField_is_Extension())
+    && ((rPar(currRing)>1)||(currRing->minpoly==NULL)))
     {
       h=pInitContent_a(ph);
       p=ph;
