@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: fereadl.c,v 1.10 2000-01-14 09:48:31 Singular Exp $ */
+/* $Id: fereadl.c,v 1.11 2000-02-14 14:10:54 Singular Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -23,6 +23,8 @@
  #include <stdio.h>
  #include <stdlib.h>
  #include <string.h>
+ #include <sys/time.h>
+ #include <sys/types.h>
  #ifdef MSDOS
   #include <pc.h>
  #else
@@ -207,7 +209,7 @@ void fe_init (void)
         #ifdef atarist
           fe_echo = fopen( "/dev/tty", "w" );
         #else
-	  fe_echo = fopen( ttyname(fileno(stdin)), "w" );
+          fe_echo = fopen( ttyname(fileno(stdin)), "w" );
         #endif
       }
       /* Save the terminal attributes so we can restore them later. */
@@ -286,7 +288,7 @@ void fe_init (void)
 
       #if 0
       /* --------------------------------------------------------------
-      * put the following code back in, if cursor motion 
+      * put the following code back in, if cursor motion
       * shows unexpected behavior
       * it's commented out because it clears the screen (sometimes)
       * --------------------------------------------------------------*/
@@ -434,6 +436,22 @@ static int fe_getchar()
   return c;
 }
 
+static int fe_getchar_stat()
+{
+  #ifdef MSDOS
+  return 0;
+  #else
+  fd_set rfds;
+  struct timeval tv;
+
+  FD_ZERO(&rfds);
+  FD_SET(STDIN_FILENO, &rfds);
+  tv.tv_sec = 0;
+  tv.tv_usec = 0;
+  return select(STDIN_FILENO+1, &rfds, NULL, NULL, &tv);
+  #endif
+}
+
 static void fe_set_cursor(char *s,int i)
 {
   char tgoto_buf[40];
@@ -491,9 +509,13 @@ char * fe_fgets_stdin_fe(char *pr,char *s, int size)
           i=strlen(s);
           if (i<size-1) s[i]='\n';
           fputc('\n',fe_echo);
-          fflush(fe_echo);
-          fe_temp_reset();
-          return s;
+          if (!fe_getchar_stat())
+          {
+            fflush(fe_echo);
+            fe_temp_reset();
+            return s;
+          }
+          break;
         }
         #ifdef MSDOS
         case 0x153:
