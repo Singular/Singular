@@ -1,6 +1,6 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: Factor.cc,v 1.12 2002-07-30 15:10:22 Singular Exp $ ";
+static char * rcsid = "$Id: Factor.cc,v 1.13 2002-07-30 17:06:47 Singular Exp $ ";
 static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) michael@math.uni-sb.de \nPlease include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -891,7 +891,8 @@ Factorize(const CanonicalForm & F, Variable minpoly, int is_SqrFree ){
   if ( getCharacteristic() == 0 ) { // char == 0
     TIMING_START(factorize_time);
     //cout << "Factoring in char=0 of " << F << " = " << Outputlist << endl;
-    Outputlist= factorize(F,minpoly);
+    // SHOULD: Outputlist= factorize(F,minpoly);
+    Outputlist= factorize(F);
     // Factorization in char=0 doesn't sometimes return at least two elements!!!
     if ( getNumVars(Outputlist.getFirst().factor()) != 0 )
       Outputlist.insert(CFFactor(1,1));
@@ -1010,6 +1011,9 @@ Factorize(const CanonicalForm & F, Variable minpoly, int is_SqrFree ){
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.12  2002/07/30 15:10:22  Singular
+*hannes: added Factorize for alg. ext.
+
 Revision 1.11  2001/08/22 14:21:16  Singular
 *hannes: added search for main var to Factorize
 
