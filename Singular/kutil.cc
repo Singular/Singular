@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.8 1997-06-20 09:56:55 Singular Exp $ */
+/* $Id: kutil.cc,v 1.9 1997-10-24 08:57:18 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for std
 */
@@ -1639,6 +1639,65 @@ int posInT15 (TSet set,int length,LObject p)
 /*2
 * looks up the position of p in set
 * set[0] is the smallest with respect to the ordering-procedure
+* maximaldegree, pComp
+*/
+int posInT15_c (TSet set,int length,LObject p)
+{
+  if (length==-1) return 0;
+
+  int i;
+  int an = 0;
+  int en= length;
+  int cc = (-1+2*currRing->order[0]==ringorder_c);
+  /* cc==1 for (c,..), cc==-1 for (C,..) */
+  int c = pGetComp(p.p)*cc;
+  int o = pFDeg(p.p) + p.ecart;
+
+  if (pGetComp(set[length].p)*cc < c)
+    return length+1;
+  if (pGetComp(set[length].p)*cc == c)
+  {
+    if ((pFDeg(set[length].p)+set[length].ecart < o)
+    || ((pFDeg(set[length].p)+set[length].ecart == o)
+       && (pComp0(set[length].p,p.p) != pOrdSgn)))
+      return length+1;
+  }
+
+  loop
+  {
+    if (an >= en-1)
+    {
+      if (pGetComp(set[an].p)*cc < c)
+        return en;
+      if (pGetComp(set[an].p)*cc == c)
+      {
+        if ((pFDeg(set[an].p)+set[an].ecart > o)
+        || ((pFDeg(set[an].p)+set[an].ecart  == o)
+           && (pComp0(set[an].p,p.p) == pOrdSgn)))
+          return an;
+      }
+      return en;
+    }
+    i=(an+en) / 2;
+    if (pGetComp(set[i].p)*cc > c)
+      en=i;
+    else if (pGetComp(set[i].p)*cc == c)
+    {
+      if ((pFDeg(set[i].p) +set[i].ecart > o)
+      || ((pFDeg(set[i].p) +set[i].ecart == o)
+         && (pComp0(set[i].p,p.p) == pOrdSgn)))
+        en=i;
+      else
+        an=i;
+    }
+    else
+      an=i;
+  }
+}
+
+/*2
+* looks up the position of p in set
+* set[0] is the smallest with respect to the ordering-procedure
 * pFDeg+ecart, ecart, pComp
 */
 int posInT17 (TSet set,int length,LObject p)
@@ -2057,6 +2116,64 @@ int posInL15 (LSet set, int length, LObject p,kStrategy strat)
       an=i;
     else
       en=i;
+  }
+}
+
+/*2
+* looks up the position of polynomial p in set
+* e is the ecart of p
+* set[length] is the smallest element in set with respect
+* to the ordering-procedure maximaldegree,pComp
+*/
+int posInL15_c (LSet set, int length, LObject p,kStrategy strat)
+{
+  int i;
+  int an = 0;
+  int en= length;
+  int cc = (-1+2*currRing->order[0]==ringorder_c);
+  /* cc==1 for (c,..), cc==-1 for (C,..) */
+  int c = pGetComp(p.p)*cc;
+  int o = pFDeg(p.p) + p.ecart;
+
+  if (length<0) return 0;
+  if (pGetComp(set[length].p)*cc < c)
+    return length+1;
+  if (pGetComp(set[length].p)*cc == c)
+  {
+    if ((pFDeg(set[length].p) + set[length].ecart > o)
+    || ((pFDeg(set[length].p) + set[length].ecart == o)
+       && (pComp0(set[length].p,p.p) != -pOrdSgn)))
+      return length+1;
+  }
+  loop
+  {
+    if (an >= en-1)
+    {
+      if (pGetComp(set[an].p)*cc < c)
+        return en;
+      if (pGetComp(set[an].p)*cc == c)
+      {
+        if ((pFDeg(set[an].p) + set[an].ecart > o)
+        || ((pFDeg(set[an].p) + set[an].ecart == o)
+           && (pComp0(set[an].p,p.p) != -pOrdSgn)))
+          return en;
+      }
+      return an;
+    }
+    i=(an+en) / 2;
+    if (pGetComp(set[i].p)*cc > c)
+      en=i;
+    else if (pGetComp(set[i].p)*cc == c)
+    {
+      if ((pFDeg(set[i].p) + set[i].ecart > o)
+      || ((pFDeg(set[i].p) +set[i].ecart == o)
+         && (pComp0(set[i].p,p.p) != -pOrdSgn)))
+        an=i;
+      else
+        en=i;
+    }
+    else
+      an=i;
   }
 }
 
@@ -3465,8 +3582,17 @@ void initBuchMoraPos (kStrategy strat)
   {
     if (strat->honey)
     {
-      strat->posInL = posInL15;
-      strat->posInT = posInT15;
+      if ((currRing->order[0]==ringorder_c)
+      ||(currRing->order[0]==ringorder_C))
+      {
+        strat->posInL = posInL15_c;
+        strat->posInT = posInT15_c;
+      }
+      else
+      {
+        strat->posInL = posInL15;
+        strat->posInT = posInT15;
+      }
     }
     else if (pLexOrder && !TEST_OPT_INTSTRATEGY)
     {
