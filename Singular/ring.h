@@ -6,10 +6,11 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.72 2002-04-30 13:35:13 levandov Exp $ */
+/* $Id: ring.h,v 1.73 2003-01-31 09:18:08 Singular Exp $ */
 
 /* includes */
 #include "structs.h"
+#include "tok.h"  // we need ABS
 #include "polys-impl.h"
 
 #define SHORT_REAL_LENGTH 6 // use short reals for real <= 6 digits
@@ -65,9 +66,6 @@ BOOLEAN rEqual(ring r1, ring r2, BOOLEAN qr = 1);
 void   rUnComplete(ring r);
 
 #define  rInternalChar(r) ((r)->ch)
-#ifndef ABS
-#define ABS(x) ((x) < 0 ? (-(x)) : (x))
-#endif
 
 BOOLEAN rRing_is_Homog(ring r=currRing);
 BOOLEAN rRing_has_CompLastBlock(ring r=currRing);
