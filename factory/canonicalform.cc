@@ -1,8 +1,11 @@
 // emacs editmode for this file is -*- C++ -*-
-// $Id: canonicalform.cc,v 1.4 1997-04-07 14:53:44 schmidt Exp $
+// $Id: canonicalform.cc,v 1.5 1997-04-18 13:10:30 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.4  1997/04/07 14:53:44  schmidt
+#include <config.h> added
+
 Revision 1.3  1997/03/26 16:27:09  schmidt
 stream-io wrapped by NOSTREAMIO
 
@@ -1175,7 +1178,7 @@ CanonicalForm::mapinto () const
 	else  if ( getGFDegree() == 1 )
 	    return CanonicalForm( int2imm_p( ff_norm( imm2int( value ) ) ) );
 	else
-	    return CanonicalForm( int2imm_gf( ff_norm( imm2int( value ) ) ) );
+	    return CanonicalForm( int2imm_gf( gf_int2gf( imm2int( value ) ) ) );
     else  if ( value->inBaseDomain() )
 	if ( getCharacteristic() == 0 )
 	    if ( value->levelcoeff() == PrimePowerDomain )
