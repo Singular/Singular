@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.h,v 1.4 1997-09-16 13:45:33 Singular Exp $ */
+/* $Id: longalg.h,v 1.5 1998-02-17 15:05:53 obachman Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -90,6 +90,6 @@ extern number   (*nacCopy)(number a);
 extern BOOLEAN  (*nacIsZero)(number a);
 extern number   (*nacInit)(int i);
 extern void     (*nacNormalize)(number &a);
-
+extern void napWrite(alg l);
 #endif
 
