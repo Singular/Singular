@@ -1,49 +1,65 @@
-// $Id: finvar.lib,v 1.14 1998-10-21 10:28:21 krueger Exp $
+// $Id: finvar.lib,v 1.15 1998-12-02 10:52:08 Singular Exp $
 // author: Agnes Eileen Heydtmann, email:agnes@math.uni-sb.de
-// last change: 3.5.98
+// last change: 98/11/05
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: finvar.lib,v 1.14 1998-10-21 10:28:21 krueger Exp $"
+version="$Id: finvar.lib,v 1.15 1998-12-02 10:52:08 Singular Exp $"
 info="
 LIBRARY:  finvar.lib       LIBRARY TO CALCULATE INVARIANT RINGS & MORE
-                           (c) Agnes Eileen Heydtmann,
-                           send bugs and comments to agnes@math.uni-sb.de
 
-  cyclotomic(...)                        cyclotomic polynomial
-  group_reynolds(...)                    finite group and Reynolds operator
-  molien(...)                            Molien series
-  reynolds_molien(...)                   Reynolds operator and Molien series
-  partial_molien(...)                    partial expansion of Molien series
-  evaluate_reynolds(...)                 image under the Reynolds operator
-  invariant_basis(...)                   basis of homogeneous invariants
-  invariant_basis_reynolds(...)          basis of homogeneous invariants
-  primary_char0(...)                     primary invariants
-  primary_charp(...)                     primary invariants
-  primary_char0_no_molien(...)           primary invariants
-  primary_charp_no_molien(...)           primary invariants
-  primary_charp_without(...)             primary invariants
-  primary_invariants(...)                primary invariants
-  primary_char0_random(...)              primary invariants
-  primary_charp_random(...)              primary invariants
-  primary_char0_no_molien_random(...)    primary invariants
-  primary_charp_no_molien_random(...)    primary invariants
-  primary_charp_without_random(...)      primary invariants
-  primary_invariants_random(...)         primary invariants
-  power_products(...)                    exponents for power products
-  secondary_char0(...)                   secondary invariants
-  secondary_charp(...)                   secondary invariants
-  secondary_no_molien(...)               secondary invariants
-  secondary_with_irreducible_ones_no_molien(...)
-                                         secondary invariants
-  secondary_not_cohen_macaulay(...)      secondary invariants
-  invariant_ring(...)                    primary and secondary invariants
-  invariant_ring_random(...)             primary and secondary invariants
-  algebra_containment(...)               answers query of algebra containment
-  module_containment(...)                answers query of module containment
-  orbit_variety(...)                     ideal of the orbit variety
-  relative_orbit_variety(...)            ideal of a relative orbit variety
-  image_of_variety(...)                  ideal of the image of a variety
+ A library for computing polynomial invariants of finite matrix groups and
+ generators of related varieties. The algorithms are based on B. Sturmfels,
+ G. Kemper and Decker et al..
+ Author: Agnes E. Heydtmann, agnes@math.uni-sb.de
+
+ MAIN PROCEDURES:
+ invariant_ring()                  generators of the invariant ring (i.r.)
+ invariant_ring_random()           generators of the i.r., randomized alg.
+ primary_invariants()              primary invariants (p.i.)
+ primary_invariants_random()       primary invariants, randomized alg.
+
+ SUB-PROCEDURES:
+ cyclotomic()                      cyclotomic polynomial
+ group_reynolds()                  finite group and Reynolds operator (R.o.)
+ molien()                          Molien series (M.s.)
+ reynolds_molien()                 Reynolds operator and Molien series
+ partial_molien()                  partial expansion of Molien series
+ evaluate_reynolds()               image under the Reynolds operator
+ invariant_basis()                 basis of homogeneous invariants of a degree
+ invariant_basis_reynolds()        as invariant_basis(), with R.o.
+ primary_char0()                   primary invariants in char 0
+ primary_charp()                   primary invariant in char p
+ primary_char0_no_molien()         p.i., char 0, without Molien series
+ primary_charp_no_molien()         p.i., char p, without Molien series
+ primary_charp_without()           p.i., char p, without R.o. or Molien series
+ primary_char0_random()            primary invariants in char 0, randomized
+ primary_charp_random()            primary invariants in char p, randomized
+ primary_char0_no_molien_random()  p.i., char 0, without M.s., randomized
+ primary_charp_no_molien_random()  p.i., char p, without M.s., randomized
+ primary_charp_without_random()    p.i., char p, without R.o. or M.s., random.
+ power_products()                  exponents for power products
+ secondary_char0()                 secondary (s.i.) invariants in char 0
+ secondary_charp()                 secondary invariants in char p
+ secondary_no_molien()             secondary invariants, without Molien series
+ secondary_and_irreducibles_no_molien() s.i. & irreducible s.i., without M.s.
+ secondary_not_cohen_macaulay()    s.i. when invariant ring not Cohen-Macaulay
+ algebra_containment()             query of algebra containment
+ module_containment()              query of module containment
+ orbit_variety()                   ideal of the orbit variety
+ relative_orbit_variety()          ideal of a relative orbit variety
+ image_of_variety()                ideal of the image of a variety
 ";
-
+////////////////////////////////////////////////////////////////////////////////
+// perhaps useful procedures (no help provided):
+// unique()                        is a matrix among other matrices?
+// exponent()                      gives the exponent of a number
+// sort_of_invariant_basis()       lin. ind. invariants of a degree mod p.i.
+// next_vector                     lists all of Z^n with first nonzero entry 1
+// int_number_map                  integers 1..q are maped to q field elements
+// search                          searches a number of p.i., char 0
+// p_search                        searches a number of p.i., char p
+// search_random                   searches a # of p.i., char 0, randomized
+// p_search_random                 searches a # of p.i., char p, randomized
+// concat_intmat                   concatenates two integer matrices
 ////////////////////////////////////////////////////////////////////////////////
 LIB "matrix.lib";
 LIB "elim.lib";
@@ -2222,7 +2238,7 @@ THEORY:  Bases of homogeneous invariants are generated successively and those
     return();
   }
   if (typeof(`ring_name`)<>"ring")
-  { "ERROR:   Second parameter ought to be the name of a ring where the Molien";
+  { "ERROR:   Second parameter ought to the name of a ring where the Molien";
     "         is stored.";
     return();
   }
@@ -2927,12 +2943,7 @@ THEORY:  Bases of homogeneous invariants are generated successively and those
     }
     list L=group_reynolds(#[1..gen_num],v);
     string newring="aksldfalkdsflkj";
-    if (typeof(L[2])=="int")
-    { molien(L[3..size(L)],newring,intvec(1,interval,v));
-    }
-    else
-    { molien(L[2..size(L)],newring,intvec(1,interval,v));
-    }
+    molien(L[2..size(L)],newring,intvec(1,interval,v));
     matrix P=primary_charp(L[1],newring,v);
     return(P,L[1],newring);
   }
@@ -3367,7 +3378,7 @@ THEORY:  Bases of homogeneous invariants are generated successively and random
     return();
   }
   if (typeof(`ring_name`)<>"ring")
-  { "ERROR:   Second parameter ought to be the name of a ring where the Molien";
+  { "ERROR:   Second parameter ought to the name of a ring where the Molien";
     "         is stored.";
     return();
   }
@@ -4032,12 +4043,7 @@ THEORY:  Bases of homogeneous invariants are generated successively and random
         { if (v)
           { "  We are dealing with the non-modular case.";
           }
-          if (typeof(L[2])=="int")
-          { molien(L[3..size(L)],newring,intvec(0,interval,v));
-          }
-          else
-          { molien(L[2..size(L)],newring,intvec(0,interval,v));
-          }
+          molien(L[2..size(L)],newring,intvec(0,interval,v));
           matrix P=primary_charp_random(L[1],newring,max,v);
           return(P,L[1],newring);
         }
@@ -4106,12 +4112,7 @@ THEORY:  Bases of homogeneous invariants are generated successively and random
     }
     list L=group_reynolds(#[1..gen_num],v);
     string newring="aksldfalkdsflkj";
-    if (typeof(L[2])=="int")
-    { molien(L[3..size(L)],newring,intvec(1,interval,v));
-    }
-    else
-    { molien(L[2..size(L)],newring,intvec(1,interval,v));
-    }
+    molien(L[2..size(L)],newring,intvec(1,interval,v));
     matrix P=primary_charp_random(L[1],newring,max,v);
     return(P,L[1],newring);
   }
@@ -4793,8 +4794,8 @@ example
          print(S);
 }
 
-proc secondary_with_irreducible_ones_no_molien (matrix P, matrix REY, list #)
-"USAGE:   secondary_with_irreducible_ones_no_molien(P,REY[,v]);
+proc secondary_and_irreducibles_no_molien (matrix P, matrix REY, list #)
+"USAGE:   secondary_and_irreducibles_no_molien(P,REY[,v]);
          P: a 1xn <matrix> with primary invariants, REY: a gxn <matrix>
          representing the Reynolds operator, v: an optional <int>
 ASSUME:  n is the number of variables of the basering, g the size of the group,
@@ -4803,7 +4804,7 @@ ASSUME:  n is the number of variables of the basering, g the size of the group,
 RETURN:  secondary invariants of the invariant ring (type <matrix>) and
          irreducible secondary invariants (type <matrix>)
 DISPLAY: information if v does not equal 0
-EXAMPLE: example secondary_with_irreducible_ones_no_molien; shows an example
+EXAMPLE: example secondary_and_irreducibles_no_molien; shows an example
 THEORY:  The secondary invariants are calculated by finding a basis (in terms of
          monomials) of the basering modulo the primary invariants, mapping those
          to invariants with the Reynolds operator and using these images or
@@ -4985,7 +4986,7 @@ example
          ring R=0,(x,y,z),dp;
          matrix A[3][3]=0,1,0,-1,0,0,0,0,-1;
          list L=primary_invariants(A,intvec(1,1,0));
-         matrix S,IS=secondary_with_irreducible_ones_no_molien(L[1..2]);
+         matrix S,IS=secondary_and_irreducibles_no_molien(L[1..2]);
          print(S);
          print(IS);
 }
@@ -5250,12 +5251,7 @@ THEORY:  Bases of homogeneous invariants are generated successively and those
         { if (v)
           { "  We are dealing with the non-modular case.";
           }
-          if (typeof(L[2])=="int")
-          { molien(L[3..size(L)],newring,L[2],intvec(0,interval,v));
-          }
-          else
-          { molien(L[2..size(L)],newring,L[2],intvec(0,interval,v));
-          }
+          molien(L[3..size(L)],newring,L[2],intvec(0,interval,v));
           matrix P=primary_charp(L[1],newring,v);
           matrix S,IS=secondary_charp(P,L[1],newring,v);
           if (defined(aksldfalkdsflkj)==2)
@@ -5338,12 +5334,7 @@ THEORY:  Bases of homogeneous invariants are generated successively and those
     }
     list L=group_reynolds(#[1..gen_num],v);
     string newring="aksldfalkdsflkj";
-    if (typeof(L[2])=="int")
-    { molien(L[3..size(L)],newring,intvec(1,interval,v));
-    }
-    else
-    { molien(L[2..size(L)],newring,intvec(1,interval,v));
-    }
+    molien(L[2..size(L)],newring,intvec(1,interval,v));
     matrix P=primary_charp(L[1],newring,v);
     matrix S,IS=secondary_charp(P,L[1],newring,v);
     kill aksldfalkdsflkj;
@@ -5484,12 +5475,7 @@ THEORY:  is the same as for invariant_ring except that random combinations of
         { if (v)
           { "  We are dealing with the non-modular case.";
           }
-          if (typeof(L[2])"int")
-          { molien(L[3..size(L)],newring,L[2],intvec(0,interval,v));
-          }
-          else
-          { molien(L[2..size(L)],newring,L[2],intvec(0,interval,v));
-          }
+          molien(L[3..size(L)],newring,L[2],intvec(0,interval,v));
           matrix P=primary_charp_random(L[1],newring,max,v);
           matrix S,IS=secondary_charp(P,L[1],newring,v);
           if (voice==2)
@@ -5572,12 +5558,7 @@ THEORY:  is the same as for invariant_ring except that random combinations of
     }
     list L=group_reynolds(#[1..gen_num],v);
     string newring="aksldfalkdsflkj";
-    if (typeof(L[2])"int")
-    { molien(L[3..size(L)],newring,L[2],intvec(0,interval,v));
-    }
-    else
-    { molien(L[2..size(L)],newring,L[2],intvec(0,interval,v));
-    }
+    molien(L[2..size(L)],newring,intvec(1,v));
     matrix P=primary_charp_random(L[1],newring,max,v);
     matrix S,IS=secondary_charp(P,L[1],newring,v);
     kill aksldfalkdsflkj;
@@ -5911,5 +5892,3 @@ example
          ideal I=xy;
          print(image_of_variety(I,F));
 }
-
-
