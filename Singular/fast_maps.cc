@@ -6,7 +6,7 @@
  *  Purpose: implementation of fast maps
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 02/01
- *  Version: $Id: fast_maps.cc,v 1.2 2002-01-18 17:13:13 bricken Exp $
+ *  Version: $Id: fast_maps.cc,v 1.3 2002-01-19 09:54:51 Singular Exp $
  *******************************************************************/
 #include "mod2.h"
 #include <omalloc.h>
@@ -467,24 +467,71 @@ ideal maideal_2_ideal(ideal orig_id,
 }
 #endif
 
+/*****************************************************************
+* evaluate all monomial in the mapoly list,
+* put the results also into the corresponding sBuckets
+******************************************************************/
 
-    
-    
-                    
-  
-    
+void mapolyEval(mapoly root)
+{
+  // invert the list rooted at root:
+  if ((root!=NULL) && (root->next!=NULL))
+  {
+    mapoly q=root->next;
+    mapoly qn;
+    root->next=NULL;
+    do
+    {
+      qn=q->next;
+      q->next=root;
+      root=q;
+    }
+    while (qn !=NULL);
+  }
 
-
-
-
-
-
-
-
-  
-  
-  
-  
-
- 
-      
+  mapoly p=root;
+  while (p!=NULL)
+  {
+     // look at each mapoly: compute its value in ->dest
+     if (p->dest==NULL)
+     {
+       if (p->factors==0) p->dest=pOne();
+       else if (p->factors==2)
+       {
+         poly f1=p->f1->dest;
+         p->f1->ref--;
+         poly f2=p->f2->dest;
+         p->f2->ref--;
+         if (p->f1->ref>0) f1=pCopy(f1);
+         else
+         {
+           // clear p->f1
+           p->f1->dest=NULL;
+         }
+         if (p->f2->ref>0) f2=pCopy(f2);
+         else
+         {
+           // clear p->f2
+           p->f2->dest=NULL;
+         }
+         p->dest=pMult(f1,f2);
+      // substitute the monomial: go through macoeff
+         int len=pLength(p->dest);
+         macoeff c=p->coeff;
+         macoeff cc;
+         while (c!=NULL)
+         {
+           poly t=ppMult_nn(p->dest,c->n);
+           sBucket_Add_p(c->bucket, t, len);
+           cc=c;
+           c=c->next;
+           // clean up
+           nDelete(&(cc->n));
+           omFreeBin(cc,macoeffBin);
+         }
+         p->coeff=NULL;
+       } /* p->factors==2 */
+     } /* p->dest==NULL */
+     p=p->next;
+   }
+}
