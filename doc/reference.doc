@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.56 1998-05-18 15:23:40 schmidt Exp $
+@comment $Id: reference.doc,v 1.57 1998-05-18 16:09:12 wichmann Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -2323,7 +2323,7 @@ deletes the attribute given as the second argument.
 @end table
 @menu
 * attrib::
-* optopn::
+* option::
 @end menu
 @iftex
 See @ref{attrib}, @ref{option}.
