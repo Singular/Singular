@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.28 1998-05-14 13:04:21 Singular Exp $ */
+/* $Id: syz1.cc,v 1.29 1998-06-29 13:16:37 pohl Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -2561,6 +2561,22 @@ syStrategy syMinimize(syStrategy syzstr)
 
 static void sySetHighdeg()
 {
+#ifdef __MWERKS__
+  const double m=(double)INT_MAX;
+  double t=1.0;
+  unsigned int h_d=1;
+  unsigned int h_n=1+pVariables;
+  loop
+  {
+    t *=(double)h_n;
+    t /=(double)h_d;
+    if (t>=m) break;
+    h_d++;
+    h_n++;
+  }
+  h_d--;
+  highdeg = h_d;
+#else
   long long t=1, h_d=1;
   long long h_n=1+pVariables;
   while ((t=((t*h_n)/h_d))<INT_MAX)
@@ -2570,6 +2586,7 @@ static void sySetHighdeg()
   }
   h_d--;
   highdeg = h_d;
+#endif
   //Print("max deg=%d\n",highdeg);
 }
 
