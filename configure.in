@@ -511,4 +511,9 @@ AC_SUBST(SUBDIRS)
 AC_SUBST(CONFIG_SUBDIRS)
 AC_CONFIG_SUBDIRS($CONFIG_SUBDIRS) 
 
-AC_OUTPUT(Makefile doc/Makefile)
+if test "$enable_gmp" = yes; then
+  AC_OUTPUT(Makefile doc/Makefile gmp/Makefile.in)
+else
+  AC_OUTPUT(Makefile doc/Makefile)
+fi
+
