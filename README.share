@@ -18,14 +18,14 @@ ABOUT THIS DISTRIBUTION
 =======================
 This distribution contains the following files and subdirectories
 
-  ./info/singular.hlp				info file
-  ./Singular/LIB/<x.y.z>/			Singular libraries
+  ./info/singular.hlp                           info file
+  ./Singular/LIB/<x.y.z>/                       Singular libraries
   ./Singular/gftables                           Singular gftables
-  ./Singular/doc/<x.y.z>/			documentation (ps, dvi, info)
-  ./Singular/html/<x.y.z>/			documentation (html)
-  ./Singular/COPYING				licence information
+  ./Singular/doc/<x.y.z>/                       documentation (ps, dvi, info)
+  ./Singular/html/<x.y.z>/                      documentation (html)
+  ./Singular/COPYING                            licence information
   ./Singular/README.general                     general Singular info
-  ./Singular/README.share			this file
+  ./Singular/README.share                       this file
 
 Note that this distribution does not contain the Singular
 executables. Instead, it contains only architecture-independent data.
