@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.104 1999-04-19 11:03:01 obachman Exp $
+@comment $Id: reference.doc,v 1.105 1999-05-06 10:00:13 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -5130,6 +5130,8 @@ See @ref{link}; @ref{open}; @ref{read}; @ref{write}.
 @*@code{std (} module_expression@code{)}
 @*@code{std (} ideal_expression@code{,} intvec_expression @code{)}
 @*@code{std (} module_expression@code{,} intvec_expression @code{)}
+@*@code{std (} ideal_expression@code{,} poly_expression @code{)}
+@*@code{std (} module_expression@code{,} vector_expression @code{)}
 @item @strong{Type:}
 ideal or module
 @item @strong{Purpose:}
@@ -5138,10 +5140,13 @@ monomial ordering of the basering.
 A standard basis is a set of generators such that
 the leading terms generate the leading ideal resp. module.
 @*Use an optional
-second argument as Hilbert series
+second argument of type @code{intvec} as Hilbert series
 (result of @code{hilb(i,1)}, see @ref{hilb}),
 if the ideal resp. module is homogeneous,
 (Hilbert driven standard basis computation, @ref{stdhilb}).
+@*Use an optional second argument of type @code{poly} resp.@ @code{vector}
+to construct the standard basis from an already computed one (givenn as the 
+first argument) and one additional generator (the second argument).
 @item @strong{Example:}
 @example
 @c example
