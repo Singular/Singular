@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.27 2001-01-11 17:31:30 Singular Exp $";
+version="$Id: gaussman.lib,v 1.28 2001-01-19 14:59:03 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -142,14 +142,15 @@ static proc redNF(module M,module N,list #)
 ///////////////////////////////////////////////////////////////////////////////
 
 proc monodromy(poly f,list #)
-"USAGE:    monodromy(f[,mode]); poly f, int mode[=1]
+"USAGE:    monodromy(f[,mode]); poly f, int mode
 ASSUME:   basering has local ordering, f has isolated singularity at 0
 RETURN:
 @format
-          if mode=0:
-            matrix M: exp(-2*pi*i*M) is a monodromy matrix of f
-          if mode=1:
-            ideal e: exp(-2*pi*i*e) is the spectrum of the monodromy of f
+if mode=0:
+  matrix M: exp(-2*pi*i*M) is a monodromy matrix of f
+if mode=1:
+  ideal e: exp(-2*pi*i*e) is the spectrum of the monodromy of f
+default: mode=1
 @end format
 SEE ALSO: mondromy_lib
 KEYWORDS: singularities; Gauss-Manin connection; monodromy;
@@ -385,21 +386,22 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc vfiltration(poly f,list #)
-"USAGE:    vfiltration(f[,mode]); poly f, int mode[=1]
+"USAGE:    vfiltration(f[,mode]); poly f, int mode
 ASSUME:   basering has local ordering, f has isolated singularity at 0
 RETURN:
 @format
-          list l:
-          if mode=0 or mode=1:
-            ideal l[1]: spectral numbers in increasing order
-            intvec l[2]:
-              int l[2][i]: multiplicity of spectral number l[1][i]
-          if mode=1:
-            list l[3]:
-              module l[3][i]: vector space basis of l[1][i]-th graded part
-                              of the V-filtration on H''/H' in terms of l[4]
-            ideal l[4]: monomial vector space basis of H''/H'
-            ideal l[5]: standard basis of the Jacobian ideal
+list l:
+if mode=0 or mode=1:
+  ideal l[1]: spectral numbers in increasing order
+  intvec l[2]:
+    int l[2][i]: multiplicity of spectral number l[1][i]
+if mode=1:
+  list l[3]:
+  module l[3][i]: vector space basis of l[1][i]-th graded part
+                  of the V-filtration on H''/H' in terms of l[4]
+  ideal l[4]: monomial vector space basis of H''/H'
+  ideal l[5]: standard basis of the Jacobian ideal
+default: mode=1
 @end format
 NOTE:     H' and H'' denote the Brieskorn lattices
 SEE ALSO: spectrum_lib
@@ -767,17 +769,17 @@ proc vfiltjacalg(list l)
 ASSUME:  basering has local ordering, f has isolated singularity at 0
 RETURN:
 @format
-         list l:
-           ideal l[1]: spectral numbers of the V-filtration
-                       on the Jacobian algebra in increasing order
-           intvec l[2]:
-             int l[2][i]: multiplicity of spectral number l[1][i]
-           list l[3]:
-             module l[3][i]: vector space basis of the l[1][i]-th graded part
-                             of the V-filtration on the Jacobian algebra
-                             in terms of l[4]
-           ideal l[4]: monomial vector space basis of the Jacobian algebra
-           ideal l[5]: standard basis of the Jacobian ideal
+list l:
+  ideal l[1]: spectral numbers of the V-filtration
+              on the Jacobian algebra in increasing order
+  intvec l[2]:
+    int l[2][i]: multiplicity of spectral number l[1][i]
+  list l[3]:
+  module l[3][i]: vector space basis of the l[1][i]-th graded part
+                  of the V-filtration on the Jacobian algebra
+                  in terms of l[4]
+  ideal l[4]: monomial vector space basis of the Jacobian algebra
+  ideal l[5]: standard basis of the Jacobian ideal
 @end format
 EXAMPLE: example vfiltjacalg; shows an example
 "
