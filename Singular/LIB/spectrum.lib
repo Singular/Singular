@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: spectrum.lib,v 1.13 2001-03-20 14:18:03 mschulze Exp $";
+version="$Id: spectrum.lib,v 1.14 2001-03-20 18:19:48 mschulze Exp $";
 category="Singularities";
 info="
 LIBRARY:  spectrum.lib  Singularity Spectrum for Nondegenerate Singularities
@@ -18,7 +18,7 @@ ASSUME:   basering has local ordering,
 RETURN:
 @format
 list S:
-  ideal S[1]: spectral numbers
+  ideal S[1]: spectral numbers in increasing order
   intvec S[2]:
     int S[2][i]: multiplicity of spectral number S[1][i]
 @end format
@@ -31,23 +31,23 @@ EXAMPLE:  example spectrumnd; shows an example
 {
   if(size(#)==0)
   {
-    list l=system("spectrum",f);
+    list S=system("spectrum",f);
   }
   else
   {
-    list l=system("spectrum",f,#[1]);
+    list S=system("spectrum",f,#[1]);
   }
-  ideal s=number(l[4][1])/l[5][1]-1;
+  ideal a=number(S[4][1])/S[5][1]-1;
   int i;
-  for(i=l[3];i>1;i--)
+  for(i=S[3];i>1;i--)
   {
-    s[i]=number(l[4][i])/l[5][i]-1;
+    a[i]=number(S[4][i])/S[5][i]-1;
   }
-  return(list(s,l[6]));
+  return(list(a,S[6]));
 }
 example
 { "EXAMPLE:"; echo = 2;
-  ring r=0,(x,y),ds;
+  ring R=0,(x,y),ds;
   poly f=x^31+x^6*y^7+x^2*y^12+x^13*y^2+y^29;
   spectrumnd(f);
 }
@@ -64,4 +64,3 @@ proc semicontqh(list #)
   ERROR("semicontqh was replaced by spsemicont in gaussman.lib");
 }
 ///////////////////////////////////////////////////////////////////////////////
-

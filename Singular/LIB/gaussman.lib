@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.35 2001-03-20 14:16:46 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.36 2001-03-20 18:19:48 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -15,7 +15,6 @@ PROCEDURES:
  vfiltration(f[,opt]);      V-filtration on H''/H', singularity spectrum of f
  spectrum(f);               singularity spectrum of f
  endfilt(poly f,list V);    endomorphism filtration of filtration V
- gamma(list S);             gamma invariant of spectrum S
  spprint(list S);           print spectrum S
  spadd(list S1,list S2);    sum of spectra S1 and S2
  spsub(list S1,list S2);    difference of spectra S1 and S2
@@ -23,7 +22,9 @@ PROCEDURES:
  spmul(list S,intvec k);    linear combination of spectra S with coefficients k
  spissemicont(list S[,opt]);        test spectrum S for semicontinuity
  spsemicont(list S0,list S[,opt]);  relative semicontinuity of spectra S0 and S
- spgeomgenus(list S);       geometric genus of spectrum S
+ spmilnor(list S);          milnor number of spectrum S
+ spgeomgenus(list S);       geometrical genus of spectrum S
+ spgamma(list S);           gamma invariant of spectrum S
 
 SEE ALSO: mondromy_lib, spectrum_lib
 
@@ -88,7 +89,8 @@ static proc maxorddif(matrix H)
 
 proc monodromy(poly f,list #)
 "USAGE:    monodromy(f[,opt]); poly f, int opt
-ASSUME:   basering has local ordering, f has isolated singularity at 0
+ASSUME:   basering has characteristic 0 and local ordering,
+          f has isolated singularity at 0
 RETURN:
 @format
 if opt==0:
@@ -102,6 +104,31 @@ KEYWORDS: singularities; Gauss-Manin connection; monodromy
 EXAMPLE:  example monodromy; shows an example
 "
 {
+  if(charstr(basering)!="0")
+  {
+    ERROR("characteristic 0 expected");
+  }
+  int n=nvars(basering)-1;
+  for(int i=n+1;i>=1;i--)
+  {
+    if(var(i)>1)
+    {
+      ERROR("local ordering expected");
+    }
+  }
+  ideal J=jacob(f);
+  ideal sJ=std(J);
+  if(vdim(sJ)<=0)
+  {
+    if(vdim(sJ)==0)
+    {
+      ERROR("singularity at 0 expected");
+    }
+    else
+    {
+      ERROR("isolated singularity at 0 expected");
+    }
+  }
   int opt=1;
   if(size(#)>0)
   {
@@ -111,28 +138,6 @@ EXAMPLE:  example monodromy; shows an example
     }
   }
 
-  int i,j;
-  int n=nvars(basering)-1;
-  for(i=n+1;i>=1;i--)
-  {
-    if(var(i)>1)
-    {
-      ERROR("no local ordering");
-    }
-  }
-  ideal J=jacob(f);
-  ideal sJ=std(J);
-  if(vdim(sJ)<=0)
-  {
-    if(vdim(sJ)==0)
-    {
-      ERROR("no singularity at 0");
-    }
-    else
-    {
-      ERROR("no isolated singularity at 0");
-    }
-  }
   ideal m=kbase(sJ);
   int mu,modm=ncols(m),maxorddif(m);
 
@@ -144,7 +149,7 @@ EXAMPLE:  example monodromy; shows an example
   module H0;
   int sdH=1;
   int k=-1;
-  int K,N,mide;
+  int j,K,N,mide;
 
   while(k<K||sdH>0)
   {
@@ -326,7 +331,8 @@ example
 
 proc vfiltration(poly f,list #)
 "USAGE:    vfiltration(f[,opt]); poly f, int opt
-ASSUME:   basering has local ordering, f has isolated singularity at 0
+ASSUME:   basering has characteristic 0 and local ordering,
+          f has isolated singularity at 0
 RETURN:
 @format
 list V: V-filtration of f on H''/H'
@@ -348,6 +354,31 @@ KEYWORDS: singularities; Gauss-Manin connection;
 EXAMPLE:  example vfiltration; shows an example
 "
 {
+  if(charstr(basering)!="0")
+  {
+    ERROR("characteristic 0 expected");
+  }
+  int n=nvars(basering)-1;
+  for(int i=n+1;i>=1;i--)
+  {
+    if(var(i)>1)
+    {
+      ERROR("local ordering expected");
+    }
+  }
+  ideal J=jacob(f);
+  ideal sJ=std(J);
+  if(vdim(sJ)<=0)
+  {
+    if(vdim(sJ)==0)
+    {
+      ERROR("singularity at 0 expected");
+    }
+    else
+    {
+      ERROR("isolated singularity at 0 expected");
+    }
+  }
   int opt=1;
   if(size(#)>0)
   {
@@ -357,28 +388,6 @@ EXAMPLE:  example vfiltration; shows an example
     }
   }
 
-  int i,j;
-  int n=nvars(basering)-1;
-  for(i=n+1;i>=1;i--)
-  {
-    if(var(i)>1)
-    {
-      ERROR("no local ordering");
-    }
-  }
-  ideal J=jacob(f);
-  ideal sJ=std(J);
-  if(vdim(sJ)<=0)
-  {
-    if(vdim(sJ)==0)
-    {
-      ERROR("no singularity at 0");
-    }
-    else
-    {
-      ERROR("no isolated singularity at 0");
-    }
-  }
   ideal m=kbase(sJ);
   int mu,modm=ncols(m),maxorddif(m);
 
@@ -390,7 +399,7 @@ EXAMPLE:  example vfiltration; shows an example
   module H0;
   int sdH=1;
   int k=-1;
-  int K;
+  int j,K;
 
   while(k<K||sdH>0)
   {
@@ -697,7 +706,8 @@ example
 
 proc spectrum(poly f)
 "USAGE:    spectrum(f); poly f
-ASSUME:   basering has local ordering, f has isolated singularity at 0
+ASSUME:   basering has characteristic 0 and local ordering,
+          f has isolated singularity at 0
 RETURN:
 @format
 list S: singularity spectrum of f
@@ -722,7 +732,8 @@ example
 
 proc endfilt(poly f,list V)
 "USAGE:   endfilt(f,V); poly f, list V
-ASSUME:  basering has local ordering, f has isolated singularity at 0
+ASSUME:  basering has characteristic 0 and local ordering,
+         f has isolated singularity at 0
 RETURN:
 @format
 list V1: endomorphim filtration of V on the Jacobian algebra of f
@@ -740,11 +751,34 @@ KEYWORDS: singularities; Gauss-Manin connection; spectrum;
 EXAMPLE: example endfilt; shows an example
 "
 {
+  if(charstr(basering)!="0")
+  {
+    ERROR("characteristic 0 expected");
+  }
+  int n=nvars(basering)-1;
+  for(int i=n+1;i>=1;i--)
+  {
+    if(var(i)>1)
+    {
+      ERROR("local ordering expected");
+    }
+  }
+  ideal sJ=std(jacob(f));
+  if(vdim(sJ)<=0)
+  {
+    if(vdim(sJ)==0)
+    {
+      ERROR("singularity at 0 expected");
+    }
+    else
+    {
+      ERROR("isolated singularity at 0 expected");
+    }
+  }
+
   def a,d,v,m=V[1..4];
   int mu=ncols(m);
-  ideal sJ=std(jacob(f));
 
-  int i,j,k;
   module V0=v[1];
   for(i=2;i<=size(v);i++)
   {
@@ -760,7 +794,7 @@ EXAMPLE: example endfilt; shows an example
     M[i]=lift(V0,coeffs(reduce(m[i]*m,U,sJ),m)*V0);
   }
 
-  int i0,j0,i1,j1;
+  int j,k,i0,j0,i1,j1;
   number b0=number(a[1]-a[ncols(a)]);
   number b1,b2;
   matrix M0;
@@ -879,35 +913,6 @@ example
   ring R=0,(x,y),ds;
   poly f=x5+x2y2+y5;
   endfilt(f,vfiltration(f));
-}
-///////////////////////////////////////////////////////////////////////////////
-
-proc gamma(list S)
-"USAGE:   gamma(S); list S
-RETURN:  number: gamma invariant of spectrum S
-EXAMPLE: example gamma; shows an example
-"
-{
-  ideal a=S[1];
-  intvec d=S[2];
-  int n=nvars(basering)-1;
-  number g=0;
-  int i,j;
-  for(i=1;i<=ncols(a);i++)
-  {
-    for(j=1;j<=d[i];j++)
-    {
-      g=g+(number(a[i])-number(n-1)/2)^2;
-    }
-  }
-  g=-g/4+sum(d)*number(a[ncols(a)]-a[1])/48;
-  return(g);
-}
-example
-{ "EXAMPLE:"; echo=2;
-  ring R=0,(x,y),ds;
-  poly f=x5+x2y2+y5;
-  gamma(spectrum(f));
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -1190,9 +1195,26 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
+proc spmilnor(list S)
+"USAGE:   spmilnor(S); list S
+RETURN:  int: Milnor number of spectrum S
+EXAMPLE: example spmilnor; shows an example
+"
+{
+  return(sum(S[2]));
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring R=0,(x,y),ds;
+  list S=list(ideal(-1/2,-3/10,-1/10,0,1/10,3/10,1/2),intvec(1,2,2,1,2,2,1));
+  spprint(S);
+  spmilnor(S);
+}
+///////////////////////////////////////////////////////////////////////////////
+
 proc spgeomgenus(list S)
 "USAGE:   spgeomgenus(S); list S
-RETURN:  int g: geometric genus of spectrum S
+RETURN:  int: geometrical genus of spectrum S
 EXAMPLE: example spgeomgenus; shows an example
 "
 {
@@ -1215,5 +1237,32 @@ example
   list S=list(ideal(-1/2,-3/10,-1/10,0,1/10,3/10,1/2),intvec(1,2,2,1,2,2,1));
   spprint(S);
   spgeomgenus(S);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc spgamma(list S)
+"USAGE:   spgamma(S); list S
+RETURN:  number: gamma invariant of spectrum S
+EXAMPLE: example spgamma; shows an example
+"
+{
+  int i,j;
+  number g=0;
+  for(i=1;i<=ncols(S[1]);i++)
+  {
+    for(j=1;j<=S[2][i];j++)
+    {
+      g=g+(number(S[1][i])-number(nvars(basering)-2)/2)^2;
+    }
+  }
+  g=-g/4+sum(S[2])*number(S[1][ncols(S[1])]-S[1][1])/48;
+  return(g);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring R=0,(x,y),ds;
+  list S=list(ideal(-1/2,-3/10,-1/10,0,1/10,3/10,1/2),intvec(1,2,2,1,2,2,1));
+  spprint(S);
+  spgamma(S);
 }
 ///////////////////////////////////////////////////////////////////////////////
