@@ -104,6 +104,7 @@ struct calc_dat
   int extended_product_crit;
   BOOLEAN is_char0;
 };
+static int add_to_reductors(calc_dat* c, poly h, int len);
 static int bucket_guess(kBucket* bucket);
 static poly redNFTail (poly h,const int sl,kStrategy strat, int len);
 static poly redNF2 (poly h,calc_dat* c , int &len);

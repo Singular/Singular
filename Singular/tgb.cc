@@ -5,7 +5,7 @@
 
 #include "tgb.h"
 #define OM_KEEP 0
-#define LEN_VAR1
+#define LEN_VAR4
 
 #ifdef LEN_VAR1
 // erste Variante: Laenge: Anzahl der Monome
@@ -293,7 +293,7 @@ static BOOLEAN is_empty(calc_dat* c){
 }
 
 
-static void add_to_reductors(calc_dat* c, poly h, int len){
+static int add_to_reductors(calc_dat* c, poly h, int len){
   assume(lenS_correct(c->strat));
  
   int i;
@@ -306,8 +306,11 @@ static void add_to_reductors(calc_dat* c, poly h, int len){
   P.tailRing=c->r;
   P.p=h; /*p_Copy(h,c->r);*/
   P.FDeg=pFDeg(P.p,c->r);
-  if (!rField_is_Zp(c->r)) 
+  if (!rField_is_Zp(c->r)){ 
     pCleardenom(P.p);
+    pContent(P.p); //is a duplicate call, but belongs here
+  }
+  
   else                     
     pNorm(P.p);
  
@@ -320,7 +323,7 @@ static void add_to_reductors(calc_dat* c, poly h, int len){
  
   if(c->strat->lenSw)
     c->strat->lenSw[i]=pSLength(P.p,len);
- 
+  return i;
  
 }
 static void length_one_crit(calc_dat* c, int pos, int len)
@@ -1440,7 +1443,7 @@ static poly redNF2 (poly h,calc_dat* c , int &len)
 
               c->strat->lenS[old_pos]=new_length;
               if(c->strat->lenSw)
-                c->strat->lenS[old_pos]=pSLength(sec_copy,new_length);
+                c->strat->lenSw[old_pos]=pSLength(sec_copy,new_length);
               int i=0;
               for(i=new_pos;i<old_pos;i++){
                 if (strat->lenS[i]<=new_length)
@@ -1699,12 +1702,20 @@ static BOOLEAN redNF2_n_steps (redNF_inf* obj,calc_dat* c, int n)
             //        replace_quietly(c,j,sec_copy);
             // have to do many additional things for consistency
             {
+	        if (!rField_is_Zp(c->r)){ 
+		  pCleardenom(sec_copy);
+		  pContent(sec_copy); 
+		}
+		
+		else                     
+		  pNorm(sec_copy);
+ 
               int old_pos=j;
               new_pos=min(old_pos, new_pos);
               assume(new_pos<=old_pos);
               c->strat->lenS[old_pos]=new_length;
               if(c->strat->lenSw)
-                c->strat->lenS[old_pos]=pSLength(sec_copy,new_length);
+                c->strat->lenSw[old_pos]=pSLength(sec_copy,new_length);
               int i=0;
               for(i=new_pos;i<old_pos;i++){
                 if (strat->lenS[i]<=new_length)
@@ -2520,4 +2531,331 @@ static poly kBucketGcd(kBucket* b, ring r)
     }
   }
   return m;
+}
+
+
+struct find_erg{
+  int to_reduce_u;
+  int to_reduce_l;
+  int reduce_by;//index of reductor
+  BOOLEAN fromS;//else from los
+  BOOLEAN swap_roles; //from reduce_by, to_reduce_u if fromS
+};
+static int guess_quality(LObject* p, calc_dat* c){
+  //looks only on bucket
+  if (c->is_char0) return kSBucketLength(p->bucket);
+  return (bucket_guess(p->bucket));
+}
+static int quality_of_pos_in_strat_S(int pos, calc_dat* c){
+  if (c->is_char0) return c->strat->lenSw[pos];
+  return c->strat->lenS[pos];
+}
+static int quality(poly p, int len, calc_dat* c){
+  if (c->is_char0) return pSLength(p,len);
+  return pLength(p);
+}
+static void multi_reduction_lls_trick(LObject** los, int losl,calc_dat* c,find_erg & erg){
+  if(erg.fromS){
+    if(pLmEqual(c->strat->S[erg.reduce_by],los[erg.to_reduce_u]->p))
+    {
+      int i;
+      int quality_a=quality_of_pos_in_strat_S(erg.reduce_by,c);
+      int best=erg.to_reduce_u+1;
+      for (i=erg.to_reduce_u;i>=erg.to_reduce_l;i--){
+	int qc=guess_quality(los[i],c);
+	if (qc<quality_a){
+	  best=i;
+	  quality_a=qc;
+	}
+      }
+      if(best!=erg.to_reduce_u+1){
+	LObject* h=los[erg.to_reduce_u];
+	los[erg.to_reduce_u]=los[best];
+	los[best]=h;
+	erg.swap_roles=TRUE;
+      }
+      else{
+	
+	erg.swap_roles=FALSE;
+      }
+      return;
+    }
+      else
+    {
+      if (erg.to_reduce_u>erg.to_reduce_l){
+	int i;
+	int quality_a=quality_of_pos_in_strat_S(erg.reduce_by,c);
+	int best=erg.to_reduce_u+1;
+	for (i=erg.to_reduce_u;i>=erg.to_reduce_l;i--){
+	  int qc=guess_quality(los[i],c);
+	  if (qc<quality_a){
+	    best=i;
+	    quality_a=qc;
+	  }
+	}
+	if(best!=erg.to_reduce_u+1){
+	  LObject* h=los[erg.to_reduce_l];
+	  los[erg.to_reduce_l]=los[best];
+	  los[best]=h;
+	  erg.reduce_by=erg.to_reduce_l;
+	  erg.fromS=FALSE;
+	  erg.to_reduce_l++;
+	  
+	}
+      }
+      erg.swap_roles=FALSE;
+      return;
+      }
+    
+  }
+  else{
+    if(erg.reduce_by>erg.to_reduce_u){
+      //then lm(rb)>= lm(tru) so =
+      assume(erg.reduce_by==erg.to_reduce_u+1);
+      int best=erg.reduce_by;
+      int quality_a=guess_quality(los[erg.reduce_by],c);
+      int i;
+	for (i=erg.to_reduce_u;i>=erg.to_reduce_l;i--){
+	  int qc=guess_quality(los[i],c);
+	  if (qc<quality_a){
+	    best=i;
+	    quality_a=qc;
+	  }
+	}
+	if(best!=erg.reduce_by){
+	  LObject* h=los[erg.reduce_by];
+	  los[erg.reduce_by]=los[best];
+	  los[best]=h;
+	}
+	erg.swap_roles=FALSE;
+	return;
+	
+	  
+    }
+    else
+    {
+      assume(!pLmEqual(los[erg.reduce_by]->p,los[erg.to_reduce_l]->p));
+      //further assume, that reduce_by is the above all other polys
+      //with same leading term
+      int il=erg.reduce_by;
+      int quality_a =guess_quality(los[erg.reduce_by],c);
+      int qc;
+      while((il>0) && pLmEqual(los[il-1]->p,los[il]->p)){
+	il--;
+	qc=guess_quality(los[il],c);
+	if (qc<quality_a){
+	  quality_a=qc;
+	  erg.reduce_by=il;
+	}
+      }
+      erg.swap_roles=FALSE;
+    }
+  
+  }
+  if(erg.swap_roles){
+    poly clear_into;
+    int dummy_len;
+    int new_length;
+    int bp=erg.to_reduce_u;//bucket_positon
+    kBucketClear(los[bp]->bucket,&clear_into,&new_length);
+    poly p=c->strat->S[erg.reduce_by];
+    int j=erg.reduce_by;
+    int old_length=c->strat->lenS[j];// in view of S
+    los[bp]->p=p;
+    kBucketInit(los[bp]->bucket,p,old_length);
+    int qal=quality(clear_into,new_length,c);
+    int pos_in_c=-1;    
+    int z;
+    int new_pos;
+    new_pos=simple_posInS(c->strat,clear_into,qal,c->is_char0);
+    assume(new_pos<=j);
+    for (z=c->n;z;z--)
+    {
+      if(p==c->S->m[z-1])
+      {
+	pos_in_c=z-1;
+	break;
+      }
+    }
+    if(pos_in_c>=0)
+    {
+      c->S->m[pos_in_c]=clear_into;
+      c->lengths[pos_in_c]=new_length;
+      c_S_element_changed_hook(pos_in_c,c);
+    }
+    c->strat->S[j]=clear_into;
+    c->strat->lenS[j]=new_length;
+    if(c->strat->lenSw)
+      c->strat->lenS[j]=qal;
+    if(c->is_char0)
+    {
+      pContent(clear_into);
+      pCleardenom(clear_into);
+    }
+  else                     
+    pNorm(clear_into);
+    if (new_pos<j)
+      move_forward_in_S(j,new_pos,c->strat,c->is_char0);
+
+  }
+}
+static find_erg multi_reduction_find(LObject** los, int losl,calc_dat* c,int startf){
+  kStrategy strat=c->strat;
+  assume(startf<=losl);
+  int i=startf;
+  find_erg erg;
+  int j;
+  while(i>=0){
+    j=kFindDivisibleByInS(strat->S,strat->sevS,strat->sl,los[i]);
+    if(j>=0){
+     
+      erg.to_reduce_u=startf;
+      erg.reduce_by=j;
+      erg.fromS=TRUE;
+      int i2;
+      for(i2=i-1;i2>=0;i2--){
+	if(!pLmEqual(los[i]->p,los[i2]->p))
+	  break;
+      }
+      erg.to_reduce_l=i2+1;
+      return erg;
+    }
+    if (j<0){
+      //not reduceable, try to use this for reducing higher terms
+      int i2;
+      for (i2=i+1;i2<=losl;i2++){
+	if (p_LmShortDivisibleBy(los[i]->p,los[i]->sev,los[i2]->p,los[i2]->sev,
+				c->r)){
+	  int i3=i2;
+	  while((i3+1<losl) && (pLmEqual(los[i2]->p, los[i3+1]->p)))
+	    i3++;
+	  erg.to_reduce_u=i3;
+	  erg.to_reduce_l=i2;
+	  erg.reduce_by=i;
+	  erg.fromS=FALSE;
+	  return erg;
+	}
+      }
+      i2=i;
+      while((i2>0)&&(pLmEqual(los[i]->p,los[i2-1]->p)))
+	i2--;
+      if(i2!=i){
+	
+	erg.to_reduce_u=i-1;
+	erg.to_reduce_l=i2;
+	erg.reduce_by=i;
+	erg.fromS=FALSE;
+	return erg;
+      }
+ 
+      i--;
+    }
+  }
+  erg.reduce_by=-1;//error code
+  return erg;
+}
+
+ //  nicht reduzierbare eintraege in ergebnisliste schreiben
+//   nullen loeschen
+//   while(finde_groessten leitterm reduzierbar(c,erg)){
+  
+static int multi_reduction_clear_zeroes(LObject** los, int  losl)
+{
+  int deleted=0;
+  int  i=0;
+  while(i<losl)
+  {
+    if(los[i]->p==NULL){
+      delete los[i];//here we assume los are constructed with new
+      int j;
+      for(j=i+1;j<losl-deleted;j++)
+      {
+	los[j-1]=los[j];
+      }
+      deleted++;
+    }
+    else
+      i++;
+  }
+  return deleted;
+}
+
+static void sort_region_down(LObject** los, int l, int u, calc_dat* c)
+{
+  int i;
+  for(i=l;i<=u;i++)
+  {
+    int j;
+    for(j=i;j;j--)
+    {
+      if(pLmCmp(los[j]->p,los[j-1]->p)==1){
+	LObject* h=los[j];
+	los[j]=los[j-1];
+	los[j-1]=h;
+      }
+      else break;
+    }
+  }
+}
+
+//assume that los is ordered ascending by leading term, all non zero
+static void multi_reduction(LObject** los, int & losl, calc_dat* c)
+{
+  
+  //initialize;
+  assume(c->strat->sl>=0);
+  assume(losl>0);
+  int i;
+  for(i=0;i<losl;i++){
+    los[i]->SetShortExpVector();
+    los[i]->p=kBucketGetLm(los[i]->bucket);
+  }
+  poly h=kBucketGetLm(los[i]->bucket);
+  kStrategy strat=c->strat;
+  int curr_pos=losl-1;
+
+
+//  nicht reduzierbare einträge in ergebnisliste schreiben
+  // nullen loeschen
+  while(curr_pos>=0){
+    find_erg erg=multi_reduction_find(los, losl,c,curr_pos);
+    if(erg.reduce_by<0) break;
+    multi_reduction_lls_trick(los,losl,c,erg);
+    //erweitern? muß noch implementiert werden
+    int i;
+    int len;
+    poly reductor;
+    if(erg.fromS){
+      reductor=strat->S[erg.reduce_by];
+      len=strat->lenS[erg.reduce_by];
+      
+    }
+    else 
+    {
+      //bucket aufloesen reduzieren, neu füllen
+      
+      kBucketClear(los[erg.reduce_by]->bucket,&reductor,&len);
+ 
+ 
+    }
+    for(i=erg.to_reduce_l;i<=erg.to_reduce_u;i++)
+    {
+      assume((!erg.fromS)||(i!=erg.reduce_by));
+       number coef=kBucketPolyRed(los[i]->bucket,reductor,
+                                  len,
+				  strat->kNoether);
+       nDelete(&coef);
+       los[i]->p = kBucketGetLm(los[i]->bucket);
+       if(los[i]->p!=NULL)
+	 los[i]->SetShortExpVector();
+    }
+    if(!erg.fromS)
+      kBucketInit(los[erg.reduce_by]->bucket,reductor,len);
+		 
+    int deleted=multi_reduction_clear_zeroes(los, losl);
+    losl -= deleted;
+    curr_pos -= deleted;
+    sort_region_down(los, erg.to_reduce_l, erg.to_reduce_u-deleted, c);
+  }
+  return;
 }
