@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feOpt.cc,v 1.14 2000-09-18 09:18:54 obachman Exp $ */
+/* $Id: feOpt.cc,v 1.15 2001-01-30 12:12:33 Singular Exp $ */
 /*
 * ABSTRACT: Implementation of option buisness
 */
@@ -170,6 +170,7 @@ const char SHORT_OPTS_STRING[] = "bdhqtvxec:r:u:";
 #ifdef GENERATE_OPTION_INDEX
 
 #include <stdio.h>
+#include <unistd.h>
 main()
 {
   FILE* fd;
