@@ -1,3 +1,12 @@
+Wed Jan 14 15:36:04 1998  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
+
+	* binom.h: #undef TEST_MAC_ORDER as default
+
+	* polys-impl.h: fixes to make things clearer and for
+	  NO_EXP_VECTOR_OPS 
+
+	* Makefile.in (Singularp): use static linking for 
+
 Fri Dec 19 17:22:26 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* claptmpl.cc: template instantiation for `Array<REvaluation>'
