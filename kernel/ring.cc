@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.27 2004-10-29 18:48:41 levandov Exp $ */
+/* $Id: ring.cc,v 1.28 2005-02-03 16:41:29 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -1205,6 +1205,34 @@ int rSum(ring r1, ring r2, ring &sum)
       rChangeCurrRing(old_ring);
   }
 #endif
+  if (r1->qideal!=NULL)
+  {
+    if (r2->qideal!=NULL)
+    {
+      WerrorS("todo: qring+qring"); 
+      return -1;
+    }
+    else
+    {
+      int * perm=(int*)omAlloc0(sizeof(int)*(sum->N+1));
+      int i;
+      for(i=1;i<=r1->N;i++) perm[i]=i;
+      sum->qideal=idInit(IDELEMS(r1->qideal),1);
+      for (int i=0;i<IDELEMS(r1->qideal);i++)
+        sum->qideal->m[i]=pPermPoly(r1->qideal->m[i],perm,r1,nCopy);
+      omFree((ADDRESS)perm);
+    }
+  }
+  else if (r2->qideal!=NULL)
+  {
+    int * perm=(int*)omAlloc0(sizeof(int)*(sum->N+1));
+    int i;
+    for(i=1;i<=r2->N;i++) perm[i]=i+r1->N;
+    sum->qideal=idInit(IDELEMS(r2->qideal),1);
+    for (int i=0;i<IDELEMS(r2->qideal);i++)
+      sum->qideal->m[i]=pPermPoly(r2->qideal->m[i],perm,r2,nCopy);
+    omFree((ADDRESS)perm);
+  }
   return 1;
 }
 /*2
