@@ -563,6 +563,8 @@ dnl
 # fereadl - io routines
 AC_CHECK_HEADERS(termcap.h)
 AC_CHECK_HEADERS(termios.h)
+AC_CHECK_HEADERS(term.h)
+AC_CHECK_HEADERS(sys/termbits.h)
 
 # readline
 if test "$with_readline" != no; then
@@ -644,10 +646,16 @@ ac_cv_have_readline="no"
     AC_DEFINE(HAVE_READLINE)
   else
     AC_MSG_WARN(building without readline: disabling fancy display)
-    AC_DEFINE(HAVE_FEREAD)
+    AC_CHECK_LIB(ncurses,tgetent,,\
+    AC_CHECK_LIB(curses,tgetent,,\
+    AC_CHECK_LIB(termcap,tgetent,,\
+    AC_DEFINE(HAVE_FEREAD))))
   fi
 else
-  AC_DEFINE(HAVE_FEREAD)
+    AC_CHECK_LIB(ncurses,tgetent,,\
+    AC_CHECK_LIB(curses,tgetent,,\
+    AC_CHECK_LIB(termcap,tgetent,,\
+  AC_DEFINE(HAVE_FEREAD))))
 fi
 
 NEED_LIBS=$LIBS
