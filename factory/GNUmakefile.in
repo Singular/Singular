@@ -1,5 +1,5 @@
 # @configure_input@
-# $Id: GNUmakefile.in,v 1.28 1998-02-05 15:56:25 schmidt Exp $
+# $Id: GNUmakefile.in,v 1.29 1998-02-20 16:43:23 schmidt Exp $
 
 #
 # GNUmakefile.in - used by `configure' to create `GNUmakefile', the
@@ -538,10 +538,14 @@ installcf:	cf
 		for file in $(templatesrc) $(templateincl); do \
 		  $(INSTALL_DATA) $(srcdir)/templates/$$file $(templatedir)/$$file; \
 		done
+# we run `ranlib' another time for SUN machines
+		$(RANLIB) $(libdir)/$(libfactory)
 
 installmem:	mem
 		$(MKINSTALLDIRS) $(libdir)
 		$(INSTALL_DATA) libcfmem.a $(libdir)/libcfmem.a
+# once again: another run for SUN
+		$(RANLIB) $(libdir)/libcfmem.a
 
 # to a pity, this cannot be done automatically ...
 installgftables:
