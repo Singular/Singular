@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.10 1998-03-16 14:56:47 obachman Exp $ */
+/* $Id: structs.h,v 1.11 1998-04-28 09:39:27 pohl Exp $ */
 /*
 * ABSTRACT
 */
@@ -146,7 +146,11 @@ int siRand();
 /*the general set of std-options --> kutil.cc */
 extern BITSET test;
 /*the general set of verbose-options --> febase.cc */
+#ifdef __cplusplus
+extern "C" BITSET verbose;
+#else
 extern BITSET verbose;
+#endif
 /*debugging the bison grammar --> grammar.cc*/
 #ifdef YYDEBUG
 #if YYDEBUG
