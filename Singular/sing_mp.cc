@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sing_mp.cc,v 1.10 1997-04-10 15:22:18 obachman Exp $ */
+/* $Id: sing_mp.cc,v 1.11 1997-04-10 16:17:11 obachman Exp $ */
 
 /*
 * ABSTRACT: interface to MP links
@@ -287,6 +287,7 @@ BOOLEAN slWriteMP(si_link l, leftv v)
     v->next = next;
     v = next;
     next = v->next;
+    v->next = NULL;
     if (mpsr_PutMsg((MP_Link_pt) l->data, v) != mpsr_Success)
     {
       mpsr_PrintError((MP_Link_pt) l->data);
