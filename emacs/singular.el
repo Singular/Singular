@@ -1,6 +1,6 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.29 1999-07-19 10:25:16 obachman Exp $
+;; $Id: singular.el,v 1.30 1999-08-10 17:45:56 wichmann Exp $
 
 ;;; Commentary:
 
@@ -14,51 +14,75 @@
 ;; - "Singular" is written with an upper-case `S' in comments, doc
 ;;   strings, and messages.  As part of symbols, it is written with
 ;;   a lower-case `s'.
-;; - use a `fill-column' of 70 for doc strings and comments
+;; - When referring to the Singular interactive mode, do it in that
+;;   wording.  Use the notation `singular-interactive-mode' only when
+;;   really referring to the lisp object.
+;; - use a `fill-column' of 75 for doc strings and comments
+;; - mark incomplete doc strings or code with `NOT READY' optionally
+;;   followed by an explanation what exactly is missing
+;;
 ;; - use foldings to structure the source code but try not to exceed a
-;;   maximal depth of two folding (one folding in another folding which is
-;;   on top-level)
+;;   maximum depth of two foldings
 ;; - use lowercase folding titles except for first word
 ;; - folding-marks are `;;{{{' and `;;}}}' resp., for sake of standard
 ;;   conformity
-;; - mark incomplete doc strings or code with `NOT READY' (optionally
-;;   followed by an explanation what exactly is missing)
-;; - documentation on the customization of the modes is in the
-;;   doc-strings to `singular-mode-configuration' and
-;;   `singular-interactive-mode-configuration', resp.
+;; - use the foldings to modularize code.  That is, each folding should be,
+;;   as far as possible, self-content.  Define a function `singular-*-init'
+;;   in the folding to do the initialization of the module contained in
+;;   that folding.  Call that function from `singular-interactive-mode',
+;;   for example, instead of initializing the module directly from
+;;   `singular-interactive-mode'.  Look at the code how it is done for the
+;;   simple section or for the folding stuff.
 ;;
 ;; - use `singular' as prefix for all global symbols
 ;; - use `singular-debug' as prefix for all global symbols concerning
 ;;   debugging.
+;; - use, whenever possible without names becoming too clumsy, some unique
+;;   prefix inside a folding
 ;;
 ;; - mark dependencies on Emacs flavor/version with a comment of the form
-;;   `;; Emacs[ <version>]'     resp.
-;;   `;; XEmacs[ <version>][ <nasty comment>]' (in that order, if
-;;   possible)
+;;   `;; Emacs[ <version> ]'     resp.
+;;   `;; XEmacs[ <version> ][ <nasty comment> ]'
+;;   specified in that order, if possible
 ;; - use a `cond' statement to execute Emacs flavor/version-dependent code,
 ;;   not `if'.  This is to make such checks more extensible.
-;; - try to define different functions for different flavors/version
-;;   and use `singular-fset' at library-loading time to set the function
-;;   you really need.  If the function is named `singular-<basename>', the
+;; - try to define different functions for different flavors/version and
+;;   use `singular-fset' at library-loading time to set the function you
+;;   really need.  If the function is named `singular-<basename>', the
 ;;   flavor/version-dependent functions should be named
 ;;   `singular-<flavor>[-<version>]-<basename>'.
-
+;;
 ;; - use `singular-debug' for debugging output/actions
 ;; - to switch between buffer and process names, use the functions
 ;;   `singular-process-name-to-buffer-name' and
 ;;   `singular-buffer-name-to-process-name'
+;; - call the function `singular-keep-region-active' as last statement in
+;;   an interactive function that should keep the region active (for
+;;   example, in functions that move the point).  This is necessary to keep
+;;   XEmacs' zmacs regions active.
+;; - to get the process of the current buffer, use `singular-process'.  To
+;;   get the current process mark, use `singular-process-mark'.  Both
+;;   functions check whether Singular is alive and throw an error if not,
+;;   so you do not have to care about that yourself.  If you do not want an
+;;   error specify non-nil argument NO-ERROR.  But use them anyway.
 ;; - we assume that the buffer is *not* read-only
 
 ;;}}}
 
-(require 'comint)
-
 ;;{{{ Code common to both modes
+;;{{{ Customizing
+(defgroup singular-faces nil
+  "Faces in Singular mode and Singular interactive mode."
+  :group 'faces
+  :group 'singular-interactive)
+;;}}}
+
 ;;{{{ Debugging stuff
 (defvar singular-debug nil
-  "*List of modes to debug or t to debug all modes.
-Currently, there are the modes `interactive', `interactive-filter',
-`interactive-simple-secs', and `interactive-sections'.")
+  "List of modes to debug or t to debug all modes.
+Currently, the following modes are supported:
+  `interactive',
+  `interactive-filter'.")
 
 (defun singular-debug-format (string)
   "Return STRING in a nicer format."
@@ -83,39 +107,35 @@ of `singular-debug', othwerwise ELSE-FORM."
 ;;{{{ Determining version
 (defvar singular-emacs-flavor nil
   "A symbol describing the current Emacs.
-Currently, only Emacs \(`emacs') and XEmacs are supported \(`xemacs').")
+Currently, only Emacs \(`emacs') and XEmacs \(`xemacs') are supported.")
 
 (defvar singular-emacs-major-version nil
   "An integer describing the major version of the current emacs.")
 
 (defvar singular-emacs-minor-version nil
-  "An integer describing the major version of the current emacs.")
+  "An integer describing the minor version of the current emacs.")
 
-(defun singular-fset (real-function emacs-function xemacs-function
-				    &optional emacs-19-function)
+(defun singular-fset (real-function emacs-function xemacs-function)
   "Set REAL-FUNCTION to one of the functions, in dependency on Emacs flavor and version.
 Sets REAL-FUNCTION to XEMACS-FUNCTION if `singular-emacs-flavor' is
-`xemacs'.  Sets REAL-FUNCTION to EMACS-FUNCTION if `singular-emacs-flavor'
-is `emacs' and `singular-emacs-major-version' is 20.  Otherwise, sets
-REAL-FUNCTION to EMACS-19-FUNCTION which defaults to EMACS-FUNCTION.
+`xemacs', otherwise sets REAL-FUNCTION to EMACS-FUNCTION.
 
-This is not as common as would be desirable.  But it is sufficient so far."
+This is not as common as it would be desirable.  But it is sufficient so
+far."
   (cond
    ;; XEmacs
    ((eq singular-emacs-flavor 'xemacs)
     (fset real-function xemacs-function))
-   ;; Emacs 20
-   ((eq singular-emacs-major-version 20)
-    (fset real-function emacs-function))
-   ;; Emacs 19
+   ;; Emacs
    (t
-    (fset real-function (or emacs-19-function emacs-function)))))
+    (fset real-function emacs-function))))
 
 (defun singular-set-version ()
   "Determine flavor, major version, and minor version of current emacs.
-singular.el is guaranteed to run on Emacs 19.34, Emacs 20.2, and XEmacs
-20.2.  It should run on newer version and on slightly older ones, too."
+singular.el is guaranteed to run on Emacs 20.3 and XEmacs 20.3.
+It should run on newer version and on slightly older ones, too.
 
+This function is called exactly once when singular.el is loaded."
   ;; get major and minor versions first
   (if (and (boundp 'emacs-major-version)
 	   (boundp 'emacs-minor-version))
@@ -126,10 +146,10 @@ singular.el is guaranteed to run on Emacs 19.34, Emacs 20.2, and XEmacs
 "You seem to have quite an old Emacs or XEmacs version.  Some of the
 features from singular.el will not work properly.  Consider upgrading to a
 more recent version of Emacs or XEmacs.  singular.el is guaranteed to run
-on Emacs 19.34, Emacs 20.2, and XEmacs 20.2."))
+on Emacs 20.3 and XEmacs 20.3."))
     ;; assume the oldest version we support
-    (setq singular-emacs-major-version 19
-	  singular-emacs-minor-version 34))
+    (setq singular-emacs-major-version 20
+	  singular-emacs-minor-version 3))
 
   ;; get flavor
   (if (string-match "XEmacs\\|Lucid" emacs-version)
@@ -139,163 +159,429 @@ on Emacs 19.34, Emacs 20.2, and XEmacs 20.2."))
 (singular-set-version)
 ;;}}}
 
-;;{{{ Faces
+;;{{{ Syntax table
+(defvar singular-mode-syntax-table nil
+  "Syntax table for `singular-interactive-mode' resp. `singular-mode'.")
 
-;; Note:
-;;
-;; These fonts look quite good:
-;; "-adobe-courier-bold-r-*-*-18-*-*-*-*-*-*-*" for input
-;; "-adobe-courier-bold-o-*-*-18-*-*-*-*-*-*-*" for output
-;;
-;; For my (Jens) Emacs a quite good variant is:
-;; "-misc-fixed-bold-*-*-*-15-*-*-*-*-*-*-*" for input
-;; "-misc-fixed-medium-*-*-*-15-*-*-*-*-*-*-*" for output
+(if singular-mode-syntax-table
+    ()
+  (setq singular-mode-syntax-table (make-syntax-table))
+  ;; stolen from cc-mode.el except for back-tics which are special to Singular
+  (modify-syntax-entry ?_  "_"     	singular-mode-syntax-table)
+  (modify-syntax-entry ?\\ "\\"    	singular-mode-syntax-table)
+  (modify-syntax-entry ?+  "."     	singular-mode-syntax-table)
+  (modify-syntax-entry ?-  "."     	singular-mode-syntax-table)
+  (modify-syntax-entry ?=  "."     	singular-mode-syntax-table)
+  (modify-syntax-entry ?%  "."     	singular-mode-syntax-table)
+  (modify-syntax-entry ?<  "."     	singular-mode-syntax-table)
+  (modify-syntax-entry ?>  "."     	singular-mode-syntax-table)
+  (modify-syntax-entry ?&  "."     	singular-mode-syntax-table)
+  (modify-syntax-entry ?|  "."     	singular-mode-syntax-table)
+  (modify-syntax-entry ?\' "\""    	singular-mode-syntax-table)
+  (modify-syntax-entry ?\` "\""    	singular-mode-syntax-table)
+  ;; block and line-oriented comments
+  (cond
+   ;; Emacs
+   ((eq singular-emacs-flavor 'emacs)
+    (modify-syntax-entry ?/  ". 124b" 	singular-mode-syntax-table)
+    (modify-syntax-entry ?*  ". 23"   	singular-mode-syntax-table))
+   ;; XEmacs
+   (t
+    (modify-syntax-entry ?/  ". 1456" 	singular-mode-syntax-table)
+    (modify-syntax-entry ?*  ". 23"   	singular-mode-syntax-table)))
+  (modify-syntax-entry ?\n "> b"    	singular-mode-syntax-table)
+  (modify-syntax-entry ?\^m "> b"    	singular-mode-syntax-table))
 
-(make-face 'singular-input-face)
-;(set-face-background 'singular-input-face "Orange")
-(defvar singular-input-face 'singular-input-face
-  "Face for user input.
-This face should have set background only.")
+(defun singular-mode-syntax-table-init ()
+  "Initialize syntax table of current buffer.
 
-(make-face 'singular-output-face)
-;(set-face-font 'singular-output-face "-adobe-courier-bold-o-*-*-18-*-*-*-*-*-*-*")
-;(set-face-background 'singular-output-face "Wheat")
-(defvar singular-output-face 'singular-output-face
-  "Face for Singular output.
-This face should have set background only.")
-
-(defun singular-lookup-face (face-type)
-  "Return face belonging to FACE-TYPE.
-NOT READY [should be rewritten completely.  Interface should stay the same.]!"
-  (cond ((eq face-type 'input) singular-input-face)
-	((eq face-type 'output) singular-output-face)))
-
-;; Additional faces for font locking
-(make-face 'font-lock-singular-error-face)
-
-(defvar font-lock-singular-error-face 'font-lock-singular-error-face
-  "Additional font-lock face for singular errors.")
-
-(cond 
- ;; XEmacs
- ((eq singular-emacs-flavor 'xemacs)
-  ;; That 'append avoids to overwrite the face if it is already set
-  (set-face-foreground 'font-lock-singular-error-face "Red"
-		       'global nil 'append)))
-
-(make-face 'font-lock-singular-warn-face)
-
-(defvar font-lock-singular-warn-face 'font-lock-singular-warn-face
-  "Additional font-lock face for singular warnings.")
-
-(cond
- ;; XEmacs
- ((eq singular-emacs-flavor 'xemacs)
-  ;; That 'append avoids to overwrite the face if it is already set
-  (set-face-foreground 'font-lock-singular-warn-face "Orange" 
-		       'global nil 'append)))
-
-(make-face 'font-lock-singular-prompt-face)
-
-(defvar font-lock-singular-warn-face 'font-lock-singular-prompt-face
-  "Addition font-lock face for the singular prompt.")
-
-(cond
- ;; XEmacs
- ((eq singular-emacs-flavor 'xemacs)
-  ;; That 'append avoids to overwrite the face if it is already set
-  (set-face-foreground 'font-lock-singular-prompt-face "Gray50"
-		       'global nil 'append)))
+This function is called at mode initialization time."
+  (set-syntax-table singular-mode-syntax-table))
 ;;}}}
 
-;;{{{ Font-locking
-;(make-regexp '("def" "ideal" "int"  "intmat" "intvec"  
-;	       "link" "list" "map" "matrix" "module" 
-;	       "number" "poly" "proc" "qring" "resolution" 
-;	       "ring" "string" "vector"))
-
-(defvar singular-font-lock-keywords-1
-  '(
-    ("^\\(> \\|\\. \\)" . font-lock-singular-prompt-face)
-    ("^   [\\?].*" 0 font-lock-singular-error-face t)
-    ("^// \\(\\*\\*.*\\)" 1 font-lock-singular-warn-face t)
-    )
-  "Subdued level for highlighting in singular-(interactive)-mode")
-
-(defvar singular-font-lock-keywords-2
-  (append
-   singular-font-lock-keywords-1
-   '(
-     ("\\<\\(def\\|i\\(deal\\|nt\\(\\|mat\\|vec\\)\\)\\|li\\(nk\\|st\\)\\|m\\(a\\(p\\|trix\\)\\|odule\\)\\|number\\|p\\(oly\\|roc\\)\\|qring\\|r\\(esolution\\|ing\\)\\|string\\|vector\\)\\>" . font-lock-type-face)
-     ))
-  "Medium level for highlighting in singular-(interactive)-mode")
-
-(defvar singular-font-lock-keywords-3 
-  (append
-   singular-font-lock-keywords-2
-   '(
-     ("^   [\\?].*`\\(\\sw\\sw+\\)`" 1 font-lock-reference-name-face t)
-;;     ()))
-     ))
-  "Gaudy level for highlihgting in singular-(interactive)-mode") 
-
-(defvar singular-font-lock-keywords singular-font-lock-keywords-1
-  "Default highlighting for singular-(interactive)-mode")
-
-(defvar singular-font-lock-defaults 
-  '((singular-font-lock-keywords
-     singular-font-lock-keywords-1 singular-font-lock-keywords-2
-     singular-font-lock-keywords-3)
-    nil                   ;; KEYWORDS-ONLY 
-    nil                   ;; CASE-FOLD (ignore case when non-nil)
-    ((?_ . "w"))          ;; SYNTAX-ALIST
-    (beginning-of-line))  ;; SYNTAX_BEGIN
-  "Emacs-default for font-lock-mode in singular-(interactive)-mode")
-
-(cond 
- ;; XEmacs
- ((eq singular-emacs-flavor 'xemacs)
-  (singular-debug 'interactive (message "setting up font-lock for XEmacs"))
-  (put 'singular-interactive-mode 'font-lock-defaults
-       singular-font-lock-defaults)))
+;;{{{ Miscellaneous
+(defsubst singular-keep-region-active ()
+  "Do whatever is necessary to keep the region active in XEmacs.
+Ignore byte-compiler warnings you might see.  This is not needed for
+Emacs."
+  ;; XEmacs.  We do not use the standard way here to test for flavor
+  ;; because it is presumably faster with that test on `boundp'.
+  (and (boundp 'zmacs-region-stays)
+       (setq zmacs-region-stays t)))
 ;;}}}
-
 ;;}}}
 
 ;;{{{ Singular interactive mode
+;;{{{ Customizing
 
-;;{{{ Key map and menus
-(defvar singular-interactive-mode-map ()
+;; Note:
+;;
+;; Some notes on Customize:
+;;
+;; - The documentation states that for the `:initialize' option of
+;;   `defcustom' the default value is `custom-initialize-set'.  However, in
+;;   the source code of Customize `custom-initialize-reset' is used.  So
+;;   better always specify the `:initialize' option explicitly.
+;; - Customize is bad at setting buffer-local variables or properties.
+;;   This is quite natural since Customize itself uses its own buffer.  So
+;;   changing buffer-local variables and properties with Customize is
+;;   possible only at a "Singular-global" level.  That is, for all buffers
+;;   currently having Singular interactive mode as major mode.  The function
+;;   `singular-map-buffer' helps to do such customization.
+;;
+;; Some common customizing patterns:
+;;
+;; - How to customize buffer-local properties?
+;;   First, the `defcustom' itself must not set anything buffer-local since
+;;   at time of its definition (most likely) no Singular buffers will be
+;;   around.  If there are Singular buffers we do not care about them.  But
+;;   anyhow, at definition of the `defcustom' the global default has to be
+;;   set.  Hence, the `:initialize' option should be set to
+;;   `custom-initialize-default'.
+;;   The buffer-local initialization has to be done at mode initialization
+;;   time.  The global default value should then be used to set the local
+;;   properties.
+;;   At last, the function specified with the `:set' option should set the
+;;   local properties in all Singular buffers to the new, customized value.
+;;   Most likely, the function `singular-map-buffer' may be used for that.
+;;   In addition, the function should, of course, set the global value via
+;;   `set-default'.
+;;   For an example, see `singular-folding-line-move-ignore-folding'.
+;;
+;; - How to encapsulate other mode's global variables into Singular
+;;   interactive mode variables?
+;;   Set them always.  That is, set them if the `defcustom' is evaluated
+;;   (use `custom-initialize-reset' as `:initial' function) and set them
+;;   when the Singular interactive mode variable is customized (by means
+;;   of an appropriate `:set' function).
+;;   For an example, see `singular-section-face-alist' (which does not
+;;   encapsulate another mode's variable, but Singular interactive mode's
+;;   own variable `singular-simple-sec-clear-type').
+
+(defgroup singular-interactive nil
+  "Running Singular with Emacs or XEmacs as front end."
+  :group 'processes)
+
+(defgroup singular-sections-and-foldings nil
+  "Sections and foldings in Singular interactive mode."
+  :group 'singular-interactive)
+
+(defgroup singular-interactive-miscellaneous nil
+  "Miscellaneous settings for Singular interactive mode."
+  :group 'singular-interactive)
+
+(defgroup singular-demo-mode nil
+  "Settings concerning Singular demo mode."
+  :group 'singular-interactive)
+
+(defun singular-map-buffer (func &rest args)
+  "Apply FUNC to ARGS in all existing Singular buffers.
+That is, in all buffers having Singular interactive major mode.  The
+function is executed in the context of the buffer.  This is a must-have for
+the customizing stuff to change buffer-local properties."
+  (save-excursion
+    (mapcar (function
+	     (lambda (buffer)
+	       (set-buffer buffer)
+	       (if (eq major-mode 'singular-interactive-mode)
+		   (apply func args))))
+	    (buffer-list))))
+;;}}}
+
+;;{{{ Comint
+
+;; Note:
+;;
+;; We require Comint, but we really do not use it too much.  One may argue
+;; that this is bad since Comint is a standardized way to communicate with
+;; external processes.  One may argue further that many experienced Emacs
+;; users are forced now to re-do their Comint customization for Singular
+;; interactive mode.  However, we believe that the intersection between
+;; experienced Emacs users and users of Singular interactive mode is almost
+;; empty.
+;;
+;; In fact, we used Comint really much in the beginning of this project.
+;; Later during development it turned at that using Comint's input and
+;; output processing is to inflexible and not appropriate for Singular
+;; interactive mode with its input and output sections.  So we begun to
+;; rewrite large portions of Comint to adapt it to our needs.  At some
+;; point it came clear that it would be best to throw out Comint
+;; alltogether, would not have been there some auxilliary functions which
+;; are really useful but annoying to rewrite.  These are, for example, the
+;; command line history functions or the completion stuff offered by
+;; Comint.
+;;
+;; Our policy with regard to these remainders of Comint is: Use the
+;; functions to bind them to keys, but do not use them internally.
+;; Encapsulate Comint customization into Singular interactive mode
+;; customization.  In particular, do not take care about Comint settings
+;; which already may be present, overwrite them.  Hide Comint from the
+;; user.
+;;
+;; Here is how exactly we use Comint:
+;;
+;; - All variables necessary to use Comint's input ring are properly
+;;   initialized.  One may find this in the `History' folding.
+;; - `comint-prompt-regexp' is initialized since it is used in some
+;;   of the functions regarding input ring handling.  Furthermore, its
+;;   initialization enables us to use functions as `comint-bol', etc.
+;;   Initialization is done in the `Skipping and stripping prompts ...'
+;;   folding.
+;; - We call `comint-mode' as first step in `singular-interactive-mode'.
+;;   Most of the work done there is to initialize the local variables as
+;;   necessary.  Besides that, the function does nothing that interferes
+;;   with Singular interactive mode.  To be consequent we set
+;;   `comint-mode-hook' temporarily to nil when calling `comint-mode'.
+;; - In `singular-exec', we use `comint-exec-1' to fire up the process.
+;;   Furthermore, we set `comint-ptyp' there as it is used in the signal
+;;   sending commands of Comint.  All that `comint-exec-1' does is that it
+;;   sets up the process environment (it adds or modifies the setting of
+;;   the 'TERM' variable), sets the execution directory, and does some
+;;   magic with the process coding stuff.
+;; - One more time the most important point: we do *not* use Comint's
+;;   output and input processing.  In particular, we do not run any of
+;;   Comint's hooks on input or output.  Anyway, we do better, don't we?
+
+(require 'comint)
+;;}}}
+
+;;{{{ Font-locking
+(defvar singular-font-lock-error-face 'singular-font-lock-error-face
+  "Face name to use for Singular errors.")
+
+(defvar singular-font-lock-warning-face 'singular-font-lock-warning-face
+  "Face name to use for Singular warnings.")
+
+(defvar singular-font-lock-prompt-face 'singular-font-lock-prompt-face
+  "Face name to use for Singular prompts.")
+
+(defface singular-font-lock-error-face
+  '((((class color)) (:foreground "Red" :bold t))
+    (t (:inverse-video t :bold t)))
+  "*Font Lock mode face used to highlight Singular errors."
+  :group 'singular-faces)
+
+(defface singular-font-lock-warning-face
+  '((((class color)) (:foreground "OrangeRed" :bold nil))
+    (t (:inverse-video t :bold t)))
+  "*Font Lock mode face used to highlight Singular warnings."
+  :group 'singular-faces)
+
+(defface singular-font-lock-prompt-face
+  '((((class color) (background light)) (:foreground "Blue" :bold t))
+    (((class color) (background dark)) (:foreground "LightSkyBlue" :bold t))
+    (t (:inverse-video t :bold t)))
+  "*Font Lock mode face used to highlight Singular prompts."
+  :group 'singular-faces)
+
+(defconst singular-font-lock-singular-types nil
+  "List of Singular types.")
+
+(eval-when-compile
+  (setq singular-font-lock-singular-types
+	'("def" "ideal" "int" "intmat" "intvec" "link" "list" "map" "matrix"
+	  "module" "number" "poly" "proc" "qring" "resolution" "ring" "string"
+	  "vector")))
+
+(defconst singular-interactive-font-lock-keywords-1
+  '(
+    ("^\\([>.]\\) " 1 singular-font-lock-prompt-face t)
+    ("^   [\\?].*" 0 singular-font-lock-error-face t)
+    ("^// \\*\\*.*" 0 singular-font-lock-warning-face t)
+    )
+  "Subdued level highlighting for Singular interactive mode")
+
+(defconst singular-interactive-font-lock-keywords-2
+  (append
+   singular-interactive-font-lock-keywords-1
+   (eval-when-compile
+     (list
+      (cons
+       (concat "\\<" (regexp-opt singular-font-lock-singular-types t) "\\>")
+       'font-lock-type-face))))
+  "Medium level highlighting for Singular interactive mode")
+
+(defconst singular-interactive-font-lock-keywords-3
+  (append
+   singular-interactive-font-lock-keywords-2
+   '(
+     ("^   [\\?].*`\\(\\sw\\sw+\\)`" 1 font-lock-reference-name-face t)
+     ))
+  "Gaudy level highlighting for Singular interactive mode.")
+
+(defconst singular-interactive-font-lock-keywords singular-interactive-font-lock-keywords-1
+  "Default highlighting for Singular interactive mode.")
+
+(defconst singular-interactive-font-lock-defaults
+  '((singular-interactive-font-lock-keywords
+     singular-interactive-font-lock-keywords-1
+     singular-interactive-font-lock-keywords-2
+     singular-interactive-font-lock-keywords-3)
+    ;; KEYWORDS-ONLY (do not fontify strings & comments if non-nil)
+    nil
+    ;; CASE-FOLD (ignore case if non-nil)
+    nil
+    ;; SYNTAX-ALIST (add this to Font Lock's syntax table)
+    ((?_ . "w"))
+    ;; SYNTAX-BEGIN
+    singular-section-goto-beginning)
+  "Default expressions to highlight in Singular interactive mode.")
+
+(defun singular-interactive-font-lock-init ()
+  "Initialize Font Lock mode for Singular interactive mode.
+
+For XEmacs, this function is called exactly once when singular.el is
+loaded.
+For Emacs, this function is called  at mode initialization time."
+  (cond 
+   ;; Emacs
+   ((eq singular-emacs-flavor 'emacs)
+    (singular-debug 'interactive (message "Setting up Font Lock mode for Emacs"))
+    (set (make-local-variable 'font-lock-defaults)
+	 singular-interactive-font-lock-defaults))
+   ;; XEmacs
+   ((eq singular-emacs-flavor 'xemacs)
+    (singular-debug 'interactive (message "Setting up Font Lock mode for XEmacs"))
+    (put 'singular-interactive-mode
+	 'font-lock-defaults singular-interactive-font-lock-defaults))))
+
+;; XEmacs Font Lock mode initialization
+(cond
+ ;; XEmacs
+ ((eq singular-emacs-flavor 'xemacs)
+  (singular-interactive-font-lock-init)))
+;;}}}
+
+;;{{{ Key map
+(defvar singular-interactive-mode-map nil
   "Key map to use in Singular interactive mode.")
 
 (if singular-interactive-mode-map
     ()
+  ;; create empty keymap first
   (cond
    ;; Emacs
    ((eq singular-emacs-flavor 'emacs)
-    (setq singular-interactive-mode-map
-	  (nconc (make-sparse-keymap) comint-mode-map)))
+    (setq singular-interactive-mode-map (make-sparse-keymap)))
    ;; XEmacs
    (t
     (setq singular-interactive-mode-map (make-keymap))
-    (set-keymap-parents singular-interactive-mode-map (list comint-mode-map))
     (set-keymap-name singular-interactive-mode-map
 		     'singular-interactive-mode-map)))
-  (define-key singular-interactive-mode-map "\C-m" 'singular-send-or-copy-input)
-  (define-key singular-interactive-mode-map "\t" 'singular-dynamic-complete)
-  (define-key singular-interactive-mode-map "\C-c\C-f" 'singular-load-file)
-  (define-key singular-interactive-mode-map "\C-c\C-l" 'singular-load-library)
-  (define-key singular-interactive-mode-map "\C-c\C-d" 'singular-demo-load)
-  (define-key singular-interactive-mode-map "\C-c\C-c\C-d" 'singular-demo-exit)
-  (define-key singular-interactive-mode-map "\C-c\C-t" 'singular-toggle-truncate-lines)
-  (define-key singular-interactive-mode-map "\C-c$" 'singular-exit-singular)
-  (define-key singular-interactive-mode-map "\C-cfl" 'singular-fold-last-output)
-  (define-key singular-interactive-mode-map "\C-cfa" 'singular-fold-all-output)
-  (define-key singular-interactive-mode-map "\C-cfp" 'singular-fold-at-point)
-  (define-key singular-interactive-mode-map "\C-cul" 'singular-unfold-last-output)
-  (define-key singular-interactive-mode-map "\C-cua" 'singular-unfold-all-output)
-  (define-key singular-interactive-mode-map "\C-cup" 'singular-unfold-at-point))
 
+  ;; define keys
+  (define-key singular-interactive-mode-map [?\C-m]	'singular-send-or-copy-input)
+  (define-key singular-interactive-mode-map [?\M-r]	'comint-previous-matching-input)
+  (define-key singular-interactive-mode-map [?\M-s]	'comint-next-matching-input)
+
+  ;; C-c prefix
+  (define-key singular-interactive-mode-map [?\C-c ?\C-f] 'singular-folding-toggle-fold-at-point-or-all)
+  (define-key singular-interactive-mode-map [?\C-c ?\C-o] 'singular-folding-toggle-fold-latest-output)
+  (define-key singular-interactive-mode-map [?\C-c ?\C-l] 'singular-recenter))
+
+(defcustom singular-history-keys '(meta)
+  "Keys to use for history access.
+Should be a list describing which keys or key combinations to use for
+history access in Singular interactive mode.  Valid entries are `control',
+`cursor', and `meta'.
+
+For more information one should refer to the documentation of
+`singular-history-keys'.
+
+Changing this variable has an immediate effect only if one uses
+\\[customize] to do so."
+  :type '(set (const :tag "Cursor keys" cursor)
+	      (const :tag "C-p, C-n" control)
+	      (const :tag "M-p, M-n" meta))
+  :initialize 'custom-initialize-default
+  :set (function
+	(lambda (var value)
+	  (singular-history-cursor-keys-set value singular-cursor-keys)
+	  (set-default var value)))
+  :group 'singular-interactive-miscellaneous)
+
+(defcustom singular-cursor-keys '(control cursor)
+  "Keys to use for cursor movement.
+Should be a list describing which keys or key combinations to use for
+cursor movement in Singular interactive mode.  Valid entries are `control',
+`cursor', and `meta'.
+
+An experienced Emacs user would prefer setting `singular-cursor-keys' to
+`(control cursor)' and `singular-history-keys' to `(meta)'.  This means
+that C-p, C-n, and the cursor keys move the cursor, whereas M-p and M-n
+scroll through the history of Singular commands.
+
+On the other hand, an user used to running Singular in a, say, xterm, would
+prefer the other way round: Setting the variable `singular-history-keys' to
+`(control cursor)' and `singular-cursor-keys' to `(meta)'.
+
+Keys which are not mentioned in both lists are not modified from their
+standard settings.  Naturally, the lists `singular-cursor-keys' and
+`singular-history-keys' should be disjunct.
+
+Changing this variable has an immediate effect only if one uses
+\\[customize] to do so."
+  :type '(set (const :tag "Cursor keys" cursor)
+	      (const :tag "C-p, C-n" control)
+	      (const :tag "M-p, M-n" meta))
+  :initialize 'custom-initialize-default
+  :set (function
+	(lambda (var value)
+	  (singular-history-cursor-keys-set singular-history-keys value)
+	  (set-default var value)))
+  :group 'singular-interactive-miscellaneous)
+
+(defun singular-history-cursor-key-set (key function-spec)
+  "Set keys corresponding to KEY and according to FUNCTION-SPEC.
+FUNCTION-SPEC should be a cons cell of the format (PREV-FUNC . NEXT-FUNC)."
+  (cond
+   ((eq key 'control)
+    (define-key singular-interactive-mode-map [?\C-p]	(car function-spec))
+    (define-key singular-interactive-mode-map [?\C-n]	(cdr function-spec)))
+   ((eq key 'meta)
+    (define-key singular-interactive-mode-map [?\M-p]	(car function-spec))
+    (define-key singular-interactive-mode-map [?\M-n]	(cdr function-spec)))
+   ((eq key 'cursor)
+    (define-key singular-interactive-mode-map [up]	(car function-spec))
+    (define-key singular-interactive-mode-map [down]	(cdr function-spec)))))
+
+(defun singular-history-cursor-keys-set (history-keys cursor-keys)
+  "Set the keys according to HISTORY-KEYS and CURSOR-KEYS.
+Checks whether HISTORY-KEYS and CURSOR-KEYS are disjunct.  Throws an error
+if not."
+  ;; do the check first
+  (if (memq nil (mapcar (function (lambda (elt) (not (memq elt history-keys))))
+			cursor-keys))
+      (error "History keys and cursor keys are not disjunct (see `singular-cursor-keys')"))
+
+  ;; remove old bindings first
+  (singular-history-cursor-key-set 'cursor '(nil . nil))
+  (singular-history-cursor-key-set 'control '(nil . nil))
+  (singular-history-cursor-key-set 'meta '(nil . nil))
+
+  ;; set new bindings
+  (mapcar (function
+	   (lambda (key)
+	     (singular-history-cursor-key-set key '(comint-previous-input . comint-next-input))))
+	  history-keys)
+  (mapcar (function
+	   (lambda (key)
+	     (singular-history-cursor-key-set key '(previous-line . next-line))))
+	  cursor-keys))
+
+;; static initialization.  Deferred to this point since at the time where
+;; the defcustoms are defined not all necessary functions and variables are
+;; available.
+(singular-history-cursor-keys-set singular-history-keys singular-cursor-keys)
+
+(defun singular-interactive-mode-map-init ()
+  "Initialize key map for Singular interactive mode.
+
+This function is called  at mode initialization time."
+  (use-local-map singular-interactive-mode-map))
+;;}}}
+
+;;{{{ Menus and logos
 (defvar singular-interactive-mode-menu-1 nil
   "NOT READY [docu]")
 
@@ -381,188 +667,39 @@ NOT READY [should be rewritten completely.  Interface should stay the same.]!"
      ((eq singular-emacs-flavor 'xemacs)
       (add-submenu nil 
 		   singular-start-menu-definition))))
-;;}}}
 
-;;{{{ Syntax table
-(defvar singular-interactive-mode-syntax-table nil
-  "Syntax table for singular-interactive-mode")
+  ;; remove existing singular-start-menu from menu (XEmacs)
+  ;, NOT READY
+  ;; This is mayby just temporary
+;  (cond
+;   ;; XEmacs
+;   ((eq singular-emacs-flavor 'xemacs)
+;    (delete-menu-item '("Singular"))))
 
-(if singular-interactive-mode-syntax-table
-    ()
-  (setq singular-interactive-mode-syntax-table (make-syntax-table))
-  ;; rest taken from cc-mode.el
-  (modify-syntax-entry ?_  "_"     singular-interactive-mode-syntax-table)
-  (modify-syntax-entry ?\\ "\\"    singular-interactive-mode-syntax-table)
-  (modify-syntax-entry ?+  "."     singular-interactive-mode-syntax-table)
-  (modify-syntax-entry ?-  "."     singular-interactive-mode-syntax-table)
-  (modify-syntax-entry ?=  "."     singular-interactive-mode-syntax-table)
-  (modify-syntax-entry ?%  "."     singular-interactive-mode-syntax-table)
-  (modify-syntax-entry ?<  "."     singular-interactive-mode-syntax-table)
-  (modify-syntax-entry ?>  "."     singular-interactive-mode-syntax-table)
-  (modify-syntax-entry ?&  "."     singular-interactive-mode-syntax-table)
-  (modify-syntax-entry ?|  "."     singular-interactive-mode-syntax-table)
-  (modify-syntax-entry ?\' "\""    singular-interactive-mode-syntax-table)
+	    ;; NOT READY: SINGULAR-LOGO
+;	    (cond 
+;	     ((eq singular-emacs-flavor 'xemacs)
+;	      (set-extent-begin-glyph (make-extent (point-min) (point-min)) 
+;				      singular-logo)
+;	      (insert "\n")))
+
+;; NOT READY: SINGULAR-LOGO
+;(cond
+; ((eq singular-emacs-flavor 'xemacs)
+;  (defvar singular-logo (make-glyph))
+;  (set-glyph-image singular-logo
+;		   (concat "~/" "singlogo.xpm")
+;		   'global 'x)))
+
+(defun singular-interactive-mode-menu-init ()
+  "Initialize menus for Singular interactive mode.
+
+This function is called  at mode initialization time."
   (cond
-   ;; Emacs
-   ((eq singular-emacs-flavor 'emacs)
-    (modify-syntax-entry ?/  ". 124b" singular-interactive-mode-syntax-table))
    ;; XEmacs
-   (t
-    (modify-syntax-entry ?/  ". 1456" singular-interactive-mode-syntax-table)))
-  (modify-syntax-entry ?*  ". 23"   singular-interactive-mode-syntax-table)
-  (modify-syntax-entry ?\n "> b"    singular-interactive-mode-syntax-table)
-  (modify-syntax-entry ?\^m "> b"    singular-interactive-mode-syntax-table))
-
-;;}}}
-
-;;{{{ Miscellaneous
-
-;; Note:
-;;
-;; We assume a one-to-one correspondance between Singular buffers
-;; and Singular processes.  We always have
-;; (equal buffer-name (concat "*" process-name "*")).
-
-(defun singular-buffer-name-to-process-name (buffer-name)
-  "Create the process name for BUFFER-NAME.
-The process name is the buffer name with surrounding `*' stripped
-off."
-  (substring buffer-name 1 -1))
-
-(defun singular-process-name-to-buffer-name (process-name)
-  "Create the buffer name for PROCESS-NAME.
-The buffer name is the process name with surrounding `*'."
-  (concat "*" process-name "*"))
-
-(defun singular-run-hook-with-arg-and-value (hook value)
-  "Call functions on HOOK.
-Provides argument VALUE.  If a function returns a non-nil value it
-replaces VALUE as new argument to the functions.  Returns final
-VALUE."
-  (let (result)
-    (while hook
-      (setq result (funcall (car hook) value))
-      (and result (setq value result))
-      (setq hook (cdr hook)))
-    value))
-
-(defmacro singular-process ()
-  "Return process of current buffer."
-  (get-buffer-process (current-buffer)))
-
-(defmacro singular-process-mark ()
-  "Return process mark of current buffer."
-  (process-mark (get-buffer-process (current-buffer))))
-
-(defun singular-load-file (file &optional noexpand)
-  "Read a file in Singular (via '< \"FILE\";').
-If optional argument NOEXPAND is nil, FILE is expanded using
-`expand-file-name'."
-  (interactive "fLoad file: ")
-  (let* ((filename (if noexpand file (expand-file-name file)))
-	 (string (concat "< \"" filename "\";"))
-	 (process (singular-process)))
-    (singular-input-filter process string)
-    (singular-send-string process string)))
-
-(defun singular-load-library (file &optional noexpand)
-  "Read a Singular library (via 'LIB \"FILE\";').
-If optional argument NOEXPAND is nil, FILE is expanded using
-`expand-file-name'."
-  (interactive "fLoad Library: ")
-  (let* ((filename (if noexpand file (expand-file-name file)))
-	 (string (concat "LIB \"" filename "\";"))
-	 (process (singular-process)))
-    (singular-input-filter process string)
-    (singular-send-string process string)))
-
-(defun singular-exit-singular ()
-  "Exit Singular and kill Singular buffer.
-Sends string \"quit;\" to Singular process."
-  (interactive)
-  (let ((string "quit;")
-	(process (singular-process)))
-    (singular-input-filter process string)
-    (singular-send-string process string))
-  (kill-buffer (current-buffer)))
-
-;; The function `singular-toggle-truncate-lines' is obsolete in XEmacs
-;; but not in Emacs. So define it anyway.
-(defun singular-toggle-truncate-lines ()
-  "Toggle truncate-lines."
-  (interactive)
-  (setq truncate-lines (not truncate-lines))
-  (recenter))
-;;}}}
-
-;;{{{ Customizing variables of comint
-
-;; Note:
-;;
-;; In contrast to the variables from comint.el, all the variables
-;; below are global variables.  It would not make any sense to make
-;; them buffer-local since
-;; o they are read only when Singular interactive mode comes up;
-;; o since they are Singular-dependent and not user-dependent, i.e.,
-;;   the user would not mind to change them.
-;;
-;; For the same reasons these variables are not marked as
-;; "customizable" by a leading `*'.
-
-(defvar singular-prompt-regexp "^> "
-  "Regexp to match prompt patterns in Singular.
-Should not match the continuation prompt \(`.'), only the regular
-prompt \(`>').
-
-This variable is used to initialize `comint-prompt-regexp' when
-Singular interactive mode starts up.")
-
-(defvar singular-delimiter-argument-list '(?= ?\( ?\) ?, ?;)
-  "List of characters to recognize as separate arguments.
-
-This variable is used to initialize `comint-delimiter-argument-list'
-when Singular interactive mode starts up.")
-
-(defvar singular-input-ignoredups t
-  "If non-nil, don't add input matching the last on the input ring.
-
-This variable is used to initialize `comint-input-ignoredups' when
-Singular interactive mode starts up.")
-
-(defvar singular-buffer-maximum-size 2048
-  "The maximum size in lines for Singular buffers.
-
-This variable is used to initialize `comint-buffer-maximum-size' when
-Singular interactive mode starts up.")
-
-(defvar singular-input-ring-size 64
-  "Size of input history ring.
-
-This variable is used to initialize `comint-input-ring-size' when
-Singular interactive mode starts up.")
-
-(defvar singular-history-filter-regexp "\\`\\(..?\\|\\s *\\)\\'"
-  "Regular expression to filter strings *not* to insert in the history.
-By default, input consisting of less than three characters and input
-consisting of white-space only is not added to the history.")
-
-(defvar singular-history-filter
-  (function (lambda (string)
-	      (not (string-match singular-history-filter-regexp string))))
-  "Predicate for filtering additions to input history.
-
-This variable is used to initialize `comint-input-filter' when
-Singular interactive mode starts up.")
-
-(defvar singular-completion-addsuffix '("/" . "")
-  "*Specifies suffixes to be added on completed file names and directories.
-If a cons pair, it should be of the form (DIRSUFFIX . FILESUFFIX) where
-DIRSUFFIX and FILESUFFIX are strings added on unambiguous or exact completion.
-If non-nil, add a `/' to completed directories, ` ' to file names.
-This mirrors the optional behavior of tcsh.
-
-This variable is used to initialize `comint-completion-addsuffix' when
-Singular interactive mode starts up.")
+   ((eq singular-emacs-flavor 'xemacs)
+    (easy-menu-add singular-interactive-mode-menu-1)
+    (easy-menu-add singular-interactive-mode-menu-2))))
 ;;}}}
 
 ;;{{{ Skipping and stripping prompts and newlines and other things
@@ -630,7 +767,7 @@ Leaves point after the last prompt found."
   (concat singular-extended-prompt-regexp "*")
   "Matches an arbitary sequence of Singular prompts.")
 
-(defun singular-skip-prompt-forward ()
+(defun singular-prompt-skip-forward ()
   "Skip forward over prompts."
   (looking-at singular-skip-prompt-forward-regexp)
   (goto-char (match-end 0)))
@@ -638,9 +775,278 @@ Leaves point after the last prompt found."
 (defun singular-skip-prompt-backward ()
   "Skip backward over prompts."
   (while (re-search-backward singular-extended-prompt-regexp (- (point) 2) t)))
+
+(defun singular-remove-prompt-filter (beg end simple-sec-start)
+  "Strip prompts from last simple section."
+  (if simple-sec-start (singular-remove-prompt simple-sec-start end)))
+
+(defvar singular-prompt-regexp "^> "
+  "Regexp to match prompt patterns in Singular.
+Should not match the continuation prompt \(`.'), only the regular
+prompt \(`>').
+
+This variable is used to initialize `comint-prompt-regexp' when
+Singular interactive mode starts up.")
 ;;}}}
 
-;;{{{ Simple section stuff for both Emacs and XEmacs
+;;{{{ Miscellaneous
+
+;; Note:
+;;
+;; We assume a one-to-one correspondence between Singular buffers and
+;; Singular processes.  We always have (equal buffer-name (concat "*"
+;; process-name "*")).
+
+(defsubst singular-buffer-name-to-process-name (buffer-name)
+  "Create the process name for BUFFER-NAME.
+The process name is the buffer name with surrounding `*' stripped off."
+  (substring buffer-name 1 -1))
+
+(defsubst singular-process-name-to-buffer-name (process-name)
+  "Create the buffer name for PROCESS-NAME.
+The buffer name is the process name with surrounding `*'."
+  (concat "*" process-name "*"))
+
+(defsubst singular-run-hook-with-arg-and-value (hook value)
+  "Call functions on HOOK.
+Provides argument VALUE to the functions.  If a function returns a non-nil
+value it replaces VALUE as new argument to the remaining functions.
+Returns final VALUE."
+  (while hook
+    (setq value (or (funcall (car hook) value) value)
+	  hook (cdr hook)))
+  value)
+
+(defsubst singular-process (&optional no-error)
+  "Return process of current buffer.
+If no process is active this function silently returns nil if optional
+argument NO-ERROR is non-nil, otherwise it throws an error."
+  (cond ((get-buffer-process (current-buffer)))
+	(no-error nil)
+	(t (error "No Singular running in this buffer"))))
+
+(defsubst singular-process-mark (&optional no-error)
+  "Return process mark of current buffer.
+If no process is active this function silently returns nil if optional
+argument NO-ERROR is non-nil, otherwise it throws an error."
+  (let ((process (singular-process no-error)))
+    (and process
+	 (process-mark process))))
+
+(defun singular-time-stamp-difference (new-time-stamp old-time-stamp)
+  "Return the number of seconds between NEW-TIME-STAMP and OLD-TIME-STAMP.
+Both NEW-TIME-STAMP and OLD-TIME-STAMP should be in the format
+that is returned, for example, by `current-time'.
+Does not return a difference larger than 2^17 seconds."
+  (let ((high-difference (min 1 (- (car new-time-stamp) (car old-time-stamp))))
+	(low-difference (- (cadr new-time-stamp) (cadr old-time-stamp))))
+    (+ (* high-difference 131072) low-difference)))
+;;}}}
+
+;;{{{ Miscellaneous interactive
+(defun singular-recenter (&optional arg)
+  "Center point in window and redisplay frame.  With ARG, put point on line ARG.
+The desired position of point is always relative to the current window.
+Just C-u as prefix means put point in the center of the window.
+If ARG is omitted or nil, erases the entire frame and then redraws with
+point in the center of the current window.
+Scrolls window to the left margin and moves point to beginning of line."
+  (interactive "P")
+  (singular-reposition-point-and-window)
+  (recenter arg))
+
+(defun singular-reposition-point-and-window ()
+  "Scroll window to the left margin and move point to beginning of line."
+  (interactive)
+  (set-window-hscroll (selected-window) 0)
+  (move-to-column 0)
+  ;; be careful where to place point
+  (singular-prompt-skip-forward))
+
+(defun singular-toggle-truncate-lines ()
+  "Toggle `truncate-lines'.
+A non-nil value of `truncate-lines' means do not display continuation
+lines\; give each line of text one screen line.
+Repositions window and point after toggling `truncate-lines'."
+  (interactive)
+  (setq truncate-lines (not truncate-lines))
+  ;; reposition so that user does not get confused
+  (singular-reposition-point-and-window))
+
+;; this is not a buffer-local variable even if at first glance it seems
+;; that it should be one.  But if one changes buffer the contents of this
+;; variable becomes irrelevant since the last command is no longer a
+;; horizontal scroll command.  The same is true for the initial value, so
+;; we set it to nil.
+(defvar singular-scroll-previous-amount nil
+  "Amount of previous horizontal scroll command.")
+
+(defun singular-scroll-right (&optional scroll-amount)
+  "Scroll selected window SCROLL-AMOUNT columns right.
+SCROLL-AMOUNT defaults to amount of previous horizontal scroll command.  If
+the command immediately preceding this command has not been a horizontal
+scroll command SCROLL-AMOUNT defaults to window width minus 2.
+Moves point to leftmost visible column."
+  (interactive "P")
+
+  ;; get amount to scroll
+  (setq singular-scroll-previous-amount
+	(cond (scroll-amount (prefix-numeric-value scroll-amount))
+	      ((eq last-command 'singular-scroll-horizontal)
+	       singular-scroll-previous-amount)
+	      (t (- (frame-width) 2)))
+	this-command 'singular-scroll-horizontal)
+
+  ;; scroll
+  (scroll-right singular-scroll-previous-amount)
+  (move-to-column (window-hscroll))
+  ;; be careful where to place point.  But what if `(current-column)'
+  ;; equals, say, one?  Well, we simply do not care about that case.
+  ;; Should not happen to often.
+  (if (eq (current-column) 0)
+      (singular-prompt-skip-forward)))
+
+(defun singular-scroll-left (&optional scroll-amount)
+  "Scroll selected window SCROLL-AMOUNT columns left.
+SCROLL-AMOUNT defaults to amount of previous horizontal scroll command.  If
+the command immediately preceding this command has not been a horizontal
+scroll command SCROLL-AMOUNT defaults to window width minus 2.
+Moves point to leftmost visible column."
+  (interactive "P")
+
+  ;; get amount to scroll
+  (setq singular-scroll-previous-amount
+	(cond (scroll-amount (prefix-numeric-value scroll-amount))
+	      ((eq last-command 'singular-scroll-horizontal)
+	       singular-scroll-previous-amount)
+	      (t (- (frame-width) 2)))
+	this-command 'singular-scroll-horizontal)
+
+  ;; scroll
+  (scroll-left singular-scroll-previous-amount)
+  (move-to-column (window-hscroll))
+  ;; be careful where to place point.  But what if `(current-column)'
+  ;; equals, say, one?  Well, we simply do not care about that case.
+  ;; Should not happen to often.
+  (if (eq (current-column) 0)
+      (singular-prompt-skip-forward)))
+
+(defun singular-load-file (file &optional noexpand)
+  "Read a file into Singular (via '< \"FILE\";').
+If optional argument NOEXPAND is non-nil, FILE is left as it is entered by
+the user, otherwise it is expanded using `expand-file-name'."
+  (interactive "fLoad file: ")
+  (let* ((filename (if noexpand file (expand-file-name file)))
+	 (string (concat "< \"" filename "\";"))
+	 (process (singular-process)))
+    (singular-input-filter process string)
+    (singular-send-string process string)))
+
+(defun singular-load-library (file &optional noexpand)
+  "Read a Singular library (via 'LIB \"FILE\";').
+If optional argument NOEXPAND is non-nil, FILE is left as it is entered by
+the user, otherwise it is expanded using `expand-file-name'."
+  (interactive "fLoad Library: ")
+  (let* ((filename (if noexpand file (expand-file-name file)))
+	 (string (concat "LIB \"" filename "\";"))
+	 (process (singular-process)))
+    (singular-input-filter process string)
+    (singular-send-string process string)))
+
+(defun singular-exit-singular ()
+  "Exit Singular and kill Singular buffer.
+Sends string \"quit;\" to Singular process."
+  (interactive)
+  (let ((string "quit;")
+	(process (singular-process)))
+    (singular-input-filter process string)
+    (singular-send-string process string))
+  (kill-buffer (current-buffer)))
+;;}}}
+
+;;{{{ History
+(defcustom singular-history-ignoredups t
+  "If non-nil, do not add input matching the last on the input history."
+  :type 'boolean
+  :initialize 'custom-initialize-default
+  :group 'singular-interactive-miscellaneous)
+
+;; this variable is used to set Comint's `comint-input-ring-size'
+(defcustom singular-history-size 64
+  "Size of the input history.
+
+Changing this variable has no immediate effect even if one uses
+\\[customize] to do so.  The new value will be used only in new Singular
+interactive mode buffers."
+  :type 'integer
+  :initialize 'custom-initialize-default
+  :group 'singular-interactive-miscellaneous)
+
+(defcustom singular-history-filter-regexp "\\`\\(..?\\|\\s *\\)\\'"
+  "Regular expression to filter strings *not* to insert in the input history.
+By default, input consisting of less than three characters and input
+consisting of white-space only is not inserted into the input history."
+  :type 'regexp
+  :initialize 'custom-initialize-default
+  :group 'singular-interactive-miscellaneous)
+
+(defcustom singular-history-explicit-file-name nil
+  "If non-nil, use this as file name to load and save the input history.
+If this variable equals nil, the `SINGULARHIST' environment variable is
+used to determine the file name.
+One should note that the input history is saved to file only on regular
+termination of Singular; that is, if one leaves Singular using the commands
+`quit\;' or `exit\;'."
+  :type '(choice (const nil) file)
+  :initialize 'custom-initialize-default
+  :group 'singular-interactive-miscellaneous)
+
+(defun singular-history-read ()
+  "Read the input history from file.
+If `singular-history-explicit-file-name' is non-nil, uses that as file
+name, otherwise tries environment variable `SINGULARHIST'.
+This function is called from `singular-exec' every time a new Singular
+process is started."
+  (singular-debug 'interactive (message "Reading input ring"))
+  (let ((comint-input-ring-file-name (or singular-history-explicit-file-name
+					 (getenv "SINGULARHIST"))))
+    ;; `comint-read-input-ring' does nothing if
+    ;; `comint-input-ring-file-name' equals nil
+    (comint-read-input-ring t)))
+
+(defun singular-history-write ()
+  "Write back the input history to file.
+If `singular-history-explicit-file-name' is non-nil, uses that as file
+name, otherwise tries environment variable `SINGULARHIST'.
+This function is called from `singular-exit-sentinel' every time a Singular
+process terminates regularly."
+  (singular-debug 'interactive (message "Writing input ring back"))
+  (let ((comint-input-ring-file-name (or singular-history-explicit-file-name
+					 (getenv "SINGULARHIST"))))
+    ;; `comint-write-input-ring' does nothing if
+    ;; `comint-input-ring-file-name' equals nil
+    (comint-write-input-ring)))
+
+(defun singular-history-insert (input)
+  "Insert string INPUT into the input history if necessary."
+  (if (and (not (string-match singular-history-filter-regexp input))
+	   (or singular-demo-insert-into-history
+	       (not singular-demo-mode))
+	   (or (not singular-history-ignoredups)
+	       (not (ring-p comint-input-ring))
+	       (ring-empty-p comint-input-ring)
+	       (not (string-equal (ring-ref comint-input-ring 0) input))))
+      (ring-insert comint-input-ring input))
+  (setq comint-input-ring-index nil))
+
+(defun singular-history-init ()
+  "Initialize variables concerning the input history.
+
+This function is called at mode initialization time."
+  (setq comint-input-ring-size singular-history-size))
+;;}}}
+
+;;{{{ Simple section API for both Emacs and XEmacs
 
 ;; Note:
 ;;
@@ -650,7 +1056,7 @@ Leaves point after the last prompt found."
 ;;
 ;; In general, simple sections are more or less Emacs' overlays or XEmacs
 ;; extents, resp.  But they are more than simply an interface to overlays
-;; or sections.
+;; or extents.
 ;;
 ;; - Simple sections are non-empty portions of text.  They are interpreted
 ;;   as left-closed, right-opened intervals, i.e., the start point of a
@@ -675,6 +1081,14 @@ Leaves point after the last prompt found."
 ;;   some of the functions assume that there is no narrowing in
 ;;   effect.
 ;; - After creation, simple sections are not modified any further.
+;; - There is one nasty little corner case: what if a non-clear simple
+;;   section spans up to end of buffer?  By definition, eob is not included
+;;   in that section since they are right-opened intervals.  Most of the
+;;   functions react as if there is an imagenary empty clear simple section
+;;   at eob.
+;; - Even though by now there are only two types of different simple
+;;   sections there may be an arbitrary number of them.  Furthermore,
+;;   simple sections of different types may appear in arbitrary order.
 ;;
 ;; - In `singular-interactive-mode', the whole buffer is covered with
 ;;   simple sections from the very beginning of the file up to the
@@ -685,23 +1099,41 @@ Leaves point after the last prompt found."
 
 (defvar singular-simple-sec-clear-type 'input
   "Type of clear simple sections.
-If nil no clear simple sections are used.")
+If nil no clear simple sections are used.
+
+One should not set this variable directly.  Rather, one should customize
+`singular-section-face-alist'.")
 
 (defvar singular-simple-sec-last-end nil
   "Marker at the end of the last simple section.
 Should be initialized by `singular-simple-sec-init' before any calls to
-`singular-simple-sec-create' are done.
+`singular-simple-sec-create' are done.  Instead of accessing this variable
+directly one should use the macro `singular-simple-sec-last-end-position'.
 
 This variable is buffer-local.")
 
 (defun singular-simple-sec-init (pos)
-  "Initialize global variables belonging to simple section management.
+  "Initialize variables belonging to simple section management.
 Creates the buffer-local marker `singular-simple-sec-last-end' and
-initializes it to POS."
+initializes it to POS.  POS should be at beginning of a line.
+
+This function is called every time a new Singular session is started."
   (make-local-variable 'singular-simple-sec-last-end)
   (if (not (markerp singular-simple-sec-last-end))
       (setq singular-simple-sec-last-end (make-marker)))
   (set-marker singular-simple-sec-last-end pos))
+
+(defmacro singular-simple-sec-last-end-position ()
+  "Return the marker position of `singular-simple-sec-last-end'.
+This macro exists more or less for purposes of information hiding only."
+  '(marker-position singular-simple-sec-last-end))
+
+(defsubst singular-simple-sec-lookup-face (type)
+  "Return the face to use for simple sections of type TYPE.
+This accesses the `singular-section-type-alist'.  It does not harm if nil
+is associated with TYPE in that alist: In this case, this function will
+never be called for that TYPE."
+  (cdr (assq type singular-section-face-alist)))
 
 ;; Note:
 ;;
@@ -714,9 +1146,9 @@ initializes it to POS."
 	       'singular-emacs-simple-sec-create
 	       'singular-xemacs-simple-sec-create)
 
-(singular-fset 'singular-simple-sec-reset-last
-	       'singular-emacs-simple-sec-reset-last
-	       'singular-xemacs-simple-sec-reset-last)
+(singular-fset 'singular-simple-sec-at
+	       'singular-emacs-simple-sec-at
+	       'singular-xemacs-simple-sec-at)
 
 (singular-fset 'singular-simple-sec-start
 	       'singular-emacs-simple-sec-start
@@ -726,6 +1158,14 @@ initializes it to POS."
 	       'singular-emacs-simple-sec-end
 	       'singular-xemacs-simple-sec-end)
 
+(singular-fset 'singular-simple-sec-type
+	       'singular-emacs-simple-sec-type
+	       'singular-xemacs-simple-sec-type)
+
+(singular-fset 'singular-simple-sec-before
+	       'singular-emacs-simple-sec-before
+	       'singular-xemacs-simple-sec-before)
+
 (singular-fset 'singular-simple-sec-start-at
 	       'singular-emacs-simple-sec-start-at
 	       'singular-xemacs-simple-sec-start-at)
@@ -734,33 +1174,49 @@ initializes it to POS."
 	       'singular-emacs-simple-sec-end-at
 	       'singular-xemacs-simple-sec-end-at)
 
-(singular-fset 'singular-simple-sec-type
-	       'singular-emacs-simple-sec-type
-	       'singular-xemacs-simple-sec-type)
-
-(singular-fset 'singular-simple-sec-at
-	       'singular-emacs-simple-sec-at
-	       'singular-xemacs-simple-sec-at)
-
-(singular-fset 'singular-simple-sec-before
-	       'singular-emacs-simple-sec-before
-	       'singular-xemacs-simple-sec-before)
-
 (singular-fset 'singular-simple-sec-in
 	       'singular-emacs-simple-sec-in
 	       'singular-xemacs-simple-sec-in)
 ;;}}}
 
-;;{{{ Simple section stuff for Emacs
+;;{{{ Simple section API for Emacs
+(defsubst singular-emacs-simple-sec-start (simple-sec)
+  "Return start of non-clear simple section SIMPLE-SEC.
+Narrowing has no effect on this function."
+  (overlay-start simple-sec))
+
+(defsubst singular-emacs-simple-sec-end (simple-sec)
+  "Return end of non-clear simple section SIMPLE-SEC.
+Narrowing has no effect on this function."
+  (overlay-end simple-sec))
+
+(defsubst singular-emacs-simple-sec-type (simple-sec)
+  "Return type of SIMPLE-SEC.
+Returns nil if SIMPLE-SEC happens to be an overlay but not a simple
+section.
+Narrowing has no effect on this function."
+  (if simple-sec
+      (overlay-get simple-sec 'singular-type)
+    singular-simple-sec-clear-type))
+
+(defsubst singular-emacs-simple-sec-before (pos)
+  "Return simple section before buffer position POS.
+This is the same as `singular-simple-sec-at' except if POS falls on a
+section border.  In this case `singular-simple-section-before' returns the
+previous simple section instead of the current one.  If POS falls on
+beginning of buffer, the simple section at beginning of buffer is returned.
+Narrowing has no effect on this function."
+  (singular-emacs-simple-sec-at (max 1 (1- pos))))
+
 (defun singular-emacs-simple-sec-create (type end)
   "Create a new simple section of type TYPE.
-Creates the section from end of previous simple section up to END.
-END should be larger than `singular-simple-sec-last-end'.
-Returns the new simple section or `empty' if no simple section has
-been created.
-Assumes that no narrowing is in effect.
-Updates `singular-simple-sec-last-end'."
-  (let ((last-end (marker-position singular-simple-sec-last-end))
+Creates the section from end of previous simple section up to the first
+beginning of line before END.  That position should be larger than or equal
+to `singular-simple-sec-last-end'.  Updates `singular-simple-sec-last-end'.
+Returns the new simple section or `empty' if no simple section has been
+created.
+Assumes that no narrowing is in effect."
+  (let ((last-end (singular-simple-sec-last-end-position))
 	;; `simple-sec' is the new simple section or `empty'
 	simple-sec)
 
@@ -772,11 +1228,17 @@ Updates `singular-simple-sec-last-end'."
 
     (cond
      ;; do not create empty sections
-     ((eq end last-end) (setq simple-sec 'empty))
-     ;; create only non-clear simple sections
+     ((eq end last-end)
+      'empty)
+     ;; non-clear simple sections
      ((not (eq type singular-simple-sec-clear-type))
-      ;; if type has not changed we only have to extend the previous
-      ;; simple section
+      ;; if type has not changed we only have to extend the previous simple
+      ;; section.  If `last-end' happens to be 1 (meaning that we are
+      ;; creating the first non-clear simple section in the buffer), then
+      ;; `singular-simple-sec-before' returns nil,
+      ;; `singular-simple-sec-type' returns the type of clear simple
+      ;; sections that definitely does not equal TYPE, and a new simple
+      ;; section is created as necessary.
       (setq simple-sec (singular-emacs-simple-sec-before last-end))
       (if (eq type (singular-emacs-simple-sec-type simple-sec))
 	  ;; move existing overlay
@@ -786,65 +1248,66 @@ Updates `singular-simple-sec-last-end'."
 	;; set type property
 	(overlay-put simple-sec 'singular-type type)
 	;; set face
-	(overlay-put simple-sec 'face (singular-lookup-face type))
+	(overlay-put simple-sec 'face (singular-simple-sec-lookup-face type))
 	;; evaporate empty sections
-	(overlay-put simple-sec 'evaporate t))))
-	    
-    ;; update end of last simple section
-    (set-marker singular-simple-sec-last-end end)
-    simple-sec))
-
-(defun singular-emacs-simple-sec-reset-last (pos)
-  "Reset end of last simple section to POS after accidental extension.
-Updates `singular-simple-sec-last-end', too."
-  (let ((simple-sec (singular-emacs-simple-sec-at pos)))
-    (if simple-sec (move-overlay simple-sec (overlay-start simple-sec) pos))
-    (set-marker singular-simple-sec-last-end pos)))
-
-(defun singular-emacs-simple-sec-start (simple-sec)
-  "Return start of non-clear simple section SIMPLE-SEC."
-  (overlay-start simple-sec))
-
-(defun singular-emacs-simple-sec-end (simple-sec)
-  "Return end of non-clear simple section SIMPLE-SEC."
-  (overlay-end simple-sec))
+	(overlay-put simple-sec 'evaporate t))
+      ;; update `singular-simple-sec-last-end' and return new simple
+      ;; section
+      (set-marker singular-simple-sec-last-end end)
+      simple-sec)
+     ;; clear simple sections
+     (t
+      ;; update `singular-simple-sec-last-end' and return nil
+      (set-marker singular-simple-sec-last-end end)
+      nil))))
 
 (defun singular-emacs-simple-sec-start-at (pos)
-  "Return start of clear section at position POS.
-Assumes that no narrowing is in effect."
-  (let ((previous-overlay-change (1+ pos)))
+  "Return start of clear simple section at position POS.
+Assumes the existence of an imagenary empty clear simple section if POS is
+at end of buffer and there is non-clear simple section immediately ending
+at POS.
+Assumes that no narrowing is in effect (since `previous-overlay-change'
+imlicitly does so)."
+  ;; yes, this `(1+ pos)' is OK at eob for
+  ;; `singular-emacs-simple-sec-before' as well as
+  ;; `previous-overlay-change'
+  (let ((previous-overlay-change-pos (1+ pos)))
     ;; this `while' loop at last will run into the end of the next
-    ;; non-clear overlay or stop at bob.  Since POS may be right at the end
-    ;; of a previous non-clear location, we have to search at least one
-    ;; time from POS+1 backwards.
-    (while (not (or (singular-emacs-simple-sec-before previous-overlay-change)
-		    (eq previous-overlay-change (point-min))))
-      (setq previous-overlay-change
-	    (previous-overlay-change previous-overlay-change)))
-    previous-overlay-change))
+    ;; non-clear simple section or stop at bob.  Since POS may be right at
+    ;; the end of a previous non-clear location, we have to search at least
+    ;; one time from POS+1 backwards.
+    (while (not (or (singular-emacs-simple-sec-before previous-overlay-change-pos)
+		    (eq previous-overlay-change-pos 1)))
+      (setq previous-overlay-change-pos
+	    (previous-overlay-change previous-overlay-change-pos)))
+    previous-overlay-change-pos))
 
 (defun singular-emacs-simple-sec-end-at (pos)
-  "Return end of clear section at position POS.
-Assumes that no narrowing is in effect."
-  (let ((next-overlay-change (next-overlay-change pos)))
+  "Return end of clear simple section at position POS.
+Assumes the existence of an imagenary empty clear simple section if POS is
+at end of buffer and there is non-clear simple section immediately ending
+at POS.
+Assumes that no narrowing is in effect (since `next-overlay-change'
+imlicitly does so)."
+  (let ((next-overlay-change-pos (next-overlay-change pos)))
     ;; this `while' loop at last will run into the beginning of the next
-    ;; non-clear overlay or stop at eob.  Since POS may not be at the
-    ;; beginning of a non-clear simple section we may start searching
+    ;; non-clear simple section or stop at eob.  Since POS may not be at
+    ;; the beginning of a non-clear simple section we may start searching
     ;; immediately.
-    (while (not (or (singular-emacs-simple-sec-at next-overlay-change)
-		    (eq next-overlay-change (point-max))))
-      (setq next-overlay-change
-	    (next-overlay-change next-overlay-change)))
-    next-overlay-change))
-
-(defun singular-emacs-simple-sec-type (simple-sec)
-  "Return type of SIMPLE-SEC."
-  (if simple-sec
-      (overlay-get simple-sec 'singular-type)
-    singular-simple-sec-clear-type))
+    (while (not (or (singular-emacs-simple-sec-at next-overlay-change-pos)
+		    (eq next-overlay-change-pos (point-max))))
+      (setq next-overlay-change-pos
+	    (next-overlay-change next-overlay-change-pos)))
+    next-overlay-change-pos))
 
 (defun singular-emacs-simple-sec-at (pos)
-  "Return simple section at position POS."
+  "Return simple section at buffer position POS.
+Assumes the existence of an imagenary empty clear simple section if POS is
+at end of buffer and there is non-clear simple section immediately ending
+at POS.
+Narrowing has no effect on this function."
+  ;; at eob, `overlays-at' always returns nil so everything is OK for this
+  ;; case, too
   (let ((overlays (overlays-at pos)) simple-sec)
     ;; be careful, there may be other overlays!
     (while (and overlays (not simple-sec))
@@ -853,33 +1316,105 @@ Assumes that no narrowing is in effect."
       (setq overlays (cdr overlays)))
     simple-sec))
 
-(defun singular-emacs-simple-sec-before (pos)
-  "Return simple section before position POS.
-This is the same as `singular-simple-section-at' except if POS falls
-on a section border.  In this case `singular-simple-section-before'
-returns the previous simple section instead of the current one."
-  (singular-emacs-simple-sec-at (max 1 (1- pos))))
-
 (defun singular-emacs-simple-sec-in (beg end)
   "Return a list of all simple sections intersecting with the region from BEG to END.
-A simple section intersects the region if the section and the region
-have at least one character in common.
-The result contains both clear and non-clear simple sections in the
-order in that the appear in the region."
-  ;; NOT READY
-  nil)
+A simple section intersects the region if the section and the region have
+at least one character in common.  The sections are returned with
+startpoints in increasing order and clear simple sections (that is, nil's)
+inserted as necessary.  BEG is assumed to be less than or equal to END.
+The imagenary empty clear simple section at end of buffer is never included
+in the result.
+Narrowing has no effect on this function."
+  (let (overlays overlay-cursor)
+    (if (= beg end)
+	;; `overlays-in' seems not be correct with respect to this case
+	nil
+      ;; go to END since chances are good that the overlays come in correct
+      ;; order, then
+      (setq overlays (let ((old-point (point)))
+		       (goto-char end)
+		       (prog1 (overlays-in beg end)
+			 (goto-char old-point)))
+
+      ;; now, turn overlays that are not simple sections into nils
+	    overlays (mapcar (function
+			      (lambda (overlay)
+				(and (singular-emacs-simple-sec-type overlay)
+				     overlay)))
+			     overlays)
+      ;; then, remove nils from list
+	    overlays (delq nil overlays)
+      ;; now, we have to sort the list since documentation of `overlays-in'
+      ;; does not state anything about the order the overlays are returned in
+	    overlays
+	    (sort overlays
+		  (function
+		   (lambda (a b)
+		     (< (overlay-start a) (overlay-start b))))))
+
+      ;; at last, we have the list of non-clear simple sections.  Now, go and
+      ;; insert clear simple sections as necessary.
+      (if (null overlays)
+	  ;; if there are no non-clear simple sections at all there can be
+	  ;; only one large clear simple section
+	  '(nil)
+	;; we care about inside clear simple section first
+	(setq overlay-cursor overlays)
+	(while (cdr overlay-cursor)
+	  (if (eq (overlay-end (car overlay-cursor))
+		  (overlay-start (cadr overlay-cursor)))
+	      (setq overlay-cursor (cdr overlay-cursor))
+	    ;; insert nil
+	    (setcdr overlay-cursor
+		    (cons nil (cdr overlay-cursor)))
+	    (setq overlay-cursor (cddr overlay-cursor))))
+	;; now, check BEG and END for clear simple sections
+	(if (> (overlay-start (car overlays)) beg)
+	    (setq overlays (cons nil overlays)))
+	;; `overlay-cursor' still points to the end
+	(if (< (overlay-end (car overlay-cursor)) end)
+	    (setcdr overlay-cursor (cons nil nil)))
+	overlays))))
 ;;}}}
 
-;;{{{ Simple section stuff for XEmacs
+;;{{{ Simple section API for XEmacs
+(defsubst singular-xemacs-simple-sec-start (simple-sec)
+  "Return start of non-clear simple section SIMPLE-SEC.
+Narrowing has no effect on this function."
+  (extent-start-position simple-sec))
+
+(defsubst singular-xemacs-simple-sec-end (simple-sec)
+  "Return end of non-clear simple section SIMPLE-SEC.
+Narrowing has no effect on this function."
+  (extent-end-position simple-sec))
+
+(defsubst singular-xemacs-simple-sec-type (simple-sec)
+  "Return type of SIMPLE-SEC.
+Returns nil if SIMPLE-SEC happens to be an extent but not a simple
+section.
+Narrowing has no effect on this function."
+  (if simple-sec
+      (extent-property simple-sec 'singular-type)
+    singular-simple-sec-clear-type))
+
+(defsubst singular-xemacs-simple-sec-before (pos)
+  "Return simple section before buffer position POS.
+This is the same as `singular-simple-sec-at' except if POS falls on a
+section border.  In this case `singular-simple-section-before' returns the
+previous simple section instead of the current one.  If POS falls on
+beginning of buffer, the simple section at beginning of buffer is returned.
+Narrowing has no effect on this function."
+  (singular-xemacs-simple-sec-at (max 1 (1- pos))))
+
 (defun singular-xemacs-simple-sec-create (type end)
   "Create a new simple section of type TYPE.
-Creates the section from end of previous simple section up to END.
-END should be larger than `singular-simple-sec-last-end'.
-Returns the new simple section or `empty' if no simple section has
-been created.
-Assumes that no narrowing is in effect.
-Updates `singular-simple-sec-last-end'."
-  (let ((last-end (marker-position singular-simple-sec-last-end))
+Creates the section from end of previous simple section up to the first
+beginning of line before END.  That position should be larger than or equal
+to `singular-simple-sec-last-end'.  Updates `singular-simple-sec-last-end'.
+Returns the new simple section or `empty' if no simple section has been
+created.
+Assumes that no narrowing is in effect."
+  (let ((last-end (singular-simple-sec-last-end-position))
 	;; `simple-sec' is the new simple section or `empty'
 	simple-sec)
 
@@ -891,11 +1426,17 @@ Updates `singular-simple-sec-last-end'."
 
     (cond
      ;; do not create empty sections
-     ((eq end last-end) (setq simple-sec 'empty))
-     ;; create only non-clear simple sections
+     ((eq end last-end)
+      'empty)
+     ;; non-clear simple sections
      ((not (eq type singular-simple-sec-clear-type))
-      ;; if type has not changed we only have to extend the previous
-      ;; simple section
+      ;; if type has not changed we only have to extend the previous simple
+      ;; section.  If `last-end' happens to be 1 (meaning that we are
+      ;; creating the first non-clear simple section in the buffer), then
+      ;; `singular-simple-sec-before' returns nil,
+      ;; `singular-simple-sec-type' returns the type of clear simple
+      ;; sections that definitely does not equal TYPE, and a new simple
+      ;; section is created as necessary.
       (setq simple-sec (singular-xemacs-simple-sec-before last-end))
       (if (eq type (singular-xemacs-simple-sec-type simple-sec))
 	  ;; move existing extent
@@ -905,127 +1446,119 @@ Updates `singular-simple-sec-last-end'."
 	(setq simple-sec (make-extent last-end end))
 	;; set type property
 	(set-extent-property simple-sec 'singular-type type)
-	;; set face
-	(set-extent-property simple-sec 'face (singular-lookup-face type)))))
-	    
-    ;; update end of last simple section
-    (set-marker singular-simple-sec-last-end end)
-    simple-sec))
-
-(defun singular-xemacs-simple-sec-reset-last (pos)
-  "Reset end of last simple section to POS after accidental extension.
-Updates `singular-simple-sec-last-end', too."
-  (let ((simple-sec (singular-xemacs-simple-sec-at pos)))
-    (if simple-sec 
-	(set-extent-endpoints simple-sec (extent-start-position simple-sec) pos))
-    (set-marker singular-simple-sec-last-end pos)))
-
-(defun singular-xemacs-simple-sec-start (simple-sec)
-  "Return start of non-clear simple section SIMPLE-SEC."
-  (extent-start-position simple-sec))
-
-(defun singular-xemacs-simple-sec-end (simple-sec)
-  "Return end of non-clear simple section SIMPLE-SEC."
-  (extent-end-position simple-sec))
+	;; set face.  In contrast to Emacs, we do not need to set somethin
+	;; like `evaporate'.  `detachable' is set by XEmacs by default.
+	(set-extent-property simple-sec 'face (singular-simple-sec-lookup-face type)))
+      ;; update `singular-simple-sec-last-end' and return new simple
+      ;; section
+      (set-marker singular-simple-sec-last-end end)
+      simple-sec)
+     ;; clear simple sections
+     (t
+      ;; update `singular-simple-sec-last-end' and return nil
+      (set-marker singular-simple-sec-last-end end)
+      nil))))
 
 (defun singular-xemacs-simple-sec-start-at (pos)
-  "Return start of clear section at position POS.
-Assumes that no narrowing is in effect."
-  ;; if previous-extent-change is called with an argument bigger
-  ;; than (1+ (buffer-size))  (not (point-max)!), we get an error!
-  (let ((previous-extent-change (if (> pos (buffer-size))
-				    pos
-				  (1+ pos))))
-    ;; this `while' loop at last will run into the end of the next
-    ;; non-clear extent or stop at bob.  Since POS may be right at the end
-    ;; of a previous non-clear location, we have to search at least one
-    ;; time from POS+1 backwards.
-    (while (not (or (singular-xemacs-simple-sec-before previous-extent-change)
-		    (eq previous-extent-change (point-min))))
-      (setq previous-extent-change
-	    (previous-extent-change previous-extent-change)))
-    previous-extent-change))
+  "Return start of clear simple section at position POS.
+Assumes the existence of an imagenary empty clear simple section if POS is
+at end of buffer and there is non-clear simple section immediately ending
+at POS.
+Assumes that no narrowing is in effect (since `previous-extent-change'
+imlicitly does so)."
+  ;; get into some hairy details at end of buffer.  Look if there is a
+  ;; non-clear simple section immediately ending at end of buffer and
+  ;; return the start of the imagenary empty clear simple section in that
+  ;; case.  If buffer is empty this test fails since
+  ;; `singular-xemacs-simple-sec-before' (corretly) returns nil.  But in
+  ;; that case the following loop returns the correct result.
+  (if (and (eq pos (point-max))
+	   (singular-xemacs-simple-sec-before pos))
+      pos
+    (let ((previous-extent-change-pos (min (1+ pos) (point-max))))
+      ;; this `while' loop at last will run into the end of the next
+      ;; non-clear simple section or stop at bob.  Since POS may be right at
+      ;; the end of a previous non-clear location, we have to search at least
+      ;; one time from POS+1 backwards.
+      (while (not (or (singular-xemacs-simple-sec-before previous-extent-change-pos)
+		      (eq previous-extent-change-pos 1)))
+	(setq previous-extent-change-pos
+	      (previous-extent-change previous-extent-change-pos)))
+      previous-extent-change-pos)))
 
 (defun singular-xemacs-simple-sec-end-at (pos)
-  "Return end of clear section at position POS.
-Assumes that no narrowing is in effect."
-  (let ((next-extent-change (next-extent-change pos)))
+  "Return end of clear simple section at position POS.
+Assumes the existence of an imagenary empty clear simple section if POS is
+at end of buffer and there is non-clear simple section immediately ending
+at POS.
+Assumes that no narrowing is in effect (since `next-extent-change'
+imlicitly does so)."
+  (let ((next-extent-change-pos (next-extent-change pos)))
     ;; this `while' loop at last will run into the beginning of the next
-    ;; non-clear extent or stop at eob.  Since POS may not be at the
-    ;; beginning of a non-clear simple section we may start searching
+    ;; non-clear simple section or stop at eob.  Since POS may not be at
+    ;; the beginning of a non-clear simple section we may start searching
     ;; immediately.
-    (while (not (or (singular-xemacs-simple-sec-at next-extent-change)
-		    (eq next-extent-change (point-max))))
-      (setq next-extent-change
-	    (next-extent-change next-extent-change)))
-    next-extent-change))
-
-(defun singular-xemacs-simple-sec-type (simple-sec)
-  "Return type of SIMPLE-SEC."
-  (if simple-sec
-      (extent-property simple-sec 'singular-type)
-    singular-simple-sec-clear-type))
+    (while (not (or (singular-xemacs-simple-sec-at next-extent-change-pos)
+		    (eq next-extent-change-pos (point-max))))
+      (setq next-extent-change-pos
+	    (next-extent-change next-extent-change-pos)))
+    next-extent-change-pos))
 
 (defun singular-xemacs-simple-sec-at (pos)
-  "Return simple section at position POS."
+  "Return simple section at buffer position POS.
+Assumes the existence of an imagenary empty clear simple section if POS is
+at end of buffer and there is non-clear simple section immediately ending
+at POS.
+Narrowing has no effect on this function."
+  ;; at eob, `map-extent' always returns nil so everything is OK for this
+  ;; case, too.  Do not try to use `extent-at' at this point.  `extent-at'
+  ;; does not return extents outside narrowed text.
   (map-extents (function (lambda (ext args) ext))
-	       ;; is this pos-pos-region OK? I think so.
-	       (current-buffer) pos pos nil nil 'singular-type))
-
-(defun singular-xemacs-simple-sec-before (pos)
-  "Return simple section before position POS.
-This is the same as `singular-simple-section-at' except if POS falls
-on a section border.  In this case `singular-simple-section-before'
-returns the previous simple section instead of the current one."
-  (singular-xemacs-simple-sec-at (max 1 (1- pos))))
+	       nil pos pos nil nil 'singular-type))
 
 (defun singular-xemacs-simple-sec-in (beg end)
   "Return a list of all simple sections intersecting with the region from BEG to END.
-A simple section intersects the region if the section and the region
-have at least one character in common.
-The result contains both clear and non-clear simple sections in the
-order they appear in the region."
-  ;; NOT READY [order of sections???]
-  (let ((extent-list))
-    (map-extents 
-     (function (lambda (ext arg)
+A simple section intersects the region if the section and the region have
+at least one character in common.  The sections are returned with
+startpoints in increasing order and clear simple sections (that is, nil's)
+inserted as necessary.  BEG is assumed to be less than or equal to END.
+The imagenary empty clear simple section at end of buffer is never included
+in the result.
+Narrowing has no effect on this function."
+  (let (extents extent-cursor)
+    (if (= beg end)
+	;; `mapcar-extents' may return some extents in this case, so
+	;; exclude it
+	nil
+      ;; OK, that's a little bit easier than for Emacs ...
+      (setq extents (mapcar-extents 'identity nil nil beg end nil 'singular-type))
 
-		 ;; if start of first extent is not point-min, insert
-		 ;; a clear-simple-sec first:
-		 (or extent-list 
-		     (= (extent-start-position ext) (point-min))
-		     (setq extent-list (append (list nil) extent-list)))
-
-		 ;; if end of previous simple-sec is not equal start of
-		 ;; current simple-sec than we have to insert a
-		 ;; clear-simple-sec first:
-		 (and (car extent-list)
-		      (not (= (extent-end-position (car extent-list))
-			      (extent-start-position ext)))
-		      (setq extent-list (append (list nil) extent-list)))
-
-		 ;; finally insert this non-clear simple-sec:
-		 (setq extent-list (append (list ext) extent-list))
-		 nil))
-     (current-buffer) beg end nil nil 'singular-type)
-
-    ;; if extent-list is still nil at this point, then no non-clear
-    ;; simple-sec intersects with region (BEG END). 
-    ;; Then insert a clear simple-sec:
-    (or extent-list
-	(setq extent-list '(nil)))
-
-    ;; if last inserted simple-sec is non-clear and its end is smaller
-    ;; than END, then insert another clear simple sec:
-    (and (car extent-list)
-	 (<= (extent-end-position (car extent-list)) end)
-	 (setq extent-list (append (list nil) extent-list)))
-
-    ;; we set up the list in decreasing order, so reverse the list
-    (reverse extent-list)))
+      ;; now we have the list of non-clear simple sections.  Go and
+      ;; insert clear simple sections as necessary.
+      (if (null extents)
+	  ;; if there are no non-clear simple sections at all there can be
+	  ;; only one large clear simple section
+	  '(nil)
+	;; we care about inside clear simple section first
+	(setq extent-cursor extents)
+	(while (cdr extent-cursor)
+	  (if (eq (extent-end-position (car extent-cursor))
+		  (extent-start-position (cadr extent-cursor)))
+	      (setq extent-cursor (cdr extent-cursor))
+	    ;; insert nil
+	    (setcdr extent-cursor
+		    (cons nil (cdr extent-cursor)))
+	    (setq extent-cursor (cddr extent-cursor))))
+	;; now, check BEG and END for clear simple sections
+	(if (> (extent-start-position (car extents)) beg)
+	    (setq extents (cons nil extents)))
+	;; `extent-cursor' still points to the end
+	(if (< (extent-end-position (car extent-cursor)) end)
+	    (setcdr extent-cursor (cons nil nil)))
+	extents))))
 ;;}}}
 
-;;{{{ Section stuff
+;;{{{ Section API
 
 ;; Note:
 ;;
@@ -1038,11 +1571,114 @@ order they appear in the region."
 ;; - Sections are read-only objects, neither are they modified nor are they
 ;;   created.
 ;; - Buffer narrowing does not restrict the extent of completely or
-;;   partially inaccessible sections.  In contrast to simple sections
-;;   the functions concerning sections do not assume that there is no
-;;   narrowing in effect.
+;;   partially inaccessible sections.  In contrast to simple sections the
+;;   functions concerning sections do not assume that there is no narrowing
+;;   in effect.  However, most functions provide an optional argument
+;;   RESTRICTED that restricts the start and end point of the returned
+;;   sections to the currently active restrictions.  Of course, that does
+;;   not affect the range of the underlying simple sections, only the
+;;   additional start and end points being returned.  One should note that
+;;   by restricting sections one may get empty sections, that is, sections
+;;   for which the additional start and end point are equal.
 ;; - Sections are independent from implementation dependencies.  There are
 ;;   no different versions of the functions for Emacs and XEmacs.
+;; - Whenever possible, one should not access simple section directly.
+;;   Instead, one should use the section API.
+
+(defcustom singular-section-face-alist '((input . nil)
+					 (output . singular-section-output-face))
+  "*Alist that maps section types to faces.
+Should be a list consisting of elements (SECTION-TYPE . FACE-OR-NIL), where
+SECTION-TYPE is either `input' or `output'.
+
+At any time, the Singular interactive mode buffer is completely covered by
+sections of two different types: input sections and output sections.  This
+variable determines which faces are used to display the different sections.
+
+If for type SECTION-TYPE the value FACE-OR-NIL is a face it is used to
+display the contents of all sections of that particular type.
+If instead FACE-OR-NIL equals nil sections of that type become so-called
+clear sections.  The content of clear sections is displayed as regular
+text, with no faces at all attached to them.
+
+Some notes and restrictions on this variable (believe them or not):
+o Changing this variable during a Singular session may cause unexpected
+  results (but not too serious ones, though).
+o There may be only one clear section type defined at a time.
+o Choosing clear input sections is a good idea.
+o Choosing clear output sections is a bad idea.
+o Consequence: Not to change this variable is a good idea."
+  ;; to add new section types, simply extend the `list' widget.
+  ;; The rest should work unchanged.  Do not forget to update docu.
+  :type '(list (cons :tag "Input sections"
+		     (const :format "" input)
+		     (choice :format
+"Choose either clear or non-clear input sections.  For non-clear sections,
+select or modify a face (preferably `singular-section-input-face') used to
+display the sections.
+%[Choice%]
+%v
+"
+			     (const :tag "Clear sections" nil)
+			     (face :tag "Non-clear sections")))
+	       (cons :tag "Output sections"
+		     (const :format "" output)
+		     (choice :format
+"Choose either clear or non-clear ouput sections.  For non-clear sections,
+select or modify a face (preferably `singular-section-output-face') used to
+display the sections.
+%[Choice%]
+%v
+"
+			     (const :tag "Clear sections" nil)
+			     (face :tag "Non-clear sections"))))
+  :initialize 'custom-initialize-reset
+  ;; this function checks for validity (only one clear section
+  ;; type) and sets `singular-simple-sec-clear-type' accordingly.
+  ;; In case of an error, nothing is set or modified.
+  :set (function (lambda (var value)
+		   (let* ((cdrs-with-nils (mapcar 'cdr value))
+			  (cdrs-without-nils (delq nil (copy-sequence cdrs-with-nils))))
+		     (if (> (- (length cdrs-with-nils) (length cdrs-without-nils)) 1)
+			 (error "Only one clear section type allowed (see `singular-section-face-alist')")
+		       (set-default var value)
+		       (setq singular-simple-sec-clear-type (car (rassq nil value)))))))
+  :group 'singular-faces
+  :group 'singular-sections-and-foldings)
+
+(defface singular-section-input-face '((t nil))
+  "*Face to use for input sections.
+It may be not sufficient to modify this face to change the appearance of
+input sections.  See `singular-section-face-alist' for more information."
+  :group 'singular-faces
+  :group 'singular-sections-and-foldings)
+
+(defface singular-section-output-face '((t (:bold t)))
+  "*Face to use for output sections.
+It may be not sufficient to modify this face to change the appearance of
+output sections.  See `singular-section-face-alist' for more information."
+  :group 'singular-faces
+  :group 'singular-sections-and-foldings)
+
+(defsubst singular-section-create (simple-sec type start end)
+  "Create and return a new section."
+  (vector simple-sec type start end))
+
+(defsubst singular-section-simple-sec (section)
+  "Return underlying simple section of SECTION."
+  (aref section 0))
+
+(defsubst singular-section-type (section)
+  "Return type of SECTION."
+  (aref section 1))
+
+(defsubst singular-section-start (section)
+  "Return start of SECTION."
+  (aref section 2))
+
+(defsubst singular-section-end (section)
+  "Return end of SECTION."
+  (aref section 3))
 
 (defun singular-section-at (pos &optional restricted)
   "Return section at position POS.
@@ -1058,264 +1694,712 @@ non-nil."
 	(widen)
 	(setq start (singular-simple-sec-start-at pos)
 	      end (singular-simple-sec-end-at pos))))
-    (if restricted
-	(vector simple-sec type
-		(max start (point-min)) (min end (point-max)))
-      (vector simple-sec type start end))))
+    (cond
+     ;; not restricted first
+     ((not restricted)
+      (singular-section-create simple-sec type start end))
+     ;; restricted and degenerated
+     ((and restricted
+	   (< end (point-min)))
+      (singular-section-create simple-sec type (point-min) (point-min)))
+     ;; restricted and degenerated
+     ((and restricted
+	   (> start (point-max)))
+      (singular-section-create simple-sec type (point-max) (point-max)))
+     ;; restricted but not degenrated
+     (t
+      (singular-section-create simple-sec type
+			       (max start (point-min))
+			       (min end (point-max)))))))
 
 (defun singular-section-before (pos &optional restricted)
   "Return section before position POS.
-This is the same as `singular-section-at' except if POS falls on a
-section border.  In this case `singular-section-before' returns the
-previous section instead of the current one.
+This is the same as `singular-section-at' except if POS falls on a section
+border.  In this case `singular-section-before' returns the previous
+section instead of the current one.  If POS falls on beginning of buffer,
+the section at beginning of buffer is returned.
 Returns section intersected with current restriction if RESTRICTED is
 non-nil."
   (singular-section-at (max 1 (1- pos)) restricted))
 
-(defun singular-section-in (reg-beg reg-end)
-  "NOT READY [docu]"
-  (let ((simple-secs (singular-simple-sec-in reg-beg reg-end))
-	sections current last-end 
-	type beg end)
-    (save-restriction
-      (widen)
-      (while simple-secs
-	(setq current (car simple-secs))
-	(setq type (singular-simple-sec-type current))
-	(if current
-	    ;; current is a non-clear simple-sec
-	    (setq beg (singular-simple-sec-start current)
-		  end (singular-simple-sec-end current)
-		  last-end end)
-	  ;; current is a clear simple-sec
-	  (setq beg (singular-simple-sec-start-at (or last-end
-							(point-min)))
-		end (singular-simple-sec-end-at (or last-end
-						    (point-min)))))
-        ;; NOT READY [RESTRICTED]
-	(setq sections (append sections (list (vector current type beg end))))
-	(setq simple-secs (cdr simple-secs))))
-    sections))
+(defun singular-section-in (beg end &optional restricted)
+  "Return a list of all sections intersecting with the region from BEG to END.
+A section intersects with the region if the section and the region have at
+least one character in common.  The sections are returned in increasing
+order.
+If optional argument RESTRICTED is non-nil only sections which are
+completely in the intersection of the region and the current restriction
+are returned."
+  ;; exchange BEG and END if necessary as a special service to our users
+  (let* ((reg-beg (min beg end))
+	 (reg-end (max beg end))
+	 ;; we need these since we widen the buffer later on
+	 (point-min (point-min))
+	 (point-max (point-max))
+	 simple-sections)
+    (if (and restricted
+	     (or (> reg-beg point-max) (< reg-end point-min)))
+	;; degenerate restrictions
+	nil
+      ;; do the intersection if necessary and get simple sections
+      (setq reg-beg (if restricted (max reg-beg point-min) reg-beg)
+	    reg-end (if restricted (min reg-end point-max) reg-end)
+	    simple-sections (singular-simple-sec-in reg-beg reg-end))
+      ;; we still have REG-BEG <= REG-END in any case.  SIMPLE-SECTIONS
+      ;; contains the list of simple sections intersecting with the region
+      ;; from REG-BEG and REG-END.
 
-(defmacro singular-section-simple-sec (section)
-  "Return underlying simple section of SECTION."
-  `(aref ,section 0))
+      (if (null simple-sections)
+	  nil
+	;; and here we even have REG-BEG < REG-END
+	(save-restriction
+	  (widen)
+	  ;; get sections intersecting with the region from REG-BEG to
+	  ;; REG-END
+	  (let* ((sections (singular-section-in-internal simple-sections
+							 reg-beg reg-end))
+		 first-section-start last-section-end)
+	    (if (not restricted)
+		sections
+	      (setq first-section-start (singular-section-start (car sections))
+		    last-section-end (singular-section-end (car (last sections))))
+	      ;; popping off first element is easy ...
+	      (if (< first-section-start point-min)
+		  (setq sections (cdr sections)))
+	      ;; ... but last element is harder to pop off
+	      (cond
+	       (;; no elements left
+		(null sections)
+		nil)
+	       (;; one element left
+		(null (cdr sections))
+		(if (> last-section-end point-max)
+		    nil
+		  sections))
+	       (;; more than one element left
+		t
+		(if (> last-section-end point-max)
+		    (setcdr (last sections 2) nil))
+		sections)))))))))
 
-(defmacro singular-section-type (section)
-  "Return type of SECTION."
-  `(aref ,section 1))
+(defun singular-section-in-internal (simple-sections reg-beg reg-end)
+  "Create a list of sections from SIMPLE-SECTIONS.
+This is the back-end for `singular-section-in'.
+First simple section should be such that it contains REG-BEG, last simple
+section should be such that it contains or ends at REG-END.  These
+arguments are used to find the start resp. end of clear simple sections of
+terminal clear simple sections in SIMPLE-SECTIONS.
+Assumes that REG-BEG < REG-END.
+Assumes that SIMPLE-SECTIONS is not empty.
+Assumes that no narrowing is in effect."
+  (let* (;; we pop off the extra nil at the end of the loop
+	 (sections (cons nil nil))
+	 (sections-end sections)
+	 (simple-section (car simple-sections))
+	 type start end)
 
-(defmacro singular-section-start (section)
-  "Return start of SECTION."
-  `(aref ,section 2))
+    ;; first, get unrestricted start
+    (setq start (if simple-section
+		    (singular-simple-sec-start simple-section)
+		  ;; here we need that no narrowing is in effect
+		  (singular-simple-sec-start-at reg-beg)))
 
-(defmacro singular-section-end (section)
-  "Return end of SECTION."
-  `(aref ,section 3))
+    ;; loop through all simple sections but last
+    (while (cdr simple-sections)
+      (setq simple-section (car simple-sections)
+	    type (singular-simple-sec-type simple-section)
+	    end (if simple-section
+		    (singular-simple-sec-end simple-section)
+		  (singular-simple-sec-start (cadr simple-sections)))
+
+	    ;; append the new section to `sections-end'
+	    sections-end
+	    (setcdr sections-end
+		    (cons (singular-section-create simple-section type start end) nil))
+
+	    ;; get next simple section and its start
+	    simple-sections (cdr simple-sections)
+	    start end))
+
+    ;; care about last simple section
+    (setq simple-section (car simple-sections)
+	  type (singular-simple-sec-type simple-section)
+	  end (if simple-section
+		  (singular-simple-sec-end simple-section)
+		;; the `1-' is OK since REG-BEG < REG-END.
+		;; here we need that no narrowing is in effect
+		(singular-simple-sec-end-at (1- reg-end))))
+    (setcdr sections-end
+	    (cons (singular-section-create simple-section type start end) nil))
+
+    ;; we should not forget to pop off our auxilliary cons-cell
+    (cdr sections)))
+
+(defun singular-section-mapsection (func sections &optional type-filter negate-filter)
+  "Apply FUNC to each section in SECTIONS, and make a list of the results.
+If optional argument TYPE-FILTER is non-nil it should be a list of section
+types.  FUNC is then applied only to those sections with type occuring in
+TYPE-FILTER.  If in addition optional argument NEGATE-FILTER is non-nil
+FUNC is applied only to those sections with type not occuring in
+TYPE-FILTER.
+
+In any case the length of the list this function returns equals the
+number of sections actually processed."
+  (if (not type-filter)
+      (mapcar func sections)
+    ;; copy the list first
+    (let ((sections (copy-sequence sections)))
+      ;; filter elements and turn them to t's
+      (setq sections
+	    (mapcar (function
+		     (lambda (section)
+		       ;; that strange expression evaluates to t iff the
+		       ;; section should be removed.  The `not' is to
+		       ;; canonize boolean values to t or nil, resp.
+		       (or (eq (not (memq (singular-section-type section) type-filter))
+			       (not negate-filter))
+			   section)))
+		    sections)
+
+      ;; remove t's now
+	    sections (delq t sections))
+
+      ;; call function for remaining sections
+      (mapcar func sections))))
 ;;}}}
 
-;;{{{ Getting section contents
+;;{{{ Section miscellaneous
 (defun singular-input-section-to-string (section &optional end raw)
-  "Get content of SECTION as string.
-Returns text between start of SECTION and END if optional argument END
-is non-nil.  END should be a position inside SECTION.
+  "Get content of input section SECTION as string.
+Returns text between start of SECTION and END if optional argument END is
+non-nil, otherwise text between start and end of SECTION.  END should be a
+position inside SECTION.
 Strips leading prompts and trailing white space unless optional argument
 RAW is non-nil."
   (save-restriction
     (widen)
-    (let ((string (if end
-		      (buffer-substring (singular-section-start section) end)
-		    (buffer-substring (singular-section-start section)
-				      (singular-section-end section)))))
-      (if raw string
-	(singular-strip-leading-prompt
-	 (singular-strip-white-space string t))))))
+    (let ((string (buffer-substring (singular-section-start section)
+				    (or end (singular-section-end section)))))
+      (if raw
+	  string
+	(singular-strip-leading-prompt (singular-strip-white-space string t))))))
 ;;}}}
 
-;;{{{ Last input and output section
-(defun singular-last-input-section (&optional no-error)
-  "Return last input section.
-Returns nil if optional argument NO-ERROR is non-nil and there is no
-last input section defined, throws an error otherwise."
-  (let ((last-input-start (marker-position singular-last-input-section-start))
-	(last-input-end (marker-position singular-current-output-section-start)))
-    (cond ((and last-input-start last-input-end)
-	   (vector (singular-simple-sec-at last-input-start) 'input
-		   last-input-start last-input-end))
-	  (no-error nil)
-	  (t (error "No last input section defined")))))
+;;{{{ Section miscellaneous interactive
+(defun singular-section-goto-beginning ()
+  "Move point to beginning of current section."
+  (interactive)
+  (goto-char (singular-section-start (singular-section-at (point))))
+  (singular-keep-region-active))
 
-(defun singular-current-output-section (&optional no-error)
-  "Return current output section.
-Returns nil if optional argument NO-ERROR is non-nil and there is no
-current output section defined, throws an error otherwise."
-  (let ((current-output-start (marker-position singular-current-output-section-start))
-	(current-output-end (save-excursion
-			      (goto-char (singular-process-mark))
-			      (singular-skip-prompt-backward)
-			      (and (bolp) (point)))))
-    (cond ((and current-output-start current-output-end)
-	   (vector (singular-simple-sec-at current-output-start) 'output
-		   current-output-start current-output-end))
-	  (no-error nil)
-	  (t (error "No current output section defined")))))
+(defun singular-section-goto-end ()
+  "Move point to end of current section."
+  (interactive)
+  (goto-char (singular-section-end (singular-section-at (point))))
+  (singular-keep-region-active))
 
-(defun singular-last-output-section (&optional no-error)
-  "Return last output section.
-Returns nil if optional argument NO-ERROR is non-nil and there is no
-last output section defined, throws an error otherwise."
-  (let ((last-output-start (marker-position singular-last-output-section-start))
-	(last-output-end (marker-position singular-last-input-section-start)))
-    (cond ((and last-output-start last-output-end)
-	   (vector (singular-simple-sec-at last-output-start) 'output
-		   last-output-start last-output-end))
-	  (no-error nil)
-	  (t (error "No last output section defined")))))
+(defun singular-section-backward (n)
+  "Move backward until encountering the beginning of a section.
+With argument, do this that many times.  With N less than zero, call
+`singular-section-forward' with argument -N."
+  (interactive "p")
+  (while (> n 0)
+    (goto-char (singular-section-start (singular-section-before (point))))
+    (setq n (1- n)))
+  (if (< n 0)
+      (singular-section-forward (- n))
+    (singular-keep-region-active)))
 
-(defun singular-latest-output-section (&optional no-error)
-  "Return latest output section.
-This is the current output section if it is defined, otherwise the
-last output section.
-Returns nil if optional argument NO-ERROR is non-nil and there is no
-latest output section defined, throws an error otherwise."
-  (or (singular-current-output-section t)
-      (singular-last-output-section t)
-      (if no-error
-	  nil
-	(error "No latest output section defined"))))
+(defun singular-section-forward (n)
+  "Move forward until encountering the end of a section.
+With argument, do this that many times.  With N less than zero, call
+`singular-section-backward' with argument -N."
+  (interactive "p")
+  (while (> n 0)
+    (goto-char (singular-section-end (singular-section-at (point))))
+    (setq n (1- n)))
+  (if (< n 0)
+      (singular-section-backward (- n))
+    (singular-keep-region-active)))
 ;;}}}
 
-;;{{{ Folding sections
-(defvar singular-folding-ellipsis "Singular I/O ..."
-  "Ellipsis to show for folded input or output.")
+;;{{{ Folding sections for both Emacs and XEmacs
+(defcustom singular-folding-ellipsis "Singular I/O ..."
+  "*Ellipsis to show for folded input or output.
+Changing this variable has an immediate effect only if one uses
+\\[customize] to do so.
+However, even then it may be necessary to refresh display completely (using
+\\[recenter], for example) for the new settings to be visible."
+  :type 'string
+  :initialize 'custom-initialize-default
+  :set (function
+	(lambda (var value)
+	  ;; set in all singular buffers
+	  (singular-map-buffer 'singular-folding-set-ellipsis value)
+	  (set-default var value)))
+  :group 'singular-sections-and-foldings)
 
-(defun singular-fold-internal (start end fold)
-  "(Un)fold region from START to END.
-Folds if FOLD is non-nil, otherwise unfolds.
-Folding affects undo information and buffer modified flag.
-Assumes that there is no narrowing in effect."
-  (save-excursion
-    (if fold
-	(progn
-	  (goto-char start) (insert ?\r)
-	  (subst-char-in-region start end ?\n ?\r t))
-      (subst-char-in-region start end ?\r ?\n t)
-      (goto-char start) (delete-char 1))))
+(defcustom singular-folding-line-move-ignore-folding t
+  "*If non-nil, ignore folded sections when moving point up or down.
+This variable is used to initialize `line-move-ignore-invisible'.  However,
+documentation states that setting `line-move-ignore-invisible' to a non-nil
+value may result in a slow-down when moving the point up or down.  One
+should try to set this variable to nil if point motion seems too slow.
 
-(defun singular-section-foldedp (section)
-  "Return t iff SECTION is folded.
-Assumes that there is no narrowing in effect."
-  (eq (char-after (singular-section-start section)) ?\r))
+Changing this variable has an immediate effect only if one uses
+\\[customize] to do so."
+  :type 'boolean
+  :initialize 'custom-initialize-default
+  :set (function
+	(lambda (var value)
+	  ;; set in all singular buffers
+	  (singular-map-buffer 'set 'line-move-ignore-invisible value)
+	  (set-default var value)))
+  :group 'singular-sections-and-foldings)
 
-(defun singular-fold-section (section)
-  "\(Un)fold SECTION.
-\(Un)folds section at point and goes to beginning of section if called
-interactively.
-Unfolds folded sections and folds unfolded sections."
-  (interactive (list (singular-section-at (point))))
-  (let ((start (singular-section-start section))
-	;; we have to save restrictions this way since we change text
-	;; outside the restriction.  Note that we do not use a marker for
-	;; `old-point-min'.  This way, even partial narrowed sections are
-	;; folded properly if they have been narrowed at bol.  Nice but
-	;; dirty trick: The insertion of a `?\r' at beginning of section
-	;; advances the beginning of the restriction such that it displays
-	;; the `?\r' immediately before bol.  Seems worth it.
-	(old-point-min (point-min))
-	(old-point-max (point-max-marker)))
-    (unwind-protect
-	(progn
-	  (widen)
-	  (singular-fold-internal start (singular-section-end section)
-				  (not (singular-section-foldedp section))))
-      ;; this is unwide-protected
-      (narrow-to-region old-point-min old-point-max)
-      (set-marker old-point-max nil))
-    (if (interactive-p) (goto-char (max start (point-min))))))
+(defun singular-folding-set-ellipsis (ellipsis)
+  "Set ellipsis to show for folded input or output in current buffer."
+  (cond
+   ;; Emacs
+   ((eq singular-emacs-flavor 'emacs)
+    (setq buffer-display-table (or (copy-sequence standard-display-table)
+				   (make-display-table)))
+    (set-display-table-slot buffer-display-table
+			    'selective-display (vconcat ellipsis)))
+   ;; XEmacs
+   (t
+    (set-glyph-image invisible-text-glyph ellipsis (current-buffer)))))
 
-(defun singular-do-folding (where &optional unfold)
-  "Fold or unfold certain sections.
-WHERE may be 'last, 'all, or 'at-point. If WHERE equals 'last or 
-'all, only output sections are affected. If WHERE equals 'at-point,
-the section at point is affected (input or output).
-If optional argument UNFOLD is non-nil, then unfold section instead
-of folding it."
-  (let (which)
-    (cond 
-     ((eq where 'last)
-      (setq which (list (singular-latest-output-section t))))
+(defun singular-folding-init ()
+  "Initializes folding of sections for the current buffer.
+That includes setting `buffer-invisibility-spec' and the ellipsis to show
+for hidden text.
 
-     ((eq where 'at-point)
-      (setq which (list (singular-section-at (point)))))
+This function is called at mode initialization time."
+  ;; initialize `buffer-invisibility-spec' first
+  (let ((singular-invisibility-spec (cons 'singular-interactive-mode t)))
+    (if (and (listp buffer-invisibility-spec)
+	     (not (member singular-invisibility-spec buffer-invisibility-spec)))
+	(setq buffer-invisibility-spec
+	      (cons singular-invisibility-spec buffer-invisibility-spec))
+      (setq buffer-invisibility-spec (list singular-invisibility-spec))))
+  ;; ignore invisible lines on movements
+  (set (make-local-variable 'line-move-ignore-invisible)
+       singular-folding-line-move-ignore-folding)
+  ;; now for the ellipsis
+  (singular-folding-set-ellipsis singular-folding-ellipsis))
 
-     ((eq where 'all)
-      (setq which (singular-section-in (point-min) (point-max)))
+(defun singular-folding-fold (section &optional no-error)
+  "Fold section SECTION if it is not already folded.
+Does not fold sections that do not end in a newline or that are restricted
+either in part or as a whole.  Rather fails with an error in such cases
+or silently fails if optional argument NO-ERROR is non-nil.
+This is for safety only: In both cases the result may be confusing to the
+user."
+  (let* ((start (singular-section-start section))
+	 (end (singular-section-end section)))
+    (cond ((or (< start (point-min))
+	       (> end (point-max)))
+	   (unless no-error
+	     (error "Folding not possible: section is restricted in part or as a whole")))
+	  ((not (eq (char-before end) ?\n))
+	   (unless no-error
+	     (error "Folding not possible: section does not end in newline")))
+	  ((not (singular-folding-foldedp section))
+	   ;; fold but only if not already folded
+	   (singular-folding-fold-internal section)))))
 
-      ;; just use the output sections:
-      (let (newwhich)
-	(while which
-	  (if (eq (singular-section-type (car which)) 'output)
-	      (setq newwhich (append (list (car which)) newwhich)))
-	  (setq which (cdr which)))
-	(setq which newwhich)))
+(defun singular-folding-unfold (section &optional no-error invisibility-overlay-or-extent)
+  "Unfold section SECTION if it is not already unfolded.
+Does not unfold sections that are restricted either in part or as a whole.
+Rather fails with an error in such cases or silently fails if optional
+argument NO-ERROR is non-nil.  This is for safety only: The result may be
+confusing to the user.
+If optional argument INVISIBILITY-OVERLAY-OR_EXTENT is non-nil it should be
+the invisibility overlay or extent, respectively, of the section to
+unfold."
+  (let* ((start (singular-section-start section))
+	 (end (singular-section-end section)))
+    (cond ((or (< start (point-min))
+	       (> end (point-max)))
+	   (unless no-error
+	     (error "Unfolding not possible: section is restricted in part or as a whole")))
+	  ((or invisibility-overlay-or-extent
+	       (setq invisibility-overlay-or-extent (singular-folding-foldedp section)))
+	   ;; unfold but only if not already unfolded
+	   (singular-folding-unfold-internal section invisibility-overlay-or-extent)))))
 
-     (t 
-      (singular-debug 'interactive
-		      (message "singular-do-folding: wrong argument"))))
-    (while which
-      (let* ((current (car which))
-	    (is-folded (singular-section-foldedp current)))
-	(and (if unfold is-folded (not is-folded))
-	     (singular-fold-section current)))
-      (setq which (cdr which))))
-  ;; NOT READY: HACK: recenter (because of error in subst-char-in-region!?!)
-  (recenter))
-
-(defun singular-fold-last-output ()
-  "Fold last output section.
-If it is already folded, do nothing."
+(defun singular-folding-fold-at-point ()
+  "Fold section point currently is in.
+Does not fold sections that do not end in a newline or that are restricted
+either in part or as a whole.  Rather fails with an error in such cases."
   (interactive)
-  (singular-do-folding 'last))
+  (singular-folding-fold (singular-section-at (point))))
 
-(defun singular-fold-all-output ()
-  "Fold all output sections."
-  (interactive) 
-  (singular-do-folding 'all))
-
-(defun singular-fold-at-point
-  "Fold section at point (input or output section).
-If it is already folded, do nothing."
-  (interactive) 
-  (singular-do-folding 'at-point))
-
-(defun singular-unfold-last-output ()
-  "Unfold last output section.
-If it is already unfolded, do nothing."
+(defun singular-folding-unfold-at-point ()
+  "Unfold section point currently is in.
+Does not unfold sections that are restricted either in part or as a whole.
+Rather fails with an error in such cases."
   (interactive)
-  (singular-do-folding 'last 'unfold))
+  (singular-folding-unfold (singular-section-at (point))))
 
-(defun singular-unfold-all-output ()
-  "Unfold all output section."
+(defun singular-folding-fold-latest-output ()
+  "Fold latest output section.
+Does not fold sections that do not end in a newline or that are restricted
+either in part or as a whole.  Rather fails with an error in such cases."
   (interactive)
-  (singular-do-folding 'all 'unfold))
+  (singular-folding-fold (singular-latest-output-section)))
 
-(defun singular-unfold-at-point ()
-  "Unfold section at point (input or output section).
-If it is already unfolded, do nothing."
+(defun singular-folding-unfold-latest-output ()
+  "Unfolds latest output section.
+Does not unfold sections that are restricted either in part or as a whole.
+Rather fails with an error in such cases."
   (interactive)
-  (singular-do-folding 'at-point 'unfold))
+  (singular-folding-unfold (singular-latest-output-section)))
+
+(defun singular-folding-fold-all-output ()
+  "Fold all complete, unfolded output sections.
+That is, all output sections that are not restricted in part or as a whole
+and that end in a newline."
+  (interactive)
+  (singular-section-mapsection (function (lambda (section) (singular-folding-fold section t)))
+			       (singular-section-in (point-min) (point-max) t)
+			       '(output)))
+
+(defun singular-folding-unfold-all-output ()
+  "Unfold all complete, folded output sections.
+That is, all output sections that are not restricted in part or as a whole."
+  (interactive)
+  (singular-section-mapsection (function (lambda (section) (singular-folding-unfold section t)))
+			       (singular-section-in (point-min) (point-max) t)
+			       '(output)))
+
+(defun singular-folding-toggle-fold-at-point-or-all (&optional arg)
+  "Fold or unfold section point currently is in or all output sections.
+Without prefix argument, folds unfolded sections and unfolds folded
+sections.  With prefix argument, folds all output sections if argument is
+positive, otherwise unfolds all output sections.
+Does neither fold nor unfold sections that do not end in a newline or that
+are restricted either in part or as a whole.  Rather fails with an error in
+such cases."
+  (interactive "P")
+    (cond ((not arg)
+	   ;; fold or unfold section at point
+	   (let* ((section (singular-section-at (point)))
+		  (invisibility-overlay-or-extent (singular-folding-foldedp section)))
+	     (if invisibility-overlay-or-extent
+		 (singular-folding-unfold section nil invisibility-overlay-or-extent)
+	       (singular-folding-fold section))))
+	  ((> (prefix-numeric-value arg) 0)
+	   (singular-folding-fold-all-output))
+	  (t
+	   (singular-folding-unfold-all-output))))
+
+(defun singular-folding-toggle-fold-latest-output (&optional arg)
+  "Fold or unfold latest output section.
+Folds unfolded sections and unfolds folded sections.
+Does neither fold nor unfold sections that do not end in a newline or that
+are restricted either in part or as a whole.  Rather fails with an error in
+such cases."
+  (interactive)
+  (let* ((section (singular-latest-output-section))
+	 (invisibility-overlay-or-extent (singular-folding-foldedp section)))
+    (if invisibility-overlay-or-extent
+	(singular-folding-unfold section nil invisibility-overlay-or-extent)
+      (singular-folding-fold section))))
+
+;; Note:
+;;
+;; The rest of the folding is either marked as
+;; Emacs
+;; or
+;; XEmacs
+
+(singular-fset 'singular-folding-fold-internal
+	       'singular-emacs-folding-fold-internal
+	       'singular-xemacs-folding-fold-internal)
+
+(singular-fset 'singular-folding-unfold-internal
+	       'singular-emacs-folding-unfold-internal
+	       'singular-xemacs-folding-unfold-internal)
+
+(singular-fset 'singular-folding-foldedp
+	       'singular-emacs-folding-foldedp-internal
+	       'singular-xemacs-folding-foldedp-internal)
 ;;}}}
 
-;;{{{ Input and output filters
+;;{{{ Folding sections for Emacs
 
-;; debugging filters
+;; Note:
+;;
+;; For Emacs, we use overlays to hide text (so-called "invisibility
+;; overlays").  In addition to their `invisible' property, they have the
+;; `singular-invisible' property set.  Setting the intangible property does
+;; not work very well for Emacs.  We use the variable
+;; `line-move-ignore-invisible' which works quite well.
+
+(defun singular-emacs-folding-fold-internal (section)
+  "Fold section SECTION.
+SECTION should end in a newline.  That terminal newline is not
+folded or otherwise ellipsis does not appear.
+SECTION should be unfolded."
+  (let* ((start (singular-section-start section))
+	 ;; do not make trailing newline invisible
+	 (end (1- (singular-section-end section)))
+	 invisibility-overlay)
+    ;; create new overlay and add properties
+    (setq invisibility-overlay (make-overlay start end))
+    ;; mark them as invisibility overlays
+    (overlay-put invisibility-overlay 'singular-invisible t)
+    ;; set invisible properties
+    (overlay-put invisibility-overlay 'invisible 'singular-interactive-mode)
+    ;; evaporate empty invisibility overlays
+    (overlay-put invisibility-overlay 'evaporate t)))
+
+(defun singular-emacs-folding-unfold-internal (section &optional invisibility-overlay)
+  "Unfold section SECTION.
+SECTION should be folded.
+If optional argument INVISIBILITY-OVERLAY is non-nil it should be the
+invisibility overlay of the section to unfold."
+  (let ((invisibility-overlay
+	 (or invisibility-overlay
+	     (singular-emacs-folding-foldedp-internal section))))
+    ;; to keep number of overlays low we delete it
+    (delete-overlay invisibility-overlay)))
+
+(defun singular-emacs-folding-foldedp-internal (section)
+  "Returns non-nil iff SECTION is folded.
+More specifically, returns the invisibility overlay if there is one.
+Narrowing has no effect on this function."
+  (let* ((start (singular-section-start section))
+	 (overlays (overlays-at start))
+	 invisibility-overlay)
+    ;; check for invisibility overlay
+    (while (and overlays (not invisibility-overlay))
+      (if (overlay-get (car overlays) 'singular-invisible)
+	  (setq invisibility-overlay (car overlays))
+	(setq overlays (cdr overlays))))
+    invisibility-overlay))
+;;}}}
+
+;;{{{ Folding sections for XEmacs
+
+;; Note:
+;;
+;; For XEmacs, we use extents to hide text (so-called "invisibility
+;; extents").  In addition to their `invisible' property, they have the
+;; `singular-invisible' property set.  To ignore invisible text we use the
+;; variable `line-move-ignore-invisible' which works quite well.
+
+(defun singular-xemacs-folding-fold-internal (section)
+  "Fold section SECTION.
+SECTION should end in a newline.  That terminal newline is not
+folded or otherwise ellipsis does not appear.
+SECTION should be unfolded."
+  (let* ((start (singular-section-start section))
+	 ;; do not make trailing newline invisible
+	 (end (1- (singular-section-end section)))
+	 invisibility-extent)
+    ;; create new extent and add properties
+    (setq invisibility-extent (make-extent start end))
+    ;; mark them as invisibility extents
+    (set-extent-property invisibility-extent 'singular-invisible t)
+    ;; set invisible properties
+    (set-extent-property invisibility-extent 'invisible 'singular-interactive-mode)))
+
+(defun singular-xemacs-folding-unfold-internal (section &optional invisibility-extent)
+  "Unfold section SECTION.
+SECTION should be folded.
+If optional argument INVISIBILITY-EXTENT is non-nil it should be the
+invisibility extent of the section to unfold."
+  (let ((invisibility-extent
+	 (or invisibility-extent
+	     (singular-xemacs-folding-foldedp-internal section))))
+    ;; to keep number of extents low we delete it
+    (delete-extent invisibility-extent)))
+
+(defun singular-xemacs-folding-foldedp-internal (section)
+  "Returns non-nil iff SECTION is folded.
+More specifically, returns the invisibility extent if there is one.
+Narrowing has no effect on this function."
+  ;; do not try to use `extent-at' at this point.  `extent-at' does not
+  ;; return extents outside narrowed text.
+  (let* ((start (singular-section-start section))
+	 (invisibility-extent (map-extents
+			    (function (lambda (ext args) ext))
+			    nil start start nil nil 'singular-invisible)))
+    invisibility-extent))
+;;}}}
+
+;;{{{ Online help
+
+;; Note:
+;;
+;; Catching user's help commands to Singular and translating them to calls
+;; to `info' is quite a difficult task due to the asynchronous
+;; communication with Singular.  We use an heuristic approach which should
+;; work in most cases:
+
+(require 'info)
+
+(defcustom singular-help-same-window 'default
+  "Specifies how to open the window for Singular online help.
+If this variable equals `default', the standard Emacs behaviour to open the
+Info buffer is adopted (which very much depends on the settings of
+`same-window-buffer-names').
+If this variable is non-nil, Singular online help comes up in the selected
+window.
+If this variable equals nil, Singular online help comes up in another
+window."
+  :initialize 'custom-initialize-default
+  :type '(choice (const :tag "This window" t)
+		 (const :tag "Other window" nil)
+		 (const :tag "Default" default))
+  :group 'singular-interactive-miscellaneous)
+
+(defcustom singular-help-explicit-file-name nil
+  "Specifies the file name of the Singular online manual.
+If non-nil, this variable overrides all other possible ways to determine
+the file name of the Singular online manual.
+For more information one should refer to the `singular-help' function."
+  :initialize 'custom-initialize-default
+  :type 'file
+  :group 'singular-interactive-miscellaneous)
+
+(defvar singular-help-time-stamp 0
+  "A time stamp set by `singular-help-pre-input-hook'.
+This time stamp is set to `(current-time)' when the user issues a help
+command.  To be true, not the whole time stamp is stored, only the less
+significant half.
+
+This variable is buffer-local.")
+
+(defvar singular-help-response-pending nil
+  "If non-nil, Singulars response has not been completely received.
+
+This variable is buffer-local.")
+
+(defvar singular-help-topic nil
+  "If non-nil, contains help topic to dhow in post output filter.
+
+This variable is buffer-local.")
+
+(defconst singular-help-command-regexp "^\\s-*shelp\\>"
+  "Regular expression to match Singular help commands.")
+
+(defconst singular-help-response-line-1
+  "^Your help command could not be executed.  Use\n"
+  "Regular expression that matches the first line of Singulars response.")
+
+(defconst singular-help-response-line-2
+  "^C-h C-s \\(.*\\)\n")
+
+(defconst singular-help-response-line-3
+  "^to enter the Singular online help\.  For general\n"
+  "Regular expression that matches the first line of Singulars response.")
+
+(defconst singular-help-response-line-4
+  "^information on Singular running on Emacs, type C-h m\.\n"
+  "Regular expression that matches the first line of Singulars response.")
+
+(defun singular-help-pre-input-filter (input)
+  "Check user's input for help commands.
+Sets time stamp if one is found."
+  (if (string-match singular-help-command-regexp input)
+      (setq singular-help-time-stamp (cadr (current-time))))
+  ;; return nil so that input passes unchanged
+  nil)
+
+(defun singular-help-pre-output-filter (output)
+  "Check for Singular's response on a help command.
+Removes it and fires up `(info)' to handle the help command."
+  ;; check first
+  ;; - whether a help statement has been issued less than one second ago, or
+  ;; - whether there is a pending response.
+  ;;
+  ;; Only if one of these conditions is met we go on and check text for a
+  ;; response on a help command.  Checking uncoditionally every piece of
+  ;; output would be far too expensive.
+  ;;
+  ;; If check fails nil is returned, what is exactly what we need for the
+  ;; filter.
+  (if (or (= (cadr (current-time)) singular-help-time-stamp)
+	  singular-help-response-pending)
+      ;; if response is pending for more than five seconds, give up
+      (if (and singular-help-response-pending
+	       (> (singular-time-stamp-difference (current-time) singular-help-time-stamp) 5))
+	  ;; this command returns nil, what is exactly what we need for the filter
+	  (setq singular-help-response-pending nil)
+	  ;; go through output, removing the response.  If there is a
+	  ;; pending response we nevertheless check for all lines, not only
+	  ;; for the pending one.  At last, pending responses should not
+	  ;; occur to often.
+	  (when (string-match singular-help-response-line-1 output)
+	    (setq output (replace-match "" t t output))
+	    (setq singular-help-response-pending t))
+	  (when (string-match singular-help-response-line-2 output)
+	    ;; after all, we found what we are looking for
+	    (setq singular-help-topic (substring output (match-beginning 1) (match-end 1)))
+	    (setq output (replace-match "" t t output))
+	    (setq singular-help-response-pending t))
+	  (when (string-match singular-help-response-line-3 output)
+	    (setq output (replace-match "" t t output))
+	    (setq singular-help-response-pending t))
+	  (when (string-match singular-help-response-line-4 output)
+	    (setq output (replace-match "" t t output))
+	    ;; we completely removed the help from output!
+	    (setq singular-help-response-pending nil))
+
+	  ;; return modified OUTPUT
+	  output)))
+
+(defun singular-help-post-output-filter (&rest ignore)
+  (when singular-help-topic
+    (save-excursion (singular-help singular-help-topic))
+    (setq singular-help-topic nil)))
+
+(defun singular-help (&optional help-topic)
+  "Show help on HELP-TOPIC in Singular online manual."
+  
+  (interactive "s")
+
+  ;; check for empty help topic and convert it to top node
+  (if (or (null help-topic) (string= help-topic ""))
+      (setq help-topic "Top"))
+
+  (let ((same-window-buffer-names
+	 (cond
+	  ((null singular-help-same-window)
+	   nil)
+	  ((eq singular-help-same-window 'default)
+	   same-window-buffer-names)
+	  (t
+	   '("*info*"))))
+	(node-name (concat "(" (or singular-help-explicit-file-name
+				   singular-help-file-name)
+			   ")" help-topic)))
+    (pop-to-buffer "*info*")
+    (Info-goto-node node-name)))
+    
+
+(defun singular-help-init ()
+  "Initialize online help support for Singular interactive mode.
+
+This function is called at mode initialization time."
+  (make-local-variable 'singular-help-time-stamp)
+  (make-local-variable 'singular-help-response-pending)
+  (make-local-variable 'singular-help-topic)
+  (add-hook 'singular-pre-input-filter-functions 'singular-help-pre-input-filter)
+  (add-hook 'singular-pre-output-filter-functions 'singular-help-pre-output-filter)
+  (add-hook 'singular-post-output-filter-functions 'singular-help-post-output-filter))
+;;}}}
+
+;;{{{ Debugging filters
 (defun singular-debug-pre-input-filter (string)
   "Display STRING and some markers in mini-buffer."
   (singular-debug 'interactive-filter
-		  (message "Pre-input filter: %s"
-			   (singular-debug-format string)))
-  (singular-debug 'interactive-filter
-		  (message "Pre-input filter: (li %S ci %S lo %S co %S)"
+		  (message "Pre-input filter: %s (li %S ci %S lo %S co %S)"
+			   (singular-debug-format string)
 			   (marker-position singular-last-input-section-start)
 			   (marker-position singular-current-input-section-start)
 			   (marker-position singular-last-output-section-start)
@@ -1325,9 +2409,8 @@ If it is already unfolded, do nothing."
 (defun singular-debug-post-input-filter (beg end)
   "Display BEG, END, and some markers in mini-buffer."
   (singular-debug 'interactive-filter
-		  (message "Post-input filter: (beg %S end %S)" beg end))
-  (singular-debug 'interactive-filter
-		  (message "Post-input filter: (li %S ci %S lo %S co %S)"
+		  (message "Post-input filter: (beg %S end %S) (li %S ci %S lo %S co %S)"
+			   beg end
 			   (marker-position singular-last-input-section-start)
 			   (marker-position singular-current-input-section-start)
 			   (marker-position singular-last-output-section-start)
@@ -1336,10 +2419,8 @@ If it is already unfolded, do nothing."
 (defun singular-debug-pre-output-filter (string)
   "Display STRING and some markers in mini-buffer."
   (singular-debug 'interactive-filter
-		  (message "Pre-output filter: %s"
-			   (singular-debug-format string)))
-  (singular-debug 'interactive-filter
-		  (message "Pre-output filter: (li %S ci %S lo %S co %S)"
+		  (message "Pre-output filter: %s (li %S ci %S lo %S co %S)"
+			   (singular-debug-format string)
 			   (marker-position singular-last-input-section-start)
 			   (marker-position singular-current-input-section-start)
 			   (marker-position singular-last-output-section-start)
@@ -1349,29 +2430,64 @@ If it is already unfolded, do nothing."
 (defun singular-debug-post-output-filter (beg end simple-sec-start)
   "Display BEG, END, SIMPLE-SEC-START, and some markers in mini-buffer."
   (singular-debug 'interactive-filter
-		  (message "Post-output filter: (beg %S end %S sss %S)"
-			   beg end simple-sec-start))
-  (singular-debug 'interactive-filter
-		  (message "Post-output filter: (li %S ci %S lo %S co %S)"
+		  (message "Post-output filter: (beg %S end %S sss %S) (li %S ci %S lo %S co %S)"
+			   beg end simple-sec-start
 			   (marker-position singular-last-input-section-start)
 			   (marker-position singular-current-input-section-start)
 			   (marker-position singular-last-output-section-start)
 			   (marker-position singular-current-output-section-start))))
 
-;; stripping prompts
-(defun singular-remove-prompt-filter (beg end simple-sec-start)
-  "Strip prompts from last simple section."
-  (if simple-sec-start (singular-remove-prompt simple-sec-start end)))
+(defun singular-debug-filter-init ()
+  "Add debug filters to the necessary hooks.
+
+This function is called at mode initialization time."
+  (add-hook 'singular-pre-input-filter-functions
+	    'singular-debug-pre-input-filter nil t)
+  (add-hook 'singular-post-input-filter-functions
+	    'singular-debug-post-input-filter nil t)
+  (add-hook 'singular-pre-output-filter-functions
+	    'singular-debug-pre-output-filter nil t)
+  (add-hook 'singular-post-output-filter-functions
+	    'singular-debug-post-output-filter nil t))
 ;;}}}
 
 ;;{{{ Demo mode
-(defvar singular-demo-chunk-regexp "\\(\n\n\\)"
-  "Regular expressions to recognize chunks of a demo file.
-If there is a subexpression specified its content is removed when the
-chunk is displayed.")
+(defcustom singular-demo-chunk-regexp "\\(\n\\s *\n\\)"
+  "Regular expressions to recognize separate chunks of a demo file.
+If there is a subexpression specified its contents is removed when the
+chunk is displayed.
+The default value is \"\\\\(\\n\\\\s *\\n\\\\)\" which means that chunks are
+separated by a blank line which is removed when the chunks are displayed."
+  :type 'regexp
+  :group 'singular-demo-mode)
 
-(defvar singular-demo-print-messages t
-  "If non-nil, print message on how to continue demo mode")
+(defcustom singular-demo-insert-into-history nil
+  "If non-nil, insert input into history even while demo mode is on.
+Otherwise, demo chunks and other commands executed during demo mode are not
+inserted into the history."
+  :type 'boolean
+  :group 'singular-demo-mode)
+
+(defcustom singular-demo-print-messages nil
+  "If non-nil, print message on how to continue demo mode."
+  :type 'boolean
+  :group 'singular-demo-mode)
+
+(defcustom singular-demo-exit-on-load nil
+  "If non-nil, a running demo is automatically discarded when a new one is loaded.
+Otherwise, the load is aborted with an error."
+  :type 'boolean
+  :group 'singular-demo-mode)
+
+(defcustom singular-demo-load-directory nil
+  "Directory where demo files reside.
+If non-nil, this directory is offered as a starting point to search for
+demo files when `singular-demo-load' is called interactively.
+If this variable equals nil whatever Emacs offers is used as starting
+point.  In general, this is the directory where Singular has been started
+in."
+  :type '(choice (const nil) (file))
+  :group 'singular-demo-mode)
 
 (defvar singular-demo-mode nil
   "Non-nil if Singular demo mode is on.
@@ -1388,135 +2504,210 @@ This variable is buffer-local.")
 
 This variable is buffer-local.")
 
-(defvar singular-demo-command-on-enter nil
-  "Singular command to send when entering demo mode or nil if no string to send.")
+(defun singular-demo-load (demo-file)
+  "Load demo file DEMO-FILE and enter Singular demo mode.
+NOT READY."
+  (interactive
+   (list
+    (cond
+     ;; Emacs
+     ((eq singular-emacs-flavor 'emacs)
+      (read-file-name "Load demo file: "
+		      singular-demo-load-directory
+		      nil t))
+     ;; XEmacs
+     (t
+      ;; there are some problems with the window being popped up when this
+      ;; function is called from a menu.  It does not display the contents
+      ;; of `singular-demo-load-directory' but of `default-directory'.
+      (let ((default-directory (or singular-demo-load-directory
+				   default-directory)))
+	(read-file-name "Load demo file: "
+			singular-demo-load-directory
+			nil t))))))
 
-(defvar singular-demo-command-on-leave nil
-  "Singular command to send when leaving demo mode or nil if no string to send.")
-  
-(defun singular-demo-mode (mode)
-  "Switch between demo mode states.
-MODE may be either:
-- `init' to initialize global variables;
-- `exit' to clean up demo and leave Singular demo mode;
-- `enter' to enter Singular demo mode;
-- `leave' to leave Singular demo mode.
+  ;; check for running demo
+  (if singular-demo-mode
+      (if singular-demo-exit-on-load
+	  ;; silently exit running demo
+	  (singular-demo-exit)
+	(error "There already is a demo running, exit with `singular-demo-exit' first")))
 
-Modifies the global variables `singular-demo-mode',
-`singular-demo-end', and `singular-demo-old-mode-name' to reflect the
-new state of Singular demo mode."
-  (cond
-   ;; initialization.  Should be called only once.
-   ((eq mode 'init)
-    (make-local-variable 'singular-demo-mode)
-    (make-local-variable 'singular-demo-mode-old-name)
-    (make-local-variable 'singular-demo-mode-end)
-    (if (not (and (boundp 'singular-demo-end)
-		  singular-demo-end))
-	(setq singular-demo-end (make-marker))))
+  ;; load new demo
+  (let ((old-point-min (point-min)))
+    (unwind-protect
+	(progn
+	  (goto-char (point-max))
+	  (widen)
+	  (cond
+	   ;; XEmacs
+	   ((eq singular-emacs-flavor 'xemacs)
+	    ;; load file and remember its end
+	    (set-marker singular-demo-end
+			(+ (point) (nth 1 (insert-file-contents-literally demo-file)))))
+	   ;; Emacs
+	   (t
+	    ;; Emacs does something like an `insert-before-markers' so
+	    ;; save all essential markers
+	    (let ((pmark-pos (marker-position (singular-process-mark)))
+		  (sliss-pos (marker-position singular-last-input-section-start))
+		  (sciss-pos (marker-position singular-current-input-section-start))
+		  (sloss-pos (marker-position singular-last-output-section-start))
+		  (scoss-pos (marker-position singular-current-output-section-start)))
 
-   ;; final exit.  Clean up demo.
-   ((and (eq mode 'exit)
-	 singular-demo-mode)
-    (setq mode-name singular-demo-old-mode-name
-	  singular-demo-mode nil)
-    ;; clean up hidden rest of demo file if existent
+	      (unwind-protect
+		  ;; load file and remember its end
+		  (set-marker singular-demo-end
+			      (+ (point) (nth 1 (insert-file-contents-literally demo-file))))
+
+		;; restore markers.
+		;; This is unwind-protected.
+		(set-marker (singular-process-mark) pmark-pos)
+		(set-marker singular-last-input-section-start sliss-pos)
+		(set-marker singular-current-input-section-start sciss-pos)
+		(set-marker singular-last-output-section-start sloss-pos)
+		(set-marker singular-current-output-section-start scoss-pos))))))
+
+      ;; completely hide demo file.
+      ;; This is unwind-protected.
+      (narrow-to-region old-point-min (point))))
+
+  ;; switch demo mode on
+  (setq singular-demo-old-mode-name mode-name
+	mode-name "Singular Demo"
+	singular-demo-mode t)
+  (run-hooks 'singular-demo-mode-enter-hook)
+  (if singular-demo-print-messages (message "Hit RET to start demo"))
+  (force-mode-line-update))
+
+(defun singular-demo-exit-internal ()
+  "Exit Singular demo mode.
+Recovers the old mode name, sets `singular-demo-mode' to nil, runs
+the hooks on `singular-demo-mode-exit-hook'."
+  (setq mode-name singular-demo-old-mode-name
+	singular-demo-mode nil)
+  (run-hooks 'singular-demo-mode-exit-hook)
+  (force-mode-line-update))
+
+(defun singular-demo-exit ()
+  "Prematurely exit Singular demo mode.
+Cleans up everything that is left from the demo.
+Runs the hooks on `singular-demo-mode-exit-hook'.
+Does nothing when Singular demo mode is turned off."
+  (interactive)
+  (when singular-demo-mode
+    ;; clean up hidden rest of demo file
     (let ((old-point-min (point-min))
 	  (old-point-max (point-max)))
       (unwind-protect
 	  (progn
 	    (widen)
 	    (delete-region old-point-max singular-demo-end))
-	;; this is unwide-protected
+	;; this is unwind-protected
 	(narrow-to-region old-point-min old-point-max)))
-    (if (and singular-demo-command-on-leave
-	     (singular-process))
-	(send-string (singular-process) singular-demo-command-on-leave))
-    (force-mode-line-update))
-
-   ;; enter demo mode
-   ((and (eq mode 'enter)
-	 (not singular-demo-mode))
-    (setq singular-demo-old-mode-name mode-name
-	  mode-name "Singular Demo"
-	  singular-demo-mode t)
-    (if singular-demo-command-on-enter
-	(send-string (singular-process) singular-demo-command-on-enter))
-    (if singular-demo-print-messages
-	(message "Hit RET to start demo"))
-    (force-mode-line-update))
-
-   ;; leave demo mode
-   ((and (eq mode 'leave)
-	 singular-demo-mode)
-    (setq mode-name singular-demo-old-mode-name
-	  singular-demo-mode nil)
-    (if singular-demo-command-on-leave
-	(send-string (singular-process) singular-demo-command-on-leave))
-    (force-mode-line-update))))
-
-(defun singular-demo-exit ()
-  "Prematurely exit singular demo mode."
-  (interactive)
-  (singular-demo-mode 'exit))
+    (singular-demo-exit-internal)))
 
 (defun singular-demo-show-next-chunk ()
   "Show next chunk of demo file at input prompt.
+Assumes that Singular demo mode is on.
 Moves point to end of buffer and widenes the buffer such that the next
 chunk of the demo file becomes visible.
 Finds and removes chunk separators as specified by
 `singular-demo-chunk-regexp'.
-Removing chunk separators affects undo information and buffer-modified
-flag.
-Leaves demo mode after showing last chunk."
+Leaves demo mode after showing last chunk.  In that case runs hooks on
+`singular-demo-mode-exit-hook'."
   (let ((old-point-min (point-min)))
     (unwind-protect
 	(progn
 	  (goto-char (point-max))
 	  (widen)
 	  (if (re-search-forward singular-demo-chunk-regexp singular-demo-end 'limit)
-	      (and (match-beginning 1)
-		   (delete-region (match-beginning 1) (match-end 1)))
-	    ;; remove trailing white-space
-	    (skip-syntax-backward "-")
+	      (if (match-beginning 1)
+		  (delete-region (match-beginning 1) (match-end 1)))
+	    ;; remove trailing white-space.  We may not use
+	    ;; `(skip-syntax-backward "-")' since newline is has no white
+	    ;; space syntax.  The solution down below should suffice in
+	    ;; almost all cases ...
+	    (skip-chars-backward " \t\n\r")
 	    (delete-region (point) singular-demo-end)
-	    (singular-demo-mode 'leave)))
+	    (singular-demo-exit-internal)))
 
       ;; this is unwind-protected
       (narrow-to-region old-point-min (point)))))
 
-(defun singular-demo-load (demo-file)
-  "Load demo file DEMO-FILE and enter Singular demo mode.
-For a description of the Singular demo mode one should refer to the
-doc-string of `singular-interactive-mode'.
-Moves point to end of buffer and inserts contents of DEMO-FILE there."
-  (interactive "fLoad demo file: ")
+(defun singular-demo-mode-init ()
+  "Initialize variables belonging to Singular demo mode.
+Creates some buffer-local variables and the buffer-local marker
+`singular-demo-end'.
 
-  ;; check for running demo
-  (and singular-demo-mode
-       (singular-demo-exit))
-
-  (let ((old-point-min (point-min)))
-    (unwind-protect
-	(progn
-	  (goto-char (point-max))
-	  (widen)
-	  ;; load file and remember its end
-	  (set-marker singular-demo-end
-		      (+ (point) (nth 1 (insert-file-contents demo-file)))))
-
-      ;; completely hide demo file.
-      ;; This is unwide protected.
-      (narrow-to-region old-point-min (point)))
-
-    ;; switch demo mode on
-    (singular-demo-mode 'enter)))
+This function is called  at mode initialization time."
+  (make-local-variable 'singular-demo-mode)
+  (make-local-variable 'singular-demo-mode-old-name)
+  (make-local-variable 'singular-demo-mode-end)
+  (if (not (and (boundp 'singular-demo-end)
+		singular-demo-end))
+      (setq singular-demo-end (make-marker))))
 ;;}}}
       
 ;;{{{ Some lengthy notes on input and output
 
 ;; NOT READY[so sorry]!
 
+;;}}}
+
+;;{{{ Last input and output section
+(defun singular-last-input-section (&optional no-error)
+  "Return last input section.
+Returns nil if optional argument NO-ERROR is non-nil and there is no
+last input section defined, throws an error otherwise."
+  (let ((last-input-start (marker-position singular-last-input-section-start))
+	(last-input-end (marker-position singular-current-output-section-start)))
+    (cond ((and last-input-start last-input-end)
+	   (singular-section-create (singular-simple-sec-at last-input-start) 'input
+				    last-input-start last-input-end))
+	  (no-error nil)
+	  (t (error "No last input section defined")))))
+
+(defun singular-current-output-section (&optional no-error)
+  "Return current output section.
+Returns nil if optional argument NO-ERROR is non-nil and there is no
+current output section defined, throws an error otherwise."
+  (let ((current-output-start (marker-position singular-current-output-section-start))
+	(current-output-end (save-excursion
+			      (save-restriction
+				(widen)
+				(goto-char (singular-process-mark))
+				(singular-skip-prompt-backward)
+				(and (bolp) (point))))))
+    (cond ((and current-output-start current-output-end)
+	   (singular-section-create (singular-simple-sec-at current-output-start) 'output
+				    current-output-start current-output-end))
+	  (no-error nil)
+	  (t (error "No current output section defined")))))
+
+(defun singular-last-output-section (&optional no-error)
+  "Return last output section.
+Returns nil if optional argument NO-ERROR is non-nil and there is no
+last output section defined, throws an error otherwise."
+  (let ((last-output-start (marker-position singular-last-output-section-start))
+	(last-output-end (marker-position singular-last-input-section-start)))
+    (cond ((and last-output-start last-output-end)
+	   (singular-section-create (singular-simple-sec-at last-output-start) 'output
+				    last-output-start last-output-end))
+	  (no-error nil)
+	  (t (error "No last output section defined")))))
+
+(defun singular-latest-output-section (&optional no-error)
+  "Return latest output section.
+This is the current output section if it is defined, otherwise the
+last output section.
+Returns nil if optional argument NO-ERROR is non-nil and there is no
+latest output section defined, throws an error otherwise."
+  (or (singular-current-output-section t)
+      (singular-last-output-section t)
+      (if no-error
+	  nil
+	(error "No latest output section defined"))))
 ;;}}}
 
 ;;{{{ Sending input
@@ -1628,7 +2819,7 @@ notes on input and output\" in singular.el."
 
 		;; get end of last simple section (equals start of
 		;; current)
-		      simple-sec-start (marker-position singular-simple-sec-last-end))
+		      simple-sec-start (singular-simple-sec-last-end-position))
 
 		;; prepare for insertion
 		(widen)
@@ -1684,7 +2875,7 @@ non-nil, otherwise on a per-line base."
     ;; get input from line
     (save-excursion
       (beginning-of-line)
-      (singular-skip-prompt-forward)
+      (singular-prompt-skip-forward)
       (let ((old-point (point)))
 	(end-of-line)
 	(buffer-substring old-point (point))))))
@@ -1722,27 +2913,16 @@ NOT READY[old input copying, demo mode,
 	   singular-demo-print-messages
 	   (message "Hit RET to continue demo"))
 
-      ;; go to desired position
-      (if comint-eol-on-send (end-of-line))
-      (if send-full-section (goto-char (point-max)))
+      ;; go to desired position.  NOT READY.
+      ;(if singular-eol-on-send (end-of-line))
+      ;(if send-full-section (goto-char (point-max)))
 
-      ;; do history expansion
-      (if (eq comint-input-autoexpand 'input)
-	  (comint-replace-by-expanded-history t))
       (let* ((input (buffer-substring pmark (point))))
-
-	;; insert input into history
-	(if (and (funcall comint-input-filter input)
-		 (or (null comint-input-ignoredups)
-		     (not (ring-p comint-input-ring))
-		     (ring-empty-p comint-input-ring)
-		     (not (string-equal (ring-ref comint-input-ring 0) input))))
-	    (ring-insert comint-input-ring input))
-	(setq comint-input-ring-index nil)
-
-	;; send string to process ...
+	;; insert string into history
+	(singular-history-insert input)
+	;; send string to process
 	(singular-send-string process input)
-	;; ... and insert it into buffer ...
+	;; "insert" it into buffer
 	(singular-input-filter process (point)))))))
 ;;}}}
 
@@ -1833,7 +3013,7 @@ notes on input and output\" in singular.el."
 
 		;; get end of last simple section (equals start of
 		;; current)
-		      simple-sec-start (marker-position singular-simple-sec-last-end)
+		      simple-sec-start (singular-simple-sec-last-end-position)
 
 		;; get string to insert
 		      string (singular-run-hook-with-arg-and-value
@@ -1878,57 +3058,6 @@ notes on input and output\" in singular.el."
 	    (set-buffer old-buffer))))))
 ;;}}}
 
-;;{{{ Filename, Command, and Help Completion
-;; NOT READY
-;; how to find and load the completion files?
-(load-file "cmd-cmpl.el")
-(load-file "hlp-cmpl.el")
-
-(defun singular-dynamic-complete ()
-  "NOT READY: docu"
-  (interactive)
-  (if (eq (buffer-syntactic-context) 'string)
-      ;; then: expand filename
-      (comint-dynamic-complete-as-filename)
-    ;; else: expand command or help
-    (let ((end (point))
-	  beg
-	  pattern
-	  completion-list
-	  completion)
-      (save-excursion
-	(beginning-of-line)
-	(if (re-search-forward (concat singular-prompt-regexp
-				       "[ \t]*\\([\\?]\\|help \\)[ \t]*\\(.*\\)")
-			       end t)
-	    (setq pattern (match-string 2)
-		  beg (match-beginning 2)
-		  completion-list singular-completion-hlp-list)
-	  (goto-char end)
-	  (skip-chars-backward "a-zA-Z0-9")
-	  (setq pattern (buffer-substring (point) end)
-		beg (point)
-		completion-list singular-completion-cmd-list)))
-      
-      (setq completion (try-completion pattern
-				       completion-list))
-      (cond ((eq completion t)
-	     (message "[Sole completion]"))  ;; nothing to complete
-	    ((null completion)               ;; no completion found
-	     (message "Can't find completion for \"%s\"" pattern)
-	     (ding))
-	    ((not (string= pattern completion))
-	     (delete-region beg end)
-	     (insert completion))
-	    (t
-	     (message "Making completion list...")
-	     (let ((list (all-completions pattern 
-					  completion-list)))
-	       (with-output-to-temp-buffer "*Completions*"
-		 (display-completion-list list)))
-	     (message "Making completion list...%s" "done"))))))
-;;}}}
-
 ;;{{{ Singular interactive mode
 (defun singular-interactive-mode ()
   "Major mode for interacting with Singular.
@@ -1939,103 +3068,56 @@ NOT READY [multiple Singulars]!
 
 \\{singular-interactive-mode-map}
 Customization: Entry to this mode runs the hooks on `comint-mode-hook'
-and `singular-interactive-mode-hook' \(in that order).  Before each
-input, the hooks on `comint-input-filter-functions' are run.  After
-each Singular output, the hooks on `comint-output-filter-functions'
-are run.
+and `singular-interactive-mode-hook' \(in that order).
 
 NOT READY [much more to come.  See shell.el.]!"
   (interactive)
 
-  ;; remove existing singular-start-menu from menu (XEmacs)
-  ;, NOT READY
-  ;; This is mayby just temporary
-;  (cond
-;   ;; XEmacs
-;   ((eq singular-emacs-flavor 'xemacs)
-;    (delete-menu-item '("Singular"))))
+  ;; uh-oh, we have to set `comint-input-ring-size' before we call
+  ;; `comint-mode'
+  (singular-history-init)
 
   ;; run comint mode and do basic mode setup
-  (comint-mode)
+  (let (comint-mode-hook)
+    (comint-mode))
   (setq major-mode 'singular-interactive-mode)
   (setq mode-name "Singular Interaction")
 
   ;; key bindings, syntax tables and menus
-  (use-local-map singular-interactive-mode-map)
-  (set-syntax-table singular-interactive-mode-syntax-table)
-  (cond
-   ;; XEmacs
-   ((eq singular-emacs-flavor 'xemacs)
-    (easy-menu-add singular-interactive-mode-menu-1)
-    (easy-menu-add singular-interactive-mode-menu-2)))
+  (singular-interactive-mode-map-init)
+  (singular-mode-syntax-table-init)
+  (singular-interactive-mode-menu-init)
 
   (setq comment-start "// ")
   (setq comment-start-skip "// *")
   (setq comment-end "")
 
-  ;; customize comint for Singular
-  (setq comint-prompt-regexp singular-prompt-regexp)
-  (setq comint-delimiter-argument-list singular-delimiter-argument-list)
-  (setq comint-input-ignoredups singular-input-ignoredups)
-  (make-local-variable 'comint-buffer-maximum-size)
-  (setq comint-buffer-maximum-size singular-buffer-maximum-size)
-  (setq comint-input-ring-size singular-input-ring-size)
-  (setq comint-input-filter singular-history-filter)
-  (setq comint-completion-addsuffix singular-completion-addsuffix)
-
-  ;; get name of history file (if any)
-  (setq comint-input-ring-file-name (getenv "SINGULARHIST"))
-  (if (or (not comint-input-ring-file-name)
-	  (equal comint-input-ring-file-name "")
-	  (equal (file-truename comint-input-ring-file-name) "/dev/null"))
-      (setq comint-input-ring-file-name nil))
+;  (singular-prompt-init)
 
   ;; initialize singular demo mode, input and output filters
-  (singular-demo-mode 'init)
+  (singular-demo-mode-init)
   (make-local-variable 'singular-pre-input-filter-functions)
   (make-local-hook 'singular-post-input-filter-functions)
   (make-local-variable 'singular-pre-output-filter-functions)
   (make-local-hook 'singular-post-output-filter-functions)
 
-  ;; selective display
-  (setq selective-display t)
-  (setq selective-display-ellipses t)
-  (cond
-   ;; Emacs
-   ((eq singular-emacs-flavor 'emacs)
-    (setq buffer-display-table (or (copy-sequence standard-display-table)
-				   (make-display-table)))
-    (set-display-table-slot buffer-display-table
-     'selective-display (vconcat singular-folding-ellipsis)))
-    ;; XEmacs
-   (t
-    (set-glyph-image invisible-text-glyph singular-folding-ellipsis (current-buffer))))
+  ;; folding sections
+  (singular-folding-init)
 
   ;; debugging filters
-  (singular-debug 'interactive-filter
-		  (add-hook 'singular-pre-input-filter-functions
-			    'singular-debug-pre-input-filter nil t))
-  (singular-debug 'interactive-filter
-		  (add-hook 'singular-post-input-filter-functions
-			    'singular-debug-post-input-filter nil t))
-  (singular-debug 'interactive-filter
-		  (add-hook 'singular-pre-output-filter-functions
-			    'singular-debug-pre-output-filter nil t))
-  (singular-debug 'interactive-filter
-		  (add-hook 'singular-post-output-filter-functions
-			    'singular-debug-post-output-filter nil t))
+  (singular-debug 'interactive-filter (singular-debug-filter-init))
+
+  (singular-help-init)
 
   ;; other input or output filters
   (add-hook 'singular-post-output-filter-functions
 	    'singular-remove-prompt-filter nil t)
 
-  ;; font-locking
+  ;; Emacs Font Lock mode initialization
   (cond
    ;; Emacs
    ((eq singular-emacs-flavor 'emacs)
-    (make-local-variable 'font-lock-defaults)
-    (singular-debug 'interactive (message "Setting up font-lock for emacs"))
-    (setq font-lock-defaults singular-font-lock-defaults)))
+    (singular-interactive-font-lock-init)))
 
   (run-hooks 'singular-interactive-mode-hook))
 ;;}}}
@@ -2067,15 +3149,14 @@ process buffer is still alive."
     (singular-debug 'interactive
 		    (message "Sentinel: %s" (substring message 0 -1)))
     ;; exit demo mode if necessary
-    (singular-demo-mode 'exit)
+    (singular-demo-exit)
     (if (string-match "finished\\|exited" message)
 	(let ((process-buffer (process-buffer process)))
 	  (if (and process-buffer
 		   (buffer-name process-buffer)
 		   (set-buffer process-buffer))
-	      (progn
-		(singular-debug 'interactive (message "Writing input ring back"))
-		(comint-write-input-ring)))))))
+	      ;; write back history
+	      (singular-history-write))))))
 
 (defun singular-exec (buffer name executable start-file switches)
   "Start a new Singular process NAME in BUFFER, running EXECUTABLE.
@@ -2087,7 +3168,7 @@ sent to the process.
 Deletes any old processes running in that buffer.
 Moves point to the end of BUFFER.
 Initializes all important markers and the simple sections.
-Runs `comint-exec-hook' and `singular-exec-hook' (in that order).
+Runs the hooks on `singular-exec-hook'.
 Returns BUFFER."
   (let ((old-buffer (current-buffer)))
     (unwind-protect
@@ -2115,13 +3196,6 @@ Returns BUFFER."
 	    (singular-output-filter-init (point))
 	    (singular-simple-sec-init (point))
 
-	    ;; NOT READY: SINGULAR-LOGO
-;	    (cond 
-;	     ((eq singular-emacs-flavor 'xemacs)
-;	      (set-extent-begin-glyph (make-extent (point-min) (point-min)) 
-;				      singular-logo)
-;	      (insert "\n")))
-
 	    ;; feed process with start file and read input ring.  Take
 	    ;; care about the undo information.
 	    (if start-file
@@ -2132,24 +3206,16 @@ Returns BUFFER."
 		  (setq start-string (buffer-substring (point) (point-max)))
 		  (delete-region (point) (point-max))
 		  (send-string process start-string)))
-	    (singular-debug 'interactive (message "Reading input ring"))
-	    (comint-read-input-ring t)
+
+	    ;; read history if present
+	    (singular-history-read)
 
 	    ;; execute hooks
-	    (run-hooks 'comint-exec-hook)
 	    (run-hooks 'singular-exec-hook))
 	  
 	  buffer)
       ;; this code is unwide-protected
       (set-buffer old-buffer))))
-
-;; NOT READY: SINGULAR-LOGO
-;(cond
-; ((eq singular-emacs-flavor 'xemacs)
-;  (defvar singular-logo (make-glyph))
-;  (set-glyph-image singular-logo
-;		   (concat "~/" "singlogo.xpm")
-;		   'global 'x)))
 
 ;; Note:
 ;;
@@ -2174,7 +3240,7 @@ giving commands for sending input and handling ouput of Singular.  See
 `singular-interactive-mode'.
 
 Every time `singular' starts a new Singular process it runs the hooks
-on `comint-exec-hook' and `singular-exec-hook' \(in that order).
+on `singular-exec-hook'.
 
 Type \\[describe-mode] in the Singular buffer for a list of commands."
   ;; handle interactive calls
@@ -2285,5 +3351,9 @@ Calls `singular' with the appropriate arguments."
 ;;}}}
 
 (provide 'singular)
+
+;;; Local Variables:
+;;; fill-column: 75
+;;; End:
 
 ;;; singular.el ends here.
