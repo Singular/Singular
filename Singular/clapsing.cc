@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.24 1998-02-09 12:10:16 Singular Exp $
+// $Id: clapsing.cc,v 1.25 1998-02-17 15:07:51 obachman Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -906,8 +906,21 @@ alg singclap_alglcm ( alg f, alg g )
  return res;
 }
 
+#ifdef FACTORY_DEBUG_OUT
+#include "longalg.h"
+#include "febase.h"
+#endif
+
 void singclap_algdividecontent ( alg f, alg g, alg &ff, alg &gg )
 {
+#ifdef FACTORY_DEBUG_OUT
+    StringSetS("f = ");
+    napWrite(f);
+    PrintS(StringAppend("\n"));
+    StringSetS("g = ");
+    napWrite(g);
+    PrintS(StringAppend("\n"));
+#endif
   // over Q(a) / Fp(a)
  if (nGetChar()==1) setCharacteristic( 0 );
  else               setCharacteristic( -nGetChar() );
@@ -935,5 +948,13 @@ void singclap_algdividecontent ( alg f, alg g, alg &ff, alg &gg )
    }
  }
  Off(SW_RATIONAL);
+#ifdef FACTORY_DEBUG_OUT
+    StringSetS("ff = ");
+    napWrite(ff);
+    PrintS(StringAppend("\n"));
+    StringSetS("gg = ");
+    napWrite(gg);
+    PrintS(StringAppend("\n"));
+#endif 
 }
 #endif
