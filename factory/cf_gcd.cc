@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_gcd.cc,v 1.21 2001-01-30 13:41:12 Singular Exp $ */
+/* $Id: cf_gcd.cc,v 1.22 2004-01-19 11:26:20 Singular Exp $ */
 
 #include <config.h>
 
@@ -16,6 +16,10 @@
 #include "sm_sparsemod.h"
 #include "fac_util.h"
 #include "ftmpl_functions.h"
+
+#ifdef HAVE_NTL
+#include "NTLconvert.h"
+#endif
 
 static CanonicalForm gcd_poly( const CanonicalForm & f, const CanonicalForm& g, bool modularflag );
 
@@ -169,77 +173,109 @@ extgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, Ca
 static CanonicalForm
 gcd_poly_univar0( const CanonicalForm & F, const CanonicalForm & G, bool primitive )
 {
-    CanonicalForm f, g, c, cg, cl, BB, B, M, q, Dp, newD, D, newq;
-    int p, i, n;
+#ifdef HAVE_NTL 
+  if (isOn(SW_USE_NTL_GCD))
+  {
+    if ( getCharacteristic() > 0 )
+    {
+      zz_pContext ccc(getCharacteristic());
+      ccc.restore();
+      zz_p::init(getCharacteristic());
+      zz_pX F1=convertFacCF2NTLzzpX(F);
+      zz_pX G1=convertFacCF2NTLzzpX(G);
+      zz_pX R=GCD(F1,G1);
+      return convertNTLzzpX2CF(R,F.mvar());
+    }
+    else
+    {
+      ZZX F1=convertFacCF2NTLZZX(F);
+      ZZX G1=convertFacCF2NTLZZX(G);
+      ZZX R=GCD(F1,G1);
+      return convertNTLZZX2CF(R,F.mvar());
+    }
+  }
+#endif
+  CanonicalForm f, g, c, cg, cl, BB, B, M, q, Dp, newD, D, newq;
+  int p, i, n;
 
-    if ( primitive ) {
-        f = F;
-        g = G;
-        c = 1;
-    }
-    else {
-        CanonicalForm cF = content( F ), cG = content( G );
-        f = F / cF;
-        g = G / cG;
-        c = bgcd( cF, cG );
-    }
-    cg = gcd( f.lc(), g.lc() );
-    cl = ( f.lc() / cg ) * g.lc();
+  if ( primitive )
+  {
+    f = F;
+    g = G;
+    c = 1;
+  }
+  else
+  {
+    CanonicalForm cF = content( F ), cG = content( G );
+    f = F / cF;
+    g = G / cG;
+    c = bgcd( cF, cG );
+  }
+  cg = gcd( f.lc(), g.lc() );
+  cl = ( f.lc() / cg ) * g.lc();
 //     B = 2 * cg * tmin(
 //         maxnorm(f)*power(CanonicalForm(2),f.degree())*isqrt(f.degree()+1),
 //         maxnorm(g)*power(CanonicalForm(2),g.degree())*isqrt(g.degree()+1)
 //         )+1;
-    M = tmin( maxNorm(f), maxNorm(g) );
-    BB = power(CanonicalForm(2),tmin(f.degree(),g.degree()))*M;
-    q = 0;
-    i = cf_getNumSmallPrimes() - 1;
-    while ( true ) {
-        B = BB;
-        while ( i >= 0 && q < B ) {
-            p = cf_getSmallPrime( i );
-            i--;
-            while ( i >= 0 && mod( cl, p ) == 0 ) {
-                p = cf_getSmallPrime( i );
-                i--;
-            }
-            setCharacteristic( p );
-            Dp = gcd( mapinto( f ), mapinto( g ) );
-            Dp = ( Dp / Dp.lc() ) * mapinto( cg );
-            setCharacteristic( 0 );
-            if ( Dp.degree() == 0 ) return c;
-            if ( q.isZero() ) {
-                D = mapinto( Dp );
-                q = p;
-                B = power(CanonicalForm(2),D.degree())*M+1;
-            }
-            else {
-                if ( Dp.degree() == D.degree() ) {
-                    chineseRemainder( D, q, mapinto( Dp ), p, newD, newq );
-                    q = newq;
-                    D = newD;
-                }
-                else if ( Dp.degree() < D.degree() ) {
-                    // all previous p's are bad primes
-                    q = p;
-                    D = mapinto( Dp );
-                    B = power(CanonicalForm(2),D.degree())*M+1;
-                }
-                // else p is a bad prime
-            }
+  M = tmin( maxNorm(f), maxNorm(g) );
+  BB = power(CanonicalForm(2),tmin(f.degree(),g.degree()))*M;
+  q = 0;
+  i = cf_getNumSmallPrimes() - 1;
+  while ( true )
+  {
+    B = BB;
+    while ( i >= 0 && q < B )
+    {
+      p = cf_getSmallPrime( i );
+      i--;
+      while ( i >= 0 && mod( cl, p ) == 0 )
+      {
+        p = cf_getSmallPrime( i );
+        i--;
+      }
+      setCharacteristic( p );
+      Dp = gcd( mapinto( f ), mapinto( g ) );
+      Dp = ( Dp / Dp.lc() ) * mapinto( cg );
+      setCharacteristic( 0 );
+      if ( Dp.degree() == 0 )
+        return c;
+      if ( q.isZero() )
+      {
+        D = mapinto( Dp );
+        q = p;
+        B = power(CanonicalForm(2),D.degree())*M+1;
+      }
+      else
+      {
+        if ( Dp.degree() == D.degree() )
+        {
+          chineseRemainder( D, q, mapinto( Dp ), p, newD, newq );
+          q = newq;
+          D = newD;
         }
-        if ( i >= 0 ) {
-            // now balance D mod q
-            D = pp( balance( D, q ) );
-            if ( divides( D, f ) && divides( D, g ) )
-                return D * c;
-            else
-                q = 0;
+        else if ( Dp.degree() < D.degree() )
+        {
+          // all previous p's are bad primes
+          q = p;
+          D = mapinto( Dp );
+          B = power(CanonicalForm(2),D.degree())*M+1;
         }
-        else {
-            return gcd_poly( F, G, false );
-        }
-        DEBOUTLN( cerr, "another try ..." );
+        // else p is a bad prime
+      }
     }
+    if ( i >= 0 )
+    {
+      // now balance D mod q
+      D = pp( balance( D, q ) );
+      if ( divides( D, f ) && divides( D, g ) )
+        return D * c;
+      else
+        q = 0;
+    }
+    else
+      return gcd_poly( F, G, false );
+    DEBOUTLN( cerr, "another try ..." );
+  }
 }
 
 static CanonicalForm

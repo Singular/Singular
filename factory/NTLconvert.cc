@@ -1,4 +1,4 @@
-/* $Id: NTLconvert.cc,v 1.12 2003-10-15 17:19:38 Singular Exp $ */
+/* $Id: NTLconvert.cc,v 1.13 2004-01-19 11:26:19 Singular Exp $ */
 #include <config.h>
 
 #include "cf_gmp.h"
@@ -19,8 +19,10 @@
 #include <string.h>
 #include <NTL/ZZXFactoring.h>
 #include <NTL/ZZ_pXFactoring.h>
+#include <NTL/lzz_pXFactoring.h>
 #include <NTL/GF2XFactoring.h>
 #include <NTL/ZZ_pEXFactoring.h>
+#include <NTL/lzz_pEXFactoring.h>
 #include <NTL/GF2EXFactoring.h>
 #include <NTL/tools.h>
 #include "int_int.h"
@@ -119,6 +121,64 @@ ZZ_pX convertFacCF2NTLZZpX(CanonicalForm f)
        cout<<"convertFacCF2NTLZZ_pX: coefficient not immediate! : "<<f<<"\n";
        #else
        printf("convertFacCF2NTLZZ_pX: coefficient not immediate!, char=%d\n",
+              getCharacteristic());
+       #endif
+       exit(1);
+    }
+    else
+    {
+      SetCoeff(ntl_poly,NTLcurrentExp,c.intval());
+    }
+    NTLcurrentExp--;
+  }
+
+  //Set the remaining coefficients of ntl_poly to zero.
+  // This is necessary, because NTL internally
+  // also stores powers with zero coefficient,
+  // whereas factory stores tuples of degree and coefficient
+  //leaving out tuples if the coefficient equals zero
+  for (k=NTLcurrentExp;k>=0;k--)
+  {
+    SetCoeff(ntl_poly,k,0);
+  }
+
+  //normalize the polynomial and return it
+  ntl_poly.normalize();
+
+  return ntl_poly;
+}
+zz_pX convertFacCF2NTLzzpX(CanonicalForm f)
+{
+  zz_pX ntl_poly;
+
+  CFIterator i;
+  i=f;
+
+  int j=0;
+  int NTLcurrentExp=i.exp();
+  int largestExp=i.exp();
+  int k;
+
+  // we now build up the NTL-polynomial
+  ntl_poly.SetMaxLength(largestExp+1);
+
+  for (;i.hasTerms();i++)
+  {
+    for (k=NTLcurrentExp;k>i.exp();k--)
+    {
+      SetCoeff(ntl_poly,k,0);
+    }
+    NTLcurrentExp=i.exp();
+
+    CanonicalForm c=i.coeff();
+    if (!c.isImm()) c.mapinto(); //c%= getCharacteristic();
+    if (!c.isImm())
+    {  //This case will never happen if the characteristic is in fact a prime
+       // number, since all coefficients are represented as immediates
+       #ifndef NOSTREAMIO
+       cout<<"convertFacCF2NTLzz_pX: coefficient not immediate! : "<<f<<"\n";
+       #else
+       printf("convertFacCF2NTLzz_pX: coefficient not immediate!, char=%d\n",
               getCharacteristic());
        #endif
        exit(1);
@@ -260,6 +320,56 @@ CanonicalForm convertNTLZZpX2CF(ZZ_pX poly,Variable x)
   return bigone;
 }
 
+CanonicalForm convertNTLzzpX2CF(zz_pX poly,Variable x)
+{
+  //printf("convertNTLzzpX2CF\n");
+  CanonicalForm bigone;
+
+
+  if (deg(poly)>0)
+  {
+    // poly is non-constant
+    bigone=0;
+    bigone.mapinto();
+    // Compute the canonicalform coefficient by coefficient,
+    // bigone summarizes the result.
+    for (int j=0;j<deg(poly)+1;j++)
+    {
+      if (coeff(poly,j)!=0)
+      {
+        bigone+=(power(x,j)*CanonicalForm(to_long(rep(coeff(poly,j)))));
+      }
+    }
+  }
+  else
+  {
+    // poly is immediate
+    bigone=CanonicalForm(to_long(rep(coeff(poly,0))));
+    bigone.mapinto();
+  }
+  return bigone;
+}
+
+CanonicalForm convertNTLZZX2CF(ZZX polynom,Variable x)
+{
+  //printf("convertNTLZZX2CF\n");
+  CanonicalForm bigone;
+
+  // Go through the vector e and build up the CFFList
+  // As usual bigone summarizes the result
+  bigone=0;
+  ZZ coefficient;
+
+  for (int j=0;j<=deg(polynom);j++)
+  {
+    coefficient=coeff(polynom,j);
+    if (!IsZero(coefficient))
+    {
+      bigone += (power(x,j)*convertZZ2CF(coefficient));
+    }
+  }
+  return bigone;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // NAME: convertNTLGF2X2CF                                                    //
@@ -356,6 +466,33 @@ CFFList convertNTLvec_pair_ZZpX_long2FacCFFList
   for (int i=e.length()-1;i>=0;i--)
   {
     rueckgabe.append(CFFactor(convertNTLZZpX2CF(e[i].a,x),e[i].b));
+  }
+  if(isOn(SW_USE_NTL_SORT)) rueckgabe.sort(NTLcmpCF);
+  // the multiplicity at pos 1
+  if (!IsOne(multi))
+    rueckgabe.insert(CFFactor(CanonicalForm(to_long(rep(multi))),1));
+  return rueckgabe;
+}
+CFFList convertNTLvec_pair_zzpX_long2FacCFFList
+                                  (vec_pair_zz_pX_long e,zz_p multi,Variable x)
+{
+  //printf("convertNTLvec_pair_zzpX_long2FacCFFList\n");
+  CFFList rueckgabe;
+  zz_pX polynom;
+  long exponent;
+  CanonicalForm bigone;
+
+  // Maybe, e may additionally be sorted with respect to increasing degree of x
+  // but this is not
+  //important for the factorization, but nevertheless would take computing time,
+  // so it is omitted
+
+
+  // Go through the vector e and compute the CFFList
+  // again bigone summarizes the result
+  for (int i=e.length()-1;i>=0;i--)
+  {
+    rueckgabe.append(CFFactor(convertNTLzzpX2CF(e[i].a,x),e[i].b));
   }
   if(isOn(SW_USE_NTL_SORT)) rueckgabe.sort(NTLcmpCF);
   // the multiplicity at pos 1
@@ -628,29 +765,14 @@ CFFList convertNTLvec_pair_ZZX_long2FacCFFList(vec_pair_ZZX_long e,ZZ multi,Vari
   long exponent;
   CanonicalForm bigone;
 
-  // Maybe, e may additionally be sorted with respect to increasing degree of x, but this is not
-  //important for the factorization, but nevertheless would take computing time, so it is omitted
-
-
   // Go through the vector e and build up the CFFList
   // As usual bigone summarizes the result
   for (int i=e.length()-1;i>=0;i--)
   {
-    bigone=0;
     ZZ coefficient;
     polynom=e[i].a;
     exponent=e[i].b;
-    long coeff_long;
-
-    for (int j=0;j<deg(polynom)+1;j++)
-    {
-      coefficient=coeff(polynom,j);
-      if (!IsZero(coefficient))
-      {
-        bigone += (power(x,j)*convertZZ2CF(coefficient));
-      }
-    }
-
+    bigone=convertNTLZZX2CF(polynom,x);
     //append the converted polynomial to the list
     rueckgabe.append(CFFactor(bigone,exponent));
   }
@@ -683,6 +805,10 @@ CFFList convertNTLvec_pair_ZZX_long2FacCFFList(vec_pair_ZZX_long e,ZZ multi,Vari
 CanonicalForm convertNTLZZpE2CF(ZZ_pE coefficient,Variable x)
 {
   return convertNTLZZpX2CF(rep(coefficient),x);
+}
+CanonicalForm convertNTLzzpE2CF(zz_pE coefficient,Variable x)
+{
+  return convertNTLzzpX2CF(rep(coefficient),x);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -746,6 +872,51 @@ CFFList convertNTLvec_pair_ZZpEX_long2FacCFFList(vec_pair_ZZ_pEX_long e,ZZ_pE mu
   // Start by appending the multiplicity
   if (!IsOne(multi))
     rueckgabe.insert(CFFactor(convertNTLZZpE2CF(multi,alpha),1));
+
+  //return the computed CFFList
+  return rueckgabe;
+}
+CFFList convertNTLvec_pair_zzpEX_long2FacCFFList(vec_pair_zz_pEX_long e,zz_pE multi,Variable x,Variable alpha)
+{
+  CFFList rueckgabe;
+  zz_pEX polynom;
+  long exponent;
+  CanonicalForm bigone;
+
+  // Maybe, e may additionally be sorted with respect to increasing degree of x, but this is not
+  //important for the factorization, but nevertheless would take computing time, so it is omitted
+
+  // Go through the vector e and build up the CFFList
+  // As usual bigone summarizes the result during every loop
+  for (int i=e.length()-1;i>=0;i--)
+  {
+    bigone=0;
+
+    polynom=e[i].a;
+    exponent=e[i].b;
+
+    for (int j=0;j<deg(polynom)+1;j++)
+    {
+      if (IsOne(coeff(polynom,j)))
+      {
+        bigone+=power(x,j);
+      }
+      else
+      {
+        CanonicalForm coefficient=convertNTLzzpE2CF(coeff(polynom,j),alpha);
+        if (coeff(polynom,j)!=0)
+        {
+          bigone += (power(x,j)*coefficient);
+        }
+      }
+    }
+    //append the computed polynomials together with its exponent to the CFFList
+    rueckgabe.append(CFFactor(bigone,exponent));
+  }
+  if(isOn(SW_USE_NTL_SORT)) rueckgabe.sort(NTLcmpCF);
+  // Start by appending the multiplicity
+  if (!IsOne(multi))
+    rueckgabe.insert(CFFactor(convertNTLzzpE2CF(multi,alpha),1));
 
   //return the computed CFFList
   return rueckgabe;
@@ -896,6 +1067,34 @@ ZZ_pEX convertFacCF2NTLZZ_pEX(CanonicalForm f, ZZ_pX mipo)
     //ZZ_pE ccc;
     //conv(ccc,cc);
     SetCoeff(result,NTLcurrentExp,to_ZZ_pE(cc));
+    NTLcurrentExp--;
+  }
+  for(k=NTLcurrentExp;k>=0;k--) SetCoeff(result,k,0);
+  result.normalize();
+  return result;
+}
+zz_pEX convertFacCF2NTLzz_pEX(CanonicalForm f, zz_pX mipo)
+{
+  zz_pE::init(mipo);
+  zz_pEX result;
+  CFIterator i;
+  i=f;
+
+  int j=0;
+  int NTLcurrentExp=i.exp();
+  int largestExp=i.exp();
+  int k;
+
+  result.SetMaxLength(largestExp+1);
+  for(;i.hasTerms();i++)
+  {
+    for(k=NTLcurrentExp;k>i.exp();k--) SetCoeff(result,k,0);
+    NTLcurrentExp=i.exp();
+    CanonicalForm c=i.coeff();
+    zz_pX cc=convertFacCF2NTLzzpX(c);
+    //ZZ_pE ccc;
+    //conv(ccc,cc);
+    SetCoeff(result,NTLcurrentExp,to_zz_pE(cc));
     NTLcurrentExp--;
   }
   for(k=NTLcurrentExp;k>=0;k--) SetCoeff(result,k,0);
