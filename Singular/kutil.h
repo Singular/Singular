@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.62 2002-05-22 10:42:35 Singular Exp $ */
+/* $Id: kutil.h,v 1.63 2002-05-27 09:35:33 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -231,6 +231,7 @@ public:
   ideal M; /*set of minimal generators*/
   polyset S;
   intset ecartS;
+  intset lenS;
   intset fromQ;
   unsigned long* sevS;
   unsigned long* sevT;

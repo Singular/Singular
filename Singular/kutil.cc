@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.107 2002-05-22 13:52:28 levandov Exp $ */
+/* $Id: kutil.cc,v 1.108 2002-05-27 09:36:55 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -803,6 +803,10 @@ void deleteInS (int i,kStrategy strat)
     strat->sevS[j] = strat->sevS[j+1];
     strat->S_2_R[j] = strat->S_2_R[j+1];
   }
+  if (strat->lenS!=NULL)
+  {
+    for (j=i; j<strat->sl; j++) strat->lenS[j] = strat->lenS[j+1];
+  }
   if (strat->fromQ!=NULL)
   {
     for (j=i; j<strat->sl; j++)
@@ -859,7 +863,7 @@ void deleteInL (LSet set, int *length, int j,kStrategy strat)
 *is used after updating the pairset,if the leading term of p
 *divides the leading term of some S[i] it will be canceled
 */
-inline void clearS (poly p, unsigned long p_sev, int* at, int* k,
+static inline void clearS (poly p, unsigned long p_sev, int* at, int* k,
                     kStrategy strat)
 {
   assume(p_sev == pGetShortExpVector(p));
@@ -971,10 +975,10 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR 
     */
       if (!rIsPluralRing(currRing))
       {
-	strat->cp++;
-	pLmFree(Lp.lcm);
-	Lp.lcm=NULL;
-	return;
+        strat->cp++;
+        pLmFree(Lp.lcm);
+        Lp.lcm=NULL;
+        return;
       }
     }
     else
@@ -1045,10 +1049,10 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR 
     */
       if (!rIsPluralRing(currRing))
       {
-	strat->cp++;
-	pLmFree(Lp.lcm);
-	Lp.lcm=NULL;
-	return;
+        strat->cp++;
+        pLmFree(Lp.lcm);
+        Lp.lcm=NULL;
+        return;
       }
     }
     if (strat->fromT && (strat->ecartS[i]>ecart))
@@ -1186,8 +1190,8 @@ void enterOnePairSpecial (int i,poly p,int ecart,kStrategy strat, int atR = -1)
     //PrintS("prod-crit\n");
       if (!rIsPluralRing(currRing))
       {
-	strat->cp++;
-	return;
+        strat->cp++;
+        return;
       }
   }
 
@@ -3677,6 +3681,11 @@ void enterSBba (LObject p,int atS,kStrategy strat, int atR)
                                          IDELEMS(strat->Shdl)*sizeof(int),
                                          (IDELEMS(strat->Shdl)+setmax)
                                                   *sizeof(int));
+    if (strat->lenS!=NULL)
+      strat->lenS=(int*)omRealloc0Size(strat->lenS,
+                                       IDELEMS(strat->Shdl)*sizeof(int),
+                                       (IDELEMS(strat->Shdl)+setmax)
+                                                 *sizeof(int));
     if (strat->fromQ!=NULL)
     {
       strat->fromQ = (intset)omReallocSize(strat->fromQ,
@@ -3699,6 +3708,9 @@ void enterSBba (LObject p,int atS,kStrategy strat, int atR)
             (strat->sl - atS + 1)*sizeof(unsigned long));
     memmove(&(strat->S_2_R[atS+1]), &(strat->S_2_R[atS]),
             (strat->sl - atS + 1)*sizeof(int));
+    if (strat->lenS!=NULL)
+    memmove(&(strat->lenS[atS+1]), &(strat->lenS[atS]),
+            (strat->sl - atS + 1)*sizeof(int));
 #else
     for (i=strat->sl+1; i>=atS+1; i--)
     {
@@ -3707,6 +3719,9 @@ void enterSBba (LObject p,int atS,kStrategy strat, int atR)
       strat->sevS[i] = strat->sevS[i-1];
       strat->S_2_R[i] = strat->S_2_R[i-1];
     }
+    if (strat->lenS!=NULL)
+    for (i=strat->sl+1; i>=atS+1; i--)
+      strat->lenS[i] = strat->lenS[i-1];
 #endif
   }
   if (strat->fromQ!=NULL)
