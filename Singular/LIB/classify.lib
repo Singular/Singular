@@ -1,5 +1,5 @@
 //=============================================================================
-// $Id: classify.lib,v 1.3 1995-02-08 16:15:46 krueger Exp $
+// $Id: classify.lib,v 1.4 1995-02-09 13:52:14 krueger Exp $
 //
 // Please send bugs and comments to krueger@mathematik.uni-kl.de
 //
@@ -118,6 +118,7 @@ proc Classify
   for(@i=5;@i<=@n;@i=@i+1) {
     @f_nf = @f_nf + x(@i)^2;
   }
+  if(DeBug>1) { "Normal form NF(f)=", @f_nf; }
 
   map @ConvUp=RingB,maxideal(1);
   poly @f_out = @ConvUp(@f_out);
