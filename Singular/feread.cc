@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feread.cc,v 1.32 1999-12-14 17:58:19 Singular Exp $ */
+/* $Id: feread.cc,v 1.33 1999-12-16 14:47:39 Singular Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -218,7 +218,11 @@ static int fe_init_dyn_rl()
   int res=0;
   loop
   {
+    #if defined(HPUX_9) || defined(HPUX_10)
+    fe_rl_hdl=dynl_open("libreadline.sl");
+    #else
     fe_rl_hdl=dynl_open("libreadline.so");
+    #endif
     if (fe_rl_hdl==NULL) { return 1;}
 
     fe_filename_completion_function=
