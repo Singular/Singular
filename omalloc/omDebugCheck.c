@@ -3,7 +3,7 @@
  *  Purpose: implementation of omCheck functions
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omDebugCheck.c,v 1.3 2000-08-14 12:26:42 obachman Exp $
+ *  Version: $Id: omDebugCheck.c,v 1.4 2000-08-18 09:05:52 obachman Exp $
  *******************************************************************/
 #include <limits.h>
 #include <stdarg.h>
@@ -134,7 +134,7 @@ omError_t omDoCheckAddr(void* addr, void* bin_size, omTrackFlags_t flags, char l
   if ((flags & OM_FSIZE) && bin_size == NULL) return omError_NoError;
   omAddrCheckReturn(omCheckPtr(addr, report, OM_FLR_VAL));
   omAddrCheckReturnError((flags & OM_FALIGN) &&  !OM_IS_STRICT_ALIGNED(addr), omError_UnalignedAddr);
-  omAddrCheckReturnError((flags & OM_FBIN) && ! omIsKnownTopBin((omBin) bin_size, 1), omError_UnknownBin);
+  omAddrCheckReturnError((flags & OM_FBIN) && !omIsKnownTopBin((omBin) bin_size, 1), omError_UnknownBin);
   
   if (omIsBinPageAddr(addr))
   {
@@ -175,7 +175,7 @@ static omError_t omDoCheckLargeAddr(void* addr, void* bin_size, omTrackFlags_t f
   omAssume(! omIsBinPageAddr(addr));
   omAssume(! omCheckPtr(addr, omError_NoError, OM_FLR));
   
-  omAddrCheckReturnError(flags & OM_FBIN, omError_WrongBin);
+  omAddrCheckReturnError((flags & OM_FBIN) || (flags & OM_FBINADDR), omError_NotBinAddr);
   omAddrCheckReturnError(level > 1 && omFindRegionOfAddr(addr) != NULL, omError_FreedAddrOrMemoryCorrupted);
   r_size = omSizeOfLargeAddr(addr);
   omAddrCheckReturnError(! OM_IS_ALIGNED(r_size), omError_FalseAddrOrMemoryCorrupted);
@@ -225,7 +225,7 @@ omError_t omDoCheckBinAddr(void* addr, void* bin_size, omTrackFlags_t flags, cha
                            != 0), omError_FalseAddr);
 
   /* Check that specified bin or size is correct */
-  omAddrCheckReturnError((flags & OM_FBIN) 
+  omAddrCheckReturnError((flags & OM_FBIN) &&  bin_size != NULL 
                          && ((omBin) bin_size) != omGetTopBinOfAddr(addr), omError_WrongBin);
 
   if (flags & OM_FSIZE && (!(flags & OM_FSLOPPY)  || (size_t) bin_size > 0))

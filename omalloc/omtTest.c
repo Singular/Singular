@@ -161,12 +161,7 @@ int size_range_number = RANGE_MAX / RANGE_MIN;
 
 int MyRandSpec()
 {
-#if 0
-  /* This behaves badly on the HP's, because RAND_MAX == 32767 */
-  int spec = 1 + (int) ( ((double) SPEC_MAX)* ((double) random())/(RAND_MAX + 1.0));
-#else
   unsigned long spec = random() + 1;
-#endif  
   if (! size_range_number)
   {
     size_range = size_range << 1;

@@ -3,7 +3,7 @@
  *  Purpose: implementation of main omDebug functions
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omDebugTrack.c,v 1.3 2000-08-14 12:26:43 obachman Exp $
+ *  Version: $Id: omDebugTrack.c,v 1.4 2000-08-18 09:05:52 obachman Exp $
  *******************************************************************/
 #include <limits.h>
 #include "omConfig.h"
@@ -403,7 +403,7 @@ void omFreeTrackAddr(void* d_addr)
 
   om_JustFreedPage = NULL;
 
-  ___omFreeBin(d_addr);
+  __omFreeBinAddr(d_addr);
 
   if (page != om_JustFreedPage)
     omSetTrackOfUsedBlocks(page->used_blocks);
@@ -468,7 +468,8 @@ static omError_t omDoCheckTrackAddr(omTrackAddr d_addr, void* addr, void* bin_si
       omAddrCheckReturnCorrupted((size_t) d_addr->bin_size < SIZEOF_OM_ALIGNMENT);
     }
       
-
+    omAddrCheckReturnError((flags & OM_FBINADDR) && !((d_addr->flags & OM_FBIN) || ((size_t) d_addr->bin_size <= OM_MAX_BLOCK_SIZE)), omError_NotBinAddr);
+      
     omAddrCheckReturnError((flags & OM_FBIN) && ( !(d_addr->flags & OM_FBIN) || d_addr->bin_size != bin_size),omError_WrongBin);
     if (flags & OM_FSIZE)
     {

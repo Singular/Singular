@@ -3,7 +3,7 @@
  *  Purpose: alloc function to be included in omMain.c
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omtTestAlloc.c,v 1.4 2000-08-18 09:02:02 obachman Exp $
+ *  Version: $Id: omtTestAlloc.c,v 1.5 2000-08-18 09:05:53 obachman Exp $
  *******************************************************************/
 #include "omtTest.h"
 
@@ -133,6 +133,10 @@ void omtTestFree(omMemCell cell)
   }
   else if (bin != NULL && IS_FREE_BIN(spec))
     omFreeBin(addr, bin);
+  else if (IS_FREE_BINADDR(spec) && (bin != NULL || size <= OM_MAX_BLOCK_SIZE))
+  {
+    omFreeBinAddr(addr);
+  }
   else
   {
     if (IS_SLOPPY(spec))

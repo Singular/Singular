@@ -3,7 +3,7 @@
  *  Purpose: implementation of main omTest functions
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 7/00
- *  Version: $Id: omDebug.c,v 1.6 2000-08-14 12:26:42 obachman Exp $
+ *  Version: $Id: omDebug.c,v 1.7 2000-08-18 09:05:51 obachman Exp $
  *******************************************************************/
 #include <limits.h>
 #include "omConfig.h"
@@ -42,6 +42,10 @@ omError_t omTestAddrBin(void* addr, omBin bin, int check_level)
 omError_t omTestAddrSize(void* addr, size_t size, int check_level)
 {
   return _omDebugAddr(addr,(void*)(size),OM_FSIZE,OM_CLFL);
+}
+omError_t omTestBinAddr(void* addr, int check_level)
+{
+  return _omDebugAddr(addr,NULL, OM_FBINADDR, OM_CLFL);
 }
 omError_t omTestAddr(void* addr, int check_level)
 {
@@ -486,8 +490,8 @@ static void __omDebugFree(void* addr, void* size_bin, omTrackFlags_t flags, OM_F
   }
   else
 #endif   
-    if (om_Opts.Keep <= 0 && (flags & OM_FBIN))
-      ___omFreeBin(addr);
+    if (om_Opts.Keep <= 0 && ((flags & OM_FBIN) || (flags & OM_FBINADDR)))
+      __omFreeBinAddr(addr);
     else if (om_Opts.Keep <= 0 && (flags & OM_FSIZE))
       __omFreeSize(addr, (size_t) size_bin);
     else

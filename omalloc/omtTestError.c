@@ -190,6 +190,19 @@ int omtTestErrors()
           break;
         }
 
+        case omError_NotBinAddr:
+        {
+          spec.NotIsBin = 1;
+          spec.MinSize = OM_MAX_BLOCK_SIZE + 1;
+          cell = omFindCell(spec);
+          if (cell != NULL)
+          {
+            omDebugBinAddr(cell->addr);
+          }
+          else printf("cell not found");
+          break;
+        }
+
         case omError_UnalignedAddr: 
         {
           cell = omFindCell(spec);

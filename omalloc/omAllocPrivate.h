@@ -4,7 +4,7 @@
  *           routines for omalloc
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omAllocPrivate.h,v 1.3 2000-08-14 12:26:39 obachman Exp $
+ *  Version: $Id: omAllocPrivate.h,v 1.4 2000-08-18 09:05:51 obachman Exp $
  *******************************************************************/
 #ifndef OM_ALLOC_PRIVATE_H
 #define OM_ALLOC_PRIVATE_H
@@ -155,9 +155,8 @@ do                                              \
 }                                               \
 while (0)
 
-#define __omFreeBin(addr, bin) ___omFreeBin(addr)
 
-#define ___omFreeBin(addr)                                      \
+#define __omFreeBinAddr(addr)                                   \
 do                                                              \
 {                                                               \
   register void* __om_addr = (void*) (addr);                    \
@@ -174,7 +173,7 @@ do                                                                              
     size_t old_sizeW = (omIsNormalBinPageAddr(old_addr) ? old_bin->sizeW : omSizeWOfAddr(old_addr));    \
     __omTypeAllocBin(new_type, new_addr, new_bin);                                                      \
     omMemcpyW(new_addr, old_addr, (new_bin->sizeW > old_sizeW ? old_sizeW : new_bin->sizeW));           \
-    __omFreeBin(old_addr, old_bin);                                                                     \
+    __omFreeBinAddr(old_addr);                                                                     \
   }                                                                                                     \
   else                                                                                                  \
   {                                                                                                     \
@@ -194,7 +193,7 @@ do                                                                              
     omMemcpyW(new_addr, old_addr, (new_bin->sizeW > old_sizeW ? old_sizeW : new_bin->sizeW));           \
     if (new_bin->sizeW > old_sizeW)                                                                     \
        omMemsetW((void**)new_addr + old_sizeW, 0, new_bin->sizeW - old_sizeW);                          \
-    __omFreeBin(old_addr, old_bin);                                                                     \
+    __omFreeBinAddr(old_addr);                                                                     \
   }                                                                                                     \
   else                                                                                                  \
   {                                                                                                     \
@@ -283,7 +282,7 @@ do                                                          \
 {                                                           \
   if (size <= OM_MAX_BLOCK_SIZE || omIsBinPageAddr(addr))   \
   {                                                         \
-    ___omFreeBin(addr);                                     \
+    __omFreeBinAddr(addr);                                     \
   }                                                         \
   else                                                      \
   {                                                         \
@@ -297,7 +296,7 @@ do                                              \
 {                                               \
   if (omIsBinPageAddr(addr))                    \
   {                                             \
-    ___omFreeBin(addr);                         \
+    __omFreeBinAddr(addr);                         \
   }                                             \
   else                                          \
   {                                             \

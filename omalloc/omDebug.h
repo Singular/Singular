@@ -3,7 +3,7 @@
  *  Purpose: declaration of common Debug/Check/Track stuff
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 7/00
- *  Version: $Id: omDebug.h,v 1.6 2000-08-14 12:26:42 obachman Exp $
+ *  Version: $Id: omDebug.h,v 1.7 2000-08-18 09:05:51 obachman Exp $
  *******************************************************************/
 #ifndef OM_DEBUG_H
 #define OM_DEBUG_H
@@ -38,9 +38,11 @@
 #define OM_FZERO    32          /* for Alloc0 */
 #define OM_FALIGN   64          /* for AllocAligned */
 #define OM_FSLOPPY  128         /* be sloppy about arguments */
-#define OM_FMAX     250         /* maximal flag: OM_FBIN and OM_FSIZE can not be at the same time, 
-                                   and so can't OM_USED and OM_KEPT. Hence 255 - BIN - USED*/
-typedef unsigned char omTrackFlags_t;
+#define OM_FBINADDR 256
+/* maximal flag: OM_FBIN and OM_FSIZE can not be at the same time, 
+   and so can't OM_USED and OM_KEPT. Hence 255 - BIN - USED*/
+#define OM_FMAX     512 - OM_FBIN - OM_FUSED
+typedef unsigned short omTrackFlags_t;
 
 void* _omDebugAlloc(void* size_bin, omTrackFlags_t flags, OM_CTFL_DECL);
 void* _omDebugRealloc(void* old_addr, void* old_size_bin, void* new_size_bin,

@@ -3,7 +3,7 @@
  *  Purpose: implementation of Error handling routines 
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omError.c,v 1.3 2000-08-14 12:26:44 obachman Exp $
+ *  Version: $Id: omError.c,v 1.4 2000-08-18 09:05:52 obachman Exp $
  *******************************************************************/
 
 #include <stdarg.h>
@@ -33,8 +33,9 @@ static struct omErrorString_s om_ErrorStrings[] =
   {omError_WrongSize,                   "omError_WrongSize",                   "wrong size specification of addr"},
   {omError_FreedAddr,                   "omError_FreedAddr",                   "addr had previosuly been freed"},
   {omError_FreedAddrOrMemoryCorrupted,  "omError_FreedAddrOrMemoryCorrupted",  "addr had previosuly been freed  or memory corrupted"},
-  {omError_WrongBin,                    "omError_WrongBin",                    "wrong Bin specification for addr"},
+  {omError_WrongBin,                    "omError_WrongBin",                    "addr is not from given Bin"},
   {omError_UnknownBin,                  "omError_UnknownBin",                  "given Bin is unknown"},
+  {omError_NotBinAddr,                  "omError_NotBinAddr",                  "addr is not a BinAddr"},
   {omError_UnalignedAddr,               "omError_UnalignedAddr",               "addr is unaligned"},
   {omError_NullSizeAlloc,               "omError_NullSizeAlloc",               "alloc of size 0"},
   {omError_ListCycleError,              "omError_ListCycleError",              "list has cycles"},

@@ -3,7 +3,7 @@
  *  Purpose: Error handling of omalloc
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omError.h,v 1.3 2000-08-14 12:26:44 obachman Exp $
+ *  Version: $Id: omError.h,v 1.4 2000-08-18 09:05:53 obachman Exp $
  *******************************************************************/
 #ifndef OM_ERROR_H
 #define OM_ERROR_H
@@ -28,6 +28,7 @@ enum omError_e
   omError_FreedAddrOrMemoryCorrupted,
   omError_WrongBin,
   omError_UnknownBin,
+  omError_NotBinAddr,
   omError_UnalignedAddr,
   omError_NullSizeAlloc,
   omError_ListCycleError,

@@ -1,5 +1,6 @@
 #include <time.h>
 #include <string.h>
+#include <limits.h>
 
 #define TRACK_LEVEL   1
 #define CHECK_LEVEL   1
@@ -67,12 +68,13 @@ void TestFree(omMemCell cell);
 #define DO_TRACK(spec)      0
 #define GET_TRACK(spec)     0
 #endif
-#define IS_FREE_SIZE(spec)  (spec & (1 << 28))
-#define IS_FREE_BIN(spec)   (spec & (1 << 29))
-#define IS_SLOPPY(spec)     (spec & (1 << 30))
+#define IS_FREE_SIZE(spec)      (spec & (1 << 28))
+#define IS_FREE_BIN(spec)       (spec & (1 << 29))
+#define IS_SLOPPY(spec)         (spec & (1 << 30))
+#define IS_FREE_BINADDR(spec)   (spec & (1 << 31))
 
 
-#define SPEC_MAX   (((unsigned long) (1 << 31)) -1)
+#define SPEC_MAX   ULONG_MAX
 #define SIZE_MAX  ((1 << 14) -1)
 #define RANGE_MIN (1 << 6)
 #define RANGE_MAX (1 << 14)
