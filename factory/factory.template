@@ -1,21 +1,21 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: factory.template,v 1.10 1997-08-29 07:26:43 schmidt Exp $ */
+/* $Id: factory.template,v 1.11 1997-10-23 13:06:50 schmidt Exp $ */
 
 #ifndef INCL_FACTORY_H
 #define INCL_FACTORY_H
 
 //{{{ docu
 //
-// factory.template - template to generate factory.h.
+// factory.template - template to generate `factory.h'.
 //
-// factory.h is the user interface to factory.  Created
-// automatically by makeheader, it collects all important
-// declarations from all important factory header files into one
-// overall header file leaving out all boring factory internal
-// stuff.  See ./bin/makeheader for an explanation of the syntax
+// `factory.h' is the user interface to Factory.  Created
+// automatically by `makeheader', it collects all important
+// declarations from all important Factory header files into one
+// overall header file leaving out all boring Factory internal
+// stuff.  See `./bin/makeheader' for an explanation of the syntax
 // of this file.
 //
-// Note: In this file the order of 'includes' matters (since this
+// Note: In this file the order of "includes" matters (since this
 // are not real includes)!  In general, files at the end depend
 // on files at the beginning.
 //
