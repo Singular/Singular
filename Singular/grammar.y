@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.92 2001-08-27 14:47:01 Singular Exp $ */
+/* $Id: grammar.y,v 1.93 2001-09-25 16:07:26 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -847,11 +847,21 @@ currring_lists:
 declare_ip_variable:
         ROOT_DECL elemexpr
           {
+            #ifdef HAVE_NS
+            if (iiDeclCommand(&$$,&$2,myynest,$1,&($2.req_packhdl->idroot)))
+              YYERROR;
+            #else
             if (iiDeclCommand(&$$,&$2,myynest,$1,&IDROOT)) YYERROR;
+            #endif
           }
         | ROOT_DECL_LIST elemexpr
           {
+            #ifdef HAVE_NS
+            if (iiDeclCommand(&$$,&$2,myynest,$1,&($2.req_packhdl->idroot)))
+              YYERROR;
+            #else
             if (iiDeclCommand(&$$,&$2,myynest,$1,&IDROOT)) YYERROR;
+            #endif
           }
         | RING_DECL elemexpr
           {
@@ -883,15 +893,19 @@ declare_ip_variable:
           }
         | INTMAT_CMD elemexpr '[' expr ']' '[' expr ']'
           {
-            if (iiDeclCommand(&$$,&$2,myynest,$1,&IDROOT)) YYERROR;
             int r; TESTSETINT($4,r);
             int c; TESTSETINT($7,c);
             if (r < 1)
               MYYERROR("rows must be greater than 0");
             if (c < 0)
               MYYERROR("cols must be greater than -1");
+            #ifdef HAVE_NS
+            if (iiDeclCommand(&$$,&$2,myynest,$1,&($2.req_packhdl->idroot)))
+              YYERROR;
+            #else
+            if (iiDeclCommand(&$$,&$2,myynest,$1,&IDROOT)) YYERROR;
+            #endif
             leftv v=&$$;
-            //while (v->next!=NULL) { v=v->next; }
             idhdl h=(idhdl)v->data;
             delete IDINTVEC(h);
             IDINTVEC(h) = new intvec(r,c,0);
@@ -899,7 +913,12 @@ declare_ip_variable:
           }
         | INTMAT_CMD elemexpr
           {
+            #ifdef HAVE_NS
+            if (iiDeclCommand(&$$,&$2,myynest,$1,&($2.req_packhdl->idroot)))
+              YYERROR;
+            #else
             if (iiDeclCommand(&$$,&$2,myynest,$1,&IDROOT)) YYERROR;
+            #endif
             leftv v=&$$;
             idhdl h;
             do
@@ -917,11 +936,17 @@ declare_ip_variable:
             memset(&r,0,sizeof(sleftv));
             if ((BEGIN_RING<t) && (t<END_RING))
             {
-              if (iiDeclCommand(&r,&$3,myynest,t,&(currRing->idroot), TRUE)) YYERROR;
+              if (iiDeclCommand(&r,&$3,myynest,t,&(currRing->idroot), TRUE))
+                YYERROR;
             }
             else
             {
+              #ifdef HAVE_NS
+              if (iiDeclCommand(&r,&$3,myynest,t,&($3.req_packhdl->idroot)))
+                YYERROR;
+              #else
               if (iiDeclCommand(&r,&$3,myynest,t,&IDROOT)) YYERROR;
+              #endif
             }
             leftv v=&$1;
             while (v->next!=NULL) v=v->next;
@@ -931,7 +956,12 @@ declare_ip_variable:
           }
         | PROC_CMD elemexpr
           {
-            if (iiDeclCommand(&$$,&$2,myynest,PROC_CMD,&IDROOT, FALSE, TRUE)) YYERROR;
+            #ifdef HAVE_NS
+            if (iiDeclCommand(&$$,&$2,myynest,$1,&($2.req_packhdl->idroot)))
+              YYERROR;
+            #else
+            if (iiDeclCommand(&$$,&$2,myynest,$1,&IDROOT)) YYERROR;
+            #endif
           }
         ;
 
@@ -1100,7 +1130,10 @@ exportcmd:
             && (iiExport(&$2,0,(idhdl)$4.data)))
               YYERROR;
 #else
-            printf("String: %s;\n", (char *)$4.data);
+#ifdef HAVE_NS
+#else
+            Print("%s::%s;\n", (char *)$4.Name(),$2.Name()); 
+#endif /* HAVE_NS */
 #endif /* HAVE_NAMESPACES */
           }
         }
@@ -1438,7 +1471,8 @@ setringcmd:
 #ifdef USE_IILOCALRING
                   iiLocalRing[myynest-1]=IDRING(h);
 #else
-                  namespaceroot->next->currRing=IDRING(h);
+                  procstack->currRing=IDRING(h);
+                  procstack->currRingHdl=h;
 #endif
                 }
                 else

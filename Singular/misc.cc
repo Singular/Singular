@@ -238,7 +238,7 @@ void singular_example(char *str)
   idhdl h, ns;
   iiname2hdl(s, &ns, &h);
 #else /* HAVE_NAMESPACES */
-  idhdl h=idroot->get(s,myynest);
+  idhdl h=IDROOT->get(s,myynest);
 #endif /* HAVE_NAMESPACES */
   if ((h!=NULL) && (IDTYP(h)==PROC_CMD))
   {

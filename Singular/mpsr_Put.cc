@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_Put.cc,v 1.26 2001-08-27 14:47:16 Singular Exp $ */
+/* $Id: mpsr_Put.cc,v 1.27 2001-09-25 16:07:31 Singular Exp $ */
 
 /***************************************************************
  *
@@ -609,7 +609,9 @@ mpsr_Status_t mpsr_PutDump(MP_Link_pt link)
         // for putting numbers
         if (IDTYP(h) == PACKAGE_CMD)
         {
+#ifdef HAVE_NAMESPACES
           namespaceroot->push(IDPACKAGE(h), IDID(h));
+#endif
           h2 = IDPACKAGE(h)->idroot;
         }
         else
@@ -646,10 +648,12 @@ mpsr_Status_t mpsr_PutDump(MP_Link_pt link)
 #endif
           h2 = h2->next;
         }
+#ifdef HAVE_NAMESPACES
         if (IDTYP(h) == PACKAGE_CMD)
         {
           namespaceroot->pop();
         }
+#endif
       }
     }
 

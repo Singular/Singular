@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.169 2001-08-27 14:47:37 Singular Exp $ */
+/* $Id: ring.cc,v 1.170 2001-09-25 16:07:32 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -902,30 +902,23 @@ void rKill(ring r)
         iiLocalRing[j]=NULL;
       }
     }
-#else /* USE_IILOCALRING */
+// #else /* USE_IILOCALRING */
+#endif /* USE_IILOCALRING */
     {
-      namehdl nshdl = namespaceroot;
+      proclevel * nshdl = procstack;
+      int lev=myynest-1;
 
-      for(nshdl=namespaceroot; nshdl->isroot != TRUE; nshdl = nshdl->next) {
-        //Print("NSstack: %s:%d, nesting=%d\n", nshdl->name, nshdl->lev, nshdl->myynest);
+      for(; nshdl != NULL; nshdl = nshdl->next)
+      {
         if (nshdl->currRing==r)
         {
-          if (nshdl->myynest<myynest)
-//            Warn("killing the basering for level %d/%d",nshdl->lev,nshdl->myynest);
-          Warn("killing the basering for level %d",nshdl->myynest);
+          Warn("killing the basering for level %d",lev);
           nshdl->currRing=NULL;
+          nshdl->currRingHdl=NULL;
         }
       }
-      if (nshdl->currRing==r)
-      {
-        //Print("NSstack: %s:%d, nesting=%d\n", nshdl->name, nshdl->lev, nshdl->myynest);
-        if (nshdl->myynest<myynest)
-//          Warn("killing the basering for level %d/%d",nshdl->lev,nshdl->myynest);
-          Warn("killing the basering for level %d",nshdl->myynest);
-        nshdl->currRing=NULL;
-      }
     }
-#endif /* USE_IILOCALRING */
+//#endif /* USE_IILOCALRING */
 
     rDelete(r);
     return;

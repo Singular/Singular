@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.76 2001-08-27 14:47:32 Singular Exp $ */
+/* $Id: polys.cc,v 1.77 2001-09-25 16:07:31 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -167,6 +167,7 @@ void pLcm(poly a, poly b, poly m)
 */
 char * p_Read(char *st, poly &rc, ring r)
 {
+  if (r==NULL) { rc=NULL;return st;}
   int i,j;
   rc = p_Init(r);
   char *s = r->cf->nRead(st,&(rc->coef));

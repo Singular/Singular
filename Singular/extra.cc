@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.166 2001-08-27 14:46:56 Singular Exp $ */
+/* $Id: extra.cc,v 1.167 2001-09-25 16:07:24 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -967,7 +967,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 #endif
-#ifndef HAVE_NAMESPACES
+#if !defined(HAVE_NAMESPACES) && !defined(HAVE_NS)
 /*==================== lib ==================================*/
     if(strcmp(sys_cmd,"LIB")==0)
     {
@@ -1006,7 +1006,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       return FALSE;
     }
     else
-#endif /* HAVE_NAMESPACES */
 /*==================== nsstack ===================================*/
     if(strcmp(sys_cmd,"nsstack")==0)
     {
@@ -1018,6 +1017,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       return FALSE;
     }
     else
+#endif /* HAVE_NAMESPACES */
 /*==================== proclist =================================*/
     if(strcmp(sys_cmd,"proclist")==0)
     {

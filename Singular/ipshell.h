@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.h,v 1.24 2000-04-11 15:18:07 Singular Exp $ */
+/* $Id: ipshell.h,v 1.25 2001-09-25 16:07:29 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -51,6 +51,10 @@ int     IsPrime(int i);
 
 BOOLEAN iiWRITE(leftv res,leftv exprlist);
 BOOLEAN iiExport(leftv v, int toLev);
+#ifdef HAVE_NS
+BOOLEAN iiExport(leftv v, int toLev, idhdl roothdl);
+BOOLEAN iiInternalExport (leftv v, int toLev, idhdl roothdl);
+#endif /* HAVE_NS */
 #ifdef HAVE_NAMESPACES
 BOOLEAN iiExport(leftv v, int toLev, idhdl roothdl);
 BOOLEAN iiInternalExport (leftv v, int toLev, idhdl roothdl);

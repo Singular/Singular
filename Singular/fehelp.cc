@@ -546,7 +546,7 @@ static BOOLEAN heOnlineHelp(char* s)
   idhdl h, ns;
   iiname2hdl(s, &ns, &h);
 #else /* HAVE_NAMESPACES */
-  idhdl h=idroot->get(s,myynest);
+  idhdl h=IDROOT->get(s,myynest);
 #endif /* HAVE_NAMESPACES */
 
   // try help for a procedure
@@ -651,7 +651,7 @@ static long heKeyChksum(char* key)
   idhdl h, ns;
   iiname2hdl(key, &ns, &h);
 #else /* HAVE_NAMESPACES */
-  idhdl h=idroot->get(key,myynest);
+  idhdl h=IDROOT->get(key,myynest);
 #endif /* HAVE_NAMESPACES */
   if ((h!=NULL) && (IDTYP(h)==PROC_CMD))
   {

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.52 2001-09-19 14:59:31 anne Exp $ */
+/* $Id: ipid.cc,v 1.53 2001-09-25 16:07:27 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -32,13 +32,22 @@ omBin ip_command_bin = omGetSpecBin(sizeof(ip_command));
 omBin sip_package_bin = omGetSpecBin(sizeof(sip_package));
 omBin ip_package_bin = omGetSpecBin(sizeof(ip_package));
 omBin idrec_bin = omGetSpecBin(sizeof(idrec));
+#ifdef HAVE_NAMESPACES
 omBin namerec_bin = omGetSpecBin(sizeof(namerec));
-
 namehdl namespaceroot = NULL;
+#endif
+
+proclevel *procstack=NULL;
 #define TEST
 #ifndef HAVE_NAMESPACES
 idhdl idroot = NULL;
 #endif /* HAVE_NAMESPACES */
+
+#ifdef HAVE_NS
+idhdl currPackHdl = NULL;
+package currPack =NULL;
+package basePack =NULL;
+#endif /* HAVE_NS */
 idhdl currRingHdl = NULL;
 ring  currRing = NULL;
 ideal currQuotient = NULL;
@@ -696,7 +705,7 @@ idhdl ggetid(const char *n, BOOLEAN local, idhdl *packhdl)
   else *packhdl = NULL;
   return h3;
 #else /* HAVE_NAMESPACES */
-  idhdl h = idroot->get(n,myynest);
+  idhdl h = IDROOT->get(n,myynest);
   idhdl h2=NULL;
   *packhdl = NULL;
   if ((currRing!=NULL) && ((h==NULL)||(IDLEV(h)!=myynest)))
@@ -725,7 +734,7 @@ idhdl ggetid(const char *n, BOOLEAN local)
   }
   return h3;
 #else /* HAVE_NAMESPACES */
-  idhdl h = idroot->get(n,myynest);
+  idhdl h = IDROOT->get(n,myynest);
   idhdl h2=NULL;
   if ((currRing!=NULL) && ((h==NULL)||(IDLEV(h)!=myynest)))
   {
@@ -991,6 +1000,33 @@ char *getnamelev()
 // warning: address of local variable `buf' returned
 #endif
 
+void proclevel::push(ring r, idhdl R,char *n)
+{
+  proclevel *p=(proclevel*)omAlloc0(sizeof(proclevel));
+  p->currRing=r;
+  p->currRingHdl=R;
+  p->name=n;
+  #ifdef HAVE_NS
+  p->currPackHdl=::currPackHdl;
+  p->currPack=::currPack;
+  #endif
+  p->next=this;
+  procstack=p;
+}  
+void proclevel::pop(ring &r, idhdl &R)
+{
+  r=this->currRing;
+  //if (r==NULL) Print("set ring to NULL at lev %d(%s)\n",myynest,name);
+  R=this->currRingHdl;
+  #ifdef HAVE_NS
+  ::currPackHdl=this->currPackHdl;
+  ::currPack=this->currPack;
+  #endif
+  proclevel *p=this;
+  procstack=next;
+  omFreeSize(p,sizeof(proclevel));
+}
+#ifdef HAVE_NAMESPACES
 namehdl namerec::push(package pack, char *name, int nesting, BOOLEAN init)
 {
   //printf("PUSH: put entry (%s) on stack\n", name);
@@ -1006,9 +1042,7 @@ namehdl namerec::push(package pack, char *name, int nesting, BOOLEAN init)
   if(init)
   {
     ns->next    = NULL;
-#ifdef HAVE_NAMESPACES
     ns->pack    = (ip_package *)omAlloc0Bin(ip_package_bin);
-#endif /* HAVE_NAMESPACES */
     ns->isroot  = TRUE;
     ns->lev     = 1;
     //ns->myynest = 0;
@@ -1016,9 +1050,7 @@ namehdl namerec::push(package pack, char *name, int nesting, BOOLEAN init)
   else
   {
     extern ring currRing;
-#ifdef HAVE_NAMESPACES
     ns->pack   = pack;
-#endif /* HAVE_NAMESPACES */
     ns->lev    = this->lev+1;
     //ns->myynest = myynest+1;
     this->currRing = currRing;
@@ -1044,7 +1076,9 @@ namehdl namerec::push(package pack, char *name, int nesting, BOOLEAN init)
   //Print("NSPUSH: done\n");
   return(namespaceroot);
 }
+#endif /* HAVE_NAMESPACES */
 
+#ifdef HAVE_NAMESPACES
 namehdl namerec::pop(BOOLEAN change_nesting)
 {
   namehdl ns;
@@ -1063,6 +1097,7 @@ namehdl namerec::pop(BOOLEAN change_nesting)
   omFreeBin((ADDRESS)ns,  namerec_bin);
   return(namespaceroot);
 }
+#endif /* HAVE_NAMESPACES */
 
 #ifdef HAVE_NAMESPACES
 idhdl namerec::get(const char * s, int lev, BOOLEAN root)

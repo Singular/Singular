@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.89 2001-09-19 14:59:32 anne Exp $ */
+/* $Id: iplib.cc,v 1.90 2001-09-25 16:07:28 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -31,7 +31,11 @@ BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN tellerror);
                                     char *procname, int line, long pos,
                                     BOOLEAN pstatic = FALSE);
 #endif /* HAVE_LIBPARSER */
+#ifdef HAVE_NAMESPACES
 #define NS_LRING namespaceroot->next->currRing
+#else
+#define NS_LRING procstack->currRing
+#endif
 
 #include "mod_raw.h"
 
@@ -71,7 +75,7 @@ BOOLEAN iiGetLibStatus(char *lib)
   {
     omFree(plib);
     return FALSE;
-  }  
+  }
   omFree(plib);
   return TRUE;
 #endif
@@ -353,23 +357,18 @@ static void iiShowLevRings()
   }
 #endif
   {
-    namehdl nshdl;
-    for(nshdl=namespaceroot; nshdl->isroot != TRUE; nshdl = nshdl->next)
+    proclevel * nshdl;
+    for(nshdl=procstack; nshdl != NULL; nshdl = nshdl->next)
     {
-      Print("%d lev %d:",nshdl->lev, nshdl->myynest);
       if (nshdl->currRing==NULL) PrintS("NULL");
       else                       Print("%d",nshdl->currRing);
       PrintLn();
     }
-    Print("%d lev %d:",nshdl->lev, nshdl->myynest);
-    if (nshdl->currRing==NULL) PrintS("NULL");
-    else                       Print("%d",nshdl->currRing);
-    PrintLn();
   }
   if (currRing==NULL) PrintS("curr:NULL\n");
   else                Print ("curr:%x\n",currRing);
 }
-#endif
+#endif /* RDEBUG */
 
 static void iiCheckNest()
 {
@@ -423,15 +422,14 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
     //printf("iiMake_proc: staying in TOP-LEVEL\n");
   }
 #else /* HAVE_NAMESPACES */
+  omFree((ADDRESS)plib);
   if(pi->is_static && myynest==0)
   {
     Werror("'%s::%s()' is a local procedure and cannot be accessed by an user.",
            pi->libname, pi->procname);
-    omFree((ADDRESS)plib);
     return NULL;
   }
-  namespaceroot->push(NULL, plib, myynest+1);
-  omFree((ADDRESS)plib);
+  procstack->push(currRing,currRingHdl,pi->procname);
 #endif /* HAVE_NAMESPACES */
   iiCheckNest();
 #ifdef USE_IILOCALRING
@@ -479,7 +477,7 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
     //iiRETURNEXPR[myynest+1].Init(); //done by CleanUp
   }
 #ifdef USE_IILOCALRING
-  if(namespaceroot->next->currRing != iiLocalRing[myynest]) printf("iiMake_proc: 1 ring not saved\n");
+  if(procstack->currRing != iiLocalRing[myynest]) Print("iiMake_proc: 1 ring not saved procs:%x, iiLocal:%x\n",procstack->currRing, iiLocalRing[myynest]);
   if (iiLocalRing[myynest] != currRing)
   {
     if (((iiRETURNEXPR[myynest+1].Typ()>BEGIN_RING)
@@ -502,7 +500,6 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
     {
       rSetHdl(rFindHdl(iiLocalRing[myynest],NULL, NULL));
       iiLocalRing[myynest]=NULL;
-      namespaceroot->next->currRing = NULL;
     }
     else
     { currRingHdl=NULL; currRing=NULL; }
@@ -517,9 +514,21 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
     {
       char *n;
       char *o;
-      if (NS_LRING!=NULL) o=rFindHdl(NS_LRING,NULL, NULL)->id;
+      if (NS_LRING!=NULL)
+      {
+        if(IDRING(procstack->currRingHdl)==NS_LRING)
+          o=IDID(procstack->currRingHdl);
+        else
+          o=rFindHdl(NS_LRING,NULL, NULL)->id;
+      }
       else                            o="none";
-      if (currRing!=NULL)             n=rFindHdl(currRing,NULL, NULL)->id;
+      if (currRing!=NULL)
+      {
+        if((currRingHdl!=NULL) && (IDRING(currRingHdl)==currRing))
+          n=IDID(currRingHdl);
+        else
+          n=rFindHdl(currRing,NULL, NULL)->id;
+      }
       else                            n="none";
       Werror("ring change during procedure call: %s -> %s",o,n);
       iiRETURNEXPR[myynest+1].CleanUp();
@@ -527,8 +536,10 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
     }
     if (NS_LRING!=NULL)
     {
-      rSetHdl(rFindHdl(NS_LRING,NULL, NULL));
-      NS_LRING=NULL;
+      idhdl rh=procstack->currRingHdl;
+      if ((rh==NULL)||(IDRING(rh)!=NS_LRING))
+        rh=rFindHdl(NS_LRING,NULL, NULL);
+      rSetHdl(rh);
     }
     else
     { currRingHdl=NULL; currRing=NULL; }
@@ -541,7 +552,7 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
     omFreeBin((ADDRESS)iiCurrArgs, sleftv_bin);
     iiCurrArgs=NULL;
   }
-  namespaceroot->pop(TRUE);
+  procstack->pop(currRing,currRingHdl);
   if (err)
     return NULL;
   return &iiRETURNEXPR[myynest+1];
@@ -569,7 +580,7 @@ BOOLEAN iiEStart(char* example, procinfo *pi)
   if(ns != NULL)  namespaceroot->push(IDPACKAGE(ns), IDID(ns), myynest+1);
   else            namespaceroot->push(namespaceroot->root->pack, "Top", myynest+1);
 #else /* HAVE_NAMESPACES */
-  namespaceroot->push(NULL, "", myynest+1);
+  procstack->push(currRing,currRingHdl,example);
 #endif /* HAVE_NAMESPACES */
 #ifdef USE_IILOCALRING
   iiLocalRing[myynest]=currRing;
@@ -613,8 +624,10 @@ BOOLEAN iiEStart(char* example, procinfo *pi)
   {
     if (NS_LRING!=NULL)
     {
-      rSetHdl(rFindHdl(NS_LRING,NULL, NULL));
-      NS_LRING=NULL;
+      idhdl rh=procstack->currRingHdl;
+      if ((rh==NULL)||(IDRING(rh)!=NS_LRING))
+        rh=rFindHdl(NS_LRING,NULL, NULL);
+      rSetHdl(rh);
     }
     else
     {
@@ -623,7 +636,7 @@ BOOLEAN iiEStart(char* example, procinfo *pi)
     }
   }
 #endif /* USE_IILOCALRING */
-  namespaceroot->pop(TRUE);
+  procstack->pop(currRing,currRingHdl);
   return err;
 }
 
@@ -734,7 +747,7 @@ BOOLEAN iiLocateLib(const char* lib, char* where)
   {
     omFree(plib);
     return FALSE;
-  }  
+  }
   strcpy(where,IDPACKAGE(hl)->libname);
   omFree(plib);
 #endif
@@ -777,6 +790,7 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
     return TRUE;
   }
 #else /* HAVE_NAMESPACES */
+#ifndef HAVE_NS
   hl = idroot->get("LIB",0);
   if (hl==NULL)
   {
@@ -827,6 +841,7 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
     }
 #endif
   }
+#endif /* HAVE_NS */
 #endif /* HAVE_NAMESPACES */
 #ifdef HAVE_TCL
   if (tclmode)
@@ -888,7 +903,7 @@ static void iiCleanProcs(idhdl &root)
         // - no proc body can start at the beginning of the file
         killhdl(root);
         if (prev==NULL)
-          root=idroot;
+          root=IDROOT;
         else
         {
           root=prev;
@@ -939,7 +954,7 @@ static BOOLEAN iiLoadLIB(FILE *fp, char *libnamebuf, char*newlib,
     reinit_yylp();
     fclose( yylpin );
     #ifndef HAVE_NAMESPACES
-    iiCleanProcs(idroot);
+    iiCleanProcs(IDROOT);
     #endif /* HAVE_NAMESPACES */
     return TRUE;
   }
@@ -1107,8 +1122,10 @@ BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN tellerror)
       goto load_modules_end;
     }
   }
+#ifdef HAVE_NAMESPACES
+  // push ?
   namespaceroot->push(IDPACKAGE(pl), IDID(pl));
-
+#endif
   if((IDPACKAGE(pl)->handle=dynl_open(FullName))==(void *)NULL)
   {
     Werror("dynl_open failed:%s", dynl_error());
@@ -1125,9 +1142,11 @@ BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN tellerror)
   RET=FALSE;
 
   load_modules_end:
+#ifdef HAVE_NAMESPACES
+  // pop ?
   namespaceroot->pop();
+#endif
   return RET;
-
 }
 #endif /* HAVE_DYNAMIC_LOADING */
 

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: subexpr.h,v 1.28 2001-02-09 14:22:56 Singular Exp $ */
+/* $Id: subexpr.h,v 1.29 2001-09-25 16:07:33 Singular Exp $ */
 /*
 * ABSTRACT: handling of leftv
 */
@@ -57,6 +57,10 @@ class sleftv
     idhdl       req_packhdl;
 #define IDSROOT(a) (IDPACKAGE(((sleftv)a).packhdl)->idroot)
 #endif /* HAVE_NAMESPACES */
+#ifdef HAVE_NS
+    package     packhdl;
+    package     req_packhdl;
+#endif /* HAVE_NS */
     inline void Init() { memset(this,0,sizeof(*this)); }
     void Set(int val);
     void Print(leftv store=NULL,int spaces=0);

@@ -5,7 +5,7 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id: mod2.h.in,v 1.101 2001-08-27 14:47:11 Singular Exp $
+ *  Version: $Id: mod2.h.in,v 1.102 2001-09-25 16:07:30 Singular Exp $
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H
@@ -559,9 +559,6 @@ int hpux9_system(const char* system);
 
 #endif /* not NDEBUG */
 
-#ifdef HAVE_DYNAMIC_LOADING
-#   define HAVE_NAMESPACES 1
-#endif /* HAVE_DYNAMIC_LOADING */
 #ifdef HAVE_NAMESPACES
 #  undef USE_IILOCALRING
 #endif

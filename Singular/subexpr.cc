@@ -4,7 +4,7 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id: subexpr.cc,v 1.76 2001-05-30 14:37:57 Singular Exp $ */
+/* $Id: subexpr.cc,v 1.77 2001-09-25 16:07:33 Singular Exp $ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -1315,6 +1315,12 @@ void syMake(leftv v,char * id, idhdl packhdl)
     v->req_packhdl = packhdl;
   else v->req_packhdl = namespaceroot->get(namespaceroot->name, 0, TRUE);
 #endif /* HAVE_NAMESPACES */
+#ifdef HAVE_NS
+  v->packhdl = NULL;
+  if(packhdl != NULL)
+    v->req_packhdl = IDPACKAGE(packhdl);
+  else v->req_packhdl = basePack;
+#endif /* HAVE_NS */
 #ifdef SIQ
   if (siq<=0)
 #endif
@@ -1363,6 +1369,13 @@ void syMake(leftv v,char * id, idhdl packhdl)
       h=ggetid(id, packhdl==NULL ? FALSE : TRUE, &(v->packhdl));
       //if(h==NULL) Print("syMake: h is null\n");
 #else /* HAVE_NAMESPACES */
+#ifdef HAVE_NS
+      if(v->req_packhdl!=currPack)
+      {
+        h=v->req_packhdl->idroot->get(id,myynest);
+      }
+      else
+#endif
       h=ggetid(id);
 #endif /* HAVE_NAMESPACES */
       /* 3) existing identifier, local */

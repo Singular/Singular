@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.266 2001-08-28 11:49:46 Singular Exp $ */
+/* $Id: iparith.cc,v 1.267 2001-09-25 16:07:26 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -745,7 +745,50 @@ static BOOLEAN jjCOLCOL(leftv res, leftv u, leftv v)
         return TRUE;
   }
 #else /* HAVE_NAMESPACES */
+#ifdef HAVE_NS
+  idhdl packhdl;
+
+  switch(u->Typ())
+  {
+      case 0:
+        Print("%s of type 'ANY'. Trying load.\n", v->name);
+        //if(iiTryLoadLib(u, u->name))
+        {
+          Werror("'%s' no such package", u->name);
+          return TRUE;
+        }
+        //syMake(u,u->name,NULL);
+        // else: use next case !!! no break !!!
+
+      case PACKAGE_CMD:
+        packhdl = (idhdl)u->data;
+        if((!IDPACKAGE(packhdl)->loaded) 
+        && (IDPACKAGE(packhdl)->language > LANG_TOP))
+        {
+          //if(iiReLoadLib(packhdl))
+          //  Werror("unable to reload package '%s'", IDID(packhdl));
+          Werror("'%s' not loaded", u->name);
+          return TRUE;
+        }
+        if(v->rtyp == IDHDL)
+        {
+          v->name = omStrDup(v->name);
+        }
+        syMake(v, v->name, packhdl);
+        memcpy(res, v, sizeof(sleftv));
+        memset(v, 0, sizeof(sleftv));
+        break;
+
+      case DEF_CMD:
+        break;
+
+      default:
+        WerrorS("<package>::<id> expected");
+        return TRUE;
+  }
+#else
   WerrorS("package is not supported in this version");
+#endif /* HAVE_NS */
 #endif /* HAVE_NAMESPACES */
   return FALSE;
 }

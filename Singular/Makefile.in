@@ -94,7 +94,7 @@ endif
 
 # normal C++ source files
 CXXSOURCES=grammar.cc scanner.cc algmap.cc attrib.cc clapconv.cc \
-    clapsing.cc cntrlc.cc mminit.cc\
+    clapsing.cc mminit.cc\
     extra.cc febase.cc feread.cc fehelp.cc feResource.cc feOpt.cc \
     ffields.cc hdegree.cc hilb.cc hutil.cc \
     gring.cc gr_kstd2.cc\
@@ -103,7 +103,7 @@ CXXSOURCES=grammar.cc scanner.cc algmap.cc attrib.cc clapconv.cc \
     ipprint.cc ipshell.cc khstd.cc kstdfac.cc \
     kstd1.cc kstd2.cc kutil.cc lists.cc \
     longalg.cc longrat.cc longrat0.cc \
-    maps.cc matpol.cc misc.cc sdb.cc gnumpfl.cc gnumpc.cc \
+    maps.cc matpol.cc sdb.cc gnumpfl.cc gnumpc.cc \
     modulop.cc mpr_complex.cc sparsmat.cc \
     fglm.cc fglmzero.cc fglmvec.cc fglmgauss.cc fglmhom.cc fglmcomb.cc \
     numbers.cc polys.cc p_polys.cc polys0.cc polys1.cc polys-impl.cc \
@@ -116,7 +116,7 @@ CXXSOURCES=grammar.cc scanner.cc algmap.cc attrib.cc clapconv.cc \
     mpr_inout.cc mpr_base.cc mpr_numeric.cc \
     prCopy.cc p_Mult_q.cc \
     pDebug.cc pInline2.cc pInline1.cc pInline0.cc \
-    pShallowCopyDelete.cc 
+    pShallowCopyDelete.cc  cntrlc.cc misc.cc
 
 # stuff for MP
 MPSR_SOURCES = mpsr_Put.cc mpsr_PutPoly.cc mpsr_GetPoly.cc mpsr_sl.cc\

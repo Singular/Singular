@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.l,v 1.46 2001-08-27 14:47:08 Singular Exp $ */
+/* $Id: libparse.l,v 1.47 2001-09-25 16:07:29 Singular Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -352,7 +352,7 @@ static     { p_static=TRUE; }
                 }
                #else /* HAVE_NAMESPACES */
                h0 = enterid( omStrDup(proc), 0 /*myynest*/, PROC_CMD,
-                                   &idroot, TRUE );
+                                   &IDROOT, TRUE );
                #endif /* HAVE_NAMESPACES */
                /* omCheckAddr(IDID(h0)); */
                if (h0!=NULL)
