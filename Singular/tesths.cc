@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.18 1997-06-17 11:53:58 Singular Exp $ */
+/* $Id: tesths.cc,v 1.19 1997-06-20 10:19:05 obachman Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -58,7 +58,7 @@ int main(          /* main entry to Singular */
 #ifdef GENTABLE
   extern ttGen1();
   extern ttGen2();
-  #ifndef HAVE_MPSR
+  #ifndef macintosh
     extern mpsr_ttGen(); // For initialization of (CMD, MP_COP) tables
     mpsr_ttGen();
   #endif
