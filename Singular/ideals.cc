@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.95 2000-05-24 14:32:37 siebert Exp $ */
+/* $Id: ideals.cc,v 1.96 2000-07-06 13:30:01 pohl Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -313,6 +313,19 @@ void idDelDiv(ideal id)
   }
 }
 
+/*2
+*test if the ideal has only constant polynomials
+*/
+BOOLEAN idIsConstant(ideal id)
+{
+  int k;
+  for (k = IDELEMS(id)-1; k>=0; k--)
+  {
+    if (pIsConstantPoly(id->m[k]) == FALSE)
+      return FALSE;
+  }
+  return TRUE;
+}
 
 /*2
 * copy an ideal

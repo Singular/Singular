@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ntsolve.lib,v 1.5 2000-01-12 11:01:39 pohl Exp $";
+version="$Id: ntsolve.lib,v 1.6 2000-07-06 13:32:25 pohl Exp $";
 info="
 LIBRARY: ntsolve.lib ONE REAL SOLUTION OF POLYNOMIAL SYSTEMS (NEWTON ITERATION)
 AUTHOR:  Wilfred Pohl,   email: pohl@mathematik.uni-kl.de
@@ -9,10 +9,10 @@ nt_solve(i,..);        find one real root of 0-dimensional ideal
 ";
 ///////////////////////////////////////////////////////////////////////////////
 
-proc nt_solve( ideal gls, vector ini, intvec ipar )
+proc nt_solve( ideal gls, ideal ini, intvec ipar )
 "USAGE:   nt_solve(gls,ini,ipar);
          gls: the equations
-         ini: the vector of initial values
+         ini: the ideal of initial values
          ipar: control
            ipar[1] - max. number of iterations
            ipar[2] - accuracy, have the l2-norm ||.||
@@ -23,7 +23,7 @@ proc nt_solve( ideal gls, vector ini, intvec ipar )
            defaults - 100, 10, 0
 ASSUME:  gls is a zerodimensional ideal with
          nvars(basering) = size(gls) (> 1)
-RETURN:  vector of one solution (if found)
+RETURN:  ideal of one solution (if found)
          0 (else)
 EXAMPLE: example nt_solve; shows an example
 "
@@ -34,18 +34,18 @@ EXAMPLE: example nt_solve; shows an example
       ERROR("wrong dimension");}
     if (size(ini) != di){
       ERROR("wrong number of initial values");}
+    int prec = system("getPrecDigits"); // precision
 
     int i1,i2,i3;
     i1 = size(ipar);
     int itmax, acc, prot;
     if (i1 < 1){itmax = 100;}else{itmax = ipar[1];}
-    if (i1 < 2){acc = 10;}else{acc = ipar[2];}
+    if (i1 < 2){acc = prec/2;}else{acc = ipar[2];}
     if (i1 < 3){prot = 0;}else{prot = ipar[3];}
+    if ((acc <= 0)||(acc > prec-1)){acc = prec-1;}
 
-    int prec = acc+5; // precision in the working ring
     int dpl = di+1;
     string out; // for prot != 0 and more
-    intvec permut; // the permutations in bareiss
     out = "ring rnewton=(real,prec),("+varstr(basering)+"),(c,dp);";
     execute(out);
     ideal gls1=imap(rn,gls);
@@ -56,7 +56,8 @@ EXAMPLE: example nt_solve; shows an example
     if (i1>0){
       setring rn; kill rnewton;
       ERROR("one var not in equation");}
-    vector direction,ini1;
+    list direction;
+    ideal ini1;
     ini1 = imap(rn,ini);
     number dum,y1,y2,y3,genau;
     genau = 0.1;
@@ -68,7 +69,7 @@ EXAMPLE: example nt_solve; shows an example
     for (i1=di;i1>0;i1--){
       nt = subst(nt,var(i1),ini1[i1]);}
     // now we have in sub the general structure
-    // and in nt the strukture with subst. vars
+    // and in nt the structure with subst. vars
 
     // compute initial error
     y1 = ml2norm(nt,genau);
@@ -80,24 +81,22 @@ EXAMPLE: example nt_solve; shows an example
     if(prot){out="  Nr. "+string(i3);out;}
 
     // find newton direction
-    list bar = bareiss(nt,1,-1);
-    nt = bar[1];
-    permut = bar[2];
-    kill bar;
-    direction=nt[di][dpl]/leadcoef(nt[di][di])*gen(di);
-    for(i1=di-1;i1>0;i1--){
-      y3 = leadcoef(nt[i1][dpl]);
-      for(i2=di;i2>i1;i2--){
-        y3 = y3-leadcoef(direction[i2])*leadcoef(nt[i1][i2]);}
-      direction = direction+(y3/leadcoef(nt[i1][i1])*gen(i1));}
+    direction=bareiss(nt,1,-1);
 
     // find dumping
-    dum = linesearch(gls1,ini1,direction,permut,y1,dum,genau);
+    dum = linesearch(gls1,ini1,direction[1],y1,dum,genau);
+    if (i3%5 == 0)
+    {
+      if (dum <= 0.000001)
+      {
+        dum = 1.0;
+      }
+    }
     if(prot){out="  dumping = "+string(dum);out;}
 
     // new value
     for(i1=di;i1>0;i1--){
-      ini1=ini1-dum*direction[i1]*gen(permut[i1]);}
+      ini1[i1]=ini1[i1]-dum*direction[1][i1];}
     nt = sub;
     for (i1=di;i1>0;i1--){
       nt = subst(nt,var(i1),ini1[i1]);}
@@ -106,10 +105,9 @@ EXAMPLE: example nt_solve; shows an example
     if(y1<y2){break;} // we are ready
   }
 
-    setring rn;
     if (y1>y2){
-      kill rnewton;
-      ERROR("no convergence");}
+      "WARNING: no convergence";}
+    setring rn;
     ini = imap(rnewton,ini1);
     kill rnewton;
     return(ini);
@@ -117,41 +115,36 @@ EXAMPLE: example nt_solve; shows an example
 example
 {
     "EXAMPLE:";echo=2;
-    ring rsq = (real,16),(x,y,z,w),(c,lp);
+    ring rsq = (real,40),(x,y,z,w),lp;
     ideal gls =  x2+y2+z2-10, y2+z3+w-8, xy+yz+xz+w5 - 1,w3+y;
-    vector ini = [3.1,2.9,1.1,0.5];
-    intvec ipar = 200,8,1;
-    vector sol = nt_solve(gls,ini,ipar);
+    ideal ini = 3.1,2.9,1.1,0.5;
+    intvec ipar = 200,0,1;
+    ideal sol = nt_solve(gls,ini,ipar);
     sol;
 }
 ///////////////////////////////////////////////////////////////////////////////
 
 static proc sqrt (number wr, number wa, number wg)
 {
-  number we=wr*wg;
+  number es,we;
   number wb=wa;
   number wf=wb*wb-wr;
-  while (wf>we)
+  if(wf>0){
+    es=wf;}
+  else{
+    es=-wf;}
+  we=wg*es;
+  while (es>we)
   {
     wf=wf/(wb+wb);
     wb=wb-wf;
     wf=wb*wb-wr;
+    if(wf>0){
+      es=wf;}
+    else{
+      es=-wf;}
   }
   return(wb);
-}
-
-static proc vl2norm (vector H, number wg)
-{
-  number wa,wb;
-  int wi;
-  wa = leadcoef(H[1]);
-  wa = wa*wa;
-  for(wi=size(H);wi>1;wi--)
-  {
-    wb=leadcoef(H[wi]);
-    wa=wa+wb*wb;
-  }
-  return(sqrt(wa,wa,wg));
 }
 
 static proc il2norm (ideal H, number wg)
@@ -184,29 +177,30 @@ static proc ml2norm (module H, number wg)
 }
 
 static
-proc linesearch(ideal nl, vector aa, vector bb, intvec pe,
+proc linesearch(ideal nl, ideal aa, ideal bb,
 number z1, number tt, number gg)
 {
   int ii,d;
-  vector cc;
-  ideal jn;
-  number z2,z3,e1;
+  ideal cc,jn;
+  number ss,z2,z3,mm;
+
+  mm=0.000001;
+  ss=tt;
   d=size(nl);
   cc=aa;
-  for(ii=d;ii>0;ii--){cc=cc-tt*bb[ii]*gen(pe[ii]);}
+  for(ii=d;ii>0;ii--){cc[ii]=cc[ii]-ss*bb[ii];}
   jn=nl;
   for(ii=d;ii>0;ii--){jn=subst(jn,var(ii),cc[ii]);}
   z2=il2norm(jn,gg);
   z3=-1;
-  e1=1.0e-6;
   while(z2>=z1)
   {
-    if(tt<e1){return (e1);}
-    tt=0.5*tt;
+    ss=0.5*ss;
+    if(ss<mm){return (mm);}
     cc=aa;
     for(ii=d;ii>0;ii--)
     {
-      cc=cc-tt*bb[ii]*gen(pe[ii]);
+      cc[ii]=cc[ii]-ss*bb[ii];
     }
     jn=nl;
     for(ii=d;ii>0;ii--){jn=subst(jn,var(ii),cc[ii]);}
@@ -217,11 +211,11 @@ number z1, number tt, number gg)
   {
     while(z3<z2)
     {
-      tt=tt+tt;
+      ss=ss+ss;
       cc=aa;
       for(ii=d;ii>0;ii--)
       {
-        cc=cc-tt*bb[ii]*gen(pe[ii]);
+        cc[ii]=cc[ii]-ss*bb[ii];
       }
       jn=nl;
       for(ii=d;ii>0;ii--){jn=subst(jn,var(ii),cc[ii]);}
@@ -231,9 +225,10 @@ number z1, number tt, number gg)
   }
   z2=z2-z1;
   z3=z3-z1;
-  tt=0.25*tt*(z3-4*z2)/(z3-2*z2);
-  if(tt<e1){return (e1);}
-  return(tt);
+  ss=0.25*ss*(z3-4*z2)/(z3-2*z2);
+  if(ss>1.0){return (1.0);}
+  if(ss<mm){return (mm);}
+  return(ss);
 }
 ///////////////////////////////////////////////////////////////////////////////
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sparsmat.cc,v 1.29 2000-06-21 07:32:20 pohl Exp $ */
+/* $Id: sparsmat.cc,v 1.30 2000-07-06 13:30:04 pohl Exp $ */
 
 /*
 * ABSTRACT: operations with sparse matrices (bareiss, ...)
@@ -96,7 +96,6 @@ private:
   void smRowToCol();
   void smFinalMult();
   void smSparseHomog();
-  void smRealPivot();
   void smWeights();
   void smPivot();
   void smNewWeights();
@@ -471,6 +470,7 @@ poly sparse_mat::smDet()
     }
     if (act < 2)
     {
+      if (TEST_OPT_PROT) PrintS(".\n");
       this->smFinalMult();
       this->smPivDel();
       if (act != 0) res = m_act[1]->m;
@@ -531,6 +531,7 @@ void sparse_mat::smBareiss(int x, int y)
       this->smToredElim();
     if (act < y)
     {
+      if (TEST_OPT_PROT) PrintS(".\n");
       this->smCopToRes();
       return;
     }
@@ -542,9 +543,8 @@ void sparse_mat::smBareiss(int x, int y)
 *   - with x unreduced last rows, pivots from here are not allowed
 *   - the method will finish for number of unreduced columns < y
 */
-void sparse_mat::smNewBareiss(int x, int y0)
+void sparse_mat::smNewBareiss(int x, int y)
 {
-  int y=y0;
   if ((x > 0) && (x < nrows))
   {
     tored -= x;
@@ -558,10 +558,7 @@ void sparse_mat::smNewBareiss(int x, int y0)
   }
   normalize = this->smCheckNormalize();
   if (normalize) this->smNormalize();
-  if(y0>=0)
-    this->smPivot();
-  else
-    this->smRealPivot();
+  this->smPivot();
   this->smSelectPR();
   this->sm1Elim();
   crd++;
@@ -580,10 +577,7 @@ void sparse_mat::smNewBareiss(int x, int y0)
   loop
   {
     if (normalize) this->smNormalize();
-    if(y0>=0)
-      this->smNewPivot();
-    else
-      this->smRealPivot();
+    this->smNewPivot();
     this->smSelectPR();
     this->smMultCol();
     this->smHElim();
@@ -596,6 +590,7 @@ void sparse_mat::smNewBareiss(int x, int y0)
       this->smToredElim();
     if (act <= y)
     {
+      if (TEST_OPT_PROT) PrintS(".\n");
       this->smFinalMult();
       this->smCopToRes();
       return;
@@ -604,59 +599,6 @@ void sparse_mat::smNewBareiss(int x, int y0)
 }
 
 /* ----------------- pivot method ------------------ */
-
-void sparse_mat::smRealPivot()
-{
-  smpoly a;
-  number nopt,n1;
-  int i, copt, ropt;
-
-  nopt=nInit(0);
-  for (i=act; i; i--)
-  {
-    a = m_act[i];
-    loop
-    {
-      if (a->pos > tored)
-        break;
-      n1=pGetCoeff(a->m);
-      if(nGreaterZero(n1))
-      {
-        if(nGreater(n1,nopt))
-        {
-          nDelete(&nopt);
-          nopt=nCopy(n1);
-          copt=i;
-          ropt=a->pos;
-        }
-      }
-      else
-      {
-        n1=nNeg(n1);
-        if(nGreater(n1,nopt))
-        {
-          nDelete(&nopt);
-          nopt=nCopy(n1);
-          copt=i;
-          ropt=a->pos;
-        }
-        n1=nNeg(n1);
-      }
-      a = a->n;
-      if (a == NULL)
-        break;
-    }
-  }
-  rpiv = ropt;
-  cpiv = copt;
-  nDelete(&nopt);
-  if (cpiv != act)
-  {
-    a = m_act[act];
-    m_act[act] = m_act[cpiv];
-    m_act[cpiv] = a;
-  }
-}
 
 /*
 * prepare smPivot, compute weights for rows and columns
@@ -2412,7 +2354,6 @@ private:
   void smColToRow();
   void smRowToCol();
   void smSelectPR();
-  void smRealWeights();
   void smRealPivot();
   void smZeroToredElim();
   void smGElim();
@@ -2433,40 +2374,50 @@ public:
 *   I = module(transprose(M)) + r*gen(n+1)
 * uses  Gauss-elimination
 */
-ideal smCallSolv(ideal I)
+lists smCallSolv(ideal I)
 {
   sparse_number_mat *linsolv;
   int k;
   ring origR;
   sip_sring tmpR;
-  ideal rr, res;
+  ideal rr, ss;
+  lists res;
 
+  if (idIsConstant(I)==FALSE)
+  {
+    WerrorS("symbol in equation");
+    return NULL;
+  }
   I->rank = idRankFreeModule(I);
   if (smCheckSolv(I)) return NULL;
+  res=(lists)AllocSizeOf(slists);
   rr=smRingCopy(I,&origR,tmpR);
-  res = NULL;
+  ss = NULL;
   linsolv = new sparse_number_mat(rr);
   linsolv->smTriangular();
   if (linsolv->smIsSing() == 0)
   {
     linsolv->smSolv();
-    res = linsolv->smRes2Ideal();
+    ss = linsolv->smRes2Ideal();
   }
   else
     WerrorS("singular problem for linsolv");
   delete linsolv;
-  if ((origR!=NULL) && (res!=NULL))
+  if ((origR!=NULL) && (ss!=NULL))
   {
     rChangeCurrRing(origR,TRUE);
-    rr = idInit(IDELEMS(res), 1);
-    for (k=0;k<IDELEMS(res);k++)
-      rr->m[k] = prCopyR(res->m[k], &tmpR);
+    rr = idInit(IDELEMS(ss), 1);
+    for (k=0;k<IDELEMS(ss);k++)
+      rr->m[k] = prCopyR(ss->m[k], &tmpR);
     rChangeCurrRing(&tmpR,FALSE);
-    idDelete(&res);
-    res = rr;
+    idDelete(&ss);
+    ss = rr;
   }
   if(origR!=NULL)
     smRingClean(origR,tmpR);
+  res->Init(1);
+  res->m[0].rtyp=IDEAL_CMD;
+  res->m[0].data=(void *)ss;
   return res;
 }
 
@@ -2538,6 +2489,7 @@ void sparse_number_mat::smTriangular()
     this->smZeroToredElim();
     if (sing != 0) return;
   }
+  if (TEST_OPT_PROT) PrintS(".\n");
   piv = m_act[1];
   rpiv = piv->pos;
   m_act[1] = piv->n;
@@ -2645,90 +2597,42 @@ ideal sparse_number_mat::smRes2Ideal()
 /* ----------------- pivot method ------------------ */
 
 /*
-* prepare smPivot, compute weights for rows and columns
-* and the weight for all points
-*/
-void sparse_number_mat::smRealWeights()
-{
-  int wc;
-  smnumber a;
-  int i;
-
-  for (i=tored; i; i--) wrw[i] = 0; // ???
-  for (i=act; i; i--)
-  {
-    wc = 0;
-    a = m_act[i];
-    loop
-    {
-      wc++;
-      wrw[a->pos]++;
-      a = a->n;
-      if ((a == NULL) || (a->pos > tored))
-        break;
-    }
-    wcl[i] = wc;
-  }
-}
-
-/*
 * compute pivot
 */
 void sparse_number_mat::smRealPivot()
 {
-  int wopt = 1<<30;
-  int w;
   smnumber a;
-  number x, xo, xu;
+  number x, xo;
   int i, copt, ropt;
 
-  this->smRealWeights();
-  nNew(&xo);
-  nNew(&xu);
+  xo=nInit(0);
   for (i=act; i; i--)
   {
     a = m_act[i];
     while ((a!=NULL) && (a->pos<=tored))
     {
-      w = (wcl[i]-1)*(wrw[a->pos]-1);
-      if (w==0) // row or column with only one point
+      x = a->m;
+      if (nGreaterZero(x))
       {
-        rpiv = a->pos;
-        if (i != act)
+        if (nGreater(x,xo))
         {
-          a = m_act[act];
-          m_act[act] = m_act[i];
-          m_act[i] = a;
-        }
-        return;
-      }
-      if (w == wopt)
-      {
-        x = a->m;
-        if (nGreater(x,xo) || nGreater(xu,x))
-        {
-          nDelete(&xu);
           nDelete(&xo);
           xo = nCopy(x);
-          xu = nCopy(x);
-          if (nGreaterZero(xu)) xu = nNeg(xu);
-          else xo = nNeg(xo);
           copt = i;
           ropt = a->pos;
         }
       }
-      else if (w < wopt)
+      else
       {
-        x = a->m;
-        wopt = w;
-        nDelete(&xu);
-        nDelete(&xo);
-        xo = nCopy(x);
-        xu = nCopy(x);
-        if (nGreaterZero(xu)) xu = nNeg(xu);
-        else xo = nNeg(xo);
-        copt = i;
-        ropt = a->pos;
+        xo = nNeg(xo);
+        if (nGreater(xo,x))
+        {
+          nDelete(&xo);
+          xo = nCopy(x);
+          copt = i;
+          ropt = a->pos;
+        }
+        xo = nNeg(xo);
       }
       a = a->n;
     }
@@ -2741,7 +2645,6 @@ void sparse_number_mat::smRealPivot()
     m_act[copt] = a;
   }
   nDelete(&xo);
-  nDelete(&xu);
 }
 
 /* ----------------- elimination ------------------ */
@@ -2833,6 +2736,13 @@ void sparse_number_mat::smSelectPR()
   smnumber a, ap;
   int i;
 
+  if (TEST_OPT_PROT)
+  {
+    if ((crd+1)%10)
+      PrintS(".");
+    else
+      PrintS(".\n");
+  }
   a = m_act[act];
   if (a->pos < rpiv)
   {

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.37 2000-05-05 09:46:57 Singular Exp $ */
+/* $Id: polys1.cc,v 1.38 2000-07-06 13:30:04 pohl Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -41,6 +41,22 @@ BOOLEAN   pIsConstant(const poly p)
       if (pGetExp(p,i)!=0) return FALSE;
     }
     if (pGetComp(p)) return FALSE;
+  }
+  return TRUE;
+}
+
+/*2
+*test if the polynom is a constant
+*/
+BOOLEAN   pIsConstantPoly(poly p)
+{
+  while(p!=NULL)
+  {
+    for (int i=pVariables;i;i--)
+    {
+      if (pGetExp(p,i)!=0) return FALSE;
+    }
+    pIter(p);
   }
   return TRUE;
 }
