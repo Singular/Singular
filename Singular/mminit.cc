@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mminit.cc,v 1.4 1997-04-08 16:49:24 Singular Exp $ */
+/* $Id: mminit.cc,v 1.5 1997-04-24 18:01:30 Singular Exp $ */
 /*
 * ABSTRACT: init of memory management
 */
@@ -37,7 +37,20 @@ mcb mm_tmpList[MAXLIST]=
   NULL,NULL,NULL,NULL,
   NULL,NULL,NULL,NULL,
   NULL,NULL};
-;
+#ifdef MM_STAT
+int mm_active[MAXLIST+1]=
+{ 0,0,0,0,
+  0,0,0,0,
+  0,0,0,0,
+  0,0,0,0,
+  0,0,0};
+int mm_max[MAXLIST+2]=
+{ 0,0,0,0,
+  0,0,0,0,
+  0,0,0,0,
+  0,0,0,0,
+  0,0,0,0};
+#endif
 #else
 mcb mm_normList[MAXLIST]=
 { NULL,NULL,NULL,NULL,
@@ -53,7 +66,24 @@ mcb mm_tmpList[MAXLIST]=
   NULL,NULL,NULL,NULL,
   NULL,NULL,NULL,NULL,
   NULL,NULL};
+#ifdef MM_STAT
+int mm_active[MAXLIST+1]=
+{ 0,0,0,0,
+  0,0,0,
+  0,0,0,0,
+  0,0,0,0,
+  0,0,0,0,
+  0,0,0};
+int mm_max[MAXLIST+2]=
+{ 0,0,0,0,
+  0,0,0,
+  0,0,0,0,
+  0,0,0,0,
+  0,0,0,0,
+  0,0,0,0};
 #endif
+#endif
+
 
 mcb *mm_theList=mm_normList;
 
@@ -66,12 +96,12 @@ void *mm_spec_part=NULL;
 
 #ifdef MDEBUG
 
-DBMCB mm_theDBused;
-DBMCB mm_theDBfree;
-DBMCB mm_tmpDBused;
-DBMCB mm_tmpDBfree;
-DBMCB mm_normDBused;
-DBMCB mm_normDBfree;
+DBMCB mm_theDBused={NULL,NULL,0,0,NULL,0,0,NULL};
+DBMCB mm_theDBfree={NULL,NULL,0,0,NULL,0,0,NULL};
+DBMCB mm_tmpDBused={NULL,NULL,0,0,NULL,0,0,NULL};
+DBMCB mm_tmpDBfree={NULL,NULL,0,0,NULL,0,0,NULL};
+DBMCB mm_normDBused={NULL,NULL,0,0,NULL,0,0,NULL};
+DBMCB mm_normDBfree={NULL,NULL,0,0,NULL,0,0,NULL};
 void * mm_maxAddr=NULL;
 void * mm_minAddr=NULL;
 
@@ -133,31 +163,15 @@ int mmIsInitialized=0;
 
 int mmInit( void )
 {
-  int ii;
-#ifdef MM_STAT
-  for(ii=0; ii<=MAXLIST; ii++)
-  {
-    mm_active[ii]=0; mm_max[ii]=0;
-  }
-  mm_max[MAXLIST+1]=0;
-#endif
-#ifdef MDEBUG
-  if ( ! mmIsInitialized ) {
-    memset(&mm_theDBused,0,sizeof(mm_theDBused));
-    memset(&mm_theDBfree,0,sizeof(mm_theDBfree));
-    memset(&mm_tmpDBused,0,sizeof(mm_tmpDBused));
-    memset(&mm_tmpDBfree,0,sizeof(mm_tmpDBfree));
-    memset(&mm_normDBused,0,sizeof(mm_normDBused));
-    memset(&mm_normDBfree,0,sizeof(mm_normDBfree));
-    mmIsInitialized=1;
-  }
-#endif /* MDEBUG */
 #ifdef HAVE_GMP
+  if(mmIsInitialized==0)
+  {
 #ifndef MDEBUG
-  mp_set_memory_functions(mmAllocBlock,mmReallocBlock,mmFreeBlock);
+    mp_set_memory_functions(mmAllocBlock,mmReallocBlock,mmFreeBlock);
 #else
-  mp_set_memory_functions(mgAllocBlock,mgReallocBlock,mgFreeBlock);
+    mp_set_memory_functions(mgAllocBlock,mgReallocBlock,mgFreeBlock);
 #endif
+  }
 #endif
   return 1;
 }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.6 1997-04-02 15:06:58 Singular Exp $ */
+/* $Id: febase.cc,v 1.7 1997-04-24 18:01:30 Singular Exp $ */
 /*
 * ABSTRACT: i/o system, handling of 'voices'
 */
@@ -66,7 +66,7 @@ extern FILE* yyin;
 
 #define INITIAL_PRINT_BUFFER 24*1024
 static int feBufferLength=INITIAL_PRINT_BUFFER;
-static char * feBuffer;
+static char * feBuffer=(char *)Alloc(INITIAL_PRINT_BUFFER);
 
 #define START_LEVMAX 32
 int     levmax       = START_LEVMAX;
@@ -583,10 +583,9 @@ void I_FEbase(void)
   FileAttribs[0].filename    = mstrdup("STDIN");
   yylineno = 1;
   currentVoice = &FileAttribs[0];
-  feBuffer = (char *)Alloc(INITIAL_PRINT_BUFFER);
 }
 
-char * feBufferStart;
+static char * feBufferStart;
   /* only used in StringSet(S)/StringAppend(S)*/
 char * StringAppend(char *fmt, ...)
 {
