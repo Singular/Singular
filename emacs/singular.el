@@ -1,6 +1,6 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.22 1998-08-07 07:55:52 wichmann Exp $
+;; $Id: singular.el,v 1.23 1998-08-07 08:48:15 wichmann Exp $
 
 ;;; Commentary:
 
@@ -1222,7 +1222,9 @@ WHERE= 'at-point --> whatever is at point"
 	    (is-folded (singular-section-foldedp current)))
 	(and (if unfold is-folded (not is-folded))
 	     (singular-fold-section current)))
-      (setq which (cdr which)))))
+      (setq which (cdr which))))
+  ;; NOT READY: HACK: recenter (because of error in subst-char-in-region!?!)
+  (recenter))
 
 (defun singular-fold-last-output ()
   "Fold last output section.
