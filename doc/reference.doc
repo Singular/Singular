@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.94 1998-08-27 16:13:18 Singular Exp $
+@comment $Id: reference.doc,v 1.95 1998-09-08 14:34:26 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -2517,6 +2517,7 @@ See
 intvec
 @item @strong{Purpose:}
 returns the exponent vector of the leading monomial of a polynomial or a vector.
+In the case of a vector the last component is the index in the vector.
 @item @strong{Example:}
 @example
 @c example
