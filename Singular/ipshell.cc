@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.17 1998-04-03 17:38:41 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.18 1998-04-07 19:14:44 krueger Exp $ */
 /*
 * ABSTRACT:
 */
@@ -138,7 +138,9 @@ static void list1(char* s, idhdl h,BOOLEAN c)
                         ,MATCOLS(IDMATRIX(h))
                         );
                    break;
-    case PROC_CMD:    break;
+    case PROC_CMD:  Print(" from %s",IDPROC(h)->libname);
+                   if(IDPROC(h)->is_static) Print(" (static)");
+                   break;
     case STRING_CMD:
                    {
                      char *s;
@@ -267,15 +269,15 @@ void list_cmd(int typ, const char* what, char *prefix,BOOLEAN iterate)
       h = ggetid(what);
       if (h!=NULL)
       {
-        if (iterate) list1(prefix,h,TRUE);
-        if ((IDTYP(h)==RING_CMD)
-        || (IDTYP(h)==QRING_CMD)
-        || (IDTYP(h)==PACKAGE_CMD))
-        {
-          h=IDRING(h)->idroot;
-        }
-        else
-          return;
+	if (iterate) list1(prefix,h,TRUE);
+	if ((IDTYP(h)==RING_CMD)
+	    || (IDTYP(h)==QRING_CMD)
+	    || (IDTYP(h)==PACKAGE_CMD))
+	  {
+	    h=IDRING(h)->idroot;
+	  }
+	else
+	  return;
       }
       else
       {

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.16 1998-04-07 17:53:31 Singular Exp $ */
+/* $Id: iplib.cc,v 1.17 1998-04-07 19:14:43 krueger Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -69,7 +69,7 @@ char* iiProcName(char *buf, char & ct, char* &e)
 */
 char * iiProcArgs(char *e,BOOLEAN withParenth)
 {
-  while ((*e==' ') || (*e=='(')) e++;
+  while ((*e==' ') || (*e=='\t') || (*e=='(')) e++;
   if (*e<' ')
   {
     if (withParenth)
@@ -501,7 +501,7 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
 #  endif
   if (BVERBOSE(V_LOAD_LIB)) Print( "// ** loading %s...", libnamebuf);
   yylplex(newlib, libnamebuf, &lib_style);
-  if(lib_style == OLD_LIBSTYLE)
+  if( (lib_style == OLD_LIBSTYLE) && (BVERBOSE(V_LOAD_LIB)))
     Warn( "library %s has an old format. Please fix it for the next time",
 	  newlib);
   else {
