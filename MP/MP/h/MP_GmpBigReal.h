@@ -12,7 +12,7 @@
 #include "MP.h"
 
 #ifdef MP_HAVE_GMP_APREAL
-#include "gmp.h"
+#include "mp_gmp.h"
 
 EXTERN MP_BigRealOps_t imp_gmp_bigreal_ops;
 

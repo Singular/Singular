@@ -13,7 +13,7 @@
 
 #ifdef MP_HAVE_GMP_APINT
 
-#include "gmp.h"
+#include "mp_gmp.h"
 
 EXTERN MP_BigIntOps_t imp_gmp_bigint_ops;
 

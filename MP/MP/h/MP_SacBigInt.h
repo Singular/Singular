@@ -11,7 +11,7 @@
 
 #ifdef MP_HAVE_SAC
 #include "saclib.h"
-#include "gmp.h"
+#include "mp_gmp.h"
 
 EXTERN MP_BigIntOps_t sac_ops;
 

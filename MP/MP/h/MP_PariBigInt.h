@@ -41,7 +41,7 @@ EXTERN GEN (*IMP_AllocCgeti) _ANSI_ARGS_((long));
 EXTERN void (*IMP_FreeCgeti) _ANSI_ARGS_((GEN));
 
 #ifdef HAVE_GMP_PARI_CONVERSIONS
-#include "gmp.h"
+#include "mp_gmp.h"
 EXTERN mpz_ptr _pari_to_gmp(GEN pnum, mpz_ptr *gnum_ptr);
 EXTERN GEN     _gmp_to_pari(mpz_ptr gnum);
 #endif

@@ -1579,7 +1579,7 @@ IMP_GetUint8Vector(link, (MP_Uint8_t **) vec, len)
 
 #ifdef MP_HAVE_GMP_APINT
 
-#include "gmp.h"
+#include "mp_gmp.h"
 
 EXTERN MP_BigIntOps_t imp_gmp_bigint_ops;
 

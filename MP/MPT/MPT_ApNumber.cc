@@ -138,7 +138,7 @@ int MPT_GetApIntFormat()
 }
 
 #ifdef MP_HAVE_GMP_APINT     
-#include "gmp.h"
+#include "mp_gmp.h"
 
 static void MPT_DeleteGmpApInt(MPT_Arg_t arg)
 {
