@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.h,v 1.10 1998-09-30 14:34:28 Singular Exp $ */
+/* $Id: ideals.h,v 1.11 1998-11-12 14:44:36 siebert Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -87,7 +87,7 @@ ideal idSyzMin (ideal h1,ideal  quot, tHomog h,intvec **w,
 ideal   idLiftStd  (ideal h1, ideal quot, matrix *m, tHomog h=testHomog);
 
 ideal   idLift (ideal mod, ideal sumod);
-ideal   idLiftNonStB (ideal  mod, ideal submod);
+ideal   idLiftNonStB (ideal  mod, ideal submod,BOOLEAN goodShape=FALSE);
 
 intvec * idMWLift(ideal mod,intvec * weights);
 

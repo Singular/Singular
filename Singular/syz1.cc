@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.34 1998-11-02 09:05:43 Singular Exp $ */
+/* $Id: syz1.cc,v 1.35 1998-11-12 14:44:38 siebert Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -2390,7 +2390,7 @@ static resolvente syReorder(resolvente res,int length,
 /*3
 * converts a resolution into a list of modules
 */
-lists syConvRes(syStrategy syzstr)
+lists syConvRes(syStrategy syzstr,BOOLEAN toDel)
 {
   if ((syzstr->fullres==NULL) && (syzstr->minres==NULL))
   {
@@ -2425,13 +2425,15 @@ lists syConvRes(syStrategy syzstr)
       }
     }
   }
-  return liMakeResolv(trueres,syzstr->length,syzstr->list_length,typ0,w);
+  lists li = liMakeResolv(trueres,syzstr->length,syzstr->list_length,typ0,w);
+  if (toDel) syKillComputation(syzstr);
+  return li;
 }
 
 /*3
 * converts a list of modules into a resolution
 */
-syStrategy syConvList(lists li)
+syStrategy syConvList(lists li,BOOLEAN toDel)
 {
   int typ0;
   syStrategy result=(syStrategy)Alloc0(sizeof(ssyStrategy));
@@ -2445,6 +2447,7 @@ syStrategy syConvList(lists li)
   }
   result->list_length=result->length;
   Free((ADDRESS)fr,(result->length)*sizeof(ideal));
+  if (toDel) li->Clean();
   return result;
 }
 

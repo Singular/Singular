@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.40 1998-11-10 17:12:03 Singular Exp $ */
+/* $Id: ideals.cc,v 1.41 1998-11-12 14:44:34 siebert Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -64,6 +64,19 @@ ideal idInit(int idsize, int rank)
   else
     hh->m=NULL;
   return hh;
+}
+
+void idPrint(ideal id)
+{
+  Print("Module of rank %d,real rank %d and %d generators.\n",
+         id->rank,idRankFreeModule(id),IDELEMS(id));
+  for (int i=0;i<IDELEMS(id);i++)
+  {
+    if (id->m[i]!=NULL)
+    {
+      Print("generator %d: ",i);pWrite(id->m[i]);
+    }
+  }
 }
 
 /*2
@@ -1585,7 +1598,7 @@ ideal idLiftStd (ideal  h1,ideal  quot, matrix* ma, tHomog h)
 *computes a representation of the generators of submod with respect to those
 * of mod
 */
-ideal idLiftNonStB (ideal  mod, ideal submod)
+ideal idLiftNonStB (ideal  mod, ideal submod,BOOLEAN goodShape)
 {
   int   lsmod =idRankFreeModule(submod), i, j, k, quotgen;
   ideal result, h3, temp;
@@ -1597,10 +1610,13 @@ ideal idLiftNonStB (ideal  mod, ideal submod)
   k=lsmod;
   //idSkipZeroes(mod);
   h3=idPrepare(mod,currQuotient,(tHomog)FALSE,&k,&quotgen,&i,NULL);
-  for (j=0;j<IDELEMS(h3);j++)
+  if (!goodShape)
   {
-    if ((h3->m[j] != NULL) && (pMinComp(h3->m[j]) > k))
-      pDelete(&(h3->m[j]));
+    for (j=0;j<IDELEMS(h3);j++)
+    {
+      if ((h3->m[j] != NULL) && (pMinComp(h3->m[j]) > k))
+        pDelete(&(h3->m[j]));
+    }
   }
   idSkipZeroes(h3);
   if (lsmod==0)
