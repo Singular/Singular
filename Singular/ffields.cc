@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ffields.cc,v 1.9 1997-04-25 15:03:57 obachman Exp $ */
+/* $Id: ffields.cc,v 1.10 1997-04-25 15:54:02 Singular Exp $ */
 /*
 * ABSTRACT: finite fields with a none-prime number of elements (via tables)
 */
@@ -549,7 +549,7 @@ static int convback62 ( char c )
         return int(c) - int('a') + 36;
 }
 
-static int convertback62 ( char * p, int n , int q)
+static int convertback62 ( char * p, int n )
 {
     int r = 0;
     for ( int j = 0; j < n; j++ )
