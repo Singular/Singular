@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.15 1999-06-22 08:09:19 Singular Exp $ */
+/* $Id: numbers.cc,v 1.16 1999-06-23 10:04:55 wenk Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -349,7 +349,7 @@ void nSetChar(ring r, BOOLEAN complete)
   /* -------------- long R -----------------------*/
   if (rField_is_long_R(r))
   {
-    setGMPFloatPrecBytes(r->ch_flags);
+    setGMPFloatDigits(r->ch_flags);
 #ifdef LDEBUG
     nDBDelete= ngfDBDelete;
 #else
@@ -393,7 +393,7 @@ void nSetChar(ring r, BOOLEAN complete)
   /* -------------- long C -----------------------*/
   else if (rField_is_long_C(r))
   {
-    setGMPFloatPrecBytes(r->ch_flags);
+    setGMPFloatDigits(r->ch_flags);
 #ifdef LDEBUG
     nDBDelete= ngcDBDelete;
 #else
