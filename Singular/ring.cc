@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.115 2000-09-13 13:42:40 Singular Exp $ */
+/* $Id: ring.cc,v 1.116 2000-09-13 13:43:44 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -2609,7 +2609,7 @@ BOOLEAN rComplete(ring r, int force)
         {
           rO_LexVars_neg(j, j_bits,r->block1[i],r->block0[i]+1, prev_ordsgn,
                          tmp_ordsgn, v,bits);
-          if ((j_bits >= bits)&&(j_bits != BITS_PER_LONG-bits))s
+          if ((j_bits >= bits)&&(j_bits != BITS_PER_LONG-bits))
           // there is enough space for the last var
             rO_LexVars_neg(j, j_bits, r->block0[i],r->block0[i],
                          prev_ordsgn,tmp_ordsgn,v,bits);
