@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: imm.h,v 1.10 1997-12-17 10:38:33 schmidt Exp $ */
+/* $Id: imm.h,v 1.11 1997-12-17 11:05:27 schmidt Exp $ */
 
 #ifndef INCL_IMM_H
 #define INCL_IMM_H
@@ -179,7 +179,18 @@ imm_sign ( const InternalCF * const op )
 //}}}
 
 //{{{ inline int imm_cmp, imm_cmp_p, imm_cmp_gf ( const InternalCF * const lhs, const InternalCF * const rhs )
-// docu: see CanonicalForm::operator <(), CanonicalForm::operator ==()
+//{{{ docu
+//
+// imm_cmp(), imm_cmp_p(), imm_cmp_gf() - compare immediate objects.
+//
+// For immediate integers, it is clear how this should be done.
+// For objects from finite fields, it is not clear since they
+// are not ordered fields.  However, since we want to have a
+// total well order on polynomials we have to define a total well
+// order on all coefficients, too.  I decided to use simply the
+// order on the representation as `int's of such objects.
+//
+//}}}
 inline int
 imm_cmp ( const InternalCF * const lhs, const InternalCF * const rhs )
 {
