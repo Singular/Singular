@@ -5,7 +5,7 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id: mod2.h.in,v 1.106 2003-06-11 21:22:45 krueger Exp $
+ *  Version: $Id: mod2.h.in,v 1.107 2003-07-14 14:09:27 Singular Exp $
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H
@@ -15,6 +15,8 @@
  ******************************************************************/
 /* Define to use dynamic linking */
 #undef HAVE_DL
+/* Define to use readline lib for fancy display: configure result */
+#undef HAVE_LIBREADLINE
 /* Define to use static readline lib for fancy display */
 #undef HAVE_READLINE
 /* define to use dynamic version of readline lib */

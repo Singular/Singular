@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.55 2003-05-22 17:31:02 Singular Exp $ */
+/* $Id: febase.h,v 1.56 2003-07-14 14:09:27 Singular Exp $ */
 /*
 * ABSTRACT: basic i/o
 */
@@ -50,6 +50,10 @@ extern "C"
 #define MAXPATHLEN 1024
 #endif
 
+#ifdef HAVE_LIBREADLINE
+  #define HAVE_READLINE 1
+#endif
+
 #ifdef HAVE_DYN_RL
   #undef HAVE_READLINE
   #define HAVE_FEREAD 1
@@ -59,6 +63,7 @@ extern "C"
 #endif
 #endif
 #ifdef ix86_Linux
+  // FEREAD stuff does not work with glibc2
   #undef HAVE_FEREAD
 #endif
 
