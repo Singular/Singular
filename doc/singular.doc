@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.20 1998-05-11 11:56:41 wichmann Exp $
+@comment $Id: singular.doc,v 1.21 1998-05-13 08:00:01 wichmann Exp $
 @comment this file contains the main structure of the manual
 @c ------------------------
 @comment %**start of header
@@ -148,7 +148,7 @@ displays only the first 20 characters
 @section Major differences to the C programming language
 @cindex C programming language
 
-Although many constructs from Singular's programming language are similar
+Although many constructs from @sc{Singular}'s programming language are similar
 to those from the C programming language, there are some subtle
 differences. Most notably:
 
@@ -196,7 +196,7 @@ evaluated by first evaluating @code{a} and @code{b}, even though the value of
 this is different from the left-to-right evaluation of logical
 expressions (as found in most programming languages like C) which, for
 example, determine the @code{(1 || b)} without evaluating @code{b}.
-Hence, in Singular, the following results in a syntax error
+Hence, in @sc{Singular}, the following results in a syntax error
 @example
 if (defined(i) && i > 0) @{@}
 @end example
@@ -257,7 +257,7 @@ statement. However, it can be imitated in the following way:
 @subsection Usage of commas
 @cindex comma
 
-In Singular, a comma separates list elements and the value of a comma
+In @sc{Singular}, a comma separates list elements and the value of a comma
 expression is a list.
 Hence, commas can not be used to combine several expressions into
 a single expression. For example, instead of writing
@@ -274,7 +274,7 @@ you have to write
 @subsection Usage of brackets
 @cindex bracket
 
-In Singular, curly brackets (i.e. "@code{@{@}}") @strong{must always} be
+In @sc{Singular}, curly brackets (i.e. "@code{@{@}}") @strong{must always} be
 used to enclose the (statement) body following such constructs like
 @code{if, else, for, while}, even if this block consists of only a
 single statement. Similarly, in the return statement a procedure round
@@ -302,7 +302,7 @@ int i,j = tworeturn();
 @cindex continue 
 Singular's @code{continue} construct is only valid inside the body of
 the @code{for} construct. It skips the rest of the loop-body and jumps
-to the beginning of the block. Unlike the C-construct Singular's
+to the beginning of the block. Unlike the C-construct @sc{Singular}'s
 @code{continue} @strong{does not execute the increment statement}. For
 example,
 @example
