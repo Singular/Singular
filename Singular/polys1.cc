@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.63 2001-02-08 13:13:04 Singular Exp $ */
+/* $Id: polys1.cc,v 1.64 2001-02-08 13:46:36 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -1135,24 +1135,19 @@ poly ppJet(poly p, int m)
 
 poly pJet(poly p, int m)
 {
-  poly r=p;
   poly t=NULL;
 
-  while (p!=NULL)
+  while((p!=NULL) && (pTotaldegree(p)>m)) pLmDelete(&p);
+  if (p==NULL) return NULL;
+  poly r=p;
+  while (pNext(p)!=NULL)
   {
-    if (pTotaldegree(p)>m)
+    if (pTotaldegree(pNext(p))>m)
     {
-      if (p==r) 
-      { 
-        pLmDelete(&p);
-	r=p;
-      }
-      else
-      {
-        pLmDelete(&p);
-      }
+      pLmDelete(&pNext(p));
     }
-    pIter(p);
+    else
+      pIter(p);
   }
   return r;
 }
