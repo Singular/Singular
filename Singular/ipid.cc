@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.58 2002-01-18 16:34:09 Singular Exp $ */
+/* $Id: ipid.cc,v 1.59 2002-02-04 12:06:53 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -951,7 +951,7 @@ BOOLEAN paKill(package pack, BOOLEAN force_top)
          (IDTYP(hdh)==PACKAGE_CMD && IDPACKAGE(hdh)->language!=LANG_TOP) ||
          (IDTYP(hdh)==PACKAGE_CMD && IDPACKAGE(hdh)->language==LANG_TOP &&
          IDPACKAGE(hdh)->ref>0 ))
-        killhdl2(hdh,&(pack->idroot));
+        killhdl2(hdh,&(pack->idroot),currRing);
       hdh = temp;
     }
     if(checkPackage(pack))
