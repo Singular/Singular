@@ -1,5 +1,5 @@
 //=============================================================================
-// $Id: classify.lib,v 1.1 1995-01-02 22:58:50 krueger Exp $
+// $Id: classify.lib,v 1.2 1995-02-04 19:40:47 krueger Exp $
 //
 //=============================================================================
 // Library-loader.
@@ -7,53 +7,76 @@
 proc Lib_lib_Classify
 {
   if(defined(SLib_lib_Classify) == 1) { return(); }
-  string SLib_lib_Classify="$Id: classify.lib,v 1.1 1995-01-02 22:58:50 krueger Exp $";
+  string SLib_lib_Classify="$Id: classify.lib,v 1.2 1995-02-04 19:40:47 krueger Exp $";
   verbose (noloadLib);
-//  string @Required="lib0,lib1,lib_Classify";
-//  @Required=@Required+",lib_Setring,lib_ReOrder,lib_RandomPoly,lib_Morse";
-//  @Required=@Required+",lib_tools,lib_Kclass,lib_Ausgaben,lib_WorkOn";
-//  @Required=@Required+",lib_HKclass";
-//  int @len = size(@Required);
-//  int @i;
-//  int @k;
-//  string @s;
+  string @Required="lib0,lib1,lib_Classify";
+  @Required=@Required+",lib_Setring,lib_ReOrder,lib_RandomPoly,lib_Morse";
+  @Required=@Required+",lib_tools,lib_Kclass,lib_Ausgaben,lib_WorkOn";
+  @Required=@Required+",lib_HKclass";
+  int @len = size(@Required);
+  int @i;
+  int @k;
+  int @j;
+  string @s;
+  string @s1;
 
-//  for(@i=1;@i<@len;@i=@i+@k) {
-//    @s = @Required[@i..@len-@i];
-//    @k = substring(",", @s);
-//    @s = @Required[@i..@i+@k-2];
-//    @s;
-//    @i;
-//  }
-  if(defined(SLib_lib0) == 0)  { LIB "lib0"; Lib_lib0(); }
-  if(defined(SLib_lib1) == 0)  { LIB "lib1"; Lib_lib1(); }
-  if(defined(SLib_lib_Classify) == 0){LIB "lib_Classify"; Lib_lib_Classify(); }
-  if(defined(SLib_lib_Setring) == 0) {LIB "lib_Setring"; Lib_lib_Setring(); }
-  if(defined(SLib_lib_ReOrder) == 0) {LIB "lib_ReOrder"; Lib_lib_ReOrder(); }
-  if(defined(SLib_lib_RandomPoly)==0){LIB"lib_RandomPoly";Lib_lib_RandomPoly();}
-  if(defined(SLib_lib_Morse) == 0)   {LIB "lib_Morse"; Lib_lib_Morse(); }
-  if(defined(SLib_lib_Kclass) == 0)  {LIB "lib_Kclass"; Lib_lib_Kclass(); }
-  if(defined(SLib_lib_tools) == 0)   {LIB "lib_tools"; Lib_lib_tools(); }
-  if(defined(SLib_lib_Ausgaben) == 0){LIB "lib_Ausgaben"; Lib_lib_Ausgaben(); }
-  if(defined(SLib_lib_WorkOn) == 0)  {LIB "lib_WorkOn"; Lib_lib_WorkOn(); }
-  if(defined(SLib_lib_HKclass) == 0) {LIB "lib_HKclass"; Lib_lib_HKclass(); }
-//  if(defined(SLib_) == 0)  { LIB ""; Lib_(); }
-//  if(defined(SLib_) == 0)  { LIB ""; Lib_(); }
+  for(@i=1;@i<@len;@i=@i+@k) {
+    @s = @Required[@i..@len];
+    @k = find(@s, ",");
+    if(@k>0) { 
+      @s = @Required[@i,@k-1];
+    }
+    else {
+      @k = size(@s);
+    }
+    @s1 = "@j = defined(SLib_"+@s+");";
+    execute @s1;
+    if( @j == 0) {
+      @s1 = "LIB \""+@s+"\";";
+      execute @s1;
+      @s1 = "Lib_"+@s+"();";
+      execute @s1;
+    }
+  }
 }
 
 //=============================================================================
 //
 //
 proc ShowLibs
-{
+{ 
+  string @Required = LIB;
+  int @len = size(@Required);
+  int @i;
+  int @k;
+  int @j;
+  string @s;
+  string @s1;
+
+  for(@i=1;@i<@len;@i=@i+@k) {
+    @s = @Required[@i..@len];
+    @k = find(@s, ",");
+    if(@k>0) { 
+      @s = @Required[@i,@k-1]; 
+    }
+    else {
+      @k = size(@s);
+    }
+    @s1 = "@j = defined(SLib_"+@s+");";
+    execute @s1;
+    if( @j != 0) {
+      @s1 = "SLib_"+@s+";";
+      execute @s1;
+    }
+  }
 }
 proc Lib_lib0
 {
-  string SLib_lib0="Nix";
+  string SLib_lib0="lib0 - Ohne";
 }
 proc Lib_lib1
 {
-  string SLib_lib1="Nix";
+  string SLib_lib1="lib1 - Ohne";
 }
 
 
@@ -78,6 +101,7 @@ proc Classify
     return(#1);
   }
   Lib_lib_Classify();
+  int @show_nf = 1;    // return Normal-form if set to '1'
 
   poly @f_in = #1;
   int @n = nvars(basering);
@@ -98,11 +122,19 @@ proc Classify
   string @s1;
   string @s2;
   string @s3;
+  string @s4;
   @s1,@s2=Klassifiziere(@Conv(@f_in));
-  @s3 = "poly @f_out="+@s1+";";
+  @s4 = "poly @f_out="+@s1+";";
+
   setring RingB;
-  execute @s3;
+  execute @s4;
   setring Rtop;
+
+  poly @f_nf = NormalForm(@s2);
+  for(@i=5;@i<=@n;@i=@i+1) {
+    @f_nf = @f_nf + x(@i)^2;
+  }
+
   map @ConvUp=RingB,maxideal(1);
   poly @f_out = @ConvUp(@f_out);
   for(@i=CoRang+1;@i<=@n;@i=@i+1) {
@@ -110,7 +142,10 @@ proc Classify
   }
   execute @RingInput;
   map @ConvBack=Rtop,maxideal(1);
-// @s2;
-  return(@ConvBack(@f_out));     
+
+  if(@show_nf == 1) {
+    return(@ConvBack(@f_nf));
+  }
+  else { return(@ConvBack(@f_out)); }
 }
-// lib0: map SHB=r,A_Z("x",@n);
+// E n d   O f   F i l e
