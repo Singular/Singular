@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.25 1998-05-06 11:56:20 Singular Exp $
+@comment $Id: reference.doc,v 1.26 1998-05-06 11:59:03 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -5152,7 +5152,7 @@ Unlike the C-construct it @strong{does not execute the increment statement}
 * Control structures::
 @end menu
 @iftex
-See @ref{Control structures}; @ref{block}.
+See @ref{Control structures}; @ref{for}.
 @end iftex
 @c ---------------------------------------
 @node else, export, continue, Control structures
