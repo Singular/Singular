@@ -1,5 +1,8 @@
 Tue Apr 15 12:07:17 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
+	* silink.cc (slStandardInit): changed Ascii type specifyer from
+	  "ascii" to "Ascii" for consistency
+
 	* iparith.cc : added #else branch to #ifdef HAVE_FGLM in proc table
 
 	*  (extra.cc): system("sh",command) returns exit status of command
