@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: maps.cc,v 1.34 2000-12-20 11:23:47 Singular Exp $ */
+/* $Id: maps.cc,v 1.35 2001-02-13 13:11:10 Singular Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */
@@ -88,8 +88,7 @@ poly maEvalVariable(poly p, int v,int pExp,matrix s)
 
 static poly maEvalMonom(map theMap, poly p,ring preimage_r,matrix s, nMapFunc nMap)
 {
-    poly q=pOne();
-    pSetCoeff(q,nMap(pGetCoeff(p)));
+    poly q=pNSet(nMap(pGetCoeff(p)));
 
     int i;
     for(i=preimage_r->N; i>0; i--)
@@ -218,8 +217,9 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id)
           (theImageRing->N*sizeof(char*)));
   sip_sring tmpR;
 
-  if (theImageRing->OrdSgn == 1) orders[0] = ringorder_dp;
-  else orders[0] = ringorder_ls;
+  //if (theImageRing->OrdSgn == 1)s
+     orders[0] = ringorder_dp;
+  //else orders[0] = ringorder_ls;
   block1[0] = imagepvariables;
   block0[0] = 1;
   /*
@@ -261,29 +261,28 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id)
   {
     if ((i<IDELEMS(theMap)) && (theMap->m[i]!=NULL))
     {
-      p = pChangeSizeOfPoly(theImageRing, theMap->m[i],1,imagepvariables);
+      p = pSort(pChangeSizeOfPoly(theImageRing,theMap->m[i],1,imagepvariables));
       q = p;
-      while (pNext(q)) pIter(q);
-      pNext(q) = pOne();
+      while (pNext(q)!=NULL) pIter(q);
+      pNext(q) = pISet(-1);
       pIter(q);
     }
     else
-      q = p = pOne();
-    pGetCoeff(q)=nNeg(pGetCoeff(q));
+      q = p = pISet(-1);
     pSetExp(q,i+1+imagepvariables,1);
     pSetm(q);
     temp1->m[i] = p;
   }
   for (i=sourcering->N;i<sourcering->N+j0;i++)
   {
-    temp1->m[i] = pChangeSizeOfPoly(theImageRing,
-                                    id->m[i-sourcering->N],1,imagepvariables);
+    temp1->m[i] = pSort(pChangeSizeOfPoly(theImageRing,
+                                    id->m[i-sourcering->N],1,imagepvariables));
   }
   for (i=sourcering->N+j0;i<sourcering->N+j;i++)
   {
-    temp1->m[i] = pChangeSizeOfPoly(theImageRing,
+    temp1->m[i] = pSort(pChangeSizeOfPoly(theImageRing,
                                     theImageRing->qideal->m[i-sourcering->N-j0],
-                                    1,imagepvariables);
+                                    1,imagepvariables));
   }
   // we ignore here homogenity - may be changed later:
   temp2 = kStd(temp1,NULL,isNotHomog,NULL);
