@@ -1,11 +1,11 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_switches.cc,v 1.4 1997-09-08 10:39:46 schmidt Exp $ */
+/* $Id: cf_switches.cc,v 1.5 1998-01-16 08:09:21 schmidt Exp $ */
 
 //{{{ docu
 //
 // cf_switches.cc - definition of class CFSwitches.
 //
-// Used by: cf_globals.cc
+// Used by: cf_globals.cc, ftest/ftest_util.cc
 //
 //}}}
 
