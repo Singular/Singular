@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.268 2001-10-09 16:36:03 Singular Exp $ */
+/* $Id: iparith.cc,v 1.269 2001-10-29 17:54:02 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2152,6 +2152,7 @@ static BOOLEAN jjSTD_HILB(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjSTD_1(leftv res, leftv u, leftv v)
 {
+  assumeStdFlag(u);
   ideal result;
   intvec *w=(intvec *)atGet(u,"isHomog");
   tHomog hom=testHomog;
@@ -3639,7 +3640,7 @@ struct sValCmd1 dArith1[]=
 ,{jjrCharStr,   CHARSTR_CMD,     XS(STRING_CMD), RING_CMD }
 ,{jjrCharStr,   CHARSTR_CMD,     XS(STRING_CMD), QRING_CMD }
 ,{jjOpenClose,  CLOSE_CMD,       NONE,           LINK_CMD }
-,{jjWRONG,      COLS_CMD,        0,              VECTOR_CMD }
+//,{jjWRONG,      COLS_CMD,        0,              VECTOR_CMD }
 ,{jjCOLS,       COLS_CMD,        INT_CMD,        MATRIX_CMD }
 ,{jjCOLS,       COLS_CMD,        INT_CMD,        IDEAL_CMD }
 ,{jjCOLS,       COLS_CMD,        INT_CMD,        MODUL_CMD }
