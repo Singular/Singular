@@ -1,8 +1,8 @@
-// $Id: deform.lib,v 1.28 2004-02-23 10:19:09 Singular Exp $
+// $Id: deform.lib,v 1.29 2004-04-16 13:55:32 Singular Exp $
 // author: Bernd Martin email: martin@math.tu-cottbus.de
 //(bm, last modified 4/98)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: deform.lib,v 1.28 2004-02-23 10:19:09 Singular Exp $";
+version="$Id: deform.lib,v 1.29 2004-04-16 13:55:32 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  deform.lib    Miniversal Deformation of Singularities and Modules
@@ -894,8 +894,8 @@ Sub-proc: return martix ord(a_ij) with respect to weight_vec, or
     }
   }
  setring br;
-  if(system("with","Namespaces")) { kill Ring::nr; }
-  kill nr;
+  if(system("with","Namespaces")) { kill Top::nr; }
+  if (defined(nr)) { kill nr; }
   return(degA);
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -955,8 +955,8 @@ Sub-procedure: Computing relative (with respect to flatten(Fo)) weight_vec
    int l = homog(A) ;
    if (l==0) {
      setring br;
-     if(system("with","Namespaces")) { kill Ring::nr; }
-     kill nr;
+     if(system("with","Namespaces")) { kill Top::nr; }
+     if (defined(nr)) { kill nr; }
      return(l);
    }
    dv = attrib(A,"isHomog");
@@ -964,8 +964,8 @@ Sub-procedure: Computing relative (with respect to flatten(Fo)) weight_vec
    dv = dv[2..size(dv)];
    dv = dv-l;
  setring br;
-   if(system("with","Namespaces")) { kill Ring::nr; }
-   kill nr;
+   if(system("with","Namespaces")) { kill Top::nr; }
+   if (defined(nr)) { kill nr; }
    return(dv);
 }
 ///////////////////////////////////////////////////////////////////////////////

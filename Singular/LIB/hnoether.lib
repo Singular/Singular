@@ -1,4 +1,4 @@
-version="$Id: hnoether.lib,v 1.36 2004-02-23 10:22:33 Singular Exp $";
+version="$Id: hnoether.lib,v 1.37 2004-04-16 13:55:33 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  hnoether.lib   Hamburger-Noether (Puiseux) Development
@@ -2616,7 +2616,7 @@ EXAMPLE: example extdevelop;  shows an example
  if (ringwechsel)
  {
    if(system("with","Namespaces")) { kill Top::extdguenstig; }
-   kill extdguenstig;
+   if (defined(extdguenstig)) {kill extdguenstig; }
  }
 
  return(list(mneu,v,switch,f));
