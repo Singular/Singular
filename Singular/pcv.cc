@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: pcv.cc,v 1.23 1999-06-11 14:25:59 mschulze Exp $ */
+/* $Id: pcv.cc,v 1.24 1999-06-11 14:45:29 Singular Exp $ */
 /*
 * ABSTRACT: conversion between polys and coef vectors
 */
@@ -38,15 +38,15 @@ lists pcvLAddL(lists l1,lists l2)
     if(i<=l1->nr&&(l1->m[i].rtyp==POLY_CMD||l1->m[i].rtyp==VECTOR_CMD))
     {
       l0->m[i].rtyp=l1->m[i].rtyp;
-      l0->m[i].data=pCopy(l1->m[i].data);
+      l0->m[i].data=pCopy((poly)l1->m[i].data);
       if(i<=l2->nr&&l2->m[i].rtyp==l1->m[i].rtyp)
-        l0->m[i].data=pAdd(l0->m[i].data,pCopy(l2->m[i].data));
+        l0->m[i].data=pAdd(l0->m[i].data,pCopy((poly)l2->m[i].data));
     }
     else
     if(i<=l2->nr&&(l2->m[i].rtyp==POLY_CMD||l2->m[i].rtyp==VECTOR_CMD))
     {
       l0->m[i].rtyp=l2->m[i].rtyp;
-      l0->m[i].data=pCopy(l2->m[i].data);
+      l0->m[i].data=pCopy((poly)l2->m[i].data);
     }
   }
   return(l0);
@@ -61,7 +61,7 @@ lists pcvPMulL(poly p,lists l1)
     if(l1->m[i].rtyp==POLY_CMD)
     {
       l0->m[i].rtyp=POLY_CMD;
-      l0->m[i].data=pMult(pCopy(p),pCopy(l1->m[i].data));
+      l0->m[i].data=pMult(pCopy(p),pCopy((poly)l1->m[i].data));
     }
   }
   return(l0);
