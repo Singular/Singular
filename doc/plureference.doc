@@ -1,5 +1,5 @@
   @comment -*-texinfo-*-
-@comment $Id: plureference.doc,v 1.24 2004-10-19 16:32:34 levandov Exp $
+@comment $Id: plureference.doc,v 1.25 2004-10-21 18:14:36 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -1140,7 +1140,7 @@ See
 @item @strong{Syntax:}
 @code{oppose (} ring_name, name @code{)}
 @item @strong{Type:}
-poly, vector, ideal or module
+poly, vector, ideal, module or matrix
 (the same type as the second argument)
 @item @strong{Purpose:}
 for a given object in the given ring, creates its opposite object
@@ -1159,15 +1159,17 @@ matrix m[3][4]=e,f,h,1,0,h^2, p,0,0,1,e^2,e*f*h+1;
 module mm =module(m); 
 def b = opposite(r);
 setring b; b;   // we will oppose this collection of objects
-poly P = oppose(r,p); 
-vector V = oppose(r,v);
-ideal I = oppose(r,i);
+poly P    = oppose(r,p); 
+vector V  = oppose(r,v);
+ideal I   = oppose(r,i);
+matrix M  = oppose(r,m);
 module MM = oppose(r,mm);
 // now let's check the correctness:
 setring r;
 print(matrix(oppose(b,P)-p));
 print(matrix(oppose(b,V)-v));
 print(matrix(oppose(b,I)-i));
+print(matrix(oppose(b,M)-m));
 print(matrix(oppose(b,MM)-mm));
 @c example
 @end smallexample
