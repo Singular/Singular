@@ -32,6 +32,7 @@ struct calc_dat
   kStrategy strat;
   int** deg;
   int* misses;
+  int max_misses;
   int found_i;
   int found_j;
   int continue_i;
@@ -41,7 +42,7 @@ struct calc_dat
   int normal_forms;
   int skipped_pairs;
   int current_degree;
-  
+  int misses_counter;
 };
 bool find_next_pair(calc_dat* c);
 void replace_pair(int & i, int & j, calc_dat* c);
@@ -71,6 +72,10 @@ bool find_next_pair(calc_dat* c)
       }
       for(int j=(i==start_i)?start_j+1:0;j<i;j++){
 	// printf("searching at %d,%d",i,j);
+	if (c->misses_counter>=2) {
+	  c->skipped_pairs++;
+	  break;
+	}
 	if (c->states[i][j]==UNCALCULATED){
 	  if(c->deg[i][j]<=c->current_degree)
 	  {
@@ -84,6 +89,7 @@ bool find_next_pair(calc_dat* c)
 	  }
 	}
       }
+      c->misses_counter=0;
     }
 //   int z=0;
 //   i=start_i;
@@ -197,9 +203,16 @@ void replace_pair(int & i, int & j, calc_dat* c)
       if ((comp_deg<curr_deg)
           ||
           ((comp_deg==curr_deg) &&
-           (c->lengths[i]+c->lengths[j]
+           (c->misses[i]+c->misses[j]
             <=
-            c->lengths[i_con[m]]+c->lengths[j_con[n]])))
+            c->misses[i_con[m]]+c->misses[j_con[n]])))
+//       if ((comp_deg<curr_deg)
+//           ||
+//           ((comp_deg==curr_deg) &&
+//            (c->lengths[i]+c->lengths[j]
+//             <=
+//             c->lengths[i_con[m]]+c->lengths[j_con[n]])))
+
       {
         curr_deg=comp_deg;
         i=i_con[m];
@@ -256,6 +269,8 @@ int* make_connections(int from, poly bound, calc_dat* c)
 void initial_data(calc_dat* c){
   void* h;
   int i,j;
+  c->misses_counter=0;
+  c->max_misses=0;
   c->normal_forms=0;
   c->current_degree=1;
   c->skipped_pairs=0;
@@ -288,6 +303,7 @@ void initial_data(calc_dat* c){
   c->short_Exps=(long*) omalloc(n*sizeof(long));
   for (i=0;i<n;i++){
     c->lengths[i]=pLength(c->S->m[i]);
+    c->misses[i]=0;
     h=omalloc(i*sizeof(int));
     if (h!=NULL){
       c->states[i]=(int*) h;
@@ -323,7 +339,7 @@ void initial_data(calc_dat* c){
   for (i=c->strat->sl;i>=0;i--)
     pNorm(c->strat->S[i]);
 }
-void add_to_basis(poly h, calc_dat* c){
+void add_to_basis(poly h, int i_pos, int j_pos,calc_dat* c){
   
   void* hp;
   PrintS("s");
@@ -373,38 +389,39 @@ void add_to_basis(poly h, calc_dat* c){
   c->short_Exps[i]=p_GetShortExpVector(h,c->r);
   for (j=0;j<i;j++){
     c->deg[i][j]=pLcmDeg(c->S->m[i],c->S->m[j]);
-    if (c->rep[j]==j){ 
+       if (c->rep[j]==j){ 
       //check product criterion
-      if (pHasNotCF(c->S->m[i],c->S->m[j])){
-        c->states[i][j]=HASTREP;
-      } else {
-        c->states[i][j]=UNCALCULATED;
-      }
+     
+	 c->states[i][j]=UNCALCULATED;
+    
 
       //lies I[i] under I[j] ?
-      if(p_LmShortDivisibleBy(c->S->m[i],c->short_Exps[i],c->S->m[j],~(c->short_Exps[j]),c->r)){
-        c->rep[j]=i;
-        PrintS("R");
-        for(int z=0;z<j;z++){
-          if (c->states[j][z]==UNCALCULATED){
-            c->states[j][z]=UNIMPORTANT;
-          }
-        }
-        for(int z=j+1;z<i;z++){
-          if (c->states[z][j]==UNCALCULATED){
-            c->states[z][j]=UNIMPORTANT;
-          }
-        }
-      }
-    }
+	 if(p_LmShortDivisibleBy(c->S->m[i],c->short_Exps[i],c->S->m[j],~(c->short_Exps[j]),c->r)){
+	   c->rep[j]=i;
+	   PrintS("R");
+
+	   c->misses[i_pos]--;
+	   c->misses[j_pos]--;
+	   for(int z=0;z<j;z++){
+	     if (c->states[j][z]==UNCALCULATED){
+	       c->states[j][z]=UNIMPORTANT;
+	     }
+	   }
+	   for(int z=j+1;z<i;z++){
+	     if (c->states[z][j]==UNCALCULATED){
+	       c->states[z][j]=UNIMPORTANT;
+	     }
+	   }
+	 }
+       }
     else {
-      
-      c->states[i][j]=UNIMPORTANT;
-      if (pHasNotCF(c->S->m[i],c->S->m[j]))
-        c->states[i][j]=HASTREP;
-    }
+           c->states[i][j]=UNIMPORTANT;
+         }
     if ((c->lengths[i]==1) && (c->lengths[j]==1))
       c->states[i][j]=HASTREP;
+    if (pHasNotCF(c->S->m[i],c->S->m[j]))
+      c->states[i][j]=HASTREP;
+    
   }
   if (c->skipped_i>0){
     c->continue_i=c->skipped_i;
@@ -500,9 +517,12 @@ void do_this_spoly_stuff(int i,int j,calc_dat* c){
   if (hr==NULL)
   {
     PrintS("-");
+    c->misses_counter++;
+    c->misses[i]++;
+    c->misses[j]++;
   } else {
     
-    add_to_basis(hr, c);
+    add_to_basis(hr, i,j,c);
   }
 }
 
