@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feread.cc,v 1.17 1998-07-29 16:49:26 Singular Exp $ */
+/* $Id: feread.cc,v 1.18 1998-08-03 16:39:05 Singular Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -11,6 +11,9 @@
 #include "tok.h"
 #include "febase.h"
 #include "mmemory.h"
+#ifdef HAVE_TCL
+#include "ipid.h"
+#endif
 
 #ifdef HAVE_FEREAD
  #include <unistd.h>
@@ -328,7 +331,8 @@ char * fe_fgets_stdin(char *s, int size)
   #ifdef HAVE_TCL
   if (tclmode)
   {
-    PrintTCLS('P',pr);
+    if(currRing!=NULL) PrintTCLS('P',pr);
+    else               PrintTCLS('U',pr);
   }
   else
   #endif
@@ -725,7 +729,8 @@ char * fe_fgets_stdin_rl(char *pr,char *s, int size)
     #ifdef HAVE_TCL
     if (tclmode)
     {
-      PrintTCLS('P',pr);
+      if(currRing!=NULL) PrintTCLS('P',pr);
+      else               PrintTCLS('U',pr);
     }
     else
     #endif

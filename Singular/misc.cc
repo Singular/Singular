@@ -579,10 +579,6 @@ BOOLEAN setOption(leftv res, leftv v)
     }
     if(strcmp(n,"none")==0)
     {
-      #ifdef HAVE_TCL
-      if (tclmode)
-        PrintTCLS('O',"none");
-      #endif
       test=0;
       verbose=0;
       goto okay;
@@ -594,10 +590,6 @@ BOOLEAN setOption(leftv res, leftv v)
         if (optionStruct[i].setval & validOpts)
         {
           test |= optionStruct[i].setval;
-          #ifdef HAVE_TCL
-          if (tclmode)
-            PrintTCLS('O',n);
-          #endif
         }
         else
           Warn("cannot set option");
@@ -613,10 +605,6 @@ BOOLEAN setOption(leftv res, leftv v)
         if (optionStruct[i].setval & validOpts)
         {
           test &= optionStruct[i].resetval;
-          #ifdef HAVE_TCL
-          if (tclmode)
-            PrintTCLS('O',n);
-          #endif
         }
         else
           Warn("cannot clear option");
@@ -634,10 +622,6 @@ BOOLEAN setOption(leftv res, leftv v)
         else                  yydebug=0;
         #endif
         #endif
-        #ifdef HAVE_TCL
-        if (tclmode)
-          PrintTCLS('O',n);
-        #endif
         goto okay;
       }
       else if ((strncmp(n,"no",2)==0)
@@ -650,10 +634,6 @@ BOOLEAN setOption(leftv res, leftv v)
         else                  yydebug=0;
         #endif
         #endif
-        #ifdef HAVE_TCL
-        if (tclmode)
-          PrintTCLS('O',n);
-        #endif
         goto okay;
       }
     }
@@ -662,6 +642,47 @@ BOOLEAN setOption(leftv res, leftv v)
     FreeL((ADDRESS)n);
     v=v->next;
   } while (v!=NULL);
+  #ifdef HAVE_TCL
+    if (tclmode)
+    {
+      BITSET tmp;
+      int i;
+      StringSet("");
+      if ((test!=0)||(verbose!=0))
+      {
+        tmp=test;
+        if(tmp)
+        {
+          for (i=0; optionStruct[i].setval!=0; i++)
+          {
+            if (optionStruct[i].setval & test)
+            {
+              StringAppend(" %s",optionStruct[i].name);
+              tmp &=optionStruct[i].resetval;
+            }
+          }
+        }
+        tmp=verbose;
+        if (tmp)
+        {
+          for (i=0; verboseStruct[i].setval!=0; i++)
+          {
+            if (verboseStruct[i].setval & tmp)
+            {
+              StringAppend(" %s",verboseStruct[i].name);
+              tmp &=verboseStruct[i].resetval;
+            }
+          }
+        }
+        PrintTCLS('O',StringAppend(""));
+        StringSet("");
+      }
+      else
+      {
+        PrintTCLS('O'," ");
+      }
+    }
+  #endif
   return FALSE;
 }
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.31 1998-06-18 17:32:12 Singular Exp $ */
+/* $Id: iplib.cc,v 1.32 1998-08-03 16:39:06 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -549,6 +549,12 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
     }
 #endif
   }
+#ifdef HAVE_TCL
+  if (tclmode)
+  {
+    PrintTCLS('L',newlib);
+  }
+#endif
 #ifdef HAVE_NAMESPACES
   pl = namespaceroot->get(plib,0, TRUE);
   if (pl==NULL)

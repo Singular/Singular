@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.62 1998-07-29 13:55:45 Singular Exp $ */
+/* $Id: febase.cc,v 1.63 1998-08-03 16:39:04 Singular Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -86,11 +86,13 @@ BOOLEAN tclmode=FALSE;
 *  W:l:s  warning
 *  N:l:s  stdout
 *  Q:0:   quit
-*  P:0:   prompt >
-*  P:1:   prompt .
+*  P:l:   prompt > (ring defined)
+*  U:l:   prompt > (no ring defined)
+*  P:l:   prompt .
 *  R:l:<ring-name> ring change
-* plan:
-*  O:l:<option/no-option> option change (option)
+*  L:l:<lib name> library loaded
+*  O:l:<list of options(space seperated)> option change
+*  M:l:<mem-usage> output from "option(mem)"
 */
 
 #include "febase.inc"
