@@ -1,4 +1,4 @@
-// $Id: classify.lib,v 1.9 1997-08-13 17:21:03 krueger Exp $
+// $Id: classify.lib,v 1.10 1997-08-14 10:31:14 krueger Exp $
 //=============================================================================
 //
 // Please send bugs and comments to krueger@mathematik.uni-kl.de
@@ -32,7 +32,7 @@ REMARK:   This version of classify is only alpha.
           Please send bugs and comments to:
           "Kai Krueger" <krueger@mathematik.uni-kl.de>
 NOTE:     The procedure init_debug(n); is usefull as trace-mode.
-	  n may range from 0 to 10, higher values of n give more informations.
+	  n may range from 0 to 10, higher values of n give more information.
 {
 //         or set the shell-variable SG_DEBUG to the debugging level.
   if(system("version")<922) {
