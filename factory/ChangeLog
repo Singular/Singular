@@ -1,51 +1,99 @@
-Fri Jun  6 09:38:05 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
-
-	* configure.in: removed some stupid warnings when 'dangerous'
-	  combinations of with's/enable's are specified and some other
- 	  fixes in configures messages
-
-	* configure.in (AC_ARG_ENABLE(memdebug)): removed code which sets
-	  enable_memdebug to 'normal' since this is really never tested
-
-	* configure.in (AC_ARG_WITH(gmp, builtingmp)): new command line
-	  options.  rest of configure.in adapted to the new scheme of
- 	  specifying where gmp lives
+Tue Jun 24 11:15:25 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* configure.in: doc fix
 
-	* GNUmakefile.in (distsrc, clean): gengftables added to the
-	  distribution
-	  (distfiles): ChangeLog added to the distribution
+	* configure.in: some fixes in configure's messages
 
-Thu Jun  5 15:03:48 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+Mon Jun 23 12:44:50 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
-	* configure.in: --with-Singular --enable-debugoutput is now
-	  possible.  So is --with-Singular --enable-timing.
+	* config.h.in: doc checked
+	* factory.template: doc checked
+	* factoryconf.template: doc checked
+	* gengftables.cc: doc checked
 
-	* GNUmakefile.in (gengftables.o): added check which makes make
-	  complain if factory was not configured in the right way
+	* config.h.in: doc fix
 
-	* configure.in: removed checks on sizeof(int) == sizeof(void *)
-	  == 4
-
-	* debug.h: removed dependency on NDEBUG
+	* factory.template: doc fix
 
 	* factoryconf.template: doc fix
 
-	* GNUmakefile.in: ($(srcdir)/config.h.in, $(srcdir)/stamp-h.in,
- 	  realmaintainerclean, dist, distfiles): instead of creating
- 	  config.h.in we will deliver it as a real source file
-	* config.h.in: config.h.in is a real source file and not
-	  longer created from acconfig.h
+Fri Jun 20 12:09:00 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
-	* config.h.in (INCL_CONFIG_H): added flag to prevent multiple
+	* templates/: all files prefixed with 'ftmpl_'.  All #include
+	  statements changed.
+	* GNUmakefile.in (templatesrc, templateincl): all files prefixed
+	  with 'ftmpl_'
+
+	* ftmpl_inst.cc, tmpl_inst.cc: tmpl_inst.cc renamed to
+	  ftmpl_inst.cc
+	* GNUmakefile.in: all references to tmpl_inst replaced by
+	  references to ftmpl_inst
+
+Thu Jun 19 14:33:17 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* config.h.in: doc fix
+
+	* factoryconf.template: doc fix
+
+	* headers of almost all source files fixed
+
+Thu Jun 12 13:12:49 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* cf_globals.cc: doc fix
+
+Fri Jun  6 09:38:05 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* configure.in: some stupid warnings removed if "dangerous"
+	  combinations of with's/enable's are specified on commandline.
+ 	  Some other fixes in configure's messages.
+
+	* configure.in (enable_memdebug): code removed which sets
+	  enable_memdebug to 'normal' since this is really never tested
+
+	* configure.in (with_gmp, with_builtingmp): new command line
+	  options.  Rest of configure.in adapted to new scheme of
+ 	  specifying where gmp lives.
+
+	* configure.in: doc fix
+
+	* GNUmakefile.in (distsrc, clean): gengftables added to
+	  distribution
+	  (distfiles): ChangeLog added to distribution
+
+Thu Jun  5 15:03:48 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* configure.in (enable_debugoutput, enable_timing): dependency on
+	  with_Singular removed so '--with-Singular --enable-debugoutput'
+	  and '--with-Singular --enable-timing' are possible
+
+	* GNUmakefile.in (gengftables.o): check added which makes make
+	  complain if factory was not configured in the right way
+
+	* configure.in: checks on sizeof(int) == sizeof(void *) == 4
+	  removed
+
+	* debug.h: dependency on #define NDEBUG removed
+
+	* factoryconf.template: doc fix
+
+	* config.h.in: added to distribution as source file.  config.h.in
+	  is not created from acconfig.h any longer.
+	* acconfig.h: removed from distribution
+	* GNUmakefile.in: ($(srcdir)/config.h.in, $(srcdir)/stamp-h.in,
+ 	  realmaintainerclean, dist, distfiles): changed to reflect the
+	  changes described above
+
+	* config.h.in (INCL_CONFIG_H): new #define to prevent multiple
 	  inclusion of config.h
 
 	* GNUmakefile.in ($(srcdir)/configure): make will not complain
 	  about a missing autoconf any longer
 
-	* canonicalform.cc (operator >>, SINGULAR): returns 0 again when
-	  compiled with Singular and with stream IO enabled
+	* canonicalform.cc (operator>>): returns 0 again if #define
+	  SINGULAR and #define NOSTREAMIO are switched on
+
+--------
+von hier ab aufw"arts noch mal checken
 
 Before Mon Jun  4 1997 Jens Schmidt <schmidt@mathematik.uni-kl.de>
 
@@ -78,11 +126,15 @@ Before Mon Jun  4 1997 Jens Schmidt <schmidt@mathematik.uni-kl.de>
  	  which are not translated but installed (e.g. templates) and is
 	  installed, too.
 
+	* factory.template: rewritten to new makeheader syntax
 	* factory.template, factory.h: factory.h removed from the
 	  distribution, factory.template added since makeheader is now
  	  included in the distribution
-	* singfactory.h: removed from distribution.  Functionality
-	  moved to factory.template/factory.h.
+
+	* factory.template, singfactory.h (SINGULAR): Singular-stuff moved
+	  from singfactory.h to factory.template.  Wrapped by #ifdef
+	  SINGULAR.
+	* singfactory.h: removed from distribution
 
 	* gengftables.cc: code for generating gftables added to the
 	  distribution
@@ -104,9 +156,32 @@ Before Mon Jun  4 1997 Jens Schmidt <schmidt@mathematik.uni-kl.de>
 
 
 	Now for the changes at organization level:
+!! Erkl"aren, was DEBOUT/ASSERT/TIMING macros sind
 
-	* canonicalform.cc (operator >>, SINGULAR): removed dependency on
-	  #define SINGULAR
+	* assert.h (NOASSERT, NDEBUG): the define to switch the assertions
+	  off is NOASSERT instead of NDEBUG.  But NDEBUG works, too, for
+	  backward compatibility.
+
+	* assert.h (__ASSERT1, ASSERT1, STICKYASSERT1): new assert macros
+	  which print additional argument
+
+	* assert.h (DEBINCLEVEL, DEBDECLEVEL, DEBOUTSL, DEBOUT, DEBOUTLN):
+	  debug functionality moved to debug.h
+	* assert.cc: renamed to debug.cc
+	* debug.h, debug.cc: new files.  DEBOUT-functionality moved from
+	  assert.h/assert.cc to these files.  All sourcre files which need
+	  this functionality include debug.h.
+
+	* assert.h (PVIRT_VOID, PVIRT_INTCF, PVIRT_BOOL, PVIRT_INT,
+	  PVIRT_CHARCC): PVIRT_*-functionality moved from int_cf.h to
+	  assert.h
+	* int_cf.h (PVIRT_VOID, PVIRT_INTCF, PVIRT_BOOL, PVIRT_INT,
+	  PVIRT_CHARCC): PVIRT_-*functionality moved to assert.h
+
+	* assert.h (__WARN, WARN, STICKYWARN): new macros
+
+	* assert.h (__ASSERT, __STICKYASSERT): the preprocessor instead of
+ 	  fprintf() pastes the message into the format string now
 
 	* cf_factor.cc (factorize, MULTIFACTOR): removed dependency on
 	  #define MULTIFACTOR
@@ -139,131 +214,182 @@ Before Mon Jun  4 1997 Jens Schmidt <schmidt@mathematik.uni-kl.de>
 	* fac_univar.cc (DEBUGOUTPUT, TIMING, sys/times.h): some spurious
 	  #define's and #include's removed
 
+--------
+nochmal checken
+
+	* config.h.in (GFTABLEDIR): new #define
+	* gfops.cc (gf_get_table): uses #define GFTABLEDIR to get the path
+	  to the GF(q) tables
+
 	* config.h.in (MDEBUG, NOASSERT, TIMING, DEBUGOUTPUT): new
 	  #defines
 
-	* config.h.in (MULTIPROTOCOL): #define removed.  No more
-	  MULTIPROTOCOL support.
-	* int_int.h (class InternalInteger, MULTIPROTOCOL): removed
-	  declarations dependent on #define MULTIPROTOCOL
-	* int_rat.h (class InternalRational, MULTIPROTOCOL): removed
-	  declarations dependent on #define MULTIPROTOCOL
+	* config.h.in (MULTIPROTOCOL): #define MULTIPROTOCOL removed.  No
+	  more MULTIPROTOCOL support.
+	* int_int.h (class InternalInteger): declarations dependent on
+	  #define MULTIPROTOCOL removed
+	* int_rat.h (class InternalRational): declarations dependent on
+	  #define MULTIPROTOCOL removed
 
-	* config.h.in (NOSTREAMIO): new define NOSTREAMIO to switch off
+	* config.h.in (NOSTREAMIO): new #define NOSTREAMIO to switch off
 	  stream IO.  Operators <<, >>, and related stuff wrapped by
- 	  #ifndef where necessary
+ 	  #ifndef.
 
-	* cf_factory.cc (CFFactory::basic ( int, int ), ASSERT1): error
-	  message changed to call of ASSERT1 macro
-	* fac_util.cc: (crossprod, ASSERT): error message changed to
-	  call of ASSERT macro
-	* int_cf.cc: (ASSERT, ASSERT1): error messages changed to calls of
-	  ASSERT1 macro
-	* int_cf.h (InternalCF::InternalCF( InternalCF& ), ASSERT): error
-	  message changed to call of ASSERT macro
-	* int_poly.cc (InternalPoly::InternalPoly( InternalPoly& ),
-	  ASSERT): error message changed to call of ASSERT macro
+	* cf_factory.cc (CFFactory::basic( int, int )): error message
+	  changed to call of ASSERT macros
+	* fac_util.cc: (crossprod): error message changed to call of
+	  ASSERT macros
+	* int_cf.cc: several error messages changed to calls of ASSERT
+	  macros
+	* int_cf.h (InternalCF::InternalCF( InternalCF& )): error message
+	  changed to call of ASSERT macros
+	* int_poly.cc (InternalPoly::InternalPoly( InternalPoly& )): error
+	  message changed to call of ASSERT macros
+	* templates/array.cc (Array<T>::operator[], Array<T>::operator+=):
+	  error messages changed to calls of ASSERT macros
+	* templates/list.cc (List<T>::getFirst, List<T>::getLast,
+	  ListIterator<T>::getItem): error messages changed to calls of
+	  ASSERT macros
 
-	* fac_univar.cc (TIMING, TIMING_END_AND_PRINT, timing.h): timing
-	  stuff changed to calls of TIMING macros
+	* templates/matrix.cc (ASSERT): definition of ASSERT macros
+	  replaced by inclusion of factoryconf.h
 
-	* initgmp.cc (initializeGMP, SINGULAR): dependency on
-	  #define SINGULAR removed
+========
+ab hier fertig
 
-	* int_cf.h (PVIRT_VOID, PVIRT_INTCF, PVIRT_BOOL, PVIRT_INT,
-	  PVIRT_CHARCC): PVIRT_-*functionality moved to assert.h
+	* fac_univar.cc (ZFactorizeUnivariate): timing stuff changed to
+	  calls of TIMING macros
 
-	* mmallocb.c (TEST, MM_TEST): references to #define TEST changed
-	  to MM_TEST
+	* debug.cc (deb_level, level_msg, deb_inc_level): modified so
+	  deb_inc_level()'s output is more pretty at time of first call
+
+	* debug.h (DEBUGOUTPUT): #define DEBUGOUTPUT is switched off now
+	  if #define NDEBUG is switched on
+
+	* debug.h (DEBOUT, DEBOUTLN): slightly modified so they print
+	  "objects" instead of only one "msg" and one "object".  All
+ 	  callers changed.
+
+	* canonicalform.cc (operator>>): dependency on #define SINGULAR
+	  removed
+
+	* gmpext.h: references to #define INCL_GCDEXT_H replaced by
+	  references to #define INCL_GMPEXT_H
+
+	* initgmp.cc (initializeGMP): dependency on #define SINGULAR
+	  removed
+
+	* mmallocb.c (MM_TEST, TEST): references to #define TEST
+	  replaced by references to #define MM_TEST
+
+	* readcf.h: '#include <stdio.h>' replaced by '#include <iostream.h>'
+
+	* readcf.y: dependency on #define COMEAU removed
 
 	* timing.h (TIMING_END_AND_PRINT): new macro
 
-	* timing.h (HZ, CLOCKS_PER_SEC, time.h): ticks per second
-	  calculated in a hopefully more portable way
-
-	* timing.h: doc fix
+	* timing.h (HZ): new #define to calculate ticks per second in a
+	  more portable way.  All references changed.
 
 
 	Last not least, changes at source code level:
 
-	* canonicalform.cc (mapinto): fixed mapping from int to GF
+	* canonicalform.cc (mapinto): fixed mapping from int to GF(q)
+
+	* cf_factor.cc (sqrFree( CanonicalForm, boolean )): new
+	  function which sorts output if desired
+	* cf_factor.cc (sqrFree( CanonicalForm )): changed to call new
+	  sqrFree()
+	* canonicalform.h, cf_factor.h (sqrFree( CanonicalForm, boolean )):
+	  new declaration
+	* fac_sqrfree.cc (compareFactors, sortCFFList): new functions used
+	  by new sqrFree()
+	* fac_sqrfee.h (sortCFFList): new declaration
 
 	* cf_defs.h (SW_USE_SPARSEMOD): new switch
 
-	* cf_factor.cc, cf_factor.h (sqrFree( CanonicalForm, boolean )):
-	  new function which sorts output if desired
-	* cf_factor.cc (sqrFree): simply calls the new function now
-
-	* cf_globals.cc (factoryVersion, FACTORYVERSION): version string
-	  added
-	* cf_globals.h (factoryVersion): version string added
-	* config.h.in (FACTORYVERSION): new #define to initialize
-	  factoryVersion
+	* cf_globals.cc (factoryVersion): new external
+	* cf_globals.h (factoryVersion): new declaration
+	* config.h.in (FACTORYVERSION): new #define
+	* factory.template: '#include cf_globals.h' added because of
+	  version string
 
 	* cf_linsys.cc (linearSystemSolve, determinant, determinant2):
-	  typedef int_ptr introduced and used
+	  typedef int_ptr added
+	  (linearSystemSolve, determinant, determinant2): 'new (int*)[..]'
+	  replaced by 'new int_ptr[..]'
+	* templates/matrix.h (Matrix<T>::T_ptr): new typedef
+	* templates/matrix.cc (Matrix<T>::Matrix( int, int ),
+	  Matrix<T>::Matrix( Matrix<T> ), Matrix<T>::operator=): 'new (T*)[..]'
+	  replaced by 'new T_ptr[..]'
 
-	* cf_random.cc (RandomGenerator, RanGen): new class
-	  RandomGenerator and new static RanGen which replace calls to the
- 	  poorly programmed stdlib-random generator
+	* cf_iter.h: superfluous '#include <iostream.h>' removed
+	* cf_factor.h: superfluous '#include <iostream.h>' removed
+	* cf_reval.h: superfluous '#include <iostream.h>' removed
+	* memutil.c: superfluous '#include <stdio.h>' removed
+	* mmalloc.c: superfluous '#include <stdio.h>' removed
 
-	* cf_iter.h (iostream.h): spurious #include <iostream.h> removed
-	* cf_factor.h (iostream.h): spurious #include <iostream.h> removed
-	* cf_reval.h (iostream.h): spurious #include <iostream.h> removed
-	* cf_switches.h (RATTIONAL): spurious #define RATIONAL removed
-	* int_int.cc (IntInt): spurious #define IntInt removed
-	* int_pp.cc (IntPP): spurious #define IntPP removed
-	* memutil.c (stdio.h): spurious #include <stdio.h> removed
-	* mmalloc.c (stdio.h): spurious #include <stdio.h> removed
+	* cf_random.cc (RandomGenerator): new class
+	  (RanGen): new static
+	  (factoryrandom, factoryseed): calls to stdlib random generator
+	  replaced by methods of class RandomGenerator
 
-	* fac_univar.cc (MAX_FP_FAC, max_fp_fac): #define changed to const int
+	* cf_switches.h (RATIONAL): superfluous #define RATIONAL removed
+	* int_int.cc (IntInt): superfluous #define IntInt removed
+	* int_pp.cc (IntPP): superfluous #define IntPP removed
 
-  	* fac_univar.cc (initHG, ZFactorizeUnivariate): added
-	  STICKYWARNings because of some strange errors which occure in
- 	  these functions
+  	* fac_univar.cc (initHG, ZFactorizeUnivariate): STICKYWARNings
+	  added because of some strange errors which occur in these
+ 	  functions
 
-	* fac_univar.cc (kBound): added cast to double in calculation of
+	* fac_univar.cc (kBound): cast to double added in calculation of
 	  the bound
-	  (UnivariateQuadraticLift): added cast to double in calculation
+	  (UnivariateQuadraticLift): cast to double added in calculation
 	  of no_iter
 
-	* fac_univar.cc (ZFactorizeUnivariate): removed spurious
-	  declaration of CFFList G.  Some trivial structural changes.
-  	  Removed test on D != 0 before deleting D.
+	* fac_univar.cc (max_fp_fac, MAX_FP_FAC): '#define MAX_FP_FAC'
+	  replaced by 'const int max_fp_fac'.  All references changed.
 
-	* fac_univar.cc: doc fix
+	* fac_univar.cc (ZFactorizeUnivariate): superfluous declaration of
+	  'CFFList G' removed.  Some trivial structural changes.  Test on
+ 	  'D != 0' (before deleting D) removed.
+
+	* gfops.h (gf_gf2ff, gf_isff): declarations marked as public for
+	  Singular
+	* factory.template: '#include "gfops.h"' added
+
+	* gfops.cc (gf_get_table): gf_table[gf_q] is guaranteed to be 0
+
+	* gfops.cc (gf_get_table): rewritten.  Major changes: copies
+	  Singulars tables if these are present instead of reading from
+	  disk.  Uses standard IO instead of stream IO to read the tables.
+	* singext.h (nfCharQ, nfM1, nfMinPoly, nfPlus1Table): declarations
+	  of Singular objects added to copy Singulars GF(q) tables
+
+	* gfops.cc (gf_get_table): length of temporary buffer replaced by
+	  'const int gf_maxbuffer'
+
+	* gfops.cc (gf_isff): rewritten
+
+	* gfops.cc (gf_maxtable, MAXTABLE): '#define MAXTABLE' replaced by
+	  'const int gf_maxtable'.  All references changed.
+	* gfops.cc (gf_valid_combination): 'int m' replaced by references
+	  to gf_maxtable
+
+	* gfops.cc (intVec2CF): new function
+
+	* gfops.h (gf_mipo): new declaration
+
+	* imm.h (class InternalCF): superfluous declaration of class
+	  InternalCF removed
+
+	* imm.h (imm_intval): convertion from GF(q) to integer added
 
 	* int_int.cc (InternalInteger::genOne): Ruedigers last fryday
 	  afternoon fix
 
-	* variable.cc (Variable::Variable( char ), Variable::Variable( int, char ),
-	  rootOf): delete changed to delete [] where necessary
-
 	* variable.cc (Variable::name): casts to int added
 
-
-	Not sorted yet:
-
-	* assert.h (NOASSERT, NDEBUG): the define to switch the assertions
-	  off is NOASSERT instead of NDEBUG.  But NDEBUG works, too, for
-	  backward compatibility.
-	  (__ASSERT1, ASSERT1, STICKYASSERT1): new assert macros which
-	  print additional argument
-	  (DEBINCLEVEL, DEBDECLEVEL, DEBOUTSL, DEBOUT, DEBOUTLN): debug
-	  functionality moved to debug.h
-	  (PVIRT_VOID, PVIRT_INTCF, PVIRT_BOOL, PVIRT_INT, PVIRT_CHARCC):
-	  PVIRT_*-functionality moved from int_cf.h to assert.h
-	  (__WARN, WARN, STICKYWARN): new macros
-	  (__ASSERT, __STICKYASSERT): the preprocessor instead of
- 	  fpritnf() pastes the message into the format string now
-	* assert.cc: renamed to debug.cc
-	* debug.h, debug.cc: new files.  DEBOUT-functionality moved from
-	  assert.h/assert.cc to these files.  All sourcre files which need
-	  this functionality include debug.h.
-	  (DEBUGOUTPUT, NDEBUG): DEBUGOUTPUT is switched off now if NDEBUG
-	  is switched on
-	  (DEBOUT, DEBOUTLN): slightly modified so they print 'objects'
-	  now instead of only one 'msg' and one 'object'.  All callers
-	  changed.
-	  (deb_level, level_msg, deb_inc_level): modified so
-	  deb_inc_level()'s output is more pretty at time of first call
+	* variable.cc (Variable::Variable( char ),
+	  Variable::Variable( int, char ), rootOf): 'delete ...' changed
+	  to 'delete [] ...' where necessary
