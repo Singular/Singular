@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.h,v 1.9 1999-09-29 10:59:30 obachman Exp $ */
+/* $Id: kstd1.h,v 1.10 1999-10-19 14:03:50 obachman Exp $ */
 /*
 * ABSTRACT
 */
@@ -71,7 +71,6 @@ extern intvec * kModW;
 25 no redTail(p)/redTail(s)
 26 integer strategy
 27 stop at HC (finiteDeterminacyTest)
-28 minimizes directly during the mres command
 29 kStd + 1 new element
 30 noRedSyz
 31 weight

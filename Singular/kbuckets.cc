@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.cc,v 1.10 1999-10-18 16:49:21 obachman Exp $ */
+/* $Id: kbuckets.cc,v 1.11 1999-10-19 14:03:50 obachman Exp $ */
 
 #include "mod2.h"
 #include "tok.h"
@@ -172,7 +172,6 @@ void kBucketInit(kBucket_pt bucket, poly lm, int length,
                  memHeap heap)
 {
   int i;
-
   assume(bucket != NULL);
   assume(length <= 0 || length == pLength(lm));
   assume(kBucketIsCleared(bucket));
@@ -296,6 +295,8 @@ static int kBucketCanonicalize(kBucket_pt bucket)
     p = p_Add_q(p, bucket->buckets[i],
                 &pl, bucket->buckets_length[i],
                 bucket->heap);
+    bucket->buckets[i] = NULL;
+    bucket->buckets_length[i] = 0;
   }
 
   lm = bucket->buckets[0];

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmisc.c,v 1.16 1999-10-18 11:19:30 obachman Exp $ */
+/* $Id: mmisc.c,v 1.17 1999-10-19 14:03:50 obachman Exp $ */
 
 /*
 * ABSTRACT:
@@ -151,6 +151,7 @@ void mmDebugUnGetTemHeap(memHeap *heap_p, char* file, int line)
  
 void mmGarbageCollectHeaps(int strict)
 {
+#ifdef NDEBUG
   int show_mem = BVERBOSE(V_SHOW_MEM);
   int i;
   int s_strict = strict & 1;
@@ -193,6 +194,7 @@ void mmGarbageCollectHeaps(int strict)
     fflush(stdout);
     verbose |= Sy_bit(V_SHOW_MEM);
   }
+#endif
 }
   
 size_t mmSizeL( void* adr )
