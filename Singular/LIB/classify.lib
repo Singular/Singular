@@ -1,4 +1,4 @@
-// $Id: classify.lib,v 1.13 1997-09-26 08:14:35 krueger Exp $
+// $Id: classify.lib,v 1.14 1997-09-29 11:30:33 krueger Exp $
 //
 //  A library for the classification of isolated hypersurface singularities
 //  with respect to right equivalence. Based on the determinator of 
@@ -33,249 +33,231 @@ LIB "morse.lib";
 LIB "tools.lib";
 LIB "nflist.lib";
 LIB "hilbert.lib";
+LIB "elim.lib";
 
 ///////////////////////////////////////////////////////////////////////////////
-//--------------------------- output ------------------------------------------
-///////////////////////////////////////////////////////////////////////////////
-//=============================================================================
-// TopLevel Funktion of the Arnold-Classifier.
-//
 proc classify (poly f_in)
 USAGE:    classify(f);  f=poly
-COMPUTE:  Normalform and singularity type of f
-RETURN:   Normalform of f
+COMPUTE:  normal form and singularity type of f with respect to right
+	  equivalence, as given in the book "Singularities of differentiables 
+	  maps, Volume I" by V.I. Arnold, S.M. Gusein-Zade, A.N. Varchenko
+RETURN:   normal form of f, of type poly
+REMARK:   This version of classify is only alpha. Please send bugs and comments
+	  to: "Kai Krueger" <krueger@mathematik.uni-kl.de>
+	  Be shure to have at least Singular version 0.9.3, better 1.0.1
+NOTE:     type init_debug(n); (0 <= n <= 10) in order to get intermediate 
+	  information, higher values of n give more information.
+	  The proc creates several global objects with names all starting with
+	  @, hence there should be no name conflicts 
 EXAMPLE:  example classify; shows an example
-REMARK:   This version of classify is only alpha.
-          Please send bugs and comments to:
-          "Kai Krueger" <krueger@mathematik.uni-kl.de>
-NOTE:     The procedure init_debug(n); is usefull as trace-mode.
-          n may range from 0 to 10, higher values of n give more information.
-{
-//         or set the shell-variable SG_DEBUG to the debugging level.
-  if(system("version")<922) {
-    "Sorry. You need to have at least Singular version 0.9.2.c"
-    return;
-  }
 
-  def ring_top=basering;
-  // Get characteristics of ring set it as default.
-  if(defined(CharOfRing) == 1) { kill CharOfRing; }
-  int CharOfRing = char(basering);
-  export CharOfRing;
+{
+//---------------------------- initialisation ---------------------------------
+  init_debug();                    // initialize trace/debug mode
+  int n        = nvars(basering);
+  def ring_top = basering; 
+  int show_nf  = 1;                // return normal form if set to '1'
+  int i;
 
   if(checkring()) { return(f_in); }
-  int @show_nf = 1;    // return normal form if set to '1'
-
-  int @n = nvars(basering);
-
-  // Save the name of initial ring
-  int @i;
-
-  // if trace/debug mode not set, do it!
-  init_debug();
 
   // define new ring
-  if( defined(Rtop) == 1) { kill Rtop; }
-  ring Rtop=char(basering),(x(1..@n)),(c,ds);
-  export Rtop;
+  if( defined(@Rtop) == 1) { kill @Rtop; }
+  ring @Rtop=char(basering),(x(1..n)),(c,ds);
+  export @Rtop;
 
-  map @Conv=ring_top,maxideal(1);
+  map conv_ringtop2rtop=ring_top,maxideal(1);
   setring ring_top;
 
-  if(defined(ShowPoly) == 1) { kill ShowPoly; }
-  map ShowPoly=Rtop,maxideal(1);
-  export ShowPoly;
-  setring Rtop;
+  if(defined(@showpoly) == 1) { kill @showpoly; }
+  map @showpoly=@Rtop,maxideal(1);
+  export @showpoly;
+  setring @Rtop;
   init();
 
-  string RingDisplay = "ring_top";
-  export RingDisplay;
+  string @ringdisplay = "ring_top";
+  export @ringdisplay;
 
-  string @s1;
-  string @s2;
-  string @s4;
-  @s1,@s2=Klassifiziere(@Conv(f_in));
-  // @s1: f nach saemtlichen Koordinatentransformationen
-  // @s2: Typ des Polynoms f z.b: E[18]
-  @s4 = "poly @f_out="+@s1+";";
-  debug_log(10, "S1=", @s1);
-  debug_log(10, "S2=", @s2);
+  string s1;
+  string s2;
+  string s4;
+  s1,s2=Klassifiziere(conv_ringtop2rtop(f_in));
+  // s1: f nach saemtlichen Koordinatentransformationen
+  // s2: Typ des Polynoms f z.b: E[18]
+  s4 = "poly f_out="+s1+";";
+  debug_log(10, "S1=", s1);
+  debug_log(10, "S2=", s2);
 
-  if( @s2[1,2]=="f " || @s2[1,4]=="The " || @s2=="Fehler!" || @s2=="A[0]") { 
-    if( @s2 != "Fehler!") { @s2; }
-    if(@s1=="1" || @s2[1,4]=="The " || @s2=="Fehler!" ) { 
+  if( s2[1,2]=="f " || s2[1,4]=="The " || s2=="Fehler!" || s2=="A[0]") { 
+    if( s2 != "Fehler!") { s2; }
+    if(s1=="1" || s2[1,4]=="The " || s2=="Fehler!" ) { 
       setring ring_top;
       return(f_in);
     }
-    setring Rtop;
-    execute @s4;
-    map @ConvUp=Rtop,maxideal(1);
+    setring @Rtop;
+    execute s4;
+    map ConvUp=@Rtop,maxideal(1);
   }
   else {
     setring RingB;
-    execute @s4;
-    setring Rtop;
-    map @ConvUp=RingB,maxideal(1);
+    execute s4;
+    setring @Rtop;
+    map ConvUp=RingB,maxideal(1);
   }
-  if(@show_nf==1) {
-    poly @f_nf = normalform(@s2);
-    for(@i=4;@i<=@n;@i=@i+1) {
-      @f_nf = @f_nf + x(@i)^2;
+  if(show_nf==1) {
+    poly f_nf = normalform(s2);
+    for(i=4;i<=n;i=i+1) {
+      f_nf = f_nf + x(i)^2;
     }
-    if(DeBug>1) { "Normal form NF(f)=", @f_nf; }
+    if(DeBug>1) { "Normal form NF(f)=", f_nf; }
   }
-  poly @f_out = @ConvUp(@f_out);
-  for(@i=CoRang+1;@i<=@n;@i=@i+1) {
-    @f_out = @f_out + x(@i)^2;
+  poly f_out = ConvUp(f_out);
+  for(i=CoRang+1;i<=n;i=i+1) {
+    f_out = f_out + x(i)^2;
   }
   setring ring_top;
-  map @ConvBack=Rtop,maxideal(1);
+  map conv_rtop2ringtop=@Rtop,maxideal(1);
 
-  if(@show_nf == 1) {
-    return(@ConvBack(@f_nf));
+  if(show_nf == 1) {
+    return(conv_rtop2ringtop(f_nf));
   }
-  else { return(@ConvBack(@f_out)); }
+  else { return(conv_rtop2ringtop(f_out)); }
 }
 example
 {"EXAMPLE"; echo=2;
    ring r=0,(x,y,z),ds;
-   init_debug(2);
    poly f=(x2+3y-2z)^2+xyz-(x-y3+x2*z3)^3;
-   poly g=classify(f);
+   classify(f);
+   init_debug(3);
+   classify(f);
 }
-//=============================================================================
-// Id: Kclass.lib,v 1.12 1997/08/13 17:21:05 krueger Exp 
-//=============================================================================
-proc Klassifiziere (poly @f)
-USAGE:    Klassifiziere(f);
-{ 
-  string @s1;
-  int @cnt;
-// Warum hier init() noch einmal, keine Ahnung.
-// Wenn nicht geht's einfach nicht. Hans fragen!
-  init(1);
-  int  @n = nvars(basering);    // Zahl der Variablen des aktuellen Rings.
 
-  // Define always 'RingDisplay' to be able to run 'Show(f)'
-  if( defined(RingDisplay) == 0) { 
-    string RingDisplay;
-    export RingDisplay;
-  }
-  RingDisplay = "setring RingB;";
-
-  if(defined(SG_Typ) == 1) { kill SG_Typ; } // Typ(s) von f nach Hilbert.
-  string SG_Typ = "";
-  export SG_Typ;
-
-  //
-  @s1 = "ring RingB="+string(CharOfRing)+",("+A_Z("x", @n)+"),ds;";
-  execute @s1;                  // in diesem Ring werden Polynome angezeigt.
-  @s1 = "map ShowPoly=Rtop,"+A_Z("x", @n)+";";
-  execute @s1;                  // Hiermit werden Polynome angezeigt.
-  export ShowPoly;
-  setring Rtop;                 // in den Ausgangs-ring zurueck.
-  export RingB;
-
-  //===============================================
-
-  if(jet(@f,0) != 0 ) { 
-    if(defined(CoRang) == 0) { int CoRang = CoRangf(@f); }
-    return("1", "f is a unit");
-  }
-
-  debug_log(1, "Computing Basicinvariants of f ...");
-  if(defined(Mu) == 1) { kill Mu; }
-  if(defined(K) == 1) { kill K; }
-  if(defined(CoRang) == 1) { kill CoRang; }
-  int K;
-  int Mu;
-  int CoRang;
-  K, Mu, CoRang = basicinvariants(@f);
-  "About the singularity :";
-  "          Milnor number(f)   = "+string(Mu);
-  "          Corank(f)          = "+string(CoRang);
-  "          Determinacy       <= "+string(K);
-  export CoRang, K, Mu;
-
-//  ideal @Jf = Jf;
-//  if(dim(std(EH(@Jf))) != @n) { return("x(1)","A[0]"); }
-  if( Mu == 0) { 
-    CoRang=1;
-    return("x(1)","A[0]");
-  }
-
-  if(Mu<0) {
-    "The Milnor number of the function is infinite.";
-    "The singularity is not in Arnolds list.";
-    return("", "Fehler!");
-  }
-
-  @f = jet(@f, K);
-  @s1,@cnt = HKclass(Hilb(@f));
-  if(@cnt>0) { "Guessing type via Hilbert polynomial: ", @s1; }
-  else { "Hilbert polynomial not recognised. Milnor code = ", Hilb(@f); }
-  "";
-  "Computing normal form ...";
-
-  // Einteilung nach Corang
-  if( defined(ShowPhi) == 0) { int ShowPhi = 0; }
-  if(CoRang == 0) { return(Funktion2(@f, CoRang)); }
-  if(CoRang == 1) { return(Funktion2(@f, CoRang)); }
-  if(CoRang == 2) { return(Funktion1bis(@f, CoRang)); }
-  if(CoRang == 3) { return(Funktion1bis(@f, CoRang)); }
-  return(Funktion105(@f, CoRang));
-}
 ///////////////////////////////////////////////////////////////////////////////
-proc Funktion1bis (poly @f, int corank)
-USAGE:    Funktion1bis();
-{ // pruefe ob abspaltung von Quadraten noetig, wenn ja tue dies.
+  proc Klassifiziere (poly f)
+  { 
+  //-------------------------- initialisation ---------------------------------
+    string s1;
+    int cnt;
+  //  init(1);
+    int  n = nvars(basering);    // Zahl der Variablen des aktuellen Rings.
 
-  int  @n = nvars(basering);
-  string @s1;
-  string @RestRing = nameof(basering);
+    // Define always '@ringdisplay' to be able to run 'Show(f)'
+    if( defined(@ringdisplay) == 0) { 
+      string @ringdisplay;
+      export @ringdisplay;
+    }
+    @ringdisplay = "setring RingB;";
 
-  if( @n > corank) {
-    "I have to apply the splitting lemma. This will take some time....:-)";
-    poly @g = Morse(@f, K, corank);
+    if(defined(SG_Typ) == 1) { kill SG_Typ; } // Typ(s) von f nach Hilbert.
+    string SG_Typ = "";
+    export SG_Typ;
 
-    @g = ReOrder(@g);
-    if(defined(PhiG)==1) { kill PhiG; }
-    if(defined(Rrest) == 1) { kill Rrest; }
-    if(defined(ShowPoly) == 1 ) { kill ShowPoly; }
-    if(defined(RingB) == 1) { kill RingB; }
-
-    execute Setring(corank, "Rrest");
-    export Rrest;
-    @RestRing = nameof(basering);
-
-    map @MapReduce=Rtop,maxideal(1);
-    poly @G = @MapReduce(@g);
-
-    @s1 = "map PhiG=Rtop," + string(maxideal(1));// Konstruiere Id auf r
-    execute @s1;
-    export PhiG;
-
-    @s1 = "ring RingB=",string(CharOfRing),",("+A_Z("x", corank)+"),ds;";
-    execute @s1;
+    execute ("ring RingB="+charstr(basering)+",("+A_Z("x", n)+"),(c,ds);");
+    execute("map @showpoly=@Rtop,"+A_Z("x", n)+";");
+    export @showpoly;
+    setring @Rtop;                 // in den Ausgangs-ring zurueck.
     export RingB;
-  }
-  else { poly @G = @f; }
 
-  setring RingB;
-  @s1 = "map ShowPoly=",@RestRing,","+A_Z("x", corank)+";";
-  execute @s1;
-  export ShowPoly;
-  @s1 = "setring ",@RestRing,";";
-  execute @s1;
+    //===============================================
 
-  if(defined(PhiG)==0) {
-    map PhiG=basering, maxideal(1);
-    export PhiG;
+    if(jet(f,0) != 0 ) { 
+      if(defined(CoRang) == 0) { int CoRang = CoRangf(f); }
+      return("1", "f is a unit");
+    }
+
+    debug_log(1, "Computing Basicinvariants of f ...");
+    if(defined(Mu) == 1) { kill Mu; }
+    if(defined(K) == 1) { kill K; }
+    if(defined(CoRang) == 1) { kill CoRang; }
+    int K;
+    int Mu;
+    int CoRang;
+    K, Mu, CoRang = basicinvariants(f);
+    "About the singularity :";
+    "          Milnor number(f)   = "+string(Mu);
+    "          Corank(f)          = "+string(CoRang);
+    "          Determinacy       <= "+string(K);
+    export CoRang, K, Mu;
+
+  //  ideal Jf = Jf;
+  //  if(dim(std(EH(Jf))) != n) { return("x(1)","A[0]"); }
+    if( Mu == 0) { 
+      CoRang=1;
+      return("x(1)","A[0]");
+    }
+
+    if(Mu<0) {
+      "The Milnor number of the function is infinite.";
+      "The singularity is not in Arnolds list.";
+      return("", "Fehler!");
+    }
+
+    f = jet(f, K);
+    s1,cnt = HKclass(Hilb(f));
+    if(cnt>0) { "Guessing type via Hilbert polynomial: ", s1; }
+    else { "Hilbert polynomial not recognised. Milnor code = ", Hilb(f); }
+    "";
+    "Computing normal form ...";
+
+    // Einteilung nach Corang
+    if( defined(ShowPhi) == 0) { int ShowPhi = 0; }
+    if(CoRang == 0) { return(Funktion2(f, CoRang)); }
+    if(CoRang == 1) { return(Funktion2(f, CoRang)); }
+    if(CoRang == 2) { return(Funktion1bis(f, CoRang)); }
+    if(CoRang == 3) { return(Funktion1bis(f, CoRang)); }
+    return(Funktion105(f, CoRang));
   }
-  if(corank == 2) { return(Funktion3(@G, corank)); }
-  if(corank == 3) { return(Funktion50(@G, corank)); }
-  return("","Fehler!");
-}
+
+///////////////////////////////////////////////////////////////////////////////
+  proc Funktion1bis (poly @f, int corank)
+  { // pruefe ob abspaltung von Quadraten noetig, wenn ja tue dies.
+  
+    int  @n = nvars(basering);
+    string @s1;
+    string @RestRing = nameof(basering);
+  
+    if( @n > corank) {
+      "I have to apply the splitting lemma. This will take some time....:-)";
+      poly @g = Morse(@f, K, corank);
+  
+      @g = ReOrder(@g);
+      if(defined(PhiG)==1) { kill PhiG; }
+      if(defined(Rrest) == 1) { kill Rrest; }
+      if(defined(@showpoly) == 1 ) { kill @showpoly; }
+      if(defined(RingB) == 1) { kill RingB; }
+  
+      execute Setring(corank, "Rrest");
+      export Rrest;
+      @RestRing = nameof(basering);
+  
+      map @MapReduce=@Rtop,maxideal(1);
+      poly @G = @MapReduce(@g);
+  
+      @s1 = "map PhiG=@Rtop," + string(maxideal(1));// Konstruiere Id auf r
+      execute @s1;
+      export PhiG;
+  
+      execute("ring RingB="+charstr(basering)+",("+A_Z("x", corank)+"),(c,ds);");
+      export RingB;
+    }
+    else { poly @G = @f; }
+  
+    setring RingB;
+    @s1 = "map @showpoly=",@RestRing,","+A_Z("x", corank)+";";
+    execute @s1;
+    export @showpoly;
+    @s1 = "setring ",@RestRing,";";
+    execute @s1;
+  
+    if(defined(PhiG)==0) {
+      map PhiG=basering, maxideal(1);
+      export PhiG;
+    }
+    if(corank == 2) { return(Funktion3(@G, corank)); }
+    if(corank == 3) { return(Funktion50(@G, corank)); }
+    return("","Fehler!");
+  }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc Funktion3 (poly @f, int corank);
 USAGE:    Funktion3();
@@ -299,8 +281,8 @@ USAGE:    Funktion3();
   }
   return("", "Fehler!");        // Should never occur
 }
+
 ///////////////////////////////////////////////////////////////////////////////
-//proc Funktion6 - put here
 proc Funktion6 (poly @f, int corank)
 USAGE:    Funktion6()
 { 
@@ -371,15 +353,8 @@ USAGE:    Funktion6()
   }
   return("","Fehler!");
 }
-///////////////////////////////////////////////////////////////////////////////
-//proc Funktion13 - put here
-//=========================================================================
-// Id: lib_WorkOn,v 1.8 1995/01/27 12:53:11 krueger Exp
-//
-///////////////////////////////////////////////////////////////////////////////
-//
 
-//=========================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion13 (poly @f, int corank)
 USAGE:    Funktion13();
 { 
@@ -406,7 +381,7 @@ USAGE:    Funktion13();
   } 
   return("","Fehler!");
 }
-///////////////////////////////////////////////////////////////////////////////
+
 ///////////////////////////////////////////////////////////////////////////////
 proc Funktion17 (poly @f, int corank)
 USAGE:    Funktion17();
@@ -457,6 +432,7 @@ USAGE:    Funktion17();
   }
   return("","Fehler!");
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc Funktion25 (poly @f, int CoRang)
 USAGE:    Funktion25();
@@ -545,12 +521,11 @@ USAGE:    Funktion25();
   }  // Ende der While-Schleife
   return("","Fehler!"):
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc Funktion40  (poly @f, int @k)
 USAGE:    Funktion40();
 {
-//  poly @f = #[1];
-//  int @k = #[2];
   int @r;
   string @Typ;
   string @fkt;
@@ -629,19 +604,8 @@ USAGE:    Funktion40();
  if( @Typ == "J[k,r]" ) { return(Funktion45(@f, @k, @r, @sr)); }
  return("","Fehler!");
 }
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-//proc Funktion50 - put here
-//=========================================================================
-// Id: lib_WorkOn,v 1.6 1995/08/29 18:04:09 krueger Exp
-//
-// Please send bugs and comments to krueger@mathematik.uni-kl.de
-//
-///////////////////////////////////////////////////////////////////////////////
 
-LIB "elim.lib";
-
-//=========================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion50 (poly @f, int corank)
 USAGE:    Funktion50();
 { 
@@ -688,6 +652,7 @@ USAGE:    Funktion50();
 
   return("","Fehler!");
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc Funktion51 (poly @f, int @k)
 USAGE:    Funktion51();
@@ -699,6 +664,7 @@ USAGE:    Funktion51();
   @s+"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc Funktion52 (poly @f, int @k)
 USAGE:    Funktion52();
@@ -711,6 +677,7 @@ USAGE:    Funktion52();
   @s+"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc Funktion54 (poly @f, int @k)
 USAGE:    Funktion54();
@@ -723,6 +690,7 @@ USAGE:    Funktion54();
   @s+"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc Funktion56 (poly @f, int @k)
 USAGE:    Funktion56();
@@ -735,6 +703,7 @@ USAGE:    Funktion56();
   @s+"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc Funktion58 (poly @fin, int @k)
 USAGE:    Funktion58();
@@ -1009,6 +978,7 @@ USAGE:    Funktion66();
   @JetId = std(@JetId);
   "nach z:",Show(@fz), "  Id=", @JetId, "  Dim=", dim(@JetId);
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc Funktion82 (poly @f, int @k)
 USAGE:    Funktion82();
@@ -1100,6 +1070,7 @@ debug_log(2, "Fall: ", @Fall, "  x=", @kx, "  z=", @kz);
   }
   return("", "Fehler");
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc Isomorphie_s82_z (poly @f, poly @fk, int @p)
 USAGE:    Isomorphie_s82_z();
@@ -1148,6 +1119,7 @@ USAGE:    Isomorphie_s82_x();
 
   return(@f);
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc Funktion83 (poly @f, int @k)
 USAGE:    Funktion83();
@@ -1330,28 +1302,31 @@ USAGE:    Funktion97();
   " Dim=",@Dim," Dim2=",dim(@j2)," Mult=",@Mult," Mult2=",mult(@j2);
   return(Show(@f), "V[k,r]");
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc Funktion103 (poly @f)
 USAGE:    Funktion103();
 {
   return(FunktionNoClass(@f,"3-jet = x3"));
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc Funktion104 (poly @f)
 USAGE:    Funktion104();
 {
   return(FunktionNoClass(@f));
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc Funktion105 (poly @f);
 USAGE:    Funktion105();
 {
   return(FunktionNoClass(@f));
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc FunktionNoClass (poly @f, list #)
 USAGE:    FunktionNoClass();
-
 { 
   if(size(#)==2) { string @txt=#[2]; }
 
@@ -1362,7 +1337,7 @@ USAGE:    FunktionNoClass();
 
   return(Show(@f), @s);
 }
-///////////////////////////////////////////////////////////////////////////////
+
 ///////////////////////////////////////////////////////////////////////////////
 proc tschirnhaus (poly @f, poly @x)
 USAGE:    tschirnhaus();
@@ -1391,7 +1366,7 @@ USAGE:    tschirnhaus();
   map @Phi =basering, @B;
   return(@Phi(@f), @Phi);
 }
-///////////////////////////////////////////////////////////////////////////////
+
 ///////////////////////////////////////////////////////////////////////////////
 proc Isomorphie_s17 (poly @f, poly @fk, int @k, int @ct)
 USAGE:    Isomorphie_s17();
@@ -1540,58 +1515,46 @@ USAGE:    Isomorphie_s17();
 
 }
 
-//=============================================================================
-//  Id: Ausgaben.lib,v 1.17 1997/08/13 07:39:04 krueger Exp
-/=============================================================================
-//
-// Please send bugs and comments to krueger@mathematik.uni-kl.de
-//
 ///////////////////////////////////////////////////////////////////////////////
-// required libraries
-
-///////////////////////////////////////////////////////////////////////////////
-// required by 
-// LIB "Classify.lib"
-// LIB "Kclass.lib"
-
-///////////////////////////////////////////////////////////////////////////////
-proc Funktion2 (poly @f, int corank)
+proc Funktion2 (poly f, int corank)
 USAGE:    
 { 
-  poly @f = #[1];
-  string @s = "The singularity `"+string(Show(@f));
-  string @tp = "A["+string(Mu)+"]";
+  string s = "The singularity `"+string(Show(f));
+  string tp = "A["+string(Mu)+"]";
 
-  @s = @s +"' is R-equivalent to "+@tp+".";
-  @s; // +"  ("+SG_Typ+")";
-  ring RingB=CharOfRing,x,ds;
-//  Morse(@f, Kbestimmt(@f));
-  return(string(x^(Mu+1)), @tp);
+  s = s +"' is R-equivalent to "+tp+".";
+  s; // +"  ("+SG_Typ+")";
+  ring RingB=char(basering),x,ds;
+//  Morse(f, Kbestimmt(f));
+  return(string(x^(Mu+1)), tp);
 }
+
 ///////////////////////////////////////////////////////////////////////////////
-proc Funktion4
+proc Funktion4 (poly f, int corank)
 USAGE:    
 { 
-  poly @f = #[1];
-  string @s = "The singularity `"+Show(jet(@f, K));
-  string @tp = "D[4]";
+  string s = "The singularity `"+Show(jet(f, K));
+  string tp = "D[4]";
 
-  @s = @s +"' is R-equivalent to "+@tp+".";
-  @s; // +"  ("+SG_Typ+")";
-  return(Show(@f), @tp);
+  s = s +"' is R-equivalent to "+tp+".";
+  s; // +"  ("+SG_Typ+")";
+  setring @Rtop;
+  return(Show(f), tp);
+//  return(f, tp);
 }
+
 ///////////////////////////////////////////////////////////////////////////////
-proc Funktion5
+proc Funktion5 (poly f, int corank)
 USAGE:    
 { 
-  poly @f = #[1];
-  string @s = "The singularity `"+Show(jet(@f, K));
-  string @tp = "D["+string(Mu)+"]";
+  string s = "The singularity `"+Show(jet(f, K));
+  string tp = "D["+string(Mu)+"]";
 
-  @s = @s +"' is R-equivalent to "+@tp+".";
-  @s; // +"  ("+SG_Typ+")";
-  return(Show(@f), @tp);
+  s = s +"' is R-equivalent to "+tp+".";
+  s; // +"  ("+SG_Typ+")";
+  return(Show(f), tp);
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc Funktion7
 USAGE:    
@@ -1606,6 +1569,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc Funktion8
 USAGE:    
@@ -1620,6 +1584,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc Funktion9
 USAGE:    
@@ -1634,6 +1599,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc Funktion11
 USAGE:    
@@ -1648,6 +1614,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc Funktion12
 USAGE:    
@@ -1663,6 +1630,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc Funktion14
 USAGE:    
@@ -1676,6 +1644,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc Funktion15
 USAGE:    
@@ -1690,6 +1659,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc Funktion16
 USAGE:    
@@ -1706,6 +1676,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc Funktion19
 USAGE:    
@@ -1719,6 +1690,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc Funktion20
 USAGE:    
@@ -1732,6 +1704,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc Funktion21
 USAGE:    
@@ -1745,6 +1718,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc Funktion23
 USAGE:    
@@ -1758,6 +1732,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc Funktion24
 USAGE:    
@@ -1772,6 +1747,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc Funktion27
 USAGE:    
@@ -1785,6 +1761,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc Funktion28 
 USAGE:    
@@ -1798,6 +1775,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc Funktion30 
 USAGE:    
@@ -1811,6 +1789,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc Funktion31 
 USAGE:    
@@ -1825,6 +1804,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc Funktion32 
 USAGE:    
@@ -1839,6 +1819,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc Funktion34 
 USAGE:    
@@ -1852,6 +1833,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc Funktion35 
 USAGE:    
@@ -1865,6 +1847,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc Funktion37 
 USAGE:    
@@ -1878,6 +1861,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc Funktion38 
 USAGE:    
@@ -1892,6 +1876,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc Funktion39
 USAGE:    
@@ -1905,6 +1890,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc Funktion42
 USAGE:    
@@ -1919,6 +1905,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc Funktion43
 USAGE:    
@@ -1933,6 +1920,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc Funktion44
 USAGE:    
@@ -1947,6 +1935,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc Funktion45
 USAGE:    
@@ -1962,6 +1951,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc Funktion47
 USAGE:    
@@ -1978,6 +1968,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc Funktion60
 USAGE:    
@@ -1991,6 +1982,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc Funktion61
 USAGE:    
@@ -2004,6 +1996,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc Funktion62
 USAGE:    
@@ -2017,6 +2010,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc Funktion64
 USAGE:    
@@ -2030,6 +2024,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc Funktion65
 USAGE:    
@@ -2044,6 +2039,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc Funktion84
 USAGE:    
@@ -2054,6 +2050,7 @@ USAGE:
 
   return(FunktionNoClass(#[1]));
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc Funktion86
 USAGE:    
@@ -2064,6 +2061,7 @@ USAGE:
 
   return(FunktionNoClass(#[1]));
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc Funktion87
 USAGE:    
@@ -2074,6 +2072,7 @@ USAGE:
 
   return(FunktionNoClass(#[1]));
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc Funktion89
 USAGE:    
@@ -2084,6 +2083,7 @@ USAGE:
 
   return(FunktionNoClass(#[1]));
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc Funktion100
 USAGE:    
@@ -2098,6 +2098,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc Funktion101
 USAGE:    
@@ -2112,6 +2113,9 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
+
+///////////////////////////////////////////////////////////////////////////////
+
 ///////////////////////////////////////////////////////////////////////////////
 proc internalfunctions
 USAGE:   internalfunctions();
@@ -2211,3 +2215,6 @@ EXAMPLE: no example
 //proc classify (poly f_in)
 //proc internalfunctions
 //proc tschirnhaus (poly @f, poly @x)
+///////////////////////////////////////////////////////////////////////////////
+//---------------------------- initialisation ---------------------------------
+//------------------------------ output ---------------------------------------
