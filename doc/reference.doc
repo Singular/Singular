@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.68 1998-05-19 09:25:43 Singular Exp $
+@comment $Id: reference.doc,v 1.69 1998-05-19 10:23:10 anne Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -255,7 +255,7 @@ value of type int is the multiplicity (see @ref{mult})
 @c * Expressions::
 @c @end menu
 @c @iftex
-@c See @ref{Expressions}, @ref{killattrib}.
+@c See @ref{Expressions}; @ref{killattrib}.
 @c @end iftex
 @c ---------------------------------------
 @node bareiss, betti, attrib, Functions
@@ -286,10 +286,9 @@ also the determinant of the matrix given as input.
 @end table
 @menu
 * matrix::
-* matrix expressions::
 @end menu
 @iftex
-See @ref{det}; @ref{matrix}; @ref{matrix expressions}.
+See @ref{det}; @ref{matrix}.
 @end iftex
 @c ---------------------------------------
 @node betti, char, bareiss, Functions
@@ -389,11 +388,11 @@ $$
 * mres::
 * sres::
 * print::
-* list expressions::
+* list::
 * resolution::
 @end menu
 @iftex
-See @ref{res}; @ref{lres}; @ref{mres}; @ref{sres}; @ref{print}; @ref{list expressions}; @ref{resolution}.
+See @ref{res}; @ref{lres}; @ref{mres}; @ref{sres}; @ref{print}; @ref{list}; @ref{resolution}.
 @end iftex
 @c ---------------------------------------
 @node char, char_series, betti, Functions
@@ -590,10 +589,10 @@ all denominators from its coefficients and then divide it by its content.
 @end example
 @end table
 @c @menu
-@c * poly expressions::
+@c * poly::
 @c @end menu
 @c @iftex
-@c See @ref{poly expressions}.
+@c See @ref{poly}.
 @c @end iftex
 @c ---------------------------------------
 @node close, coef, cleardenom, Functions
@@ -619,7 +618,7 @@ close(l); // shut down SINGULAR server
 * open::
 @end menu
 @iftex
-See @ref{link}, @ref{open}.
+See @ref{link}; @ref{open}.
 @end iftex
 @c ---------------------------------------
 @node coef, coeffs, close, Functions
@@ -667,11 +666,11 @@ coefficients of the monomials in the vector.
 @end example
 @end table
 @menu
-* poly expressions::
+* poly::
 * coeffs::
 @end menu
 @iftex
-See @ref{poly expressions}; @ref{coeffs}.
+See @ref{poly}; @ref{coeffs}.
 @end iftex
 @c ---------------------------------------
 @node coeffs, contract, coef, Functions
@@ -754,11 +753,11 @@ such that the entries of A does not contain any variable from P.
 @end example
 @end table
 @menu
-* poly expressions::
+* poly::
 * coef::
 @end menu
 @iftex
-See @ref{poly expressions}; @ref{coef}.
+See @ref{poly}; @ref{coef}.
 @end iftex
 @c ---------------------------------------
 @node contract, dbprint, coeffs, Functions
@@ -796,10 +795,10 @@ where A and B are the multiexponents of the ring variables represented by x.
 @end table
 @menu
 * diff::
-* ideal expressions::
+* ideal::
 @end menu
 @iftex
-See @ref{diff}, @ref{ideal expressions}, @ref{leadexp}, @ref{matrix}.
+See @ref{diff}; @ref{ideal}; @ref{leadexp}; @ref{matrix}.
 @end iftex
 @c ---------------------------------------
 @node dbprint, defined, contract, Functions
@@ -909,11 +908,11 @@ the terms of a polynomial or a vector;
 @end table
 @menu
 * ord::
-* poly expressions::
-* vector expressions::
+* poly::
+* vector::
 @end menu
 @iftex
-See @ref{ord}; @ref{poly expressions}; @ref{vector expressions}.
+See @ref{ord}; @ref{poly}; @ref{vector}.
 @end iftex
 @c ---------------------------------------
 @node degree, delete, deg, Functions
@@ -981,11 +980,10 @@ deletes the element with the given index from a list (the input is not changed).
 @end table
 @menu
 * list::
-* list expressions::
 * insert::
 @end menu
 @iftex
-See @ref{list}; @ref{list expressions}; @ref{insert}.
+See @ref{list}; @ref{insert}.
 @end iftex
 @c ---------------------------------------
 @node det, diff, delete, Functions
@@ -1056,21 +1054,21 @@ ideal, producing a m x n matrix.
 @end example
 @end table
 @menu
-* poly expressions::
-* vector expressions::
-* ideal expressions::
-* module expressions::
-* matrix expressions::
+* poly::
+* vector::
+* ideal::
+* module::
+* matrix::
 * contract::
 * jacob::
 * var::
 @end menu
 @iftex
-See @ref{poly expressions};
-@ref{vector expressions};
-@ref{ideal expressions};
-@ref{module expressions};
-@ref{matrix expressions};
+See @ref{poly};
+@ref{vector};
+@ref{ideal};
+@ref{module};
+@ref{matrix};
 @ref{contract};
 @ref{jacob};
 @ref{var};
@@ -1193,13 +1191,13 @@ provided as the third argument.
 * module::
 * std::
 * hilb::
-* ideal expressions::
-* module expressions::
+* ideal::
+* module::
 @end menu
 @iftex
 See @ref{ideal}; @ref{module}; @ref{std}; @ref{hilb};
-@ref{ideal expressions};
-@ref{module expressions}.
+@ref{ideal};
+@ref{module}.
 @end iftex
 @c ---------------------------------------
 @node eval, execute, eliminate, Functions
@@ -1314,13 +1312,13 @@ polynomials must be univariate to apply @code{extgcd}
 @end table
 @menu
 * gcd::
-* int expressions::
-* poly expressions::
+* int::
+* poly::
 @end menu
 @iftex
 See @ref{gcd};
-@ref{int expressions};
-@ref{poly expressions}
+@ref{int};
+@ref{poly}
 @end iftex
 @c ---------------------------------------
 @node facstd, factorize, extgcd, Functions
@@ -1360,12 +1358,12 @@ extensions over the rational numbers.
 @menu
 * std::
 * ring::
-* ideal expressions::
+* ideal::
 @end menu
 @iftex
 See @ref{std};
 @ref{ring};
-@ref{ideal expressions}.
+@ref{ideal}.
 @end iftex
 @c ---------------------------------------
 @node factorize, fetch, facstd, Functions
@@ -1407,10 +1405,10 @@ numbers.
 @end example
 @end table
 @menu
-* poly expressions::
+* poly::
 @end menu
 @iftex
-See @ref{poly expressions}
+See @ref{poly}
 @end iftex
 @c ---------------------------------------
 @node fetch, fglm, factorize, Functions
@@ -1534,7 +1532,7 @@ input comes from new file @file{filename}. This is shorthand
 @end table
 @c ref
 See
-@ref{execute},
+@ref{execute};
 @ref{read}.
 @c ref
 @c ---------------------------------------
@@ -1563,10 +1561,10 @@ in the string or 0 (if not found),
 @end example
 @end table
 @menu
-* string expressions::
+* string::
 @end menu
 @iftex
-See @ref{string expressions}.
+See @ref{string}.
 @end iftex
 @c ---------------------------------------
 @node finduni, freemodule, find, Functions
@@ -1630,10 +1628,10 @@ creates the free module of rank n generated by
 @end table
 @menu
 * gen::
-* module expressions::
+* module::
 @end menu
 @iftex
-See @ref{gen}; @ref{module expressions}.
+See @ref{gen}; @ref{module}.
 @end iftex
 @c ---------------------------------------
 @node gcd, gen, freemodule, Functions
@@ -1663,13 +1661,13 @@ numbers.
 @end table
 @menu
 * extgcd::
-* int expressions::
-* poly expressions::
+* int::
+* poly::
 @end menu
 @iftex
 See @ref{extgcd};
-@ref{int expressions};
-@ref{poly expressions}
+@ref{int};
+@ref{poly}
 @end iftex
 @c ----------------------------------------
 @node gen, getdump, gcd, Functions
@@ -1697,7 +1695,7 @@ returns the i-th free generator of a free module.
 @end example
 @end table
 @c ref
-See @ref{freemodule}; @ref{int expressions}; @ref{vector}.
+See @ref{freemodule}; @ref{int}; @ref{vector}.
 @c ref
 @c ---------------------------------------
 @node getdump, groebner, gen, Functions
@@ -1734,7 +1732,7 @@ to @code{stdin} (standard input).
 * read::
 @end menu
 @iftex
-See @ref{link}, @ref{dump}, @ref{read}.
+See @ref{link}; @ref{dump}; @ref{read}.
 @end iftex
 @c ---------------------------------------
 @node groebner, help, getdump, Functions
@@ -1830,9 +1828,9 @@ returns the n-th (n=1, 2) Hilbert series as intvec with two arguments.
 @c ref
 See
 @ref{Hilbert function};
-@ref{ideal expressions};
+@ref{ideal};
 @ref{intvec};
-@ref{module expressions};
+@ref{module};
 @ref{stdhilb};
 @ref{std}.
 @c ref
@@ -1876,14 +1874,14 @@ weight 1).
 @end example
 @end table
 @menu
-* poly expressions::
-* vector expressions::
-* ideal expressions::
-* module expressions::
+* poly::
+* vector::
+* ideal::
+* module::
 @end menu
 @iftex
-See @ref{poly expressions}; @ref{vector expressions}; @ref{ideal expressions};
-@ref{module expressions}.
+See @ref{poly}; @ref{vector}; @ref{ideal};
+@ref{module}.
 @end iftex
 @c ---------------------------------------
 @node imap, indepSet, homog, Functions
@@ -1966,10 +1964,10 @@ computes a list of all (if the flag is 1) or of all maximal sets U of independen
 @end table
 @menu
 * std::
-* ideal expressions::
+* ideal::
 @end menu
 @iftex
-See @ref{std}; @ref{ideal expressions}.
+See @ref{std}; @ref{ideal}.
 @end iftex
 @c ---------------------------------------
 @node insert, interred, indepSet, Functions
@@ -1996,11 +1994,10 @@ arguments) after the given position (the input is not changed).
 @end table
 @menu
 * list::
-* list expressions::
 * delete::
 @end menu
 @iftex
-See @ref{list}; @ref{list expressions}; @ref{delete}.
+See @ref{list}; @ref{delete}.
 @end iftex
 @c ---------------------------------------
 @node interred, intersect, insert, Functions
@@ -2090,14 +2087,14 @@ Remark: L(g) denotes the leading term of g and ecart(g)=deg(g)-deg(L(g)).
 @end example
 @end table
 @menu
-* ideal expressions::
-* module expressions::
+* ideal::
+* module::
 * std::
 @end menu
 @iftex
 See
-@ref{ideal expressions};
-@ref{module expressions};
+@ref{ideal};
+@ref{module};
 @ref{std}.
 @end iftex
 @c ---------------------------------------
@@ -2130,13 +2127,13 @@ If the option @code{computeSB} is in effect the result is a standard basis.
 @end example
 @end table
 @menu
-* ideal expressions::
-* module expressions::
+* ideal::
+* module::
 * option::
 @end menu
 @iftex
-See @ref{ideal expressions};
-@ref{module expressions};
+See @ref{ideal};
+@ref{module};
 @ref{option}.
 @end iftex
 @c ---------------------------------------
@@ -2165,14 +2162,14 @@ partial derivatives of the input.
 @end example
 @end table
 @menu
-* ideal expressions::
-* module expressions::
+* ideal::
+* module::
 * diff::
 * nvars::
 @end menu
 @iftex
-See @ref{ideal expressions};
-@ref{module expressions};
+See @ref{ideal};
+@ref{module};
 @ref{diff};
 @ref{nvars}.
 @end iftex
@@ -2224,19 +2221,19 @@ argument.
 @end example
 @end table
 @menu
-* poly expressions::
-* vector expressions::
-* ideal expressions::
-* module expressions::
-* int expressions::
-* intvec expressions::
+* poly::
+* vector::
+* ideal::
+* module::
+* int::
+* intvec::
 @end menu
 @iftex
-See @ref{poly expressions}; @ref{vector expressions};
-@ref{ideal expressions};
-@ref{module expressions};
-@ref{int expressions};
-@ref{intvec expressions}.
+See @ref{poly}; @ref{vector};
+@ref{ideal};
+@ref{module};
+@ref{int};
+@ref{intvec}.
 @end iftex
 @c ---------------------------------------
 @node kbase, kill, jet, Functions
@@ -2273,12 +2270,12 @@ second argument, the quotient must be not finite dimensional.
 @end example
 @end table
 @menu
-* ideal expressions::
-* module expressions::
+* ideal::
+* module::
 * vdim::
 @end menu
 @iftex
-See @ref{ideal expressions}; @ref{module expressions}; @ref{vdim}.
+See @ref{ideal}; @ref{module}; @ref{vdim}.
 @end iftex
 @c ---------------------------------------
 @node kill, killattrib, kbase, Functions
@@ -2311,7 +2308,7 @@ deletes objects.
 * names::
 @end menu
 @iftex
-See @ref{defined}, @ref{general_lib}, @ref{names}
+See @ref{defined}; @ref{general_lib}; @ref{names}
 @end iftex
 @c ---------------------------------------
 @node killattrib, koszul, kill, Functions
@@ -2341,7 +2338,7 @@ deletes the attribute given as the second argument.
 * option::
 @end menu
 @iftex
-See @ref{attrib}, @ref{option}.
+See @ref{attrib}; @ref{option}.
 @end iftex
 @c ---------------------------------------
 @node koszul, lead, killattrib, Functions
@@ -2375,12 +2372,12 @@ the first n generators of the ideal @code{id}.
 @end example
 @end table
 @menu
-* int expressions::
-* ideal expressions::
-* matrix expressions::
+* int::
+* ideal::
+* matrix::
 @end menu
 @iftex
-See @ref{int expressions}; @ref{matrix expressions}.
+See @ref{int}; @ref{matrix}.
 @end iftex
 @c -------------------------------------------------
 @node lead, leadcoef, koszul, Functions
@@ -2418,17 +2415,17 @@ to the monomial ordering.
 @end example
 @end table
 @menu
-* poly expressions::
-* vector expressions::
-* ideal expressions::
-* module expressions::
+* poly::
+* vector::
+* ideal::
+* module::
 @end menu
 @iftex
 See
-@ref{poly expressions};
-@ref{vector expressions};
-@ref{ideal expressions};
-@ref{module expressions}.
+@ref{poly};
+@ref{vector};
+@ref{ideal};
+@ref{module}.
 @end iftex
 @c -------------------------------------------------
 @node leadcoef, leadexp, lead, Functions
@@ -2458,8 +2455,8 @@ with respect to the monomial ordering.
 @c ref
 See 
 @ref{number} 
-@ref{poly expressions};
-@ref{vector expressions}.
+@ref{poly};
+@ref{vector}.
 @c ref
 @c -------------------------------------------------
 @node leadexp, LIB, leadcoef, Functions
@@ -2488,8 +2485,8 @@ returns the exponent vector of the leading monomial of a polynomial or a vector.
 @c ref
 See 
 @ref{intvec};
-@ref{poly expressions};
-@ref{vector expressions}.
+@ref{poly};
+@ref{vector}.
 @c ref
 @c ---------------------------------------
 @node LIB, lift, leadexp, Functions
@@ -2539,7 +2536,7 @@ See
 @ref{Procedures and libraries};
 @ref{SINGULAR libraries};
 @ref{proc}; 
-@ref{string expressions}.
+@ref{string}.
 @c ref
 @c -------------------------------------------------
 @node lift, liftstd, LIB, Functions
@@ -2574,12 +2571,12 @@ Gives a warning if @code{sm} is not a submodule.
 @end example
 @end table
 @menu
-* ideal expressions::
-* module expressions::
+* ideal::
+* module::
 @end menu
 @iftex
-See @ref{ideal expressions};
-@ref{module expressions}.
+See @ref{ideal};
+@ref{module}.
 @end iftex
 @c -----------------------------------------
 @node liftstd, listvar, lift, Functions
@@ -2735,10 +2732,10 @@ $=M_i$
 @c ref
 See
 @ref{betti};
-@ref{ideal expressions};
-@ref{int expressions};
+@ref{ideal};
+@ref{int};
 @ref{minres};
-@ref{module expressions};
+@ref{module};
 @ref{mres};
 @ref{res};
 @ref{sres}.
@@ -2768,7 +2765,7 @@ returns the power given by int_expression of the maximal ideal
 * ring::
 @end menu
 @iftex
-See  @ref{ideal},@ref{ring}.
+See  @ref{ideal}; @ref{ring}.
 @end iftex
 @c ---------------------------------------
 @node  memory, minbase, maxideal, Functions
@@ -3046,13 +3043,14 @@ first szyzgy module of L[p], is 0 (if the basering is not a qring).
 @end example
 @end table
 @menu
-* ideal expressions::
-* module expressions::
+* ideal::
+* lres::
+* module::
 * res::
 * sres::
 @end menu
 @iftex
-See @ref{ideal expressions}; @ref{module expressions};
+See @ref{ideal}; @ref{lres}; @ref{module};
 @ref{res}; @ref{sres}.
 @end iftex
 @c ---------------------------------------
@@ -3082,12 +3080,12 @@ the ring a polynomial ring (global ordering).
 @end example
 @end table
 @menu
-* ideal expressions::
+* ideal::
 * std::
 * minbase::
 @end menu
 @iftex
-See @ref{ideal expressions};
+See @ref{ideal};
 @ref{std}; @ref{minbase}.
 @end iftex
 @c ---------------------------------------
@@ -3175,7 +3173,7 @@ See @ref{typeof}; @ref{names}; @ref{reservedName}.
 @item @strong{Type:}
 list of strings
 @item @strong{Purpose:}
-returns the names of all user defined variables
+returns the names of all user defined variables and procedures
 which are ring independent or, in the second case, belong to the given ring.
 @item @strong{Example:}
 @example
@@ -3210,7 +3208,8 @@ int
 returns the number of columns of a matrix or an intmat @*or the number of
 given generators of the ideal, including zeros.
 @*Note that @code{size(}ideal@code{)} counts the number of generators
-which are different from zero.
+which are different from zero. (Use @code{nrows} to get the number of rows of a given
+matrix or intmat.)
 @item @strong{Example:}
 @example
 @c example
@@ -3225,12 +3224,11 @@ which are different from zero.
 @end table
 @menu
 * matrix::
-* matrix expressions::
 * nrows::
 * size::
 @end menu
 @iftex
-See @ref{matrix}; @ref{matrix expressions}; @ref{nrows}; @ref{size}.
+See @ref{matrix}; @ref{nrows}; @ref{size}.
 @end iftex
 @c ---------------------------------------
 @node npars, nrows, ncols, Functions
@@ -3254,10 +3252,11 @@ returns the number of parameters of a ring.
 @end table
 @menu
 * par::
+* parstr::
 * ring::
 @end menu
 @iftex
-See @ref{par}, @ref{ring}.
+See @ref{par}; @ref{parstr}; @ref{ring}.
 @end iftex
 @c ---------------------------------------
 @node nrows, nvars, npars, Functions
@@ -3273,9 +3272,10 @@ See @ref{par}, @ref{ring}.
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
-returns the number of rows of a matrix, an intmat or an intvec resp.@*
-the minimal rank of a free module in which the given the module or
-vector lives (the index of the last non-zero component).
+returns the number of rows of a matrix, an intmat or an intvec, resp.@*
+the minimal rank of a free module in which the given module or
+vector lives (the index of the last non-zero component). (Use @code{ncols}
+to get the number of columns of a given matrix or intmat.)
 @item @strong{Example:}
 @example
 @c example
@@ -3323,7 +3323,7 @@ returns the number of variables of a ring.
 *var::
 @end menu
 @iftex
-See @ref{ring}, @ref{var}.
+See @ref{ring}; @ref{var}.
 @end iftex
 @c ---------------------------------------
 @node open, option, nvars, Functions
@@ -3348,7 +3348,7 @@ close(l); // shut down SINGULAR server
 * close::
 @end menu
 @iftex
-See @ref{link}, @ref{close}.
+See @ref{link}; @ref{close}.
 @end iftex
 @c ---------------------------------------
 @node option, ord, open, Functions
@@ -3363,7 +3363,7 @@ string
 lists all defined options.
 @*
 @item @strong{Syntax:}
-@code{option (} option_name @code{)}
+@code{option (} option_name @code{);}
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
@@ -3379,7 +3379,7 @@ intvec
 dumps the state of all options to an intvec.
 @*
 @item @strong{Syntax:}
-@code{option ( set,} int_expression @code{);}
+@code{option ( set,} intvec_expression @code{);}
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
@@ -3397,10 +3397,10 @@ of a generating set if @code{returnSB} is set. This option should not be used fo
 @item @code{fastHC}
 tries to find HC (highest corner of the staircase) as fast as possible
 during a standard basis computation (only used for local orderings)
-@item @code{interrupt}
-allows fast interruption of standard basis computation
+@c @item @code{interrupt}
+@c allows fast interruption of standard basis computation
 @item @code{intStrategy}
-avoids divisions (of coefficients) during standard basis computations
+avoids divisions of coefficients during standard basis computations
 @item @code{minRes}
 special (additional) minimizing during computations (res,mres),
 @*assumes homogeneous case and degree-compatible ordering
@@ -3476,7 +3476,7 @@ shows correct usage in error messages (default)
   ring r=0,x,dp;
   degBound=22;
   option();
-  intvec i=option(get);i;
+  intvec i=option(get);
   option(none);
   option(set,i);
   option();
@@ -3510,8 +3510,8 @@ syzygy module
 
 @item @tab @code{std} @tab @code{s} @tab found a new element of the standard
 basis 
-@item @tab @tab @code{-} @tab reduced a pair to 0
-@item @tab @tab @code{.} @tab postponed a reduction of an S-polynomial
+@item @tab @tab @code{-} @tab reduced a pair/S-polynomial to 0
+@item @tab @tab @code{.} @tab postponed a reduction of an pair/S-polynomial
 @item @tab @tab @code{H(d)} @tab found a 'highest corner' of degree @code{d},
 no need to consider higher degrees 
 @item @tab @tab @code{(n)} @tab @code{n} critical pairs are still to be
@@ -3520,7 +3520,6 @@ reduced
 elements 
 @item @tab @tab @code{d} @tab the degree of the leading terms is currently
 @code{n} 
-
 @item @tab @code{syz} @tab @tab all characters: like the output of @code{std}
 @end multitable
 
@@ -3562,11 +3561,11 @@ the weights are the weights used for the first block of the ring ordering.
 @end table
 @menu
 * deg::
-* poly expressions::
-* vector expressions::
+* poly::
+* vector::
 @end menu
 @iftex
-See @ref{deg}; @ref{poly expressions}; @ref{vector expressions}.
+See @ref{deg}; @ref{poly}; @ref{vector}.
 @end iftex
 @c ---------------------------------------
 @node ordstr, par, ord, Functions
@@ -3606,7 +3605,8 @@ See @ref{ring}; @ref{varstr}; @ref{parstr}; @ref{charstr}.
 @item @strong{Type:}
 number
 @item @strong{Purpose:}
-returns the n-th parameter of the basering.
+returns the n-th parameter of the basering. This command should only be used if the basering
+has at least one parameter. 
 @item @strong{Example:}
 @example
 @c example
@@ -3616,12 +3616,13 @@ returns the n-th parameter of the basering.
 @end example
 @end table
 @menu
+* npars::
 * parstr::
 * ring::
 * var::
 @end menu
 @iftex
-See @ref{parstr}; @ref{ring}; @ref{var}.
+See @ref{npars}; @ref{parstr}; @ref{ring}; @ref{var}.
 @end iftex
 @c ---------------------------------------
 @node pardeg, parstr, par, Functions
@@ -3643,11 +3644,12 @@ returns the degree of a number considered as a polynomial in the ring parameters
 @end example
 @end table
 @menu
+* number::
 * ring::
 * var::
 @end menu
 @iftex
-See @ref{ring}; @ref{var}.
+See @ref{number}; @ref{ring}; @ref{var}.
 @end iftex
 @c ---------------------------------------
 @node parstr, pause, pardeg, Functions
@@ -3661,7 +3663,7 @@ See @ref{ring}; @ref{var}.
 @item @strong{Type:}
 string
 @item @strong{Purpose:}
-returns the list of parameters of the ring
+returns the list of parameters of the ring as a string
 @*or the name of the n-th parameter for an integer n.
 @*@code{parstr(n)} is equivalent to @code{parstr(basering,n)}.
 @item @strong{Example:}
@@ -3676,15 +3678,16 @@ returns the list of parameters of the ring
 @end table
 @menu
 * charstr::
+* npars::
 * ordstr::
+* par::
 * ring::
 * varstr::
 @end menu
 @iftex
-See @ref{charstr}; @ref{ordstr}; @ref{par}
+See @ref{charstr}; @ref{npars}; @ref{ordstr}; @ref{par}
 @ref{ring};
-@ref{varstr};
-
+@ref{varstr}.
 @end iftex
 @c ---------------------------------------
 @node pause, preimage, parstr, Functions
@@ -3710,6 +3713,7 @@ pauses the execution of a procedure until the return key is pressed.
 @node preimage, prime, pause, Functions
 @subsection preimage
 @cindex preimage
+@cindex kernel
 
 @table @code
 @item @strong{Syntax:}
@@ -3722,7 +3726,10 @@ returns the preimage of an ideal under a given map.
 @*
 The second argument has to be a map from the basering to the given ring
 (or an ideal defining such a map),
-and the ideal has to be an ideal in the given ring.
+and the ideal has to be an ideal in the given ring. 
+@item @strong{Note:}
+To compute the kernel of a map, the preimage of zero has to be determined. Hence there is no
+special command for computing the kernel of a map in @sc{Singular}.
 @item @strong{Example:}
 @example
 @c example
@@ -3734,6 +3741,9 @@ and the ideal has to be an ideal in the given ring.
   setring r1;
   ideal i1=preimage(r,f,i1);
   i1;
+  ideal i0=0;
+  // the kernel of f
+  preimage(r,f,i0);
 @c example
 @end example
 @end table
@@ -3766,10 +3776,10 @@ returns the largest prime less then 32004 smaller or equal to the argument;
 @end example
 @end table
 @menu
-* int expressions::
+* int::
 @end menu
 @iftex
-See @ref{int expressions}.
+See @ref{int}.
 @end iftex
 @c ---------------------------------------
 @node print, prune, prime, Functions
@@ -3848,10 +3858,10 @@ corresponding factor modules are isomorphic.
 @end example
 @end table
 @menu
-* module expressions::
+* module::
 @end menu
 @iftex
-See @ref{module expressions}.
+See @ref{module}.
 @end iftex
 @c ---------------------------------------
 @node qhweight, quote, prune, Functions
@@ -3875,12 +3885,12 @@ If the input is not weighted homogeneous, an intvec of zeroes is returned.
 @end example
 @end table
 @menu
-* ideal expressions::
-* intvec expressions::
+* ideal::
+* intvec::
 * weight::
 @end menu
 @iftex
-See @ref{ideal expressions}; @ref{intvec expressions}; @ref{weight}.
+See @ref{ideal}; @ref{intvec}; @ref{weight}.
 @end iftex
 @c ---------------------------------------
 @node quote, quotient, qhweight, Functions
@@ -3894,20 +3904,22 @@ none
 @item @strong{Purpose:}
 prevents expressions from evaluation. Within a quoted expression, the
 quote can be "undone" by an @code{eval} (i.e., each eval "undoes" the
-effect of exactly one quote). Used with @code{write}.
+effect of exactly one @code{quote}). Used with @code{write}.
 @item @strong{Example:}
 @example
-link l="MPfile:w example.mp";
-ring r=0,(x,y,z),ds;
-ideal i=maxideal(3);
-ideal j=x7,x2,z;
-// compute i+j before writing, but not std
-write (l, quote(std(eval(i+j))));
-option(prot);
-close(l);
-// now read it in again and evaluate:
-read(l);
-close(l);
+@c example
+  link l="MPfile:w example.mp";
+  ring r=0,(x,y,z),ds;
+  ideal i=maxideal(3);
+  ideal j=x7,x2,z;
+  option(prot);
+  // compute i+j before writing, but not std
+  write (l, quote(std(eval(i+j))));
+  close(l);
+  // now read it in again and evaluate:
+  read(l);
+  close(l);
+@c example
 @end example
 @end table
 @menu
@@ -3963,12 +3975,12 @@ quotient(id2,id1);
 @end example
 @end table
 @menu
-* ideal expressions::
-* module expressions::
+* ideal::
+* module::
 @end menu
 @iftex
-See @ref{ideal expressions};
-@ref{module expressions}.
+See @ref{ideal};
+@ref{module}.
 @end iftex
 @c ---------------------------------------
 @node random, read, quotient, Functions
@@ -3998,11 +4010,11 @@ returns a random intmat of size rows x cols with entries between
 @end example
 @end table
 @menu
-* int expressions::
-* intmat expressions::
+* int::
+* intmat::
 @end menu
 @iftex
-See @ref{int expressions}; @ref{intmat expressions}.
+See @ref{int}; @ref{intmat}.
 @end iftex
 @c ---------------------------------------
 @node read, reduce, random, Functions
@@ -4023,13 +4035,13 @@ file is returned as one string.
 @*For MP links, one expression is read
 from the link, and returned after an evaluation.
 As long as there is no data to read from an MPtcp
-link the @code{read} command blocks (i.e. does not return).
+link the @code{read} command blocks (i.e., does not return).
 The @code{status} command can be used to check whether or not
 there is data to read.
 @*For DBM links, a
 @code{read} with one argument returns the value of the next entry in the
 data base, and a @code{read} with two arguments returns the value to the
-key from the data base.
+key given as the second argument from the data base.
 @item @strong{Example:}
 @example
 @c example
@@ -4037,7 +4049,6 @@ key from the data base.
   ideal i=x+y,z3+22y;
   // write the ideal i to the file save_i
   write(":w save_i",i);
-  // @dots{}
   ring r0=0,(x,y,z),Dp;
   // create an ideal k equal to the content
   // of the file save_i
@@ -4048,14 +4059,14 @@ key from the data base.
 @end example
 @end table
 @menu
-* link::
-* write::
-* getdump::
 * execute::
+* getdump::
+* link::
 * status::
+* write::
 @end menu
 @iftex
-See @ref{link}; @ref{write}; @ref{getdump}; @ref{execute}; @ref{status}.
+See @ref{execute}; @ref{getdump}; @ref{link}; @ref{status}; @ref{write}.
 @end iftex
 @c ---------------------------------------
 @node reduce, regularity, read, Functions
@@ -4065,16 +4076,16 @@ See @ref{link}; @ref{write}; @ref{getdump}; @ref{execute}; @ref{status}.
 @table @code
 @item @strong{Syntax:}
 @code{reduce (} poly_expression@code{,} ideal_expression @code{)}
-@*@code{reduce (} vector_expression@code{,} ideal_expression @code{)}
-@*@code{reduce (} vector_expression@code{,} module_expression @code{)}
-@*@code{reduce (} ideal_expression@code{,} ideal_expression @code{)}
-@*@code{reduce (} module_expression@code{,} ideal_expression @code{)}
-@*@code{reduce (} module_expression@code{,} module_expression @code{)}
 @*@code{reduce (} poly_expression@code{,} ideal_expression@code{,} int_expression @code{)}
+@*@code{reduce (} vector_expression@code{,} ideal_expression @code{)}
 @*@code{reduce (} vector_expression@code{,} ideal_expression@code{,} int_expression @code{)}
+@*@code{reduce (} vector_expression@code{,} module_expression @code{)}
 @*@code{reduce (} vector_expression@code{,} module_expression@code{,} int_expression @code{)}
+@*@code{reduce (} ideal_expression@code{,} ideal_expression @code{)}
 @*@code{reduce (} ideal_expression@code{,} ideal_expression@code{,} int_expression @code{)}
+@*@code{reduce (} module_expression@code{,} ideal_expression @code{)}
 @*@code{reduce (} module_expression@code{,} ideal_expression@code{,} int_expression @code{)}
+@*@code{reduce (} module_expression@code{,} module_expression @code{)}
 @*@code{reduce (} module_expression@code{,} module_expression@code{,} int_expression @code{)}
 @item @strong{Type:}
 the type of the first argument
@@ -4104,12 +4115,12 @@ only the leading term and does no tail reduction.
 @end example
 @end table
 @menu
-* ideal expressions::
-* vector expressions::
+* ideal::
+* vector::
 * std::
 @end menu
 @iftex
-See @ref{ideal expressions}; @ref{vector expressions}; @ref{std}.
+See @ref{ideal}; @ref{vector}; @ref{std}.
 @end iftex
 @c ---------------------------------------
 @node regularity, res, reduce, Functions
@@ -4234,14 +4245,14 @@ $=M_i$
 @end example
 @end table
 @menu
-* ideal expressions::
-* module expressions::
-* int expressions::
+* ideal::
+* lres::
+* module::
 * mres::
 * sres::
 @end menu
 @iftex
-See @ref{ideal expressions}; @ref{module expressions}; @ref{int expressions};
+See @ref{ideal}; @ref{lres}; @ref{module};
 @ref{mres};@ref{sres}.
 @end iftex
 @c ---------------------------------------
@@ -4263,7 +4274,7 @@ whether the string is a reserved identifier.
 @item @strong{Example:}
 @example
 reservedName();
-@expansion{} ...
+@expansion{} ... // output skipped
 @c example
   reservedName("ring");
   reservedName("xyz");
@@ -4300,11 +4311,11 @@ to the variable given as the third argument.
 @end example
 @end table
 @menu
-* poly expressions::
+* poly::
 * ring::
 @end menu
 @iftex
-See @ref{poly expressions} @ref{ring}.
+See @ref{poly}; @ref{ring}.
 @end iftex
 @c ---------------------------------------
 @node rvar, setring, resultant, Functions
@@ -4363,9 +4374,11 @@ changes the basering to another (already defined) ring.
   // the basering is again r1
 @c @c example
 @end example
-@item @strong{Use in proc:}
+@item @strong{Use in procedures:}
 All changes of the basering by a definition
-of a new ring or a setring command in a proc are local to this proc.
+of a new ring or a setring command in a procedure are local to this procedure.
+Use keepring to move a ring which is local to a procedure up by one nesting 
+level.  
 @end table
 @menu
 * ring::
@@ -4387,11 +4400,11 @@ See @ref{ring}; @ref{keepring}.
 @item @strong{Type:}
 the type of the first argument
 @item @strong{Purpose:}
-returns the "simplified" first argument depending on the function
+returns the "simplified" first argument depending on the simplification rule
 given as the second argument.
 @*The simplifications rules are the sum of the following
 functions:
-@table @asis
+@table @code
 @item 1
 normalize (leading coefficients are 1)
 @item 2
@@ -4427,14 +4440,14 @@ simplify(A,2+8); // by automatic conversion to module
 @end example
 @end table
 @menu
-* poly expressions::
-* vector expressions::
-* ideal expressions::
-* module expressions::
+* poly::
+* vector::
+* ideal::
+* module::
 @end menu
 @iftex
-See @ref{poly expressions}; @ref{vector expressions};
-@ref{ideal expressions}; @ref{module expressions}.
+See @ref{poly}; @ref{vector};
+@ref{ideal}; @ref{module}.
 @end iftex
 @c ---------------------------------------
 @node size, sortvec, simplify, Functions
@@ -4488,22 +4501,22 @@ returns the the number of entries (rows*columns).
 @menu
 * ncols::
 * nrows::
-* string expressions::
-* intvec expressions::
-* intmat expressions::
-* poly expressions::
-* vector expressions::
-* ideal expressions::
-* module expressions::
+* string::
+* intvec::
+* intmat::
+* poly::
+* vector::
+* ideal::
+* module::
 @end menu
 @iftex
-See @ref{string expressions};
-@ref{intvec expressions};
-@ref{intmat expressions};
-@ref{poly expressions};
-@ref{vector expressions};
-@ref{ideal expressions}; 
-@ref{module expressions}
+See @ref{string};
+@ref{intvec};
+@ref{intmat};
+@ref{poly};
+@ref{vector};
+@ref{ideal}; 
+@ref{module};
 @ref{ncols}; @ref{nrows}.
 @end iftex
 @c ---------------------------------------
@@ -4605,17 +4618,18 @@ $=M_i$
 @end example
 @end table
 @menu
-* ideal expressions::
-* module expressions::
-* int expressions::
+* betti::
+* ideal::
+* int::
+* lres::
+* minres::
+* module::
 * mres::
 * res::
-* minres::
-* betti::
 @end menu
 @iftex
-See @ref{ideal expressions}; @ref{module expressions}; @ref{int expressions};
-@ref{mres}; @ref{res}; @ref{minres}; @ref{betti}.
+See @ref{betti}; @ref{ideal}; @ref{int};
+@ref{lres}; @ref{minres}; @ref{module}; @ref{mres}; @ref{res}.
 @end iftex
 @c ---------------------------------------
 @node status, std, sres, Functions
@@ -4660,7 +4674,7 @@ returns (depending on the type of the link and its status)
   link l=":w example.txt";
   status(l,"write");
   open(l);
-  status(l,"write");
+  status(l,"write","ready");
   close(l);
 @c example
 @end example
@@ -4672,7 +4686,7 @@ returns (depending on the type of the link and its status)
 * write::
 @end menu
 @iftex
-See @ref{link}, @ref{open}, @ref{read}, @ref{write}.
+See @ref{link}; @ref{open}; @ref{read}; @ref{write}.
 @end iftex
 @c ---------------------------------------
 @node std, stdfglm, status, Functions
@@ -4834,14 +4848,14 @@ substitutes a ring variable by a monomial (a polynomial of length <=1).
 @end example
 @end table
 @menu
-* poly expressions::
-* vector expressions::
-* ideal expressions::
-* module expressions::
+* poly::
+* vector::
+* ideal::
+* module::
 @end menu
 @iftex
-See @ref{poly expressions}; @ref{vector expressions};
-@ref{ideal expressions}; @ref{module expressions}.
+See @ref{poly}; @ref{vector};
+@ref{ideal}; @ref{module}.
 @end iftex
 @c ---------------------------------------
 @node  system, syz, subst, Functions
@@ -4857,7 +4871,7 @@ depends on the desired function, may be none
 @item @strong{Purpose:}
 interface to internal data and the operating system.
 @*Not all functions work on every platform.
-@item @strong{Functions}
+@item @strong{Functions:}
 @table @code
 @item @code{system("sh"},string_expression @code{)} 
 shell escape, returns the return code of the shell
@@ -4885,9 +4899,9 @@ returns the order of the highest corner of the last
 computation or 0
 @item @code{system("Singular")} 
 returns the absolute (path) name of the running @sc{Singular} (type string)
-@item @code{system("--option_name")} 
-returns the value of the command line
-option @code{"option_name"}; for on/off options, the return value is of type 
+@item @code{system("long_option_name")} 
+returns the value of the (command-line)
+option @code{"long_option_name"}; for on/off options, the return value is of type 
 int and either 1 or 0; for all other options, the return type is string.
 @end table
 @item @strong{Example for UNIX:}
@@ -4946,11 +4960,11 @@ of the ideal resp. module.
 @end example
 @end table
 @menu
-* ideal expressions::
-* module expressions::
+* ideal::
+* module::
 @end menu
 @iftex
-See @ref{ideal expressions}; @ref{module expressions}.
+See @ref{ideal}; @ref{module}.
 @end iftex
 @c ---------------------------------------
 @node trace, transpose, syz, Functions
@@ -4974,12 +4988,12 @@ returns the trace of an intmat resp a matrix.
 @end example
 @end table
 @menu
-* matrix expressions::
-* intmat expressions::
+* matrix::
+* intmat::
 @end menu
 @iftex
-See @ref{matrix expressions};
-@ref{intmat expressions}.
+See @ref{matrix};
+@ref{intmat}.
 @end iftex
 @c ---------------------------------------
 @node transpose, type, trace, Functions
@@ -5004,10 +5018,10 @@ transposes a matrix.
 @end example
 @end table
 @menu
-* matrix expressions::
+* matrix::
 @end menu
 @iftex
-See @ref{matrix expressions}.
+See @ref{matrix}.
 @end iftex
 @c ---------------------------------------
 @node type, typeof, transpose, Functions
@@ -5015,12 +5029,12 @@ See @ref{matrix expressions}.
 @cindex type
 @table @code
 @item @strong{Syntax:}
-@code{type} name @code{;}
-@c @*expression;
+@code{type} (name) @code{;}
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
-lists the [name, level, type and] value of a variable.
+lists the [name, level, type and] value of a variable. To display the
+value of an expression, it is sufficient to type @code{expression;}.
 @item @strong{Example:}
 @example
 @c example
@@ -5036,7 +5050,7 @@ lists the [name, level, type and] value of a variable.
 * Data types::
 @end menu
 @iftex
-See @ref{listvar}, @ref{print}, @ref{Data types}.
+See @ref{listvar}; @ref{print}; @ref{Data types}.
 @end iftex
 @c ---------------------------------------
 @node typeof, var, type, Functions
@@ -5063,7 +5077,7 @@ Possible types are:
 @code{"matrix"},
 @code{"module"},
 @code{"number"},
-@code{none},
+@code{"none"},
 @code{"poly"},
 @code{"proc"},
 @code{"qring"},
@@ -5121,12 +5135,12 @@ returns the n-th ring variable for a given integer n.
 @end table
 @menu
 * ring::
-* int expressions::
+* int::
 * nvars::
 * varstr::
 @end menu
 @iftex
-See @ref{ring}, @ref{int expressions}; @ref{nvars}; @ref{varstr}.
+See @ref{ring}; @ref{int}; @ref{nvars}; @ref{varstr}.
 @end iftex
 @c ---------------------------------------
 @node varstr, vdim, var, Functions
@@ -5140,7 +5154,7 @@ See @ref{ring}, @ref{int expressions}; @ref{nvars}; @ref{varstr}.
 @item @strong{Type:}
 string
 @item @strong{Purpose:}
-returns the list of the names of the ring variables
+returns the list of the names of the ring variables as a string
 @*or the name of the n-th ring variable for a given integer n.
 @*@code{varstr(n)} is equivalent to @code{varstr(basering,n)}.
 @item @strong{Example:}
@@ -5155,7 +5169,7 @@ returns the list of the names of the ring variables
 @end table
 @menu
 * ring::
-* int expressions::
+* int::
 * var::
 * nvars::
 * ordstr::
@@ -5163,7 +5177,7 @@ returns the list of the names of the ring variables
 * parstr::
 @end menu
 @iftex
-See @ref{ring}, @ref{int expressions}; @ref{nvars}; @ref{var};
+See @ref{ring}; @ref{int}; @ref{nvars}; @ref{var};
 @ref{ordstr};
 @ref{charstr};
 @ref{parstr}.
@@ -5231,10 +5245,10 @@ computes the n-th exterior power of matrix for a given integer n.
 @menu
 * matrix::
 * minor::
-* int expressions::
+* int::
 @end menu
 @iftex
-See @ref{matrix}; @ref{minor}; @ref{int expressions}.
+See @ref{matrix}; @ref{minor}; @ref{int}.
 @end iftex
 @c ---------------------------------------
 @node weight, write, wedge, Functions
@@ -5268,12 +5282,12 @@ which the input is weighted homogeneous is found.
 @end example
 @end table
 @menu
-* ideal expressions::
-* intvec expressions::
+* ideal::
+* intvec::
 * qhweight::
 @end menu
 @iftex
-See @ref{ideal expressions}; @ref{intvec expressions}; @ref{qhweight}.
+See @ref{ideal}; @ref{intvec}; @ref{qhweight}.
 @end iftex
 @c ---------------------------------------
 @node  write,  , weight, Functions
@@ -5301,7 +5315,8 @@ can be used. A @code{write} blocks (i.e. does not return), as long as a
 MPtcp link is not ready for writing.
 @*For DBM links, @code{write} with three arguments inserts the first
 string as key and the second string as value into the dbm data
-base. Called with two arguments it deletes the entry with the key
+base. 
+@*Called with two arguments it deletes the entry with the key
 specified by the string from the data base.
 @item @strong{Example:}
 @example
@@ -5332,7 +5347,7 @@ execute "ideal k="+s+";"; // this defines an ideal k which
 * dump::
 @end menu
 @iftex
-See @ref{read}, @ref{link}, @ref{Data types};
+See @ref{read}; @ref{link}; @ref{Data types};
 @ref{quote}; @ref{eval}; @ref{dump}.
 @end iftex
 
@@ -5367,19 +5382,19 @@ order to define procedures and to collect commands belonging to
 the sequence of statements consists of only a single command it has to be
 surrounded by curly brackets! 
 Variables which are defined inside a block
-are local to that block. Use @code{export} to make them globally
-available. Note that there is no ending semicolon at the end of the
-block.
+are not local to that block. Note that there is no ending semicolon at 
+the end of the block.
 @table @code
 @item @strong{Example:}
 @example
 if ( i>j )
 @{
   // This is the block
-  int temp; // temp is a local variable
+  int temp; 
   i=temp;
   i=j;
   j=temp;
+  kill temp;
 @}
 @end example
 @end table
@@ -5417,7 +5432,8 @@ See @ref{Control structures}; @ref{while}; @ref{for}.
 @code{continue;}
 @item @strong{Purpose:}
 skips the rest of this loop und jumps to the beginning of the
-block. This command is only valid inside a @code{for} construct.
+block. This command is only valid inside a @code{for} or a @code{while}
+construct.
 @item @strong{Note:}
 Unlike the C-construct it @strong{does not execute the increment statement}.
 The command @code{continue} is mainly for internal use.
@@ -5439,7 +5455,7 @@ for (int i = 1 ; i<=10; i=i+1)
 @end example
 @end table
 @c ref 
-See @ref{Control structures}; @ref{for}.
+See @ref{Control structures}; @ref{for}; @ref{while}.
 @c ref
 @c ---------------------------------------
 @node else, export, continue, Control structures
@@ -5448,7 +5464,7 @@ See @ref{Control structures}; @ref{for}.
 @item @strong{Syntax:}
 @code{if (} boolean_expression @code{)} true_block @code{else} false_block
 @item @strong{Purpose:}
-executes true_block if the boolean_expression of the @code{if} statement
+executes false_block if the boolean_expression of the @code{if} statement
 is false. This command is only valid in combination with an @code{if}
 command. 
 @item @strong{Example:}
@@ -5565,7 +5581,8 @@ See @ref{else}; @ref{break}; @ref{Control structures};
 @code{keepring} name @code{;}
 @item @strong{Purpose:}
 moves the specified ring to the next (upper) level. This command can only
-be used inside of procedures. There it provides the possibility to keep
+be used inside of procedures and it should be the last command before the
+@code{return} statement. There it provides the possibility to keep
 a ring which is local to the procedure (and its objects) accessible after
 the procedure ended without making the ring global.
 @item @strong{Example:}
@@ -5683,8 +5700,9 @@ See @ref{Control structures}; @ref{boolean expressions}; @ref{break}.
 
 @c ---------------------------------------
 @node ~, , while, Control structures
-@subsection ~
+@subsection ~ (breakpoint)
 @cindex ~
+@cindex breakpoint
 @table @code
 @item @strong{Syntax:}
 @code{~;}
@@ -5782,11 +5800,11 @@ degBound = 0; //resets degree bound to infinity
 @end table
 @menu
 @strong{See:}
-* int expressions::
+* int::
 * option::
 @end menu
 @iftex
-See @ref{int expressions}; @ref{option}.
+See @ref{int}; @ref{option}.
 @end iftex
 @c -----------------------------------------------------
 @node echo, minpoly, degBound, System variables
@@ -5797,8 +5815,8 @@ See @ref{int expressions}; @ref{option}.
 int
 @item @strong{Purpose:}
 input is echoed if @code{echo} >= @code{voice}.
-@*echo is a local setting for a script and defaulted to 0.
-@*echo does not affect the output of commands
+@*echo is a local setting for a procedure and defaulted to 0.
+@*echo does not affect the output of commands.
 @item @strong{Example:}
 @c this example cannot be a computed one - echo interferes with -e
 @example
@@ -5809,11 +5827,11 @@ int i = echo;
 @end table
 @menu
 @strong{See:}
-* int expressions::
+* int::
 * voice::
 @end menu
 @iftex
-See @ref{int expressions}; ref{voice}.
+See @ref{int}; ref{voice}.
 @end iftex
 @c -----------------------------------------------------
 @node minpoly, multBound, echo, System variables
@@ -5879,11 +5897,11 @@ multBound = 0;//disbales multBound
 @end table
 @menu
 @strong{See:}
-* int expressions::
+* int::
 * option::
 @end menu
 @iftex
-See @ref{int expressions}; @ref{option}.
+See @ref{int}; @ref{option}.
 @end iftex
 @c -----------------------------------------------------
 @node noether, printlevel, multBound, System variables
@@ -5912,12 +5930,12 @@ the monomial @code{noether} during the computation.
 @end table
 @menu
 @strong{See:}
-* poly expressions::
+* poly::
 * degBound::
 * std::
 @end menu
 @iftex
-See @ref{poly expressions}; @ref{std}.
+See @ref{poly}; @ref{std}.
 @end iftex
 @c -----------------------------------------------------
 @node printlevel, short, noether, System variables
@@ -5942,12 +5960,12 @@ If @code{printlevel} >= @code{voice} @code{dbprint} is equivalent to
 @end table
 @menu
 @strong{See:}
-* int expressions::
+* int::
 * dbprint::
 * voice::
 @end menu
 @iftex
-See @ref{int expressions}; @ref{dbprint}; @ref{voice}.
+See @ref{int}; @ref{dbprint}; @ref{voice}.
 @end iftex
 @c -----------------------------------------------------
 @node short, timer, printlevel, System variables
@@ -5985,10 +6003,14 @@ the previous setting.
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
-(1) the CPU time used for each command is printed if timer >0 and if this
+@enumerate
+@item
+the CPU time used for each command is printed if timer >0 and if this
 time is bigger than a (customizable) minimal time; 
-@*(2) yields the used CPU time since the start-up of @sc{Singular} in a
+@item
+yields the used CPU time since the start-up of @sc{Singular} in a
 (customizable) resolution.
+@end enumerate
 
 The default setting of @code{timer} is 0, the default minimal time is
 0.5 seconds, and the default timer resolution is 1 (i.e., default unit
@@ -6016,7 +6038,7 @@ commands, see example below.
 @end example
 @end table
 @c ref
-See @ref{Command line options}, @ref{system}, @ref{rtimer}.
+See @ref{Command line options}; @ref{system}; @ref{rtimer}.
 @c ref
 @c ---------------------------------------
 @node TRACE var, rtimer, timer, System variables
@@ -6050,10 +6072,10 @@ in this line is suspended until the user presses @code{RETURN}.
 @end example
 @end table
 @menu
-* int expressions::
+* int::
 @end menu
 @iftex
-See @ref{int expressions}.
+See @ref{int}.
 @end iftex
 @c ---------------------------------------
 @node rtimer, voice, TRACE var, System variables
@@ -6064,7 +6086,7 @@ See @ref{int expressions}.
 int
 @item @strong{Purpose:}
 identical to @code{timer}, except that real times (i.e., wall-clock)
-times ar reported, instead of CPU times.
+times are reported, instead of CPU times.
 @end table
 @menu
 * timer::
@@ -6072,7 +6094,7 @@ times ar reported, instead of CPU times.
 * system::
 @end menu
 @iftex
-See @ref{timer}, @ref{Command line options}, @ref{system}.
+See @ref{timer}; @ref{Command line options}; @ref{system}.
 @end iftex
 @c ---------------------------------------
 @node voice,, rtimer, System variables
@@ -6098,10 +6120,10 @@ proc p
 @end table
 @menu
 * dbprint::
-* int expressions::
+* int::
 * printlevel::
 @end menu
 @iftex
-See @ref{dbprint}, @ref{int expressions}, @ref{printlevel}.
+See @ref{dbprint}; @ref{int}; @ref{printlevel}.
 @end iftex
 @c ---------------------------------------
