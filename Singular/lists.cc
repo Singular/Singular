@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: lists.cc,v 1.9 1998-06-17 18:13:44 Singular Exp $ */
+/* $Id: lists.cc,v 1.10 1998-06-18 08:17:41 Singular Exp $ */
 /*
 * ABSTRACT: handling of the list type
 */
@@ -216,6 +216,14 @@ lists liMakeResolv(resolvente r, int length, int reallen,
         if (i==0)
         {
           L->m[i].rtyp=typ0;
+	  int j=IDELEMS(r[0])-1;
+	  while ((j>0) && (r[0]->m[j]==NULL)) j--;
+	  j++;
+	  if (j!=IDELEMS(r[0]))
+	  {
+	    pEnlargeSet(&(r[0]->m),IDELEMS(r[0]),j-IDELEMS(r[0]));
+	    IDELEMS(r[0])=j;
+	  }
         }
         else
         {
@@ -230,8 +238,8 @@ lists liMakeResolv(resolvente r, int length, int reallen,
           {
             r[i]->rank=max(rank,idRankFreeModule(r[i]));
           }
+          idSkipZeroes(r[i]);
         }
-        idSkipZeroes(r[i]);
         L->m[i].data=(void *)r[i];
         if ((weights!=NULL) && (weights[i]!=NULL))
         {
