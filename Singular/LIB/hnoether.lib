@@ -2,7 +2,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // This library is for Singular 1-3-7 or newer
 
-version="$Id: hnoether.lib,v 1.33 2002-06-17 12:15:32 keilen Exp $";
+version="$Id: hnoether.lib,v 1.34 2002-07-23 14:27:35 keilen Exp $";
 category="Singularities";
 info="
 LIBRARY:  hnoether.lib   Hamburger-Noether (Puiseux) Development
@@ -1227,7 +1227,6 @@ RETURN:  list, if INPUT contains a valid HNE:
 @end format
          an empty list, if INPUT contains no valid HNE.
 ASSUME:  INPUT is bivariate polynomial f or the output of @code{hnexpansion(f[,\"ess\"]), 
-         @code{extdevelop(develop(f),n)}, or one entry in the list @code{hne} 
          or the list @code{hne} in the HNEring created by @code{hnexpansion}.
 RETURN:  list INV, such that INV[i] is the output of @code{invariants(develop(f[i]))}
          as above, where f[i] is the ith branch of the curve f, and the last entry
@@ -1414,116 +1413,6 @@ example
  INV[size(INV)][3];                // the delta invariant of the curve
 }
 
-///////////////////////////////////////////////////////////////////////////////
-proc planeCurveInvariants
-"USAGE:  planeCurveInvariants(INPUT); INPUT list or poly
-ASSUME:  INPUT is bivariate polynomial f, or the output of @code{hnexpansion(f[,\"ess\"]), 
-         or of @code{develop(f)}, or of @code{extdevelop(develop(f),n)}, or (one entry 
-         in) the list @code{hne} in the HNEring created by @code{hnexpansion}.
-RETURN:  list INV, such that INV[i] is the output of @code{invariants(develop(f[i]))}
-         as above, where f[i] is the ith branch of the curve f, and the last entry
-         contains further invariants of f in the format:
-@format
-    INV[i][1]    : intvec    (characteristic exponents)
-    INV[i][2]    : intvec    (generators of the semigroup)
-    INV[i][3]    : intvec    (Puiseux pairs, 1st components)
-    INV[i][4]    : intvec    (Puiseux pairs, 2nd components)
-    INV[i][5]    : int       (degree of the conductor)
-    INV[i][6]    : intvec    (sequence of multiplicities)
-    INV[last][1] : intmat    (contact matrix of the branches)
-    INV[last][2] : intmat    (intersection multiplicities of the branches)
-    INV[last][3] : int       (delta invariant of f)
-@end format
-NOTE:    In case the Hamburger-Noether expansion of the curve f is needed
-         for other purposes as well it is better to calculate this first
-         with the aid of @code{hnexpansion} and use it as input instead of
-         the polynomial itself.
-SEE ALSO: develop, displayInvariants, multsequence, intersection
-KEYWORDS: characteristic exponents; semigroup of values; Puiseux pairs;
-          conductor, degree; multiplicities, sequence of
-EXAMPLE:  example invariants; shows an example
-"
-{
- //---- INPUT = poly, or HNEring, or hne of reducible curve  --------------------
-  if (typeof(#[1])=="poly")
-  {
-    list HNEXPANSION=hnexpansion(#[1]);
-    return(planeCurveInvariants(HNEXPANSION));
-  }
-  if (typeof(#[1])=="ring")
-  {
-    def H_N_E_R_I_N_G=#[1];
-    def rette_ring=basering;
-    setring H_N_E_R_I_N_G;
-  }
-  if (typeof(#[1])=="list")
-  {
-    list hne=#;
-  }
-  if (typeof(#[1])=="matrix")
-  {
-    list hne;
-    hne[1]=#;
-  }
-  list ErGeBnIs;
-  for (int lauf=1;lauf<=size(hne);lauf++)
-  {
-    ErGeBnIs[lauf]=invariants(hne[lauf]);
-  }
-  // Calculate the intersection matrix and the intersection multiplicities.
-  intmat contact[size(hne)][size(hne)];
-  intmat intersectionmatrix[size(hne)][size(hne)];
-  int Lauf;
-  for (lauf=1;lauf<=size(hne);lauf++)
-  {
-    for (Lauf=lauf+1;Lauf<=size(hne);Lauf++)
-    {
-      contact[lauf,Lauf]=separateHNE(hne[lauf],hne[Lauf]);
-      contact[Lauf,lauf]=contact[lauf,Lauf];
-      intersectionmatrix[lauf,Lauf]=intersection(hne[lauf],hne[Lauf]);
-      intersectionmatrix[Lauf,lauf]=intersectionmatrix[lauf,Lauf];
-    }
-  }
-  // Calculate the delta invariant.
-  int inters;
-  int del=ErGeBnIs[size(hne)][5]/2;
-  for(lauf=1;lauf<=size(hne)-1;lauf++)
-  {
-    del=del+ErGeBnIs[lauf][5]/2;
-    for(Lauf=lauf+1;Lauf<=size(hne);Lauf++)
-    {
-      inters=inters+intersectionmatrix[lauf,Lauf];
-    }
-  }
-  del=del+inters;
-  list LAST=contact,intersectionmatrix,del;
-  ErGeBnIs[size(hne)+1]=LAST;
-  if (defined(H_N_E_R_I_N_G))
-  {
-    setring rette_ring;
-    kill H_N_E_R_I_N_G;
-  }
-  return(ErGeBnIs);
-}
-example
-{ "EXAMPLE:"; echo = 2;
- ring exring=0,(x,y),dp;
- list hne=develop(y4+2x3y2+x6+x5y);
- list erg=planeCurveInvariants(hne);
- erg[1][1];                   // the characteristic exponents
- erg[1][2];                   // the generators of the semigroup of values
- erg[1][3],erg[1][4];         // the Puiseux pairs in packed form
- erg[1][5] / 2;               // the delta-invariant
- erg[1][6];                   // the sequence of multiplicities
-                           // To display the invariants more 'nicely':
- displayInvariants(hne);
- /////////////////////////////
- list INV=planeCurveInvariants((x2-y3)*(x3-y5));
- INV[1][1];                // the characteristic exponents of the first branch
- INV[2][6];                // the sequence of multiplicities of the second branch
- print(INV[3][1]);         // the contact matrix of the branches
- print(INV[3][2]);         // the intersection numbers of the branches
-}
 ///////////////////////////////////////////////////////////////////////////////
 
 proc displayInvariants
