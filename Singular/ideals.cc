@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.16 1998-01-12 18:59:47 obachman Exp $ */
+/* $Id: ideals.cc,v 1.17 1998-02-18 11:38:26 siebert Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -2267,6 +2267,183 @@ ideal idMinors(matrix a, int ar)
   pEnlargeSet(&result->m,size,k-size);
   IDELEMS(result) = k;
   return (result);
+}
+
+/*3
+* produces recursively the ideal of all arxar-minors of a
+*/
+static void idRecMin(matrix a,int ar,poly *barDiv,ideal result,
+              int * nextPlace, intvec * pfRows, intvec * iv)
+{
+Print("Level: %d\n",ar);
+/*--- there is no non-zero minor coming from a------------*/
+  if((ar<0) || (ar>min(a->ncols,a->nrows)-1))
+  {
+    return;
+  }
+
+/*--- initializing temporary structures-------------------*/
+  int i,j,r,c,newi,newp,k;
+  poly p=NULL,pp;
+  BOOLEAN justChosen=FALSE;
+
+  if (ar==0)
+  {
+/*--- ar is 0, the matrix-entres are minors---------------*/
+    for (i=a->nrows;i>0;i--)
+    {
+      for (j=a->ncols;j>0;j--)
+      {
+        p = MATELEM(a,i,j);
+        if (p!=NULL)
+        {
+          if (*nextPlace>=IDELEMS(result))
+          {
+            pEnlargeSet(&(result->m),IDELEMS(result),16);
+            IDELEMS(result) += 16;
+          }
+          MATELEM(a,i,j) = NULL;
+if ((*nextPlace==21) || (*nextPlace==37))
+{
+  Print("Hier sind sie!\n");
+}
+pWrite(p);
+          result->m[*nextPlace] = p;
+          (*nextPlace)++;
+        }
+      }
+    }
+    idDelete((ideal*)&a);
+    return;
+  }
+/*--- ar>0, we perform one step of the Bareiss algorithm--*/
+  p = pCopy(*barDiv);   //we had to store barDiv for the remaining loops
+  pp = pCopy(p);   //we had to store barDiv for the remaining loops
+  matrix nextStep = mpOneStepBareiss(a,barDiv,&r,&c);
+/*--- we compute the row-index of the chosen row r -------*/
+  newi = 0;
+  while ((newi<iv->length()) && ((*iv)[newi]!=0)) newi++;
+  k = (*iv)[newi] = r;
+  for (j=newi-1;j>0;j--)
+  {
+    if (k>=(*iv)[j]) k++;
+  }
+  newp = 0;
+  while ((newp<pfRows->length()) && ((*pfRows)[newp]!=0)) 
+  {
+    if ((*pfRows)[newp]==k) 
+    {
+      justChosen = TRUE;
+Print("just chosen\n");
+      break;
+    }
+    newp++;
+  }
+  if (!justChosen) (*pfRows)[newp] = k;
+Print("Chosen: ");pfRows->show();PrintLn();
+Print("Deleted: ");iv->show();PrintLn();
+/*--- we read out the r-1 x c-1 matrix for the next step--*/
+  if ((a->nrows-1)*(a->ncols-1)>0)
+  {
+    matrix next = mpNew(a->nrows-1,a->ncols-1);
+    for (i=a->nrows-1;i>0;i--)
+    {
+      for (j=a->ncols-1;j>0;j--)
+      {
+        MATELEM(next,i,j) = MATELEM(nextStep,i,j);
+        MATELEM(nextStep,i,j) =NULL;
+      }
+    }
+    idDelete((ideal*)&nextStep);
+/*--- we call the next Step------------------------------*/
+    idRecMin(next,ar-1,barDiv,result,nextPlace,pfRows,iv);
+    next = NULL;
+  }
+/*--- now we have to take out the r-th row...------------*/
+Print("back for rows on Level: %d\n",ar);
+Print("The actual row was %d\n",k);
+Print("Chosen: ");pfRows->show();PrintLn();
+Print("Deleted: ");iv->show();PrintLn();
+  if (((a->nrows)>1) && (!justChosen))
+  {
+    nextStep = mpNew(a->nrows-1,a->ncols);
+    for (i=r-1;i>0;i--)
+    {
+      for (j=a->ncols;j>0;j--)
+      {
+        MATELEM(nextStep,i,j) = pCopy(MATELEM(a,i,j));
+      }
+    }
+    for (i=a->nrows;i>r;i--)
+    {
+      for (j=a->ncols;j>0;j--)
+      {
+        MATELEM(nextStep,i-1,j) = pCopy(MATELEM(a,i,j));
+      }
+    }
+/*--- and to perform the algorithm with the rest---------*/
+    idRecMin(nextStep,ar,&p,result,nextPlace,pfRows,iv);
+    nextStep = NULL;
+  }
+/*--- now we have to take out the c-th col...------------*/
+Print("back for cols on Level: %d\n",ar);
+Print("Chosen: ");pfRows->show();PrintLn();
+Print("Deleted: ");iv->show();PrintLn();
+  if ((a->nrows)>1)
+  {
+    nextStep = mpNew(a->nrows,a->ncols-1);
+    for (i=a->nrows;i>0;i--)
+    {
+      for (j=c-1;j>0;j--)
+      {
+        MATELEM(nextStep,i,j) = MATELEM(a,i,j);
+        MATELEM(a,i,j) = NULL;
+      }
+    }
+    for (i=a->nrows;i>0;i--)
+    {
+      for (j=a->ncols;j>c;j--)
+      {
+        MATELEM(nextStep,i,j-1) = MATELEM(a,i,j);
+        MATELEM(a,i,j) = NULL;
+      }
+    }
+    idDelete((ideal*)&a);
+/*--- and to perform the algorithm with the rest---------*/
+    (*iv)[newi] = 0;
+    idRecMin(nextStep,ar,&p,result,nextPlace,pfRows,iv);
+    nextStep = NULL;
+  }
+/*--- deleting temporary structures and returns----------*/
+  if (!justChosen) (*pfRows)[newp] = 0;
+  pDelete(barDiv);
+  pDelete(&p);
+  pDelete(&pp);
+  return;
+}
+
+/*2
+* compute all ar-minors of the matrix a
+* the caller of idRecMin
+*/
+ideal idMinors1(matrix a, int ar)
+{
+  if((ar<=0) || (ar>min(a->ncols,a->nrows)))
+  {
+    Werror("%d-th minor ",ar);
+    return NULL;
+  }
+  int i=0;
+  intvec * iv=new intvec(a->nrows+1);
+  intvec * pv=new intvec(a->nrows+1);
+  poly barDiv=NULL;
+  ideal result=idInit(16,0);
+
+  idRecMin(mpCopy(a),ar-1,&barDiv,result,&i,pv,iv);
+  idSkipZeroes(result);
+  delete iv;
+  delete pv;
+  return result;
 }
 
 /*2

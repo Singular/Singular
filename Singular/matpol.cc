@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.cc,v 1.8 1998-01-12 17:32:48 Singular Exp $ */
+/* $Id: matpol.cc,v 1.9 1998-02-18 11:35:31 siebert Exp $ */
 
 /*
 * ABSTRACT:
@@ -330,6 +330,7 @@ class mp_permmatrix
   void mpDelElem(int, int);
   void mpElimBareiss(poly);
   int mpPivotBareiss(row_col_weight *);
+  int mpPivotRow(row_col_weight *, int);
   void mpToIntvec(intvec *);
   void mpRowReorder();
   void mpColReorder();
@@ -387,9 +388,10 @@ matrix mpOneStepBareiss (matrix a, poly *H, int *r, int *c)
   matrix re = mpCopy(a);
   mp_permmatrix *Bareiss = new mp_permmatrix(re);
   row_col_weight w(Bareiss->mpGetRdim(), Bareiss->mpGetCdim());
+  int row = *r;
 
   /* step of Bareiss */
-  if(Bareiss->mpPivotBareiss(&w))
+  if((row && Bareiss->mpPivotRow(&w,row-1)) || Bareiss->mpPivotBareiss(&w))
   {
     Bareiss->mpElimBareiss(div);
     div = Bareiss->mpGetElem(Bareiss->mpGetRdim(), Bareiss->mpGetCdim());
@@ -1101,6 +1103,81 @@ int mp_permmatrix::mpPivotBareiss(row_col_weight *C)
           iopt = i;
           jopt = j;
         }
+      }
+    }
+  }
+  if (iopt < 0)
+    return 0;
+  mpReplace(iopt, s_m, sign, qrow);
+  mpReplace(jopt, s_n, sign, qcol);
+  return 1;
+}
+
+/*2
+* pivot strategy for Bareiss algorithm with defined row
+*/
+int mp_permmatrix::mpPivotRow(row_col_weight *C, int row)
+{
+  poly p, *a;
+  int j, iopt, jopt;
+  float sum, f1, f2, fo, r, ro, lp;
+  float *dr = C->wrow, *dc = C->wcol;
+
+  fo = 1.0e20;
+  ro = 0.0;
+  iopt = jopt = -1;
+  
+  s_n--;
+  s_m--;
+  if (s_m == 0)
+    return 0;
+  if (s_n == 0)
+  {
+    p = this->mpRowAdr(row)[qcol[0]];
+    if (p)
+    {
+      f1 = mpPolyWeight(p);
+      if (f1 < fo)
+      {
+        fo = f1;
+        if (iopt >= 0)
+        pDelete(&(this->mpRowAdr(iopt)[qcol[0]]));
+        iopt = row;
+      }
+      else
+        pDelete(&(this->mpRowAdr(row)[qcol[0]]));
+    }
+    if (iopt >= 0)
+      mpReplace(iopt, s_m, sign, qrow);
+    return 0;
+  }
+  this->mpRowWeight(dr);
+  this->mpColWeight(dc);
+  sum = 0.0;
+  for(j=s_m; j>=0; j--)
+    sum += dr[j];
+  r = dr[row];
+  a = this->mpRowAdr(row);
+  for(j=s_n; j>=0; j--)
+  {
+    p = a[qcol[j]];
+    if (p)
+    {
+      lp = mpPolyWeight(p);
+      ro = r - lp;
+      f1 = ro * (dc[j]-lp);
+      if (f1 != 0.0)
+      {
+        f2 = lp * (sum - ro - dc[j]);
+        f2 += f1;
+      }
+      else
+        f2 = lp-r-dc[j];
+      if (f2 < fo)
+      {
+        fo = f2;
+        iopt = row;
+        jopt = j;
       }
     }
   }
