@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.l,v 1.5 1998-04-06 16:27:20 krueger Exp $ */
+/* $Id: libparse.l,v 1.6 1998-04-16 08:12:55 pohl Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -82,6 +82,7 @@ int yylp_errno = 0;
 #define YYLP_MISS_BR2   11
 #define YYLP_MISS_BR3   12
 
+#ifdef __MWERKS__
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -91,9 +92,21 @@ FILE   *fdopen(int filedes, char *type);
 long   ftell(FILE *fp);
 long   tell(int filedes);
 int    isatty(int filedes);
+#else
+int    _fileno(FILE *stream);
+FILE   *_fdopen(int filedes, char *type);
+long   _ftell(FILE *fp);
+long   _tell(int filedes);
+int    _isatty(int filedes);
+#define fileno  _fileno
+#define fdopen  _fdopen
+#define ftell    _ftell
+#define tell    _tell
+#define isatty  _isatty
 #endif /* macintosh */
 #ifdef __cplusplus
 }
+#endif
 #endif
 
 #ifdef STANDALONE_PARSER
@@ -107,8 +120,8 @@ extern "C" {
   int yylpwrap();
 }
 #else /* STANDALONE_PARSER */
-idhdl h;
-#  define pi IDPROC(h)
+idhdl h0;
+#  define pi IDPROC(h0)
 extern "C"
 {
   int yylpwrap();
@@ -243,10 +256,10 @@ static     { p_static=1; }
                proc[0]='\0';
                sscanf( yytext, "%*[^p]proc %s", proc);
                if(strlen(proc)<1) sscanf( yytext, "proc %s", proc);
-               h = enterid( mstrdup(proc), myynest, PROC_CMD,
+               h0 = enterid( mstrdup(proc), myynest, PROC_CMD,
 				   &idroot, FALSE );
-               if (h!=NULL) {
-                 iiInitSingularProcinfo(IDPROC(h), newlib, proc,
+               if (h0!=NULL) {
+                 iiInitSingularProcinfo(IDPROC(h0), newlib, proc,
 				yylplineno, current_pos(0),p_static);
                  if (BVERBOSE(V_LOAD_PROC))
                    Warn( "     proc %s loaded", proc );
