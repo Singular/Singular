@@ -6,7 +6,7 @@
  *  Purpose: implementation of fast maps
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 02/01
- *  Version: $Id: fast_maps.cc,v 1.15 2002-01-19 16:14:46 Singular Exp $
+ *  Version: $Id: fast_maps.cc,v 1.16 2002-01-19 17:11:42 obachman Exp $
  *******************************************************************/
 #include "mod2.h"
 #include <omalloc.h>
@@ -16,6 +16,78 @@
 #include "ring.h"
 #include "febase.h"
 #include "fast_maps.h"
+
+// define if you want to use special dest_ring
+#define HAVE_DEST_R 1
+// define if you want to use special src_ring
+#define HAVE_SRC_R 0
+// define if you want to use optimization step
+#define HAVE_MAP_OPTIMIZATION 0
+
+
+
+/*******************************************************************************
+**
+*F  maMaxExp  . . . . . . . . . . . .  returns maximal exponent of result of map
+*/
+// return maximal monomial if max_map_monomials are substituted into pi_m
+static poly maGetMaxExpP(poly* max_map_monomials, 
+                         int n_max_map_monomials, ring map_r, 
+                         poly pi_m, ring pi_r)
+{
+  int n = min(pi_r->N, n_max_map_monomials);
+  int i, j;
+  Exponent_t e_i, e_j;
+  poly m_i, map_j = p_Init(map_r);
+  
+  for (i=1; i <= n; i++)
+  {
+    e_i = p_GetExp(pi_m, i, pi_r);
+    m_i = max_map_monomials[i-1];
+    if (e_i > 0 && m_i != NULL && ! p_IsConstantComp(m_i, map_r))
+    {
+      for (j = 1; j<= map_r->N; j++)
+      {
+        e_j = p_GetExp(m_i, j, map_r);
+        if (e_j > 0)
+        {
+          p_AddExp(map_j, j, e_j*e_i, map_r);
+        }
+      }
+    }
+  }
+  return map_j;
+}
+
+// returns maximal exponent if map_id is applied to pi_id
+static Exponent_t maGetMaxExp(ideal map_id, ring map_r, ideal pi_id, ring pi_r)
+{
+  Exponent_t max=0;
+  poly* max_map_monomials = (poly*) omAlloc(IDELEMS(map_id)*sizeof(poly));
+  poly max_pi_i, max_map_i;
+  
+  int i, j;
+  for (i=0; i<IDELEMS(map_id); i++)
+  {
+    max_map_monomials[i] = p_GetMaxExpP(map_id->m[i], map_r);
+  }
+  
+  for (i=0; i<IDELEMS(pi_id); i++)
+  {
+    max_pi_i = p_GetMaxExpP(pi_id->m[i], pi_r);
+    max_map_i = maGetMaxExpP(max_map_monomials, IDELEMS(map_id), map_r, 
+                              max_pi_i, pi_r);
+    Exponent_t temp = p_GetMaxExp(max_map_i, map_r);
+    if (temp > max){
+      max=temp;
+    }
+
+    p_LmFree(max_pi_i, pi_r);
+    p_LmFree(max_map_i, map_r);
+  }
+  return max;
+}
+
 
 #if 0
 // paste into extra.cc
@@ -51,6 +123,7 @@ map Phi = map_r, image_id;
 system("map", Phi, map_id);
 
 #endif
+
 /*******************************************************************************
 **
 *F  debugging stuff
@@ -221,14 +294,32 @@ void maMap_CreatePolyIdeal(ideal map_id, ring map_r, ring src_r, ring dest_r,
   }
 }
 
+
 void maMap_CreateRings(ideal map_id, ring map_r, 
                        ideal image_id, ring image_r, 
                        ring &src_r, ring &dest_r)
 {
+#if HAVE_SRC_R > 0
+#else
   src_r = map_r;
+#endif
+
+#if HAVE_DEST_R > 0
+  Exponent_t maxExp = maGetMaxExp(map_id, map_r, image_id, map_r);
+  dest_r = rModifyRing_Simple(image_r, TRUE, TRUE, maxExp);
+#else
   dest_r = image_r;
+#endif
 }
 
+void maMap_KillRings(ring map_r, ring image_r, ring src_r, ring dest_r)
+{
+  if (map_r != src_r)
+    rKillModified_Wp_Ring(src_r);
+  if (image_r != dest_r)
+    rKillModifiedRing_Simple(dest_r);
+}
+    
 ideal maIdeal_2_Ideal(maideal m_id, ring dest_r)
 {
   ideal res = idInit(m_id->n, 1);
@@ -246,15 +337,51 @@ ideal maIdeal_2_Ideal(maideal m_id, ring dest_r)
 ideal fast_map(ideal map_id, ring map_r, ideal image_id, ring image_r)
 {
   ring src_r, dest_r;
+  ideal dest_id, res_id;
+
+  // construct rings we work in: 
+  // src_r: Wp with Weights set to length of poly in image_id
+  // dest_r: Simple ring without degree ordering and short exponents
   maMap_CreateRings(map_id, map_r, image_id, image_r, src_r, dest_r);
   
+  // construct dest_id
+  if (dest_r != image_r)
+    dest_id = idrShallowCopyR(image_id, image_r, dest_r);
+  else
+    dest_id = image_id;
+
+  // construct mpoly and mideal
   mapoly mp;
   maideal mideal;
   maMap_CreatePolyIdeal(map_id, map_r, src_r, dest_r, mp, mideal);
-  maPoly_Eval(mp, src_r, image_id, dest_r);
+  
+  // do the optimization step
+#if HAVE_MAP_OPTIMIZE > 0
+  maPoly_Optimize(mp, src_r);
+#endif
 
-  return maIdeal_2_Ideal(mideal, dest_r);
+  // do the actual evaluation
+  maPoly_Eval(mp, src_r, dest_id, dest_r);
+
+  // collect the results back into an ideal
+  ideal res_dest_id = maIdeal_2_Ideal(mideal, dest_r);
+
+  // convert result back to image_r
+  ideal res_image_id;
+  if (dest_r != image_r)
+  {
+    res_image_id = idrShallowCopyR(res_dest_id, dest_r, image_r);
+    id_ShallowDelete(&res_dest_id, dest_r);
+  }
+  else
+    res_image_id = res_dest_id;
+  
+  // clean-up the rings
+  maMap_KillRings(map_r, image_r, src_r, dest_r);
+
+  return res_image_id;
 }
+
 
 #if 0
 
