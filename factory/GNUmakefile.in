@@ -1,5 +1,5 @@
 # @configure_input@
-# $Id: GNUmakefile.in,v 1.29 1998-02-20 16:43:23 schmidt Exp $
+# $Id: GNUmakefile.in,v 1.30 1998-03-10 14:53:10 schmidt Exp $
 
 #
 # GNUmakefile.in - used by `configure' to create `GNUmakefile', the
@@ -215,6 +215,11 @@ basefactoryincl := \
 		fac_univar.h \
 		fac_util.h \
 		ffops.h \
+		ftmpl_array.h \
+		ftmpl_factor.h \
+		ftmpl_functions.h \
+		ftmpl_list.h \
+		ftmpl_matrix.h \
 		gf_tabutil.h \
 		gfops.h \
 		gmpext.h \
