@@ -206,6 +206,7 @@ Singular-static: mod2.h Makefile version.h scanner.cc gmalloc.o \
           ${ASO_OBJS} ${OBJS} \
           iparith.o tesths.cc libparse.cc claptmpl.o mpsr_Tok.o
 	echo "#define HAVE_STATIC" > static.h
+	sleep 1
 	${MAKE} LD_STATIC=1 Singular
 	echo "#undef HABE_STATIC" > static.h
 	${INSTALL_PROGRAM} Singular Singular-static
@@ -403,6 +404,7 @@ maintainer-clean: distclean srcclean
 
 install-bindist: $(HEADERS) $(SOURCES) Makefile depend
 	echo "#define MAKE_DISTRIBUTION	" > distrib.h
+	sleep 1
 	${MAKE} ${SING_EXEC} ESingular TSingular libparse ${RUN_SINGULARS}
 	${MKINSTALLDIRS} ${install_bindir} 
 	${INSTALL_PROGRAM} -s  ${SING_EXEC} ${install_bindir}/Singular
