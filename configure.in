@@ -1,6 +1,10 @@
 dnl Process this file with autoconf to produce a configure script
 AC_INIT(Singular/matpol.h)
 AC_PREFIX_DEFAULT(`pwd`)
+pwd=`pwd`
+
+
+# determine Makefiles to output
 OUTPUT_MAKEFILES="Makefile"
 if test -d "doc"; then
    OUTPUT_MAKEFILES="$OUTPUT_MAKEFILES doc/Makefile doc/version.texi doc/uname.texi"
@@ -24,8 +28,10 @@ fi
 if test -d "IntegerProgramming"; then
    OUTPUT_MAKEFILES=$OUTPUT_MAKEFILES" IntegerProgramming/Makefile"
 fi
+if test -d "InstallShield"; then
+   OUTPUT_MAKEFILES=$OUTPUT_MAKEFILES" InstallShield/Makefile InstallShield/Etc/Makefile InstallShield/Cygwin/Makefile InstallShield/Singular/Makefile InstallShield/Xemacs/Makefile"
+fi
 
-pwd=`pwd`
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl determine singuname
@@ -63,17 +69,20 @@ SINGULAR_SUB_VERSION=8
 SINGULAR_SHORT_VERSION="${SINGULAR_MAJOR_VERSION}${VERSION_SEP}${SINGULAR_MINOR_VERSION}"
 SINGULAR_VERSION="${SINGULAR_SHORT_VERSION}${VERSION_SEP}${SINGULAR_SUB_VERSION}"
 VERSION_DATE="May 2000"
+SINGULAR_ROOT_DIR=$pwd
 
 export SINGULAR_MINOR_VERSION
 export SINGULAR_MAJOR_VERSION
 export SINGULAR_SUB_VERSION
 export SINGULAR_VERSION
 export VERSION_DATE
+export SINGULAR_ROOT_DIR
 
 dnl substitue them into the Makefiles
 AC_SUBST(SINGULAR_VERSION)
 AC_SUBST(VERSION_DATE)
 AC_SUBST(SINGULAR_SHORT_VERSION)
+AC_SUBST(SINGULAR_ROOT_DIR)
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl compiler stuff
@@ -124,6 +133,13 @@ AC_CHECK_PROGS(GUNZIP, gunzip,  ${pwd}/warn_not_found.sh gunzip)
 AC_CHECK_PROGS(MYGZIP, gzip, ${pwd}/warn_not_found.sh gzip)
 AC_CHECK_PROG(LATEX2HTML, latex2html, latex2html)
 AC_PROG_LN_S
+
+if test -e "${pwd}/mkinstalldirs"; then
+  MKINSTALLDIRS=${pwd}/mkinstalldirs
+  AC_SUBST(MKINSTALLDIRS)
+else
+  AC_MSG_ERROR(mkinstalldirs not foind in ${pwd})
+fi
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl Set exec_prefix, bindir, libdir, includedir to some sensible values
