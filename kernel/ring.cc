@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.17 2004-08-13 14:25:46 Singular Exp $ */
+/* $Id: ring.cc,v 1.18 2004-08-13 18:26:02 levandov Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -27,6 +27,7 @@
 #ifdef HAVE_PLURAL
 #include "gring.h"
 #include "matpol.h"
+#include "maps.h"
 #endif
 
 #define BITS_PER_LONG 8*SIZEOF_LONG
@@ -1133,11 +1134,28 @@ int rSum(ring r1, ring r2, ring &sum)
     /* multiplication matrices */
     ring old_ring = currRing;
     rChangeCurrRing(sum);
+/* find permutations of vars and pars */
+    int *perm1 = (int *)omAlloc0((R1->N+1)*sizeof(int));
+    int *par_perm1 = (int *)omAlloc0((R1->P+1)*sizeof(int));
+    int *perm2 = (int *)omAlloc0((R2->N+1)*sizeof(int));
+    int *par_perm2 = (int *)omAlloc0((R2->P+1)*sizeof(int));
+    //    maFindPerm(char **preim_names, int preim_n, char **preim_par, int preim_p,
+    //                char **names,       int n,       char **par,       int nop,
+    //                int * perm, int *par_perm, int ch);
+    maFindPerm(R1->names,  R1->N,  R1->parameter,  R1->P,
+               sum->names, sum->N, sum->parameter, sum->P,
+               perm1, par_perm1, sum->ch);
+    maFindPerm(R2->names,  R2->N,  R2->parameter,  R2->P,
+               sum->names, sum->N, sum->parameter, sum->P,
+               perm2, par_perm2, sum->ch);
+    nMapFunc nMap1 = nSetMap(R1);
+    nMapFunc nMap2 = nSetMap(R2);
     matrix C1 = R1->nc->C, C2 = R2->nc->C;
     matrix D1 = R1->nc->D, D2 = R2->nc->D;
     int l = R1->N + R2->N;
     matrix C  = mpNew(l,l);
     matrix D  = mpNew(l,l);
+    int param_shift = 0;
     for (i=1; i<= R1->N + R2->N; i++)
     {
       for (j= i+1; j<= R1->N + R2->N; j++)
@@ -1149,10 +1167,13 @@ int rSum(ring r1, ring r2, ring &sum)
     {
       for (j=i+1; j<=R1->N; j++)
       {
-	MATELEM(C,i,j) = p_CopyEmbed(MATELEM(C1,i,j),R1,0);
+	MATELEM(C,i,j) = pPermPoly(MATELEM(C1,i,j),perm1,R1,nMap1,par_perm1,R1->P);
+	MATELEM(D,i,j) = pPermPoly(MATELEM(D1,i,j),perm1,R1,nMap1,par_perm1,R1->P);
+	//	MATELEM(C,i,j) = p_CopyEmbed(MATELEM(C1,i,j),R1,0,param_shift);
 	  //prCopyR_NoSort(MATELEM(C1,i,j),R1,sum);
 	//	MATELEM(D,i,j) = prCopyR(MATELEM(D1,i,j),R1,sum);
-	MATELEM(D,i,j) = p_CopyEmbed(MATELEM(D1,i,j),R1,0);
+	//	MATELEM(D,i,j) = p_CopyEmbed(MATELEM(D1,i,j),R1,0,param_shift);
+
       }
     }
     for (i=1; i< R2->N; i++)
@@ -1161,8 +1182,11 @@ int rSum(ring r1, ring r2, ring &sum)
       {
 	//	MATELEM(C,R1->N+i,R1->N+j) = prCopyR_NoSort(MATELEM(C2,i,j),R2,sum);
 	//	MATELEM(D,R1->N+i,R1->N+j) = prCopyR(MATELEM(D2,i,j),R2,sum);
-	MATELEM(C,R1->N+i,R1->N+j) = p_CopyEmbed(MATELEM(C2,i,j),R2, R1->N);
-	MATELEM(D,R1->N+i,R1->N+j) = p_CopyEmbed(MATELEM(D2,i,j),R2, R1->N);
+	//	MATELEM(C,R1->N+i,R1->N+j) = p_CopyEmbed(MATELEM(C2,i,j),R2, R1->N,param_shift);
+	//	MATELEM(D,R1->N+i,R1->N+j) = p_CopyEmbed(MATELEM(D2,i,j),R2, R1->N,param_shift);
+
+	MATELEM(C,R1->N+i,R1->N+j) = pPermPoly(MATELEM(C2,i,j),perm2,R2,nMap2,par_perm2,R2->P);
+	MATELEM(D,R1->N+i,R1->N+j) = pPermPoly(MATELEM(D2,i,j),perm2,R2,nMap2,par_perm2,R2->P);
       }
     }
     sum->nc->C = C;
@@ -3461,8 +3485,11 @@ void rSetWeightVec(ring r, int *wv)
 
 #include <ctype.h>
 
-ring rOpp(ring src)
+ring rOpposite(ring src)
+  /* creates an opposite algebra of R */
+  /* that is R^opp, where f (*^opp) g = g*f  */
 {
+  ring save=currRing;  
   ring r=rCopy(src);
   // change vars v1..vN -> vN..v1
   int i;
@@ -3528,7 +3555,7 @@ ring rOpp(ring src)
       //case ro_wp64:
       case ro_syzcomp:
       case ro_syz:
-         WerrorS("not implemented in rOpp");
+         WerrorS("not implemented in rOpposite");
          // should not happen
          break;
 
@@ -3539,17 +3566,69 @@ ring rOpp(ring src)
         break;
       case ro_none:
       default:
-       Werror("unknown typ in rOpp(%d)",r->typ[i].ord_typ);
+       Werror("unknown type in rOpposite(%d)",r->typ[i].ord_typ);
        break;
     }
   }
   // avoid printing changed stuff:
-  r->order[0]=ringorder_unspec;
-  r->block0[0]=1;
-  r->block1[0]=rVar(r);
-  r->order[1]=0;
-#ifdef RDEBUG
-  rDebugPrint(r);
-#endif
+//   r->order[0]=ringorder_unspec;
+//   r->block0[0]=1;
+//   r->block1[0]=rVar(r);
+//   r->order[1]=0;
+// #ifdef RDEBUG
+//   rDebugPrint(r);
+//#endif
+  /* now, we initialize a non-comm structure on it */
+  rComplete(r); /* dare we? */
+  //#ifdef HAVE_PLURAL
+  if (!rIsPluralRing(src))
+  {
+    return(r);
+  }
+  rChangeCurrRing(r);  
+  /* basic nc constructions  */
+  r->nc = (nc_struct *)omAlloc0(sizeof(nc_struct));
+  r->nc->ref = 1; /* in spite of Copy(src)? */
+  r->nc->basering = r;
+  r->nc->type =  src->nc->type;
+  int *perm = (int *)omAlloc0((r->N+1)*sizeof(int));
+  int *par_perm = NULL;
+  nMapFunc nMap = nSetMap(src);
+  int j;
+  int ni,nj;
+  for(i=1; i<=r->N; i++)
+  {
+    perm[i] = r->N+1-i;
+  }
+  matrix C = mpNew(r->N,r->N);
+  matrix D = mpNew(r->N,r->N);
+  for (i=1; i< r->N; i++)
+  {
+    for (j=i+1; j<=r->N; j++)
+    {
+      ni = r->N +1 - i;
+      nj = r->N +1 - j; /* i<j ==>   nj < ni */
+      MATELEM(C,nj,ni) = pPermPoly(MATELEM(src->nc->C,i,j),perm,src,nMap,par_perm,src->P);
+      MATELEM(D,nj,ni) = pPermPoly(MATELEM(src->nc->D,i,j),perm,src,nMap,par_perm,src->P);
+    }
+  }
+  r->nc->C = C;
+  r->nc->D = D;
+  if (nc_InitMultiplication(r))
+    WarnS("Error initializing multiplication!");
+  r->nc->IsSkewConstant =   src->nc->IsSkewConstant;
+  rChangeCurrRing(save);
   return r;
+}
+
+ring rEnvelope(ring R)
+  /* creates an enveloping algebra of R */
+  /* that is R^e = R \tensor_K R^opp */
+{
+  ring Ropp = rOpposite(R);
+  ring Renv;
+  int stat = rSum(R, Ropp, Renv);
+  if (stat <=0)
+    WarnS("Error in rEnvelope at rSum");
+  return Renv;
 }

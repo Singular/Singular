@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.11 2004-07-29 14:58:00 Singular Exp $
+ *  Version: $Id: gring.cc,v 1.12 2004-08-13 18:26:03 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -1026,34 +1026,38 @@ poly nc_ReduceSpoly(poly p1, poly p2,poly spNoether, const ring r)
 #endif
     return(NULL);
   }
-  poly m=pOne();
+  poly m = pOne();
   p_ExpVectorDiff(m,p2,p1,r);
   //p_Setm(m,r);
 #ifdef PDEBUG
   p_Test(m,r);
 #endif
   /* pSetComp(m,r)=0? */
-  poly N=nc_mm_Mult_p(m,p_Head(p1,r),r);
-  number C=n_Copy(p_GetCoeff(N,r),r);
-  number cF=n_Copy(p_GetCoeff(p2,r),r);
+  poly   N  = nc_mm_Mult_p(m, p_Head(p1,r), r);
+  number C  = n_Copy( p_GetCoeff(N,  r), r);
+  number cF = n_Copy( p_GetCoeff(p2, r),r);
   /* GCD stuff */
-  number cG = nGcd(C,cF,r);
-  if (!nEqual(cG,n_Init(1,r)))
+  number cG = nGcd(C, cF, r);
+  if ( !nEqual(cG, n_Init(1,r) ) )
   {
-    cF = nDiv(cF,cG);
-    C  = nDiv(C,cG);
+    cF = nDiv(cF, cG);
+    C  = nDiv(C,  cG);
   }
-  p2=p_Mult_nn(p2,C,r);
+  p2 = p_Mult_nn(p2, C, r);
   poly out = nc_mm_Mult_p(m, p_Copy(pNext(p1),r), r);
-  N=p_Add_q(N,out,r);
-  number MinusOne=n_Init(-1,r);
+  N = p_Add_q(N, out, r);
+  p_Test(p2,r);
+  p_Test(N,r);
+  number MinusOne = n_Init(-1,r);
   if (!n_Equal(cF,MinusOne,r))
   {
-    cF=n_Neg(cF,r);
-    N=p_Mult_nn(N,cF,r);
+    cF = n_Neg(cF,r);
+    N  = p_Mult_nn(N, cF, r);
+    p_Test(N,r);
   }
-  out=p_Add_q(p2,N,r);
-  if (out!=NULL) pContent(out);
+  out = p_Add_q(p2,N,r);
+  p_Test(out,r);
+  if ( out!=NULL ) pContent(out);
   p_Delete(&m,r);
   n_Delete(&cF,r);
   n_Delete(&C,r);
@@ -2241,7 +2245,6 @@ ring nc_rCreateNCcomm(ring r)
   matrix C = mpNew(r->N,r->N);
   matrix D = mpNew(r->N,r->N);
   int i,j;
-  number One=r->cf->nInit(1);
   for(i=1; i<r->N; i++)
   {
     for(j=i+1; j<=r->N; j++)
@@ -2258,9 +2261,12 @@ ring nc_rCreateNCcomm(ring r)
   return r;
 }
 
-poly p_CopyEmbed(poly p, ring srcRing, int shift)
-  /* for use with embeddings: srcRing is a sum of smaller rings */
+poly p_CopyEmbed(poly p, ring srcRing, int shift, int par_shift)
+  /* NOT USED ANYMORE: replaced by maFindPerm in ring.cc */
+  /* for use with embeddings: currRing is a sum of smaller rings */
+  /* and srcRing is one of such smaller rings */
   /* shift defines the position of a subring in srcRing */
+  /* par_shift defines the position of a subfield in basefield of CurrRing */
 {
   if (currRing == srcRing)
   {
@@ -2268,14 +2274,14 @@ poly p_CopyEmbed(poly p, ring srcRing, int shift)
   }
   nMapFunc nMap=nSetMap(srcRing);
   poly q;
-  if ( nMap == nCopy)
-  {
-    q = prCopyR(p,srcRing);
-  }
-  else
+  //  if ( nMap == nCopy)
+  //  {
+  //    q = prCopyR(p,srcRing);
+  //  }
+  //  else
   {
     int *perm = (int *)omAlloc0((srcRing->N+1)*sizeof(int));
-    int *par_perm = NULL;
+    int *par_perm = (int *)omAlloc0((srcRing->P+1)*sizeof(int));
     //    int *par_perm = (int *)omAlloc0((srcRing->P+1)*sizeof(int));
     int i;
     //    if (srcRing->P > 0)
@@ -2288,8 +2294,10 @@ poly p_CopyEmbed(poly p, ring srcRing, int shift)
       Werror("bad shifts in p_CopyEmbed");
       return(0);
     }
-    for (i=1; i<=srcRing->N; i++)
-      perm[i]=shift+i;
+    for (i=1; i<= srcRing->N; i++)
+    {
+      perm[i] = shift+i;
+    }
     q = pPermPoly(p,perm,srcRing,nMap,par_perm,srcRing->P);
   }
   return(q);
