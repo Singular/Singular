@@ -1534,7 +1534,7 @@ See @ref{matrix expression}; @ref{poly expression}.
 @item @strong{Syntax:}
 @code{qring} name @code{=} ideal_expression @code{;}
 @item @strong{Purpose:}
-define a quotient ring as the base ring modulo a standard basis
+defines a quotient ring as the base ring modulo an ideal.
 
 The ideal must be a standard basis.
 The qring command performs a change of the base ring to this
