@@ -1,13 +1,16 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: emacs.cc,v 1.23 2002-06-07 12:44:33 bricken Exp $ */
+/* $Id: emacs.cc,v 1.24 2002-07-01 11:34:53 Singular Exp $ */
 /*
 * ABSTRACT: Esingular main file
 */
 
 #include <stdio.h>
 #include <unistd.h>
+#ifdef DecAlpha_OSF1
+#define _BSD
+#endif
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
@@ -196,7 +199,7 @@ int main(int argc, char** argv)
   }
 
 #ifdef ix86_Win
-#define EXTRA_XTERM_ARGS "+vb -sl 2000 -fb Courier-bold-12 -tn linux -cr Red3"
+#define EXTRA_XTERM_ARGS "+vb -sl 2000 -fb Courier-bold-12 -tn xterm -cr Red3"
 #else
 #define EXTRA_XTERM_ARGS ""
 #endif
@@ -307,11 +310,11 @@ int main(int argc, char** argv)
   strcat(syscall, ") \"singular\"))'");
 #endif
 
-//  if (no_emacs_call)
-//  {
+  if (no_emacs_call)
+  {
     printf("%s\n", syscall);
- // }
-//  else
+  }
+  else
   {
     if (system(syscall) != 0)
     {
