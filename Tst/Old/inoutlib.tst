@@ -8,5 +8,7 @@ example rMacaulay;
 example show;
 example split;
 example tab;
+example showrecursive;
+example writelist;
 LIB "tst.lib";tst_status(1);$
 
