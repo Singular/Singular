@@ -1,5 +1,5 @@
   @comment -*-texinfo-*-
-@comment $Id: plureference.doc,v 1.17 2004-05-27 20:04:03 levandov Exp $
+@comment $Id: plureference.doc,v 1.18 2004-06-01 12:46:40 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -66,7 +66,6 @@ The general syntax of a function is
 @node betti @value{PSUFFIX}, bracket, Functions @value{PSUFFIX}, Functions @value{PSUFFIX}
 @section betti @value{PSUFFIX}
 @cindex betti @value{PSUFFIX}
-@table @code
 @table @code
 @item @strong{Syntax:}
 @code{betti (} list_expression @code{)}
@@ -414,7 +413,7 @@ ideal J = d-1;
 ideal H = intersect(I,J);
 H;
 @c example
-@c//answer: [0,xy^2],[y^2,-xy]
+@c //answer: [0,xy^2],[y^2,-xy]
 @end smallexample
 @end table
 
@@ -876,7 +875,7 @@ See
 
 
 @c ---------------------------------------
-@node option @value{PSUFFIX},preimage@value{PSUFFIX}, nres @value{PSUFFIX}, Functions @value{PSUFFIX}
+@node option @value{PSUFFIX},preimage @value{PSUFFIX}, nres @value{PSUFFIX}, Functions @value{PSUFFIX}
 @section option @value{PSUFFIX}
 @cindex option @value{PSUFFIX}
 @table @code
@@ -1010,8 +1009,7 @@ See
 @c ref
 
 @c ---------------------------------------
-@node preimage@value{PSUFFIX}, quotient @value{PSUFFIX}, 
-option @value{PSUFFIX}, Functions @value{PSUFFIX}
+@node preimage@value{PSUFFIX}, quotient @value{PSUFFIX}, option @value{PSUFFIX}, Functions @value{PSUFFIX}
 @section preimage@value{PSUFFIX}
 @cindex preimage@value{PSUFFIX}
 

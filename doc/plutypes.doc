@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: plutypes.doc,v 1.18 2004-05-27 20:04:07 levandov Exp $
+@comment $Id: plutypes.doc,v 1.19 2004-06-01 12:46:40 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -50,7 +50,7 @@ For the general syntax of a declaration see
 
 @c ---------------------------------------
 
-@node ideal @value{PSUFFIX}, module @value{PSUFFIX}, Data types @value{PSUFFIX}, Data types @value{PSUFFIX}
+@node ideal @value{PSUFFIX}, map @value{PSUFFIX}, Data types @value{PSUFFIX}, Data types @value{PSUFFIX}
 @section ideal @value{PSUFFIX}
 @c @cindex ideal
 @cindex  untyped definitions 
@@ -529,7 +529,7 @@ substitute a ring variable (see @ref{subst})
 
 @c ---------------------------------------
 
-@node module @value{PSUFFIX}, poly @value{PSUFFIX}, ideal @value{PSUFFIX}, Data types @value{PSUFFIX}
+@node module @value{PSUFFIX}, poly @value{PSUFFIX}, map @value{PSUFFIX}, Data types @value{PSUFFIX}
 @section module @value{PSUFFIX}
 @cindex module @value{PSUFFIX}
 
