@@ -1,8 +1,11 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/febase.cc,v 1.1.1.1 1997-03-19 13:18:44 obachman Exp $";
+static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/febase.cc,v 1.2 1997-03-21 14:40:18 Singular Exp $";
 /* $Log: not supported by cvs2svn $
+// Revision 1.1.1.1  1997/03/19  13:18:44  obachman
+// Imported Singular sources
+//
 */
 
 /*
@@ -149,7 +152,7 @@ BOOLEAN tclmode=FALSE;
 FILE * feFopen(char *path, char *mode, char *where,int useWerror)
 {
   if (where!=NULL) strcpy(where,path);
-  if ((*mode=='a') ||(*mode=='w') || (strchr(path,DIR_SEP)!=NULL))
+  if ((*mode=='a') ||(*mode=='w') || (path[0]==DIR_SEP)||(path[0]=='.'))
     return fopen(path,mode);
   char found = 0;
   FILE * f=NULL;
