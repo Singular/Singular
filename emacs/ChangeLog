@@ -1,3 +1,122 @@
+1999-08-27  Jens Schmidt  <schmidt@de.oracle.com>
+
+	* .bashrc (STARTUP): load `cmpl-hlp.el' now
+
+	* singular.el: `Online help' folding finished
+
+1999-08-26  Jens Schmidt  <schmidt@de.oracle.com>
+
+	* singular.el (singular-error): new function
+
+	* .bashrc: adapted to new Singular version
+
+	* .emacs-singular: code removed that starts Singular
+
+	* .emacs-singular: code added to add global menus for Emacs and
+	  XEmacs
+
+	* .emacs-singular: settings for `singular-help-same-window'
+	  added.  Settings for `singular-history-keys' and
+	  `singular-cursor-keys' removed.
+
+1999-08-24  Jens Schmidt  <schmidt@de.oracle.com>
+
+	* singular.el (singular-same-window): new defcustom
+	  (singular): uses the above variable to pop to buffer
+
+	* singular.el: Folding `Starting Singular' renamed to `Starting
+	  and stopping Singular'
+	  (singular-exit-singular): moved to that folding
+
+	* singular.el (singular-move-on-send): marked as user option
+
+	* singular.el (singular-demo-last-directory): new variable
+	  (singular-demo-mode-init): makes the above variable buffer-local
+	  (singular-demo-load): uses and sets the above variable in
+	  interactive specifier
+
+	* singular.el (singular-demo-print-messages,
+	  singular-demo-exit-on-load): default values changed
+
+	* singular.el (singular-demo-chunk-regexp,
+	  singular-demo-print-messages, singular-demo-exit-on-load,
+	  singular-demo-load-directory): marked as user options
+
+	* singular.el: Lots of changes to `Online help' folding.  Is still
+	  quiet experimental.
+
+	* singular.el (singular-history-ignoredups, singular-history-size,
+	  singular-history-filter-regexp,
+	  singular-history-explicit-file-name): marked as user options
+
+	* singular.el (singular-beginning-of-line): new function
+
+	* singular.el (singular-toggle-truncate-lines): bug fix.  Does
+	  frame refresh now after toggling value.
+
+	* singular.el (singular-pop-to-buffer): new function.  Used in
+	  `singular-help' and `singular'.
+
+	* singular.el (singular-cursor-key-model): new defcustom replacing
+	  former `singular-history-keys' and `singular-cursor-keys'
+	  (singular-cursor-key-model-set): new function replacing former
+	  `singular-history-cursor-keys-set' and
+	  `singular-history-cursor-key-set'
+	  static initialization removed
+
+	* singular.el (singular-interactive-mode-map): key bindings added
+	  for:
+	  `singular-help'
+	  `singular-beginning-of-line'
+	  `singular-toggle-truncate-lines'
+	  `singular-demo-load'
+	  `singular-load-library'
+	  `singular-load-file'
+	  `singular-restart'
+	  `singular-exit-singular'
+
+	* singular.el (singular): new customizing group
+	  (singular-interactive): made a subgroup of the above group
+
+1999-08-20  Jens Schmidt  <schmidt@de.oracle.com>
+
+	* singular.el (singular-move-on-send): new defcustom
+	  (singular-get-old-input, singular-send-or-copy-input): slightly
+	  rewritten
+
+	* singular.el (singular-demo-chunk-regexp,
+	  singular-demo-print-messages, singular-demo-exit-on-load,
+	  singular-demo-load-directory): `:initialize' tags added
+
+	* singular.el: folding `Skipping and stripping prompts and
+	  newlines ...' completely rewritten.  Almost all variables
+	  and constants removed.  Functions and variables renamed:
+
+	  singular-skip-prompt-forward to singular-prompt-skip-forward
+	  singular-skip-prompt-backward to singular-prompt-skip-backward
+	  singular-strip-leading-prompt to singular-prompt-remove-string
+	  singular-remove-prompt to singular-prompt-remove-region
+	  singular-remove-prompt-filter to singular-prompt-remove-filter
+	  singular-strip-white-space to singular-white-space-strip
+	  singular-prompt-regexp to singular-comint-prompt-regexp
+
+	  All references changed.  New function `singular-prompt-init'
+	  added which is called in `singular-interactive-mode'
+	
+	* .emacs-singular: loads customization from ~/.emacs-singular-cust
+	  if present
+
+	* .emacs-singular: loads singular.el from
+	  `singular-emacs-home-directory'
+
+	* .emacs-singular: code added to remove "Load .emacs" menu entry
+	  on XEmacs
+
+	* .emacs-singular: doc fixes
+
+	* .bashrc: variables `singular-emacs-home-directory' and
+	  `singular-help-file-name' added to commandlines
+
 1999-08-18  T. Wichmann  <wichmann@arboretum.itwm.uni-kl.de>
         * singular.el singular-help-file-name variable introduced
 	  added section for singular-*-alists
@@ -17,12 +136,43 @@
 	  new functions (singular), (singular-restart), (singular-other)
 	  new variables for last singular arguments incl. history
 	  
+1999-08-15  Jens Schmidt  <schmidt@de.oracle.com>
+
+	* singular.el: new folding `Sending input interactive'.  Functions
+	  `singular-get-old-input' and `singular-send-or-copy-input' moved
+	  to that folding.
+
+	* singular.el: folding `Skipping and stripping prompts and
+	  newlines ...' renamed to `Skipping and stripping prompts and
+	  whitespace ...'
+
+	* singular.el (singular-interactive-mode): slightly re-organized
+
+	* singular.el (singular-demo-show-next-chunk): bug fix
+
+	* singular.el (singular-section-kill): new function
+	  (singular-interactive-mode-map): key binding added for the
+	  aforementioned function
+
+	* singular.el (singular-section-to-string): renamed from
+	  `singular-input-section-to-string'.  Optional argument END
+	  removed.  All callers changed.
+
+	* singular.el (singular-section-check): new function
+	  singular.el (singular-folding-fold, singular-folding-unfold):
+	  use `singular-section-check'
 
 1999-08-11  T. Wichmann  <wichmann@arboretum.itwm.uni-kl.de>
 
 	* singular.el: code for menu support rewritten
 	  scanning of singular header implemented
 	  dynamic completion implemented
+
+1999-08-10  Jens Schmidt  <schmidt@de.oracle.com>
+
+	* singular.el (singular-history-insert): does not check
+	  `singular-demo-insert-into-history' any longer
+	  (singular-demo-insert-into-history): variable removed
 
 1999-08-09  Jens Schmidt  <schmidt@de.oracle.com>
 
