@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: scanner.l,v 1.13 1998-06-02 15:30:04 Singular Exp $ */
+/* $Id: scanner.l,v 1.14 1998-12-14 14:27:43 Singular Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -110,9 +110,11 @@ parname        #
                            yy_noeof=0;
                          }
 pause[ \t\n]*[\.;]       { fePause(); }
-while                    { blocknest = 0; yy_noeof = noeof_brace; BEGIN(brace);
+while                    { prompt_char='.';
+                           blocknest = 0; yy_noeof = noeof_brace; BEGIN(brace);
                            return WHILE_CMD;}
-for                      { blocknest = 0; yy_noeof = noeof_brace; BEGIN(brace);
+for                      { prompt_char='.';
+                           blocknest = 0; yy_noeof = noeof_brace; BEGIN(brace);
                            return FOR_CMD;}
 
 ("help"|"?")[ \t\n]*     { yy_noeof = noeof_asstring;
