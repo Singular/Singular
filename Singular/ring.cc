@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.127 2000-10-24 16:33:49 Singular Exp $ */
+/* $Id: ring.cc,v 1.128 2000-10-25 09:23:24 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -3001,7 +3001,7 @@ BOOLEAN rComplete(ring r, int force)
   rSetVarL(r);
   // ----------------------------
   // set NegWeightL*
-  rSetNegWeightL(r);
+  rSetNegWeight(r);
   return FALSE;
 }
 
