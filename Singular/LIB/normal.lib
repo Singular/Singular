@@ -5,7 +5,7 @@
 // written by Gert-Martin Greuel and Gerhard Pfister
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: normal.lib,v 1.7 1998-06-17 09:23:17 pfister Exp $";
+version="$Id: normal.lib,v 1.8 1998-07-27 09:13:02 obachman Exp $";
 info="
 LIBRARY: normal.lib: PROCEDURE FOR NORMALIZATION (I)
 
@@ -253,6 +253,10 @@ EXAMPLE: example HomJJ;  shows an example
       }
       ideal endphi = maxideal(1);
       ideal endid = fetch(P,id);
+      L=substpart(endid,endphi,homo,rw);
+      def lastRing=L[1];
+      setring lastRing;
+
       attrib(endid,"isCohenMacaulay",isCo);
       attrib(endid,"isPrim",isPr);
       attrib(endid,"isIsolatedSingularity",isIso);
@@ -260,16 +264,17 @@ EXAMPLE: example HomJJ;  shows an example
       attrib(endid,"isEqudimensional",isEq);
       attrib(endid,"isCompleteIntersection",0);
       attrib(endid,"isRad",0);
-      export endid;
-      export endphi;
-      L = newR1;
+//      export endid;
+//      export endphi;
+//      L = newR1;
+      L=lastRing;
       L = insert(L,1,1);
       dbprint(printlevel-voice+3,"// case R = Hom(J,J)");
       if(y==1)
       {
          "R=Hom(rad(J),rad(J))";
          "   ";
-         newR1;
+         lastRing;
          "   ";
          "the new ideal";
          endid;
@@ -283,7 +288,7 @@ EXAMPLE: example HomJJ;  shows an example
          setring P;
          id;
          "   ";
-         setring newR1;
+         setring lastRing;
          "the map";
          "   ";
          endphi;
@@ -384,69 +389,9 @@ EXAMPLE: example HomJJ;  shows an example
    ideal endid  = imap(newR,id)+imap(newR,Q);
    ideal endphi = ideal(X(1..nvars(R)));
 
-   map phi = basering,maxideal(1);
-   list Le = elimpart(endid);
-           //this proc and the next loop try to
-   q = size(Le[2]);                 //substitute as many variables as possible
-   rw1 = 0;
-   rw1[nvars(basering)] = 0;
-   rw1 = rw1+1;
-
-   while( size(Le[2]) != 0 )
-   {
-      endid = Le[1];
-      map ps = newRing,Le[5];
-      phi = phi(ps);
-      kill ps;
-
-      for( ii=1; ii<=size(rw1); ii++ )
-      {
-         if( Le[4][ii]==0 )
-         {
-            rw1[ii]=0;                             //look for substituted vars
-         }
-      }
-      Le=elimpart(endid);
-      q = q + size(Le[2]);
-   }
-   endphi = phi(endphi);
-
-//---------- return -----------------------------------------------------------
-// in the homogeneous case put weights for the remaining vars correctly, i.e.
-// delete from rw those weights for which the corresponding entry of rw1 is 0
-
-   if (homo==1 && nvars(newRing)-q >1 && size(endid) >0 )
-   {
-      jj=1;
-      for( ii=2; ii<size(rw1); ii++)
-      {
-         jj++;
-         if( rw1[ii]==0 )
-         {
-            rw=rw[1..jj-1],rw[jj+1..size(rw)];
-            jj=jj-1;
-         }
-      }
-      if( rw1[1]==0 ) { rw=rw[2..size(rw)]; }
-      if( rw1[size(rw1)]==0 ){ rw=rw[1..size(rw)-1]; }
-
-      ring lastRing = char(R),(T(1..nvars(newRing)-q)),(a(rw),dp);
-   }
-   else
-   {
-      ring lastRing = char(R),(T(1..nvars(newRing)-q)),dp;
-   }
-
-   ideal lastmap;
-   q = 1;
-   for(ii=1; ii<=size(rw1); ii++ )
-   {
-      if ( rw1[ii]==1 ) { lastmap[ii] = T(q); q=q+1; }
-      if ( rw1[ii]==0 ) { lastmap[ii] = 0; }
-   }
-   map phi = newRing,lastmap;
-   ideal endid  = phi(endid);
-   ideal endphi = phi(endphi);
+   L=substpart(endid,endphi,homo,rw);
+   def lastRing=L[1];
+   setring lastRing;
    attrib(endid,"isCohenMacaulay",isCo);
    attrib(endid,"isPrim",isPr);
    attrib(endid,"isIsolatedSingularity",isIso);
@@ -454,9 +399,9 @@ EXAMPLE: example HomJJ;  shows an example
    attrib(endid,"isEquidimensional",isEq);
    attrib(endid,"isCompleteIntersection",0);
    attrib(endid,"isRad",0);
-   export(endid);
-   export(endphi);
-   if(y==1)
+  // export(endid);
+  // export(endphi);
+	   if(y==1)
    {
       "the new ring after reduction of the number of variables";
       "   ";
@@ -651,15 +596,8 @@ EXAMPLE: example normal; shows an example
 }
 example
 { "EXAMPLE:"; echo = 2;
- //Theo1
- ring r=32003,(x,y,z),wp(2,3,6);
- ideal i=zy2-zx3-x6;
+   ring  r = 0,(x,y,z),dp;
 
- list pr=normal(i);
- def r1=pr[1];
- setring r1;
- KK;
- setring r;
 }
 
 
@@ -689,7 +627,7 @@ EXAMPLE: example normalizationPrimes; shows an example
    ideal J,SB,MB,KK;
    int depth,lauf,prdim;
    int ti=timer;
-
+   
    if(size(i)==0)
    {
       if(y==1)
@@ -793,10 +731,16 @@ EXAMPLE: example normalizationPrimes; shows an example
             "the ideal was smooth";
          }
          MB=SM[2];
-         execute "ring newR6="+charstr(basering)+",("+varstr(basering)+"),("
-                      +ordstr(basering)+");";
-         ideal KK=fetch(BAS,MB);
-         ideal PP=fetch(BAS,ihp);
+         intvec rw;
+         list LL=substpart(MB,ihp,0,rw);
+         def newR6=LL[1];
+         setring newR6;
+         ideal KK=endid;
+         ideal PP=endphi;
+//        execute "ring newR6="+charstr(basering)+",("+varstr(basering)+"),("
+//                      +ordstr(basering)+");";
+//         ideal KK=fetch(BAS,MB);
+//         ideal PP=fetch(BAS,ihp);
          export PP;
          export KK;
          result=newR6;
@@ -813,10 +757,16 @@ EXAMPLE: example normalizationPrimes; shows an example
          "the ideal was zero-dimensional and homogeneous";
       }
       MB=maxideal(1);
-      execute "ring newR5="+charstr(basering)+",("+varstr(basering)+"),("
-                      +ordstr(basering)+");";
-      ideal KK=fetch(BAS,MB);
-      ideal PP=fetch(BAS,ihp);
+      intvec rw;
+      list LL=substpart(MB,ihp,0,rw);
+      def newR5=LL[1];
+      setring newR5;
+      ideal KK=endid;
+      ideal PP=endphi;
+//      execute "ring newR5="+charstr(basering)+",("+varstr(basering)+"),("
+//                      +ordstr(basering)+");";
+//      ideal KK=fetch(BAS,MB);
+//      ideal PP=fetch(BAS,ihp);
       export PP;
       export KK;
       result=newR5;
@@ -835,10 +785,16 @@ EXAMPLE: example normalizationPrimes; shows an example
          "the ideal defines a line";
       }
       MB=SM[2];
-      execute "ring newR4="+charstr(basering)+",("+varstr(basering)+"),("
-                      +ordstr(basering)+");";
-      ideal KK=fetch(BAS,MB);
-      ideal PP=fetch(BAS,ihp);
+      intvec rw;
+      list LL=substpart(MB,ihp,0,rw);
+      def newR4=LL[1];
+      setring newR4;
+      ideal KK=endid;
+      ideal PP=endphi;
+//      execute "ring newR4="+charstr(basering)+",("+varstr(basering)+"),("
+//                      +ordstr(basering)+");";
+//      ideal KK=fetch(BAS,MB);
+//      ideal PP=fetch(BAS,ihp);
       export PP;
       export KK;
       result=newR4;
@@ -915,10 +871,16 @@ EXAMPLE: example normalizationPrimes; shows an example
             "it is smooth";
          }
          MB=SM[2];
-         execute "ring newR3="+charstr(basering)+",("+varstr(basering)+"),("
-                      +ordstr(basering)+");";
-         ideal KK=fetch(BAS,MB);
-         ideal PP=fetch(BAS,ihp);
+         intvec rw;
+         list LL=substpart(MB,ihp,0,rw);
+//         execute "ring newR3="+charstr(basering)+",("+varstr(basering)+"),("
+//                      +ordstr(basering)+");";
+         def newR3=LL[1];
+         setring newR3;
+//         ideal KK=fetch(BAS,MB);
+//         ideal PP=fetch(BAS,ihp);
+         ideal KK=endid;
+         ideal PP=endphi;
          export PP;
          export KK;
          result=newR3;
@@ -1149,7 +1111,7 @@ EXAMPLE: example normalizationPrimes; shows an example
          def lastR=RS[1];
          setring lastR;
          ideal KK=endid;
-         ideal PP=fetch(BAS,ihp);
+         ideal PP=endphi;
          export PP;
          export KK;
          setring BAS;
@@ -1231,17 +1193,98 @@ EXAMPLE: example normalizationPrimes; shows an example
 }
 example
 { "EXAMPLE:";echo = 2;
-//Theo1
-ring r=32003,(x,y,z),wp(2,3,6);
-ideal i=zy2-zx3-x6;
+   LIB"normal.lib";
+   //Huneke
+ring qr=31991,(a,b,c,d,e),dp;
+ideal i=
+5abcde-a5-b5-c5-d5-e5,
+ab3c+bc3d+a3be+cd3e+ade3,
+a2bc2+b2cd2+a2d2e+ab2e2+c2de2,
+abc5-b4c2d-2a2b2cde+ac3d2e-a4de2+bcd2e3+abe5,
+ab2c4-b5cd-a2b3de+2abc2d2e+ad4e2-a2bce3-cde5,
+a3b2cd-bc2d4+ab2c3e-b5de-d6e+3abcd2e2-a2be4-de6,
+a4b2c-abc2d3-ab5e-b3c2de-ad5e+2a2bcde2+cd2e4,
+b6c+bc6+a2b4e-3ab2c2de+c4d2e-a3cde2-abd3e2+bce5;
 
 list pr=normal(i);
 def r1=pr[1];
 setring r1;
 KK;
-setring r;
 }
 
+proc substpart(ideal endid,ideal endphi, int homo, intvec rw) 
+{
+   def newRing=basering;
+   int ii,jj;
+   map phi = basering,maxideal(1);
+   list Le = elimpart(endid);
+           //this proc and the next loop try to
+   int q = size(Le[2]);              //substitute as many variables as possible
+   intvec rw1 = 0;                   //indices of substituted variables
+   rw1[nvars(basering)] = 0;
+   rw1 = rw1+1;
+
+   while( size(Le[2]) != 0 )
+   {
+      endid = Le[1];
+      map ps = newRing,Le[5];
+      phi = ps(phi);
+      kill ps;
+
+      for( ii=1; ii<=size(rw1); ii++ )
+      {
+         if( Le[4][ii]==0 )
+         {
+            rw1[ii]=0;                             //look for substituted vars
+         }
+      }
+      Le=elimpart(endid);
+      q = q + size(Le[2]);
+   }
+   endphi = phi(endphi);
+
+//---------- return -----------------------------------------------------------
+// in the homogeneous case put weights for the remaining vars correctly, i.e.
+// delete from rw those weights for which the corresponding entry of rw1 is 0
+
+   if (homo==1 && nvars(newRing)-q >1 && size(endid) >0 )
+   {
+      jj=1;
+      for( ii=2; ii<size(rw1); ii++)
+      {
+         jj++;
+         if( rw1[ii]==0 )
+         {
+            rw=rw[1..jj-1],rw[jj+1..size(rw)];
+            jj=jj-1;
+         }
+      }
+      if( rw1[1]==0 ) { rw=rw[2..size(rw)]; }
+      if( rw1[size(rw1)]==0 ){ rw=rw[1..size(rw)-1]; }
+
+      ring lastRing = char(basering),(T(1..nvars(newRing)-q)),(a(rw),dp);
+   }
+   else
+   {
+      ring lastRing = char(basering),(T(1..nvars(newRing)-q)),dp;
+   }
+
+   ideal lastmap;
+   q = 1;
+   for(ii=1; ii<=size(rw1); ii++ )
+   {
+      if ( rw1[ii]==1 ) { lastmap[ii] = T(q); q=q+1; }
+      if ( rw1[ii]==0 ) { lastmap[ii] = 0; }
+   }
+   map phi = newRing,lastmap;
+   ideal endid  = phi(endid);
+   ideal endphi = phi(endphi);
+   export(endid);
+   export(endphi);
+   list L = lastRing;
+   setring newRing;
+   return(L);
+}
 
 
 /////////////////////////////////////////////////////////////////////////////
