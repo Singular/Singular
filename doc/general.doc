@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.6 1998-04-27 16:41:09 krueger Exp $
+@comment $Id: general.doc,v 1.7 1998-04-28 09:29:52 krueger Exp $
 @comment this file contains the general information about Singular
 
 @menu
@@ -11,6 +11,7 @@
 * Debugging tools::
 * Implemented algorithms::      
 @end menu
+
 @c ---------------------------------------------------------------------------
 @node Interactive use, Rings and orderings, General concepts, General concepts
 @section Interactive use
@@ -28,42 +29,293 @@
 * Commandline options::
 @end menu
 
+@c --------------------------------------------------------------------------
+@c @node How to enter and exit -- command line options,General syntax,,Command Syntax
 @node How to enter and exit,Singular prompt and error recovery  , Interactive use, Interactive use
 @subsection How to enter and exit
 @cindex How to enter and exit
 
+@*To start @sc{Singular}, enter @code{Singular} at the system prompt.
+@*You will get a header with the version name, the compilation date
+and a short remark how to get help on
+@sc{Singular}.
+Enter @code{help;} to get the online manual at the @sc{Singular} prompt
+@code{>}.
+Commands are always ended with a @code{;} (semicolon) and @code{<ENTER>}.
+Spaces and commas are always considered as separators. 
+@*To exit @sc{Singular} enter @code{quit;}, @code{exit;} or @code{$}.
+
+
+@sc{Singular} may also be started with command-line options and with 
+filenames as arguments. More generally, the synopsis of @sc{Singular} is
+@*@code{  Singular  [options] [file1 [file2 ...]] }
+@ref{Commandline options}
+@menu
+* Commandline options::
+@end menu
+
+@*On start-up, @sc{Singular} 
+@enumerate
+@item 
+loads the library @code{standard.lib} (provided the @code{--no-stdlib}
+was not given)
+
+@item
+searches the current directory and then the
+home directory of the user for a file named @code{.singularrc} and
+executes it, if found (provided the @code{--no-rc} options was not
+given)
+
+@item 
+executes the files @code{file1}, @code{file2} ...  (given on the command
+line) in that order. 
+@end enumerate
+
+Unless otherwise specified, @sc{Singular} locates all (data) files and
+libraries by first searching for them in the current working directory,
+and then by searching through all the directories specified by the
+environment variable @code{SINGULARPATH} (@code{SPATH} on DOS-based
+systems) and finally by searching through some default directories
+(e.g., @code{/usr/local/share/Singular}).
+
+@c --------------------------------------------------------------------------
 @node Singular prompt and error recovery,The online help system,How to enter and exit, Interactive use
 @subsection Singular prompt and error recovery
 @cindex Singular prompt and error recovery
+@cindex prompt
+@cindex error recovery
+The @sc{Singular} prompt @code{>}
+asks the user for input of a command, while the prompt @code{.}
+asks the user for input of missing parts of a command (remember the
+semicolon @code{;} at the end of every command). If your input
+is erroneous @sc{Singular} may miss the semicolon.
+(It may be missed because @code{Singular} needs first a @code{"} or @code{@}}.)
+On the other hand additional @code{;} will not harm @sc{Singular}:
+extra semicolons are interpreted as empty statements.
 
+@c --------------------------------------------------------------------------
 @node The online help system,Interrupting SINGULAR,Singular prompt and error recovery,Interactive use
 @subsection The online help system
 @cindex The online help system
 
+@c --------------------------------------------------------------------------
 @node Interrupting SINGULAR,Editing Input,The online help system,Interactive use
 @subsection Interrupting SINGULAR
 @cindex Interrupting SINGULAR
 
+@c --------------------------------------------------------------------------
 @node Editing Input,Control parameters,Interrupting SINGULAR,Interactive use
 @subsection Editing Input
 @cindex Editing Input
 
+If the command line option @code{-t} is not given,
+@sc{Singular} redefines the terminal characteristics
+@footnote{
+therefore the comandline option @code{-t} must be given if @sc{Singular} should
+run in the background
+}
+and the following keys can be used for editing
+the input and retrieving previous input lines
+(CTL denotes the control key):
+@table @kbd
+@item CTL-A
+goto to the start of the line
+@item CTL-B
+go one character to the left
+@item CTL-D
+erase the character under the cursor
+(or return @kbd{EOF}, if the current line is empty)
+@item CTL-E
+goto to the end of the line
+@item CTL-F
+go one character to the right
+@item BACKSPACE
+@itemx DELETE
+@itemx CTL-H
+erase the character before the cursor
+@item CTL-K
+kill the rest of the line
+@item CTL-N
+save the current line to the history and get the next line
+@item CTL-P
+save the current line to the history and get the previous line
+@item CTL-U
+kill the whole line
+@item RETURN
+save the current line to the history and
+send it to the Singular parser for interpretation
+@end table
+@* @strong{Remark:}
+@* There is a history of the last 32 unique lines.
+@* This section does not apply to the MPW-Macintosh version of
+@sc{Singular}.
+@* This section describes only a subset of the key bindings of
+@sc{Singular}s built with @code{readline}. See the @code{readline} manual
+for the key bindings.
+
+@c --------------------------------------------------------------------------
 @node Control parameters,Sources of input,Editing Input,Interactive use
 @subsection Control parameters
 @cindex Control parameters
 
+You may wish to set some control parameters. Most often used are
+@code{timer}, @code{option(prot)} and @code{pagewidth}.
+
+@itemize @bullet
+@item
+If @code{timer} is set to 1 the time (in sec) used for the execution of
+a command
+is displayed if it is bigger than 0.5 sec (Unix: CPU-time
+or Macintosh/MSDOS: time between two commands).
+@item
+@code{option(prot)} shows a short protocol during std-computation: the
+number between brackets () is the number of critical pairs still
+to be reduced (except immediatly after an H 'high corner' where it shows the
+degree above which all monomials can be discarded), a - sign indicates
+that one critical pair has been reduced (either to 0 or to a new
+s-polynomial which indicated by an s), a number without brackets
+shows the degree in which the computation takes place (this is in
+particular useful if the input is homogeneous).
+There are many more options, mostly used to control the strategies
+for the std-computations, see the manual or type @code{help option;}.
+@item
+@code{pagewidth} sets the number of characters in a line printed on the
+screen.
+@item
+verbose controls messages like warnings, loading libs, etc., see the
+manual or type @code{help verbose;}.
+@end itemize
+
+@example
+pagewidth = 80;        // set pagewidth to 80 characters
+option(prot);          // short protocoll
+timer = 1;             // activate the timer
+verbose(noredefine);   // supress redefine-warnings
+@end example
+
+It is useful to have a file say, init, in which your preferred
+parameters are set. Such a file could also contain the commands
+for loading those libraries which you usually use. If you start
+by typing '@code{Singular init}' the @code{init} file and hence all commands
+contained in @code{init} are executed.
+
+@c --------------------------------------------------------------------------
 @node Sources of input,Reuse of output,Control parameters,Interactive use
 @subsection Sources of input
 @cindex Sources of input
 
+@c --------------------------------------------------------------------------
 @node Reuse of output,Commandline options,Sources of input,Interactive use
 @subsection Reuse of output
 @cindex Reuse of output
 
+The possibility to re-use the last printed result
+turned out to be a useful feature, which is still under development.
+@*The most recently printed expression is still available
+under the special name @code{_}, e.g.
+@example
+@c example
+  ring r;
+  ideal i=x2+y3,y3+z4,y5+z2;
+  std(i);
+  ideal k=_;
+  k;
+  ideal kk=_+_*x;
+  kk;
+  LIB "general.lib";
+  write("", which("Singular"));
+@c example
+@end example
+
+@c --------------------------------------------------------------------------
 @node Commandline options, ,Reuse of output,Interactive use
 @subsection Commandline options
 @cindex Commandline options
 
+@*with the options (which can be given in both, their long and
+short format):
+@table @asis
+
+@item @code{-b},@code{--batch} 
+Run in MP batch mode. Opens a TCP/IP connection with host specified by
+@code{--MPhost} at the port specified by @code{--MPport}. Input is read
+from and output is written to this connection in the MP format.
+
+@item @code{-h},@code{--help} 
+Print a short help message and exit.
+
+@item @code{-q},@code{--quiet}
+Do not print start-up banner and warnings and redirect stderr (all error
+messages)  to stdout (normal output channel).
+
+@item @code{-t},@code{--no-tty} 
+Do not redefine the terminal characteristics (useful for batch
+processes, see @ref{Editing Input}).  
+
+@item @code{-v},@code{--version}             
+Print extended information about the version and configuration of
+@sc{Singular}  (used optional parts, compilation date, start of random
+generator etc.). This information should be included if a user reports
+an error to the authors.
+
+@item @code{-e},@code{--echo[=VAL]} 
+Set value of variable @code{echo} to @code{VAL} (integer in the range 0
+.. 9). Without an argument, @code{echo} is set to 1, which echoes all
+input coming from a file. By default, the value of @code{echo} is 0. See
+also @ref{System variables}.
+
+@item @code{-c},@code{--execute=STRING} 
+Execute @code{STRING} as a (sequence) of @sc{Singular} commands on
+start-up after the @code{.singularrc} file is executed, but prior to
+executing the files given on the command line.
+
+@item @code{-r},@code{--random=SEED}         
+Seed (i.e., set initial value of) pseudo random generator with integer
+(integer) @code{SEED} (integer). If this option is not given, then the
+random generated is seeded with a time-based @code{SEED} (e.g., the
+number of seconds since January, 1, 1970, on Unix systems).
+
+@item @code{-u},@code{--user-option=STRING}
+Returns @code{STRING} on @code{system("--user-option")}. This is useful
+for passing arbitrary arguments (like filenames) from the command line to 
+the @sc{Singular} interpreter (i.e. top-level of @sc{Singular}).
+
+@item @code{--no-stdlib}
+Do not load the library @code{standard.lib} on start-up. By default,
+this library is loaded on start-up.
+
+@item @code{--no-rc}               
+Do not execute the @code{.singularrc} file on start-up. By default,
+@sc{Singular} searches first in the current directory and then in the
+home directory of the user for a file named @code{.singularrc}. If it is 
+found, then it is executed after the library @code{standard.lib} is
+loaded and prior to executing the string specified by
+@code{--user-option}.
+
+@item @code{--min-time=SECS}
+If the @code{timer} variables is set, do only report times larger than
+@code{SECS} seconds (@code{SECS} needs to be a floating point number
+greater than 0). By default, this value is set to 0.5 (i.e., half a
+second).
+
+@item @code{--MPport=PORT} 
+Use @code{PORT} as default port number for MP connections (whenever not
+further specified) . This option is mandatory when the @code{--batch}
+option is given. See also @ref{MPtcp links}.
+
+@item @code{--MPhost=HOST}
+Use @code{HOST} as default host for MP connections (whenever not
+further specified) . This option is mandatory when the @code{--batch}
+option is given. See also @ref{MPtcp links}.
+
+@item @code{--ticks-per-sec=TICKS} 
+Sets unit of timer to @code{TICKS} per second (i.e. the value reported by 
+the @code{timer} variable multiplied by @code{TICKS} gives the time in
+seconds.By default, this value is 1.
+
+@end table
+
+@c --------------------------------------------------------------------------
 @c ---------------------------------------------------------------------------
 @node Rings and orderings, The SINGULAR language, Interactive use, General concepts
 @section Rings and orderings
@@ -92,12 +344,13 @@
 @section The SINGULAR language
 @cindex The SINGULAR language
 
+
 @menu
 * General command syntax::      
 * Names and objects::           
 * Special characters::          
 * Controll structures::         
-* Proc Commands::               
+* Proc commands::               
 @end menu
 
 @node General command syntax, Names and objects, The SINGULAR language, The SINGULAR language
@@ -112,13 +365,16 @@
 @subsection Special characters
 @cindex Special characters
 
-@node Controll structures, Proc Commands, Special characters,The SINGULAR language 
+@c @node Controll structures, Proc Commands, Special characters,The SINGULAR language 
+@node Controll structures, , Special characters,The SINGULAR language 
 @subsection Controll structures
 @cindex Controll structures
 
-@node Proc Commands, ,Controll structures, The SINGULAR language
-@subsection Proc Commands
-@cindex Proc Commands
+@clear proccommandsmain
+@c @subsection Proc commands
+@c @cindex Proc commands
+@c @node Proc Commands, ,Controll structures, The SINGULAR language 
+@c @include proccommands.tex
 
 @c ---------------------------------------------------------------------------
 @include libraries.tex
