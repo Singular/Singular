@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.76 2002-03-08 09:40:23 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.77 2002-03-08 10:30:56 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -390,7 +390,7 @@ static proc saturate()
   H=std(H0);
 
   dbprint(printlevel-voice+2,"// transform H'' to saturation of H''");
-  H0=division(freemodule(mu)*s^k,H,k,intvec(1))[1];
+  H0=division(freemodule(mu)*s^k,H,k*deg(s))[1];
 
   return(A0,r,H,H0,k);
 }
@@ -404,9 +404,8 @@ static proc tjet(matrix A0,ideal r,module H,int k0,int K)
   matrix C;
   C,r=l[1..2];
   A0=A0+C;
-
   dbprint(printlevel-voice+2,"// transform A to saturation of H''");
-  matrix A=division(A0*H+s^2*diff(matrix(H),s),H,K+1,intvec(1))[1]/s;
+  matrix A=division(A0*H+s^2*diff(matrix(H),s),H,(K+1)*deg(s))[1]/s;
 
   return(A,A0,r);
 }
@@ -1123,7 +1122,7 @@ EXAMPLE:  example tmatrix; shows examples
 
   dbprint(printlevel-voice+2,"// transform to V-splitting basis");
   A=jet(A,0);
-  H=std(division(H,U,k0+k1,intvec(1))[1]);
+  H=std(division(H,U,(k0+k1)*deg(s))[1]);
 
   dbprint(printlevel-voice+2,"// compute V-leading terms of H''");
   int i0,j0;
@@ -1234,7 +1233,7 @@ EXAMPLE:  example tmatrix; shows examples
   attrib(H,"isSB",1);
 
   dbprint(printlevel-voice+2,"// compute matrix A0+sA1 of t");
-  A=division(s*A*H+s^2*diff(matrix(H),s),H,1,intvec(1))[1];
+  A=division(s*A*H+s^2*diff(matrix(H),s),H,deg(s))[1];
   A0=jet(A,0);
   A=jet(A,1)/s;
 
