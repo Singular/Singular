@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.31 2000-09-25 12:26:34 obachman Exp $ */
+/* $Id: kutil.h,v 1.32 2000-10-04 13:12:03 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -57,7 +57,7 @@ public:
   KINLINE void Iter(ring r = currRing);
   KINLINE void Tail_Minus_mm_Mult_qq(poly m, poly qq, int lq, poly spNoether);
   KINLINE void sLObject::Tail_Mult_nn(number n);
-  KINLINE poly GetP(ring LmRing = currRing);
+  KINLINE poly GetP(ring LmRing = currRing, omBin bin = NULL);
   KINLINE void CanonicalizeP();
 };
 
@@ -125,19 +125,15 @@ public:
   BOOLEAN posInLOldFlag;
   BOOLEAN use_buckets;
   ring tailRing;
+  omBin lmBin;
+  omBin tailBin;
   /*FALSE, if posInL == posInL10*/
   char    redTailChange;
   char    news;
   char    newt;/*used for messageSets*/
 
-  skStrategy()
-    {
-      memset(this, 0, sizeof(skStrategy));
-      tailRing = currRing;
-      P.tailRing = currRing;
-      P.lmRing = currRing;
-    };
-  
+  KINLINE skStrategy();
+  KINLINE ~skStrategy();
 };
 
 void deleteHC(poly *p, int *e, int *l, kStrategy strat);
@@ -207,6 +203,11 @@ BOOLEAN newHEdge(polyset S, int ak,kStrategy strat);
  ***************************************************************/
 
 KINLINE TSet initT ();
+KINLINE poly k_LmInit_lmRing_2_tailRing(poly p, ring lmRing, ring tailRing, omBin bin);
+KINLINE poly k_LmInit_tailRing_2_lmRing(poly p, ring tailRing, ring lmRing, omBin bin);
+KINLINE poly k_LmShallowCopyDelete_lmRing_2_tailRing(poly p, ring lmRing, ring tailRing, omBin bin);
+KINLINE poly k_LmShallowCopyDelete_tailRing_2_lmRing(poly p, ring tailRing, ring lmRing,  omBin bin);
+
 KINLINE poly k_LmInit_lmRing_2_tailRing(poly p, ring lmRing, ring tailRing);
 KINLINE poly k_LmInit_tailRing_2_lmRing(poly p, ring tailRing, ring lmRing);
 KINLINE poly k_LmShallowCopyDelete_lmRing_2_tailRing(poly p, ring lmRing, ring tailRing);

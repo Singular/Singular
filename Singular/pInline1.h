@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which iter over ExpVector
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline1.h,v 1.4 2000-09-20 12:56:36 obachman Exp $
+ *  Version: $Id: pInline1.h,v 1.5 2000-10-04 13:12:04 obachman Exp $
  *******************************************************************/
 #ifndef PINLINE1_H
 #define PINLINE1_H
@@ -59,14 +59,20 @@ BOOLEAN pDebugLmShortDivisibleBy(poly p1, unsigned long sev_1, ring r_1,
  * Allocation/Initalization/Deletion 
  *
  ***************************************************************/
-PINLINE1 poly p_Init(ring r)
+PINLINE1 poly p_Init(ring r, omBin bin)
 {
   p_CheckRing1(r);
+  pAssume1(bin != NULL && r->PolyBin->sizeW == bin->sizeW);
   poly p;
-  omTypeAlloc0Bin(poly, p, r->PolyBin);
+  omTypeAlloc0Bin(poly, p, bin);
   p_SetRingOfPoly(p, r);
   return p;
 }
+PINLINE1 poly p_Init(ring r)
+{
+  return p_Init(r, r->PolyBin);
+}
+
 PINLINE1 poly p_LmInit(poly p, ring r)
 {
   p_CheckPolyRing1(p, r);
@@ -89,6 +95,18 @@ PINLINE1 poly p_Head(poly p, ring r)
   _pNext(np) = NULL;
   _pSetCoeff0(np, n_Copy(_pGetCoeff(p), r));
   return np;
+}
+
+PINLINE1 poly p_LmShallowCopyDelete(poly p, const ring r, omBin bin)
+{
+  p_CheckPolyRing1(p, r);
+  pAssume1(bin->sizeW == r->PolyBin->sizeW);
+  poly new_p = p_New(r);
+  p_MemCopy_LengthGeneral(new_p->exp, p->exp, r->ExpLSize);
+  pSetCoeff0(new_p, pGetCoeff(p));
+  pNext(new_p) = pNext(p);
+  omFreeBinAddr(p);
+  return new_p;
 }
 
 /***************************************************************

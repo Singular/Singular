@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.54 2000-09-18 09:19:07 obachman Exp $ */
+/* $Id: kstd1.cc,v 1.55 2000-10-04 13:12:01 obachman Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1770,7 +1770,7 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   pLexOrder = b;
 //Print("%d reductions canceled \n",strat->cel);
   HCord=strat->HCord;
-  kFreeStrat(strat);
+  delete(strat);
   if ((delete_w)&&(w!=NULL)&&(*w!=NULL)) delete *w;
   return r;
 }
@@ -1896,7 +1896,7 @@ lists min_std(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
     idSkipZeroes(strat->M);
     l->m[1].data=(void *)strat->M;
   }
-  kFreeStrat(strat);
+  delete(strat);
   if (reduced>2)
   {
     Kstd1_deg=Kstd1_OldDeg;
@@ -1916,7 +1916,7 @@ poly kNF(ideal F, ideal Q, poly p,int syzComp, int lazyReduce)
     p=kNF1(F,Q,p,strat,lazyReduce);
   else
     p=kNF2(F,Q,p,strat,lazyReduce);
-  kFreeStrat(strat);
+  delete(strat);
   return p;
 }
 
@@ -1933,7 +1933,7 @@ ideal kNF(ideal F, ideal Q, ideal p,int syzComp,int lazyReduce)
     res=kNF1(F,Q,p,strat,lazyReduce);
   else
     res=kNF2(F,Q,p,strat,lazyReduce);
-  kFreeStrat(strat);
+  delete(strat);
   return res;
 }
 
@@ -1992,6 +1992,6 @@ ideal kInterRed (ideal F, ideal Q)
 //    mflush();
 //  }
   ideal shdl=strat->Shdl;
-  kFreeStrat(strat);
+  delete(strat);
   return shdl;
 }

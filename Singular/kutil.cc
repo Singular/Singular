@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.63 2000-09-25 12:26:33 obachman Exp $ */
+/* $Id: kutil.cc,v 1.64 2000-10-04 13:12:03 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -3242,6 +3242,12 @@ void enterT (LObject p,kStrategy strat)
     for (i=strat->tl+1; i>=atT+1; i--) strat->T[i] = strat->T[i-1];
   }
   else atT = 0;
+
+  if (strat->tailBin != NULL)
+    pNext(p.p)=p_ShallowCopyDelete(pNext(p.p),
+                                   (strat->tailRing != NULL ? 
+                                    strat->tailRing : currRing),
+                                   strat->tailBin);
   strat->T[atT].p = p.p;
   strat->T[atT].ecart = p.ecart;
   strat->T[atT].length = p.length;
@@ -3281,7 +3287,16 @@ void enterTBba (LObject p, int atT,kStrategy strat)
   if (TEST_OPT_INTSTRATEGY)
     strat->T[atT].length = p.length;
 
-  strat->T[atT].pLength = p.pLength;
+  if (strat->tailBin != NULL)
+    pNext(p.p)=p_ShallowCopyDelete(pNext(p.p),
+                                   (strat->tailRing != NULL ? 
+                                    strat->tailRing : currRing),
+                                   strat->tailBin);
+  if (strat->use_buckets && p.pLength <= 0)
+    strat->T[atT].pLength = pLength(p.p);
+  else
+    strat->T[atT].pLength = p.pLength;
+
   if (p.sev == 0)
   {
     p.sev = pGetShortExpVector(p.p);
@@ -3621,11 +3636,6 @@ BOOLEAN newHEdge(polyset S, int ak,kStrategy strat)
   }
   pLmFree(newNoether);
   return FALSE;
-}
-
-void kFreeStrat(kStrategy strat)
-{
-  omFreeSize(strat, sizeof(skStrategy));
 }
 
 rOrderType_t spGetOrderType(ring r, int modrank, int syzcomp)

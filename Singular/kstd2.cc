@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.48 2000-09-25 12:26:32 obachman Exp $ */
+/* $Id: kstd2.cc,v 1.49 2000-10-04 13:12:02 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -622,7 +622,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     {
       /* statistic */
       if (TEST_OPT_PROT) PrintS("s");
-      strat->P.GetP();
+      strat->P.GetP(currRing, strat->lmBin);
       /* enter P.p into s and L */
       {
         int pos=posInS(strat->S,strat->sl,strat->P.p);
@@ -876,7 +876,7 @@ ideal stdred(ideal F, ideal Q, tHomog h,intvec ** w)
     pFDeg = pOldFDeg;
   }
   pLexOrder = b;
-  kFreeStrat(strat);
+  delete(strat);
   if ((delete_w)&&(w!=NULL)&&(*w!=NULL)) delete *w;
   idSkipZeroes(r);
   return r;

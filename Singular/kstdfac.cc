@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstdfac.cc,v 1.41 2000-09-25 12:26:32 obachman Exp $ */
+/* $Id: kstdfac.cc,v 1.42 2000-10-04 13:12:02 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
@@ -883,7 +883,7 @@ lists kStdfac(ideal F, ideal Q, tHomog h,intvec ** w,ideal D)
   while (strat!=NULL)
   {
     orgstrat=strat->next;
-    kFreeStrat(strat);
+    delete(strat);
     strat=orgstrat;
   }
   if ((delete_w)&&(w!=NULL)&&(*w!=NULL)) delete *w;

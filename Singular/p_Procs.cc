@@ -6,7 +6,7 @@
  *  Purpose: implementation of primitive procs for polys
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Procs.cc,v 1.12 2000-09-25 12:26:35 obachman Exp $
+ *  Version: $Id: p_Procs.cc,v 1.13 2000-10-04 13:12:04 obachman Exp $
  *******************************************************************/
 #include <string.h>
 
@@ -63,7 +63,7 @@ const int HAVE_FAST_FIELD = 2;
 //   2 -- special cases for length <= 2
 //   3 -- special cases for length <= 4
 //   4 -- special cases for length <= 8
-const int HAVE_FAST_LENGTH = 3;
+const int HAVE_FAST_LENGTH = 4;
 
 // Set HAVE_FAST_ORD to:
 //  0  -- only OrdGeneral

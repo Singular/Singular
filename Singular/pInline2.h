@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which are of constant time
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline2.h,v 1.6 2000-09-25 12:26:35 obachman Exp $
+ *  Version: $Id: pInline2.h,v 1.7 2000-10-04 13:12:04 obachman Exp $
  *******************************************************************/
 #ifndef PINLINE2_H
 #define PINLINE2_H
@@ -168,13 +168,19 @@ PINLINE2 Exponent_t p_GetExpDiff(poly p1, poly p2, int i, ring r)
  * Allocation/Initalization/Deletion
  *
  ***************************************************************/
-PINLINE2 poly p_New(ring r)
+PINLINE2 poly p_New(ring r, omBin bin)
 {
   p_CheckRing2(r);
+  pAssume2(bin != NULL && r->PolyBin->sizeW == bin->sizeW);
   poly p;
-  omTypeAllocBin(poly, p, r->PolyBin);
+  omTypeAllocBin(poly, p, bin);
   p_SetRingOfPoly(p, r);
   return p;
+}
+
+PINLINE2 poly p_New(ring r)
+{
+  return p_New(r, r->PolyBin);
 }
 
 PINLINE2 void p_DeleteLm(poly *p, ring r)
@@ -301,6 +307,13 @@ PINLINE2 void p_Delete(poly *p,  const ring lmRing, const ring tailRing)
       tailRing->p_Procs->p_Delete(&pNext(*p), tailRing);
     p_LmDelete(p, lmRing);
   }
+}
+
+PINLINE2 poly p_ShallowCopyDelete(poly p, const ring r, omBin bin)
+{
+  p_CheckPolyRing2(p, r);
+  pAssume2(r->PolyBin->sizeW == bin->sizeW);
+  return r->p_Procs->p_ShallowCopyDelete(p, r, bin);
 }
 
 // returns p+q, destroys p and q
