@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.294 2003-03-31 12:27:00 Singular Exp $ */
+/* $Id: iparith.cc,v 1.295 2003-04-03 13:22:00 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -59,9 +59,11 @@
 #ifdef HAVE_PLURAL
 #define ALLOW_PLURAL    ,1
 #define NO_PLURAL       ,0
+#define COMM_PLURAL     ,2
 #else
 #define ALLOW_PLURAL
-#define NO_PLURAL  
+#define NO_PLURAL
+#define COMM_PLURAL
 #endif
 
 /*=============== types =====================*/
@@ -82,9 +84,9 @@ struct sValCmd1
   short cmd;
   short res;
   short arg;
-#ifdef HAVE_PLURAL  
+#ifdef HAVE_PLURAL
   short valid_for_plural;
-#endif  
+#endif
 };
 
 typedef BOOLEAN (*proc2)(leftv,leftv,leftv);
@@ -95,9 +97,9 @@ struct sValCmd2
   short res;
   short arg1;
   short arg2;
-#ifdef HAVE_PLURAL  
+#ifdef HAVE_PLURAL
   short valid_for_plural;
-#endif  
+#endif
 };
 
 typedef BOOLEAN (*proc3)(leftv,leftv,leftv,leftv);
@@ -109,9 +111,9 @@ struct sValCmd3
   short arg1;
   short arg2;
   short arg3;
-#ifdef HAVE_PLURAL  
+#ifdef HAVE_PLURAL
   short valid_for_plural;
-#endif  
+#endif
 };
 struct sValCmdM
 {
@@ -119,9 +121,9 @@ struct sValCmdM
   short cmd;
   short res;
   short number_of_args; /* -1: any, -2: any >0, .. */
-#ifdef HAVE_PLURAL  
+#ifdef HAVE_PLURAL
   short valid_for_plural;
-#endif  
+#endif
 };
 #endif
 
@@ -739,8 +741,8 @@ static BOOLEAN jjCOLCOL(leftv res, leftv u, leftv v)
         {
           v->name = omStrDup(v->name);
         }
-	v->req_packhdl=IDPACKAGE(packhdl);
-	v->packhdl=IDPACKAGE(packhdl);
+        v->req_packhdl=IDPACKAGE(packhdl);
+        v->packhdl=IDPACKAGE(packhdl);
         syMake(v, v->name, packhdl);
         memcpy(res, v, sizeof(sleftv));
         memset(v, 0, sizeof(sleftv));
@@ -5834,6 +5836,21 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
       && (bt==dArith2[i].arg2))
       {
         res->rtyp=dArith2[i].res;
+        #ifdef HAVE_PLURAL
+        if ((currRing!=NULL) && (rIsPluralRing(currRing)))
+        {
+          if (dArith2[i].valid_for_plural==NO_PLURAL)
+          {
+            Werror("not implemented for non-commutative rings");
+            break;
+          }
+          else if (dArith2[i].valid_for_plural==COMM_PLURAL)
+          {
+            Warn("assume commutative subalgebra for cmd `%s`,Tok2Cmdname(i));
+          }
+          /* else ALLOW_PLURAL */
+        }
+        #endif
         if (dArith2[i].p(res,a,b))
         {
           break;// leave loop, goto error handling
@@ -5862,6 +5879,22 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
           if ((bi=iiTestConvert(bt,dArith2[i].arg2))!=0)
           {
             res->rtyp=dArith2[i].res;
+            #ifdef HAVE_PLURAL
+            if ((currRing!=NULL) && (rIsPluralRing(currRing)))
+            {
+              if (dArith2[i].valid_for_plural==NO_PLURAL)
+              {
+                Werror("not implemented for non-commutative rings");
+                break;
+              }
+              else if (dArith2[i].valid_for_plural==COMM_PLURAL)
+              {
+                Warn("assume commutative subalgebra for cmd `%s`,
+                      Tok2Cmdname(i));
+              }
+              /* else ALLOW_PLURAL */
+            }
+            #endif
             failed= ((iiConvert(at,dArith2[i].arg1,ai,a,an))
             || (iiConvert(bt,dArith2[i].arg2,bi,b,bn))
             || (dArith2[i].p(res,an,bn)));
@@ -5980,13 +6013,21 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
       if (at==dArith1[i].arg)
       {
         int r=res->rtyp=dArith1[i].res;
-	#ifdef HAVE_PLURAL
-	if ((currRing!=NULL) && (rIsPluralRing(currRing)) && (dArith1[i].valid_for_plural==0))
-	{
-	  Werror("not implemented for non-commutative rings");
-	  break;
-	}
-	#endif
+        #ifdef HAVE_PLURAL
+        if ((currRing!=NULL) && (rIsPluralRing(currRing)))
+        {
+          if (dArith1[i].valid_for_plural==NO_PLURAL)
+          {
+            Werror("not implemented for non-commutative rings");
+            break;
+          }
+          else if (dArith1[i].valid_for_plural==COMM_PLURAL)
+          {
+            Warn("assume commutative subalgebra for cmd `%s`,Tok2Cmdname(i));
+          }
+          /* else ALLOW_PLURAL */
+        }
+        #endif
         if (r<0)
         {
           res->rtyp=-r;
@@ -6023,13 +6064,21 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
         if ((ai=iiTestConvert(at,dArith1[i].arg))!=0)
         {
           int r=res->rtyp=dArith1[i].res;
-	  #ifdef HAVE_PLURAL
-	  if ((currRing!=NULL) && (rIsPluralRing(currRing)) && (dArith1[i].valid_for_plural==0))
-	  {
-	    Werror("not implemented for non-commutative rings");
-	    break;
-	  }
-	  #endif
+          #ifdef HAVE_PLURAL
+          if ((currRing!=NULL) && (rIsPluralRing(currRing)))
+          {
+            if (dArith1[i].valid_for_plural==NO_PLURAL)
+            {
+              Werror("not implemented for non-commutative rings");
+              break;
+            }
+            else if (dArith1[i].valid_for_plural==COMM_PLURAL)
+            {
+              Warn("assume commutative subalgebra for cmd `%s`,Tok2Cmdname(i));
+            }
+            /* else ALLOW_PLURAL */
+          }
+          #endif
           if (r<0)
           {
             res->rtyp=-r;
@@ -6144,13 +6193,21 @@ BOOLEAN iiExprArith3(leftv res, int op, leftv a, leftv b, leftv c)
       && (ct==dArith3[i].arg3))
       {
         res->rtyp=dArith3[i].res;
-	#ifdef HAVE_PLURAL
-	if ((currRing!=NULL) && (rIsPluralRing(currRing)) && (dArith3[i].valid_for_plural==0))
-	{
-	  Werror("not implemented for non-commutative rings");
-	  break;
-	}
-	#endif
+        #ifdef HAVE_PLURAL
+        if ((currRing!=NULL) && (rIsPluralRing(currRing)))
+        {
+            if (dArith3[i].valid_for_plural==NO_PLURAL)
+            {
+              Werror("not implemented for non-commutative rings");
+              break;
+            }
+            else if (dArith3[i].valid_for_plural==COMM_PLURAL)
+            {
+              Warn("assume commutative subalgebra for cmd `%s`,Tok2Cmdname(i));
+            }
+            /* else ALLOW_PLURAL */
+        }
+        #endif
         if (dArith3[i].p(res,a,b,c))
         {
           break;// leave loop, goto error handling
@@ -6181,15 +6238,22 @@ BOOLEAN iiExprArith3(leftv res, int op, leftv a, leftv b, leftv c)
             if ((ci=iiTestConvert(ct,dArith3[i].arg3))!=0)
             {
               res->rtyp=dArith3[i].res;
-	      #ifdef HAVE_PLURAL
-	      if ((currRing!=NULL)
-	      && (rIsPluralRing(currRing))
-	      && (dArith3[i].valid_for_plural==0))
-	      {
-	        Werror("not implemented for non-commutative rings");
-	        break;
-	      }
-	      #endif
+              #ifdef HAVE_PLURAL
+              if ((currRing!=NULL)
+              && (rIsPluralRing(currRing)))
+              {
+                if (dArith3[i].valid_for_plural==NO_PLURAL)
+                {
+                   Werror("not implemented for non-commutative rings");
+                   break;
+                 }
+                 else if (dArith3[i].valid_for_plural==COMM_PLURAL)
+                 {
+                   Warn("assume commutative subalgebra for cmd `%s`,Tok2Cmdname(i));
+                 }
+                 /* else ALLOW_PLURAL */
+              }
+              #endif
               failed= ((iiConvert(at,dArith3[i].arg1,ai,a,an))
                 || (iiConvert(bt,dArith3[i].arg2,bi,b,bn))
                 || (iiConvert(ct,dArith3[i].arg3,ci,c,cn))
@@ -6324,7 +6388,7 @@ BOOLEAN iiExprArithM(leftv res, leftv a, int op)
             a->next->next->data=NULL;
             a->next->next->name=NULL;
             a->next->next->attribute=NULL;
-	    /* no break */
+            /* no break */
           case 2:
             memcpy(&d->arg2,a->next,sizeof(sleftv));
             a->next->rtyp=0;
@@ -6332,7 +6396,7 @@ BOOLEAN iiExprArithM(leftv res, leftv a, int op)
             a->next->data=NULL;
             a->next->attribute=NULL;
             d->arg2.next=NULL;
-	    /* no break */
+            /* no break */
           case 1:
             d->arg1.next=NULL;
         }
@@ -6360,15 +6424,22 @@ BOOLEAN iiExprArithM(leftv res, leftv a, int op)
       || ((dArithM[i].number_of_args==-2)&&(args>0)))
       {
         res->rtyp=dArithM[i].res;
-	#ifdef HAVE_PLURAL
-	if ((currRing!=NULL)
-	&& (rIsPluralRing(currRing))
-	&& (dArithM[i].valid_for_plural==0))
-	{
-	  Werror("not implemented for non-commutative rings");
-	  break;
-	}
-	#endif
+        #ifdef HAVE_PLURAL
+        if ((currRing!=NULL)
+        && (rIsPluralRing(currRing)))
+        {
+          if (dArithM[i].valid_for_plural==NO_PLURAL)
+          {
+            Werror("not implemented for non-commutative rings");
+            break;
+          }
+          else if (dArithM[i].valid_for_plural==COMM_PLURAL)
+          {
+            Warn("assume commutative subalgebra for cmd `%s`,Tok2Cmdname(i));
+          }
+          /* else ALLOW_PLURAL */
+        }
+        #endif
         if (dArithM[i].p(res,a))
         {
           break;// leave loop, goto error handling
