@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.plural.texi,v 1.1 2003-05-22 19:15:53 levandov Exp $
+@comment $Id: NEWS.plural.texi,v 1.2 2003-05-22 19:21:24 levandov Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -91,5 +91,3 @@ Ring change during std-related computations
 Results is less memory usage, faster memory allocation/free, less
 fragmentation, much better locality of reference.
 @end table
-
-@end itemize
