@@ -1,9 +1,9 @@
-// $Id: poly.lib,v 1.21 2000-01-10 16:24:29 obachman Exp $
+// $Id: poly.lib,v 1.22 2000-01-10 16:30:31 obachman Exp $
 //(GMG, last modified 22.06.96)
 //(obachman: 17.12.97 -- added katsura)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: poly.lib,v 1.21 2000-01-10 16:24:29 obachman Exp $";
+version="$Id: poly.lib,v 1.22 2000-01-10 16:30:31 obachman Exp $";
 info="
 LIBRARY:  poly.lib      PROCEDURES FOR MANIPULATING POLYS, IDEALS, MODULES
 
@@ -711,7 +711,7 @@ example
 proc denominator(number n)
 "USAGE: denominator(n); n number
 RETURN: number, the denominator of n
-SEE ALSO: denominator, content, cleardenom
+SEE ALSO: numerator, content, cleardenom
 EXAMPLE: example denominator; shows an example
 "
 {
