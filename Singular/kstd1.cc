@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.70 2000-12-14 16:38:50 obachman Exp $ */
+/* $Id: kstd1.cc,v 1.71 2000-12-14 17:32:46 obachman Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1525,11 +1525,7 @@ intvec * kModW, * kHomW;
 
 long kModDeg(poly p, ring r)
 {
-#ifndef HAVE_OLD_STD
   long o=pWDegree(p, r);
-#else
-  long o = pTotaldegree(p,r);
-#endif
   long i=p_GetComp(p, r);
   if (i==0) return o;
   return o+(*kModW)[i-1];
