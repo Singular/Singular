@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.49 2001-03-27 17:08:24 Singular Exp $ */
+/* $Id: ipid.cc,v 1.50 2001-05-22 13:20:59 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -291,7 +291,7 @@ idhdl idrec::set(char * s, int lev, idtyp t, BOOLEAN init)
       // IDRING(h)=rCopy(currRing);
       /* QRING_CMD is ring dep => currRing !=NULL */
     }
-    else 
+    else
 #endif
       if (t == PROC_CMD)
     {
@@ -643,7 +643,7 @@ void killhdl(idhdl h, idhdl * ih)
 
   if (IDID(h)) // OB: ?????
     omFree((ADDRESS)IDID(h));
-  //IDID(h)=NULL;
+  IDID(h)=NULL;
   if (h == (*ih))
   {
     // h is at the beginning of the list
@@ -657,9 +657,9 @@ void killhdl(idhdl h, idhdl * ih)
     {
       if (hh==NULL)
       {
-        Print(">>%s<< not found for kill\n",IDID(h));
-	break;
-      }	
+        PrintS(">>?<< not found for kill\n");
+        return;
+      }
       idhdl hhh = IDNEXT(hh);
       if (hhh == h)
       {
@@ -815,14 +815,18 @@ char * piProcinfo(procinfov pi, char *request)
   if(pi == NULL) return "empty proc";
   else if (strcmp(request, "libname")  == 0) return pi->libname;
   else if (strcmp(request, "procname") == 0) return pi->procname;
-  else if (strcmp(request, "type")     == 0) {
-    switch (pi->language) {
+  else if (strcmp(request, "type")     == 0)
+  {
+    switch (pi->language)
+    {
       case LANG_SINGULAR: return "singular"; break;
       case LANG_C:        return "object";   break;
       case LANG_NONE:     return "none";     break;
       default:            return "unknow language";
     }
-  } else if (strcmp(request, "ref")      == 0) {
+  }
+  else if (strcmp(request, "ref")      == 0)
+  {
     char p[8];
     sprintf(p, "%d", pi->ref);
     return omStrDup(p);  // MEMORY-LEAK
