@@ -47,14 +47,15 @@ if test -d "rpm"; then
    OUTPUT_MAKEFILES=$OUTPUT_MAKEFILES" rpm/rpmrc rpm/Singular.spec"
 fi
 if test -d "modules"; then
-   OUTPUT_MAKEFILES=$OUTPUT_MAKEFILES" modules/Makefile"
+dnl    OUTPUT_MAKEFILES=$OUTPUT_MAKEFILES" modules/Makefile"
+   CONFIG_SUBDIRS=$CONFIG_SUBDIRS" modules"
 fi
-if test -d "modules/tools"; then
-   OUTPUT_MAKEFILES=$OUTPUT_MAKEFILES" modules/tools/Makefile"
-fi
-if test -d "modules/modgen"; then
-   OUTPUT_MAKEFILES=$OUTPUT_MAKEFILES" modules/modgen/Makefile"
-fi
+dnl if test -d "modules/tools"; then
+dnl    OUTPUT_MAKEFILES=$OUTPUT_MAKEFILES" modules/tools/Makefile"
+dnl fi
+dnl if test -d "modules/modgen"; then
+dnl    OUTPUT_MAKEFILES=$OUTPUT_MAKEFILES" modules/modgen/Makefile"
+dnl fi
 if test -d "emacs"; then
    OUTPUT_MAKEFILES=$OUTPUT_MAKEFILES" emacs/Makefile"
 fi
