@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.110 1998-12-10 15:38:02 obachman Exp $
+@comment $Id: general.doc,v 1.111 1999-01-22 17:40:55 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -948,6 +948,10 @@ The result is only displayed on the screen.
 @item dim
 @ref{dim}@*
 computes the dimension of the ideal resp.@: module.
+@item highcorner
+@ref{highcorner}@*
+computes the smallest monomial not contained in the ideal.
+The ideal has to be zero-dimensional.
 @item hilb
 @ref{hilb}@*
 computes the first and resp.@: or second Hilbert series of an ideal

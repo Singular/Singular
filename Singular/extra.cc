@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.87 1999-01-19 13:42:30 Singular Exp $ */
+/* $Id: extra.cc,v 1.88 1999-01-22 17:40:49 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -880,9 +880,9 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       {
         if (slOpen(l, SI_LINK_READ)) return TRUE;
       }
-      
+
       MP_Link_pt link = (MP_Link_pt) l->data;
-      if (MP_InitMsg(link) != MP_Success) 
+      if (MP_InitMsg(link) != MP_Success)
       {
         WerrorS("Can not Init");
       }
@@ -914,9 +914,9 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 #endif
+/*============================================================*/
       Werror( "system(\"%s\",...) %s", sys_cmd, feNotImplemented );
   }
   return TRUE;
 }
 #endif // HAVE_EXTENDED_SYSTEM
-/*============================================================*/

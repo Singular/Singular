@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.27 1999-01-21 15:00:07 Singular Exp $ */
+/* $Id: longalg.cc,v 1.28 1999-01-22 17:40:51 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -1639,10 +1639,33 @@ BOOLEAN naGreaterZero(number za)
 */
 BOOLEAN naEqual (number a, number b)
 {
-  number h;
-  BOOLEAN bo;
-  h = naSub(a, b);
-  bo = naIsZero(h);
+  if(a==b) return TRUE;
+  if((a==NULL)&&(b!=NULL)) return FALSE;
+  if((b==NULL)&&(a!=NULL)) return FALSE;
+
+  lnumber aa=(lnumber)a;
+  lnumber bb=(lnumber)b;
+
+  int an_deg=0;
+  if(aa->n!=NULL)
+    an_deg=napDeg(aa->n);
+  int bn_deg=0;
+  if(bb->n!=NULL)
+    bn_deg=napDeg(bb->n);
+  if(an_deg+napDeg(bb->z)!=bn_deg+napDeg(aa->z))
+    return FALSE;
+#if 0
+  naNormalize(a);
+  aa=(lnumber)a;
+  naNormalize(b);
+  bb=(lnumber)b;
+  if((aa->n==NULL)&&(bb->n!=NULL)) return FALSE;
+  if((bb->n==NULL)&&(aa->n!=NULL)) return FALSE;
+  if(napComp(aa->z,bb->z)!=0) return FALSE;
+  if((aa->n!=NULL) && (napComp(aa->n,bb->n))) return FALSE;
+#endif
+  number h = naSub(a, b);
+  BOOLEAN bo = naIsZero(h);
   naDelete(&h);
   return bo;
 }

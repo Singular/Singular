@@ -167,6 +167,7 @@ cmdnames cmds[] =
   { "gcd",         0, GCD_CMD ,           CMD_2},
   { "GCD",         2, GCD_CMD ,           CMD_2},
   { "hilb",        0, HILBERT_CMD ,       CMD_12},
+  { "highcorner",  0, HIGHCORNER_CMD,     CMD_1},
   { "homog",       0, HOMOG_CMD ,         CMD_12},
   { "ideal",       0, IDEAL_CMD ,         IDEAL_CMD},
   { "if",          0, IF_CMD ,            IF_CMD},
@@ -2472,6 +2473,14 @@ static BOOLEAN jjE(leftv res, leftv v)
   pSetComp((poly)res->data,(int)v->Data());
   return FALSE;
 }
+#ifdef HAVE_FACTORY
+static BOOLEAN jjFACSTD(leftv res, leftv v)
+{
+  res->data=(void *)kStdfac((ideal)v->Data(),NULL,testHomog,NULL);
+  setFlag(res,FLAG_STD);
+  return FALSE;
+}
+#endif
 static BOOLEAN jjGETDUMP(leftv res, leftv v)
 {
   si_link l = (si_link)v->Data();
@@ -2486,14 +2495,38 @@ static BOOLEAN jjGETDUMP(leftv res, leftv v)
   else
     return FALSE;
 }
-#ifdef HAVE_FACTORY
-static BOOLEAN jjFACSTD(leftv res, leftv v)
+static BOOLEAN jjHIGHCORNER(leftv res, leftv v)
 {
-  res->data=(void *)kStdfac((ideal)v->Data(),NULL,testHomog,NULL);
-  setFlag(res,FLAG_STD);
+  ideal I=(ideal)v->Data();
+  BOOLEAN *UsedAxis=(BOOLEAN *)Alloc0(pVariables*sizeof(BOOLEAN));
+  int i,n;
+  for(i=IDELEMS(I)-1;i>=0;i--)
+  {
+    if((n=pIsPurePower(I->m[i]))!=0) UsedAxis[n-1]=TRUE;
+  }
+  for(i=pVariables-1;i>=0;i--)
+  {
+    if(UsedAxis[i]==FALSE) return FALSE; // not zero-dim.
+  }
+  if (currRing->OrdSgn==1)
+  {
+    res->data=pOne();
+    return FALSE;
+  }
+  poly po=NULL;
+  scComputeHC(I,0,po);
+  if (po!=NULL)
+  {
+    pGetCoeff(po)=nInit(1);
+    for (i=pVariables; i>0; i--)
+    {
+      if (pGetExp(po, i) > 0) pDecrExp(po,i);
+    }
+    pSetm(po);
+  }
+  res->data=(void *)po;
   return FALSE;
 }
-#endif
 static BOOLEAN jjHILBERT(leftv res, leftv v)
 {
   assumeStdFlag(v);
@@ -3347,6 +3380,7 @@ struct sValCmd1 dArith1[]=
 ,{jjWRONG,      FACSTD_CMD,      LIST_CMD,       IDEAL_CMD }
 #endif
 ,{jjGETDUMP,    GETDUMP_CMD,     NONE,           LINK_CMD }
+,{jjHIGHCORNER, HIGHCORNER_CMD,  POLY_CMD,       IDEAL_CMD }
 ,{jjHILBERT,    HILBERT_CMD,     NONE,           IDEAL_CMD }
 ,{jjHILBERT,    HILBERT_CMD,     NONE,           MODUL_CMD }
 ,{jjHILBERT_IV, HILBERT_CMD,     INTVEC_CMD,     INTVEC_CMD }
