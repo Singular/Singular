@@ -1,5 +1,9 @@
 Wed Jan 14 15:36:04 1998  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
+	* polys-impl.h (pMonAddFast): fixed handling of component
+
+	* mmutil.c: added _memcpyW for DO_DEEP_PROFILE
+
 	* binom.h: #undef TEST_MAC_ORDER as default
 
 	* polys-impl.h: fixes to make things clearer and for
