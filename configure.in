@@ -77,6 +77,9 @@ dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl check for various libraries and headers
 dnl
 AC_CHECK_LIB(m, atof)
+AC_CHECK_LIB(bsd, socket)
+AC_CHECK_LIB(socket, listen)
+AC_CHECK_LIB(nsl, gethostbyname)
 AC_CHECK_LIB(gmp, mpq_init)
 AC_CHECK_LIB(smallgmp, mpz_init)
 AC_CHECK_LIB(MP, IMP_PutGmpInt)
