@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.44 1998-06-04 16:42:38 pohl Exp $ */
+/* $Id: febase.cc,v 1.45 1998-06-04 17:20:54 Singular Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -142,7 +142,7 @@ BOOLEAN tclmode=FALSE;
  *****************************************************************/
 
 // Define to chatter about path stuff
-#define PATH_DEBUG
+// #define PATH_DEBUG
 static char* feArgv0 = NULL;
 static char* feExpandedExecutable = NULL;
 static char* feBinDir = NULL;
