@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.134 1999-07-23 12:32:37 obachman Exp $
+@comment $Id: general.doc,v 1.135 1999-07-23 12:42:05 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -2547,13 +2547,14 @@ and then @code{RETURN} .
 
 @menu
 * Tracing of procedures::
+* Source code debugger::
 * Break points::
 * Printing of data::
 * libparse::
 @end menu
 
 @c ---------------------------------------
-@node Tracing of procedures, Break points, Debugging tools, Debugging tools
+@node Tracing of procedures,Source code debugger,Debugging tools,Debugging tools
 @subsection Tracing of procedures
 Setting the @code{TRACE} variable to 1 (resp.@: 3) results in a listing of
 the called procedures (resp.@: together with line numbers).
@@ -2582,7 +2583,12 @@ See @ref{TRACE var}.
 @end smallexample
 
 @c ---------------------------------------
-@node Break points, Printing of data, Tracing of procedures, Debugging tools
+@node Source code debugger, Break points, Tracing of procedures, Debugging tools
+@subsection Source code debugger
+TBC
+
+@c ---------------------------------------
+@node Break points, Printing of data, Source code debugger, Debugging tools
 @subsection Break points
 A break point can be put into a proc by inserting the command @code{~}.
 If @code{Singular} reaches a break point it asks for lines of commands
