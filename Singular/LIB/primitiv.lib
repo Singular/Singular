@@ -1,11 +1,11 @@
-// $Id: primitiv.lib,v 1.1 1997-06-30 12:31:44 Singular Exp $
+// $Id: primitiv.lib,v 1.2 1997-08-13 14:13:29 Singular Exp $
 // This library requires Singular 1.0
 
 LIBRARY:    primitiv.lib    PROCEDURES FOR FINDING A PRIMITIVE ELEMENT
 
  primitivE(ideal i); finds minimal polynomial for a primitive element
 
- splitring(poly f,string R[,list L]);  define ringextension with name R
+ splitring(poly f,string R[,list L]);  define ring extension with name R
                                        and switch to it
  randomLast(int b);       random transformation of the last variable
 
@@ -20,7 +20,6 @@ RETURN:  ideal = maxideal(1) but the last variable exchanged by
 NOTE:   
 EXAMPLE: example randomLast; shows an example
 {
-
   ideal i=maxideal(1);
   int k=size(i);
   i[k]=0;
@@ -35,7 +34,7 @@ example
    ideal i = randomLast(10);
    i;
 }
-
+///////////////////////////////////////////////////////////////////////////////
 
 proc primitivE(ideal i)
 USAGE:  primitivE(i); i ideal of the following form:
@@ -60,13 +59,13 @@ EXAMPLE:    example primitivE;  shows an example
  ideal i=fetch(altring,i);
 
  int k,schlecht;
- //def P=basering;
  int nva = nvars(basering);
  ideal jmap,j;
  map phi;
  option(redSB);
  int Fehlversuche;
-
+ //-------- Mache so lange Random-Koord.wechsel, bis letztes Poly -------------
+ //--------------- das Minpoly eines primitiven Elements ist : ----------------
  for (Fehlversuche=0; 1; Fehlversuche++) {
    schlecht=0;
    if (Fehlversuche==0) { jmap=maxideal(1);}
@@ -77,26 +76,26 @@ EXAMPLE:    example primitivE;  shows an example
    phi=lexring,jmap;
    j=phi(i);
    setring deglexring;
-
-   // j=std(fetch(lexring,phi(i)));j; will er nicht
+ //--------------- Berechne reduzierte Standardbasis mit fglm: ----------------
    j=std(fetch(lexring,j));
    setring lexring;
    j=fglm(deglexring,j);
- //testen, ob SB n Elemente enthaelt
- // falls ja lead(Fi)=xi i=1... n-1
+ //-- teste, ob SB n Elemente enthaelt (falls ja, ob lead(Fi)=xi i=1... n-1): -
    if (size(j)==nva) {
      for (k=1; k<nva; k++) {
-       j[k+1]=j[k+1]/leadcoef(j[k+1]); // normiere die Erzeuger
-       if (lead(j[k+1]) != var(nva-k)) { schlecht=1;} // Random-Koord.transf. war schlecht gewaehlt
+       j[k+1]=j[k+1]/leadcoef(j[k+1]);        // normiere die Erzeuger
+       if (lead(j[k+1]) != var(nva-k)) { schlecht=1;}
      }
      if (schlecht==0) {
+ //--- Random-Koord.wechsel war gut: Berechne das zurueckzugebende Ideal: -----
        ideal erg;
        for (k=1; k<nva; k++) { erg[k]=var(k)-j[nva-k+1]; }
                                // =g_k(x_n) mit a_k=g_k(a_n)
        erg[nva]=var(nva);
        map chi=lexring,erg;
-       ideal extra=maxideal(1);extra=phi(extra); // sonst: "argument of a map must have a name"
-       erg=j[1]+chi(extra);  // j[1] = Minimalpolynom
+       ideal extra=maxideal(1);extra=phi(extra);
+                               // sonst: "argument of a map must have a name"
+       erg=j[1]+chi(extra);    // j[1] = Minimalpolynom
        setring altring;
        return(fetch(lexring,erg));
      }
@@ -120,8 +119,8 @@ example
  // ==> no element was primitive -- the calculation of a is based on a random
  //     choice.
 }
+///////////////////////////////////////////////////////////////////////////////
 
- //proc splitring(poly f, string @R, list L)
 proc splitring
 USAGE:  splitring(f,R[,L]);  f poly, univariate, irreducible(!), R string,
                      L list of polys and/or ideals (optional)
@@ -136,17 +135,18 @@ ACTION: defines a ring with name R, in which f is reducible, and changes to it
         will be REPLACED by the new ring (with the same name as the old ring).
 
 RETURNs: list L mapped into the new ring R, if L is given; else nothing
-NOTE   : it is assumed that the active ring is bivariate
+ASSUME : the active ring must be bivariate and allow an algebraic extension
+         (e.g. it cannot be a transcendent ring extension of Q or Z/p)
 EXAMPLE: example splitring;  shows an example
 {
- // split ist bereits eine proc in 'inout.lib'
+ //----------------- split ist bereits eine proc in 'inout.lib' ! -------------
  poly f=#[1]; string @R=#[2];
  if (size(#)>2) {
     list L=#[3];
     int L_groesse=size(L);
  }
  else { int L_groesse=-1; }
- // ermittle das Minimalpolynom des aktuellen Rings:
+ //-------------- ermittle das Minimalpolynom des aktuellen Rings: ------------
  string minp=string(minpoly);
 
  if (@R=="") {
@@ -158,64 +158,73 @@ EXAMPLE: example splitring;  shows an example
  string charakt=string(char(altring));
  string varnames=varstr(altring);
  string algname;
-
+ //--------------- Fall 1: Bisheriger Ring hatte kein Minimalpolynom ----------
  if (minp=="0") {
   if (find(varnames,"a")==0)        { algname="a";}
   else { if (find(varnames,"b")==0) { algname="b";}
          else                       { algname="c";}
-  } // nur ZWEI Variablen erlaubt ==> c ist kein Variablenname
+ //----------- nur ZWEI Variablen erlaubt ==> c ist kein Variablenname --------
+  }
+ //-- erzeuge einen String, der das Minimalpolynom des neuen Rings enthaelt: --
   execute("ring splt1="+charakt+","+algname+",dp;");
   map nach_splt1=altring,var(1),var(1);
   execute("poly mipol="+string(nach_splt1(f))+";");
   string Rminp=string(mipol);
-  execute("ring "+@R+" = ("+charakt+","+algname+"),("+varnames+"),("+ordstr(altring)+");");
+ //--------------------- definiere den neuen Ring: ----------------------------
+  execute("ring "+@R+" = ("+charakt+","+algname+"),("+varnames+"),("
+           +ordstr(altring)+");");
   execute("minpoly="+Rminp+";");
-  //execute("def neuring="+@R+";");
   execute("export "+@R+";");
   def neuring=basering;
-
+ //---------------------- Berechne die zurueckzugebende Liste: ----------------
   list erg;
-  if (L_groesse>0) {  // L ist ja nicht in 'neuring' definiert, daher merke man
-   map take=altring,maxideal(1);      // sich die Groesse als int
+  if (L_groesse>0) {
+ // L ist ja nicht in 'neuring' def., daher merke man sich die Groesse als int
+   map take=altring,maxideal(1);
    erg=take(L);
   }            // take(empty list) gibt nicht empty list, sondern Fehlermeldung
  }
  else {
-  algname=parstr(altring); // Name des algebraischen Elements
-  //-string fstr=string(f);
+ //------------- Fall 2: Bisheriger Ring hatte ein Minimalpolynom: ------------
+  algname=parstr(altring);           // Name des algebraischen Elements
   if (size(algname)>1) {"only one Parameter is allowed!!"; return();}
-  // Minimalpolynom in ein Polynom umwandeln:
+ //---------------- Minimalpolynom in ein Polynom umwandeln: ------------------
   execute("ring splt2="+charakt+","+algname+",dp;");
   execute("poly mipol="+minp+";");
-  // f ist Polynom in algname und einer weiteren Variablen --> mache f bivariat
+ // f ist Polynom in algname und einer weiteren Variablen --> mache f bivariat:
   execute("ring splt3="+charakt+",("+algname+","+varnames+"),dp;");
-  //-execute("poly f="+fstr+";");
-  poly f=imap(altring,f);  // ersetzt //- : fstr & execute
+  poly f=imap(altring,f);
+ //-------------- Vorbereitung des Aufrufes von primitivE: --------------------
   execute("ring splt1="+charakt+",(x,y),dp;");
   map nach_splt1_3=splt3,x,y,y;
   map nach_splt1_2=splt2,x;
   ideal maxid=nach_splt1_2(mipol),nach_splt1_3(f);
   ideal primit=primitivE(maxid);
   "new minimal polynomial:",primit[1];
+ //-- erzeuge einen String, der das Minimalpolynom des neuen Rings enthaelt: --
   setring splt2;
   map nach_splt2=splt1,0,var(1);     // x->0, y->a
   minp=string(nach_splt2(primit)[1]);
+ //--------------------- definiere den neuen Ring: ----------------------------
   execute("ring "+@R+" = ("+charakt+","+algname+"),("+varnames+"),("+ordstr(altring)+");");
   execute("minpoly="+minp+";");
   execute("export "+@R+";");
   def neuring=basering;
-  // Uebersicht: wenn altring=(p,a),(x,y),dp; dann:
-  // splt1=p,(x,y),dp;  splt2=p,a,dp;  splt3=p,(a,x,y),dp;
 
+ //--------------- Uebersicht: wenn altring=(p,a),(x,y),dp; dann: -------------
+ //------------ splt1=p,(x,y),dp;  splt2=p,a,dp;  splt3=p,(a,x,y),dp; ---------
+
+  list erg;
   if (L_groesse>0) {
+ //---------------------- Berechne die zurueckzugebende Liste: ----------------
     setring splt3;
     list zwi=imap(altring,L);
     map nach_splt3_1=splt1,0,var(1);  // x->0, y->a
+ //----- rechne das primitive Element von altring in das von neuring um: ------
     map convert=splt3,nach_splt3_1(primit)[2],var(2),var(3); 
-    // rechnet das primitive Element von altring in das von neuring um
     zwi=convert(zwi);
     setring neuring;
-    list erg=imap(splt3,zwi);
+    erg=imap(splt3,zwi);
   }
  }
  if (defined(altrname)) {
