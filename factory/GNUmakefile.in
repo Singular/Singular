@@ -1,5 +1,5 @@
 # @configure_input@
-# $Id: GNUmakefile.in,v 1.26 1998-01-22 10:46:47 schmidt Exp $
+# $Id: GNUmakefile.in,v 1.27 1998-02-03 13:05:52 schmidt Exp $
 
 #
 # GNUmakefile.in - used by `configure' to create `GNUmakefile', the
@@ -301,10 +301,10 @@ ftestincl :=	\
 		ftest_io.h \
 		ftest_util.h
 
-# FTE m4 source files (exported for GNUmakefile in ftest/)
-ftestm4src :=	\
-		bextgcd.m4 \
-		bgcd.m4 \
+# FTE m4 source files (exported for `GNUmakefile' in `ftest/').
+# This variable may be already initialized from the development
+# `GNUmakefile'.
+ftestm4src :=	$(ftestm4src) \
 		degree.m4 \
 		deriv.m4 \
 		factorize.m4 \
