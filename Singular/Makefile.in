@@ -106,7 +106,7 @@ TESTS=${testdir}/comparecheck ${testdir}/fac_test.in ${testdir}/fac_test.out\
 	${testdir}/dbm_test.in ${testdir}/dbm_test.out
 
 DISTFILES=${SOURCES} ${HEADERS} Makefile.in configure.in configure \
-	mod2.h.in grammar.h testgh install-sh mkinstalldirs \
+	mod2.h.in si_paths.h.in grammar.h testgh install-sh mkinstalldirs \
 	${INCS}
 
 OBJS=grammar.o scanner.o matpol.o binom.o\
@@ -183,7 +183,8 @@ mmutil.inc: mmutil.c mmprivat.h
 
 mmutil.o mmutil.d: mmutil.inc
 
-version.h: ${SOURCES} ${HEADERS} Makefile.in mod2.h.in configure.in
+version.h: ${SOURCES} ${HEADERS} Makefile.in mod2.h.in si_paths.h.in \
+           configure.in
 	echo "#define SINGULAR_VERSION_ID " `date '+%y%m%d%H'` >version.h
 
 spSpolyLoop.cc spSpolyLoop.dd : spSpolyLoop.inc
@@ -212,8 +213,8 @@ src: scanner.cc grammar.h grammar.cc libparse.cc spSpolyLoop.inc
 
 mod2.h: stamp-h
 
-stamp-h : config.status mod2.h.in 
-	CONFIG_FILES= CONFIG_HEADERS=mod2.h ./config.status
+stamp-h : config.status mod2.h.in  si_paths.h.in
+	CONFIG_FILES= CONFIG_HEADERS="mod2.h si_paths.h" ./config.status
 
 Makefile: Makefile.in config.status 
 	CONFIG_FILES="Makefile" CONFIG_HEADERS= ./config.status

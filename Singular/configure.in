@@ -1,6 +1,6 @@
 dnl Process this file with autoconf to produce a configure script.
 AC_INIT(matpol.h)
-AC_CONFIG_HEADER(mod2.h)
+AC_CONFIG_HEADER(mod2.h si_paths.h)
 
 dnl llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl version stuff -- should be set in ../configure.in
@@ -122,12 +122,12 @@ dnl if they are not yet already set
 # expand prefix 
 test "x$prefix" = xNONE && prefix=$ac_default_prefix
 if test "${with_rootdir+set}" != set; then
-  AC_DEFINE_UNQUOTED(SINGULAR_ROOT_DIR, "${prefix}")
+  AC_DEFINE_UNQUOTED(S_ROOT_DIR, "${prefix}")
 else
-  AC_DEFINE_UNQUOTED(SINGULAR_ROOT_DIR, "${with_rootdir}")
+  AC_DEFINE_UNQUOTED(S_ROOT_DIR, "${with_rootdir}")
 fi
 
-# expand exec_prefix
+# expand exec_prefixad
 if test "x$exec_prefix" = xNONE; then
   if test -x "singuname.sh"; then
     singuname="/bin/sh singuname.sh"
@@ -148,7 +148,7 @@ fi
 test "x$bindir" = 'x${exec_prefix}/bin' && bindir="${exec_prefix}/bin" 
 SINGULAR=${SINGULAR:-$bindir/Singular-$SINGULAR_MAJOR_VERSION.$SINGULAR_MINOR_VERSION.$SINGULAR_SUB_VERSION}
 AC_SUBST(SINGULAR)
-AC_DEFINE_UNQUOTED(SINGULAR_BIN_DIR, "${bindir}")
+AC_DEFINE_UNQUOTED(S_BIN_DIR, "${bindir}")
 
 # expand libdir
 test "x$libdir" = 'x${exec_prefix}/lib'&& libdir="${exec_prefix}/lib/${SINGULAR_VERSION}"
@@ -429,6 +429,7 @@ if test "$with_readline" != no; then
    AC_CHECK_LIB(curses,tgetent,,\
    AC_CHECK_LIB(termcap,tgetent)))
    AC_CHECK_LIB(readline, rl_abort)
+   AC_CHECK_HEADERS(readline/readline.h readline/history.h)
    if test "$ac_cv_lib_readline_rl_abort" = yes && \
       test "$ac_cv_header_readline_readline_h" = yes; then
      AC_MSG_CHECKING(whether readline.h is ok)

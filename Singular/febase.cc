@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.49 1998-06-08 17:48:09 Singular Exp $ */
+/* $Id: febase.cc,v 1.50 1998-06-13 14:34:28 obachman Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -25,23 +25,7 @@
 #include "subexpr.h"
 #include "ipshell.h"
 
-// Define or pass as argument to compiler, if you are building a distribution
-// #define MAKE_DISTRIBUTION
-
-#if defined(MAKE_DISTRIBUTION)
-#undef SINGULAR_ROOT_DIR
-#undef SINGULAR_BIN_DIR
-
-#ifdef WINNT
-#define SINGULAR_ROOT_DIR "/Singular"
-#define SINGULAR_BIN_DIR "/Singular/Intel-Win"
-#else
-#define SINGULAR_ROOT_DIR "/usr/local"
-#define SINGULAR_BIN_DIR "/usr/local/bin"
-#endif
-
-#endif // defined(MAKE_DISTRIBUTION)
-
+#include "si_paths.h"
 
 #ifndef MAXPATHLEN
 #define MAXPATHLEN 1024
