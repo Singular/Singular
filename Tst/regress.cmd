@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 #################################################################
-# $Id: regress.cmd,v 1.12 1998-06-10 15:18:29 obachman Exp $
+# $Id: regress.cmd,v 1.13 1998-06-12 06:30:17 obachman Exp $
 # FILE:    regress.cmd 
 # PURPOSE: Script which runs regress test of Singular
 # CREATED: 2/16/98
@@ -128,8 +128,8 @@ sub Diff
   local($exit_status);
   
   # prepare the result files: 
-  &mysystem("$cat $root.res | $tr \"\\r\" \" \" | $sed $sed_scripts > $root.res.cleaned");
-  &mysystem("$cat $root.new.res | $tr \"\\r\" \" \" | $sed $sed_scripts > $root.new.res.cleaned");
+  &mysystem("$cat $root.res | $tr \"\\013\" \" \" | $sed $sed_scripts > $root.res.cleaned");
+  &mysystem("$cat $root.new.res | $tr \"\\013\" \" \" | $sed $sed_scripts > $root.new.res.cleaned");
 
   # doo the diff call
   if ($verbosity > 0 && ! $WINNT)
