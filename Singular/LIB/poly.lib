@@ -1,11 +1,13 @@
-// $Id: poly.lib,v 1.8 1997-11-18 16:12:59 Singular Exp $
+// $Id: poly.lib,v 1.9 1997-12-17 17:28:05 obachman Exp $
 //system("random",787422842);
 //(GMG, last modified 22.06.96)
+//(obachman: 17.12.97 -- added katsura)
 ///////////////////////////////////////////////////////////////////////////////
 
 LIBRARY:  poly.lib      PROCEDURES FOR MANIPULATING POLYS, IDEALS, MODULES
 
  cyclic(int);           ideal of cyclic n-roots
+ katsura([i]);		katsura [i] ideal
  freerank(poly/...)     rank of coker(input) if coker is free else -1
  is_homog(poly/...);    int, =1 resp. =0 if input is homogeneous resp. not
  is_zero(poly/...);     int, =1 resp. =0 if coker(input) is 0 resp. not
@@ -48,6 +50,59 @@ example
    ring r=0,(u,v,w,x,y,z),lp;
    cyclic(nvars(basering));
    homog(cyclic(5),z);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc katsura
+USAGE:	katsura([n]); n integer
+RETURN: katsura(n) : n-th katsura ideal of newly created and set ring
+                     (32003, x(0..n), dp)
+        katsura()  : katsura ideal of basering 
+EXAMPLE: example katsura; shows examples
+{
+  if ( size(#) == 1 && typeof(#[1]) == "int")
+  {
+    ring katsura_ring = 32003, x(0..#[1]), dp;
+    keepring katsura_ring;
+  }
+  ideal s;
+  int i, j;
+  int n = nvars(basering) -1;
+  poly p;
+  
+  p = -1;
+  for (i = -n; i <= n; i++)
+  {
+    p = p + kat_var(i, n);
+  }
+  s[1] = p;
+  
+  for (i = 0; i < n; i++)
+  {
+    p = -1 * kat_var(i,n);
+    for (j = -n; j <= n; j++)
+    {
+      p = p + kat_var(j,n) * kat_var(i-j, n);
+    }
+    s = s,p;
+  }
+  return (s);
+}
+//-------------------------------- examples -----------------------------------
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r;
+  katsura();
+  katsura(3);
+}
+
+proc kat_var(int i, int n)
+{
+  poly p;
+  if (i < 0)  { i = -i;}
+  if (i <= n) { p = var(i+1); }
+  return (p);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
