@@ -1,13 +1,15 @@
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: mondromy.lib,v 1.1 1999-06-22 10:42:24 obachman Exp $";
+version="$Id: mondromy.lib,v 1.2 1999-06-22 14:50:49 mschulze Exp $";
 info="
 LIBRARY: mondromy.lib  PROCEDURES TO COMPUTE THE MONODROMY OF A SINGULARITY
 AUTHOR:  Mathias Schulze, email: mschulze@mathematik.uni-kl.de
 
  invunit(u,n);         series inverse of polynomial u up to order n
  detadj(U);            determinant and adjoint matrix of square matrix U
+ jacoblift(f);         lifts f^kappa in jacob(f) with minimal kappa
  monodromy(f[,opt]);   monodromy of isolated hypersurface singularity f
+ H''basis(f);          basis of Brieskorn lattice H''
 ";
 
 LIB "ring.lib";
@@ -63,6 +65,7 @@ static proc pcvinit()
     pcvbasis=Pcv::Basis;
   }
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 
 static proc min(intvec v)
@@ -114,13 +117,12 @@ proc codimV(list V,int N)
   int codim=pcvdim(0,N);
   if(size(V)>0)
   {
-    dbprint(printlevel-voice+2,"//computing codimension...");
     dbprint(printlevel-voice+2,"//vector space dimension: "+string(codim));
-    dbprint(printlevel-voice+2,"//number of generators: "+string(size(V)));
+    dbprint(printlevel-voice+2,
+      "//number of subspace generators: "+string(size(V)));
     int t=timer;
     codim=codim-ncols(interred(module(V[1..size(V)])));
-    dbprint(printlevel-voice+2,"//...codimension computed ["+string(timer-t)+
-      " secs]");
+    dbprint(printlevel-voice+2,"//codimension: "+string(codim));
   }
   return(codim);
 }
@@ -131,20 +133,18 @@ proc quotV(list V,int N)
   module Q=freemodule(pcvdim(0,N));
   if(size(V)>0)
   {
-    dbprint(printlevel-voice+2,"//computing quotient vector space...");
     dbprint(printlevel-voice+2,"//vector space dimension: "+string(nrows(Q)));
-    dbprint(printlevel-voice+2,"//number of generators: "+string(size(V)));
+    dbprint(printlevel-voice+2,
+      "//number of subspace generators: "+string(size(V)));
     int t=timer;
     Q=interred(reduce(std(Q),std(module(V[1..size(V)]))));
-    dbprint(printlevel-voice+2,"//...quotient vector space computed ["
-      +string(timer-t)+" secs]");
   }
   return(list(Q[1..size(Q)]));
 }
 ///////////////////////////////////////////////////////////////////////////////
 
 proc invunit(poly u,int n)
-"USAGE:   invunit(u,n); u polynomial, n integer
+"USAGE:   invunit(u,n); u poly, n int
 ASSUME:  The polynomial u is a series unit.
 RETURN:  The procedure returns the series inverse of u up to order n
          or a zero polynomial if u is no series unit.
@@ -242,7 +242,16 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc getkappaxiu(poly f)
+proc jacoblift(poly f)
+"USAGE:   jacoblift(f); f poly
+ASSUME:  The polynomial f in a series ring (local ordering) defines 
+         an isolated hypersurface singularity.
+RETURN:  The procedure returns a list with entries kappa, xi, u of type 
+         int, vector, poly such that kappa is minimal with f^kappa in jacob(f),
+         u is a unit, and u*f^kappa=(matrix(jacob(f))*xi)[1,1].
+DISPLAY: printlevel>=1; shows comments.
+EXAMPLE: example jacoblift; shows an example.
+"
 {
   dbprint(printlevel-voice+2,"//computing kappa...");
   int t=timer;
@@ -269,7 +278,13 @@ static proc getkappaxiu(poly f)
   poly u=(matrix(jf)*xi)[1,1]/fkappa;
   dbprint(printlevel-voice+2,"//...u computed ["+string(timer-t)+" secs]");
 
-  return(kappa,xi,u);
+  return(list(kappa,xi,u));
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring R=0,(x,y),ds;
+  poly f=x2y2+x6+y6;
+  jacoblift(f);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -339,8 +354,15 @@ static proc incK(poly f,int mu,int K,int deltaK,int N,
   dbprint(printlevel-voice+2,"//N="+string(N));
 
   deltaN=1;
+  dbprint(printlevel-voice+2,"//computing codimension of");
+  dbprint(printlevel-voice+2,"//df^dOmega^(n-1)+f^K*Omega^(n+1) in "
+    +"Omega^(n+1) mod m^N*Omega^(n+1)...");
+  int t=timer;
   while(codimV(V1+V2,N)<K*mu)
   {
+    dbprint(printlevel-voice+2,"//...codimension computed ["+string(timer-t)
+      +" secs]");
+
     deltaP1=getdeltaP1(f,K,N,deltaN);
     V1=pcvladdl(V1,pcvp2cv(P1,N,N+deltaN))+pcvp2cv(deltaP1,0,N+deltaN);
     P1=P1+deltaP1;
@@ -353,7 +375,14 @@ static proc incK(poly f,int mu,int K,int deltaK,int N,
 
     N=N+deltaN;
     dbprint(printlevel-voice+2,"//N="+string(N));
+
+    dbprint(printlevel-voice+2,"//computing codimension of");
+    dbprint(printlevel-voice+2,"//df^dOmega^(n-1)+f^K*Omega^(n+1) in "
+      +"Omega^(n+1) mod m^N*Omega^(n+1)...");
+    t=timer;
   }
+  dbprint(printlevel-voice+2,"//...codimension computed ["+string(timer-t)
+    +" secs]");
 
   return(K,N,P1,P2,Pe,V1,V2,Ve);
 }
@@ -396,7 +425,7 @@ static proc MK(poly f,int mu,int kappa,vector xi,poly u,
     +" secs]");
 
   dbprint(printlevel-voice+2,
-    "//lifting nabla(e) to vector space basis of H''/t^KH''...");
+    "//lifting nabla(e) to C-basis of H''/t^KH''...");
   list V=Ve+V1+V2;
   module W=module(V[1..size(V)]);
   dbprint(printlevel-voice+2,"//vector space dimension: "+string(nrows(W)));
@@ -406,7 +435,7 @@ static proc MK(poly f,int mu,int kappa,vector xi,poly u,
   dbprint(printlevel-voice+2,"//...nabla(e) lifted ["+string(timer-t)
     +" secs]");
 
-  dbprint(printlevel-voice+2,"//computing lift of nabla(e) to e...");
+  dbprint(printlevel-voice+2,"//computing e-lift of nabla(e)...");
   t=timer;
   int i1,i2,j,k;
   matrix M[mu][mu];
@@ -420,7 +449,7 @@ static proc MK(poly f,int mu,int kappa,vector xi,poly u,
       }
     }
   }
-  dbprint(printlevel-voice+2,"//...lift of nabla(e) to e computed ["
+  dbprint(printlevel-voice+2,"//...e-lift of nabla(e) computed ["
     +string(timer-t)+" secs]");
 
   return(M,N,Vnablae);
@@ -541,17 +570,21 @@ static proc nonqhmonodromy(poly f,int mu,int opt)
 {
   pcvinit();
 
-  dbprint(printlevel-voice+2,"//computing kappa, xi and u...");
-  def kappa,xi,u=getkappaxiu(f);
+  dbprint(printlevel-voice+2,"//computing kappa, xi and u with "+
+    "u*f^kappa=(matrix(jacob(f))*xi)[1,1]...");
+  list jl=jacoblift(f);
+  def kappa,xi,u=jl[1..3];
   dbprint(printlevel-voice+2,"//...kappa, xi and u computed");
   dbprint(printlevel-voice+2,"//kappa="+string(kappa));
   if(kappa==1)
   {
-    dbprint(printlevel-voice+2,"//singularity quasihomogeneous");
+    dbprint(printlevel-voice+2,
+      "//f quasihomogenous with respect to suitable coordinates");
   }
   else
   {
-    dbprint(printlevel-voice+2,"//singularity not quasihomogeneous");
+    dbprint(printlevel-voice+2,
+      "//f not quasihomogenous for any choice of coordinates");
   }
   dbprint(printlevel-voice+2,"//xi=");
   dbprint(printlevel-voice+2,xi);
@@ -564,10 +597,11 @@ static proc nonqhmonodromy(poly f,int mu,int opt)
   K,N,P1,P2,Pe,V1,V2,Ve=incK(f,mu,K,1,N,e,P1,P2,Pe,V1,V2,Ve);
   dbprint(printlevel-voice+2,"//...K and N increased");
 
-  dbprint(printlevel-voice+2,
-    "//computing basis e of Brieskorn lattice H''...");
+  dbprint(printlevel-voice+2,"//computing C{f}-basis e of Brieskorn lattice "
+    +"H''=Omega^(n+1)/df^dOmega^(n-1)...");
+  int t=timer;
   e=pcvcv2p(quotV(V1+V2,N),0,N);
-  dbprint(printlevel-voice+2,"//...e computed");
+  dbprint(printlevel-voice+2,"//...e computed ["+string(timer-t)+" secs]");
 
   dbprint(printlevel-voice+2,"//e=");
   dbprint(printlevel-voice+2,e);
@@ -592,7 +626,7 @@ static proc nonqhmonodromy(poly f,int mu,int opt)
     matrix U=freemodule(mu)*var(1)^((mu-1)*(kappa-1));
     int i;
     dbprint(printlevel-voice+2,"//comparing with previous lattice...");
-    int t=timer;
+    t=timer;
     for(i=mu-1;i>=1&&size(reduce(U,std(prevU)))>0;i--)
     {
       dbprint(printlevel-voice+2,"//...compared with previous lattice ["
@@ -626,11 +660,11 @@ static proc nonqhmonodromy(poly f,int mu,int opt)
     if(ncols(U)>nrows(U))
     {
       dbprint(printlevel-voice+2,
-        "//computing basis of t*nabla-stable lattice...");
+        "//computing C{f}-basis of t*nabla-stable lattice...");
       t=timer;
       U=minbase(U);
       dbprint(printlevel-voice+2,
-        "//...basis of t*nabla-stable lattice computed ["+string(timer-t)
+        "//...C{f}-basis of t*nabla-stable lattice computed ["+string(timer-t)
         +" secs]");
     }
 
@@ -739,8 +773,9 @@ static proc nonqhmonodromy(poly f,int mu,int opt)
 static proc qhmonodromy(poly f,intvec w)
 {
   dbprint(printlevel-voice+2,"//computing basis e of Milnor algebra...");
+  int t=timer;
   ideal e=kbase(std(jacob(f)));
-  dbprint(printlevel-voice+2,"//...e computed");
+  dbprint(printlevel-voice+2,"//...e computed ["+string(timer-t)+" secs]");
 
   dbprint(printlevel-voice+2,
     "//computing Milnor number mu and quasihomogeneous degree d...");
@@ -761,29 +796,23 @@ static proc qhmonodromy(poly f,intvec w)
 ///////////////////////////////////////////////////////////////////////////////
 
 proc monodromy(poly f, list #)
-"USAGE:   monodromy(f[,opt]); f polynomial, opt integer
+"USAGE:   monodromy(f[,opt]); f poly, opt int
 ASSUME:  The polynomial f in a series ring (local ordering) defines 
          an isolated hypersurface singularity.
-RETURN:  The procedure returns a residue matrix of the meromorphic Gauss-Manin 
-         connection of the singularity defined by f or an empty matrix
-         if the assumptions are not fulfilled. 
-         If opt=0 (default), the matrix exp(2*pi*i*monodromy(f)) is a 
-         monodromy matrix of the singularity defined by f, else the 
-         characteristic polynomial of the matrix exp(2*pi*i*monodromy(f)) 
-         is the characteristic polynomial of the monodromy of the singularity 
-         defined by f.
-DISPLAY: printlevel>=1; shows comments.
-EXAMPLE: example monodromy; shows an example.
+RETURN:  The procedure returns a residue matrix M of the meromorphic 
+         Gauss-Manin connection of the singularity defined by f 
+         or an empty matrix if the assumptions are not fulfilled. 
+         If opt=0 (default), exp(2*pi*i*M) is a monodromy matrix of f, 
+         else, only the characteristic polynomial of exp(2*pi*i*M) coincides 
+         with the characteristic polynomial of the monodromy of f.
 THEORY:  The procedure uses an algorithm by Brieskorn (See E. Brieskorn, 
-         Die Monodromie der isolierten Singularitaeten von Hyperflaechen, 
          manuscipta math. 2 (1970), 103-161) to compute a connection matrix of 
          the meromorphic Gauss-Manin connection up to arbitrarily high order, 
          and an algorithm of Gerard and Levelt (See R. Gerard, A.H.M. Levelt, 
-         Invariants mesurant l'irregularite en un point singulier des systeme 
-         d'equations differentielles lineaires, Ann. Inst. Fourier, 
-         Grenoble 23,1 (1973), pp. 157-195) to transform it to a simple pole.
-         For a detailed description of the algorithm see M. Schulze, 
-         Computation of the Monodromy of an Isolated Hypersurface Singularity.
+         Ann. Inst. Fourier, Grenoble 23,1 (1973), pp. 157-195) to transform 
+         it to a simple pole.
+DISPLAY: printlevel>=1; shows comments.
+EXAMPLE: example monodromy; shows an example.
 "
 {
   int opt;
@@ -801,6 +830,8 @@ THEORY:  The procedure uses an algorithm by Brieskorn (See E. Brieskorn,
    
   }
 
+  dbprint(printlevel-voice+2,"//basering="+string(basering));
+
   int i;
   for(i=nvars(basering);i>=1;i--)
   {
@@ -810,19 +841,21 @@ THEORY:  The procedure uses an algorithm by Brieskorn (See E. Brieskorn,
     }
   }
 
-  dbprint(printlevel-voice+2,"//basering="+string(basering));
-
   if(i<0)
   {
     print("//no series ring (local ordering)");
+
+    matrix M[1][0];
+    return(M);
   }
   else
   {
     dbprint(printlevel-voice+2,"//f="+string(f));
 
     dbprint(printlevel-voice+2,"//computing milnor number mu of f...");
+    int t=timer;
     int mu=milnor(f);
-    dbprint(printlevel-voice+2,"//...mu computed");
+    dbprint(printlevel-voice+2,"//...mu computed ["+string(timer-t)+" secs]");
 
     dbprint(printlevel-voice+2,"//mu="+string(mu));
 
@@ -850,12 +883,14 @@ THEORY:  The procedure uses an algorithm by Brieskorn (See E. Brieskorn,
 
       if(w==0)
       {
-        dbprint(printlevel-voice+2,"//polynomial not quasihomogeneous");
+        dbprint(printlevel-voice+2,
+          "//f not quasihomogeneous with respect to given coordinates");
         return(nonqhmonodromy(f,mu,opt));
       }
       else
       {
-        dbprint(printlevel-voice+2,"//polynomial quasihomogeneous");
+        dbprint(printlevel-voice+2,
+          "//f quasihomogeneous with respect to given coordinates");
         return(qhmonodromy(f,w));
       }
     }
@@ -867,5 +902,110 @@ example
   poly f=x2y2+x6+y6;
   matrix M=monodromy(f);
   print(M);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc H''basis(poly f)
+"USAGE:   H''basis(f); f poly
+ASSUME:  The polynomial f in a series ring (local ordering) defines 
+         an isolated hypersurface singularity.
+RETURN:  The procedure returns a list of representatives of a C{f}-basis of the
+         Brieskorn lattice H''=Omega^(n+1)/df^dOmega^(n-1).
+THEORY:  H'' is a free C{f}-module of rank milnor(f).
+DISPLAY: printlevel>=1; shows comments.
+EXAMPLE: example H''basis; shows an example.
+"
+{
+  pcvinit();
+
+  dbprint(printlevel-voice+2,"//basering="+string(basering));
+
+  int i;
+  for(i=nvars(basering);i>=1;i--)
+  {
+    if(1<var(i))
+    {
+      i=-1;
+    }
+  }
+
+  if(i<0)
+  {
+    print("//no series ring (local ordering)");
+
+    return(list());
+  }
+  else
+  {
+    dbprint(printlevel-voice+2,"//f="+string(f));
+
+    dbprint(printlevel-voice+2,"//computing milnor number mu of f...");
+    int t=timer;
+    int mu=milnor(f);
+    dbprint(printlevel-voice+2,"//...mu computed ["+string(timer-t)+" secs]");
+
+    dbprint(printlevel-voice+2,"//mu="+string(mu));
+
+    if(mu<=0)
+    {
+      if(mu==0)
+      {
+        print("//no singularity");
+      }
+      else
+      {
+        print("//non isolated singularity");
+      }
+
+      return(list());
+    }
+    else
+    {
+      dbprint(printlevel-voice+2,"//computing kappa, xi and u with "+
+        "u*f^kappa=(matrix(jacob(f))*xi)[1,1]...");
+      list jl=jacoblift(f);
+      def kappa,xi,u=jl[1..3];
+      dbprint(printlevel-voice+2,"//...kappa, xi and u computed");
+      dbprint(printlevel-voice+2,"//kappa="+string(kappa));
+      if(kappa==1)
+      {
+        dbprint(printlevel-voice+2,
+          "//f quasihomogenous with respect to suitable coordinates");
+      }
+      else
+      {
+        dbprint(printlevel-voice+2,
+          "//f not quasihomogenous for any choice of coordinates");
+      }
+      dbprint(printlevel-voice+2,"//xi=");
+      dbprint(printlevel-voice+2,xi);
+      dbprint(printlevel-voice+2,"//u="+string(u));
+
+      int K,N,prevN;
+      list e,P1,P2,Pe,V1,V2,Ve,Vnablae;
+
+      dbprint(printlevel-voice+2,"//increasing K and N...");
+      K,N,P1,P2,Pe,V1,V2,Ve=incK(f,mu,K,1,N,e,P1,P2,Pe,V1,V2,Ve);
+      dbprint(printlevel-voice+2,"//...K and N increased");
+
+      dbprint(printlevel-voice+2,
+        "//computing C{f}-basis e of Brieskorn lattice "
+        +"H''=Omega^(n+1)/df^dOmega^(n-1)...");
+      t=timer;
+      e=pcvcv2p(quotV(V1+V2,N),0,N);
+      dbprint(printlevel-voice+2,"//...e computed ["+string(timer-t)+" secs]");
+
+      dbprint(printlevel-voice+2,"//e=");
+      dbprint(printlevel-voice+2,e);
+
+      return(e);
+    }
+  }
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring R=0,(x,y),ds;
+  poly f=x2y2+x6+y6;
+  H''basis(f);
 }
 ///////////////////////////////////////////////////////////////////////////////
