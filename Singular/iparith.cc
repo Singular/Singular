@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.296 2003-04-09 11:24:35 Singular Exp $ */
+/* $Id: iparith.cc,v 1.297 2003-04-09 14:44:29 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -5839,7 +5839,7 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
         #ifdef HAVE_PLURAL
         if ((currRing!=NULL) && (rIsPluralRing(currRing)))
         {
-          if (dArith2[i].valid_for_plural==NO_PLURAL)
+          if (dArith2[i].valid_for_plural==0 /*NO_PLURAL*/)
           {
             Werror("not implemented for non-commutative rings");
             break;
@@ -5882,7 +5882,7 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
             #ifdef HAVE_PLURAL
             if ((currRing!=NULL) && (rIsPluralRing(currRing)))
             {
-              if (dArith2[i].valid_for_plural==NO_PLURAL)
+              if (dArith2[i].valid_for_plural==0 /*NO_PLURAL*/)
               {
                 Werror("not implemented for non-commutative rings");
                 break;
@@ -6016,7 +6016,7 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
         #ifdef HAVE_PLURAL
         if ((currRing!=NULL) && (rIsPluralRing(currRing)))
         {
-          if (dArith1[i].valid_for_plural==NO_PLURAL)
+          if (dArith1[i].valid_for_plural==0 /*NO_PLURAL*/)
           {
             Werror("not implemented for non-commutative rings");
             break;
@@ -6067,7 +6067,7 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
           #ifdef HAVE_PLURAL
           if ((currRing!=NULL) && (rIsPluralRing(currRing)))
           {
-            if (dArith1[i].valid_for_plural==NO_PLURAL)
+            if (dArith1[i].valid_for_plural==0 /*NO_PLURAL*/)
             {
               Werror("not implemented for non-commutative rings");
               break;
@@ -6196,7 +6196,7 @@ BOOLEAN iiExprArith3(leftv res, int op, leftv a, leftv b, leftv c)
         #ifdef HAVE_PLURAL
         if ((currRing!=NULL) && (rIsPluralRing(currRing)))
         {
-            if (dArith3[i].valid_for_plural==NO_PLURAL)
+            if (dArith3[i].valid_for_plural==0 /*NO_PLURAL*/)
             {
               Werror("not implemented for non-commutative rings");
               break;
@@ -6242,7 +6242,7 @@ BOOLEAN iiExprArith3(leftv res, int op, leftv a, leftv b, leftv c)
               if ((currRing!=NULL)
               && (rIsPluralRing(currRing)))
               {
-                if (dArith3[i].valid_for_plural==NO_PLURAL)
+                if (dArith3[i].valid_for_plural==0 /*NO_PLURAL*/)
                 {
                    Werror("not implemented for non-commutative rings");
                    break;
@@ -6428,7 +6428,7 @@ BOOLEAN iiExprArithM(leftv res, leftv a, int op)
         if ((currRing!=NULL)
         && (rIsPluralRing(currRing)))
         {
-          if (dArithM[i].valid_for_plural==NO_PLURAL)
+          if (dArithM[i].valid_for_plural==0 /*NO_PLURAL*/)
           {
             Werror("not implemented for non-commutative rings");
             break;
