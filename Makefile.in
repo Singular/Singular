@@ -4,10 +4,19 @@ PRODUCT		= Singular
 VERSION		= 1.0
 
 DISTNAME	= ${PRODUCT}-full-${VERSION}
+BINDISTNAME	= ${PRODUCT}-${VERSION}.@host@
+SHAREDISTNAME	= ${PRODUCT}-${VERSION}-share
+MKINSTALLDIRS	= ./mkinstalldirs
 
 @SET_MAKE@
 BUILD_SUBDIRS	= @CONFIG_SUBDIRS@
 SUBDIRS		= @SUBDIRS@
+
+prefix 		= @prefix@
+exec_prefix	= @exec_prefix@
+infodir		= @infodir@
+datadir		= @datadir@
+bindir		= @bindir@
 
 TEMPDIR		= /tmp
 
@@ -39,7 +48,7 @@ clean distclean mostlyclean maintainer-clean:
 	fi
 
 dist: 
-	rm -rf ${DISTNAME}.tar* ${TEMPDIR}/${DISTNAME}*
+	rm -rf ${DISTNAME}.tar* ${TEMPDIR}/${DISTNAME}* 
 	mkdir ${TEMPDIR}/${DISTNAME}
 	- cp -pR . ${TEMPDIR}/${DISTNAME}
 	cd ${TEMPDIR}/${DISTNAME}; ${MAKE} distclean; 
@@ -47,6 +56,46 @@ dist:
 	rm -rf ${TEMPDIR}/${DISTNAME}
 	- gzip -9 ${TEMPDIR}/${DISTNAME}.tar
 	- mv ${TEMPDIR}/${DISTNAME}.tar.gz .
+
+bindist: ${bindir}/Singular
+	rm -rf  ${BINDISTNAME}*
+	if test "${datadir}" != /usr/local/share || \
+	   test "${infodir}" != /usr/local/info; then \
+		cd Singular ;\
+		mv mod2.h mod2.h.orig ;\
+		sed -f ../sed.bindist.cmd mod2.h.orig > mod2.h ;\
+		/bin/rm -f febase.o misc.o;\
+		${MAKE} Singular ;\
+		/bin/rm -f febase.o misc.o;\
+		mv mod2.h.orig mod2.h;\
+	fi
+	mv Singular/Singular ${BINDISTNAME}
+	strip ${BINDISTNAME}
+	gzip -9 ${BINDISTNAME}
+
+sharedist: ${bindir}/Singular
+	cd Singular; ${MAKE} dvi; ${MAKE} info
+	/bin/rm -rf ${TEMPDIR}/Singular-share
+	${MKINSTALLDIRS} ${TEMPDIR}/Singular-share/info
+	${MKINSTALLDIRS} ${TEMPDIR}/Singular-share/share/Singular/doc
+	${MKINSTALLDIRS} ${TEMPDIR}/Singular-share/share/Singular/gftables
+	cp Singular/LIB/*.lib ${TEMPDIR}/Singular-share/share/Singular
+	cp Singular/LIB/gftables/[0-9]* \
+		${TEMPDIR}/Singular-share/share/Singular/gftables
+	cp Singular/doc/singular.hlp ${TEMPDIR}/Singular-share/info
+	cp Singular/doc/singular.dvi Singular/doc/tutor.dvi \
+		${TEMPDIR}/Singular-share/share/Singular/doc
+	cd  ${TEMPDIR}/Singular-share/share/Singular/; \
+	ln -s ../../info/singular.hlp singular.hlp
+	cp COPYING.share README.share ${TEMPDIR}/Singular-share
+	cd ${TEMPDIR}/Singular-share;\
+	tar cf ${SHAREDISTNAME}.tar * ;\
+	gzip -9 ${SHAREDISTNAME}.tar
+	mv ${TEMPDIR}/Singular-share/${SHAREDISTNAME}.tar.gz .
+	/bin/rm -rf ${TEMPDIR}/Singular-share
+
+${bindir}/Singular: 
+	${MAKE} install	
 
 Singular factory libfac MP gmp:
 	cd $@; ${MAKE} all

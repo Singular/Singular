@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.3 1997-04-02 15:07:44 Singular Exp $ */
+/* $Id: polys.cc,v 1.4 1997-06-04 19:45:23 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -1370,8 +1370,13 @@ int pWTotaldegree(poly p)
         break;
       case ringorder_c:
       case ringorder_C:
-      case ringorder_a:
         break;
+      case ringorder_a:
+        for (k=block0[i];k<=block1[i];k++)
+        { // only one line
+          j+=p->exp[k]*polys_wv[i][k-block0[i]];
+        }
+        return j;
     }
   }
   return  j;
@@ -1782,8 +1787,16 @@ void pChangeRing(int n, int Sgn, int * orders, int * b0, int * b1,
   /*------- more than one block ----------------------*/
   else
   {
-    pLexOrder=TRUE;
+    //pLexOrder=TRUE;
     pVectorOut=orders[0]==ringorder_c;
+    if ((pVectorOut)||(orders[0]==ringorder_C))
+    {
+      if(block1[1]!=pVariables) pLexOrder=TRUE;
+    }  
+    else
+    {
+      if(block1[0]!=pVariables) pLexOrder=TRUE;
+    }
     /*the number of orderings:*/
     i = 0;
     while (orders[++i] != 0);

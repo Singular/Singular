@@ -54,10 +54,12 @@ dnl
 dnl compiler stuff
 dnl we do not want to have "-g -O" for CFLAGS  
 if test "${CXXFLAGS+set}" != set; then
+  ac_cxxflags_set=no
   CXXFLAGS="-O"
 fi
 if test "${CFLAGS+set}" != set; then
   CFLAGS="-O"
+  ac_cflags_set=no
 fi
 
 AC_PROG_CC
@@ -416,10 +418,12 @@ fi
 
 
 if test ${GXX} = yes; then
-  CXXFLAGS="-O3 -w -fomit-frame-pointer"
+  if test "$ac_cxxflags_set" = no; then
+    CXXFLAGS="-O3 -w -fomit-frame-pointer"
+  fi
   CXXTEMPLFLAGS="-fno-implicit-templates"
   if test "$ac_cv_is_aix" = yes; then
-    CXXNOOPTFLAGS="-O -w -fomit-frame-pointer"
+    CXXNOOPTFLAGS="-w"
   else
     CXXNOOPTFLAGS=$CXXFLAGS
   fi
@@ -430,7 +434,7 @@ fi
 AC_SUBST(CXXTEMPLFLAGS)
 AC_SUBST(CXXNOOPTFLAGS)
 
-if test ${GCC} = yes; then
+if test ${GCC} = yes && test "$ac_cflags_set" = no ; then
   CFLAGS="-O3 -w -fomit-frame-pointer"
 fi
 

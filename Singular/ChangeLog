@@ -19,7 +19,18 @@ Mon May 12 16:48:14 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de
 
 	* misc.cc: Added / to Help_File and Info_File
 
+Sun May 25 14:06:12 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* configure.in: Fixed handling of CXXFLAGS -- it is not touched if
+	  set as env var
+
+Fri May 23 11:40:14 1997  Olaf Bachmann  <obachman@schlupp.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* Makefile.in: Changed dist target to cp; make distclean
+
 Wed May 21 08:56:19 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* mpsr_Tok.cc: fixed dependencies/generation of mpsr_Tok.inc
 
 	* tesths.cc (main): made -v option gmp v1.3 clean
 

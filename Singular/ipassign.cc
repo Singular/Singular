@@ -1,8 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.11 1997-05-23 15:00:01 Singular Exp $ */
-
 /*
 * ABSTRACT: interpreter:
 *           assignment of expressions and lists to objects or lists
@@ -260,11 +258,19 @@ static BOOLEAN jiA_POLY(leftv res, leftv a,Subexpr e)
     {
       j=i; i=1;
       // for ideal/module: check indices
-      if ((res->rtyp!=MAP_CMD) &&(j>MATCOLS(m)))
+      if (res->rtyp!=MAP_CMD)
       {
-        pEnlargeSet(&(m->m),MATCOLS(m),j-MATCOLS(m));
-        MATCOLS(m)=j;
-      }
+        if (j>MATCOLS(m))
+        {
+          pEnlargeSet(&(m->m),MATCOLS(m),j-MATCOLS(m));
+          MATCOLS(m)=j;
+        }
+        else if (j<=0)
+        {
+          Werror("index[%d] must be positive",j/*e->start*/);
+          return TRUE;
+        }
+      }  
     }
     else
     {

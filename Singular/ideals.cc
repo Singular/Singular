@@ -1,7 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.7 1997-05-21 13:05:12 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -948,6 +947,7 @@ ideal idSect (ideal h1,ideal h2)
 {
   ideal first=h2,second=h1,temp,temp1,result;
   int i,j,k,flength,slength,length,rank=min(h1->rank,h2->rank);
+  intvec *w;
   poly p,q;
 
   if ((idIs0(h1)) && (idIs0(h2)))  return idInit(1,rank);
@@ -993,7 +993,8 @@ ideal idSect (ideal h1,ideal h2)
     }
   }
   pSetSyzComp(length);
-  temp1 = std(temp,currQuotient,(tHomog)FALSE,NULL,NULL,length);
+  temp1 = std(temp,currQuotient,testHomog,&w,NULL,length);
+  if (w!=NULL) delete w;
   pSetSyzComp(0);
   idDelete(&temp);
   result = idInit(IDELEMS(temp1),rank);
@@ -2658,6 +2659,7 @@ ideal idModulo (ideal h2,ideal h1)
 {
   ideal temp,temp1;
   int i,j,k,rk,flength=0,slength,length;
+  intvec * w;
   poly p,q;
 
   if (idIs0(h2))
@@ -2702,9 +2704,10 @@ ideal idModulo (ideal h2,ideal h1)
     }
   }
   pSetSyzComp(length);
-  temp1 = std(temp,currQuotient,(tHomog)FALSE,NULL,NULL,length);
+  temp1 = std(temp,currQuotient,testHomog,&w,NULL,length);
   pSetSyzComp(0);
   idDelete(&temp);
+  if (w!=NULL) delete w;
   for (i=0;i<IDELEMS(temp1);i++)
   {
     if ((temp1->m[i]!=NULL)

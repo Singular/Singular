@@ -1,11 +1,10 @@
-// $Id: all.lib,v 1.1 1997-05-01 17:50:40 Singular Exp $
+// $Id: all.lib,v 1.2 1997-06-04 19:45:25 obachman Exp $
 ///////////////////////////////////////////////////////////////////////////////
 
 LIBRARY:  all.lib   Load all libraries
 
 ///////////////////////////////////////////////////////////////////////////////
 
-LIB "cs.lib";
 LIB "deform.lib";
 LIB "elim.lib";
 LIB "factor.lib";

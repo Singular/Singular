@@ -23,7 +23,7 @@ See below for an overview of Singular, and for distribution and
 support information.
 
 If you receive this file as part of a complete Singular distribution,
-see also the README, COPYING, and INSTALL files contained in the top
+see also the README.src, COPYING.src, and INSTALL files contained in the top
 directory of the full Singular distribution.
 
 
@@ -67,13 +67,22 @@ The newest version of Singular is always available by anonymous ftp
 from 
 	     www.mathematik.uni-kl.de:/pub/Math/Singular
 
-Binary versions of Singular for some common hard- and software
+Binary versions of Singular for common hard- and software
 platforms are contained in the files Singular-1.0.<platform>.gz where
 <platform> is, for example, 'linux', 'SunOS', etc.  See the file
 README.bin for more information about the distribution of Singular
 binaries.
 
-The source code of Singular is distributed in two versions:
+Architecture - independent files (such as libraries written in the
+Singular programming language, and the Singular documentation) are
+distributed as Singular-1.0-share.tar.gz. See the file README.share
+for more information. 
+
+In general, Singular is only available as binary program. For
+exceptions, you may contact us at
+        singular@mathematik.uni-kl.de
+
+The source is distributed in two versions:
   1. A full source distribution of Singular is contained in
      Singular-full-1.0.tar.gz.  This (gzip'ed and tar'ed) file
      contains the source code, documentation, and supporting data
@@ -85,8 +94,7 @@ The source code of Singular is distributed in two versions:
      sources, documentation and supporting data files for Singular,
      only, i.e., it comes WITHOUT the sources for any of the add-on
      packages.
-See the file README.src for further information on the distribution of
-Singular sources.
+
 
 Documentation to Singular is distributed as:
 Singular-1.0.dvi.gz	 - Reference manual in dvi format
@@ -95,11 +103,6 @@ Singular-1.0.ps.gz	 - Reference manual in postscript format
 Tutorial.dvi.gz		 - Singular tutorial in postscript format
 singular.hlp.gz		 - Reference manual in Info format
 Singular-1.0.html.tar.gz - Reference manual in html format
-See the file README.doc for further information on the distribution of
-Singular documentation.
-
-Libraries written in Singular's programming language are contained in
-the file Singular-1.0.LIB.tar.gz. 
 
 
 More information about Singular: Comments, Questions, Bug Reports

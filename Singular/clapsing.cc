@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.6 1997-05-05 13:40:03 obachman Exp $
+// $Id: clapsing.cc,v 1.7 1997-06-04 19:45:09 obachman Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -224,6 +224,8 @@ void singclap_divide_content ( poly f )
 {
   if ( nGetChar() == 1 )
     setCharacteristic( 0 );
+  else  if ( nGetChar() == -1 )
+    return; /* not implemented for R */
   else  if ( nGetChar() < 0 )
     setCharacteristic( -nGetChar() );
   else
@@ -278,6 +280,15 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
   //            0 return factors and exponents
 
   ideal res=NULL;
+  if (f==NULL)
+  {
+    res=idInit(1,1);
+    if (with_exps!=1)
+    {
+      (*v)=new intvec(1);
+    }
+    return res;
+  }
   Off(SW_RATIONAL);
   On(SW_SYMMETRIC_FF);
   CFFList L;
@@ -361,7 +372,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
     int j=0;
     if (with_exps!=1)
     {
-      if (with_exps==2)
+      if ((with_exps==2)&&(n>1))
       {
         n--;
         J++;

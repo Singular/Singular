@@ -2,7 +2,8 @@ dnl Process this file with autoconf to produce a configure script
 AC_INIT(Singular/matpol.h)
 AC_PREFIX_DEFAULT(`pwd`)
 
-AC_CANONICAL_SYSTEM
+AC_CANONICAL_HOST
+AC_SUBST(host)
 
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
@@ -80,12 +81,12 @@ if test "$ac_cv_lib_MP_IMP_PutGmpInt" = yes && \
   ac_MP_ok=yes
 fi
 
-if test "$ac_cv_lib_singcf_initCanonicalForm" = yes && \
+if test "$ac_cv_lib_singcf_atof" = yes && \
  test "$ac_cv_header_factory_h" = yes; then
   ac_factory_ok=yes
 fi
 
-if test "$ac_cv_lib_singfac_IrrCharSeries" = yes && \
+if test "$ac_cv_lib_singfac_atof" = yes && \
  test "$ac_cv_header_factor_h" = yes; then
   ac_libfac_ok=yes
 fi

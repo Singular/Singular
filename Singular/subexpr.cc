@@ -1,8 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: subexpr.cc,v 1.19 1997-05-23 18:08:27 Singular Exp $ */
-
 /*
 * ABSTRACT: handling of leftv
 */
@@ -504,6 +502,8 @@ void * sleftv::CopyD(int t)
   {
     void *x=data;
     if (rtyp==VNOETHER) x=(void *)pCopy(ppNoether);
+    else if ((rtyp==VMINPOLY)&& (currRing->minpoly!=NULL)&&(currRing->ch<2))
+      x=(void *)nCopy(currRing->minpoly);
     data=NULL;
     return x;
   }
@@ -575,10 +575,10 @@ void * sleftv::CopyD(int t)
 
 void * sleftv::CopyD()
 {
-  if ((rtyp!=IDHDL)&&(e==NULL))
+  if ((rtyp!=IDHDL)&&(e==NULL)
+  &&(rtyp!=VNOETHER)&&(rtyp!=VMINPOLY))
   {
     void *x=data;
-    if (rtyp==VNOETHER) x=(void *)pCopy(ppNoether);
     data=NULL;
     return x;
   }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.3 1997-04-02 15:07:16 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.4 1997-06-04 19:45:20 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -283,20 +283,20 @@ static void redHomog0 (LObject* h,kStrategy strat)
 #endif
         return;
       }
-      else if (strat->syzComp!=0)
-      {
-        if ((strat->syzComp>0) && (pMinComp((*h).p) > strat->syzComp))
-        {
-          //pContent((*h).p);
-          pCleardenom((*h).p);// also does a pContent
+//      else if (strat->syzComp!=0)
+//      {
+//        if ((strat->syzComp>0) && (pMinComp((*h).p) > strat->syzComp))
+//        {
+//          //pContent((*h).p);
+//          pCleardenom((*h).p);// also does a pContent
 /*
 *         (*h).length=pLength0((*h).p);
 */
-          k=strat->posInT(strat->T,strat->tl,(*h));
-          enterTBba((*h),k,strat);
-          return;
-        }
-      }
+//          k=strat->posInT(strat->T,strat->tl,(*h));
+//          enterTBba((*h),k,strat);
+//          return;
+//        }
+//      }
       /*- try to reduce the s-polynomial -*/
       j = 0;
     }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.cc,v 1.6 1997-05-02 15:10:22 Singular Exp $ */
+/* $Id: modulop.cc,v 1.7 1997-06-04 19:45:22 obachman Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
@@ -91,12 +91,11 @@ BOOLEAN npIsOne (number a)
 
 BOOLEAN npIsMOne (number a)
 {
-  return npPminus1M == (int)a;
+  return ((npPminus1M == (int)a)&&(1!=(int)a));
 }
 
 number npDiv (number a,number b)
 {
-#ifdef LDEBUG
   if ((int)a==0)
     return (number)0;
   else if ((int)b==0)
@@ -104,10 +103,6 @@ number npDiv (number a,number b)
     WerrorS("div by 0");
     return (number)0;
   }
-#else
-  if (((int)a==0) || ((int)b==0))
-    return (number)0;
-#endif
   else
   {
     int s = npLogTable[(int)a] - npLogTable[(int)b];

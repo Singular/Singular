@@ -1,7 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: misc.cc,v 1.14 1997-05-21 13:05:15 obachman Exp $ */
 /*
 * ABSTRACT:
 */
@@ -385,12 +384,28 @@ void singular_help(char *str,BOOLEAN example)
       singular_manual(str);
 #else
       char tmp[150];
+      char tmp2[150];
+      char strstr[100];
       sprintf(tmp,"%s/singular.hlp", SINGULAR_INFODIR);
+      if (strcmp(str,"index")==0)
+         strstr[0]='\0';
+       else
+         sprintf(strstr," Index \"%s\"",str);  
       if (!access(tmp, R_OK))
-        sprintf(tmp, "info -f %s/singular.hlp Index \"%s\"",
-                SINGULAR_INFODIR, str);
+      {
+        sprintf(tmp, "info -f %s/singular.hlp %s", SINGULAR_INFODIR, strstr);
+      }
       else
-        sprintf(tmp,"info singular Index \"%s\"",str);
+      {
+        FILE *fd = feFopen("singular.hlp", "r", tmp2, FALSE);
+        if (fd != NULL)
+        {
+          fclose(fd);
+          sprintf(tmp, "info -f %s %s", tmp2,strstr);
+        }
+        else
+          sprintf(tmp,"info singular %s",strstr);
+      }
       system(tmp);
 #ifndef MSDOS
       //sprintf(tmp,"clear");

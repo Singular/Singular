@@ -1,8 +1,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: attrib.cc,v 1.6 1997-05-22 16:05:04 Singular Exp $ */
-
 /*
 * ABSTRACT: attributes to leftv and idhdl
 */
