@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.21 1998-04-27 14:58:09 krueger Exp $ */
+/* $Id: iplib.cc,v 1.22 1998-05-05 13:20:46 obachman Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -505,14 +505,8 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
 # if YYLPDEBUG > 1
   print_init();
 #  endif
-  if (BVERBOSE(V_LOAD_LIB)) Print( "// ** loading %s...", libnamebuf);
+//  if (BVERBOSE(V_LOAD_LIB)) Print( "// ** loading %s...", libnamebuf);
   yylplex(newlib, libnamebuf, &lib_style);
-  if( (lib_style == OLD_LIBSTYLE) && (BVERBOSE(V_LOAD_LIB)))
-    Warn( "library %s has an old format. Please fix it for the next time",
-	  newlib);
-  else {
-    if (BVERBOSE(V_LOAD_LIB)) Print("done.\n");
-  }
   if(yylp_errno) {
     Werror("Library %s: ERROR occured: in line %d, %d.", newlib, yylplineno,
          current_pos(0));
@@ -522,6 +516,13 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
     fclose( yylpin );
     FreeL((ADDRESS)newlib);
     return TRUE;
+  }
+  if (BVERBOSE(V_LOAD_LIB)) Print( "// ** loaded %s", libnamebuf);
+  if( (lib_style == OLD_LIBSTYLE) && (BVERBOSE(V_LOAD_LIB)))
+    Warn( "library %s has an old format. Please fix it for the next time",
+	  newlib);
+  else {
+    if (BVERBOSE(V_LOAD_LIB)) Print("\n");
   }
   reinit_yylp();
   fclose( yylpin );
