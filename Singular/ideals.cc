@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.29 1998-05-25 12:56:40 Singular Exp $ */
+/* $Id: ideals.cc,v 1.30 1998-05-26 09:19:32 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -264,7 +264,7 @@ void idDelLmEquals(ideal id)
     IDELEMS(id) = l;
   }
 }
-          
+
 void idDelDiv(ideal id)
 {
   int i, j, t;
@@ -273,7 +273,7 @@ void idDelDiv(ideal id)
   {
     for (j=l-1; j>i; j--)
     {
-      
+
       if (((id->m[j] != NULL) && pDivisibleBy(id->m[i], id->m[j])) ||
           (id->m[i] == NULL && id->m[j] == NULL))
       {
@@ -292,7 +292,7 @@ void idDelDiv(ideal id)
     IDELEMS(id) = l;
   }
 }
-  
+
 
 /*2
 * copy an ideal
