@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.18 2005-02-03 17:52:02 Singular Exp $
+ *  Version: $Id: gring.cc,v 1.19 2005-02-03 18:29:32 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -1700,8 +1700,8 @@ int nc_CheckSubalgebra(poly PolyVar, ring r)
 BOOLEAN nc_CallPlural(matrix CCC, matrix DDD, poly CCN, poly DDN, ring r)
   /* returns TRUE if there were errors */
   /* analyze inputs, check them for consistency */
-  /* detect nc_type, DO NOT initialize multiplication */
-  /* check the ordering condition and evtl. NDC */
+  /* detects nc_type, DO NOT initialize multiplication but call for it at the end*/
+  /* checks the ordering condition and evtl. NDC */
 {
   matrix CC = NULL; 
   matrix DD = NULL;
@@ -1838,13 +1838,13 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD, poly CCN, poly DDN, ring r)
     D = mpNew(r->N,r->N);
     if (DN  == NULL)
     {
-      if ( (currRing->nc->type == nc_lie) || (currRing->nc->type == nc_undef) )  
+      if ( (r->nc->type == nc_lie) || (r->nc->type == nc_undef) )  
       {
-	currRing->nc->type = nc_comm; /* it was nc_skew earlier */
+	r->nc->type = nc_comm; /* it was nc_skew earlier */
       }
       else /* nc_general, nc_skew */
       {
-	currRing->nc->type = nc_skew;
+	r->nc->type = nc_skew;
       }
     }
     else /* DN  != NULL */
@@ -1873,7 +1873,7 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD, poly CCN, poly DDN, ring r)
       p = MATELEM(D,i,j);
       if ( p != NULL)
       {
-	q = pOne();
+	q = p_ISet(1,r); // replaces pOne();
 	p_SetExp(q,i,1,r);
 	p_SetExp(q,j,1,r);
 	p_Setm(q,r);
