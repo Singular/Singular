@@ -1,0 +1,10 @@
+// example of a library with a syntax error
+  info="LIBRARY: bad_lib0";
+  proc tt(int i)
+  {
+  "huhu";
+  }
+  uu // here is the error
+  proc t1(int j)
+  { return(j); }
+  
