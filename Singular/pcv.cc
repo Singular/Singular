@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: pcv.cc,v 1.33 2001-10-09 16:36:17 Singular Exp $ */
+/* $Id: pcv.cc,v 1.34 2001-11-14 16:41:02 Singular Exp $ */
 /*
 * ABSTRACT: conversion between polys and coef vectors
 */
@@ -9,7 +9,7 @@
 #include "mod2.h"
 
 #ifdef HAVE_PCV
-#if !defined(HAVE_DYNAMIC_LOADING) || defined(BUILD_MODULE)
+//#if !defined(HAVE_DYNAMIC_LOADING) || defined(BUILD_MODULE)
 
 #include "tok.h"
 #include "ipid.h"
@@ -464,5 +464,5 @@ BOOLEAN pcvBasis(leftv res,leftv h)
   return TRUE;
 }
 
-#endif /* !defined(HAVE_DYNAMIC_LOADING) || defined(BUILD_MODULE) */
+//#endif /* !defined(HAVE_DYNAMIC_LOADING) || defined(BUILD_MODULE) */
 #endif /* HAVE_PCV */
