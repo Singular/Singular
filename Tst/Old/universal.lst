@@ -71,17 +71,17 @@ m3ex
 m4ex
 m5ex
 m7ex
-; CORE m8ex
+; DIFF m8ex
 m9ex
-; BUG m10ex
-; BUG m11ex
+; DIFF m10ex
+; DIFF m11ex
 m13ex
 m15ex
 m16ex
 m17ex
 m18ex
-; BUG m19ex
-; CORE polylib
+; DIFF m19ex
+polylib
 ringlib
 lamm
 alex2
@@ -109,10 +109,10 @@ err1
 err2
 err3
 err4
-; BUG err5
+; DIFF err5
 err6
 err7
-; CORE sat
+sat
 fak
 filenest
 firsts
@@ -135,7 +135,6 @@ lists
 longalg
 lpowers
 palg
-; algmap
 algnorm
 det
 map
@@ -164,9 +163,9 @@ redtail
 string
 namof
 koszul
-; BUG res
+; BUG res 
 sres
-; BUG syzygies
+; DIFF syzygies
 varlist
 qhw
 weight
