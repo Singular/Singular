@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.69 1999-12-06 16:06:45 obachman Exp $ */
+/* $Id: iplib.cc,v 1.70 1999-12-08 16:59:52 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -533,7 +533,7 @@ BOOLEAN iiEStart(char* example, procinfo *pi)
   FreeL((ADDRESS)plib);
 #endif /* HAVE_NAMESPACES */
 
-  newBuffer( example, BT_example, pi, 
+  newBuffer( example, BT_example, pi,
              (pi != NULL ? pi->data.s.example_lineno: 0));
 
   iiCheckNest();
@@ -661,10 +661,10 @@ BOOLEAN iiReLoadLib(idhdl packhdl)
 BOOLEAN iiLocateLib(const char* lib, char* where)
 {
   idhdl hl;
-  
+
   hl = idroot->get("LIB", 0);
   if (hl == NULL || strstr(IDSTRING(hl), lib) == NULL) return FALSE;
-  
+
   if (strstr(IDSTRING(hl), ",") == NULL)
   {
     strcpy(where, IDSTRING(hl));
@@ -685,8 +685,7 @@ BOOLEAN iiLocateLib(const char* lib, char* where)
   }
   return TRUE;
 }
-    
-  
+
 #ifdef HAVE_NAMESPACES
 BOOLEAN iiLibCmd( char *newlib, BOOLEAN autoexport, BOOLEAN tellerror )
 #else /* HAVE_NAMESPACES */
@@ -862,16 +861,17 @@ static BOOLEAN iiLoadLIB(FILE *fp, char *libnamebuf, char*newlib,
   lib_style_types lib_style;
 
   yylpin = fp;
-#if YYLPDEBUG > 1
+  #if YYLPDEBUG > 1
   print_init();
-#endif
+  #endif
   extern int lpverbose;
-  if (BVERBOSE(V_DEBUG_LIB)) lpverbose=1; else lpverbose=0;
-#ifdef HAVE_NAMESPACES
-   yylplex(newlib, libnamebuf, &lib_style, pl, autoexport);
-#else /* HAVE_NAMESPACES */
-  yylplex(newlib, libnamebuf, &lib_style);
-#endif /* HAVE_NAMESPACES */
+  if (BVERBOSE(V_DEBUG_LIB)) lpverbose=1;
+  else lpverbose=0;
+  #ifdef HAVE_NAMESPACES
+    yylplex(newlib, libnamebuf, &lib_style, pl, autoexport);
+  #else /* HAVE_NAMESPACES */
+    yylplex(newlib, libnamebuf, &lib_style);
+  #endif /* HAVE_NAMESPACES */
   if(yylp_errno)
   {
     Werror("Library %s: ERROR occured: in line %d, %d.", newlib, yylplineno,
@@ -887,12 +887,12 @@ static BOOLEAN iiLoadLIB(FILE *fp, char *libnamebuf, char*newlib,
     Werror("Cannot load library,... aborting.");
     reinit_yylp();
     fclose( yylpin );
-#ifndef HAVE_NAMESPACES
+    #ifndef HAVE_NAMESPACES
     iiCleanProcs(idroot);
-#endif /* HAVE_NAMESPACES */
+    #endif /* HAVE_NAMESPACES */
     return TRUE;
   }
-#ifdef HAVE_NAMESPACES
+  #ifdef HAVE_NAMESPACES
   if (BVERBOSE(V_LOAD_LIB))
   {
     idhdl versionhdl  = namespaceroot->get("version",0);
@@ -901,10 +901,10 @@ static BOOLEAN iiLoadLIB(FILE *fp, char *libnamebuf, char*newlib,
     else
       Print( "// ** loaded %s\n", libnamebuf);
   }
-#else /* HAVE_NAMESPACES */
-  if (BVERBOSE(V_LOAD_LIB)) Print( "// ** loaded %s %s\n", libnamebuf,
-                                   text_buffer);
-#endif /* HAVE_NAMESPACES */
+  #else /* HAVE_NAMESPACES */
+  if (BVERBOSE(V_LOAD_LIB))
+    Print( "// ** loaded %s %s\n", libnamebuf, text_buffer);
+  #endif /* HAVE_NAMESPACES */
   if( (lib_style == OLD_LIBSTYLE) && (BVERBOSE(V_LOAD_LIB)))
   {
     Warn( "library %s has old format. This format is still accepted,", newlib);
