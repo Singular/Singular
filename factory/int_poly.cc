@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_poly.cc,v 1.9 1997-12-17 14:15:06 schmidt Exp $ */
+/* $Id: int_poly.cc,v 1.10 1998-03-17 15:56:31 schmidt Exp $ */
 
 #include <config.h>
 
@@ -827,9 +827,65 @@ InternalPoly::mulcoeff( InternalCF* cc )
 }
 
 InternalCF*
-InternalPoly::dividecoeff( InternalCF* c, bool invert )
+InternalPoly::dividecoeff( InternalCF* cc, bool invert )
 {
-    return divcoeff( c, invert );
+    CanonicalForm c( is_imm(cc) ? cc : cc->copyObject() );
+    if ( inExtension() && getReduce( var ) && invert ) {
+	InternalCF * dummy;
+	dummy = this->invert();
+	dummy = dummy->mulcoeff( cc );
+	if ( getRefCount() == 1 ) {
+	    delete this;
+	    return dummy;
+	}
+	else {
+	    decRefCount();
+	    return dummy;
+	}
+    }
+    if ( invert )
+	if ( getRefCount() == 1 ) {
+	    delete this;
+	    return CFFactory::basic( 0 );
+	}
+	else {
+	    decRefCount();
+	    return CFFactory::basic( 0 );
+	}
+    if ( c.isOne() )
+	return this;
+    else {
+	if ( getRefCount() == 1 ) {
+	    firstTerm = divideTermList( firstTerm, c, lastTerm );
+	    if ( firstTerm && firstTerm->exp != 0 )
+		return this;
+	    else  if ( firstTerm ) {
+		InternalCF * res = firstTerm->coeff.getval();
+		delete this;
+		return res;
+	    }
+	    else {
+		delete this;
+		return CFFactory::basic( 0 );
+	    }
+	}
+	else {
+	    decRefCount();
+	    termList last, first = copyTermList( firstTerm, last );
+	    first = divideTermList( first, c, last );
+	    if ( first && first->exp != 0 )
+		return new InternalPoly( first, last, var );
+	    else  if ( first ) {
+		InternalCF * res = first->coeff.getval();
+		delete first;
+		return res;
+	    }
+	    else {
+		delete first;
+		return CFFactory::basic( 0 );
+	    }
+	}
+    }
 }
 
 InternalCF*
@@ -979,7 +1035,7 @@ InternalPoly::divremcoeff( InternalCF* cc, InternalCF*& quot, InternalCF*& rem, 
 	CanonicalForm c( is_imm(cc) ? cc : cc->copyObject() );
 	ASSERT( ! c.isZero(), "divide by zero!" );
 	termList quotlast, quotfirst = copyTermList( firstTerm, quotlast );
-	quotfirst = divTermList( quotfirst, c, quotlast );
+	quotfirst = divideTermList( quotfirst, c, quotlast );
 	if ( quotfirst )
 	    if ( quotfirst->exp == 0 ) {
 		quot = quotfirst->coeff.getval();
@@ -1217,7 +1273,7 @@ InternalPoly::mulTermList ( termList theCursor, const CanonicalForm& coeff, cons
 }
 
 termList
-InternalPoly::divTermList ( termList firstTerm, const CanonicalForm& coeff, termList& lastTerm )
+InternalPoly::divideTermList ( termList firstTerm, const CanonicalForm& coeff, termList& lastTerm )
 {
     termList theCursor = firstTerm;
     lastTerm = 0;
@@ -1225,6 +1281,32 @@ InternalPoly::divTermList ( termList firstTerm, const CanonicalForm& coeff, term
 
     while ( theCursor ) {
 	theCursor->coeff /= coeff;
+	if ( theCursor->coeff.isZero() ) {
+	    if ( theCursor == firstTerm )
+		firstTerm = theCursor->next;
+	    else
+		lastTerm->next = theCursor->next;
+	    dummy = theCursor;
+	    theCursor = theCursor->next;
+	    delete dummy;
+	}
+	else {
+	    lastTerm = theCursor;
+	    theCursor = theCursor->next;
+	}
+    }
+    return firstTerm;
+}
+
+termList
+InternalPoly::divTermList ( termList firstTerm, const CanonicalForm& coeff, termList& lastTerm )
+{
+    termList theCursor = firstTerm;
+    lastTerm = 0;
+    termList dummy;
+
+    while ( theCursor ) {
+	theCursor->coeff.div( coeff );
 	if ( theCursor->coeff.isZero() ) {
 	    if ( theCursor == firstTerm )
 		firstTerm = theCursor->next;

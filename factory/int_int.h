@@ -1,12 +1,11 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_int.h,v 1.7 1998-01-22 10:54:22 schmidt Exp $ */
+/* $Id: int_int.h,v 1.8 1998-03-17 15:56:18 schmidt Exp $ */
 
 #ifndef INCL_INT_INT_H
 #define INCL_INT_INT_H
 
 #include <config.h>
 
-#include "cf_gmp.h"
 #ifndef NOSTREAMIO
 #include <iostream.h>
 #endif /* NOSTREAMIO */
@@ -14,13 +13,23 @@
 #include "assert.h"
 
 #include "int_cf.h"
+#include "cf_gmp.h"
+#include "gmpext.h"
 
 class InternalInteger : public InternalCF
 {
 private:
     MP_INT thempi;
-    static int initialized;
-    static MP_INT & MPI( const InternalCF * const c );
+
+    // auxilliary methods
+    inline InternalCF * normalizeMyself ();
+    inline InternalCF * uiNormalizeMyself ();
+
+    static inline InternalCF * normalizeMPI ( MP_INT & );
+    static inline InternalCF * uiNormalizeMPI ( MP_INT & );
+
+    static inline MP_INT & MPI ( const InternalCF * const c );
+
 public:
     InternalInteger();
     InternalInteger( const InternalCF& )
@@ -94,9 +103,102 @@ public:
     friend MP_INT getmpi ( InternalCF * value, bool symmetric );
 };
 
-inline MP_INT & InternalInteger::MPI( const InternalCF * const c )
+//{{{ inline InternalCF * InternalInteger::normalizeMyself, uiNormalizeMyself ()
+//{{{ docu
+//
+// normalizeMyself(), uiNormalizeMyself() - normalize CO.
+//
+// If CO fits into an immediate integer, delete CO and return the
+// immediate.  Otherwise, return a pointer to CO.
+//
+// `uiNormalizeMyself()' is the same as `normalizeMyself()'
+// except that CO is expected to be non-begative.  In this case,
+// we may use `mpz_get_ui()' to convert the underlying mpi into
+// an immediate which is slightly faster than the signed variant.
+//
+// Note: We do not mind reference counting at this point!  CO is
+// deleted unconditionally!
+//
+//}}}
+inline InternalCF *
+InternalInteger::normalizeMyself ()
+{
+    ASSERT( getRefCount() == 1, "internal error: must not delete CO" );
+
+    if ( mpz_is_imm( &thempi ) ) {
+	InternalCF * result = int2imm( mpz_get_si( &thempi ) );
+	delete this;
+	return result;
+    } else
+	return this;
+}
+
+inline InternalCF *
+InternalInteger::uiNormalizeMyself ()
+{
+    ASSERT( getRefCount() == 1, "internal error: must not delete CO" );
+
+    if ( mpz_is_imm( &thempi ) ) {
+	InternalCF * result = int2imm( mpz_get_ui( &thempi ) );
+	delete this;
+	return result;
+    } else
+	return this;
+}
+//}}}
+
+//{{{ static inline InternalCF * InternalInteger::normalizeMPI, uiNormalizeMPI ( MP_INT & aMpi )
+//{{{ docu
+//
+// normalizeMPI(), uiNormalizeMPI() - normalize a mpi.
+//
+// If `aMpi' fits into an immediate integer, clear `aMpi' and
+// return the immediate.  Otherwise, return a new
+// `InternalInteger' with `aMpi' as underlying mpi.
+//
+// `uiNormalizeMPI()' is the same as `normalizeMPI()' except that
+// `aMpi' is expected to be non-begative.  In this case, we may
+// use `mpz_get_ui()' to convert `aMpi' into an immediate which
+// is slightly faster than the signed variant.
+//
+//}}}
+inline InternalCF *
+InternalInteger::normalizeMPI ( MP_INT & aMpi )
+{
+    if ( mpz_is_imm( &aMpi ) ) {
+	InternalCF * result = int2imm( mpz_get_si( &aMpi ) );
+	mpz_clear( &aMpi );
+	return result;
+    } else
+	return new InternalInteger( aMpi );
+}
+
+inline InternalCF *
+InternalInteger::uiNormalizeMPI ( MP_INT & aMpi )
+{
+    if ( mpz_is_imm( &aMpi ) ) {
+	InternalCF * result = int2imm( mpz_get_ui( &aMpi ) );
+	mpz_clear( &aMpi );
+	return result;
+    } else
+	return new InternalInteger( aMpi );
+}
+//}}}
+
+//{{{ inline MP_INT & InternalInteger::MPI ( const InternalCF * const c )
+//{{{ docu
+//
+// MPI() - return underlying mpi of `c'.
+//
+// `c' is expected to be an `InternalInteger *'.  `c's underlying
+// mpi is returned.
+//
+//}}}
+inline MP_INT &
+InternalInteger::MPI ( const InternalCF * const c )
 {
     return (((InternalInteger*)c)->thempi);
 }
+//}}}
 
 #endif /* ! INCL_INT_INT_H */

@@ -1,5 +1,5 @@
 # @configure_input@
-# $Id: GNUmakefile.in,v 1.31 1998-03-11 18:35:31 schmidt Exp $
+# $Id: GNUmakefile.in,v 1.32 1998-03-17 15:59:42 schmidt Exp $
 
 #
 # GNUmakefile.in - used by `configure' to create `GNUmakefile', the
@@ -162,6 +162,7 @@ basefactorysrc := \
 		initgmp.cc \
 		int_cf.cc \
 		int_int.cc \
+		int_intdiv.cc \
 		int_poly.cc \
 		int_pp.cc \
 		int_rat.cc \

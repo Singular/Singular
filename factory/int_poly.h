@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_poly.h,v 1.4 1997-10-10 10:36:16 schmidt Exp $ */
+/* $Id: int_poly.h,v 1.5 1998-03-17 15:56:46 schmidt Exp $ */
 
 #ifndef INCL_INT_POLY_H
 #define INCL_INT_POLY_H
@@ -43,6 +43,7 @@ private:
     static void negateTermList ( termList );
     static termList addTermList ( termList, termList, termList&, bool negate );
     static void mulTermList ( termList, const CanonicalForm& , const int );
+    static termList divideTermList ( termList, const CanonicalForm&, termList& );
     static termList divTermList ( termList, const CanonicalForm&, termList& );
     static termList modTermList ( termList, const CanonicalForm&, termList& );
     static void appendTermList ( termList&, termList&, const CanonicalForm&, const int );
