@@ -50,8 +50,11 @@
 /* Return the absolute name of the program named NAME.  This function
    searches the directories in the PATH environment variable if PROG
    has no directory components. */
-char *
-find_executable (const char *name)
+#ifndef HAVE_READLINK
+char * find_executable (const char *name)
+#else
+char * find_executable_link (const char *name)
+#endif
 {
   char *search;
   char *p;
@@ -59,32 +62,9 @@ find_executable (const char *name)
   char tbuf[MAXPATHLEN];
 
   if (ABSOLUTE_FILENAME_P(name)) {
-      /* If we can execute the named file, and it is normal, then return it. */
-      if (! access (name, X_OK)) {
-        struct stat stat_temp;
-        char buf[MAXPATHLEN];
-        int ret;
-
-        if (stat (name, &stat_temp))
-          return 0;
-
-#ifdef HAVE_READLINK
-        if( (ret=readlink(name, buf, MAXPATHLEN))>0) {
-          char *p = strrchr(name, '/');
-          if(p!=NULL) *(p+1)='\0';
-          buf[ret]='\0';
-          if(buf[0]=='/') return(find_executable(buf));
-          strcat(name, buf);
-          return(find_executable(name));
-        }
-#endif /* HAVE_READLINK */
-#ifndef STAT_MACROS_BROKEN
-        if (! S_ISREG(stat_temp.st_mode))
-          return 0;
-#endif
-        
+      /* If we can execute the named file then return it. */
+      if (! access (name, X_OK)) 
         return copy_of (name);
-      }
     }
   else {
     if (((name[0] == '.') && (name[1] == '/')) || 
@@ -184,29 +164,8 @@ find_executable (const char *name)
       strcat (tbuf, "/");
       strcat (tbuf, name);
 
-      /* If we can execute the named file, and it is normal, then return it. */
+      /* If we can execute the named file, then return it. */
       if (! access (tbuf, X_OK)) {
-        struct stat stat_temp;
-        char buf[MAXPATHLEN];
-        int ret;
-
-        if (stat (tbuf, &stat_temp))
-          continue;
-
-#ifdef HAVE_READLINK
-        if( (ret=readlink(tbuf, buf, MAXPATHLEN))>0) {
-          char *p = strrchr(tbuf, '/');
-          if(p!=NULL) *(p+1)='\0';
-          buf[ret]='\0';
-          if(buf[0]=='/') return(find_executable(buf));
-          strcat(tbuf, buf);
-          return(find_executable(tbuf));
-        }
-#endif /* HAVE_READLINK */
-#ifndef STAT_MACROS_BROKEN
-        if (! S_ISREG(stat_temp.st_mode))
-          continue;
-#endif
 #ifdef WINNT
         if (extra != NULL)
           FreeL(extra);
@@ -218,6 +177,46 @@ find_executable (const char *name)
 
   return NULL;
 }
+
+#ifdef HAVE_READLINK
+char * find_executable (const char *name)
+{
+  char * link = find_executable_link(name);
+  char buf[MAXPATHLEN];
+  int ret;
+
+  if (link == NULL && (ret=readlink(name, buf, MAXPATHLEN)) > 0)
+  {
+    buf[ret] ='\0';
+    link = find_executable_link(buf);
+  }
+  // follow, if we have a link
+  if (link != NULL && (ret=readlink(link, buf, MAXPATHLEN)) > 0)
+  {
+    char *p = strrchr(link, '/');
+    char *executable;
+
+    
+    if(p!=NULL) *(p+1)='\0';
+    buf[ret]='\0';
+    
+    if (buf[0] != '/')
+    {
+      executable = (char*) AllocL(strlen(link) + ret);
+      strcpy(executable, link);
+      strcat(executable, buf);
+    }
+    else
+    {
+      executable = copy_of(buf);
+    }
+    
+    FreeL(link);
+    return executable;
+  }
+  return link;
+}
+#endif /* HAVE_READLINK */
 
 #else
 
