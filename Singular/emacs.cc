@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: emacs.cc,v 1.1 1999-08-25 15:26:01 obachman Exp $ */
+/* $Id: emacs.cc,v 1.2 1999-08-25 15:55:32 obachman Exp $ */
 /*
 * ABSTRACT: Esingular main file
 */
@@ -69,6 +69,7 @@ int main(int argc, char** argv)
   char* emacs_dir = NULL;
   char* emacs_load = NULL;
   int no_emacs_call = 0;
+  char cwd[MAXPATHLEN];
   
   // parse-cmdline options
   
@@ -125,7 +126,7 @@ int main(int argc, char** argv)
   if (emacs == NULL) emacs = feResource("emacs", 0);
   if (emacs == NULL)
   {
-    fprintf(stderr, "Error: Can't find emacs executable. \nExpected it at %s\n. Specify alternative with --emacs option, or set EMACS environment variable.\n", 
+    fprintf(stderr, "Error: Can't find emacs executable. \nExpected it at %s\n. Specify alternative with --emacs option,\n or set EMACS environment variable.\n", 
             feResourceDefault("emacs"));
     mainUsage(argv[0]);
     exit(1);
@@ -134,7 +135,7 @@ int main(int argc, char** argv)
   if (singular == NULL) singular = feResource("SingularEmacs", 0);
   if (singular == NULL)
   {
-    fprintf(stderr, "Error: Can't find singular executable.\nExpected it at %s\nSpecify with --singular option, or set SINGULAR_EMACS environment variable.\n", 
+    fprintf(stderr, "Error: Can't find singular executable.\nExpected it at %s\nSpecify with --singular option,\n  or set SINGULAR_EMACS environment variable.\n", 
             feResourceDefault("SingularEmacs"));
     mainUsage(argv[0]);
     exit(1);
@@ -143,21 +144,39 @@ int main(int argc, char** argv)
   if (emacs_dir == NULL) emacs_dir = feResource("EmacsDir", 0);
   if (emacs_dir == NULL)
   {
-    fprintf(stderr, "Error: Can't find emacs directory for Singular lisp files. \nExpected it at %s\nSpecify with --emacs_dir option, or set SINGULAR_EMACS_DIR environment variable.\n", 
+    fprintf(stderr, "Error: Can't find emacs directory for Singular lisp files. \nExpected it at %s\nSpecify with --emacs_dir option,\n  or set SINGULAR_EMACS_DIR environment variable.\n", 
             feResourceDefault("EmacsDir"));
     mainUsage(argv[0]);
     exit(1);
   }
 
-  if (emacs_load == NULL) emacs_load = feResource("EmacsLoad", 0);
-  if (emacs_load == NULL)
+  if (emacs_load == NULL) 
   {
-    fprintf(stderr, "Error: Can't find emacs load file for Singular mode. \nExpected it at %s\nSpecify with --emacs_load option, or set SINGULAR_EMACS_LOAD environment variable.\n", 
-            feResourceDefault("EmacsLoad"));
-    mainUsage(argv[0]);
-    exit(1);
+    // look into env variable
+    emacs_load = getenv("SINGULAR_EMACS_LOAD");
+    if (access(emacs_load, R_OK))
+    {
+      // look in home-dir
+      emacs_load = getenv("HOME");
+      sprintf(cwd, "%s/.emacs-singular", emacs_load);
+      if (! access(cwd, R_OK))
+      {
+        emacs_load = mstrdup(cwd);
+      }
+      else
+      {
+        // try witrh resources
+        emacs_load = feResource("EmacsLoad", 0);
+        if (emacs_load == NULL)
+        {
+          fprintf(stderr, "Error: Can't find emacs load file for Singular mode. \nExpected it at %s\nSpecify with --emacs_load option,\n or set SINGULAR_EMACS_LOAD environment variable,\n or put file '.emacs-singular' in your home directory.\n", 
+                  feResourceDefault("EmacsLoad"));  
+          mainUsage(argv[0]);
+          exit(1);
+        }
+      }
+    }
   }
-  
   
   // construct options
   int i, length = 0;
@@ -181,7 +200,6 @@ int main(int argc, char** argv)
   char* prefix = "--";
   if (strstr(emacs, "xemacs") || strstr(emacs, "Xemacs") || strstr(emacs, "XEMACS"))
     prefix = "-";
-  char cwd[MAXPATHLEN];
   getcwd(cwd, MAXPATHLEN);
 
   sprintf(syscall, "%s %seval '(setq singular-emacs-home-directory \"%s\")' %sq %sl %s %seval '(singular-other \"%s\" \"%s\" (quote ",

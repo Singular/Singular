@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feResource.cc,v 1.8 1999-08-25 15:26:02 obachman Exp $ */
+/* $Id: feResource.cc,v 1.9 1999-08-25 15:55:32 obachman Exp $ */
 /*
 * ABSTRACT: management of resources
 */
@@ -85,8 +85,8 @@ static feResourceConfig_s feResourceConfigs[20] =
  
 #ifdef ESINGULAR
   {"emacs",    'E',    feResBinary, "EMACS",               "%b/emacs",              ""},
-  {"SingularEmacs", 'M',    feResBinary, "SINGULAR_EMACS",  "%b/Singular",           ""},
-  {"EmacsLoad",'l',    feResFile,   "SINGULAR_EMACS_LOAD", "%e/.singular-emacs",             ""},
+  {"SingularEmacs",'M',feResBinary, "SINGULAR",             "%b/Singular",           ""},
+  {"EmacsLoad",'l',    feResFile,   "SINGULAR_EMACS_LOAD",  "%e/.emacs-singular",             ""},
 #endif
   {NULL, 0, feResUndef, NULL, NULL, NULL}, // must be the last record
 };
