@@ -2766,7 +2766,9 @@ poly free_row_to_poly(tgb_sparse_matrix* mat, int row, poly* monoms, int monom_i
     (*set_this)=pLmInit(monoms[monom_index-1-r->exp]);
     pSetCoeff((*set_this),r->coef);
     set_this=&((*set_this)->next);
+    mac_poly old=r;
     r=r->next;
+    delete old;
     
   }
   return p;
