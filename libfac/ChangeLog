@@ -1,3 +1,8 @@
+Thu Mar 12 14:32:06 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* charset/csutil.cc, charset/alg_factor.cc: all references to
+	  `common_den()' replaced by `bCommonDen()'
+
 Fri Feb 27 11:32:02 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* factor/tmpl_inst.cc: template names adapted (`*.cc' ->
