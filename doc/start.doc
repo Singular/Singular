@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: start.doc,v 1.47 2001-02-26 10:34:03 Singular Exp $
+@comment $Id: start.doc,v 1.48 2001-05-28 12:38:43 Singular Exp $
 @comment this file contains the "Introduction" chapter.
 @c * wichmann: + added changes by GMG.
 
@@ -478,7 +478,7 @@ variable names @code{a} and @code{b}.
 @end table
 
 @c Another valid characteristic would be, for example, a prime number less
-@c or equal to @math{32003}. The name of the ring variables may be any
+@c or equal to 32003. The name of the ring variables may be any
 @c valid @sc{Singular} name. Even indexed names are allowed, so
 @c @code{x(1..10)} specifies the ring variables @code{x(1)}, @dots{},
 @c @code{x(10)}. @sc{Singular} offers the possibility to calculate with any
