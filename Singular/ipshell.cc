@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.41 1999-04-17 14:58:50 obachman Exp $ */
+/* $Id: ipshell.cc,v 1.42 1999-06-25 13:12:49 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -761,14 +761,25 @@ int iiRegularity(lists L)
 }
 
 BOOLEAN iiDebugMarker=TRUE;
+#define BREAK_LINE_LENGTH 80
 void iiDebug()
 {
   Print("\n-- break point in %s --\n",VoiceName());
   if (iiDebugMarker) VoiceBackTrack();
   char * s;
   iiDebugMarker=FALSE;
-  s = (char *)AllocL(84);
-  fe_fgets_stdin("",s,80);
+  s = (char *)AllocL(BREAK_LINE_LENGTH+4);
+  loop
+  {
+    memset(s,0,80);
+    fe_fgets_stdin("",s,BREAK_LINE_LENGTH);
+    if (s[BREAK_LINE_LENGTH-1]!='\0')
+    {
+      Print("line too long, max is %d chars\n",BREAK_LINE_LENGTH);
+    }
+    else
+      break;
+  }
   if (*s=='\n')
   {
     iiDebugMarker=TRUE;
