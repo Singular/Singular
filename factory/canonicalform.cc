@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.cc,v 1.10 1997-07-16 10:16:08 schmidt Exp $ */
+/* $Id: canonicalform.cc,v 1.11 1997-07-30 07:55:02 schmidt Exp $ */
 
 #include <config.h>
 
@@ -1155,15 +1155,6 @@ initCanonicalForm( void )
 	(void)mmInit();
 #endif
 
-	Off( SW_RATIONAL );
-	Off( SW_QUOTIENT );
-	Off( SW_SYMMETRIC_FF );
-	Off( SW_BERLEKAMP );
-	Off( SW_FAC_USE_BIG_PRIMES );
-	Off( SW_FAC_QUADRATICLIFT );
-	Off( SW_USE_EZGCD );
-	Off( SW_USE_SPARSEMOD );
-
 	(void)initializeCharacteristic();
 	(void)initializeGMP();
 	initPT();
@@ -1252,18 +1243,6 @@ CanonicalForm::isFFinGF() const
     return is_imm( value ) == GFMARK && gf_isff( imm2int( value ) );
 }
 
-static void
-fillVarsRec ( const CanonicalForm & f, int * vars )
-{
-    int n;
-    if ( (n = f.level()) > 0 ) {
-	vars[n] = 1;
-	CFIterator i;
-	for ( i = f; i.hasTerms(); ++i )
-	    fillVarsRec( i.coeff(), vars );
-    }
-}
-
 CanonicalForm
 CanonicalForm::sqrt ( ) const
 {
@@ -1316,50 +1295,6 @@ CanonicalForm::ilog2( ) const
 	return value->ilog2();
 }
 //}}}
-
-int
-getNumVars( const CanonicalForm & f )
-{
-    int n;
-    if ( f.inCoeffDomain() )
-	return 0;
-    else  if ( (n = f.level()) == 1 )
-	return 1;
-    else {
-	int * vars = new int[ n+1 ];
-	int i;
-	for ( i = 0; i < n; i++ ) vars[i] = 0;
-	for ( CFIterator I = f; I.hasTerms(); ++I )
-	    fillVarsRec( I.coeff(), vars );
-	int m = 0;
-	for ( i = 1; i < n; i++ )
-	    if ( vars[i] != 0 ) m++;
-	delete [] vars;
-	return m+1;
-    }
-}
-
-CanonicalForm
-getVars( const CanonicalForm & f )
-{
-    int n;
-    if ( f.inCoeffDomain() )
-	return 1;
-    else  if ( (n = f.level()) == 1 )
-	return Variable( 1 );
-    else {
-	int * vars = new int[ n+1 ];
-	int i;
-	for ( i = 0; i <= n; i++ ) vars[i] = 0;
-	for ( CFIterator I = f; I.hasTerms(); ++I )
-	    fillVarsRec( I.coeff(), vars );
-	CanonicalForm result = 1;
-	for ( i = n; i > 0; i-- )
-	    if ( vars[i] != 0 ) result *= Variable( i );
-	delete [] vars;
-	return f.mvar() * result;
-    }
-}
 
 bool
 divides ( const CanonicalForm & f, const CanonicalForm & g )
