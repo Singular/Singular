@@ -285,6 +285,12 @@ extern MPT_Annot_pt MPT_FindAnnot(MPT_Node_pt node, MP_DictTag_t dict,
 extern MPT_Tree_pt MPT_GetProtoTypespec(MPT_Node_pt node);
 
 extern void MPT_MoveAnnots(MPT_Node_pt from, MPT_Node_pt to);
+extern void MPT_RemoveAnnot(MPT_Node_pt node,
+                            MP_DictTag_t dict,
+                            MP_AnnotType_t type);
+#define MPT_RemoveProtoAnnot(node) \
+MPT_RemoveAnnot(node, MP_ProtoDict, MP_AnnotProtoPrototype)
+
 extern MP_Boolean_t MPT_IsTrueProtoTypeSpec(MPT_Tree_pt typespec);
 
 extern void*       IMP_MemAlloc0Fnc(size_t size);
