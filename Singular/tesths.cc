@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.37 1998-05-04 11:36:45 obachman Exp $ */
+/* $Id: tesths.cc,v 1.38 1998-05-04 17:17:26 Singular Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -58,10 +58,10 @@
 static struct option longopts[] =
 {
 #ifdef HAVE_MPSR
-  {LON_BATCH,             0,  0,  'b'},   
+  {LON_BATCH,             0,  0,  'b'},
 #endif
   {LON_HELP,              0,  0,  'h'},
-  {LON_QUIET,             0,  0,  'q'},   
+  {LON_QUIET,             0,  0,  'q'},
   {LON_NO_TTY,            0,  0,  't'},
   {LON_VERSION,           0,  0,  'v'},
 #ifdef HAVE_TCL
@@ -95,23 +95,23 @@ struct sing_option
   const char*   name;    // as in option
   const char*   arg_name;// name of argument, if has_arg > 0
   const char*   help;    // (short) help string
-  char*         val;     // (default) value of option: 0: not set 1:set 
+  char*         val;     // (default) value of option: 0: not set 1:set
                          // string:"" if has_arg > 0
 };
 
 // mention only documented options here
-static struct sing_option sing_longopts[] = 
+static struct sing_option sing_longopts[] =
 {
 #ifdef HAVE_MPSR
-  {LON_BATCH,       0,          "Run in MP batch mode",                                 0},   
+  {LON_BATCH,       0,          "Run in MP batch mode",                                 0},
 #endif
   {LON_HELP,        0,          "Print help message and exit",                          0},
-  {LON_QUIET,       0,          "Do not print start-up banner and warnings",            0},   
+  {LON_QUIET,       0,          "Do not print start-up banner and warnings",            0},
   {LON_NO_TTY,      0,          "Do not redefine the terminal characteristics",         0},
   {LON_VERSION,     0,          "Print extended version and configuration info",        0},
 #ifdef HAVE_TCL
   {LON_TCLMODE      0,          "Run in TCL mode, i.e., with TCL user interface",       0},
-#endif  
+#endif
   {LON_ECHO,        "VAL",      "Set value of variable `echo' to (integer) VAL",        ""},
   {LON_EXECUTE,     "STRING",   "Execute STRING on start-up",                           ""},
   {LON_RANDOM,      "SEED",     "Seed random generator with integer (integer) SEED",    ""},
@@ -168,7 +168,7 @@ static void mainHelp(const char* name)
   printf("Singular %s -- a CAS for polynomial computations. Usage:\n", S_VERSION1);
   printf("   %s [options] [file1 [file2 ...]]\n", name);
   printf("Options:\n");
-  
+
   while (longopts[i].name != 0)
   {
     sopt = mainGetSingOption(longopts[i].name);
@@ -196,7 +196,7 @@ static void mainHelp(const char* name)
                sopt->help);
       }
     }
-#ifndef NDEBUG      
+#ifndef NDEBUG
     else
       printf("--%s Undocumented\n", longopts[i].name);
 #endif
@@ -228,7 +228,7 @@ void mainOptionValues()
       if (sopt->val == NULL || sopt->val == (char*) 1)
         Print("// --%-10s %d\n", sopt->name, sopt->val);
       else
-        Print("// --%-10s %s\n", sopt->name, sopt->val); 
+        Print("// --%-10s %s\n", sopt->name, sopt->val);
     }
     else
       Print("// --%s Undocumented \n", longopts[i].name);
@@ -285,14 +285,14 @@ int main(          /* main entry to Singular */
 
   // parse command line options
   while((optc = getopt_long(argc, argv,
-                            SHORT_OPTS_STRING, longopts, &option_index)) 
+                            SHORT_OPTS_STRING, longopts, &option_index))
         != EOF)
   {
     switch(optc)
     {
-          
+   
         case 'b':
-#ifdef HAVE_MPSR          
+#ifdef HAVE_MPSR   
           feBatch=TRUE;
           mainSetSingOptionValue(LON_BATCH, (char*) 1);
           break;
@@ -370,7 +370,7 @@ int main(          /* main entry to Singular */
           execute_string = optarg;
           mainSetSingOptionValue(LON_EXECUTE, optarg);
           break;
-          
+   
         case 'r':
           errno = 0;
           siRandomStart = strtol(optarg, NULL, 10);
@@ -390,7 +390,7 @@ int main(          /* main entry to Singular */
           #endif
           mainSetSingOptionValue(LON_RANDOM, optarg);
           break;
-          
+   
         case 'u':
           mainSetSingOptionValue(LON_USER_OPTION, optarg);
           break;
@@ -411,7 +411,7 @@ int main(          /* main entry to Singular */
             double mintime = atof(optarg);
             if (mintime <= 0)
             {
-              printf("%s: `%s' invalid float argument for option `--%s'\n",  
+              printf("%s: `%s' invalid float argument for option `--%s'\n",
                      argv[0], optarg, LON_MIN_TIME);
               mainUsage(argv[0]);
               exit(1);
@@ -428,7 +428,7 @@ int main(          /* main entry to Singular */
           {
             mainSetSingOptionValue(LON_MP_HOST, optarg);
           }
-#endif          
+#endif   
           else if (strcmp(longopts[option_index].name, LON_TICKS_PER_SEC) == 0)
           {
             int ticks = atoi(optarg);
@@ -465,22 +465,22 @@ int main(          /* main entry to Singular */
   if (BVERBOSE(0) && !feBatch)
   {
     printf(
-"              Welcome to SINGULAR                  /\n"
-"           A Computer Algebra System             o<     %s\n"
-" for Commutative Algebra and Algebraic Geometry    \\    %s\n\n"
-"by: G.-M. Greuel, G. Pfister, H. Schoenemann\n"
-"Fachbereich Mathematik der Universitaet, D-67653 Kaiserslautern\n"
+"      SINGULAR : a Computer Algebra System              /\n"
+" for Commutative Algebra and Algebraic Geometry        /   %s\n"
+"                                                     0<\n"
+"  by: G.-M. Greuel, G. Pfister, H. Schoenemann         \\   %s\n"
+"FB Mathematik der Universitaet, D-67653 Kaiserslautern  \\\n"
 #if 0
 "contributions: O.Bachmann,W.Decker,H.Grassmann,B.Martin,M.Messollen,W.Neumann,\n"
 "\tW.Pohl,T.Siebert,R.Stobbe,T.Wichmann\n"
 "e-mail: singular@mathematik.uni-kl.de\n", S_VERSION1,S_VERSION2);
-#endif    
+#endif
 , S_VERSION1,S_VERSION2);
 #if 0
     printf("%s  %s  (%d)",S_VERSION1,S_VERSION2, SINGULAR_VERSION_ID);
-#endif    
-    printf("\nPlease note:  EVERY COMMAND MUST END WITH A SEMICOLON \";"
-           "\"\n(e.g., help; help command; help General syntax; help ring; quit;)\n\n");
+#endif
+    printf("\nPlease note:  every command must end with a semicolon \";"
+           "\"\n(e.g., help; help command; help General syntax; help ring; quit;)\n");
   }
   else
   if (!feBatch)
@@ -496,8 +496,11 @@ int main(          /* main entry to Singular */
   myynest=0;
   if (load_std_lib)
   {
+    int vv=verbose;
+    verbose &= ~Sy_bit(V_LOAD_LIB);
     iiLibCmd(mstrdup("standard.lib"),TRUE);
-  }  
+    verbose=vv;
+  }
   errorreported = 0;
 #ifndef macintosh
 #if defined(HAVE_FEREAD) || defined(HAVE_READLINE)

@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.19 1998-04-30 17:37:44 Singular Exp $
+@comment $Id: types.doc,v 1.20 1998-05-04 17:17:29 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -199,11 +199,11 @@ a typecast to ideal.
 * ideal operations::
 * ideal related functions::
 * implicit type conversions::
-* type casting::
+* Type casting::
 @end menu
 @iftex
 See @ref{ideal}; @ref{ideal operations}; @ref{ideal related functions};
-@ref{implicit type conversions}; @ref{type casting}.
+@ref{implicit type conversions}; @ref{Type casting}.
 @end iftex
 @c {{{endfold}}}
 
@@ -450,12 +450,12 @@ must be converted to the type number over a ring with characteristic 0.
 @end example
 @menu
 * implicit type conversions::
-* type casting::
+* Type casting::
 * int operations::
 * int related functions::
 @end menu
 @iftex
-See @ref{implicit type conversions}; @ref{type casting}; @ref{int related functions}.
+See @ref{implicit type conversions}; @ref{Type casting}; @ref{int related functions}.
 @end iftex
 @c {{{endfold}}}
 
@@ -1362,7 +1362,7 @@ define @code{L[1]} to be the basering for instance by
 @code{setring L[1];}.
 @*Note: Unlike other assignments a ring as an element of a list
 is not a copy but another reference to the same ring.
-@*Note: @code{list()} is the empty list, see @ref{type casting}.
+@*Note: @code{list()} is the empty list, see @ref{Type casting}.
 
 @c ------------------------------
 @node list declarations, list expressions, list, list
@@ -1417,11 +1417,11 @@ the empty list @code{list()}
 * list operations::
 * list functions::
 * implicit type conversions::
-* type casting::
+* Type casting::
 @end menu
 @iftex
 See @ref{list}; @ref{list operations}; @ref{list functions};
-@ref{implicit type conversions}; @ref{type casting}.
+@ref{implicit type conversions}; @ref{Type casting}.
 @end iftex
 @c {{{endfold}}}
 
@@ -1707,11 +1707,11 @@ a typecast to matrix.
 * matrix operations::
 * matrix functions::
 * implicit type conversions::
-* type casting::
+* Type casting::
 @end menu
 @iftex
 See @ref{matrix}; @ref{matrix operations}; @ref{matrix functions};
-@ref{implicit type conversions}; @ref{type casting}.
+@ref{implicit type conversions}; @ref{Type casting}.
 @end iftex
 @c {{{endfold}}}
 
@@ -1902,11 +1902,11 @@ a typecast to module.
 * module operations::
 * module functions::
 * implicit type conversions::
-* type casting::
+* Type casting::
 @end menu
 @iftex
 See @ref{module}; @ref{module operations}; @ref{module functions};
-@ref{implicit type conversions}; @ref{type casting}.
+@ref{implicit type conversions}; @ref{Type casting}.
 @end iftex
 @c {{{endfold}}}
 
@@ -2113,11 +2113,11 @@ number s combined by arithmetic operations @code{+,-,*,/} or @code{^,**}.
 * number::
 * number operations::
 * implicit type conversions::
-* type casting::
+* Type casting::
 @end menu
 @iftex
 See @ref{number}; @ref{ring}; @ref{number operations};
-@ref{implicit type conversions}; @ref{type casting}.
+@ref{implicit type conversions}; @ref{Type casting}.
 @end iftex
 @c {{{endfold}}}
 
@@ -2244,11 +2244,11 @@ poly expressions combined by arithmetic operations +,-,*,/ or ^.
 * poly operations::
 * poly related functions::
 * implicit type conversions::
-* type casting::
+* Type casting::
 @end menu
 @iftex
 See @ref{ring}; @ref{poly}; @ref{poly operations}; @ref{poly related functions};
-@ref{implicit type conversions}; @ref{type casting}.
+@ref{implicit type conversions}; @ref{Type casting}.
 @end iftex
 @c {{{endfold}}}
 
@@ -2440,11 +2440,11 @@ a typecast from list to resolution.
 * resolution::
 * resolution related functions::
 * implicit type conversions::
-* type casting::
+* Type casting::
 @end menu
 @iftex
 See @ref{resolution}; @ref{resolution related functions};
-@ref{implicit type conversions}; @ref{type casting}.
+@ref{implicit type conversions}; @ref{Type casting}.
 @end iftex
 
 @c ------------------------------
@@ -2660,11 +2660,11 @@ string expressions combined by the operation @code{+}.
 @end example
 @menu
 * implicit type conversions::
-* type casting::
+* Type casting::
 * string functions::
 @end menu
 @iftex
-See @ref{implicit type conversions}; @ref{type casting}.
+See @ref{implicit type conversions}; @ref{Type casting}.
 @end iftex
 @c {{{endfold}}}
 
@@ -2828,11 +2828,11 @@ combined by arithmetic operation @code{*}.
 * vector operations::
 * vector related functions::
 * implicit type conversions::
-* type casting::
+* Type casting::
 @end menu
 @iftex
 See @ref{ring}; @ref{vector}; @ref{vector operations}; @ref{vector related functions};
-@ref{implicit type conversions}; @ref{type casting}.
+@ref{implicit type conversions}; @ref{Type casting}.
 @end iftex
 @c {{{endfold}}}
 

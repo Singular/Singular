@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.11 1998-04-30 09:35:57 Singular Exp $
+@comment $Id: singular.doc,v 1.12 1998-05-04 17:17:28 Singular Exp $
 @comment this file contains the main structure of the manual
 @c ------------------------
 @comment %**start of header
@@ -113,6 +113,7 @@ q:quit, m:menu item, n:next node, p:previous node, u:up, g:goto node
 * Monomials and precedence::
 * Behaviour of continue::
 * Evaluation of logical expressions::
+* Meaning of mult etc.::
 @end menu
 @c -------------------------------------------------------------------------
 @node Limitations,Integer division,,Tricks and pitfalls
@@ -192,7 +193,7 @@ Unlike the C-construct @code{continue}
 @code{continue} is mainly for internal use.
 
 @c -------------------------------------------------------------------------
-@node Evaluation of logical expressions,,Behaviour of continue,Tricks and pitfalls
+@node Evaluation of logical expressions,Meaning of mult etc.,Behaviour of continue,Tricks and pitfalls
 @section Evaluation of logical expressions
 @cindex and
 @cindex or
@@ -205,6 +206,22 @@ evaluated by first evaluating @code{a} and @code{b}, even though the value of
 this is different from the left-to-right evaluation of logical
 expressions (as found in most programming languages like C) which, for
 example, determine the @code{(1 || b)} without evaluating @code{b}.
+
+@c -------------------------------------------------------------------------
+@node Meaning of mult etc., , Evaluation of logical expressions,Tricks and pitfalls
+@section Meaning of mult etc.
+@cindex mult
+@cindex degree
+
+A standard mistake is to interprete degree(i) or mult(i) for an
+inhomogeneous ideal i as the degree of the homogenisation or
+as something like the 'degree of the affine part'. For the
+ordering dp (degree reverse lexicographical) the converse is
+true: if i is given by a standard basis, mult(i) is the degree
+of the homogeneous ideal obtained by homogenisation of i and
+then putting the homogenizing variable to 0, hence it is the
+degree of the part at infinity.
+(Check this by looking at the initial ideal.)
 
 @c ----------------------------------------------------------------------------
 @node Examples, Mathematical background, Tricks and pitfalls, Top

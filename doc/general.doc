@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.20 1998-05-04 13:02:03 Singular Exp $
+@comment $Id: general.doc,v 1.21 1998-05-04 17:17:27 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -112,6 +112,46 @@ extra semicolons are interpreted as empty statements.
 @subsection The online help system
 @cindex The online help system
 
+@sc{Singular} uses @code{info} (from @code{texinfo}) for it's help system.@*
+The whole manual is decomposed into "nodes" of information.
+A node contains text describing a specific topic at a specific level of
+detail. The top line of a node is its "header".  This node's header
+(the upper most line) tells the name of this node (@code{Node:}),
+the name of the next node (@code{Next:}),
+the name of the previous node (@code{Prev:}),
+and the name of an "Up" node (@code{Up:}).
+
+To move within info type commands of single characters and do not type a RETURN
+character. The most important commands:
+@table @asis
+@item @code{q} 
+leave info
+@item @code{n}
+go to the "next" node
+@item @code{p}
+go to the "previous" node
+@item @code{u}
+go to the "up" node
+@item @code{m}
+pick a menu item specified by name. Reads name of menu entry
+@item @code{f}
+follow a cross reference.  Reads name of reference
+@item @code{l}
+go to the previous visited node
+@item @code{h}
+help about info (use @code{l} to come back)
+@item @code{b}
+go to the begining of the current node
+@item @code{e}
+go to the end of the current node
+@item SPACE
+scroll forward a page
+@item DEL
+scroll backward a page
+@item @code{s}
+search through this Info file for a specified string,
+and select the node in which the next occurrence is found
+@end table
 @c --------------------------------------------------------------------------
 @node Interrupting SINGULAR,Editing input,The online help system,Interactive use
 @subsection Interrupting SINGULAR
@@ -656,16 +696,6 @@ result will be the corresponding invariant of the ideal itself.
 Nevertheless, it remains the task of the user to give a correct
 interpretation of the result.
 
-A standard mistake is to interprete degree(i) or mult(i) for an
-inhomogeneous ideal i as the degree of the homogenisation or
-as something like the 'degree of the affine part'. For the
-ordering dp (degree reverse lexicographical) the converse is
-true: if i is given by a standard basis, mult(i) is the degree
-of the homogeneous ideal obtained by homogenisation of i and
-then putting the homogenizing variable to 0, hence it is the
-degree of the part at infinity.
-(Check this by looking at the initial ideal.)
-
 @iftex
 --------------------------------------------------------------------------
 @end iftex
@@ -695,12 +725,12 @@ See the literature cited in @ref{Introduction}, (section 'Background').
 @sc{Singular} offers the following monomial orderings which are implemented
 in an effective way:
 @menu
-* global orderings:: lp, dp, wp, Dp, Wp.
-* local orderings:: ls, ds, ws, Ds, Ws.
-* module orderings:: c, C.
-* matrix orderings:: M.
-* product orderings::
-* extra weight vector:: a.
+* Global orderings:: lp, dp, wp, Dp, Wp.
+* Local orderings:: ls, ds, ws, Ds, Ws.
+* Module orderings:: c, C.
+* Matrix orderings:: M.
+* Product orderings::
+* Extra weight vector:: a.
 @end menu
 @iftex
 @itemize @bullet
@@ -1038,9 +1068,9 @@ the separator for expression lists and function arguments
 @item  @code{//}
 makes the rest of the line a comment
 @item  @code{\}
-escape character for @code{"} within strings (see @ref{string expression})
+escape character for @code{"} within strings (see @ref{string expressions})
 @item  @code{..}
-construct an intvec from start and end (see @ref{intvec expression})
+construct an intvec from start and end (see @ref{intvec expressions})
 @item  @code{::}
 access identifiers within packages (complete name is package_name::identifier)
 @item  @code{$}
