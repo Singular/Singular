@@ -14,7 +14,7 @@ if test -r "singuname.sh"; then
     ac_cv_singuname=`/bin/sh singuname.sh`
   fi
 fi
-if test -r "../singuname.sh"; then
+if test "$ac_cv_singuname" = unknown && test -r "../singuname.sh"; then
   if (/bin/sh ../singuname.sh >/dev/null 2>&1) then
     ac_cv_singuname=`/bin/sh singuname.sh`
   fi

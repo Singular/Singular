@@ -137,7 +137,11 @@ sharedist: ${SINGULAR}
 	cp -R doc/html/* ${TMPDIR}/Singular/html/${S_VERSION}
 	cd ${TMPDIR}/info; \
         ${LN_S} ../Singular/doc/${S_VERSION}/singular.hlp .
-	cp README.share COPYING README.general ${TMPDIR}/Singular
+	cat README.share | sed -e "s/<x.y.z>/${S_VERSION}/" > \
+                           ${TMPDIR}/Singular/README.share
+	cat README.general | sed -e "s/<x.y.z>/${S_VERSION}/" > \
+                             ${TMPDIR}/Singular/README.general
+	cp COPYING ${TMPDIR}/Singular
 	cd ${TMPDIR}; \
            tar -cf sing.tar Singular info; \
            gzip sing.tar
@@ -157,7 +161,13 @@ bindist: ${SINGULAR}
 	cd ${TMPDIR}/${SINGUNAME}/bin; \
            ${LN_S} Singular-${S_VERSION} Singular
 	cp Singular/libparse ${TMPDIR}/${SINGUNAME}/bin/
-	cp INSTALL COPYING README.bin README.general ${TMPDIR}/Singular
+	cp COPYING ${TMPDIR}/Singular
+	cat README.bin | sed -e "s/<x.y.z>/${S_VERSION}/" > \
+                         ${TMPDIR}/Singular/README.bin
+	cat README.general | sed -e "s/<x.y.z>/${S_VERSION}/" > \
+                             ${TMPDIR}/Singular/README.general
+	cat INSTALL | sed -e "s/<x.y.z>/${S_VERSION}/" > \
+                      ${TMPDIR}/Singular/INSTALL
 	cd ${TMPDIR}; \
            tar cf ${BINDIST_NAME}.tar ${SINGUNAME} Singular; \
            gzip ${BINDIST_NAME}.tar
@@ -173,8 +183,13 @@ static-bindist: ${SINGULAR}
            ${TMPDIR}/${SINGUNAME}/bin/Singular-${S_VERSION}-static
 	cd ${TMPDIR}/${SINGUNAME}/bin;  \
            ${LN_S} Singular-${S_VERSION}-static Singular
-	cp Singular/libparse ${TMPDIR}/${SINGUNAME}/bin/
-	cp INSTALL COPYING README.bin README.general ${TMPDIR}/Singular
+	cp COPYING ${TMPDIR}/Singular
+	cat README.bin | sed -e "s/<x.y.z>/${S_VERSION}/" > \
+                         ${TMPDIR}/Singular/README.bin
+	cat README.general | sed -e "s/<x.y.z>/${S_VERSION}/" > \
+                             ${TMPDIR}/Singular/README.general
+	cat INSTALL | sed -e "s/<x.y.z>/${S_VERSION}/" > \
+                      ${TMPDIR}/Singular/INSTALL
 	cd ${TMPDIR}; \
            tar cf ${BINDIST_NAME}-static.tar ${SINGUNAME} Singular;\
            gzip ${BINDIST_NAME}-static.tar
@@ -210,11 +225,13 @@ windist: ${SHAREDIST_NAME}.tar.gz ${SINGULAR}
 	cd ${TMPDIR}; gunzip ${SHAREDIST_NAME}.tar.gz; \
                       tar xf ${SHAREDIST_NAME}.tar
 	rm -rf ${TMPDIR}/info ${TMPDIR}/Singular/README.share
-	cp INSTALL.win	${TMPDIR}/Singular/INSTALL
-	cp README.win	${TMPDIR}/Singular/README
+	cat INSTALL.win	| sed -e "s/<x.y.z>/${S_VERSION}/" > \
+                         ${TMPDIR}/Singular/INSTALL
+	cp README.win | sed -e "s/<x.y.z>/${S_VERSION}/" > \
+                         ${TMPDIR}/Singular/README
 	cd ${TMPDIR}; \
            ${ZIP} -r sing Singular 
-	cp ${TMPDIR}/sing.zip Singular-${SINGULAR_VERSION}-${SINGUNAME}.zip .
+	cp ${TMPDIR}/sing.zip Singular-${S_VERSION}-${SINGUNAME}.zip .
 	rm -rf ${TMPDIR}
 
 
