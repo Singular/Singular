@@ -1,6 +1,6 @@
 // Last change 12.02.2001 (Eric Westenberger)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: zeroset.lib,v 1.8 2001-08-27 14:48:02 Singular Exp $";
+version="$Id: zeroset.lib,v 1.9 2005-02-22 10:36:38 Singular Exp $";
 category="Symbolic-numerical solving";
 info="
 LIBRARY:  zeroset.lib      Procedures For Roots and Factorization
@@ -11,9 +11,9 @@ AUTHOR:   Thomas Bayer,    email: tbayer@mathematik.uni-kl.de
 OVERVIEW:
  Algorithms for finding the zero-set of a zero-dim. ideal in Q(a)[x_1,..,x_n],
  Roots and Factorization of univariate polynomials over Q(a)[t]
- where a is an algebric number. Written in the frame of the
+ where a is an algebraic number. Written in the frame of the
  diploma thesis (advisor: Prof. Gert-Martin Greuel) 'Computations of moduli
- spaces of semiquasihomogenous singularities and an implementation in Singular'.
+ spaces of semiquasihomogeneous singularities and an implementation in Singular'.
  This library is meant as a preliminary extension of the functionality
  of Singular for univariate factorization of polynomials over simple algebraic
  extensions in characteristic 0.
@@ -22,8 +22,6 @@ OVERVIEW:
  basering is stored.
 
 PROCEDURES:
- EGCD(f, g)    gcd over an algebraic extension field of Q
- Factor(f)    factorization of f over an algebraic extension field
  Quotient(f, g)    quotient q  of f w.r.t. g (in f = q*g + remainder)
  Remainder(f,g)    remainder of the division of f by g
  Roots(f)    computes all roots of f in an extension field of Q
@@ -31,16 +29,18 @@ PROCEDURES:
  ZeroSet(I)    zero-set of the 0-dim. ideal I
 
 AUXILIARY PROCEDURES:
- EGCDMain(f, g)    gcd over an algebraic extension field of Q
- FactorMain(f)    factorization of f over an algebraic extension field
  InvertNumberMain(c)  inverts an element of an algebraic extension field
  QuotientMain(f, g)  quotient of f w.r.t. g
  RemainderMain(f,g)  remainder of the division of f by g
- RootsMain(f)    computes all roots of f, might extend the groundfield
+ RootsMain(f)    computes all roots of f, might extend the ground field
  SQFRNormMain(f)  norm of f (f must be squarefree)
  ContainedQ(data, f)  f in data ?
  SameQ(a, b)    a == b (list a,b)
 ";
+// Factor(f)    factorization of f over an algebraic extension field
+// EGCD(f, g)    gcd over an algebraic extension field of Q
+// EGCDMain(f, g)    gcd over an algebraic extension field of Q
+// FactorMain(f)    factorization of f over an algebraic extension field
 
 LIB "primitiv.lib";
 LIB "primdec.lib";
@@ -84,8 +84,8 @@ RETURN:  ring, a polynomial ring over an extension field of the ground field,
          containing a list 'roots' and polynomials 'newA' and 'f':
   @format
   - 'roots' is the list of roots of the polynomial f (no multiplicities)
-  - if the groundfield is Q(a') and the extension field is Q(a), then
-    'newA' is the representation of a' in Q(a).
+  - if the ground field is Q(a') and the extension field is Q(a), then
+    'newA' is the representation of a' in Q(a). 
     If the basering contains a parameter 'a' and the minpoly remains unchanged
     then 'newA' = 'a'.
     If the basering does not contain a parameter then 'newA' = 'a' (default).
@@ -163,9 +163,9 @@ PURPOSE: compute all roots of f in a finite extension of the ground field
 RETURN:  list, all entries are polynomials
   @format
   _[1] = roots of f, each entry is a polynomial
-  _[2] = 'newA' - if the groundfield is Q(a') and the extension field
+  _[2] = 'newA' - if the ground field is Q(a') and the extension field
          is Q(a), then 'newA' is the representation of a' in Q(a)
-  _[3] = minpoly of the algebraic extension of the groundfield
+  _[3] = minpoly of the algebraic extension of the ground field
   @end format
 ASSUME:  basering = Q[x,a] ideal mpoly must be defined, it might be 0!
 NOTE:    might change the ideal mpoly !!
@@ -203,14 +203,14 @@ EXAMPLE: example  Roots; shows an example
       nlMult[nlinFactors] = factorList[2][i];
     }
   }
-  if(linFactors == size(factorList[1]) - 1) {    // all roots of f are contained in the groundfield
+  if(linFactors == size(factorList[1]) - 1) {    // all roots of f are contained in the ground field
     result[1] = roots;
     result[2] = var(2);
     result[3] = mpoly[1];
     return(result);
   }
 
-  // process the nonlinear factors, i.e., extend the groundfield
+  // process the nonlinear factors, i.e., extend the ground field
   // where a nonlinear factor (irreducible) is a minimal polynomial
   // compute the primitive element of this extension
 
@@ -301,17 +301,17 @@ EXAMPLE: example  Roots; shows an example
 proc ZeroSet(ideal I, list #)
 "USAGE:   ZeroSet(I [,opt] ); I=ideal, opt=integer
 PURPOSE: compute the zero-set of the zero-dim. ideal I, in a finite extension
-         of the groundfield.
+         of the ground field.
 RETURN:  ring, a polynomial ring over an extension field of the ground field,
          containing a list 'zeroset', a polynomial 'newA', and an
          ideal 'id':
   @format
   - 'zeroset' is the list of the zeros of the ideal I, each zero is an ideal.
-  - if the groundfield is Q(a') and the extension field is Q(a), then
+  - if the ground field is Q(a') and the extension field is Q(a), then
     'newA' is the representation of a' in Q(a).
     If the basering contains a parameter 'a' and the minpoly remains unchanged
     then 'newA' = 'a'.
-    If the basering does not contain a parameter then 'newA' = 'a' (default).
+    If the basering does not contain a parameter then 'newA' = 'a' (default).    
   - 'id' is the ideal I in Q(a)[x_1,...] (a' substituted by 'newA')
   @end format
 ASSUME:  dim(I) = 0, and ground field to be Q or a simple extension of Q given
@@ -586,6 +586,7 @@ RETURN:  polynomial h s.t. h is a greatest common divisor of f and g (not nec.
          monic)
 ASSUME:  basering = Q(a)[t]
 EXAMPLE: example  EGCD; shows an example
+NOTE: obsolete: use gcd
 "
 {
   def GCDB = basering;
@@ -768,6 +769,7 @@ RETURN:  list with two entries
 ASSUME:  basering must be the univariate polynomial ring over a field, which
          is Q or a simple extension of Q given by a minpoly.
 NOTE:    if basering = Q[t] then this is the built-in @code{factorize}
+NOTE:    obsolete: use factorize
 EXAMPLE: example  Factor; shows an example
 "
 {
@@ -856,12 +858,12 @@ EXAMPLE: example  Factor; shows an example
 proc ZeroSetMain(ideal I, int primDecQ)
 "USAGE:   ZeroSetMain(ideal I, int opt); ideal I, int opt
 PURPOSE: compute the zero-set of the zero-dim. ideal I, in a simple extension
-         of the groundfield.
+         of the ground field.
 RETURN:  list
          - 'f' is the polynomial f in  Q(a) (a' being substituted by newA)
          _[1] = zero-set (list), is the list of the zero-set of the ideal I,
                 each entry is an ideal.
-         _[2] = 'newA';  if the groundfield is Q(a') and the extension field
+         _[2] = 'newA';  if the ground field is Q(a') and the extension field
                 is Q(a), then 'newA' is the representation of a' in Q(a).
                 If the basering contains a parameter 'a' and the minpoly
                 remains unchanged then 'newA' = 'a'. If the basering does not
@@ -910,7 +912,7 @@ EXAMPLE: example ZeroSet; shows an example
   }
 
   // compute the zero-set of each primary ideal and join them.
-  // If necessary, change the groundfield and transform the zero-set
+  // If necessary, change the ground field and transform the zero-set
 
   dbprint(dbPrt, "
 find the zero-set of each primary ideal, form the union
@@ -945,11 +947,11 @@ and keep track of the minimal polynomials ");
 proc ZeroSetMainWork(ideal id, intvec wt, int sVars)
 "USAGE:   ZeroSetMainWork(I, wt, sVars);
 PURPOSE: compute the zero-set of the zero-dim. ideal I, in a finite extension
-         of the groundfield (without multiplicities).
+         of the ground field (without multiplicities).
 RETURN:  list, all entries are polynomials
          _[1] = zeros, each entry is an ideal
-         _[2] = newA; if the groundfield is Q(a') this is the rep. of a' w.r.t. a
-         _[3] = minpoly of the algebraic extension of the groundfield (ideal)
+         _[2] = newA; if the ground field is Q(a') this is the rep. of a' w.r.t. a
+         _[3] = minpoly of the algebraic extension of the ground field (ideal)
          _[4] = name of algebraic number (default = 'a')
 ASSUME:  basering = Q[x_1,x_2,...,x_n,a]
          ideal mpoly must be defined, it might be 0!
@@ -1109,7 +1111,7 @@ RETURN:  list
 proc NonLinearZeroSetMain(ideal I, intvec wt)
 "USAGE:   ZeroSetMainWork(I, wt, sVars);
 PURPOSE: solves the (nonlinear) univariate polynomials in I
-         of the groundfield (without multiplicities).
+         of the ground field (without multiplicities).
 RETURN:  list, all entries are polynomials
          _[1] = list of solutions
          _[2] = newA
