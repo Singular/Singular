@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.h,v 1.23 1998-03-10 14:47:58 schmidt Exp $ */
+/* $Id: canonicalform.h,v 1.24 1998-03-12 10:28:35 schmidt Exp $ */
 
 #ifndef INCL_CANONICALFORM_H
 #define INCL_CANONICALFORM_H
@@ -152,6 +152,8 @@ public:
 //}}}
 
 //{{{ function declarations from canonicalform.cc
+CanonicalForm blcm ( const CanonicalForm & f, const CanonicalForm & g );
+
 CanonicalForm power ( const CanonicalForm & f, int n );
 
 CanonicalForm power ( const Variable & v, int n );
@@ -242,6 +244,9 @@ num ( const CanonicalForm & f ) { return f.num(); }
 inline CanonicalForm
 den ( const CanonicalForm & f ) { return f.den(); }
 
+inline int
+sign ( const CanonicalForm & a ) { return a.sign(); }
+
 inline CanonicalForm
 deriv ( const CanonicalForm & f, const Variable & x ) { return f.deriv( x ); }
 
@@ -261,15 +266,6 @@ head ( const CanonicalForm & f )
 {
     if ( f.level() > 0 )
 	return power( f.mvar(), f.degree() ) * f.LC();
-    else
-	return f;
-}
-
-inline CanonicalForm
-abs ( const CanonicalForm & f )
-{
-    if ( f < 0 )
-	return -f;
     else
 	return f;
 }
