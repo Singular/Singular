@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: cntrlc.cc,v 1.28 1999-12-03 11:20:13 obachman Exp $ */
+/* $Id: cntrlc.cc,v 1.29 2000-03-08 15:08:09 Singular Exp $ */
 /*
 * ABSTRACT - interupt handling
 */
@@ -339,6 +339,9 @@ void init_signals()
 void sigint_handler(int sig)
 {
   mflush();
+  #ifdef HAVE_FEREAD
+  if (fe_is_raw_tty) fe_temp_reset();
+  #endif
   loop
   {
     int cnt=0;
@@ -465,6 +468,10 @@ static void debug (int method)
   char buf[16];
   char *args[4] = { "gdb", "Singularg", NULL, NULL };
 
+  #ifdef HAVE_FEREAD
+  if (fe_is_raw_tty) fe_temp_reset();
+  #endif
+
   sprintf (buf, "%d", getpid ());
 
   args[2] = buf;
@@ -523,7 +530,7 @@ static void stack_trace (char **args)
   if ((pipe (in_fd) == -1) || (pipe (out_fd) == -1))
   {
     perror ("could open pipe");
-    _exit (0);
+    m2_end(999);
   }
 
   pid = fork ();
@@ -535,12 +542,12 @@ static void stack_trace (char **args)
 
     execvp (args[0], args);      /* exec gdb */
     perror ("exec failed");
-    _exit (0);
+    m2_end(999);
   }
   else if (pid == -1)
   {
     perror ("could not fork");
-    _exit (0);
+    m2_end(999);
   }
 
   FD_ZERO (&fdset);
@@ -604,7 +611,7 @@ static void stack_trace (char **args)
   close (in_fd[1]);
   close (out_fd[0]);
   close (out_fd[1]);
-  _exit (0);
+  m2_end(0);
 }
 
 static void stack_trace_sigchld (int signum)

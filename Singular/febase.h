@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.44 1999-12-14 17:46:53 Singular Exp $ */
+/* $Id: febase.h,v 1.45 2000-03-08 15:08:09 Singular Exp $ */
 /*
 * ABSTRACT: basic i/o
 */
@@ -33,6 +33,11 @@ extern char fePathSep;
 
 #ifndef MAXPATHLEN
 #define MAXPATHLEN 1024
+#endif
+
+#ifdef HAVE_DYN_RL
+  #undef HAVE_READLINE
+  #define HAVE_FEREAD 1
 #endif
 
 /*
@@ -87,19 +92,24 @@ extern BOOLEAN feOut;
 extern "C" {
 #endif
 
-void   Werror(char *fmt, ...);
-void   WerrorS(const char *s);
-void   Print(char* fmt, ...);
-void   PrintLn();
+void    Werror(char *fmt, ...);
+void    WerrorS(const char *s);
+void    Print(char* fmt, ...);
+void    PrintLn();
 #ifdef HAVE_TCL
-void   PrintTCLS(const char c, const char * s);
+void    PrintTCLS(const char c, const char * s);
 #else
 #define PrintTCLS(A,B) Print("TCL-ErrS:%s",B)
 #endif
-void   PrintS(char* s);
+void    PrintS(char* s);
 #define feReportBug(s) fePrintReportBug(s, __FILE__, __LINE__)
-void fePrintReportBug(char* msg, char* file, int line);
-char* feGetResource(const char id);
+void    fePrintReportBug(char* msg, char* file, int line);
+char*   feGetResource(const char id);
+
+#ifdef HAVE_FEREAD
+extern BOOLEAN fe_is_raw_tty;
+void           fe_temp_reset (void);
+#endif
 
 #ifdef __cplusplus
 }
@@ -248,7 +258,13 @@ Voice * feInitStdin();
 
 /* the interface for reading: */
 extern  char * (*fe_fgets_stdin)(char *pr,char *s, int size);
+
+#ifdef HAVE_FEREAD
+char * fe_fgets_stdin_drl(char *pr,char *s, int size);
+#endif
+
 void fe_reset_input_mode();
+
 #ifndef MSDOS
 extern "C" {
 #ifndef HAVE_ATEXIT
@@ -287,11 +303,5 @@ void fe_reset_fe (void);
 void SPrintStart();
 char* SPrintEnd();
 
-
-#ifdef HAVE_DYN_RL
-#undef HAVE_READLINE
-#define HAVE_FEREAD 1
-char * fe_fgets_stdin_drl(char *pr,char *s, int size);
-#endif
 
 #endif /* ifndef FEBASE_H */

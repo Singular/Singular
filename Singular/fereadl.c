@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: fereadl.c,v 1.14 2000-03-08 13:33:42 Singular Exp $ */
+/* $Id: fereadl.c,v 1.15 2000-03-08 15:08:09 Singular Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -14,63 +14,60 @@
 #include "structs.h"
 #include "febase.h"
 
-#ifdef SunOS_5
-#define _XOPEN_SOURCE_EXTENDED
-#endif
-
 #ifdef HAVE_FEREAD
- #include <unistd.h>
- #include <stdio.h>
- #include <stdlib.h>
- #include <sys/time.h>
- #include <sys/types.h>
- #include <string.h>
- 
- #ifdef MSDOS
-  #include <pc.h>
- #else
-  #ifdef SunOS_5
-  /* solaris special, found with v 5.7 */
-  #define _XOPEN_SOURCE_EXTENDED
-  #include "/usr/xpg4/include/term.h"
-  #endif
-  #ifdef HAVE_TERM_H
-  #ifndef SunOS_5
-  #include <term.h>
-  #endif
-  #elif HAVE_TERMCAP_H
-  #include <termcap.h>
-  #elif HAVE_TERMIOS_H
-  #include <termios.h>
-  #endif
+  #include <unistd.h>
+  #include <stdio.h>
+  #include <stdlib.h>
+  #include <sys/time.h>
+  #include <sys/types.h>
+  #include <string.h>
 
-  #ifdef atarist
-   #include <ioctl.h>
+  #ifdef MSDOS
+    #include <pc.h>
   #else
-   #ifdef NeXT
-    #include <sgtty.h>
-    #include <sys/ioctl.h>
-   #endif
+    #ifdef SunOS_5
+      /* solaris special, found with v 5.7 */
+      #define _XOPEN_SOURCE_EXTENDED
+      #include "/usr/xpg4/include/term.h"
+    #endif
+    #ifdef HAVE_TERM_H
+      #ifndef SunOS_5
+        #include <term.h>
+      #endif
+    #elif HAVE_TERMCAP_H
+      #include <termcap.h>
+    #elif HAVE_TERMIOS_H
+      #include <termios.h>
+    #endif
+
+    #ifdef atarist
+      #include <ioctl.h>
+    #else
+      #ifdef NeXT
+        #include <sgtty.h>
+        #include <sys/ioctl.h>
+      #endif
+    #endif
   #endif
- #endif
 
 
 #ifndef STDIN_FILENO
-#define STDIN_FILENO 0
+  #define STDIN_FILENO 0
 #endif
 #ifndef STDOUT_FILENO
-#define STDOUT_FILENO 1
+  #define STDOUT_FILENO 1
 #endif
 
 #define feCTRL(C) ((C) & 0x1F)    /* <ctrl> character  */
 
 #ifndef MSDOS
-/* Use this variable to remember original terminal attributes. */
-#if defined( atarist ) || defined( NeXT )
-struct sgttyb  fe_saved_attributes;
-#else
-struct termios fe_saved_attributes;
-#endif
+
+  /* Use this variable to remember original terminal attributes. */
+  #if defined( atarist ) || defined( NeXT )
+    struct sgttyb  fe_saved_attributes;
+  #else
+    struct termios fe_saved_attributes;
+  #endif
 #endif
 
 static BOOLEAN fe_stdout_is_tty;
@@ -82,7 +79,7 @@ FILE *  fe_echo; /*the output file for echoed characters*/
 #define fe_hist_max 32
 char ** fe_hist=NULL;
 short   fe_hist_pos;
-short   fe_is_raw_tty=0;
+BOOLEAN fe_is_raw_tty=0;
 int     fe_cursor_pos; /* 0..colmax-1*/
 int     fe_cursor_line; /* 0..pagelength-1*/
 
@@ -94,19 +91,22 @@ int     fe_cursor_line; /* 0..pagelength-1*/
     void fe_reset_fe (void)
   #endif
   {
-    if (fe_stdin_is_tty && fe_is_raw_tty)
+    if (fe_stdin_is_tty)
     {
       int i;
-      #ifdef atarist
-        stty(0, &fe_saved_attributes);
-      #else
-        #ifdef NeXT
-          ioctl(STDIN_FILENO, TIOCSETP, &fe_saved_attributes);
+      if (fe_is_raw_tty)
+      {
+        #ifdef atarist
+          stty(0, &fe_saved_attributes);
         #else
-          tcsetattr (STDIN_FILENO, TCSANOW, &fe_saved_attributes);
+          #ifdef NeXT
+            ioctl(STDIN_FILENO, TIOCSETP, &fe_saved_attributes);
+          #else
+            tcsetattr (STDIN_FILENO, TCSANOW, &fe_saved_attributes);
+          #endif
         #endif
-      #endif
-      fe_is_raw_tty=0;
+        fe_is_raw_tty=0;
+      }
       for(i=fe_hist_max-1;i>=0;i--)
       {
         FreeL((ADDRESS)fe_hist[i]);
@@ -212,7 +212,7 @@ void fe_init (void)
         #ifdef atarist
           fe_echo = fopen( "/dev/tty", "w" );
         #else
-	  fe_echo = fopen( ttyname(fileno(stdin)), "w" );
+          fe_echo = fopen( ttyname(fileno(stdin)), "w" );
         #endif
       }
       /* Save the terminal attributes so we can restore them later. */
@@ -487,9 +487,9 @@ char * fe_fgets_stdin_fe(char *pr,char *s, int size)
         case feCTRL('M'):
         case feCTRL('J'):
         {
-	  fd_set fdset;
-	  struct timeval tv;
-	  int sel;
+          fd_set fdset;
+          struct timeval tv;
+          int sel;
 
           fe_add_hist(s);
           i=strlen(s);
@@ -497,16 +497,16 @@ char * fe_fgets_stdin_fe(char *pr,char *s, int size)
           fputc('\n',fe_echo);
           fflush(fe_echo);
 
-	  FD_ZERO (&fdset);
-	  FD_SET(STDIN_FILENO, &fdset);
-	  tv.tv_sec = 0;
-	  tv.tv_usec = 0;
-	  #ifdef hpux
-	    sel = select (STDIN_FILENO+1, (int *)fdset.fds_bits, NULL, NULL, &tv);
-	  #else
-	    sel = select (STDIN_FILENO+1, &fdset, NULL, NULL, &tv);
-	  #endif
-	  if (sel==0)
+          FD_ZERO (&fdset);
+          FD_SET(STDIN_FILENO, &fdset);
+          tv.tv_sec = 0;
+          tv.tv_usec = 0;
+          #ifdef hpux
+            sel = select (STDIN_FILENO+1, (int *)fdset.fds_bits, NULL, NULL, &tv);
+          #else
+            sel = select (STDIN_FILENO+1, &fdset, NULL, NULL, &tv);
+          #endif
+          if (sel==0)
             fe_temp_reset();
           return s;
         }
