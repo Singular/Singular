@@ -347,7 +347,7 @@ int singular_manual(char *str)
 #endif // buildin_help
 /*************************************************/
 
-void singular_help(char *str,BOOLEAN example)
+void singular_help(char *str)
 {
   char *s=str;
   while (*s==' ') s++;
@@ -366,36 +366,16 @@ void singular_help(char *str,BOOLEAN example)
   idhdl h=idroot->get(s,myynest);
 #endif /* HAVE_NAMESPACES */
   if ((h!=NULL) && (IDTYP(h)==PROC_CMD)
-  && (example ||(strcmp(IDPROC(h)->libname, "standard.lib")!=0)))
+  && (strcmp(IDPROC(h)->libname, "standard.lib")!=0))
   {
     char *lib=iiGetLibName(IDPROC(h));
-    Print("// proc %s ",s);
-    if((lib==NULL)||(*lib=='\0'))
+    if((lib!=NULL)&&(*lib!='\0'))
     {
-      PrintLn();
+      Print("// proc %s from lib %s\n",s,lib);
+      s=iiGetLibProcBuffer(IDPROC(h), 0);
+      PrintS(s);
+      FreeL((ADDRESS)s);
     }
-    else
-    {
-      Print("from lib %s\n",lib);
-      s=iiGetLibProcBuffer(IDPROC(h), example ? 2 : 0);
-      if (!example)
-      {
-        PrintS(s);
-        FreeL((ADDRESS)s);
-      }
-      else
-      {
-        if (s!=NULL)
-        {
-          if (strlen(s)>5) iiEStart(s,IDPROC(h));
-          else FreeL((ADDRESS)s);
-        }
-      }
-    }
-  }
-  else if (example)
-  {
-    Werror("%s not found",s);
   }
   else
   {
@@ -450,7 +430,7 @@ void singular_help(char *str,BOOLEAN example)
         fclose( yylpin );
         PrintS(text_buffer);
         FreeL(text_buffer);
-	text_buffer=NULL;
+        text_buffer=NULL;
       }
 #endif /* HAVE_LIBPARSER */
     }
@@ -471,6 +451,44 @@ void singular_help(char *str,BOOLEAN example)
 #endif
     }
   }
+}
+
+void singular_example(char *str)
+{
+  char *s=str;
+  while (*s==' ') s++;
+  char *ss=s;
+  while (*ss!='\0') ss++;
+  while (*ss<=' ')
+  {
+    *ss='\0';
+    ss--;
+  }
+#ifdef HAVE_NAMESPACES
+  idhdl h, ns;
+  iiname2hdl(s, &ns, &h);
+#else /* HAVE_NAMESPACES */
+  idhdl h=idroot->get(s,myynest);
+#endif /* HAVE_NAMESPACES */
+  if ((h!=NULL) && (IDTYP(h)==PROC_CMD))
+  {
+    char *lib=iiGetLibName(IDPROC(h));
+    if((lib!=NULL)&&(*lib=='\0'))
+    {
+      Print("// proc %s from lib %s\n",s,lib);
+      s=iiGetLibProcBuffer(IDPROC(h), 2);
+      if (s!=NULL)
+      {
+        if (strlen(s)>5)
+        {
+          iiEStart(s,IDPROC(h));
+          return;
+        }
+        else FreeL((ADDRESS)s);
+      }
+    }
+  }
+  Werror("%s not found",s);
 }
 
 

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.20 1999-05-26 16:24:02 obachman Exp $ */
+/* $Id: structs.h,v 1.21 1999-07-28 08:39:00 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -199,7 +199,8 @@ void  m2_end(short i);
 
 #ifdef __cplusplus
 int   inits(void);
-void  singular_help(char *str, BOOLEAN example);
+void  singular_help(char *str);
+void  singular_example(char *str);
 #ifdef buildin_help
 int   singular_manual(char *str);
 #endif

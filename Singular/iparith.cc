@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.164 1999-07-26 17:03:54 Singular Exp $ */
+/* $Id: iparith.cc,v 1.165 1999-07-28 08:38:58 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -4734,7 +4734,7 @@ static BOOLEAN jjSUBST_M(leftv res, leftv u)
     leftv tmp_next=res->next;
     res->next=rest;
     memset(&tmp_res,0,sizeof(tmp_res));
-    b = iiExprArithM(&tmp_res,iiOp,res);
+    b = iiExprArithM(&tmp_res,res,iiOp);
     memcpy(res,&tmp_res,sizeof(tmp_res));
     res->next=tmp_next;
   }  

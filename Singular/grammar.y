@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.65 1999-07-20 12:29:49 Singular Exp $ */
+/* $Id: grammar.y,v 1.66 1999-07-28 08:38:58 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -1055,7 +1055,7 @@ executecmd:
           }
         | EXAMPLE_CMD extendedid
           {
-            singular_help($2,TRUE);
+            singular_example($2);
             FreeL((ADDRESS)$2);
           }
         ;
@@ -1070,14 +1070,14 @@ filecmd:
 helpcmd:
         HELP_CMD STRINGTOK ';'
           {
-            singular_help($2,FALSE);
+            singular_help($2);
             FreeL((ADDRESS)$2);
           }
         | HELP_CMD ';'
           {
             char *s=(char *)Alloc(10);
             strcpy(s,"index");
-            singular_help(s,FALSE);
+            singular_help(s);
             Free((ADDRESS)s,10);
           }
         ;
