@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.cc,v 1.1.1.1 2003-10-06 12:15:56 Singular Exp $ */
+/* $Id: kbuckets.cc,v 1.2 2004-10-07 18:10:01 bricken Exp $ */
 
 #include "mod2.h"
 #include "structs.h"
@@ -271,7 +271,7 @@ int kBucketCanonicalize(kBucket_pt bucket)
     p = p_Add_q(p, bucket->buckets[i],
                  pl, bucket->buckets_length[i], r);
   #else
-    q = p_Add_q(q, bucket->buckets[i],
+    p = p_Add_q(p, bucket->buckets[i],
                  pl, bucket->buckets_length[i], r);
   #endif
     bucket->buckets[i] = NULL;
