@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.132 2003-03-19 23:08:57 levandov Exp $ */
+/* $Id: ideals.cc,v 1.133 2003-03-28 09:39:46 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -658,7 +658,7 @@ BOOLEAN idIsModule(ideal id, ring r)
   return FALSE;
 }
 
-    
+
 /*2
 *returns true if id is homogenous with respect to the aktual weights
 */
@@ -1171,7 +1171,7 @@ ideal idSect (ideal h1,ideal h2)
         k = pGetComp(p)-1-length;
         pSetComp(p,0);
         pSetmComp(p);
-	result->m[j] = pAdd(result->m[j],pMult(pCopy(first->m[k]),p));
+        result->m[j] = pAdd(result->m[j],pMult(pCopy(first->m[k]),p));
         p = q;
       }
       j++;
@@ -1925,7 +1925,7 @@ lists idLiftW(ideal P,ideal Q,int n,short *w)
         pNormalize(p);
         if(w==NULL&&pDeg(p0)>n||w!=NULL&&pDegW(p0,w)>n)
           pDelete(&p0);
-	else
+        else
           MATELEM(T,j+1,i+1)=pAdd(MATELEM(T,j+1,i+1),p0);
         j=IDELEMS(Q)-1;
       }
@@ -1933,12 +1933,12 @@ lists idLiftW(ideal P,ideal Q,int n,short *w)
       {
         if(j==0)
         {
-	  poly p0=p;
-	  pIter(p);
+          poly p0=p;
+          pIter(p);
           pNext(p0)=NULL;
-	  if(w==NULL&&pDeg(p0)>n||w!=NULL&&pDegW(p0,w)>n)
+          if(w==NULL&&pDeg(p0)>n||w!=NULL&&pDegW(p0,w)>n)
             pDelete(&p0);
-	  else
+          else
             R->m[i]=pAdd(R->m[i],p0);
           j=IDELEMS(Q)-1;
         }
@@ -2367,7 +2367,8 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
     return idCopy(h1);
   }
   if (idIs0(h1)) return idInit(1,h1->rank);
-  if (rIsPluralRing(currRing)) 
+#ifdef HAVE_PLURAL
+  if (rIsPluralRing(currRing))
     /* in the NC case, we have to check the admissibility of */
     /* the subalgebra to be intersected with */
   {
@@ -2375,11 +2376,12 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
     {
       if (!nc_CheckSubalgebra(delVar,currRing))
       {
-	WerrorS("no elimination is possible: subalgebra is not admissible");
-	return idCopy(h1);
+        WerrorS("no elimination is possible: subalgebra is not admissible");
+        return idCopy(h1);
       }
     }
   }
+#endif
   hom=(tHomog)idHomModule(h1,NULL,&w); //sets w to weight vector or NULL
   h3=idInit(16,h1->rank);
   for (k=0;; k++)
