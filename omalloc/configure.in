@@ -1,0 +1,341 @@
+dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
+dnl File: configure.in
+dnl Purpose: Process this file with autoconf to produce configure
+dnl Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
+dnl Created: 11/99
+dnl Version: $Id: configure.in,v 1.1.1.1 1999-11-18 17:45:52 obachman Exp $
+dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
+
+AC_INIT(omAlloc.c)
+AC_CONFIG_HEADER(omConfig.h)
+
+dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
+dnl help for configure
+dnl
+AC_ARG_WITH(
+  mtrack,
+  [  --with-mtrack           use mpr routines for extended memory tracking
+                             -- works only under ix86-Linux])
+AC_ARG_WITH(
+  align8,
+  [  --with-align8           only use 8-aligned memory])
+AC_ARG_WITH(
+  align8,
+  [  --enable-stat           enable memory statistics])
+AC_ARG_WITH(
+  mtrack,
+  [  --disable-mtrack        disable memory track])
+                             
+
+dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
+dnl get singuname
+dnl
+AC_MSG_CHECKING(singuname)
+AC_CACHE_VAL(ac_cv_singuname,
+ac_cv_singuname="unknown"
+if test -r "singuname.sh"; then
+  if (/bin/sh singuname.sh >/dev/null 2>&1) then
+    ac_cv_singuname=`/bin/sh singuname.sh`
+  fi
+fi
+if test "$ac_cv_singuname" = unknown && test -r "../singuname.sh"; then
+  if (/bin/sh ../singuname.sh >/dev/null 2>&1) then
+    ac_cv_singuname=`/bin/sh ../singuname.sh`
+  fi
+fi
+)
+AC_MSG_RESULT($ac_cv_singuname)
+if test "$ac_cv_singuname" = unknown; then
+  AC_MSG_WARN(Unknown architecture: Check singuname.sh)
+  ac_cv_singuname="unknown"
+fi
+
+dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
+dnl compiler/make  config
+dnl
+
+if test "${CFLAGS+set}" != set; then
+  CFLAGS="-O"
+  ac_cflags_set=no
+fi
+
+AC_PROG_MAKE_SET
+AC_PROG_CC
+AC_PROG_CPP
+AC_C_CONST
+AC_C_INLINE
+if test "$ac_cv_c_inline" != no; then
+  AC_DEFINE_UNQUOTED(OM_INLINE, static $ac_cv_c_inline)
+fi
+AC_PROG_RANLIB
+AC_CHECK_PROG(AR, ar, ar, :)
+if test "$ac_cv_prog_AR" != ar; then
+  AC_MSG_ERROR(*** ar program not found)
+fi
+AC_CHECK_PROG(PERL, perl, perl, :)
+if test "$ac_cv_prog_PERL" != perl; then
+  AC_MSG_ERROR(*** perl program not found)
+fi
+
+AC_CHECK_PROG(ADDR2LINE, addr2line, addr2line, no)
+if test "$ac_cv_prog_ADDR2LINE" = addr2line; then
+  AC_DEFINE_UNQUOTED(OM_PROG_ADDR2LINE, "$ac_cv_prog_ADDR2LINE")
+fi
+AC_CHECK_PROG(NM, nm, nm, no)
+if test "$ac_cv_prog_NM" = nm; then
+  AC_DEFINE_UNQUOTED(OM_PROG_NM, "$ac_cv_prog_NM")
+fi
+
+# header file checks
+AC_HEADER_STDC
+AC_CHECK_HEADERS(limits.h,,
+  AC_MSG_ERROR(Can not compile without limits.h))
+AC_CHECK_HEADERS(unistd.h)
+
+AC_CHECK_FUNCS(popen readlink getcwd getwd)
+
+
+if test "$enable_mtrack" != no; then
+# functions which crawl up the stack from return and frame addr
+if test "${GCC}" = yes; then
+  ac_cv_func_return_addr="__builtin_return_address"
+  AC_DEFINE_UNQUOTED(OM_RETURN_ADDR, __builtin_return_address)
+  ac_cv_func_frame_addr="__builtin_frame_address"
+  AC_DEFINE_UNQUOTED(OM_FRAME_ADDR, __builtin_frame_address)
+fi
+
+# test them
+if test "${ac_cv_func_return_addr+set}" = set; then
+# first, check whether return addr 
+AC_MSG_CHECKING(whether $ac_cv_func_return_addr works)
+AC_CACHE_VAL(ac_cv_func_return_addr_works,
+AC_TRY_RUN([
+int test_return_addr()
+{
+   if (OM_RETURN_ADDR(1)  != 0 && OM_RETURN_ADDR(0) != 0) return 0;
+   return 1;
+}
+
+int main()
+{
+   return test_return_addr();
+}
+], ac_cv_func_return_addr_works=yes,  
+   ac_cv_func_return_addr_works=no,
+   ac_cv_func_return_addr_works=no))
+AC_MSG_RESULT($ac_cv_func_return_addr_works)
+
+if test "$ac_cv_func_return_addr_works" = yes; then
+AC_DEFINE_UNQUOTED(OM_RETURN_ADDR_WORKS)
+if test "${ac_cv_func_frame_addr+set}" = set; then
+# first, check whether return addr 
+AC_MSG_CHECKING(whether $ac_cv_func_frame_addr works)
+AC_CACHE_VAL(ac_cv_func_frame_addr_works,
+AC_TRY_RUN([
+int test_frame_addr()
+{
+   if (OM_FRAME_ADDR(1)  != 0 && OM_FRAME_ADDR(0) != 0) return 0;
+   return 1;
+}
+
+int main()
+{
+   return test_frame_addr();
+}
+], ac_cv_func_frame_addr_works=yes,  
+   ac_cv_func_frame_addr_works=no,
+   ac_cv_func_frame_addr_works=no))
+AC_MSG_RESULT($ac_cv_func_frame_addr_works)
+
+if test "$ac_cv_func_frame_addr_works" = yes; then
+AC_DEFINE_UNQUOTED(OM_FRAME_ADDR_WORKS)
+fi
+fi  # "${ac_cv_func_frame_addr+set}" = set
+fi  # "$ac_cv_func_return_addr_works" = yes
+fi  # "${ac_cv_func_return_addr+set}" = set
+fi  # "$enable_mtrack" != no;
+
+
+dnl llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
+dnl Find out more about particularity of the system
+dnl
+
+# sizes
+AC_CHECK_SIZEOF(long,4)
+AC_CHECK_SIZEOF(void*,4)
+AC_CHECK_SIZEOF(double, 8)
+if test "$ac_cv_sizeof_long" != "$ac_cv_sizeof_voidp"; then
+  AC_MSG_ERROR(need equal sizes for long and void*)
+fi
+if test "$ac_cv_sizeof_voidp" != 4 && "$ac_cv_sizeof_voidp" != 8; then
+  AC_MSG_ERROR(need void* to be 4 or 8 bytes long)
+fi
+
+AC_MSG_CHECKING(align8)
+if test "$with_align8" = yes || test "$ac_cv_sizeof_long" = 8; then
+  $ac_cv_align8 = yes
+else
+AC_CACHE_VAL(ac_cv_align8,
+AC_TRY_RUN([ 
+int main() 
+{
+  void* ptr = (void*) malloc(12); 
+  double* d_ptr; 
+  if ((unsigned long) ptr % 8 == 0) ptr = ptr + 4;  
+  d_ptr = (double*) ptr;
+  *d_ptr = (double) 1.1;
+  if (*d_ptr != (double) 1.1) return 1;
+  else return 0;
+}
+], ac_cv_align8=no, ac_cv_align8=yes, ac_cv_align8=yes))
+fi
+AC_MSG_RESULT($ac_cv_align8)
+
+if test $ac_cv_align8 = "yes"; then
+  AC_DEFINE(OM_ALIGN_8)
+fi
+
+dnl
+dnl
+dnl figure out the page size of your system
+dnl
+dnl
+AC_MSG_CHECKING(size of system page)
+AC_CACHE_VAL(ac_cv_pagesize,
+AC_TRY_RUN([#include <stdio.h>
+#define HAVE_GMALLOC
+#include "gmalloc.c"
+
+main()
+{
+  FILE *f=fopen("conftestval", "w");
+  if (!f) exit(1);
+  fprintf(f, "%d\n", getpagesize());
+  exit(0);
+}], ac_cv_pagesize=`cat conftestval`, ac_cv_pagesize=0, ac_cv_pagesize=0))
+AC_MSG_RESULT($ac_cv_pagesize)
+if test "$ac_cv_pagesize" != 0; then
+  AC_DEFINE_UNQUOTED(SIZEOF_SYSTEM_PAGE, $ac_cv_pagesize)
+fi
+
+dnl
+dnl figure out what to do w.r.t. valloc
+dnl
+
+AC_MSG_CHECKING(for page aligned valloc)
+AC_CACHE_VAL(ac_cv_have_page_alignment,
+
+cat > pagetest.c << EOF
+#include <stdio.h>
+#ifndef ADJUSTMENT
+#define ADJUSTMENT 0
+#endif
+#define REPEAT 1000
+main()
+{
+  long i;
+  unsigned long p1 = (unsigned long) valloc(SIZEOF_SYSTEM_PAGE - ADJUSTMENT);
+  unsigned long p2;
+  unsigned long diffs = 0;
+
+  if ((p1 == 0) || (p1 & (SIZEOF_SYSTEM_PAGE - 1))) exit(1);
+
+  for (i = 0; i<REPEAT; i++)
+  {
+    p2 = (unsigned long) valloc(SIZEOF_SYSTEM_PAGE - ADJUSTMENT);
+    if ((p2 == 0) || (p2 & (SIZEOF_SYSTEM_PAGE - 1))) exit(1);
+    diffs += (p2 - p1);
+    p1 = p2;
+  }
+
+  if ( ((double) diffs)/((double)REPEAT) < ((double) SIZEOF_SYSTEM_PAGE)*1.05 )
+  {
+    FILE *f=fopen("conftestval", "w");
+    if (!f) exit(1);
+    fprintf(f, "%d\n", SIZEOF_SYSTEM_PAGE - ADJUSTMENT);
+    exit(0);
+  }
+  exit(1);
+}
+EOF
+
+ac_cv_have_page_alignment=no
+if test "$with_gmalloc" != yes && \
+   test "$ac_cv_func_valloc" = yes && \
+   test "$ac_cv_pagesize" != 0; then
+AC_TRY_RUN([
+#define ADJUSTMENT 0
+#include "pagetest.c"
+], ac_cv_have_page_alignment="ac_cv_usable_pagesize="`cat  conftestval`,
+ac_cv_have_page_alignment=no, ac_cv_have_page_alignment=no)
+  if test "$ac_cv_have_page_alignment" = no; then
+AC_TRY_RUN([
+#define ADJUSTMENT SIZEOF_VOIDP
+#include "pagetest.c"
+], ac_cv_have_page_alignment="ac_cv_usable_pagesize="`cat  conftestval`,
+ac_cv_have_page_alignment=no, ac_cv_have_page_alignment=no)
+  fi
+fi
+
+if test "$ac_cv_have_page_alignment" = no && test "$ac_cv_pagesize" != 0; then
+AC_TRY_RUN([
+#define ADJUSTMENT 0
+#define HAVE_GMALLOC
+#include "gmalloc.c"
+#include "pagetest.c"
+], ac_cv_have_page_alignment="ac_cv_have_gmalloc=yes; ac_cv_usable_pagesize="`cat  conftestval`,
+ac_cv_have_page_alignment=no, ac_cv_have_page_alignment=no)
+  if test "$ac_cv_have_page_alignment" = no; then
+AC_TRY_RUN([
+#define ADJUSTMENT SIZEOF_VOIDP
+#define HAVE_GMALLOC
+#include "gmalloc.c"
+#include "pagetest.c"
+], ac_cv_have_page_alignment="ac_cv_have_gmalloc=yes; ac_cv_usable_pagesize="`cat  conftestval`,
+ac_cv_have_page_alignment=no, ac_cv_have_page_alignment=no)
+  fi
+fi
+rm -rf conftesteval pagetest.c
+
+)
+
+if test "$ac_cv_have_page_alignment" != no && test "$ac_cv_with_gmalloc" != no; then
+  eval $ac_cv_have_page_alignment
+  AC_DEFINE_UNQUOTED(OM_VALLOC, valloc)
+  AC_DEFINE_UNQUOTED(OM_VFREE, free)
+  if test "$ac_cv_have_gmalloc" = yes; then
+    AC_DEFINE(HAVE_GMALLOC)
+    AC_MSG_RESULT(from gmalloc)
+  else
+    AC_MSG_RESULT(from system)
+  fi
+  AC_DEFINE_UNQUOTED(SIZEOF_OM_PAGE, $ac_cv_usable_pagesize)
+else
+  AC_MSG_RESULT(no)
+  AC_MSG_ERROR(need valloc)
+fi
+
+
+dnl llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
+dnl check for stat
+dnl
+AC_MSG_CHECKING(whether to enable statistics)
+if test "$enable_stat" = yes; then
+  AC_MSG_RESULT(yes)
+  AC_DEFINE(OM_HAVE_STAT)
+else
+  AC_MSG_RESULT(no)
+fi
+
+
+if test "${GCC}" = yes && test "$ac_cflags_set" = no ; then
+  CFLAGS="-pipe -Wall -O3 -fomit-frame-pointer"
+fi
+
+
+AC_OUTPUT(Makefile, \
+ if test "$CONFIG_HEADERS"; then echo timestamp > stamp-h; fi)
+
+
+
+

@@ -1,0 +1,236 @@
+#################################################################
+### File:    Makefile.in
+### Purpose: Makefile for omalloc
+### Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
+### Created: 11/99
+### Version: $Id: Makefile.in,v 1.1.1.1 1999-11-18 17:45:53 obachman Exp $
+#################################################################
+
+SHELL		= /bin/sh
+
+##
+## various paths
+##
+# header file is installed here
+includedir	= @includedir@
+# library is installed here
+libdir 		= @libdir@
+
+##
+## various programs
+##
+@SET_MAKE@
+CC		= @CC@
+AR		= @AR@
+RANLIB		= @RANLIB@
+PERL		= @PERL@
+INSTALL		= ../install-sh -c
+INSTALL_PROGRAM	= ${INSTALL}
+INSTALL_DATA	= ${INSTALL} -m 644
+MKINSTALLDIRS   = ../mkinstalldirs
+
+##
+## compiler and linker options
+##
+CFLAGS		= @CFLAGS@ 
+CPPFLAGS	= @CPPFLAGS@
+DEFS		= -DNDEBUG @DEFS@
+
+##
+## End configuration dependend stuff
+#################################################################
+
+###
+### file sets
+###
+
+# normal C source files
+CSOURCES=omAlloc.c omList.c  omDebug.c omPage.c omLocal.c omFindExec.c \
+	 omTrack.c gmalloc.c 
+
+SOURCES=${CSOURCES} 
+
+# ASO_SOURCES
+ASO_SOURCES = 
+
+HEADERS=omPrivate.h omList.h omAlloc.h omPage.c omLocal.h omMemOps.h \
+        omDebug.h omTrack.h omFindExec.h 
+
+OBJS := $(CSOURCES:.c=.o) 
+
+ASO_OBJS := $(ASO_SOURCES:.aso.cc=.aso) 
+
+DISTFILES=$(SOURCES) $(HEADERS) makeheader.pl Makefile.in \
+           omConfig.h.in omTables.c omTest.c
+##
+## Build Targets
+##
+
+%.o: %.c omConfig.h omTables.inc
+	${CC} ${CFLAGS} ${CPPFLAGS} ${DEFS} -c $<
+
+%.aso.o: %.aso.cc mmtables.inc 
+	${CXX} ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} $< -o $@
+.PRECIOUS: %.aso.o
+
+%.aso: %.aso.o
+	./$< > $@
+
+all:	lib libomalloc.h libg
+
+lib: libomalloc.a
+
+libomalloc.a: $(OBJS) Makefile omConfig.h
+	rm -f $@
+	$(AR) cr $@ $(OBJS) 
+	$(RANLIB) $@
+
+libomalloc.h: $(HEADERS) 
+	$(PERL) makeheader.pl omAlloc.h $@
+
+omTables.inc: omTables
+	./omTables > $@
+
+omTables: omPrivate.h omConfig.h omTables.c
+	${CC} ${CFLAGS} ${CPPFLAGS} ${DEFS} -DOM_GENERATE_INC omTables.c -o omTables
+
+omConfig.h: stamp-h
+
+stamp-h : config.status omConfig.h.in
+	CONFIG_FILES= CONFIG_HEADERS="omConfig.h" ./config.status
+
+Makefile: Makefile.in config.status
+	CONFIG_FILES="Makefile" CONFIG_HEADERS= ./config.status
+
+config.status: configure
+	./config.status --recheck
+
+configure: configure.in
+	@echo "WARNING: You need to rerun autoconf. I am proceeding, for now."
+	@touch configure
+#	autoconf
+
+##
+## install targets
+##
+install: all
+	$(MKINSTALLDIRS) $(libdir)
+	$(MKINSTALLDIRS) $(includedir)
+	$(INSTALL_DATA) libomalloc.a $(libdir)
+	$(RANLIB) $(libdir)/libomalloc.a
+	$(INSTALL_DATA) libmalloc.h $(includedir)/omAlloc.h
+
+uninstall: 
+	rm -f $(includedir)/omAlloc.h $(libdir)/libomalloc.a
+
+##
+## clean targest
+##
+mostlyclean: 
+	-rm -f core *.d *.o *.og *.op *_d.c *.a depend a.out *.tgz omTables
+	-rm -f omTest omTest_* libomalloc*
+
+clean: mostlyclean
+
+distclean: clean
+	-rm -f  *~ .\#*  stamp-h configure
+	-rm -f omConfig.h Makefile TAGS* tags config.status config.cache config.log
+
+srcclean: distclean
+
+maintainer-clean: distclean 
+	rm configure
+
+##
+## Below here is stuff for developpers
+#################################################################
+
+##
+## compiler and linker options for debug version
+##
+
+CCG		= gcc
+CCM		= gcc -MM -DGENERATE_DEPEND
+
+CFLAGSG		= -g -Wall -Wno-unused -pipe
+DEFSG		=  @DEFS@
+
+##
+## .og files for having -O and -g object versions available at the same time
+##
+OBJG := $(CSOURCES:.c=.og) 
+
+
+##
+## Debug Targets
+##
+%.og: %.c
+	$(CCG) ${CFLAGSG} ${CPPFLAGS} ${DEFSG} -c $< -o $@
+
+libg: libomalloc_g.a
+
+libomalloc_g.a: $(OBJG) Makefile omConfig.h
+	rm -f $@
+	$(AR) cr $@ $(OBJG) 
+	$(RANLIB) $@
+
+
+##
+## Debug Targets
+##
+OBJD := $(CSOURCES:%.c=%_d.og) 
+
+%_d.c : %.c
+	$(CCG) -E -P $< | $(PERL) -p -e 's/;/;\n/g' | $(PERL) -p -e 's/\{/\n\{/g' | $(PERL) -p -e 's/\}/\n\}/g' > $@
+.PRECIOUS: %_d.c
+
+
+
+libd: libomalloc_d.a
+
+libomalloc_d.a: $(OBJD) Makefile omConfig.h
+	rm -f $@
+	$(AR) cr $@ $(OBJD) 
+	$(RANLIB) $@
+
+
+##
+## Test program
+##
+
+omTest_d: libd omTest.c
+	$(CCG) ${CFLAGSG} ${CPPFLAGS} ${DEFSG} omTest.c -L. -lomalloc_d -o omTest_d
+
+omTest_g: libg omTest.c
+	$(CCG) ${CFLAGSG} ${CPPFLAGS} ${DEFSG} omTest.c -L. -lomalloc_g -o omTest_g
+
+omTest: lib omTest.c
+	$(CC) ${CFLAGS} ${CPPFLAGS} ${DEFS} omTest.c -L. -lomalloc -o omTest
+
+
+##
+## tar and backup
+##
+
+tar:
+	tar czvf omalloc.tgz $(DISTFILES)
+
+backup: tar
+	mcopy omalloc.tgz a:
+
+##
+## Dependencies 
+## 
+%.d: %.c omConfig.h Makefile
+	echo $(@:.d=.og) $(@:.d=.od) $(@:.d=_d.c) $(@:.d=.ot)" " \\ > $@
+	$(CCM) ${CPPFLAGS} ${DEFSG} $< >> $@
+
+depend:   $(CSOURCES:.c=.d) omConfig.h 
+	cat *.d >depend
+
+ifeq (depend,$(wildcard depend))
+include depend
+endif
+
+
+
