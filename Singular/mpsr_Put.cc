@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_Put.cc,v 1.10 1998-08-24 14:39:09 obachman Exp $ */
+/* $Id: mpsr_Put.cc,v 1.11 1998-09-21 12:42:10 Singular Exp $ */
 
 
 /***************************************************************
@@ -548,7 +548,11 @@ mpsr_Status_t mpsr_PutDump(MP_Link_pt link)
              IDTYP(h) != LINK_CMD)
     {
       cmd.arg1.name = IDID(h);
-      memcpy(&(cmd.arg2), h, sizeof(sleftv));
+      //memcpy(&(cmd.arg2), h, sizeof(sleftv));
+      cmd.arg2.data=IDDATA(h);
+      cmd.arg2.flag=h->flag;
+      cmd.arg2.attribute=h->attribute;
+      cmd.arg2.rtyp=h->typ;
       if (mpsr_PutLeftv(link, lv , currRing) != mpsr_Success) break;
 #ifdef MPSR_DEBUG
       Print("Dumped %s\n", IDID(h));
@@ -563,7 +567,11 @@ mpsr_Status_t mpsr_PutDump(MP_Link_pt link)
         while (h2 != NULL)
         {
           cmd.arg1.name = IDID(h2);
-          memcpy(&(cmd.arg2), h2, sizeof(sleftv));
+          //memcpy(&(cmd.arg2), h2, sizeof(sleftv));
+          cmd.arg2.data=IDDATA(h);
+          cmd.arg2.flag=h->flag;
+          cmd.arg2.attribute=h->attribute;
+          cmd.arg2.rtyp=h->typ;
           if (mpsr_PutLeftv(link, lv, r) != mpsr_Success) break;
 #ifdef MPSR_DEBUG
           Print("Dumped %s\n", IDID(h2));
