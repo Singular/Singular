@@ -1,19 +1,19 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.49 1998-05-12 09:08:00 schmidt Exp $
+@comment $Id: general.doc,v 1.50 1998-05-12 09:09:37 schmidt Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
 @c with emacs (C-c C-e C-b).
-%**start
-\input texinfo.tex
-@setfilename general.info
-@node Top, General concepts
-@menu
-* General concepts::
-@end menu
-@node General concepts, Data types, Introduction, Top
-@chapter General concepts
-%**end
+@c %**start
+@c \input texinfo.tex
+@c @setfilename general.info
+@c @node Top, General concepts
+@c @menu
+@c * General concepts::
+@c @end menu
+@c @node General concepts, Data types, Introduction, Top
+@c @chapter General concepts
+@c %**end
 
 @menu
 * Interactive use::
