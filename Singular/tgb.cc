@@ -2185,27 +2185,7 @@ static int pLcmDeg(poly a, poly b)
   return n;
 
 }
-static int pMinDeg3(poly f){
-  if (f==NULL){
-    return(-1);
 
-  }
-
-  poly h=f->next;
-  int n=pTotaldegree(h);
-  int i=0;
-  while((i<2)){
-    if (h==NULL)
-      return(n);
-    h=h->next;
-    if (h!=NULL){
-      n=min(n,pTotaldegree(h));
-    }
-    i++;
-  }
-
-  return n;
-}
 
 
 static void shorten_tails(calc_dat* c, poly monom)
