@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_iter.cc,v 1.2 1997-06-19 12:24:23 schmidt Exp $ */
+/* $Id: cf_iter.cc,v 1.3 1998-06-29 14:37:49 schmidt Exp $ */
 
 #include <config.h>
 
@@ -100,56 +100,4 @@ CFIterator::operator= ( const CanonicalForm & f )
 	ispoly = true; hasterms = true;
     }
     return *this;
-}
-
-CFIterator&
-CFIterator::operator++ ()
-{
-    ASSERT( hasterms, "illegal term" );
-    if ( ispoly ) {
-	cursor = cursor->next;
-	hasterms = cursor != 0;
-    }
-    else
-	hasterms = false;
-    return *this;
-}
-
-CFIterator&
-CFIterator::operator++ ( int )
-{
-    ASSERT( hasterms, "illegal term" );
-    if ( ispoly ) {
-	cursor = cursor->next;
-	hasterms = cursor != 0;
-    }
-    else
-	hasterms = false;
-    return *this;
-}
-
-int
-CFIterator::hasTerms() const
-{
-    return hasterms;
-}
-
-CanonicalForm
-CFIterator::coeff() const
-{
-    ASSERT( hasterms, "illegal term" );
-    if ( ispoly )
-	return cursor->coeff;
-    else
-	return data;
-}
-
-int
-CFIterator::exp() const
-{
-    ASSERT( hasterms, "illegal term" );
-    if ( ispoly )
-	return cursor->exp;
-    else
-	return 0;
 }
