@@ -1,11 +1,14 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fac_util.h,v 1.0 1996-05-17 10:59:40 stobbe Exp $
+// $Id: fac_util.h,v 1.1 1996-06-27 11:34:25 stobbe Exp $
 
 #ifndef INCL_FAC_UTIL_H
 #define INCL_FAC_UTIL_H
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.0  1996/05/17 10:59:40  stobbe
+Initial revision
+
 */
 
 #include "canonicalform.h"
@@ -36,6 +39,8 @@ public:
 CanonicalForm replaceLc( const CanonicalForm & f, const CanonicalForm & c );
 
 CanonicalForm remainder( const CanonicalForm & f, const CanonicalForm & g, const modpk & pk );
+
+void divremainder( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & quot, CanonicalForm & rem, const modpk & pk );
 
 /*ENDPUBLIC*/
 

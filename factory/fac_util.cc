@@ -1,8 +1,11 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fac_util.cc,v 1.0 1996-05-17 10:59:46 stobbe Exp $
+// $Id: fac_util.cc,v 1.1 1996-06-27 11:34:24 stobbe Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.0  1996/05/17 10:59:46  stobbe
+Initial revision
+
 */
 
 #include "assert.h"
@@ -110,6 +113,32 @@ remainder( const CanonicalForm & f, const CanonicalForm & g, const modpk & pk )
 	    result = pk( result - lc( result ) * invlcg * g * power( x, result.degree() - degg ) );
 	}
 	return result;
+    }
+}
+
+void
+divremainder( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & quot, CanonicalForm & rem, const modpk & pk )
+{
+    ASSERT( (f.inCoeffDomain() || f.isUnivariate()) && (g.inCoeffDomain() || g.isUnivariate()) && (f.inCoeffDomain() || g.inCoeffDomain() || f.mvar() == g.mvar()), "can not build remainder" );
+    if ( f.inCoeffDomain() )
+	if ( g.inCoeffDomain() ) {
+	    divrem( f, g, quot, rem );
+	    quot = pk( quot );
+	    rem = pk( rem );
+	}
+	else {
+	    quot = 0;
+	    rem = pk( f );
+	}
+    else {
+	Variable x = f.mvar();
+	CanonicalForm invlcg = pk.inverse( g.lc() );
+	rem = f;
+	int degg = g.degree();
+	while ( rem.degree() >= degg ) {
+	    quot += pk( lc( rem ) * invlcg ) * power( x, rem.degree() - degg );
+	    rem = pk( rem - lc( rem ) * invlcg * g * power( x, rem.degree() - degg ) );
+	}
     }
 }
 
