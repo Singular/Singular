@@ -1757,10 +1757,10 @@ static void now_t_rep(const int & arg_i, const int & arg_j, calc_dat* c){
 }
 static void soon_t_rep(const int& arg_i, const int& arg_j, calc_dat* c)
 {
-  assume(0<=i);
-  assume(0<=j);
-  assume(i<c->n);
-  assume(j<c->n);
+  assume(0<=arg_i);
+  assume(0<=arg_j);
+  assume(arg_i<c->n);
+  assume(arg_j<c->n);
   int i,j;
   if (arg_i==arg_j){
     return;
@@ -1777,10 +1777,10 @@ static void soon_t_rep(const int& arg_i, const int& arg_j, calc_dat* c)
     c->states[j][i]=SOONTREP;
 }
 static BOOLEAN has_t_rep(const int & arg_i, const  int & arg_j, calc_dat* state){
-  assume(0<=i);
-  assume(0<=j);
-  assume(i<c->n);
-  assume(j<c->n);
+  assume(0<=arg_i);
+  assume(0<=arg_j);
+  //assume(arg_i<c->n);
+  //assume(arg_j<c->n);
   if (arg_i==arg_j)
     {
       return (TRUE);
