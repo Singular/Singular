@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.55 1998-12-09 11:21:51 krueger Exp $ */
+/* $Id: grammar.y,v 1.56 1999-01-07 12:21:51 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -333,7 +333,7 @@ lines:
             if (inerror==2) PrintLn();
             errorreported = inerror = cmdtok = 0;
             lastreserved = currid = NULL;
-            expected_parms = noringvars = siCntrlc = FALSE;
+            expected_parms = siCntrlc = FALSE;
           }
         ;
 
@@ -359,6 +359,7 @@ pprompt:
             #ifdef SIQ
             siq=0;
             #endif
+	    noringvars = FALSE;
             currentVoice->ifsw=0;
             if (inerror)
             {
@@ -1299,7 +1300,6 @@ ringcmd:
           ordering           /* list of (multiplier ordering (weight(s))) */
           {
             BOOLEAN do_pop = FALSE;
-            //noringvars = FALSE;
             char *ring_name = $2.name;
 #ifdef HAVE_NAMESPACES
             if (((sleftv)$2).req_packhdl != NULL)
@@ -1323,6 +1323,7 @@ ringcmd:
             $4.CleanUp();
             $6.CleanUp();
             $8.CleanUp();
+	    noringvars = FALSE;
             if (b==NULL)
             {
               MYYERROR("cannot make ring");
@@ -1331,7 +1332,6 @@ ringcmd:
         | ringcmd1 elemexpr
           {
             BOOLEAN do_pop = FALSE;
-            //noringvars = FALSE;
             char *ring_name = $2.name;
 #ifdef HAVE_NAMESPACES
             if (((sleftv)$2).req_packhdl != NULL)
@@ -1347,6 +1347,7 @@ ringcmd:
 #ifdef HAVE_NAMESPACES
             if(do_pop) namespaceroot->pop();
 #endif /* HAVE_NAMESPACES */
+	    noringvars = FALSE;
           }
         | DRING_CMD { noringvars = TRUE; }
           elemexpr cmdeq
@@ -1357,7 +1358,6 @@ ringcmd:
             #ifdef DRING
             BOOLEAN do_pop = FALSE;
             idhdl h;
-            //noringvars = FALSE;
             char *ring_name = $3.name;
 #ifdef HAVE_NAMESPACES
             if (((sleftv)$3).req_packhdl != NULL)
@@ -1387,6 +1387,7 @@ ringcmd:
             setFlag(h,FLAG_DRING);
             rDSet();
             #endif
+	    noringvars = FALSE;
           }
         ;
 

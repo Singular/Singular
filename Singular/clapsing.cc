@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.43 1998-12-11 16:41:08 schmidt Exp $
+// $Id: clapsing.cc,v 1.44 1999-01-07 12:21:50 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -66,41 +66,41 @@
 // `FACTORY_GCD_STAT' (2), or `FACTORY_GCD_DEBOUT_PATTERN' (3) is on:
 //
 // sinclap_divide_content:
-// (1)	G = <firstCoeff>
-// (3)	G#= <firstCoeff, pattern>
-// (1)	h = <nextCoeff>
-// (3)	h#= <nextCoeff, pattern>
-// (2)	gcnt: <statistics on gcd as explained above>
-// (1)	g = <intermediateResult>
-// (3)	g#= <intermediateResult, pattern>
-// (1)	h = <nextCoeff>
-// (3)	h#= <nextCoeff, pattern>
-// (2)	gcnt: <statistics on gcd as explained above>
-//	...
-// (1)	h = <lastCoeff>
-// (3)	h#= <lastCoeff, pattern>
-// (1)	g = <finalResult>
-// (3)	g#= <finalResult, pattern>
-// (2)	gcnt: <statistics on gcd as explained above>
-// (2)	cont: <statistics on content as explained above>
-//   
+// (1) G = <firstCoeff>
+// (3) G#= <firstCoeff, pattern>
+// (1) h = <nextCoeff>
+// (3) h#= <nextCoeff, pattern>
+// (2) gcnt: <statistics on gcd as explained above>
+// (1) g = <intermediateResult>
+// (3) g#= <intermediateResult, pattern>
+// (1) h = <nextCoeff>
+// (3) h#= <nextCoeff, pattern>
+// (2) gcnt: <statistics on gcd as explained above>
+//  ...
+// (1) h = <lastCoeff>
+// (3) h#= <lastCoeff, pattern>
+// (1) g = <finalResult>
+// (3) g#= <finalResult, pattern>
+// (2) gcnt: <statistics on gcd as explained above>
+// (2) cont: <statistics on content as explained above>
+//
 // singclap_alglcm:
-// (1)  f = <inputPolyF>
-// (3)  f#= <inputPolyF, pattern>
-// (1)  g = <inputPolyG>
-// (3)  g#= <inputPolyG, pattern>
-// (1)  d = <its gcd>
-// (3)  d#= <its gcd, pattern>
-// (2)  alcm: <statistics as explained above>
-// 
+// (1) f = <inputPolyF>
+// (3) f#= <inputPolyF, pattern>
+// (1) g = <inputPolyG>
+// (3) g#= <inputPolyG, pattern>
+// (1) d = <its gcd>
+// (3) d#= <its gcd, pattern>
+// (2) alcm: <statistics as explained above>
+//
 // singclap_algdividecontent:
-// (1)  f = <inputPolyF>
-// (3)  f#= <inputPolyF, pattern>
-// (1)  g = <inputPolyG>
-// (3)  g#= <inputPolyG, pattern>
-// (1)  d = <its gcd>
-// (3)  d#= <its gcd, pattern>
-// (2)  acnt: <statistics as explained above>
+// (1) f = <inputPolyF>
+// (3) f#= <inputPolyF, pattern>
+// (1) g = <inputPolyG>
+// (3) g#= <inputPolyG, pattern>
+// (1) d = <its gcd>
+// (3) d#= <its gcd, pattern>
+// (2) acnt: <statistics as explained above>
 //
 
 #ifdef FACTORY_GCD_STAT
@@ -190,7 +190,7 @@ TIMING_DEFINE_PRINT( algLcmTimer );
 #define FACTORY_CFAOUT( tag, f ) \
   FACTORY_CFAOUT_POLY( tag " = ", f ); \
   FACTORY_CFAOUT_PAT( tag "#= ", f )
-  
+
 
 
 
@@ -508,17 +508,27 @@ void singclap_divide_content ( poly f )
     CFList L;
     CanonicalForm g, h;
     poly p = pNext(f);
-    //nTest(pGetCoeff(f));
-    FACTORY_ALGOUT( "G", (((lnumber)pGetCoeff(f))->z) );
-    g = convSingTrClapP( ((lnumber)pGetCoeff(f))->z );
-    L.append( g );
+
+    // first attemp: find smallest g:
+
+    number gg=pGetCoeff(f);
+    while (p!=NULL)
+    {
+      if (nGreater(gg,pGetCoeff(p))) gg=pGetCoeff(p);
+      pIter(p);
+    }
+    FACTORY_ALGOUT( "G", ((lnumber)gg)->z );
+    g = convSingTrClapP( ((lnumber)gg)->z );
+
+    // second run: gcd's
+
+    p = f;
     TIMING_START( contentTimer );
     while ( (p != NULL) && (g != 1) )
     {
-      //nTest(pGetCoeff(p));
       FACTORY_ALGOUT( "h", (((lnumber)pGetCoeff(p))->z) );
       h = convSingTrClapP( ((lnumber)pGetCoeff(p))->z );
-      p = pNext( p );
+      pIter( p );
 #ifdef FACTORY_GCD_STAT
       // save g
       CanonicalForm gOld = g;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.16 1998-07-23 09:07:02 Singular Exp $ */
+/* $Id: polys1.cc,v 1.17 1999-01-07 12:21:52 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -263,13 +263,16 @@ static void pnFreeBin(number *bin, int exp)
 */
 static poly pMonPower(poly p, int exp)
 {
-  number x, y;
   int i;
 
-  y = pGetCoeff(p);
-  nPower(y,exp,&x);
-  nDelete(&y);
-  pSetCoeff0(p,x);
+  if(!nIsOne(pGetCoeff(p)))
+  {
+    number x, y;
+    y = pGetCoeff(p);
+    nPower(y,exp,&x);
+    nDelete(&y);
+    pSetCoeff0(p,x);
+  }
   for (i=pVariables; i!=0; i--)
   {
     pMultExp(p,i, exp);
@@ -729,39 +732,24 @@ poly pISet(int i)
   return rc;
 }
 
-// /*2
-// * create a new polynomial and init it as 1
-// */
-// poly pOne(void)
-// {
-//   poly p=pInit();
-//   pSetCoeff0(p,nInit(1));
-// #ifdef TEST_MAC_ORDER
-//   pSetm(p);
-// #endif
-//   return p;
-// }
-
 void pContent(poly ph)
 {
   number h,d;
   poly p;
 
-  p = ph;
-  if(pNext(p)==NULL)
+  if(pNext(ph)==NULL)
   {
-    pSetCoeff(p,nInit(1));
+    pSetCoeff(ph,nInit(1));
   }
   else
   {
 #ifdef PDEBUG
-    if (!pTest(p)) return;
+    if (!pTest(ph)) return;
 #endif
-    nNormalize(pGetCoeff(p));
-    if(!nGreaterZero(pGetCoeff(ph)))
-      ph = pNeg(ph);
-    h=nCopy(pGetCoeff(p));
-    pIter(p);
+    nNormalize(pGetCoeff(ph));
+    if(!nGreaterZero(pGetCoeff(ph))) ph = pNeg(ph);
+    h=nCopy(pGetCoeff(ph));
+    p = pNext(ph);
     while (p!=NULL)
     {
       nNormalize(pGetCoeff(p));
@@ -798,13 +786,78 @@ void pContent(poly ph)
 #ifdef HAVE_FACTORY
     if ( (nGetChar() == 1) || (nGetChar() < 0) ) /* Q[a],Q(a),Zp[a],Z/p(a) */
     {
-      pTest(ph);
       singclap_divide_content(ph);
-      pTest(ph);
+      if(!nGreaterZero(pGetCoeff(ph))) ph = pNeg(ph);
     }
 #endif
   }
+  pTest(ph);
 }
+
+//void pContent(poly ph)
+//{
+//  number h,d;
+//  poly p;
+//
+//  p = ph;
+//  if(pNext(p)==NULL)
+//  {
+//    pSetCoeff(p,nInit(1));
+//  }
+//  else
+//  {
+//#ifdef PDEBUG
+//    if (!pTest(p)) return;
+//#endif
+//    nNormalize(pGetCoeff(p));
+//    if(!nGreaterZero(pGetCoeff(ph)))
+//    {
+//      ph = pNeg(ph);
+//      nNormalize(pGetCoeff(p));
+//    }
+//    h=pGetCoeff(p);
+//    pIter(p);
+//    while (p!=NULL)
+//    {
+//      nNormalize(pGetCoeff(p));
+//      if (nGreater(h,pGetCoeff(p))) h=pGetCoeff(p);
+//      pIter(p);
+//    }
+//    h=nCopy(h);
+//    p=ph;
+//    while (p!=NULL)
+//    {
+//      d=nGcd(h,pGetCoeff(p));
+//      nDelete(&h);
+//      h = d;
+//      if(nIsOne(h))
+//      {
+//        break;
+//      }
+//      pIter(p);
+//    }
+//    p = ph;
+//    //number tmp;
+//    if(!nIsOne(h))
+//    {
+//      while (p!=NULL)
+//      {
+//        d = nIntDiv(pGetCoeff(p),h);
+//        pSetCoeff(p,d);
+//        pIter(p);
+//      }
+//    }
+//    nDelete(&h);
+//#ifdef HAVE_FACTORY
+//    if ( (nGetChar() == 1) || (nGetChar() < 0) ) /* Q[a],Q(a),Zp[a],Z/p(a) */
+//    {
+//      pTest(ph);
+//      singclap_divide_content(ph);
+//      pTest(ph);
+//    }
+//#endif
+//  }
+//}
 
 void pCleardenom(poly ph)
 {
