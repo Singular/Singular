@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: pdata.doc,v 1.16 1999-07-23 12:32:38 obachman Exp $
+@comment $Id: pdata.doc,v 1.17 1999-08-06 14:06:46 obachman Exp $
 @comment this file contains the "Polynomial data" appendix.
 
 @c The following directives are necessary for proper compilation
@@ -28,7 +28,8 @@
 @c -----------------------------------------------------------------
 @node Representation of mathematical objects,Monomial orderings,,Polynomial data
 @section Representation of mathematical objects
-@cindex Representation of mathematical objects
+@cindex mathematical objects
+@cindex representation, math objects
 
 @sc{Singular} distinguishes between objects which do not belong to a ring
 and those which belong to a specific ring (see @ref{Rings and orderings}).

@@ -248,25 +248,15 @@ char* feHelpBrowser(char* which, int warn)
   return heCurrentHelpBrowser->browser;
 }
 
-void feStringAppendBrowsers(int warn)
+void  feStringAppendBrowsers(int warn)
 {
   int i;
-  
-  if (warn)
-  {
-    i = 0;
-    while (heHelpBrowsers[i].browser != NULL)
-    {
-      heHelpBrowsers[i].init_proc(warn);
-      i++;
-    }
-  }
   StringAppendS("Available HelpBrowsers: ");
   
   i = 0;
   while (heHelpBrowsers[i].browser != NULL)
   {
-    if (heHelpBrowsers[i].init_proc(0)) 
+    if (heHelpBrowsers[i].init_proc(warn)) 
       StringAppend("%s, ", heHelpBrowsers[i].browser);
     i++;
   }
@@ -649,7 +639,7 @@ static void heBrowserHelp(heEntry hentry)
   assume(heCurrentHelpBrowser != NULL);
   Warn("Displaying help in browser '%s'.", heCurrentHelpBrowser->browser);
   Warn("Use 'system(\"--browser\", \"<browser>\");' to change browser");
-  Warn("Use 'system(\"browsers\");'                 for available browsers");
+  Warn("Use 'system(\"browsers\");'               for available browsers");
   heCurrentHelpBrowser->help_proc(hentry);
 }
 

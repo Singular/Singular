@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmisc.c,v 1.6 1999-06-30 15:42:12 Singular Exp $ */
+/* $Id: mmisc.c,v 1.7 1999-08-06 14:06:41 obachman Exp $ */
 
 /*
 * ABSTRACT:
@@ -12,6 +12,7 @@
 #include "mmprivate.h"
 #include "mmpage.h"
 #include "febase.h"
+#include "version.h"
 #ifdef MTRACK
 #include "mmbt.h"
 #endif
@@ -100,9 +101,9 @@ void mmCheckPrint( void )
   }
 }
 
-#ifndef MAKE_DISTRIBUTION
 void mmPrintStat()
 {
+#ifndef MAKE_DISTRIBUTION
   int i;
   long l,a;
 
@@ -136,8 +137,8 @@ void mmPrintStat()
            l*(SIZE_OF_PAGE/mmGetHeapBlockSize(&mm_theList[i])) - a);
   }
   while (mmGetSize(i) < MAX_BLOCK_SIZE);
-}
 #endif
+}
 
 #ifdef MLIST
 void mmTestList (int all)

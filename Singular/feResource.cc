@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feResource.cc,v 1.3 1999-08-05 11:28:02 obachman Exp $ */
+/* $Id: feResource.cc,v 1.4 1999-08-06 14:06:38 obachman Exp $ */
 /*
 * ABSTRACT: management of resources
 */
@@ -11,6 +11,7 @@
 #include "mod2.h"
 #include "mmemory.h"
 #include "febase.h"
+#include "version.h"
 
 // define RESOURCE_DEBUG for chattering about resource management
 // #define RESOURCE_DEBUG
@@ -65,7 +66,7 @@ static feResourceConfig_s feResourceConfigs[20] =
   {"Singular",  'S',    feResBinary,"SINGULAR_EXECUTABLE",  "%d/"S_UNAME"/Singular",""},
   {"BinDir",    'b',    feResDir,   "SINGULAR_BIN_DIR",     "%d/"S_UNAME            ""},
   {"RootDir",   'r',    feResDir,   "SINGULAR_ROOT_DIR",    "%b/..",                ""},
-  {"DefaultDir",'d',    feResDir,   "SINGULAR_DEFAULT_DIR",  NULL,                  SINGULAR_DEFAULT_DIR},
+  {"DefaultDir",'d',    feResDir,   "SINGULAR_DEFAULT_DIR",  SINGULAR_DEFAULT_DIR,  ""},
   {"InfoFile",  'i',    feResFile,  "SINGULAR_INFO_FILE",   "%r/info/singular.hlp", ""},
   {"IdxFile",   'x',    feResFile,  "SINGULAR_IDX_FILE",    "%r/doc/singular.idx",  ""},
   {"HtmlDir",   'h',    feResDir,   "SINGULAR_HTML_DIR",    "%r/html",              ""},
@@ -156,6 +157,27 @@ void feInitResources(char* argv0)
 #endif
 }
 
+void feReInitResources()
+{
+  int i = 0;
+  while (feResourceConfigs[i].key != NULL)
+  {
+    if (feResourceConfigs[i].value != "")
+    {
+      if (feResourceConfigs[i].value != NULL)
+        FreeL(feResourceConfigs[i].value);
+      feResourceConfigs[i].value = "";
+    }
+    i++;
+  }
+#ifdef RESOURCE_DEBUG
+  printf("feReInitResources: entering with feArgv0=%s=\n", feArgv0);
+  feResource('S');
+  feResource('b');
+  feResource('r');
+  feResource('s');
+#endif
+}
 
 /*****************************************************************
  *
@@ -206,12 +228,14 @@ static char* feInitResource(feResourceConfig config, int warn)
   {
     char* evalue = getenv(config->env); 
     if (evalue != NULL)
-    {
+    { 
 #ifdef RESOURCE_DEBUG
       printf("feInitResource: Found value from env:%s\n", evalue);
 #endif
       strcpy(value, evalue);
-      if (feVerifyResourceValue(config->type, 
+      if (config->type == feResBinary  // do not verify binaries
+          ||
+          feVerifyResourceValue(config->type, 
                                 feCleanResourceValue(config->type, value)))
       {
 #ifdef RESOURCE_DEBUG
@@ -281,7 +305,7 @@ static char* feInitResource(feResourceConfig config, int warn)
       if (feVerifyResourceValue(config->type, 
                                 feCleanResourceValue(config->type, value)))
       {
-        config->value = value;
+        config->value = mstrdup(value);
 #ifdef RESOURCE_DEBUG
         printf("feInitResource: Set value of %s to =%s=\n", config->key, config->value);
 #endif
@@ -636,10 +660,12 @@ static char* feSprintf(char* s, const char* fmt)
 void feStringAppendResources(int warn)
 {
   int i = 0;
+  char* r;
   while (feResourceConfigs[i].key != NULL)
   {
+    r = feResource(feResourceConfigs[i].key, warn);
     StringAppend("%-10s:\t%s\n", feResourceConfigs[i].key, 
-                 feResource(feResourceConfigs[i].key, warn));
+                 (r != NULL ? r : ""));
     i++;
   }
 }

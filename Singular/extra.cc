@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.98 1999-08-04 15:38:24 obachman Exp $ */
+/* $Id: extra.cc,v 1.99 1999-08-06 14:06:37 obachman Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -48,9 +48,12 @@
 #include "kstd1.h"
 #include "syz.h"
 #include "sdb.h"
+#include "version.h"
 
 // Define to enable many more system commands
+#ifndef MAKE_DISTRIBUTION
 #define HAVE_EXTENDED_SYSTEM
+#endif
 
 #ifdef STDTRACE
 //#include "comm.h"
@@ -269,7 +272,33 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       else
       {
         WerrorS("string expected");
+        return TRUE;
       }
+    }
+    else
+/*==================== setenv ==================================*/
+    if (strcmp(sys_cmd,"setenv")==0)
+    {
+#ifdef HAVE_SETENV
+      if (h!=NULL && h->Typ()==STRING_CMD && h->Data() != NULL &&
+          h->next != NULL && h->next->Typ() == STRING_CMD 
+          && h->next->Data() != NULL)
+      {
+        res->rtyp=STRING_CMD;
+        setenv((char *)h->Data(), (char *)h->next->Data(), 1);
+        res->data=(void *)mstrdup((char *)h->next->Data());
+        feReInitResources();
+        return FALSE;
+      }
+      else
+      {
+        WerrorS("two strings expected");
+        return TRUE;
+      }
+#else
+      WerroS("setenv not supported on this platform");
+      return TRUE;
+#endif      
     }
     else
 /*==================== tty ==================================*/

@@ -305,19 +305,21 @@ maintainer-clean: distclean srcclean
 ## miscellanous targets
 ##
 
-Singular-bindist: mod2.h Makefile version.h scanner.cc ${OBJS} iparith.o \
-                  mpsr_Tok.o tesths.cc libparse.cc depend 
-	${MAKE} CXXFLAGS="${CXXFLAGS} -DMAKE_DISTRIBUTION" -W feResource.cc Singular
+Singular-bindist: ${OBJS} Makefile
+	echo "#define SINGULAR_VERSION_ID " `date '+%y%m%d%H'` >version.h
+	echo "#define MAKE_DISTRIBUTION	" >> version.h
+	${MAKE} Singular
+	strip Singular
 	${INSTALL} -s Singular Singular-bindist
-	rm feResource.o
+	echo "#define SINGULAR_VERSION_ID " `date '+%y%m%d%H'` >version.h
 
-Singular-static-bindist: mod2.h Makefile version.h scanner.cc si_paths.h \
-                         ${OBJS} iparith.o mpsr_Tok.o tesths.cc \
-                         libparse.cc depend 
-	${MAKE} CXXFLAGS="${CXXFLAGS} -DMAKE_DISTRIBUTION" -W feResource.cc Singular-static
+Singular-static-bindist: ${OBJS} Makefile
+	echo "#define SINGULAR_VERSION_ID " `date '+%y%m%d%H'` >version.h
+	echo "#define MAKE_DISTRIBUTION	" >> version.h
+	${MAKE} Singular-static
 	strip Singular-static
 	mv Singular-static Singular-static-bindist
-	rm feResource.o
+	echo "#define SINGULAR_VERSION_ID " `date '+%y%m%d%H'` >version.h
 
 tar:
 	tar cf Singular-${SINGULAR_VERSION}-src.tar ${DISTFILES}
@@ -491,15 +493,15 @@ installp: Singularp
 ##
 ## dependencies
 ##
-%.dd: %.cc mod2.h
+%.dd: %.cc mod2.h 
 	echo $(@:.dd=.og) $(@:.dd=.op) $(@:.dd=.ob) " " \\ > $@
 	$(CXXM) -DGENTABLE ${CPPFLAGS} ${DEFSG} $< >> $@
 
-%.d: %.c mod2.h
+%.d: %.c mod2.h 
 	echo $(@:.d=.og) $(@:.d=.op) $(@:.d=.ob) " " \\ > $@
 	$(CCM) ${CPPFLAGS} ${DEFSG} $< >> $@
 
-depend: $(CXXSOURCES:.cc=.dd) $(CSOURCES:.c=.d) mod2.h
+depend: $(CXXSOURCES:.cc=.dd) $(CSOURCES:.c=.d) mod2.h 
 	cat *.d *.dd >depend
 
 #include $(SOURCES:.cc=.dd) $(CSOURCES:.c=.d)

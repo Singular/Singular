@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.134 1999-08-05 10:58:55 obachman Exp $
+@comment $Id: reference.doc,v 1.135 1999-08-06 14:06:47 obachman Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -1344,7 +1344,7 @@ This should be used as an emergency, or, failure exit within procedures.
 @smallexample
 @c example error
 int i = 1;
-proc myError() {ERROR("Need to leave now"); i = 2;}
+proc myError() {ERROR("Need to leave now");i=2;}
 myError();
 i;     
 @c example
@@ -5323,6 +5323,12 @@ returns the process number (for creating unique names)
 @cindex getenv
 @cindex system, getenv
 returns shell environment variable given as the second argument
+@item @code{system("setenv",}string_expression, string_expression@code{)}
+@cindex setenv
+@cindex system, setenv
+sets the shell environment variable given as the second argument to the
+value given as the third argument. Returns the third argument. Might not 
+be available on all platforms.
 @item @code{system("tty")}
 @cindex tty
 @cindex system, tty
@@ -5366,6 +5372,10 @@ string. @xref{Command line options}.
 sets the value of the (command-line)
 option @code{"long_option_name"} to @code{value}; can only be used for
 some options (e.g., for @code{--browser}). @xref{Command line options}.
+@item @code{system("browsers");}
+@cindex system, browsers
+returns a string about available help browsers. 
+@xref{The online help system}.
 @end table
 @item @strong{Example for UNIX:}
 @smallexample

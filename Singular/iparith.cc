@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.165 1999-07-28 08:38:58 Singular Exp $ */
+/* $Id: iparith.cc,v 1.166 1999-08-06 14:06:39 obachman Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2812,9 +2812,7 @@ static BOOLEAN jjMEMORY(leftv res, leftv v)
     break;
 #endif
   default:
-#ifndef MAKE_DISRIBUTION
     mmPrintStat();
-#endif
     res->data = (char *)0;
   }
   return FALSE;

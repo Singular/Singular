@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.33 1999-08-04 15:38:26 obachman Exp $ */
+/* $Id: febase.h,v 1.34 1999-08-06 14:06:38 obachman Exp $ */
 /*
 * ABSTRACT: basic i/o
 */
@@ -136,6 +136,8 @@ char* feResource(const char* key, int warn = -1);
 // This needs to be called before the first call to feResource
 // Initializes Resources, SearchPath, and extends PATH
 void feInitResources(char* argv0);
+// Re-inits resources, should be called after changing env. variables
+void feReInitResources();
 // Prints resources into string with StringAppend, etc
 void feStringAppendResources(int warn = -1);
 

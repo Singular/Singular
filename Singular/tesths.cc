@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.66 1999-08-04 15:38:27 obachman Exp $ */
+/* $Id: tesths.cc,v 1.67 1999-08-06 14:06:41 obachman Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -433,6 +433,13 @@ int main(          /* main entry to Singular */
           else if (strcmp(longopts[option_index].name, LON_EMACS) == 0)
           {
             mainSetSingOptionValue(LON_EMACS, (char*) 1);
+            // print EmacsDir and InfoFile so that Emacs
+            // mode can pcik it up
+            Warn("EmacsDir: %s", (feResource("EmacsDir") != NULL ? 
+                                  feResource("EmacsDir") : ""));
+            Warn("InfoFile: %s", (feResource("InfoFile") != NULL ? 
+                                  feResource("InfoFile") : ""));
+            
           }
           else if (strcmp(longopts[option_index].name, LON_NO_RC) == 0)
           {
@@ -504,7 +511,7 @@ int main(          /* main entry to Singular */
           exit(1);
     }
   }
-  /*. say hello */
+  /* say hello */
   {
     idhdl h;
     namespaceroot->push(NULL, "Top", 0, TRUE);
@@ -615,14 +622,6 @@ int main(          /* main entry to Singular */
     }
   }
 
-  if (mainGetSingOptionValue(LON_EMACS))
-  {
-    Warn("EmacsDir: %s", (feResource("EmacsDir") != NULL ? 
-                          feResource("EmacsDir") : ""));
-    Warn("InfoFile: %s", (feResource("InfoFile") != NULL ? 
-                          feResource("InfoFile") : ""));
-    feHelpBrowser("emacs");
-  }
   /* start shell */
   if (feBatch)
   {
