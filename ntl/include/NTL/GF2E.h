@@ -434,14 +434,6 @@ inline GF2E random_GF2E()
    { GF2E x; random(x); NTL_OPT_RETURN(GF2E, x); }
 
 
-// ****** input/output
-
-inline NTL_SNS ostream& operator<<(NTL_SNS ostream& s, const GF2E& a)
-   { return s << a._GF2E__rep; }
-   
-NTL_SNS istream& operator>>(NTL_SNS istream& s, GF2E& x);
-
-
 inline GF2E& GF2E::operator=(long a) { conv(*this, a); return *this; }
 inline GF2E& GF2E::operator=(GF2 a) { conv(*this, a); return *this; }
 

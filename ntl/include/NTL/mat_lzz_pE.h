@@ -8,8 +8,6 @@ NTL_OPEN_NNS
 
 NTL_matrix_decl(zz_pE,vec_zz_pE,vec_vec_zz_pE,mat_zz_pE)
 
-NTL_io_matrix_decl(zz_pE,vec_zz_pE,vec_vec_zz_pE,mat_zz_pE)
-
 NTL_eq_matrix_decl(zz_pE,vec_zz_pE,vec_vec_zz_pE,mat_zz_pE)
 
 void add(mat_zz_pE& X, const mat_zz_pE& A, const mat_zz_pE& B); 

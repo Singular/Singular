@@ -123,10 +123,6 @@ inline void append(WordVector& v, const WordVector& w)
    { WordVector::append_impl(v, w); }
 
 
-NTL_SNS istream& operator>>(NTL_SNS istream&, WordVector&);  
-NTL_SNS ostream& operator<<(NTL_SNS ostream&, const WordVector&);  
-
-
 long operator==(const WordVector& a, const WordVector& b);  
 long operator!=(const WordVector& a, const WordVector& b);
 

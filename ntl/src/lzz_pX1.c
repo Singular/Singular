@@ -893,9 +893,6 @@ NTL_vector_impl(zz_pX,vec_zz_pX)
 
 NTL_eq_vector_impl(zz_pX,vec_zz_pX)
 
-NTL_io_vector_impl(zz_pX,vec_zz_pX)
-
-
 
    
 void InnerProduct(zz_pX& x, const vec_zz_p& v, long low, long high, 

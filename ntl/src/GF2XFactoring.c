@@ -125,8 +125,6 @@ void SquareFreeDecomp(vec_pair_GF2X_long& u, const GF2X& ff)
 static
 void AddFactor(vec_pair_GF2X_long& factors, const GF2X& g, long d, long verbose)
 {
-   if (verbose)
-      cerr << "degree=" << d << ", number=" << deg(g)/d << "\n";
    append(factors, cons(g, d));
 }
 
@@ -137,8 +135,6 @@ void ProcessTable(GF2X& f, vec_pair_GF2X_long& factors,
 
 {
    if (limit == 0) return;
-
-   if (verbose) cerr << "+";
 
    GF2X t1;
 
@@ -342,17 +338,10 @@ void EDF(vec_GF2X& factors, const GF2X& ff, long d, long verbose)
    }
 
    
-   double t;
-   if (verbose) { 
-      cerr << "computing EDF(" << d << "," << r << ")..."; 
-      t = GetTime(); 
-   }
-
    factors.SetLength(0);
 
    RecEDF(factors, f, d);
 
-   if (verbose) cerr << (GetTime()-t) << "\n";
 }
 
 
@@ -379,12 +368,7 @@ void SFCanZass(vec_GF2X& factors, const GF2X& ff, long verbose)
 
    
    vec_pair_GF2X_long u;
-   if (verbose) { cerr << "computing DDF..."; t = GetTime(); }
    DDF(u, f, verbose);
-   if (verbose) { 
-      t = GetTime()-t; 
-      cerr << "DDF time: " << t << "\n";
-   }
 
    vec_GF2X v;
 
@@ -418,19 +402,13 @@ void CanZass(vec_pair_GF2X_long& factors, const GF2X& f, long verbose)
    vec_GF2X x;
 
    
-   if (verbose) { cerr << "square-free decomposition..."; t = GetTime(); }
    SquareFreeDecomp(sfd, f);
-   if (verbose) cerr << (GetTime()-t) << "\n";
 
    factors.SetLength(0);
 
    long i, j;
 
    for (i = 0; i < sfd.length(); i++) {
-      if (verbose) {
-         cerr << "factoring multiplicity " << sfd[i].b 
-              << ", deg = " << deg(sfd[i].a) << "\n";
-      }
 
       SFCanZass(x, sfd[i].a, verbose);
 

@@ -10,8 +10,6 @@ NTL_vector_decl(vec_ulong,vec_vec_ulong)
 
 NTL_eq_vector_decl(vec_ulong,vec_vec_ulong)
 
-NTL_io_vector_decl(vec_ulong,vec_vec_ulong)
-
 NTL_CLOSE_NNS
 
 

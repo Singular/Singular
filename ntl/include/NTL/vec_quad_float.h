@@ -9,8 +9,6 @@ NTL_OPEN_NNS
 
 NTL_vector_decl(quad_float,vec_quad_float)
 
-NTL_io_vector_decl(quad_float,vec_quad_float)
-
 NTL_eq_vector_decl(quad_float,vec_quad_float)
 
 NTL_CLOSE_NNS

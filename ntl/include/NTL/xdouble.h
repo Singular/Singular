@@ -217,10 +217,6 @@ inline void conv(xdouble& x, float a) { x = to_xdouble(a); }
 inline void conv(xdouble& x, double a) { x = to_xdouble(a); }
 inline void conv(xdouble& x, const char *a) { x = to_xdouble(a); }
 
-NTL_SNS ostream& operator<<(NTL_SNS ostream& s, const xdouble& a);
-
-NTL_SNS istream& operator>>(NTL_SNS istream& s, xdouble& x);
-
 xdouble trunc(const xdouble& a);
 xdouble floor(const xdouble& a);
 xdouble ceil(const xdouble& a);

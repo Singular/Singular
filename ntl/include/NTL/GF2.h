@@ -191,10 +191,6 @@ inline void random(GF2& x)
 inline GF2 random_GF2()
    { GF2 x; random(x); return x; }
 
-NTL_SNS ostream& operator<<(NTL_SNS ostream& s, GF2 a);
-
-NTL_SNS istream& operator>>(NTL_SNS istream& s, GF2& x);
-
 NTL_CLOSE_NNS
 
 #endif

@@ -352,14 +352,6 @@ inline ZZ_pE random_ZZ_pE()
    { ZZ_pE x; random(x); NTL_OPT_RETURN(ZZ_pE, x); }
 
 
-// ****** input/output
-
-inline NTL_SNS ostream& operator<<(NTL_SNS ostream& s, const ZZ_pE& a)
-   { return s << a._ZZ_pE__rep; }
-   
-NTL_SNS istream& operator>>(NTL_SNS istream& s, ZZ_pE& x);
-
-
 inline ZZ_pE& ZZ_pE::operator=(long a) { conv(*this, a); return *this; }
 inline ZZ_pE& ZZ_pE::operator=(const ZZ_p& a) { conv(*this, a); return *this; }
 

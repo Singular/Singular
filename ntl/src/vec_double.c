@@ -13,8 +13,6 @@ void BlockDestroy(double *, double) { }
 
 NTL_vector_impl_plain(double,vec_double)
 
-NTL_io_vector_impl(double,vec_double)
-
 NTL_eq_vector_impl(double,vec_double)
 
 NTL_END_IMPL

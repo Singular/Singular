@@ -28,19 +28,6 @@ void conv(ZZX& x, const ZZ_pX& a)
 }
 
 
-istream& operator>>(istream& s, ZZX& x)
-{
-   s >> x.rep;
-   x.normalize();
-   return s;
-}
-
-ostream& operator<<(ostream& s, const ZZX& a)
-{
-   return s << a.rep;
-}
-
-
 void ZZX::normalize()
 {
    long n;

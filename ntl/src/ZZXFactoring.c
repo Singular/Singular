@@ -417,27 +417,10 @@ void MultiLift(vec_ZZX& A, const vec_zz_pX& a, const ZZX& f, long e,
    vec_ZZX v, w;
    vec_long link;
 
-   double t;
-
-   if (verbose) {
-      cerr << "building tree...";
-      t = GetTime();
-   }
-
    BuildTree(link, v, w, a);
 
-   if (verbose) cerr << (GetTime()-t) << "\n";
-
-
    for (i = l-1; i > 0; i--) {
-      if (verbose) {
-         cerr << "lifting to " << E[i-1] << "...";
-         t = GetTime();
-      }
-      
       TreeLift(link, v, w, E[i], E[i-1], f, i != 1);
-
-      if (verbose) cerr << (GetTime()-t) << "\n";
    }
 
    A.SetLength(k);
@@ -606,7 +589,6 @@ SmallPrimeFactorization(LocalInfoT& LocalInfo, const ZZX& f,
       long p = LocalInfo.s.next();
       if (!p) Error("out of small primes");
       if (divide(LeadCoeff(f), p)) {
-         if (verbose) cerr << "skipping " << p << "\n";
          continue;
       }
       zz_p::init(p, maxroot);
@@ -619,15 +601,9 @@ SmallPrimeFactorization(LocalInfoT& LocalInfo, const ZZX& f,
 
       GCD(d, ffp, ff);
       if (!IsOne(d)) {
-         if (verbose)  cerr << "skipping " << p << "\n";
          continue;
       }
 
-
-      if (verbose) {
-         cerr << "factoring mod " << p << "...";
-         t = GetTime();
-      }
 
       vec_pair_zz_pX_long thisfac;
       zz_pX thish; 
@@ -642,16 +618,6 @@ SmallPrimeFactorization(LocalInfoT& LocalInfo, const ZZX& f,
       RecordPattern(pattern, thisfac);
       long r = NumFactors(pattern);
       
-      if (verbose) {
-         cerr << (GetTime()-t) << "\n";
-         cerr << "degree sequence: ";
-         for (i = 0; i <= n; i++)
-            if (pattern[i]) {
-               cerr << pattern[i] << "*" << i << " ";
-            }
-         cerr << "\n";
-      }
-
       if (r == 1) {
          irred = 1;
          break;
@@ -695,14 +661,7 @@ SmallPrimeFactorization(LocalInfoT& LocalInfo, const ZZX& f,
 
       spfactors = NTL_NEW_OP vec_zz_pX;
 
-      if (verbose) {
-         cerr << "p = " << zz_p::modulus() << ", completing factorization...";
-         t = GetTime();
-      }
       SFCanZass2(*spfactors, *bestfac, *besth, 0);
-      if (verbose) {
-         cerr << (GetTime()-t) << "\n";
-      }
    }
 
    delete bestfac;
@@ -855,13 +814,6 @@ void UpdateLocalInfo(LocalInfoT& LocalInfo, vec_ZZ& pdeg,
                      const vec_ZZ_pX& W, const vec_ZZX& factors,
                      const ZZX& f, long k, long verbose)
 {
-   static long cnt = 0;
-
-   if (verbose) {
-      cnt = (cnt + 1) % 100;
-      if (!cnt) cerr << "#";
-   }
-
    double t;
    long i, j;
 
@@ -873,11 +825,6 @@ void UpdateLocalInfo(LocalInfoT& LocalInfo, vec_ZZ& pdeg,
       pattern.SetLength(LocalInfo.n+1);
 
       ZZ pd;
-
-      if (verbose) {
-         cerr << "updating local info...";
-         t = GetTime();
-      }
 
       for (i = 0; i < LocalInfo.NumPrimes; i++) {
          zz_p::init(LocalInfo.p[i], NextPowerOfTwo(LocalInfo.n)+1);
@@ -905,12 +852,9 @@ void UpdateLocalInfo(LocalInfoT& LocalInfo, vec_ZZ& pdeg,
 
       CalcPossibleDegrees(pdeg, W, k);
 
-      if (verbose) cerr << (GetTime()-t) << "\n";
    }
 
    if (!ZZXFac_van_Hoeij && LocalInfo.NumPrimes + 1 < ZZXFac_MaxNumPrimes) {
-      if (verbose)
-         cerr << "adding a prime\n";
 
       zz_pBak bak;
       bak.save();
@@ -921,7 +865,6 @@ void UpdateLocalInfo(LocalInfoT& LocalInfo, vec_ZZ& pdeg,
             Error("UpdateLocalInfo: out of primes");
 
          if (divide(LeadCoeff(f), p)) {
-            if (verbose) cerr << "skipping " << p << "\n";
             continue;
          }
 
@@ -935,17 +878,11 @@ void UpdateLocalInfo(LocalInfoT& LocalInfo, vec_ZZ& pdeg,
    
          GCD(d, ffp, ff);
          if (!IsOne(d)) {
-            if (verbose)  cerr << "skipping " << p << "\n";
             continue;
          }
 
          vec_pair_zz_pX_long thisfac;
          zz_pX thish;
-
-         if (verbose) {
-            cerr << "factoring mod " << p << "...";
-            t = GetTime();
-         }
 
          SFCanZass1(thisfac, thish, ff, 0);
 
@@ -957,16 +894,6 @@ void UpdateLocalInfo(LocalInfoT& LocalInfo, vec_ZZ& pdeg,
 
          pattern.SetLength(LocalInfo.n+1);
          RecordPattern(pattern, thisfac);
-
-         if (verbose) {
-            cerr << (GetTime()-t) << "\n";
-            cerr << "degree sequence: ";
-            for (i = 0; i <= LocalInfo.n; i++)
-               if (pattern[i]) {
-                  cerr << pattern[i] << "*" << i << " ";
-               }
-            cerr << "\n";
-         }
 
          ZZ pd;
          CalcPossibleDegrees(pd, pattern);
@@ -1003,12 +930,6 @@ void CardinalitySearch(vec_ZZX& factors, ZZX& f,
 {
    double start_time, end_time;
 
-   if (verbose) {
-      start_time = GetTime();
-      cerr << "\n************ ";
-      cerr << "start cardinality " << k << "\n";
-   }
-
    vec_long I, D;
    I.SetLength(k);
    D.SetLength(k);
@@ -1044,8 +965,7 @@ void CardinalitySearch(vec_ZZX& factors, ZZX& f,
       bit_and(pd, pdeg[I[0]], LocalInfo.PossibleDegrees);
 
       if (IsZero(pd)) {
-         if (verbose) cerr << "skipping\n";
-         goto done;
+         return; //goto done;
       }
 
       unpack(upd, pd, LocalInfo.n);
@@ -1067,8 +987,7 @@ void CardinalitySearch(vec_ZZX& factors, ZZX& f,
                UpdateLocalInfo(LocalInfo, pdeg, W, factors, f, k, verbose);
                bit_and(pd, pdeg[I[0]], LocalInfo.PossibleDegrees);
                if (IsZero(pd)) {
-                  if (verbose) cerr << "skipping\n";
-                  goto done;
+                  return; //goto done;
                }
                unpack(upd, pd, LocalInfo.n);
             }
@@ -1088,10 +1007,6 @@ void CardinalitySearch(vec_ZZX& factors, ZZX& f,
                continue;
             }
 
-            if (verbose) {
-               cerr << "+";
-            }
-
             cnt += 1000;
 
             if (2*D[k-1] <= deg(f)) {
@@ -1102,9 +1017,6 @@ void CardinalitySearch(vec_ZZX& factors, ZZX& f,
                   i--;
                   continue;
                }
-               if (verbose) {
-                  cerr << "*";
-               }
                PrimitivePart(g, g);
                if (!divide(h, f, g)) {
                   i--;
@@ -1113,9 +1025,6 @@ void CardinalitySearch(vec_ZZX& factors, ZZX& f,
                
                // factor found!
                append(factors, g);
-               if (verbose) {
-                 cerr << "degree " << deg(g) << " factor found\n";
-               }
                f = h;
                mul(ct, ConstTerm(f), LeadCoeff(f));
                conv(lc, LeadCoeff(f));
@@ -1128,9 +1037,6 @@ void CardinalitySearch(vec_ZZX& factors, ZZX& f,
                   i--;
                   continue;
                }
-               if (verbose) {
-                  cerr << "*";
-               }
                PrimitivePart(g, g);
                if (!divide(h, f, g)) {
                   i--;
@@ -1139,9 +1045,6 @@ void CardinalitySearch(vec_ZZX& factors, ZZX& f,
 
                // factor found!
                append(factors, h);
-               if (verbose) {
-                 cerr << "degree " << deg(h) << " factor found\n";
-               }
                f = g;
                mul(ct, ConstTerm(f), LeadCoeff(f));
                conv(lc, LeadCoeff(f));
@@ -1152,7 +1055,7 @@ void CardinalitySearch(vec_ZZX& factors, ZZX& f,
             cnt = 0;
 
             if (2*k > r) 
-               goto done;
+               return; //goto done;
             else 
                break;
          }
@@ -1176,16 +1079,8 @@ void CardinalitySearch(vec_ZZX& factors, ZZX& f,
       }
    }
 
+   //done: 
 
-   done: 
-
-
-   if (verbose) {
-      end_time = GetTime();
-      cerr << "\n************ ";
-      cerr << "end cardinality " << k << "\n";
-      cerr << "time: " << (end_time-start_time) << "\n";
-   }
 }
 
 
@@ -1452,26 +1347,6 @@ ZZ choose_fn(long r, long k)
 }
 
 static
-void PrintInfo(const char *s, const ZZ& a, const ZZ& b)
-{
-   cerr << s << a << " / " << b << " = ";
-   
-   double x = to_double(a)/to_double(b);
-
-   if (x == 0) 
-      cerr << "0"; 
-   else {
-      int n;
-      double f;
-
-      f = frexp(x, &n);
-      cerr << f << "*2^" << n;
-   }
-
-   cerr << "\n";
-}
-
-static
 void RemoveFactors1(vec_long& W, const vec_long& I, long r)
 {
    long k = I.length();
@@ -1676,12 +1551,6 @@ void CardinalitySearch1(vec_ZZX& factors, ZZX& f,
 {
    double start_time, end_time;
 
-   if (verbose) {
-      start_time = GetTime();
-      cerr << "\n************ ";
-      cerr << "start cardinality " << k << "\n";
-   }
-
    if (k <= 1) Error("internal error: call CardinalitySearch");
 
    // This test is needed to ensure correcntes of "n-2" test
@@ -1694,7 +1563,6 @@ void CardinalitySearch1(vec_ZZX& factors, ZZX& f,
 
    bit_and(pd, pdeg[0], LocalInfo.PossibleDegrees);
    if (pd == 0) {
-      if (verbose) cerr << "skipping\n";
       return;
    }
 
@@ -1772,10 +1640,6 @@ void CardinalitySearch1(vec_ZZX& factors, ZZX& f,
       }
    }
 
-   if (verbose) {
-      cerr << "pruning = " << pruning << "\n";
-   }
-
    vec_ZZ_p prod;
    prod.SetLength(k);
    long ProdLen;
@@ -1837,7 +1701,6 @@ void CardinalitySearch1(vec_ZZX& factors, ZZX& f,
       bit_and(pd, pdeg[I[0]], LocalInfo.PossibleDegrees);
 
       if (IsZero(pd)) {
-         if (verbose) cerr << "skipping\n";
          goto done;
       }
 
@@ -1871,7 +1734,6 @@ void CardinalitySearch1(vec_ZZX& factors, ZZX& f,
             UpdateLocalInfo(LocalInfo, pdeg, W, factors, f, k, verbose);
             bit_and(pd, pdeg[I[0]], LocalInfo.PossibleDegrees);
             if (IsZero(pd)) {
-               if (verbose) cerr << "skipping\n";
                goto done;
             }
             unpack(upd, pd, LocalInfo.n);
@@ -1938,10 +1800,6 @@ void CardinalitySearch1(vec_ZZX& factors, ZZX& f,
 
                   td_cnt++;
    
-                  if (verbose) {
-                     cerr << "+";
-                  }
-   
                   cnt += 1000;
    
                   if (2*D[k-1] <= deg(f)) {
@@ -1951,9 +1809,6 @@ void CardinalitySearch1(vec_ZZX& factors, ZZX& f,
                      if(MaxBits(g) > bnd) {
                         continue;
                      }
-                     if (verbose) {
-                        cerr << "*";
-                     }
                      PrimitivePart(g, g);
                      if (!divide(h, f, g)) {
                         continue;
@@ -1961,9 +1816,6 @@ void CardinalitySearch1(vec_ZZX& factors, ZZX& f,
                   
                      // factor found!
                      append(factors, g);
-                     if (verbose) {
-                       cerr << "degree " << deg(g) << " factor found\n";
-                     }
                      f = h;
                      mul(ct, ConstTerm(f), LeadCoeff(f));
                      conv(lc, LeadCoeff(f));
@@ -1975,9 +1827,6 @@ void CardinalitySearch1(vec_ZZX& factors, ZZX& f,
                      if(MaxBits(g) > bnd) {
                         continue;
                      }
-                     if (verbose) {
-                        cerr << "*";
-                     }
                      PrimitivePart(g, g);
                      if (!divide(h, f, g)) {
                         continue;
@@ -1985,9 +1834,6 @@ void CardinalitySearch1(vec_ZZX& factors, ZZX& f,
       
                      // factor found!
                      append(factors, h);
-                     if (verbose) {
-                       cerr << "degree " << deg(h) << " factor found\n";
-                     }
                      f = g;
                      mul(ct, ConstTerm(f), LeadCoeff(f));
                      conv(lc, LeadCoeff(f));
@@ -2126,57 +1972,6 @@ void CardinalitySearch1(vec_ZZX& factors, ZZX& f,
       delete [] shamt_tab;
    }
 
-   if (verbose) { 
-      end_time = GetTime();
-      cerr << "\n************ ";
-      cerr << "end cardinality " << k << "\n";
-      cerr << "time: " << (end_time-start_time) << "\n";
-      ZZ loops_max = choose_fn(initial_r+1, k);
-      ZZ tuples_max = choose_fn(initial_r, k);
-
-      loop_total += loop_cnt;
-      degree_total += degree_cnt;
-      n2_total += n2_cnt;
-      sl_total += sl_cnt;
-      ct_total += ct_cnt;
-      pl_total += pl_cnt;
-      c1_total += c1_cnt;
-      pl1_total += pl1_cnt;
-      td_total += td_cnt;
-
-      cerr << "\n";
-      PrintInfo("loops: ", loop_total, loops_max);
-      PrintInfo("degree tests: ", degree_total, tuples_max);
-
-      PrintInfo("n-2 tests: ", n2_total, tuples_max);
-
-      cerr << "ave sum len: ";
-      if (n2_total == 0) 
-         cerr << "--";
-      else
-         cerr << (to_double(sl_total)/to_double(n2_total));
-      cerr << "\n";
-
-      PrintInfo("f(1) tests: ", c1_total, tuples_max);
-
-      cerr << "ave prod len: ";
-      if (c1_total == 0) 
-         cerr << "--";
-      else
-         cerr << (to_double(pl1_total)/to_double(c1_total));
-      cerr << "\n";
-
-      PrintInfo("f(0) tests: ", ct_total, tuples_max);
-
-      cerr << "ave prod len: ";
-      if (ct_total == 0) 
-         cerr << "--";
-      else
-         cerr << (to_double(pl_total)/to_double(ct_total));
-      cerr << "\n";
-
-      PrintInfo("trial divs: ", td_total, tuples_max);
-   }
 }
 
 
@@ -2650,9 +2445,6 @@ void BuildReductionMatrix(mat_ZZ& M, long& C, long r, long d, const ZZ& pdelta,
    for (i = 1; i <= d; i++)
       M(i+s, i+r) = pdelta;
 
-   if (verbose) 
-      cerr << "ratio = " << double(maxbits)/double(NumBits(pdelta))
-           << "; ";
 }
 
 
@@ -2705,18 +2497,11 @@ long GotThem(vec_ZZX& factors,
    long s, r;
    long i, j, cnt;
 
-   if (verbose) {
-      cerr << "   checking A (s = " << B_L.NumRows() 
-           << "): gauss...";
-   }
-
    tt0 = GetTime();
 
    gauss(det, R, B_L);
 
    tt1 = GetTime();
-
-   if (verbose) cerr << (tt1-tt0) << "; ";
 
    // check if condition A holds
 
@@ -2728,21 +2513,14 @@ long GotThem(vec_ZZX& factors,
       for (i = 0; i < s; i++) {
          if (R[i][j] == 0) continue;
          if (R[i][j] != det) {
-            if (verbose) cerr << "failed.\n";
             return 0;
          }
          cnt++;
       }
 
       if (cnt != 1) {
-         if (verbose) cerr << "failed.\n";
          return 0;
       }
-   }
-
-   if (verbose) {
-      cerr << "passed.\n";
-      cerr << "   checking B...";
    }
 
    // extract relevant information from R
@@ -2772,12 +2550,8 @@ long GotThem(vec_ZZX& factors,
 
    for (i = 0; i < s; i++)
       if (I_vec[i].length() <= van_hoeij_card_thresh) {
-         if (verbose) cerr << "X\n";
          return 0;
       }
-
-   if (verbose) cerr << "1";
-
 
    // sort deg_vec, I_vec in order of increasing degree
 
@@ -2813,13 +2587,9 @@ long GotThem(vec_ZZX& factors,
          sub(t1, t1, ZZ_p::modulus());
 
       if (!divide(ct, t1)) {
-          if (verbose) cerr << "X\n";
           return 0;
       }
    }
-
-   if (verbose) cerr << "2";
-
 
    // multiply out polynomials and perform size tests
 
@@ -2833,15 +2603,11 @@ long GotThem(vec_ZZX& factors,
       mul(gg, gg, lc);
       BalCopy(g, gg);
       if (MaxBits(g) > bnd) {
-         if (verbose) cerr << "X\n";
          return 0;
       }
       PrimitivePart(g, g);
       append(fac, g);
    }
-
-   if (verbose) cerr << "3";
-
 
    // finally...trial division
 
@@ -2850,7 +2616,6 @@ long GotThem(vec_ZZX& factors,
 
    for (i = 0; i < s-1; i++) {
       if (!divide(h, f1, fac[i])) {
-         cerr << "X\n";
          return 0;
       }
 
@@ -2858,8 +2623,6 @@ long GotThem(vec_ZZX& factors,
    }
 
    // got them!
-
-   if (verbose) cerr << "$\n";
 
    append(factors, fac);
    append(factors, f1);
@@ -2883,10 +2646,6 @@ void AdditionalLifting(ZZ& P1,
       new_e1 = max(2*e1, new_bound); // at least double e1
    else
       new_e1 = new_bound;
-
-   if (verbose) {
-      cerr << ">>> additional hensel lifting to " << new_e1 << "...\n";
-   }
 
    ZZ new_P1;
 
@@ -2932,10 +2691,6 @@ void AdditionalLifting(ZZ& P1,
    MultiLift(w1, ww1, f1, new_e1, verbose);
 
    tt1 = GetTime();
-
-   if (verbose) {
-      cerr << "lifting time: " << (tt1-tt0) << "\n\n";
-   }
 
    P1 = new_P1;
    e1 = new_e1;
@@ -3059,10 +2814,6 @@ void FindTrueFactors_vH(vec_ZZX& factors, const ZZX& ff,
       time_start = GetTime();
       lll_time = 0;
    
-      if (verbose) {
-         cerr << "\n\n*** starting knapsack procedure\n";
-      }
-   
       ZZ P1 = P;
       long e1 = e;    // invariant: P1 = p^{e1}
    
@@ -3097,10 +2848,6 @@ void FindTrueFactors_vH(vec_ZZX& factors, const ZZX& ff,
    
       ZZ root_bound = RootBound(f);
    
-      if (verbose) {
-         cerr << "NumBits(root_bound) = " << NumBits(root_bound) << "\n";
-      }
-
       long dense = 0;
       long ran_bits = 32;
 
@@ -3119,7 +2866,6 @@ void FindTrueFactors_vH(vec_ZZX& factors, const ZZX& ff,
          if (ok_to_abandon && 
              ((d >= 2 && s > 128) || (d >= 3 && s > 32) || (d >= 4 && s > 8) ||
               d >= 5) ) {
-            if (verbose) cerr << "   abandoning\n";
             append(factors, f);
             break;
          }
@@ -3188,16 +2934,6 @@ void FindTrueFactors_vH(vec_ZZX& factors, const ZZX& ff,
             Compute_pb_eff(b_eff, pb_eff, p, d, root_bound, n, ran_bits); 
          }
 
-         if (verbose) {
-            cerr << "*** d = " << d 
-                 << "; s = " << s 
-                 << "; delta = " << delta 
-                 << "; b_eff = " << b_eff;
-
-            if (dense) cerr << "; dense [" << d1 << "]";
-            cerr << "\n";
-         }
-   
          if (b_eff + delta > e1) {
             long doubling;
 
@@ -3205,10 +2941,6 @@ void FindTrueFactors_vH(vec_ZZX& factors, const ZZX& ff,
 
             AdditionalLifting(P1, e1, w1, p, b_eff + delta, f, 
                               doubling, verbose);
-
-            if (verbose) {
-               cerr << ">>> recomputing traces...";
-            }
 
             tt0 = GetTime();
 
@@ -3224,10 +2956,7 @@ void FindTrueFactors_vH(vec_ZZX& factors, const ZZX& ff,
             }
 
             tt1 = GetTime();
-            if (verbose) cerr << (tt1-tt0) << "\n";
          }
-   
-         if (verbose) cerr << "   trace..."; 
    
          tt0 = GetTime();
 
@@ -3262,12 +2991,8 @@ void FindTrueFactors_vH(vec_ZZX& factors, const ZZX& ff,
    
          tt1 = GetTime();
    
-         if (verbose) cerr << (tt1-tt0) << "\n";
-   
          mat_ZZ M;
          long C;
-   
-         if (verbose) cerr << "   building matrix...";
    
          tt0 = GetTime();
    
@@ -3275,17 +3000,12 @@ void FindTrueFactors_vH(vec_ZZX& factors, const ZZX& ff,
    
          tt1 = GetTime();
    
-         if (verbose) cerr << (tt1-tt0) << "\n";
-
          if (SkipSparse) {   
             if (!dense) {
-               if (verbose) cerr << "skipping LLL\n";
                continue;
             }
          }
 
-         if (verbose) cerr << "   LLL...";
-   
          tt0 = GetTime();
    
          vec_ZZ D;
@@ -3295,23 +3015,17 @@ void FindTrueFactors_vH(vec_ZZX& factors, const ZZX& ff,
 
          lll_time += (tt1-tt0);
    
-         if (verbose) cerr << (tt1-tt0) << "\n";
-   
          if (rnk != s + d1) {
             Error("van Hoeij -- bad rank");
          }
    
          mat_ZZ B1;
    
-         if (verbose) cerr << "   CutAway...";
-   
          tt0 = GetTime();
    
          CutAway(B1, D, M, C, r, d1);
    
          tt1 = GetTime();
-   
-         if (verbose) cerr << (tt1-tt0) << "\n";
    
          if (B1.NumRows() >= s) continue;
          // no progress...try again
@@ -3326,7 +3040,6 @@ void FindTrueFactors_vH(vec_ZZX& factors, const ZZX& ff,
             Error("oops! s == 0 should not happen!");
    
          if (s == 1) {
-            if (verbose) cerr << "   irreducible!\n";
             append(factors, f);
             break;
          }
@@ -3339,11 +3052,6 @@ void FindTrueFactors_vH(vec_ZZX& factors, const ZZX& ff,
 
       time_stop = GetTime();
 
-      if (verbose) {
-         cerr << "*** knapsack finished: total time = " 
-              << (time_stop - time_start) << "; LLL time = "
-              << lll_time << "\n";
-      }
    }
 
    bak.restore();
@@ -3361,9 +3069,6 @@ void ll_SFFactor(vec_ZZX& factors, const ZZX& ff,
    if (deg(ff) <= 1) {
       factors.SetLength(1);
       factors[0] = ff;
-      if (verbose) {
-         cerr << "*** SFFactor, trivial case 1.\n";
-      }
       return;
    }
 
@@ -3418,15 +3123,7 @@ void ll_SFFactor(vec_ZZX& factors, const ZZX& ff,
          r++;
       }
 
-      if (verbose) {
-         cerr << "*** SFFactor: trivial case 2.\n";
-      }
-
       return;
-   }
-
-   if (verbose) {
-      cerr << "*** start SFFactor.\n";
    }
 
    // reverse f if this makes lead coefficient smaller
@@ -3445,11 +3142,6 @@ void ll_SFFactor(vec_ZZX& factors, const ZZX& ff,
 
    // obtain factorization modulo small primes
 
-   if (verbose) {
-      cerr << "factorization modulo small primes...\n";
-      t = GetTime();
-   }
-
    LocalInfoT LocalInfo;
 
    zz_pBak bak;
@@ -3462,11 +3154,6 @@ void ll_SFFactor(vec_ZZX& factors, const ZZX& ff,
       // f was found to be irreducible 
 
       bak.restore();
-
-      if (verbose) {
-         t = GetTime()-t;
-         cerr << "small prime time: " << t << ", irreducible.\n";
-      }
 
       if (rev)
          inplace_rev(f);
@@ -3490,12 +3177,6 @@ void ll_SFFactor(vec_ZZX& factors, const ZZX& ff,
       }
 
       return;
-   }
-
-   if (verbose) {
-      t = GetTime()-t;
-      cerr << "small prime time: ";
-      cerr << t << ", number of factors = " << spfactors->length() << "\n";
    }
 
    // prepare for Hensel lifting
@@ -3547,12 +3228,6 @@ void ll_SFFactor(vec_ZZX& factors, const ZZX& ff,
       e++;
    }
 
-   if (verbose) {
-      cerr << "lifting bound = " << lift_bnd << " bits.\n";
-      cerr << "Hensel lifting to exponent " << e << "...\n";
-      t = GetTime();
-   }
-
    // third, compute f1 so that it is monic and equal to f mod P
 
    ZZX f1;
@@ -3581,12 +3256,6 @@ void ll_SFFactor(vec_ZZX& factors, const ZZX& ff,
    MultiLift(w, *spfactors, f1, e, verbose);
 
 
-   if (verbose) {
-      t = GetTime()-t;
-      cerr << "\nlifting time: ";
-      cerr << t << "\n\n";
-   }
-
    // We're done with zz_p...restore
 
    delete spfactors;
@@ -3594,21 +3263,11 @@ void ll_SFFactor(vec_ZZX& factors, const ZZX& ff,
 
    // search for true factors
 
-   if (verbose) {
-      cerr << "searching for true factors...\n";
-      t = GetTime();
-   }
-
    if (ZZXFac_van_Hoeij && w.length() > van_hoeij_size_thresh)
       FindTrueFactors_vH(factors, f, w, P, p, e, 
                          LocalInfo, verbose, coeff_bnd);
    else
       FindTrueFactors(factors, f, w, P, LocalInfo, verbose, coeff_bnd);
-
-   if (verbose) {
-      t = GetTime()-t;
-      cerr << "factor search time " << t << "\n";
-   }
 
    long r = factors.length();
 
@@ -3634,12 +3293,6 @@ void ll_SFFactor(vec_ZZX& factors, const ZZX& ff,
 
    // that's it!!
 
-   if (verbose) {
-      cerr << "*** end SFFactor.  degree sequence:\n";
-      for (i = 0; i < r; i++)
-         cerr << deg(factors[i]) << " ";
-      cerr << "\n";
-   }
 }
 
 
@@ -3729,9 +3382,6 @@ void SFFactor(vec_ZZX& factors, const ZZX& ff,
    long m = DeflationFactor(ff);
 
    if (m == 1) {
-      if (verbose) {
-         cerr << "SFFactor -- no deflation\n";
-      }
 
       ok_to_abandon = 0;
       ll_SFFactor(factors, ff, verbose, bnd);
@@ -3742,10 +3392,6 @@ void SFFactor(vec_ZZX& factors, const ZZX& ff,
    vec_long v;
    MakeFacList(v, m);
    long l = v.length();
-
-   if (verbose) {
-      cerr << "SFFactor -- deflation: " << v << "\n";
-   }
 
    vec_ZZX res;
    res.SetLength(1);
@@ -3762,12 +3408,6 @@ void SFFactor(vec_ZZX& factors, const ZZX& ff,
       res1.SetLength(0);
       for (j = 0; j < res.length(); j++) {
          vec_ZZX res2;
-         double t;
-         if (verbose) {
-            cerr << "begin - step " << k << ", " << j << "; deg = " 
-                 << deg(res[j]) << "\n";
-            t = GetTime();
-         }
 
          if (k < 0)
             ok_to_abandon = 0;
@@ -3775,12 +3415,6 @@ void SFFactor(vec_ZZX& factors, const ZZX& ff,
             ok_to_abandon = 1;
 
          ll_SFFactor(res2, res[j], verbose, k < 0 ? bnd : 0);
-
-         if (verbose) {
-            t = GetTime()-t;
-            cerr << "end   - step " << k << ", " << j << "; time = "
-                 << t << "\n\n";
-         }
 
          append(res1, res2);
       }
@@ -3832,9 +3466,7 @@ void factor(ZZ& c,
 
    double t;
 
-   if (verbose) { cerr << "square-free decomposition..."; t = GetTime(); }
    SquareFreeDecomp(sfd, ff);
-   if (verbose) cerr << (GetTime()-t) << "\n";
 
    factors.SetLength(0);
 
@@ -3843,19 +3475,8 @@ void factor(ZZ& c,
    long i, j;
 
    for (i = 0; i < sfd.length(); i++) {
-      if (verbose) {
-         cerr << "factoring multiplicity " << sfd[i].b
-              << ", deg = " << deg(sfd[i].a) << "\n";
-         t = GetTime();
-      }
 
       SFFactor(x, sfd[i].a, verbose, bnd);
-
-      if (verbose) {
-         t = GetTime()-t;
-         cerr << "total time for multiplicity " 
-              << sfd[i].b << ": " << t << "\n";
-      }
 
       for (j = 0; j < x.length(); j++)
          append(factors, cons(x[j], sfd[i].b));

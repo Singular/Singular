@@ -1196,20 +1196,6 @@ void shift(long);
 };
 
 
-
-
-/**************************************************************
-
-                      Input/Output
-
-***************************************************************/
-
-NTL_SNS istream& operator>>(NTL_SNS istream& s, ZZ& x);  
-NTL_SNS ostream& operator<<(NTL_SNS ostream& s, const ZZ& a); 
-
-
-
-
 /****************************************************************
 
     Single-precision modular arithmetic

@@ -370,9 +370,7 @@ void RootEDF(vec_zz_pEX& factors, const zz_pEX& f, long verbose)
    vec_zz_pE roots;
    double t;
 
-   if (verbose) { cerr << "finding roots..."; t = GetTime(); }
    FindRoots(roots, f);
-   if (verbose) { cerr << (GetTime()-t) << "\n"; }
 
    long r = roots.length();
    factors.SetLength(r);
@@ -404,8 +402,6 @@ void RecEDF(vec_zz_pEX& factors, const zz_pEX& f, const zz_pEX& b, long d,
    vec_zz_pEX v;
    long i;
    zz_pEX bb;
-
-   if (verbose) cerr << "+";
 
    EDFSplit(v, f, b, d);
    for (i = 0; i < v.length(); i++) {
@@ -451,17 +447,10 @@ void EDF(vec_zz_pEX& factors, const zz_pEX& ff, const zz_pEX& bb,
    }
 
    
-   double t;
-   if (verbose) { 
-      cerr << "computing EDF(" << d << "," << r << ")..."; 
-      t = GetTime(); 
-   }
-
    factors.SetLength(0);
 
    RecEDF(factors, f, b, d, verbose);
 
-   if (verbose) cerr << (GetTime()-t) << "\n";
 }
 
 
@@ -493,17 +482,10 @@ void SFCanZass(vec_zz_pEX& factors, const zz_pEX& ff, long verbose)
 
    zz_pEX h;
 
-   if (verbose) { cerr << "computing X^p..."; t = GetTime(); }
    FrobeniusMap(h, F);
-   if (verbose) { cerr << (GetTime()-t) << "\n"; }
 
    vec_pair_zz_pEX_long u;
-   if (verbose) { cerr << "computing DDF..."; t = GetTime(); }
    NewDDF(u, f, h, verbose);
-   if (verbose) { 
-      t = GetTime()-t; 
-      cerr << "DDF time: " << t << "\n";
-   }
 
    zz_pEX hh;
    vec_zz_pEX v;
@@ -547,20 +529,13 @@ void CanZass(vec_pair_zz_pEX_long& factors, const zz_pEX& f, long verbose)
    vec_zz_pEX x;
 
    
-   if (verbose) { cerr << "square-free decomposition..."; t = GetTime(); }
    SquareFreeDecomp(sfd, f);
-   if (verbose) cerr << (GetTime()-t) << "\n";
 
    factors.SetLength(0);
 
    long i, j;
 
    for (i = 0; i < sfd.length(); i++) {
-      if (verbose) {
-         cerr << "factoring multiplicity " << sfd[i].b 
-              << ", deg = " << deg(sfd[i].a) << "\n";
-      }
-
       SFCanZass(x, sfd[i].a, verbose);
 
       for (j = 0; j < x.length(); j++)
@@ -1072,9 +1047,6 @@ double zz_pEXFileThresh = 256;
 static vec_zz_pEX BabyStepFile;
 static vec_zz_pEX GiantStepFile;
 
-static long use_files;
-
-
 static
 double CalcTableSize(long n, long k)
 {
@@ -1095,9 +1067,6 @@ void GenerateBabySteps(zz_pEX& h1, const zz_pEX& f, const zz_pEX& h, long k,
                        long verbose)
 
 {
-   double t;
-
-   if (verbose) { cerr << "generating baby steps..."; t = GetTime(); }
 
    zz_pEXModulus F;
    build(F, f);
@@ -1120,27 +1089,14 @@ void GenerateBabySteps(zz_pEX& h1, const zz_pEX& f, const zz_pEX& h, long k,
 
    long i;
 
-   if (!use_files) {
       BabyStepFile.kill();
       BabyStepFile.SetLength(k-1);
-   }
 
    for (i = 1; i <= k-1; i++) {
-      if (use_files) {
-         ofstream s;
-         OpenWrite(s, FileName(zz_pEX_stem, "baby", i));
-         s << h1 << "\n";
-         s.close();
-      }
-      else
          BabyStepFile(i) = h1;
 
       CompMod(h1, h1, H, F);
-      if (verbose) cerr << "+";
    }
-
-   if (verbose)
-      cerr << (GetTime()-t) << "\n";
 
 }
 
@@ -1148,10 +1104,6 @@ void GenerateBabySteps(zz_pEX& h1, const zz_pEX& f, const zz_pEX& h, long k,
 static
 void GenerateGiantSteps(const zz_pEX& f, const zz_pEX& h, long l, long verbose)
 {
-
-   double t;
-
-   if (verbose) { cerr << "generating giant steps..."; t = GetTime(); }
 
    zz_pEXModulus F;
    build(F, f);
@@ -1175,55 +1127,24 @@ void GenerateGiantSteps(const zz_pEX& f, const zz_pEX& h, long l, long verbose)
 
    long i;
 
-   if (!use_files) {
       GiantStepFile.kill();
       GiantStepFile.SetLength(l);
-   }
 
    for (i = 1; i <= l-1; i++) {
-      if (use_files) {
-         ofstream s;
-         OpenWrite(s, FileName(zz_pEX_stem, "giant", i));
-         s << h1 << "\n";
-         s.close();
-      }
-      else
         GiantStepFile(i) = h1;
 
       CompMod(h1, h1, H, F);
-      if (verbose) cerr << "+";
    }
 
-   if (use_files) {
-      ofstream s;
-      OpenWrite(s, FileName(zz_pEX_stem, "giant", i));
-      s << h1 << "\n";
-      s.close();
-   }
-   else
       GiantStepFile(i) = h1;
-
-   if (verbose)
-      cerr << (GetTime()-t) << "\n";
 
 }
 
 static
 void FileCleanup(long k, long l)
 {
-   if (use_files) {
-      long i;
-   
-      for (i = 1; i <= k-1; i++)
-         remove(FileName(zz_pEX_stem, "baby", i));
-   
-      for (i = 1; i <= l; i++)
-         remove(FileName(zz_pEX_stem, "giant", i));
-   }
-   else {
       BabyStepFile.kill();
       GiantStepFile.kill();
-   }
 }
 
 
@@ -1237,9 +1158,6 @@ void NewAddFactor(vec_pair_zz_pEX_long& u, const zz_pEX& g, long m, long verbose
    u[len].a = g;
    u[len].b = m;
 
-   if (verbose) {
-      cerr << "split " << m << " " << deg(g) << "\n";
-   }
 }
 
    
@@ -1295,15 +1213,6 @@ void NewProcessTable(vec_pair_zz_pEX_long& u, zz_pEX& f, const zz_pEXModulus& F,
 static
 void FetchGiantStep(zz_pEX& g, long gs, const zz_pEXModulus& F)
 {
-   if (use_files) {
-      ifstream s;
-   
-      OpenRead(s, FileName(zz_pEX_stem, "giant", gs));
-   
-      s >> g;
-      s.close();
-   }
-   else
       g = GiantStepFile(gs);
 
 
@@ -1320,13 +1229,6 @@ void FetchBabySteps(vec_zz_pEX& v, long k)
 
    long i;
    for (i = 1; i <= k-1; i++) {
-      if (use_files) {
-         ifstream s;
-         OpenRead(s, FileName(zz_pEX_stem, "baby", i));
-         s >> v[i];
-         s.close();
-      }
-      else
          v[i] = BabyStepFile(i);
    }
 }
@@ -1338,13 +1240,6 @@ void GiantRefine(vec_pair_zz_pEX_long& u, const zz_pEX& ff, long k, long l,
                  long verbose)
 
 {
-   double t;
-
-   if (verbose) {
-      cerr << "giant refine...";
-      t = GetTime();
-   }
-
    u.SetLength(0);
 
    vec_zz_pEX BabyStep;
@@ -1386,11 +1281,8 @@ void GiantRefine(vec_pair_zz_pEX_long& u, const zz_pEX& ff, long k, long l,
          MulMod(buf[size-1], buf[size-1], h, F);
       }
 
-      if (verbose && bs == 0) cerr << "+";
-
       if (size == zz_pEX_GCDTableSize && bs == 0) {
          NewProcessTable(u, f, F, buf, size, first_gs, k, verbose);
-         if (verbose) cerr << "*";
          size = 0;
       }
 
@@ -1407,16 +1299,11 @@ void GiantRefine(vec_pair_zz_pEX_long& u, const zz_pEX& ff, long k, long l,
 
    if (size > 0) {
       NewProcessTable(u, f, F, buf, size, first_gs, k, verbose);
-      if (verbose) cerr << "*";
    }
 
    if (deg(f) > 0) 
       NewAddFactor(u, f, 0, verbose);
 
-   if (verbose) {
-      t = GetTime()-t;
-      cerr << "giant refine time: " << t << "\n";
-   }
 }
 
 
@@ -1481,13 +1368,6 @@ void BabyRefine(vec_pair_zz_pEX_long& factors, const vec_pair_zz_pEX_long& u,
                 long k, long l, long verbose)
 
 {
-   double t;
-
-   if (verbose) {
-      cerr << "baby refine...";
-      t = GetTime();
-   }
-
    factors.SetLength(0);
 
    vec_zz_pEX BabyStep;
@@ -1506,10 +1386,6 @@ void BabyRefine(vec_pair_zz_pEX_long& factors, const vec_pair_zz_pEX_long& u,
       }
    }
 
-   if (verbose) {
-      t = GetTime()-t;
-      cerr << "baby refine time: " << t << "\n";
-   }
 }
 
       
@@ -1545,11 +1421,6 @@ void NewDDF(vec_pair_zz_pEX_long& factors,
    long l = (B+k-1)/k;
 
    zz_pEX h1;
-
-   if (CalcTableSize(deg(f), k + l - 1) > zz_pEXFileThresh)
-      use_files = 1;
-   else
-      use_files = 0;
 
    GenerateBabySteps(h1, f, h, k, verbose);
 

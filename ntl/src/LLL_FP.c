@@ -430,13 +430,6 @@ static double LastTime = 0;
 
 static void LLLStatus(long max_k, double t, long m, const mat_ZZ& B)
 {
-   cerr << "---- LLL_FP status ----\n";
-   cerr << "elapsed time: ";
-   PrintTime(cerr, t-StartTime);
-   cerr << ", stage: " << max_k;
-   cerr << ", rank: " << m;
-   cerr << ", swaps: " << NumSwaps << "\n";
-
    ZZ t1;
    long i;
    double prodlen = 0;
@@ -445,25 +438,6 @@ static void LLLStatus(long max_k, double t, long m, const mat_ZZ& B)
       InnerProduct(t1, B(i), B(i));
       if (!IsZero(t1))
          prodlen += log(t1);
-   }
-
-   cerr << "log of prod of lengths: " << prodlen/(2.0*log(2.0)) << "\n";
-
-   if (LLLDumpFile) {
-      cerr << "dumping to " << LLLDumpFile << "...";
-
-      ofstream f;
-      OpenWrite(f, LLLDumpFile);
-      
-      f << "[";
-      for (i = 1; i <= m; i++) {
-         f << B(i) << "\n";
-      }
-      f << "]\n";
-
-      f.close();
-
-      cerr << "\n";
    }
 
    LastTime = t;
@@ -488,25 +462,10 @@ static void inc_red_fudge()
    log_red--;
 
    
-   cerr << "LLL_FP: warning--relaxing reduction (" << log_red << ")\n";
-
    if (log_red < 4)
       Error("LLL_FP: too much loss of precision...stop!");
 }
 
-
-#if 0
-
-static void print_mus(double **mu, long k)
-{
-   long i;
-
-   for (i = k-1; i >= 1; i--)
-      cerr << mu[k][i] << " ";
-   cerr << "\n";
-}
-
-#endif
 
 void ComputeGS(const mat_ZZ& B, mat_RR& B1, 
                mat_RR& mu, vec_RR& b,
@@ -523,7 +482,6 @@ static void RR_GS(mat_ZZ& B, double **B1, double **mu,
 {
    double tt;
 
-   cerr << "LLL_FP: RR refresh " << rr_st << "..." << k << "...";
    tt = GetTime();
 
    if (rr_st > k) Error("LLL_FP: can not continue!!!");
@@ -592,7 +550,6 @@ static void RR_GS(mat_ZZ& B, double **B1, double **mu,
 
    tt = GetTime()-tt;
    RR_GS_time += tt;
-   cerr << tt << " (" << RR_GS_time << ")\n";
 }
 
 void ComputeGS(const mat_ZZ& B, mat_RR& mu, vec_RR& c)
@@ -752,7 +709,6 @@ long ll_LLL_FP(mat_ZZ& B, mat_ZZ* U, double delta, long deep,
       st[k] = k;
 
       if (swap_cnt > 200000) {
-         cerr << "LLL_FP: swap loop?\n";
          RR_GS(B, B1, mu, b, c, buf, prec,
                rr_st, k, m_orig, rr_B1, rr_mu, rr_b, rr_c);
          if (rr_st < st[k+1]) st[k+1] = rr_st;
@@ -786,7 +742,7 @@ long ll_LLL_FP(mat_ZZ& B, mat_ZZ* U, double delta, long deep,
                sz = new_sz;
             }
             else {
-               cerr << "LLL_FP: warning--infinite loop?\n";
+               //cerr << "LLL_FP: warning--infinite loop?\n";
             }
          }
 
@@ -1200,19 +1156,6 @@ void BKZStatus(double tt, double enum_time, unsigned long NumIterations,
                unsigned long NumNoOps, long m, 
                const mat_ZZ& B)
 {
-   cerr << "---- BKZ_FP status ----\n";
-   cerr << "elapsed time: ";
-   PrintTime(cerr, tt-StartTime);
-   cerr << ", enum time: ";
-   PrintTime(cerr, enum_time);
-   cerr << ", iter: " << NumIterations << "\n";
-   cerr << "triv: " << NumTrivial;
-   cerr << ", nontriv: " << NumNonTrivial;
-   cerr << ", no ops: " << NumNoOps;
-   cerr << ", rank: " << m;
-   cerr << ", swaps: " << NumSwaps << "\n";
-
-
 
    ZZ t1;
    long i;
@@ -1222,26 +1165,6 @@ void BKZStatus(double tt, double enum_time, unsigned long NumIterations,
       InnerProduct(t1, B(i), B(i));
       if (!IsZero(t1))
          prodlen += log(t1);
-   }
-
-   cerr << "log of prod of lengths: " << prodlen/(2.0*log(2.0)) << "\n";
-
-
-   if (LLLDumpFile) {
-      cerr << "dumping to " << LLLDumpFile << "...";
-
-      ofstream f;
-      OpenWrite(f, LLLDumpFile);
-      
-      f << "[";
-      for (i = 1; i <= m; i++) {
-         f << B(i) << "\n";
-      }
-      f << "]\n";
-
-      f.close();
-
-      cerr << "\n";
    }
 
    LastTime = tt;

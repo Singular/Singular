@@ -10,7 +10,6 @@
 
 #include <cstdlib>
 #include <cmath>
-#include <iostream>
 
 #else
 
@@ -18,7 +17,6 @@
 
 #include <stdlib.h>
 #include <math.h>
-#include <iostream.h>
 
 #endif
 
@@ -242,7 +240,6 @@ inline double to_double(float a) { return double(a); }
 inline double to_double(double a) { return a; }
 
 
-long SkipWhiteSpace(NTL_SNS istream& s);
 long IsWhiteSpace(long c);
 
 long CharToIntVal(long c);
@@ -260,7 +257,6 @@ inline void ForceToMem(double *p) { _ntl_ForceToMem(p); }
 
 
 
-void PrintTime(NTL_SNS ostream& s, double t);
 
 NTL_CLOSE_NNS
 

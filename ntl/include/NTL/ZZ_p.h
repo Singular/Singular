@@ -419,14 +419,6 @@ inline ZZ_p random_ZZ_p()
    { ZZ_p x; random(x); NTL_OPT_RETURN(ZZ_p, x); }
 
 
-// ****** input/output
-
-inline NTL_SNS ostream& operator<<(NTL_SNS ostream& s, const ZZ_p& a)
-   { return s << a._ZZ_p__rep; }
-   
-NTL_SNS istream& operator>>(NTL_SNS istream& s, ZZ_p& x);
-
-
 inline ZZ_p& ZZ_p::operator=(long a) { conv(*this, a); return *this; }
 
 NTL_CLOSE_NNS

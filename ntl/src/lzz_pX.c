@@ -29,19 +29,6 @@ const zz_pX& zz_pX::zero()
 
 
 
-istream& operator>>(istream& s, zz_pX& x)
-{
-   s >> x.rep;
-   x.normalize();
-   return s;
-}
-
-ostream& operator<<(ostream& s, const zz_pX& a)
-{
-   return s << a.rep;
-}
-
-
 void zz_pX::normalize()
 {
    long n;

@@ -12,8 +12,6 @@ static void ExactDiv(ZZ& qq, const ZZ& a, const ZZ& b)
 
    DivRem(q, r, a, b);
    if (!IsZero(r)) {
-      cerr << "a = " << a << "\n";
-      cerr << "b = " << b << "\n";
       Error("ExactDiv: nonzero remainder");
    }
    qq = q;
@@ -235,7 +233,6 @@ long swap(long k, mat_ZZ& B, vec_long& P, vec_ZZ& D,
 
 
    if (P(k) != 0) {
-      if (verbose) cerr << "swap case 1: " << k << "\n";
 
       swap(B(k-1), B(k));
       if (U) swap((*U)(k-1), (*U)(k));
@@ -259,7 +256,6 @@ long swap(long k, mat_ZZ& B, vec_long& P, vec_ZZ& D,
       return 0;
    }
    else if (!IsZero(lam(k)(P(k-1)))) {
-      if (verbose) cerr << "swap case 2: " << k << "\n";
       XGCD(e, x, y, lam(k)(P(k-1)), D[P(k-1)]);
 
       ExactDiv(t1, lam(k)(P(k-1)), e);
@@ -293,7 +289,6 @@ long swap(long k, mat_ZZ& B, vec_long& P, vec_ZZ& D,
       return 1;
    }
    else {
-      if (verbose) cerr << "swap case 3: " << k << "\n";
 
       swap(B(k-1), B(k));
       if (U) swap((*U)(k-1), (*U)(k));

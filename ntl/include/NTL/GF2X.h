@@ -100,13 +100,6 @@ inline long operator!=(GF2 a, const GF2X& b) { return !(a == b); }
 inline long operator!=(long a, const GF2X& b) { return !(a == b); }
 
 
-NTL_SNS istream & operator>>(NTL_SNS istream& s, GF2X& a);
-
-NTL_SNS ostream& operator<<(NTL_SNS ostream& s, const GF2X& a);
-
-
-
-
 void random(GF2X& x, long n);
 inline GF2X random_GF2X(long n)
    { GF2X x; random(x, n); NTL_OPT_RETURN(GF2X, x); }
@@ -243,8 +236,6 @@ inline GF2X power(const GF2X& a, long e)
 
 
 NTL_vector_decl(GF2X,vec_GF2X)
-
-NTL_io_vector_decl(GF2X,vec_GF2X)
 
 NTL_eq_vector_decl(GF2X,vec_GF2X)
 
