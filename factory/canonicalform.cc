@@ -1,8 +1,13 @@
 // emacs editmode for this file is -*- C++ -*-
-// $Id: canonicalform.cc,v 1.1 1996-06-13 07:15:50 stobbe Exp $
+// $Id: canonicalform.cc,v 1.2 1996-07-02 11:18:32 stobbe Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.1  1996/06/13 07:15:50  stobbe
+"CanonicalForm::deriv(x): bug fix, result is now swapped back if x is not
+                         the main variable of *this
+"
+
 Revision 1.0  1996/05/17 10:59:42  stobbe
 Initial revision
 
@@ -1122,6 +1127,15 @@ initCanonicalForm( void )
 #if defined USE_MEMUTIL && ! defined USE_OLD_MEMMAN
 	(void)mmInit();
 #endif
+
+	Off( SW_RATIONAL );
+	Off( SW_QUOTIENT );
+	Off( SW_SYMMETRIC_FF );
+	Off( SW_BERLEKAMP );
+	Off( SW_FAC_USE_BIG_PRIMES );
+	Off( SW_FAC_QUADRATICLIFT );
+	Off( SW_USE_EZGCD );
+
 	(void)initializeCharacteristic();
 	(void)initializeGMP();
 	initPT();
