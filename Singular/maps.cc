@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Id: maps.cc,v 1.3 1997-03-24 14:25:18 Singular Exp $";
+static char rcsid[] = "$Id: maps.cc,v 1.4 1997-03-25 15:40:19 Singular Exp $";
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */
@@ -267,8 +267,8 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id)
   return temp1;
 }
 
-void maFindPerm(char **preim_names, int preim_n, char **preim_par,
-                char **names, int n, char **par, int nop,
+void maFindPerm(char **preim_names, int preim_n, char **preim_par, int preim_p,
+                char **names,       int n,       char **par,       int nop,
                 int * perm, int *par_perm)
 {
   int i,j;
@@ -302,7 +302,7 @@ void maFindPerm(char **preim_names, int preim_n, char **preim_par,
   }
   if (par_perm!=NULL)
   {
-    for (i=0; preim_par[i]!=NULL; i++)
+    for (i=0; i<preim_p; i++)
     {
       for(j=0; j<n; j++)
       {
@@ -342,7 +342,7 @@ poly maIMap(ring r, poly p)
   nSetMap(r->ch,r->parameter,r->P,r->minpoly);
   int *perm=(int *)Alloc0((r->N+1)*sizeof(int));
   //int *par_perm=(int *)Alloc0(rPar(r)*sizeof(int));
-  maFindPerm(r->names,r->N, r->parameter,
+  maFindPerm(r->names,r->N, r->parameter, r->P,
              currRing->names,currRing->N,currRing->parameter, currRing->P,
              perm,NULL/*par_perm*/);
   poly res=pPermPoly(p,perm,r->N/*,par_perm,rPar(r)*/);

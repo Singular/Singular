@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Id: iparith.cc,v 1.6 1997-03-24 14:24:51 Singular Exp $";
+static char rcsid[] = "$Id: iparith.cc,v 1.7 1997-03-25 15:40:18 Singular Exp $";
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
 */
@@ -1397,7 +1397,7 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
       perm=(int *)Alloc0((r->N+1)*sizeof(int));
       if (par_perm_size!=0)
         par_perm=(int *)Alloc0(par_perm_size*sizeof(int));
-      maFindPerm(r->names,       r->N,       r->parameter,
+      maFindPerm(r->names,       r->N,       r->parameter,        r->P,
                  currRing->names,currRing->N,currRing->parameter, currRing->P,
                  perm,par_perm);
     }
