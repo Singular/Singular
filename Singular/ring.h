@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.56 2000-11-16 16:49:20 Singular Exp $ */
+/* $Id: ring.h,v 1.57 2000-11-23 14:06:50 Singular Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -19,6 +19,7 @@ void   rChangeCurrRing(ring r, BOOLEAN complete = TRUE);
 void   rSetHdl(idhdl h, BOOLEAN complete = TRUE);
 ring   rInit(sleftv* pn, sleftv* rv, sleftv* ord);
 idhdl  rDefault(char *s);
+ring   rDefault(int ch, int N, char **n);
 int    rIsRingVar(char *n);
 void   rWrite(ring r);
 void   rKill(idhdl h);
