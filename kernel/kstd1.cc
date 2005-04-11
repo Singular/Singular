@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.5 2005-02-17 09:42:19 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.6 2005-04-11 15:59:01 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1792,7 +1792,7 @@ ideal kMin_std(ideal F, ideal Q, tHomog h,intvec ** w, ideal &M, intvec *hilb,
   if ((delete_w)&&(temp_w!=NULL)) delete temp_w;
   if ((IDELEMS(r)==1) && (r->m[0]!=NULL) && pIsConstant(r->m[0]) && (strat->ak==0))
   {
-    ideal M=idInit(1,F->rank);
+    M=idInit(1,F->rank);
     M->m[0]=pOne();
     //if (strat->ak!=0) { pSetComp(M->m[0],strat->ak); pSetmComp(M->m[0]); }
     if (strat->M!=NULL) idDelete(&strat->M);
