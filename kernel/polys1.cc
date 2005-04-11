@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.11 2005-03-17 14:36:30 Singular Exp $ */
+/* $Id: polys1.cc,v 1.12 2005-04-11 15:59:28 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -97,8 +97,6 @@ static number* pnBin(int exp)
   i = exp - 1;
   for (e=2; e<h; e++)
   {
-//    if(!nIsZero(bin[e-1]))
-//    {
       x = nInit(i);
       i--;
       y = nMult(x,bin[e-1]);
@@ -107,11 +105,6 @@ static number* pnBin(int exp)
       bin[e] = nIntDiv(y,x);
       nDelete(&x);
       nDelete(&y);
-//    }
-//    else
-//    {
-//      bin[e] = nInit(binom(exp,e));
-//    }
   }
   return bin;
 }
