@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: variable.cc,v 1.4 1997-06-19 12:21:52 schmidt Exp $ */
+/* $Id: variable.cc,v 1.5 2005-04-13 15:01:53 Singular Exp $ */
 
 #include <config.h>
 
@@ -244,4 +244,21 @@ char getDefaultVarName()
 char getDefaultExtName()
 {
     return default_name_ext;
+}
+
+int ExtensionLevel()
+{
+  if( var_names_ext == 0)
+    return 0;
+  return strlen( var_names_ext )-1;
+}
+
+void Reduce( bool on)
+{
+  int i;
+  for (i=ExtensionLevel(); i>0;i--)
+  {
+    Variable l(-i);
+    setReduce(l,on);
+  }
 }

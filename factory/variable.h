@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: variable.h,v 1.3 1997-06-19 12:21:49 schmidt Exp $ */
+/* $Id: variable.h,v 1.4 2005-04-13 15:01:53 Singular Exp $ */
 
 #ifndef INCL_VARIABLE_H
 #define INCL_VARIABLE_H
@@ -64,6 +64,7 @@ public:
 #ifndef NOSTREAMIO
     friend ostream & operator << ( ostream & os, const Variable & v );
 #endif /* NOSTREAMIO */
+    friend void swap_levels();
     friend Variable rootOf( const CanonicalForm &, char name = '@' );
 };
 
@@ -74,6 +75,8 @@ CanonicalForm getMipo( const Variable & alpha, const Variable & x );
 
 char getDefaultVarName();
 char getDefaultExtName();
+
+int ExtensionLevel();
 
 /*ENDPUBLIC*/
 
