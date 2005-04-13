@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.343 2005-04-01 15:16:09 Singular Exp $ */
+/* $Id: iparith.cc,v 1.344 2005-04-13 16:43:12 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2344,12 +2344,14 @@ static BOOLEAN jjSIMPL_ID(leftv res, leftv u, leftv v)
   return FALSE;
 }
 #ifdef HAVE_FACTORY
+extern int singclap_factorize_retry;
 static BOOLEAN jjSQR_FREE_DEC(leftv res, leftv u,leftv dummy)
 {
   intvec *v=NULL;
   int sw=(int)dummy->Data();
   int fac_sw=sw;
   if ((sw<0)||(sw>2)) fac_sw=1;
+  singclap_factorize_retry=0;
   ideal f=singclap_factorize((poly)(u->Data()), &v, fac_sw);
   if (f==NULL)
     return TRUE;
@@ -3091,6 +3093,7 @@ static BOOLEAN jjFACSTD(leftv res, leftv v)
 static BOOLEAN jjFAC_P(leftv res, leftv u)
 {
   intvec *v=NULL;
+  singclap_factorize_retry=0;
   ideal f=singclap_factorize((poly)(u->Data()), &v, 0);
   if (f==NULL) return TRUE;
   ivTest(v);
