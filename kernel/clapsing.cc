@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.5 2005-03-30 13:17:08 Singular Exp $
+// $Id: clapsing.cc,v 1.6 2005-04-13 16:38:10 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -662,6 +662,9 @@ static int primepower(int c)
   return p;
 }
 
+int singclap_factorize_retry;
+extern int si_factor_reminder;
+
 ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
 {
   // with_exps: 3,1 return only true factors, no exponents
@@ -737,7 +740,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
   #endif
   CFFList L;
   number N=NULL;
-  number NN=NULL;
+  CanonicalForm T_F(0);
   number old_lead_coeff=nCopy(pGetCoeff(f));
 
   if (rField_is_Q() || rField_is_Zp())
@@ -747,20 +750,11 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
     {
       //if (f!=NULL) // already tested at start of routine
       {
-        number n0=nCopy(pGetCoeff(f));
-        if (with_exps==0)
-          N=nCopy(n0);
-        pCleardenom(f);
-        NN=nDiv(n0,pGetCoeff(f));
-        nDelete(&n0);
-        if (with_exps==0)
-        {
-          nDelete(&N);
-          N=nCopy(NN);
-        }
+        pCleardenom_n(f,N);
       }
     }
     CanonicalForm F( convSingPClapP( f ) );
+    T_F=F;
     if (nGetChar()==0) /* Q */
     {
       L = factorize( F );
@@ -780,6 +774,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
     int c=rChar(currRing);
     setCharacteristic( c, primepower(c) );
     CanonicalForm F( convSingGFClapGF( f ) );
+    T_F=F;
     if (F.isUnivariate())
     {
       L = factorize( F );
@@ -795,11 +790,13 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
   {
     if (rField_is_Q_a()) setCharacteristic( 0 );
     else                 setCharacteristic( -nGetChar() );
+    pCleardenom_n(f,N);
     if (currRing->minpoly!=NULL)
     {
       CanonicalForm mipo=convSingTrClapP(((lnumber)currRing->minpoly)->z);
       Variable a=rootOf(mipo);
       CanonicalForm F( convSingAPClapAP( f,a ) );
+      T_F=F;
       L.insert(F);
       if (rField_is_Zp_a() && F.isUnivariate())
       {
@@ -808,6 +805,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
       else
       {
         CanonicalForm G( convSingTrPClapP( f ) );
+        T_F=G;
 #ifdef HAVE_LIBFAC_P
         if (rField_is_Q_a())
         {
@@ -834,6 +832,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
     else
     {
       CanonicalForm F( convSingTrPClapP( f ) );
+      T_F=F;
       if (rField_is_Q_a())
       {
         L = factorize( F );
@@ -860,6 +859,87 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
     // convert into ideal
     int n = L.length();
     CFFListIterator J=L;
+    CanonicalForm T=1;
+    for ( ; J.hasItem(); J++ )
+    {
+      int T_e = J.getItem().exp();
+      while(T_e>0)  { T *= J.getItem().factor(); T_e--; }
+    }
+    T_F-=T;
+    if (!T_F.isZero())
+    {
+      poly T_F_conv=pOne();
+      J=L;
+      for ( ; J.hasItem(); J++ )
+      {
+        poly p;
+        int T_e = J.getItem().exp();
+        if (rField_is_Zp() || rField_is_Q())           /* Q, Fp */
+          p=( convClapPSingP( J.getItem().factor() ));
+        else if (rField_is_Extension())     /* Q(a), Fp(a) */
+        {
+          if (currRing->minpoly==NULL)
+            p=( convClapPSingTrP( J.getItem().factor() ));
+          else
+            p=( convClapAPSingAP( J.getItem().factor() ));
+        }
+        while(T_e>0)  { T_F_conv=pMult(T_F_conv,pCopy(p)); T_e--; }
+        pDelete(&p);
+      }
+      number n_T=pGetCoeff(T_F_conv);
+      number n_f=pGetCoeff(f);
+      poly n_f_m=pMult_nn(pCopy(f),n_T);
+      T_F_conv=pMult_nn(T_F_conv,n_f);
+      T_F_conv=pSub(T_F_conv,n_f_m);
+      if ((T_F_conv!=NULL) && (singclap_factorize_retry<1))
+      {
+        singclap_factorize_retry++;
+        if( si_factor_reminder) Print("problem with factorize, retrying\n");
+      #ifdef FEHLER_FACTORIZE
+        Print("Problem....:");pWrite(f);
+        J=L;
+        for ( ; J.hasItem(); J++ )
+        {
+          if (rField_is_Zp() || rField_is_Q())           /* Q, Fp */
+            pWrite0( convClapPSingP( J.getItem().factor() ));
+          else if (rField_is_Extension())     /* Q(a), Fp(a) */
+          {
+            if (currRing->minpoly==NULL)
+              pWrite0( convClapPSingTrP( J.getItem().factor() ));
+            else
+              pWrite0( convClapAPSingAP( J.getItem().factor() ));
+          }
+          Print(" exp: %d\n", J.getItem().exp());
+        }
+        Print("mult:");
+        if (rField_is_Zp() || rField_is_Q())           /* Q, Fp */
+          pWrite( convClapPSingP( T ));
+        else if (rField_is_Extension())     /* Q(a), Fp(a) */
+        {
+          if (currRing->minpoly==NULL)
+            pWrite( convClapPSingTrP( T ));
+          else
+            pWrite( convClapAPSingAP( T ));
+        }
+        Print("diff: sing:"); pWrite(T_F_conv);
+        Print("diff: factory:");
+        if (rField_is_Zp() || rField_is_Q())           /* Q, Fp */
+          pWrite( convClapPSingP( T_F ));
+        else if (rField_is_Extension())     /* Q(a), Fp(a) */
+        {
+          if (currRing->minpoly==NULL)
+            pWrite( convClapPSingTrP( T_F ));
+          else
+            pWrite( convClapAPSingAP( T_F ));
+        }
+      #endif
+        ideal T_i=singclap_factorize ( f, v , with_exps);
+        if (N!=NULL) nDelete(&N);
+        pDelete(&T_F_conv);
+        return T_i;
+      }
+    }
+    J=L;
     int j=0;
     if (with_exps!=1)
     {
@@ -891,8 +971,6 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
     if (N!=NULL)
     {
       pMult_nn(res->m[0],N);
-      nDelete(&N);
-      N=NULL;
     }
     // delete constants
     if (res!=NULL)
@@ -967,13 +1045,11 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
 notImpl:
   if (res==NULL)
     WerrorS( feNotImplemented );
-  if (NN!=NULL)
-  {
-    pMult_nn(f,NN);
-    nDelete(&NN);
-  }
   if (N!=NULL)
   {
+    number NN=nInvers(N);
+    pMult_nn(f,NN);
+    nDelete(&NN);
     nDelete(&N);
   }
   //PrintS("......S\n");

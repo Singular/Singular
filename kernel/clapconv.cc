@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapconv.cc,v 1.3 2005-03-30 13:17:07 Singular Exp $
+// $Id: clapconv.cc,v 1.4 2005-04-13 16:38:09 Singular Exp $
 /*
 * ABSTRACT: convert data between Singular and factory
 */
@@ -610,6 +610,14 @@ napoly convClapASingA ( const CanonicalForm & f )
     {
       napSetExp(t,1,i.exp());
       a=napAdd(a,t);
+    }
+  }
+  if (a!=NULL)
+  {
+    if (naMinimalPoly!=NULL)
+    {
+      if (napGetExp(a,1) >= napGetExp(naMinimalPoly,1))
+        a = napRemainder( a, naMinimalPoly);
     }
   }
   return a;
