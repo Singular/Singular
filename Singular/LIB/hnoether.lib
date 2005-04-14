@@ -1,36 +1,37 @@
-version="$Id: hnoether.lib,v 1.43 2005-01-13 09:42:03 Singular Exp $";
+version="$Id: hnoether.lib,v 1.44 2005-04-14 15:39:20 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  hnoether.lib   Hamburger-Noether (Puiseux) Development
-AUTHOR:   Martin Lamm,   lamm@mathematik.uni-kl.de
+AUTHORS:   Martin Lamm,      lamm@mathematik.uni-kl.de
+           Christoph Lossen, lossen@mathematik.uni-kl.de
 
 OVERVIEW:
- A library for computing the Hamburger-Noether, resp. Puiseux, development
- of a plane curve singularity following [Campillo, A.: Algebroid curves
- in positive characteristic, Springer LNM 813 (1980)]. @*
+ A library for computing the Hamburger-Noether expansion (analogue of 
+ Puiseux expansion over fields of arbitrary characteristic) of a reduced 
+ plane curve singularity following [Campillo, A.: Algebroid curves in
+ positive characteristic, Springer LNM 813 (1980)]. @*
  The library contains also procedures for computing the (topological)
  numerical invariants of plane curve singularities.
 
 MAIN PROCEDURES:
- hnexpansion(f);            Hamburger-Noether (H-N) development of f
- sethnering(hn);            changes to the hnering created by hnexpansion
- develop(f [,n]);           H-N development of irreducible curves
+ hnexpansion(f [,\"ess\"]); Hamburger-Noether (HN) expansion of f
+ develop(f [,n]);           HN expansion of irreducible plane curve germs
  extdevelop(hne,n);         extension of the H-N development hne of f
- parametrisation(f [,x]);   a parametrization of f 
- displayHNE(hne);           display H-N development as an ideal
- invariants(f);             invariants of f, e.g. the characteristic exponents
- displayInvariants(f);      display invariants of f
- multsequence(f);           sequence of multiplicities
- displayMultsequence(f);    display sequence of multiplicities
+ param(L [,s]);             parametrization of branches described by HN data
+ displayHNE(hne);           display HN development as an ideal
+ invariants(hne);           invariants of f, e.g. the characteristic exponents
+ displayInvariants(hne);    display invariants of f
+ multsequence(hne);         sequence of multiplicities
+ displayMultsequence(hne);  display sequence of multiplicities
  intersection(hne1,hne2);   intersection multiplicity of two curves
- stripHNE(hne);             reduce amount of memory consumed by hne
- is_irred(f);               test if f is irreducible
+ is_irred(f);               test if f is irreducible as power series
  delta(f);                  delta invariant of f
  newtonpoly(f);             (local) Newton polygon of f
  is_NND(f);                 test if f is Newton non-degenerate
 
 
 AUXILIARY PROCEDURES:
+ stripHNE(hne);             reduce amount of memory consumed by hne
  puiseux2generators(m,n);   convert Puiseux pairs to generators of semigroup
  separateHNE(hne1,hne2);    number of quadratic transf. needed for separation
  squarefree(f);             a squarefree divisor of the poly f
@@ -40,11 +41,8 @@ AUXILIARY PROCEDURES:
 KEYWORDS: Hamburger-Noether expansion; Puiseux expansion; curve singularities
 ";
 
-// HNdevelop(f);              Hamburger-Noether (H-N) development of f
-// reddevelop(f);             H-N development of reducible curves
-// essdevelop(f);             H-N development of essential branches
+// essdevelop(f);             HN expansion of essential branches
 // multiplicities(hne);       multiplicities of blowed up curves
-
 
 ///////////////////////////////////////////////////////////////////////////////
 LIB "primitiv.lib";
@@ -84,8 +82,8 @@ NOTE:  The library @code{hnoether.lib} contains some more procedures which
 
 //       static procedures not useful for interactive use:
 // polytest(f);        tests coefficients and exponents of poly f
-// extractHNEs(H,t);   extracts output H of HN to output of reddevelop
-// HN(f,grenze);       recursive subroutine for reddevelop
+// extractHNEs(H,t);   extracts output H of HN to output of hnexpansion
+// HN(f,grenze);       recursive subroutine for hnexpansion
 // constructHNEs(...); subroutine for HN
 }
 example
@@ -181,7 +179,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc T2_Transform (poly f, number d, int M, int N, poly refpoly)
+proc T2_Transform (poly f_neu, number d, int M, int N, poly refpoly)
 "USAGE:   T2_Transform(f,d,M,N,ref); f poly, d number; M,N int; ref poly
 RETURN:  list: poly T2(f,d',M,N), number d' in \{ d, 1/d \}
 ASSUME:  ref has the same Newton polygon as f (but can be simpler)
@@ -218,14 +216,15 @@ EXAMPLE: example T2_Transform;  shows an example
    "delt =",d,"Q =",Q,"tau,sigma =",tau,sigma;
   }
  //------------------- Durchfuehrung der Transformation T2 --------------------
-  f=Tstar(f);
+  f_neu=Tstar(f_neu);
   refpoly=Tstar(refpoly);
- //--- dividiere f so lange durch x & y, wie die Div. aufgeht, benutze ein  ---
- //--- Referenzpolynom mit gleichem Newtonpolynom wie f zur Beschleunigung: ---
+  //--- dividiere f_neu so lange durch x & y, wie die Division aufgeht, 
+  //    benutze ein Referenzpolynom mit gleichem Newtonpolynom wie f_neu zur 
+  //    Beschleunigung: ---
   for (hilf=refpoly/xp; hilf*xp==refpoly; hilf=refpoly/xp) {refpoly=hilf; s++;}
   for (hilf=refpoly/yp; hilf*yp==refpoly; hilf=refpoly/yp) {refpoly=hilf; t++;}
-  f=f/(xp^s*yp^t);
-  return(list(T1(f),d));
+  f_neu=f_neu/(xp^s*yp^t);
+  return(list(T1(f_neu),d));
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -806,7 +805,8 @@ EXAMPLES: example develop;         shows an example
     }
     if (Abbruch == 0) {
       f = T1_Transform(f,delt,M/ e);
-      dbprint(printlevel-voice+2,"a("+string(zeile)+","+string(Q)+") = "+string(delt)); 
+      dbprint(printlevel-voice+2,"a("+string(zeile)+","+string(Q)+") = "
+              +string(delt)); 
       a(zeile)[Q]=delt;
       if (defined(HNDebugOn)) {"transformed polynomial: ",f;}}
 
@@ -901,7 +901,7 @@ example
   // z(3) = -z(4)^2 + 0*z(4)^3 +...+ 0*z(4)^8 + ?*z(4)^9 + ...
   // (the missing x in the last line indicates that it is not complete.)
   hne[2];
-  parametrisation(hne);
+  param(hne);
   // parametrization:   x(t)= -t^14+O(t^21),  y(t)= -3t^98+O(t^105)
   // (the term -t^109 in y may have a wrong coefficient)
   displayHNE(hne);
@@ -911,175 +911,16 @@ example
 //               procedures to extract information out of HNE                //
 ///////////////////////////////////////////////////////////////////////////////
 
-proc parametrisation
-"USAGE: parametrisation(INPUT [,x]); INPUT list or poly, x int (optional)
-ASSUME: INPUT is either a bivariate polynomial f defining a plane curve 
-        singularity, or it is the output of @code{hnexpansion(f[,\"ess\"])}, 
-        or of @code{develop(f)}, or of @code{extdevelop(develop(f),n)}, 
-        or  the list @{hne} in the ring created by @code{hnexpansion(f)} 
-        respectively one entry thereof.
-RETURN: a list L containing a parametrization L[i] for each branch f[i] of f 
-        in the following format: @*
-        - if only the list INPUT is given, L[i] is an ideal of two polynomials 
-        p[1],p[2]: if the HNE of was finite  then f[i](p[1],p[2])=0; if not, 
-        the \"real\" parametrization will be two power series and p[1],p[2] are
-        truncations of these series.@*
-        - if the optional parameter x is given, L[i] is itself a list: 
-        L[i][1] is the parametrization ideal as above and L[i][2] is an intvec 
-        with two entries indicating the highest degree up to which the 
-        coefficients of the monomials in L[i][1] are exact (entry -1 means that
-        the corresponding parametrization is exact).
-NOTE:   If the basering has only 2 variables, the first variable is chosen
-        as indefinite. Otherwise, the 3rd variable is chosen. @*
-        In case the Hamburger-Noether expansion of the curve f is needed
-        for other purposes as well it is better to calculate this first
-        with the aid of @code{hnexpansion} and use it as input instead of
-        the polynomial itself.
-SEE ALSO: develop, extdevelop
-KEYWORDS: parametrization
-EXAMPLE: example parametrisation;     shows an example
-         example develop;         shows another example
-"
-{
-  ////////////////////////////////////////////////////////////////////////
-  // Decide on the type of input
-  ////////////////////////////////////////////////////////////////////////
-  // Do the case where the input is a polynomial
-  if (typeof(#[1])=="poly")
-  {
-    list HNEXPANSION=hnexpansion(#[1]);
-    if (size(#)==1)
-    {
-      return(parametrisation(HNEXPANSION));
-    }
-    else
-    {
-      return(parametrisation(HNEXPANSION,1));
-    }
-  }
-  // Do the case where the input is not a polynomial.
-  int zusatz;  
-  if (typeof(#[1])=="list")
-  {
-    if (typeof(#[1][1])=="ring")
-    { // Input is a HNEring and extra input x exists.
-      zusatz=1;
-      def HNE_RING=#[1][1];
-    }
-    else
-    {
-      if (typeof(#[1][1])=="list")
-      { // Input is a reducible HN-expansion and extra input x exists.
-        zusatz=1;
-        list hne=#[1];
-      }
-      else
-      {
-        if (typeof(#[size(#)])=="list")  
-        { // Input is a reducible HN-expansion and no extra input exists.
-          list hne=#;
-        }
-        else  
-        { // Input is an irreducible HN-expansion and extra input x exists 
-          list hne;
-          hne[1]=#[1];
-          zusatz=1;
-        }
-      }
-    }
-  }
-  if (typeof(#[1])=="matrix")
-  {
-    list hne;
-    hne[1]=#;
-  }
-  if (typeof(#[1])=="ring")
-  { // Input is a HNEring and no extra input exists.
-    def HNE_RING=#[1];
-  }
-  ////////////////////////////////////////////////////////////////////////////
-  // Calculate the parametrization.
-  if (defined(HNE_RING))
-  {
-    def rettering=basering;
-    setring HNE_RING;
-  }
-  int r=size(hne);
-  list ErGeBnIs;
-  // Calculate the parametrization for each branch with the aid of param.
-  for (int lauf=1;lauf<=r;lauf++)
-  {
-    if (zusatz==1)
-    {
-      ErGeBnIs[lauf]=param(hne[lauf],1);
-    }
-    else
-    {
-      ErGeBnIs[lauf]=param(hne[lauf]);
-    }
-  }
-  // Map the parametrization to the basering, if necessary, and return it.
-  if (defined(HNE_RING))
-  {
-    setring rettering;
-    list erg=fetch(HNE_RING,ErGeBnIs);
-    kill HNE_RING;
-    // If the basering has 3 variables, choose the third variable for the parametrization.
-    if (nvars(rettering)>=3)
-    {
-      for (lauf=1;lauf<=r;lauf++)
-      {
-        if (zusatz==1)
-        {
-          erg[lauf][1]=subst(erg[lauf][1],var(1),var(3));
-        }
-        else
-        {
-          erg[lauf]=subst(erg[lauf],var(1),var(3));
-        }
-      }
-    }
-    return(erg);
-  }
-  else
-  {
-    return(ErGeBnIs);
-  }
-}
-example
-{ "EXAMPLE:"; echo = 2;
- ring exring=0,(x,y,t),ds;
- // 1st Example: input is a polynomial
- poly g=(x2-y3)*(x3-y5);
- parametrisation(g);
- // 2nd Example: input is the ring of a Hamburger-Noether expansion
- poly h=x2-y2-y3;
- list hn=hnexpansion(h);
- parametrisation(h,1);
- // 3rd Example: input is a Hamburger-Noether expansion
- poly f=x3+2xy2+y2;
- list hne=develop(f);
- list hne_extended=extdevelop(hne,10);
-            //   compare the matrices ...
- print(hne[1]);
- print(hne_extended[1]);
-            // ... and the resulting parametrizations:
- parametrisation(hne);
- parametrisation(hne_extended);
- parametrisation(hne_extended,0);
-}
-
-
-proc param
-"USAGE:  param(L [,x]); L list, x any type (optional)
+proc param (list L, list #)
+"USAGE:  param(L [,s]); L list, s any type (optional)
 ASSUME:  L is the output of @code{develop(f)}, or of
-        @code{extdevelop(develop(f),n)}, or one entry in the list @code{hne}
-        in the ring created by @code{hnexpansion(f[,\"ess\"])}.
+        @code{extdevelop(develop(f),n)}, or (one entry in) the list of HN 
+        data created by @code{hnexpansion(f[,\"ess\"])}.
 RETURN: a parametrization for f in the following format: @*
         - if only the list L is given, the result is an ideal of two
         polynomials p[1],p[2]: if the HNE was finite then f(p[1],p[2])=0};
-        if not, the \"real\" parametrization will be two power series and
-        p[1],p[2] are truncations of these series.@*
+        if not, the true parametrization will be given by two power series, 
+        and p[1],p[2] are truncations of these series.@*
         - if the optional parameter x is given, the result is a list l:
         l[1]=param(L) (ideal) and l[2]=intvec with two entries indicating
         the highest degree up to which the coefficients of the monomials in
@@ -1087,25 +928,32 @@ RETURN: a parametrization for f in the following format: @*
         is exact).
 NOTE:   If the basering has only 2 variables, the first variable is chosen
         as indefinite. Otherwise, the 3rd variable is chosen.
-SEE ALSO: parametrization, develop, extdevelop
+SEE ALSO: develop, extdevelop
 KEYWORDS: parametrization
 EXAMPLE: example param;     shows an example
          example develop;   shows another example
 "
 {
  //-------------------------- Initialisierungen -------------------------------
- if (typeof(#[1])=="list") {
-   list Li=#[1];
-   matrix m=Li[1];
-   intvec v=Li[2];
-   int switch=Li[3];
-   int return_list=1;
+ int return_list;
+ if (size(#)>0) { return_list=1; }
+
+ if (typeof(L[1])=="list") { // output of hnexpansion (> 1 branch)
+   list Ergebnis;
+   for (int i=1; i<=size(L); i++) {
+     dbprint(printlevel-voice+4,"// Parametrization of branch number "
+       +string(i)+" computed.");  
+     printlevel=printlevel+1;
+     if (return_list==1) { Ergebnis[i]=param(L[i],1); }
+     else                { Ergebnis[i]=param(L[i]); }
+     printlevel=printlevel-1;
+   }
+   return(Ergebnis);
  }
  else {
-   matrix m=#[1];
-   intvec v=#[2];
-   int switch=#[3];
-   int return_list=0;
+   matrix m=L[1];
+   intvec v=L[2];
+   int switch=L[3];
  }
  if (switch==-1) {
    "An error has occurred in develop, so there is no HNE.";
@@ -1122,7 +970,8 @@ EXAMPLE: example param;     shows an example
    fehler=0;           // die Parametrisierung wird exakt werden
    for (i=1; i<=v[zeile]; i++) {
      z(zeile)=z(zeile)+m[zeile,i]*z(zeile+1)^i;
- }}
+   }
+ }
  else {
    untervor=1;         // = Untergrad der vorhergehenden Zeile
    if (v[zeile]==-1) {
@@ -1131,13 +980,15 @@ EXAMPLE: example param;     shows an example
        z(zeile)=z(zeile)+m[zeile,i]*z(zeile+1)^i;
        if ((untergrad==0) and (m[zeile,i]!=0)) {untergrad=i;}
                        // = Untergrad der aktuellen Zeile
-   }}
+     }
+   }
    else {
      fehler= -v[zeile];
      for (i=1; i<-v[zeile]; i++) {
        z(zeile)=z(zeile)+m[zeile,i]*z(zeile+1)^i;
        if ((untergrad==0) and (m[zeile,i]!=0)) {untergrad=i;}
-   }}
+     }
+   }
  }
  //------------- Parametrisierung der restlichen Zeilen der HNE ---------------
  for (zeile=size(v)-1; zeile>0; zeile--) {
@@ -1154,26 +1005,29 @@ EXAMPLE: example param;     shows an example
      fehler=fehler+untergrad*(v[zeile]-1)+untervor;   // Fehler dieser Zeile
      hilf=untergrad;
      untergrad=untergrad*v[zeile]+untervor;
-     untervor=hilf;}}    // untervor = altes untergrad
+     untervor=hilf;}     // untervor = altes untergrad
+   }
    else {
      fehlervor=fehler;
      fehler=fehler+untergrad*(beginn-1);
      untervor=untergrad;
      untergrad=untergrad*beginn;
- }}
+   }
+ }
  //--------------------- Ausgabe der Fehlerabschaetzung -----------------------
  if (switch==0) {
    if (fehler>0) {
      if (fehlervor>0) {
-       if ((voice==2) && (printlevel > -1)) {
-         "// ** Warning: result is exact up to order",fehlervor-1,"in",
-         maxideal(1)[1],"and",fehler-1,"in",maxideal(1)[2],"!";
-     }}
+       dbprint(printlevel-voice+4,""+
+         "// ** Warning: result is exact up to order "+string(fehlervor-1)+
+         " in "+ string(var(1))+" and "+string(fehler-1)+" in " +
+         string(var(2))+" !"); 
+     }
      else {
-       if ((voice==2) && (printlevel > -1)) {
-         "// ** Warning: result is exact up to order",fehler-1,"in",
-         maxideal(1)[2],"!";
-     }}
+       dbprint(printlevel-voice+4,""+
+         "// ** Warning: result is exact up to order "+ string(fehler-1)+
+         " in "+string(var(2))+" !");
+     }
    }
    if (return_list==0) { return(ideal(z(2),z(1))); }
    else   { return(list(ideal(z(2),z(1)),intvec(fehlervor-1,fehler-1))); }
@@ -1181,15 +1035,16 @@ EXAMPLE: example param;     shows an example
  else {
    if (fehler>0) {
      if (fehlervor>0) {
-      if ((voice==2) && (printlevel > -1)) {
-        "// ** Warning: result is exact up to order",fehler-1,"in",
-        maxideal(1)[1],"and",fehlervor-1,"in",maxideal(1)[2],"!";
-     }}
+       dbprint(printlevel-voice+4,""+
+         "// ** Warning: result is exact up to order "+string(fehler-1)+
+         " in "+ string(var(1))+" and "+string(fehlervor-1)+" in " +
+         string(var(2))+" !"); 
+     }
      else {
-      if ((voice==2) && (printlevel > -1)) {
-        "// ** Warning: result is exact up to order",fehler-1,"in",
-        maxideal(1)[1],"!";
-     }}
+       dbprint(printlevel-voice+4,""+
+        "// ** Warning: result is exact up to order "+ string(fehler-1)+
+         " in "+string(var(1))+" !");
+     }
    }
    if (return_list==0) { return(ideal(z(1),z(2))); }
    else   { return(list(ideal(z(1),z(2)),intvec(fehler-1,fehlervor-1))); }
@@ -1201,43 +1056,46 @@ example
  poly f=x3+2xy2+y2;
  list hne=develop(f);
  list hne_extended=extdevelop(hne,10);
-            //   compare the matrices ...
+            //   compare the HNE matrices ...
  print(hne[1]);
  print(hne_extended[1]);
             // ... and the resulting parametrizations:
  param(hne);
  param(hne_extended);
  param(hne_extended,0);
+
+ // An example with more than one branch:
+ list L=hnexpansion(f*(x2+y4));
+ def HNring = L[1]; setring HNring;
+ param(hne);
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 
 proc invariants
 "USAGE:   invariants(INPUT); INPUT list or poly
-ASSUME:  INPUT is the output of @code{develop(f)}, or of
-         @code{extdevelop(develop(f),n)}, or one entry in the list @code{hne} 
-         of the HNEring created by @code{hnexpansion}.
-RETURN:  list, if INPUT contains a valid HNE:
+ASSUME:  @code{INPUT} is the output of @code{develop(f)}, or of
+         @code{extdevelop(develop(f),n)}, or one entry of the list of HN data 
+         computed by @code{hnexpansion(f[,\"ess\"])}.
+RETURN:  list @code{INV} of the following format:
 @format
-    invariants(INPUT)[1]:  intvec    (characteristic exponents)
-    invariants(INPUT)[2]:  intvec    (generators of the semigroup)
-    invariants(INPUT)[3]:  intvec    (Puiseux pairs, 1st components)
-    invariants(INPUT)[4]:  intvec    (Puiseux pairs, 2nd components)
-    invariants(INPUT)[5]:  int       (degree of the conductor)
-    invariants(INPUT)[6]:  intvec    (sequence of multiplicities)
+    INV[1]:  intvec    (characteristic exponents)
+    INV[2]:  intvec    (generators of the semigroup)
+    INV[3]:  intvec    (Puiseux pairs, 1st components)
+    INV[4]:  intvec    (Puiseux pairs, 2nd components)
+    INV[5]:  int       (degree of the conductor)
+    INV[6]:  intvec    (sequence of multiplicities)
 @end format
-         an empty list, if INPUT contains no valid HNE.
-ASSUME:  INPUT is bivariate polynomial f or the output of @code{hnexpansion(f[,\"ess\"])}, 
-         or the list @code{hne} in the HNEring created by @code{hnexpansion}.
-RETURN:  list INV, such that INV[i] is the output of @code{invariants(develop(f[i]))}
-         as above, where f[i] is the ith branch of the curve f, and the last 
-         entry contains further invariants of f in the format:
+         If @code{INPUT} contains no valid HN expansion, the empty list is 
+         returned.
+ASSUME:  @code{INPUT} is a bivariate polynomial f, or the output of 
+         @code{hnexpansion(f)}, or the list of HN data computed by 
+         @code{hnexpansion(f [,\"ess\"])}.
+RETURN:  list @code{INV}, such that @code{INV[i]} coincides with the output of 
+         @code{invariants(develop(f[i]))}, where f[i] is the i-th branch of 
+         f, and the last entry of @code{INV} contains further invariants of 
+         f in the format:
 @format
-    INV[i][1]    : intvec    (characteristic exponents)
-    INV[i][2]    : intvec    (generators of the semigroup)
-    INV[i][3]    : intvec    (Puiseux pairs, 1st components)
-    INV[i][4]    : intvec    (Puiseux pairs, 2nd components)
-    INV[i][5]    : int       (degree of the conductor)
-    INV[i][6]    : intvec    (sequence of multiplicities)
     INV[last][1] : intmat    (contact matrix of the branches)
     INV[last][2] : intmat    (intersection multiplicities of the branches)
     INV[last][3] : int       (delta invariant of f)
@@ -1246,70 +1104,69 @@ NOTE:    In case the Hamburger-Noether expansion of the curve f is needed
          for other purposes as well it is better to calculate this first
          with the aid of @code{hnexpansion} and use it as input instead of
          the polynomial itself.
-SEE ALSO: develop, displayInvariants, multsequence, intersection
+SEE ALSO: hnexpansion, develop, displayInvariants, multsequence, intersection
 KEYWORDS: characteristic exponents; semigroup of values; Puiseux pairs;
           conductor, degree; multiplicities, sequence of
 EXAMPLE:  example invariants; shows an example
 "
 {
- //---- INPUT = poly, or HNEring, or hne of reducible curve  --------------------
-  if (typeof(#[1])!="matrix")
-  {
-    if (typeof(#[1])=="poly")
-    {
-      list HNEXPANSION=hnexpansion(#[1]);
-      return(invariants(HNEXPANSION));
-    }
-    if (typeof(#[1])=="ring")
-    {
-      def H_N_E_R_I_N_G=#[1];
-      def rette_ring=basering;
-      setring H_N_E_R_I_N_G;
-    }
-    if (typeof(#[1])=="list")
-    {
-      list hne=#;
-    }
-    list ErGeBnIs;
-    for (int lauf=1;lauf<=size(hne);lauf++)
-    {
-      ErGeBnIs[lauf]=invariants(hne[lauf]);
-    }
-    // Calculate the intersection matrix and the intersection multiplicities.
-    intmat contact[size(hne)][size(hne)];
-    intmat intersectionmatrix[size(hne)][size(hne)];
-    int Lauf;
-    for (lauf=1;lauf<=size(hne);lauf++)
-    {
-      for (Lauf=lauf+1;Lauf<=size(hne);Lauf++)
-      {
-        contact[lauf,Lauf]=separateHNE(hne[lauf],hne[Lauf]);
-        contact[Lauf,lauf]=contact[lauf,Lauf];
-        intersectionmatrix[lauf,Lauf]=intersection(hne[lauf],hne[Lauf]);
-        intersectionmatrix[Lauf,lauf]=intersectionmatrix[lauf,Lauf];
+ //---- INPUT = poly, or HNEring, or hne of reducible curve  -----------------
+ if (typeof(#[1])!="matrix") {
+   if (typeof(#[1])=="poly") {
+      list L=hnexpansion(#[1]);
+      if (typeof(L[1])=="ring") {
+        def altring = basering;
+        def HNring = L[1]; setring HNring;
+        list Ergebnis = invariants(hne);
+        setring altring;
+        kill HNring;
+        return(Ergebnis);
       }
-    }
-    // Calculate the delta invariant.
-    int inters;
-    int del=ErGeBnIs[size(hne)][5]/2;
-    for(lauf=1;lauf<=size(hne)-1;lauf++)
-    {
-      del=del+ErGeBnIs[lauf][5]/2;
-      for(Lauf=lauf+1;Lauf<=size(hne);Lauf++)
-      {
+      else {
+        return(invariants(L));
+      }  
+   }
+   if (typeof(#[1])=="ring") {
+     def altring = basering;
+     def HNring = #[1]; setring HNring;
+     list Ergebnis = invariants(hne);
+     setring altring;
+     kill HNring;
+     return(Ergebnis);  
+   }
+   if (typeof(#[1])=="list") {
+     list hne=#;
+     list Ergebnis;
+     for (int lauf=1;lauf<=size(hne);lauf++) {
+       Ergebnis[lauf]=invariants(hne[lauf]);
+     }
+     // Calculate the intersection matrix and the intersection multiplicities.
+     intmat contact[size(hne)][size(hne)];
+     intmat intersectionmatrix[size(hne)][size(hne)];
+     int Lauf;
+     for (lauf=1;lauf<=size(hne);lauf++) {
+       for (Lauf=lauf+1;Lauf<=size(hne);Lauf++) {
+         contact[lauf,Lauf]=separateHNE(hne[lauf],hne[Lauf]);
+         contact[Lauf,lauf]=contact[lauf,Lauf];
+         intersectionmatrix[lauf,Lauf]=intersection(hne[lauf],hne[Lauf]);
+         intersectionmatrix[Lauf,lauf]=intersectionmatrix[lauf,Lauf];
+       }
+     }
+     // Calculate the delta invariant.
+     int inters;
+     int del=Ergebnis[size(hne)][5]/2;
+     for(lauf=1;lauf<=size(hne)-1;lauf++) {
+       del=del+Ergebnis[lauf][5]/2;
+       for(Lauf=lauf+1;Lauf<=size(hne);Lauf++) {
          inters=inters+intersectionmatrix[lauf,Lauf];
-      }
-    }
-    del=del+inters;
-    list LAST=contact,intersectionmatrix,del;
-    ErGeBnIs[size(hne)+1]=LAST;
-    if (defined(H_N_E_R_I_N_G))
-    {
-      setring rette_ring;
-      kill H_N_E_R_I_N_G;
-    }
-    return(ErGeBnIs);
-  }
+       }
+     }
+     del=del+inters;
+     list LAST=contact,intersectionmatrix,del;
+     Ergebnis[size(hne)+1]=LAST;
+     return(Ergebnis);
+   }
+ }
  //-------------------------- Initialisierungen -------------------------------
  matrix m=#[1];
  intvec v=#[2];
@@ -1417,13 +1274,14 @@ example
 
 proc displayInvariants
 "USAGE:  displayInvariants(INPUT); INPUT list or poly
-ASSUME:  INPUT is a bivariate polynomial, or the output of @code{develop(f)}, or of
-         @code{extdevelop(develop(f),n)}, or (one entry of) the list @code{hne}
-         in the ring created by @code{hnexpansion(f[,\"ess\"])}.
+ASSUME:  @code{INPUT} is a bivariate polynomial, or the output of 
+         @code{develop(f)}, resp. of @code{extdevelop(develop(f),n)}, or (one 
+         entry of) the list of HN data computed by 
+         @code{hnexpansion(f[,\"ess\"])}.
 RETURN:  none
 DISPLAY: invariants of the corresponding branch, resp. of all branches,
          in a better readable form.
-NOTE:    In case the Hamburger-Noether expansion of the curve f is needed
+NOTE:    If the Hamburger-Noether expansion of the curve f is needed
          for other purposes as well it is better to calculate this first
          with the aid of @code{hnexpansion} and use it as input instead of
          the polynomial itself.
@@ -1431,24 +1289,26 @@ SEE ALSO: invariants, intersection, develop, hnexpansion
 EXAMPLE: example displayInvariants;  shows an example
 "
 {
-  // INPUT = poly or ring
-  if (typeof(#[1])=="poly") 
-  {
-    list HNEXPANSION=hnexpansion(#[1]);
-    displayInvariants(HNEXPANSION);
-    return();
-  }
-  if (typeof(#[1])=="ring")
-  {
-    def H_N_E_RING=#[1];
-    def rettering=basering;
-    setring H_N_E_RING;
-    displayInvariants(hne);
-    setring rettering;
-    kill H_N_E_RING;
-    return();
-  }
-  // INPUT = hne of a plane curve
+ // INPUT = poly or ring
+ if (typeof(#[1])=="poly") {
+   list L=hnexpansion(#[1]);
+   if (typeof(L[1])=="ring") {
+     def HNring = L[1]; setring HNring;
+     displayInvariants(hne);
+     return();
+   }
+   else {
+     displayInvariants(L);
+     return();
+   }
+ }
+ if (typeof(#[1])=="ring")
+ {
+   def HNring = #[1]; setring HNring;
+   displayInvariants(hne);
+   return();
+ }
+ // INPUT = hne of a plane curve
  int i,j,k,mul;
  string Ausgabe;
  list ergebnis;
@@ -1738,25 +1598,25 @@ EXAMPLE: example intersection;  shows an example
 }
 example
 {
-  // ------ the example starts here -------
   "EXAMPLE:"; echo = 2;
   ring r=0,(x,y),dp;
-  list hn=hnexpansion((x2-y3)*(x2+y3));
-  def HNEring=hn[1];
-  setring HNEring;
+  list hne=hnexpansion((x2-y3)*(x2+y3));
   intersection(hne[1],hne[2]);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
 proc multsequence
 "USAGE:   multsequence(INPUT); INPUT list or poly 
-ASSUME:  INPUT is the output of @code{develop(f)}, or of @code{extdevelop(develop(f),n)}, 
-         or one entry in the list @code{hne} of the ring created by @code{hnexpansion(f)}.
-RETURN:  intvec corresponding to the multiplicity sequence of (a branch)
-         of the curve (the same as @code{invariants(INPUT)[6]}).
+ASSUME:  @code{INPUT} is the output of @code{develop(f)}, or of
+         @code{extdevelop(develop(f),n)}, or one entry of the list of HN data 
+         computed by @code{hnexpansion(f[,\"ess\"])}.
+RETURN:  intvec corresponding to the multiplicity sequence of the irreducible
+         plane curve singularity described by the HN data (return value
+         coincides with @code{invariants(INPUT)[6]}).
 
-ASSUME:  INPUT is a bivariate polynomial, or the output of @code{hnexpansion(f)},
-         or the list @code{hne} in the ring created by @code{hnexpansion(f)}.
+ASSUME:  @code{INPUT} is a bivariate polynomial f, or the output of 
+         @code{hnexpansion(f)}, or the list of HN data computed by 
+         @code{hnexpansion(f [,\"ess\"])}.
 RETURN:  list of two integer matrices:
 @texinfo
 @table @asis
@@ -1771,11 +1631,13 @@ RETURN:  list of two integer matrices:
    contains the information which of these infinitely near points coincide.
 @end table
 @end texinfo
-NOTE:  The order of elements of the list @code{hne} obtained from @code{hnexpansion(f[,\"ess\")}
-       must not be changed (because then the coincident infinitely near points
-       couldn't be grouped together, cf. meaning of 2nd intmat in example).
-       Hence, it is not wise to compute the HNE of several polynomials
-       separately, put them into a list INPUT and call @code{multsequence(INPUT)}. @*
+NOTE:  The order of the elements of the list of HN data obtained from 
+       @code{hnexpansion(f [,\"ess\"])} must not be changed (because otherwise
+       the coincident infinitely near points couldn't be grouped together, 
+       see the meaning of the 2nd intmat in the example).
+       Hence, it is not wise to compute the HN expansion of polynomial factors
+       separately, put them into a list INPUT and call 
+       @code{multsequence(INPUT)}. @*
        Use @code{displayMultsequence} to produce a better readable output for
        reducible curves on the screen. @*
        In case the Hamburger-Noether expansion of the curve f is needed
@@ -1788,21 +1650,28 @@ EXAMPLE: example multsequence;  shows an example
 "
 {
  //---- INPUT = poly, or HNEring --------------------
-  if (typeof(#[1])=="poly")
-  {
-    list HNEXPANSION=hnexpansion(#[1]);
-    return(multsequence(HNEXPANSION));
-  }
-  if (typeof(#[1])=="ring")
-  {
-    def H_N_ER_I_N_G=#[1];
-    def ret_te_ring=basering;
-    setring H_N_ER_I_N_G;
-    list ErGeBnIs=multsequence(hne);
-    setring ret_te_ring;
-    kill H_N_ER_I_N_G;
-    return(ErGeBnIs);
-  }
+ if (typeof(#[1])=="poly") {
+   list L=hnexpansion(#[1]);
+   if (typeof(L[1])=="ring") {
+     def altring = basering;
+     def HNring = L[1]; setring HNring;
+     list Ergebnis = multsequence(hne);
+     setring altring;
+     kill HNring;
+     return(Ergebnis);
+   }
+   else {
+     return(multsequence(L));
+   }  
+ }
+ if (typeof(#[1])=="ring") {
+   def altring = basering;
+   def HNring = #[1]; setring HNring;
+   list Ergebnis = multsequence(hne);
+   setring altring;
+   kill HNring;
+   return(Ergebnis);  
+ }
  //-- entferne ueberfluessige Daten zur Erhoehung der Rechengeschwindigkeit: --
  #=stripHNE(#);
  int k,i,j;
@@ -1885,44 +1754,29 @@ EXAMPLE: example multsequence;  shows an example
 }
 example
 {
-  // -------- prepare for example ---------
-  if (nameof(basering)=="HNEring") {
-   def rettering=HNEring;
-   kill HNEring;
-  }
-  // ------ the example starts here -------
   "EXAMPLE:"; echo = 2;
   ring r=0,(x,y),dp;
-  list hn=hnexpansion((x6-y10)*(x+y2-y3)*(x+y2+y3));   // 4 branches
-  def HNEring=hn[1];
-  setring HNEring;
+  list hne=hnexpansion((x6-y10)*(x+y2-y3)*(x+y2+y3));
   multsequence(hne[1]),"  |  ",multsequence(hne[2]),"  |  ",
   multsequence(hne[3]),"  |  ",multsequence(hne[4]);
   multsequence(hne);
   // The meaning of the entries of the 2nd matrix is as follows:
   displayMultsequence(hne);
-  echo = 0;
-  // --- restore HNEring if previously defined ---
-  kill HNEring,r;
-  if (defined(rettering)) {
-   setring rettering;
-   def HNEring=rettering;
-   export HNEring;
-  }
 }
 ///////////////////////////////////////////////////////////////////////////////
 
 proc displayMultsequence
 "USAGE:   displayMultsequence(INPUT); INPUT list or poly
-ASSUME:  INPUT is a bivariate polynomial, or the output of @code{develop(f)}, 
-         or of @code{extdevelop(develop(f),n)}, or of of @code{hnexpansion(f[,\"ess\"])}, 
-         or (one entry in) the list @code{hne} of the ring created by @code{hnexpansion(f[,\"ess \"])}.
+ASSUME:  @code{INPUT} is a bivariate polynomial, or the output of 
+         @code{develop(f)}, resp. of @code{extdevelop(develop(f),n)}, or (one 
+         entry of) the list of HN data computed by @code{hnexpansion(f[,\"ess\"])}, 
+         or the output of @code{hnexpansion(f)}.
 RETURN:  nothing
 DISPLAY: the sequence of multiplicities:
 @format
  - if @code{INPUT=develop(f)} or @code{INPUT=extdevelop(develop(f),n)} or @code{INPUT=hne[i]}:
                       @code{a , b , c , ....... , 1}
- - if @code{INPUT=f} or @code{INPUT=hnexpansion(f[,\"ess\"])} or @code{INPUT=hne}:
+ - if @code{INPUT=f} or @code{INPUT=hnexpansion(f)} or @code{INPUT=hne}:
                       @code{[(a_1, .... , b_1 , .... , c_1)],}
                       @code{[(a_2, ... ), ... , (... , c_2)],}
                       @code{ ........................................ ,}
@@ -1932,7 +1786,7 @@ DISPLAY: the sequence of multiplicities:
        @code{[...]} the multiplicities of the j-th transformed of all branches,
        @code{(...)} indicating branches meeting in an infinitely near point.
 @end format
-NOTE:  The same restrictions for INPUT as in @code{multsequence} apply.@*
+NOTE:  The Same restrictions as in @code{multsequence} apply for the input.@*
        In case the Hamburger-Noether expansion of the curve f is needed
        for other purposes as well it is better to calculate this first
        with the aid of @code{hnexpansion} and use it as input instead of
@@ -1942,22 +1796,24 @@ EXAMPLE: example displayMultsequence;  shows an example
 "
 {
  //---- INPUT = poly, or HNEring --------------------
-  if (typeof(#[1])=="poly")
-  {
-    list HNEXPANSION=hnexpansion(#[1]);
-    displayMultsequence(HNEXPANSION);
-    return();
-  }
-  if (typeof(#[1])=="ring")
-  {
-    def H_N_ER_I_N_G=#[1];
-    def ret_te_ring=basering;
-    setring H_N_ER_I_N_G;
-    displayMultsequence(hne);
-    setring ret_te_ring;
-    kill H_N_ER_I_N_G;
-    return();
-  }
+ if (typeof(#[1])=="poly") {
+   list L=hnexpansion(#[1]);
+   if (typeof(L[1])=="ring") {
+     def HNring = L[1]; setring HNring;
+     displayMultsequence(hne);
+     return();
+   }
+   else {
+     displayMultsequence(L);
+     return();
+   }  
+ }
+ if (typeof(#[1])=="ring") {
+   def HNring = #[1]; setring HNring;
+   displayMultsequence(hne);
+   return();  
+ }
+
  //-- entferne ueberfluessige Daten zur Erhoehung der Rechengeschwindigkeit: --
  #=stripHNE(#);
  //----------------- Multiplizitaetensequenz eines Zweiges --------------------
@@ -1991,17 +1847,18 @@ EXAMPLE: example displayMultsequence;  shows an example
      output;
    }
  }
-} // example multsequence; geht wegen echo nicht (muesste auf 3 gesetzt werden)
+} 
 example
 {
-  // ------ the example starts here -------
   "EXAMPLE:"; echo = 2;
   ring r=0,(x,y),dp;
-  //// Example 1: Input = output of develop
+  // Example 1: Input = output of develop
   displayMultsequence(develop(x3-y5));
-  //// Example 2: Input = bivariate polynomial
+
+  // Example 2: Input = bivariate polynomial
   displayMultsequence((x6-y10)*(x+y2-y3)*(x+y2+y3));
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 
 proc separateHNE (list hn1,list hn2)
@@ -2555,9 +2412,9 @@ NOTE:    The new HN-matrix will have at least N columns (if the HNE is not
          @code{extdevelop(develop(f),N)} will produce the same result as
          @code{develop(f,N)}.@*
          If the matrix M of L has n columns then, compared with
-         @code{parametrisation(L)}, @code{paramametrize(extdevelop(L,N))} will increase the
+         @code{parametrization(L)}, @code{paramametrize(extdevelop(L,N))} will increase the
          exactness by at least (N-n) more significant monomials.
-SEE ALSO: develop, hnexpansion, parametrisation
+SEE ALSO: develop, hnexpansion, parametrization
 EXAMPLE: example extdevelop;  shows an example
 "
 {
@@ -2682,32 +2539,17 @@ EXAMPLE: example extdevelop;  shows an example
 }
 example
 {
-  if (defined(HNEring))
-  {
-    def save_r_i_n_g=HNEring;
-    kill HNEring;
-  }
-  // ------ the example starts here -------
   "EXAMPLE:"; echo = 2;
   ring exring=0,(x,y),dp;
-  list hn=hnexpansion(x14-3y2x11-y3x10-y2x9+3y4x8+y5x7+3y4x6+x5*(-y6+y5)
+  list hne=hnexpansion(x14-3y2x11-y3x10-y2x9+3y4x8+y5x7+3y4x6+x5*(-y6+y5)
                       -3y6x3-y7x2+y8);
-  def HNEring=hn[1];
-  setring HNEring;  echo=0;
-  export(HNEring);  echo=2;
-  print(hne[1][1]);    // HNE of 1st branch is finite
+  displayHNE(hne);    // HNE of 1st,3rd branch is finite
   print(extdevelop(hne[1],5)[1]);
-  print(hne[2][1]);    // HNE of 2nd branch can be extended
   list ehne=extdevelop(hne[2],5);
-  print(ehne[1]);      // new HN-matrix has 5 columns
-  parametrisation(hne[2]);
-  parametrisation(ehne);
-  echo=0;
-  if (defined(save_r_i_n_g))
-  {
-    kill HNEring;
-    def HNEring=save_r_i_n_g;
-  }
+  displayHNE(ehne);
+  param(hne[2]);
+  param(ehne);
+
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -2785,8 +2627,8 @@ NOTE:   This procedure is only for internal purpose; examples don't make sense
 
 proc factorfirst(poly f, int M, int N)
 "USAGE : factorfirst(f,M,N); f poly, M,N int
-RETURN: number d: f=c*(y^(N/e) - d*x^(M/e))^e with e=gcd(M,N), number c fitting
-        0 if d does not exist
+RETURN: number d such that f=const*(y^(N/e) - d*x^(M/e))^e, where e=gcd(M,N), 
+        0 if such a d does not exist
 EXAMPLE: example factorfirst;  shows an example
 "
 {
@@ -2831,269 +2673,185 @@ example
   factorfirst(x14+x8y3+y7,14,7);
 }
 
-///////////////////////////////////////////////////////////////////////////////
-//         
-//  the command HNdevelop is obsolete  --> here is the former help string:
-//
-///////////////////////////////////////////////////////////////////////////////
-//
-//ASSUME:  f is a bivariate polynomial (in the first 2 ring variables)
-//CREATE:  ring with name @code{HNEring}, variables @code{x,y} and ordering
-//         @code{ls} over a field extension of the current basering's ground
-//         field. @*
-//         Since the Hamburger-Noether development usually does not exist
-//         in the originally given basering, @code{HNdevelop} always defines
-//         @code{HNEring} and CHANGES to it. The field extension is chosen
-//         minimally.
-//RETURN:  list @code{L} of lists @code{L[i]} (corresponding to the output of
-//         @code{develop(f[i])}, f[i] a branch of f, but the last entry being
-//         omitted).
-//@texinfo
-//@table @asis
-//@item @code{L[i][1]}; matrix:
-//         Each row contains the coefficients of the corresponding line of the
-//         Hamburger-Noether expansion (HNE) for f[i]. The end of the line is
-//         marked in the matrix by the first ring variable (usually x).
-//@item @code{L[i][2]}; intvec:
-//         indicating the length of lines of the HNE
-//@item @code{L[i][3]}; int:
-//         0  if the 1st ring variable was transversal (with respect to f[i]), @*
-//         1  if the variables were changed at the beginning of the
-//            computation, @*
-//        -1  if an error has occurred.
-//@item @code{L[i][4]}; poly:
-//         the transformed polynomial of f[i] to make it possible to extend the
-//         Hamburger-Noether development a posteriori without having to do
-//         all the previous calculation once again (0 if not needed)
-//@end table
-//@end texinfo
-//NOTE:    @code{HNdevelop} decides which procedure (@code{develop} or
-//         @code{reddevelop}) applies best to the given problem and calls it. @*
-//         If f is known to be irreducible as a power series, @code{develop(f)}
-//         should be chosen instead to avoid the change of basering. @*
-//         If @code{printlevel>=2} comments are displayed (default is
-//         @code{printlevel=0}).
-//
-//EXAMPLE: example HNdevelop;  shows an example
-//
-proc HNdevelop (poly f)
-"USAGE:   HNdevelop(f); f poly
-NOTE:     command is obsolete, use hnexpansion(f) instead.
-SEE ALSO: hnexpansion, develop, extdevelop, param, displayHNE
+///////////////////////////////////////////////////////////////////////////
+
+proc hnexpansion(poly f,list #)
+"USAGE:   hnexpansion(f[,\"ess\"]);   f poly
+ASSUME:  f is a bivariate polynomial (in the first 2 ring variables)
+RETURN:  list @code{L}, containing Hamburger-Noether data of @code{f}:
+         If the computation of the HNE required no field extension, @code{L} 
+         is a list of lists @code{L[i]} (corresponding to the output of 
+         @code{develop}, applied to a branch of @code{f}, but the last entry
+         being omitted):
+@texinfo
+@table @asis
+@item @code{L[i][1]}; matrix:
+         Each row contains the coefficients of the corresponding line of the
+         Hamburger-Noether expansion (HNE) for the i-th branch. The end of 
+         the line is marked in the matrix by the first ring variable 
+         (usually x).
+@item @code{L[i][2]}; intvec:
+         indicating the length of lines of the HNE
+@item @code{L[i][3]}; int:
+         0  if the 1st ring variable was transversal (with respect to the 
+            i-th branch), @*
+         1  if the variables were changed at the beginning of the
+            computation, @*
+        -1  if an error has occurred.
+@item @code{L[i][4]}; poly:
+         the transformed equation of the i-th branch to make it possible 
+         to extend the Hamburger-Noether data a posteriori without having 
+         to do all the previous calculation once again (0 if not needed).
+@end table
+@end texinfo
+         If the computation of the HNE required a field extension, the first
+         entry @code{L[1]} of the list is a ring, in which a list @code{hne}
+         of lists (the HN data, as above) and a poly @code{f} (image of 
+         @code{f} over the new field) are stored. 
+         @*
+         If called with an additional input parameter, @code{hnexpansion} 
+         computes only one representative for each class of conjugate 
+         branches (over the ground field active when calling the procedure). 
+         In this case, the returned list @code{L} always has only two 
+         entries: @code{L[1]} is either a list of lists (the HN data) or a 
+         ring (as above), and @code{L[2]} is an integer vector (the number
+         of branches in the respective conjugacy classes).
+
+NOTE:    If f is known to be irreducible as a power series, @code{develop(f)}
+         could be chosen instead to avoid a change of basering during the 
+         computations. @*
+         Increasing  @code{printlevel} leads to more and more comments. @*
+         Having defined a variable @code{HNDebugOn} leads to a maximum
+         number of comments.
+
+SEE ALSO: develop, extdevelop, parametrization, displayHNE
+EXAMPLE: example hnexpansion;  shows an example
 "
 {
- int irred=0;
+ int essential; 
+ if (size(#)==1) { essential=1; }
+ int field_ext;
+ def altring=basering;
+
  //--------- Falls Ring (p^k,a),...: Wechsel in (p,a),... + minpoly -----------
- if ((find(charstr(basering),string(char(basering)))!=1) &&
-     (charstr(basering)<>"real")) {
+ if ( (find(charstr(basering),string(char(basering)))!=1) &&
+      (charstr(basering)<>"real")&&
+      (charstr(basering)<>"complex") ) {
    string strmip=string(minpoly);
    string strf=string(f);
    execute("ring tempr=("+string(char(basering))+","+parstr(basering)+"),("
            +varstr(basering)+"),dp;");
    execute("minpoly="+strmip+";");
    execute("poly f="+strf+";");
-   list hne=reddevelop(f);
+   field_ext=1;
+   def L=pre_HN(f,essential);
+   if (size(L)==0) { return(list()); }
+   def HNEring=L[1];
+   setring HNEring;
+   if ((typeof(hne[1])=="ideal")) { return(list()); }
    if ((voice==2) && (printlevel > -1)) {
-     "// Attention: The parameter",par(1),"has changed its meaning!";
-     "// It need no longer be a generator of the cyclic group of unities!";
+     "// Attention: The parameter",par(1),"may have changed its meaning!";
+     "// It needs no longer be a generator of the cyclic group of unities!";
    }
+   dbprint(printlevel-voice+2,
+     "// result: "+string(size(hne))+" branch(es) successfully computed.");
  }
  else {
- //--- Falls Ring (0,a),... + minpoly : solange factorize nicht in Singular ---
- //------- implementiert ist, develop aufrufen (kann spaeter entfallen) -------
- //
- // **** lossen: gestrichen 08/05  ****
- //   if ((char(basering)==0) && (npars(basering)==1)) {
- //     if (string(minpoly)<>"0") { irred=1; }
- //   }
- //
- //------------------ Aufruf der geeigneten Prozedur --------------------------
-   if (irred==0) {
-     list hne=pre_HN(f,0);       // = reddevelop(f);
-     dbprint(printlevel-voice+2,
-        "// result: "+string(size(hne))+" branch(es) successfully computed,",
-        "//         basering has changed to HNEring");
+   def L=pre_HN(f,essential);
+   if (size(L)==0) { return(list()); }
+   if (L[2]==1) { field_ext=1; }
+   intvec hne_conj=L[3];
+   def HNEring=L[1];
+   setring HNEring;
+   if ((typeof(hne[1])=="ideal")) { return(list()); }
+   dbprint(printlevel-voice+2,
+      "// result: "+string(size(hne))+" branch(es) successfully computed.");
+ }
+ if (field_ext==1) {
+   dbprint(printlevel-voice+3,"
+// 'hnexpansion' created a list of one ring.
+// To see the ring and the data stored in the ring, type (if you assigned 
+// the name L to the list): 
+     show(L);
+// To display the computed HN expansion, type 
+     def HNring = L[1]; setring HNring;  displayHNE(hne); ");
+   if (essential==1) {
+     dbprint(printlevel-voice+3,""+
+"// As second entry of the returned list L, you obtain an integer vector, 
+// indicating the number of conjugates for each of the computed branches.");
+     return(list(HNEring,hne_conj));
+   }   
+   return(list(HNEring));
+ }
+ else { // no change of basering necessary --> map data to original ring
+   setring altring;
+   if ((npars(altring)==1) and (minpoly!=0)) {
+     ring HNhelpring=char(altring),(a,x,y),ls;
+     list hne=imap(HNEring,hne);
+     setring altring;
+     map m=HNhelpring,par(1),var(1),var(2);
+     list hne=m(hne);
+     kill m,HNhelpring;
+   }
+   else {   
+     list hne=fetch(HNEring,hne);
+   }
+   kill HNEring;
+   if (essential==1) {
+     dbprint(printlevel-voice+3,"
+// No change of ring necessary, return value is a list:
+//   first entry  =  list :  HN expansion of essential branches.
+//   second entry =  intvec: numbers of conjugated branches 
+     ");
+     return(list(hne,hne_conj));
    }
    else {
-     def altring=basering;
-     string strmip=string(minpoly);
-     ring HNEring=(char(altring),`parstr(altring)`),(x,y),ls;
-     execute("minpoly="+strmip+";");
-     export HNEring;
-     poly f=fetch(altring,f);
-     list hn=develop(f,-1);
-     list hne;
-     if (hn[3] <> -1) {
-       hne[1]=list(hn[1],hn[2],hn[3],hn[4]);
-       if (hn[5] <> 1) {
-   " ** WARNING : The curve is reducible, but only one branch could be found!";
-       }
-     }
-     else { " ** Sorry -- could not find a HNE."; }
-     dbprint(printlevel-voice+2,"// note: basering has changed to HNEring");
+     dbprint(printlevel-voice+3,"
+// No change of ring necessary, return value is HN expansion.
+     ");
+     return(hne);
    }
  }
- export hne;
- keepring basering;
- return(hne);
 }
 example
 {
-  // -------- prepare for example ---------
-  if (nameof(basering)=="HNEring") {
-   def rettering=HNEring;
-   kill HNEring;
-  }
-  // ------ the example starts here -------
   "EXAMPLE:"; echo = 2;
   ring r=0,(x,y),dp;
-  list hne=HNdevelop(x4-y6);
-  nameof(basering);
+  // First, an example which requires no field extension:
+  list hne=hnexpansion(x4-y6);
   size(hne);           // number of branches
-  print(hne[1][1]);    // HN-matrix of 1st branch
+  displayHNE(hne);     // HN expansion of branches
   param(hne[1]);       // parametrization of 1st branch
   param(hne[2]);       // parametrization of 2nd branch
-  kill HNEring,r;
-  echo = 0;
-  // --- restore HNEring if previously defined ---
-  if (defined(rettering)) {
-   setring rettering;
-   def HNEring=rettering;
-   export HNEring;
-  }
+
+  // An example which requires a field extension:
+  list L=hnexpansion((x4-y6)*(y2+x4));
+  def R=L[1]; setring R; displayHNE(hne);
+  basering;
+  setring r; kill R;
+  
+  // Computing only one representative per conjugacy class:
+  L=hnexpansion((x4-y6)*(y2+x4),"ess");
+  def R=L[1]; setring R; displayHNE(hne);
+  L[2];     // number of branches in respective conjugacy classes
 }
 
-///////////////////////////////////////////////////////////////////////////////
-//         
-//  the command reddevelop is obsolete  --> here is the former help string:
-//
-///////////////////////////////////////////////////////////////////////////////
-//ASSUME:  f is a bivariate polynomial (in the first 2 ring variables)
-//CREATE:  ring with name @code{HNEring}, variables @code{x,y} and ordering
-//         @code{ls} over a field extension of the current basering's ground
-//         field. @*
-//         Since the Hamburger-Noether development of a reducible curve
-//         singularity usually does not exist in the originally given basering,
-//         @code{reddevelop} always defines @code{HNEring} and CHANGES to it.
-//         The field extension is chosen minimally.
-//RETURN:  list @code{L} of lists @code{L[i]} (corresponding to the output of
-//         @code{develop(f[i])}, f[i] a branch of f, but the last entry being
-//         omitted).
-//@texinfo
-//@table @asis
-//@item @code{L[i][1]}; matrix:
-//         Each row contains the coefficients of the corresponding line of the
-//         Hamburger-Noether expansion (HNE) for f[i]. The end of the line is
-//         marked in the matrix by the first ring variable (usually x).
-//@item @code{L[i][2]}; intvec:
-//         indicating the length of lines of the HNE
-//@item @code{L[i][3]}; int:
-//         0  if the 1st ring variable was transversal (with respect to f[i]), @*
-//         1  if the variables were changed at the beginning of the
-//            computation, @*
-//        -1  if an error has occurred.
-//@item @code{L[i][4]}; poly:
-//         the transformed polynomial of f[i] to make it possible to extend the
-//         Hamburger-Noether development a posteriori without having to do
-//         all the previous calculation once again (0 if not needed)
-//@end table
-//@end texinfo
-//NOTE:    If @code{printlevel>=0} comments are displayed (default is
-//         @code{printlevel=0}).
-//
-//EXAMPLE: example reddevelop;  shows an example
-//
-proc reddevelop (poly f)
-"USAGE:   reddevelop(f); f poly
-NOTE:     command is obsolete, use hnexpansion(f) instead.   
-SEE ALSO: hnexpansion, develop, extdevelop, param, displayHNE
-"
-{
- list Ergebnis=pre_HN(f,0);
- if (size(Ergebnis)>0) {     // otherwise an error may have occurred
-  dbprint(printlevel-voice+2,
-   "// result: "+string(size(Ergebnis))+" branch(es) successfully computed,",
-   "//         basering has changed to HNEring");
- }
-
- // ----- Lossen 10/02 : the branches have to be resorted to be able to
- // -----                display the multsequence in a nice way
- if (size(Ergebnis)>2)
- {  
-   int i,j,k,m;
-   list dummy;
-   int nbsave;
-   int no_br = size(Ergebnis);
-   intmat nbhd[no_br][no_br];
-   for (i=1;i<no_br;i++)
-   {
-     for (j=i+1;j<=no_br;j++)  
-     { 
-       nbhd[i,j]=separateHNE(Ergebnis[i],Ergebnis[j]);
-       k=i+1;
-       while ( (nbhd[i,k] >= nbhd[i,j]) and (k<j) )
-       {
-         k++;
-       }
-       if (k<j)  // branches have to be resorted 
-       {
-         dummy=Ergebnis[j];
-         nbsave=nbhd[i,j];
-         for (m=k; m<j; m++)
-         {
-           Ergebnis[m+1]=Ergebnis[m];
-           nbhd[i,m+1]=nbhd[i,m];
-         }
-         Ergebnis[k]=dummy;
-         nbhd[i,k]=nbsave;
-       }
-     }
-   }
- }
- // -----
- 
- export Ergebnis;
- keepring basering;
- return(Ergebnis);
-}
-example
-{
-  // -------- prepare for example ---------
-  if (nameof(basering)=="HNEring")
-  {
-   def rettering=HNEring;
-   kill HNEring;
-  }
-  // ------ the example starts here -------
-  "EXAMPLE:"; echo = 2;
-  ring r = 32003,(x,y),dp;
-  poly f = x25+x24-4x23-1x22y+4x22+8x21y-2x21-12x20y-4x19y2+4x20+10x19y
-          +12x18y2-24x18y-20x17y2-4x16y3+x18+60x16y2+20x15y3-9x16y
-          -80x14y3-10x13y4+36x14y2+60x12y4+2x11y5-84x12y3-24x10y5
-          +126x10y4+4x8y6-126x8y5+84x6y6-36x4y7+9x2y8-1y9;
-  list hne=reddevelop(f);
-  size(hne);            // number of branches
-  print(hne[1][1]);     // HN-matrix of 1st branch
-  print(hne[4][1]);     // HN-matrix of 4th branch
-  // a ring change was necessary, a is a parameter
-  HNEring;
-  kill HNEring,r;
-  echo = 0;
-  // --- restore HNEring if previously defined ---
-  if (defined(rettering)) {
-   setring rettering;
-   def HNEring=rettering;
-   export HNEring;
-  }
-}
 ///////////////////////////////////////////////////////////////////////////////
 
 static proc pre_HN (poly f, int essential)
 "NOTE: This procedure is only for internal use, it is called via
-      reddevelop or essdevelop"
+       hnexpansion
+RETURN: list:  first entry = HNEring  (containing list hne, poly f)
+               second entry = 0  if no change of base ring necessary
+                              1  if change of base ring necessary
+               third entry = numbers of conjugates ( if essential = 1 ) 
+        if some error has occured, the empty list is returned
+" 
 {
  def altring = basering;
- int p = char(basering);                 // Ringcharakteristik
+ int p = char(basering);
+ int field_ext;
+ intvec hne_conj;
 
  //-------------------- Tests auf Zulaessigkeit von basering ------------------
  if (charstr(basering)=="real") {
@@ -3118,21 +2876,21 @@ static proc pre_HN (poly f, int essential)
  }
  //----------------- Definition eines neuen Ringes: HNEring -------------------
  string namex=varstr(1); string namey=varstr(2);
- if (string(char(altring))==charstr(altring)) {       // kein Parameter
+ if (string(char(altring))==charstr(altring)) { // kein Parameter, nicht 'real'
    ring HNEring = char(altring),(x,y),ls;
    map m=altring,x,y;
    poly f=m(f);
+   export f;
    kill m;
  }
  else {
    string mipl=string(minpoly);
    if (mipl=="0") {
-     " ** WARNING: No algebraic extension of this ground field is possible!";
-     " ** We try to develop this polynomial, but if the need for an extension";
-     " ** occurs during the calculation, we cannot proceed with the";
-     " ** corresponding branches ...";
+     "// ** WARNING: Algebraic extension of given ground field not possible!";
+     "// ** We try to develop this polynomial, but if the need for a field";
+     "// ** extension occurs during the calculation, we cannot proceed with"; 
+     "// ** the corresponding branches.";
      execute("ring HNEring=("+charstr(basering)+"),(x,y),ls;");
- //--- ring ...=(char(.),`parstr()`),... geht nicht, wenn mehr als 1 Param. ---
    }
    else {
     string pa=parstr(altring);
@@ -3141,25 +2899,42 @@ static proc pre_HN (poly f, int essential)
     ring HNEring=(p,a),(x,y),ls;
     map getminpol=HNhelpring,a;
     mipl=string(getminpol(mipo));    // String umgewandelt mit 'a' als Param.
-    execute("minpoly="+mipl+";");     // "minpoly=poly is not supported"
+    execute("minpoly="+mipl+";");    // "minpoly=poly is not supported"
     kill HNhelpring, getminpol;
    }
-   if (nvars(altring)==2) { poly f=fetch(altring,f); }
+   if (nvars(altring)==2) {
+     poly f=fetch(altring,f);
+     export f;
+   }
    else {
-     map m=altring,x,y;
-     poly f=m(f);
+     if (defined(pa)) { // Parameter hatte vorher anderen Namen als 'a'
+       ring HNhelpring=p,(`pa`,x,y),ls;
+       poly f=imap(altring,f);
+       setring HNEring;
+       map m=HNhelpring,a,x,y;
+       poly f=m(f);
+       kill HNhelpring;
+     }
+     else {
+       map m=altring,x,y;
+       poly f=m(f);
+     }
+     export f;
      kill m;
    }
  }
- export HNEring;
-
+ 
  if (defined(HNDebugOn))
  {"received polynomial: ",f,", with x =",namex,", y =",namey;}
 
  //----------------------- Variablendefinitionen ------------------------------
  int Abbruch,i,NullHNEx,NullHNEy;
  string str;
- list Newton,Ergebnis,hilflist;
+ list Newton,hne; 
+
+ // --- changed for SINGULAR 3: ---
+ hne=ideal(0);
+ export hne;
 
  //====================== Tests auf Zulaessigkeit des Polynoms ================
 
@@ -3167,12 +2942,12 @@ static proc pre_HN (poly f, int essential)
  if (subst(subst(f,x,0),y,0)!=0) {
    dbprint(printlevel+1,
            "The given polynomial is a unit in the power series ring!");
-   keepring HNEring;
+   setring altring; kill HNEring;
    return(list());                   // there are no HNEs
  }
  if (f==0) {
    dbprint(printlevel+1,"The given polynomial is zero!");
-   keepring HNEring;
+   setring altring; kill HNEring;
    return(list());                   // there are no HNEs
  }
 
@@ -3227,7 +3002,6 @@ static proc pre_HN (poly f, int essential)
      else {
        if (str<>"c") {
          setring altring;
-         if(system("with","Namespaces")) { kill Top::HNEring; }
          kill HNEring;kill zweitring;
          return(list());}
        else { "if the algorithm doesn't terminate, you were wrong...";}
@@ -3262,9 +3036,9 @@ static proc pre_HN (poly f, int essential)
        " You can:";
        " (c) continue with a squarefree divisor (but factors of the form g^"
        +string(p);
-       "     are lost; this is recommended, takes no more time)";
+       "     are lost; this is recommended, takes no extra time)";
        " (f) continue with the full radical (using a factorization of the";
-       "     pure power part; this could take much time)";
+       "     pure power part; this could take some time)";
        " (q) quit the algorithm";
        "";"Please enter the letter of your choice:";
        str=read("")[1];
@@ -3280,12 +3054,10 @@ static proc pre_HN (poly f, int essential)
      "//   Either call me again with a squarefree polynomial f or assign";
      "            printlevel=1;";
      "//   before calling me with a non-squarefree f.";
-     "//   If printlevel > 0, I will present to you some possibilities how to",
-       "proceed.";
+     "//   If printlevel > 0, I present some possibilities how to proceed.";
      str="q";
    }
    if (str=="q") {
-    if(system("with","Namespaces")) { kill Top::HNEring; }
     setring altring;kill HNEring;
     return(list());
    }
@@ -3297,8 +3069,8 @@ static proc pre_HN (poly f, int essential)
  }
  //====================== Ende Test auf Quadratfreiheit =======================
  if (subst(subst(f,x,0),y,0)!=0) {
-   "Sorry. The remaining polynomial is a unit in the power series ring...";
-   keepring HNEring;
+   "The polynomial is a unit in the power series ring. No HNE computed.";
+   setring altring;kill HNEring;
    return(list());
  }
  //---------------------- Test, ob f teilbar durch x oder y -------------------
@@ -3326,21 +3098,25 @@ static proc pre_HN (poly f, int essential)
  // weiterung. Definiere Objekte, die spaeter uebertragen werden.
  // Binde die Listen (azeilen,...) an den Ring (um sie nicht zu ueberschreiben
  // bei Def. in einem anderen Ring).
- // Exportiere Objekte, damit sie auch in der proc HN noch da sind
  //----------------------------------------------------------------------------
  ring HNE_noparam = char(altring),(a,x,y),ls;
- export HNE_noparam;
  poly f;
  list azeilen=ideal(0);
  list HNEs=ideal(0);
  list aneu=ideal(0);
  list faktoren=ideal(0);
+
  ideal deltais;
- poly delt;                   // nicht number, weil delta von a abhaengen kann
- export f,azeilen,HNEs,aneu,faktoren,deltais,delt;
+ poly delt;
+
  //----- hier steht die Anzahl bisher benoetigter Ringerweiterungen drin: -----
- int EXTHNEnumber=0; export EXTHNEnumber;
+ int EXTHNEnumber=0; 
+
+ list EXTHNEring;
+ list HNE_RingDATA;
+ int number_of_letztring;
  setring HNEring;
+ number_of_letztring=0;
 
  // ================= Die eigentliche Berechnung der HNE: =====================
 
@@ -3348,154 +3124,146 @@ static proc pre_HN (poly f, int essential)
  if (defined(HNDebugOn))
    {"1st step: Treat Newton polygon until height",grenze1;}
  if (grenze1>0) {
-  hilflist=HN(f,grenze1,1,essential);
-  if (typeof(hilflist[1][1])=="ideal") { hilflist[1]=list(); }
- //- fuer den Fall, dass keine Zweige in transz. Erw. berechnet werden konnten-
-  Ergebnis=extractHNEs(hilflist[1],0);
-  if (hilflist[2]!=-1) {
-    if (defined(HNDebugOn)) {" ring change in HN(",1,") detected";}
-    poly transfproc=hilflist[2];
-    map hole=HNE_noparam,transfproc,x,y;
-    setring HNE_noparam;
-    f=imap(HNEring,f);
-    setring EXTHNEring(EXTHNEnumber);
-    poly f=hole(f);
-  }
+  if (EXTHNEnumber>0){ EXTHNEring = EXTHNEring(1..EXTHNEnumber); }
+  HNE_RingDATA = list(HNEring, HNE_noparam, EXTHNEnumber, EXTHNEring, 
+                      number_of_letztring); 
+
+  list hilflist=HN(HNE_RingDATA,f,grenze1,1,essential,0,hne_conj,1);
+  kill HNEring, HNE_noparam;
+  if (EXTHNEnumber>0) { kill EXTHNEring(1..EXTHNEnumber);}
+  def HNEring = hilflist[1][1];
+  def HNE_noparam = hilflist[1][2];
+  EXTHNEnumber = hilflist[1][3];
+  for (i=1; i<=EXTHNEnumber; i++) { def EXTHNEring(i)=hilflist[1][4][i]; }
+  if (hilflist[2]==0) { setring HNEring; number_of_letztring=0; }
+  else                { setring EXTHNEring(hilflist[2]);}
+  if (hilflist[3]==1){field_ext=1;}
+  hne_conj=hilflist[5];
+
+  if (number_of_letztring != hilflist[2])
+  {  // Ringwechsel in Prozedur HN
+     map hole=HNE_noparam,transfproc,x,y;
+     setring HNE_noparam;
+     if (not(defined(f))) {poly f;}
+     f=imap(HNEring,f);
+     setring EXTHNEring(EXTHNEnumber);
+     if (not(defined(f))) {poly f; f=hole(f); export f;}
+     else                 {f=hole(f);}
+  } 
+  number_of_letztring = hilflist[2];
+  kill hilflist; 
  }
+
  if (NullHNEy==1) {
-  Ergebnis=Ergebnis+list(list(matrix(ideal(0,x)),intvec(1),int(0),poly(0)));
+  if ((typeof(hne[1])=="ideal")) { hne=list(); }
+  hne=hne+list(list(matrix(ideal(0,x)),intvec(1),int(0),poly(0)));
+  if (hne_conj==0) { hne_conj=1; }
+  else { hne_conj = hne_conj, 1; }
  }
  // --------------- Berechne HNE von allen verbliebenen Zweigen: --------------
  if (defined(HNDebugOn))
     {"2nd step: Treat Newton polygon until height",grenze2;}
  if (grenze2>0) {
+
+  if (EXTHNEnumber>0){ EXTHNEring = EXTHNEring(1..EXTHNEnumber); }
+
+  if (essential==1) { number_of_letztring=0; }
+  if (number_of_letztring==0) { setring HNEring; }
+  else                        { setring EXTHNEring(number_of_letztring); }
   map xytausch=basering,y,x;
+
+  HNE_RingDATA = list(HNEring, HNE_noparam, EXTHNEnumber, EXTHNEring,
+                      number_of_letztring); 
+  list hilflist=HN(HNE_RingDATA,xytausch(f),grenze2,1,essential,1,hne_conj,1);
+  kill HNEring, HNE_noparam;
+  if (EXTHNEnumber>0){ kill EXTHNEring(1..EXTHNEnumber); }
+  def HNEring = hilflist[1][1];
+  def HNE_noparam = hilflist[1][2];
+  EXTHNEnumber = hilflist[1][3];
+  for (i=1; i<=EXTHNEnumber; i++) { def EXTHNEring(i)=hilflist[1][4][i]; }
+  if (hilflist[2]==0) { setring HNEring; number_of_letztring=0; }
+  else                { setring EXTHNEring(hilflist[2]); 
+                        number_of_letztring=hilflist[2]; }
+  if (hilflist[3]==1){field_ext=1;}
+  hne_conj=hilflist[5];
   kill hilflist;
-  def letztring=basering;
-  if (EXTHNEnumber==0) { setring HNEring; }
-  else                 { setring EXTHNEring(EXTHNEnumber); }
-  list hilflist=HN(xytausch(f),grenze2,1,essential);
-  if (typeof(hilflist[1][1])=="ideal") { hilflist[1]=list(); }
-  if (not defined(Ergebnis)) {
- //-- HN wurde schon mal ausgefuehrt; Ringwechsel beim zweiten Aufruf von HN --
-    if (defined(HNDebugOn)) {" ring change in HN(",1,") detected";}
-    poly transfproc=hilflist[2];
-    map hole=HNE_noparam,transfproc,x,y;
-    setring HNE_noparam;
-    list Ergebnis=imap(letztring,Ergebnis);
-    setring EXTHNEring(EXTHNEnumber);
-    list Ergebnis=hole(Ergebnis);
-  }
-  Ergebnis=Ergebnis+extractHNEs(hilflist[1],1);
  }
  if (NullHNEx==1) {
-  Ergebnis=Ergebnis+list(list(matrix(ideal(0,x)),intvec(1),int(1),poly(0)));
+  if ((typeof(hne[1])=="ideal")) { hne=list(); }
+  hne=hne+list(list(matrix(ideal(0,x)),intvec(1),int(1),poly(0)));
+  if (hne_conj==0) { hne_conj=1; }
+  else { hne_conj = hne_conj, 1; }
  }
- //------------------- Loesche globale, nicht mehr benoetigte Objekte: --------
- if (EXTHNEnumber>0) {
-  if(system("with","Namespaces")) { kill Top::HNEring; }
-  if (defined(HNEring)) { kill HNEring; }
-  def HNEring=EXTHNEring(EXTHNEnumber);
-  setring HNEring;
-  export HNEring;
-  kill EXTHNEring(1..EXTHNEnumber);
- }
- kill HNE_noparam;
- kill EXTHNEnumber;
- export Ergebnis;
- keepring basering;
 
- return(Ergebnis);
+
+ // --- aufraeumen ---
+ if (defined(HNEakut)){ 
+   kill HNEakut,faktoren,deltais,transformiert,teiler,leitf;
+ }
+ if (defined(hilflist)) {kill hilflist;}
+ if (defined(erg)) {kill erg;}
+ if (defined(delt)) {kill delt;}
+ if (defined(azeilen)) { kill azeilen;}
+ if (defined(aneu)) { kill aneu;}
+ if (defined(transfproc)) { kill transfproc;}
+ if (defined(transf)) { kill transf;}
+ if (not(defined(f))) { poly f = imap(HNEring,f); export f; }
+
+ return(list(basering,field_ext,hne_conj));
 }
 
-///////////////////////////////////////////////////////////////////////////////
-//         
-//  the command essdevelop is obsolete  --> here is the former help string:
-//
-///////////////////////////////////////////////////////////////////////////////
-//ASSUME:  f is a bivariate polynomial (in the first 2 ring variables)
-//CREATE:  ring with name @code{HNEring}, variables @code{x,y} and ordering
-//         @code{ls} over a field extension of the current basering's ground 
-//         field. @*
-//         Since the Hamburger-Noether development of a reducible curve
-//         singularity usually does not exist in the originally given basering,
-//         @code{essdevelop} always defines @code{HNEring} and CHANGES to it.
-//         The field extension is chosen minimally.
-//RETURN:  list @code{L} of lists @code{L[i]} (corresponding to the output of
-//         @code{develop(f[i])}, f[i] an \"essential\" branch of f, but the
-//         last entry being omitted).@*
-//         For more details type @code{help reddevelop;}.
-//NOTE:    If the HNE needs a field extension, some of the branches will be
-//         conjugate. In this case @code{essdevelop} reduces the computation to
-//         one representative for each group of conjugate branches.@*
-//         Note that the degree of each branch is in general less than the
-//         degree of the field extension in which all HNEs can be put.@*
-//         Use @code{reddevelop} or @code{HNdevelop} to compute a complete HNE,
-//         i.e., a HNE for all branches.@*
-//         If @code{printlevel>=0} comments are displayed (default is
-//         @code{printlevel=0}).
-//SEE ALSO: hnexpansion, develop, reddevelop, HNdevelop, extdevelop
-//EXAMPLE: example essdevelop;  shows an example
+//////////////////////////////////////////////////////////////////////////////
 proc essdevelop (poly f)
 "USAGE:   essdevelop(f); f poly
 NOTE:     command is obsolete, use hnexpansion(f,\"ess\") instead.
 SEE ALSO: hnexpansion, develop, extdevelop, param
 "
 {
- list Ergebnis=pre_HN(f,1);
- dbprint(printlevel-voice+2,
-    "// result: "+string(size(Ergebnis))+" branch(es) successfully computed;");
- if (string(minpoly) <> "0") {
-   dbprint(printlevel-voice+2,
-    "// note that conjugate branches are omitted and that the number",
-    "// of branches represented by each remaining one may vary!");
- }
- dbprint(printlevel-voice+2,
-    "// basering has changed to HNEring");
- export Ergebnis;
- keepring basering;
+ printlevel=printlevel+1;
+ list Ergebnis=hnexpansion(f,1);
+ printlevel=printlevel-1;
  return(Ergebnis);
-}
-example
-{
-  // -------- prepare for example ---------
-  if (nameof(basering)=="HNEring") {
-   def rettering=HNEring;
-   kill HNEring;
-  }
-  // ------ the example starts here -------
-  "EXAMPLE:"; echo = 2;
-  ring r=2,(x,y),dp;
-  poly f=(x4+x2y+y2)*(x3+xy2+y3);
-  // --------- compute all branches: ---------
-  list hne=reddevelop(f);
-  displayHNE(hne[1]);   // HN-matrix of 1st branch
-  displayHNE(hne[4]);   // HN-matrix of 4th branch
-  setring r;
-  kill HNEring;
-  // --- compute only one of conjugate branches: ---
-  list hne=essdevelop(f);
-  displayHNE(hne);
-  // no. 1 of essdevelop represents no. 1 - 3 of reddevelop and
-  // no. 2 of essdevelop represents no. 4 + 5 of reddevelop
-  kill HNEring,r;
-  echo = 0;
-  // --- restore HNEring if previously defined ---
-  if (defined(rettering)) {
-   setring rettering;
-   def HNEring=rettering;
-   export HNEring;
-  }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static proc HN (poly f,int grenze, int Aufruf_Ebene, int essential)
-"NOTE: This procedure is only for internal use, it is called via pre_HN"
+static proc HN (list HNE_RingDATA,poly fneu,int grenze,Aufruf_Ebene,
+                     essential,getauscht,intvec hne_conj,int conj_factor)  
+"NOTE: This procedure is only for internal use, it is called via pre_HN
+RETURN: list: first entry = list of HNErings, 
+              second entry = number of new base ring (0 for HNEring,
+                                                      -1 for HNE_noparam,
+                                                      i for EXTHNEring(i))
+              third entry = 0 if no field extension necessary
+                            1 if field extension necessary
+              forth entry = HNEs (only if no change of basering)
+"
 {
  //---------- Variablendefinitionen fuer den unverzweigten Teil: --------------
  if (defined(HNDebugOn)) {"procedure HN",Aufruf_Ebene;}
- int Abbruch,ende,i,j,e,M,N,Q,R,zeiger,zeile,zeilevorher;
+ int Abbruch,ende,i,j,k,e,M,N,Q,R,zeiger,zeile,zeilevorher,dd;
  intvec hqs;
+ int field_ext;
+ int ring_changed, hneshift;
+ intvec conjugates,conj2,conj1;
+
+ list EXTHNEring;
+ def HNEring = HNE_RingDATA[1];
+ def HNE_noparam = HNE_RingDATA[2];
+ int EXTHNEnumber = HNE_RingDATA[3];
+ for (i=1; i<=EXTHNEnumber; i++) { def EXTHNEring(i)=HNE_RingDATA[4][i]; }
+ int number_of_letztring = HNE_RingDATA[5];
+ if (defined(basering))
+ { 
+   if (number_of_letztring==0) { kill HNEring; def HNEring=basering; }
+   else                 { kill EXTHNEring(number_of_letztring); 
+                          def EXTHNEring(number_of_letztring)=basering; }
+ }
+ else
+ {
+   if ( number_of_letztring==0) { setring HNEring; }
+   else                         { setring EXTHNEring(number_of_letztring); } 
+ }
+ if (not(defined(hne))) {list hne;}
  poly fvorher;
  list erg=ideal(0); list HNEs=ideal(0); // um die Listen an den Ring zu binden
 
@@ -3510,11 +3278,12 @@ static proc HN (poly f,int grenze, int Aufruf_Ebene, int essential)
  number delt;
  int p = char(basering);                // Ringcharakteristik
  list azeilen=ideal(0);
- ideal hilfid; list hilflist=ideal(0); intvec hilfvec;
+
+ ideal hilfid; intvec hilfvec;
 
  // ======================= der unverzweigte Teil: ============================
  while (Abbruch==0) {
-  Newton=newtonpoly(f,1);
+  Newton=newtonpoly(fneu,1);
   zeiger=find_in_list(Newton,grenze);
   if (Newton[zeiger][2] != grenze)
     {"Didn't find an edge in the Newton polygon!";}
@@ -3525,67 +3294,71 @@ static proc HN (poly f,int grenze, int Aufruf_Ebene, int essential)
     R = M%N;
     Q = M / N;
 
- //-------- 1. Versuch: ist der quasihomogene Leitterm reine Potenz ? ---------
- //              (dann geht alles wie im irreduziblen Fall)
- //----------------------------------------------------------------------------
+    //-------- 1. Versuch: ist der quasihomogene Leitterm reine Potenz ? ------
+    //              (dann geht alles wie im irreduziblen Fall)
+    //-------------------------------------------------------------------------
     e = gcd(M,N);
-    delt=factorfirst(redleit(f,Newton[zeiger],Newton[zeiger+1])
+    delt=factorfirst(redleit(fneu,Newton[zeiger],Newton[zeiger+1])
                       /x^Newton[zeiger][1],M,N);
     if (delt==0) {
       if (defined(HNDebugOn)) {" The given polynomial is reducible !";}
       Abbruch=1;
     }
     if (Abbruch==0) {
- //-------------- f,zeile retten fuer den Spezialfall (###): ------------------
-      fvorher=f;zeilevorher=zeile;
+      //----------- fneu,zeile retten fuer den Spezialfall (###): -------------
+      fvorher=fneu;zeilevorher=zeile;
       if (R==0) {
- //------------- transformiere f mit T1, wenn kein Abbruch nachher: -----------
-        if (N>1) { f = T1_Transform(f,delt,M/ e); }
+        //-------- transformiere fneu mit T1, wenn kein Abbruch nachher: ------
+        if (N>1) { fneu = T1_Transform(fneu,delt,M/ e); }
         else     { ende=1; }
         if (defined(HNDebugOn)) {"a("+string(zeile)+","+string(Q)+") =",delt;}
         azeilen[zeile+1][Q]=delt;
       }
       else {
- //------------- R > 0 : transformiere f mit T2 -------------------------------
-        erg=T2_Transform(f,delt,M,N,referencepoly(Newton));
-        f=erg[1];delt=erg[2];
- //------- vollziehe Euklid.Alg. nach, um die HN-Matrix zu berechnen: ---------
+        //------------- R > 0 : transformiere fneu mit T2 ---------------------
+        erg=T2_Transform(fneu,delt,M,N,referencepoly(Newton));
+        fneu=erg[1];delt=erg[2];
+        //----- vollziehe Euklid.Alg. nach, um die HN-Matrix zu berechnen: ----
         while (R!=0) {
          if (defined(HNDebugOn)) { "h("+string(zeile)+") =",Q; }
          hqs[zeile+1]=Q;         // denn zeile beginnt mit dem Wert 0
- //------------------ markiere das Zeilenende der HNE: ------------------------
+         //--------------- markiere das Zeilenende der HNE: -------------------
          azeilen[zeile+1][Q+1]=x;
          zeile=zeile+1;
- //----------- Bereitstellung von Speicherplatz fuer eine neue Zeile: ---------
+         //-------- Bereitstellung von Speicherplatz fuer eine neue Zeile: ----
          azeilen[zeile+1]=ideal(0);
          M=N; N=R; R=M%N; Q=M / N;
         }
         if (defined(HNDebugOn)) {"a("+string(zeile)+","+string(Q)+") =",delt;}
         azeilen[zeile+1][Q]=delt;
       }
-      if (defined(HNDebugOn)) {"transformed polynomial: ",f;}
+      if (defined(HNDebugOn)) {"transformed polynomial: ",fneu;}
       grenze=e;
- //----------------------- teste Abbruchbedingungen: --------------------------
-      if (subst(f,y,0)==0) {              // <==> y|f
+      //----------------------- teste Abbruchbedingungen: ---------------------
+      if (subst(fneu,y,0)==0) {              // <==> y|fneu
         dbprint(printlevel-voice+3,"finite HNE of one branch found");
            // voice abzufragen macht bei rekursiven procs keinen Sinn
         azeilen[zeile+1][Q+1]=x;
- //- Q wird nur in hqs eingetragen, wenn der Spezialfall nicht eintritt (s.u.)-
+        //----- Q wird nur in hqs eingetragen, wenn der Spezialfall nicht 
+        //      eintritt (siehe unten) -----
         Abbruch=2;
         if (grenze>1) {
-         if (jet(f,1,intvec(0,1))==0) {
- //------ jet(...)=alle Monome von f, die nicht durch y2 teilbar sind ---------
- "THE TEST FOR SQUAREFREENESS WAS BAD!! The polynomial was NOT squarefree!!!";}
+         if (jet(fneu,1,intvec(0,1))==0) {
+           //- jet(...)=alle Monome von fneu, die nicht durch y2 teilbar sind -
+           "THE TEST FOR SQUAREFREENESS WAS BAD!!";
+           " The polynomial was NOT squarefree!!!";}
          else {
- //-------------------------- Spezialfall (###): ------------------------------
- // Wir haben das Problem, dass die HNE eines Zweiges hier abbricht, aber ein
- // anderer Zweig bis hierher genau die gleiche HNE hat, die noch weiter geht
- // Loesung: mache Transform. rueckgaengig und behandle f im Verzweigungsteil
- //----------------------------------------------------------------------------
+           //----------------------- Spezialfall (###): -----------------------
+           // Wir haben das Problem, dass die HNE eines Zweiges hier abbricht,
+           // aber ein anderer Zweig bis hierher genau die gleiche HNE hat, die
+           // noch weiter geht 
+           // Loesung: mache Transform. rueckgaengig und behandle fneu im 
+           // Verzweigungsteil
+           //------------------------------------------------------------------
           Abbruch=1;
-          f=fvorher;zeile=zeilevorher;grenze=Newton[zeiger][2];
+          fneu=fvorher;zeile=zeilevorher;grenze=Newton[zeiger][2];
         }}
-        else {f=0;}     // f nicht mehr gebraucht - spare Speicher
+        else {fneu=0;}     // fneu nicht mehr gebraucht - spare Speicher
         if (Abbruch==2) { hqs[zeile+1]=Q; }
       }                 // Spezialfall nicht eingetreten
       else {
@@ -3599,14 +3372,13 @@ static proc HN (poly f,int grenze, int Aufruf_Ebene, int essential)
  }                      // end(while Abbruch==0)
 
  // ===================== der Teil bei Verzweigung: ===========================
-
  if (Abbruch==1) {
- //---------- Variablendefinitionen fuer den verzweigten Teil: ----------------
+  //---------- Variablendefinitionen fuer den verzweigten Teil: ---------------
   poly leitf,teiler,transformiert;
   list aneu=ideal(0);
   list faktoren;
-  list HNEakut=ideal(0);
   ideal deltais;
+  list HNEakut=ideal(0);  
   intvec eis;
   int zaehler,hnezaehler,zl,zl1,M1,N1,R1,Q1,needext;
   int numberofRingchanges,lastRingnumber,ringischanged,flag;
@@ -3619,8 +3391,31 @@ static proc HN (poly f,int grenze, int Aufruf_Ebene, int essential)
   }
   azeilen=list(hqs)+azeilen; // hat jetzt Struktur von HNEs: hqs in der 1.Zeile
 
- //======= Schleife fuer jede zu betrachtende Seite des Newtonpolygons: =======
+  //======= Schleife fuer jede zu betrachtende Seite des Newtonpolygons: ======
   for(i=zeiger; i<size(Newton); i++) {
+   if ((essential==1) and (EXTHNEnumber>number_of_letztring)) { 
+     // ----- setze ring zurueck fuer neue Kante  -----
+     // ---- (damit konjugierte Zweige erkennbar) -----
+     hneshift=hneshift+hnezaehler;
+     hnezaehler=0;
+     ring_changed=0;
+     def SaveRing = EXTHNEring(EXTHNEnumber);
+     setring SaveRing;
+     if (not(defined(HNEs))) { // HN wurde zum 2.Mal von pre_HN aufgerufen
+       list HNEs=ideal(0); 
+     }
+     for (k=number_of_letztring+1; k<=EXTHNEnumber; k++) { kill EXTHNEring(k);}
+     EXTHNEnumber=number_of_letztring;    
+     if (EXTHNEnumber==0) { setring HNEring; }
+     else                 { setring EXTHNEring(EXTHNEnumber); }
+     if (not(defined(HNEs))) { list HNEs; }
+     HNEs=ideal(0);
+     deltais=0;
+     delt=0;
+     if (defined(zerlege)) { kill zerlege; }
+"Hier durch gelaufen";
+   }
+
    if (defined(HNDebugOn)) { "we consider side",Newton[i],Newton[i+1]; }
    M=Newton[i+1][1]-Newton[i][1];
    N=Newton[i][2]-Newton[i+1][2];
@@ -3630,33 +3425,54 @@ static proc HN (poly f,int grenze, int Aufruf_Ebene, int essential)
    needext=1;
    letztringname=nameof(basering);
    lastRingnumber=EXTHNEnumber;
-   faktoren=list(ideal(charPoly(redleit(f,Newton[i],Newton[i+1])
+   faktoren=list(ideal(charPoly(redleit(fneu,Newton[i],Newton[i+1])
                        /(x^Newton[i][1]*y^Newton[i+1][2]),M,N)  ),
                  intvec(1));                  // = (zu faktoriserendes Poly, 1)
+   conjugates=1;
 
- //-- wechsle so lange in Ringerw., bis Leitform vollst. in Linearfakt. zerf.:-
+   //-- wechsle so lange in Ringerweiterungen, bis Leitform vollstaendig
+   //   in Linearfaktoren zerfaellt -----
    for (numberofRingchanges=1; needext==1; numberofRingchanges++) {
-    leitf=redleit(f,Newton[i],Newton[i+1])/(x^Newton[i][1]*y^Newton[i+1][2]);
+    leitf=redleit(fneu,Newton[i],Newton[i+1])/
+                     (x^Newton[i][1]*y^Newton[i+1][2]); 
     delt=factorfirst(leitf,M,N);
     needext=0;
     if (delt==0) {
-
- //---------- Sonderbehandlung: faktorisiere einige Polynome ueber Q(a): -------
-     if (charstr(basering)=="0,a") {
-//*CL old: faktoren=factorize(charPoly(leitf,M,N),2);  // damit funktion. Bsp. Baladi 5
-         faktoren=factorize(charPoly(leitf,M,N));  
+     //---------- Sonderbehandlung: faktorisiere einige Polynome ueber Q(a): --
+     if ((charstr(basering)=="0,a") and (essential==0)) {
+        faktoren=factorize(charPoly(leitf,M,N));  
+        conjugates=1;
+        for (k=2;k<=size(faktoren[2]);k++) {conjugates=conjugates,1;}
      }
      else {
- //------------------ faktorisiere das charakt. Polynom: ----------------------
+       //------------------ faktorisiere das charakt. Polynom: ----------------
        if ((numberofRingchanges==1) or (essential==0)) {
-         faktoren=factorlist(faktoren);
+         def L_help=factorlist(faktoren,conjugates);
+         faktoren=L_help[1];
+         conjugates=L_help[2]*conj_factor;
+         kill L_help;
        }
        else {     // eliminiere alle konjugierten Nullstellen bis auf eine:
          ideal hilf_id;
          for (zaehler=1; zaehler<=size(faktoren[1]); zaehler++) {
-           hilf_id=factorize(faktoren[1][zaehler])[1];
-           if (size(hilf_id)>1) { faktoren[1][zaehler]=hilf_id[2]; }
-           else                 { faktoren[1][zaehler]=hilf_id[1]; }
+           hilf_id=factorize(faktoren[1][zaehler],1);  // war vorher ...)[1];
+           if (size(hilf_id)>1) {
+             poly fac=hilf_id[1];
+             dd=deg(fac);
+             // Zur Sicherheit:
+             if (deg(fac)==0) { fac=hilf_id[2]; }
+             for (k=2;k<=size(hilf_id);k++) {
+               dd=dd+deg(hilf_id[k]);
+               if (deg(hilf_id[k])<deg(fac)) { fac=hilf_id[k]; } 
+             }
+             faktoren[1][zaehler]=fac;
+             kill fac; 
+             conjugates[zaehler]=conj_factor*dd; 
+           }
+           else { 
+             faktoren[1][zaehler]=hilf_id[1]; 
+             conjugates[zaehler]=conj_factor; 
+           }
          }
        }
      }
@@ -3664,102 +3480,143 @@ static proc HN (poly f,int grenze, int Aufruf_Ebene, int essential)
      zaehler=1; eis=0;
      for (j=1; j<=size(faktoren[2]); j++) {
       teiler=faktoren[1][j];
-      if (teiler/y != 0) {         // sonst war's eine Einheit --> wegwerfen!
+      if (teiler/y != 0) {         // sonst war's eine Konstante --> wegwerfen!
         if (defined(HNDebugOn)) {"factor of leading form found:",teiler;}
         if (teiler/y2 == 0) {      // --> Faktor hat die Form cy+d
           deltais[zaehler]=-subst(teiler,y,0)/koeff(teiler,0,1); //=-d/c
           eis[zaehler]=faktoren[2][j];
+          conj2[zaehler]=conjugates[j];
           zaehler++;
         }
         else {
           dbprint(printlevel-voice+2,
              " Change of basering (field extension) necessary!");
-          if (defined(HNDebugOn)) { teiler,"is not properly factored!"; }
+          if (defined(HNDebugOn)) { teiler,"is not yet properly factorized!"; }
           if (needext==0) { poly zerlege=teiler; }
           needext=1;
+          field_ext=1;
         }
       }
-     }                             // end(for j)
+     }  // end(for j)
     }
-    else { deltais=ideal(delt); eis=e;}
+    else { deltais=ideal(delt); eis=e; conj2=conj_factor; }
     if (defined(HNDebugOn)) {"roots of char. poly:";deltais;
                              "with multiplicities:",eis;}
     if (needext==1) {
- //--------------------- fuehre den Ringwechsel aus: --------------------------
+      //--------------------- fuehre den Ringwechsel aus: ---------------------
       ringischanged=1;
       if ((size(parstr(basering))>0) && string(minpoly)=="0") {
-        " ** We've had bad luck! The HNE cannot completely be calculated!";
-                                   // HNE in transzendenter Erw. fehlgeschlagen
+        " ** We've had bad luck! The HNE cannot be calculated completely!";
+        // HNE in transzendenter Erweiterung fehlgeschlagen
         kill zerlege;
         ringischanged=0; break;    // weiter mit gefundenen Faktoren
       }
       if (parstr(basering)=="") {
-        EXTHNEnumber++;
-        splitring(zerlege,"EXTHNEring("+string(EXTHNEnumber)+")");
+        EXTHNEnumber++; 
+        def EXTHNEring(EXTHNEnumber) = splitring(zerlege);
+        setring EXTHNEring(EXTHNEnumber);
+
         poly transf=0;
         poly transfproc=0;
+        ring_changed=1;
+        export transfproc; 
       }
       else {
-        if (defined(translist)) { kill translist; } // Vermeidung einer Warnung
         if (numberofRingchanges>1) {  // ein Ringwechsel hat nicht gereicht
-         list translist=splitring(zerlege,"",list(transf,transfproc,faktoren));
-         poly transf=translist[1];
-         poly transfproc=translist[2];
-         list faktoren=translist[3];
+         def helpring = splitring(zerlege,list(transf,transfproc,faktoren)); 
+         kill EXTHNEring(EXTHNEnumber);
+         def EXTHNEring(EXTHNEnumber)=helpring;
+         setring EXTHNEring(EXTHNEnumber);
+         kill helpring;
+
+         poly transf=erg[1];
+         poly transfproc=erg[2];
+         ring_changed=1;
+         list faktoren=erg[3];
+         export transfproc;
+         kill erg;
         }
         else {
-         if (defined(transfproc)) { // in dieser proc geschah schon Ringwechsel
+         if (ring_changed==1) { // in dieser proc geschah schon Ringwechsel
           EXTHNEnumber++;
-          list translist=splitring(zerlege,"EXTHNEring("
-               +string(EXTHNEnumber)+")",list(a,transfproc));
-          poly transf=translist[1];
-          poly transfproc=translist[2];
+          def EXTHNEring(EXTHNEnumber) = splitring(zerlege,list(a,transfproc));
+          setring EXTHNEring(EXTHNEnumber);
+          poly transf=erg[1];
+          poly transfproc=erg[2];
+          export transfproc;
+          kill erg;
          }
-         else {
+         else { // parameter war vorher da
           EXTHNEnumber++;
-          list translist=splitring(zerlege,"EXTHNEring("
-               +string(EXTHNEnumber)+")",a);
-          poly transf=translist[1];
+          def EXTHNEring(EXTHNEnumber) = splitring(zerlege,a);
+          setring EXTHNEring(EXTHNEnumber);
+          poly transf=erg[1];
           poly transfproc=transf;
+          ring_changed=1;
+          export transfproc;
+          kill erg;
         }}
       }
- //----------------------------------------------------------------------------
- // transf enthaelt jetzt den alten Parameter des Ringes, der aktiv war vor
- // Beginn der Schleife (evtl. also ueber mehrere Ringwechsel weitergereicht),
- // transfproc enthaelt den alten Parm. des R., der aktiv war zu Beginn der
- // Prozedur, und der an die aufrufende Prozedur zurueckgegeben werden muss
- // transf ist Null, falls der alte Ring keinen Parameter hatte,
- // das gleiche gilt fuer transfproc
- //----------------------------------------------------------------------------
+      //-----------------------------------------------------------------------
+      // transf enthaelt jetzt den alten Parameter des Ringes, der aktiv war 
+      // vor Beginn der Schleife (evtl. also ueber mehrere Ringwechsel 
+      // weitergereicht), 
+      // transfproc enthaelt den alten Parameter des Ringes, der aktiv war zu 
+      // Beginn der Prozedur, und der an die aufrufende Prozedur zurueckgegeben
+      // werden muss 
+      // transf ist Null, falls der alte Ring keinen Parameter hatte,
+      // das gleiche gilt fuer transfproc
+      //-----------------------------------------------------------------------
 
- //------ Neudef. von Variablen, Uebertragung bisher errechneter Daten: -------
+      //---- Neudef. von Variablen, Uebertragung bisher errechneter Daten: ----
       poly leitf,teiler,transformiert;
       list aneu=ideal(0);
       ideal deltais;
       number delt;
       setring HNE_noparam;
       if (defined(letztring)) { kill letztring; }
-      if (lastRingnumber>0) { def letztring=EXTHNEring(lastRingnumber); }
-      else                  { def letztring=HNEring; }
+      if (EXTHNEnumber>1) { def letztring=EXTHNEring(EXTHNEnumber-1); }
+      else                { def letztring=HNEring; }
+      if (not defined(fneu)) {poly fneu;}
+      fneu=imap(letztring,fneu);
+      if (not defined(f)) {poly f;}
       f=imap(letztring,f);
+      if (not defined(hne)) {list hne;}
+      hne=imap(letztring,hne);
+
+      if (not defined(faktoren)) {list faktoren; }
       faktoren=imap(letztring,faktoren);
+        
+      if (not(defined(azeilen))){list azeilen,HNEs;}
+      azeilen=imap(letztring,azeilen);
+      HNEs=imap(letztring,HNEs);
+
       setring EXTHNEring(EXTHNEnumber);
-      map hole=HNE_noparam,transf,x,y;
-      poly f=hole(f);
-      if (not defined(faktoren)) {
-        list faktoren=hole(faktoren);
+      if (not(defined(hole))) { map hole; }
+      hole=HNE_noparam,transf,x,y;
+      poly fneu=hole(fneu);
+      if (not defined(faktoren)) {list faktoren;}
+      faktoren=hole(faktoren);
+
+      if (not(defined(f)))
+      {
+        poly f=hole(f);
+        list hne=hole(hne);
+        export f,hne;      
       }
     }
    }    // end (while needext==1) bzw. for (numberofRingchanges)
 
    if (eis==0) { i++; continue; }
    if (ringischanged==1) {
-    list erg,hilflist,HNEakut;            // dienen nur zum Sp. von Zwi.erg.
+    list erg,HNEakut;            // dienen nur zum Sp. von Zwi.erg.
+
     ideal hilfid;
-    erg=ideal(0); hilflist=erg; HNEakut=erg;
+    erg=ideal(0); HNEakut=erg;
 
     hole=HNE_noparam,transf,x,y;
     setring HNE_noparam;
+    if (not(defined(azeilen))){list azeilen,HNEs;}
     azeilen=imap(letztring,azeilen);
     HNEs=imap(letztring,HNEs);
 
@@ -3770,13 +3627,14 @@ static proc HN (poly f,int grenze, int Aufruf_Ebene, int essential)
     ringischanged=0;
    }
 
- //============ Schleife fuer jeden gefundenen Faktor der Leitform: ===========
+   //============ Schleife fuer jeden gefundenen Faktor der Leitform: =========
    for (j=1; j<=size(eis); j++) {
- //-- Mache Transf. T1 oder T2, trage Daten in HNEs ein, falls HNE abbricht: --
+     //---- Mache Transformation T1 oder T2, trage Daten in HNEs ein, 
+     //     falls HNE abbricht: ----
 
- //------------------------ Fall R==0: ----------------------------------------
+    //------------------------ Fall R==0: -------------------------------------
     if (R==0) {
-      transformiert = T1_Transform(f,number(deltais[j]),M/ e);
+      transformiert = T1_Transform(fneu,number(deltais[j]),M/ e);
       if (defined(HNDebugOn)) {
         "a("+string(zeile)+","+string(Q)+") =",deltais[j];
         "transformed polynomial: ",transformiert;
@@ -3784,42 +3642,44 @@ static proc HN (poly f,int grenze, int Aufruf_Ebene, int essential)
       if (subst(transformiert,y,0)==0) {
        dbprint(printlevel-voice+3,"finite HNE found");
        hnezaehler++;
- //------------ trage deltais[j],x ein in letzte Zeile, fertig: ---------------
+       //-------- trage deltais[j],x ein in letzte Zeile, fertig: -------------
        HNEakut=azeilen+list(poly(0));        // =HNEs[hnezaehler];
        hilfid=HNEakut[zeile+2]; hilfid[Q]=deltais[j]; hilfid[Q+1]=x;
        HNEakut[zeile+2]=hilfid;
        HNEakut[1][zeile+1]=Q;                // aktualisiere Vektor mit den hqs
        HNEs[hnezaehler]=HNEakut;
+       conj1[hneshift+hnezaehler]=conj2[j];
        if (eis[j]>1) {
         transformiert=transformiert/y;
-        if (subst(transformiert,y,0)==0) {
- "THE TEST FOR SQUAREFREENESS WAS BAD!! The polynomial was NOT squarefree!!!";}
+        if (subst(transformiert,y,0)==0){"THE TEST FOR SQUAREFREENESS WAS BAD!"
+                                  +"! The polynomial was NOT squarefree!!!";}
         else {
- //------ Spezialfall (###) eingetreten: Noch weitere Zweige vorhanden --------
+          //--- Spezialfall (###) eingetreten: Noch weitere Zweige vorhanden --
           eis[j]=eis[j]-1;
         }
        }
       }
     }
     else {
- //------------------------ Fall R <> 0: --------------------------------------
-      erg=T2_Transform(f,number(deltais[j]),M,N,referencepoly(Newton));
+      //------------------------ Fall R <> 0: ---------------------------------
+      erg=T2_Transform(fneu,number(deltais[j]),M,N,referencepoly(Newton));
       transformiert=erg[1];delt=erg[2];
       if (defined(HNDebugOn)) {"transformed polynomial: ",transformiert;}
       if (subst(transformiert,y,0)==0) {
        dbprint(printlevel-voice+3,"finite HNE found");
        hnezaehler++;
- //---------------- trage endliche HNE in HNEs ein: ---------------------------
+       //---------------- trage endliche HNE in HNEs ein: ---------------------
        HNEakut=azeilen;           // dupliziere den gemeins. Anfang der HNE's
        zl=2;                      // (kommt schliesslich nach HNEs[hnezaehler])
- //----------------------------------------------------------------------------
- // Werte von:  zeile: aktuelle Zeilennummer der HNE (gemeinsamer Teil)
- //             zl   : die HNE spaltet auf; zeile+zl ist der Index fuer die
- // Zeile des aktuellen Zweigs; (zeile+zl-2) ist die tatsaechl. Zeilennr.
- // (bei 0 angefangen) der HNE  ([1] <- intvec(hqs), [2] <- 0. Zeile usw.)
- //----------------------------------------------------------------------------
+       //----------------------------------------------------------------------
+       // Werte von:  zeile: aktuelle Zeilennummer der HNE (gemeinsamer Teil)
+       //             zl : die HNE spaltet auf; zeile+zl ist der Index fuer die
+       //                  Zeile des aktuellen Zweigs; (zeile+zl-2) ist die 
+       //                  tatsaechl. Zeilennr. (bei 0 angefangen) der HNE  
+       //                  ([1] <- intvec(hqs), [2] <- 0. Zeile usw.)
+       //----------------------------------------------------------------------
 
- //---------- vollziehe Euklid.Alg. nach, um die HN-Matrix zu berechnen: ------
+       //----- vollziehe Euklid.Alg. nach, um die HN-Matrix zu berechnen: -----
        M1=M;N1=N;R1=R;Q1=M1/ N1;
        while (R1!=0) {
         if (defined(HNDebugOn)) { "h("+string(zeile+zl-2)+") =",Q1; }
@@ -3827,7 +3687,7 @@ static proc HN (poly f,int grenze, int Aufruf_Ebene, int essential)
         HNEakut[zeile+zl][Q1+1]=x;
                                   // markiere das Zeilenende der HNE
         zl=zl+1;
- //-------- Bereitstellung von Speicherplatz fuer eine neue Zeile: ------------
+        //----- Bereitstellung von Speicherplatz fuer eine neue Zeile: --------
         HNEakut[zeile+zl]=ideal(0);
 
         M1=N1; N1=R1; R1=M1%N1; Q1=M1 / N1;
@@ -3840,81 +3700,114 @@ static proc HN (poly f,int grenze, int Aufruf_Ebene, int essential)
        HNEakut[1][zeile+zl-1] =Q1;     // aktualisiere Vektor mit hqs
        HNEakut[zeile+zl+1]=poly(0);
        HNEs[hnezaehler]=HNEakut;
- //-------------------- Ende der Eintragungen in HNEs -------------------------
+       conj1[hneshift+hnezaehler]=conj2[j];
+
+       //-------------------- Ende der Eintragungen in HNEs -------------------
 
        if (eis[j]>1) {
         transformiert=transformiert/y;
-        if (subst(transformiert,y,0)==0) {
- "THE TEST FOR SQUAREFREENESS WAS BAD!! The polynomial was NOT squarefree!!!";}
+        if (subst(transformiert,y,0)==0){"THE TEST FOR SQUAREFREENESS WAS BAD!"
+                               +" The polynomial was NOT squarefree!!!";}
          else {
- //--------- Spezialfall (###) eingetreten: Noch weitere Zweige vorhanden -----
+          //--- Spezialfall (###) eingetreten: Noch weitere Zweige vorhanden --
           eis[j]=eis[j]-1;
        }}
       }                           // endif (subst()==0)
     }                             // endelse (R<>0)
 
- //========== Falls HNE nicht abbricht: Rekursiver Aufruf von HN: =============
- //------------------- Berechne HNE von transformiert -------------------------
+    //========== Falls HNE nicht abbricht: Rekursiver Aufruf von HN: ==========
+    //------------------- Berechne HNE von transformiert ----------------------
     if (subst(transformiert,y,0)!=0) {
      lastRingnumber=EXTHNEnumber;
-     list HNerg=HN(transformiert,eis[j],Aufruf_Ebene+1,essential);
-     if (HNerg[2]==-1) {          // kein Ringwechsel in HN aufgetreten
-       aneu=HNerg[1];  }
-     else {
+
+     if (EXTHNEnumber>0){ EXTHNEring = EXTHNEring(1..EXTHNEnumber); }
+     HNE_RingDATA = list( HNEring, HNE_noparam, EXTHNEnumber, EXTHNEring, 
+                          lastRingnumber); 
+     if (defined(HNerg)) {kill HNerg;}
+     list HNerg=HN(HNE_RingDATA,transformiert,eis[j],Aufruf_Ebene+1,
+                                essential,getauscht,hne_conj,conj2[j]);    
+     HNE_RingDATA = HNerg[1];
+     if (conj1==0) { conj1=HNerg[5]; }
+     else  { conj1 = conj1,HNerg[5]; }
+
+     if (HNerg[3]==1) { field_ext=1; }
+     if (HNerg[2]==lastRingnumber) { // kein Ringwechsel in HN aufgetreten
+       if (not(defined(aneu))) { list aneu; }
+       aneu = HNerg[4];
+     }
+     else { // Ringwechsel aufgetreten
        if (defined(HNDebugOn))
           {" ring change in HN(",Aufruf_Ebene+1,") detected";}
-       list aneu=HNerg[1];
-       poly transfproc=HNerg[2];
+       EXTHNEnumber = HNerg[1][3];
+       for (i=lastRingnumber+1; i<=EXTHNEnumber; i++) { 
+         def EXTHNEring(i)=HNerg[1][4][i]; 
+       } 
+       if (HNerg[2]==0) { setring HNEring; }
+       else             { setring EXTHNEring(HNerg[2]); }
+       def tempRing=HNerg[4];
+       def aneu=imap(tempRing,HNEs);
+       kill tempRing;
 
- //- stelle lokale Var. im neuen Ring wieder her und rette ggf. ihren Inhalt: -
-       list erg,hilflist,faktoren,HNEakut;
-       ideal hilfid;
-       erg=ideal(0); hilflist=erg; faktoren=erg; HNEakut=erg;
+       //--- stelle lokale Variablen im neuen Ring wieder her, und rette 
+       //    gegebenenfalls ihren Inhalt: ----
+       list erg,faktoren,HNEakut;
+       ideal hilfid;      
+       erg=ideal(0); faktoren=erg; HNEakut=erg;
        poly leitf,teiler,transformiert;
-
        map hole=HNE_noparam,transfproc,x,y;
        setring HNE_noparam;
        if (lastRingnumber>0) { def letztring=EXTHNEring(lastRingnumber); }
        else                  { def letztring=HNEring; }
        HNEs=imap(letztring,HNEs);
+       if (not defined(azeilen)) {list azeilen;}
        azeilen=imap(letztring,azeilen);
+       if (not defined(deltais)) {ideal deltais;}
        deltais=imap(letztring,deltais);
+       if (not defined(delt)) {poly delt;}
        delt=imap(letztring,delt);
+       if (not defined(fneu)) {poly fneu;}
+       fneu=imap(letztring,fneu);
+       if (not defined(f)) {poly f;}
        f=imap(letztring,f);
+       if (not defined(hne)) {list hne;}
+       hne=imap(letztring,hne);
 
        setring EXTHNEring(EXTHNEnumber);
        list HNEs=hole(HNEs);
        list azeilen=hole(azeilen);
        ideal deltais=hole(deltais);
        number delt=number(hole(delt));
-       poly f=hole(f);
+       poly fneu=hole(fneu);
+       if (not(defined(f)))
+       { 
+         poly f=hole(f);
+         list hne=hole(hne);
+         export f,hne;
+       }
      }
-     kill HNerg;
- //----------------------------------------------------------------------------
- // HNerg muss jedesmal mit "list" neu definiert werden, weil vorher noch nicht
- // ------- klar ist, ob der Ring nach Aufruf von HN noch derselbe ist --------
 
- //============= Verknuepfe bisherige HNE mit von HN gelieferten HNEs: ========
+     //========== Verknuepfe bisherige HNE mit von HN gelieferten HNEs: ======
      if (R==0) {
        HNEs,hnezaehler=constructHNEs(HNEs,hnezaehler,aneu,azeilen,zeile,
                        deltais,Q,j);
+       kill aneu; 
      }
      else {
       for (zaehler=1; zaehler<=size(aneu); zaehler++) {
        hnezaehler++;
        HNEakut=azeilen;          // dupliziere den gemeinsamen Anfang der HNE's
        zl=2;                     // (kommt schliesslich nach HNEs[hnezaehler])
- //---------------- Trage Beitrag dieser Transformation T2 ein: ---------------
- //--------- Zur Bedeutung von zeile, zl: siehe Kommentar weiter oben ---------
+       //------------ Trage Beitrag dieser Transformation T2 ein: -------------
+       //------ Zur Bedeutung von zeile, zl: siehe Kommentar weiter oben ------
 
- //--------- vollziehe Euklid.Alg. nach, um die HN-Matrix zu berechnen: -------
+       //----- vollziehe Euklid.Alg. nach, um die HN-Matrix zu berechnen: -----
        M1=M;N1=N;R1=R;Q1=M1/ N1;
        while (R1!=0) {
         if (defined(HNDebugOn)) { "h("+string(zeile+zl-2)+") =",Q1; }
         HNEakut[1][zeile+zl-1]=Q1;
         HNEakut[zeile+zl][Q1+1]=x;    // Markierung des Zeilenendes der HNE
         zl=zl+1;
- //-------- Bereitstellung von Speicherplatz fuer eine neue Zeile: ------------
+        //----- Bereitstellung von Speicherplatz fuer eine neue Zeile: --------
         HNEakut[zeile+zl]=ideal(0);
         M1=N1; N1=R1; R1=M1%N1; Q1=M1 / N1;
        }
@@ -3923,42 +3816,208 @@ static proc HN (poly f,int grenze, int Aufruf_Ebene, int essential)
        }
        HNEakut[zeile+zl][Q1]=delt;
 
- //--- Daten aus T2_Transform sind eingetragen; haenge Daten von HN an: -------
+       //-- Daten aus T2_Transform sind eingetragen; haenge Daten von HN an: --
        hilfid=HNEakut[zeile+zl];
        for (zl1=Q1+1; zl1<=ncols(aneu[zaehler][2]); zl1++) {
         hilfid[zl1]=aneu[zaehler][2][zl1];
        }
        HNEakut[zeile+zl]=hilfid;
- //--- vorher HNEs[.][zeile+zl]<-aneu[.][2], jetzt [zeile+zl+1] <- [3] usw.: --
+       // ------ vorher HNEs[.][zeile+zl]<-aneu[.][2], 
+       //        jetzt [zeile+zl+1] <- [3] usw.: --------
        for (zl1=3; zl1<=size(aneu[zaehler]); zl1++) {
          HNEakut[zeile+zl+zl1-2]=aneu[zaehler][zl1];
        }
- //--- setze die hqs zusammen: HNEs[hnezaehler][1]=HNEs[..][1],aneu[..][1] ----
+       //--- setze hqs zusammen: HNEs[hnezaehler][1]=HNEs[..][1],aneu[..][1] --
        hilfvec=HNEakut[1],aneu[zaehler][1];
        HNEakut[1]=hilfvec;
- //----------- weil nicht geht: liste[1]=liste[1],aneu[zaehler][1] ------------
+       //-------- weil nicht geht: liste[1]=liste[1],aneu[zaehler][1] ---------
        HNEs[hnezaehler]=HNEakut;
       }                     // end(for zaehler)
+     kill aneu;
      }                      // endelse (R<>0)
     }                       // endif (subst()!=0)  (weiteres Aufblasen mit HN)
 
    }                        // end(for j) (Behandlung der einzelnen delta_i)
 
-  }
-  export HNEs;
-  keepring basering;
-  if (defined(transfproc)) { export transfproc;return(list(HNEs,transfproc)); }
-  else                     { return(list(HNEs,poly(-1))); }
- // -1 als 2. Rueckgabewert zeigt an, dass kein Ringwechsel stattgefunden hat -
+
+   // ------------------------- new for essdevelop ----------------------------
+   if ((essential==1) and (defined(SaveRing))) {
+     // ----- uebertrage Daten in gemeinsame Koerpererweiterung ---------------
+     if (EXTHNEnumber>number_of_letztring) {
+       // ----- fuer aktuelle Kante war Koerpererweiterung erforderlich -------
+       EXTHNEnumber++;
+       if (not(defined(minPol))) { poly miniPol; }
+       miniPol=minpoly;
+       setring SaveRing;
+       if (not(defined(miniPol))) { poly miniPol; }
+       miniPol=minpoly;
+       setring HNE_noparam;
+       if (not(defined(a_x))){ map a_x,a_y; poly mp_save, mp_new; }
+       mp_save=imap(SaveRing,miniPol); 
+       mp_new=imap(EXTHNEring(EXTHNEnumber-1),miniPol); 
+       if (mp_save==mp_new) { // Sonderfall: wieder gleicher Ring
+         def EXTHNEring(EXTHNEnumber)=SaveRing;
+         setring EXTHNEring(EXTHNEnumber);
+         if (not(defined(f))) {poly f; f=hole(f); export f;}
+         list dummyL=imap(EXTHNEring(EXTHNEnumber-1),HNEs);
+         if (not(defined(HNEs))) { def HNEs=list(); }
+         HNEs[size(HNEs)+1..size(HNEs)+size(dummyL)]=dummyL[1..size(dummyL)];
+         kill dummyL,SaveRing;
+       } 
+       else { // verschiedene Ringe
+         a_x=HNE_noparam,x,0,0;
+         a_y=HNE_noparam,y,0,0;
+         mp_save=a_x(mp_save); // minpoly aus SaveRing mit a --> x
+         mp_new=a_y(mp_new);   // minpoly aus SaveRing mit a --> y
+         setring SaveRing;
+         poly mp_new=imap(HNE_noparam,mp_new);
+         list Lfac=factorize(mp_new,1);
+         poly fac=Lfac[1][1];
+         for (k=2;k<=size(Lfac[1]);k++) {
+           if (deg(Lfac[1][k])<deg(fac)) { fac=Lfac[1][k]; } 
+         }
+
+         if (deg(fac)==1) { // keine Erweiterung noetig
+           def EXTHNEring(EXTHNEnumber)=SaveRing;
+           setring HNE_noparam;
+           HNEs=imap(EXTHNEring(EXTHNEnumber-1),HNEs);
+           setring EXTHNEring(EXTHNEnumber);
+           if (not(defined(f))) {poly f; f=hole(f); export f;}
+           map phi=HNE_noparam,-subst(fac,y,0)/koeff(fac,0,1),x,y;
+           list dummyL=phi(HNEs);
+           if (not(defined(HNEs))) { def HNEs=list(); }
+           if ((size(HNEs)==1) and (typeof(HNEs[1])=="ideal")) {HNEs=list();}
+           HNEs[size(HNEs)+1..size(HNEs)+size(dummyL)]=dummyL[1..size(dummyL)];
+           kill dummyL,phi,SaveRing;
+         }
+         else { // Koerpererweiterung noetig
+           def EXTHNEring(EXTHNEnumber) = splitring(fac,list(a,transfproc));
+           setring EXTHNEring(EXTHNEnumber);
+           poly transf=erg[1];  // image of parameter from SaveRing
+           poly transfproc=erg[2];
+           poly transb=erg[3];  // image of parameter from EXTHNEring(..)
+           export transfproc;
+           kill erg;
+           setring HNE_noparam;
+           if (not(defined(HNEs1))) { list HNEs1=ideal(0); } 
+           HNEs1=imap(EXTHNEring(EXTHNEnumber-1),HNEs);
+           if (not(defined(hne))) { list hne=ideal(0); } 
+           hne=imap(SaveRing,hne);
+           HNEs=imap(SaveRing,HNEs);
+           setring EXTHNEring(EXTHNEnumber);
+           map hole=HNE_noparam,transf,x,y;
+           poly fneu=hole(fneu);
+           poly f=hole(f); 
+           map phi=HNE_noparam,transb,x,y;
+           list HNEs=hole(HNEs);
+           list hne=hole(hne);
+           export f,hne;
+           if ((size(HNEs)==1) and (typeof(HNEs[1])=="ideal")) {HNEs=list();}
+           list dummyL=phi(HNEs1);
+           HNEs[size(HNEs)+1..size(HNEs)+size(dummyL)]=dummyL[1..size(dummyL)];
+           kill dummyL,phi,SaveRing;
+         }
+       }
+     }
+     else { // nur bei letzter Kante muss was getan werden
+       if (i==size(Newton)-1) { 
+         EXTHNEnumber++;
+         if (number_of_letztring==0) { def letztring=HNEring; }
+         else       { def letztring=EXTHNEring(EXTHNEnumber); }
+         if (minpoly==0) { 
+           def EXTHNEring(EXTHNEnumber)=SaveRing;
+           setring EXTHNEring(EXTHNEnumber);
+           if (not(defined(f))) {poly f; f=hole(f); export f;}
+           if ((size(HNEs)==1) and (typeof(HNEs[1])=="ideal")) {HNEs=list();}
+           list dummyL=imap(letztring,HNEs);
+           HNEs[size(HNEs)+1..size(HNEs)+size(dummyL)]=dummyL[1..size(dummyL)];
+           kill dummyL,letztring,SaveRing;
+         }
+         else { // muessen Daten nach SaveRing uebertragen;
+           setring HNE_noparam;
+           if (not(defined(HNEs))) { list HNEs; } 
+           HNEs=imap(letztring,HNEs);
+           def EXTHNEring(EXTHNEnumber)=SaveRing;
+           setring EXTHNEring(EXTHNEnumber);
+           if (not(defined(hole))) { map hole; }
+           hole=HNE_noparam,transfproc,x,y;
+           list dummyL=hole(HNEs);
+           if (not(defined(HNEs))) { def HNEs=list(); }
+           if ((size(HNEs)==1) and (typeof(HNEs[1])=="ideal")) {HNEs=list();}
+           HNEs[size(HNEs)+1..size(HNEs)+size(dummyL)]=dummyL[1..size(dummyL)];
+           kill dummyL, letztring,SaveRing;
+         }
+       }
+     }
+   }
+   // -----------------end of new part (loop for essential=1) ---------------- 
+  } // end (Loop uber Kanten)
+  if (defined(SaveRing)) { kill SaveRing; }
  }
  else {
-  HNEs[1]=list(hqs)+azeilen+list(f); // f ist das transform. Poly oder Null
-  export HNEs;
-  keepring basering;
-  return(list(HNEs,poly(-1)));
- //-- in dieser proc trat keine Verzweigung auf, also auch kein Ringwechsel ---
+  HNEs[1]=list(hqs)+azeilen+list(fneu); // fneu ist transform. Poly oder Null
+  conj1[1]=conj_factor;
+ } 
+
+ if (Aufruf_Ebene == 1)
+ {
+   if ((number_of_letztring!=EXTHNEnumber) and (not(defined(hne))))
+   { 
+     //----- falls Zweige in transz. Erw. berechnet werden konnten ---------
+     if (defined(transfproc)) 
+     { // --- Ringwechsel hat stattgefunden ---
+       if (defined(HNDebugOn)) {" ring change in HN(",1,") detected";}
+       if (not(defined(hole))) { map hole; }
+       hole=HNE_noparam,transfproc,x,y;
+       setring HNE_noparam;
+       f=imap(HNEring,f);
+       if (number_of_letztring==0) { def letztring=HNEring; }
+       else                        { def letztring=EXTHNEring(EXTHNEnumber); }
+       if (not(defined(hne))) { list hne; }
+       hne=imap(letztring,hne);
+       setring EXTHNEring(EXTHNEnumber);
+       if (not(defined(f))) { poly f=hole(f); export f; }
+       list hne=hole(hne);
+       export hne;
+     }
+   }
+   if (size(HNEs)>0) {
+     if ((size(HNEs)>1) or (typeof(HNEs[1])!="ideal") or (size(HNEs[1])>0)) {
+       if ((typeof(hne[1])=="ideal")) { hne=list(); }
+       hne=hne+extractHNEs(HNEs,getauscht);
+       if (hne_conj==0) { hne_conj=conj1; }
+       else { hne_conj = hne_conj, conj1; }
+     }
+   }
+ }
+ else
+ { // HN wurde rekursiv aufgerufen 
+   if (number_of_letztring!=EXTHNEnumber)
+   { // Ringwechsel hatte stattgefunden
+     string mipl_alt = string(minpoly);
+     execute("ring tempRing = ("+charstr(basering)+"),("+varstr(basering)+
+                              "),("+ordstr(basering)+");"); 
+     execute("minpoly="+ mipl_alt +";");
+     list HNEs=imap(EXTHNEring(EXTHNEnumber),HNEs);
+     export HNEs;
+     if (defined(HNDebugOn)) {" ! tempRing defined ! ";} 
+   } 
+   if (conj1!=0) { hne_conj=conj1; }
+   else          { hne_conj=conj_factor; }
+ }
+ if (EXTHNEnumber>0){ EXTHNEring = EXTHNEring(1..EXTHNEnumber); }
+ HNE_RingDATA = list(HNEring, HNE_noparam, EXTHNEnumber, EXTHNEring);
+ if (number_of_letztring==EXTHNEnumber) {
+   return(list(HNE_RingDATA,EXTHNEnumber,field_ext,HNEs,hne_conj));
+ }
+ else {
+   if (defined(tempRing)) {
+     return(list(HNE_RingDATA,EXTHNEnumber,field_ext,tempRing,hne_conj));
+   }
+   return(list(HNE_RingDATA,EXTHNEnumber,field_ext,0,hne_conj));
  }
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 
 static proc constructHNEs (list HNEs,int hnezaehler,list aneu,list azeilen,
@@ -4014,7 +4073,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc factorlist (list L)
+proc factorlist (list L, list #)
 "USAGE:   factorlist(L);   L a list in the format of `factorize'
 RETURN:  the nonconstant irreducible factors of
          L[1][1]^L[2][1] * L[1][2]^L[2][2] *...* L[1][size(L[1])]^...
@@ -4023,12 +4082,20 @@ SEE ALSO: factorize
 EXAMPLE: example factorlist;  shows an example
 "
 {
+ int k;
+ if ((size(#)>=1) and ((typeof(#[1])=="intvec") or (typeof(#[1])=="int"))) { 
+   int with_conj = 1; intvec C = #[1]; 
+ } 
+ else { 
+   int with_conj = 0; intvec C = L[2]; 
+ }
  // eine Sortierung der Faktoren eruebrigt sich, weil keine zwei versch.
  // red.Fakt. einen gleichen irred. Fakt. haben koennen (I.3.27 Diplarb.)
  int i,gross;
  list faktoren,hilf;
+ intvec conjugates;
  ideal hil1,hil2;
- intvec v,w;
+ intvec v,w,hilf_conj;
  for (i=1; (L[1][i] == jet(L[1][i],0)) && (i<size(L[1])); i++) {;}
  if (L[1][i] != jet(L[1][i],0)) {
    hilf=factorize(L[1][i]);
@@ -4036,19 +4103,21 @@ EXAMPLE: example factorlist;  shows an example
  // konstante Faktoren raus, sondern alle Einheiten in der LOKALISIERUNG nach
  // der Monomordnung!!! Im Beispiel unten verschwindet der Faktor x+y+1, wenn
  // man ds statt dp als Ordnung nimmt!
+   hilf_conj=C[i];
+   for (k=2;k<=size(hilf[2]);k++){ hilf_conj=hilf_conj,C[i]; }
    hilf[2]=hilf[2]*L[2][i];
    hil1=hilf[1];
    gross=size(hil1);
    if (gross>1) {
-       // faktoren=list(hilf[1][2..gross],hilf[2][2..gross]);
-       // -->  `? indexed object must have a name'
      v=hilf[2];
      faktoren=list(ideal(hil1[2..gross]),intvec(v[2..gross]));
+     conjugates=intvec(hilf_conj[2..gross]);
    }
-   else         { faktoren=hilf; }
+   else         { faktoren=hilf; conjugates=hilf_conj; }
  }
  else {
    faktoren=L;
+   conjugates=C;
  }
 
  for (i++; i<=size(L[2]); i++) {
@@ -4059,12 +4128,15 @@ EXAMPLE: example factorlist;  shows an example
        hil1[size(hil1)+1]=L[1][i];
        faktoren[1]=hil1;
        v=faktoren[2],L[2][i];
+       conjugates=conjugates,C[i];
        faktoren[2]=v;
      }
    }
  //----------------------- nichtlinearer Term -- faktorisiere -----------------
    else {
      hilf=factorize(L[1][i]);
+     hilf_conj=C[i];
+     for (k=2;k<=size(hilf[2]);k++){ hilf_conj=hilf_conj,C[i]; }
      hilf[2]=hilf[2]*L[2][i];
      hil1=faktoren[1];
      hil2=hilf[1];
@@ -4076,15 +4148,17 @@ EXAMPLE: example factorlist;  shows an example
      faktoren[1]=hil1;
      w=hilf[2];
      v=faktoren[2],w[2..gross];
+     conjugates=conjugates,hilf_conj[2..gross];
      faktoren[2]=v;
    }
  }
- return(faktoren);
+ if (with_conj==0) { return(faktoren); }
+ else { return(list(faktoren,conjugates)); }  // for essential development
 }
 example
 { "EXAMPLE:"; echo = 2;
  ring exring=0,(x,y),ds;
- list L=ideal(x,(x-y)^2*(x+y+1),x+y),intvec(2,2,1);
+ list L=list(ideal(x,(x-y)^2*(x+y+1),x+y),intvec(2,2,1));
  L;
  factorlist(L);
 }
@@ -4171,222 +4245,3 @@ example
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-
-
-proc hnexpansion(poly f,list #)
-"USAGE:   hnexpansion(f); or hnexpansion(f,\"ess\");  f poly
-
-USAGE:   hnexpansion(f); f poly
-ASSUME:  f is a bivariate polynomial (in the first 2 ring variables)
-CREATE:  ring with variables @code{x,y} and ordering @code{ls} over a 
-         field extension of the current basering's ground field,         
-         since the Hamburger-Noether development usually does not exist
-         in the originally given basering. The field extension is chosen
-         minimally.@*
-         Moreover, in the ring a list @code{hne} of lists @code{hne[i]} is 
-         created (corresponding to the output of @code{develop(f[i])}, 
-         f[i] a branch of f, but the last entry being omitted).
-@texinfo
-@table @asis
-@item @code{hne[i][1]}; matrix:
-         Each row contains the coefficients of the corresponding line of the
-         Hamburger-Noether expansion (HNE) for f[i]. The end of the line is
-         marked in the matrix by the first ring variable (usually x).
-@item @code{hne[i][2]}; intvec:
-         indicating the length of lines of the HNE
-@item @code{hne[i][3]}; int:
-         0  if the 1st ring variable was transversal (with respect to f[i]), @*
-         1  if the variables were changed at the beginning of the
-            computation, @*
-        -1  if an error has occurred.
-@item @code{hne[i][4]}; poly:
-         the transformed polynomial of f[i] to make it possible to extend the
-         Hamburger-Noether development a posteriori without having to do
-         all the previous calculation once again (0 if not needed)
-@end table
-@end texinfo
-RETURN:  a list, say @code{hn}, containing the created ring 
-NOTE:    to use the ring type: @code{def HNEring=hn[i]; setring HNEring;}.
-         @*
-         If f is known to be irreducible as a power series, @code{develop(f)}
-         could be chosen instead to avoid the change of basering. @*
-         Increasing  @code{printlevel} leads to more and more comments.
-
-USAGE:   hnexpansion(f,\"ess\"); f poly
-ASSUME:  f is a bivariate polynomial (in the first 2 ring variables)
-CREATE:  ring with variables @code{x,y} and ordering @code{ls} over a 
-         field extension of the current basering's ground field,         
-         since the Hamburger-Noether development usually does not exist
-         in the originally given basering. The field extension is chosen
-         minimally.
-         @*
-         Moreover, in the ring a list @code{hne} of lists @code{hne[i]} is 
-         created (corresponding to the output of @code{develop(f[i])}, f[i] an
-         \"essential\" branch of f, but the last entry being omitted). See 
-         @code{hnexpansion} above for more details.
-RETURN:  a list, say @code{hn}, containing the created ring 
-NOTE:    to use the ring type: @code{def hnering=hn[i]; setring hnering;}.
-         @*
-         Alternatively you may use the procedure sethnering and type: 
-         @code{sethnering(hn);}
-         @*
-         If the HNE needs a field extension, some of the branches will be
-         conjugate. In this case @code{hnexpansion(f,\"ess\")} reduces the 
-         computation to one representative for each group of conjugate 
-         branches.@*
-         Note that the degree of each branch is in general less than the degree
-         of the field extension in which all HNEs can be put.@*
-         Use @code{hnexpansion(f)} to compute a complete HNE, i.e., a HNE for 
-         all branches.@*
-         Increasing  @code{printlevel} leads to more and more comments.        
-SEE ALSO: develop, extdevelop, parametrisation, displayHNE
-EXAMPLE: example hnexpansion;  shows an example
-"
-{
-  def rettering=basering;
-  if (defined(HNEring))
-  {
-    def @HNEring = HNEring;  
-    kill HNEring;
-  }
-  if (size(#)==1)
-  {
-    list hne=essdevelop(f);
-  }
-  else
-  {
-    list hne=HNdevelop(f);
-  }
-  export hne;
-  list hnereturn=HNEring;
-  setring rettering;
-  kill HNEring;
-  if (defined(@HNEring))
-  {
-    def HNEring=@HNEring;  
-    export(HNEring);
-  }
-  dbprint(printlevel-voice+2,"
-// 'hnexpansion' created a list containing a ring, which
-// contains the Hamburger-Noether expansion as a list hne.
-// To see the ring, type (if the name of your list is hn):
-     show(hn);
-// To access the ring and list, type:
-     def hnering = hn[1]; 
-     setring hnering;
-     hne;
-////////////////////////////////////////////////");
-
-  return(hnereturn);
-}
-example
-{
-  "EXAMPLE:"; echo = 2;
-  ring r=0,(x,y),ls;
-  list hn=hnexpansion(x4-y6);
-  show(hn);
-  
-  def hnering=hn[1];
-  setring hnering;
-  size(hne);           // number of branches
-  print(hne[1][1]);    // HN-matrix of 1st branch
-  parametrisation(hne);    // parametrization of the two branches
-  /////////////////////////////////////////////////////////
-  ring s=2,(x,y),ls;
-  poly f=(x4+x2y+y2)*(x3+xy2+y3);
-  // --------- compute all branches: ---------
-  hn=hnexpansion(f);
-  hnering=hn[1];
-  setring hnering;
-  displayHNE(hne[1]);   // HN-matrix of 1st branch
-  displayHNE(hne[4]);   // HN-matrix of 4th branch
-  setring s;
-  // --- compute only one of conjugate branches: ---
-  hn=hnexpansion(f,"ess");
-  hnering=hn[1];
-  setring hnering;
-  displayHNE(hne);
-  // no. 1 of hnexpansion(f,"ess") represents no. 1 - 3 of hnexpansion(f) and
-  // no. 2 of hnexpansion(f,"ess") represents no. 4 + 5 of hnexpansion(f)
-}
-///////////////////////////////////////////////////////////////////////////////
-
-proc sethnering (list L,list #)
-"USAGE:  sethnering(L[,s]); L list, s string (optional)
-ASSUME:  L is a list containing a ring (e.g. the output of @code{hnexpansion}).
-CREATE:  The procedure creates a ring with name given by the optional parameter
-         s resp. with name hnering, if no optional parameter is given, and
-         changes your ring to this ring. The new ring will be the ring given 
-         as the first entry in the list L.          
-RETURN:  nothing. 
-SEE ALSO: hnexpansion
-EXAMPLE: example sethnering; shows some examples.
-"
- 
-{
-  if (typeof(L[1])=="ring")
-  {
-    if (size(#)>0)
-    {
-      if (typeof(#[1])=="string")
-      {        
-        execute("def "+#[1]+"=L[1];");
-        execute("export "+#[1]+";");
-        execute("setring "+#[1]+";");
-        execute("keepring "+#[1]+";");
-      }
-      else
-      {
-        ERROR("Optional Input was no string.");
-        return();
-      }
-    }
-    else
-    {
-      def hnering=L[1];
-      export hnering;
-      setring hnering;
-      keepring hnering;
-    }
-    return();
-  }
-  else
-  {
-    ERROR("Input was no hnering.");
-    return();
-  }
-}
-example
-{
-  // -------- prepare for example ---------
-  if (defined(hnering))
-  {
-   def rette@ring=hnering;
-   if (nameof(basering)=="hnering")
-   {
-     int wechsel=1;
-   }
-   else
-   {
-     int wechsel;
-   }
-   kill hnering;
-  }
-  // ------ the example starts here -------
-  "EXAMPLE:"; echo = 2;
-  ring r=0,(x,y),ls;
-  nameof(basering);
-  sethnering(hnexpansion(x4-y6)); // Creates hnering and changes to it!
-  nameof(basering);
-  echo = 0;
-  // --- restore HNEring if previously defined ---
-  kill hnering;
-  if (defined(rette@ring)) {
-   def hnering=rette@ring;
-   export hnering;
-   if (wechsel==1)
-   {
-     setring hnering;
-   }
-  }
-}
