@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.7 2005-04-14 08:19:18 Singular Exp $
+// $Id: clapsing.cc,v 1.8 2005-04-14 12:30:11 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -701,7 +701,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
         pSetCoeff(res->m[0],nCopy(pGetCoeff(f)));
         // no break
       case 2: // with exp.
-        (*v)=new intvec(si_max(n,1));
+        (*v)=new intvec(si_max(1,n));
         (**v)[0]=1;
         // no break
       case 1: ;
@@ -731,7 +731,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
     return res;
   }
   //PrintS("S:");pWrite(f);PrintLn();
-  // use factory/liffac in general ==============================
+  // use factory/libfac in general ==============================
   Off(SW_RATIONAL);
   On(SW_SYMMETRIC_FF);
   #ifdef HAVE_NTL
@@ -1069,7 +1069,6 @@ notImpl:
   //PrintS("......S\n");
   return res;
 }
-
 matrix singclap_irrCharSeries ( ideal I)
 {
 #ifdef HAVE_LIBFAC_P
