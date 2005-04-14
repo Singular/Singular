@@ -42,7 +42,8 @@ if test x$CXXFLAGS = x
 then
   CXXFLAGS="-O3 -fomit-frame-pointer -fno-rtti -fno-exceptions"
 fi
-
+CFLAGS="$CPPFLAGS $CFLAGS"
+CXXFLAGS="$CPPFLAGS $CXXFLAGS"
 echo "#!/bin/sh" >config.status
 echo "cd src" >>config.status
 echo ./configure CC=\"$SING_CC\" CXX=\"$SING_CXX\" LIBDIR=$libdir INCLUDEDIR=$includedir PREFIX=$prefix NTL_GMP_LIP=on GMP_PREFIX=$prefix/${ac_cv_singuname} CFLAGS=\"$CFLAGS\" CXXFLAGS=\"$CXXFLAGS\" LDFLAGS=\"$LDFLAGS\" >>config.status
