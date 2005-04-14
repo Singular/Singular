@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.6 2005-04-13 16:38:10 Singular Exp $
+// $Id: clapsing.cc,v 1.7 2005-04-14 08:19:18 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -740,19 +740,30 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
   #endif
   CFFList L;
   number N=NULL;
+  number NN=NULL;
   CanonicalForm T_F(0);
   number old_lead_coeff=nCopy(pGetCoeff(f));
 
+  if (!rField_is_Zp()) /* Q, Q(a), Zp(a) */
+  {
+    //if (f!=NULL) // already tested at start of routine
+    {
+      number n0=nCopy(pGetCoeff(f));
+      if (with_exps==0)
+        N=nCopy(n0);
+      pCleardenom(f);
+      NN=nDiv(n0,pGetCoeff(f));
+      nDelete(&n0);
+      if (with_exps==0)
+      {
+        nDelete(&N);
+        N=nCopy(NN);
+      }
+    }
+  }
   if (rField_is_Q() || rField_is_Zp())
   {
     setCharacteristic( nGetChar() );
-    if (nGetChar()==0) /* Q */
-    {
-      //if (f!=NULL) // already tested at start of routine
-      {
-        pCleardenom_n(f,N);
-      }
-    }
     CanonicalForm F( convSingPClapP( f ) );
     T_F=F;
     if (nGetChar()==0) /* Q */
@@ -790,7 +801,6 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
   {
     if (rField_is_Q_a()) setCharacteristic( 0 );
     else                 setCharacteristic( -nGetChar() );
-    pCleardenom_n(f,N);
     if (currRing->minpoly!=NULL)
     {
       CanonicalForm mipo=convSingTrClapP(((lnumber)currRing->minpoly)->z);
@@ -971,6 +981,8 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
     if (N!=NULL)
     {
       pMult_nn(res->m[0],N);
+      nDelete(&N);
+      N=NULL;
     }
     // delete constants
     if (res!=NULL)
@@ -1045,11 +1057,13 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
 notImpl:
   if (res==NULL)
     WerrorS( feNotImplemented );
-  if (N!=NULL)
+  if (NN!=NULL)
   {
-    number NN=nInvers(N);
     pMult_nn(f,NN);
     nDelete(&NN);
+  }
+  if (N!=NULL)
+  {
     nDelete(&N);
   }
   //PrintS("......S\n");
