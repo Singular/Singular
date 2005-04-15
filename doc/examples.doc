@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.63 2001-01-09 12:42:41 Singular Exp $
+@comment $Id: examples.doc,v 1.64 2005-04-15 13:43:33 Singular Exp $
 @comment this file contains the examples
 
 @c The following directives are necessary for proper compilation
@@ -1960,10 +1960,10 @@ convert one set of invariants to another.
   ring r = 0,(x,y),dp;
   poly f=x11-2y2x8-y3x7-y2x6+y4x5+2y4x3+y5x2-y6;
   // = (x5-1y2) * (x6-2x3y2-1x2y3+y4)
-  list hn=reddevelop(f);
-  show(hn[1][1]);     // Hamburger-Noether matrix of 1st branch
-  displayInvariants(hn);
-  param(hn[2]);      // parametrization of 2nd branch
+  list L=hnexpansion(f);
+  show(L[1][1]);     // Hamburger-Noether matrix of 1st branch
+  displayInvariants(L);
+  param(L[2]);       // parametrization of 2nd branch
 @c example
 @end smallexample
 @end ifset
