@@ -1,7 +1,7 @@
-version="$Id: hnoether.lib,v 1.44 2005-04-14 15:39:20 Singular Exp $";
+-	version="$Id: hnoether.lib,v 1.45 2005-04-15 13:42:53 Singular Exp $";
 category="Singularities";
 info="
-LIBRARY:  hnoether.lib   Hamburger-Noether (Puiseux) Development
+LIBRARY:  hnoether.lib   Hamburger-Noether (Puiseux) Expansion
 AUTHORS:   Martin Lamm,      lamm@mathematik.uni-kl.de
            Christoph Lossen, lossen@mathematik.uni-kl.de
 
@@ -16,18 +16,18 @@ OVERVIEW:
 MAIN PROCEDURES:
  hnexpansion(f [,\"ess\"]); Hamburger-Noether (HN) expansion of f
  develop(f [,n]);           HN expansion of irreducible plane curve germs
- extdevelop(hne,n);         extension of the H-N development hne of f
- param(L [,s]);             parametrization of branches described by HN data
- displayHNE(hne);           display HN development as an ideal
+ extdevelop(hne,n);         extension of the H-N expansion hne of f
+ param(hne [,s]);           parametrization of branches described by HN data
+ displayHNE(hne);           display HN expansion as an ideal
  invariants(hne);           invariants of f, e.g. the characteristic exponents
  displayInvariants(hne);    display invariants of f
  multsequence(hne);         sequence of multiplicities
  displayMultsequence(hne);  display sequence of multiplicities
- intersection(hne1,hne2);   intersection multiplicity of two curves
- is_irred(f);               test if f is irreducible as power series
+ intersection(hne1,hne2);   intersection multiplicity of two local branches
+ is_irred(f);               test whether f is irreducible as power series
  delta(f);                  delta invariant of f
  newtonpoly(f);             (local) Newton polygon of f
- is_NND(f);                 test if f is Newton non-degenerate
+ is_NND(f);                 test whether f is Newton non-degenerate
 
 
 AUXILIARY PROCEDURES:
@@ -916,7 +916,8 @@ proc param (list L, list #)
 ASSUME:  L is the output of @code{develop(f)}, or of
         @code{extdevelop(develop(f),n)}, or (one entry in) the list of HN 
         data created by @code{hnexpansion(f[,\"ess\"])}.
-RETURN: a parametrization for f in the following format: @*
+RETURN: If L are the HN data of an irreducible plane curve singularity f: a 
+        parametrization for f in the following format: @*
         - if only the list L is given, the result is an ideal of two
         polynomials p[1],p[2]: if the HNE was finite then f(p[1],p[2])=0};
         if not, the true parametrization will be given by two power series, 
@@ -926,6 +927,9 @@ RETURN: a parametrization for f in the following format: @*
         the highest degree up to which the coefficients of the monomials in
         l[1] are exact (entry -1 means that the corresponding parametrization
         is exact).
+        If L collects the HN data of a reducible plane curve singularity f, 
+        the return value is a list of parametrizations in the respective 
+        format. 
 NOTE:   If the basering has only 2 variables, the first variable is chosen
         as indefinite. Otherwise, the 3rd variable is chosen.
 SEE ALSO: develop, extdevelop
@@ -1499,12 +1503,12 @@ example
 
 proc intersection (list hn1, list hn2)
 "USAGE:   intersection(hne1,hne2); hne1, hne2 lists
-ASSUME:  hne1, hne2 represent a HNE (i.e., are the output of
-        @code{develop(f)}, or of @code{extdevelop(develop(f),n)}, or
-        one entry of the list @code{hne} in the ring created by
-        @code{hnexpansion(f[,\"ess\"])}).
-RETURN:  int, the intersection multiplicity of the branches corresponding to
-         hne1 and hne2.
+ASSUME: @code{hne1, hne2} represent an HN expansion of an irreducible plane 
+        curve singularity (that is, are the output of @code{develop(f)}, or of
+        @code{extdevelop(develop(f),n)}, or one entry of the list of HN data
+        computed by @code{hnexpansion(f[,\"ess\"])}).
+RETURN:  int, the intersection multiplicity of the irreducible plane curve 
+         singularities corresponding to @code{hne1} and @code{hne2}.
 SEE ALSO: hnexpansion, displayInvariants
 KEYWORDS: intersection multiplicity
 EXAMPLE: example intersection;  shows an example
@@ -1968,7 +1972,8 @@ proc displayHNE(list ldev,list #)
 ASSUME:  L is the output of @code{develop(f)}, or of @code{exdevelop(f,n)},
          or of @code{hnexpansion(f[,\"ess\"])}, or (one entry in) the list 
          @code{hne} in the ring created by @code{hnexpansion(f[,\"ess\"])}.
-RETURN:  - if only one argument is given, no return value, but
+RETURN:  - if only one argument is given and if the input are the HN data
+         of an irreducible plane curve singularity, no return value, but
          display an ideal HNE of the following form:
      @example
        y = []*x^1+[]*x^2   +...+x^<>*z(1)
@@ -1977,17 +1982,17 @@ RETURN:  - if only one argument is given, no return value, but
        .......             ..........................
        z(r-1) =   []*z(r)^2+[]*z(r)^3+......
      @end example
-     where @code{x},@code{y} are the first 2 variables of the basering.
-     The values of @code{[]} are the coefficients of the Hamburger-Noether
-     matrix, the values of @code{<>} are represented by @code{x} in the
-     HN-matrix.@*
-     - if a second argument is given, create and export a new ring with
-     name @code{displayring} containing an ideal @code{HNE} as described
-     above.@*
-     - if L corresponds to the output of @code{hnexpansion(f[,\"ess\"])}
-     or to the list @code{hne} in the ring created by @code{hnexpansion(f[,\"ess\"])},
-     @code{displayHNE(L[,n])} shows the HNE's of all branches of f in the form
-     described above. The optional parameter is then ignored.
+        where @code{x},@code{y} are the first 2 variables of the basering.
+        The values of @code{[]} are the coefficients of the Hamburger-Noether
+        matrix, the values of @code{<>} are represented by @code{x} in the
+        HN matrix.@*
+        - if a second argument is given and if the input are the HN data
+        of an irreducible plane curve singularity, return a ring containing 
+        an ideal @code{HNE} as described above.@*
+        - if L corresponds to the output of @code{hnexpansion(f)}
+        or to the list of HN data computed by @code{hnexpansion(f[,\"ess\"])},
+        @code{displayHNE(L[,n])} shows the HNE's of all branches of f in the 
+        format described above. The optional parameter is then ignored.
 NOTE:  The 1st line of the above ideal (i.e., @code{HNE[1]}) means that
      @code{y=[]*z(0)^1+...}, the 2nd line (@code{HNE[2]}) means that
      @code{x=[]*z(1)^2+...}, so you can see which indeterminate
@@ -2032,9 +2037,6 @@ EXAMPLE: example displayHNE; shows an example
  // End change by T. Keilen
  //////////////////////////////////////////////////////////////
  setring displayring;
- if (size(#) != 0) {
-    export displayring;
-  }
  map holematrix=altring,0;        // mappt nur die Monome vom Grad Null
  matrix m=holematrix(m);
  int i,j;
@@ -2120,10 +2122,9 @@ if (size(#) == 0) {
    return();
  }
 if (size(#) != 0) {
-   "// basering is now 'displayring' containing ideal 'HNE'";
+   HNE;
    export(HNE);
-   keepring(displayring);
-   return(HNE);
+   return(displayring);
  }
 }
 example
@@ -2798,17 +2799,15 @@ EXAMPLE: example hnexpansion;  shows an example
    }
    kill HNEring;
    if (essential==1) {
-     dbprint(printlevel-voice+3,"
-// No change of ring necessary, return value is a list:
+     dbprint(printlevel-voice+3,""+
+"// No change of ring necessary, return value is a list:
 //   first entry  =  list :  HN expansion of essential branches.
-//   second entry =  intvec: numbers of conjugated branches 
-     ");
+//   second entry =  intvec: numbers of conjugated branches ");
      return(list(hne,hne_conj));
    }
    else {
-     dbprint(printlevel-voice+3,"
-// No change of ring necessary, return value is HN expansion.
-     ");
+     dbprint(printlevel-voice+3,""+
+"// No change of ring necessary, return value is HN expansion.");
      return(hne);
    }
  }
@@ -3413,7 +3412,6 @@ RETURN: list: first entry = list of HNErings,
      deltais=0;
      delt=0;
      if (defined(zerlege)) { kill zerlege; }
-"Hier durch gelaufen";
    }
 
    if (defined(HNDebugOn)) { "we consider side",Newton[i],Newton[i+1]; }
@@ -3758,6 +3756,7 @@ RETURN: list: first entry = list of HNErings,
        setring HNE_noparam;
        if (lastRingnumber>0) { def letztring=EXTHNEring(lastRingnumber); }
        else                  { def letztring=HNEring; }
+       if (not defined(HNEs)) {list HNEs;}
        HNEs=imap(letztring,HNEs);
        if (not defined(azeilen)) {list azeilen;}
        azeilen=imap(letztring,azeilen);
@@ -3861,6 +3860,7 @@ RETURN: list: first entry = list of HNErings,
          if (not(defined(f))) {poly f; f=hole(f); export f;}
          list dummyL=imap(EXTHNEring(EXTHNEnumber-1),HNEs);
          if (not(defined(HNEs))) { def HNEs=list(); }
+         if ((size(HNEs)==1) and (typeof(HNEs[1])=="ideal")) {HNEs=list();}
          HNEs[size(HNEs)+1..size(HNEs)+size(dummyL)]=dummyL[1..size(dummyL)];
          kill dummyL,SaveRing;
        } 
@@ -4162,44 +4162,17 @@ example
  L;
  factorlist(L);
 }
-///////////////////////////////////////////////////////////////////////////////
-
-proc deltaHNE(list hne)
-"USAGE:   deltaHNE(L);  L list
-NOTE:     command is obsolete, use hnexpansion(f,\"ess\") instead.   
-SEE ALSO: delta, deltaLoc
-"
-{
-   int i,j,inters;
-   int n=size(hne);
-   list INV;
-   for (i=1;i<=n;i++)
-   {
-     INV[i]=invariants(hne[i]);
-   }
-   int del=INV[n][5]/2;
-   for(i=1;i<=n-1;i++)
-   {
-      del=del+INV[i][5]/2;
-      for(j=i+1;j<=n;j++)
-      {
-         inters=inters+intersection(hne[i],hne[j]);
-      }
-   }    
-   return(del+inters);
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 
 proc delta
-"USAGE:  delta(INPUT);  INPUT a polynomial defining an isolated  plane curve
+"USAGE:  delta(INPUT);  INPUT a polynomial defining an isolated plane curve
          singularity at 0, or the Hamburger-Noether expansion thereof, i.e.
-         the output of @code{develop(f)}, or the output of @code{hnexpansion(f[,\"ess\"])},
-         or (one of the entries of) the list @code{hne} in the ring created
-         by @code{hnexpansion(f[,\"ess\"])}.
-RETURN:  the delta invariant of the singularity at 0, the vector space
-         dimension of R~/R, where R~ is the normalization of the
-         singularity R=basering/f
+         the output of @code{develop(f)}, or the output of @code{hnexpansion(f)},
+         or the list of HN data computed by @code{hnexpansion(f)}.
+RETURN:  int, the delta invariant of the singularity at 0, that is, the vector
+         space dimension of R~/R, (R~ the normalization of the local ring of 
+         the singularity.
 NOTE:    In case the Hamburger-Noether expansion of the curve f is needed
          for other purposes as well it is better to calculate this first
          with the aid of @code{hnexpansion} and use it as input instead of
@@ -4209,20 +4182,20 @@ KEYWORDS: delta invariant
 EXAMPLE: example delta;  shows an example
 "
 {
-  if (typeof(#[1])=="poly")
-  { // INPUT = polynomial defining the curve
-    list HNEXPANSION=hnexpansion(#[1]);
-    return(delta(HNEXPANSION));
+  if (typeof(#[1])=="poly") { // INPUT = polynomial defining the singularity
+    list L=hnexpansion(#[1]);
+    if (typeof(L[1])=="ring") {
+      def altring = basering;
+      def HNring = L[1]; setring HNring;
+      return(delta(hne));
+    }
+    else {
+      return(delta(L));
+    }  
   }
-  if (typeof(#[1])=="ring")
-  { // INPUT = HNEring of curve
-    def r_e_t_t_e_r_i_n_g=basering;
-    def H_N_E_RING=#[1];
-    setring H_N_E_RING;
-    int del=delta(hne);
-    setring r_e_t_t_e_r_i_n_g;
-    kill H_N_E_RING;    
-    return(del);
+  if (typeof(#[1])=="ring") { // INPUT = HNEring of curve
+    def HNring = #[1]; setring HNring;
+    return(delta(hne));
   }
   if (typeof(#[1])=="matrix")  
   { // INPUT = hne of an irreducible curve  

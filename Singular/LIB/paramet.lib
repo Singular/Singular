@@ -1,6 +1,6 @@
 // last change:           17.01.2001
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: paramet.lib,v 1.14 2005-01-13 09:42:04 Singular Exp $";
+version="$Id: paramet.lib,v 1.15 2005-04-15 13:42:54 Singular Exp $";
 category="Visualization";
 info="
 LIBRARY: paramet.lib   Parametrization of Varieties
@@ -192,25 +192,33 @@ EXAMPLE:  example parametrizesing; shows an example"
 {
   intvec ov=option(get);
   option(noredefine);
-  list hn,para;
+  list L,para;
   if (nvars(basering)==2 and
       (find(ordstr(basering), "ls") > 0 ||
        find(ordstr(basering), "ds") > 0 ||
        find(ordstr(basering), "lp") > 0))
   {
-    hn = reddevelop(f);
-    for (int ii=1; ii<=size(hn); ii++)
-    {
-      para[ii]=param(hn[ii]);
+    L = hnexpansion(f);
+    if (typeof(L[1])=="ring") {
+      def altring = basering;
+      def HNring = L[1]; setring HNring;
+      list P = param(hne);
+      export P;
+      option(set,ov);
+      setring(altring);
+      return(list(HNring));
     }
+    else {
+      option(set,ov);
+      list P = param(L);
+      return(P);
+    }   
   }
   else
   {
-    para[1]=0;
+    option(set,ov);
+    return(list());
   }
-  keepring basering;
-  option(set,ov);
-  return(para);
 }
 example
 { "EXAMPLE:";echo = 2;
