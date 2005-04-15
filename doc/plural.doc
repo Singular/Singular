@@ -75,6 +75,7 @@
 @ifset singularmanual
 @node PLURAL conventions, Data types @value{PSUFFIX}, (dir) ,Top
 @section  PLURAL conventions
+@cindex  PLURAL conventions
 @end ifset 
 
 @ifclear singularmanual
