@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.121 2005-02-22 15:30:49 Singular Exp $
+@comment $Id: singular.doc,v 1.122 2005-04-15 13:54:06 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -490,7 +490,6 @@ LIB "all.lib";
 @menu
 * graphics_lib:: procedures to draw  with Mathematica
 * latex_lib:: procedures for typesetting in TeX
-* paramet_lib:: procedures for parametrizations
 * surf_lib:: interface to the surf programm::
 @end menu
 
@@ -499,15 +498,11 @@ LIB "all.lib";
 @subsection graphics_lib
 @c lib graphics.lib no_ex
 @c ---------------------------------------------------------
-@node latex_lib, paramet_lib, graphics_lib, Visualization
+@node latex_lib, surf_lib, graphics_lib, Visualization
 @subsection latex_lib
 @c lib latex.lib
 @c ---------------------------------------------------------
-@node paramet_lib, surf_lib, latex_lib, Visualization
-@subsection paramet_lib
-@c lib paramet.lib
-@c ---------------------------------------------------------
-@node surf_lib,, paramet_lib, Visualization
+@node surf_lib,, latex_lib, Visualization
 @subsection surf_lib
 @c lib surf.lib no_ex
 
