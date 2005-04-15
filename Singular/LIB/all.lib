@@ -1,6 +1,6 @@
-// $Id: all.lib,v 1.39 2005-02-22 10:39:08 Singular Exp $
+// $Id: all.lib,v 1.40 2005-04-15 13:52:09 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: all.lib,v 1.39 2005-02-22 10:39:08 Singular Exp $";
+version="$Id: all.lib,v 1.40 2005-04-15 13:52:09 Singular Exp $";
 category = "General purpose";
 info="
 LIBRARY:  all.lib   Load all libraries
@@ -60,7 +60,6 @@ Symbolic-numerical solving
 Visualization
   graphics_lib:    Procedures to use Graphics with Mathematica
   latex_lib:       Typesetting of Singular-Objects in LaTex2e
-  paramet_lib:     Parametrization of Varieties
   surf_lib:        Procedures for Graphics with Surf
 
 Coding theory
@@ -123,7 +122,6 @@ LIB "zeroset.lib";
 LIB "graphics.lib";
 LIB "latex.lib";
 LIB "surf.lib";
-LIB "paramet.lib";
 //Coding theory
 LIB "brnoeth.lib";
 //Miscellaneous
