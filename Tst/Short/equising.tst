@@ -22,9 +22,9 @@ proc tst(list d)
               
      list EsList = esStratum(F);
      EsList[2];  
-     if (typeof(EsList[1])=="ideal") 
+     if (typeof(EsList[1])=="list") 
      { 
-       ideal ES = EsList[1];
+       ideal ES = EsList[1][1];
      }
      else
      {
@@ -91,7 +91,7 @@ ring rr=0,(A,B,C,x,y),ls;
 poly f=x7+y7+(x-y)^2*x2y2;
 poly F=f+A*y*diff(f,x)+B*x*diff(f,x)+C*diff(f,y);
 list M=esStratum(F,6);
-std(M[1]);
+std(M[1][1]);
 
 kill(rr);
 /////////////////////////////////////////////////
