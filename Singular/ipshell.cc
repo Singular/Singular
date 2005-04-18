@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.98 2005-04-18 12:22:09 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.99 2005-04-18 13:01:19 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1730,8 +1730,11 @@ ring rCompose(lists  L)
        R->ch= -R->algring->ch;
     else
        R->ch=1;
-    R->parameter=R->algring->names;
     R->P=R->algring->N;
+    R->parameter=(char**)omAlloc0(R->P*sizeof(char_ptr));
+    int i;
+    for(i=R->P-1;i>=0;i--)
+      R->parameter[i]=omStrDup(R->algring->names[i]);
     if (R->algring->qideal!=NULL)
     {
       R->minpoly=pGetCoeff(R->algring->qideal->m[0]);
