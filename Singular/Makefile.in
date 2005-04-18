@@ -163,7 +163,7 @@ HEADERS=lists.h attrib.h \
 	ipshell.h tok.h \
 	fast_maps.h \
 	silink.h \
-	fglm.h sing_dbm.h \
+	fglm.h sing_dbm.h maps_ip.h \
 	mpsr.h mpsr_sl.h\
 	mpsr_Get.h kmatrix.h janet.h\
 	mpsr_Put.h\
