@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.226 2004-08-05 15:08:28 Singular Exp $
+@comment $Id: reference.doc,v 1.227 2005-04-18 15:12:02 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -5836,14 +5836,14 @@ See
 @cindex subst
 @table @code
 @item @strong{Syntax:}
-@code{subst (} poly_expression@code{,} ring_variable@code{,} poly_expression @code{)}
-@*@code{subst (} vector_expression@code{,} ring_variable@code{,} poly_expression @code{)}
-@*@code{subst (} ideal_expression@code{,} ring_variable@code{,} poly_expression @code{)}
-@*@code{subst (} module_expression@code{,} ring_variable@code{,} poly_expression @code{)}
+@code{subst (} poly_expression@code{,} variable@code{,} poly_expression @code{)}
+@*@code{subst (} vector_expression@code{,} variable@code{,} poly_expression @code{)}
+@*@code{subst (} ideal_expression@code{,} variable@code{,} poly_expression @code{)}
+@*@code{subst (} module_expression@code{,} variable@code{,} poly_expression @code{)}
 @item @strong{Type:}
 poly, vector, ideal or module (corresponding to the first argument)
 @item @strong{Purpose:}
-substitutes a ring variable by a polynomial.
+substitutes a ring variable/parameter variable by a polynomial.
 @item @strong{Note:}
 use @code{map} for substitutions by polynomials.
 @item @strong{Example:}

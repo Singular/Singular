@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.344 2005-04-13 16:43:12 Singular Exp $ */
+/* $Id: iparith.cc,v 1.345 2005-04-18 15:10:04 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -34,6 +34,7 @@
 #include "numbers.h"
 #include "stairc.h"
 #include "maps.h"
+#include "maps_ip.h"
 #include "syz.h"
 #include "weight.h"
 #include "ipconv.h"
@@ -44,7 +45,7 @@
 #include "sparsmat.h"
 #include "units.h"
 #include "janet.h"
-#include "../kernel/GMPrat.h"
+#include "GMPrat.h"
 #ifdef HAVE_FACTORY
 #include "clapsing.h"
 #include "kstdfac.h"
@@ -4780,6 +4781,7 @@ static BOOLEAN jjSUBST_Test(leftv v,leftv w,
   int &ringvar, poly &monomexpr)
 {
   monomexpr=(poly)w->Data();
+  poly p=(poly)v->Data();
   #if 0
   if (pLength(monomexpr)>1)
   {
@@ -4788,10 +4790,19 @@ static BOOLEAN jjSUBST_Test(leftv v,leftv w,
     return TRUE;
   }
   #endif
-  if (!(ringvar=pVar((poly)v->Data())))
+  if (!(ringvar=pVar(p)))
   {
-    WerrorS("ringvar expected");
-    return TRUE;
+    if (rField_is_Extension(currRing))
+    {
+      assume(currRing->algring!=NULL);
+      lnumber n=(lnumber)pGetCoeff(p);
+      ringvar=-p_Var(n->z,currRing->algring);
+    }
+    if(ringvar==0)
+    {
+      WerrorS("ringvar/par expected");
+      return TRUE;
+    }
   }
   return FALSE;
 }
@@ -4801,11 +4812,16 @@ static BOOLEAN jjSUBST_P(leftv res, leftv u, leftv v,leftv w)
   poly monomexpr;
   BOOLEAN nok=jjSUBST_Test(v,w,ringvar,monomexpr);
   if (nok) return TRUE;
-  if ((monomexpr==NULL)||(pNext(monomexpr)==NULL))
-    res->data = pSubst((poly)u->CopyD(res->rtyp),ringvar,monomexpr);
+  if (ringvar>0)
+  {
+    if ((monomexpr==NULL)||(pNext(monomexpr)==NULL))
+      res->data = pSubst((poly)u->CopyD(res->rtyp),ringvar,monomexpr);
+    else
+      res->data= pSubstPoly((poly)u->Data(),ringvar,monomexpr);
+  }
   else
   {
-    res->data= pSubstPoly((poly)u->Data(),ringvar,monomexpr);
+    res->data=pSubstPar((poly)u->Data(),-ringvar,monomexpr);
   }
   return FALSE;
 }
@@ -4815,10 +4831,17 @@ static BOOLEAN jjSUBST_Id(leftv res, leftv u, leftv v,leftv w)
   poly monomexpr;
   BOOLEAN nok=jjSUBST_Test(v,w,ringvar,monomexpr);
   if (nok) return TRUE;
-  if ((monomexpr==NULL)||(pNext(monomexpr)==NULL))
-    res->data = idSubst((ideal)u->CopyD(res->rtyp),ringvar,monomexpr);
+  if (ringvar>0)
+  {
+    if ((monomexpr==NULL)||(pNext(monomexpr)==NULL))
+      res->data = idSubst((ideal)u->CopyD(res->rtyp),ringvar,monomexpr);
+    else
+      res->data = idSubstPoly((ideal)u->Data(),ringvar,monomexpr);
+  }
   else
-    res->data = idSubstPoly((ideal)u->Data(),ringvar,monomexpr);
+  {
+    res->data = idSubstPar((ideal)u->Data(),-ringvar,monomexpr);
+  }
   return FALSE;
 }
 // we do not want to have jjSUBST_Id_X inlined:

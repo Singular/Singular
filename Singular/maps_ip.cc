@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: maps_ip.cc,v 1.6 2004-09-23 07:39:27 Singular Exp $ */
+/* $Id: maps_ip.cc,v 1.7 2005-04-18 15:10:06 Singular Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */
@@ -19,6 +19,7 @@
 #include "longalg.h"
 #include "lists.h"
 #include "maps.h"
+#include "maps_ip.h"
 #include "prCopy.h"
 
 /*2
