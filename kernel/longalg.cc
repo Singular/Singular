@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.7 2005-02-25 16:10:52 Singular Exp $ */
+/* $Id: longalg.cc,v 1.8 2005-04-18 13:01:39 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -2100,7 +2100,7 @@ static napoly napPerm(napoly p,const int *par_perm,const ring src_ring,const nMa
     {
       if (p==NULL)
       {
-        napDelete(&w);
+        p_Delete(&w,nacRing);
         return NULL;
       }
       /* else continue*/
@@ -2236,18 +2236,18 @@ nMapFunc naSetMap(ring src, ring dst)
 /*2
 * convert a napoly number into a poly
 */
-poly naPermNumber(number z, int * par_perm, int P, ring r)
+poly naPermNumber(number z, int * par_perm, int P, ring oldRing)
 {
   if (z==NULL) return NULL;
   poly res=NULL;
   poly p;
   napoly za=((lnumber)z)->z;
   napoly zb=((lnumber)z)->n;
-  nMapFunc nMap=naSetMap(r,currRing);
+  nMapFunc nMap=naSetMap(oldRing,currRing);
   if (currRing->parameter!=NULL)
-    nMap=currRing->algring->cf->cfSetMap(r->algring, nacRing);
+    nMap=currRing->algring->cf->cfSetMap(oldRing->algring, nacRing);
   else
-    nMap=currRing->cf->cfSetMap(r->algring, currRing);
+    nMap=currRing->cf->cfSetMap(oldRing->algring, currRing);
   if (nMap==NULL) return NULL; /* emergency exit only */
   do
   {
@@ -2262,7 +2262,7 @@ poly naPermNumber(number z, int * par_perm, int P, ring r)
     lnumber pan;
     if (currRing->parameter!=NULL)
     {
-      assume(r->algring!=NULL);
+      assume(oldRing->algring!=NULL);
       pGetCoeff(p)=(number)omAlloc0Bin(rnumber_bin);
       pan=(lnumber)pGetCoeff(p);
       pan->s=2;
@@ -2275,13 +2275,13 @@ poly naPermNumber(number z, int * par_perm, int P, ring r)
     }
     for(i=0;i<P;i++)
     {
-      if(napGetExpFrom(za,i+1,r)!=0)
+      if(napGetExpFrom(za,i+1,oldRing)!=0)
       {
         if(par_perm==NULL)
         {
           if ((rPar(currRing)>=i) && (pa!=NULL))
           {
-            napSetExp(pa,i+1,napGetExpFrom(za,i+1,r));
+            napSetExp(pa,i+1,napGetExpFrom(za,i+1,oldRing));
             p_Setm(pa,nacRing);
           }
           else
@@ -2291,10 +2291,10 @@ poly naPermNumber(number z, int * par_perm, int P, ring r)
           }
         }
         else if(par_perm[i]>0)
-          pSetExp(p,par_perm[i],napGetExpFrom(za,i+1,r));
+          pSetExp(p,par_perm[i],napGetExpFrom(za,i+1,oldRing));
         else if((par_perm[i]<0)&&(pa!=NULL))
         {
-          napSetExp(pa,-par_perm[i], napGetExpFrom(za,i+1,r));
+          napSetExp(pa,-par_perm[i], napGetExpFrom(za,i+1,oldRing));
           p_Setm(pa,nacRing);
         }
         else
@@ -2309,7 +2309,7 @@ poly naPermNumber(number z, int * par_perm, int P, ring r)
       pSetm(p);
       if (zb!=NULL)
       {
-        pan->n=napPerm(zb,par_perm,r,nMap);
+        pan->n=napPerm(zb,par_perm,oldRing,nMap);
         if(pan->n==NULL) /* error in mapping or mapping to variable */
           pDelete(&p);
       }

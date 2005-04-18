@@ -6,7 +6,7 @@
  *  Purpose: implementation of debug related poly routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pDebug.cc,v 1.1.1.1 2003-10-06 12:15:57 Singular Exp $
+ *  Version: $Id: pDebug.cc,v 1.2 2005-04-18 13:01:40 Singular Exp $
  *******************************************************************/
 
 #ifndef PDEBUG_CC
@@ -233,7 +233,7 @@ BOOLEAN _p_Test(poly p, ring r, int level)
     pPolyAssumeReturnMsg(ismod == (p_GetComp(p, r) > 0), "mixed poly/vector");
 
     // special check for ringorder_s/S
-    if (r->order[1] == ringorder_S)
+    if ((r->order!=NULL) &&(r->order[1] == ringorder_S))
     {
       long c1, cc1, ccc1, ec1;
       sro_ord* o = &(r->typ[1]);
