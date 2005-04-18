@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.97 2005-02-17 09:49:20 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.98 2005-04-18 12:22:09 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1726,9 +1726,16 @@ ring rCompose(lists  L)
       WerrorS("could not create rational function coefficient field");
       goto rCompose_err;
     }
-    R->ch=R->algring->ch;
+    if (R->algring->ch>0)
+       R->ch= -R->algring->ch;
+    else
+       R->ch=1;
     R->parameter=R->algring->names;
     R->P=R->algring->N;
+    if (R->algring->qideal!=NULL)
+    {
+      R->minpoly=pGetCoeff(R->algring->qideal->m[0]);
+    }
   }
   else
   {
