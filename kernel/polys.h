@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.3 2005-01-27 16:42:15 Singular Exp $ */
+/* $Id: polys.h,v 1.4 2005-04-18 14:50:55 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials of the
              currRing
@@ -416,7 +416,8 @@ long      pDegW(poly p, short *w);
 /*-----------type conversions ----------------------------*/
 poly  pPolys2Vec(polyset p, int len);
 void  pVec2Polys(poly v, polyset *p, int *len);
-int   pVar(poly m);
+int   p_Var(poly mi,const ring r);
+#define   pVar(m) p_Var(m,currRing)
 
 /*-----------specials for spoly-computations--------------*/
 BOOLEAN pCompareChain (poly p,poly p1,poly p2,poly lcm);

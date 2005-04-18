@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.12 2005-04-11 15:59:28 Singular Exp $ */
+/* $Id: polys1.cc,v 1.13 2005-04-18 14:50:56 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -1630,14 +1630,14 @@ void  pVec2Polys(poly v, polyset *p, int *len)
   }
 }
 
-int pVar(poly m)
+int p_Var(poly m,const ring r)
 {
   if (m==NULL) return 0;
   if (pNext(m)!=NULL) return 0;
   int i,e=0;
-  for (i=pVariables; i>0; i--)
+  for (i=r->N; i>0; i--)
   {
-    if (pGetExp(m,i)==1)
+    if (p_GetExp(m,i,r)==1)
     {
       if (e==0) e=i;
       else return 0;
