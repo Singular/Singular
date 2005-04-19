@@ -1,0 +1,556 @@
+// E. Tobis  12.Nov.2004
+// last change 16. Apr. 2005 (G.-M. Greuel)
+///////////////////////////////////////////////////////////////////////////////
+category="Symbolic-numerical solving"
+info="
+LIBRARY: mrrcount.lib Counting number of real roots of polynomial systems
+AUTHOR:               Enrique A. Tobis, etobis@dc.uba.ar 
+
+OVERVIEW:  Routines for counting the number of real roots of a multivariate
+           polynomial system.
+           References:
+
+PROCEDURES:
+ symsignature(m)   Signature of the symmetric matrix m
+ sturmquery(h,B,I) Sturm query of h on V(I)
+ matbil(h,B,I)     Matrix of the bilinear form on R/I associated to h
+ matmult(f,B,I)    Matrix of multiplication by f (m_f) on R/I in the basis B
+ tracemult(f,B,I)  Trace of m_f (B is an ordered basis of R/I)
+ coords(f,B,I)     Coordinates of f in the ordered basis B
+ randcharpoly(B,I) Pseudorandom charpoly of univ. projection
+ verify(p,B,i)     Verifies the result of randcharpoly
+ randlinpoly()     Pseudorandom linear polynomial 
+ powersums(f,B,I)  Powersums of the roots of a char polynomial
+ symmfunc(S)       Symmetric functions from the powersums S
+ univarpoly(l)     Polynomial with coefficients from l
+ qbase(i)          Like kbase, but the monomials are ordered
+
+KEYWORDS: real roots, univariate projection
+";
+///////////////////////////////////////////////////////////////////
+LIB "linalg.lib";   // We use charpoly
+LIB "urrcount.lib"; // We use varsigns
+
+proc symsignature(matrix m)
+"USAGE:     symsignature(m); m matrix. m must be symmetric.
+RETURN:    number: the signature of m
+SEE ALSO:  matbil,sturmquery
+EXAMPLE:   example symsignature; shows an example"
+{
+  int positive, negative, i, j;
+  list l;
+  poly variable;
+
+  if (isparam(m)) {
+    ERROR("This procedure cannot operate with parametric arguments");
+  }
+
+  if (!isSquare(m)) {
+    ERROR ("m must be a square matrix");
+  }
+
+  // We check whether m is symmetric
+  for (i = 1;i <= nrows(m);i++) {
+    for (j = i;j <= nrows(m);j++) {
+      if (m[i,j] != m[j,i]) {
+	ERROR ("m must be a symmetric matrix");
+      }
+    }
+  }
+
+  poly f = charpoly(m); // Uses the last variable of the ring
+
+  for (i = size(f);i >= 1;i--) {
+    l[i] = leadcoef(f[i]);
+  }
+  positive = varsigns(l);
+
+  variable = var(nvars(basering)); // charpoly uses the last variable
+  f = subst(f,variable,-variable);
+
+  for (i = size(f);i >= 1;i--) {
+    l[i] = leadcoef(f[i]);
+  }
+
+  negative = varsigns(l);
+  return (positive - negative);
+}
+example
+{
+  echo = 2;
+  ring r = 0,(x,y),dp;
+  ideal i = x4-y2x,y2-13;
+  i = groebner(i);
+  ideal b = qbase(i);
+
+  matrix m = matbil(1,b,i);
+  symsignature(m);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc sturmquery(poly h,ideal B,ideal I)
+"USAGE:     sturmquery(h,b,i); h poly, b,i ideal
+RETURN:    number: the Sturm query of h in V(i)
+ASSUME:    b is an ordered monomial basis of r/i, r = basering
+SEE ALSO:  symsignature,matbil
+EXAMPLE:   example sturmquery; shows an example"
+{
+  if (isparam(h) || isparam(B) || isparam(I)) {
+    ERROR("This procedure cannot operate with parametric arguments");
+  }
+
+  return (mysymmsig(matbil(h,B,I)));
+}
+example
+{
+  echo = 2;
+  ring r = 0,(x,y),dp;
+  ideal i = x4-y2x,y2-13;
+  i = groebner(i);
+  ideal b = qbase(i);
+
+  sturmquery(1,b,i);
+}
+
+static proc mysymmsig(matrix m) 
+// returns the signature of a square symmetric matrix m
+{
+  int positive, negative, i;
+  list l;
+  poly variable;
+
+  poly f = charpoly(m); // Uses the last variable of the ring
+
+  for (i = size(f);i >= 1;i--) {
+    l[i] = leadcoef(f[i]);
+  }
+  positive = varsigns(l);
+
+  variable = var(nvars(basering)); // charpoly uses the last variable
+  f = subst(f,variable,-variable);
+
+  for (i = size(f);i >= 1;i--) {
+    l[i] = leadcoef(f[i]);
+  }
+
+  negative = varsigns(l);
+  return (positive - negative);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc matbil(poly h,ideal B,ideal I)
+"USAGE:    matbil(h,b,i); h poly, b,i ideal
+RETURN:    matrix: the matrix of the bilinear form (f,g) |-> trace(m_fhg),
+           m_fhg = multiplication with fhg on r/i
+ASSUME:    i is a Groebner basis and b is an ordered monomial basis of r/i,
+           r = basering
+SEE ALSO:  matmult,tracemult
+EXAMPLE:   example matbil; shows an example"
+{
+  matrix m[size(B)][size(B)];
+  poly f;
+  int k,l;
+
+  f = reduce(h,I);
+  for (k = 1;k <= size(B);k++) {
+    for (l = 1;l <= k;l++) {
+      m[k,l] = tracemult((reduce(f*B[k]*B[l],I),B,I));
+      m[l,k] = m[k,l]; // The matrix we are trying to compute is symmetric
+    }
+  }
+  return(m);
+}
+example
+{
+  echo = 2;
+  ring r = 0,(x,y),dp;
+  ideal i = x4-y2x,y2-13;
+  i = groebner(i);
+  ideal b = qbase(i);
+  poly f = x3-xy+y-13+x4-y2x;
+
+  matrix m = matbil(f,b,i);
+  print(m);
+
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc tracemult(poly f,ideal B,ideal I)
+"USAGE:     tracemult(f,b,i);f poly, b,i ideal
+RETURN:    number: the trace of the multiplication by f (m_f) on r/i, 
+           written in the monomial basis b of r/i, r = basering 
+           (faster than matmult + trace)
+ASSUME:    i is a Groebner basis and b is an ordered monomial basis of r/i
+SEE ALSO:  matmult,trace
+EXAMPLE:   example tracemult; shows an example"
+{
+  poly g;
+  int k; // Iterates over the basis monomials
+  int l; // Iterates over the rows of the matrix
+  list coordinates;
+  number m;
+
+  g = reduce(f,I);
+  
+  m = 0;
+  for (k = 1;k <= size(B);k++) {
+    coordinates = coords(g*(B[k]),B,I); // f*x_k written on the basis B
+    m = m + coordinates[k];
+  }
+  return (m);
+}
+example
+{
+  echo = 2;
+  ring r = 0,(x,y),dp;
+  ideal i = x4-y2x,y2-13;
+  i = groebner(i);
+  ideal b = qbase(i);
+
+  poly f = x3-xy+y-13+x4-y2x;
+  matrix m = matmult(f,b,i);
+  print(m);
+
+  tracemult(f,b,i);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc matmult(poly f, ideal B, ideal I)
+"USAGE:     matmult(f,b,i); f poly, b,i ideal
+RETURN:    matrix: the matrix of the multiplication map by f (m_f) on r/i
+           wrt to the monomial basis b of r/i (r = basering)
+ASSUME:    i is a Groebner basis and b is an ordered monomial basis of r/i
+SEE ALSO:  coords,matbil
+EXAMPLE:   example matmult; shows an example"
+{
+  poly g;
+  int k; // Iterates over the basis monomials
+  int l; // Iterates over the rows of the matrix
+  list coordinates;
+  matrix m[size(B)][size(B)];
+
+  g = reduce(f,I);
+  
+  for (k = 1;k <= size(B);k++) {
+    coordinates = coords(g*(B[k]),B,I); // f*x_k written on the basis B
+    for (l = 1;l <= size(B);l++) {
+      m[l,k] = coordinates[l];
+    }
+  }
+  return (m);
+}
+example
+{
+  echo = 2;
+  ring r = 0,(x,y),dp;
+  ideal i = x4-y2x,y2-13;
+  i = groebner(i);
+  ideal b = qbase(i);
+
+  poly f = x3-xy+y-13+x4-y2x;
+
+  matrix m = matmult(f,b,i);
+  print(m);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc coords(poly f,ideal B,ideal I)
+"USAGE:     coords(f,b,i), f poly, b,i ideal
+RETURN:    list: the coordinates of the class of f in the monomial basis b
+ASSUME:    i is a Groebner basis and b is an ordered monomial basis of r/i,
+           r = basering
+SEE ALSO:  matmult,matbil
+KEYWORDS:  coordinates
+EXAMPLE:   example coords; shows an example"
+{
+  // We assume the basis is sorted according to the ring order
+  poly g;
+  int k,l=1,1;
+  list coordinates;
+  int N = size(B);
+
+  // We first compute the normal form of f wrt I
+  g = reduce(f,I);
+
+  coordinates[N] = 0; // We resize the list of coordinates
+  while (k <= N) {
+    if (l <= size(g) && leadmonom(g[l]) == B[k]) {
+      coordinates[k] = leadcoef(g[l]);
+      l++;
+    } else {
+      coordinates[k] = 0;
+    }
+    k++;
+  }
+  return (coordinates);
+}
+example
+{
+  echo = 2;
+  ring r = 0,(x,y),dp;
+  ideal i = x4-y2x,y2-13;
+  i = groebner(i);
+  ideal b = qbase(i);
+  
+  coords(x3-xy+y-13+x4-y2x,b,i);
+  b;
+}
+///////////////////////////////////////////////////////////////////////////////
+
+static proc isSquare(matrix m) 
+// returns 1 iff m is a square matrix
+{
+  return (nrows(m)==ncols(m));
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc randcharpoly(ideal B,ideal I)
+"USAGE:     randcharpoly(b,i); b,i ideal
+RETURN:    poly: the characteristic polynomial of a pseudorandom
+           rational univariate projection having one zero per zero of i
+ASSUME:    i is a Groebner basis and b is an ordered monomial basis of r/i,
+           r = basering
+KEYWORDS:  rational univariate projection
+EXAMPLE:   example randcharpoly; shows an example"
+{
+  poly p;
+  poly generic;
+  list l;
+  matrix m;
+  poly q;
+
+  generic = randlinpoly();
+
+  p = reduce(generic,I);
+  m = matmult(p,B,I);
+  q = charpoly(m);
+
+  print("*********************************************************************");
+  print("* WARNING: This polynomial was obtained using  pseudorandom numbers.*");
+  print("* If you want to verify the result, please use the command          *");
+  print("*                                                                   *");
+  print("* verify(p,b,i)                                                     *");
+  print("*                                                                   *");
+  print("* where p is the polynomial, b is the monomial basis used, and i    *");
+  print("* the Groebner basis of the ideal                                   *");
+  print("*********************************************************************");
+
+  return(q);
+}
+example
+{
+  echo = 2;
+  ring r = 0,(x,y,z),dp;
+  ideal i = (x-1)*(x-2),(y-1),(z-1)*(z-2)*(z-3)^2;
+  i = groebner(i);
+  ideal b = qbase(i);
+  poly p = randcharpoly(b,i);
+  p;
+  nrroots(p); // See nrroots in urrcount.lib
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc verify(poly p,ideal b,ideal i)
+"USAGE:     verify(p,b,i);p poly, b,i,ideal
+RETURN:    integer: 1 iff the polynomial p splits the points of V(i). 
+           It's used to check the result of randcharpoly
+ASSUME:    i is a Groebner basis and b is an ordered monomial basis of r/i,
+           r = basering
+SEE ALSO:  randcharpoly
+EXAMPLE:   example verify; shows an example"
+{
+  poly sqrfree;
+  int correct;
+  poly variable;
+
+  if (isparam(p) || isparam(b) || isparam(i)) {
+    ERROR("This procedure cannot operate with parametric arguments");
+  }
+
+  variable = isuni(p);
+  sqrfree = p/gcd(p,diff(p,variable));
+  correct = (mat_rk(matbil(1,b,i)) == deg(sqrfree));
+
+  if (correct) {
+    print("Verification successful");
+  } else {
+    print("The choice of random numbers was not useful");
+  }
+  return (correct);
+}
+example
+{
+  echo = 2;
+  ring r = 0,(x,y),dp;
+  poly f = x3-xy+y-13+x4-y2x;
+  ideal i = x4-y2x,y2-13;
+  i = groebner(i);
+  ideal b = qbase(i);
+  poly p = randcharpoly(b,i);
+  verify(p,b,i);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc randlinpoly() 
+"USAGE:     randlinpoly();
+RETURN:    poly: a polynomial linear in each variable of the ring, with
+           pseudorandom coefficients
+SEE ALSO:  randcharpoly;
+EXAMPLE:   example randlinpoly; shows an example"
+{
+  int n,i;
+  poly p = 0;
+  
+  n = nvars(basering);
+  for (i = 1;i <= n;i++) {
+    p = p + var(i)*random(1,1000000);
+  }
+  return (p);
+}
+example
+{
+  echo = 2;
+  ring r = 0,(x,y,z,w),dp;
+  poly p = randlinpoly();
+  p;
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc powersums(poly f,ideal B,ideal I)
+"USAGE:     powersums(f,b,i); f poly; b,i ideal, b a sorted monomial basis for
+           the quotient between the basering and i.
+RETURN:    list: the powersums of the results of evaluating f at the zeros of I
+SEE ALSO:  symmfunc
+EXAMPLE:   example symmfunc; shows an example"
+{
+  int N,k; 
+  list sums;
+
+  N = size(B);
+  for (k = 1;k <= N;k++) {
+    sums = sums + list(leadcoef(trace(matmult(f^k,B,I))));
+  }
+  return (sums);
+}
+example
+{
+  echo = 2;
+  ring r = 0,(x,y,z),dp;
+
+  ideal i = (x-1)*(x-2),(y-1),(z+5); // V(I) = {(1,1,-5),(2,1,-5)
+  i = groebner(i);
+
+  ideal b = qbase(i);
+  poly f = x+y+z;
+  list psums = list(-2-3,4+9); // f evaluated at V(I) gives {-3,-2}
+  list l = powersums(f,b,i);
+  psums;
+  l;
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc symmfunc(list S) 
+// Takes the list of power sums and returns the symmetric functions
+"USAGE:     symmfunc(s); s list
+RETURN:    list: the symmetric functions of the roots of a polynomial, given
+                 the power sums of those roots.
+SEE ALSO:  powersums
+EXAMPLE:   example symmfunc; shows an example"
+{
+  list a;
+  int j,l,N;
+  number sum;
+
+  N = size(S);
+  a[N+1] = 1; // We set the length of the list and initialize its last element.
+
+  for (l = N - 1;l >= 0;l--) {
+    sum = 0;
+    for (j = l + 1;j <= N;j++) {
+      sum = sum + ((a[j+1])*(S[j-l]));
+    }
+    sum = -sum;
+    a[l+1] = sum/(N-l);
+  }
+
+  a = reverse(a);
+  return (a);
+}
+example
+{
+  echo = 2;
+  ring r = 0,x,dp;
+  poly p = (x-1)*(x-2)*(x-3);
+  list psums = list(1+2+3,1+4+9,1+8+27);
+  list l = symmfunc(psums);
+  l;
+  p; // Compare p with the elements of l
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc univarpoly(list l)
+"USAGE:     univarpoly(l); l list
+RETURN:    poly: a polynomial p on the first variable of basering, say x, 
+           with p = l[1] + l[2]*x + l[3]*x^2 + ...
+EXAMPLE:  example univarpoly; shows an example"
+{
+  poly p;
+  int i,n;
+  
+  n = size(l);
+  for (i = 1;i <= n;i++) {
+    p = p + l[i]*var(1)^(n-i);
+  }
+  return (p);
+}
+example
+{
+  echo = 2;
+  ring r = 0,x,dp;
+  list l = list(1,2,3,4,5);
+  poly p = univarpoly(l);
+  p;
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc qbase(ideal i)
+"USAGE:    qbase(I); I zero-dimensional ideal
+RETURN:   ideal: A monomial basis of the quotient between the basering and the
+          ideal I, sorted according to the basering order.
+SEE ALSO: kbase
+KEYWORDS: zero-dimensional
+EXAMPLE:  example qbase; shows an example"
+{
+  ideal b;
+
+  b = kbase(i);
+  b = reverseideal(sort(b)[1]); // sort sorts in ascending order
+  return (b);
+}
+example
+{
+  echo = 2;
+  ring r = 0,(x,y,z),dp;
+
+  ideal i = 2x2,-y2,z3;
+  i = groebner(i);
+  ideal b = qbase(i);
+  b;
+  b = kbase(i);
+  b; // Compare this with the result of qbase
+}
+///////////////////////////////////////////////////////////////////////////////
+
+static proc reverseideal(ideal b) // Returns b reversed
+{
+  int i;
+  ideal result;
+
+  result = b[1];
+  for (i = 2;i <= size(b);i++) {
+    result = b[i], result;
+  }
+  return (result);
+}
+///////////////////////////////////////////////////////////////////////////////
+

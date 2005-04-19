@@ -1,4 +1,4 @@
-version="$Id: brnoeth.lib,v 1.13 2004-02-17 16:03:20 Singular Exp $";
+version="$Id: brnoeth.lib,v 1.14 2005-04-19 15:23:38 Singular Exp $";
 category="Coding theory";
 info="
 LIBRARY:   brnoeth.lib  Brill-Noether Algorithm, Weierstrass-SG and AG-codes
@@ -134,10 +134,10 @@ static proc pd2 (poly g1,poly g2)
     def BR=basering;
     poly A=g1;
     poly B=g2;
-    ring raux1=char(basering),(x,y,a),lp;
+    ring raux1=char(basering),(x,y,@a),lp;
     poly G;
-    ring raux2=(char(basering),a),(x,y),lp;
-    map psi=BR,x,a;
+    ring raux2=(char(basering),@a),(x,y),lp;
+    map psi=BR,x,@a;
     minpoly=number(psi(A));
     poly f=psi(B);
     ideal facts=factorize(f,1);
@@ -150,7 +150,7 @@ static proc pd2 (poly g1,poly g2)
       sg=string(g);
       setring raux1;
       execute("G="+sg+";");
-      G=subst(G,a,y);
+      G=subst(G,@a,y);
       setring BR;
       map ppssii=raux1,var(1),var(2),0;
       J[2]=ppssii(G);
@@ -373,12 +373,12 @@ static proc inf_P (poly f)
       {
         // the point is non-rational and a field extension with minpoly=aux
         // is needed
-        ring r_ext=(char(basering),a),(x,y,z),lp;
+        ring r_ext=(char(basering),@a),(x,y,z),lp;
         poly F=imap(r_auxz,F);
         poly f_xz=subst(F,y,1);
         poly aux=imap(base_r,aux);
-        minpoly=number(subst(aux,x,a));
-        map phi=r_ext,x+a,0,z;
+        minpoly=number(subst(aux,x,@a));
+        map phi=r_ext,x+@a,0,z;
         poly f_origin=phi(f_xz);
         if ( subst(subst(diff(f_origin,x),x,0),z,0)==0 &&
              subst(subst(diff(f_origin,z),x,0),z,0)==0 )
@@ -768,7 +768,7 @@ static proc conj_bs (list L,int r)
 static proc subfield (sf)
 {
   // writes the generator "a" of a subfield of the coefficients field of
-  //   basering in terms of the the current generator (also called "a") as a
+  //   basering in terms of the current generator (also called "a") as a
   //   string sf is an existing ring whose coefficient field is such a subfield
   // warning : in basering there must be a variable called "x" and subfield
   //   must not be prime
@@ -1147,8 +1147,20 @@ static proc place (intvec Pp,int sing,list CURVE)
   export(CHI);
   int i,j,k;
   int m,n;
-//  list L@HNE=essdevelop(CHI);
-  list L@HNE=ratdevelop(CHI);
+//  list L@HNE=essdevelop(CHI);  
+  list LLL=ratdevelop(CHI);
+  if (typeof(LLL[1])=="ring") {
+    def altring=basering;
+    def HNEring = LLL[1]; setring HNEring;
+    def L@HNE = hne;
+    kill hne;
+  }
+  else {
+    def L@HNE=LLL;
+    def HNEring=basering;
+    setring HNEring;
+  }
+  kill LLL;
   export(L@HNE);
   int n_branches=size(L@HNE);
   list Li_aux=list();
@@ -1999,6 +2011,8 @@ NOTE:     @code{Adj_div(f);} computes and stores the fundamental data of the
 
           If @code{printlevel>=0} additional comments are displayed (default:
           @code{printlevel=0}).
+WARNING:  The parameter of the needed field extensions is called 'a'. Thus,
+          there should be no global object named 'a' when executing Adj_div.
 KEYWORDS: Hamburger-Noether expansions; adjunction divisor
 SEE ALSO: closed_points, NSplaces
 EXAMPLE:  example Adj_div; shows an example
@@ -2017,6 +2031,19 @@ EXAMPLE:  example Adj_div; shows an example
   if (npars(basering)>0)
   {
     ERROR("Base field not implemented");
+  }
+  if (defined(a)==1)
+  {
+    if ((typeof(a)=="int") or (typeof(a)=="intvec") or (typeof(a)=="intmat") or
+        (typeof(a)=="string") or (typeof(a)=="proc") or (typeof(a)=="list"))
+    {
+      print("WARNING: There is an object named 'a' of the global type "
+             + typeof(a)+".");
+      print("This will cause problems when "
+             + "executing Adj_div, as 'a' is used for "
+             + "the name of the parameter of the field extensions needed.");
+      ERROR("Please rename or kill the object named 'a'"); 
+    }
   }
   intvec opgt=option(get);
   option(redSB);
@@ -2169,8 +2196,10 @@ RETURN:   list L with updated data of CURVE after computing all non-singular
    @end format
           See @ref{Adj_div} for a description of the entries in L.
 NOTE:     The list_expression should be the output of the procedure Adj_div.@*
-          If @code{printlevel>=0} additional comments are displayed (default:
-          @code{printlevel=0}).
+          Raising @code{printlevel}, additional comments are displayed 
+          (default: @code{printlevel=0}).
+WARNING:  The parameter of the needed field extensions is called 'a'. Thus,
+          there should be no global object named 'a' when executing NSplaces.
 SEE ALSO: closed_points, Adj_div
 EXAMPLE:  example NSplaces; shows an example
 "
@@ -2180,6 +2209,19 @@ EXAMPLE:  example NSplaces; shows an example
   // list CURVE must be the output of the procedure "Adj_div"
   // notice : if h==0 then nothing is done
   // warning : non-positive entries are forgotten
+  if (defined(a)==1)
+  {
+    if ((typeof(a)=="int") or (typeof(a)=="intvec") or (typeof(a)=="intmat") or
+        (typeof(a)=="string") or (typeof(a)=="proc") or (typeof(a)=="list"))
+    {
+      print("WARNING: There is an object named 'a' of the global type "
+             + typeof(a)+".");
+      print("This will cause problems when "
+             + "executing Adj_div, as 'a' is used for "
+             + "the name of the parameter of the field extensions needed.");
+      ERROR("Please rename or kill the object named 'a'"); 
+    }
+  }
   if (h==0)
   {
     return(CURVE);
@@ -2210,6 +2252,7 @@ EXAMPLE:  example NSplaces; shows an example
           pP[2]=l;
           for (j=1;j<=s;j=j+1)
           {
+            dbprint(printlevel-voice-2,"Place No.\ "+string(j));
             pP[3]=j;
             update_CURVE=place(pP,0,update_CURVE);
           }
@@ -2871,25 +2914,43 @@ static proc extra_place (ideal P)
   map phi=base_r,x+A,y+B;
   poly LOC_EQ=phi(CHI);
   kill(A,B,phi);
-  list L@HNE=essdevelop(LOC_EQ)[1];
-  export(L@HNE);
-  int m=nrows(L@HNE[1]);
-  int n=ncols(L@HNE[1]);
-  intvec Li2=L@HNE[2];
-  int Li3=L@HNE[3];
-  setring ES;
-  string newa=subfield(HNEring);
-  poly paux=importdatum(HNEring,"L@HNE[4]",newa);
-  matrix Maux[m][n];
-  int i,j;
-  for (i=1;i<=m;i=i+1)
-  {
-    for (j=1;j<=n;j=j+1)
+  list LLL=essdevelop(LOC_EQ);
+  if (typeof(LLL[1])=="ring") {
+    def altring=basering;
+    def HNEring = LLL[1]; 
+    setring HNEring;
+    def L@HNE = hne[1];
+    kill hne;
+    export(L@HNE);
+    int m=nrows(L@HNE[1]);
+    int n=ncols(L@HNE[1]);
+    intvec Li2=L@HNE[2];
+    int Li3=L@HNE[3];
+    setring ES;
+    string newa=subfield(HNEring);
+    poly paux=importdatum(HNEring,"L@HNE[4]",newa);
+    matrix Maux[m][n];
+    int i,j;
+    for (i=1;i<=m;i=i+1)
     {
-      Maux[i,j]=importdatum(HNEring,"L@HNE[1]["+string(i)+","+
-                                                string(j)+"]",newa);
+      for (j=1;j<=n;j=j+1)
+      {
+        Maux[i,j]=importdatum(HNEring,"L@HNE[1]["+string(i)+","+
+                                                  string(j)+"]",newa);
+      }
     }
   }
+  else {
+    def L@HNE=LLL[1][1];
+    matrix Maux=L@HNE[1];
+    intvec Li2=L@HNE[2];
+    int Li3=L@HNE[3];
+    poly paux=L@HNE[4];
+    def HNEring=basering;
+    setring HNEring;
+  }
+  kill LLL;
+  
   list BRANCH=list();
   BRANCH[1]=Maux;
   BRANCH[2]=Li2;
@@ -3320,15 +3381,9 @@ EXAMPLE:  example BrillNoether; shows an example
   int N=size(nFORMS(n));
   matrix H0[1][N];
   int i,j;
-  for (i=1;i<=N;i=i+1)
-  {
-    H0[1,i]=VmW[k,i];
-  }
+  for (i=1;i<=N;i=i+1) { H0[1,i]=VmW[k,i]; }
   poly Ho;
-  for (i=1;i<=N;i=i+1)
-  {
-    Ho=Ho+(H0[1,i]*nFORMS(n)[i]);
-  }
+  for (i=1;i<=N;i=i+1) { Ho=Ho+(H0[1,i]*nFORMS(n)[i]); }
   list INTERD=intersection_div(Ho,update_CURVE);
   intvec NHo=INTERD[1];
   update_CURVE=INTERD[2];
@@ -4705,9 +4760,19 @@ example
 ////////////// this procedure should move in hnoether.lib /////////
 static proc ratdevelop (poly chi)
 {
-  def r=basering;
+  int ring_is_changed;
   int k1=res_deg();
-  list HND=essdevelop(chi);
+  list L=essdevelop(chi);
+  if (typeof(L[1])=="ring") {
+    def altring=basering;
+    def HNring = L[1]; setring HNring;
+    def HND = hne;
+    kill hne;
+    ring_is_changed=1;
+  }
+  else {
+    def HND=L[1];
+  }
   int k2=res_deg();
   if (k1<k2)
   {
@@ -4748,11 +4813,9 @@ static proc ratdevelop (poly chi)
       }
     }
   }
-  keepring(HNEring);
-  return(HND);
+  if (ring_is_changed==0) { return(HND); }
+  else { export HND; setring altring; return(HNring); }
 }
-;
-
 
 
 

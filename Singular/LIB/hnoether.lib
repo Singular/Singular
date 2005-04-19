@@ -1,4 +1,4 @@
--	version="$Id: hnoether.lib,v 1.45 2005-04-15 13:42:53 Singular Exp $";
+-	version="$Id: hnoether.lib,v 1.46 2005-04-19 15:23:40 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  hnoether.lib   Hamburger-Noether (Puiseux) Expansion
@@ -572,7 +572,7 @@ EXAMPLES: example develop;         shows an example
  if (ringwechsel) { poly f=m(f); }
  if (defined(HNDebugOn))
  {"received polynomial: ",f,", where x =",namex,", y =",namey;}
-
+ kill m;
  int M,N,Q,R,l,e,hilf,eps,getauscht,Abbruch,zeile,exponent,Ausgabe;
 
  // Werte von Ausgabe: 0 : normale HNE-Matrix,
@@ -2768,6 +2768,43 @@ EXAMPLE: example hnexpansion;  shows an example
    dbprint(printlevel-voice+2,
       "// result: "+string(size(hne))+" branch(es) successfully computed.");
  }
+
+ // ----- Lossen 10/02 : the branches have to be resorted to be able to
+ // -----                display the multsequence in a nice way
+ if (size(hne)>2)
+ {  
+   int i,j,k,m;
+   list dummy;
+   int nbsave;
+   int no_br = size(hne);
+   intmat nbhd[no_br][no_br];
+   for (i=1;i<no_br;i++)
+   {
+     for (j=i+1;j<=no_br;j++)  
+     { 
+       nbhd[i,j]=separateHNE(hne[i],hne[j]);
+       k=i+1;
+       while ( (nbhd[i,k] >= nbhd[i,j]) and (k<j) )
+       {
+         k++;
+       }
+       if (k<j)  // branches have to be resorted 
+       {
+         dummy=hne[j];
+         nbsave=nbhd[i,j];
+         for (m=k; m<j; m++)
+         {
+           hne[m+1]=hne[m];
+           nbhd[i,m+1]=nbhd[i,m];
+         }
+         hne[k]=dummy;
+         nbhd[i,k]=nbsave;
+       }
+     }
+   }
+ }
+ // -----
+ 
  if (field_ext==1) {
    dbprint(printlevel-voice+3,"
 // 'hnexpansion' created a list of one ring.
@@ -2790,9 +2827,9 @@ EXAMPLE: example hnexpansion;  shows an example
      ring HNhelpring=char(altring),(a,x,y),ls;
      list hne=imap(HNEring,hne);
      setring altring;
-     map m=HNhelpring,par(1),var(1),var(2);
-     list hne=m(hne);
-     kill m,HNhelpring;
+     map mmm=HNhelpring,par(1),var(1),var(2);
+     list hne=mmm(hne);
+     kill mmm,HNhelpring;
    }
    else {   
      list hne=fetch(HNEring,hne);

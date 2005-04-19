@@ -1,4 +1,4 @@
-version="$Id: equising.lib,v 1.9 2005-04-15 15:20:12 Singular Exp $";
+version="$Id: equising.lib,v 1.10 2005-04-19 15:23:39 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  equising.lib  Equisingularity Stratum of a Family of Plane Curves
@@ -618,6 +618,8 @@ static proc make_ring_small(ideal J)
 
 static proc esComputation (int typ, poly p_F, list #)
 {
+  intvec ov=option(get);  // store options set at beginning
+  option(redSB);
   // Initialize variables
   int branch=1;
   int blowup=1;
@@ -639,10 +641,12 @@ static proc esComputation (int typ, poly p_F, list #)
     print("family is trivial (no deformation parameters)!");
     if (typ==1) //isEquising
     {
+      option(set,ov);
       return(1);  
     }
     else
     {
+      option(set,ov);
       return(list(ideal(0),0));
     }
   }
@@ -659,10 +663,12 @@ static proc esComputation (int typ, poly p_F, list #)
         print("No computation performed !");
         if (typ==1) //isEquising
         {
+          option(set,ov);
           return(1);  
         }
         else
         {
+          option(set,ov);
           return(list(ideal(0),int(1)));
         }
       }
@@ -674,9 +680,12 @@ static proc esComputation (int typ, poly p_F, list #)
         }
       }      
     }
-    if (typeof(#[1])=="list")
+    else
     {
-      def @L=#[1];  // is assumed to be the Hamburger-Noether matrix
+      if (typeof(#)=="list")
+      {
+        def @L=#;  // is assumed to be the Hamburger-Noether matrix
+      }
     }
   }
   int ring_is_changed;
@@ -715,10 +724,12 @@ static proc esComputation (int typ, poly p_F, list #)
       if (typ==1) //isEquising
       {
         print("Return value (=0) has no meaning!");
+        option(set,ov);
         return(0);  
       }
       else
       { 
+        option(set,ov);
         return(list( ideal(0),error));
       }
     }
@@ -736,12 +747,15 @@ static proc esComputation (int typ, poly p_F, list #)
       if (typ==1) //isEquising
       {
         print("Return value (=0) has no meaning!");
+        option(set,ov);
         return(0);  
       }
       else
       {
+        option(set,ov);
         return(list(ideal(0),int(1)));
       }
+      option(set,ov);
       return(0);
     }
     else
@@ -749,10 +763,10 @@ static proc esComputation (int typ, poly p_F, list #)
       if (typeof(LLL[1])=="ring") {
         def HNering = LLL[1]; 
         setring HNering; 
-        def @L=hne;
+        def @L=stripHNE(hne);
       }
       else {
-        def @L=LLL;
+        def @L=stripHNE(LLL);
       }
     }
     printlevel=i;
@@ -831,6 +845,7 @@ static proc esComputation (int typ, poly p_F, list #)
   }
 
   J=interred(J);
+  if (defined(artin_bd)) { J=jet(J,artin_bd-1); }
 
 // J=std(J);
 
@@ -839,6 +854,7 @@ static proc esComputation (int typ, poly p_F, list #)
     if(ideal(nselect(J,1,no_b))<>0)
     {
       setring old_ring;
+      option(set,ov);
       return(0);
     }    
   }
@@ -907,25 +923,26 @@ static proc esComputation (int typ, poly p_F, list #)
   coef_Mat = coef(G,xy);
   Jnew=coef_Mat[2,1..ncols(coef_Mat)];
 
+  // simplification of Jnew
+
   if (defined(artin_bd)) // the artin_bd-th power of the maxideal of 
                          // deformation parameters can be cutted off
   {
     Jnew=jet(Jnew,artin_bd-1);
   }
-
-  // simplification of Jnew
   Jnew=interred(Jnew);
-
+  if (defined(artin_bd)) { Jnew=jet(Jnew,artin_bd-1); }
   J=J,Jnew;
+
   if (typ==1) // isEquising
   {
     if(ideal(nselect(J,1,no_b))<>0)
     {
       setring old_ring;
+      option(set,ov);
       return(0);
     }    
   }
-
 
   while (fertig<>soll and blowup<nrows(M[3])) 
   {
@@ -1037,13 +1054,14 @@ static proc esComputation (int typ, poly p_F, list #)
         J=J,Jnew;
         if (typ==1) // isEquising
         {
+          if (defined(artin_bd)) { J=jet(Jnew,artin_bd-1); }
           if(ideal(nselect(J,1,no_b))<>0)
           {
             setring old_ring;
+            option(set,ov);
             return(0);
           }    
         }
-
       }
     }
     if (number_of_branches>=2)
@@ -1051,9 +1069,11 @@ static proc esComputation (int typ, poly p_F, list #)
       J=interred(J);
       if (typ==1) // isEquising
       {
+        if (defined(artin_bd)) { J=jet(Jnew,artin_bd-1); }
         if(ideal(nselect(J,1,no_b))<>0)
         {
           setring old_ring;
+          option(set,ov);
           return(0);
         }    
       }
@@ -1089,9 +1109,11 @@ static proc esComputation (int typ, poly p_F, list #)
   J=simplify(J,10);
   if (typ==1) // isEquising
   {
+    if (defined(artin_bd)) { J=jet(Jnew,artin_bd-1); }
     if(ideal(nselect(J,1,no_b))<>0)
     {
       setring old_ring;
+      option(set,ov);
       return(0);
     }    
   }
@@ -1137,16 +1159,17 @@ static proc esComputation (int typ, poly p_F, list #)
          attrib(MM,"isSB",1);
          qring QQ=MM;     
       }
-        else
-        {   
-           qId=qId,MM;
-           qring QQ = std(qId);
-        }
+      else
+      {   
+         qId=qId,MM;
+         qring QQ = std(qId);
+      }
 
       ideal Shortmap=imap(myRing,Shortmap);
       map phiphi=myRing,Shortmap;
 
       ideal J=phiphi(J);
+      option(redSB);
       J=std(J);
       J=nselect(J,1,no_b);
 
@@ -1158,18 +1181,20 @@ static proc esComputation (int typ, poly p_F, list #)
 
       J=J,Jnew;
       J=interred(J);
+      if (defined(artin_bd)){ J=jet(J,artin_bd-1); }
     }
     else
     {
       J=std(J);
       J=nselect(J,1,no_b);
+      if (defined(artin_bd)){ J=jet(J,artin_bd-1); }
     }
   }
  
   dbprint(i_print,"// finished");
   dbprint(i_print,"// ");
   
-  minPolyStr = "";
+  minPolyStr = "";option(set,ov);
   if (minpoly !=0)
   {
    minPolyStr = "minpoly = "+string(minpoly);
@@ -1179,14 +1204,17 @@ static proc esComputation (int typ, poly p_F, list #)
   
   if (typ==1) // isEquising
   {
+    if (defined(artin_bd)) { J=jet(Jnew,artin_bd-1); }
     if(J<>0)
     {
       setring old_ring;
+      option(set,ov);
       return(0);
     }    
     else
     {
       setring old_ring;
+      option(set,ov);
       return(1);
     }    
   }
@@ -1232,11 +1260,12 @@ static proc esComputation (int typ, poly p_F, list #)
     export(ES);
     export(ES_all_triv);
     setring old_ring;
-    dbprint(i_print+1,"
+    dbprint(i_print+2,"
 // 'esStratum' created a list M of a ring and an integer.
 // To access the ideal defining the equisingularity stratum, type:
         def ESSring = M[1]; setring ESSring;  ES; ");
 
+    option(set,ov);
     return(list(ESSring,0));
   }
   else
@@ -1259,6 +1288,8 @@ static proc esComputation (int typ, poly p_F, list #)
 //    _[1][2] = ideal defining the part of the equisingularity stratum 
 //              where all equimultiple sections are trivial 
 //    _[2] = 0");
+
+    option(set,ov);
     return(list(list(ES,ES_all_triv),0));
   }
   
@@ -1998,7 +2029,7 @@ ring rr=0,(A,B,C,x,y),ls;
 poly f=x7+y7+(x-y)^2*x2y2;
 poly F=f+A*y*diff(f,x)+B*x*diff(f,x)+C*diff(f,y);
 list M=esStratum(F,6);
-std(M[1]);  // standard basis of equisingularity ideal
+std(M[1][1]);  // standard basis of equisingularity ideal
 
 LIB "equising.lib";
 printlevel=2;
@@ -2006,6 +2037,7 @@ timer=1;
 ring rr=0,(x,y),ls;
 poly f=x20+y7+(x-y)^2*x2y2+x2y4; // Newton non-degenerate
 list K=esIdeal(f);
+K;
 
 ring rr=0,(x,y),ls;
 poly f=x6y-3x4y4-x4y5+3x2y7-x4y6+2x2y8-y10+2x2y9-y11+x2y10-y12-y13;
@@ -2014,6 +2046,13 @@ versal(f);
 setring Px;
 poly F=Fs[1,1];
 list M=esStratum(F,2);
+
+LIB "equising.lib";
+ring R=0,(A,B,C,D,x,y),ds;
+poly f=x6y-3x4y4-x4y5+3x2y7-x4y6+2x2y8-y10+2x2y9-y11+x2y10-y12-y13;
+poly F=f+Ax9+Bx7y2+Cx9y+Dx8y2;
+list M=esStratum(F,2);
+
 
 LIB "equising.lib";
 printlevel=2;
@@ -2045,7 +2084,6 @@ tau_es(f);        //-> 68
 versal(f);
 setring Px;
 poly F=Fs[1,1];
-int t=timer;
 list M=esStratum(F);
 timer-t;          //-> 0
 
