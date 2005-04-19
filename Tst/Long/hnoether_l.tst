@@ -501,4 +501,9 @@ squarefree(y3);
 squarefree((x2+y)^3*(x-y)^2*(x+y));
 
 example allsquarefree;
+// ------ Test multSequence (depends on numbering of branches):
+ring rr=0,(x,y),ls;
+poly f=x6y-3x4y4-x4y5+3x2y7-x4y6+2x2y8-y10+2x2y9-y11+x2y10-y12-y13;
+multsequence(f);
+
 tst_status(1);$
