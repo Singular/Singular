@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.4 2005-04-18 14:50:55 Singular Exp $ */
+/* $Id: polys.h,v 1.5 2005-04-20 17:25:52 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials of the
              currRing
@@ -274,7 +274,7 @@ void      pSplit(poly p, poly * r);   /*p => IN(p), r => REST(p) */
 
 /*-------------ring management:----------------------*/
 //extern void pChangeRing(ring newRing);
-extern void pSetGlobals(ring r, BOOLEAN complete = TRUE);
+extern void pSetGlobals(const ring r, BOOLEAN complete = TRUE);
 // resets the pFDeg and pLDeg: if pLDeg is not given, it is
 // set to currRing->pLDegOrig, i.e. to the respective LDegProc which
 // only uses pFDeg (and not pDeg, or pTotalDegree, etc).
@@ -297,7 +297,7 @@ extern void pRestoreDegProcs(pFDegProc old_FDeg, pLDegProc old_lDeg);
  ***************************************************************/
 extern pLDegProc pLDeg;
 extern pFDegProc pFDeg;
-int  pWeight(int c, ring r = currRing);
+int  pWeight(int c, const ring r = currRing);
 long pDeg(poly p, ring r = currRing);
 long pTotaldegree(poly p, ring r = currRing);
 long pWTotaldegree(poly p, ring r = currRing);

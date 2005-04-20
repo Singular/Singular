@@ -6,7 +6,7 @@
  *  Purpose: implementation of currRing independent poly procedures
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_polys.cc,v 1.1.1.1 2003-10-06 12:15:55 Singular Exp $
+ *  Version: $Id: p_polys.cc,v 1.2 2005-04-20 17:25:51 Singular Exp $
  *******************************************************************/
 
 #include "mod2.h"
@@ -168,14 +168,14 @@ p_SetmProc p_GetSetmProc(ring r)
 * compute the degree of the leading monomial of p
 * the ordering is compatible with degree, use a->order
 */
-inline long _pDeg(poly a, ring r)
+inline long _pDeg(poly a, const ring r)
 {
   p_LmCheckPolyRing(a, r);
   assume(p_GetOrder(a, r) == pWTotaldegree(a, r));
   return p_GetOrder(a, r);
 }
 
-long pDeg(poly a, ring r)
+long pDeg(poly a, const ring r)
 {
   return _pDeg(a, r);
 }
@@ -275,7 +275,7 @@ long pWTotaldegree(poly p, ring r)
   return  j;
 }
 
-int pWeight(int i, ring r)
+int pWeight(int i, const ring r)
 {
   if ((r->firstwv==NULL) || (i>r->firstBlockEnds))
   {

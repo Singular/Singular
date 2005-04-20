@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.4 2005-01-18 17:28:23 Singular Exp $ */
+/* $Id: polys.cc,v 1.5 2005-04-20 17:25:52 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -49,7 +49,7 @@ poly      ppNoether = NULL;
 */
 
 
-void pSetGlobals(ring r, BOOLEAN complete)
+void pSetGlobals(const ring r, BOOLEAN complete)
 {
   int i;
   if (ppNoether!=NULL) pDelete(&ppNoether);
