@@ -24,7 +24,7 @@
   ring r = 0,(x,y),dp;
   poly f=x11-2y2x8-y3x7-y2x6+y4x5+2y4x3+y5x2-y6;
   // = (x5-1y2) * (x6-2x3y2-1x2y3+y4)
-  list hn=reddevelop(f);
+  list hn=hnexpansion(f);
   show(hn[1][1]);     // Hamburger-Noether matrix of 1st brach
   displayInvariants(hn);
   param(hn[2]);      // parametrization of 2nd branch

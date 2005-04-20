@@ -1,7 +1,7 @@
    LIB "hnoether.lib";
    ring r=0,(x,y),dp;
 "0,2 <Return> 1,1 <Return> 3,0 <Return><Return>";
-   reddevelop(x2-y2+x3);
+   hnexpansion(x2-y2+x3);
 LIB "tst.lib";tst_status(1);$
 //
 //Der gleiche Fehler tritt auf bei reddevelop((y-x)*(y-2x)*(y-3x+x2));
