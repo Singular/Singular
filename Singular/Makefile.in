@@ -208,18 +208,16 @@ endif
 
 SLIB0 = COPYING \
 	ainvar.lib   alexpoly.lib  algebra.lib   all.lib       brnoeth.lib \
-        classify.lib control.lib \
-        deform.lib   elim.lib      equising.lib  finvar.lib    gmspoly.lib \
-        gmssing.lib \
-        general.lib  graphics.lib  groups.lib    hnoether.lib  homolog.lib  \
-        inout.lib \
+        classify.lib control.lib   deform.lib    elim.lib      equising.lib \
+        finvar.lib   gmspoly.lib   gmssing.lib   general.lib   graphics.lib \
+        groups.lib   hnoether.lib  homolog.lib   inout.lib \
         intprog.lib  latex.lib     linalg.lib    makedbm.lib    matrix.lib \
-	mprimdec.lib \
-        mondromy.lib mregular.lib  normal.lib    ntsolve.lib    \
+	mprimdec.lib mondromy.lib  mregular.lib  normal.lib     ntsolve.lib  \
         poly.lib     presolve.lib  primdec.lib   primitiv.lib   qhmoduli.lib \
         random.lib   reesclos.lib  ring.lib      rinvar.lib     sing.lib \
-        solve.lib    spcurve.lib   spectrum.lib  standard.lib   stratify.lib \
-        surf.lib     toric.lib     triang.lib    zeroset.lib    help.cnf 
+        solve.lib    signcond.lib  spcurve.lib   spectrum.lib   standard.lib \
+        stratify.lib surf.lib      toric.lib     triang.lib     urrcount.lib \
+        zeroset.lib  help.cnf 
  
 
 PLIBS = center.lib gkdim.lib involution.lib ncall.lib ncalg.lib ncdecomp.lib nctools.lib qmatrix.lib

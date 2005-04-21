@@ -1,0 +1,1012 @@
+// E. Tobis  12.Nov.2004
+// last change 16. Apr. 2005 (G.-M. Greuel)
+///////////////////////////////////////////////////////////////////////////////
+category="Symbolic-numerical solving"
+info="
+LIBRARY: urrcount.lib   Counting number of real roots of univariate polynomial
+AUTHOR:                 Enrique A. Tobis, etobis@dc.uba.ar 
+
+OVERVIEW:  Routines for bounding and counting the number of real roots of a
+           univariate polynomial by using Strum and Sturm-Habicht sequences.
+           References:
+
+PROCEDURES:
+  isuni(p)         Checks whether a polynomials is univariate
+  whichvariable(p) The only variable of a univariate monomial (or 0)
+  varsigns(p)      Number of sign changes in a list
+  boundBuFou(p,a,b) Bound for number of real roots of poly p in interval (a,b)
+  boundposDes(p)   Bound for the number of positive real roots of poly p
+  boundDes(p)      Bound for the number of real roots of poly p
+  allrealst(p)     Checks whether all the roots of a poly are real (via Sturm)
+  maxabs(p)        A bound for the maximum absolute value of a root of a poly
+  allreal(p)       Checks whether all the roots of a poly are real (via St-Ha)
+  sturm(p,a,b)     Number of real roots of a poly on an interval (via Sturm)
+  sturmseq(p)      Sturm sequence of a polynomial
+  sturmha(p,a,b)   Number of real roots of a poly in (a,b) (via Sturm-Habicht)
+  sturmhaseq(p)    A Sturm-Habicht Sequence of a polynomial
+  reverse(l)       Reverses a list
+  nrroots(p)        The number of real roots of p
+  isparam(p)       Returns 0 iff the polynomial has non-parametric coefficients
+
+KEYWORDS:         real roots, univariate polynomial
+";
+///////////////////////////////////////////////////////////////////////////////
+
+static proc isparametric(poly p)
+{
+  int ispar;
+  def ba = basering;
+
+  // If the basering has parameters declared
+  if (npars(basering) != 0) {
+    // If we were given just a polynomial
+    list lba = ringlist(ba);
+    lba[1]=0;
+    def rba = ring(lba); setring rba;
+    poly p1 = imap(ba,p);
+    setring ba;
+    poly p1 = imap(rba,p1);
+    ispar = ispar || (size(p-p1)!=0);
+  }
+  return (ispar);
+}
+///////////////////////////////////////////////////////////////////////////////
+proc isparam(list #)
+"USAGE:     isparam(ideal/module/poly/list);
+RETURN:    int: 0 if the argument is not parametric and 1 if it
+EXAMPLE:   example isparam; shows an example"
+{
+  int i;
+  int ispar;
+
+  def ar = #[1];
+
+  ispar = 0;
+
+  // It we were given only one argument (not a list)
+  if (size(#) == 1) {
+    if (typeof(ar) == "number") {
+      ispar = (pardeg(ar) > 0);
+    } else {
+    if (typeof(ar) == "poly") {
+      ispar = isparametric(ar);
+    } else {
+    if (typeof(ar) == "ideal" || typeof(ar) == "module") {
+      // Ciclo que revisa cada polinomio
+      i = size(ar);
+      while (!ispar && (i >= 1)) {
+	ispar = ispar || (isparametric(ar[i]));
+	i--;
+      }
+    } else {
+    if (typeof(ar) == "matrix" || typeof(ar) == "intmat") {
+      int j;
+      i = nrows(m);
+      while (!isparam && (i >= 1)) {
+	j = nrows(m);
+	while (!isparam && (j >= 1)) {
+	  isparam = isparam || (isparametric(m[i,j]));
+	  j--;
+	}
+	i--;
+      }
+    }
+  }}}} else {
+  if (size(#) > 1) {
+    i = size(#);
+    while (!ispar && (i >= 1)) {
+      if ((typeof(#[i]) != "poly") && (typeof(#[i]) != "number") &&
+	  typeof(#[i]) != "int") {
+      	ERROR("This procedure only works with lists of polynomials");
+      }
+      ispar = ispar || (isparametric(#[i]));
+      i--;
+    }
+  }}
+  return (ispar);
+}
+example
+{
+  echo = 2;
+  ring r = 0,x,dp;
+  isparam(2x3-56x+2);
+  ring s = (0,a,b,c),x,dp;
+  isparam(2x3-56x+2);
+  isparam(2x3-56x+abc);
+}
+///////////////////////////////////////////////////////////////////////////////
+proc isuni(poly p)
+"USAGE:     isuni(p); poly p;
+RETURN:    poly: if p is a univariate polynomial, it returns the variable. If
+           not, zero.
+SEE ALSO:  variable
+EXAMPLE:   example isuni; shows an example"
+{
+  poly variable;
+  poly g;
+  int i;
+  int sofarsogood;
+
+  variable = whichvariable(leadmonom(p));
+
+  if (variable != 0) {
+    i = 1;
+    sofarsogood = 1;
+    while (sofarsogood && i <= size(p)) {
+      g = p[i]/(variable^(deg(p[i])));
+      sofarsogood = sofarsogood && deg(g) == 0;
+      i++;
+    }
+  }
+
+  if (sofarsogood) {
+    return (variable);
+  } else {
+    return (0);
+  }
+}
+example
+{
+  echo = 2;
+  ring r = 0,(x,y),dp;
+  poly p = 6x7-3x2+2x-15/7;
+  isuni(p);
+  isuni(p*y);
+}
+///////////////////////////////////////////////////////////////////////////////
+proc whichvariable(poly p)
+"USAGE:     whichvariable(p); poly p
+RETURN:    poly: if p is a univariate monomial, the variable. Otherwise 0.
+ASSUME:    p is a monomial
+SEE ALSO:  isuni
+EXAMPLE:   example whichvariable; shows an example"
+{ 
+  int i;
+  int found;
+  poly g;
+  poly variable;
+
+  if (size(p) != 1) {
+    ERROR("p must be a monomial");
+  }
+
+  found = 0;
+
+  i = 1;
+  while (!found && i <= nvars(basering)) {
+    g = diff(p,var(i));
+    if (deg(g) == deg(p) - 1) {
+      // We suspect p is a polynomial in var(i)
+      variable = var(i);
+      found = 1;
+    }
+    i++;
+  }
+
+  // We now have to confirm our suspicion
+  if (found) {
+    if (leadmonom(p/(variable^deg(p))) == 1) { //If p is a monomial on variable
+      return (variable);
+    } else { if (deg(p) <= 0) { // If we received a constant polynomial
+      return (var(1));
+    } else {
+      return (0);
+    }}
+  } else { if (deg(p) <= 0) { // If we received a constant polynomial
+    return (var(1));
+  } else {
+    return (0);
+  }}
+}
+example
+{
+  echo = 2;
+  ring r = 0,(x,y),dp;
+  whichvariable(x5);
+  whichvariable(x3y);
+}
+///////////////////////////////////////////////////////////////////////////////
+proc varsigns(list l)
+"USAGE:     varsigns(l); list l.
+RETURN:    number: the number of sign changes in the list l
+SEE ALSO:  boundposDes
+EXAMPLE:   example varsigns; shows an example"
+{
+  int lastsign;
+  int numberofchanges = 0;
+
+  if (isparam(l)) {
+    ERROR("This procedure cannot operate with parametric arguments");
+  }
+  
+  lastsign = sign(l[1]);
+
+  for (int i = 1; i <= size(l); i = i + 1) {
+    if (sign(l[i]) != lastsign && sign(l[i]) != 0) {
+      numberofchanges++;
+      lastsign = sign(l[i]);
+    }
+  }
+  return (numberofchanges);
+}
+example
+{
+  echo = 2;
+  ring r = 0,x,dp;
+  list l = 1,2,3;
+  varsigns(l);
+  l = 1,-1,2,-2,3,-3;
+  varsigns(l);
+}
+///////////////////////////////////////////////////////////////////////////////
+proc boundBuFou(poly p,number a,number b) 
+"USAGE:     boundBuFou(p,a,b); p poly, a,b number
+RETURN:    number: an upper bound for the number of real roots of p in (a,b], 
+           with the same parity as the actual number of roots (using the 
+           Budan-Fourier Theorem)
+ASSUME:    p is a univarite polynomials with rational coefficients
+           a, b are rational numbers with a < b
+SEE ALSO:  boundposDes,varsigns
+EXAMPLE:   example boundBuFou; shows an example"
+{
+  int i;
+  poly variable;
+  list Der;
+  list Dera,Derb;
+  int d;
+  number bound;
+
+  variable = isuni(p);
+
+  if (isparam(p) || isparam(a) || isparam(b)) {
+    ERROR("This procedure cannot operate with parametric arguments");
+  }
+
+  // p must be a univariate polynomial
+  if (variable == 0) {
+    ERROR("p must be a univariate polynomial");
+  }
+
+  if (a >= b) {
+    ERROR("a must be smaller than b");
+  }
+
+  d = deg(p);
+  
+  // We calculate the list of derivatives
+
+  Der[d+1] = p;
+
+  for (i = 0;i < d;i++) {
+    Der[d-i] = diff(Der[d-i+1],variable);
+  }
+
+  // Then evaluate that list
+
+  for (i = d+1;i >= 1;i--) {
+    Dera [i] = leadcoef(subst(Der[i],variable,a));
+    Derb [i] = leadcoef(subst(Der[i],variable,b));
+  }
+
+  // Finally we calculate the sign variations
+
+  bound = varsigns(Dera) - varsigns(Derb);
+
+  return(bound);
+}
+example
+{
+  echo = 2;
+  ring r = 0,x,dp;
+  poly p = (x+2)*(x-1)*(x-5);
+  boundBuFou(p,-3,5);
+  boundBuFou(p,-2,5);
+}
+///////////////////////////////////////////////////////////////////////////////
+proc boundposDes(poly p)
+"USAGE:     boundposDes(p); poly p
+RETURN:    number: an upper bound for the number of positive roots of p, with
+           the same parity as the actual number of positive roots of p.
+ASSUME:    p is a univarite polynomials with rational coefficients
+SEE ALSO:  boundBuFou
+EXAMPLE:   example boundposDes; shows an example"
+{
+  poly g;
+  number nroots;
+  poly variable;
+  list coefficients;
+  int i;
+
+  variable = isuni(p);
+
+  if (isparam(p)) {
+    ERROR("This procedure cannot operate with parametric arguments");
+  }
+
+  // p must be a univariate polynomial
+  if (variable == 0) {
+    ERROR("p must be a univariate polynomial");
+  }
+
+  g = p; // We will work with g
+
+  // We check whether 0 is a root of g, and if so, remove it
+  if (subst(g,variable,0) == 0) {
+    g = g/variable^(deg(g[size[g]]));
+  }
+
+  // We count the number of positive roots
+  i = size(g);
+  while (i >= 1) {
+    coefficients[i] = leadcoef(g[i]);
+    i--;
+  }
+  nroots = varsigns(coefficients);
+
+  return(nroots);
+}
+example
+{
+  echo = 2;
+  ring r = 0,x,dp;
+  poly p = (x+2)*(x-1)*(x-5);
+  boundposDes(p);
+
+  p = p*(x2+1);
+
+  boundposDes(p);
+}
+///////////////////////////////////////////////////////////////////////////////
+proc boundDes(poly p)
+"USAGE:     boundDes(p); poly p
+RETURN:    number: an upper bound for the number of real roots of p, with
+           the same parity as the actual number of real roots of p.
+ASSUME:    p is a univarite polynomials with rational coefficients
+SEE ALSO:  boundBuFou
+EXAMPLE:   example boundDes; shows an example"
+{
+  poly g;
+  number nroots;
+  poly variable;
+  list coefficients;
+  int i;
+
+  variable = isuni(p);
+
+  if (isparam(p)) {
+    ERROR("This procedure cannot operate with parametric arguments");
+  }
+
+  // p must be a univariate polynomial
+  if (variable == 0) {
+    ERROR("p must be a univariate polynomial");
+  }
+
+  g = p; // We will work with g
+
+  nroots = 0;
+  // We check whether 0 is a root of g, and if so, remove it
+  if (subst(g,variable,0) == 0) {
+    g = g/variable^(deg(g[size[g]]));
+    nroots++;
+  }
+
+  // We count the number of positive roots
+  i = size(g);
+  while (i >= 1) {
+    coefficients[i] = leadcoef(g[i]);
+    i--;
+  }
+  nroots = nroots + varsigns(coefficients);
+
+  // We count the number of negative roots
+  g = subst(g,variable,-variable);
+  i = size(g);
+  while (i >= 1) {
+    coefficients[i] = leadcoef(g[i]);
+    i--;
+  }
+  nroots = nroots + varsigns(coefficients);
+
+  return(nroots);
+}
+example
+{
+  echo = 2;
+  ring r = 0,x,dp;
+  poly p = (x+2)*(x-1)*(x-5);
+  boundDes(p);
+
+  p = p*(x2+1);
+
+  boundDes(p);
+}
+///////////////////////////////////////////////////////////////////////////////
+proc allrealst(poly p)
+"USAGE:     allrealst(p); poly p
+RETURN:    int: 1 iff all the roots of p are real, 0 otherwise 
+           Checks whether all the roots of p are real by using Sturm's Theorem
+ASSUME:    p is a univarite polynomials with rational coefficients
+SEE ALSO:  allreal,sturm,sturmha
+EXAMPLE:   example allrealst; shows an example"
+{
+  number upper,lower;
+  poly sqfp; // The square-free part of p
+  poly variable;
+
+  variable = isuni(p);
+
+  if (isparam(p)) {
+    ERROR("This procedure cannot operate with parametric arguments");
+  }
+  if (variable == 0) {
+    ERROR ("p must be a univariate polynomial");
+  }
+
+  sqfp = p/gcd(p,diff(p,variable));
+
+  upper = maxabs(sqfp); // By adding one we ensure that sqfp(upper) != 0
+  lower = -upper;
+
+  return (sturm(sqfp,lower,upper) == deg(sqfp));
+}
+example
+{
+  echo = 2;
+  ring r = 0,x,dp;
+  poly p = (x+2)*(x-1)*(x-5);
+  allrealst(p);
+  p = p*(x2+1);
+  allrealst(p);
+}
+///////////////////////////////////////////////////////////////////////////////
+proc maxabs(poly p)
+"USAGE:     maxabs(p); poly p
+RETURN:    number: an upper bound for the largest absolute value of a root of p
+ASSUME:    p is a univarite polynomials with rational coefficients
+SEE ALSO:  sturm
+EXAMPLE:   example maxabs; shows an example"
+{
+  number maximum;
+  poly monic;
+  int i;
+
+  if (isparam(p)) {
+    ERROR("This procedure cannot operate with parametric arguments");
+  }
+
+  monic =  simplify(p,1);
+
+  maximum = 0;
+
+  for (i = 1; i <= size(monic); i = i + 1) {
+    maximum = max(abs(leadcoef(p[i])),maximum);
+  }
+
+  return (maximum + 1);
+}
+example
+{
+  echo = 2;
+  echo = 2;
+  ring r = 0,x,dp;
+  poly p = (x+2)*(x-1)*(x-5);
+  maxabs(p);
+}
+///////////////////////////////////////////////////////////////////////////////
+proc sturm(poly p,number a,number b) 
+"USAGE:     sturm(p,a,b); poly p, number a,b
+RETURN:    number: the number of real roots of p in (a,b]
+ASSUME:    p is a univarite polynomials with rational coefficients,
+           a, b are rational numbers with a < b
+SEE ALSO:  sturmha,allrealst,allreal
+EXAMPLE:   example sturm; shows an example"
+{
+  list l;
+  list pa;
+  list pb;
+  int signsA,signsB;
+  int i;
+  int nroots;
+  poly variable;
+
+  if (isparam(p)) {
+    ERROR("This procedure cannot operate with parametric arguments");
+  }
+
+  variable = isuni(p);
+
+  if (variable == 0) {
+    ERROR ("p must be a univariate polynomial");
+  }
+
+  if (a >= b) {
+    ERROR("a must be lower than b");
+  }
+
+  if (subst(p,variable,a) == 0 || subst(p,variable,b) == 0) {
+    ERROR ("Neither a nor b can be roots of P");
+  }
+
+  l = sturmseq(p);
+
+  i = size(l);
+
+  while (i >= 1) { // We build the sequences
+    pa[i] = leadcoef(subst(l[i],variable,a));
+    pb[i] = leadcoef(subst(l[i],variable,b));
+    i--;
+  }
+
+  signsA = varsigns(pa);
+  signsB = varsigns(pb);
+
+  nroots = signsA - signsB + nroots;
+
+  return (nroots);
+}
+example
+{
+  echo = 2;
+  ring r = 0,x,dp;
+  poly p = (x+2)*(x-1)*(x-5);
+  sturm(p,-3,6);
+  p = p*(x2+1);
+  sturm(p,-3,6);
+  p = p*(x+2);
+  sturm(p,-3,6);
+}
+///////////////////////////////////////////////////////////////////////////////
+proc sturmseq(poly p)
+"USAGE:     sturmseq(p); p poly
+RETURN:    list: a Sturm sequence of p
+ASSUME:    p is a univarite polynomials with rational coefficients
+SEE ALSO:  sturm,sturmhaseq
+EXAMPLE:   example sturmseq; shows an example"
+{
+  list stseq;
+  poly variable;
+  int i;
+  
+  variable = isuni(p);
+  
+  if (isparam(p)) {
+    ERROR("This procedure cannot operate with parametric arguments");
+  }
+
+  if (variable == 0) {
+    ERROR ("p must be a univariate polynomial");
+  }
+  
+  // The two first polynomials in Sturm's sequence
+  stseq = list();
+  stseq[1] = p;
+  stseq[2] = diff(p,variable);
+  poly q = stseq[2];
+  i = 3;
+
+  while (q <>0) {
+    q=reduce(stseq[i-2],std(stseq[i-1]));
+    if (q<>0) {
+      stseq[i] = q;
+    }
+    i++;
+  }
+
+  // Right now, we have gcd(P,P') in stseq[size(stseq)];
+ 
+  for (i = size(stseq)-1;i >= 1;i--) {
+    stseq[i] = stseq[i]/(sign(leadcoef(stseq[size(stseq)]))*stseq[size(stseq)]);
+    stseq[i] = stseq[i]/abs(leadcoef(stseq[i]));
+  }
+  
+  // We divide the gcd by itself
+  stseq[size(stseq)] = sign(leadcoef(stseq[size(stseq)]));
+  
+  return (stseq);
+}
+example
+{
+  echo = 2;
+  ring r = 0,(z,x),dp;
+  poly p = x5-3x4+12x3+7x-153;
+  sturmseq(p);
+}
+///////////////////////////////////////////////////////////////////////////////
+proc allreal(poly p)
+"USAGE:     allreal(p);
+RETURN:    bool: 1 iff all the roots of p are real
+SEE ALSO:  allrealst
+EXAMPLE:   example allreal; shows an example"
+{
+  number upper,lower;
+  poly sqfp; // The square-free part of p
+  poly variable;
+
+  if (isparam(p)) {
+    ERROR("This procedure cannot operate with parametric arguments");
+  }
+
+  variable = isuni(p);
+
+  if (variable == 0) {
+    ERROR ("p must be a univariate polynomial");
+  }
+
+  sqfp = p/gcd(p,diff(p,variable));
+
+  return (sturmha(sqfp,-maxabs(p),maxabs(p)) == deg(sqfp));
+}
+example
+{
+  echo = 2;
+  ring r = 0,x,dp;
+  poly p = (x+2)*(x-1)*(x-5);
+  allreal(p);
+  p = p*(x2+1);
+  allreal(p);
+}
+///////////////////////////////////////////////////////////////////////////////
+proc sturmha(poly P,number a,number b)
+"USAGE:     sturmha(p,a,b); poly p, number a,b
+RETURN:    number: the number of real roots of p in (a,b) (using a 
+           Sturm-Habicht sequence)
+SEE ALSO:  sturm,allreal
+EXAMPLE:   example sturmha; shows an example"
+{
+  list seq;
+  int i;
+  list seqa,seqb;
+  poly variable;
+  number bound;
+  number result;
+
+  if (isparam(P) || isparam(a) || isparam(b)) {
+    ERROR("This procedure cannot operate with parametric arguments");
+  }
+
+  variable = isuni(P);
+
+  if (variable == 0) {
+    ERROR ("P must be a univariate polynomial");
+  }
+
+  if (a >= b) {
+    ERROR("a must be lower than b");
+  }
+
+  if (subst(P,variable,a) == 0 || subst(P,variable,b) == 0) {
+    ERROR ("Neither a nor b can be roots of P");
+  }
+
+  seq = sturmhaseq(P);
+
+  bound = maxabs(P);
+
+  if (a < -bound) {
+    a = -bound;
+  }
+
+  if (b > bound) {
+    b = bound;
+  }
+
+//  if (a == -bound && b == bound) {
+//    for (i = size(seq);i >= 1;i--) {
+//      seq[i] = leadcoef(seq[i]);
+//    }
+//    result = D(seq);
+//  } else {
+    for (i = size(seq);i >= 1;i--) {
+      seqa[i] = leadcoef(subst(seq[i],variable,a));
+      seqb[i] = leadcoef(subst(seq[i],variable,b));
+    }
+    result = (W(seqa) - W(seqb));
+//  }
+  return (result);
+}
+example
+{
+  echo = 2;
+  ring r = 0,x,dp;
+  poly p = (x+2)*(x-1)*(x-5);
+  sturmha(p,-3,6);
+  p = p*(x2+1);
+  sturmha(p,-3,6);
+}
+///////////////////////////////////////////////////////////////////////////////
+proc sturmhaseq(poly P)
+"USAGE:     sturmhaseq(P); P poly. P must be univariate
+RETURN:    list: the nonzero polynomials of the Sturm-Habicht sequence of P
+SEE ALSO:  sturm,sturmseq,sturmha
+EXAMPLE:   example sturmhaseq; shows an example"
+{
+  poly Q;
+  poly variable;
+  int p,q,i,j,k,l;
+  list SR;
+  list sr;
+  list srbar;
+  list T;
+
+  if (isparam(P)) {
+    ERROR("This procedure cannot operate with parametric arguments");
+  }
+
+  variable = isuni(P);
+
+  if (variable == 0) {
+    ERROR ("P must be a univariate polynomial");
+  }
+
+  p = deg(P);
+  Q = diff(P,variable);
+  q = deg(Q);
+
+  // Initialization
+  SR[p+2] = sign(leadcoef(P)^(p-q-1))*P;
+//  T[p+2] = SR[p+2];
+
+  srbar[p+2] = sign(leadcoef(P)^(p-q));
+  sr[p+2] = srbar[p+2];
+
+  SR[p-1+2] = sign(leadcoef(P)^(p-q+1))*Q;
+//  T[p-1+2] = SR[p-1+2];
+  srbar[p-1+2] = sign(leadcoef(P)^(p-q+1))*leadcoef(Q);
+
+  i = p+1;
+  j = p;
+
+  while (SR[j-1+2] != 0) {
+    k = deg(SR[j-1+2]);
+    if (k == j-1) {
+      sr[j-1+2] = srbar[j-1+2];
+      SR[k-1+2] = -(reduce(sr[j-1+2]^2*SR[i-1+2],
+                    std(SR[j-1+2])))/(sr[j+2]*srbar[i-1+2]);
+
+//      T[k-1+2] = SR[k-1+2];
+      srbar[k-1+2] = leadcoef(SR[k-1+2]);
+    } 
+    if (k < j-1) {
+      // Computation of sr[k+2]
+      for (l = 1;l <= j-k-1;l++) {
+	srbar[j-l-1+2] = ((-1)^l)*(srbar[j-1+2]*srbar[j-l+2])/sr[j+2];
+    }
+    sr[k+2] = srbar[k+2];
+
+      // Computation of SR[k-1+2]
+      SR[k-1+2] = -reduce(srbar[j-1+2]*sr[k+2]*SR[i-1+2],
+                  std(SR[j-1+2]))/(sr[j+2]*srbar[i-1+2]);
+
+      srbar[k-1+2] = leadcoef(SR[k-1+2]);
+
+      SR[k+2] = SR[j-1+2] * ( sr[k+2] / leadcoef(SR[j-1+2]));
+    }
+    i = j;
+    j = k;
+  }
+
+  // We build a new list, discarding the undefined and zero elements
+  // Plus, we reverse the elements
+
+  list filtered;
+  i = size(SR);
+  while (i >= 1) {
+    if (typeof(SR[i]) != "none") {
+      if (SR[i] != 0) {
+	filtered = insert(filtered,SR[i]);
+      }
+    }
+    i--;
+  }
+
+  return (filtered);
+}
+example
+{
+  echo = 2;
+  ring r = 0,x,dp;
+  poly p = x5-x4+x-3/2;
+  list l = sturmhaseq(p);
+  l;
+}
+///////////////////////////////////////////////////////////////////////////////
+proc nrroots(poly p)
+"USAGE:     nrroots(p); poly p
+RETURN:    number: the number of real roots of p
+SEE ALSO:  boundposDes, sturm, sturmha
+EXAMPLE:   example nrroots; shows an example"
+{
+  if (isparam(p)) {
+    ERROR("This procedure cannot operate with parametric arguments");
+  }
+
+  number a = maxabs(p);
+
+  return (sturmha(p,-a,a));
+
+}
+example
+{
+  echo = 2;
+  ring r = 0,x,dp;
+  poly p = (x+2)*(x-1)*(x-5);
+  nrroots(p);
+  p = p*(x2+1);
+  nrroots(p)
+}
+///////////////////////////////////////////////////////////////////////////////
+static proc abs(number x)
+  // Returns the absolute value of x
+{
+  number av;
+
+  if (x >= 0) {
+    av = x;
+  } else {
+    av = -x;
+  }
+ 
+  return (av);
+}
+///////////////////////////////////////////////////////////////////////////////
+proc sign(number x)
+{
+  int sgn;
+
+  if (isparam(x)) {
+    print(x);
+    ERROR("This procedure cannot operate with parameters");
+  }
+
+  if (x > 0) {
+    sgn = 1;
+  } else { if (x < 0) {
+    sgn = -1;
+  } else {
+    sgn = 0;
+  }}
+
+  return (sgn);
+}
+///////////////////////////////////////////////////////////////////////////////
+static proc max(number a,number b)
+{
+  number maximum;
+
+  if (isparam(a) || isparam(b)) {
+    ERROR("This procedure cannot operate with parameters");
+  }
+
+  if (a > b) {
+    maximum = a;
+  } else {
+    maximum = b;
+  }
+
+  return (maximum);
+}
+///////////////////////////////////////////////////////////////////////////////
+proc reverse(list l)
+"USAGE:     reverse(l); l list
+RETURN:    list: l reversed.
+EXAMPLE:   example reverse; shows an example"
+{
+  int i;
+  list result;
+
+  for (i = 1;i <= size(l);i++) {
+    result = list(l[i]) + result;
+  }
+  return (result);
+}
+example
+{
+  echo = 2;
+  ring r = 0,x,dp;
+  list l = 1,2,3,4,5;
+  list rev = reverse(l);
+  l;
+  rev;
+}
+///////////////////////////////////////////////////////////////////////////////
+static proc D(list l)
+{
+  int p;
+  int q;
+  int i;
+  int sc; // The modified number of sign changes
+
+  if (l[size(l)] == 0) {
+    ERROR("l[size(l)] cannot be 0");
+  }
+
+  sc = 0;
+
+  // We know that l[size(l)]] != 0
+  p = size(l);
+  q = p - 1;
+
+  while (searchnot(l,q,-1,0)) {
+    q = searchnot(l,q,-1,0);
+    if ((p - q) % 2 == 1) { // if p-q is odd
+      sc = sc + ((-1)^(((p-q)*(p-q-1)) / 2))*sign(l[p]*l[q]);
+    }
+    p = q;
+    q = p - 1;
+  }
+
+  return (sc);
+}
+///////////////////////////////////////////////////////////////////////////////
+static proc search(list l,int from,int dir,number element)
+{
+  int i;
+  int result;
+  i = from;
+
+  result = 0;
+
+  while (i + dir >= 0 && i + dir <= size(l) + 1 && !result) {
+    if (l[i] == element) {
+      result = i;
+    }
+    i = i + dir;
+  }
+
+  return (result);
+}
+///////////////////////////////////////////////////////////////////////////////
+static proc searchnot(list l,int from,int dir,number element)
+{
+  int i;
+  int result;
+  i = from;
+
+  result = 0;
+
+  while (i + dir >= 0 && i + dir <= size(l) + 1 && !result) {
+    if (l[i] != element) {
+      result = i;
+    }
+    i = i + dir;
+  }
+
+  return (result);
+}
+///////////////////////////////////////////////////////////////////////////////
+static proc W(list l)
+{
+  int i,temp,sc,lastsign,nofzeros,n;
+
+  n = size(l);
+  sc = 0;
+  nofzeros = 0;
+  i = 1;
+  lastsign = sign(l[i]);
+
+  i++;
+
+  while (i <= n) {
+    if (l[i] == 0) {
+      nofzeros++;
+    } else {
+      temp = lastsign * sign(l[i]);
+      
+      if (temp < 0) {
+	sc++;
+      } else {
+	if (nofzeros == 2) {
+	  sc = sc + 2;
+	}
+      }
+      nofzeros = 0;
+      lastsign = temp/lastsign;
+    }
+    i++;
+  }
+  return (sc);
+}
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+

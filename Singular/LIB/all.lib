@@ -1,6 +1,6 @@
-// $Id: all.lib,v 1.40 2005-04-15 13:52:09 Singular Exp $
+// $Id: all.lib,v 1.41 2005-04-21 15:55:55 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: all.lib,v 1.40 2005-04-15 13:52:09 Singular Exp $";
+version="$Id: all.lib,v 1.41 2005-04-21 15:55:55 Singular Exp $";
 category = "General purpose";
 info="
 LIBRARY:  all.lib   Load all libraries
@@ -53,8 +53,10 @@ Invariant theory
 Symbolic-numerical solving
   ntsolve_lib:     Real Newton Solving of Polynomial Systems
   presolve_lib:    Pre-Solving of Polynomial Equations
+  signcond_lib:    Computing realizable sign conditions
   solve_lib:       Complex Solving of Polynomial Systems
   triang_lib:      Decompose Zero-dimensional Ideals into Triangular Sets
+  urrcount_lib:    Counting number of real roots of univariate polynomial
   zeroset_lib:     Procedures For Roots and Factorization
 
 Visualization
@@ -115,7 +117,9 @@ LIB "stratify.lib";
 //Symbolic-numerical solving
 LIB "presolve.lib";
 LIB "solve.lib";
+LIB "signcond.lib";
 LIB "triang.lib";
+LIB "urrcount.lib";
 LIB "ntsolve.lib";
 LIB "zeroset.lib";
 //Visualization
