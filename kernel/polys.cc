@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.5 2005-04-20 17:25:52 Singular Exp $ */
+/* $Id: polys.cc,v 1.6 2005-04-21 17:15:49 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -753,8 +753,8 @@ static void pSplitAndReversePoly(poly p, int n, poly *non_zero, poly *zero)
 */
 static poly pSubst1 (poly p,int n)
 {
-  poly qq,result = NULL;
-  poly zero, non_zero;
+  poly qq=NULL, result = NULL;
+  poly zero=NULL, non_zero=NULL;
 
   // reverse, so that add is likely to be linear
   pSplitAndReversePoly(p, n, &non_zero, &zero);
