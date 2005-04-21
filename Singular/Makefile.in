@@ -143,7 +143,7 @@ ESOURCES=mmalloc.cc iparith.cc $(COMMON_SOURCES) \
 	$(DL_KERNEL_SOURCES) $(DL_LIB_SOURCES) $(STATIC_SOURCES) 
 
 SOURCES=${CSOURCES} ${CXXSOURCES} \
-	grammar.y scanner.l libparse.l prCopyTemplate.cc \
+	grammar.y scanner.l libparse.l \
         p_Delete__T.cc p_ShallowCopyDelete__T.cc \
         p_Copy__T.cc p_Mult_nn__T.cc  pp_Mult_nn__T.cc \
         pp_Mult_mm__T.cc p_Mult_mm__T.cc \
@@ -175,7 +175,7 @@ HEADERS=lists.h attrib.h \
 DISTFILES=${SOURCES} ${HEADERS} ${ESOURCES} \
         Makefile.in configure.in configure \
 	mod2.h.in grammar.h testgh install-sh mkinstalldirs \
-	check_aso.pl prCopy.pl
+	check_aso.pl
 
 OBJS := $(CXXSOURCES:.cc=.o) $(CSOURCES:.c=.o)
 
