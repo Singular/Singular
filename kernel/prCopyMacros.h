@@ -21,6 +21,8 @@ while (0)
 #define PR_CPY_EVECTOR(dest, dest_r, src, src_r) \
   omMemcpyW(dest->exp, src->exp, dest_r->ExpL_Size)
 #define PR_ALLOC_MONOM(r) p_New(r) 
+#undef PR_ALLOC_MONOM
+#define PR_ALLOC_MONOM(r) p_Init(r) 
 #else
 #define  PR_INIT_EVECTOR_COPY(r_src, r_dest) int _min = si_min(r_dest->N, r_src->N)
 #define  PR_CPY_EVECTOR(dest, dest_r, src, src_r) \
