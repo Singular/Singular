@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.31 2005-03-14 16:45:15 Singular Exp $ */
+/* $Id: ring.cc,v 1.32 2005-04-21 16:16:46 levandov Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -3913,4 +3913,83 @@ ring rEnvelope(ring R)
 //    }
   rTest(Renv);
   return Renv;
+}
+
+BOOLEAN nc_rComplete(ring src, ring dest)
+/* returns TRUE is there were errors */
+/* dest is actualy equals src with the different ordering */
+/* we map src->nc correctly to dest->src */
+/* to be executed after rComplete, before rChangeCurrRing */
+
+{
+  if (!rIsPluralRing(src))
+    return FALSE;
+  int i,j;
+  int N = dest->N;
+  if (src->N != N)
+  {
+    WarnS("wrong nc_rComplete call");
+    return TRUE;
+  }
+//   ncKill(dest); // in order to init new
+//   if (nc_CallPlural(src->nc->C, src->nc->D, NULL, NULL, dest))
+//   {
+//     return TRUE;
+//   }
+//   else
+//     return FALSE;
+  //  if (dest->nc != NULL)
+  //    ncKill(dest);
+  //  dest->nc           = (nc_struct *)omAlloc0(sizeof(nc_struct));
+  //  dest->nc->ref      = 1; 
+  //  dest->nc->basering = dest;
+  //  dest->nc->type     =  src->nc->type;
+  ring save = currRing;
+  int WeChangeRing = 0;
+  if (dest != currRing)
+  {
+    WeChangeRing = 1;
+    rChangeCurrRing(dest);
+  }
+  matrix C = mpNew(N,N);
+  matrix D = mpNew(N,N);
+  matrix C0 = src->nc->C;
+  matrix D0 = src->nc->D;
+  poly p = NULL;
+  number n = NULL;
+  for (i=1; i< N; i++)
+  {
+    for (j= i+1; j<= N; j++)
+    {
+      //      n = p_GetCoeff(MATELEM(C0,i,j), src);
+      //      p = pOne();
+      //      p_SetCoeff(p,n,dest);
+      //      MATELEM(C,i,j) = nc_p_CopyPut(p, dest);
+      p = prCopyR(MATELEM(C0,i,j), src, dest); // like in nc_p_CopyGet
+      MATELEM(C,i,j) = p; //nc_p_CopyPut(p, dest);
+      //      p_Delete(&p,dest);
+      p = NULL;
+      if (MATELEM(D0,i,j) != NULL)
+      {
+	p = prCopyR(MATELEM(D0,i,j), src, dest); // like in nc_p_CopyGet
+	MATELEM(D,i,j) = p; //nc_p_CopyPut(p, dest);
+	//	p_Delete(&p,dest);
+	p = NULL;
+      }
+    }
+  }
+  idTest((ideal)C);
+  idTest((ideal)D);
+  id_Delete((ideal *)&(dest->nc->C),dest->nc->basering);
+  id_Delete((ideal *)&(dest->nc->D),dest->nc->basering);
+  dest->nc->C = C;
+  dest->nc->D = D;
+  if ( WeChangeRing )
+    rChangeCurrRing(save);
+  if (nc_InitMultiplication(dest))
+  {
+    WarnS("Error initializing multiplication!");
+    return TRUE;
+  }
+  return FALSE;
 }

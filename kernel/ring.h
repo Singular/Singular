@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.6 2004-11-04 19:56:12 levandov Exp $ */
+/* $Id: ring.h,v 1.7 2005-04-21 16:16:47 levandov Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -142,6 +142,9 @@ n_coeffType rFieldType(ring r);
 // even if they exist
 BOOLEAN rComplete(ring r, int force = 0);
 // use this to free fields created by rComplete
+
+BOOLEAN nc_rComplete(ring src, ring dest);
+
 void rUnComplete(ring r);
 inline int rBlocks(ring r)
 {

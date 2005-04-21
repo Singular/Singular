@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gring.h,v 1.9 2004-10-18 18:57:06 levandov Exp $ */
+/* $Id: gring.h,v 1.10 2005-04-21 16:16:45 levandov Exp $ */
 /*
 * ABSTRACT additional defines etc for --with-plural
 */
@@ -17,6 +17,8 @@
 
 /* the part, related to the interface */ 
 BOOLEAN nc_CallPlural(matrix CC, matrix DD, poly CN, poly DN, ring r);
+int nc_CheckOrdCondition(matrix D, ring r);
+int nc_CheckSubalgebra(poly PolyVar, ring r);
 BOOLEAN nc_InitMultiplication(ring r);
 BOOLEAN rIsLikeOpposite(ring rBase, ring rCandidate);
 
@@ -80,8 +82,6 @@ void nc_kBucketPolyRed(kBucket_pt b, poly p, number *c);
 void nc_PolyPolyRed(poly &b, poly p, number *c);
 
 matrix nc_PrintMat(int a, int b, ring r, int metric);
-
-int nc_CheckSubalgebra(poly PolyVar, ring r);
 
 poly p_CopyEmbed(poly p, ring srcRing, int shift, int par_shift);
 poly pOppose(ring Rop, poly p);

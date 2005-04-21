@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.21 2005-02-11 20:19:46 levandov Exp $
+ *  Version: $Id: gring.cc,v 1.22 2005-04-21 16:16:45 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -136,10 +136,12 @@ poly nc_p_Mult_mm_Common(poly p, const poly m, int side, const ring r)
       else
       {
         /* REPORT_ERROR */
+#ifdef PDEBUG
 	const char* s;
 	if (side==1) s="nc_p_Mult_mm";
 	else s="nc_mm_Mult_p";
 	Print("%s: exponent mismatch %d and %d\n",s,expP,expM);
+#endif
         expOut=0;
       }
     }
@@ -1209,7 +1211,9 @@ poly nc_CreateShortSpoly(poly p1, poly p2, const ring r)
 {
   if (p_GetComp(p1,r)!=p_GetComp(p2,r))
   {
+#ifdef PDEBUG
     Print("spShort:exponent mismatch!");
+#endif
     return(NULL);
   }
   poly m=pOne();
@@ -1594,6 +1598,11 @@ void ncKill(ring r)
   }
   id_Delete((ideal *)&(r->nc->C),r->nc->basering);
   id_Delete((ideal *)&(r->nc->D),r->nc->basering);
+  r->nc->basering->ref--;
+  if (r->nc->basering<=0) 
+  {
+    rKill(r->nc->basering);
+  }
   omFreeSize((ADDRESS)r->nc,sizeof(nc_struct));
   r->nc=NULL;
 }
@@ -1612,7 +1621,6 @@ poly nc_p_CopyGet(poly a, const ring r)
   if (r==r->nc->basering) return(p_Copy(a,r));
   else
   {
-    //    nFunc nMap = nSetMap();
     return(prCopyR_NoSort(a,r->nc->basering,r));
   }
 }
@@ -1629,9 +1637,18 @@ poly nc_p_CopyPut(poly a, const ring r)
 }
 
 int nc_CheckSubalgebra(poly PolyVar, ring r)
-  /* returns TRUE if product of vars from PolyVar defines */
+  /* returns TRUE if there were errors */
+  /* checks whether product of vars from PolyVar defines */
   /* an admissible subalgebra of r */
+  /* r is indeed currRing */
 {
+  ring save = currRing;
+  int WeChangeRing = 0;
+  if (currRing != r)
+  {
+    rChangeCurrRing(r);
+    WeChangeRing = 1;
+  }
   int rN=r->N;
   int *ExpVar=(int*)omAlloc0((rN+1)*sizeof(int));
   int *ExpTmp=(int*)omAlloc0((rN+1)*sizeof(int));
@@ -1639,15 +1656,15 @@ int nc_CheckSubalgebra(poly PolyVar, ring r)
   int i; int j; int k;
   poly test=NULL;
   int OK=1;
-  for (i=1;i<rN;i++)
+  for (i=1; i<rN; i++)
   {
     if (ExpVar[i]==0) /* i.e. not in PolyVar */
     {  
-      for (j=i+1;j<=rN;j++)
+      for (j=i+1; j<=rN; j++)
       {
 	if (ExpVar[j]==0)
 	{
-	  test=nc_p_CopyGet(MATELEM(r->nc->D,i,j),r);
+	  test = nc_p_CopyGet(MATELEM(r->nc->D,i,j),r);
 	  while (test!=NULL)
 	  {
             p_GetExpV(test, ExpTmp, r);
@@ -1659,7 +1676,7 @@ int nc_CheckSubalgebra(poly PolyVar, ring r)
 		if (ExpVar[k]!=0) OK=0;
 	      }
             }
-	    if (!OK) return(FALSE);
+	    if (!OK) return(TRUE);
 	    pIter(test);
           }
 	}
@@ -1669,33 +1686,61 @@ int nc_CheckSubalgebra(poly PolyVar, ring r)
   p_Delete(&test,r);
   freeT(ExpVar,rN);
   freeT(ExpTmp,rN);
-  return(TRUE);
+  if ( WeChangeRing )
+    rChangeCurrRing(save);
+  return(FALSE);
 }
 
-// int Commutative_Context(ring r, leftv expression)
-//   /* returns 1 if expression consists */
-//   /*  of commutative elements */
-// {
-//   /* crucial: poly -> ideal, module, matrix  */
-  
-// }
+int nc_CheckOrdCondition(matrix D, ring r)
+/* returns TRUE if there were errors */
+/* checks whether the current ordering */
+/* is admissible for r and D == r->nc->D */
+/* to be executed in a currRing */
+{
+  /* analyze D: an upper triangular matrix of polys */ 
+  /* check the ordering condition for D */
+  ring save = currRing;
+  int WeChangeRing = 0;
+  if (currRing != r)
+  {
+    rChangeCurrRing(r);
+    WeChangeRing = 1;
+  }
+  poly p,q;
+  int i,j;
+  int report = 1;
+  for(i=1; i<r->N; i++)
+  {
+    for(j=i+1; j<=r->N; j++)
+    { 
+      p = nc_p_CopyGet(MATELEM(D,i,j),r);
+      if ( p != NULL)
+      {
+	q = p_ISet(1,r); // replaces pOne();
+	p_SetExp(q,i,1,r);
+	p_SetExp(q,j,1,r);
+	p_Setm(q,r);
+	if (p_LmCmp(q,p,r) != 1) /* i.e. lm(p)< lm(q)  */
+	{
+	  Print("Bad ordering at %d,%d\n",i,j);
+#ifdef PDEBUG
+	  p_Write(p,r);
+	  p_Write(q,r);
+#endif
+	  report = 0;
+	}
+	p_Delete(&q,r);
+	p_Delete(&p,r);
+	p = NULL;
+      }
+    }
+  }
+  if ( WeChangeRing )
+    rChangeCurrRing(save);
+  return(!report);
+}
 
-// int Comm_Context_Poly(ring r, poly p)
-// {
-//   poly COMM=r->nc->COMM;
-//   poly pp=pOne();
-//   memset(pp->exp,0,r->ExpL_Size*sizeof(long));
-//   while (p!=NULL)
-//   {
-//     for (i=0;i<=r->ExpL_Size;i++)
-//     {
-//       if ((p->exp[i]) && (pp->exp[i]))  return(FALSE); 
-//       /* nonzero exponent of non-comm variable */
-//     }
-//     pIter(p);
-//   }
-//   return(TRUE);
-// }
+
 
 BOOLEAN nc_CallPlural(matrix CCC, matrix DDD, poly CCN, poly DDN, ring r)
   /* returns TRUE if there were errors */
@@ -1724,9 +1769,17 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD, poly CCN, poly DDN, ring r)
       ncKill(r); 
     }
   }
+  ring save = currRing;
+  int WeChangeRing = 0;
+  if (currRing!=r)
+  {
+    rChangeCurrRing(r);
+    WeChangeRing = 1;
+  }
   r->nc = (nc_struct *)omAlloc0(sizeof(nc_struct));
   r->nc->ref = 1;
   r->nc->basering = r;
+  r->ref++;
   r->nc->type = nc_undef;
 
   /* initialition of the matrix C */
@@ -1742,6 +1795,8 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD, poly CCN, poly DDN, ring r)
     {
       Werror("Square %d x %d  matrix expected",r->N,r->N);
       ncCleanUp(r);
+      if (WeChangeRing)
+	rChangeCurrRing(save);
       return TRUE;
     }
   }
@@ -1761,6 +1816,8 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD, poly CCN, poly DDN, ring r)
     {
       Werror("Square %d x %d  matrix expected",r->N,r->N);
       ncCleanUp(r);
+      if (WeChangeRing)
+	rChangeCurrRing(save);
       return TRUE;
     }
   }
@@ -1776,6 +1833,8 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD, poly CCN, poly DDN, ring r)
     {
       Werror("Incorrect input : zero coefficients are not allowed");
       ncCleanUp(r);
+      if (WeChangeRing)
+	rChangeCurrRing(save);
       return TRUE;
     }
     if (nIsOne(nN)) 
@@ -1818,6 +1877,8 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD, poly CCN, poly DDN, ring r)
 	{
 	  Werror("Incorrect input : matrix of coefficients contains zeros in the upper triangle");
 	  ncCleanUp(r);
+	  if (WeChangeRing)
+	    rChangeCurrRing(save);
 	  return TRUE;
 	}
 	if (!nEqual(pN,qN)) tmpIsSkewConstant = 0;
@@ -1867,37 +1928,19 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD, poly CCN, poly DDN, ring r)
   }
   /* analyze D */ 
   /* check the ordering condition for D (both matrix and poly cases) */
-  poly p,q;
-  int report = 1;
-  for(i=1; i<r->N; i++)
+
+  if ( nc_CheckOrdCondition(D, r) )
   {
-    for(j=i+1; j<=r->N; j++)
-    { 
-      p = MATELEM(D,i,j);
-      if ( p != NULL)
-      {
-	q = p_ISet(1,r); // replaces pOne();
-	p_SetExp(q,i,1,r);
-	p_SetExp(q,j,1,r);
-	p_Setm(q,r);
-	if (p_LmCmp(q,p,r) != 1) /* i.e. lm(p)<=lm(q)  */
-	{
-	  Print("Bad ordering at %d,%d",i,j);
-	  report = 0;
-	}
-	p_Delete(&q,r);
-	p = NULL;
-      }
-    }
-  }
-  if (!report)
-  {
-    Werror("Matrix of polynomials violates the ordering condition");
     ncCleanUp(r);
+    if (WeChangeRing)
+      rChangeCurrRing(save);
+    Werror("Matrix of polynomials violates the ordering condition");
     return TRUE;
   }
   r->nc->C = C;
   r->nc->D = D;
+  if (WeChangeRing)
+    rChangeCurrRing(save);
   return nc_InitMultiplication(r);
 }
 
@@ -2015,15 +2058,14 @@ poly nc_pSubst(poly p, int n, poly e)
       pre = pOne();
       pSetExpV(pre,PRE);
       pSetm(pre);
-      pSetComp(pre,PRE[0]);
       res = nc_mm_Mult_p(pre,res,currRing);
       /* multiply with suffix */
       suf = pOne();
       pSetExpV(suf,SUF);
       pSetm(suf);
-      pSetComp(suf,PRE[0]);
       res = nc_p_Mult_mm(res,suf,currRing);
       res = p_Mult_nn(res,C,currRing);
+      pSetComp(res,PRE[0]);
     }
     else /* pow==0 */
     {
@@ -2409,3 +2451,28 @@ BOOLEAN rIsLikeOpposite(ring rBase, ring rCandidate)
 }
 
 #endif
+
+
+// int Commutative_Context(ring r, leftv expression)
+//   /* returns 1 if expression consists */
+//   /*  of commutative elements */
+// {
+//   /* crucial: poly -> ideal, module, matrix  */
+// }
+
+// int Comm_Context_Poly(ring r, poly p)
+// {
+//   poly COMM=r->nc->COMM;
+//   poly pp=pOne();
+//   memset(pp->exp,0,r->ExpL_Size*sizeof(long));
+//   while (p!=NULL)
+//   {
+//     for (i=0;i<=r->ExpL_Size;i++)
+//     {
+//       if ((p->exp[i]) && (pp->exp[i]))  return(FALSE); 
+//       /* nonzero exponent of non-comm variable */
+//     }
+//     pIter(p);
+//   }
+//   return(TRUE);
+// }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.8 2005-03-17 14:13:02 Singular Exp $ */
+/* $Id: ideals.cc,v 1.9 2005-04-21 16:16:46 levandov Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -2375,7 +2375,7 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
   {
     if (currRing->nc->type!=nc_skew)
     {
-      if (!nc_CheckSubalgebra(delVar,currRing))
+      if (nc_CheckSubalgebra(delVar,currRing))
       {
         WerrorS("no elimination is possible: subalgebra is not admissible");
         return idCopy(h1);
@@ -2424,9 +2424,28 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
   tmpR.wvhdl = wv;
   rComplete(&tmpR, 1);
 
+#ifdef HAVE_PLURAL
+  // update nc structure on tmpR
+  // in particular, tests the admissibility of the ordering
+  if (nc_rComplete(origR, &tmpR)) 
+  {
+    WerrorS("no elimination is possible: subalgebra is not admissible");
+    // goto cleanup
+    omFree((ADDRESS)wv[0]);
+    omFreeSize((ADDRESS)wv,ordersize*sizeof(int**));
+    omFreeSize((ADDRESS)ord,ordersize*sizeof(int));
+    omFreeSize((ADDRESS)block0,ordersize*sizeof(int));
+    omFreeSize((ADDRESS)block1,ordersize*sizeof(int));
+    rUnComplete(&tmpR);
+    if (w!=NULL)
+      delete w;
+    return idCopy(h1);
+  }
+#endif
   // change into the new ring
   //pChangeRing(pVariables,currRing->OrdSgn,ord,block0,block1,wv);
   rChangeCurrRing(&tmpR);
+
   h = idInit(IDELEMS(h1),h1->rank);
   // fetch data from the old ring
   for (k=0;k<IDELEMS(h1);k++) h->m[k] = prCopyR( h1->m[k], origR);
