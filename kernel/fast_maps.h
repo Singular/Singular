@@ -7,7 +7,7 @@
  *  Author:  obachman (Olaf Bachmann), hannes (Hannes Schoenemann),
  *           bricken (Michael Brickenstein) 
  *  Created: 01/02
- *  Version: $Id: fast_maps.h,v 1.1.1.1 2003-10-06 12:15:51 Singular Exp $
+ *  Version: $Id: fast_maps.h,v 1.2 2005-04-21 13:31:32 Singular Exp $
  *******************************************************************/
 
 /*******************************************************************************

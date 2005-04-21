@@ -111,7 +111,7 @@ CXXSOURCES=grammar.cc scanner.cc attrib.cc \
     libparse.cc sing_win.cc\
     gms.cc pcv.cc maps_ip.cc\
     tgb.cc\
-    pShallowCopyDelete.cc fast_maps.cc cntrlc.cc misc.cc
+    pShallowCopyDelete.cc cntrlc.cc misc.cc
 
 # stuff for MP
 MPSR_SOURCES = mpsr_Put.cc mpsr_PutPoly.cc mpsr_GetPoly.cc mpsr_sl.cc\
@@ -161,7 +161,6 @@ HEADERS=lists.h attrib.h \
 	subexpr.h ipid.h \
 	cntrlc.h ipprint.h sdb.h \
 	ipshell.h tok.h \
-	fast_maps.h \
 	silink.h \
 	fglm.h sing_dbm.h maps_ip.h \
 	mpsr.h mpsr_sl.h\
