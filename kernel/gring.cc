@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.22 2005-04-21 16:16:45 levandov Exp $
+ *  Version: $Id: gring.cc,v 1.23 2005-04-21 16:25:28 Singular Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -1964,8 +1964,9 @@ BOOLEAN nc_InitMultiplication(ring r)
     WeChangeRing = 1;
   }
   int i,j;
-  r->nc->MT = (matrix *)omAlloc0(r->N*(r->N-1)/2*sizeof(matrix));
-  r->nc->MTsize = (int *)omAlloc0(r->N*(r->N-1)/2*sizeof(int));
+  r->nc->MT = (matrix *)omAlloc0((r->N*(r->N-1))/2*sizeof(matrix));
+  r->nc->MTsize = (int *)omAlloc0((r->N*(r->N-1))/2*sizeof(int));
+  idTest(((ideal)r->nc->C));
   matrix COM = mpCopy(r->nc->C);
   poly p,q;
   short DefMTsize=7;
@@ -1987,13 +1988,13 @@ BOOLEAN nc_InitMultiplication(ring r)
 	/* TODO check the special multiplication properties */
 	IsNonComm = 1;
 	p_Delete(&(MATELEM(COM,i,j)),r);
-	MATELEM(COM,i,j) = NULL;
+	//MATELEM(COM,i,j) = NULL; // done by p_Delete
 	r->nc->MTsize[UPMATELEM(i,j,r->N)] = DefMTsize; /* default sizes */
 	r->nc->MT[UPMATELEM(i,j,r->N)] = mpNew(DefMTsize, DefMTsize);
       }
       /* set MT[i,j,1,1] to c_i_j*x_i*x_j + D_i_j */
       p = p_ISet(1,r); /* instead of     p = pOne(); */
-      p_SetCoeff(p,nCopy(pGetCoeff(MATELEM(r->nc->C,i,j))),r);
+      p_SetCoeff(p,n_Copy(pGetCoeff(MATELEM(r->nc->C,i,j)),r),r);
       p_SetExp(p,i,1,r);
       p_SetExp(p,j,1,r);
       p_Setm(p,r);
@@ -2001,7 +2002,7 @@ BOOLEAN nc_InitMultiplication(ring r)
       p = p_Add_q(p,q,r);
       MATELEM(r->nc->MT[UPMATELEM(i,j,r->N)],1,1) = nc_p_CopyPut(p,r);
       p_Delete(&p,r);
-      p = NULL;
+      // p = NULL;// done by p_Delete
     }
   }
   if (r->nc->type==nc_undef)
