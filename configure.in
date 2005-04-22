@@ -606,7 +606,7 @@ elif test "$enable_Singular" = yes; then
   if test -d Singular; then
     AC_MSG_RESULT(yes)
     CONFIG_SUBDIRS="$CONFIG_SUBDIRS Singular"
-    BUILD_SUBDIRS="$BUILD_SUBDIRS Singular"	
+    BUILD_SUBDIRS="$BUILD_SUBDIRS kernel Singular"	
   else
     AC_MSG_RESULT(no)
     AC_MSG_ERROR(can not build Singular without Singular directory)
