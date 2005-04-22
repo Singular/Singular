@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: plutypes.doc,v 1.23 2005-03-08 13:50:36 levandov Exp $
+@comment $Id: plutypes.doc,v 1.24 2005-04-22 16:33:28 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -1252,9 +1252,9 @@ S;
 @cindex ring related functions @value{PSUFFIX}
 
 @table @code
-@item{envelope}
+@item envelope
 enveloping ring (see @ref{envelope})
-@item{opposite}
+@item opposite
 opposite ring (see @ref{opposite})
 @item qring
 quotient ring (see @ref{qring @value{PSUFFIX}}) 
