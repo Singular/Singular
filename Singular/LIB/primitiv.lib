@@ -2,7 +2,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // This library is for Singular 1.2 or newer
 
-version="$Id: primitiv.lib,v 1.19 2005-04-20 17:28:48 Singular Exp $";
+version="$Id: primitiv.lib,v 1.20 2005-04-22 16:04:46 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:    primitiv.lib    Computing a Primitive Element
@@ -382,13 +382,13 @@ EXAMPLE: example splitring;  shows an example
 example
 { "EXAMPLE:"; echo = 2;
  ring r=0,(x,y),dp;
- splitring(x2-2,"r1");   // change to Q(sqrt(2))
+ def r1=splitring(x2-2);
+ setring r1; basering;    // change to Q(sqrt(2))
  // change to Q(sqrt(2),sqrt(sqrt(2)))=Q(a) and return the transformed
  // old parameter:
- splitring(x2-a,"r2",a);
+ def r2=splitring(x2-a,a);
+ setring r2; basering; erg;
  // the result is (a)^2 = (sqrt(sqrt(2)))^2
- nameof(basering);
- r2;
  kill r1; kill r2;
 }
 ///////////////////////////////////////////////////////////////////////////////
