@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.9 2005-04-21 16:16:46 levandov Exp $ */
+/* $Id: ideals.cc,v 1.10 2005-04-22 18:09:43 levandov Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -2373,7 +2373,7 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
     /* in the NC case, we have to check the admissibility of */
     /* the subalgebra to be intersected with */
   {
-    if (currRing->nc->type!=nc_skew)
+    if (currRing->nc->type!=nc_skew) /* in (quasi)-commutative algebras every subalgebra is admissible */
     {
       if (nc_CheckSubalgebra(delVar,currRing))
       {
@@ -2425,20 +2425,35 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
   rComplete(&tmpR, 1);
 
 #ifdef HAVE_PLURAL
-  // update nc structure on tmpR
-  // in particular, tests the admissibility of the ordering
-  if (nc_rComplete(origR, &tmpR)) 
+  /* update nc structure on tmpR */
+  int BAD = 0;
+  if ( nc_rComplete(origR, &tmpR) ) 
   {
-    WerrorS("no elimination is possible: subalgebra is not admissible");
-    // goto cleanup
+    Werror("error in nc_rComplete");
+    BAD = 1;
+  }
+  if (!BAD) 
+  {
+    /* tests the admissibility of the new elim. ordering */
+    if ( nc_CheckOrdCondition( (&tmpR)->nc->D, &tmpR) )
+    {
+      Werror("no elimination is possible: ordering condition is violated");
+      BAD = 1;
+    }
+  }
+  if (BAD)
+  {
+    // cleanup
     omFree((ADDRESS)wv[0]);
     omFreeSize((ADDRESS)wv,ordersize*sizeof(int**));
     omFreeSize((ADDRESS)ord,ordersize*sizeof(int));
     omFreeSize((ADDRESS)block0,ordersize*sizeof(int));
     omFreeSize((ADDRESS)block1,ordersize*sizeof(int));
     rUnComplete(&tmpR);
-    if (w!=NULL)
+    if (w!=NULL)      
+    {
       delete w;
+    }
     return idCopy(h1);
   }
 #endif

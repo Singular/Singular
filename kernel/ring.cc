@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.32 2005-04-21 16:16:46 levandov Exp $ */
+/* $Id: ring.cc,v 1.33 2005-04-22 18:09:42 levandov Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -3928,22 +3928,10 @@ BOOLEAN nc_rComplete(ring src, ring dest)
   int N = dest->N;
   if (src->N != N)
   {
+    /* should not happen */
     WarnS("wrong nc_rComplete call");
     return TRUE;
   }
-//   ncKill(dest); // in order to init new
-//   if (nc_CallPlural(src->nc->C, src->nc->D, NULL, NULL, dest))
-//   {
-//     return TRUE;
-//   }
-//   else
-//     return FALSE;
-  //  if (dest->nc != NULL)
-  //    ncKill(dest);
-  //  dest->nc           = (nc_struct *)omAlloc0(sizeof(nc_struct));
-  //  dest->nc->ref      = 1; 
-  //  dest->nc->basering = dest;
-  //  dest->nc->type     =  src->nc->type;
   ring save = currRing;
   int WeChangeRing = 0;
   if (dest != currRing)
@@ -3961,25 +3949,23 @@ BOOLEAN nc_rComplete(ring src, ring dest)
   {
     for (j= i+1; j<= N; j++)
     {
-      //      n = p_GetCoeff(MATELEM(C0,i,j), src);
-      //      p = pOne();
-      //      p_SetCoeff(p,n,dest);
-      //      MATELEM(C,i,j) = nc_p_CopyPut(p, dest);
-      p = prCopyR(MATELEM(C0,i,j), src, dest); // like in nc_p_CopyGet
-      MATELEM(C,i,j) = p; //nc_p_CopyPut(p, dest);
-      //      p_Delete(&p,dest);
+      n = n_Copy(p_GetCoeff(MATELEM(C0,i,j), src),src);
+      p = p_ISet(1,dest);
+      p_SetCoeff(p,n,dest);
+      MATELEM(C,i,j) = p;
       p = NULL;
       if (MATELEM(D0,i,j) != NULL)
       {
-	p = prCopyR(MATELEM(D0,i,j), src, dest); // like in nc_p_CopyGet
-	MATELEM(D,i,j) = p; //nc_p_CopyPut(p, dest);
-	//	p_Delete(&p,dest);
+	p = prCopyR(MATELEM(D0,i,j), src->nc->basering, dest);
+	MATELEM(D,i,j) = nc_p_CopyPut(p, dest);
+	p_Delete(&p, dest);
 	p = NULL;
       }
     }
   }
-  idTest((ideal)C);
-  idTest((ideal)D);
+  /* One must test C and D _only_ in r->nc->basering!!! not in r!!! */
+  //  idTest((ideal)C);
+  //  idTest((ideal)D);
   id_Delete((ideal *)&(dest->nc->C),dest->nc->basering);
   id_Delete((ideal *)&(dest->nc->D),dest->nc->basering);
   dest->nc->C = C;

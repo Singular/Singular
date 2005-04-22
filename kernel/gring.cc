@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.24 2005-04-22 16:33:13 Singular Exp $
+ *  Version: $Id: gring.cc,v 1.25 2005-04-22 18:09:42 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -1616,7 +1616,17 @@ void ncCleanUp(ring r)
 
 poly nc_p_CopyGet(poly a, const ring r)
 /* for use in getting the mult. matrix elements*/
+/* ring r must be a currRing! */
+/* for consistency, copies a poly from the comm. r->nc->basering */
+/* to its image in NC ring */
 {
+  if (r != currRing)
+  {
+#ifdef PDEBUF
+    Werror("nc_p_CopyGet call not in currRing");
+#endif
+    return(NULL);
+  }
   if (!rIsPluralRing(r)) return(p_Copy(a,r));
   if (r==r->nc->basering) return(p_Copy(a,r));
   else
@@ -1627,7 +1637,17 @@ poly nc_p_CopyGet(poly a, const ring r)
 
 poly nc_p_CopyPut(poly a, const ring r)
 /* for use in defining the mult. matrix elements*/
+/* ring r must be a currRing! */
+/* for consistency, puts a polynomial from the NC ring */
+/* to its presentation in the comm. r->nc->basering */
 {
+  if (r != currRing)
+  {
+#ifdef PDEBUF
+    Werror("nc_p_CopyGet call not in currRing");
+#endif
+    return(NULL);
+  }
   if (!rIsPluralRing(r)) return(p_Copy(a,r));
   if (r==r->nc->basering) return(p_Copy(a,r));
   else
@@ -1636,11 +1656,11 @@ poly nc_p_CopyPut(poly a, const ring r)
   }
 }
 
-int nc_CheckSubalgebra(poly PolyVar, ring r)
+BOOLEAN nc_CheckSubalgebra(poly PolyVar, ring r)
   /* returns TRUE if there were errors */
   /* checks whether product of vars from PolyVar defines */
   /* an admissible subalgebra of r */
-  /* r is indeed currRing */
+  /* r is indeed currRing and assumed to be noncomm. */
 {
   ring save = currRing;
   int WeChangeRing = 0;
@@ -1691,7 +1711,7 @@ int nc_CheckSubalgebra(poly PolyVar, ring r)
   return(FALSE);
 }
 
-int nc_CheckOrdCondition(matrix D, ring r)
+BOOLEAN nc_CheckOrdCondition(matrix D, ring r)
 /* returns TRUE if there were errors */
 /* checks whether the current ordering */
 /* is admissible for r and D == r->nc->D */
@@ -1701,14 +1721,14 @@ int nc_CheckOrdCondition(matrix D, ring r)
   /* check the ordering condition for D */
   ring save = currRing;
   int WeChangeRing = 0;
-  if (currRing != r)
+  if (r != currRing)
   {
     rChangeCurrRing(r);
     WeChangeRing = 1;
   }
   poly p,q;
   int i,j;
-  int report = 1;
+  int report = 0;
   for(i=1; i<r->N; i++)
   {
     for(j=i+1; j<=r->N; j++)
@@ -1720,14 +1740,14 @@ int nc_CheckOrdCondition(matrix D, ring r)
 	p_SetExp(q,i,1,r);
 	p_SetExp(q,j,1,r);
 	p_Setm(q,r);
-	if (p_LmCmp(q,p,r) != 1) /* i.e. lm(p)< lm(q)  */
+	if (p_LmCmp(q,p,r) != 1) /* i.e. lm(p)==xy < lm(q)==D_ij  */
 	{
 	  Print("Bad ordering at %d,%d\n",i,j);
 #ifdef PDEBUG
 	  p_Write(p,r);
 	  p_Write(q,r);
 #endif
-	  report = 0;
+	  report = 1;
 	}
 	p_Delete(&q,r);
 	p_Delete(&p,r);
@@ -1737,7 +1757,7 @@ int nc_CheckOrdCondition(matrix D, ring r)
   }
   if ( WeChangeRing )
     rChangeCurrRing(save);
-  return(!report);
+  return(report);
 }
 
 
