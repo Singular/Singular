@@ -2,8 +2,8 @@ LIB "tst.lib";
 tst_init();
 
 LIB"ring.lib";
-proc primaryTest(ideal i, poly p)
-"USAGE:   primaryTest(i,p); i standard basis with respect to
+proc PrimaryTest(ideal i, poly p)
+"USAGE:   PrimaryTest(i,p); i standard basis with respect to
           lp, p irreducible polynomial in K[var(n)], 
           p^a=i[1] for some a;
 RETURN:   an ideal, the radical of i if i is primary and in 
@@ -42,7 +42,7 @@ RETURN:   an ideal, the radical of i if i is primary and in
 
    ring s=(0,x),(d,e,f,g),lp;
    ideal i=g^5,(x*f-g)^3,5*e-g^2,x*d^3;
-   primaryTest(i,g);
+   PrimaryTest(i,g);
    kill s;
 
 proc zeroDecomp(ideal i)
@@ -79,7 +79,7 @@ NOTE:    algorithm of Gianni/Trager/Zacharias
    {
      p=fac[1][k]^fac[2][k];
      primary=groebner(j+p);
-     prim=primaryTest(primary,fac[1][k]);
+     prim=PrimaryTest(primary,fac[1][k]);
 //---test whether all ideals were primary and in general 
 //   position
      if(prim==0)
@@ -173,7 +173,7 @@ proc prepareSat(ideal i)
    return(p);
 }
 
-LIB"elim.lib";
+//LIB"elim.lib";
 proc decomp(ideal i)
 "USAGE:  decomp(i); i ideal
 RETURN:  list l of lists of two ideals such that the

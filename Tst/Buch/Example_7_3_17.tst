@@ -2,7 +2,6 @@ LIB "tst.lib";
 tst_init();
 
 LIB"homolog.lib";
-LIB"primdec.lib";
 
 proc flatLocus1(matrix M)
 {
