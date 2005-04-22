@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz0.cc,v 1.4 2005-02-17 09:42:22 Singular Exp $ */
+/* $Id: syz0.cc,v 1.5 2005-04-22 16:31:51 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -30,6 +30,7 @@ static kBucket_pt sy0buck;
 static void syInitSort(ideal arg,intvec **modcomp)
 {
   int i,j,k,kk,kkk,jj;
+  idSkipZeroes(arg);
   polyset F,oldF=arg->m;
   int Fl=IDELEMS(arg);
   int rkF=idRankFreeModule(arg);
