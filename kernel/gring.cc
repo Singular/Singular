@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.23 2005-04-21 16:25:28 Singular Exp $
+ *  Version: $Id: gring.cc,v 1.24 2005-04-22 16:33:13 Singular Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -1998,6 +1998,7 @@ BOOLEAN nc_InitMultiplication(ring r)
       p_SetExp(p,i,1,r);
       p_SetExp(p,j,1,r);
       p_Setm(p,r);
+      p_Test(MATELEM(r->nc->D,i,j),r);
       q =  nc_p_CopyGet(MATELEM(r->nc->D,i,j),r);
       p = p_Add_q(p,q,r);
       MATELEM(r->nc->MT[UPMATELEM(i,j,r->N)],1,1) = nc_p_CopyPut(p,r);
