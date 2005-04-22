@@ -3,7 +3,7 @@
 ****************************************/
 /*
 * ABSTRACT: help system
-* versin $Id: fehelp.cc,v 1.39 2004-09-13 15:41:33 Singular Exp $
+* versin $Id: fehelp.cc,v 1.40 2005-04-22 15:14:02 Singular Exp $
 */
 
 #include <string.h>
@@ -611,7 +611,8 @@ static int heReKey2Entry (char* filename, char* key, heEntry hentry)
   {
     if (index_key[MAX_HE_ENTRY_LENGTH]!='\0')
     {
-      WerrorS("index file corrupt");
+      index_key[MAX_HE_ENTRY_LENGTH]='\0';
+      Werror("index file corrupt at line >>%s<<",index_key);
       break;
     }
     else if (strmatch(index_key, key))
