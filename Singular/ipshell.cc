@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.99 2005-04-18 13:01:19 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.100 2005-04-22 14:18:29 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -910,8 +910,7 @@ BOOLEAN jjBETTI2(leftv res, leftv u, leftv v)
   if (r==NULL) return TRUE;
   res->data=(char *)syBetti(r,len,&reg,weights,(int)v->Data());
   omFreeSize((ADDRESS)r,(len)*sizeof(ideal));
-  if (add_row_shift!=0) 
-    atSet(res,omStrDup("rowShift"),(void*)add_row_shift,INT_CMD);
+  atSet(res,omStrDup("rowShift"),(void*)add_row_shift,INT_CMD);
   if (weights!=NULL) delete weights;
   return FALSE;
 }
