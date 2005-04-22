@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.100 2005-04-22 14:18:29 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.101 2005-04-22 17:57:01 levandov Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1920,7 +1920,7 @@ rCompose_err:
     int i;
     if (R->names!=NULL)
     {
-      i=R->N;
+      i=R->N-1;
       while (i>=0) { if (R->names[i]!=NULL) omFree(R->names[i]); i--; }
       omFree(R->names);
     }
