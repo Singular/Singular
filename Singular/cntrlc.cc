@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: cntrlc.cc,v 1.42 2004-11-09 14:54:21 Singular Exp $ */
+/* $Id: cntrlc.cc,v 1.43 2005-04-22 08:36:51 krueger Exp $ */
 /*
 * ABSTRACT - interupt handling
 */
@@ -40,38 +40,38 @@
 #endif
 
 #ifdef unix
-#ifndef hpux
-#include <unistd.h>
-#include <sys/types.h>
+# ifndef hpux
+#  include <unistd.h>
+#  include <sys/types.h>
 
-#ifdef TIME_WITH_SYS_TIME
-# include <time.h>
-# ifdef HAVE_SYS_TIME_H
-#   include <sys/time.h>
-# endif
-#else
-# ifdef HAVE_SYS_TIME_H
-#   include <sys/time.h>
-# else
+#  ifdef TIME_WITH_SYS_TIME
 #   include <time.h>
-# endif
-#endif
-#ifdef HAVE_SYS_TIMES_H
-#include <sys/times.h>
-#endif
+#   ifdef HAVE_SYS_TIME_H
+#     include <sys/time.h>
+#   endif
+#  else
+#   ifdef HAVE_SYS_TIME_H
+#     include <sys/time.h>
+#   else
+#     include <time.h>
+#   endif
+#  endif
+#  ifdef HAVE_SYS_TIMES_H
+#   include <sys/times.h>
+#  endif
 
-#define INTERACTIVE 0
-#define STACK_TRACE 1
-#ifdef CALL_GDB
+#  define INTERACTIVE 0
+#  define STACK_TRACE 1
+#  ifdef CALL_GDB
 static void debug (int);
 static void debug_stop (char **);
-#endif
-#ifndef __OPTIMIZE__
+#  endif
+#  ifndef __OPTIMIZE__
 static void stack_trace (char **);
 static void stack_trace_sigchld (int);
-#endif
-#endif
-#endif
+#  endif
+# endif /* !hpux */
+#endif  /* unix */
 
 /* data */
 jmp_buf si_start_jmpbuf;
@@ -84,16 +84,16 @@ typedef void (*si_hdl_typ)(int);
 /*0 implementation*/
 #ifndef MSDOS
 /* signals are not implemented in DJGCC */
-#ifndef macintosh
+# ifndef macintosh
 /* signals are not right implemented in macintosh */
 void sigint_handler(int sig);
-#endif
+# endif /* !macintosh */
 #endif
 
 #if defined(linux) && defined(__i386__)
-#if defined(HAVE_SIGCONTEXT) || defined(HAVE_ASM_SIGCONTEXT_H)
-#include <asm/sigcontext.h>
-#else
+# if defined(HAVE_SIGCONTEXT) || defined(HAVE_ASM_SIGCONTEXT_H)
+#  include <asm/sigcontext.h>
+# else
 struct sigcontext_struct {
         unsigned short gs, __gsh;
         unsigned short fs, __fsh;
@@ -118,7 +118,7 @@ struct sigcontext_struct {
         unsigned long oldmask;
         unsigned long cr2;
 };
-#endif
+# endif
 typedef struct sigcontext_struct sigcontext;
 
 /*2
@@ -133,7 +133,7 @@ void sigsegv_handler(int sig, sigcontext s)
                    "please inform the authors\n",
                    (int)s.eip,(int)s.cr2,siRandomStart);
   }
-#ifdef __OPTIMIZE__
+# ifdef __OPTIMIZE__
   if(si_restart<3)
   {
     si_restart++;
@@ -141,10 +141,10 @@ void sigsegv_handler(int sig, sigcontext s)
     init_signals();
     longjmp(si_start_jmpbuf,1);
   }
-#endif
-#ifdef CALL_GDB
+# endif
+# ifdef CALL_GDB
   if (sig!=SIGINT) debug(INTERACTIVE);
-#endif
+# endif
   exit(0);
 }
 
@@ -157,10 +157,10 @@ void sig_ign_hdl(int sig)
   // see also: hpux_system
 }
 
-#ifdef PAGE_TEST
-#ifndef PAGE_INTERRUPT_TIME
-#define PAGE_INTERRUPT_TIME 1
-#endif
+# ifdef PAGE_TEST
+#  ifndef PAGE_INTERRUPT_TIME
+#   define PAGE_INTERRUPT_TIME 1
+#  endif
 void sig11_handler(int sig, sigcontext s)
 {
   unsigned long base =(unsigned long)(s.cr2&(~4095));
@@ -190,7 +190,7 @@ void sigalarm_handler(int sig, sigcontext s)
   setitimer(ITIMER_VIRTUAL,&t,&o);
   signal(SIGVTALRM,(si_hdl_typ)sigalarm_handler);
 }
-#endif
+# endif /* PAGE_TEST */
 
 /*2
 * init signal handlers, linux/i386 version
@@ -198,7 +198,7 @@ void sigalarm_handler(int sig, sigcontext s)
 void init_signals()
 {
 /*4 signal handler: linux*/
-#ifdef PAGE_TEST
+# ifdef PAGE_TEST
   signal(SIGSEGV,(si_hdl_typ)sig11_handler);
   struct itimerval t,o;
   memset(&t,0,sizeof(t));
@@ -208,12 +208,12 @@ void init_signals()
   o.it_value.tv_usec    =(unsigned)PAGE_INTERRUPT_TIME;
   setitimer(ITIMER_VIRTUAL,&t,&o);
   signal(SIGVTALRM,(si_hdl_typ)sigalarm_handler);
-#else
+# else /* PAGE_TEST */
   if (SIG_ERR==signal(SIGSEGV,(si_hdl_typ)sigsegv_handler))
   {
     PrintS("cannot set signal handler for SEGV\n");
   }
-#endif
+# endif /* PAGE_TEST */
   if (SIG_ERR==signal(SIGFPE, (si_hdl_typ)sigsegv_handler))
   {
     PrintS("cannot set signal handler for FPE\n");
@@ -234,8 +234,8 @@ void init_signals()
   signal(SIGCHLD, (si_hdl_typ)sig_ign_hdl);
 }
 
-#else
-#ifdef SPARC_SUNOS_4
+#else /* linux && __i386__ */
+# ifdef SPARC_SUNOS_4
 /*2
 * signal handler for run time errors, sparc sunos 4 version
 */
@@ -249,7 +249,7 @@ void sigsegv_handler(int sig, int code, struct sigcontext *scp, char *addr)
                    "please inform the authors\n",
                    (int)addr,siRandomStart);
   }
-#ifdef __OPTIMIZE__
+#  ifdef __OPTIMIZE__
   if(si_restart<3)
   {
     si_restart++;
@@ -257,10 +257,10 @@ void sigsegv_handler(int sig, int code, struct sigcontext *scp, char *addr)
     init_signals();
     longjmp(si_start_jmpbuf,1);
   }
-#endif
-#ifdef CALL_GDB
+#  endif /* __OPTIMIZE__ */
+#  ifdef CALL_GDB
   if (sig!=SIGINT) debug(STACK_TRACE);
-#endif
+#  endif /* CALL_GDB */
   exit(0);
 }
 
@@ -278,12 +278,12 @@ void init_signals()
   signal(SIGINT ,sigint_handler);
   signal(SIGCHLD, (void (*)(int))SIG_IGN);
 }
-#else
+# else /* SPARC_SUNOS_4 */
 
 /*2
 * signal handler for run time errors, general version
 */
-#ifndef macintosh
+# ifndef macintosh
 void sigsegv_handler(int sig)
 {
   fprintf(stderr,"Singular : signal %d (v: %d/%u):\n",
@@ -294,7 +294,7 @@ void sigsegv_handler(int sig)
                    "please inform the authors\n",
                    siRandomStart);
   }
-#ifdef __OPTIMIZE__
+#  ifdef __OPTIMIZE__
   if(si_restart<3)
   {
     si_restart++;
@@ -302,51 +302,51 @@ void sigsegv_handler(int sig)
     init_signals();
     longjmp(si_start_jmpbuf,1);
   }
-#endif
-#ifdef unix
-#ifndef hpux
+#  endif /* __OPTIMIZE__ */
+#  ifdef unix
+#   ifndef hpux
 /* debug(..) does not work under HPUX (because ptrace does not work..) */
-#ifdef CALL_GDB
-#ifndef MSDOS
+#    ifdef CALL_GDB
+#     ifndef MSDOS
   if (sig!=SIGINT) debug(STACK_TRACE);
-#endif
-#endif
-#endif
-#endif
+#     endif /* MSDOS */
+#    endif /* CALL_GDB */
+#   endif /* !hpux */
+#  endif /* unix */
   exit(0);
 }
-#endif
+# endif /* !macintosh */
 
 /*2
 * init signal handlers, general version
 */
 void init_signals()
 {
-#ifndef MSDOS
+# ifndef MSDOS
 /* signals are not implemented in DJGCC */
-#ifndef macintosh
+#  ifndef macintosh
 /* signals are temporaliy removed for macs. */
 /*4 signal handler:*/
   signal(SIGSEGV,(void (*) (int))sigsegv_handler);
-#ifdef SIGBUS
+#   ifdef SIGBUS
   signal(SIGBUS, sigsegv_handler);
-#endif
-#ifdef SIGFPE
+#   endif
+#   ifdef SIGFPE
   signal(SIGFPE, sigsegv_handler);
-#endif
-#ifdef SIGILL
+#   endif
+#   ifdef SIGILL
   signal(SIGILL, sigsegv_handler);
-#endif
-#ifdef SIGIOT
+#   endif
+#   ifdef SIGIOT
   signal(SIGIOT, sigsegv_handler);
-#endif
-#ifdef SIGXCPU
+#   endif
+#   ifdef SIGXCPU
   signal(SIGXCPU, (void (*)(int))SIG_IGN);
-#endif
+#   endif
   signal(SIGINT ,sigint_handler);
   signal(SIGCHLD, (void (*)(int))SIG_IGN);
-#endif
-#endif
+#  endif
+# endif
 }
 #endif
 #endif
