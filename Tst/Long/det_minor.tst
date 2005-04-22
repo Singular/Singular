@@ -31,4 +31,4 @@ ideal g=kuddelmuddel(p),p;
 g;
 syz(g);
 kill RR;
-LIB "tst.lib";tst_status(1);$;
+tst_status(1);$;
