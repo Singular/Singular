@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hutil.cc,v 1.3 2004-10-28 14:16:27 Singular Exp $ */
+/* $Id: hutil.cc,v 1.4 2005-04-22 16:32:15 Singular Exp $ */
 /*
 * ABSTRACT: Utilities for staircase operations
 */
@@ -27,7 +27,7 @@ monf stcmem, radmem;
 // (i.e. changed) except in hInit, or, if hInit would return the
 // "security" copy as well. But then, all the relevant data is held in
 // global variables, so we might do that here, as well.
-static int **hsecure= NULL;
+static scfmon hsecure= NULL;
 
 scfmon hInit(ideal S, ideal Q, int *Nexist, ring tailRing)
 {
@@ -83,7 +83,7 @@ scfmon hInit(ideal S, ideal Q, int *Nexist, ring tailRing)
   if (!k)
     return NULL;
   ek = ex = (scfmon)omAlloc(k * sizeof(scmon));
-  hsecure = (int**) omAlloc(k * sizeof(scmon));
+  hsecure = (scfmon) omAlloc(k * sizeof(scmon));
   for (i = sl; i>0; i--)
   {
     if (*si!=NULL)
@@ -140,7 +140,7 @@ void hDelete(scfmon ev, int ev_length)
   if (ev_length>0)
   {
     for (i=ev_length-1;i>=0;i--)
-      omFreeSize(hsecure[i],(pVariables+1)*sizeof(int));
+      omFreeSize(hsecure[i],(pVariables+1)*sizeof(scmon));
     omFreeSize(hsecure, ev_length*sizeof(scmon));
     omFreeSize(ev,  ev_length*sizeof(scmon));
   }
