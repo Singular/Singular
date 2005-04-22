@@ -1,7 +1,7 @@
-// $Id: sing.lib,v 1.24 2001-02-06 11:35:08 anne Exp $
+// $Id: sing.lib,v 1.25 2005-04-22 16:30:16 Singular Exp $
 //(GMG/BM, last modified 26.06.96)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: sing.lib,v 1.24 2001-02-06 11:35:08 anne Exp $";
+version="$Id: sing.lib,v 1.25 2005-04-22 16:30:16 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  sing.lib      Invariants of Singularities
@@ -17,6 +17,7 @@ PROCEDURES:
  is_is(i);              is ideal i an isolated singularity?
  is_reg(f,id);          is poly f a regular element mod id? (id ideal/module)
  is_regs(i[,id]);       are gen's of ideal i regular sequence modulo id?
+ locstd(i);             SB for local degree ordering without cancelling units
  milnor(i);             milnor number of ideal i; (assume i is ICIS in nf)
  nf_icis(i);            generic combinations of generators; get ICIS in nf
  slocus(i);             ideal of singular locus of ideal i
@@ -26,10 +27,13 @@ PROCEDURES:
  T_1(i);                T^1-module of ideal i
  T_2((i);               T^2-module of ideal i
  T_12(i);               T^1- and T^2-module of ideal i
+ tangentcone(id);       compute tangent cone of id
+
 ";
 
 LIB "inout.lib";
 LIB "random.lib";
+LIB "primdec.lib";
 ///////////////////////////////////////////////////////////////////////////////
 
 proc deform (ideal id)
@@ -361,6 +365,48 @@ example
 
 proc slocus (ideal i)
 "USAGE:   slocus(i);  i ideal
+RETURN:  ideal of singular locus of i 
+EXAMPLE: example slocus; shows an example
+"
+{
+  def R=basering;
+  int j,k;
+  ideal res;
+
+  if(ord_test(basering)!=1)
+  {
+     string va=varstr(basering);
+     if( size( parstr(basering))>0){va=va+","+parstr(basering);}
+     execute ("ring S = ("+charstr(basering)+"),("+va+"),dp;");
+     ideal i=imap(R,i);
+     list l=equidim(i);
+     setring R;
+     list l=imap(S,l);
+  }
+  else
+  {
+     list l=equidim(i);
+  }
+  int n=size(l);
+  if (n==1){return(slocusEqi(i));}
+  res=slocusEqi(l[1]);
+  for(j=2;j<=n;j++){res=intersect(res,slocusEqi(l[j]));}
+  for(j=1;j<n;j++)
+  {
+     for(k=j+1;k<=n;k++){res=intersect(res,l[j]+l[k]);}
+  }
+  return(res);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r  = 0,(u,v,w,x,y,z),dp;
+   ideal i = wx,wy,wz,vx,vy,vz,ux,uy,uz,y3-x2;;
+   slocus(i);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+static proc slocusEqi (ideal i)
+"USAGE:   slocus(i);  i ideal
 RETURN:  ideal of singular locus of i if i is pure dimensional
 NOTE:    this proc returns i and c-minors of jacobian ideal of i where c is the
          codimension of i. Hence, if i is not pure dimensional, slocus may
@@ -369,7 +415,9 @@ NOTE:    this proc returns i and c-minors of jacobian ideal of i where c is the
 EXAMPLE: example slocus; shows an example
 "
 {
-  int cod  = nvars(basering)-dim(std(i));
+  ideal ist=std(i);
+  if(deg(ist[1])==0){return(ist);}
+  int cod  = nvars(basering)-dim(ist);
   i        = i+minor(jacob(i),cod);
   return(i);
 }
@@ -389,7 +437,7 @@ ASSUME:  f is a weighted homogeneous isolated singularity w.r.t. the weights
 COMPUTE: the spectral numbers of the w-homogeneous polynomial f, computed in a
          ring of characteristic 0
 RETURN:  intvec  d,s1,...,su  where:
-         d = w-degree(f)  and  si/d = ith spectral-number(f)
+         d = w-degree(f)  and  si/d = i-th spectral-number(f)
          No return value if basering has parameters or if f is no isolated
          singularity, displays a warning in this case
 EXAMPLE: example qhspectrum; shows an example
@@ -878,3 +926,79 @@ example
    attrib(j,"isSB",1);
    codim(m,j);          // should be 23 (Milnor number -1 of y7-x5)
 }
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc tangentcone (id,list #)
+"USAGE:   tangentcone(id [,n]); id = ideal, n = int
+RETURN:  the tangent cone of id
+NOTE:    the procedure works for any monomial ordering. 
+         If n=0 use std w.r.t. local ordering ds, if n=1 use locstd
+EXAMPLE: example tangentcone; shows an example
+"
+{
+  int ii,n;
+  def bas = basering;
+  ideal tang;
+  if (size(#) !=0) { n= #[1]; }
+  if( n==0 )
+  {
+     changeord("@newr@","ds");
+     ideal @id = imap(bas,id);
+     @id = std(@id);
+     setring bas;
+     id = imap(@newr@,@id);
+     kill @newr@;
+  }
+  else
+  {
+    id = locstd(id);
+  }
+  
+  for(ii=1; ii<=size(id); ii++)
+  {
+    tang[ii]=jet(id[ii],mindeg(id[ii]));     
+  }
+  return(tang);  
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,(x,y,z),ds;
+   ideal i  = 7xyz+z5,x2+y3+z7,5z5+y5;
+   tangentcone(i);
+}   
+///////////////////////////////////////////////////////////////////////////////
+
+proc locstd (id)
+"USAGE:   locstd (id); id = ideal
+RETURN:  a standard basis for a local degree ordering
+NOTE:    the procedure homogenizes id w.r.t. a new 1st variable @t@, computes
+         a SB wrt (dp(1),dp) and substitutes @t@ by 1.
+         Hence the result is a SB with respect to an ordering which sorts
+         first w.r.t. the order and then refines it with dp. This is a
+         local degree ordering.
+         This is done in order to avoid cancellation of units and thus
+         be able to use option(contentSB);
+EXAMPLE: example locstd; shows an example
+"
+{
+  int ii;
+  def bas = basering;
+  execute("ring  @r_locstd 
+     =("+charstr(bas)+"),(@t@,"+varstr(bas)+"),(dp(1),dp);");
+  ideal @id = imap(bas,id);
+  ideal @hid = homog(@id,@t@);
+  @hid = std(@hid);
+  @hid = subst(@hid,@t@,1);
+  setring bas;
+  def @hid = imap(@r_locstd,@hid);
+  attrib(@hid,"isSB",1);
+  kill @r_locstd;
+  return(@hid);  
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,(x,y,z),ds;
+   ideal i  = xyz+z5,2x2+y3+z7,3z5+y5;
+   locstd(i);
+}   
