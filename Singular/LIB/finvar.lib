@@ -1,6 +1,6 @@
 // last change: 98/11/05
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: finvar.lib,v 1.32 2001-02-02 16:28:58 mschulze Exp $"
+version="$Id: finvar.lib,v 1.33 2005-04-22 15:14:40 Singular Exp $"
 category="Invariant theory";
 info="
 LIBRARY:  finvar.lib    Invariant Rings of Finite Groups
@@ -2341,7 +2341,7 @@ example
          string newring="alskdfj";
          molien(L[2..size(L)],newring);
          matrix P=primary_charp(L[1],newring);
-         if(system("with","Namespaces")) { kill Top::`newring`; }
+         //if(system("with","Namespaces")) { kill Top::`newring`; }
          kill `newring`;
          print(P);
 }
@@ -3482,7 +3482,7 @@ example
          string newring="alskdfj";
          molien(L[2..size(L)],newring);
          matrix P=primary_charp_random(L[1],newring,1);
-         if(system("with","Namespaces")) { kill Top::`newring`; }
+         //if(system("with","Namespaces")) { kill Top::`newring`; }
          kill `newring`;
          print(P);
 }

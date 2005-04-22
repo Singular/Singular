@@ -26,7 +26,7 @@ PROCEDURES:
 
 KEYWORDS: Hamburger-Noether expansion; Puiseux expansion; curve singularities;
           topological invariants; Alexander polynomial; resolution graph;
-          total multiplicities; equsingular Tjurina number
+          total multiplicities; equisingular Tjurina number
 ";
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -1250,7 +1250,7 @@ ASSUME:      charexp contains the integer vectors of characteristic exponents
              contact matrix
 RETURN:      intmat, the matrix intersection multiplicities of the branches
 SEE ALSO:    invariants, resolutiongraph, totalmultiplicities, semigroup
-KEYWORDS:    contact matrix, characteristic exponents, intersection multiplicity, topological invariants
+KEYWORDS:    contact matrix; characteristic exponents; intersection multiplicity; topological invariants
 EXAMPLE:     example charexp2inter;   shows an example"
 {
   int n=ncols(contact);
@@ -1320,7 +1320,7 @@ ASSUME:      v contains the characteristic exponents of an irreducible plane
 RETURN:      int, the conductor of the plane curve singularity
 NOTE:        If the curve singularity is smooth, the conductor is zero.
 SEE ALSO:    invariants, resolutiongraph, totalmultiplicities, semigroup
-KEYWORDS:    conductor, characteristic exponents; multiplicity sequence; topological invariants
+KEYWORDS:    conductor; characteristic exponents; multiplicity sequence; topological invariants
 EXAMPLE:     example charexp2conductor;   shows an example"
 {
   intvec E;
@@ -1587,7 +1587,7 @@ example
 static proc euclidseq(int a,int b)
 "USAGE:      euclidseq(a,b),  a,b integers
 RETURN:      intvec,  the divisors in the euclidean alogrithm with multiplicities
-KEYWORDS:    Euclidean algorithm, multiplicity sequence
+KEYWORDS:    Euclidean algorithm; multiplicity sequence
 NOTE :       This procedure is for internal use only; it is called by charexp2multseq.
 "
 {
