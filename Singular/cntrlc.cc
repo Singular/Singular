@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: cntrlc.cc,v 1.43 2005-04-22 08:36:51 krueger Exp $ */
+/* $Id: cntrlc.cc,v 1.44 2005-04-24 08:43:16 krueger Exp $ */
 /*
 * ABSTRACT - interupt handling
 */
@@ -9,7 +9,7 @@
 /* includes */
 #ifdef DecAlpha_OSF1
 #define _XOPEN_SOURCE_EXTENDED
-#endif
+#endif /* MP3-Y2 0.022UF */
 #include <stdio.h>
 #include <stddef.h>
 #include <stdlib.h>
@@ -26,7 +26,7 @@
 #include "version.h"
 #ifdef PAGE_TEST
 #include "page.h"
-#endif
+#endif /* PAGE_TEST */
 
 
 /* undef, if you don't want GDB to come up on error */
@@ -73,6 +73,11 @@ static void stack_trace_sigchld (int);
 # endif /* !hpux */
 #endif  /* unix */
 
+/*---------------------------------------------------------------------*
+ * File scope Variables (Variables share by several functions in
+ *                       the same file )
+ *
+ *---------------------------------------------------------------------*/
 /* data */
 jmp_buf si_start_jmpbuf;
 int siRandomStart;
@@ -82,14 +87,46 @@ BOOLEAN siCntrlc = FALSE;
 typedef void (*si_hdl_typ)(int);
 
 /*0 implementation*/
+/*---------------------------------------------------------------------*
+ * Functions declarations
+ *
+ *---------------------------------------------------------------------*/
 #ifndef MSDOS
 /* signals are not implemented in DJGCC */
 # ifndef macintosh
 /* signals are not right implemented in macintosh */
 void sigint_handler(int sig);
 # endif /* !macintosh */
-#endif
+#endif /* MSDOS */
 
+extern sighandler_t set_signal ( int sig, sighandler_t signal_handler);
+
+/*---------------------------------------------------------------------*/
+/** 
+ * @brief meta function for binding a signal to an handler
+
+ @param[in] sig             Signal number
+ @param[in] signal_handler  Pointer to signal handler
+
+ @return value of signal()
+**/
+/*---------------------------------------------------------------------*/
+sighandler_t set_signal (
+  int sig,
+  sighandler_t signal_handler
+  )
+{
+  sighandler_t retval;
+  if ((retval=signal (sig, (si_hdl_typ)signal_handler)) == SIG_ERR) {
+     fprintf(stderr, "Unable to init signal %d ... exiting...\n", sig);
+  }
+  siginterrupt(sig, 1);
+  return retval;
+}                               /* set_signal */
+
+
+/*---------------------------------------------------------------------*/
+/*-- linux and i386 ---*/
 #if defined(linux) && defined(__i386__)
 # if defined(HAVE_SIGCONTEXT) || defined(HAVE_ASM_SIGCONTEXT_H)
 #  include <asm/sigcontext.h>
@@ -121,9 +158,15 @@ struct sigcontext_struct {
 # endif
 typedef struct sigcontext_struct sigcontext;
 
-/*2
-* signal handler for run time errors, linux/i386 version
-*/
+
+/*2---------------------------------------------------------------------*/
+/** 
+ * @brief signal handler for run time errors, linux/i386 version
+
+ @param[in] sig     
+ @param[in] s   
+**/
+/*---------------------------------------------------------------------*/
 void sigsegv_handler(int sig, sigcontext s)
 {
   fprintf(stderr,"Singular : signal %d (v: %d/%u):\n",sig,SINGULAR_VERSION,feVersionId);
@@ -141,26 +184,43 @@ void sigsegv_handler(int sig, sigcontext s)
     init_signals();
     longjmp(si_start_jmpbuf,1);
   }
-# endif
+# endif /* __OPTIMIZE__ */
 # ifdef CALL_GDB
   if (sig!=SIGINT) debug(INTERACTIVE);
-# endif
+# endif /* CALL_GDB */
   exit(0);
 }
 
-void sig_ign_hdl(int sig)
-{
+/*---------------------------------------------------------------------*/
+/** 
+ * @brief additional default signal handler
+
   // some newer Linux version cannot have SIG_IGN for SIGCHLD,
   // so use this nice routine here:
   //  SuSe 9.x reports -1 always
   //  Redhat 9.x/FC x reports sometimes -1
   // see also: hpux_system
+
+ @param[in] sig     
+**/
+/*---------------------------------------------------------------------*/
+void sig_ign_hdl(int sig)
+{
 }
 
 # ifdef PAGE_TEST
 #  ifndef PAGE_INTERRUPT_TIME
 #   define PAGE_INTERRUPT_TIME 1
 #  endif
+
+/*---------------------------------------------------------------------*/
+/** 
+ * @brief signal handler for segmentation faults
+
+ @param[in] sig     
+ @param[in] s   
+**/
+/*---------------------------------------------------------------------*/
 void sig11_handler(int sig, sigcontext s)
 {
   unsigned long base =(unsigned long)(s.cr2&(~4095));
@@ -170,9 +230,17 @@ void sig11_handler(int sig, sigcontext s)
   mmUse_tab[i]='1';
   mmPage_tab_acc++;
   mmPage_AllowAccess((void *)base);
-  signal(SIGSEGV,(si_hdl_typ)sig11_handler);
+  set_signal(SIGSEGV,(si_hdl_typ)sig11_handler);
 }
 
+/*---------------------------------------------------------------------*/
+/** 
+ * @brief signal handler for alarm signals
+
+ @param[in] sig     
+ @param[in] s   
+**/
+/*---------------------------------------------------------------------*/
 void sigalarm_handler(int sig, sigcontext s)
 {
   int i=mmPage_tab_ind-1;
@@ -188,7 +256,7 @@ void sigalarm_handler(int sig, sigcontext s)
   o.it_value.tv_sec     =(unsigned)0;
   o.it_value.tv_usec    =(unsigned)PAGE_INTERRUPT_TIME;
   setitimer(ITIMER_VIRTUAL,&t,&o);
-  signal(SIGVTALRM,(si_hdl_typ)sigalarm_handler);
+  set_signal(SIGVTALRM,(si_hdl_typ)sigalarm_handler);
 }
 # endif /* PAGE_TEST */
 
@@ -199,7 +267,7 @@ void init_signals()
 {
 /*4 signal handler: linux*/
 # ifdef PAGE_TEST
-  signal(SIGSEGV,(si_hdl_typ)sig11_handler);
+  set_signal(SIGSEGV,(si_hdl_typ)sig11_handler);
   struct itimerval t,o;
   memset(&t,0,sizeof(t));
   t.it_value.tv_sec     =(unsigned)0;
@@ -207,34 +275,36 @@ void init_signals()
   o.it_value.tv_sec     =(unsigned)0;
   o.it_value.tv_usec    =(unsigned)PAGE_INTERRUPT_TIME;
   setitimer(ITIMER_VIRTUAL,&t,&o);
-  signal(SIGVTALRM,(si_hdl_typ)sigalarm_handler);
+  set_signal(SIGVTALRM,(si_hdl_typ)sigalarm_handler);
 # else /* PAGE_TEST */
-  if (SIG_ERR==signal(SIGSEGV,(si_hdl_typ)sigsegv_handler))
+  if (SIG_ERR==set_signal(SIGSEGV,(si_hdl_typ)sigsegv_handler))
   {
     PrintS("cannot set signal handler for SEGV\n");
   }
 # endif /* PAGE_TEST */
-  if (SIG_ERR==signal(SIGFPE, (si_hdl_typ)sigsegv_handler))
+  if (SIG_ERR==set_signal(SIGFPE, (si_hdl_typ)sigsegv_handler))
   {
     PrintS("cannot set signal handler for FPE\n");
   }
-  if (SIG_ERR==signal(SIGILL, (si_hdl_typ)sigsegv_handler))
+  if (SIG_ERR==set_signal(SIGILL, (si_hdl_typ)sigsegv_handler))
   {
     PrintS("cannot set signal handler for ILL\n");
   }
-  if (SIG_ERR==signal(SIGIOT, (si_hdl_typ)sigsegv_handler))
+  if (SIG_ERR==set_signal(SIGIOT, (si_hdl_typ)sigsegv_handler))
   {
     PrintS("cannot set signal handler for IOT\n");
   }
-  if (SIG_ERR==signal(SIGINT ,sigint_handler))
+  if (SIG_ERR==set_signal(SIGINT ,(si_hdl_typ)sigint_handler))
   {
     PrintS("cannot set signal handler for INT\n");
   }
-  //signal(SIGCHLD, (void (*)(int))SIG_IGN);
-  signal(SIGCHLD, (si_hdl_typ)sig_ign_hdl);
+  //set_signal(SIGCHLD, (void (*)(int))SIG_IGN);
+  set_signal(SIGCHLD, (si_hdl_typ)sig_ign_hdl);
 }
 
 #else /* linux && __i386__ */
+/*---------------------------------------------------------------------*/
+/*-- SPARC_SUNOS_4 ---*/
 # ifdef SPARC_SUNOS_4
 /*2
 * signal handler for run time errors, sparc sunos 4 version
@@ -270,20 +340,21 @@ void sigsegv_handler(int sig, int code, struct sigcontext *scp, char *addr)
 void init_signals()
 {
 /*4 signal handler:*/
-  signal(SIGSEGV,sigsegv_handler);
-  signal(SIGBUS, sigsegv_handler);
-  signal(SIGFPE, sigsegv_handler);
-  signal(SIGILL, sigsegv_handler);
-  signal(SIGIOT, sigsegv_handler);
-  signal(SIGINT ,sigint_handler);
-  signal(SIGCHLD, (void (*)(int))SIG_IGN);
+  set_signal(SIGSEGV,sigsegv_handler);
+  set_signal(SIGBUS, sigsegv_handler);
+  set_signal(SIGFPE, sigsegv_handler);
+  set_signal(SIGILL, sigsegv_handler);
+  set_signal(SIGIOT, sigsegv_handler);
+  set_signal(SIGINT ,sigint_handler);
+  set_signal(SIGCHLD, (void (*)(int))SIG_IGN);
 }
 # else /* SPARC_SUNOS_4 */
 
+/*---------------------------------------------------------------------*/
 /*2
 * signal handler for run time errors, general version
 */
-# ifndef macintosh
+#  ifndef macintosh
 void sigsegv_handler(int sig)
 {
   fprintf(stderr,"Singular : signal %d (v: %d/%u):\n",
@@ -294,7 +365,7 @@ void sigsegv_handler(int sig)
                    "please inform the authors\n",
                    siRandomStart);
   }
-#  ifdef __OPTIMIZE__
+#   ifdef __OPTIMIZE__
   if(si_restart<3)
   {
     si_restart++;
@@ -302,66 +373,67 @@ void sigsegv_handler(int sig)
     init_signals();
     longjmp(si_start_jmpbuf,1);
   }
-#  endif /* __OPTIMIZE__ */
-#  ifdef unix
-#   ifndef hpux
+#   endif /* __OPTIMIZE__ */
+#   ifdef unix
+#    ifndef hpux
 /* debug(..) does not work under HPUX (because ptrace does not work..) */
-#    ifdef CALL_GDB
-#     ifndef MSDOS
+#     ifdef CALL_GDB
+#      ifndef MSDOS
   if (sig!=SIGINT) debug(STACK_TRACE);
-#     endif /* MSDOS */
-#    endif /* CALL_GDB */
-#   endif /* !hpux */
-#  endif /* unix */
+#      endif /* MSDOS */
+#     endif /* CALL_GDB */
+#    endif /* !hpux */
+#   endif /* unix */
   exit(0);
 }
-# endif /* !macintosh */
+#  endif /* !macintosh */
 
 /*2
 * init signal handlers, general version
 */
 void init_signals()
 {
-# ifndef MSDOS
+#  ifndef MSDOS
 /* signals are not implemented in DJGCC */
-#  ifndef macintosh
+#   ifndef macintosh
 /* signals are temporaliy removed for macs. */
 /*4 signal handler:*/
-  signal(SIGSEGV,(void (*) (int))sigsegv_handler);
-#   ifdef SIGBUS
-  signal(SIGBUS, sigsegv_handler);
-#   endif
-#   ifdef SIGFPE
-  signal(SIGFPE, sigsegv_handler);
-#   endif
-#   ifdef SIGILL
-  signal(SIGILL, sigsegv_handler);
-#   endif
-#   ifdef SIGIOT
-  signal(SIGIOT, sigsegv_handler);
-#   endif
-#   ifdef SIGXCPU
-  signal(SIGXCPU, (void (*)(int))SIG_IGN);
-#   endif
-  signal(SIGINT ,sigint_handler);
-  signal(SIGCHLD, (void (*)(int))SIG_IGN);
-#  endif
-# endif
+  set_signal(SIGSEGV,(void (*) (int))sigsegv_handler);
+#    ifdef SIGBUS
+  set_signal(SIGBUS, sigsegv_handler);
+#    endif /* SIGBUS */
+#    ifdef SIGFPE
+  set_signal(SIGFPE, sigsegv_handler);
+#    endif /* SIGFPE */
+#    ifdef SIGILL
+  set_signal(SIGILL, sigsegv_handler);
+#    endif /* SIGILL */
+#    ifdef SIGIOT
+  set_signal(SIGIOT, sigsegv_handler);
+#    endif /* SIGIOT */
+#    ifdef SIGXCPU
+  set_signal(SIGXCPU, (void (*)(int))SIG_IGN);
+#    endif /* SIGIOT */
+  set_signal(SIGINT ,sigint_handler);
+  set_signal(SIGCHLD, (void (*)(int))SIG_IGN);
+#   endif /* !macintosh */
+#  endif /* !MSDOS */
 }
-#endif
-#endif
+# endif /* SPARC_SUNOS_4 */
+#endif /* linux && __i386__ */
+
 
 #ifndef MSDOS
-#ifndef macintosh
+# ifndef macintosh
 /*2
 * signal handler for SIGINT
 */
 void sigint_handler(int sig)
 {
   mflush();
-  #ifdef HAVE_FEREAD
+#  ifdef HAVE_FEREAD
   if (fe_is_raw_tty) fe_temp_reset();
-  #endif
+#  endif /* HAVE_FEREAD */
   loop
   {
     int cnt=0;
@@ -380,28 +452,28 @@ void sigint_handler(int sig)
     
     switch(c)
     {
-#if defined(MONOM_COUNT) || defined(DIV_COUNT)
+#  if defined(MONOM_COUNT) || defined(DIV_COUNT)
               case 'e':
-#ifdef MONOM_COUNT
+#   ifdef MONOM_COUNT
                 extern void ResetMonomCount();
                 ResetMonomCount();
-#endif
-#ifdef DIV_COUNT
+#   endif /* MONOM_COUNT */
+#   ifdef DIV_COUNT
                 extern void ResetDivCount();
                 ResetDivCount();
-#endif
+#   endif /* DIV_COUNT */
                 break;
               case 'o':
-#ifdef MONOM_COUNT
+#   ifdef MONOM_COUNT
                 extern void OutputMonomCount();
                 OutputMonomCount();
-#endif
-#ifdef DIV_COUNT
+#   endif /* COUNT */
+#   ifdef DIV_COUNT
                 extern void OutputDivCount();
                 OutputDivCount();
-#endif
+#   endif /* DIV_COUNT */
                 break;
-#endif // defined(MONOM_COUNT) || defined(DIV_COUNT)
+#  endif /* defined(MONOM_COUNT) || defined(DIV_COUNT) */
       case 'q':
                 m2_end(2);
       case 'r':
@@ -413,18 +485,18 @@ void sigint_handler(int sig)
                 siCntrlc++;
       case 'c':
                 if (feGetOptValue(FE_OPT_EMACS) == NULL) fgetc(stdin);
-                signal(SIGINT ,(si_hdl_typ)sigint_handler);
+                set_signal(SIGINT ,(si_hdl_typ)sigint_handler);
                 return;
                 //siCntrlc ++;
-                //if (siCntrlc>2) signal(SIGINT,(si_hdl_typ) sigsegv_handler);
-                //else            signal(SIGINT,(si_hdl_typ) sigint_handler);
+                //if (siCntrlc>2) set_signal(SIGINT,(si_hdl_typ) sigsegv_handler);
+                //else            set_signal(SIGINT,(si_hdl_typ) sigint_handler);
     }
     cnt++;
     if(cnt>5) m2_end(2);
   }
 }
-#endif
-#endif
+# endif /* !macintosh */
+#endif /* !MSDOS */
 
 //#ifdef macintosh
 //#include <Types.h>
@@ -465,7 +537,7 @@ void sigint_handler(int sig)
 //  {
 //    int saveecho = si_echo;
 //    siCntrlc = FALSE;
-//    signal(SIGINT ,sigint_handler);
+//    set_signal(SIGINT ,sigint_handler);
 ////#ifdef macintosh
 ////    flush_intr();
 ////#endif
@@ -474,14 +546,14 @@ void sigint_handler(int sig)
 //  }
 //#endif
 //}
-#endif
+#endif /* !MSDOS */
 
 #ifdef unix
-#ifndef hpux
-#ifndef __OPTIMIZE__
-#ifndef MSDOS
+# ifndef hpux
+#  ifndef __OPTIMIZE__
+#   ifndef MSDOS
 int si_stop_stack_trace_x;
-#ifdef CALL_GDB
+#    ifdef CALL_GDB
 static void debug (int method)
 {
   if (feOptValue(FE_OPT_NO_TTY))
@@ -493,9 +565,9 @@ static void debug (int method)
   char buf[16];
   char *args[4] = { "gdb", "Singularg", NULL, NULL };
 
-  #ifdef HAVE_FEREAD
+#     ifdef HAVE_FEREAD
   if (fe_is_raw_tty) fe_temp_reset();
-  #endif
+#     endif /* HAVE_FEREAD */
 
   sprintf (buf, "%d", getpid ());
 
@@ -535,7 +607,7 @@ static void debug_stop ( char **args)
   perror ("exec failed");
   _exit (0);
 }
-#endif
+#    endif /* CALL_GDB */
 
 static int stack_trace_done;
 
@@ -594,11 +666,11 @@ static void stack_trace (char **args)
     tv.tv_sec = 1;
     tv.tv_usec = 0;
 
-#ifdef hpux
+#    ifdef hpux
     sel = select (FD_SETSIZE, (int *)readset.fds_bits, NULL, NULL, &tv);
-#else
+#    else /* hpux */
     sel = select (FD_SETSIZE, &readset, NULL, NULL, &tv);
-#endif
+#    endif /* hpux */
     if (sel == -1)
       break;
 
@@ -647,24 +719,24 @@ static void stack_trace_sigchld (int signum)
   stack_trace_done = 1;
 }
 
-#endif
-#endif
-#endif
-#endif
+#   endif /* !MSDOS */
+#  endif /* !__OPTIMIZE__ */
+# endif /* !hpux */
+#endif /* unix */
 
 /* Under HPUX 9, system(...) returns -1 if SIGCHLD does not equal
    SIG_DFL. However, if it stays at SIG_DFL we get zombie processes
    for terminated childs generated by fork. Therefors some special treatment 
    is necessary */
 #ifdef HPUX_9
-#undef system
+# undef system
 extern "C" {
   int  hpux9_system(const char* call)
   {
     int ret;
-    signal(SIGCHLD, (void (*)(int))SIG_DFL);
+    set_signal(SIGCHLD, (void (*)(int))SIG_DFL);
     ret = system(call);
-    signal(SIGCHLD, (void (*)(int))SIG_IGN);
+    set_signal(SIGCHLD, (void (*)(int))SIG_IGN);
     return ret;
   }
 }
