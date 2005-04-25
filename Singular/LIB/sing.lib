@@ -1,7 +1,7 @@
-// $Id: sing.lib,v 1.25 2005-04-22 16:30:16 Singular Exp $
+// $Id: sing.lib,v 1.26 2005-04-25 16:58:46 Singular Exp $
 //(GMG/BM, last modified 26.06.96)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: sing.lib,v 1.25 2005-04-22 16:30:16 Singular Exp $";
+version="$Id: sing.lib,v 1.26 2005-04-25 16:58:46 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  sing.lib      Invariants of Singularities
@@ -787,7 +787,7 @@ example
 { "EXAMPLE:"; echo = 2;
    int p      = printlevel;
    printlevel = 1;
-   ring r     = 200,(x,y,z,u,v),(c,ws(4,3,2,3,4));
+   ring r     = 199,(x,y,z,u,v),(c,ws(4,3,2,3,4));
    ideal i    = xz-y2,yz2-xu,xv-yzu,yu-z3,z2u-yv,zv-u2;
                             //a cyclic quotient singularity
    list L     = T_12(i,1);
