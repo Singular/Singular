@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.10 2005-04-22 18:09:43 levandov Exp $ */
+/* $Id: ideals.cc,v 1.11 2005-04-25 18:15:23 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -2426,35 +2426,38 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
 
 #ifdef HAVE_PLURAL
   /* update nc structure on tmpR */
-  int BAD = 0;
-  if ( nc_rComplete(origR, &tmpR) ) 
+  if (rIsPluralRing(currRing))
   {
-    Werror("error in nc_rComplete");
-    BAD = 1;
-  }
-  if (!BAD) 
-  {
-    /* tests the admissibility of the new elim. ordering */
-    if ( nc_CheckOrdCondition( (&tmpR)->nc->D, &tmpR) )
+    BOOLEAN BAD = FALSE;
+    if ( nc_rComplete(origR, &tmpR) ) 
     {
-      Werror("no elimination is possible: ordering condition is violated");
-      BAD = 1;
+      Werror("error in nc_rComplete");
+      BAD = TRUE;
     }
-  }
-  if (BAD)
-  {
-    // cleanup
-    omFree((ADDRESS)wv[0]);
-    omFreeSize((ADDRESS)wv,ordersize*sizeof(int**));
-    omFreeSize((ADDRESS)ord,ordersize*sizeof(int));
-    omFreeSize((ADDRESS)block0,ordersize*sizeof(int));
-    omFreeSize((ADDRESS)block1,ordersize*sizeof(int));
-    rUnComplete(&tmpR);
-    if (w!=NULL)      
+    if (!BAD) 
     {
-      delete w;
+      /* tests the admissibility of the new elim. ordering */
+      if ( nc_CheckOrdCondition( (&tmpR)->nc->D, &tmpR) )
+      {
+        Werror("no elimination is possible: ordering condition is violated");
+        BAD = TRUE;
+      }
     }
-    return idCopy(h1);
+    if (BAD)
+    {
+      // cleanup
+      omFree((ADDRESS)wv[0]);
+      omFreeSize((ADDRESS)wv,ordersize*sizeof(int**));
+      omFreeSize((ADDRESS)ord,ordersize*sizeof(int));
+      omFreeSize((ADDRESS)block0,ordersize*sizeof(int));
+      omFreeSize((ADDRESS)block1,ordersize*sizeof(int));
+      rUnComplete(&tmpR);
+      if (w!=NULL)      
+      {
+        delete w;
+      }
+      return idCopy(h1);
+    }
   }
 #endif
   // change into the new ring

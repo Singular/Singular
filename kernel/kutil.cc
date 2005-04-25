@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.7 2005-03-17 14:15:13 Singular Exp $ */
+/* $Id: kutil.cc,v 1.8 2005-04-25 18:15:24 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -4103,7 +4103,9 @@ void updateResult(ideal r,ideal Q, kStrategy strat)
     poly p;
     for (l=IDELEMS(r)-1;l>=0;l--)
     {
-      if (r->m[l]!=NULL)
+      if ((r->m[l]!=NULL)
+      && (strat->syzComp>0)
+      && (pGetComp(r->m[l])<=strat->syzComp))
       {
         for(q=IDELEMS(Q)-1; q>=0;q--)
         {

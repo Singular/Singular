@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.6 2005-04-11 15:59:01 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.7 2005-04-25 18:15:23 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1230,6 +1230,8 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       strat->P.GetP();
       // statistics
       if (TEST_OPT_PROT) PrintS("s");
+      // cancel unit
+      cancelunit(&strat->P);
       // normalization
       if (!TEST_OPT_INTSTRATEGY)
         strat->P.pNorm();
@@ -1241,8 +1243,6 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       // for char 0, clear denominators
       if (TEST_OPT_INTSTRATEGY)
         strat->P.pCleardenom();
-      // cancel unit
-      cancelunit(&strat->P);
 
       // put in T
       enterT(strat->P,strat);

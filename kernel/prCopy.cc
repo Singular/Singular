@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: prCopy.cc,v 1.1.1.1 2003-10-06 12:15:57 Singular Exp $ */
+/* $Id: prCopy.cc,v 1.2 2005-04-25 18:15:25 Singular Exp $ */
 /*
 * ABSTRACT - implementation of functions for Copy/Move/Delete for Polys
 */
@@ -25,7 +25,7 @@ prCopyEvector(poly dest, ring dest_r, poly src, ring src_r,int max)
     p_SetExp(dest, i, p_GetExp( src, i,src_r), dest_r);
     assume(n == pGetCoeff(dest));
   }
-  if (rRing_has_Comp(dest_r))
+  if (rRing_has_Comp(dest_r) && rRing_has_Comp(src_r))
     p_SetComp(dest, p_GetComp( src,src_r), dest_r);
   assume(n == pGetCoeff(dest));
   p_Setm(dest, dest_r);
