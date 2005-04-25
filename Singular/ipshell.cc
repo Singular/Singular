@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.101 2005-04-22 17:57:01 levandov Exp $ */
+/* $Id: ipshell.cc,v 1.102 2005-04-25 09:19:31 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -240,7 +240,7 @@ void type_cmd(idhdl h)
     currRing->ShortOut = oldShortOut;
 }
 
-static void killlocals0(int v, idhdl * localhdl)
+static void killlocals0(int v, idhdl * localhdl, const ring r)
 {
   idhdl h = *localhdl;
   while (h!=NULL)
@@ -262,7 +262,7 @@ static void killlocals0(int v, idhdl * localhdl)
       else if (vv >= v)
       {
         idhdl nexth = IDNEXT(h);
-        killhdl2(h,localhdl,currRing);
+        killhdl2(h,localhdl,r);
         h = nexth;
         //PrintS("kill\n");
       }
@@ -277,14 +277,14 @@ static void killlocals0(int v, idhdl * localhdl)
 #ifndef HAVE_NS
 void killlocals(int v)
 {
-  killlocals0(v,&IDROOT);
+  killlocals0(v,&IDROOT,currRing);
 
   if ((iiRETURNEXPR_len > myynest)
   && ((iiRETURNEXPR[myynest].Typ()==RING_CMD)
     || (iiRETURNEXPR[myynest].Typ()==QRING_CMD)))
   {
     leftv h=&iiRETURNEXPR[myynest];
-    killlocals0(v,&(((ring)h->data)->idroot));
+    killlocals0(v,&(((ring)h->data)->idroot),(ring)h->data);
   }
 
   idhdl sh=currRingHdl;
@@ -299,11 +299,11 @@ void killlocals(int v)
     && (IDRING(h)->idroot!=NULL))
     {
       if (IDRING(h)!=currRing) {changed=TRUE;rSetHdl(h);}
-      killlocals0(v,&(IDRING(h)->idroot));
+      killlocals0(v,&(IDRING(h)->idroot),IDRING(h));
     }
     else if (IDTYP(h) == PACKAGE_CMD)
     {
-      killlocals0(v,&(IDPACKAGE(h)->idroot));
+      killlocals0(v,&(IDPACKAGE(h)->idroot),IDRING(h));
     }
     h = IDNEXT(h);
   }
@@ -374,7 +374,7 @@ BOOLEAN killlocals_list(int v, lists L)
     && (((ring)d)->idroot!=NULL))
     {
       if (d!=currRing) {changed=TRUE;rChangeCurrRing((ring)d);}
-      killlocals0(v,&(((ring)h->data)->idroot));
+      killlocals0(v,&(((ring)h->data)->idroot),(ring)h->data);
     }
     else if (h->rtyp==LIST_CMD)
       changed|=killlocals_list(v,(lists)d);
@@ -399,7 +399,7 @@ void killlocals(int v)
     {
       leftv h=&iiRETURNEXPR[myynest];
       if (((ring)h->data)->idroot!=NULL)
-        killlocals0(v,&(((ring)h->data)->idroot));
+        killlocals0(v,&(((ring)h->data)->idroot),(ring)h->data);
     }
     else if (/*iiRETURNEXPR[myynest].Typ()*/ t==LIST_CMD)
     {
