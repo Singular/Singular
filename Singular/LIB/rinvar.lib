@@ -1,6 +1,6 @@
 // Last change 10.12.2000 (TB)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: rinvar.lib,v 1.9 2005-04-25 10:13:07 Singular Exp $";
+version="$Id: rinvar.lib,v 1.10 2005-04-25 12:37:46 Singular Exp $";
 category="Invariant theory";
 info="
 LIBRARY:  rinvar.lib      Invariant Rings of Reductive Groups
@@ -982,7 +982,7 @@ ASSUME:  basering = K[s(1..r),t(1..n)], K = Q or K = Q(a') and minpoly != 0,
   setring RORR;
   map Phi = RA1, maxideal(1);
   Phi[nvars(RORR) + 1] = newA;
-  ideal id = Phi(Grp);
+  id = Phi(Grp); // id already defined by ZeroSet of level 0
   ideal actionid = Phi(Gaction);
   kill parName,minPoly,Phi,RA1;
 // end of ersetzt durch    
