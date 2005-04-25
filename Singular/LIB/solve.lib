@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: solve.lib,v 1.27 2004-08-05 15:59:22 Singular Exp $";
+version="$Id: solve.lib,v 1.28 2005-04-25 16:57:36 Singular Exp $";
 category="Symbolic-numerical solving";
 info="
 LIBRARY: solve.lib     Complex Solving of Polynomial Systems
@@ -480,7 +480,7 @@ static proc transroots(list r)
 /*
 * returns a poly without zeroroots
 */
-static proc divzero(poly f,int iv);
+static proc divzero(poly f,int iv)
 {
   poly p=f;
   poly q=p;
@@ -542,8 +542,8 @@ RETURN:  list of solutions of the ideal G, depending on n; one solution is a
 NOTE:    If the problem is not 0-dim. the procedure stops with ERROR, if the 
          ideal G is not a lex. standard basis, it is generated with internal 
          computation (Hilbert driven), if the input-ring (with char 0) has 
-         the name "<A>", the lexicographical and complex output-ring has the 
-         name "<A>C".
+         the name \"<A>\", the lexicographical and complex output-ring has the 
+         name \"<A>C\".
 EXAMPLE: example solve; shows an example
 "
 {
