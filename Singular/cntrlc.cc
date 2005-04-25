@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: cntrlc.cc,v 1.44 2005-04-24 08:43:16 krueger Exp $ */
+/* $Id: cntrlc.cc,v 1.45 2005-04-25 13:25:46 Singular Exp $ */
 /*
 * ABSTRACT - interupt handling
 */
@@ -86,6 +86,7 @@ BOOLEAN siCntrlc = FALSE;
 
 typedef void (*si_hdl_typ)(int);
 
+
 /*0 implementation*/
 /*---------------------------------------------------------------------*
  * Functions declarations
@@ -93,13 +94,10 @@ typedef void (*si_hdl_typ)(int);
  *---------------------------------------------------------------------*/
 #ifndef MSDOS
 /* signals are not implemented in DJGCC */
-# ifndef macintosh
-/* signals are not right implemented in macintosh */
 void sigint_handler(int sig);
-# endif /* !macintosh */
 #endif /* MSDOS */
 
-extern sighandler_t set_signal ( int sig, sighandler_t signal_handler);
+si_hdl_typ si_set_signal ( int sig, si_hdl_typ signal_handler);
 
 /*---------------------------------------------------------------------*/
 /** 
@@ -111,18 +109,19 @@ extern sighandler_t set_signal ( int sig, sighandler_t signal_handler);
  @return value of signal()
 **/
 /*---------------------------------------------------------------------*/
-sighandler_t set_signal (
+si_hdl_typ si_set_signal (
   int sig,
-  sighandler_t signal_handler
+  si_hdl_typ signal_handler
   )
 {
-  sighandler_t retval;
-  if ((retval=signal (sig, (si_hdl_typ)signal_handler)) == SIG_ERR) {
+  si_hdl_typ retval=signal (sig, (si_hdl_typ)signal_handler);
+  if (retval == SIG_ERR)
+  {
      fprintf(stderr, "Unable to init signal %d ... exiting...\n", sig);
   }
   siginterrupt(sig, 1);
   return retval;
-}                               /* set_signal */
+}                               /* si_set_signal */
 
 
 /*---------------------------------------------------------------------*/
@@ -230,7 +229,7 @@ void sig11_handler(int sig, sigcontext s)
   mmUse_tab[i]='1';
   mmPage_tab_acc++;
   mmPage_AllowAccess((void *)base);
-  set_signal(SIGSEGV,(si_hdl_typ)sig11_handler);
+  si_set_signal(SIGSEGV,(si_hdl_typ)sig11_handler);
 }
 
 /*---------------------------------------------------------------------*/
@@ -256,7 +255,7 @@ void sigalarm_handler(int sig, sigcontext s)
   o.it_value.tv_sec     =(unsigned)0;
   o.it_value.tv_usec    =(unsigned)PAGE_INTERRUPT_TIME;
   setitimer(ITIMER_VIRTUAL,&t,&o);
-  set_signal(SIGVTALRM,(si_hdl_typ)sigalarm_handler);
+  si_set_signal(SIGVTALRM,(si_hdl_typ)sigalarm_handler);
 }
 # endif /* PAGE_TEST */
 
@@ -267,7 +266,7 @@ void init_signals()
 {
 /*4 signal handler: linux*/
 # ifdef PAGE_TEST
-  set_signal(SIGSEGV,(si_hdl_typ)sig11_handler);
+  si_set_signal(SIGSEGV,(si_hdl_typ)sig11_handler);
   struct itimerval t,o;
   memset(&t,0,sizeof(t));
   t.it_value.tv_sec     =(unsigned)0;
@@ -275,31 +274,31 @@ void init_signals()
   o.it_value.tv_sec     =(unsigned)0;
   o.it_value.tv_usec    =(unsigned)PAGE_INTERRUPT_TIME;
   setitimer(ITIMER_VIRTUAL,&t,&o);
-  set_signal(SIGVTALRM,(si_hdl_typ)sigalarm_handler);
+  si_set_signal(SIGVTALRM,(si_hdl_typ)sigalarm_handler);
 # else /* PAGE_TEST */
-  if (SIG_ERR==set_signal(SIGSEGV,(si_hdl_typ)sigsegv_handler))
+  if (SIG_ERR==si_set_signal(SIGSEGV,(si_hdl_typ)sigsegv_handler))
   {
     PrintS("cannot set signal handler for SEGV\n");
   }
 # endif /* PAGE_TEST */
-  if (SIG_ERR==set_signal(SIGFPE, (si_hdl_typ)sigsegv_handler))
+  if (SIG_ERR==si_set_signal(SIGFPE, (si_hdl_typ)sigsegv_handler))
   {
     PrintS("cannot set signal handler for FPE\n");
   }
-  if (SIG_ERR==set_signal(SIGILL, (si_hdl_typ)sigsegv_handler))
+  if (SIG_ERR==si_set_signal(SIGILL, (si_hdl_typ)sigsegv_handler))
   {
     PrintS("cannot set signal handler for ILL\n");
   }
-  if (SIG_ERR==set_signal(SIGIOT, (si_hdl_typ)sigsegv_handler))
+  if (SIG_ERR==si_set_signal(SIGIOT, (si_hdl_typ)sigsegv_handler))
   {
     PrintS("cannot set signal handler for IOT\n");
   }
-  if (SIG_ERR==set_signal(SIGINT ,(si_hdl_typ)sigint_handler))
+  if (SIG_ERR==si_set_signal(SIGINT ,(si_hdl_typ)sigint_handler))
   {
     PrintS("cannot set signal handler for INT\n");
   }
-  //set_signal(SIGCHLD, (void (*)(int))SIG_IGN);
-  set_signal(SIGCHLD, (si_hdl_typ)sig_ign_hdl);
+  //si_set_signal(SIGCHLD, (void (*)(int))SIG_IGN);
+  si_set_signal(SIGCHLD, (si_hdl_typ)sig_ign_hdl);
 }
 
 #else /* linux && __i386__ */
@@ -340,13 +339,13 @@ void sigsegv_handler(int sig, int code, struct sigcontext *scp, char *addr)
 void init_signals()
 {
 /*4 signal handler:*/
-  set_signal(SIGSEGV,sigsegv_handler);
-  set_signal(SIGBUS, sigsegv_handler);
-  set_signal(SIGFPE, sigsegv_handler);
-  set_signal(SIGILL, sigsegv_handler);
-  set_signal(SIGIOT, sigsegv_handler);
-  set_signal(SIGINT ,sigint_handler);
-  set_signal(SIGCHLD, (void (*)(int))SIG_IGN);
+  si_set_signal(SIGSEGV,sigsegv_handler);
+  si_set_signal(SIGBUS, sigsegv_handler);
+  si_set_signal(SIGFPE, sigsegv_handler);
+  si_set_signal(SIGILL, sigsegv_handler);
+  si_set_signal(SIGIOT, sigsegv_handler);
+  si_set_signal(SIGINT ,sigint_handler);
+  si_set_signal(SIGCHLD, (void (*)(int))SIG_IGN);
 }
 # else /* SPARC_SUNOS_4 */
 
@@ -354,7 +353,6 @@ void init_signals()
 /*2
 * signal handler for run time errors, general version
 */
-#  ifndef macintosh
 void sigsegv_handler(int sig)
 {
   fprintf(stderr,"Singular : signal %d (v: %d/%u):\n",
@@ -386,7 +384,6 @@ void sigsegv_handler(int sig)
 #   endif /* unix */
   exit(0);
 }
-#  endif /* !macintosh */
 
 /*2
 * init signal handlers, general version
@@ -395,28 +392,25 @@ void init_signals()
 {
 #  ifndef MSDOS
 /* signals are not implemented in DJGCC */
-#   ifndef macintosh
-/* signals are temporaliy removed for macs. */
 /*4 signal handler:*/
-  set_signal(SIGSEGV,(void (*) (int))sigsegv_handler);
+  si_set_signal(SIGSEGV,(void (*) (int))sigsegv_handler);
 #    ifdef SIGBUS
-  set_signal(SIGBUS, sigsegv_handler);
+  si_set_signal(SIGBUS, sigsegv_handler);
 #    endif /* SIGBUS */
 #    ifdef SIGFPE
-  set_signal(SIGFPE, sigsegv_handler);
+  si_set_signal(SIGFPE, sigsegv_handler);
 #    endif /* SIGFPE */
 #    ifdef SIGILL
-  set_signal(SIGILL, sigsegv_handler);
+  si_set_signal(SIGILL, sigsegv_handler);
 #    endif /* SIGILL */
 #    ifdef SIGIOT
-  set_signal(SIGIOT, sigsegv_handler);
+  si_set_signal(SIGIOT, sigsegv_handler);
 #    endif /* SIGIOT */
 #    ifdef SIGXCPU
-  set_signal(SIGXCPU, (void (*)(int))SIG_IGN);
+  si_set_signal(SIGXCPU, (void (*)(int))SIG_IGN);
 #    endif /* SIGIOT */
-  set_signal(SIGINT ,sigint_handler);
-  set_signal(SIGCHLD, (void (*)(int))SIG_IGN);
-#   endif /* !macintosh */
+  si_set_signal(SIGINT ,sigint_handler);
+  si_set_signal(SIGCHLD, (void (*)(int))SIG_IGN);
 #  endif /* !MSDOS */
 }
 # endif /* SPARC_SUNOS_4 */
@@ -424,7 +418,6 @@ void init_signals()
 
 
 #ifndef MSDOS
-# ifndef macintosh
 /*2
 * signal handler for SIGINT
 */
@@ -485,17 +478,16 @@ void sigint_handler(int sig)
                 siCntrlc++;
       case 'c':
                 if (feGetOptValue(FE_OPT_EMACS) == NULL) fgetc(stdin);
-                set_signal(SIGINT ,(si_hdl_typ)sigint_handler);
+                si_set_signal(SIGINT ,(si_hdl_typ)sigint_handler);
                 return;
                 //siCntrlc ++;
-                //if (siCntrlc>2) set_signal(SIGINT,(si_hdl_typ) sigsegv_handler);
-                //else            set_signal(SIGINT,(si_hdl_typ) sigint_handler);
+                //if (siCntrlc>2) si_set_signal(SIGINT,(si_hdl_typ) sigsegv_handler);
+                //else            si_set_signal(SIGINT,(si_hdl_typ) sigint_handler);
     }
     cnt++;
     if(cnt>5) m2_end(2);
   }
 }
-# endif /* !macintosh */
 #endif /* !MSDOS */
 
 //#ifdef macintosh
@@ -537,7 +529,7 @@ void sigint_handler(int sig)
 //  {
 //    int saveecho = si_echo;
 //    siCntrlc = FALSE;
-//    set_signal(SIGINT ,sigint_handler);
+//    si_set_signal(SIGINT ,sigint_handler);
 ////#ifdef macintosh
 ////    flush_intr();
 ////#endif
@@ -734,9 +726,9 @@ extern "C" {
   int  hpux9_system(const char* call)
   {
     int ret;
-    set_signal(SIGCHLD, (void (*)(int))SIG_DFL);
+    si_set_signal(SIGCHLD, (void (*)(int))SIG_DFL);
     ret = system(call);
-    set_signal(SIGCHLD, (void (*)(int))SIG_IGN);
+    si_set_signal(SIGCHLD, (void (*)(int))SIG_IGN);
     return ret;
   }
 }
