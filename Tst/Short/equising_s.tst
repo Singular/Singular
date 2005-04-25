@@ -43,7 +43,8 @@ proc tst(list d)
      
      poly f = y8+4x3y6+6x6y4+2x5y5+4x9y2+4x8y3+x12+2x11y+2x10y2+x13;
                	    
-     versal(f);
+     list L=versal(f);
+     def Px=L[1];
      setring Px;
      poly F = Fs[1,1];
               
@@ -66,10 +67,7 @@ proc tst(list d)
 
      isEquising(F);
 
-     kill(Px);
-     kill(Qx);
-     kill(Ox);
-     kill(So);
+     kill L,Px;
      kill(q);
      if (defined(R)){ kill(R); }
      kill(r);
@@ -126,7 +124,8 @@ example tau_es;
 ring r=0,(w,v),ds;
 poly f=w2-v199;   // simple singularity
 list L=hnexpansion(f);
-versal(f);
+list LL=versal(f);
+def Px=LL[1];
 setring Px;
 list L=imap(r,L);
 poly F=Fs[1,1]-A(198)+A(198)*w2;
@@ -134,7 +133,7 @@ list M=esStratum(F,2,L);
 reduce(F,std(M[1][1]));
 M=esStratum(F,L);
 reduce(F,std(M[1][1]));
-kill Px,r;
+kill LL,Px,r;
 /////////////////////////////////////////////////
 
 

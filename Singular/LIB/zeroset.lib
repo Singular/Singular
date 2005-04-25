@@ -1,12 +1,11 @@
-// changed 12.02.2001 (Eric Westenberger)
-// last change 29.10.2004 (Bayer Thomas, Quotient, QuotientMain)
+// Last change 12.02.2001 (Eric Westenberger)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: zeroset.lib,v 1.10 2005-04-19 15:23:42 Singular Exp $";
+version="$Id: zeroset.lib,v 1.11 2005-04-25 10:13:07 Singular Exp $";
 category="Symbolic-numerical solving";
 info="
 LIBRARY:  zeroset.lib      Procedures For Roots and Factorization
-AUTHOR:   Thomas Bayer,    email: bayert@web.de
-          http://www14.informatik.tu-muenchen.de/personen/bayert/
+AUTHOR:   Thomas Bayer,    email: tbayer@mathematik.uni-kl.de
+          http://wwwmayr.informatik.tu-muenchen.de/personen/bayert/
           Current Adress: Institut fuer Informatik, TU Muenchen
 
 OVERVIEW:
@@ -14,8 +13,7 @@ OVERVIEW:
  Roots and Factorization of univariate polynomials over Q(a)[t]
  where a is an algebraic number. Written in the frame of the
  diploma thesis (advisor: Prof. Gert-Martin Greuel) 'Computations of moduli
- spaces of semiquasihomogeneous singularities and an implementation in 
- Singular'.
+ spaces of semiquasihomogeneous singularities and an implementation in Singular'.
  This library is meant as a preliminary extension of the functionality
  of Singular for univariate factorization of polynomials over simple algebraic
  extensions in characteristic 0.
@@ -24,33 +22,34 @@ OVERVIEW:
  basering is stored.
 
 PROCEDURES:
- EGCD(f, g)      gcd over an algebraic extension field of Q
- Factor(f)       factorization of f over an algebraic extension field
- Quotient(f, g)  quotient q  of f w.r.t. g (in f = q*g + remainder)
- Remainder(f,g)  remainder of the division of f by g
- Roots(f)        computes all roots of f in an extension field of Q
- SQFRNorm(f)     norm of f (f must be squarefree)
- ZeroSet(I)      zero-set of the 0-dim. ideal I
+ EGCD(f, g)    gcd over an algebraic extension field of Q
+ Factor(f)    factorization of f over an algebraic extension field
+ Quotient(f, g)    quotient q  of f w.r.t. g (in f = q*g + remainder)
+ Remainder(f,g)    remainder of the division of f by g
+ Roots(f)    computes all roots of f in an extension field of Q
+ SQFRNorm(f)    norm of f (f must be squarefree)
+ ZeroSet(I)    zero-set of the 0-dim. ideal I
 
 AUXILIARY PROCEDURES:
- EGCDMain(f, g)       gcd over an algebraic extension field of Q
- FactorMain(f)        factorization of f over an algebraic extension field
+ EGCDMain(f, g)    gcd over an algebraic extension field of Q
+ FactorMain(f)    factorization of f over an algebraic extension field
  InvertNumberMain(c)  inverts an element of an algebraic extension field
- QuotientMain(f, g)   quotient of f w.r.t. g
- RemainderMain(f,g)   remainder of the division of f by g
- RootsMain(f)         computes all roots of f, might extend the ground field
- SQFRNormMain(f)      norm of f (f must be squarefree)
+ QuotientMain(f, g)  quotient of f w.r.t. g
+ RemainderMain(f,g)  remainder of the division of f by g
+ RootsMain(f)    computes all roots of f, might extend the ground field
+ SQFRNormMain(f)  norm of f (f must be squarefree)
  ContainedQ(data, f)  f in data ?
- SameQ(a, b)          a == b (list a,b)
+ SameQ(a, b)    a == b (list a,b)
 ";
 
 LIB "primitiv.lib";
 LIB "primdec.lib";
 
 // note : return a ring : ring need not be exported !!!
-// Arithmetic in Q(a)[x] without built-in procedures
+
+// Artihmetic in Q(a)[x] without built-in procedures
 // assume basering = Q[x,a] and minpoly is represented by mpoly(a).
-// The algorithms are taken from "Polynomial Algorithms in Computer Algebra",
+// the algorithms are taken from "Polynomial Algorithms in Computer Algebra",
 // F. Winkler, Springer Verlag Wien, 1996.
 
 
@@ -68,7 +67,7 @@ LIB "primdec.lib";
 // In procedures with name 'proc-name'Main a polynomial ring over a simple
 // extension field is represented as Q[x...,a] together with the ideal
 // 'mpoly' (attribute "isSB"). The arithmetic in the extension field is
-// implemented in the procedures 'MultPolys' (multiplication)
+// implemented in the procedures in the procedures 'MultPolys' (multiplication)
 // and 'InvertNumber' (inversion). After addition and substraction one should
 // apply 'SimplifyPoly' to the result to reduce the result w.r.t. 'mpoly'.
 // This is done by reducing each coefficient seperately, which is more
@@ -105,6 +104,7 @@ EXAMPLE: example  Roots; shows an example
   def ROB = basering;
   def ROR = TransferRing(basering);
   setring ROR;
+  export(ROR);
 
   // get the polynomial f and find the roots
 
@@ -172,7 +172,6 @@ NOTE:    might change the ideal mpoly !!
 EXAMPLE: example  Roots; shows an example
 "
 {
-  def altring=basering;
   int i, linFactors, nlinFactors, dbPrt;
   intvec wt = 1,0;    // deg(a) = 0
   list factorList, nlFactors, nlMult, roots, result;
@@ -332,20 +331,22 @@ EXAMPLE: example ZeroSet; shows an example
   if(size(#) > 0) { primaryDecQ = #[1]; }
   else { primaryDecQ = 0; }
 
-  // create a new ring 'ZSR' with one additional variable instead of the parameter
-  // if the basering does not contain a parameter then 'a' is used as the additional variable.
+  // create a new ring 'ZSR' with one additional variable instead of the 
+  // parameter
+  // if the basering does not contain a parameter then 'a' is used as the 
+  // additional variable.
 
   def RZSB = basering;
-  def ZSR = TransferRing(basering);
+  def ZSR = TransferRing(RZSB);
   setring ZSR;
 
   // get ideal I and find the zero-set
 
   ideal id = std(imap(RZSB, I));
-        print(dim(id));
-        if(dim(id) > 1) {       // new variable adjoined to ZSR
-                ERROR(" ideal not zerodimensional ");
-        }
+//  print(dim(id));
+  if(dim(id) > 1) {       // new variable adjoined to ZSR
+    ERROR(" ideal not zerodimensional ");
+  }
 
   list result = ZeroSetMain(id, primaryDecQ);
 
@@ -355,7 +356,8 @@ EXAMPLE: example ZeroSet; shows an example
   poly newA = result[2];
   poly minPoly = result[3][1];
 
-  // transform the generators of the ideal I w.r.t. the new representation of 'a'
+  // transform the generators of the ideal I w.r.t. the new representation 
+  // of 'a'
 
   map F = basering, maxideal(1);
   F[nvars(basering)] = newA;
@@ -381,6 +383,7 @@ EXAMPLE: example ZeroSet; shows an example
 // To access the zero-set, 'newA' and the new representation of the ideal, type
    def R = ZeroSet(I); setring R; zeroset; newA; id;
 ");
+  setring RZSB;
   return(RZBN);
 }
 example
@@ -466,28 +469,30 @@ ASSUME:  basering = Q[x_1,...,x_n,a]
 ///////////////////////////////////////////////////////////////////////////////
 
 proc Quotient(poly f, poly g)
-"USAGE:   Quotient(f, g); poly f, g;
-PUROPSE: compute the quotient q and remainder r s.t. f = g*q + r, deg(r) < g
+"USAGE:   Quotient(f, g); where f,g are polynomials;
+PURPOSE: compute the quotient q and remainder r s.t. f = g*q + r, deg(r) < deg(g)
 RETURN:  list of polynomials
-         _[1] = quotient  q
-         _[2] = remainder r
+  @format
+  _[1] = quotient  q
+  _[2] = remainder r
+  @end format
 ASSUME:  basering = Q[x] or Q(a)[x]
 EXAMPLE: example  Quotient; shows an example
 "
 {
-	def QUOB = basering;
-	def QUOR = TransferRing(basering);	// new ring with parameter 'a' replaced by a variable
-	setring QUOR;
-	poly f = imap(QUOB, f);
-	poly g = imap(QUOB, g);
-	list result = QuotientMain(f, g);
+  def QUOB = basering;
+  def QUOR = TransferRing(basering);  // new ring with parameter 'a' replaced by a variable
+  setring QUOR;
+  export(QUOR);
+  poly f = imap(QUOB, f);
+  poly g = imap(QUOB, g);
+  list result = QuotientMain(f, g);
 
-	setring(QUOB);
-	list result = imap(QUOR, result);
-	kill(QUOR);
-	return(result);
+  setring(QUOB);
+  list result = imap(QUOR, result);
+  kill(QUOR);
+  return(result);
 }
-
 example
 {"EXAMPLE:";  echo = 2;
  ring R = (0,a), x, lp;
@@ -500,42 +505,27 @@ example
 }
 
 proc QuotientMain(poly f, poly g)
-"USAGE:   QuotientMain(f, g); poly f, g
-PUROPSE: compute the quotient q and remainder r s.t. f = g*q + r, deg(r) < g
+"USAGE:   QuotientMain(f, g); where f,g are polynomials
+PURPOSE: compute the quotient q and remainder r s.t. f = g*q + r, deg(r) < deg(g)
 RETURN:  list of polynomials
-         _[1] = quotient  q
-         _[2] = remainder r
-ASSUME:  basering = Q[x,a] and ideal 'mpoly' is defined (it might be 0),
-         this represents the ring Q(a)[x] together with 'minpoly'.
+  @format
+  _[1] = quotient  q
+  _[2] = remainder r
+  @end format
+ASSUME:  basering = Q[x,a] and ideal mpoly is defined (it might be 0),
+         this represents the ring Q(a)[x] together with its minimal polynomial.
 EXAMPLE: example  Quotient; shows an example
 "
 {
-        def altring=basering;
-	int dg;
-	intvec wt = 1,0;
-	list ltList;
-	poly fn, q, p, lcgInv, lmonog;
+  if(g == 0) { ERROR("Division by zero !");}
 
-	if(g == 0) { ERROR("Division by zero !");}
-
-	ltList = LeadTerm(g, 1);
-	dg = deg(ltList[2]);
-	if(dg == 0) {			// g is a constant
-		result[1] = MultPolys(f, InvertNumberMain(g));
-		result[2] = 0;
-		return(result);
-	}
-	fn = f;
-	q = 0;
-	lcgInv = InvertNumberMain(ltList[3]);	// inverse of leading coef of g
-	lmonog = ltList[2];			// leading monomial of g
-
-	while(deg(fn, wt) >= dg) {		// degree of fn > degree of g
-		p = MultPolys(LeadTerm(fn, 1)[1]/lmonog, lcgInv);
-		q = SimplifyPoly(q + p);
-		fn = SimplifyPoly(fn - MultPolys(p, g));
-	}
-	return(list(q, fn));
+  def QMB = basering;
+  def QMR = NewBaseRing();
+  setring QMR;
+  poly f, g, h;
+  h = imap(QMB, f) / imap(QMB, g);
+  setring QMB;
+  return(list(imap(QMR, h), 0));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -551,6 +541,7 @@ ASSUME:  basering = Q[x] or Q(a)[x]
   def REMB = basering;
   def REMR = TransferRing(basering);  // new ring with parameter 'a' replaced by a variable
   setring(REMR);
+  export(REMR);
   poly f = imap(REMB, f);
   poly g = imap(REMB, g);
   poly h = RemainderMain(f, g);
@@ -577,7 +568,6 @@ ASSUME:  basering = Q[x,a] and ideal mpoly is defined (it might be 0),
          this represents the ring Q(a)[x] together with its minimal polynomial.
 "
 {
-  def altring=basering;
   int dg;
   intvec wt = 1,0;;
   poly lc, g1, r;
@@ -604,6 +594,7 @@ EXAMPLE: example  EGCD; shows an example
   def GCDB = basering;
   def GCDR = TransferRing(basering);  // new ring with parameter 'a' replaced by a variable
   setring GCDR;
+  export(GCDR);
   poly f = imap(GCDB, f);
   poly g = imap(GCDB, g);
   poly h = EGCDMain(f, g);  // squarefree norm of f
@@ -673,6 +664,7 @@ EXAMPLE: example  MEGCD; shows an example
   if(@mp != "0") { execute ("minpoly = " + @mp + ";"); }
   execute("poly @f = " + @sf + ";");
   execute("poly @g = " + @sg + ";");
+  export(@RGCD);
   poly @h = EGCD(@f, @g);
   setring(@RGCDB);
   poly h = imap(@RGCD, @h);
@@ -697,14 +689,15 @@ EXAMPLE: example  SQFRNorm; shows an example
 "
 {
   def SNB = basering;
-  def SNR = TransferRing(basering);  // new ring with parameter 'a' replaced by a variable
+  def SNR = TransferRing(SNB);  // new ring with parameter 'a' 
+                                // replaced by a variable
   setring SNR;
   poly f = imap(SNB, f);
   list result = SQFRNormMain(f);  // squarefree norm of f
 
-  setring(SNB);
+  setring SNB;
   list result = imap(SNR, result);
-  kill(SNR);
+  kill SNR;
   return(result);
 }
 example
@@ -730,7 +723,7 @@ NOTE:   the norm is an element of Q[x]
 EXAMPLE: example  SqfrNorm; shows an example
 "
 {
-  def altring=basering;
+  def SNRMB = basering;
   int s = 0;
   intvec wt = 1,0;
   ideal mapId;
@@ -740,14 +733,13 @@ EXAMPLE: example  SqfrNorm; shows an example
 
   mapId[1] = var(1) - var(2);    // linear transformation
   mapId[2] = var(2);
-  map Fs = basering, mapId;
+  map Fs = SNRMB, mapId;
 
   N = resultant(f, mpoly[1], var(2));  // norm of f
   N1 = diff(N, var(1));
   g = f;
 
   ringSTR = "ring SNRM1 = 0, " + string(var(1)) + ", dp;";  // univariate ring
-  def SNRMB = basering;
   execute(ringSTR);
   poly N, N1, h;        // N, N1 do not contain 'a', use built-in gcd
   h = gcd(imap(SNRMB, N), imap(SNRMB, N1));
@@ -785,6 +777,7 @@ EXAMPLE: example  Factor; shows an example
   def FRB = basering;
   def FRR = TransferRing(basering);  // new ring with parameter 'a' replaced by a variable
   setring FRR;
+  export(FRR);
   poly f = imap(FRB, f);
   list result = FactorMain(f);  // squarefree norm of f
 
@@ -890,6 +883,7 @@ EXAMPLE: example ZeroSet; shows an example
   // minpoly and the parameter representing the algebraic extension are
   // transformed according to 'newA', i.e., only bookeeping is done.
 
+  def altring=basering;
   int i, j, n, noMP, dbPrt;
   intvec w;
   list currentSol, result, idealList, primDecList, zeroSet;
@@ -967,6 +961,7 @@ NOTE:    might change 'mpoly' !!
 EXAMPLE: example  IdealSolve; shows an example
 "
 {
+  def altring=basering;
   int i, j, k, nrSols, n, noMP;
   ideal I, generators, gens, solid, partsolid;
   list linSol, linearSolution, nLinSol, nonlinSolutions, partSol, sol, solutions, result;
@@ -1076,6 +1071,7 @@ RETURN:  list
          _[3] = new generators (standardbasis)
 "
 {
+  def altring=basering;
   int i, ok, n, found, nrSols;
   ideal generators, newGens;
   list result, index, totalIndex, vars, sol, temp;
@@ -1139,6 +1135,7 @@ NOTE:    might change 'mpoly' !!
   string ringSTR;
 
   def NLZR = basering;
+  export(NLZR);
 
   n = nvars(basering) - 1;
 
@@ -1167,8 +1164,10 @@ NOTE:    might change 'mpoly' !!
       ideal mpoly = std(imap(NLZR, mpoly));
       list roots;
       poly f = imap(NLZR, f);
+      export(RIS1);
       export(mpoly);
       roots = RootsMain(f);
+
       // get "old" basering with new minpoly
 
       setring(NLZR);
@@ -1423,6 +1422,7 @@ ASSUME:  basering = Q[x_1,...,x_n,a]
          ideal 'mpoly' must be defined, it might be 0 !
 "
 {
+  def altring=basering;
   int n;
   poly f;
 
@@ -1450,6 +1450,7 @@ ASSUME:  R = K[x_1,...,x_n] where K = Q or K = Q(a).
 NOTE:    Creates the ring needed for all prodecures with name 'proc-name'Main
 "
 {
+  def altring=basering;
   string ringSTR, parName, minPoly;
 
   setring(R);
@@ -1467,6 +1468,7 @@ NOTE:    Creates the ring needed for all prodecures with name 'proc-name'Main
   execute(ringSTR);
   execute("ideal mpoly = std(" + minPoly + ");");
   export(mpoly);
+  setring altring;
   return(TR);
 }
 
@@ -1503,6 +1505,7 @@ ASSUME:  basering = Q[x_1,...,x_n, a], 'mpoly' must be defined
   ringSTR = "ring TR = " + parName + ", (" + varString + "), lp;";
   execute(ringSTR);
   if(MP) { minpoly = number(imap(BR, mpoly)[1]); }
+  setring BR;
   return(TR);
 }
 

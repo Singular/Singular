@@ -7,20 +7,14 @@
 // www:    http://wwwmayr.informatik.tu-muenchen.de/personen/bayert/
 // email : bayert@in.tum.de
 //
-// Last change 10.12.2000
-// 
-// written in the frame of the diploma thesis (advisor: Prof. Gert-Martin Greuel)
-// "Computations of moduli spaces of semiquasihomogenous singularities and an
-//  implementation in Singular"
-// Arbeitsgruppe Algebraische Geometrie, Fachbereich Mathematik,
-// Universitaet Kaiserslautern
+// Last change 10.12.2000 
 ///////////////////////////////////////////////////////////////////////////////
 
 LIB "tst.lib";
 LIB "rinvar.lib";        
 
 tst_init();
-tst_ignore("CVS ID $Id: rinvar.tst,v 1.1 2000-12-11 16:07:30 Singular Exp $"); 
+tst_ignore("CVS ID $Id: rinvar.tst,v 1.2 2005-04-25 10:11:18 Singular Exp $"); 
  
 
 // example 1

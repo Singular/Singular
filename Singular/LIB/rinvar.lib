@@ -1,6 +1,6 @@
 // Last change 10.12.2000 (TB)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: rinvar.lib,v 1.8 2002-02-19 12:30:16 Singular Exp $";
+version="$Id: rinvar.lib,v 1.9 2005-04-25 10:13:07 Singular Exp $";
 category="Invariant theory";
 info="
 LIBRARY:  rinvar.lib      Invariant Rings of Reductive Groups
@@ -96,14 +96,16 @@ EXAMPLE: example ImageGroup; shows an example
   string ringSTR1, ringSTR2, order;
 
   dbPrt = printlevel-voice+2;
-  dbprint(dbPrt, "Image Group of " + string(Grp) + ", action =  " + string(Gaction));
+  dbprint(dbPrt, "Image Group of " + string(Grp) + ", action =  " 
+                                   + string(Gaction));
   def RIGB = basering;
   mPoly = minpoly;
   tVars = 1;
   k = 0;
 
   // compute the representation of G induced by Gaction, i.e., a matrix
-  // of size(Gaction) x size(Gaction) and polynomials in s(1),...,s(r) as entries
+  // of size(Gaction) x size(Gaction) and polynomials in s(1),...,s(r) as 
+  // entries
   // the matrix is represented as the list 'matrixEntries' where
   // the entries which are always 0 are omittet.
 
@@ -126,7 +128,8 @@ EXAMPLE: example ImageGroup; shows an example
   // only to 0's. Note that z(1..newVars) are slack variables
 
   order = "(dp(" + string(nvars(basering)) + "), dp);";
-  ringSTR1 = "ring RIGR = (" + charstr(basering) + "), (" + varstr(basering) + ", z(1.." + string(newVars) + "))," + order;
+  ringSTR1 = "ring RIGR = (" + charstr(basering) + "), (" + varstr(basering) 
+                             + ", z(1.." + string(newVars) + "))," + order;
   execute(ringSTR1);
   minpoly = number(imap(RIGB, mPoly));
   ideal I1, I2, Gn, G, F, mEntries, newGaction;
@@ -137,7 +140,7 @@ EXAMPLE: example ImageGroup; shows an example
   // prepare the ideals needed to compute the image
   // and compute the new action of the image on K^m
 
-  for(i = 1; i <= size(mEntries); i++) { I1[i] = var(i + nvars(RIGB)) - mEntries[i]; }
+  for(i=1;i<=size(mEntries);i++){ I1[i] = var(i + nvars(RIGB))-mEntries[i]; }
   I1 = std(I1);
 
   for(i = 1; i <= ncols(F); i++) { newGaction[i] = reduce(F[i], I1); }
@@ -150,7 +153,8 @@ EXAMPLE: example ImageGroup; shows an example
   // s(1..newVars) as the original basering and map the ideal
   // Gn (contians only z(1..newVars)) to this ring
 
-  ringSTR2 = "ring RIGS = (" + charstr(basering) + "), (s(1.." + string(newVars) + "), t(1.." + string(nrt) + ")), lp;";
+  ringSTR2 = "ring RIGS = (" + charstr(basering) + "), (s(1.." 
+                     + string(newVars) + "), t(1.." + string(nrt) + ")), lp;";
   execute(ringSTR2);
   minpoly = number(imap(RIGB, mPoly));
   ideal mapIdeal, groupid, actionid;
@@ -158,29 +162,27 @@ EXAMPLE: example ImageGroup; shows an example
 
   // construct the map F : RIGB -> RIGS
 
-  for(i = 1; i <= nvars(RIGB) - nrt; i++) { mapIdeal[i] = 0;}      // s(i) -> 0
+  for(i=1;i<=nvars(RIGB)-nrt;i++) { mapIdeal[i] = 0;}            // s(i)-> 0
   offset = nvars(RIGB) - nrt;
-  for(i = 1; i <= nrt; i++) { mapIdeal[i + offset] = var(newVars + i);}    // t(i) -> t(i)
+  for(i=1;i<=nrt;i++) { mapIdeal[i+offset] = var(newVars + i);}  // t(i)->t(i)
   offset = offset + nrt;
-  for(i = 1; i <= newVars; i++) { mapIdeal[i + offset] = var(i);}      // z(i) -> s(i)
+  for(i=1;i<=newVars;i++) { mapIdeal[i + offset] = var(i);}      // z(i)->s(i)
 
   // map Gn and newGaction to RIGS
 
   map F = RIGR, mapIdeal;
   groupid = F(Gn);
   actionid = F(newGaction);
-  export(groupid);
-  export(actionid);
-  dbprint(dbPrt, "
+  export groupid, actionid;
+  dbprint(dbPrt+1, "
 // 'ImageGroup' created a new ring.
-// To see the ring, type (if the name of the ring is R):
+// To see the ring, type (if the name 'R' was assigned to the return value):
      show(R);
-// To access the ideal of the image-group Gn of the group G w.r.t. 'action'
-// and the new action of Gn, type
-     def R = ImageGroup(G, action); setring R;  groupid; actionid;
-// 'groupid' is the ideal defining the image of the group G w.r.t. 'action'
-// and 'actionid' is the new action of 'groupid'.
+// To access the ideal of the image of the input group and to access the new
+// action of the group, type
+     setring R;  groupid; actionid;
 ");
+  setring RIGB;
   return(RIGS);
 }
 example
@@ -333,15 +335,14 @@ EXAMPLE: example ImageVariety; shows an example
   minpoly = number(imap(RARB, mPoly));
   ideal imageid = imap(RAR1, J2);
   export(imageid);
-     dbprint(dbPrt, "
+     dbprint(dbPrt+1, "
 // 'ImageVariety' created a new ring.
-// To see the ring, type (if the name of the ring is R):
+// To see the ring, type (if the name 'R' was assigned to the return value):
      show(R);
-// To access the ideal of the image F(X), where F is a map and X is a variety
-// with ideal I,type
-     def R = ImageVariety(I, F); setring R;  imageid;
-// 'imageid' is the ideal of the Zariski closure of F(X).
+// To access the ideal of the image variety, type
+     setring R;  imageid;
 ");
+  setring RARB;
   return(RAR2);
 }
 example
@@ -362,7 +363,7 @@ PURPOSE: linearize the group action 'action' and find an equivariant embedding
          of K^m where m = size(action).
 ASSUME:  G contains only variables var(1..r) (r = nrs)
 basering = K[s(1..r),t(1..m)], K = Q or K = Q(a) and minpoly != 0.
-RETURN:  polynomial ring contianing the ideals 'actionid', 'embedid', 'groupid'
+RETURN:  polynomial ring containing the ideals 'actionid', 'embedid', 'groupid'
          - 'actionid' is the ideal defining the linearized action of G
          - 'embedid' is a parameterization of an equivariant embedding (closed)
          - 'groupid' is the ideal of G in the new ring
@@ -370,6 +371,7 @@ NOTE:    set printlevel > 0 to see a trace
 EXAMPLE: example LinearizeAction; shows an example
 "
 {
+  def altring = basering;
   int i, j, k, ok, loop, nrt, sizeOfDecomp, dbPrt;
   intvec wt;
   ideal action, basis, G, reduceIdeal;
@@ -403,25 +405,29 @@ EXAMPLE: example LinearizeAction; shows an example
     else {   // action[i] is not linear
 
     // compute the minimal decomposition of action[i]
-    // action[i] = decompMx[1,1]*decompMx[2,1] + ... + decompMx[1,k]*decompMx[2,k]
+    // action[i]=decompMx[1,1]*decompMx[2,1]+ ... +decompMx[1,k]*decompMx[2,k]
     // decompMx[1,j] contains variables var(1)...var(nrs)
     // decompMx[2,j] contains variables var(nrs + 1)...var(nvars(basering))
 
-    dbprint(dbPrt, "  " + string(action[i]) + " is not linear, a minimal decomposition is :");
+    dbprint(dbPrt, "  " + string(action[i]) 
+                   + " is not linear, a minimal decomposition is :");
     decompMx = MinimalDecomposition(action[i], nrs, nrt);
     sizeOfDecomp = ncols(decompMx);
     dbprint(dbPrt, decompMx);
 
-    for(j = 1; j <= sizeOfDecomp; j++) {   // check if decompMx[2,j] is a linear combination of basis elements
+    for(j = 1; j <= sizeOfDecomp; j++) {   
+      // check if decompMx[2,j] is a linear combination of basis elements
       actCoeff = decompMx[2, j];
       ok = LinearCombinationQ(basis, actCoeff, nrt + nrs);
       if(ok == 0) {
 
         // nonlinear element, compute new component of the action
 
-        dbprint(dbPrt, "  the polynomial " + string(actCoeff) + " is not a linear combination of the elements of basis");
+        dbprint(dbPrt, "  the polynomial " + string(actCoeff) 
+                   + " is not a linear combination of the elements of basis");
         nrt++;
-        str = charstr(basering) + ", (" + varstr(basering) + ",t(" + string(nrt) + ")),";
+        str = charstr(basering) + ", (" + varstr(basering) 
+                   + ",t(" + string(nrt) + ")),";
         if(defined(RLAB)) { kill(RLAB);}
         def RLAB = basering;
         if(defined(RLAR)) { kill(RLAR);}
@@ -450,11 +456,14 @@ EXAMPLE: example LinearizeAction; shows an example
         action[ncols(action) + 1] = actCoeff;
         dbprint(dbPrt, "  extend basering by " + string(var(nrs + nrt)));
         dbprint(dbPrt, "  new basis = " + string(basis));
-        dbprint(dbPrt, "  action of G on new basis element = " + string(actCoeff));
-        dbprint(dbPrt, "  decomp : " + string(decompMx[2, j]) + " -> " + string(var(nrs + nrt)));
+        dbprint(dbPrt, "  action of G on new basis element = " 
+                    + string(actCoeff));
+        dbprint(dbPrt, "  decomp : " + string(decompMx[2, j]) + " -> " 
+                    + string(var(nrs + nrt)));
       } // end if
       else {
-        dbprint(dbPrt, "  the polynomial " + string(actCoeff) + " is a linear combination of the elements of basis");
+        dbprint(dbPrt, "  the polynomial " + string(actCoeff) 
+                    + " is a linear combination of the elements of basis");
       }
     } // end for
     reduceIdeal = std(reduceIdeal);
@@ -463,25 +472,20 @@ EXAMPLE: example LinearizeAction; shows an example
     if(i < ncols(action)) { i++;}
     else {loop = 0;}
   } // end while
-  if(defined(actionid)) { kill(actionid); }
+  if(defined(actionid)) { kill actionid; }
   ideal actionid, embedid, groupid;
   actionid = action;
   embedid = basis;
   groupid = G;
-  export(actionid);
-  export(embedid);
-  export(groupid);
-dbprint(dbPrt, "
+  export actionid, embedid, groupid;
+dbprint(dbPrt+1, "
 // 'LinearizeAction' created a new ring.
-// To see the ring, type (if the name of the ring is R):
+// To see the ring, type (if the name 'R' was assigned to the return value):
      show(R);
-// To access the new action and the equivariant embedding, where G and 'action'
-// are the original group and group-action contained in K[s(1..ns)] and
-// K[s(1..ns),t(1..nt)] respectively, type
-     def R = LinearizeAction(G, action, ns, nt); setring R; actionid; embedid; groupid
-// 'actionid' is the ideal of the linearized action, 'embedid' is the ideal
-// defining the equivariant embedding and 'grouid' is the ideal G.
+// To access the new action and the equivariant embedding, type
+     setring R; actionid; embedid; groupid
 ");
+  setring altring;
   return(RLAR);
 }
 example
@@ -502,7 +506,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc LinearActionQ(Gaction, int nrs)
-"USAGE:   LinearActionQ(action,nrs,nrt); ideal action, int nrs
+"USAGE:   LinearActionQ(action,nrs); ideal action, int nrs
 PURPOSE: check if the action defined by 'action' is linear w.r.t. the variables
          var(nrs + 1...nvars(basering)).
 RETURN:  0 action not linear
@@ -532,9 +536,14 @@ EXAMPLE: example LinearActionQ; shows an example
 example
 {"EXAMPLE:";  echo = 2;
   ring R   = 0,(s(1..5), t(1..3)),dp;
-  ideal G =  s(3)-s(4), s(2)-s(5), s(4)*s(5), s(1)^2*s(4)+s(1)^2*s(5)-1, s(1)^2*s(5)^2-s(5), s(4)^4-s(5)^4+s(1)^2, s(1)^4+s(4)^3-s(5)^3, s(5)^5-s(1)^2*s(5);
-  ideal Gaction = -s(4)*t(1)+s(5)*t(1), -s(4)^2*t(2)+2*s(4)^2*t(3)^2+s(5)^2*t(2), s(4)*t(3)+s(5)*t(3);
-  LinearActionQ(Gaction, 5, 3);
+  ideal G =  s(3)-s(4), s(2)-s(5), s(4)*s(5), s(1)^2*s(4)+s(1)^2*s(5)-1, 
+             s(1)^2*s(5)^2-s(5), s(4)^4-s(5)^4+s(1)^2, s(1)^4+s(4)^3-s(5)^3, 
+             s(5)^5-s(1)^2*s(5);
+  ideal Gaction = -s(4)*t(1)+s(5)*t(1), 
+                  -s(4)^2*t(2)+2*s(4)^2*t(3)^2+s(5)^2*t(2), 
+                   s(4)*t(3)+s(5)*t(3);
+  LinearActionQ(Gaction, 5);
+  LinearActionQ(Gaction, 8);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -585,14 +594,15 @@ proc InvariantRing(ideal G, ideal action, list #)
 "USAGE:   InvariantRing(G, Gact [, opt]); ideal G, Gact; int opt
 PURPOSE: compute generators of the invariant ring of G w.r.t. the action 'Gact'
 ASSUME:  G is a finite group and 'Gact' is a linear action.
-RETURN:  polynomial ring over a simple extension of the groundfield of the
-         basering (the extension might be trivial), containing the ideals
-         'invars' and 'groupid' and the poly 'newA'
-         - 'invars' contains the algebra-generators of the invariant ring
+RETURN:  ring R; this ring comes with the ideals 'invars' and 'groupid' and 
+         with the poly 'newA':
+         - 'invars' contains the algebra generators of the invariant ring
          - 'groupid' is the ideal of G in the new ring
-         - 'newA' if the minpoly changes this is the new representation of the
-           algebraic number, otherwise it is set to 'a'.
-NOTE:    the delivered ring might have a different minimal polynomial
+         - 'newA' is the new representation of the primitive root of the 
+           minimal polynomial of the ring which was active when calling the 
+           procedure (if the minpoly did not change, 'newA' is set to 'a').
+NOTE:    the minimal polynomial of the output ring depends on some random
+         choices
 EXAMPLE: example InvariantRing; shows an example
 "
 {
@@ -612,82 +622,102 @@ EXAMPLE: example InvariantRing; shows an example
 
   // compute the nullcone of G by means of Derksen's algorithm
 
-  invarsGens = NullCone(groupid, action);    // compute the nullcone of the linear action
+  invarsGens = NullCone(groupid, action);  // compute nullcone of linear action
   dbprint(dbPrt, " generators of zero-fibre ideal are " + string(invarsGens));
 
   // make all generators of the nullcone invariant
   // if necessary, compute the Reynolds Operator, i.e., find all elements
-  // of the variety defined by G. It might be necessary to extend the groundfield.
+  // of the variety defined by G. It might be necessary to extend the 
+  // ground field.
 
   def IRB = basering;
   if(defined(RIRR)) { kill(RIRR);}
   def RIRR = basering;
   setring RIRR;
-  export(RIRR);
-  export(invarsGens);
+//  export(RIRR);
+//  export(invarsGens);
   noReynolds = 1;
   dbprint(dbPrt, " nullcone is generated by " + string(size(invarsGens)));
    dbprint(dbPrt, " degrees = " + string(maxdeg(invarsGens)));
   for(i = 1; i <= ncols(invarsGens); i++){
-    ok =  InvariantQ(invarsGens[i], groupid, action);
-    if(ok) { dbprint(dbPrt, string(i) + ": poly " + string(invarsGens[i]) + " is invariant");}
+    ok = InvariantQ(invarsGens[i], groupid, action);
+    if(ok) { dbprint(dbPrt, string(i) + ": poly " + string(invarsGens[i]) 
+                                      + " is invariant");}
     else {
       if(noReynolds) {
 
         // compute the Reynolds operator and change the ring !
-
-        def RORN = ReynoldsOperator(groupid, action, primaryDec);
         noReynolds = 0;
+        def RORN = ReynoldsOperator(groupid, action, primaryDec);
         setring RORN;
-        export(RORN);
         ideal groupid = std(id);
         attrib(groupid, "isSB", 1);
         ideal action = actionid;
-        ideal invarsGens = TransferIdeal(RIRR, "invarsGens", newA);
-        export(invarsGens);
-        kill(RIRR);
+//        ideal invarsGens = TransferIdeal(RIRR, "invarsGens", newA);
+//        export(invarsGens);
+// lossen: ersetzt durch
+        setring RIRR;
+        string parName, minPoly;
+        if(npars(basering) == 0) {
+          parName = "a";
+          minPoly = "0";
+        }
+        else {
+          parName = parstr(basering);
+          minPoly = string(minpoly);
+        }
+        execute("ring RA1=0,(" + varstr(basering) + "," + parName + "), lp;");
+        if (minPoly!="0") { execute("ideal mpoly = std(" + minPoly + ");"); }
+        ideal I = imap(RIRR,invarsGens);
+        setring RORN;
+        map Phi = RA1, maxideal(1);
+        Phi[nvars(RORN) + 1] = newA;
+        ideal invarsGens = Phi(I);
+        kill Phi,RA1,RIRR;
+// end of ersetzt durch      
 
       }
-      dbprint(dbPrt, string(i) + ": poly " + string(invarsGens[i]) + " is NOT invariant");
+      dbprint(dbPrt, string(i) + ": poly " + string(invarsGens[i]) 
+                               + " is NOT invariant");
       invarsGens[i] = ReynoldsImage(ROelements, invarsGens[i]);
       dbprint(dbPrt, " --> " + string(invarsGens[i]));
     }
   }
   for(i = 1; i <= ncols(invarsGens); i++){
     ok =  InvariantQ(invarsGens[i], groupid, action);
-    if(ok) { dbprint(dbPrt, string(i) + ": poly " + string(invarsGens[i]) + " is invariant"); }
+    if(ok) { dbprint(dbPrt, string(i) + ": poly " + string(invarsGens[i]) 
+                                      + " is invariant"); }
     else { print(string(i) + ": Fatal Error with Reynolds ");}
   }
-  kill(IRB);
   if(noReynolds == 0) {
     def RIRS = RORN;
-    setring(RIRS);
-    kill(RORN);export(groupid);
+    setring RIRS;
+    kill RORN;
+    export groupid;
   }
   else {
     def RIRS = RIRR;
-    kill(RIRR);
-    setring(RIRS);
-                export(groupid);
+    kill RIRR;
+    setring RIRS;
+    export groupid;
   }
   ideal invars = invarsGens;
-  kill(invarsGens);
-  export(invars);
-  // export(groupid);
-dbprint(dbPrt, "
+  kill invarsGens;
+  if (defined(ROelements)) { kill ROelements,actionid,zeroset,id; }
+  export invars;
+  dbprint(dbPrt+1, "
 // 'InvariantRing' created a new ring.
-// To see the ring, type (if the name of the ring is R):
+// To see the ring, type (if the name 'R' was assigned to the return value):
      show(R);
-// To access the generators of the invariant ring of G w.r.t. the linear
-// group-action 'action' of G, where G is contained in K[s(1..ns)] and
-// 'action' in K[s(1..ns),t(1..nt)], type
-     def R = InvariantRing(G, action); setring R; invars;
-// 'invars' contains generator of the invariant ring.
-// Note that G is containd in R as the ideal 'groupid', to see it, type
+// To access the generators of the invariant ring type
+     setring R; invars;
+// Note that the input group G is stored in R as the ideal 'groupid'; to 
+// see it, type
     groupid;
 // Note that 'InvariantRing' might change the minimal polynomial
 // The representation of the algebraic number is given by 'newA'
 ");
+  setring IRB;
   return(RIRS);
 }
 example
@@ -714,11 +744,10 @@ RETURN:  int;
          0 if f is not invariant,
          1 if f is invariant
 NOTE:    G need not be finite
-EXAMPLE: example InvariantQ; shows an example
 "
 {
+  def altring=basering;
   map F;
-
   if(deg(f) == 0) { return(1); }
   for(int i = 1; i <= size(action); i++) {
     F[nvars(basering) - size(action) + i] = action[i];
@@ -849,13 +878,15 @@ EXAMPLE: example NullCone; shows an example
   nt = size(action);
   order = "(dp(" + string(nvars(basering) - nt) + "), dp);";
   vars = "(s(1.." + string(nvars(basering) - nt);
-  vars = vars + "), t(1.." + string(nt) + "), Y(1.." + string(nt) + "))," + order;
-  ringSTR = "ring RNCR = (" + charstr(basering) +  "),"  + vars; // ring for the computation
+  vars = vars +"),t(1.."+string(nt) + "), Y(1.." + string(nt) + "))," + order;
+  ringSTR = "ring RNCR = (" + charstr(basering) +  "),"  + vars; 
+  // ring for the computation
 
   minPoly = minpoly;
   offset =  size(G) + nt;
   execute(ringSTR);
-  minpoly = number(imap(RNCB, minPoly));
+  def aaa=imap(RNCB, minPoly);
+  if (aaa!=0) { minpoly = number(aaa); }
   ideal action, G, I, J, N, generators;
   map F;
   poly f;
@@ -879,12 +910,11 @@ EXAMPLE: example NullCone; shows an example
   N = nselect(J, 1, groupVars);
 
   // substitute
-
   for(i = 1; i <= nvars(basering); i = i + 1) { F[i] = 0; }
   for(i = groupVars + 1; i <= offset; i = i + 1) { F[i] = var(i); }
 
   generators = mstd(F(N))[2];
-        setring(RNCB);
+  setring RNCB;
   return(fetch(RNCR, generators));
 }
 example
@@ -900,13 +930,13 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc ReynoldsOperator(ideal Grp, ideal Gaction, list #)
-"USAGE:   ReynoldsOperator(G, action [, opt); ideal G, action; int opt
+"USAGE:   ReynoldsOperator(G, action [, opt]); ideal G, action; int opt
 PURPOSE: compute the Reynolds operator of the group G which act via 'action'
 RETURN:  polynomial ring R over a simple extension of the groundfield of the
          basering (the extension might be trivial), containing a list
          'ROelements', the ideals 'id', 'actionid' and the polynomial 'newA'.
          R = K(a)[s(1..r),t(1..n)].
-         - 'ROelements'  is a list of ideal, each ideal represents a
+         - 'ROelements'  is a list of ideals, each ideal represents a
            substitution map F : R -> R according to the zero-set of G
          - 'id' is the ideal of G in the new ring
          - 'newA' is the new representation of a' in terms of a. If the
@@ -914,9 +944,9 @@ RETURN:  polynomial ring R over a simple extension of the groundfield of the
 ASSUME:  basering = K[s(1..r),t(1..n)], K = Q or K = Q(a') and minpoly != 0,
          G is the ideal of a finite group in K[s(1..r)], 'action' is a linear
          group action of G
-EXAMPLE: example ReynoldsOperator; shows an example
 "
 {
+  def ROBR = basering;
   int i, j, n, ns, primaryDec;
   ideal G1 = Grp;
   list solution, saction;
@@ -924,18 +954,38 @@ EXAMPLE: example ReynoldsOperator; shows an example
 
   if(size(#) > 0) { primaryDec = #[1]; }
   else { primaryDec = 0; }
+  kill #;
 
   n = nvars(basering);
   ns = n - size(Gaction);
   for(i = ns + 1; i <= n; i++) { G1 = G1, var(i);}
 
-  def ROBR = basering;
-  export(Grp);
-  export(Gaction);
-  def RORN = ZeroSet(G1, primaryDec);
-  setring RORN;
-  id = TransferIdeal(ROBR, "Grp", newA);  // defined in ZeroSet ...
-  ideal actionid = TransferIdeal(ROBR, "Gaction", newA);
+  def RORR = ZeroSet(G1, primaryDec);
+//  setring RORR;
+//  id = TransferIdeal(ROBR, "Grp", newA);  // defined in ZeroSet ...
+//  ideal actionid = TransferIdeal(ROBR, "Gaction", newA);
+// lossen: ersetzt durch
+  setring ROBR;
+  string parName, minPoly;
+  if(npars(basering) == 0) {
+    parName = "a";
+    minPoly = "0";
+  }
+  else {
+    parName = parstr(basering);
+    minPoly = string(minpoly);
+  }
+  execute("ring RA1=0,(" + varstr(basering) + "," + parName + "), lp;");
+  if (minPoly!="0") { execute("ideal mpoly = std(" + minPoly + ");"); }
+  ideal Grp = imap(ROBR,Grp);
+  ideal Gaction = imap(ROBR,Gaction);
+  setring RORR;
+  map Phi = RA1, maxideal(1);
+  Phi[nvars(RORR) + 1] = newA;
+  ideal id = Phi(Grp);
+  ideal actionid = Phi(Gaction);
+  kill parName,minPoly,Phi,RA1;
+// end of ersetzt durch    
   list ROelements;
   ideal Rf;
   map groupElem;
@@ -943,7 +993,7 @@ EXAMPLE: example ReynoldsOperator; shows an example
 
   for(i = 1; i <= size(zeroset); i++) {
     groupElem = zeroset[i];    // element of G
-    for(j = ns + 1; j <= n; j++) { groupElem[j] = var(j); } // do not change t's
+    for(j = ns + 1; j<=n; j++) { groupElem[j] = var(j); } //do not change t's
     for(j = 1; j <= n - ns; j++) {
       h1 = actionid[j];
       h2 = groupElem(h1);
@@ -951,9 +1001,9 @@ EXAMPLE: example ReynoldsOperator; shows an example
     }
     ROelements[i] = Rf;
   }
-  export(actionid);
-  export(ROelements);
-  return(RORN);
+  export actionid, ROelements;
+  setring ROBR;
+  return(RORR);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -965,11 +1015,12 @@ PURPOSE: compute the Reynolds image of the polynomial f where RO represents
 RETURN:  poly
 "
 {
+  def RIBR=basering;
   map F;
   poly h = 0;
 
   for(int i = 1; i <= size(reynoldsOp); i++) {
-    F = basering, reynoldsOp[i];
+    F = RIBR, reynoldsOp[i];
     h = h + F(f);
   }
   return(h/size(reynoldsOp));
@@ -1058,27 +1109,6 @@ RETURN: list
   result[3] = simplify(sList[4], 2);
   result[4] = sList;
   return(result);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-static proc TransferIdeal(R, string name, poly newA)
-" USAGE:  TransferIdeal(R, name, newA); ring R, string name, poly newA
-PURPOSE: Maps an ideal with name 'name' in R to the basering, s.t. all
-         variables are fixed but par(1) is replaced by 'newA'.
-RETURN:  ideal
-NOTE:    this is used to transfor an ideal if the minimal polynomial has changed
-"
-{
-  def RAB = basering;
-  def RA1 = TransferRing(R);
-
-  setring RA1;
-  execute("ideal I = imap(R, " + name + ");");
-  setring RAB;
-  map F = RA1, maxideal(1);
-  F[nvars(RAB) + 1] = newA;
-  return(F(I));
 }
 
 ///////////////////////////////////////////////////////////////////////////////

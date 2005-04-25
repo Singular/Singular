@@ -1,6 +1,5 @@
-//(GMG, last modified 03.11.95)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ring.lib,v 1.20 2005-04-15 13:42:55 Singular Exp $";
+version="$Id: ring.lib,v 1.21 2005-04-25 10:13:06 Singular Exp $";
 category="General purpose";
 info="
 LIBRARY:  ring.lib      Manipulating Rings and Maps
@@ -182,38 +181,33 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc defring (string s1, string s2, int n, string s3, string s4)
-"USAGE:   defring(s1,s2,n,s3,s4);  s1..s4=strings, n=integer
-CREATE:  Define a ring with name 's1', characteristic 's2', ordering 's4' and
-         n variables with names derived from s3 and make it the basering.
-         If s3 is a single letter, say s3=\"a\", and if n<=26 then a and the
-         following n-1 letters from the alphabeth (cyclic order) are taken as
-         variables. If n>26 or if s3 is a single letter followed by (, say
-         s3=\"T(\", the variables are T(1),...,T(n).
-RETURN:  No return value
+proc defring (string s2, int n, string s3, string s4)
+"USAGE:   defring(ch,n,va,or);  ch,va,or=strings, n=integer
+RETURN:  ring R with characteristic 'ch', ordering 'or' and n variables with 
+         names derived from va.
+         If va is a single letter, say va=\"a\", and if n<=26 then a and the
+         following n-1 letters from the alphabet (cyclic order) are taken as
+         variables. If n>26 or if va is a single letter followed by a bracket,
+         say va=\"T(\", the variables are T(1),...,T(n).
 NOTE:    This proc is useful for defining a ring in a procedure.
          This proc uses 'execute' or calls a procedure using 'execute'.
-         If you use it in your own proc, let the local names of your proc
-         start with @.
+         If you use it in your own proc, it may be advisable to let the local 
+         names of your proc start with a @.
 EXAMPLE: example defring; shows an example
 "
 {
-   string @newring = "ring "+s1+"=("+s2+"),(";
+   string @newring = "ring newring =("+s2+"),(";
    if( n>26 or s3[2]=="(" ) { string @v = s3[1]+"(1.."+string(n)+")"; }
    else { string @v = A_Z(s3,n); }
    @newring=@newring+@v+"),("+s4+");";
    execute(@newring);
-   export(basering);
-   keepring(`s1`);
-   if (voice==2) { "// basering is now:",s1; }
-   return();
+   return(newring);
 }
 example
 { "EXAMPLE:"; echo = 2;
-   defring("r","0",5,"u","ls"); r; "";
-   defring("R","2,A",10,"x(","dp(3),ws(1,2,3),ds"); R;
-   if(system("with","Namespaces")) { kill Top::R,Top::r; }
-   if (defined(R)) {kill R,r;}
+   def r=defring("0",5,"u","ls"); r; setring r;"";
+   def R=defring("2,A",10,"x(","dp(3),ws(1,2,3),ds"); R; setring R;
+   kill R,r;
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -286,22 +280,22 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc extendring (string na, int n, string va, string o, list #)
-"USAGE:   extendring(na,n,va,o[iv,i,r]);  na,va,o=strings,
-         n,i=integers, r=ring, iv=intvec of positive integers or iv=0
-CREATE:  Define a ring with name `na` which extends the ring r by adding n new
-         variables in front of [after, if i!=0] the old variables and make it
-         the basering [default: (i,r)=(0,basering)].
+proc extendring (int n, string va, string o, list #)
+"USAGE:   extendring(n,va,o[iv,i,r]);  va,o=strings, n,i=integers, r=ring, 
+          iv=intvec of positive integers or iv=0
+RETURN:  ring R, which extends the ring r by adding n new variables in front 
+         of (resp. after, if i!=0) the old variables.
+         [default: (i,r)=(0,basering)].
 @*       -- The characteristic is the characteristic of r.
 @*       -- The new vars are derived from va. If va is a single letter, say
             va=\"T\", and if n<=26 then T and the following n-1 letters from
             T..Z..T (resp. T(1..n) if n>26) are taken as additional variables.
-            If va is a single letter followed by (, say va=\"x(\", the new
-            variables are x(1),...,x(n).
-@*       -- The ordering is the product ordering between the ordering of r and
-            an ordering derived from `o` [and iv].
-@*        -  If o contains a 'c' or a 'C' in front resp. at the end this is
-            taken for the whole ordering in front resp. at the end. If o does
+            If va is a single letter followed by a bracket, say va=\"x(\", 
+            the new variables are x(1),...,x(n).
+@*       -- The ordering is the product ordering of the ordering of r and of an
+            ordering derived from `o` [and iv].
+@*        -  If o contains a 'c' or a 'C' in front resp. at the end, this is
+            taken for the whole ordering in front, resp. at the end. If o does
             not contain a 'c' or a 'C' the same rule applies to ordstr(r).
 @*        -  If no intvec iv is given, or if iv=0, o may be any allowed ordstr,
             like \"ds\" or \"dp(2),wp(1,2,3),Ds(2)\" or \"ds(a),dp(b),ls\" if
@@ -318,11 +312,10 @@ CREATE:  Define a ring with name `na` which extends the ring r by adding n new
             iv as block-size for the remaining non-weighted blocks.
             e.g. o=\"dp,ws,Dp,ds\", iv=3,2,3,4,2,5 creates the ordering
             dp(2),ws(2,3,4),Dp(5),ds
-RETURN:  No return value
 NOTE:    This proc is useful for adding deformation parameters.
          This proc uses 'execute' or calls a procedure using 'execute'.
-         If you use it in your own proc, let the local names of your proc
-         start with @ (see the file HelpForProc)
+         If you use it in your own proc, it may be advisable to let the local 
+         names of your proc start with a @ (see the file HelpForProc)
 EXAMPLE: example extendring; shows an example
 "
 {
@@ -390,7 +383,7 @@ EXAMPLE: example extendring; shows an example
       if( @k>0 and o[size(o)]!=")" ) { o=o+"("+string(@k)+")"; }
    }
 //------------------------ prepare string of new ring -------------------------
-   @newring = "ring "+na+"=("+charstr(@r)+"),(";
+   @newring = "ring na =("+charstr(@r)+"),(";
    if( n>26 or va[2]=="(" ) { @v = va[1]+"(1.."+string(n)+")"; }
    else                     { @v = A_Z(va,n); }
    if( @i==0 )
@@ -406,39 +399,41 @@ EXAMPLE: example extendring; shows an example
    @newring=@newring+@v+"),("+o+");";
 //---------------------------- execute and export -----------------------------
    execute(@newring);
-   export(basering);
-   keepring(`na`);
-   if (voice==2) { "// basering is now",na; }
-   return();
+   dbprint(printlevel-voice+2,"
+// 'extendring' created a new ring.
+// To see the ring, type (if the name 'R' was assigned to the return value):
+     show(R);
+");
+
+   return(na);
 }
 example
 { "EXAMPLE:"; echo = 2;
    ring r=0,(x,y,z),ds;
    show(r);"";
-   //blocksize is derived from no of vars:
+   // blocksize is derived from no of vars:
    int t=5;
-   extendring("R1",t,"a","dp");         //t global: "dp" -> "dp(5)"
-   show(R1); "";
-   extendring("R2",4,"T(","c,dp",1,r);    //"dp" -> "c,..,dp(4)"
-   show(R2);"";
+   def R1=extendring(t,"a","dp");         //t global: "dp" -> "dp(5)"
+   show(R1); setring R1; "";
+   def R2=extendring(4,"T(","c,dp",1,r);    //"dp" -> "c,..,dp(4)"
+   show(R2); setring R2; "";
 
-   //no intvec given, blocksize given: given blocksize is used:
-   extendring("R3",4,"T(","dp(2)",0,r);   // "dp(2)" -> "dp(2)"
-   show(R3);"";
+   // no intvec given, blocksize given: given blocksize is used:
+   def R3=extendring(4,"T(","dp(2)",0,r);   // "dp(2)" -> "dp(2)"
+   show(R3); setring R3; "";
 
-   //intvec given: weights and blocksize is derived from given intvec
-   //(no specification of a blocksize in the given ordstr is allowed!)
-   //if intvec does not cover all given blocks, the last block is used
-   //for the remaining variables, if intvec has too many components,
-   //the last ones are ignored
+   // intvec given: weights and blocksize is derived from given intvec
+   // (no specification of a blocksize in the given ordstr is allowed!)
+   // if intvec does not cover all given blocks, the last block is used
+   // for the remaining variables, if intvec has too many components,
+   // the last ones are ignored
    intvec v=3,2,3,4,1,3;
-   extendring("R4",10,"A","ds,ws,Dp,dp",v,0,r);
-         //v covers 3 blocks: v[1] (=3) : no of components of ws
-         //next v[1] values (=v[2..4]) give weights
-         //remaining components of v are used for the remaining blocks
+   def R4=extendring(10,"A","ds,ws,Dp,dp",v,0,r);
+   // v covers 3 blocks: v[1] (=3) : no of components of ws
+   // next v[1] values (=v[2..4]) give weights
+   // remaining components of v are used for the remaining blocks
    show(R4);
-   if(system("with","Namespaces")){kill Top::r,Top::R1,Top::R2,Top::R3,Top::R4;}
-   if (defined(r)) { kill r,R1,R2,R3,R4; }
+   kill r,R1,R2,R3,R4;
 }
 ///////////////////////////////////////////////////////////////////////////////
 

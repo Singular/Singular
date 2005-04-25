@@ -1,4 +1,4 @@
-version="$Id: equising.lib,v 1.10 2005-04-19 15:23:39 Singular Exp $";
+version="$Id: equising.lib,v 1.11 2005-04-25 10:13:06 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  equising.lib  Equisingularity Stratum of a Family of Plane Curves
@@ -1956,7 +1956,8 @@ LIB "equising.lib";
    poly p3 = p2^2+x^10*p1;
    poly p=p3^2+x^20*p2;
    p;
-   versal(p);
+   list L=versal(p);
+   def Px=L[1];
    setring Px;
    poly F=Fs[1,1];
    int t=timer;
@@ -1968,7 +1969,8 @@ option(prot);
 printlevel=2;
 ring r=0,(x,y),ds;
 poly f=(x-yx+y2)^2-(y+x)^31;
-versal(f);
+list L=versal(f);
+def Px=L[1];
 setring Px;
 poly F=Fs[1,1];
 int t=timer;
@@ -1982,7 +1984,8 @@ option(prot);
 timer=1;
 ring r=32003,(x,y),ds;
 poly f=(x4-y4)^2-x10;
-versal(f);
+list L=versal(f);
+def Px=L[1];
 setring Px;
 poly F=Fs[1,1];
 int t=timer;
@@ -2016,7 +2019,8 @@ LIB "equising.lib";
 ring r=0,(w,v),ds;
 poly f=w2-v199;
 list L=hnexpansion(f);
-versal(f);
+List LL=versal(f);
+def Px=LL[1];
 setring Px;
 list L=imap(r,L);
 poly F=Fs[1,1];
@@ -2042,7 +2046,8 @@ K;
 ring rr=0,(x,y),ls;
 poly f=x6y-3x4y4-x4y5+3x2y7-x4y6+2x2y8-y10+2x2y9-y11+x2y10-y12-y13;
 list K=esIdeal(f);
-versal(f);
+list L=versal(f);
+def Px=L[1];
 setring Px;
 poly F=Fs[1,1];
 list M=esStratum(F,2);
@@ -2081,7 +2086,8 @@ list K=esIdeal(f);
 vdim(std(K[1]));  //-> 68
 tau_es(f);        //-> 68
 
-versal(f);
+list L=versal(f);
+def Px=L[1];
 setring Px;
 poly F=Fs[1,1];
 list M=esStratum(F);

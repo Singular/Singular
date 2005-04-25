@@ -179,4 +179,4 @@ ideal i=6*t^5*x^3*z+5*x^5*z^4+4*t^4*y*w^4,
 list I=mres(i,0);
 I;
 kill r;
-LIB "tst.lib";tst_status(1);$;
+tst_status(1);$;

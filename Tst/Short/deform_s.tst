@@ -10,13 +10,13 @@ example versal;
    ring  r2       = 0,(x,y,z),ds;
    ideal Fo       = x2,xy,yz,zx;
    printlevel     = 2;
-   versal(Fo);
+   def L=versal(Fo);
+   def Px=L[1];def So=L[3];
    setring(So);
    ideal Js=imap(Px,Js);
    hilb(std(Js)); 
    printlevel     = p;
-   if(system("with","Namespaces")) { kill Ring::Px,Top::Qx,Ring::So; }
-   kill Px,Qx,So;
+   kill L,Px,So;
 example mod_versal;
 example lift_rel_kb;
 // rest of what used to be in that example
@@ -33,13 +33,15 @@ example lift_kbase;
    printlevel =  2; 
 ring  r1  = 0,(x,y,z,u),dp;
  ideal i3 = xy,xz,xu,yz,yu,zu;       
- versal(i3);
+ list L=versal(i3);
+ def Px=L[1]; def So=L[3];
  setring Px;
  listvar(Px);
- setring(So);
+ size(reduce(Fs*Rs,std(ideal(Js))));
+ setring So;
  ideal Js=imap(Px,Js);
  hilb(std(Js)); 
- kill_rings();
+ kill L,Px,So;
 ring   Po = 0,(x,y),dp;
 ideal  Io = std(x^4+y^3);
 matrix Mo;
@@ -52,13 +54,14 @@ int i';
 for (i'=0;i'<3;i'=i'+1)
 {
   Mo=m(i');
-  mod_versal(Mo,Io);
+  list L=mod_versal(Mo,Io);
+  def Px=L[1]; def Qx=L[2]; def So=L[3]; 
   setring Px;
   listvar(Px);
   setring(So);
   ideal Js=imap(Qx,Js);
   hilb(std(Js)); 
   setring(Po);
- kill_rings();
+  kill L,Px,Qx,So;
 }
 tst_status(1);$

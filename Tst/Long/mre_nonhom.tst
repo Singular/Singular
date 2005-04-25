@@ -55,4 +55,4 @@ a3*b+b3*c+c3*d+d3*e+a*e3;
 list I=mres(i,0);
 I;
 kill cyc5;
-LIB "tst.lib";tst_status(1);$;
+tst_status(1);$;

@@ -1,8 +1,8 @@
-// $Id: deform.lib,v 1.30 2004-04-20 15:55:22 Singular Exp $
+// $Id: deform.lib,v 1.31 2005-04-25 10:13:05 Singular Exp $
 // author: Bernd Martin email: martin@math.tu-cottbus.de
 //(bm, last modified 4/98)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: deform.lib,v 1.30 2004-04-20 15:55:22 Singular Exp $";
+version="$Id: deform.lib,v 1.31 2005-04-25 10:13:05 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  deform.lib    Miniversal Deformation of Singularities and Modules
@@ -13,7 +13,6 @@ PROCEDURES:
  mod_versal(Mo,I,[,d,any]) miniversal deformation of module Mo modulo ideal I
  lift_kbase(N,M);          lifting N into standard kbase of M
  lift_rel_kb(N,M[,kbM,p])  relative lifting N into a kbase of M
- kill_rings([\"prefix\"])  kills the exported rings from above
 ";
 
 LIB "inout.lib";
@@ -26,27 +25,27 @@ LIB "sing.lib";
 proc versal (ideal Fo,list #)
 "USAGE:   versal(Fo[,d,any]); Fo=ideal, d=int, any=list
 COMPUTE: miniversal deformation of Fo up to degree d (default d=100),
-CREATE:  Rings (exported):
-         'my'Px = extending the basering Po by new variables given by
-           \"A,B,..\" (deformation parameters), returns as basering; the
-           new variables precede the old ones, the ordering is the
-           product between \"ls\" and \"ord(Po)\"
-         @*'my'Qx = Px/Fo extending Qo=Po/Fo,
-         @*'my'So = the embedding-ring of the versal base space,
-         @*'my'Ox = Px/Js extending So/Js.   (default my=\"\")
-
-      Matrices (in Px, exported):
+RETURN: list L of 4 rings:
+         L[1] extending the basering Po by new variables given by
+          \"A,B,..\" (deformation parameters); the new variables precede 
+         the old ones, the ordering is the product of \"ls\" and \"ord(Po)\" @*
+         L[2] = L[1]/Fo extending Qo=Po/Fo, @*
+         L[3] = the embedding ring of the versal base space, @*
+         L[4] = L[1]/Js extending L[3]/Js. @*
+      In the ring L[1] the following matrices are stored:
          @*Js  = giving the versal base space (obstructions),
          @*Fs  = giving the versal family of Fo,
          @*Rs  = giving the lifting of Ro=syz(Fo).
 
       If d is defined (!=0), it computes up to degree d.
       @*If 'any' is defined and any[1] is no string, interactive version.
-      @*Otherwise 'any' gives predefined strings: \"my\",\"param\",\"order\",\"out\"
-      (\"my\" prefix-string, \"param\" is a letter (e.g. \"A\")  for the name of
-      first parameter or (e.g. \"A(\") for index parameter variables, \"order\"
-      ordering string for ring extension), \"out\" name of output-file).
-NOTE:   printlevel < 0        no output at all,
+      @*Otherwise 'any' is interpreted as a list of predefined strings: 
+      \"my\",\"param\",\"order\",\"out\": @*
+      (\"my\" internal prefix, \"param\" is a letter (e.g. \"A\") for the 
+      name of the first parameter or (e.g. \"A(\") for index parameter 
+      variables, \"order\" ordering string for ring extension), \"out\" name 
+      of output file). 
+NOTE:   printlevel < 0        no additional output,
         printlevel >=0,1,2,.. informs you, what is going on;
         this proc uses 'execute'.
 EXAMPLE:example versal; shows an example
@@ -103,7 +102,7 @@ setring  Po;
   @t2 = Ls[4];                                 // vdim of T_2
   kill Ls;
   t1' = @t1;
-  if( @t1==0) { dbprint(p,"// rigid!"); return();}
+  if( @t1==0) { dbprint(p,"// rigid!"); return(list());}
   if( @t2==0) { @smooth=1; dbprint(p,"// smooth base space");}
   dbprint(p,"// ready: T_1 and T_2");
   @colR = ncols(Ro);
@@ -122,8 +121,13 @@ setring  Po;
      InfD,dummy,t1' = interact2(InfD,@jv);kill dummy;
   }
  //---- create new rings and objects ------------------------------------------
-  get_rings(Fo,t1',1,@my,@order,@param);
- setring `myPx`;
+  list list_of_rings=get_rings(Fo,t1',1,@order,@param);
+  def `myPx`= list_of_rings[1];
+  def `myQx`= list_of_rings[2];
+  def `myOx`= list_of_rings[3];
+  def `mySo`= list_of_rings[4];
+  kill list_of_rings;
+  setring `myPx`;
   @jv=0; @jv[t1']=0; @jv=@jv+1; @jv[nvars(basering)]=0;
                                                //weight-vector for calculating
                                                //rel-jet with resp to def-para
@@ -205,7 +209,6 @@ setring  Po;
         m_J  = std(J*ideal(Mon));
       degBound = 0;
 //--------------- obtain new base-ring ----------------------------------------
-        if(system("with","Namespaces")==1) { kill Top::`myOx`; }
         if(defined(`myOx`)) {kill `myOx`;}
   qring `myOx` = J;
         matrix Fs,Rs,F_R,Cup,Cup',homFR,New,Rn,Fn;
@@ -267,15 +270,15 @@ setring  Po;
    dbprint(p-1,
    "// ___ Equations of miniversal base space ___",Js,
    "// ___ Equations of miniversal total space ___",Fs);
-   dbprint(p,"","// Result belongs to ring "+myPx+".",
-   "// Equations of total space of miniversal deformation are ",
-   "// given by Fs, equations of miniversal base space by Js.",
-   "// Make "+myPx+" the basering and list objects defined in "
-   +myPx+" by typing:",
-   "   setring "+myPx+"; show("+myPx+");","   listvar(matrix);",
-   "// NOTE: rings "+myQx+", "+myPx+", "+mySo+" are alive!",
-   "// (use 'kill_rings(\""+@my+"\");' to remove)");
-   return();
+   dbprint(p,"","
+// 'versal' returned a list, say L, of four rings. In L[1] are stored:
+//   as matrix Fs: Equations of total space of the miniversal deformation,
+//   as matrix Js: Equations of miniversal base space,
+//   as matrix Rs: syzygies of Fs mod Js.
+// To access these data, type
+     def Px=L[1]; setring Px; print(Fs); print(Js); print(Rs);
+");
+   return(list(`myPx`,`myQx`,`mySo`,`myOx`));
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -285,7 +288,9 @@ example
    matrix m[2][4] = x,y,z,u,y,z,u,v;
    ideal Fo       = minor(m,2);
                     // cone over rational normal curve of degree 4
-   versal(Fo);
+   list L=versal(Fo);
+   L;
+   def Px=L[1]; 
    setring Px;
    // ___ Equations of miniversal base space ___:
    Js;"";
@@ -297,27 +302,26 @@ example
 proc mod_versal(matrix Mo, ideal I, list #)
 "USAGE:   mod_versal(Mo,I[,d,any]); I=ideal, M=module, d=int, any =list
 COMPUTE: miniversal deformation of coker(Mo) over Qo=Po/Io, Po=basering;
-CREATE:  Ringsr (exported):
-         'my'Px  = extending the basering by new variables (deformation
-                   parameters), the new variables precede the old ones,
-                   the ordering is the product between \"my_ord\"
-                   and \"ord(Po)\"
-         @*'my'Qx  = Px/Io extending Qo (returns as basering),
-         @*'my'Ox  = Px/(Io+Js) ring of the versal deformation of coker(Ms),
-         @*'my'So  = embedding-ring of the versal base space.  (default 'my'=\"\")
-
-      Matrices (in Qx, exported):
+RETURN:  list L of 4 rings:
+         L[1] extending the basering Po by new variables given by
+          \"A,B,..\" (deformation parameters); the new variables precede 
+         the old ones, the ordering is the product of \"ls\" and \"ord(Po)\" @*
+         L[2] = L[1]/Io extending Qo, @*
+         L[3] = the embedding ring of the versal base space, @*
+         L[4] = L[1]/(Io+Js) ring of the versal deformation of coker(Ms). @*
+      In the ring L[1] the following matrices are stored:
          @*Js  = giving the versal base space (obstructions),
-         @*Ms  = giving the versal family of Mo,
-         @*Ls  = giving the lifting of syzygies Lo=syz(Mo),
-
+         @*Fs  = giving the versal family of Mo,
+         @*Rs  = giving the lifting of syzygies Lo=syz(Mo).   
       If d is defined (!=0), it computes up to degree d.
       @*If 'any' is defined and any[1] is no string, interactive version.
-      @*Otherwise 'any' gives predefined strings:\"my\",\"param\",\"order\",\"out\"
-      (\"my\" prefix-string, \"param\" is a letter (e.g. \"A\")  for the name of
-      first parameter or (e.g. \"A(\") for index parameter variables, \"ord\"
-      ordering string for ring extension), \"out\" name of output-file).
-NOTE:   printlevel < 0        no output at all,
+      @*Otherwise 'any' is interpreted as a list of predefined strings: 
+      \"my\",\"param\",\"order\",\"out\": @*
+      (\"my\" internal prefix, \"param\" is a letter (e.g. \"A\") for the 
+      name of the first parameter or (e.g. \"A(\") for index parameter 
+      variables, \"order\" ordering string for ring extension), \"out\" name 
+      of output file). 
+NOTE:   printlevel < 0        no additional output,
         printlevel >=0,1,2,.. informs you, what is going on,
         this proc uses 'execute'.
 EXAMPLE:example mod_versal; shows an example
@@ -380,7 +384,12 @@ EXAMPLE:example mod_versal; shows an example
   }
 //-------- get new rings and objects ------------------------------------------
  setring Po;
-  get_rings(I,e1',0,@my,@order,@param);
+  list list_of_rings=get_rings(I,e1',0,@order,@param);
+  def `myPx`= list_of_rings[1];
+  def `myQx`= list_of_rings[2];
+  def `myOx`= list_of_rings[3];
+  def `mySo`= list_of_rings[4];
+  kill list_of_rings;
  setring `myPx`;
   ideal  J,m_J;
   ideal  I_J  = imap(Po,I);
@@ -453,9 +462,6 @@ EXAMPLE:example mod_versal; shows an example
      degBound=0;
       I_J = Io,J;                attrib(I_J,"isSB",1);
 //-------- obtain new base ring -----------------------------------------------
-      if(system("with","Namespaces")) {
-         if(defined(Top::`myOx`)) { kill Top::`myOx`; }
-      }
       if (defined(`myOx`)) {kill `myOx`;}
  qring `myOx` = I_J;
       ideal null,tet;            attrib(null,"isSB",1);
@@ -516,18 +522,16 @@ EXAMPLE:example mod_versal; shows an example
     @degr = @degr[1..e1'];
     dbprint(p-1,"// quasi-homogeneous weights of miniversal base",@degr);
   }
-  dbprint(p-1,"// Result belongs to qring "+myQx,
-  "// Equations of total space of miniversal deformation are in Js",
-  simplify(ideal(Js),10),
-  "// Matrix of the deformed module is Ms and lifted syzygies are Ls.",
-  "// Make "+myQx+" the basering and list objects defined in "+myQx+
-  " by typing:",
-  "   listvar(ring);setring "+myQx+"; show("+myQx+");listvar(ideal);"+
-  "listvar(matrix);",
-  "// NOTE: rings "+myQx+", "+myOx+", "+mySo+" are still alive!",
-  "// (use: 'kill_rings("+@my+");' to remove them)");
+  dbprint(p,"
+// 'mod_versal' returned a list, say L, of four rings. In L[2] are stored:
+//   as matrix Ms: presentation matrix of the deformed module,
+//   as matrix Ls: lifted syzygies,
+//   as matrix Js:  Equations of total space of miniversal deformation
+// To access these data, type
+     def Qx=L[2]; setring Qx; print(Ms); print(Ls); print(Js);
+");
   option(set,save_opt);
-  return();
+  return(list(`myPx`,`myQx`,`mySo`,`myOx`));
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -536,11 +540,12 @@ example
   ring  Ro = 0,(x,y),wp(3,4);
   ideal Io = x4+y3;
   matrix Mo[2][2] = x2,y,-y2,x2;
-  mod_versal(Mo,Io);
+  list L = mod_versal(Mo,Io);
+  def Qx=L[2]; setring Qx;
+  print(Ms);
+  print(Ls);
+  print(Js);
   printlevel = p;
-  if(system("with","Namespaces")) {
-        kill Top::Px,Top::Qx,Top::So;
-  }
   if (defined(Px)) {kill Px,Qx,So;}
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -548,6 +553,7 @@ proc kill_rings(list #)
 "USAGE: kill_rings([string]);
 RETURN: nothing, but kills exported rings generated by procedures
         'versal' and 'mod_versal' with optional prefix 'string'
+NOTE: obsolete
 "
 {
   string my,br;
@@ -639,41 +645,38 @@ Sub-procedure: obtain Ext1 and Ext2 and other objects used by mod_versal
    return(iv,M1,kb1,lift1,L');
 }
 ///////////////////////////////////////////////////////////////////////////////
-proc get_rings(ideal Io,int e1,int switch, list #)
+static proc get_rings(ideal Io,int e1,int switch, list #)
 "
-Sub-procedure: creating ring-extensions
+Sub-procedure: creating ring-extensions, returned as a list of 4 rings
 "
 {
    def Po = basering;
    string my;
    string my_ord = "ds";
    string my_var = "A";
-   if (size(#)>2)
+   if (size(#)>1)
    {
-     my     = #[1];
-     my_ord = #[2];
-     my_var = #[3];
+     my_ord = #[1];
+     my_var = #[2];
    }
-   string my_Px = my+"Px";
-   string my_Qx = my+"Qx";
-   string my_Ox = my+"Ox";
-   string my_So = my+"So";
-   extendring(my_Px,e1,my_var,my_ord);
-   ideal Io  = imap(Po,Io);         attrib(Io,"isSB",1);
-   my ="qring "+my_Qx+" = Io;       export("+my_Qx+");";
-   execute(my);
+   def my_Px=extendring(e1,my_var,my_ord);
+   setring my_Px;
+   ideal Io  = imap(Po,Io);         
+   attrib(Io,"isSB",1);
+   qring my_Qx = Io;
    if (switch)
    {
-     setring `my_Px`;
-     my = "qring "+my_Ox+" = std(ideal(0));export("+my_Ox+");";
+     setring my_Px;
+     qring my_Ox = std(ideal(0));
    }
    else
    {
-     my = "def "+my_Ox+" = "+my_Qx+";export("+my_Ox+");";
+     def my_Ox = my_Qx;
    }
-  execute(my);
-  defring(my_So,charstr(Po),e1,my_var,my_ord);
-  return();
+   def my_So=defring(charstr(Po),e1,my_var,my_ord);
+   setring my_So;
+   list erg=list(my_Px,my_Qx,my_Ox,my_So);
+   return(erg);
 }
 ///////////////////////////////////////////////////////////////////////////////
 proc get_inf_def(list #)

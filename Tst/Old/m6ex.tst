@@ -14,7 +14,8 @@
   int k,l =3,2;
   ideal j=xy,x^k+y^l+z2;
   print(deform(j));
-  versal(j);                  // using default names
+  list L=versal(j);                  // using default names
+  def Px=L[1];
   setring Px;
   show(Px);                   // show is a procedure from inout.lib
   listvar(ideal);
@@ -22,6 +23,7 @@
   Js;
   // ___ Equations of miniversal total space ___:
   Fs;
+kill L;
   // the miniversal deformation of V(j) is the projection from the
   // miniversal total space to the miniversal base space:
   // { (A,B,C,D,E,F,x,y,z) | xy+A+Bz=0, y2+z2+x3+C+Dx+Ex2+Fy=0 }
@@ -43,5 +45,4 @@
   //  --> { A(1..4) |
   //         -A(1)*A(4) = A(3)*A(4) = -A(2)*A(4)-A(4)^2 = 0 }
   //----------------------------------------------------
-  killall(); // proc from general.lib, kills all user-defined variables
 LIB "tst.lib";tst_status(1);$
