@@ -6,7 +6,7 @@
  *  Purpose: implementation of fast maps
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 02/01
- *  Version: $Id: fast_maps.cc,v 1.2 2005-04-21 13:31:32 Singular Exp $
+ *  Version: $Id: fast_maps.cc,v 1.3 2005-04-25 12:59:13 Singular Exp $
  *******************************************************************/
 #include "mod2.h"
 #include <omalloc.h>
@@ -283,7 +283,7 @@ void maMap_CreateRings(ideal map_id, ring map_r,
 
   for (i=0; i<n; i++)
   {
-    weights[i] = pLength(image_id->m[i]);
+    weights[i] = pLength(image_id->m[i])+1;
   }
   src_r = rModifyRing_Wp(map_r, weights);
 #else
