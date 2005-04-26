@@ -1,8 +1,8 @@
-// $Id: deform.lib,v 1.31 2005-04-25 10:13:05 Singular Exp $
+// $Id: deform.lib,v 1.32 2005-04-26 09:00:38 Singular Exp $
 // author: Bernd Martin email: martin@math.tu-cottbus.de
 //(bm, last modified 4/98)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: deform.lib,v 1.31 2005-04-25 10:13:05 Singular Exp $";
+version="$Id: deform.lib,v 1.32 2005-04-26 09:00:38 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  deform.lib    Miniversal Deformation of Singularities and Modules
@@ -60,7 +60,7 @@ EXAMPLE:example versal; shows an example
   d_max    = 100;
   @my = ""; @param="A"; @order="ds"; @out="no";
   @size    = size(#);
-  if( @size>0 ) { d_max = #[1]; }
+  if( @size>0 ) { if (#[1]>0) { d_max = #[1];} }
   if( @size>1 )
   { if(typeof(#[2])!="string")
     { string @active;
