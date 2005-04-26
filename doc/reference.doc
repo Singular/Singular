@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.227 2005-04-18 15:12:02 Singular Exp $
+@comment $Id: reference.doc,v 1.228 2005-04-26 12:47:42 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -1057,6 +1057,7 @@ multiplicity of the ideal, resp.@: module, if the input is a standard
 basis with respect to a degree ordering.
 @item @strong{Example:}
 @smallexample
+@c example
 ring r3=32003,(x,y,z),ds;
 int a,b,c,t=11,10,3,1;
 poly f=x^a+y^b+z^(3*c)+x^(c+2)*y^(c-1)+x^(c-1)*y^(c-1)*z3
@@ -1064,9 +1065,7 @@ poly f=x^a+y^b+z^(3*c)+x^(c+2)*y^(c-1)+x^(c-1)*y^(c-1)*z3
 ideal i=jacob(f);
 ideal i0=std(i);
 degree(i0);
-@expansion{} //codimension 3
-@expansion{} //dimension 0
-@expansion{} //multiplicity 314
+@c example
 @end smallexample
 @end table
 @c ref
@@ -5370,7 +5369,7 @@ See
 @ref{varstr}.
 @c ref
 @c ---------------------------------------
-@node setring, simplify, rvar, Functions
+@node setring, simplex, rvar, Functions
 @subsection setring
 @cindex setring
 @table @code
@@ -5407,7 +5406,98 @@ See
 @ref{keepring}.
 @c ref
 @c ---------------------------------------
-@node simplify, size, setring, Functions
+@node simplex, simplify, setring, Functions
+@subsection simplex
+@cindex simplex
+@table @code
+@item @strong{Syntax:}
+@code{simplex (} matrix_expression@code{,} int_expression@code{,} 
+int_expression@code{,} int_expression@code{,} int_expression@code{,} 
+int_expression@code{)}
+@item @strong{Type:}
+list
+@item @strong{Purpose:}
+perform the simplex algorithm for the tableau given by the input, e.g.
+M,m,n,m1,m2,m3: 
+
+@table @asis
+@item  M matrix of numbers : 
+     first row describing the objective function (maximize problem), 
+     the remaining rows describing constraints; 
+@item  m,n,m1,m2,m3 int :
+     n = number of variables; 
+     m = total number of constraints; 
+     m1 = number of <=constraints (rows 2 ... m1+1 of M); 
+     m2 = number of >=constraints (rows m1+2 ... m1+m2+1 of M); 
+     m3 = number of == constraints.
+@end table 
+
+The following assumptions are made: 
+@table @asis
+@item   * ground field is of type @code{(real,N)}, N>=4; 
+@item   * the matrix M is of size m x n; 
+@item   * m=m1+m2+m3;
+@item   * the entries M[2,1] ,..., M[m+1,1] are non-negative;
+@item   * the variables x(i) are non-negative;
+@item   * a row  b, a(1) ,..., a(n)  corresponds to  b+a(1)x(1)+...+a(n)x(n);
+@item   * for a <=, >=, or == constraint: add "in mind" >=0, <=0, or ==0.
+@end table   
+
+The output is a list L with 
+@table @asis
+@item * L[1] = matrix
+@item * L[2] = int: 
+    0 = finite solution found;  1 = unbounded;  -1 = no solution;  
+   -2 = error occured;
+@item * L[3] = intvec :  
+   L[3][k] = number of variable which corresponds to row k+1 of L[1];             
+@item * L[4] = intvec :  
+   L[4][j] = number of variable which is represented by column j+1 of L[1] 
+   ("non-basis variable");
+@item * L[5] = int :  
+   number of constraints (= m);
+@item * L[6] = int :  
+   number of variables (= n).
+@end table
+
+The solution can be read from the first column of L[1] as is done by the 
+procedure @ref{simplexOut} in @code{solve.lib}. 
+
+@item @strong{Example:}
+@smallexample
+@c example
+    ring r = (real,10),(x),lp;
+
+    // consider the max. problem:
+    //
+    //    maximize  x(1) + x(2) + 3*x(3) - 0.5*x(4)
+    //
+    //  with constraints:   x(1) +          2*x(3)          <= 740
+    //                             2*x(2)          - 7*x(4) <=   0
+    //                               x(2) -   x(3) + 2*x(4) >=   0.5
+    //                      x(1) +   x(2) +   x(3) +   x(4)  =   9
+    //
+    matrix sm[5][5]=(  0, 1, 1, 3,-0.5,
+                     740,-1, 0,-2, 0,
+                       0, 0,-2, 0, 7,
+                     0.5, 0,-1, 1,-2,
+                       9,-1,-1,-1,-1);
+
+    int n = 4;  // number of constraints
+    int m = 4;  // number of variables
+    int m1= 2;  // number of <= constraints
+    int m2= 1;  // number of >= constraints
+    int m3= 1;  // number of == constraints
+    simplex(sm, n, m, m1, m2, m3);
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{simplexOut}.
+@c ref
+@c ---------------------------------------
+@node simplify, size, simplex, Functions
 @subsection simplify
 @cindex simplify
 @table @code
