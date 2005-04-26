@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.345 2005-04-18 15:10:04 Singular Exp $ */
+/* $Id: iparith.cc,v 1.346 2005-04-26 08:59:10 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2973,7 +2973,8 @@ static BOOLEAN jjDEG_M(leftv res, leftv u)
 static BOOLEAN jjDEGREE(leftv res, leftv v)
 {
   assumeStdFlag(v);
-  scDegree((ideal)v->Data(),currQuotient);
+  intvec *module_w=(intvec*)atGet(v,"isHomog");
+  scDegree((ideal)v->Data(),module_w,currQuotient);
   return FALSE;
 }
 static BOOLEAN jjDEFINED(leftv res, leftv v)

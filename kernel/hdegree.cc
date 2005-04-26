@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hdegree.cc,v 1.3 2004-10-05 11:25:39 pohl Exp $ */
+/* $Id: hdegree.cc,v 1.4 2005-04-26 08:57:54 Singular Exp $ */
 /*
 *  ABSTRACT -  dimension, multiplicity, HC, kbase
 */
@@ -806,12 +806,24 @@ void scPrintDegree(int co, int mu)
     Print("// dimension (local)   = %d\n// multiplicity = %d\n", di, mu);
 }
 
-int scDegree(ideal S, ideal Q)
+void scDegree(ideal S, intvec *modulweight, ideal Q)
 {
-  hDegree(S, Q);
-  int di = pVariables-hCo;
-  if (di!=0) return hMu;
-  else /*variety is empty or not projective*/ return 0;
+  int co, mu, l;
+  intvec *hseries2;
+  intvec *hseries1 = hFirstSeries(S, modulweight, Q);
+  l = hseries1->length()-1;
+  if (l > 1)
+    hseries2 = hSecondSeries(hseries1);
+  else
+    hseries2 = hseries1;
+  hDegreeSeries(hseries1, hseries2, &co, &mu);
+  if ((l == 1) &&(mu == 0))
+    scPrintDegree(pVariables+1, 0);
+  else
+    scPrintDegree(co, mu);
+  if (l>1)
+    delete hseries1;
+  delete hseries2;
 }
 
 static void hDegree0(ideal S, ideal Q)

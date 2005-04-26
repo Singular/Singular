@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hilb.cc,v 1.1.1.1 2003-10-06 12:15:53 Singular Exp $ */
+/* $Id: hilb.cc,v 1.2 2005-04-26 08:58:13 Singular Exp $ */
 /*
 *  ABSTRACT -  Hilbert series
 */
@@ -402,7 +402,7 @@ intvec * hSecondSeries(intvec *hseries1)
   return hseries2;
 }
 
-static void hDegreeSeries(intvec *s1, intvec *s2, int *co, int *mu)
+void hDegreeSeries(intvec *s1, intvec *s2, int *co, int *mu)
 {
   int m, i, j, k;
   *co = *mu = 0;
