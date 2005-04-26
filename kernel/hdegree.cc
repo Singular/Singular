@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hdegree.cc,v 1.4 2005-04-26 08:57:54 Singular Exp $ */
+/* $Id: hdegree.cc,v 1.5 2005-04-26 17:15:21 Singular Exp $ */
 /*
 *  ABSTRACT -  dimension, multiplicity, HC, kbase
 */
@@ -797,7 +797,7 @@ void scPrintDegree(int co, int mu)
   int di = pVariables-co;
   if (pOrdSgn == 1)
   {
-    if (di!=0)
+    if (di>0)
       Print("// dimension (proj.)  = %d\n// degree (proj.)   = %d\n", di-1, mu);
     else
       Print("// dimension (affine) = 0\n// degree (affine)  = %d\n",       mu);
