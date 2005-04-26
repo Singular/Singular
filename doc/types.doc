@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.122 2004-05-13 16:27:55 levandov Exp $
+@comment $Id: types.doc,v 1.123 2005-04-26 20:05:41 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -1957,10 +1957,10 @@ Z/p -> Z/p' : [i]_p in Z/p -> i in [-p/2,p/2] in Z, i -> [i]_p' in Z/p'
 @end ifinfo
 @item
 @tex
-$C \rightarrow R, \quad$ the real part
+$C \rightarrow R, \quad$ by taking the real part
 @end tex
 @ifinfo
-C -> R : the real part
+C -> R by taking the real part.
 @end ifinfo
 @end itemize
 
@@ -2023,7 +2023,7 @@ defines a ring map from preimage_ring to basering.
 If the ideal contains less elements than variables in the
 preimage_ring the remaining variables are mapped to 0, if the ideal contains
 more elements these are ignored.
-The image ring is always the actual basering.
+The image ring is always the current basering.
 For the mapping of coefficients from different fields see @ref{map}.
 
 @item Default:
@@ -2094,7 +2094,8 @@ map expressions combined by composition using parentheses (@code{(}, @code{)})
 @item @code{( )}
 composition of maps. If, for example, @code{f} and @code{g} are maps,
 then @code{f(g)} is a map expression giving the composition of @code{f}
-and @code{g}.
+and @code{g},
+@* provided the target ring of @code{g} is the basering of @code{f}.
 
 @item map_expression @code{[} int_expressions @code{]}
 is a map entry (the image of the corresponding variable)
@@ -2517,7 +2518,7 @@ See
 addition (concatenation of the generators and simplification)
 
 @item @code{*}
-multiplication with ideal or poly, but not `module` * `module`
+multiplication with ideal or poly (but not `module` * `module`!)
 
 @item module_expression @code{[} int_expression @code{,} int_expression @code{]}
 is a module entry, where the first index indicates the row and
@@ -2959,7 +2960,7 @@ defines a package
 
 Polynomials are the basic data for all main algorithms in
 @code{@sc{Singular}}. They consist of finitely many terms
-(coefficient*power product) which are combined by the usual polynomial
+(coefficient*monomial) which are combined by the usual polynomial
 operations (see @ref{poly expressions}). Polynomials can only be defined
 or accessed with respect to a basering which determines the coefficient
 type, the names of the indeterminates and the monomial ordering.
@@ -3081,16 +3082,16 @@ negation or subtraction
 multiplication
 
 @item @code{/}
-division by a polynomial, ignoring the rest
+division by a polynomial, non divisible terms yield 0
 
 @item @code{^}, @code{**}
-power by an integer
+power by a positive integer
 
 @item @code{<}, @code{<=}, @code{>}, @code{>=}, @code{==}, @code{<>}
-comparison (w.r.t. monomial ordering)
+comparison (of leading monomials w.r.t. monomial ordering)
 
 @item poly_expression @code{[} intvec_expression @code{]}
-the monomial at the indicated place w.r.t.@: the monomial ordering
+the sum of monomials at the indicated places w.r.t. the monomial ordering
 @end table
 
 @*@strong{Example:}
@@ -3133,8 +3134,8 @@ matrix of coefficients and monomials (see @ref{coef})
 matrix of coefficients (see @ref{coeffs})
 @item deg
 degree (see @ref{deg})
-@item det
-determinant (see @ref{det})
+@c @item det
+@c determinant (see @ref{det})
 @item diff
 partial derivative (see @ref{diff})
 @item extgcd

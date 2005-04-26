@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.228 2005-04-26 12:47:42 Singular Exp $
+@comment $Id: reference.doc,v 1.229 2005-04-26 20:05:39 levandov Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -401,9 +401,10 @@ generator in the first module.
 @*For the computation betti uses only the initial monomials. This could lead
 to confusing results for a non-homogeneous input.
 
-The optional second argument is a switch for the minimization of the Betti
-numbers. If it is 0 then the Betti numbers correspond exactly to the input -
-otherwise the command is identical to the one-argument form.
+If the optional second argument is non-zero, the Betti
+numbers will be minimized. 
+@c If it is 0 then the Betti numbers correspond exactly to the input -
+@c otherwise the command is identical to the one-argument form.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -3770,7 +3771,7 @@ A1
 @end ifinfo
 are a minimal set of generators
 of M if the basering is local or if M is homogeneous.
-If the int expression k is not zero then the computation stops after k steps
+If the int expression k is not zero, then the computation stops after k steps
 and returns a list of modules
 @tex
 $M_i={\tt module}(A_i)$, i=1...k.
