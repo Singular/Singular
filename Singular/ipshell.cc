@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.103 2005-04-26 17:12:24 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.104 2005-04-26 18:21:26 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -410,8 +410,10 @@ void killlocals(int v)
   if (changed)
   {
     currRingHdl=rFindHdl(cr,NULL,NULL);
-    if (currRingHdl==NULL) currRingHdl=sh;
-    rChangeCurrRing(cr);
+    if (currRingHdl==NULL) 
+      currRing=NULL;
+    else
+      rChangeCurrRing(cr);
   }
 
   if (myynest<=1) iiNoKeepRing=TRUE;
