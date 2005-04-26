@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hutil.cc,v 1.4 2005-04-22 16:32:15 Singular Exp $ */
+/* $Id: hutil.cc,v 1.5 2005-04-26 17:14:36 Singular Exp $ */
 /*
 * ABSTRACT: Utilities for staircase operations
 */
@@ -149,11 +149,13 @@ void hDelete(scfmon ev, int ev_length)
 
 void hComp(scfmon exist, int Nexist, int ak, scfmon stc, int *Nstc)
 {
-  int  i = Nexist, k = 0;
+  int k = 0;
   scfmon ex = exist, co = stc;
-  for (; i; i--)
+  int i;
+
+  for (i = Nexist; i>0; i--)
   {
-    if (!(**ex) || ((**ex) == ak))
+    if (((**ex) == 0) || ((**ex) == ak))
     {
       *co = *ex;
       co++;
