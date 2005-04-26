@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: pluconventions.doc,v 1.7 2004-08-12 16:58:19 levandov Exp $
+@comment $Id: pluconventions.doc,v 1.8 2005-04-26 20:04:47 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -15,7 +15,7 @@
 @settitel PLURAL
 @node Top, PLURAL conventions, (dir), (dir)
 @menu
-* PLURAL conventions ::
+*  PLURAL conventions ::
 @end menu
 @node PLURAL conventions,  , Top, Top
 @chapter PLURAL conventions
@@ -34,59 +34,107 @@
 @c @end menu
 
 @c ----------------------------------------------- 
-@table @strong
 
-@item relations on algebra
+@table @strong
+@item @strong{What is @sc{Plural}?}
+
+@sc{Plural} is a kernel extension of @sc{Singular},
+providing many algorithms for computations within certain noncommutative algebras
+@* (see @ref{Mathematical background @value{PSUFFIX}} for detailed
+information on algebras and algorithms).
+
+@sc{Plural} is compatible with @sc{Singular}, that is it uses the
+same data structures, 
+sometimes interpreting them in a different way
+@* and/or modifying them for its own purposes. 
+In spite of such a difference, one can always transfer 
+objects from @sc{Singular} to @sc{Plural} and back.
+
+Functionalities of @sc{Plural} (see @ref{Functions  @value{PSUFFIX}}) are accessible as soon as the basering becomes noncommutative (see @ref{ncalgebra}).
+
+@end table
+
+
+@table @strong
+@item @strong{What @sc{Plural} does not do:}
+@itemize 
+
+@item @sc{Plural} does not perform computations in free algebra
 @itemize 
 @sc{Plural} @strong{can not} compute in free algebra or in its
 general factor algebras. One can only input and work with 
-G-algebras (see @ref{G-algebras}), which relations are of the special form
-but still general enough to handle many important algebras. See
-@ref{PLURAL libraries} for pre-defined definitions for many of them.
+G-algebras (see @ref{G-algebras}), 
+@* which relations are of the special form
+but still general enough to handle many important algebras. 
+
+@* See @ref{PLURAL libraries} for procedures, setting 
+many important algebras in an easy way.
 @end itemize
+
+@item @sc{Plural} does not work with local and mixed orderings
+
+Right now, one can use only global orderings in @sc{Plural}
+(see @ref{ General definitions for orderings }). 
+
+This will be enhaced in future by providing the possibility of computations in a tensor product of a noncommutative algebra (with a global ordering)
+@* with a commutative algebra (with any ordering).
+
+@item @sc{Plural} does not handle noncommutative parameters
+
+Defining parameters, one @strong{can not} impose noncommutative relations
+on them. Moreover, it is impossible to introduce 
+@* parameters which do not commute with variables. 
+
+@end itemize
+@end table
+
+
+@table @strong  
+@item @sc{Plural} conventions
 
 @item *-multiplication  @value{PSUFFIX}
 @itemize 
 
-in the non-commutative case,
-one should use @code{y*x} for the multiplication while @code{yx} is interpreted as
-commutative expression. See example in  @ref{poly expressions @value{PSUFFIX}}. 
+in the noncommutative case, the correct multiplication of @code{y} by
+ @code{x} must be written as @code{y*x}. 
+@* Both expressions @code{yx} and @code{xy} are equal, since they are 
+interpreted as commutative expressions. See example in @ref{poly expressions @value{PSUFFIX}}. 
 
 @end itemize
-
-
 
 @item   @code{ideal} @value{PSUFFIX}
 @itemize
                         
-Under an @code{ideal} @sc{Plural} understands a @strong{left} ideal.
-For more information see @ref{ideal @value{PSUFFIX}}. For the operations
-with two-sided ideals see @ref{twostd}. 
+Under an @code{ideal} @sc{Plural} understands a list of generators
+of a @strong{left} ideal. For more information see @ref{ideal @value{PSUFFIX}}.
+ @* For a @strong{two-sided ideal} @code{T}, use command @ref{twostd} in order to compute
+the two-sided Groebner basis of @code{T}.
+@c ( at the same time it is a left Groebner basis).
 @end itemize
 
 @item @code{module} @value{PSUFFIX}
 @itemize
-Under a @code{module} @sc{Plural} understands a @strong{left} submodule of a free module of a finite rank.
-For more information see @ref{module @value{PSUFFIX}}. 
+Under a @code{module} @sc{Plural} understands 
+@strong{either} a fininitely generated @strong{left} submodule of a free module (of finite rank) 
+@* @strong{or} a factor module of a free module (of finite rank) by its left submodule (see @ref{module @value{PSUFFIX}} for details).
 @end itemize
 
-@item ordering @value{PSUFFIX}
-@itemize
-@sc{Plural} works with @strong{global} orderings  only.  
-@ifset singularmanual
-See @ref{ General definitions for orderings }
-@end ifset
-@ifclear singularmanual 
-See @sc{Singular} manual section General definitions for orderings. 
-@end ifclear
-
-@end itemize
+@c @item ordering @value{PSUFFIX}
+@c @itemize
+@c @sc{Plural} works with @strong{global} orderings  only.  
+@c @ifset singularmanual
+@c See @ref{ General definitions for orderings }
+@c @end ifset
+@c @ifclear singularmanual 
+@c See @sc{Singular} manual section General definitions for orderings. 
+@c @end ifclear
+@c @end itemize
 
 @item @code{qring} @value{PSUFFIX}
 
 @itemize
-In @sc{Plural} it is only possible to build factor-algebras modulo @strong{two-sided} ideals. 
+In @sc{Plural} it is only possible to build factor-algebras modulo @strong{two-sided} ideals (see @ref{qring @value{PSUFFIX}}). 
 @end itemize 
-
-
 @end table   
+
+

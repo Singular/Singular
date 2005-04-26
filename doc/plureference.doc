@@ -1,5 +1,5 @@
   @comment -*-texinfo-*-
-@comment $Id: plureference.doc,v 1.26 2005-03-08 13:50:35 levandov Exp $
+@comment $Id: plureference.doc,v 1.27 2005-04-26 20:04:48 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -81,8 +81,7 @@ The general syntax of a function is
 @item @strong{Type:}
 intmat
 @item @strong{Note:}
-in the non-commutative case it makes sense only if your basering R has
-homogeneous relations
+in the noncommutative case, computing Betti numbers makes sense only if the basering @math{R} has homogeneous relations
 @item @strong{Purpose:}
 with 1 argument: computes the graded Betti numbers of a minimal resolution of
 @tex
@@ -95,7 +94,7 @@ $R^n/M$.
 @*
 @end iftex
 @tex
-The entry d of the intmat at place (i,j) is the minimal number of
+The entry d of the intmat at place (i, j) is the minimal number of
 generators in degree i+j of the j-th syzygy module (= module of
 relations) of $R^n/M$ (the 0th (resp.\ 1st) syzygy module of $R^n/M$ is
 $R^n$ (resp.\ $M$)).
@@ -105,67 +104,34 @@ R^n/M, if R denotes the basering and
 M a homogeneous submodule of R^n and the argument represents a resolution of
 R^n/M:
 @*The entry d of the intmat at place (i,j) is the minimal number of
-generators in degree i+j of the j-th syzygy module (= module of
-relations) of R^n/M (the 0th (resp.@: 1st) syzygy module of R^n/M is R^n
+generators in degree i+j of the j-th syzygy module 
+@c (= module of relations) 
+of R^n/M (the 0th (resp.@: 1st) syzygy module of R^n/M is R^n
 (resp.@: M)).
 @end ifinfo
-The argument is considered to be the result of a res/sres/mres/nres/lres
+The argument is considered to be the result of a @code{mres} or @code{nres}
 command. This implies that a zero is only allowed (and counted) as a
 generator in the first module.
-@*For the computation betti uses only the initial monomials. This could lead
-to confusing results for a non-homogeneous input.
+@*For the computation @code{betti} uses only the initial monomials. This could lead to confusing results for a non-homogeneous input.
 
-The optional second argument is a switch for the minimization of the Betti
-numbers. If it is 0 then the Betti numbers correspond exactly to the input -
-otherwise the command is identical to the one-argument form.
+@c The optional second argument is a switch for the minimization of the Betti
+@c numbers. If it is 0 then the Betti numbers correspond exactly to the input -
+@c otherwise the command is identical to the one-argument form.
 @item @strong{Example:}
 @smallexample
 @c example
- // proposed by Uli Walther
-int N=2;
-int i;
+int i;int N=2;
 ring r=0,(x(1..N),d(1..N),q(1..N)),Dp;
 matrix D[3*N][3*N];
 for (i=1;i<=N;i++)
-{
-  D[i,N+i]=q(i)^2;
-}
-ncalgebra(1,D); // a kind of homogenized Weyl algebra
+{ D[i,N+i]=q(i)^2; }
+ncalgebra(1,D); // this algebra is a kind of homogenized Weyl algebra
 r;
-ideal I= maxideal(1);
-I;
+ideal I = x(1),x(2),d(1),d(2),q(1),q(2);
 option(redSB);
 option(redTail);
 resolution R = mres(I,0); // the full length resolution
 print(betti(R),"betti");
-kill r;
-// betti in qring
-LIB "nctools.lib";
-int N=1;
-int i;
-ring r=0,(x(1..N),d(1..N),q(1..N)),Dp;
-matrix C = UpOneMatrix(3*N);
-for (i=1;i<=N;i++)
-{
-  C[i,N+i]=-1;
-  C[i,2*N+i]=-1;
-  C[N+i,2*N+i]=-1;
-}
-ncalgebra(C,0);
-ideal I=0;
-for (i=1;i<=N;i++)
-{
-  I=I,x(i)^2,d(i)^2,x(i)*d(i)+q(i)^2;
-}
-option(redSB);
-option(redTail);
-I = twostd(I);
-qring QR=I;
-QR;
-ideal M = maxideal(1);
-resolution RM = mres(M,5); // only first 5 steps
-print(betti(RM),"betti");
-
 @c example
 @end smallexample
 @end table
@@ -178,7 +144,7 @@ print(betti(RM),"betti");
 
 @table @code
 @item @strong{Syntax:}
-@code{bracket (} poly_expression p, poly_expression q @code{)}
+@code{bracket (} poly_expression, poly_expression @code{)}
 @item @strong{Type:}
 poly
 @item @strong{Purpose:}
@@ -188,12 +154,12 @@ the second. Uses special routines, based on the Leibniz rule.
 @smallexample
 @c example
 ring r=(0,Q),(x,y,z),Dp;
-minpoly=Q^4+Q^2+1;
+minpoly=Q^2-Q+1;
 matrix C[3][3];
 matrix D[3][3];
 C[1,2]=Q2;    C[1,3]=1/Q2;  C[2,3]=Q2;
 D[1,2]=-Q*z;  D[1,3]=1/Q*y; D[2,3]=-Q*x; 
-ncalgebra(C,D);  // this is a quantum deformation of U(so_3).
+ncalgebra(C,D);  // this is a quantum deformation of U(so_3) with q a 6th root of unity
 poly p=Q^4*x2+y2+Q^4*z2+Q*(1-Q^4)*x*y*z; // this is the central element  
 p=p^3; // it is still central
 poly q=(x+Q*y+Q^2*z)^4;  // take some big noncentral element
@@ -212,39 +178,37 @@ bracket(p,q); // check p*q=q*p
 @item @strong{Syntax:}
 @code{eliminate (} ideal_expression@code{,} product_of_ring_variables@code{)}
 @*@code{eliminate (} module_expression@code{,} product_of_ring_variables@code{)}
-@*@code{eliminate (} ideal_expression@code{,} product_of_ring_variables@code{,} intvec_hilb @code{)}
-@*@code{eliminate (} module_expression@code{,} product_of_ring_variables@code{,} intvec_hilb @code{)}
 @item @strong{Type:}
 the same as the type of the first argument
 @item @strong{Purpose:}
 eliminates variables occurring as factors of the second argument from an
 ideal, resp.@: module, by intersecting it with the subring not containing
 these variables.
-@item @strong{Note:} @code{eliminate} does not need a special ordering nor a Groebner basis as input.
-@c @item @strong{Note:}
-@c Since elimination is expensive, for homogeneous input it might be useful
-@c first to compute the Hilbert function of the ideal (first
-@c argument) with a fast ordering (e.g., @code{dp}). Then make use of it to speed
-@c up the computation: a Hilbert-driven elimination uses the intvec
-@c provided as the third argument.
+@item @strong{Note:}  
+@code{eliminate} does not need neither a special ordering on the basering nor a Groebner basis as input.
+@item @strong{Remark:}
+ in noncommutative case, not every subset of a set of variables generates
+a proper subalgebra. Even if it is so, there may be cases, when still
+no elimination is possible. In these situations special error messages
+will be returned.
+
 @item @strong{Example:}
 @smallexample
 @c example error
 ring r=0,(e,f,h,a),Dp;
 matrix d[4][4];
 d[1,2]=-h; d[1,3]=2*e; d[2,3]=-2*f;
-ncalgebra(1,d);  // this is U(sl_2), tensored with K[a] over K
+ncalgebra(1,d);  // this algebra is U(sl_2), tensored with K[a] over K
 option(redSB);
 option(redTail);
-poly p=4*e*f+h^2-2*h-a;  // this is central element with parameter
-ideal I=e^3,f^3, h^3-4*h,p;
-ideal J=eliminate(I,e*f*h);
-// this will give us the central character of I
+poly  p = 4*e*f+h^2-2*h-a;  // this is central element with parameter
+ideal I = e^3,f^3, h^3-4*h,p;
+ideal J = eliminate(I,e*f*h);  // this will give us the central character of I
 J;
-// now we try to eliminate h, 
-// that is to intersect I with subalgebra [e,f]
-// which is not admissible subalgebra!
+// now we try to eliminate h, that is to intersect I with subalgebra S,
+// generated by e and f. But S is not closed in itself:
 eliminate(I,h); 
+// since a commutes with e,f,h, we can eliminate it:
 eliminate(I,a);
 @c example
 @end smallexample
@@ -324,17 +288,19 @@ variables, not their names.
 @smallexample
 @c example
 LIB "ncalg.lib";
-def Usl2 = sl2();
+def Usl2 = sl2(); // this algebra is U(sl_2)
 setring Usl2;
+option(redSB); 
+option(redTail);
 poly  C  = 4*e*f+h^2-2*h; // the central element of U(sl2)
 ideal I  = e^3,f^3,h^3-4*h;
 ideal J  = twostd(I);
-J;
-ideal QC = twostd(C);
+print(matrix(J));  // print a compact presentation of J
+ideal QC = twostd(C-8);
 qring Q  = QC;
 ideal QJ = fetch(Usl2,J);
 QJ = std(QJ);
-QJ; 
+print(matrix(QJ)); // print a compact presentation of QJ
 @c example
 @end smallexample
 @end table
@@ -367,22 +333,22 @@ different ground fields).
 Useful for mapping from a homogenized ring to the original ring or
 for mappings from/to rings with/without parameters. Compared with
 @code{fetch}, @code{imap} uses the names of variables and parameters.
-Unlike @code{map} and @code{fetch} @code{imap} can map parameters to variables.
+Unlike @code{map} and @code{fetch}, @code{imap} can map parameters to variables.
 @item @strong{Example:}
 @smallexample
 @c example
 LIB "ncalg.lib";
-ring ABP=0,(p4,p5,a,b),dp;
+ring ABP=0,(p4,p5,a,b),dp; //  a commutative ring
 def Usl3 = sl(3);
-def BIG = Usl3+ABP;
+def BIG  = Usl3+ABP;
 setring BIG;
 poly P4 = 3*x(1)*y(1)+3*x(2)*y(2)+3*x(3)*y(3)+h(1)^2+h(1)*h(2)+h(2)^2-3*h(1)-3*h(2);  // central element of U(sl_3) of degree 2
 poly P5 = 4*x(1)*y(1) + h(1)^2 - 2*h(1); // central element of the subalgebra of U(sl_3), isomorphic to U(sl_2)
 ideal J = x(1),x(2),h(1)-a,h(2)-b; // we are interested in the module U(sl_3)/J, depending on parameters a,b
-ideal I = p4-P4,p5-P5;
-ideal K = I,J;
+ideal I = p4-P4, p5-P5;
+ideal K = I, J;
 ideal E = eliminate(K,x(1)*x(2)*x(3)*y(1)*y(2)*y(3)*h(1)*h(2));
-E; // this is the ideal of central characters
+E; // this is the ideal of central characters in ABP
 ring abP = (0,a,b),(p4,p5),dp; // what are the characters on nonzero a,b?
 ideal abE = imap(BIG, E);
 option(redSB);
@@ -417,15 +383,12 @@ ideal, resp. module
 
 @item @strong{Purpose:}
 computes the intersection of ideals, resp. modules. 
-
-
 @item @strong{Example:}
-
+@c // 1. from [BGV], p.213, Ex.2.5. answer: [0,xy^2],[y^2,-xy]
+@c // 2. from [BGV], p.148, Ex.3.8
 @smallexample
 @c example
-
-// from [BGV], p.213, Ex.2.5
-ring r2=0,(x,y),dp;
+ring r=0,(x,y),dp;
 ncalgebra(-1,0);
 module M=[x,x],[y,0];
 module N=[0,y^2],[y,x];
@@ -433,18 +396,16 @@ option(redSB);
 module Res;
 Res=intersect(M,N);
 print(Res);
-kill r2;
-
-// from [BGV], p.148, Ex.3.8
+kill r;
+//--------------------------------
 LIB "ncalg.lib";
 ring r=0,(x,d),dp;
-Weyl(); // supply r with the structure of the 1st Weyl algebra
+Weyl(); // make r into Weyl algebra
 ideal I = x+d^2;
 ideal J = d-1;
 ideal H = intersect(I,J);
 H;
 @c example
-@c //answer: [0,xy^2],[y^2,-xy]
 @end smallexample
 @end table
 
@@ -475,26 +436,23 @@ this is the same as the vector space basis of the
 factor-module. 
 
 @item @strong{Note:}
-you have the ring structure on the ring modulo the ideal if and only
-if the ideal is two-sided. 
-
+in the noncommutative case, a ring modulo an ideal has a ring stucture 
+if and only if an ideal is two-sided. 
 @item @strong{Example:}
 @smallexample
 @c example
-  ring r=0,(x,y,z),dp;
-  matrix d[3][3];
-  d[1,2]=-z;
-  d[1,3]=2x;
-  d[2,3]=-2y;
-  ncalgebra(1,d);
-  ideal i=x2,y2,z2-1;
-  i=std(i);
-  i;
-  kbase(i);
-  vdim(i);
-  ideal j=x,z-1;
-  j=std(j);
-  kbase(j,3);
+ring r=0,(x,y,z),dp;
+matrix d[3][3];
+d[1,2]=-z;  d[1,3]=2x;  d[2,3]=-2y;
+ncalgebra(1,d); // this algebra is U(sl_2)
+ideal i=x2,y2,z2-1;
+i=std(i);
+print(matrix(i));  // print a compact presentation of i
+kbase(i);
+vdim(i);
+ideal j=x,z-1;
+j=std(j);
+kbase(j,3);
 @c example
 @end smallexample
 @end table
@@ -514,45 +472,40 @@ See
 @item @strong{Syntax:}
 @code{lift (} ideal_expression@code{,} subideal_expression @code{)}
 @*@code{lift (} module_expression@code{,} submodule_expression @code{)}
-@*@code{lift (} ideal_expression@code{,} subideal_expression@code{,} matrix_name @code{)}
-@*@code{lift (} module_expression@code{,} submodule_expression@code{,} matrix_name @code{)}
 @item @strong{Type:}
 matrix
 @item @strong{Purpose:}
 computes the left transformation matrix which expresses the generators of a
 submodule in terms of the generators of a module.  Uses different
-algorithms for modules which are, resp.@: are not, represented by a
-standard basis.
+algorithms for modules which are (resp.@: are not) represented by a
+Groebner basis.
 @* More precisely, if  @code{m} is the
-module (or ideal), @code{sm} the submodule (or ideal),
+module, @code{sm} the submodule,
 and @code{T} the transformation matrix returned by
 lift, then @code{transpose(matrix(sm)) = transpose(T)*transpose(m)}
-and @code{module(transpose(sm)) = module(transpose(T)*transpose(m))}
-(resp.@: @code{ideal(sm) = ideal(transpose(T)*transpose(m))}).
-@c where @code{U} is a diagonal matrix of units.
-@*@code{U} is always the unity matrix if the basering is a polynomial ring
-(not power series ring). @code{U} is stored in the optional third argument.
+and @code{module(transpose(sm)) = module(transpose(T)*transpose(m))}.
+If  @code{m} and @code{sm} are ideals, @code{ideal(sm) = ideal(transpose(T)*transpose(m))}.
+
 @item @strong{Note:}
 Gives a warning if @code{sm} is not a submodule.
 @item @strong{Example:}
 @smallexample
 @c example
-  ring r = (0,a),(e,f,h),(c,dp);
-  matrix @D[3][3];
-  @D[1,2]=-h;
-  @D[1,3]=2*e;
-  @D[2,3]=-2*f;
-  ncalgebra(1,@D); // parametric U(sl_2)
-  ideal i = e,h-a;
-  i = std(i);
-  i;
-  poly Z = 4*e*f+h^2-2*h; // central element
-  Z = Z - NF(Z,i); //cen. character
-  ideal j = std(Z);
-  matrix T = lift(i,j);
-  print(T);
-  ideal tj = ideal(transpose(T)*transpose(matrix(i)));
-  std(ideal(j-tj)); // test
+ring r = (0,a),(e,f,h),(c,dp);
+matrix D[3][3];
+D[1,2]=-h;  D[1,3]=2*e;  D[2,3]=-2*f;
+ncalgebra(1,D); // this algebra is a parametric U(sl_2)
+ideal i = e,h-a;
+i = std(i);
+print(matrix(i)); // print a compact presentation of i
+poly Z = 4*e*f+h^2-2*h; // central element
+Z = Z - NF(Z,i); //central character
+ideal j = std(Z);
+j;
+matrix T = lift(i,j);
+print(T);
+ideal tj = ideal(transpose(T)*transpose(matrix(i)));
+std(ideal(j-tj)); // test
 @c example
 @end smallexample
 @end table
@@ -575,26 +528,29 @@ See
 @item @strong{Type:}
 ideal or module
 @item @strong{Purpose:}
-returns a standard basis of an ideal or module and the transformation
-matrix from the given ideal, resp.@: module, to the standard basis.
-@*That is, if @code{m} is the ideal or module, @code{sm} the standard
-basis returned by @code{liftstd}, and @code{T} the transformation matrix
-then @code{transpose(matrix(sm))=transpose(T)*transpose(matrix(m))} and @code{sm=ideal(transpose(T)*transpose(matrix(m)))}, 
-resp.@: @code{sm=module(transpose(transpose(T)*transpose(matrix(m))))}.
+returns a Groebner basis of an ideal or module and the transformation
+matrix from the given ideal, resp.@: module, to the Groebner basis.
+@*That is, if @code{m} is the ideal or module, @code{sm} is the Groebner
+basis of  @code{m}, returned by @code{liftstd}, and @code{T} is the transformation matrix,
+then @code{transpose(matrix(sm))=transpose(T)*transpose(matrix(m))} and 
+@code{sm=module(transpose(transpose(T)*transpose(matrix(m))))}.
+
+If @code{m} is an ideal, @code{sm=ideal(transpose(T)*transpose(matrix(m)))}.
 @item @strong{Example:}
 @smallexample
 @c example
-  LIB "ncalg.lib";
-  def A = sl2();
-  setring A;
-  ideal i = e2,f;
-  option(redSB);
-  option(redTail);
-  matrix T;
-  ideal j = liftstd(i,T);
-  print(T);
-  ideal tj = ideal(transpose(T)*transpose(matrix(i)));
-  std(ideal(j-tj)); // test
+LIB "ncalg.lib";
+def A = sl2();
+setring A;  // this algebra is U(sl_2)
+ideal i = e2,f;
+option(redSB);
+option(redTail);
+matrix T;
+ideal j = liftstd(i,T);
+print(matrix(j)); // the Groebner basis, printed in a compact form
+print(T);  // the tansformation matrix
+ideal tj = ideal(transpose(T)*transpose(matrix(i)));
+std(ideal(j-tj)); // test
 @c example
 @end smallexample
 @end table
@@ -603,8 +559,7 @@ See
 @ref{ideal @value{PSUFFIX}};
 @ref{ring @value{PSUFFIX}};
 @ref{option @value{PSUFFIX}};
-@ref{std @value{PSUFFIX}};
-@ref{matrix}.
+@ref{std @value{PSUFFIX}}.
 @c ref
 
 
@@ -629,7 +584,7 @@ operating system during the current @sc{Plural} session.
 @end itemize
 @item @strong{Note:}
 To monitor the memory usage during ongoing computations the option
-@code{mem} should be set (using the command @code{option(mem);} .
+@code{mem} should be set (using the command @code{option(mem);}).
 @ifset singularmanual
 see also @ref{option}).
 @end ifset
@@ -677,32 +632,21 @@ resolution
 minimizes a free resolution of an ideal or module
 given by the list_expression, resp.@: resolution_expression.
 @item @strong{Example:}
-
 @smallexample
 @c example
-ring A=0,(x,y,z),Dp;
-matrix d[3][3];
-d[1,2]=-z;
-d[1,3]=2x;
-d[2,3]=-2y;
-ncalgebra(1,d);
-ideal i=x,y,z;
+LIB "ncalg.lib";
+def A = sl2();
+setring A; // this algebra is U(sl_2)
+ideal i=e,f,h;
 i=std(i);
-resolution F=nres(i,0);
-F;
-int a;
-for (a=1;a<=size(list(F));a++)
-{
-printf("Module: %s",a);
-print(matrix(F[a]));
-}
-resolution MF=minres(F);
-MF;
-for (a=1;a<=size(list(MF));a++)
-{
-printf("Module: %s",a);
-print(matrix(MF[a]));
-}
+resolution F=nres(i,0);   F;
+print(matrix(F[1])); // print compact presentations of F's
+print(matrix(F[2]));
+print(matrix(F[3]));
+resolution MF=minres(F);  MF;
+print(matrix(MF[1]));
+print(matrix(MF[2]));
+print(matrix(MF[3]));
 @c example
 @end smallexample
 @end table
@@ -732,7 +676,7 @@ represents h1/(h1 intersect h2) (isomorphic to (h1+h2)/h2)
 @tex
 represents $h_1/(h_1 \cap h_2) \cong (h_1+h_2)/h_2$
 @end tex
-where
+, where
 @tex
 $h_1$ and $h_2$
 @end tex
@@ -741,28 +685,27 @@ h1 and h2
 @end ifinfo
 are considered as submodules of the same free module
 @tex
-$R^l$
+$R^s$
 @end tex
 @ifinfo
-R^l
+R^s
 @end ifinfo
-(l=1 for ideals). Let
+(s=1 for ideals). 
+@*Let
 @tex
-$H_1$, resp.\ $H_2$,
+$H_1$ (resp.\ $H_2$)
 @end tex
 @ifinfo
-H1 and H2
-be the matrices of size l x k, resp.@: l x m, having the columns of
+H1 (resp. H2)
+ be the matrix of size l x k (resp.@: l x m), having the generators of
+ h1 (resp.@: h2)
 @end ifinfo
 @tex
-be the matrices of size $l \times k$, resp.\ $l \times m$, having the
-generators of $h_1$, resp.\ $h_2$,
+ be the matrix of size $l \times k$ (resp.\ $l \times m$), having the
+generators of $h_1$ (resp.\ $h_2$)
 @end tex
-@ifinfo
-h1, resp.@: h2,
-@end ifinfo
 as columns.
-Then
+@* Then
 @tex
 $h_1/(h_1 \cap h_2) \cong R^k / ker(\overline{H_1})$
 @end tex
@@ -774,9 +717,9 @@ $h_1/(h_1 \cap h_2) \cong R^k / ker(\overline{H_1})$
 @*
 @end format
 @end ifinfo
-where
+, where
 @tex
-$\overline{H_1}: R^k \rightarrow R^l/Im(H_2)=R^l/h_2$
+$\overline{H_1}: R^k \rightarrow R^s/Im(H_2)=R^s/h_2$
 is the induced map.
 @end tex
 @ifinfo
@@ -792,25 +735,24 @@ the kernel of this induced map.
 @item @strong{Example:}
 @smallexample
 @c example
-  LIB "ncalg.lib";
-  def A = sl2();
-  setring A;
-  option(redSB);
-  option(redTail);
-
-  ideal I = e2,f2,h2-1;
-  I = twostd(I);
-  I;
-  ideal E = std(e);
-  ideal T = modulo(E,I);
-  T = NF(std(I+T),I);
-  T = std(T);
-  T;
+LIB "ncalg.lib";
+def A = sl2();
+setring A; // this algebra is U(sl_2)
+option(redSB);
+option(redTail);
+ideal I = e2,f2,h2-1;
+I = twostd(I);
+print(matrix(I)); // print a compact presentation of I
+ideal E = std(e);
+ideal T = modulo(E,I);
+T = NF(std(I+T),I);
+T = std(T);
+T;
 @c example
 @end smallexample
 @end table
 @c ref
-See
+See 
 @ref{syz @value{PSUFFIX}}.
 @c ref
 
@@ -850,11 +792,11 @@ $A_1$
 A1
 @end ifinfo
 are a (possibly) minimal set of generators
-of M. 
-If the int expression k is not zero then the computation stops after k steps
+of @math{M}. 
+If the int expression k is not zero, then the computation stops after k steps
 and returns a list of modules
 @tex
-$M_i={\tt module}(A_i)$, i=1...k.
+$M_i={\tt module}(A_i)$, $i= 1 \ldots k$.
 @end tex
 @ifinfo
 Mi=module(Ai), i=1...k.
@@ -871,7 +813,7 @@ L[i]<>0 for i<=p,
 @tex
 ${\tt L[i]}\neq 0$ for $i \le p$,
 @end tex
- but @code{L[p+1]}, the first syzygy module of @code{L[p]},
+ but @code{L[p+1]} (the first syzygy module of @code{L[p]})
 is 0 (if the basering is not a qring).
 @item @strong{Note:}
 Accessing single elements of a resolution may require that some partial
@@ -879,30 +821,20 @@ computations have to be finished and may therefore take some time.
 @item @strong{Example:}
 @smallexample
 @c example
-LIB "poly.lib";
-ring A=0,(x,y,z),Dp;
-matrix d[3][3];
-d[1,2]=-z;
-d[1,3]=2x;
-d[2,3]=-2y;
-ncalgebra(1,d);
-ideal i=x,y,z;
-i=std(i);
+LIB "ncalg.lib";
+def A = sl2();
+setring A; // this algebra is U(sl_2)
+option(redSB);
+option(redTail);
+ideal i = e,f,h;
+i = std(i);
 resolution M=mres(i,0);
-// now we print the resolution out, pretty print its components
-// and check that F is indeed exact
 M;
-for (int a=1;a<=size(list(M));a++)
-{ 
-  printf("Module: %s",a);
-  print(matrix(M[a]));
-  if (a>1)
-  {
-    printf("The defect of exactness at: (%s,%s)",a-1,a);
-    std(flatten(transpose(M[a])*transpose(M[a-1])));
-  }
-}
-
+print(matrix(M[1])); // print compact presentations of M's
+print(matrix(M[2]));
+std(ideal(transpose(M[2])*transpose(M[1]))); // see the exactness at this point
+print(matrix(M[3]));
+std(ideal(transpose(M[3])*transpose(M[2]))); // see the exactness at this point
 @c example
 @end smallexample
 @end table
@@ -912,17 +844,13 @@ See
 @ref{minres @value{PSUFFIX}};
 @ref{nres @value{PSUFFIX}};
 @ref{module @value{PSUFFIX}};
-
 @c ref
-
-
 
 
 @c -----------------------------
 @node ncalgebra, nres @value{PSUFFIX}, mres @value{PSUFFIX}, Functions @value{PSUFFIX}
 @section ncalgebra
 @cindex ncalgebra
-
 
 @table @code
 @item @strong{Syntax:}
@@ -940,7 +868,7 @@ $ x_1, \ldots, x_k ,\;$
  x_1,... ,x_k, 
 @end ifinfo
 creates the
-non-commutative extension of @code{r} subject to relations
+noncommutative extension on @code{r} subject to relations
 @tex 
 $ \{ x_j x_i=c_{ij} \cdot x_i x_j + d_{ij}, 1 \leq i <j \leq k \}, $
 where $ c_{ij}$ and $d_{ij}$ should be organized into two strictly upper
@@ -951,7 +879,7 @@ where c_@{ij@}  and d_@{ij@  should be organized into two strictly upper
 @end ifinfo
  triangular matrices @code{C} with entries
 @tex 
-$ c_{ij}$ 
+$c_{ij}$ 
 @end tex
 @ifinfo
 c_@{ij@} 
@@ -964,60 +892,74 @@ $ d_{ij}$
 @ifinfo
 d_@{ij@} 
 @end ifinfo
- from @code{r}.
+ from @code{r}. 
+@* If
+@tex 
+$\forall i<j$, $c_{ij} = n$ 
+@end tex
+@ifinfo
+for all i<j, c_@{ij@} = n
+@end ifinfo
+ , one can input a number @code{n} instead of matrix @code{C}.
+@* If
+@tex 
+$\forall i<j$, $d_{ij} = p$ 
+@end tex
+@ifinfo
+for all i<j, d_@{ij@} = p
+@end ifinfo
+ , one can input a poly @code{p} instead of matrix @code{D}.
 
 @item @strong{Remark:}
-At present, we do not perform checks of leading monomial condition
-and non-degeneracy conditions (@pxref{G-algebras}), while setting an algebra. 
+At present, we do not perform checks of non-degeneracy conditions (@pxref{G-algebras}) while setting an algebra. 
 
 @item @strong{Example:}
 @smallexample
 @c example
-ring r1=(0,Q),(x,y,z),Dp;
-minpoly=Q^4+Q^2+1;
+LIB "nctools.lib";
+// ------- first example: C, D are matrices -------------------
+ring r1 = (0,Q),(x,y,z),Dp;
+minpoly = RootOfUnity(6);
 matrix C[3][3];
 matrix D[3][3];
-C[1,2]=Q2;
-C[1,3]=1/Q2;
-C[2,3]=Q2;
-D[1,2]=-Q*z;
-D[1,3]=1/Q*y;
-D[2,3]=-Q*x; 
-ncalgebra(C,D);
-// it is quantum deformation U'_q(so_3),
-// with q=Q^2 specialized at the 3rd root of unity
+C[1,2]=Q2;   C[1,3]=1/Q2;  C[2,3]=Q2;
+D[1,2]=-Q*z; D[1,3]=1/Q*y; D[2,3]=-Q*x; 
+ncalgebra(C,D); // this algebra is a quantum deformation U'_q(so_3), with Q^2 being the 3rd root of unity
 r1;
 kill r1;
+// -------- second example : number n=1, D is a matrix --
 ring r2=0,(Xa,Xb,Xc,Ya,Yb,Yc,Ha,Hb),dp;
 matrix d[8][8];
-d[1,2]=-Xc; d[1,4]=-Ha; d[1,6]=Yb;
-d[1,7]=2*Xa; d[1,8]=-Xa; d[2,5]=-Hb;
-d[2,6]=-Ya; d[2,7]=-Xb; d[2,8]=2*Xb;
-d[3,4]=Xb; d[3,5]=-Xa; d[3,6]=-Ha-Hb;
-d[3,7]=Xc; d[3,8]=Xc; d[4,5]=Yc;
-d[4,7]=-2*Ya; d[4,8]=Ya; d[5,7]=Yb;
+d[1,2]=-Xc; d[1,4]=-Ha;  d[1,6]=Yb;     d[1,7]=2*Xa; d[1,8]=-Xa; 
+d[2,5]=-Hb; d[2,6]=-Ya;  d[2,7]=-Xb;    d[2,8]=2*Xb;
+d[3,4]=Xb; d[3,5]=-Xa;   d[3,6]=-Ha-Hb; d[3,7]=Xc;   d[3,8]=Xc; 
+d[4,5]=Yc; d[4,7]=-2*Ya; d[4,8]=Ya;     d[5,7]=Yb;
 d[5,8]=-2*Yb; d[6,7]=-Yc; d[6,8]=-Yc;
-ncalgebra(1,d);
-// it is U(sl_3)
+ncalgebra(1,d);  // this algebra is U(sl_3)
 r2;
 kill r2;
+// -------- third example : C is a matrix, p = 0 is a poly ---
 ring r3=0,(a,b,c,d),lp;
 matrix c[4][4];
 c[1,2]=1; c[1,3]=3; c[1,4]=-2;
 c[2,3]=-1; c[2,4]=-3; c[3,4]=1;
-ncalgebra(c,0);
-// it is some quasi--commutative algebra
+ncalgebra(c,0); // it is a quasi--commutative algebra
 r3;
 kill r3;
-ring r4=0,(t,u,v,w),dp;
-ncalgebra(-1,0);
-// it is anticommutative algebra
+// -------- third example : number n = -1, poly p = 3w --
+ring r4=0,(u,v,w),dp;
+ncalgebra(-1,3w);
 r4;
 kill r4;
-
 @c example
 @end smallexample
 @end table
+@c ref
+See also
+@ref{ncalg_lib};
+@ref{nctools_lib};
+@ref{qmatrix_lib};
+@c ref
 
 
 @c ---------------------------------------
@@ -1031,83 +973,25 @@ kill r4;
 @item @strong{Type:}
 resolution
 @item @strong{Purpose:}
-computes a free resolution of an ideal or module M which is minimized
+computes a free resolution of an ideal or module which is minimized
 from the second module on (by the Groebner basis method).
-
-@c More precisely, let
-@c @tex
-@c $A_1$=matrix(M),
-@c @end tex
-@c @ifinfo
-@c A1=matrix(M),
-@c @end ifinfo
-@c then @code{nres} computes a free resolution of
-@c @ifinfo
-@c coker(A1)=F0/M
-@c @format
-@c                     A2       A1
-@c       ... ----> F2 ----> F1 ----> F0 --> F0/M --> 0.
-@c @end format
-@c @end ifinfo
-@c @tex
-@c $coker(A_1)=F_0/M$
-@c $$...\longrightarrow F_2 \buildrel{A_2}\over{\longrightarrow} F_1 \buildrel{A_1}\over{\longrightarrow} F_0\longrightarrow F_0/M\longrightarrow 0,$$
-@c @end tex
-@c @*where the columns of the matrix
-@c @tex
-@c $A_1$
-@c @end tex
-@c @ifinfo
-@c A1
-@c @end ifinfo
-@c are the given set of generators of M.
-@c If the int expression k is not zero then the computation stops after k steps
-@c and returns a list of modules
-@c @tex
-@c $M_i={\tt module}(A_i)$, i=1..k.
-@c @end tex
-@c @ifinfo
-@c Mi=module(Ai), i=1..k.
-@c @end ifinfo
-@c @*@code{nres(M,0)} returns a list of n modules where n is the number of
-@c variables of the basering.
-@c Let @code{list L=nres(M,0);} then @code{L[1]=M} is identical to the input,
-@c @code{L[2]} is a minimal set of generators for the first syzygy
-@c module of  @code{L[1]}, etc.
-@c @ifinfo
-@c (L[i]=M_i
-@c @end ifinfo
-@c @tex
-@c (${\tt L[i]}=M_i$
-@c @end tex
-@c in the notations from above).
-@c @item @strong{Example:}
+@item @strong{Example:}
 @smallexample
 @c example
-LIB "poly.lib";
-ring A=0,(x,y,z),Dp;
-matrix d[3][3];
-d[1,2]=-z;
-d[1,3]=2x;
-d[2,3]=-2y;
-ncalgebra(1,d);
-ideal i=x,y,z;
-i=std(i);
+LIB "ncalg.lib";
+def A = sl2();
+setring A; // this algebra is U(sl_2)
+option(redSB);
+option(redTail);
+ideal i = e,f,h;
+i = std(i);
 resolution F=nres(i,0);
-// now we print the resolution componentwise
-// and check that F is indeed exact
 F;
-for (int a=1;a<=size(list(F));a++)
-{ 
-  printf("Module: %s",a);
-  print(matrix(F[a]));
-  if (a>1)
-  {
-    printf("Obstruction of exactness at: (%s,%s)",a-1,a);
-    std(flatten(transpose(F[a])*transpose(F[a-1])));
-  }
-}
-
+print(matrix(F[1]));  // print the resolution componentwise
+print(matrix(F[2]));
+std(ideal(transpose(F[2])*transpose(F[1]))); // see the exactness at this point
+print(matrix(F[3]));
+std(ideal(transpose(F[3])*transpose(F[2]))); // see the exactness at this point
 @c example
 @end smallexample
 @end table
@@ -1128,39 +1012,38 @@ See
 @item @strong{Syntax:}
 @code{oppose (} ring_name, name @code{)}
 @item @strong{Type:}
-poly, vector, ideal, module or matrix
-(the same type as the second argument)
+poly, vector, ideal, module or matrix (the same type as the second argument)
 @item @strong{Purpose:}
 for a given object in the given ring, creates its opposite object
 in the opposite ring (the last one is assumed to be the current ring).
 @item @strong{Remark:}
-for an object
-@iftex
- $O, (O^opp)^opp = O$.
-@end iftex
+for any object
+@tex
+ $O, \; (O^{opp})^{opp} = O$.
+@end tex
 @ifinfo
- O, (O^opp)^opp = O. 
+ O,  (O^opp)^opp = O. 
 @end ifinfo
 @smallexample
 @c example 
 LIB "ncalg.lib";
 def r = sl2();
 setring r;
-poly   p = (h^2-1)*f*e;
-vector v = [1,e*h,0,p];
-ideal  i = h*e, f^2*e,h*f*e;
-matrix m[3][4]=e,f,h,1,0,h^2, p,0,0,1,e^2,e*f*h+1;
-module mm =module(m); 
-def b = opposite(r);
+matrix m[3][4];
+poly   p  = (h^2-1)*f*e;
+vector v  = [1,e*h,0,p];
+ideal  i  = h*e, f^2*e,h*f*e;
+m         = e,f,h,1,0,h^2, p,0,0,1,e^2,e*f*h+1;
+module mm = module(m); 
+def b     = opposite(r);
 setring b; b;   // we will oppose this collection of objects
 poly P    = oppose(r,p); 
 vector V  = oppose(r,v);
-ideal I   = oppose(r,i);
+ideal  I  = oppose(r,i);
 matrix M  = oppose(r,m);
 module MM = oppose(r,mm);
-// now let's check the correctness:
-setring r;
-print(matrix(oppose(b,P)-p));
+setring r;   // now let's check the correctness:
+print(matrix(oppose(b,P)-p)); // print compact presentations of objects
 print(matrix(oppose(b,V)-v));
 print(matrix(oppose(b,I)-i));
 print(matrix(oppose(b,M)-m));
@@ -1191,6 +1074,7 @@ You have to activate the ring with the @code{setring} command.
 @* An opposite algebra of a given algebra is
 an algebra with the same vectorspace but with the opposite
 multiplication, i.e.
+@*
 @tex
 $\forall \; f,g \in A^{opp}$, a new multiplication $*$ on $A^{opp}$ 
 is defined to be $f*g := g \cdot f$.
@@ -1212,7 +1096,7 @@ with the reverse order of columns).
 @smallexample
 @c example 
 LIB "ncalg.lib";
-def B = Qso3(3);
+def B = Qso3(3);  //this algebra is a quantum deformation of U(so_3), where the quantum parameter is a 3rd root of unity
 setring B; B;
 def Bopp = opposite(B);
 setring Bopp; 
@@ -1373,17 +1257,15 @@ See
 ideal
 @item @strong{Purpose:}
 returns the preimage of an ideal under a given map.
-@*
 The second argument has to be a map from the basering to the given ring
 (or an ideal defining such a map),
 and the ideal has to be an ideal in the given ring.
 @item @strong{Note:}
 To compute the kernel of a map, the preimage of zero has to be determined.
 Hence there is no special command for computing the kernel of a map in
-@sc{Singular}. 
-@item @strong{Note:}
-at the moment it could be computed 
-only for maps A -> B, where A is commutative
+@sc{Plural}. 
+@item @strong{Remark:}
+in the noncommutative case, it is implemented only for maps A -> B, where A is  a commutative ring
 @item @strong{Example:}
 @smallexample
 @c example
@@ -1392,17 +1274,17 @@ ring   R = 0,a,dp;
 def Usl2 = sl2();
 setring Usl2;
 poly  C = 4*e*f+h^2-2*h; // the central element of U(sl2)
-ideal I = e^3,f^3,h^3-4*h;
+ideal I = e^3, f^3, h^3-4*h;
 ideal J = twostd(I); // two-sided GB
 ideal K = std(I);    // left GB
 map Phi = R,C;
 setring R;
 ideal PreJ = preimage(Usl2,Phi,J); // central character of J
 PreJ;
-factorize(PreJ[1],1); // there are two characters for J
+factorize(PreJ[1],1); // there are two simple characters for J
 ideal PreK = preimage(Usl2,Phi,K); // central character of K
 PreK;
-factorize(PreK[1],1); // there are three characters for K
+factorize(PreK[1],1); // there are three simple characters for K
  
 @c example
 @end smallexample
@@ -1459,15 +1341,16 @@ $\{b \in R^n \mid bJ \subset M\}$.
 @end tex
 @end itemize
 @item @strong{Note:}
-Should be used for two-sided ideals (bimodules) only, otherwise the
+It must used for two-sided ideals (bimodules) only, otherwise the
 result may have no meaning.
 
 @item @strong{Example:}
+@c // from [BGV], Ex.3.17, p.150, modified by q
 @smallexample
 @c example
-// from [BGV], Ex.3.17, p.150
-ring r=0,(x,y),Dp;
-ncalgebra(2,0);
+//------ a very easy example ------------
+ring r=(0,q),(x,y),Dp;
+ncalgebra(q,0); // this algebra is a quantum plane
 option(returnSB);
 poly f1  = x^3+2*x*y^2+2*x^2*y;
 poly f2  = y;
@@ -1479,17 +1362,17 @@ ideal j = f1',f2';
 ideal J = twostd(j);
 quotient(I,J);
 kill r;
-// a bit more complicated example
+//------- a bit more complicated example
 LIB "ncalg.lib";
-def Usl2 =sl2();
+def Usl2 = sl2(); // this algebra is U(sl_2)
 setring Usl2;
 ideal i = e3,f3,h3-4*h;
 ideal I = std(i);
 poly  C = 4*e*f+h^2-2*h;
-ideal H = C-8;
+ideal H = twostd(C-8);
 option(returnSB);
 ideal Q = quotient(I,H);
-Q;
+print(matrix(Q)); // print a compact presentation of Q
 @c example
 @end smallexample
 @end table
@@ -1522,11 +1405,11 @@ See
 @item @strong{Type:}
 the type of the first argument
 @item @strong{Purpose:}
-reduces a polynomial, vector, ideal  or module to its normal form with
-respect to an ideal or module represented by a Groebner basis.
+reduces a polynomial, vector, ideal  or module to its @strong{left} normal form with
+respect to an ideal or module represented by a left Groebner basis.
 Returns 0 if and only if the polynomial (resp.@: vector, ideal, module)
 is an element (resp.@: subideal, submodule) of the ideal (resp.@: module).
-The result may have no meaning if the second argument is not a Groebner basis.
+The result may have no meaning if the second argument is not a left Groebner basis.
 @*The third (optional) argument 1 of type int forces a reduction which considers only the leading term and does no tail reduction.
 @item @strong{Note:}
 The commands @code{reduce} and @code{NF} are synonymous.
@@ -1536,36 +1419,29 @@ The commands @code{reduce} and @code{NF} are synonymous.
 ring r=(0,a),(e,f,h),Dp;
 matrix d[3][3];
 d[1,2]=-h;  d[1,3]=2e;  d[2,3]=-2f;
-ncalgebra(1,d);  // this is parametric U(sl_2)
+ncalgebra(1,d);  // this algebra is a parametric U(sl_2)
 ideal I=e2,f2,h2-1;
 I=std(I);
+print(matrix(I)); // print a compact presentation of I
 ideal J=e,h-a;
 J=std(J);
+print(matrix(J)); // print a compact presentation of J
 poly z=4*e*f+h^2-2*h;   // z is the central element of U(sl_2)
-// the central character of I:
-NF(z,I);
-// the central character of J:
-NF(z,J);
+NF(z,I);  // the central character of I:
+NF(z,J); // the central character of J:
+poly nz = z - NF(z,J); // nz will belong to J
+NF(nz,J);
 @c example
 @end smallexample
 @end table
 
 @c ref
-See
+See also
 @ref{ideal @value{PSUFFIX}};
 @ref{module @value{PSUFFIX}};
 @ref{std @value{PSUFFIX}}.
 @c ref
 
-@ifset singularmanual
-@c ref
-@ref{vector}.
-@c ref
-@end ifset 
-
-@ifclear singularmanual
-see also @code{vector} in @sc{Singular} manual.
-@end ifclear   
 
 @c ---------------------------------------
 @node std @value{PSUFFIX}, subst @value{PSUFFIX}, reduce @value{PSUFFIX}, Functions @value{PSUFFIX}
@@ -1580,17 +1456,18 @@ see also @code{vector} in @sc{Singular} manual.
 @item @strong{Type:}
 ideal or module
 @item @strong{Purpose:}
-returns a Groebner basis of an ideal or module with respect to the
-monomial ordering of the basering.
-A Groebner basis is a set of generators such that
-the leading terms generate the leading ideal, resp.@: module.
+returns a left Groebner basis (see @ref{Groebner bases} for a definition) 
+of an ideal or module with respect to the
+monomial ordering of the basering. 
+@c is a set of generators such that
+@c the leading terms generate the leading ideal, resp.@: module.
 
 Use an optional second argument of type poly, resp.@: vector,
 to construct the Groebner basis from an already computed one (given as the
 first argument) and one additional generator (the second argument).
 @item @strong{Note:}
 To view the progress of long running computations, use
-@code{option(prot)} 
+@code{option(prot)}. 
 @ifset singularmanual 
 (@pxref{option}(prot)).
 @end ifset
@@ -1598,26 +1475,20 @@ To view the progress of long running computations, use
 @item @strong{Example:}
 @smallexample
 @c example
-ring R=0,(x,y,z),dp;
-matrix d[3][3];
-d[1,2]=-z;  d[1,3]=2x;  d[2,3]=-2y;
-ncalgebra(1,d); //U(sl_2)
-ideal I=x2,y2,z2-1;
+LIB "ncalg.lib";
+def R = sl2(); // this algebra is U(sl_2)
+setring R;
+ideal I = e2, f2, h2-1;
 I=std(I);
 I;
 kill R;
 //------------------------------------------
-ring Rq3=(0,Q),(x,y,z),dp; //U'_q(so_3)
-minpoly=Q^2-Q+1; // at the 3rd root of unity
-matrix C[3][3];
-matrix D[3][3];
-C[1,2]=Q2;    C[1,3]=1/Q2;  C[2,3]=Q2;
-D[1,2]=-Q*z;  D[1,3]=1/Q*y; D[2,3]=-Q*x; 
-ncalgebra(C,D);
-ideal J=x2,y2,z2;
+def RQ = Qso3(3); // this algebra is U'_q(so_3) with Q at 6th root of unity
+setring RQ;
+RQ;
+ideal J=x2, y2, z2;
 J=std(J);
 J;
-
 @c example
 @end smallexample
 @end table
@@ -1650,12 +1521,12 @@ poly, vector, ideal or module (corresponding to the first argument)
 @smallexample
 @c example
 LIB "ncalg.lib";
-def a=sl2();
-setring a;
-poly C=e*f*h;
-poly C1=subst(C,e,h^3);
+def R = sl2(); // this algebra is U(sl_2)
+setring R;
+poly C  = e*f*h;
+poly C1 = subst(C,e,h^3);
 C1;
-poly C2=subst(C,f,e+f);
+poly C2 = subst(C,f,e+f);
 C2;
 @c example
 @end smallexample
@@ -1683,31 +1554,25 @@ if @code{S} is a matrix of a left syzygy module of left submodule given by matri
 @item @strong{Example:}
 @smallexample
 @c example
-LIB "nctools.lib";
-LIB "poly.lib";
-ring Rq=(0,Q),(x,y,z),dp; // U_q(so_3)
-minpoly = RootOfUnity(6); // Q is a 6th root of unity
-matrix C[3][3];
-matrix D[3][3];
-C[1,2]=Q2;    C[1,3]=1/Q2;  C[2,3]=Q2;
-D[1,2]=-Q*z;  D[1,3]=1/Q*y; D[2,3]=-Q*x; 
-ncalgebra(C,D); 
+LIB "ncalg.lib";
+def R = Qso3(3);
+setring R;
 option(redSB);
 option(redTail); // we wish to have minimal bases
-poly Cq=Q^4*x2+y2+Q^4*z2+Q*(1-Q^4)*x*y*z;
-poly C1=x^3+x;
-poly C2=y^3+y;
-poly C3=z^3+z;
-ideal I=Cq,C1,C2,C3; // ideal generated by central elements
-I=std(I);
-I;
-module S=syz(I); // S is a big module
-S=std(S);
-print(S[1]);
-print(S[size(S)]);
-matrix Tst = transpose(S)*transpose(I);
-ideal tst = flatten(Tst); // just collect all the entries of Tst
-std(tst); // we see it's zero
+ideal tst;
+ideal J = x3+x,x*y*z;
+print(syz(J));
+ideal K = x+y+z,y+z,z;
+module S = syz(K);
+print(S);
+tst = ideal(transpose(S)*transpose(K));
+std(tst); // check the property of a syzygy module
+K = std(K); // now compute the Groebner basis of K ...
+print(matrix(K)); // print a compact presentation of K
+S = syz(K); // ... and its syzygy module
+print(S);
+tst = ideal(transpose(S)*transpose(K));
+std(tst); // check the property of a syzygy module 
 @c example
 @end smallexample
 @end table
@@ -1737,37 +1602,27 @@ generated by the input, treated as a set of two-sided generators.
 @ifset singularmanual
 see @ref{std}
 @end ifset
-
-@item @strong{Example:}
-@smallexample
-@c example
-ring r=0,(x,y,z),dp;
-matrix d[3][3];
-d[1,2]=-z;
-d[1,3]=2x;
-d[2,3]=-2y;
-ncalgebra(1,d); 
-// this is algebra U(sl_2)
-int N=2;
-poly f=1;
-for(int n=0;n<=N;n++)
-{ 
-  f=f*(z+N-2*n);
-}
-f;
-ideal i=x^(N+1),y^(N+1),f;
-option(redSB);
-option(redTail);
-ideal I=std(i);
-I;
-ideal J=twostd(i);
-J;
-
-@c example
-@end smallexample
 @item @strong{Remark:}
 There are algebras with no two-sided ideals except 0 and the
 whole algebra (like Weyl algebras).
+@item @strong{Example:}
+@smallexample
+@c example
+LIB "ncalg.lib";
+def U = sl2(); // this algebra is U(sl_2)
+setring U; 
+ideal i= e^3, f^3, h^3 - 4*h;
+option(redSB);
+option(redTail);
+ideal I = std(i);
+print(matrix(I)); // print a compact presentation of I
+ideal J = twostd(i);
+print(matrix(J)); // print a compact presentation of J
+ideal K = NF(J,I); // elements present in J but not in I
+K = K+0; // simplify K
+print(matrix(K));
+@c example
+@end smallexample
 @end table
 
 
@@ -1793,18 +1648,15 @@ this is the same as the vector space dimension of the
 factor-module. 
 
 @item @strong{Note:}
-you have the ring structure on the ring modulo the ideal if and only
-if the ideal is two-sided. 
-
+in the noncommutative case, a ring modulo an ideal has a ring stucture if and only if an ideal is two-sided.
 @item @strong{Example:}
 @smallexample
 @c example
 ring R=0,(x,y,z),dp;
 matrix d[3][3];
-d[1,2]=-z;
-d[1,3]=2x;
-d[2,3]=-2y;
+d[1,2]=-z;  d[1,3]=2x;  d[2,3]=-2y;
 ncalgebra(1,d); //U(sl_2)
+option(redSB); option(redTail);
 ideal I=x3,y3,z3-z;
 I=std(I);
 I;
@@ -1819,19 +1671,6 @@ See
 @ref{std @value{PSUFFIX} };
 @ref{kbase @value{PSUFFIX}}.
 @c ref
-
-@ifset singularmanual
-@c ref
-@ref{dim};
-@ref{degree};
-@ref{mult};
-@c ref
-@end ifset
-
-@ifclear singularmanual
-see also @sc{Singular} manual sections dim, degree, mult, kbase.
-@end ifclear
-
 
 
 @c @c ---------------------------------------

@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: plutypes.doc,v 1.24 2005-04-22 16:33:28 Singular Exp $
+@comment $Id: plutypes.doc,v 1.25 2005-04-26 20:04:49 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -26,10 +26,10 @@
 @cindex expression list
 This chapter explains all data types of @sc{Plural} in
 alphabetical order. For every type, there is a description of the
-declaration syntax as well as information about how to build expressions
-of certain types.
+declaration syntax 
+@* as well as information about how to build expressions of certain types.
 
-The term expression list in @sc{Plural} refers to any comma separated
+The term "expression list" in @sc{Plural} refers to any comma separated
 list of expressions.
 
 For the general syntax of a declaration see 
@@ -55,13 +55,14 @@ For the general syntax of a declaration see
 @c @cindex ideal
 @cindex  untyped definitions 
 
-Under an ideal @sc{Plural} understand a @strong{left} ideal. Ideals are represented as lists of polynomials which are interpreted as
-left generators of  the ideal. For the operations with two-sided ideals see 
+Under an ideal @sc{Plural} understand a @strong{left} ideal. 
+@* Ideals are represented as lists of polynomials which are interpreted as
+left generators of  the ideal. 
+@* For the operations with two-sided ideals see 
  @ref{twostd}. 
 
 
-Like polynomials ideals
-can only be defined or accessed with respect to a basering.
+Like polynomials, ideals can only be defined or accessed with respect to a basering.
 
 @strong{Note:} @code{size} counts only the non-zero generators of an ideal
 whereas @code{ncols} counts all generators. 
@@ -95,15 +96,15 @@ defines a left ideal.
 @item Example:
 @smallexample
 @c example
-  ring r=0,(x,y,z),dp;
-  ncalgebra(-1,0);
-  poly s1 = x2;
-  poly s2 = y3;
-  poly s3 = z;
-  ideal i =  s1, s2-s1, 0,s2*s3, s3^4;
-  i;
-  size(i);
-  ncols(i);
+ring r=0,(x,y,z),dp;
+ncalgebra(-1,0); // an anticommutative algebra
+poly s1 = x2;
+poly s2 = y3;
+poly s3 = z;
+ideal i =  s1, s2-s1, 0,s2*s3, s3^4;
+i;
+size(i);
+ncols(i);
 @c example
 @end smallexample
 @end table
@@ -138,24 +139,21 @@ a type cast to ideal
 @smallexample
 @c example
 ring r=0,(x,y,z),dp;
-ncalgebra(-1,0); 
+ncalgebra(-1,0); // an anticommutative algebra
 ideal m = maxideal(1);
 m;
 poly f = x2;
 poly g = y3;
 ideal i = x*y*z , f-g, g*(x-y) + f^4 ,0, 2x-z2y;
 ideal M = i + maxideal(10);
-timer =0;
 i = M*M;
-timer;
 ncols(i);
-timer =0;
 i = M^2;
 ncols(i);
-timer;
 i[ncols(i)];
 vector v = [x,y-z,x2,y-x,x2yz2-y];
 ideal j = ideal(v);
+j;
 @c example
 @end smallexample
 
@@ -171,8 +169,8 @@ ideal j = ideal(v);
 addition (concatenation of the generators and simplification)
 
 @item @code{*}
-multiplication (with ideal, poly, vector, module; simplification in case of
-multiplication with ideal)
+multiplication (with ideal, poly, vector, module; in case of
+multiplication with ideal, the result will be simplified)
 
 @item @code{^}
 exponentiation (by a non-negative integer)
@@ -183,7 +181,7 @@ generator.
 
 @ifset singularmanual
 @strong{Note:} For simplification of an ideal, see also
- @ref{simplify} (in @sc{Singular}) .
+ @ref{simplify}.
 @end ifset 
 
 @ifclear singularmanual
@@ -196,17 +194,14 @@ in @sc{Singular} manual.
 @c example
 ring r=0,(x,y,z),dp;
 matrix D[3][3];
-D[1,2]=-z;
-D[1,3]=y;
-D[2,3]=x;
-ncalgebra(1,D); 
+D[1,2]=-z;  D[1,3]=y;  D[2,3]=x;
+ncalgebra(1,D); // this algebra is U(so_3) 
 ideal I = 0,x,0,1;
 I;
 I + 0;    // simplification
-ideal J = I,0,x,x-z;
-J;
-I * J;   //  multiplication with simplification
 I*x;
+ideal J = I,0,x,x-z;
+I * J;   //  multiplication with simplification
 vector V = [x,y,z];
 print(V*I);
 ideal m = maxideal(1);
@@ -353,10 +348,10 @@ Z/p -> Z/p' : [i]_p in Z/p -> i in [-p/2,p/2] in Z, i -> [i]_p' in Z/p'
 @end ifinfo
 @item
 @tex
-$C \rightarrow R, \quad$ the real part
+$C \rightarrow R, \quad$ by taking the real part.
 @end tex
 @ifinfo
-C -> R : the real part
+C -> R by taking the real part.
 @end ifinfo
 @end itemize
 
@@ -414,12 +409,12 @@ maps only to map objects with integer coefficients.
 @*@code{map} name @code{=} map_expression @code{;}
 
 @item Purpose:
-defines a ring map from preimage_ring to basering.
-@* Maps the variables of the preimage ring to the generators of the ideal.
-If the ideal contains less elements than variables in the
-preimage_ring the remaining variables are mapped to 0, if the ideal contains
-more elements these are ignored.
-The image ring is always the actual basering.
+defines a ring map from @code{preimage_ring} to basering.
+@* Maps the variables of the @code{preimage ring} to the generators of the ideal.
+@* If the ideal contains less elements than the number of variables in the
+@code{preimage_ring}, the remaining variables are mapped to 0. 
+@* If the ideal contains more elements, extra elements are ignored.
+@* The image ring is always the current basering.
 For the mapping of coefficients from different fields see @ref{map}.
 
 @item Default:
@@ -436,13 +431,21 @@ by names (no evaluation in the preimage ring is possible).
 @item Example:
 @smallexample
 @c example
+// an easy example
+ring r1 = 0,(a,b),dp; // a commutative ring
+poly P = a^2+ab+b^3;
+ring r2 = 0,(x,y),dp;
+ncalgebra(1,-1); // a Weyl algebra
+map M = r1, x^2, -y^3; // note this is not a morphism, just a map
+M(P);
+// now, consider more interesting example
 LIB "ncalg.lib";
-def Usl2 = sl2();
+def Usl2 = sl2(); // this algebra is U(sl_2), generated by  e,f,h
 setring Usl2;
 poly  C  = 4*e*f+h^2-2*h; // the central element of U(sl2)
 poly  D  = e^3*f-h^4;     // some polynomial
 ring W1  = 0,(D,X),dp;
-ncalgebra(1,-1); //opposite Weyl algebra
+ncalgebra(1,-1); // this algebra is the opposite Weyl algebra
 option(redSB);
 option(redTail);
 map F = Usl2, -X, D*D*X, 2*D*X;
@@ -486,7 +489,8 @@ map expressions combined by composition using parentheses (@code{(}, @code{)})
 @item @code{( )}
 composition of maps. If, for example, @code{f} and @code{g} are maps,
 then @code{f(g)} is a map expression giving the composition of @code{f}
-and @code{g}.
+and @code{g},
+@* provided the target ring of @code{g} is the basering of @code{f}.
 
 @item map_expression @code{[} int_expressions @code{]}
 is a map entry (the image of the corresponding variable)
@@ -495,11 +499,11 @@ is a map entry (the image of the corresponding variable)
 @*@strong{Example:}
 @smallexample
 @c example
- LIB "ncalg.lib";
-def Usl2 = sl2();
+LIB "ncalg.lib";
+def Usl2 = sl2(); // this algebra is U(sl_2)
 setring Usl2;
-map F=Usl2,f,e,-h; // check the automorphism of U(sl_2)
-map G=F(F);
+map F = Usl2, f, e, -h; // check the endomorphism of U(sl_2)
+map G = F(F);
 poly p = (f+e*h)^2 + 3*h-e;
 p;
 F(p);
@@ -535,34 +539,28 @@ substitute a ring variable (see @ref{subst})
 @section module @value{PSUFFIX}
 @cindex module @value{PSUFFIX}
 
-Modules are left  submodules of a free module over the basering with basis
-@code{gen(1)}, @code{gen(2)}, @dots{} .
-They are represented by lists of vectors
-@ifset singularmanual 
-(vector data type is the same as in @sc{Singular} @pxref{vector})
-@end ifset 
-@ifclear singularmanual 
-(vector data type is the same as in @sc{Singular})
-@end ifclear 
- which generate the submodule.
-Like vectors they
+Modules are @strong{left} submodules of a free module over the basering with basis
+@code{gen(1)}, @code{gen(2)}, @dots{}, @code{gen(n)} for some natural number @code{n}.
+@* They are represented by lists of vectors, which generate the left submodule.
+Like vectors, they
 can only be defined or accessed with respect to a basering.
 
-If @math{M} is a submodule of
+If @math{M} is a left submodule of
 @ifinfo
 R^n,
 @end ifinfo
 @tex
 $R^n$
 @end tex
-(@math{R} is the basering) generated by vectors
+(where @math{R} is the basering) generated by vectors
 @ifinfo
-v_1, @dots{}, v_k, then v_1, @dots{}, v_k
+v_1, @dots{}, v_k, then 
 @end ifinfo
 @tex
-$v_1, \ldots, v_k$, then $v_1, \ldots, v_k$
+$v_1, \ldots, v_k$, then 
 @end tex
-may be considered as the generators of relations of
+ these generators may be considered as 
+@* the generators of relations of
 @ifinfo
 R^n/M
 @end ifinfo
@@ -570,31 +568,31 @@ R^n/M
 $R^n/M$
 @end tex
 between the canonical generators @code{gen(1)},@dots{},@code{gen(n)}.
-Hence any finitely generated @math{R}-module can be represented in @sc{Plural}
-by its module of relations. The assignments
-@code{module M=v1,...,vk; matrix A=M;} 
+Hence, any finitely generated @math{R}-module can be represented in @sc{Plural}
+by its module of relations. 
+@* The assignments @code{module M=v1,...,vk; matrix A=M;} 
 create the presentation matrix of size
 @ifinfo
 n x k
 @end ifinfo
 @tex
-n$\times$k
+$n \times k$
 @end tex
  for
 @ifinfo
 R^n/M,
 @end ifinfo
 @tex
-$R^n$/M,
+$R^n/M$,
 @end tex
-i.e., the columns of A are the vectors
+ i.e. the columns of A are the vectors
 @ifinfo
-v_1, @dots{}, v_k
+v_1, @dots{}, v_k which generate M. 
 @end ifinfo
 @tex
-$v_1, \ldots, v_k$
+$v_1, \ldots, v_k$ which generate $M$. 
 @end tex
-which generate M. 
+
 
 @menu
 * module declarations @value{PSUFFIX}::
@@ -627,15 +625,12 @@ defines a left  module.
 @c example
 ring r=0,(x,y,z),(c,dp);
 matrix D[3][3];
-D[1,2]=-z;
-D[1,3]=y;
-D[2,3]=x;
-ncalgebra(1,D); 
-// it is U(so_3)
+D[1,2]=-z;  D[1,3]=y;  D[2,3]=x;
+ncalgebra(1,D); // this algebra is U(so_3)
 vector s1 = [x2,y3,z];
 vector s2 = [xy,1,0];
 vector s3 = [0,x2-y2,z];
-poly   f  = xyz;
+poly   f  = -x*y;
 module m = s1, s2-s1,f*(s3-s1);
 m;
 // show m in matrix format (columns generate m)
@@ -683,7 +678,7 @@ a type cast to module
 addition (concatenation of the generators and simplification)
 
 @item @code{*}
-multiplication with ideal or poly, but not `module` * `module`
+right or left multiplication with ideal or poly (but not `module` * `module`!)
 
 @item module_expression @code{[} int_expression @code{,} int_expression @code{]}
 is a module entry, where the first index indicates the row and
@@ -697,13 +692,12 @@ is a vector, where the index indicates the column
 @smallexample
 @c example
 ring A=0,(x,y,z),Dp;
-matrix d[3][3];
-d[1,2]=-z;
-d[1,3]=2x;
-d[2,3]=-2y;
-ncalgebra(1,d);
-module m=[x,y],[0,0,x*z];
-print((x+y)*m);
+matrix D[3][3];
+D[1,2]=-z;  D[1,3]=y;  D[2,3]=x;  // this algebra is U(so_3) 
+ncalgebra(1,D);
+module M = [x,y],[0,0,x*z];
+module N = (x+y-z)*M - M*(x+y-z);
+print(-N);
 @c example
 @end smallexample
 
@@ -750,9 +744,8 @@ computation of the first syzygy module (see @ref{syz @value{PSUFFIX}})
 
 Polynomials are the basic data for all main algorithms in
 @sc{Plural}. They consist of finitely many terms
-(coefficient*power product) which are combined by the usual polynomial
-operations 
-@c (see @ref{poly expressions}).
+(coefficient*monomial) which are combined by the usual polynomial
+operations (see @ref{poly expressions @value{PSUFFIX}}).
  Polynomials can only be defined
 or accessed with respect to a basering which determines the coefficient
 type, the names of the indeterminants and the monomial ordering.
@@ -791,9 +784,8 @@ defines a polynomial.
 @smallexample
 @c example
 ring r = 32003,(x,y,z),dp;
-ncalgebra(-1,1);
+ncalgebra(-1,1); // ring of some differential-like operators
 r;
-// ring of some differential-like operators 
 poly s1  = x3y2+151x5y+186xy6+169y9;
 poly s2  = 1*x^2*y^2*z^2+3z8;
 poly s3  = 5/4x4y2+4/5*x*y^5+2x2y2z3+y7+11x10;
@@ -822,53 +814,34 @@ a monomial (there are NO spaces allowed inside a monomial)
 @smallexample
   [coefficient] ring_variable [ exponent] [ring_variable [exponent] @dots{}]
 @end smallexample
-@c monomials which contain an indexed ring variable
-@c must be built from @code{ring_variable} and @code{coefficient}
-@c with the operations @code{*} and @code{^}
+ monomials which contain an indexed ring variable
+ must be built from @code{ring_variable} and @code{coefficient}
+ with the operations @code{*} and @code{^}
 @item
 an identifier of type poly
 @item
 a function returning poly
 @item
-poly expressions combined by the arithmetic operations
-@code{+}, @code{-}, @code{*}, @code{/}, or @code{^}.
+poly expressions combined by the arithmetic operations @code{+}, @code{-}, @code{*}, @code{/}, or @code{^}.
 @item
 a type cast to poly
 @end enumerate
 
-@*@strong{Example:}
-@smallexample
-2x, x3, 2x2y3, xyz, 2xy2; //  are monomials
-2*x, x^3, 2*x^2*y^3, x*y*z, 2*x*y^2; // are poly expressions
-2*x(1); // is a valid poly expression, but not 2x(1) (a syntax error)
-2*x^3;  // is a valid poly expression equal to 2x3 (a valid monomial)
-        // but not equal to 2x^3 which will be interpreted as (2x)^3
-        // since 2x is a monomial
-@c example
-ring r=0,(x,y),dp;
-poly f = 10x2y3 +2x2y2-2xy+y -x+2;
-lead(f);
-leadmonom(f);
-simplify(f,1);     // normalize leading coefficient
-poly g = 1/2x2 + 1/3y;
-cleardenom(g);
-int i = 102;
-poly(i);
-typeof(_); 
-@c example
-@end smallexample
-@*@strong{Remark:} In the non-commutative case see @ref{PLURAL conventions}.
- 
-@*@strong{Example:}
+@strong{Remark:} In the non-commutative case see @ref{PLURAL conventions}.
+
+@strong{Example:}
 @smallexample
 @c example
 ring r=0,(x,y),dp;
-ncalgebra(1,1);
-// it is a Weyl algebra 
+ncalgebra(1,1);  // make it a Weyl algebra 
 r;
 yx;      // not correct input
 y*x;     // correct input
-
+poly f = 10x2*y3 + 2y2*x^2 - 2*x*y + y - x + 2;
+lead(f);
+leadmonom(f);
+simplify(f,1);     // normalize leading coefficient
+cleardenom(f);
 @c example
 @end smallexample 
 
@@ -893,13 +866,13 @@ multiplication
 division by a monomial, non divisible terms yield 0
 
 @item @code{^}, @code{**}
-power by an integer
+power by a positive integer
 
 @item @code{<}, @code{<=}, @code{>}, @code{>=}, @code{==}, @code{<>}
-comparison (w.r.t. monomial ordering)
+comparison (of leading monomials w.r.t. monomial ordering)
 
 @item poly_expression @code{[} intvec_expression @code{]}
-the monomial at the indicated place w.r.t.@: the monomial ordering
+the sum of monomials at the indicated places w.r.t. the monomial ordering
 @end table
 
 
@@ -912,8 +885,7 @@ the monomial at the indicated place w.r.t.@: the monomial ordering
 
 @table @code
 @item bracket 
-Computes the Lie bracket of two polinomials
-(see @ref{bracket})
+computes the Lie bracket of two polinomials (see @ref{bracket})
 @end table
 
 @c ---------------------------------------
@@ -922,10 +894,11 @@ Computes the Lie bracket of two polinomials
 @section qring @value{PSUFFIX}
 @cindex qring @value{PSUFFIX}
 
-@sc{Plural} offers the opportunity to calculate in 
-factor rings  modulo a two-sided ideal.  The ideal has to be given
-as a two-sided Groebner basis.  For a detailed description of the concept
-of rings and quotient rings see
+@sc{Plural} offers the opportunity to compute within 
+factor-rings modulo two-sided ideals.  The ideal has to be given
+as a two-sided Groebner basis (see @ref{twostd} command). 
+
+@* For a detailed description of the concept of rings and quotient rings see
 @ifset singularmanual 
 @ref{Rings and orderings}.
 @end ifset
@@ -939,10 +912,8 @@ in @sc{Singular} manual section Rings and orderings.
 
 @strong{Note:}
 we highly recommend to turn on 
-option(redSB);
-option(redTail);
-while computing in qrings. Otherwise results
-could have no meaning.
+@code{option(redSB); option(redTail);}
+while computing in qrings. Otherwise results may have no meaning.
 
 @c ---------------------------------------
 
@@ -957,24 +928,22 @@ could have no meaning.
 @item Default:
 none
 @item Purpose:
-declares a quotient ring as the basering modulo ideal_expression.  Sets
+declares a quotient ring as the basering modulo ideal_expression and sets
 it as current basering.
 @item Example:
 @smallexample
 @c example
-ring r=0,(x,y,z,u,v,w),dp;
-ncalgebra(-1,0);
-// anticommutative algebra
+ring r=0,(z,u,v,w),dp;
+ncalgebra(-1,0); // an anticommutative algebra
 option(redSB);
 option(redTail);
-ideal i=x^2,y^2,z^2,u^2,v^2,w^2;
-qring q=twostd(i);
-// now it is an exterior algebra
+ideal i=z^2,u^2,v^2,w^2;
+qring q=twostd(i); // now it is an exterior algebra
 q;
-poly k=(x+y)*(y-u)*(zv+u-w);
-k;
+poly k = (v-u)*(zv+u-w);
+k; // the output is not yet totally reduced
 poly ek=reduce(k,std(0));
-ek;
+ek; // the reduced form
 @c example
 @end smallexample
 @end table
@@ -1033,12 +1002,13 @@ none
 ring r=0,(x,y,z),dp;
 matrix D[3][3];
 D[1,2]=z;
-ncalgebra(1,D); // it is Heisenberg algebra
+ncalgebra(1,D); // it is a Heisenberg algebra
 ideal i=z2+z,x+y;
 resolution re=nres(i,0);
 re;
 list l = re;
 l;
+print(matrix(l[2]));
 @c example
 @end smallexample
 @end table
@@ -1056,7 +1026,7 @@ an identifier of type resolution
 @item
 a function returning a resolution
 @item
-a type cast to resolution from a list of ideals, resp.@: modules..
+a type cast to resolution from a list of ideals, resp.@: modules.
 @end enumerate
 
 
@@ -1068,9 +1038,9 @@ a type cast to resolution from a list of ideals, resp.@: modules..
 
 @table @code
 @item minres 
-minimize a free resolution  (see @ref{minres @value{PSUFFIX}})
+minimizes a free resolution  (see @ref{minres @value{PSUFFIX}})
 @item mres 
-computes minimal free resolution of an ideal resp. 
+computes a minimal free resolution of an ideal resp. 
 module w.r.t. a minimal set of generators of the given ideal
 resp. module (see @ref{mres @value{PSUFFIX}})
 @item nres 
@@ -1096,9 +1066,9 @@ For a detailed description of the concept of rings see
 @ifclear singularmanual
 @sc{Singular} manual (Chapter: General Concepts, Section: Rings and orderings).
 @end ifclear
+
 @*@strong{Note:} @sc{Plural} works with global orderings
-only 
-(@pxref{PLURAL conventions}).
+only (@pxref{PLURAL conventions}).
 
 @menu
 * ring declarations @value{PSUFFIX}::
@@ -1163,7 +1133,7 @@ If one of coefficient_field, names_of_ring_variables, and ordering
 consists of only one entry, the parentheses around this entry may be
 omitted.
 
-In order to create the non-commutative extention, see @ref{ncalgebra}.  
+@strong{In order to create the non-commutative extension, use} @ref{ncalgebra}.  
 
 
 @c ---------------------------------------
@@ -1173,49 +1143,49 @@ In order to create the non-commutative extention, see @ref{ncalgebra}.
 @cindex ring operations @value{PSUFFIX}
 @table @asis
 @item @code{+}
-construct an algebra 
+construct a tensor product over the groung field
 @ifinfo
 C = A\otimes_k B
 @end ifinfo
 @tex
 $C = A\otimes_{\bf{K} } B$
 @end tex 
-for two
+of two
 @ifinfo 
-G-algebras. 
+G-algebras A and B. 
 @end ifinfo
 @tex
-$G$-algebras.
+$G$-algebras $A$ and $B$.
 @end tex
 
 Let
 @ifinfo
- A=k1<x_1,...,x_n | @{x_j x_i=c^1_@{ij@}x_i x_j + d^1_@{ij @} @}, 1 =<i <j =< n >,
+ A=k1<x_1,...,x_n | @{x_j x_i=c_@{ij@}x_i x_j + d_@{ij @} @}, 1 =<i <j =< n >,
  and
- B=k2<y_1,...,y_m | @{y_j y_i=c^2_@{ij@}y_i y_j + d^2_@{ij @} @}, 1 =<i <j =< m >
+ B=k2<y_1,...,y_m | @{y_j y_i=q_@{ij@}y_i y_j + r_@{ij @} @}, 1 =<i <j =< m >
 @end ifinfo
 
 @tex 
 $A= k_1 \langle x_1, \ldots ,x_n \mid$ 
-$\{ x_j x_i=c^1_{ij} \cdot x_i x_j + d^1_{ij}\}, 1 \leq i <j \leq n \rangle$,
+$\{ x_j x_i=c_{ij} \cdot x_i x_j + d_{ij}\}, 1 \leq i <j \leq n \rangle$,
 and
 $B= k_2 \langle y_1, \ldots ,y_m \mid$
-$\{ y_j y_i=c^2_{ij} \cdot y_i y_j + d^2_{ij}\}, 1 \leq i <j \leq m \rangle$
+$\{ y_j y_i=q_{ij} \cdot y_i y_j + r_{ij}\}, 1 \leq i <j \leq m \rangle$
 @end tex
 
-be two G-algebras, then C is defined to be the algebra
+be two @math{G}-algebras, then @math{C} is defined to be the algebra
 
 @ifinfo
 C = K<x_1,...,x_n, y_1,...,y_m |
-@{x_j x_i=c^1_@{ij@}x_i x_j + d^1_@{ij @}, 1 =<i <j =< n @},
-@{y_j y_i=c^2_@{ij@}y_i y_j + d^2_@{ij @}, 1 =<i <j =< m @},
+@{x_j x_i=c_@{ij@}x_i x_j + d_@{ij @}, 1 =<i <j =< n @},
+@{y_j y_i=q_@{ij@}y_i y_j + r_@{ij @}, 1 =<i <j =< m @},
 @{y_j x_i = x_i y_j, 1 <= j <= m, 1 <= i <= n @}>
 @end ifinfo
 
 @tex 
 $C = K \langle x_1, \ldots ,x_n, y_1, \ldots ,y_m \mid$
-$\{ x_j x_i=c^1_{ij} \cdot x_i x_j + d^1_{ij}, 1 \leq i <j \leq n\}$,
-$\{ y_j y_i=c^2_{ij} \cdot y_i y_j + d^2_{ij}, 1 \leq i <j \leq m\}$,
+$\{ x_j x_i=c_{ij} \cdot x_i x_j + d_{ij}, 1 \leq i <j \leq n\}$,
+$\{ y_j y_i=q_{ij} \cdot y_i y_j + r_{ij}, 1 \leq i <j \leq m\}$,
 $\{ y_j x_i = x_i y_j, 1 \leq j \leq m, 1 \leq i \leq n\}  \rangle$.
 @end tex
 
