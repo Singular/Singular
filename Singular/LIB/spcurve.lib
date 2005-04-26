@@ -1,6 +1,6 @@
 // (anne, last modified 31.5.99)
 /////////////////////////////////////////////////////////////////////////////
-version="$Id: spcurve.lib,v 1.17 2002-05-17 12:20:44 anne Exp $";
+version="$Id: spcurve.lib,v 1.18 2005-04-26 17:19:41 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY: spcurve.lib    Deformations and Invariants of CM-codim 2 Singularities
@@ -187,10 +187,10 @@ proc semiCMcod2(matrix M, module t1,list #)
 ASSUME:  M is a presentation matrix of an ideal i, CM of codimension 2,
          and t1 is a presentation of the space of first order deformations
          of i ((M,t1) as returned by the procedure matrixT1)
-CREATE:  new basering with name rneu
-RETURN:  ideal in rneu describing the semiuniversal deformation of i;
+RETURN:  new ring in which the ideal semi describing the semiuniversal 
+         deformation of i;
          if the optional third argument is given, the perturbation matrix
-         of the semiuniversal deformation is returned.
+         of the semiuniversal deformation is returned instead of the ideal.
 NOTE:    The current basering should not contain any variables named
          A(j) where j is some integer!
 EXAMPLE: example semiCMcod2; shows an example"
@@ -249,15 +249,14 @@ EXAMPLE: example semiCMcod2; shows an example"
 //---------------------------------------------------------------------------
   if(size(#)>0)
   {
-    matrix result=O;
+    matrix semi=O;
   }
   else
   {
-    ideal result=minor(O,gt);
+    ideal semi=minor(O,gt);
   }
-  export rneu;
-  keepring rneu;
-  return(result);
+  export semi;
+  return(rneu);
 }
 example
 { "EXAMPLE:"; echo=2;
@@ -265,7 +264,9 @@ example
   ideal curve=x(1)*x(2),x(1)*x(3),x(2)*x(3);
   matrix M=isCMcod2(curve);
   list l=matrixT1(M,3);
-  semiCMcod2(l[1],std(l[2]));
+  def rneu=semiCMcod2(l[1],std(l[2]));
+  setring rneu;
+  semi;
 }
 /////////////////////////////////////////////////////////////////////////////
 
@@ -317,9 +318,9 @@ example
   ideal curve=x(1)*x(2),x(1)*x(3),x(2)*x(3);
   matrix M=isCMcod2(curve);
   list l=matrixT1(M,3);
-  def sem=semiCMcod2(l[1],std(l[2]));
-  basering;
-  discr(sem,3);
+  def rneu=semiCMcod2(l[1],std(l[2]));
+  setring rneu;
+  discr(semi,3);
 }
 /////////////////////////////////////////////////////////////////////////////
 
@@ -566,15 +567,12 @@ proc posweight(matrix M, module t1, int choose, list #)
          n=0 : all deformations of non-negative weight @*
          n=1 : only non-constant deformations of non-negative weight @*
          n=2 : all deformations of positive weight @*
-         As an optional parameter the name of a new ring may be
-         specified.
 ASSUME:  M is a presentation matrix of a Cohen-Macaulay codimension 2
          ideal and t1 is its T1 space in matrix notation
-CREATE:  new basering (default name: rneu); a different name for this ring
-         may be given as a 4th parameter
-RETURN:  list, consisting of a presentation matrix describing the deformation
-         given by the generators of T1 of non-negative/positive weight
-         and the weight vector for the new variables
+RETURN:  new ring containing a list posw, consisting of a presentation 
+         matrix describing the deformation given by the generators of T1 
+         of non-negative/positive weight and the weight vector for the new 
+         variables
 NOTE:   The current basering should not contain any variables named
          T(i) where i is some integer!
 EXAMPLE: example posweight; shows an example"
@@ -692,22 +690,11 @@ EXAMPLE: example posweight; shows an example"
   ideal n=N;
   matrix O[gt+1][gt]=n;
 //---------------------------------------------------------------------------
-// Keep the ring and return the matrix
+// Keep the matrix and return the ring in which it lives
 //---------------------------------------------------------------------------
-  if (defined(newname)>1)
-  {
-    def `newname`=rneu;
-    setring `newname`;
-    export `newname`;
-    keepring `newname`;
-  }
-  else
-  {
-    export rneu;
-    keepring rneu;
-  }
-  list ret=O,iv;
-  return(ret);
+  list posw=O,iv;
+  export posw;
+  return(rneu);
 }
 example
 { "EXAMPLE:"; echo=2;
@@ -715,9 +702,10 @@ example
   ideal curve=(x(3)-x(1)^2)*x(3),(x(3)-x(1)^2)*x(2),x(2)^2-x(1)^7*x(3);
   matrix M=isCMcod2(curve);
   list l=matrixT1(M,3);
-  list li=posweight(l[1],std(l[2]),0);
-  pmat(li[1]);
-  li[2];
+  def rneu=posweight(l[1],std(l[2]),0);
+  setring rneu;
+  pmat(posw[1]);
+  posw[2];
 }
 /////////////////////////////////////////////////////////////////////////////
 
@@ -732,11 +720,10 @@ proc KSpencerKernel(matrix M,list #)
               entry ij corresponds to gen((i-1)*n+j)
 ASSUME:    M is a quasihomogeneous n x (n+1) matrix where the n minors define
            an isolated space curve singularity
-CREATE:    2 new rings (default names: rneu and reneu)
-           different ring names may be specified as a 2nd parameter
-RETURN:    coefficient matrix representing the kernel of the Kodaira-
-           Spencer map of the family of non-negative deformations
-           having the given singularity as special fibre
+RETURN:    new ring containing the coefficient matrix KS representing 
+           the kernel of the Kodaira-Spencer map of the family of 
+           non-negative deformations having the given singularity as 
+           special fibre
 NOTE:      * the initial basering should not contain variables with name
              e(i) or T(i), since those variable names will internally be
              used by the script
@@ -902,15 +889,9 @@ EXAMPLE:   example KSpencerKernel; shows an example"
 // Define the family of curves with the same quasihomogeneous initial
 // matrix M, compute T1 and pass again to the ring with the variables e(i)
 //--------------------------------------------------------------------------
-  if (defined(newname)>1)
-  {
-    list li=posweight(M,mo,2,newname+"1");
-    def rneu=basering;
-  }
-  else
-  {
-    list li=posweight(M,mo,2);
-  }
+  def rneu=posweight(M,mo,2);
+  setring rneu;
+  list li=posw;
   if (size(li)<=1)
   {
     ERROR("Internal Error: Problem determining perturbations of weight > 0.")
@@ -1067,29 +1048,18 @@ EXAMPLE:   example KSpencerKernel; shows an example"
     export watch Progress;
   }
   option(set,optvec);
-// make sure that the exported ring has the right name
-  if (defined(newname)>1)
-  {
-    def `newname`=reneu;
-    setring `newname`;
-    export `newname`;
-    keepring `newname`;
-  }
-  else
-  {
-    export reneu;
-    keepring reneu;
-  }
-  return(ret[2]);
+  def KS=ret[2];
+  export KS;
+  return(reneu);
 }
 example
 { "EXAMPLE:"; echo=2;
   ring r=0,(x,y,z),ds;
   matrix M[3][2]=z-x^7,0,y^2,z,x^9,y;
-  def KS=KSpencerKernel(M,"ar");
-  print(KS);
-  nameof(basering);
+  def rneu=KSpencerKernel(M,"ar");
+  setring rneu;
   basering;
+  print(KS);
 }
 ///////////////////////////////////////////////////////////////////////////
 
