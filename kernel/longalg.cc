@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.8 2005-04-18 13:01:39 Singular Exp $ */
+/* $Id: longalg.cc,v 1.9 2005-04-27 14:55:33 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -2309,8 +2309,13 @@ poly naPermNumber(number z, int * par_perm, int P, ring oldRing)
       pSetm(p);
       if (zb!=NULL)
       {
-        pan->n=napPerm(zb,par_perm,oldRing,nMap);
-        if(pan->n==NULL) /* error in mapping or mapping to variable */
+        if  (currRing->P>0)
+        {
+          pan->n=napPerm(zb,par_perm,oldRing,nMap);
+          if(pan->n==NULL) /* error in mapping or mapping to variable */
+            pDelete(&p);
+        }
+        else
           pDelete(&p);
       }
       pTest(p);
