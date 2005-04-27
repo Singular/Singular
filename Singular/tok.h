@@ -6,7 +6,7 @@
 /*
 * ABSTRACT: tokens, types for interpreter; general macros
 */
-/* $Id: tok.h,v 1.59 2004-10-18 18:57:46 levandov Exp $ */
+/* $Id: tok.h,v 1.60 2005-04-27 15:15:17 Singular Exp $ */
 
 #ifndef MYYSTYPE
 #include "structs.h"
@@ -77,6 +77,7 @@ enum {
   ENVELOPE_CMD,
   ERROR_CMD,
   EXECUTE_CMD,
+  EXPORTTO_CMD,
   EXTGCD_CMD,
   FAC_CMD,
   FIND_CMD,
@@ -89,6 +90,7 @@ enum {
   HIGHCORNER_CMD,
   HRES_CMD,
   IMPART_CMD,
+  IMPORTFROM_CMD,
   INSERT_CMD,
   INT_CMD,
   INTDIV_CMD,

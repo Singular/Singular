@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.104 2005-01-18 15:41:58 Singular Exp $ */
+/* $Id: grammar.y,v 1.105 2005-04-27 15:15:15 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -309,8 +309,6 @@ void yyerror(char * fmt)
         /* put variables of this type into the currRing list */
 %token <i> EXAMPLE_CMD
 %token <i> EXPORT_CMD
-%token <i> EXPORTTO_CMD
-%token <i> IMPORTFROM_CMD
 %token <i> HELP_CMD
 %token <i> KILL_CMD
 %token <i> LIB_CMD

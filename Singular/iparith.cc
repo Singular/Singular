@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.346 2005-04-26 08:59:10 Singular Exp $ */
+/* $Id: iparith.cc,v 1.347 2005-04-27 15:15:18 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -145,6 +145,8 @@ extern int cmdtok;
 extern BOOLEAN expected_parms;
 
 #define ii_div_by_0 "div. by 0"
+#define ii_not_for_plural "not implemented for non-commutative rings"
+
 int iiOp; /* the current operation*/
 
 #ifdef GENTABLE
@@ -194,6 +196,7 @@ cmdnames cmds[] =
   { "example",     0, EXAMPLE_CMD ,       EXAMPLE_CMD},
   { "execute",     0, EXECUTE_CMD ,       CMD_1},
   { "export",      0, EXPORT_CMD ,        EXPORT_CMD},
+  { "exportto",    0, EXPORTTO_CMD ,      CMD_2},
   { "factorize",   0, FAC_CMD ,           CMD_12},
   { "fetch",       0, FETCH_CMD ,         CMD_2},
   { "fglm",        0, FGLM_CMD ,          CMD_2},
@@ -215,6 +218,7 @@ cmdnames cmds[] =
   { "if",          0, IF_CMD ,            IF_CMD},
   { "imap",        0, IMAP_CMD ,          CMD_2},
   { "impart",      0, IMPART_CMD ,        CMD_1},
+  { "importfrom",  0, IMPORTFROM_CMD ,    CMD_2},
   { "indepSet",    0, INDEPSET_CMD ,      CMD_12},
   { "insert",      0, INSERT_CMD ,        CMD_23},
   { "int",         0, INT_CMD ,           ROOT_DECL},
@@ -1450,11 +1454,11 @@ static BOOLEAN jjPROC(leftv res, leftv u, leftv v)
   void *d;
   int typ;
   BOOLEAN t=FALSE;
-  if (u->rtyp!=IDHDL) 
+  if (u->rtyp!=IDHDL)
   {
     tmp_proc.id="_auto";
     tmp_proc.typ=PROC_CMD;
-    tmp_proc.data.pinf=(procinfo *)u->Data();  
+    tmp_proc.data.pinf=(procinfo *)u->Data();
     tmp_proc.ref=1;
     d=u->data; u->data=(void *)&tmp_proc;
     e=u->e; u->e=NULL;
@@ -1648,6 +1652,11 @@ static BOOLEAN jjELIMIN(leftv res, leftv u, leftv v)
   setFlag(res,FLAG_STD);
   return FALSE;
 }
+static BOOLEAN jjEXPORTTO(leftv res, leftv u, leftv v)
+{
+  Print("exportto %s -> %s\n",v->Name(),u->Name() );
+  return FALSE;
+}
 static BOOLEAN jjERROR(leftv res, leftv u)
 {
   WerrorS((char *)u->Data());
@@ -1709,7 +1718,7 @@ static BOOLEAN jjFACSTD2(leftv res, leftv v, leftv w)
   lists L=(lists)omAllocBin(slists_bin);
   L->Init(l);
   l=0;
-  while(h!=NULL) 
+  while(h!=NULL)
   {
     L->m[l].data=(char *)h->d;
     L->m[l].rtyp=IDEAL_CMD;
@@ -1917,6 +1926,11 @@ static BOOLEAN jjHOMOG_ID(leftv res, leftv u, leftv v)
   res->data = (char *)idHomogen((ideal)u->Data(),i);
   return FALSE;
 }
+static BOOLEAN jjIMPORTFROM(leftv res, leftv u, leftv v)
+{
+  Print("importfrom %s::%s ->.\n",v->Name(),u->Name() );
+  return FALSE;
+}
 static BOOLEAN jjINDEPSET2(leftv res, leftv u, leftv v)
 {
   assumeStdFlag(u);
@@ -2058,7 +2072,7 @@ static BOOLEAN jjPlural_mat_mat(leftv res, leftv a, leftv b)
 
 static BOOLEAN jjBRACKET(leftv res, leftv a, leftv b)
 {
-  if (rIsPluralRing(currRing)) 
+  if (rIsPluralRing(currRing))
   {
     poly p = (poly)a->CopyD(POLY_CMD);
     poly q = (poly)b->Data();
@@ -2096,7 +2110,7 @@ static BOOLEAN jjOPPOSE(leftv res, leftv a, leftv b)
 	res->rtyp = argtype;
 	break;
       }
-    case POLY_CMD: 
+    case POLY_CMD:
     case VECTOR_CMD:
       {
 	poly    q = (poly)IDDATA(w);
@@ -2104,15 +2118,15 @@ static BOOLEAN jjOPPOSE(leftv res, leftv a, leftv b)
 	res->rtyp = argtype;
 	break;
       }
-    case IDEAL_CMD: 
-    case MODUL_CMD:  
+    case IDEAL_CMD:
+    case MODUL_CMD:
       {
 	ideal   Q = (ideal)IDDATA(w);
 	res->data = idOppose(r,Q);
 	res->rtyp = argtype;
 	break;
       }
-    case MATRIX_CMD:  
+    case MATRIX_CMD:
       {
 	ring save = currRing;
 	rChangeCurrRing(r);
@@ -2121,25 +2135,24 @@ static BOOLEAN jjOPPOSE(leftv res, leftv a, leftv b)
 	rChangeCurrRing(save);
         ideal   S = idOppose(r,Q);
 	id_Delete(&Q, r);
-	res->data = idModule2Matrix(S); 
+	res->data = idModule2Matrix(S);
 	res->rtyp = argtype;
 	break;
       }
-    default:  
-      {       
-	Werror("unsupported type in oppose");
+    default:
+      {
+	WerrorS("unsupported type in oppose");
 	return TRUE;
       }
     }
   }
-  else 
+  else
   {
     Werror("identifier %s not found in %s",b->Fullname(),a->Fullname());
     return TRUE;
   }
   return FALSE;
 }
-
 #endif /* HAVE_PLURAL */
 
 static BOOLEAN jjQUOT(leftv res, leftv u, leftv v)
@@ -2285,7 +2298,7 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
   res->data=(void *)r;
   if (ww!=NULL) { delete ww; ww=NULL; }
   if ((r->weights!=NULL) && (r->weights[0]!=NULL))
-  { 
+  {
     ww=ivCopy(r->weights[0]);
     if (weights!=NULL) (*ww) += add_row_shift;
     atSet(res,omStrDup("isHomog"),ww,INTVEC_CMD);
@@ -2684,6 +2697,7 @@ struct sValCmd2 dArith2[]=
 ,{jjDIVISION,  DIVISION_CMD,   LIST_CMD,       MODUL_CMD,  MODUL_CMD NO_PLURAL}
 ,{jjELIMIN,    ELIMINATION_CMD,IDEAL_CMD,      IDEAL_CMD,  POLY_CMD ALLOW_PLURAL}
 ,{jjELIMIN,    ELIMINATION_CMD,MODUL_CMD,      MODUL_CMD,  POLY_CMD ALLOW_PLURAL}
+,{jjEXPORTTO,  EXPORTTO_CMD,   NONE,           PACKAGE_CMD, IDHDL ALLOW_PLURAL}
 ,{jjEXTGCD_I,  EXTGCD_CMD,     LIST_CMD,       INT_CMD,    INT_CMD ALLOW_PLURAL}
 #ifdef HAVE_FACTORY
 ,{jjEXTGCD_P,  EXTGCD_CMD,     LIST_CMD,       POLY_CMD,   POLY_CMD NO_PLURAL}
@@ -2723,6 +2737,7 @@ struct sValCmd2 dArith2[]=
 ,{jjCALL2MANY, IDEAL_CMD,      IDEAL_CMD,      DEF_CMD,    DEF_CMD ALLOW_PLURAL}
 ,{jjFETCH,     IMAP_CMD,       ANY_TYPE/*set by p*/,RING_CMD,  ANY_TYPE ALLOW_PLURAL}
 ,{jjFETCH,     IMAP_CMD,       ANY_TYPE/*set by p*/,QRING_CMD, ANY_TYPE ALLOW_PLURAL}
+,{jjIMPORTFROM,IMPORTFROM_CMD, NONE,           PACKAGE_CMD, ANY_TYPE ALLOW_PLURAL}
 ,{jjINDEPSET2, INDEPSET_CMD,   LIST_CMD,       IDEAL_CMD,  INT_CMD NO_PLURAL}
 ,{lInsert,     INSERT_CMD,     LIST_CMD,       LIST_CMD,   DEF_CMD ALLOW_PLURAL}
 ,{jjINTERSECT, INTERSECT_CMD,  IDEAL_CMD,      IDEAL_CMD,  IDEAL_CMD ALLOW_PLURAL}
@@ -3080,7 +3095,7 @@ static BOOLEAN jjFACSTD(leftv res, leftv v)
   lists L=(lists)omAllocBin(slists_bin);
   L->Init(l);
   l=0;
-  while(h!=NULL) 
+  while(h!=NULL)
   {
     L->m[l].data=(char *)h->d;
     L->m[l].rtyp=IDEAL_CMD;
@@ -3149,7 +3164,7 @@ static BOOLEAN jjHIGHCORNER_M(leftv res, leftv v)
     p=iiHighCorner(I,i);
     if (p==NULL)
     {
-      Werror("module must be zero-dimensional");
+      WerrorS("module must be zero-dimensional");
       if (delete_w) delete w;
       return TRUE;
     }
@@ -3634,7 +3649,7 @@ static BOOLEAN jjOPPOSITE(leftv res, leftv a)
 {
   ring    r = (ring)a->Data();
   if (rIsPluralRing(r))
-  {  
+  {
     res->data = rOpposite(r);
   }
   else res->data = rCopy(r);
@@ -3645,7 +3660,7 @@ static BOOLEAN jjENVELOPE(leftv res, leftv a)
 {
   ring    r = (ring)a->Data();
   if (rIsPluralRing(r))
-  {  
+  {
     //    ideal   i;
 //     if (a->rtyp == QRING_CMD)
 //     {
@@ -5261,6 +5276,24 @@ static BOOLEAN jjDIVISION4(leftv res, leftv v)
   return FALSE;
 }
 
+//static BOOLEAN jjEXPORTTO_M(leftv res, leftv u)
+//{
+//  int l=u->listLength();
+//  if (l<2) return TRUE;
+//  BOOLEAN b;
+//  leftv v=u->next;
+//  leftv zz=v;
+//  leftv z=zz;
+//  u->next=NULL;
+//  do
+//  {
+//    leftv z=z->next;
+//    b=iiExprArith2(res,u,iiOp,z, (iiOp > 255));
+//    if (b) break;
+//  } while (z!=NULL);
+//  u->next=zz;
+//  return b;
+//}
 static BOOLEAN jjIDEAL_PL(leftv res, leftv v)
 {
   int s=1;
@@ -5450,7 +5483,7 @@ static BOOLEAN jjJET4(leftv res, leftv u)
   {
     if(!pIsUnit((poly)u2->Data()))
     {
-      Werror("2nd argument must be a unit");
+      WerrorS("2nd argument must be a unit");
       return TRUE;
     }
     res->rtyp=u1->Typ();
@@ -5466,7 +5499,7 @@ static BOOLEAN jjJET4(leftv res, leftv u)
   {
     if(!mpIsDiagUnit((matrix)u2->Data()))
     {
-      Werror("2nd argument must be a diagonal matrix of units");
+      WerrorS("2nd argument must be a diagonal matrix of units");
       return TRUE;
     }
     res->rtyp=u1->Typ();
@@ -5592,7 +5625,7 @@ static BOOLEAN jjREDUCE4(leftv res, leftv u)
     assumeStdFlag(u3);
     if(!mpIsDiagUnit((matrix)u2->Data()))
     {
-      Werror("2nd argument must be a diagonal matrix of units");
+      WerrorS("2nd argument must be a diagonal matrix of units");
       return TRUE;
     }
     res->rtyp=IDEAL_CMD;
@@ -5607,7 +5640,7 @@ static BOOLEAN jjREDUCE4(leftv res, leftv u)
     assumeStdFlag(u3);
     if(!pIsUnit((poly)u2->Data()))
     {
-      Werror("2nd argument must be a unit");
+      WerrorS("2nd argument must be a unit");
       return TRUE;
     }
     res->rtyp=POLY_CMD;
@@ -5634,7 +5667,7 @@ static BOOLEAN jjREDUCE5(leftv res, leftv u)
     assumeStdFlag(u3);
     if(!mpIsDiagUnit((matrix)u2->Data()))
     {
-      Werror("2nd argument must be a diagonal matrix of units");
+      WerrorS("2nd argument must be a diagonal matrix of units");
       return TRUE;
     }
     res->rtyp=IDEAL_CMD;
@@ -5650,7 +5683,7 @@ static BOOLEAN jjREDUCE5(leftv res, leftv u)
     assumeStdFlag(u3);
     if(!pIsUnit((poly)u2->Data()))
     {
-      Werror("2nd argument must be a unit");
+      WerrorS("2nd argument must be a unit");
       return TRUE;
     }
     res->rtyp=POLY_CMD;
@@ -5810,6 +5843,7 @@ struct sValCmdM dArithM[]=
 ,{jjDIVISION4, DIVISION_CMD,    ANY_TYPE/*or set by p*/,3    NO_PLURAL}
 ,{jjDIVISION4, DIVISION_CMD,    ANY_TYPE/*or set by p*/,4    NO_PLURAL}
 ,{jjDBPRINT,   DBPRINT_CMD,     NONE,               -2       ALLOW_PLURAL}
+//,{jjEXPORTTO_M,  EXPORTTO_CMD,    NONE,             -2       ALLOW_PLURAL}
 ,{jjCALL1ARG,  IDEAL_CMD,       IDEAL_CMD,          1        ALLOW_PLURAL}
 ,{jjIDEAL_PL,  IDEAL_CMD,       IDEAL_CMD,          -1       ALLOW_PLURAL}
 ,{jjCALL2ARG,  INTERSECT_CMD,   IDEAL_CMD,          2        ALLOW_PLURAL}
@@ -6260,7 +6294,7 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
         {
           if (dArith2[i].valid_for_plural==0 /*NO_PLURAL*/)
           {
-            Werror("not implemented for non-commutative rings");
+            WerrorS(ii_not_for_plural);
             break;
           }
           else if (dArith2[i].valid_for_plural==2 /* COMM_PLURAL */)
@@ -6303,7 +6337,7 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
             {
               if (dArith2[i].valid_for_plural==0 /*NO_PLURAL*/)
               {
-                Werror("not implemented for non-commutative rings");
+                WerrorS(ii_not_for_plural);
                 break;
               }
               else if (dArith2[i].valid_for_plural==2 /* COMM_PLURAL */)
@@ -6437,7 +6471,7 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
         {
           if (dArith1[i].valid_for_plural==0 /*NO_PLURAL*/)
           {
-            Werror("not implemented for non-commutative rings");
+            WerrorS(ii_not_for_plural);
             break;
           }
           else if (dArith1[i].valid_for_plural==2 /* COMM_PLURAL */)
@@ -6488,7 +6522,7 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
           {
             if (dArith1[i].valid_for_plural==0 /*NO_PLURAL*/)
             {
-              Werror("not implemented for non-commutative rings");
+              WerrorS(ii_not_for_plural);
               break;
             }
             else if (dArith1[i].valid_for_plural==2 /* COMM_PLURAL */)
@@ -6617,7 +6651,7 @@ BOOLEAN iiExprArith3(leftv res, int op, leftv a, leftv b, leftv c)
         {
             if (dArith3[i].valid_for_plural==0 /*NO_PLURAL*/)
             {
-              Werror("not implemented for non-commutative rings");
+              WerrorS(ii_not_for_plural);
               break;
             }
             else if (dArith3[i].valid_for_plural==2 /* COMM_PLURAL */)
@@ -6663,7 +6697,7 @@ BOOLEAN iiExprArith3(leftv res, int op, leftv a, leftv b, leftv c)
               {
                 if (dArith3[i].valid_for_plural==0 /*NO_PLURAL*/)
                 {
-                   Werror("not implemented for non-commutative rings");
+                   WerrorS(ii_not_for_plural);
                    break;
                  }
                  else if (dArith3[i].valid_for_plural==2 /* COMM_PLURAL */)
@@ -6849,7 +6883,7 @@ BOOLEAN iiExprArithM(leftv res, leftv a, int op)
         {
           if (dArithM[i].valid_for_plural==0 /*NO_PLURAL*/)
           {
-            Werror("not implemented for non-commutative rings");
+            WerrorS(ii_not_for_plural);
             break;
           }
           else if (dArithM[i].valid_for_plural==2 /* COMM_PLURAL */)
