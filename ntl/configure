@@ -8,7 +8,7 @@ do
   esac
 done
 
-if test -r ../config.cache; then 
+if test -r ../config.cache; then
   . ../config.cache
 fi
 
