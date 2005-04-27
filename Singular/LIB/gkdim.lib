@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gkdim.lib,v 1.6 2005-02-23 18:10:45 levandov Exp $";
+version="$Id: gkdim.lib,v 1.7 2005-04-27 19:32:14 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: GKdim.lib     Procedures for calculating the Gelfand-Kirillov dimension
@@ -46,7 +46,8 @@ NOTE: uses the dim procedure, if the factor-module is zero, -1 is returned
 ///////////////////////////////////////////////////////////////////////////////
 proc GKdim(list L)
 "USAGE:   GKdim(L);   L is a left ideal/module/matrix
-RETURN:  int, the Gelfand-Kirillov dimension of the factor-module, whose presentation is given by L
+PURPOSE: compute the Gelfand-Kirillov dimension of the factor-module, whose presentation is given by L
+RETURN:  int 
 NOTE:  if the factor-module is zero, -1 is returned
 EXAMPLE: example GKdim; shows examples
 "
