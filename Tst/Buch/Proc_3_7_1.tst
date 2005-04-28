@@ -51,7 +51,8 @@ RETURN:  two ideals i1,i2, where i2 is given by a subset of
 //----- change to lexicographical ordering ------------
    //a procedure from ring.lib changing the order to lp 
    //creating a new basering s
-   changeord("s","lp");
+   def s=changeord("lp");
+   setring s;
 //----- make a random coordinate change ----------------
    //creating lower triangular random generators for the 
    //maximal ideal a procedure form random.lib

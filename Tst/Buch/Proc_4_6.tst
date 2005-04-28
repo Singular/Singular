@@ -55,7 +55,7 @@ NOTE:    algorithm of Gianni/Trager/Zacharias
 {
    def  BAS = basering;
 //----the ordering is changed to the lexicographical one
-   changeord("R","lp");
+   def R=changeord("lp"); setring R;
    ideal i=fetch(BAS,i);
    int n=nvars(R);
    int k;
