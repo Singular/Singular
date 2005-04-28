@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: makefile.cc,v 1.13 2002-09-26 09:55:10 anne Exp $ */
+/* $Id: makefile.cc,v 1.14 2005-04-28 13:47:17 Singular Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -15,11 +15,11 @@
 #include <mod2.h>
 #include <febase.h>
 #include <grammar.h>
+#include <structs.h>
+#include <tok.h>
 #include <ipid.h>
 #include <ipshell.h>
-#include <structs.h>
 #include <subexpr.h>
-#include <tok.h>
 #include <regex.h>
 
 #include "modgen.h"
@@ -97,8 +97,8 @@ void build_head_section(
   fprintf(fp, "CC\t= gcc\n");
   fprintf(fp, "CXX\t= gcc\n");
 #warning "PROBLEM: nice place for include file has to be found"
-  fprintf(fp, "CFLAGS\t= -DNDEBUG -DBUILD_MODULE -I. -I%s/Singular -I%s/include\n",PREFIX,EXEC_PREFIX);
-  fprintf(fp, "DCFLAGS\t= -DBUILD_MODULE -I. -I%s/Singular -I%s/include\n",PREFIX,EXEC_PREFIX);
+  fprintf(fp, "CFLAGS\t= -DNDEBUG -DBUILD_MODULE -I. -I%s/kernel -I%s/Singular -I%s/include\n",PREFIX,PREFIX,EXEC_PREFIX);
+  fprintf(fp, "DCFLAGS\t= -DBUILD_MODULE -I. -I%s/kernel -I%s/Singular -I%s/include\n",PREFIX,PREFIX,EXEC_PREFIX);
   fprintf(fp, "#LD\t=\n");
   fprintf(fp, "\n");
   fprintf(fp, "instdir          = %s\n", inst_dir );

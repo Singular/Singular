@@ -27,7 +27,6 @@ BISON		= bison
 INSTALL		= @INSTALL@
 INSTALL_PROGRAM	= @INSTALL_PROGRAM@ 
 INSTALL_DATA	= @INSTALL_DATA@
-MKINSTALLDIRS   = ./mkinstalldirs
 LN_S		= @LN_S@
 
 SINGUNAME	= @SINGUNAME@
@@ -37,9 +36,9 @@ S_VERSION       = $${SINGULAR_VERSION-@SINGULAR_VERSION@}
 DISTROOT_NAME   = Singular-${S_VERSION}
 BINDIST_NAME    = ${DISTROOT_NAME}-${SINGUNAME}
 SHAREDIST_NAME  = ${DISTROOT_NAME}-share
-MKINSTALLDIRS   = $(topsrcdir)/Singular/mkinstalldirs
+MKINSTALLDIRS   = ../../Singular/mkinstalldirs
 LN_S            = @LN_S@
-INSTALL         = $(topsrcdir)/Singular/install-sh -c
+INSTALL         = ../../Singular/install-sh -c
 INSTALL_PROGRAM = ${INSTALL}
 INSTALL_DATA    = ${INSTALL} -m 644
 MODGEN		= $(bindir)/modgen
@@ -48,7 +47,7 @@ MODGEN		= $(bindir)/modgen
 ## compiler and linker options
 ##
 CFLAGS	+= --no-rtti --no-exceptions -O3 -w -fomit-frame-pointer -pipe -fno-implicit-templates \
-	-g -I${includedir} -I../include -I../../Singular -DNDEBUG -DMODULE_GENERATOR \
+	-g -I${includedir} -I../include -I../../kernel -I../../Singular -DNDEBUG -DMODULE_GENERATOR \
 	-D${SING_UNAME}
 LIBS	+= -L/usr/local/lib -lgmp
 
