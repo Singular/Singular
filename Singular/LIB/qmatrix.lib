@@ -1,4 +1,4 @@
-version="$Id: qmatrix.lib,v 1.8 2005-02-23 18:10:46 levandov Exp $";
+version="$Id: qmatrix.lib,v 1.9 2005-04-28 16:32:06 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: qmatrix.lib     Quantum matrices, quantum minors and symmetric groups
@@ -79,7 +79,8 @@ example
 
 proc LengthSymElement(intvec v)
 "USAGE:   LengthSymElement(v); v an intvec representing an element of S(n)
-RETURN:  int, the length of v
+PURPOSE: determine the length of v
+RETURN:  int
 NOTE:    if v doesn't represent an element of S(n), the output may have no sense
 SEE ALSO: SymGroup, LengthSym
 EXAMPLE: example LengthSymElement; shows examples
@@ -107,7 +108,8 @@ example
 
 proc LengthSym(intmat M)
 "USAGE:   LengthSym(M); M an intmat representing a subset of S(n) (each row must be an element of S(n))
-RETURN:  intvec, the i-th element is the length of the i-th row of M
+PURPOSE: determine a vector, which i-th element is the length of the i-th row of M
+RETURN:  intvec 
 NOTE:    If M is not a subset of S(n), the output may not have meaning
 SEE ALSO: SymGroup, LengthSymElement
 EXAMPLE: example LengthSym; shows examples

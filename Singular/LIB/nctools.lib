@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: nctools.lib,v 1.10 2005-02-23 18:10:46 levandov Exp $";
+version="$Id: nctools.lib,v 1.11 2005-04-28 16:32:06 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: nctools.lib     General tools for noncommutative algebras
@@ -15,15 +15,15 @@ weightedRing(r);	changes the ordering of a ring to a weighted one,
 ndc([v]);               the ideal of non-degeneracy conditions in G-algebra,
 RootOfUnity(n);         the minimal polynomial for the n-th primitive root of unity,
 Weyl([p]);              creates Weyl algebra structure in a basering (two different realizations),
-CreateWeyl(n, [p]);     returns n-th Weyl algebra in (x(i),D(i)) presentation; in char p, if an integer p is given,
-Heisenberg(N, [p,d]);   returns N-th  Heisenberg algebra in (x(i),y(i),h) realization,
+CreateWeyl(n, [p]);     returns n-th Weyl algebra in (x(i),D(i)) presentation,
+Heisenberg(N, [p,d]);   returns n-th  Heisenberg algebra in (x(i),y(i),h) realization,
 Exterior();             returns qring, the exterior algebra of a basering,
-Fin_dim_algebra(matrix M, list #); creates finite dimensional algebra structure from the basering and the multiplication matrix M,
+fin_dim_algebra(matrix M, list #); creates finite dimensional algebra structure from the basering and the multiplication matrix M,
 
 AUXILIARY PROCEDURES:
-Newton(f);  		Newton diagram of a polynomial f,
+Newton(f);  		Newton diagram of a polynomial,
 NCRelations(r);		recovers the non-commutative relations of a G-algebra,
-IsCentral(p,[v]);       check for the commutativity of polynomial p with the G-algebra,
+IsCentral(p,[v]);       check for the commutativity of a polynomial in the G-algebra,
 Is_NC();                checks whether basering is noncommutative,
 UpOneMatrix(N);         returns NxN matrix with 1's in the whole upper triagle,
 
@@ -33,14 +33,14 @@ wRing(r);		alias to weightedRing,
 
 ///////////////////////////////////////////////////////////////////////////////
 
-// This procedure computes a weights vector for a G-Algebra
-// r must be a G-algebra
+// This procedure computes a weights vector for a G-algebra r
 
 proc Gweights(def r)
 "USAGE:   Gweights(r); r a ring or a square matrix
-RETURN:   a weight vector for the G-algebra:
-          r itself, if it is of the type ring,
+PURPOSE: compute the weight vector for the G-algebra:
+          either r itself, if it is of the type ring,
           or for a G-algebra, defined by the square matrix r
+RETURN:   intvec
 NOTE:    with Gweights you obtain a vector, which must be used to redefine the G-Algebra. If the input is a matrix and the output is the zero vector then there is not a G-algebra structure associated to these relations with respect to the given variables. Another possibility is to use wRing or weightedRing to obtain directly the G-Algebra.
 EXAMPLE: example Gweights; shows examples
 SEE ALSO: wRing, weightedRing
@@ -121,9 +121,10 @@ example
 
 proc weightedRing(def r)
 "USAGE:   weightedRing(r); r a ring
-RETURN:  ring with the relations of r with order changed to comply with
-the ordering condition for G-algebras
-NOTE:    you have to activate this ring with the "setring" command
+PURPOSE:  equip a ring with such weights,that the relations of a new ring
+comply with the ordering condition for G-algebras
+RETURN:  ring
+NOTE:    you have to activate this ring with the \"setring\" command
 EXAMPLE: example weightedRing; shows examples
 SEE ALSO: wRing, Gweights
 "{
@@ -336,7 +337,8 @@ RETURNS: if there is a solution, an intvec with the solution."
 
 proc Newton(poly f)
 "USAGE:   Newton(f); f a poly
-RETURN:  intmat, representing the Newton diagram of f
+PURPOSE: compute the Newton diagram of f
+RETURN:  intmat
 NOTE:    each row is the exponent of a monomial of f
 EXAMPLE: example Newton; shows examples
 "{
@@ -372,9 +374,11 @@ example
 
 proc NCRelations(def r)
 "USAGE:   NCRelations(r); r a ring
-RETURN:  a list with two elements, both elements are of type matrix and
-	 represent the matrices C,D defining the non-commutative relations
-	 of the G-algebra r
+PURPOSE: recover the noncommutative relations via matrices C and D from
+a noncommutative ring
+RETURN:  list L with two elements, both elements are of type matrix:
+         L[1] = matrix of coefficients C,
+         L[2] = matrix of polynomials D
 EXAMPLE: example NCRelations; shows examples
 "{
   list l;
@@ -432,12 +436,14 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc Fin_dim_algebra(matrix M, list #)
-"USAGE:   Fin_dim_algebra(M,[r]); M a matrix, r an optional ring.
-RETURN:  nothing. Creates finite dimensional algebra structure in a ring r
-(if it is given) or in a basering (by default) from the matrix M. Exports the ideal called Quot for further qring definition. 
-NOTE: matrix M will be read according to relations x_j*x_i = M[i,j]; Quot is not given in its two-sided Groebner basis.
-EXAMPLE: Fin_dim_algebra; shows examples
+proc fin_dim_algebra(matrix M, list #)
+"USAGE:   fin_dim_algebra(M,[r]); M a matrix, r an optional ring.
+PURPOSE: creates a finite dimensional algebra structure in a ring r
+(if it is given) or in a basering (by default) from the matrix M. 
+Exports the ideal called Quot for further qring definition. 
+RETURN:  nothing
+NOTE: matrix M will be read according to relations Xj*Xi = M[i,j]; Quot is not given in its two-sided Groebner basis.
+EXAMPLE: example fin_dim_algebra; shows examples
 "
 {
   if (size(#) >0)
@@ -488,7 +494,7 @@ example
   ring r=(0,a,b),(x(1..3)),dp;
   matrix S[3][3];
   S[2,3]=a*x(1); S[3,2]=-b*x(1);
-  Fin_dim_algebra(S);
+  fin_dim_algebra(S);
   Quot = twostd(Quot);
   qring Qr = Quot;
   Qr;
@@ -497,8 +503,9 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc IsCentral(poly p, list #)
-"USAGE:   IsCentral(p,[v]); p poly, v an integer (with v!=0 procedure will be verbose)
-RETURN:  integer (1 if p commutes with all variables, 0 otherwise)
+"USAGE:   IsCentral(p,[v]); p poly, v an integer (with v!=0, procedure will be verbose)
+PURPOSE: check whether p is central in a basering (that is, commutes with everything)
+RETURN:  integer (1, if p commutes with all variables, 0 otherwise)
 EXAMPLE: example IsCentral; shows examples
 "{
   int N = nvars(basering);
@@ -538,7 +545,8 @@ example
 
 proc UpOneMatrix(int N)
 "USAGE:   UpOneMatrix(N); N an integer, the number of columns
-RETURN:  intmat, NxN matrix with 1's in the whole upper triagle
+PURPOSE: compute an NxN matrix with 1's in the whole upper triagle
+RETURN:  intmat
 NOTE: helpful for setting noncommutative algebras with complicated
 coefficient matrices
 EXAMPLE: example UpOneMatrix; shows examples
@@ -566,8 +574,9 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 proc ndc(list #)
-"USAGE:   ndc([v]); v an optional integer. If v!=0 procedure will be verbose
-RETURN:  ideal of non-degeneracy conditions of the basering
+"USAGE:   ndc([v]); v an optional integer (if v!=0, procedure will be verbose)
+PURPOSE: compute the non-degeneracy conditions of the basering,
+RETURN:  ideal
 EXAMPLE: example ndc; shows examples
 "
 {
@@ -632,7 +641,8 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 proc RootOfUnity(int n)
 "USAGE:   RootOfUnity(n); n an integer
-RETURN:  number, the n-th primitive root of unity (for use as minpoly)
+PURPOSE: compute the minimal polynomial for the n-th primitive root of unity 
+RETURN:  number
 NOTE: works only in field extensions by one element
 EXAMPLE: example RootOfUnity; shows examples
 "
@@ -710,9 +720,11 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 proc Weyl(list #)
 "USAGE:   Weyl([p]); p an optional integer.
-RETURN:  nothing. Creates Weyl algebra structure in a basering. By default
+PURPOSE: create a Weyl algebra structure on a basering. By default
 mimics (x(1..N),d(1..N)) realization. If p is given and is not zero,
 uses (x(1),d(1),x(2),d(2),... ) realization.
+RETURN:  nothing
+SEE ALSO: CreateWeyl
 EXAMPLE: example Weyl; shows examples
 "
 {
@@ -768,8 +780,9 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 proc Heisenberg(int N, list #)
 "USAGE:   Heisenberg(N, [p,d]); N an integer (setting 2*N+1 variables), p an optional integer (field characteristic), d an optional integer (power of h in the commutator)
-RETURN:  N-th  Heisenberg algebra in x(i),y(i),h realization
-NOTE: you have to activate this ring with the "setring" command
+PURPOSE: create a N-th  Heisenberg algebra in x(i),y(i),h realization
+RETURN: nothing 
+NOTE: you have to activate this ring with the \"setring\" command
 EXAMPLE: example Heisenberg; shows examples
 "
 {
@@ -804,16 +817,18 @@ example
 {
   "EXAMPLE:";echo=2;
   def a = Heisenberg(2);
-  setring a; 
-  a;
+  setring a;   a;
+  def H3 = Heisenberg(3, 7, 2);
+  setring H3;  H3;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 proc Exterior(list #)
 "USAGE:   Exterior();
-RETURN:  qring, the exterior algebra of a basering
-NOTE: you have to activate this qring with the "setring" command
+PURPOSE:  create the exterior algebra of a basering,
+RETURN:  qring
+NOTE: you have to activate this qring with the \"setring\" command
 EXAMPLE: example Exterior; shows examples
 "
 {
@@ -852,8 +867,9 @@ example
 
 proc CreateWeyl(int n, list #)
 "USAGE:   CreateWeyl(n,[p]); n an integer, n>0; p an optional integer (field characteristic)
-RETURN:  a ring, describing n-th Weyl algebra
-NOTE:    You have to activate this ring with the "setring" command.
+PURPOSE: create a n-th Weyl algebra
+RETURN:  ring 
+NOTE:    you have to activate this ring with the \"setring\" command.
          The presentation of n-th Weyl algebra is classical:
 	 D(i)x(i)=x(i)D(i)+1
 SEE ALSO: Weyl
@@ -895,7 +911,8 @@ example
 
 proc Is_NC()
 "USAGE:   Is_NC();
-RETURN:   1, if basering is noncommutative; 0 otherwise.
+PURPOSE: check whether a basering is commutative or not
+RETURN:   int (1, if basering is noncommutative; 0 otherwise)
 EXAMPLE: example Is_NC; shows examples
 "{
   string rname=nameof(basering);
