@@ -1,8 +1,8 @@
-// $Id: deform.lib,v 1.33 2005-04-28 09:22:14 Singular Exp $
+// $Id: deform.lib,v 1.34 2005-04-28 15:12:24 Singular Exp $
 // author: Bernd Martin email: martin@math.tu-cottbus.de
 //(bm, last modified 4/98)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: deform.lib,v 1.33 2005-04-28 09:22:14 Singular Exp $";
+version="$Id: deform.lib,v 1.34 2005-04-28 15:12:24 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  deform.lib    Miniversal Deformation of Singularities and Modules
@@ -893,8 +893,7 @@ Sub-proc: return martix ord(a_ij) with respect to weight_vec, or
       {  degA[i,j]=ord(A[i,j]); }
     }
   }
- setring br;
-  if(system("with","Namespaces")) { kill Top::nr; }
+  setring br;
   if (defined(nr)) { kill nr; }
   return(degA);
 }
