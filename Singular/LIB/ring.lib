@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ring.lib,v 1.21 2005-04-25 10:13:06 Singular Exp $";
+version="$Id: ring.lib,v 1.22 2005-04-28 09:21:59 Singular Exp $";
 category="General purpose";
 info="
 LIBRARY:  ring.lib      Manipulating Rings and Maps
@@ -27,29 +27,23 @@ LIB "general.lib";
 LIB "primdec.lib";
 ///////////////////////////////////////////////////////////////////////////////
 
-proc changechar (string newr, string c, list #)
-"USAGE:   changechar(newr,c[,r]);  newr,c=strings, r=ring
-CREATE:  create a new ring with name `newr` and make it the basering if r is
-         an existing ring [default: r=basering].
-         The new ring differs from the old ring only in the characteristic.
-         If, say, (newr,c) = (\"R\",\"0,A\") and the ring r exists, the new
-         basering will have name R, characteristic 0 and one parameter A.
-RETURN:  No return value
-NOTE:    Works for qrings if map from old_char to new_char is implemented
+proc changechar (string c, list #)
+"USAGE:   changechar(c[,r]);  c=string, r=ring
+RETURN:  ring R, obtained from the ring r [default: r=basering], by changing
+         charstr(r) to c.
+NOTE:    Works for qrings if map from old_char to new_char is implemented.
          This proc uses 'execute' or calls a procedure using 'execute'.
-         If you use it in your own proc, let the local names of your proc
-         start with @.
 EXAMPLE: example changechar; shows an example
 "
 {
    if( size(#)==0 ) { def @r=basering; }
-   if( size(#)==1 ) { def @r=#[1]; }
+   if(( size(#)==1 ) and (typeof(#[1])=="ring")) { def @r=#[1]; }
    setring @r;
    ideal i = ideal(@r); int @q = size(i);
    if( @q!=0 )
-      { string @s = "@newr1"; }
+      { string @s = "Rnew1"; }
    else
-      { string @s = newr; }
+      { string @s = "Rnew"; }
    string @newring = @s+"=("+c+"),("+varstr(@r)+"),("+ordstr(@r)+");";
    execute("ring "+@newring);
    if( @q!=0 )
@@ -57,34 +51,26 @@ EXAMPLE: example changechar; shows an example
       map phi = @r,maxideal(1);
       ideal i = phi(i);
       attrib(i,"isSB",1);         //*** attrib funktioniert ?
-      execute("qring "+newr+"=i;");
+      qring Rnew=i;
    }
-   export(`newr`);
-   keepring(`newr`);
-   if (voice==2) { "// basering is now",newr; }
-   return();
+   return(Rnew);
 }
 example
 {  "EXAMPLE:"; echo = 2;
    ring r=0,(x,y,u,v),(dp(2),ds);
-   changechar("R","2,A"); R;"";
-   changechar("R1","32003",R); R1;
-   if(system("with","Namespaces")) { kill Top::R,Top::R1; }
-   if (defined(R)) {kill R,R1;}
+   def R=changechar("2,A"); R;"";
+   def R1=changechar("32003",R); R1;
+   kill R,R1;
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc changeord (string newr, string o, list #)
-"USAGE:   changeord(newr,o[,r]);  newr,o=strings, r=ring/qring
-CREATE:  create a new ring with name `newr` and make it the basering if r is
-         an existing ring/qring [default: r=basering].
-         The new ring differs from the old ring only in the ordering. If, say,
-         (newr,o) = (\"R\",\"wp(2,3),dp\") and the ring r exists and has >=3
-         variables, the new basering will have name R and ordering wp(2,3),dp.
-RETURN:  No return value
+proc changeord (string o, list #)
+"USAGE:   changeord(newordstr[,r]);  newordstr=string, r=ring/qring
+RETURN:  ring R, obtained from the ring r [default: r=basering], by changing
+         ordstr(r) to newordstr. If, say, newordstr=(\"R\",\"wp(2,3),dp\") and
+         if the ring r exists and has >=3 variables, the ring R will be 
+         equipped with the monomial ordering wp(2,3),dp.
 NOTE:    This proc uses 'execute' or calls a procedure using 'execute'.
-         If you use it in your own proc, let the local names of your proc
-         start with @.
 EXAMPLE: example changeord; shows an example
 "
 {
@@ -93,9 +79,9 @@ EXAMPLE: example changeord; shows an example
    setring @r;
    ideal i = ideal(@r); int @q = size(i);
    if( @q!=0 )
-      { string @s = "@newr1"; }
+      { string @s = "Rnew1"; }
    else
-      { string @s = newr; }
+      { string @s = "Rnew"; }
    string @newring = @s+"=("+charstr(@r)+"),("+varstr(@r)+"),("+o+");";
    execute("ring "+@newring);
    if( @q!=0 )
@@ -103,40 +89,32 @@ EXAMPLE: example changeord; shows an example
       map phi = @r,maxideal(1);
       ideal i = phi(i);
       attrib(i,"isSB",1);         //*** attrib funktioniert ?
-      execute("qring "+newr+"=i;");
+      qring Rnew=i;
    }
-   export(`newr`);
-   keepring(`newr`);
-   if (voice==2) { "// basering is now",newr; }
-   return();
+   return(Rnew);
 }
 example
 {  "EXAMPLE:"; echo = 2;
    ring r=0,(x,y,u,v),(dp(2),ds);
-   changeord("R","wp(2,3),dp"); R; "";
+   def R=changeord("wp(2,3),dp"); R; "";
    ideal i = x^2,y^2-u^3,v;
    qring Q = std(i);
-   changeord("Q'","lp",Q); Q';
-   if(system("with","Namespaces")) { kill Top::R,Top::Q,Top::Q'; }
-   if (defined(R)) {kill R,Q,Q';}
+   def Q'=changeord("lp",Q); Q';
+   kill R,Q,Q';
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc changevar (string newr, string vars, list #)
-"USAGE:   changevar(newr,vars[,r]);  newr,vars=strings, r=ring/qring
-CREATE:  creates a new ring with name `newr` and makes it the basering if r
-         is an existing ring/qring [default: r=basering].
-         The new ring differs from the old ring only in the variables. If,
-         say, (newr,vars) = (\"R\",\"t()\") and the ring r exists and has n
+proc changevar (string vars, list #)
+"USAGE:   changevar(vars[,r]);  vars=string, r=ring/qring
+RETURN:  ring R, obtained from the ring r [default: r=basering], by changing
+         varstr(r) according to the value of vars.
+         If, say, vars = \"t()\" and the ring r exists and has n
          variables, the new basering will have name R and variables
          t(1),...,t(n).
          If vars = \"a,b,c,d\", the new ring will have the variables a,b,c,d.
-RETURN:  No return value
 NOTE:    This procedure is useful in connection with the procedure ringtensor,
          when a conflict between variable names must be avoided.
          This proc uses 'execute' or calls a procedure using 'execute'.
-         If you use it in your own proc, let the local names of your proc
-         start with @.
 EXAMPLE: example changevar; shows an example
 "
 {
@@ -145,9 +123,9 @@ EXAMPLE: example changevar; shows an example
    setring @r;
    ideal i = ideal(@r); int @q = size(i);
    if( @q!=0 )
-      { string @s = "@newr1"; }
+      { string @s = "Rnew1"; }
    else
-      { string @s = newr; }
+      { string @s = "Rnew"; }
    string @newring = @s+"=("+charstr(@r)+"),(";
    if( vars[size(vars)-1]=="(" and vars[size(vars)]==")" )
    {
@@ -161,12 +139,9 @@ EXAMPLE: example changevar; shows an example
       map phi = @r,maxideal(1);
       ideal i = phi(i);
       attrib(i,"isSB",1);         //*** attrib funktioniert ?
-      execute("qring "+newr+"=i;");
+      qring Rnew=i;
    }
-   export(`newr`);
-   keepring(`newr`);
-   if (voice==2) { "// basering is now",newr; }
-   return();
+   return(Rnew);
 }
 example
 {  "EXAMPLE:"; echo = 2;
@@ -174,10 +149,9 @@ example
    ideal i = x^2,y^2-u^3,v;
    qring Q = std(i);
    setring(r);
-   changevar("R","A()"); R; "";
-   changevar("Q'","a,b,c,d",Q); Q';
-   if(system("with","Namespaces")) { kill Top::R,Top::Q,Top::Q'; }
-   if (defined(R)) {kill R,Q,Q';}
+   def R=changevar("A()"); R; "";
+   def Q'=changevar("a,b,c,d",Q); Q';
+   kill R,Q,Q';
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -191,8 +165,6 @@ RETURN:  ring R with characteristic 'ch', ordering 'or' and n variables with
          say va=\"T(\", the variables are T(1),...,T(n).
 NOTE:    This proc is useful for defining a ring in a procedure.
          This proc uses 'execute' or calls a procedure using 'execute'.
-         If you use it in your own proc, it may be advisable to let the local 
-         names of your proc start with a @.
 EXAMPLE: example defring; shows an example
 "
 {
@@ -213,10 +185,9 @@ example
 
 proc defrings (int n, list #)
 "USAGE:   defrings(n,[p]);  n,p integers
-CREATE:  Defines a ring with name Sn, characteristic p, ordering ds and n
-         variables x,y,z,a,b,...if n<=26 (resp. x(1..n) if n>26) and makes it
-         the basering (default: p=32003)
-RETURN:  No return value
+RETURN:  ring R with characteristic p [default: p=32003], ordering ds and n
+         variables x,y,z,a,b,...if n<=26 (resp. x(1..n) if n>26) 
+NOTE:    This proc uses 'execute' or calls a procedure using 'execute'.
 EXAMPLE: example defrings; shows an example
 "
 {
@@ -225,32 +196,34 @@ EXAMPLE: example defrings; shows an example
    else { p=#[1]; }
    if (n >26)
    {
-      string s="ring S"+string(n)+"="+string(p)+",x(1.."+string(n)+"),ds;";
+      string s="ring S ="+string(p)+",x(1.."+string(n)+"),ds;";
    }
    else
    {
-      string s="ring S"+string(n)+"="+string(p)+",("+A_Z("x",n)+"),ds;";
+      string s="ring S ="+string(p)+",("+A_Z("x",n)+"),ds;";
    }
    execute(s);
-   export basering;
-   execute("keepring S"+string(n)+";");
-   if (voice==2) { "// basering is now:",s; }
+   dbprint(printlevel-voice+2,"
+// 'defrings' created a ring. To see the ring, type (if the name R was 
+// assigned to the return value):
+    show R;
+// To make the ring the active basering, type 
+    setring R; ");
+   return(S);
 }
 example
 { "EXAMPLE:"; echo = 2;
-   defrings(5,0); S5; "";
-   defrings(30); S30;
-   if(system("with","Namespaces")) { kill Top::S5,Top::S30; }
-   if (defined(R)) {kill S5,S30;}
+   def S5=defrings(5,0); S5; "";
+   def S30=defrings(30); S30;
+   kill S5,S30;
 }
 ///////////////////////////////////////////////////////////////////////////////
 
 proc defringp (int n,list #)
 "USAGE:   defringp(n,[p]);  n,p=integers
-CREATE:  defines a ring with name Pn, characteristic p, ordering dp and n
-         variables x,y,z,a,b,...if n<=26 (resp. x(1..n) if n>26) and makes it
-         the basering (default: p=32003)
-RETURN:  No return value
+RETURN:  ring R with characteristic p [default: p=32003], ordering dp and n
+         variables x,y,z,a,b,...if n<=26 (resp. x(1..n) if n>26) 
+NOTE:    This proc uses 'execute' or calls a procedure using 'execute'.
 EXAMPLE: example defringp; shows an example
 "
 {
@@ -259,24 +232,26 @@ EXAMPLE: example defringp; shows an example
    else { p=#[1]; }
    if (n >26)
    {
-      string s="ring P"+string(n)+"="+string(p)+",x(1.."+string(n)+"),dp;";
+      string s="ring P="+string(p)+",x(1.."+string(n)+"),dp;";
    }
    else
    {
-     string s="ring P"+string(n)+"="+string(p)+",("+A_Z("x",n)+"),dp;";
+     string s="ring P="+string(p)+",("+A_Z("x",n)+"),dp;";
    }
    execute(s);
-   export basering;
-   execute("keepring P"+string(n)+";");
-   //the next comment is only shown if defringp is not called by another proc
-   if (voice==2) { "// basering is now:",s; }
+   dbprint(printlevel-voice+2,"
+// 'defringp' created a ring. To see the ring, type (if the name R was 
+// assigned to the return value):
+    show R;
+// To make the ring the active basering, type 
+    setring R; ");
+   return(P);
 }
 example
 { "EXAMPLE:"; echo = 2;
-   defringp(5,0); P5; "";
-   defringp(30); P30;
-   if(system("with","Namespaces")) { kill Top::P5,Top::P30; }
-   if (defined(R)) {kill P5,P30;}
+   def P5=defringp(5,0); P5; "";
+   def P30=defringp(30); P30;
+   kill P5,P30;
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -619,15 +594,13 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc ringtensor (string s, list #)
-"USAGE:   ringtensor(s,r1,r2,...); s=string, r1,r2,...=rings
-CREATE:  A new base ring with name `s` if r1,r2,... are existing rings.
-         If, say, s = \"R\" and the rings r1,r2,... exist, the new ring will
-         have name R, variables from all rings r1,r2,... and as monomial
-         ordering the block (product) ordering of r1,r2,... . Hence, R
+proc ringtensor (list #)
+"USAGE:   ringtensor(r1,r2,...); s=string, r1,r2,...=rings
+RETURN:  ring R whose variables are the variables from all rings r1,r2,... 
+         and whose monomial ordering is the block (product) ordering of the 
+         respective monomial orderings of r1,r2,... . Hence, R
          is the tensor product of the rings r1,r2,... with ordering matrix
          equal to the direct sum of the ordering matrices of r1,r2,...
-RETURN:  no return value
 NOTE:    The characteristic of the new ring will be that of r1. The names of
          variables in the rings r1,r2,... should differ (if a name, say x,
          occurs in r1 and r2, then, in the new ring r, x always refers to the
@@ -636,8 +609,6 @@ NOTE:    The characteristic of the new ring will be that of r1. The names of
          of ri is compatible with the characteristic of r1 (i.e. if imap from
          ri to r1 is implemented)
          This proc uses 'execute' or calls a procedure using 'execute'.
-         If you use it in your own proc, let the local names of your proc
-         start with @ (see the file HelpForProc)
 EXAMPLE: example ringtensor; shows an example
 "
 {
@@ -659,7 +630,7 @@ EXAMPLE: example ringtensor; shows an example
       @q=@q+@q(@ii);
    }
    if( @q!=0 ) { @s1 = "@newr"; }   // @q=0 iff none of the rings ri is a qring
-   else {  @s1 = s; }
+   else {  @s1 = "s"; }
 //------------------------------- create new ring -----------------------------
    string @newring ="=("+charstr(#[1])+"),("+@vars[1,size(@vars)-1]+"),("
                   +@order[1,size(@order)-1]+");";
@@ -676,31 +647,34 @@ EXAMPLE: example ringtensor; shows an example
          }
       }
       i=std(i);
-      execute("qring "+s+"=i;");
+      qring s=i;
    }
-//----------------------- export and keep created ring ------------------------
-   export(`s`);
-   keepring(`s`);
-   if (voice==2) { "// basering is now",s; }
-   return();
+   dbprint(printlevel-voice+2,"
+// 'ringtensor' created a ring. To see the ring, type (if the name R was 
+// assigned to the return value):
+    show R;
+// To make the ring the active basering, type 
+    setring R; ");
+   return(s);
 }
 example
 { "EXAMPLE:"; echo = 2;
    ring r=32003,(x,y,u,v),dp;
    ring s=0,(a,b,c),wp(1,2,3);
    ring t=0,x(1..5),(c,ls);
-   ringtensor("R",r,s,t);
-   type R;
+   def R=ringtensor(r,s,t);
+   type R; 
    setring s;
    ideal i = a2+b3+c5;
-   changevar("S","x,y,z");       //change vars of sand make S the basering
-   qring qS =std(fetch(s,i));    //create qring of S mod i (maped to S)
-   changevar("T","d,e,f,g,h",t); //change vars of t and make T the basering
-   qring qT=std(d2+e2-f3);       //create qring of T mod d2+e2-f3
-   ringtensor("Q",s,qS,t,qT);
+   def S=changevar("x,y,z");       //change vars of s
+   setring S;
+   qring qS =std(fetch(s,i));      //create qring of S mod i (maped to S)
+   def T=changevar("d,e,f,g,h",t); //change vars of t
+   setring T;
+   qring qT=std(d2+e2-f3);         //create qring of T mod d2+e2-f3
+   def Q=ringtensor(s,qS,t,qT);
    type Q;
-   if(system("with","Namespaces")){kill Top::Q,Top::R,Top::S,Top::T;}
-   if (defined(R)) { kill R,S,T,Q; }
+   kill R,S,T,Q;
 }
 ///////////////////////////////////////////////////////////////////////////////
 
