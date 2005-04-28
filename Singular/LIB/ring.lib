@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ring.lib,v 1.22 2005-04-28 09:21:59 Singular Exp $";
+version="$Id: ring.lib,v 1.23 2005-04-28 15:11:52 Singular Exp $";
 category="General purpose";
 info="
 LIBRARY:  ring.lib      Manipulating Rings and Maps
@@ -59,7 +59,7 @@ example
 {  "EXAMPLE:"; echo = 2;
    ring r=0,(x,y,u,v),(dp(2),ds);
    def R=changechar("2,A"); R;"";
-   def R1=changechar("32003",R); R1;
+   def R1=changechar("32003",R); setring R1; R1;
    kill R,R1;
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -99,7 +99,7 @@ example
    def R=changeord("wp(2,3),dp"); R; "";
    ideal i = x^2,y^2-u^3,v;
    qring Q = std(i);
-   def Q'=changeord("lp",Q); Q';
+   def Q'=changeord("lp",Q); setring Q'; Q';
    kill R,Q,Q';
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -150,7 +150,7 @@ example
    qring Q = std(i);
    setring(r);
    def R=changevar("A()"); R; "";
-   def Q'=changevar("a,b,c,d",Q); Q';
+   def Q'=changevar("a,b,c,d",Q); setring Q'; Q'; 
    kill R,Q,Q';
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -673,7 +673,7 @@ example
    setring T;
    qring qT=std(d2+e2-f3);         //create qring of T mod d2+e2-f3
    def Q=ringtensor(s,qS,t,qT);
-   type Q;
+   setring Q; type Q;
    kill R,S,T,Q;
 }
 ///////////////////////////////////////////////////////////////////////////////
