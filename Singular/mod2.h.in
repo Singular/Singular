@@ -5,7 +5,7 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id: mod2.h.in,v 1.109 2005-02-16 10:54:07 Singular Exp $
+ *  Version: $Id: mod2.h.in,v 1.110 2005-04-28 12:25:32 hannes Exp $
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H
@@ -107,6 +107,8 @@
 #undef HAVE_GETPWNAM
 /* Define if you have popen */
 #undef HAVE_POPEN
+/* Define if you have siginterrupt (BSD4.3) */
+#undef HAVE_SIGINTERRUPT
 /* Define sizeof(char) */
 #define SIZEOF_CHAR 1
 /* Define sizeof(short) */

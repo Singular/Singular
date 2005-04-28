@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: cntrlc.cc,v 1.45 2005-04-25 13:25:46 Singular Exp $ */
+/* $Id: cntrlc.cc,v 1.46 2005-04-28 12:25:23 hannes Exp $ */
 /*
 * ABSTRACT - interupt handling
 */
@@ -119,7 +119,9 @@ si_hdl_typ si_set_signal (
   {
      fprintf(stderr, "Unable to init signal %d ... exiting...\n", sig);
   }
+#ifdef HAVE_SIGINTERRUPT
   siginterrupt(sig, 1);
+#endif
   return retval;
 }                               /* si_set_signal */
 

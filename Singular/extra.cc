@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.220 2005-04-01 08:15:55 bricken Exp $ */
+/* $Id: extra.cc,v 1.221 2005-04-28 12:25:30 hannes Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -60,6 +60,10 @@
 #include "digitech.h"
 #ifdef HAVE_SPECTRUM
 #include "spectrum.h"
+#endif
+
+#if defined(HPUX_10) || defined(HPUX_9)
+extern "C" int setenv(const char *name, const char *value, int overwrite);
 #endif
 
 #ifdef HAVE_PLURAL
