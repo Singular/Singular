@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.123 2005-04-26 20:05:41 levandov Exp $
+@comment $Id: types.doc,v 1.124 2005-04-28 14:55:40 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -45,6 +45,7 @@ For the general syntax of a declaration see @ref{General command syntax}.
 * matrix::
 * module::
 * number::
+* package::
 * poly::
 * proc::
 * qring::
@@ -52,9 +53,6 @@ For the general syntax of a declaration see @ref{General command syntax}.
 * ring::
 * string::
 * vector::
-@ifset namespaces
-* package::
-@end ifset
 @end menu
 
 @c ---------------------------------------
@@ -2639,12 +2637,7 @@ of leading terms (see @ref{vdim})
 @c @end example
 
 @c ---------------------------------------
-@ifset namespaces
 @node number, package, module, Data types
-@end ifset
-@ifclear namespaces
-@node number, poly, module, Data types
-@end ifclear
 @section number
 @cindex number
 @cindex coefficient field
@@ -2877,18 +2870,22 @@ real part of a complex number
 @end table
 
 @c ---------------------------------------
-@ifset namespaces
 @node package, poly, number, Data types
 @section package
 @cindex package
 @cindex ::
 
-Package are a collection of identifier.
-The set of all identifier is called toplevel package: @code{Top}.
-Other reserved package names are @code{Current} with denotes the current
-package name in use, and @code{Up} which will be the current package
-when leave the current one.
-@ref{Libraries}, @ref{Namespaces}.
+The data type package is used to group identifiers into collections.
+It is mainly used as an internal means to avoid collisions of names 
+of identifiers in libraries with variable names defined by the user.
+The most important package is the toplevel package, called @code{Top}.
+It contains all user defined identifiers as well as all user accessible 
+library procedures. Identifiers which are local to a library are contained
+in a package whose name is obtained from the name of the library, where the 
+first letter is converted to uppercase, the remaining ones to lowercase.
+Another reserved package name is @code{Current} with denotes the current
+package name in use.
+See also @ref{Libraries}.
 
 @c * package expressions::
 @c * package operations::
@@ -2906,7 +2903,7 @@ when leave the current one.
 @code{package} name @code{;}
 
 @item Purpose:
-defines a package
+defines a package (Only relevant in very special situations).
 
 @item Example:
 @smallexample
@@ -2934,27 +2931,14 @@ defines a package
 (see @ref{importfrom})
 @item listvar
 (see @ref{listvar})
-@item names
-(see @ref{names})
 @item load
 (see @ref{load})
 @item LIB
 (see @ref{LIB})
-@item system
-@code{system("nsstack")}
-@code{system("nspop")}
-@code{system("nspush",}package @code{)}
-(see @ref{system})
 @end table
-@end ifset
 
 @c ---------------------------------------
-@ifset namespaces
 @node poly, proc, package, Data types
-@end ifset
-@ifclear namespaces
-@node poly, proc, number, Data types
-@end ifclear
 @section poly
 @cindex poly
 

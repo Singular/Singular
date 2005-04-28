@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.122 2005-04-15 13:54:06 Singular Exp $
+@comment $Id: singular.doc,v 1.123 2005-04-28 14:55:39 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -24,7 +24,7 @@
 @set singularmanual 1
 @set withplural 1 
 @set PSUFFIX  (plural)
-@c @set namespaces 1
+@set namespaces 1
 @include version.texi
 @include uname.texi
 @c --------------------- end general setting --------------------

@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.65 2005-04-26 12:47:41 Singular Exp $
+@comment $Id: examples.doc,v 1.66 2005-04-28 14:55:36 Singular Exp $
 @comment this file contains the examples
 
 @c The following directives are necessary for proper compilation
@@ -37,7 +37,7 @@ The following topics are treated:
 * Finite fields::
 * Elimination::
 * Free resolution::
-* Handling of graded modules::
+* Handling graded modules::
 * Computation of Ext::
 * Polar curves::
 * Depth::
@@ -68,7 +68,7 @@ The following topics are treated:
 * Deformations::
 * Elimination::
 * Free resolution::
-* Handling of graded modules::
+* Handling graded modules::
 * Formatting output::
 * Factorization::
 * Kernel of module homomorphisms::
@@ -1133,10 +1133,10 @@ P^4.
 
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
-@node Free resolution, Handling of graded modules, Elimination, Examples
+@node Free resolution, Handling graded modules, Elimination, Examples
 @end ifset
 @ifclear singularmanual
-@node Free resolution, Handling of graded modules, Elimination, Examples
+@node Free resolution, Handling graded modules, Elimination, Examples
 @end ifclear
 @section  Free resolution
 @cindex  Free resolution
@@ -1281,25 +1281,84 @@ the @code{lres} command.
 
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
-@node Handling of graded modules, Computation of Ext, Free resolution, Examples
+@node Handling graded modules, Computation of Ext, Free resolution, Examples
 @end ifset
 @ifclear singularmanual
-@node Handling of graded modules, Formatting output, Free resolution, Examples
+@node Handling graded modules, Formatting output, Free resolution, Examples
 @end ifclear
-@section  Handling of graded modules
-@cindex  Handling of graded modules
+@section  Handling graded modules
+@cindex  Handling graded modules
 
-Hier wird noch ein Text reingeschrieben! 
+How to deal with graded modules in \@sc{Singular} is best explained by
+looking at an example:
 
 @smallexample
 @c example
-ring R = 0,(x,y,z,u,v),dp;
+ring R = 0, (w,x,y,z), dp;
+module I = [-x,0,-z2,0,y2z], [0,-x,-yz,0,y3], [-w,0,0,yz,-z3], 
+           [0,-w,0,y2,-yz2], [0,-1,-w,0,xz], [0,-w,0,y2,-yz2],
+           [x2,-y2,-wy2+xz2]; 
+print(I);
+
+// (1) Check on degrees:
+// =====================
+attrib(I,"isHomog"); // attribute not set => empty output
+homog(I);
+attrib(I,"isHomog");
+
+print(betti(I,0),"betti");  // read degrees from Betti diagram
+
+// (2) Shift degrees:
+// ==================
+def J=I;
+intvec DV = 0,0,-1,-1,-2; 
+attrib(J,"isHomog",DV);    // assign new weight vector
+attrib(J,"isHomog");
+print(betti(J,0),"betti"); 
+
+intmat bettiI=betti(I,0);  // degree corresponding to first non-zero row
+                           // of Betti diagram is accessible via
+                           // attribute "rowShift" 
+attrib(bettiI);
+intmat bettiJ=betti(J,0);
+attrib(bettiJ);
+
+// (3) Graded free resolutions:
+// ============================
+resolution resJ = mres(J,0);
+attrib(resJ);
+print(betti(resJ),"betti");
+attrib(betti(resJ));
 @c example
 @end smallexample
 
+A check on degrees ((1), by using the @code{homog} command) shows that this
+is a graded matrix. The @code{homog} command assigns an admissible weight
+vector (here: 2,2,1,1,0) to the module @code{I} which is accessible via the
+attribute @code{"isHomog"}. Thus, we may think of @code{I} as a graded
+submodule of the graded free $R$-module  
+@tex
+$$F=R(-2)^2\oplus R(-1)^2\oplus R\,.$$
+@end tex
+@ifinfo
+F=R(-2)^2+ R(-1)^2+ R .
+@end ifinfo
+We may also read the degrees from the Betti diagram as shown above.
+The degree on the left of the first nonzero row of the Betti diagram is 
+accessible via the attribute @code{"rowShift"} of the betti matrix
+(which is of type @code{intmat}):
+
+(2) We may shift degrees by assigning another admissible degree vector.
+Note that @sc{Singular} does not check whether the assigned degree
+vector really is admissible. Moreover, note that all assigned
+attributes are lost under a type conversion (e.g. from @code{module} to
+@code{matrix}). 
+
+(3) The same applies to the computation of free resolutions:
+
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
-@node Computation of Ext, Polar curves, Handling of graded modules, Examples
+@node Computation of Ext, Polar curves, Handling graded modules, Examples
 @section  Computation of Ext
 @cindex  Ext
 
@@ -1681,7 +1740,7 @@ could be improved.
 @node Formatting output, Cyclic roots, Depth, Examples
 @end ifset
 @ifclear singularmanual
-@node Formatting output, Factorization, Handling of graded modules, Examples
+@node Formatting output, Factorization, Handling graded modules, Examples
 @end ifclear
 @section Formatting output
 @cindex Formatting output

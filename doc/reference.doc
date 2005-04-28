@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.229 2005-04-26 20:05:39 levandov Exp $
+@comment $Id: reference.doc,v 1.230 2005-04-28 14:55:38 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -3122,7 +3122,6 @@ See
 @ref{Command line options};
 @ref{Procedures and libraries};
 @ref{SINGULAR libraries};
-@ref{Namespaces};
 @ref{proc};
 @ref{standard_lib};
 @ref{string};
@@ -3316,7 +3315,6 @@ See
 @ref{Names};
 @ref{defined};
 @ref{names};
-@ref{Namespaces};
 @ref{package};
 @ref{type}.
 @c ref
@@ -6672,7 +6670,6 @@ See
 * exportto::
 * importfrom::
 * load::
-* unload::
 @end ifset
 @end menu
 
@@ -6837,10 +6834,11 @@ See
 @code{export} name @code{;}
 @*@code{export} list_of_names @code{;}
 @item @strong{Purpose:}
-converts a local variable of a procedure to a global one.
+converts a local variable of a procedure to a global one, that is the
+identifier is moved from the current package to the package @code{Top}.
 @item @strong{Note:}
 Objects defined in a ring are not automatically exported
-when exporting the ring (use @code{keepring} instead).
+when exporting the ring.
 @item @strong{Example:}
 @smallexample
 proc p1
@@ -6864,7 +6862,9 @@ listvar();
 @ifset namespaces
 @c ref
 See
-@ref{exportto}; @ref{keepring}.
+@ref{exportto};
+@ref{importfrom};
+@ref{keepring}.
 @c ref
 @end ifset
 @ifclear namespaces
@@ -6884,34 +6884,44 @@ See
 @code{exportto(} package_name @code{, }name @code{);}
 @*@code{exportto(} package_name @code{,} list_of_names @code{);}
 @item @strong{Purpose:}
-converts a local variable of a procedure to a global one.
-package_name can be @code{Current}, @code{Up}, @code{Top} or any other
-identifier of type package.
+transfers an identifier in the current package into the one specified by 
+package_name. package_name can be @code{Current}, @code{Top} 
+or any other identifier of type package.
 
 @item @strong{Note:}
 Objects defined in a ring are not automatically exported
-when exporting the ring (use @code{keepring} instead).
+when exporting the ring.
+
+@item @strong{Warning:}
+The identifier is transfered to the other package. It does no longer 
+exist in the current package. If the identifier should be copied instead,
+@ref{importfrom} should be used instead.
+
 @item @strong{Example:}
+HIER MUSS NOCH GEAENDERT WERDEN!!!
 @smallexample
 proc p1
 @{
   int i,j;
   exportto(Current,i);
   intmat m;
-  listvar();
+  listvar(Current);
   exportto(Top,m);
 @}
 p1();
 @expansion{} // m                    [1]  intmat 1 x 1
 @expansion{} // j                    [1]  int 0
 @expansion{} // i                    [0]  int 0
-listvar();
+listvar(Top);
 @expansion{} // m                    [0]  intmat 1 x 1
 @expansion{} // i                    [0]  int 0
 @end smallexample
 @end table
 @c ref
-See @ref{keepring}.
+See
+@ref{export};
+@ref{importfrom};
+@ref{keepring}.
 @c ref
 @c ---------------------------------------
 @node importfrom, load, exportto, Control structures
@@ -6919,20 +6929,41 @@ See @ref{keepring}.
 @cindex importfrom
 @table @code
 @item @strong{Syntax:}
-@code{importfrom(}@code{);}
+@code{importfrom(} package_name @code{, }name @code{);}
+@*@code{importfrom(} package_name @code{,} list_of_names @code{);}
+@item @strong{Purpose:}
+creates a new identifier in the current package which is a copy of the 
+one specified by name in the package package_name. package_name can be 
+@code{Top} or any other identifier of type package.
+
+@item @strong{Note:}
+Objects defined in a ring are not automatically imported
+when importing the ring.
+
+@item @strong{Warning:}
+The identifier is copied to the current package. It does still exist
+(independently) in the package package_name. If the identifier should 
+be erased in the package from which it originates, @ref{exportto} should 
+be used instead.
+
+@item @strong{Example:}
+HIER MUSS NOCH GEAENDERT WERDEN!!!
+
 @end table
 
 @c ref
-See @ref{exportto}.
+See
+@ref{export};
+@ref{exportto};
+@ref{keepring}.
 @c ref
 @c ---------------------------------------
-@node load, unload, importfrom, Control structures
+@node load, for, importfrom, Control structures
 @subsection load
 @cindex load
 @table @code
 @item @strong{Syntax:}
 @code{load(} string_expression @code{);}
-@*@code{load(}string_expression@code{,"with");}
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
@@ -6947,13 +6978,13 @@ none
 @c issuing the command @code{system("with");"}.
 reads a library of procedures from a file. If the given filename does
 not start with @kbd{.} or @kbd{/}, the following directories are
-searched for (in that order): the current directory, the directories given in
-the environment variable @code{SINGULARPATH}, some default directories
-relative to the location of the @sc{Singular} executable program, and
-finally some default absolute directories. You can view the search path
-which @sc{Singular} uses to locate its libraries, by starting up
-@sc{Singular} with the option @code{-v}, or by issuing the command
-@code{system("with");"}.
+searched for it (in the given order): the current directory, the 
+directories given in the environment variable @code{SINGULARPATH}, some
+default directories relative to the location of the @sc{Singular} 
+executable program, and finally some default absolute directories. 
+You can view the search path which @sc{Singular} uses to locate its 
+libraries, by starting up @sc{Singular} with the option @code{-v}, 
+or by issuing the command @code{system("with");"}.
 
 Unless  @sc{Singular} is started with the @code{--no-stdlib} option, the
 library @code{standard.lib} is automatically loaded at start-up time.
@@ -6973,55 +7004,20 @@ command:
 @end smallexample
 
 Each time a library @ref{Singular library} / dynamic module @ref{dynamic
-module} is loaded, the corresponding namespace is created, if it does
+module} is loaded, the corresponding package is created, if it does
 not already exist.
 
-The name of this namespace corresponding to a Singular library is
+The name of a package corresponding to a Singular library is
 derived from the name of the library file. The first letter is
 capitalized and everything to right of the left-most dot is
 dropped.
 For a dynamic module the packagename is hard-coded in the binary file.
 
-@sc{Singular} also supports autoloading of packages.
-To use this features, just specify the identifier by its full name:
-
-@smallexample
-@c example error
-  listvar(package);
-  Inout::version;     // full name of a variable in the package Inout
-  listvar(package);   // the package Inout has been autoloaded
-@c example
-@end smallexample
-
-For autoloading the base of the filename is generated by converting the
-packagename to lowercase letters. The search is done in the standard
-@sc{Singular} search path, first looking for a file of this name, and then
-appending to the base @code{.lib}, @code{.so}, @code{.sl} (in this order).
-
-
-An identifier of type @code{package} is created and all procedures are
-stored in that package.
-Before loading the type of the file is checking. For an Singular
-library, the package is set as filename until the first '.' in the name
-with an uppercase first letter. If the library to load is an binary file
-with procedures written in an higher language (e.g. C, C++, ...) the
-package name s hard-code in the library.
-
-
-The second argument @code{"with"} will automatically export all none
-static procedures to the toplevel.
-
-
 Only the names of the procedures in the library are loaded, the body of
 the procedures is read during the first call of this procedure. This minimizes
 memory consumption by unused procedures.  When @sc{Singular} is started
 with the @code{-q} or @code{--quiet} option, no message about the
-loading of a library is displayed.  More exactly, option @code{-q} (and
-likewise @code{--quiet}) unsets option @code{loadLib} to inhibit
-monitoring of library loading (@pxref{option}).
-
-Unless  @sc{Singular} is started with the @code{--no-stdlib} option, the
-library @code{standard.lib} is automatically loaded at start-up time.
+loading of a library is displayed.  
 
 @smallexample
 @c example
@@ -7044,23 +7040,12 @@ See
 @ref{LIB};
 @ref{exportto};
 @ref{importfrom};
-@ref{Namespaces};
 @ref{dynamic module}
 @c ref
-
-@c ---------------------------------------
-@node unload, for, load, Control structures
-@subsection unload
-@cindex unload
-@table @code
-@item @strong{Syntax:}
-@code{unload(}@code{);}
-@end table
-@c ---------------------------------------
 @end ifset
 @c ---------------------------------------
 @ifset namespaces
-@node for, if, unload, Control structures
+@node for, if, load, Control structures
 @end ifset
 @ifclear namespaces
 @node for, if, export, Control structures
@@ -7138,12 +7123,19 @@ See
 @table @code
 @item @strong{Syntax:}
 @code{keepring} name @code{;}
+@item @strong{Warning:}
+This command is obsolete. Instead the respective identifiers in the ring
+should be exported and the ring itself should subsequently be returned.
+The command is only included for backward compatibility and may be 
+removed in future releases.
+
 @item @strong{Purpose:}
 moves the specified ring to the next (upper) level. This command can only
 be used inside of procedures and it should be the last command before the
 @code{return} statement. There it provides the possibility to keep
 a ring which is local to the procedure (and its objects) accessible after
 the procedure ended without making the ring global.
+
 @item @strong{Example:}
 @smallexample
 proc P1
