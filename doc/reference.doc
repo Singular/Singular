@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.230 2005-04-28 14:55:38 Singular Exp $
+@comment $Id: reference.doc,v 1.231 2005-04-28 16:29:55 levandov Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -401,8 +401,7 @@ generator in the first module.
 @*For the computation betti uses only the initial monomials. This could lead
 to confusing results for a non-homogeneous input.
 
-If the optional second argument is non-zero, the Betti
-numbers will be minimized. 
+If the optional second argument is non-zero, the Betti numbers will be minimized. 
 @c If it is 0 then the Betti numbers correspond exactly to the input -
 @c otherwise the command is identical to the one-argument form.
 @item @strong{Example:}

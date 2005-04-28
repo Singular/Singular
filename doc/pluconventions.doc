@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: pluconventions.doc,v 1.8 2005-04-26 20:04:47 levandov Exp $
+@comment $Id: pluconventions.doc,v 1.9 2005-04-28 16:29:53 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -13,12 +13,13 @@
 \input texinfo.tex
 @setfilename plureference.info
 @settitel PLURAL
-@node Top, PLURAL conventions, (dir), (dir)
+@node Top, Getting started with PLURAL, (dir), (dir)
 @menu
-*  PLURAL conventions ::
+*  Getting started with PLURAL ::
 @end menu
-@node PLURAL conventions,  , Top, Top
-@chapter PLURAL conventions
+@c *  PLURAL conventions ::
+@node Getting started with PLURAL,  , Top, Top
+@chapter Getting started with PLURAL
 %**end
 @end ignore
 
@@ -36,45 +37,56 @@
 @c ----------------------------------------------- 
 
 @table @strong
-@item @strong{What is @sc{Plural}?}
+@item @strong{What is @sc{Plural}?} @strong{What @sc{Plural} does?}
 
 @sc{Plural} is a kernel extension of @sc{Singular},
 providing many algorithms for computations within certain noncommutative algebras
-@* (see @ref{Mathematical background @value{PSUFFIX}} for detailed
-information on algebras and algorithms).
+@* (see see @ref{G-algebras} and @ref{Mathematical background @value{PSUFFIX}} for detailed information on algebras and algorithms).
 
-@sc{Plural} is compatible with @sc{Singular}, that is it uses the
-same data structures, 
-sometimes interpreting them in a different way
+@sc{Plural} is compatible with @sc{Singular}, since it uses the
+same data structures, sometimes interpreting them in a different way
 @* and/or modifying them for its own purposes. 
 In spite of such a difference, one can always transfer 
-objects from @sc{Singular} to @sc{Plural} and back.
+objects from commutative rings of @sc{Singular} 
+to noncommutative rings @sc{Plural} and back.
 
-Functionalities of @sc{Plural} (see @ref{Functions  @value{PSUFFIX}}) are accessible as soon as the basering becomes noncommutative (see @ref{ncalgebra}).
 
+
+With @sc{Plural}, one can set up a noncommutative G-algebra with
+a PBW basis, say, @math{A} (see @ref{G-algebras} for step-by-step building instruction and also @ref{PLURAL libraries} 
+for procedures, setting many important algebras easily).
+
+Functionalities of @sc{Plural} (enlisted in @ref{Functions  @value{PSUFFIX}}) are accessible as soon as the basering becomes noncommutative (see @ref{ncalgebra}).
+
+One can perform various computations with polynomials and ideals in @math{A},
+vectors and submodules of a free module
+@tex
+$A^n$.
+@end tex
+@ifinfo
+A^n.
+@end ifinfo
+
+One can work also within factor-algebras of G-algebras (see @ref{qring} type)
+by two-sided ideals (see @ref{twostd}).
+
+@end itemize
 @end table
 
-
 @table @strong
-@item @strong{What @sc{Plural} does not do:}
+@item @strong{What @sc{Plural} does not:}
 @itemize 
 
-@item @sc{Plural} does not perform computations in free algebra
-@itemize 
-@sc{Plural} @strong{can not} compute in free algebra or in its
-general factor algebras. One can only input and work with 
-G-algebras (see @ref{G-algebras}), 
-@* which relations are of the special form
-but still general enough to handle many important algebras. 
+@item @sc{Plural} does not perform computations neither in free algebra
+nor in its general factor algebras.
 
-@* See @ref{PLURAL libraries} for procedures, setting 
-many important algebras in an easy way.
-@end itemize
+One can only input and work with G-algebras and with their factor-algebras
+by two-sided ideals.
 
 @item @sc{Plural} does not work with local and mixed orderings
 
 Right now, one can use only global orderings in @sc{Plural}
-(see @ref{ General definitions for orderings }). 
+(see @ref{General definitions for orderings}). 
 
 This will be enhaced in future by providing the possibility of computations in a tensor product of a noncommutative algebra (with a global ordering)
 @* with a commutative algebra (with any ordering).

@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: plutypes.doc,v 1.25 2005-04-26 20:04:49 levandov Exp $
+@comment $Id: plutypes.doc,v 1.26 2005-04-28 16:29:55 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -827,7 +827,7 @@ poly expressions combined by the arithmetic operations @code{+}, @code{-}, @code
 a type cast to poly
 @end enumerate
 
-@strong{Remark:} In the non-commutative case see @ref{PLURAL conventions}.
+@strong{Remark:} In the non-commutative case see @ref{Getting started with PLURAL}.
 
 @strong{Example:}
 @smallexample
@@ -1068,7 +1068,7 @@ For a detailed description of the concept of rings see
 @end ifclear
 
 @*@strong{Note:} @sc{Plural} works with global orderings
-only (@pxref{PLURAL conventions}).
+only (@pxref{Getting started with PLURAL}).
 
 @menu
 * ring declarations @value{PSUFFIX}::

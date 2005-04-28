@@ -5,7 +5,7 @@
 @c * PLURAL conventions::          
 @c @end menu
 
-@node Top, PLURAL conventions, (dir), (dir)
+@node Top, Getting started with PLURAL, (dir), (dir)
 @c @chapter PLURAL
 @c @cindex PLURAL
 
@@ -39,7 +39,7 @@
 @c * Preface::
 @c * Introduction::
 @c * General concepts::
-* PLURAL conventions::
+* Getting started with PLURAL::
 * Data types @value{PSUFFIX}::
 * Functions  @value{PSUFFIX}::
 @c * Tricks and pitfalls::
@@ -73,17 +73,17 @@
 @c @include general.tex
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
-@node PLURAL conventions, Data types @value{PSUFFIX}, (dir) ,Top
-@section  PLURAL conventions
-@cindex  PLURAL conventions
+@node  Getting started with PLURAL, Data types @value{PSUFFIX}, (dir) ,Top
+@section  Getting started with PLURAL
+@cindex  Getting started with PLURAL
 @end ifset 
 
 @ifclear singularmanual
-@node  PLURAL conventions, Data types @value{PSUFFIX}, (dir) ,Top
-@chapter PLURAL conventions
+@node   Getting started with PLURAL, Data types @value{PSUFFIX}, (dir) ,Top
+@chapter Getting started with PLURAL
 @end ifclear 
 
-@cindex  PLURAL conventions
+@cindex  Getting started with PLURAL
 @include pluconventions.tex
 
 
@@ -94,7 +94,7 @@
 @end menu
 @end ifset 
 
-@node Data types @value{PSUFFIX}, Functions @value{PSUFFIX}, PLURAL conventions, Top
+@node Data types @value{PSUFFIX}, Functions @value{PSUFFIX},  Getting started with PLURAL, Top
 
 @ifset singularmanual
 @section Data types @value{PSUFFIX}

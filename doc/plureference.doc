@@ -1,5 +1,5 @@
   @comment -*-texinfo-*-
-@comment $Id: plureference.doc,v 1.27 2005-04-26 20:04:48 levandov Exp $
+@comment $Id: plureference.doc,v 1.28 2005-04-28 16:29:54 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -15,10 +15,10 @@
 @settitele PLURAL
 @node Top, Functions @value{PSUFFIX}, (dir), (dir)
 @menu
-* Functions @value{PSUFFIX}::
+* Functions @value{PSUFFIX}::   
 @end menu
 
-@node Functions @value{PSUFFIX}, , Top, Top 
+@node Functions @value{PSUFFIX},  , Top, Top
 @chapter  Functions @value{PSUFFIX}
 %**end
 @end ignore
@@ -37,33 +37,32 @@ The general syntax of a function is
 
 
 @menu
-* betti @value{PSUFFIX}::
-* bracket::
-* eliminate @value{PSUFFIX}::
-* envelope::
-* fetch @value{PSUFFIX}::
-* imap @value{PSUFFIX}::
-* intersect @value{PSUFFIX}::
-* kbase @value{PSUFFIX}::
-* lift @value{PSUFFIX}::
-* liftstd @value{PSUFFIX}::
-* memory @value{PSUFFIX}::
-* minres @value{PSUFFIX}::
-* modulo @value{PSUFFIX}::
-* mres @value{PSUFFIX}::
-* ncalgebra::
-* nres @value{PSUFFIX}::
-* oppose::
-* opposite::
-* option @value{PSUFFIX}::
-* preimage @value{PSUFFIX}::
-* quotient @value{PSUFFIX}::
-* reduce @value{PSUFFIX}::
-* std @value{PSUFFIX}::
-* subst @value{PSUFFIX}:: 
-* syz @value{PSUFFIX}:: 
-* twostd::
+* betti @value{PSUFFIX}::       
+* bracket::                     
+* eliminate @value{PSUFFIX}::   
+* envelope::                    
+* fetch @value{PSUFFIX}::       
+* imap @value{PSUFFIX}::        
+* intersect @value{PSUFFIX}::   
+* kbase @value{PSUFFIX}::       
+* lift @value{PSUFFIX}::        
+* liftstd @value{PSUFFIX}::     
+* minres @value{PSUFFIX}::      
+* modulo @value{PSUFFIX}::      
+* mres @value{PSUFFIX}::        
+* ncalgebra::                   
+* nres @value{PSUFFIX}::        
+* oppose::                      
+* opposite::                    
+* preimage @value{PSUFFIX}::    
+* quotient @value{PSUFFIX}::    
+* reduce @value{PSUFFIX}::      
+* std @value{PSUFFIX}::         
+* subst  @value{PSUFFIX}::      
+* syz @value{PSUFFIX}::         
+* twostd::                      
 * vdim @value{PSUFFIX}::
+* Comparison between Singular and Plural functions::
 @end menu
 
 
@@ -114,6 +113,7 @@ command. This implies that a zero is only allowed (and counted) as a
 generator in the first module.
 @*For the computation @code{betti} uses only the initial monomials. This could lead to confusing results for a non-homogeneous input.
 
+If the optional second argument is non-zero, the Betti numbers will be minimized.
 @c The optional second argument is a switch for the minimization of the Betti
 @c numbers. If it is 0 then the Betti numbers correspond exactly to the input -
 @c otherwise the command is identical to the one-argument form.
@@ -130,7 +130,7 @@ r;
 ideal I = x(1),x(2),d(1),d(2),q(1),q(2);
 option(redSB);
 option(redTail);
-resolution R = mres(I,0); // the full length resolution
+resolution R = mres(I,0); // the full length minimal resolution
 print(betti(R),"betti");
 @c example
 @end smallexample
@@ -518,7 +518,7 @@ See
 
 
 @c -----------------------------------------
-@node liftstd @value{PSUFFIX}, memory @value{PSUFFIX}, lift @value{PSUFFIX}, Functions @value{PSUFFIX}
+@node liftstd @value{PSUFFIX}, minres @value{PSUFFIX}, lift @value{PSUFFIX}, Functions @value{PSUFFIX}
 @section liftstd @value{PSUFFIX}
 @cindex liftstd @value{PSUFFIX}
 @table @code
@@ -558,64 +558,12 @@ std(ideal(j-tj)); // test
 See
 @ref{ideal @value{PSUFFIX}};
 @ref{ring @value{PSUFFIX}};
-@ref{option @value{PSUFFIX}};
 @ref{std @value{PSUFFIX}}.
 @c ref
 
 
 @c ---------------------------------------
-@node  memory @value{PSUFFIX}, minres @value{PSUFFIX}, liftstd @value{PSUFFIX}, Functions @value{PSUFFIX}
-@section memory @value{PSUFFIX}
-@cindex memory @value{PSUFFIX}
-@cindex memory managment
-@table @code
-@item @strong{Syntax:}
-@code{memory (} int_expression @code{)}
-@item @strong{Type:}
-int
-@item @strong{Purpose:}
-returns statistics concerning the memory management:
-@itemize @bullet
-@item @code{memory(0)} is the number of active (used) bytes,
-@item @code{memory(1)} is the number of bytes allocated from the
-operating system,
-@item @code{memory(2)} is the maximal number of bytes ever allocated from the
-operating system during the current @sc{Plural} session.
-@end itemize
-@item @strong{Note:}
-To monitor the memory usage during ongoing computations the option
-@code{mem} should be set (using the command @code{option(mem);}).
-@ifset singularmanual
-see also @ref{option}).
-@end ifset
-@item @strong{Example:}
-@smallexample
-@c example
-ring r=0,(x(1..100)),dp;
-ncalgebra(-1,0);
-poly p=(x(1)+x(100))^50;
-proc ReportMemoryUsage()
-{  "Memory currently used by SINGULAR     :",memory(0),"Byte (",
-   memory(0)/101023, "KByte)" +newline+
-   "Memory currently allocated from system:",memory(1), "Byte (",
-   memory(1)/1023, "KByte)";
-   "Maximal memory allocated from system  :",memory(2), "Byte (",
-   memory(2)/1023, "KByte)";
-}
-ReportMemoryUsage();
-kill p;
-ReportMemoryUsage(); // less memory used: p killed
-kill r; 
-@c example
-@end smallexample
-@end table
-@c ref
-@ref{option @value{PSUFFIX}};
-@c ref
-
-
-@c ---------------------------------------
-@node  minres @value{PSUFFIX}, modulo @value{PSUFFIX}, memory @value{PSUFFIX}, Functions @value{PSUFFIX}
+@node  minres @value{PSUFFIX}, modulo @value{PSUFFIX}, liftstd @value{PSUFFIX}, Functions @value{PSUFFIX}
 @section minres @value{PSUFFIX}
 @cindex minres @value{PSUFFIX}
 
@@ -752,7 +700,7 @@ T;
 @end smallexample
 @end table
 @c ref
-See 
+See also
 @ref{syz @value{PSUFFIX}}.
 @c ref
 
@@ -955,7 +903,7 @@ kill r4;
 @end smallexample
 @end table
 @c ref
-See also
+See also 
 @ref{ncalg_lib};
 @ref{nctools_lib};
 @ref{qmatrix_lib};
@@ -1058,7 +1006,7 @@ See
 @c ref
 
 @c ---------------------------------------
-@node opposite, option @value{PSUFFIX}, oppose, Functions @value{PSUFFIX}
+@node opposite, preimage @value{PSUFFIX}, oppose, Functions @value{PSUFFIX}
 @section opposite
 @cindex opposite
 
@@ -1111,141 +1059,7 @@ See
 @c ref
 
 @c ---------------------------------------
-@node option @value{PSUFFIX},preimage @value{PSUFFIX}, opposite, Functions @value{PSUFFIX}
-@section option @value{PSUFFIX}
-@cindex option @value{PSUFFIX}
-@table @code
-@item @strong{Syntax:}
-@code{option ()}
-@item @strong{Type:}
-string
-@item @strong{Purpose:}
-lists all defined options.
-@*
-@item @strong{Syntax:}
-@code{option (} option_name @code{)}
-@item @strong{Type:}
-none
-@item @strong{Purpose:}
-sets an option.
-@item @strong{Note:}
-To disable an option, use the prefix @code{no}.
-@*
-@item @strong{Syntax:}
-@code{option ( get )}
-@item @strong{Type:}
-intvec
-@item @strong{Purpose:}
-dumps the state of all options to an intvec.
-@*
-@item @strong{Syntax:}
-@code{option ( set,} intvec_expression @code{)}
-@item @strong{Type:}
-none
-@item @strong{Purpose:}
-restores the state of all options from an intvec (produced by
-@code{option(get)}).
-@sp 1
-@item @strong{Values:}
-The following options are used to manipulate the behavior of
-computations and act like boolean switches. Use the prefix @code{no} to
-disable an option. Notice that some options are ring dependent and reset
-to their default values on a change of the current basering.
-
-@table @asis
-@c ---------
-@item @code{prot}
-@cindex prot, option
-@cindex protocoll of computations
-@cindex progress watch
-shows protocol information indicating the
-progress during the following computations:
-@code{mres},
-@code{minres},
-@code{res},
-@code{std},
-@code{syz}.
-@c ---------
-@item @code{redSB}
-@cindex redSB, option
-@cindex reduced Groebner basis
-computes a reduced Groebner basis in any related computation.
-@c ---------
-@item @code{redTail}
-@cindex redTail, option
-reduction of the tails of polynomials during Groebner basis
-computations. This option is ring dependent. By default, it is set for
-rings with global degree orderings and not set for all other rings.
-@c ---------
-
-@end table
-@*
-The following options, which also control computations, are special,
-since they are not manipulated by the @code{option} command but by a
-direct assignment of a value. Reset the option by assigning the value 0;
-the command @code{option(none)} will not reset them! If there is a
-non-zero value assigned, the command @code{option()} prints the option.
-@*
-The last set of options controls the output of @sc{Plural}:
-@table @asis
-
-@item  @code{mem}
-@cindex mem, option
-@ifset  singularmanual 
-shows memory usage in square brackets (see @ref{memory}).
-@end ifset
-@ifclear singularmanual
-shows memory usage in square brackets (see @ref{memory @value{PSUFFIX}}).
-@end ifclear  
-
-@c @smallexample
-@c @c example
-@c   option(prot);
-@c   option();
-@c   ring r=0,x,dp;
-@c   degBound=22;
-@c   option();
-@c   intvec i=option(get);
-@c   option(none);
-@c   option(set,i);
-@c   option();
-@c @c example
-@c @end smallexample
-@end table
-
-@*The output reported on @code{option(prot)} has the following meaning:
-@multitable @columnfractions .01 .14 .11 .65
-
-@item @tab @tab @tab
-@item @tab @code{mres}
-@tab @code{[}@math{d}@code{]}
-@tab computations of the @math{d}-th syzygy module
-@item @tab @tab @tab all other characters: like the output of @code{std}
-@item @tab @tab @tab
-@item @tab @code{minres}
-@tab @code{[}@math{d}@code{]}
-@tab minimizing of the @math{d}-th syzygy module
-@item @tab @tab @tab
-@item @tab @code{reduce}
-@tab @code{r} @tab reduced a leading term
-@item @tab @tab @tab
-@item @tab @code{std}
-@tab @code{[}@math{m}@code{:}@math{n}@code{]}
-@tab internal ring change to poly representation with exponent bound
-@math{m} and @math{n} words in exponent vector
-@item @tab @tab @tab
-@item @tab @code{syz} @tab @tab all characters: like the output of @code{std}
-@end multitable
-
-@end table
-
-@c ref
-See
-@ref{std @value{PSUFFIX}}.
-@c ref
-
-@c ---------------------------------------
-@node preimage @value{PSUFFIX}, quotient @value{PSUFFIX}, option @value{PSUFFIX}, Functions @value{PSUFFIX}
+@node preimage @value{PSUFFIX}, quotient @value{PSUFFIX}, opposite, Functions @value{PSUFFIX}
 @section preimage @value{PSUFFIX}
 @cindex preimage @value{PSUFFIX}
 
@@ -1444,7 +1258,7 @@ See also
 
 
 @c ---------------------------------------
-@node std @value{PSUFFIX}, subst @value{PSUFFIX}, reduce @value{PSUFFIX}, Functions @value{PSUFFIX}
+@node std @value{PSUFFIX}, subst  @value{PSUFFIX}, reduce @value{PSUFFIX}, Functions @value{PSUFFIX}
 @section std @value{PSUFFIX}
 @cindex std @value{PSUFFIX}
 @table @code
@@ -1456,7 +1270,7 @@ See also
 @item @strong{Type:}
 ideal or module
 @item @strong{Purpose:}
-returns a left Groebner basis (see @ref{Groebner bases} for a definition) 
+returns a left Groebner basis (see @ref{Groebner bases in G-algebras}} for a definition) 
 of an ideal or module with respect to the
 monomial ordering of the basering. 
 @c is a set of generators such that
@@ -1493,10 +1307,9 @@ J;
 @end smallexample
 @end table
 @c ref
-See
+See also
 @ref{ideal @value{PSUFFIX}};
-@ref{ring @value{PSUFFIX}};
-@ref{option @value{PSUFFIX}};
+@ref{ring @value{PSUFFIX}}.
 @c ref
 
 
@@ -1536,7 +1349,7 @@ C2;
 
 
 @c -------------------------------------------------
-@node syz @value{PSUFFIX}, twostd, subst @value{PSUFFIX}, Functions @value{PSUFFIX}
+@node syz @value{PSUFFIX}, twostd, subst  @value{PSUFFIX}, Functions @value{PSUFFIX}
 @section syz @value{PSUFFIX}
 @cindex syz @value{PSUFFIX}
 @table @code
@@ -1577,7 +1390,7 @@ std(tst); // check the property of a syzygy module
 @end smallexample
 @end table
 @c ref
-See
+See also
 @ref{ideal @value{PSUFFIX}};
 @ref{module @value{PSUFFIX}};
 @ref{mres @value{PSUFFIX}};
@@ -1666,11 +1479,23 @@ vdim(I);
 @end smallexample
 @end table
 @c ref
-See
+See also
 @ref{ideal @value{PSUFFIX} };
 @ref{std @value{PSUFFIX} };
 @ref{kbase @value{PSUFFIX}}.
 @c ref
+
+@node Comparison between Singular and Plural functions, ,vdim @value{PSUFFIX}, Functions @value{PSUFFIX}
+@section Comparison between Singular and Plural functions
+@cindex Singular vs Plural
+
+@multitable @columnfractions .45 .45
+@item @code{SINGULAR} @tab @code{PLURAL}
+@item @ref{std}       @tab @ref{std  @value{PSUFFIX}}
+@item @ref{deg}       @tab deg
+@item @code{---}      @tab @ref{twostd}
+@item @ref{det}       @tab @code{---} 
+@end multitable
 
 
 @c @c ---------------------------------------
