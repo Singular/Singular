@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: mondromy.lib,v 1.24 2005-03-10 16:58:54 Singular Exp $";
+version="$Id: mondromy.lib,v 1.25 2005-04-28 09:22:17 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  mondromy.lib  Monodromy of an Isolated Hypersurface Singularity
@@ -225,7 +225,7 @@ EXAMPLE: example detadj; shows an example.
     else
     {
       def br=basering;
-      changeord("pr","dp");
+      def pr=changeord("dp"); setring pr;
       matrix U=fetch(br,U);
       poly detU=fetch(br,detU);
 

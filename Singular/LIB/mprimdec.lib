@@ -1,4 +1,4 @@
-// $Id: mprimdec.lib,v 1.4 2001-08-27 14:47:54 Singular Exp $
+// $Id: mprimdec.lib,v 1.5 2005-04-28 09:22:17 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
 // mprimdec.lib
 // algorithms for primary decomposition for modules based on
@@ -9,6 +9,9 @@
 // written by Alexander Dreyer
 //
 // $Log: not supported by cvs2svn $
+// Revision 1.4  2001/08/27 14:47:54  Singular
+// *hannes: merge-2-0-2
+//
 // Revision 1.3  2001/07/10 11:49:19  dreyer
 // + changed commands factor to factorize(...,2), idealsEqual to modulesEqual
 //   minAssPrimes to minAssGTZ;  minAssChar;
@@ -16,7 +19,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: mprimdec.lib,v 1.4 2001-08-27 14:47:54 Singular Exp $";
+version="$Id: mprimdec.lib,v 1.5 2005-04-28 09:22:17 Singular Exp $";
 category="Commutative Algebra";
 
 info="
@@ -487,7 +490,8 @@ EXAMPLE: example zeroMod; shows an example
   // the ordering is changed to lex
   ////////////////////////////////////////////////////////////////
   def BAS = basering;
-  changeord("@R","lp");
+  def @R=changeord("lp");
+  setring @R;
   module @N=fetch(BAS,@N);
   int nVar=nvars(@R);
   module @M=freemodule(nrows(@N));     // @M=basering^k
@@ -1194,7 +1198,8 @@ EXAMPLE: example preComp; shows an example
 "
 {
   def BAS=basering;
-  changeord("@R","C,lp");
+  def @R=changeord("C,lp");
+  setring @R;
   module @N=std(imap(BAS,@N));
   ideal ann; module check, @M; int @k;
   (ann, check, @M, @k)=getData(@N,imap(BAS,#),1);
@@ -1755,7 +1760,8 @@ EXAMPLE: example zeroMod; shows an example
   // the ordering is changed to lex
   ////////////////////////////////////////////////////////////////
   def BAS = basering;
-  changeord("@R","C,lp");
+  def @R=changeord("C,lp");
+  setring @R;
   module @N=std(imap(BAS,@N));
   module @M=imap(BAS,@M);
   ideal ann=std(imap(BAS,ann));

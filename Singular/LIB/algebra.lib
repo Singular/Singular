@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: algebra.lib,v 1.9 2001-01-16 13:48:21 Singular Exp $";
+version="$Id: algebra.lib,v 1.10 2005-04-28 09:22:14 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  algebra.lib   Compute with Algbras and Algebra Maps
@@ -778,7 +778,8 @@ EXAMPLE: example noetherNormal; shows an example
    // ------------------------ change of ordering ---------------------------
    //a procedure from ring.lib changing the order to dp creating a new
    //basering @R in order to compute the dimension d of i
-   changeord("@R","dp");
+   def @R=changeord("dp");
+   setring @R;
    ideal i = imap(r,i);
    list j = mstd(i);
    i = j[2];
@@ -792,7 +793,8 @@ EXAMPLE: example noetherNormal; shows an example
    // ------------------------ change of ordering ---------------------------
    //Now change the order to (dp(n-d),lp) creating a new basering @S
     string s ="dp("+string(n-d)+"),lp";
-   changeord("@S",s);
+   def @S=changeord(s);
+   setring @S;
    ideal m;
 
    // ----------------- sparse-random coordinate change  --------------------

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: matrix.lib,v 1.27 2005-01-11 16:17:50 Singular Exp $";
+version="$Id: matrix.lib,v 1.28 2005-04-28 09:22:16 Singular Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  matrix.lib    Elementary Matrix Operations
@@ -537,7 +537,7 @@ EXAMPLE: example gauss_col; shows an example
 //------------------------ change ordering if necessary ----------------------
    if( ordstr(R) != ("C,dp("+string(nvars(R))+")") )
    {
-     changeord("@R","C,dp",R); u=1;
+     def @R=changeord("C,dp",R); setring @R; u=1;
      execute("minpoly="+mp+";");
      matrix A = imap(R,A);
      module M = A;

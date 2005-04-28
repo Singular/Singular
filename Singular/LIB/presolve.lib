@@ -1,6 +1,6 @@
 //last change: 13.02.2001 (Eric Westenberger)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: presolve.lib,v 1.19 2001-11-05 16:06:29 pfister Exp $";
+version="$Id: presolve.lib,v 1.20 2005-04-28 09:22:18 Singular Exp $";
 category="Symbolic-numerical solving";
 info="
 LIBRARY:  presolve.lib     Pre-Solving of Polynomial Equations
@@ -436,7 +436,8 @@ EXAMPLE: example fastelim; shows an example.
       intvec v = ordevar[1];
       newvar=string(sort(maxideal(1),v)[1]);
 //------------ create new ring with "best" ordering of variables --------------
-      changevar("r0",newvar);
+      def r0=changevar(newvar);
+      setring r0;
       list L = imap(r1,L);
       kill r1;
       def r1 = r0;

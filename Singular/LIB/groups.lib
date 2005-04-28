@@ -1,7 +1,7 @@
-// $Id: groups.lib,v 1.1 2001-11-05 16:04:11 pfister Exp $
+// $Id: groups.lib,v 1.2 2005-04-28 09:22:15 Singular Exp $
 //(GP, last modified 26.10.01)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: groups.lib,v 1.1 2001-11-05 16:04:11 pfister Exp $";
+version="$Id: groups.lib,v 1.2 2005-04-28 09:22:15 Singular Exp $";
 category="Applications";
 info="
 LIBRARY:  groups.lib      Finite Group Theory
@@ -688,7 +688,8 @@ static proc changeOrdTest(ideal I)
 {
    def R=basering;
    if(deg(I[1])==0){return(I);}
-   changeord("RR","dp");
+   def RR=changeord("dp");
+   setring RR;
    ideal I=imap(R,I);
    ideal K=timeStd(I,5);
    if(deg(K[1])==0)

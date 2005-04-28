@@ -1,8 +1,8 @@
-// $Id: deform.lib,v 1.32 2005-04-26 09:00:38 Singular Exp $
+// $Id: deform.lib,v 1.33 2005-04-28 09:22:14 Singular Exp $
 // author: Bernd Martin email: martin@math.tu-cottbus.de
 //(bm, last modified 4/98)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: deform.lib,v 1.32 2005-04-26 09:00:38 Singular Exp $";
+version="$Id: deform.lib,v 1.33 2005-04-28 09:22:14 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  deform.lib    Miniversal Deformation of Singularities and Modules
@@ -883,7 +883,8 @@ Sub-proc: return martix ord(a_ij) with respect to weight_vec, or
   int i,j;
   string ord_str = "wp("+string(w_vec)+")";
   def br = basering;
- changeord("nr",ord_str);
+  def nr=changeord(ord_str);
+  setring nr;
   matrix A    = imap(br,A);
   intmat degA[@r][@c];
   if (homog(ideal(A)))
@@ -948,7 +949,8 @@ Sub-procedure: Computing relative (with respect to flatten(Fo)) weight_vec
    A  = transpose(A);
    def br = basering;
    string o_str = "wp("+string(d_vec)+")";
- changeord("nr",o_str);
+   def nr=changeord(o_str);
+   setring nr;
    module A = fetch(br,A);
    intvec dv;
    int l = homog(A) ;

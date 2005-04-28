@@ -1,6 +1,6 @@
 //GMG last modified: 04/25/2000
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: linalg.lib,v 1.36 2004-06-28 14:14:03 Singular Exp $";
+version="$Id: linalg.lib,v 1.37 2005-04-28 09:22:15 Singular Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  linalg.lib  Algorithmic Linear Algebra
@@ -48,7 +48,8 @@ static proc const_mat(matrix A)
   int i;
   int n=ncols(A);
   def BR=basering;
-  changeord("@R","dp,c",BR);
+  def @R=changeord("dp,c",BR);
+  setring @R;
   matrix A=fetch(BR,A);
   for(i=1;i<=n;i=i+1){
     if(deg(lead(A)[i])>=1){
@@ -156,7 +157,8 @@ EXAMPLE:  example inverse; shows an example
    if( ordstr(R) != "C,dp(nvars(R))" )
    {
      u=1;
-     changeord("@R","C,dp",R);
+     def @R=changeord("C,dp",R);
+     setring @R;
      module M = fetch(R,M);
      execute("minpoly="+mp+";");
    }
@@ -570,7 +572,8 @@ EXAMPLE: example charpoly_B; shows an example"
   }
   s=s+")";
 
-  changeord("@R",s);
+  def @R=changeord(s);
+  setring @R;
   execute("minpoly="+mp+";");
   matrix A = imap(BR,A);
   for(i=1; i<=n; i++){
