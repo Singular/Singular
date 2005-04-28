@@ -1,7 +1,7 @@
-// $Id: sing.lib,v 1.26 2005-04-25 16:58:46 Singular Exp $
+// $Id: sing.lib,v 1.27 2005-04-28 14:29:09 Singular Exp $
 //(GMG/BM, last modified 26.06.96)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: sing.lib,v 1.26 2005-04-25 16:58:46 Singular Exp $";
+version="$Id: sing.lib,v 1.27 2005-04-28 14:29:09 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  sing.lib      Invariants of Singularities
@@ -943,7 +943,7 @@ EXAMPLE: example tangentcone; shows an example
   if (size(#) !=0) { n= #[1]; }
   if( n==0 )
   {
-     changeord("@newr@","ds");
+     def @newr@=changeord("ds"); setring @newr@;
      ideal @id = imap(bas,id);
      @id = std(@id);
      setring bas;
