@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.96 2005-02-04 14:44:12 Singular Exp $ */
+/* $Id: tesths.cc,v 1.97 2005-04-28 17:10:57 Singular Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -56,10 +56,12 @@ int main(          /* main entry to Singular */
 #ifdef GENTABLE
   extern void ttGen1();
   extern void ttGen2();
+  extern void ttGen4();
   #ifndef __MWERKS__
     extern void mpsr_ttGen(); // For initialization of (CMD, MP_COP) tables
     mpsr_ttGen();
   #endif
+  ttGen4();
   ttGen1();
   ttGen2();
 #else

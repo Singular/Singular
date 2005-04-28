@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.347 2005-04-27 15:15:18 Singular Exp $ */
+/* $Id: iparith.cc,v 1.348 2005-04-28 17:10:47 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -61,8 +61,11 @@
 #ifdef HAVE_PLURAL
 #include "gring.h"
 #define ALLOW_PLURAL    ,1
+#define ALLOW_PLURAL_N   1
 #define NO_PLURAL       ,0
+#define NO_PLURAL_N      0
 #define COMM_PLURAL     ,2
+#define COMM_PLURAL_N    2
 #else
 #define ALLOW_PLURAL
 #define NO_PLURAL
@@ -6249,6 +6252,122 @@ void ttGen3()
   fclose(outfile);
 }
 #endif
+void ttGen4()
+{
+  FILE *outfile = myfopen("plural_cmd.inc","w");
+  int i;
+  char *old_s="";
+  fprintf(outfile,
+  "@c *****************************************\n"
+  "@c *  Computer Algebra System SINGULAR     *\n"
+  "@c *****************************************\n\n");
+/*-------------------------------------------------------------------*/
+  fprintf(outfile,"@multicolumn .45 .45\n");
+  int op;
+  i=0;
+  while ((op=dArith1[i].cmd)!=0)
+  {
+    if (dArith1[i].p!=jjWRONG)
+    {
+      char *s = iiTwoOps(op);
+      if ((s!=NULL) && (isalpha(s[0])) && (strcmp(s,old_s)!=0))
+      {
+        old_s=s;
+        switch (dArith1[i].valid_for_plural)
+        {
+          case NO_PLURAL_N:
+            fprintf(outfile,"@item @ref{%s} @tab @code{---}\n",s);
+            break;
+          case ALLOW_PLURAL_N:
+            fprintf(outfile,"@item @ref{%s} @tab @ref{%s (plural)}\n",s,s);
+            break;
+          case COMM_PLURAL_N:
+            fprintf(outfile,"@item @ref{%s} @tab %s\n",s,s);
+            break;
+        }
+      }
+    }
+    i++;
+  }
+  fprintf(outfile,"@c ---------------------------------------------\n");
+  i=0;
+  while ((op=dArith2[i].cmd)!=0)
+  {
+    if (dArith2[i].p!=jjWRONG2)
+    {
+      char *s = iiTwoOps(op);
+      if ((s!=NULL) && (isalpha(s[0])) && (strcmp(s,old_s)!=0))
+      {
+        old_s=s;
+        switch (dArith2[i].valid_for_plural)
+        {
+          case NO_PLURAL_N:
+            fprintf(outfile,"@item @ref{%s} @tab @code{---}\n",s);
+            break;
+          case ALLOW_PLURAL_N:
+            fprintf(outfile,"@item @ref{%s} @tab @ref{%s (plural)}\n",s,s);
+            break;
+          case COMM_PLURAL_N:
+            fprintf(outfile,"@item @ref{%s} @tab %s\n",s,s);
+            break;
+        }
+      }
+    }
+    i++;
+  }
+  fprintf(outfile,"@c ---------------------------------------------\n");
+  i=0;
+  while ((op=dArith3[i].cmd)!=0)
+  {
+    char *s = iiTwoOps(op);
+    if (dArith3[i].p!=jjWRONG3)
+    {
+      if ((s!=NULL) && (isalpha(s[0])) && (strcmp(s,old_s)!=0))
+      {
+        old_s=s;
+        switch (dArith3[i].valid_for_plural)
+        {
+          case NO_PLURAL_N:
+            fprintf(outfile,"@item @ref{%s} @tab @code{---}\n",s);
+            break;
+          case ALLOW_PLURAL_N:
+            fprintf(outfile,"@item @ref{%s} @tab @ref{%s (plural)}\n",s,s);
+            break;
+          case COMM_PLURAL_N:
+            fprintf(outfile,"@item @ref{%s} @tab %s\n",s,s);
+            break;
+        }
+      }
+    }
+    i++;
+  }
+  fprintf(outfile,"@c ---------------------------------------------\n");
+  i=0;
+  while ((op=dArithM[i].cmd)!=0)
+  {
+    char *s = iiTwoOps(op);
+    if ((s!=NULL) && (isalpha(s[0])) && (strcmp(s,old_s)!=0))
+    {
+        old_s=s;
+        switch (dArithM[i].valid_for_plural)
+        {
+          case NO_PLURAL_N:
+            fprintf(outfile,"@item @ref{%s} @tab @code{---}\n",s);
+            break;
+          case ALLOW_PLURAL_N:
+            fprintf(outfile,"@item @ref{%s} @tab @ref{%s (plural)}\n",s,s);
+            break;
+          case COMM_PLURAL_N:
+            fprintf(outfile,"@item @ref{%s} @tab %s\n",s,s);
+            break;
+        }
+    }
+    i++;
+  }
+  fprintf(outfile,"@c ---------------------------------------------\n");
+  fprintf(outfile,"@end table\n");
+  fclose(outfile);
+}
 /*-------------------------------------------------------------------*/
 #else
 #include "iparith.inc"
