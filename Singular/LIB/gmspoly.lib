@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gmspoly.lib,v 1.8 2004-08-10 17:03:44 mschulze Exp $";
+version="$Id: gmspoly.lib,v 1.9 2005-04-28 09:23:17 Singular Exp $";
 category="Singularities";
 
 info="
@@ -7,7 +7,7 @@ LIBRARY:  gmspoly.lib  Gauss-Manin System of Tame Polynomials
 
 AUTHOR:   Mathias Schulze, email: mschulze@mathematik.uni-kl.de
 
-OVERVIEW: A library to compute invariants related to the the Gauss-Manin system
+OVERVIEW: A library to compute invariants related to the Gauss-Manin system
           of a cohomologically tame polynomial
 
 PROCEDURES:
@@ -55,6 +55,7 @@ static proc maxdegree(matrix A)
 
 proc istame(poly f)
 "USAGE:    istame(f); poly f
+ASSUME: basering has no variables named w(1),w(2),... 
 RETURN:
 @format
 int k=
@@ -68,9 +69,10 @@ EXAMPLE:  example istame; shows examples
   int d=vdim(std(jacob(f)));
   def @X=basering;
   int n=nvars(@X);
-  changechar("@WX","(0,w(1.."+string(n)+"))");
+  def @WX=changechar("(0,w(1.."+string(n)+"))");
+  setring @WX;
   ideal J=jacob(imap(@X,f));
-
+~
   int i;
   for(i=1;i<=n;i++)
   {
