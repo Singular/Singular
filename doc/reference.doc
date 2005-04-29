@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.232 2005-04-29 08:56:21 Singular Exp $
+@comment $Id: reference.doc,v 1.233 2005-04-29 13:32:05 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -172,6 +172,7 @@ brackets are allowed.
 * simplex::
 * simplify::
 * size::
+* slimgb::
 * sortvec::
 * sprintf::
 * sres::
@@ -5554,7 +5555,7 @@ See
 @ref{module}.
 @c ref
 @c ---------------------------------------
-@node size, sortvec, simplify, Functions
+@node size, slimgb, simplify, Functions
 @subsection size
 @cindex size
 @table @code
@@ -5624,7 +5625,46 @@ See
 @ref{nrows}.
 @c ref
 @c ---------------------------------------
-@node sortvec, sprintf, size, Functions
+@node slimgb, sortvec, size, Functions
+@subsection slimgb
+@cindex slimgb
+@table @code
+@item @strong{Syntax:}
+@code{slimgb (} ideal_expression@code{)}
+
+@item @strong{Type:}
+ideal
+@item @strong{Purpose:}
+returns a groeber basis of an ideal or with respect to the
+monomial ordering of the basering, which has to be global
+A groebner basis is a set of generators such that
+the leading terms generate the leading ideal.
+@item @strong{Note:}
+The algorithm is described in the diploma thesis of Michael Brickenstein
+"Neue Varianten zur Berechnung von Groebner Basen",
+written 2004 under supervision of Prof. Dr. Greuel in Kaiserslautern.
+
+It is designed to keep polynomials short with small coefficients.
+Currently best results are examples over function field (parameters).
+
+For the performance it is essential, that one of following is fullfilled: the ideal is homogeneous or the ordering is a degree ordering, maybe future version will improve here.
+
+The program only supports the option prot (which will give protocoll output).
+The Protocoll looks like that:
+M[n,m] means a parallel reduction of n elements with m non zero output elements.
+"b" notices an exchange trick described in the thesis and "e" adds reductor with non minimal leading term.
+@end table
+
+@c ref
+See
+@ref{groebner};
+@ref{ideal};
+@ref{ring};
+@ref{option};
+@ref{std}.
+@c ref
+@c ---------------------------------------
+@node sortvec, sprintf, slimgb, Functions
 @subsection sortvec
 @cindex sortvec
 @table @code
