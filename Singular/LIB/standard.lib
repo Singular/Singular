@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: standard.lib,v 1.67 2004-08-26 09:42:54 Singular Exp $";
+version="$Id: standard.lib,v 1.68 2005-04-29 16:11:41 Singular Exp $";
 category="Miscellaneous";
 info="
 LIBRARY: standard.lib   Procedures which are always loaded at Start-up
@@ -1109,8 +1109,7 @@ example
    ring r=0,(x,y),dp;
    poly p=((x2+y3)^2+xy6)*((x3+y2)^2+x10y);
    p=p^2;
-   timeFactorize(p,2);
-   "ERROR: will not run currently:";
+   //timeFactorize(p,2);
    //timeFactorize(p,20);
 }
 
