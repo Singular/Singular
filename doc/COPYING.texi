@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: COPYING.texi,v 1.15 2003-05-20 16:00:50 Singular Exp $
+@comment $Id: COPYING.texi,v 1.16 2005-04-29 19:42:58 levandov Exp $
 @comment this file contains the copyright notice on Singular
 @ifclear VERSION
 @include version.texi
@@ -113,37 +113,40 @@ Sch@"onemann.
 @cindex Sch@"onemann, Hans
 
 Currently, the @sc{Singular} team has the following members:
-Olaf Bachmann,
 Anne Fr@"ubis-Kr@"uger,
 Thomas Keilen,
 Kai Kr@"uger,
 Christoph Lossen,
 Viktor Levandovskyy,
-Wilfred Pohl,
-Mathias Schulze,
-Eric Westenberger,
+Wilfred Pohl
 and
-Tim Wichmann.
-@cindex Bachmann, Olaf
+Oliver Wienand
 @cindex Fr@"ubis-Kr@"uger, Anne
 @cindex Keilen, Thomas
 @cindex Kr@"uger, Kai
 @cindex Lossen, Christoph
 @cindex Levandovskyy, Viktor
 @cindex Pohl, Wilfred
-@cindex Schulze, Mathias
-@cindex Westenberger, Eric
-@cindex Wichmann, Tim
+@cindex Wienand, Oliver
 
 Past members of the @sc{Singular} team are:
+Olaf Bachmann,
 Hubert Grassmann,
 Wolfgang Neumann,
 Jens Schmidt,
-R@"udiger Stobbe.
+Mathias Schulze,
+R@"udiger Stobbe,
+Eric Westenberger
+and
+Tim Wichmann.
+@cindex Bachmann, Olaf
 @cindex Grassmann, Hubert
 @cindex Neumann, Wolfgang
 @cindex Schmidt, Jens
+@cindex Schulze, Mathias
 @cindex Stobbe, R@"udiger
+@cindex Westenberger, Eric
+@cindex Wichmann, Tim
 
 Further contributions to @sc{Singular} were made by:
 Thomas Bayer,
