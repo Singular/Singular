@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: maps_ip.cc,v 1.7 2005-04-18 15:10:06 Singular Exp $ */
+/* $Id: maps_ip.cc,v 1.8 2005-04-29 16:04:36 Singular Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */
@@ -21,6 +21,14 @@
 #include "maps.h"
 #include "maps_ip.h"
 #include "prCopy.h"
+
+// define this if you want to use the fast_map routine for mapping ideals
+#define FAST_MAP
+
+#ifdef FAST_MAP
+#include "fast_maps.h"
+#endif
+
 
 /*2
 * maps the expression w to res,
@@ -265,6 +273,7 @@ ideal  idSubstPar(ideal id, int n, poly e)
 */
 poly pSubstPoly(poly p, int var, poly image)
 {
+  if (p==NULL) return NULL;
 #ifdef HAVE_PLURAL
   if (rIsPluralRing(currRing))
   {
@@ -276,20 +285,34 @@ poly pSubstPoly(poly p, int var, poly image)
   pDelete(&(theMap->m[var-1]));
   theMap->m[var-1]=pCopy(image);
 
-  leftv v=(leftv)omAlloc0Bin(sleftv_bin);
-  sleftv tmpW;
-  memset(&tmpW,0,sizeof(sleftv));
-  tmpW.rtyp=POLY_CMD;
-  tmpW.data=p;
   poly res=NULL;
-  if (maApplyFetch(MAP_CMD,theMap,v,&tmpW,currRing,NULL,NULL,0,nCopy))
+#ifdef FAST_MAP
+  if (pGetComp(p)==0)
   {
-    WerrorS("map failed");
-    v->data=NULL;
+    ideal src_id=idInit(1,1);
+    src_id->m[0]=p;
+    ideal res_id=fast_map(src_id,currRing,(ideal)theMap,currRing);
+    res=res_id->m[0];
+    res_id->m[0]=NULL; idDelete(&res_id);
+    src_id->m[0]=NULL; idDelete(&src_id);
   }
-  res=(poly)(v->data);
+  else
+#endif
+  {
+    sleftv tmpW;
+    memset(&tmpW,0,sizeof(sleftv));
+    tmpW.rtyp=POLY_CMD;
+    tmpW.data=p;
+    leftv v=(leftv)omAlloc0Bin(sleftv_bin);
+    if (maApplyFetch(MAP_CMD,theMap,v,&tmpW,currRing,NULL,NULL,0,nCopy))
+    {
+      WerrorS("map failed");
+      v->data=NULL;
+    }
+    res=(poly)(v->data);
+    omFreeBin((ADDRESS)v, sleftv_bin);
+  }
   idDelete((ideal *)(&theMap));
-  omFreeBin((ADDRESS)v, sleftv_bin);
   return res;
 }
 
