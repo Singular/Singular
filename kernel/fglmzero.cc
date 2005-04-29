@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmzero.cc,v 1.2 2004-06-23 15:12:24 Singular Exp $
+// $Id: fglmzero.cc,v 1.3 2005-04-29 17:35:17 Singular Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -1101,10 +1101,11 @@ FindUnivariatePolys( const idealFunctionals & l )
     ideal perm = idMaxIdeal(1);
     intvec *iv = idSort(perm,TRUE);
     idDelete(&perm);
-    for(int i = pVariables; i > 0; i--) varpermutation[pVariables+1-i] = (*iv)[i-1];
+    for(i = pVariables; i > 0; i--) varpermutation[pVariables+1-i] = (*iv)[i-1];
     delete iv;
      
-    for ( i= 1; i <= pVariables; i++ ) {
+    for (i= 1; i <= pVariables; i++ )
+    {
         // main loop
         STICKYPROT2( "(%i)", i /*varpermutation[i]*/);
         gaussReducer gauss( l.dimen() );

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.33 2005-04-22 18:09:42 levandov Exp $ */
+/* $Id: ring.cc,v 1.34 2005-04-29 17:35:18 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -1237,8 +1237,8 @@ int rSum(ring r1, ring r2, ring &sum)
 	       perm1, par_perm1, sum->ch);
     nMapFunc nMap1 = nSetMap(r1);
     Q1 = idInit(IDELEMS(r1->qideal),1);
-    for (int i=0;i<IDELEMS(r1->qideal);i++)
-      Q1->m[i] = pPermPoly(r1->qideal->m[i],perm1,r1,nMap1,par_perm1,rPar(r1));
+    for (int for_i=0;for_i<IDELEMS(r1->qideal);for_i++)
+      Q1->m[for_i] = pPermPoly(r1->qideal->m[for_i],perm1,r1,nMap1,par_perm1,rPar(r1));
     omFree((ADDRESS)perm1);
   }
   else
@@ -1256,8 +1256,8 @@ int rSum(ring r1, ring r2, ring &sum)
 	       perm2, par_perm2, sum->ch);
     nMapFunc nMap2 = nSetMap(r2);
     Q2 = idInit(IDELEMS(r2->qideal),1);
-    for (int i=0;i<IDELEMS(r2->qideal);i++)
-      Q2->m[i] = pPermPoly(r2->qideal->m[i],perm2,r2,nMap2,par_perm2,rPar(r2));
+    for (int for_i=0;for_i<IDELEMS(r2->qideal);for_i++)
+      Q2->m[for_i] = pPermPoly(r2->qideal->m[for_i],perm2,r2,nMap2,par_perm2,rPar(r2));
     omFree((ADDRESS)perm2);
   }
   else
@@ -2243,11 +2243,11 @@ ring rModifyRing_Wp(ring r, int* weights)
   *res = *r;
   /*weights: entries for 3 blocks: NULL*/
   res->wvhdl = (int **)omAlloc0(3 * sizeof(int_ptr));
-  /*order: dp,C,0*/
+  /*order: Wp,C,0*/
   res->order = (int *) omAlloc(3 * sizeof(int *));
   res->block0 = (int *)omAlloc0(3 * sizeof(int *));
   res->block1 = (int *)omAlloc0(3 * sizeof(int *));
-  /* ringorder dp for the first block: var 1..3 */
+  /* ringorder Wp for the first block: var 1..r->N */
   res->order[0]  = ringorder_Wp;
   res->block0[0] = 1;
   res->block1[0] = r->N;
