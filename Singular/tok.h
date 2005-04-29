@@ -6,7 +6,7 @@
 /*
 * ABSTRACT: tokens, types for interpreter; general macros
 */
-/* $Id: tok.h,v 1.60 2005-04-27 15:15:17 Singular Exp $ */
+/* $Id: tok.h,v 1.61 2005-04-29 13:23:02 Singular Exp $ */
 
 #ifndef MYYSTYPE
 #include "structs.h"
@@ -135,6 +135,7 @@ enum {
   RINGLIST_CMD,
   ROWS_CMD,
   SIMPLEX_CMD,
+  SLIM_GB_CMD,
   SQR_FREE_DEC_CMD,
   STATUS_CMD,
   STRING_CMD,

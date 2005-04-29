@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.349 2005-04-29 12:21:40 bricken Exp $ */
+/* $Id: iparith.cc,v 1.350 2005-04-29 13:23:02 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -328,6 +328,7 @@ cmdnames cmds[] =
   { "simplex",     0, SIMPLEX_CMD,        CMD_M},
   { "simplify",    0, SIMPLIFY_CMD ,      CMD_2},
   { "size",        0, COUNT_CMD ,         CMD_1},
+  { "slimgb",      0, SLIM_GB_CMD ,       CMD_1},
   { "sortvec",     0, SORTVEC_CMD ,       CMD_1},
   #ifdef OLD_RES
   { "sres",        0, SRES_CMD ,          CMD_23},
@@ -3607,6 +3608,13 @@ static BOOLEAN jjRPAR(leftv res, leftv v)
   res->data = (char *)rPar(((ring)v->Data()));
   return FALSE;
 }
+static BOOLEAN jjSLIM_GB(leftv res, leftv u)
+{
+  if (pOrdSgn!=1)
+    return TRUE;
+  res->data=(char *)t_rep_gb(currRing, (ideal)u->Data());
+  return FALSE;
+}
 static BOOLEAN jjSTD(leftv res, leftv v)
 {
   ideal result;
@@ -4232,6 +4240,7 @@ struct sValCmd1 dArith1[]=
 ,{jjROWS,       ROWS_CMD,        INT_CMD,        MATRIX_CMD     ALLOW_PLURAL}
 ,{jjROWS_IV,    ROWS_CMD,        INT_CMD,        INTMAT_CMD     ALLOW_PLURAL}
 ,{jjCOUNT_IV,   ROWS_CMD,        INT_CMD,        INTVEC_CMD     ALLOW_PLURAL}
+,{jjSLIM_GB,    SLIM_GB_CMD,     IDEAL_CMD,      IDEAL_CMD      NO_PLURAL}
 ,{jjSort_Id,    SORTVEC_CMD,     INTVEC_CMD,     IDEAL_CMD      ALLOW_PLURAL}
 ,{jjSort_Id,    SORTVEC_CMD,     INTVEC_CMD,     MODUL_CMD      ALLOW_PLURAL}
 ,{jjSTD,        STD_CMD,         IDEAL_CMD,      IDEAL_CMD      ALLOW_PLURAL}
@@ -4884,13 +4893,6 @@ static BOOLEAN jjSUBST_Id_X(leftv res, leftv u, leftv v,leftv w, int input_type)
   BOOLEAN b=jjSUBST_Id(res,u,v,&tmp);
   tmp.CleanUp();
   return b;
-}
-static BOOLEAN jjSLIM_GB(leftv res, leftv u){
-  if (pOrdSgn!=1){
-    return TRUE;
-  }
-  res->data=t_rep_gb(currRing, (ideal)u->Data());
-  return FALSE;
 }
 static BOOLEAN jjMATRIX_Id(leftv res, leftv u, leftv v,leftv w)
 {
