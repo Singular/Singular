@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: normal.lib,v 1.41 2005-01-04 10:38:34 Singular Exp $";
+version="$Id: normal.lib,v 1.42 2005-04-29 13:23:25 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  normal.lib     Normalization of Affine Rings
@@ -12,6 +12,8 @@ MAIN PROCEDURES:
                      the delta invariant
  HomJJ(L);           presentation of End_R(J) as affine ring, L a list
  genus(I);           computes genus of the projective curve defined by I
+ primeClosure(L);    integral closure of R/p (p prime), L a list 
+ closureFrac(L)      write poly in integral closure as element of Quot(R/p)
 
 AUXILIARY PROCEDURE: 
  deltaLoc(f,S);      (sum of) delta invariant(s) at conjugated singular points
@@ -26,6 +28,7 @@ LIB "presolve.lib";
 LIB "inout.lib";
 LIB "ring.lib";
 LIB "hnoether.lib";
+LIB "reesclos.lib";
 ///////////////////////////////////////////////////////////////////////////////
 
 proc HomJJ (list Li)
@@ -2164,8 +2167,13 @@ EXAMPLE:  example closureRingtower; shows an example
 
   for (int i=1;i<=n;i++)
     {
+      if (defined(R(i))) { 
+        string s="Fixed name R("+string(i)+") leads to conflict with existing "
+              +"object having this name";
+        ERROR(s);
+      }
       def R(i)=L[i];
-      keepring (R(i));
+      export R(i);
     }
 
   return();
@@ -2179,6 +2187,7 @@ example
   closureRingtower(L);
   R(1);
   R(4);
+  kill R(1),R(2),R(3),R(4);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -2198,7 +2207,7 @@ EXAMPLE:  example closureFrac; shows an example
   int j,k,l;
   string mapstr;
 
-  closureRingtower(L);         // The rings of L get names R[1],...,R[n]
+  for (int i=1;i<=n;i++) { def R(i)=L[i]; }
 
 // The quotient representing f is computed as in 'closureGenerators' with
 // the differences that
@@ -2300,18 +2309,20 @@ example
   "EXAMPLE:"; echo=2;
   ring R=0,(x,y),dp;
   ideal ker=x2+y2;
-  export R;
+  export ker;
   list L=primeClosure(R);          // We normalize R/ker
-  closureRingtower(L);             // Now R/ker=R(1) with normalization R(2)
+  for (int i=1;i<=size(L);i++) { def R(i)=L[i]; }
   setring R(2);
   kill(R);
   phi;                             // The map R(1)-->R(2)
-  poly f=T(1)*T(2);                // We will get a representation of f
-  export R(2);
+  poly f=T(2);                     // We will get a representation of f
+  export f;
+  L[2]=R(2);
   closureFrac(L);
   setring R(1);
-  kill (R(2));
+  kill R(2);
   fraction;                        // f=fraction[1]/fraction[2] via phi
+  kill R(1);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -2334,7 +2345,7 @@ proc closureGenerators(list L);    // called inside normalI
   int length=nvars(L[n]);         // the number of variables of the last ring
   string mapstr;
 
-  closureRingtower(L);            // ...and the rings R(1),...,R(n) out of L.
+  for (int i=1;i<=n;i++) { def R(i)=L[i]; }
 
   // For each variable (counter j) and for each intermediate ring (counter k):
   // Find a preimage of var_j*phi(nzd(k-1)) in R(k-1).
