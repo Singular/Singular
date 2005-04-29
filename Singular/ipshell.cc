@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.104 2005-04-26 18:21:26 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.105 2005-04-29 07:49:55 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1591,8 +1591,16 @@ void rDecomposeC(leftv h,const ring R)
   // ----------------------------------------
 }
 
-lists rDecompose(ring r)
+lists rDecompose(const ring r)
 {
+  // sanity check:
+  if ((r!=currRing) 
+  && ((r->minpoly!=NULL) || (r->qideal!=NULL) || (r->minideal!=NULL))
+  )
+  {
+    WerrorS("ring must be the base ring or compatible");
+    return NULL;
+  }
   // 0: char/ cf - ring
   // 1: list (var)
   // 2: list (ord)
@@ -1614,6 +1622,11 @@ lists rDecompose(ring r)
       rDecomposeC(&(L->m[0]),r);
     else
       rDecomposeCF(&(L->m[0]),r->algring,r);
+    if (L->m[0].rtyp==0)
+    {
+      omFreeBin(slists_bin,(void *)L);
+      return NULL;
+    }
   }
   else
   #endif
@@ -1699,7 +1712,7 @@ lists rDecompose(ring r)
   return L;
 }
 
-ring rCompose(lists  L)
+ring rCompose(const lists  L)
 {
   if ((L->nr!=3)
 #ifdef HAVE_PLURAL
