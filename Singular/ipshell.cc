@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.105 2005-04-29 07:49:55 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.106 2005-04-29 16:11:12 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1535,58 +1535,36 @@ void rDecomposeCF(leftv h,const ring r,const ring R)
   // ----------------------------------------
 }
 void rDecomposeC(leftv h,const ring R)
+/* field is R or C */
 {
   lists L=(lists)omAlloc0Bin(slists_bin);
-  L->Init(4);
+  if (rField_is_long_C(R)) L->Init(3);
+  else                     L->Init(2);
   h->rtyp=LIST_CMD;
   h->data=(void *)L;
   // 0: char/ cf - ring
   // 1: list (var)
   // 2: list (ord)
-  // 3: qideal
   // ----------------------------------------
   // 0: char/ cf - ring
   L->m[0].rtyp=INT_CMD;
-  L->m[0].data=(void *)R->ch;
+  L->m[0].data=(void *)0;
   // ----------------------------------------
-  // 1: list (var)
+  // 1: 
   lists LL=(lists)omAlloc0Bin(slists_bin);
-  LL->Init(1);
-    LL->m[0].rtyp=STRING_CMD;
-    LL->m[0].data=(void *)omStrDup(R->parameter[0]);
+  LL->Init(2);
+    LL->m[0].rtyp=INT_CMD;
+    LL->m[0].data=(void *)si_max(R->float_len,SHORT_REAL_LENGTH);
+    LL->m[1].rtyp=INT_CMD;
+    LL->m[1].data=(void *)si_max(R->float_len2,SHORT_REAL_LENGTH);
   L->m[1].rtyp=LIST_CMD;
   L->m[1].data=(void *)LL;
   // ----------------------------------------
-  // 2: list (ord)
-  LL=(lists)omAlloc0Bin(slists_bin);
-  LL->Init(1);
-  lists LLL;
+  // 2: list (par)
+  if (rField_is_long_C(R))
   {
-    intvec *iv;
-    int j;
-    LL->m[0].rtyp=LIST_CMD;
-    LLL=(lists)omAlloc0Bin(slists_bin);
-    LLL->Init(2);
-    LLL->m[0].rtyp=STRING_CMD;
-    LLL->m[0].data=(void *)omStrDup("lp");
-    {
-      iv=new intvec(1);
-      for(;j>=0; j--) (*iv)[0]=1;
-    }
-    LLL->m[1].rtyp=INTVEC_CMD;
-    LLL->m[1].data=(void *)iv;
-    LL->m[0].data=(void *)LLL;
-  }
-  L->m[2].rtyp=LIST_CMD;
-  L->m[2].data=(void *)LL;
-  // ----------------------------------------
-  // 3: qideal
-  L->m[3].rtyp=IDEAL_CMD;
-  {
-    ideal I=idInit(1,1);
-    L->m[3].data=(void *)I;
-    //I->m[0]=pOne();
-    //pSetCoeff(I->m[0],R->minpoly);
+    L->m[2].rtyp=STRING_CMD;
+    L->m[2].data=(void *)omStrDup(R->parameter[0]);
   }
   // ----------------------------------------
 }
@@ -1616,12 +1594,13 @@ lists rDecompose(const ring r)
   // ----------------------------------------
   // 0: char/ cf - ring
   #if 1 /* TODO */
-  if (rIsExtension(r))
+  if (rField_is_numeric(r))
   {
-    if (rField_is_long_C(r))
-      rDecomposeC(&(L->m[0]),r);
-    else
-      rDecomposeCF(&(L->m[0]),r->algring,r);
+    rDecomposeC(&(L->m[0]),r);
+  }
+  else if (rIsExtension(r))
+  {
+    rDecomposeCF(&(L->m[0]),r->algring,r);
     if (L->m[0].rtyp==0)
     {
       omFreeBin(slists_bin,(void *)L);
@@ -1712,6 +1691,49 @@ lists rDecompose(const ring r)
   return L;
 }
 
+void rComposeC(lists L, ring R)
+/* field is R or C */
+{
+  Print("in rComposeC\n");
+  // ----------------------------------------
+  // 0: char/ cf - ring
+  if ((L->m[0].rtyp!=INT_CMD) || (L->m[0].data!=(char *)0))
+    Werror("invald coeff. field description, expecting 0");
+    return;
+  R->ch=-1;
+  // ----------------------------------------
+  // 1: 
+  if (L->m[1].rtyp!=LIST_CMD) 
+    Werror("invald coeff. field description, expecting precision list");
+  lists LL=(lists)L->m[1].data;
+  int r1=(int)LL->m[0].data;
+  int r2=(int)LL->m[1].data;
+  if ((r1<=SHORT_REAL_LENGTH)
+  && (r2=SHORT_REAL_LENGTH))
+  {
+    R->float_len=0;
+    R->float_len2=0;
+  }
+  else
+  {
+    R->float_len=si_min(r1,32767);
+    R->float_len2=si_min(r2,32767);
+  }
+  // ----------------------------------------
+  // 2: list (par)
+  if (L->nr==2)
+  {
+    R->P=1;
+    if (L->m[2].rtyp!=STRING_CMD)
+    {
+      Werror("invald coeff. field description, expecting parameter name");
+      return;
+    }
+    R->parameter=(char**)omAlloc0(R->P*sizeof(char_ptr));
+    R->parameter[0]=omStrDup((char *)L->m[2].data);
+  }
+  // ----------------------------------------
+}
 ring rCompose(const lists  L)
 {
   if ((L->nr!=3)
@@ -1734,24 +1756,30 @@ ring rCompose(const lists  L)
   }
   else if (L->m[0].Typ()==LIST_CMD)
   {
-    R->algring=rCompose((lists)L->m[0].Data());
-    if (R->algring==NULL)
-    {
-      WerrorS("could not create rational function coefficient field");
-      goto rCompose_err;
-    }
-    if (R->algring->ch>0)
-       R->ch= -R->algring->ch;
+    lists LL=(lists)L->m[0].Data();
+    if (LL->nr<3)
+      rComposeC(LL,R); /* R, long_R, long_C */
     else
-       R->ch=1;
-    R->P=R->algring->N;
-    R->parameter=(char**)omAlloc0(R->P*sizeof(char_ptr));
-    int i;
-    for(i=R->P-1;i>=0;i--)
-      R->parameter[i]=omStrDup(R->algring->names[i]);
-    if (R->algring->qideal!=NULL)
     {
-      R->minpoly=pGetCoeff(R->algring->qideal->m[0]);
+      R->algring=rCompose((lists)L->m[0].Data());
+      if (R->algring==NULL)
+      {
+        WerrorS("could not create rational function coefficient field");
+        goto rCompose_err;
+      }
+      if (R->algring->ch>0)
+         R->ch= -R->algring->ch;
+      else
+         R->ch=1;
+      R->P=R->algring->N;
+      R->parameter=(char**)omAlloc0(R->P*sizeof(char_ptr));
+      int i;
+      for(i=R->P-1;i>=0;i--)
+        R->parameter[i]=omStrDup(R->algring->names[i]);
+      if (R->algring->qideal!=NULL)
+      {
+        R->minpoly=pGetCoeff(R->algring->qideal->m[0]);
+      }
     }
   }
   else
