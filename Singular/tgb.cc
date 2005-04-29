@@ -177,7 +177,8 @@ int red_object::guess_quality(calc_dat* c){
       s=kSBucketLength(bucket,this->p);
     else 
     {
-      if((pLexOrder) &&(!c->is_homog)) 
+      if((pLexOrder) &&(!c->is_homog))
+	//if (false)
 	s=kEBucketLength(this->bucket,this->p,c);
       else s=bucket_guess(bucket);
     }
@@ -186,8 +187,9 @@ int red_object::guess_quality(calc_dat* c){
 	s+=kSBucketLength(sum->ac->bucket);
       else
       {
-	if((pLexOrder) &&(!c->is_homog)) 
-	  s=kEBucketLength(sum->ac->bucket,this->p,c);
+	if((pLexOrder) &&(!c->is_homog))
+	//if (false)
+	  s+=kEBucketLength(sum->ac->bucket,this->p,c);
 	else
 	  s+=bucket_guess(sum->ac->bucket);
       }
