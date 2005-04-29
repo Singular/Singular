@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: maps_ip.cc,v 1.8 2005-04-29 16:04:36 Singular Exp $ */
+/* $Id: maps_ip.cc,v 1.9 2005-04-29 16:07:46 Singular Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */
@@ -23,7 +23,7 @@
 #include "prCopy.h"
 
 // define this if you want to use the fast_map routine for mapping ideals
-#define FAST_MAP
+//#define FAST_MAP
 
 #ifdef FAST_MAP
 #include "fast_maps.h"
