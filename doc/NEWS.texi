@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.39 2005-04-29 08:23:49 Singular Exp $
+@comment $Id: NEWS.texi,v 1.40 2005-04-29 13:30:49 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -36,6 +36,8 @@ name spaces (package)
 easy manipulation of rings (ringlist)
 @item
 improved speed of maps (subst, map)
+@item
+variant of Faugeres F4: @nref{slimgb}.
 @item
 improved factorization (integration of NTL, factorization over algebraic extensions,
 zeroset.lib)
@@ -78,6 +80,7 @@ the documentation of libraries was generally improved.
 
 @table @asis
 @item @code{ringlist}
+@item @code{slimgb}
 @end table
 
 @heading @sc{Singular} functions whose syntax/semantics has changed
