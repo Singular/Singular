@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.38 2005-04-26 12:47:41 Singular Exp $
+@comment $Id: NEWS.texi,v 1.39 2005-04-29 08:23:49 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -20,246 +20,87 @@
 @end macro
 @end ifset
 
-The current version @value{VERSION} is an update to the new
-release series version 2-0. 
+The current version @value{VERSION} is a pre-release to the new
+release series version 3-0. 
 
-Singular version 2 is generally much faster than any previous
-version of Singular, due to a rewrite of major parts of the Singular
-kernel (e.g., the kernel has a new memory manager and a new polynomial
-arithmetic) and due to new and better implemented algorithms (e.g., for
-computing resolutions and determinants).
-
-Besides theses internal changes, Singular version 2 offers many new
-features and functionlities (which were partly already incorporated in
-the 1-3 series). E.g., a native Windows distribution, an Emacs user
-interface, a new help system, 16  new libraries, etc.
-
-All these changes are explained in more detail below.
-
-@heading Efficiency Improvements
-The following table shows some timings which compare the efficincy of
-Singular version 1-2-3 and Singular version 2. All times are in seconds
-and were obtained on an AMD Athlon with 700 MHz, 128 MB RAM, running
-Linux.
-
-@multitable @columnfractions .15 .15 .25 .15 .15 .15
-@item @strong{Example} @tab @strong{Comp} @tab @strong{Ring} @tab @strong{1-2} @tab @strong{2-0} @tab @strong{Speedup}
-@item @uref{http://www.singular.uni-kl.de/Benchmarks/Singular/mora_1.sing,,mora_1} @tab std  @tab 32003,x(1..3),ds @tab 82 @tab 9.4 @tab 8.7
-@item @uref{http://www.singular.uni-kl.de/Benchmarks/Singular/mora_9.sing,,mora_9} @tab std  @tab 32003,x(1..14),ds @tab 9600 @tab 96 @tab 100
-@item @uref{http://www.singular.uni-kl.de/Benchmarks/Singular/homog_gonnet.sing,,homog_gonnet} @tab std  @tab 32003,x(1..18),dp @tab 33 @tab 8.9 @tab 4.5
-@item @uref{http://www.singular.uni-kl.de/Benchmarks/Singular/homog_cyclic_8.sing,,homog_cyclic_8} @tab std  @tab 32003,x(1..9),dp @tab 1873 @tab 472 @tab 4.0
-@item  @uref{http://www.singular.uni-kl.de/Benchmarks/Singular/cyclic_8.sing,,cyclic_8} @tab std @tab 32003,x(1..8),dp @tab >47800 @tab 478 @tab >100
-@end multitable
+Singular version 3 has a greater functionality and an improved architecture.
+Major new features are:
+@itemize
+@item
+dynamic modules
+@item
+non-commutative extensions (plural)
+@item
+name spaces (package)
+@item
+easy manipulation of rings (ringlist)
+@item
+improved speed of maps (subst, map)
+@item
+improved factorization (integration of NTL, factorization over algebraic extensions,
+zeroset.lib)
+@item
+improved gcd of polynomials (including bug fixes)
+@item
+ports to more architectures including automatic building from source (fink on Mac, ebuild on Gentoo)
+@item
+more help browser supported, user extendable (help.cnf)
+@item
+many bugs fixed
+@end itemize
+Besides theses internal changes, Singular version 3 offers many new
+features and functionalities (which were partly already incorporated in
+the 2-0 series).
 
 @heading Factorizing algorithms revisited
 Starting with version 2-0-4, we use NTL (of Victor Shoup) for factoring
 univariate polynomials. The multivariate factoring code in libfac/factory
 does now also work over algebraic extension fields.
 
-@heading General Changes
-@table @asis
-@item @strong{Windows distribution}
-created with Installshield, includes Cygwin, Singular, and (optionally)
-XEmacs, distributed as several self-extracting archives. Contains @sc{Singular} help
-in a Windows Help format (the file @code{Manual.hlp}).
-@item @nref{Emacs user interface}
-the recommended interface for using @sc{Singular}
-@item @code{ESingular}
-new program for an out-of-the-box, pre-customized Emacs which runs
-Singular
-@item @nref{The online help system}
-choose in which browser the on-line help is displayed;
-@*wildcard expansion of help topics
-@*new layout of html manual pages
-@item @nref{Source code debugger}
-interactive debugging of procedures written in the @sc{Singular}
-language
-@item @nref{example}
-Provide on-line examples for all kernel and library commands.
-@item file/directory layout of distribution
-@code{Singular/<version>/}
-@item http://www.singular.uni-kl.de
-New WWW home-site of @sc{Singular}
-@item RPM versions of Singular
-including integration into KDE
-@end table
-
-@heading Extensions of the ring concept
-
-@table @asis
-@item new coefficient domains: arbitrary long real and complex numbers
-@item no restriction on number of ring variables
-@item no restriction on number of parameters
-@c @item TBC: DegBound on exponent values
-@c @item TBC: parameters over real/complex
-@c @item TBC: declaration with "ring of ring".
-@end table
-
 @heading New @sc{Singular} libraries
 
 Reorganisation of libraries into "Categories".
 @table @asis
-@item @nref{intprog_lib} procedures for computing toric ideals
-@item @nref{toric_lib} procedures for Integer Programming using Groebner bases
-@item @nref{spectrum_lib} procedures for computing spectra
 @item @nref{mregular_lib}  procedures for computing the Castelnuovo-Mumford regularity
-@c @item @nref{mprimdec}
-@c procedures for primary decomposition of modules
-@item @nref{mondromy_lib}
-procedures for computing the monodromy of a singularity
+@item @nref{mprimdec}
+procedures for primary decomposition of modules
 @item @nref{gmspoly_lib}, @nref{gmssing_lib}
 procedures for the Gauss-Manin connection of a singularity
-@item @nref{spcurve_lib}
-procedures for CM codimension 2 singularities
-@item @nref{triang_lib}
-procedures for decomposing zero-dimensional ideals
-@item @nref{solve_lib}
-procedures for solving polynomial systems
-@item @nref{surf_lib}
-visualization of curves and surfaces with @code{surf}
-@item @nref{reesclos_lib}
-Rees Algebra and integral closure of an ideal
-@item @nref{brnoeth_lib}
-Brill-Noether algorithm, Weierstrass semigroups and AG codes
-@item @nref{stratify_lib}
-Algorithmic stratification by the Greuel-Pfister algorithm
-@item @nref{rinvar_lib}
-Invariant rings of reductive groups
-@item @nref{zeroset_lib}
-Procedures for roots and factorization
-@item @nref{qhmoduli_lib}
-Moduli spaces of sqh-singularities
 @end table
 
 @heading Changes in @sc{Singular} libraries
 Many procedures were moved into different libraries,
-the documentation of libraries was generally improved and
-some libraries renamed:
+the documentation of libraries was generally improved.
 @table @asis
-@item @nref{ainvar_lib}
-renamed @code{invar.lib} to @code{ainvar.lib}
-(see also @code{rinvar.lib}, @code{finvar.lib}).
-@item @nref{deform_lib}
-renamed procedures @code{T1, T2, T12} to @code{T_1, T_2, T_12}.
-@item @nref{poly_lib}
-new procedures numerator/denominator
-@item @nref{linalg_lib}
-included @code{jordan.lib} in @code{linalg.lib}
 @end table
 
 @heading New @sc{Singular} functions
 
 @table @asis
-@item @code{convhull, simplex}
-TODO: docu, tests
-@item @nref{division}
-Extension of lift: @code{division(M,SM)} returns a list @code{[T,U,R]}
-with @code{SM*U+R=M*T}
-@item @nref{breakpoint}
-sets a debugger breakpoint
-@item @code{div}
-integer division omitting remainder
-@item @nref{ERROR}
-interrupts computation in current procedure and returns with error
-message to top-level
-@item @nref{fglmquot}
-calculate ideal quotions using FGLM-techniques
-@item @nref{leadmonom}
-returns the leading monomial of a polynomial or a vector as a polynomial
-or vector whose coefficient is one
-@item @nref{highcorner}
-returns the smallest monomial not contained in and ideal/module
-@item @nref{hres}
-calculate free resolution of homogenous ideal using Hilbert-driven
-algorithm.
-@item @nref{minor}
-with an optional third argument minors modulo a standard basis will be computed
-@item @nref{mpresmat}
-calculate module representing the multipolynomial resultant matrix
-@item @nref{uressolve}
-compute all complex roots of a zerodimensional ideal
-@item @nref{vandermonde}
-solve Vandermonde linear system
-@item @nref{jet}
-extended for series expansions of rational expressions
-@item @nref{reduce}
-extended for reduced normal form of rational expressions
+@item @code{ringlist}
 @end table
 
 @heading @sc{Singular} functions whose syntax/semantics has changed
 @table @asis
-@item @nref{division}
-arguments swapped w.r.t. version 2-0-1 and before
-@item @nref{coeffs}
-Extended possible syntax to
-@code{coeffs(ideal,ideal)} and @code{coeffs(module,module)} which is
-equivalent to @code{coeffs(ideal,ideal,p)} and
-@code{coeffs(module,module,p)} where @code{p} is a polynomial (i.e.,
-monomial) consisting of all ring variables.
-@item @nref{execute}
-parenthesis around argument of execute is now @strong{mandatory}.
-@item @nref{lift}
-new implementation (unified handling of isSB and not isSB case); new
-optional third argument (a matrix name), which, if given, stores the
-"matrix of units"
-@item @nref{bareiss}
-new implementation after Lie-Saunders, much faster
-@item @nref{example}
-run example for all kernel commands.
-@c @item @nref{fetch}
-@item @nref{print}
-Finer-grained control for formatted output.
-@item @nref{pause}
-can be called with argument, must be called with parenthesis.
-@item @nref{option}
-new options: @code{oldStd}, @code{redThrough}, @code{notBuckets}
-@end table
-
-@heading Changes of command-line options and system resources
-@table @asis
-@item @code{--browser}, @code{--allow-net}, @code{--emacs}, @code{--sdb}
-new command-line options
-@ifset singularmanual
-(@pxref{Command line options})
-@end ifset
-.
-@item @nref{system}
-values of command-line options can be inspected/set at run-time with
-@code{system(<option>[,<new_value])}.
-@item @code{.singularrc}
-system administrators can put a "global" @code{.singularrc} file into
-the directories where @sc{Singular} libraries reside
-@ifset singularmanual
-(@pxref{Startup sequence})
-@end ifset
-.
-@item @code{libreadline}
-if found, a shared version of the @code{readline} library is linked-in
-dynamically at run-time. If not found, @code{readline} is emulated.
+@item @nref{degree}
+outputs degree and dimension instead of returning an int
+@item @nref{attrib}
+new attribute: @code{rowShift}
 @end table
 
 @heading Internal Changes
 @table @asis
-@item new data structures for monomials and polynomials
-Makes polynomial arithmetic significantly faster: Especially for block -
-or weighted orderings.
-Bucket representation of polynomials in std;
-Ring change during std, res and bareiss computations
-(resulting in more speed and less space consumption).
-@item new memory management
-Results is less memory usage, faster memory allocation/free, less
-fragmentation, much better locality of reference.
-@item factorization
-revisited, missing cases implemented
+@item new mapping code
+@item non-commutative extensions (plural)
+@item factory revisited
 @end table
 
 @heading Porting
 
 @itemize @bullet
 @item
-@code{libreadline} works only with ix86-libc5,
-ix86-libc6,HPUX_9,HPUX_10
-@item Singular is available for ix86-libc5, ix86-libc6, HPUX_9, HPUX_10,
+@item Singular is available for ix86-Linux, HPUX_9, HPUX_10,
 SunOS-4, SunOS-5, IRIX-6, ix86-Win (runs on Windows 95/98/NT4/2000),
-FreeBSD 4.2, MacOS X
+FreeBSD, MacOS X, DecAlpha-Linux, x86_64-Linux (AMD64/Opteron/EM64T),
+IA64-Linux
 @end itemize
