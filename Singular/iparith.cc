@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.348 2005-04-28 17:10:47 Singular Exp $ */
+/* $Id: iparith.cc,v 1.349 2005-04-29 12:21:40 bricken Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -46,6 +46,7 @@
 #include "units.h"
 #include "janet.h"
 #include "GMPrat.h"
+#include "tgb.h"
 #ifdef HAVE_FACTORY
 #include "clapsing.h"
 #include "kstdfac.h"
@@ -4883,6 +4884,13 @@ static BOOLEAN jjSUBST_Id_X(leftv res, leftv u, leftv v,leftv w, int input_type)
   BOOLEAN b=jjSUBST_Id(res,u,v,&tmp);
   tmp.CleanUp();
   return b;
+}
+static BOOLEAN jjSLIM_GB(leftv res, leftv u){
+  if (pOrdSgn!=1){
+    return TRUE;
+  }
+  res->data=t_rep_gb(currRing, (ideal)u->Data());
+  return FALSE;
 }
 static BOOLEAN jjMATRIX_Id(leftv res, leftv u, leftv v,leftv w)
 {
