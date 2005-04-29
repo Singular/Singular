@@ -1,5 +1,5 @@
-version="$Id: control.lib,v 1.27 2005-04-03 20:31:37 plural Exp $";
-category="Applications";
+version="$Id: control.lib,v 1.28 2005-04-29 14:53:50 levandov Exp $";
+category="System and Control Theory";
 info="
 LIBRARY:  control.lib Procedures for System and Control Theory 
 AUTHORS:  Oleksandr Iena       yena@mathematik.uni-kl.de
@@ -35,7 +35,7 @@ view();                      well-formatted output of lists, modules and matrice
 NOTE (EXAMPLES): In order to use examples below, execute the commands
 @* def A = exAntenna(); setring A; 
 @* Thus A will become a basering from the example with the predefined module R (transposed), corresponding to the system. After that you can just type in 
-@* control(R); //respectively autonom(R); 
+@* control(R); // respectively autonom(R); 
 and check the result.
 
 
@@ -87,7 +87,7 @@ proc declare(string NameOfRing, string Variables, list #)
 @*          NameOfRing:  string with name of ring,
 @*	    Variables:   string with names of variables separated by commas(e.g. \"x,y,z\"),
 @*	    Parameters: string of parameters in the ring separated by commas(e.g. \"a,b,c\"),
-@*	    Ordering:   string with name of ordering (by default, the ordering \"dp,C\" is used)
+@*	    Ordering:   string with name of ordering (by default, the ordering (dp,C) is used)
 PURPOSE: define the ring easily
 RETURN:  no return value
 EXAMPLE:  example declare; shows an example 
@@ -122,29 +122,29 @@ example
   string v="x,y,z";
   string p="q,p";
   string Ord ="c,lp";
- 
+  //----------------------------------
   declare("Ring_1",v);
   print(nameof(basering));
   print(basering);
-  
+  //----------------------------------
   declare("Ring_2",v,p);
   print(basering);
   print(nameof(basering));
-  
+  //----------------------------------
   declare("Ring_3",v,p,Ord);
   print(basering);
   print(nameof(basering));
-  
+  //----------------------------------
   declare("Ring_4",v,"",Ord);
   print(basering);
   print(nameof(basering));
-  
+  //----------------------------------
   declare("Ring_5",v," ",Ord);
   print(basering);
   print(nameof(basering));
 };
 //
-//maybe reasonable to add this in declare
+// maybe reasonable to add this in declare
 //
 //  print("Please enter your representation matrix in the following form: 
 //  module R=[1st row],[2nd row],...");
