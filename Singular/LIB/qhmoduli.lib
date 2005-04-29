@@ -16,7 +16,6 @@ PROCEDURES:
 
  Max(data)                maximal integer contained in 'data'
  Min(data)                minimal integer contained in  'data'
- Table(cmd, i, lb, ub)    list, i-th entry is cmd(i), lb <= i <= ub
 ";
 
 // NOTE: This library has been written in the frame of the diploma thesis
@@ -716,7 +715,7 @@ EXAMPLE: example ArnoldAction; shows an example
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc MonosAndTerms(poly f, wt, int ub)
+static proc MonosAndTerms(poly f, wt, int ub)
 "USAGE:   MonosAndTerms(f, w, ub); poly f, intvec w, int ub
 PURPOSE: returns a list of all monomials and terms occuring in f of
          weighted degree < ub
@@ -752,7 +751,7 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc SelectMonos(parts, intvec wt, int d)
+static proc SelectMonos(parts, intvec wt, int d)
 "USAGE:   SelectMonos(parts, w, d); list/ideal parts, intvec w, int d
 PURPOSE: returns a list of all monomials and terms occuring in f of
          weighted degree = d
@@ -787,7 +786,7 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc Expand(substitution, degVec, ideal reduceI, intvec w1, int ub, list truncated)
+static proc Expand(substitution, degVec, ideal reduceI, intvec w1, int ub, list truncated)
 "USAGE:   Expand(substitution, degVec, reduceI, w, ub, truncated);
          ideal/list substitution, list/intvec degVec, ideal reduceI, intvec w,
          int ub, list truncated
@@ -829,7 +828,7 @@ GLOBAL:  computedPowers
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc PolyProduct(poly g1, poly h1, ideal reduceI, intvec wt, int ub)
+static proc PolyProduct(poly g1, poly h1, ideal reduceI, intvec wt, int ub)
 "USAGE:   PolyProduct(g, h, reduceI, wt, ub); poly g, h; ideal reduceI,
           intvec wt, int ub.
 PURPOSE: compute g*h and reduce it w.r.t 'reduceI' and omit terms of weighted
@@ -877,7 +876,8 @@ NOTE:    used by 'Expand'
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc PolyPower1(int varIndex, poly f, int e, ideal reduceI, intvec wt, int truncated, int ub)
+static proc PolyPower1(int varIndex, poly f, int e, ideal reduceI, intvec wt, 
+                       int truncated, int ub)
 "USAGE:   PolyPower1(i, f, e, reduceI, wt, truncated, ub);int i, e, ub;poly f;
          ideal reduceI; intvec wt; list truncated;
 PURPOSE: compute f^e, use previous computations if possible, and reduce it
@@ -936,23 +936,7 @@ GLOBAL:  'computedPowers'
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc Num(int i)
-// Type : void
-// Purpose : set basering R, poly f and weight w to ...
-{
-  string p = "poly f = " + example_poly[i];
-  //string str = "wt = " + example_weight[ex_nr5 + i - 1] + ";";
-  string r = "ring R = 0, (" + example_vars[i] + "), ls;";
-  //execute(str);
-  execute(r);
-  execute(p);
-  wt = weight(f);
-  keepring R;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-proc RingVarsToList(list @index)
+static proc RingVarsToList(list @index)
 {
   int i;
   list temp;
@@ -962,7 +946,7 @@ proc RingVarsToList(list @index)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-
+static
 proc APSubstitution(poly f, ideal substitution, ideal reduceIdeal, intvec wt, int ub, int nrs, int nrt)
 "USAGE:   APSubstitution(f, subs, reduceI, w, ub, int nrs, int nrt); poly f
          ideal subs, reduceI, intvec w, int ub, nrs, nrt;
@@ -1185,7 +1169,7 @@ GLOBAL: 'varSubsList', contains the index j s.t. x(i) -> x(i)t(j) ...
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc AllCombinations(list partition, list indices)
+static proc AllCombinations(list partition, list indices)
 "USAGE:   AllCombinations(partition,indices); list partition, indices)
 PURPOSE: all combinations for a given partititon
 RETURN:  list
@@ -1220,7 +1204,7 @@ GLOBAL: varSubsList, contains the index j s.t. x(i) -> x(i)t(j) ...
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc AllSingleCombinations(int n, list index)
+static proc AllSingleCombinations(int n, list index)
 "USAGE:   AllSingleCombinations(n index); int n, list index
 PURPOSE: all combinations for var(n)
 RETURN:  list
@@ -1259,7 +1243,7 @@ RETURN:  list
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc AllCombinationsAux(list parts, list index)
+static proc AllCombinationsAux(list parts, list index)
 "USAGE:  AllCombinationsAux(parts ,index); list parts, index
 PURPOSE: all compbinations for nonlinear substituiton
 RETURN:  list
@@ -1289,7 +1273,7 @@ RETURN:  list
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc Partitions(int n, list nr)
+static proc Partitions(int n, list nr)
 "USAGE:   Partitions(n, nr); int n, list nr
 PURPOSE: partitions of n consisting of elements from nr
 RETURN:  list
@@ -1328,7 +1312,7 @@ RETURN:  list
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc NumFactor(int a, int b)
+static proc NumFactor(int a, int b)
 " USAGE: NumFactor(a, b); int a, b
 PURPOSE: if b divides a then return b/a, else return 0
 RETURN:  int
@@ -1341,7 +1325,7 @@ RETURN:  int
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc Table(string cmd, string iterator, int lb, int ub)
+static proc Table(string cmd, string iterator, int lb, int ub)
 " USAGE: Table(cmd,i, lb, ub); string cmd, i; int lb, ub
 PURPOSE: generate a list of size ub - lb + 1 s.t. _[i] = cmd(i)
 RETURN:  list

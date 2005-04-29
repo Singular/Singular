@@ -1,6 +1,6 @@
 // Last change 10.12.2000 (TB)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: rinvar.lib,v 1.10 2005-04-25 12:37:46 Singular Exp $";
+version="$Id: rinvar.lib,v 1.11 2005-04-29 08:55:50 Singular Exp $";
 category="Invariant theory";
 info="
 LIBRARY:  rinvar.lib      Invariant Rings of Reductive Groups
@@ -1113,7 +1113,7 @@ RETURN: list
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc RingVarProduct(index)
+proc RingVarProduct(index)
 // list of indices
 {
   poly f = 1;
