@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: pluconventions.doc,v 1.9 2005-04-28 16:29:53 levandov Exp $
+@comment $Id: pluconventions.doc,v 1.10 2005-04-29 08:56:19 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -70,7 +70,6 @@ A^n.
 One can work also within factor-algebras of G-algebras (see @ref{qring} type)
 by two-sided ideals (see @ref{twostd}).
 
-@end itemize
 @end table
 
 @table @strong

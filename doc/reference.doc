@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.231 2005-04-28 16:29:55 levandov Exp $
+@comment $Id: reference.doc,v 1.232 2005-04-29 08:56:21 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -169,6 +169,7 @@ brackets are allowed.
 * ringlist::
 * rvar::
 * setring::
+* simplex::
 * simplify::
 * size::
 * sortvec::
