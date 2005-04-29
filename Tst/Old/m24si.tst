@@ -22,4 +22,5 @@
   killall("proc");
   kill killall;
   dump("");                    // dump to stdout
+  system("sh","rm example.txt");
 LIB "tst.lib";tst_status(1);$
