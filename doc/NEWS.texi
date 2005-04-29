@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.40 2005-04-29 13:30:49 Singular Exp $
+@comment $Id: NEWS.texi,v 1.41 2005-04-29 19:42:34 levandov Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -29,7 +29,7 @@ Major new features are:
 @item
 dynamic modules
 @item
-non-commutative extensions (plural)
+non-commutative extension @nref{PLURAL}
 @item
 name spaces (package)
 @item
@@ -63,10 +63,13 @@ does now also work over algebraic extension fields.
 
 Reorganisation of libraries into "Categories".
 @table @asis
-@item @nref{mregular_lib}  procedures for computing the Castelnuovo-Mumford regularity
-@item @nref{mprimdec}
+@item @nref{control_lib} 
+algebraic analysis tools for System and Control Theory
+@item @nref{mregular_lib}    
+procedures for computing the Castelnuovo-Mumford regularity
+@item @nref{mprimdec_lib}    
 procedures for primary decomposition of modules
-@item @nref{gmspoly_lib}, @nref{gmssing_lib}
+@item @nref{gmspoly_lib}, @nref{gmssing_lib}   
 procedures for the Gauss-Manin connection of a singularity
 @end table
 
@@ -91,19 +94,47 @@ outputs degree and dimension instead of returning an int
 new attribute: @code{rowShift}
 @end table
 
+@heading Noncommutative Extension @sc{Plural}
+
+Starting with version 3-0-0, @sc{Singular} features a
+noncommutative extension @sc{Plural}. It allows to 
+set and to compute within noncommutative algebras
+ with PBW basis. Among available algorithms are Groebner
+bases for left modules, syzygies and resolutions.
+
+Together with @sc{Plural} come the following libraries:
+
+@table @asis
+@item @nref{center_lib}
+computes generators of the center and centralizer subalgebras up
+to a given degree resp. up to a given number of generators
+@item @nref{involution_lib}
+determines linear antiautomorphisms (involutions) and automorphisms
+@item @nref{gkdim_lib}
+computes a Gel'fand-Kirillov dimension for modules
+@item @nref{ncalg_lib}
+includes ready-to-use funtions for defining many important
+ noncommutative algebras
+@item @nref{ncdecomp_lib}
+computes a decomposition of module by its central characters
+@item @nref{ncalg_lib}, @nref{nctools_lib}
+contain numerous useful tools for noncommutative algebras
+@item @nref{qmatrix_lib}
+procedures, related to quantum matrices and minors
+@end table
+
 @heading Internal Changes
 @table @asis
 @item new mapping code
-@item non-commutative extensions (plural)
+@c @item non-commutative extension (Plural)
 @item factory revisited
 @end table
 
 @heading Porting
 
 @itemize @bullet
-@item
 @item Singular is available for ix86-Linux, HPUX_9, HPUX_10,
-SunOS-4, SunOS-5, IRIX-6, ix86-Win (runs on Windows 95/98/NT4/2000),
+SunOS-4, SunOS-5, IRIX-6, ix86-Win (runs on Windows 95/98/NT4/2000/XP),
 FreeBSD, MacOS X, DecAlpha-Linux, x86_64-Linux (AMD64/Opteron/EM64T),
 IA64-Linux
 @end itemize

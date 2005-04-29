@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.123 2005-04-28 14:55:39 Singular Exp $
+@comment $Id: singular.doc,v 1.124 2005-04-29 19:42:34 levandov Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -52,7 +52,7 @@ This is the texinfo file describing Singular (version @value{VERSION})
 @sp 2
 @center with contributions by
 @center O. Bachmann, W. Decker, S. Endra@ss{}, I. Farran, A. Fr@"uhbis-Kr@"uger, C. Gorzel,
-@center H. Grassmann, A. Heydtmann, D. Hillebrand, T. Keilen, U. Klein, K. Kr@"uger, M. Lamm,
+@center H. Grassmann, A. Heydtmann, D. Hillebrand, T. Keilen, U. Klein, K. Kr@"uger, M. Lamm, V. Levandovskyy
 @center C. Lossen, B. Martin, M. Me@ss{}ollen, W. Neumann, T. N@"u@ss{}ler, W. Pohl, T. Siebert,
 @center J. Schmidt, M. Schulze, R. Stobbe, M. Wenk, T. Wichmann
 @sp 2
@@ -191,6 +191,11 @@ This is the texinfo file describing Singular (version @value{VERSION})
 @appendix Mathematical background
 @cindex Mathematical background
 @include math.tex
+
+@c @ifset withplural
+@c @include s-plumath.tex
+@c @end ifset
+
 @c ----------------------------------------------------------------------------
 @node SINGULAR libraries, Release Notes, Mathematical background, Top
 @appendix SINGULAR libraries
@@ -213,6 +218,7 @@ command @code{LIB "all.lib";} for loading all libraries.
 * Symbolic-numerical solving::
 * Visualization::
 * Coding theory::
+* System and Control theory::
 @end menu
 @c ----------------------------------------------------------
 @node standard_lib, General purpose, SINGULAR libraries, SINGULAR libraries
@@ -519,6 +525,24 @@ LIB "all.lib";
 @node brnoeth_lib, , , Coding theory
 @subsection brnoeth_lib
 @c lib brnoeth.lib no_ex
+
+
+@c ----------------------------------------------------------------------------
+@node System and Control theory, , Coding theory, SINGULAR libraries
+@section System and Control theory
+@cindex System and Control theory
+@cindex Control theory
+
+@menu
+* control_lib:: Algebraic analysis tools for System and Control Theory
+@end menu
+
+@c ---------------------------------------------------------
+@node control_lib, , , System and Control theory
+@subsection control_lib
+@c lib control.lib
+
+
 @c ----------------------------------------------------------
 @node Release Notes, Index, SINGULAR libraries, Top
 @chapter Release Notes
