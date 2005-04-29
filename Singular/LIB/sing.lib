@@ -1,7 +1,7 @@
-// $Id: sing.lib,v 1.27 2005-04-28 14:29:09 Singular Exp $
+// $Id: sing.lib,v 1.28 2005-04-29 16:48:31 Singular Exp $
 //(GMG/BM, last modified 26.06.96)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: sing.lib,v 1.27 2005-04-28 14:29:09 Singular Exp $";
+version="$Id: sing.lib,v 1.28 2005-04-29 16:48:31 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  sing.lib      Invariants of Singularities
@@ -9,7 +9,7 @@ AUTHORS:  Gert-Martin Greuel, email: greuel@mathematik.uni-kl.de @*
           Bernd Martin, email: martin@math.tu-cottbus.de
 
 PROCEDURES:
- codim (id1, id2);      vector space dimension of of id2/id1 if finite
+ codim(id1, id2);       vector space dimension of of id2/id1 if finite
  deform(i);             infinitesimal deformations of ideal i
  dim_slocus(i);         dimension of singular locus of ideal i
  is_active(f,id);       is poly f an active element mod id? (id ideal/module)
