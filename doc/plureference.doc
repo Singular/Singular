@@ -1,5 +1,5 @@
   @comment -*-texinfo-*-
-@comment $Id: plureference.doc,v 1.29 2005-04-29 08:56:20 Singular Exp $
+@comment $Id: plureference.doc,v 1.30 2005-04-29 19:43:44 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -1270,7 +1270,7 @@ See also
 @item @strong{Type:}
 ideal or module
 @item @strong{Purpose:}
-returns a left Groebner basis (see @ref{Groebner bases in G-algebras}) for a definition) 
+returns a left Groebner basis (see @ref{Groebner bases in G-algebras} for a definition) 
 of an ideal or module with respect to the
 monomial ordering of the basering. 
 @c is a set of generators such that

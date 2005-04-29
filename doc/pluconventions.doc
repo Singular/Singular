@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: pluconventions.doc,v 1.10 2005-04-29 08:56:19 Singular Exp $
+@comment $Id: pluconventions.doc,v 1.11 2005-04-29 19:43:43 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -12,8 +12,9 @@
 %**start
 \input texinfo.tex
 @setfilename plureference.info
-@settitel PLURAL
-@node Top, Getting started with PLURAL, (dir), (dir)
+
+@c @settitel PLURAL
+@c @node Top, Getting started with PLURAL, (dir), (dir)
 @menu
 *  Getting started with PLURAL ::
 @end menu
@@ -51,7 +52,6 @@ objects from commutative rings of @sc{Singular}
 to noncommutative rings @sc{Plural} and back.
 
 
-
 With @sc{Plural}, one can set up a noncommutative G-algebra with
 a PBW basis, say, @math{A} (see @ref{G-algebras} for step-by-step building instruction and also @ref{PLURAL libraries} 
 for procedures, setting many important algebras easily).
@@ -69,7 +69,6 @@ A^n.
 
 One can work also within factor-algebras of G-algebras (see @ref{qring} type)
 by two-sided ideals (see @ref{twostd}).
-
 @end table
 
 @table @strong

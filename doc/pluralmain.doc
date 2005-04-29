@@ -1,7 +1,6 @@
 \input texinfo    @c -*-texinfo-*-
 @comment this file contains the main structure of the manual
 
-
 @c ------------------------
 @c %**start of header
 @c ------------------------
@@ -45,15 +44,16 @@ This is the texinfo file describing Singular:Plural (version @value{VERSION})
 @center @titlefont{Manual}
 @center Version @value{VERSION}
 @sp 2
-@center Singular:Plural is created and its development is directed and coordinated by
-@center G.-M. Greuel, Y. A. Drozd, V. Levandovskyy and H. Sch@"onemann
-@sp 2
-@center with contributions by
-@center L. Bodnarchuk and O. Khomenko
+@center Singular:Plural is created by V. Levandovskyy and H. Sch@"onemann
+@center its development is directed and coordinated by G.-M. Greuel
+@center supported by G. Pfister and  Y. A. Drozd
+@c @sp 2
+@c @center with contributions by
+@c @center L. Bodnarchuk and O. Khomenko
 @sp 2
 @author Fachbereich Mathematik
 @author Zentrum f@"ur Computeralgebra
-@author Universit@"at Kaiserslautern
+@author Technische Universit@"at Kaiserslautern
 @author D-67653 Kaiserslautern
 @end titlepage
 
