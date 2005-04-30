@@ -1,7 +1,8 @@
-version="$Id: control.lib,v 1.28 2005-04-29 14:53:50 levandov Exp $";
+version="$Id: control.lib,v 1.29 2005-04-30 20:34:59 levandov Exp $";
 category="System and Control Theory";
 info="
-LIBRARY:  control.lib Procedures for System and Control Theory 
+LIBRARY:  control.lib     Algebraic analysis tools for System and Control Theory
+
 AUTHORS:  Oleksandr Iena       yena@mathematik.uni-kl.de
 @*        Markus Becker        mbecker@mathematik.uni-kl.de
 @*        Viktor Levandovskyy  levandov@mathematik.uni-kl.de
@@ -9,59 +10,29 @@ AUTHORS:  Oleksandr Iena       yena@mathematik.uni-kl.de
 SUPPORT: Forschungsschwerpunkt 'Mathematik und Praxis' (Project of Dr. E. Zerz
 and V. Levandovskyy), Uni Kaiserslautern
 
-NOTE: This library provides algebraic analysis tools for System and Control Theory
+MAIN PROCEDURES:
+  control(R);            analysis of controllability-related properties of R (using Ext modules)
+  control2(R);           analysis of controllability-related properties of R (using dimension)
+  autonom(R);            analysis of autonomy-related properties of R (using Ext modules)
+  autonom2(R);           analysis of autonomy-related properties of R (using dimension)
 
-PROCEDURES:
-control (R);            analysis of controllability-related properties of R (using Ext modules),
-control2 (R);           analysis of controllability-related properties of R (using dimension),
-autonom (R);            analysis of autonomy-related properties of R (using Ext modules),
-autonom2 (R);           analysis of autonomy-related properties of R (using dimension),
-LeftKernel (R);         a left kernel of R,
-RightKernel (R);        a right kernel of R,
-LeftInverse (R);        a left inverse of R,
-RightInverse (R);       a right inverse of R,
-smith (M);              a Smith form of a module M,
-colrank (M);            a column rank of M as of matrix,
-genericity (M);         analysis of the genericity of parameters,
-canonize (L);           Groebnerification for modules in the output of control/autonomy procs,
-iostruct (R);           computes an I/O-structure of behavior given by a module R
-FindTorsion (R, I);     generators of the submodule of a module R, annihilated by the ideal I.
-
+COMPONENT PROCEDURES:
+  LeftKernel(R);         a left kernel of R
+  RightKernel(R);        a right kernel of R
+  LeftInverse(R);        a left inverse of R
+  RightInverse(R);       a right inverse of R
+  smith(M);              a Smith form of a module M
+  colrank(M);            a column rank of M as of matrix
+  genericity(M);         analysis of the genericity of parameters
+  canonize(L);           Groebnerification for modules in the output of control or autonomy procs
+  iostruct(R);           computes an IO-structure of behavior given by a module R
+  FindTorsion(R, I);     generators of the submodule of a module R, annihilated by the ideal I
 
 AUXILIARY PROCEDURES:
-declare(NameOfRing,Variables [,Parameters, Ordering]);    define the ring easily
-view();                      well-formatted output of lists, modules and matrices
-
-NOTE (EXAMPLES): In order to use examples below, execute the commands
-@* def A = exAntenna(); setring A; 
-@* Thus A will become a basering from the example with the predefined module R (transposed), corresponding to the system. After that you can just type in 
-@* control(R); // respectively autonom(R); 
-and check the result.
-
-
-EXAMPLES (AUTONOMY):
-exCauchy();                  example of 1-dimensional Cauchy equation,
-exCauchy2();                 example of 2-dimensional Cauchy equation,
-exZerz();                    example from the lecture of Eva Zerz,
-
-EXAMPLES (CONTROLLABILITY):
-ex1();                       example of noncontrollable system,   
-ex2();                       example of controllable system ,
-exAntenna();                 Antenna,
-exEinstein();                Einstein equations,
-exFlexibleRod();             Flexible Rod,
-exTwoPendula();              Two Pendula mounted on a cart,
-exWindTunnel();              Wind Tunnel. 
+  ControlExample(s);     set up an example from the mini database inside of the library
+  declare(N,V,P,O);      defines the ring easily
+  view();                well-formatted output of lists, modules and matrices
 ";
-
-// NOTE: static things should not be shown for end-user
-// static Ext_Our(...)                  Copy of Ext_R from 'homolog.lib' in commutative case;
-// static is_zero_Our(module R)         Copy of is_zero from 'poly.lib';
-//  static space(int n)           Procedure used inside the procedure 'Print' to have a better formatted output
-// static control_output();      Generating the output for the procedure 'control'
-// static autonom_output();      Generating the output for the procedure 'autonom' and 'autonom2'
-// static extgcd_Our(poly p, poly q)  Computes extgcd of p and q. for versions ealier than 2006 extgcd has a bug and is therefore not used
-// static normalize_Our(matrix N, matrix Q) normalizes the columns of N and divides the columns of Q through the leading coefficients of the columns of N
 
 LIB "homolog.lib"; 
 LIB "poly.lib";
@@ -81,85 +52,14 @@ PURPOSE: save previous options and set customized options
   option(redTail);
   return (v);
 }
-//---------------------------------------------------------------
-proc declare(string NameOfRing, string Variables, list #)
-"USAGE: declare(NameOfRing, Variables,[Parameters, Ordering]);
-@*          NameOfRing:  string with name of ring,
-@*	    Variables:   string with names of variables separated by commas(e.g. \"x,y,z\"),
-@*	    Parameters: string of parameters in the ring separated by commas(e.g. \"a,b,c\"),
-@*	    Ordering:   string with name of ordering (by default, the ordering (dp,C) is used)
-PURPOSE: define the ring easily
-RETURN:  no return value
-EXAMPLE:  example declare; shows an example 
-"
-{
-  if(size(#)==0)
-  {
-    execute("ring "+NameOfRing+"=0,("+Variables+"),dp;");
-  }
-  else
-  {
-    if(size(#)==1)
-    {
-      execute( "ring " + NameOfRing + "=(0," + #[1] + "),(" + Variables + "),dp;" );
-    }
-    else
-    { 
-      if( (size(#[1])!=0)&&(#[1]!=" ") )
-      {
-        execute( "ring " + NameOfRing + "=(0," + #[1] + "),(" + Variables + "),("+#[2]+");" );
-      }
-      else
-      {
-        execute( "ring " + NameOfRing + "=0,("+Variables+"),("+#[2]+");" ); 
-      };
-    };
-  };
-  keepring(basering);
-}
-example
-{"EXAMPLE:";echo = 2;
-  string v="x,y,z";
-  string p="q,p";
-  string Ord ="c,lp";
-  //----------------------------------
-  declare("Ring_1",v);
-  print(nameof(basering));
-  print(basering);
-  //----------------------------------
-  declare("Ring_2",v,p);
-  print(basering);
-  print(nameof(basering));
-  //----------------------------------
-  declare("Ring_3",v,p,Ord);
-  print(basering);
-  print(nameof(basering));
-  //----------------------------------
-  declare("Ring_4",v,"",Ord);
-  print(basering);
-  print(nameof(basering));
-  //----------------------------------
-  declare("Ring_5",v," ",Ord);
-  print(basering);
-  print(nameof(basering));
-};
-//
-// maybe reasonable to add this in declare
-//
-//  print("Please enter your representation matrix in the following form: 
-//  module R=[1st row],[2nd row],...");
-//  print("Type the command: R=transpose(R)");
-//  print(" To compute controllability please enter: control(R)");
-//  print(" To compute autonomy please enter: autonom(R)");
+
 //-------------------------------------------------------------------------
 
 static proc space(int n)
-"USAGE:spase(n); 
-         n: integer, number of needed spaces
+"USAGE:spase(n); n is an integer (number of needed spaces)
 RETURN:  string consisting of n spaces
 NOTE:  the procedure is used in the procedure 'view' to have a better formatted output
-"
-{
+"{
   int i;
   string s="";
   for(i=1;i<=n;i++)
@@ -170,15 +70,12 @@ NOTE:  the procedure is used in the procedure 'view' to have a better formatted 
 };
 //-----------------------------------------------------------------------------
 proc view(M)
-"USAGE:  view(M);
-           M:  any type
+"USAGE:  view(M);   M is of any type
 RETURN:  no return value
-PURPOSE:  procedure for ( well-) formatted output of modules, matrices, lists of modules, matrices;
-          shows everything even if entries are long
+PURPOSE:  procedure for (well-) formatted output of modules, matrices, lists of modules, matrices; shows everything even if entries are long
 NOTE:  in case of other types( not 'module', 'matrix', 'list') works just as standard 'print' procedure  
 EXAMPLE:  example view; shows an example
-"
-{
+"{
   // to be replaced with something more feasible
   if ( (typeof(M)=="module")||(typeof(M)=="matrix") )
   {
@@ -254,8 +151,7 @@ proc RightKernel(matrix M)
 PURPOSE: computes the right kernel of matrix M (a module of all elements v such that Mv=0)
 RETURN:  module
 EXAMPLE: example RightKernel; shows an example
-"
-{ 
+"{ 
   return(modulo(M,std(0)));
 }
 example
@@ -294,7 +190,7 @@ proc LeftInverse(module M)
 PURPOSE: computes such a matrix L, that LM == Id;
 RETURN:  module
 EXAMPLE: example LeftInverse; shows an example
-NOTE: exists only in the case when Id \subseteq M!
+NOTE: exists only in the case when Id belongs to M!
 "
 {
   // it works also for the NC case;
@@ -318,14 +214,15 @@ NOTE: exists only in the case when Id \subseteq M!
   return(T2);
 }
 example
-{ // trivial example:
-"EXAMPLE:";echo =2;
+{ 
+  "EXAMPLE:";echo =2;
+  // a trivial example:
   ring r = 0,(x,z),dp;
   matrix M[2][1] = 1,x2z;
   print(M);
   print( LeftInverse(M) );  
   kill r;
-  // derived from the exTwoPendula
+  // derived from the example TwoPendula:
   ring r=(0,m1,m2,M,g,L1,L2),Dt,dp;
   matrix U[3][1];
   U[1,1]=(-L2)*Dt^4+(g)*Dt^2;
@@ -334,6 +231,8 @@ example
   module M = module(U);
   module L = LeftInverse(M);
   print(L);
+  // check
+  print(L*M);
 };
 //-----------------------------------------------------------------------
 proc RightInverse(module R)
@@ -341,20 +240,20 @@ proc RightInverse(module R)
 PURPOSE: computes such a matrix L, that ML == Id;
 RETURN:  module
 EXAMPLE: example RightInverse; shows an example
-NOTE: exists only in the case when Id \subseteq M!
+NOTE: exists only in the case when Id belongs to M!
 "
 {
   return(transpose(LeftInverse(transpose(R))));
 }
 example
 { "EXAMPLE:";echo =2;
-  // trivial example:
+  // a trivial example:
   ring r = 0,(x,z),dp;
   matrix M[1][2] = 1,x2+z;
   print(M);
   print( RightInverse(M) );  
   kill r;
-  // derived from the exTwoPendula
+  // derived from the TwoPendula example:
   ring r=(0,m1,m2,M,g,L1,L2),Dt,dp;
   matrix U[1][3];
   U[1,1]=(-L2)*Dt^4+(g)*Dt^2;
@@ -363,6 +262,8 @@ example
   module M = module(U);
   module L = RightInverse(M);
   print(L);
+  // check
+  print(M*L);
 };
 //-----------------------------------------------------------------------
 static proc dim_Our(module R)
@@ -406,17 +307,15 @@ static proc is_zero_Our
 };
 //------------------------------------------------------------------------
 static proc control_output(int i, int NVars, module R, module Ext_1, list Gen) 
-//static proc control_output(int i, int NVars, module R, module Ext_1) 
-"USAGE:  control_output(i, NVars, R, Ext_1), where
-           i:  integer, number of first nonzero Ext or 
-             just a number of variables in a base ring + 1 in case that all the Exts are zero,
-	   NVars:  integer, number of variables in a base ring,
-	   R:  module R (cokernel representation),
-	   Ext_1:  module, the first Ext(its cokernel representation)      
+"USAGE:  control_output(i, NVars, R, Ext_1), 
+PURPOSE: where
+@*         i is integer (number of first nonzero Ext or a number of variables in a basering + 1 in case that all the Exts are zero),
+@*	   NVars:  integer, number of variables in a base ring,
+@*	   R:  module R (cokernel representation),
+@*	   Ext_1:  module, the first Ext(its cokernel representation)      
 RETURN:  list with all the contollability properties of the system which is to be returned in 'control' procedure
 NOTE:  this procedure is used in 'control' procedure
-"
-{
+"{
   // TODO: NVars to be replaced with the global hom. dimension of basering!!!
   // Is not clear what to do with gl.dim of qrings
   string DofS = "dimension of the system:";
@@ -522,7 +421,7 @@ EXAMPLE:  example control; shows an example
 }
 example
 {"EXAMPLE:";echo = 2; 
-  //Wind Tunnel
+  // a WindTunnel example
   ring A = (0,a, omega, zeta, k),(D1, delta),dp;
   module R;
   R = [D1+a, -k*a*delta, 0, 0],
@@ -538,7 +437,7 @@ proc control2(module R)
 PURPOSE: computes list of all the properties concerning controllability of the system (behavior), represented by the  matrix R
 RETURN: list
 EXAMPLE:  example control2; shows an example
-NOTE: same as control(R); but using dimensions, this procedure only works for full row rank matrices
+NOTE: this procedure is analogous to 'control' but uses dimension calculations.This approach works for full row rank matrices only.
 "
 {
   if( nrows(R) != colrank(transpose(R)) )
@@ -558,7 +457,7 @@ NOTE: same as control(R); but using dimensions, this procedure only works for fu
 }
 example
 {"EXAMPLE:";echo = 2; 
-  //Wind Tunnel
+  //a WindTunnel example
   ring A = (0,a, omega, zeta, k),(D1, delta),dp;
   module R;
   R = [D1+a, -k*a*delta, 0, 0],
@@ -695,7 +594,7 @@ EXAMPLE:  example autonom2; shows an example
 }
 example
 {"EXAMPLE:"; echo = 2;
-  //Cauchy
+  // Cauchy1 example
   ring r=0,(s1,s2,s3,s4),dp;
   module R= [s1,-s2],
             [s2, s1],
@@ -745,142 +644,7 @@ example
   view( autonom(R) );
 };  
 
-//----------------------------------------------------------
-//
-//Some example rings with defined systems
-//----------------------------------------------------------
-//autonomy:
-//
-//----------------------------------------------------------
-proc exCauchy()
-{
-  ring @r=0,(s1,s2),dp;
-  module R= [s1,-s2],
-            [s2, s1];
-  R=transpose(R);
-  export R;
-  return(@r);	    
-};
-//----------------------------------------------------------
-proc exCauchy2()
-{
-  ring @r=0,(s1,s2,s3,s4),dp;
-  module R= [s1,-s2],
-            [s2, s1],
-	    [s3,-s4],
-	    [s4, s3];	    
-  R=transpose(R);
-  export R;
-  return(@r);	    
-}; 
-//----------------------------------------------------------
-proc exZerz()
-{ 
-  ring @r=0,(d1,d2),dp;
-  module R=[d1^2-d2],
-           [d2^2-1];
-  R=transpose(R);
-  export R;
-  return(@r);	    
-};  
-//----------------------------------------------------------
-//control
-//----------------------------------------------------------
-proc ex1()
-{
-  ring @r=0,(s1,s2,s3),dp;
-  module R=[0,-s3,s2],
-           [s3,0,-s1];
-  R=transpose(R);	   
-  export R;
-  return(@r);
-};
-//----------------------------------------------------------
-proc ex2()
-{ 
-  ring @r=0,(s1,s2,s3),dp;
-  module R=[0,-s3,s2],
-           [s3,0,-s1],
-           [-s2,s1,0];
-  R=transpose(R);	   
-  export R;
-  return(@r); 
-};
-//----------------------------------------------------------
-proc exAntenna()
-{
-  ring @r = (0, K1, K2, Te, Kp, Kc),(Dt, delta), dp;
-  module R;
-  R = [Dt, -K1, 0, 0, 0, 0, 0, 0, 0],
-      [0, Dt+K2/Te, 0, 0, 0, 0, -Kp/Te*delta, -Kc/Te*delta, -Kc/Te*delta],
-      [0, 0, Dt, -K1, 0, 0, 0, 0, 0],
-      [0, 0, 0, Dt+K2/Te, 0, 0, -Kc/Te*delta, -Kp/Te*delta, -Kc/Te*delta],
-      [0, 0, 0, 0, Dt, -K1, 0, 0, 0],
-      [0, 0, 0, 0, 0, Dt+K2/Te, -Kc/Te*delta, -Kc/Te*delta, -Kp/Te*delta];
 
-  R=transpose(R);
-  export R;
-  return(@r);  
-};
-
-//----------------------------------------------------------
-
-proc exEinstein()
-{
-  ring @r = 0,(D(1..4)),dp;
-  module R =
-  [D(2)^2+D(3)^2-D(4)^2, D(1)^2, D(1)^2, -D(1)^2, -2*D(1)*D(2), 0, 0, -2*D(1)*D(3), 0, 2*D(1)*D(4)],
-  [D(2)^2, D(1)^2+D(3)^2-D(4)^2, D(2)^2, -D(2)^2, -2*D(1)*D(2), -2*D(2)*D(3), 0, 0, 2*D(2)*D(4), 0], 
-  [D(3)^2, D(3)^2, D(1)^2+D(2)^2-D(4)^2, -D(3)^2, 0, -2*D(2)*D(3), 2*D(3)*D(4), -2*D(1)*D(3), 0, 0],
-  [D(4)^2, D(4)^2, D(4)^2, D(1)^2+D(2)^2+D(3)^2, 0, 0, -2*D(3)*D(4), 0, -2*D(2)*D(4), -2*D(1)*D(4)],
-  [0, 0, D(1)*D(2), -D(1)*D(2), D(3)^2-D(4)^2, -D(1)*D(3), 0, -D(2)*D(3), D(1)*D(4), D(2)*D(4)],
-  [D(2)*D(3), 0, 0, -D(2)*D(3),-D(1)*D(3), D(1)^2-D(4)^2, D(2)*D(4), -D(1)*D(2), D(3)*D(4), 0],
-  [D(3)*D(4), D(3)*D(4), 0, 0, 0, -D(2)*D(4), D(1)^2+D(2)^2, -D(1)*D(4), -D(2)*D(3), -D(1)*D(3)],
-  [0, D(1)*D(3), 0, -D(1)*D(3), -D(2)*D(3), -D(1)*D(2), D(1)*D(4), D(2)^2-D(4)^2, 0, D(3)*D(4)],
-  [D(2)*D(4), 0, D(2)*D(4), 0, -D(1)*D(4), -D(3)*D(4), -D(2)*D(3), 0, D(1)^2+D(3)^2, -D(1)*D(2)], 
-  [0, D(1)*D(4), D(1)*D(4), 0, -D(2)*D(4), 0, -D(1)*D(3), -D(3)*D(4), -D(1)*D(2), D(2)^2+D(3)^2];
-
-  R=transpose(R);
-  export R;
-  return(@r);  
-};
-
-//----------------------------------------------------------
-proc exFlexibleRod()
-{
-  ring @r = 0,(D1, delta), dp;
-  module R;
-  R = [D1, -D1*delta, -1], [2*D1*delta, -D1-D1*delta^2, 0];
-  
-  R=transpose(R);
-  export R;
-  return(@r);  
-};
-
-//----------------------------------------------------------
-proc exTwoPendula()
-{  
-  ring @r=(0,m1,m2,M,g,L1,L2),Dt,dp;
-  module R = [m1*L1*Dt^2, m2*L2*Dt^2, -1, (M+m1+m2)*Dt^2], 
-             [m1*L1^2*Dt^2-m1*L1*g, 0, 0, m1*L1*Dt^2],
-             [0, m2*L2^2*Dt^2-m2*L2*g, 0, m2*L2*Dt^2];
-
-  R=transpose(R);
-  export R;
-  return(@r);  
-};
-//----------------------------------------------------------
-proc exWindTunnel()
-{ 
-  ring @r = (0,a, omega, zeta, k),(D1, delta),dp;
-  module R = [D1+a, -k*a*delta, 0, 0],
-             [0, D1, -1, 0],
-             [0, omega^2, D1+2*zeta*omega, -omega^2];
-
-  R=transpose(R);
-  export R;
-  return(@r);  
-};
 //----------------------------------------------------------
 proc genericity(matrix M)
 "USAGE:  genericity(M), M is a matrix/module
@@ -1209,22 +973,24 @@ example
 {"EXAMPLE:";echo = 2;
  //Example Antenna
  ring r = (0, K1, K2, Te, Kp, Kc),(Dt, delta), (c,dp);
- 
  module RR;
- RR = [Dt, -K1, 0, 0, 0, 0, 0, 0, 0],
+ RR = 
+   [Dt, -K1, 0, 0, 0, 0, 0, 0, 0],
    [0, Dt+K2/Te, 0, 0, 0, 0, -Kp/Te*delta, -Kc/Te*delta, -Kc/Te*delta],
    [0, 0, Dt, -K1, 0, 0, 0, 0, 0],
    [0, 0, 0, Dt+K2/Te, 0, 0, -Kc/Te*delta, -Kp/Te*delta, -Kc/Te*delta],
    [0, 0, 0, 0, Dt, -K1, 0, 0, 0],
    [0, 0, 0, 0, 0, Dt+K2/Te, -Kc/Te*delta, -Kc/Te*delta, -Kp/Te*delta];
  module R = transpose(RR);
- view(R);
  view(iostruct(R));
 };	
 
 //---------------------------------------------------------------
 static proc smdeg(matrix N)  
-// returns an intvec of length 2 with the index of an element of N with smallest degree
+"USAGE: smdeg( N ); N a matrix 
+RETURN:  intvec
+PURPOSE: returns an intvec of length 2 with the index of an element of N with smallest degree
+"
 {
   int n = nrows(N);
   int m = ncols(N);
@@ -1279,8 +1045,10 @@ static proc smdeg(matrix N)
 }
 //---------------------------------------------------------------
 static proc NoNon0Pol(vector v)
-// returns 1, if there is only one non-zero element in v and 0 else
-{
+"USAGE: NoNon0Pol(v), v a vector
+RETURN:  int
+PURPOSE: returns 1, if there is only one non-zero element in v and 0 else
+"{
   int i,j;
   int n = nrows(v);
   for( j=1; j<=n; j++)
@@ -1490,7 +1258,6 @@ example
   ring r=0,x,dp;
   // see what happens when the matrix is already in Smith-Form
   module M = [x,0,0],[0,x2,0],[0,0,x3];
-  print(M);
   list L = smith(M);
   print(L[1]);
   matrix N=matrix(M);
@@ -1506,7 +1273,7 @@ example
   print(B2);
 }
 //---------------------------------------------------------------
-proc list_tex(L, string name,link l,int nr_loop)
+static proc list_tex(L, string name,link l,int nr_loop)
 "USAGE: list_tex(L,name,l), where L is a list, name a string, l a link
 	 writes the content of list L in a tex-file 'name'
 RETURN: nothing
@@ -1565,6 +1332,10 @@ RETURN: nothing
     }
   }
 }
+example
+{
+  "EXAMPLE:";echo = 2;
+}
 //---------------------------------------------------------------
 proc verbatim_tex(string s, link l)
 "USAGE: verbatim_tex(s,l), where s is a string and l a link
@@ -1577,6 +1348,10 @@ RETURN: nothing
   write(l,s);
   write(l,"\\end{verbatim}");
   write(l,"\\par");
+}
+example
+{
+  "EXAMPLE:";echo = 2;
 }
 //---------------------------------------------------------------
 proc FindTorsion(module R, ideal TAnn)
@@ -1620,3 +1395,270 @@ example
   print(RR);  // the module itself
   print(Tr); // generators of the torsion submodule
 }
+
+
+proc ControlExample(string s)
+"USAGE:  ControlExample(s);   s a string
+PURPOSE: set up an example from the mini database by initalizing a ring and a module in a ring
+RETURN:  ring
+NOTE: in order to see the list of available examples, execute @code{ControlExample(\"show\");}
+@* To use ab example, one has to do the following. Suppose one calls the ring, where the example will be activated, A. Then, by executing
+@*  @code{def A = ControlExample(\"Antenna\");} and @code{setring A;},
+@* A will become a basering from the example \"Antenna\" with 
+the predefined system module R (transposed).
+After that one can just execute @code{control(R);} respectively 
+@code{autonom(R);} to perform the control resp. autonomy analysis of R.
+EXAMPLE: example ControlExample; shows an example
+"{
+  list E, S, D; // E=official name, S=synonym, D=description
+  E[1] = "Cauchy1";  S[1] = "cauchy1";  D[1] = "1-dimensional Cauchy equation";
+  E[2] = "Cauchy2";  S[2] = "cauchy2";  D[2] = "2-dimensional Cauchy equation";
+  E[3] = "Control1"; S[3] = "control1"; D[3] = "example of a simple noncontrollable system";
+  E[4] = "Control2"; S[4] = "control2"; D[4] = "example of a simple controllable system";
+  E[5] = "Antenna";  S[5] = "antenna";  D[5] = "antenna";
+  E[6] = "Einstein"; S[6] = "einstein"; D[6] = "Einstein equations in vacuum";
+  E[7] = "FlexibleRod"; S[7] = "flexible rod"; D[7] = "flexible rod";
+  E[8] = "TwoPendula";  S[8] = "two pendula";  D[8] = "two pendula mounted on a cart";
+  E[9] = "WindTunnel";  S[9] = "wind tunnel";D[9] = "wind tunnel";
+  E[10] = "Zerz1";      S[10] = "zerz1"; D[10] = "example from the lecture of Eva Zerz";
+  // all the examples so far
+  int i;
+  if ( (s=="show") || (s=="Show") )
+  {
+    print("The list of examples:");
+    for (i=1; i<=size(E); i++)
+    {
+      printf("name: %s,  desc: %s", E[i],D[i]);
+    }
+    return();
+  }
+  string t;
+  for (i=1; i<=size(E); i++)
+  {
+    if ( (s==E[i]) || (s==S[i]) )
+    {
+      t = "def @A = ex"+E[i]+"();";
+      execute(t);
+      return(@A);
+    }
+  }
+  "No example found";
+  return();
+}
+example
+{
+  "EXAMPLE:";echo = 2;
+  ControlExample("show");   // let us see all available examples:
+  def B = ControlExample("TwoPendula"); // let us set up a particular example
+  setring B;
+  print(R);
+}
+
+//----------------------------------------------------------
+//
+//Some example rings with defined systems
+//----------------------------------------------------------
+//autonomy:
+//
+//----------------------------------------------------------
+static proc exCauchy1()
+{
+  ring @r=0,(s1,s2),dp;
+  module R= [s1,-s2],
+            [s2, s1];
+  R=transpose(R);
+  export R;
+  return(@r);	    
+};
+//----------------------------------------------------------
+static proc exCauchy2()
+{
+  ring @r=0,(s1,s2,s3,s4),dp;
+  module R= [s1,-s2],
+            [s2, s1],
+	    [s3,-s4],
+	    [s4, s3];	    
+  R=transpose(R);
+  export R;
+  return(@r);	    
+}; 
+//----------------------------------------------------------
+static proc exZerz1()
+{ 
+  ring @r=0,(d1,d2),dp;
+  module R=[d1^2-d2],
+           [d2^2-1];
+  R=transpose(R);
+  export R;
+  return(@r);	    
+};  
+//----------------------------------------------------------
+//control
+//----------------------------------------------------------
+static proc exControl1()
+{
+  ring @r=0,(s1,s2,s3),dp;
+  module R=[0,-s3,s2],
+           [s3,0,-s1];
+  R=transpose(R);	   
+  export R;
+  return(@r);
+};
+//----------------------------------------------------------
+static proc exControl2()
+{ 
+  ring @r=0,(s1,s2,s3),dp;
+  module R=[0,-s3,s2],
+           [s3,0,-s1],
+           [-s2,s1,0];
+  R=transpose(R);	   
+  export R;
+  return(@r); 
+};
+//----------------------------------------------------------
+static proc exAntenna()
+{
+  ring @r = (0, K1, K2, Te, Kp, Kc),(Dt, delta), dp;
+  module R;
+  R = [Dt, -K1, 0, 0, 0, 0, 0, 0, 0],
+      [0, Dt+K2/Te, 0, 0, 0, 0, -Kp/Te*delta, -Kc/Te*delta, -Kc/Te*delta],
+      [0, 0, Dt, -K1, 0, 0, 0, 0, 0],
+      [0, 0, 0, Dt+K2/Te, 0, 0, -Kc/Te*delta, -Kp/Te*delta, -Kc/Te*delta],
+      [0, 0, 0, 0, Dt, -K1, 0, 0, 0],
+      [0, 0, 0, 0, 0, Dt+K2/Te, -Kc/Te*delta, -Kc/Te*delta, -Kp/Te*delta];
+
+  R=transpose(R);
+  export R;
+  return(@r);  
+};
+
+//----------------------------------------------------------
+
+static proc exEinstein()
+{
+  ring @r = 0,(D(1..4)),dp;
+  module R =
+  [D(2)^2+D(3)^2-D(4)^2, D(1)^2, D(1)^2, -D(1)^2, -2*D(1)*D(2), 0, 0, -2*D(1)*D(3), 0, 2*D(1)*D(4)],
+  [D(2)^2, D(1)^2+D(3)^2-D(4)^2, D(2)^2, -D(2)^2, -2*D(1)*D(2), -2*D(2)*D(3), 0, 0, 2*D(2)*D(4), 0], 
+  [D(3)^2, D(3)^2, D(1)^2+D(2)^2-D(4)^2, -D(3)^2, 0, -2*D(2)*D(3), 2*D(3)*D(4), -2*D(1)*D(3), 0, 0],
+  [D(4)^2, D(4)^2, D(4)^2, D(1)^2+D(2)^2+D(3)^2, 0, 0, -2*D(3)*D(4), 0, -2*D(2)*D(4), -2*D(1)*D(4)],
+  [0, 0, D(1)*D(2), -D(1)*D(2), D(3)^2-D(4)^2, -D(1)*D(3), 0, -D(2)*D(3), D(1)*D(4), D(2)*D(4)],
+  [D(2)*D(3), 0, 0, -D(2)*D(3),-D(1)*D(3), D(1)^2-D(4)^2, D(2)*D(4), -D(1)*D(2), D(3)*D(4), 0],
+  [D(3)*D(4), D(3)*D(4), 0, 0, 0, -D(2)*D(4), D(1)^2+D(2)^2, -D(1)*D(4), -D(2)*D(3), -D(1)*D(3)],
+  [0, D(1)*D(3), 0, -D(1)*D(3), -D(2)*D(3), -D(1)*D(2), D(1)*D(4), D(2)^2-D(4)^2, 0, D(3)*D(4)],
+  [D(2)*D(4), 0, D(2)*D(4), 0, -D(1)*D(4), -D(3)*D(4), -D(2)*D(3), 0, D(1)^2+D(3)^2, -D(1)*D(2)], 
+  [0, D(1)*D(4), D(1)*D(4), 0, -D(2)*D(4), 0, -D(1)*D(3), -D(3)*D(4), -D(1)*D(2), D(2)^2+D(3)^2];
+
+  R=transpose(R);
+  export R;
+  return(@r);  
+};
+
+//----------------------------------------------------------
+static proc exFlexibleRod()
+{
+  ring @r = 0,(D1, delta), dp;
+  module R;
+  R = [D1, -D1*delta, -1], [2*D1*delta, -D1-D1*delta^2, 0];
+  
+  R=transpose(R);
+  export R;
+  return(@r);  
+};
+
+//----------------------------------------------------------
+static proc exTwoPendula()
+{  
+  ring @r=(0,m1,m2,M,g,L1,L2),Dt,dp;
+  module R = [m1*L1*Dt^2, m2*L2*Dt^2, -1, (M+m1+m2)*Dt^2], 
+             [m1*L1^2*Dt^2-m1*L1*g, 0, 0, m1*L1*Dt^2],
+             [0, m2*L2^2*Dt^2-m2*L2*g, 0, m2*L2*Dt^2];
+
+  R=transpose(R);
+  export R;
+  return(@r);  
+};
+//----------------------------------------------------------
+static proc exWindTunnel()
+{ 
+  ring @r = (0,a, omega, zeta, k),(D1, delta),dp;
+  module R = [D1+a, -k*a*delta, 0, 0],
+             [0, D1, -1, 0],
+             [0, omega^2, D1+2*zeta*omega, -omega^2];
+
+  R=transpose(R);
+  export R;
+  return(@r);  
+};
+
+
+//---------------------------------------------------------------
+proc declare(string NameOfRing, string Variables, list #)
+"USAGE: declare(NameOfRing, Variables,[Parameters, Ordering]);  where
+@*         NameOfRing is string with name of ring, 
+@*         Variables is a string with names of variables separated by commas (e.g. \"x,y,z\"),
+@*	    Parameters is string of parameters in the ring separated by commas (e.g. \"a,b,c\"),
+@*	    Ordering is   string with name of ordering (by default, the ordering (dp,C) is used).
+PURPOSE: define the ring easily
+RETURN:  no return value
+ EXAMPLE:  example declare; shows an example 
+ "
+ {
+   if(size(#)==0)
+   {
+     execute("ring "+NameOfRing+"=0,("+Variables+"),dp;");
+   }
+   else
+   {
+     if(size(#)==1)
+     {
+       execute( "ring " + NameOfRing + "=(0," + #[1] + "),(" + Variables + "),dp;" );
+     }
+     else
+     { 
+       if( (size(#[1])!=0)&&(#[1]!=" ") )
+       {
+         execute( "ring " + NameOfRing + "=(0," + #[1] + "),(" + Variables + "),("+#[2]+");" );
+       }
+       else
+       {
+         execute( "ring " + NameOfRing + "=0,("+Variables+"),("+#[2]+");" ); 
+       };
+     };
+   };
+   keepring(basering);
+ }
+ example
+ {"EXAMPLE:";echo = 2;
+   string v="x,y,z";
+   string p="q,p";
+   string Ord ="c,lp";
+   //----------------------------------
+   declare("Ring_1",v);
+   print(nameof(basering));
+   print(basering);
+   //----------------------------------
+   declare("Ring_2",v,p);
+   print(basering);
+   print(nameof(basering));
+   //----------------------------------
+   declare("Ring_3",v,p,Ord);
+   print(basering);
+   print(nameof(basering));
+   //----------------------------------
+   declare("Ring_4",v,"",Ord);
+   print(basering);
+   print(nameof(basering));
+   //----------------------------------
+   declare("Ring_5",v," ",Ord);
+   print(basering);
+   print(nameof(basering));
+ };
+//
+// maybe reasonable to add this in declare
+//
+//  print("Please enter your representation matrix in the following form: 
+//  module R=[1st row],[2nd row],...");
+//  print("Type the command: R=transpose(R)");
+//  print(" To compute controllability please enter: control(R)");
+//  print(" To compute autonomy please enter: autonom(R)");
