@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.106 2005-04-29 16:11:12 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.107 2005-04-30 15:31:34 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1554,7 +1554,7 @@ void rDecomposeC(leftv h,const ring R)
   lists LL=(lists)omAlloc0Bin(slists_bin);
   LL->Init(2);
     LL->m[0].rtyp=INT_CMD;
-    LL->m[0].data=(void *)si_max(R->float_len,SHORT_REAL_LENGTH);
+    LL->m[0].data=(void *)si_max(R->float_len,SHORT_REAL_LENGTH/2);
     LL->m[1].rtyp=INT_CMD;
     LL->m[1].data=(void *)si_max(R->float_len2,SHORT_REAL_LENGTH);
   L->m[1].rtyp=LIST_CMD;
@@ -1694,12 +1694,13 @@ lists rDecompose(const ring r)
 void rComposeC(lists L, ring R)
 /* field is R or C */
 {
-  Print("in rComposeC\n");
   // ----------------------------------------
   // 0: char/ cf - ring
   if ((L->m[0].rtyp!=INT_CMD) || (L->m[0].data!=(char *)0))
+  {
     Werror("invald coeff. field description, expecting 0");
     return;
+  }
   R->ch=-1;
   // ----------------------------------------
   // 1: 
@@ -1711,8 +1712,8 @@ void rComposeC(lists L, ring R)
   if ((r1<=SHORT_REAL_LENGTH)
   && (r2=SHORT_REAL_LENGTH))
   {
-    R->float_len=0;
-    R->float_len2=0;
+    R->float_len=SHORT_REAL_LENGTH/2;
+    R->float_len2=SHORT_REAL_LENGTH;
   }
   else
   {
