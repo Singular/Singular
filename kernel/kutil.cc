@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.8 2005-04-25 18:15:24 Singular Exp $ */
+/* $Id: kutil.cc,v 1.9 2005-04-30 16:41:20 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -919,13 +919,13 @@ static inline void clearS (poly p, unsigned long p_sev, int* at, int* k,
 #ifdef PDEBUG
 /* int zaehler=0; */
 /* for counting number of pairs in Plural */
-#endif PDEBUG
+#endif /*PDEBUG*/
 
 void enterL (LSet *set,int *length, int *LSetmax, LObject p,int at)
 {
 #ifdef PDEBUG
   /*  zaehler++; */
-#endif PDEBUG
+#endif /*PDEBUG*/
   int i;
   // this should be corrected
   assume(p.FDeg == p.pFDeg());

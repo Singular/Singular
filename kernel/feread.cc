@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feread.cc,v 1.4 2005-04-30 14:41:31 Singular Exp $ */
+/* $Id: feread.cc,v 1.5 2005-04-30 16:38:26 Singular Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -133,11 +133,11 @@ extern "C" {
   extern char ** rl_completion_matches (const char*, RL_PROC);
   extern CPPFunction * rl_attempted_completion_function;
   extern FILE * rl_outstream;
-  extern char * readline ();
-  extern void add_history ();
+  extern char * readline (char *);
+  extern void add_history (char *);
   extern int write_history ();
   extern void using_history();
-  extern int read_history();
+  extern int read_history(char *);
   extern int history_total_bytes();
  #endif /* READLINE_READLINE_H_OK */
  typedef char * (*PROC)();
@@ -161,8 +161,8 @@ extern "C"
 {
   int fe_init_dyn_rl();
   char *(*fe_filename_completion_function)(); /* 3 */
-  char *(* fe_readline) ();                   /* 4 */
-  void (*fe_add_history) ();                  /* 5 */
+  char *(* fe_readline) (char *);             /* 4 */
+  void (*fe_add_history) (char *);            /* 5 */
   char ** fe_rl_readline_name;                /* 6 */
   char **fe_rl_line_buffer;                   /* 7 */
   char **(*fe_completion_matches)();          /* 8 */
@@ -171,7 +171,7 @@ extern "C"
   int (*fe_write_history) ();                 /* 11 */
   int (*fe_history_total_bytes) ();           /* 12 */
   void (*fe_using_history) ();                /* 13 */
-  int (*fe_read_history) ();                  /* 14 */
+  int (*fe_read_history) (char *);            /* 14 */
 
 }
 #endif
