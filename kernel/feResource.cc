@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feResource.cc,v 1.2 2004-07-12 15:02:08 Singular Exp $ */
+/* $Id: feResource.cc,v 1.3 2005-04-30 14:35:30 hannes Exp $ */
 /*
 * ABSTRACT: management of resources
 */
@@ -14,6 +14,11 @@
 #ifdef AIX_4
 #define HAVE_PUTENV 1
 #endif
+
+#if defined(HPUX_10) || defined(HPUX_9)
+extern "C" int setenv(const char *name, const char *value, int overwrite);
+#endif
+
 
 #include "distrib.h"
 #include "dError.h"
