@@ -40,7 +40,12 @@ fi
 
 if test x$CXXFLAGS = x
 then
-  CXXFLAGS="-O3 -fomit-frame-pointer -fno-rtti -fno-exceptions"
+  if test ac_cv_cxx_have_exception = yes
+  then
+    CXXFLAGS="-O3 -fomit-frame-pointer -fno-rtti -fno-exceptions"
+  else
+    CXXFLAGS="-O3 -fomit-frame-pointer -fno-rtti"
+  fi
 fi
 CFLAGS="$CPPFLAGS $CFLAGS"
 CXXFLAGS="$CPPFLAGS $CXXFLAGS"
