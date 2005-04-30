@@ -2,7 +2,7 @@
 ###
 ### Makefile for Singular-modules
 ###
-### $Id: Makefile.in,v 1.9 2003-06-09 09:42:23 krueger Exp $
+### $Id: Makefile.in,v 1.10 2005-04-30 09:06:46 krueger Exp $
 ###
 #################################################################
 
@@ -97,7 +97,7 @@ clean:
 	do \
 		if test -d $${SUBDIR}; then \
 		   echo ${MAKE} $@ in $${SUBDIR}; \
-		   ( cd $${SUBDIR} && ${MAKE} $@; ) \
+		  if [ -e "$${SUBDIR}/Makefile" ]; then (cd $${SUBDIR}; $(MAKE) $@;) fi \
 		fi; \
 	done
 
@@ -114,7 +114,7 @@ mod_clean:
 	do \
 		if test -d $${SUBDIR}; then \
 		   echo ${MAKE} clean in $${SUBDIR}; \
-		   ( cd $${SUBDIR} && ${MAKE} clean; )\
+		  if [ -e "$${SUBDIR}/Makefile" ]; then (cd $${SUBDIR}; $(MAKE) clean;) fi \
 		fi; \
 	done
 
@@ -123,7 +123,7 @@ distclean: clean mod_clean
 	for SUBDIR in ${MOD_DIRS}; \
 	do \
 		echo ${MAKE} $@ in $${SUBDIR}; \
-		( cd $${SUBDIR} && ${MAKE} $@ ;) \
+		  if [ -e "$${SUBDIR}/Makefile" ]; then (cd $${SUBDIR}; $(MAKE) clean;) fi \
 	done
 	rm -f Makefile
 
