@@ -1,4 +1,5 @@
 #!/bin/sh
+# version $Id: configure,v 1.19 2005-04-30 15:29:37 Singular Exp $
 for i in $*
 do
   case $i in
@@ -33,12 +34,12 @@ then
   SING_CXX=g++
 fi
 
-if test x$CFLAGS = x
+if test "x$CFLAGS" = x
 then
   CFLAGS="-O3 -fomit-frame-pointer"
 fi
 
-if test x$CXXFLAGS = x
+if test "x$CXXFLAGS" = x
 then
   if test ac_cv_cxx_have_exception = yes
   then
@@ -57,4 +58,3 @@ echo "cd .." >>config.status
 chmod +rx config.status
 
 . ./config.status
-
