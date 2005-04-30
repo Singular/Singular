@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.l,v 1.55 2005-02-23 15:31:33 Singular Exp $ */
+/* $Id: libparse.l,v 1.56 2005-04-30 17:38:41 Singular Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -324,7 +324,7 @@ static     { p_static=TRUE; }
              #endif
              iiInitSingularProcinfo(pi, newlib, proc, yylplineno,
                                     current_pos(0), p_static);
-             #else STANDALONE_PARSER
+             #else /*STANDALONE_PARSER*/
              if( mode == LOAD_LIB)
              {
                #ifdef HAVE_NS
@@ -356,7 +356,7 @@ static     { p_static=TRUE; }
                  if (BVERBOSE(V_LOAD_PROC))
                    Warn( "     proc '%s' registered", proc );
                }
-               #endif STANDALONE_PARSER
+               #endif /*STANDALONE_PARSER*/
                SET_DEF_END(mode, pi, current_pos(yyleng+1));
                #if YYLPDEBUG
                if(lpverbose)
@@ -370,7 +370,7 @@ static     { p_static=TRUE; }
                p_static=FALSE;
              #ifndef STANDALONE_PARSER
              }
-             #endif STANDALONE_PARSER
+             #endif /*STANDALONE_PARSER*/
            }
 example    {
              BEGIN(pexample);
