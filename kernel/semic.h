@@ -81,7 +81,7 @@ public:
 
     #ifdef SEMIC_PRINT
     friend ostream &  operator << ( ostream&,const spectrum& );
-    #endif SEMIC_PRINT
+    #endif /*SEMIC_PRINT*/
 
     void    copy_new    ( int );
     void    copy_delete ( void );

@@ -4,7 +4,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpr_numeric.h,v 1.1.1.1 2003-10-06 12:15:58 Singular Exp $ */
+/* $Id: mpr_numeric.h,v 1.2 2005-04-30 16:48:39 Singular Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - numeric stuff
@@ -221,7 +221,7 @@ private:
 
 //<-
 
-#endif MPR_NUMERIC_H
+#endif /*MPR_NUMERIC_H*/
 
 // local Variables: ***
 // folded-file: t ***
