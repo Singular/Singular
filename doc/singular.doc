@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.124 2005-04-29 19:42:34 levandov Exp $
+@comment $Id: singular.doc,v 1.125 2005-04-30 20:35:58 levandov Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -54,7 +54,7 @@ This is the texinfo file describing Singular (version @value{VERSION})
 @center O. Bachmann, W. Decker, S. Endra@ss{}, I. Farran, A. Fr@"uhbis-Kr@"uger, C. Gorzel,
 @center H. Grassmann, A. Heydtmann, D. Hillebrand, T. Keilen, U. Klein, K. Kr@"uger, M. Lamm, V. Levandovskyy
 @center C. Lossen, B. Martin, M. Me@ss{}ollen, W. Neumann, T. N@"u@ss{}ler, W. Pohl, T. Siebert,
-@center J. Schmidt, M. Schulze, R. Stobbe, M. Wenk, T. Wichmann
+@center J. Schmidt, M. Schulze, R. Stobbe, M. Wenk, T. Wichmann, D. Yanovich
 @sp 2
 @author Fachbereich Mathematik
 @author Zentrum f@"ur Computeralgebra
@@ -148,7 +148,7 @@ This is the texinfo file describing Singular (version @value{VERSION})
 
 @c ----------------------------------------------------------------------------
 @ifset withplural
-@node Tricks and pitfalls, PLURAL, Functions and system variables, Top
+@node Tricks and pitfalls, , Functions and system variables, Top
 @end ifset
 
 @ifclear withplural
@@ -513,7 +513,7 @@ LIB "all.lib";
 @c lib surf.lib no_ex
 
 @c ----------------------------------------------------------------------------
-@node Coding theory, , Visualization, SINGULAR libraries
+@node Coding theory, System and Control theory, Visualization, SINGULAR libraries
 @section Coding theory
 @cindex Coding theory
 

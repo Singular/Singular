@@ -1,7 +1,7 @@
 #####################################################################
 ###
 ### Makefile for Singular documentation
-### $Id: Makefile.in,v 1.97 2005-03-22 13:51:59 levandov Exp $
+### $Id: Makefile.in,v 1.98 2005-04-30 20:35:57 levandov Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -103,16 +103,19 @@ PLU_STANDALONE_TEXI_FILES = COPYING.plural.texi INSTALL_unix.plural.texi \
                             NEWS.plural.texi README_download.plural.texi \
                             INSTALL_win.plural.texi
 
-DOC2TEX_FILES	= \
-		examples.tex general.tex ti_ip.tex math.tex reference.tex \
-		start.tex types.tex pdata.tex tricks.tex platform.tex
+PLU_ONLY_FILES		= pluplatform.tex
 
 PLU_DOC2TEX_FILES	= \
-		plural.tex plumath.tex plureference.tex plutypes.tex pluconventions.tex pluplatform.tex
+		plural.tex plumath.tex plureference.tex plutypes.tex pluconventions.tex
 
-MANUAL_FILES	= ${TEX_FILES} ${DOC2TEX_FILES}
+DOC2TEX_FILES	= \
+		examples.tex general.tex ti_ip.tex math.tex reference.tex \
+		start.tex types.tex pdata.tex tricks.tex platform.tex \
+		${PLU_DOC2TEX_FILES}
 
-PLU_MANUAL_FILES = ${PLU_DOC2TEX_FILES}
+PLU_MANUAL_FILES = ${PLU_DOC2TEX_FILES} ${PLU_ONLY_FILES}
+
+MANUAL_FILES	= ${TEX_FILES} ${DOC2TEX_FILES} ${PLU_MANUAL_FILES}
 
 TUTOR_FILES	= \
 		tutor.tex examples.tex start.tex copyright.tex
@@ -297,7 +300,7 @@ install-standalone: standalone
 # html targets
 #
 html: ${TMP_DIR} ${HTML_SUBDIR}/${HTML_MANUAL_TOP} ${IMAGES_HTML} $(STANDALONE_TEXI_FILES)
-${HTML_SUBDIR}/${HTML_MANUAL_TOP}: ${TEXI2HTML_INIT} ${TEXI2HTML} singular.tex
+${HTML_SUBDIR}/${HTML_MANUAL_TOP}: ${TEXI2HTML_INIT} ${TEXI2HTML} singular.tex s-plural.tex
 	${PERL} ${TEXI2HTML} ${TEXI2HTML_OPTS} -prefix ${HTML_MANUAL_PREFIX} \
         -top_file ${HTML_MANUAL_TOP} singular.tex
 
@@ -483,4 +486,3 @@ Makefile: Makefile.in
 	cd ..; 	CONFIG_FILES="doc/Makefile" CONFIG_HEADERS= ./config.status
 
 html-done: ${MANUAL_FILES}
-
