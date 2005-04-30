@@ -1,5 +1,5 @@
   @comment -*-texinfo-*-
-@comment $Id: plureference.doc,v 1.30 2005-04-29 19:43:44 levandov Exp $
+@comment $Id: plureference.doc,v 1.31 2005-04-30 20:38:04 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -11,9 +11,7 @@
 @ignore
 %**start
 \input texinfo.tex
-@setfilename plureference.info
-@settitele PLURAL
-@node Top, Functions @value{PSUFFIX}, (dir), (dir)
+
 @menu
 * Functions @value{PSUFFIX}::   
 @end menu
@@ -22,10 +20,8 @@
 @chapter  Functions @value{PSUFFIX}
 %**end
 @end ignore
-
-
-
 @cindex Functions @value{PSUFFIX}
+
 This chapter gives a complete reference of all functions, commands and
 special variables of the @sc{Plural} kernel (i.e., all built-in
 commands).

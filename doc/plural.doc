@@ -1,17 +1,24 @@
 @c -*-texinfo-*-
 @ifclear singularmanual
 @c -----------------------Top node-----------------------------------
-@c @menu
-@c * PLURAL conventions::          
-@c @end menu
-
 @node Top, Getting started with PLURAL, Top, Top
 @c @chapter PLURAL
 @c @cindex PLURAL
 
+
 @ifclear PSUFFIX
 @set PSUFFIX
 @end ifclear
+@end ifclear
+
+@ifnothtml
+@ifinfo
+@center @strong{SINGULAR:PLURAL}
+@center A Computer Algebra Subsystem for Noncommutative Polynomial Algebras
+@center User Manual for @sc{Singular:Plural} Version @value{VERSION}
+@center @uref{http://www.singular.uni-kl.de/plural}
+@end ifinfo
+@end ifnothtml
 
 @ifhtml
 @html
@@ -33,8 +40,6 @@
 @end html
 @end ifhtml
 
-@end ifclear
-
 @menu
 @c * Preface::
 @c * Introduction::
@@ -45,9 +50,9 @@
 @c * Tricks and pitfalls::
 @c * Examples::
 @c * Polynomial data::
-@ifclear singularmanual
+@c @ifclear singularmanual
 * Mathematical background @value{PSUFFIX}::
-@end ifclear
+@c @end ifclear
 * PLURAL libraries::
 @c * Release Notes::
 @ifclear singularmanual
@@ -75,30 +80,31 @@
 @c @include general.tex
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
-@node  Getting started with PLURAL, Data types @value{PSUFFIX}, (dir) ,Top
+@node  Getting started with PLURAL, Data types @value{PSUFFIX}, , PLURAL
 @section  Getting started with PLURAL
 @end ifset 
 
 @ifclear singularmanual
-@node   Getting started with PLURAL, Data types @value{PSUFFIX}, (dir) ,Top
+@node   Getting started with PLURAL, Data types @value{PSUFFIX}, , Top
 @chapter Getting started with PLURAL
 @end ifclear 
 
 @cindex  Getting started with PLURAL
 @include pluconventions.tex
 
-
 @c ----------------------------------------------------------------------------
-@ifset singularmanual
-@menu
-* Data types @value{PSUFFIX}::  
-@end menu
-@end ifset 
+@c @ifset singularmanual
+@c @menu
+@c * Data types @value{PSUFFIX}::  
+@c @end menu
+@c @end ifset
 
-@node Data types @value{PSUFFIX}, Functions @value{PSUFFIX},  Getting started with PLURAL, Top
+
+@node Data types @value{PSUFFIX}, Functions @value{PSUFFIX}, Getting started with PLURAL, PLURAL
 
 @ifset singularmanual
 @section Data types @value{PSUFFIX}
+@lowersections
 @end ifset 
 
 @ifclear singularmanual
@@ -108,50 +114,48 @@
 @cindex Data types @value{PSUFFIX}
 @include plutypes.tex
 
-@c ----------------------------------------------------------------------------
 @ifset singularmanual
-@menu
-* Functions  @value{PSUFFIX}::  
-@end menu
-@end ifset
+@raisesections
+@end ifset 
 
-@node Functions @value{PSUFFIX}, Mathematical background @value{PSUFFIX}, Data types @value{PSUFFIX}, Top
-@comment  node-name,  next,  previous,  up
+@c ----------------------------------------------------------------------------
+@c @ifset singularmanual
+@c @menu
+@c * Functions @value{PSUFFIX}::  
+@c @end menu
+@c @end ifset
+
+@node Functions @value{PSUFFIX}, Mathematical background @value{PSUFFIX}, Data types @value{PSUFFIX}, PLURAL
+
 @ifset singularmanual
-@section Functions  @value{PSUFFIX}
+@section Functions @value{PSUFFIX}
+@lowersections
 @end ifset
 
 @ifclear singularmanual
-@chapter Functions  @value{PSUFFIX}
+@chapter Functions @value{PSUFFIX}
 @end ifclear
 
 @cindex commands @value{PSUFFIX}
 @include plureference.tex
 
-@c @c ----------------------------------------------------------------------------
-@c @node Tricks and pitfalls, Examples, Functions,Top
-@c @chapter Tricks and pitfalls
-@c @cindex Tricks and pitfalls
-@c @include tricks.tex
+@ifset singularmanual
+@raisesections
+@end ifset 
 
-@c @c ----------------------------------------------------------------------------
-@c @node Examples, Mathematical background, Tricks and pitfalls, Top
-@c @appendix Examples
-@c @cindex Examples
-@c @include examples.tex
-
-@c @c ----------------------------------------------------------------------------
-@c @node Polynomial data,Mathematical background, Examples, Top
-@c @appendix Polynomial data
-@c @cindex Polynomial data
-@c @include pdata.tex
 
 @c ----------------------------------------------------------------------------
+@c @ifset singularmanual
+@c @menu
+@c * Mathematical background @value{PSUFFIX}::  
+@c @end menu
+@c @end ifset
 
-@node Mathematical background @value{PSUFFIX}, PLURAL libraries, Functions @value{PSUFFIX},  Top
+@node Mathematical background @value{PSUFFIX}, PLURAL libraries, Functions @value{PSUFFIX}, PLURAL
 
 @ifset singularmanual
 @section Mathematical background @value{PSUFFIX}
+@lowersections
 @end ifset
 
 @ifclear singularmanual
@@ -161,10 +165,15 @@
 @cindex Mathematical background @value{PSUFFIX}
 @include plumath.tex
 
+@ifset singularmanual
+@raisesections
+@end ifset 
+
 @c --------------------------------------------------------------------
 @ifset singularmanual
-@node PLURAL libraries, Release Notes @value{PSUFFIX}, Mathematical background @value{PSUFFIX}, Top
+@node PLURAL libraries, Examples, Mathematical background @value{PSUFFIX}, PLURAL
 @section PLURAL libraries
+@lowersections
 @end ifset
 
 @ifclear singularmanual
@@ -267,6 +276,10 @@ LIB "ncall.lib";
 @cindex qmatrix.lib
 
 @c lib qmatrix.lib
+
+@ifset singularmanual
+@raisesections
+@end ifset 
 
 @c ----------------------------------------------------------
 

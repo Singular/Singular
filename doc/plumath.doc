@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: plumath.doc,v 1.25 2005-04-29 19:43:43 levandov Exp $
+@comment $Id: plumath.doc,v 1.26 2005-04-30 20:38:03 levandov Exp $
 @comment this file contains the mathematical background of Singular:Plural
 
 @c The following directives are necessary for proper compilation
@@ -20,23 +20,13 @@
 @c * References @value{PSUFFIX}::   
 @c @end menu
 
-@node Top, Mathematical background @value{PSUFFIX},(dir), (dir)
-@menu
-* Mathematical background @value{PSUFFIX}::
-@end menu
-
-@ifset singularmanual
-@node Mathematical background @value{PSUFFIX}, ,Functions and system variables @value{PSUFFIX}, PLURAL 
-@end ifset
-
-@ifclear singularmanual
-@node Mathematical background @value{PSUFFIX}, G-algebras, PLURAL, PLURAL
-@end ifclear
-
+@c @node Top, Mathematical background @value{PSUFFIX},(dir), (dir)
+@c  @menu
+@c * Mathematical background @value{PSUFFIX}::
+@c @end menu
 @section Mathematical background @value{PSUFFIX}
 %**end
 @end ignore 
-
 
 This section introduces some of the mathematical notions and definitions used
 throughout the @sc{Plural} manual. For details, please, refer to
@@ -50,10 +40,8 @@ some articles or text books (see @ref{References @value{PSUFFIX}}).
 @end menu
 
 
-
-
 @c ---------------------------------------------------------------------------
-@node G-algebras, Groebner bases in G-algebras, ,Mathematical background @value{PSUFFIX} 
+@node G-algebras, Groebner bases in G-algebras,  , Mathematical background @value{PSUFFIX} 
 @section G-algebras
 @cindex G-algebra
 

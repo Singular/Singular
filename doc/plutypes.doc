@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: plutypes.doc,v 1.26 2005-04-28 16:29:55 levandov Exp $
+@comment $Id: plutypes.doc,v 1.27 2005-04-30 20:38:04 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -13,7 +13,6 @@
 \input texinfo.tex
 @setfilename plutypes.info
 
-@node Top, Data types @value{PSUFFIX}, (dir), (dir)
 @menu
 * Data types @value{PSUFFIX}::
 @end menu
@@ -24,6 +23,7 @@
 @end ignore
 
 @cindex expression list
+
 This chapter explains all data types of @sc{Plural} in
 alphabetical order. For every type, there is a description of the
 declaration syntax 
