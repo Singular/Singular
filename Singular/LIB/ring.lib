@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ring.lib,v 1.23 2005-04-28 15:11:52 Singular Exp $";
+version="$Id: ring.lib,v 1.24 2005-04-30 20:34:23 levandov Exp $";
 category="General purpose";
 info="
 LIBRARY:  ring.lib      Manipulating Rings and Maps
@@ -766,9 +766,9 @@ PURPOSE: computes the preimage of an ideal under a given map for non-global
          the given ring (or the name of an ideal defining such a map), and 
          the ideal has to be an ideal in the given ring.
 SEE ALSO: preimage
-KEYWORDS: 
-EXAMPLE: example preimageLoc ; shows an example"
-{
+KEYWORDS: preimage under a map between local rings, map between local rings, map between local and global rings
+EXAMPLE: example preimageLoc ; shows an example
+"{
   def S=basering;
   int i;
   string newRing,minpoly_string;
@@ -862,4 +862,3 @@ example
   ideal nu=preimageLoc("R","psi","null");
   nu;
 }
-
