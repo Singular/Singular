@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: README_download.texi,v 1.9 2001-08-27 14:40:03 Singular Exp $
+@comment $Id: README_download.texi,v 1.10 2005-04-30 20:37:32 levandov Exp $
 @c FILE: README_download.texi
 @c PURPOSE: downloading instructions, to be includeded in manual and README_ftp
 @c
@@ -35,7 +35,7 @@ Linux distribution version >= 6; RedHat Linux distribution version >= 5.2).
 @tab PC's running under Linux with @code{libc} version 5 (if you are not 
 sure which @code{libc} version you have, run @code{ldd /bin/ls}).
 @item @code{ix86-Win}
-@tab PC's running Windows 95/98/NT/2K which have Cygwin version 1.0 (or
+@tab PC's running Windows 95/98/NT/2K/XP which have Cygwin version 1.0 (or
 higher) already installed. Unless you are familiar with Cygwin, we
 recommend that you download one of the self-extracting archives as
 described below.
@@ -84,7 +84,7 @@ After unpacking, see the created file
 for details on how to finish the installation.
 @end enumerate
 
-@heading To download @sc{Singular} for Windows 95/98/NT/2K
+@heading To download @sc{Singular} for Windows 95/98/NT/2K/XP
 
 @enumerate
 @item
