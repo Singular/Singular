@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: COPYING.texi,v 1.16 2005-04-29 19:42:58 levandov Exp $
+@comment $Id: COPYING.texi,v 1.17 2005-04-30 20:36:17 levandov Exp $
 @comment this file contains the copyright notice on Singular
 @ifclear VERSION
 @include version.texi
@@ -120,7 +120,7 @@ Christoph Lossen,
 Viktor Levandovskyy,
 Wilfred Pohl
 and
-Oliver Wienand
+Oliver Wienand.
 @cindex Fr@"ubis-Kr@"uger, Anne
 @cindex Keilen, Thomas
 @cindex Kr@"uger, Kai
@@ -163,7 +163,8 @@ Martin Lamm,
 Bernd Martin,
 Michael Me@ss{}ollen,
 Thomas N@"u@ss{}ler,
-Moritz Wenk.
+Moritz Wenk,
+Denis Yanovich.
 
 
 We should like to acknowledge the financial support given by
