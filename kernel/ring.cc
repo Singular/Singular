@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.34 2005-04-29 17:35:18 Singular Exp $ */
+/* $Id: ring.cc,v 1.35 2005-05-01 19:56:36 levandov Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -324,25 +324,30 @@ void rWrite(ring r)
     }
   }
 #ifdef HAVE_PLURAL
-  if ((r->nc!=NULL) && (r==currRing))
+  if (r->nc!=NULL)
   {
-    poly pl=NULL;
-    int nl;
     PrintS("\n//   noncommutative relations:");
-    //    Print("\n//   noncommutative relations (type %d):",(int)r->nc->type);
-    for (int i = 1; i<r->N; i++)
+    if (r==currRing)
     {
-      for (int j = i+1; j<=r->N; j++)
+      poly pl=NULL;
+      int nl;
+      int i,j;
+      //    Print("\n//   noncommutative relations (type %d):",(int)r->nc->type);
+      for (i = 1; i<r->N; i++)
       {
-        nl=nIsOne(p_GetCoeff(MATELEM(r->nc->C,i,j),r));
-        if ((MATELEM(r->nc->D,i,j)!=NULL)||(!nl))
-        {
-          Print("\n//    %s%s=",r->names[j-1],r->names[i-1]);
-          pl=MATELEM(r->nc->MT[UPMATELEM(i,j,r->N)],1,1);
-          pWrite0(pl);
-        }
+	for (j = i+1; j<=r->N; j++)
+	{
+	  nl = nIsOne(p_GetCoeff(MATELEM(r->nc->C,i,j),r));
+	  if ( (MATELEM(r->nc->D,i,j)!=NULL) || (!nl) )
+	  {
+	    Print("\n//    %s%s=",r->names[j-1],r->names[i-1]);
+	    pl = MATELEM(r->nc->MT[UPMATELEM(i,j,r->N)],1,1);
+	    pWrite0(pl);
+	  }
+	}
       }
     }
+    else PrintS(" ...");
 #ifdef PDEBUG
     Print("\n//   noncommutative type:%d",r->nc->type);
     Print("\n//   is skew constant:%d",r->nc->IsSkewConstant);
@@ -1096,7 +1101,7 @@ int rSum(ring r1, ring r2, ring &sum)
     sum->nc->basering = sum;
     if ( !R1_is_nc ) nc_rCreateNCcomm(R1);
     if ( !R2_is_nc ) nc_rCreateNCcomm(R2);
-    /* nc types */
+    /* nc->type's */
     sum->nc->type = nc_undef;
     nc_type t1 = R1->nc->type, t2 = R2->nc->type;
     if ( t1==t2) sum->nc->type = t1;
@@ -1139,19 +1144,14 @@ int rSum(ring r1, ring r2, ring &sum)
     }
     if (sum->nc->type == nc_undef)
       WarnS("Error on recognizing nc types");
-    /* multiplication matrices */
-//     ring old_ring = currRing;
-//     rChangeCurrRing(sum);
-/* find permutations of vars and pars */
+    /* multiplication matrices business: */
+    /* find permutations of vars and pars */
     int *perm1 = (int *)omAlloc0((rVar(R1)+1)*sizeof(int));
     int *par_perm1 = NULL;
     if (rPar(R1)!=0) par_perm1=(int *)omAlloc0((rPar(R1)+1)*sizeof(int));
     int *perm2 = (int *)omAlloc0((rVar(R2)+1)*sizeof(int));
     int *par_perm2 = NULL;
     if (rPar(R2)!=0) par_perm2=(int *)omAlloc0((rPar(R2)+1)*sizeof(int));
-    //    maFindPerm(char **preim_names, int preim_n, char **preim_par, int preim_p,
-    //                char **names,       int n,       char **par,       int nop,
-    //                int * perm, int *par_perm, int ch);
     maFindPerm(R1->names,  rVar(R1),  R1->parameter,  rPar(R1),
                sum->names, rVar(sum), sum->parameter, rPar(sum),
                perm1, par_perm1, sum->ch);
@@ -1206,7 +1206,7 @@ int rSum(ring r1, ring r2, ring &sum)
     /* delete R1, R2*/
     rDelete(R1);
     rDelete(R2);
-    /* TODO: delete perm arrays */
+    /* delete perm arrays */
     if (perm1!=NULL) omFree((ADDRESS)perm1);
     if (perm2!=NULL) omFree((ADDRESS)perm2);
     if (par_perm1!=NULL) omFree((ADDRESS)par_perm1);
@@ -3831,6 +3831,7 @@ ring rOpposite(ring src)
   {
     return r;
   }
+  if ( rIsPluralRing(src) )
   {
   rChangeCurrRing(r);  /* we were not in r */
   /* basic nc constructions  */
@@ -3876,7 +3877,7 @@ ring rOpposite(ring src)
   rTest(r);
   rChangeCurrRing(save);
   }
-#endif
+#endif /* HAVE_PLURAL */
   return r;
 }
 
@@ -3889,28 +3890,6 @@ ring rEnvelope(ring R)
   int stat = rSum(R, Ropp, Renv); /* takes care of qideals */
   if ( stat <=0 )
     WarnS("Error in rEnvelope at rSum");
-  /* now create the qideal for qrings */
-//    if (R->qideal != NULL)
-//    {
-//      ring save = currRing;
-//      rChangeCurrRing(Ropp);
-//      ideal Q = idCopy(R->qideal);
-//      ideal Qop = idOppose(R,Q);
-//      rChangeCurrRing(Renv);
-//      ideal Qenv = idInit(Q->ncols+Qop->ncols,1);
-//      int i;
-//      for (i=0; i< Q->ncols; i++)
-//      {
-//        Qenv->m[i] = maIMap(R,Q->m[i]);
-//      }
-//      for (i=0; i<= Qop->ncols; i++)
-//      {
-//        Qenv->m[Q->ncols+i] = maIMap(Ropp,Qop->m[i]);
-//      }
-//      /* should we run twostd on the result? */
-//      Renv->qideal = Qenv;
-//      rChangeCurrRing(save);
-//    }
   rTest(Renv);
   return Renv;
 }
