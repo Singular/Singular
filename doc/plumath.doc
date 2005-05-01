@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: plumath.doc,v 1.26 2005-04-30 20:38:03 levandov Exp $
+@comment $Id: plumath.doc,v 1.27 2005-05-01 20:23:00 levandov Exp $
 @comment this file contains the mathematical background of Singular:Plural
 
 @c The following directives are necessary for proper compilation
@@ -742,6 +742,19 @@ Levandovskyy V.; Sch@"onemann, H.
   algebras.
   In  Proc. of the International Symposium on Symbolic and
   Algebraic Computation (ISSAC'03). ACM Press, 2003.
+
+@item
+@c LVdiss  art
+ Levandovskyy, V. 
+   Non--commutative Computer Algebra for polynomial algebras: Gr@"obner bases, applications and implementation.
+   Doctoral Thesis, Universit@"at Kaiserslautern, 2005.
+
+@item
+@c LV3  article
+ Levandovskyy, V. 
+ On preimages of ideals in certain non--commutative algebras.
+ In Pfister G., Cojocaru S. and Ufnarovski, V. (editors), Computational Commutative and Non-Commutative Algebraic Geometry, IOS Press, 2005.
+
 
 @item
 @c MoraNC  article
