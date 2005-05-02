@@ -1,6 +1,6 @@
 //last change: 13.02.2001 (Eric Westenberger)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: presolve.lib,v 1.21 2005-05-02 07:43:22 Singular Exp $";
+version="$Id: presolve.lib,v 1.22 2005-05-02 11:53:42 Singular Exp $";
 category="Symbolic-numerical solving";
 info="
 LIBRARY:  presolve.lib     Pre-Solving of Polynomial Equations
@@ -610,6 +610,7 @@ EXAMPLE: example faststd; shows an example.
 }
 example
 { "EXAMPLE:"; echo = 2;
+   system("--ticks-per-sec",100); // show time in 1/100 sec
    ring s = 0,(e,f,x,y,z,t,u,v,w,a,b,c,d),(c,lp);
    ideal i = w2+f2-1, x2+t2+a2-1,  y2+u2+b2-1, z2+v2+c2-1,
             d2+e2-1, f4+2u, wa+tf, xy+tu+ab;
