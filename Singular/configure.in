@@ -315,7 +315,7 @@ SAVE_LIBS=${LIBS}
 LIBS=
 
 dnl I'm not sure what they are for
-dnl AC_CHECK_LIB(bsd, socket)
+AC_CHECK_LIB(bsd, setenv)
 dnl AC_CHECK_LIB(socket, listen)
 dnl AC_CHECK_LIB(nsl, gethostbyname)
 dnl AC_CHECK_LIB(ucb, index)
