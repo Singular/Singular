@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.233 2005-04-29 13:32:05 Singular Exp $
+@comment $Id: reference.doc,v 1.234 2005-05-02 08:09:26 bricken Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -5641,7 +5641,7 @@ A groebner basis is a set of generators such that
 the leading terms generate the leading ideal.
 @item @strong{Note:}
 The algorithm is described in the diploma thesis of Michael Brickenstein
-"Neue Varianten zur Berechnung von Groebner Basen",
+"Neue Varianten zur Berechnung von Groebnerbasen",
 written 2004 under supervision of Prof. Dr. Greuel in Kaiserslautern.
 
 It is designed to keep polynomials short with small coefficients.
