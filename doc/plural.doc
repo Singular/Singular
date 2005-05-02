@@ -171,7 +171,7 @@
 
 @c --------------------------------------------------------------------
 @ifset singularmanual
-@node PLURAL libraries, Examples, Mathematical background @value{PSUFFIX}, PLURAL
+@node PLURAL libraries, , Mathematical background @value{PSUFFIX}, PLURAL
 @section PLURAL libraries
 @lowersections
 @end ifset

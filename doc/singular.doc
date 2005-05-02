@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.126 2005-05-02 11:54:10 Singular Exp $
+@comment $Id: singular.doc,v 1.127 2005-05-02 13:18:58 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -148,7 +148,7 @@ This is the texinfo file describing Singular (version @value{VERSION})
 
 @c ----------------------------------------------------------------------------
 @ifset withplural
-@node Tricks and pitfalls, , Functions and system variables, Top
+@node Tricks and pitfalls, PLURAL, Functions and system variables, Top
 @end ifset
 
 @ifclear withplural
@@ -465,6 +465,9 @@ LIB "all.lib";
 * triang_lib:: procedures for decomposing zero-dimensional ideals
 * ntsolve_lib:: one real solution of polynomial systems (Newton iteration)
 * zeroset_lib:: procedures for roots and factorization
+* mrrcount_lib:: counting the number of real roots
+* signcond_lib:: computing realizable sign conditions
+* urrcount_lib:: counting number of real roots of univariate polynomial
 @end menu
 
 @c ---------------------------------------------------------
@@ -484,9 +487,21 @@ LIB "all.lib";
 @subsection ntsolve_lib
 @c lib ntsolve.lib
 @c ---------------------------------------------------------
-@node zeroset_lib, , ntsolve_lib, Symbolic-numerical solving
+@node zeroset_lib,mrrcount_lib , ntsolve_lib, Symbolic-numerical solving
 @subsection zeroset_lib
 @c lib zeroset.lib
+@c ---------------------------------------------------------
+@node mrrcount_lib, signcond_lib ,zeroset_lib, Symbolic-numerical solving
+@subsection mrrcount_lib
+@c lib mrrcount.lib
+@c ---------------------------------------------------------
+@node signcond_lib, urrcount_lib, mrrcount_lib, Symbolic-numerical solving
+@subsection signcond_lib
+@c lib signcond.lib
+@c ---------------------------------------------------------
+@node urrcount_lib, , signcond_lib, Symbolic-numerical solving
+@subsection urrcount_lib
+@c lib urrcount.lib
 
 @c ----------------------------------------------------------------------------
 @node Visualization, Coding theory, Symbolic-numerical solving, SINGULAR libraries
