@@ -1,4 +1,4 @@
-// $Id: urrcount.lib,v 1.2 2005-05-02 12:24:16 Singular Exp $
+// $Id: urrcount.lib,v 1.3 2005-05-02 13:11:56 Singular Exp $
 // E. Tobis  12.Nov.2004, April 2004
 // last change 1. May 2005 (G.-M. Greuel)
 ///////////////////////////////////////////////////////////////////////////////
@@ -128,7 +128,7 @@ proc isuni(poly p)
 "USAGE:     isuni(p); poly p;
 RETURN:    poly: if p is a univariate polynomial, it returns the variable. If
            not, zero.
-SEE ALSO:  variable
+SEE ALSO:  whichvariable
 EXAMPLE:   example isuni; shows an example"
 {
   poly variable;
