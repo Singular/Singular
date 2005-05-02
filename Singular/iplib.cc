@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.106 2005-01-18 15:41:59 Singular Exp $ */
+/* $Id: iplib.cc,v 1.107 2005-05-02 15:59:29 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -664,7 +664,7 @@ static BOOLEAN iiLoadLIB(FILE *fp, char *libnamebuf, char *newlib,
 BOOLEAN iiTryLoadLib(leftv v, char *id)
 {
   BOOLEAN LoadResult = TRUE;
-#ifdef HAVE_NAMESPACES
+#ifdef HAVE_NS
   char libnamebuf[128];
   char *libname = (char *)omAlloc(strlen(id)+5);
   char *suffix[] = { "", ".lib", ".so", ".sl", NULL };

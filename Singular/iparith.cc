@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.350 2005-04-29 13:23:02 Singular Exp $ */
+/* $Id: iparith.cc,v 1.351 2005-05-02 15:58:45 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -745,12 +745,12 @@ static BOOLEAN jjCOLCOL(leftv res, leftv u, leftv v)
   {
       case 0:
         Print("%s of type 'ANY'. Trying load.\n", v->name);
-        //if(iiTryLoadLib(u, u->name))
+        if(iiTryLoadLib(u, u->name))
         {
           Werror("'%s' no such package", u->name);
           return TRUE;
         }
-        //syMake(u,u->name,NULL);
+        syMake(u,u->name,NULL);
         // else: use next case !!! no break !!!
 
       case PACKAGE_CMD:
@@ -2110,44 +2110,44 @@ static BOOLEAN jjOPPOSE(leftv res, leftv a, leftv b)
     {
     case NUMBER_CMD:
       {
-	/* since basefields are equal, we can apply nCopy */
-	res->data = nCopy((number)IDDATA(w));
-	res->rtyp = argtype;
-	break;
+        /* since basefields are equal, we can apply nCopy */
+        res->data = nCopy((number)IDDATA(w));
+        res->rtyp = argtype;
+        break;
       }
     case POLY_CMD:
     case VECTOR_CMD:
       {
-	poly    q = (poly)IDDATA(w);
-	res->data = pOppose(r,q);
-	res->rtyp = argtype;
-	break;
+        poly    q = (poly)IDDATA(w);
+        res->data = pOppose(r,q);
+        res->rtyp = argtype;
+        break;
       }
     case IDEAL_CMD:
     case MODUL_CMD:
       {
-	ideal   Q = (ideal)IDDATA(w);
-	res->data = idOppose(r,Q);
-	res->rtyp = argtype;
-	break;
+        ideal   Q = (ideal)IDDATA(w);
+        res->data = idOppose(r,Q);
+        res->rtyp = argtype;
+        break;
       }
     case MATRIX_CMD:
       {
-	ring save = currRing;
-	rChangeCurrRing(r);
-	matrix  m = (matrix)IDDATA(w);
-	ideal   Q = idMatrix2Module(mpCopy(m));
-	rChangeCurrRing(save);
+        ring save = currRing;
+        rChangeCurrRing(r);
+        matrix  m = (matrix)IDDATA(w);
+        ideal   Q = idMatrix2Module(mpCopy(m));
+        rChangeCurrRing(save);
         ideal   S = idOppose(r,Q);
-	id_Delete(&Q, r);
-	res->data = idModule2Matrix(S);
-	res->rtyp = argtype;
-	break;
+        id_Delete(&Q, r);
+        res->data = idModule2Matrix(S);
+        res->rtyp = argtype;
+        break;
       }
     default:
       {
-	WerrorS("unsupported type in oppose");
-	return TRUE;
+        WerrorS("unsupported type in oppose");
+        return TRUE;
       }
     }
   }
