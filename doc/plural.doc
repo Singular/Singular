@@ -23,16 +23,25 @@
 @ifhtml
 @html
 <CENTER>
-<A HREF="http://www.singular.uni-kl.de">
-<IMG SRC="singular.jpg"></A><br>
+<A HREF="http://www.singular.uni-kl.de/plural">
+<IMG SRC="plural.jpg" ALT="Singular:Plural logo"></A><br>
 <h3> A Computer Algebra Subsystem for Noncommutative Polynomial Algebras </h3>
 <p></p>
+@end html
+@ifclear singularmanual
+@ifhtml
+@html
 <h4>HTML User Manual for Singular:Plural Version
 @end html
 @value{VERSION}, @value{VERSION_DATE}
 @html
 </h4>
 </center>
+@end html
+@end ifclear
+
+@ifhtml
+@html
 <CENTER><A HREF="http://www.uni-kl.de/"><I>University of Kaiserslautern</I></A></CENTER>
 <CENTER><A HREF="http://www.mathematik.uni-kl.de/"><I>Department of Mathematics</I></A></CENTER>
 <CENTER><A HREF="http://www.mathematik.uni-kl.de/~zca/">

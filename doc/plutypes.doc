@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: plutypes.doc,v 1.27 2005-04-30 20:38:04 levandov Exp $
+@comment $Id: plutypes.doc,v 1.28 2005-05-02 21:59:49 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -32,8 +32,7 @@ declaration syntax
 The term "expression list" in @sc{Plural} refers to any comma separated
 list of expressions.
 
-For the general syntax of a declaration see 
-@c @ref{General command syntax}.
+For the general syntax of a declaration see @ref{General command syntax}.
 
 @menu
 * ideal @value{PSUFFIX}::
@@ -43,8 +42,6 @@ For the general syntax of a declaration see
 * qring @value{PSUFFIX}::
 * resolution @value{PSUFFIX}::
 * ring @value{PSUFFIX}::
-@ifset namespaces
-@end ifset
 @end menu
 
 
@@ -55,7 +52,7 @@ For the general syntax of a declaration see
 @c @cindex ideal
 @cindex  untyped definitions 
 
-Under an ideal @sc{Plural} understand a @strong{left} ideal. 
+For @sc{Plural} ideals are @strong{left} ideals. 
 @* Ideals are represented as lists of polynomials which are interpreted as
 left generators of  the ideal. 
 @* For the operations with two-sided ideals see 
@@ -122,9 +119,9 @@ An ideal expression is:
 @item
 an identifier of type ideal
 @item
-a function returning ideal
+a function returning an ideal
 @item
-ideal expressions combined by the arithmetic operations
+a combination of ideal expressions by the arithmetic operations
 @code{+} or @code{*}
 @item
 a power of an ideal expression (operator @code{^} or @code{**})
@@ -178,6 +175,7 @@ exponentiation (by a non-negative integer)
 @item ideal_expression @code{[} intvec_expression @code{]}
 are polynomial generators of the ideal, index 1 gives the first
 generator.
+@end table
 
 @ifset singularmanual
 @strong{Note:} For simplification of an ideal, see also
@@ -203,14 +201,14 @@ I*x;
 ideal J = I,0,x,x-z;
 I * J;   //  multiplication with simplification
 vector V = [x,y,z];
-print(V*I);
+print(I*V);
 ideal m = maxideal(1);
 m^2;
 ideal II = I[2..4];
 II;
 @c example
 @end smallexample
-@end table
+
 
 @c ------------------------------
 
@@ -220,25 +218,61 @@ II;
 
 
 @table @code
-
+@item eliminate
+elimination of variables (see @ref{eliminate @value{PSUFFIX}})
+@item intersect
+ideal intersection (see @ref{intersect @value{PSUFFIX}})
+@item kbase
+vector space basis of basering modulo the leading ideal
+(see @ref{kbase @value{PSUFFIX}})
+@item lead
+leading terms of a set of generators (see @ref{lead})
+@item lift
+lift-matrix (see @ref{lift @value{PSUFFIX}})
+@item liftstd
+left Groebner basis and transformation matrix computation (see @ref{liftstd @value{PSUFFIX}})
+@item maxideal
+generators of a power of the maximal ideal at 0 (see @ref{maxideal})
+@item modulo
+represents
+@tex
+$(h1+h2)/h1 \cong h2/(h1 \cap h2)$
+@end tex
+@ifinfo
+(h1+h2)/h1=h2/(h1 intersect h2)
+@end ifinfo
+(see @ref{modulo @value{PSUFFIX}})
 @item mres 
-minimal free resolution of an ideal resp.@: module w.r.t. a minimal set
-of generators of the given ideal resp.@: module
+minimal free resolution of an ideal and a minimal set
+of generators of the given ideal
 (see @ref{mres @value{PSUFFIX}})
+@item ncols
+number of columns (see @ref{ncols})
 @item nres 
 computes a free resolution of an ideal resp.@: module M which is
-minimized from the second module on
-(see @ref{nres @value{PSUFFIX}})          
+minimized from the second free module on (see @ref{nres @value{PSUFFIX}})          
+@item oppose
+creates an opposite ideal of a given ideal from the given ring into a basering (see @ref{oppose})
+@item preimage
+preimage under a ring map (see @ref{preimage @value{PSUFFIX}})
+@item quotient
+ideal quotient (see @ref{quotient @value{PSUFFIX}})
 @item reduce
-normal form with respect to a Groebner basis (see @ref{reduce @value{PSUFFIX}})
-@c @item res
-@c free resolution of an ideal resp.@: module but not changing the given ideal resp.@: module(see @ref{res @value{PSUFFIX}})
+left normal form with respect to a left Groebner basis (see @ref{reduce @value{PSUFFIX}})
+@item simplify
+simplify a set of polynomials (see @ref{simplify})
+@item size
+number of non-zero generators (see @ref{size})
 @item std
-Groebner basis computation (see @ref{std @value{PSUFFIX}})
+left Groebner basis computation (see @ref{std @value{PSUFFIX}})
+@item subst
+substitute a ring variable (see @ref{subst @value{PSUFFIX}})
 @item syz
 computation of the first syzygy module (see @ref{syz @value{PSUFFIX}})
 @item twostd
 two-sided Groebner basis computation (see @ref{twostd})
+@item vdim
+vector space dimension of basering modulo the leading ideal (see @ref{vdim @value{PSUFFIX}})
 @end table
 
 
@@ -254,11 +288,13 @@ Maps are ring maps from a preimage ring into the basering.
 @item
 the target of a map is @strong{ALWAYS} the actual basering
 @item
-the preimage ring is stored "by name", that means, maps can only be
+the preimage ring has to be stored "by its name", that means, maps can only be
 used in such contexts, where the name of the preimage ring can be
-resolved (i.e., there might be problems for rings/maps defined in
-subprocedures). 
-@c See also @ref{Identifier resolution}, @ref{Names in procedures}.
+resolved (this has to be considered in subprocedures).
+@c (i.e., there might be problems for rings/maps defined in subprocedures).
+@ifset singularmanual
+See also @ref{Identifier resolution}, @ref{Names in procedures}.
+@end ifset
 @end itemize
 
 Maps between rings with different coefficient fields are
@@ -273,7 +309,7 @@ $Q \rightarrow  Q(a, \ldots)$
 @ifinfo
 Q -> Q(a,..)
 @end ifinfo
-
+     (@math{Q}: the rational numbers)
 @item
 @tex
 $Q \rightarrow R$
@@ -281,7 +317,7 @@ $Q \rightarrow R$
 @ifinfo
 Q -> R
 @end ifinfo
-
+     (@math{R}: the real numbers)
 @item
 @tex
 $Q \rightarrow  C$
@@ -289,7 +325,7 @@ $Q \rightarrow  C$
 @ifinfo
 Q -> C
 @end ifinfo
-
+     (@math{C}: the complex numbers)
 @item
 @tex
 $Z/p \rightarrow  (Z/p)(a, \ldots)$
@@ -297,7 +333,7 @@ $Z/p \rightarrow  (Z/p)(a, \ldots)$
 @ifinfo
 Z/p ->(Z/p)(a,...)
 @end ifinfo
-
+     (@math{Z}: the integers)
 @item
 @tex
 $Z/p \rightarrow  GF(p^n)$
@@ -305,7 +341,7 @@ $Z/p \rightarrow  GF(p^n)$
 @ifinfo
 Z/p -> GF(p^n)
 @end ifinfo
-
+     (@math{GF}: the Galois field)
 @item
 @tex
 $Z/p \rightarrow  R$
@@ -348,14 +384,14 @@ Z/p -> Z/p' : [i]_p in Z/p -> i in [-p/2,p/2] in Z, i -> [i]_p' in Z/p'
 @end ifinfo
 @item
 @tex
-$C \rightarrow R, \quad$ by taking the real part.
+$C \rightarrow R, \quad$ by taking the real part
 @end tex
 @ifinfo
 C -> R by taking the real part.
 @end ifinfo
 @end itemize
 
-Finally, in Singular we allow the mapping from rings
+Finally, in @sc{Plural} we allow the mapping from rings
 with coefficient field Q to rings whose ground fields
 have finite characteristic:
 
@@ -415,7 +451,7 @@ defines a ring map from @code{preimage_ring} to basering.
 @code{preimage_ring}, the remaining variables are mapped to 0. 
 @* If the ideal contains more elements, extra elements are ignored.
 @* The image ring is always the current basering.
-For the mapping of coefficients from different fields see @ref{map}.
+For the mapping of coefficients from different fields see @ref{map @value{PSUFFIX}}.
 
 @item Default:
 none
@@ -438,7 +474,7 @@ ring r2 = 0,(x,y),dp;
 ncalgebra(1,-1); // a Weyl algebra
 map M = r1, x^2, -y^3; // note this is not a morphism, just a map
 M(P);
-// now, consider more interesting example
+// now, a more interesting example
 LIB "ncalg.lib";
 def Usl2 = sl2(); // this algebra is U(sl_2), generated by  e,f,h
 setring Usl2;
@@ -449,7 +485,7 @@ ncalgebra(1,-1); // this algebra is the opposite Weyl algebra
 option(redSB);
 option(redTail);
 map F = Usl2, -X, D*D*X, 2*D*X;
-F(C); // 0, because this map has a nonzero kernel
+F(C); // 0, because C is in the kernel of F
 F(D);
  
 @c example
@@ -488,8 +524,14 @@ map expressions combined by composition using parentheses (@code{(}, @code{)})
 @table @asis
 @item @code{( )}
 composition of maps. If, for example, @code{f} and @code{g} are maps,
-then @code{f(g)} is a map expression giving the composition of @code{f}
-and @code{g},
+then @code{f(g)} is a map expression giving the composition 
+@tex
+$f \circ g$
+@end tex
+@ifinfo
+@code{f} @bullet{} @code{g}
+@end ifinfo
+ of @code{f} and @code{g},
 @* provided the target ring of @code{g} is the basering of @code{f}.
 
 @item map_expression @code{[} int_expressions @code{]}
@@ -502,13 +544,13 @@ is a map entry (the image of the corresponding variable)
 LIB "ncalg.lib";
 def Usl2 = sl2(); // this algebra is U(sl_2)
 setring Usl2;
-map F = Usl2, f, e, -h; // check the endomorphism of U(sl_2)
+map F = Usl2, f, e, -h; // endomorphism of U(sl_2)
 map G = F(F);
 poly p = (f+e*h)^2 + 3*h-e;
 p;
 F(p);
 G(p);
-(G(p) == p); // G is the identity
+(G(p) == p); // G is the identity on p
 @c example
 @end smallexample
 
@@ -529,7 +571,7 @@ a convenient map procedure for inclusions and projections of rings (see @ref{ima
 preimage under a ring map (see @ref{preimage @value{PSUFFIX}})
 
 @item subst
-substitute a ring variable (see @ref{subst})
+substitute a ring variable (see @ref{subst @value{PSUFFIX}})
 @end table
 
 
@@ -542,8 +584,7 @@ substitute a ring variable (see @ref{subst})
 Modules are @strong{left} submodules of a free module over the basering with basis
 @code{gen(1)}, @code{gen(2)}, @dots{}, @code{gen(n)} for some natural number @code{n}.
 @* They are represented by lists of vectors, which generate the left submodule.
-Like vectors, they
-can only be defined or accessed with respect to a basering.
+Like vectors, they can only be defined or accessed with respect to a basering.
 
 If @math{M} is a left submodule of
 @ifinfo
@@ -660,13 +701,6 @@ multiplication of a module expression with an ideal or a poly expression: @code{
 a type cast to module
 @end enumerate
 
-
-@c @*@strong{Example:}
-@c @example
-@c @c example
-@c @c example
-@c @end example
-
 @c ------------------------------
 @node module operations @value{PSUFFIX}, module related functions @value{PSUFFIX}, module expressions @value{PSUFFIX}, module @value{PSUFFIX}
 @subsection module operations @value{PSUFFIX}
@@ -685,7 +719,7 @@ is a module entry, where the first index indicates the row and
 the second the column
 
 @item module_expressions @code{[} int_expression @code{]}
-is a vector, where the index indicates the column
+is a vector, where the index indicates the column (generator)
 @end table
 
 @*@strong{Example:}
@@ -707,38 +741,71 @@ print(-N);
 @subsection module related functions @value{PSUFFIX}
 @cindex module related functions @value{PSUFFIX}
 
-
-
 @table @code
+@item eliminate
+elimination of variables (see @ref{eliminate @value{PSUFFIX}})
+@item freemodule
+the free module of given rank (see @ref{freemodule})
+@item intersect
+module intersection (see @ref{intersect @value{PSUFFIX}})
+@item kbase
+vector space basis of free module over the basering modulo the module of
+leading terms (see @ref{kbase @value{PSUFFIX}})
+@item lead
+initial module (see @ref{lead})
+@item lift
+lift-matrix (see @ref{lift @value{PSUFFIX}})
+@item liftstd
+left Groebner basis and transformation matrix computation (see @ref{liftstd @value{PSUFFIX}})
+@item modulo
+represents
+@tex
+$(h1+h2)/h1 \cong h2/(h1 \cap h2)$
+@end tex
+@ifinfo
+(h1+h2)/h1=h2/(h1 intersect h2)
+@end ifinfo
+(see @ref{modulo @value{PSUFFIX}})
 @item mres 
-computes minimal free resolution of an ideal resp. 
-module w.r.t. a minimal set of generators of the given ideal
-resp. module (see @ref{mres @value{PSUFFIX}})
+minimal free resolution of a module and a minimal set
+of generators of the given ideal module
+(see @ref{mres @value{PSUFFIX}})
+@item ncols
+number of columns (see @ref{ncols})
 @item nres 
 computes a free resolution of an ideal resp.@: module M which is
-minimized from the second module on
-(see @ref{nres @value{PSUFFIX}})          
+minimized from the second free module on (see @ref{nres @value{PSUFFIX}})          
+@item nrows
+number of rows (see @ref{nrows})
+@item oppose
+creates an opposite module of a given module from the given ring into a basering (see @ref{oppose})
+@item print
+nice print format (see @ref{print})
+@item prune
+minimize the embedding into a free module (see @ref{prune})
+@item quotient
+module quotient (see @ref{quotient @value{PSUFFIX}})
 @item reduce
-normal form with respect to a Groebner basis (see @ref{reduce @value{PSUFFIX}})
+left normal form with respect to a left Groebner basis (see @ref{reduce @value{PSUFFIX}})
+@item simplify
+simplify a set of vectors (see @ref{simplify})
+@item size
+number of non-zero generators (see @ref{size})
 @item std
-Groebner basis computation (see @ref{std @value{PSUFFIX}})
+left Groebner basis computation (see @ref{std @value{PSUFFIX}})
+@item subst
+substitute a ring variable (see @ref{subst @value{PSUFFIX}})
 @item syz
 computation of the first syzygy module (see @ref{syz @value{PSUFFIX}})
+@item vdim
+vector space dimension of free module over the basering modulo module
+of leading terms (see @ref{vdim @value{PSUFFIX}})
 @end table
-
-
-
-
 
 
 @c ---------------------------------------
 
-@ifset namespaces
 @node poly @value{PSUFFIX}, qring @value{PSUFFIX}, module @value{PSUFFIX}, Data types @value{PSUFFIX}
-@end ifset
-@ifclear namespaces
-@node poly @value{PSUFFIX}, qring @value{PSUFFIX}, module @value{PSUFFIX}, Data types @value{PSUFFIX}
-@end ifclear
 @section poly @value{PSUFFIX}
 @cindex poly @value{PSUFFIX}
 
@@ -756,6 +823,9 @@ type, the names of the indeterminants and the monomial ordering.
   poly f=x3+y5+z2;
 @c example
 @end smallexample
+
+@strong{Remark:} Remember the conventions on polynomial
+multiplication we follow (@code{*}-multiplication in @ref{Getting started with PLURAL}).
 
 @menu
 * poly declarations @value{PSUFFIX}::
@@ -786,6 +856,8 @@ defines a polynomial.
 ring r = 32003,(x,y,z),dp;
 ncalgebra(-1,1); // ring of some differential-like operators
 r;
+yx;      // not correct input
+y*x;     // correct input
 poly s1  = x3y2+151x5y+186xy6+169y9;
 poly s2  = 1*x^2*y^2*z^2+3z8;
 poly s3  = 5/4x4y2+4/5*x*y^5+2x2y2z3+y7+11x10;
@@ -827,7 +899,6 @@ poly expressions combined by the arithmetic operations @code{+}, @code{-}, @code
 a type cast to poly
 @end enumerate
 
-@strong{Remark:} In the non-commutative case see @ref{Getting started with PLURAL}.
 
 @strong{Example:}
 @smallexample
@@ -886,6 +957,26 @@ the sum of monomials at the indicated places w.r.t. the monomial ordering
 @table @code
 @item bracket 
 computes the Lie bracket of two polinomials (see @ref{bracket})
+@item lead
+leading term (see @ref{lead})
+@item leadcoef
+coefficient of the leading term (see @ref{leadcoef})
+@item leadexp
+the exponent vector of the leading monomial (see @ref{leadexp})
+@item leadmonom
+leading monomial (see @ref{leadmonom})
+@item oppose
+creates an opposite poly of a given poly from the given ring into a basering (see @ref{oppose})
+@item reduce
+left normal form with respect to a left Groebner basis (see @ref{reduce @value{PSUFFIX}})
+@item simplify
+normalize a polynomial (see @ref{simplify})
+@item size
+number of monomials (see @ref{size})
+@item subst
+substitute a ring variable (see @ref{subst @value{PSUFFIX}})
+@item var
+the indicated variable of the ring (see @ref{var})
 @end table
 
 @c ---------------------------------------
@@ -894,30 +985,31 @@ computes the Lie bracket of two polinomials (see @ref{bracket})
 @section qring @value{PSUFFIX}
 @cindex qring @value{PSUFFIX}
 
-@sc{Plural} offers the opportunity to compute within 
+@sc{Plural} offers the possibility to compute within 
 factor-rings modulo two-sided ideals.  The ideal has to be given
 as a two-sided Groebner basis (see @ref{twostd} command). 
 
 @* For a detailed description of the concept of rings and quotient rings see
-@ifset singularmanual 
-@ref{Rings and orderings}.
-@end ifset
 @ifclear singularmanual
 in @sc{Singular} manual section Rings and orderings.
 @end ifclear
+@ifset singularmanual 
+@ref{Rings and orderings}.
+@end ifset
+
 
 @menu
 * qring declaration @value{PSUFFIX}::
+* qring related functions @value{PSUFFIX}::
 @end menu
 
 @strong{Note:}
 we highly recommend to turn on 
 @code{option(redSB); option(redTail);}
-while computing in qrings. Otherwise results may have no meaning.
+while computing in qrings. Otherwise results may have a difficult interpretation.
 
 @c ---------------------------------------
-
-@node qring declaration @value{PSUFFIX},  , qring @value{PSUFFIX}, qring @value{PSUFFIX}
+@node qring declaration @value{PSUFFIX}, qring related functions @value{PSUFFIX}, qring @value{PSUFFIX}, qring @value{PSUFFIX}
 @subsection qring declaration @value{PSUFFIX}
 @cindex qring declaration @value{PSUFFIX}
 
@@ -928,16 +1020,21 @@ while computing in qrings. Otherwise results may have no meaning.
 @item Default:
 none
 @item Purpose:
-declares a quotient ring as the basering modulo ideal_expression and sets
+declares a quotient ring as the basering modulo an @code{ideal_expression} and sets
 it as current basering.
+@item Note:
+reports error if an ideal is not a two-sided Groebner basis.
 @item Example:
 @smallexample
-@c example
+@c example error
 ring r=0,(z,u,v,w),dp;
 ncalgebra(-1,0); // an anticommutative algebra
 option(redSB);
 option(redTail);
 ideal i=z^2,u^2,v^2,w^2;
+qring Q = i;  // incorrect call produces error
+kill Q;
+setring r;  // go back to the ring r
 qring q=twostd(i); // now it is an exterior algebra
 q;
 poly k = (v-u)*(zv+u-w);
@@ -948,13 +1045,21 @@ ek; // the reduced form
 @end smallexample
 @end table
 
+@c ---------------------------------------
+@node qring related functions @value{PSUFFIX}, , qring @value{PSUFFIX}, qring @value{PSUFFIX}
+@subsection qring related functions @value{PSUFFIX}
+@cindex qring related functions @value{PSUFFIX}
 
-@c ------------------------------------------------------------
-@c   This piece of text exists also in the file general.doc,
-@c   chapter "General syntax of a ring declaration".
-@c   If you change something here, change it there, too!
-@c ------------------------------------------------------------
-
+@table @code
+@item envelope
+enveloping ring (see @ref{envelope})
+@item nvars
+number of ring variables (see @ref{nvars})
+@item opposite
+opposite ring (see @ref{opposite})
+@item setring
+set a new basering (see @ref{setring})
+@end table
 
 @c ---------------------------------------
 
@@ -962,15 +1067,15 @@ ek; // the reduced form
 @section resolution @value{PSUFFIX}
 @cindex resolution @value{PSUFFIX}
 
-The resolution type is intended as an intermediate representation which
+The type resolution is intended as an intermediate representation which
 internally retains additional information obtained during computation of
 resolutions. It furthermore enables the use of partial results to
 compute, for example, Betti numbers or minimal resolutions. Like ideals
 and modules, a resolution can only be defined w.r.t.@: a basering.
 
 @strong{Note:}
-to access the elements of a resolution, it has to be assigned to a list,
-which also completes computations and may therefore take time,
+to access the elements of a resolution, it has to be assigned to a list.
+This assignment also completes computations and may therefore take time,
 (resp.@: an access directly with the brackets @code{[ , ]} causes
 implicitly a cast to a list).
 
@@ -1037,11 +1142,13 @@ a type cast to resolution from a list of ideals, resp.@: modules.
 @cindex resolution related functions @value{PSUFFIX}
 
 @table @code
+@item betti
+Betti numbers of a resolution (see @ref{betti @value{PSUFFIX}})
 @item minres 
 minimizes a free resolution  (see @ref{minres @value{PSUFFIX}})
 @item mres 
 computes a minimal free resolution of an ideal resp. 
-module w.r.t. a minimal set of generators of the given ideal
+module and a minimal set of generators of the given ideal
 resp. module (see @ref{mres @value{PSUFFIX}})
 @item nres 
 computes a free resolution of an ideal resp.@: module M which is
@@ -1143,7 +1250,7 @@ omitted.
 @cindex ring operations @value{PSUFFIX}
 @table @asis
 @item @code{+}
-construct a tensor product over the groung field
+construct a tensor product 
 @ifinfo
 C = A\otimes_k B
 @end ifinfo
@@ -1152,11 +1259,12 @@ $C = A\otimes_{\bf{K} } B$
 @end tex 
 of two
 @ifinfo 
-G-algebras A and B. 
+G-algebras A and B
 @end ifinfo
 @tex
-$G$-algebras $A$ and $B$.
+$G$-algebras $A$ and $B$
 @end tex
+ over the groung field.
 
 Let
 @ifinfo
@@ -1192,8 +1300,15 @@ $\{ y_j x_i = x_i y_j, 1 \leq j \leq m, 1 \leq i \leq n\}  \rangle$.
 @end table
 
 
-Concerning the ground fields @math{k_1} and @math{k_2} take the
-following guide lines into consideration:
+Concerning the ground fields @math{k_1} resp. @math{k_2} of @math{A} resp. @math{B}, take the
+following guide lines for 
+@ifinfo
+A\otimes_k B
+@end ifinfo
+@tex
+$A\otimes_{\bf{K} } B$
+@end tex 
+ into consideration:
 @itemize @bullet
 @item Neither @math{k_1} nor @math{k_2} may be @math{R} or @math{C}.
 @item If the characteristic of @math{k_1} and @math{k_2} differs, then one of them must be @math{Q}.
@@ -1222,10 +1337,26 @@ S;
 @cindex ring related functions @value{PSUFFIX}
 
 @table @code
+@item charstr
+description of the coefficient field of a ring (see @ref{charstr})
 @item envelope
 enveloping ring (see @ref{envelope})
+@item npars
+number of ring parameters (see @ref{npars})
+@item nvars
+number of ring variables (see @ref{nvars})
 @item opposite
 opposite ring (see @ref{opposite})
+@item ordstr
+monomial ordering of a ring (see @ref{ordstr})
+@item parstr
+names of all ring parameters or the
+name of the n-th ring parameter (see @ref{parstr})
 @item qring
 quotient ring (see @ref{qring @value{PSUFFIX}}) 
+@item setring
+set a new basering (see @ref{setring})
+@item varstr
+names of all ring variables or the
+name of the n-th ring variable (see @ref{varstr})
 @end table

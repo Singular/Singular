@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: pluconventions.doc,v 1.11 2005-04-29 19:43:43 levandov Exp $
+@comment $Id: pluconventions.doc,v 1.12 2005-05-02 21:59:47 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -38,27 +38,27 @@
 @c ----------------------------------------------- 
 
 @table @strong
-@item @strong{What is @sc{Plural}?} @strong{What @sc{Plural} does?}
+@item @strong{What is and what does @sc{Plural}?}
 
 @sc{Plural} is a kernel extension of @sc{Singular},
 providing many algorithms for computations within certain noncommutative algebras
-@* (see see @ref{G-algebras} and @ref{Mathematical background @value{PSUFFIX}} for detailed information on algebras and algorithms).
+(see see @ref{G-algebras} and @ref{Mathematical background @value{PSUFFIX}} for detailed information on algebras and algorithms).
 
 @sc{Plural} is compatible with @sc{Singular}, since it uses the
 same data structures, sometimes interpreting them in a different way
-@* and/or modifying them for its own purposes. 
+and/or modifying them for its own purposes. 
 In spite of such a difference, one can always transfer 
 objects from commutative rings of @sc{Singular} 
 to noncommutative rings @sc{Plural} and back.
 
 
-With @sc{Plural}, one can set up a noncommutative G-algebra with
-a PBW basis, say, @math{A} (see @ref{G-algebras} for step-by-step building instruction and also @ref{PLURAL libraries} 
-for procedures, setting many important algebras easily).
+With @sc{Plural}, one can set up a noncommutative @math{G}-algebra with
+a Poincar@'e-Birkhoff-Witt (PBW) basis, say, @math{A} (see @ref{G-algebras} for step-by-step building instructions and also @ref{PLURAL libraries} 
+for procedures for setting many important algebras easily).
 
 Functionalities of @sc{Plural} (enlisted in @ref{Functions  @value{PSUFFIX}}) are accessible as soon as the basering becomes noncommutative (see @ref{ncalgebra}).
 
-One can perform various computations with polynomials and ideals in @math{A},
+One can perform various computations with polynomials and ideals in @math{A} and with
 vectors and submodules of a free module
 @tex
 $A^n$.
@@ -67,7 +67,7 @@ $A^n$.
 A^n.
 @end ifinfo
 
-One can work also within factor-algebras of G-algebras (see @ref{qring} type)
+One can work also within factor-algebras of @math{G}-algebras (see @ref{qring @value{PSUFFIX}} type)
 by two-sided ideals (see @ref{twostd}).
 @end table
 
@@ -75,23 +75,23 @@ by two-sided ideals (see @ref{twostd}).
 @item @strong{What @sc{Plural} does not:}
 @itemize 
 
-@item @sc{Plural} does not perform computations neither in free algebra
-nor in its general factor algebras.
+@item 
+@sc{Plural} does not perform computations in free algebra or in its general factor algebras.
 
-One can only input and work with G-algebras and with their factor-algebras
+One can only work with @math{G}-algebras and with their factor-algebras
 by two-sided ideals.
 
-@item @sc{Plural} does not work with local and mixed orderings
+@item @sc{Plural} requires a monomial ordering but it does not work with local and mixed orderings.
 
 Right now, one can use only global orderings in @sc{Plural}
 (see @ref{General definitions for orderings}). 
 
-This will be enhaced in future by providing the possibility of computations in a tensor product of a noncommutative algebra (with a global ordering)
+This will be enhaced in the future by providing the possibility of computations in a tensor product of a noncommutative algebra (with a global ordering)
 @* with a commutative algebra (with any ordering).
 
-@item @sc{Plural} does not handle noncommutative parameters
+@item @sc{Plural} does not handle noncommutative parameters.
 
-Defining parameters, one @strong{can not} impose noncommutative relations
+Defining parameters, one @strong{cannot} impose noncommutative relations
 on them. Moreover, it is impossible to introduce 
 @* parameters which do not commute with variables. 
 
@@ -108,7 +108,8 @@ on them. Moreover, it is impossible to introduce
 in the noncommutative case, the correct multiplication of @code{y} by
  @code{x} must be written as @code{y*x}. 
 @* Both expressions @code{yx} and @code{xy} are equal, since they are 
-interpreted as commutative expressions. See example in @ref{poly expressions @value{PSUFFIX}}. 
+interpreted as commutative expressions. See example in @ref{poly expressions @value{PSUFFIX}}.
+@* Note, that @sc{Plural} output consists only of monomials, hence the signs @code{*} are omitted. 
 
 @end itemize
 
