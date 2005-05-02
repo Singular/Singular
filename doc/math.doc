@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.75 2005-04-30 20:35:58 levandov Exp $
+@comment $Id: math.doc,v 1.76 2005-05-02 11:54:50 Singular Exp $
 @comment this file contains the mathematical background of Singular
 
 @c The following directives are necessary for proper compilation
@@ -724,7 +724,7 @@ Other sources to check are @code{http://symbolicnet.org/},
 @code{http://www-sop.inria.fr/galaad/}, @code{http://www.bath.ac.uk/~masjpf/CAIN.html},... and the following list of books.
 
 @ifset withplural
-For the references for noncommutative algebras and algorithms, see @ref{References @value{PSUFFIX}}.
+For the references for noncommutative algebras and algorithms, see @ref{References (plural)}.
 @end ifset
 
 @subheading Text books on computational algebraic geometry
