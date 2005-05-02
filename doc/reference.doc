@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.234 2005-05-02 08:09:26 bricken Exp $
+@comment $Id: reference.doc,v 1.235 2005-05-02 10:23:01 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -5318,13 +5318,46 @@ See
 @item @strong{Type:}
 list
 @item @strong{Purpose:}
-decomposes a ring/qring into a list of 4 components: the field description,
-the variable names, the ordering and the quotient ideal.
+decomposes a ring/qring into a list of 4 (or 6 in the noncommutative case)
+components:i
+@itemize
+@item
+the field description,
+@item
+the variable names (a list of strings)
+@item
+the ordering (a list of lists)
+@itemize
+@item
+ordering as string
+@item
+parameter to the ordering (int or intvec)
+@end itemize
+@item
+the quotient ideal.
+@end itemize
 @item @strong{Example:}
 @smallexample
 @c example
-  ring r=32003,(x,y,z),dp;
-  ringlist(r);
+ ring R=32003,(x,y,z);dp;
+ ringlist(R);
+ ring r = 0,(x,y),dp;
+ list l = ringlist(r);
+ l;
+ //  Now change l and create a new ring, by
+ //- changing the base field to the function field with parameter a, 
+ //- introducing one extra variable z, 
+ //- defining the weighted ordering wp(2,3,4).
+ //- define the minpoly after creating the function field 
+ l[1]=list(0,list("a"),list(list("lp",1)),ideal(0));
+ l[2][size(l[2])+1]="z";
+ l[3][1]=list("wp",intvec(2,3,4));
+ def ra = ring(l);     //creates the newring
+ ra; setring ra;
+ list lra = ringlist(ra);
+ lra[1][4]=ideal(a2+1);
+ def Ra = ring(lra);
+ setring Ra; Ra; 
 @c example
 @end smallexample
 @end table
