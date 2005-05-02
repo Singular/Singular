@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.125 2005-04-30 20:35:58 levandov Exp $
+@comment $Id: singular.doc,v 1.126 2005-05-02 11:54:10 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -524,7 +524,7 @@ LIB "all.lib";
 @c ---------------------------------------------------------
 @node brnoeth_lib, , , Coding theory
 @subsection brnoeth_lib
-@c lib brnoeth.lib no_ex
+@c lib brnoeth.lib
 
 
 @c ----------------------------------------------------------------------------
