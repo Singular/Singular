@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.235 2005-05-02 10:23:01 Singular Exp $
+@comment $Id: reference.doc,v 1.236 2005-05-02 11:58:48 levandov Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -5339,7 +5339,7 @@ the quotient ideal.
 @item @strong{Example:}
 @smallexample
 @c example
- ring R=32003,(x,y,z);dp;
+ ring R=32003,(x,y,z),dp;
  ringlist(R);
  ring r = 0,(x,y),dp;
  list l = ringlist(r);
