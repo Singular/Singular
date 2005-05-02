@@ -1,14 +1,23 @@
-// E. Tobis  12.Nov.2004
-// last change 16. Apr. 2005 (G.-M. Greuel)
+// $Id: urrcount.lib,v 1.2 2005-05-02 12:24:16 Singular Exp $
+// E. Tobis  12.Nov.2004, April 2004
+// last change 1. May 2005 (G.-M. Greuel)
 ///////////////////////////////////////////////////////////////////////////////
 category="Symbolic-numerical solving"
 info="
 LIBRARY: urrcount.lib   Counting number of real roots of univariate polynomial
-AUTHOR:                 Enrique A. Tobis, etobis@dc.uba.ar 
+AUTHOR:                 Enrique A. Tobis, etobis@dc.uba.ar
 
 OVERVIEW:  Routines for bounding and counting the number of real roots of a
-           univariate polynomial by using Strum and Sturm-Habicht sequences.
-           References:
+           univariate polynomial, by means of several different methods, namely
+           Descartes' rule of signs, the Budan-Fourier theorem, Sturm sequences
+           and Sturm-Habicht sequences. The first two give bounds on the number
+           of roots. The other two compute the actual number of roots of the
+           polynomial. There are several wrapper functions, to simplify the
+           application of the aforesaid theorems and some functions
+           to determine whether a given polynomial is univariate.
+           References: Basu, Pollack, Roy, \"Algorithms in Real Algebraic
+           Geometry\", Springer, 2003.
+
 
 PROCEDURES:
   isuni(p)         Checks whether a polynomials is univariate
@@ -25,7 +34,7 @@ PROCEDURES:
   sturmha(p,a,b)   Number of real roots of a poly in (a,b) (via Sturm-Habicht)
   sturmhaseq(p)    A Sturm-Habicht Sequence of a polynomial
   reverse(l)       Reverses a list
-  nrroots(p)        The number of real roots of p
+  nrroots(p)       The number of real roots of p
   isparam(p)       Returns 0 iff the polynomial has non-parametric coefficients
 
 KEYWORDS:         real roots, univariate polynomial
@@ -75,20 +84,20 @@ EXAMPLE:   example isparam; shows an example"
       // Ciclo que revisa cada polinomio
       i = size(ar);
       while (!ispar && (i >= 1)) {
-	ispar = ispar || (isparametric(ar[i]));
-	i--;
+        ispar = ispar || (isparametric(ar[i]));
+        i--;
       }
     } else {
     if (typeof(ar) == "matrix" || typeof(ar) == "intmat") {
       int j;
       i = nrows(m);
-      while (!isparam && (i >= 1)) {
-	j = nrows(m);
-	while (!isparam && (j >= 1)) {
-	  isparam = isparam || (isparametric(m[i,j]));
-	  j--;
-	}
-	i--;
+      while (!ispar && (i >= 1)) {
+        j = nrows(m);
+        while (!ispar && (j >= 1)) {
+          ispar = ispar || (isparametric(m[i,j]));
+          j--;
+        }
+        i--;
       }
     }
   }}}} else {
@@ -96,8 +105,8 @@ EXAMPLE:   example isparam; shows an example"
     i = size(#);
     while (!ispar && (i >= 1)) {
       if ((typeof(#[i]) != "poly") && (typeof(#[i]) != "number") &&
-	  typeof(#[i]) != "int") {
-      	ERROR("This procedure only works with lists of polynomials");
+          typeof(#[i]) != "int") {
+              ERROR("This procedure only works with lists of polynomials");
       }
       ispar = ispar || (isparametric(#[i]));
       i--;
@@ -160,7 +169,7 @@ RETURN:    poly: if p is a univariate monomial, the variable. Otherwise 0.
 ASSUME:    p is a monomial
 SEE ALSO:  isuni
 EXAMPLE:   example whichvariable; shows an example"
-{ 
+{
   int i;
   int found;
   poly g;
@@ -218,7 +227,7 @@ EXAMPLE:   example varsigns; shows an example"
   if (isparam(l)) {
     ERROR("This procedure cannot operate with parametric arguments");
   }
-  
+
   lastsign = sign(l[1]);
 
   for (int i = 1; i <= size(l); i = i + 1) {
@@ -239,10 +248,10 @@ example
   varsigns(l);
 }
 ///////////////////////////////////////////////////////////////////////////////
-proc boundBuFou(poly p,number a,number b) 
+proc boundBuFou(poly p,number a,number b)
 "USAGE:     boundBuFou(p,a,b); p poly, a,b number
-RETURN:    number: an upper bound for the number of real roots of p in (a,b], 
-           with the same parity as the actual number of roots (using the 
+RETURN:    number: an upper bound for the number of real roots of p in (a,b],
+           with the same parity as the actual number of roots (using the
            Budan-Fourier Theorem)
 ASSUME:    p is a univarite polynomials with rational coefficients
            a, b are rational numbers with a < b
@@ -272,7 +281,7 @@ EXAMPLE:   example boundBuFou; shows an example"
   }
 
   d = deg(p);
-  
+
   // We calculate the list of derivatives
 
   Der[d+1] = p;
@@ -424,7 +433,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 proc allrealst(poly p)
 "USAGE:     allrealst(p); poly p
-RETURN:    int: 1 iff all the roots of p are real, 0 otherwise 
+RETURN:    int: 1 iff all the roots of p are real, 0 otherwise
            Checks whether all the roots of p are real by using Sturm's Theorem
 ASSUME:    p is a univarite polynomials with rational coefficients
 SEE ALSO:  allreal,sturm,sturmha
@@ -494,7 +503,7 @@ example
   maxabs(p);
 }
 ///////////////////////////////////////////////////////////////////////////////
-proc sturm(poly p,number a,number b) 
+proc sturm(poly p,number a,number b)
 "USAGE:     sturm(p,a,b); poly p, number a,b
 RETURN:    number: the number of real roots of p in (a,b]
 ASSUME:    p is a univarite polynomials with rational coefficients,
@@ -561,15 +570,20 @@ proc sturmseq(poly p)
 "USAGE:     sturmseq(p); p poly
 RETURN:    list: a Sturm sequence of p
 ASSUME:    p is a univarite polynomials with rational coefficients
+THEORY:    The Sturm sequence of p (also called remainder sequence) is the
+           sequence begininng with p, p' and goes on with minus the remainder
+           of the two previous polynomials, until the remainder is zero.
+           See: Basu, Pollack, Roy, "Algorithms in Real Algebraic Geometry",
+           Springer, 2003.
 SEE ALSO:  sturm,sturmhaseq
 EXAMPLE:   example sturmseq; shows an example"
 {
   list stseq;
   poly variable;
   int i;
-  
+
   variable = isuni(p);
-  
+
   if (isparam(p)) {
     ERROR("This procedure cannot operate with parametric arguments");
   }
@@ -577,7 +591,7 @@ EXAMPLE:   example sturmseq; shows an example"
   if (variable == 0) {
     ERROR ("p must be a univariate polynomial");
   }
-  
+
   // The two first polynomials in Sturm's sequence
   stseq = list();
   stseq[1] = p;
@@ -594,15 +608,15 @@ EXAMPLE:   example sturmseq; shows an example"
   }
 
   // Right now, we have gcd(P,P') in stseq[size(stseq)];
- 
+
   for (i = size(stseq)-1;i >= 1;i--) {
     stseq[i] = stseq[i]/(sign(leadcoef(stseq[size(stseq)]))*stseq[size(stseq)]);
     stseq[i] = stseq[i]/abs(leadcoef(stseq[i]));
   }
-  
+
   // We divide the gcd by itself
   stseq[size(stseq)] = sign(leadcoef(stseq[size(stseq)]));
-  
+
   return (stseq);
 }
 example
@@ -649,7 +663,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 proc sturmha(poly P,number a,number b)
 "USAGE:     sturmha(p,a,b); poly p, number a,b
-RETURN:    number: the number of real roots of p in (a,b) (using a 
+RETURN:    number: the number of real roots of p in (a,b) (using a
            Sturm-Habicht sequence)
 SEE ALSO:  sturm,allreal
 EXAMPLE:   example sturmha; shows an example"
@@ -716,8 +730,14 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 proc sturmhaseq(poly P)
-"USAGE:     sturmhaseq(P); P poly. P must be univariate
+"USAGE:     sturmhaseq(P); P poly.
 RETURN:    list: the nonzero polynomials of the Sturm-Habicht sequence of P
+ASSUME:    P is a univariate polynomial.
+THEORY:    The Sturm-Habicht sequence (also subresultant sequence) is closely
+           related to the Sturm sequence, but behaves better with respect to
+           the size of the coefficients. It is defined via subresultants.
+           See: Basu, Pollack, Roy, "Algorithms in Real Algebraic Geometry",
+           Springer, 2003.
 SEE ALSO:  sturm,sturmseq,sturmha
 EXAMPLE:   example sturmhaseq; shows an example"
 {
@@ -766,11 +786,11 @@ EXAMPLE:   example sturmhaseq; shows an example"
 
 //      T[k-1+2] = SR[k-1+2];
       srbar[k-1+2] = leadcoef(SR[k-1+2]);
-    } 
+    }
     if (k < j-1) {
       // Computation of sr[k+2]
       for (l = 1;l <= j-k-1;l++) {
-	srbar[j-l-1+2] = ((-1)^l)*(srbar[j-1+2]*srbar[j-l+2])/sr[j+2];
+        srbar[j-l-1+2] = ((-1)^l)*(srbar[j-1+2]*srbar[j-l+2])/sr[j+2];
     }
     sr[k+2] = srbar[k+2];
 
@@ -794,7 +814,7 @@ EXAMPLE:   example sturmhaseq; shows an example"
   while (i >= 1) {
     if (typeof(SR[i]) != "none") {
       if (SR[i] != 0) {
-	filtered = insert(filtered,SR[i]);
+        filtered = insert(filtered,SR[i]);
       }
     }
     i--;
@@ -846,7 +866,7 @@ static proc abs(number x)
   } else {
     av = -x;
   }
- 
+
   return (av);
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -992,13 +1012,13 @@ static proc W(list l)
       nofzeros++;
     } else {
       temp = lastsign * sign(l[i]);
-      
+
       if (temp < 0) {
-	sc++;
+        sc++;
       } else {
-	if (nofzeros == 2) {
-	  sc = sc + 2;
-	}
+        if (nofzeros == 2) {
+          sc = sc + 2;
+        }
       }
       nofzeros = 0;
       lastsign = temp/lastsign;
@@ -1008,5 +1028,5 @@ static proc W(list l)
   return (sc);
 }
 ///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
+
 
