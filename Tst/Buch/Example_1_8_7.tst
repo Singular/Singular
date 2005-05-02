@@ -11,16 +11,17 @@ J;
 LIB"solve.lib";
 laguerre_solve(J[1],6);
 
-triang_solve(triangMH(J),6);
+def C=triang_solve(triangMH(J),6);
+setring C;
 
 rlist;
 
 setring A;
-kill Solve::AC;
 vdim(J);
 LIB "sing.lib";
 ideal sJ=groebner(slocus(I));
-triang_solve(triangMH(sJ),6);
+def D=triang_solve(triangMH(sJ),6);
+setring D;
 rlist;
 
 tst_status(1);$
