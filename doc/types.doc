@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.124 2005-04-28 14:55:40 Singular Exp $
+@comment $Id: types.doc,v 1.125 2005-05-02 15:21:38 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -2926,14 +2926,20 @@ defines a package (Only relevant in very special situations).
 
 @table @code
 @item exportto
+      transfer an identifier to the specified package
 (see @ref{exportto})
 @item importfrom
+      generate a copy of an identifier from the specified package in the
+      current package
 (see @ref{importfrom})
-@item listvar
+@item listvar 
+      list variables currently defined in a given package
 (see @ref{listvar})
-@item load
+@item load 
+      load a library or dynamic module
 (see @ref{load})
 @item LIB
+      load a library or dynamic module
 (see @ref{LIB})
 @end table
 

@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.236 2005-05-02 11:58:48 levandov Exp $
+@comment $Id: reference.doc,v 1.237 2005-05-02 15:22:12 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -3079,19 +3079,12 @@ See
 @code{LIB} string_expression@code{;}
 @item @strong{Type:}
 none
-@ifset namespaces
-@item @strong{Note:}
-This command is obsoleted by
-@code{load(}string_expression@code{,"with");}
-@end ifset
-@ifclear namespaces
 @item @strong{Purpose:}
 reads a library of procedures from a file. If the given filename does
 not start with @kbd{.} or @kbd{/} and cannot be located in the current
 directory, each directory contained in the library
 @code{SearchPath} is searched for file of this name.
 @xref{Loading of a library}, for more info on @code{SearchPath}.
-@end ifclear
 
 @item @strong{Note on standard.lib:}
 Unless  @sc{Singular} is started with the @code{--no-stdlib} option, the
@@ -3117,7 +3110,6 @@ shows all loaded libraries written in Singular.
 @c example
 @end smallexample
 @end table
-@ifset namespaces
 @c ref
 See
 @ref{Command line options};
@@ -3130,20 +3122,6 @@ See
 @ref{package};
 @ref{system}.
 @c ref
-@end ifset
-@ifclear namespaces
-@c ref
-See
-@ref{Command line options};
-@ref{Loading of a library};
-@ref{Procedures and libraries};
-@ref{SINGULAR libraries};
-@ref{proc};
-@ref{standard_lib};
-@ref{string};
-@ref{system}.
-@c ref
-@end ifclear
 @c -------------------------------------------------
 @node lift, liftstd, LIB, Functions
 @subsection lift
@@ -3235,20 +3213,11 @@ See
 @cindex listvar
 @table @code
 @item @strong{Syntax:}
-@ifset namespaces
 @code{listvar (} [package] @code{)}
 @*@code{listvar (} [package@code{,}] type @code{)}
 @*@code{listvar (} [package@code{,}] ring_name @code{)}
 @*@code{listvar (} [package@code{,}] name @code{)}
 @*@code{listvar (} [package@code{,}] @code{all )}
-@end ifset
-@ifclear namespaces
-@code{listvar (} [package] @code{)}
-@*@code{listvar (} [package@code{,}] type @code{)}
-@*@code{listvar (} [package@code{,}] ring_name @code{)}
-@*@code{listvar (} [package@code{,}] name @code{)}
-@*@code{listvar (} [package@code{,}] @code{all )}
-@end ifclear
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
@@ -3265,8 +3234,7 @@ ring,
 The current basering is marked with a @code{*}.  The nesting level of
 variables in procedures is shown in square brackets.
 
-@ifset namespaces
-package can be @code{Current}, @code{Up}, @code{Top} or any other
+package can be @code{Current}, @code{Top} or any other
 identifier of type package.
 @item @strong{Example:}
 @smallexample
@@ -3287,29 +3255,7 @@ identifier of type package.
   listvar(Standard, proc);
 @c example
 @end smallexample
-@end ifset
-@ifclear namespaces
-@item @strong{Example:}
-@smallexample
-@c example
-  proc t1 { }
-  proc t2 { }
-  ring s;
-  poly ss;
-  ring r;
-  poly f=x+y+z;
-  int i=7;
-  ideal I=f,x,y;
-  listvar(all);
-  listvar();
-  listvar(r);
-  listvar(t1);
-  listvar(proc);
-@c example
-@end smallexample
-@end ifclear
 @end table
-@ifset namespaces
 @c ref
 See
 @ref{Names in procedures};
@@ -3319,17 +3265,6 @@ See
 @ref{package};
 @ref{type}.
 @c ref
-@end ifset
-@ifclear namespaces
-@c ref
-See
-@ref{Names in procedures};
-@ref{Names};
-@ref{defined};
-@ref{names};
-@ref{type}.
-@c ref
-@end ifclear
 @c ---------------------------------------
 @node lres, maxideal, listvar, Functions
 @subsection lres
@@ -3927,9 +3862,7 @@ See
 @item @strong{Syntax:}
 @code{names ( )}
 @*@code{names (} ring_name @code{)}
-@ifset namespaces
 @*@code{names (} package_name @code{)}
-@end ifset
 @item @strong{Type:}
 list of strings
 @item @strong{Purpose:}
@@ -3937,8 +3870,7 @@ returns the names of all user-defined variables which are ring independent
 (this includes the names of  procedures) or, in the second case, which
 belong to the given ring.
 
-@ifset namespaces
-package_name can be @code{Current}, @code{Up}, @code{Top} or any other
+package_name can be @code{Current}, @code{Top} or any other
 identifier of type package.
 @item @strong{Example:}
 @smallexample
@@ -3957,21 +3889,6 @@ identifier of type package.
   names(p::q);
 @c example
 @end smallexample
-@end ifset
-@ifclear namespaces
-@item @strong{Example:}
-@smallexample
-@c example
-  int i=9;
-  ring r;
-  poly f;
-  poly g;
-  setring r;
-  names();
-  names(r);
-@c example
-@end smallexample
-@end ifclear
 @end table
 @c ref
 See
@@ -6732,18 +6649,16 @@ See
 * continue::
 * else::
 * export::
+* exportto::
 * for::
 * if::
+* importfrom::
 * keepring::
+* load::
 * quit::
 * return::
 * while::
 * ~::
-@ifset namespaces
-* exportto::
-* importfrom::
-* load::
-@end ifset
 @end menu
 
 A sequence of commands surrounded by curly brackets (@code{@{} and
@@ -6894,12 +6809,7 @@ See
 @ref{Control structures}.
 @c ref
 @c ---------------------------------------
-@ifset namespaces
 @node export, exportto, else, Control structures
-@end ifset
-@ifclear namespaces
-@node export, for, else, Control structures
-@end ifclear
 @subsection export
 @cindex export
 @table @code
@@ -6932,24 +6842,14 @@ listvar();
 @end smallexample
 @end table
 
-@ifset namespaces
 @c ref
 See
 @ref{exportto};
 @ref{importfrom};
 @ref{keepring}.
 @c ref
-@end ifset
-@ifclear namespaces
-@c ref
-See
-@ref{keepring}.
-@c ref
-@end ifclear
 @c ---------------------------------------
-@ifset namespaces
-@c ---------------------------------------
-@node exportto, importfrom, export, Control structures
+@node exportto, for, export, Control structures
 @subsection exportto
 @cindex exportto
 @table @code
@@ -6997,7 +6897,75 @@ See
 @ref{keepring}.
 @c ref
 @c ---------------------------------------
-@node importfrom, load, exportto, Control structures
+@node for, if, exportto, Control structures
+@subsection for
+@cindex for
+@table @code
+@item @strong{Syntax:}
+@code{for (} init_command@code{;}
+boolean_expression@code{;}
+iterate_commands@code{)} block
+@item @strong{Purpose:}
+repetitive, conditional execution of a command block.
+@*The command init_command is executed first. Then boolean_expression is
+evaluated. If its value is TRUE the block is executed, otherwise the
+@code{for} statement is complete. After each execution of the block, the
+command iterate_command is executed and boolean_expression is
+evaluated. This is repeated until boolean_expression evaluates to FALSE.
+@*The command @code{break;} leaves the innermost @code{for} construct.
+@item @strong{Example:}
+@smallexample
+// sum of 1 to 10:
+int s=0;
+for (int i=1; i<=10; i=i+1)
+@{
+   s=s+i;
+@}
+s;
+@expansion{} 55
+@end smallexample
+@end table
+@c ref
+See
+@ref{Control structures};
+@ref{boolean expressions};
+@ref{while};
+@ref{if};
+@ref{break};
+@ref{continue}.
+@c ref
+@c ---------------------------------------
+@node if, importfrom, for, Control structures
+@subsection if
+@cindex if
+@cindex else
+@table @code
+@item @strong{Syntax:}
+@code{if (} boolean_expression @code{)} true_block
+@*@code{if (} boolean_expression @code{)} true_block @code{else} false_block
+@item @strong{Purpose:}
+executes true_block if the boolean condition is true. If the @code{if}
+statement is followed by an @code{else} statement and the boolean
+condition is false, then false_block is executed.
+@item @strong{Example:}
+@smallexample
+int i = 9;
+matrix m[i][i];
+if (i > 5 and typeof(m) == "matrix")
+@{
+  m[i][i] = i;
+@}
+@end smallexample
+@end table
+@c ref
+See
+@ref{else};
+@ref{break};
+@ref{Control structures};
+@ref{boolean expressions}.
+@c ref
+@c ---------------------------------------
+@node importfrom, keepring, if, Control structures
 @subsection importfrom
 @cindex importfrom
 @table @code
@@ -7031,7 +6999,52 @@ See
 @ref{keepring}.
 @c ref
 @c ---------------------------------------
-@node load, for, importfrom, Control structures
+@node keepring, load, importfrom, Control structures
+@subsection keepring
+@cindex keepring
+@table @code
+@item @strong{Syntax:}
+@code{keepring} name @code{;}
+@item @strong{Warning:}
+This command is obsolete. Instead the respective identifiers in the ring
+should be exported and the ring itself should subsequently be returned.
+The command is only included for backward compatibility and may be 
+removed in future releases.
+
+@item @strong{Purpose:}
+moves the specified ring to the next (upper) level. This command can only
+be used inside of procedures and it should be the last command before the
+@code{return} statement. There it provides the possibility to keep
+a ring which is local to the procedure (and its objects) accessible after
+the procedure ended without making the ring global.
+
+@item @strong{Example:}
+@smallexample
+proc P1
+@{
+  ring r=0,x,dp;
+  keepring r;
+@}
+proc P2
+@{
+  "inside P2: " + nameof(basering);
+  P1();
+  "inside P2, after call of P1: " + nameof(basering);
+@}
+ring r1= 0,y,dp;
+P2();
+@expansion{} inside P2: r1
+@expansion{} inside P2, after call of P1: r
+"at top level: " + nameof(basering);
+@expansion{} at top level: r1
+@end smallexample
+@end table
+@c ref
+See
+@ref{ring}.
+@c ref
+@c ---------------------------------------
+@node load, quit, keepring, Control structures
 @subsection load
 @cindex load
 @table @code
@@ -7117,125 +7130,7 @@ See
 @c ref
 @end ifset
 @c ---------------------------------------
-@ifset namespaces
-@node for, if, load, Control structures
-@end ifset
-@ifclear namespaces
-@node for, if, export, Control structures
-@end ifclear
-@subsection for
-@cindex for
-@table @code
-@item @strong{Syntax:}
-@code{for (} init_command@code{;}
-boolean_expression@code{;}
-iterate_commands@code{)} block
-@item @strong{Purpose:}
-repetitive, conditional execution of a command block.
-@*The command init_command is executed first. Then boolean_expression is
-evaluated. If its value is TRUE the block is executed, otherwise the
-@code{for} statement is complete. After each execution of the block, the
-command iterate_command is executed and boolean_expression is
-evaluated. This is repeated until boolean_expression evaluates to FALSE.
-@*The command @code{break;} leaves the innermost @code{for} construct.
-@item @strong{Example:}
-@smallexample
-// sum of 1 to 10:
-int s=0;
-for (int i=1; i<=10; i=i+1)
-@{
-   s=s+i;
-@}
-s;
-@expansion{} 55
-@end smallexample
-@end table
-@c ref
-See
-@ref{Control structures};
-@ref{boolean expressions};
-@ref{while};
-@ref{if};
-@ref{break};
-@ref{continue}.
-@c ref
-@c ---------------------------------------
-@node if, keepring, for, Control structures
-@subsection if
-@cindex if
-@cindex else
-@table @code
-@item @strong{Syntax:}
-@code{if (} boolean_expression @code{)} true_block
-@*@code{if (} boolean_expression @code{)} true_block @code{else} false_block
-@item @strong{Purpose:}
-executes true_block if the boolean condition is true. If the @code{if}
-statement is followed by an @code{else} statement and the boolean
-condition is false, then false_block is executed.
-@item @strong{Example:}
-@smallexample
-int i = 9;
-matrix m[i][i];
-if (i > 5 and typeof(m) == "matrix")
-@{
-  m[i][i] = i;
-@}
-@end smallexample
-@end table
-@c ref
-See
-@ref{else};
-@ref{break};
-@ref{Control structures};
-@ref{boolean expressions}.
-@c ref
-@c ---------------------------------------
-@node keepring, quit, if, Control structures
-@subsection keepring
-@cindex keepring
-@table @code
-@item @strong{Syntax:}
-@code{keepring} name @code{;}
-@item @strong{Warning:}
-This command is obsolete. Instead the respective identifiers in the ring
-should be exported and the ring itself should subsequently be returned.
-The command is only included for backward compatibility and may be 
-removed in future releases.
-
-@item @strong{Purpose:}
-moves the specified ring to the next (upper) level. This command can only
-be used inside of procedures and it should be the last command before the
-@code{return} statement. There it provides the possibility to keep
-a ring which is local to the procedure (and its objects) accessible after
-the procedure ended without making the ring global.
-
-@item @strong{Example:}
-@smallexample
-proc P1
-@{
-  ring r=0,x,dp;
-  keepring r;
-@}
-proc P2
-@{
-  "inside P2: " + nameof(basering);
-  P1();
-  "inside P2, after call of P1: " + nameof(basering);
-@}
-ring r1= 0,y,dp;
-P2();
-@expansion{} inside P2: r1
-@expansion{} inside P2, after call of P1: r
-"at top level: " + nameof(basering);
-@expansion{} at top level: r1
-@end smallexample
-@end table
-@c ref
-See
-@ref{ring}.
-@c ref
-@c ---------------------------------------
-@node quit, return, keepring, Control structures
+@node quit, return, load, Control structures
 @subsection quit
 @cindex quit
 @cindex exit
