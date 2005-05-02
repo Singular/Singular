@@ -1,5 +1,5 @@
 #!/bin/sh
-# version $Id: configure,v 1.19 2005-04-30 15:29:37 Singular Exp $
+# version $Id: configure,v 1.20 2005-05-02 14:08:07 Singular Exp $
 for i in $*
 do
   case $i in
@@ -36,16 +36,16 @@ fi
 
 if test "x$CFLAGS" = x
 then
-  CFLAGS="-O3 -fomit-frame-pointer"
+  CFLAGS="-O2 -fomit-frame-pointer"
 fi
 
 if test "x$CXXFLAGS" = x
 then
   if test ac_cv_cxx_have_exception = yes
   then
-    CXXFLAGS="-O3 -fomit-frame-pointer -fno-rtti -fno-exceptions"
+    CXXFLAGS="-O2 -fomit-frame-pointer -fno-rtti -fno-exceptions"
   else
-    CXXFLAGS="-O3 -fomit-frame-pointer -fno-rtti"
+    CXXFLAGS="-O2 -fomit-frame-pointer -fno-rtti"
   fi
 fi
 CFLAGS="$CPPFLAGS $CFLAGS"
