@@ -3,7 +3,7 @@
 
 LIB "tst.lib";
 tst_init();
-tst_ignore("CVS ID $Id: solve_s.tst,v 1.4 2004-02-12 14:20:28 Singular Exp $");
+tst_ignore("CVS ID $Id: solve_s.tst,v 1.5 2005-05-02 07:42:56 Singular Exp $");
 
 LIB "solve.lib";
 
@@ -35,20 +35,28 @@ ideal im=f0,f1,f2,f3;
 ures_solve(i);
 mp_res_mat(im);
 
-fglm_solve(i,30);
+def rinC = fglm_solve(i,30);
+setring rinC;
 rlist;
 
 setring rs2;
-triangL_solve(i,30);
+kill rinC;
+def rinC = triangL_solve(i,30);
+setring rinC;
 rlist;
 
 setring rs2;
-triangLf_solve(i,30);
+kill rinC;
+def rinC = triangLf_solve(i,30);
+setring rinC;
 rlist;
 
 setring rs2;
-triangM_solve(i,30);
+kill rinC;
+def rinC = triangM_solve(i,30);
+setring rinC;
 rlist;
+kill rinC;
 
 ////////////////////////////
 

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: solve.lib,v 1.28 2005-04-25 16:57:36 Singular Exp $";
+version="$Id: solve.lib,v 1.29 2005-05-02 07:43:22 Singular Exp $";
 category="Symbolic-numerical solving";
 info="
 LIBRARY: solve.lib     Complex Solving of Polynomial Systems
@@ -45,9 +45,9 @@ ASSUME:  f is a univariate polynomial;@*
          basering has characteristic 0 and is either complex or without
          parameters. 
 RETURN:  list of (complex) roots of the polynomial f, depending on n. The 
-         result is of type
- string: if the basering is not complex,
- number: otherwise.
+         result is of type@*
+          string: if the basering is not complex,@*
+          number: otherwise.
 NOTE:    If printlevel >0: displays comments ( default = 0 ).
          If s != 0 and if the procedure stops with ERROR, try a higher
          internal precision m.
@@ -515,8 +515,8 @@ static proc addzero(list zz,string ss,int iz,int a)
 ///////////////////////////////////////////////////////////////////////////////
 
 proc solve( ideal G, list # )
-"USAGE:   solve(G [, m, n, l] ); G = ideal,
-         m, n, l = integers (control parameters of the method)
+"USAGE:   solve(G [, m, n [, l]] [,\"oldring\"] [,\"nodisplay\"] ); G = ideal,
+         m, n, l = integers (control parameters of the method), outR ring
          m: precision of output in digits ( 4 <= m) and of the
             generated ring of complex numbers;
          n: control of multiplicity
@@ -524,43 +524,134 @@ proc solve( ideal G, list # )
             n != 0, find all roots (with multiplicity)
          l: precision of internal computation in decimal digits ( l >=8 )
             only if the basering is not complex or complex with smaller
-            precision,
-         ( default: m, n, l = 8, 0, 30 or
-                    for (n != 0 and size(#) = 2) l = 60 )
+            precision, @*
+         [default: (m,n,l) = (8,0,30), or if only (m,n) are set explicitly
+          with n!=0, then (m,n,l) = (m,n,60) ]
 ASSUME:  the ideal is 0-dimensional;@*
-         basering has characteristic 0 and is either complex or
-         without parameters;
-RETURN:  list of solutions of the ideal G, depending on n; one solution is a 
-         list of complex numbers in the generated output ring (the new 
-         basering).
- The result is a list L
-    n  = 0: a list of all different solutions (L[i]),
-    n != 0: a list of two elements,
-            L[i][1] contains all different solutions with the same multiplicity
-            L[i][2] the multiplicity
- L is ordered w.r.t. multiplicity (the smallest first).
-NOTE:    If the problem is not 0-dim. the procedure stops with ERROR, if the 
-         ideal G is not a lex. standard basis, it is generated with internal 
-         computation (Hilbert driven), if the input-ring (with char 0) has 
-         the name \"<A>\", the lexicographical and complex output-ring has the 
-         name \"<A>C\".
+         basering has characteristic 0 and is either complex or without 
+         parameters;
+RETURN:  (1) If called without the additional parameter @code{\"oldring\"}: @*
+         ring @code{R} with the same number of variables but with complex 
+         coefficients (and precision m). @code{R} comes with a list 
+         @code{SOL} of numbers, in which complex roots of G are stored: @*
+         * If n  = 0, @code{SOL} is the list of all different solutions, each 
+         of them being represented by a list of numbers. @*
+         * If n != 0, @code{SOL} is a list of two list: SOL[i][1] is the list 
+         of all different solutions with the multiplicity SOL[i][2].@*
+         SOL is ordered w.r.t. multiplicity (the smallest first). @*
+         (2) If called with the additional parameter @code{\"oldring\"}, the 
+         procedure looks for an appropriate ring (on the Top level) in which 
+         the solutions can be stored (interactive). @*
+         The user may then select an appropriate ring and choose a name for 
+         the output list in this ring. The list is exported directly to the 
+         selected ring and the return value is a string \"result exported to\"
+         + name of the selected ring.
+NOTE:    If the problem is not 0-dim. the procedure stops with ERROR. If the 
+         ideal G is not a lexicographic Groebner basis, the lexicographic 
+         Groebner basis is computed internally (Hilbert driven).  @*
+         The computed solutions are displayed, unless @code{solve} is called
+         with the additional parameter @code{\"nodisplay\"}.
 EXAMPLE: example solve; shows an example
 "
 {
 // test if basering admissible
   if (char(basering)!=0){ERROR("characteristic of basering not 0");}
-  if ((charstr(basering)[1]=="0") and (npars(basering)!=0)){ERROR("basering has parameters");}
+  if ((charstr(basering)[1]=="0") and (npars(basering)!=0)){
+    ERROR("basering has parameters");
+  }
 
 // some global settings and control
+  int oldr, nodisp, ii, jj;
+  list LL;
   int outprec = 8;
   int mu = 0;
   int prec = 30;
-  if (size(#)>0){outprec = #[1];if (outprec<4){outprec = 4;}}
-  if (size(#)>1){mu = #[2];}
-  if (size(#)>2){prec = #[3];if (prec<8){prec = 8;}}
-  else {if(mu!=0){prec = 60;}}
+  // check additional parameters...
+  if (size(#)>0){
+    int sofar=1;
+    if (typeof(#[1])=="int"){
+      outprec = #[1];
+      if (outprec<4){outprec = 4;}
+      if (size(#)>1){
+        if (typeof(#[2])=="int"){ 
+          mu = #[2];
+          if (size(#)>2){
+            if (typeof(#[3])=="int"){ 
+              prec = #[3];
+              if (prec<8){prec = 8;}
+            }
+            else {
+              if(mu!=0){prec = 60;}
+              if (#[3]=="oldring"){ oldr=1; }
+              if (#[3]=="nodisplay"){ nodisp=1; }
+            }
+            sofar=3;
+          }
+        }
+        else {
+          if (#[2]=="oldring"){ oldr=1; }
+          if (#[2]=="nodisplay"){ nodisp=1; }
+        }
+        sofar=2;
+      }
+    }
+    else {
+      if (#[1]=="oldring"){ oldr=1; }
+      if (#[1]=="nodisplay"){ nodisp=1; }
+    }   
+    for (ii=sofar+1;ii<=size(#);ii++) { // check for additional strings
+       if (#[ii]=="oldring"){ oldr=1; }
+       if (#[ii]=="nodisplay"){ nodisp=1; }
+    }
+  }   
   if (outprec>prec){prec = outprec;}
-  string rinC = nameof(basering)+"C";
+
+  // if interaktive version is chosen -- choice of basering (Top::`outR`)
+  // and name for list of solutions (outL):
+  if (oldr==1) {
+    list Out; 
+    LL=names(Top);
+    for (ii=1;ii<=size(LL);ii++)
+    { 
+      if (typeof(`LL[ii]`)=="ring") {
+        if (find(charstr(`LL[ii]`),"complex,"+string(outprec))){
+          jj++;
+          Out[jj]=LL[ii];
+        }
+      }
+    }
+    if (size(Out)>0) {
+      print("// *** You may select between the following rings for storing "+
+            "the list of");
+      print("// *** complex solutions:");
+      Out;
+      print("// *** Enter the number of the chosen ring");
+      print("// ***  (0: none of them => new ring created and returned)");
+      string chosen;
+      while (chosen=="") { chosen=read(""); }
+      execute("def tchosen = "+chosen);
+      if (typeof(tchosen)=="int") {
+        if ((tchosen>0) and (tchosen<=size(Out))) {
+          string outR = Out[tchosen];
+          print("// *** You have chosen the ring "+ outR +". In this ring"
+                +" the following objects");
+          print("//*** are defined:");
+          listvar(Top::`outR`);
+          print("// *** Enter a name for the list of solutions (different "+
+                "from existing names):"); 
+          string outL;
+          while (outL==""){ outL=read(""); }
+        }
+      }
+    }
+    else {
+      print("No appropriate ring for storing the list of solutions found " +
+             "=> new ring created and returned");
+    }
+    if (not(defined(outR))) { oldr=0; }   
+  }
+
+//  string rinC = nameof(basering)+"C";
   string sord = ordstr(basering);
   int nv = nvars(basering);
   def rin = basering;
@@ -577,7 +668,7 @@ EXAMPLE: example solve; shows an example
 // ERROR
   if (sb){if (dim(G)!=0){ERROR("ideal not zero-dimensional");}}
 
-// the trivial homog case
+// the trivial homogeneous case (unique solution: (0,...0))
   if (homog(G))
   {
     if (sb==0)
@@ -586,40 +677,57 @@ EXAMPLE: example solve; shows an example
       varstr(rin)+"),dp;");
       ideal G = std(imap(rin,G));
       if (dim(G)!=0){ERROR("ideal not zero-dimensional");}
+      int vdG=vdim(G);
     }
-    changering(rinC,outprec);
-    list ret0;
-    if (mu==0){ret0[1] = zerolist(nv);}
-    else{ret0[1] = list(zerolist(nv),list(vdim(G)));}
-    option(set,ovec);
-    keepring basering;
-    return(ret0);
+    if (oldr!=1) { 
+      execute("ring rinC =(complex,"+string(outprec)+
+                 "),("+varstr(basering)+"),lp;"); 
+      list SOL;
+      if (mu==0){SOL[1] = zerolist(nv);}
+      else{SOL[1] = list(zerolist(nv),list(vdG));}
+      export SOL;
+      if (nodisp==0) { print(SOL); }
+      option(set,ovec);
+      dbprint( printlevel-voice+3,"
+// 'solve' created a ring, in which a list SOL of numbers (the complex solutions)
+// is stored. 
+// To access the list of complex solutions, type (if the name R was assigned 
+// to the return value): 
+        setring R; SOL; ");
+      return(rinC);
+    }
+    else {
+      setring (Top::`outR`);
+      list SOL;
+      if (mu==0){SOL[1] = zerolist(nv);}
+      else{SOL[1] = list(zerolist(nv),list(vdG));}
+      execute("def "+outL + "=SOL;");
+      execute("export "+outL+";");
+      if (nodisp==0) { print(SOL); }
+      option(set,ovec);
+      kill SOL;
+      return("result exported to "+outR+" as list "+outL);
+    }
   }
 
 // look for reduced standard basis in lex
-  if (sb*lp==0)
-  {
-    if (sb==0)
-    {
-      execute("ring dphilb=("+charstr(rin)+"),("+
-      varstr(rin)+"),dp;");
+  if (sb*lp==0) {
+    if (sb==0) {
+      execute("ring dphilb=("+charstr(rin)+"),("+ varstr(rin)+"),dp;");
       ideal G = imap(rin,G);
       G = std(G);
       if (dim(G)!=0){ERROR("ideal not zero-dimensional");}
     }
-    else
-    {
+    else {
       def dphilb = basering;      
     }    
-    execute("ring lexhilb=("+charstr(rin)+"),("+
-    varstr(rin)+"),lp;");
+    execute("ring lexhilb=("+charstr(rin)+"),("+ varstr(rin)+"),lp;");
     option(redTail);
     ideal H = fglm(dphilb,G);
     kill dphilb;
     H = simplify(H,2);
     if (lp){setring rin;}
-    else
-    {
+    else {
       execute("ring lplex=("+charstr(rin)+"),("+
       varstr(rin)+"),lp;");
     }
@@ -630,47 +738,95 @@ EXAMPLE: example solve; shows an example
 
 // only 1 variable
   def hr = basering;
-  if (nv==1)
-  {
-    if ((mu==0) and (charstr(basering)[1]=="0")) // special case 
-    {
+  if (nv==1) {
+    if ((mu==0) and (charstr(basering)[1]=="0")) { // special case 
       list L = laguerre_solve(H[1],prec,prec,mu,0); // list of strings
-      changering(rinC,outprec);
-      list sp;
-      for (int ii=1; ii<=size(L); ii++ ) 
-      { 
-        execute("sp[ii]="+L[ii]); 
+      if (oldr!=1) { 
+        execute("ring rinC =(complex,"+string(outprec)+
+                   "),("+varstr(basering)+"),lp;"); 
+        list SOL;
+        for (ii=1; ii<=size(L); ii++ ) { execute("SOL[ii]="+L[ii]+";"); }
+        export SOL;
+        if (nodisp==0) { print(SOL); }
+        option(set,ovec);
+        dbprint( printlevel-voice+3,"
+// 'solve' created a ring, in which a list SOL of numbers (the complex solutions)
+// is stored. 
+// To access the list of complex solutions, type (if the name R was assigned 
+// to the return value): 
+        setring R; SOL; ");
+        return(rinC);
       }
-      keepring basering;
-      return(sp);
+      else {
+        setring (Top::`outR`);
+        list SOL;
+        for (ii=1; ii<=size(L); ii++ ) { execute("SOL[ii]="+L[ii]+";"); }
+        execute("def "+outL + "=SOL;");
+        execute("export "+outL+";");
+        if (nodisp==0) { print(SOL); }
+        option(set,ovec);
+        kill SOL;
+        return("result exported to "+outR+" as list "+outL);
+      }
     }
-    else
-    {
+    else {
       execute("ring internC=(complex,"+string(prec)+
                  "),("+varstr(basering)+"),lp;");
-
       ideal H = imap(hr,H);
       list sp = splittolist(splitsqrfree(H[1],var(1)));
-      int jj = size(sp);
+      jj = size(sp);
       while(jj>0)
       {
         sp[jj][1] = laguerre(sp[jj][1],prec,1);
         jj--;
       }
       setring hr;
-      changering(rinC,outprec);
-      list sp=imap(internC,sp);
-
-      keepring basering;
-      if(mu!=0){return(sp);}
-      jj = size(sp);
-      list ll=sp[jj][1];
-      while(jj>1)
-      {
-        jj--;
-        ll = sp[jj][1]+ll;
+      if (oldr!=1) { 
+        execute("ring rinC =(complex,"+string(outprec)+
+                 "),("+varstr(basering)+"),lp;"); 
+        list SOL;
+        list sp=imap(internC,sp);
+        if(mu!=0){ SOL=sp; }
+        else {
+          jj = size(sp);
+          SOL=sp[jj][1];
+          while(jj>1) {
+            jj--;
+            SOL = sp[jj][1]+SOL;
+          }
+        }
+        export SOL;
+        if (nodisp==0) { print(SOL); }
+        option(set,ovec);
+        dbprint( printlevel-voice+3,"
+// 'solve' created a ring, in which a list SOL of numbers (the complex solutions)
+// is stored. 
+// To access the list of complex solutions, type (if the name R was assigned 
+// to the return value): 
+        setring R; SOL; ");
+        return(rinC);
       }
-      return(ll);
+      else {
+        setring (Top::`outR`);
+        list SOL;
+        list sp=imap(internC,sp);
+        if(mu!=0){ SOL=sp; }
+        else {
+          jj = size(sp);
+          SOL=sp[jj][1];
+          while(jj>1) {
+            jj--;
+            SOL = sp[jj][1]+SOL;
+          }
+        }
+        kill sp;
+        execute("def "+outL + "=SOL;");
+        execute("export "+outL+";");
+        if (nodisp==0) { print(SOL); }
+        option(set,ovec);
+        kill SOL;
+        return("result exported to "+outR+" as list "+outL);
+      }
     }    
   }    
   
@@ -694,7 +850,8 @@ EXAMPLE: example solve; shows an example
   }
   else
   {
-    changering(rinC,prec);
+    execute("ring rinC =(complex,"+string(outprec)+
+                 "),("+varstr(basering)+"),lp;"); 
   }
   list triC = imap(hr,sp);
 
@@ -723,88 +880,91 @@ EXAMPLE: example solve; shows an example
 
 // final computations
   option(set,ovec);
-  if (outprec==prec)
-  {
-    keepring basering;
-    return(ret1);
+  if (outprec==prec) { // we are in ring rinC
+    if (oldr!=1) {
+      list SOL=ret1;
+      export SOL;
+      if (nodisp==0) { print(SOL); }
+      dbprint( printlevel-voice+3,"
+// 'solve' created a ring, in which a list SOL of numbers (the complex solutions)
+// is stored. 
+// To access the list of complex solutions, type (if the name R was assigned 
+// to the return value): 
+        setring R; SOL; ");
+      return(rinC);
+    }
+    else {
+      setring (Top::`outR`);
+      list SOL=imap(rinC,ret1);
+      execute("def "+outL + "=SOL;");
+      execute("export "+outL+";");
+      if (nodisp==0) { print(SOL); }
+      kill SOL;
+      return("result exported to "+outR+" as list "+outL);    
+    }
   }
-  changering(rinC,outprec);
-  keepring basering;
-  return(imap(internC,ret1));
+  else {
+    if (oldr!=1) {
+      execute("ring rinC =(complex,"+string(outprec)+
+                 "),("+varstr(basering)+"),lp;"); 
+      list SOL=imap(internC,ret1);
+      export SOL;
+      if (nodisp==0) { print(SOL); }
+      dbprint( printlevel-voice+3,"
+// 'solve' created a ring, in which a list SOL of numbers (the complex solutions)
+// is stored. 
+// To access the list of complex solutions, type (if the name R was assigned 
+// to the return value): 
+        setring R; SOL; ");
+      return(rinC);
+    }
+    else {
+      setring (Top::`outR`);
+      list SOL=imap(internC,ret1);
+      execute("def "+outL + "=SOL;");
+      execute("export "+outL+";");
+      if (nodisp==0) { print(SOL); }
+      kill SOL;
+      return("result exported to "+outR+" as list "+outL);    
+    }
+  }
 }
 example
 {
     "EXAMPLE:";echo=2;
     // Find all roots of a multivariate ideal using triangular sets:
-    int d=4;// with these 3 parameters you may construct
-    int t=3;// very hard problems for 'solve'
-    int s=2;
+    int d,t,s = 4,3,2 ; 
     int i;
-    ring A=0,(x(1..d)),dp;
+    ring A=0,x(1..d),dp;
     poly p=-1;
-    for(i=d;i>0;i--){p=p+x(i)^s;}
-    ideal I=x(d)^t-x(d)^s+p;
-    for(i=d-1;i>0;i--){I=x(i)^t-x(i)^s+p,I;}
+    for (i=d; i>0; i--) { p=p+x(i)^s; }
+    ideal I = x(d)^t-x(d)^s+p;
+    for (i=d-1; i>0; i--) { I=x(i)^t-x(i)^s+p,I; }
     I;
-    // the mutiplicity is
+    // the multiplicity is
     vdim(std(I));
-    list l1=solve(I,6,0);
-    // the current ring is
-    AC;
+    def AC=solve(I,6,0,"nodisplay");  // solutions should not be displayed
+    // list of solutions is stored in AC as the list SOL (default name)
+    setring AC;
+    size(SOL);               // number of different solutions
+    SOL[5];                  // the 5th solution
     // you must start with char. 0
     setring A;
-    list l2=solve(I,6,1);
-    // the number of different solutions is
-    size(l1);
-    // this is equal to
-    size(l2[1][1])+size(l2[2][1]);
-    // the number of solutions with multiplicity is
-    size(l2[1][1])*l2[1][2]+size(l2[2][1])*l2[2][2];
-    // the solutions with multiplicity
-    l2[2][2];
-    // are
-    l2[2][1];
+    def AC1=solve(I,6,1,"nodisplay");
+    setring AC1;
+    size(SOL);               // number of different multiplicities
+    SOL[1][1][1];            // a solution with
+    SOL[1][2];               // multiplicity 1
+    SOL[2][1][1];            // a solution with
+    SOL[2][2];               // multiplicity 12
+    // the number of different solutions is equal to
+    size(SOL[1][1])+size(SOL[2][1]);
+    // the number of complex solutions (counted with multiplicities) is
+    size(SOL[1][1])*SOL[1][2]+size(SOL[2][1])*SOL[2][2];
 }
 //////////////////////////////////////////////////////////////////////////////
 //                subprocedures for solve
 
-/* ----------------------- support ----------------------- */
-/*
-* the complex ring with precision outprec
-* has the well defined name: rinC
-* 1. if such a ring exists with the precision outprec,
-*    this will be the current ring
-* 2. otherwise such a ring will be created
-*/
-static proc changering(string rinC, int outprec)
-{
-  string rinDC = "ring "+rinC+"=(complex,"+string(outprec)+
-                 "),("+varstr(basering)+"),lp;";
-  string h = "int ex=defined("+rinC+");";
-
-  execute(h);
-  if (ex)
-  {
-    h = "setring "+rinC+";";
-    execute(h);
-    if (system("getPrecDigits")==outprec)
-    {"// name of current ring: "+rinC;}
-    else
-    {
-      execute("kill "+rinC+";");
-      execute(rinDC);
-      execute("export "+rinC+";");
-      "// name of new current ring: "+rinC;
-    }
-  }
-  else
-  {
-    execute(rinDC);
-    execute("export "+rinC+";");
-    "// name of new current ring: "+rinC;
-  }
-  keepring basering;
-}
 
 /*
 * return one zero-solution
@@ -1334,10 +1494,12 @@ example
     ideal v=16,0,11376,1046880,85949136;
     interpolate( 3, v, 4 );
 }
-///////////////////////////////////////////////////////////////////////////////
 
+///////////////////////////////////////////////////////////////////////////////
+// changed for Singular 3
+// Return value is now a list: (rlist, rn@)
 static proc psubst( int d, int dd, int n, list resl,
-                    ideal fi, int elem, int nv, int prec )
+                    ideal fi, int elem, int nv, int prec, int rn@, list rlist)
 {
     //   nv: number of ring variables         (fixed value)
     // elem: number of elements in ideal fi   (fixed value)
@@ -1348,10 +1510,11 @@ static proc psubst( int d, int dd, int n, list resl,
     //   dd: actual element of fi
     //    d: actual variable
 
+    list LL;
+    int pdebug;
     int olddd=dd;
 
-    if ( pdebug>=1 )
-    {"// 0 step "+string(dd)+" of "+string(elem);}
+    dbprint(printlevel-voice+2, "// 0 step "+string(dd)+" of "+string(elem) );
 
     if ( dd <= elem )
     {
@@ -1361,8 +1524,7 @@ static proc psubst( int d, int dd, int n, list resl,
         poly ps;
         int thedd;
 
-        if ( pdebug>=1 )
-        {"// 1 dd = "+string(dd);}
+        dbprint( printlevel-voice+1,"// 1 dd = "+string(dd) );
 
         thedd=0;
         while ( (dd+1 <= elem) && loop )
@@ -1371,12 +1533,11 @@ static proc psubst( int d, int dd, int n, list resl,
 
             if ( n-1 > 0 )
             {
-                if ( pdebug>=2 )
-                {
+                dbprint( printlevel-voice,
                     "// 2 ps=fi["+string(dd+1)+"]"+" size="
                         +string(size(coeffs(ps,var(n-1))))
-                        +"  leadexp(ps)="+string(leadexp(ps));
-                }
+                        +"  leadexp(ps)="+string(leadexp(ps)) );
+
                 if ( size(coeffs(ps,var(n-1))) == 1 )
                 {
                     dd++;
@@ -1391,37 +1552,31 @@ static proc psubst( int d, int dd, int n, list resl,
             }
             else
             {
-                if ( pdebug>=2 )
-                {
+                dbprint( printlevel-voice,
                     "// 2 ps=fi["+string(dd+1)+"]"+"  leadexp(ps)="
-                        +string(leadexp(ps));
-                }
+                        +string(leadexp(ps)) );
                 dd++;
             }
         }
         thedd=dd;
         ps= fi[thedd];
 
-        if ( pdebug>=1 )
-        {
+        dbprint( printlevel-voice+1,
             "// 3    fi["+string(thedd-1)+"]"+"  leadexp(fi[thedd-1])="
-                +string(leadexp(fi[thedd-1]));
+                +string(leadexp(fi[thedd-1])) );
+        dbprint( printlevel-voice+1,
             "// 3 ps=fi["+string(thedd)+"]"+"  leadexp(ps)="
-                +string(leadexp(ps));
-        }
+                +string(leadexp(ps)) );
 
         for ( k= nv; k > nv-d; k-- )
         {
-            if ( pdebug>=2 )
-            {
+            dbprint( printlevel-voice,
                 "// 4 subst(fi["+string(thedd)+"],"
-                    +string(var(k))+","+string(resl[k])+");";
-            }
+                    +string(var(k))+","+string(resl[k])+");" );
             ps = subst(ps,var(k),resl[k]);
         }
 
-        if ( pdebug>=2 )
-        { "// 5 substituted ps="+string(ps); }
+        dbprint( printlevel-voice, "// 5 substituted ps="+string(ps) ); 
 
         if ( ps != 0 )
         {
@@ -1429,22 +1584,20 @@ static proc psubst( int d, int dd, int n, list resl,
         }
         else
         {
-            if ( pdebug>=1 )
-            { "// 30 ps == 0, thats not cool..."; }
-            lsr=@ln; // lsr=number(0);
+            dbprint( printlevel-voice+1,"// 30 ps == 0, thats not cool...");
+            lsr=list(number(0)); 
         }
 
-        if ( pdebug>=1 )
-        { "// 6 laguerre_solve found roots: lsr["+string(size(lsr))+"]"; }
+        dbprint( printlevel-voice+1, 
+         "// 6 laguerre_solve found roots: lsr["+string(size(lsr))+"]" ); 
 
         if ( size(lsr) > 1 )
         {
-            if ( pdebug>=1 )
-            {
+            dbprint( printlevel-voice+1,  
                 "// 10 checking roots found before, range "
-                    +string(dd-olddd)+" -- "+string(dd);
-                "// 10 thedd = "+string(thedd);
-            }
+                    +string(dd-olddd)+" -- "+string(dd) );
+            dbprint( printlevel-voice+1,  
+                "// 10 thedd = "+string(thedd) );
 
             int i,j,l;
             int ls=size(lsr);
@@ -1524,7 +1677,7 @@ static proc psubst( int d, int dd, int n, list resl,
             {
                 "Numerical problem: No root found...";
                 "Output may be incorrect!";
-                nares=@ln;
+                nares=list(number(0));
             }
 
             if ( pdebug>=1 )
@@ -1540,16 +1693,18 @@ static proc psubst( int d, int dd, int n, list resl,
                     {
                         rn@++;  
                     }
-                    psubst( d+1, dd+1, n-1, resl, fi, elem, nv, prec );
+                    LL = psubst( d+1, dd+1, n-1, resl, fi, elem, nv, prec, 
+                                 rn@, rlist );
+                    rlist = LL[1];
+                    rn@ = LL[2];
                 }
                 else
                 {
-                    if ( i > 1 ) {  rn@++; }  //bug found by O.Labs
-                    if ( pdebug>=1 )
-                    {"// 30_1 <"+string(rn@)+"> "+string(size(resl))+" <-----";}
-                    if ( pdebug>=2 )
-                    { resl; }
-                    rlist[rn@]=resl;
+                   if ( i > 1 ) {  rn@++; }  //bug found by O.Labs
+                   if ( pdebug>=1 )
+                   {"// 30_1 <"+string(rn@)+"> "+string(size(resl))+" <-----";}
+                   if ( pdebug>=2 ){ resl; }
+                   rlist[rn@]=resl;
                 }
             }
         }
@@ -1561,7 +1716,10 @@ static proc psubst( int d, int dd, int n, list resl,
 
             if ( dd < elem )
             {
-                psubst( d+1, dd+1, n-1, resl, fi, elem, nv, prec );
+                LL= psubst( d+1, dd+1, n-1, resl, fi, elem, nv, prec, 
+                            rn@, rlist );
+                rlist = LL[1];
+                rn@ = LL[2];
             }
             else
             {
@@ -1573,6 +1731,7 @@ static proc psubst( int d, int dd, int n, list resl,
             }
         }
     }
+    return(list(rlist,rn@));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1580,13 +1739,13 @@ static proc psubst( int d, int dd, int n, list resl,
 proc fglm_solve( ideal fi, list # )
 "USAGE:   fglm_solve(i [, p] ); i ideal, p integer
 ASSUME:  the ground field has char 0.
-RETURN:  a list of numbers, the complex roots of i; 
-         p>0: gives precision of complex numbers in decimal digits (default: 
-         p=30). 
+RETURN:  ring @code{R} with the same number of variables but with complex 
+         coefficients (and precision p). @code{R} comes with a list 
+         @code{rlist} of numbers, in which the complex roots of i are stored.@*
+         p>0: gives precision of complex numbers in decimal digits [default: 
+         p=30]. 
 NOTE:    The procedure uses a standard basis of i to determine all complex 
          roots of i.
-         It creates a ring rC with the same number of variables but with 
-         complex coefficients (and precision p).
 EXAMPLE: example fglm_solve; shows an example
 "
 {
@@ -1597,17 +1756,23 @@ EXAMPLE: example fglm_solve; shows an example
         prec=#[1];
     }
 
-    lex_solve(stdfglm(fi),prec);
-    keepring basering;
+    def R = lex_solve(stdfglm(fi),prec);
+    dbprint( printlevel-voice+3,"
+// 'fglm_solve' created a ring, in which a list rlist of numbers (the
+// complex solutions) is stored. 
+// To access the list of complex solutions, type (if the name R was assigned 
+// to the return value): 
+        setring R; rlist; ");
+    return(R);
 }
 example
 {
     "EXAMPLE:";echo=2;
     ring r = 0,(x,y),lp;
     // compute the intersection points of two curves
-    ideal s=  x2 + y2 - 10, x2 + xy + 2y2 - 16;
-    fglm_solve(s,10);
-    rlist;
+    ideal s =  x2 + y2 - 10, x2 + xy + 2y2 - 16;
+    def R = fglm_solve(s,10);
+    setring R; rlist;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1617,50 +1782,30 @@ proc lex_solve( ideal fi, list # )
   p>0: gives precision of complex numbers in decimal digits (default: p=30).
 ASSUME:  i is a reduced lexicographical Groebner bases of a zero-dimensional 
          ideal, sorted by increasing leading terms.
-RETURN:  nothing
-CREATE:  The procedure creates a complec ring with the same variables but
-         with complex coefficients (and precision p).
-         In this ring a list rlist of numbers is created, in which the complex
-         roots of i are stored.
+RETURN:  ring @code{R} with the same number of variables but with complex 
+         coefficients (and precision p). @code{R} comes with a list 
+         @code{rlist} of numbers, in which the complex roots of i are stored.
 EXAMPLE: example lex_solve; shows an example
 "
 {
     int prec=30;
+    list LL;
 
     if ( size(#)>=1  && typeof(#[1])=="int")
     {
         prec=#[1];
     }
 
-    if ( !defined(pdebug) )
-    {
-        int pdebug;
-        pdebug=0;
-        export pdebug;
-    }
-
-    string orings= nameof(basering);
+    if ( !defined(pdebug) ) { int pdebug; }
     def oring= basering;
 
     // change the ground field to complex numbers
-    string nrings= "ring "+orings+"C=(complex,"+string(prec)
+    string nrings= "ring RC =(complex,"+string(prec)
         +"),("+varstr(basering)+"),lp;";
     execute(nrings);
 
-    if ( pdebug>=0 )
-    { "// name of new ring: "+string(nameof(basering));}
-
     // map fi from old to new ring
     ideal fi= imap(oring,fi);
-
-    // list with entry 0 (number)
-    number nn=0;
-    if ( !defined(@ln) )
-    {
-        list @ln;
-        export @ln;
-    }
-    @ln=nn;
 
     int idelem= size(fi);
     int nv= nvars(basering);
@@ -1673,42 +1818,39 @@ EXAMPLE: example lex_solve; shows an example
         export rlist;
     }
 
-    if ( !defined(rn@) )
-    {
-        int rn@;
-        export rn@;
-    }
-    rn@=0;
-
     li= laguerre_solve(fi[1],prec,prec,0);
     lis= size(li);
 
-    if ( pdebug>=1 )
-    {"// laguerre found roots: "+string(size(li));}
+    dbprint(printlevel-voice+2,"// laguerre found roots: "+string(size(li)));
+    int rn@;
 
     for ( j= 1; j <= lis; j++ )
     {
-        if ( pdebug>=1 )
-        {"// root "+string(j);}
+        dbprint(printlevel-voice+1,"// root "+string(j) );
         rn@++;
         resl[nv]= li[j];
-        psubst( 1, 2, nv-1, resl, fi, idelem, nv, prec );
+        LL = psubst( 1, 2, nv-1, resl, fi, idelem, nv, prec, rn@, rlist );
+        rlist=LL[1];
+        rn@=LL[2];
     }
 
-    if ( pdebug>=0 )
-    {"// list of roots: "+nameof(rlist);}
+    dbprint( printlevel-voice+3,"
+// 'lex_solve' created a ring, in which a list rlist of numbers (the
+// complex solutions) is stored. 
+// To access the list of complex solutions, type (if the name R was assigned 
+// to the return value): 
+        setring R; rlist; ");
 
-    // keep the ring and exit
-    keepring basering;
+    return(RC);
 }
 example
 {
     "EXAMPLE:";echo=2;
     ring r = 0,(x,y),lp;
     // compute the intersection points of two curves
-    ideal s=  x2 + y2 - 10, x2 + xy + 2y2 - 16;
-    lex_solve(stdfglm(s),10);
-    rlist;
+    ideal s =  x2 + y2 - 10, x2 + xy + 2y2 - 16;
+    def R = lex_solve(stdfglm(s),10);
+    setring R; rlist;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1717,14 +1859,13 @@ proc triangLf_solve( ideal fi, list # )
 "USAGE:   triangLf_solve(i [, p] ); i ideal, p integer,
          p>0: gives precision of complex numbers in digits (default: p=30).
 ASSUME:  the ground field has char 0;  i is a zero-dimensional ideal
-RETURN:  nothing
-CREATE:  The procedure creates a ring rC with the same number of variables but
-         with complex coefficients (and precision p).@*
-         In rC a list rlist of numbers is created, in which the complex
-         roots of i are stored.@*
-         The proc uses a triangular system (Lazard's Algorithm with 
-         factorization) computed from a standard basis to determine recursively 
-         all complex roots with Laguerre's algorithm of input ideal i.
+RETURN:  ring @code{R} with the same number of variables but with complex 
+         coefficients (and precision p). @code{R} comes with a list 
+         @code{rlist} of numbers, in which the complex roots of i are stored.
+NOTE:    The proc uses a triangular system (Lazard's Algorithm with 
+         factorization) computed from a standard basis to determine 
+         recursively all complex roots of the input ideal i with Laguerre's 
+         algorithm. 
 EXAMPLE: example triangLf_solve; shows an example
 "
 {
@@ -1735,17 +1876,23 @@ EXAMPLE: example triangLf_solve; shows an example
         prec=#[1];
     }
 
-    triang_solve(triangLfak(stdfglm(fi)),prec);
-    keepring basering;
+    def R=triang_solve(triangLfak(stdfglm(fi)),prec);
+    dbprint( printlevel-voice+3,"
+// 'triangLf_solve' created a ring, in which a list rlist of numbers (the
+// complex solutions) is stored. 
+// To access the list of complex solutions, type (if the name R was assigned 
+// to the return value): 
+        setring R; rlist; ");
+    return(R);
 }
 example
 {
     "EXAMPLE:";echo=2;
     ring r = 0,(x,y),lp;
     // compute the intersection points of two curves
-    ideal s=  x2 + y2 - 10, x2 + xy + 2y2 - 16;
-    triangLf_solve(s,10);
-    rlist;
+    ideal s = x2 + y2 - 10, x2 + xy + 2y2 - 16;
+    def R = triangLf_solve(s,10);
+    setring R; rlist;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1755,12 +1902,10 @@ proc triangM_solve( ideal fi, list # )
          p>0: gives precision of complex numbers in digits (default: p=30).
 ASSUME:  the ground field has char 0;@*
          i zero-dimensional ideal
-RETURN:  nothing
-CREATE:  The procedure creates a ring rC with the same number of variables but
-         with complex coefficients (and precision p).@*
-         In rC a list rlist of numbers is created, in which the complex
-         roots of i are stored.@*
-         The proc uses a triangular system (Moellers Algorithm) computed from a
+RETURN:  ring @code{R} with the same number of variables but with complex 
+         coefficients (and precision p). @code{R} comes with a list 
+         @code{rlist} of numbers, in which the complex roots of i are stored.
+NOTE:    The proc uses a triangular system (Moellers Algorithm) computed from a
          standard basis to determine recursively all complex roots with 
          Laguerre's algorithm of input ideal i.
 EXAMPLE: example triangM_solve; shows an example
@@ -1773,17 +1918,23 @@ EXAMPLE: example triangM_solve; shows an example
         prec=#[1];
     }
 
-    triang_solve(triangM(stdfglm(fi)),prec);
-    keepring basering;
+    def R = triang_solve(triangM(stdfglm(fi)),prec);
+    dbprint( printlevel-voice+3,"
+// 'triangM_solve' created a ring, in which a list rlist of numbers (the
+// complex solutions) is stored. 
+// To access the list of complex solutions, type (if the name R was assigned 
+// to the return value): 
+        setring R; rlist; ");
+    return(R);
 }
 example
 {
     "EXAMPLE:";echo=2;
     ring r = 0,(x,y),lp;
     // compute the intersection points of two curves
-    ideal s=  x2 + y2 - 10, x2 + xy + 2y2 - 16;
-    triangM_solve(s,10);
-    rlist;
+    ideal s =  x2 + y2 - 10, x2 + xy + 2y2 - 16;
+    def R = triangM_solve(s,10);
+    setring R; rlist;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1792,12 +1943,10 @@ proc triangL_solve( ideal fi, list # )
 "USAGE:   triangL_solve(i [, p] ); i=ideal, p=integer,@*
          p>0: gives precision of complex numbers in digits (default: p=30).
 ASSUME:  the ground field has char 0; i is a zero-dimensional ideal.
-RETURN:  nothing
-CREATE:  The procedure creates a ring rC with the same number of variables but
-         with complex coefficients (and precision p).@*
-         In rC a list rlist of numbers is created, in which the complex
-         roots of i are stored.@*
-         The proc uses a triangular system (Lazard's Algorithm) computed from 
+RETURN:  ring @code{R} with the same number of variables but with complex 
+         coefficients (and precision p). @code{R} comes with a list 
+         @code{rlist} of numbers, in which the complex roots of i are stored.
+NOTE:    The proc uses a triangular system (Lazard's Algorithm) computed from 
          a standard basis to determine recursively all complex roots with 
          Laguerre's algorithm of input ideal i.
 EXAMPLE: example triangL_solve; shows an example
@@ -1810,24 +1959,30 @@ EXAMPLE: example triangL_solve; shows an example
         prec=#[1];
     }
 
-    triang_solve(triangL(stdfglm(fi)),prec);
-    keepring basering;
+    def R=triang_solve(triangL(stdfglm(fi)),prec);
+    dbprint( printlevel-voice+3,"
+// 'triangL_solve' created a ring, in which a list rlist of numbers (the
+// complex solutions) is stored. 
+// To access the list of complex solutions, type (if the name R was assigned 
+// to the return value): 
+        setring R; rlist; ");
+    return(R);
 }
 example
 {
     "EXAMPLE:";echo=2;
     ring r = 0,(x,y),lp;
     // compute the intersection points of two curves
-    ideal s=  x2 + y2 - 10, x2 + xy + 2y2 - 16;
-    triangL_solve(s,10);
-    rlist;
+    ideal s =  x2 + y2 - 10, x2 + xy + 2y2 - 16;
+    def R = triangL_solve(s,10);
+    setring R; rlist;
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
 
 proc triang_solve( list lfi, int prec, list # )
-"USAGE:   triang_solve(l,p [, d] ); l=list, p,d=integers,@*
+"USAGE:   triang_solve(l,p [,d] ); l=list, p,d=integers@*
          l a list of finitely many triangular systems, such that the union of 
          their varieties equals the variety of the initial ideal.@*
          p>0: gives precision of complex numbers in digits,@*
@@ -1836,46 +1991,27 @@ proc triang_solve( list lfi, int prec, list # )
 ASSUME:  the ground field has char 0;@*
          l was computed using Algorithm of Lazard or Algorithm of Moeller
          (see triang.lib).
-RETURN:  nothing
-CREATE:  The procedure creates a ring rC with the same number of variables but
-         with complex coefficients (and precision p).@*
-         In rC a list rlist of numbers is created, in which the complex
-         roots of i are stored.@*
+RETURN:  ring @code{R} with the same number of variables but with complex 
+         coefficients (and precision p). @code{R} comes with a list 
+         @code{rlist} of numbers, in which the complex roots of l are stored.@*
 EXAMPLE: example triang_solve; shows an example
 "
 {
-    if ( !defined(pdebug) )
-    {
-        int pdebug;
-        export pdebug;
-    }
-    pdebug=0;
-
-    string orings= nameof(basering);
     def oring= basering;
+    list LL;
 
     // change the ground field to complex numbers
-    string nrings= "ring "+orings+"C=(real,"+string(prec)
+    string nrings= "ring RC =(complex,"+string(prec)
         +",I),("+varstr(basering)+"),lp;";
     execute(nrings);
 
-    if ( pdebug>=0 )
-    { "// name of new ring: "+string(nameof(basering));}
-
     // list with entry 0 (number)
     number nn=0;
-    if ( !defined(@ln) )
-    {
-        list @ln;
-        export @ln;
-    }
-    @ln=nn;
 
     // set number of digits for zero-comparison of roots
     if ( !defined(myCompDigits) )
     {
         int myCompDigits;
-        export  myCompDigits;
     }
     if ( size(#)>=1  && typeof(#[1])=="int" )
     {
@@ -1886,12 +2022,11 @@ EXAMPLE: example triang_solve; shows an example
         myCompDigits=(system("getPrecDigits"));
     }
 
-    if ( pdebug>=1 )
-    {"// myCompDigits="+string(myCompDigits);}
+    dbprint( printlevel-voice+2,"// myCompDigits="+string(myCompDigits) );
 
     int idelem;
     int nv= nvars(basering);
-    int i,j,k,lis;
+    int i,j,lis;
     list resu,li;
 
     if ( !defined(rlist) )
@@ -1900,19 +2035,13 @@ EXAMPLE: example triang_solve; shows an example
         export rlist;
     }
 
-    if ( !defined(rn@) )
-    {
-        int rn@;
-        export rn@;
-    }
-    rn@=0;
+    int rn@=0;
 
     // map the list
     list lfi= imap(oring,lfi);
-
     int slfi= size(lfi);
-    ideal fi;
 
+    ideal fi;
     for ( i= 1; i <= slfi; i++ )
     {
         // map fi from old to new ring
@@ -1924,23 +2053,28 @@ EXAMPLE: example triang_solve; shows an example
         li= laguerre_solve(fi[1],myCompDigits,myCompDigits,0);
         lis= size(li);
 
-        if ( pdebug>=1 )
-        {"// laguerre found roots: "+string(size(li));}
+        dbprint( printlevel-voice+2,"// laguerre found roots: "+string(lis) );
 
         for ( j= 1; j <= lis; j++ )
         {
-            if ( pdebug>=1 )
-            {"// root "+string(j);}
+            dbprint( printlevel-voice+2,"// root "+string(j) );
             rn@++;
             resu[nv]= li[j];
-            psubst( 1, 2, nv-1, resu, fi, idelem, nv, myCompDigits );
+            LL = psubst( 1, 2, nv-1, resu, fi, idelem, nv, myCompDigits, 
+                         rn@, rlist );
+            rlist = LL[1];
+            rn@ = LL[2];
         }
     }
 
-    if ( pdebug>=0 )
-    {"// list of roots: "+nameof(rlist);}
-    // keep the ring and exit
-    keepring basering;
+    dbprint( printlevel-voice+3,"
+// 'triang_solve' created a ring, in which a list rlist of numbers (the
+// complex solutions) is stored. 
+// To access the list of complex solutions, type (if the name R was assigned 
+// to the return value): 
+        setring R; rlist; ");
+
+    return(RC);
 }
 example
 {
@@ -1948,8 +2082,8 @@ example
     ring r = 0,(x,y),lp;
     // compute the intersection points of two curves
     ideal s=  x2 + y2 - 10, x2 + xy + 2y2 - 16;
-    triang_solve(triangLfak(stdfglm(s)),10);
-    rlist;
+    def R=triang_solve(triangLfak(stdfglm(s)),10);
+    setring R; rlist;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -1,6 +1,6 @@
 //last change: 13.02.2001 (Eric Westenberger)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: presolve.lib,v 1.20 2005-04-28 09:22:18 Singular Exp $";
+version="$Id: presolve.lib,v 1.21 2005-05-02 07:43:22 Singular Exp $";
 category="Symbolic-numerical solving";
 info="
 LIBRARY:  presolve.lib     Pre-Solving of Polynomial Equations
@@ -12,12 +12,13 @@ PROCEDURES:
  elimpart(id[,n]);      partial elimination of vars [among first n vars]
  elimpartanyr(i,p);     factors of p partially eliminated from i in any ring
  fastelim(i,p[..]);     fast elimination of factors of p from i [options]
+ faststd(id,[..]);      fast std for ideal id [options]
  findvars(id[..]);      ideal of variables occuring in id [more information]
  hilbvec(id[,c,o]);     intvec of Hilberseries of id [in char c and ord o]
  linearpart(id);        elements of id of total degree <=1
  tolessvars(id[,]);     maps id to new basering having only vars occuring in id
  solvelinearpart(id);   reduced std-basis of linear part of id
- sortandmap(id,s1,s2);  map to new basering with vars sorted w.r.t. complexity
+ sortandmap(id [..]);   map to new basering with vars sorted w.r.t. complexity
  sortvars(id[n1,p1..]); sort vars w.r.t. complexity in id [different blocks]
  valvars(id[..]);       valuation of vars w.r.t. to their complexity in id
  idealsSimplify(id);    ideal I = eliminate(Id,m) m is a product of variables
@@ -450,9 +451,9 @@ EXAMPLE: example fastelim; shows an example.
       def r2 = r1;
    }
    else
-//------- h!=0: homogenize and compute Hilbert-series using hilbvec ----------
+//------- h!=0: homogenize and compute Hilbert series using hilbvec ----------
    {
-      intvec hi = hilbvec(L[1]);         // Hilbert-series of i
+      intvec hi = hilbvec(L[1]);         // Hilbert series of i
       execute("ring r2=("+charstr(P)+"),("+varstr(basering)+",@homo),dp;");
       list L = imap(r1,L);
       L[1] = homog(L[1],@homo);          // @homo = homogenizing var
@@ -478,29 +479,30 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc faststd (@id,string @s1,string @s2, list #)
-"USAGE:   faststd(id,s1,s2[,\"hilb\",\"sort\",\"dec\",o,\"blocks\"]);
-         id=ideal/module, s1,s2=strings (names for new ring and maped id)
-         o = string (allowed ordstring:\"lp\",\"dp\",\"Dp\",\"ls\",\"ds\",\"Ds\")
-         \"hilb\",\"sort\",\"dec\",\"block\" options for Hilbert-std, sortandmap
-COMPUTE: create a new ring (with \"best\" ordering of vars) and compute a
-         std-basis of id (hopefully faster)
-         - If say, s1=\"R\" and s2=\"j\", the new basering has name R and the
-           std-basis of the image of id in R has name j
-         - \"hilb\"  : use Hilbert-series driven std-basis computation
-         - \"sort\"  : use 'sortandmap' for a best ordering of vars
-         - \"dec\"   : order vars w.r.t. decreasing complexity (with \"sort\")
-         - \"block\" : create blockordering, each block having ordstr=o, s.t.
-                     vars of same complexity are in one block (with \"sort\")
-         - o       : defines the basic ordering of the resulting ring
-         default: o = ordering of 1-st block of basering - if it is allowed,
-                      else o=\"dp\",
-                  \"sort\", if none of the optional parameters is given
-RETURN:  nothing
-NOTE:    This proc is only useful for hard problems where other methods fail.
-         \"hilb\" is useful for hard orderings (as \"lp\") or for characteristic 0,
-         it is correct for \"lp\",\"dp\",\"Dp\" (and for blockorderings combining
-         these) but not for s-orderings or if the vars have different weights.
+proc faststd (@id, list #)
+"USAGE:   faststd(id [,\"hilb\",\"sort\",\"dec\",o,\"blocks\"]);
+         id=ideal/module, o=string (allowed:\"lp\",\"dp\",\"Dp\",\"ls\",
+         \"ds\",\"Ds\"),  \"hilb\",\"sort\",\"dec\",\"block\" options for 
+         Hilbert-driven std, and the procedure sortandmap
+RETURN:  a ring R, in which an ideal STD_id is stored: @*
+         - the ring R differs from the active basering only in the choice 
+         of monomial ordering and in the sorting of the variables.
+         - STD_id is a standard basis for the image (under imap) of the input 
+         ideal/module id with respect to the new monomial ordering. @*
+NOTE:    Using the optional input parameters, we may modify the computations
+         performed: @*
+         - \"hilb\"  : use Hilbert-driven standard basis computation@*
+         - \"sort\"  : use 'sortandmap' for a best sorting of the variables@*
+         - \"dec\"   : order vars w.r.t. decreasing complexity (with \"sort\")@*
+         - \"block\" : create block ordering, each block having ordstr=o, s.t.
+                     vars of same complexity are in one block (with \"sort\")@*
+         - o       : defines the basic ordering of the resulting ring@*
+         [default: o=ordering of 1st block of basering (if allowed, else o=\"dp\"],
+                  \"sort\", if none of the optional parameters is given @*
+         This proc is only useful for hard problems where other methods fail.@*
+         \"hilb\" is useful for hard orderings (as \"lp\") or for characteristic 0,@*
+         it is correct for \"lp\",\"dp\",\"Dp\" (and for block orderings combining
+         these) but not for s-orderings or if the vars have different weights.@*
          There seem to be only few cases in which \"dec\" is fast
 EXAMPLE: example faststd; shows an example.
 "
@@ -535,58 +537,48 @@ EXAMPLE: example faststd; shows an example.
               or #[@ii]=="ds" or #[@ii]=="Ds" ) { @o = #[@ii]; }
       }
    }
-   if( voice==2 ) { "// choosen options, hilb sort dec block:",@h,@s,@n,@m; }
+   if( voice==2 ) { "// chosen options, hilb sort dec block:",@h,@s,@n,@m; }
 
 //-------------------- nosort: create ring with new name ----------------------
    if ( @s==0 )
    {
-      execute("ring "+@s1+"=("+charstr(@P)+"),("+varstr(@P)+"),("+@o+");");
-      def @id = imap(@P,@id);
-      verbose(noredefine);
-      def @P = basering;
-      verbose(redefine);
-      kill `@s1`;
-      if ( @h==0 ) { @id = std(@id); }
+      execute("ring @S1 =("+charstr(@P)+"),("+varstr(@P)+"),("+@o+");");
+      def STD_id = imap(@P,@id);
+      if ( @h==0 ) { STD_id = std(STD_id); }
    }
-//--------- sort: create new ring with "best" ordering of variables -----------
- proc bestorder(@id,string @s1,string @s2,int @n,string @o,int @m,int @l)
-  {
-     intvec getoption = option(get);
-     option(redSB);
-     @id = interred(sort(@id)[1]);
-     poly @p = product(maxideal(1),1..@l);
-     def i,s1,s2,n,p,o,m = @id,@s1,@s2,@n,@p,@o,@m;
-     sortandmap(i,s1,s2,n,p,0,o,m);
-     option(set,getoption);
-     keepring(basering);
-  }
+
 //---------------------- no hilb: compute SB directly -------------------------
    if ( @s != 0 and @h == 0 )
    {
-      bestorder(@id,@s1,@s2,@n,@o,@m,nvars(@P));
-      verbose(noredefine);
-      def @P = basering;
-      verbose(redefine);
-      kill `@s1`;
-      def @id = `@s2`;
-      @id = std(@id);
+      intvec getoption = option(get);
+      option(redSB);
+      @id = interred(sort(@id)[1]);
+      poly @p = product(maxideal(1),1..nvars(@P));
+      def @S1=sortandmap(@id,@n,@p,0,@o,@m);
+      setring @S1;
+      option(set,getoption);
+      def STD_id=imap(@S1,IMAG);
+      STD_id = std(STD_id);
    }
 //------- hilb: homogenize and compute Hilbert-series using hilbvec -----------
 // this uses another standardbasis computation
    if ( @h != 0 )
    {
-      execute("ring @Q=("+charstr(@P)+"),("+varstr(@P)+",@homo),("+@o+");");
+      execute("ring @Q=("+charstr(@P)+"),("+varstr(@P)+",@homo),("+@o+");");  
       def @id = imap(@P,@id);
-      kill @P;
       @id = homog(@id,@homo);               // @homo = homogenizing var
       if ( @s != 0 )
       {
-         bestorder(@id,@s1,@s2,@n,@o,@m,nvars(@Q)-1);
-         verbose(noredefine);
-         def @Q= basering;
-         kill `@s1`;
-         def @id = `@s2`;
-         verbose(redefine);
+        intvec getoption = option(get);
+        option(redSB);
+        @id = interred(sort(@id)[1]);
+        poly @p = product(maxideal(1),1..(nvars(@Q)-1));
+        def @S1=sortandmap(@id,@n,@p,0,@o,@m);
+        setring @S1;
+        option(set,getoption);
+        kill @Q;
+        def @Q= basering;
+        def @id = IMAG;
       }
       intvec @hi;                     // encoding of Hilbert-series of i
       @hi = hilbvec(@id);
@@ -602,49 +594,56 @@ EXAMPLE: example faststd; shows an example.
          if ( @o[1]=="c" or @o[1]=="C") { @o = @o[1,size(@o)-6]; }
          else { @o = @o[1,size(@o)-8] + @o[size(@o)-1,2]; }
       }
-      execute("ring @P=("+charstr(@Q)+"),("+@va+"),("+@o+");");
-      def @id = imap(@Q,@id);
+      kill @S1;      
+      execute("ring @S1=("+charstr(@Q)+"),("+@va+"),("+@o+");");
+      def STD_id = imap(@Q,@id);
    }
-   def `@s1` = @P;
-   def `@s2` = @id;
-   attrib(`@s2`,"isSB",1);
-   export(`@s2`);
-   kill @P;
-   keepring(basering);
-   if( voice==2 ) { "// basering is now "+@s1+", std-basis has name "+@s2; }
-   return();
+   attrib(STD_id,"isSB",1);
+   export STD_id;
+   if (defined(IMAG)) { kill IMAG; } 
+   setring @P;
+   dbprint(printlevel-voice+3,"
+// 'faststd' created a ring, in which an object STD_id is stored. 
+// To access the object, type (if the name R was assigned to the return value):
+        setring R; STD_id; ");
+   return(@S1);
 }
 example
 { "EXAMPLE:"; echo = 2;
    ring s = 0,(e,f,x,y,z,t,u,v,w,a,b,c,d),(c,lp);
    ideal i = w2+f2-1, x2+t2+a2-1,  y2+u2+b2-1, z2+v2+c2-1,
             d2+e2-1, f4+2u, wa+tf, xy+tu+ab;
-  option(prot); timer=1;
+   option(prot); timer=1;
    int time = timer;
    ideal j=std(i);
    timer-time;
-   show(R);dim(j),mult(j);
-   int time = timer;
-   faststd(i,"R","i");                      // use "best" ordering of vars
+   dim(j),mult(j);
+
+   time = timer;
+   def R=faststd(i);                      // use "best" ordering of vars
    timer-time;
-   show(R);dim(i),mult(i);
-   setring s;time = timer;
-   faststd(i,"R","i","hilb");                // hilb-std only
+   show(R);setring R;dim(STD_id),mult(STD_id);
+
+   setring s;kill R;time = timer;
+   def R=faststd(i,"hilb");                // hilb-std only
    timer-time;
-   show(R);dim(i),mult(i);
-   setring s;time = timer;
-   faststd(i,"R","i","hilb","sort");         // hilb-std,"best" ordering
+   show(R);setring R;dim(STD_id),mult(STD_id);
+
+   setring s;kill R;time = timer;
+   def R=faststd(i,"hilb","sort");         // hilb-std,"best" ordering
    timer-time;
-   show(R);dim(i),mult(i);
-    setring s;time = timer;
-   faststd(i,"R","i","hilb","sort","block","dec"); // hilb-std,"best",blocks
+   show(R);setring R;dim(STD_id),mult(STD_id);
+
+   setring s;kill R;time = timer;
+   def R=faststd(i,"hilb","sort","block","dec"); // hilb-std,"best",blocks
    timer-time;
-   show(R);dim(i),mult(i);
-  setring s;time = timer;
+   show(R);setring R;dim(STD_id),mult(STD_id);
+
+   setring s;kill R;time = timer;
    timer-time;time = timer;
-   faststd(i,"R","i","sort","block","Dp"); //"best",decreasing,Dp-blocks
+   def R=faststd(i,"sort","block","Dp"); //"best",decreasing,Dp-blocks
    timer-time;
-   show(R);dim(i),mult(i);
+   show(R);setring R;dim(STD_id),mult(STD_id);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -749,33 +748,21 @@ example
 
 proc tolessvars (id ,list #)
 "USAGE:   tolessvars(id [,s1,s2] ); id poly/ideal/vector/module/matrix,
-          s1,s2=strings@*
-          s1: name of new ring,@*
-          s2: new ordering@*
-          (default: s1=\"R(n)\" where n is the # of vars in the new ring,
-          s2=\"dp\" or \"ds\" depending whether the first block of the old
-          ordering is a p- resp. an s-ordering)
-
-CREATE:  nothing, if id contains all vars of the basering.@*
-         Else, create a ring with same char as the basering, but possibly less
-         variables (only those variables which actually occur in id) and map
-         id to the new ring, which will be the basering after the proc has
-         finished.
-DISPLAY: If printlevel >=0, display ideal of vars, which have been ommitted from
-         the old ring
-RETURN:  the original ideal id (see NOTE)
-NOTE:    You must not type, say, 'ideal id=tolessvars(id);' since the ring
-         to which 'id' would belong will only be defined by the r.h.s.. But you
-         may type 'def id=tolessvars(id);' or 'list id=tolessvars(id);'
-         since then 'id' does not a priory belong to a ring, its type will
-         be defined by the right hand side. Moreover, do not use a name which
-         occurs in the old ring, for the same reason.
+          s1=string (new ordering)@*
+          [default: s1=\"dp\" or \"ds\" depending on whether the first block 
+          of the old ordering is a p- resp. an s-ordering)
+RETURN:  If id contains all vars of the basering: empty list. @*
+         Else: ring R with the same char as the basering, but possibly less
+         variables (only those variables which actually occur in id). In R
+         an object IMAG (image of id under imap) is stored.  
+DISPLAY: If printlevel >=0, display ideal of vars, which have been ommitted 
+         from the old ring.
 EXAMPLE: example tolessvars; shows an example
 "
 {
 //---------------- initialisation and check occurence of vars -----------------
    int s,ii,n,fp,fs;
-   string s1,s2,newvar;
+   string s2,newvar;
    int pr = printlevel-voice+3;  // p = printlevel+1 (default: p=1)
    def P = basering;
    s2 = ordstr(P);
@@ -790,11 +777,12 @@ EXAMPLE: example tolessvars; shows an example
    }
    if( n == nvars(P) )
    {
-      dbprint( pr,"","// all variables occured in "+typeof(id)+", no change of ring!");
-      return(id);
+     dbprint(printlevel-voice+3,"
+// All variables appear in input object. 
+// empty list returned. "); 
+     return(list());
    }
 //----------------- prepare new ring, map to it and return --------------------
-   s1 = "R("+string(n)+")";
    if ( size(#) == 0 )
    {
        fp = find(s2,"p");
@@ -802,25 +790,25 @@ EXAMPLE: example tolessvars; shows an example
        if( fs==0 or (fs>=fp && fp!=0) ) { s2="dp"; }
        else {  s2="ds"; }
    }
-   if ( size(#) ==1 ) { s1=#[1]; }
-   if ( size(#) ==2 ) { s1=#[1]; s2=#[2]; }
-   //dbprint( pr,"","// variables which did not occur:",simplify(max,2) );
+   if ( size(#) ==1 ) { s2=#[1]; }
    dbprint( pr,"","// variables which did not occur:",L[3] );
-
-   execute("ring "+s1+"=("+charstr(P)+"),("+newvar+"),("+s2+");");
-   def id = imap(P,id);
-   export(basering);
-   keepring (basering);
-   dbprint( pr,"// basering is now "+s1 );
-   return(id);
+   execute("ring S1=("+charstr(P)+"),("+newvar+"),("+s2+");");
+   def IMAG = imap(P,id);
+   export IMAG;
+   dbprint(printlevel-voice+3,"
+// 'tolessvars' created a ring, in which an object IMAG is stored. 
+// To access the object, type (if the name R was assigned to the return value):
+        setring R; IMAG; ");
+   return(S1);
 }
 example
 { "EXAMPLE:"; echo = 2;
    ring r  = 0,(x,y,z),dp;
    ideal i = y2-x3,x-3,y-2x;
-   def j   = tolessvars(i,"R_r","lp");
+   def R_r = tolessvars(i,"lp");
+   setring R_r;
    show(basering);
-   j;
+   IMAG;
    kill R_r;
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -875,31 +863,33 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc sortandmap (@id,string @s1,string @s2, list #)
-"USAGE:   sortandmap(id,s1,s2[,n1,p1,n2,p2...,o1,m1,o2,m2...]);@*
+proc sortandmap (@id, list #)
+"USAGE:   sortandmap(id [,n1,p1,n2,p2...,o1,m1,o2,m2...]);@*
          id=poly/ideal/vector/module,@*
-         s1,s2 = strings (names for new ring and mapped id),@*
          p1,p2,...= polynomials (product of variables),@*
          n1,n2,...= integers,@*
          o1,o2,...= strings,@*
          m1,m2,...= integers@*
          (default: p1=product of all vars, n1=0, o1=\"dp\",m1=0)
          the last pi (containing the remaining vars) may be omitted
-CREATE:  a new ring and map id into it, the new ring has same char as basering
-         but with new ordering and vars sorted in the following manner:
+RETURN:  a ring R, in which a poly/ideal/vector/module IMAG is stored: @*
+         - the ring R differs from the active basering only in the choice 
+         of monomial ordering and in the sorting of the variables.@*
+         - IMAG is the image (under imap) of the input ideal/module id @*
+         The new monomial ordering and sorting of vars is as follows:
   @format
   - each block of vars occuring in pi is sorted w.r.t. its complexity in id,
   - ni controls the sorting in i-th block (= vars occuring in pi):
-    ni=0 (resp.!=0) means that less (resp. more) complex vars come first
+    ni=0 (resp.!=0) means that least complex (resp. most complex) vars come 
+    first @*
   - oi and mi define the monomial ordering of the i-th block:
     if mi =0, oi=ordstr(i-th block)
     if mi!=0, the ordering of the i-th block itself is a blockordering,
       each subblock having ordstr=oi, such that vars of same complexity are
       in one block
   @end format
-  Note that only simple ordstrings oi are allowed:
-  \"lp\",\"dp\",\"Dp\",\"ls\",\"ds\",\"Ds\".
-RETURN:  nothing
+         Note that only simple ordstrings oi are allowed: \"lp\",\"dp\",\"Dp\",
+         \"ls\",\"ds\",\"Ds\". @*
 NOTE:    We define a variable x to be more complex than y (with respect to id)
          if val(x) > val(y) lexicographically, where val(x) denotes the
          valuation vector of x:@*
@@ -945,25 +935,26 @@ EXAMPLE: example sortandmap; shows an example
       }
    }
    @o=@o[1..size(@o)-1];
-//------------------ create new ring and make objects global -----------------
-   execute("ring "+@s1+"=("+charstr(@P)+"),("+@va+"),("+@o+");");
-   def @id = imap(@P,@id);
-   execute("def "+ @s2+"=@id;");
-   execute("export("+@s1+");");
-   execute("export("+@s2+");");
-   keepring(basering);
-   return();
+   execute("ring @S1 =("+charstr(@P)+"),("+@va+"),("+@o+");");
+   def IMAG = imap(@P,@id);
+   export IMAG;
+   dbprint(printlevel-voice+3,"
+// 'sortandmap' created a ring, in which an object IMAG is stored. 
+// To access the object, type (if the name R was assigned to the return value):
+        setring R; IMAG; ");
+   return(@S1);
 }
 example
 { "EXAMPLE:"; echo = 2;
    ring s = 32003,(x,y,z),dp;
    ideal i=x3+y2,xz+z2;
-   sortandmap(i,"R_r","i");
-   // i is now an ideal in the new basering R_r
+   def R_r=sortandmap(i);  
    show(R_r);
+   setring R_r; IMAG;
    kill R_r; setring s;
-   sortandmap(i,"R_r","i",1,xy,0,z,0,"ds",0,"lp",0);
+   def R_r=sortandmap(i,1,xy,0,z,0,"ds",0,"lp",0);
    show(R_r);
+   setring R_r; IMAG;
    kill R_r;
 }
 ///////////////////////////////////////////////////////////////////////////////

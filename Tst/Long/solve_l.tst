@@ -3,7 +3,7 @@
 
 LIB "tst.lib";
 tst_init();
-tst_ignore("CVS ID $Id: solve_l.tst,v 1.2 1999-11-18 16:38:35 obachman Exp $");
+tst_ignore("CVS ID $Id: solve_l.tst,v 1.3 2005-05-02 07:42:46 Singular Exp $");
 
 LIB "solve.lib";
 
@@ -35,20 +35,25 @@ ideal im=f0,f1,f2,f3;
 ures_solve(i);
 mp_res_mat(im);
 
-fglm_solve(i,30);
+def rinC=fglm_solve(i,30);
+setring rinC;
 rlist;
 
 setring rs2;
-triangL_solve(i,30);
-rlist;
+kill rinC;
+def rinC=triangL_solve(i,30);
+setring rinC; rlist;
 
 setring rs2;
-triangLf_solve(i,30);
-rlist;
+kill rinC;
+def rinC=triangLf_solve(i,30);
+setring rinC; rlist;
 
 setring rs2;
-triangM_solve(i,30);
-rlist;
+kill rinC;
+def rinC=triangM_solve(i,30);
+setring rinC; rlist;
+kill rinC;
 
 ////////////////////////////
 
@@ -78,20 +83,23 @@ ideal im=f0,f1,f2,f3;
 ures_solve(i);
 mp_res_mat(im);
 
-fglm_solve(i,30);
-rlist;
+def rinC=fglm_solve(i,30);
+setring rinC; rlist;
 
 setring rs4;
-triangL_solve(i,30);
-rlist;
+kill rinC;
+def rinC=triangL_solve(i,30);
+setring rinC;rlist;
 
 setring rs4;
-triangLf_solve(i,30);
-rlist;
+kill rinC;
+def rinC=triangLf_solve(i,30);
+setring rinC;rlist;
 
 setring rs4;
-triangM_solve(i,30);
-rlist;
+kill rinC;
+def rinC=triangM_solve(i,30);
+setring rinC;rlist;
 
 ////////////////////////////
 
