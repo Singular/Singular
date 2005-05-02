@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: COPYING.texi,v 1.17 2005-04-30 20:36:17 levandov Exp $
+@comment $Id: COPYING.texi,v 1.18 2005-05-02 22:01:14 levandov Exp $
 @comment this file contains the copyright notice on Singular
 @ifclear VERSION
 @include version.texi
@@ -113,16 +113,16 @@ Sch@"onemann.
 @cindex Sch@"onemann, Hans
 
 Currently, the @sc{Singular} team has the following members:
+Michael Brickenstein,
 Anne Fr@"ubis-Kr@"uger,
-Thomas Keilen,
 Kai Kr@"uger,
 Christoph Lossen,
 Viktor Levandovskyy,
 Wilfred Pohl
 and
 Oliver Wienand.
+@cindex Brickenstein, Michael 
 @cindex Fr@"ubis-Kr@"uger, Anne
-@cindex Keilen, Thomas
 @cindex Kr@"uger, Kai
 @cindex Lossen, Christoph
 @cindex Levandovskyy, Viktor
@@ -159,13 +159,15 @@ Christian Gorzel,
 Agnes Heydtmann,
 Dietmar Hillebrand,
 Tobias Hirsch,
+Thomas Keilen,
 Martin Lamm,
 Bernd Martin,
 Michael Me@ss{}ollen,
 Thomas N@"u@ss{}ler,
 Moritz Wenk,
 Denis Yanovich.
-
+@cindex Keilen, Thomas
+@cindex Decker, Wolfram
 
 We should like to acknowledge the financial support given by
 the Volkswagen-Stiftung,
