@@ -3,7 +3,7 @@
 ****************************************/
 /*
 * ABSTRACT: help system
-* versin $Id: fehelp.cc,v 1.40 2005-04-22 15:14:02 Singular Exp $
+* versin $Id: fehelp.cc,v 1.41 2005-05-02 16:31:55 Singular Exp $
 */
 
 #include <string.h>
@@ -232,7 +232,7 @@ static void feBrowserFile()
   {
 #ifdef ix86_Win
     // for the 6(!) default browsers
-    heHelpBrowsers=(heBrowser_s*)omAlloc0(5*sizeof(heBrowser_s));
+    heHelpBrowsers=(heBrowser_s*)omAlloc0(6*sizeof(heBrowser_s));
 #else
     // for the 4(!) default browsers
     heHelpBrowsers=(heBrowser_s*)omAlloc0(4*sizeof(heBrowser_s));
@@ -641,16 +641,11 @@ static int heReKey2Entry (char* filename, char* key, heEntry hentry)
 // otherwise, return FALSE
 static BOOLEAN heOnlineHelp(char* s)
 {
-#ifdef HAVE_NAMESPACES
-  idhdl h, ns;
-  iiname2hdl(s, &ns, &h);
-#else /* HAVE_NAMESPACES */
 #ifdef HAVE_NS
   idhdl h=IDROOT->get(s,myynest);
 #else
   idhdl h=idroot->get(s,myynest);
 #endif /* HAVE_NS */
-#endif /* HAVE_NAMESPACES */
 
   // try help for a procedure
   if ((h!=NULL) && (IDTYP(h)==PROC_CMD))
@@ -700,15 +695,11 @@ static BOOLEAN heOnlineHelp(char* s)
     lib_style_types lib_style; // = OLD_LIBSTYLE;
 
     yylpin = fp;
-#ifdef HAVE_NAMESPACES
-    yylplex(str, libnamebuf, &lib_style, IDROOT, FALSE, GET_INFO);
-#else /* HAVE_NAMESPACES */
 #ifdef HAVE_NS
     yylplex(str, libnamebuf, &lib_style, IDROOT, FALSE, GET_INFO);
 #else
     yylplex(str, libnamebuf, &lib_style, GET_INFO);
 #endif /* HAVE_NS */
-#endif /* HAVE_NAMESPACES */
     reinit_yylp();
     if(lib_style == OLD_LIBSTYLE)
     {
@@ -754,16 +745,11 @@ static BOOLEAN heOnlineHelp(char* s)
 static long heKeyChksum(char* key)
 {
   if (key == NULL || *key == '\0') return 0;
-#ifdef HAVE_NAMESPACES
-  idhdl h, ns;
-  iiname2hdl(key, &ns, &h);
-#else /* HAVE_NAMESPACES */
 #ifdef HAVE_NS
   idhdl h=IDROOT->get(key,myynest);
 #else
   idhdl h=idroot->get(key,myynest);
 #endif /* HAVE_NS */
-#endif /* HAVE_NAMESPACES */
   if ((h!=NULL) && (IDTYP(h)==PROC_CMD))
   {
     procinfo *pi = IDPROC(h);
@@ -946,11 +932,11 @@ static void heGenHelp(heEntry hentry, int br)
                    { // remove #SEC
                      char *pp=strchr(sys,'#');
                      if (pp!=NULL)
-		     { 
-		       *pp='\0';
+                     {
+                       *pp='\0';
                        i=strlen(sys);
-		       memset(pp,0,MAX_SYSCMD_LEN-i);
-		     }  
+                       memset(pp,0,MAX_SYSCMD_LEN-i);
+                     }
                    }
                    i=strlen(sys);
                    break;

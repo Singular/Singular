@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.h,v 1.36 2005-01-24 14:59:13 Singular Exp $ */
+/* $Id: ipshell.h,v 1.37 2005-05-02 16:31:56 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -190,5 +190,6 @@ void listall(int showproc=1);
 void checkall();
 void iiCheckPack(package &p);
 #endif
+BOOLEAN iiTryLoadLib(leftv v, char *id);
 #endif
 

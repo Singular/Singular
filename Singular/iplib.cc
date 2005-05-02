@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.107 2005-05-02 15:59:29 Singular Exp $ */
+/* $Id: iplib.cc,v 1.108 2005-05-02 16:31:56 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -870,7 +870,6 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
 
  return LoadResult;
 }
-
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 static void iiCleanProcs(idhdl &root)
 {
