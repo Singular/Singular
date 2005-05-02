@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.125 2005-05-02 15:21:38 Singular Exp $
+@comment $Id: types.doc,v 1.126 2005-05-02 22:00:55 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -193,9 +193,9 @@ An ideal expression is:
 @item
 an identifier of type ideal
 @item
-a function returning ideal
+a function returning an ideal
 @item
-ideal expressions combined by the arithmetic operations
+a combination of ideal expressions by the arithmetic operations
 @code{+} or @code{*}
 @item
 a power of an ideal expression (operator @code{^} or @code{**})
@@ -361,6 +361,9 @@ standard basis and minimal generating set of an ideal (see @ref{mstd})
 multiplicity, resp.@: degree, of the ideal of leading terms (see @ref{mult})
 @item ncols
 number of columns (see @ref{ncols})
+@item nres 
+computes a free resolution of an ideal resp.@: module M which is
+minimized from the second free module on (see @ref{nres})
 @item preimage
 preimage under a ring map (see @ref{preimage})
 @item qhweight
@@ -1861,11 +1864,11 @@ Maps are ring maps from a preimage ring into the basering.
 @item
 the target of a map is @strong{ALWAYS} the actual basering
 @item
-the preimage ring is stored "by name", that means, maps can only be
+the preimage ring has to be stored "by its name", that means, maps can only be
 used in such contexts, where the name of the preimage ring can be
-resolved (i.e., there might be problems for rings/maps defined in
-subprocedures). See also @ref{Identifier resolution}, @ref{Names in
-procedures}.
+resolved (this has to be considered in subprocedures).
+@c (i.e., there might be problems for rings/maps defined in subprocedures). 
+See also @ref{Identifier resolution}, @ref{Names in procedures}.
 @end itemize
 
 Maps between rings with different coefficient fields are
@@ -1880,7 +1883,7 @@ $Q \rightarrow  Q(a, \ldots)$
 @ifinfo
 Q -> Q(a,..)
 @end ifinfo
-
+     (@math{Q}: the rational numbers)
 @item
 @tex
 $Q \rightarrow R$
@@ -1888,7 +1891,7 @@ $Q \rightarrow R$
 @ifinfo
 Q -> R
 @end ifinfo
-
+     (@math{R}: the real numbers)
 @item
 @tex
 $Q \rightarrow  C$
@@ -1896,7 +1899,7 @@ $Q \rightarrow  C$
 @ifinfo
 Q -> C
 @end ifinfo
-
+     (@math{C}: the complex numbers)
 @item
 @tex
 $Z/p \rightarrow  (Z/p)(a, \ldots)$
@@ -1904,7 +1907,7 @@ $Z/p \rightarrow  (Z/p)(a, \ldots)$
 @ifinfo
 Z/p ->(Z/p)(a,...)
 @end ifinfo
-
+     (@math{Z}: the integers)
 @item
 @tex
 $Z/p \rightarrow  GF(p^n)$
@@ -1912,7 +1915,7 @@ $Z/p \rightarrow  GF(p^n)$
 @ifinfo
 Z/p -> GF(p^n)
 @end ifinfo
-
+     (@math{GF}: the Galois field)
 @item
 @tex
 $Z/p \rightarrow  R$
@@ -1962,7 +1965,7 @@ C -> R by taking the real part.
 @end ifinfo
 @end itemize
 
-Finally, in Singular we allow the mapping from rings
+Finally, in @sc{Singular} we allow the mapping from rings
 with coefficient field Q to rings whose ground fields
 have finite characteristic:
 
@@ -2091,8 +2094,14 @@ map expressions combined by composition using parentheses (@code{(}, @code{)})
 @table @asis
 @item @code{( )}
 composition of maps. If, for example, @code{f} and @code{g} are maps,
-then @code{f(g)} is a map expression giving the composition of @code{f}
-and @code{g},
+then @code{f(g)} is a map expression giving the composition 
+@tex
+$f \circ g$
+@end tex
+@ifinfo
+@code{f} @bullet{} @code{g}
+@end ifinfo
+ of @code{f} and @code{g},
 @* provided the target ring of @code{g} is the basering of @code{f}.
 
 @item map_expression @code{[} int_expressions @code{]}
@@ -2523,7 +2532,7 @@ is a module entry, where the first index indicates the row and
 the second the column
 
 @item module_expressions @code{[} int_expression @code{]}
-is a vector, where the index indicates the column
+is a vector, where the index indicates the column (generator)
 @end table
 
 @*@strong{Example:}
@@ -2594,6 +2603,9 @@ minimal free resolution of an ideal resp.@: module w.r.t. a minimal set of gener
 (see @ref{mres})
 @item mult
 multiplicity, resp.@: degree, of the module of leading terms (see @ref{mult})
+@item nres 
+computes a free resolution of an ideal resp.@: module M which is
+minimized from the second free module on (see @ref{nres})
 @item ncols
 number of columns (see @ref{ncols})
 @item nrows
@@ -3317,15 +3329,15 @@ basering;
 @section resolution
 @cindex resolution
 
-The resolution type is intended as an intermediate representation which
+The type resolution is intended as an intermediate representation which
 internally retains additional information obtained during computation of
 resolutions. It furthermore enables the use of partial results to
 compute, for example, Betti numbers or minimal resolutions. Like ideals
 and modules, a resolution can only be defined w.r.t.@: a basering.
 
 @strong{Note:}
-to access the elements of a resolution, it has to be assigned to a list,
-which also completes computations and may therefore take time,
+to access the elements of a resolution, it has to be assigned to a list.
+This assignment also completes computations and may therefore take time,
 (resp.@: an access directly with the brackets @code{[ , ]} causes
 implicitly a cast to a list).
 
@@ -3396,7 +3408,7 @@ free resolution (see @ref{lres})
 @item minres
 minimize a free resolution (see @ref{minres})
 @item mres
-minimal free resolution of an ideal, resp.@: module w.r.t. a minimal set of generators of
+minimal free resolution of an ideal, resp.@: module and a minimal set of generators of
 the given ideal, resp.@: module (see @ref{mres})
 @item res
 free resolution of an ideal, resp.@: module, but not changing the

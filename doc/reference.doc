@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.237 2005-05-02 15:22:12 Singular Exp $
+@comment $Id: reference.doc,v 1.238 2005-05-02 22:00:54 levandov Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -1332,8 +1332,12 @@ See
 the same as the type of the first argument
 @item @strong{Purpose:}
 eliminates variables occurring as factors of the second argument from an
-ideal, resp.@: module, by intersecting it with the subring not containing
-these variables.
+ideal (resp.@: a submodule of a free module), by intersecting it 
+(resp. each component of the submodule) with the subring not containing these variables.
+@c comment: GMG insisted on changing the definition
+@c eliminates variables occurring as factors of the second argument from an
+@c ideal, resp.@: module, by intersecting it with the subring not containing
+@c these variables.
 @*@code{eliminate} does not need a special ordering nor a standard basis as input.
 @item @strong{Note:}
 Since elimination is expensive, for homogeneous input it might be useful
@@ -1631,7 +1635,7 @@ maps objects between rings.
 @code{fetch} is the identity map between rings and qrings,
 the i-th variable of the source ring is mapped to the i-th
 variable of the basering.  The coefficient fields must be compatible.
-(See @ref{map} for a description of possible mapping between
+(See @ref{map} for a description of possible mappings between
 different ground fields).
 @*@code{fetch} offers a convenient way to change
 variable names or orderings, or to map objects from a ring to a quotient
@@ -2348,7 +2352,7 @@ number, poly, vector, ideal, module, matrix or list
 identity map on common subrings.  @code{imap} is the map between rings
 and qrings with compatible ground fields which is the identity on
 variables and parameters of the same name and 0 otherwise.
-(See @ref{map} for a description of possible mapping between
+(See @ref{map} for a description of possible mappings between
 different ground fields).
 Useful for mapping from a homogenized ring to the original ring or
 for mappings from/to rings with/without parameters. Compared with
