@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.108 2005-05-02 16:31:56 Singular Exp $ */
+/* $Id: iplib.cc,v 1.109 2005-05-03 17:32:51 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -23,7 +23,9 @@
 #include "ipshell.h"
 #include "lists.h"
 
+#ifdef HAVE_DYNAMIC_LOADING
 BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN tellerror);
+#endif
 
 #ifdef HAVE_LIBPARSER
 #  include "libparse.h"
@@ -685,8 +687,10 @@ BOOLEAN iiTryLoadLib(leftv v, char *id)
 
       if (LT==LT_SINGULAR)
         LoadResult = iiLibCmd(s, FALSE);
+      #ifdef HAVE_DYNAMIC_LOADING
       else if ((LT==LT_ELF) || (LT==LT_HPUX))
         LoadResult = load_modules(s,libnamebuf,FALSE);
+      #endif
       if(!LoadResult )
       {
         v->name = iiConvName(libname);
