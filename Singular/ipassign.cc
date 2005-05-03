@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.73 2005-05-03 15:41:50 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.74 2005-05-03 16:12:03 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -1541,9 +1541,9 @@ BOOLEAN jjIMPORTFROM(leftv res, leftv u, leftv v)
   if (h!=NULL)
   {
     //check for existence
-    if (IDPACKAGE(h)==basePack)
+    if (((package)(u->Data()))==basePack)
     {
-      PrintS("source and destination packages are identical");
+      WarnS("source and destination packages are identical");
       return FALSE;
     }
     idhdl t=basePack->idroot->get(vn /*v->Name()*/, myynest);
