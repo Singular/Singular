@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: plutypes.doc,v 1.28 2005-05-02 21:59:49 levandov Exp $
+@comment $Id: plutypes.doc,v 1.29 2005-05-03 10:30:00 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -1046,7 +1046,7 @@ ek; // the reduced form
 @end table
 
 @c ---------------------------------------
-@node qring related functions @value{PSUFFIX}, , qring @value{PSUFFIX}, qring @value{PSUFFIX}
+@node qring related functions @value{PSUFFIX}, , qring declaration @value{PSUFFIX}, qring @value{PSUFFIX}
 @subsection qring related functions @value{PSUFFIX}
 @cindex qring related functions @value{PSUFFIX}
 

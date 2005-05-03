@@ -1,5 +1,5 @@
   @comment -*-texinfo-*-
-@comment $Id: plureference.doc,v 1.32 2005-05-02 21:59:48 levandov Exp $
+@comment $Id: plureference.doc,v 1.33 2005-05-03 10:29:59 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -975,7 +975,7 @@ See
 poly, vector, ideal, module or matrix (the same type as the second argument)
 @item @strong{Purpose:}
 for a given object in the given ring, creates its opposite object
-in the opposite (@xref{opposite}) ring (the last one is assumed to be the current ring).
+in the opposite (@ref{opposite}) ring (the last one is assumed to be the current ring).
 @item @strong{Remark:}
 for any object
 @tex
