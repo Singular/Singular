@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpr_numeric.cc,v 1.1.1.1 2003-10-06 12:15:56 Singular Exp $ */
+/* $Id: mpr_numeric.cc,v 1.2 2005-05-03 13:03:47 Singular Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - numeric stuff
@@ -301,7 +301,7 @@ rootContainer::~rootContainer()
   for ( i=0; i < tdg; i++ ) delete theroots[i];
   omFreeSize( (ADDRESS) theroots, (tdg)*sizeof(gmp_complex*) );
 
-  mprPROTnl("~rootContainer()");
+  //mprPROTnl("~rootContainer()");
 }
 //<-
 
@@ -370,7 +370,7 @@ poly rootContainer::getPoly()
 
       }
     }
-    pSetm( result );
+    if (result!=NULL) pSetm( result );
   }
 
   return result;
@@ -513,7 +513,7 @@ bool rootContainer::laguer_driver(gmp_complex ** a, gmp_complex ** roots, bool p
         goto theend;
       }
     }
-    if (!type) x = o/x;
+    if ((!type)&&(!((x.real()==zero)&&(x.imag()==zero)))) x = o/x;
     if (x.imag() == zero)
     {
       *roots[k] = x;
@@ -690,7 +690,8 @@ void rootContainer::solvequad(gmp_complex **a, gmp_complex **r, int &k, int &j)
 {
   gmp_float zero(0.0);
 
-  if (j>k)
+  if ((j>k)
+  &&(((*a[2]).real()!=zero)||((*a[2]).imag()!=zero)))
   {
     gmp_complex sq(zero);
     gmp_complex h1(*a[1]/(*a[2] + *a[2])), h2(*a[0] / *a[2]);
@@ -723,11 +724,18 @@ void rootContainer::solvequad(gmp_complex **a, gmp_complex **r, int &k, int &j)
   }
   else
   {
-    *r[k]= (gmp_complex)0.0-(*a[0] / *a[1]);
-    if(r[k]->imag()==zero)
-      j++;
+    if (((*a[1]).real()==zero) && ((*a[1]).imag()==zero))
+    {
+      WerrorS("precision lost, try again with higher precision");
+    }
     else
-      k--;
+    {
+      *r[k]= (gmp_complex)0.0-(*a[0] / *a[1]);
+      if(r[k]->imag()==zero)
+        j++;
+      else
+        k--;
+    }
   }
 }
 
