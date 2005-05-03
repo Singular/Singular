@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.239 2005-05-03 08:59:39 Singular Exp $
+@comment $Id: reference.doc,v 1.240 2005-05-03 11:50:00 anne Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -7091,8 +7091,8 @@ command:
 @c example
 @end smallexample
 
-Each time a library @ref{Singular library} / dynamic module @ref{dynamic
-module} is loaded, the corresponding package is created, if it does
+Each time a library @ref{Libraries} / dynamic module @ref{Dynamic
+loading} is loaded, the corresponding package is created, if it does
 not already exist.
 
 The name of a package corresponding to a Singular library is

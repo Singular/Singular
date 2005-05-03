@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.197 2005-05-03 08:59:38 Singular Exp $
+@comment $Id: general.doc,v 1.198 2005-05-03 11:51:55 anne Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -31,7 +31,7 @@
 * Libraries::
 * Guidelines for writing a library::
 * Debugging tools::
-* Dynamic Loading::
+* Dynamic loading::
 @end menu
 
 
@@ -3936,7 +3936,7 @@ one subsection for each procedure):
 @c lib template.lib  lib_fun lib_ex
 
 @c ----------------------------------------------------------------------
-@node Debugging tools, Dynamic Modules, Guidelines for writing a library, General concepts
+@node Debugging tools, Dynamic loading, Guidelines for writing a library, General concepts
 @section Debugging tools
 @cindex Debugging tools
 
@@ -4173,9 +4173,9 @@ LIB "sample.lib";
 @expansion{}    ? error occurred in STDIN line 1: `LIB "sample.lib";`
 @end smallexample
 @c ---------------------------------------
-@node Dynamic Loading, , Debugging Tools, General concepts
-@section Dynamic Loading
-@cindex Dynamic Loading
+@node Dynamic loading, , Debugging tools, General concepts
+@section Dynamic loading
+@cindex Dynamic loading
 
 In addition to the concept of libraries, it is also possible to
 dynamically extend the functionality by loading functions written 
