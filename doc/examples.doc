@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.69 2005-05-03 12:31:44 bricken Exp $
+@comment $Id: examples.doc,v 1.70 2005-05-03 16:40:53 Singular Exp $
 @comment this file contains the examples
 
 @c The following directives are necessary for proper compilation
@@ -150,6 +150,7 @@ For a more basic introduction to programming in @sc{Singular}, we refer
 to @ref{Getting started}.
 
 @smallexample
+@c example
 option(prot);
 ring R = 32003,(x,y,z),dp;
 R;
@@ -172,6 +173,7 @@ ideal i = imap(R,i);
 dim(std(i));
 map phi = R, x+3972, y-6961, z-7944;
 dim(std(phi(i)));
+@c example
 @end smallexample
 
 @c ----------------------------------------------------------------------------
@@ -185,89 +187,137 @@ dim(std(phi(i)));
 @cindex Procedures and libraries
 @cindex Libraries
 
-The computation of the Milnor number (for an arbitrary isolated complete
-intersection singularity ICIS) and the Tjurina number (for an arbitrary
-isolated singularity) can be done by using procedures from the library
-@code{sing.lib}. For a hypersurface singularity it is very easy to write a
-procedure which computes the Milnor number and the Tjurina number.
+The user may add his own commands to the commands already available by
+writing @sc{Singular} procedures. See @ref{Procedures} for the syntax
+and general structure of a procedure.
 
-We shall demonstrate:
+A @sc{Singular} library is a text file collecting several procedures
+(see @ref{Format of a library}). The probably most efficient way of 
+writing a new library is to use one of the official @sc{Singular}
+libraries, say @code{ring.lib} as a sample. On a Unix-like operating
+system, type @code{LIB "ring.lib";} to get information on where the
+libraries are stored on your disk.
+
+@sc{Singular} provides several commands and tools, which may be useful
+when writing a procedure, for instance, to have a look at intermediate
+results (see @ref{Debugging tools}).
+
+We show here short examples of procedures to demonstrate the following:
+
 @itemize @bullet
 @item
-load the library @code{sing.lib}
-@c item
-@c disable the protocol option
-@item
-define a local ring in 2 variables and characteristic 0
-@item
-define a plane curve singularity
-@item
-compute Milnor number and Tjurina number by using the procedures
-@code{milnor} and @code{tjurina}
-@item
-write your own procedures:
-(A procedure has a list of input parameters and of return values, both
-lists may be empty.)
+Write procedures which returns an integer (ring independent), see also
+@ref{Milnor and Tjurina number}. (Here we restrict ourselevs to the main
+body of the procedures).
   @itemize @minus
   @item
-  the procedure @code{mil} which must be called with one parameter, a
+  The procedure @code{milnorNumber} must be called with one parameter, a
   polynomial.
-  The name g is local to the procedure and is killed automatically.
-  @code{mil} returns the Milnor number (and displays a comment).
+  The name g is local to the procedure and is killed automatically when
+  leaving the procedure.
+  @code{milnorNumber} returns the Milnor number (and displays a comment).
   @item
-  the procedure @code{tjur} where the parameters are not specified. They
-  are referred
-  to by @code{#[1]} for the 1st, @code{#[2]} for the 2nd parameter, etc.
-  @code{tjur} returns the Tjurina number (and displays a comment).
+  The procedure @code{tjurinaNumber} has no specified number of
+  parameters. Here, the parameters are referred to by @code{#[1]} for
+  the 1st, @code{#[2]} for the 2nd parameter, etc.
+  @code{tjurinaNumber} returns the Tjurina number (and displays a comment).
   @item
-  the procedure @code{milrina} which returns a list consisting of two
-  integers,
-  the Milnor and the Tjurina number.
+  the procedure @code{milnor_tjurina} which returns a list consisting of two
+  integers, the Milnor and the Tjurina number.
   @end itemize
+
+@item
+Write a procedure which creates a new ring and returns data dependent on
+this new ring (two numbers and an int). In this example, we also show
+how to write a help text for the procedure (which is optional, but
+recommended). 
 @end itemize
 
+
 @smallexample
+@c example
+proc milnorNumber (poly g)
+{
+   "Milnor number:";
+   return(vdim(std(jacob(g))));
+}
+
+proc tjurinaNumber
+{
+   "Tjurina number:";
+   return(vdim(std(jacob(#[1])+#[1])));
+}
+
+proc milnor_tjurina (poly f)
+{
+   ideal j=jacob(f);
+   list L=vdim(std(j)),vdim(std(j+f));
+   return(L);
+}
+
+proc real_sols (number b, number c)
+"USAGE: real_sols (b,c);  b,c number
+ASSUME: active basering has characteristic 0
+RETURN: list: first entry is an integer (the number of different real 
+        solutions). If this number is non-negative, the list has as second 
+        entry a ring in which the list SOL of real solutions of x^2+bx+c=0 
+        is stored (as floating point number, precision 30 digits).
+NOTE:   This procedure calls laguerre_solve from solve.lib.
+"
+{
+  def oldring = basering;  // assign name to the ring active when
+                           // calling the procedure
+  number disc = b^2-4*c;
+  if (disc>0) { int n_of_sols = 2; }
+  if (disc==0) { int n_of_sols = 1; }
+  string s = nameof(var(1));  // name of first ring variable
+  if (disc>=0) {
+    execute("ring rinC =(complex,30),("+s+"),lp;");
+    if (not(defined(laguerre_solve))) { LIB "solve.lib"; }
+    poly f = x2+imap(oldring,b)*x+imap(oldring,c);   
+                        // f is a local ring-dependent variable
+    list SOL = laguerre_solve(f,30);
+    export SOL;         // make SOL a global ring-dependent variable
+                        // such variables are still accessible when the
+                        // ring is among the return values of the proc 
+    setring oldring;
+    return(list(n_of_sols,rinC));    
+  }
+  else { 
+    return(list(0)); 
+  }
+}
+
+//
+// Applying the procedures:
+//
 LIB "sing.lib";
 // you should get the information that sing.lib has been loaded
 // together with some other libraries which are needed by sing.lib
 ring r = 0,(x,y),ds;
 poly f = x7+y7+(x-y)^2*x2y2;
-milnor(f);
-@expansion{} 28
-tjurina(f);
-@expansion{} 24
 
-proc mil (poly g)
-@{
-   "Milnor number:";
-   return(vdim(std(jacob(g))));
-@}
-mil(f);
-@expansion{} Milnor number:
-@expansion{} 28
+milnorNumber(f);
+tjurinaNumber(f);
+milnor_tjurina(f);     // a list containing Milnor and Tjurina number
 
-proc tjur
-@{
-   "Tjurina number:";
-   return(vdim(std(jacob(#[1])+#[1])));
-@}
-tjur(f);
-@expansion{} Tjurina number:
-@expansion{} 24
+def L=real_sols(2,1);
+L[1];                  // number of real solutions of x^2+2x+1
+def R1=L[2]; 
+setring R1; 
+listvar(R1);           // only global ring-dependent objects are still alive
+SOL;                   // the real solutions
 
-proc milrina (poly f)
-@{
-   ideal j=jacob(f);
-   list L=vdim(std(j)),vdim(std(j+f));
-   return(L);
-@}
-milrina(f);     // a list containing Milnor and Tjurina number
-@expansion{} [1]:
-@expansion{}    28
-@expansion{} [2]:
-@expansion{}    24
-milrina(f)[2];  // the second element of the list
-@expansion{} 24
+setring r;
+L=real_sols(1,1);
+L[1];                  // number of reals solutions of x^2+x+1
+
+setring r;
+L=real_sols(1,-5);
+L[1];                  // number of reals solutions of x^2+x-5
+def R3=L[2]; 
+setring R3; SOL;       // the real solutions 
+@c example
 @end smallexample
 
 @c ----------------------------------------------------------------------------
@@ -618,8 +668,10 @@ not be terminated through the link while it is still computing.
 
 @c ----------------------------------------------------------------------------
 @node Computing Groebner and Standard Bases, Commutative Algebra, Programming, Examples
-@section Commutative Algebra
-@cindex Commutative Algebra
+@section Computing Groebner and Standard Bases
+@cindex Computing Groebner and Standard Bases
+@cindex Groebner Bases
+@cindex Standard Bases
 
 @menu
 * groebner and std::
@@ -675,9 +727,14 @@ and @code{stdhilb} about 10 times faster than @code{std}.
 @subsection slim Groebner bases
 @cindex Groebner bases, slim
 @cindex slimgb
-This is a new algorithm called slimgb designed for keeping polynomials short and coefficients small. In particular it is very fast over function fields.
+The command @code{slimgb} is designed for keeping the polynomials short
+and the coefficients small in a Groebner basis computation. 
+It provides, in particular, a fast algorithm for computing Groebner bases
+over function fields and with respect to degree orderings.
 
-In the example below it is over 200 times faster than std.
+In the example below (Groebner basis with respect to degree reverse
+lexicographic ordering over finite field) it is more than 200 times
+faster than the @code{std} command.
 @smallexample
 @c example
   ring r = 32003, (x,y,z,t,u,v,w,a,b,c,d,e,f,g,h,i,j,k), dp;
@@ -695,7 +752,9 @@ In the example below it is over 200 times faster than std.
   ideal l = slimgb(i0);
 @c example
 @end smallexample
-One trick in this example is to change the roles of the first polynomial and the S-Polynomial of a2b-x2 and abx-1, which has the same leading term.
+One trick in this example is to exchange the roles of the first polynomial
+and of the S-Polynomial of @code{a2b-x2} and @code{abx-1}. Note that
+this S-polynomial has the same leading term @code{x3}. 
 
 For detailed information and limitations see @ref{slimgb}.
 @c ----------------------------------------------------------------------------
@@ -2984,6 +3043,7 @@ symbolic-numerical approach via Groebner bases, resp.@: resultants). In
 the example below, we show some of these commands at work.
 
 @smallexample
+@c example
 LIB "solve.lib";
 ring r=0,x(1..5),dp;
 poly f0= x(1)^3+x(2)^2+x(3)^2+x(4)^2-x(5)^2;
@@ -3040,6 +3100,7 @@ def T1=solve(k,30,"nodisplay");  // compute all solutions with mult's
 setring T1;
 size(SOL);               // number of different solutions 
 SOL[1];
+@c example
 @end smallexample
 @c //
 @c // We could also use a resultant-based method to compute the complex
@@ -3070,6 +3131,7 @@ Geometry codes. The procedures can be applied to plane (singular) curves
 defined over a prime field of positive characteristic.
   
 @smallexample
+@c example
 LIB "brnoeth.lib";
 ring s=2,(x,y),lp;            // characteristic 2
 poly f=x3y+y3+x;              // the Klein quartic
@@ -3116,6 +3178,7 @@ disturb[1,12]=1+a;
 y=y+disturb;                  // disturb the code word (3 errors)
 def yy=decodeSV(y,K);         // error correction
 yy-y;                         // display the error
+@c example
 @end smallexample
 
 @c --------------------------------------------------------------------
