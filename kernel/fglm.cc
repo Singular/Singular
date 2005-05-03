@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglm.cc,v 1.2 2005-04-13 16:46:37 Singular Exp $
+// $Id: fglm.cc,v 1.3 2005-05-03 07:29:01 Singular Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -419,7 +419,8 @@ findUniProc( leftv result, leftv first )
             destIdeal= idInit(0,0);
             break;
         case FglmNotReduced:
-            Werror( "The ideal %s has to be reduced", first->Name() );
+            Werror( "The ideal %s has to be given by a reduced SB",
+                    first->Name() );
             destIdeal= idInit(0,0);
             break;
         default:
