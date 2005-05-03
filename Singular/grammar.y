@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.106 2005-05-02 16:31:55 Singular Exp $ */
+/* $Id: grammar.y,v 1.107 2005-05-03 09:35:16 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -1385,15 +1385,16 @@ ringcmd:
         ;
 
 scriptcmd:
-         SYSVAR expr
+         SYSVAR stringexpr
           {
-            //if (($1!=LIB_CMD)||(iiLibCmd($2)))
-            if ($1==LIB_CMD)
-            {
-              sleftv tmp;
-              if(iiExprArith1(&tmp,&$2,LIB_CMD)) YYERROR;
-            }
-            else YYERROR;
+            if (($1!=LIB_CMD)||(iiLibCmd($2)))
+            //if ($1==LIB_CMD)
+            //{
+            //  sleftv tmp;
+            //  if(iiExprArith1(&tmp,&$2,LIB_CMD)) YYERROR;
+            //}
+            //else
+                YYERROR;
           }
         ;
 
