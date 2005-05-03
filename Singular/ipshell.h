@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.h,v 1.37 2005-05-02 16:31:56 Singular Exp $ */
+/* $Id: ipshell.h,v 1.38 2005-05-03 15:41:50 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -70,6 +70,7 @@ BOOLEAN jjMINRES(leftv res, leftv v);
 BOOLEAN jjBETTI(leftv res, leftv v);
 BOOLEAN jjBETTI2(leftv res, leftv u, leftv v);
 BOOLEAN jjBETTI2_ID(leftv res, leftv u, leftv v);
+BOOLEAN jjIMPORTFROM(leftv res, leftv u, leftv v);
 
 int     iiRegularity(lists L);
 leftv   singular_system(sleftv h);

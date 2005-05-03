@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.351 2005-05-02 15:58:45 Singular Exp $ */
+/* $Id: iparith.cc,v 1.352 2005-05-03 15:41:48 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1929,11 +1929,6 @@ static BOOLEAN jjHOMOG_ID(leftv res, leftv u, leftv v)
     return TRUE;
   }
   res->data = (char *)idHomogen((ideal)u->Data(),i);
-  return FALSE;
-}
-static BOOLEAN jjIMPORTFROM(leftv res, leftv u, leftv v)
-{
-  Print("importfrom %s::%s ->.\n",v->Name(),u->Name() );
   return FALSE;
 }
 static BOOLEAN jjINDEPSET2(leftv res, leftv u, leftv v)

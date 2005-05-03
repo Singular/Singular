@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.72 2005-03-24 10:54:19 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.73 2005-05-03 15:41:50 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -1531,4 +1531,40 @@ BOOLEAN iiAssign(leftv l, leftv r)
   if (nok && (!errorreported)) WerrorS("incompatible type in list assignment");
   r->CleanUp();
   return nok;
+}
+BOOLEAN jjIMPORTFROM(leftv res, leftv u, leftv v)
+{
+  //Print("importfrom %s::%s ->.\n",v->Name(),u->Name() );
+  assume(u->Typ()==PACKAGE_CMD);
+  char *vn=(char *)v->Name();
+  idhdl h=((package)(u->Data()))->idroot->get(vn /*v->Name()*/, myynest);
+  if (h!=NULL)
+  {
+    //check for existence
+    if (IDPACKAGE(h)==basePack)
+    {
+      PrintS("source and destination packages are identical");
+      return FALSE;
+    }
+    idhdl t=basePack->idroot->get(vn /*v->Name()*/, myynest);
+    if (t!=NULL)
+    {
+      Warn("redefining `%s`",vn);
+      killhdl(t);
+    }
+    sleftv tmp_expr;
+    if (iiDeclCommand(&tmp_expr,v,myynest,DEF_CMD,&IDROOT)) return TRUE;
+    sleftv h_expr;
+    memset(&h_expr,0,sizeof(h_expr));
+    h_expr.rtyp=IDHDL;
+    h_expr.data=h;
+    h_expr.name=vn;
+    return iiAssign(&tmp_expr,&h_expr);
+  }
+  else
+  {
+    Werror("`%s` not found in `%s`",v->Name(), u->Name());
+    return TRUE;
+  }
+  return FALSE;
 }
