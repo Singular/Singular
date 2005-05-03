@@ -1,0 +1,721 @@
+proc InterDiv(intmat M, list #)
+{
+  "Warning: alpha testing version of this procedure";
+  int i,j;
+  string tempstr;
+//---------------------------------------------------------------------------
+//  build up temporary filename and open file for writing
+//---------------------------------------------------------------------------
+  if(size(#)>0)
+  {
+     if((typeof(#[1])=="string") && (goodFilename(#[1])))
+     {
+        string @filename=#[1];
+     }
+     else
+     {
+        ERROR("Second argument should specify a WRITABLE file");
+     }
+  }
+  if(!defined(@filename))
+  {
+     string @filename=buildFilename("InterDiv.dot");
+  }
+  link eing=":w "+@filename;
+//--------------------------------------------------------------------------
+// write input for external program dot to file
+//--------------------------------------------------------------------------
+  write(eing,"graph G{");
+  for(i=1;i<=ncols(M);i++)
+  {
+     if(M[i,i]!=-2)
+     {
+        tempstr=string(i)+"[shape=circle,label=\""+string(M[i,i])+"\"];";
+     }
+     else
+     {
+        tempstr=string(i)+"[shape=point,label=\" \"];";
+     }
+     write(eing,tempstr);
+  }
+  for(i=1;i<=nrows(M);i++)
+  {
+     for(j=i+1;j<=ncols(M);j++)
+     {
+        if(M[i,j]!=0)
+        {
+           tempstr=string(i) + "--" + string(j) + ";";
+           write(eing,tempstr);
+        }
+     }
+  }
+  write(eing,"}");
+  close(eing);
+//---------------------------------------------------------------------------
+// produce graphics output using the programs dot and xv
+//---------------------------------------------------------------------------
+  string outfile=@filename + ".jpg";
+  if(!find(outfile,"/"))
+  {
+//--- xv needs fully qualified path to file
+     outfile=system("getenv","PWD") + "/" + outfile;
+  }
+  j=system("sh","dot -Tjpg " + @filename + " -o "+ outfile);
+  j=system("sh","/usr/bin/X11/xv " + outfile + " &");
+//---------------------------------------------------------------------------
+// clean up if necessary
+//---------------------------------------------------------------------------
+  "Currently showing graphics in separate window";
+  "Press <Return> to continue";
+  pause();
+  if((size(#)==0)&&(find(@filename,"/tmp/")))
+  {
+//--- do not leave any garbage in the public directories
+    j=system("sh","/bin/rm " + outfile + " " + @filename);
+  }
+  return();
+}
+///////////////////////////////////////////////////////////////////////////////
+//static
+proc goodFilename(string datei)
+{
+//--- check whether the specified file datei is writable for us
+  if(!system("sh","touch " + datei + " > /dev/null 2>&1"))
+  {
+     return(1);
+  }
+  else
+  {
+     return(0);
+  }
+}
+//////////////////////////////////////////////////////////////////////////////
+//static
+proc buildFilename(string datei)
+{
+  if(goodFilename(datei))
+  {
+     return(datei);
+  }
+  if(find(datei,"/"))
+  {
+     ERROR("Specified directory/file is not writable");
+  }
+  datei="/tmp/" + datei;
+  if(goodFilename(datei))
+  {
+     return(datei);
+  }
+//--- not reached
+  ERROR("At least /tmp should be writable");
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc ResTree(list re, intmat DivMat, list #)
+{
+//-----------------------------------------------------------------------------
+// Initialization and definition of the temporary filename
+//-----------------------------------------------------------------------------
+  int i,j,dimC,jsave;
+  string tempstr;
+  def R=basering;
+  if(size(#)>0)
+  {
+     if(typeof(#[1])=="string")
+     {
+        if(goodFilename(#[1]))
+        {
+           string @filename=#[1];
+        }
+        else
+        {
+           ERROR("optional argument of type string "+
+                  "should specify a writable file.");
+        }
+     }
+     if(typeof(#[1])=="intvec")
+     {
+        intvec @rot=#[1];
+     }
+  }
+  if(size(#)>1)
+  {
+     if((typeof(#[2])=="string")&&(!defined(@filename)))
+     {
+        if(goodFilename(#[1]))
+        {
+           string @filename=#[1];
+        }
+        else
+        {
+           ERROR("optional argument of type string "+
+                  "should specify a writable file.");
+        }
+     }
+     if((typeof(#[2])=="intvec")&&(!defined(@rot)))
+     {
+        intvec @rot=#[2];
+     }
+  }
+  if(!defined(@filename))
+  {
+     string @filename=buildFilename("ResTree.dot");
+  }
+  if(!defined(@rot))
+  {
+     intvec @rot;
+     @rot[size(re[2])]=0;
+  }
+  link eing=":w "+@filename;
+//----------------------------------------------------------------------------
+// writing the input to the program dot into a file
+//----------------------------------------------------------------------------
+  write(eing,"graph G{");
+  tempstr="1[shape=box,label=\"chart 1\"];";
+  write(eing,tempstr);
+  for(i=2;i<=size(re[2]);i++)
+  {
+     tempstr=string(i)+"[shape=box,label=\"chart " + string(i)
+            + "\\nE:"+string(simplify(ideal(DivMat[i,1..ncols(DivMat)]),2))
+            + " \"";
+     if(@rot[i]==1)
+     {
+        tempstr=tempstr + "color=\"red\"];";
+     }
+     else
+     {
+        tempstr=tempstr + "];";
+     }
+     write(eing,tempstr);
+  }
+  for(i=2;i<=size(re[2]);i++)
+  {
+     def S=re[2][i];
+     setring S;
+     j=int(leadcoef(path[1,ncols(path)]));
+     if(j!=jsave)
+     {
+        def T=re[2][j];
+        setring T;
+        dimC=dim(std(BO[1]+cent));
+        setring S;
+        kill T;
+     }
+     setring R;
+     kill S;
+     if(j!=jsave)
+     {
+        tempstr=string(j) + "--" + string(i) +"[label=\"d=" + string(dimC)
+               + "\"];";
+        jsave=j;
+     }
+     else
+     {
+       tempstr=string(j) + "--" + string(i) +";";
+     }
+     write(eing,tempstr);
+  }
+  write(eing,"}");
+  close(eing);
+//---------------------------------------------------------------------------
+// Create the graphics output using the programs dot and xv
+//---------------------------------------------------------------------------
+  string outfile=@filename + ".jpg";
+  if(!find(outfile,"/"))
+  {
+//--- xv needs fully qualified path to file
+     outfile=system("getenv","PWD") + "/" + outfile;
+  }
+  j=system("sh", "dot -Tjpg " + @filename + " -o "+ outfile);
+  j=system("sh","/usr/bin/X11/xv " + outfile + "&");
+//---------------------------------------------------------------------------
+// Clean up public directories if necessary
+//---------------------------------------------------------------------------
+  "Currently showing graphics in separate window";
+  "Press <Return> to continue";
+  pause();
+  if(find(@filename,"/tmp/"))
+  {
+//--- do not leave any garbage in the public directories
+    j=system("sh","/bin/rm " + @filename + ".jpg "+ @filename);
+  }
+  return();
+}
+/////////////////////////////////////////////////////////////////////////////
+
+proc finalCharts(list re, list inter, intvec endiv, list #)
+{
+//-----------------------------------------------------------------------------
+// Initialization and Sanity Checks
+//-----------------------------------------------------------------------------
+  int i,j,k,a,b,cnt,whichE,offset,haveDcE8;
+  def R=basering;
+  list endCharts;
+  string fname,tempstr;
+  for(i=1;i<=size(endiv);i++)
+  {
+    if(endiv[i]==1)
+    {
+       endCharts[size(endCharts)+1]=i;
+//--- Sanity checks for the chart i
+       if(nvars(re[2][i])!=3)
+       {
+          ERROR("This chart is not embedded in 3-dimensional space");
+       }
+       if(defined(S)){kill S;}
+       def S=re[2][i];
+       setring S;
+       if(dim(std(BO[1]+BO[2]))!=2)
+       {
+          ERROR("Strict Transform is not a surface");
+       }
+       if(size(equidim(BO[1]+BO[2]))!=1)
+       {
+          ERROR("Strict Transform has lower dimensional components.");
+       }
+//--- put the missing information into dcE, if necessary
+       for(k=1;k<=size(dcE);k++)
+       {
+          for(j=1;j<=size(dcE[k]);j++)
+          {
+             if(deg(std(dcE[k][j][1])[1])!=0)
+             {
+                if(size(dcE[k][j][1]) < 8)
+                {
+                   setring R;
+                   k=prepareDcE(re,inter,endiv);
+                   setring S;
+                }
+                haveDcE8=1;
+                break;
+             }
+          }
+          if(haveDcE8!=0) break;
+       }
+       setring R;
+    }
+  }
+  if(!defined(colorlist))
+  {
+     list colorlist;
+     for(i=1;i<=10;i++)
+     {
+       colorlist[i]="curve_red = "+string((i-1)*25)+"; curve_green = "+
+                     string(255-(i-1)*25)+"; curve_blue = "+
+                     string(((i-1) mod 5)*50)+";";
+     }
+  }
+  else
+  {
+     "Warning!";
+     "Using colors specified in variable colorlist. No syntax checks";
+     "performed on the content of this list.";
+     "If built-in colors should be used, please rename the global";
+     "object colorlist";
+  }
+  if(ncols(inter[1])>size(colorlist))
+  {
+    ERROR("Too many exceptional curves on this surface.....");
+  }
+  if((size(endCharts)>20)&&(size(#)==0))
+  {
+    ERROR("More than 20 final charts...");
+  }
+//-----------------------------------------------------------------------------
+// Determine the basename of the temporary files
+//-----------------------------------------------------------------------------
+  if(size(#)>0)
+  {
+     if((typeof(#[1])=="string") && (goodFilename(#[1])))
+     {
+        string fnamebase=#[1];
+     }
+     else
+     {
+        ERROR("Second argument should specify a WRITABLE file");
+     }
+  }
+  if(!defined(@fnamebase))
+  {
+     string fnamebase=buildFilename("Chart");
+  }
+//-----------------------------------------------------------------------------
+// Go through all final charts and write a separate surf input file for each
+//-----------------------------------------------------------------------------
+  for(i=1;i<=size(endCharts);i++)
+  {
+     fname=fnamebase + string(endCharts[i]) + ".surf";
+     if(defined(eing)){kill eing;}
+     link eing=":w "+fname;
+//--- define surf's root finding algorithm
+     tempstr="root_finder = d_chain_bisection; epsilon = 0.000000001;";
+     write(eing,tempstr);
+//--- define image size
+     tempstr="int wid = 480;width = wid; height = wid;";
+     write(eing,tempstr);
+//--- define ambient lighting
+     tempstr="ambient=50;";
+     write(eing,tempstr);
+//--- define background colour: some shade of gray
+     tempstr="background_red=200; background_green=200; background_blue=200;";
+     write(eing,tempstr);
+//--- define surface colour (one side):
+     tempstr="surface_red=22; surface_green=150; surface_blue=255;";
+     write(eing,tempstr);
+//--- define surface colour (other side):
+     tempstr="inside_red=255; inside_green=192; inside_blue=0;";
+     write(eing,tempstr);
+//--- define scaling factor
+     tempstr="scale_x=0.5; scale_y=0.5; scale_z=0.5;";
+     write(eing,tempstr);
+//--- rotate a little bit
+     tempstr="rot_y=0.9013941717697173; rot_x=-0.5556596516994916; rot_z=0.103062920202253447;";
+     write(eing,tempstr);
+//----------------------------------------------------------------------------
+// change to the chart and extract the equation of the surface
+// then draw the surface
+//----------------------------------------------------------------------------
+     if(defined(S)){kill S;}
+     def S=re[2][endCharts[i]];
+     setring S;
+//--- define equation of strict transform (hypersurface of dim 2)
+     ideal drawJ=simplify(mstd(radical(BO[1]+BO[2]))[2],2);
+     if(size(drawJ)>1)
+     {
+//!!! unnoetig! Da kann man auch surface2,... machen
+        ERROR("Did not find generator of principal ideal " + string(drawJ));
+     }
+     tempstr="poly f = " + map2Surf(string(drawJ[1])) + ";";
+     write(eing,tempstr);
+     tempstr="surface = f;draw_surface;";
+     write(eing,tempstr);
+//----------------------------------------------------------------------------
+// now consider all exceptional curves in this chart separately
+// and draw them
+//---------------------------------------------------------------------------
+     if(!defined(dcE))
+     {
+//--- Oups, exceptional curves not yet decomposed in this chart
+//--- should not happen in practice
+        ERROR("The procedure intersectionDiv has not been used
+               on this tree of charts");
+     }
+     for(j=1;j<=size(dcE);j++)
+     {
+//--- Run through all exceptional divisors (in the embedded sense)
+        for(k=1;k<=size(dcE[j]);k++)
+        {
+//--- Run through all curves corresponding to the current divisor
+           if(deg(std(dcE[j][k][1])[1])==0)
+           {
+//--- This one is empty - skip it
+              k++;
+              if(k>size(dcE[j])) {break;}
+              continue;
+           }
+           for(a=1;a<=size(inter[3]);a++)
+           {
+//--- this curve belongs to which (Q-irred.) divisor in global numbering?
+              if(inIVList(intvec(endCharts[i],j,k),inter[3][a])) break;
+           }
+           if(a>size(inter[3]))
+           {
+//--- curve not found in list
+              ERROR("Inconsistency between data of arguments 1 and 2");
+           }
+           whichE=a;
+           offset=0;
+           for(a=1;a<whichE;a++)
+           {
+//--- count C-irred. divisors up to this (Q-irred. divisor) index
+              offset=offset+inter[4][a];
+           }
+           for(a=1;a<=size(dcE[j][k][7]);a++)
+           {
+//--- run through all C-irred divisors corresponding to this Q-irred. one
+//--- run through all generators of the ideal of the curve
+//--- unfortunately the ideal is encoded in a string,
+//--- and we need to work to find the generators
+              int tempint=find(dcE[j][k][6],",");
+              b=0;
+              cnt=1;
+              while(tempint!=0)
+              {
+                if(!find(dcE[j][k][7][a],"i"))
+                {
+//--- 1) surf can only handle real numbers ==> we ignore the other curves
+//--- 2) we can only form substrings of named strings:
+                  tempstr=dcE[j][k][6];            // give it a name
+                  tempstr=tempstr[b+1..tempint-1]; // find correct substring
+                  tempstr="poly f" + string(offset+dcE[j][k][8][a])+ "_" +
+                       string(b+1) + " = " +
+                       map2Surf(plugInNumZero(tempstr,dcE[j][k][7][a])) + ";";
+                  write(eing,tempstr);
+                  tempstr="cutsurface" + string(cnt) + " = f" +
+                       string(offset+dcE[j][k][8][a]) + "_" +string(b+1) + ";";
+                  write(eing,tempstr);
+                  cnt++;
+                }
+                b=tempint;                          // save end-mark
+                tempint=find(dcE[j][k][6],",",b+1); // next one please
+              }
+              if(!find(dcE[j][k][7][a],"i"))
+              {
+                tempstr=dcE[j][k][6];                 // as before, but for last
+                tempstr=tempstr[b+1..size(tempstr)];  // fragment
+                tempstr="poly f" + string(offset+dcE[j][k][8][a])+ "_" +
+                       string(b+1) + " = " +
+                       map2Surf(plugInNumZero(tempstr,dcE[j][k][7][a])) + ";";
+                write(eing,tempstr);
+                tempstr="cutsurface" + string(cnt)+ " = f" +
+                       string(offset+dcE[j][k][8][a]) + "_" +string(b+1) + ";";
+                write(eing,tempstr);
+                cnt++;
+              }
+//--- draw the curve on the surface
+              if(cnt>1)
+              {
+                 tempstr=colorlist[offset+dcE[j][k][8][a]];
+                 write(eing,tempstr);
+                 write(eing,"cut_with_surface;");
+              }
+              kill tempint;
+           }
+        }
+     }
+     if(!find(fnamebase,"/"))
+     {
+//--- xv needs fully qualified path to file
+         if(defined(outfile)) {kill outfile;}
+         string outfile=system("getenv","PWD") + "/" + fnamebase;
+     }
+     if(!defined(outfile))
+     {
+       tempstr="filename = \"" + fnamebase + string(endCharts[i]) + ".ras\";";
+     }
+     else
+     {
+       tempstr="filename = \"" + outfile + string(endCharts[i]) + ".ras\";";
+     }
+     write(eing,tempstr);
+     tempstr="color_file_format = sun;";
+     write(eing,tempstr);
+     tempstr="save_color_image;";
+     write(eing,tempstr);
+     close(eing);
+     j=system("sh", "surf -n " + fnamebase +string(endCharts[i]) + ".surf");
+     if(!defined(outfile))
+     {
+        j=system("sh","/usr/bin/X11/xv " + fnamebase
+                       + string(endCharts[i]) + ".ras &");
+     }
+     else
+     {
+        j=system("sh","/usr/bin/X11/xv " + outfile
+                       + string(endCharts[i]) + ".ras &");
+        kill outfile;
+     }
+     "Currently showing graphics for chart "+string(endCharts[i])
+                    +" in separate window";
+     "Press <Return> to continue";
+     pause();
+  }
+  return(0);
+}
+//////////////////////////////////////////////////////////////////////////////
+// static
+proc plugInNumZero(string f,string num)
+{
+  int i;
+  string fStr=f;
+  i=find(fStr,"t");
+  while(i!=0)
+  {
+    fStr = string(fStr[1..i-1]) + "(" + num + ")"
+         + string(fStr[i+1..size(fStr)]);
+    i=find(fStr,"t");
+  }
+  return(fStr);
+}
+//////////////////////////////////////////////////////////////////////////////
+// static
+proc replaceInStr(string alles, string alt, string neu)
+{
+  int i=find(alles,alt);
+  while(i!=0)
+  {
+    if((i-1)<1)
+    {
+       if(size(alt)==size(alles))
+       {
+          alles=neu;
+       }
+       else
+       {
+          alles=neu + string(alles[i+size(alt)..size(alles)]);
+       }
+    }
+    else
+    {
+       if(i+size(alt)>size(alles))
+       {
+          alles=string(alles[1..i-1]) + neu;
+       }
+       else
+       {
+          alles=string(alles[1..i-1]) + neu +
+                string(alles[i+size(alt)..size(alles)]);
+       }
+    }
+    i=find(alles,alt);
+  }
+  return(alles);
+}
+/////////////////////////////////////////////////////////////////////////////
+// static
+proc map2Surf(string str)
+{
+  str=replaceInStr(str,string(var(1)),"x");
+  str=replaceInStr(str,string(var(2)),"y");
+  str=replaceInStr(str,string(var(3)),"z");
+  return(str);
+}
+/////////////////////////////////////////////////////////////////////////////
+// static
+proc prepareDcE(list re, list inter, list endCharts)
+{
+   def R=basering;
+//---Test whether we are in the irreducible surface case
+   def S=re[2][1];
+   setring S;
+   BO[2]=BO[2]+BO[1];              // make sure we are living in the smooth W
+   if(dim(std(BO[2]))!=2)
+   {
+     ERROR("The given original object is not a surface");
+   }
+   if(dim(std(slocus(BO[2])))>0)
+   {
+     ERROR("The given original object has non-isolated singularities.");
+   }
+   setring R;
+//----------------------------------------------------------------------------
+// Compute a non-embedded resolution from the given embedded one by
+// dropping redundant trailing blow-ups
+//----------------------------------------------------------------------------
+//--- compute non-embedded resolution
+   int ii,j,k,a,b,comPa;
+   list abst=abstractR(re);
+   intvec endiv=abst[1];
+   intvec deleted=abst[2];
+//--- identify the divisors in the various final charts
+   list iden0=collectDiv(re,deleted)[2];
+                                    // list of final divisors
+//----------------------------------------------------------------------------
+// For each Q-irred. divisor (specified in inter[3]), run through all
+// occurrences and identify the different C-components
+//----------------------------------------------------------------------------
+   for(ii=1;ii<=size(inter[3]);ii++)
+   {
+//--- run through all Q-irred. curves,
+//--- set up the first occurrence for reference
+      if(defined(S)) {kill S;}
+      def S=re[2][inter[3][ii][1][1]];
+                                    // inter[3] = list of Q-irred div.
+                                    // inter[3][ii] = ii-th thereof
+                                    // inter[3][ii][1] = first occurrence
+                                    // inter[3][ii][1][1] = corr. chart index
+      setring S;
+      dcE[inter[3][ii][1][2]][inter[3][ii][1][3]][8]=
+              intvec(1..ncols(dcE[inter[3][ii][1][2]][inter[3][ii][1][3]][4]));
+//--- prepare the ideal of the divisor for mapping to different chart
+      if(defined(idlist1)){kill idlist1;}
+      list idlist1;
+      idlist1[1]=dcE[inter[3][ii][1][2]][inter[3][ii][1][3]][6];
+      export(idlist1);
+      for(j=2;j<=size(inter[3][ii]);j++)
+      {
+//--- now do the comparison with the other occurrences
+//--- 1. find a common parent for inter[3][ii][1][1] and inter[3][ii][j][1]
+         if(defined(S)){kill S;}
+         def S=re[2][inter[3][ii][j][1]];
+         setring S;
+         if(defined(opath)){kill opath;}
+         def opath=imap(re[2][inter[3][ii][1][1]],path);
+         k=1;
+         while(opath[1,k]==path[1,k])
+         {
+            k++;
+            if((k>ncols(opath))||(k>ncols(path))) break;
+         }
+         comPa=int(leadcoef(opath[1,k-1]));
+//--- 2. use fetchInTree to transfer the C-components
+         if(defined(str)) {kill str;}
+         if(defined(il)) {kill il;}
+         if(defined(mpi)) {kill mpi;}
+         if(defined(nulli)) {kill nulli;}
+         string str="idlist1";
+         attrib(str,"algext",imap(re[2][inter[3][ii][1][1]],dcE)[inter[3][ii][1][2]][inter[3][ii][1][3]][5]);
+         list il=fetchInTree(re,inter[3][ii][1][1],comPa,inter[3][ii][j][1],str,iden0,1);
+         list nulli=imap(re[2][inter[3][ii][1][1]],dcE)[inter[3][ii][1][2]][inter[3][ii][1][3]][7];
+         string mpi=imap(re[2][inter[3][ii][1][1]],dcE)[inter[3][ii][1][2]][inter[3][ii][1][3]][5];
+         if(mpi!=dcE[inter[3][ii][j][2]][inter[3][ii][j][3]][5])
+         {
+            ERROR("Problem identifying the appropriate field extension.!");
+         }
+         if(defined(ringt)){kill ringt;}
+         ring ringt=0,(t),dp;
+         if(defined(St)){kill St;}
+         def St=S+ringt;
+         setring St;
+         if(defined(strId)) {kill strId;}
+         string strId="ideal id1=" + il[1] + ";";
+         execute(strId);
+         id1=std(id1);
+         strId="ideal idj="
+                         + imap(S,dcE)[inter[3][ii][j][2]][inter[3][ii][j][3]][6]
+                         +  ";";
+         execute(strId);
+         idj=std(idj);
+         if(defined(nullj)){kill nullj;}
+         list nullj=imap(S,dcE)[inter[3][ii][1][2]][inter[3][ii][1][3]][7];
+         if(defined(rcomp)){kill rcomp;}
+         strId="ring rcomp=complex,(" +varstr(basering) +"),(" +
+                           ordstr(basering) + ");";
+         execute(strId);
+         def id1=imap(St,id1);
+         def idj=imap(St,idj);
+         ideal id10,idj0;
+         if(defined(tintvec)){kill tintvec;}
+         intvec tintvec;
+         tintvec[size(nullj)]=0;
+         for(a=1;a<=size(nullj);a++)
+         {
+            if(defined(numa)) {kill numa;}
+            strId="number numa=" + string(nullj[a]) + ";";
+            execute(strId);
+            idj0=subst(idj,t,numa);
+            for(b=1;b<=size(nulli);b++)
+            {
+               if(defined(numb)) {kill numb;}
+               strId="number numb=" + string(nulli[b]) + ";";
+               execute(strId);
+               id10=subst(id1,t,numb);
+               attrib(id10,"isSB",1);
+               if(size(reduce(idj0,id10))==0)
+               {
+                  tintvec[a]=b;
+                  break;
+               }
+            }
+            if(!find(string(tintvec),string(b)))
+            {
+~;
+               ERROR("Problem identifying C-components in different charts.");
+            }
+         }
+         setring S;
+         dcE[inter[3][ii][1][2]][inter[3][ii][1][3]][8]=tintvec;
+      }
+   }
+   return(0);
+}

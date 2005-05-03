@@ -1,0 +1,5230 @@
+//////////////////////////////////////////////////////////////////////////////
+version="$Id: reszeta.lib,v 1.2 2005-05-03 14:22:08 Singular Exp $";
+category="Commutative Algebra";
+info="
+LIBRARY:  zeta.lib       Zeta-function of Denef and Loeser
+
+AUTHORS:  A. Fruehbis-Krueger,  anne@mathematik.uni-kl.de,
+@*        G. Pfister,           pfister@mathematik.uni-kl.de
+
+MAIN PROCEDURES:
+intersectionDiv(L)   computes intersection form and genera of exceptional
+                     divisors (isolated singularities of surfaces)
+spectralNeg(L)       computes negative spectral numbers
+                     (isolated hypersurface singularity)
+zetaDL               computes Denef-Loeser zeta function
+                     (hypersurface singularity of dimension 2)
+
+AUXILLIARY PROCEDURES:
+collectDiv(L[,iv])   identify exceptional divisors in different charts
+                     (embedded and non-embedded case)
+prepEmbDiv(L[,b])    prepare list of divisors (including components
+                     of strict transform, embedded case)
+abstractR(L)         pass from embedded to non-embedded resolution
+";
+LIB "resol.lib";
+LIB "solve.lib";
+LIB "normal.lib";
+///////////////////////////////////////////////////////////////////////////////
+//      the repunit: ring R=0,x,dp;number n=10;(n^1031-1)/9;  is prim        //
+//      record:      number m=2;number k=m^20996011-1;                       //
+///////////////////////////////////////////////////////////////////////////////
+static
+proc spectral1(poly h,list re, list DL,intvec v, intvec n)
+"Internal procedure - no help and no example available
+"
+{
+//--- compute one spectral number
+//--- DL is output of prepEmbDiv
+   int i;
+   intvec w=computeH(h,re,DL);
+   number gw=number(w[1]+v[1])/number(n[1]);
+   for(i=2;i<=size(v);i++)
+   {
+      if(gw>number(w[i]+v[i])/number(n[i]))
+      {
+         gw=number(w[i]+v[i])/number(n[i]);
+      }
+   }
+   return(gw-1);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc spectralNeg(list re,list #)
+"USAGE:   spectralNeg(L);
+@*        L = list of rings
+ASSUME:   L is output of resolution of singularities
+RETURN:   list of numbers, each a spectral number in (-1,0]
+EXAMPLE:  example spectralNeg;  shows an example
+"
+{
+//-----------------------------------------------------------------------------
+// Initialization and Sanity Checks
+//-----------------------------------------------------------------------------
+   int i,j,l;
+   number bound;
+   list resu;
+   if(size(#)>0)
+   {
+//--- undocumented feature:
+//--- if # is not empty it computes numbers up to this bound,
+//--- not necessarily spectral numbers
+      bound=number(#[1]);
+   }
+//--- get list of embedded divisors
+   list DL=prepEmbDiv(re,1);
+   int k=1;
+   ideal I,delI;
+   number g;
+   int m=nvars(basering);
+//--- prepare the multiplicities of exceptional divisors N and nu
+   intvec v=computeV(re,DL);        // nu
+   intvec n=computeN(re,DL);        // N
+//---------------------------------------------------------------------------
+// start computation, first case separately, then loop
+//---------------------------------------------------------------------------
+   resu[1]=spectral1(1,re,DL,v,n);  // first number, corresponding to
+                                    // volume form itself
+   if(resu[1]>=bound)
+   {
+//--- exceeds bound ==> not a spectral number
+      resu=delete(resu,1);
+      return(resu);
+   }
+   delI=std(ideal(0));
+   while(k)
+   {
+//--- now run through all monomial x volume form, degree by degree
+      j++;
+      k=0;
+      I=maxideal(j);
+      I=reduce(I,delI);
+      for(i=1;i<=size(I);i++)
+      {
+//--- all monomials in degree j
+         g=spectral1(I[i],re,DL,v,n);
+         if(g<bound)
+         {
+//--- otherwise g exceeds bound ==> not a spectral number
+            k=1;
+            l=1;
+            while(resu[l]<g)
+            {
+               l++;
+               if(l==size(resu)+1){break;}
+            }
+            if(l==size(resu)+1){resu[size(resu)+1]=g;}
+            if(resu[l]!=g){resu=insert(resu,g,l-1);}
+         }
+         else
+         {
+            delI[size(delI)+1]=I[i];
+         }
+      }
+      attrib(delI,"isSB",1);
+   }
+   return(resu);
+}
+example
+{"EXAMPLE:";
+   echo = 2;
+   ring R=0,(x,y,z),dp;
+   ideal I=x3+y4+z5;
+   list L=resolve(I,"K");
+   spectralNeg(L);
+   LIB"gaussman.lib";
+   ring r=0,(x,y,z),ds;
+   poly f=x3+y4+z5;
+   spectrum(f);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+static
+proc ordE(ideal J,ideal E,ideal W)
+"Internal procedure - no help and no example available
+"
+{
+//--- compute multiplicity of E in J -- embedded in W
+   int s;
+   if(size(J)==0){~;ERROR("ordE: J=0");}
+   ideal Estd=std(E+W);
+   ideal Epow=1;
+   ideal Jquot=1;
+   while(size(reduce(Jquot,Estd))!=0)
+   {
+      s++;
+      Epow=Epow*E;
+      Jquot=quotient(Epow+W,J);
+   }
+   return(s-1);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+static
+proc computeV(list re, list DL)
+"Internal procedure - no help and no example available
+"
+{
+//--- computes for every divisor E_i its multiplicity + 1 in pi^*(w)
+//--- w a non-vanishing 1-form
+//--- note: DL is output of prepEmbDiv
+
+//-----------------------------------------------------------------------------
+// Initialization
+//-----------------------------------------------------------------------------
+   def R=basering;
+   int i,j,k,n;
+   intvec v,w;
+   list iden=DL;
+   v[size(iden)]=0;
+
+//----------------------------------------------------------------------------
+// Run through all exceptional divisors
+//----------------------------------------------------------------------------
+   for(k=1;k<=size(iden);k++)
+   {
+      for(i=1;i<=size(iden[k]);i++)
+      {
+         if(defined(S)){kill S;}
+         def S=re[2][iden[k][i][1]];
+         setring S;
+         if((!v[k])&&(defined(EList)))
+         {
+            if(defined(II)){kill II;}
+//--- we might be embedded in a non-trivial BO[1]
+//--- take this into account when forming the jacobi-determinant
+            ideal II=jacobDet(BO[5],BO[1]);
+            if(size(II)!=0)
+            {
+                v[k]=ordE(II,EList[iden[k][i][2]],BO[1])+1;
+            }
+         }
+         setring R;
+      }
+   }
+   return(v);
+}
+example
+{"EXAMPLE:";
+   echo = 2;
+   ring R=0,(x,y,z),dp;
+   ideal I=(x-y)*(x-z)*(y-z)-z4;
+   list re=resolve(I,1);
+   intvec v=computeV(re);
+   v;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+static
+proc jacobDet(ideal I, ideal J)
+"Internal procedure - no help and no example available
+"
+{
+//--- Returns the Jacobian determinant of the morphism
+//--- K[x_1,...,x_m]--->K[y_1,...,y_n]/J defined by x_i ---> I_i.
+//--- Let basering=K[y_1,...,y_n], l=n-dim(basering/J),
+//--- I=<I_1,...,I_m>, J=<J_1,...,J_r>
+//--- For each subset v in {1,...,n} of l elements and
+//--- w in {1,...,r} of l elements
+//--- let K_v,w be the ideal generated by the n-l-minors of the matrix
+//--- (diff(I_i,y_j)+
+//---  \sum_k diff(I_i,y_v[k])*diff(J_w[k],y_j))_{j not in v  multiplied with
+//---                                 the determinant of (diff(J_w[i],y_v[j]))
+//--- the sum of all such ideals K_v,w plus J is returned.
+
+//----------------------------------------------------------------------------
+// Initialization
+//----------------------------------------------------------------------------
+   int n=nvars(basering);
+   int i,j,k;
+   intvec u,v,w,x;
+   matrix MI[ncols(I)][n]=jacob(I);
+   matrix N=unitmat(n);
+   matrix L;
+   ideal K=J;
+   if(size(J)==0)
+   {
+      K=minor(MI,n);
+   }
+
+//---------------------------------------------------------------------------
+// Do calculation as described above.
+// separately for case size(J)=1
+//---------------------------------------------------------------------------
+   if(size(J)==1)
+   {
+      matrix MJ[ncols(J)][n]=jacob(J);
+      N=concat(N,transpose(MJ));
+      v=1..n;
+      for(i=1;i<=n;i++)
+      {
+         L=transpose(permcol(N,i,n+1));
+         if(i==1){w=2..n;}
+         if(i==n){w=1..n-1;}
+         if((i!=1)&&(i!=n)){w=1..i-1,i+1..n;}
+         L=submat(L,v,w);
+         L=MI*L;
+         K=K+minor(L,n-1)*MJ[1,i];
+      }
+   }
+   if(size(J)>1)
+   {
+      matrix MJ[ncols(J)][n]=jacob(J);
+      matrix SMJ;
+      N=concat(N,transpose(MJ));
+      ideal Jstd=std(J);
+      int l=n-dim(Jstd);
+      int r=ncols(J);
+      list L1=indexSet(n,l);
+      list L2=indexSet(r,l);
+      for(i=1;i<=size(L1);i++)
+      {
+         for(j=1;j<=size(L2);j++)
+         {
+            for(k=1;k<=size(L1[i]);k++)
+            {
+               if(L1[i][k]){v[size(v)+1]=k;}
+            }
+            v=v[2..size(v)];
+            for(k=1;k<=size(L2[j]);k++)
+            {
+               if(L2[j][k]){w[size(w)+1]=k;}
+            }
+            w=w[2..size(w)];
+            SMJ=submat(MJ,w,v);
+            L=N;
+            for(k=1;k<=l;k++)
+            {
+               L=permcol(L,v[k],n+w[k]);
+            }
+            u=1..n;
+            x=1..n;
+            v=sort(v)[1];
+            for(k=l;k>=1;k--)
+            {
+               if(v[k])
+               {
+                  u=deleteInt(u,v[k],1);
+               }
+            }
+            L=transpose(submat(L,u,x));
+            L=MI*L;
+            K=K+minor(L,n-l)*det(SMJ);
+         }
+      }
+   }
+   return(K);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+static
+proc computeH(ideal h,list re,list DL)
+"Internal procedure - no help and no example available
+"
+{
+//--- additional procedure to computeV, allows
+//--- computation for polynomial x volume form
+//--- by computing the contribution of the polynomial h
+//--- Note: DL is output of prepEmbDiv
+
+//----------------------------------------------------------------------------
+// Initialization
+//----------------------------------------------------------------------------
+   def R=basering;
+   ideal II=h;
+   list iden=DL;
+   def T=re[2][1];
+   setring T;
+   int i,k;
+   intvec v;
+   v[size(iden)]=0;
+   if(deg(II[1])==0){return(v);}
+//----------------------------------------------------------------------------
+// Run through all exceptional divisors
+//----------------------------------------------------------------------------
+   for(k=1;k<=size(iden);k++)
+   {
+      for(i=1;i<=size(iden[k]);i++)
+      {
+         if(defined(S)){kill S;}
+         def S=re[2][iden[k][i][1]];
+         setring S;
+         if((!v[k])&&(defined(EList)))
+         {
+            if(defined(JJ)){kill JJ;}
+            if(defined(phi)){kill phi;}
+            map phi=T,BO[5];
+            ideal JJ=phi(II);
+            if(size(JJ)!=0)
+            {
+               v[k]=ordE(JJ,EList[iden[k][i][2]],BO[1]);
+            }
+         }
+         setring R;
+      }
+   }
+   return(v);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+static
+proc computeN(list re,list DL)
+"Internal procedure - no help and no example available
+"
+{
+//--- computes for every (Q-irred.) divisor E_i its multiplicity in f \circ pi
+//--- DL is output of prepEmbDiv
+
+//----------------------------------------------------------------------------
+// Initialization
+//----------------------------------------------------------------------------
+   def R=basering;
+   list iden=DL;
+   def T=re[2][1];
+   setring T;
+   ideal J=BO[2];
+   int i,k;
+   intvec v;
+   v[size(iden)]=0;
+//----------------------------------------------------------------------------
+// Run through all exceptional divisors
+//----------------------------------------------------------------------------
+   for(k=1;k<=size(iden);k++)
+   {
+      for(i=1;i<=size(iden[k]);i++)
+      {
+         if(defined(S)){kill S;}
+         def S=re[2][iden[k][i][1]];
+         setring S;
+         if((!v[k])&&(defined(EList)))
+         {
+            if(defined(II)){kill II;}
+            if(defined(phi)){kill phi;}
+            map phi=T,BO[5];
+            ideal II=phi(J);
+            if(size(II)!=0)
+            {
+               v[k]=ordE(II,EList[iden[k][i][2]],BO[1]);
+            }
+         }
+         setring R;
+      }
+   }
+   return(v);
+}
+example
+{"EXAMPLE:";
+   echo = 2;
+   ring R=0,(x,y,z),dp;
+   ideal I=(x-y)*(x-z)*(y-z)-z4;
+   list re=resolve(I,1);
+   intvec v=computeN(re);
+   v;
+}
+//////////////////////////////////////////////////////////////////////////////
+static
+proc countEijk(list re,list iden,intvec iv,list #)
+"Internal procedure - no help and no example available
+"
+{
+//--- count the number of points in the intersection of 3 exceptional
+//--- hyperplanes (of dimension 2) - one of them is allowed to be a component
+//--- of the strict transform
+
+//----------------------------------------------------------------------------
+// Initialization
+//----------------------------------------------------------------------------
+   int i,j,k,comPa,numPts,localCase;
+   intvec ituple,jtuple,ktuple;
+   list chList,tmpList;
+   def R=basering;
+   if(size(#)>0)
+   {
+      if(string(#[1])=="local")
+      {
+         localCase=1;
+      }
+   }
+//----------------------------------------------------------------------------
+// Find common charts
+//----------------------------------------------------------------------------
+   for(i=1;i<=size(iden[iv[1]]);i++)
+   {
+//--- find common charts - only for final charts
+      if(defined(S)) {kill S;}
+      def S=re[2][iden[iv[1]][i][1]];
+      setring S;
+      if(!defined(EList))
+      {
+        i++;
+        setring R;
+        continue;
+      }
+      setring R;
+      kill ituple,jtuple,ktuple;
+      intvec ituple=iden[iv[1]][i];
+      intvec jtuple=findInIVList(1,ituple[1],iden[iv[2]]);
+      intvec ktuple=findInIVList(1,ituple[1],iden[iv[3]]);
+      if((size(jtuple)!=1)&&(size(ktuple)!=1))
+      {
+//--- chList contains all information about the common charts,
+//--- each entry represents a chart and contains three intvecs from iden
+//--- one for each E_l
+        kill tmpList;
+        list tmpList=ituple,jtuple,ktuple;
+        chList[size(chList)+1]=tmpList;
+        i++;
+        if(i<=size(iden[iv[1]]))
+        {
+           continue;
+        }
+        else
+        {
+           break;
+        }
+      }
+   }
+   if(size(chList)==0)
+   {
+//--- no common chart !!!
+     return(int(0));
+   }
+//----------------------------------------------------------------------------
+// Count points in common charts
+//----------------------------------------------------------------------------
+   for(i=1;i<=size(chList);i++)
+   {
+//--- run through all common charts
+      if(defined(S)) { kill S;}
+      def S=re[2][chList[i][1][1]];
+      setring S;
+//--- intersection in this chart
+      if(defined(interId)){kill interId;}
+      if(localCase==1)
+      {
+//--- in this case we need to intersect with \pi^-1(0)
+         ideal interId=EList[chList[i][1][2]]+EList[chList[i][2][2]]
+                                          +EList[chList[i][3][2]]+BO[5];
+      }
+      else
+      {
+         ideal interId=EList[chList[i][1][2]]+EList[chList[i][2][2]]
+                                          +EList[chList[i][3][2]];
+      }
+      interId=std(interId);
+      if(defined(otherId)) {kill otherId;}
+      ideal otherId=1;
+      for(j=1;j<i;j++)
+      {
+//--- run through the previously computed ones
+        if(defined(opath)){kill opath;}
+        def opath=imap(re[2][chList[j][1][1]],path);
+        comPa=1;
+        while(opath[1,comPa]==path[1,comPa])
+        {
+           comPa++;
+           if((comPa>ncols(path))||(comPa>ncols(opath))) break;
+        }
+        comPa=int(leadcoef(path[1,comPa-1]));
+        otherId=otherId+interId;
+        otherId=intersect(otherId,
+                     fetchInTree(re,chList[j][1][1],
+                                 comPa,chList[i][1][1],"interId",iden));
+      }
+      otherId=std(otherId);
+//--- do not count each point more than once
+      interId=sat(interId,otherId)[1];
+      export(interId);
+      if(dim(interId)>0)
+      {
+         ERROR("CountEijk: intersection not zerodimensional");
+      }
+//--- add the remaining number of points to the total point count numPts
+      numPts=numPts+vdim(interId);
+   }
+   return(numPts);
+}
+//////////////////////////////////////////////////////////////////////////////
+static
+proc chiEij(list re, list iden, intvec iv)
+"Internal procedure - no help and no example available
+"
+{
+//!!! Copy of chiEij_local adjusted for non-local case
+//!!! changes must be made in both copies
+
+//--- compute the Euler characteristic of the intersection
+//--- curve of two exceptional hypersurfaces (of dimension 2)
+//--- one of which is allowed to be a component of the strict transform
+//--- using the formula chi(Eij)=2-2g(Eij)
+
+//----------------------------------------------------------------------------
+// Initialization
+//----------------------------------------------------------------------------
+  int i,j,k,chi,g;
+  intvec ituple,jtuple,inters;
+  def R=basering;
+//----------------------------------------------------------------------------
+// Find a common chart in which they intersect
+//----------------------------------------------------------------------------
+  for(i=1;i<=size(iden[iv[1]]);i++)
+  {
+//--- find a common chart in which they intersect: only for final charts
+     if(defined(S)) {kill S;}
+     def S=re[2][iden[iv[1]][i][1]];
+     setring S;
+     if(!defined(EList))
+     {
+       i++;
+       setring R;
+       continue;
+     }
+     setring R;
+     kill ituple,jtuple;
+     intvec ituple=iden[iv[1]][i];
+     intvec jtuple=findInIVList(1,ituple[1],iden[iv[2]]);
+     if(size(jtuple)==1)
+     {
+       if(i<size(iden[iv[1]]))
+       {
+//--- not in this chart
+         i++;
+         continue;
+       }
+       else
+       {
+         if(size(inters)==1)
+         {
+//--- E_i and E_j do not meet at all
+            return("leer");
+         }
+         else
+         {
+            return(chi);
+         }
+       }
+     }
+//----------------------------------------------------------------------------
+// Run through common charts and compute the Euler characteristic of
+// each component of Eij.
+// As soon as a component has been treated in a chart, it will not be used in
+// any subsequent charts.
+//----------------------------------------------------------------------------
+     if(defined(S)) {kill S;}
+     def S=re[2][ituple[1]];
+     setring S;
+//--- interId: now all components in this chart,
+//---          but we want only new components
+     if(defined(interId)){kill interId;}
+     ideal interId=EList[ituple[2]]+EList[jtuple[2]];
+     interId=std(interId);
+//--- doneId: already considered components
+     if(defined(doneId)){kill doneId;}
+     ideal doneId=1;
+     for(j=2;j<=size(inters);j++)
+     {
+//--- fetch the components which have already been dealt with via fetchInTree
+        if(defined(opath)) {kill opath;}
+        def opath=imap(re[2][inters[j]],path);
+        k=1;
+        while((k<ncols(opath))&&(k<ncols(path)))
+        {
+           if(path[1,k+1]!=opath[1,k+1]) break;
+           k++;
+        }
+        if(defined(comPa)) {kill comPa;}
+        int comPa=int(leadcoef(path[1,k]));
+        if(defined(tempId)){kill tempId;}
+        ideal tempId=fetchInTree(re,inters[j],comPa,
+                                    iden[iv[1]][i][1],"interId",iden);
+        doneId=intersect(doneId,tempId);
+        kill tempId;
+     }
+//--- only consider new components in interId
+     interId=sat(interId,doneId)[1];
+     if(dim(interId)>1)
+     {
+       ERROR("genus_Eij: higher dimensional intersection");
+     }
+     if(dim(interId)>=0)
+     {
+//--- save the index of the current chart for future use
+        export(interId);
+        inters[size(inters)+1]=iden[iv[1]][i][1];
+     }
+     BO[1]=std(BO[1]);
+     if(((dim(interId)<=0)&&(dim(BO[1])>2))||
+        ((dim(interId)<0)&&(dim(BO[1])==2)))
+     {
+       if(i<size(iden[iv[1]]))
+       {
+//--- not in this chart
+         setring R;
+         i++;
+         continue;
+       }
+       else
+       {
+         if(size(inters)==1)
+         {
+//--- E_i and E_j do not meet at all
+            return("leer");
+         }
+         else
+         {
+            return(chi);
+         }
+       }
+     }
+     g=genus(interId);
+
+//--- chi is the Euler characteristic of the (disjoint !!!) union of the
+//--- considered components
+//--- remark: components are disjoint, because the E_i are normal crossing!!!
+
+     chi=chi+(2-2*g);
+  }
+  return(chi);
+}
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+static
+proc chiEij_local(list re, list iden, intvec iv)
+"Internal procedure - no help and no example available
+"
+{
+//!!! Copy of chiEij adjusted for local case
+//!!! changes must be made in both copies
+
+//--- we have to consider two different cases:
+//--- case1: E_i \cap E_j \cap \pi^-1(0) is a curve
+//---    compute the Euler characteristic of the intersection
+//---    curve of two exceptional hypersurfaces (of dimension 2)
+//---    one of which is allowed to be a component of the strict transform
+//---    using the formula chi(Eij)=2-2g(Eij)
+//--- case2: E_i \cap E_j \cap \pi^-1(0) is a set of points
+//---    count the points
+
+//----------------------------------------------------------------------------
+// Initialization
+//----------------------------------------------------------------------------
+  int i,j,k,chi,g,points;
+  intvec ituple,jtuple,inters;
+  def R=basering;
+//----------------------------------------------------------------------------
+// Find a common chart in which they intersect
+//----------------------------------------------------------------------------
+  for(i=1;i<=size(iden[iv[1]]);i++)
+  {
+//--- find a common chart in which they intersect: only for final charts
+     if(defined(S)) {kill S;}
+     def S=re[2][iden[iv[1]][i][1]];
+     setring S;
+     if(!defined(EList))
+     {
+       i++;
+       setring R;
+       continue;
+     }
+     setring R;
+     kill ituple,jtuple;
+     intvec ituple=iden[iv[1]][i];
+     intvec jtuple=findInIVList(1,ituple[1],iden[iv[2]]);
+     if(size(jtuple)==1)
+     {
+       if(i<size(iden[iv[1]]))
+       {
+//--- not in this chart
+         i++;
+         continue;
+       }
+       else
+       {
+         if(size(inters)==1)
+         {
+//--- E_i and E_j do not meet at all
+            return("leer");
+         }
+         else
+         {
+            return(chi);
+         }
+       }
+     }
+//----------------------------------------------------------------------------
+// Run through common charts and compute the Euler characteristic of
+// each component of Eij.
+// As soon as a component has been treated in a chart, it will not be used in
+// any subsequent charts.
+//----------------------------------------------------------------------------
+     if(defined(S)) {kill S;}
+     def S=re[2][ituple[1]];
+     setring S;
+//--- interId: now all components in this chart,
+//---          but we want only new components
+     if(defined(interId)){kill interId;}
+     ideal interId=EList[ituple[2]]+EList[jtuple[2]]+BO[5];
+     interId=std(interId);
+//--- doneId: already considered components
+     if(defined(doneId)){kill doneId;}
+     ideal doneId=1;
+     for(j=2;j<=size(inters);j++)
+     {
+//--- fetch the components which have already been dealt with via fetchInTree
+        if(defined(opath)) {kill opath;}
+        def opath=imap(re[2][inters[j]],path);
+        k=1;
+        while((k<ncols(opath))&&(k<ncols(path)))
+        {
+           if(path[1,k+1]!=opath[1,k+1]) break;
+           k++;
+        }
+        if(defined(comPa)) {kill comPa;}
+        int comPa=int(leadcoef(path[1,k]));
+        if(defined(tempId)){kill tempId;}
+        ideal tempId=fetchInTree(re,inters[j],comPa,
+                                    iden[iv[1]][i][1],"interId",iden);
+        doneId=intersect(doneId,tempId);
+        kill tempId;
+     }
+//--- only consider new components in interId
+     interId=sat(interId,doneId)[1];
+     if(dim(interId)>1)
+     {
+       ERROR("genus_Eij: higher dimensional intersection");
+     }
+     if(dim(interId)>=0)
+     {
+//--- save the index of the current chart for future use
+        export(interId);
+        inters[size(inters)+1]=iden[iv[1]][i][1];
+     }
+     BO[1]=std(BO[1]);
+     if(dim(interId)<0)
+     {
+       if(i<size(iden[iv[1]]))
+       {
+//--- not in this chart
+         setring R;
+         i++;
+         continue;
+       }
+       else
+       {
+         if(size(inters)==1)
+         {
+//--- E_i and E_j do not meet at all
+            return("leer");
+         }
+         else
+         {
+            return(chi);
+         }
+       }
+     }
+     if((dim(interId)==0)&&(dim(std(BO[1]))>2))
+     {
+//--- for sets of points the Euler characteristic is just
+//--- the number of points
+//--- fat points are impossible, since everything is smooth and n.c.
+        chi=chi+vdim(interId);
+        points=1;
+     }
+     else
+     {
+        if(points==1)
+        {
+           ERROR("components of intersection do not have same dimension");
+        }
+        g=genus(interId);
+//--- chi is the Euler characteristic of the (disjoint !!!) union of the
+//--- considered components
+//--- remark: components are disjoint, because the E_i are normal crossing!!!
+        chi=chi+(2-2*g);
+     }
+  }
+  return(chi);
+}
+//////////////////////////////////////////////////////////////////////////////
+static
+proc computeChiE(list re, list iden)
+"Internal procedure - no help and no example available
+"
+{
+//--- compute the Euler characteristic of the exceptional hypersurfaces
+//--- (of dimension 2), not considering the components of the strict
+//--- transform
+
+//----------------------------------------------------------------------------
+// Initialization
+//----------------------------------------------------------------------------
+   int i,j,k,m,thisE,otherE;
+   def R=basering;
+   intvec nulliv,chi_temp,kvec;
+   nulliv[size(iden)]=0;
+   list chi_E;
+   for(i=1;i<=size(iden);i++)
+   {
+      chi_E[i]=list();
+   }
+//---------------------------------------------------------------------------
+// Run through the list of charts and compute the Euler characteristic of
+// the new exceptional hypersurface and change the values for the old ones
+// according to the blow-up which has just been performed
+// For initialization reasons, treat the case of the first blow-up separately
+//---------------------------------------------------------------------------
+   for(i=2;i<=size(re[2]);i++)
+   {
+//--- run through all charts
+      if(defined(S)){kill S;}
+      def S=re[2][i];
+      setring S;
+      m=int(leadcoef(path[1,ncols(path)]));
+      if(defined(Spa)){kill Spa;}
+      def Spa=re[2][m];
+      if(size(BO[4])==1)
+      {
+//--- just one exceptional divisor
+         thisE=1;
+         setring Spa;
+         if(i==2)
+         {
+//--- have not set the initial value of chi(E_1) yet
+           if(dim(std(cent))==0)
+           {
+//--- center was point ==> new except. div. is a P^2
+              list templist=3*vdim(std(BO[1]+cent)),nulliv;
+           }
+           else
+           {
+//--- center was curve ==> new except. div. is curve x P^1
+              list templist=4-4*genus(BO[1]+cent),nulliv;
+           }
+           chi_E[1]=templist;
+           kill templist;
+         }
+         setring S;
+         i++;
+         if(i<size(re[2]))
+         {
+            continue;
+         }
+         else
+         {
+            break;
+         }
+      }
+      for(j=1;j<=size(iden);j++)
+      {
+//--- find out which exceptional divisor has just been born
+        if(inIVList(intvec(i,size(BO[4])),iden[j]))
+        {
+//--- found it
+           thisE=j;
+           break;
+        }
+      }
+//--- now setup new chi and change the previous ones appropriately
+      setring Spa;
+      if(size(chi_E[thisE])==0)
+      {
+//--- have not set the initial value of chi(E_thisE) yet
+        if(dim(std(cent))==0)
+        {
+//--- center was point  ==> new except. div. is a P^2
+           list templist=3*vdim(std(BO[1]+cent)),nulliv;
+        }
+        else
+        {
+//--- center was curve   ==> new except. div. is a C x P^1
+           list templist=4-4*genus(BO[1]+cent),nulliv;
+        }
+        chi_E[thisE]=templist;
+        kill templist;
+      }
+      for(j=1;j<=size(BO[4]);j++)
+      {
+//--- we are in the parent ring ==> thisE is not yet born
+//--- all the other E_i have already been initialized, but the chi
+//--- might change with the current blow-up at cent
+         if(BO[6][j]==1)
+         {
+//--- ignore empty sets
+            j++;
+            if(j<=size(BO[4]))
+            {
+              continue;
+            }
+            else
+            {
+              break;
+            }
+         }
+         for(k=1;k<=size(iden);k++)
+         {
+//--- find global index of BO[4][j]
+            if(inIVList(intvec(m,j),iden[k]))
+            {
+               otherE=k;
+               break;
+            }
+         }
+         if(chi_E[otherE][2][thisE]==1)
+         {
+//--- already considered this one
+            j++;
+            if(j<=size(BO[4]))
+            {
+              continue;
+            }
+            else
+            {
+              break;
+            }
+         }
+//---------------------------------------------------------------------------
+// update chi according to the formula
+// chi(E_k^transf)=chi(E_k) - chi(C \cap E_k) + chi(E_k \cap E_new)
+// for convenience of implementation, we first compute
+//        chi(E_k) - chi(C \cap E_k)
+// and afterwards add the last term chi(E_k \cap E_new)
+//---------------------------------------------------------------------------
+         ideal CinE=std(cent+BO[4][j]+BO[1]);  // this is C \cap E_k
+         if(dim(CinE)==1)
+         {
+//--- center meets E_k in a curve
+            chi_temp[otherE]=chi_E[otherE][1]-(2-2*genus(CinE));
+         }
+         if(dim(CinE)==0)
+         {
+//--- center meets E_k in points
+            chi_temp[otherE]=chi_E[otherE][1]-vdim(std(CinE));
+         }
+         kill CinE;
+         setring S;
+//--- now we are back in the i-th ring in the list
+         ideal CinE=std(BO[4][j]+BO[4][size(BO[4])]+BO[1]);
+                                              // this is E_k \cap E_new
+         if(dim(CinE)==1)
+         {
+//--- if the two divisors meet, they meet in a curve
+            chi_E[otherE][1]=chi_temp[otherE]+(2-2*genus(CinE));
+            chi_E[otherE][2][thisE]=1;         // this blow-up of E_k is done
+         }
+         kill CinE;
+         setring Spa;
+      }
+   }
+   setring R;
+   return(chi_E);
+}
+//////////////////////////////////////////////////////////////////////////////
+static
+proc computeChiE_local(list re, list iden)
+"Internal procedure - no help and no example available
+"
+{
+//--- compute the Euler characteristic of the intersection of the
+//--- exceptional hypersurfaces with \pi^-1(0) which can be of
+//--- dimension 1 or 2 - not considering the components of the strict
+//--- transform
+
+//----------------------------------------------------------------------------
+// Initialization
+//----------------------------------------------------------------------------
+   int i,j,k,aa,m,n,thisE,otherE;
+   def R=basering;
+   intvec nulliv,chi_temp,kvec,dimEi,endiv;
+   nulliv[size(iden)]=0;
+   dimEi[size(iden)]=0;
+   endiv[size(re[2])]=0;
+   list chi_E;
+   for(i=1;i<=size(iden);i++)
+   {
+      chi_E[i]=list();
+   }
+//---------------------------------------------------------------------------
+// Run through the list of charts and compute the Euler characteristic of
+// the new exceptional hypersurface and change the values for the old ones
+// according to the blow-up which has just been performed
+// For initialization reasons, treat the case of the first blow-up separately
+//---------------------------------------------------------------------------
+   for(i=2;i<=size(re[2]);i++)
+   {
+//--- run through all charts
+      if(defined(S)){kill S;}
+      def S=re[2][i];
+      setring S;
+      if(defined(EList))
+      {
+         endiv[i]=1;
+      }
+      m=int(leadcoef(path[1,ncols(path)]));
+      if(defined(Spa)){kill Spa;}
+      def Spa=re[2][m];
+      if(size(BO[4])==1)
+      {
+//--- just one exceptional divisor
+         thisE=1;
+         setring Spa;
+         if(i==2)
+         {
+//--- have not set the initial value of chi(E_1) yet
+//--- in the local case, we need to know whether the center contains 0
+           if(size(reduce(cent,std(maxideal(1))))!=0)
+           {
+//--- first center does not meet 0
+              list templist=0,nulliv;
+              dimEi[1]=-1;
+           }
+           else
+           {
+              if(dim(std(cent))==0)
+              {
+//--- center was point ==> new except. div. is a P^2
+                 list templist=3*vdim(std(BO[1]+cent)),nulliv;
+                 dimEi[1]=2;
+              }
+              else
+              {
+//--- center was curve ==> intersection of new exceptional divisor
+//---                      with \pi^-1(0) is a curve, namely P^1
+                 setring S;
+                 list templist=2,nulliv;
+                 dimEi[1]=1;
+              }
+           }
+           chi_E[1]=templist;
+           kill templist;
+         }
+         setring S;
+         i++;
+         if(i<size(re[2]))
+         {
+            continue;
+         }
+         else
+         {
+            break;
+         }
+      }
+      for(j=1;j<=size(iden);j++)
+      {
+//--- find out which exceptional divisor has just been born
+        if(inIVList(intvec(i,size(BO[4])),iden[j]))
+        {
+//--- found it
+           thisE=j;
+           break;
+        }
+      }
+//--- now setup new chi and change the previous ones appropriately
+      setring Spa;
+      if(size(chi_E[thisE])==0)
+      {
+//--- have not set the initial value of chi(E_thisE) yet
+        if(deg(std(cent+BO[5])[1])==0)
+        {
+           if(dim(std(cent))==0)
+           {
+//--- \pi^-1(0) does not meet the Q-point cent
+              list templist=0,nulliv;
+              dimEi[thisE]=-1;
+           }
+//--- if cent is a curve, the intersection point might simply be outside
+//--- of this chart!!!
+        }
+        else
+        {
+           if(dim(std(cent))==0)
+           {
+//--- center was point  ==> new except. div. is a P^2
+              list templist=3*vdim(std(BO[1]+cent)),nulliv;
+              dimEi[thisE]=2;
+           }
+           else
+           {
+//--- center was curve   ==> new except. div. is a C x P^1
+              if(dim(std(cent+BO[5]))==1)
+              {
+//--- whole curve is in \pi^-1(0)
+                 list templist=4-4*genus(BO[1]+cent),nulliv;
+                 dimEi[thisE]=2;
+              }
+              else
+              {
+//--- curve meets \pi^-1(0) in points
+//--- in S, the intersection will be a curve!!!
+                 setring S;
+                 list templist=2-2*genus(BO[1]+BO[4][size(BO[4])]+BO[5]),nulliv;
+                 dimEi[thisE]=1;
+                 setring Spa;
+              }
+           }
+        }
+        if(defined(templist))
+        {
+          chi_E[thisE]=templist;
+        }
+        kill templist;
+      }
+      for(j=1;j<=size(BO[4]);j++)
+      {
+//--- we are in the parent ring ==> thisE is not yet born
+//--- all the other E_i have already been initialized, but the chi
+//--- might change with the current blow-up at cent
+         if(BO[6][j]==1)
+         {
+//--- ignore empty sets
+            j++;
+            if(j<=size(BO[4]))
+            {
+              continue;
+            }
+            else
+            {
+              break;
+            }
+         }
+         for(k=1;k<=size(iden);k++)
+         {
+//--- find global index of BO[4][j]
+            if(inIVList(intvec(m,j),iden[k]))
+            {
+               otherE=k;
+               break;
+            }
+         }
+         if(dimEi[otherE]<=1)
+         {
+//--- dimEi[otherE]==-1: center leading to this E does not meet \pi^-1(0)
+//--- dimEi[otherE]== 0: center leading to this E does not meet \pi^-1(0)
+//---                   in any previously visited charts
+//---                   maybe in some other branch later, but has nothing
+//---                   to do with this center
+//--- dimEi[otherE]== 1: E \cap \pi^-1(0) is curve
+//---                   ==> chi is birational invariant
+            j++;
+            if(j<=size(BO[4]))
+            {
+              continue;
+            }
+            break;
+         }
+         if(chi_E[otherE][2][thisE]==1)
+         {
+//--- already considered this one
+            j++;
+            if(j<=size(BO[4]))
+            {
+              continue;
+            }
+            else
+            {
+              break;
+            }
+         }
+//---------------------------------------------------------------------------
+// update chi according to the formula
+// chi(E_k^transf)=chi(E_k) - chi(C \cap E_k) + chi(E_k \cap E_new)
+// for convenience of implementation, we first compute
+//        chi(E_k) - chi(C \cap E_k)
+// and afterwards add the last term chi(E_k \cap E_new)
+//---------------------------------------------------------------------------
+         ideal CinE=std(cent+BO[4][j]+BO[1]);  // this is C \cap E_k
+         if(dim(CinE)==1)
+         {
+//--- center meets E_k in a curve
+            chi_temp[otherE]=chi_E[otherE][1]-(2-2*genus(CinE));
+         }
+         if(dim(CinE)==0)
+         {
+//--- center meets E_k in points
+            chi_temp[otherE]=chi_E[otherE][1]-vdim(std(CinE));
+         }
+         kill CinE;
+         setring S;
+//--- now we are back in the i-th ring in the list
+         ideal CinE=std(BO[4][j]+BO[4][size(BO[4])]+BO[1]);
+                                              // this is E_k \cap E_new
+         if(dim(CinE)==1)
+         {
+//--- if the two divisors meet, they meet in a curve
+            chi_E[otherE][1]=chi_temp[otherE]+(2-2*genus(CinE));
+            chi_E[otherE][2][thisE]=1;         // this blow-up of E_k is done
+         }
+         kill CinE;
+         setring Spa;
+      }
+   }
+//--- we still need to clean-up the 1-dimensional E_i \cap \pi^-1(0)
+   for(i=1;i<=size(dimEi);i++)
+   {
+      if(dimEi[i]!=1)
+      {
+//--- not 1-dimensional ==> skip
+         i++;
+         if(i>size(dimEi)) break;
+         continue;
+      }
+      if(defined(myCharts)) {kill myCharts;}
+      intvec myCharts;
+      chi_E[i]=0;
+      for(j=1;j<=size(re[2]);j++)
+      {
+         if(endiv[j]==0)
+         {
+//--- not an endChart ==> skip
+            j++;
+            if(j>size(re[2])) break;
+            continue;
+         }
+         if(defined(mtuple)) {kill mtuple;}
+         intvec mtuple=findInIVList(1,j,iden[i]);
+         if(size(mtuple)==1)
+         {
+//-- nothing to do with this Ei ==> skip
+            j++;
+            if(j>size(re[2])) break;
+            continue;
+         }
+         myCharts[size(myCharts)+1]=j;
+         if(defined(S)){kill S;}
+         def S=re[2][j];
+         setring S;
+         if(defined(interId)){kill interId;}
+//--- all components
+         ideal interId=std(BO[4][mtuple[2]]+BO[5]);
+         if(defined(myPts)){kill myPts;}
+         ideal myPts=1;
+         export(myPts);
+         export(interId);
+         if(defined(doneId)){kill doneId;}
+         if(defined(donePts)){kill donePts;}
+         ideal donePts=1;
+         ideal doneId=1;
+         for(k=2;k<size(myCharts);k++)
+         {
+//--- fetch the components which have already been dealt with via fetchInTree
+            if(defined(opath)) {kill opath;}
+            def opath=imap(re[2][myCharts[k][1]],path);
+            aa=1;
+            while((aa<ncols(opath))&&(aa<ncols(path)))
+            {
+               if(path[1,aa+1]!=opath[1,aa+1]) break;
+               aa++;
+            }
+            if(defined(comPa)) {kill comPa;}
+            int comPa=int(leadcoef(path[1,aa]));
+            if(defined(tempId)){kill tempId;}
+            ideal tempId=fetchInTree(re,myCharts[k][1],comPa,j,"interId",iden);
+            doneId=intersect(doneId,tempId);
+            kill tempId;
+            ideal tempId=fetchInTree(re,myCharts[k][1],comPa,j,"myPts",iden);
+            donePts=intersect(donePts,tempId);
+            kill tempId;
+         }
+//--- drop components which have already been dealt with
+         interId=sat(interId,doneId)[1];
+         list pr=minAssGTZ(interId);
+         myPts=std(interId+doneId);
+         for(k=1;k<=size(pr);k++)
+         {
+           for(n=k+1;n<=size(pr);n++)
+           {
+              myPts=intersect(myPts,std(pr[k]+pr[n]));
+           }
+           if(deg(std(pr[k])[1])>0)
+           {
+              chi_E[i]=chi_E[i]+(2-2*genus(pr[k]));
+           }
+         }
+         myPts=sat(myPts,donePts)[1];
+         chi_E[i]=chi_E[i]-vdim(myPts);
+      }
+   }
+   setring R;
+   return(chi_E);
+}
+//////////////////////////////////////////////////////////////////////////////
+static
+proc chi_ast(list re,list iden,list #)
+"Internal procedure - no help and no example available
+"
+{
+//--- compute the Euler characteristic of the Ei,Eij,Eijk and the
+//--- corresponding Ei^*,Eij^*,Eijk^* by preparing the input to the
+//--- specialized auxilliary procedures and then recombining the results
+
+//----------------------------------------------------------------------------
+// Initialization
+//----------------------------------------------------------------------------
+   int i,j,k,g;
+   intvec tiv;
+   list chi_ijk,chi_ij,chi_i,ast_ijk,ast_ij,ast_i,tmplist,g_ij,emptylist;
+   list leererSchnitt;
+   def R=basering;
+   ring Rhelp=0,@t,dp;
+   setring R;
+//----------------------------------------------------------------------------
+// first compute the chi(Eij) and  at the same time
+// check whether E_i \cap E_j is empty
+// the formula is
+//              chi_ij=2-2*genus(E_i \cap E_j)
+//----------------------------------------------------------------------------
+   if(size(#)>0)
+   {
+      "Entering chi_ast";
+   }
+   for(i=1;i<=size(iden)-1;i++)
+   {
+      for(j=i+1;j<=size(iden);j++)
+      {
+         if(defined(blub)){kill blub;}
+         def blub=chiEij(re,iden,intvec(i,j));
+         if(typeof(blub)=="int")
+         {
+            tmplist=intvec(i,j),blub;
+         }
+         else
+         {
+            leererSchnitt[size(leererSchnitt)+1]=intvec(i,j);
+            tmplist=intvec(i,j),0;
+         }
+         chi_ij[size(chi_ij)+1]=tmplist;
+      }
+   }
+   if(size(#)>0)
+   {
+      "chi_ij computed";
+   }
+//-----------------------------------------------------------------------------
+// compute chi(Eijk)=chi^*(Eijk) by counting the points in the intersection
+//      chi_ijk=#(E_i \cap E_j \cap E_k)
+//      ast_ijk=chi_ijk
+//-----------------------------------------------------------------------------
+   for(i=1;i<=size(iden)-2;i++)
+   {
+      for(j=i+1;j<=size(iden)-1;j++)
+      {
+         for(k=j+1;k<=size(iden);k++)
+         {
+            if(inIVList(intvec(i,j),leererSchnitt))
+            {
+               tmplist=intvec(i,j,k),0;
+            }
+            else
+            {
+               tmplist=intvec(i,j,k),countEijk(re,iden,intvec(i,j,k));
+            }
+            chi_ijk[size(chi_ijk)+1]=tmplist;
+         }
+      }
+   }
+   ast_ijk=chi_ijk;
+   if(size(#)>0)
+   {
+      "chi_ijk computed";
+   }
+//----------------------------------------------------------------------------
+// construct chi(Eij^*) by the formula
+//      ast_ij=chi_ij - sum_ijk chi_ijk,
+// where k runs over all indices != i,j
+//----------------------------------------------------------------------------
+   for(i=1;i<=size(chi_ij);i++)
+   {
+      ast_ij[i]=chi_ij[i];
+      for(k=1;k<=size(chi_ijk);k++)
+      {
+         if(((chi_ijk[k][1][1]==chi_ij[i][1][1])||
+                 (chi_ijk[k][1][2]==chi_ij[i][1][1]))&&
+            ((chi_ijk[k][1][2]==chi_ij[i][1][2])||
+                 (chi_ijk[k][1][3]==chi_ij[i][1][2])))
+         {
+            ast_ij[i][2]=ast_ij[i][2]-chi_ijk[k][2];
+         }
+      }
+   }
+   if(size(#)>0)
+   {
+      "ast_ij computed";
+   }
+//----------------------------------------------------------------------------
+// construct ast_i according to the following formulae
+//      ast_i=0 if E_i is (Q- resp. C-)component of the strict transform
+//      chi_i=3*n if E_i originates from blowing up a Q-point,
+//                which consists of n (different) C-points
+//      chi_i=2-2g(C) if E_i originates from blowing up a (Q-)curve C
+//           (chi_i=n*(2-2g(C_i))=2-2g(C),
+//                 where C=\cup C_i, C_i \cap C_j = \emptyset)
+// if E_i is not a component of the strict transform, then
+//       ast_i=chi_i - sum_{j!=i} ast_ij
+//----------------------------------------------------------------------------
+   for(i=1;i<=size(iden);i++)
+   {
+      if(defined(S)) {kill S;}
+      def S=re[2][iden[i][1][1]];
+      setring S;
+      if(iden[i][1][2]>size(BO[4]))
+      {
+         i--;
+         break;
+      }
+   }
+   list idenE=iden;
+   while(size(idenE)>i)
+   {
+      idenE=delete(idenE,size(idenE));
+   }
+   list cl=computeChiE(re,idenE);
+   for(i=1;i<=size(idenE);i++)
+   {
+      chi_i[i]=list(intvec(i),cl[i][1]);
+   }
+   if(size(#)>0)
+   {
+      "chi_i computed";
+   }
+   for(i=1;i<=size(idenE);i++)
+   {
+      ast_i[i]=chi_i[i];
+      for(j=1;j<=size(ast_ij);j++)
+      {
+         if((ast_ij[j][1][1]==i)||(ast_ij[j][1][2]==i))
+         {
+            ast_i[i][2]=ast_i[i][2]-chi_ij[j][2];
+         }
+      }
+      for(j=1;j<=size(ast_ijk);j++)
+      {
+         if((ast_ijk[j][1][1]==i)||(ast_ijk[j][1][2]==i)
+                                 ||(ast_ijk[j][1][3]==i))
+         {
+            ast_i[i][2]=ast_i[i][2]+chi_ijk[j][2];
+         }
+      }
+   }
+   for(i=size(idenE)+1;i<=size(iden);i++)
+   {
+      ast_i[i]=list(intvec(i),0);
+   }
+//--- results are in ast_i, ast_ij and ast_ijk
+//--- all are of the form intvec(indices),int(value)
+   list result=ast_i,ast_ij,ast_ijk;
+   return(result);
+}
+//////////////////////////////////////////////////////////////////////////////
+static
+proc chi_ast_local(list re,list iden,list #)
+"Internal procedure - no help and no example available
+"
+{
+//--- compute the Euler characteristic of the Ei,Eij,Eijk and the
+//--- corresponding Ei^*,Eij^*,Eijk^* by preparing the input to the
+//--- specialized auxilliary procedures and then recombining the results
+
+//----------------------------------------------------------------------------
+// Initialization
+//----------------------------------------------------------------------------
+   int i,j,k,g;
+   intvec tiv;
+   list chi_ijk,chi_ij,chi_i,ast_ijk,ast_ij,ast_i,tmplist,g_ij,emptylist;
+   list leererSchnitt;
+   def R=basering;
+   ring Rhelp=0,@t,dp;
+   setring R;
+//----------------------------------------------------------------------------
+// first compute
+// if E_i \cap E_j \cap \pi^-1(0) is a curve:
+//    chi(Eij) and  at the same time
+//    check whether E_i \cap E_j is empty
+//    the formula is
+//              chi_ij=2-2*genus(E_i \cap E_j)
+// otherwise (points):
+//    chi(E_ij) by counting the points
+//----------------------------------------------------------------------------
+   if(size(#)>0)
+   {
+      "Entering chi_ast_local";
+   }
+   for(i=1;i<=size(iden)-1;i++)
+   {
+      for(j=i+1;j<=size(iden);j++)
+      {
+         if(defined(blub)){kill blub;}
+         def blub=chiEij_local(re,iden,intvec(i,j));
+         if(typeof(blub)=="int")
+         {
+            tmplist=intvec(i,j),blub;
+         }
+         else
+         {
+            leererSchnitt[size(leererSchnitt)+1]=intvec(i,j);
+            tmplist=intvec(i,j),0;
+         }
+         chi_ij[size(chi_ij)+1]=tmplist;
+      }
+   }
+   if(size(#)>0)
+   {
+      "chi_ij computed";
+   }
+//-----------------------------------------------------------------------------
+// compute chi(Eijk)=chi^*(Eijk) by counting the points in the intersection
+//      chi_ijk=#(E_i \cap E_j \cap E_k \cap \pi^-1(0))
+//      ast_ijk=chi_ijk
+//-----------------------------------------------------------------------------
+   for(i=1;i<=size(iden)-2;i++)
+   {
+      for(j=i+1;j<=size(iden)-1;j++)
+      {
+         for(k=j+1;k<=size(iden);k++)
+         {
+            if(inIVList(intvec(i,j),leererSchnitt))
+            {
+               tmplist=intvec(i,j,k),0;
+            }
+            else
+            {
+               tmplist=intvec(i,j,k),countEijk(re,iden,intvec(i,j,k),"local");
+            }
+            chi_ijk[size(chi_ijk)+1]=tmplist;
+         }
+      }
+   }
+   ast_ijk=chi_ijk;
+   if(size(#)>0)
+   {
+      "chi_ijk computed";
+   }
+//----------------------------------------------------------------------------
+// construct chi(Eij^*) by the formula
+//      ast_ij=chi_ij - sum_ijk chi_ijk,
+// where k runs over all indices != i,j
+//----------------------------------------------------------------------------
+   for(i=1;i<=size(chi_ij);i++)
+   {
+      ast_ij[i]=chi_ij[i];
+      for(k=1;k<=size(chi_ijk);k++)
+      {
+         if(((chi_ijk[k][1][1]==chi_ij[i][1][1])||
+                 (chi_ijk[k][1][2]==chi_ij[i][1][1]))&&
+            ((chi_ijk[k][1][2]==chi_ij[i][1][2])||
+                 (chi_ijk[k][1][3]==chi_ij[i][1][2])))
+         {
+            ast_ij[i][2]=ast_ij[i][2]-chi_ijk[k][2];
+         }
+      }
+   }
+   if(size(#)>0)
+   {
+      "ast_ij computed";
+   }
+//----------------------------------------------------------------------------
+// construct ast_i according to the following formulae
+//      ast_i=0 if E_i is (Q- resp. C-)component of the strict transform
+// if E_i \cap \pi^-1(0) is of dimension 2:
+//      chi_i=3*n if E_i originates from blowing up a Q-point,
+//                which consists of n (different) C-points
+//      chi_i=2-2g(C) if E_i originates from blowing up a (Q-)curve C
+//           (chi_i=n*(2-2g(C_i))=2-2g(C),
+//                 where C=\cup C_i, C_i \cap C_j = \emptyset)
+// if E_i \cap \pi^-1(0) is a curve:
+//      use the formula chi_i=2-2*genus(E_i \cap \pi^-1(0))
+//
+// for E_i not a component of the strict transform we have
+//       ast_i=chi_i - sum_{j!=i} ast_ij
+//----------------------------------------------------------------------------
+   for(i=1;i<=size(iden);i++)
+   {
+      if(defined(S)) {kill S;}
+      def S=re[2][iden[i][1][1]];
+      setring S;
+      if(iden[i][1][2]>size(BO[4]))
+      {
+         i--;
+         break;
+      }
+   }
+   list idenE=iden;
+   while(size(idenE)>i)
+   {
+      idenE=delete(idenE,size(idenE));
+   }
+   list cl=computeChiE_local(re,idenE);
+   for(i=1;i<=size(idenE);i++)
+   {
+      chi_i[i]=list(intvec(i),cl[i][1]);
+   }
+   if(size(#)>0)
+   {
+      "chi_i computed";
+   }
+   for(i=1;i<=size(idenE);i++)
+   {
+      ast_i[i]=chi_i[i];
+      for(j=1;j<=size(ast_ij);j++)
+      {
+         if((ast_ij[j][1][1]==i)||(ast_ij[j][1][2]==i))
+         {
+            ast_i[i][2]=ast_i[i][2]-chi_ij[j][2];
+         }
+      }
+      for(j=1;j<=size(ast_ijk);j++)
+      {
+         if((ast_ijk[j][1][1]==i)||(ast_ijk[j][1][2]==i)
+                                 ||(ast_ijk[j][1][3]==i))
+         {
+            ast_i[i][2]=ast_i[i][2]+chi_ijk[j][2];
+         }
+      }
+   }
+   for(i=size(idenE)+1;i<=size(iden);i++)
+   {
+      ast_i[i]=list(intvec(i),0);
+   }
+//--- results are in ast_i, ast_ij and ast_ijk
+//--- all are of the form intvec(indices),int(value)
+//"End of chi_ast_local";
+//~;
+   list result=ast_i,ast_ij,ast_ijk;
+   return(result);
+}
+//////////////////////////////////////////////////////////////////////////////
+
+proc zetaDL(list re,int d,list #)
+"USAGE:   zetaDL(L,d[,s][,a]);
+@*        L = list of rings
+@*        d = integer
+@*        s = string
+@*        a = integer
+ASSUME:   L is the output of resolution of singularities
+COMPUTE:  local Denef-Loeser zeta function, if string s is present and
+          has the value 'lokal'; global Denef-Loeser zeta function otherwise
+RETURN:   string specifying the Denef-Loeser zeta function if a not present
+          list l if a is present, where
+          l[1]: string specifying the Denef-Loeser zeta function
+          l[2]: list ast,
+                     ast[1]=chi(Ei^*)
+                     ast[2]=chi(Eij^*)
+                     ast[3]=chi(Eijk^*)
+          l[3]: intvec nu of multiplicites as needed in computation of zeta
+                function
+          l[4]: intvec N of multiplicities as needed in compuation of zeta
+                function
+EXAMPLE:  example zetaDL;   shows an example
+"
+{
+//----------------------------------------------------------------------------
+// Initialization
+//----------------------------------------------------------------------------
+   def R=basering;
+   int show_all,i;
+   if(size(#)>0)
+   {
+     if((typeof(#[1])=="int")||(size(#)>1))
+     {
+       show_all=1;
+     }
+     if(typeof(#[1])=="string")
+     {
+       if((#[1]=="local")||(#[1]=="lokal"))
+       {
+//          ERROR("Local case not implemented yet");
+          "Local Case: Assuming that no (!) charts were dropped";
+          "during calculation of the resolution (option \"A\")";
+          int localComp=1;
+       }
+       else
+       {
+          "Computing global zeta function";
+       }
+     }
+   }
+//----------------------------------------------------------------------------
+// Identify the embedded divisors and chi(Ei^*), chi(Eij^*) and chi(Eijk^*)
+// as well as the integer vector V(=nu) and N
+//----------------------------------------------------------------------------
+   list iden=prepEmbDiv(re);       //--- identify the E_i
+//!!! TIMING:    E8 takes 520 sec ==> needs speed up
+   if(!defined(localComp))
+   {
+      list ast_list=chi_ast(re,iden); //--- compute chi(E^*)
+   }
+   else
+   {
+      list ast_list=chi_ast_local(re,iden);
+   }
+   intvec Vvec=computeV(re,iden);  //--- nu
+   intvec Nvec=computeN(re,iden);  //--- N
+//----------------------------------------------------------------------------
+// Build a new ring with one parameter s
+// and compute Zeta_top^(d) in its ground field
+//----------------------------------------------------------------------------
+   ring Qs=(0,s),x,dp;
+   number zetaTop=0;
+   number enum,denom;
+   denom=1;
+   for(i=1;i<=size(Nvec);i++)
+   {
+      denom=denom*(Vvec[i]+s*Nvec[i]);
+   }
+//--- factors for which index set J consists of one element
+//--- (do something only if d divides N_j)
+   for(i=1;i<=size(ast_list[1]);i++)
+   {
+      if((((Nvec[ast_list[1][i][1][1]]/d)*d)-Nvec[ast_list[1][i][1][1]]==0)&&
+         (ast_list[1][i][2]!=0))
+      {
+          enum=enum+ast_list[1][i][2]*(denom/(Vvec[ast_list[1][i][1][1]]+s*Nvec[ast_list[1][i][1][1]]));
+      }
+   }
+//--- factors for which index set J consists of two elements
+//--- (do something only if d divides both N_i and N_j)
+//!!! TIMING: E8 takes 690 sec and has 703 elements
+//!!!         ==> need to implement a smarter way to do this
+//!!! e.g. build up enumerator and denominator separately, thus not
+//!!!      searching for common factors in each step
+   for(i=1;i<=size(ast_list[2]);i++)
+   {
+      if((((Nvec[ast_list[2][i][1][1]]/d)*d)-Nvec[ast_list[2][i][1][1]]==0)&&
+         (((Nvec[ast_list[2][i][1][2]]/d)*d)-Nvec[ast_list[2][i][1][2]]==0)&&
+          (ast_list[2][i][2]!=0))
+      {
+         enum=enum+ast_list[2][i][2]*(denom/((Vvec[ast_list[2][i][1][1]]+s*Nvec[ast_list[2][i][1][1]])*(Vvec[ast_list[2][i][1][2]]+s*Nvec[ast_list[2][i][1][2]])));
+      }
+   }
+//--- factors for which index set J consists of three elements
+//--- (do something only if d divides N_i, N_j and N_k)
+//!!! TIMING: E8 takes 490 sec and has 8436 elements
+//!!!         ==> same kind of improvements as in the previous case needed
+   for(i=1;i<=size(ast_list[3]);i++)
+   {
+      if((((Nvec[ast_list[3][i][1][1]]/d)*d)-Nvec[ast_list[3][i][1][1]]==0)&&
+         (((Nvec[ast_list[3][i][1][2]]/d)*d)-Nvec[ast_list[3][i][1][2]]==0)&&
+         (((Nvec[ast_list[3][i][1][3]]/d)*d)-Nvec[ast_list[3][i][1][3]]==0)&&
+         (ast_list[3][i][2]!=0))
+      {
+         enum=enum+ast_list[3][i][2]*(denom/((Vvec[ast_list[3][i][1][1]]+s*Nvec[ast_list[3][i][1][1]])*(Vvec[ast_list[3][i][1][2]]+s*Nvec[ast_list[3][i][1][2]])*(Vvec[ast_list[3][i][1][3]]+s*Nvec[ast_list[3][i][1][3]])));
+      }
+   }
+   zetaTop=enum/denom;
+   zetaTop=numerator(zetaTop)/denominator(zetaTop);
+   string zetaStr=string(zetaTop);
+
+   if(show_all)
+   {
+      list result=zetaStr,ast_list,Vvec,Nvec;
+   }
+   else
+   {
+      list result=zetaStr;
+   }
+   setring R;
+   return(result);
+}
+example
+{"EXAMPLE:";
+   echo = 2;
+   ring R=0,(x,y,z),dp;
+   ideal I=x2+y2+z3;
+   list re=resolve(I,"K");
+   zetaDL(re,1);
+   I=(xz+y2)*(xz+y2+x2)+z5;
+   list L=resolve(I,"K");
+   zetaDL(L,1);
+
+//===== expected zeta function =========
+// (130s+20s^2+87)/(1+s)/(3+4s)/(29+40s)
+//======================================
+}
+//////////////////////////////////////////////////////////////////////////////
+
+proc abstractR(list re)
+"USAGE:   abstractR(L);
+@*        L = list of rings
+ASSUME:   L is output of resolution of singularities
+NOTE:     currently only implemented for isolated surface singularities
+RETURN:   list l
+          l[1]: intvec, where
+                   l[1][i]=1 if the corresponding ring is a final chart
+                             of non-embedded resolution
+                   l[1][i]=0 otherwise
+          l[2]: intvec, where
+                   l[2][i]=1 if the corresponding ring does not occur
+                             in the non-embedded resolution
+                   l[2][i]=0 otherwise
+          l[3]: list L
+EXAMPLE:  example abstractR;   shows an example
+"
+{
+//---------------------------------------------------------------------------
+// Initialization and sanity checks
+//---------------------------------------------------------------------------
+   def R=basering;
+//---Test whether we are in the irreducible surface case
+   def S=re[2][1];
+   setring S;
+   BO[2]=BO[2]+BO[1];
+   if(dim(std(BO[2]))!=2)
+   {
+       ERROR("NOT A SURFACE");
+   }
+   if(dim(std(slocus(BO[2])))>0)
+   {
+       ERROR("NOT AN ISOLATED SINGULARITY");
+   }
+   setring R;
+   int i,j,k,l,i0;
+   intvec deleted;
+   intvec endiv;
+   endiv[size(re[2])]=0;
+   deleted[size(re[2])]=0;
+//-----------------------------------------------------------------------------
+// run through all rings, only consider final charts
+// for each final chart follow the list of charts leading up to it until
+//     we encounter a chart which is not finished in the non-embedded case
+//-----------------------------------------------------------------------------
+   for(i=1;i<=size(re[2]);i++)
+   {
+      if(defined(S)){kill S;}
+      def S=re[2][i];
+      setring S;
+      if(size(reduce(cent,std(BO[2]+BO[1])))!=0)
+      {
+//--- only consider endrings
+         i++;
+         continue;
+      }
+      i0=i;
+      for(j=ncols(path);j>=2;j--)
+      {
+//--- walk backwards through history
+        if(j==2)
+        {
+          endiv[i0]=1;
+          break;
+        }
+        k=int(leadcoef(path[1,j]));
+        if((deleted[k]==1)||(endiv[k]==1))
+        {
+          deleted[i0]=1;
+          break;
+        }
+        if(defined(SPa)){kill SPa;}
+        def SPa=re[2][k];
+        setring SPa;
+        l=int(leadcoef(path[1,ncols(path)]));
+        if(defined(SPa2)){kill SPa2;}
+        def SPa2=re[2][l];
+        setring SPa2;
+        if((deleted[l]==1)||(endiv[l]==1))
+        {
+//--- parent was already treated via different final chart
+//--- we may safely inherit the data
+          deleted[i0]=1;
+          setring S;
+          i0=k;
+          j--;
+          continue;
+        }
+        setring SPa;
+//!!! Idea of Improvement:
+//!!! BESSER: rueckwaerts gehend nur testen ob glatt
+//!!!         danach vorwaerts bis zum ersten Mal abstractNC
+//!!! ACHTUNG: rueckweg unterwegs notieren - wir haben nur vergangenheit!
+        if((deg(std(slocus(BO[2]))[1])!=0)||(!abstractNC(BO)))
+        {
+//--- not finished in the non-embedded case
+           endiv[i0]=1;
+           break;
+        }
+//--- unnecessary chart in non-embedded case
+        setring S;
+        deleted[i0]=1;
+        i0=k;
+      }
+   }
+//-----------------------------------------------------------------------------
+// Clean up the intvec deleted and return the result
+//-----------------------------------------------------------------------------
+   setring R;
+   for(i=1;i<=size(endiv);i++)
+   {
+     if(endiv[i]==1)
+     {
+        if(defined(S)) {kill S;}
+        def S=re[2][i];
+        setring S;
+        for(j=3;j<ncols(path);j++)
+        {
+           if((endiv[int(leadcoef(path[1,j]))]==1)||
+              (deleted[int(leadcoef(path[1,j]))]==1))
+           {
+              deleted[int(leadcoef(path[1,j+1]))]=1;
+              endiv[int(leadcoef(path[1,j+1]))]=0;
+           }
+        }
+        if((endiv[int(leadcoef(path[1,ncols(path)]))]==1)||
+           (deleted[int(leadcoef(path[1,ncols(path)]))]==1))
+        {
+           deleted[i]=1;
+           endiv[i]=0;
+        }
+     }
+   }
+   list resu=endiv,deleted,re;
+   return(resu);
+}
+example
+{"EXAMPLE:";
+   echo = 2;
+   ring r = 0,(x,y,z),dp;
+   ideal I=x2+y2+z11;
+   list L=resolve(I);
+   abstractR(L);
+}
+//////////////////////////////////////////////////////////////////////////////
+static
+proc decompE(list BO)
+"Internal procedure - no help and no example available
+"
+{
+//--- compute the list of exceptional divisors, including the components
+//--- of the strict transform in the non-embedded case
+//--- (computation over Q !!!)
+   def R=basering;
+   list Elist,prList;
+   int i;
+   for(i=1;i<=size(BO[4]);i++)
+   {
+      Elist[i]=BO[4][i];
+   }
+/* practical speed up (part 1 of 3) -- no theoretical relevance
+   ideal M=maxideal(1);
+   M[1]=var(nvars(basering));
+   M[nvars(basering)]=var(1);
+   map phi=R,M;
+*/
+   ideal KK=BO[2];
+
+/* practical speed up (part 2 of 3)
+   KK=phi(KK);
+*/
+   prList=minAssGTZ(KK);
+
+/* practical speed up (part 3 of 3)
+   prList=phi(prList);
+*/
+
+   for(i=1;i<=size(prList);i++)
+   {
+      Elist[size(BO[4])+i]=prList[i];
+   }
+   return(Elist);
+}
+//////////////////////////////////////////////////////////////////////////////
+
+proc prepEmbDiv(list re, list #)
+"USAGE:   prepEmbDiv(L[,a]);
+@*        L = list of rings
+@*        a = integer
+ASSUME:   L is output of resolution of singularities
+COMPUTE:  if a is not present: exceptional divisors including components
+          of the strict transform
+          otherwise: only exceptional divisors
+RETURN:   list of Q-irreducible exceptional divisors (embedded case)
+EXAMPLE:  example prepEmbDiv;   shows an example
+"
+{
+//--- 1) in each final chart, a list of (decomposed) exceptional divisors
+//---    is created (and exported)
+//--- 2) the strict transform is decomposed
+//--- 3) the exceptional divisors (including the strict transform)
+//---    in the different charts are compared, identified and this
+//---    information collected into a list which is then returned
+//---------------------------------------------------------------------------
+// Initialization
+//---------------------------------------------------------------------------
+   int i,j,k,ncomps,offset,found,a,b,c,d;
+   list tmpList;
+   def R=basering;
+//--- identify identical exceptional divisors
+//--- (note: we are in the embedded case)
+   list iden=collectDiv(re)[2];
+//---------------------------------------------------------------------------
+// Go to each final chart and create the EList
+//---------------------------------------------------------------------------
+   for(i=1;i<=size(iden[size(iden)]);i++)
+   {
+      if(defined(S)){kill S;}
+      def S=re[2][iden[size(iden)][i][1]];
+      setring S;
+      if(defined(EList)){kill EList;}
+      list EList=decompE(BO);
+      export(EList);
+      setring R;
+      kill S;
+   }
+//--- save original iden for further use and then drop
+//--- strict transform from it
+   list iden0=iden;
+   iden=delete(iden,size(iden));
+   if(size(#)>0)
+   {
+//--- we are not interested in the strict transform of X
+      return(iden);
+   }
+//----------------------------------------------------------------------------
+// Run through all final charts and collect and identify all components of
+// the strict transform
+//----------------------------------------------------------------------------
+//--- first final chart - to be used for initialization
+   def S=re[2][iden0[size(iden0)][1][1]];
+   setring S;
+   ncomps=size(EList)-size(BO[4]);
+   if((ncomps==1)&&(deg(std(EList[size(EList)])[1])==0))
+   {
+      ncomps=0;
+   }
+   offset=size(BO[4]);
+   for(i=1;i<=ncomps;i++)
+   {
+//--- add components of strict transform
+      tmpList[1]=intvec(iden0[size(iden0)][1][1],size(BO[4])+i);
+      iden[size(iden)+1]=tmpList;
+   }
+//--- now run through the other final charts
+   for(i=2;i<=size(iden0[size(iden0)]);i++)
+   {
+      if(defined(S2)){kill S2;}
+      def S2=re[2][iden0[size(iden0)][i][1]];
+      setring S2;
+//--- determine common parent of this ring and re[2][iden0[size(iden0)][1][1]]
+      if(defined(opath)){kill opath;}
+      def opath=imap(S,path);
+      j=1;
+      while(opath[1,j]==path[1,j])
+      {
+         j++;
+         if((j>ncols(path))||(j>ncols(opath))) break;
+      }
+      if(defined(li1)){kill li1;}
+      list li1;
+//--- fetch the components we have considered in
+//--- re[2][iden0[size(iden0)][1][1]]
+//--- via the resolution tree
+      for(k=1;k<=ncomps;k++)
+      {
+         if(defined(id1)){kill id1;}
+         string tempstr="EList["+string(eval(k+offset))+"]";
+         ideal id1=fetchInTree(re,iden0[size(iden0)][1][1],
+                               int(leadcoef(path[1,j-1])),
+                               iden0[size(iden0)][i][1],tempstr,iden0,1);
+         kill tempstr;
+         li1[k]=id1;
+         kill id1;
+      }
+//--- do the comparison
+      for(k=size(BO[4])+1;k<=size(EList);k++)
+      {
+//--- only components of the strict transform are interesting
+         if((size(BO[4])+1==size(EList))&&(deg(std(EList[size(EList)])[1])==0))
+         {
+            break;
+         }
+         found=0;
+         for(j=1;j<=size(li1);j++)
+         {
+            if((size(reduce(li1[j],std(EList[k])))==0)&&
+               (size(reduce(EList[k],std(li1[j])))==0))
+            {
+//--- found a match
+               li1[j]=ideal(1);
+               iden[size(iden0)-1+j][size(iden[size(iden0)-1+j])+1]=
+                      intvec(iden0[size(iden0)][i][1],k);
+               found=1;
+               break;
+            }
+         }
+         if(!found)
+         {
+//--- no match yet, maybe there are entries not corresponding to the
+//--- initialization of the list -- collected in list repair
+            if(!defined(repair))
+            {
+//--- no entries in repair, we add the very first one
+               list repair;
+               repair[1]=list(intvec(iden0[size(iden0)][i][1],k));
+            }
+            else
+            {
+//--- compare against repair, and add the item appropriately
+//--- steps of comparison as before
+               for(c=1;c<=size(repair);c++)
+               {
+                  for(d=1;d<=size(repair[c]);d++)
+                  {
+                     if(defined(opath)) {kill opath;}
+                     def opath=imap(re[2][repair[c][d][1]],path);
+                     b=0;
+                     while(path[1,b+1]==opath[1,b+1])
+                     {
+                        b++;
+                        if((b>ncols(path)-1)||(b>ncols(opath)-1)) break;
+                     }
+                     b=int(leadcoef(path[1,b]));
+                     string tempstr="EList["+string(eval(repair[c][d][2]))
+                                     +"]";
+                     if(defined(id1)){kill id1;}
+                     ideal id1=fetchInTree(re,repair[c][d][1],b,
+                               iden0[size(iden0)][i][1],tempstr,iden0,1);
+                     kill tempstr;
+                     if((size(reduce(EList[k],std(id1)))==0)&&
+                        (size(reduce(id1,std(EList[k])))==0))
+                     {
+                        repair[c][size(repair[c])+1]=intvec(iden0[size(iden0)][i][1],k);
+                        break;
+                     }
+                  }
+                  if(d<=size(repair[c]))
+                  {
+                     break;
+                  }
+               }
+               if(c>size(repair))
+               {
+                  repair[size(repair)+1]=list(intvec(iden0[size(iden0)][i][1],k));
+               }
+            }
+         }
+      }
+   }
+   if(defined(repair))
+   {
+//--- there were further components, add them
+      for(c=1;c<=size(repair);c++)
+      {
+         iden[size(iden)+1]=repair[c];
+      }
+      kill repair;
+   }
+//--- up to now only Q-irred components - not C-irred components !!!
+   return(iden);
+}
+example
+{"EXAMPLE:";
+   echo = 2;
+   ring R=0,(x,y,z),dp;
+   ideal I=x2+y2+z11;
+   list L=resolve(I);
+   prepEmbDiv(L);
+}
+///////////////////////////////////////////////////////////////////////////////
+static
+proc decompEinX(list BO)
+"Internal procedure - no help and no example available
+"
+{
+//--- decomposition of exceptional divisor, non-embedded resolution.
+//--- even a single exceptional divisor may be Q-reducible when considered
+//--- as divisor on the strict transform
+
+//----------------------------------------------------------------------------
+// Initialization
+//----------------------------------------------------------------------------
+   int i,j,k,de,contact;
+   intmat interMat;
+   list dcE,tmpList,prList,sa,nullList;
+   string mpol,compList;
+   def R=basering;
+   ideal I;
+//----------------------------------------------------------------------------
+// pass to divisors on V(J) and throw away components already present as
+// previous exceptional divisors
+//----------------------------------------------------------------------------
+   for(i=1;i<=size(BO[4]);i++)
+   {
+      I=BO[4][i]+BO[2];
+      for(j=i+1;j<=size(BO[4]);j++)
+      {
+         sa=sat(I,BO[4][j]+BO[2]);
+         if(sa[2])
+         {
+           I=sa[1];
+         }
+      }
+//!!! Practical improvement - not yet implemented:
+//!!!hier den Input besser aufbereiten (cf. J. Wahl's example)
+//!!!I[1]=x(2)^15*y(2)^9+3*x(2)^10*y(2)^6+3*x(2)^5*y(2)^3+x(2)+1;
+//!!!I[2]=x(2)^8*y(2)^6+y(0);
+//!!!heuristisch die Ordnung so waehlen, dass y(0) im Prinzip eliminiert
+//!!!wird.
+//-----------------------------------------------------------------------------
+// 1) decompose exceptional divisor (over Q)
+// 2) check whether there are C-reducible Q-components
+// 3) if necessary, find appropriate field extension of Q to decompose
+// 4) in each chart collect information in list dcE and export it
+//-----------------------------------------------------------------------------
+      prList=primdecGTZ(I);
+      for(j=1;j<=size(prList);j++)
+      {
+        tmpList=grad(prList[j][2]);
+        de=tmpList[1];
+        interMat=tmpList[2];
+        mpol=tmpList[3];
+        compList=tmpList[4];
+        nullList=tmpList[5];
+        contact=Kontakt(prList[j][1],BO[2]);
+        tmpList=prList[j][2],de,contact,interMat,mpol,compList,nullList;
+        prList[j]=tmpList;
+      }
+      dcE[i]=prList;
+   }
+   return(dcE);
+}
+//////////////////////////////////////////////////////////////////////////////
+static
+proc getMinpoly(poly p)
+"Internal procedure - no help and no example available
+"
+{
+//---assume that p is a polynomial in 2 variables and irreducible
+//---over Q. Computes an irreducible polynomial mp in one variable
+//---over Q such that p splits completely over the splitting field of mp
+//---returns mp as a string
+//---use a variant of the algorithm of S. Gao
+  def R=basering;
+  int i,j,k,a,b,m,n;
+  intvec v;
+  string mp="poly p=t-1;";
+  list Li=string(1);
+  list re=mp,Li,1;
+
+//---check which variables occur in p
+  for(i=1;i<=nvars(basering);i++)
+  {
+    if(p!=subst(p,var(i),0)){v[size(v)+1]=i;}
+  }
+
+//---the poly is constant
+  if(size(v)==1){return(re);}
+
+//---the poly depends only on one variable or is homogeneous
+//---in 2 variables
+  if((size(v)==2)||((size(v)==3)&&(homog(p))))
+  {
+     if((size(v)==3)&&(homog(p)))
+     {
+        p=subst(p,var(v[3]),1);
+     }
+     ring Rhelp=0,var(v[2]),dp;
+     poly p=imap(R,p);
+     ring Shelp=0,t,dp;
+     poly p=fetch(Rhelp,p);
+     int de=deg(p);
+     p=simplifyMinpoly(p);
+     Li=getNumZeros(p);
+     short=0;
+     mp="poly p="+string(p)+";";
+     re=mp,Li,de;
+     setring R;
+     return(re);
+  }
+  v=v[2..size(v)];
+  if(size(v)>2){ERROR("getMinpoly:input depends on more then 2 variables");}
+
+//---the general case, the poly is considered as poly in x an y now
+  ring T=0,(x,y),lp;
+  ideal M,N;
+  M[nvars(R)]=0;
+  N[nvars(R)]=0;
+  M[v[1]]=x;
+  N[v[1]]=y;
+  M[v[2]]=y;
+  N[v[2]]=x;
+  map phi=R,M;
+  map psi=R,N;
+  poly p=phi(p);
+  poly q=psi(p);
+  ring Thelp=(0,x),y,dp;
+  poly p=imap(T,p);
+  poly q=imap(T,q);
+  n=deg(p);              //---the degree with respect to y
+  m=deg(q);              //---the degree with respect to x
+  setring T;
+  ring A=0,(u(1..m*(n+1)),v(1..(m+1)*n),x,y,t),dp;
+  poly f=imap(T,p);
+  poly g;
+  poly h;
+  for(i=0;i<=m-1;i++)
+  {
+     for(j=0;j<=n;j++)
+     {
+        g=g+u(i*(n+1)+j+1)*x^i*y^j;
+     }
+  }
+  for(i=0;i<=m;i++)
+  {
+     for(j=0;j<=n-1;j++)
+     {
+        h=h+v(i*n+j+1)*x^i*y^j;
+     }
+  }
+  poly L=f*(diff(g,y)-diff(h,x))+h*diff(f,x)-g*diff(f,y);
+//---according to the theory f is absolutely irreducible iff
+//---L(g,h)=0 has no non-trivial solution g,h
+//---(g=diff(f,x),h=diff(f,y) is always a solution)
+//---therefore we compute a vector space basis of G
+//---G={g in Q[x,y],deg_x(g)<m,|exist h, such that L(g,h)=0}
+//---dim(G)=a is the number of factors of f in C[x,y]
+  matrix M=coef(L,xy);
+  ideal J=M[2,1..ncols(M)];
+  option(redSB);
+  J=std(J);
+  option(noredSB);
+  poly gred=reduce(g,J);
+  ideal G;
+  for(i=1;i<=m*(n+1);i++)
+  {
+    if(gred!=subst(gred,u(i),0))
+    {
+       G[size(G)+1]=subst(gred,u(i),1);
+    }
+  }
+  for(i=1;i<=n*(m+1);i++)
+  {
+    if(gred!=subst(gred,v(i),0))
+    {
+       G[size(G)+1]=subst(gred,v(i),1);
+    }
+  }
+  for(i=1;i<=m*(n+1);i++)
+  {
+     G=subst(G,u(i),0);
+  }
+  for(i=1;i<=n*(m+1);i++)
+  {
+     G=subst(G,v(i),0);
+  }
+//---the number of factors in C[x,y]
+  a=size(G);
+  for(i=1;i<=a;i++)
+  {
+     G[i]=simplify(G[i],1);
+  }
+  if(a==1)
+  {
+//---f is absolutely irreducible
+    setring R;
+    return(re);
+  }
+//---let g in G be any non-trivial element (g not in <diff(f,x)>)
+//---according to the theory f=product over all c in C of the
+//---gcd(f,g-c*diff(f,x))
+//---let g_1,...,g_a be a basis of G and write
+//---g*g_i=sum a_ij*g_j*diff(f,x)  mod f
+//---let B=(a_ij) and ch=det(t*unitmat(a)-B) the characteristic
+//---polynomial then the number of distinct irreducible factors
+//---of gcd(f,g-c*diff(f,x)) in C[x,y] is equal to the multiplicity
+//---of c as a root of ch.
+//---in our special situation (f is irreducible over Q) ch should
+//---be irreducible and the different roots of ch lead to the
+//---factors of f, i.e. ch is the minpoly we are looking for
+
+  poly fh=homog(f,t);
+//---homogenization is used to obtain a constant matrix using lift
+  ideal Gh=homog(G,t);
+  int dh,df;
+  df=deg(fh);
+  for(i=1;i<=a;i++)
+  {
+    if(deg(Gh[i])>dh){dh=deg(Gh[i]);}
+  }
+  for(i=1;i<=a;i++)
+  {
+    Gh[i]=t^(dh-deg(Gh[i]))*Gh[i];
+  }
+  ideal GF=simplify(diff(fh,x),1)*Gh,fh;
+  poly ch;
+  matrix LI;
+  matrix B[a][a];
+  matrix E=unitmat(a);
+  poly gran;
+  ideal fac;
+  for(i=1;i<=a;i++)
+  {
+     LI=lift(GF,t^(df-1-dh)*Gh[i]*Gh);
+     B=LI[1..a,1..a];
+     ch=det(t*E-B);
+//---irreducibility test
+     fac=factorize(ch,1);
+     if(deg(fac[1])==a)
+     {
+        ch=simplifyMinpoly(ch);
+        Li=getNumZeros(ch);
+        int de=deg(ch);
+        short=0;
+        mp="poly p="+string(ch)+";";
+        re=mp,Li,de;
+        setring R;
+        return(re);
+     }
+  }
+  ERROR("getMinpoly:not found:please send the example to the authors");
+}
+//////////////////////////////////////////////////////////////////////////////
+static
+proc getNumZeros(poly p)
+"Internal procedure - no help and no example available
+"
+{
+//--- compute numerically (!!!) the zeros of the minimal polynomial
+  def R=basering;
+  ring S=0,t,dp;
+  poly p=imap(R,p);
+  def L=laguerre_solve(p,30);
+//!!! practical improvement:
+//!!! testen ob die Nullstellen signifikant verschieden sind
+//!!! und im Notfall Genauigkeit erhoehen
+  list re;
+  int i;
+  for(i=1;i<=size(L);i++)
+  {
+    re[i]=string(L[i]);
+  }
+  setring R;
+  return(re);
+}
+//////////////////////////////////////////////////////////////////////////////
+static
+proc simplifyMinpoly(poly p)
+"Internal procedure - no help and no example available
+"
+{
+//--- describe field extension in a simple way
+   p=cleardenom(p);
+   int n=int(leadcoef(p));
+   int d=deg(p);
+   int i,k;
+   int re=1;
+   number s=1;
+
+   list L=primefactors(n);
+
+   for(i=1;i<=size(L[1]);i++)
+   {
+      k=L[2][i] mod d;
+      s=1/number((L[1][i])^(L[2][i]/d));
+      if(!k){p=subst(p,t,s*t);}
+   }
+   p=cleardenom(p);
+   n=int(leadcoef(subst(p,t,0)));
+   L=primefactors(n);
+   for(i=1;i<=size(L[1]);i++)
+   {
+      k=L[2][i] mod d;
+      s=(L[1][i])^(L[2][i]/d);
+      if(!k){p=subst(p,t,s*t);}
+   }
+   p=cleardenom(p);
+   return(p);
+}
+///////////////////////////////////////////////////////////////////////////////
+static
+proc grad(ideal I)
+"Internal procedure - no help and no example available
+"
+{
+//--- computes the number of components over C
+//--- for a prime ideal of height 1 over Q
+  def R=basering;
+  int n=nvars(basering);
+  string mp="poly p=t-1;";
+  string str=string(1);
+  list zeroList=string(1);
+  int i,j,k,l,d,e,c,mi;
+  ideal Istd=std(I);
+  intmat interMat;
+  d=dim(Istd);
+  if(d==-1){return(list(0,0,mp,str,zeroList));}
+  if(d!=1){ERROR("ideal is not one-dimensional");}
+  ideal Sloc=std(slocus(I));
+  if(deg(Sloc[1])>0)
+  {
+//---This is only to test that in case of singularities we have only
+//---one singular point which is a normal crossing
+//---consider the different singular points
+    ideal M;
+    list pr=minAssGTZ(Sloc);
+    if(size(pr)>1){ERROR("grad:more then one singular point");}
+    for(l=1;l<=size(pr);l++)
+    {
+       M=std(pr[l]);
+       d=vdim(M);
+       if(d!=1)
+       {
+//---now we have to extend the field
+          if(defined(S)){kill S;}
+          ring S=0,x(1..n),lp;
+          ideal M=fetch(R,M);
+          ideal I=fetch(R,I);
+          ideal jmap;
+          map phi=S,maxideal(1);;
+          ideal Mstd=std(M);
+//---M has to be in general position with respect to lp, i.e.
+//---vdim(M)=deg(M[1])
+          poly p=Mstd[1];
+          e=vdim(Mstd);
+          while(e!=deg(p))
+          {
+             jmap=randomLast(100);
+             phi=S,jmap;
+             Mstd=std(phi(M));
+             p=Mstd[1];
+          }
+          I=phi(I);
+          kill phi;
+//---now it is in general position an M[1] defines the field extension
+//---Q[x]/M over Q
+          ring Shelp=0,t,dp;
+          ideal helpmap;
+          helpmap[n]=t;
+          map psi=S,helpmap;
+          poly p=psi(p);
+          ring T=(0,t),x(1..n),lp;
+          poly p=imap(Shelp,p);
+//---we are now in the polynomial ring over the field Q[x]/M
+          minpoly=leadcoef(p);
+          ideal M=imap(S,Mstd);
+          M=M,var(n)-t;
+          ideal I=fetch(S,I);
+       }
+//---we construct a map phi which maps M to maxideal(1)
+       option(redSB);
+       ideal Mstd=-simplify(std(M),1);
+       option(noredSB);
+       for(i=1;i<=n;i++)
+       {
+         Mstd=subst(Mstd,var(i),-var(i));
+         M[n-i+1]=Mstd[i];
+       }
+       M=M[1..n];
+//---go to the localization with respect to <x>
+       if(d!=1)
+       {
+          ring Tloc=(0,t),x(1..n),ds;
+          poly p=imap(Shelp,p);
+          minpoly=leadcoef(p);
+          ideal M=fetch(T,M);
+          map phi=T,M;
+       }
+       else
+       {
+          ring Tloc=0,x(1..n),ds;
+          ideal M=fetch(R,M);
+          map phi=R,M;
+       }
+       ideal I=phi(I);
+       ideal Istd=std(I);
+       mi=mi+milnor(Istd);
+       if(mi>l)
+       {
+          ERROR("grad:divisor is really singular");
+       }
+       setring R;
+    }
+  }
+  intvec ind=indepSet(Istd,1)[1];
+  for(i=1;i<=n;i++){if(ind[i]) break;}
+//---the i-th variable is the independent one
+  ring Shelp=0,x(1..n),dp;
+  ideal I=fetch(R,I);
+  if(defined(S)){kill S;}
+  if(i==1){ring S=(0,x(1)),x(2..n),lp;}
+  if(i==n){ring S=(0,x(n)),x(1..n-1),lp;}
+  if((i!=1)&&(i!=n)){ring S=(0,x(i)),(x(1..i-1),x(i+1..n)),lp;}
+//---I is zero-dimensional now
+  ideal I=imap(Shelp,I);
+  ideal Istd=std(I);
+  ideal jmap;
+  map phi;
+  poly p=Istd[1];
+  e=vdim(Istd);
+  if(e==1)
+  {
+     setring R;
+     str=string(I);
+     list resi=1,interMat,mp,str,zeroList;
+     return(resi);
+  }
+//---move I to general position with respect to lp
+  if(e!=deg(p))
+  {
+     jmap=randomLast(5);
+     phi=S,jmap;
+     Istd=std(phi(I));
+     p=Istd[1];
+  }
+  while(e!=deg(p))
+  {
+     jmap=randomLast(100);
+     phi=S,jmap;
+     Istd=std(phi(I));
+     p=Istd[1];
+  }
+  setring Shelp;
+  poly p=imap(S,p);
+  list Q=getMinpoly(p);
+  int de=Q[3];
+  mp=Q[1];
+//!!!diese Stelle effizienter machen
+//!!!minAssGTZ vermeiden durch direkte Betrachtung von
+//!!!p und mp und evtl. Quotientenbildung
+//!!!bisher nicht zeitkritisch
+  string Tesr="ring Tes=(0,t),("+varstr(R)+"),dp;";
+  execute(Tesr);
+  execute(mp);
+  minpoly=leadcoef(p);
+  ideal I=fetch(R,I);
+  list pr=minAssGTZ(I);
+  ideal allgEbene=randomLast(100)[nvars(basering)];
+  int minpts=vdim(std(I+allgEbene));
+  ideal tempi;
+  j=1;
+  for(i=1;i<=size(pr);i++)
+  {
+    tempi=std(pr[i]+allgEbene);
+    if(vdim(tempi)<minpts)
+    {
+      minpts=vdim(tempi);
+      j=i;
+    }
+  }
+  tempi=pr[j];
+  str=string(tempi);
+  kill interMat;
+  setring R;
+  intmat interMat[de][de]=intersComp(str,mp,Q[2],str,mp,Q[2]);
+  list resi=de,interMat,mp,str,Q[2];
+  return(resi);
+}
+////////////////////////////////////////////////////////////////////////////
+static
+proc Kontakt(ideal I, ideal K)
+"Internal procedure - no help and no example available
+"
+{
+//---Let K be a prime ideal and I an ideal not contained in K
+//---computes a maximalideal M=<x(1)-a1,...,x(n)-an>, ai in a field
+//---extension of Q,  containing I+K and an integer a
+//---such that in the localization of the polynomial ring with
+//---respect to M the ideal I is not contained in K+M^a+1 but in M^a in
+  def R=basering;
+  int n=nvars(basering);
+  int i,j,k,d,e;
+  ideal J=std(I+K);
+  if(dim(J)==-1){return(0);}
+  ideal W;
+//---choice of the maximal ideal M
+  for(i=1;i<=n;i++)
+  {
+     W=std(J,var(i));
+     d=dim(W);
+     if(d==0) break;
+  }
+  i=1;k=2;
+  while((d)&&(i<n))
+  {
+     W=std(J,var(i)+var(k));
+     d=dim(W);
+     if(k==n){i++;k=i;}
+     if(k<n){k++;}
+  }
+  while(d)
+  {
+    W=std(J,randomid(maxideal(1))[1]);
+    d=dim(W);
+  }
+//---now we have a collection om maximalideals and choose one with dim Q[x]/M
+//---minimal
+  list pr=minAssGTZ(W);
+  d=vdim(std(pr[1]));
+  k=1;
+  for(i=2;i<=size(pr);i++)
+  {
+    if(d==1) break;
+    e=vdim(std(pr[i]));
+    if(e<d){k=i;d=e;}
+  }
+//---M is fixed now
+//---if dim Q[x]/M =1 we localize at M
+  ideal M=pr[k];
+  if(d!=1)
+  {
+//---now we have to extend the field
+     if(defined(S)){kill S;}
+     ring S=0,x(1..n),lp;
+     ideal M=fetch(R,M);
+     ideal I=fetch(R,I);
+     ideal K=fetch(R,K);
+     ideal jmap;
+     map phi=S,maxideal(1);;
+     ideal Mstd=std(M);
+//---M has to be in general position with respect to lp, i.e.
+//---vdim(M)=deg(M[1])
+     poly p=Mstd[1];
+     e=vdim(Mstd);
+     while(e!=deg(p))
+     {
+        jmap=randomLast(100);
+        phi=S,jmap;
+        Mstd=std(phi(M));
+        p=Mstd[1];
+     }
+     I=phi(I);
+     K=phi(K);
+     kill phi;
+//---now it is in general position an M[1] defines the field extension
+//---Q[x]/M over Q
+     ring Shelp=0,t,dp;
+     ideal helpmap;
+     helpmap[n]=t;
+     map psi=S,helpmap;
+     poly p=psi(p);
+     ring T=(0,t),x(1..n),lp;
+     poly p=imap(Shelp,p);
+//---we are now in the polynomial ring over the field Q[x]/M
+     minpoly=leadcoef(p);
+     ideal M=imap(S,Mstd);
+     M=M,var(n)-t;
+     ideal I=fetch(S,I);
+     ideal K=fetch(S,K);
+  }
+//---we construct a map phi which maps M to maxideal(1)
+  option(redSB);
+  ideal Mstd=-simplify(std(M),1);
+  option(noredSB);
+  for(i=1;i<=n;i++)
+  {
+    Mstd=subst(Mstd,var(i),-var(i));
+    M[n-i+1]=Mstd[i];
+  }
+  M=M[1..n];
+//---go to the localization with respect to <x>
+  if(d!=1)
+  {
+     ring Tloc=(0,t),x(1..n),ds;
+     poly p=imap(Shelp,p);
+     minpoly=leadcoef(p);
+     ideal M=fetch(T,M);
+     map phi=T,M;
+  }
+  else
+  {
+     ring Tloc=0,x(1..n),ds;
+     ideal M=fetch(R,M);
+     map phi=R,M;
+  }
+  ideal K=phi(K);
+  ideal I=phi(I);
+//---compute the order of I in (Q[x]/M)[[x]]/K
+  k=1;d=0;
+  while(!d)
+  {
+     k++;
+     d=size(reduce(I,std(maxideal(k)+K)));
+  }
+  setring R;
+  return(k-1);
+}
+example
+{"EXAMPLE:";
+   echo = 2;
+   ring r = 0,(x,y,z),dp;
+   ideal I=x4+z4+1;
+   ideal K=x+y2+z2;
+   Kontakt(I,K);
+}
+//////////////////////////////////////////////////////////////////////////////
+static
+proc abstractNC(list BO)
+"Internal procedure - no help and no example available
+"
+{
+//--- check normal crossing property
+//--- used for passing from embedded to non-embedded resolution
+//----------------------------------------------------------------------------
+// Initialization
+//----------------------------------------------------------------------------
+  int i,k,j,flag;
+  list L;
+  ideal J;
+  if(dim(std(cent))>0){return(1);}
+//----------------------------------------------------------------------------
+// check each exceptional divisor on V(J)
+//----------------------------------------------------------------------------
+  for(i=1;i<=size(BO[4]);i++)
+  {
+    if(dim(std(BO[2]+BO[4][i]))>0)
+    {
+//--- really something to do
+      J=radical(BO[4][i]+BO[2]);
+      if(deg(std(slocus(J))[1])!=0)
+      {
+        if(!nodes(J))
+        {
+//--- really singular, not only nodes ==> not normal crossing
+          return(0);
+        }
+      }
+      for(k=1;k<=size(L);k++)
+      {
+//--- run through previously considered divisors
+//--- we do not want to bother with the same one twice
+         if((size(reduce(J,std(L[k])))==0)&&(size(reduce(L[k],std(J)))==0))
+         {
+//--- already considered this one
+            flag=1;break;
+         }
+//--- drop previously considered exceptional divisors from the current one
+         J=sat(J,L[k])[1];
+         if(deg(std(J)[1])==0)
+         {
+//--- nothing remaining
+            flag=1;break;
+         }
+      }
+      if(flag==0)
+      {
+//--- add exceptional divisor to the list
+         L[size(L)+1]=J;
+      }
+      flag=0;
+    }
+  }
+//---------------------------------------------------------------------------
+// check intersection properties between different exceptional divisors
+//---------------------------------------------------------------------------
+  for(k=1;k<size(L);k++)
+  {
+     for(i=k+1;i<=size(L);i++)
+     {
+        if(!nodes(intersect(L[k],L[i])))
+        {
+//--- divisors Ek and Ei do not meet in a node but in a singularity
+//--- which is not allowed to occur ==> not normal crossing
+           return(0);
+        }
+        for(j=i+1;j<=size(L);j++)
+        {
+           if(deg(std(L[i]+L[j]+L[k])[1])>0)
+           {
+//--- three divisors meet simultaneously ==> not normal crossing
+              return(0);
+           }
+        }
+     }
+   }
+//--- we reached this point ==> normal crossing
+   return(1);
+}
+//////////////////////////////////////////////////////////////////////////////
+static
+proc nodes(ideal J)
+"Internal procedure - no help and no example available
+"
+{
+//--- check whether at most nodes occur as singularities
+   ideal K=std(slocus(J));
+   if(deg(K[1])==0){return(1);}
+   if(dim(K)>0){return(0);}
+   if(vdim(K)!=vdim(std(radical(K)))){return(0);}
+   return(1);
+}
+//////////////////////////////////////////////////////////////////////////////
+
+proc intersectionDiv(list re)
+"USAGE:   intersectionDiv(L);
+@*        L = list of rings
+ASSUME:   L is output of resolution of singularities
+          (only case of isolated surface singularities)
+COMPUTE:  intersection matrix and genera of the exceptional divisors
+          (considered as curves on the strict transform)
+RETURN:   list l, where
+          l[1]: intersection matrix of exceptional divisors
+          l[2]: intvec, genera of exceptional divisors
+          l[3]: divisorList, encoding the identification of the divisors
+EXAMPLE:  example intersectionDiv;  shows an example
+"
+{
+//----------------------------------------------------------------------------
+//--- Computes in case of surface singularities (non-embedded resolution):
+//--- the intersection of the divisors (on the surface)
+//--- assuming that re=resolve(J)
+//----------------------------------------------------------------------------
+   def R=basering;
+//---Test whether we are in the irreducible surface case
+   def S=re[2][1];
+   setring S;
+   BO[2]=BO[2]+BO[1];              // make sure we are living in the smooth W
+   if(dim(std(BO[2]))!=2)
+   {
+     ERROR("The given original object is not a surface");
+   }
+   if(dim(std(slocus(BO[2])))>0)
+   {
+     ERROR("The given original object has non-isolated singularities.");
+   }
+   setring R;
+//----------------------------------------------------------------------------
+// Compute a non-embedded resolution from the given embedded one by
+// dropping redundant trailing blow-ups
+//----------------------------------------------------------------------------
+   list resu,tmpiden,templist;
+   intvec divcomp;
+   int i,j,k,offset1,offset2,a,b,c,d,q,found;
+//--- compute non-embedded resolution
+   list abst=abstractR(re);
+   intvec endiv=abst[1];
+   intvec deleted=abst[2];
+//--- identify the divisors in the various final charts
+   list iden=collectDiv(re,deleted)[2];
+                                    // list of final divisors
+   list iden0=iden;                 // backup copy of iden for later use
+
+   iden=delete(iden,size(iden));    // drop list of endRings from iden
+//---------------------------------------------------------------------------
+// In iden, only the final charts should be listed, whereas iden0 contains
+// everything.
+//---------------------------------------------------------------------------
+   for(i=1;i<=size(iden);i++)
+   {
+     k=size(iden[i]);
+     tmpiden=iden[i];
+     for(j=k;j>0;j--)
+     {
+        if(!endiv[iden[i][j][1]])
+        {
+//---not a final chart
+           tmpiden=delete(tmpiden,j);
+        }
+     }
+     if(size(tmpiden)==0)
+     {
+//--- oops, this divisor does not appear in final charts
+        iden=delete(iden,i);
+        continue;
+     }
+     else
+     {
+        iden[i]=tmpiden;
+     }
+   }
+//---------------------------------------------------------------------------
+// Even though the exceptional divisors were irreducible in the embedded
+// case, they may very well have become reducible after intersection with
+// the strict transform of the original object.
+// ===> compute a decomposition for each divisor in each of the final charts
+//      and change the entries of iden accordingly
+// In particular, it is important to keep track of the identification of the
+// components of the divisors in each of the charts
+//---------------------------------------------------------------------------
+   int n=size(iden);
+   for(i=1;i<=size(re[2]);i++)
+   {
+     if(endiv[i])
+     {
+        def SN=re[2][i];
+        setring SN;
+        if(defined(dcE)){kill dcE;}
+        list dcE=decompEinX(BO);       // decomposition of exceptional divisors
+        export(dcE);
+        setring R;
+        kill SN;
+     }
+   }
+   if(defined(tmpiden)){kill tmpiden;}
+   list tmpiden=iden;
+   for(i=1;i<=size(iden);i++)
+   {
+      for(j=size(iden[i]);j>0;j--)
+      {
+         def SN=re[2][iden[i][j][1]];
+         setring SN;
+         if(size(dcE[iden[i][j][2]])==1)
+         {
+           if(dcE[iden[i][j][2]][1][2]==0)
+           {
+             tmpiden[i]=delete(tmpiden[i],j);
+           }
+         }
+         setring R;
+         kill SN;
+      }
+   }
+   for(i=size(tmpiden);i>0;i--)
+   {
+      if(size(tmpiden[i])==0)
+      {
+         tmpiden=delete(tmpiden,i);
+      }
+   }
+   iden=tmpiden;
+   kill tmpiden;
+   list tmpiden;
+//--- change entries of iden accordingly
+   for(i=1;i<=size(iden);i++)
+   {
+//--- first set up new entries in iden if necessary - using the first chart
+//--- in which we see the respective exceptional divisor
+     if(defined(S)){kill S;}
+     def S=re[2][iden[i][1][1]];
+//--- considering first entry for i-th divisor
+     setring S;
+     a=size(dcE[iden[i][1][2]]);
+     for(j=1;j<=a;j++)
+     {
+//--- reducible - add to the list considering each component as an exceptional
+//--- divisor in its own right
+        list tl;
+        tl[1]=intvec(iden[i][1][1],iden[i][1][2],j);
+        tmpiden[size(tmpiden)+1]=tl;
+        kill tl;
+     }
+//--- now identify the components in the other charts w.r.t. the ones in the
+//--- first chart which have already been added to the list
+     for(j=2;j<=size(iden[i]);j++)
+     {
+//--- considering remaining entries for the same original divisor
+       if(defined(S2)){kill S2;}
+       def S2=re[2][iden[i][j][1]];
+       setring S2;
+//--- determine common parent of this ring and re[2][iden[i][1][1]]
+       if(defined(opath)){kill opath;}
+       def opath=imap(S,path);
+       b=1;
+       while(opath[1,b]==path[1,b])
+       {
+          b++;
+          if((b>ncols(path))||(b>ncols(opath))) break;
+       }
+       if(defined(li1)){kill li1;}
+       list li1;
+//--- fetch the components we have considered in re[2][iden[i][1][1]]
+//--- via the resolution tree
+       for(k=1;k<=a;k++)
+       {
+          string tempstr="dcE["+string(eval(iden[i][1][2]))+"]["+string(k)+"][1]";
+          if(defined(id1)){kill id1;}
+          ideal id1=fetchInTree(re,iden[i][1][1],int(leadcoef(path[1,b-1])),
+                      iden[i][j][1],tempstr,iden0,1);
+          kill tempstr;
+          li1[k]=radical(id1);        // for comparison only the geometric
+                                      // object matters
+          kill id1;
+       }
+//--- compare the components we have fetched with the components in the
+//--- current ring
+       for(k=1;k<=size(dcE[iden[i][j][2]]);k++)
+       {
+          found=0;
+          for(b=1;b<=size(li1);b++)
+          {
+             if((size(reduce(li1[b],std(dcE[iden[i][j][2]][k][1])))==0)&&
+               (size(reduce(dcE[iden[i][j][2]][k][1],std(li1[b]+BO[2])))==0))
+             {
+                li1[b]=ideal(1);
+                tmpiden[size(tmpiden)-a+b][size(tmpiden[size(tmpiden)-a+b])+1]=
+                       intvec(iden[i][j][1],iden[i][j][2],k);
+                found=1;
+                break;
+             }
+          }
+          if(!found)
+          {
+            if(!defined(repair))
+            {
+               list repair;
+               repair[1]=list(intvec(iden[i][j][1],iden[i][j][2],k));
+            }
+            else
+            {
+               for(c=1;c<=size(repair);c++)
+               {
+                  for(d=1;d<=size(repair[c]);d++)
+                  {
+                     if(defined(opath)) {kill opath;}
+                     def opath=imap(re[2][repair[c][d][1]],path);
+                     q=0;
+                     while(path[1,q+1]==opath[1,q+1])
+                     {
+                        q++;
+                        if((q>ncols(path)-1)||(q>ncols(opath)-1)) break;
+                     }
+                     q=int(leadcoef(path[1,q]));
+                     string tempstr="dcE["+string(eval(repair[c][d][2]))+"]["+string(eval(repair[c][d][3]))+"][1]";
+                     if(defined(id1)){kill id1;}
+                     ideal id1=fetchInTree(re,repair[c][d][1],q,
+                                  iden[i][j][1],tempstr,iden0,1);
+                     kill tempstr;
+//!!! sind die nicht schon radical?
+                     id1=radical(id1);        // for comparison
+                                              // only the geometric
+                                              // object matters
+                     if((size(reduce(dcE[iden[i][j][2]][k][1],std(id1+BO[2])))==0)&&
+                        (size(reduce(id1+BO[2],std(dcE[iden[i][j][2]][k][1])))==0))
+                     {
+                       repair[c][size(repair[c])+1]=intvec(iden[i][j][1],iden[i][j][2],k);
+                       break;
+                     }
+                  }
+                  if(d<=size(repair[c]))
+                  {
+                     break;
+                  }
+               }
+               if(c>size(repair))
+               {
+                  repair[size(repair)+1]=list(intvec(iden[i][j][1],iden[i][j][2],k));
+               }
+            }
+         }
+       }
+     }
+     if(defined(repair))
+     {
+       for(c=1;c<=size(repair);c++)
+       {
+          tmpiden[size(tmpiden)+1]=repair[c];
+       }
+       kill repair;
+     }
+   }
+   setring R;
+   for(i=size(tmpiden);i>0;i--)
+   {
+      if(size(tmpiden[i])==0)
+      {
+        tmpiden=delete(tmpiden,i);
+        continue;
+      }
+   }
+   iden=tmpiden;                      // store the modified divisor list
+   kill tmpiden;                      // and clean up temporary objects
+//---------------------------------------------------------------------------
+// Now we have decomposed everything into irreducible components over Q,
+// but over C there might still be some reducible ones left:
+// Determine the number of components over C.
+//---------------------------------------------------------------------------
+   n=0;
+   for(i=1;i<=size(iden);i++)
+   {
+      if(defined(S)) {kill S;}
+      def S=re[2][iden[i][1][1]];
+      setring S;
+      divcomp[i]=ncols(dcE[iden[i][1][2]][iden[i][1][3]][4]);
+          // number of components of the Q-irreducible curve dcE[iden[i][1][2]]
+      n=n+divcomp[i];
+      setring R;
+   }
+//---------------------------------------------------------------------------
+// set up the entries Inters[i,j] , i!=j, in the intersection matrix:
+// we have to compute the intersection of the exceptional divisors (over C)
+//    i.e. we have to work in over appropriate algebraic extension of Q.
+// (1) plug the intersection matrices of the components of the same Q-irred.
+//     divisor into the correct position in the intersection matrix
+// (2) for comparison of Ei,k and Ej,l move to a chart where both divisors
+//     are present, fetch the components from the very first chart containing
+//     the respective divisor and then compare by using intersComp
+// (4) put the result into the correct position in the integer matrix Inters
+//---------------------------------------------------------------------------
+//--- some initialization
+   int comPai,comPaj;
+   intvec v,w;
+   intmat Inters[n][n];
+//--- run through all Q-irreducible exceptional divisors
+   for(i=1;i<=size(iden);i++)
+   {
+      if(divcomp[i]>1)
+      {
+//--- (1) put the intersection matrix for Ei,k with Ei,l into the correct place
+         for(k=1;k<=size(iden[i]);k++)
+         {
+            if(defined(tempmat)){kill tempmat;}
+            intmat tempmat=imap(re[2][iden[i][k][1]],dcE)[iden[i][k][2]][iden[i][k][3]][4];
+            if(size(ideal(tempmat))!=0)
+            {
+               Inters[i+offset1..(i+offset1+divcomp[i]-1),
+                      i+offset1..(i+offset1+divcomp[i]-1)]=
+                       tempmat[1..nrows(tempmat),1..ncols(tempmat)];
+               break;
+            }
+            kill tempmat;
+         }
+      }
+      offset2=offset1+divcomp[i]-1;
+//--- set up the components over C of the i-th exceptional divisor
+      if(defined(S)){kill S;}
+      def S=re[2][iden[i][1][1]];
+      setring S;
+      if(defined(idlisti)) {kill idlisti;}
+      list idlisti;
+      idlisti[1]=dcE[iden[i][1][2]][iden[i][1][3]][6];
+      export(idlisti);
+      setring R;
+//--- run through the remaining exceptional divisors and check whether they
+//--- have a chart in common with the i-th divisor
+      for(j=i+1;j<=size(iden);j++)
+      {
+         kill templist;
+         list templist;
+         for(k=1;k<=size(iden[i]);k++)
+         {
+            intvec tiv2=findInIVList(1,iden[i][k][1],iden[j]);
+            if(size(tiv2)!=1)
+            {
+//--- tiv2[1] is a common chart for the divisors i and j
+              tiv2[4..6]=iden[i][k];
+              templist[size(templist)+1]=tiv2;
+            }
+            kill tiv2;
+         }
+         if(size(templist)==0)
+         {
+//--- the two (Q-irred) divisors do not appear in any chart simultaneously
+            offset2=offset2+divcomp[j]-1;
+            j++;
+            continue;
+         }
+         for(k=1;k<=size(templist);k++)
+         {
+            if(defined(S)) {kill S;}
+//--- set up the components over C of the j-th exceptional divisor
+            def S=re[2][iden[j][1][1]];
+            setring S;
+            if(defined(idlistj)) {kill idlistj;}
+            list idlistj;
+            idlistj[1]=dcE[iden[j][1][2]][iden[j][1][3]][6];
+            export(idlistj);
+            if(defined(opath)){kill opath;}
+            def opath=imap(re[2][templist[k][1]],path);
+            comPaj=1;
+            while(opath[1,comPaj]==path[1,comPaj])
+            {
+              comPaj++;
+              if((comPaj>ncols(opath))||(comPaj>ncols(path))) break;
+            }
+            comPaj=int(leadcoef(path[1,comPaj-1]));
+            setring R;
+            kill S;
+            def S=re[2][iden[i][1][1]];
+            setring S;
+            if(defined(opath)){kill opath;}
+            def opath=imap(re[2][templist[k][1]],path);
+            comPai=1;
+            while(opath[1,comPai]==path[1,comPai])
+            {
+               comPai++;
+               if((comPai>ncols(opath))||(comPai>ncols(path))) break;
+            }
+            comPai=int(leadcoef(opath[1,comPai-1]));
+            setring R;
+            kill S;
+            def S=re[2][templist[k][1]];
+            setring S;
+            if(defined(il)) {kill il;}
+            if(defined(jl)) {kill jl;}
+            if(defined(str1)) {kill str1;}
+            if(defined(str2)) {kill str2;}
+            string str1="idlisti";
+            string str2="idlistj";
+            attrib(str1,"algext",imap(re[2][iden[i][1][1]],dcE)[iden[i][1][2]][iden[i][1][3]][5]);
+            attrib(str2,"algext",imap(re[2][iden[j][1][1]],dcE)[iden[j][1][2]][iden[j][1][3]][5]);
+            list il=fetchInTree(re,iden[i][1][1],comPai,
+                                templist[k][1],str1,iden0,1);
+            list jl=fetchInTree(re,iden[j][1][1],comPaj,
+                                templist[k][1],str2,iden0,1);
+            list nulli=imap(re[2][iden[i][1][1]],dcE)[iden[i][1][2]][iden[i][1][3]][7];
+            list nullj=imap(re[2][iden[j][1][1]],dcE)[iden[j][1][2]][iden[j][1][3]][7];
+            string mpi=imap(re[2][iden[i][1][1]],dcE)[iden[i][1][2]][iden[i][1][3]][5];
+            string mpj=imap(re[2][iden[j][1][1]],dcE)[iden[j][1][2]][iden[j][1][3]][5];
+            if(defined(tintMat)){kill tintMat;}
+            intmat tintMat=intersComp(il[1],mpi,nulli,jl[1],mpj,nullj);
+            kill mpi;
+            kill mpj;
+            kill nulli;
+            kill nullj;
+            for(a=1;a<=divcomp[i];a++)
+            {
+               for(b=1;b<=divcomp[j];b++)
+               {
+                 if(tintMat[a,b]!=0)
+                 {
+                    Inters[i+offset1+a-1,j+offset2+b-1]=tintMat[a,b];
+                    Inters[j+offset2+b-1,i+offset1+a-1]=tintMat[a,b];
+                 }
+               }
+            }
+         }
+         offset2=offset2+divcomp[j]-1;
+      }
+      offset1=offset1+divcomp[i]-1;
+   }
+   Inters=addSelfInter(re,Inters,iden,iden0,endiv);
+   intvec GenusIden;
+
+   list tl_genus;
+   a=1;
+   for(i=1;i<=size(iden);i++)
+   {
+      tl_genus=genus_E(re,iden0,iden[i][1]);
+      for(j=1;j<=tl_genus[2];j++)
+      {
+        GenusIden[a]=tl_genus[1];
+        a++;
+      }
+   }
+
+   list retlist=Inters,GenusIden,iden,divcomp;
+   return(retlist);
+}
+example
+{"EXAMPLE:";
+   echo = 2;
+   ring r = 0,(x(1..3)),dp(3);
+   ideal J=x(3)^5+x(2)^4+x(1)^3+x(1)*x(2)*x(3);
+   list re=resolve(J);
+   list di=intersectionDiv(re);
+   di;
+
+}
+//////////////////////////////////////////////////////////////////////////////
+static
+proc intersComp(string str1,
+                string mp1,
+                list null1,
+                string str2,
+                string mp2,
+                list null2)
+"Internal procedure - no help and no example available
+"
+{
+//--- format of input
+//--- str1 : ideal (over field extension 1)
+//--- mp1  : minpoly of field extension 1
+//--- null1: numerical zeros of minpoly
+//--- str2 : ideal (over field extension 2)
+//--- mp2  : minpoly of field extension 2
+//--- null2: numerical zeros of minpoly
+
+//--- determine intersection matrix of the C-components defined by the input
+
+//---------------------------------------------------------------------------
+// Initialization
+//---------------------------------------------------------------------------
+  int ii,jj,same;
+  def R=basering;
+  intmat InterMat[size(null1)][size(null2)];
+  ring ringst=0,(t,s),dp;
+//---------------------------------------------------------------------------
+// Add new variables s and t and compare the minpolys and ideals
+// to find out whether they are identical
+//---------------------------------------------------------------------------
+  def S=R+ringst;
+  setring S;
+  if((mp1==mp2)&&(str1==str2))
+  {
+    same=1;
+  }
+//--- define first Q-component/C-components, substitute t by s
+  string tempstr="ideal id1="+str1+";";
+  execute(tempstr);
+  execute(mp1);
+  id1=subst(id1,t,s);
+  poly q=subst(p,t,s);
+  kill p;
+//--- define second Q-component/C-components
+  tempstr="ideal id2="+str2+";";
+  execute(tempstr);
+  execute(mp2);
+//--- do the intersection
+  ideal interId=id1+id2+ideal(p)+ideal(q);
+  if(same)
+  {
+    interId=quotient(interId,t-s);
+  }
+  interId=std(interId);
+//--- refine the comparison by passing to each of the numerical zeros
+//--- of the two minpolys
+  ideal stid=nselect(interId,1,nvars(R));
+  ring compl_st=complex,(s,t),dp;
+  def stid=imap(S,stid);
+  ideal tempid,tempid2;
+  for(ii=1;ii<=size(null1);ii++)
+  {
+    tempstr="number numi="+null1[ii]+";";
+    execute(tempstr);
+    tempid=subst(stid,s,numi);
+    kill numi;
+    for(jj=1;jj<=size(null2);jj++)
+    {
+       tempstr="number numj="+null2[jj]+";";
+       execute(tempstr);
+       tempid2=subst(tempid,t,numj);
+       kill numj;
+       if(size(tempid2)==0)
+       {
+         InterMat[ii,jj]=1;
+       }
+    }
+  }
+//--- sanity check; as both Q-components were Q-irreducible,
+//--- summation over all entries of a single row must lead to the same
+//--- result, no matter which row is chosen
+//--- dito for the columns
+  int cou,cou1;
+  for(ii=1;ii<=ncols(InterMat);ii++)
+  {
+    cou=0;
+    for(jj=1;jj<=nrows(InterMat);jj++)
+    {
+      cou=cou+InterMat[jj,ii];
+    }
+    if(ii==1){cou1=cou;}
+    if(cou1!=cou){ERROR("intersComp:matrix has wrong entries");}
+  }
+  for(ii=1;ii<=nrows(InterMat);ii++)
+  {
+    cou=0;
+    for(jj=1;jj<=ncols(InterMat);jj++)
+    {
+      cou=cou+InterMat[ii,jj];
+    }
+    if(ii==1){cou1=cou;}
+    if(cou1!=cou){ERROR("intersComp:matrix has wrong entries");}
+  }
+  return(InterMat);
+}
+/////////////////////////////////////////////////////////////////////////////
+static
+proc addSelfInter(list re,intmat Inters,list iden,list iden0,intvec endiv)
+"Internal procedure - no help and no example available
+"
+{
+//---------------------------------------------------------------------------
+// Initialization
+//---------------------------------------------------------------------------
+   def R=basering;
+   int i,j,k,l,a,b;
+   int n=size(iden);
+   intvec v,w;
+   list satlist;
+   def T=re[2][1];
+   setring T;
+   poly p;
+   p=var(1);  //any linear form will do,
+              //but this one is most convenient
+   ideal F=ideal(p);
+//----------------------------------------------------------------------------
+// lift linear form to every end ring, determine the multiplicity of
+// the exceptional divisors and store it in Flist
+//----------------------------------------------------------------------------
+   list templist;
+   intvec tiv;
+   for(i=1;i<=size(endiv);i++)
+   {
+     if(endiv[i]==1)
+     {
+        kill v;
+        intvec v;
+        a=0;
+        if(defined(S)) {kill S;}
+        def S=re[2][i];
+        setring S;
+        map resi=T,BO[5];
+        ideal F=resi(F)+BO[2];
+        ideal Ftemp=F;
+        list Flist;
+        if(defined(satlist)){kill satlist;}
+        list satlist;
+        for(a=1;a<=size(dcE);a++)
+        {
+           for(b=1;b<=size(dcE[a]);b++)
+           {
+              Ftemp=sat(Ftemp,dcE[a][b][1])[1];
+           }
+        }
+        F=sat(F,Ftemp)[1];
+        Flist[1]=Ftemp;
+        Ftemp=1;
+        list pr=primdecGTZ(F);
+        v[size(pr)]=0;
+        for(j=1;j<=size(pr);j++)
+        {
+          for(a=1;a<=size(dcE);a++)
+          {
+             if(j==1)
+             {
+               kill tiv;
+               intvec tiv;
+               tiv[size(dcE[a])]=0;
+               templist[a]=tiv;
+               if(v[j]==1)
+               {
+                 a++;
+                 continue;
+               }
+             }
+             if(dcE[a][1][2]==0)
+             {
+                a++;
+                continue;
+             }
+             for(b=1;b<=size(dcE[a]);b++)
+             {
+                if((size(reduce(dcE[a][b][1],std(pr[j][2])))==0)&&
+                   (size(reduce(pr[j][2],std(dcE[a][b][1])))==0))
+                {
+                  templist[a][b]=Vielfachheit(pr[j][1],pr[j][2]);
+                  v[j]=1;
+                  break;
+                }
+             }
+             if((v[j]==1)&&(j>1)) break;
+          }
+        }
+        kill v;
+        intvec v;
+        Flist[2]=templist;
+     }
+   }
+//-----------------------------------------------------------------------------
+// Now set up all the data:
+// 1. run through all exceptional divisors in iden and determine the
+//    coefficients c_i of the divisor of F.  ===> civ
+// 2. determine the intersection locus of F^bar and the Ei and from this data
+//    the F^bar.Ei . ===> intF
+//-----------------------------------------------------------------------------
+   intvec civ;
+   intvec intF;
+   intF[ncols(Inters)]=0;
+   int offset,comPa,ncomp,vd;
+   for(i=1;i<=size(iden);i++)
+   {
+      ncomp=0;
+      for(j=1;j<=size(iden[i]);j++)
+      {
+        if(defined(S)) {kill S;}
+        def S=re[2][iden[i][j][1]];
+        setring S;
+        if((size(civ)<i+offset+1)&&
+           (((Flist[2][iden[i][j][2]][iden[i][j][3]])!=0)||(j==size(iden[i]))))
+        {
+           ncomp=ncols(dcE[iden[i][j][2]][iden[i][j][3]][4]);
+           for(k=1;k<=ncomp;k++)
+           {
+              civ[i+offset+k]=Flist[2][iden[i][j][2]][iden[i][j][3]];
+              if(deg(std(slocus(dcE[iden[i][j][2]][iden[i][j][3]][1]))[1])>0)
+              {
+                   civ[i+offset+k]=civ[i+k];
+              }
+           }
+        }
+        if(defined(interId)) {kill interId;}
+        ideal interId=dcE[iden[i][j][2]][iden[i][j][3]][1]+Flist[1];
+        if(defined(interList)) {kill interList;}
+        list interList;
+        interList[1]=string(interId);
+        interList[2]=ideal(0);
+        export(interList);
+        if(defined(doneId)) {kill doneId;}
+        if(defined(tempId)) {kill tempId;}
+        ideal doneId=ideal(1);
+        if(defined(dl)) {kill dl;}
+        list dl;
+        for(k=1;k<j;k++)
+        {
+           if(defined(St)) {kill St;}
+           def St=re[2][iden[i][k][1]];
+           setring St;
+           if(defined(str)){kill str;}
+           string str="interId="+interList[1]+";";
+           execute(str);
+           if(deg(std(interId)[1])==0)
+           {
+             setring S;
+             k++;
+             continue;
+           }
+           setring S;
+           if(defined(opath)) {kill opath;}
+           def opath=imap(re[2][iden[i][k][1]],path);
+           comPa=1;
+           while(opath[1,comPa]==path[1,comPa])
+           {
+              comPa++;
+              if((comPa>ncols(path))||(comPa>ncols(opath))) break;
+           }
+           comPa=int(leadcoef(path[1,comPa-1]));
+           if(defined(str)) {kill str;}
+           string str="interList";
+           attrib(str,"algext","poly p=t-1;");
+           dl=fetchInTree(re,iden[i][k][1],comPa,iden[i][j][1],str,iden0,1);
+           if(defined(tempId)){kill tempId;}
+           str="ideal tempId="+dl[1]+";";
+           execute(str);
+           doneId=intersect(doneId,tempId);
+           str="interId="+interList[1]+";";
+           execute(str);
+           interId=sat(interId,doneId)[1];
+           interList[1]=string(interId);
+        }
+        interId=std(interId);
+        if(dim(interId)>0)
+        {
+           "oops, intersection not a set of points";
+           ~;
+        }
+        vd=vdim(interId);
+        if(vd>0)
+        {
+          for(k=i+offset;k<=i+offset+ncomp-1;k++)
+          {
+             intF[k]=intF[k]+(vd/ncomp);
+          }
+        }
+      }
+      offset=size(civ)-i-1;
+   }
+   if(defined(tiv)){kill tiv;}
+   intvec tiv=civ[2..size(civ)];
+   civ=tiv;
+   kill tiv;
+//-----------------------------------------------------------------------------
+// Using the F_total= sum c_i Ei + F^bar, the intersection matrix Inters and
+// the f^bar.Ei, determine the selfintersection numbers of the Ei from the
+// equation F_total.Ei=0 and store it in the diagonal of Inters.
+//-----------------------------------------------------------------------------
+   intvec diag=Inters*civ+intF;
+   for(i=1;i<=size(diag);i++)
+   {
+      Inters[i,i]=-diag[i]/civ[i];
+   }
+   return(Inters);
+}
+//////////////////////////////////////////////////////////////////////////////
+static
+proc invSort(list re, list #)
+"Internal procedure - no help and no example available
+"
+{
+  int i,j,k,markier,EZeiger,offset;
+  intvec v,e;
+  intvec deleted;
+  if(size(#)>0)
+  {
+     deleted=#[1];
+  }
+  else
+  {
+    deleted[size(re[2])]=0;
+  }
+  list LE,HI;
+  def R=basering;
+//----------------------------------------------------------------------------
+// Go through all rings
+//----------------------------------------------------------------------------
+  for(i=1;i<=size(re[2]);i++)
+  {
+     if(deleted[i]){i++;continue}
+     def S=re[2][i];
+     setring S;
+//----------------------------------------------------------------------------
+// Determine Invariant
+//----------------------------------------------------------------------------
+     if((size(BO[3])==size(BO[9]))||(size(BO[3])==size(BO[9])+1))
+     {
+        if(defined(merk2)){kill merk2;}
+        intvec merk2;
+        EZeiger=0;
+        for(j=1;j<=size(BO[9]);j++)
+        {
+          offset=0;
+          if(BO[7][j]==-1)
+          {
+             BO[7][j]=size(BO[4])-EZeiger;
+          }
+          for(k=EZeiger+1;(k<=EZeiger+BO[7][j])&&(k<=size(BO[4]));k++)
+          {
+             if(BO[6][k]==2)
+             {
+                offset++;
+             }
+          }
+          EZeiger=EZeiger+BO[7][1];
+          merk2[3*j-2]=BO[3][j];
+          merk2[3*j-1]=BO[9][j]-offset;
+          if(size(invSat[2])>j)
+          {
+            merk2[3*j]=-invSat[2][j];
+          }
+          else
+          {
+            if(j<size(BO[9]))
+            {
+               "!!!!!problem with invSat";~;
+            }
+          }
+        }
+        if((size(BO[3])>size(BO[9])))
+        {
+          merk2[size(merk2)+1]=BO[3][size(BO[3])];
+        }
+        if((size(merk2)%3)==0)
+        {
+          intvec tintvec=merk2[1..size(merk2)-1];
+          merk2=tintvec;
+          kill tintvec;
+        }
+     }
+     else
+     {
+         ERROR("This situation should not occur, please send the example
+                 to the authors.");
+     }
+//----------------------------------------------------------------------------
+// Save invariant describing current center as an object in this ring
+// We also store information on the intersection with the center and the
+// exceptional divisors
+//----------------------------------------------------------------------------
+     cent=std(cent);
+     kill e;
+     intvec e;
+     for(j=1;j<=size(BO[4]);j++)
+     {
+        if(size(reduce(BO[4][j],std(cent+BO[1])))==0)
+        {
+           e[j]=1;
+        }
+        else
+        {
+           e[j]=0;
+        }
+     }
+     if(size(ideal(merk2))==0)
+     {
+        markier=1;
+     }
+     if((size(merk2)%3==0)&&(merk2[size(merk2)]==0))
+     {
+       intvec blabla=merk2[1..size(merk2)-1];
+       merk2=blabla;
+       kill blabla;
+     }
+     if(defined(invCenter)){kill invCenter;}
+     list invCenter=cent,merk2,e;
+     export invCenter;
+//----------------------------------------------------------------------------
+// Insert it into correct place in the list
+//----------------------------------------------------------------------------
+     if(i==1)
+     {
+       if(!markier)
+       {
+         HI=intvec(merk2[1]+1),intvec(1);
+       }
+       else
+       {
+         HI=intvec(778),intvec(1);   // some really large integer
+                                     // will be changed at the end!!!
+       }
+       LE[1]=HI;
+       i++;
+       setring R;
+       kill S;
+       continue;
+     }
+     if(markier==1)
+     {
+       if(i==2)
+       {
+         HI=intvec(777),intvec(2);   // same really large integer-1
+         LE[2]=HI;
+         i++;
+         setring R;
+         kill S;
+         continue;
+       }
+       else
+       {
+         if(ncols(path)==2)
+         {
+           LE[2][2][size(LE[2][2])+1]=i;
+           i++;
+           setring R;
+           kill S;
+           continue;
+         }
+         else
+         {
+           markier=0;
+         }
+       }
+     }
+     j=1;
+     def SOld=re[2][int(leadcoef(path[1,ncols(path)]))];
+     setring SOld;
+     merk2=invCenter[2];
+     setring S;
+     kill SOld;
+     while(merk2<LE[j][1])
+     {
+        j++;
+        if(j>size(LE)) break;
+     }
+     HI=merk2,intvec(i);
+     if(j<=size(LE))
+     {
+        if(merk2>LE[j][1])
+        {
+          LE=insert(LE,HI,j-1);
+        }
+        else
+        {
+           while((merk2==LE[j][1])&&(size(merk2)<size(LE[j][1])))
+           {
+              j++;
+              if(j>size(LE)) break;
+           }
+           if(j<=size(LE))
+           {
+              if((merk2!=LE[j][1])||(size(merk2)!=size(LE[j][1])))
+              {
+                LE=insert(LE,HI,j-1);
+              }
+              else
+              {
+                LE[j][2][size(LE[j][2])+1]=i;
+              }
+           }
+           else
+           {
+              LE[size(LE)+1]=HI;
+           }
+        }
+     }
+     else
+     {
+        LE[size(LE)+1]=HI;
+     }
+     setring R;
+     kill S;
+  }
+  if((LE[1][1]==intvec(778)) && (size(LE)>2))
+  {
+     LE[1][1]=intvec(LE[3][1][1]+2);     // by now we know what 'sufficiently
+     LE[2][1]=intvec(LE[3][1][1]+1);     // large' is
+  }
+  return(LE);
+}
+example
+{"EXAMPLE:";
+   echo = 2;
+   ring r = 0,(x(1..3)),dp(3);
+   ideal J=x(1)^3-x(1)*x(2)^3+x(3)^2;
+   list re=resolve(J,1);
+   list di=invSort(re);
+   di;
+}
+/////////////////////////////////////////////////////////////////////////////
+static
+proc addToRE(intvec v,int x,list RE)
+"Internal procedure - no help and no example available
+"
+{
+//--- auxilliary procedure for collectDiv,
+//--- inserting an entry at the correct place
+   int i=1;
+   while(i<=size(RE))
+   {
+      if(v==RE[i][1])
+      {
+         RE[i][2][size(RE[i][2])+1]=x;
+         return(RE);
+      }
+      if(v>RE[i][1])
+      {
+         list templist=v,intvec(x);
+         RE=insert(RE,templist,i-1);
+         return(RE);
+      }
+      i++;
+   }
+   list templist=v,intvec(x);
+   RE=insert(RE,templist,size(RE));
+   return(RE);
+}
+////////////////////////////////////////////////////////////////////////////
+
+proc collectDiv(list re,list #)
+"USAGE:   collectDiv(L);
+@*        L = list of rings
+ASSUME:   L is output of resolution of singularities
+COMPUTE:  list representing the identification of the exceptional divisors
+          in the various charts
+RETURN:   list l, where
+          l[1]: intmat, entry k in position i,j implies BO[4][j] of chart i
+                is divisor k (if k!=0)
+                if k==0, no divisor corresponding to i,j
+          l[2]: list ll, where each entry of ll is a list of intvecs
+                entry i,j in list ll[k] implies BO[4][j] of chart i
+                is divisor k
+          l[3]: list L
+EXAMPLE:  example collectDiv;   shows an example
+"
+{
+//------------------------------------------------------------------------
+// Initialization
+//------------------------------------------------------------------------
+  int i,j,k,l,m,maxk,maxj,mPa,oPa,interC,pa,ignoreL,iTotal;
+  int mLast,oLast=1,1;
+  intvec deleted;
+//--- sort the rings by the invariant which controlled the last of the
+//--- exceptional divisors
+  if(size(#)>0)
+  {
+     deleted=#[1];
+  }
+  else
+  {
+    deleted[size(re[2])]=0;
+  }
+  list LE=invSort(re,deleted);
+  list LEtotal=LE;
+  intmat M[size(re[2])][size(re[2])];
+  intvec invar,tempiv;
+  def R=basering;
+  list divList;
+  list RE,SE;
+  intvec myEi,otherEi,tempe;
+  int co=2;
+
+  while(size(LE)>0)
+  {
+//------------------------------------------------------------------------
+// Run through the sorted list LE whose entries are lists containing
+// the invariant and the numbers of all rings corresponding to it
+//------------------------------------------------------------------------
+     for(i=co;i<=size(LE);i++)
+     {
+//--- i==1 in first iteration:
+//--- the original ring which did not arise from a blow-up
+//--- hence there are no exceptional divisors to be identified there ;
+
+//------------------------------------------------------------------------
+// For each fixed value of the invariant, run through all corresponding
+// rings
+//------------------------------------------------------------------------
+        for(l=1;l<=size(LE[i][2]);l++)
+        {
+           if(defined(S)){kill S;}
+           def S=re[2][LE[i][2][l]];
+           setring S;
+           if(size(BO[4])>maxj){maxj=size(BO[4]);}
+//--- all exceptional divisors, except the last one, were previously
+//--- identified - hence we can simply inherit the data from the parent ring
+           for(j=1;j<size(BO[4]);j++)
+           {
+              if(deg(std(BO[4][j])[1])>0)
+              {
+                k=int(leadcoef(path[1,ncols(path)]));
+                k=M[k,j];
+                if(k==0)
+                {
+                   RE=addToRE(LE[i][1],LE[i][2][l],RE);
+                   ignoreL=1;
+                   break;
+                }
+                M[LE[i][2][l],j]=k;
+                tempiv=LE[i][2][l],j;
+                divList[k][size(divList[k])+1]=tempiv;
+              }
+           }
+          if(ignoreL){ignoreL=0;l++;continue;}
+//----------------------------------------------------------------------------
+// In the remaining part of the procedure, the identification of the last
+// exceptional divisor takes place.
+// Step 1: check whether there is a previously considered ring with the
+//         same parent; if this is the case, we can again inherit the data
+// Step 1':check whether the parent had a stored center which it then used
+//         in this case, we are dealing with an additional component of this
+//         divisor: store it in the integer otherComp
+// Step 2: if no appropriate ring was found in step 1, we check whether
+//         there is a previously considered ring, in the parent of which
+//         the center intersects the same exceptional divisors as the center
+//         in our parent.
+//         if such a ring does not exist: new exceptional divisor
+//         if it exists: see below
+//----------------------------------------------------------------------------
+           if(path[1,ncols(path)-1]==0)
+           {
+//--- current ring originated from very first blow-up
+//--- hence exceptional divisor is the first one
+              M[LE[i][2][l],1]=1;
+              if(size(divList)>0)
+              {
+                 divList[1][size(divList[1])+1]=intvec(LE[i][2][l],j);
+              }
+              else
+              {
+                 divList[1]=list(intvec(LE[i][2][l],j));
+              }
+              l++;
+              continue;
+           }
+           if(l==1)
+           {
+              list TE=addToRE(LE[i][1],1,SE);
+              if(size(TE)!=size(SE))
+              {
+//--- new value of invariant hence new exceptional divisor
+                 SE=TE;
+                 divList[size(divList)+1]=list(intvec(LE[i][2][l],j));
+                 M[LE[i][2][l],j]=size(divList);
+              }
+              kill TE;
+           }
+           for(k=1;k<=size(LEtotal);k++)
+           {
+              if(LE[i][1]==LEtotal[k][1])
+              {
+                 iTotal=k;
+                 break;
+              }
+           }
+//--- Step 1
+           k=1;
+           while(LEtotal[iTotal][2][k]<LE[i][2][l])
+           {
+              if(defined(tempPath)){kill tempPath;}
+              def tempPath=imap(re[2][LEtotal[iTotal][2][k]],path);
+              if(tempPath[1,ncols(tempPath)]==path[1,ncols(path)])
+              {
+//--- Same parent, hence we inherit our data
+                 m=size(imap(re[2][LEtotal[iTotal][2][k]],BO)[4]);
+                 m=M[LEtotal[iTotal][2][k],m];
+                 if(m==0)
+                 {
+                    RE=addToRE(LE[i][1],LE[i][2][l],RE);
+                    ignoreL=1;
+                    break;
+                 }
+                 M[LE[i][2][l],j]=m;
+                 tempiv=LE[i][2][l],j;
+                 divList[m][size(divList[m])+1]=tempiv;
+                 break;
+              }
+              k++;
+              if(k>size(LEtotal[iTotal][2])) {break;}
+           }
+           if(ignoreL){ignoreL=0;l++;continue;}
+//--- Step 1', if necessary
+           if(M[LE[i][2][l],j]==0)
+           {
+             int savedCent;
+             def SPa1=re[2][int(leadcoef(path[1,ncols(path)]))];
+                       // parent ring
+             setring SPa1;
+             if(size(BO)>9)
+             {
+                if(size(BO[10])>0)
+                {
+                   savedCent=1;
+                }
+             }
+             if(!savedCent)
+             {
+                def SPa2=re[2][int(leadcoef(path[1,ncols(path)]))];
+                map lMa=SPa2,lastMap;
+                       // map leading from grandparent to parent
+                list transBO=lMa(BO);
+                       // actually we only need BO[10], but this is an
+                       // object not a name
+                list tempsat;
+                if(size(transBO)>9)
+                {
+//--- there were saved centers
+                   while((k<=size(transBO[10])) & (savedCent==0))
+                   {
+                      tempsat=sat(transBO[10][k][1],BO[4][size(BO[4])]);
+                      if(deg(tempsat[1][1])!=0)
+                      {
+//--- saved center can be seen in this affine chart
+                        if((size(reduce(tempsat[1],std(cent)))==0) &&
+                           (size(reduce(cent,tempsat[1]))==0))
+                        {
+//--- this was the saved center which was used
+                           savedCent=1;
+                        }
+                      }
+                      k++;
+                   }
+                }
+                kill lMa;          // clean up temporary objects
+                kill tempsat;
+                kill transBO;
+             }
+             setring S;         // back to the ring which we want to consider
+             if(savedCent==1)
+             {
+               vector otherComp;
+               otherComp[M[int(leadcoef(path[1,ncols(path)])),size(BO[4])-1]]
+                        =1;
+             }
+             kill savedCent;
+             if (defined(SPa2)){kill SPa2;}
+             kill SPa1;
+           }
+//--- Step 2, if necessary
+           if(M[LE[i][2][l],j]==0)
+           {
+//--- we are not done after step 1 and 2
+              pa=int(leadcoef(path[1,ncols(path)]));  // parent ring
+              tempe=imap(re[2][pa],invCenter)[3];     // intersection there
+              kill myEi;
+              intvec myEi;
+              for(k=1;k<=size(tempe);k++)
+              {
+                if(tempe[k]==1)
+                {
+//--- center meets this exceptional divisor
+                   myEi[size(myEi)+1]=M[pa,k];
+                   mLast=k;
+                }
+              }
+//--- ring in which the last divisor we meet is new-born
+              mPa=int(leadcoef(path[1,mLast+2]));
+              k=1;
+              while(LEtotal[iTotal][2][k]<LE[i][2][l])
+              {
+//--- perform the same preparations for the ring we want to compare with
+                 if(defined(tempPath)){kill tempPath;}
+                 def tempPath=imap(re[2][LEtotal[iTotal][2][k]],path);
+                                                          // its ancestors
+                 tempe=imap(re[2][int(leadcoef(tempPath[1,ncols(tempPath)]))],
+                         invCenter)[3];                   // its intersections
+                 kill otherEi;
+                 intvec otherEi;
+                 for(m=1;m<=size(tempe);m++)
+                 {
+                   if(tempe[m]==1)
+                   {
+//--- its center meets this exceptional divisor
+                     otherEi[size(otherEi)+1]
+                          =M[int(leadcoef(tempPath[1,ncols(tempPath)])),m];
+                     oLast=m;
+                   }
+                 }
+                 if(myEi!=otherEi)
+                 {
+//--- not the same center because of intersection properties with the
+//--- exceptional divisor
+                    k++;
+                    if(k>size(LEtotal[iTotal][2]))
+                    {
+                      break;
+                    }
+                    else
+                    {
+                      continue;
+                    }
+                 }
+//----------------------------------------------------------------------------
+// Current situation:
+// 1. the last exceptional divisor could not be identified by simply
+//    considering its parent
+// 2. it could not be proved to be a new one by considering its intersections
+//    with previous exceptional divisors
+//----------------------------------------------------------------------------
+                 if(defined(bool1)) { kill bool1;}
+                 int bool1=
+                       compareE(re,LE[i][2][l],LEtotal[iTotal][2][k],divList);
+                 if(bool1)
+                 {
+//--- found some non-empty intersection
+                    if(bool1==1)
+                    {
+//--- it is really the same exceptional divisor
+                       m=size(imap(re[2][LEtotal[iTotal][2][k]],BO)[4]);
+                       m=M[LEtotal[iTotal][2][k],m];
+                       if(m==0)
+                       {
+                          RE=addToRE(LE[i][1],LE[i][2][l],RE);
+                          ignoreL=1;
+                          break;
+                       }
+                       M[LE[i][2][l],j]=m;
+                       tempiv=LE[i][2][l],j;
+                       divList[m][size(divList[m])+1]=tempiv;
+                       break;
+                    }
+                    else
+                    {
+                       m=size(imap(re[2][LEtotal[iTotal][2][k]],BO)[4]);
+                       m=M[LEtotal[iTotal][2][k],m];
+                       if(m!=0)
+                       {
+                          otherComp[m]=1;
+                       }
+                    }
+                 }
+                 k++;
+                 if(k>size(LEtotal[iTotal][2]))
+                 {
+                   break;
+                 }
+              }
+              if(ignoreL){ignoreL=0;l++;continue;}
+              if( M[LE[i][2][l],j]==0)
+              {
+                 divList[size(divList)+1]=list(intvec(LE[i][2][l],j));
+                 M[LE[i][2][l],j]=size(divList);
+              }
+           }
+           setring R;
+           kill S;
+        }
+     }
+     LE=RE;
+     co=1;
+     kill RE;
+     list RE;
+  }
+//----------------------------------------------------------------------------
+// Add the strict transform to the list of divisors at the last place
+// and clean up M
+//----------------------------------------------------------------------------
+//--- add strict transform
+  for(i=1;i<=size(re[2]);i++)
+  {
+     if(defined(S)){kill S;}
+     def S=re[2][i];
+     setring S;
+     if(size(reduce(cent,std(BO[2])))==0)
+     {
+        tempiv=i,0;
+        RE[size(RE)+1]=tempiv;
+     }
+     setring R;
+  }
+  divList[size(divList)+1]=RE;
+//--- drop trailing zero-columns of M
+  intvec iv0;
+  iv0[nrows(M)]=0;
+  for(i=ncols(M);i>0;i--)
+  {
+    if(intvec(M[1..nrows(M),i])!=iv0) break;
+  }
+  intmat N[nrows(M)][i];
+  for(i=1;i<=ncols(N);i++)
+  {
+    N[1..nrows(M),i]=M[1..nrows(M),i];
+  }
+  kill M;
+  intmat M=N;
+  list retlist=cleanUpDiv(re,M,divList);
+  return(retlist);
+}
+example
+{"EXAMPLE:";
+   echo = 2;
+   ring R=0,(x,y,z),dp;
+   ideal I=xyz+x4+y4+z4;
+//we really need to blow up curves even if the generic point of
+//the curve the total transform is n.c.
+//this occurs here in r[2][5]
+   list re=resolve(I,1);
+   list di=collectDiv(re);
+   di;
+}
+//////////////////////////////////////////////////////////////////////////////
+static
+proc cleanUpDiv(list re,intmat M,list divList)
+"Internal procedure - no help and no example available
+"
+{
+//--- It may occur that two different entries of invSort coincide on the
+//--- first part up to the last entry of the shorter one. In this case
+//--- exceptional divisors may appear in both entries of the invSort-list.
+//--- To correct this, we now compare the final collection of Divisors
+//--- for coinciding ones.
+   int i,j,k,a,oPa,mPa,comPa,mdim,odim;
+   def R=basering;
+   for(i=1;i<=size(divList)-2;i++)
+   {
+      if(defined(Sm)){kill Sm;}
+      def Sm=re[2][divList[i][1][1]];
+      setring Sm;
+      mPa=int(leadcoef(path[1,ncols(path)]));
+      if(defined(SmPa)){kill SmPa;}
+      def SmPa=re[2][mPa];
+      setring SmPa;
+      mdim=dim(std(BO[1]+cent));
+      setring Sm;
+      if(mPa==1)
+      {
+//--- very first divisor originates exactly from the first blow-up
+//--- there cannot be any mistake here
+         i++;
+         continue;
+      }
+      for(j=i+1;j<=size(divList)-1;j++)
+      {
+         setring Sm;
+         for(k=1;k<=size(divList[j]);k++)
+         {
+            if(size(findInIVList(1,divList[j][k][1],divList[i]))>1)
+            {
+//--- same divisor cannot appear twice in the same chart
+               k=-1;
+               break;
+            }
+         }
+         if(k==-1)
+         {
+            j++;
+            if(j>size(divList)-1) break;
+            continue;
+         }
+         if(defined(opath)){kill opath;}
+         def opath=imap(re[2][divList[j][1][1]],path);
+         oPa=int(leadcoef(opath[1,ncols(opath)]));
+         if(defined(SoPa)){kill SoPa;}
+         def SoPa=re[2][oPa];
+         setring SoPa;
+         odim=dim(std(BO[1]+cent));
+         setring Sm;
+         if(mdim!=odim)
+         {
+//--- different dimension ==> cannot be same center
+            j++;
+            if(j>size(divList)-1) break;
+            continue;
+         }
+         comPa=1;
+         while(path[1,comPa]==opath[1,comPa])
+         {
+           comPa++;
+           if((comPa>ncols(path))||(comPa>ncols(opath))) break;
+         }
+         comPa=int(leadcoef(path[1,comPa-1]));
+         if(defined(SPa)){kill SPa;}
+         def SPa=re[2][mPa];
+         setring SPa;
+         if(defined(tempIdE)){kill tempIdE;}
+         ideal tempIdE=fetchInTree(re,oPa,comPa,mPa,"cent",divList);
+         if((size(reduce(cent,std(tempIdE)))!=0)||
+            (size(reduce(tempIdE,std(cent)))!=0))
+         {
+//--- it is not the same divisor!
+            j++;
+            if(j>size(divList))
+            {
+               break;
+            }
+            else
+            {
+               continue;
+            }
+         }
+         for(k=1;k<=size(divList[j]);k++)
+         {
+//--- append the entries of the j-th divisor (which is actually also the i-th)
+//--- to the i-th divisor
+            divList[i][size(divList[i])+1]=divList[j][k];
+         }
+         divList=delete(divList,j);  //kill obsolete entry from the list
+         for(k=1;k<=nrows(M);k++)
+         {
+            for(a=1;a<=ncols(M);a++)
+            {
+               if(M[k,a]==j)
+               {
+//--- j-th divisor is actually the i-th one
+                  M[k,a]=i;
+               }
+               if(M[k,a]>j)
+               {
+//--- index j was deleted from the list ==> all subsequent indices dropped by
+//--- one
+                  M[k,a]=M[k,a]-1;
+               }
+            }
+         }
+         j--;                        //do not forget to consider new j-th entry
+      }
+   }
+   setring R;
+   list retlist=M,divList;
+   return(retlist);
+}
+/////////////////////////////////////////////////////////////////////////////
+static
+proc findTrans(ideal Z, ideal E, list notE, list #)
+"Internal procedure - no help and no example available
+"
+{
+//---Auxilliary procedure for fetchInTree!
+//---Assume E prime ideal, Z+E eqidimensional,
+//---ht(E)+r=ht(Z+E). Compute  P=<p[1],...,p[r]> in Z+E, and poly f,
+//---such that radical(Z+E)=radical((E+P):f)
+   int i,j,d,e;
+   ideal Estd=std(E);
+//!!! alternative to subsequent line:
+//!!!           ideal Zstd=std(radical(Z+E));
+   ideal Zstd=std(Z+E);
+   ideal J=1;
+   if(size(#)>0)
+   {
+      J=#[1];
+   }
+   if(deg(Zstd[1])==0){return(list(ideal(1),poly(1)));}
+   for(i=1;i<=size(notE);i++)
+   {
+      notE[i]=std(notE[i]);
+   }
+   ideal Zred=simplify(reduce(Z,Estd),2);
+   if(size(Zred)==0){Z,Estd;~;ERROR("Z is contained in E");}
+   ideal P,Q,Qstd;
+   Q=Estd;
+   attrib(Q,"isSB",1);
+   d=dim(Estd);
+   e=dim(Zstd);
+   for(i=1;i<=size(Zred);i++)
+   {
+      Qstd=std(Q,Zred[i]);
+      if(dim(Qstd)<d)
+      {
+         d=dim(Qstd);
+         P[size(P)+1]=Zred[i];
+         Q=Qstd;
+         attrib(Q,"isSB",1);
+         if(d==e) break;
+      }
+   }
+   list pr=minAssGTZ(E+P);
+   list sr=minAssGTZ(J+P);
+   i=0;
+   Q=1;
+   list qr;
+
+   while(i<size(pr))
+   {
+      i++;
+      Qstd=std(pr[i]);
+      Zred=simplify(reduce(Zstd,Qstd),2);
+      if(size(Zred)==0)
+      {
+        qr[size(qr)+1]=pr[i];
+        pr=delete(pr,i);
+        i--;
+      }
+      else
+      {
+         Q=intersect(Q,pr[i]);
+      }
+   }
+   i=0;
+   while(i<size(sr))
+   {
+      i++;
+      Qstd=std(sr[i]+E);
+      Zred=simplify(reduce(Zstd,Qstd),2);
+      if((size(Zred)!=0)||(dim(Qstd)!=dim(Zstd)))
+      {
+        Q=intersect(Q,sr[i]);
+      }
+   }
+   poly f;
+   for(i=1;i<=size(Q);i++)
+   {
+      f=Q[i];
+      for(e=1;e<=size(qr);e++)
+      {
+         if(reduce(f,std(qr[e]))==0){f=0;break;}
+      }
+      for(j=1;j<=size(notE);j++)
+      {
+         if(reduce(f,notE[j])==0){f=0; break;}
+      }
+      if(f!=0) break;
+   }
+   i=0;
+   while(f==0)
+   {
+      i++;
+      f=randomid(Q)[1];
+      for(e=1;e<=size(qr);e++)
+      {
+         if(reduce(f,std(qr[e]))==0){f=0;break;}
+      }
+      for(j=1;j<=size(notE);j++)
+      {
+         if(reduce(f,notE[j])==0){f=0; break;}
+      }
+      if(f!=0) break;
+      if(i>20)
+      {
+         ~;
+         ERROR("findTrans:Hier ist was faul");
+      }
+   }
+
+   list resu=P,f;
+   return(resu);
+}
+/////////////////////////////////////////////////////////////////////////////
+static
+proc compareE(list L, int m, int o, list DivL)
+"Internal procedure - no help and no example available
+"
+{
+//----------------------------------------------------------------------------
+// We want to compare the divisors BO[4][size(BO[4])] of the rings
+// L[2][m] and L[2][o].
+// In the initialization step, we collect all necessary data from those
+// those rings. In particular, we determine at what point (in the resolution
+// history) the branches for L[2][m] and L[2][o] were separated, denoting
+// the corresponding ring indices by mPa, oPa and comPa.
+//----------------------------------------------------------------------------
+   def R=basering;
+   int i,j,k,len;
+
+//-- find direct parents and branching point in resolution history
+   matrix tpm=imap(L[2][m],path);
+   matrix tpo=imap(L[2][o],path);
+   int m1,o1=int(leadcoef(tpm[1,ncols(tpm)])),
+             int(leadcoef(tpo[1,ncols(tpo)]));
+   while((i<ncols(tpo)) && (i<ncols(tpm)))
+   {
+     if(tpm[1,i+1]!=tpo[1,i+1]) break;
+     i++;
+   }
+   int branchpos=i;
+   int comPa=int(leadcoef(tpm[1,branchpos]));  // last common ancestor
+//----------------------------------------------------------------------------
+// simple checks to save us some work in obvious cases
+//----------------------------------------------------------------------------
+   if((comPa==m1)||(comPa==o1))
+   {
+//--- one is in the history of the other ==> they cannot give rise
+//---                                        to the same divisor
+      return(0);
+   }
+   def T=L[2][o1];
+   setring T;
+   int dimCo1=dim(std(cent+BO[1]));
+   def S=L[2][m1];
+   setring S;
+   int dimCm1=dim(std(cent+BO[1]));
+   if(dimCm1!=dimCo1)
+   {
+//--- centers do not have same dimension ==> they cannot give rise
+//---                                        to the same divisor
+      return(0);
+   }
+//----------------------------------------------------------------------------
+// fetch the center via the tree for comparison
+//----------------------------------------------------------------------------
+   if(defined(invLocus0)) {kill invLocus0;}
+   ideal invLocus0=fetchInTree(L,o1,comPa,m1,"cent",DivL);
+             // blow down from L[2][o1] to L[2][comPa] and then up to L[2][m1]
+   if(deg(std(invLocus0+invCenter[1]+BO[1])[1])!=0)
+   {
+     setring R;
+     return(int(1));
+   }
+   if(size(BO)>9)
+   {
+     for(i=1;i<=size(BO[10]);i++)
+     {
+       if(deg(std(invLocus0+BO[10][i][1]+BO[1])[1])!=0)
+       {
+         if(dim(std(BO[10][i][1]+BO[1])) >
+              dim(std(invLocus0+BO[10][i][1]+BO[1])))
+         {
+           ERROR("Internal Error: Please send this example to the authors.");
+         }
+         setring R;
+         return(int(2));
+       }
+     }
+   }
+   setring R;
+   return(int(0));
+//----------------------------------------------------------------------------
+// Return-Values:
+//        TRUE (=1) if the exceptional divisors coincide,
+//        TRUE (=2) if the exceptional divisors originate from different
+//                  components of the same center
+//        FALSE (=0) otherwise
+//----------------------------------------------------------------------------
+}
+//////////////////////////////////////////////////////////////////////////////
+
+proc fetchInTree(list L,
+                 int o1,
+                 int comPa,
+                 int m1,
+                 string idname,
+                 list DivL,
+                 list #);
+"Internal procedure - no help and no example available
+"
+{
+//----------------------------------------------------------------------------
+// Initialization and Sanity Checks
+//----------------------------------------------------------------------------
+   int i,j,k,m,branchPos,inJ,exception;
+   string algext;
+//--- we need to be in L[2][m1]
+   def R=basering;
+   ideal test_for_the_same_ring=-77;
+   def Sm1=L[2][m1];
+   setring Sm1;
+   if(!defined(test_for_the_same_ring))
+   {
+//--- we are not in L[2][m1]
+      ERROR("basering has to coincide with L[2][m1]");
+   }
+   else
+   {
+//--- we are in L[2][m1]
+      kill test_for_the_same_ring;
+   }
+//--- non-embedded case?
+   if(size(#)>0)
+   {
+      inJ=1;
+   }
+//--- do parameter values make sense?
+   if(comPa<1)
+   {
+     ERROR("Common Parent should at least be the first ring!");
+   }
+//--- do we need to pass to an algebraic field extension of Q?
+   if(typeof(attrib(idname,"algext"))=="string")
+   {
+      algext=attrib(idname,"algext");
+   }
+//--- check wheter comPa is in the history of m1
+//--- same test for o1 can be done later on (on the fly)
+   if(m1==comPa)
+   {
+      j=1;
+      i=ncols(path)+1;
+   }
+   else
+   {
+      for(i=1;i<=ncols(path);i++)
+      {
+        if(int(leadcoef(path[1,i]))==comPa)
+        {
+//--- comPa occurs in the history
+           j=1;
+           break;
+        }
+      }
+   }
+   branchPos=i;
+   if(j==0)
+   {
+     ERROR("L[2][comPa] not in history of L[2][m1]!");
+   }
+//----------------------------------------------------------------------------
+// Blow down ideal "idname" from L[2][o1] to L[2][comPa], where the latter
+// is assumed to be the common parent of L[2][o1] and L[2][m1]
+//----------------------------------------------------------------------------
+   if(size(algext)>0)
+   {
+      if(defined(tstr)){kill tstr;}
+      string tstr="ring So1=(0,t),("+varstr(L[2][o1])+"),("+ordstr(L[2][o1])+");";
+      execute(tstr);
+      setring So1;
+      execute(algext);
+      minpoly=leadcoef(p);
+      if(defined(id1)) { kill id1; }
+      if(defined(id2)) { kill id2; }
+      if(defined(idlist)) { kill idlist; }
+      execute("int bool2=defined("+idname+");");
+      if(bool2==0)
+      {
+        execute("list ttlist=imap(L[2][o1],"+idname+");");
+      }
+      else
+      {
+        execute("list ttlist="+idname+";");
+      }
+      kill bool2;
+      def BO=imap(L[2][o1],BO);
+      def path=imap(L[2][o1],path);
+      def lastMap=imap(L[2][o1],lastMap);
+      ideal id2=1;
+      if(defined(notE)){kill notE;}
+      list notE;
+      intvec nE;
+      list idlist;
+      for(i=1;i<=size(ttlist);i++)
+      {
+         if((i==size(ttlist))&&(typeof(ttlist[i])!="string")) break;
+         execute("ideal tid="+ttlist[i]+";");
+         idlist[i]=list(tid,ideal(1),nE);
+         kill tid;
+      }
+   }
+   else
+   {
+      def So1=L[2][o1];
+      setring So1;
+      if(defined(id1)) { kill id1; }
+      if(defined(id2)) { kill id2; }
+      if(defined(idlist)) { kill idlist; }
+      execute("ideal id1="+idname+";");
+      if(deg(std(id1)[1])==0)
+      {
+//--- problems with findTrans if id1 is empty set
+//!!! todo: also correct in if branch!!!
+         setring R;
+         return(ideal(1));
+      }
+     // id1=radical(id1);
+
+      ideal id2=1;
+      list idlist;
+      if(defined(notE)){kill notE;}
+      list notE;
+      intvec nE;
+      idlist[1]=list(id1,id2,nE);
+   }
+   if(defined(tli)){kill tli;}
+   list tli;
+   if(defined(id1)) { kill id1; }
+   if(defined(id2)) { kill id2; }
+   ideal id1;
+   ideal id2;
+   if(defined(Etemp)){kill Etemp;}
+   ideal Etemp;
+   for(m=1;m<=size(idlist);m++)
+   {
+      id1=idlist[m][1];
+      id2=idlist[m][2];
+      nE=idlist[m][3];
+      for(i=branchPos-1;i<=size(BO[4]);i++)
+      {
+        if(size(reduce(BO[4][i],std(id1+BO[1])))==0)
+        {
+           if(size(reduce(id1,std(BO[4][i])))!=0)
+           {
+             Etemp=BO[4][i];
+             if(npars(basering)>0)
+             {
+                if(defined(prtemp)){kill prtemp;}
+                list prtemp=minAssGTZ(BO[4][i]);
+                if(size(prtemp)>1)
+                {
+                  Etemp=ideal(1);
+                  for(j=1;j<=size(prtemp);j++)
+                  {
+                     if(size(reduce(prtemp[j],std(id1)))==0)
+                     {
+                        Etemp=prtemp[j];
+                        break;
+                     }
+                  }
+                  if(deg(std(Etemp)[1])==0)
+                  {
+                    ERROR("fetchInTree:something wrong in field extension");
+                  }
+                }
+             }
+             if(inJ)
+             {
+                tli=findTrans(id1+BO[2],Etemp,notE,BO[2]);
+             }
+             else
+             {
+                tli=findTrans(id1,Etemp,notE);
+             }
+           }
+           else
+           {
+             tli[1]=ideal(0);
+             tli[2]=ideal(1);
+           }
+           id1=tli[1];
+           id2=id2*tli[2];
+           notE[size(notE)+1]=BO[4][i];
+           for(j=1;j<=size(DivL);j++)
+           {
+              if(inIVList(intvec(o1,i),DivL[j]))
+              {
+                 nE[size(nE)+1]=j;
+                 break;
+              }
+           }
+           if(size(nE)<size(notE))
+           {
+              ERROR("fetchInTree: divisor not found in divL");
+           }
+        }
+        idlist[m][1]=id1;
+        idlist[m][2]=id2;
+        idlist[m][3]=nE;
+      }
+   }
+   if(o1>1)
+   {
+      while(int(leadcoef(path[1,ncols(path)]))>=comPa)
+      {
+         if((int(leadcoef(path[1,ncols(path)]))>comPa)&&
+            (int(leadcoef(path[1,ncols(path)-1]))<comPa))
+         {
+            ERROR("L[2][comPa] not in history of L[2][o1]!");
+         }
+         def S=basering;
+         if(int(leadcoef(path[1,ncols(path)]))==1)
+         {
+//--- that's the very first ring!!!
+           int und_jetzt_raus;
+         }
+         if(defined(T)){kill T;}
+         if(size(algext)>0)
+         {
+           if(defined(T0)){kill T0;}
+           def T0=L[2][int(leadcoef(path[1,ncols(path)]))];
+           if(defined(tstr)){kill tstr;}
+           string tstr="ring T=(0,t),("
+                      +varstr(L[2][int(leadcoef(path[1,ncols(path)]))])+"),("
+                      +ordstr(L[2][int(leadcoef(path[1,ncols(path)]))])+");";
+           execute(tstr);
+           setring T;
+           execute(algext);
+           minpoly=leadcoef(p);
+           kill tstr;
+           def BO=imap(T0,BO);
+           if(!defined(und_jetzt_raus))
+           {
+              def path=imap(T0,path);
+              def lastMap=imap(T0,lastMap);
+           }
+           if(defined(idlist)){kill idlist;}
+           list idlist=list(list(ideal(1),ideal(1)));
+         }
+         else
+         {
+           def T=L[2][int(leadcoef(path[1,ncols(path)]))];
+           setring T;
+           if(defined(id1)) { kill id1; }
+           if(defined(id2)) { kill id2; }
+           if(defined(idlist)){kill idlist;}
+           list idlist=list(list(ideal(1),ideal(1)));
+         }
+         setring S;
+         if(defined(phi)) { kill phi; }
+         map phi=T,lastMap;
+         for(m=1;m<=size(idlist);m++)
+         {
+            if(defined(id1)){kill id1;}
+            if(defined(id2)){kill id2;}
+            ideal id1=idlist[m][1]+BO[1];
+            ideal id2=idlist[m][2]+BO[1];
+            nE=idlist[m][3];
+            setring T;
+            ideal id1=preimage(S,phi,id1);
+            ideal id2=preimage(S,phi,id2);
+            idlist[m]=list(id1,id2,nE);
+            kill id1,id2;
+            setring S;
+         }
+         setring T;
+//--- after blowing down we might again be sitting inside a relevant
+//--- exceptional divisor
+         for(m=1;m<=size(idlist);m++)
+         {
+            if(defined(id1)) {kill id1;}
+            if(defined(id2)) {kill id2;}
+            if(defined(notE)) {kill notE;}
+            if(defined(notE)) {kill notE;}
+            list notE;
+            ideal id1=idlist[m][1];
+            ideal id2=idlist[m][2];
+            nE=idlist[m][3];
+            for(i=branchPos-1;i<=size(BO[4]);i++)
+            {
+               if(size(reduce(BO[4][i],std(id1)))==0)
+               {
+                  if(size(reduce(id1,std(BO[4][i])))!=0)
+                  {
+                     if(defined(Etemp)) {kill Etemp;}
+                     ideal Etemp=BO[4][i];
+                     if(npars(basering)>0)
+                     {
+                        if(defined(prtemp)){kill prtemp;}
+                        list prtemp=minAssGTZ(BO[4][i]);
+                        if(size(prtemp)>1)
+                        {
+                           Etemp=ideal(1);
+                           for(j=1;j<=size(prtemp);j++)
+                           {
+                               if(size(reduce(prtemp[j],std(id1)))==0)
+                               {
+                                  Etemp=prtemp[j];
+                                  break;
+                               }
+                           }
+                           if(deg(std(Etemp)[1])==0)
+                           {
+                              ERROR("fetchInTree:something wrong in field extension");
+                           }
+                        }
+                     }
+                     if(defined(tli)) {kill tli;}
+                     if(inJ)
+                     {
+                        def tli=findTrans(id1+BO[2],Etemp,notE,BO[2]);
+                     }
+                     else
+                     {
+                        def tli=findTrans(id1,Etemp,notE);
+                     }
+                  }
+                  else
+                  {
+                     tli[1]=ideal(0);
+                     tli[2]=ideal(1);
+                  }
+                  id1=tli[1];
+                  id2=id2*tli[2];
+                  notE[size(notE)+1]=BO[4][i];
+                  for(j=1;j<=size(DivL);j++)
+                  {
+                     if(inIVList(intvec(o1,i),DivL[j]))
+                     {
+                        nE[size(nE)+1]=j;
+                        break;
+                     }
+                  }
+                  if(size(nE)<size(notE))
+                  {
+                     ERROR("fetchInTree: divisor not found in divL");
+                  }
+               }
+               idlist[m][1]=id1;
+               idlist[m][2]=id2;
+               idlist[m][3]=nE;
+            }
+         }
+         kill S;
+         if(defined(und_jetzt_raus))
+         {
+           kill und_jetzt_raus;
+           break;
+         }
+      }
+   }
+//----------------------------------------------------------------------------
+// Blow up ideal id1 from L[2][comPa] to L[2][m1]. To this end, first
+// determine the path to follow and save it in path_togo.
+//----------------------------------------------------------------------------
+   if(m1==comPa)
+   {
+      if(size(algext)==0)
+      {
+        return(idlist[1][1]);
+      }
+      else
+      {
+        list retlist;
+        for(m=1;m<=size(idlist);m++)
+        {
+          retlist[m]=string(idlist[m][1]);
+        }
+        return(retlist);
+      }
+   }
+   if(defined(path_m1)) { kill path_m1; }
+   matrix path_m1=imap(Sm1,path);
+   intvec path_togo;
+   for(i=1;i<=ncols(path_m1);i++)
+   {
+      if(path_m1[1,i]>=comPa)
+      {
+        path_togo=path_togo,int(leadcoef(path_m1[1,i]));
+      }
+   }
+   path_togo=path_togo[2..size(path_togo)],m1;
+   i=1;
+   while(i<size(path_togo))
+   {
+      def S=basering;
+      if(defined(T)){kill T;}
+      if(size(algext)>0)
+      {
+         if(defined(T0)){kill T0;}
+         def T0=L[2][path_togo[i+1]];
+         if(defined(tstr)){kill tstr;}
+         string tstr="ring T=(0,t),(" +varstr(T0)+"),(" +ordstr(T0)+");";
+         execute(tstr);
+         setring T;
+         execute(algext);
+         minpoly=leadcoef(p);
+         kill tstr;
+         def path=imap(T0,path);
+         def BO=imap(T0,BO);
+         def lastMap=imap(T0,lastMap);
+         if(defined(phi)){kill phi;}
+         map phi=S,lastMap;
+         list idlist=phi(idlist);
+      }
+      else
+      {
+         def T=L[2][path_togo[i+1]];
+         setring T;
+         if(defined(phi)) { kill phi; }
+         map phi=S,lastMap;
+         if(defined(idlist)) {kill idlist;}
+         list idlist=phi(idlist);
+         idlist[1][1]=radical(idlist[1][1]);
+         idlist[1][2]=radical(idlist[1][2]);
+      }
+      for(m=1;m<=size(idlist);m++)
+      {
+         idlist[m][1]=sat(idlist[m][1]+BO[1],BO[4][size(BO[4])])[1];
+         idlist[m][2]=sat(idlist[m][2],BO[4][size(BO[4])])[1];
+      }
+      if((size(algext)==0)&&(deg(std(idlist[1][1])[1])==0))
+      {
+//--- strict transform empty in this chart, it will stay empty till the end
+         setring Sm1;
+         return(ideal(1));
+      }
+      kill S;
+      i++;
+   }
+   ideal E,bla;
+   intvec kv;
+   list retlist;
+   for(m=1;m<=size(idlist);m++)
+   {
+      for(j=2;j<=size(idlist[m][3]);j++)
+      {
+         kv=findInIVList(1,path_togo[size(path_togo)],DivL[idlist[m][3][j]]);
+         if(kv!=intvec(0))
+         {
+           E=E+BO[4][kv[2]];
+         }
+      }
+      bla=quotient(idlist[m][1]+E,idlist[m][2]);
+      retlist[m]=string(bla);
+   }
+   if(size(algext)==0)
+   {
+     return(bla);
+   }
+   return(retlist);
+}
+/////////////////////////////////////////////////////////////////////////////
+static
+proc findInIVList(int pos, int val, list ivl)
+"Internal procedure - no help and no example available
+"
+{
+//--- find entry with value val at position pos in list of intvecs
+//--- and return the corresponding entry
+   int i;
+   for(i=1;i<=size(ivl);i++)
+   {
+      if(ivl[i][pos]==val)
+      {
+         return(ivl[i]);
+      }
+   }
+   return(intvec(0));
+}
+/////////////////////////////////////////////////////////////////////////////
+static
+proc inIVList(intvec iv, list li)
+"Internal procedure - no help and no example available
+"
+{
+//--- if intvec iv is contained in list li return 1, 0 otherwise
+  int i;
+  int s=size(iv);
+  for(i=1;i<=size(li);i++)
+  {
+     if(typeof(li[i])!="intvec"){ERROR("Not integer vector in the list");}
+     if(s==size(li[i]))
+     {
+        if(iv==li[i]){return(1);}
+     }
+  }
+  return(0);
+}
+//////////////////////////////////////////////////////////////////////////////
+static
+proc Vielfachheit(ideal J,ideal I)
+"Internal procedure - no help and no example available
+"
+{
+//--- auxilliary procedure for addSelfInter
+//--- compute multiplicity, suitable for the special situation there
+  int d=1;
+  int vd;
+  int c;
+  poly p;
+  ideal Ip,Jp;
+  while((d>0)||(!vd))
+  {
+     p=randomLast(100)[nvars(basering)];
+     Ip=std(I+ideal(p));
+     c++;
+     if(c>20){ERROR("Vielfachheit: Dimension is wrong");}
+     d=dim(Ip);
+     vd=vdim(Ip);
+  }
+  Jp=std(J+ideal(p));
+  return(vdim(Jp)/vdim(Ip));
+}
+/////////////////////////////////////////////////////////////////////////////
+static
+proc genus_E(list re, list iden0, intvec Eindex)
+"Internal procedure - no help and no example available
+"
+{
+   int i,ge,gel,num;
+   def R=basering;
+   ring Rhelp=0,@t,dp;
+   def S=re[2][Eindex[1]];
+   setring S;
+   def Sh=S+Rhelp;
+//----------------------------------------------------------------------------
+//--- The Q-component X is reducible over C, decomposes into s=num components
+//--- X_i, we assume they have n.c.
+//---           s*g(X_i)=g(X)+s-1.
+//----------------------------------------------------------------------------
+   if(defined(I2)){kill I2;}
+   ideal I2=dcE[Eindex[2]][Eindex[3]][1];
+   num=ncols(dcE[Eindex[2]][Eindex[3]][4]);
+   setring Sh;
+   if(defined(I2)){kill I2;}
+   ideal I2=imap(S,I2);
+   I2=homog(I2,@t);
+   ge=genus(I2);
+   gel=(ge+(num-1))/num;
+   if(gel*num-ge-num+1!=0){ERROR("genus_E: not divisible by num");}
+   setring R;
+   return(gel,num);
+}
+
