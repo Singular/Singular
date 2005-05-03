@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.68 2005-05-03 11:51:32 Singular Exp $
+@comment $Id: examples.doc,v 1.69 2005-05-03 12:31:44 bricken Exp $
 @comment this file contains the examples
 
 @c The following directives are necessary for proper compilation
@@ -675,8 +675,29 @@ and @code{stdhilb} about 10 times faster than @code{std}.
 @subsection slim Groebner bases
 @cindex Groebner bases, slim
 @cindex slimgb
+This is a new algorithm called slimgb designed for keeping polynomials short and coefficients small. In particular it is very fast over function fields.
 
+In the example below it is over 200 times faster than std.
+@smallexample
+@c example
+  ring r = 32003, (x,y,z,t,u,v,w,a,b,c,d,e,f,g,h,i,j,k), dp;
+  timer = 1;
+  ideal i0=x3-x2y+x2z+xt-7uv+8xa+bc+gh+ij+vw+ak+tu,
+           a2b -x2,
+           abx-1,
+           uv+x,
+           khuvw+x4,
+           vw-ef,
+           ki-jk,
+           abcd-x4,
+           hijk-xy,
+           tuvw+x2;
+  ideal l = slimgb(i0);
+@c example
+@end smallexample
+One trick in this example is to change the roles of the first polynomial and the S-Polynomial of a2b-x2 and abx-1, which has the same leading term.
 
+For detailed information and limitations see @ref{slimgb}.
 @c ----------------------------------------------------------------------------
 @node Commutative Algebra, Singularity Theory, Computing Groebner and Standard Bases, Examples
 @section Commutative Algebra
