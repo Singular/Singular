@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.67 2005-05-03 10:29:57 Singular Exp $
+@comment $Id: examples.doc,v 1.68 2005-05-03 11:51:32 Singular Exp $
 @comment this file contains the examples
 
 @c The following directives are necessary for proper compilation
@@ -26,7 +26,8 @@ The following topics are treated:
 
 @ifset singularmanual
 @menu
-* Programming::procedures and libraries, formatting output, fast lexicographic Groebner bases, etc.
+* Programming::procedures and libraries, formatting output, etc.
+* Computing Groebner and Standard Bases::GB conversion, slim GB
 * Commutative Algebra::saturation, elimination, free resolution, factorization, primary decomposition, normalization, etc.
 * Singularity Theory::singular and critical points, invariants of hypersurface singularities, classification, resolution of singularities, etc.
 * Invariant Theory:: G_a-invariants, invariants of finite groups
@@ -38,6 +39,7 @@ The following topics are treated:
 @ifclear singularmanual
 @menu
 * Programming::
+* Computing Groebner and Standard Bases::
 * Commutative Algebra::
 * Singularity Theory::
 * Non-Commutative Algebra::
@@ -63,7 +65,7 @@ The following topics are treated:
 
 
 @c ----------------------------------------------------------------------------
-@node Programming, Commutative Algebra, Examples, Examples
+@node Programming, Computing Groebner and Standard Bases, Examples, Examples
 @section Programming
 @cindex Programming
 
@@ -75,7 +77,6 @@ The following topics are treated:
 * Parameters::
 * Formatting output::
 * Cyclic roots::
-* Fast lexicographic Groebner bases::
 * Parallelization with MPtcp links::
 * Dynamic modules::
 @end menu
@@ -87,7 +88,6 @@ The following topics are treated:
 * Writing procedures and libraries::
 * Parameters::
 * Formatting output::
-* Fast lexicographic Groebner bases::
 * Dynamic modules::
 @end menu
 @end ifclear
@@ -399,7 +399,7 @@ j_0=j_t=a
 @node Formatting output, Cyclic roots, Parameters, Programming
 @end ifset
 @ifclear singularmanual
-@node Formatting output, Fast lexicographic Groebner bases, Parameters, Programming
+@node Formatting output, Dynamic modules, Parameters, Programming
 @end ifclear
 @subsection Formatting output
 @cindex Formatting output
@@ -432,7 +432,7 @@ adding appropriate space.
 
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
-@node Cyclic roots, Fast lexicographic Groebner bases, Formatting output, Programming
+@node Cyclic roots, Parallelization with MPtcp links , Formatting output, Programming
 @subsection Cyclic roots
 @cindex Cyclic roots
 
@@ -501,48 +501,7 @@ degree(j);
 
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
-@node Fast lexicographic Groebner bases, Parallelization with MPtcp links, Cyclic roots, Programming 
-@end ifset
-@ifclear singularmanual
-@node Fast lexicographic Groebner bases, Dynamic modules, Formatting output, Programming  
-@end ifclear
-@subsection Fast lexicographic Groebner bases
-@cindex Fast lexicographic GB
-@cindex Lexicographic Groebner bases, computation of
-
-Compute Groebner basis in lexicographical ordering
-by using the FGLM algorithm (@code{stdfglm})
-and Hilbert driven Groebner (@code{stdhilb}).
-
-The command @code{stdfglm} applies only for zero-dimensional ideals and
-returns a reduced Groebner basis.
-
-For the ideal below, @code{stdfglm} is more than 100 times
-and @code{stdhilb} about 10 times faster than @code{std}.
-
-@smallexample
-@c example
-  ring r =32003,(a,b,c,d,e),lp;
-  ideal i=a+b+c+d, ab+bc+cd+ae+de, abc+bcd+abe+ade+cde,
-          abc+abce+abde+acde+bcde, abcde-1;
-  int t=timer;
-  ideal j1=stdfglm(i);
-  timer-t;
-  size(j1);   // size (no. of polys) in computed GB
-  t=timer;
-  ideal j2=stdhilb(i);
-  timer-t;
-  size(j2);   // size (no. of polys) in computed GB
-  // usual Groebner basis computation for lex ordering
-  t=timer;
-  ideal j0 =std(i);
-  timer-t;
-@c example
-@end smallexample
-
-@c ----------------------------------------------------------------------------
-@ifset singularmanual
-@node  Parallelization with MPtcp links, Dynamic modules, Fast lexicographic Groebner bases, Programming 
+@node  Parallelization with MPtcp links, Dynamic modules, Cyclic roots, Programming 
 @subsection Parallelization with MPtcp links
 @cindex Parallelization
 @cindex MPtcp
@@ -648,17 +607,78 @@ not be terminated through the link while it is still computing.
 
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
-@node Dynamic modules, Saturation, Parallelization with MPtcp links, Programming
+@node Dynamic modules, groebner and std, Parallelization with MPtcp links, Programming
 @end ifset
 @ifclear singularmanual
-@node Dynamic modules, Saturation, Fast lexicographic Groebner bases, Programming
+@node Dynamic modules, groebner and std, Formatting output, Programming
 @end ifclear
 @subsection Dynamic modules
 @cindex Classification of hypersurface singularities
 @cindex Hypersurface singularities, classification of
 
 @c ----------------------------------------------------------------------------
-@node Commutative Algebra, Singularity Theory, Programming, Examples
+@node Computing Groebner and Standard Bases, Commutative Algebra, Programming, Examples
+@section Commutative Algebra
+@cindex Commutative Algebra
+
+@menu
+* groebner and std::
+* Groebner basis conversion::
+* slim Groebner bases::
+@end menu
+
+@c ----------------------------------------------------------------------------
+@node groebner and std, Groebner basis conversion, Dynamic modules, Computing Groebner and Standard Bases
+@subsection groebner and std
+@cindex groebner
+@cindex std
+
+@c ----------------------------------------------------------------------------
+@node Groebner basis conversion, slim Groebner bases, groebner and std, Computing Groebner and Standard Bases
+@subsection Groebner basis conversion
+@cindex Groebner basis conversion
+@cindex Lexicographic Groebner bases, computation of
+
+Compute Groebner basis in lexicographical ordering
+by using the FGLM algorithm (@code{stdfglm})
+and Hilbert driven Groebner (@code{stdhilb}).
+
+The command @code{stdfglm} applies only for zero-dimensional ideals and
+returns a reduced Groebner basis.
+
+For the ideal below, @code{stdfglm} is more than 100 times
+and @code{stdhilb} about 10 times faster than @code{std}.
+
+@smallexample
+@c example
+  ring r =32003,(a,b,c,d,e),lp;
+  ideal i=a+b+c+d, ab+bc+cd+ae+de, abc+bcd+abe+ade+cde,
+          abc+abce+abde+acde+bcde, abcde-1;
+  int t=timer;
+  ideal j1=stdfglm(i);
+  timer-t;
+  size(j1);   // size (no. of polys) in computed GB
+  t=timer;
+  ideal j2=stdhilb(i);
+  timer-t;
+  size(j2);   // size (no. of polys) in computed GB
+  // usual Groebner basis computation for lex ordering
+  t=timer;
+  ideal j0 =std(i);
+  timer-t;
+@c example
+@end smallexample
+
+
+@c ----------------------------------------------------------------------------
+@node slim Groebner bases, Saturation, Groebner basis conversion, Computing Groebner and Standard Bases
+@subsection slim Groebner bases
+@cindex Groebner bases, slim
+@cindex slimgb
+
+
+@c ----------------------------------------------------------------------------
+@node Commutative Algebra, Singularity Theory, Computing Groebner and Standard Bases, Examples
 @section Commutative Algebra
 @cindex Commutative Algebra
 
@@ -694,10 +714,10 @@ not be terminated through the link while it is still computing.
 
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
-@node Saturation, Finite fields, Dynamic modules, Commutative Algebra
+@node Saturation, Finite fields, slim Groebner bases, Commutative Algebra
 @end ifset
 @ifclear singularmanual
-@node Saturation, Elimination, Dynamic modules, Commutative Algebra
+@node Saturation, Elimination, slim Groebner bases, Commutative Algebra
 @end ifclear
 @subsection Saturation
 @cindex Saturation
