@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_gcd.cc,v 1.29 2005-02-11 13:22:44 Singular Exp $ */
+/* $Id: cf_gcd.cc,v 1.30 2005-05-03 09:35:34 Singular Exp $ */
 
 #include <config.h>
 
@@ -146,7 +146,7 @@ CanonicalForm
 extgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, CanonicalForm & b )
 {
 #ifdef HAVE_NTL
-  if (isOn(SW_USE_NTL_GCD) && ( getCharacteristic() > 0 )
+  if (isOn(SW_USE_NTL_GCD_P) && ( getCharacteristic() > 0 )
   && isPurePoly(f) && isPurePoly(g))
   {
     zz_pContext ccc(getCharacteristic());
@@ -193,7 +193,7 @@ static CanonicalForm
 gcd_poly_univar0( const CanonicalForm & F, const CanonicalForm & G, bool primitive )
 {
 #ifdef HAVE_NTL
-  if (isOn(SW_USE_NTL_GCD) && isPurePoly(F) && isPurePoly(G))
+  if (isOn(SW_USE_NTL_GCD_P) && isPurePoly(F) && isPurePoly(G))
   {
     if ( getCharacteristic() > 0 )
     {
@@ -342,7 +342,8 @@ gcd_poly1( const CanonicalForm & f, const CanonicalForm & g, bool modularflag )
     if ( pi.isUnivariate() && pi1.isUnivariate() )
     {
 #ifdef HAVE_NTL
-      if (isOn(SW_USE_NTL_GCD) && isPurePoly(pi) && isPurePoly(pi1))
+      if ((isOn(SW_USE_NTL_GCD_P)||isOn(SW_USE_NTL_GCD_0))
+       && isPurePoly(pi) && isPurePoly(pi1))
          return gcd_poly_univar0(f, g, true);
 #endif
       if ( modularflag)

@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_switches.cc,v 1.6 2005-02-17 13:59:27 Singular Exp $ */
+/* $Id: cf_switches.cc,v 1.7 2005-05-03 09:35:34 Singular Exp $ */
 
 //{{{ docu
 //
@@ -29,7 +29,8 @@ CFSwitches::CFSwitches ()
 // and set the default (recommended) On-values:
 #ifdef HAVE_NTL
   On(SW_USE_NTL);
-  //Off(SW_USE_NTL_GCD);
+  //Off(SW_USE_NTL_GCD_0);
+  //Off(SW_USE_NTL_GCD_P);
   //Off(SW_USE_NTL_SORT);
 #endif
   On(SW_USE_EZGCD);

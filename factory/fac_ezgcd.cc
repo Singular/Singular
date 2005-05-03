@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_ezgcd.cc,v 1.18 2005-02-11 13:24:27 Singular Exp $ */
+/* $Id: fac_ezgcd.cc,v 1.19 2005-05-03 09:35:34 Singular Exp $ */
 
 #include <config.h>
 
@@ -221,10 +221,13 @@ ezgcd_specialcase ( const CanonicalForm & F, const CanonicalForm & G, REvaluatio
     }
 #if 1
     Off(SW_USE_EZGCD);
-    //bool ntl=isOn(SW_USE_NTL_GCD);
-    //Off(SW_USE_NTL_GCD);
+    //bool ntl0=isOn(SW_USE_NTL_GCD_0);
+    //Off(SW_USE_NTL_GCD_0);
+    //bool ntlp=isOn(SW_USE_NTL_GCD_P);
+    //Off(SW_USE_NTL_GCD_P);
     d=gcd( F, G );
-    //if (ntl) On(SW_USE_NTL_GCD);
+    //if (ntl0) On(SW_USE_NTL_GCD_0);
+    //if (ntlp) On(SW_USE_NTL_GCD_P);
     On(SW_USE_EZGCD);
     return d;
 #else
