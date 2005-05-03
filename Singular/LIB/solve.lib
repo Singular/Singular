@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: solve.lib,v 1.29 2005-05-02 07:43:22 Singular Exp $";
+version="$Id: solve.lib,v 1.30 2005-05-03 07:28:29 Singular Exp $";
 category="Symbolic-numerical solving";
 info="
 LIBRARY: solve.lib     Complex Solving of Polynomial Systems
@@ -605,7 +605,6 @@ EXAMPLE: example solve; shows an example
     }
   }   
   if (outprec>prec){prec = outprec;}
-
   // if interaktive version is chosen -- choice of basering (Top::`outR`)
   // and name for list of solutions (outL):
   if (oldr==1) {
@@ -720,6 +719,8 @@ EXAMPLE: example solve; shows an example
     }
     else {
       def dphilb = basering;      
+      G=interred(G);
+      attrib(G,"isSB",1); 
     }    
     execute("ring lexhilb=("+charstr(rin)+"),("+ varstr(rin)+"),lp;");
     option(redTail);
