@@ -3,7 +3,7 @@
 ****************************************/
 /*
 * ABSTRACT: help system
-* versin $Id: fehelp.cc,v 1.41 2005-05-02 16:31:55 Singular Exp $
+* versin $Id: fehelp.cc,v 1.42 2005-05-03 14:30:09 Singular Exp $
 */
 
 #include <string.h>
@@ -636,31 +636,71 @@ static int heReKey2Entry (char* filename, char* key, heEntry hentry)
   return i;
 }
 
+// test for h being a string and print it
+static void hePrintHelpStr(const idhdl hh,const char *id,const char *pa)
+{
+  if ((hh!=NULL) && (IDTYP(hh)==STRING_CMD))
+  {
+    PrintS(IDSTRING(hh));
+    PrintLn();
+  }
+  else
+    Print("`%s` not found in package %s\n",id,pa);
+}
 // try to find the help string as a loaded procedure or library
 // if found, display the help and return TRUE
 // otherwise, return FALSE
 static BOOLEAN heOnlineHelp(char* s)
 {
-#ifdef HAVE_NS
   idhdl h=IDROOT->get(s,myynest);
-#else
-  idhdl h=idroot->get(s,myynest);
-#endif /* HAVE_NS */
+  char *ss;
 
   // try help for a procedure
-  if ((h!=NULL) && (IDTYP(h)==PROC_CMD))
+  if (h!=NULL)
   {
-    char *lib=iiGetLibName(IDPROC(h));
-    if((lib!=NULL)&&(*lib!='\0'))
+    if  (IDTYP(h)==PROC_CMD)
     {
-      Print("// proc %s from lib %s\n",s,lib);
-      s=iiGetLibProcBuffer(IDPROC(h), 0);
-      if (s!=NULL)
+      char *lib=iiGetLibName(IDPROC(h));
+      if((lib!=NULL)&&(*lib!='\0'))
       {
-        PrintS(s);
-        omFree((ADDRESS)s);
+        Print("// proc %s from lib %s\n",s,lib);
+        s=iiGetLibProcBuffer(IDPROC(h), 0);
+        if (s!=NULL)
+        {
+          PrintS(s);
+          omFree((ADDRESS)s);
+        }
+        return TRUE;
       }
-      return TRUE;
+      else
+      {
+        char s_help[200];
+        strcpy(s_help,s);
+        strcat(s_help,"_help");
+        idhdl hh=IDROOT->get(s_help,0);
+        hePrintHelpStr(hh,s_help,"Top");
+      }
+    }
+    else if (IDTYP(h)==PACKAGE_CMD)
+    {
+      idhdl hh=IDPACKAGE(h)->idroot->get("info",0);
+      hePrintHelpStr(hh,"info",s);
+    }
+    else if ((ss=strstr(s,"::"))!=NULL)
+    {
+      *ss='\0';
+      ss+=2;
+      h=ggetid(s);
+      if (h!=NULL)
+      {      
+        Print("help for %s from package %\n",ss,s);
+        char s_help[200];
+        strcpy(s_help,ss);
+        strcat(s_help,"_help");
+        idhdl hh=IDPACKAGE(h)->idroot->get(s_help,0);
+        hePrintHelpStr(hh,s_help,s);
+      }
+      else Print("package %s not found\n",s); 
     }
     return FALSE;
   }
