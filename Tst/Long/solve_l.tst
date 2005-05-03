@@ -3,7 +3,7 @@
 
 LIB "tst.lib";
 tst_init();
-tst_ignore("CVS ID $Id: solve_l.tst,v 1.3 2005-05-02 07:42:46 Singular Exp $");
+tst_ignore("CVS ID $Id: solve_l.tst,v 1.4 2005-05-03 13:02:59 Singular Exp $");
 
 LIB "solve.lib";
 
@@ -19,7 +19,10 @@ poly f3= x^2 + y^2 + z^2 - 1;
 ideal i=f1,f2,f3;
 ideal im=f0,f1,f2,f3;
 
-ures_solve(homog(i,h),1);
+def A=ures_solve(homog(i,h),1);
+setring A; SOL;
+kill A;
+setring rs1;
 mp_res_mat(homog(im,h),1);
 
 tst_ignore( "ring rs2 = 0,(x,y,z),lp;" );
@@ -32,7 +35,10 @@ poly f3= x^2 + y^2 + z^2 - 1;
 ideal i=f1,f2,f3;
 ideal im=f0,f1,f2,f3;
 
-ures_solve(i);
+def A=ures_solve(i);
+setring A; SOL;
+kill A;
+setring rs2;
 mp_res_mat(im);
 
 def rinC=fglm_solve(i,30);
@@ -67,7 +73,10 @@ poly f3= x1 - 5*x1^2 - x2 + 2*x1*x2 - 2*x2^2 + 8*x1*x3 - 10*x2*x3 - 13*x3^2;
 ideal i=f1,f2,f3;
 ideal im=f0,f1,f2,f3;
 
-ures_solve(homog(i,x0),1);
+def A=ures_solve(homog(i,x0),1);
+setring A; SOL;
+kill A;
+setring rs3;
 mp_res_mat(homog(im,x0),1);
 
 tst_ignore( "ring rs4 = 0,(x1,x2,x3),lp;" );
@@ -80,7 +89,10 @@ poly f3= x1 - 5*x1^2 - x2 + 2*x1*x2 - 2*x2^2 + 8*x1*x3 - 10*x2*x3 - 13*x3^2;
 ideal i=f1,f2,f3;
 ideal im=f0,f1,f2,f3;
 
-ures_solve(i);
+def A=ures_solve(i);
+setring A; SOL;
+kill A;
+setring rs4;
 mp_res_mat(im);
 
 def rinC=fglm_solve(i,30);

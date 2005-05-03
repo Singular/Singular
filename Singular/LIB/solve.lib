@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: solve.lib,v 1.30 2005-05-03 07:28:29 Singular Exp $";
+version="$Id: solve.lib,v 1.31 2005-05-03 13:02:54 Singular Exp $";
 category="Symbolic-numerical solving";
 info="
 LIBRARY: solve.lib     Complex Solving of Polynomial Systems
@@ -45,7 +45,7 @@ ASSUME:  f is a univariate polynomial;@*
          basering has characteristic 0 and is either complex or without
          parameters. 
 RETURN:  list of (complex) roots of the polynomial f, depending on n. The 
-         result is of type@*
+         entries of the result are of type@*
           string: if the basering is not complex,@*
           number: otherwise.
 NOTE:    If printlevel >0: displays comments ( default = 0 ).
@@ -1351,19 +1351,20 @@ static proc l_mutrisolve(list sp, list o, int prec)
 
 proc ures_solve( ideal gls, list # )
 "USAGE:   ures_solve(i [, k, p] ); i = ideal, k, p = integers
-   k=0: use sparse resultant matrix of Gelfand, Kapranov and Zelevinsky,
-   k=1: use resultant matrix of Macaulay which works only for
-          homogeneous ideals,
+   k=0: use sparse resultant matrix of Gelfand, Kapranov and Zelevinsky, @*
+   k=1: use resultant matrix of Macaulay which works only for 
+          homogeneous ideals,@*
    p>0: defines precision of the long floats for internal computation
           if the basering is not complex (in decimal digits),
    (default: k=0, p=30)
-ASSUME:  i is a zerodimensional ideal with
-         nvars(basering) = ncols(i) = number of vars
-         actually occurring in i,
-RETURN:  list of all (complex) roots of the polynomial system i = 0; the 
-         result is of type
-   string: if the basering is not complex,
-   number: otherwise.
+ASSUME:  i is a zerodimensional ideal given by a quadratic system, that is,@*
+         nvars(basering) = ncols(i) = number of vars actually occurring in i,
+RETURN:  If the ground field is the field of complex numbers: list of numbers
+         (the complex roots of the polynomial system i=0). @*
+         Otherwise: ring @code{R} with the same number of variables but with 
+         complex coefficients (and precision p). @code{R} comes with a list 
+         @code{SOL} of numbers, in which complex roots of the polynomial 
+         system i are stored: @*
 EXAMPLE: example ures_solve; shows an example
 "
 {
@@ -1389,9 +1390,38 @@ EXAMPLE: example ures_solve; shows an example
         }
     }
 
-    return(uressolve(gls,typ,prec,1));
-    // the last nonzero parameter gives an extra run of
-    // Laguerre's algorithm leading to better results
+    list LL=uressolve(gls,typ,prec,1);
+    int sizeLL=size(LL);
+    if (sizeLL==0) { 
+      dbprint(printlevel-voice+3,"No solution found!");
+      return(list());
+    }   
+    if (typeof(LL[1][1])=="string") {
+      int ii,jj;
+      int nv=size(LL[1]);
+      execute("ring rinC =(complex,"+string(prec)+",I),("
+                           +varstr(basering)+"),lp;"); 
+      list SOL,SOLnew;
+      for (ii=1; ii<=sizeLL; ii++) { 
+        SOLnew=list();
+        for (jj=1; jj<=nv; jj++) { 
+          execute("SOLnew["+string(jj)+"]="+LL[ii][jj]+";");
+        }
+        SOL[ii]=SOLnew;
+      }
+      kill SOLnew;
+      export SOL;
+      dbprint( printlevel-voice+3,"
+// 'ures_solve' created a ring, in which a list SOL of numbers (the complex 
+// solutions) is stored. 
+// To access the list of complex solutions, type (if the name R was assigned 
+// to the return value): 
+        setring R; SOL; ");
+      return(rinC);
+    }
+    else {
+      return(LL);
+    }
 }
 example
 {
@@ -1399,7 +1429,8 @@ example
     // compute the intersection points of two curves
     ring rsq = 0,(x,y),lp;
     ideal gls=  x2 + y2 - 10, x2 + xy + 2y2 - 16;
-    ures_solve(gls,0,16);
+    def R=ures_solve(gls,0,16);
+    setring R; SOL;
     // result is a list (x,y)-coordinates as strings
 
     // now with complex coefficient field, precision is 20 digits
