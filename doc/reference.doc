@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.238 2005-05-02 22:00:54 levandov Exp $
+@comment $Id: reference.doc,v 1.239 2005-05-03 08:59:39 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -6313,20 +6313,18 @@ are of type number, otherwise of type string.
 @item @strong{Example:}
 @smallexample
 @c example
-/*
 ring rsc=(real,20,I),(x,y),lp;
 ideal i=(2+3*I)*x2+(0.35+I*45.0e-2)*y2-8,x2+xy+(42.7)*y2;
 list l=uressolve(i,0,0,2);
 l[1];
 subst(subst(i[1],x,l[1][1]),y,l[1][2]);
-*/
 @c example
 @end smallexample
 @end table
 @c ref
 See
-@ref{laguerre}
-@ref{mpresmat}
+@ref{laguerre};
+@ref{mpresmat}.
 @c ref
 @c ---------------------------------------
 @node vandermonde, var, uressolve, Functions
@@ -7132,7 +7130,6 @@ See
 @ref{importfrom};
 @ref{dynamic module}
 @c ref
-@end ifset
 @c ---------------------------------------
 @node quit, return, load, Control structures
 @subsection quit

@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.196 2003-02-18 16:13:10 Singular Exp $
+@comment $Id: general.doc,v 1.197 2005-05-03 08:59:38 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -31,6 +31,7 @@
 * Libraries::
 * Guidelines for writing a library::
 * Debugging tools::
+* Dynamic Loading::
 @end menu
 
 
@@ -2773,7 +2774,9 @@ as well(see @ref{proc}).
 * quit::
 * keepring::
 * export::
+* exportto::
 * if::
+* importfrom::
 * else::
 * for::
 * while::
@@ -3933,7 +3936,7 @@ one subsection for each procedure):
 @c lib template.lib  lib_fun lib_ex
 
 @c ----------------------------------------------------------------------
-@node Debugging tools,  , Guidelines for writing a library, General concepts
+@node Debugging tools, Dynamic Modules, Guidelines for writing a library, General concepts
 @section Debugging tools
 @cindex Debugging tools
 
@@ -4169,3 +4172,28 @@ LIB "sample.lib";
 @expansion{}    ? Cannot load library,... aborting.
 @expansion{}    ? error occurred in STDIN line 1: `LIB "sample.lib";`
 @end smallexample
+@c ---------------------------------------
+@node Dynamic Loading, , Debugging Tools, General concepts
+@section Dynamic Loading
+@cindex Dynamic Loading
+
+In addition to the concept of libraries, it is also possible to
+dynamically extend the functionality by loading functions written 
+in C/C++ or some other higher programming language. A collection 
+of such functions is called a dynamic module and can be loaded by
+the command @code{LIB}. It is basically handled in the same way as a 
+library: upon loading, a new @code{package} is created which holds the
+contents of the dynamic module, but in contrast to the case of a library,
+the name of the @code{package} is not derived from the filename, but is
+hardcoded in the dynamic module. In particular, general information 
+about it can be displayed by the command @code{help package_name}. 
+After loading the dynamic module, its functions can be used exactly like 
+the built-in @sc{Singular} functions.
+
+To have the full functionality of a built-in function, dynamic modules
+need to comply with certain requirements on their internal structure.
+As this would be beyond the scope of the @code{Singular} manual, 
+a separate guide on how to write and use dynamic modules can be found 
+at @code{http://www.singular.uni-kl.de/DynMod.ps}. 
+
+
