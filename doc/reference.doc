@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.243 2005-05-04 16:33:27 Singular Exp $
+@comment $Id: reference.doc,v 1.244 2005-05-04 16:56:49 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -1898,19 +1898,20 @@ See
 @table @code
 @item @strong{Syntax:}
 @code{frwalk (} ring_name@code{,} ideal_name @code{)}
-*@code{frwalk (} ring_name@code{,} ideal_name @code{,} int_expression @code{)}
+@*@code{frwalk (} ring_name@code{,} ideal_name @code{,} int_expression @code{)}
 @item @strong{Type:}
 ideal
 @item @strong{Purpose:}
-computes for the given ideal in the given ring
-a Groebner basis in the current ring, by applying the so-called fractal walk
+computes for the ideal @code{ideal_name} in the ring @code{ring_name}
+a Groebner basis in the current ring, by applying the fractal walk
 algorithm.
 @*The main application is to compute a lexicographical Groebner basis
 from a reduced Groebner basis with respect to a degree ordering. This
 can be much faster than computing a lexicographical Groebner basis
 directly.
-@*The only permissible difference between the given ring and the current ring
-is the monomial ordering.
+@item @strong{Note:}
+The only permissible difference between the ring @code{ring_name}
+and the base ring active when calling @code{frwalk} is the monomial ordering.
 @item @strong{Example:}
 @smallexample
 @c example
