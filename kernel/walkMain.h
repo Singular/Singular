@@ -1,3 +1,6 @@
+#ifndef WALKMAIN_H
+#define WALKMAIN_H
+
 #include "intvec.h"
 #include "int64vec.h"
 
@@ -54,3 +57,5 @@ WalkState walk64(ideal I,int64vec* currw64,ring destRing,int64vec* destVec64,ide
 WalkState fractalWalk64(ideal sourceIdeal,ring destRing,ideal & destIdeal,BOOLEAN sourceIsSB,BOOLEAN unperturbedStartVectorStrategy);
 //REPLACES firstWalkStep64 FOR fractalWalk64
 WalkState unperturbedFirstStep64(ideal & G,int64vec* currw64, ring destRing);
+
+#endif
