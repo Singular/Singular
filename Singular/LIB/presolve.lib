@@ -1,6 +1,6 @@
 //last change: 13.02.2001 (Eric Westenberger)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: presolve.lib,v 1.22 2005-05-02 11:53:42 Singular Exp $";
+version="$Id: presolve.lib,v 1.23 2005-05-04 09:31:39 Singular Exp $";
 category="Symbolic-numerical solving";
 info="
 LIBRARY:  presolve.lib     Pre-Solving of Polynomial Equations
@@ -18,7 +18,7 @@ PROCEDURES:
  linearpart(id);        elements of id of total degree <=1
  tolessvars(id[,]);     maps id to new basering having only vars occuring in id
  solvelinearpart(id);   reduced std-basis of linear part of id
- sortandmap(id [..]);   map to new basering with vars sorted w.r.t. complexity
+ sortandmap(id[..]);   map to new basering with vars sorted w.r.t. complexity
  sortvars(id[n1,p1..]); sort vars w.r.t. complexity in id [different blocks]
  valvars(id[..]);       valuation of vars w.r.t. to their complexity in id
  idealsSimplify(id);    ideal I = eliminate(Id,m) m is a product of variables
@@ -33,6 +33,60 @@ LIB "general.lib";
 LIB "matrix.lib";
 LIB "ring.lib";
 LIB "elim.lib";
+///////////////////////////////////////////////////////////////////////////////
+proc shortid (id,int n,list #)
+"USAGE:   shortid(id,n[,e]); id= ideal/module, n,e=integers
+RETURN:  - if called with two arguments or e=0:
+@*       same type as id, containing generators of id having <= n terms.
+@*       - if called with three arguments and e!=0:
+@*       a list L:
+@*       L[1]: same type as id, containing generators of id having <= n terms.
+@*       L[2]: number of corresponding generator of id
+NOTE:    May be used to compute partial standard basis in case id is to hard
+EXAMPLE: example shortid; shows an example  
+"
+{
+  intvec v;
+  int ii;
+  for(ii=1; ii<=ncols(id); ii++)
+  {
+   if (size(id[ii]) <=n and id[ii]!=0 )
+   {
+     v=v,ii;
+   }
+   if (size(id[ii]) > n )
+   {
+       id[ii]=0;
+   }
+  }
+  if( size(v)>1 )
+  {  
+    v = v[2..size(v)];
+  }
+  id = simplify(id,2);
+  list L = id,v;
+  if ( size(#)==0 )
+  {
+    return(id);
+  }
+  if ( size(#)!=0 )
+  {
+    if(#[1]==0)
+    {
+      return(id);
+    }
+    if(#[1]!=0)
+    {
+      return(L);
+    }
+  }
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring s=0,(x,y,z,w),dp;
+   ideal i = (x3+y2+yw2)^2,(xz+z2)^2,xyz-w2-xzw; 
+   shortid(i,3);
+}
 ///////////////////////////////////////////////////////////////////////////////
 
 proc degreepart (id,int d1,int d2,list #)
@@ -147,7 +201,7 @@ EXAMPLE: example elimlinearpart; shows an example
          }
       }
    }
-   lin = simplify(lin,2);
+   lin = simplify(lin,3);
    attrib(lin,"isSB",1);
    ideal eva = lead(lin);
    attrib(eva,"isSB",1);
@@ -292,7 +346,7 @@ EXAMPLE: example elimpart; shows an example
                   lin = phi(lin);
                   kin = simplify(phi(kin),2);
                   l = size(kin);
-                  ii=ii+1;
+                 // ii=ii+1;
                   break;
                }
             }
@@ -320,7 +374,10 @@ EXAMPLE: example elimpart; shows an example
          {  phi[ii] = eva[kk]-sub[kk]; break; }
       }
    }
-   L = lin, eva, sub, neva, phi;
+   map psi=P,phi;
+   ideal phi1=maxideal(1);
+   for(ii=1;ii<=size(eva);ii++){phi1=psi(phi1);}
+   L = lin, eva, sub, neva, phi1;
   return(L);
 }
 example
@@ -1163,7 +1220,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 proc idealSplit(ideal I,list #)
-"USAGE:  idealSplit(id,timeF,timeS);  id ideal and optioonal 
+"USAGE:  idealSplit(id,timeF,timeS);  id ideal and optional 
          timeF ,timeS integers to bound the time which can be used
          for factorization resp. standard basis computation
 RETURN:  a list of ideals such that their intersection 
