@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.1.1.1 2003-10-06 12:15:52 Singular Exp $ */
+/* $Id: febase.h,v 1.2 2005-05-04 07:50:49 Singular Exp $ */
 /*
 * ABSTRACT: basic i/o
 */
@@ -35,7 +35,7 @@ extern char fePathSep;
 #include <mylimits.h>
 
 /* OSF/1 and AIX_4 are missing the header for setenv, but the proc exists */
-#if defined(__alpha) || defined(AIX_4)
+#if defined(DecAlpha_OSF1) || defined(AIX_4)
 #ifdef __cplusplus
 extern "C"
 {
