@@ -1,6 +1,6 @@
-// $Id: all.lib,v 1.41 2005-04-21 15:55:55 Singular Exp $
+// $Id: all.lib,v 1.42 2005-05-04 13:18:14 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: all.lib,v 1.41 2005-04-21 15:55:55 Singular Exp $";
+version="$Id: all.lib,v 1.42 2005-05-04 13:18:14 Singular Exp $";
 category = "General purpose";
 info="
 LIBRARY:  all.lib   Load all libraries
@@ -29,6 +29,7 @@ Commutative algebra
   primitiv_lib:    Computing a Primitive Element
   reesclos_lib:    Rees Algebra and Integral Closure of Ideals
   toric_lib:       Standard Basis of Toric Ideals
+  groebnerwal_lib: Groebner walk and Fraktal Walk
 
 Singularities
   alexpoly.lib:    Resolution Graph and Alexander Polynomial
@@ -96,6 +97,7 @@ LIB "primitiv.lib";
 LIB "reesclos.lib";
 LIB "intprog.lib";
 LIB "toric.lib";
+LIB "groebnerwalk.lib";
 //Singularities
 LIB "alexpoly.lib";
 LIB "classify.lib";
