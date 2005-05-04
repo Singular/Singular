@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.128 2005-05-04 15:53:11 Singular Exp $
+@comment $Id: singular.doc,v 1.129 2005-05-04 16:33:29 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -299,7 +299,7 @@ LIB "all.lib";
 @c ---------------------------------------------------------
 @node linalg_lib, , matrix_lib, Linear algebra
 @subsection linalg_lib
-@c lib linalg.lib no_ex
+@c lib linalg.lib
 @c ----------------------------------------------------------------------------
 @node Commutative algebra, Singularities, Linear algebra, SINGULAR libraries
 @section Commutative algebra
@@ -333,7 +333,7 @@ LIB "all.lib";
 @subsection groebnerwalk_lib
 @c lib groebnerwalk.lib
 @c ----------------------------------------------------------
-@node homolog_lib, mprimdec_lib, elim_lib, Commutative algebra
+@node homolog_lib, mprimdec_lib, groebnerwalk_lib, Commutative algebra
 @subsection homolog_lib
 @c lib homolog.lib
 @c ----------------------------------------------------------
@@ -402,11 +402,11 @@ LIB "all.lib";
 @c ----------------------------------------------------------
 @node gmssing_lib, gmspoly_lib, equising_lib, Singularities
 @subsection gmssing_lib
-@c lib gmssing.lib no_ex
+@c lib gmssing.lib
 @c ----------------------------------------------------------
 @node gmspoly_lib, hnoether_lib, gmssing_lib, Singularities
 @subsection gmspoly_lib
-@c lib gmspoly.lib no_ex
+@c lib gmspoly.lib
 @c ---------------------------------------------------------
 @node hnoether_lib, mondromy_lib, gmspoly_lib, Singularities
 @subsection hnoether_lib
@@ -414,11 +414,11 @@ LIB "all.lib";
 @c ---------------------------------------------------------
 @node mondromy_lib, qhmoduli_lib, hnoether_lib, Singularities
 @subsection mondromy_lib
-@c lib mondromy.lib no_ex
+@c lib mondromy.lib
 @c ---------------------------------------------------------
 @node qhmoduli_lib, sing_lib, mondromy_lib, Singularities
 @subsection qhmoduli_lib
-@c lib qhmoduli.lib no_ex
+@c lib qhmoduli.lib
 @c ----------------------------------------------------------
 @node sing_lib, spcurve_lib, qhmoduli_lib, Singularities
 @subsection sing_lib
@@ -446,7 +446,7 @@ LIB "all.lib";
 @c ----------------------------------------------------------
 @node finvar_lib, ainvar_lib, Invariant theory, Invariant theory
 @subsection finvar_lib
-@c lib finvar.lib no_ex
+@c lib finvar.lib
 @c ----------------------------------------------------------
 @node ainvar_lib, rinvar_lib, finvar_lib, Invariant theory
 @subsection ainvar_lib

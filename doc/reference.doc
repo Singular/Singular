@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.242 2005-05-04 13:36:23 Singular Exp $
+@comment $Id: reference.doc,v 1.243 2005-05-04 16:33:27 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -92,6 +92,7 @@ brackets are allowed.
 * finduni::
 * fprintf::
 * freemodule::
+* frwalk::
 * gcd::
 * gen::
 * getdump::
@@ -1862,7 +1863,7 @@ See
 @c lib standard.lib:fprintf lib_fun lib_ex subsection
 
 @c ---------------------------------------
-@node freemodule, gcd, fprintf, Functions
+@node freemodule, frwalk, fprintf, Functions
 @subsection freemodule
 @cindex freemodule
 
@@ -1890,7 +1891,48 @@ See
 @ref{module}.
 @c ref
 @c ---------------------------------------
-@node gcd, gen, freemodule, Functions
+@node frwalk, gcd, freemodule, Functions
+@subsection frwalk
+@cindex frwalk
+
+@table @code
+@item @strong{Syntax:}
+@code{frwalk (} ring_name@code{,} ideal_name @code{)}
+*@code{frwalk (} ring_name@code{,} ideal_name @code{,} int_expression @code{)}
+@item @strong{Type:}
+ideal
+@item @strong{Purpose:}
+computes for the given ideal in the given ring
+a Groebner basis in the current ring, by applying the so-called fractal walk
+algorithm.
+@*The main application is to compute a lexicographical Groebner basis
+from a reduced Groebner basis with respect to a degree ordering. This
+can be much faster than computing a lexicographical Groebner basis
+directly.
+@*The only permissible difference between the given ring and the current ring
+is the monomial ordering.
+@item @strong{Example:}
+@smallexample
+@c example
+  ring r=0,(x,y,z),dp;
+  ideal i=y3+x2, x2y+x2, x3-x2, z4-x2-y;
+  i=std(i);
+  ring s=0,(x,y,z),lp;
+  ideal j=frwalk(r,i);
+  j;
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{fglm};
+@ref{groebner};
+@ref{ring};
+@ref{qring};
+@ref{std}.
+@c ref
+@c ---------------------------------------
+@node gcd, gen, frwalk, Functions
 @subsection gcd
 @cindex gcd
 
