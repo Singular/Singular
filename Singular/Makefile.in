@@ -104,7 +104,6 @@ CXXSOURCES=grammar.cc scanner.cc attrib.cc \
     lists.cc \
     sdb.cc \
     fglm.cc \
-    p_polys.cc \
     silink.cc \
     subexpr.cc \
     janet.cc wrapper.cc\
