@@ -1,3 +1,6 @@
+#ifndef WALKSUPPORT_H
+#define WALKSUPPORT_H
+
 #include "intvec.h"
 #include "int64vec.h"
 
@@ -47,4 +50,4 @@ ideal sortRedSB(ideal G);
 intvec* int64VecToIntVec(int64vec* source);
 int64vec* rGetGlobalOrderWeightVec(ring r);
 
-
+#endif
