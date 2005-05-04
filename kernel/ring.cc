@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.36 2005-05-04 14:13:16 Singular Exp $ */
+/* $Id: ring.cc,v 1.37 2005-05-04 15:25:45 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -293,6 +293,7 @@ void rWrite(ring r)
     if ((r->order[l] >= ringorder_lp)
     ||(r->order[l] == ringorder_M)
     ||(r->order[l] == ringorder_a)
+    ||(r->order[l] == ringorder_a64)
     ||(r->order[l] == ringorder_aa))
     {
       PrintS("\n//                  : names    ");
@@ -318,7 +319,12 @@ void rWrite(ring r)
         PrintS("\n//                  : weights  ");
         for (i = 0; i<=r->block1[l]-r->block0[l]; i++)
         {
-          Print("%*d " ,nlen,r->wvhdl[l][i+j],i+j);
+          if (r->order[l] == ringorder_a64)
+          { int64 *w=(int64 *)r->wvhdl[l];
+            Print("%*lld " ,nlen,w[i+j],i+j);
+          }
+          else
+            Print("%*d " ,nlen,r->wvhdl[l][i+j],i+j);
         }
         if (r->order[l]!=ringorder_M) break;
       }
@@ -472,9 +478,22 @@ char * rOrdStr(ring r)
              j+=i+1)
         {
           char c=',';
-          for (i = 0; i<r->block1[l]-r->block0[l]; i++)
+          if(r->order[l]==ringorder_a64)
           {
-            StringAppend("%d," ,r->wvhdl[l][i+j]);
+            int64 * w=(int64 *)r->wvhdl[l];
+            for (i = 0; i<r->block1[l]-r->block0[l]; i++)
+            {
+              StringAppend("%lld," ,w[i]);
+            }
+            StringAppend("%lld)" ,w[i]);
+            break;
+          }
+          else
+          {
+            for (i = 0; i<r->block1[l]-r->block0[l]; i++)
+            {
+              StringAppend("%d," ,r->wvhdl[l][i+j]);
+            }
           }
           if (r->order[l]!=ringorder_M)
           {
@@ -1279,8 +1298,7 @@ int rSum(ring r1, ring r2, ring &sum)
  *        qring:        same nCopy, same idCopy as currRing)
  * DOES NOT CALL rComplete
  */
-static ring rCopy0(ring r, BOOLEAN copy_qideal = TRUE,
-                   BOOLEAN copy_ordering = TRUE)
+ring rCopy0(ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
 {
   if (r == NULL) return NULL;
   int i,j;
@@ -1629,6 +1647,7 @@ BOOLEAN rIsPolyVar(int v, ring r)
           return (r->wvhdl[i][v-r->block0[i]]>0);
         case ringorder_M:
           return 2; /*don't know*/
+        case ringorder_a64: /* assume: all weight are non-negative!*/
         case ringorder_lp:
         case ringorder_rp:
         case ringorder_dp:
@@ -1824,6 +1843,25 @@ static void rO_WDegree(int &place, int &bitplace, int start, int end,
       break;
     }
   }
+}
+
+static void rO_WDegree64(int &place, int &bitplace, int start, int end,
+    long *o, sro_ord &ord_struct, int64 *weights)
+{
+  // weighted degree (aligned) of variables v_start..v_end, ordsgn 1,
+  // reserved 2 places
+  rO_Align(place,bitplace);
+  ord_struct.ord_typ=ro_wp64;
+  ord_struct.data.wp64.start=start;
+  ord_struct.data.wp64.end=end;
+  ord_struct.data.wp64.place=place;
+  ord_struct.data.wp64.weights64=weights;
+  o[place]=1;
+  place++;
+  o[place]=1;
+  place++;
+  rO_Align(place,bitplace);
+  int i;
 }
 
 static void rO_WDegree_neg(int &place, int &bitplace, int start, int end,
@@ -2401,6 +2439,7 @@ static void rHighSet(ring r, int o_r, int o)
     case ringorder_rp:
     case ringorder_a:
     case ringorder_aa:
+    case ringorder_a64:
       if (r->OrdSgn==-1) r->MixedOrder=TRUE;
       break;
     case ringorder_ls:
@@ -2440,11 +2479,25 @@ static void rSetFirstWv(ring r, int i, int* order, int* block1, int** wvhdl)
   if(block1[i]!=r->N) r->LexOrder=TRUE;
   r->firstBlockEnds=block1[i];
   r->firstwv = wvhdl[i];
-  if ((order[i]== ringorder_ws) || (order[i]==ringorder_Ws))
+  if ((order[i]== ringorder_ws) || (order[i]==ringorder_Ws)
+  || (order[i]== ringorder_wp) || (order[i]==ringorder_Wp)
+  || (order[i]== ringorder_a) /*|| (order[i]==ringorder_A)*/)
   {
     int j;
     for(j=block1[i]-r->block0[i];j>=0;j--)
-      if (r->firstwv[j]<0) { r->MixedOrder=TRUE; break; }
+    {
+      if (r->firstwv[j]<0) r->MixedOrder=TRUE;
+      if (r->firstwv[j]==0) r->LexOrder=TRUE;
+    }
+  }
+  else if (order[i]==ringorder_a64)
+  {
+    int j;
+    int64 *w=rGetWeightVec(r);
+    for(j=block1[i]-r->block0[i];j>=0;j--)
+    {
+      if (w[j]==0) r->LexOrder=TRUE;
+    }
   }
 }
 
@@ -2675,6 +2728,12 @@ BOOLEAN rComplete(ring r, int force)
       case ringorder_aa:
         rO_WDegree(j,j_bits,r->block0[i],r->block1[i],tmp_ordsgn,tmp_typ[typ_i],
                    r->wvhdl[i]);
+        typ_i++;
+        break;
+
+      case ringorder_a64:
+        rO_WDegree64(j,j_bits,r->block0[i],r->block1[i],tmp_ordsgn,
+                     tmp_typ[typ_i], (int64 *)(r->wvhdl[i]));
         typ_i++;
         break;
 
@@ -3101,7 +3160,7 @@ void rDebugPrint(ring r)
     PrintS("NULL ?\n");
     return;
   }
-  char *TYP[]={"ro_dp","ro_wp","ro_wp_neg","ro_cp",
+  char *TYP[]={"ro_dp","ro_wp","ro_wp64","ro_wp_neg","ro_cp",
                "ro_syzcomp", "ro_syz", "ro_none"};
   int i,j;
 
@@ -3137,6 +3196,13 @@ void rDebugPrint(ring r)
         int l;
         for(l=r->typ[j].data.wp.start;l<=r->typ[j].data.wp.end;l++)
           Print(" %d",r->typ[j].data.wp.weights[l-r->typ[j].data.wp.start]);
+      }
+      else if (r->typ[j].ord_typ==ro_wp64)
+      {
+        Print(" w64:");
+        int l;
+        for(l=r->typ[j].data.wp64.start;l<=r->typ[j].data.wp64.end;l++)
+          Print(" %l",(long)(((int64*)r->typ[j].data.wp64.weights64)+l-r->typ[j].data.wp64.start));
       }
     }
     PrintLn();
@@ -3554,20 +3620,22 @@ n_coeffType rFieldType(ring r)
   return n_unknown;
 }
 
-int * rGetWeightVec(ring r)
+int64 * rGetWeightVec(ring r)
 {
   assume(r!=NULL);
   assume(r->OrdSize>0);
-  assume(r->typ[0].ord_typ==ro_wp);
-  return (r->typ[0].data.wp.weights);
+  int i=0;
+  while((r->typ[i].ord_typ!=ro_wp64) && (r->typ[i].ord_typ>0)) i++;
+  assume(r->typ[i].ord_typ==ro_wp64);
+  return (int64*)(r->typ[i].data.wp64.weights64);
 }
 
-void rSetWeightVec(ring r, int *wv)
+void rSetWeightVec(ring r, int64 *wv)
 {
   assume(r!=NULL);
   assume(r->OrdSize>0);
-  assume(r->typ[0].ord_typ==ro_wp);
-  memcpy(r->typ[0].data.wp.weights,wv,r->N*sizeof(int));
+  assume(r->typ[0].ord_typ==ro_wp64);
+  memcpy(r->typ[0].data.wp64.weights64,wv,r->N*sizeof(int64));
 }
 
 #include <ctype.h>
@@ -3958,4 +4026,26 @@ BOOLEAN nc_rComplete(ring src, ring dest)
     return TRUE;
   }
   return FALSE;
+}
+
+void rModify_a_to_A(ring r)
+// to be called BEFORE rComplete:
+// changes every Block with a(...) to A(...)
+{
+   int i=0;
+   int j;
+   while(r->order[i]!=0)
+   {
+      if (r->order[i]==ringorder_a)
+      {
+        r->order[i]=ringorder_a64;
+	int *w=r->wvhdl[i];
+	int64 *w64=(int64 *)omAlloc((r->block1[i]-r->block0[i]+1)*sizeof(int64));
+	for(j=r->block1[i]-r->block0[i];j>=0;j--)
+		w64[j]=(int64)w[j];
+	r->wvhdl[i]=(int*)w64;
+	omFreeSize(w,(r->block1[i]-r->block0[i]+1)*sizeof(int));
+      }
+      i++;
+   }
 }

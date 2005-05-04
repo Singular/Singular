@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.9 2005-05-04 14:13:17 Singular Exp $ */
+/* $Id: ring.h,v 1.10 2005-05-04 15:25:46 Singular Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -27,8 +27,10 @@ void   rWrite(ring r);
 void   rKill(idhdl h);
 void   rKill(ring r);
 ring   rCopy(ring r);
+ring rCopy0(ring r, BOOLEAN copy_qideal = TRUE, BOOLEAN copy_ordering = TRUE);
 ring   rOpposite(ring r);
 ring   rEnvelope(ring r);
+
 
 
 
@@ -271,6 +273,7 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
                          unsigned long exp_limit);
 // construct Wp, C ring
 ring rModifyRing_Wp(ring r, int* weights);
+void rModify_a_to_A(ring r);
 
 void rKillModifiedRing(ring r);
 // also frees weights
@@ -282,8 +285,8 @@ void rKillModifiedRing_Simple(ring r);
 void rDebugPrint(ring r);
 void pDebugPrint(poly p);
 
-int * rGetWeightVec(ring r);
-void rSetWeightVec(ring r, int *);
+int64 * rGetWeightVec(ring r);
+void rSetWeightVec(ring r, int64 *wv);
 
 lists rDecompose(const ring r);
 ring rCompose(const lists  L);

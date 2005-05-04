@@ -106,7 +106,7 @@ CXXSOURCES=clapconv.cc \
     syz.cc syz0.cc syz1.cc syz2.cc syz3.cc\
     timer.cc weight.cc \
     GMPrat.cc multicnt.cc npolygon.cc semic.cc spectrum.cc splist.cc \
-    mod_raw.cc sing_win.cc\
+    mod_raw.cc sing_win.cc walkProc.cc walkMain.cc walkSupport.cc\
     eigenval.cc units.cc kbuckets.cc sbuckets.cc\
     mpr_inout.cc mpr_base.cc mpr_numeric.cc \
     prCopy.cc p_Mult_q.cc \
@@ -149,7 +149,7 @@ HEADERS=hutil.h stairc.h ideals.h \
 	clapsing.h matpol.h polys.h p_polys.h syz.h \
 	ring.h timer.h dError.h fast_maps.h \
 	febase.h shortfl.h mpr_complex.h mpr_global.h \
-	gring.h \
+	gring.h walkProc.h walkMain.h walkSupport.h\
 	ffields.h khstd.h sparsmat.h gnumpfl.h gnumpc.h \
 	fglm.h kstd1.h modulop.h sing_dbm.h weight.h \
 	fglmgauss.h fglmvec.h \

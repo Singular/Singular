@@ -1,14 +1,14 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mod_raw.cc,v 1.2 2004-08-13 10:40:53 Singular Exp $ */
+/* $Id: mod_raw.cc,v 1.3 2005-05-04 15:25:45 Singular Exp $ */
 /*
  * ABSTRACT: machine depend code for dynamic modules
  *
  * Provides: dynl_open()
  *           dynl_sym()
  *           dynl_error()
- *           dunl_close()
+ *           dynl_close()
 */
 
 #include <stdio.h>
