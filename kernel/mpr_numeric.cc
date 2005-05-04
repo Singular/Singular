@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpr_numeric.cc,v 1.3 2005-05-04 07:23:17 Singular Exp $ */
+/* $Id: mpr_numeric.cc,v 1.4 2005-05-04 07:25:22 Singular Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - numeric stuff
@@ -696,7 +696,7 @@ void rootContainer::solvequad(gmp_complex **a, gmp_complex **r, int &k, int &j)
     gmp_complex sq(zero);
     gmp_complex h1(*a[1]/(*a[2] + *a[2])), h2(*a[0] / *a[2]);
     gmp_complex disk((h1 * h1) - h2);
-    if (disk.imag()==zero)
+    if (disk.imag().isZero())
     {
       if (disk.real()<zero)
       {
@@ -711,7 +711,7 @@ void rootContainer::solvequad(gmp_complex **a, gmp_complex **r, int &k, int &j)
     *r[k+1] = sq - h1;
     sq += h1;
     *r[k] = (gmp_complex)0.0-sq;
-    if(sq.imag()==zero)
+    if(sq.imag().isZero())
     {
       k = j;
       j++;
@@ -724,14 +724,14 @@ void rootContainer::solvequad(gmp_complex **a, gmp_complex **r, int &k, int &j)
   }
   else
   {
-    if (((*a[1]).real()==zero) && ((*a[1]).imag()==zero))
+    if (((*a[1]).real().isZero()) && ((*a[1]).imag().isZero()))
     {
       WerrorS("precision lost, try again with higher precision");
     }
     else
     {
       *r[k]= (gmp_complex)0.0-(*a[0] / *a[1]);
-      if(r[k]->imag()==zero)
+      if(r[k]->imag().isZero())
         j++;
       else
         k--;
