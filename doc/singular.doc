@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.127 2005-05-02 13:18:58 Singular Exp $
+@comment $Id: singular.doc,v 1.128 2005-05-04 15:53:11 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -308,6 +308,7 @@ LIB "all.lib";
 @menu
 * algebra_lib:: procedures for computing with algebras and maps
 * elim_lib:: procedures for elimination, saturation and blowing up
+* groebnerwalk_lib:: Groebner walk and Fraktal walk
 * homolog_lib:: procedures for homological algebra
 * mprimdec_lib:: procedures for primary decomposition of modules
 * mregular_lib:: procedures for Castelnuovo-Mumford regularity
@@ -324,9 +325,13 @@ LIB "all.lib";
 @subsection algebra_lib
 @c lib algebra.lib
 @c ----------------------------------------------------------
-@node elim_lib, homolog_lib, algebra_lib, Commutative algebra
+@node elim_lib, groebnerwalk_lib, algebra_lib, Commutative algebra
 @subsection elim_lib
 @c lib elim.lib
+@c ----------------------------------------------------------
+@node groebnerwalk_lib, homolog_lib, elim_lib, Commutative algebra
+@subsection groebnerwalk_lib
+@c lib groebnerwalk.lib
 @c ----------------------------------------------------------
 @node homolog_lib, mprimdec_lib, elim_lib, Commutative algebra
 @subsection homolog_lib
