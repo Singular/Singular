@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpr_numeric.cc,v 1.2 2005-05-03 13:03:47 Singular Exp $ */
+/* $Id: mpr_numeric.cc,v 1.3 2005-05-04 07:23:17 Singular Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - numeric stuff
@@ -691,7 +691,7 @@ void rootContainer::solvequad(gmp_complex **a, gmp_complex **r, int &k, int &j)
   gmp_float zero(0.0);
 
   if ((j>k)
-  &&(((*a[2]).real()!=zero)||((*a[2]).imag()!=zero)))
+  &&((!(*a[2]).real().isZero())||(!(*a[2]).imag().isZero())))
   {
     gmp_complex sq(zero);
     gmp_complex h1(*a[1]/(*a[2] + *a[2])), h2(*a[0] / *a[2]);
