@@ -110,7 +110,7 @@ CXXSOURCES=grammar.cc scanner.cc attrib.cc \
     janet.cc wrapper.cc\
     libparse.cc sing_win.cc\
     gms.cc pcv.cc maps_ip.cc\
-    tgb.cc\
+    tgb.cc walk.cc\
     pShallowCopyDelete.cc cntrlc.cc misc.cc
 
 # stuff for MP
@@ -165,7 +165,7 @@ HEADERS=lists.h attrib.h \
 	fglm.h sing_dbm.h maps_ip.h \
 	mpsr.h mpsr_sl.h\
 	mpsr_Get.h kmatrix.h janet.h\
-	mpsr_Put.h\
+	mpsr_Put.h walk.h\
 	dbm_sl.h libparse.h \
 	gms.h pcv.h eigenval_ip.h \
 	feOpt.h fegetopt.h distrib.h walk.h \

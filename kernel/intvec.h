@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: intvec.h,v 1.3 2004-07-19 16:46:36 Singular Exp $ */
+/* $Id: intvec.h,v 1.4 2005-05-04 14:08:54 Singular Exp $ */
 /*
 * ABSTRACT: class intvec: lists/vectors of integers
 */
@@ -60,7 +60,7 @@ public:
   void show(int mat=0,int spaces=0);
   inline void makeVector() { row*=col;col=1; }
   char * String(int dim = 2);
-  char * ivString(int mat=0,int spaces=0, int dim=2);
+  char * ivString(int not_mat=1,int spaces=0, int dim=2);
   inline ~intvec()
     {
       if (v!=NULL)

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.35 2005-05-01 19:56:36 levandov Exp $ */
+/* $Id: ring.cc,v 1.36 2005-05-04 14:13:16 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -36,6 +36,7 @@ static const char * const ringorder_name[] =
 {
   " ?", //ringorder_no = 0,
   "a", //ringorder_a,
+  "A", //ringorder_a64,
   "c", //ringorder_c,
   "C", //ringorder_C,
   "M", //ringorder_M,

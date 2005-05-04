@@ -94,7 +94,7 @@ CXXSOURCES=clapconv.cc \
     febase.cc feread.cc feResource.cc \
     ffields.cc hdegree.cc hilb.cc hutil.cc \
     gring.cc gr_kstd2.cc\
-    ideals.cc intvec.cc \
+    ideals.cc intvec.cc int64vec.cc \
     khstd.cc kstdfac.cc \
     kstd1.cc kstd2.cc kutil.cc \
     longalg.cc longrat.cc longrat0.cc \
@@ -144,7 +144,7 @@ SOURCES=${CSOURCES} ${CXXSOURCES} \
 	claptmpl.cc 
 
 HEADERS=hutil.h stairc.h ideals.h \
-	longalg.h structs.h intvec.h longrat.h \
+	longalg.h structs.h intvec.h int64vec.h longrat.h \
 	numbers.h stype.h clapconv.h ipconv.h maps.h \
 	clapsing.h matpol.h polys.h p_polys.h syz.h \
 	ring.h timer.h dError.h fast_maps.h \

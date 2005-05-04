@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: primdec.lib,v 1.102 2004-02-12 09:54:06 Singular Exp $";
+version="$Id: primdec.lib,v 1.103 2005-05-04 14:09:48 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -1844,6 +1844,7 @@ EXAMPLE: example minAssPrimes; shows an example
 "
 {
    def @P=basering;
+   if(size(i)==0){return(list(ideal(0)));}
    list qr=simplifyIdeal(i);
    map phi=@P,qr[2];
    i=qr[1];
@@ -1991,6 +1992,7 @@ EXAMPLE: example minAssPrimes; shows an example
 "
 {
    def P=basering;
+   if(size(i)==0){return(list(ideal(0)));}
    list q=simplifyIdeal(i);
    list re=maxideal(1);
    int j,a,k;
@@ -2408,15 +2410,69 @@ proc algeDeco(ideal i, int w)
 //the other cases
    def R=basering;
    int n=nvars(R);
+
+//---Anfang Provisorium
+   if(size(i)==2)
+   {
+      option(redSB);
+      ideal J=std(i);
+      option(noredSB);
+      if((size(J)==2)&&(deg(J[1])==1))
+      {
+         ideal keep;
+         poly f;
+         int j;
+         for(j=1;j<=nvars(basering);j++)
+         {
+           f=J[2];
+           while((f/var(j))*var(j)-f==0)
+           {
+             f=f/var(j);
+             keep=keep,var(j);
+           }
+           J[2]=f;
+         }
+         ideal K=factorize(J[2],1);
+         if(deg(K[1])==0){K=0;}
+         K=K+std(keep);
+         ideal L;
+         list resu;
+         for(j=1;j<=size(K);j++)
+         {
+            L=J[1],K[j];
+            resu[j]=L;
+         }
+         return(resu);
+      }
+   }
+//---Ende Provisorium
    string mp="poly p="+string(minpoly)+";";
    string gnir="ring RH="+string(char(R))+",("+varstr(R)+","+string(par(1))
                 +"),dp;";
    execute(gnir);
    execute(mp);
    ideal i=imap(R,i);
-         i=i,p;
-   list pr;
+   ideal I=subst(i,var(nvars(basering)),0);
    int j;
+   for(j=1;j<=ncols(i);j++)
+   {
+     if(i[j]!=I[j]){break;}
+   }
+   if((j>ncols(i))&&(deg(p)==1))  
+   {
+     setring R;
+     kill RH;
+     kill gnir;
+     string gnir="ring RH="+string(char(R))+",("+varstr(R)+"),dp;";
+     execute(gnir);
+     ideal i=imap(R,i);
+     ideal J;
+   }
+   else
+   {
+      i=i,p;
+   }
+   list pr;
 
    if(w==0)
    {
@@ -2430,22 +2486,29 @@ proc algeDeco(ideal i, int w)
    if(w==2)
    {
       pr=minAssPrimes(i);
-   }
-
-   gnir="ring RS="+string(char(R))+",("+varstr(RH)
+   }   
+   if(n<nvars(basering))  
+   {   
+      gnir="ring RS="+string(char(R))+",("+varstr(RH)
                 +"),(dp("+string(n)+"),lp);";
-   execute(gnir);
-   list pr=imap(RH,pr);
-   ideal K;
-   for(j=1;j<=size(pr);j++)
-   {
-      K=groebner(pr[j]);
-      K=K[2..size(K)];
-      pr[j]=K;
+      execute(gnir);
+      list pr=imap(RH,pr);
+      ideal K;
+      for(j=1;j<=size(pr);j++)
+      {
+         K=groebner(pr[j]);
+         K=K[2..size(K)];
+         pr[j]=K;
+      }
+      setring R;
+      list pr=imap(RS,pr);
    }
-   setring R;
-   list pr=imap(RS,pr);
-      list re;
+   else
+   {
+      setring R;
+      list pr=imap(RH,pr);
+   }
+   list re;
    if(w==2)
    {
       re=pr;
@@ -3292,7 +3355,7 @@ static proc powerCoeffs(poly f,int e)
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc sep(poly f,int i, list #)
+proc sep(poly f,int i, list #)
 "USAGE:  input: a polynomial f depending on the i-th variable and optional
          an integer k considering the polynomial f defined over Fp(t1,...,tm)
          as polynomial over Fp(t(1)^(p^-k),...,t(m)^(p^-k))
@@ -3305,7 +3368,12 @@ static proc sep(poly f,int i, list #)
    int k;
    if(size(#)>0){k=#[1];}
 
+
    poly h=gcd(f,diff(f,var(i)));
+   if((reduce(f,std(h))!=0)||(reduce(diff(f,var(i)),std(h))!=0))
+   {
+      ERROR("FEHLER IN GCD");
+   }
    poly g1=lift(h,f)[1][1];    //  f/h
    poly h1;
 
@@ -3352,8 +3420,19 @@ example
    int m=npars(R);
    int n=nvars(R);
    int p=char(R);
+   int d=vdim(I);
    int i,k;
    list l;
+   if(((p==0)||(p>d))&&(d==deg(I[1])))
+   {
+     intvec e=leadexp(I[1]);
+     for(i=1;i<=nvars(basering);i++)
+     {
+       if(e[i]!=0) break;
+     }
+     I[1]=sep(I[1],i)[1];
+     return(interred(I));
+   }
    intvec op=option(get);
 
    option(redSB);
@@ -5091,6 +5170,7 @@ example
    ideal pr= equiRadical(i);
    pr;
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc radical(ideal i,list #)
 "USAGE:   radical(i); i ideal.
@@ -5113,6 +5193,7 @@ EXAMPLE: example radical; shows an example
    ideal re=1;
    intvec op = option(get);
    list qr=simplifyIdeal(i);
+   ideal isave=i;
    map phi=@P,qr[2];
 
    option(redSB);

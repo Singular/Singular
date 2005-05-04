@@ -1,10 +1,12 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.222 2005-04-29 13:25:08 Singular Exp $ */
+/* $Id: extra.cc,v 1.223 2005-05-04 14:09:45 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
+
+#define HAVE_WALK 1
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -54,7 +56,9 @@
 #include "prCopy.h"
 #include "mpr_complex.h"
 
+#ifdef HAVE_WALK
 #include "walk.h"
+#endif
 #include "weight.h"
 #include "fast_mult.h"
 #include "digitech.h"
@@ -1021,6 +1025,807 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
 #endif
+#ifdef HAVE_WALK
+/*==================== walk stuff =================*/
+#ifdef OWNW
+    if (strcmp(sys_cmd, "walkNextWeight") == 0)
+    {
+      if (h == NULL || h->Typ() != INTVEC_CMD ||
+          h->next == NULL || h->next->Typ() != INTVEC_CMD ||
+          h->next->next == NULL || h->next->next->Typ() != IDEAL_CMD)
+      {
+        Werror("system(\"walkNextWeight\", intvec, intvec, ideal) expected");
+        return TRUE;
+      }
+
+      if (((intvec*) h->Data())->length() != currRing->N ||
+          ((intvec*) h->next->Data())->length() != currRing->N)
+      {
+        Werror("system(\"walkNextWeight\" ...) intvecs not of length %d\n",
+               currRing->N);
+        return TRUE;
+      }
+      res->data = (void*) walkNextWeight(((intvec*) h->Data()),
+                                         ((intvec*) h->next->Data()),
+                                         (ideal) h->next->next->Data());
+      if (res->data == (void*) 0 || res->data == (void*) 1)
+      {
+        res->rtyp = INT_CMD;
+      }
+      else
+      {
+        res->rtyp = INTVEC_CMD;
+      }
+      return FALSE;
+    }
+    else if (strcmp(sys_cmd, "walkInitials") == 0)
+    {
+      if (h == NULL || h->Typ() != IDEAL_CMD)
+      {
+        WerrorS("system(\"walkInitials\", ideal) expected");
+        return TRUE;
+      }
+
+      res->data = (void*) walkInitials((ideal) h->Data());
+      res->rtyp = IDEAL_CMD;
+      return FALSE;
+    }
+    else
+#endif
+#ifdef WAIV
+    if (strcmp(sys_cmd, "walkAddIntVec") == 0)
+    {
+      if (h == NULL || h->Typ() != INTVEC_CMD ||
+	  h->next == NULL || h->next->Typ() != INTVEC_CMD) 
+      {
+        WerrorS("system(\"walkAddIntVec\", intvec, intvec) expected");
+        return TRUE;
+      }
+      intvec* arg1 = (intvec*) h->Data();
+      intvec* arg2 = (intvec*) h->next->Data();
+
+
+      res->data = (intvec*) walkAddIntVec(arg1, arg2);
+      res->rtyp = INTVEC_CMD;
+      return FALSE;
+    }
+    else
+#endif 
+#ifdef MwaklNextWeight
+    if (strcmp(sys_cmd, "MwalkNextWeight") == 0)
+    {
+      if (h == NULL || h->Typ() != INTVEC_CMD ||
+          h->next == NULL || h->next->Typ() != INTVEC_CMD ||
+          h->next->next == NULL || h->next->next->Typ() != IDEAL_CMD)
+      {
+        Werror("system(\"MwalkNextWeight\", intvec, intvec, ideal) expected");
+        return TRUE;
+      }
+
+      if (((intvec*) h->Data())->length() != currRing->N ||
+          ((intvec*) h->next->Data())->length() != currRing->N)
+      {
+        Werror("system(\"MwalkNextWeight\" ...) intvecs not of length %d\n",
+               currRing->N);
+        return TRUE;
+      }
+      intvec* arg1 = (intvec*) h->Data();
+      intvec* arg2 = (intvec*) h->next->Data();
+      ideal arg3   =   (ideal) h->next->next->Data();
+
+      intvec* result = (intvec*) MwalkNextWeight(arg1, arg2, arg3);
+
+      res->rtyp = INTVEC_CMD;
+      res->data =  result;
+      
+      return FALSE;
+    }
+    else
+#endif //MWalkNextWeight
+    if(strcmp(sys_cmd, "Mivdp") == 0)
+    {
+      if (h == NULL || h->Typ() != INT_CMD)
+      {
+        Werror("system(\"Mivdp\", int) expected");
+        return TRUE;
+      }
+      if ((int) h->Data() != currRing->N)
+      {
+        Werror("system(\"Mivdp\" ...) intvecs not of length %d\n",
+               currRing->N);
+        return TRUE;
+      }
+      int arg1 = (int) h->Data();
+    
+      intvec* result = (intvec*) Mivdp(arg1);
+
+      res->rtyp = INTVEC_CMD;
+      res->data =  result;
+      
+      return FALSE;
+    }    
+
+    else if(strcmp(sys_cmd, "Mivlp") == 0)
+    {
+      if (h == NULL || h->Typ() != INT_CMD)
+      {
+        Werror("system(\"Mivlp\", int) expected");
+        return TRUE;
+      }
+      if ((int) h->Data() != currRing->N)
+      {
+        Werror("system(\"Mivlp\" ...) intvecs not of length %d\n",
+               currRing->N);
+        return TRUE;
+      }
+      int arg1 = (int) h->Data();
+    
+      intvec* result = (intvec*) Mivlp(arg1);
+
+      res->rtyp = INTVEC_CMD;
+      res->data =  result;
+      
+      return FALSE;
+    }
+   else
+#ifdef MpDiv
+      if(strcmp(sys_cmd, "MpDiv") == 0)
+      {        
+        if(h==NULL || h->Typ() != POLY_CMD ||
+           h->next == NULL || h->next->Typ() != POLY_CMD)
+        {
+          Werror("system(\"MpDiv\",poly, poly) expected");
+          return TRUE;
+        }
+        poly arg1 = (poly) h->Data();
+        poly arg2 = (poly) h->next->Data();
+        
+        poly result = MpDiv(arg1, arg2);
+
+        res->rtyp = POLY_CMD;
+        res->data = result;
+        return FALSE;
+      }
+    else
+#endif
+#ifdef MpMult
+      if(strcmp(sys_cmd, "MpMult") == 0)
+      {        
+        if(h==NULL || h->Typ() != POLY_CMD ||
+           h->next == NULL || h->next->Typ() != POLY_CMD)
+        {
+          Werror("system(\"MpMult\",poly, poly) expected");
+          return TRUE;
+        }
+        poly arg1 = (poly) h->Data();
+        poly arg2 = (poly) h->next->Data();
+        
+        poly result = MpMult(arg1, arg2);
+        res->rtyp = POLY_CMD;
+        res->data = result;
+        return FALSE;
+      }
+  else
+#endif
+   if (strcmp(sys_cmd, "MivSame") == 0)
+    {
+      if(h == NULL || h->Typ() != INTVEC_CMD ||
+         h->next == NULL || h->next->Typ() != INTVEC_CMD )
+      {
+        Werror("system(\"MivSame\", intvec, intvec) expected");
+        return TRUE;
+      }
+      /*
+      if (((intvec*) h->Data())->length() != currRing->N || 
+          ((intvec*) h->next->Data())->length() != currRing->N)  
+      {
+        Werror("system(\"MivSame\" ...) intvecs not of length %d\n", 
+               currRing->N); 
+        return TRUE; 
+      } 
+      */
+      intvec* arg1 = (intvec*) h->Data();
+      intvec* arg2 = (intvec*) h->next->Data();
+      /*    
+      poly result = (poly) MivSame(arg1, arg2);
+
+      res->rtyp = POLY_CMD;
+      res->data =  (poly) result;
+      */
+      res->rtyp = INT_CMD; res->data = (void*) MivSame(arg1, arg2);
+      return FALSE;
+    }
+  else
+   if (strcmp(sys_cmd, "M3ivSame") == 0)
+    {
+      if(h == NULL || h->Typ() != INTVEC_CMD ||
+         h->next == NULL || h->next->Typ() != INTVEC_CMD ||
+	 h->next->next == NULL || h->next->next->Typ() != INTVEC_CMD  )
+      {
+        Werror("system(\"M3ivSame\", intvec, intvec, intvec) expected");
+        return TRUE;
+      }
+      /*
+      if (((intvec*) h->Data())->length() != currRing->N || 
+          ((intvec*) h->next->Data())->length() != currRing->N ||
+	  ((intvec*) h->next->next->Data())->length() != currRing->N )  
+      {
+        Werror("system(\"M3ivSame\" ...) intvecs not of length %d\n", 
+               currRing->N); 
+        return TRUE; 
+      } 
+      */
+      intvec* arg1 = (intvec*) h->Data();
+      intvec* arg2 = (intvec*) h->next->Data();
+      intvec* arg3 = (intvec*) h->next->next->Data();
+      /*  
+      poly result = (poly) M3ivSame(arg1, arg2, arg3);
+
+      res->rtyp = POLY_CMD;
+      res->data =  (poly) result;
+      */
+      res->rtyp = INT_CMD;res->data = (void*) M3ivSame(arg1, arg2, arg3);
+      return FALSE;
+    }
+  else
+      if(strcmp(sys_cmd, "MwalkInitialForm") == 0)
+      {
+        if(h == NULL || h->Typ() != IDEAL_CMD ||
+           h->next == NULL || h->next->Typ() != INTVEC_CMD)
+        {
+          Werror("system(\"MwalkInitialForm\", ideal, intvec) expected");
+          return TRUE;
+        }
+        if(((intvec*) h->next->Data())->length() != currRing->N)
+        {
+          Werror("system \"MwalkInitialForm\"...) intvec not of length %d\n",
+                 currRing->N);
+          return TRUE;
+        }
+        ideal id      = (ideal) h->Data();
+        intvec* int_w = (intvec*) h->next->Data();
+        ideal result  = (ideal) MwalkInitialForm(id, int_w);
+
+        res->rtyp = IDEAL_CMD;
+        res->data = result;
+        return FALSE;
+      }
+  else
+    /************** Perturbation walk **********/
+     if(strcmp(sys_cmd, "MivMatrixOrder") == 0)
+      {         
+        if(h==NULL || h->Typ() != INTVEC_CMD)
+        {
+          Werror("system(\"MivMatrixOrder\",intvec) expected");
+          return TRUE;
+        }
+        intvec* arg1 = (intvec*) h->Data();
+
+        intvec* result = MivMatrixOrder(arg1);
+
+        res->rtyp = INTVEC_CMD;
+        res->data =  result;
+        return FALSE;
+      }
+    else
+     if(strcmp(sys_cmd, "MivMatrixOrderdp") == 0)
+      {         
+        if(h==NULL || h->Typ() != INT_CMD)
+        {
+          Werror("system(\"MivMatrixOrderdp\",intvec) expected");
+          return TRUE;
+        }
+        int arg1 = (int) h->Data();
+        
+        intvec* result = (intvec*) MivMatrixOrderdp(arg1);
+
+        res->rtyp = INTVEC_CMD;
+        res->data =  result;
+        return FALSE;
+      }
+    else
+    if(strcmp(sys_cmd, "MPertVectors") == 0)
+      {
+        
+        if(h==NULL || h->Typ() != IDEAL_CMD ||
+           h->next == NULL || h->next->Typ() != INTVEC_CMD ||
+           h->next->next == NULL || h->next->next->Typ() != INT_CMD)
+        {
+          Werror("system(\"MPertVectors\",ideal, intvec, int) expected");
+          return TRUE;
+        }
+        
+        ideal arg1 = (ideal) h->Data();
+        intvec* arg2 = (intvec*) h->next->Data();
+        int arg3 = (int) h->next->next->Data();
+               
+        intvec* result = (intvec*) MPertVectors(arg1, arg2, arg3);
+
+        res->rtyp = INTVEC_CMD;
+        res->data =  result;
+        return FALSE;
+      }
+    else
+    if(strcmp(sys_cmd, "MPertVectorslp") == 0)
+      {
+        
+        if(h==NULL || h->Typ() != IDEAL_CMD ||
+           h->next == NULL || h->next->Typ() != INTVEC_CMD ||
+           h->next->next == NULL || h->next->next->Typ() != INT_CMD)
+        {
+          Werror("system(\"MPertVectorslp\",ideal, intvec, int) expected");
+          return TRUE;
+        }
+        
+        ideal arg1 = (ideal) h->Data();
+        intvec* arg2 = (intvec*) h->next->Data();
+        int arg3 = (int) h->next->next->Data();
+               
+        intvec* result = (intvec*) MPertVectorslp(arg1, arg2, arg3);
+
+        res->rtyp = INTVEC_CMD;
+        res->data =  result;
+        return FALSE;
+      }
+        /************** fractal walk **********/
+    else
+      if(strcmp(sys_cmd, "Mfpertvector") == 0)
+      {
+        if(h==NULL || h->Typ() != IDEAL_CMD ||
+          h->next==NULL || h->next->Typ() != INTVEC_CMD  )
+        {
+          Werror("system(\"Mfpertvector\", ideal,intvec) expected");
+          return TRUE;
+        }
+        ideal arg1 = (ideal) h->Data();
+        intvec* arg2 = (intvec*) h->next->Data(); 
+        intvec* result = Mfpertvector(arg1, arg2);
+ 
+        res->rtyp = INTVEC_CMD;
+        res->data =  result;
+        return FALSE;
+      }
+    else
+     if(strcmp(sys_cmd, "MivUnit") == 0)
+      {         
+        int arg1 = (int) h->Data();
+        
+        intvec* result = (intvec*) MivUnit(arg1);
+
+        res->rtyp = INTVEC_CMD;
+        res->data =  result;
+        return FALSE;
+      } 
+     else
+       if(strcmp(sys_cmd, "MivWeightOrderlp") == 0)
+       {
+        if(h==NULL || h->Typ() != INTVEC_CMD)
+        {
+          Werror("system(\"MivWeightOrderlp\",intvec) expected");
+          return TRUE;
+        }
+        intvec* arg1 = (intvec*) h->Data();
+        intvec* result = MivWeightOrderlp(arg1);
+ 
+        res->rtyp = INTVEC_CMD;
+        res->data =  result;
+        return FALSE;
+      }
+     else
+    if(strcmp(sys_cmd, "MivWeightOrderdp") == 0)
+      {
+        if(h==NULL || h->Typ() != INTVEC_CMD)
+        {
+          Werror("system(\"MivWeightOrderdp\",intvec) expected");
+          return TRUE;
+        }
+        intvec* arg1 = (intvec*) h->Data();
+        //int arg2 = (int) h->next->Data();
+ 
+        intvec* result = MivWeightOrderdp(arg1);
+ 
+        res->rtyp = INTVEC_CMD;
+        res->data =  result;
+        return FALSE;
+      }
+    else             
+     if(strcmp(sys_cmd, "MivMatrixOrderlp") == 0)
+      {         
+        if(h==NULL || h->Typ() != INT_CMD)
+        {
+          Werror("system(\"MivMatrixOrderlp\",int) expected");
+          return TRUE;
+        }
+        int arg1 = (int) h->Data();
+        
+        intvec* result = (intvec*) MivMatrixOrderlp(arg1);
+
+        res->rtyp = INTVEC_CMD;
+        res->data =  result;
+        return FALSE;
+      }
+    else
+    if (strcmp(sys_cmd, "MkInterRedNextWeight") == 0)
+    {
+      if (h == NULL || h->Typ() != INTVEC_CMD ||
+          h->next == NULL || h->next->Typ() != INTVEC_CMD ||
+          h->next->next == NULL || h->next->next->Typ() != IDEAL_CMD)
+      {
+        Werror("system(\"MkInterRedNextWeight\", intvec, intvec, ideal) expected");
+        return TRUE;
+      }
+
+      if (((intvec*) h->Data())->length() != currRing->N ||
+          ((intvec*) h->next->Data())->length() != currRing->N)
+      {
+        Werror("system(\"MkInterRedNextWeight\" ...) intvecs not of length %d\n",
+               currRing->N);
+        return TRUE;
+      }
+      intvec* arg1 = (intvec*) h->Data();
+      intvec* arg2 = (intvec*) h->next->Data();
+      ideal arg3   =   (ideal) h->next->next->Data();
+
+      intvec* result = (intvec*) MkInterRedNextWeight(arg1, arg2, arg3);
+
+      res->rtyp = INTVEC_CMD;
+      res->data =  result;
+      
+      return FALSE;
+    }
+    else
+#ifdef MPertNextWeight
+    if (strcmp(sys_cmd, "MPertNextWeight") == 0)
+    {
+      if (h == NULL || h->Typ() != INTVEC_CMD ||
+          h->next == NULL || h->next->Typ() != IDEAL_CMD ||
+          h->next->next == NULL || h->next->next->Typ() != INT_CMD)
+      {
+        Werror("system(\"MPertNextWeight\", intvec, ideal, int) expected");
+        return TRUE;
+      }
+
+      if (((intvec*) h->Data())->length() != currRing->N)
+      {
+        Werror("system(\"MPertNextWeight\" ...) intvecs not of length %d\n",
+               currRing->N);
+        return TRUE;
+      }
+      intvec* arg1 = (intvec*) h->Data();
+      ideal arg2 = (ideal) h->next->Data();
+      int arg3   =   (int) h->next->next->Data();
+
+      intvec* result = (intvec*) MPertNextWeight(arg1, arg2, arg3);
+
+      res->rtyp = INTVEC_CMD;
+      res->data =  result;
+      
+      return FALSE;
+    }
+    else
+#endif //MPertNextWeight
+#ifdef Mivperttarget
+  if (strcmp(sys_cmd, "Mivperttarget") == 0)
+    {
+      if (h == NULL || h->Typ() != IDEAL_CMD ||
+          h->next == NULL || h->next->Typ() != INT_CMD )
+      {
+        Werror("system(\"Mivperttarget\", ideal, int) expected");
+        return TRUE;
+      }
+
+      ideal arg1 = (ideal) h->Data();
+      int arg2 = (int) h->next->Data();
+
+      intvec* result = (intvec*) Mivperttarget(arg1, arg2);
+
+      res->rtyp = INTVEC_CMD;
+      res->data =  result;
+      
+      return FALSE;
+    }
+    else
+#endif //Mivperttarget
+    if (strcmp(sys_cmd, "Mwalk") == 0)
+    {
+      if (h == NULL || h->Typ() != IDEAL_CMD ||
+          h->next == NULL || h->next->Typ() != INTVEC_CMD ||
+          h->next->next == NULL || h->next->next->Typ() != INTVEC_CMD)
+      {
+        Werror("system(\"Mwalk\", ideal, intvec, intvec) expected");
+        return TRUE;
+      }
+
+      if (((intvec*) h->next->Data())->length() != currRing->N &&
+	  ((intvec*) h->next->next->Data())->length() != currRing->N )
+      {
+        Werror("system(\"Mwalk\" ...) intvecs not of length %d\n",
+               currRing->N);
+        return TRUE;
+      }
+      ideal arg1 = (ideal) h->Data();
+      intvec* arg2 = (intvec*) h->next->Data();
+      intvec* arg3   =  (intvec*) h->next->next->Data();
+
+
+      ideal result = (ideal) Mwalk(arg1, arg2, arg3);
+
+      res->rtyp = IDEAL_CMD;
+      res->data =  result;
+      
+      return FALSE;
+    }
+    else
+#ifdef MPWALK_ORIG
+    if (strcmp(sys_cmd, "Mpwalk") == 0)
+    {
+      if (h == NULL || h->Typ() != IDEAL_CMD ||
+          h->next == NULL || h->next->Typ() != INT_CMD ||
+          h->next->next == NULL || h->next->next->Typ() != INT_CMD ||
+          h->next->next->next == NULL || 
+	    h->next->next->next->Typ() != INTVEC_CMD ||
+          h->next->next->next->next == NULL || 
+	    h->next->next->next->next->Typ() != INTVEC_CMD)
+      {
+        Werror("system(\"Mpwalk\", ideal, int, int, intvec, intvec) expected");
+        return TRUE;
+      }
+
+      if (((intvec*) h->next->next->next->Data())->length() != currRing->N &&
+	  ((intvec*) h->next->next->next->next->Data())->length()!=currRing->N)
+      {
+        Werror("system(\"Mpwalk\" ...) intvecs not of length %d\n",
+               currRing->N);
+        return TRUE;
+      }
+      ideal arg1 = (ideal) h->Data();
+      int arg2 = (int) h->next->Data();
+      int arg3 = (int) h->next->next->Data();
+      intvec* arg4 = (intvec*) h->next->next->next->Data();
+      intvec* arg5   =  (intvec*) h->next->next->next->next->Data();
+
+
+      ideal result = (ideal) Mpwalk(arg1, arg2, arg3, arg4, arg5);
+
+      res->rtyp = IDEAL_CMD;
+      res->data =  result;
+      
+      return FALSE;
+    }
+    else
+#endif
+    if (strcmp(sys_cmd, "Mpwalk") == 0)
+    {
+      if (h == NULL || h->Typ() != IDEAL_CMD ||
+          h->next == NULL || h->next->Typ() != INT_CMD ||
+          h->next->next == NULL || h->next->next->Typ() != INT_CMD ||
+          h->next->next->next == NULL || 
+	    h->next->next->next->Typ() != INTVEC_CMD ||
+          h->next->next->next->next == NULL || 
+	    h->next->next->next->next->Typ() != INTVEC_CMD||
+          h->next->next->next->next->next == NULL || 
+	    h->next->next->next->next->next->Typ() != INT_CMD)
+      {
+        Werror("system(\"Mpwalk\", ideal, int, int, intvec, intvec, int) expected");
+        return TRUE;
+      }
+
+      if (((intvec*) h->next->next->next->Data())->length() != currRing->N &&
+	  ((intvec*) h->next->next->next->next->Data())->length()!=currRing->N)
+      {
+        Werror("system(\"Mpwalk\" ...) intvecs not of length %d\n",
+               currRing->N);
+        return TRUE;
+      }
+      ideal arg1 = (ideal) h->Data();
+      int arg2 = (int) h->next->Data();
+      int arg3 = (int) h->next->next->Data();
+      intvec* arg4 = (intvec*) h->next->next->next->Data();
+      intvec* arg5   =  (intvec*) h->next->next->next->next->Data();
+      int arg6   =  (int) h->next->next->next->next->next->Data();
+
+
+      ideal result = (ideal) Mpwalk(arg1, arg2, arg3, arg4, arg5, arg6);
+
+      res->rtyp = IDEAL_CMD;
+      res->data =  result;
+      
+      return FALSE;
+    }
+    else
+    if (strcmp(sys_cmd, "MAltwalk1") == 0)
+    {
+      if (h == NULL || h->Typ() != IDEAL_CMD ||
+          h->next == NULL || h->next->Typ() != INT_CMD ||
+          h->next->next == NULL || h->next->next->Typ() != INT_CMD ||
+          h->next->next->next == NULL || 
+	    h->next->next->next->Typ() != INTVEC_CMD ||
+          h->next->next->next->next == NULL || 
+	    h->next->next->next->next->Typ() != INTVEC_CMD)
+      {
+        Werror("system(\"MAltwalk1\", ideal, int, int, intvec, intvec) expected");
+        return TRUE;
+      }
+
+      if (((intvec*) h->next->next->next->Data())->length() != currRing->N &&
+	  ((intvec*) h->next->next->next->next->Data())->length()!=currRing->N)
+      {
+        Werror("system(\"MAltwalk1\" ...) intvecs not of length %d\n",
+               currRing->N);
+        return TRUE;
+      }
+      ideal arg1 = (ideal) h->Data();
+      int arg2 = (int) h->next->Data();
+      int arg3 = (int) h->next->next->Data();
+      intvec* arg4 = (intvec*) h->next->next->next->Data();
+      intvec* arg5   =  (intvec*) h->next->next->next->next->Data();
+
+
+      ideal result = (ideal) MAltwalk1(arg1, arg2, arg3, arg4, arg5);
+
+      res->rtyp = IDEAL_CMD;
+      res->data =  result;
+      
+      return FALSE;
+    }
+#ifdef MFWALK_ALT
+    else
+    if (strcmp(sys_cmd, "Mfwalk_alt") == 0)
+    {
+      if (h == NULL || h->Typ() != IDEAL_CMD ||
+          h->next == NULL || h->next->Typ() != INTVEC_CMD ||
+          h->next->next == NULL || h->next->next->Typ() != INTVEC_CMD ||
+          h->next->next->next == NULL || h->next->next->next->Typ() !=INT_CMD)
+      {
+        Werror("system(\"Mfwalk\", ideal, intvec, intvec,int) expected");
+        return TRUE;
+      }
+
+      if (((intvec*) h->next->Data())->length() != currRing->N &&
+	  ((intvec*) h->next->next->Data())->length() != currRing->N )
+      {
+        Werror("system(\"Mfwalk\" ...) intvecs not of length %d\n",
+               currRing->N);
+        return TRUE;
+      }
+      ideal arg1 = (ideal) h->Data();
+      intvec* arg2 = (intvec*) h->next->Data();
+      intvec* arg3   =  (intvec*) h->next->next->Data();
+      int arg4 = (int) h->next->next->next->Data();
+
+      ideal result = (ideal) Mfwalk_alt(arg1, arg2, arg3, arg4);
+
+      res->rtyp = IDEAL_CMD;
+      res->data =  result;
+      
+      return FALSE;
+    }
+#endif
+    else
+    if (strcmp(sys_cmd, "Mfwalk") == 0)
+    {
+      if (h == NULL || h->Typ() != IDEAL_CMD ||
+          h->next == NULL || h->next->Typ() != INTVEC_CMD ||
+          h->next->next == NULL || h->next->next->Typ() != INTVEC_CMD)
+      {
+        Werror("system(\"Mfwalk\", ideal, intvec, intvec) expected");
+        return TRUE;
+      }
+
+      if (((intvec*) h->next->Data())->length() != currRing->N &&
+	  ((intvec*) h->next->next->Data())->length() != currRing->N )
+      {
+        Werror("system(\"Mfwalk\" ...) intvecs not of length %d\n",
+               currRing->N);
+        return TRUE;
+      }
+      ideal arg1 = (ideal) h->Data();
+      intvec* arg2 = (intvec*) h->next->Data();
+      intvec* arg3   =  (intvec*) h->next->next->Data();
+
+      ideal result = (ideal) Mfwalk(arg1, arg2, arg3);
+
+      res->rtyp = IDEAL_CMD;
+      res->data =  result;
+      
+      return FALSE;
+    }
+    else
+ 
+#ifdef TRAN_Orig
+    if (strcmp(sys_cmd, "TranMImprovwalk") == 0)
+    {
+      if (h == NULL || h->Typ() != IDEAL_CMD ||
+          h->next == NULL || h->next->Typ() != INTVEC_CMD ||
+          h->next->next == NULL || h->next->next->Typ() != INTVEC_CMD)
+      {
+        Werror("system(\"TranMImprovwalk\", ideal, intvec, intvec) expected");
+        return TRUE;
+      }
+
+      if (((intvec*) h->next->Data())->length() != currRing->N &&
+	  ((intvec*) h->next->next->Data())->length() != currRing->N )
+      {
+        Werror("system(\"TranMImprovwalk\" ...) intvecs not of length %d\n",
+               currRing->N);
+        return TRUE;
+      }
+      ideal arg1 = (ideal) h->Data();
+      intvec* arg2 = (intvec*) h->next->Data();
+      intvec* arg3   =  (intvec*) h->next->next->Data();
+
+
+      ideal result = (ideal) TranMImprovwalk(arg1, arg2, arg3);
+
+      res->rtyp = IDEAL_CMD;
+      res->data =  result;
+      
+      return FALSE;
+    }
+    else
+#endif
+    if (strcmp(sys_cmd, "MAltwalk2") == 0)
+      {
+      if (h == NULL || h->Typ() != IDEAL_CMD ||
+          h->next == NULL || h->next->Typ() != INTVEC_CMD ||
+          h->next->next == NULL || h->next->next->Typ() != INTVEC_CMD)
+      {
+        Werror("system(\"MAltwalk2\", ideal, intvec, intvec) expected");
+        return TRUE;
+      }
+
+      if (((intvec*) h->next->Data())->length() != currRing->N &&
+	  ((intvec*) h->next->next->Data())->length() != currRing->N )
+      {
+        Werror("system(\"MAltwalk2\" ...) intvecs not of length %d\n",
+               currRing->N);
+        return TRUE;
+      }
+      ideal arg1 = (ideal) h->Data();
+      intvec* arg2 = (intvec*) h->next->Data();
+      intvec* arg3   =  (intvec*) h->next->next->Data();
+
+
+      ideal result = (ideal) MAltwalk2(arg1, arg2, arg3);
+
+      res->rtyp = IDEAL_CMD;
+      res->data =  result;
+      
+      return FALSE;
+    }
+    else
+    if (strcmp(sys_cmd, "TranMImprovwalk") == 0)
+    {
+      if (h == NULL || h->Typ() != IDEAL_CMD ||
+          h->next == NULL || h->next->Typ() != INTVEC_CMD ||
+          h->next->next == NULL || h->next->next->Typ() != INTVEC_CMD||
+          h->next->next->next == NULL || h->next->next->next->Typ() != INT_CMD)
+      {
+        Werror("system(\"TranMImprovwalk\", ideal, intvec, intvec, int) expected");
+        return TRUE;
+      }
+
+      if (((intvec*) h->next->Data())->length() != currRing->N &&
+	  ((intvec*) h->next->next->Data())->length() != currRing->N )
+      {
+        Werror("system(\"TranMImprovwalk\" ...) intvecs not of length %d\n",
+               currRing->N);
+        return TRUE;
+      }
+      ideal arg1 = (ideal) h->Data();
+      intvec* arg2 = (intvec*) h->next->Data();
+      intvec* arg3   =  (intvec*) h->next->next->Data();
+      int arg4   =  (int) h->next->next->next->Data();
+
+      ideal result = (ideal) TranMImprovwalk(arg1, arg2, arg3, arg4);
+
+      res->rtyp = IDEAL_CMD;
+      res->data =  result;
+      
+      return FALSE;
+    }
+    else
+#endif
 /*================= Extended system call ========================*/
    {
      #ifndef MAKE_DISTRIBUTION
@@ -1623,52 +2428,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       return FALSE;
     }
     else
-#ifdef HAVE_WALK
-/*==================== walk stuff =================*/
-    if (strcmp(sys_cmd, "walkNextWeight") == 0)
-    {
-      if (h == NULL || h->Typ() != INTVEC_CMD ||
-          h->next == NULL || h->next->Typ() != INTVEC_CMD ||
-          h->next->next == NULL || h->next->next->Typ() != IDEAL_CMD)
-      {
-        Werror("system(\"walkNextWeight\", intvec, intvec, ideal) expected");
-        return TRUE;
-      }
-
-      if (((intvec*) h->Data())->length() != currRing->N ||
-          ((intvec*) h->next->Data())->length() != currRing->N)
-      {
-        Werror("system(\"walkNextWeight\" ...) intvecs not of length %d\n",
-               currRing->N);
-        return TRUE;
-      }
-      res->data = (void*) walkNextWeight(((intvec*) h->Data()),
-                                         ((intvec*) h->next->Data()),
-                                         (ideal) h->next->next->Data());
-      if (res->data == (void*) 0 || res->data == (void*) 1)
-      {
-        res->rtyp = INT_CMD;
-      }
-      else
-      {
-        res->rtyp = INTVEC_CMD;
-      }
-      return FALSE;
-    }
-    else if (strcmp(sys_cmd, "walkInitials") == 0)
-    {
-      if (h == NULL || h->Typ() != IDEAL_CMD)
-      {
-        WerrorS("system(\"walkInitials\", ideal) expected");
-        return TRUE;
-      }
-
-      res->data = (void*) walkInitials((ideal) h->Data());
-      res->rtyp = IDEAL_CMD;
-      return FALSE;
-    }
-    else
-#endif
 #ifdef ix86_Win
 #ifdef HAVE_DL
 /*==================== DLL =================*/

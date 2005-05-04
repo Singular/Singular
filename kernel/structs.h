@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.6 2005-03-14 16:17:19 Singular Exp $ */
+/* $Id: structs.h,v 1.7 2005-05-04 14:08:55 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -32,6 +32,15 @@ typedef void * Sy_reference;
 /* #define HAVE_DIV_MOD*/
 #endif
 #endif
+
+#if SIZEOF_LONG == 4
+typedef long long int64;
+#elif SIZEOF_LONG == 8
+typedef long int64;
+#else
+#error int64 undefined 
+#endif
+
 
 typedef long Exponent_t;
 typedef long Order_t;
@@ -284,6 +293,7 @@ typedef enum
 {
   ro_dp, // ordering is a degree ordering
   ro_wp, // ordering is a weighted degree ordering
+  ro_wp64, // ordering is a weighted64 degree ordering
   ro_wp_neg, // ordering is a weighted degree ordering
              // with possibly negative weights
   ro_cp,    // ordering duplicates variables
@@ -311,6 +321,16 @@ struct sro_wp
   int *weights; // pointers into wvhdl field
 };
 typedef struct sro_wp sro_wp;
+
+// ordering is a weighted degree ordering
+struct sro_wp64
+{
+    short place;  // where weighted degree is stored (in L)
+    short start;  // bounds of ordering (in E)
+    short end;
+    int64 *weights64; // pointers into wvhdl field
+};
+typedef struct sro_wp64 sro_wp64;
 
 // ordering duplicates variables
 struct sro_cp
@@ -356,6 +376,7 @@ struct sro_ord
   {
      sro_dp dp;
      sro_wp wp;
+     sro_wp64 wp64;
      sro_cp cp;
      sro_syzcomp syzcomp;
      sro_syz syz;

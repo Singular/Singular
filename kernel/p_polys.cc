@@ -6,14 +6,18 @@
  *  Purpose: implementation of currRing independent poly procedures
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_polys.cc,v 1.2 2005-04-20 17:25:51 Singular Exp $
+ *  Version: $Id: p_polys.cc,v 1.3 2005-05-04 14:08:55 Singular Exp $
  *******************************************************************/
 
 #include "mod2.h"
 #include "structs.h"
+#include "structs.h"
 #include "p_polys.h"
 #include "ring.h"
+#include "int64vec.h"
+#ifndef NDEBUG
 #include "febase.h"
+#endif
 
 /***************************************************************
  *
@@ -24,6 +28,8 @@
 static int* _Components = NULL;
 static long* _ShiftedComponents = NULL;
 static int _ExternalComponents = 0;
+
+BOOLEAN pSetm_error=0;
 
 void p_Setm_General(poly p, ring r)
 {
@@ -55,8 +61,63 @@ void p_Setm_General(poly p, ring r)
           a=o->data.wp.start;
           e=o->data.wp.end;
           int *w=o->data.wp.weights;
+#if 1
           for(int i=a;i<=e;i++) ord+=p_GetExp(p,i,r)*w[i-a];
+#else
+          long ai;
+          int ei,wi;
+          for(int i=a;i<=e;i++)
+          {
+             ei=p_GetExp(p,i,r);
+             wi=w[i-a];
+             ai=ei*wi;
+             if (ai/ei!=wi) pSetm_error=TRUE;
+             ord+=ai;
+             if (ord<ai) pSetm_error=TRUE;
+          }
+#endif  
           p->exp[o->data.wp.place]=ord;
+          break;
+        }
+      case ro_wp64:
+        {
+	  int64 ord=0;
+          int a,e;
+          a=o->data.wp64.start;
+          e=o->data.wp64.end;
+          int64 *w=o->data.wp64.weights64;
+          int64 ei,wi,ai;
+          for(int i=a;i<=e;i++) {
+            //Print("exp %d w %d \n",p_GetExp(p,i,r),(int)w[i-a]);
+            //ord+=((int64)p_GetExp(p,i,r))*w[i-a];
+            ei=(int64)p_GetExp(p,i,r);
+            wi=w[i-a];
+            ai=ei*wi;
+	    if(ei!=0 && ai/ei!=wi){ 
+              pSetm_error=TRUE;
+              Print("ai %lld, wi %lld\n",ai,wi);
+            }
+            ord+=ai;
+            if (ord<ai){
+               pSetm_error=TRUE;
+               Print("ai %lld, ord %lld\n",ai,ord);
+            }
+          }
+          int64 mask=(int64)0x7fffffff;
+          long a_0=(long)(ord&mask); //2^31
+          long a_1=(long)(ord >>31 ); /*(ord/(mask+1));*/
+
+	  //Print("mask: %x,  ord: %d,  a_0: %d,  a_1: %d\n"
+	  //,(int)mask,(int)ord,(int)a_0,(int)a_1);
+		    //Print("mask: %d",mask);
+
+          p->exp[o->data.wp64.place]=a_1;
+	  p->exp[o->data.wp64.place+1]=a_0;
+//            if(p_Setm_error) Print("***************************\n
+//                                    ***************************\n
+//                                    **WARNING: overflow error**\n
+//                                    ***************************\n
+//                                    ***************************\n");
           break;
         }
         case ro_cp:
@@ -72,9 +133,9 @@ void p_Setm_General(poly p, ring r)
         {
           int c=p_GetComp(p,r);
           long sc = c;
-          int* Components = (_ExternalComponents ? _Components :
+          int* Components = (_ExternalComponents ? _Components : 
                              o->data.syzcomp.Components);
-          long* ShiftedComponents = (_ExternalComponents ? _ShiftedComponents:
+          long* ShiftedComponents = (_ExternalComponents ? _ShiftedComponents: 
                                      o->data.syzcomp.ShiftedComponents);
           if (ShiftedComponents != NULL)
           {
@@ -141,17 +202,17 @@ void p_Setm_WFirstTotalDegree(poly p, ring r)
 
 p_SetmProc p_GetSetmProc(ring r)
 {
-  // covers lp, rp, ls,
+  // covers lp, rp, ls, 
   if (r->typ == NULL) return p_Setm_Dummy;
 
   if (r->OrdSize == 1)
   {
-    if (r->typ[0].ord_typ == ro_dp &&
+    if (r->typ[0].ord_typ == ro_dp && 
         r->typ[0].data.dp.start == 1 &&
         r->typ[0].data.dp.end == r->N &&
         r->typ[0].data.dp.place == r->pOrdIndex)
       return p_Setm_TotalDegree;
-    if (r->typ[0].ord_typ == ro_wp &&
+    if (r->typ[0].ord_typ == ro_wp && 
         r->typ[0].data.wp.start == 1 &&
         r->typ[0].data.wp.end == r->N &&
         r->typ[0].data.wp.place == r->pOrdIndex &&
@@ -168,14 +229,14 @@ p_SetmProc p_GetSetmProc(ring r)
 * compute the degree of the leading monomial of p
 * the ordering is compatible with degree, use a->order
 */
-inline long _pDeg(poly a, const ring r)
+inline long _pDeg(poly a, ring r)
 {
   p_LmCheckPolyRing(a, r);
   assume(p_GetOrder(a, r) == pWTotaldegree(a, r));
   return p_GetOrder(a, r);
 }
 
-long pDeg(poly a, const ring r)
+long pDeg(poly a, ring r)
 {
   return _pDeg(a, r);
 }
@@ -196,13 +257,13 @@ long pTotaldegree(poly p, ring r)
   return (long) _pTotaldegree(p, r);
 }
 
-// pWTotalDegree for weighted orderings
+// pWTotalDegree for weighted orderings 
 // whose first block covers all variables
 inline long _pWFirstTotalDegree(poly p, ring r)
 {
   int i;
   long sum = 0;
-
+  
   for (i=1; i<= r->firstBlockEnds; i++)
   {
     sum += p_GetExp(p, i, r)*r->firstwv[i-1];
@@ -253,6 +314,17 @@ long pWTotaldegree(poly p, ring r)
           j+= p_GetExp(p,k,r);
         }
         break;
+      case ringorder_a64:
+        {
+          int64* w=(int64*)r->wvhdl[i];
+          for (k=0;k<=(r->block1[i] - r->block0[i]);k++)
+          { 
+            //there should be added a line which checks if w[k]>2^31
+            j+= p_GetExp(p,k+1, r)*(long)w[k];
+          }
+          //break;
+          return j;
+        }
       case ringorder_c:
       case ringorder_C:
       case ringorder_S:
@@ -264,7 +336,9 @@ long pWTotaldegree(poly p, ring r)
         { // only one line
           j+= p_GetExp(p,k, r)*r->wvhdl[i][ k- r->block0[i]];
         }
+        //break;
         return j;
+
 #ifndef NDEBUG
       default:
         Print("missing order %d in pWTotaldegree\n",r->order[i]);
@@ -352,7 +426,7 @@ long pLDeg0c(poly p,int *l, ring r)
 
   if (! rIsSyzIndexRing(r))
   {
-    while (pNext(p) != NULL)
+    while (pNext(p) != NULL) 
     {
       pIter(p);
       ll++;
@@ -680,8 +754,8 @@ long pLDeg1c_WFirstTotalDegree(poly p,int *l, ring r)
  *
  ***************************************************************/
 
-static inline unsigned long
-p_GetMaxExpL2(unsigned long l1, unsigned long l2, ring r,
+static inline unsigned long 
+p_GetMaxExpL2(unsigned long l1, unsigned long l2, ring r, 
               unsigned long number_of_exp)
 {
   const unsigned long bitmask = r->bitmask;
@@ -722,14 +796,14 @@ poly p_GetMaxExpP(poly p, ring r)
   int i, offset;
   unsigned long l_p, l_max;
   unsigned long divmask = r->divmask;
-
+  
   do
   {
     offset = r->VarL_Offset[0];
     l_p = p->exp[offset];
     l_max = max->exp[offset];
     // do the divisibility trick to find out whether l has an exponent
-    if (l_p > l_max ||
+    if (l_p > l_max || 
         (((l_max & divmask) ^ (l_p & divmask)) != ((l_max-l_p) & divmask)))
       max->exp[offset] = p_GetMaxExpL2(l_max, l_p, r);
 
@@ -739,7 +813,7 @@ poly p_GetMaxExpP(poly p, ring r)
       l_p = p->exp[offset];
       l_max = max->exp[offset];
       // do the divisibility trick to find out whether l has an exponent
-      if (l_p > l_max ||
+      if (l_p > l_max || 
           (((l_max & divmask) ^ (l_p & divmask)) != ((l_max-l_p) & divmask)))
         max->exp[offset] = p_GetMaxExpL2(l_max, l_p, r);
     }
@@ -753,7 +827,7 @@ unsigned long p_GetMaxExpL(poly p, ring r, unsigned long l_max)
 {
   unsigned long l_p, divmask = r->divmask;
   int i;
-
+  
   while (p != NULL)
   {
     l_p = p->exp[r->VarL_Offset[0]];
@@ -764,7 +838,7 @@ unsigned long p_GetMaxExpL(poly p, ring r, unsigned long l_max)
     {
       l_p = p->exp[r->VarL_Offset[i]];
       // do the divisibility trick to find out whether l has an exponent
-      if (l_p > l_max ||
+      if (l_p > l_max || 
           (((l_max & divmask) ^ (l_p & divmask)) != ((l_max-l_p) & divmask)))
         l_max = p_GetMaxExpL2(l_max, l_p, r);
     }
@@ -773,6 +847,9 @@ unsigned long p_GetMaxExpL(poly p, ring r, unsigned long l_max)
   return l_max;
 }
 
+
+
+    
 /***************************************************************
  *
  * Misc things
@@ -845,18 +922,4 @@ poly p_NSet(number n, ring r)
     return rc;
   }
 }
-
-/***************************************************************
- *
- * p_ShallowDelete
- *
- ***************************************************************/
-#undef LINKAGE
-#define LINKAGE
-#undef p_Delete
-#define p_Delete p_ShallowDelete
-#undef n_Delete
-#define n_Delete(n, r) ((void)0)
-
-#include "p_Delete__T.cc"
 
