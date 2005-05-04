@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.241 2005-05-04 07:11:46 bricken Exp $
+@comment $Id: reference.doc,v 1.242 2005-05-04 13:36:23 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -1702,7 +1702,6 @@ resp.@: parameters.
 @item @strong{Example:}
 @smallexample
 @c example
-/*
   ring r=0,(x,y,z),dp;
   ideal i=y3+x2, x2y+x2, x3-x2, z4-x2-y;
   option(redSB);   // force the computation of a reduced SB
@@ -1711,7 +1710,6 @@ resp.@: parameters.
   ring s=0,(z,x,y),lp;
   ideal j=fglm(r,i);
   j;
-*/
 @c example
 @end smallexample
 @end table
