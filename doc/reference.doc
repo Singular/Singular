@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.240 2005-05-03 11:50:00 anne Exp $
+@comment $Id: reference.doc,v 1.241 2005-05-04 07:11:46 bricken Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -5589,8 +5589,8 @@ See
 @item @strong{Type:}
 ideal
 @item @strong{Purpose:}
-returns a groeber basis of an ideal or with respect to the
-monomial ordering of the basering, which has to be global
+returns a groeber basis of an ideal with respect to the
+monomial ordering of the basering, which has to be global.
 A groebner basis is a set of generators such that
 the leading terms generate the leading ideal.
 @item @strong{Note:}
@@ -5607,6 +5607,8 @@ The program only supports the option prot (which will give protocoll output).
 The Protocoll looks like that:
 M[n,m] means a parallel reduction of n elements with m non zero output elements.
 "b" notices an exchange trick described in the thesis and "e" adds reductor with non minimal leading term.
+
+For an example see @ref{slim Groebner bases}.
 @end table
 
 @c ref
