@@ -6,7 +6,7 @@
 /*
 * ABSTRACT: tokens, types for interpreter; general macros
 */
-/* $Id: tok.h,v 1.61 2005-04-29 13:23:02 Singular Exp $ */
+/* $Id: tok.h,v 1.62 2005-05-05 10:42:00 Singular Exp $ */
 
 #ifndef MYYSTYPE
 #include "structs.h"
@@ -82,6 +82,7 @@ enum {
   FAC_CMD,
   FIND_CMD,
   FACSTD_CMD,
+  FWALK_CMD,
   FGLM_CMD,
   FGLMQUOT_CMD,
   FINDUNI_CMD,

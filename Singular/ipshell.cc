@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.107 2005-04-30 15:31:34 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.108 2005-05-05 10:41:59 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -4044,7 +4044,8 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
       R->bitmask=(*iv)[2];
       n--;
     }
-    else if ((*iv)[1]!=ringorder_a) o++;
+    else if (((*iv)[1]!=ringorder_a)
+    && ((*iv)[1]!=ringorder_a64)) o++;
     n++;
     sl=sl->next;
   }
@@ -4136,6 +4137,19 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
               if ((*iv)[i]<0) typ=-1;
             }
             break;
+          case ringorder_a64:
+          {
+            R->block0[n] = last+1;
+            R->block1[n] = min(last+iv->length()-2 , R->N);
+            R->wvhdl[n] = (int*)omAlloc((iv->length()-1)*sizeof(int64));
+            int64 *w=(int64 *)R->wvhdl[n];
+            for (i=2; i<iv->length(); i++)
+            {
+              w[i-2]=(*iv)[i];
+              if ((*iv)[i]<0) typ=-1;
+            }
+            break;
+          }
           case ringorder_M:
           {
             int Mtyp=rTypeOfMatrixOrder(iv);
@@ -4550,4 +4564,3 @@ idhdl rSimpleFindHdl(ring r, idhdl root, idhdl n=NULL)
   //return next_best;
   return NULL;
 }
-

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.352 2005-05-03 15:41:48 Singular Exp $ */
+/* $Id: iparith.cc,v 1.353 2005-05-05 10:41:58 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -47,6 +47,7 @@
 #include "janet.h"
 #include "GMPrat.h"
 #include "tgb.h"
+#include "walkProc.h"
 #ifdef HAVE_FACTORY
 #include "clapsing.h"
 #include "kstdfac.h"
@@ -210,6 +211,7 @@ cmdnames cmds[] =
   { "forif",       0, IF_CMD ,            IF_CMD},
   { "freemodule",  0, FREEMODULE_CMD ,    CMD_1},
   { "facstd",      0, FACSTD_CMD ,        CMD_12},
+  { "frwalk",      0, FWALK_CMD ,         CMD_23},
   { "gen",         0, E_CMD ,             CMD_1},
   { "getdump",     0, GETDUMP_CMD,        CMD_1},
   { "gcd",         0, GCD_CMD ,           CMD_2},
@@ -1851,6 +1853,12 @@ static BOOLEAN jjFIND2(leftv res, leftv u, leftv v)
   /*else res->data=NULL;*/
   return FALSE;
 }
+static BOOLEAN jjFWALK(leftv res, leftv u, leftv v)
+{
+  res->data=(char *)fractalWalkProc(u,v);
+  setFlag( res, FLAG_STD );
+  return FALSE;
+}
 static BOOLEAN jjGCD_I(leftv res, leftv u, leftv v)
 {
   int uu=(int)u->Data();int vv=(int)v->Data();
@@ -2720,6 +2728,8 @@ struct sValCmd2 dArith2[]=
 ,{jjWRONG2,    FGLMQUOT_CMD,   IDEAL_CMD,      POLY_CMD,   IDEAL_CMD NO_PLURAL}
 #endif
 ,{jjFIND2,     FIND_CMD,       INT_CMD,        STRING_CMD, STRING_CMD ALLOW_PLURAL}
+,{jjFWALK,     FWALK_CMD,      IDEAL_CMD,      RING_CMD,   DEF_CMD NO_PLURAL}
+
 ,{jjGCD_I,     GCD_CMD,        INT_CMD,        INT_CMD,    INT_CMD ALLOW_PLURAL}
 ,{jjGCD_N,     GCD_CMD,        NUMBER_CMD,     NUMBER_CMD, NUMBER_CMD ALLOW_PLURAL}
 #if defined(HAVE_FACTORY) && defined(HAVE_LIBFAC_P)
@@ -4626,6 +4636,15 @@ static BOOLEAN jjFIND3(leftv res, leftv u, leftv v, leftv w)
   }
   return FALSE;
 }
+static BOOLEAN jjFWALK3(leftv res, leftv u, leftv v, leftv w)
+{
+  if ((int)w->Data()==0)
+    res->data=(char *)walkProc(u,v);
+  else
+    res->data=(char *)fractalWalkProc(u,v);
+  setFlag( res, FLAG_STD );
+  return FALSE;
+}
 static BOOLEAN jjHILBERT3(leftv res, leftv u, leftv v, leftv w)
 {
   assumeStdFlag(u);
@@ -5075,6 +5094,7 @@ struct sValCmd3 dArith3[]=
 ,{jjCOEFFS3_KB,     COEFFS_CMD, MATRIX_CMD, MODUL_CMD,  MODUL_CMD,  POLY_CMD ALLOW_PLURAL}
 ,{jjELIMIN_HILB,    ELIMINATION_CMD,IDEAL_CMD, IDEAL_CMD, POLY_CMD, INTVEC_CMD NO_PLURAL}
 ,{jjFIND3,          FIND_CMD,   INT_CMD,    STRING_CMD, STRING_CMD, INT_CMD ALLOW_PLURAL}
+,{jjFWALK3,         FWALK_CMD,  IDEAL_CMD,  RING_CMD,   DEF_CMD,    INT_CMD NO_PLURAL}
 ,{jjHILBERT3,       HILBERT_CMD,INTVEC_CMD, IDEAL_CMD,  INT_CMD,    INTVEC_CMD NO_PLURAL}
 ,{jjHILBERT3,       HILBERT_CMD,INTVEC_CMD, MODUL_CMD,  INT_CMD,    INTVEC_CMD NO_PLURAL}
 ,{jjCALL3MANY,      IDEAL_CMD,  IDEAL_CMD,  DEF_CMD,    DEF_CMD,    DEF_CMD ALLOW_PLURAL}
