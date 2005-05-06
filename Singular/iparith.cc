@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.353 2005-05-05 10:41:58 Singular Exp $ */
+/* $Id: iparith.cc,v 1.354 2005-05-06 11:55:38 bricken Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -3616,7 +3616,10 @@ static BOOLEAN jjRPAR(leftv res, leftv v)
 static BOOLEAN jjSLIM_GB(leftv res, leftv u)
 {
   if (pOrdSgn!=1)
+  {
+    Werror("ordering must be global for slimgb");
     return TRUE;
+  }
   res->data=(char *)t_rep_gb(currRing, (ideal)u->Data());
   return FALSE;
 }
