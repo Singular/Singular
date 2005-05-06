@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.75 2005-05-06 14:59:08 Singular Exp $
+@comment $Id: examples.doc,v 1.76 2005-05-06 15:51:55 Singular Exp $
 @comment this file contains the examples
 
 @c The following directives are necessary for proper compilation
@@ -343,12 +343,12 @@ See also @ref{Dynamic modules}.
 @cindex local rings, computing in 
 
 In @sc{Singular} we may implement localizations of the polynomial ring
-by choosing an appropriate monomial ordering when defining the ring by
-the @code{ring} command. We refer to @ref{Monomial orderings} for a
-thorugh discussion of the monomial orderings available in
+by choosing an appropriate monomial ordering (when defining the ring by
+the @code{ring} command). We refer to @ref{Monomial orderings} for a
+thorough discussion of the monomial orderings available in
 @sc{Singular}. 
 
-At this point, we restrict ourselves in describing the relation between
+At this point, we restrict ourselves to describing the relation between
 a monomial ordering and the ring (as mathematical object) which is 
 implemented by the ordering. This is most easily done by describing the 
 set of units: if > is a monomial ordering then precisely those elements
@@ -362,7 +362,7 @@ closed set of polynomials with leading monomial 1.
 @tex
 That is, choosing > implements the ring
 $$
-  K[x]_> := \left\{{f}\over{u}\; \bigg|\; f, u \in K[x],
+  K[x]_> := \left\{{{f}\over{u}}\; \bigg|\; f, u \in K[x],
   \, LM(u) =
   1\right\}.
 $$
@@ -376,9 +376,9 @@ ordering, we obtain "something in between these two rings":
 
 @smallexample
 @c example
-ring R = 0,(x,y,z),lp;     // polynomial ring (global ordering)
+ring R = 0,(x,y,z),dp;     // polynomial ring (global ordering)
 poly f = y4z3+2x2y2z2+4z4+5y2+1;
-f;                         // display f in a lex-ordered way
+f;                         // display f in a degrevlex-ordered way
 short=0;                   // avoid short notation
 f;
 short=1;
@@ -418,6 +418,16 @@ leadmonom(1+x(1));       // unit
 
 @c example
 @end smallexample
+
+Note, that even if we implictly compute over the localization of 
+the polynomial ring, most computations are explicitly performed with 
+polynomial data only.
+In particular,  @code{1/(1-x);} does not return a power series
+expansion or a fraction but 0 (division with remainder in polynomial ring).
+
+See @ref{division} for division with remainder in the localization and
+@ref{invunit} for a procedure returning a truncated power series expansion
+of the inverse of a unit.
 
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
