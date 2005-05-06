@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.108 2005-05-05 10:41:59 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.109 2005-05-06 12:39:47 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1233,7 +1233,9 @@ BOOLEAN iiInternalExport (leftv v, int toLev, idhdl roothdl)
 BOOLEAN iiExport (leftv v, int toLev)
 {
 #ifdef HAVE_NS
+#ifndef NDEBUG
   checkall();
+#endif
 #endif
   BOOLEAN nok=FALSE;
   leftv r=v;
@@ -1256,7 +1258,9 @@ BOOLEAN iiExport (leftv v, int toLev)
   }
   r->CleanUp();
 #ifdef HAVE_NS
+#ifndef NDEBUG
   checkall();
+#endif
 #endif
   return nok;
 }
@@ -1265,7 +1269,9 @@ BOOLEAN iiExport (leftv v, int toLev)
 #ifdef HAVE_NS
 BOOLEAN iiExport (leftv v, int toLev, idhdl root)
 {
+#ifndef NDEBUG
   checkall();
+#endif
   //  Print("iiExport1: pack=%s\n",IDID(root));
   BOOLEAN nok=FALSE;
   leftv rv=v;
@@ -1306,7 +1312,9 @@ BOOLEAN iiExport (leftv v, int toLev, idhdl root)
     v=v->next;
   }
   rv->CleanUp();
+#ifndef NDEBUG
   checkall();
+#endif
   return nok;
 }
 #endif

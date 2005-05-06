@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gmssing.lib,v 1.6 2005-04-22 16:29:55 Singular Exp $";
+version="$Id: gmssing.lib,v 1.7 2005-05-06 12:39:49 Singular Exp $";
 category="Singularities";
 
 info="
@@ -121,7 +121,7 @@ ring G;  Gauss-Manin system of t with variable s
   int gmsmaxdeg;  maximal weight of variables
 @end format
 NOTE:     gmsbasis is a C[[s]]-basis of H'' and [t,s]=s^2
-KEYWORDS: singularities; Gauss-Manin system; Brieskorn lattice
+KEYWORDS: Gauss-Manin system; Brieskorn lattice
 EXAMPLE:  example gmsring; shows examples
 "
 {
@@ -220,7 +220,6 @@ RETURN:
   ideal nf[1];  projection of p to <gmsbasis>C{{s}} mod s^(K+1)
   ideal nf[2];  p==nf[1]+nf[2]
 NOTE:     computation can be continued by setting p=nf[2]
-KEYWORDS: singularities; Gauss-Manin system; Brieskorn lattice
 EXAMPLE:  example gmsnf; shows examples
 "
 {
@@ -300,7 +299,6 @@ list l;
   ideal l[2];  p==matrix(gmsbasis)*l[1]+l[2]
 @end format
 NOTE:     computation can be continued by setting p=l[2]
-KEYWORDS: singularities; Gauss-Manin system; Brieskorn lattice
 EXAMPLE:  example gmscoeffs; shows examples
 "
 {
@@ -581,8 +579,7 @@ ASSUME:   characteristic 0; local degree ordering;
           isolated critical point 0 of t
 RETURN:   ideal r;  roots of the Bernstein polynomial b excluding the root -1
 NOTE:     the roots of b are negative rational numbers and -1 is a root of b
-KEYWORDS: singularities; Gauss-Manin system; Brieskorn lattice;
-          Bernstein polynomial
+KEYWORDS: Bernstein polynomial
 EXAMPLE:  example bernstein; shows examples
 "
 {
@@ -639,7 +636,7 @@ list l;  Jordan data jordan(M) of monodromy matrix exp(-2*pi*i*M)
     int l[3][i];  multiplicity of i-th Jordan block of M
 @end format
 SEE ALSO: mondromy_lib, linalg_lib
-KEYWORDS: singularities; Gauss-Manin system; Brieskorn lattice; monodromy
+KEYWORDS: monodromy
 EXAMPLE:  example monodromy; shows examples
 "
 {
@@ -685,8 +682,7 @@ list sp;  singularity spectrum of t
     int sp[2][i];  multiplicity of i-th spectral number
 @end format
 SEE ALSO: spectrum_lib
-KEYWORDS: singularities; Gauss-Manin system; Brieskorn lattice;
-          mixed Hodge structure; V-filtration; spectrum
+KEYWORDS: mixed Hodge structure; V-filtration; spectrum
 EXAMPLE:  example spectrum; shows examples
 "
 {
@@ -716,8 +712,7 @@ list spp;  spectral pairs of t
     int spp[3][i];  multiplicity of i-th spectral pair
 @end format
 SEE ALSO: spectrum_lib
-KEYWORDS: singularities; Gauss-Manin system; Brieskorn lattice;
-          mixed Hodge structure; V-filtration; weight filtration;
+KEYWORDS: mixed Hodge structure; V-filtration; weight filtration;
           spectrum; spectral pairs
 EXAMPLE:  example sppairs; shows examples
 "
@@ -750,8 +745,7 @@ list v;  V-filtration on H''/s*H''
   ideal v[5];  standard basis of Jacobian ideal
 @end format
 SEE ALSO: spectrum_lib
-KEYWORDS: singularities; Gauss-Manin system; Brieskorn lattice;
-          mixed Hodge structure; V-filtration; spectrum
+KEYWORDS: mixed Hodge structure; V-filtration; spectrum
 EXAMPLE:  example vfilt; shows examples
 "
 {
@@ -785,8 +779,7 @@ list vw;  weighted V-filtration on H''/s*H''
   ideal vw[6];  standard basis of Jacobian ideal
 @end format
 SEE ALSO: spectrum_lib
-KEYWORDS: singularities; Gauss-Manin system; Brieskorn lattice;
-          mixed Hodge structure; V-filtration; weight filtration;
+KEYWORDS: mixed Hodge structure; V-filtration; weight filtration;
           spectrum; spectral pairs
 EXAMPLE:  example vwfilt; shows examples
 "
@@ -1036,9 +1029,7 @@ list l=A0,A1,T,M;
   module T;  C-basis of C^mu
   ideal M;  monomial C-basis of H''/sH''
 @end format
-KEYWORDS: singularities; Gauss-Manin system; Brieskorn lattice;
-          mixed Hodge structure; V-filtration; weight filtration;
-          monodromy; spectrum; spectral pairs; good basis
+KEYWORDS: good basis
 EXAMPLE:  example tmatrix; shows examples
 "
 {
@@ -1095,8 +1086,7 @@ list ev;  V-filtration on Jacobian algebra
   ideal ev[4];  monomial vector space basis of Jacobian algebra
   ideal ev[5];  standard basis of Jacobian ideal
 @end format
-KEYWORDS: singularities; Gauss-Manin system; Brieskorn lattice;
-          mixed Hodge structure; V-filtration; endomorphism filtration
+KEYWORDS: V-filtration; endomorphism filtration
 EXAMPLE:  example endvfilt; shows examples
 "
 {

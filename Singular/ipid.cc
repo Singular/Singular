@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.70 2005-01-18 15:41:58 Singular Exp $ */
+/* $Id: ipid.cc,v 1.71 2005-05-06 12:39:46 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -387,7 +387,9 @@ idhdl enterid(char * s, int lev, idtyp t, idhdl* root, BOOLEAN init)
   }
   *root = (*root)->set(s, lev, t, init);
 #ifdef HAVE_NS
+#ifndef NDEBUG
   checkall();
+#endif
 #endif
   return *root;
 

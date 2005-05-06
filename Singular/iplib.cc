@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.109 2005-05-03 17:32:51 Singular Exp $ */
+/* $Id: iplib.cc,v 1.110 2005-05-06 12:39:47 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -322,7 +322,9 @@ BOOLEAN iiPStart(idhdl pn, sleftv  * v)
   myynest++;
   err=yyparse();
 #ifdef HAVE_NS
+#ifndef NDEBUG
   checkall();
+#endif
 #endif
   if (sLastPrinted.rtyp!=0)
   {
@@ -331,7 +333,9 @@ BOOLEAN iiPStart(idhdl pn, sleftv  * v)
   //Print("kill locals for %s (level %d)\n",IDID(pn),myynest);
   killlocals(myynest);
 #ifdef HAVE_NS
+#ifndef NDEBUG
   checkall();
+#endif
 #endif
   //Print("end kill locals for %s (%d)\n",IDID(pn),myynest);
   myynest--;
