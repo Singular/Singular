@@ -3,7 +3,7 @@
 ****************************************/
 /*
 * ABSTRACT: help system
-* versin $Id: fehelp.cc,v 1.42 2005-05-03 14:30:09 Singular Exp $
+* versin $Id: fehelp.cc,v 1.43 2005-05-06 10:08:43 Singular Exp $
 */
 
 #include <string.h>
@@ -609,9 +609,9 @@ static int heReKey2Entry (char* filename, char* key, heEntry hentry)
   memset(index_key,0,MAX_HE_ENTRY_LENGTH);
   while (fscanf(fd, "%[^\t]\t%*[^\n]\n", index_key) == 1)
   {
-    if (index_key[MAX_HE_ENTRY_LENGTH]!='\0')
+    if ((index_key[MAX_HE_ENTRY_LENGTH-1]!='\0'))
     {
-      index_key[MAX_HE_ENTRY_LENGTH]='\0';
+      index_key[MAX_HE_ENTRY_LENGTH-1]='\0';
       Werror("index file corrupt at line >>%s<<",index_key);
       break;
     }
