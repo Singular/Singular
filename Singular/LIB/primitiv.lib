@@ -2,7 +2,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // This library is for Singular 1.2 or newer
 
-version="$Id: primitiv.lib,v 1.20 2005-04-22 16:04:46 Singular Exp $";
+version="$Id: primitiv.lib,v 1.21 2005-05-06 09:42:00 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:    primitiv.lib    Computing a Primitive Element
@@ -258,7 +258,7 @@ proc splitring(poly f,list #)
 ASSUME:  f is univariate and irreducible over the active ring. @*
          The active ring must allow an algebraic extension (e.g., it cannot
          be a transcendent ring extension of Q or Z/p).
-RETURN:  ring; @
+RETURN:  ring; @*
            if called with a nonempty second parameter L, then in the output 
            ring there is defined a list erg ( =L mapped to the new ring);
            if the minpoly of the active ring is non-zero, then the image of 

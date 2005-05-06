@@ -1,6 +1,6 @@
 // Last change 12.02.2001 (Eric Westenberger)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: zeroset.lib,v 1.11 2005-04-25 10:13:07 Singular Exp $";
+version="$Id: zeroset.lib,v 1.12 2005-05-06 09:42:02 Singular Exp $";
 category="Symbolic-numerical solving";
 info="
 LIBRARY:  zeroset.lib      Procedures For Roots and Factorization
@@ -621,8 +621,8 @@ ASSUME:  basering = Q[x,a] and ideal mpoly is defined (it might be 0),
          this represents the ring Q(a)[x] together with its minimal polynomial.
 EXAMPLE: example EGCD; shows an example
 "
-// might be extended to return s1, s2 s.t. f*s1 + g*s2 = gcd
 {
+// might be extended to return s1, s2 s.t. f*s1 + g*s2 = gcd
   int i = 1;
   poly r1, r2, r;
 
@@ -811,9 +811,9 @@ ASSUME:  basering = Q[x,a], representing Q(a)[x]. An ideal mpoly must
          be defined, representing the minimal polynomial (it might be 0!).
 EXAMPLE: example  Factor; shows an example
 "
+{
 // extend this by a squarefree factorization !!
 // multiplicities are not valid !!
-{
   int i, s;
   list normList, factorList, quo_rem;
   poly f1, h, h1, H, g, leadCoef, invCoeff;

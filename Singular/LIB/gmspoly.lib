@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gmspoly.lib,v 1.9 2005-04-28 09:23:17 Singular Exp $";
+version="$Id: gmspoly.lib,v 1.10 2005-05-06 09:41:59 Singular Exp $";
 category="Singularities";
 
 info="
@@ -72,7 +72,6 @@ EXAMPLE:  example istame; shows examples
   def @WX=changechar("(0,w(1.."+string(n)+"))");
   setring @WX;
   ideal J=jacob(imap(@X,f));
-~
   int i;
   for(i=1;i<=n;i++)
   {

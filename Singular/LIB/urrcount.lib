@@ -1,4 +1,4 @@
-// $Id: urrcount.lib,v 1.3 2005-05-02 13:11:56 Singular Exp $
+// $Id: urrcount.lib,v 1.4 2005-05-06 09:42:01 Singular Exp $
 // E. Tobis  12.Nov.2004, April 2004
 // last change 1. May 2005 (G.-M. Greuel)
 ///////////////////////////////////////////////////////////////////////////////
@@ -573,7 +573,7 @@ ASSUME:    p is a univarite polynomials with rational coefficients
 THEORY:    The Sturm sequence of p (also called remainder sequence) is the
            sequence begininng with p, p' and goes on with minus the remainder
            of the two previous polynomials, until the remainder is zero.
-           See: Basu, Pollack, Roy, "Algorithms in Real Algebraic Geometry",
+           See: Basu, Pollack, Roy, Algorithms in Real Algebraic Geometry,
            Springer, 2003.
 SEE ALSO:  sturm,sturmhaseq
 EXAMPLE:   example sturmseq; shows an example"
@@ -736,7 +736,7 @@ ASSUME:    P is a univariate polynomial.
 THEORY:    The Sturm-Habicht sequence (also subresultant sequence) is closely
            related to the Sturm sequence, but behaves better with respect to
            the size of the coefficients. It is defined via subresultants.
-           See: Basu, Pollack, Roy, "Algorithms in Real Algebraic Geometry",
+           See: Basu, Pollack, Roy, Algorithms in Real Algebraic Geometry,
            Springer, 2003.
 SEE ALSO:  sturm,sturmseq,sturmha
 EXAMPLE:   example sturmhaseq; shows an example"

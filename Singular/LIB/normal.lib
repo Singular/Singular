@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: normal.lib,v 1.42 2005-04-29 13:23:25 Singular Exp $";
+version="$Id: normal.lib,v 1.43 2005-05-06 09:41:59 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  normal.lib     Normalization of Affine Rings
@@ -2193,7 +2193,7 @@ example
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-proc closureFrac(list L);
+proc closureFrac(list L)
 "USAGE:    closureFrac (L); L a list as in the result of primeClosure, L[n]
                            containing an additional poly f
 CREATE:   a list fraction of two elements of L[1], such that

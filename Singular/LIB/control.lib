@@ -1,4 +1,4 @@
-version="$Id: control.lib,v 1.29 2005-04-30 20:34:59 levandov Exp $";
+version="$Id: control.lib,v 1.30 2005-05-06 09:41:58 Singular Exp $";
 category="System and Control Theory";
 info="
 LIBRARY:  control.lib     Algebraic analysis tools for System and Control Theory
@@ -1601,9 +1601,9 @@ proc declare(string NameOfRing, string Variables, list #)
 @*	    Ordering is   string with name of ordering (by default, the ordering (dp,C) is used).
 PURPOSE: define the ring easily
 RETURN:  no return value
- EXAMPLE:  example declare; shows an example 
- "
- {
+EXAMPLE:  example declare; shows an example 
+"
+{
    if(size(#)==0)
    {
      execute("ring "+NameOfRing+"=0,("+Variables+"),dp;");
@@ -1627,9 +1627,9 @@ RETURN:  no return value
      };
    };
    keepring(basering);
- }
- example
- {"EXAMPLE:";echo = 2;
+}
+example
+{"EXAMPLE:";echo = 2;
    string v="x,y,z";
    string p="q,p";
    string Ord ="c,lp";
@@ -1653,7 +1653,7 @@ RETURN:  no return value
    declare("Ring_5",v," ",Ord);
    print(basering);
    print(nameof(basering));
- };
+}
 //
 // maybe reasonable to add this in declare
 //

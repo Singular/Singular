@@ -1,6 +1,6 @@
 // Last change 10.12.2000 (TB)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: rinvar.lib,v 1.11 2005-04-29 08:55:50 Singular Exp $";
+version="$Id: rinvar.lib,v 1.12 2005-05-06 09:42:01 Singular Exp $";
 category="Invariant theory";
 info="
 LIBRARY:  rinvar.lib      Invariant Rings of Reductive Groups
@@ -27,7 +27,6 @@ PROCEDURES:
  ReynoldsImage(RO,f);           image of f under the Reynolds operator 'RO'
  ReynoldsOperator(G, Gaction);  Reynolds operator of the group G
  SimplifyIdeal(I[,m,s]);        simplify the ideal I (try to reduce variables)
- TransferIdeal(R,name,nA);      transfer the ideal 'name' from R to basering
 
 SEE ALSO: qhmoduli_lib, zeroset_lib
 ";
@@ -653,9 +652,6 @@ EXAMPLE: example InvariantRing; shows an example
         ideal groupid = std(id);
         attrib(groupid, "isSB", 1);
         ideal action = actionid;
-//        ideal invarsGens = TransferIdeal(RIRR, "invarsGens", newA);
-//        export(invarsGens);
-// lossen: ersetzt durch
         setring RIRR;
         string parName, minPoly;
         if(npars(basering) == 0) {
@@ -961,10 +957,6 @@ ASSUME:  basering = K[s(1..r),t(1..n)], K = Q or K = Q(a') and minpoly != 0,
   for(i = ns + 1; i <= n; i++) { G1 = G1, var(i);}
 
   def RORR = ZeroSet(G1, primaryDec);
-//  setring RORR;
-//  id = TransferIdeal(ROBR, "Grp", newA);  // defined in ZeroSet ...
-//  ideal actionid = TransferIdeal(ROBR, "Gaction", newA);
-// lossen: ersetzt durch
   setring ROBR;
   string parName, minPoly;
   if(npars(basering) == 0) {

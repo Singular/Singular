@@ -1,6 +1,6 @@
 //last change: 13.02.2001 (Eric Westenberger)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: presolve.lib,v 1.23 2005-05-04 09:31:39 Singular Exp $";
+version="$Id: presolve.lib,v 1.24 2005-05-06 09:42:00 Singular Exp $";
 category="Symbolic-numerical solving";
 info="
 LIBRARY:  presolve.lib     Pre-Solving of Polynomial Equations
@@ -21,8 +21,6 @@ PROCEDURES:
  sortandmap(id[..]);   map to new basering with vars sorted w.r.t. complexity
  sortvars(id[n1,p1..]); sort vars w.r.t. complexity in id [different blocks]
  valvars(id[..]);       valuation of vars w.r.t. to their complexity in id
- idealsSimplify(id);    ideal I = eliminate(Id,m) m is a product of variables
-                       which are only linearly involved in the generators of id
  idealSplit(id,tF,fS);  a list of ideals such that their intersection 
                         has the same radical as id
                        ( parameters in square brackets [] are optional)
