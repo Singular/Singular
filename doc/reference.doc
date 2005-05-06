@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.245 2005-05-06 09:24:52 bricken Exp $
+@comment $Id: reference.doc,v 1.246 2005-05-06 09:45:36 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -1745,7 +1745,6 @@ ideal.
 @item @strong{Example:}
 @smallexample
 @c example
-/*
   ring r=0,(x,y,z),lp;
   ideal i=y3+x2,x2y+x2,x3-x2,z4-x2-y;
   option(redSB);   // force the computation of a reduced SB
@@ -1753,7 +1752,6 @@ ideal.
   poly p=reduce(x+yz2+z10,i);
   ideal j=fglmquot(i,p);
   j;
-*/
 @c example
 @end smallexample
 @end table
@@ -1837,14 +1835,12 @@ the current ring.
 @item @strong{Example:}
 @smallexample
 @c example
-/*
   ring  r=0,(x,y,z), dp;
   ideal i=y3+x2,x2y+x2,z4-x2-y;
   option(redSB);  // force computation of reduced basis
   i=std(i);
   ideal k=finduni(i);
   print(k);
-*/
 @c example
 @end smallexample
 @end table
@@ -2435,10 +2431,8 @@ returns the imaginary part of a number in a complex ground field,
 @item @strong{Example:}
 @smallexample
 @c example
-/*
   ring r=(complex,i),x,dp;
   impart(1+2*i);
-*/
 @c example
 @end smallexample
 @end table
@@ -2957,11 +2951,9 @@ list are of type number, otherwise of type string.
 @item @strong{Example:}
 @smallexample
 @c example
-/*
 ring rs1=0,(x,y),lp;
 poly f=15x5+x3+x2-10;
 laguerre(f,10,2);
-*/
 @c example
 @end smallexample
 @end table
@@ -5194,10 +5186,8 @@ returns the real part of a number from a complex ground field,
 @item @strong{Example:}
 @smallexample
 @c example
-/*
   ring r=(complex,i),x,dp;
   repart(1+2*i);
-*/
 @c example
 @end smallexample
 @end table
