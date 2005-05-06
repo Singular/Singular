@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: claptmpl.cc,v 1.25 2001-08-27 14:46:49 Singular Exp $
+// $Id: claptmpl.cc,v 1.26 2005-05-06 14:44:28 hannes Exp $
 /*
 * ABSTRACT - instantiation of all templates
 */
