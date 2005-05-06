@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.74 2005-05-06 11:51:36 bricken Exp $
+@comment $Id: examples.doc,v 1.75 2005-05-06 14:59:08 Singular Exp $
 @comment this file contains the examples
 
 @c The following directives are necessary for proper compilation
@@ -73,6 +73,7 @@ The following topics are treated:
 @menu
 * Basic programming::
 * Writing procedures and libraries::
+* Rings associated to monomial orderings::
 * Long coefficients::
 * Parameters::
 * Formatting output::
@@ -86,6 +87,7 @@ The following topics are treated:
 @menu
 * Basic programming::
 * Writing procedures and libraries::
+* Rings associated to monomial orderings::
 * Parameters::
 * Formatting output::
 * Dynamic modules::
@@ -171,21 +173,30 @@ dim(std(phi(i)));
 
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
-@node Writing procedures and libraries, Long coefficients,  Basic programming, Programming
+@node Writing procedures and libraries, Rings associated to monomial orderings,  Basic programming, Programming
 @end ifset
 @ifclear singularmanual
-@node Writing procedures and libraries, Parameters,  Basic programming, Programming
+@node Writing procedures and libraries, Rings associated to monomial orderings,  Basic programming, Programming
 @end ifclear
 @subsection Writing procedures and libraries
 @cindex Procedures and libraries
 @cindex Libraries
 
-The user may add his own commands to the commands already available by
-writing @sc{Singular} procedures. See @ref{Procedures} for the syntax
-and general structure of a procedure.
+The user may add his own commands to the commands already available in
+@sc{Singular} by writing @sc{Singular} procedures. There are basically
+two kinds of procedures: 
+@itemize @bullet
+@item procedures written in the @sc{Singular} programming language (which
+usually are collected in @sc{Singular} libraries).
+@item procedures written in C/C++ (collected in dynamic modules).
+@end itemize
 
-A @sc{Singular} library is a text file collecting several procedures
-(see @ref{Format of a library}). The probably most efficient way of 
+At this point, we restrict ourselves to describing the first kind of
+(library) procedures, which are sufficient for most applications. The
+syntax and general structure of a library (procedure) is described in
+@ref{Procedures}, and @ref{Format of a library}. 
+
+The probably most efficient way of 
 writing a new library is to use one of the official @sc{Singular}
 libraries, say @code{ring.lib} as a sample. On a Unix-like operating
 system, type @code{LIB "ring.lib";} to get information on where the
@@ -195,12 +206,12 @@ libraries are stored on your disk.
 when writing a procedure, for instance, to have a look at intermediate
 results (see @ref{Debugging tools}).
 
-We show here short examples of procedures to demonstrate the following:
+We give short examples of procedures to demonstrate the following:
 
 @itemize @bullet
 @item
-Write procedures which returns an integer (ring independent), see also
-@ref{Milnor and Tjurina number}. (Here we restrict ourselevs to the main
+Write procedures which return an integer (ring independent), see also
+@ref{Milnor and Tjurina number}. (Here we restrict ourselves to the main
 body of the procedures).
   @itemize @minus
   @item
@@ -221,7 +232,7 @@ body of the procedures).
 
 @item
 Write a procedure which creates a new ring and returns data dependent on
-this new ring (two numbers and an int). In this example, we also show
+this new ring (two numbers) and an int. In this example, we also show
 how to write a help text for the procedure (which is optional, but
 recommended). 
 @end itemize
@@ -313,9 +324,104 @@ setring R3; SOL;       // the real solutions
 @c example
 @end smallexample
 
+Writing a dynamic module is not as simple as writing a library
+procedure, since it does not only require some knowledge of C/C++, but
+also about the way the @sc{Singular} kernel works.
+See also @ref{Dynamic modules}.
+
+
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
-@node Long coefficients, Parameters, Writing procedures and libraries, Programming
+@node Rings associated to monomial orderings, Long coefficients,  Writing procedures and libraries, Programming
+@end ifset
+@ifclear singularmanual
+@node Rings associated to monomial orderings, Parameters,  Writing procedures and libraries, Programming
+@end ifclear
+@subsection Rings associated to monomial orderings
+@cindex monomial orderings
+@cindex localization
+@cindex local rings, computing in 
+
+In @sc{Singular} we may implement localizations of the polynomial ring
+by choosing an appropriate monomial ordering when defining the ring by
+the @code{ring} command. We refer to @ref{Monomial orderings} for a
+thorugh discussion of the monomial orderings available in
+@sc{Singular}. 
+
+At this point, we restrict ourselves in describing the relation between
+a monomial ordering and the ring (as mathematical object) which is 
+implemented by the ordering. This is most easily done by describing the 
+set of units: if > is a monomial ordering then precisely those elements
+which have leading monomial 1 are considered as units (in all
+computations performed with respect to this ordering). 
+
+In mathematical terms: choosing a monomial ordering > implements the
+localization of the polynomial ring with respect to the multiplicatively
+closed set of polynomials with leading monomial 1.
+
+@tex
+That is, choosing > implements the ring
+$$
+  K[x]_> := \left\{{f}\over{u}\; \bigg|\; f, u \in K[x],
+  \, LM(u) =
+  1\right\}.
+$$
+@end tex
+
+If > is global (that is, 1 is the smallest monomial), the implemented
+ring is just the polynomial ring. If > is local (that is, if 1 is the
+largest monomial), the implemented ring is the localization of the
+polynomial ring w.r.t.@: the homogeneous maximal ideal. For a mixed
+ordering, we obtain "something in between these two rings":
+
+@smallexample
+@c example
+ring R = 0,(x,y,z),lp;     // polynomial ring (global ordering)
+poly f = y4z3+2x2y2z2+4z4+5y2+1;
+f;                         // display f in a lex-ordered way
+short=0;                   // avoid short notation
+f;
+short=1;
+leadmonom(f);              // leading monomial
+
+ring r = 0,(x,y,z),ds;     // local ring (local ordering)
+poly f = fetch(R,f);
+f;                         // terms of f sorted by degree
+leadmonom(f);              // leading monomial
+
+// Now we implement more "advanced" examples of rings:
+//
+// 1)   (K[y]_<y>)[x]
+//
+int n,m=2,3;
+ring A1 = 0,(x(1..n),y(1..m)),(dp(n),ds(m));
+poly f  = x(1)*x(2)^2+1+y(1)^10+x(1)*y(2)^5+y(3);
+leadmonom(f);
+leadmonom(1+y(1));         // unit
+leadmonom(1+x(1));         // no unit
+
+//
+// 2)  some ring in between (K[x]_<x>)[y] and K[x,y]_<x>
+//
+ring A2 = 0,(x(1..n),y(1..m)),(ds(n),dp(m));
+leadmonom(1+x(1));       // unit
+leadmonom(1+x(1)*y(1));  // unit
+leadmonom(1+y(1));       // no unit
+
+//
+// 3)  K[x,y]_<x>
+//
+ring A4 = (0,y(1..m)),(x(1..n)),ds;
+leadmonom(1+y(1));       // in ground field
+leadmonom(1+x(1)*y(1));  // unit
+leadmonom(1+x(1));       // unit
+
+@c example
+@end smallexample
+
+@c ----------------------------------------------------------------------------
+@ifset singularmanual
+@node Long coefficients, Parameters, Rings associated to monomial orderings, Programming
 @subsection Long coefficients
 @cindex Long coefficients
 @cindex coefficients, long
@@ -370,13 +476,13 @@ vdim(j);
 @node Parameters, Formatting output, Long coefficients, Programming
 @end ifset
 @ifclear singularmanual
-@node Parameters, Formatting output, Writing  procedures and libraries, Programming
+@node Parameters, Formatting output, Rings associated to monomial orderings, Programming
 @end ifclear
 @subsection Parameters
 @cindex Parameters
 
 @ifset singularmanual
-Let us deform the ideal in Section @ref{Long coefficients} by
+Let us deform the ideal in @ref{Long coefficients} by
 introducing a parameter t and compute over the ground field Q(t).
 We compute the dimension at the generic point,
 @end ifset
@@ -387,10 +493,10 @@ We compute the dimension at the generic point,
 @end ifclear
 i.e.,
 @tex
-$dim_{Q(t)}Q(t)[x,y]/j$.
+$dim_{Q(t)}Q(t)[x,y]/j$. 
 @end tex
 @ifinfo
-dim_Q(t) Q(t)[x,y]/j.
+dim_Q(t) Q(t)[x,y]/j. 
 @end ifinfo
 @ifset singularmanual
 (This gives the
@@ -407,10 +513,10 @@ a in Q
 @end ifinfo
 this is the same as
 @tex
-$dim_Q Q[x,y]/j_0$,
+$dim_Q Q[x,y]/j_0$, 
 @end tex
 @ifinfo
-dim_Q Q[x,y]/j0,
+dim_Q Q[x,y]/j0, 
 @end ifinfo
 where
 @tex
@@ -687,7 +793,9 @@ and references on these criteria and on further strategies for improving the
 performance of Buchberger's algorithm.
 
 @sc{Singular}'s implementation of Buchberger's algorithm is available via
-the @code{std} command ('std' referring to 'st'an'd'ard basis).
+the @code{std} command ('std' referring to 'st'an'd'ard basis). The
+computation of reduced Groebner and standard bases may be forced by setting
+@code{option(redSB)} (see @ref{option}). 
 
 However, depending on the monomial ordering of the active basering, it may be
 advisable to use the @code{groebner} command instead. This command is
@@ -705,25 +813,25 @@ We apply the commands @code{std} and @code{groebner} to compute a
 lexicographic Groebner basis for the ideal of cyclic roots over the 
 basering with 6 variables (see @ref{Cyclic roots}). We set
 @code{option(prot)} to make @sc{Singular} display some information on
-the preformed computations (see @ref{option} for an interpretation of
-the displayed symbols).
+the performed computations (see @ref{option} for an interpretation of
+the displayed symbols). For long running computations, it is always
+recommended to set this option.  
 
 
 @smallexample
 @c example
-timer = 1;                              // activate the timer
-system("--ticks-per-sec", 100);         // give time in 1/100 sec
 LIB "poly.lib";
 ring r=32003,(a,b,c,d,e,f),lp;
 ideal I=cyclic(6);
 option(prot);
 int t=timer;
+system("--ticks-per-sec", 100);         // give time in 1/100 sec
 ideal sI=std(I);
-timer-t;             // time in 1/100 secs
+timer-t;                                // used time (in 1/100 secs)
 size(sI);
 t=timer;
 sI=groebner(I);
-timer-t;             // time in 1/100 secs
+timer-t;                                // used time (in 1/100 secs)
 size(sI);
 option(noprot);
 @c example
@@ -749,7 +857,7 @@ Buchberger algorithm are based on this observation:
 @itemize @bullet
 @item 
 Groebner basis conversion: Given an ideal @math{I\subset K[x_1,\dots,x_n]} and a
-slow monomial order, compute a Gr\"obner basis with respect to an
+slow monomial order, compute a Groebner basis with respect to an
 appropriately chosen fast order. Then convert the result to a Groebner 
 basis with respect to the given slow order. 
 
@@ -3071,33 +3179,30 @@ Here we turn our attention to the probably most popular aspect of
 the solving problem: given a system of complex polynomial equations with only
 finitely many solutions, compute floating point approximations for these
 solutions. This is widely considered as a task for 
-numerical analysis rather than for computer algebra or algebraic
-geometry. However, due to rounding errors, purely numerical methods are
-often unstable in an unpredictable way. Frequently they do not find all
-solutions, respectively the correct number of different solutions,
-and they have problems with over-determined systems, that is, systems
-with more equations than variables.
+numerical analysis. However, due to rounding errors, purely numerical 
+methods are often unstable in an unpredictable way. 
 
 Therefore, in many cases, it is worth investing more computing power to derive
 additional knowledge on the geometric structure of the set of solutions (not 
 to mention the question of how to decide whether the set of solutions is 
-finite or not). We speak then of a symbolic-numerical approach to the solving 
-problem (combining numerical methods with a symbolic preprocessing).
+finite or not). The symbolic-numerical approach to the solving 
+problem combines numerical methods with a symbolic preprocessing.
 
 Depending on whether we want to preserve the multiplicities of the solutions 
 or not, possible goals for a symbolic preprocessing are
 
 @itemize @bullet
-@item to find another system of generators (for instance, a reduced Gr\"obner
+@item to find another system of generators (for instance, a reduced Groebner
   basis) for the ideal I generated by the polynomial equations. Or, to 
  find a system of polynomials defining an ideal which has the same radical 
-as I.
+as I (see @ref{Computing Groebner and Standard Bases},
+resp.@: @ref{radical}). 
 @end itemize
 In any case, the goal should be to find a system for which a
 numerical solution can be found more easily and in a more stable way. 
 For systems with a large number of generators, a first step in a @sc{Singular}
 computation could be to reduce the number of generators by applying
-the @code{interred} command. Another goal might be 
+the @code{interred} command (see @ref{interred}). Another goal might be 
 
 @itemize @bullet
 @item to decompose the system into several smaller (or, at least, more
