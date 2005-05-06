@@ -140,8 +140,7 @@ SOURCES=${CSOURCES} ${CXXSOURCES} \
 	pp_Mult_Coeff_mm_DivSelectMult__T.cc \
 	p_Merge_q__T.cc pp_Mult_mm_Noether__T.cc\
 	p_kBucketSetLm__T.cc \
-	kInline.cc \
-	claptmpl.cc 
+	kInline.cc
 
 HEADERS=hutil.h stairc.h ideals.h \
 	longalg.h structs.h intvec.h int64vec.h longrat.h \
@@ -272,9 +271,6 @@ libkernel.a: ${OBJS}
 	ar cr $@ $^
 
 p_Procs_Lib.o: p_Procs_Lib.inc
-
-claptmpl.o: claptmpl.cc mod2.h
-	${CXX} ${CXXFLAGS}  ${CPPFLAGS} ${DEFS} -c $<	
 
 kversion.h: ${SOURCES} ${HEADERS} Makefile.in mod2.h.in \
            configure.in
@@ -435,9 +431,6 @@ p_Procs_Lib_%.dl_og : p_Procs_Lib.cc  p_Procs_Dynamic.og
 %.dl_og: %.cc
 	${CXXG} ${CXXFLAGSG} ${CXXTEMPLFLAGSG} ${CPPFLAGS} ${DEFSG} ${SFLAGS} -c $< -o $@
 
-claptmpl.og: claptmpl.cc mod2.h
-	$(CXXG)  ${CXXFLAGSG} ${CPPFLAGS} ${DEFSG} -c $< -o $@
-
 %.og: %.cc
 	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGSG} ${CPPFLAGS} ${DEFSG} -c $< -o $@
 
@@ -494,9 +487,6 @@ p_Procs_Lib_%.dl_op : p_Procs_Lib.cc p_Procs_Dynamic.op
 	${CXXP} ${CXXFLAGSP} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSP} ${SFLAGS} -c $< -o $@
 
 
-claptmpl.op: claptmpl.cc mod2.h
-	$(CXXP)  ${CXXFLAGSP} ${CPPFLAGS} ${DEFSP} -c $< -o $@
-
 %.op: %.cc
 	$(CXXP) ${CXXFLAGSP} ${CXXTEMPLFLAGSP} ${CPPFLAGS} ${DEFSP} -c $< -o $@
 
@@ -512,9 +502,6 @@ p_Procs_Lib_%.dl_ob : p_Procs_Lib.cc  p_Procs_Dynamic.ob
 
 %.dl_ob: %.cc
 	${CXXP} ${CXXFLAGSB} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSB} ${SFLAGS} -c $< -o $@
-
-claptmpl.ob: claptmpl.cc mod2.h
-	$(CXXP)  ${CXXFLAGSP} ${CPPFLAGS} ${DEFSB} -c $< -o $@
 
 %.ob: %.cc
 	$(CXXP) ${CXXFLAGSP} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSB} -c $< -o $@
@@ -536,9 +523,6 @@ p_Procs_Lib_%.dl_ot : p_Procs_Lib.cc p_Procs_Dynamic.ot
 
 %.dl_ot: %.cc
 	${CXXP} ${CXXFLAGST} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFST} ${SFLAGS} -c $< -o $@
-
-claptmpl.ot: claptmpl.cc mod2.h
-	$(CXXP)  ${CXXFLAGST} ${CPPFLAGS} ${DEFST} -c $< -o $@
 
 %.ot: %.cc
 	$(CXXP) ${CXXFLAGST} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFST} -c $< -o $@
@@ -564,9 +548,6 @@ p_Procs_Lib_%.dl_oa : p_Procs_Lib.cc p_Procs_Dynamic.oa
 
 %.dl_oa: %.cc
 	${CXX} ${CXXFLAGSA} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSA} ${SFLAGS} -c $< -o $@
-
-claptmpl.oa: claptmpl.cc mod2.h
-	$(CXX)  ${CXXFLAGSA} ${CPPFLAGS} ${DEFSA} -c $< -o $@
 
 %.oa: %.cc
 	$(CXX) ${CXXFLAGSA} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSA} -c $< -o $@
@@ -616,7 +597,7 @@ check_aso:
 	echo $(@:.d=.og) $(@:.d=.od) $(@:.dd=_d.c) $(@:.d=.op) $(@:.d=.ob) $(@:.d=.ot) $(@:.d=.oa)" " \\ > $@
 	$(CCM) ${CPPFLAGS} ${DEFSG} $< >> $@
 
-depend:   $(CXXSOURCES:.cc=.dd) $(ESOURCES:.cc=.dd) $(CSOURCES:.c=.d) mod2.h claptmpl.dd
+depend:   $(CXXSOURCES:.cc=.dd) $(ESOURCES:.cc=.dd) $(CSOURCES:.c=.d) mod2.h
 	cat *.d *.dd >depend
 
 ifeq (depend,$(wildcard depend))
