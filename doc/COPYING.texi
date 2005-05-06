@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: COPYING.texi,v 1.20 2005-05-06 16:27:20 Singular Exp $
+@comment $Id: COPYING.texi,v 1.21 2005-05-06 18:03:23 levandov Exp $
 @comment this file contains the copyright notice on Singular
 @ifclear VERSION
 @include version.texi
@@ -151,42 +151,64 @@ Tim Wichmann.
 Further contributions to @sc{Singular} were made by:
 Thomas Bayer,
 Isabelle Bermejo,
+Markus Becker,
 Stephan Endra@ss{},
 Jose Ignacio Farran Martin,
 Wolfram Decker,
+Vladimir Gerdt,
 Philippe Gimenez,
 Christian Gorzel,
+Fernando Hernando Carrillo,
 Agnes Heydtmann,
 Dietmar Hillebrand,
 Tobias Hirsch,
 Thomas Keilen,
 Martin Lamm,
+Francisco Javier Lobillo Borrero,
 Bernd Martin,
 Michael Me@ss{}ollen,
+Oleksandr Motsak,
 Thomas N@"u@ss{}ler,
+Carlos Rabelo,
+Alfredo Sanchez-Navarro,
 Henrik Strohmayer,
+I. Sulandra,
+Christine Theis,
 Enrique Tobis,
+Alberto Vigneron-Tenorio,
 Moritz Wenk,
-Denis Yanovich.
+Denis Yanovich,
+Oleksandr Yena.
 @cindex Bayer, Thomas
 @cindex Bermejo, Isabelle
+@cindex Becker, Markus 
 @cindex Endra@ss{}, Stephan
 @cindex Farran Martin, Jose Ignacio
 @cindex Decker, Wolfram
+@cindex Gerdt, Vladimir 
 @cindex Gimenez, Philippe
 @cindex Gorzel, Christian
+@cindex Hernando, Fernando 
 @cindex Heydtmann, Agnes
 @cindex Hillebrand, Dietmar
 @cindex Hirsch, Tobias
 @cindex Keilen, Thomas
 @cindex Lamm, Martin
+@cindex Lobillo, Javier
 @cindex Martin, Bernd
 @cindex Me@ss{}ollen, Michael
+@cindex Motsak, Oleksandr 
 @cindex N@"u@ss{}ler, Thomas
+@cindex Rabelo, Carlos
+@cindex Sanchez-Navarro, Alfredo 
 @cindex Strohmayer, Henrik
+@cindex Sulandra, I.
 @cindex Tobis, Enrique
+@cindex Theis, Christine 
+@cindex Vigneron-Tenorio, Alberto 
 @cindex Wenk, Moritz
 @cindex Yanovich, Denis
+@cindex Yena, Oleksandr 
 
 We should like to acknowledge the financial support given by
 the Volkswagen-Stiftung,
