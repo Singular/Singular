@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: primdec.lib,v 1.104 2005-05-06 14:38:57 hannes Exp $";
+version="$Id: primdec.lib,v 1.105 2005-05-06 16:01:50 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -53,7 +53,6 @@ static proc sat1 (ideal id, poly p)
 "USAGE:   sat1(id,j);  id ideal, j polynomial
 RETURN:  saturation of id with respect to j (= union_(k=1...) of id:j^k)
 NOTE:    result is a std basis in the basering
-EXAMPLE: example sat1; shows an example
 "
 {
    int @k;
@@ -79,7 +78,6 @@ static proc sat2 (ideal id, ideal h)
 "USAGE:   sat2(id,j);  id ideal, j polynomial
 RETURN:  saturation of id with respect to j (= union_(k=1...) of id:j^k)
 NOTE:    result is a std basis in the basering
-EXAMPLE: example sat2; shows an example
 "
 {
    int @k,@i;
@@ -3829,11 +3827,29 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc Ann(module M)
+"USAGE:   Ann(M);  M module
+RETURN:  ideal, the annihilator of coker(M)
+NOTE:    The output is the ideal of all elements a of the basering R such that
+         a * R^m is contained in M  (m=number of rows of M).
+EXAMPLE: example Ann; shows an example
+"
 {
   M=prune(M);  //to obtain a small embedding
   ideal ann=quotient1(M,freemodule(nrows(M)));
   return(ann);
 }
+example
+{ "EXAMPLE:"; echo = 2;
+   ring  r = 0,(x,y,z),lp;
+   module M = x2-y2,z3;
+   Ann(M);
+   M = [1,x2],[y,x];
+   Ann(M);
+   qring Q=std(xy-1);
+   module M=imap(r,M);
+   Ann(M);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 //computes the equidimensional part of the ideal i of codimension e

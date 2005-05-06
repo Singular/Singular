@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: matrix.lib,v 1.29 2005-05-06 14:38:45 hannes Exp $";
+version="$Id: matrix.lib,v 1.30 2005-05-06 16:01:49 Singular Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  matrix.lib    Elementary Matrix Operations
@@ -974,6 +974,10 @@ example
 }
 //////////////////////////////////////////////////////////////////////////////
 proc headStand(matrix M)
+"USAGE:   headStand(M);  M matrix
+RETURN:  matrix B such that B[i][j]=M[n-i+1,m-j+1], n=nrows(M), m=ncols(M)
+EXAMPLE: example headStand; shows an example
+"
 {
   int i,j;
   int n=nrows(M);
@@ -987,5 +991,14 @@ proc headStand(matrix M)
      }
   }
   return(B);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r=0,(A,B,C),dp;
+   matrix M[2][3]=
+   0,A,  B,
+   A2, B2, C;
+   print(M);
+   print(headStand(M));
 }
 //////////////////////////////////////////////////////////////////////////////
