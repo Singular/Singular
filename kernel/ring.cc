@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.37 2005-05-04 15:25:45 Singular Exp $ */
+/* $Id: ring.cc,v 1.38 2005-05-06 14:12:35 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -342,16 +342,16 @@ void rWrite(ring r)
       //    Print("\n//   noncommutative relations (type %d):",(int)r->nc->type);
       for (i = 1; i<r->N; i++)
       {
-	for (j = i+1; j<=r->N; j++)
-	{
-	  nl = nIsOne(p_GetCoeff(MATELEM(r->nc->C,i,j),r));
-	  if ( (MATELEM(r->nc->D,i,j)!=NULL) || (!nl) )
-	  {
-	    Print("\n//    %s%s=",r->names[j-1],r->names[i-1]);
-	    pl = MATELEM(r->nc->MT[UPMATELEM(i,j,r->N)],1,1);
-	    pWrite0(pl);
-	  }
-	}
+        for (j = i+1; j<=r->N; j++)
+        {
+          nl = nIsOne(p_GetCoeff(MATELEM(r->nc->C,i,j),r));
+          if ( (MATELEM(r->nc->D,i,j)!=NULL) || (!nl) )
+          {
+            Print("\n//    %s%s=",r->names[j-1],r->names[i-1]);
+            pl = MATELEM(r->nc->MT[UPMATELEM(i,j,r->N)],1,1);
+            pWrite0(pl);
+          }
+        }
       }
     }
     else PrintS(" ...");
@@ -1105,7 +1105,6 @@ int rSum(ring r1, ring r2, ring &sum)
 //#endif
 #ifdef HAVE_PLURAL
   ring old_ring = currRing;
-  rChangeCurrRing(sum);
   BOOLEAN R1_is_nc = rIsPluralRing(r1);
   BOOLEAN R2_is_nc = rIsPluralRing(r2);
   if ( (R1_is_nc) || (R2_is_nc))
@@ -1131,32 +1130,32 @@ int rSum(ring r1, ring r2, ring &sum)
     }
     if (sum->nc->type == nc_undef) /* not yet done */
     {
-      switch (t1) 
+      switch (t1)
       {
         case nc_comm:
-	  sum->nc->type = t2;
+          sum->nc->type = t2;
           break;
         case nc_lie:
-	  switch(t2)
-	  {
-	    case nc_skew:
-	      sum->nc->type = nc_general;  break;
-	    case nc_comm:
-	      sum->nc->type = nc_lie;  break;
-	    default:
-	      /*sum->nc->type = nc_undef;*/  break;
-	  }
-	  break;
+          switch(t2)
+          {
+            case nc_skew:
+              sum->nc->type = nc_general;  break;
+            case nc_comm:
+              sum->nc->type = nc_lie;  break;
+            default:
+              /*sum->nc->type = nc_undef;*/  break;
+          }
+          break;
         case nc_skew:
-	  switch(t2)
-	  {
-	    case nc_lie:
-	      sum->nc->type = nc_lie;  break;
-	    case nc_comm:
-	      sum->nc->type = nc_skew;  break;
-	    default:
-	      /*sum->nc->type = nc_undef;*/  break;
-	  }
+          switch(t2)
+          {
+            case nc_lie:
+              sum->nc->type = nc_lie;  break;
+            case nc_comm:
+              sum->nc->type = nc_skew;  break;
+            default:
+              /*sum->nc->type = nc_undef;*/  break;
+          }
         default:
           /*sum->nc->type = nc_undef;*/
           break;
@@ -1190,7 +1189,7 @@ int rSum(ring r1, ring r2, ring &sum)
     {
       for (j= i+1; j<= rVar(R1) + rVar(R2); j++)
       {
-	MATELEM(C,i,j) = pOne();
+        MATELEM(C,i,j) = pOne();
       }
     }
     for (i=1; i< rVar(R1); i++)
@@ -1198,11 +1197,11 @@ int rSum(ring r1, ring r2, ring &sum)
       for (j=i+1; j<=rVar(R1); j++)
       {
 
-	MATELEM(C,i,j) = pPermPoly(MATELEM(C1,i,j),perm1,R1,nMap1,par_perm1,rPar(R1));
-	if (MATELEM(D1,i,j) != NULL)
-	{
-	  MATELEM(D,i,j) = pPermPoly(MATELEM(D1,i,j),perm1,R1,nMap1,par_perm1,rPar(R1));
-	}
+        MATELEM(C,i,j) = pPermPoly(MATELEM(C1,i,j),perm1,R1,nMap1,par_perm1,rPar(R1));
+        if (MATELEM(D1,i,j) != NULL)
+        {
+          MATELEM(D,i,j) = pPermPoly(MATELEM(D1,i,j),perm1,R1,nMap1,par_perm1,rPar(R1));
+        }
       }
     }
     for (i=1; i< rVar(R2); i++)
@@ -1210,10 +1209,10 @@ int rSum(ring r1, ring r2, ring &sum)
       for (j=i+1; j<=rVar(R2); j++)
       {
         MATELEM(C,rVar(R1)+i,rVar(R1)+j) = pPermPoly(MATELEM(C2,i,j),perm2,R2,nMap2,par_perm2,rPar(R2));
-      	if (MATELEM(D2,i,j) != NULL)
-	{
-	  MATELEM(D,rVar(R1)+i,rVar(R1)+j) = pPermPoly(MATELEM(D2,i,j),perm2,R2,nMap2,par_perm2,rPar(R2));
-	}
+              if (MATELEM(D2,i,j) != NULL)
+        {
+          MATELEM(D,rVar(R1)+i,rVar(R1)+j) = pPermPoly(MATELEM(D2,i,j),perm2,R2,nMap2,par_perm2,rPar(R2));
+        }
       }
     }
     idTest((ideal)C);
@@ -1231,19 +1230,18 @@ int rSum(ring r1, ring r2, ring &sum)
     if (perm2!=NULL) omFree((ADDRESS)perm2);
     if (par_perm1!=NULL) omFree((ADDRESS)par_perm1);
     if (par_perm2!=NULL) omFree((ADDRESS)par_perm2);
-    if ( old_ring != NULL)
-      rChangeCurrRing(old_ring);
+    rChangeCurrRing(old_ring);
   }
 #endif
-  ring old_ring2 = currRing;
-  rChangeCurrRing(sum);
   ideal Q=NULL;
-  ideal Q1, Q2;
+  ideal Q1=NULL, Q2=NULL;
+  ring old_ring2 = currRing;
   if (r1->qideal!=NULL)
   {
+    rChangeCurrRing(sum);
 //     if (r2->qideal!=NULL)
 //     {
-//       WerrorS("todo: qring+qring"); 
+//       WerrorS("todo: qring+qring");
 //       return -1;
 //     }
 //     else
@@ -1253,44 +1251,40 @@ int rSum(ring r1, ring r2, ring &sum)
     int *par_perm1 = NULL;
     if (rPar(r1)!=0) par_perm1=(int *)omAlloc0((rPar(r1)+1)*sizeof(int));
     maFindPerm(r1->names,  rVar(r1),  r1->parameter,  rPar(r1),
-	       sum->names, rVar(sum), sum->parameter, rPar(sum),
-	       perm1, par_perm1, sum->ch);
+               sum->names, rVar(sum), sum->parameter, rPar(sum),
+               perm1, par_perm1, sum->ch);
     nMapFunc nMap1 = nSetMap(r1);
     Q1 = idInit(IDELEMS(r1->qideal),1);
     for (int for_i=0;for_i<IDELEMS(r1->qideal);for_i++)
       Q1->m[for_i] = pPermPoly(r1->qideal->m[for_i],perm1,r1,nMap1,par_perm1,rPar(r1));
     omFree((ADDRESS)perm1);
   }
-  else
-  {
-    Q1 = NULL;
-  }
 
   if (r2->qideal!=NULL)
   {
+    if (currRing!=sum)
+      rChangeCurrRing(sum);
     int *perm2 = (int *)omAlloc0((rVar(r2)+1)*sizeof(int));
     int *par_perm2 = NULL;
     if (rPar(r2)!=0) par_perm2=(int *)omAlloc0((rPar(r2)+1)*sizeof(int));
     maFindPerm(r2->names,  rVar(r2),  r2->parameter,  rPar(r2),
-	       sum->names, rVar(sum), sum->parameter, rPar(sum),
-	       perm2, par_perm2, sum->ch);
+               sum->names, rVar(sum), sum->parameter, rPar(sum),
+               perm2, par_perm2, sum->ch);
     nMapFunc nMap2 = nSetMap(r2);
     Q2 = idInit(IDELEMS(r2->qideal),1);
     for (int for_i=0;for_i<IDELEMS(r2->qideal);for_i++)
       Q2->m[for_i] = pPermPoly(r2->qideal->m[for_i],perm2,r2,nMap2,par_perm2,rPar(r2));
     omFree((ADDRESS)perm2);
   }
-  else
-  {
-    Q2 = NULL;
-  }
   if ( (Q1!=NULL) || ( Q2!=NULL))
+  {
     Q = idSimpleAdd(Q1,Q2);
-  sum->qideal = Q; 
-  if ( old_ring2 != NULL)
     rChangeCurrRing(old_ring2);
+  }
+  sum->qideal = Q;
   return 1;
 }
+
 /*2
  * create a copy of the ring r, which must be equivalent to currRing
  * used for qring definition,..
@@ -3667,8 +3661,8 @@ static void rOppWeight(int *w, int l)
   for(int j=0; j<=i2; j++)
   {
     int t=w[j];
-    w[j]=w[l-j]; 
-    w[l-j]=t; 
+    w[j]=w[l-j];
+    w[l-j]=t;
   }
 }
 
@@ -3723,7 +3717,7 @@ ring rOpposite(ring src)
 //    switch(r->typ[i].ord_typ)
 //    {
 //      case ro_dp:
-//      // 
+//      //
 //        t=r->typ[i].data.dp.start;
 //        r->typ[i].data.dp.start=rOppVar(r,r->typ[i].data.dp.end);
 //        r->typ[i].data.dp.end=rOppVar(r,t);
@@ -3780,7 +3774,7 @@ ring rOpposite(ring src)
         r->block1[j]=rOppVar(r, src->block0[i]);
         break;
       case ringorder_dp: /* dp -> a(1..1),ls */
-      { 
+      {
         l=rRealloc1(r,src,l,j);
         r->order[j]=ringorder_a;
         r->block0[j]=rOppVar(r, src->block1[i]);
@@ -3794,9 +3788,9 @@ ring rOpposite(ring src)
         r->block1[j]=rOppVar(r, src->block0[i]);
         j++;
         break;
-      } 
+      }
       case ringorder_Dp: /* Dp -> a(1..1),rp */
-      { 
+      {
         l=rRealloc1(r,src,l,j);
         r->order[j]=ringorder_a;
         r->block0[j]=rOppVar(r, src->block1[i]);
@@ -3810,9 +3804,9 @@ ring rOpposite(ring src)
         r->block1[j]=rOppVar(r, src->block0[i]);
         j++;
         break;
-      } 
+      }
       case ringorder_wp: /* wp -> a(...),ls */
-      { 
+      {
         l=rRealloc1(r,src,l,j);
         r->order[j]=ringorder_a;
         r->block0[j]=rOppVar(r, src->block1[i]);
@@ -3825,9 +3819,9 @@ ring rOpposite(ring src)
         r->block1[j]=rOppVar(r, src->block0[i]);
         j++;
         break;
-      } 
+      }
       case ringorder_Wp: /* Wp -> a(...),rp */
-      { 
+      {
         l=rRealloc1(r,src,l,j);
         r->order[j]=ringorder_a;
         r->block0[j]=rOppVar(r, src->block1[i]);
@@ -3840,9 +3834,9 @@ ring rOpposite(ring src)
         r->block1[j]=rOppVar(r, src->block0[i]);
         j++;
         break;
-      } 
+      }
       case ringorder_M: /* M -> M */
-      { 
+      {
         r->order[j]=ringorder_M;
         r->block0[j]=rOppVar(r, src->block1[i]);
         r->block1[j]=rOppVar(r, src->block0[i]);
@@ -3856,7 +3850,7 @@ ring rOpposite(ring src)
         break;
       }
       case ringorder_a: /*  a(...),ls -> wp/dp */
-      { 
+      {
         r->block0[j]=rOppVar(r, src->block1[i]);
         r->block1[j]=rOppVar(r, src->block0[i]);
         rOppWeight(r->wvhdl[j], r->block1[j]-r->block0[j]);
@@ -3888,7 +3882,7 @@ ring rOpposite(ring src)
         Werror("order %s not (yet) supported", rSimpleOrdStr(src->order[i]));
         break;
     }
-  } 
+  }
   rComplete(r);
 #ifdef RDEBUG
   //   rDebugPrint(r);
@@ -4004,10 +3998,10 @@ BOOLEAN nc_rComplete(ring src, ring dest)
       p = NULL;
       if (MATELEM(D0,i,j) != NULL)
       {
-	p = prCopyR(MATELEM(D0,i,j), src->nc->basering, dest);
-	MATELEM(D,i,j) = nc_p_CopyPut(p, dest);
-	p_Delete(&p, dest);
-	p = NULL;
+        p = prCopyR(MATELEM(D0,i,j), src->nc->basering, dest);
+        MATELEM(D,i,j) = nc_p_CopyPut(p, dest);
+        p_Delete(&p, dest);
+        p = NULL;
       }
     }
   }
@@ -4039,12 +4033,12 @@ void rModify_a_to_A(ring r)
       if (r->order[i]==ringorder_a)
       {
         r->order[i]=ringorder_a64;
-	int *w=r->wvhdl[i];
-	int64 *w64=(int64 *)omAlloc((r->block1[i]-r->block0[i]+1)*sizeof(int64));
-	for(j=r->block1[i]-r->block0[i];j>=0;j--)
-		w64[j]=(int64)w[j];
-	r->wvhdl[i]=(int*)w64;
-	omFreeSize(w,(r->block1[i]-r->block0[i]+1)*sizeof(int));
+        int *w=r->wvhdl[i];
+        int64 *w64=(int64 *)omAlloc((r->block1[i]-r->block0[i]+1)*sizeof(int64));
+        for(j=r->block1[i]-r->block0[i];j>=0;j--)
+                w64[j]=(int64)w[j];
+        r->wvhdl[i]=(int*)w64;
+        omFreeSize(w,(r->block1[i]-r->block0[i]+1)*sizeof(int));
       }
       i++;
    }
