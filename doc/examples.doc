@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.73 2005-05-06 09:24:51 bricken Exp $
+@comment $Id: examples.doc,v 1.74 2005-05-06 11:51:36 bricken Exp $
 @comment this file contains the examples
 
 @c The following directives are necessary for proper compilation
@@ -808,28 +808,24 @@ It provides, in particular, a fast algorithm for computing Groebner bases
 over function fields and with respect to degree orderings.
 
 In the example below (Groebner basis with respect to degree reverse
-lexicographic ordering over finite field) it is more than 200 times
+lexicographic ordering over function field) it is more than 600 times
 faster than the @code{std} command.
 @smallexample
 @c example
-  ring r = 32003, (x,y,z,t,u,v,w,a,b,c,d,e,f,g,h,i,j,k), dp;
-  timer = 1;
-  ideal i0=x3-x2y+x2z+xt-7uv+8xa+bc+gh+ij+vw+ak+tu,
-           a2b -x2,
-           abx-1,
-           uv+x,
-           khuvw+x4,
-           vw-ef,
-           ki-jk,
-           abcd-x4,
-           hijk-xy,
-           tuvw+x2;
-  ideal l = slimgb(i0);
+ring r=(32003,u1, u2, u3, u4),(x1, x2, x3, x4, x5, x6, x7),dp;
+timer=1;
+ideal i=
+-x4*u3+x5*u2,
+x1*u3+2*x2*u1-2*x2*u2-2*x3*u3-u1*u4+u2*u4,
+-2*x1*x5+4*x4*x6+4*x5*x7+x1*u3-2*x4*u1-2*x4*u4-2*x6*u2-2*x7*u3+u1*u2+u2*u4,
+-x1*x5+x1*x7-x4*u1+x4*u2-x4*u4+x5*u3+x6*u1-x6*u2+x6*u4-x7*u3,
+-x1*x4+x1*u1-x5*u1+x5*u4,
+-2*x1*x3+x1*u3-2*x2*u4+u1*u4+u2*u4,
+x1^2*u3+x1*u1*u2-x1*u2^2-x1*u3^2-u1*u3*u4+u3*u4^2;
+i=system("trepgb", i);
+
 @c example
 @end smallexample
-One trick in this example is to exchange the roles of the first polynomial
-and of the S-Polynomial of @code{a2b-x2} and @code{abx-1}. Note that
-this S-polynomial has the same leading term @code{x3}. 
 
 For detailed information and limitations see @ref{slimgb}.
 @c ----------------------------------------------------------------------------
