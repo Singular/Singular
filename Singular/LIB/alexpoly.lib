@@ -1,4 +1,4 @@
-version="$Id: alexpoly.lib,v 1.10 2005-05-06 17:07:34 Singular Exp $";
+version="$Id: alexpoly.lib,v 1.11 2005-05-06 17:17:01 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  alexpoly.lib   Resolution Graph and Alexander Polynomial
@@ -22,7 +22,7 @@ PROCEDURES:
  charexp2inter(c,e);        converts contact matrix and charact. exp. to intersection matrix
  charexp2conductor(v);      converts characteristic exponents to conductor
  charexp2poly(v,a);         calculates a polynomial f with characteristic exponents v
- tau_es(f);                 equisingular Tjurina number of f
+ tau_es2(f);                equisingular Tjurina number of f
 
 KEYWORDS: Hamburger-Noether expansion; Puiseux expansion; curve singularities;
           topological invariants; Alexander polynomial; resolution graph;
@@ -1402,8 +1402,8 @@ example
   invariants(f)[1][1];  // The characteristic exponents of f.
 }
 
-proc tau_es (def INPUT, list #)
-"USAGE:  tau_es(INPUT); INPUT poly or list
+proc tau_es2 (def INPUT, list #)
+"USAGE:  tau_es2(INPUT); INPUT poly or list
 ASSUME:  INPUT is either a REDUCED bivariate polynomial defining a plane curve singularity,
          or the output of @code{hnexpansion(f[,\"ess\"])}, or the list @code{hne} in
          the ring created by @code{hnexpansion(f[,\"ess\"])}, or the output of
@@ -1422,8 +1422,8 @@ NOTE:    The equisingular Tjurina number is calculated with the aid of a Hamburg
          @*
          If you are not sure whether the INPUT polynomial is reduced or not, use
          @code{squarefree(INPUT)} as input instead.
-SEE ALSO: develop, hnexpansion, totalmultiplicities, equising.lib
-EXAMPLE: example tau_es;  shows an example
+SEE ALSO: tau_es, develop, hnexpansion, totalmultiplicities, equising.lib
+EXAMPLE: example tau_es2;  shows an example
 "
 {
   // If the input is a weighted homogeneous polynomial, then use a direct algorithm to
@@ -1574,9 +1574,9 @@ example
   poly f1=y2-x3;
   poly f2=(y2-x3)^2-4x5y-x7;
   poly f3=y3-x2;
-  tau_es(f1);
-  tau_es(f2);
-  tau_es(f1*f2*f3);
+  tau_es2(f1);
+  tau_es2(f2);
+  tau_es2(f1*f2*f3);
 }
 
 
