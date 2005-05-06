@@ -1,6 +1,6 @@
-// $Id: urrcount.lib,v 1.4 2005-05-06 09:42:01 Singular Exp $
+// $Id: urrcount.lib,v 1.5 2005-05-06 11:17:33 Singular Exp $
 // E. Tobis  12.Nov.2004, April 2004
-// last change 1. May 2005 (G.-M. Greuel)
+// last change 5. May 2005 (G.-M. Greuel)
 ///////////////////////////////////////////////////////////////////////////////
 category="Symbolic-numerical solving"
 info="
@@ -62,7 +62,8 @@ static proc isparametric(poly p)
 ///////////////////////////////////////////////////////////////////////////////
 proc isparam(list #)
 "USAGE:     isparam(ideal/module/poly/list);
-RETURN:    int: 0 if the argument is not parametric and 1 if it
+RETURN:    int: 0 if the argument has non-parametric coefficients
+           and 1 if it has
 EXAMPLE:   example isparam; shows an example"
 {
   int i;
@@ -217,7 +218,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 proc varsigns(list l)
 "USAGE:     varsigns(l); list l.
-RETURN:    number: the number of sign changes in the list l
+RETURN:    int: the number of sign changes in the list l
 SEE ALSO:  boundposDes
 EXAMPLE:   example varsigns; shows an example"
 {
@@ -250,7 +251,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 proc boundBuFou(poly p,number a,number b)
 "USAGE:     boundBuFou(p,a,b); p poly, a,b number
-RETURN:    number: an upper bound for the number of real roots of p in (a,b],
+RETURN:    int: an upper bound for the number of real roots of p in (a,b],
            with the same parity as the actual number of roots (using the
            Budan-Fourier Theorem)
 ASSUME:    p is a univarite polynomials with rational coefficients
@@ -314,7 +315,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 proc boundposDes(poly p)
 "USAGE:     boundposDes(p); poly p
-RETURN:    number: an upper bound for the number of positive roots of p, with
+RETURN:    int: an upper bound for the number of positive roots of p, with
            the same parity as the actual number of positive roots of p.
 ASSUME:    p is a univarite polynomials with rational coefficients
 SEE ALSO:  boundBuFou
@@ -368,7 +369,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 proc boundDes(poly p)
 "USAGE:     boundDes(p); poly p
-RETURN:    number: an upper bound for the number of real roots of p, with
+RETURN:    int: an upper bound for the number of real roots of p, with
            the same parity as the actual number of real roots of p.
 ASSUME:    p is a univarite polynomials with rational coefficients
 SEE ALSO:  boundBuFou
@@ -433,7 +434,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 proc allrealst(poly p)
 "USAGE:     allrealst(p); poly p
-RETURN:    int: 1 iff all the roots of p are real, 0 otherwise
+RETURN:    int: 1 iff all the roots of p are real, 0 otherwise.
            Checks whether all the roots of p are real by using Sturm's Theorem
 ASSUME:    p is a univarite polynomials with rational coefficients
 SEE ALSO:  allreal,sturm,sturmha
@@ -505,7 +506,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 proc sturm(poly p,number a,number b)
 "USAGE:     sturm(p,a,b); poly p, number a,b
-RETURN:    number: the number of real roots of p in (a,b]
+RETURN:    int: the number of real roots of p in (a,b]
 ASSUME:    p is a univarite polynomials with rational coefficients,
            a, b are rational numbers with a < b
 SEE ALSO:  sturmha,allrealst,allreal
@@ -629,7 +630,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 proc allreal(poly p)
 "USAGE:     allreal(p);
-RETURN:    bool: 1 iff all the roots of p are real
+RETURN:    int: 1 iff all the roots of p are real, 0 otherwise
 SEE ALSO:  allrealst
 EXAMPLE:   example allreal; shows an example"
 {
@@ -663,7 +664,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 proc sturmha(poly P,number a,number b)
 "USAGE:     sturmha(p,a,b); poly p, number a,b
-RETURN:    number: the number of real roots of p in (a,b) (using a
+RETURN:    int: the number of real roots of p in (a,b) (using a
            Sturm-Habicht sequence)
 SEE ALSO:  sturm,allreal
 EXAMPLE:   example sturmha; shows an example"
@@ -673,7 +674,8 @@ EXAMPLE:   example sturmha; shows an example"
   list seqa,seqb;
   poly variable;
   number bound;
-  number result;
+  //number result;
+  int result;
 
   if (isparam(P) || isparam(a) || isparam(b)) {
     ERROR("This procedure cannot operate with parametric arguments");
@@ -833,7 +835,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 proc nrroots(poly p)
 "USAGE:     nrroots(p); poly p
-RETURN:    number: the number of real roots of p
+RETURN:    int: the number of real roots of p
 SEE ALSO:  boundposDes, sturm, sturmha
 EXAMPLE:   example nrroots; shows an example"
 {
@@ -1028,5 +1030,6 @@ static proc W(list l)
   return (sc);
 }
 ///////////////////////////////////////////////////////////////////////////////
+
 
 

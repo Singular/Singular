@@ -1,4 +1,4 @@
-// $Id: signcond.lib,v 1.2 2005-05-02 12:24:16 Singular Exp $
+// $Id: signcond.lib,v 1.3 2005-05-06 11:17:33 Singular Exp $
 // E. Tobis  12.Nov.2004
 // last change 16. Apr. 2005 (G.-M. Greuel)
 ///////////////////////////////////////////////////////////////////////////////
@@ -13,7 +13,7 @@ OVERVIEW:  Routines to determine the number of solutions of a multivariate
            Geometry\", Springer, 2003.
 
 PROCEDURES:
-  signcnd(P,I)   The sign conditions realized the polynomials of P on a V(I)
+  signcnd(P,I)   The sign conditions realized by polynomials of P on a V(I)
   psigncnd(P,l)  Pretty prints the output of signcnd (l)
   firstoct(I)    The number of elements of V(I) with every coordinate > 0
 
@@ -26,7 +26,7 @@ LIB "linalg.lib";
 
 proc firstoct(ideal I)
 "USAGE:    firstoct(i); i ideal
-RETURN:   number: the number of points of V(i) lying in the first orthant
+RETURN:   number: the number of points of V(i) lying in the first octant
 ASSUME:   i is a Groebner basis
 SEE ALSO: signcnd
 EXAMPLE:  example firstoct; shows an example"
@@ -69,10 +69,20 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc signcnd(ideal P,ideal I)
-"USAGE:     signcnd(P,i); ideal P,i. i must be a grobner basis
+"USAGE:     signcnd(P,I); ideal P,I
 RETURN:    list: the sign conditions realized by the polynomials of P on V(I).
-           See the example for an explanation of the output.
-SEE ALSO:  firstoct
+           The output of signcnd is a list of two lists. Both lists have the
+           same length. That length is the number of sign conditions realized 
+           by the polynomials of P on the set V(i).
+           Each element of the first list indicates a sign condition of the
+           polynomials of P.
+           Each element of the second list indicates how many elements of V(I)
+           give rise to the sign condition expressed by the same position on 
+           the first list.
+           See the example for further explanation of the output.
+ASSUME:    I is a Groebner basis
+NOTE:      The procedure psigncnd performs some pretty printing of this output
+SEE ALSO:  firstoct, psigncnd
 EXAMPLE:   example signcnd; shows an example"
 {
   ideal B;
@@ -241,39 +251,28 @@ EXAMPLE:   example signcnd; shows an example"
   return (result);
 }
 example
-{
-  echo = 2;
+{ echo = 2;
   ring r = 0,(x,y),dp;
   ideal i = (x-2)*(x+3)*x,y*(y-1);
   ideal P = x,y;
   list l = signcnd(P,i);
-  echo = 0;
 
-  print("The output of signcnd is a list of two lists. Both lists have the
-same");
-  print("length. That length is the number of sign conditions realized by the");
-  print ("polynomials of P on the set V(i). In this example, that number
-is");
-  print("print(size(l[1]));");
-  print(size(l[1]));
-  print("Each element of the first list indicates a sign condition of the");
-  print("polynomials of P. For example,");
-  print("print(l[1][2]);");
-  print(l[1][2]);
-  print("means P[1] > 0,P[2] = 0");
-  print("Each element of the second list indicates how many elements of V(I)");
-  print("give rise to the sign condition expressed by the same position on the");
-  print("first list. For example");
-  print("print(l[2][2]);");
-  print(l[2][2]);
-  print("indicates that exactly 1 elemnt of V(I) gives rise to the condition");
-  print("P[1] > 0,P[2] = 0.");
-  print("The procedure psigncnd performs some pretty printing on this output.");
+  size(l[1]);     // = the number of sign conditions of P on V(i)
+
+  //Each element of l[1] indicates a sign condition of the polynomials of P. 
+  //The following means P[1] > 0, P[2] = 0:
+  l[1][2];
+
+  //Each element of l[2] indicates how many elements of V(I) give rise to 
+  //the sign condition expressed by the same position on the first list.
+  //The following means that exactly 1 element of V(I) gives rise to the 
+  //condition P[1] > 0, P[2] = 0:
+  l[2][2];
 }
 ///////////////////////////////////////////////////////////////////////////////
 
 proc psigncnd(ideal P,list l)
-"USAGE:     psigncnd(P,I); ideal P, list l
+"USAGE:     psigncnd(P,l); ideal P, list l
 RETURN:    list: a formatted version of l
 SEE ALSO:  signcnd
 EXAMPLE:   example psigncnd; shows an example"
@@ -436,4 +435,5 @@ static proc incexp(list exp)
   return (exp);
 }
 ///////////////////////////////////////////////////////////////////////////////
+
 
