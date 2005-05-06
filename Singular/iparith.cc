@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.354 2005-05-06 11:55:38 bricken Exp $ */
+/* $Id: iparith.cc,v 1.355 2005-05-06 17:31:04 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1661,8 +1661,8 @@ static BOOLEAN jjELIMIN(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjEXPORTTO(leftv res, leftv u, leftv v)
 {
-  Print("exportto %s -> %s\n",v->Name(),u->Name() );
-  return FALSE;
+  //Print("exportto %s -> %s\n",v->Name(),u->Name() );
+  return iiExport(v,0,(idhdl)u->data);
 }
 static BOOLEAN jjERROR(leftv res, leftv u)
 {

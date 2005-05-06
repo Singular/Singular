@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.109 2005-05-06 12:39:47 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.110 2005-05-06 17:31:05 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -458,7 +458,7 @@ void list_cmd(int typ, const char* what, char *prefix,BOOLEAN iterate, BOOLEAN f
         }
         else if((IDTYP(h)==PACKAGE_CMD) || (IDTYP(h)==POINTER_CMD))
         {
-          Print("list_cmd:package or pointer\n");
+          //Print("list_cmd:package or pointer\n");
           all=TRUE;typ=PROC_CMD;fullname=TRUE;really_all=TRUE;
           h=IDPACKAGE(h)->idroot;
         }

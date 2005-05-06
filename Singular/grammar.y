@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.108 2005-05-06 12:16:47 Singular Exp $ */
+/* $Id: grammar.y,v 1.109 2005-05-06 17:31:03 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -1153,30 +1153,6 @@ exportcmd:
 	  else
 #endif /* HAVE_NS */
             if (iiExport(&$2,0)) YYERROR;
-        }
-        | EXPORT_CMD exprlist extendedid expr
-        {
-          if ((strcmp($3,"to")!=0) ||
-          (($4.Typ()!=PACKAGE_CMD) && ($4.Typ()!=INT_CMD) &&
-           ($4.Typ()!=STRING_CMD)))
-            MYYERROR("export <id> to <package|int>");
-          omFree((ADDRESS)$3);
-          if ($4.Typ()==INT_CMD)
-          {
-            if (iiExport(&$2,((int)$4.Data())-1)) YYERROR;
-          }
-          else
-          {
-#ifdef HAVE_NS
-            package p=(package)$4.Data();
-	    if (p!=$2.req_packhdl)
-	    {
-	      if(iiExport(&$2,0,(idhdl)$4.data)) YYERROR;
-	    }
-#else
-            Print("%s::%s;\n", (char *)$4.Name(),$2.Name());
-#endif /* HAVE_NS */
-          }
         }
         ;
 
