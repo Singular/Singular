@@ -1,13 +1,13 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ncdecomp.lib,v 1.8 2005-04-28 16:32:06 levandov Exp $";
+version="$Id: ncdecomp.lib,v 1.9 2005-05-06 14:38:49 hannes Exp $";
 category="Noncommutative";
 info="
-LIBRARY:  ncdecomp.lib      Central character decomposition of a module 
+LIBRARY:  ncdecomp.lib      Central character decomposition of a module
 AUTHORS:  Viktor Levandovskyy,     levandov@mathematik.uni-kl.de.
 
 OVERVIEW:
-This library presents algorithms for the  central character 
-decomposition of a module (in other words, a 
+This library presents algorithms for the  central character
+decomposition of a module (in other words, a
 decomposition into generalized weight modules with respect to the center).
 Based on ideas of O. Khomenko and V. Levandovskyy.
 
@@ -38,7 +38,7 @@ static proc CharKernel(list L, int i)
     Li = L[1..sL-1];
   }
   if ( (i>1) && (i < sL))
-  { 
+  {
     Li = L[1..i-1];
     for (j=i+1; j<=sL; j++)
     {
@@ -84,11 +84,11 @@ static proc MyIsEqual(module A, module B)
 // both A and B are submodules of free module
   option(redSB);
   option(redTail);
-  if (attrib(A,"isSB")!=1) 
+  if (attrib(A,"isSB")!=1)
   {
     A = std(A);
   }
-  if (attrib(B,"isSB")!=1) 
+  if (attrib(B,"isSB")!=1)
   {
     B = std(B);
   }
@@ -106,7 +106,7 @@ static proc MyIsEqual(module A, module B)
 proc CentralQuot(module I, ideal G)
 "USAGE:  CentralQuot(M, G), for a module M and an ideal G,
 PURPOSE: compute the central quotient I:G
-RETURN:  module 
+RETURN:  module
 NOTE:    the output module is not necessarily a Groebner basis,
 SEE ALSO: CentralSaturation, CenCharDec
 EXAMPLE: example CentralQuot; shows examples
@@ -181,8 +181,8 @@ proc CenCharDec(module I, def #)
 "USAGE:  CenCharDec(I, C);  I a module, C an ideal/list of generators of the center;
 PURPOSE: compute a finite central character decomposition (or determine that there is no finite one),
 RETURN:  a list L, where each entry consists of three records:
-@*       L[*][1] ('ideal' type), the central character as the maximal ideal in the center, 
-@*       L[*][2] ('module' type), the Groebner basis of the weight module, corresponding to the character, 
+@*       L[*][1] ('ideal' type), the central character as the maximal ideal in the center,
+@*       L[*][2] ('module' type), the Groebner basis of the weight module, corresponding to the character,
 @*       L[*][3] ('int' type) is the K-dimension of the weight module (-1 is returned in the case of infinite dimension);
 NOTE:     actual decomposition is a sum of L[i][2];
 @*        some modules have no finite decomposition (in such case one gets warning message)
@@ -361,8 +361,8 @@ EXAMPLE: example IntersectWithSub; shows an example
       p = bracket(Z[i],Z[j]);
       if (p!=0)
       {
-	"Error: generators of the subalgebra do not commute.";
-	return(ideal(0));
+        "Error: generators of the subalgebra do not commute.";
+        return(ideal(0));
       }
     }
   }

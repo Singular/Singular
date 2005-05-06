@@ -1,17 +1,17 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: nctools.lib,v 1.11 2005-04-28 16:32:06 levandov Exp $";
+version="$Id: nctools.lib,v 1.12 2005-05-06 14:38:50 hannes Exp $";
 category="Noncommutative";
 info="
 LIBRARY: nctools.lib     General tools for noncommutative algebras
 AUTHORS:   Levandovskyy V.,     levandov@mathematik.uni-kl.de,
 @*         Lobillo, F.J.,       jlobillo@ugr.es,
-@*	   Rabelo, C.,          crabelo@ugr.es.
+@*           Rabelo, C.,          crabelo@ugr.es.
 
 SUPPORT: DFG (Deutsche Forschungsgesellschaft) and Metodos algebraicos y efectivos en grupos cuanticos, BFM2001-3141, MCYT, Jose Gomez-Torrecillas (Main researcher).
 
 PROCEDURES:
-Gweights(r);		computes weights for a compatible ordering in a G-algebra,
-weightedRing(r);	changes the ordering of a ring to a weighted one,
+Gweights(r);                computes weights for a compatible ordering in a G-algebra,
+weightedRing(r);        changes the ordering of a ring to a weighted one,
 ndc([v]);               the ideal of non-degeneracy conditions in G-algebra,
 RootOfUnity(n);         the minimal polynomial for the n-th primitive root of unity,
 Weyl([p]);              creates Weyl algebra structure in a basering (two different realizations),
@@ -21,14 +21,14 @@ Exterior();             returns qring, the exterior algebra of a basering,
 fin_dim_algebra(matrix M, list #); creates finite dimensional algebra structure from the basering and the multiplication matrix M,
 
 AUXILIARY PROCEDURES:
-Newton(f);  		Newton diagram of a polynomial,
-NCRelations(r);		recovers the non-commutative relations of a G-algebra,
+Newton(f);                  Newton diagram of a polynomial,
+NCRelations(r);                recovers the non-commutative relations of a G-algebra,
 IsCentral(p,[v]);       check for the commutativity of a polynomial in the G-algebra,
 Is_NC();                checks whether basering is noncommutative,
 UpOneMatrix(N);         returns NxN matrix with 1's in the whole upper triagle,
 
 ALIAS PROCEDURES:
-wRing(r);		alias to weightedRing,
+wRing(r);                alias to weightedRing,
 ";
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -102,9 +102,9 @@ example
 {
   "EXAMPLE:";echo=2;
   ring r = (0,q),(a,b,c,d),lp;
-  matrix C[4][4]; 
+  matrix C[4][4];
   C[1,2]=q; C[1,3]=q; C[1,4]=1; C[2,3]=1; C[2,4]=q; C[3,4]=q;
-  matrix D[4][4]; 
+  matrix D[4][4];
   D[1,4]=(q-1/q)*b*c;
   ncalgebra(C,D);
   setring r; r;
@@ -114,7 +114,7 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 
-// This procedure take a ring r, call to Gweights(r) and use the output 
+// This procedure take a ring r, call to Gweights(r) and use the output
 // of Gweights(r) to make a change of order in r
 // The output is a new ring, equal to r but the order
 // r must be a G-algebra
@@ -160,9 +160,9 @@ example
 {
   "EXAMPLE:";echo=2;
   ring r = (0,q),(a,b,c,d),lp;
-  matrix C[4][4]; 
+  matrix C[4][4];
   C[1,2]=q; C[1,3]=q; C[1,4]=1; C[2,3]=1; C[2,4]=q; C[3,4]=q;
-  matrix D[4][4]; 
+  matrix D[4][4];
   D[1,4]=(q-1/q)*b*c;
   ncalgebra(C,D);
   setring r; r;
@@ -276,7 +276,7 @@ static proc SimplMat(matrix P)
     int f = 1+n+r;
     intmat M[f][n+1]=0;
     int i;
-    for (i=2; i<=(n+1); i++) 
+    for (i=2; i<=(n+1); i++)
     {
       M[1,i]=-1; // (0,-1,-1,-1,...) objective function in the first row
     }
@@ -323,7 +323,7 @@ RETURNS: if there is a solution, an intvec with the solution."
     {
       if ( nv[i-1] <= N )
       {
-	wv[1,nv[i-1]]=int(m[i,1]);
+        wv[1,nv[i-1]]=int(m[i,1]);
       }
     }
   }
@@ -393,24 +393,24 @@ EXAMPLE: example NCRelations; shows examples
       int i,j;
       for (i=2; i<=n; i++)
       {
-	for (j=1; j<i; j++)
-	{
-	  f=var(i)*var(j); // yx=c*xy+...
-	  g=var(j)*var(i); // xy
-	  while (C[j,i]==0)
-	  {
-	    if (leadmonom(f)==leadmonom(g))
-	    {
-	      C[j,i]=leadcoef(f);
-	      D[j,i]=D[j,i]+f-lead(f);
-	    }
-	    else
-	    {
-	      D[j,i]=D[j,i]+lead(f);
-	      f=f-lead(f);
-	    }
-	  }
-	}
+        for (j=1; j<i; j++)
+        {
+          f=var(i)*var(j); // yx=c*xy+...
+          g=var(j)*var(i); // xy
+          while (C[j,i]==0)
+          {
+            if (leadmonom(f)==leadmonom(g))
+            {
+              C[j,i]=leadcoef(f);
+              D[j,i]=D[j,i]+f-lead(f);
+            }
+            else
+            {
+              D[j,i]=D[j,i]+lead(f);
+              f=f-lead(f);
+            }
+          }
+        }
       }
       l=C,D;
     }
@@ -439,8 +439,8 @@ example
 proc fin_dim_algebra(matrix M, list #)
 "USAGE:   fin_dim_algebra(M,[r]); M a matrix, r an optional ring.
 PURPOSE: creates a finite dimensional algebra structure in a ring r
-(if it is given) or in a basering (by default) from the matrix M. 
-Exports the ideal called Quot for further qring definition. 
+(if it is given) or in a basering (by default) from the matrix M.
+Exports the ideal called Quot for further qring definition.
 RETURN:  nothing
 NOTE: matrix M will be read according to relations Xj*Xi = M[i,j]; Quot is not given in its two-sided Groebner basis.
 EXAMPLE: example fin_dim_algebra; shows examples
@@ -471,15 +471,15 @@ EXAMPLE: example fin_dim_algebra; shows examples
       else { I=I,p; }
       if (j>i)
       {
-	if ((M[i,j]!=0) && (M[j,i]!=0))
-	{
-	  c = leadcoef(M[j,i])/leadcoef(M[i,j]);
-	}
-	else
-	{
-	  c = 1;
-	}
-	C[i,j]=c;
+        if ((M[i,j]!=0) && (M[j,i]!=0))
+        {
+          c = leadcoef(M[j,i])/leadcoef(M[i,j]);
+        }
+        else
+        {
+          c = 1;
+        }
+        C[i,j]=c;
         D[i,j]= - M[j,i] +c*M[i,j];
       }
     }
@@ -519,7 +519,7 @@ EXAMPLE: example IsCentral; shows examples
     {
       if (size(#) >0 )
       {
-	"Noncentral at:", var(in);
+        "Noncentral at:", var(in);
       }
       flag = 0;
     }
@@ -597,25 +597,25 @@ EXAMPLE: example ndc; shows examples
     {
       for (b=a+1; b<=numvars-1; b++)
       {
-	for(c=b+1; c<=numvars; c++)
-	{
-	  p = (var(c)^cnt)*(var(b)^cnt);
-	  p = p*(var(a)^cnt);
-	  p = p-(var(c)^cnt)*((var(b)^cnt)*(var(a)^cnt));
-	  if (Verbose) {a,".",b,".",c,".";}
-	  if (p!=0)
-	  { 
-	    if ( res==0 )
-	    {
-	      res[1] = p;
-	    }
-	    else
-	    {
-	      res = res,p;
-	    }
-	    if (Verbose) { "failed:",p; }
-	  }
-	}
+        for(c=b+1; c<=numvars; c++)
+        {
+          p = (var(c)^cnt)*(var(b)^cnt);
+          p = p*(var(a)^cnt);
+          p = p-(var(c)^cnt)*((var(b)^cnt)*(var(a)^cnt));
+          if (Verbose) {a,".",b,".",c,".";}
+          if (p!=0)
+          {
+            if ( res==0 )
+            {
+              res[1] = p;
+            }
+            else
+            {
+              res = res,p;
+            }
+            if (Verbose) { "failed:",p; }
+          }
+        }
       }
     }
     if (Verbose) { "done"; }
@@ -641,7 +641,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 proc RootOfUnity(int n)
 "USAGE:   RootOfUnity(n); n an integer
-PURPOSE: compute the minimal polynomial for the n-th primitive root of unity 
+PURPOSE: compute the minimal polynomial for the n-th primitive root of unity
 RETURN:  number
 NOTE: works only in field extensions by one element
 EXAMPLE: example RootOfUnity; shows examples
@@ -781,7 +781,7 @@ example
 proc Heisenberg(int N, list #)
 "USAGE:   Heisenberg(N, [p,d]); N an integer (setting 2*N+1 variables), p an optional integer (field characteristic), d an optional integer (power of h in the commutator)
 PURPOSE: create a N-th  Heisenberg algebra in x(i),y(i),h realization
-RETURN: nothing 
+RETURN: nothing
 NOTE: you have to activate this ring with the \"setring\" command
 EXAMPLE: example Heisenberg; shows examples
 "
@@ -868,10 +868,10 @@ example
 proc CreateWeyl(int n, list #)
 "USAGE:   CreateWeyl(n,[p]); n an integer, n>0; p an optional integer (field characteristic)
 PURPOSE: create a n-th Weyl algebra
-RETURN:  ring 
+RETURN:  ring
 NOTE:    you have to activate this ring with the \"setring\" command.
          The presentation of n-th Weyl algebra is classical:
-	 D(i)x(i)=x(i)D(i)+1
+         D(i)x(i)=x(i)D(i)+1
 SEE ALSO: Weyl
 EXAMPLE: example CreateWeyl; shows examples
 "{

@@ -1,6 +1,6 @@
 //last change: 02.03.2001 (Eric Westenberger)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: surf.lib,v 1.23 2005-05-01 21:09:08 bricken Exp $";
+version="$Id: surf.lib,v 1.24 2005-05-06 14:39:19 hannes Exp $";
 category="Visualization";
 info="
 LIBRARY: surf.lib    Procedures for Graphics with Surf
@@ -121,11 +121,11 @@ background_red=255; background_green=255; background_blue=255;");
     surf_call = surf_call + extra_surf_opts + " ";
   }
   surf_call =surf_call+ l +" >/dev/null 2>&1";
- 
+
   if("ppcMac-darwin"!=system("uname")){
      i=system("sh",surf_call);
   } else {
-    surf_call= surf_call + " || "+ "singularsurf " + 
+    surf_call= surf_call + " || "+ "singularsurf " +
       extra_surf_opts + " " +l +" >/dev/null 2>&1";
       i=system("sh",surf_call);
   }

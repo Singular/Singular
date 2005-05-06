@@ -1,17 +1,17 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ncalg.lib,v 1.11 2005-02-23 18:10:46 levandov Exp $";
+version="$Id: ncalg.lib,v 1.12 2005-05-06 14:38:48 hannes Exp $";
 category="Noncommutative";
 info="
 LIBRARY:  ncalg.lib      Definitions of important GR-algebras
 AUTHORS:  Viktor Levandovskyy,     levandov@mathematik.uni-kl.de,
-	  Oleksandr Motsak,        motsak@mathematik.uni-kl.de.
+          Oleksandr Motsak,        motsak@mathematik.uni-kl.de.
 
 PROCEDURES:
 sl(n[,p]);   returns U(sl_n) in char p, if an integer p is given,
-sl2([p]);    returns U(sl_2) in the (e,f,h) presentation; in char p, if an integer p is given, 
+sl2([p]);    returns U(sl_2) in the (e,f,h) presentation; in char p, if an integer p is given,
 g2([p]);     returns U(g_2) in the (x(i),y(i),Ha,Hb) presentation; in char p, if an integer p is given,
 gl(n,[p]);    returns U(gl_n) in the (e_ij (1<i,j<n)) presentation; in char p, if an integer p is given,
-Qso3([n]);   returns U_q(so_3) in the presentation of Klimyk, if integer n is given, the quantum parameter will be specialized at the (2n)-th root of unity, 
+Qso3([n]);   returns U_q(so_3) in the presentation of Klimyk, if integer n is given, the quantum parameter will be specialized at the (2n)-th root of unity,
 Qso3Casimir(n [,m]); returns a list with the (optionally normalized) Casimir elements of U_q(so_3) for the quantum parameter specialized at the n-th root of unity,
 Qsl2([n]); returns ring, corresponding to the V_q(sl_2) and the ideal Qideal in it, such that U_q(sl_2) = V_q(sl_2) / Qideal; if n is specified, the quantum parameter q will be specialized at the n-th root of unity
 Qsl3([n]); returns ring, corresponding to the V_q(sl_3) and the ideal Qideal in it, such that U_q(sl_3) = V_q(sl_3) / Qideal; if n is specified, the quantum parameter q will be specialized at the n-th root of unity
@@ -67,9 +67,9 @@ example
 proc sl(int n, list #)
 "USAGE:   sl(n,[p]); n an integer, n>1; p an optional integer (field characteristic)
 PURPOSE: set up the U(sl_n) in x(i),y(i),h(i) presentation over the field of char p
-RETURN:  ring, describing 
-NOTE:    You have to activate this ring with the 'setring' command. 
-@*       The presentation of U(sl_n) is derived from the standard presentation of sl_n, 
+RETURN:  ring, describing
+NOTE:    You have to activate this ring with the 'setring' command.
+@*       The presentation of U(sl_n) is derived from the standard presentation of sl_n,
 @*       where positive resp. negative roots are denoted by x(i) resp. y(i) and
 @*       Cartan elements are denoted by h(i).
 SEE ALSO: sl2, g2, gl, Qsl3, Qso3
@@ -86,19 +86,19 @@ EXAMPLE: example sl; shows examples
     setring @@@a;
     return(@@@a);
   }
-  
+
   int @p = defInt(#);
   ring @@@rr=@p,(x(1..n*(n-1)/2),y(1..n*(n-1)/2),h(1..n-1)),dp;
   intmat CNT[n][n]=0;
   matrix TMP[n][n]=0;
   int k,l=1,1;
-  int buf=0;  
+  int buf=0;
   list X,Y,H;
   for(k=1; k<=n; k++)
   {
     for(l=k+1; l<=n; l++)
     {
-      buf = (l-k-1)*(2*n-l+k)/2 + k; 
+      buf = (l-k-1)*(2*n-l+k)/2 + k;
       CNT[k,l] = buf;
       TMP[k,l] = 1;
       X[buf] = TMP;
@@ -106,7 +106,7 @@ EXAMPLE: example sl; shows examples
       CNT[l,k] = buf;
       TMP[l,k] = 1;
       Y[buf] = TMP;
-      TMP=0;   
+      TMP=0;
     }
   }
   for(k=1; k<=n-1; k++)
@@ -115,12 +115,12 @@ EXAMPLE: example sl; shows examples
     TMP[k+1,k+1]=-1;
     H[k]=TMP;
     TMP=0;
-  }  
+  }
   int i,j=1,1;
   number p,q=0,0;
   list V=X+Y+H;
   int v=size(V);
-  matrix D[v][v]=0;  
+  matrix D[v][v]=0;
   for(k=1; k<=v; k++)
   {
     for(l=k+1; l<=v; l++)
@@ -133,11 +133,11 @@ EXAMPLE: example sl; shows examples
           buf=(j-i-1)*(2*n-j+i)/2+i;
           if (TMP[i,j]!=0)
           {
-	    D[k,l]=D[k,l]+leadcoef(TMP[i,j])*x(buf);
+            D[k,l]=D[k,l]+leadcoef(TMP[i,j])*x(buf);
           }
           if (TMP[j,i]!=0)
-          {          
-	    D[k,l]=D[k,l]+leadcoef(TMP[j,i])*y(buf);
+          {
+            D[k,l]=D[k,l]+leadcoef(TMP[j,i])*y(buf);
           }
         }
       }
@@ -148,8 +148,8 @@ EXAMPLE: example sl; shows examples
         p=leadcoef(TMP[j,j]);
         q=leadcoef(TMP[j+1,j+1]);
         D[k,l]=D[k,l]+p*h(j);
-	//        if ((j!=n-1)&&((p+q)!=0)) {D[k,l]=D[k,l]+(p+q)*h(j+1);}
-        TMP[j+1,j+1]=TMP[j+1,j+1]+p; 
+        //        if ((j!=n-1)&&((p+q)!=0)) {D[k,l]=D[k,l]+(p+q)*h(j+1);}
+        TMP[j+1,j+1]=TMP[j+1,j+1]+p;
       }
     }
   }
@@ -262,13 +262,13 @@ EXAMPLE: example gl; shows examples
   for ( i = 1; i<= n ; i++ )
   {
         for ( j = 1; j<= n ; j++ )
-	{
-	    if ( vs != "" ) 
-	    {
-		vs = vs + ", ";
-	    };
-	    vs = vs + "e_" + string(i) + "_" + string(j);    
-	};  
+        {
+            if ( vs != "" )
+            {
+                vs = vs + ", ";
+            };
+            vs = vs + "e_" + string(i) + "_" + string(j);
+        };
   };
   string strRING = "ring RING_GL=(" + string (@p) + "), (" + vs + "),dp;";
   execute( strRING );
@@ -281,21 +281,21 @@ EXAMPLE: example gl; shows examples
   {
     ik = 1 + ((k-1)/n);
     jk = k -  n*(ik-1);
-    
+
     for( l=k+1; l<=N; l++)
     {
         il = 1 + ((l-1)/n);
-	jl = l -  n*(il-1);
-	p = 0;    
-	if( jl == ik )
-	{
-	    p = p + var ( (il-1)*n + jk );
-	};
-	if( jk == il )
-	{
-	    p = p - var ( (ik-1)*n + jl );
-	};
-	D[k,l]=p;
+        jl = l -  n*(il-1);
+        p = 0;
+        if( jl == ik )
+        {
+            p = p + var ( (il-1)*n + jk );
+        };
+        if( jk == il )
+        {
+            p = p - var ( (ik-1)*n + jl );
+        };
+        D[k,l]=p;
     };
   };
   ncalgebra(1,D);
@@ -316,7 +316,7 @@ NOTE:    you have to activate this ring with the 'setring' command
 SEE ALSO: sl, g2, gl, Qsl2, Qsl3, Qso3Casimir
 EXAMPLE: example Qso3; shows examples
 "{
-  int @p = 2*defInt(#); 
+  int @p = 2*defInt(#);
   ring @@@r=(0,Q),(x,y,z),dp;
   minpoly = RootOfUnity(@p);
   matrix C[3][3];
@@ -371,7 +371,7 @@ EXAMPLE: example Qso3Casimir; shows examples
     rs=rs+hlp;
     hlp=0; k2=0; k1=0;
   }
-  if (size(#)>0) 
+  if (size(#)>0)
   {
     int m = int(#[1]);
     if (m!=0)
@@ -399,18 +399,18 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 proc Qsl2(list #)
 "USAGE:   Qsl2([n]), n an optional integer
-PURPOSE: set up the U_q(sl_2) = V_q(sl_2) / Qideal via the ring V_q(sl_2) and the ideal 'Qideal' in it; 
+PURPOSE: set up the U_q(sl_2) = V_q(sl_2) / Qideal via the ring V_q(sl_2) and the ideal 'Qideal' in it;
 @*       if n is specified, the quantum parameter q will be specialized at the n-th root of unity
 RETURN:  ring (V_q(sl_2))
-NOTE:    you have to activate this ring with the 'setring' command. 
+NOTE:    you have to activate this ring with the 'setring' command.
 @*       In order to create the U_q(sl_2) from the output, you have to call the command like 'qring Usl2q = Qideal;'
-SEE ALSO: sl, Qsl3, Qso3 
+SEE ALSO: sl, Qsl3, Qso3
 EXAMPLE: example Qsl2; shows examples
 "
 {
   ring r=(0,q),(E,F,Ke,Kf),dp;
   int @p = defInt(#);
-  if (@p >1) 
+  if (@p >1)
   {
     minpoly = RootOfUnity(@p);
   }
@@ -424,7 +424,7 @@ EXAMPLE: example Qsl2; shows examples
   ncalgebra(C,D);
   ideal Qideal = Ke*Kf-1;
   Qideal = twostd(Qideal);
-  export Qideal; 
+  export Qideal;
   return(r);
 }
 example
@@ -434,22 +434,22 @@ example
    Qideal;
    qring Usl2q = Qideal;
    Usl2q;
-}	
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 proc Qsl3(list #)
 "USAGE:   Qsl3([n]), n an optional integer
-PURPOSE: set up the U_q(sl_3) = V_q(sl_3) / Qideal via the ring V_q(sl_3) and the ideal 'Qideal' in it; 
+PURPOSE: set up the U_q(sl_3) = V_q(sl_3) / Qideal via the ring V_q(sl_3) and the ideal 'Qideal' in it;
 @*       if n is specified, the quantum parameter q will be specialized at the n-th root of unity
 RETURN:  ring (V_q(sl_3))
-NOTE:    you have to activate this ring with the 'setring' command. 
+NOTE:    you have to activate this ring with the 'setring' command.
 @*       In order to create the U_q(sl_3) from the output, you have to call the command like 'qring Usl3q = Qideal;'
 SEE ALSO: sl, Qsl2, Qso3
 EXAMPLE: example Qsl3; shows examples
 "{
   int @p = defInt(#);
   ring @@@rrr=(0, q), (f12, f13, f23, k1, k2, l1, l2, e12, e13, e23), wp(2, 3, 2, 1, 1, 1, 1, 2, 3, 2);
-  if (@p >1) 
+  if (@p >1)
   {
     minpoly = RootOfUnity(@p);
   }
@@ -461,7 +461,7 @@ EXAMPLE: example Qsl3; shows examples
   number Q  = (q )^2;
   number Q1 = (q1)^2;
   //   number QQ = Q - Q1; // q2 - 1/(q2)
-  number QQ1= 1 / (Q - Q1);  
+  number QQ1= 1 / (Q - Q1);
   // relations:
   C[1,2] = Q1;
   C[2,3] = C[1,2];
@@ -469,7 +469,7 @@ EXAMPLE: example Qsl3; shows examples
   C[9,10]= C[1,2];
   C[1,3] = Q;
   C[8,10]= C[1,3];
-  
+
   D[1,3] = -q*(f13);
   D[8,10]= -q*(e13);
   // V_q(sl_3)
@@ -527,17 +527,17 @@ example
 }
 
 proc GKZsystem(intmat A, string sord, string alg, list #)
-"USAGE:   GKZsystem(A, sord, alg, [,v]), where 
-@*        A    is an intmat, defining the system, 
-@*        sord is a string with desired term ordering, 
-@*        alg  is a string, saying which algorithm to use (exactly like in toric_lib), 
+"USAGE:   GKZsystem(A, sord, alg, [,v]), where
+@*        A    is an intmat, defining the system,
+@*        sord is a string with desired term ordering,
+@*        alg  is a string, saying which algorithm to use (exactly like in toric_lib),
 @*        v    is an optional intvec.
 PURPOSE: compute the ring and the GKZ system of equations in it
 RETURN:  ring (moreover, the ideal GKZid with equations is exported in it)
-NOTE:    you have to activate the ring with the 'setring' command; 
+NOTE:    you have to activate the ring with the 'setring' command;
 the procedure is elaborated by Oleksandr Yena
-OVERVIEW: this procedure uses toric_lib and therefore inherits its input requirements: 
-@*        possible values for input variable 'alg' are: \"ect\",\"pt\",\"blr\", \"hs\", \"du\". 
+OVERVIEW: this procedure uses toric_lib and therefore inherits its input requirements:
+@*        possible values for input variable 'alg' are: \"ect\",\"pt\",\"blr\", \"hs\", \"du\".
 @*        As for the term ordering, it should be a string in Singular format like \"lp\",\"dp\", etc. @*        Please consult with the toric_lib for allowed orderings and more details.
 SEE ALSO: toric_lib
 EXAMPLE: example GKZsystem; shows examples
@@ -550,7 +550,7 @@ EXAMPLE: example GKZsystem; shows examples
   {
     I0 = toric_ideal(A, alg);
   }
-  else 
+  else
   {
     if ( typeof(#[1]) == "intvec" )
     {

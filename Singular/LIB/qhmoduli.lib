@@ -876,7 +876,7 @@ NOTE:    used by 'Expand'
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc PolyPower1(int varIndex, poly f, int e, ideal reduceI, intvec wt, 
+static proc PolyPower1(int varIndex, poly f, int e, ideal reduceI, intvec wt,
                        int truncated, int ub)
 "USAGE:   PolyPower1(i, f, e, reduceI, wt, truncated, ub);int i, e, ub;poly f;
          ideal reduceI; intvec wt; list truncated;

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gmspoly.lib,v 1.10 2005-05-06 09:41:59 Singular Exp $";
+version="$Id: gmspoly.lib,v 1.11 2005-05-06 14:38:33 hannes Exp $";
 category="Singularities";
 
 info="
@@ -55,7 +55,7 @@ static proc maxdegree(matrix A)
 
 proc istame(poly f)
 "USAGE:    istame(f); poly f
-ASSUME: basering has no variables named w(1),w(2),... 
+ASSUME: basering has no variables named w(1),w(2),...
 RETURN:
 @format
 int k=
@@ -113,7 +113,7 @@ static proc pidbasis(module M0,module M)
     L=M;
 
     M=T,M;
-    N=transpose(std(transpose(M)));  
+    N=transpose(std(transpose(M)));
     T=N[1..m];
     M=N[m+1..ncols(N)];
 

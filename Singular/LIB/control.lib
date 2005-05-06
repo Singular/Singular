@@ -1,4 +1,4 @@
-version="$Id: control.lib,v 1.30 2005-05-06 09:41:58 Singular Exp $";
+version="$Id: control.lib,v 1.31 2005-05-06 14:38:12 hannes Exp $";
 category="System and Control Theory";
 info="
 LIBRARY:  control.lib     Algebraic analysis tools for System and Control Theory
@@ -34,7 +34,7 @@ AUXILIARY PROCEDURES:
   view();                well-formatted output of lists, modules and matrices
 ";
 
-LIB "homolog.lib"; 
+LIB "homolog.lib";
 LIB "poly.lib";
 LIB "primdec.lib";
 LIB "matrix.lib";
@@ -73,7 +73,7 @@ proc view(M)
 "USAGE:  view(M);   M is of any type
 RETURN:  no return value
 PURPOSE:  procedure for (well-) formatted output of modules, matrices, lists of modules, matrices; shows everything even if entries are long
-NOTE:  in case of other types( not 'module', 'matrix', 'list') works just as standard 'print' procedure  
+NOTE:  in case of other types( not 'module', 'matrix', 'list') works just as standard 'print' procedure
 EXAMPLE:  example view; shows an example
 "{
   // to be replaced with something more feasible
@@ -87,11 +87,11 @@ EXAMPLE:  example view; shows an example
   int Size=0;
   int max;
   string s;
-  
+
   for(i=1;i<=@C;i++)
-  { 
-    max=0; 
-    
+  {
+    max=0;
+
     for(j=1;j<=@R;j++)
     {
       Size=size( string( M[j,i] ) );
@@ -102,7 +102,7 @@ EXAMPLE:  example view; shows an example
     };
     MaxLength[i] = max;
   };
-  
+
   for(i=1;i<=@R;i++)
   {
     s="";
@@ -110,7 +110,7 @@ EXAMPLE:  example view; shows an example
     {
       s=s+string(M[i,j])+space( MaxLength[j]-size( string( M[i,j] ) ) ) +",";
     };
-    
+
     s=s+string(M[i,j])+space( MaxLength[j]-size( string( M[i,j] ) ) );
 
     if (i!=@R)
@@ -120,9 +120,9 @@ EXAMPLE:  example view; shows an example
     print(s);
   };
 
-  return();    
+  return();
   };
-  
+
   if(typeof(M)=="list")
   {
     int sz=size(M);
@@ -131,7 +131,7 @@ EXAMPLE:  example view; shows an example
     {
       view(M[i]);
       print("");
-    }; 
+    };
 
     return();
   };
@@ -151,7 +151,7 @@ proc RightKernel(matrix M)
 PURPOSE: computes the right kernel of matrix M (a module of all elements v such that Mv=0)
 RETURN:  module
 EXAMPLE: example RightKernel; shows an example
-"{ 
+"{
   return(modulo(M,std(0)));
 }
 example
@@ -214,13 +214,13 @@ NOTE: exists only in the case when Id belongs to M!
   return(T2);
 }
 example
-{ 
+{
   "EXAMPLE:";echo =2;
   // a trivial example:
   ring r = 0,(x,z),dp;
   matrix M[2][1] = 1,x2z;
   print(M);
-  print( LeftInverse(M) );  
+  print( LeftInverse(M) );
   kill r;
   // derived from the example TwoPendula:
   ring r=(0,m1,m2,M,g,L1,L2),Dt,dp;
@@ -251,7 +251,7 @@ example
   ring r = 0,(x,z),dp;
   matrix M[1][2] = 1,x2+z;
   print(M);
-  print( RightInverse(M) );  
+  print( RightInverse(M) );
   kill r;
   // derived from the TwoPendula example:
   ring r=(0,m1,m2,M,g,L1,L2),Dt,dp;
@@ -306,13 +306,13 @@ static proc is_zero_Our
   //  return( is_zero(R) ) ;
 };
 //------------------------------------------------------------------------
-static proc control_output(int i, int NVars, module R, module Ext_1, list Gen) 
-"USAGE:  control_output(i, NVars, R, Ext_1), 
+static proc control_output(int i, int NVars, module R, module Ext_1, list Gen)
+"USAGE:  control_output(i, NVars, R, Ext_1),
 PURPOSE: where
 @*         i is integer (number of first nonzero Ext or a number of variables in a basering + 1 in case that all the Exts are zero),
-@*	   NVars:  integer, number of variables in a base ring,
-@*	   R:  module R (cokernel representation),
-@*	   Ext_1:  module, the first Ext(its cokernel representation)      
+@*           NVars:  integer, number of variables in a base ring,
+@*           R:  module R (cokernel representation),
+@*           Ext_1:  module, the first Ext(its cokernel representation)
 RETURN:  list with all the contollability properties of the system which is to be returned in 'control' procedure
 NOTE:  this procedure is used in 'control' procedure
 "{
@@ -322,73 +322,73 @@ NOTE:  this procedure is used in 'control' procedure
   string Fn   = "number of first nonzero Ext:";
   string Gen_mes = "Parameter constellations which might lead to a non-controllable system:";
 
-  module RK = RightKernel(R); 
+  module RK = RightKernel(R);
   int d=dim_Our(std(transpose(R)));
 
   if (i==1)
-  { 
-    return( 
+  {
+    return(
             list ( Fn,
-	           i,
-	          "not controllable , image representation for controllable part:",
-         	   RK,	    
-	          "kernel representation for controllable part:",
-		   LeftKernel( RK ),
-		  "obstruction to controllability",
-		   Ext_1,
-		  "annihilator of torsion module (of obstruction to controllability)",
-		   Ann_Our(Ext_1),
-		   DofS,
-		   d
-		 ) 
+                   i,
+                  "not controllable , image representation for controllable part:",
+                    RK,
+                  "kernel representation for controllable part:",
+                   LeftKernel( RK ),
+                  "obstruction to controllability",
+                   Ext_1,
+                  "annihilator of torsion module (of obstruction to controllability)",
+                   Ann_Our(Ext_1),
+                   DofS,
+                   d
+                 )
           );
   };
-  
+
   if(i>NVars)
-  { 
+  {
     return( list(  Fn,
-                   -1, 
+                   -1,
                   "strongly controllable(flat), image representation:",
-		   RK,
-		  "left inverse to image representation:",
-		   LeftInverse(RK),
-		   DofS,
-		   d,
-		   Gen_mes,
-		   Gen) 
+                   RK,
+                  "left inverse to image representation:",
+                   LeftInverse(RK),
+                   DofS,
+                   d,
+                   Gen_mes,
+                   Gen)
           );
   };
-  
+
   //
   //now i<=NVars
   //
-       
+
   if( (i==2) )
   {
     return( list( Fn,
-                  i, 
+                  i,
                  "controllable, not reflexive, image representation:",
-		  RK,
+                  RK,
                   DofS,
                   d,
-		  Gen_mes,
-		  Gen) 
-          ); 
+                  Gen_mes,
+                  Gen)
+          );
   };
-    
+
   if( (i>=3) )
   {
     return( list ( Fn,
-                   i, 
+                   i,
                   "reflexive, not strongly controllable, image representation:",
-		   RK,
-		   DofS,
-		   d,
-   		   Gen_mes,
-		   Gen) 
+                   RK,
+                   DofS,
+                   d,
+                      Gen_mes,
+                   Gen)
           );
-  };  
-};  
+  };
+};
 //-------------------------------------------------------------------------
 
 proc control(module R)
@@ -399,13 +399,13 @@ EXAMPLE:  example control; shows an example
 "
 {
   int i;
-  int NVars=nvars(basering); 
+  int NVars=nvars(basering);
   // TODO: NVars to be replaced with the global hom. dimension of basering!!!
   int ExtIsZero;
   intvec v=Opt_Our();
   module R_std=std(R);
   module Ext_1 = std(Ext_Our(1,R_std));
-   
+
   ExtIsZero=is_zero_Our(Ext_1);
   i=1;
   while( (ExtIsZero) && (i<=NVars) )
@@ -420,7 +420,7 @@ EXAMPLE:  example control; shows an example
   return( control_output( i, NVars, R, Ext_1, l ) );
 }
 example
-{"EXAMPLE:";echo = 2; 
+{"EXAMPLE:";echo = 2;
   // a WindTunnel example
   ring A = (0,a, omega, zeta, k),(D1, delta),dp;
   module R;
@@ -443,7 +443,7 @@ NOTE: this procedure is analogous to 'control' but uses dimension calculations.T
   if( nrows(R) != colrank(transpose(R)) )
   {
     return ("control2 cannot be applied, since R does not have full row rank");
-  }  
+  }
   intvec v=Opt_Our();
   module R_std=std(R);
   int d=dim_Our(R_std);
@@ -456,7 +456,7 @@ NOTE: this procedure is analogous to 'control' but uses dimension calculations.T
   return( control_output( i, NVars, R, Ext_1, l));
 }
 example
-{"EXAMPLE:";echo = 2; 
+{"EXAMPLE:";echo = 2;
   //a WindTunnel example
   ring A = (0,a, omega, zeta, k),(D1, delta),dp;
   module R;
@@ -488,19 +488,19 @@ example
     [D(3),0,-D(1)],
     [-D(2),D(1),0];
   R=transpose(R);
-  colrank(R); 
+  colrank(R);
 };
-  
+
 //------------------------------------------------------------------------
-static proc autonom_output( int i, int NVars, module RC, int R_rank ) 
+static proc autonom_output( int i, int NVars, module RC, int R_rank )
 "USAGE:  proc autonom_output(i, NVars, RC, R_rank)
-           i:  integer, number of first nonzero Ext or 
-	       just number of variables in a base ring + 1 in case that all the Exts are zero
-	   NVars:  integer, number of variables in a base ring  
-	   RC: module, kernel-representation of controllable part of the system
-	   R_rank: integer, column rank of the representation matrix
+           i:  integer, number of first nonzero Ext or
+               just number of variables in a base ring + 1 in case that all the Exts are zero
+           NVars:  integer, number of variables in a base ring
+           RC: module, kernel-representation of controllable part of the system
+           R_rank: integer, column rank of the representation matrix
 PURPOSE: compute all the autonomy properties of the system which is to be returned in 'autonom' procedure
-RETURN:  list 
+RETURN:  list
 NOTE:  this procedure is used in 'autonom' procedure
 "
 {
@@ -508,67 +508,67 @@ NOTE:  this procedure is used in 'autonom' procedure
   string DofS="dimension of the system:";
   string Fn = "number of first nonzero Ext:";
   if(i==0)
-  { 
+  {
     return( list(  Fn,
                    i,
                   "not autonomous",
-		   "kernel representation for controllable part",
-		   RC,
-		   "column rank of the matrix",
-		   R_rank,
-		   DofS,
-		   d ) 
-	  );
+                   "kernel representation for controllable part",
+                   RC,
+                   "column rank of the matrix",
+                   R_rank,
+                   DofS,
+                   d )
+          );
   };
-  
+
   if( i>NVars )
-  {  
+  {
     return( list( Fn,
                   -1,
                   "trivial",
-		  DofS,
-		  d ) 
+                  DofS,
+                  d )
           );
   };
-  
+
   //
   //now i<=NVars
   //
-    
-     
+
+
   if( i==1 )
   // in case that NVars==1 there is no sense to consider the notion
-  // of strongly autonomous behavior, because it does not imply 
+  // of strongly autonomous behavior, because it does not imply
   // that system is overdetermined in this case
   {
     return( list ( Fn,
-                   i, 
+                   i,
                   "autonomous, not overdetermined",
-		   DofS,
-		   d ) 
-          ); 
+                   DofS,
+                   d )
+          );
   };
-    
+
   if( i==NVars )
-  {  
+  {
     return( list(  Fn,
                    i,
                   "strongly autonomous(fin. dimensional),in particular overdetermined",
-		   DofS,
-		   d) 
-	  );
+                   DofS,
+                   d)
+          );
   };
-  
+
   if( i<NVars )
   {
     return( list ( Fn,
                    i,
                   "overdetermined, not strongly autonomous",
-		   DofS, 
-		   d) 
+                   DofS,
+                   d)
           );
   };
-};  
+};
 //--------------------------------------------------------------------------
 proc autonom2(module R)
 "USAGE:  autonom2(R);   R a module (R is a matrix of the system of equations which is to be investigated)
@@ -577,13 +577,13 @@ RETURN: list
 NOTE:  this procedure is analogous to 'autonom' but uses dimension calculations
 EXAMPLE:  example autonom2; shows an example
 "
-{ 
+{
   int d;
   int NVars = nvars(basering);
   module RT = transpose(R);
   module RC;  //for computation of controllable part if if exists
   int R_rank = ncols(R);
-  d     = dim_Our( std(RT) );  //this is the dimension of the system 
+  d     = dim_Our( std(RT) );  //this is the dimension of the system
   int i = NVars-d;  //First non-zero Ext
   if( d==0 )
     {
@@ -598,12 +598,12 @@ example
   ring r=0,(s1,s2,s3,s4),dp;
   module R= [s1,-s2],
             [s2, s1],
-	    [s3,-s4],
-	    [s4, s3];	    
+            [s3,-s4],
+            [s4, s3];
   R=transpose(R);
   view( R );
   view( autonom2(R) );
-};  
+};
 //----------------------------------------------------------
 proc autonom(module R)
 "USAGE:  autonom(R);   R a module (R is a matrix of the system of equations which is to be investigated)
@@ -617,7 +617,7 @@ EXAMPLE: example autonom; shows an example
   module RT=transpose(R);
   module RC;
   int R_rank=ncols(R);
-  ExtIsZero=is_zero_Our(Ext_Our(0,RT));     
+  ExtIsZero=is_zero_Our(Ext_Our(0,RT));
   int i=0;
   while( (ExtIsZero)&&(i<=NVars) )
   {
@@ -637,20 +637,20 @@ example
   ring r=0,(s1,s2,s3,s4),dp;
   module R= [s1,-s2],
             [s2, s1],
-	    [s3,-s4],
-	    [s4, s3];	    
+            [s3,-s4],
+            [s4, s3];
   R=transpose(R);
   view( R );
   view( autonom(R) );
-};  
+};
 
 
 //----------------------------------------------------------
 proc genericity(matrix M)
 "USAGE:  genericity(M), M is a matrix/module
 PURPOSE: determine parametric expressions which have been assumed to be non-zero in the process of computing the Groebner basis
-RETURN:  list (of strings) 
-NOTE: we strongly recommend to switch on the redSB and redTail options; 
+RETURN:  list (of strings)
+NOTE: we strongly recommend to switch on the redSB and redTail options;
 @*    the procedure is effective with the lift procedure for modules with parameters
 EXAMPLE:  example genericity; shows an example
 "
@@ -671,8 +671,8 @@ example
 {  // TwoPendula
   "EXAMPLE:"; echo = 2;
   ring r=(0,m1,m2,M,g,L1,L2),Dt,dp;
-  module RR = 
-    [m1*L1*Dt^2, m2*L2*Dt^2, -1, (M+m1+m2)*Dt^2], 
+  module RR =
+    [m1*L1*Dt^2, m2*L2*Dt^2, -1, (M+m1+m2)*Dt^2],
     [m1*L1^2*Dt^2-m1*L1*g, 0, 0, m1*L1*Dt^2],
     [0, m2*L2^2*Dt^2-m2*L2*g, 0, m2*L2*Dt^2];
   module R = transpose(RR);
@@ -729,7 +729,7 @@ static proc victors_genericity(matrix M)
       cDe++; Denomiro[cDe]= NM[cl];
       cl++;
       p = p - lead(p); // for the next cycle
-    }      
+    }
     if ( p!= 0)
     {
       num = content(p);
@@ -781,12 +781,12 @@ static proc victors_genericity(matrix M)
       // throw away every monomial from factorization (also constants from above ring)
       for (j=1; j<=size(F);j++)
       {
-	q = F[j]-lead(F[j]);
-	if (q!=0)
-	{
-	  @L[cl] = F[j];
-	  cl++;
-	}
+        q = F[j]-lead(F[j]);
+        if (q!=0)
+        {
+          @L[cl] = F[j];
+          cl++;
+        }
       }
     }
   }
@@ -813,13 +813,13 @@ static proc evas_genericity(matrix M)
   for (i=1; i<=s; i++)
   {
     p = I[i];
-    while (p !=0) 
-    { 
-      Den = Den, denominator(leadcoef(p)); 
-      p   = p-lead(p); 
+    while (p !=0)
+    {
+      Den = Den, denominator(leadcoef(p));
+      p   = p-lead(p);
     }
   }
-  Den = simplify(Den,2+4);  
+  Den = simplify(Den,2+4);
   string newvars = parstr(basering);
   def save = basering;
   string NewRing = "ring @NR =" +string(char(basering))+",("+newvars+"),Dp;";
@@ -829,13 +829,13 @@ static proc evas_genericity(matrix M)
   Den = simplify(Den,2);
   int s1 = size(Den);
   for (i=1; i<=s1; i++)
-  { 
+  {
     if (Den[i] !=1)
-    { 
-      F= F, factorize(Den[i],1); 
-    } 
+    {
+      F= F, factorize(Den[i],1);
+    }
   }
-  F = simplify(F, 2+4+8); 
+  F = simplify(F, 2+4+8);
   ideal @L = F;
   list SL;
   int c,j;
@@ -870,7 +870,7 @@ static proc evas_genericity(matrix M)
 proc canonize(list L)
 "USAGE:  canonize(L), L a list
 PURPOSE: modules in the list are canonized by computing their reduced minimal (= unique up to constant factor w.r.t. the given ordering) Groebner bases
-RETURN:  list 
+RETURN:  list
 ASSUME:  L is the output of control/autonomy procedures
 EXAMPLE:  example canonize; shows an example
 "
@@ -895,8 +895,8 @@ example
 {  // TwoPendula with L1=L2=L
   "EXAMPLE:"; echo = 2;
   ring r=(0,m1,m2,M,g,L),Dt,dp;
-  module RR = 
-    [m1*L*Dt^2, m2*L*Dt^2, -1, (M+m1+m2)*Dt^2], 
+  module RR =
+    [m1*L*Dt^2, m2*L*Dt^2, -1, (M+m1+m2)*Dt^2],
     [m1*L^2*Dt^2-m1*L*g, 0, 0, m1*L*Dt^2],
     [0, m2*L^2*Dt^2-m2*L*g, 0, m2*L*Dt^2];
   module R = transpose(RR);
@@ -913,16 +913,16 @@ static proc elementof (int i, intvec v)
   for(int j=1;j<=nrows(v);j++)
     {
       if(v[j]==i)
-	{
-	  b=1;
-	  return (b);
-	}
+        {
+          b=1;
+          return (b);
+        }
     }
   return (b);
 }
 //-----------------------------------------------------------------
 proc iostruct(module R)
-"USAGE: iostruct( R ); R a module 
+"USAGE: iostruct( R ); R a module
 RETURN:  list L with entries: string s, intvec v, module P and module Q
 PURPOSE:  if R is the kernel-representation-matrix of some system, then we output a input-ouput representation Py=Qu of the system, the components that have been chosen as outputs(intvec v) and a comment s
 NOTE:  the procedure uses Bareiss algorithm which might not terminate in some cases
@@ -940,29 +940,29 @@ EXAMPLE:  example iostruct; shows an example
   module P;
   module Q;
   int n=0;
-  
+
   while(b==1)               //sort v through bubblesort
     {
       b=0;
       for(i=1;i<NRows;i++)
-	{
-	  if(v[i]>v[i+1])
-	  {
-	    temp=v[i];
-	    v[i]=v[i+1];
-	    v[i+1]=temp;
-	    b=1;
-	  }
-	}
+        {
+          if(v[i]>v[i+1])
+          {
+            temp=v[i];
+            v[i]=v[i+1];
+            v[i+1]=temp;
+            b=1;
+          }
+        }
     }
-  P=R[v];                     //generate P 
+  P=R[v];                     //generate P
   for(i=1;i<=NCols;i++)       //generate Q
     {
       if(elementof(i,v)==1)
-	{
-	  i++;
-	  continue;
-	}
+        {
+          i++;
+          continue;
+        }
       Q=Q,R[i];
     }
   Q=simplify(Q,2);
@@ -974,7 +974,7 @@ example
  //Example Antenna
  ring r = (0, K1, K2, Te, Kp, Kc),(Dt, delta), (c,dp);
  module RR;
- RR = 
+ RR =
    [Dt, -K1, 0, 0, 0, 0, 0, 0, 0],
    [0, Dt+K2/Te, 0, 0, 0, 0, -Kp/Te*delta, -Kc/Te*delta, -Kc/Te*delta],
    [0, 0, Dt, -K1, 0, 0, 0, 0, 0],
@@ -983,11 +983,11 @@ example
    [0, 0, 0, 0, 0, Dt+K2/Te, -Kc/Te*delta, -Kc/Te*delta, -Kp/Te*delta];
  module R = transpose(RR);
  view(iostruct(R));
-};	
+};
 
 //---------------------------------------------------------------
-static proc smdeg(matrix N)  
-"USAGE: smdeg( N ); N a matrix 
+static proc smdeg(matrix N)
+"USAGE: smdeg( N ); N a matrix
 RETURN:  intvec
 PURPOSE: returns an intvec of length 2 with the index of an element of N with smallest degree
 "
@@ -998,27 +998,27 @@ PURPOSE: returns an intvec of length 2 with the index of an element of N with sm
   intvec v;
   int i,j;            // counter
 
-  if (N==0) 
+  if (N==0)
   {
     v = 1,1;
     return(v);
-  } 
-  
-  for (i=1; i<=n; i++) 
+  }
+
+  for (i=1; i<=n; i++)
 // hier wird ein Element ausgewaehlt(!=0) und mit dessen Grad gestartet
   {
     for (j=1; j<=m; j++)
     {
       if( deg(N[i,j])!=-1 )
       {
-	d=deg(N[i,j]);
-	break;
+        d=deg(N[i,j]);
+        break;
       }
     }
     if (d != -1)
     {
       break;
-    }  
+    }
   }
   for(i=1; i<=n; i++)
   {
@@ -1027,7 +1027,7 @@ PURPOSE: returns an intvec of length 2 with the index of an element of N with sm
       d_temp = deg(N[i,j]);
       if ( (d_temp < d) && (N[i,j]!=0) )
       {
-	d=d_temp;
+        d=d_temp;
       }
     }
   }
@@ -1037,8 +1037,8 @@ PURPOSE: returns an intvec of length 2 with the index of an element of N with sm
     {
       if ( (deg(N[i,j]) == d) && (N[i,j]!=0) )
       {
-	v = i,j;
-	return(v);
+        v = i,j;
+        return(v);
       }
     }
   }
@@ -1075,22 +1075,22 @@ static proc extgcd_Our(poly p, poly q)
   {
     J = p,q; // J = N[k-1,k-1],N[k,k]; //J is of type ideal
     L[1] = liftstd(J,T);  //T is of type matrix
-    if(J[1]==p) //this is just for the case the SINGULAR swaps the 
+    if(J[1]==p) //this is just for the case the SINGULAR swaps the
     //      two elements due to ordering
-    {  
-      L[2] = T[1,1]; 
-      L[3] = T[2,1]; 
+    {
+      L[2] = T[1,1];
+      L[3] = T[2,1];
     }
     else
-    { 
-      L[2] = T[2,1]; 
-      L[3] = T[1,1]; 
+    {
+      L[2] = T[2,1];
+      L[3] = T[1,1];
     }
   }
   else
   {
-    L=extgcd(p,q); 
-    //    L=extgcd(N[k-1,k-1],N[k,k]);  
+    L=extgcd(p,q);
+    //    L=extgcd(N[k-1,k-1],N[k,k]);
     //one can use this line if extgcd-bug is fixed
   }
   return(L);
@@ -1099,13 +1099,13 @@ static proc normalize_Our(matrix N, matrix Q)
 "USAGE: normalize_Our(N,Q), N, Q are two matrices
 PURPOSE: normalizes N and divides the columns of Q through the leading coefficients of the columns of N
 RETURN: normalized matrix N and altered Q(according to the scheme mentioned in purpose). If number of columns of N and Q do not coincide, N and Q are returned unchanged
-NOTE: number of columns of N and Q must coincide. 
+NOTE: number of columns of N and Q must coincide.
 "
 {
   if(ncols(N) != ncols(Q))
     {
       return (N,Q);
-    }	
+    }
   module M = module(N);
   module S = module(Q);
   int NCols = ncols(N);
@@ -1122,18 +1122,18 @@ NOTE: number of columns of N and Q must coincide.
    N = matrix(M);
    Q = matrix(S);
    return (N,Q);
-} 		
-	
+}
+
 //---------------------------------------------------------------
 proc smith( module M )
 "USAGE: smith(M), M a module or a matrix,
 PURPOSE: computes the Smith form of a matrix
 RETURN: a list of length 4 with the following entries:
-@*      [1]: The Smith-Form S of M, 
-@*      [2]: the rank of M, 
+@*      [1]: The Smith-Form S of M,
+@*      [2]: the rank of M,
 @*      [3]: a unimodular matrix U,
-@*      [4]: a unimodular matrix V, 
-such that U*M*V=S. An warning is returned when no Smith Form exists. 
+@*      [4]: a unimodular matrix V,
+such that U*M*V=S. An warning is returned when no Smith Form exists.
 NOTE: The Smith form only exists over PIDs (principal ideal domains). Use global ordering for computations!
 "
 {
@@ -1156,25 +1156,25 @@ NOTE: The Smith form only exists over PIDs (principal ideal domains). Use global
   intmat g[1][m];              //to save degrees
   matrix mu[1][m];             //to save leadcoefficients
   int ii;                       //counter
-  
-  while ((k!=n) && (k!=m) )    
+
+  while ((k!=n) && (k!=m) )
   {
     k++;
     while ((k<=n) && (k<=m))  //outer while-loop for column-operations
     {
       while(k<=m )        //inner while-loop for row-operations
       {
-	if( (n>m) && (k < n) && (k<m))
-	{      
-	  if( simplify((ideal(submat(N,k+1..n,k+1..m))),2)== 0)
-	  {
-	    return(N,k-1,P,Q);
-	  }
-	}
+        if( (n>m) && (k < n) && (k<m))
+        {
+          if( simplify((ideal(submat(N,k+1..n,k+1..m))),2)== 0)
+          {
+            return(N,k-1,P,Q);
+          }
+        }
         i,j = smdeg(submat(N,k..n,k..m)); //choose smallest degree in the remaining submatrix
         i=i+(k-1);                        //indices adjusted to the whole matrix
-	j=j+(k-1);
-	if(i!=k)                    //take the element with smallest degree in the first position
+        j=j+(k-1);
+        if(i!=k)                    //take the element with smallest degree in the first position
         {
           N=permrow(N,i,k);
           P=permrow(P,i,k);
@@ -1192,19 +1192,19 @@ NOTE: The Smith form only exists over PIDs (principal ideal domains). Use global
         deg_temp=ord(N[k,k]);             //ord outputs the leading degree of N[k,k]
         for(ii=k+1;ii<=n;ii++)
         {
-          lambda[1,ii]=leadcoef(N[ii,k])/tmp;     
+          lambda[1,ii]=leadcoef(N[ii,k])/tmp;
           f[1,ii]=deg(N[ii,k])-deg_temp;
         }
         for(ii=k+1;ii<=n;ii++)
         {
-          N = addrow(N,k,-lambda[1,ii]*var(1)^f[1,ii],ii);	         
+          N = addrow(N,k,-lambda[1,ii]*var(1)^f[1,ii],ii);
           P = addrow(P,k,-lambda[1,ii]*var(1)^f[1,ii],ii);
-	  N,Q=normalize_Our(N,Q);
-	}
+          N,Q=normalize_Our(N,Q);
+        }
       }
       if (k>n)
       {
-	break;
+        break;
       }
       if(NoNon0Pol(transpose(N)[k])==1)
       {
@@ -1212,35 +1212,35 @@ NOTE: The Smith form only exists over PIDs (principal ideal domains). Use global
       }
       tmp=leadcoef(N[k,k]);
       deg_temp=ord(N[k,k]); //ord outputs the leading degree of N[k][k]
-      
+
       for(ii=k+1;ii<=m;ii++)
       {
-        mu[1,ii]=leadcoef(N[k,ii])/tmp;     
+        mu[1,ii]=leadcoef(N[k,ii])/tmp;
         g[1,ii]=deg(N[k,ii])-deg_temp;
       }
       for(ii=k+1;ii<=m;ii++)
       {
         N=addcol(N,k,-mu[1,ii]*var(1)^g[1,ii],ii);
         Q=addcol(Q,k,-mu[1,ii]*var(1)^g[1,ii],ii);
-	N,Q=normalize_Our(N,Q);
+        N,Q=normalize_Our(N,Q);
       }
     }
     if( (k!=1) && (k<n) && (k<m) )
     {
-      L = extgcd_Our(N[k-1,k-1],N[k,k]);      
+      L = extgcd_Our(N[k-1,k-1],N[k,k]);
       if ( N[k-1,k-1]!=L[1] )  //means that N[k-1,k-1] is not a divisor of N[k,k]
       {
-	N=addrow(N,k-1,L[2],k);
-	P=addrow(P,k-1,L[2],k);
-        N,Q=normalize_Our(N,Q);	
-	
+        N=addrow(N,k-1,L[2],k);
+        P=addrow(P,k-1,L[2],k);
+        N,Q=normalize_Our(N,Q);
+
         N=addcol(N,k,-L[3],k-1);
-	Q=addcol(Q,k,-L[3],k-1);
-	N,Q=normalize_Our(N,Q);
-	k=k-2;
+        Q=addcol(Q,k,-L[3],k-1);
+        N,Q=normalize_Our(N,Q);
+        k=k-2;
       }
     }
-  }  
+  }
   if( (k<=n) && (k<=m) )
   {
     if( N[k,k]==0)
@@ -1275,7 +1275,7 @@ example
 //---------------------------------------------------------------
 static proc list_tex(L, string name,link l,int nr_loop)
 "USAGE: list_tex(L,name,l), where L is a list, name a string, l a link
-	 writes the content of list L in a tex-file 'name'
+         writes the content of list L in a tex-file 'name'
 RETURN: nothing
 "
 {
@@ -1283,7 +1283,7 @@ RETURN: nothing
   {
     texobj(name,L);
   }
-  if(size(L)==0)  
+  if(size(L)==0)
   {
   }
   else
@@ -1293,41 +1293,41 @@ RETURN: nothing
     {
       while(1)
       {
-	if(typeof(L[i])=="string")  //Fehler hier fuer normalen output->nur wenn string in liste dann verbatim
-	{
-	  t=L[i];
-	  if(nr_loop==1)
-	  {
-	    write(l,"\\begin\{center\}");
-	    write(l,"\\begin\{verbatim\}");
-	  }
-	  write(l,t);
-	  if(nr_loop==0)
-	  {
-	    write(l,"\\par");
-	  }
-	  if(nr_loop==1)
-	  {
-	    write(l,"\\end\{verbatim\}");
-	    write(l,"\\end\{center\}");
-	  }
-	  break;
-	}
-	if(typeof(L[i])=="module")
-	{
-	  texobj(name,matrix(L[i]));
-	  break;
-	}
-	if(typeof(L[i])=="list")
-	{
-	  list_tex(L[i],name,l,1);
-	  break;
-	}
-	write(l,"\\begin\{center\}");
-	texobj(name,L[i]);
-	write(l,"\\end\{center\}");
-	write(l,"\\par");
-	break;
+        if(typeof(L[i])=="string")  //Fehler hier fuer normalen output->nur wenn string in liste dann verbatim
+        {
+          t=L[i];
+          if(nr_loop==1)
+          {
+            write(l,"\\begin\{center\}");
+            write(l,"\\begin\{verbatim\}");
+          }
+          write(l,t);
+          if(nr_loop==0)
+          {
+            write(l,"\\par");
+          }
+          if(nr_loop==1)
+          {
+            write(l,"\\end\{verbatim\}");
+            write(l,"\\end\{center\}");
+          }
+          break;
+        }
+        if(typeof(L[i])=="module")
+        {
+          texobj(name,matrix(L[i]));
+          break;
+        }
+        if(typeof(L[i])=="list")
+        {
+          list_tex(L[i],name,l,1);
+          break;
+        }
+        write(l,"\\begin\{center\}");
+        texobj(name,L[i]);
+        write(l,"\\end\{center\}");
+        write(l,"\\par");
+        break;
       }
     }
   }
@@ -1340,7 +1340,7 @@ example
 proc verbatim_tex(string s, link l)
 "USAGE: verbatim_tex(s,l), where s is a string and l a link
 PURPOSE: writes the content of s in verbatim-environment in the file
-	 specified by link
+         specified by link
 RETURN: nothing
 "
 {
@@ -1404,9 +1404,9 @@ RETURN:  ring
 NOTE: in order to see the list of available examples, execute @code{ControlExample(\"show\");}
 @* To use ab example, one has to do the following. Suppose one calls the ring, where the example will be activated, A. Then, by executing
 @*  @code{def A = ControlExample(\"Antenna\");} and @code{setring A;},
-@* A will become a basering from the example \"Antenna\" with 
+@* A will become a basering from the example \"Antenna\" with
 the predefined system module R (transposed).
-After that one can just execute @code{control(R);} respectively 
+After that one can just execute @code{control(R);} respectively
 @code{autonom(R);} to perform the control resp. autonomy analysis of R.
 EXAMPLE: example ControlExample; shows an example
 "{
@@ -1468,7 +1468,7 @@ static proc exCauchy1()
             [s2, s1];
   R=transpose(R);
   export R;
-  return(@r);	    
+  return(@r);
 };
 //----------------------------------------------------------
 static proc exCauchy2()
@@ -1476,22 +1476,22 @@ static proc exCauchy2()
   ring @r=0,(s1,s2,s3,s4),dp;
   module R= [s1,-s2],
             [s2, s1],
-	    [s3,-s4],
-	    [s4, s3];	    
+            [s3,-s4],
+            [s4, s3];
   R=transpose(R);
   export R;
-  return(@r);	    
-}; 
+  return(@r);
+};
 //----------------------------------------------------------
 static proc exZerz1()
-{ 
+{
   ring @r=0,(d1,d2),dp;
   module R=[d1^2-d2],
            [d2^2-1];
   R=transpose(R);
   export R;
-  return(@r);	    
-};  
+  return(@r);
+};
 //----------------------------------------------------------
 //control
 //----------------------------------------------------------
@@ -1500,20 +1500,20 @@ static proc exControl1()
   ring @r=0,(s1,s2,s3),dp;
   module R=[0,-s3,s2],
            [s3,0,-s1];
-  R=transpose(R);	   
+  R=transpose(R);
   export R;
   return(@r);
 };
 //----------------------------------------------------------
 static proc exControl2()
-{ 
+{
   ring @r=0,(s1,s2,s3),dp;
   module R=[0,-s3,s2],
            [s3,0,-s1],
            [-s2,s1,0];
-  R=transpose(R);	   
+  R=transpose(R);
   export R;
-  return(@r); 
+  return(@r);
 };
 //----------------------------------------------------------
 static proc exAntenna()
@@ -1529,7 +1529,7 @@ static proc exAntenna()
 
   R=transpose(R);
   export R;
-  return(@r);  
+  return(@r);
 };
 
 //----------------------------------------------------------
@@ -1539,19 +1539,19 @@ static proc exEinstein()
   ring @r = 0,(D(1..4)),dp;
   module R =
   [D(2)^2+D(3)^2-D(4)^2, D(1)^2, D(1)^2, -D(1)^2, -2*D(1)*D(2), 0, 0, -2*D(1)*D(3), 0, 2*D(1)*D(4)],
-  [D(2)^2, D(1)^2+D(3)^2-D(4)^2, D(2)^2, -D(2)^2, -2*D(1)*D(2), -2*D(2)*D(3), 0, 0, 2*D(2)*D(4), 0], 
+  [D(2)^2, D(1)^2+D(3)^2-D(4)^2, D(2)^2, -D(2)^2, -2*D(1)*D(2), -2*D(2)*D(3), 0, 0, 2*D(2)*D(4), 0],
   [D(3)^2, D(3)^2, D(1)^2+D(2)^2-D(4)^2, -D(3)^2, 0, -2*D(2)*D(3), 2*D(3)*D(4), -2*D(1)*D(3), 0, 0],
   [D(4)^2, D(4)^2, D(4)^2, D(1)^2+D(2)^2+D(3)^2, 0, 0, -2*D(3)*D(4), 0, -2*D(2)*D(4), -2*D(1)*D(4)],
   [0, 0, D(1)*D(2), -D(1)*D(2), D(3)^2-D(4)^2, -D(1)*D(3), 0, -D(2)*D(3), D(1)*D(4), D(2)*D(4)],
   [D(2)*D(3), 0, 0, -D(2)*D(3),-D(1)*D(3), D(1)^2-D(4)^2, D(2)*D(4), -D(1)*D(2), D(3)*D(4), 0],
   [D(3)*D(4), D(3)*D(4), 0, 0, 0, -D(2)*D(4), D(1)^2+D(2)^2, -D(1)*D(4), -D(2)*D(3), -D(1)*D(3)],
   [0, D(1)*D(3), 0, -D(1)*D(3), -D(2)*D(3), -D(1)*D(2), D(1)*D(4), D(2)^2-D(4)^2, 0, D(3)*D(4)],
-  [D(2)*D(4), 0, D(2)*D(4), 0, -D(1)*D(4), -D(3)*D(4), -D(2)*D(3), 0, D(1)^2+D(3)^2, -D(1)*D(2)], 
+  [D(2)*D(4), 0, D(2)*D(4), 0, -D(1)*D(4), -D(3)*D(4), -D(2)*D(3), 0, D(1)^2+D(3)^2, -D(1)*D(2)],
   [0, D(1)*D(4), D(1)*D(4), 0, -D(2)*D(4), 0, -D(1)*D(3), -D(3)*D(4), -D(1)*D(2), D(2)^2+D(3)^2];
 
   R=transpose(R);
   export R;
-  return(@r);  
+  return(@r);
 };
 
 //----------------------------------------------------------
@@ -1560,27 +1560,27 @@ static proc exFlexibleRod()
   ring @r = 0,(D1, delta), dp;
   module R;
   R = [D1, -D1*delta, -1], [2*D1*delta, -D1-D1*delta^2, 0];
-  
+
   R=transpose(R);
   export R;
-  return(@r);  
+  return(@r);
 };
 
 //----------------------------------------------------------
 static proc exTwoPendula()
-{  
+{
   ring @r=(0,m1,m2,M,g,L1,L2),Dt,dp;
-  module R = [m1*L1*Dt^2, m2*L2*Dt^2, -1, (M+m1+m2)*Dt^2], 
+  module R = [m1*L1*Dt^2, m2*L2*Dt^2, -1, (M+m1+m2)*Dt^2],
              [m1*L1^2*Dt^2-m1*L1*g, 0, 0, m1*L1*Dt^2],
              [0, m2*L2^2*Dt^2-m2*L2*g, 0, m2*L2*Dt^2];
 
   R=transpose(R);
   export R;
-  return(@r);  
+  return(@r);
 };
 //----------------------------------------------------------
 static proc exWindTunnel()
-{ 
+{
   ring @r = (0,a, omega, zeta, k),(D1, delta),dp;
   module R = [D1+a, -k*a*delta, 0, 0],
              [0, D1, -1, 0],
@@ -1588,20 +1588,20 @@ static proc exWindTunnel()
 
   R=transpose(R);
   export R;
-  return(@r);  
+  return(@r);
 };
 
 
 //---------------------------------------------------------------
 proc declare(string NameOfRing, string Variables, list #)
 "USAGE: declare(NameOfRing, Variables,[Parameters, Ordering]);  where
-@*         NameOfRing is string with name of ring, 
+@*         NameOfRing is string with name of ring,
 @*         Variables is a string with names of variables separated by commas (e.g. \"x,y,z\"),
-@*	    Parameters is string of parameters in the ring separated by commas (e.g. \"a,b,c\"),
-@*	    Ordering is   string with name of ordering (by default, the ordering (dp,C) is used).
+@*            Parameters is string of parameters in the ring separated by commas (e.g. \"a,b,c\"),
+@*            Ordering is   string with name of ordering (by default, the ordering (dp,C) is used).
 PURPOSE: define the ring easily
 RETURN:  no return value
-EXAMPLE:  example declare; shows an example 
+EXAMPLE:  example declare; shows an example
 "
 {
    if(size(#)==0)
@@ -1615,14 +1615,14 @@ EXAMPLE:  example declare; shows an example
        execute( "ring " + NameOfRing + "=(0," + #[1] + "),(" + Variables + "),dp;" );
      }
      else
-     { 
+     {
        if( (size(#[1])!=0)&&(#[1]!=" ") )
        {
          execute( "ring " + NameOfRing + "=(0," + #[1] + "),(" + Variables + "),("+#[2]+");" );
        }
        else
        {
-         execute( "ring " + NameOfRing + "=0,("+Variables+"),("+#[2]+");" ); 
+         execute( "ring " + NameOfRing + "=0,("+Variables+"),("+#[2]+");" );
        };
      };
    };
@@ -1657,7 +1657,7 @@ example
 //
 // maybe reasonable to add this in declare
 //
-//  print("Please enter your representation matrix in the following form: 
+//  print("Please enter your representation matrix in the following form:
 //  module R=[1st row],[2nd row],...");
 //  print("Type the command: R=transpose(R)");
 //  print(" To compute controllability please enter: control(R)");

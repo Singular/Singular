@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: normal.lib,v 1.43 2005-05-06 09:41:59 Singular Exp $";
+version="$Id: normal.lib,v 1.44 2005-05-06 14:38:50 hannes Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  normal.lib     Normalization of Affine Rings
@@ -12,10 +12,10 @@ MAIN PROCEDURES:
                      the delta invariant
  HomJJ(L);           presentation of End_R(J) as affine ring, L a list
  genus(I);           computes genus of the projective curve defined by I
- primeClosure(L);    integral closure of R/p (p prime), L a list 
+ primeClosure(L);    integral closure of R/p (p prime), L a list
  closureFrac(L)      write poly in integral closure as element of Quot(R/p)
 
-AUXILIARY PROCEDURE: 
+AUXILIARY PROCEDURE:
  deltaLoc(f,S);      (sum of) delta invariant(s) at conjugated singular points
 ";
 
@@ -115,7 +115,7 @@ EXAMPLE: example HomJJ;  shows an example
       "// f=p*J:J";f;
    }
    f2 = std(p);
-  
+
 //---------- Test: Hom(J,J) == R ?, if yes, go home ---------------------------
 
    rf = interred(reduce(f,f2));       // represents p*Hom(J,J)/p*R = Hom(J,J)/R
@@ -360,16 +360,16 @@ proc normal(ideal id, list #)
          are computed.
 ASSUME:  The ideal must be radical, for non-radical ideals the output may
          be wrong (i=radical(i); makes i radical)
-RETURN:  a list of rings, say nor and in case of @code{choose=\"wd\"} an 
-         integer at the end of the list. 
+RETURN:  a list of rings, say nor and in case of @code{choose=\"wd\"} an
+         integer at the end of the list.
          In case of @code{choose=\"g\"} it returns a list of polynomials
          g_1,...,g_k+1 at the end of the list such that g_1/g_k+1,...
          g_k/g_k+1 generate the integral closure.
-         Each ring @code{nor[i]} contains two ideals with given names 
+         Each ring @code{nor[i]} contains two ideals with given names
          @code{norid} and @code{normap} such that@*
-         - the direct sum of the rings @code{nor[i]/norid} is the 
+         - the direct sum of the rings @code{nor[i]/norid} is the
          normalization of basering/id;@*
-         - @code{normap} gives the normalization map from basering/id to 
+         - @code{normap} gives the normalization map from basering/id to
          @code{nor[i]/norid} (for each i).
 NOTE:    to use the i-th ring type: @code{def R=nor[i]; setring R;}.
 @*       Increasing printlevel displays more comments (default: printlevel=0).
@@ -489,8 +489,8 @@ EXAMPLE: example normal; shows an example
          {
             keepresult=keepresult+facstd(prim[j]);
          }
-         prim=keepresult; 
-         option(noredSB); 
+         prim=keepresult;
+         option(noredSB);
       }
    }
    else
@@ -558,7 +558,7 @@ EXAMPLE: example normal; shows an example
       {
          result=insert(result,keepresult[j]);
       }
-      sr = string(size(result));      
+      sr = string(size(result));
    }
    if(withdelta)
    {
@@ -567,7 +567,7 @@ EXAMPLE: example normal; shows an example
    }
       dbprint(y+1,"
 // 'normal' created a list of "+sr+" ring(s).");
-      if(withdelta) 
+      if(withdelta)
       {
         dbprint(y+1,"// nor["+sr+"+1] is the delta-invariant.");
       }
@@ -955,7 +955,7 @@ EXAMPLE: example normalizationPrimes; shows an example
 
    //if it is an isolated singularity only at 0 things are easier
    //JM ideal of singular locus, SM ideal of variety
-   if(attrib(SM[2],"onlySingularAtZero"))          
+   if(attrib(SM[2],"onlySingularAtZero"))
    {
       attrib(SM[2],"isIsolatedSingularity",1);
       ideal SL=simplify(reduce(maxideal(1),SM[1]),2);
@@ -1026,7 +1026,7 @@ EXAMPLE: example normalizationPrimes; shows an example
           attrib(id1,"isCompleteIntersection",0);
           attrib(id1,"isEquidimensional",0);
           attrib(id1,"onlySingularAtZero",1);
-          
+
           ideal t1=id,id1;
           int mul=vdim(std(t1));
           kill t1;
@@ -1034,7 +1034,7 @@ EXAMPLE: example normalizationPrimes; shows an example
           keepresult1=normalizationPrimes(id,ihp,0);
 
           keepresult2=normalizationPrimes(id1,ihp,0);
-            
+
           delt=delt+mul+keepresult1[size(keepresult1)]
                          +keepresult1[size(keepresult1)];
 
@@ -1065,7 +1065,7 @@ EXAMPLE: example normalizationPrimes; shows an example
       }
       J=radical(JM[2]);   //the singular locus
       JM=mstd(J);
-      
+
       if((vdim(JM[1])==1)&&(size(reduce(J,std(maxideal(1))))==0))
       {
          attrib(SM[2],"onlySingularAtZero",1);
@@ -1173,7 +1173,7 @@ EXAMPLE: example normalizationPrimes; shows an example
       attrib(vid,"isIsolatedSingularity",isIs);
       attrib(vid,"isRegInCodim2",0);
       attrib(vid,"onlySingularAtZero",oSAZ);
-      attrib(vid,"isEquidimensional",equi);      
+      attrib(vid,"isEquidimensional",equi);
       attrib(vid,"isCompleteIntersection",0);
 
       keepresult1=normalizationPrimes(vid,ihp,0);
@@ -1189,7 +1189,7 @@ EXAMPLE: example normalizationPrimes; shows an example
       attrib(vid,"isPrim",0);
       attrib(vid,"isIsolatedSingularity",isIs);
       attrib(vid,"isRegInCodim2",0);
-      attrib(vid,"isEquidimensional",equi);     
+      attrib(vid,"isEquidimensional",equi);
       attrib(vid,"isCompleteIntersection",0);
       attrib(vid,"onlySingularAtZero",oSAZ);
 
@@ -1197,7 +1197,7 @@ EXAMPLE: example normalizationPrimes; shows an example
       int delta2=keepresult2[size(keepresult2)];
 
       setring BAS;
-      
+
       for(lauf=1;lauf<=size(keepresult2)-1;lauf++)
       {
          keepresult1=insert(keepresult1,keepresult2[lauf]);
@@ -1316,7 +1316,7 @@ proc substpart(ideal endid, ideal endphi, int homo, intvec rw)
 
 proc genus(ideal I,list #)
 "USAGE:   genus(I) or genus(i,1); I a 1-dimensional ideal
-RETURN:  an integer, the geometric genus p_g = p_a - delta of the projective 
+RETURN:  an integer, the geometric genus p_g = p_a - delta of the projective
          curve defined by I, where p_a is the arithmetic genus.
 NOTE:    delta is the sum of all local delta-invariants of the singularities,
          i.e. dim(R'/R), R' the normalization of the local ring R of the
@@ -1338,7 +1338,7 @@ EXAMPLE: example genus; shows an example
         if(w==1){"WARNING:This is not a curve";}
       }
    }
-   list L=elimpart(I);    
+   list L=elimpart(I);
    if(size(L[2])!=0)
    {
       map psi=R0,L[5];
@@ -1360,7 +1360,7 @@ EXAMPLE: example genus; shows an example
    {
       string newvar=string(N[1]);
       execute("ring R=("+charstr(R0)+"),("+newvar+"),dp;");
-      ideal I =imap(R0,I); 
+      ideal I =imap(R0,I);
       attrib(I,"isSB",1);
    }
    else
@@ -1387,12 +1387,12 @@ EXAMPLE: example genus; shows an example
       I=homog(I,@s);
       attrib(I,"isSB",1);
    }
- 
+
    if((nvars(basering)<=3)&&(size(I)>1))
    {
        ERROR("This is not equidimensional");
-   } 
-   
+   }
+
    intvec hp=hilbPoly(I);
    int p_a=1-hp[1];
    int d=hp[2];
@@ -1404,7 +1404,7 @@ EXAMPLE: example genus; shows an example
       "arithmetic genus:";p_a;
       "degree:";d;"";
    }
-   
+
    intvec v = hilb(I,1);
    int i,o;
    if(nvars(basering)>3)
@@ -1428,7 +1428,7 @@ EXAMPLE: example genus; shows an example
          K=phi(I);
          K=eliminate(K,m,v);
          if(size(K)==1){de=deg(K[1]);}
-         if((i==5)&&(d!=de))   
+         if((i==5)&&(d!=de))
          {
             K=reduce(equidimMax(I),I);
             if(size(K)!=0){ERROR("This is not equidimensional");}
@@ -1436,7 +1436,7 @@ EXAMPLE: example genus; shows an example
          if(i==10)
          {
             J;K;
-            ERROR("genus: did not find a good projection for to 
+            ERROR("genus: did not find a good projection for to
                            the plain");
          }
          if(i<5)
@@ -1465,7 +1465,7 @@ EXAMPLE: example genus; shows an example
       I=K;
    }
    poly p=I[1];
-      
+
    execute("ring S=("+charstr(R)+"),(x,y,t),dp;");
    ideal L=maxideal(1);
    execute("ring C=("+charstr(R)+"),(x,y),ds;");
@@ -1476,29 +1476,29 @@ EXAMPLE: example genus; shows an example
    poly g,h;
    ideal I,I1;
    execute("ring B=("+charstr(R)+"),(x,t),ds;");
-   
+
    setring S;
    if(o)
    {
      for(i=1;i<=nvars(newR)-3;i++){L[i]=0;}
      L=L,maxideal(1);
-   }   
+   }
    map sigma=newR,L;
    poly F=sigma(p);
    if(w>=1){"the projected curve:";"";F;"";}
-   
+
    kill newR;
-   
+
    int genus=(d-1)*(d-2)/2;
    if(w>=1){"the arithmetic genus of the plane curve:";genus;pause();}
- 
+
    int delt,deltaloc,deltainf,tau,tauinf,cusps,iloc,iglob,l,nsing,
        tauloc,tausing,k,rat,nbranchinf,nbranch,nodes,cuspsinf,nodesinf;
    list inv;
 
    if(w>=1)
      {"";"analyse the singularities at oo";"";"singular locus at (1,x,0):";"";}
-   setring A;        
+   setring A;
    g=phi(F);
    h=psi(F);
    I=g,jacob(g),var(2);
@@ -1507,7 +1507,7 @@ EXAMPLE: example genus; shows an example
    {
       list qr=minAssGTZ(I);
       if(w>=1){qr;"";}
-      
+
       for(k=1;k<=size(qr);k++)
       {
          if(w>=1){ nsing=nsing+vdim(std(qr[k]));}
@@ -1516,7 +1516,7 @@ EXAMPLE: example genus; shows an example
          tauinf=tauinf+inv[2];
          l=vdim(std(qr[k]));
          if(inv[2]==l){nodesinf=nodesinf+l;}
-         if(inv[2]==2*l){cuspsinf=cuspsinf+l;}         
+         if(inv[2]==2*l){cuspsinf=cuspsinf+l;}
          nbranchinf=nbranchinf+inv[3];
       }
    }
@@ -1525,16 +1525,16 @@ EXAMPLE: example genus; shows an example
      if(w>=1){"            the curve is smooth at (1,x,0)";"";}
    }
    if(w>=1){"singular locus at (0,1,0):";"";}
-   inv=deltaLoc(h,maxideal(1)); 
+   inv=deltaLoc(h,maxideal(1));
    if((w>=1)&&(inv[2]!=0)){ nsing++;}
    deltainf=deltainf+inv[1];
    tauinf=tauinf+inv[2];
    if(inv[2]==1){nodesinf++;}
-   if(inv[2]==2){cuspsinf++;}         
-   
+   if(inv[2]==2){cuspsinf++;}
+
    if((w>=1)&&(inv[2]==0)){"            the curve is smooth at (0,1,0)";"";}
    if(inv[2]>0){nbranchinf=nbranchinf+inv[3];}
-  
+
    if(w>=1)
    {
       if(tauinf==0)
@@ -1559,7 +1559,7 @@ EXAMPLE: example genus; shows an example
    map sigma=S,var(1),var(2),1;
    ideal I=sigma(F);
 
-   if(size(#)!=0)     
+   if(size(#)!=0)
    {                              //uses the normalization to compute delta
       list nor=normal(I,"wd");
       delt=nor[size(nor)];
@@ -1571,7 +1571,7 @@ EXAMPLE: example genus; shows an example
    ideal I1=jacob(I);
    matrix Hess[2][2]=jacob(I1);
    ideal ID=I+I1+ideal(det(Hess));//singular locus of I+I1
-   
+
    ideal radID=std(radical(ID));//the non-nodal locus
    if(w>=1){"the non-nodal locus:";"";radID;pause();"";}
    if(deg(radID[1])==0)
@@ -1580,9 +1580,9 @@ EXAMPLE: example genus; shows an example
    }
    else
    {
-     ideal IDsing=minor(jacob(ID),2)+radID;//singular locus of ID 
+     ideal IDsing=minor(jacob(ID),2)+radID;//singular locus of ID
    }
-   
+
    iglob=vdim(std(IDsing));
 
    if(iglob!=0)//computation of the radical of IDsing
@@ -1603,25 +1603,25 @@ EXAMPLE: example genus; shows an example
    }
    cusps=vdim(radID)-iglob;
    nsing=nsing+cusps;
-   
+
    if(iglob==0)
    {
       if(w>=1){"             there are only cusps and nodes";"";}
       tau=vdim(std(I+jacob(I)));
       tauinf=tauinf+tau;
-      nodes=tau-2*cusps; 
+      nodes=tau-2*cusps;
       delt=nodes+cusps;
-      nbranch=2*tau-3*cusps; 
+      nbranch=2*tau-3*cusps;
       nsing=nsing+nodes;
    }
    else
    {
        if(w>=1){"the non-nodal-cuspidal singularities";"";}
-       setring C;                     
+       setring C;
        ideal I1=imap(newR,IDsing);
        iloc=vdim(std(I1));
        if(iglob==iloc)
-       { 
+       {
           if(w>=1){"only cusps and nodes outside (0,0,1)";}
           setring newR;
           tau=vdim(std(I+jacob(I)));
@@ -1629,9 +1629,9 @@ EXAMPLE: example genus; shows an example
           inv=deltaLoc(I[1],maxideal(1));
           delt=inv[1];
           tauloc=inv[2];
-          nodes=tau-tauloc-2*cusps; 
+          nodes=tau-tauloc-2*cusps;
           nsing=nsing+nodes;
-          nbranch=inv[3]+ 2*nodes+cusps;         
+          nbranch=inv[3]+ 2*nodes+cusps;
           delt=delt+nodes+cusps;
           if((w>=1)&&(inv[2]==0)){"smooth at (0,0,1)";}
         }
@@ -1640,7 +1640,7 @@ EXAMPLE: example genus; shows an example
            setring newR;
            list pr=minAssGTZ(IDsing);
            if(w>=1){pr;}
-           
+
            for(k=1;k<=size(pr);k++)
            {
               if(w>=1){nsing=nsing+vdim(std(pr[k]));}
@@ -1653,8 +1653,8 @@ EXAMPLE: example genus; shows an example
            tauinf=tauinf+tau;
            nodes=tau-tausing-2*cusps;
            nsing=nsing+nodes;
-           delt=delt+nodes+cusps;  
-           nbranch=nbranch+2*nodes+cusps;            
+           delt=delt+nodes+cusps;
+           nbranch=nbranch+2*nodes+cusps;
         }
    }
    genus=genus-delt-deltainf;
@@ -1685,11 +1685,11 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 proc deltaLoc(poly f,ideal singL)
-"USAGE:  deltaLoc(f,J);  f poly, J ideal 
+"USAGE:  deltaLoc(f,J);  f poly, J ideal
 ASSUME: f is reduced bivariate polynomial; basering has exactly two variables;
         J is irreducible prime component of the singular locus of f (e.g., one
-        entry of the output of @code{minAssGTZ(I);}, I = <f,jacob(f)>). 
-RETURN:  list L: 
+        entry of the output of @code{minAssGTZ(I);}, I = <f,jacob(f)>).
+RETURN:  list L:
 @texinfo
 @table @asis
 @item @code{L[1]}; int:
@@ -1699,11 +1699,11 @@ RETURN:  list L:
          the sum of (local) Tjurina numbers of f at the (conjugated) singular
          points given by J.
 @item @code{L[3]}; int:
-         the sum of (local) number of branches of f at the (conjugated) 
+         the sum of (local) number of branches of f at the (conjugated)
          singular points given by J.
 @end table
 @end texinfo
-NOTE:    procedure makes use of @code{execute}; increasing printlevel displays 
+NOTE:    procedure makes use of @code{execute}; increasing printlevel displays
          more comments (default: printlevel=0).
 SEE ALSO: delta, tjurina
 KEYWORDS: delta invariant; Tjurina number
@@ -1743,7 +1743,7 @@ EXAMPLE: example deltaLoc;  shows an example
       poly c;
       map psi;
       number co;
-      
+
       while((deg(lead(singL[1]))>1)&&(deg(lead(singL[2]))>1))
       {
          psi=S,x,y+random(-100,100)*x;
@@ -1751,7 +1751,7 @@ EXAMPLE: example deltaLoc;  shows an example
          singL=std(singL);
           f=psi(f);
       }
-      
+
       if(deg(lead(singL[2]))==1)
       {
          p=singL[1];
@@ -1767,19 +1767,19 @@ EXAMPLE: example deltaLoc;  shows an example
          c=singL[1]-lead(singL[1]);
          co=leadcoef(singL[1]);
       }
-      
+
       execute("ring B=("+charstr(S)+"),a,dp;");
       map beta=S,a,a;
       poly p=beta(p);
-      
+
       execute("ring C=("+charstr(S)+",a),("+varstr(S)+"),ds;");
       number p=number(imap(B,p));
-      
+
       minpoly=p;
       map iota=S,a,a;
       number c=number(iota(c));
       number co=iota(co);
-      
+
       map alpha=S,x-c/co,y+a;
       poly f=alpha(f);
       f=cleardenom(f);
@@ -1791,15 +1791,15 @@ EXAMPLE: example deltaLoc;  shows an example
         f;
         pause();
         "";
-      } 
+      }
    }
    option(noredSB);
    ideal fstd=std(ideal(f)+jacob(f));
    poly hc=highcorner(fstd);
-   int tau=vdim(fstd);      
+   int tau=vdim(fstd);
    int o=ord(f);
    int delt,nb;
-   
+
    if(tau==0)                 //smooth case
    {
       setring R;
@@ -1807,17 +1807,17 @@ EXAMPLE: example deltaLoc;  shows an example
    }
    if((char(basering)>=181)||(char(basering)==0))
    {
-      if(o==2)                //A_k-singularity 
+      if(o==2)                //A_k-singularity
       {
-        if(w>=1){"A_k-singularity";"";}        
+        if(w>=1){"A_k-singularity";"";}
          setring R;
          delt=(tau+1)/2;
-         return(list(d*delt,d*tau,d*(2*delt-tau+1)));   
+         return(list(d*delt,d*tau,d*(2*delt-tau+1)));
       }
       if((lead(f)==var(1)*var(2)^2)||(lead(f)==var(1)^2*var(2)))
-      { 
+      {
         if(w>=1){"D_k- singularity";"";}
-        
+
          setring R;
          delt=(tau+2)/2;
          return(list(d*delt,d*tau,d*(2*delt-tau+1)));
@@ -1825,13 +1825,13 @@ EXAMPLE: example deltaLoc;  shows an example
 
       int mu=vdim(std(jacob(f)));
       poly g=f+var(1)^mu+var(2)^mu;  //to obtain a convenient Newton-polygon
- 
+
       list NP=newtonpoly(g);
       if(w>=1){"Newton-Polygon:";NP;"";}
       int s=size(NP);
-       
-      if(is_NND(f,mu,NP))     
-      { // the Newton-polygon is non-degenerate                            
+
+      if(is_NND(f,mu,NP))
+      { // the Newton-polygon is non-degenerate
         // compute nb, the number of branches
         for(i=1;i<=s-1;i++)
         {
@@ -1844,7 +1844,7 @@ EXAMPLE: example deltaLoc;  shows an example
       if(w>=1){"Newton-Polygon is degenerated";"";}
 
       // the following can certainly be made more efficient when replacing
-      // 'reddevelop' (used only for computing number of branches) by 
+      // 'reddevelop' (used only for computing number of branches) by
       // successive blowing-up + test if Newton polygon degenerate:
       if(s>2)    //  splitting of f
       {
@@ -1860,7 +1860,7 @@ EXAMPLE: example deltaLoc;  shows an example
          ideal wi=var(2)^NP[2][2],f2;
          matrix li;
          while(de<st)
-         { 
+         {
            k=jet(h,de,v);
            li=lift(wi,k);
            f1=f1+li[2,1];
@@ -1881,7 +1881,7 @@ EXAMPLE: example deltaLoc;  shows an example
          nb=0;
          for(i=1;i<=size(fac);i++)
          {
-            nb=nb+deltaLoc(fac[i],maxideal(1))[3];           
+            nb=nb+deltaLoc(fac[i],maxideal(1))[3];
          }
          setring R;
          return(list(d*(mu+nb-1)/2,d*tau,d*nb));
@@ -1889,7 +1889,7 @@ EXAMPLE: example deltaLoc;  shows an example
       list hne=reddevelop(f);
       nb=size(hne);
       setring R;
-      kill HNEring;       
+      kill HNEring;
       return(list(d*(mu+nb-1)/2,d*tau,d*nb));
    }
    else             //the case of small characteristic
@@ -1910,26 +1910,26 @@ example
   size(qr);
   // each component of the singular locus either describes a cusp or a pair
   // of conjugated nodes:
-  deltaLoc(f,qr[1]); 
-  deltaLoc(f,qr[2]); 
-  deltaLoc(f,qr[3]); 
-  deltaLoc(f,qr[4]); 
-  deltaLoc(f,qr[5]); 
+  deltaLoc(f,qr[1]);
+  deltaLoc(f,qr[2]);
+  deltaLoc(f,qr[3]);
+  deltaLoc(f,qr[4]);
+  deltaLoc(f,qr[5]);
   deltaLoc(f,qr[6]);
 }
 ///////////////////////////////////////////////////////////////////////////////
-// compute the weighted degree of p 
+// compute the weighted degree of p
 static proc w_deg(poly p, intvec v)
 {
    if(p==0){return(-1);}
    int d=0;
    while(jet(p,d,v)==0){d++;}
    d=(transpose(leadexp(jet(p,d,v)))*v)[1];
-   return(d);  
+   return(d);
 }
 
 //proc hilbPoly(ideal J)
-//{  
+//{
 //   poly hp;
 //   int i;
 //   if(!attrib(J,"isSB")){J=std(J);}
@@ -2002,7 +2002,7 @@ EXAMPLE:  example primeClosure; shows an example
       ker=simplify(interred(ker),15);
       execute ("ring R0="+charstr(R)+",("+varstr(R)+"),("+ordstr(R)+");");
       ideal ker=fetch(R,ker);
- 	
+
       // check whether we compute the normalization of the blow up of
       // an isolated singularity at the origin (checked in normalI)
 
@@ -2041,7 +2041,7 @@ EXAMPLE:  example primeClosure; shows an example
       {
         ideal J;
         for (int s=1;s<=attrib(R0,"iso_sing_Rees");s++)
-	{
+        {
           J=J,var(s);
         }
       }
@@ -2051,14 +2051,14 @@ EXAMPLE:  example primeClosure; shows an example
       }
       J=J+SM[2];
       if (homog(J)==1)
-        {
-          J=mstd(J)[2];			
-        }
-      J=radical(interred(J));			
+      {
+        J=mstd(J)[2];
+      }
+      J=radical(interred(J));
     }
   else
     {
-      J=radical(interred(J));	
+      J=radical(interred(J));
     }
 
   // having computed the radical J of the ideal of the singular locus,
@@ -2078,7 +2078,7 @@ EXAMPLE:  example primeClosure; shows an example
 
   export nzd;
   list RR=SM[1],SM[2],J,nzd;
-  list RS=HomJJ(RR);  
+  list RS=HomJJ(RR);
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -2110,10 +2110,10 @@ EXAMPLE:  example primeClosure; shows an example
       kill(endid);
 
       map phi=R0,endphi;      // fetch the singular locus
-      ideal J=mstd(simplify(phi(J)+ker,4))[2];	
+      ideal J=mstd(simplify(phi(J)+ker,4))[2];
       export(J);
       if(n>1)
-      {	
+      {
          ideal normap=phi(normap);
       }
       else
@@ -2167,7 +2167,7 @@ EXAMPLE:  example closureRingtower; shows an example
 
   for (int i=1;i<=n;i++)
     {
-      if (defined(R(i))) { 
+      if (defined(R(i))) {
         string s="Fixed name R("+string(i)+") leads to conflict with existing "
               +"object having this name";
         ERROR(s);
@@ -2373,9 +2373,9 @@ proc closureGenerators(list L);    // called inside normalI
         {
 
           if (j==1)
-            {
-	      map phimap=R(k-1),phi;      // phimap is the map corresponding
-            }                             // to phi
+          {
+            map phimap=R(k-1),phi;      // phimap is the map corresponding
+          }                             // to phi
 
           p=p*phimap(nzd);
 
@@ -2594,7 +2594,7 @@ sux2y2-bvx2y2+sux2z2-bvx2z2+suy2z2-bvy2z2,
 tux2y3-bvx2y2z+tux2yz2+tuy3z2-bvx2z3-bvy2z3;
 
 
-//riemenschneider  
+//riemenschneider
 ring r=32000,(p,q,s,t,u,v,w,x,y,z),wp(1,1,1,1,1,1,2,1,1,1);
 ideal i=
 xz,
@@ -2613,7 +2613,7 @@ ring r=0,(u,v,w,x,y,z),wp(1,1,1,3,2,1);
 ideal i=wx,wy,wz,vx,vy,vz,ux,uy,uz,y3-x2;
 
 //Yoshihiko Sakai
-ring r=0,(x,y),dp;   //genus 0 4 nodes and 6 cusps   
+ring r=0,(x,y),dp;   //genus 0 4 nodes and 6 cusps
 ideal i=(x2+y^2-1)^3 +27x2y2;
 
 ring r=0,(x,y),dp;   //genus 0
@@ -2625,7 +2625,7 @@ ideal i=y3-x6+1;
 int m=9;           // q=9: genus 0
 int p=2;
 int q=9;//2,...,9
-ring r=0,(x,y),dp;  
+ring r=0,(x,y),dp;
 ideal i=y^m - x^p*(x - 1)^q;
 
 ring r=0,(x,y),dp;  //genus 19

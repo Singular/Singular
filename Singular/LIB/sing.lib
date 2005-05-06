@@ -1,7 +1,7 @@
-// $Id: sing.lib,v 1.28 2005-04-29 16:48:31 Singular Exp $
+// $Id: sing.lib,v 1.29 2005-05-06 14:39:12 hannes Exp $
 //(GMG/BM, last modified 26.06.96)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: sing.lib,v 1.28 2005-04-29 16:48:31 Singular Exp $";
+version="$Id: sing.lib,v 1.29 2005-05-06 14:39:12 hannes Exp $";
 category="Singularities";
 info="
 LIBRARY:  sing.lib      Invariants of Singularities
@@ -365,7 +365,7 @@ example
 
 proc slocus (ideal i)
 "USAGE:   slocus(i);  i ideal
-RETURN:  ideal of singular locus of i 
+RETURN:  ideal of singular locus of i
 EXAMPLE: example slocus; shows an example
 "
 {
@@ -932,7 +932,7 @@ example
 proc tangentcone (id,list #)
 "USAGE:   tangentcone(id [,n]); id = ideal, n = int
 RETURN:  the tangent cone of id
-NOTE:    the procedure works for any monomial ordering. 
+NOTE:    the procedure works for any monomial ordering.
          If n=0 use std w.r.t. local ordering ds, if n=1 use locstd
 EXAMPLE: example tangentcone; shows an example
 "
@@ -954,19 +954,19 @@ EXAMPLE: example tangentcone; shows an example
   {
     id = locstd(id);
   }
-  
+
   for(ii=1; ii<=size(id); ii++)
   {
-    tang[ii]=jet(id[ii],mindeg(id[ii]));     
+    tang[ii]=jet(id[ii],mindeg(id[ii]));
   }
-  return(tang);  
+  return(tang);
 }
 example
 { "EXAMPLE:"; echo = 2;
    ring R = 0,(x,y,z),ds;
    ideal i  = 7xyz+z5,x2+y3+z7,5z5+y5;
    tangentcone(i);
-}   
+}
 ///////////////////////////////////////////////////////////////////////////////
 
 proc locstd (id)
@@ -984,7 +984,7 @@ EXAMPLE: example locstd; shows an example
 {
   int ii;
   def bas = basering;
-  execute("ring  @r_locstd 
+  execute("ring  @r_locstd
      =("+charstr(bas)+"),(@t@,"+varstr(bas)+"),(dp(1),dp);");
   ideal @id = imap(bas,id);
   ideal @hid = homog(@id,@t@);
@@ -994,11 +994,11 @@ EXAMPLE: example locstd; shows an example
   def @hid = imap(@r_locstd,@hid);
   attrib(@hid,"isSB",1);
   kill @r_locstd;
-  return(@hid);  
+  return(@hid);
 }
 example
 { "EXAMPLE:"; echo = 2;
    ring R = 0,(x,y,z),ds;
    ideal i  = xyz+z5,2x2+y3+z7,3z5+y5;
    locstd(i);
-}   
+}

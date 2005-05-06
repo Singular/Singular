@@ -1,4 +1,4 @@
-// $Id: signcond.lib,v 1.3 2005-05-06 11:17:33 Singular Exp $
+// $Id: signcond.lib,v 1.4 2005-05-06 14:39:09 hannes Exp $
 // E. Tobis  12.Nov.2004
 // last change 16. Apr. 2005 (G.-M. Greuel)
 ///////////////////////////////////////////////////////////////////////////////
@@ -72,12 +72,12 @@ proc signcnd(ideal P,ideal I)
 "USAGE:     signcnd(P,I); ideal P,I
 RETURN:    list: the sign conditions realized by the polynomials of P on V(I).
            The output of signcnd is a list of two lists. Both lists have the
-           same length. That length is the number of sign conditions realized 
+           same length. That length is the number of sign conditions realized
            by the polynomials of P on the set V(i).
            Each element of the first list indicates a sign condition of the
            polynomials of P.
            Each element of the second list indicates how many elements of V(I)
-           give rise to the sign condition expressed by the same position on 
+           give rise to the sign condition expressed by the same position on
            the first list.
            See the example for further explanation of the output.
 ASSUME:    I is a Groebner basis
@@ -259,13 +259,13 @@ example
 
   size(l[1]);     // = the number of sign conditions of P on V(i)
 
-  //Each element of l[1] indicates a sign condition of the polynomials of P. 
+  //Each element of l[1] indicates a sign condition of the polynomials of P.
   //The following means P[1] > 0, P[2] = 0:
   l[1][2];
 
-  //Each element of l[2] indicates how many elements of V(I) give rise to 
+  //Each element of l[2] indicates how many elements of V(I) give rise to
   //the sign condition expressed by the same position on the first list.
-  //The following means that exactly 1 element of V(I) gives rise to the 
+  //The following means that exactly 1 element of V(I) gives rise to the
   //condition P[1] > 0, P[2] = 0:
   l[2][2];
 }

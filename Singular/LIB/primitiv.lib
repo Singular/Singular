@@ -2,7 +2,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // This library is for Singular 1.2 or newer
 
-version="$Id: primitiv.lib,v 1.21 2005-05-06 09:42:00 Singular Exp $";
+version="$Id: primitiv.lib,v 1.22 2005-05-06 14:39:03 hannes Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:    primitiv.lib    Computing a Primitive Element
@@ -259,11 +259,11 @@ ASSUME:  f is univariate and irreducible over the active ring. @*
          The active ring must allow an algebraic extension (e.g., it cannot
          be a transcendent ring extension of Q or Z/p).
 RETURN:  ring; @*
-           if called with a nonempty second parameter L, then in the output 
+           if called with a nonempty second parameter L, then in the output
            ring there is defined a list erg ( =L mapped to the new ring);
-           if the minpoly of the active ring is non-zero, then the image of 
-           the primitive root of f in the output ring is appended as last 
-           entry of the list erg. 
+           if the minpoly of the active ring is non-zero, then the image of
+           the primitive root of f in the output ring is appended as last
+           entry of the list erg.
 NOTE:    If the old ring has no parameter, the name @code{a} is chosen for the
          parameter of R (if @code{a} is no ring variable; if it is, @code{b} is
          chosen, etc.; if @code{a,b,c,o} are ring variables,
@@ -372,7 +372,7 @@ EXAMPLE: example splitring;  shows an example
     map convert=splt3,convid;
     zwi=convert(zwi);
     setring neuring;
-    erg=imap(splt3,zwi); 
+    erg=imap(splt3,zwi);
     erg[size(erg)+1]=imap(splt3,new_b);
   }
  }

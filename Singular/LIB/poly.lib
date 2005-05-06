@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: poly.lib,v 1.35 2004-06-21 10:13:24 Singular Exp $";
+version="$Id: poly.lib,v 1.36 2005-05-06 14:38:55 hannes Exp $";
 category="General purpose";
 info="
 LIBRARY:  poly.lib      Procedures for Manipulating Polys, Ideals, Modules
@@ -91,12 +91,12 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 proc substitute (I,list #)
 "USAGE:  - case 1: typeof(#[1])==poly:
-           substitute (I,v,f[,v1,f1,v2,f2,...]); I object of basering which 
+           substitute (I,v,f[,v1,f1,v2,f2,...]); I object of basering which
            can be mapped, v,v1,v2,.. ring variables, f,f1,f2,... poly
 @*       - case 2: typeof(#[1])==ideal:
            substitute1 (I,v,f); I object of basering which can be mapped,
            v ideal of ring variables, f ideal
-RETURN:  object of same type as I, 
+RETURN:  object of same type as I,
 @*       - case 1: ring variable v,v1,v2,... substituted by polynomials
            f,f1,f2,..., in this order
 @*       - case 2: ring variables in v substituted by polynomials in f:
@@ -130,7 +130,7 @@ EXAMPLE: example substitute; shows an example
    {
      ideal v = #[1];
      ideal f = #[2];
-     int mi = size(v); 
+     int mi = size(v);
      if(ncols(f)<mi)
      {
         mi = ncols(f);
@@ -145,7 +145,7 @@ EXAMPLE: example substitute; shows an example
         phi = bas,m;
         J = phi(J);
      }
-     return(J); 
+     return(J);
    }
 }
 example
@@ -156,7 +156,7 @@ example
    ideal v = c,t,b;
    ideal f = b+c,0,b-1;
    substitute(I,v,f);
-} 
+}
 ///////////////////////////////////////////////////////////////////////////////
 proc cyclic (int n)
 "USAGE:   cyclic(n);  n integer

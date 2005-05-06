@@ -1,10 +1,10 @@
 //last change: 13.02.2001 (Eric Westenberger)
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: triang.lib,v 1.7 2001-02-19 14:17:50 lossen Exp $";
+version="$Id: triang.lib,v 1.8 2005-05-06 14:39:19 hannes Exp $";
 category="Symbolic-numerical solving";
 info="
 LIBRARY: triang.lib   Decompose Zero-dimensional Ideals into Triangular Sets
-AUTHOR:	D. Hillebrand
+AUTHOR: D. Hillebrand
 
 PROCEDURES:
  triangL(G);          Decomposition of (G) into triangular systems (Lazard).

@@ -1,6 +1,6 @@
 // (anne, last modified 31.5.99)
 /////////////////////////////////////////////////////////////////////////////
-version="$Id: spcurve.lib,v 1.19 2005-05-06 09:42:01 Singular Exp $";
+version="$Id: spcurve.lib,v 1.20 2005-05-06 14:39:18 hannes Exp $";
 category="Singularities";
 info="
 LIBRARY: spcurve.lib    Deformations and Invariants of CM-codim 2 Singularities
@@ -187,7 +187,7 @@ proc semiCMcod2(matrix M, module t1,list #)
 ASSUME:  M is a presentation matrix of an ideal i, CM of codimension 2,
          and t1 is a presentation of the space of first order deformations
          of i ((M,t1) as returned by the procedure matrixT1)
-RETURN:  new ring in which the ideal semi describing the semiuniversal 
+RETURN:  new ring in which the ideal semi describing the semiuniversal
          deformation of i;
          if the optional third argument is given, the perturbation matrix
          of the semiuniversal deformation is returned instead of the ideal.
@@ -570,9 +570,9 @@ proc posweight(matrix M, module t1, int choose, list #)
          n=2 : all deformations of positive weight @*
 ASSUME:  M is a presentation matrix of a Cohen-Macaulay codimension 2
          ideal and t1 is its T1 space in matrix notation
-RETURN:  new ring containing a list posw, consisting of a presentation 
-         matrix describing the deformation given by the generators of T1 
-         of non-negative/positive weight and the weight vector for the new 
+RETURN:  new ring containing a list posw, consisting of a presentation
+         matrix describing the deformation given by the generators of T1
+         of non-negative/positive weight and the weight vector for the new
          variables
 NOTE:   The current basering should not contain any variables named
          T(i) where i is some integer!
@@ -721,9 +721,9 @@ proc KSpencerKernel(matrix M,list #)
               entry ij corresponds to gen((i-1)*n+j)
 ASSUME:    M is a quasihomogeneous n x (n+1) matrix where the n minors define
            an isolated space curve singularity
-RETURN:    new ring containing the coefficient matrix KS representing 
-           the kernel of the Kodaira-Spencer map of the family of 
-           non-negative deformations having the given singularity as 
+RETURN:    new ring containing the coefficient matrix KS representing
+           the kernel of the Kodaira-Spencer map of the family of
+           non-negative deformations having the given singularity as
            special fibre
 NOTE:      * the initial basering should not contain variables with name
              e(i) or T(i), since those variable names will internally be

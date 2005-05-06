@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: matrix.lib,v 1.28 2005-04-28 09:22:16 Singular Exp $";
+version="$Id: matrix.lib,v 1.29 2005-05-06 14:38:45 hannes Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  matrix.lib    Elementary Matrix Operations
@@ -465,7 +465,7 @@ EXAMPLE: example tensor; shows an example
      matrix D[q][0];
      return(D);
    }
- 
+
    int i,j;
    matrix C,D;
    for( i=1; i<=nrows(A); i++ )
@@ -605,7 +605,7 @@ RETURN: - a matrix B, if called with one argument; B is the complete row-
           no division by polynomials).
 @*      - a list L of two matrices, if called with two arguments;
           L satisfies transpose(L[2])*A=transpose(L[1])
-	  with L[1] the row-reduced form of A
+          with L[1] the row-reduced form of A
           and L[2] the transformation matrix.
 NOTE:   * This procedure just applies gauss_col to the transposed matrix.
           The transformation matrix is obtained by applying lift.

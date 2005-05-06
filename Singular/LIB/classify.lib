@@ -1,6 +1,6 @@
 // KK,GMG last modified: 17.12.00
 ///////////////////////////////////////////////////////////////////////////////
-version  = "$Id: classify.lib,v 1.49 2001-08-27 14:47:48 Singular Exp $";
+version  = "$Id: classify.lib,v 1.50 2005-05-06 14:38:10 hannes Exp $";
 category="Singularities";
 info="
 LIBRARY:  classify.lib  Arnold Classifier of Singularities
@@ -1645,7 +1645,7 @@ static proc Morse(poly f, int K, int corank, int ShowPhi)
         a = Coeff(jet(fc,2), x(RFlg[i]), x(RFlg[i])^2);
         debug_log(6,"Koeffizient von x(" + string(RFlg[i]) + ")^2 ist:", a);
         if( (a != 0) || (i==n) )
-	{
+        {
           debug_log(6, "BREAK!!!!!!!!!!!!!!");
           break;
         }
@@ -1653,7 +1653,7 @@ static proc Morse(poly f, int K, int corank, int ShowPhi)
                      string(RFlg[i]), ")");
         B = maxideal(1);
         for( k=1; k<=n ; k=k+1)
-	{
+        {
           if(k==RFlg[j]) { B[rvar(x(k))] = x(k) + x(RFlg[i]); }
         }
         Phi = ring_top,B;
@@ -1671,7 +1671,7 @@ static proc Morse(poly f, int K, int corank, int ShowPhi)
         debug_log(6, "Koeffizient von x("+string(RFlg[i])+") ist: ",
                       string(P));
         if(P != 0)
-	{
+        {
           debug_log(6, "1 Koeffizient von x("+string(RFlg[i])+") ist: ",
                        string(P));
           debug_log(6, "a=" + string(a));
@@ -1687,7 +1687,7 @@ static proc Morse(poly f, int K, int corank, int ShowPhi)
           fc   = jet(fi,K);
           P    = Coeff(fc, x(RFlg[i]), x(RFlg[i]));
           if( P != 0)
-	  {
+          {
             fi = fc;
             continue;
           }

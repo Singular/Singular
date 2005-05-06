@@ -1,8 +1,8 @@
-// $Id: deform.lib,v 1.34 2005-04-28 15:12:24 Singular Exp $
+// $Id: deform.lib,v 1.35 2005-05-06 14:38:14 hannes Exp $
 // author: Bernd Martin email: martin@math.tu-cottbus.de
 //(bm, last modified 4/98)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: deform.lib,v 1.34 2005-04-28 15:12:24 Singular Exp $";
+version="$Id: deform.lib,v 1.35 2005-05-06 14:38:14 hannes Exp $";
 category="Singularities";
 info="
 LIBRARY:  deform.lib    Miniversal Deformation of Singularities and Modules
@@ -27,7 +27,7 @@ proc versal (ideal Fo,list #)
 COMPUTE: miniversal deformation of Fo up to degree d (default d=100),
 RETURN: list L of 4 rings:
          L[1] extending the basering Po by new variables given by
-          \"A,B,..\" (deformation parameters); the new variables precede 
+          \"A,B,..\" (deformation parameters); the new variables precede
          the old ones, the ordering is the product of \"ls\" and \"ord(Po)\" @*
          L[2] = L[1]/Fo extending Qo=Po/Fo, @*
          L[3] = the embedding ring of the versal base space, @*
@@ -39,12 +39,12 @@ RETURN: list L of 4 rings:
 
       If d is defined (!=0), it computes up to degree d.
       @*If 'any' is defined and any[1] is no string, interactive version.
-      @*Otherwise 'any' is interpreted as a list of predefined strings: 
+      @*Otherwise 'any' is interpreted as a list of predefined strings:
       \"my\",\"param\",\"order\",\"out\": @*
-      (\"my\" internal prefix, \"param\" is a letter (e.g. \"A\") for the 
-      name of the first parameter or (e.g. \"A(\") for index parameter 
-      variables, \"order\" ordering string for ring extension), \"out\" name 
-      of output file). 
+      (\"my\" internal prefix, \"param\" is a letter (e.g. \"A\") for the
+      name of the first parameter or (e.g. \"A(\") for index parameter
+      variables, \"order\" ordering string for ring extension), \"out\" name
+      of output file).
 NOTE:   printlevel < 0        no additional output,
         printlevel >=0,1,2,.. informs you, what is going on;
         this proc uses 'execute'.
@@ -290,7 +290,7 @@ example
                     // cone over rational normal curve of degree 4
    list L=versal(Fo);
    L;
-   def Px=L[1]; 
+   def Px=L[1];
    setring Px;
    // ___ Equations of miniversal base space ___:
    Js;"";
@@ -304,7 +304,7 @@ proc mod_versal(matrix Mo, ideal I, list #)
 COMPUTE: miniversal deformation of coker(Mo) over Qo=Po/Io, Po=basering;
 RETURN:  list L of 4 rings:
          L[1] extending the basering Po by new variables given by
-          \"A,B,..\" (deformation parameters); the new variables precede 
+          \"A,B,..\" (deformation parameters); the new variables precede
          the old ones, the ordering is the product of \"ls\" and \"ord(Po)\" @*
          L[2] = L[1]/Io extending Qo, @*
          L[3] = the embedding ring of the versal base space, @*
@@ -312,15 +312,15 @@ RETURN:  list L of 4 rings:
       In the ring L[1] the following matrices are stored:
          @*Js  = giving the versal base space (obstructions),
          @*Fs  = giving the versal family of Mo,
-         @*Rs  = giving the lifting of syzygies Lo=syz(Mo).   
+         @*Rs  = giving the lifting of syzygies Lo=syz(Mo).
       If d is defined (!=0), it computes up to degree d.
       @*If 'any' is defined and any[1] is no string, interactive version.
-      @*Otherwise 'any' is interpreted as a list of predefined strings: 
+      @*Otherwise 'any' is interpreted as a list of predefined strings:
       \"my\",\"param\",\"order\",\"out\": @*
-      (\"my\" internal prefix, \"param\" is a letter (e.g. \"A\") for the 
-      name of the first parameter or (e.g. \"A(\") for index parameter 
-      variables, \"order\" ordering string for ring extension), \"out\" name 
-      of output file). 
+      (\"my\" internal prefix, \"param\" is a letter (e.g. \"A\") for the
+      name of the first parameter or (e.g. \"A(\") for index parameter
+      variables, \"order\" ordering string for ring extension), \"out\" name
+      of output file).
 NOTE:   printlevel < 0        no additional output,
         printlevel >=0,1,2,.. informs you, what is going on,
         this proc uses 'execute'.
@@ -661,7 +661,7 @@ Sub-procedure: creating ring-extensions, returned as a list of 4 rings
    }
    def my_Px=extendring(e1,my_var,my_ord);
    setring my_Px;
-   ideal Io  = imap(Po,Io);         
+   ideal Io  = imap(Po,Io);
    attrib(Io,"isSB",1);
    qring my_Qx = Io;
    if (switch)
@@ -840,7 +840,7 @@ Sub-procedure: asking for and reading your input
     }
     t1=size(vvvv);
 // ==========================================================
-    
+
     int l,l1;
     for (l=1;l<=t1;l=l+1)
     {
@@ -926,7 +926,7 @@ Sub proc: return relative weight string of columns of A with respect
     }
     if (size(tv)>1)
     { k = tv[2];
-      tv = tv[2..size(tv)]; 
+      tv = tv[2..size(tv)];
       tv = tv -k;
       if (tv==0) { @nv = @nv+string(-k)+",";}
       else {return("");}

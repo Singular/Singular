@@ -1,4 +1,4 @@
-version="$Id: brnoeth.lib,v 1.14 2005-04-19 15:23:38 Singular Exp $";
+version="$Id: brnoeth.lib,v 1.15 2005-05-06 14:38:04 hannes Exp $";
 category="Coding theory";
 info="
 LIBRARY:   brnoeth.lib  Brill-Noether Algorithm, Weierstrass-SG and AG-codes
@@ -1147,7 +1147,7 @@ static proc place (intvec Pp,int sing,list CURVE)
   export(CHI);
   int i,j,k;
   int m,n;
-//  list L@HNE=essdevelop(CHI);  
+//  list L@HNE=essdevelop(CHI);
   list LLL=ratdevelop(CHI);
   if (typeof(LLL[1])=="ring") {
     def altring=basering;
@@ -2042,7 +2042,7 @@ EXAMPLE:  example Adj_div; shows an example
       print("This will cause problems when "
              + "executing Adj_div, as 'a' is used for "
              + "the name of the parameter of the field extensions needed.");
-      ERROR("Please rename or kill the object named 'a'"); 
+      ERROR("Please rename or kill the object named 'a'");
     }
   }
   intvec opgt=option(get);
@@ -2196,7 +2196,7 @@ RETURN:   list L with updated data of CURVE after computing all non-singular
    @end format
           See @ref{Adj_div} for a description of the entries in L.
 NOTE:     The list_expression should be the output of the procedure Adj_div.@*
-          Raising @code{printlevel}, additional comments are displayed 
+          Raising @code{printlevel}, additional comments are displayed
           (default: @code{printlevel=0}).
 WARNING:  The parameter of the needed field extensions is called 'a'. Thus,
           there should be no global object named 'a' when executing NSplaces.
@@ -2219,7 +2219,7 @@ EXAMPLE:  example NSplaces; shows an example
       print("This will cause problems when "
              + "executing Adj_div, as 'a' is used for "
              + "the name of the parameter of the field extensions needed.");
-      ERROR("Please rename or kill the object named 'a'"); 
+      ERROR("Please rename or kill the object named 'a'");
     }
   }
   if (h==0)
@@ -2917,7 +2917,7 @@ static proc extra_place (ideal P)
   list LLL=essdevelop(LOC_EQ);
   if (typeof(LLL[1])=="ring") {
     def altring=basering;
-    def HNEring = LLL[1]; 
+    def HNEring = LLL[1];
     setring HNEring;
     def L@HNE = hne[1];
     kill hne;
@@ -2950,7 +2950,7 @@ static proc extra_place (ideal P)
     setring HNEring;
   }
   kill LLL;
-  
+
   list BRANCH=list();
   BRANCH[1]=Maux;
   BRANCH[2]=Li2;

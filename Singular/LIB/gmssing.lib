@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gmssing.lib,v 1.7 2005-05-06 12:39:49 Singular Exp $";
+version="$Id: gmssing.lib,v 1.8 2005-05-06 14:38:33 hannes Exp $";
 category="Singularities";
 
 info="
@@ -521,7 +521,7 @@ static proc transform(matrix A,matrix A0,ideal r,module H,module H0,ideal e,
                 A[i,j]=A[i,j]/var(1);
               }
             }
-	  }
+          }
         }
       }
 

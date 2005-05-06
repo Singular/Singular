@@ -1,6 +1,6 @@
 // (GMG/BM, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: inout.lib,v 1.23 2002-06-12 13:08:21 keilen Exp $";
+version="$Id: inout.lib,v 1.24 2005-05-06 14:38:40 hannes Exp $";
 category="General purpose";
 info="
 LIBRARY:  inout.lib     Printing and Manipulating In- and Output
@@ -105,7 +105,7 @@ example
    module m = [f*(x-y)],[0,f*(x-y)];
    string s=lprint(m); s;"";
    execute("matrix M[2][2]="+s+";");      //use the string s as input
-   module m1 = transpose(M);	          //should be the same as m
+   module m1 = transpose(M);              //should be the same as m
    print(m-m1);
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -476,7 +476,7 @@ EXAMPLE: example show; shows an example
                (typeof(@hi@lf@)!="number") and
                (typeof(@hi@lf@)!="resolution"))
            {
-             listvar(`na@me@s[names@i]`);             
+             listvar(`na@me@s[names@i]`);
            }
            kill(@hi@lf@);
          }
@@ -504,7 +504,7 @@ EXAMPLE: example show; shows an example
                (typeof(@hi@lf@)!="number") and
                (typeof(@hi@lf@)!="resolution"))
            {
-             listvar(`na@me@s[names@i]`);             
+             listvar(`na@me@s[names@i]`);
            }
            kill(@hi@lf@);
          }

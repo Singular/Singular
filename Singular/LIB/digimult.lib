@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: digimult.lib,v 1.1 2005-05-04 15:41:12 bricken Exp $";
+version="$Id: digimult.lib,v 1.2 2005-05-06 14:38:17 hannes Exp $";
 category="Logic";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
 AUTHORS: Michael Brickenstein, bricken@mathematik.uni-kl.de
 
 OVERVIEW:
-	Various algorithms for verifiying digital circuits, including SAT-Solvers
+        Various algorithms for verifiying digital circuits, including SAT-Solvers
 
 PROCEDURES:
          satisfiable(I);   returns 1, if system is satisfiable
@@ -39,7 +39,7 @@ proc poly_cancel_mod_number(poly f, number n){
   if ((leadcoef(l) mod n)==0){
     return(poly_cancel_mod_number(f-l,n));
   }
-  
+
   return(l+poly_cancel_mod_number(f-l,n));
 }
 
@@ -73,8 +73,7 @@ proc uni_poly_on_values(list l){
     summand=1;
     for(j=1;j<=size(l);j++){
       if(i!=j){
-	summand=summand*(var(1)-l[j][1]);
-	
+        summand=summand*(var(1)-l[j][1]);
       }
     }
     summand=summand/subst(summand,var(1),l[i][1]);
@@ -162,7 +161,7 @@ static proc simple_gps(ideal i, list var_order, int step){
   }
   j=simplify(j,2);
   j=simplify(j,8);
-  
+
   poly v=var(var_order[1]);
   var_order=delete(var_order,1);
   ideal j0=subst(j,v,0);
@@ -176,5 +175,5 @@ static proc simple_gps(ideal i, list var_order, int step){
     j0=simplify(j0,8);
     return(simple_gps(j0,var_order, step));
   }
-  
+
 }

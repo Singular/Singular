@@ -1,6 +1,6 @@
 //GMG last modified: 04/25/2000
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: linalg.lib,v 1.37 2005-04-28 09:22:15 Singular Exp $";
+version="$Id: linalg.lib,v 1.38 2005-05-06 14:38:43 hannes Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  linalg.lib  Algorithmic Linear Algebra
@@ -1342,10 +1342,10 @@ proc eigenvals(matrix M)
 ASSUME:  eigenvalues of M in basefield
 RETURN:
 @format
-list l; 
+list l;
   ideal l[1];
     number l[1][i];  i-th eigenvalue of M
-  intvec l[2]; 
+  intvec l[2];
     int l[2][i];  multiplicity of i-th eigenvalue of M
 @end format
 EXAMPLE: example eigenvals; shows examples
@@ -1396,11 +1396,11 @@ EXAMPLE: example eigenvals; shows examples
       {
         e0=number(jet(l[1][i]/var(1),0));
         if(e0!=0)
-	{
+        {
           k++;
           e[k]=(e0*var(1)-l[1][i])/e0;
           m[k]=l[2][i];
-	}
+        }
       }
     }
   }
@@ -1421,9 +1421,9 @@ ASSUME:  eigenvalues of M in basefield
 RETURN:
 @format
 list l;  minimal polynomial of M
-  ideal l[1]; 
+  ideal l[1];
     number l[1][i];  i-th root of minimal polynomial of M
-  intvec l[2]; 
+  intvec l[2];
     int l[2][i];  multiplicity of i-th root of minimal polynomial of M
 @end format
 EXAMPLE: example minipoly; shows examples
@@ -1525,7 +1525,7 @@ EXAMPLE: example spnf; shows examples
       for(j=i-1;j>=1;j--)
       {
         if(m[j]!=0)
-	{
+        {
           if(number(a[i])>number(a[j]))
           {
             a1=number(a[i]);
@@ -1622,11 +1622,11 @@ ASSUME:  eigenvalues of M in basefield
 RETURN:
 @format
 list l;  Jordan data of M
-  ideal l[1]; 
+  ideal l[1];
     number l[1][i];  eigenvalue of i-th Jordan block of M
-  intvec l[2]; 
+  intvec l[2];
     int l[2][i];  size of i-th Jordan block of M
-  intvec l[3]; 
+  intvec l[3];
     int l[3][i];  multiplicity of i-th Jordan block of M
 @end format
 EXAMPLE: example jordan; shows examples
@@ -1718,7 +1718,7 @@ RETURN:
 @format
 list l:
   module l[1];  inverse(l[1])*M*l[1] in Jordan normal form
-  intvec l[2]; 
+  intvec l[2];
     int l[2][i];  weight filtration index of l[1][i]
 @end format
 EXAMPLE: example jordanbasis; shows examples

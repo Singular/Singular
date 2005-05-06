@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.90 2003-04-15 11:47:27 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.91 2005-05-06 14:38:29 hannes Exp $";
 category="Singularities";
 
 info="
@@ -37,7 +37,7 @@ SEE ALSO: mondromy_lib, spectrum_lib
 
 KEYWORDS: singularities; Gauss-Manin system; Brieskorn lattice;
           mixed Hodge structure; V-filtration; weight filtration
-          Bernstein polynomial; monodromy; spectrum; spectral pairs; 
+          Bernstein polynomial; monodromy; spectrum; spectral pairs;
           good basis;
 ";
 
@@ -520,7 +520,7 @@ static proc transform(matrix A,matrix A0,ideal r,module H,module H0,ideal e,
                 A[i,j]=A[i,j]*var(1);
               }
             }
-	  }
+          }
         }
       }
 
@@ -564,7 +564,7 @@ ASSUME:   characteristic 0; local degree ordering;
           isolated critical point 0 of t
 RETURN:   ideal r;  roots of the Bernstein polynomial b excluding the root -1
 NOTE:     the roots of b are negative rational numbers and -1 is a root of b
-KEYWORDS: singularities; Gauss-Manin system; Brieskorn lattice; 
+KEYWORDS: singularities; Gauss-Manin system; Brieskorn lattice;
           Bernstein polynomial
 EXAMPLE:  example bernstein; shows examples
 "
@@ -614,11 +614,11 @@ ASSUME:   characteristic 0; local degree ordering;
 RETURN:
 @format
 list l;  Jordan data jordan(M) of monodromy matrix exp(-2*pi*i*M)
-  ideal l[1]; 
+  ideal l[1];
     number l[1][i];  eigenvalue of i-th Jordan block of M
-  intvec l[2]; 
+  intvec l[2];
     int l[2][i];  size of i-th Jordan block of M
-  intvec l[3]; 
+  intvec l[3];
     int l[3][i];  multiplicity of i-th Jordan block of M
 @end format
 SEE ALSO: mondromy_lib, linalg_lib

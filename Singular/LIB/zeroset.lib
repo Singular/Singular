@@ -1,6 +1,6 @@
 // Last change 12.02.2001 (Eric Westenberger)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: zeroset.lib,v 1.12 2005-05-06 09:42:02 Singular Exp $";
+version="$Id: zeroset.lib,v 1.13 2005-05-06 14:39:20 hannes Exp $";
 category="Symbolic-numerical solving";
 info="
 LIBRARY:  zeroset.lib      Procedures For Roots and Factorization
@@ -85,7 +85,7 @@ RETURN:  ring, a polynomial ring over an extension field of the ground field,
   @format
   - 'roots' is the list of roots of the polynomial f (no multiplicities)
   - if the ground field is Q(a') and the extension field is Q(a), then
-    'newA' is the representation of a' in Q(a). 
+    'newA' is the representation of a' in Q(a).
     If the basering contains a parameter 'a' and the minpoly remains unchanged
     then 'newA' = 'a'.
     If the basering does not contain a parameter then 'newA' = 'a' (default).
@@ -311,7 +311,7 @@ RETURN:  ring, a polynomial ring over an extension field of the ground field,
     'newA' is the representation of a' in Q(a).
     If the basering contains a parameter 'a' and the minpoly remains unchanged
     then 'newA' = 'a'.
-    If the basering does not contain a parameter then 'newA' = 'a' (default).    
+    If the basering does not contain a parameter then 'newA' = 'a' (default).
   - 'id' is the ideal I in Q(a)[x_1,...] (a' substituted by 'newA')
   @end format
 ASSUME:  dim(I) = 0, and ground field to be Q or a simple extension of Q given
@@ -331,9 +331,9 @@ EXAMPLE: example ZeroSet; shows an example
   if(size(#) > 0) { primaryDecQ = #[1]; }
   else { primaryDecQ = 0; }
 
-  // create a new ring 'ZSR' with one additional variable instead of the 
+  // create a new ring 'ZSR' with one additional variable instead of the
   // parameter
-  // if the basering does not contain a parameter then 'a' is used as the 
+  // if the basering does not contain a parameter then 'a' is used as the
   // additional variable.
 
   def RZSB = basering;
@@ -356,7 +356,7 @@ EXAMPLE: example ZeroSet; shows an example
   poly newA = result[2];
   poly minPoly = result[3][1];
 
-  // transform the generators of the ideal I w.r.t. the new representation 
+  // transform the generators of the ideal I w.r.t. the new representation
   // of 'a'
 
   map F = basering, maxideal(1);
@@ -689,7 +689,7 @@ EXAMPLE: example  SQFRNorm; shows an example
 "
 {
   def SNB = basering;
-  def SNR = TransferRing(SNB);  // new ring with parameter 'a' 
+  def SNR = TransferRing(SNB);  // new ring with parameter 'a'
                                 // replaced by a variable
   setring SNR;
   poly f = imap(SNB, f);

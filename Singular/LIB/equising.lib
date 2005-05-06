@@ -1,13 +1,13 @@
-version="$Id: equising.lib,v 1.11 2005-04-25 10:13:06 Singular Exp $";
+version="$Id: equising.lib,v 1.12 2005-05-06 14:38:17 hannes Exp $";
 category="Singularities";
 info="
 LIBRARY:  equising.lib  Equisingularity Stratum of a Family of Plane Curves
-AUTHOR:   Christoph Lossen, lossen@mathematik.uni-kl.de 
+AUTHOR:   Christoph Lossen, lossen@mathematik.uni-kl.de
           Andrea Mindnich, mindnich@mathematik.uni-kl.de
 
 MAIN PROCEDURES:
  tau_es(f);             codim of mu-const stratum in semi-universal def. base
- esIdeal(f);            (Wahl's) equisingularity ideal of f 
+ esIdeal(f);            (Wahl's) equisingularity ideal of f
  esStratum(F[,m,L]);    equisingularity stratum of a family F
  isEquising(F[,m,L]);   tests if a given deformation is equisingular
 
@@ -54,38 +54,38 @@ static proc swapXY(poly f)
 // computes m-jet w.r.t. the variables x,y (other variables weighted 0
 static proc m_Jet(poly F,int m);
 {
-  intvec w=xyVector();  
-  poly Fd=jet(F,m,w);  
+  intvec w=xyVector();
+  poly Fd=jet(F,m,w);
   return(Fd);
 }
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // computes the 4 control matrices (input is multsequence(L))
-proc control_Matrix(list M); 
+proc control_Matrix(list M);
 "USAGE:   control_Matrix(L); L list
 ASSUME:  L is the output of multsequence(hnexpansion(f)).
 RETURN:  list M of 4 intmat's:
 @format
-  M[1] contains the multiplicities at the respective infinitely near points 
-       p[i,j] (i=step of blowup+1, j=branch) -- if branches j=k,...,k+m pass 
-       through the same p[i,j] then the multiplicity is stored in M[1][k,j], 
-       while M[1][k+1]=...=M[1][k+m]=0.   
-  M[2] contains the number of branches meeting at p[i,j] (again, the information 
-       is stored according to the above rule)   
-  M[3] contains the information about the splitting of M[1][i,j] with respect to 
-       different tangents of branches at p[i,j] (information is stored only for 
-       minimal j>=k corresponding to a new tangent direction). 
-       The entries are the sum of multiplicities of all branches with the 
+  M[1] contains the multiplicities at the respective infinitely near points
+       p[i,j] (i=step of blowup+1, j=branch) -- if branches j=k,...,k+m pass
+       through the same p[i,j] then the multiplicity is stored in M[1][k,j],
+       while M[1][k+1]=...=M[1][k+m]=0.
+  M[2] contains the number of branches meeting at p[i,j] (again, the information
+       is stored according to the above rule)
+  M[3] contains the information about the splitting of M[1][i,j] with respect to
+       different tangents of branches at p[i,j] (information is stored only for
+       minimal j>=k corresponding to a new tangent direction).
+       The entries are the sum of multiplicities of all branches with the
        respective tangent.
-  M[4] contains the maximal sum of higher multiplicities for a branch passing 
-       through p[i,j] ( = degree Bound for blowing up)  
+  M[4] contains the maximal sum of higher multiplicities for a branch passing
+       through p[i,j] ( = degree Bound for blowing up)
 @end format
-NOTE:    the branches are ordered in such a way that only consecutive branches 
+NOTE:    the branches are ordered in such a way that only consecutive branches
          can meet at an infinitely near point. @*
-         the final rows of the matrices M[1],...,M[3] is (1,1,1,...,1), and 
-         correspond to infinitely near points such that the strict transforms 
-         of the branches are smooth and intersect the exceptional divisor 
+         the final rows of the matrices M[1],...,M[3] is (1,1,1,...,1), and
+         correspond to infinitely near points such that the strict transforms
+         of the branches are smooth and intersect the exceptional divisor
          transversally.
 SEE ALSO: multsequence
 EXAMPLE: example control_Matrix; shows an example
@@ -95,23 +95,23 @@ EXAMPLE: example control_Matrix; shows an example
 
   dummy=0;
   for (j=1;j<=ncols(M[2]);j++)
-  { 
+  {
     dummy=dummy+M[1][nrows(M[1])-1,j]-M[1][nrows(M[1]),j];
   }
   intmat S[nrows(M[1])+dummy][ncols(M[1])];
   intmat T[nrows(M[1])+dummy][ncols(M[1])];
   intmat U[nrows(M[1])+dummy][ncols(M[1])];
   intmat maxDeg[nrows(M[1])+dummy][ncols(M[1])];
-  
+
   for (i=1;i<=nrows(M[2]);i++)
   {
     dummy=1;
     for (j=1;j<=ncols(M[2]);j++)
     {
       for (k=dummy;k<dummy+M[2][i,j];k++)
-      { 
-        T[i,dummy]=T[i,dummy]+1; 
-        S[i,dummy]=S[i,dummy]+M[1][i,k]; 
+      {
+        T[i,dummy]=T[i,dummy]+1;
+        S[i,dummy]=S[i,dummy]+M[1][i,k];
         if (i>1)
         {
           U[i-1,dummy]=U[i-1,dummy]+M[1][i-1,k];
@@ -126,13 +126,13 @@ EXAMPLE: example control_Matrix; shows an example
   for (i=nrows(M[1]);i<=nrows(S);i++)
   {
     for (j=1;j<=ncols(M[2]);j++)
-    { 
-      S[i,j]=1;  
-      T[i,j]=1;  
+    {
+      S[i,j]=1;
+      T[i,j]=1;
       U[i,j]=1;
     }
   }
-  
+
   // Computing the degree Bounds to be stored in M[4]:
   for (i=1;i<=nrows(S);i++)
   {
@@ -140,21 +140,21 @@ EXAMPLE: example control_Matrix; shows an example
     for (j=1;j<=ncols(S);j++)
     {
       for (k=dummy;k<dummy+T[i,j];k++)
-      { 
+      {
         maxDeg[i,k]=S[i,dummy];  // multiplicity at i-th blowup
       }
       dummy=k;
     }
   }
-  // adding up multiplicities 
-  for (i=nrows(S);i>=2;i--)  
+  // adding up multiplicities
+  for (i=nrows(S);i>=2;i--)
   {
     for (j=1;j<=ncols(S);j++)
     {
       maxDeg[i-1,j]=maxDeg[i-1,j]+maxDeg[i,j];
     }
   }
-  
+
   list L=S,T,U,maxDeg;
   return(L);
 }
@@ -164,7 +164,7 @@ EXAMPLE: example control_Matrix; shows an example
 //  matrix of higher tangent directions:
 //  returns list: 1) tangent directions
 //                2) swapping information (x <--> y)
-static proc inf_Tangents(list L,int s); // L aus hnexpansion, 
+static proc inf_Tangents(list L,int s); // L aus hnexpansion,
 {
   int nv=nvars(basering);
   matrix M;
@@ -177,11 +177,11 @@ static proc inf_Tangents(list L,int s); // L aus hnexpansion,
   {
     V[k]=L[k][3];  // switch: 0 --> tangent 2nd parameter
                    //         1 --> tangent 1st parameter
-    e=0;    
+    e=0;
     M=L[k][1];
     counter=1;
     B[counter,k]=M[1,1];
-    
+
     for (i=1;i<=nrows(M);i++)
     {
       for (j=2;j<=ncols(M);j++)
@@ -192,9 +192,9 @@ static proc inf_Tangents(list L,int s); // L aus hnexpansion,
           if (i<>nrows(M))
           {
             B[counter,k]=M[i,j];
-            j=ncols(M)+1; // goto new row of HNmatrix... 
+            j=ncols(M)+1; // goto new row of HNmatrix...
             if (counter<>s)
-            { 
+            {
               if (counter+1<=nrows(Mult))
               {
                 e=Mult[counter-1,k]-Mult[counter,k]-Mult[counter+1,k];
@@ -205,16 +205,16 @@ static proc inf_Tangents(list L,int s); // L aus hnexpansion,
               }
             }
           }
-          else 
+          else
           {
             B[counter,k]=0;
-            j=ncols(M)+1; // goto new row of HNmatrix... 
+            j=ncols(M)+1; // goto new row of HNmatrix...
           }
         }
         else
         {
           if (e<=0)
-          { 
+          {
             B[counter,k]=M[i,j];
           }
           else  // point is still proximate to an earlier point
@@ -230,10 +230,10 @@ static proc inf_Tangents(list L,int s); // L aus hnexpansion,
             }
           }
         }
-        
-        if (counter==s) // given number of points determined 
+
+        if (counter==s) // given number of points determined
         {
-            j=ncols(M)+1;  
+            j=ncols(M)+1;
             i=nrows(M)+1;
             // leave procedure
         }
@@ -246,7 +246,7 @@ static proc inf_Tangents(list L,int s); // L aus hnexpansion,
 
 ////////////////////////////////////////////////////////////////////////////////
 // compute "good" upper bound for needed number of help variables
-// 
+//
 static proc Determine_no_b(intmat U,matrix B)
 // U is assumed to be 3rd output of control_Matrix
 // B is assumed to be 1st output of inf_Tangents
@@ -264,7 +264,7 @@ static proc Determine_no_b(intmat U,matrix B)
           counter=counter+1;
         }
       }
-      
+
     }
   }
   counter=counter+ncols(U);
@@ -272,9 +272,9 @@ static proc Determine_no_b(intmat U,matrix B)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// compute number of infinitely near free points corresponding to non-zero 
+// compute number of infinitely near free points corresponding to non-zero
 // entries in control_Matrix[1] (except first row)
-// 
+//
 static proc no_freePoints(intmat Mult,matrix B)
 // Mult is assumed to be 1st output of control_Matrix
 // U is assumed to be 3rd output of control_Matrix
@@ -329,15 +329,15 @@ static proc makeMinPolyString (string newParName)
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// 
+//
 // DEFINES: A new basering, "myRing",
 //          with new names for the parameters and variables.
 //          The new names for the parameters are a(1..k),
 //          and t(1..s),x,y for the variables
 //          The ring ordering is ordStr.
 // NOTE:    This proc uses 'execute'.
-static proc createMyRing_new(poly p_F, string ordStr, 
-                                string minPolyStr, int no_b) 
+static proc createMyRing_new(poly p_F, string ordStr,
+                                string minPolyStr, int no_b)
 {
   def r_old = basering;
 
@@ -392,7 +392,7 @@ static proc createMyRing_new(poly p_F, string ordStr,
   poly p_F = fetch(r_old, p_F);
   export p_F,mIdeal;
 
-  // Extension by no_b auxiliary variables 
+  // Extension by no_b auxiliary variables
   if (no_b>0)
   {
     if (npars(basering) == 0)
@@ -400,7 +400,7 @@ static proc createMyRing_new(poly p_F, string ordStr,
       ordStr = "(dp("+string(no_b)+"),"+ordStr+")";
       helpStr = "ring myRing ="
                 + string(chara)+ ", (b(1..no_b), t(1..nDefParams), x, y),"
-                + ordStr +";"; 
+                + ordStr +";";
       execute(helpStr);
     }
     else
@@ -418,10 +418,10 @@ static proc createMyRing_new(poly p_F, string ordStr,
           execute(helpStr);
 
           helpStr = "minpoly =" + minPolyStr + ";";
-          execute (helpStr);  
+          execute (helpStr);
         }
         else // no minpoly given
-        {  
+        {
           ordStr = "(dp(" + string(no_b) + ")," + ordStr + ")";
           helpStr = "ring myRing =
                     (" + string(chara) + ",a(1..npars(basering)) ),
@@ -440,7 +440,7 @@ static proc createMyRing_new(poly p_F, string ordStr,
       }
     }
     ideal qIdeal = imap(myRing1, qIdeal);
-  
+
     if(qIdeal != 0)
     {
       def r_base = basering;
@@ -454,8 +454,8 @@ static proc createMyRing_new(poly p_F, string ordStr,
     export p_F,mIdeal;
     kill myRing1;
   }
-  else 
-  { 
+  else
+  {
     if(qIdeal != 0)
     {
       def r_base = basering;
@@ -470,15 +470,15 @@ static proc createMyRing_new(poly p_F, string ordStr,
     {
       def myRing=myRing1;
     }
-    kill myRing1;    
+    kill myRing1;
   }
-  
+
   setring r_old;
   return(myRing);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// returns list of coef, leadmonomial  
+// returns list of coef, leadmonomial
 //
 static proc determine_coef (poly Fm)
 {
@@ -531,7 +531,7 @@ static proc determine_coef (poly Fm)
   poly g=imap(myRing1,g);
   kill myRing1;
   def M=coef(Fm,xy);
-  
+
   for (i=1; i<=ncols(M); i++)
   {
     if (M[1,i]==g)
@@ -577,11 +577,11 @@ static proc checkPoly (poly p_f)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-static proc make_ring_small(ideal J) 
-// returns varstr for new ring, the map and the number of vars 
+static proc make_ring_small(ideal J)
+// returns varstr for new ring, the map and the number of vars
 {
   attrib(J,"isSB",1);
-  int counter=0; 
+  int counter=0;
   ideal newmap;
   string newvar="";
   for (int i=1; i<=nvars(basering); i++)
@@ -589,22 +589,22 @@ static proc make_ring_small(ideal J)
     if (reduce(var(i),J)<>0)
     {
       newmap[i]=var(i);
-      
+
       if (newvar=="")
       {
         newvar=newvar+string(var(i));
-        counter=counter+1;       
+        counter=counter+1;
       }
       else
       {
         newvar=newvar+","+string(var(i));
-        counter=counter+1;       
+        counter=counter+1;
       }
     }
-    else 
+    else
     {
       newmap[i]=0;
-    }  
+    }
   }
   list L=newvar,newmap,counter;
   attrib(J,"isSB",0);
@@ -625,7 +625,7 @@ static proc esComputation (int typ, poly p_F, list #)
   int blowup=1;
   int auxVar=1;
   int nVars;
-  
+
   intvec upper_bound, upper_bound_old, fertig, soll;
   list blowup_string;
   int i_print= printlevel-voice+2;
@@ -642,7 +642,7 @@ static proc esComputation (int typ, poly p_F, list #)
     if (typ==1) //isEquising
     {
       option(set,ov);
-      return(1);  
+      return(1);
     }
     else
     {
@@ -657,14 +657,14 @@ static proc esComputation (int typ, poly p_F, list #)
     {
       def artin_bd=#[1];  // compute modulo maxideal(artin_bd)
       if (artin_bd <= 1)
-      { 
+      {
         print("Do you really want to compute over Basering/maxideal("
               +string(artin_bd)+") ?");
         print("No computation performed !");
         if (typ==1) //isEquising
         {
           option(set,ov);
-          return(1);  
+          return(1);
         }
         else
         {
@@ -673,12 +673,12 @@ static proc esComputation (int typ, poly p_F, list #)
         }
       }
       if (size(#)>1)
-      { 
+      {
         if (typeof(#[2])=="list")
         {
           def @L=#[2];  // is assumed to be the Hamburger-Noether matrix
         }
-      }      
+      }
     }
     else
     {
@@ -709,14 +709,14 @@ static proc esComputation (int typ, poly p_F, list #)
     map phi=old_ring,Map_Phi;
     poly f=phi(p_F);
 
-    // Heuristics: if x,y are transversal parameters then computation of HNE 
-    // can be much faster when exchanging variables...! 
+    // Heuristics: if x,y are transversal parameters then computation of HNE
+    // can be much faster when exchanging variables...!
     if (2*size(coeffs(f,x))<size(coeffs(f,y)))
     {
       swapped=1;
       f=swapXY(f);
     }
-    
+
     int error=checkPoly(f);
     if (error)
     {
@@ -725,30 +725,30 @@ static proc esComputation (int typ, poly p_F, list #)
       {
         print("Return value (=0) has no meaning!");
         option(set,ov);
-        return(0);  
+        return(0);
       }
       else
-      { 
+      {
         option(set,ov);
         return(list( ideal(0),error));
       }
     }
-    
+
     dbprint(i_print,"// ");
     dbprint(i_print,"// Compute HN expansion");
     dbprint(i_print,"// ---------------------");
     i=printlevel;
     printlevel=printlevel-5;
-    list LLL=hnexpansion(f); 
+    list LLL=hnexpansion(f);
 
     if (size(LLL)==0) { // empty list returned by hnexpansion
       setring old_ring;
-      print(i_print,"Unable to compute HN expansion !");      
+      print(i_print,"Unable to compute HN expansion !");
       if (typ==1) //isEquising
       {
         print("Return value (=0) has no meaning!");
         option(set,ov);
-        return(0);  
+        return(0);
       }
       else
       {
@@ -761,8 +761,8 @@ static proc esComputation (int typ, poly p_F, list #)
     else
     {
       if (typeof(LLL[1])=="ring") {
-        def HNering = LLL[1]; 
-        setring HNering; 
+        def HNering = LLL[1];
+        setring HNering;
         def @L=stripHNE(hne);
       }
       else {
@@ -775,7 +775,7 @@ static proc esComputation (int typ, poly p_F, list #)
   }
   def HNEring=basering;
   list M=multsequence(@L);
-  M=control_Matrix(M);     // this returns the 4 control matrices  
+  M=control_Matrix(M);     // this returns the 4 control matrices
   def maxDeg=M[4];
 
   list L1=inf_Tangents(@L,nrows(M[1]));
@@ -791,7 +791,7 @@ static proc esComputation (int typ, poly p_F, list #)
   }
 
   // Determine maximal number of needed auxiliary parameters (free tangents):
-  no_b=Determine_no_b(M[3],B);  
+  no_b=Determine_no_b(M[3],B);
 
   // test whether HNexpansion needed field extension....
   string minPolyStr = "";
@@ -816,9 +816,9 @@ static proc esComputation (int typ, poly p_F, list #)
   ideal J,Jnew,final_Map;
   number_of_branches=ncols(M[1]);
   for (i=1;i<=number_of_branches;i++)
-  { 
+  {
     poly F(i);
-    ideal bl_Map(i);  
+    ideal bl_Map(i);
   }
   upper_bound[number_of_branches]=0;
   upper_bound[1]=number_of_branches;
@@ -828,9 +828,9 @@ static proc esComputation (int typ, poly p_F, list #)
 
   // Hole:  B = matrix of blowup points
   if (ring_is_changed==0) { matrix B=hole(B); }
-  else                    { matrix B=imap(HNEring,B); } 
+  else                    { matrix B=imap(HNEring,B); }
   m=M[1][blowup,branch];    // multiplicity at 0
-   
+
   // now, we start by checking equimultiplicity along trivial section
   poly Fm=m_Jet(p_F,m-1);
 
@@ -838,7 +838,7 @@ static proc esComputation (int typ, poly p_F, list #)
   Jnew=coef_Mat[2,1..ncols(coef_Mat)];
   J=J,Jnew;
 
-  if (defined(artin_bd)) // the artin_bd-th power of the maxideal of 
+  if (defined(artin_bd)) // the artin_bd-th power of the maxideal of
                          // deformation parameters can be cutted off
   {
     J=jet(J,artin_bd-1);
@@ -856,13 +856,13 @@ static proc esComputation (int typ, poly p_F, list #)
       setring old_ring;
       option(set,ov);
       return(0);
-    }    
+    }
   }
-  
+
   F(1)=p_F;
 
   // and reduce the remaining terms in F(1):
-  bl_Map(1)=maxideal(1); 
+  bl_Map(1)=maxideal(1);
 
   attrib(J,"isSB",1);
   bl_Map(1)=reduce(bl_Map(1),J);
@@ -882,10 +882,10 @@ static proc esComputation (int typ, poly p_F, list #)
   G=1;
   counter=branch;
   k=upper_bound[branch];
-  
+
   F_save=F(1);  // is truncated differently in the following loop
-  
-  while(counter<=k) 
+
+  while(counter<=k)
   {
     F(counter)=m_Jet(F_save,maxDeg[blowup,counter]);
     if (V[counter]==0) // 2nd ring variable is tangent to this branch
@@ -895,11 +895,11 @@ static proc esComputation (int typ, poly p_F, list #)
     else // 1st ring variable is tangent to this branch
     {
       G=G*(x-(b(auxVar)+B[blowup,counter])*y)^(M[3][blowup,counter]);
-      F(counter)=swapXY(F(counter)); 
+      F(counter)=swapXY(F(counter));
     }
     bl_Map(counter)=maxideal(1);
     bl_Map(counter)[nvars(basering)]=xy+(b(auxVar)+B[blowup,counter])*x;
-    
+
     auxVar=auxVar+1;
     upper_bound[counter]=counter+M[2][blowup+1,counter]-1;
     counter=counter+M[2][blowup+1,counter];
@@ -908,7 +908,7 @@ static proc esComputation (int typ, poly p_F, list #)
 
   list LeadDataFm=determine_coef(Fm);
   def LeadDataG=coef(G,xy);
-  
+
   for (i=1; i<=ncols(LeadDataG); i++)
   {
     if (LeadDataG[1,i]==LeadDataFm[2])
@@ -917,7 +917,7 @@ static proc esComputation (int typ, poly p_F, list #)
       i=ncols(LeadDataG)+1;
     }
   }
-    
+
   G=LeadDataFm[1]*G-LeadG*Fm;  // leading terms in y should cancel...
 
   coef_Mat = coef(G,xy);
@@ -925,7 +925,7 @@ static proc esComputation (int typ, poly p_F, list #)
 
   // simplification of Jnew
 
-  if (defined(artin_bd)) // the artin_bd-th power of the maxideal of 
+  if (defined(artin_bd)) // the artin_bd-th power of the maxideal of
                          // deformation parameters can be cutted off
   {
     Jnew=jet(Jnew,artin_bd-1);
@@ -941,23 +941,23 @@ static proc esComputation (int typ, poly p_F, list #)
       setring old_ring;
       option(set,ov);
       return(0);
-    }    
+    }
   }
 
-  while (fertig<>soll and blowup<nrows(M[3])) 
+  while (fertig<>soll and blowup<nrows(M[3]))
   {
     upper_bound_old=upper_bound;
     dbprint(i_print,"// Blowup Step "+string(blowup)+" completed");
     blowup=blowup+1;
-    
+
     for (branch=1;branch<=number_of_branches;branch=branch+1)
     {
       Jnew=0;
-      
+
       // First we check if the branch still has to be considered:
-      if (branch==upper_bound_old[branch] and fertig[branch]<>1) 
+      if (branch==upper_bound_old[branch] and fertig[branch]<>1)
       {
-        if (M[3][blowup-1,branch]==1 and 
+        if (M[3][blowup-1,branch]==1 and
                ((B[blowup,branch]<>x and B[blowup,branch]<>y)
             or (blowup==nrows(M[3])) ))
         {
@@ -965,18 +965,18 @@ static proc esComputation (int typ, poly p_F, list #)
           dbprint(i_print,"// 1 branch finished");
         }
       }
-      
-      if (branch<=upper_bound_old[branch] and fertig[branch]<>1) 
+
+      if (branch<=upper_bound_old[branch] and fertig[branch]<>1)
       {
         for (i=branch;i>=1;i--)
-        { 
+        {
           if (M[1][blowup-1,i]<>0)
           {
             m=M[1][blowup-1,i]; // multiplicity before blowup
-            i=0;          
+            i=0;
           }
         }
-         
+
         // we blow up the branch and take the strict transform:
         attrib(J,"isSB",1);
         bl_Map(branch)=reduce(bl_Map(branch),J);
@@ -993,7 +993,7 @@ static proc esComputation (int typ, poly p_F, list #)
 
         m=M[1][blowup,branch]; // multiplicity after blowup
         Fm=m_Jet(F(branch),m); // homogeneous part of lowest degree
- 
+
 
         // we check for Fm=F[k]*...*F[k+s] where
         //
@@ -1005,14 +1005,14 @@ static proc esComputation (int typ, poly p_F, list #)
         G=1;
         counter=branch;
         k=upper_bound[branch];
-        
+
         F_save=F(branch);
-        
-        while(counter<=k) 
+
+        while(counter<=k)
         {
           F(counter)=m_Jet(F_save,maxDeg[blowup,counter]);
-        
-          if (B[blowup,counter]<>x and B[blowup,counter]<>y) 
+
+          if (B[blowup,counter]<>x and B[blowup,counter]<>y)
           {
             G=G*(y-(b(auxVar)+B[blowup,counter])*x)^(M[3][blowup,counter]);
             bl_Map(counter)=maxideal(1);
@@ -1020,7 +1020,7 @@ static proc esComputation (int typ, poly p_F, list #)
                                         xy+(b(auxVar)+B[blowup,counter])*x;
             auxVar=auxVar+1;
           }
-          else 
+          else
           {
             if (B[blowup,counter]==x)
             {
@@ -1031,18 +1031,18 @@ static proc esComputation (int typ, poly p_F, list #)
             }
             else
             {
-              G=G*y^(M[3][blowup,counter]); // tangent has to be y 
+              G=G*y^(M[3][blowup,counter]); // tangent has to be y
               bl_Map(counter)=maxideal(1);
               bl_Map(counter)[nvars(basering)]=xy;
             }
-          } 
+          }
           upper_bound[counter]=counter+M[2][blowup+1,counter]-1;
           counter=counter+M[2][blowup+1,counter];
         }
         G=determine_coef(Fm)[1]*G-Fm;  // leading terms in y should cancel
         coef_Mat = coef(G,xy);
         Jnew=coef_Mat[2,1..ncols(coef_Mat)];
-        if (defined(artin_bd)) // the artin_bd-th power of the maxideal of 
+        if (defined(artin_bd)) // the artin_bd-th power of the maxideal of
                               // deformation parameters can be cutted off
         {
           Jnew=jet(Jnew,artin_bd-1);
@@ -1060,7 +1060,7 @@ static proc esComputation (int typ, poly p_F, list #)
             setring old_ring;
             option(set,ov);
             return(0);
-          }    
+          }
         }
       }
     }
@@ -1075,14 +1075,14 @@ static proc esComputation (int typ, poly p_F, list #)
           setring old_ring;
           option(set,ov);
           return(0);
-        }    
+        }
       }
     }
   }
-  
+
   // computation for all equimultiple sections being trivial (I^s(f))
   ideal Jtriv=J;
-  for (i=1;i<=no_b; i++) 
+  for (i=1;i<=no_b; i++)
   {
     Jtriv=subst(Jtriv,b(i),0);
   }
@@ -1093,16 +1093,16 @@ static proc esComputation (int typ, poly p_F, list #)
   dbprint(i_print,"// -------------------");
 
   poly gg;
-  int b_left=no_b;  
+  int b_left=no_b;
 
-  for (i=1;i<=no_b; i++) 
+  for (i=1;i<=no_b; i++)
   {
-    attrib(J,"isSB",1);  
+    attrib(J,"isSB",1);
     gg=reduce(b(i),J);
-    if (gg==0) 
-    { 
+    if (gg==0)
+    {
       b_left = b_left-1;  // another b(i) has to be 0
-    }                 
+    }
     J = subst(J, b(i), gg);
     attrib(J,"isSB",0);
   }
@@ -1115,7 +1115,7 @@ static proc esComputation (int typ, poly p_F, list #)
       setring old_ring;
       option(set,ov);
       return(0);
-    }    
+    }
   }
 
   ideal J_no_b = nselect(J,1,no_b);
@@ -1125,7 +1125,7 @@ static proc esComputation (int typ, poly p_F, list #)
     // some b(i) didn't appear in linear conditions and have to be eliminated
     if (defined(artin_bd))
     {
-      // first we make the ring smaller (removing variables, which are 
+      // first we make the ring smaller (removing variables, which are
       // forced to 0 by J
       list LL=make_ring_small(J);
       ideal Shortmap=LL[2];
@@ -1136,8 +1136,8 @@ static proc esComputation (int typ, poly p_F, list #)
       }
       ordStr = "dp(" + string(b_left) + "),dp";
       ideal qId = ideal(basering);
-    
-      helpStr = "ring Shortring = (" 
+
+      helpStr = "ring Shortring = ("
                 + charstr(basering) + "),("+ LL[1] +") , ("+ ordStr  +");";
       execute(helpStr);
       execute(minPolyStr);
@@ -1153,14 +1153,14 @@ static proc esComputation (int typ, poly p_F, list #)
 
       // we change to the qring mod m^artin_bd
       // first, we have to check if we were in a qring when starting
-      ideal qId = imap(myRing, qId);  
+      ideal qId = imap(myRing, qId);
       if (qId == 0)
       {
          attrib(MM,"isSB",1);
-         qring QQ=MM;     
+         qring QQ=MM;
       }
       else
-      {   
+      {
          qId=qId,MM;
          qring QQ = std(qId);
       }
@@ -1190,10 +1190,10 @@ static proc esComputation (int typ, poly p_F, list #)
       if (defined(artin_bd)){ J=jet(J,artin_bd-1); }
     }
   }
- 
+
   dbprint(i_print,"// finished");
   dbprint(i_print,"// ");
-  
+
   minPolyStr = "";option(set,ov);
   if (minpoly !=0)
   {
@@ -1201,7 +1201,7 @@ static proc esComputation (int typ, poly p_F, list #)
   }
 
   kill HNEring;
-  
+
   if (typ==1) // isEquising
   {
     if (defined(artin_bd)) { J=jet(Jnew,artin_bd-1); }
@@ -1210,26 +1210,26 @@ static proc esComputation (int typ, poly p_F, list #)
       setring old_ring;
       option(set,ov);
       return(0);
-    }    
+    }
     else
     {
       setring old_ring;
       option(set,ov);
       return(1);
-    }    
+    }
   }
- 
+
   setring old_ring;
   // we are back in the original ring
 
   if (npars(myRing)<>0)
   {
     ideal qIdeal = ideal(basering);
-    helpStr = "ring ESSring = (" 
+    helpStr = "ring ESSring = ("
                  + string(char(basering))+ "," + parstr(myRing) +
                  ") , ("+ varstr(basering)+") , ("+ ordstr(basering) +");";
     execute(helpStr);
-    execute(minPolyStr);  
+    execute(minPolyStr);
     // basering has changed to ESSring
 
     ideal qIdeal = fetch(old_ring, qIdeal);
@@ -1239,8 +1239,8 @@ static proc esComputation (int typ, poly p_F, list #)
       kill ESSring;
       qring ESSring = std(qIdeal);
     }
-    kill qIdeal; 
- 
+    kill qIdeal;
+
     ideal SSS;
     for (int ii=1;ii<=nvars(basering);ii++)
     {
@@ -1251,10 +1251,10 @@ static proc esComputation (int typ, poly p_F, list #)
     ideal ES=phi(J);
     ideal ES_all_triv=phi(Jtriv);
     kill phi;
-  
+
     if (defined(p_F)<=0)
-    { 
-      poly p_F=fetch(old_ring,p_F); 
+    {
+      poly p_F=fetch(old_ring,p_F);
       export(p_F);
     }
     export(ES);
@@ -1269,7 +1269,7 @@ static proc esComputation (int typ, poly p_F, list #)
     return(list(ESSring,0));
   }
   else
-  { 
+  {
     // no new ring definition necessary
     ideal SSS;
     for (int ii=1;ii<=nvars(basering);ii++)
@@ -1285,14 +1285,14 @@ static proc esComputation (int typ, poly p_F, list #)
     setring old_ring;
     dbprint(i_print,"// output of 'esStratum' is a list consisting of:
 //    _[1][1] = ideal defining the equisingularity stratum
-//    _[1][2] = ideal defining the part of the equisingularity stratum 
-//              where all equimultiple sections are trivial 
+//    _[1][2] = ideal defining the part of the equisingularity stratum
+//              where all equimultiple sections are trivial
 //    _[2] = 0");
 
     option(set,ov);
     return(list(list(ES,ES_all_triv),0));
   }
-  
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1305,7 +1305,7 @@ RETURN:  int, the codimension of the mu-const stratum in the semi-universal
          deformation base.
 NOTE:    printlevel>=1 displays additional information.
          When called with any additional parameter, the computation of the
-         Milnor number is avoided (no check for NND). 
+         Milnor number is avoided (no check for NND).
 SEE ALSO: esIdeal, tjurina, invariants
 EXAMPLE: example tau_es; shows an example.
 "
@@ -1322,12 +1322,12 @@ EXAMPLE: example tau_es; shows an example.
     print("// computation stopped");
     return(0);
   }
-  if ( mult(std(1+var(1)+var(2))) <> 0) 
+  if ( mult(std(1+var(1)+var(2))) <> 0)
   {
     print("// basering is not local !");
     print("// computation stopped");
     return(0);
-  }  
+  }
 
   if (mult(std(f))<=1)
   {
@@ -1360,11 +1360,11 @@ EXAMPLE: example tau_es; shows an example.
 
   // check for D_k singularity
   // ----------------------------------------
-  if (mult(std(f))==3 and size(factorize(jet(f,3))[1])>=3) 
+  if (mult(std(f))==3 and size(factorize(jet(f,3))[1])>=3)
   {
     dbprint(i_print,"// ");
     dbprint(i_print,"// polynomial defined D_k singularity");
-    dbprint(i_print,"// ");    
+    dbprint(i_print,"// ");
     ideal ES_Id = f, jacob(f);
     return( vdim(std(Jacobi_Id)));
   }
@@ -1376,12 +1376,12 @@ EXAMPLE: example tau_es; shows an example.
     // ----------------------------------------
     Jacobi_Id=std(Jacobi_Id);
     int mu = vdim(Jacobi_Id);
-    poly f_tilde=f+var(1)^mu+var(2)^mu;  //to obtain convenient Newton-polygon 
-   
+    poly f_tilde=f+var(1)^mu+var(2)^mu;  //to obtain convenient Newton-polygon
+
     list NP=newtonpoly(f_tilde);
     dbprint(i_print-1,"// Newton polygon:");
-    dbprint(i_print-1,NP); 
-    dbprint(i_print-1,""); 
+    dbprint(i_print-1,NP);
+    dbprint(i_print-1,"");
 
     if(is_NND(f,mu,NP))          // f is Newton non-degenerate
     {
@@ -1396,7 +1396,7 @@ EXAMPLE: example tau_es; shows an example.
         slope_y=NP[i][2]-NP[i+1][2];
         for (k=NP[i][1]+1; k<=NP[i+1][1]; k++)
         {
-          while ( slope_x*upper + slope_y*k >= 
+          while ( slope_x*upper + slope_y*k >=
                   slope_x*NP[i][2] + slope_y*NP[i][1])
           {
             upper=upper-1;
@@ -1423,9 +1423,9 @@ EXAMPLE: example tau_es; shows an example.
     }
   }
 
-  // for Newton degenerate polynomials, we compute the HN expansion, and 
+  // for Newton degenerate polynomials, we compute the HN expansion, and
   // count the number of free points .....
-  
+
   dbprint(i_print-1,"// ");
   dbprint(i_print-1,"// Compute HN expansion");
   dbprint(i_print-1,"// ---------------------");
@@ -1434,17 +1434,17 @@ EXAMPLE: example tau_es; shows an example.
   if (2*size(coeffs(f,x))<size(coeffs(f,y)))
   {
     f=swapXY(f);
-  }    
-  list LLL=hnexpansion(f); 
+  }
+  list LLL=hnexpansion(f);
   if (size(LLL)==0) { // empty list returned by hnexpansion
     setring old_ring;
     ERROR("Unable to compute HN expansion !");
-  }   
+  }
   else
   {
     if (typeof(LLL[1])=="ring") {
-      def HNering = LLL[1]; 
-      setring HNering; 
+      def HNering = LLL[1];
+      setring HNering;
       def @L=hne;
     }
     else {
@@ -1460,10 +1460,10 @@ EXAMPLE: example tau_es; shows an example.
   list M=multsequence(@L);
   M=control_Matrix(M);     // this returns the 4 control matrices
   intmat Mult=M[1];
-  
+
   list L1=inf_Tangents(@L,nrows(M[1]));
   matrix B=L1[1];
-  
+
   // determine sum_i m_i(m_i+1)/2 (over inf. near points)
   int conditions=0;
   for (i=1;i<=nrows(Mult);i++)
@@ -1475,7 +1475,7 @@ EXAMPLE: example tau_es; shows an example.
   }
   int freePts=no_freePoints(M[1],B);
   int taues=conditions-freePts-2;
-  
+
   setring old_ring;
   return(taues);
 }
@@ -1493,15 +1493,15 @@ example
 proc esIdeal (poly f,list #)
 "USAGE:   esIdeal(f[,any]]); f poly
 ASSUME:  f is a reduced bivariate polynomial, the basering has precisely
-         two variables, is local and no qring, and the characteristic of 
-         the ground field does not divide mult(f). 
+         two variables, is local and no qring, and the characteristic of
+         the ground field does not divide mult(f).
 RETURN:  if called with only one parameter: list of two ideals,
 @format
           _[1]:  equisingularity ideal of f (in sense of Wahl),
           _[2]:  ideal of equisingularity with fixed position of the
                  singularity;
 @end format
-         if called with more than one parameter: list of three ideals, 
+         if called with more than one parameter: list of three ideals,
 @format
           _[1]:  equisingularity ideal of f (in sense of Wahl)
           _[2]:  ideal of equisingularity with fixed position of the
@@ -1519,7 +1519,7 @@ EXAMPLE: example esIdeal; shows examples.
 {
 
   int typ;
-  if (size(#)>0) { typ=1; }   // I^s is also computed 
+  if (size(#)>0) { typ=1; }   // I^s is also computed
   int i,k,s;
   int slope_x, slope_y, upper;
   int i_print = printlevel - voice + 3;
@@ -1532,12 +1532,12 @@ EXAMPLE: example esIdeal; shows examples.
     print("// computation stopped");
     return(list(0,0));
   }
-  if ( mult(std(1+var(1)+var(2))) <> 0) 
+  if ( mult(std(1+var(1)+var(2))) <> 0)
   {
     print("// basering is not local !");
     print("// computation stopped");
     return(list(0,0));
-  }  
+  }
 
   if (mult(std(f))<=1)
   {
@@ -1549,7 +1549,7 @@ EXAMPLE: example esIdeal; shows examples.
     else
     {
       return(list(ideal(1),ideal(1),ideal(1)));
-    } 
+    }
   }
 
   if ( deg(squarefree(f))!=deg(f) )
@@ -1566,17 +1566,17 @@ EXAMPLE: example esIdeal; shows examples.
       print("// characteristic of ground field divides "
             + "multiplicity of polynomial !");
       print("// computation stopped");
-      return(list(0,0));    
+      return(list(0,0));
     }
   }
-  
+
   // check for A_k singularity
   // ----------------------------------------
   if (mult(std(f))==2)
   {
     dbprint(i_print,"// ");
     dbprint(i_print,"// polynomial defined A_k singularity");
-    dbprint(i_print,"// ");    
+    dbprint(i_print,"// ");
     ideal ES_Id = f, jacob(f);
     ES_Id = interred(ES_Id);
     ideal ESfix_Id = f, maxideal(1)*jacob(f);
@@ -1593,11 +1593,11 @@ EXAMPLE: example esIdeal; shows examples.
 
   // check for D_k singularity
   // ----------------------------------------
-  if (mult(std(f))==3 and size(factorize(jet(f,3))[1])>=3) 
+  if (mult(std(f))==3 and size(factorize(jet(f,3))[1])>=3)
   {
     dbprint(i_print,"// ");
     dbprint(i_print,"// polynomial defined D_k singularity");
-    dbprint(i_print,"// ");    
+    dbprint(i_print,"// ");
     ideal ES_Id = f, jacob(f);
     ES_Id = interred(ES_Id);
     ideal ESfix_Id = f, maxideal(1)*jacob(f);
@@ -1616,10 +1616,10 @@ EXAMPLE: example esIdeal; shows examples.
   // ----------------------------------------
   int mu = milnor(f);
   poly f_tilde=f+var(1)^mu+var(2)^mu;  //to obtain a convenient Newton-polygon
- 
+
   list NP=newtonpoly(f_tilde);
   dbprint(i_print-1,"// Newton polygon:");
-  dbprint(i_print-1,NP); 
+  dbprint(i_print-1,NP);
   dbprint(i_print-1,"");
 
   if(is_NND(f,mu,NP))          // f is Newton non-degenerate
@@ -1635,7 +1635,7 @@ EXAMPLE: example esIdeal; shows examples.
       slope_y=NP[i][2]-NP[i+1][2];
       for (k=NP[i][1]+1; k<=NP[i+1][1]; k++)
       {
-        while ( slope_x*upper + slope_y*k >= 
+        while ( slope_x*upper + slope_y*k >=
                 slope_x*NP[i][2] + slope_y*NP[i][1])
         {
           upper=upper-1;
@@ -1665,14 +1665,14 @@ EXAMPLE: example esIdeal; shows examples.
     dbprint(i_print,"polynomial is Newton degenerate !");
     dbprint(i_print,"");
   }
-  
+
   def old_ring=basering;
 
   dbprint(i_print,"// ");
   dbprint(i_print,"// versal deformation with triv. section");
   dbprint(i_print,"// =====================================");
   dbprint(i_print,"// ");
- 
+
   ideal JJ=maxideal(1)*jacob(f);
   ideal kbase_versal=kbase(std(JJ));
   s=size(kbase_versal);
@@ -1680,10 +1680,10 @@ EXAMPLE: example esIdeal; shows examples.
                         +varstr(basering)+"),(ds("+string(s)+"),"
                         +ordstr(basering)+");";
   MinPolyStr = string(minpoly);
-                           
+
   execute(ring_versal);
   if (MinPolyStr<>"0")
-  { 
+  {
     MinPolyStr = "minpoly="+MinPolyStr;
     execute(MinPolyStr);
   }
@@ -1701,7 +1701,7 @@ EXAMPLE: example esIdeal; shows examples.
 
   ideal ES_Id,ES_Id_all_triv;
   poly Ftriv=F;
-  
+
   dbprint(i_print,"// ");
   dbprint(i_print,"// Compute equisingularity Stratum over Spec(C[t]/t^2)");
   dbprint(i_print,"// ===================================================");
@@ -1715,7 +1715,7 @@ EXAMPLE: example esIdeal; shows examples.
     print("Some error has occured during the computation");
     return(list(0,0));
   }
-  
+
   if ( typeof(M[1])=="list" )
   {
     int defpars = nvars(basering)-2;
@@ -1723,7 +1723,7 @@ EXAMPLE: example esIdeal; shows examples.
     poly g;
     F=reduce(F,std(M[1][1]));
     Ftriv=reduce(Ftriv,std(M[1][2]));
-  
+
     for (i=1; i<=defpars; i++)
     {
       Fred=reduce(F,std(var(i)));
@@ -1741,10 +1741,10 @@ EXAMPLE: example esIdeal; shows examples.
     setring old_ring;
     // back to original ring
 
-    ideal ES_Id = imap(@Px,ES_Id);    
+    ideal ES_Id = imap(@Px,ES_Id);
     ES_Id = interred(ES_Id);
 
-    ideal ES_Id_all_triv = imap(@Px,ES_Id_all_triv);    
+    ideal ES_Id_all_triv = imap(@Px,ES_Id_all_triv);
     ES_Id_all_triv = interred(ES_Id_all_triv);
 
     ideal ESfix_Id = ES_Id, f, maxideal(1)*jacob(f);
@@ -1763,10 +1763,10 @@ EXAMPLE: example esIdeal; shows examples.
   else
   {
     def AuxRing=M[1];
- 
+
     dbprint(i_print,"// ");
     dbprint(i_print,"// change ring to ESSring");
- 
+
     setring AuxRing;  // contains p_F, ES
 
     int defpars = nvars(basering)-2;
@@ -1827,7 +1827,7 @@ example
 {
   "EXAMPLE:"; echo=2;
   ring r=0,(x,y),ds;
-  poly f=x7+y7+(x-y)^2*x2y2; 
+  poly f=x7+y7+(x-y)^2*x2y2;
   list K=esIdeal(f);
   option(redSB);
   // Wahl's equisingularity ideal:
@@ -1837,8 +1837,8 @@ example
   poly f=x4+4x3y+6x2y2+4xy3+y4+2x2y15+4xy16+2y17+xy23+y24+y30+y31;
   list K=esIdeal(f);
   vdim(std(K[1]));
-  // the latter should be equal to: 
-  tau_es(f);     
+  // the latter should be equal to:
+  tau_es(f);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1847,11 +1847,11 @@ proc esStratum (poly p_F, list #)
 "USAGE:   esStratum(F[,m,L]); F poly, m int, L list
 ASSUME:  F defines a deformation of a reduced bivariate polynomial f
          and the characteristic of the basering does not divide mult(f). @*
-         If nv is the number of variables of the basering, then the first 
+         If nv is the number of variables of the basering, then the first
          nv-2 variables are the deformation parameters. @*
          If the basering is a qring, ideal(basering) must only depend
          on the deformation parameters.
-COMPUTE: equations for the stratum of equisingular deformations with  
+COMPUTE: equations for the stratum of equisingular deformations with
          fixed (trivial) section.
 RETURN:  list l: either consisting of a list and an integer, where
 @format
@@ -1863,7 +1863,7 @@ RETURN:  list l: either consisting of a list and an integer, where
 @end format
 or consisting of a ring and an integer, where
 @format
-  l[1]=ESSring is a ring extension of basering containing the ideal ES 
+  l[1]=ESSring is a ring extension of basering containing the ideal ES
         (describing the ES-stratum), the ideal ES_all_triv (describing the
         part with trival equimultiple sections) and the poly p_F=F,
   l[2]=1 if some error has occured,  l[2]=0 otherwise.
@@ -1871,7 +1871,7 @@ or consisting of a ring and an integer, where
 NOTE:    L is supposed to be the output of hnexpansion (with the given ordering
          of the variables appearing in f). @*
          If m is given, the ES Stratum over A/maxideal(m) is computed. @*
-         This procedure uses @code{execute} or calls a procedure using 
+         This procedure uses @code{execute} or calls a procedure using
          @code{execute}.
          printlevel>=2 displays additional information.
 SEE ALSO: esIdeal, isEquising
@@ -1885,13 +1885,13 @@ EXAMPLE: example esStratum; shows examples.
 example
 {
    "EXAMPLE:"; echo=2;
-   int p=printlevel; 
+   int p=printlevel;
    printlevel=1;
    ring r = 0,(a,b,c,d,e,f,g,x,y),ds;
    poly F = (x2+2xy+y2+x5)+ax+by+cx2+dxy+ey2+fx3+gx4;
    list M = esStratum(F);
    M[1][1];
-   
+
    printlevel=3;     // displays additional information
    esStratum(F,2)  ; // ES-stratum over Q[a,b,c,d,e,f,g] / <a,b,c,d,e,f,g>^2
 
@@ -1908,7 +1908,7 @@ proc isEquising (poly p_F, list #)
 "USAGE:   isEquising(F[,m,L]); F poly, m int, L list
 ASSUME:  F defines a deformation of a reduced bivariate polynomial f
          and the characteristic of the basering does not divide mult(f). @*
-         If nv is the number of variables of the basering, then the first 
+         If nv is the number of variables of the basering, then the first
          nv-2 variables are the deformation parameters. @*
          If the basering is a qring, ideal(basering) must only depend
          on the deformation parameters.
@@ -1918,7 +1918,7 @@ RETURN:  int: 1 if the family is equisingular, 0 otherwise.
 NOTE:    L is supposed to be the output of hnexpansion (with the given ordering
          of the variables appearing in f). @*
          If m is given, the family is considered over A/maxideal(m). @*
-         This procedure uses @code{execute} or calls a procedure using 
+         This procedure uses @code{execute} or calls a procedure using
          @code{execute}.
          printlevel>=2 displays additional information.
 EXAMPLE: example isEquising; shows examples.
@@ -1941,7 +1941,7 @@ example
    ring rr=0,(A,B,C,x,y),ls;
    poly f=x7+y7+(x-y)^2*x2y2;
    poly F=f+A*y*diff(f,x)+B*x*diff(f,x);
-   isEquising(F);  
+   isEquising(F);
    isEquising(F,2);    // computation over  Q[a,b] / <a,b>^2
 }
 
@@ -1951,7 +1951,7 @@ example
 
 LIB "equising.lib";
    ring r = 0,(x,y),ds;
-   poly p1 = y^2+x^3; 
+   poly p1 = y^2+x^3;
    poly p2 = p1^2+x5y;
    poly p3 = p2^2+x^10*p1;
    poly p=p3^2+x^20*p2;
@@ -1998,7 +1998,7 @@ timer=1;
 ring rr=0,(x,y),ls;
 poly f=x7+y7+(x-y)^2*x2y2;
 list K=esIdeal(f);
-// tau_es 
+// tau_es
 vdim(std(K[1])); //-> 22
 // tau_es_fix
 vdim(std(K[2])); //-> 24
@@ -2008,11 +2008,11 @@ LIB "equising.lib";
 printlevel=2;
 timer=1;
 ring rr=0,(x,y),ls;
-poly f=x7+y7+(x-y)^2*x2y2+x2y4; // Newton non-deg. 
+poly f=x7+y7+(x-y)^2*x2y2+x2y4; // Newton non-deg.
 list K=esIdeal(f);
 // tau_es
 vdim(std(K[1])); //-> 21
-// tau_es_fix 
+// tau_es_fix
 vdim(std(K[2])); //-> 23
 
 LIB "equising.lib";

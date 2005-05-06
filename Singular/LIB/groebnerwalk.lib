@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////
-// $Id: groebnerwalk.lib,v 1.2 2005-05-04 13:16:46 Singular Exp $   //
+// $Id: groebnerwalk.lib,v 1.3 2005-05-06 14:38:34 hannes Exp $   //
 ///////////////////////////////////////////////////////////////
 
-version="$Id: groebnerwalk.lib,v 1.2 2005-05-04 13:16:46 Singular Exp $"; 
-category="cc"; 
- 
-info="    
-LIBRARY: groebnerwalk.lib   
+version="$Id: groebnerwalk.lib,v 1.3 2005-05-06 14:38:34 hannes Exp $";
+category="cc";
+
+info="
+LIBRARY: groebnerwalk.lib
 
 PROCEDURES:
  gwalk(ideal[,intvec]);   standard basis of ideal via groebnerwalk alg
@@ -15,31 +15,31 @@ PROCEDURES:
  twalk(ideal[,intvec]);   standard basis of ideal via Tran's alg
  awalk1(ideal[,intvec]);   standard basis of ideal via the first alt. alg
  awalk2(ideal[,intvec]);   standard basis of ideal via the second alt. alg
-";    
-   
+";
+
 //////////////////////////////////////////////////////////////////////////////
 
-static proc OrderStringalp(string Wpal,list #) 
+static proc OrderStringalp(string Wpal,list #)
 {
-  int n= nvars(basering); 
+  int n= nvars(basering);
   string order_str;
-  intvec curr_weight, target_weight; 
-  curr_weight = system("Mivdp",n);   
-  target_weight = system("Mivlp",n);   
+  intvec curr_weight, target_weight;
+  curr_weight = system("Mivdp",n);
+  target_weight = system("Mivlp",n);
 
    if(size(#) != 0)
    {
      if(size(#) == 1)
      {
-       if(typeof(#[1]) == "intvec") 
+       if(typeof(#[1]) == "intvec")
        {
          if(Wpal == "al"){
            order_str = "(a("+string(#[1])+"),lp("+string(n) + "),C)";
          }
          else {
            order_str = "(Wp("+string(#[1])+"),C)";
-         }         
-         curr_weight = #[1]; 
+         }
+         curr_weight = #[1];
        }
        else
        {
@@ -51,20 +51,20 @@ static proc OrderStringalp(string Wpal,list #)
           else {
             order_str = "dp";
           }
-        }   
+        }
         else {
           order_str = "dp";
-        }   
+        }
      }
-    } 
-    else 
+    }
+    else
     {
      if(size(#) == 2)
      {
        if(typeof(#[2]) == "intvec")
        {
-         target_weight = #[2]; 
-       } 
+         target_weight = #[2];
+       }
        if(typeof(#[1]) == "intvec")
        {
          if(Wpal == "al"){
@@ -73,7 +73,7 @@ static proc OrderStringalp(string Wpal,list #)
          else {
            order_str = "(Wp("+string(#[1])+"),C)";
          }
-         curr_weight = #[1]; 
+         curr_weight = #[1];
        }
        else
        {
@@ -81,17 +81,17 @@ static proc OrderStringalp(string Wpal,list #)
         {
           if(#[1] == "Dp") {
             order_str = "Dp";
-	   }
-	   else {
-	      order_str = "dp";
-	   }
+           }
+           else {
+              order_str = "dp";
+           }
         }
         else {
            order_str = "dp";
         }
       }
-     }	
-    }		
+     }
+    }
    }
    else {
      order_str = "dp";
@@ -99,7 +99,7 @@ static proc OrderStringalp(string Wpal,list #)
    list result;
    result[1] = order_str;
    result[2] = curr_weight;
-   result[3] = target_weight;   
+   result[3] = target_weight;
    return(result);
 }
 
@@ -107,14 +107,14 @@ static proc OrderStringalp_NP(string Wpal,list #)
 {
   int n= nvars(basering);
   string order_str = "dp";
-  //string order_str = "Dp"; 
+  //string order_str = "Dp";
 
   int nP = 1;// call LatsGB to compute the wanted GB  by pwalk
 
   //Default:
   // if size(#)=0, the Gröbnerwalk algorithm and its developments compute
   // a Groebner basis from "dp" to "lp"
-  
+
   intvec curr_weight = system("Mivdp",n); //define (1,1,...,1)
   intvec target_weight = system("Mivlp",n); //define (1,0,...,0)
 
@@ -123,14 +123,14 @@ static proc OrderStringalp_NP(string Wpal,list #)
     if(size(#) == 1)
     {
       if(typeof(#[1]) == "intvec") {
-        curr_weight = #[1]; 
-        
+        curr_weight = #[1];
+
         if(Wpal == "al"){
           order_str = "(a("+string(#[1])+"),lp("+string(n) + "),C)";
         }
         else {
           order_str = "(Wp("+string(#[1])+"),C)";
-        }         
+        }
       }
       else {
         if(typeof(#[1]) == "int"){
@@ -148,7 +148,7 @@ static proc OrderStringalp_NP(string Wpal,list #)
      if(size(#) == 2)
      {
        if(typeof(#[1]) == "intvec" and typeof(#[2]) == "int"){
-         curr_weight = #[1]; 
+         curr_weight = #[1];
 
          if(Wpal == "al"){
            order_str = "(a("+string(#[1])+"),lp("+string(n) + "),C)";
@@ -159,9 +159,9 @@ static proc OrderStringalp_NP(string Wpal,list #)
        }
        else{
          if(typeof(#[1]) == "intvec" and typeof(#[2]) == "intvec"){
-           curr_weight = #[1]; 
-           target_weight = #[2]; 
-           
+           curr_weight = #[1];
+           target_weight = #[2];
+
            if(Wpal == "al"){
              order_str = "(a("+string(#[1])+"),lp("+string(n) + "),C)";
            }
@@ -178,12 +178,12 @@ static proc OrderStringalp_NP(string Wpal,list #)
      }
      else {
        if(size(#) == 3) {
-         if(typeof(#[1]) == "intvec" and typeof(#[2]) == "intvec" and 
+         if(typeof(#[1]) == "intvec" and typeof(#[2]) == "intvec" and
             typeof(#[3]) == "int")
          {
-           curr_weight = #[1]; 
-           target_weight = #[2]; 
-           nP = #[3];	
+           curr_weight = #[1];
+           target_weight = #[2];
+           nP = #[3];
            if(Wpal == "al"){
              order_str = "(a("+string(#[1])+"),lp("+string(n) + "),C)";
            }
@@ -194,8 +194,8 @@ static proc OrderStringalp_NP(string Wpal,list #)
          else{
            print("// ** the input must be \"(ideal,intvec,intvec,int)\"");
            print("// ** and a lex. GB will be computed from \"dp\" to \"lp\"");
-         
-         }         
+
+         }
        }
        else{
          print("// ** The given input is wrong");
@@ -203,8 +203,8 @@ static proc OrderStringalp_NP(string Wpal,list #)
        }
      }
     }
-  } 
-  
+  }
+
   list result;
   result[1] = nP;
   result[2] = order_str;
@@ -219,24 +219,24 @@ proc gwalk(ideal Go, list #)
 "SYNTAX: gwalk(ideal i);
          gwalk(ideal i, intvec v, intvec w);
 TYPE:    ideal
-PURPOSE: compute the standard basis of the ideal, calculated via 
-	 the improved Groebner walk algorithm  from the ordering 
-	 \"(a(v),lp)\", \"dp\" or \"Dp\"
-	 to the ordering  \"(a(w),lp)\" or \"(a(1,0,...,0),lp)\". 
+PURPOSE: compute the standard basis of the ideal, calculated via
+         the improved Groebner walk algorithm  from the ordering
+         \"(a(v),lp)\", \"dp\" or \"Dp\"
+         to the ordering  \"(a(w),lp)\" or \"(a(1,0,...,0),lp)\".
 SEE ALSO: std, stdfglm, groebner, pwalk, fwalk, twalk, awalk1, awalk2
 KEYWORDS: Groebner walk
-EXAMPLE: example gwalk; shows an example" 	   
+EXAMPLE: example gwalk; shows an example"
 {
 
    /* we use ring with ordering (a(...),lp,C) */
    list OSCTW    = OrderStringalp_NP("al", #);//"dp"
-   //list OSCTW    = OrderStringalp("al", "Dp");//Dp 
+   //list OSCTW    = OrderStringalp("al", "Dp");//Dp
 
    string ord_str =   OSCTW[2];
    intvec curr_weight   =   OSCTW[3]; /* original weight vector */
    intvec target_weight =   OSCTW[4]; /* terget weight vector */
    kill(OSCTW);
-   option(redSB);   
+   option(redSB);
    def xR = basering;
 
    execute("ring ostR = ("+charstr(xR)+"),("+varstr(xR)+"),"+ord_str+";");
@@ -245,39 +245,39 @@ EXAMPLE: example gwalk; shows an example"
    //print("//** help ring = " + string(basering));
    ideal G = fetch(xR, Go);
    G = system("Mwalk", G, curr_weight, target_weight);
-      
-   setring xR; 
+
+   setring xR;
    //kill(Go);
 
-   keepring basering; 
-   ideal result = fetch(old_ring, G); 
-   return (result); 
-} 
+   keepring basering;
+   ideal result = fetch(old_ring, G);
+   return (result);
+}
 example
 {
   "EXAMPLE:"; echo = 2;
   //** compute a Gröbner basis of I w.r.t. lp.
   ring r = 32003,(z,y,x), lp;
-  ideal I = y3+xyz+y2z+xz3, 3+xy+x2y+y2z; 
-  gwalk(I);    
+  ideal I = y3+xyz+y2z+xz3, 3+xy+x2y+y2z;
+  gwalk(I);
 }
 
 
 /* 16 Mai 2003 */
 proc awalk1(ideal G, list #)
 "SYNTAX: awalk1(ideal i);
-	 awalk1(ideal i, int n);
+         awalk1(ideal i, int n);
          awalk1(ideal i, int n, intvec v, intvec w);
          awalk1(ideal i, intvec v, intvec w);
 TYPE:    ideal
-PURPOSE: compute the standard basis of the ideal, calculated via 
-	  the first alternative algorithm from an ordering 
-	 \"(a(v),lp)\", \"dp\" or \"Dp\" to the ordering  
-	 \"(a(w),lp)\" or \"(a(1,0,...,0),lp)\" 
-	 with a perturbation degree n for the weight vector w.
+PURPOSE: compute the standard basis of the ideal, calculated via
+          the first alternative algorithm from an ordering
+         \"(a(v),lp)\", \"dp\" or \"Dp\" to the ordering
+         \"(a(w),lp)\" or \"(a(1,0,...,0),lp)\"
+         with a perturbation degree n for the weight vector w.
 SEE ALSO: std, stdfglm, groebner, gwalk, pwalk, fwalk, twalk, awalk2
 KEYWORDS: the first alternative algorithm
-EXAMPLE: example awalk1; shows an example"   
+EXAMPLE: example awalk1; shows an example"
 {
   if (size(#) == 0)
   {
@@ -290,15 +290,15 @@ EXAMPLE: example awalk1; shows an example"
     }
     else  {
       return (awalk1_tmp(G, nvars(basering)-1, #));
-    } 
-  }     
+    }
+  }
 }
 example
 {
     "EXAMPLE:"; echo = 2;
     ring r = 32003,(z,y,x), lp;
-    ideal I = y3+xyz+y2z+xz3, 3+xy+x2y+y2z; 
-    awalk1(I,3);     
+    ideal I = y3+xyz+y2z+xz3, 3+xy+x2y+y2z;
+    awalk1(I,3);
 }
 
 
@@ -317,8 +317,8 @@ proc awalk1_tmp(ideal Go, int n2, list #)
    }
 
    /* we use ring with ordering (a(...),lp,C) */
-   list OSCTW    = OrderStringalp_NP("al", #); 
-   //list OSCTW    = OrderStringalp("al", "Dp"); 
+   list OSCTW    = OrderStringalp_NP("al", #);
+   //list OSCTW    = OrderStringalp("al", "Dp");
 
    string ord_str =   OSCTW[2];
    intvec curr_weight   =   OSCTW[3]; /* original weight vector */
@@ -328,34 +328,34 @@ proc awalk1_tmp(ideal Go, int n2, list #)
 
    def xR = basering;
 
-   execute("ring ostR = ("+charstr(xR)+"),("+varstr(xR)+"),"+ord_str+";");  
-   def old_ring = basering; 
-   //print("//** help ring = " + string(basering)); 
+   execute("ring ostR = ("+charstr(xR)+"),("+varstr(xR)+"),"+ord_str+";");
+   def old_ring = basering;
+   //print("//** help ring = " + string(basering));
 
    ideal G = fetch(xR, Go);
    G = system("MAltwalk1", G, n1, n2, curr_weight, target_weight);
-   
-   setring xR; 
+
+   setring xR;
    //kill(Go);
 
-   keepring basering; 
-   ideal result = fetch(old_ring, G); 
-   return (result); 
-} 
+   keepring basering;
+   ideal result = fetch(old_ring, G);
+   return (result);
+}
 
 proc fwalk(ideal Go, list #)
-"SYNTAX: fwalk(ideal i); 
+"SYNTAX: fwalk(ideal i);
          fwalk(ideal i, intvec v, intvec w);
 TYPE:    ideal
 PURPOSE: compute the standard basis of the ideal w.r.t. the
-	lexicographical ordering or a weighted-lex ordering,
-	calculated via  the fractal walk algorithm.
+        lexicographical ordering or a weighted-lex ordering,
+        calculated via  the fractal walk algorithm.
 SEE ALSO: std, stdfglm, groebner, gwalk, pwalk, twalk, awalk1, awalk2
 KEYWORDS: The fractal walk algorithm
-EXAMPLE: example fwalk; shows an example" 
+EXAMPLE: example fwalk; shows an example"
 {
    /* we use ring with ordering (a(...),lp,C) */
-   list OSCTW    = OrderStringalp_NP("al", #); 
+   list OSCTW    = OrderStringalp_NP("al", #);
 
    string ord_str =   OSCTW[2];
    intvec curr_weight   =   OSCTW[3]; /* original weight vector */
@@ -364,26 +364,26 @@ EXAMPLE: example fwalk; shows an example"
    option(redSB);
    def xR = basering;
 
-   execute("ring ostR = ("+charstr(xR)+"),("+varstr(xR)+"),"+ord_str+";"); 
+   execute("ring ostR = ("+charstr(xR)+"),("+varstr(xR)+"),"+ord_str+";");
    def old_ring = basering;
    //print("//** help ring = " + string(basering));
 
    ideal G = fetch(xR, Go);
    G = system("Mfwalk", G, curr_weight, target_weight);
-   
-   setring xR; 
+
+   setring xR;
    //kill(Go);
 
-   keepring basering; 
-   ideal result = fetch(old_ring, G); 
-   return (result); 
-} 
+   keepring basering;
+   ideal result = fetch(old_ring, G);
+   return (result);
+}
 example
 {
     "EXAMPLE:"; echo = 2;
     ring r = 32003,(z,y,x), lp;
-    ideal I = y3+xyz+y2z+xz3, 3+xy+x2y+y2z; 
-    fwalk(I);     
+    ideal I = y3+xyz+y2z+xz3, 3+xy+x2y+y2z;
+    fwalk(I);
 }
 
 
@@ -391,17 +391,17 @@ proc awalk2(ideal Go, list #)
 "SYNTAX: awalk2(ideal i);
          awalk2(ideal i, intvec v, intvec w);
 TYPE:    ideal
-PURPOSE: compute the standard basis of the ideal, calculated via 
-	 the second alternative algorithm from the ordering 
-	 \"(a(v),lp)\", \"dp\" or \"Dp\"
-	 to the ordering  \"(a(w),lp)\" or \"(a(1,0,...,0),lp)\". 
+PURPOSE: compute the standard basis of the ideal, calculated via
+         the second alternative algorithm from the ordering
+         \"(a(v),lp)\", \"dp\" or \"Dp\"
+         to the ordering  \"(a(w),lp)\" or \"(a(1,0,...,0),lp)\".
 SEE ALSO: std, stdfglm, groebner, gwalk, pwalk, fwalk, twalk, awalk1
 KEYWORDS: Groebner walk
 EXAMPLE: example awalk2; shows an example"
 {
    /* we use ring with ordering (a(...),lp,C) */
    list OSCTW    = OrderStringalp_NP("al", #);//"dp"
-   //list OSCTW    = OrderStringalp("al", "Dp");//Dp 
+   //list OSCTW    = OrderStringalp("al", "Dp");//Dp
 
    string ord_str =   OSCTW[2];
    intvec curr_weight   =   OSCTW[3]; /* original weight vector */
@@ -415,31 +415,31 @@ EXAMPLE: example awalk2; shows an example"
    //print("//** help ring = " + string(basering));
    ideal G = fetch(xR, Go);
    G = system("MAltwalk2", G, curr_weight, target_weight);
-   
-   setring xR; 
+
+   setring xR;
    //kill(Go);
 
-   keepring basering; 
-   ideal result = fetch(old_ring, G); 
-   return (result); 
-} 
+   keepring basering;
+   ideal result = fetch(old_ring, G);
+   return (result);
+}
 example
 {
     "EXAMPLE:"; echo = 2;
     ring r = 32003,(z,y,x), lp;
-    ideal I = y3+xyz+y2z+xz3, 3+xy+x2y+y2z; 
-    awalk2(I);     
+    ideal I = y3+xyz+y2z+xz3, 3+xy+x2y+y2z;
+    awalk2(I);
 }
 
 proc pwalk(ideal Go, int n1, int n2, list #)
 "SYNTAX: pwalk(int d, ideal i, int n1, int n2);
          pwalk(int d, ideal i, int n1, int n2, intvec v, intvec w);
 TYPE:    ideal
-PURPOSE: compute the standard basis of the ideal, calculated via 
-	 the perturbation walk algorithm  from the ordering 
-	 \"(a(v),lp)\", \"dp\" or \"Dp\"
-	 to the ordering  \"(a(w),lp)\" or \"(a(1,0,...,0),lp)\" 
-	 with a perturbation degree n, m for v and w, resp.
+PURPOSE: compute the standard basis of the ideal, calculated via
+         the perturbation walk algorithm  from the ordering
+         \"(a(v),lp)\", \"dp\" or \"Dp\"
+         to the ordering  \"(a(w),lp)\" or \"(a(1,0,...,0),lp)\"
+         with a perturbation degree n, m for v and w, resp.
 SEE ALSO: std, stdfglm, groebner, gwalk, fwalk, twalk, awalk1, awalk2
 KEYWORDS: Perturbation walk
 EXAMPLE: example pwalk; shows an example"
@@ -454,10 +454,10 @@ EXAMPLE: example pwalk; shows an example"
   }
 
   /* we use ring with ordering (a(...),lp,C) */
-  list OSCTW    = OrderStringalp_NP("al", #); 
-  //list OSCTW    = OrderStringalp("al", "Dp");//Dp 
+  list OSCTW    = OrderStringalp_NP("al", #);
+  //list OSCTW    = OrderStringalp("al", "Dp");//Dp
   int nP = OSCTW[1];
-    
+
   string ord_str =   OSCTW[2];
   intvec curr_weight   =   OSCTW[3]; /* original weight vector */
   intvec target_weight =   OSCTW[4]; /* terget weight vector */
@@ -471,20 +471,20 @@ EXAMPLE: example pwalk; shows an example"
 
   ideal G = fetch(xR, Go);
   G = system("Mpwalk", G, n1, n2, curr_weight, target_weight,nP);
-   
-  setring xR; 
+
+  setring xR;
   //kill(Go);
 
-  keepring basering; 
-  ideal result = fetch(old_ring, G); 
-  return (result); 
-} 
+  keepring basering;
+  ideal result = fetch(old_ring, G);
+  return (result);
+}
 example
 {
     "EXAMPLE:"; echo = 2;
     ring r = 32003,(z,y,x), lp;
-    ideal I = y3+xyz+y2z+xz3, 3+xy+x2y+y2z; 
-    pwalk(I,2,3);     
+    ideal I = y3+xyz+y2z+xz3, 3+xy+x2y+y2z;
+    pwalk(I,2,3);
 }
 
 
@@ -492,43 +492,43 @@ proc twalk(ideal Go, list #)
 "SYNTAX: twalk(ideal i);
          twalk(ideal i, intvec v, intvec w);
 TYPE:    ideal
-PURPOSE: compute the standard basis of the ideal w.r.t. 
- 	 the ordering  \"(a(w),lp)\" or \"(a(1,0,...,0),lp)\", 
-	 calculated via the Tran algorithm.
+PURPOSE: compute the standard basis of the ideal w.r.t.
+         the ordering  \"(a(w),lp)\" or \"(a(1,0,...,0),lp)\",
+         calculated via the Tran algorithm.
 SEE ALSO: std, stdfglm, groebner, gwalk, pwalk, fwalk, awalk1, awalk2
 KEYWORDS: The Tran algorithm
 EXAMPLE: example twalk; shows an example"
 {
   list L = OrderStringalp_NP("al", #);
   int nP = L[1];
-  
+
   /* we use ring with ordering (a(...),lp,C) */
   string ord_str =   L[2];
   intvec curr_weight   = L[3];
   intvec target_weight =  L[4];
   kill(L);
-   
+
   option(redSB);
   def xR = basering;
-  
+
   execute("ring ostR = ("+charstr(xR)+"),("+varstr(xR)+"),"+ord_str+";");
   def old_ring = basering;
-   
+
   //print("//** help ring = " + string(basering));
   ideal G = fetch(xR, Go);
   G = system("TranMImprovwalk", G, curr_weight, target_weight, nP);
-   
-  setring xR; 
+
+  setring xR;
    //kill(Go);
 
-   keepring basering; 
-   ideal result = fetch(old_ring, G); 
-   return (result); 
-} 
+   keepring basering;
+   ideal result = fetch(old_ring, G);
+   return (result);
+}
 example
 {
     "EXAMPLE:"; echo = 2;
     ring r = 32003,(z,y,x), lp;
-    ideal I = y3+xyz+y2z+xz3, 3+xy+x2y+y2z; 
-    twalk(I);     
+    ideal I = y3+xyz+y2z+xz3, 3+xy+x2y+y2z;
+    twalk(I);
 }

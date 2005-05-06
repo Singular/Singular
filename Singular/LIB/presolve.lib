@@ -1,6 +1,6 @@
 //last change: 13.02.2001 (Eric Westenberger)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: presolve.lib,v 1.24 2005-05-06 09:42:00 Singular Exp $";
+version="$Id: presolve.lib,v 1.25 2005-05-06 14:38:56 hannes Exp $";
 category="Symbolic-numerical solving";
 info="
 LIBRARY:  presolve.lib     Pre-Solving of Polynomial Equations
@@ -21,7 +21,7 @@ PROCEDURES:
  sortandmap(id[..]);   map to new basering with vars sorted w.r.t. complexity
  sortvars(id[n1,p1..]); sort vars w.r.t. complexity in id [different blocks]
  valvars(id[..]);       valuation of vars w.r.t. to their complexity in id
- idealSplit(id,tF,fS);  a list of ideals such that their intersection 
+ idealSplit(id,tF,fS);  a list of ideals such that their intersection
                         has the same radical as id
                        ( parameters in square brackets [] are optional)
 ";
@@ -41,7 +41,7 @@ RETURN:  - if called with two arguments or e=0:
 @*       L[1]: same type as id, containing generators of id having <= n terms.
 @*       L[2]: number of corresponding generator of id
 NOTE:    May be used to compute partial standard basis in case id is to hard
-EXAMPLE: example shortid; shows an example  
+EXAMPLE: example shortid; shows an example
 "
 {
   intvec v;
@@ -58,7 +58,7 @@ EXAMPLE: example shortid; shows an example
    }
   }
   if( size(v)>1 )
-  {  
+  {
     v = v[2..size(v)];
   }
   id = simplify(id,2);
@@ -82,7 +82,7 @@ EXAMPLE: example shortid; shows an example
 example
 { "EXAMPLE:"; echo = 2;
    ring s=0,(x,y,z,w),dp;
-   ideal i = (x3+y2+yw2)^2,(xz+z2)^2,xyz-w2-xzw; 
+   ideal i = (x3+y2+yw2)^2,(xz+z2)^2,xyz-w2-xzw;
    shortid(i,3);
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -537,12 +537,12 @@ example
 proc faststd (@id, list #)
 "USAGE:   faststd(id [,\"hilb\",\"sort\",\"dec\",o,\"blocks\"]);
          id=ideal/module, o=string (allowed:\"lp\",\"dp\",\"Dp\",\"ls\",
-         \"ds\",\"Ds\"),  \"hilb\",\"sort\",\"dec\",\"block\" options for 
+         \"ds\",\"Ds\"),  \"hilb\",\"sort\",\"dec\",\"block\" options for
          Hilbert-driven std, and the procedure sortandmap
 RETURN:  a ring R, in which an ideal STD_id is stored: @*
-         - the ring R differs from the active basering only in the choice 
+         - the ring R differs from the active basering only in the choice
          of monomial ordering and in the sorting of the variables.
-         - STD_id is a standard basis for the image (under imap) of the input 
+         - STD_id is a standard basis for the image (under imap) of the input
          ideal/module id with respect to the new monomial ordering. @*
 NOTE:    Using the optional input parameters, we may modify the computations
          performed: @*
@@ -619,7 +619,7 @@ EXAMPLE: example faststd; shows an example.
 // this uses another standardbasis computation
    if ( @h != 0 )
    {
-      execute("ring @Q=("+charstr(@P)+"),("+varstr(@P)+",@homo),("+@o+");");  
+      execute("ring @Q=("+charstr(@P)+"),("+varstr(@P)+",@homo),("+@o+");");
       def @id = imap(@P,@id);
       @id = homog(@id,@homo);               // @homo = homogenizing var
       if ( @s != 0 )
@@ -649,16 +649,16 @@ EXAMPLE: example faststd; shows an example.
          if ( @o[1]=="c" or @o[1]=="C") { @o = @o[1,size(@o)-6]; }
          else { @o = @o[1,size(@o)-8] + @o[size(@o)-1,2]; }
       }
-      kill @S1;      
+      kill @S1;
       execute("ring @S1=("+charstr(@Q)+"),("+@va+"),("+@o+");");
       def STD_id = imap(@Q,@id);
    }
    attrib(STD_id,"isSB",1);
    export STD_id;
-   if (defined(IMAG)) { kill IMAG; } 
+   if (defined(IMAG)) { kill IMAG; }
    setring @P;
    dbprint(printlevel-voice+3,"
-// 'faststd' created a ring, in which an object STD_id is stored. 
+// 'faststd' created a ring, in which an object STD_id is stored.
 // To access the object, type (if the name R was assigned to the return value):
         setring R; STD_id; ");
    return(@S1);
@@ -805,13 +805,13 @@ example
 proc tolessvars (id ,list #)
 "USAGE:   tolessvars(id [,s1,s2] ); id poly/ideal/vector/module/matrix,
           s1=string (new ordering)@*
-          [default: s1=\"dp\" or \"ds\" depending on whether the first block 
+          [default: s1=\"dp\" or \"ds\" depending on whether the first block
           of the old ordering is a p- resp. an s-ordering)
 RETURN:  If id contains all vars of the basering: empty list. @*
          Else: ring R with the same char as the basering, but possibly less
          variables (only those variables which actually occur in id). In R
-         an object IMAG (image of id under imap) is stored.  
-DISPLAY: If printlevel >=0, display ideal of vars, which have been ommitted 
+         an object IMAG (image of id under imap) is stored.
+DISPLAY: If printlevel >=0, display ideal of vars, which have been ommitted
          from the old ring.
 EXAMPLE: example tolessvars; shows an example
 "
@@ -834,8 +834,8 @@ EXAMPLE: example tolessvars; shows an example
    if( n == nvars(P) )
    {
      dbprint(printlevel-voice+3,"
-// All variables appear in input object. 
-// empty list returned. "); 
+// All variables appear in input object.
+// empty list returned. ");
      return(list());
    }
 //----------------- prepare new ring, map to it and return --------------------
@@ -852,7 +852,7 @@ EXAMPLE: example tolessvars; shows an example
    def IMAG = imap(P,id);
    export IMAG;
    dbprint(printlevel-voice+3,"
-// 'tolessvars' created a ring, in which an object IMAG is stored. 
+// 'tolessvars' created a ring, in which an object IMAG is stored.
 // To access the object, type (if the name R was assigned to the return value):
         setring R; IMAG; ");
    return(S1);
@@ -929,14 +929,14 @@ proc sortandmap (@id, list #)
          (default: p1=product of all vars, n1=0, o1=\"dp\",m1=0)
          the last pi (containing the remaining vars) may be omitted
 RETURN:  a ring R, in which a poly/ideal/vector/module IMAG is stored: @*
-         - the ring R differs from the active basering only in the choice 
+         - the ring R differs from the active basering only in the choice
          of monomial ordering and in the sorting of the variables.@*
          - IMAG is the image (under imap) of the input ideal/module id @*
          The new monomial ordering and sorting of vars is as follows:
   @format
   - each block of vars occuring in pi is sorted w.r.t. its complexity in id,
   - ni controls the sorting in i-th block (= vars occuring in pi):
-    ni=0 (resp.!=0) means that least complex (resp. most complex) vars come 
+    ni=0 (resp.!=0) means that least complex (resp. most complex) vars come
     first @*
   - oi and mi define the monomial ordering of the i-th block:
     if mi =0, oi=ordstr(i-th block)
@@ -995,7 +995,7 @@ EXAMPLE: example sortandmap; shows an example
    def IMAG = imap(@P,@id);
    export IMAG;
    dbprint(printlevel-voice+3,"
-// 'sortandmap' created a ring, in which an object IMAG is stored. 
+// 'sortandmap' created a ring, in which an object IMAG is stored.
 // To access the object, type (if the name R was assigned to the return value):
         setring R; IMAG; ");
    return(@S1);
@@ -1004,7 +1004,7 @@ example
 { "EXAMPLE:"; echo = 2;
    ring s = 32003,(x,y,z),dp;
    ideal i=x3+y2,xz+z2;
-   def R_r=sortandmap(i);  
+   def R_r=sortandmap(i);
    show(R_r);
    setring R_r; IMAG;
    kill R_r; setring s;
@@ -1218,10 +1218,10 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 proc idealSplit(ideal I,list #)
-"USAGE:  idealSplit(id,timeF,timeS);  id ideal and optional 
+"USAGE:  idealSplit(id,timeF,timeS);  id ideal and optional
          timeF ,timeS integers to bound the time which can be used
          for factorization resp. standard basis computation
-RETURN:  a list of ideals such that their intersection 
+RETURN:  a list of ideals such that their intersection
          has the same radical as id
 EXAMPLE: example idealSplit; shows an example
 "
@@ -1264,8 +1264,8 @@ EXAMPLE: example idealSplit; shows an example
    fac=timeFactorize(I[1],timeF);
 
    while((size(fac[1])==2)&&(i<size(I)))
-   { 
-      i++; 
+   {
+      i++;
       fac=timeFactorize(I[i],timeF);
    }
    if(size(fac[1])>2)
@@ -1298,8 +1298,8 @@ EXAMPLE: example idealSplit; shows an example
                re=idealSplit(timeStd(I,timeS),re,timeF,timeS);
             }
          }
-      } 
-      return(re); 
+      }
+      return(re);
    }
    J=timeStd(I,timeS);
    attrib(I,"isSB",1);
@@ -1341,7 +1341,7 @@ EXAMPLE: example idealSimplify; shows an example
    for(i=1;i<=nrows(M);i++)
    {
       for(j=1;j<=ncols(M);j++)
-      {       
+      {
          if(deg(M[i,j])==0)
          {
             ma[j]=(-1/M[i,j])*(I[i]-M[i,j]*var(j));

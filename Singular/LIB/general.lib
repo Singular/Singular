@@ -2,7 +2,7 @@
 //anne, added deleteSublist and watchdog 12.12.2000
 //eric, added absValue 11.04.2002
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: general.lib,v 1.45 2005-05-02 13:28:15 Singular Exp $";
+version="$Id: general.lib,v 1.46 2005-05-06 14:38:31 hannes Exp $";
 category="General purpose";
 info="
 LIBRARY:  general.lib   Elementary Computations of General Type
@@ -512,7 +512,6 @@ EXAMPLE: example killall; shows an example AND KILLS ALL YOUR VARIABLES
         }
         if ((system("with","Namespaces")) && defined(General))
         {
-          
           @marie=names(General);
           for ( @joni=size(@marie); @joni>0; @joni-- )
           {
@@ -1515,7 +1514,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 proc timeFactorize(poly i,list #)
 "USAGE:  timeFactorize(p,d)  poly p , integer d
-RETURN:  factorize(p) if the factorization finished after d-1 
+RETURN:  factorize(p) if the factorization finished after d-1
          seconds otherwhise f is considered to be irreducible
 EXAMPLE: example timeFactorize; shows an example
 "

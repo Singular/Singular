@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ring.lib,v 1.24 2005-04-30 20:34:23 levandov Exp $";
+version="$Id: ring.lib,v 1.25 2005-05-06 14:39:08 hannes Exp $";
 category="General purpose";
 info="
 LIBRARY:  ring.lib      Manipulating Rings and Maps
@@ -68,7 +68,7 @@ proc changeord (string o, list #)
 "USAGE:   changeord(newordstr[,r]);  newordstr=string, r=ring/qring
 RETURN:  ring R, obtained from the ring r [default: r=basering], by changing
          ordstr(r) to newordstr. If, say, newordstr=(\"R\",\"wp(2,3),dp\") and
-         if the ring r exists and has >=3 variables, the ring R will be 
+         if the ring r exists and has >=3 variables, the ring R will be
          equipped with the monomial ordering wp(2,3),dp.
 NOTE:    This proc uses 'execute' or calls a procedure using 'execute'.
 EXAMPLE: example changeord; shows an example
@@ -150,14 +150,14 @@ example
    qring Q = std(i);
    setring(r);
    def R=changevar("A()"); R; "";
-   def Q'=changevar("a,b,c,d",Q); setring Q'; Q'; 
+   def Q'=changevar("a,b,c,d",Q); setring Q'; Q';
    kill R,Q,Q';
 }
 ///////////////////////////////////////////////////////////////////////////////
 
 proc defring (string s2, int n, string s3, string s4)
 "USAGE:   defring(ch,n,va,or);  ch,va,or=strings, n=integer
-RETURN:  ring R with characteristic 'ch', ordering 'or' and n variables with 
+RETURN:  ring R with characteristic 'ch', ordering 'or' and n variables with
          names derived from va.
          If va is a single letter, say va=\"a\", and if n<=26 then a and the
          following n-1 letters from the alphabet (cyclic order) are taken as
@@ -186,7 +186,7 @@ example
 proc defrings (int n, list #)
 "USAGE:   defrings(n,[p]);  n,p integers
 RETURN:  ring R with characteristic p [default: p=32003], ordering ds and n
-         variables x,y,z,a,b,...if n<=26 (resp. x(1..n) if n>26) 
+         variables x,y,z,a,b,...if n<=26 (resp. x(1..n) if n>26)
 NOTE:    This proc uses 'execute' or calls a procedure using 'execute'.
 EXAMPLE: example defrings; shows an example
 "
@@ -204,10 +204,10 @@ EXAMPLE: example defrings; shows an example
    }
    execute(s);
    dbprint(printlevel-voice+2,"
-// 'defrings' created a ring. To see the ring, type (if the name R was 
+// 'defrings' created a ring. To see the ring, type (if the name R was
 // assigned to the return value):
     show R;
-// To make the ring the active basering, type 
+// To make the ring the active basering, type
     setring R; ");
    return(S);
 }
@@ -222,7 +222,7 @@ example
 proc defringp (int n,list #)
 "USAGE:   defringp(n,[p]);  n,p=integers
 RETURN:  ring R with characteristic p [default: p=32003], ordering dp and n
-         variables x,y,z,a,b,...if n<=26 (resp. x(1..n) if n>26) 
+         variables x,y,z,a,b,...if n<=26 (resp. x(1..n) if n>26)
 NOTE:    This proc uses 'execute' or calls a procedure using 'execute'.
 EXAMPLE: example defringp; shows an example
 "
@@ -240,10 +240,10 @@ EXAMPLE: example defringp; shows an example
    }
    execute(s);
    dbprint(printlevel-voice+2,"
-// 'defringp' created a ring. To see the ring, type (if the name R was 
+// 'defringp' created a ring. To see the ring, type (if the name R was
 // assigned to the return value):
     show R;
-// To make the ring the active basering, type 
+// To make the ring the active basering, type
     setring R; ");
    return(P);
 }
@@ -256,16 +256,16 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc extendring (int n, string va, string o, list #)
-"USAGE:   extendring(n,va,o[iv,i,r]);  va,o=strings, n,i=integers, r=ring, 
+"USAGE:   extendring(n,va,o[iv,i,r]);  va,o=strings, n,i=integers, r=ring,
           iv=intvec of positive integers or iv=0
-RETURN:  ring R, which extends the ring r by adding n new variables in front 
+RETURN:  ring R, which extends the ring r by adding n new variables in front
          of (resp. after, if i!=0) the old variables.
          [default: (i,r)=(0,basering)].
 @*       -- The characteristic is the characteristic of r.
 @*       -- The new vars are derived from va. If va is a single letter, say
             va=\"T\", and if n<=26 then T and the following n-1 letters from
             T..Z..T (resp. T(1..n) if n>26) are taken as additional variables.
-            If va is a single letter followed by a bracket, say va=\"x(\", 
+            If va is a single letter followed by a bracket, say va=\"x(\",
             the new variables are x(1),...,x(n).
 @*       -- The ordering is the product ordering of the ordering of r and of an
             ordering derived from `o` [and iv].
@@ -289,7 +289,7 @@ RETURN:  ring R, which extends the ring r by adding n new variables in front
             dp(2),ws(2,3,4),Dp(5),ds
 NOTE:    This proc is useful for adding deformation parameters.
          This proc uses 'execute' or calls a procedure using 'execute'.
-         If you use it in your own proc, it may be advisable to let the local 
+         If you use it in your own proc, it may be advisable to let the local
          names of your proc start with a @ (see the file HelpForProc)
 EXAMPLE: example extendring; shows an example
 "
@@ -596,8 +596,8 @@ example
 
 proc ringtensor (list #)
 "USAGE:   ringtensor(r1,r2,...); s=string, r1,r2,...=rings
-RETURN:  ring R whose variables are the variables from all rings r1,r2,... 
-         and whose monomial ordering is the block (product) ordering of the 
+RETURN:  ring R whose variables are the variables from all rings r1,r2,...
+         and whose monomial ordering is the block (product) ordering of the
          respective monomial orderings of r1,r2,... . Hence, R
          is the tensor product of the rings r1,r2,... with ordering matrix
          equal to the direct sum of the ordering matrices of r1,r2,...
@@ -650,10 +650,10 @@ EXAMPLE: example ringtensor; shows an example
       qring s=i;
    }
    dbprint(printlevel-voice+2,"
-// 'ringtensor' created a ring. To see the ring, type (if the name R was 
+// 'ringtensor' created a ring. To see the ring, type (if the name R was
 // assigned to the return value):
     show R;
-// To make the ring the active basering, type 
+// To make the ring the active basering, type
     setring R; ");
    return(s);
 }
@@ -663,7 +663,7 @@ example
    ring s=0,(a,b,c),wp(1,2,3);
    ring t=0,x(1..5),(c,ls);
    def R=ringtensor(r,s,t);
-   type R; 
+   type R;
    setring s;
    ideal i = a2+b3+c5;
    def S=changevar("x,y,z");       //change vars of s
@@ -760,10 +760,10 @@ proc preimageLoc(string R_name,string phi_name,string Q_name )
 "SYNTAX: @code{preimageLoc (} ring_name, map_name, ideal_name  @code{)}
         all input parameters of type string
 TYPE:    ideal
-PURPOSE: computes the preimage of an ideal under a given map for non-global 
+PURPOSE: computes the preimage of an ideal under a given map for non-global
          orderings.
-         The second argument has to be the name of a map from the basering to 
-         the given ring (or the name of an ideal defining such a map), and 
+         The second argument has to be the name of a map from the basering to
+         the given ring (or the name of an ideal defining such a map), and
          the ideal has to be an ideal in the given ring.
 SEE ALSO: preimage
 KEYWORDS: preimage under a map between local rings, map between local rings, map between local and global rings

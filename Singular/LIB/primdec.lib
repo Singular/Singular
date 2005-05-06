@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: primdec.lib,v 1.103 2005-05-04 14:09:48 Singular Exp $";
+version="$Id: primdec.lib,v 1.104 2005-05-06 14:38:57 hannes Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -2458,7 +2458,7 @@ proc algeDeco(ideal i, int w)
    {
      if(i[j]!=I[j]){break;}
    }
-   if((j>ncols(i))&&(deg(p)==1))  
+   if((j>ncols(i))&&(deg(p)==1))
    {
      setring R;
      kill RH;
@@ -2486,9 +2486,9 @@ proc algeDeco(ideal i, int w)
    if(w==2)
    {
       pr=minAssPrimes(i);
-   }   
-   if(n<nvars(basering))  
-   {   
+   }
+   if(n<nvars(basering))
+   {
       gnir="ring RS="+string(char(R))+",("+varstr(RH)
                 +"),(dp("+string(n)+"),lp);";
       execute(gnir);

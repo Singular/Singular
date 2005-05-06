@@ -1,7 +1,7 @@
-// $Id: groups.lib,v 1.2 2005-04-28 09:22:15 Singular Exp $
+// $Id: groups.lib,v 1.3 2005-05-06 14:38:34 hannes Exp $
 //(GP, last modified 26.10.01)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: groups.lib,v 1.2 2005-04-28 09:22:15 Singular Exp $";
+version="$Id: groups.lib,v 1.3 2005-05-06 14:38:34 hannes Exp $";
 category="Applications";
 info="
 LIBRARY:  groups.lib      Finite Group Theory
@@ -11,15 +11,15 @@ AUTHORS:  Gert-Martin Greuel, email: greuel@mathematik.uni-kl.de @*
 PROCEDURES:
 
    noSolution(I)         I an ideal in a polynomial ring over Z[x1..xn]
-                         returns a list l of primes <=32003 such that 1 
+                         returns a list l of primes <=32003 such that 1
                          is in IZ/p[x1..xn] for p not in l or an ERROR
                          if this is wrong or not decided.
 "
 /*
 // ===================== A Problem in Finite Group Theory ===================
 // Posed by Boris Kunyavskii, Bar-Ilan University, Tel Aviv
-// 
-// For any word w in X,Y,X^(-1),Y^(-1) consider the sequence U_n 
+//
+// For any word w in X,Y,X^(-1),Y^(-1) consider the sequence U_n
 // of words (depending on w) inductively
 //           U_1 = w
 //         U_n+1 = [X*U_n*X^(-1),Y*U_n*Y^(-1)]
@@ -28,13 +28,13 @@ PROCEDURES:
 
 
 // Conjecture (1):
-// (by B. Plotkin, slightly modified): 
-// A finite group G is solvable <==> 
+// (by B. Plotkin, slightly modified):
+// A finite group G is solvable <==>
 // there is an n >= 1 such that U_n(x,y) = 1 for all x,y in G
-// and for any of the 4 following words 
+// and for any of the 4 following words
 //         w1 = X^(-1)*Y*X*Y^(-1)*X
 //         w2 = X^(-2)*Y^(-1)*X
-//         w3 = Y^(-2)*X^(-1)*X 
+//         w3 = Y^(-2)*X^(-1)*X
 //         w4 = X*Y^(-2)*X^(-1)*Y*X^(-1)
 //
 // (These words remained as possibly good words by a computer search
@@ -54,7 +54,7 @@ PROCEDURES:
 // In view of this result Conjecture (1) is equivalent to
 //
 // Conjecture (2):
-// Let G be one of the groups above, then, for at least one of the 4 words w 
+// Let G be one of the groups above, then, for at least one of the 4 words w
 // above there are x,y in G such that 1 != U_n(x,y) = U_n+1(x,y) for some n.
 // (then U_n(x,y) != 1 for all n by definitionof U_n)
 
@@ -84,20 +84,20 @@ LIB "matrix.lib";
 ///////////////////////////////////////////////////////////////////////////////
 
 static proc splitS1(ideal I,int s,list #)
-"USAGE: splitS1(I,s[,l]) I ideal, s integer, l list of ideals 
+"USAGE: splitS1(I,s[,l]) I ideal, s integer, l list of ideals
 COMPUTE: Factorizes the generators of I. If for one generator f=f1*f2 and
          fi=ni*gi^ri, ni an integer and gi a polynomial, then
          compute a standardbasis of I1=I,g1 and I2=I,g2, if this can be
          done in < s seconds. Then apply splitS to I1 and I2 and continue
          in the same way. The procedure stops if no generator can be
-         factorized. 
+         factorized.
 RETURN:  A list L of ideals and prime numbers
          L[1]: A list of ideals such that the radical of the intersection
                of these ideals coincides with the radical of I
                If the optional list l of the input is not empty then
                the ideals of L[1] which contain an ideal of l are canceled.
          L[2]: A list of prime numbers appearing as factors of the ni.
-NOTE:   The computation avoids division by integers (by using 
+NOTE:   The computation avoids division by integers (by using
         option(contentSB)) hence the result is correct modulo any prime
         number which does not appear in the list L[2].
 EXAMPLE: example splitS1; shows an example
@@ -113,15 +113,15 @@ EXAMPLE: example splitS1; shows an example
    number n;
    poly p;
    re=#;
-      
+
    if(deg(I[1])==0){return(list(re+list(std(I)),qr));}
- 
+
    fac=factorize(I[1]);
-  
+
    while((size(fac[1])==2)&&(i<size(I)))
-   { 
+   {
       I[i]=fac[1][2]*fac[1][1];   //not in splitS
-      i++; 
+      i++;
       fac=factorize(I[i]);
    }
    if(size(fac[1])==2){I[size(I)]=fac[1][2]*fac[1][1];}  //not in splitS
@@ -165,8 +165,8 @@ EXAMPLE: example splitS1; shows an example
                qr=insResult(qr,pr[2]);
             }
          }
-      } 
-      return(list(re,qr)); 
+      }
+      return(list(re,qr));
    }
    J=timeStd(I,s);       //J=std(I) in splitS
    attrib(I,"isSB",1);
@@ -193,20 +193,20 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 static proc splitS(ideal I,int s,list #)
-"USAGE: splitS(I,s[,l]) I ideal, s integer, l list of ideals 
+"USAGE: splitS(I,s[,l]) I ideal, s integer, l list of ideals
 COMPUTE: Factorizes the generators of I. If for one generator f=f1*f2 and
          fi=ni*gi^ri, ni an integer and gi a polynomial, then
          compute a standardbasis of I1=I,g1 and I2=I,g2, if this can be
          done in < s seconds. Then apply splitS to I1 and I2 and continue
          in the same way. The procedure stops if no generator can be
-         factorized. 
+         factorized.
 RETURN:  A list L of ideals and prime numbers
          L[1]: A list of ideals such that the radical of the intersection
                of these ideals coincides with the radical of I
                If the optional list l of the input is not empty then
                the ideals of L[1] which contain an ideal of l are canceled.
          L[2]: A list of prime numbers appearing as factors of the ni.
-NOTE:   The computation avoids division by integers (by using 
+NOTE:   The computation avoids division by integers (by using
         option(contentSB)) hence the result is correct modulo any prime
         number which does not appear in the list L[2].
 EXAMPLE: example splitS; shows an example
@@ -222,14 +222,14 @@ EXAMPLE: example splitS; shows an example
    number n;
    poly p;
    re=#;
-   
+
    if(deg(I[1])==0){return(list(re+list(std(I)),qr));}
- 
+
    fac=factorize(I[1]);
-  
+
    while((size(fac[1])==2)&&(i<size(I)))
-   { 
-      i++; 
+   {
+      i++;
       fac=factorize(I[i]);
    }
    if(size(fac[1])>2)
@@ -272,8 +272,8 @@ EXAMPLE: example splitS; shows an example
                qr=insResult(qr,pr[2]);
             }
          }
-      } 
-      return(list(re,qr)); 
+      }
+      return(list(re,qr));
    }
    J=std(I);
    attrib(I,"isSB",1);
@@ -300,10 +300,10 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 static proc finalSplit(list I,list qr)
-"USAGE: finalSplit(I,qr) I list of ideals, qr list of primes 
-RETURN: list l of primes <=32003 such that 1 is in I[j]Z/p[x1..xn] 
-        for p not in l and all j or an ERROR if this is wrong or 
-        not decided. 
+"USAGE: finalSplit(I,qr) I list of ideals, qr list of primes
+RETURN: list l of primes <=32003 such that 1 is in I[j]Z/p[x1..xn]
+        for p not in l and all j or an ERROR if this is wrong or
+        not decided.
 EXAMPLE: example finalSplit; shows an example
 "
 {
@@ -359,10 +359,10 @@ EXAMPLE: example finalSplit; shows an example
                J=K[1..20+4*k];
                pr=splitS(J,5);
                q=pr[1];
-               qr=insResult(qr,pr[2]);  
+               qr=insResult(qr,pr[2]);
                size(q);"out";
                for(j=1;j<=size(q);j++)
-               { 
+               {
                   if(deg(q[j][1])==0)
                   {
                      pr=contentS(q[j]);
@@ -379,7 +379,7 @@ EXAMPLE: example finalSplit; shows an example
                      qr=insResult(qr,pr[2]);
                   }
                }
-  
+
             }
             if((size(q)==1)&&(deg(q[1][1])>0))
             {
@@ -390,7 +390,7 @@ EXAMPLE: example finalSplit; shows an example
                pr=splitS1(J,5);
                if(size(pr[1])>1)
                {
-                  q=pr[1];              
+                  q=pr[1];
                   qr=insResult(qr,pr[2]);
                   size(q);"out";
                   for(j=1;j<=size(q);j++)
@@ -410,8 +410,8 @@ EXAMPLE: example finalSplit; shows an example
                        q[j]=pr[1];
                        qr=insResult(qr,pr[2]);
                      }
-                  } 
-               } 
+                  }
+               }
             }
             if(size(q)>1)
             {
@@ -438,7 +438,7 @@ EXAMPLE: example finalSplit; shows an example
 l;
    for(i=1;i<=size(l);i++)
    {
-      
+
       if(deg(l[i][1])>0){l;ERROR("not ready");}
       pr=primefactors(number(l[i][1]));
       if(pr[3]!=1){pr;ERROR("not ready");}
@@ -458,8 +458,8 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 proc noSolution(ideal I)
 "USAGE: noSolution(I) I ideal
-RETURN: list l of primes <=32003 such that 1 is in IZ/p[x1..xn] 
-        for p not in l or an ERROR if this is wrong or not decided. 
+RETURN: list l of primes <=32003 such that 1 is in IZ/p[x1..xn]
+        for p not in l or an ERROR if this is wrong or not decided.
 EXAMPLE: example noSolution; shows an example
 "
 {
@@ -574,7 +574,7 @@ EXAMPLE: example noSolution; shows an example
                n=number(K[1]);
                pr=primefactors(n);
                if(pr[3]!=1)
-               { 
+               {
                   pr=contentS(J);
                   qr=insResult(qr,pr[2]);
                   J=pr[1];
@@ -654,7 +654,7 @@ EXAMPLE: example noSolution; shows an example
                }
                else
                {
-                 qr=insResult(qr,pr[1]); 
+                 qr=insResult(qr,pr[1]);
                }
             }
             else
@@ -709,16 +709,16 @@ static proc changeOrdTest(ideal I)
 
 static proc trivialSplit(list p,int depth, list #)
 "USAGE: trivialSplit(p,s) p list of ideals, s integer the number of iterations
-COMPUTE: Factorizes the monomials among the generators of I. 
+COMPUTE: Factorizes the monomials among the generators of I.
          If  one monomial contains the variables x1,..xr, then
-         I1=I(x1=0),...,Ir=I(xr=0) is considered. Then apply 
+         I1=I(x1=0),...,Ir=I(xr=0) is considered. Then apply
          trivialSplit to I1 ...Ir and continue in the same way s times.
 RETURN:  A list L of ideals and prime numbers
          L[1]: A list of ideals such that the radical of the intersection
-               of these ideals at x1=...=xr=0 coincides with the radical of 
+               of these ideals at x1=...=xr=0 coincides with the radical of
                I at x1=...=xr=0.
          L[2]: A list of prime numbers appearing as factors of the monomials.
-NOTE:   The computation avoids division by integers  hence the result 
+NOTE:   The computation avoids division by integers  hence the result
         is correct modulo any prime
         number which does not appear in the list L[2].
 EXAMPLE: example trivialSplit; shows an example
@@ -728,11 +728,11 @@ EXAMPLE: example trivialSplit; shows an example
    int i,k;
    ideal J,K,T,Ke;
    number n;
-   
+
    if(size(p)==0){return(list(p,qr));}
    if(depth<=0){return(list(p,qr));}
    if(size(#)>0)
-   {  
+   {
       T=#[1];
    }
    else
@@ -748,8 +748,8 @@ EXAMPLE: example trivialSplit; shows an example
       if((size(J)>0)&&(deg(J[1])>=1))
       {
          pr=splitS1(J,10);
-         l=pr[1]; 
-         qr=insResult(qr,pr[2]); 
+         l=pr[1];
+         qr=insResult(qr,pr[2]);
          for(i=1;i<=size(l);i++)
          {
             Ke=l[i];
@@ -874,7 +874,7 @@ EXAMPLE: example simpliFy; shows an example
    {
       for(j=1;j<=ncols(M);j++)
       {
-         if((deg(M[i,j])==0)&&(deg(I[i])==1))        
+         if((deg(M[i,j])==0)&&(deg(I[i])==1))
          {
             ma[j]=(-1/M[i,j])*(I[i]-M[i,j]*var(j));
             pr=primefactors(number(M[i,j]));
@@ -932,16 +932,16 @@ example
 { "EXAMPLE:"; echo = 2;
    ring r = 0,x,dp;
    squarefreeP(123456789100);
-}  
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 
 static proc contentS(ideal I)
 "USAGE:  contentS(I);  I ideal
-RETURN:  list l 
+RETURN:  list l
          l[1] the ideal I. Te generators of I are the generators of the
          input ideal devided by the part of the content which have
-         prime factors less then 32003. 
+         prime factors less then 32003.
          l[2] contains the prime numbers which occured in the division
 EXAMPLE: example contentS; shows an example
 "
@@ -971,17 +971,17 @@ EXAMPLE: example contentS; shows an example
             }
          }
          I[i]=cleardenom(I[i]/m);
-         re=insResult(re,pr[1]);  
+         re=insResult(re,pr[1]);
       }
    }
-   return(list(I,re));  
+   return(list(I,re));
 }
 example
 { "EXAMPLE:"; echo = 2;
    ring r = 0,(x,y),dp;
    ideal I=2x+2,3y+3x,1234567891x+1234567891;
    contentS(I);
-}  
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -995,7 +995,7 @@ static proc insResult(list r,#)
       j=1;
       while((#[i]>r[j])&&(j<size(r))){j++;}
       if(#[i]>r[j]){r=insert(r,#[i],j);}
-      if(#[i]<r[j]){r=insert(r,#[i],j-1);}      
+      if(#[i]<r[j]){r=insert(r,#[i],j-1);}
    }
    return(r);
 }
@@ -1045,7 +1045,7 @@ matrix M  = Y*U1*iY;
 matrix iN = inverse(N);
 matrix iM = inverse(M);
 matrix U2 = N*M*iN*iM;
-ideal I = ideal(U1-U2);     
+ideal I = ideal(U1-U2);
 
 //list qr=primdecGTZ(I);
 //I=qr[1][2];
@@ -1053,26 +1053,26 @@ ideal I = ideal(U1-U2);
 ring rh = 0,(b,c,t,h),dp;
 ideal I = imap(r,I);
 ideal sI = groebner(I);
-ideal hI = homog(sI,h); 
-ideal shI =std(hI);   
-ideal J = eliminate(shI,c);       //eliminate c 
+ideal hI = homog(sI,h);
+ideal shI =std(hI);
+ideal J = eliminate(shI,c);       //eliminate c
 poly f = J[1];
 
 ring r1 = 0,(b,t,h),dp;
-poly hf=b6t6-2b5t7+b4t8+b8t3h-4b7t4h+7b6t5h-6b5t6h+2b4t7h-7b6t4h2+12b5t5h2+b4t6h2-6b3t7h2-3b8th3+12b7t2h3-16b6t3h3+19b4t5h3-12b3t6h3-2b8h4+8b7th4-3b6t2h4+2b5t3h4-45b4t4h4+32b3t5h4+12b2t6h4-12b6th5+50b5t2h5-64b4t3h5+4b3t4h5+26b2t5h5-12b6h6+24b5th6+22b4t2h6+12b3t3h6-73b2t4h6-10bt5h6-8b5h7-6b4th7+88b3t2h7-68b2t3h7-26bt4h7-29b4h8+16b3th8+42b2t2h8+54bt3h8+3t4h8-28b3h9-12b2th9+88bt2h9+10t3h9-38b2h10-8bth10-11t2h10-28bh11-34th11-17h12;                                                
+poly hf=b6t6-2b5t7+b4t8+b8t3h-4b7t4h+7b6t5h-6b5t6h+2b4t7h-7b6t4h2+12b5t5h2+b4t6h2-6b3t7h2-3b8th3+12b7t2h3-16b6t3h3+19b4t5h3-12b3t6h3-2b8h4+8b7th4-3b6t2h4+2b5t3h4-45b4t4h4+32b3t5h4+12b2t6h4-12b6th5+50b5t2h5-64b4t3h5+4b3t4h5+26b2t5h5-12b6h6+24b5th6+22b4t2h6+12b3t3h6-73b2t4h6-10bt5h6-8b5h7-6b4th7+88b3t2h7-68b2t3h7-26bt4h7-29b4h8+16b3th8+42b2t2h8+54bt3h8+3t4h8-28b3h9-12b2th9+88bt2h9+10t3h9-38b2h10-8bth10-11t2h10-28bh11-34th11-17h12;
 //poly hf=b3t4-b2t5+b4t2h-2b3t3h+2b2t4h-bt5h-2b3t2h2+4bt4h2+b2t2h3-bt3h3+t4h3
 //+2b2th4-6bt2h4-4t3h4+b2h5-2bth5+2t2h5+4th6+h7;
 
 int n,m,sA,sB;
- n=6; 
+ n=6;
 //n=3;
 //m=7-n;
 
  m = 12-n;
- ideal A = maxideal(n);       ideal B = maxideal(m);      
+ ideal A = maxideal(n);       ideal B = maxideal(m);
  sA =size(A);
- sB = size(B);                                                               
-              
+ sB = size(B);
+
 ring R = 0,(b(1..sB),a(1..sA),b,t,h),dp;
 poly hf = imap(r1,hf);
 ideal A = imap(r1,A);
@@ -1084,9 +1084,9 @@ poly f2= (matrix(B)*bb)[1,1];   //Ansatz for degree m=12-n
 poly g = f1*f2-hf;              //assume hf factors
 matrix C = coef(g,bth);
 ideal co = submat(C,2,1..ncols(C));//condition for decomposition, size 91
- 
+
 ring R1 = 0,(b(1..sB),a(1..sA)),lp;
-ideal co = imap(R,co);                       
+ideal co = imap(R,co);
 co=subst(co,a(1),1);          //OE a1=1
 co = subst(co,b(1),-17);      //co1[91]=b(1)+17
 //co = subst(co,b(1),1);
@@ -1098,7 +1098,7 @@ timer-aa;
 
 //n=1 0 sec
 // keine Primzahl
-//n=2   628 sec 
+//n=2   628 sec
 // 2,3,5,7,11,13,17,19,23,29,31,37,43,47,61,89,293,347,367,487,491,3463,7498
 //n=3  1604 sec
 // 2,3,5,7,11,13,17,19,23,29,31,59,71,79,101,163,197,211,269,281,541,647,863,
