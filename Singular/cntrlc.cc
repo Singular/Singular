@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: cntrlc.cc,v 1.46 2005-04-28 12:25:23 hannes Exp $ */
+/* $Id: cntrlc.cc,v 1.47 2005-05-06 13:46:09 Singular Exp $ */
 /*
 * ABSTRACT - interupt handling
 */
@@ -412,7 +412,9 @@ void init_signals()
   si_set_signal(SIGXCPU, (void (*)(int))SIG_IGN);
 #    endif /* SIGIOT */
   si_set_signal(SIGINT ,sigint_handler);
+#if definded(HPUX_9) || defined(HPUX_10)
   si_set_signal(SIGCHLD, (void (*)(int))SIG_IGN);
+#endif
 #  endif /* !MSDOS */
 }
 # endif /* SPARC_SUNOS_4 */
