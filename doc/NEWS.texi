@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.41 2005-04-29 19:42:34 levandov Exp $
+@comment $Id: NEWS.texi,v 1.42 2005-05-06 11:30:57 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -71,6 +71,14 @@ procedures for computing the Castelnuovo-Mumford regularity
 procedures for primary decomposition of modules
 @item @nref{gmspoly_lib}, @nref{gmssing_lib}   
 procedures for the Gauss-Manin connection of a singularity
+@item @nref{mrrcount_lib}
+counting the number of real roots
+@item @nref{signcond_lib}
+computing realizable sign conditions
+@item @nref{urrcount_lib}
+counting number of real roots of univariate polynomial
+@item @nref{groebnerwalk_lib}
+Groebner and Pertubation walk
 @end table
 
 @heading Changes in @sc{Singular} libraries
@@ -84,6 +92,9 @@ the documentation of libraries was generally improved.
 @table @asis
 @item @code{ringlist}
 @item @code{slimgb}
+@item @code{exportto}
+@item @code{importfrom}
+@item @code{frwalk}
 @end table
 
 @heading @sc{Singular} functions whose syntax/semantics has changed
@@ -128,13 +139,14 @@ procedures, related to quantum matrices and minors
 @item new mapping code
 @c @item non-commutative extension (Plural)
 @item factory revisited
+(gcd, factorizing polynomial over algebraic extension fields,...)
 @end table
 
 @heading Porting
 
 @itemize @bullet
-@item Singular is available for ix86-Linux, HPUX_9, HPUX_10,
-SunOS-4, SunOS-5, IRIX-6, ix86-Win (runs on Windows 95/98/NT4/2000/XP),
+@item Singular is available for ix86-Linux, HPUX_10,
+SunOS-5, IRIX-6, ix86-Win (runs on Windows 95/98/NT4/2000/XP),
 FreeBSD, MacOS X, DecAlpha-Linux, x86_64-Linux (AMD64/Opteron/EM64T),
 IA64-Linux
 @end itemize
