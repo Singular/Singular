@@ -209,7 +209,7 @@ SLIB0 = COPYING \
 	ainvar.lib   alexpoly.lib  algebra.lib   all.lib       brnoeth.lib \
         classify.lib control.lib   deform.lib    elim.lib      equising.lib \
         finvar.lib   gmspoly.lib   gmssing.lib   general.lib   graphics.lib \
-        groups.lib   hnoether.lib  homolog.lib   inout.lib \
+        groebnerwalk.lib groups.lib   hnoether.lib  homolog.lib   inout.lib \
         intprog.lib  latex.lib     linalg.lib    makedbm.lib    matrix.lib \
 	mprimdec.lib mondromy.lib  mregular.lib  mrrcount.lib   normal.lib \
         ntsolve.lib  \

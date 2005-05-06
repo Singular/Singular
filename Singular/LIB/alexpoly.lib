@@ -1,4 +1,4 @@
-version="$I@comment d:$";
+version="$Id: alexpoly.lib,v 1.10 2005-05-06 17:07:34 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  alexpoly.lib   Resolution Graph and Alexander Polynomial
@@ -22,7 +22,7 @@ PROCEDURES:
  charexp2inter(c,e);        converts contact matrix and charact. exp. to intersection matrix
  charexp2conductor(v);      converts characteristic exponents to conductor
  charexp2poly(v,a);         calculates a polynomial f with characteristic exponents v
- tau_es(f);                 equsingular Tjurina number of f
+ tau_es(f);                 equisingular Tjurina number of f
 
 KEYWORDS: Hamburger-Noether expansion; Puiseux expansion; curve singularities;
           topological invariants; Alexander polynomial; resolution graph;
@@ -1426,7 +1426,7 @@ SEE ALSO: develop, hnexpansion, totalmultiplicities, equising.lib
 EXAMPLE: example tau_es;  shows an example
 "
 {
-  // If the input is a weighted homogeneous polnomial, then use a direct algorithm to
+  // If the input is a weighted homogeneous polynomial, then use a direct algorithm to
   // calculate the equisingular Tjurina number, by caluclating a K-basis of the
   // Tjurina algebra and omitting those elements with weighted degree at least the
   // weighted degree of the polynomial. -- If an additional input # is given (which is
