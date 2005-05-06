@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: COPYING.texi,v 1.18 2005-05-02 22:01:14 levandov Exp $
+@comment $Id: COPYING.texi,v 1.19 2005-05-06 16:26:44 Singular Exp $
 @comment this file contains the copyright notice on Singular
 @ifclear VERSION
 @include version.texi
@@ -114,7 +114,7 @@ Sch@"onemann.
 
 Currently, the @sc{Singular} team has the following members:
 Michael Brickenstein,
-Anne Fr@"ubis-Kr@"uger,
+Anne Fr@"uhbis-Kr@"uger,
 Kai Kr@"uger,
 Christoph Lossen,
 Viktor Levandovskyy,
@@ -122,7 +122,7 @@ Wilfred Pohl
 and
 Oliver Wienand.
 @cindex Brickenstein, Michael 
-@cindex Fr@"ubis-Kr@"uger, Anne
+@cindex Fr@"uhbis-Kr@"uger, Anne
 @cindex Kr@"uger, Kai
 @cindex Lossen, Christoph
 @cindex Levandovskyy, Viktor
@@ -164,10 +164,29 @@ Martin Lamm,
 Bernd Martin,
 Michael Me@ss{}ollen,
 Thomas N@"u@ss{}ler,
+Henrik Strohmayer,
+Enrique Tobis,
 Moritz Wenk,
 Denis Yanovich.
-@cindex Keilen, Thomas
+@cindex Bayer, Thomas
+@cindex Bermejo, Isabelle
+@cindex Endra@ss{}, Stephan
+@cindex Farran Martin, Jose Ignacio
 @cindex Decker, Wolfram
+@cindex Gimenez, Philippe
+@cindex Gorzel, Christian
+@cindex Heydtmann, Agnes
+@cindex Hillebrand, Dietmar
+@cindex Hirsch, Tobias
+@cindex Keilen, Thomas
+@cindex Lamm, Martin
+@cindex Martin, Bernd
+@cindex Me@ss{}ollen, Michael
+@cindex N@"u@ss{}ler, Thomas
+@cindex Strohmayer, Henrik
+@cindex Tobis, Enrique
+@cindex Wenk, Moritz
+@cindex Yanovich, Denis
 
 We should like to acknowledge the financial support given by
 the Volkswagen-Stiftung,
