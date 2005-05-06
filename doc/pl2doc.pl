@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: pl2doc.pl,v 1.21 2002-07-03 14:46:30 Singular Exp $
+# $Id: pl2doc.pl,v 1.22 2005-05-06 15:51:14 Singular Exp $
 ###################################################################
 #  Computer Algebra System SINGULAR
 #
@@ -457,7 +457,8 @@ sub OutProcInfo
   else
   {
     print $FH "\@item \@code{$proc($procargs)}  ";
-    print $FH "\n\@cindex $proc\n$_";
+    print $FH "\n\@cindex $proc\n";
+    print $FH "\@anchor{$proc}\n$_";
   }
 }
 
