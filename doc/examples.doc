@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.72 2005-05-04 17:25:18 Singular Exp $
+@comment $Id: examples.doc,v 1.73 2005-05-06 09:24:51 bricken Exp $
 @comment this file contains the examples
 
 @c The following directives are necessary for proper compilation
@@ -803,8 +803,7 @@ and @code{stdhilb} about 10 times faster than @code{std}.
 @subsection slim Groebner bases
 @cindex Groebner bases, slim
 @cindex slimgb
-The command @code{slimgb} is designed for keeping the polynomials short
-and the coefficients small in a Groebner basis computation. 
+The command @code{slimgb} is designed for keeping the polynomials slim (short with small coefficients)  during a Groebner basis computation. 
 It provides, in particular, a fast algorithm for computing Groebner bases
 over function fields and with respect to degree orderings.
 

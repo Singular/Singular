@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.244 2005-05-04 16:56:49 Singular Exp $
+@comment $Id: reference.doc,v 1.245 2005-05-06 09:24:52 bricken Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -5637,9 +5637,9 @@ the leading terms generate the leading ideal.
 @item @strong{Note:}
 The algorithm is described in the diploma thesis of Michael Brickenstein
 "Neue Varianten zur Berechnung von Groebnerbasen",
-written 2004 under supervision of Prof. Dr. Greuel in Kaiserslautern.
+written 2004 under supervision of G.-M. Greuel in Kaiserslautern.
 
-It is designed to keep polynomials short with small coefficients.
+It is designed to keep polynomials slim (short with small coefficients).
 Currently best results are examples over function field (parameters).
 
 For the performance it is essential, that one of following is fullfilled: the ideal is homogeneous or the ordering is a degree ordering, maybe future version will improve here.
