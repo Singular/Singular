@@ -3871,7 +3871,8 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
   //if (debug_Ideal) PrintS("DebugIdeal received\n");
   // Print("Idelems %i \n----------\n",IDELEMS(arg_I));
   ideal I=idCompactify(arg_I);
-  if (IDELEMS(I)==0) return I;
+  if (idIs0(I)) return I;
+
   qsort(I->m,IDELEMS(I),sizeof(poly),poly_crit);
   //Print("Idelems %i \n----------\n",IDELEMS(I));
   calc_dat* c=(calc_dat*) omalloc(sizeof(calc_dat));
