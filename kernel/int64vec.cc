@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: int64vec.cc,v 1.1 2005-05-04 14:08:54 Singular Exp $ */
+/* $Id: int64vec.cc,v 1.2 2005-05-09 12:14:57 Singular Exp $ */
 /*
 * ABSTRACT: class int64vec: lists/vectors of int64
 */
@@ -34,28 +34,6 @@ int64vec::int64vec(intvec* iv)
   for (int i=0; i<row*col; i++)
   {
     v[i] = (int64)((*iv)[i]);
-  }
-}
-
-int64vec::int64vec(int s, int e)
-{
-  int inc;
-  col = 1;
-  if (s<e)
-  {
-    row =  e-s+1;
-    inc =  1;
-  }
-  else
-  {
-    row = s-e+1;
-    inc = -1;
-  }
-  v = (int64 *)omAlloc(sizeof(int64)*row);
-  for (int i=0; i<row; i++)
-  {
-    v[i] = (int64)s;
-    s+=inc;
   }
 }
 
