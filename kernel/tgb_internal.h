@@ -1,6 +1,6 @@
 #ifndef TGB_INTERNAL_H
 #define TGB_INTERNAL_H
-
+//!\file tgb_internal.h
 #include "mod2.h"
 #include <omalloc.h>
 #include "p_polys.h"

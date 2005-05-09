@@ -1,5 +1,6 @@
 #ifndef TGB_H
 #define TGB_H
+//! \file tgb.h
 //#define OM_CHECK 3
 //#define OM_TRACK 5
 #include "mod2.h"

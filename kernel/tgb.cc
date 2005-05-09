@@ -1,4 +1,4 @@
-
+//! \file tgb.cc
 // #define OM_CHECK 3
 // #define OM_TRACK 5
 // #define OM_KEEP  1
@@ -449,7 +449,7 @@ static BOOLEAN trivial_syzygie(int pos1,int pos2,poly bound,calc_dat* c){
   
 }
 
-///returns position sets w as weight
+//! returns position sets w as weight
 int find_best(red_object* r,int l, int u, int &w, calc_dat* c){
   int best=l;
   int i;
@@ -1641,14 +1641,14 @@ int exp_number_builder::get_n(poly p){
 //mac_polys exp are smaller iff they are greater by monomial ordering
 //corresponding to solving linear equations notation
 
-//* obsolete
+//! obsolete
 struct int_poly_pair{
   poly p;
   int n;
 };
 
 
-//* obsolete
+//! obsolete
 void t2ippa_rec(poly* ip,int* ia, poly_tree_node* k, int &offset){
     if(!k) return;
     t2ippa_rec(ip,ia,k->l,offset);
@@ -1660,7 +1660,7 @@ void t2ippa_rec(poly* ip,int* ia, poly_tree_node* k, int &offset){
     delete k;
   }
 
-//*obsolete
+//! obsolete
 void t2ippa(poly* ip,int* ia,exp_number_builder & e){
 
   int o=0;
