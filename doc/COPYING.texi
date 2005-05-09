@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: COPYING.texi,v 1.21 2005-05-06 18:03:23 levandov Exp $
+@comment $Id: COPYING.texi,v 1.22 2005-05-09 07:53:22 Singular Exp $
 @comment this file contains the copyright notice on Singular
 @ifclear VERSION
 @include version.texi
@@ -129,7 +129,7 @@ Oliver Wienand.
 @cindex Pohl, Wilfred
 @cindex Wienand, Oliver
 
-Past members of the @sc{Singular} team are:
+Former members of the @sc{Singular} team are:
 Olaf Bachmann,
 Hubert Grassmann,
 Wolfgang Neumann,
