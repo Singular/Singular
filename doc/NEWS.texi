@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.42 2005-05-06 11:30:57 Singular Exp $
+@comment $Id: NEWS.texi,v 1.43 2005-05-09 07:52:34 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -27,15 +27,15 @@ Singular version 3 has a greater functionality and an improved architecture.
 Major new features are:
 @itemize
 @item
-dynamic modules
+@nref{Dynamic modules}
 @item
 non-commutative extension @nref{PLURAL}
 @item
-name spaces (package)
+name spaces (@nref{package})
 @item
-easy manipulation of rings (ringlist)
+easy manipulation of rings (@nref{ringlist})
 @item
-improved speed of maps (subst, map)
+improved speed of maps (@nref{subst}, @nref{map})
 @item
 variant of Faugeres F4: @nref{slimgb}.
 @item
