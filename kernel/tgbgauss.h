@@ -3,6 +3,7 @@
 #include "mod2.h"
 #include "numbers.h"
 #include "tgb_internal.h"
+
 class tgb_matrix{
  private:
   number** n;
@@ -27,6 +28,19 @@ class tgb_matrix{
   void add_lambda_times_row(int add_to,int summand,number factor);
   int non_zero_entries(int row);
 };
+
+class mac_poly_r{
+public:
+  number coef;
+  mac_poly_r* next;
+  int exp;
+  mac_poly_r():next(NULL){}
+};
+//mac_polys exp are smaller iff they are greater by monomial ordering
+//corresponding to solving linear equations notation
+
+typedef mac_poly_r* mac_poly;
+
 class tgb_sparse_matrix{
  private:
   ring r;
@@ -65,4 +79,15 @@ class tgb_sparse_matrix{
 };
 void simple_gauss(tgb_sparse_matrix* mat, calc_dat* c);
 void simple_gauss2(tgb_matrix* mat);
+
+
+
+mac_poly mac_p_add_ff_qq(mac_poly a, number f,mac_poly b);
+
+void mac_mult_cons(mac_poly p,number c);
+int mac_length(mac_poly p);
+
+//contrary to delete on the mac_poly_r, the coefficients are also destroyed here
+void mac_destroy(mac_poly p);
+
 #endif

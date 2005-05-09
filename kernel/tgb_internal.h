@@ -102,17 +102,6 @@ struct mp_array_list{
   mp_array_list* next;
 };
 
-class mac_poly_r{
-public:
-  number coef;
-  mac_poly_r* next;
-  int exp;
-  mac_poly_r():next(NULL){}
-};
-//mac_polys exp are smaller iff they are greater by monomial ordering
-//corresponding to solving linear equations notation
-
-typedef mac_poly_r* mac_poly;
 
 struct poly_array_list{
   poly* p;
@@ -280,18 +269,6 @@ static void finalize_reduction_step(reduction_step* r);
 
 
 
-
-
-
-
-
-mac_poly mac_p_add_ff_qq(mac_poly a, number f,mac_poly b);
-
-void mac_mult_cons(mac_poly p,number c);
-int mac_length(mac_poly p);
-
-//contrary to delete on the mac_poly_r, the coefficients are also destroyed here
-void mac_destroy(mac_poly p);
 
 
 

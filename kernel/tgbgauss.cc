@@ -2,6 +2,102 @@
 #include "tgbgauss.h"
 
 static const int bundle_size=100;
+
+mac_poly mac_p_add_ff_qq(mac_poly a, number f,mac_poly b){
+  mac_poly erg;
+  mac_poly* set_this;
+  set_this=&erg;
+  while((a!=NULL) &&(b!=NULL)){
+    if (a->exp<b->exp){
+      (*set_this)=a;
+      a=a->next;
+      set_this= &((*set_this)->next);
+    } 
+    else{
+      if (a->exp>b->exp){
+	mac_poly in =new mac_poly_r();
+	in->exp=b->exp;
+	in->coef=nMult(b->coef,f);
+	(*set_this)=in;
+	b=b->next;
+	set_this= &((*set_this)->next);
+      }
+      else {
+	//a->exp==b->ecp
+	number n=nMult(b->coef,f);
+	number n2=nAdd(a->coef,n);
+	nDelete(&n);
+	nDelete(&(a->coef));
+	if (nIsZero(n2)){
+	  nDelete(&n2);
+	  mac_poly ao=a;
+	  a=a->next;
+	  delete ao;
+	  b=b->next;
+	  
+	} else {
+	  a->coef=n2;
+	  b=b->next;
+	  (*set_this)=a;
+	  a=a->next;
+	  set_this= &((*set_this)->next);
+	}
+ 
+      }
+    
+    }
+  }
+  if((a==NULL)&&(b==NULL)){
+    (*set_this)=NULL;
+    return erg;
+  }
+  if (b==NULL) {
+    (*set_this=a);
+    return erg;
+  }
+  
+  //a==NULL
+  while(b!=NULL){
+    mac_poly mp= new mac_poly_r();
+    mp->exp=b->exp;
+    mp->coef=nMult(f,b->coef);
+    (*set_this)=mp;
+    set_this=&(mp->next);
+    b=b->next;
+  }
+  (*set_this)=NULL;
+  return erg;
+  
+}
+void mac_mult_cons(mac_poly p,number c){
+  while(p){
+    number m=nMult(p->coef,c);
+    nDelete(&(p->coef));
+    p->coef=m;
+    p=p->next;
+  }
+  
+}
+int mac_length(mac_poly p){
+  int l=0;
+  while(p){
+    l++;
+    p=p->next;
+  }
+  return l;
+}
+//contrary to delete on the mac_poly_r, the coefficients are also destroyed here
+void mac_destroy(mac_poly p){
+  mac_poly iter=p;
+  while(iter)
+  {
+    mac_poly next=iter->next;
+    nDelete(&iter->coef);
+    delete iter;
+    iter=next;
+  }
+}
+
 void simple_gauss(tgb_sparse_matrix* mat, calc_dat* c){
   int col, row;
   int* row_cache=(int*) omalloc(mat->get_rows()*sizeof(int));
