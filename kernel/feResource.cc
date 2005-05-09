@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feResource.cc,v 1.3 2005-04-30 14:35:30 hannes Exp $ */
+/* $Id: feResource.cc,v 1.4 2005-05-09 10:04:22 Singular Exp $ */
 /*
 * ABSTRACT: management of resources
 */
@@ -71,9 +71,9 @@ typedef feResourceConfig_s * feResourceConfig;
 // feCleanResource makes furthermore  the following transformations (except for URL resources)
 // 1.) '/' characters are replaced by respective directory - separators
 // 2.) ';' characters are replaced by respective path separators
-static feResourceConfig_s feResourceConfigs[25] =
+static feResourceConfig_s feResourceConfigs[] =
 {
-  {"SearchPath",    's',     feResPath,  NULL,
+  {"SearchPath",    's', feResPath,  NULL,
    "$SINGULARPATH;"
    "%b/LIB;"
    "%r/LIB;"
@@ -90,17 +90,12 @@ static feResourceConfig_s feResourceConfigs[25] =
   {"HtmlDir",   'h',    feResDir,   "SINGULAR_HTML_DIR",    "%r/html",              ""},
   {"ManualUrl", 'u',    feResUrl,   "SINGULAR_URL",         "http://www.singular.uni-kl.de/Manual/"S_VERSION1,    ""},
   {"ExDir",      'm',   feResDir,   "SINGULAR_EXAMPLES_DIR","%r/examples",              ""},
-#if !defined(macintosh)
-  {"netscape",  'N',    feResBinary,"NETSCAPE",             "%b/netscape",          ""},
-  {"info",      'I',    feResBinary,"INFO",                 "%b/info",              ""},
-  {"tkinfo",    'T',    feResBinary,"TKINFO",               "%b/tkinfo",            ""},
-#ifdef ix86_Win
-  {"rxvt",     'X',    feResBinary,"RXVT",                "%b/rxvt",             ""},
-#else
-  {"xterm",     'X',    feResBinary,"XTERM",                "%b/xterm",             ""},
-#endif
+//#if !defined(macintosh)
+//  {"netscape",  'N',    feResBinary,"NETSCAPE",             "%b/netscape",          ""},
+//  {"info",      'I',    feResBinary,"INFO",                 "%b/info",              ""},
+//  {"tkinfo",    'T',    feResBinary,"TKINFO",               "%b/tkinfo",            ""},
   {"Path",      'p',    feResPath,  NULL,                   "%b;$PATH",         ""},
-#endif // ! defined(macintosh)
+//#endif // ! defined(macintosh)
 
 #ifdef ESINGULAR
   {"emacs",    'E',    feResBinary, "ESINGULAR_EMACS",      "%b/emacs",              ""},
@@ -110,6 +105,11 @@ static feResourceConfig_s feResourceConfigs[25] =
   {"EmacsDir",  'e',    feResDir,   "ESINGULAR_EMACS_DIR",   "%r/emacs",             ""},
 #elif defined(TSINGULAR)
   {"SingularXterm",'M',feResBinary, "TSINGULAR_SINGULAR",    "%b/Singular",           ""},
+#ifdef ix86_Win
+  {"rxvt",     'X',    feResBinary,"RXVT",                "%b/rxvt",             ""},
+#else
+  {"xterm",     'X',    feResBinary,"XTERM",                "%b/xterm",             ""},
+#endif
 #else
   {"EmacsDir",  'e',    feResDir,   "SINGULAR_EMACS_DIR",   "%r/emacs",             ""},
 #endif
