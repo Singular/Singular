@@ -1,4 +1,4 @@
-// $Id: urrcount.lib,v 1.5 2005-05-06 11:17:33 Singular Exp $
+// $Id: urrcount.lib,v 1.6 2005-05-09 15:55:38 Singular Exp $
 // E. Tobis  12.Nov.2004, April 2004
 // last change 5. May 2005 (G.-M. Greuel)
 ///////////////////////////////////////////////////////////////////////////////
@@ -68,10 +68,7 @@ EXAMPLE:   example isparam; shows an example"
 {
   int i;
   int ispar;
-
   def ar = #[1];
-
-  ispar = 0;
 
   // It we were given only one argument (not a list)
   if (size(#) == 1) {
@@ -91,11 +88,11 @@ EXAMPLE:   example isparam; shows an example"
     } else {
     if (typeof(ar) == "matrix" || typeof(ar) == "intmat") {
       int j;
-      i = nrows(m);
+      i = nrows(ar);
       while (!ispar && (i >= 1)) {
-        j = nrows(m);
+        j = nrows(ar);
         while (!ispar && (j >= 1)) {
-          ispar = ispar || (isparametric(m[i,j]));
+          ispar = ispar || (isparametric(ar[i,j]));
           j--;
         }
         i--;

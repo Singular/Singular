@@ -1,6 +1,6 @@
-// $Id: mrrcount.lib,v 1.2 2005-05-02 12:24:16 Singular Exp $
+// $Id: mrrcount.lib,v 1.3 2005-05-09 15:55:37 Singular Exp $
 // E. Tobis  12.Nov.2004, April 2004
-// last change 1. May 2005 (G.-M. Greuel)
+// last change 7. May 2005 (G.-M. Greuel)
 ///////////////////////////////////////////////////////////////////////////////
 category="Symbolic-numerical solving"
 info="
@@ -10,13 +10,15 @@ AUTHOR:               Enrique A. Tobis, etobis@dc.uba.ar
 OVERVIEW:  Routines for counting the number of real roots of a multivariate
            polynomial system. Two methods are implemented: deterministic
            computation of the number of roots, via the signature of a certain
-           bilinear form; and a rational univariate projection, using a
-           pseudorandom polynomial. Also includes a command to verify the
-           correctness of the pseudorandom answer.
+           bilinear form (nrRootsDeterm); and a rational univariate projection,
+           using a pseudorandom polynomial (nrRootsProbab). It also includes a
+           command to verify the correctness of the pseudorandom answer.
            References: Basu, Pollack, Roy, \"Algorithms in Real Algebraic
            Geometry\", Springer, 2003.
 
 PROCEDURES:
+ nrRootsProbab(I)    Number of real roots of 0-dim ideal (probabilistic)
+ nrRootsDeterm(I)    Number of real roots of 0-dim ideal (deterministic)
  symsignature(m)     Signature of the symmetric matrix m
  sturmquery(h,B,I)   Sturm query of h on V(I)
  matbil(h,B,I)       Matrix of the bilinear form on R/I associated to h
@@ -37,9 +39,125 @@ KEYWORDS: real roots, univariate projection
 LIB "linalg.lib";   // We use charpoly
 LIB "urrcount.lib"; // We use varsigns
 
+proc nrRootsProbab(ideal I, list #)
+"USAGE:     nrRootsProbab(I,[n]); ideal I, int n
+RETURN:    int: the number of real roots of the ideal I by a probabilistic
+           algorithm
+ASSUME:    If I is no Groebner basis then a Groebner basis will be computed
+           by using std. If I is already a Groebner basis (i.e. if
+           attrib(I,"isSB"); returns 1) then this Groebner basis will be
+           used, hence it must be one w.r.t. (any) global ordering. This may
+           be useful if the ideal is known to be a Groebner basis or if it
+           can be computed faster by a different method.
+NOTE:      If n<10 is given, n is the number of digits being used for
+           constructing a random characteristic polynomial, a bigger n is
+           more safe but slower (default: n=5).
+           If printlevel>0 the number of complex solutions is displayed
+           (default: printlevel=0).
+SEE ALSO:  nrroots, nrRootsDeterm, randcharpoly, solve
+EXAMPLE:   example nrRootsProbab; shows an example"
+{
+  //Note on complexity: Let n = no of complex roots of I (= vdim(std(I)).
+  //Then the algorithm needs:
+  //1 std(I) and ~n NF computations (of randcharpoly wrt I)
+
+  if (isparam(I)) {
+    ERROR("This procedure cannot operate with parametric arguments");
+  }
+  int pr = printlevel-voice+2;
+  int v;
+  int n=5;
+  if (size(#) == 1) {
+    n=#[1];
+  }
+  if (attrib(I,"isSB")!=1) {
+    I = std(I);
+  }
+
+  ideal b = qbase(I);
+  v = size(b);
+  if (v == 0) {
+    ERROR("ideal is not 0-dimensional");
+  }
+  dbprint(pr,"//ideal has " +string(v)+ " complex solutions, counted with multiplicity");
+
+  poly p = randcharpoly(b,I,n);
+
+  return (nrroots(p));
+}
+
+example
+{
+  echo = 2;
+  ring r = 0,(x,y,z),lp;
+  ideal i = (x-1)*(x-2),(y-1)^3*(x-y),(z-1)*(z-2)*(z-3)^2;
+  nrRootsProbab(i);       //no of real roots (using internally std)
+
+  i = groebner(i);        //using the hilbert driven GB computation
+  int pr = printlevel;
+  printlevel = 2;
+  nrRootsProbab(i);
+  printlevel = pr;
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc nrRootsDeterm(ideal I)
+"USAGE:     nrRootsDeterm(I); ideal I
+RETURN:    int: the number of real roots of the ideal I by a deterministic
+           algorithm
+ASSUME:    If I is no Groebner basis then a Groebner basis will be computed
+           by using std. If I is already a Groebner basis (i.e. if
+           attrib(I,"isSB"); returns 1) then this Groebner basis will be
+           used, hence it must be one w.r.t. (any) global ordering. This may
+           be useful if the ideal is known to be a Groebner basis or if it
+           can be computed faster by a different method.
+NOTE:      If printlevel>0 the number of complex solutions is displayed
+           (default: printlevel=0). The proc nrRootsProbab is usually faster.
+SEE ALSO:  nrroots, nrRootsProbab, sturmquery, solve
+EXAMPLE:   example nrRootsDeterm; shows an example"
+{
+  //Note on complexity: Let n = no of complex roots of I (= vdim(std(I)).
+  //Then the algotithm needs:
+  //1 std(I) and (1/2)n*(n+1)^2 ~ 1/2n^3 NF computations (of monomials wrt I)
+
+  if (isparam(I)) {
+    ERROR("This procedure cannot operate with parametric arguments");
+  }
+  int pr = printlevel-voice+2;
+  int v;
+
+  if (attrib(I,"isSB")!=1) {
+    I = std(I);
+  }
+
+  ideal b = qbase(I);
+  v = size(b);
+  if (v == 0) {
+    ERROR("ideal is not 0-dimensional");
+  }
+  dbprint(pr,"//ideal has " +string(v)+ " complex solutions, counted with multiplicity");
+
+  return (sturmquery(1,b,I));
+}
+
+example
+{
+  echo = 2;
+  ring r = 0,(x,y,z),lp;
+  ideal I = (x-1)*(x-2),(y-1),(z-1)*(z-2)*(z-3)^2;
+  nrRootsDeterm(I);       //no of real roots (using internally std)
+
+  I = groebner(I);        //using the hilbert driven GB computation
+  int pr = printlevel;
+  printlevel = 2;
+  nrRootsDeterm(I);
+  printlevel = pr;
+}
+///////////////////////////////////////////////////////////////////////////////
+
 proc symsignature(matrix m)
 "USAGE:     symsignature(m); m matrix. m must be symmetric.
-RETURN:    number: the signature of m
+RETURN:    int: the signature of m
 SEE ALSO:  matbil,sturmquery
 EXAMPLE:   example symsignature; shows an example"
 {
@@ -96,7 +214,7 @@ example
 
 proc sturmquery(poly h,ideal B,ideal I)
 "USAGE:     sturmquery(h,b,i); h poly, b,i ideal
-RETURN:    number: the Sturm query of h in V(i)
+RETURN:    int: the Sturm query of h in V(i)
 ASSUME:    i is a Groebner basis, b is an ordered monomial basis
            of r/i, r = basering.
 SEE ALSO:  symsignature,matbil
@@ -118,6 +236,7 @@ example
 
   sturmquery(1,b,i);
 }
+///////////////////////////////////////////////////////////////////////////////
 
 static proc mysymmsig(matrix m)
 // returns the signature of a square symmetric matrix m
@@ -157,14 +276,14 @@ EXAMPLE:   example matbil; shows an example"
   matrix m[size(B)][size(B)];
   poly f;
   int k,l;
+  //h = reduce(h,I);
 
-  f = reduce(h,I);
-  for (k = 1;k <= size(B);k++) {
-    for (l = 1;l <= k;l++) {
-      m[k,l] = tracemult((reduce(f*B[k]*B[l],I),B,I));
+  for (k = 1; k <= size(B); k++) {
+    for (l = 1; l <= k; l++) {
+      m[k,l] = tracemult(h*B[k]*B[l],B,I)[1];
       m[l,k] = m[k,l]; // The matrix we are trying to compute is symmetric
     }
-  }
+   }
   return(m);
 }
 example
@@ -191,18 +310,23 @@ ASSUME:    i is a Groebner basis and b is an ordered monomial basis of r/i
 SEE ALSO:  matmult,trace
 EXAMPLE:   example tracemult; shows an example"
 {
-  poly g;
   int k; // Iterates over the basis monomials
   int l; // Iterates over the rows of the matrix
   list coordinates;
   number m;
+  poly g;
 
-  g = reduce(f,I);
-
-  m = 0;
-  for (k = 1;k <= size(B);k++) {
-    coordinates = coords(g*(B[k]),B,I); // f*x_k written on the basis B
-    m = m + coordinates[k];
+  //f = reduce(f,I);
+  for (k = 1; k <= size(B); k++) {
+    l=1;
+    g = reduce(f*B[k],I);
+    while (l <= k) {
+      if (leadmonom(g[l]) == B[k]) {
+        m = m + leadcoef(g[l]);
+        break;
+      }
+      l++;
+    }
   }
   return (m);
 }
@@ -218,28 +342,27 @@ example
   matrix m = matmult(f,b,i);
   print(m);
 
-  tracemult(f,b,i);
+  tracemult(f,b,i);            //the trace of m
 }
 ///////////////////////////////////////////////////////////////////////////////
 
 proc matmult(poly f, ideal B, ideal I)
 "USAGE:     matmult(f,b,i); f poly, b,i ideal
 RETURN:    matrix: the matrix of the multiplication map by f (m_f) on r/i
-           wrt to the monomial basis b of r/i (r = basering)
-ASSUME:    i is a Groebner basis and b is an ordered monomial basis of r/i
+           w.r.t. to the monomial basis b of r/i (r = basering)
+ASSUME:    i is a Groebner basis and b is an ordered monomial basis of r/i,
+           as given by qbase(i)
 SEE ALSO:  coords,matbil
 EXAMPLE:   example matmult; shows an example"
 {
-  poly g;
   int k; // Iterates over the basis monomials
   int l; // Iterates over the rows of the matrix
   list coordinates;
   matrix m[size(B)][size(B)];
 
-  g = reduce(f,I);
-
+  //f = reduce(f,I);
   for (k = 1;k <= size(B);k++) {
-    coordinates = coords(g*(B[k]),B,I); // f*x_k written on the basis B
+    coordinates = coords(f*(B[k]),B,I); // f*x_k written on the basis B
     for (l = 1;l <= size(B);l++) {
       m[l,k] = coordinates[l];
     }
@@ -255,7 +378,6 @@ example
   ideal b = qbase(i);
 
   poly f = x3-xy+y-13+x4-y2x;
-
   matrix m = matmult(f,b,i);
   print(m);
 }
@@ -263,7 +385,8 @@ example
 
 proc coords(poly f,ideal B,ideal I)
 "USAGE:     coords(f,b,i), f poly, b,i ideal
-RETURN:    list: the coordinates of the class of f in the monomial basis b
+RETURN:    list of numbers: the coordinates of the class of f (mod i)
+           in the monomial basis b
 ASSUME:    i is a Groebner basis and b is an ordered monomial basis of r/i,
            r = basering
 SEE ALSO:  matmult,matbil
@@ -278,14 +401,14 @@ EXAMPLE:   example coords; shows an example"
 
   // We first compute the normal form of f wrt I
   g = reduce(f,I);
+  int n = size(g);    //allways n <= N
 
-  coordinates[N] = 0; // We resize the list of coordinates
   while (k <= N) {
-    if (l <= size(g) && leadmonom(g[l]) == B[k]) {
+    if (leadmonom(g[l]) == B[k]) {
       coordinates[k] = leadcoef(g[l]);
       l++;
     } else {
-      coordinates[k] = 0;
+      coordinates[k] = number(0);
     }
     k++;
   }
@@ -296,11 +419,11 @@ example
   echo = 2;
   ring r = 0,(x,y),dp;
   ideal i = x4-y2x,y2-13;
+  poly f = x3-xy+y-13+x4-y2x;
   i = std(i);
   ideal b = qbase(i);
-
-  coords(x3-xy+y-13+x4-y2x,b,i);
   b;
+  coords(f,b,i);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -315,13 +438,15 @@ proc randcharpoly(ideal B,ideal I,list #)
 "USAGE:     randcharpoly(b,i); randcharpoly(b,i,n); b,i ideal; n int
 RETURN:    poly: the characteristic polynomial of a pseudorandom
            rational univariate projection having one zero per zero of i.
-           If n is given, it is the number of digits being used for the
-           pseudorandom coefficients (default: n=2)
+           If n<10 is given, it is the number of digits being used for the
+           pseudorandom coefficients (default: n=5)
 ASSUME:    i is a Groebner basis and b is an ordered monomial basis of r/i,
            r = basering
+NOTE:      shows a warning if printlevel>0 (default: printlevel=0)
 KEYWORDS:  rational univariate projection
 EXAMPLE:   example randcharpoly; shows an example"
 {
+  int pr = printlevel - voice + 2;
   poly p;
   poly generic;
   list l;
@@ -338,15 +463,15 @@ EXAMPLE:   example randcharpoly; shows an example"
   m = matmult(p,B,I);
   q = charpoly(m);
 
-  print("*********************************************************************");
-  print("* WARNING: This polynomial was obtained using  pseudorandom numbers.*");
-  print("* If you want to verify the result, please use the command          *");
-  print("*                                                                   *");
-  print("* verify(p,b,i)                                                     *");
-  print("*                                                                   *");
-  print("* where p is the polynomial I returned, b is the monomial basis     *");
-  print("* used, and i the Groebner basis of the ideal                       *");
-  print("*********************************************************************");
+  dbprint(pr,"*********************************************************************");
+  dbprint(pr,"* WARNING: This polynomial was obtained using  pseudorandom numbers.*");
+  dbprint(pr,"* If you want to verify the result, please use the command          *");
+  dbprint(pr,"*                                                                   *");
+  dbprint(pr,"* verify(p,b,i)                                                     *");
+  dbprint(pr,"*                                                                   *");
+  dbprint(pr,"* where p is the polynomial I returned, b is the monomial basis     *");
+  dbprint(pr,"* used, and i the Groebner basis of the ideal                       *");
+  dbprint(pr,"*********************************************************************");
 
   return(q);
 }
@@ -360,9 +485,12 @@ example
   poly p = randcharpoly(b,i);
   p;
   nrroots(p); // See nrroots in urrcount.lib
+
+  int pr = printlevel;
+  printlevel = pr+2;
   p = randcharpoly(b,i,5);
-  p;
   nrroots(p);
+  printlevel = pr;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -373,9 +501,11 @@ RETURN:    integer: 1 iff the polynomial p splits the points of V(i).
            It's used to check the result of randcharpoly
 ASSUME:    i is a Groebner basis and b is an ordered monomial basis of r/i,
            r = basering
+NOTE:      comments the result if printlevel>0 (default: printlevel=0)
 SEE ALSO:  randcharpoly
 EXAMPLE:   example verify; shows an example"
 {
+  int pr = printlevel - voice + 2;
   poly sqrfree;
   int correct;
   poly variable;
@@ -389,10 +519,10 @@ EXAMPLE:   example verify; shows an example"
   correct = (mat_rk(matbil(1,b,i)) == deg(sqrfree));
 
   if (correct) {
-    print("Verification successful");
+    dbprint(pr,"//Verification successful");
   } else {
-    print("The choice of random numbers was not useful");
-    print("You might want to try randcharpoly with a larger number of digits");
+    dbprint(pr,"//The choice of random numbers was not useful");
+    dbprint(pr,"//You might want to try randcharpoly with a larger number of digits");
   }
   return (correct);
 }
@@ -411,15 +541,15 @@ example
 
 proc randlinpoly(list #)
 "USAGE:     randlinpoly(); randlinpoly(n); n int
-RETURN:    poly: a polynomial linear in each variable of the ring, with
-           pseudorandom coefficients. If n is given, it is the number of
-           digits being used for the range of the coefficients (default: n=2)
+RETURN:    poly: linear combination  of the variables of the ring, with
+           pseudorandom coefficients. If n<10 is given, it is the number of
+           digits being used for the range of the coefficients (default: n=5)
 SEE ALSO:  randcharpoly;
 EXAMPLE:   example randlinpoly; shows an example"
 {
   int n,i;
   poly p = 0;
-  int ndigits = 2;
+  int ndigits = 5;
 
   if (size(#) == 1) {
     ndigits = #[1];
@@ -437,15 +567,15 @@ example
   ring r = 0,(x,y,z,w),dp;
   poly p = randlinpoly();
   p;
-  p = randlinpoly(5);
-  p;
+  randlinpoly(5);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
 proc powersums(poly f,ideal B,ideal I)
-"USAGE:     powersums(f,b,i); f poly; b,i ideal, b a sorted monomial basis for
-           the quotient between the basering and i.
+"USAGE:     powersums(f,b,i); f poly; b,i ideal
 RETURN:    list: the powersums of the results of evaluating f at the zeros of I
+ASSUME:    i is a Groebner basis and b is an ordered monomial basis of r/i,
+           r = basering
 SEE ALSO:  symmfunc
 EXAMPLE:   example symmfunc; shows an example"
 {
@@ -476,13 +606,13 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc symmfunc(list S)
-// Takes the list of power sums and returns the symmetric functions
 "USAGE:     symmfunc(s); s list
 RETURN:    list: the symmetric functions of the roots of a polynomial, given
                  the power sums of those roots.
 SEE ALSO:  powersums
 EXAMPLE:   example symmfunc; shows an example"
 {
+  // Takes the list of power sums and returns the symmetric functions
   list a;
   int j,l,N;
   number sum;
