@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.110 2005-05-06 17:31:05 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.111 2005-05-09 07:34:19 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1579,12 +1579,15 @@ void rDecomposeC(leftv h,const ring R)
 
 lists rDecompose(const ring r)
 {
-  // sanity check:
+  // sanity check: require currRing==r for rings with polynomial data
   if ((r!=currRing) 
-  && ((r->minpoly!=NULL) || (r->qideal!=NULL) || (r->minideal!=NULL))
-  )
+  && ((r->minpoly!=NULL) || (r->qideal!=NULL) || (r->minideal!=NULL)
+#ifdef HAVE_PLURAL
+  || (rIsPluralRing(r))
+#endif
+  ))
   {
-    WerrorS("ring must be the base ring or compatible");
+    WerrorS("ring with polynomial data must be the base ring or compatible");
     return NULL;
   }
   // 0: char/ cf - ring
@@ -1787,7 +1790,17 @@ ring rCompose(const lists  L)
         R->parameter[i]=omStrDup(R->algring->names[i]);
       if (R->algring->qideal!=NULL)
       {
-        R->minpoly=pGetCoeff(R->algring->qideal->m[0]);
+        if (IDELEMS(R->algring->qideal)==1)
+        {
+          R->minpoly=pGetCoeff(R->algring->qideal->m[0]);
+          omFreeBinAddr(R->algring->qideal->m[0]);
+          R->algring->qideal->m[0]=NULL;
+          idDelete(&(R->algring->qideal));
+        }
+        else
+        {
+          WerrorS("not implemented yet.");
+        }
       }
     }
   }
