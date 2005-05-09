@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.246 2005-05-06 09:45:36 Singular Exp $
+@comment $Id: reference.doc,v 1.247 2005-05-09 07:54:20 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -7105,7 +7105,7 @@ default directories relative to the location of the @sc{Singular}
 executable program, and finally some default absolute directories. 
 You can view the search path which @sc{Singular} uses to locate its 
 libraries, by starting up @sc{Singular} with the option @code{-v}, 
-or by issuing the command @code{system("with");"}.
+or by issuing the command @code{system("with");}.
 
 Unless  @sc{Singular} is started with the @code{--no-stdlib} option, the
 library @code{standard.lib} is automatically loaded at start-up time.
