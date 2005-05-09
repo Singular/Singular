@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.247 2005-05-09 07:54:20 Singular Exp $
+@comment $Id: reference.doc,v 1.248 2005-05-09 08:06:02 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -3127,23 +3127,21 @@ directory, each directory contained in the library
 Unless  @sc{Singular} is started with the @code{--no-stdlib} option, the
 library @code{standard.lib} is automatically loaded at start-up time.
 
-@item @strong{Syntax:}
-@code{LIB;}
-@item @strong{Type:}
-string
-@item @strong{Purpose:}
-shows all loaded libraries written in Singular.
+@c @item @strong{Syntax:}
+@c @code{LIB;}
+@c @item @strong{Type:}
+@c string
+@c @item @strong{Purpose:}
+@c shows all loaded libraries written in Singular.
 
 
 @item @strong{Example:}
 @smallexample
 @c example
   option(loadLib); // show loading of libraries
-  LIB;             // standard.lib is loaded
 
                    // the names of the procedures of inout.lib
   LIB "inout.lib"; // are now known to Singular
-  LIB;
 @c example
 @end smallexample
 @end table
@@ -5271,10 +5269,21 @@ See
 list
 @item @strong{Purpose:}
 decomposes a ring/qring into a list of 4 (or 6 in the noncommutative case)
-components:i
+components:
 @itemize
 @item
-the field description,
+the field descriptions in one of the following variants:
+  @itemize
+  @item Q, Z/p:
+  the characteristic, type int (0 or prime number)
+  @item real, complex:
+  a list of:@*
+  the charcteristic, type int (always 0)@*
+  the precision, type list (2 integers: external, internal precision)@*
+  the name of the imaginary unit, type string
+  @item transcendental or algebraic extensions:
+  described as a ringlist
+  @end itemize
 @item
 the variable names (a list of strings)
 @item
@@ -5291,8 +5300,6 @@ the quotient ideal.
 @item @strong{Example:}
 @smallexample
 @c example
- ring R=32003,(x,y,z),dp;
- ringlist(R);
  ring r = 0,(x,y),dp;
  list l = ringlist(r);
  l;
@@ -7124,8 +7131,8 @@ command:
 @c example
 @end smallexample
 
-Each time a library @ref{Libraries} / dynamic module @ref{Dynamic
-loading} is loaded, the corresponding package is created, if it does
+Each time a library (@ref{Libraries}) / dynamic module (@ref{Dynamic
+loading}) is loaded, the corresponding package is created, if it does
 not already exist.
 
 The name of a package corresponding to a Singular library is
