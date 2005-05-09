@@ -109,7 +109,7 @@ CXXSOURCES=grammar.cc scanner.cc attrib.cc \
     janet.cc wrapper.cc\
     libparse.cc sing_win.cc\
     gms.cc pcv.cc maps_ip.cc\
-    tgb.cc walk.cc walk_ip.cc \
+    walk.cc walk_ip.cc \
     pShallowCopyDelete.cc cntrlc.cc misc.cc
 
 # stuff for MP
