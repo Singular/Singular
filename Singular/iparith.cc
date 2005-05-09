@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.355 2005-05-06 17:31:04 Singular Exp $ */
+/* $Id: iparith.cc,v 1.356 2005-05-09 08:07:50 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -3621,6 +3621,7 @@ static BOOLEAN jjSLIM_GB(leftv res, leftv u)
     return TRUE;
   }
   res->data=(char *)t_rep_gb(currRing, (ideal)u->Data());
+  setFlag(res,FLAG_STD);
   return FALSE;
 }
 static BOOLEAN jjSTD(leftv res, leftv v)
