@@ -1,7 +1,7 @@
-/*****************************************
+e*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.223 2005-05-04 14:09:45 Singular Exp $ */
+/* $Id: extra.cc,v 1.224 2005-05-09 13:58:54 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -806,30 +806,30 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       }
       if (h->Typ()==MATRIX_CMD)
       {
-	currRing->nc->type=nc_undef; /* to analyze later ! */
-	//	currRing->nc->IsSkewConstant=NULL;
+        currRing->nc->type=nc_undef; /* to analyze later ! */
+        //        currRing->nc->IsSkewConstant=NULL;
       }
       else
       {
-	nN=pGetCoeff(pN); // pN is not NULL anyway
-	if (nIsZero(nN)) 
-	{
-	  Werror("zero coefficients are not allowed");
-	  return TRUE;
-	}
-	if (nIsOne(nN)) currRing->nc->type=nc_lie; 
-	else currRing->nc->type=nc_skew;
-	currRing->nc->IsSkewConstant=1;
-	/* create matrix C */
-	C=mpNew(currRing->N,currRing->N);
-	for(i=1;i<currRing->N;i++)
-	{
-	  for(j=i+1;j<=currRing->N;j++)
-	  {
-	    MATELEM(C,i,j) = nc_p_CopyPut(pN,currRing);
-	    //  MATELEM(C,i,j)=pCopy(pN);
-	  }
-	}
+        nN=pGetCoeff(pN); // pN is not NULL anyway
+        if (nIsZero(nN))
+        {
+          Werror("zero coefficients are not allowed");
+          return TRUE;
+        }
+        if (nIsOne(nN)) currRing->nc->type=nc_lie;
+        else currRing->nc->type=nc_skew;
+        currRing->nc->IsSkewConstant=1;
+        /* create matrix C */
+        C=mpNew(currRing->N,currRing->N);
+        for(i=1;i<currRing->N;i++)
+        {
+          for(j=i+1;j<=currRing->N;j++)
+          {
+            MATELEM(C,i,j) = nc_p_CopyPut(pN,currRing);
+            //  MATELEM(C,i,j)=pCopy(pN);
+          }
+        }
       }
       pN=NULL;
       h=hh;
@@ -861,14 +861,14 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       } /* end else h==NULL */
       if (pN==NULL)
       {
-	if (currRing->nc->type==nc_lie) 
-	{
-	  currRing->nc->type=nc_skew; /* even commutative! */
-	}
+        if (currRing->nc->type==nc_lie)
+        {
+          currRing->nc->type=nc_skew; /* even commutative! */
+        }
       }
-      else  
-      { 
-	if (currRing->nc->type==nc_skew) currRing->nc->type=nc_general; 
+      else
+      {
+        if (currRing->nc->type==nc_skew) currRing->nc->type=nc_general;
       } /* end pN==NULL */
       if (h==NULL)
       {
@@ -950,14 +950,14 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         if (IsNonComm==1)
         {
           assume(pN!=NULL);
-	  if ((tmpIsSkewConstant==1) && (nIsOne(pGetCoeff(pN)))) currRing->nc->type=nc_lie;
-	  else currRing->nc->type=nc_general;
-	}
-	if (IsNonComm==0) 
-	{
-	  currRing->nc->type=nc_skew; /* could be also commutative */
-	  currRing->nc->IsSkewConstant=tmpIsSkewConstant;
-	}
+          if ((tmpIsSkewConstant==1) && (nIsOne(pGetCoeff(pN)))) currRing->nc->type=nc_lie;
+          else currRing->nc->type=nc_general;
+        }
+        if (IsNonComm==0)
+        {
+          currRing->nc->type=nc_skew; /* could be also commutative */
+          currRing->nc->IsSkewConstant=tmpIsSkewConstant;
+        }
       }
       currRing->nc->COM=COM;
       return FALSE;
@@ -1006,16 +1006,16 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         Rop = (ring)h->Data();
         h   = h->next;
       }
-      if ((h!=NULL)) 
+      if ((h!=NULL))
       {
-	idhdl w;
-	if ((w=Rop->idroot->get(h->Name(),myynest))!=NULL)
-	{
-	  poly p = (poly)IDDATA(w);
-	  res->data = pOppose(Rop,p);
-	  res->rtyp = POLY_CMD;
-	  return FALSE;
-	}
+        idhdl w;
+        if ((w=Rop->idroot->get(h->Name(),myynest))!=NULL)
+        {
+          poly p = (poly)IDDATA(w);
+          res->data = pOppose(Rop,p);
+          res->rtyp = POLY_CMD;
+          return FALSE;
+        }
        }
       else
       {
@@ -1076,7 +1076,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     if (strcmp(sys_cmd, "walkAddIntVec") == 0)
     {
       if (h == NULL || h->Typ() != INTVEC_CMD ||
-	  h->next == NULL || h->next->Typ() != INTVEC_CMD) 
+          h->next == NULL || h->next->Typ() != INTVEC_CMD)
       {
         WerrorS("system(\"walkAddIntVec\", intvec, intvec) expected");
         return TRUE;
@@ -1090,7 +1090,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       return FALSE;
     }
     else
-#endif 
+#endif
 #ifdef MwaklNextWeight
     if (strcmp(sys_cmd, "MwalkNextWeight") == 0)
     {
@@ -1117,7 +1117,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 
       res->rtyp = INTVEC_CMD;
       res->data =  result;
-      
+
       return FALSE;
     }
     else
@@ -1136,14 +1136,14 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         return TRUE;
       }
       int arg1 = (int) h->Data();
-    
+
       intvec* result = (intvec*) Mivdp(arg1);
 
       res->rtyp = INTVEC_CMD;
       res->data =  result;
-      
+
       return FALSE;
-    }    
+    }
 
     else if(strcmp(sys_cmd, "Mivlp") == 0)
     {
@@ -1159,18 +1159,18 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         return TRUE;
       }
       int arg1 = (int) h->Data();
-    
+
       intvec* result = (intvec*) Mivlp(arg1);
 
       res->rtyp = INTVEC_CMD;
       res->data =  result;
-      
+
       return FALSE;
     }
    else
 #ifdef MpDiv
       if(strcmp(sys_cmd, "MpDiv") == 0)
-      {        
+      {
         if(h==NULL || h->Typ() != POLY_CMD ||
            h->next == NULL || h->next->Typ() != POLY_CMD)
         {
@@ -1179,7 +1179,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         }
         poly arg1 = (poly) h->Data();
         poly arg2 = (poly) h->next->Data();
-        
+
         poly result = MpDiv(arg1, arg2);
 
         res->rtyp = POLY_CMD;
@@ -1190,7 +1190,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 #endif
 #ifdef MpMult
       if(strcmp(sys_cmd, "MpMult") == 0)
-      {        
+      {
         if(h==NULL || h->Typ() != POLY_CMD ||
            h->next == NULL || h->next->Typ() != POLY_CMD)
         {
@@ -1199,7 +1199,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         }
         poly arg1 = (poly) h->Data();
         poly arg2 = (poly) h->next->Data();
-        
+
         poly result = MpMult(arg1, arg2);
         res->rtyp = POLY_CMD;
         res->data = result;
@@ -1216,17 +1216,17 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         return TRUE;
       }
       /*
-      if (((intvec*) h->Data())->length() != currRing->N || 
-          ((intvec*) h->next->Data())->length() != currRing->N)  
+      if (((intvec*) h->Data())->length() != currRing->N ||
+          ((intvec*) h->next->Data())->length() != currRing->N)
       {
-        Werror("system(\"MivSame\" ...) intvecs not of length %d\n", 
-               currRing->N); 
-        return TRUE; 
-      } 
+        Werror("system(\"MivSame\" ...) intvecs not of length %d\n",
+               currRing->N);
+        return TRUE;
+      }
       */
       intvec* arg1 = (intvec*) h->Data();
       intvec* arg2 = (intvec*) h->next->Data();
-      /*    
+      /*
       poly result = (poly) MivSame(arg1, arg2);
 
       res->rtyp = POLY_CMD;
@@ -1240,25 +1240,25 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     {
       if(h == NULL || h->Typ() != INTVEC_CMD ||
          h->next == NULL || h->next->Typ() != INTVEC_CMD ||
-	 h->next->next == NULL || h->next->next->Typ() != INTVEC_CMD  )
+         h->next->next == NULL || h->next->next->Typ() != INTVEC_CMD  )
       {
         Werror("system(\"M3ivSame\", intvec, intvec, intvec) expected");
         return TRUE;
       }
       /*
-      if (((intvec*) h->Data())->length() != currRing->N || 
+      if (((intvec*) h->Data())->length() != currRing->N ||
           ((intvec*) h->next->Data())->length() != currRing->N ||
-	  ((intvec*) h->next->next->Data())->length() != currRing->N )  
+          ((intvec*) h->next->next->Data())->length() != currRing->N )
       {
-        Werror("system(\"M3ivSame\" ...) intvecs not of length %d\n", 
-               currRing->N); 
-        return TRUE; 
-      } 
+        Werror("system(\"M3ivSame\" ...) intvecs not of length %d\n",
+               currRing->N);
+        return TRUE;
+      }
       */
       intvec* arg1 = (intvec*) h->Data();
       intvec* arg2 = (intvec*) h->next->Data();
       intvec* arg3 = (intvec*) h->next->next->Data();
-      /*  
+      /*
       poly result = (poly) M3ivSame(arg1, arg2, arg3);
 
       res->rtyp = POLY_CMD;
@@ -1293,7 +1293,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
   else
     /************** Perturbation walk **********/
      if(strcmp(sys_cmd, "MivMatrixOrder") == 0)
-      {         
+      {
         if(h==NULL || h->Typ() != INTVEC_CMD)
         {
           Werror("system(\"MivMatrixOrder\",intvec) expected");
@@ -1309,14 +1309,14 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       }
     else
      if(strcmp(sys_cmd, "MivMatrixOrderdp") == 0)
-      {         
+      {
         if(h==NULL || h->Typ() != INT_CMD)
         {
           Werror("system(\"MivMatrixOrderdp\",intvec) expected");
           return TRUE;
         }
         int arg1 = (int) h->Data();
-        
+
         intvec* result = (intvec*) MivMatrixOrderdp(arg1);
 
         res->rtyp = INTVEC_CMD;
@@ -1326,7 +1326,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     else
     if(strcmp(sys_cmd, "MPertVectors") == 0)
       {
-        
+
         if(h==NULL || h->Typ() != IDEAL_CMD ||
            h->next == NULL || h->next->Typ() != INTVEC_CMD ||
            h->next->next == NULL || h->next->next->Typ() != INT_CMD)
@@ -1334,11 +1334,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
           Werror("system(\"MPertVectors\",ideal, intvec, int) expected");
           return TRUE;
         }
-        
+
         ideal arg1 = (ideal) h->Data();
         intvec* arg2 = (intvec*) h->next->Data();
         int arg3 = (int) h->next->next->Data();
-               
+
         intvec* result = (intvec*) MPertVectors(arg1, arg2, arg3);
 
         res->rtyp = INTVEC_CMD;
@@ -1348,7 +1348,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     else
     if(strcmp(sys_cmd, "MPertVectorslp") == 0)
       {
-        
+
         if(h==NULL || h->Typ() != IDEAL_CMD ||
            h->next == NULL || h->next->Typ() != INTVEC_CMD ||
            h->next->next == NULL || h->next->next->Typ() != INT_CMD)
@@ -1356,11 +1356,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
           Werror("system(\"MPertVectorslp\",ideal, intvec, int) expected");
           return TRUE;
         }
-        
+
         ideal arg1 = (ideal) h->Data();
         intvec* arg2 = (intvec*) h->next->Data();
         int arg3 = (int) h->next->next->Data();
-               
+
         intvec* result = (intvec*) MPertVectorslp(arg1, arg2, arg3);
 
         res->rtyp = INTVEC_CMD;
@@ -1378,24 +1378,24 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
           return TRUE;
         }
         ideal arg1 = (ideal) h->Data();
-        intvec* arg2 = (intvec*) h->next->Data(); 
+        intvec* arg2 = (intvec*) h->next->Data();
         intvec* result = Mfpertvector(arg1, arg2);
- 
+
         res->rtyp = INTVEC_CMD;
         res->data =  result;
         return FALSE;
       }
     else
      if(strcmp(sys_cmd, "MivUnit") == 0)
-      {         
+      {
         int arg1 = (int) h->Data();
-        
+
         intvec* result = (intvec*) MivUnit(arg1);
 
         res->rtyp = INTVEC_CMD;
         res->data =  result;
         return FALSE;
-      } 
+      }
      else
        if(strcmp(sys_cmd, "MivWeightOrderlp") == 0)
        {
@@ -1406,7 +1406,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         }
         intvec* arg1 = (intvec*) h->Data();
         intvec* result = MivWeightOrderlp(arg1);
- 
+
         res->rtyp = INTVEC_CMD;
         res->data =  result;
         return FALSE;
@@ -1421,23 +1421,23 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         }
         intvec* arg1 = (intvec*) h->Data();
         //int arg2 = (int) h->next->Data();
- 
+
         intvec* result = MivWeightOrderdp(arg1);
- 
+
         res->rtyp = INTVEC_CMD;
         res->data =  result;
         return FALSE;
       }
-    else             
+    else
      if(strcmp(sys_cmd, "MivMatrixOrderlp") == 0)
-      {         
+      {
         if(h==NULL || h->Typ() != INT_CMD)
         {
           Werror("system(\"MivMatrixOrderlp\",int) expected");
           return TRUE;
         }
         int arg1 = (int) h->Data();
-        
+
         intvec* result = (intvec*) MivMatrixOrderlp(arg1);
 
         res->rtyp = INTVEC_CMD;
@@ -1470,7 +1470,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 
       res->rtyp = INTVEC_CMD;
       res->data =  result;
-      
+
       return FALSE;
     }
     else
@@ -1499,7 +1499,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 
       res->rtyp = INTVEC_CMD;
       res->data =  result;
-      
+
       return FALSE;
     }
     else
@@ -1521,7 +1521,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 
       res->rtyp = INTVEC_CMD;
       res->data =  result;
-      
+
       return FALSE;
     }
     else
@@ -1537,7 +1537,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       }
 
       if (((intvec*) h->next->Data())->length() != currRing->N &&
-	  ((intvec*) h->next->next->Data())->length() != currRing->N )
+          ((intvec*) h->next->next->Data())->length() != currRing->N )
       {
         Werror("system(\"Mwalk\" ...) intvecs not of length %d\n",
                currRing->N);
@@ -1552,7 +1552,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 
       res->rtyp = IDEAL_CMD;
       res->data =  result;
-      
+
       return FALSE;
     }
     else
@@ -1562,17 +1562,17 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       if (h == NULL || h->Typ() != IDEAL_CMD ||
           h->next == NULL || h->next->Typ() != INT_CMD ||
           h->next->next == NULL || h->next->next->Typ() != INT_CMD ||
-          h->next->next->next == NULL || 
-	    h->next->next->next->Typ() != INTVEC_CMD ||
-          h->next->next->next->next == NULL || 
-	    h->next->next->next->next->Typ() != INTVEC_CMD)
+          h->next->next->next == NULL ||
+            h->next->next->next->Typ() != INTVEC_CMD ||
+          h->next->next->next->next == NULL ||
+            h->next->next->next->next->Typ() != INTVEC_CMD)
       {
         Werror("system(\"Mpwalk\", ideal, int, int, intvec, intvec) expected");
         return TRUE;
       }
 
       if (((intvec*) h->next->next->next->Data())->length() != currRing->N &&
-	  ((intvec*) h->next->next->next->next->Data())->length()!=currRing->N)
+          ((intvec*) h->next->next->next->next->Data())->length()!=currRing->N)
       {
         Werror("system(\"Mpwalk\" ...) intvecs not of length %d\n",
                currRing->N);
@@ -1589,7 +1589,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 
       res->rtyp = IDEAL_CMD;
       res->data =  result;
-      
+
       return FALSE;
     }
     else
@@ -1599,19 +1599,19 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       if (h == NULL || h->Typ() != IDEAL_CMD ||
           h->next == NULL || h->next->Typ() != INT_CMD ||
           h->next->next == NULL || h->next->next->Typ() != INT_CMD ||
-          h->next->next->next == NULL || 
-	    h->next->next->next->Typ() != INTVEC_CMD ||
-          h->next->next->next->next == NULL || 
-	    h->next->next->next->next->Typ() != INTVEC_CMD||
-          h->next->next->next->next->next == NULL || 
-	    h->next->next->next->next->next->Typ() != INT_CMD)
+          h->next->next->next == NULL ||
+            h->next->next->next->Typ() != INTVEC_CMD ||
+          h->next->next->next->next == NULL ||
+            h->next->next->next->next->Typ() != INTVEC_CMD||
+          h->next->next->next->next->next == NULL ||
+            h->next->next->next->next->next->Typ() != INT_CMD)
       {
         Werror("system(\"Mpwalk\", ideal, int, int, intvec, intvec, int) expected");
         return TRUE;
       }
 
       if (((intvec*) h->next->next->next->Data())->length() != currRing->N &&
-	  ((intvec*) h->next->next->next->next->Data())->length()!=currRing->N)
+          ((intvec*) h->next->next->next->next->Data())->length()!=currRing->N)
       {
         Werror("system(\"Mpwalk\" ...) intvecs not of length %d\n",
                currRing->N);
@@ -1629,7 +1629,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 
       res->rtyp = IDEAL_CMD;
       res->data =  result;
-      
+
       return FALSE;
     }
     else
@@ -1638,17 +1638,17 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       if (h == NULL || h->Typ() != IDEAL_CMD ||
           h->next == NULL || h->next->Typ() != INT_CMD ||
           h->next->next == NULL || h->next->next->Typ() != INT_CMD ||
-          h->next->next->next == NULL || 
-	    h->next->next->next->Typ() != INTVEC_CMD ||
-          h->next->next->next->next == NULL || 
-	    h->next->next->next->next->Typ() != INTVEC_CMD)
+          h->next->next->next == NULL ||
+            h->next->next->next->Typ() != INTVEC_CMD ||
+          h->next->next->next->next == NULL ||
+            h->next->next->next->next->Typ() != INTVEC_CMD)
       {
         Werror("system(\"MAltwalk1\", ideal, int, int, intvec, intvec) expected");
         return TRUE;
       }
 
       if (((intvec*) h->next->next->next->Data())->length() != currRing->N &&
-	  ((intvec*) h->next->next->next->next->Data())->length()!=currRing->N)
+          ((intvec*) h->next->next->next->next->Data())->length()!=currRing->N)
       {
         Werror("system(\"MAltwalk1\" ...) intvecs not of length %d\n",
                currRing->N);
@@ -1665,7 +1665,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 
       res->rtyp = IDEAL_CMD;
       res->data =  result;
-      
+
       return FALSE;
     }
 #ifdef MFWALK_ALT
@@ -1682,7 +1682,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       }
 
       if (((intvec*) h->next->Data())->length() != currRing->N &&
-	  ((intvec*) h->next->next->Data())->length() != currRing->N )
+          ((intvec*) h->next->next->Data())->length() != currRing->N )
       {
         Werror("system(\"Mfwalk\" ...) intvecs not of length %d\n",
                currRing->N);
@@ -1697,7 +1697,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 
       res->rtyp = IDEAL_CMD;
       res->data =  result;
-      
+
       return FALSE;
     }
 #endif
@@ -1713,7 +1713,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       }
 
       if (((intvec*) h->next->Data())->length() != currRing->N &&
-	  ((intvec*) h->next->next->Data())->length() != currRing->N )
+          ((intvec*) h->next->next->Data())->length() != currRing->N )
       {
         Werror("system(\"Mfwalk\" ...) intvecs not of length %d\n",
                currRing->N);
@@ -1727,11 +1727,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 
       res->rtyp = IDEAL_CMD;
       res->data =  result;
-      
+
       return FALSE;
     }
     else
- 
+
 #ifdef TRAN_Orig
     if (strcmp(sys_cmd, "TranMImprovwalk") == 0)
     {
@@ -1744,7 +1744,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       }
 
       if (((intvec*) h->next->Data())->length() != currRing->N &&
-	  ((intvec*) h->next->next->Data())->length() != currRing->N )
+          ((intvec*) h->next->next->Data())->length() != currRing->N )
       {
         Werror("system(\"TranMImprovwalk\" ...) intvecs not of length %d\n",
                currRing->N);
@@ -1759,7 +1759,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 
       res->rtyp = IDEAL_CMD;
       res->data =  result;
-      
+
       return FALSE;
     }
     else
@@ -1775,7 +1775,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       }
 
       if (((intvec*) h->next->Data())->length() != currRing->N &&
-	  ((intvec*) h->next->next->Data())->length() != currRing->N )
+          ((intvec*) h->next->next->Data())->length() != currRing->N )
       {
         Werror("system(\"MAltwalk2\" ...) intvecs not of length %d\n",
                currRing->N);
@@ -1790,7 +1790,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 
       res->rtyp = IDEAL_CMD;
       res->data =  result;
-      
+
       return FALSE;
     }
     else
@@ -1806,7 +1806,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       }
 
       if (((intvec*) h->next->Data())->length() != currRing->N &&
-	  ((intvec*) h->next->next->Data())->length() != currRing->N )
+          ((intvec*) h->next->next->Data())->length() != currRing->N )
       {
         Werror("system(\"TranMImprovwalk\" ...) intvecs not of length %d\n",
                currRing->N);
@@ -1821,7 +1821,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 
       res->rtyp = IDEAL_CMD;
       res->data =  result;
-      
+
       return FALSE;
     }
     else
@@ -2478,25 +2478,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     else
 #endif
 /*==================== t-rep-GB ==================================*/
-    if (strcmp(sys_cmd, "trepgb")==0)
-    {
-      ring r = currRing;
-      ideal i = (ideal)h->Data();
-      h=h->next;
-      if(h)
-      {
-	
-	BOOLEAN b=(BOOLEAN) h->Data();
-	res->data=t_rep_gb(r,i,b);
-      }
-      else
-	res->data=t_rep_gb(r,i);
-      res->rtyp=IDEAL_CMD;
-      setFlag(res,FLAG_STD);
-      return(FALSE);
-    }
-    else
-      if (strcmp(sys_cmd, "unifastmult")==0)
+    if (strcmp(sys_cmd, "unifastmult")==0)
     {
       ring r = currRing;
       poly f = (poly)h->Data();
@@ -2507,7 +2489,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       return(FALSE);
     }
     else
-      if (strcmp(sys_cmd, "multifastmult")==0)
+    if (strcmp(sys_cmd, "multifastmult")==0)
     {
       ring r = currRing;
       poly f = (poly)h->Data();
@@ -2517,17 +2499,15 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       res->data=multifastmult(f,g,currRing);
       return(FALSE);
     }
-      else
-
-      if (strcmp(sys_cmd, "mults")==0)
+    else
+    if (strcmp(sys_cmd, "mults")==0)
     {
-
       res->rtyp=INT_CMD ;
       res->data=(void*) Mults();
       return(FALSE);
     }
-      else
-	if (strcmp(sys_cmd, "fastpower")==0)
+    else
+    if (strcmp(sys_cmd, "fastpower")==0)
     {
       ring r = currRing;
       poly f = (poly)h->Data();
@@ -2537,8 +2517,8 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       res->data=(void*) pFastPower(f,n,r);
       return(FALSE);
     }
-	else
-	  	if (strcmp(sys_cmd, "normalpower")==0)
+    else
+    if (strcmp(sys_cmd, "normalpower")==0)
     {
       ring r = currRing;
       poly f = (poly)h->Data();
@@ -2549,8 +2529,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       return(FALSE);
     }
     else
-     
-	  	if (strcmp(sys_cmd, "MCpower")==0)
+    if (strcmp(sys_cmd, "MCpower")==0)
     {
       ring r = currRing;
       poly f = (poly)h->Data();
@@ -2561,8 +2540,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       return(FALSE);
     }
     else
-     
-	  	if (strcmp(sys_cmd, "bit_subst")==0)
+    if (strcmp(sys_cmd, "bit_subst")==0)
     {
       ring r = currRing;
       poly outer = (poly)h->Data();
