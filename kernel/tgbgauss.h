@@ -2,7 +2,9 @@
 #define TGBGAUSS_HEADER
 #include "mod2.h"
 #include "numbers.h"
-#include "tgb_internal.h"
+//#include "tgb_internal.h"
+
+struct calc_dat;
 
 class tgb_matrix{
  private:

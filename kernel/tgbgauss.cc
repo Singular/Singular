@@ -1,6 +1,10 @@
 #include "mod2.h"
 #include "tgbgauss.h"
-
+#include <omalloc.h>
+#include <stdlib.h>
+#include "kutil.h"
+#include "febase.h"
+#include "polys.h"
 static const int bundle_size=100;
 
 mac_poly mac_p_add_ff_qq(mac_poly a, number f,mac_poly b){
