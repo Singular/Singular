@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.126 2005-05-02 22:00:55 levandov Exp $
+@comment $Id: types.doc,v 1.127 2005-05-09 14:50:27 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -3496,6 +3496,12 @@ If one of coefficient_field, names_of_ring_variables, and ordering
 consists of only one entry, the parentheses around this entry may be
 omitted.
 
+@c ref
+See also
+@ref{Examples of ring declarations};
+@ref{ring};
+@ref{ringlist}.
+@c ref
 @c ---------------------------------------
 @node ring related functions, ring operations, ring declarations, ring
 @subsection ring related functions
