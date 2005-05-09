@@ -10,6 +10,7 @@
 //       try to create spolys as formal sums
 
 #include "tgb.h"
+#include "tgb_internal.h"
 static const int bundle_size=100;
 #if 1
 static omBin lm_bin=NULL;
