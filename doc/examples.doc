@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.76 2005-05-06 15:51:55 Singular Exp $
+@comment $Id: examples.doc,v 1.77 2005-05-09 07:58:37 Singular Exp $
 @comment this file contains the examples
 
 @c The following directives are necessary for proper compilation
@@ -940,7 +940,7 @@ x1*u3+2*x2*u1-2*x2*u2-2*x3*u3-u1*u4+u2*u4,
 -x1*x4+x1*u1-x5*u1+x5*u4,
 -2*x1*x3+x1*u3-2*x2*u4+u1*u4+u2*u4,
 x1^2*u3+x1*u1*u2-x1*u2^2-x1*u3^2-u1*u3*u4+u3*u4^2;
-i=system("trepgb", i);
+i=slimgb(i);
 
 @c example
 @end smallexample
