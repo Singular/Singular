@@ -1,7 +1,7 @@
-e*****************************************
+/*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.224 2005-05-09 13:58:54 Singular Exp $ */
+/* $Id: extra.cc,v 1.225 2005-05-09 15:54:54 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
