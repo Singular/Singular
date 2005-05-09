@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: int64vec.cc,v 1.2 2005-05-09 12:14:57 Singular Exp $ */
+/* $Id: int64vec.cc,v 1.3 2005-05-09 13:47:29 Singular Exp $ */
 /*
 * ABSTRACT: class int64vec: lists/vectors of int64
 */
@@ -95,13 +95,6 @@ char * int64vec::iv64String(int not_mat,int mat,int spaces, int dim)
   return StringAppendS("");
 }
 
-void int64vec::resize(int new_length)
-{
-  assume(new_length > 0 && col == 1);
-  v = (int64*) omRealloc0Size(v, row*sizeof(int64), new_length*sizeof(int64));
-  row = new_length;
-}
-
 char * int64vec::String(int dim)
 {
   return omStrDup(iv64String(0, 0, dim));
@@ -115,45 +108,22 @@ void int64vec::show(int mat,int spaces)
     PrintS(iv64String(mat,0));
 }
 
-void int64vec::operator+=(int64 intop)
-{
-  for (int i=0; i<row*col; i++) { v[i] += intop; }
-}
-
-void int64vec::operator-=(int64 intop)
-{
-  for (int i=0; i<row*col; i++) { v[i] -= intop; }
-}
-
 void int64vec::operator*=(int64 intop)
 {
-  for (int i=0; i<row*col; i++) { v[i] *= intop; }
+  for (int i=row*col-1; i>=0; i--) { v[i] *= intop; }
 }
 
 void int64vec::operator/=(int64 intop)
 {
   if (intop == 0) return;
   int64 bb=ABS(intop);
-  for (int i=0; i<row*col; i++)
+  for (int i=row*col-1; i>=0; i--)
   {
     int64 r=v[i];
     int64 c=r%bb;
     if (c<0) c+=bb;
     r=(r-c)/intop;
     v[i]=r;
-  }
-}
-
-void int64vec::operator%=(int64 intop)
-{
-  if (intop == 0) return;
-  int64 bb=ABS(intop);
-  for (int i=0; i<row*col; i++)
-  {
-    int64 r=v[i];
-    int64 c=r%bb;
-    if (c<0) c+=bb;
-    v[i]=c;
   }
 }
 
@@ -189,21 +159,6 @@ int int64vec::compare(int64vec* op)
       return -1;
   }
   return 0;
-}
-int int64vec::compare(int64 o)
-{
-  for (int i=0; i<row*col; i++)
-  {
-    if (v[i] <o) return -1;
-    if (v[i] >o) return 1;
-  }
-  return 0;
-}
-
-int64vec * iv64Copy(int64vec * o)
-{
-  int64vec * iv=new int64vec(o);
-  return iv;
 }
 
 int64vec * iv64Add(int64vec * a, int64vec * b)
@@ -263,51 +218,6 @@ int64vec * iv64Sub(int64vec * a, int64vec * b)
   if (mn != ma) return NULL;
   iv = new int64vec(a);
   for (i=0; i<mn*a->cols(); i++) { (*iv)[i] -= (*b)[i]; }
-  return iv;
-}
-
-int64vec * iv64Tranp(int64vec * o)
-{
-  int i, j, r = o->rows(), c = o->cols();
-  int64vec * iv= new int64vec(c, r, 0);
-  for (i=0; i<r; i++)
-  {
-    for (j=0; j<c; j++)
-      (*iv)[j*r+i] = (*o)[i*c+j];
-  }
-  return iv;
-}
-
-int64 iv64Trace(int64vec * o)
-{
-  int i, m = si_min(o->rows(),o->cols()), c = o->cols();
-  int64 s = 0;
-  for (i=0; i<m; i++)
-  {
-    s += (*o)[i*c+i];
-  }
-  return s;
-}
-
-int64vec * iv64Mult(int64vec * a, int64vec * b)
-{
-  int i, j, k,
-      ra = a->rows(), ca = a->cols(),
-      rb = b->rows(), cb = b->cols();
-  int64 sum;
-  int64vec * iv;
-  if (ca != rb) return NULL;
-  iv = new int64vec(ra, cb, 0);
-  for (i=0; i<ra; i++)
-  {
-    for (j=0; j<cb; j++)
-    {
-      sum = 0;
-      for (k=0; k<ca; k++)
-        sum += (*a)[i*ca+k]*(*b)[k*cb+j];
-      (*iv)[i*cb+j] = sum;
-    }
-  }
   return iv;
 }
 

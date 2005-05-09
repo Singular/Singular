@@ -216,14 +216,17 @@ void getTaun64(ideal G,intvec* targm,int pertdeg, int64vec** v64, int64 & i64)
   //temp64 is used to check for overflow:
   for (n=2; n<=pertdeg; n++)
   {
-    temp64=iv64Copy(taun64);
-    (*taun64)*=inveps64;
-    for(int i=0; i<currRing->N;i++)
+    if (inveps64!=1)
     {
-      if((*temp64)[i]!=0 && (((*taun64)[i])/((*temp64)[i]))!=inveps64)
-      overflow_error=12;
+      temp64=iv64Copy(taun64);
+      (*taun64)*=inveps64;
+      for(int i=0; i<currRing->N;i++)
+      {
+        if((*temp64)[i]!=0 && (((*taun64)[i])/((*temp64)[i]))!=inveps64)
+        overflow_error=12;
+      }
+      delete temp64;
     }
-    delete temp64;
     temp64=iv64Copy(taun64);
     add64=getNthRow64(targm,n);
     taun64=iv64Add(add64,taun64);
