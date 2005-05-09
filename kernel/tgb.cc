@@ -1640,11 +1640,15 @@ int exp_number_builder::get_n(poly p){
 
 //mac_polys exp are smaller iff they are greater by monomial ordering
 //corresponding to solving linear equations notation
+
+//* obsolete
 struct int_poly_pair{
   poly p;
   int n;
 };
 
+
+//* obsolete
 void t2ippa_rec(poly* ip,int* ia, poly_tree_node* k, int &offset){
     if(!k) return;
     t2ippa_rec(ip,ia,k->l,offset);
@@ -1655,6 +1659,8 @@ void t2ippa_rec(poly* ip,int* ia, poly_tree_node* k, int &offset){
     t2ippa_rec(ip,ia,k->r,offset);
     delete k;
   }
+
+//*obsolete
 void t2ippa(poly* ip,int* ia,exp_number_builder & e){
 
   int o=0;
@@ -1670,6 +1676,8 @@ BOOLEAN is_valid_ro(red_object & ro){
   if ((r2.p!=ro.p)||(r2.sev!=ro.sev)||(r2.sum!=ro.sum)) return FALSE;
   return TRUE;
 }
+
+//*obsolete
 void pre_comp(poly* p,int & pn,calc_dat* c){
   if(!(pn))
     return;
@@ -4100,40 +4108,7 @@ static void multi_reduction(red_object* los, int & losl, calc_dat* c)
     erg.expand=NULL;
     int d=erg.to_reduce_u-erg.to_reduce_l+1;
     //if ((!erg.fromS)&&(d>100)){
-    if (0){
-      PrintS("L");
-      if(!erg.fromS){
-	erg.to_reduce_u=si_max(erg.to_reduce_u,erg.reduce_by);
-	if (pLmEqual(los[erg.reduce_by].p,los[erg.to_reduce_l].p))
-	  erg.to_reduce_l=si_min(erg.to_reduce_l,erg.reduce_by);
-      }
-      int pn=erg.to_reduce_u+1-erg.to_reduce_l;
-      poly* p=(poly*) omalloc((pn)*sizeof(poly));
-      int i;
-      for(i=0;i<pn;i++){
-	int len;
-	los[erg.to_reduce_l+i].flatten();
-	kBucketClear(los[erg.to_reduce_l+i].bucket,&p[i],&len);
-	
-	redTailShort(p[i],c->strat);
-      }
-      pre_comp(p,pn,c);
-      int j;
-      for(j=0;j<pn;j++){
-	los[erg.to_reduce_l+j].p=p[j];
-	los[erg.to_reduce_l+j].sev=pGetShortExpVector(p[j]);
-	los[erg.to_reduce_l+j].sum=NULL;
-	int len=pLength(p[j]);
-	kBucketInit(los[erg.to_reduce_l+j].bucket,los[erg.to_reduce_l+j].p,len);
-      }
-      for(j=erg.to_reduce_l+pn;j<=erg.to_reduce_u;j++){
-	los[j].p=NULL;
-	
-      }
-
-      omfree(p);
-    }
-    else {
+    
     multi_reduction_lls_trick(los,losl,c,erg);
     int sum=0;
 
@@ -4143,7 +4118,7 @@ static void multi_reduction(red_object* los, int & losl, calc_dat* c)
     //    wrp(los[erg.to_reduce_u].p);
     //Print("\n");
     multi_reduce_step(erg,los,c);
-    }
+   
 //     reduction_step *rs=create_reduction_step(erg, los, c);
 //     rs->reduce(los,erg.to_reduce_l,erg.to_reduce_u);
 //     finalize_reduction_step(rs);
