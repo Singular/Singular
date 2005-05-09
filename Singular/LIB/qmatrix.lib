@@ -1,20 +1,20 @@
-version="$Id: qmatrix.lib,v 1.10 2005-05-06 14:39:06 hannes Exp $";
+version="$Id: qmatrix.lib,v 1.11 2005-05-09 10:31:30 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: qmatrix.lib     Quantum matrices, quantum minors and symmetric groups
 AUTHORS: Lobillo, F.J.,  jlobillo@ugr.es
-@*         Rabelo, C.,     crabelo@ugr.es
+@*       Rabelo, C.,     crabelo@ugr.es
 
 SUPPORT: 'Metodos algebraicos y efectivos en grupos cuanticos', BFM2001-3141, MCYT, Jose Gomez-Torrecillas (Main researcher).
 
 MAIN PROCEDURES:
-quant(n, [p]);                generates the quantum matrix ring of order n;
+quantMat(n, [p]);          generates the quantum matrix ring of order n;
 qminor(u, v, nr);          calculate a quantum minor of a quantum matrix
 
 AUXILIARY PROCEDURES:
-SymGroup(n);                  generates an intmat containing S(n), each row is an element of S(n)
+SymGroup(n);                generates an intmat containing S(n), each row is an element of S(n)
 LengthSymElement(v);        calculates the length of the element v of S(n)
-LengthSym(M);                calculates the length of each element of M, being M a subset of S(n)
+LengthSym(M);               calculates the length of each element of M, being M a subset of S(n)
 ";
 
 LIB "ncalg.lib";
@@ -22,11 +22,11 @@ LIB "nctools.lib";
 ///////////////////////////////////////////////////////////////////////////////
 
 proc SymGroup(int n)
-"USAGE:   SymGroup(n); n an integer, n>0
-PURPOSE: present the symmetric group S(n) via integer vectors
+"USAGE:   SymGroup(n); n an integer (positive)
 RETURN:  intmat
+PURPOSE: represent the symmetric group S(n) via integer vectors (permutations)
 NOTE:    each row of the output integer matrix is an element of S(n)
-SEE ALSO: LengthSym, LengthSymElement;
+SEE ALSO: LengthSym, LengthSymElement
 EXAMPLE: example SymGroup; shows examples
 "{
   if (n<=0)
@@ -78,10 +78,10 @@ example
 // If size(v)=n, the group is S(n). The permutation is i->v[i].
 
 proc LengthSymElement(intvec v)
-"USAGE:   LengthSymElement(v); v an intvec representing an element of S(n)
-PURPOSE: determine the length of v
+"USAGE:  LengthSymElement(v); v intvec 
 RETURN:  int
-NOTE:    if v doesn't represent an element of S(n), the output may have no sense
+PURPOSE: determine the length of v
+ASSUME:  v represents an element of S(n); otherwise the output may have no sense
 SEE ALSO: SymGroup, LengthSym
 EXAMPLE: example LengthSymElement; shows examples
 "{
@@ -107,10 +107,10 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc LengthSym(intmat M)
-"USAGE:   LengthSym(M); M an intmat representing a subset of S(n) (each row must be an element of S(n))
-PURPOSE: determine a vector, which i-th element is the length of the i-th row of M
+"USAGE:   LengthSym(M); M an intmat 
 RETURN:  intvec
-NOTE:    If M is not a subset of S(n), the output may not have meaning
+PURPOSE: determine a vector, where the i-th element is the length of the i-th row of M
+ASSUME: M represents a subset of S(n) (each row must be an element of S(n)); otherwise, the output may have no sense
 SEE ALSO: SymGroup, LengthSymElement
 EXAMPLE: example LengthSym; shows examples
 "{
@@ -128,25 +128,24 @@ EXAMPLE: example LengthSym; shows examples
 example
 {
   "EXAMPLE:";echo=2;
-  def M=SymGroup(3);
-  M;
+  def M = SymGroup(3); M;
   LengthSym(M);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc quant(int n, list #)
-"USAGE:   quant(n [, p]); n integer (n>1), p an optional integer
-PURPOSE: compute the quantum matrix ring of order n;
+proc quantMat(int n, list #)
+"USAGE:   quantMat(n [, p]); n integer (n>1), p an optional integer
 RETURN:  ring (of quantum matrices). If p is specified, the quantum parameter q
-@*       will be specialized at p-th root of unity
-NOTE:    You have to activate this ring with the 'setring' command.
+@*       will be specialized at the p-th root of unity
+PURPOSE: compute the quantum matrix ring of order n
+NOTE:    activate this ring with the 'setring' command.
 @*       The usual representation of the variables in this quantum
-@*         algebra is not used because double indexes are not allowed
-@*         in the variables. Instead the variables are listed reading
-@*         the rows of the usual matrix representation.
+@*       algebra is not used because double indexes are not allowed
+@*       in the variables. Instead the variables are listed by reading
+@*       the rows of the usual matrix representation.
 SEE ALSO: qminor
-EXAMPLE: example quant; shows examples
+EXAMPLE: example quantMat; shows examples
 "{
   if (n>1)
   {
@@ -206,23 +205,23 @@ EXAMPLE: example quant; shows examples
 example
 {
   "EXAMPLE:"; echo=2;
-  def r=quant(2); // generate O_q(M_2) at q generic
+  def r = quantMat(2); // generate O_q(M_2) at q generic
   setring r;   r;
   kill r;
-  def r=quant(2,5); // generate O_q(M_2) at q^5=1
+  def r = quantMat(2,5); // generate O_q(M_2) at q^5=1
   setring r;   r;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 proc qminor(intvec I, intvec J, int nr)
-"USAGE:        qminor(I,J,nr); where
-@*      I is the ordered list of the rows to consider in the minor,
-@*      J is the ordered list of the columns to consider in the minor and
-@*      nr is the order of the quantum matrix algebra you are working with (quant(nr)).
-RETURN: poly, the quantum minor.
-NOTE:    I and J must have the same number of elements.
-SEE ALSO: quant
+"USAGE:        qminor(I,J,n); I,J intvec, n int
+RETURN: poly, the quantum minor
+ASSUME: I is the ordered list of the rows to consider in the minor,
+@*      J is the ordered list of the columns to consider in the minor, 
+@*      I and J must have the same number of elements,
+@*      n is the order of the quantum matrix algebra you are working with (quantMat(n)).
+SEE ALSO: quantMat
 EXAMPLE: example qminor; shows examples
 "{
   poly d=0;
@@ -254,11 +253,13 @@ EXAMPLE: example qminor; shows examples
 }
 example
 {
-  "EXAMPLE: Let r be the quantum matrix of order 3."; echo=2;
-  def r=quant(3); setring r;
-  intvec u=1,2;
-  intvec v=2,3;
-  intvec w=1,2,3;
+  "EXAMPLE:"; 
+  echo=2;
+  def r = quantMat(3); // let r be a quantum matrix of order 3
+  setring r;
+  intvec u = 1,2;
+  intvec v = 2,3;
+  intvec w = 1,2,3;
   qminor(w,w,3);
   qminor(u,v,3);
   qminor(v,u,3);
