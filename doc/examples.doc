@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.77 2005-05-09 07:58:37 Singular Exp $
+@comment $Id: examples.doc,v 1.78 2005-05-09 17:58:48 Singular Exp $
 @comment this file contains the examples
 
 @c The following directives are necessary for proper compilation
@@ -771,8 +771,7 @@ not be terminated through the link while it is still computing.
 @node Dynamic modules, groebner and std, Formatting output, Programming
 @end ifclear
 @subsection Dynamic modules
-@cindex Classification of hypersurface singularities
-@cindex Hypersurface singularities, classification of
+@cindex Dynamic modules
 
 @c ----------------------------------------------------------------------------
 @node Computing Groebner and Standard Bases, Commutative Algebra, Programming, Examples
