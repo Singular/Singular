@@ -354,7 +354,7 @@ static BOOLEAN  ascending(int* i,int top){
 
 sorted_pair_node**  merge(sorted_pair_node** p, int pn,sorted_pair_node **q, int qn,calc_dat* c){
   int i;
-  int* a= (int*) omAlloc(qn*sizeof(int));
+  int* a= (int*) omalloc(qn*sizeof(int));
 //   int mc;
 //   PrintS("Debug\n");
 //   for(mc=0;mc<qn;mc++)
@@ -378,7 +378,7 @@ sorted_pair_node**  merge(sorted_pair_node** p, int pn,sorted_pair_node **q, int
 
   }
   if((pn+qn)>c->max_pairs){
-    p=(sorted_pair_node**) omRealloc(p,2*(pn+qn)*sizeof(sorted_pair_node*));
+    p=(sorted_pair_node**) omrealloc(p,2*(pn+qn)*sizeof(sorted_pair_node*));
     c->max_pairs=2*(pn+qn);
   }
   for(i=qn-1;i>=0;i--){
@@ -471,8 +471,8 @@ int find_best(red_object* r,int l, int u, int &w, calc_dat* c){
   int sz=u-l+1;
   int n=sz/10+1;
   int filled=0;
-  int* indizes=(int*) omAlloc(n*sizeof(int));
-  int* weight=(int*) omAlloc(n*sizeof(int));
+  int* indizes=(int*) omalloc(n*sizeof(int));
+  int* weight=(int*) omalloc(n*sizeof(int));
   int worst=-1;
   int i;  
   for(i=l;i<=u;i++){
@@ -755,7 +755,7 @@ static void replace_pair(int & i, int & j, calc_dat* c)
       if (pTotaldegree(lm)>=deciding_deg)
       {
         soon_t_rep(i_con[m],j_con[n],c);
-        int_pair_node* h= (int_pair_node*)omAlloc(sizeof(int_pair_node));
+        int_pair_node* h= (int_pair_node*)omalloc(sizeof(int_pair_node));
         if (last!=NULL)
           last->next=h;
         else
@@ -817,8 +817,8 @@ static int* make_connections(int from, poly bound, calc_dat* c)
 {
   ideal I=c->S;
   int s=pTotaldegree(bound);
-  int* cans=(int*) omAlloc(c->n*sizeof(int));
-  int* connected=(int*) omAlloc(c->n*sizeof(int));
+  int* cans=(int*) omalloc(c->n*sizeof(int));
+  int* connected=(int*) omalloc(c->n*sizeof(int));
   int cans_length=0;
   connected[0]=from;
   int connected_length=1;
@@ -859,8 +859,8 @@ static int* make_connections(int from, int to, poly bound, calc_dat* c)
 {
   ideal I=c->S;
   int s=pTotaldegree(bound);
-  int* cans=(int*) omAlloc(c->n*sizeof(int));
-  int* connected=(int*) omAlloc(c->n*sizeof(int));
+  int* cans=(int*) omalloc(c->n*sizeof(int));
+  int* connected=(int*) omalloc(c->n*sizeof(int));
   cans[0]=to;
   int cans_length=1;
   connected[0]=from;
@@ -1021,47 +1021,47 @@ static sorted_pair_node** add_to_basis(poly h, int i_pos, int j_pos,calc_dat* c,
   ++(c->S->ncols);
   int i,j;
   i=c->n-1;
-  sorted_pair_node** nodes=(sorted_pair_node**) omAlloc(sizeof(sorted_pair_node*)*i);
+  sorted_pair_node** nodes=(sorted_pair_node**) omalloc(sizeof(sorted_pair_node*)*i);
   int spc=0;
-  c->T_deg=(int*) omRealloc(c->T_deg,c->n*sizeof(int));
+  c->T_deg=(int*) omrealloc(c->T_deg,c->n*sizeof(int));
   c->T_deg[i]=pTotaldegree(h);
   if(c->T_deg_full){
-    c->T_deg_full=(int*) omRealloc(c->T_deg_full,c->n*sizeof(int));
+    c->T_deg_full=(int*) omrealloc(c->T_deg_full,c->n*sizeof(int));
     c->T_deg_full[i]=pTotaldegree_full(h);
   }
   
-  c->tmp_pair_lm=(poly*) omRealloc(c->tmp_pair_lm,c->n*sizeof(poly));
+  c->tmp_pair_lm=(poly*) omrealloc(c->tmp_pair_lm,c->n*sizeof(poly));
   c->tmp_pair_lm[i]=pOne_Special(c->r);
-  c->tmp_spn=(sorted_pair_node**) omRealloc(c->tmp_spn,c->n*sizeof(sorted_pair_node*));
-  c->tmp_spn[i]=(sorted_pair_node*) omAlloc(sizeof(sorted_pair_node));
-  hp=omRealloc(c->rep, c->n *sizeof(int));
+  c->tmp_spn=(sorted_pair_node**) omrealloc(c->tmp_spn,c->n*sizeof(sorted_pair_node*));
+  c->tmp_spn[i]=(sorted_pair_node*) omalloc(sizeof(sorted_pair_node));
+  hp=omrealloc(c->rep, c->n *sizeof(int));
   if (hp!=NULL){
     c->rep=(int*) hp;
   } else {
     exit(1);
   }
-  c->short_Exps=(long *) omRealloc(c->short_Exps ,c->n*sizeof(long));
+  c->short_Exps=(long *) omrealloc(c->short_Exps ,c->n*sizeof(long));
 
-  hp=omRealloc(c->lengths, c->n *sizeof(int));
+  hp=omrealloc(c->lengths, c->n *sizeof(int));
   if (hp!=NULL){
     c->lengths=(int*) hp;
   } else {
     exit(1);
   }
   c->lengths[i]=pLength(h);
-  hp=omRealloc(c->states, c->n * sizeof(char*));
+  hp=omrealloc(c->states, c->n * sizeof(char*));
  
     c->states=(char**) hp;
-  c->gcd_of_terms=(poly*) omRealloc(c->gcd_of_terms, c->n *sizeof(poly));
+  c->gcd_of_terms=(poly*) omrealloc(c->gcd_of_terms, c->n *sizeof(poly));
   c->gcd_of_terms[i]=gcd_of_terms(h,c->r);
   c->rep[i]=i;
-  hp=omAlloc(i*sizeof(char));
+  hp=omalloc(i*sizeof(char));
   if (hp!=NULL){
     c->states[i]=(char*) hp;
   } else {
     exit(1);
   }
-  hp=omRealloc(c->S->m,c->n*sizeof(poly));
+  hp=omrealloc(c->S->m,c->n*sizeof(poly));
   if (hp!=NULL){
     c->S->m=(poly*) hp;
   } else {
@@ -1125,7 +1125,7 @@ static sorted_pair_node** add_to_basis(poly h, int i_pos, int j_pos,calc_dat* c,
 //      poly short_s=ksCreateShortSpoly(c->S->m[i],c->S->m[j],c->r);
       //    if (short_s)
       //    {
-        sorted_pair_node* s=(sorted_pair_node*) omAlloc(sizeof(sorted_pair_node));
+        sorted_pair_node* s=(sorted_pair_node*) omalloc(sizeof(sorted_pair_node));
         s->i=si_max(i,j);
         s->j=si_min(i,j);
         s->expected_length=c->lengths[i]+c->lengths[j]-2;
@@ -1219,47 +1219,47 @@ static sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_p
   ++(c->S->ncols);
   int i,j;
   i=c->n-1;
-  sorted_pair_node** nodes=(sorted_pair_node**) omAlloc(sizeof(sorted_pair_node*)*i);
+  sorted_pair_node** nodes=(sorted_pair_node**) omalloc(sizeof(sorted_pair_node*)*i);
   int spc=0;
-  c->T_deg=(int*) omRealloc(c->T_deg,c->n*sizeof(int));
+  c->T_deg=(int*) omrealloc(c->T_deg,c->n*sizeof(int));
   c->T_deg[i]=pTotaldegree(h);
   if(c->T_deg_full){
-    c->T_deg_full=(int*) omRealloc(c->T_deg_full,c->n*sizeof(int));
+    c->T_deg_full=(int*) omrealloc(c->T_deg_full,c->n*sizeof(int));
     c->T_deg_full[i]=pTotaldegree_full(h);
   }
-  c->tmp_pair_lm=(poly*) omRealloc(c->tmp_pair_lm,c->n*sizeof(poly));
+  c->tmp_pair_lm=(poly*) omrealloc(c->tmp_pair_lm,c->n*sizeof(poly));
   c->tmp_pair_lm[i]=pOne_Special(c->r);
-  c->tmp_spn=(sorted_pair_node**) omRealloc(c->tmp_spn,c->n*sizeof(sorted_pair_node*));
-  c->tmp_spn[i]=(sorted_pair_node*) omAlloc(sizeof(sorted_pair_node));
+  c->tmp_spn=(sorted_pair_node**) omrealloc(c->tmp_spn,c->n*sizeof(sorted_pair_node*));
+  c->tmp_spn[i]=(sorted_pair_node*) omalloc(sizeof(sorted_pair_node));
 
-  hp=omRealloc(c->rep, c->n *sizeof(int));
+  hp=omrealloc(c->rep, c->n *sizeof(int));
   if (hp!=NULL){
     c->rep=(int*) hp;
   } else {
     exit(1);
   }
-  c->short_Exps=(long *) omRealloc(c->short_Exps ,c->n*sizeof(long));
+  c->short_Exps=(long *) omrealloc(c->short_Exps ,c->n*sizeof(long));
 
-  hp=omRealloc(c->lengths, c->n *sizeof(int));
+  hp=omrealloc(c->lengths, c->n *sizeof(int));
   if (hp!=NULL){
     c->lengths=(int*) hp;
   } else {
     exit(1);
   }
   c->lengths[i]=pLength(h);
-  hp=omRealloc(c->states, c->n * sizeof(char*));
+  hp=omrealloc(c->states, c->n * sizeof(char*));
  
     c->states=(char**) hp;
-  c->gcd_of_terms=(poly*) omRealloc(c->gcd_of_terms, c->n *sizeof(poly));
+  c->gcd_of_terms=(poly*) omrealloc(c->gcd_of_terms, c->n *sizeof(poly));
   c->gcd_of_terms[i]=gcd_of_terms(h,c->r);
   c->rep[i]=i;
-  hp=omAlloc(i*sizeof(char));
+  hp=omalloc(i*sizeof(char));
   if (hp!=NULL){
     c->states[i]=(char*) hp;
   } else {
     exit(1);
   }
-  hp=omRealloc(c->S->m,c->n*sizeof(poly));
+  hp=omrealloc(c->S->m,c->n*sizeof(poly));
   if (hp!=NULL){
     c->S->m=(poly*) hp;
   } else {
@@ -1299,7 +1299,7 @@ static sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_p
 //      poly short_s=ksCreateShortSpoly(c->S->m[i],c->S->m[j],c->r);
       //    if (short_s)
       //    {
-    sorted_pair_node* s=c->tmp_spn[j];//(sorted_pair_node*) omAlloc(sizeof(sorted_pair_node));
+    sorted_pair_node* s=c->tmp_spn[j];//(sorted_pair_node*) omalloc(sizeof(sorted_pair_node));
     s->i=si_max(i,j);
     s->j=si_min(i,j);
     assume(s->j==j);
@@ -1333,7 +1333,7 @@ static sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_p
   //now ideal quotient crit
   qsort(nodes,spc,sizeof(sorted_pair_node*),iq_crit);
   
-    sorted_pair_node** nodes_final=(sorted_pair_node**) omAlloc(sizeof(sorted_pair_node*)*i);
+    sorted_pair_node** nodes_final=(sorted_pair_node**) omalloc(sizeof(sorted_pair_node*)*i);
   int spc_final=0;
   j=0;
   while(j<spc)
@@ -1379,7 +1379,7 @@ static sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_p
     {
       nodes[lower]->lcm_of_lm=pCopy(nodes[lower]->lcm_of_lm);
       nodes_final[spc_final++]=nodes[lower];
-      c->tmp_spn[nodes[lower]->j]=(sorted_pair_node*) omAlloc(sizeof(sorted_pair_node));
+      c->tmp_spn[nodes[lower]->j]=(sorted_pair_node*) omalloc(sizeof(sorted_pair_node));
       nodes[lower]=NULL;
       for(lower=lower+1;lower<=upper;lower++)
       {
@@ -1681,7 +1681,7 @@ BOOLEAN is_valid_ro(red_object & ro){
 void pre_comp(poly* p,int & pn,calc_dat* c){
   if(!(pn))
     return;
-  mac_poly* q=(mac_poly*) omAlloc(pn*sizeof(mac_poly)); 
+  mac_poly* q=(mac_poly*) omalloc(pn*sizeof(mac_poly)); 
   int i;
   exp_number_builder e;
   for(i=0;i<pn;i++){
@@ -1704,8 +1704,8 @@ void pre_comp(poly* p,int & pn,calc_dat* c){
     qa->next=NULL;
     pDelete(&p[i]);
   }
-  poly* ip= (poly*)omAlloc (e.n*sizeof(poly));
-  int* ia=(int*) omAlloc (e.n*sizeof(int));
+  poly* ip= (poly*)omalloc (e.n*sizeof(poly));
+  int* ia=(int*) omalloc (e.n*sizeof(int));
   t2ippa(ip,ia,e);
   for(i=0;i<pn;i++){
     mac_poly mp=q[i];
@@ -1808,7 +1808,7 @@ static void go_on (calc_dat* c){
   }
   c->average_length=c->average_length/c->n;
   i=0;
-  poly* p=(poly*) omAlloc((PAR_N+1)*sizeof(poly));//nullterminated
+  poly* p=(poly*) omalloc((PAR_N+1)*sizeof(poly));//nullterminated
 
   int curr_deg=-1;
   while(i<PAR_N){
@@ -1853,7 +1853,7 @@ static void go_on (calc_dat* c){
     omfree(p);
     return;
   }
-  red_object* buf=(red_object*) omAlloc(i*sizeof(red_object));
+  red_object* buf=(red_object*) omalloc(i*sizeof(red_object));
   c->normal_forms+=i;
   int j;
   for(j=0;j<i;j++){
@@ -1870,8 +1870,8 @@ static void go_on (calc_dat* c){
   if (TEST_OPT_PROT)
     Print("M[%i, ",i);
 #ifdef FIND_DETERMINISTIC
-  c->modifiedS=(BOOLEAN*) omAlloc((c->strat->sl+1)*sizeof(BOOLEAN));
-  c->expandS=(poly*) omAlloc((1)*sizeof(poly));
+  c->modifiedS=(BOOLEAN*) omalloc((c->strat->sl+1)*sizeof(BOOLEAN));
+  c->expandS=(poly*) omalloc((1)*sizeof(poly));
   c->expandS[0]=NULL;
   int z2;
   for(z2=0;z2<=c->strat->sl;z2++)
@@ -1932,8 +1932,8 @@ static void go_on (calc_dat* c){
       
 //     }
 //   }
-  int* ibuf=(int*) omAlloc(i*sizeof(int));
-  sorted_pair_node*** sbuf=(sorted_pair_node***) omAlloc(i*sizeof(sorted_pair_node**));
+  int* ibuf=(int*) omalloc(i*sizeof(int));
+  sorted_pair_node*** sbuf=(sorted_pair_node***) omalloc(i*sizeof(sorted_pair_node**));
   for(j=0;j<i;j++)
   {
     int len;
@@ -1951,7 +1951,7 @@ static void go_on (calc_dat* c){
   for(j=0;j<i;j++){
     sum+=ibuf[j];
   }
-  sorted_pair_node** big_sbuf=(sorted_pair_node**) omAlloc(sum*sizeof(sorted_pair_node*));
+  sorted_pair_node** big_sbuf=(sorted_pair_node**) omalloc(sum*sizeof(sorted_pair_node*));
   int partsum=0;
   for(j=0;j<i;j++)
   {
@@ -2394,7 +2394,7 @@ static int retranslate(poly* m,tgb_matrix* mat,poly* done, calc_dat* c){
     int v=mat->min_col_not_zero_in_row(i);
     //v=done_index-1-pos; => pos=done_index-1-v=mat->get_columns()-1-v
     int pos=mat->get_columns()-1-v;
-    int* ev=(int*) omAlloc((c->r->N+1)*sizeof(int));
+    int* ev=(int*) omalloc((c->r->N+1)*sizeof(int));
     pGetExpV(done[pos],ev);
     pSetExpV(m[m_index],ev);
     omfree(ev);
@@ -2407,7 +2407,7 @@ static int retranslate(poly* m,tgb_matrix* mat,poly* done, calc_dat* c){
       
       //v=done_index-1-pos; => pos=done_index-1-v=mat->get_columns()-1-v
       pos=mat->get_columns()-1-v;
-      ev=(int*) omAlloc((c->r->N+1)*sizeof(int));
+      ev=(int*) omalloc((c->r->N+1)*sizeof(int));
       pGetExpV(done[pos],ev);
       pSetExpV(pn,ev);
       omfree(ev);
@@ -2433,12 +2433,12 @@ static void go_on_F4 (calc_dat* c){
   else
     max_par=200;
   int done_size=max_par*2;
-  poly* done=(poly*) omAlloc(done_size*sizeof(poly));
+  poly* done=(poly*) omalloc(done_size*sizeof(poly));
   int done_index=0; //done_index must always be smaller than done_size
   int chosen_size=max_par*2;
-  monom_poly* chosen=(monom_poly*) omAlloc(chosen_size*sizeof(monom_poly));
+  monom_poly* chosen=(monom_poly*) omalloc(chosen_size*sizeof(monom_poly));
   int chosen_index=0;
-  //  monom_poly* vgl=(monom_poly*) omAlloc(chosen_size*sizeof(monom_poly));
+  //  monom_poly* vgl=(monom_poly*) omalloc(chosen_size*sizeof(monom_poly));
   int i=0;
   c->average_length=0;
   for(i=0;i<c->n;i++){
@@ -2497,14 +2497,14 @@ static void go_on_F4 (calc_dat* c){
       if(done_index>=done_size)
       {
 	done_size+=max_par;
-	done=(poly*) omRealloc(done,done_size*sizeof(poly));
+	done=(poly*) omrealloc(done,done_size*sizeof(poly));
       }
       done[done_index++]=lcm;
       if(chosen_index+1>=chosen_size)
       {
 	//max_par must be greater equal 2
 	chosen_size+=si_max(max_par,2);
-	chosen=(monom_poly*) omRealloc(chosen,chosen_size*sizeof(monom_poly));
+	chosen=(monom_poly*) omrealloc(chosen,chosen_size*sizeof(monom_poly));
       }
       h.f=c->S->m[s->i];
       h.m=factor1;
@@ -2518,7 +2518,7 @@ static void go_on_F4 (calc_dat* c){
       if(chosen_index>=chosen_size)
       {
 	chosen_size+=max_par;
-	chosen=(monom_poly*) omRealloc(chosen,chosen_size*sizeof(monom_poly));
+	chosen=(monom_poly*) omrealloc(chosen,chosen_size*sizeof(monom_poly));
       }
       h.f=s->lcm_of_lm;
       h.m=pOne();
@@ -2527,7 +2527,7 @@ static void go_on_F4 (calc_dat* c){
       //must carefull remember to destroy such a h;
       poly_list_node* next=c->to_destroy;
       
-      c->to_destroy=(poly_list_node*) omAlloc(sizeof(poly_list_node));
+      c->to_destroy=(poly_list_node*) omalloc(sizeof(poly_list_node));
       c->to_destroy->p=h.f;
       c->to_destroy->next=next;
       only_free=TRUE;
@@ -2572,7 +2572,7 @@ static void go_on_F4 (calc_dat* c){
   //next step process polys
   int p_size=2*chosen_index;
   int p_index=0;
-  p=(poly*) omAlloc(p_size*sizeof(poly));
+  p=(poly*) omalloc(p_size*sizeof(poly));
   for(p_index=0;p_index<chosen_index;p_index++)
   {
     p[p_index]=ppMult_mm(chosen[p_index].f,chosen[p_index].m);
@@ -2617,8 +2617,8 @@ static void go_on_F4 (calc_dat* c){
   {
     m_size+=pLength(p[i]);
   }
-  m=(poly*) omAlloc(m_size*sizeof(poly));
-  //q=(poly*) omAlloc(m_size*sizeof(poly));
+  m=(poly*) omalloc(m_size*sizeof(poly));
+  //q=(poly*) omalloc(m_size*sizeof(poly));
 
   
 
@@ -2644,7 +2644,7 @@ static void go_on_F4 (calc_dat* c){
   }
 
   int q_size=m_index;
-  poly* q=(poly*) omAlloc(q_size*sizeof(poly));
+  poly* q=(poly*) omalloc(q_size*sizeof(poly));
   int q_index=0;
   //next Step additional reductors
 
@@ -2683,19 +2683,19 @@ static void go_on_F4 (calc_dat* c){
     if(done_size<done_index+m_index)
     {
       done_size=done_index+2*m_index;
-      done=(poly*) omRealloc(done,done_size*sizeof(poly));
+      done=(poly*) omrealloc(done,done_size*sizeof(poly));
     }
     if(chosen_size<chosen_index+m_index)
     {
       chosen_size=chosen_index+2*m_index;
-      chosen=(monom_poly*) omRealloc(chosen,chosen_size*sizeof(monom_poly));
+      chosen=(monom_poly*) omrealloc(chosen,chosen_size*sizeof(monom_poly));
     }
     q_index=0;
     if(q_size<m_index)
     {
       q_size=2*m_index;
       omfree(q);
-      q=(poly*) omAlloc(q_size*sizeof(poly));
+      q=(poly*) omalloc(q_size*sizeof(poly));
     }
 
     for(i=0;i<m_index;i++)
@@ -2736,7 +2736,7 @@ static void go_on_F4 (calc_dat* c){
 	  monom_poly h;
 	  h.f=c->strat->S[S_pos];
 	  h.m=pOne();
-	  int* ev=(int*) omAlloc((c->r->N+1)*sizeof(int));
+	  int* ev=(int*) omalloc((c->r->N+1)*sizeof(int));
 	  pGetExpV(m[i],ev);
 	  pSetExpV(h.m,ev);
 	  omfree(ev);
@@ -2788,7 +2788,7 @@ static void go_on_F4 (calc_dat* c){
     if(p_size<p_index+q_index)
     {
       p_size=p_index+2*q_index;
-      p=(poly*) omRealloc(p,p_size*sizeof(poly));
+      p=(poly*) omrealloc(p,p_size*sizeof(poly));
     }
     for (i=0;i<q_index;i++)
       p[p_index++]=q[i];
@@ -2801,7 +2801,7 @@ static void go_on_F4 (calc_dat* c){
     if (m_size<sum)
     {
       omfree(m);
-      m=(poly*) omAlloc(sum*sizeof(poly));
+      m=(poly*) omalloc(sum*sizeof(poly));
     }
     m_size=sum;
     for(i=0;i<q_index;i++)
@@ -2856,7 +2856,7 @@ static void go_on_F4 (calc_dat* c){
   tgb_sparse_matrix* mat=build_sparse_matrix(p,p_index,done, done_index,c);
   simple_gauss(mat,c);
   m_size=mat->get_rows();
-  m=(poly*) omAlloc(m_size*sizeof(poly));
+  m=(poly*) omalloc(m_size*sizeof(poly));
   m_index=retranslate(m,mat,done,c);
   
   mat=NULL;
@@ -2866,10 +2866,10 @@ static void go_on_F4 (calc_dat* c){
   done=NULL;
   //next Step addElements to basis 
   int F_plus_size=m_index;
-  poly* F_plus=(poly*)omAlloc(F_plus_size*sizeof(poly));
+  poly* F_plus=(poly*)omalloc(F_plus_size*sizeof(poly));
   int F_plus_index=0;
   int F_minus_size=m_index;
-  poly* F_minus=(poly*) omAlloc(F_minus_size*sizeof(poly));
+  poly* F_minus=(poly*) omalloc(F_minus_size*sizeof(poly));
   int F_minus_index=0;
 
   //better algorithm replace p by its monoms, qsort,delete duplicates and binary search for testing if monom is contained in array
@@ -2947,11 +2947,11 @@ static void go_on_F4 (calc_dat* c){
   //should resize the array to save memory
   //F and F_minus
   qsort(chosen,chosen_index,sizeof(monom_poly),monom_poly_crit);//important for simplify
-  (*F_m_i)=(poly_array_list*) omAlloc(sizeof(poly_array_list));
+  (*F_m_i)=(poly_array_list*) omalloc(sizeof(poly_array_list));
   (*F_m_i)->size=F_minus_index;
   (*F_m_i)->p=F_minus;
   (*F_m_i)->next=NULL;
-  (*F_i)=(mp_array_list*) omAlloc(sizeof(poly_array_list));
+  (*F_i)=(mp_array_list*) omalloc(sizeof(poly_array_list));
   (*F_i)->size=chosen_index;
   (*F_i)->mp=chosen;
   (*F_i)->next=NULL;
@@ -2959,8 +2959,8 @@ static void go_on_F4 (calc_dat* c){
   if(F_plus_index>0)
   {
     int j;
-    int* ibuf=(int*) omAlloc(F_plus_index*sizeof(int));
-    sorted_pair_node*** sbuf=(sorted_pair_node***) omAlloc(F_plus_index*sizeof(sorted_pair_node**));
+    int* ibuf=(int*) omalloc(F_plus_index*sizeof(int));
+    sorted_pair_node*** sbuf=(sorted_pair_node***) omalloc(F_plus_index*sizeof(sorted_pair_node**));
   
     for(j=0;j<F_plus_index;j++)
     {
@@ -2978,7 +2978,7 @@ static void go_on_F4 (calc_dat* c){
     {
       sum+=ibuf[j];
     }
-    sorted_pair_node** big_sbuf=(sorted_pair_node**) omAlloc(sum*sizeof(sorted_pair_node*));
+    sorted_pair_node** big_sbuf=(sorted_pair_node**) omalloc(sum*sizeof(sorted_pair_node*));
     int partsum=0;
     for(j=0;j<F_plus_index;j++)
     {
@@ -3036,7 +3036,7 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
 
   qsort(I->m,IDELEMS(I),sizeof(poly),poly_crit);
   //Print("Idelems %i \n----------\n",IDELEMS(I));
-  calc_dat* c=(calc_dat*) omAlloc(sizeof(calc_dat));
+  calc_dat* c=(calc_dat*) omalloc(sizeof(calc_dat));
   
   c->r=currRing;
   c->is_homog=TRUE;
@@ -3090,7 +3090,7 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
  
   c->max_pairs=5*I->idelems();
  
-  c->apairs=(sorted_pair_node**) omAlloc(sizeof(sorted_pair_node*)*c->max_pairs);
+  c->apairs=(sorted_pair_node**) omalloc(sizeof(sorted_pair_node*)*c->max_pairs);
   c->pair_top=-1;
 
   int n=I->idelems();
@@ -3101,26 +3101,26 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
     }
   i=0;
   c->n=0;
-  c->T_deg=(int*) omAlloc(n*sizeof(int));
+  c->T_deg=(int*) omalloc(n*sizeof(int));
   if((!(c->is_homog)) &&(pLexOrder))
-    c->T_deg_full=(int*) omAlloc(n*sizeof(int));
+    c->T_deg_full=(int*) omalloc(n*sizeof(int));
   else
     c->T_deg_full=NULL;
-  c->tmp_pair_lm=(poly*) omAlloc(n*sizeof(poly));
-  c->tmp_spn=(sorted_pair_node**) omAlloc(n*sizeof(sorted_pair_node*));
+  c->tmp_pair_lm=(poly*) omalloc(n*sizeof(poly));
+  c->tmp_spn=(sorted_pair_node**) omalloc(n*sizeof(sorted_pair_node*));
   lm_bin=omGetSpecBin(POLYSIZE + (r->ExpL_Size)*sizeof(long));
 #ifdef HEAD_BIN
   c->HeadBin=omGetSpecBin(POLYSIZE + (currRing->ExpL_Size)*sizeof(long));
 #endif
   /* omUnGetSpecBin(&(c->HeadBin)); */
-  h=omAlloc(n*sizeof(char*));
+  h=omalloc(n*sizeof(char*));
   c->states=(char**) h;
-  h=omAlloc(n*sizeof(int));
+  h=omalloc(n*sizeof(int));
   c->lengths=(int*) h;
-  h=omAlloc(n*sizeof(int));
-        c->gcd_of_terms=(poly*) omAlloc(n*sizeof(poly));
+  h=omalloc(n*sizeof(int));
+        c->gcd_of_terms=(poly*) omalloc(n*sizeof(poly));
   c->rep=(int*) h;
-  c->short_Exps=(long*) omAlloc(n*sizeof(long));
+  c->short_Exps=(long*) omalloc(n*sizeof(long));
   c->S=idInit(n,1);
   c->strat=new skStrategy;
   c->strat->syzComp = 0;
@@ -3156,7 +3156,7 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
     for (i=1;i<n;i++)//the 1 is wanted, because first element is added to basis
     {
       //     add_to_basis(I->m[i],-1,-1,c);
-      si=(sorted_pair_node*) omAlloc(sizeof(sorted_pair_node));
+      si=(sorted_pair_node*) omalloc(sizeof(sorted_pair_node));
       si->i=-1;
       si->j=-1;
       si->expected_length=pLength(I->m[i]);
@@ -4140,7 +4140,7 @@ static void multi_reduction(red_object* los, int & losl, calc_dat* c)
 #ifdef FIND_DETERMINISTIC
       int i;
       for(i=0;c->expandS[i];i++);
-      c->expandS=(poly*) omRealloc(c->expandS,(i+2)*sizeof(poly));
+      c->expandS=(poly*) omrealloc(c->expandS,(i+2)*sizeof(poly));
       c->expandS[i]=erg.expand;
       c->expandS[i+1]=NULL;
 #else

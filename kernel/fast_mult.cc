@@ -310,8 +310,8 @@ poly pFastPower(poly f, int n, ring r){
     pot_max++;
   }
   int field_size=pot_max+1;
-  int* int_pot_array=(int*) omAlloc(field_size*sizeof(int));
-  poly* pot_array=(poly*) omAlloc(field_size*sizeof(poly));
+  int* int_pot_array=(int*) omalloc(field_size*sizeof(int));
+  poly* pot_array=(poly*) omalloc(field_size*sizeof(poly));
   int i;
   int pot=1;
   //initializing int_pot
@@ -539,7 +539,7 @@ poly pFastPowerMC(poly f, int n, ring r){
    if (pLength(f)<=1)
     Werror("not implemented for so small lenght of f, recursion fails");
   //  number null_number=n_Init(0,r);
-  number* facult=(number*) omAlloc((n+1)*sizeof(number));
+  number* facult=(number*) omalloc((n+1)*sizeof(number));
   facult[0]=n_Init(1,r);
   int i;
   for(i=1;i<=n;i++){
@@ -553,10 +553,10 @@ poly pFastPowerMC(poly f, int n, ring r){
   kBucket_pt erg_bucket= kBucketCreate(currRing);
   kBucketInit(erg_bucket,NULL,0);
   const int f_len=pLength(f);
-  int* exp=(int*)omAlloc(f_len*sizeof(int));
+  int* exp=(int*)omalloc(f_len*sizeof(int));
   //poly f_terms[f_len];
-  poly* f_terms=(poly*)omAlloc(f_len*sizeof(poly));
-  poly** term_potences=(poly**) omAlloc(f_len*sizeof(poly*));
+  poly* f_terms=(poly*)omalloc(f_len*sizeof(poly));
+  poly** term_potences=(poly**) omalloc(f_len*sizeof(poly*));
   
   poly f_iter=f;
   for(i=0;i<f_len;i++){
@@ -564,7 +564,7 @@ poly pFastPowerMC(poly f, int n, ring r){
     f_iter=pNext(f_iter);
   }
   for(i=0;i<f_len;i++){
-    term_potences[i]=(poly*)omAlloc((n+1)*sizeof(poly));
+    term_potences[i]=(poly*)omalloc((n+1)*sizeof(poly));
     term_potences[i][0]=p_ISet(1,r);
     int j;
     for(j=1;j<=n;j++){
