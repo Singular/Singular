@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.110 2005-05-10 14:35:09 Singular Exp $ */
+/* $Id: grammar.y,v 1.111 2005-05-10 17:33:45 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -1157,13 +1157,45 @@ exportcmd:
         ;
 
 killcmd:
-        KILL_CMD extendedid
+        KILL_CMD elemexpr
         {
-          killid($2,&IDROOT);
+          leftv v=&$2;
+          if (v->rtyp!=IDHDL)
+          {
+            if (v->name!=NULL)
+            {
+               Werror("`%s` is undefined in kill",v->name);
+            }
+            else               WerrorS("kill what ?");
+          }
+          else
+          {
+            #ifdef HAVE_NS
+            killhdl((idhdl)v->data,v->req_packhdl);
+            #else
+            killhdl((idhdl)v->data);
+            #endif
+          }
         }
-        | killcmd ',' extendedid
+        | killcmd ',' elemexpr
         {
-          killid($3,&IDROOT);
+          leftv v=&$3;
+          if (v->rtyp!=IDHDL)
+          {
+            if (v->name!=NULL)
+            {
+               Werror("`%s` is undefined in kill",v->name);
+            }
+            else               WerrorS("kill what ?");
+          }
+          else
+          {
+            #ifdef HAVE_NS
+            killhdl((idhdl)v->data,v->req_packhdl);
+            #else
+            killhdl((idhdl)v->data);
+            #endif
+          }
         }
         ;
 
