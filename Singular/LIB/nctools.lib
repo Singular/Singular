@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: nctools.lib,v 1.12 2005-05-06 14:38:50 hannes Exp $";
+version="$Id: nctools.lib,v 1.13 2005-05-10 17:31:08 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: nctools.lib     General tools for noncommutative algebras
@@ -21,14 +21,14 @@ Exterior();             returns qring, the exterior algebra of a basering,
 fin_dim_algebra(matrix M, list #); creates finite dimensional algebra structure from the basering and the multiplication matrix M,
 
 AUXILIARY PROCEDURES:
-Newton(f);                  Newton diagram of a polynomial,
-NCRelations(r);                recovers the non-commutative relations of a G-algebra,
-IsCentral(p,[v]);       check for the commutativity of a polynomial in the G-algebra,
-Is_NC();                checks whether basering is noncommutative,
+Newton(f);              Newton diagram of a polynomial,
+NCRelations(r);         recovers the non-commutative relations of a G-algebra,
+isCentral(p,[v]);       check for the commutativity of a polynomial in the G-algebra,
+isNC();                 checks whether basering is noncommutative,
 UpOneMatrix(N);         returns NxN matrix with 1's in the whole upper triagle,
 
 ALIAS PROCEDURES:
-wRing(r);                alias to weightedRing,
+wRing(r);               alias to weightedRing,
 ";
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -184,7 +184,7 @@ example
 {
   "EXAMPLE:";echo=2;
   LIB "qmatrix.lib";
-  def r=quant(2); // generate quant(2) and store it in r
+  def r = quantMat(2); // generate quantum matrix of order 2 and store it in r
   setring r; // set the ring r the active ring
   r;
   def s=wRing(r);
@@ -502,11 +502,11 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc IsCentral(poly p, list #)
-"USAGE:   IsCentral(p,[v]); p poly, v an integer (with v!=0, procedure will be verbose)
+proc isCentral(poly p, list #)
+"USAGE:   isCentral(p,[v]); p poly, v an integer (with v!=0, procedure will be verbose)
 PURPOSE: check whether p is central in a basering (that is, commutes with everything)
 RETURN:  integer (1, if p commutes with all variables, 0 otherwise)
-EXAMPLE: example IsCentral; shows examples
+EXAMPLE: example isCentral; shows examples
 "{
   int N = nvars(basering);
   int in;
@@ -536,9 +536,9 @@ example
   D[2,3]=-2*y;
   ncalgebra(1,D); // this is U(sl_2)
   poly c = 4*x*y+z^2-2*z;
-  IsCentral(c,0);
+  isCentral(c,0);
   poly h = x*c;
-  IsCentral(h,1);
+  isCentral(h,1);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -909,11 +909,11 @@ example
 
 //////////////////////////////////////////////////////////////////////
 
-proc Is_NC()
-"USAGE:   Is_NC();
+proc isNC()
+"USAGE:   isNC();
 PURPOSE: check whether a basering is commutative or not
 RETURN:   int (1, if basering is noncommutative; 0 otherwise)
-EXAMPLE: example Is_NC; shows examples
+EXAMPLE: example isNC; shows examples
 "{
   string rname=nameof(basering);
   if ( rname == "basering") // i.e. no ring has been set yet
@@ -938,10 +938,10 @@ example
 { "EXAMPLE:"; echo = 2;
    def a = CreateWeyl(2);
    setring a;
-   Is_NC();
+   isNC();
    kill a;
    ring r = 17,(x(1..7)),dp;
-   Is_NC();
+   isNC();
    kill r;
 }
 
