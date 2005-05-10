@@ -1,4 +1,4 @@
-version="$Id: brnoeth.lib,v 1.15 2005-05-06 14:38:04 hannes Exp $";
+version="$Id: brnoeth.lib,v 1.16 2005-05-10 17:48:25 Singular Exp $";
 category="Coding theory";
 info="
 LIBRARY:   brnoeth.lib  Brill-Noether Algorithm, Weierstrass-SG and AG-codes
@@ -155,11 +155,11 @@ static proc pd2 (poly g1,poly g2)
       map ppssii=raux1,var(1),var(2),0;
       J[2]=ppssii(G);
       L[i]=J;
-      kill(ppssii);
+      kill ppssii;
       setring raux2;
     }
     setring BR;
-    kill(raux1,raux2);
+    kill raux1,raux2;
   }
   return(L);
 }
@@ -227,7 +227,7 @@ NOTE:       f must be absolutely irreducible, but this is not checked
     map embpol=base_r,x,y;
     poly CHI=embpol(f);
     export(CHI);
-    kill(embpol);
+    kill embpol;
     ideal Aff_SLocus=s_locus(CHI);
     export(Aff_SLocus);
     setring Proj_R;
@@ -238,7 +238,7 @@ NOTE:       f must be absolutely irreducible, but this is not checked
     L[1]=aff_r;
     L[2]=Proj_R;
     L[3]=degX;
-    kill(aff_r,Proj_R);
+    kill aff_r,Proj_R;
     return(L);
   }
   if (nvars(basering)==3)
@@ -247,7 +247,7 @@ NOTE:       f must be absolutely irreducible, but this is not checked
     map embpol=base_r,x,y,z;
     poly CHI=embpol(f);
     export(CHI);
-    kill(embpol);
+    kill embpol;
     string s=string(subst(CHI,z,1));
     setring aff_r;
     execute("poly CHI="+s+";");
@@ -259,7 +259,7 @@ NOTE:       f must be absolutely irreducible, but this is not checked
     L[1]=aff_r;
     L[2]=Proj_R;
     L[3]=degX;
-    kill(aff_r,Proj_R);
+    kill aff_r,Proj_R;
     return(L);
   }
   ERROR("basering must have 2 or 3 variables");
@@ -326,7 +326,7 @@ static proc inf_P (poly f)
       {
         // the point is singular
         counter_S=counter_S+1;
-        kill(f_yz);
+        kill f_yz;
         setring base_r;
         IP_S[counter_S]=list(I[i],iv);
       }
@@ -334,7 +334,7 @@ static proc inf_P (poly f)
       {
         // the point is non-singular
         counter_NS=counter_NS+1;
-        kill(f_yz);
+        kill f_yz;
         setring base_r;
         IP_NS[counter_NS]=list(I[i],iv);
       }
@@ -356,7 +356,7 @@ static proc inf_P (poly f)
         {
           // the point is singular
           counter_S=counter_S+1;
-          kill(f_xz,aux,A,phi,f_origin);
+          kill f_xz,aux,A,phi,f_origin;
           setring base_r;
           IP_S[counter_S]=list(I[i],iv);
         }
@@ -364,7 +364,7 @@ static proc inf_P (poly f)
         {
           // the point is non-singular
           counter_NS=counter_NS+1;
-          kill(f_xz,aux,A,phi,f_origin);
+          kill f_xz,aux,A,phi,f_origin;
           setring base_r;
           IP_NS[counter_NS]=list(I[i],iv);
         }
@@ -386,7 +386,7 @@ static proc inf_P (poly f)
           // the point is singular
           counter_S=counter_S+1;
           setring base_r;
-          kill(r_ext);
+          kill r_ext;
           IP_S[counter_S]=list(I[i],iv);
         }
         else
@@ -394,13 +394,13 @@ static proc inf_P (poly f)
           // the point is non-singular
           counter_NS=counter_NS+1;
           setring base_r;
-          kill(r_ext);
+          kill r_ext;
           IP_NS[counter_NS]=list(I[i],iv);
         }
       }
     }
   }
-  kill(r_auxz);
+  kill r_auxz;
   return(list(IP_S,IP_NS));
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -790,7 +790,7 @@ static proc subfield (sf)
       mpol=subst(mpol,a,x);
       setring base_r;
       poly mpol=imap(auxring,mpol);
-      kill(auxring);
+      kill auxring;
       string answer="? error : non-primitive element";
       int r=res_deg();
       int q=char(basering)^r;
@@ -838,7 +838,7 @@ static proc subfield (sf)
           FF1=FF2;
           FF2=list();
         }
-        kill(FF2);
+        kill FF2;
         for (i=1;i<=q-1;i=i+1)
         {
           b=FF1[i];
@@ -849,7 +849,7 @@ static proc subfield (sf)
           }
         }
       }
-      kill(FF1);
+      kill FF1;
       return(answer);
     }
     else
@@ -889,7 +889,7 @@ static proc importdatum (sf,string datum,string rel)
     string snewdatum=string(pdatum);
     setring base_r;
     execute("poly pdatum="+snewdatum+";");
-    kill(auxring);
+    kill auxring;
     return(pdatum);
   }
 }
@@ -928,7 +928,7 @@ static proc rationalize (lf,string datum,string rel)
     string snewdatum=string(newdatum);
     setring base_r;
     execute("poly newdatum="+snewdatum+";");
-    kill(auxring);
+    kill auxring;
     return(newdatum);
   }
 }
@@ -1072,7 +1072,7 @@ static proc place (intvec Pp,int sing,list CURVE)
             number coord@3=number(1);
             map phi=base_r,x+coord@1,y+coord@2;
             poly CHI=phi(CHI);
-            kill(aux_r);
+            kill aux_r;
           }
         }
       }
@@ -1134,7 +1134,7 @@ static proc place (intvec Pp,int sing,list CURVE)
           poly CHI=Phi(CHI);
         }
       }
-      kill(r_auxz);
+      kill r_auxz;
     }
     else
     {
@@ -1232,7 +1232,7 @@ check=0;
         def S1=update_CURVE[5][1][1];
         execute("ring S(1)="+string(update_CURVE[5][1][1])+";");
         fetchall(S1);
-        kill(S1);
+        kill S1;
       }
       N_branches=size(BRANCHES);
       for (i=1;i<=n_branches;i=i+1)
@@ -1264,7 +1264,7 @@ check=0;
         {
           Conductor[N]=local_conductor(iw[2],S(1));
         }
-        kill(iw);
+        kill iw;
         PtoPl[i]=N;
       }
       setring base_r;
@@ -1306,7 +1306,7 @@ check=0;
             I_mult[j,i]=I_mult[i,j];
           }
         }
-        kill(auxgb,geobrs);
+        kill auxgb,geobrs;
       }
       else
       {
@@ -1344,7 +1344,7 @@ check=0;
               ring auxxx=(Q,a),z,lp;
               sss=string(minpoly);
               setring base_r;
-              kill(auxxx);
+              kill auxxx;
             }
             ring S(ext_0)=(char(basering),a),(x,y,t),ls;
             execute("minpoly="+sss+";");
@@ -1372,9 +1372,9 @@ check=0;
           string SR=string(update_CURVE[5][ext_0][1]);
           execute("ring S("+string(ext_0)+")="+SR+";");
           execute("minpoly="+SM+";");
-          kill(SM,SR);
+          kill SM,SR;
           fetchall(Sext_0);
-          kill(Sext_0);
+          kill Sext_0;
         }
         N_branches=size(BRANCHES);
         dgs_points(ext_0)[N_branches+1]=1;
@@ -1419,7 +1419,7 @@ check=0;
           Laux[3]=Li3;
           Laux[4]=paux;
           BRANCHES=insert(BRANCHES,Laux,N_branches);
-          kill(Laux,Maux,paux,Li2,Li3);
+          kill Laux,Maux,paux,Li2,Li3;
         }
         PARAMETRIZATIONS[N_branches+1]=param(BRANCHES[N_branches+1],0);
         N=N+1;
@@ -1429,7 +1429,7 @@ check=0;
         {
           Conductor[N]=local_conductor(iw[2],S(ext_0));
         }
-        kill(iw);
+        kill iw;
         PtoPl[i]=N;
         setring HNEring;
         update_CURVE[5][ext_0]=list();
@@ -1509,9 +1509,9 @@ check=0;
         string SR=string(update_CURVE[5][ext2][1]);
         execute("ring S("+string(ext2)+")="+SR+";");
         execute("minpoly="+SM+";");
-        kill(SM,SR);
+        kill SM,SR;
         fetchall(Sext2);
-        kill(Sext2);
+        kill Sext2;
       }
       N_branches=size(BRANCHES);
       for (i=1;i<=n_branches;i=i+1)
@@ -1549,7 +1549,7 @@ check=0;
         Laux[3]=Li3;
         Laux[4]=paux;
         BRANCHES=insert(BRANCHES,Laux,N_branches+i-1);
-        kill(Laux,Maux,paux,Li2,Li3);
+        kill Laux,Maux,paux,Li2,Li3;
         PARAMETRIZATIONS[N_branches+i]=param(BRANCHES[N_branches+i],0);
         N=N+1;
         intvec iw=ext2,N_branches+i;
@@ -1567,7 +1567,7 @@ check=0;
         {
           Conductor[N]=local_conductor(iw[2],S(ext2));
         }
-        kill(iw);
+        kill iw;
         PtoPl[i]=N;
       }
       setring base_r;
@@ -1604,7 +1604,7 @@ check=0;
             I_mult[j,i]=I_mult[i,j];
           }
         }
-        kill(auxgb,geobrs);
+        kill auxgb,geobrs;
       }
       else
       {
@@ -1642,7 +1642,7 @@ check=0;
               ring auxxx=(Q,a),z,lp;
               sss=string(minpoly);
               setring base_r;
-              kill(auxxx);
+              kill auxxx;
             }
           }
           else
@@ -1671,9 +1671,9 @@ check=0;
           string SR=string(update_CURVE[5][ext_0][1]);
           execute("ring S("+string(ext_0)+")="+SR+";");
           execute("minpoly="+SM+";");
-          kill(SM,SR);
+          kill SM,SR;
           fetchall(badring);
-          kill(badring);
+          kill badring;
         }
         N_branches=size(BRANCHES);
         // now fetch all the data into the new local ring
@@ -1709,7 +1709,7 @@ check=0;
         Laux[3]=Li3;
         Laux[4]=paux;
         BRANCHES=insert(BRANCHES,Laux,N_branches);
-        kill(Laux,Maux,paux,Li2,Li3);
+        kill Laux,Maux,paux,Li2,Li3;
         PARAMETRIZATIONS[N_branches+1]=param(BRANCHES[N_branches+1],0);
         N=N+1;
         intvec iw=ext_0,N_branches+1;
@@ -1718,7 +1718,7 @@ check=0;
         {
           Conductor[N]=local_conductor(iw[2],S(ext_0));
         }
-        kill(iw);
+        kill iw;
         PtoPl[i]=N;
         setring HNEring;
         update_CURVE[5][ext_0]=list();
@@ -1766,8 +1766,8 @@ check=0;
     Aff_Points(Pp[2])[Pp[3]]=PP;
   }
   update_CURVE[1][1]=base_r;
-  kill(HNEring);
-  kill(local_aux);
+  kill HNEring;
+  kill local_aux;
   return(update_CURVE);
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -2372,7 +2372,7 @@ NOTE:       The rank r is assumed to be 1<r<n.
         break;
       }
     }
-    kill(TT);
+    kill TT;
   }
   supl=transpose(compress(transpose(supl)));
   return(supl);
@@ -2522,7 +2522,7 @@ static proc interpolating_forms (intvec D,int n,list CURVE)
           number A=POINTS[ip][1];
           number B=POINTS[ip][2];
           map Mt=BR,A+xt,B+yt,1;
-          kill(A,B);
+          kill A,B;
         }
         else
         {
@@ -2530,7 +2530,7 @@ static proc interpolating_forms (intvec D,int n,list CURVE)
           {
             number A=POINTS[ip][1];
             map Mt=BR,A+xt,1,yt;
-            kill(A);
+            kill A;
           }
           else
           {
@@ -2581,9 +2581,9 @@ static proc interpolating_forms (intvec D,int n,list CURVE)
         totalM=transpose(concat(transpose(totalM),transpose(imap(SS,localM))));
         totalM=transpose(compress(transpose(totalM)));
         setring SS;
-        kill(xt,yt,Mt,nFORMS(n),partM,auxMC,conjM,localM);
+        kill xt,yt,Mt,nFORMS(n),partM,auxMC,conjM,localM;
         setring BR;
-        kill(SS);
+        kill SS;
       }
     }
   }
@@ -2622,7 +2622,7 @@ static proc interpolating_forms (intvec D,int n,list CURVE)
           number A=POINTS[ip][1];
           number B=POINTS[ip][2];
           map Mt=BR,A+xt,B+yt,1;
-          kill(A,B);
+          kill A,B;
         }
         else
         {
@@ -2630,7 +2630,7 @@ static proc interpolating_forms (intvec D,int n,list CURVE)
           {
             number A=POINTS[ip][1];
             map Mt=BR,A+xt,1,yt;
-            kill(A);
+            kill A;
           }
           else
           {
@@ -2681,9 +2681,9 @@ static proc interpolating_forms (intvec D,int n,list CURVE)
         totalM=transpose(concat(transpose(totalM),transpose(imap(SS,localM))));
         totalM=transpose(compress(transpose(totalM)));
         setring SS;
-        kill(xt,yt,Mt,nFORMS(n),partM,auxMC,conjM,localM);
+        kill xt,yt,Mt,nFORMS(n),partM,auxMC,conjM,localM;
         setring BR;
-        kill(SS);
+        kill SS;
       }
     }
     k=s-NPls;
@@ -2718,7 +2718,7 @@ static proc interpolating_forms (intvec D,int n,list CURVE)
       number A=POINT[1];
       number B=POINT[2];
       map Mt=BR,A+xt,B+yt,1;
-      kill(A,B);
+      kill A,B;
       ideal nFORMS(n)=Mt(nFORMS(n));
       // rewrite properly the above conditions to obtain the local equations
       matrix partM[RR][N];
@@ -2764,9 +2764,9 @@ static proc interpolating_forms (intvec D,int n,list CURVE)
       totalM=transpose(concat(transpose(totalM),transpose(imap(SS,localM))));
       totalM=transpose(compress(transpose(totalM)));
       setring SS;
-      kill(xt,yt,Mt,nFORMS(n),partM,auxMC,conjM,localM);
+      kill xt,yt,Mt,nFORMS(n),partM,auxMC,conjM,localM;
       setring BR;
-      kill(SS);
+      kill SS;
     }
   }
   return(Ker(totalM));
@@ -2865,7 +2865,7 @@ static proc extra_place (ideal P)
     ring ES=(char(basering),a),(x,y,t),ls;
     map psi=base_r,a,0;
     minpoly=number(psi(aux2));
-    kill(psi);
+    kill psi;
     number A=a;
     number B=imap(base_r,B);
   }
@@ -2880,7 +2880,7 @@ static proc extra_place (ideal P)
       ring ES=(char(basering),a),(x,y,t),ls;
       map psi=base_r,0,a;
       minpoly=number(psi(P1));
-      kill(psi);
+      kill psi;
       poly aux1=imap(base_r,P2);
       poly aux2=subst(aux1,y,a);
       number A=-number(subst(aux2,x,0));
@@ -2904,7 +2904,7 @@ static proc extra_place (ideal P)
       poly P_0=subst(P_2,y,B);
       ideal factors2=factorize(P_0,1);
       number A=-number(subst(factors2[1],x,0));
-      kill(aux_r);
+      kill aux_r;
     }
   }
   list POINT=list();
@@ -2913,7 +2913,7 @@ static proc extra_place (ideal P)
   export(POINT);
   map phi=base_r,x+A,y+B;
   poly LOC_EQ=phi(CHI);
-  kill(A,B,phi);
+  kill A,B,phi;
   list LLL=essdevelop(LOC_EQ);
   if (typeof(LLL[1])=="ring") {
     def altring=basering;
@@ -2959,12 +2959,12 @@ static proc extra_place (ideal P)
   export(BRANCH);
   list PARAMETRIZATION=param(BRANCH,0);
   export(PARAMETRIZATION);
-  kill(HNEring);
+  kill HNEring;
   setring base_r;
   list answer=list();
   answer[1]=ES;
   answer[2]=ext;
-  kill(ES);
+  kill ES;
   return(answer);
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -3056,7 +3056,7 @@ NOTE:       The procedure must be called from the ring Proj_R=CURVE[1][2]
             {
               number A=POINTS[m][1];
               map psi=BRing,x+A,1,y;
-              kill(A);
+              kill A;
             }
             else
             {
@@ -3065,15 +3065,15 @@ NOTE:       The procedure must be called from the ring Proj_R=CURVE[1][2]
             poly h=psi(H);
             I_N=local_IN(h,m)[1];
             interdiv[n]=I_N;
-            kill(h,psi);
+            kill h,psi;
             setring aff_r;
-            kill(SS);
+            kill SS;
           }
           break;
         }
       }
     }
-    kill(hinf,pinf);
+    kill hinf,pinf;
   }
   else
   {
@@ -3098,7 +3098,7 @@ NOTE:       The procedure must be called from the ring Proj_R=CURVE[1][2]
         {
           number A=POINTS[m][1];
           map psi=BRing,x+A,1,y;
-          kill(A);
+          kill A;
         }
         else
         {
@@ -3107,9 +3107,9 @@ NOTE:       The procedure must be called from the ring Proj_R=CURVE[1][2]
         poly h=psi(H);
         I_N=local_IN(h,m)[1];
         interdiv[n]=I_N;
-        kill(h,psi);
+        kill h,psi;
         setring aff_r;
-        kill(SS);
+        kill SS;
       }
     }
   }
@@ -3144,9 +3144,9 @@ NOTE:       The procedure must be called from the ring Proj_R=CURVE[1][2]
           poly h=psi(H);
           I_N=local_IN(h,m)[1];
           interdiv[n]=I_N;
-          kill(A,B,h,psi);
+          kill A,B,h,psi;
           setring aff_r;
-          kill(SS);
+          kill SS;
         }
       }
       else
@@ -3170,9 +3170,9 @@ NOTE:       The procedure must be called from the ring Proj_R=CURVE[1][2]
           poly h=psi(H);
           I_N=local_IN(h,m)[1];
           interdiv[n]=I_N;
-          kill(A,B,h,psi);
+          kill A,B,h,psi;
           setring aff_r;
-          kill(SS);
+          kill SS;
         }
         else
         {
@@ -3190,7 +3190,7 @@ NOTE:       The procedure must be called from the ring Proj_R=CURVE[1][2]
             I_N=local_IN(h,0)[1];
             interdiv[N+j]=I_N;
             setring aff_r;
-            kill(SS);
+            kill SS;
           }
           else
           {
@@ -3210,21 +3210,21 @@ NOTE:       The procedure must be called from the ring Proj_R=CURVE[1][2]
             map psi=BRing,x+A,y+B,1;
             poly h=psi(H);
             I_N=local_IN(h,0)[1];
-            kill(A,B,h,psi);
+            kill A,B,h,psi;
             interdiv[N+NN+counterEPl]=I_N;
             setring aff_r;
-            kill(SS);
+            kill SS;
           }
         }
       }
     }
-    kill(TAP,auxP);
+    kill TAP,auxP;
   }
-  kill(h,CAL,TIP);
+  kill h,CAL,TIP;
   @EXTRA@[1]=EP;
   @EXTRA@[2]=ES;
   @EXTRA@[3]=extra_dgs;
-  kill(EP);
+  kill EP;
   list update_CURVE=CURVE;
   if (size(extra_dgs)>0)
   {
@@ -3233,11 +3233,11 @@ NOTE:       The procedure must be called from the ring Proj_R=CURVE[1][2]
   }
   else
   {
-    kill(@EXTRA@);
+    kill @EXTRA@;
   }
   setring BRing;
-  kill(h);
-  kill(aff_r);
+  kill h;
+  kill aff_r;
   list answer=list();
   answer[1]=interdiv;
   answer[2]=update_CURVE;
@@ -3373,7 +3373,7 @@ EXAMPLE:  example BrillNoether; shows an example
   int n=estim_n(J,degX,Places);
   dbprint(printlevel+1,"Forms of degree "+string(n)+" : ");
   matrix W=nmultiples(n,degX,CHI);
-  kill(nFORMS(n-degX));
+  kill nFORMS(n-degX);
   list update_CURVE=CURVE;
   matrix V=interpolating_forms(J,n,update_CURVE);
   matrix VmW=supplement(W,V);
@@ -3393,11 +3393,11 @@ EXAMPLE:  example BrillNoether; shows an example
   setring aux_RING;
   if (defined(@EXTRA@)<>0)
   {
-    kill(@EXTRA@);
+    kill @EXTRA@;
   }
   setring BRing;
   update_CURVE[1][1]=aux_RING;
-  kill(aux_RING);
+  kill aux_RING;
   matrix B0=supplement(W,V2);
   if (Hamming_wt(B0)==0)
   {
@@ -3417,7 +3417,7 @@ EXAMPLE:  example BrillNoether; shows an example
     HH=H,Ho;
     Bres[j]=simplifyRF(HH);
   }
-  kill(nFORMS(n));
+  kill nFORMS(n);
   dbprint(printlevel+1," ");
   dbprint(printlevel+2,"Vector basis successfully computed ");
   dbprint(printlevel+1," ");
@@ -3847,7 +3847,7 @@ static proc disj_divs (intvec H,intvec P,list EC)
   setring auxR;
   int s=res_deg();
   setring BRing;
-  kill(auxR);
+  kill auxR;
   int i,j,k,d,l,N,M;
   intvec auxIV,iw;
   for (i=1;i<=s;i=i+1)
@@ -3860,7 +3860,7 @@ static proc disj_divs (intvec H,intvec P,list EC)
         setring auxR;
         auxIV[i]=size(POINTS);
         setring BRing;
-        kill(auxR);
+        kill auxR;
       }
       else
       {
@@ -3915,7 +3915,7 @@ static proc disj_divs (intvec H,intvec P,list EC)
       }
     }
   }
-  kill(auxIV,iw);
+  kill auxIV,iw;
   return(1);
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -3960,9 +3960,9 @@ EXAMPLE:  example AGcode_L; shows an example
     setring BR;
     list LG=imap(R,LG);
     setring R;
-    kill(LG);
+    kill LG;
     setring BR;
-    kill(R);
+    kill R;
   }
   else
   {
@@ -3970,7 +3970,7 @@ EXAMPLE:  example AGcode_L; shows an example
   }
   def RP=EC[1][5];
   matrix M=gen_mat(LG,D,RP);
-  kill(LG);
+  kill LG;
   return(M);
 }
 example
@@ -4112,7 +4112,7 @@ EXAMPLE:  example extcurve; shows an example
     dbprint(printlevel+1,"");
     dbprint(printlevel+2,"Total number of rational places : "+string(NrRatPl));
     dbprint(printlevel+1,"");
-    kill(RatPl);
+    kill RatPl;
     return(ext_CURVE);
   }
   else
@@ -4141,7 +4141,7 @@ EXAMPLE:  example extcurve; shows an example
     list LOC_EQS=imap(S(d),LOC_EQS);
     list BRANCHES=imap(S(d),BRANCHES);
     list PARAMETRIZATIONS=imap(S(d),PARAMETRIZATIONS);
-    kill(S(d));
+    kill S(d);
 
     // conjugate data from S(d)
     int s=size(POINTS);
@@ -4220,7 +4220,7 @@ EXAMPLE:  example extcurve; shows an example
             BRANCHES[1][2]=iv;
             BRANCHES[1][3]=kk;
             BRANCHES[1][4]=paux;
-            kill(Maux);
+            kill Maux;
             PARAMETRIZATIONS=insert(PARAMETRIZATIONS,list(),0);
             PARAMETRIZATIONS[1][1]=ideal(0);
             PARAMETRIZATIONS[1][1][1]=importdatum(S(i),"par@1",olda);
@@ -4239,15 +4239,15 @@ EXAMPLE:  example extcurve; shows an example
                                         PARAMETRIZATIONS[piv],1),counter);
             }
             setring S(i);
-            kill(par@1,par@2);
+            kill par@1,par@2;
             setring RatPl;
           }
-          kill(S(i));
+          kill S(i);
         }
       }
     }
-    kill(iw);
-    kill(paux);
+    kill iw;
+    kill paux;
 
     // finally add points from S(1)
     if (typeof(CURVE[5][1])=="list")
@@ -4280,9 +4280,9 @@ EXAMPLE:  example extcurve; shows an example
     dbprint(printlevel+2,"Total number of rational places : NrRatPl = "
                                    +string(NrRatPl));
     dbprint(printlevel+1,"");
-    kill(S(1));
-    kill(R(d));
-    kill(RatPl);
+    kill S(1);
+    kill R(d);
+    kill RatPl;
     return(ext_CURVE);
   }
 }
@@ -4407,7 +4407,7 @@ EXAMPLE:  example prepSV; shows an example
   matrix HP=AGcode_L(H,D,EC);
   int s=nrows(HP);
   int i,j,k;
-  kill(EE);
+  kill EE;
   for (k=1;k<=n;k=k+1)
   {
     E[k+1]=GP[1,k]*submat(HP,1..s,k..k);
@@ -4419,7 +4419,7 @@ EXAMPLE:  example prepSV; shows an example
   E[n+2]=GP;
   intvec IW=e,m+2-2*genusX;
   E[n+3]=IW;
-  kill(IW);
+  kill IW;
   return(E);
 }
 example
