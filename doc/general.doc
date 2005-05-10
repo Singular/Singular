@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.199 2005-05-10 14:10:00 anne Exp $
+@comment $Id: general.doc,v 1.200 2005-05-10 15:49:50 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -3883,7 +3883,7 @@ The purpose of the one line procedure descriptions is not to give a short help
 for the procedure, but to help the user decide what procedure might be
 the right one for the job. Details can then be found in the help section
 of each procedure. Therefore parameters may be omitted or abbreviated if
-necessary. If this description conists of only upper-case characters,
+necessary. If this description consists of only upper-case characters,
 then it will be typeset in all lowercase characters in the manual.
 
 For more information, see @ref{Typesetting of help strings}. For an
