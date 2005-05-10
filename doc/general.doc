@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.198 2005-05-03 11:51:55 anne Exp $
+@comment $Id: general.doc,v 1.199 2005-05-10 14:10:00 anne Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -3096,23 +3096,22 @@ should furthermore comply with  certain rules as explained in
 @cindex Names in procedures
 @cindex local names
 
-All variables are local to the procedure they are defined in.
-Locally defined variables cannot interfere with names in other
-procedures and are automatically deleted after leaving
-the procedure.
+All variables are local to the procedure they are defined in and to
+the package in which the procedure is defined. Locally defined variables 
+cannot interfere with names in other procedures and are automatically 
+deleted after leaving the procedure.
 
 Internally, local variables are stored using the nesting level. A variable
 is said to have nesting level 1, if it is local to a procedure that was
 called interactively, nesting level 2, if it is local to a procedure that
 was called by a procedure of nesting level 1 etc. @code{listvar()} also
 displays the nesting level, nesting level 0 is used for global objects
-(see @ref{listvar}). A ring may be 'moved up' by one nesting level
-with @code{keepring} (see @ref{keepring}). All variables living in that
-ring are moved together with that ring.
+(see @ref{listvar}). 
 
 To keep local variables after leaving the procedure, they have to be
-exported (i.e. made known) to some higher level by the @code{export}
-command (@pxref{export}).
+exported (i.e. made known) to some higher level or to some package
+by a command like @code{export} or @code{exportto} (@pxref{export}, 
+@pxref{exportto}, @pxref{importfrom}; see also @pxref{package}).
 
 @strong{Example:}
 @smallexample
@@ -3219,7 +3218,7 @@ See
 
 A library is a collection of @sc{Singular}
 procedures in a file.
-@*@sc{Singular} reads a library with the command
+@*@sc{Singular} reads a library with the commands @code{load} and
 @code{LIB}. General information about the library is displayed by the command
 @code{help libname_lib}. After loading the library, its procedures can be used
 like the built-in @sc{Singular} functions.
@@ -3247,7 +3246,7 @@ distribution, have to comply with certain rules as explained in
 @cindex DefaultDir
 @cindex SINGULARPATH
 
-Libraries can be loaded with the @code{LIB} command:
+Libraries can be loaded with the @code{LIB} or the @code{load} command:
 
 @c ------------------------------------------------------------
 @c   This piece of text exists also in the file reference.doc,
@@ -4181,19 +4180,20 @@ In addition to the concept of libraries, it is also possible to
 dynamically extend the functionality by loading functions written 
 in C/C++ or some other higher programming language. A collection 
 of such functions is called a dynamic module and can be loaded by
-the command @code{LIB}. It is basically handled in the same way as a 
-library: upon loading, a new @code{package} is created which holds the
-contents of the dynamic module, but in contrast to the case of a library,
-the name of the @code{package} is not derived from the filename, but is
-hardcoded in the dynamic module. In particular, general information 
-about it can be displayed by the command @code{help package_name}. 
-After loading the dynamic module, its functions can be used exactly like 
-the built-in @sc{Singular} functions.
+the command @code{LIB} or @code{load}. It is basically handled in 
+the same way as a library: upon loading, a new @code{package} is 
+created which holds the contents of the dynamic module, but in contrast 
+to the case of a library, the name of the @code{package} is not derived 
+from the filename, but is hardcoded in the dynamic module. In particular, 
+general information about it can be displayed by the command 
+@code{help package_name}. After loading the dynamic module, its functions 
+can be used exactly like the built-in @sc{Singular} functions.
 
 To have the full functionality of a built-in function, dynamic modules
 need to comply with certain requirements on their internal structure.
 As this would be beyond the scope of the @code{Singular} manual, 
-a separate guide on how to write and use dynamic modules can be found 
+a separate, more detailed guide on how to write and use dynamic modules 
+can be found 
 at @code{http://www.singular.uni-kl.de/DynMod.ps}. 
 
 
