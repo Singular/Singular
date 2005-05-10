@@ -34,7 +34,7 @@ poly uni_subst_bits(poly outer_uni, poly inner_multi, ring r){
   zero_ideal=idInit(0,1);
   //assumes outer_uni is univariate and ordering global
   int d_max=p_GetExp(outer_uni,1,r);
-  poly* potences=(poly*) omalloc((d_max+1)*sizeof(poly));
+  poly* potences=(poly*) omAlloc((d_max+1)*sizeof(poly));
   potences[0]=p_ISet(1,r);
   int i;
   for(i=1;i<=d_max;i++){

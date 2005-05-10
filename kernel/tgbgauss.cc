@@ -104,13 +104,13 @@ void mac_destroy(mac_poly p){
 
 void simple_gauss(tgb_sparse_matrix* mat, calc_dat* c){
   int col, row;
-  int* row_cache=(int*) omalloc(mat->get_rows()*sizeof(int));
+  int* row_cache=(int*) omAlloc(mat->get_rows()*sizeof(int));
   col=0;
   row=0;
   int i;
   int pn=mat->get_rows();
   int matcol=mat->get_columns();
-  int* area=(int*) omalloc(sizeof(int)*((matcol-1)/bundle_size+1));
+  int* area=(int*) omAlloc(sizeof(int)*((matcol-1)/bundle_size+1));
   const int max_area_index=(matcol-1)/bundle_size;
     //rows are divided in areas 
   //if row begins with columns col, it is located in [area[col/bundle_size],area[col/bundle_size+1]-1]
@@ -436,12 +436,12 @@ void simple_gauss2(tgb_matrix* mat){
 }
 
 tgb_matrix::tgb_matrix(int i, int j){
-  n=(number**) omalloc(i*sizeof (number*));;
+  n=(number**) omAlloc(i*sizeof (number*));;
   int z;
   int z2;
   for(z=0;z<i;z++)
   {
-    n[z]=(number*)omalloc(j*sizeof(number));
+    n[z]=(number*)omAlloc(j*sizeof(number));
     for(z2=0;z2<j;z2++)
     {
       n[z][z2]=nInit(0);
@@ -588,7 +588,7 @@ void tgb_matrix::free_row(int row, BOOLEAN free_non_zeros){
 
 
 tgb_sparse_matrix::tgb_sparse_matrix(int i, int j, ring rarg){
-  mp=(mac_poly*) omalloc(i*sizeof (mac_poly));;
+  mp=(mac_poly*) omAlloc(i*sizeof (mac_poly));;
   int z;
   int z2;
   for(z=0;z<i;z++)
