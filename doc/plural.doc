@@ -197,6 +197,9 @@
 described in the following subsections.
 
 Use the @code{LIB} command for loading of single libraries.
+
+@strong{Note:} For any computation in @sc{Plural}, the monomial ordering must be a global ordering.
+
 @c , and the
 @c command @code{LIB "all.lib";} for loading all libraries of 
 @c @sc{Singular} and @sc{Plural} together.
@@ -249,7 +252,6 @@ libraries, featuring noncommutative algorithms of the @sc{Singular} distribution
 @smallexample
 @c example
 option(loadLib);
-option(noredefine);
 LIB "ncall.lib";
 @c example
 @end smallexample
