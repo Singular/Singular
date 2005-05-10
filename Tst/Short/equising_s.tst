@@ -52,11 +52,11 @@ proc tst(list d)
      EsList[2];  
      if (typeof(EsList[1])=="list") 
      { 
-       ideal ES = EsList[1][1]; kill(EsList);
+       ideal ES = EsList[1][1]; kill EsList;
      }
      else
      {
-       def R=EsList[1]; kill(EsList); setring R; 
+       def R=EsList[1]; kill EsList; setring R; 
      }
      option(redSB);
      ES=std(ES);
@@ -68,9 +68,9 @@ proc tst(list d)
      isEquising(F);
 
      kill L,Px;
-     kill(q);
-     if (defined(R)){ kill(R); }
-     kill(r);
+     kill q;
+     if (defined(R)){ kill R; }
+     kill r;
    }
 }
 
@@ -101,7 +101,7 @@ F = F*(1-A)^5*(1+B+A^2)^5;
 F = reduce(F,std(id));
 esStratum(F);
 isEquising(F);
-kill(rr);
+kill rr;
 ///////////////////////////////////////////////////////////////////////////
 //      1st order es-deformation of irred. poly   
 ring rr=0,(A,B,C,x,y),ls;
@@ -111,7 +111,7 @@ list M=esStratum(F,2);
 M;
 M=esStratum(F,6);
 std(M[1][1]);
-kill(rr);
+kill rr;
 /////////////////////////////////////////////////
 
 example esStratum;
