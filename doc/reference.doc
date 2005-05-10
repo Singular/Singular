@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.248 2005-05-09 08:06:02 Singular Exp $
+@comment $Id: reference.doc,v 1.249 2005-05-10 14:48:00 anne Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -3117,7 +3117,10 @@ See
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
-reads a library of procedures from a file. If the given filename does
+reads a library of procedures from a file. In contrast to the command 
+@code{load}, the procedures from the library are added to the package
+@code{Top} as well as the package corresponding to the library.
+If the given filename does
 not start with @kbd{.} or @kbd{/} and cannot be located in the current
 directory, each directory contained in the library
 @code{SearchPath} is searched for file of this name.
@@ -6909,11 +6912,11 @@ when exporting the ring.
 
 @item @strong{Warning:}
 The identifier is transfered to the other package. It does no longer 
-exist in the current package. If the identifier should be copied instead,
+exist in the current package. If the identifier should only be copied,
 @ref{importfrom} should be used instead.
 
 @item @strong{Example:}
-HIER MUSS NOCH GEAENDERT WERDEN!!!
+
 @smallexample
 proc p1
 @{
@@ -7104,7 +7107,10 @@ none
 @c can view the search path which @sc{Singular} uses to locate its
 @c libraries, by starting up @sc{Singular} with the option @code{-v}, or by
 @c issuing the command @code{system("with");"}.
-reads a library of procedures from a file. If the given filename does
+reads a library of procedures from a file. In contrast to the command
+@code{LIB}, the command @code{load} does not add the procedures of the 
+library to the package @code{Top}, but only to the package corresponding 
+to the library. If the given filename does
 not start with @kbd{.} or @kbd{/}, the following directories are
 searched for it (in the given order): the current directory, the 
 directories given in the environment variable @code{SINGULARPATH}, some
@@ -7114,8 +7120,6 @@ You can view the search path which @sc{Singular} uses to locate its
 libraries, by starting up @sc{Singular} with the option @code{-v}, 
 or by issuing the command @code{system("with");}.
 
-Unless  @sc{Singular} is started with the @code{--no-stdlib} option, the
-library @code{standard.lib} is automatically loaded at start-up time.
 @end table
 
 All loaded libraries are displayed by the @code{listvar(package);}
