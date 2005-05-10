@@ -1,6 +1,6 @@
 LIB "tst.lib";
 tst_init();
-tst_ignore("CVS ID $Id: brnoeth_s.tst,v 1.2 2004-02-12 14:19:40 Singular Exp $");
+tst_ignore("CVS ID $Id: brnoeth_s.tst,v 1.3 2005-05-10 18:02:50 Singular Exp $");
 
 // tst_status();
 
@@ -16,14 +16,14 @@ L[3]="c";
 L[4]="d";
 intvec P=1,3,4,2;
 permute_L(L,P);
-kill(L,P);
+kill L,P;
 
 ring s=2,T,lp;
 matrix G[3][7]=1,0,1,0,1,0,1,0,1,1,0,0,1,1,0,0,0,1,1,1,1;
 print(G);
 matrix H=dual_code(G);
 print(H);
-kill(s);
+kill s;
 
 ring s=3,T,lp;
 matrix C[2][5]=0,1,0,1,1,0,1,0,0,1;
@@ -33,7 +33,7 @@ print(L[1]);
 print(L[2]);
 L[3];
 print(L[1]*transpose(L[2]));
-kill(s);
+kill s;
 
 ring s=2,(x,y),lp;
 ideal I=x4+x,y4+y;
@@ -45,7 +45,7 @@ L;
 I=x16+x,y16+y;
 L=closed_points(I);
 L;
-kill(s);
+kill s;
 
 ring r=2,(x,y),lp;
 poly f;
@@ -90,7 +90,7 @@ print(SK[1]);
 print(SK[2]);
 SK[3];
 setring r;
-kill(R,RR,RP);
+kill R,RR,RP;
 
 // HERMITE curve over F_4 (p=2) 
 
@@ -106,7 +106,7 @@ setring projR;
 Weierstrass(1,12,HC2);
 def ER2=HC2[1][4];
 setring ER2;
-kill(projR,RP);
+kill projR,RP;
 G=5;
 D=2..9;
 matrix C2=AGcode_Omega(G,D,HC2);
