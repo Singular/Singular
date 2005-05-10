@@ -1055,11 +1055,14 @@ static sorted_pair_node** add_to_basis(poly h, int i_pos, int j_pos,calc_dat* c,
   c->gcd_of_terms=(poly*) omrealloc(c->gcd_of_terms, c->n *sizeof(poly));
   c->gcd_of_terms[i]=gcd_of_terms(h,c->r);
   c->rep[i]=i;
-  hp=omalloc(i*sizeof(char));
+  if (i>0)
+    hp=omalloc(i*sizeof(char));
+  else
+    hp=NULL;
   if (hp!=NULL){
     c->states[i]=(char*) hp;
   } else {
-    exit(1);
+    //exit(1);
   }
   hp=omrealloc(c->S->m,c->n*sizeof(poly));
   if (hp!=NULL){
@@ -3214,7 +3217,7 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
     c->F_minus=c->F_minus->next;
     omfree(old);
   }
-  for(int z=0;z<c->n;z++){
+  for(int z=1 /* zero length at 0 */;z<c->n;z++){
     omfree(c->states[z]);
   }
   omfree(c->states);
