@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.109 2005-05-06 17:31:03 Singular Exp $ */
+/* $Id: grammar.y,v 1.110 2005-05-10 14:35:09 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -1146,41 +1146,24 @@ exportcmd:
         EXPORT_CMD exprlist
         {
 #ifdef HAVE_NS
-	  if (basePack!=$2.req_packhdl)
-	  {
-	    if(iiExport(&$2,0,basePackHdl)) YYERROR;
-	  }
-	  else
+          if (basePack!=$2.req_packhdl)
+          {
+            if(iiExport(&$2,0,basePackHdl)) YYERROR;
+          }
+          else
 #endif /* HAVE_NS */
             if (iiExport(&$2,0)) YYERROR;
         }
         ;
 
 killcmd:
-        KILL_CMD exprlist
+        KILL_CMD extendedid
         {
-          leftv v=&$2;
-          do
-          {
-            if (v->rtyp!=IDHDL)
-            {
-              if (v->name!=NULL)
-              {
-                 Werror("`%s` is undefined in kill",v->name);
-              }
-              else               WerrorS("kill what ?");
-            }
-            else
-            {
-	      #ifdef HAVE_NS
-              killhdl((idhdl)v->data,v->req_packhdl);
-	      #else
-              killhdl((idhdl)v->data);
-	      #endif
-            }
-            v=v->next;
-          } while (v!=NULL);
-          $2.CleanUp();
+          killid($2,&IDROOT);
+        }
+        | killcmd ',' extendedid
+        {
+          killid($3,&IDROOT);
         }
         ;
 
