@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gmspoly.lib,v 1.11 2005-05-06 14:38:33 hannes Exp $";
+version="$Id: gmspoly.lib,v 1.12 2005-05-10 17:56:13 Singular Exp $";
 category="Singularities";
 
 info="
@@ -80,7 +80,7 @@ EXAMPLE:  example istame; shows examples
   int D=vdim(std(J));
 
   setring(@X);
-  kill(@WX);
+  kill @WX;
 
   return(d>0&&d==D);
 }
@@ -544,7 +544,7 @@ EXAMPLE:  example gbasis; shows examples
   b=matrix(b)*imap(@S,G);
   A=imap(@S,A);
   export(b,A);
-  kill(@S);
+  kill @S;
 
   setring(@X);
   return(@XS);

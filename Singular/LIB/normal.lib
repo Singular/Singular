@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: normal.lib,v 1.44 2005-05-06 14:38:50 hannes Exp $";
+version="$Id: normal.lib,v 1.45 2005-05-10 17:56:14 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  normal.lib     Normalization of Affine Rings
@@ -2089,14 +2089,14 @@ EXAMPLE:  example primeClosure; shows an example
 
   if (RS[2]==1)               // we've reached the integral closure
     {
-      kill(J);
+      kill J;
       return(L);
     }
   else                        // prepare the next iteration
     {
       if (n==1)               // In the first iteration: keep only the data
         {                     // needed later on.
-          kill (RR,SM);
+          kill RR,SM;
 
           export(ker);
         }
@@ -2107,7 +2107,7 @@ EXAMPLE:  example primeClosure; shows an example
       export(ker);
       ideal norid=endid;
       export(norid);
-      kill(endid);
+      kill endid;
 
       map phi=R0,endphi;      // fetch the singular locus
       ideal J=mstd(simplify(phi(J)+ker,4))[2];
@@ -2121,9 +2121,9 @@ EXAMPLE:  example primeClosure; shows an example
          ideal normap=endphi;
       }
       export(normap);
-      kill(phi);              // we save phi as ideal, not as map, so that
+      kill phi;              // we save phi as ideal, not as map, so that
       ideal phi=endphi;       // we have more flexibility in the ring names
-      kill(endphi);           // later on.
+      kill endphi;           // later on.
       export(phi);
       L=insert(L,R1,n);       // Add the new ring R1 and go on with the
       if (size(#)>0)
@@ -2238,9 +2238,9 @@ EXAMPLE:  example closureFrac; shows an example
           p=p*phimap(nzd);
 
           if (j==2)
-            {
-              kill(phimap);
-            }
+          {
+            kill phimap;
+          }
 
           if (j==1)
             {
@@ -2261,7 +2261,7 @@ EXAMPLE:  example closureFrac; shows an example
               setring S(k);
               h=NF(imap(R(k),p),J);
               setring R(k);
-              kill(p);
+              kill p;
             }
 
           setring R(k-1);
@@ -2279,16 +2279,16 @@ EXAMPLE:  example closureFrac; shows an example
             }
           p=NF(backmap(h),std(ker));
           if (j==2)
-            {
-              kill(backmap);
-            }
+          {
+            kill backmap;
+          }
         }
 
       if (j==1)
         {
           if (defined(fraction))
             {
-              kill(fraction);
+              kill fraction;
               list fraction=p;
             }
           else
@@ -2313,7 +2313,7 @@ example
   list L=primeClosure(R);          // We normalize R/ker
   for (int i=1;i<=size(L);i++) { def R(i)=L[i]; }
   setring R(2);
-  kill(R);
+  kill R;
   phi;                             // The map R(1)-->R(2)
   poly f=T(2);                     // We will get a representation of f
   export f;

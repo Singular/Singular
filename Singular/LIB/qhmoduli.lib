@@ -92,7 +92,7 @@ EXAMPLE: example ModEqn; shows an example
     def RME2 = LinearizeAction(stabid, actionid, nvars(Gf[1]));
     setring RME2;
     export(RME2);
-    kill(RME1);
+    kill RME1;
 
     if(size(actionid) == sizeOfAction) { nonLinearQ = 0;}
     else  {
@@ -121,16 +121,16 @@ EXAMPLE: example ModEqn; shows an example
       dbprint(dbPrt, " compute equations of the quotient T_/E_f");
     }
     export(RME3);
-    kill(RME2);
+    kill RME2;
 
     // 6th step : compute the equations of the quotient T_/E_f
 
                 ideal G = groupid; ideal variety = embedid;
-                kill(groupid); kill(embedid);
+                kill groupid,embedid;
     def RME4 = QuotientEquations(G, actionid, variety, opt);
     setring RME4;
     poly mPoly = minpoly;
-    kill(RME3);
+    kill RME3;
     export(RME4);
 
     // simplify the ideal and create a new ring with propably less variables
@@ -151,7 +151,7 @@ EXAMPLE: example ModEqn; shows an example
       ideal modid = imap(RME4, id);
     }
     export(modid);
-    kill(RME4);
+    kill RME4;
   }
   else {
                 def RME5 = basering;
@@ -249,7 +249,7 @@ EXAMPLE: example QuotientEquations; shows an example
     ideal id =  imap(RQER, invars);
     ideal embedid = imap(RQEB, variety);
   }
-  kill(RQER);
+  kill RQER;
   export(id);
   export(embedid);
   return(RQES);
@@ -383,7 +383,7 @@ EXAMPLE: example ArnoldAction; shows an example
   ideal stabid = imap(STR1, stabid);
   export(actionid);
   export(stabid);
-  kill(RAAR);
+  kill RAAR;
 dbprint(dbPrt, "
 // 'ArnoldAction' created a new ring.
 // To see the ring, type (if the name of the ring is R):
@@ -507,8 +507,8 @@ GLOBAL: varSubsList, contains the index j s.t. t(i) -> t(i)t(j) ...
   ringSTR = "ring RSTR = " + parString + ", (" + varstr(basering) + ", " + varString + "), dp;";  // dp
         ringSTR1 = "ring RSTT = " + parString + ", (" + varString + ", " + varstr(basering) + "), dp;";
 
-  if(defined(RSTR)) { kill(RSTR);}
-        if(defined(RSTT)) { kill(RSTT);}
+  if(defined(RSTR)) { kill RSTR;}
+        if(defined(RSTT)) { kill RSTT;}
         execute(ringSTR1);      // this ring is only used for the result, where the variables
   export(RSTT);           // are s(1..m),t(1..n), as needed for Derksens algorithm (NullCone)
   minpoly = number(imap(RSTB, mPoly));
@@ -540,7 +540,7 @@ GLOBAL: varSubsList, contains the index j s.t. t(i) -> t(i)t(j) ...
   }
   dbprint(dbPrt, "  qhasihomogenous substituion =" + string(qhsubs));
   map F = RSTR, qhsubs;
-  kill(varSubsList);
+  kill varSubsList;
 
   // get the equations of the stabilizer by comparing coefficients
   // in the equation f = F(f).
@@ -1054,10 +1054,10 @@ GLOBAL:  'computedPowers'
     h = Expand(newSubs, degVec, reduceIdeal, w1, ub, truncatedQ) * coeffList[i];  // already reduced
     g = reduce(g + h, reduceIdeal);
   }
-   kill(computedPowers);
+  kill computedPowers;
   setring RASB;
   poly fnew = imap(RASR, g);
-  kill(RASR);
+  kill RASR;
   return(fnew);
 }
 

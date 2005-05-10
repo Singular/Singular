@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: resolve.lib,v 1.3 2005-05-06 14:39:06 hannes Exp $";
+version="$Id: resolve.lib,v 1.4 2005-05-10 17:56:15 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  resol.lib      Resolution of singularities (Desingularization)
@@ -3640,8 +3640,8 @@ EXAMPLE: example resolve;  shows an example
    intvec w=-1;
    matrix intE;
    int extra,bm;
-   if(defined(BO)){kill(BO);}
-   if(defined(cent)){kill(cent);}
+   if(defined(BO)){kill BO;}
+   if(defined(cent)){kill cent;}
 
    ideal Jrad=equiRadical(J);
    if(size(reduce(Jrad,std(J)))!=0)

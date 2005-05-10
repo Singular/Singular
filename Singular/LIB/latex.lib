@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: latex.lib,v 1.24 2005-05-09 15:55:10 Singular Exp $";
+version="$Id: latex.lib,v 1.25 2005-05-10 17:56:13 Singular Exp $";
 category="Visualization";
 info="
 LIBRARY: latex.lib    Typesetting of Singular-Objects in LaTeX2e
@@ -3078,7 +3078,7 @@ ev);
 
  texproc(fname,"milnor_number");
 
-  kill(milnor_number);
+  kill milnor_number;
 
 // ------------------------------ closing the tex file -------------------
 write(fname,"\\section{Closing the \\LaTeX\\ file}");

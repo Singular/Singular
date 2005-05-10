@@ -1,6 +1,6 @@
 // Last change 12.02.2001 (Eric Westenberger)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: zeroset.lib,v 1.13 2005-05-06 14:39:20 hannes Exp $";
+version="$Id: zeroset.lib,v 1.14 2005-05-10 17:56:17 Singular Exp $";
 category="Symbolic-numerical solving";
 info="
 LIBRARY:  zeroset.lib      Procedures For Roots and Factorization
@@ -127,7 +127,7 @@ EXAMPLE: example  Roots; shows an example
   list roots = imap(ROR, roots);
   poly newA = imap(ROR, newA);
   poly f = imap(ROR, fn);
-  kill(ROR);
+  kill ROR;
   export(roots);
   export(newA);
   export(f); dbprint(dbPrt,"
@@ -371,7 +371,7 @@ EXAMPLE: example ZeroSet; shows an example
   list zeroset = imap(ZSR, zeroset);
   poly newA = imap(ZSR, newA);
   ideal id = imap(ZSR, id);
-  kill(ZSR);
+  kill ZSR;
 
   export(id);
   export(zeroset);
@@ -490,7 +490,7 @@ EXAMPLE: example  Quotient; shows an example
 
   setring(QUOB);
   list result = imap(QUOR, result);
-  kill(QUOR);
+  kill QUOR;
   return(result);
 }
 example
@@ -548,7 +548,7 @@ ASSUME:  basering = Q[x] or Q(a)[x]
 
   setring(REMB);
   poly r = imap(REMR, h);
-  kill(REMR);
+  kill REMR;
   return(r);
 }
 example
@@ -601,7 +601,7 @@ EXAMPLE: example  EGCD; shows an example
 
   setring(GCDB);
   poly h = imap(GCDR, h);
-  kill(GCDR);
+  kill GCDR;
   return(h);
 }
 example
@@ -668,7 +668,7 @@ EXAMPLE: example  MEGCD; shows an example
   poly @h = EGCD(@f, @g);
   setring(@RGCDB);
   poly h = imap(@RGCD, @h);
-  kill(@RGCD);
+  kill @RGCD;
   return(h);
 }
 
@@ -783,7 +783,7 @@ EXAMPLE: example  Factor; shows an example
 
   setring(FRB);
   list result = imap(FRR, result);
-  kill(FRR);
+  kill FRR;
   return(result);
 }
 example
@@ -1172,7 +1172,7 @@ NOTE:    might change 'mpoly' !!
 
       setring(NLZR);
       partSol = imap(RIS1, roots);
-      kill(RIS1);
+      kill RIS1;
       if(mpoly[1] != partSol[3]) {      // change minpoly
         mpoly = std(partSol[3]);
         F = NLZR, maxideal(1);
@@ -1194,7 +1194,7 @@ NOTE:    might change 'mpoly' !!
   result[4] = index;
   result[5] = std(generators);
 
-  kill(NLZR);
+  kill NLZR;
   return(result);
 }
 

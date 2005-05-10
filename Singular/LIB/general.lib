@@ -2,7 +2,7 @@
 //anne, added deleteSublist and watchdog 12.12.2000
 //eric, added absValue 11.04.2002
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: general.lib,v 1.46 2005-05-06 14:38:31 hannes Exp $";
+version="$Id: general.lib,v 1.47 2005-05-10 17:56:13 Singular Exp $";
 category="General purpose";
 info="
 LIBRARY:  general.lib   Elementary Computations of General Type
@@ -1176,7 +1176,7 @@ EXAMPLE: example watchdog; shows an example
         }
         if(defined(watchdog_interrupt))
         {
-          kill (watchdog_interrupt);
+          kill watchdog_interrupt;
         }
         close(l_fork);
       }
@@ -1564,7 +1564,7 @@ EXAMPLE: example timeFactorize; shows an example
             def result = imap(PP, result);
             kill PP;
           }
-          kill (l_fork);
+          kill l_fork;
         }
         else
         {
@@ -1638,7 +1638,7 @@ EXAMPLE: example timeStd; shows an example
             def result = imap(PP, result);
             kill PP;
           }
-          kill (l_fork);
+          kill l_fork;
         }
         else
         {

@@ -1,8 +1,8 @@
 ///////////////////////////////////////////////////////////////
-// $Id: groebnerwalk.lib,v 1.3 2005-05-06 14:38:34 hannes Exp $   //
+// $Id: groebnerwalk.lib,v 1.4 2005-05-10 17:56:13 Singular Exp $   //
 ///////////////////////////////////////////////////////////////
 
-version="$Id: groebnerwalk.lib,v 1.3 2005-05-06 14:38:34 hannes Exp $";
+version="$Id: groebnerwalk.lib,v 1.4 2005-05-10 17:56:13 Singular Exp $";
 category="cc";
 
 info="
@@ -235,7 +235,7 @@ EXAMPLE: example gwalk; shows an example"
    string ord_str =   OSCTW[2];
    intvec curr_weight   =   OSCTW[3]; /* original weight vector */
    intvec target_weight =   OSCTW[4]; /* terget weight vector */
-   kill(OSCTW);
+   kill OSCTW;
    option(redSB);
    def xR = basering;
 
@@ -247,7 +247,7 @@ EXAMPLE: example gwalk; shows an example"
    G = system("Mwalk", G, curr_weight, target_weight);
 
    setring xR;
-   //kill(Go);
+   //kill Go;
 
    keepring basering;
    ideal result = fetch(old_ring, G);
@@ -323,7 +323,7 @@ proc awalk1_tmp(ideal Go, int n2, list #)
    string ord_str =   OSCTW[2];
    intvec curr_weight   =   OSCTW[3]; /* original weight vector */
    intvec target_weight =   OSCTW[4]; /* terget weight vector */
-   kill(OSCTW);
+   kill OSCTW;
    option(redSB);
 
    def xR = basering;
@@ -336,7 +336,7 @@ proc awalk1_tmp(ideal Go, int n2, list #)
    G = system("MAltwalk1", G, n1, n2, curr_weight, target_weight);
 
    setring xR;
-   //kill(Go);
+   //kill Go;
 
    keepring basering;
    ideal result = fetch(old_ring, G);
@@ -360,7 +360,7 @@ EXAMPLE: example fwalk; shows an example"
    string ord_str =   OSCTW[2];
    intvec curr_weight   =   OSCTW[3]; /* original weight vector */
    intvec target_weight =   OSCTW[4]; /* terget weight vector */
-   kill(OSCTW);
+   kill OSCTW;
    option(redSB);
    def xR = basering;
 
@@ -372,7 +372,7 @@ EXAMPLE: example fwalk; shows an example"
    G = system("Mfwalk", G, curr_weight, target_weight);
 
    setring xR;
-   //kill(Go);
+   //kill Go;
 
    keepring basering;
    ideal result = fetch(old_ring, G);
@@ -406,7 +406,7 @@ EXAMPLE: example awalk2; shows an example"
    string ord_str =   OSCTW[2];
    intvec curr_weight   =   OSCTW[3]; /* original weight vector */
    intvec target_weight =   OSCTW[4]; /* terget weight vector */
-   kill(OSCTW);
+   kill OSCTW;
    option(redSB);   def xR = basering;
 
    execute("ring ostR = ("+charstr(xR)+"),("+varstr(xR)+"),"+ord_str+";");
@@ -417,7 +417,7 @@ EXAMPLE: example awalk2; shows an example"
    G = system("MAltwalk2", G, curr_weight, target_weight);
 
    setring xR;
-   //kill(Go);
+   //kill Go;
 
    keepring basering;
    ideal result = fetch(old_ring, G);
@@ -461,7 +461,7 @@ EXAMPLE: example pwalk; shows an example"
   string ord_str =   OSCTW[2];
   intvec curr_weight   =   OSCTW[3]; /* original weight vector */
   intvec target_weight =   OSCTW[4]; /* terget weight vector */
-  kill(OSCTW);
+  kill OSCTW;
   option(redSB);
 
   def xR = basering;
@@ -473,7 +473,7 @@ EXAMPLE: example pwalk; shows an example"
   G = system("Mpwalk", G, n1, n2, curr_weight, target_weight,nP);
 
   setring xR;
-  //kill(Go);
+  //kill Go;
 
   keepring basering;
   ideal result = fetch(old_ring, G);
@@ -506,7 +506,7 @@ EXAMPLE: example twalk; shows an example"
   string ord_str =   L[2];
   intvec curr_weight   = L[3];
   intvec target_weight =  L[4];
-  kill(L);
+  kill L;
 
   option(redSB);
   def xR = basering;
@@ -519,7 +519,7 @@ EXAMPLE: example twalk; shows an example"
   G = system("TranMImprovwalk", G, curr_weight, target_weight, nP);
 
   setring xR;
-   //kill(Go);
+   //kill Go;
 
    keepring basering;
    ideal result = fetch(old_ring, G);

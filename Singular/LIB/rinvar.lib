@@ -1,6 +1,6 @@
 // Last change 10.12.2000 (TB)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: rinvar.lib,v 1.13 2005-05-06 14:39:09 hannes Exp $";
+version="$Id: rinvar.lib,v 1.14 2005-05-10 17:56:16 Singular Exp $";
 category="Invariant theory";
 info="
 LIBRARY:  rinvar.lib      Invariant Rings of Reductive Groups
@@ -427,9 +427,9 @@ EXAMPLE: example LinearizeAction; shows an example
         nrt++;
         str = charstr(basering) + ", (" + varstr(basering)
                    + ",t(" + string(nrt) + ")),";
-        if(defined(RLAB)) { kill(RLAB);}
+        if(defined(RLAB)) { kill RLAB;}
         def RLAB = basering;
-        if(defined(RLAR)) { kill(RLAR);}
+        if(defined(RLAR)) { kill RLAR;}
         execute("ring RLAR = " + str + "(" + order + ");");
         execute(mPoly);
 
@@ -630,7 +630,7 @@ EXAMPLE: example InvariantRing; shows an example
   // ground field.
 
   def IRB = basering;
-  if(defined(RIRR)) { kill(RIRR);}
+  if(defined(RIRR)) { kill RIRR;}
   def RIRR = basering;
   setring RIRR;
 //  export(RIRR);
@@ -1041,7 +1041,7 @@ RETURN:  matrix M, f = M[1,1]*M[2,1] + ... + M[1,n]*M[2,n]
       }
       else { columnList[size(columnList) + 1] = j; }
     }
-    if(defined(auxM)) { kill(auxM);}
+    if(defined(auxM)) { kill auxM;}
     matrix auxM[2][size(columnList)];      // built new matrix and omit
     for(j = 1; j <= size(columnList); j++) {    // the linear dependent colums
       auxM[1, j] = decompMx[1, columnList[j]];    // found above
