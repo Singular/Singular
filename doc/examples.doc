@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.79 2005-05-10 14:49:17 anne Exp $
+@comment $Id: examples.doc,v 1.80 2005-05-10 18:07:52 Singular Exp $
 @comment this file contains the examples
 
 @c The following directives are necessary for proper compilation
@@ -781,7 +781,7 @@ which allows ignoring all but the first j entries of vectors when
 forming the pairs in the standard basis computation.
 
 @smallexample
-@c example
+@c @c example
 ring r=0,(x,y),dp;
 module mo=[x^2-y^2,1,0,0],[xy+y^2,0,1,0],[y^2,0,0,1];
 print(mo);
@@ -802,7 +802,7 @@ module mostd2=Kstd::kstd(mo,2);
                     // treated too
 print(mostd2);
 
-@c example
+@c @c example
 @end smallexample
 
 @c ----------------------------------------------------------------------------
