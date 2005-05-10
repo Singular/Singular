@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.78 2005-05-09 17:58:48 Singular Exp $
+@comment $Id: examples.doc,v 1.79 2005-05-10 14:49:17 anne Exp $
 @comment this file contains the examples
 
 @c The following directives are necessary for proper compilation
@@ -234,7 +234,7 @@ body of the procedures).
 Write a procedure which creates a new ring and returns data dependent on
 this new ring (two numbers) and an int. In this example, we also show
 how to write a help text for the procedure (which is optional, but
-recommended). 
+recommended).
 @end itemize
 
 
@@ -295,9 +295,6 @@ NOTE:   This procedure calls laguerre_solve from solve.lib.
 //
 // Applying the procedures:
 //
-LIB "sing.lib";
-// you should get the information that sing.lib has been loaded
-// together with some other libraries which are needed by sing.lib
 ring r = 0,(x,y),ds;
 poly f = x7+y7+(x-y)^2*x2y2;
 
@@ -772,6 +769,41 @@ not be terminated through the link while it is still computing.
 @end ifclear
 @subsection Dynamic modules
 @cindex Dynamic modules
+
+The purpose of the following example is to illustrate the use of dynamic
+modules. Giving an example on how to write a dynamic module is beyond the
+scope of this manual. Detailed information on the latter topic can be found
+in a separate PostScript file at 
+@code{http://www.singular.uni-kl.de/DynMod.ps}.
+
+In this example, we use a dynamic module, residing in the file kstd.so, 
+which allows ignoring all but the first j entries of vectors when 
+forming the pairs in the standard basis computation.
+
+@smallexample
+@c example
+ring r=0,(x,y),dp;
+module mo=[x^2-y^2,1,0,0],[xy+y^2,0,1,0],[y^2,0,0,1];
+print(mo);
+
+// load dynamic module - at the same time creating package Kstd
+LIB("kstd.so");
+listvar(package);
+
+// set the number of components to be considered to 1
+module mostd=Kstd::kstd(mo,1);
+                    // obviously computation ignored pairs with leading
+                    // term in the second entry
+print(mostd);       
+
+// now consider 2 components
+module mostd2=Kstd::kstd(mo,2);
+                    // this time the previously unconsidered pair was
+                    // treated too
+print(mostd2);
+
+@c example
+@end smallexample
 
 @c ----------------------------------------------------------------------------
 @node Computing Groebner and Standard Bases, Commutative Algebra, Programming, Examples
