@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.130 2005-05-11 12:11:45 Singular Exp $
+@comment $Id: singular.doc,v 1.131 2005-05-11 16:08:05 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -471,8 +471,8 @@ LIB "all.lib";
 * ntsolve_lib:: one real solution of polynomial systems (Newton iteration)
 * zeroset_lib:: procedures for roots and factorization
 * mrrcount_lib:: counting the number of real roots
+* rootsur_lib:: counting number of real roots of univariate polynomial
 * signcond_lib:: computing realizable sign conditions
-* urrcount_lib:: counting number of real roots of univariate polynomial
 @end menu
 
 @c ---------------------------------------------------------
@@ -500,13 +500,13 @@ LIB "all.lib";
 @subsection mrrcount_lib
 @c lib mrrcount.lib
 @c ---------------------------------------------------------
-@node signcond_lib, urrcount_lib, mrrcount_lib, Symbolic-numerical solving
+@node signcond_lib, rootsur_lib, mrrcount_lib, Symbolic-numerical solving
 @subsection signcond_lib
 @c lib signcond.lib
 @c ---------------------------------------------------------
-@node urrcount_lib, , signcond_lib, Symbolic-numerical solving
-@subsection urrcount_lib
-@c lib urrcount.lib
+@node rootsur_lib, , signcond_lib, Symbolic-numerical solving
+@subsection rootsur_lib
+@c lib rootsur.lib
 
 @c ----------------------------------------------------------------------------
 @node Visualization, Coding theory, Symbolic-numerical solving, SINGULAR libraries

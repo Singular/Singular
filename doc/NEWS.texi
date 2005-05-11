@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.45 2005-05-11 12:10:46 Singular Exp $
+@comment $Id: NEWS.texi,v 1.46 2005-05-11 16:08:06 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -75,7 +75,7 @@ procedures for the Gauss-Manin connection of a singularity
 counting the number of real roots
 @item @nref{signcond_lib}
 computing realizable sign conditions
-@item @nref{urrcount_lib}
+@item @nref{rootsur_lib}
 counting number of real roots of univariate polynomial
 @item @nref{grwalk_lib}
 Groebner and Pertubation walk

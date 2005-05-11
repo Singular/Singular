@@ -1,6 +1,6 @@
-// $Id: all.lib,v 1.43 2005-05-11 15:01:36 anne Exp $
+// $Id: all.lib,v 1.44 2005-05-11 16:06:10 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: all.lib,v 1.43 2005-05-11 15:01:36 anne Exp $";
+version="$Id: all.lib,v 1.44 2005-05-11 16:06:10 Singular Exp $";
 category = "General purpose";
 info="
 LIBRARY:  all.lib   Load all libraries (commutative case)
@@ -62,7 +62,7 @@ Symbolic-numerical solving
   signcond_lib:    Computing realizable sign conditions
   solve_lib:       Complex Solving of Polynomial Systems
   triang_lib:      Decompose Zero-dimensional Ideals into Triangular Sets
-  urrcount_lib:    Counting number of real roots of univariate polynomial
+  rootsur_lib:     Counting number of real roots of univariate polynomial
   zeroset_lib:     Procedures For Roots and Factorization
 
 Visualization
@@ -137,7 +137,7 @@ LIB "presolve.lib";
 LIB "solve.lib";
 LIB "signcond.lib";
 LIB "triang.lib";
-LIB "urrcount.lib";
+LIB "rootsur.lib";
 LIB "mrrcount.lib";
 LIB "ntsolve.lib";
 LIB "zeroset.lib";

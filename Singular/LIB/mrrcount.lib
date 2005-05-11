@@ -1,4 +1,4 @@
-// $Id: mrrcount.lib,v 1.3 2005-05-09 15:55:37 Singular Exp $
+// $Id: mrrcount.lib,v 1.4 2005-05-11 16:06:11 Singular Exp $
 // E. Tobis  12.Nov.2004, April 2004
 // last change 7. May 2005 (G.-M. Greuel)
 ///////////////////////////////////////////////////////////////////////////////
@@ -37,7 +37,7 @@ KEYWORDS: real roots, univariate projection
 ";
 ///////////////////////////////////////////////////////////////////
 LIB "linalg.lib";   // We use charpoly
-LIB "urrcount.lib"; // We use varsigns
+LIB "rootsur.lib"; // We use varsigns
 
 proc nrRootsProbab(ideal I, list #)
 "USAGE:     nrRootsProbab(I,[n]); ideal I, int n

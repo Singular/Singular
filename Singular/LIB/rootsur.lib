@@ -1,10 +1,10 @@
-// $Id: urrcount.lib,v 1.6 2005-05-09 15:55:38 Singular Exp $
+// $Id: rootsur.lib,v 1.1 2005-05-11 16:06:11 Singular Exp $
 // E. Tobis  12.Nov.2004, April 2004
 // last change 5. May 2005 (G.-M. Greuel)
 ///////////////////////////////////////////////////////////////////////////////
 category="Symbolic-numerical solving"
 info="
-LIBRARY: urrcount.lib   Counting number of real roots of univariate polynomial
+LIBRARY: rootsur.lib   Counting number of real roots of univariate polynomial
 AUTHOR:                 Enrique A. Tobis, etobis@dc.uba.ar
 
 OVERVIEW:  Routines for bounding and counting the number of real roots of a
