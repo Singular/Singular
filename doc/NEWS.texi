@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.43 2005-05-09 07:52:34 Singular Exp $
+@comment $Id: NEWS.texi,v 1.44 2005-05-11 10:18:23 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -84,17 +84,24 @@ Groebner and Pertubation walk
 @heading Changes in @sc{Singular} libraries
 Many procedures were moved into different libraries,
 the documentation of libraries was generally improved.
+
+All procedures which used to change the current ring return now
+the newly created ring.
 @table @asis
 @end table
 
 @heading New @sc{Singular} functions
 
 @table @asis
-@item @code{ringlist}
-@item @code{slimgb}
-@item @code{exportto}
-@item @code{importfrom}
-@item @code{frwalk}
+@item @nref{ringlist}
+manipulation of rings
+@item @nref{slimgb}
+variant of the F4 algorithm to compute Groebner bases
+@item @nref{exportto}
+@item @nref{importfrom}
+
+@item @nref{frwalk}
+fractal walk to change monomial orderings
 @end table
 
 @heading @sc{Singular} functions whose syntax/semantics has changed
