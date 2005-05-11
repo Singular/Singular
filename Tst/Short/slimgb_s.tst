@@ -1,16 +1,18 @@
-// $Id: slimgb_s.tst,v 1.1 2005-05-10 11:45:41 bricken Exp $
+// $Id: slimgb_s.tst,v 1.2 2005-05-11 09:09:21 bricken Exp $
 
 //
 //
 
 
 LIB "tst.lib";
+
 LIB "poly.lib";
+
 tst_init();
-tst_ignore("CVS: $Id: slimgb_s.tst,v 1.1 2005-05-10 11:45:41 bricken Exp $");
+tst_ignore("CVS: $Id: slimgb_s.tst,v 1.2 2005-05-11 09:09:21 bricken Exp $");
 
 proc char_out(ideal i){
-  return(simplify(lead(i),1));
+  return(sort(simplify(lead(i),1))[1]);
 }
 ring r=0,x(1..5),dp;
 ideal i=cyclic(5);
