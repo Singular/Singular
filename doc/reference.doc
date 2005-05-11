@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.249 2005-05-10 14:48:00 anne Exp $
+@comment $Id: reference.doc,v 1.250 2005-05-11 08:04:48 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -45,10 +45,10 @@ The general syntax of a function is
                    [target =] function_name (<arguments>);
 @end format
 If no target is specified, the result is printed.
-In some cases (e.g., @code{export}, @code{keepring}, @code{kill},
+In some cases (e.g., @code{export}, @code{keepring}, 
 @code{setring}, @code{type}) the brackets are optional. For the commands
-@code{help}, @code{break}, @code{quit}, @code{exit} and @code{LIB} no
-brackets are allowed.
+@code{kill}, @code{help}, @code{break}, @code{quit}, @code{exit}
+and @code{LIB} no brackets are allowed.
 
 @ifinfo
 @*List of all supported kernel functions.
@@ -2835,8 +2835,8 @@ See
 @cindex kill
 @table @code
 @item @strong{Syntax:}
-@code{kill (} name @code{)}
-@*@code{kill (} list_of_names @code{)}
+@code{kill } name @code{}
+@*@code{kill } list_of_names @code{}
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
@@ -2848,7 +2848,7 @@ deletes objects.
   ring r=0,x,dp;
   poly p;
   listvar();
-  kill(i,r);
+  kill i,r;
   // the variable `i` does not exist any more
   i;
   listvar();
