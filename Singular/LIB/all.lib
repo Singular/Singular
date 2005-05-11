@@ -1,9 +1,9 @@
-// $Id: all.lib,v 1.42 2005-05-04 13:18:14 Singular Exp $
+// $Id: all.lib,v 1.43 2005-05-11 15:01:36 anne Exp $
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: all.lib,v 1.42 2005-05-04 13:18:14 Singular Exp $";
+version="$Id: all.lib,v 1.43 2005-05-11 15:01:36 anne Exp $";
 category = "General purpose";
 info="
-LIBRARY:  all.lib   Load all libraries
+LIBRARY:  all.lib   Load all libraries (commutative case)
 
 @format
 General purpose
@@ -20,27 +20,31 @@ Linear algebra
 Commutative algebra
   algebra_lib:     Compute with Algbras and Algebra Maps
   elim_lib:        Elimination, Saturation and Blowing up
+  grwalk_lib:      Groebner walk and Fraktal Walk
   homolog_lib:     Procedures for Homological Algebra
   intprog_lib:     Integer Programming with Groebner Basis Methods
+  lll_lib:         Integral LLL-Algorithm
   mprimdec_lib:    Primary Decomposition of Modules
   mregular_lib:    Castelnuovo-Mumford Regularity of CM-Schemes and Curves
   normal_lib:      Normalization of Affine Rings
   primdec_lib:     Primary Decomposition and Radical of Ideals
   primitiv_lib:    Computing a Primitive Element
   reesclos_lib:    Rees Algebra and Integral Closure of Ideals
+  resol_lib:       Resolution of Singularities
   toric_lib:       Standard Basis of Toric Ideals
-  groebnerwal_lib: Groebner walk and Fraktal Walk
+  zeta_lib:        Applications of Resolution of Singularities
 
 Singularities
-  alexpoly.lib:    Resolution Graph and Alexander Polynomial
+  alexpoly_lib:    Resolution Graph and Alexander Polynomial
   classify_lib:    Arnold Classifier of Singularities
   deform_lib:      Miniversal Deformation of Singularities and Modules
   equising_lib:    Equisingularity Stratum of a Family of Plane Curves
-  gmssing.lib:     Gauss-Manin System of Isolated Singularities
+  gmssing_lib:     Gauss-Manin System of Isolated Singularities
+                   (obsoletes gaussman_lib)
   gmspoly.lib:     Gauss-Manin System of Tame Polynomials
   hnoether_lib:    Hamburger-Noether (Puiseux) Development
   mondromy_lib:    Monodromy of an Isolated Hypersurface Singularity
-  qhmoduli.lib:    Moduli Spaces of Semi-Quasihomogeneous Singularities
+  qhmoduli_lib:    Moduli Spaces of Semi-Quasihomogeneous Singularities
   sing_lib:        Invariants of Singularities
   spcurve_lib:     Deformations and Invariants of CM-codim 2 Singularities
   spectrum_lib:    Singularity Spectrum for Nondegenerate Singularities
@@ -52,6 +56,7 @@ Invariant theory
   stratify_lib:    Algorithmic Stratification for Unipotent Group-Actions
 
 Symbolic-numerical solving
+  mrrcount_lib:    Number of Real Roots of Polynomial Systems
   ntsolve_lib:     Real Newton Solving of Polynomial Systems
   presolve_lib:    Pre-Solving of Polynomial Equations
   signcond_lib:    Computing realizable sign conditions
@@ -68,8 +73,16 @@ Visualization
 Coding theory
   brnoeth_lib:     Brill-Noether Algorithm, Weierstrass-SG and AG-codes
 
+System and Control Theory
+  control_lib:     Algebraic analysis tools for System and Control Theory
+
 Miscellaneous
   makedbm_lib:     Data Base of Singularities for the Arnold-Classifier
+
+
+Noncommutative
+  To load all libraries for the non-commutative case (Plural), please load
+  the library ncall.lib.
 
 @end format
 ";
@@ -89,15 +102,18 @@ LIB "linalg.lib";
 LIB "algebra.lib";
 LIB "elim.lib";
 LIB "homolog.lib";
+LIB "lll.lib";
 LIB "mprimdec.lib";
 LIB "mregular.lib";
 LIB "normal.lib";
 LIB "primdec.lib";
 LIB "primitiv.lib";
 LIB "reesclos.lib";
+LIB "resol.lib";
+LIB "zeta.lib";
 LIB "intprog.lib";
 LIB "toric.lib";
-LIB "groebnerwalk.lib";
+LIB "grwalk.lib";
 //Singularities
 LIB "alexpoly.lib";
 LIB "classify.lib";
@@ -122,6 +138,7 @@ LIB "solve.lib";
 LIB "signcond.lib";
 LIB "triang.lib";
 LIB "urrcount.lib";
+LIB "mrrcount.lib";
 LIB "ntsolve.lib";
 LIB "zeroset.lib";
 //Visualization
@@ -130,5 +147,7 @@ LIB "latex.lib";
 LIB "surf.lib";
 //Coding theory
 LIB "brnoeth.lib";
+//System and Control Theory
+LIB "control.lib";
 //Miscellaneous
 LIB "makedbm.lib";
