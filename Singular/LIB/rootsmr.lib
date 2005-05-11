@@ -1,10 +1,10 @@
-// $Id: mrrcount.lib,v 1.4 2005-05-11 16:06:11 Singular Exp $
+// $Id: rootsmr.lib,v 1.1 2005-05-11 16:13:25 Singular Exp $
 // E. Tobis  12.Nov.2004, April 2004
 // last change 7. May 2005 (G.-M. Greuel)
 ///////////////////////////////////////////////////////////////////////////////
 category="Symbolic-numerical solving"
 info="
-LIBRARY: mrrcount.lib Counting the number of real roots of polynomial systems
+LIBRARY: rootsmr.lib Counting the number of real roots of polynomial systems
 AUTHOR:               Enrique A. Tobis, etobis@dc.uba.ar
 
 OVERVIEW:  Routines for counting the number of real roots of a multivariate

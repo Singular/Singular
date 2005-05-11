@@ -1,6 +1,6 @@
-// $Id: all.lib,v 1.44 2005-05-11 16:06:10 Singular Exp $
+// $Id: all.lib,v 1.45 2005-05-11 16:10:23 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: all.lib,v 1.44 2005-05-11 16:06:10 Singular Exp $";
+version="$Id: all.lib,v 1.45 2005-05-11 16:10:23 Singular Exp $";
 category = "General purpose";
 info="
 LIBRARY:  all.lib   Load all libraries (commutative case)
@@ -56,7 +56,7 @@ Invariant theory
   stratify_lib:    Algorithmic Stratification for Unipotent Group-Actions
 
 Symbolic-numerical solving
-  mrrcount_lib:    Number of Real Roots of Polynomial Systems
+  rootsmr_lib:     Number of Real Roots of Polynomial Systems
   ntsolve_lib:     Real Newton Solving of Polynomial Systems
   presolve_lib:    Pre-Solving of Polynomial Equations
   signcond_lib:    Computing realizable sign conditions
@@ -138,7 +138,7 @@ LIB "solve.lib";
 LIB "signcond.lib";
 LIB "triang.lib";
 LIB "rootsur.lib";
-LIB "mrrcount.lib";
+LIB "rootsmr.lib";
 LIB "ntsolve.lib";
 LIB "zeroset.lib";
 //Visualization
