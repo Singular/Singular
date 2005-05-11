@@ -1,12 +1,13 @@
 ///////////////////////////////////////////////////////////////
-// $Id: grwalk.lib,v 1.1 2005-05-11 11:50:09 anne Exp $   //
+// $Id: grwalk.lib,v 1.2 2005-05-11 12:13:26 Singular Exp $   //
 ///////////////////////////////////////////////////////////////
 
-version="$Id: grwalk.lib,v 1.1 2005-05-11 11:50:09 anne Exp $";
+version="$Id: grwalk.lib,v 1.2 2005-05-11 12:13:26 Singular Exp $";
 category="cc";
 
 info="
-LIBRARY: groebnerwalk.lib
+LIBRARY: grwalk.lib: Groebner and Fractal walk
+AUTHOR: I. Sulandra
 
 PROCEDURES:
  gwalk(ideal[,intvec]);   standard basis of ideal via groebnerwalk alg
