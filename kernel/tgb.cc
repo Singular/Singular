@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.14 2005-05-11 10:11:53 bricken Exp $ */
+/* $Id: tgb.cc,v 1.15 2005-05-11 14:36:01 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -4324,14 +4324,7 @@ simple_reducer::~simple_reducer(){
   fill_back=NULL;
     
 }
- join_simple_reducer::~join_simple_reducer(){
-   if(fill_back!=NULL)
-   {
-     kBucketInit(fill_back,p,p_len);
-   }
-   fill_back=NULL;
-    
-}
+ 
 void multi_reduce_step(find_erg & erg, red_object* r, calc_dat* c){
   static int id=0;
   id++;
@@ -4396,10 +4389,8 @@ void multi_reduce_step(find_erg & erg, red_object* r, calc_dat* c){
     }
   }
   assume(red_len==pLength(red));
-  if (red_c>=AC_NEW_MIN)
-    pointer=new join_simple_reducer(red,red_len,r[erg.to_reduce_l].p);
-  else
-    pointer=new simple_reducer(red,red_len,c);
+ 
+  pointer=new simple_reducer(red,red_len,c);
 
   if ((!woc) && (!erg.fromS))
     pointer->fill_back=r[rn].bucket;
@@ -4414,38 +4405,7 @@ void multi_reduce_step(find_erg & erg, red_object* r, calc_dat* c){
   
 };
 
-void join_simple_reducer::target_is_no_sum_reduce(red_object & ro){
-  kbTest(ro.bucket);
-  ro.sum=new formal_sum_descriptor();
-  ro.sum->ac=ac;
-  ac->counter++;
-  kBucket_pt bucket=ro.bucket;
-  poly a1 = pNext(p), lm = kBucketExtractLm(bucket);
-  BOOLEAN reset_vec=FALSE;
-  number rn;
-  assume(a1!=NULL);
-  number an = pGetCoeff(p), bn = pGetCoeff(lm);
-  lm->next=NULL;
-  int ct = ksCheckCoeff(&an, &bn);
-  ro.sum->c_ac=nNeg(bn);
-  ro.sum->c_my=an;
-  assume(nIsZero(nAdd(nMult(ro.sum->c_my,lm->coef),nMult(p->coef,ro.sum->c_ac) )));
-  if (p_GetComp(p, bucket->bucket_ring) != p_GetComp(lm, bucket->bucket_ring))
-  {
-    p_SetCompP(a1, p_GetComp(lm, bucket->bucket_ring), bucket->bucket_ring);
-    reset_vec = TRUE;
-    p_SetComp(lm, p_GetComp(p, bucket->bucket_ring), bucket->bucket_ring);
-    p_Setm(lm, bucket->bucket_ring);
-  }
 
-
-  
-
-  p_DeleteLm(&lm, bucket->bucket_ring);
-  if (reset_vec) p_SetCompP(a1, 0, bucket->bucket_ring);
-  kbTest(bucket);
-
-}
 
   reduction_accumulator::reduction_accumulator(poly p, int p_len, poly high_to){
     //sev needs to be removed from interfaces,makes no sense
@@ -4468,12 +4428,4 @@ void join_simple_reducer::target_is_no_sum_reduce(red_object & ro){
     pDelete(&my);
   }
 void simple_reducer:: pre_reduce(red_object* r, int l, int u){}
-void join_simple_reducer:: pre_reduce(red_object* r, int l, int u){
-  for(int i=l;i<=u;i++)
-    {
-      if (r[i].sum){
-	if(r[i].sum->ac->counter<=AC_FLATTEN) r[i].flatten();
-	
-      }
-    }
-}
+

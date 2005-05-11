@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb_internal.h,v 1.5 2005-05-11 10:11:54 bricken Exp $ */
+/* $Id: tgb_internal.h,v 1.6 2005-05-11 14:36:02 bricken Exp $ */
 /*
  * ABSTRACT: tgb internal .h file
 */
@@ -246,18 +246,7 @@ class simple_reducer:public reduction_step{
   virtual void target_is_a_sum_reduce(red_object & ro);
   virtual void target_is_no_sum_reduce(red_object & ro);
 };
-class join_simple_reducer:public simple_reducer{
- public:
-  join_simple_reducer(poly p, int p_len, poly high_to):simple_reducer(p,p_len){
-    ac=new reduction_accumulator( p, p_len, high_to);
-   
-    
-  }
-    ~join_simple_reducer();
-   void pre_reduce(red_object* r, int l, int u);
-  void target_is_no_sum_reduce(red_object & ro);
-  reduction_accumulator* ac;
-};
+
 //class sum_canceling_reducer:public reduction_step {
 //  void reduce(red_object* r, int l, int u);
 //};
