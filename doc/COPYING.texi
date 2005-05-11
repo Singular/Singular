@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: COPYING.texi,v 1.22 2005-05-09 07:53:22 Singular Exp $
+@comment $Id: COPYING.texi,v 1.23 2005-05-11 16:56:21 Singular Exp $
 @comment this file contains the copyright notice on Singular
 @ifclear VERSION
 @include version.texi
@@ -108,8 +108,10 @@ The development of @sc{Singular} is directed and coordinated by
 Gert-Martin Greuel, Gerhard Pfister, and Hans
 Sch@"onemann.
 
-@cindex  Greuel, Gert-Martin
-@cindex  Pfister, Gerhard
+@cindex Contributors
+@cindex Authors
+@cindex Greuel, Gert-Martin
+@cindex Pfister, Gerhard
 @cindex Sch@"onemann, Hans
 
 Currently, the @sc{Singular} team has the following members:
