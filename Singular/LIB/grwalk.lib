@@ -1,8 +1,8 @@
 ///////////////////////////////////////////////////////////////
-// $Id: groebnerwalk.lib,v 1.4 2005-05-10 17:56:13 Singular Exp $   //
+// $Id: grwalk.lib,v 1.1 2005-05-11 11:50:09 anne Exp $   //
 ///////////////////////////////////////////////////////////////
 
-version="$Id: groebnerwalk.lib,v 1.4 2005-05-10 17:56:13 Singular Exp $";
+version="$Id: grwalk.lib,v 1.1 2005-05-11 11:50:09 anne Exp $";
 category="cc";
 
 info="
