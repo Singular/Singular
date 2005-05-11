@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.80 2005-05-10 18:07:52 Singular Exp $
+@comment $Id: examples.doc,v 1.81 2005-05-11 16:33:02 Singular Exp $
 @comment this file contains the examples
 
 @c The following directives are necessary for proper compilation
@@ -917,7 +917,7 @@ dehomogenize the elements of the resulting Groebner basis.
 @sc{Singular} provides implementations for the FGLM conversion algorithm
 (which applies to zero-dimensional ideals only, see @ref{stdfglm}) and
 variants of the Groebner walk conversion algorithm (which works for
-arbitrary ideals, @xref{frwalk}, @ref{groebnerwalk_lib}).
+arbitrary ideals, @xref{frwalk}, @ref{grwalk_lib}).
 An implementation of the Hilbert-driven Buchberger 
 algorithm is accessible via the @code{stdhilb} command (see also @ref{std}).
 
