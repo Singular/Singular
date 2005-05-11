@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb_internal.h,v 1.6 2005-05-11 14:36:02 bricken Exp $ */
+/* $Id: tgb_internal.h,v 1.7 2005-05-11 14:58:35 bricken Exp $ */
 /*
  * ABSTRACT: tgb internal .h file
 */
@@ -54,46 +54,13 @@ struct sorted_pair_node{
 
 
 //static ideal debug_Ideal;
-/** 
-    reduction_accumulators are objects which are shared by several sums
- **/
 
-class reduction_accumulator{
-  
- public:
-  /// (1/multiplied)*bucket=reduced original data
-  number multiplied;
-  ///the polynomial data
-  kBucket_pt bucket;
-  /// the short exponent vector
-  unsigned long sev;
-  /// the reference counter
-  int counter;
-  /// decrease the reference counter, at 0 it deletes the object
-  void decrease_counter(){ 
-    if((--counter)==0)
-      {
-	delete this; //self destruction
-      }
-  }
-  int last_reduction_id;
-  reduction_accumulator(poly p, int p_len, poly high_to);
-  ~reduction_accumulator(){
-    nDelete(&multiplied);
-    kBucketDeleteAndDestroy(&bucket);
-  }  
 
-  
-};
 struct poly_list_node{
   poly p;
   poly_list_node* next;
 };
-struct formal_sum_descriptor{
-  number c_my;
-  number c_ac;
-  reduction_accumulator* ac;
-};
+
 struct int_pair_node{
   int_pair_node* next;
   int a;
@@ -162,7 +129,6 @@ class red_object{
  public:
   kBucket_pt bucket;
   poly p;
-  formal_sum_descriptor* sum;
   unsigned long sev;
   void flatten();
   void validate();
@@ -243,7 +209,7 @@ class simple_reducer:public reduction_step{
   virtual void reduce(red_object* r, int l, int u);
   ~simple_reducer();
 
-  virtual void target_is_a_sum_reduce(red_object & ro);
+
   virtual void target_is_no_sum_reduce(red_object & ro);
 };
 

@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.15 2005-05-11 14:36:01 bricken Exp $ */
+/* $Id: tgb.cc,v 1.16 2005-05-11 14:58:34 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -184,18 +184,7 @@ int red_object::guess_quality(calc_dat* c){
 	s=kEBucketLength(this->bucket,this->p,c);
       else s=bucket_guess(bucket);
     }
-    if (sum!=NULL){
-      if (c->is_char0)
-	s+=kSBucketLength(sum->ac->bucket);
-      else
-      {
-	if((pLexOrder) &&(!c->is_homog))
-	//if (false)
-	  s+=kEBucketLength(sum->ac->bucket,this->p,c);
-	else
-	  s+=bucket_guess(sum->ac->bucket);
-      }
-    }
+ 
     return s;
 }
 // static int guess_quality(const red_object & p, calc_dat* c){
@@ -525,8 +514,7 @@ int find_best(red_object* r,int l, int u, int &w, calc_dat* c){
 #endif
 void red_object::canonicalize(){
   kBucketCanonicalize(bucket);
-  if(sum)
-    kBucketCanonicalize(sum->ac->bucket);
+  
   
 }
 BOOLEAN good_has_t_rep(int i, int j,calc_dat* c){
@@ -1676,7 +1664,7 @@ int anti_poly_order(const void* a, const void* b){
 BOOLEAN is_valid_ro(red_object & ro){
   red_object r2=ro;
   ro.validate();
-  if ((r2.p!=ro.p)||(r2.sev!=ro.sev)||(r2.sum!=ro.sum)) return FALSE;
+  if ((r2.p!=ro.p)||(r2.sev!=ro.sev)) return FALSE;
   return TRUE;
 }
 
@@ -1862,7 +1850,6 @@ static void go_on (calc_dat* c){
   for(j=0;j<i;j++){
     buf[j].p=p[j];
     buf[j].sev=pGetShortExpVector(p[j]);
-    buf[j].sum=NULL;
     buf[j].bucket = kBucketCreate(currRing);
     int len=pLength(p[j]);
     kBucketInit(buf[j].bucket,buf[j].p,len);
@@ -4155,78 +4142,12 @@ static void multi_reduction(red_object* los, int & losl, calc_dat* c)
   return;
 }
 void red_object::flatten(){
-  if (sum!=NULL)
-  {
-
- 
-    if(kBucketGetLm(sum->ac->bucket)!=NULL){
-      number mult_my=n_Mult(sum->c_my,sum->ac->multiplied,currRing);
-      number mult_my_h=mult_my;
-      number ac_h=sum->c_ac;
-      ksCheckCoeff(&mult_my_h, &ac_h);
-      nDelete(&sum->c_ac);
-      nDelete(&mult_my);
-      mult_my=mult_my_h;
-      sum->c_ac=ac_h;
-      poly add_this;
-      if(!nIsOne(mult_my))
-	kBucket_Mult_n(bucket,mult_my);
-      int len;
-      poly clear_into;
-      kBucketClear(sum->ac->bucket,&clear_into,&len);
-      if(sum->ac->counter>1){
-	add_this=pCopy(clear_into);
-	kBucketInit(sum->ac->bucket,clear_into,len);
-      }
-      else
-	add_this=clear_into;
-      if(!nIsOne(sum->c_ac))
-	pMult_nn(add_this, sum->c_ac);
-      
-      kBucket_Add_q(bucket,add_this, &len);
-       nDelete(&mult_my);
-     
-    }
-    nDelete(&sum->c_ac);
-    nDelete(&sum->c_my);
-   
-    sum->ac->decrease_counter();
-    delete sum;
-    p=kBucketGetLm(bucket);
-    sum=NULL;
-  }
   assume(p==kBucketGetLm(bucket));
-  assume(sum==NULL);
 }
 void red_object::validate(){
-  BOOLEAN flattened=FALSE;
-  if(sum!=NULL)
-  {
-    poly lm=kBucketGetLm(bucket);
-    poly lm_ac=kBucketGetLm(sum->ac->bucket);
-    if ((lm_ac==NULL)||((lm!=NULL) && (pLmCmp(lm,lm_ac)!=-1))){
-      flatten();
-      assume(sum==NULL);
-      flattened=TRUE;
-      p=kBucketGetLm(bucket);
-      if (p!=NULL)
-	sev=pGetShortExpVector(p);
-    } 
-    else
-    {
- 
-      p=lm_ac;
-      assume(sum->ac->sev==pGetShortExpVector(p));
-      sev=sum->ac->sev;
-    }
-    
-  }
-  else{
-    p=kBucketGetLm(bucket);
-    if(p)
+  p=kBucketGetLm(bucket);
+  if(p)
     sev=pGetShortExpVector(p);
-  }
-  assume((sum==NULL)||(kBucketGetLm(sum->ac->bucket)!=NULL));
 }
 int red_object::clear_to_poly(){
   flatten();
@@ -4237,20 +4158,7 @@ int red_object::clear_to_poly(){
 
   
 
-void red_object::adjust_coefs(number c_r, number c_ac_r){
-  assume(this->sum!=NULL);
-  number n1=nMult(sum->c_my, c_ac_r);
-  number n2=nMult(sum->c_ac,c_r);
-  nDelete(&sum->c_my);
-  nDelete(&sum->c_ac);
- 
-  int ct = ksCheckCoeff(&n1, &n2);
-  sum->c_my=n1;
-  sum->c_ac=nNeg(n2);
-  //  nDelete(&n2);
-  
 
-}
 
 void reduction_step::reduce(red_object* r, int l, int u){}
 void simple_reducer::target_is_no_sum_reduce(red_object & ro){
@@ -4259,26 +4167,7 @@ void simple_reducer::target_is_no_sum_reduce(red_object & ro){
 		 c->strat->kNoether);
 }
 
-void simple_reducer::target_is_a_sum_reduce(red_object & ro){
-  pTest(p);
-  kbTest(ro.bucket);
-  kbTest(ro.sum->ac->bucket);
-  assume(ro.sum!=NULL);
-  assume(ro.sum->ac!=NULL);
-  if(ro.sum->ac->last_reduction_id!=reduction_id){
-    number n1=kBucketPolyRed(ro.sum->ac->bucket,p, p_len, c->strat->kNoether);
-    number n2=nMult(n1,ro.sum->ac->multiplied);
-    nDelete(&ro.sum->ac->multiplied);
-    nDelete(&n1);
-    ro.sum->ac->multiplied=n2;
-    poly lm=kBucketGetLm(ro.sum->ac->bucket);
-    if (lm)
-      ro.sum->ac->sev=pGetShortExpVector(lm);
-    ro.sum->ac->last_reduction_id=reduction_id;
-  }
-  ro.sev=ro.sum->ac->sev;
-  ro.p=kBucketGetLm(ro.sum->ac->bucket);
-}
+
 void simple_reducer::reduce(red_object* r, int l, int u){
   this->pre_reduce(r,l,u);
   int i;
@@ -4293,27 +4182,15 @@ void simple_reducer::reduce(red_object* r, int l, int u){
   for(i=l;i<=u;i++){
   
 
-    if(r[i].sum==NULL)
-      this->target_is_no_sum_reduce(r[i]);
 
-    else 
-    {
-      this->target_is_a_sum_reduce(r[i]);
-      //reduce and adjust multiplied
-      r[i].sum->ac->last_reduction_id=reduction_id;
-      
-    }
-    //most elegant would be multimethods at this point and subclassing
-    //red_object for sum
+    this->target_is_no_sum_reduce(r[i]);
  
   }
   for(i=l;i<=u;i++){
     r[i].validate();
     #ifdef TGB_DEBUG
-    if (r[i].sum) r[i].sev=r[i].sum->ac->sev;
-
     #endif
-      }
+  }
 }
 reduction_step::~reduction_step(){}
 simple_reducer::~simple_reducer(){
@@ -4385,7 +4262,7 @@ void multi_reduce_step(find_erg & erg, red_object* r, calc_dat* c){
   int red_c=0;
   if(red_len>2*c->average_length){
     for(i=erg.to_reduce_l;i<=erg.to_reduce_u;i++){
-      if((r[i].sum==NULL) ||(r[i].sum->ac->counter<=AC_FLATTEN)) red_c++;
+      red_c++;
     }
   }
   assume(red_len==pLength(red));
@@ -4407,25 +4284,6 @@ void multi_reduce_step(find_erg & erg, red_object* r, calc_dat* c){
 
 
 
-  reduction_accumulator::reduction_accumulator(poly p, int p_len, poly high_to){
-    //sev needs to be removed from interfaces,makes no sense
-    
-
-    poly my=pOne();
-    counter=0;
-   
-    for(int i=1;i<=pVariables;i++)
-      pSetExp(my,i,(pGetExp(high_to, i)-pGetExp(p,i)));
-    pSetm(my);
-
-    last_reduction_id=-1;
-    multiplied=nInit(1);
-    bucket=kBucketCreate(currRing);
-    poly a=pMult_mm(pCopy(p->next),my);
-
-    this->sev=pGetShortExpVector(a);
-    kBucketInit(bucket, a,p_len-1);
-    pDelete(&my);
-  }
+ 
 void simple_reducer:: pre_reduce(red_object* r, int l, int u){}
 
