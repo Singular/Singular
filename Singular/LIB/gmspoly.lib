@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gmspoly.lib,v 1.12 2005-05-10 17:56:13 Singular Exp $";
+version="$Id: gmspoly.lib,v 1.13 2005-05-11 13:02:32 Singular Exp $";
 category="Singularities";
 
 info="
@@ -11,8 +11,8 @@ OVERVIEW: A library to compute invariants related to the Gauss-Manin system
           of a cohomologically tame polynomial
 
 PROCEDURES:
-  istame(f);  test if the polynomial f is tame
-  gbasis(f);  a good basis of the Brieskorn lattice of a cohomologically tame f
+  isTame(f);  test if the polynomial f is tame
+  goodBasis(f);  a good basis of the Brieskorn lattice of a cohomologically tame f
 
 SEE ALSO: gmssing_lib
 
@@ -53,8 +53,8 @@ static proc maxdegree(matrix A)
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc istame(poly f)
-"USAGE:    istame(f); poly f
+proc isTame(poly f)
+"USAGE:    isTame(f); poly f
 ASSUME: basering has no variables named w(1),w(2),...
 RETURN:
 @format
@@ -63,7 +63,7 @@ int k=
   1;  if f is tame
 @end format
 KEYWORDS: tame polynomial
-EXAMPLE:  example istame; shows examples
+EXAMPLE:  example isTame; shows examples
 "
 {
   int d=vdim(std(jacob(f)));
@@ -87,8 +87,8 @@ EXAMPLE:  example istame; shows examples
 example
 { "EXAMPLE:"; echo=2;
   ring R=0,(x,y),dp;
-  istame(x2y+x);
-  istame(x3+y3+xy);
+  isTame(x2y+x);
+  isTame(x3+y3+xy);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -423,8 +423,8 @@ static proc glift(ideal e,module V,matrix B,module G)
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc gbasis(poly f)
-"USAGE:    gbasis(f); poly f
+proc goodBasis(poly f)
+"USAGE:    goodBasis(f); poly f
 ASSUME:   f is cohomologically tame
 RETURN:
 @format
@@ -435,7 +435,7 @@ ring R;  basering with new variable s
 KEYWORDS: tame polynomial; Gauss-Manin system; Brieskorn lattice;
           mixed Hodge structure; V-filtration; weight filtration;
           monodromy; spectrum; spectral pairs; good basis
-EXAMPLE:  example gbasis; shows examples
+EXAMPLE:  example goodBasis; shows examples
 "
 {
   def @X=basering;
@@ -553,7 +553,7 @@ example
 { "EXAMPLE:"; echo=2;
   ring R=0,(x,y,z),dp;
   poly f=x+y+z+x2y2z2;
-  def Rs=gbasis(f);
+  def Rs=goodBasis(f);
   setring(Rs);
   b;
   print(jet(A,0));
