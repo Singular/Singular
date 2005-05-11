@@ -3326,7 +3326,7 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
   omUnGetSpecBin(&lm_bin);
   delete c->strat;
   omfree(c);
-  qsort(I->m, IDELEMS(I),sizeof(poly),pLmCmp_func);
+  //qsort(I->m, IDELEMS(I),sizeof(poly),pLmCmp_func);
   return(I);
 }
 static void now_t_rep(const int & arg_i, const int & arg_j, calc_dat* c){
