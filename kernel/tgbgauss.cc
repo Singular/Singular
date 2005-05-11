@@ -1,3 +1,10 @@
+/****************************************
+*  Computer Algebra System SINGULAR     *
+****************************************/
+/* $Id: tgbgauss.cc,v 1.6 2005-05-11 10:11:53 bricken Exp $ */
+/*
+* ABSTRACT: gauss implementation for F4
+*/
 #include "mod2.h"
 #include "tgbgauss.h"
 #include <omalloc.h>

@@ -1,13 +1,13 @@
 //! \file tgb.cc
-// #define OM_CHECK 3
-// #define OM_TRACK 5
-// #define OM_KEEP  1
-// TODO: 
-//       deg -> poly_crit
 //       multiple rings
 //       shorten_tails und dessen Aufrufe pruefen wlength!!!
-//       calculating with formal sums
-//       try to create spolys as formal sums
+/****************************************
+*  Computer Algebra System SINGULAR     *
+****************************************/
+/* $Id: tgb.cc,v 1.14 2005-05-11 10:11:53 bricken Exp $ */
+/*
+* ABSTRACT: slimgb and F4 implementation
+*/
 
 #include "tgb.h"
 #include "tgb_internal.h"

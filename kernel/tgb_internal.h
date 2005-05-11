@@ -1,6 +1,13 @@
 #ifndef TGB_INTERNAL_H
 #define TGB_INTERNAL_H
 //!\file tgb_internal.h
+/****************************************
+*  Computer Algebra System SINGULAR     *
+****************************************/
+/* $Id: tgb_internal.h,v 1.5 2005-05-11 10:11:54 bricken Exp $ */
+/*
+ * ABSTRACT: tgb internal .h file
+*/
 #include "mod2.h"
 #include <omalloc.h>
 #include "p_polys.h"

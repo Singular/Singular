@@ -1,5 +1,12 @@
 #ifndef TGBGAUSS_HEADER
 #define TGBGAUSS_HEADER
+/****************************************
+*  Computer Algebra System SINGULAR     *
+****************************************/
+/* $Id: tgbgauss.h,v 1.4 2005-05-11 10:11:54 bricken Exp $ */
+/*
+* ABSTRACT: gauss implementation for F4 header
+*/
 #include "mod2.h"
 #include "numbers.h"
 //#include "tgb_internal.h"
