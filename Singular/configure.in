@@ -362,7 +362,7 @@ case "$ac_cv_singuname" in
 	ppcMac-darwin)
 	  AC_CHECK_LIB(dl, dlopen)
           if test "$ac_cv_lib_dl_dlopen" = yes; then
-	  	LD_DYN_FLAGS="-ldl -rdynamic"
+	  	LD_DYN_FLAGS="-ldl -dynamic"
 	  	SFLAGS="-fpic -DPIC"
 	  	SLDFLAGS=-shared
 		LD=ld
