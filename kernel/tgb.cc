@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.16 2005-05-11 14:58:34 bricken Exp $ */
+/* $Id: tgb.cc,v 1.17 2005-05-11 15:22:52 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -4210,7 +4210,7 @@ void multi_reduce_step(find_erg & erg, red_object* r, calc_dat* c){
   poly red;
   int red_len;
   simple_reducer* pointer;
-  BOOLEAN woc=FALSE;
+  BOOLEAN work_on_copy=FALSE;
   if(erg.fromS){
     red=c->strat->S[rn];
     red_len=c->strat->lenS[rn];
@@ -4230,7 +4230,7 @@ void multi_reduce_step(find_erg & erg, red_object* r, calc_dat* c){
     red_len=pLength(red);
   }
   if (erg.to_reduce_u-erg.to_reduce_l>5){
-    woc=TRUE;
+    work_on_copy=TRUE;
     // poly m=pOne();
     poly m=c->tmp_lm;
     pSetCoeff(m,nInit(1));
@@ -4259,17 +4259,12 @@ void multi_reduce_step(find_erg & erg, red_object* r, calc_dat* c){
   int i;
 
 
-  int red_c=0;
-  if(red_len>2*c->average_length){
-    for(i=erg.to_reduce_l;i<=erg.to_reduce_u;i++){
-      red_c++;
-    }
-  }
+
   assume(red_len==pLength(red));
  
   pointer=new simple_reducer(red,red_len,c);
 
-  if ((!woc) && (!erg.fromS))
+  if ((!work_on_copy) && (!erg.fromS))
     pointer->fill_back=r[rn].bucket;
   else
     pointer->fill_back=NULL;
@@ -4277,7 +4272,7 @@ void multi_reduce_step(find_erg & erg, red_object* r, calc_dat* c){
   pointer->c=c;
 
   pointer->reduce(r,erg.to_reduce_l, erg.to_reduce_u);
-  if(woc) pDelete(&pointer->p);
+  if(work_on_copy) pDelete(&pointer->p);
   delete pointer;
   
 };
