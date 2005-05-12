@@ -334,7 +334,7 @@ case "$ac_cv_singuname" in
 	;;
 	*Linux*)
 	  AC_CHECK_LIB(dl, dlopen)
-          if test "$ac_cv_lib_dl_dlopen" = yes; then
+          if test "$ac_cv_lib_c_dlopen" = yes; then
 	  	LD_DYN_FLAGS="-ldl -rdynamic"
 	  	SFLAGS="-fpic -DPIC"
 	  	SLDFLAGS=-shared 
@@ -363,6 +363,16 @@ case "$ac_cv_singuname" in
 	  AC_CHECK_LIB(dl, dlopen)
           if test "$ac_cv_lib_dl_dlopen" = yes; then
 	  	LD_DYN_FLAGS="-ldl -dynamic"
+	  	SFLAGS="-fpic -DPIC"
+	  	SLDFLAGS=-shared
+		LD=ld
+	        ac_lib_dl=yes
+	  fi
+	;;
+	ix86-freebsd)
+	  AC_CHECK_LIB(c, dlopen)
+          if test "$ac_cv_lib_c_dlopen" = yes; then
+	  	LD_DYN_FLAGS="-dynamic"
 	  	SFLAGS="-fpic -DPIC"
 	  	SLDFLAGS=-shared
 		LD=ld
