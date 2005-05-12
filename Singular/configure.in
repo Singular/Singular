@@ -372,7 +372,7 @@ case "$ac_cv_singuname" in
 	ix86-freebsd)
 	  AC_CHECK_LIB(c, dlopen)
           if test "$ac_cv_lib_c_dlopen" = yes; then
-	  	LD_DYN_FLAGS="-dynamic"
+	  	LD_DYN_FLAGS="-shared"
 	  	SFLAGS="-fpic -DPIC"
 	  	SLDFLAGS=-shared
 		LD=ld

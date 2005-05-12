@@ -2048,7 +2048,7 @@ else
 fi
 
           if test "$ac_cv_lib_c_dlopen" = yes; then
-	  	LD_DYN_FLAGS="-dynamic"
+	  	LD_DYN_FLAGS="-shared"
 	  	SFLAGS="-fpic -DPIC"
 	  	SLDFLAGS=-shared
 		LD=ld
