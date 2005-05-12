@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.17 2005-05-11 15:22:52 bricken Exp $ */
+/* $Id: tgb.cc,v 1.18 2005-05-12 07:01:21 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -1022,6 +1022,7 @@ static sorted_pair_node** add_to_basis(poly h, int i_pos, int j_pos,calc_dat* c,
   c->tmp_pair_lm[i]=pOne_Special(c->r);
   c->tmp_spn=(sorted_pair_node**) omrealloc(c->tmp_spn,c->n*sizeof(sorted_pair_node*));
   c->tmp_spn[i]=(sorted_pair_node*) omalloc(sizeof(sorted_pair_node));
+#define ENLARGE(pointer, type) pointer=(type*) omrealloc(pointer, c->n*sizeof(int))
   hp=omrealloc(c->rep, c->n *sizeof(int));
   if (hp!=NULL){
     c->rep=(int*) hp;
@@ -1244,12 +1245,10 @@ static sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_p
   c->gcd_of_terms=(poly*) omrealloc(c->gcd_of_terms, c->n *sizeof(poly));
   c->gcd_of_terms[i]=gcd_of_terms(h,c->r);
   c->rep[i]=i;
-  hp=omalloc(i*sizeof(char));
-  if (hp!=NULL){
-    c->states[i]=(char*) hp;
-  } else {
-    exit(1);
-  }
+  if (i>0)
+    c->states[i]=(char*)  omalloc(i*sizeof(char));
+  else
+    c->states[i]=NULL;
   hp=omrealloc(c->S->m,c->n*sizeof(poly));
   if (hp!=NULL){
     c->S->m=(poly*) hp;
@@ -3138,7 +3137,7 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
     c->strat->lenSw=NULL;
   sorted_pair_node* si;
   assume(n>0);
-  add_to_basis(I->m[0],-1,-1,c);
+  add_to_basis_ideal_quotient(I->m[0],-1,-1,c,NULL);
 
   assume(c->strat->sl==c->strat->Shdl->idelems()-1);
   if(!(F4_mode))
