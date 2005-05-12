@@ -14,7 +14,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: F4.h,v 1.1 2005-05-12 09:19:42 bricken Exp $ */
+/* $Id: F4.h,v 1.2 2005-05-12 09:21:45 bricken Exp $ */
 /*
 * ABSTRACT: interface for F4 only routines
 */
