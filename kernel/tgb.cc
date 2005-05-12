@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.23 2005-05-12 13:42:00 bricken Exp $ */
+/* $Id: tgb.cc,v 1.24 2005-05-12 15:01:55 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -1895,11 +1895,7 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
   int n=I->idelems();
   c->array_lengths=n;
 
-  if (TEST_OPT_PROT)
-    for (i=0;i<n;i++){
-      wrp(I->m[i]);
-      PrintS("\n");
-    }
+  
   i=0;
   c->n=0;
   c->T_deg=(int*) omalloc(n*sizeof(int));
