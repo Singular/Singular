@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.19 2005-05-12 07:44:10 bricken Exp $ */
+/* $Id: tgb.cc,v 1.20 2005-05-12 08:12:29 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -1203,7 +1203,7 @@ static sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_p
 {
 
   assume(h!=NULL);
-#define ENLARGE(pointer, type) pointer=(type*) omrealloc(pointer, c->n*sizeof(type))
+#define ENLARGE(pointer, type) pointer=(type*) omrealloc(pointer, c->array_lengths*sizeof(type))
 //  BOOLEAN corr=lenS_correct(c->strat);
   BOOLEAN R_found=FALSE;
   void* hp;
@@ -1214,15 +1214,19 @@ static sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_p
   i=c->n-1;
   sorted_pair_node** nodes=(sorted_pair_node**) omalloc(sizeof(sorted_pair_node*)*i);
   int spc=0;
-  ENLARGE(c->T_deg, int);
-  ENLARGE(c->tmp_pair_lm,poly);
-  ENLARGE(c->tmp_spn,sorted_pair_node*);
-  ENLARGE(c->rep,int);
-  ENLARGE(c->short_Exps,long);
-  ENLARGE(c->lengths,int);
-  ENLARGE(c->states, char*);
-  ENLARGE(c->gcd_of_terms,poly);
-  ENLARGE(c->S->m,poly);
+  if(c->n>c->array_lengths){
+    c->array_lengths=c->array_lengths*2;
+    assume(c->array_lengths>=c->n);
+    ENLARGE(c->T_deg, int);
+    ENLARGE(c->tmp_pair_lm,poly);
+    ENLARGE(c->tmp_spn,sorted_pair_node*);
+    ENLARGE(c->rep,int);
+    ENLARGE(c->short_Exps,long);
+    ENLARGE(c->lengths,int);
+    ENLARGE(c->states, char*);
+    ENLARGE(c->gcd_of_terms,poly);
+    ENLARGE(c->S->m,poly);
+  }
   if (c->T_deg_full)
     ENLARGE(c->T_deg_full,int);
   c->T_deg[i]=pTotaldegree(h);
@@ -3076,6 +3080,8 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
   c->pair_top=-1;
 
   int n=I->idelems();
+  c->array_lengths=n;
+
   if (TEST_OPT_PROT)
     for (i=0;i<n;i++){
       wrp(I->m[i]);
@@ -3112,7 +3118,7 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
   c->strat->enterS = enterSBba;
   c->strat->sl = -1;
   i=n;
-  i=1;
+  i=1;//some strange bug else
   /* initS(c->S,NULL,c->strat); */
 /* intS start: */
   // i=((i+IDELEMS(c->S)+15)/16)*16;

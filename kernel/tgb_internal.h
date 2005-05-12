@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb_internal.h,v 1.7 2005-05-11 14:58:35 bricken Exp $ */
+/* $Id: tgb_internal.h,v 1.8 2005-05-12 08:12:30 bricken Exp $ */
 /*
  * ABSTRACT: tgb internal .h file
 */
@@ -112,6 +112,8 @@ struct calc_dat
 #endif
   unsigned int reduction_steps;
   int n;
+  //! array_lengths should be greater equal n;
+  int array_lengths; 
   int normal_forms;
   int current_degree;
   int Rcounter;
