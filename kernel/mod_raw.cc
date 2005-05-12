@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mod_raw.cc,v 1.6 2005-05-12 11:51:32 Singular Exp $ */
+/* $Id: mod_raw.cc,v 1.7 2005-05-12 12:47:14 Singular Exp $ */
 /*
  * ABSTRACT: machine depend code for dynamic modules
  *
@@ -12,6 +12,10 @@
 */
 
 #include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+#include <sys/stat.h>
+
 
 #include "mod2.h"
 #include "static.h"
@@ -19,9 +23,65 @@
 #undef HAVE_DL
 #endif
 
-#if defined(HAVE_DL)
 #include "mod_raw.h"
 #include "febase.h"
+
+/*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+#define BYTES_TO_CHECK 7
+
+lib_types type_of_LIB(char *newlib, char *libnamebuf)
+{
+  char        buf[BYTES_TO_CHECK+1];        /* one extra for terminating '\0' */
+  struct stat sb;
+  int nbytes = 0;
+  int ret;
+  lib_types LT=LT_NONE;
+
+  FILE * fp = feFopen( newlib, "r", libnamebuf, FALSE );
+  ret = stat(libnamebuf, &sb);
+
+  if (fp==NULL)
+  {
+    return LT_NOTFOUND;
+  }
+  if((sb.st_mode & S_IFMT) != S_IFREG)
+  {
+    goto lib_type_end;
+  }
+  if ((nbytes = fread((char *)buf, sizeof(char), BYTES_TO_CHECK, fp)) == -1)
+  {
+    goto lib_type_end;
+    /*NOTREACHED*/
+  }
+  if (nbytes == 0)
+    goto lib_type_end;
+  else
+  {
+    buf[nbytes++] = '\0';        /* null-terminate it */
+  }
+  if( (strncmp(buf, "\177ELF", 4)==0)) /* generic ELF */
+  {
+    LT = LT_ELF;
+    //omFree(newlib);
+    //newlib = omStrDup(libnamebuf);
+    goto lib_type_end;
+  }
+  if( (strncmp(buf, "\02\020\01\016\05\022@", 7)==0))
+  {
+    LT = LT_HPUX;
+    //omFree(newlib);
+    //newlib = omStrDup(libnamebuf);
+    goto lib_type_end;
+  }
+  if(isprint(buf[0]) || buf[0]=='\n')
+  { LT = LT_SINGULAR; goto lib_type_end; }
+
+  lib_type_end:
+  fclose(fp);
+  return LT;
+}
+/*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+#if defined(HAVE_DL)
 
 /*****************************************************************************
  *
