@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb_internal.h,v 1.8 2005-05-12 08:12:30 bricken Exp $ */
+/* $Id: tgb_internal.h,v 1.9 2005-05-12 08:25:08 bricken Exp $ */
 /*
  * ABSTRACT: tgb internal .h file
 */
@@ -156,7 +156,7 @@ static poly redNF2 (poly h,calc_dat* c , int &len, number&  m,int n=0);
 static void free_sorted_pair_node(sorted_pair_node* s, ring r);
 static void shorten_tails(calc_dat* c, poly monom);
 static void replace_pair(int & i, int & j, calc_dat* c);
-static sorted_pair_node** add_to_basis(poly h, int i, int j,calc_dat* c, int* ip=NULL);
+//static sorted_pair_node** add_to_basis(poly h, int i, int j,calc_dat* c, int* ip=NULL);
 static void do_this_spoly_stuff(int i,int j,calc_dat* c);
 //ideal t_rep_gb(ring r,ideal arg_I);
 static BOOLEAN has_t_rep(const int & arg_i, const int & arg_j, calc_dat* state);
