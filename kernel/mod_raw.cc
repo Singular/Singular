@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mod_raw.cc,v 1.5 2005-05-11 11:31:39 Singular Exp $ */
+/* $Id: mod_raw.cc,v 1.6 2005-05-12 11:51:32 Singular Exp $ */
 /*
  * ABSTRACT: machine depend code for dynamic modules
  *
@@ -83,7 +83,7 @@ extern "C" {
 
 /*****************************************************************************
  * SECTION generic ELF: ix86-linux / alpha-linux / IA64-linux /x86_64_Linux  *
- *                      SunOS-5 / IRIX-6 / ppcMac-Darwin
+ *                      SunOS-5 / IRIX-6 / ppcMac-Darwin / FreeeBSD          *
  *****************************************************************************/
 #if defined(ix86_Linux)
 #define HAVE_ELF_SYSTEM
@@ -118,6 +118,10 @@ extern "C" {
 #endif
 
 #ifdef ppcMac_darwin
+#define HAVE_ELF_SYSTEM
+#endif
+
+#ifdef ix86_freebsd
 #define HAVE_ELF_SYSTEM
 #endif
 
