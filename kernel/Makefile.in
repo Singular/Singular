@@ -49,7 +49,7 @@ CFLAGS		= @CFLAGS@ ${PIPE}
 CXXFLAGS	= @CXXFLAGS@ ${PIPE}
 CXXTEMPLFLAGS	= @CXXTEMPLFLAGS@
 CPPFLAGS	= -I${srcdir} @CPPFLAGS@
-DEFS		= -DNDEBUG -DOM_NDEBUG -D@SING_UNAME@ @DEFS@
+DEFS		= -DNDEBUG  -D@SING_UNAME@ @DEFS@
 LDFLAGS		= @LDFLAGS@
 LD_DYN_FLAGS	= @LD_DYN_FLAGS@
 SFLAGS		= @SFLAGS@
@@ -112,7 +112,7 @@ CXXSOURCES=clapconv.cc \
     prCopy.cc p_Mult_q.cc \
     pDebug.cc pInline2.cc pInline1.cc pInline0.cc \
     pShallowCopyDelete.cc fast_mult.cc digitech.cc\
-    tgb.cc tgbgauss.cc
+    tgb.cc tgbgauss.cc F4.cc
 
 # normal C source files
 CSOURCES=weight0.c fegetopt.c fereadl.c dError.c mmstd.c 
@@ -451,13 +451,13 @@ CXXP		= gcc
 CFLAGSP		= -pg -O3 ${PIPE}
 CXXFLAGSP	= -pg -O3 ${PIPE}
 CXXTEMPLFLAGSP	= -fno-implicit-templates
-DEFSP		= -DNDEBUG -DOM_NDEBUG -DDO_PROFILE -D@SING_UNAME@ @DEFS@ -DDL_TAIL=$(DL_TAILP)
+DEFSP		= -DNDEBUG  -DDO_PROFILE -D@SING_UNAME@ @DEFS@ -DDL_TAIL=$(DL_TAILP)
 LDFLAGSP	= -static @LDFLAGS@
 
 CFLAGSB		= -g -O3 ${PIPE}
 CXXFLAGSB	= -g -O3 ${PIPE}
 CXXTEMPLFLAGSB	= -fno-implicit-templates
-DEFSB		= -D@SING_UNAME@ -DOM_NDEBUG -DNDEBUG @DEFS@ -DDL_TAIL=$(DL_TAILB)
+DEFSB		= -D@SING_UNAME@  -DNDEBUG @DEFS@ -DDL_TAIL=$(DL_TAILB)
 LDFLAGSB	= -static @LDFLAGS@
 
 # bprof object  file to link with

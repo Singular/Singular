@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb_internal.h,v 1.9 2005-05-12 08:25:08 bricken Exp $ */
+/* $Id: tgb_internal.h,v 1.10 2005-05-12 09:19:43 bricken Exp $ */
 /*
  * ABSTRACT: tgb internal .h file
 */
@@ -153,7 +153,7 @@ static int add_to_reductors(calc_dat* c, poly h, int len);
 static int bucket_guess(kBucket* bucket);
 static poly redNFTail (poly h,const int sl,kStrategy strat, int len);
 static poly redNF2 (poly h,calc_dat* c , int &len, number&  m,int n=0);
-static void free_sorted_pair_node(sorted_pair_node* s, ring r);
+void free_sorted_pair_node(sorted_pair_node* s, ring r);
 static void shorten_tails(calc_dat* c, poly monom);
 static void replace_pair(int & i, int & j, calc_dat* c);
 //static sorted_pair_node** add_to_basis(poly h, int i, int j,calc_dat* c, int* ip=NULL);
@@ -162,7 +162,7 @@ static void do_this_spoly_stuff(int i,int j,calc_dat* c);
 static BOOLEAN has_t_rep(const int & arg_i, const int & arg_j, calc_dat* state);
 static int* make_connections(int from, poly bound, calc_dat* c);
 static int* make_connections(int from, int to, poly bound, calc_dat* c);
-static void now_t_rep(const int & arg_i, const int & arg_j, calc_dat* c);
+void now_t_rep(const int & arg_i, const int & arg_j, calc_dat* c);
 static void soon_t_rep(const int & arg_i, const int & arg_j, calc_dat* c);
 static int pLcmDeg(poly a, poly b);
 static int simple_posInS (kStrategy strat, poly p,int len);
@@ -170,18 +170,23 @@ static BOOLEAN find_next_pair(calc_dat* c, BOOLEAN go_higher=TRUE);
 
 static sorted_pair_node* pop_pair(calc_dat* c);
 static BOOLEAN no_pairs(calc_dat* c);
-static void clean_top_of_pair_list(calc_dat* c);
+void clean_top_of_pair_list(calc_dat* c);
 static void super_clean_top_of_pair_list(calc_dat* c);
 static BOOLEAN state_is(calc_state state, const int & i, const int & j, calc_dat* c);
 static BOOLEAN pair_better(sorted_pair_node* a,sorted_pair_node* b, calc_dat* c);
-static int pair_better_gen(const void* ap,const void* bp);
+static int tgb_pair_better_gen(const void* ap,const void* bp);
 static poly redTailShort(poly h, kStrategy strat);
 static poly gcd_of_terms(poly p, ring r);
 static BOOLEAN extended_product_criterion(poly p1, poly gcd1, poly p2, poly gcd2, calc_dat* c);
 static poly kBucketGcd(kBucket* b, ring r);
 static void multi_reduction(red_object* los, int & losl, calc_dat* c);
-static sorted_pair_node* quick_pop_pair(calc_dat* c);
-static sorted_pair_node* top_pair(calc_dat* c);
+sorted_pair_node* quick_pop_pair(calc_dat* c);
+sorted_pair_node* top_pair(calc_dat* c);
+sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,calc_dat* c, int* ip);
+sorted_pair_node**  spn_merge(sorted_pair_node** p, int pn,sorted_pair_node **q, int qn,calc_dat* c);
+int kFindDivisibleByInS_easy(kStrategy strat,const red_object & obj);
+int tgb_pair_better_gen2(const void* ap,const void* bp);
+int kFindDivisibleByInS_easy(kStrategy strat,poly p, long sev);
 //static int quality(poly p, int len, calc_dat* c);
 /**
    makes on each red_object in a region a single_step
