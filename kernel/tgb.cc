@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.18 2005-05-12 07:01:21 bricken Exp $ */
+/* $Id: tgb.cc,v 1.19 2005-05-12 07:44:10 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -1022,7 +1022,7 @@ static sorted_pair_node** add_to_basis(poly h, int i_pos, int j_pos,calc_dat* c,
   c->tmp_pair_lm[i]=pOne_Special(c->r);
   c->tmp_spn=(sorted_pair_node**) omrealloc(c->tmp_spn,c->n*sizeof(sorted_pair_node*));
   c->tmp_spn[i]=(sorted_pair_node*) omalloc(sizeof(sorted_pair_node));
-#define ENLARGE(pointer, type) pointer=(type*) omrealloc(pointer, c->n*sizeof(int))
+
   hp=omrealloc(c->rep, c->n *sizeof(int));
   if (hp!=NULL){
     c->rep=(int*) hp;
@@ -1203,6 +1203,7 @@ static sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_p
 {
 
   assume(h!=NULL);
+#define ENLARGE(pointer, type) pointer=(type*) omrealloc(pointer, c->n*sizeof(type))
 //  BOOLEAN corr=lenS_correct(c->strat);
   BOOLEAN R_found=FALSE;
   void* hp;
@@ -1213,50 +1214,42 @@ static sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_p
   i=c->n-1;
   sorted_pair_node** nodes=(sorted_pair_node**) omalloc(sizeof(sorted_pair_node*)*i);
   int spc=0;
-  c->T_deg=(int*) omrealloc(c->T_deg,c->n*sizeof(int));
+  ENLARGE(c->T_deg, int);
+  ENLARGE(c->tmp_pair_lm,poly);
+  ENLARGE(c->tmp_spn,sorted_pair_node*);
+  ENLARGE(c->rep,int);
+  ENLARGE(c->short_Exps,long);
+  ENLARGE(c->lengths,int);
+  ENLARGE(c->states, char*);
+  ENLARGE(c->gcd_of_terms,poly);
+  ENLARGE(c->S->m,poly);
+  if (c->T_deg_full)
+    ENLARGE(c->T_deg_full,int);
   c->T_deg[i]=pTotaldegree(h);
   if(c->T_deg_full){
-    c->T_deg_full=(int*) omrealloc(c->T_deg_full,c->n*sizeof(int));
     c->T_deg_full[i]=pTotaldegree_full(h);
   }
-  c->tmp_pair_lm=(poly*) omrealloc(c->tmp_pair_lm,c->n*sizeof(poly));
+  
+
   c->tmp_pair_lm[i]=pOne_Special(c->r);
-  c->tmp_spn=(sorted_pair_node**) omrealloc(c->tmp_spn,c->n*sizeof(sorted_pair_node*));
+
+
   c->tmp_spn[i]=(sorted_pair_node*) omalloc(sizeof(sorted_pair_node));
 
-  hp=omrealloc(c->rep, c->n *sizeof(int));
-  if (hp!=NULL){
-    c->rep=(int*) hp;
-  } else {
-    exit(1);
-  }
-  c->short_Exps=(long *) omrealloc(c->short_Exps ,c->n*sizeof(long));
 
-  hp=omrealloc(c->lengths, c->n *sizeof(int));
-  if (hp!=NULL){
-    c->lengths=(int*) hp;
-  } else {
-    exit(1);
-  }
   c->lengths[i]=pLength(h);
-  hp=omrealloc(c->states, c->n * sizeof(char*));
  
-    c->states=(char**) hp;
-  c->gcd_of_terms=(poly*) omrealloc(c->gcd_of_terms, c->n *sizeof(poly));
   c->gcd_of_terms[i]=gcd_of_terms(h,c->r);
   c->rep[i]=i;
   if (i>0)
     c->states[i]=(char*)  omalloc(i*sizeof(char));
   else
     c->states[i]=NULL;
-  hp=omrealloc(c->S->m,c->n*sizeof(poly));
-  if (hp!=NULL){
-    c->S->m=(poly*) hp;
-  } else {
-    exit(1);
-  }
+  
+  
   c->S->m[i]=h;
   c->short_Exps[i]=p_GetShortExpVector(h,c->r);
+#undef ENLARGE
   for (j=0;j<i;j++){
     
     //check product criterion
