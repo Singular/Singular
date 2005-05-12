@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.358 2005-05-12 13:51:06 Singular Exp $ */
+/* $Id: iparith.cc,v 1.359 2005-05-12 14:25:02 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -48,6 +48,7 @@
 #include "GMPrat.h"
 #include "tgb.h"
 #include "walkProc.h"
+#include "mod_raw.h"
 #ifdef HAVE_FACTORY
 #include "clapsing.h"
 #include "kstdfac.h"
