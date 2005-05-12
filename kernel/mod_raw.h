@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mod_raw.h,v 1.2 2005-05-12 12:47:14 Singular Exp $ */
+/* $Id: mod_raw.h,v 1.3 2005-05-12 13:50:37 Singular Exp $ */
 /*
  * ABSTRACT: machine depend code for dynamic modules
  *
@@ -13,7 +13,7 @@
  *           dunl_close()
 */
 
-typedef enum { LT_NONE, LT_NOTFOUND, LT_SINGULAR, LT_ELF, LT_HPUX} lib_types;
+#include "structs.h"
 
 lib_types type_of_LIB(char *newlib, char *fullname);
 
