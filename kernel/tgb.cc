@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.22 2005-05-12 09:19:43 bricken Exp $ */
+/* $Id: tgb.cc,v 1.23 2005-05-12 13:42:00 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -388,64 +388,7 @@ int find_best(red_object* r,int l, int u, int &w, calc_dat* c){
  return best;
 }
 
-#if 0 
-int find_best(red_object* r,int l, int u, int &w, calc_dat* c){
 
-  int sz=u-l+1;
-  int n=sz/10+1;
-  int filled=0;
-  int* indizes=(int*) omalloc(n*sizeof(int));
-  int* weight=(int*) omalloc(n*sizeof(int));
-  int worst=-1;
-  int i;  
-  for(i=l;i<=u;i++){
-    int q=r[i].guess_quality(c);
-    if ((filled<n)||(q<worst)){
-      if(filled<n){
-	worst=si_max(q,worst);
-	indizes[filled]=i;
-	weight[filled]=q;
-	filled++;
-      }
-    }
-    else{
-      int j;
-      for(j=0;j<filled;j++){
-	if (worst==weight[j]){
-	  weight[j]=q;
-	  indizes[j]=i;
-	}
-      }
-      worst=-1;
-      for(j=0;j<filled;j++){
-	if (worst<weight[j]){
-	  worst=weight[j];
-	}
-      }
-    }
-  }
-  assume(filled==n);
-  int pos=0;
-
-  for(i=0;i<filled;i++){  
-    r[indizes[i]].canonicalize();
-    weight[i]=r[indizes[i]].guess_quality(c);
-    if(weight[i]<weight[pos]) pos=i;
-  }
-  w=weight[pos];
-  pos=indizes[pos];
-
-  omfree(indizes);
-  omfree(weight);
-
-  assume(w==r[pos].guess_quality(c));
-  assume(l<=pos);
-  assume(u>=pos);
-  return pos;
-  
-}
-
-#endif
 void red_object::canonicalize(){
   kBucketCanonicalize(bucket);
   
@@ -1180,62 +1123,6 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,calc
 
 
 
-#if 0
-static poly redNF (poly h,kStrategy strat)
-{
-  int j = 0;
-  int z = 3;
-  unsigned long not_sev;
-
-  if (0 > strat->sl)
-  {
-    return h;
-  }
-  not_sev = ~ pGetShortExpVector(h);
-  loop
-    {
-      if (pLmShortDivisibleBy(strat->S[j], strat->sevS[j], h, not_sev))
-      {
-        //if (strat->interpt) test_int_std(strat->kIdeal);
-        /*- compute the s-polynomial -*/
-#ifdef KDEBUG
-        if (TEST_OPT_DEBUG)
-        {
-	  
-          PrintS("red:");
-          wrp(h);
-          PrintS(" with ");
-          wrp(strat->S[j]);
-        }
-#endif
-        h = ksOldSpolyRed(strat->S[j],h,strat->kNoether);
-#ifdef KDEBUG
-        if (TEST_OPT_DEBUG)
-        {
-          PrintS("\nto:");
-          wrp(h);
-          PrintLn();
-        }
-#endif
-        if (h == NULL) return NULL;
-        z++;
-        if (z>=10)
-        {
-          z=0;
-          pNormalize(h);
-        }
-        /*- try to reduce the s-polynomial -*/
-        j = 0;
-        not_sev = ~ pGetShortExpVector(h);
-      }
-      else
-      {
-        if (j >= strat->sl) return h;
-        j++;
-      }
-    }
-}
-#else
 
 static poly redNF2 (poly h,calc_dat* c , int &len, number&  m,int n)
 {
@@ -1777,7 +1664,7 @@ static poly redNF (poly h,kStrategy strat, int &len)
       }
     }
 }
-#endif
+
 #ifdef REDTAIL_S
 
 static poly redNFTail (poly h,const int sl,kStrategy strat, int len)
