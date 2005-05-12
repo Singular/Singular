@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: subexpr.h,v 1.34 2003-12-09 18:15:26 Singular Exp $ */
+/* $Id: subexpr.h,v 1.35 2005-05-12 12:46:42 Singular Exp $ */
 /*
 * ABSTRACT: handling of leftv
 */
@@ -123,9 +123,6 @@ class libstack
   inline char *get() { return(libname); }
 };
 #endif /* HAVE_LIBPARSER */
-
-typedef enum { LT_NONE, LT_NOTFOUND, LT_SINGULAR, LT_ELF, LT_HPUX} lib_types;
-lib_types type_of_LIB(char *newlib, char *fullname);
 
 #ifndef OM_ALLOC_H
 struct omBin_s;

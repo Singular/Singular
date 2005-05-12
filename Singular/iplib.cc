@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.110 2005-05-06 12:39:47 Singular Exp $ */
+/* $Id: iplib.cc,v 1.111 2005-05-12 12:46:42 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -1241,60 +1241,4 @@ libstackv libstack::pop(char *p)
 }
 
 #endif /* HAVE_LIBPARSER */
-/*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
-#ifndef HOWMANY
-# define HOWMANY 8192           /* how much of the file to look at */
-#endif
-
-lib_types type_of_LIB(char *newlib, char *libnamebuf)
-{
-  char        buf[HOWMANY+1];        /* one extra for terminating '\0' */
-  struct stat sb;
-  int nbytes = 0;
-  int ret;
-  lib_types LT=LT_NONE;
-
-  FILE * fp = feFopen( newlib, "r", libnamebuf, FALSE );
-  ret = stat(libnamebuf, &sb);
-
-  if (fp==NULL)
-  {
-    return LT_NOTFOUND;
-  }
-  if((sb.st_mode & S_IFMT) != S_IFREG)
-  {
-    goto lib_type_end;
-  }
-  if ((nbytes = fread((char *)buf, sizeof(char), HOWMANY, fp)) == -1)
-  {
-    goto lib_type_end;
-    /*NOTREACHED*/
-  }
-  if (nbytes == 0)
-    goto lib_type_end;
-  else
-  {
-    buf[nbytes++] = '\0';        /* null-terminate it */
-  }
-  if( (strncmp(buf, "\177ELF\01\01\01", 7)==0) && buf[16]=='\03')
-  {
-    LT = LT_ELF;
-    //omFree(newlib);
-    //newlib = omStrDup(libnamebuf);
-    goto lib_type_end;
-  }
-  if( (strncmp(buf, "\02\020\01\016\05\022@", 7)==0))
-  {
-    LT = LT_HPUX;
-    //omFree(newlib);
-    //newlib = omStrDup(libnamebuf);
-    goto lib_type_end;
-  }
-  if(isprint(buf[0]) || buf[0]=='\n')
-  { LT = LT_SINGULAR; goto lib_type_end; }
-
-  lib_type_end:
-  fclose(fp);
-  return LT;
-}
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
