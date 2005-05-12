@@ -2,6 +2,13 @@
 #include "F4.h"
 #include "tgb_internal.h"
 #include "tgbgauss.h"
+/****************************************
+*  Computer Algebra System SINGULAR     *
+****************************************/
+/* $Id: F4.cc,v 1.2 2005-05-12 09:20:50 bricken Exp $ */
+/*
+* ABSTRACT: F4 implementation
+*/
 static int posInPolys (poly*  p, int pn, poly qe,calc_dat* c)
 {
   if(pn==0) return 0;
