@@ -1,4 +1,4 @@
-// $Id: slimgb_s.tst,v 1.2 2005-05-11 09:09:21 bricken Exp $
+// $Id: slimgb_s.tst,v 1.3 2005-05-12 07:40:03 bricken Exp $
 
 //
 //
@@ -9,7 +9,7 @@ LIB "tst.lib";
 LIB "poly.lib";
 
 tst_init();
-tst_ignore("CVS: $Id: slimgb_s.tst,v 1.2 2005-05-11 09:09:21 bricken Exp $");
+tst_ignore("CVS: $Id: slimgb_s.tst,v 1.3 2005-05-12 07:40:03 bricken Exp $");
 
 proc char_out(ideal i){
   return(sort(simplify(lead(i),1))[1]);
@@ -62,5 +62,10 @@ x1^2*u3+x1*u1*u2-x1*u2^2-x1*u3^2-u1*u3*u4+u3*u4^2;
 @i=slimgb(@i);
 char_out(@i);
 kill @r;
+
+ring r=0,(x,y,z),lp;
+ideal i=x3-y,xy-z,x2-z6,yz-z7,xz-y;
+char_out(slimgb(i));
+kill r;
 
 tst_status(1);$
