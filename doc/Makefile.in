@@ -1,7 +1,7 @@
 #####################################################################
 ###
 ### Makefile for Singular documentation
-### $Id: Makefile.in,v 1.98 2005-04-30 20:35:57 levandov Exp $
+### $Id: Makefile.in,v 1.99 2005-05-12 13:52:59 Singular Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -118,7 +118,7 @@ PLU_MANUAL_FILES = ${PLU_DOC2TEX_FILES} ${PLU_ONLY_FILES}
 MANUAL_FILES	= ${TEX_FILES} ${DOC2TEX_FILES} ${PLU_MANUAL_FILES}
 
 TUTOR_FILES	= \
-		tutor.tex examples.tex start.tex copyright.tex
+		tutor.tex examples.tex start.tex COPYING.texi
 
 IMAGES_UU	:= $(wildcard images/*.uu)
 IMAGES     := $(IMAGES_UU:images/%.uu=%)
