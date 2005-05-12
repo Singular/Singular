@@ -1,5 +1,5 @@
 # @configure_input@
-# $Id: GNUmakefile.in,v 1.42 2002-03-08 10:31:44 Singular Exp $
+# $Id: GNUmakefile.in,v 1.43 2005-05-12 09:26:47 Singular Exp $
 
 #
 # GNUmakefile.in - used by `configure' to create `GNUmakefile', the
@@ -172,7 +172,10 @@ basefactorysrc := \
 		sm_sparsemod.cc \
 		sm_util.cc \
 		variable.cc \
-		NTLconvert.cc
+		NTLconvert.cc \
+                abs_fac.cc \
+		bifac.cc \
+		lgs.cc
 
 singfactorysrc := \
 		singext.cc
@@ -242,7 +245,10 @@ basefactoryincl := \
 		sm_util.h \
 		timing.h \
 		variable.h \
-		NTLconvert.h
+		NTLconvert.h \
+		bifac.h \
+		bifacConfig.h \
+		lgs.h
 
 singfactoryincl := \
 		singext.h
