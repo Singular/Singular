@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: factory.template,v 1.15 2003-10-29 10:53:50 Singular Exp $ */
+/* $Id: factory.template,v 1.16 2005-05-12 09:46:50 Singular Exp $ */
 
 #ifndef INCL_FACTORY_H
 #define INCL_FACTORY_H
@@ -106,5 +106,10 @@ extern "C" {
 #include "singext.h"
 
 #endif /* SINGULAR */
+
+#ifdef HAVE_BIFAC
+/*MAKEHEADER PUBLIC ONLY*/
+#include "bifac.h"
+#endif /* HAVE_BIFAC */
 
 #endif /* ! INCL_FACTORY_H */

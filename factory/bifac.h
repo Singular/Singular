@@ -18,16 +18,17 @@
 #include "lgs.h"
 #include "bifacConfig.h"
 
-
-CFFList AbsFactorize( const CanonicalForm  & a );
-
-
 // === IO-Streams ===
+#ifndef NOSTREAMIO
 #include <stdio.h>
 #include <fstream.h>
 #include <iostream.h>
 #include <iomanip.h>
+#endif
 
+/*BEGINPUBLIC*/
+
+CFFList AbsFactorize( const CanonicalForm  & a );
 
 class BIFAC
 {
@@ -82,6 +83,7 @@ class BIFAC
   int    exponent;  // 
 };
 
+/*ENDPUBLIC*/
 
 #endif
 // =============== Ende der Datei 'bifac.h' ============================
