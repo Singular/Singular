@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.h,v 1.3 2005-03-14 16:17:07 Singular Exp $ */
+/* $Id: ideals.h,v 1.4 2005-05-13 15:18:52 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -114,7 +114,7 @@ ideal   idMinors(matrix a, int ar, ideal R=NULL);
 
 ideal   idCompactify(ideal id);
 
-ideal idMinEmbedding(ideal arg,BOOLEAN inPlace=FALSE);
+ideal idMinEmbedding(ideal arg,BOOLEAN inPlace=FALSE, intvec **w=NULL);
 
 ideal   idHead(ideal h);
 
@@ -142,7 +142,7 @@ matrix  idDiff(matrix i, int k);
 matrix  idDiffOp(ideal I, ideal J,BOOLEAN multiply=TRUE);
 
 intvec *idSort(ideal id,BOOLEAN nolex=TRUE);
-ideal   idModulo (ideal h1,ideal h2);
+ideal   idModulo (ideal h1,ideal h2, tHomog h=testHomog, intvec ** w=NULL);
 int     idElem(ideal F);
 matrix  idCoeffOfKBase(ideal arg, ideal kbase, poly how);
 ideal   idTransp(ideal a);

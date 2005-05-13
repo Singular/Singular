@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.11 2005-04-25 18:15:23 Singular Exp $ */
+/* $Id: ideals.cc,v 1.12 2005-05-13 15:18:52 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -3222,10 +3222,12 @@ static ideal idHandleIdealOp(ideal arg,int syzcomp,int isIdeal=FALSE)
 /*2
 * represents (h1+h2)/h2=h1/(h1 intersect h2)
 */
-ideal idModulo (ideal h2,ideal h1)
+//ideal idModulo (ideal h2,ideal h1)
+ideal idModulo (ideal h2,ideal h1, tHomog hom, intvec ** w)
 {
+  intvec *wtmp=NULL;
+
   int i,j,k,rk,flength=0,slength,length;
-  intvec * w;
   poly p,q;
 
   if (idIs0(h2))
@@ -3239,6 +3241,24 @@ ideal idModulo (ideal h2,ideal h1)
     length = 1;
   }
   ideal temp = idInit(IDELEMS(h2),length+IDELEMS(h2));
+  if ((w!=NULL)&&((*w)!=NULL))
+  {
+    //Print("input weights:");(*w)->show(1);PrintLn();
+    int d;
+    int k;
+    wtmp=new intvec(length+IDELEMS(h2));
+    for (i=0;i<length;i++)
+      ((*wtmp)[i])=(**w)[i];
+    for (i=0;i<IDELEMS(h2);i++)
+    {
+      d = pDeg(h2->m[i]);
+      k= pGetComp(h2->m[i]);
+      if (slength>0) k--;
+      d +=((**w)[k]);
+      ((*wtmp)[i+length]) = d;
+    }
+    //Print("weights:");wtmp->show(1);PrintLn();
+  }
   for (i=0;i<IDELEMS(h2);i++)
   {
     temp->m[i] = pCopy(h2->m[i]);
@@ -3286,8 +3306,17 @@ ideal idModulo (ideal h2,ideal h1)
   }
 
   idTest(s_temp);
-  ideal s_temp1 = kStd(s_temp,currQuotient,testHomog,&w,NULL,length);
-  if (w!=NULL) delete w;
+  ideal s_temp1 = kStd(s_temp,currQuotient,hom,&wtmp,NULL,length);
+
+  //if (wtmp!=NULL)  Print("output weights:");wtmp->show(1);PrintLn();
+  if ((w!=NULL) && (*w !=NULL) && (wtmp!=NULL))
+  {
+    delete *w;
+    *w=new intvec(IDELEMS(h2));
+    for (i=0;i<IDELEMS(h2);i++)
+      ((**w)[i])=(*wtmp)[i+length];
+  }
+  if (wtmp!=NULL) delete wtmp;
 
   for (i=0;i<IDELEMS(s_temp1);i++)
   {
@@ -3559,7 +3588,7 @@ static void idDeleteComp(ideal arg,int red_comp)
 * returns the presentation of an isomorphic, minimally
 * embedded  module (arg represents the quotient!)
 */
-ideal idMinEmbedding(ideal arg,BOOLEAN inPlace)
+ideal idMinEmbedding(ideal arg,BOOLEAN inPlace, intvec **w)
 {
   if (idIs0(arg)) return idInit(1,arg->rank);
   int next_gen,next_comp;
@@ -3572,6 +3601,15 @@ ideal idMinEmbedding(ideal arg,BOOLEAN inPlace)
     if (next_gen<0) break;
     syGaussForOne(res,next_gen,next_comp,0,IDELEMS(res));
     idDeleteComp(res,next_comp);
+    if ((w !=NULL)&&(*w!=NULL))
+    {
+      intvec *wtmp=new intvec((*w)->length()-1);
+      int i;
+      for(i=0;i<next_comp-1;i++) (*wtmp)[i]=(**w)[i];
+      for(i=next_comp;i<(*w)->length();i++) (*wtmp)[i-1]=(**w)[i];
+      delete *w;
+      *w=wtmp;
+    }
   }
   idSkipZeroes(res);
   return res;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.359 2005-05-12 14:25:02 Singular Exp $ */
+/* $Id: iparith.cc,v 1.360 2005-05-13 15:18:48 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1902,7 +1902,7 @@ static BOOLEAN jjGCD_P(leftv res, leftv u, leftv v)
 static BOOLEAN jjHILBERT2(leftv res, leftv u, leftv v)
 {
   assumeStdFlag(u);
-  intvec *module_w=(intvec*)atGet(u,"isHomog");
+  intvec *module_w=(intvec*)atGet(u,"isHomog",INTVEC_CMD);
   intvec *iv=hFirstSeries((ideal)u->Data(),module_w,currQuotient);
   switch((int)v->Data())
   {
@@ -2014,7 +2014,50 @@ static BOOLEAN jjMINOR(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjMODULO(leftv res, leftv u, leftv v)
 {
-  res->data = (char *)idModulo((ideal)u->Data(),(ideal)v->Data());
+  intvec *w_u=(intvec *)atGet(u,"isHomog",INTVEC_CMD);
+  tHomog hom=testHomog;
+  if (w_u!=NULL)
+  {
+    w_u=ivCopy(w_u);
+    hom=isHomog;
+  }
+  intvec *w_v=(intvec *)atGet(v,"isHomog",INTVEC_CMD);
+  if (w_v!=NULL)
+  {
+    w_v=ivCopy(w_v);
+    hom=isHomog;
+  }
+  if ((w_u!=NULL) && (w_v==NULL))
+    w_v=ivCopy(w_u);
+  if ((w_v!=NULL) && (w_u==NULL))
+    w_u=ivCopy(w_v);
+  ideal u_id=(ideal)u->Data();
+  ideal v_id=(ideal)v->Data();
+  if (w_u!=NULL)
+  {
+     if ((*w_u).compare((w_v))!=0)
+     {
+       WarnS("incompatible weights");
+       delete w_u; w_u=NULL;
+       hom=testHomog;
+     }
+     else
+     {
+       if ((!idHomModule(u_id,currQuotient,&w_v))
+       || (!idHomModule(v_id,currQuotient,&w_v)))
+       {
+         WarnS("wrong weights");
+         delete w_u; w_u=NULL;
+         hom=testHomog;
+       }
+     }
+  }
+  res->data = (char *)idModulo(u_id,v_id ,hom,&w_u);
+  if (w_u!=NULL)
+  {
+    atSet(res,omStrDup("isHomog"),w_u,INTVEC_CMD);
+  }
+  delete w_v;
   return FALSE;
 }
 static BOOLEAN jjMOD_N(leftv res, leftv u, leftv v)
@@ -2249,6 +2292,7 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
       weights=NULL;
     }
   }
+
   intvec *ww=NULL;
   int add_row_shift=0;
   if (weights!=NULL)
@@ -2257,6 +2301,9 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
      add_row_shift = ww->min_in();
      (*ww) -= add_row_shift;
   }
+  else
+    idHomModule(u_id,currQuotient,&ww);
+  weights=ww;
 
   if ((iiOp == RES_CMD) || (iiOp == MRES_CMD))
   {
@@ -2305,20 +2352,26 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
   //res->data=(void *)liMakeResolv(r,l,wmaxl,u->Typ(),weights);
   r->list_length=wmaxl;
   res->data=(void *)r;
-  if (ww!=NULL) { delete ww; ww=NULL; }
   if ((r->weights!=NULL) && (r->weights[0]!=NULL))
   {
-    ww=ivCopy(r->weights[0]);
-    if (weights!=NULL) (*ww) += add_row_shift;
-    atSet(res,omStrDup("isHomog"),ww,INTVEC_CMD);
+    intvec *w=ivCopy(r->weights[0]);
+    if (weights!=NULL) (*w) += add_row_shift;
+    atSet(res,omStrDup("isHomog"),w,INTVEC_CMD);
+    delete w;
   }
-  else if (atGet(res,"isHomog",INTVEC_CMD)==NULL)
+  else
   {
+#if 0
+// need to set weights for ALL components (sres)
     if (weights!=NULL)
     {
       atSet(res,omStrDup("isHomog"),ivCopy(weights),INTVEC_CMD);
+      r->weights = (intvec**)omAlloc0Bin(void_ptr_bin);
+      (r->weights)[0] = ivCopy(weights);
     }
+#endif
   }
+  if (ww!=NULL) { delete ww; ww=NULL; }
   return FALSE;
 }
 static BOOLEAN jjRSUM(leftv res, leftv u, leftv v)
@@ -2436,7 +2489,7 @@ static BOOLEAN jjSIMPL_P(leftv res, leftv u, leftv v)
 static BOOLEAN jjSTD_HILB(leftv res, leftv u, leftv v)
 {
   ideal result;
-  intvec *w=(intvec *)atGet(u,"isHomog");
+  intvec *w=(intvec *)atGet(u,"isHomog",INTVEC_CMD);
   tHomog hom=testHomog;
   if (w!=NULL)
   {
@@ -2454,7 +2507,7 @@ static BOOLEAN jjSTD_1(leftv res, leftv u, leftv v)
 {
   assumeStdFlag(u);
   ideal result;
-  intvec *w=(intvec *)atGet(u,"isHomog");
+  intvec *w=(intvec *)atGet(u,"isHomog",INTVEC_CMD);
   tHomog hom=testHomog;
   if (w!=NULL)
   {
@@ -2999,7 +3052,7 @@ static BOOLEAN jjDEG_M(leftv res, leftv u)
 static BOOLEAN jjDEGREE(leftv res, leftv v)
 {
   assumeStdFlag(v);
-  intvec *module_w=(intvec*)atGet(v,"isHomog");
+  intvec *module_w=(intvec*)atGet(v,"isHomog",INTVEC_CMD);
   scDegree((ideal)v->Data(),module_w,currQuotient);
   return FALSE;
 }
@@ -3159,7 +3212,7 @@ static BOOLEAN jjHIGHCORNER(leftv res, leftv v)
 static BOOLEAN jjHIGHCORNER_M(leftv res, leftv v)
 {
   assumeStdFlag(v);
-  intvec *w=(intvec*)atGet(v,"isHomog");
+  intvec *w=(intvec*)atGet(v,"isHomog",INTVEC_CMD);
   BOOLEAN delete_w=FALSE;
   ideal I=(ideal)v->Data();
   int i;
@@ -3206,7 +3259,7 @@ static BOOLEAN jjHIGHCORNER_M(leftv res, leftv v)
 static BOOLEAN jjHILBERT(leftv res, leftv v)
 {
   assumeStdFlag(v);
-  intvec *module_w=(intvec*)atGet(v,"isHomog");
+  intvec *module_w=(intvec*)atGet(v,"isHomog",INTVEC_CMD);
   //scHilbertPoly((ideal)v->Data(),currQuotient);
   hLookSeries((ideal)v->Data(),module_w,currQuotient);
   return FALSE;
@@ -3541,7 +3594,10 @@ static BOOLEAN jjPRIME(leftv res, leftv v)
 }
 static BOOLEAN jjPRUNE(leftv res, leftv v)
 {
-  res->data = (char *)idMinEmbedding((ideal)v->Data());
+  intvec *w=ivCopy((intvec *)atGet(v,"isHomog",INTVEC_CMD));
+  intvec **ww=&w;
+  res->data = (char *)idMinEmbedding((ideal)v->Data(),FALSE,ww);
+  atSet(res,omStrDup("isHomog"),*ww,INTVEC_CMD);
   return FALSE;
 }
 static BOOLEAN jjP2N(leftv res, leftv v)
@@ -3628,7 +3684,7 @@ static BOOLEAN jjSLIM_GB(leftv res, leftv u)
 static BOOLEAN jjSTD(leftv res, leftv v)
 {
   ideal result;
-  intvec *w=(intvec *)atGet(v,"isHomog");
+  intvec *w=(intvec *)atGet(v,"isHomog",INTVEC_CMD);
   tHomog hom=testHomog;
   if (w!=NULL)
   {
@@ -4653,7 +4709,7 @@ static BOOLEAN jjFWALK3(leftv res, leftv u, leftv v, leftv w)
 static BOOLEAN jjHILBERT3(leftv res, leftv u, leftv v, leftv w)
 {
   assumeStdFlag(u);
-  intvec *module_w=(intvec *)atGet(u,"isHomog");
+  intvec *module_w=(intvec *)atGet(u,"isHomog",INTVEC_CMD);
   intvec *wdegree=(intvec*)w->Data();
   if (wdegree->length()!=pVariables)
   {
@@ -5018,7 +5074,7 @@ static BOOLEAN jjRES3(leftv res, leftv u, leftv v, leftv w)
     maxl = pVariables-1;
   if ((iiOp == RES_CMD) || (iiOp == MRES_CMD))
   {
-    intvec * iv=(intvec*)atGet(u,"isHomog");
+    intvec * iv=(intvec*)atGet(u,"isHomog",INTVEC_CMD);
     if (iv!=NULL)
     {
       weights = (intvec**)omAlloc0Bin(void_ptr_bin);
@@ -5053,7 +5109,7 @@ static BOOLEAN jjSTATUS3(leftv res, leftv u, leftv v, leftv w)
 static BOOLEAN jjSTD_HILB_W(leftv res, leftv u, leftv v, leftv w)
 {
   ideal result;
-  intvec *ww=(intvec *)atGet(u,"isHomog");
+  intvec *ww=(intvec *)atGet(u,"isHomog",INTVEC_CMD);
   tHomog hom=testHomog;
   if (ww!=NULL)
   {

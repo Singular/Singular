@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.250 2005-05-11 08:04:48 Singular Exp $
+@comment $Id: reference.doc,v 1.251 2005-05-13 15:18:50 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -3630,6 +3630,10 @@ is the induced map.
 @end ifinfo
 @*@code{modulo(h1,h2)} returns generators of
 the kernel of this induced map.
+@item @strong{Note:}
+If for at least one of @code{h1} or @code{h2} the attribute @code{"isHomog"} is
+set, @code{modulo(h1,h2)} also sets the attribute @code{"isHomog"}
+(if possible, that is, if the weights are compatible).
 @item @strong{Example:}
 @smallexample
 @c example
