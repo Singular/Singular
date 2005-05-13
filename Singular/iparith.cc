@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.361 2005-05-13 15:29:19 Singular Exp $ */
+/* $Id: iparith.cc,v 1.362 2005-05-13 15:37:31 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -3704,10 +3704,17 @@ static BOOLEAN jjPRIME(leftv res, leftv v)
 }
 static BOOLEAN jjPRUNE(leftv res, leftv v)
 {
-  intvec *w=ivCopy((intvec *)atGet(v,"isHomog",INTVEC_CMD));
-  intvec **ww=&w;
-  res->data = (char *)idMinEmbedding((ideal)v->Data(),FALSE,ww);
-  atSet(res,omStrDup("isHomog"),*ww,INTVEC_CMD);
+  intvec *w=(intvec *)atGet(v,"isHomog",INTVEC_CMD);
+  ideal v_id=(ideal)v->Data();
+  if ((*w)!=NULL) 
+  {
+    *w=ivCopy(*w);
+    intvec **ww=&w;
+    res->data = (char *)idMinEmbedding(v_id,FALSE,ww);
+    atSet(res,omStrDup("isHomog"),*ww,INTVEC_CMD);
+  }
+  else
+    res->data = (char *)idMinEmbedding(v_id);
   return FALSE;
 }
 static BOOLEAN jjP2N(leftv res, leftv v)
