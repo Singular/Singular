@@ -1872,7 +1872,7 @@ else
   echo "$ac_t""no" 1>&6
 fi
 
-          if test "$ac_cv_lib_c_dlopen" = yes; then
+          if test "$ac_cv_lib_dl_dlopen" = yes; then
 	  	LD_DYN_FLAGS="-ldl -rdynamic"
 	  	SFLAGS="-fpic -DPIC"
 	  	SLDFLAGS=-shared 
