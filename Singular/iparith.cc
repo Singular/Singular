@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.362 2005-05-13 15:37:31 Singular Exp $ */
+/* $Id: iparith.cc,v 1.363 2005-05-13 15:39:20 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -3706,9 +3706,9 @@ static BOOLEAN jjPRUNE(leftv res, leftv v)
 {
   intvec *w=(intvec *)atGet(v,"isHomog",INTVEC_CMD);
   ideal v_id=(ideal)v->Data();
-  if ((*w)!=NULL) 
+  if (w!=NULL) 
   {
-    *w=ivCopy(*w);
+    w=ivCopy(w);
     intvec **ww=&w;
     res->data = (char *)idMinEmbedding(v_id,FALSE,ww);
     atSet(res,omStrDup("isHomog"),*ww,INTVEC_CMD);
