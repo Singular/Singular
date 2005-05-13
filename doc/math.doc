@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.76 2005-05-02 11:54:50 Singular Exp $
+@comment $Id: math.doc,v 1.77 2005-05-13 16:19:41 Singular Exp $
 @comment this file contains the mathematical background of Singular
 
 @c The following directives are necessary for proper compilation
@@ -748,8 +748,16 @@ Cox, D.; Little, J.; O'Shea, D.:
 Ideals, Varieties and Algorithms. Springer, 1996
 
 @item
+Cox, D.; Little, J.; O'Shea, D.:
+Using Algebraic Geometry. Springer, 1998
+
+@item
 Eisenbud, D.: Commutative Algebra with a View Toward Algebraic Geometry.
 Springer, 1995
+
+@item
+Greuel, G.-M.; Pfister, G.:
+A Singular Introduction to Commutative Algebra. Springer, 2002
 
 @item
 Mishra, B.: Algorithmic Algebra, Texts and Monographs in Computer Science.
