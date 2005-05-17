@@ -2,7 +2,7 @@
 ###
 ### Makefile for Singular-modules
 ###
-### $Id: Makefile.in,v 1.10 2005-04-30 09:06:46 krueger Exp $
+### $Id: Makefile.in,v 1.11 2005-05-17 09:09:21 Singular Exp $
 ###
 #################################################################
 
@@ -66,16 +66,17 @@ MOD_DIRS = kernel
 
 all: modgen mod_prepare modules
 
-mod_prepare: modgen 
+mod_prepare: modgen/modgen 
 	for file in ${MOD_FILES}; do \
 		if test -d $${file}; then \
 	  	  echo Directory $${file} exists! Ignoring $${file}; \
 		  echo Use make mod_clean or remove directory by hand; \
+		else \
+		  ${MODGEN} $${file}.mod >$${file}.log ;\
 		fi; \
-		${MODGEN} -i ${bindir} $${file}.mod ;\
 	done
 
-modgen:
+modgen/modgen:
 	cd modgen; make install
 
 modules: mod_prepare
@@ -128,7 +129,7 @@ distclean: clean mod_clean
 	rm -f Makefile
 
 install: all
-	cd modgen; make install
+	(cd modgen; make install)
 	for SUBDIR in ${MOD_DIRS} ${MOD_FILES}; \
 	do \
 		echo ${MAKE} $@ in $${SUBDIR}; \

@@ -1,6 +1,5 @@
 # Process this file with autoconf to produce a configure script.
-AC_INIT(FULL-PACKAGE-NAME, VERSION, BUG-REPORT-ADDRESS)
-AC_CONFIG_SRCDIR([tools/misc.cc])
+AC_INIT([tools/misc.cc])
 AC_CONFIG_HEADER([include/config.h])
 
 OUTPUT_MAKEFILES="Makefile"
@@ -10,6 +9,30 @@ fi
 if test -d "modgen"; then
    OUTPUT_MAKEFILES=$OUTPUT_MAKEFILES" modgen/Makefile"
 fi
+dnl llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
+dnl version stuff -- should be set in ../configure.in
+dnl
+dnl here are some defaults
+
+SINGULAR_MAJOR_VERSION=${SINGULAR_MAJOR_VERSION:-3}
+SINGULAR_MINOR_VERSION=${SINGULAR_MINOR_VERSION:-0}
+SINGULAR_SUB_VERSION=${SINGULAR_SUB_VERSION:-0}
+SINGULAR_VERSION="${SINGULAR_VERSION:-$SINGULAR_MAJOR_VERSION${VERSION_SEP}$SINGULAR_MINOR_VERSION${VERSION_SEP}$SINGULAR_SUB_VERSION}"
+VERSION_DATE=${VERSION_DATE:-"May 2005"}
+
+dnl pass them on into the Makefiles
+AC_SUBST(SINGULAR_VERSION)
+AC_SUBST(VERSION_DATE)
+AC_SUBST(SINGULAR_MAJOR_VERSION)
+AC_SUBST(SINGULAR_MINOR_VERSION)
+AC_SUBST(SINGULAR_SUB_VERSION)
+AC_DEFINE_UNQUOTED(SINGULAR_MAJOR_VERSION, ${SINGULAR_MAJOR_VERSION})
+AC_DEFINE_UNQUOTED(SINGULAR_MINOR_VERSION, ${SINGULAR_MINOR_VERSION})
+AC_DEFINE_UNQUOTED(SINGULAR_SUB_VERSION, ${SINGULAR_SUB_VERSION})
+AC_DEFINE_UNQUOTED(S_VERSION1, "${SINGULAR_MAJOR_VERSION}${VERSION_SEP}${SINGULAR_MINOR_VERSION}${VERSION_SEP}${SINGULAR_SUB_VERSION}")
+AC_DEFINE_UNQUOTED(S_VERSION2, "${VERSION_DATE}")
+AC_DEFINE_UNQUOTED(SINGULAR_SUB_VERSION, ${SINGULAR_SUB_VERSION})
+
 
 # Checks for programs.
 AC_PROG_AWK
@@ -19,6 +42,8 @@ AC_PROG_CC
 AC_PROG_LEX
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
+# ln -s
+AC_PROG_LN_S
 
 # Checks for libraries.
 # FIXME: Replace `main' with a function in `-lgmp':
@@ -36,9 +61,8 @@ AC_C_CONST
 AC_TYPE_SIZE_T
 
 # Checks for library functions.
-AC_FUNC_MALLOC
 AC_FUNC_VPRINTF
-AC_CHECK_FUNCS([memset mkstemp mkdir regcomp strcasecmp strdup strrchr])
+AC_CHECK_FUNCS([malloc memset mkstemp mkdir regcomp strcasecmp strdup strrchr])
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl determine singuname
@@ -74,11 +98,12 @@ AC_SUBST(EXEC_EXT)
 
 SING_UNAME=`echo $SINGUNAME | tr '-' '_' `
 AC_SUBST(SING_UNAME)
+AC_SUBST(SINGULAR_VERSION)
+AC_SUBST(LN_S)
 
 # stupid Win programs do not like dots in their pathnames
 VERSION_SEP="-"
 
 dnl llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 
-AC_CONFIG_FILES([$OUTPUT_MAKEFILES])
-AC_OUTPUT
+AC_OUTPUT([$OUTPUT_MAKEFILES])
