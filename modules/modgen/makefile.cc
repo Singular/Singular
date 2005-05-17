@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: makefile.cc,v 1.14 2005-04-28 13:47:17 Singular Exp $ */
+/* $Id: makefile.cc,v 1.15 2005-05-17 09:24:44 anne Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -130,10 +130,10 @@ void build_install_section(
 {
   fprintf(fp, "install:\n");
   fprintf(fp, "\t${MKINSTALLDIRS} ${instdir}\n");
-  fprintf(fp, "\t${MKINSTALLDIRS} ${instdir}/modules\n");
-  fprintf(fp, "\t${INSTALL_PROGRAM} %s.so ${instdir}/modules/%s.so\n",
+  fprintf(fp, "\t${MKINSTALLDIRS} ${instdir}/MOD\n");
+  fprintf(fp, "\t${INSTALL_PROGRAM} %s.so ${instdir}/MOD/%s.so\n",
           module->targetname, module->targetname);
-  fprintf(fp, "\t${INSTALL_PROGRAM} %s.bin ${instdir}/modules/%s.bin\n",
+  fprintf(fp, "\t${INSTALL_PROGRAM} %s.bin ${instdir}/MOD/%s.bin\n",
           module->targetname, module->targetname);
 }
 
