@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgbgauss.cc,v 1.6 2005-05-11 10:11:53 bricken Exp $ */
+/* $Id: tgbgauss.cc,v 1.7 2005-05-17 15:26:27 bricken Exp $ */
 /*
 * ABSTRACT: gauss implementation for F4
 */
@@ -109,7 +109,7 @@ void mac_destroy(mac_poly p){
   }
 }
 
-void simple_gauss(tgb_sparse_matrix* mat, calc_dat* c){
+void simple_gauss(tgb_sparse_matrix* mat, slimgb_alg* c){
   int col, row;
   int* row_cache=(int*) omalloc(mat->get_rows()*sizeof(int));
   col=0;

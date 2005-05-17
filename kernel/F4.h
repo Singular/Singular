@@ -14,11 +14,11 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: F4.h,v 1.2 2005-05-12 09:21:45 bricken Exp $ */
+/* $Id: F4.h,v 1.3 2005-05-17 15:26:27 bricken Exp $ */
 /*
 * ABSTRACT: interface for F4 only routines
 */
 #include "mod2.h"
 #include "tgb_internal.h"
-void go_on_F4 (calc_dat* c);
+void go_on_F4 (slimgb_alg* c);
 #endif

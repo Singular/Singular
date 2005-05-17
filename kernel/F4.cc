@@ -5,11 +5,11 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: F4.cc,v 1.2 2005-05-12 09:20:50 bricken Exp $ */
+/* $Id: F4.cc,v 1.3 2005-05-17 15:26:27 bricken Exp $ */
 /*
 * ABSTRACT: F4 implementation
 */
-static int posInPolys (poly*  p, int pn, poly qe,calc_dat* c)
+static int posInPolys (poly*  p, int pn, poly qe,slimgb_alg* c)
 {
   if(pn==0) return 0;
 
@@ -36,7 +36,7 @@ static int posInPolys (poly*  p, int pn, poly qe,calc_dat* c)
   }
 }
 
-static tgb_sparse_matrix* build_sparse_matrix(poly* p,int p_index,poly* done, int done_index, calc_dat* c){
+static tgb_sparse_matrix* build_sparse_matrix(poly* p,int p_index,poly* done, int done_index, slimgb_alg* c){
   tgb_sparse_matrix* t=new tgb_sparse_matrix(p_index,done_index,c->r);
   int i, pos;
   //  Print("\n 0:%s\n",pString(done[done_index-1]));
@@ -82,7 +82,7 @@ static tgb_sparse_matrix* build_sparse_matrix(poly* p,int p_index,poly* done, in
 }
   return t;
 }
-static tgb_matrix* build_matrix(poly* p,int p_index,poly* done, int done_index, calc_dat* c){
+static tgb_matrix* build_matrix(poly* p,int p_index,poly* done, int done_index, slimgb_alg* c){
   tgb_matrix* t=new tgb_matrix(p_index,done_index);
   int i, pos;
   //  Print("\n 0:%s\n",pString(done[done_index-1]));
@@ -123,7 +123,7 @@ static tgb_matrix* build_matrix(poly* p,int p_index,poly* done, int done_index, 
   return t;
 }
 
-static int retranslate(poly* m,tgb_sparse_matrix* mat,poly* done, calc_dat* c){
+static int retranslate(poly* m,tgb_sparse_matrix* mat,poly* done, slimgb_alg* c){
   int i;
   int m_index=0;
   for(i=0;i<mat->get_rows();i++)
@@ -142,7 +142,7 @@ static int retranslate(poly* m,tgb_sparse_matrix* mat,poly* done, calc_dat* c){
 
 }
 //!returns m_index and destroys mat
- static int retranslate(poly* m,tgb_matrix* mat,poly* done, calc_dat* c){
+ static int retranslate(poly* m,tgb_matrix* mat,poly* done, slimgb_alg* c){
   int i;
   int m_index=0;
   for(i=0;i<mat->get_rows();i++)
@@ -205,7 +205,7 @@ static int monom_poly_crit(const void* ap1, const void* ap2){
   return pLmCmp(p1->m,p2->m);
  
 }
-static int posInMonomPolys (monom_poly*  p, int pn, monom_poly & qe,calc_dat* c)
+static int posInMonomPolys (monom_poly*  p, int pn, monom_poly & qe,slimgb_alg* c)
 {
   if(pn==0) return 0;
 
@@ -231,7 +231,7 @@ static int posInMonomPolys (monom_poly*  p, int pn, monom_poly & qe,calc_dat* c)
     else an=i;
   }
 }
-static void simplify(monom_poly& h, calc_dat* c){
+static void simplify(monom_poly& h, slimgb_alg* c){
   mp_array_list* F=c->F;
   poly_array_list* F_minus=c->F_minus;
   while(F)
@@ -290,7 +290,7 @@ static void simplify(monom_poly& h, calc_dat* c){
   assume(F_minus==NULL);
 }
 
-void go_on_F4 (calc_dat* c){
+void go_on_F4 (slimgb_alg* c){
   //set limit of 1000 for multireductions, at the moment for
   //programming reasons
   int max_par;

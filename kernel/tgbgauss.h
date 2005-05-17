@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgbgauss.h,v 1.4 2005-05-11 10:11:54 bricken Exp $ */
+/* $Id: tgbgauss.h,v 1.5 2005-05-17 15:26:27 bricken Exp $ */
 /*
 * ABSTRACT: gauss implementation for F4 header
 */
@@ -11,7 +11,7 @@
 #include "numbers.h"
 //#include "tgb_internal.h"
 
-struct calc_dat;
+struct slimgb_alg;
 
 class tgb_matrix{
  private:
@@ -86,7 +86,7 @@ class tgb_sparse_matrix{
   void add_lambda_times_row(int add_to,int summand,number factor);
   int non_zero_entries(int row);
 };
-void simple_gauss(tgb_sparse_matrix* mat, calc_dat* c);
+void simple_gauss(tgb_sparse_matrix* mat, slimgb_alg* c);
 void simple_gauss2(tgb_matrix* mat);
 
 
