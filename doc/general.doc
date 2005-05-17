@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.200 2005-05-10 15:49:50 Singular Exp $
+@comment $Id: general.doc,v 1.201 2005-05-17 06:48:28 anne Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -3363,6 +3363,9 @@ to an error message while loading the library.
 If an error occurs, loading is aborted and an error message is displayed,
 specifying the type of error and the line where it was detected.
 
+The first line of the library should start with the string 
+@code{// Singular-library}.
+
 The category-, info- and version-string are defined as follows:
 @cindex  info in a library
 @table @code
@@ -3478,6 +3481,13 @@ help and example section as explained in @ref{Procedure definition}.
 @*Such procedures should furthermore carefully check any assumptions
 made about their input (like the type of list elements), and, if
 necessary, omit an error using the  function @ref{ERROR}.
+
+@item
+Names of procedures should not be shorter than 4 characters and should 
+not contain any special characters, in particular the use of @code{_}
+in names of procedures is discourraged. If the name of the procedure is
+composed of more than one word, each new word should start with a 
+capital letter, all other letter should be lower case. 
 
 @item
 No procedures should be defined within the body of another procedure.
