@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feResource.cc,v 1.4 2005-05-09 10:04:22 Singular Exp $ */
+/* $Id: feResource.cc,v 1.5 2005-05-17 07:57:26 Singular Exp $ */
 /*
 * ABSTRACT: management of resources
 */
@@ -76,6 +76,7 @@ static feResourceConfig_s feResourceConfigs[] =
   {"SearchPath",    's', feResPath,  NULL,
    "$SINGULARPATH;"
    "%b/LIB;"
+   "%b/MOD;"
    "%r/LIB;"
    "%r/../LIB;"
    "%d/LIB;"
