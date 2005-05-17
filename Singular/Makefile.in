@@ -209,15 +209,15 @@ SLIB0 = COPYING \
 	ainvar.lib   alexpoly.lib  algebra.lib   all.lib       brnoeth.lib \
         classify.lib control.lib   deform.lib    elim.lib      equising.lib \
         finvar.lib   gmspoly.lib   gmssing.lib   general.lib   graphics.lib \
-        groebnerwalk.lib groups.lib   hnoether.lib  homolog.lib   inout.lib \
-        intprog.lib  latex.lib     linalg.lib    makedbm.lib    matrix.lib \
-	mprimdec.lib mondromy.lib  mregular.lib  mrrcount.lib   normal.lib \
+        grwalk.lib   groups.lib    hnoether.lib  homolog.lib   inout.lib \
+        intprog.lib  latex.lib     linalg.lib    makedbm.lib   matrix.lib \
+	mprimdec.lib mondromy.lib  mregular.lib  rootsmr.lib   normal.lib \
         ntsolve.lib  \
         poly.lib     presolve.lib  primdec.lib   primitiv.lib   qhmoduli.lib \
         random.lib   reesclos.lib  resol.lib     resgraph.lib   ring.lib \
         rinvar.lib   sing.lib \
         solve.lib    signcond.lib  spcurve.lib   spectrum.lib   standard.lib \
-        stratify.lib surf.lib      toric.lib     triang.lib     urrcount.lib \
+        stratify.lib surf.lib      toric.lib     triang.lib     rootsur.lib \
         zeta.lib     zeroset.lib  help.cnf 
  
 
