@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: solve.lib,v 1.32 2005-05-06 14:39:13 hannes Exp $";
+version="$Id: solve.lib,v 1.33 2005-05-18 07:07:32 Singular Exp $";
 category="Symbolic-numerical solving";
 info="
 LIBRARY: solve.lib     Complex Solving of Polynomial Systems
@@ -556,9 +556,8 @@ EXAMPLE: example solve; shows an example
 {
 // test if basering admissible
   if (char(basering)!=0){ERROR("characteristic of basering not 0");}
-  if ((charstr(basering)[1]=="0") and (npars(basering)!=0)){
-    ERROR("basering has parameters");
-  }
+  if ((charstr(basering)[1]=="0") and (npars(basering)!=0))
+  { ERROR("basering has parameters"); }
 
 // some global settings and control
   int oldr, nodisp, ii, jj;
@@ -567,7 +566,8 @@ EXAMPLE: example solve; shows an example
   int mu = 0;
   int prec = 30;
   // check additional parameters...
-  if (size(#)>0){
+  if (size(#)>0)
+  {
     int sofar=1;
     if (typeof(#[1])=="int"){
       outprec = #[1];
@@ -600,14 +600,18 @@ EXAMPLE: example solve; shows an example
       if (#[1]=="nodisplay"){ nodisp=1; }
     }
     for (ii=sofar+1;ii<=size(#);ii++) { // check for additional strings
-       if (#[ii]=="oldring"){ oldr=1; }
-       if (#[ii]=="nodisplay"){ nodisp=1; }
+       if (typeof(#[ii])=="string")
+       {
+          if (#[ii]=="oldring"){ oldr=1; }
+          if (#[ii]=="nodisplay"){ nodisp=1; }
+       }
     }
   }
   if (outprec>prec){prec = outprec;}
   // if interaktive version is chosen -- choice of basering (Top::`outR`)
   // and name for list of solutions (outL):
-  if (oldr==1) {
+  if (oldr==1)
+  {
     list Out;
     LL=names(Top);
     for (ii=1;ii<=size(LL);ii++)
