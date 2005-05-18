@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.h,v 1.2 2004-07-16 08:43:01 Singular Exp $ */
+/* $Id: syz.h,v 1.3 2005-05-18 15:59:58 Singular Exp $ */
 /*
 * ABSTRACT: Resolutions
 */
@@ -106,7 +106,7 @@ int sySize(syStrategy syzstr);
 int syDim(syStrategy syzstr);
 syStrategy syCopy(syStrategy syzstr);
 void syPrint(syStrategy syzstr);
-lists syConvRes(syStrategy syzstr,BOOLEAN toDel=FALSE);
+lists syConvRes(syStrategy syzstr,BOOLEAN toDel=FALSE,int add_row_shift=0);
 syStrategy syConvList(lists li,BOOLEAN toDel=FALSE);
 syStrategy syForceMin(lists li);
 syStrategy syMinimize(syStrategy syzstr);
