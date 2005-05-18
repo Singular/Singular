@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: poly.lib,v 1.36 2005-05-06 14:38:55 hannes Exp $";
+version="$Id: poly.lib,v 1.37 2005-05-18 18:07:51 levandov Exp $";
 category="General purpose";
 info="
 LIBRARY:  poly.lib      Procedures for Manipulating Polys, Ideals, Modules
@@ -25,8 +25,10 @@ PROCEDURES:
  id2mod(i,iv);          conversion inverse to mod2id
  substitute(I,...)      substitute in I variables by polynomials
  subrInterred(i1,i2,iv);interred w.r.t. a subset of variables
- hilbPoly( I)           Hilbert polynomial of basering/I
+ newtonDiag(f);         Newton diagram of a polynomial
+ hilbPoly(I);           Hilbert polynomial of basering/I
           (parameters in square brackets [] are optional)
+
 ";
 
 LIB "general.lib";
@@ -1081,7 +1083,43 @@ example
   subrInterred(mon,i,iv);
   subrInterred(mon,j,iv);
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// moved here from nctools.lib
+// This procedure calculates the Newton diagram of the polynomial f
+// The output is a intmat M, each row of M is the exp of a monomial in f
 ////////////////////////////////////////////////////////////////////////
+proc newtonDiag(poly f)
+"USAGE:  newtonDiag(f); f a poly
+RETURN:  intmat
+PURPOSE: compute the Newton diagram of f
+NOTE:    each row is the exponent of a monomial of f
+EXAMPLE: example newtonDiag; shows examples
+"{
+  int n = nvars(basering);
+  intvec N=0;
+  if ( f != 0 )
+  {
+    while ( f != 0 )
+    {
+      N = N, leadexp(f);
+      f = f-lead(f);
+    }
+  }
+  else
+  {
+    N=N, leadexp(f);
+  }
+  N = N[2..size(N)]; // Deletes the zero added in the definition of T
+  intmat M=intmat(N,(size(N)/n),n); // Conversion from vector to matrix
+  return (M);
+}
+example
+{
+  "EXAMPLE:";echo=2;
+  ring r = 0,(x,y,z),lp;
+  poly f = x2y+3xz-5y+3;
+  newtonDiag(f);
+}
 
-
-
+////////////////////////////////////////////////////////////////////////

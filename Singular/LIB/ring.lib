@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ring.lib,v 1.25 2005-05-06 14:39:08 hannes Exp $";
+version="$Id: ring.lib,v 1.26 2005-05-18 18:07:51 levandov Exp $";
 category="General purpose";
 info="
 LIBRARY:  ring.lib      Manipulating Rings and Maps
@@ -20,6 +20,7 @@ PROCEDURES:
  ringweights(r);          intvec of weights of ring variables of ring r
  preimageLoc(R,phi,Q)     computes preimage for non-global orderings
              (parameters in square brackets [] are optional)
+ rootofUnity(n);         the minimal polynomial for the n-th primitive root of unity
 ";
 
 LIB "inout.lib";
@@ -861,4 +862,81 @@ example
   setring S;
   ideal nu=preimageLoc("R","psi","null");
   nu;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+/* moved here from the nctools.lib */
+///////////////////////////////////////////////////////////////////////////////
+proc rootofUnity(int n)
+"USAGE:  rootofUnity(n); n an integer
+RETURN:  number
+PURPOSE: compute the minimal polynomial for the n-th primitive root of unity
+NOTE: works only in field extensions by one element
+EXAMPLE: example rootofUnity; shows examples
+"
+{
+  if ( npars(basering) !=1 )
+  {
+    "the procedure works only with one parameter";
+    return(0);
+  }
+  if (n<1) { return(0); }
+  number mp = par(1);
+  if (n==1) { return(mp-1); }
+  if (n==2) { return(mp+1); }
+  def OldRing = basering;
+  string CH = charstr(basering);
+  string MCH;
+  int j=1;
+  while ( (CH[j] !=",") && (j<=size(CH)))
+  {
+    MCH=MCH+CH[j]; j++;
+  }
+  string SR = "ring @@rR="+MCH+","+parstr(basering)+",dp;";
+  execute(SR);
+  poly @t=var(1)^n-1; // (x^2i-1)=(x^i-1)(x^i+1)
+  list l=factorize(@t);
+  ideal @l=l[1];
+  list @d;
+  int s=size(@l);
+  int d=deg(@l[s]);
+  int cnt=1;
+  poly res;
+  for (j=s-1; j>=1; j--)
+  {
+    if ( deg(@l[j]) > d) { d=deg(@l[j]); }
+  }
+  for (j=1; j<=s; j++)
+  {
+    if ( deg(@l[j]) == d) { @d[cnt]=@l[j]; cnt++; }
+  }
+  if ( size(@d)==1 )
+  {
+    res = poly(@d[1]);
+  }
+  else
+  {
+    j=1;
+    while  ( j <= size(@d) )
+    {
+      res = @d[j]-lead(@d[j]);
+      if ( leadcoef(res) >=0 ) { j++; }
+      else { break; }
+    }
+    res = @d[j];
+  }
+  setring OldRing;
+  poly I = imap(@@rR,res);
+  mp = leadcoef(I);
+  kill @@rR;
+  return(mp);
+}
+example
+{
+  "EXAMPLE:";echo=2;
+  ring r = (0,q),(x,y,z),dp;
+  rootofUnity(6);
+  rootofUnity(7);
+  minpoly = rootofUnity(8);
+  r;
 }
