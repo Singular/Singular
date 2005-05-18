@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.253 2005-05-17 07:02:49 Singular Exp $
+@comment $Id: reference.doc,v 1.254 2005-05-18 09:50:10 anne Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -6925,21 +6925,24 @@ exist in the current package. If the identifier should only be copied,
 @item @strong{Example:}
 
 @smallexample
+@c example
 proc p1
-@{
+{
   int i,j;
   exportto(Current,i);
   intmat m;
   listvar(Current);
   exportto(Top,m);
-@}
+}
 p1();
-@expansion{} // m                    [1]  intmat 1 x 1
-@expansion{} // j                    [1]  int 0
-@expansion{} // i                    [0]  int 0
+package Test1;
+exportto(Test1,p1);
 listvar(Top);
-@expansion{} // m                    [0]  intmat 1 x 1
-@expansion{} // i                    [0]  int 0
+listvar(Test1);
+Test1::p1();
+listvar(Top);
+listvar(Test1);
+@c example
 @end smallexample
 @end table
 @c ref
@@ -7040,8 +7043,15 @@ be erased in the package from which it originates, @ref{exportto} should
 be used instead.
 
 @item @strong{Example:}
-HIER MUSS NOCH GEAENDERT WERDEN!!!
-
+@smallexample
+@c example
+listvar(Top);
+load("inout.lib");
+listvar(Top);
+importfrom(Elim,pause);
+listvar(Top);
+@c example
+@end smallexample
 @end table
 
 @c ref
