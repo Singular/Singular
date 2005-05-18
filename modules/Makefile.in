@@ -2,7 +2,7 @@
 ###
 ### Makefile for Singular-modules
 ###
-### $Id: Makefile.in,v 1.11 2005-05-17 09:09:21 Singular Exp $
+### $Id: Makefile.in,v 1.12 2005-05-18 07:24:41 Singular Exp $
 ###
 #################################################################
 
@@ -58,7 +58,8 @@ LDFLAGS		= @LDFLAGS@ # @LD_DYNAMIC@
 CFLAGS		+= ${DEFS}
 
 MOD_FILES = loctriv pcv
-MOD_DIRS = kernel
+#MOD_DIRS = kernel
+MOD_DIRS =
 
 ##
 ##
@@ -133,5 +134,5 @@ install: all
 	for SUBDIR in ${MOD_DIRS} ${MOD_FILES}; \
 	do \
 		echo ${MAKE} $@ in $${SUBDIR}; \
-		( cd $${SUBDIR} && ${MAKE} $@;) \
+		( cd $${SUBDIR} && ${MAKE} MKINSTALLDIRS=../mkinstalldirs $@;) \
 	done
