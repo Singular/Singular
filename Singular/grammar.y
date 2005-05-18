@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.111 2005-05-10 17:33:45 Singular Exp $ */
+/* $Id: grammar.y,v 1.112 2005-05-18 17:57:04 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -1148,7 +1148,7 @@ exportcmd:
 #ifdef HAVE_NS
           if (basePack!=$2.req_packhdl)
           {
-            if(iiExport(&$2,0,basePackHdl)) YYERROR;
+            if(iiExport(&$2,0,currPackHdl)) YYERROR;
           }
           else
 #endif /* HAVE_NS */
