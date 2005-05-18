@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.12 2005-05-13 15:18:52 Singular Exp $ */
+/* $Id: ideals.cc,v 1.13 2005-05-18 15:42:57 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -3603,10 +3603,19 @@ ideal idMinEmbedding(ideal arg,BOOLEAN inPlace, intvec **w)
     idDeleteComp(res,next_comp);
     if ((w !=NULL)&&(*w!=NULL))
     {
-      intvec *wtmp=new intvec((*w)->length()-1);
-      int i;
-      for(i=0;i<next_comp-1;i++) (*wtmp)[i]=(**w)[i];
-      for(i=next_comp;i<(*w)->length();i++) (*wtmp)[i-1]=(**w)[i];
+      intvec *wtmp;
+      if ((*w)->length()==1)
+      {
+        wtmp=new intvec(1);
+        // (*wtmp)[0]=0;
+      }
+      else
+      {
+        wtmp=new intvec((*w)->length()-1);
+        int i;
+        for(i=0;i<next_comp-1;i++) (*wtmp)[i]=(**w)[i];
+        for(i=next_comp;i<(*w)->length();i++) (*wtmp)[i-1]=(**w)[i];
+      }
       delete *w;
       *w=wtmp;
     }
