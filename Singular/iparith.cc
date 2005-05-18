@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.364 2005-05-18 15:59:33 Singular Exp $ */
+/* $Id: iparith.cc,v 1.365 2005-05-18 16:24:42 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -3997,8 +3997,11 @@ static BOOLEAN jjLOAD(leftv res, leftv v, BOOLEAN autoexport)
         }
         package savepack=currPack;
         currPack=IDPACKAGE(pl);
-        BOOLEAN bo=iiLibCmd(s);
+        char libnamebuf[256];
+        FILE * fp = feFopen( s, "r", libnamebuf, TRUE );
+        BOOLEAN bo=iiLoadLIB(fp, libnamebuf, s, pl, FALSE, TRUE);
         currPack=savepack;
+        IDPACKAGE(pl)->loaded=(!bo);
         return bo;
       }
       case LT_ELF:

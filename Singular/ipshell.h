@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.h,v 1.40 2005-05-18 15:59:36 Singular Exp $ */
+/* $Id: ipshell.h,v 1.41 2005-05-18 16:24:44 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -79,6 +79,9 @@ void    iiDebug();
 BOOLEAN iiCheckRing(int i);
 poly    iiHighCorner(ideal i, int ak);
 char *  iiConvName(const char *libname);
+BOOLEAN iiLoadLIB(FILE *fp, char *libnamebuf, char *newlib,
+                         idhdl pl, BOOLEAN autoexport, BOOLEAN tellerror);
+
 
 /* ================================================================== */
 /* Expressions : */

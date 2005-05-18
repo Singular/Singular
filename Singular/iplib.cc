@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.112 2005-05-18 15:59:35 Singular Exp $ */
+/* $Id: iplib.cc,v 1.113 2005-05-18 16:24:43 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -663,9 +663,6 @@ BOOLEAN iiEStart(char* example, procinfo *pi)
 }
 
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
-static BOOLEAN iiLoadLIB(FILE *fp, char *libnamebuf, char *newlib,
-                         idhdl pl, BOOLEAN autoexport, BOOLEAN tellerror);
-
 BOOLEAN iiTryLoadLib(leftv v, char *id)
 {
   BOOLEAN LoadResult = TRUE;
@@ -908,7 +905,7 @@ static void iiCleanProcs(idhdl &root)
   }
 }
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
-static BOOLEAN iiLoadLIB(FILE *fp, char *libnamebuf, char*newlib,
+BOOLEAN iiLoadLIB(FILE *fp, char *libnamebuf, char*newlib,
              idhdl pl, BOOLEAN autoexport, BOOLEAN tellerror)
 {
   char buf[256];
