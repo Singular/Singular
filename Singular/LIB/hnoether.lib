@@ -1,4 +1,4 @@
-version="$Id: hnoether.lib,v 1.48 2005-05-06 14:38:35 hannes Exp $";
+version="$Id: hnoether.lib,v 1.49 2005-05-18 17:55:57 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  hnoether.lib   Hamburger-Noether (Puiseux) Expansion
@@ -2532,8 +2532,7 @@ EXAMPLE: example extdevelop;  shows an example
  else { v[zeile]=Q; }               // HNE war exakt
  if (ringwechsel)
  {
-   if(system("with","Namespaces")) { kill Top::extdguenstig; }
-   else { kill extdguenstig; }
+   kill extdguenstig; 
  }
 
  return(list(mneu,v,switch,f));
