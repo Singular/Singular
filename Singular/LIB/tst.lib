@@ -1,8 +1,8 @@
-// $Id: tst.lib,v 1.32 2001-01-16 13:48:47 Singular Exp $
+// $Id: tst.lib,v 1.33 2005-05-18 17:54:58 Singular Exp $
 //(obachman, last modified 6/30/98)
 /////////////////////////////////////////////////////////////////////////////
 
-version="$Id: tst.lib,v 1.32 2001-01-16 13:48:47 Singular Exp $";
+version="$Id: tst.lib,v 1.33 2005-05-18 17:54:58 Singular Exp $";
 category="Utilities";
 info="
 LIBRARY:  tst.lib      Procedures for running automatic tst Tests
@@ -807,7 +807,7 @@ proc tst_rgen_init()
   if (! defined(tst_rgen_comp_orderings))
   {
     list tst_rgen_comp_orderings;
-    export(tst_rgen_comp_orderings);
+    exportto(Top,tst_rgen_comp_orderings);
     tst_rgen_comp_orderings = list("", "C", "c", "CC", "cc");
   }
   if (! defined(tst_rgen_products))
@@ -833,7 +833,12 @@ proc tst_rgen_init()
   {
     int tst_rgen_char_index, tst_rgen_var_index, tst_rgen_comp_index, tst_rgen_ordering_index, tst_rgen_exp_bounds_index;
     list tst_rgen_orderings;
-    export (tst_rgen_char_index, tst_rgen_var_index, tst_rgen_comp_index, tst_rgen_ordering_index, tst_rgen_orderings, tst_rgen_exp_bounds_index);
+    exportto(Top, tst_rgen_char_index);
+    exportto(Top, tst_rgen_var_index);
+    exportto(Top, tst_rgen_comp_index);
+    exportto(Top, tst_rgen_ordering_index);
+    exportto(Top, tst_rgen_orderings);
+    exportto(Top, tst_rgen_exp_bounds_index);
   }
   tst_rgen_char_index = 1;
   tst_rgen_var_index = 1;
@@ -915,7 +920,7 @@ proc tst_next_ring()
     if (! defined(tst_rgen_Lring))
     {
       string tst_rgen_Lring;
-      export tst_rgen_Lring;
+      exportto(Top,tst_rgen_Lring);
     }
     tst_rgen_Lring = rs + ",L(" + string(tst_rgen_exp_bounds[tst_rgen_exp_bounds_index]) + "))";
     if (system("version") >= 1309)

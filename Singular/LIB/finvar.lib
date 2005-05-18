@@ -1,6 +1,6 @@
 // last change: 98/11/05
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: finvar.lib,v 1.35 2005-05-10 15:47:08 Singular Exp $"
+version="$Id: finvar.lib,v 1.36 2005-05-18 17:54:55 Singular Exp $"
 category="Invariant theory";
 info="
 LIBRARY:  finvar.lib    Invariant Rings of Finite Groups
@@ -740,7 +740,7 @@ EXAMPLE: example molien; shows an example
     { ring `newring`=0,x,dp;          // element, it is very easy to calculate
       matrix M[1][2]=1,(1-x)^n;       // the Molien series
     }
-    export `newring`;                 // we keep the ring where we computed the
+    exportto(Top,`newring`);          // we keep the ring where we computed the
     export M;                         // Molien series in such that we can
     setring br;                       // keep it
     if (v)

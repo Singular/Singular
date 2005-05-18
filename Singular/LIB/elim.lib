@@ -1,7 +1,7 @@
-// $Id: elim.lib,v 1.17 2005-04-28 09:22:15 Singular Exp $
+// $Id: elim.lib,v 1.18 2005-05-18 17:55:15 Singular Exp $
 // (GMG, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: elim.lib,v 1.17 2005-04-28 09:22:15 Singular Exp $";
+version="$Id: elim.lib,v 1.18 2005-05-18 17:55:15 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  elim.lib      Elimination, Saturation and Blowing up
@@ -70,7 +70,7 @@ EXAMPLE: example blowup0; shows examples
    v=v[2..size(v)];
    execute("ring Bl_"+#[1]+bsr+"=("+cr+"),("+nv+vr+nor+o+");");
    ideal `#[1]+"_"`=imap(Bl,j);
-   export basering;
+   exportto(Top,basering);
    export `#[1]+"_"`;
    setring br;
 //------------------- some comments about usage and names  --------------------
