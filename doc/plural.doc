@@ -278,7 +278,7 @@ LIB "ncall.lib";
 @cindex nctools_lib
 @cindex nctools.lib
 
-@c lib nctools.lib no_ex
+@c lib nctools.lib
 
 @c ---------------------------------------------------------
 @node qmatrix_lib,  , nctools_lib, PLURAL libraries
