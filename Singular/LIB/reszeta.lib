@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: reszeta.lib,v 1.2 2005-05-03 14:22:08 Singular Exp $";
+version="$Id: reszeta.lib,v 1.3 2005-05-18 07:07:55 anne Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  zeta.lib       Zeta-function of Denef and Loeser
@@ -12,7 +12,8 @@ intersectionDiv(L)   computes intersection form and genera of exceptional
                      divisors (isolated singularities of surfaces)
 spectralNeg(L)       computes negative spectral numbers
                      (isolated hypersurface singularity)
-zetaDL               computes Denef-Loeser zeta function
+discrepancy(L)       computes discrepancy of given resolution
+zetaDL(L,d)          computes Denef-Loeser zeta function
                      (hypersurface singularity of dimension 2)
 
 AUXILLIARY PROCEDURES:
@@ -25,9 +26,6 @@ abstractR(L)         pass from embedded to non-embedded resolution
 LIB "resol.lib";
 LIB "solve.lib";
 LIB "normal.lib";
-///////////////////////////////////////////////////////////////////////////////
-//      the repunit: ring R=0,x,dp;number n=10;(n^1031-1)/9;  is prim        //
-//      record:      number m=2;number k=m^20996011-1;                       //
 ///////////////////////////////////////////////////////////////////////////////
 static
 proc spectral1(poly h,list re, list DL,intvec v, intvec n)
@@ -1166,8 +1164,8 @@ proc computeChiE_local(list re, list iden)
         if(defined(templist))
         {
           chi_E[thisE]=templist;
+          kill templist;
         }
-        kill templist;
       }
       for(j=1;j<=size(BO[4]);j++)
       {
@@ -1251,7 +1249,7 @@ proc computeChiE_local(list re, list iden)
          if(dim(CinE)==1)
          {
 //--- if the two divisors meet, they meet in a curve
-            chi_E[otherE][1]=chi_temp[otherE]+(2-2*genus(CinE));
+            chi_E[otherE][1]=chi_temp[otherE][1]+(2-2*genus(CinE));
             chi_E[otherE][2][thisE]=1;         // this blow-up of E_k is done
          }
          kill CinE;
@@ -1337,11 +1335,11 @@ proc computeChiE_local(list re, list iden)
            }
            if(deg(std(pr[k])[1])>0)
            {
-              chi_E[i]=chi_E[i]+(2-2*genus(pr[k]));
+              chi_E[i][1]=chi_E[i][1]+(2-2*genus(pr[k]));
            }
          }
          myPts=sat(myPts,donePts)[1];
-         chi_E[i]=chi_E[i]-vdim(myPts);
+         chi_E[i][1]=chi_E[i][1]-vdim(myPts);
       }
    }
    setring R;
@@ -1653,6 +1651,13 @@ proc chi_ast_local(list re,list iden,list #)
       idenE=delete(idenE,size(idenE));
    }
    list cl=computeChiE_local(re,idenE);
+   for(i=1;i<=size(cl);i++)
+   {
+      if(size(cl[i])==0)
+      {
+         cl[i][1]=0;
+      }
+   }
    for(i=1;i<=size(idenE);i++)
    {
       chi_i[i]=list(intvec(i),cl[i][1]);
@@ -1693,17 +1698,69 @@ proc chi_ast_local(list re,list iden,list #)
 }
 //////////////////////////////////////////////////////////////////////////////
 
-proc zetaDL(list re,int d,list #)
-"USAGE:   zetaDL(L,d[,s][,a]);
-@*        L = list of rings
-@*        d = integer
-@*        s = string
-@*        a = integer
+proc discrepancy(list re)
+"USAGE:   discrepancy(L);
+@*        L    = list of rings
 ASSUME:   L is the output of resolution of singularities
-COMPUTE:  local Denef-Loeser zeta function, if string s is present and
-          has the value 'lokal'; global Denef-Loeser zeta function otherwise
-RETURN:   string specifying the Denef-Loeser zeta function if a not present
-          list l if a is present, where
+RETRUN:   discrepancies of the given resolution"
+{
+//----------------------------------------------------------------------------
+// Initialization
+//----------------------------------------------------------------------------
+   def R=basering;
+   int i,j;
+   list iden=prepEmbDiv(re);       //--- identify the E_i
+   intvec Vvec=computeV(re,iden);  //--- nu
+   intvec Nvec=computeN(re,iden);  //--- N
+   intvec Avec;
+//--- only look at exceptional divisors, not at strict transform
+   for(i=1;i<=size(iden);i++)
+   {
+      if(defined(S)) {kill S;}
+      def S=re[2][iden[i][1][1]];
+      setring S;
+      if(iden[i][1][2]>size(BO[4]))
+      {
+         i--;
+         break;
+      }
+   }
+   j=i;
+//--- discrepancies are a_i=nu_i-N_i
+   for(i=1;i<=j;i++)
+   {
+     Avec[i]=Vvec[i]-Nvec[i]-1;
+   }
+   return(Avec);
+}
+example
+{"EXAMPLE:";
+   echo = 2;
+   ring R=0,(x,y,z),dp;
+   ideal I=x2+y2+z3;
+   list re=resolve(I);
+   discrepancy(re);
+}
+//////////////////////////////////////////////////////////////////////////////
+
+proc zetaDL(list re,int d,list #)
+"USAGE:   zetaDL(L,d[,s1][,s2][,a]);
+@*        L     = list of rings
+@*        d     = integer
+@*        s1,s2 = string
+@*        a     = integer
+ASSUME:   L is the output of resolution of singularities
+COMPUTE:  local Denef-Loeser zeta function, if string s1 is present and
+             has the value 'local'; global Denef-Loeser zeta function 
+             otherwise
+          if string s1 or s2 has the value "A", additionally the 
+             characteristic polynomial of the monodromy is computed
+RETURN:   list l
+          if a is not present:
+          l[1]: string specifying the Denef-Loeser zeta function 
+          l[2]: string specifying characteristic polynomial of monodromy,
+                if "A" was specified
+          if a is present
           l[1]: string specifying the Denef-Loeser zeta function
           l[2]: list ast,
                      ast[1]=chi(Ei^*)
@@ -1713,6 +1770,8 @@ RETURN:   string specifying the Denef-Loeser zeta function if a not present
                 function
           l[4]: intvec N of multiplicities as needed in compuation of zeta
                 function
+          l[5]: string specifying characteristic polynomial of monodromy,
+                if "A" was specified
 EXAMPLE:  example zetaDL;   shows an example
 "
 {
@@ -1723,7 +1782,7 @@ EXAMPLE:  example zetaDL;   shows an example
    int show_all,i;
    if(size(#)>0)
    {
-     if((typeof(#[1])=="int")||(size(#)>1))
+     if((typeof(#[1])=="int")||(size(#)>2))
      {
        show_all=1;
      }
@@ -1735,9 +1794,20 @@ EXAMPLE:  example zetaDL;   shows an example
           "Local Case: Assuming that no (!) charts were dropped";
           "during calculation of the resolution (option \"A\")";
           int localComp=1;
+          if(size(#)>1)
+          {
+             if(#[2]=="A")
+             {
+                int aCampoFormula=1;
+             }
+          }
        }
        else
        {
+          if(#[1]=="A")
+          {
+             int aCampoFormula=1;
+          }
           "Computing global zeta function";
        }
      }
@@ -1815,11 +1885,23 @@ EXAMPLE:  example zetaDL;   shows an example
 
    if(show_all)
    {
-      list result=zetaStr,ast_list,Vvec,Nvec;
+      list result=zetaStr,ast_list[1],ast_list[2],ast_list[3],Vvec,Nvec;
    }
    else
    {
       list result=zetaStr;
+   }
+//--- compute characteristic polynomial of the monodromy
+//--- by the A'Campo formula
+   if(defined(aCampoFormula))
+   {
+      poly charP=1;
+      for(i=1;i<=size(ast_list[1]);i++)
+      {
+         charP=charP*((s^Nvec[i]-1)^ast_list[1][i][2]);
+      }
+      string charPStr=string(charP/(s-1));
+      result[size(result)+1]=charPStr;
    }
    setring R;
    return(result);
