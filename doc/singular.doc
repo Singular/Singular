@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.133 2005-05-18 09:51:30 anne Exp $
+@comment $Id: singular.doc,v 1.134 2005-05-18 20:49:39 levandov Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -564,11 +564,59 @@ LIB "all.lib";
 @cindex Control theory
 
 @menu
+* Control theory background:: An overview of the theory
 * control_lib:: Algebraic analysis tools for System and Control Theory
 @end menu
 
 @c ---------------------------------------------------------
-@node control_lib, , , System and Control theory
+@node Control theory background, control_lib, ,System and Control theory
+@subsection Control theory background
+
+Control systems are usually described by differential (or
+difference) equations, but their properties of interest are 
+most naturally expressed in terms of the system trajectories 
+(the set of all solutions to the equations). This is formalized 
+by the notion of the system @emph{behavior}. On the other hand, 
+the manipulation of linear system equations can be formalized 
+using algebra, more precisely module theory. The relationship 
+between modules and behaviors is very rich and leads to deep 
+results on system structure. 
+
+
+The key to the module-behavior correspondence
+is a property of some signal spaces that are modules 
+over the ring of differential (or difference) operators, 
+namely, @emph{the injective cogenerator property}.
+This property makes it possible to translate any statement on the
+solution spaces that can be expressed in terms of images and kernels, 
+to an equivalent statement on the modules. Thus analytic properties 
+can be identified with algebraic properties, and conversely, the 
+results of manipulating the modules using computer algebra can 
+be re-translated and interpreted using the language of systems theory. 
+This duality (@emph{algebraic analysis}) is widely used in behavioral 
+systems and control theory today.
+
+
+For instance, a system is @strong{controllable} (a fundamental property
+for any control system) if and only if the associated module
+is torsion-free. This concept can be refined by the so-called
+controllability degrees. The strongest form of controllability
+(@emph{flatness}) corresponds to a projective (or even free) module.
+
+Controllability means that one can switch from one system trajectory
+to another without violating the system law (concatenation of
+trajectories). For one-dimensional systems (ODE) that evolve in time,
+this is usually interpreted as switching from a given past trajectory
+to a desired future trajectory. Thus the system can be forced to
+behave in an arbitrarily prescribed way. 
+
+
+The extreme case opposed to controllability is @strong{autonomy}: autonomous systems evolve independently according to their law, without being influenceable 
+from the outside. Again, the property can be refined in terms
+of autonomy degrees.
+
+@c ---------------------------------------------------------
+@node control_lib, , Control theory background, System and Control theory
 @subsection control_lib
 @c lib control.lib
 
