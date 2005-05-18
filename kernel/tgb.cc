@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.25 2005-05-17 15:26:27 bricken Exp $ */
+/* $Id: tgb.cc,v 1.26 2005-05-18 10:10:31 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -951,6 +951,7 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slim
   
   c->S->m[i]=h;
   c->short_Exps[i]=p_GetShortExpVector(h,c->r);
+ 
 #undef ENLARGE
   for (j=0;j<i;j++){
     
@@ -963,8 +964,11 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slim
     {
       assume(!(p_LmDivisibleBy(c->S->m[j],c->S->m[i],c->r)));
     }
-    //lies I[i] under I[j] ?
     
+    if (_p_GetComp(c->S->m[i],c->r)!=_p_GetComp(c->S->m[j],c->r)){
+      c->states[i][j]=UNIMPORTANT;
+      continue;
+    } else
     if ((c->lengths[i]==1) && (c->lengths[j]==1))
       c->states[i][j]=HASTREP;
     else if (pHasNotCF(c->S->m[i],c->S->m[j]))
@@ -984,18 +988,20 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slim
 //      poly short_s=ksCreateShortSpoly(c->S->m[i],c->S->m[j],c->r);
       //    if (short_s)
       //    {
-    sorted_pair_node* s=c->tmp_spn[j];//(sorted_pair_node*) omalloc(sizeof(sorted_pair_node));
+    assume(spc<=j);
+    sorted_pair_node* s=c->tmp_spn[spc];//(sorted_pair_node*) omalloc(sizeof(sorted_pair_node));
     s->i=si_max(i,j);
     s->j=si_min(i,j);
     assume(s->j==j);
     s->expected_length=c->lengths[i]+c->lengths[j]-2;
       
-    poly lm=c->tmp_pair_lm[j];//=pOne_Special();
+    poly lm=c->tmp_pair_lm[spc];//=pOne_Special();
       
     pLcm(c->S->m[i], c->S->m[j], lm);
     pSetm(lm);
     s->deg=pTotaldegree(lm);
-    if(c->T_deg_full)
+
+    if(c->T_deg_full)//Sugar
     {
       int t_i=c->T_deg_full[s->i]-c->T_deg[s->i];
       int t_j=c->T_deg_full[s->j]-c->T_deg[s->j];
@@ -1007,6 +1013,7 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slim
     //assume(lm!=NULL);
     nodes[spc]=s;
     spc++;
+  
 	// }
 	//else
 	//{
@@ -1063,8 +1070,11 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slim
     else
     {
       nodes[lower]->lcm_of_lm=pCopy(nodes[lower]->lcm_of_lm);
-      nodes_final[spc_final++]=nodes[lower];
-      c->tmp_spn[nodes[lower]->j]=(sorted_pair_node*) omalloc(sizeof(sorted_pair_node));
+      assume(_p_GetComp(c->S->m[nodes[lower]->i],c->r)==_p_GetComp(c->S->m[nodes[lower]->j],c->r));
+      nodes_final[spc_final]=(sorted_pair_node*) omalloc(sizeof(sorted_pair_node));
+      
+      *(nodes_final[spc_final++])=*(nodes[lower]);
+      //c->tmp_spn[nodes[lower]->j]=(sorted_pair_node*) omalloc(sizeof(sorted_pair_node));
       nodes[lower]=NULL;
       for(lower=lower+1;lower<=upper;lower++)
       {
