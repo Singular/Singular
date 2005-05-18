@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpc.cc,v 1.2 2005-01-18 08:53:45 Singular Exp $ */
+/* $Id: gnumpc.cc,v 1.3 2005-05-18 15:39:19 Singular Exp $ */
 /*
 * ABSTRACT: computations with GMP complex floating-point numbers
 *
@@ -289,7 +289,7 @@ void ngcPower ( number x, int exp, number * u )
     *u=(number)n;
     return;
   }
-  if ( exp == 1 )
+  else if ( exp == 1 )
   {
     nNew(u);
     if ( x == NULL )
@@ -305,11 +305,39 @@ void ngcPower ( number x, int exp, number * u )
     }
     return;
   }
-  ngcPower(x,exp-1,u);
-  gmp_complex *n=new gmp_complex();
-  *n=*(gmp_complex*)x;
-  *(gmp_complex*)(*u) *= *(gmp_complex*)n;
-  delete n;
+  else if (exp == 2)
+  {
+    nNew(u);
+    if ( x == NULL )
+    {
+      gmp_complex* n = new gmp_complex();
+      *u=(number)n;
+    }
+    else
+    {
+      gmp_complex* n = new gmp_complex();
+      *n= *(gmp_complex*)x;
+      *u=(number)n;
+      *(gmp_complex*)(*u) *= *(gmp_complex*)n;
+    }
+    return;
+  }
+  if (exp&1==1)
+  {
+    ngcPower(x,exp-1,u);
+    gmp_complex *n=new gmp_complex();
+    *n=*(gmp_complex*)x;
+    *(gmp_complex*)(*u) *= *(gmp_complex*)n;
+    delete n;
+  }
+  else
+  {
+    number w;
+    nNew(&w);
+    ngcPower(x,exp/2,&w);
+    ngcPower(w,2,u);
+    nDelete(&w);
+  }
 }
 
 BOOLEAN ngcIsZero (number a)
