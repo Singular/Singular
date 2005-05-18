@@ -1,0 +1,516 @@
+///////////////////////////////////////////////////////////////////////////////
+category="Commutative Algebra";
+info="
+LIBRARY:  sheafcoh.lib   Procedures for Computing Sheaf Cohomology
+AUTHORS:  Wolfram Decker, decker@math.uni-sb.de,
+@*        Christoph Lossen,  lossen@mathematik.uni-kl.de
+@*        Gerhrd Pfister,  pfister@mathematik.uni-kl.de
+
+PROCEDURES:
+ truncate(phi,d);        truncation of coker(phi) at d
+ CM_regularity(M);       Castelnuovo-Mumford regularity of coker(M)
+ sheafCohBGG(M,l,h);     cohomology of sheaf associated to coker(M)
+ sheafCohE(M,l,h);       cohomology of sheaf associated to coker(M)
+
+AUXILIARY PROCEDURES:
+ displayCohom(B,l,h,n);  display intmat as Betti diagram (with zero rows)
+
+KEYWORDS: sheaf cohomology
+";
+
+///////////////////////////////////////////////////////////////////////////////
+LIB "matrix.lib";
+LIB "nctools.lib";
+LIB "homolog.lib";
+
+///////////////////////////////////////////////////////////////////////////////
+static proc jacobM(matrix M)
+{
+   int n=nvars(basering);
+   int a=nrows(M);
+   int b=ncols(M);
+   matrix B=transpose(diff(M,var(1)));
+   int i,j;
+   for(i=2;i<=n;i++)
+   {
+     B=concat(B,transpose(diff(M,var(i))));
+   }
+   return(transpose(B));
+}
+///////////////////////////////////////////////////////////////////////////////
+static proc max(int i,int j)
+{
+  if(i>j){return(i);}
+  return(j);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+proc truncate(module phi, int d)
+"USAGE:   truncate(M,d);  M module, d int 
+ASSUME:  M comes assigned with an admissible degree vector as an attribute
+RETURN:  module
+NOTE:    Output is a presentation matrix for the truncation of coker(M) 
+         at d.
+EXAMPLE: example truncate; shows an example
+KEYWORDS: truncated module
+"
+{
+  if ( typeof(attrib(phi,"isHomog"))=="string" ) {  
+    ERROR("No admissible degree vector assigned");
+  }
+  else {
+   intvec v=attrib(phi,"isHomog");
+  }
+  int s = nrows(phi);
+  int i,m,dummy;
+  module L;
+  for (i=1; i<=s; i++) {
+    if (d>v[i]) { 
+      L = L+maxideal(d-v[i])*gen(i); 
+    }
+    else { 
+      L = L+gen(i); 
+    }
+  }
+  L = modulo(L,phi);
+  L = minbase(prune(L));
+  if (size(L)==0) {return(L);}
+
+  // it only remains to set the degrees for L:
+  // ------------------------------------------
+  m = v[1];
+  for(i=2; i<=size(v); i++) {  if(v[i]<m) { m = v[i]; } }
+  dummy = homog(L);
+  intvec vv = attrib(L,"isHomog");
+  if (d>m) { vv = vv+d; }
+  else     { vv = vv+m; }
+  attrib(L,"isHomog",vv);
+  return(L);
+}
+example
+{"EXAMPLE:";
+   echo = 2;
+   ring R=0,(x,y,z),dp;
+   module M=maxideal(3);
+   homog(M);
+   // compute presentation matrix for truncated module (R/<x,y,z>^3)_(>=2)
+   module M2=truncate(M,2);
+   print(M2);
+   dimGradedPart(M2,1);
+   dimGradedPart(M2,2);
+   // this should coincide with:
+   dimGradedPart(M,2);
+   // shift grading by 1:
+   intvec v=1;
+   attrib(M,"isHomog",v);
+   M2=truncate(M,2);
+   print(M2);
+   dimGradedPart(M2,3);
+
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc dimGradedPart(module phi, int d)
+"USAGE:   dimGradedPart(M,d);  M module, d int 
+ASSUME:  M comes assigned with an admissible degree vector as an attribute
+RETURN:  int
+NOTE:    Output is the vector space dimension of the graded part of degree d
+         of coker(M).
+EXAMPLE: example dimGradedPart; shows an example
+KEYWORDS: graded module, graded piece
+"
+{
+  if ( typeof(attrib(phi,"isHomog"))=="string" ) {  
+    ERROR("No admissible degree vector assigned");
+  }
+  else {
+    intvec v=attrib(phi,"isHomog");
+  }
+  int s = nrows(phi);
+  int i,m,dummy;
+  module L,LL;
+  for (i=1; i<=s; i++) {
+    if (d>v[i]) { 
+      L = L+maxideal(d-v[i])*gen(i); 
+      LL = LL+maxideal(d+1-v[i])*gen(i); 
+    }
+    else { 
+      L = L+gen(i); 
+      if (d==v[i]) { 
+        LL = LL+maxideal(1)*gen(i); 
+      }
+      else { 
+        LL = LL+gen(i);
+      }
+    }
+  }
+  LL=LL,phi;
+  L = modulo(L,LL);
+  L = std(prune(L));
+  if (size(L)==0) {return(0);}
+  return(vdim(L));
+}
+example
+{"EXAMPLE:";
+   echo = 2;
+   ring R=0,(x,y,z),dp;
+   module M=maxideal(3);
+   // assign compatible weight vector (here: 0)
+   homog(M);
+   // compute dimension of graded pieces of R/<x,y,z>^3 :
+   dimGradedPart(M,0);
+   dimGradedPart(M,1);
+   dimGradedPart(M,2);
+   dimGradedPart(M,3);
+   // shift grading:
+   attrib(M,"isHomog",intvec(2));
+   dimGradedPart(M,2);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc CM_regularity (module M)
+"USAGE:   CM_regularity(M);    M module 
+ASSUME:  @code{M} comes assigned with an admissible degree vector as an 
+         attribute.
+RETURN:  integer, the Castelnuovo-Mumford regularity of coker(M)
+NOTE:    procedure calls mres
+EXAMPLE: example CM_regularity; shows an example
+KEYWORDS: Castelnuovo-Mumford regularity
+"
+{
+  if ( typeof(attrib(phi,"isHomog"))=="string" ) {  
+    ERROR("No admissible degree vector assigned");
+  }  
+  def L = mres(M,0);
+  intmat BeL = betti(L);
+  int r = nrows(module(matrix(BeL)));  // last non-zero row
+  if (typeof(attrib(BeL,"rowShift"))!="string") {
+    int shift = attrib(BeL,"rowShift");
+  }
+  return(r+shift-1);
+}
+example
+{"EXAMPLE:";
+   echo = 2;
+   ring R=0,(x,y,z,u),dp;
+   resolution T1=mres(maxideal(1),0);
+   module M=T1[3];
+   intvec v=2,2,2,2,2,2;
+   attrib(M,"isHomog",v);
+   CM_regularity(M);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc sheafCohBGG(module M,int l,int h)
+"USAGE:   sheafCohBGG(M,l,h);    M module, l,h int 
+ASSUME:  @code{M} comes assigned with an admissible degree vector as an 
+         attribute, @code{h>=l}, and the basering has @code{n+1} variables.
+RETURN:  intmat, cohomology of the associated sheaf F of coker(M) on P^n.
+DISPLAY: The intmat is displayed in a Betti-like diagram: @*
+  @format
+                0             1                     h-l
+  ----------------------------------------------------------
+     -h:     h^0(F(h))    h^0(F(h-1))   ......    h^0(F(l)) 
+   -h+1:   h^1(F(h-1))    h^1(F(h-2))   ......  h^1(F(l-1))
+           .........................................
+   -h+n:   h^n(F(h-n))  h^n(F(h-n-1))   ......  h^n(F(l-n))
+  ----------------------------------------------------------
+  total:         .................................
+  @end format
+         A @code{'-'} in the diagram refers to a zero entry, a @code{'*'} 
+         refers to a negative entry (= dimension not yet determined).  
+NOTE:    procedure is based on the Bernstein-Gel'fand-Gel'fand correspondence
+         and on Tate resolution ( see [Eisenbud, Floystad, Schreyer: Sheaf
+         cohomology and free resolutions over exterior algebras, Trans AMS
+         355 (2003)] ).
+EXAMPLE: example sheafCohBGG; shows an example
+"
+{
+  int i,j,k,row,row1,col;
+  if( typeof(attrib(M,"isHomog"))!="intvec" )
+  {
+     ERROR("The module has no weights");
+  }
+  def R=basering;
+  int reg = CM_regularity(M);
+  int bound=max(reg+1,h-1);
+  module MT=truncate(M,bound);
+  int m=nrows(MT);
+  MT=transpose(jacobM(MT));
+  MT=syz(MT);
+  int n=nvars(basering);
+  matrix ML[n][1]=maxideal(1);
+  matrix S=transpose(outer(ML,unitmat(m)));
+  matrix SS=transpose(S*MT);
+  //--- to the exterior algebra
+  def AR = Exterior();
+  setring AR;
+  option(redSB);
+  option(redTail);
+  module EM=imap(R,SS);
+  intvec w;
+  //--- here we are with our matrix
+  int bound1=max(1,bound-l+1);
+  for (i=1; i<=nrows(EM); i++)
+  {
+     w[i]=-bound-1;
+  }
+  attrib(EM,"isHomog",w);
+  resolution RE=mres(EM,bound1);
+  intmat Betti=betti(RE);
+  k=ncols(Betti);
+  int d=k-h+l-1;
+  if (d>0)
+  {
+   // select relevant k-d columns from Betti diagram:
+   row=nrows(Betti);
+   intmat newBetti[row][k-d]=Betti[1..row,d+1..k]; 
+   int shift=attrib(Betti,"rowShift"); 
+   attrib(newBetti,"rowShift",shift+d); 
+   Betti=newBetti;
+  }
+
+  row1=attrib(Betti,"rowShift");
+  row=nrows(Betti);
+  col=ncols(Betti);
+  if ((row<n) or (row1>-h) ) {
+   // insert top and bottom zero lines (diagram is n x (h-l+1))
+   intmat newBetti1[n][col];
+   for (i=1; i<=row; i++) {
+     for (j=1; j<=col; j++) {
+        newBetti1[i+row1+h,j]=Betti[i,j];
+     }
+   }
+   attrib(newBetti1,"rowShift",-h); 
+   Betti=newBetti1;
+  }
+  displayCohom(Betti,l,h,n-1);
+  setring R;
+  return(Betti);
+  option(noredSB);
+  option(noredTail);
+}
+example
+{"EXAMPLE:";
+   echo = 2;
+   ring R=0,(x,y,z,u),dp;
+   resolution T1=mres(maxideal(1),0);
+   module M=T1[3];
+   intvec v=2,2,2,2,2,2;
+   attrib(M,"isHomog",v);
+   def B=sheafCohBGG(M,-6,2);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc sheafCohE(module M,int l,int h)
+"USAGE:   sheafCohE(M,l,h);    M module, l,h int 
+ASSUME:  @code{M} comes assigned with an admissible degree vector as an 
+         attribute, @code{h>=l}, and the basering @code{S} has @code{n+1} 
+         variables. 
+RETURN:  intmat, cohomology of the associated sheaf F of coker(M) on P^n.
+DISPLAY: The intmat is displayed in a Betti-like diagram: @*
+  @format
+                0             1                     h-l
+  ----------------------------------------------------------
+     -h:     h^0(F(h))    h^0(F(h-1))   ......    h^0(F(l)) 
+   -h+1:   h^1(F(h-1))    h^1(F(h-2))   ......  h^1(F(l-1))
+           .........................................
+   -h+n:   h^n(F(h-n))  h^n(F(h-n-1))   ......  h^n(F(l-n))
+  ----------------------------------------------------------
+  total:         .................................
+  @end format
+         A @code{'-'} in the diagram refers to a zero entry, a @code{'*'} 
+         refers to a negative entry (= dimension not yet determined).  
+NOTE:    procedure is based on the local duality as described in [Eisenbud:
+         Computing cohomology. In Vasconcelos: Computational methods in
+         commutative algebra and algebraic geometry. Springer (1998)]:
+   @format
+           h^i(F(j)) = dim_K Ext_S^(n-i) (M,S)_(-j-n-1).
+   @end format
+EXAMPLE: example sheafCohE; shows an example
+"
+{
+  int i,j;
+  module N;
+  int n=nvars(basering)-1;
+  intvec v=0..n-1;
+  int col=h-l+1;
+  intmat newBetti[n+1][col];
+  list L=Ext_R(v,M,1)[2];     // list of GB for Ext_R
+  for (i=1; i<=col; i++) {
+    newBetti[1,i]=-1;
+  }
+  for (j=1; j<=n; j++) {
+     N=L[n+1-j];
+     attrib(N,"isSB",1);
+     if (dim(N)>=0) {
+       for (i=1; i<=col; i++) {
+         newBetti[j+1,i]=dimGradedPart(N,-h-n-2+j+i);
+       }
+     }
+  }
+  displayCohom(newBetti,l,h,n);
+  return(newBetti);
+}
+example
+{"EXAMPLE:";
+   echo = 2;
+   ring R=0,(x,y,z,u),dp;
+   resolution T1=mres(maxideal(1),0);
+   module M=T1[3];
+   intvec v=2,2,2,2,2,2;
+   attrib(M,"isHomog",v);
+   def B=sheafCohE(M,-6,2);
+}
+
+/*
+   To compute dim_K Ext_S^(n-j) ( M, S(-n-1) )_i
+                 = dim_K Ext_S^(n-j) ( M, S )_i-n-1
+   we just need the following input lines:
+       
+       module N = Ext_R(n-j,phi);
+       homog(N);   // Hier muss man momentan noch von Hand eingreifen...
+                   // (siehe unten) 
+       dimGradedPart( N, i-n-1); 
+*/
+
+///////////////////////////////////////////////////////////////////////////////
+proc displayCohom (intmat data, int l, int h, int n) 
+"USAGE:   displayCohom(data,l,h,n);  data intmat, l,h,n int 
+ASSUME:  @code{h>=l}, @code{data} is the return value of 
+         @code{sheafCohE(M,l,h)} or of @code{sheafCohBGG(M,l,h)}, and the 
+         basering has @code{n+1} variables. 
+RETURN:  none
+NOTE:    The intmat is displayed in a Betti-like diagram: @*
+  @format
+                0             1                     h-l
+  ----------------------------------------------------------
+     -h:     h^0(F(h))    h^0(F(h-1))   ......    h^0(F(l)) 
+   -h+1:   h^1(F(h-1))    h^1(F(h-2))   ......  h^1(F(l-1))
+           .........................................
+   -h+n:   h^n(F(h-n))  h^n(F(h-n-1))   ......  h^n(F(l-n))
+  ----------------------------------------------------------
+  total:         .................................
+  @end format
+         where @code{F} refers to the associated sheaf of @code{M} on P^n.@*
+         A @code{'-'} in the diagram refers to a zero entry, a @code{'*'} 
+         refers to a negative entry (= dimension not yet determined).  
+EXAMPLE: example truncate; shows an example
+"
+{
+  int i,j,k,dat;
+  intvec notSumCol;
+  notSumCol[h-l+1]=0;
+  string s;
+  string Row="      ";
+  string Row1="------";
+  for (i=0; i<=h-l; i++) {
+    if (i<10) { Row=Row+"     "+string(i); }
+    else      { Row=Row+"    "+string(i); }
+    Row1 = Row1+"------";
+  }
+  print(Row);
+  print(Row1);
+  for (j=1; j<=n+1; j++) {
+    s = string(j-h-1);
+    Row = "";
+    for(k=1; k<6-size(s); k++) { Row = Row+" "; } 
+    Row = Row + s+":";
+    for (i=0; i<=h-l; i++) {
+      dat = data[j,i+1];
+      if (dat>0) { s = string(dat); }
+      else {
+        if (dat==0) { s="-"; }
+        else        { s="*"; notSumCol[i+1]=1; }
+      } 
+      for(k=1; k<=6-size(s); k++) { Row = Row+" "; } 
+      Row = Row + s;
+    }
+    print(Row);
+  }
+  print(Row1);
+  Row="total:";
+  for (i=0; i<=h-l; i++) {
+    dat = 0;
+    if (notSumCol[i+1]==0) {
+      for (j=1; j<=n+1; j++) { dat = dat + data[j,i+1]; }
+      if (dat>0) { s = string(dat); }
+    }
+    else { s="*"; }
+    for (k=1; k<=6-size(s); k++) { Row = Row+" "; } 
+    Row = Row + s;
+  }
+  print(Row);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+
+/*
+Examples:
+---------
+ LIB "sheafcoh.lib";
+
+ ring S = 32003, x(0..4), dp;
+ module MI=maxideal(1);
+ attrib(MI,"isHomog",intvec(-1));  
+ resolution kos = nres(MI,0);
+ print(betti(kos),"betti");
+ LIB "random.lib";
+ matrix alpha0 = random(32002,10,3);
+ module pres = module(alpha0)+kos[3];
+ attrib(pres,"isHomog",intvec(1,1,1,1,1,1,1,1,1,1));
+ resolution fcokernel = mres(pres,0);
+ print(betti(fcokernel),"betti");
+ module dir = transpose(pres);
+ attrib(dir,"isHomog",intvec(-1,-1,-1,-2,-2,-2,
+                             -2,-2,-2,-2,-2,-2,-2));
+ resolution fdir = mres(dir,2);
+ print(betti(fdir),"betti");
+ ideal I = groebner(flatten(fdir[2]));
+ resolution FI = mres(I,0);
+ print(betti(FI),"betti");
+ module F=FI[2];
+ def A1=sheafCohE(F,-2,6);
+ def A2=sheafCohBGG(F,-2,6);
+
+ LIB "sheafcoh.lib";
+ LIB "random.lib";
+ ring S = 32003, x(0..4), dp;
+ resolution kos = nres(maxideal(1),0);
+ betti(kos);
+ matrix kos5 = kos[5];
+ matrix tphi = transpose(dsum(kos5,kos5));
+ matrix kos3 = kos[3];
+ matrix psi = dsum(kos3,kos3);
+ matrix beta1 = random(32002,20,2);
+ matrix tbeta1tilde = transpose(psi*beta1);
+ matrix tbeta0 = lift(tphi,tbeta1tilde);
+ matrix kos4 = kos[4];
+ matrix tkos4pluskos4 = transpose(dsum(kos4,kos4));
+ matrix tgammamin1 = random(32002,20,1);
+ matrix tgamma0 = tkos4pluskos4*tgammamin1;
+ matrix talpha0 = concat(tbeta0,tgamma0);
+ matrix zero[20][1];
+ matrix tpsi = transpose(psi);
+ matrix tpresg = concat(tpsi,zero);
+ matrix pres = module(transpose(talpha0))
+                    + module(transpose(tpresg));
+ module dir = transpose(pres);
+ dir = prune(dir);
+ homog(dir);  
+ intvec deg_dir = attrib(dir,"isHomog");
+ attrib(dir,"isHomog",deg_dir-2);        // set degrees
+ resolution fdir = mres(prune(dir),2);
+ print(betti(fdir),"betti");
+ ideal I = groebner(flatten(fdir[2]));
+ resolution FI = mres(I,0);
+
+ module F=FI[2];
+ def A1=sheafCohE(F,0,8);
+ def A2=sheafCohBGG(F,0,8);
+
+*/
