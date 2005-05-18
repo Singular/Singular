@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gmssing.lib,v 1.8 2005-05-06 14:38:33 hannes Exp $";
+version="$Id: gmssing.lib,v 1.9 2005-05-18 18:16:32 Singular Exp $";
 category="Singularities";
 
 info="
@@ -193,7 +193,9 @@ EXAMPLE:  example gmsring; shows examples
   ideal gmsbasis=imap(@R,m);
 
   attrib(gmsstd,"isSB",1);
-  export gmspoly,gmsjacob,gmsstd,gmsmatrix,gmsbasis,gmsmaxdeg;
+  export gmspoly, gmsjacob, gmsstd, gmsmatrix, gmsbasis;
+  if (system("with","Namespaces")) { exportto(Top, gmsmaxdeg);}
+  else { export(gmsmaxdeg);}
 
   return(G);
 }
