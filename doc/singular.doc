@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.132 2005-05-11 16:11:52 Singular Exp $
+@comment $Id: singular.doc,v 1.133 2005-05-18 09:51:30 anne Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -318,6 +318,8 @@ LIB "all.lib";
 * reesclos_lib:: Rees Algebra and integral closure of an ideal
 * intprog_lib:: Integer Programming
 * toric_lib:: toric ideals
+* resol_lib:: Resolution of Singularities
+* zeta_lib:: Applications of Resolution of Singularities
 @end menu
 
 @c ---------------------------------------------------------
@@ -365,9 +367,17 @@ LIB "all.lib";
 @subsection intprog_lib
 @c lib intprog.lib
 @c ---------------------------------------------------------
-@node toric_lib, ,intprog_lib, Commutative algebra
+@node toric_lib, resol_lib ,intprog_lib, Commutative algebra
 @subsection toric_lib
 @c lib toric.lib
+@c ---------------------------------------------------------
+@node resol_lib, zeta_lib ,toric_lib, Commutative algebra
+@subsection resol_lib
+@c lib resol.lib
+@c ---------------------------------------------------------
+@node zeta_lib, ,resol_lib, Commutative algebra
+@subsection zeta_lib
+@c lib zeta.lib
 @c ----------------------------------------------------------------------------
 @node Singularities, Invariant theory, Commutative algebra, SINGULAR libraries
 @section Singularities
