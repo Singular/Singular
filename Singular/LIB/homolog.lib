@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: homolog.lib,v 1.16 2004-11-04 16:51:28 Singular Exp $";
+version="$Id: homolog.lib,v 1.17 2005-05-18 15:59:37 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  homolog.lib   Procedures for Homological Algebra
@@ -465,18 +465,30 @@ RETURN:  - module Ext, a presentation of Ext^k(M',R) if v is of type int@*
 DISPLAY: printlevel >=0: (affine) dimension of Ext^k for each k  (default)
          printlevel >=1: Ak, Ak+1 and kbase of Ext^k in Fk*
 NOTE:    In order to compute Ext^k(M,R) use the command Ext_R(k,syz(M));
-         or the 2 commands: list L=mres(M,2);  Ext_R(k,L[2]);
+         If the attribute \"isHomog\" has been set for the input module, it 
+         is also set for the returned module (accordingly). 
 EXAMPLE: example Ext_R; shows an example
 "
 {
   // In case M is known to be a SB, set attrib(M,"isSB",1); in order to
   // avoid  unnecessary SB computations
 
-//------------ initialisation -------------------------------------------------
-  module m1,m2,ret,ret0;
-  matrix ker,kb;
-  list L1,L2,L3,L,resl,K;
-  int k,max,ii,t1,t2,di;
+  //------------ check for weight vector (graded case) -----------------------
+  int withWeight;
+  intvec weightR,ww;
+  if ( typeof(attrib(M,"isHomog"))!="string" )
+  {  
+    withWeight=1;
+  }
+
+  //------------ initialisation ----------------------------------------------
+  module m1t,m1,m2,m2t,ret,ret0,ker;
+  vector leadCol;
+  matrix kb;
+  list L1,L2,L3,L,K;
+  resolution resl,resm2;
+  int j,k,max,ii,t1,t2,di,leadComp,shift;
+  intvec A1,A2,A3;
   int s = size(v);
   intvec v1 = sort(v)[1];
   max = v1[s];                 // the maximum integer occurring in intvec v
@@ -485,13 +497,30 @@ EXAMPLE: example Ext_R; shows an example
   for( ii=1; ii<=size(#); ii++ )
   {
     t2=1; // return a list if t2=1
-    if( typeof(#[ii])=="string" )
-    {
+    if ( (typeof(#[ii])=="string") and (withWeight==0) )
+    { // NOTE: at this writing, sres does not return weights
       if ( #[ii]=="sres" ) { t1=1; t2=0; } // use sres instead of mres if t1=1
     }
   }
+
 //----------------- compute resolution of coker(M) ----------------------------
-  if( max<0 ) { dbprint(p,"// Ext^i=0 for i<0!"); return([1]); }
+  if( max<0 ) 
+  { 
+    dbprint(p,"// Ext^i=0 for i<0!"); 
+    module Result=[1];
+    if (withWeight==1) { attrib(Result,"isHomog",intvec(0)); }
+    if (s==1) { 
+      if (t2==0) { return(Result); }
+      else       { return( list(Result,Result,matrix(0)) ); }
+    }
+    list Out, KBOut;
+    for (j=1;j<=s;j++) { 
+      Out[j] = Result; 
+      KBOut[j] = matrix(0);
+    }
+    if (t2==0) { return(Out); }
+    else       { return( list(Out,Out,KBOut) ); }
+  }
   if( t1==1 )
   {
     if( attrib(M,"isSB")==0 ) { M=std(M); }
@@ -502,11 +531,16 @@ EXAMPLE: example Ext_R; shows an example
   {
 //-----------------  apply Hom(_,R) at k-th place -----------------------------
     k=v[ii];
+    dbprint(p-1,"// Computing Ext^"+string(k)+":");
     if( k<0 )                   // Ext^k=0 for negative k
     {
       dbprint(p-1,"// Ext^i=0 for i<0!");
       ret    = gen(1);
       ret0   = std(ret);
+      if (withWeight==1) { 
+        attrib(ret,"isHomog",intvec(0)); 
+        attrib(ret0,"isHomog",intvec(0)); 
+      }
       L1[ii] = ret;
       L2[ii] = ret0;
       L3[ii] = matrix(kbase(ret0));
@@ -520,17 +554,84 @@ EXAMPLE: example Ext_R; shows an example
     }
     else
     {
-      m2 = transpose(resl[k+1]);
+      m2t = resl[k+1];
+      m2 = transpose(m2t); 
+      if ((typeof(attrib(resl[k+1],"isHomog"))!="string" ) && (withWeight))
+      { 
+        // ------------- compute weights for dual -----------------------------
+        weightR=attrib(resl[k+1],"isHomog");
+        // --------------------------------------------------------------------
+        // *** set correct weights (at this writing, shift in resolution 
+        // *** is not considered when defining the weights for the 
+        // *** modules in the resolution):
+        A1=attrib(resl,"isHomog");
+        A2=attrib(resl[1],"isHomog");
+        shift=A1[1]-A2[1];
+        for (j=1; j<=size(weightR); j++) { weightR[j]=weightR[j]+shift; }
+        attrib(m2t,"isHomog",weightR);
+        // --------------------------------------------------------------------
+        for (j=1; j<=nrows(m2); j++) {
+          leadCol = leadmonom(m2t[j]);
+          leadComp = nrows(leadCol);
+          ww[j] = deg(leadCol)+weightR[leadComp];
+        }
+        attrib(m2,"isHomog",-ww);  // dualize --> negative weights
+        // --------------------------------------------------------------------
+        // *** the following should be replaced by the syz command,
+        // *** but syz forgets weights.....
+        resm2 = nres(m2,2);
+        ker = resm2[2];
+        // --------------------------------------------------------------------
+        // *** set correct weights (at this writing, shift in resolution 
+        // *** is not considered when defining the weights for the 
+        // *** modules in the resolution):
+        A1=attrib(resm2,"isHomog");
+        A2=attrib(resm2[1],"isHomog");
+        A3=attrib(ker,"isHomog");
+        shift=A1[1]-A2[1];
+        for (j=1; j<=size(A3); j++) { A3[j]=A3[j]+shift; }
+        attrib(ker,"isHomog",A3);
+        // --------------------------------------------------------------------
+      }      
+      else {
+        ker = syz(m2);
+      }
+
       if( k==0 ) { m1=0*gen(nrows(m2)); }
-      else { m1 = transpose(resl[k]); }
-//----------------- presentation of ker(m2)/im(m1) ----------------------------
-      ker = syz(m2);
+      else { // k>0
+        m1t = resl[k];
+        m1 = transpose(resl[k]); 
+        if ((typeof(attrib(m1t,"isHomog"))!="string" ) && (withWeight)) { 
+        // ------------- compute weights for dual -----------------------------
+          weightR=attrib(resl[k],"isHomog");
+          // ------------------------------------------------------------------
+          // *** set correct weights (at this writing, shift in resolution 
+          // *** is not considered when defining the weights for the 
+          // *** modules in the resolution):
+          A1=attrib(resl,"isHomog");
+          A2=attrib(resl[1],"isHomog");
+          shift=A1[1]-A2[1];
+          for (j=1; j<=size(weightR); j++) { weightR[j]=weightR[j]+shift; }
+          attrib(m1t,"isHomog",weightR);
+          // ------------------------------------------------------------------
+          ww=0;
+          for (j=1; j<=nrows(m1); j++) {
+            leadCol = leadmonom(m1t[j]);
+            leadComp = nrows(leadCol);
+            ww[j] = deg(leadCol)+weightR[leadComp];
+          }
+          attrib(m1,"isHomog",-ww);  // dualize --> negative weights
+        }
+      }
+
+      //----------------- presentation of ker(m2)/im(m1) ---------------------
       ret = modulo(ker,m1);
-      dbprint(p-1,"// Computing Ext^"+string(k)+":",
+      dbprint(p-1,
          "// Let 0<--coker(M)<--F0<--F1<--F2<--... be a resolution of M,",
          "// then F"+string(k)+"*-->F"+string(k+1)+"* is given by:",m2,
          "// and F"+string(k-1)+"*-->F"+string(k)+"* is given by:",m1,"");
       ret0 = std(ret);
+
       di=dim(ret0);
       dbprint(p,"// dimension of Ext^"+string(k)+":  "+string(di));
       if (di==0)

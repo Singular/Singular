@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_GetPoly.cc,v 1.34 2004-02-23 19:04:04 Singular Exp $ */
+/* $Id: mpsr_GetPoly.cc,v 1.35 2005-05-18 15:59:36 Singular Exp $ */
 
 /***************************************************************
  *
@@ -740,7 +740,7 @@ static mpsr_Status_t GetVarNamesAnnot(MPT_Node_pt node, ring r)
                     MP_CmtProtoIMP_Identifier))
       {
         MPT_Arg_pt arg_pt = annot->value->args;
-        lb = min(nc, N);
+        lb = si_min(nc, N);
         offset = N - (short) nc;
         if (offset < 0) offset = 0;
         for (; num_vars < lb; num_vars++)

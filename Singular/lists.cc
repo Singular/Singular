@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: lists.cc,v 1.26 2005-01-18 15:42:00 Singular Exp $ */
+/* $Id: lists.cc,v 1.27 2005-05-18 15:59:36 Singular Exp $ */
 /*
 * ABSTRACT: handling of the list type
 */
@@ -81,7 +81,7 @@ lists lInsert0(lists ul, leftv v, int pos)
   if ((pos<0)||(v->rtyp==NONE))
     return NULL;
   lists l=(lists) omAllocBin(slists_bin);
-  l->Init(max(ul->nr+2,pos+1));
+  l->Init(si_max(ul->nr+2,pos+1));
   int i,j;
 
   for(i=j=0;i<=ul->nr;i++,j++)
@@ -199,7 +199,7 @@ BOOLEAN lRingDependend(lists L)
 }
 
 lists liMakeResolv(resolvente r, int length, int reallen,
-  int typ0, intvec ** weights)
+  int typ0, intvec ** weights, int add_row_shift)
 {
   lists L=(lists)omAlloc0Bin(slists_bin);
   if (length<=0)
@@ -212,7 +212,7 @@ lists liMakeResolv(resolvente r, int length, int reallen,
     int oldlength=length;
     while (r[length-1]==NULL) length--;
     if (reallen<=0) reallen=pVariables;
-    reallen=max(reallen,length);
+    reallen=si_max(reallen,length);
     L->Init(reallen);
     int i=0;
 
@@ -243,14 +243,16 @@ lists liMakeResolv(resolvente r, int length, int reallen,
           }
           else
           {
-            r[i]->rank=max(rank,idRankFreeModule(r[i]));
+            r[i]->rank=si_max(rank,idRankFreeModule(r[i]));
           }
           idSkipZeroes(r[i]);
         }
         L->m[i].data=(void *)r[i];
         if ((weights!=NULL) && (weights[i]!=NULL))
         {
-          atSet((idhdl)&L->m[i],omStrDup("isHomog"),weights[i],INTVEC_CMD);
+          intvec *w=ivCopy(weights[i]);
+          w += add_row_shift;
+          atSet((idhdl)&L->m[i],omStrDup("isHomog"),w,INTVEC_CMD);
           weights[i] = NULL;
         }
       }

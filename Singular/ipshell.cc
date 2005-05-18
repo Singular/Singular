@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.111 2005-05-09 07:34:19 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.112 2005-05-18 15:59:35 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -188,7 +188,7 @@ static void list1(char* s, idhdl h,BOOLEAN c, BOOLEAN fullname)
                      char *s;
                      l=strlen(IDSTRING(h));
                      memset(buffer,0,22);
-                     strncpy(buffer,IDSTRING(h),min(l,20));
+                     strncpy(buffer,IDSTRING(h),si_min(l,20));
                      if ((s=strchr(buffer,'\n'))!=NULL)
                      {
                        *s='\0';
@@ -847,14 +847,20 @@ BOOLEAN jjMINRES(leftv res, leftv v)
 {
   int len=0;
   int typ0;
-  resolvente rr=liFindRes((lists)v->Data(),&len,&typ0);
+  lists L=(lists)v->Data();
+  intvec *weights=(intvec*)atGet(v,"isHomog",INTVEC_CMD);
+  int add_row_shift = 0;
+  if (weights==NULL)
+    weights=(intvec*)atGet(&(L->m[0]),"isHomog",INTVEC_CMD); 
+  if (weights!=NULL)  add_row_shift=weights->min_in();
+  resolvente rr=liFindRes(L,&len,&typ0);
   if (rr==NULL) return TRUE;
   resolvente r=iiCopyRes(rr,len);
 
   syMinimizeResolvente(r,len,0);
   omFreeSize((ADDRESS)rr,len*sizeof(ideal));
   len++;
-  res->data=(char *)liMakeResolv(r,len,-1,typ0,NULL);
+  res->data=(char *)liMakeResolv(r,len,-1,typ0,NULL,add_row_shift);
   return FALSE;
 }
 
@@ -1884,7 +1890,7 @@ ring rCompose(const lists  L)
         iv=new intvec((int)vv->m[1].Data(),(int)vv->m[1].Data());
       else
         iv=ivCopy((intvec*)vv->m[1].Data()); //assume INTVEC
-      R->block1[j]=max(R->block0[j],R->block0[j]+iv->length()-1);
+      R->block1[j]=si_max(R->block0[j],R->block0[j]+iv->length()-1);
       int i;
       switch (R->order[j])
       {
@@ -2112,7 +2118,7 @@ BOOLEAN syBetti1(leftv res, leftv u)
 /*3
 * converts a resolution into a list of modules
 */
-lists syConvRes(syStrategy syzstr,BOOLEAN toDel)
+lists syConvRes(syStrategy syzstr,BOOLEAN toDel,int add_row_shift)
 {
   if ((syzstr->fullres==NULL) && (syzstr->minres==NULL))
   {
@@ -2155,7 +2161,8 @@ lists syConvRes(syStrategy syzstr,BOOLEAN toDel)
       }
     }
   }
-  lists li = liMakeResolv(trueres,syzstr->length,syzstr->list_length,typ0,w);
+  lists li = liMakeResolv(trueres,syzstr->length,syzstr->list_length,typ0,
+                          w,add_row_shift);
   if (w != NULL) omFreeSize(w, (syzstr->length)*sizeof(intvec*));
   if (toDel) syKillComputation(syzstr);
   return li;
@@ -4161,7 +4168,7 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
           case ringorder_a64:
           {
             R->block0[n] = last+1;
-            R->block1[n] = min(last+iv->length()-2 , R->N);
+            R->block1[n] = si_min(last+iv->length()-2 , R->N);
             R->wvhdl[n] = (int*)omAlloc((iv->length()-1)*sizeof(int64));
             int64 *w=(int64 *)R->wvhdl[n];
             for (i=2; i<iv->length(); i++)

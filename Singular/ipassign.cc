@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.74 2005-05-03 16:12:03 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.75 2005-05-18 15:59:35 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -290,7 +290,10 @@ static BOOLEAN jiA_LIST_RES(leftv res, leftv a,Subexpr e)
 {
   syStrategy r=(syStrategy)a->CopyD(RESOLUTION_CMD);
   if (res->data!=NULL) ((lists)res->data)->Clean();
-  res->data=(void *)syConvRes(r,TRUE);
+  int add_row_shift = 0;
+  intvec *weights=(intvec*)atGet(a,"isHomog",INTVEC_CMD);
+  if (weights!=NULL)  add_row_shift=weights->min_in();
+  res->data=(void *)syConvRes(r,TRUE,add_row_shift);
   //jiAssignAttr(res,a);
   return FALSE;
 }
@@ -342,7 +345,7 @@ static BOOLEAN jiA_POLY(leftv res, leftv a,Subexpr e)
     /* for module: update rank */
     if ((p!=NULL) && (pGetComp(p)!=0))
     {
-      m->rank=max(m->rank,pMaxComp(p));
+      m->rank=si_max(m->rank,pMaxComp(p));
     }
   }
   return FALSE;
@@ -972,7 +975,7 @@ static BOOLEAN jjA_L_INTVEC(leftv l,leftv r,intvec *iv)
             ||(hh->Typ() == INTMAT_CMD))
     {
       intvec *ivv = (intvec *)(hh->Data());
-      int ll = 0,l = min(ivv->length(),iv->length());
+      int ll = 0,l = si_min(ivv->length(),iv->length());
       for (; l>0; l--)
       {
         (*iv)[i++] = (*ivv)[ll++];
@@ -1462,7 +1465,7 @@ BOOLEAN iiAssign(leftv l, leftv r)
             if (nok) break;
             lm->m[i]=(poly)t.CopyD(etyp);
             pNormalize(lm->m[i]);
-            if (module_assign) rk=max(rk,pMaxComp(lm->m[i]));
+            if (module_assign) rk=si_max(rk,pMaxComp(lm->m[i]));
             i++;
           }
           else
@@ -1474,11 +1477,11 @@ BOOLEAN iiAssign(leftv l, leftv r)
             rm = (matrix)t.CopyD(mtyp);
             if (module_assign)
             {
-              j = min(num,rm->cols());
-              rk=max(rk,rm->rank);
+              j = si_min(num,rm->cols());
+              rk=si_max(rk,rm->rank);
             }
             else
-              j = min(num-i,rm->rows() * rm->cols());
+              j = si_min(num-i,rm->rows() * rm->cols());
             for(k=0;k<j;k++,i++)
             {
               lm->m[i]=rm->m[k];

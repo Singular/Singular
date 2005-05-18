@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.363 2005-05-13 15:39:20 Singular Exp $ */
+/* $Id: iparith.cc,v 1.364 2005-05-18 15:59:33 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -427,7 +427,7 @@ static BOOLEAN jjOP_IM_I(leftv res, leftv u, leftv v)
 {
   intvec* aa= (intvec *)u->CopyD(INTVEC_CMD);
   int bb = (int)(v->Data());
-  int i=min(aa->rows(),aa->cols());
+  int i=si_min(aa->rows(),aa->cols());
   switch (iiOp)
   {
     case '+': for (;i>0;i--) IMATELEM(*aa,i,i) += bb;
@@ -1568,7 +1568,7 @@ static BOOLEAN jjDEG_M_IV(leftv res, leftv u, leftv v)
   ideal I=(ideal)u->Data();
   int d=-1;
   int i;
-  for(i=IDELEMS(I);i>=0;i--) d=max(d,pDegW(I->m[i],iv));
+  for(i=IDELEMS(I);i>=0;i--) d=si_max(d,pDegW(I->m[i],iv));
   omFreeSize((ADDRESS)iv,(pVariables+1)*sizeof(short));
   res->data = (char *)d;
   return FALSE;
@@ -1632,7 +1632,7 @@ static BOOLEAN jjDIVISION(leftv res, leftv u, leftv v)
   matrix T = idModule2formatedMatrix(m,vl,ul);
   if (MATCOLS(U) != ul)
   {
-    int mul=min(ul,MATCOLS(U));
+    int mul=si_min(ul,MATCOLS(U));
     matrix UU=mpNew(ul,ul);
     int i,j;
     for(i=mul;i>0;i--)
@@ -1796,18 +1796,18 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
       {
         int i;
         if (par_perm_size!=0)
-          for(i=0;i<min(rPar(r),rPar(currRing));i++) par_perm[i]=-(i+1);
-        for(i=1;i<=min(r->N,pVariables);i++) perm[i]=i;
+          for(i=si_min(rPar(r),rPar(currRing))-1;i>=0;i--) par_perm[i]=-(i+1);
+        for(i=si_min(r->N,pVariables);i>0;i--) perm[i]=i;
       }
     }
     if ((iiOp==FETCH_CMD) &&(BVERBOSE(V_IMAP)))
     {
       int i;
-      for(i=0;i<min(r->N,pVariables);i++)
+      for(i=0;i<si_min(r->N,pVariables);i++)
       {
         Print("// var nr %d: %s -> %s\n",i,r->names[i],currRing->names[i]);
       }
-      for(i=0;i<min(rPar(r),rPar(currRing));i++) // possibly empty loop
+      for(i=0;i<si_min(rPar(r),rPar(currRing));i++) // possibly empty loop
       {
         Print("// par nr %d: %s -> %s\n",
               i,r->parameter[i],currRing->parameter[i]);
@@ -2467,7 +2467,7 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
   //res->data=(void *)liMakeResolv(r,l,wmaxl,u->Typ(),weights);
   r->list_length=wmaxl;
   res->data=(void *)r;
-  if (ww!=NULL) { delete ww; ww=NULL; }
+  if ((weights!=NULL) && (ww!=NULL)) { delete ww; ww=NULL; }
   if ((r->weights!=NULL) && (r->weights[0]!=NULL))
   {
     ww=ivCopy(r->weights[0]);
@@ -3155,7 +3155,7 @@ static BOOLEAN jjDEG_M(leftv res, leftv u)
   int dummy;
   int i;
   for(i=IDELEMS(I);i>=0;i--)
-    if (I->m[i]!=NULL) d=max(d,pLDeg(I->m[i],&dummy,currRing));
+    if (I->m[i]!=NULL) d=si_max(d,pLDeg(I->m[i],&dummy,currRing));
   res->data = (char *)d;
   return FALSE;
 }
@@ -3961,6 +3961,7 @@ static BOOLEAN jjLOAD1(leftv res, leftv v)
 
 static BOOLEAN jjLOAD(leftv res, leftv v, BOOLEAN autoexport)
 {
+#ifdef HAVE_NS
   char * s=(char *)v->CopyD();
   char libnamebuf[256];
   lib_types LT = type_of_LIB(s, libnamebuf);
@@ -3979,8 +3980,27 @@ static BOOLEAN jjLOAD(leftv res, leftv v, BOOLEAN autoexport)
         break;
 
       case LT_SINGULAR:
-        return iiLibCmd(s);
-
+      {
+        char *plib = iiConvName(s);
+        idhdl pl = IDROOT->get(plib,0);
+        if (pl==NULL)
+        {
+          pl = enterid( plib,0, PACKAGE_CMD, &IDROOT, TRUE );
+          IDPACKAGE(pl)->language = LANG_SINGULAR;
+          IDPACKAGE(pl)->libname=omStrDup(plib);
+        }
+        else if (IDTYP(pl)!=PACKAGE_CMD)
+        {
+          Werror("can not create package `%s`",plib);
+          omFree(plib);
+          return TRUE;
+        }
+        package savepack=currPack;
+        currPack=IDPACKAGE(pl);
+        BOOLEAN bo=iiLibCmd(s);
+        currPack=savepack;
+        return bo;
+      }
       case LT_ELF:
       case LT_HPUX:
 #ifdef HAVE_DYNAMIC_LOADING
@@ -3990,6 +4010,7 @@ static BOOLEAN jjLOAD(leftv res, leftv v, BOOLEAN autoexport)
         break;
 #endif /* HAVE_DYNAMIC_LOADING */
   }
+#endif
   return TRUE;
 }
 
@@ -4853,7 +4874,7 @@ static BOOLEAN jjINTMAT3(leftv res, leftv u, leftv v,leftv w)
 {
   intvec* im= new intvec((int)v->Data(),(int)w->Data(), 0);
   intvec* arg = (intvec*) u->Data();
-  int i, n = min(im->cols()*im->rows(), arg->cols()*arg->rows());
+  int i, n = si_min(im->cols()*im->rows(), arg->cols()*arg->rows());
 
   for (i=0; i<n; i++)
   {
@@ -5090,7 +5111,7 @@ static BOOLEAN jjMATRIX_Id(leftv res, leftv u, leftv v,leftv w)
 {
   matrix m=mpNew((int)v->Data(),(int)w->Data());
   ideal I=(ideal)u->CopyD(IDEAL_CMD);
-  int i=min(IDELEMS(I),(int)v->Data()*(int)w->Data());
+  int i=si_min(IDELEMS(I),(int)v->Data()*(int)w->Data());
   //for(i=i-1;i>=0;i--)
   //{
   //  m->m[i]=I->m[i];
@@ -5112,8 +5133,8 @@ static BOOLEAN jjMATRIX_Ma(leftv res, leftv u, leftv v,leftv w)
 {
   matrix m=mpNew((int)v->Data(),(int)w->Data());
   matrix I=(matrix)u->CopyD(MATRIX_CMD);
-  int r=min(MATROWS(I),(int)v->Data());
-  int c=min(MATCOLS(I),(int)w->Data());
+  int r=si_min(MATROWS(I),(int)v->Data());
+  int c=si_min(MATCOLS(I),(int)w->Data());
   int i,j;
   for(i=r;i>0;i--)
   {
@@ -5557,7 +5578,7 @@ static BOOLEAN jjIDEAL_PL(leftv res, leftv v)
           pDelete(&p);
           return TRUE;
         }
-        rank=max(rank,pMaxComp(p));
+        rank=si_max(rank,pMaxComp(p));
         break;
       }
       default:
@@ -5748,7 +5769,10 @@ static BOOLEAN jjLIST_PL(leftv res, leftv v)
   lists L;
   if((sl==1)&&(v->Typ()==RESOLUTION_CMD))
   {
-    L=syConvRes((syStrategy)v->Data());
+    int add_row_shift = 0;
+    intvec *weights=(intvec*)atGet(v,"isHomog",INTVEC_CMD);
+    if (weights!=NULL)  add_row_shift=weights->min_in();
+    L=syConvRes((syStrategy)v->Data(),FALSE,add_row_shift);
   }
   else
   {

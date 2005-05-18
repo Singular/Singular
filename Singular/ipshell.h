@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.h,v 1.39 2005-05-06 12:39:48 Singular Exp $ */
+/* $Id: ipshell.h,v 1.40 2005-05-18 15:59:36 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -78,6 +78,8 @@ BOOLEAN jjSYSTEM(leftv res, leftv v);
 void    iiDebug();
 BOOLEAN iiCheckRing(int i);
 poly    iiHighCorner(ideal i, int ak);
+char *  iiConvName(const char *libname);
+
 /* ================================================================== */
 /* Expressions : */
 BOOLEAN iiExprArith1(leftv res, sleftv* a, int op);

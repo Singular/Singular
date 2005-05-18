@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.111 2005-05-12 12:46:42 Singular Exp $ */
+/* $Id: iplib.cc,v 1.112 2005-05-18 15:59:35 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -38,7 +38,6 @@ BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN tellerror);
 
 #include "mod_raw.h"
 
-static char *iiConvName(const char *p);
 #ifdef HAVE_LIBPARSER
 void yylprestart (FILE *input_file );
 int current_pos(int i=0);
@@ -1144,7 +1143,7 @@ char mytolower(char c)
 //#  define FS_SEP '/'
 //#endif
 
-static char *iiConvName(const char *libname)
+char *iiConvName(const char *libname)
 {
   char *tmpname = omStrDup(libname);
   char *p = strrchr(tmpname, DIR_SEP);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipprint.cc,v 1.21 2005-05-13 15:18:50 Singular Exp $ */
+/* $Id: ipprint.cc,v 1.22 2005-05-18 15:59:35 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: printing
 */
@@ -63,12 +63,12 @@ static void ipPrint_MA0(matrix m, const char *name)
     char *ss;
     int *l=(int *)omAlloc0(MATCOLS(m)*sizeof(int));
     int i,j,k;
-    int vl=max(colmax/MATCOLS(m),8);
+    int vl=si_max(colmax/MATCOLS(m),8);
 
     /* make enough space for the "largest" name*/
     ss=(char *)omAlloc(14+strlen(name));
     sprintf(ss,"%s[%d,%d]",name,MATCOLS(m),MATROWS(m));
-    vl=max(vl,strlen(ss));
+    vl=si_max(vl,strlen(ss));
     omFree(ss);
 
     /* convert all polys to string */
@@ -98,7 +98,7 @@ static void ipPrint_MA0(matrix m, const char *name)
           if ((i!=MATROWS(m)-1) || (j!=MATCOLS(m)-1))
           {
             strcat(ss,",");
-            vl=max(vl,strlen(ss));
+            vl=si_max(vl,strlen(ss));
           }
         }
         k=strlen(s[i*MATCOLS(m)+j]);

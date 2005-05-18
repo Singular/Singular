@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: sheafcoh.lib,v 1.2 2005-05-18 11:21:56 Singular Exp $";
+version="$Id: sheafcoh.lib,v 1.3 2005-05-18 15:59:37 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  sheafcoh.lib   Procedures for Computing Sheaf Cohomology
@@ -181,7 +181,7 @@ EXAMPLE: example CM_regularity; shows an example
 KEYWORDS: Castelnuovo-Mumford regularity
 "
 {
-  if ( typeof(attrib(phi,"isHomog"))=="string" ) {  
+  if ( typeof(attrib(M,"isHomog"))=="string" ) {  
     ERROR("No admissible degree vector assigned");
   }  
   def L = mres(M,0);

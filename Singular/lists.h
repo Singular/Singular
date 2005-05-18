@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: lists.h,v 1.19 2004-10-05 13:01:15 Singular Exp $ */
+/* $Id: lists.h,v 1.20 2005-05-18 15:59:36 Singular Exp $ */
 /*
 * ABSTRACT: handling of the list type
 */
@@ -57,7 +57,7 @@ BOOLEAN lRingDependend(lists L);
 char* lString(lists l, BOOLEAN typed = FALSE, int dim = 1);
 
 
-lists liMakeResolv(resolvente r, int length, int reallen, int typ0, intvec ** weights);
+lists liMakeResolv(resolvente r, int length, int reallen, int typ0, intvec ** weights,int add_row_shift);
 resolvente liFindRes(lists L, int * len, int *typ0,intvec *** weights=NULL);
 
 #if ! defined(MDEBUG) || defined(LISTS_CC)

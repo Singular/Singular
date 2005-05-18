@@ -6,7 +6,7 @@
 /*
 * ABSTRACT: tokens, types for interpreter; general macros
 */
-/* $Id: tok.h,v 1.62 2005-05-05 10:42:00 Singular Exp $ */
+/* $Id: tok.h,v 1.63 2005-05-18 15:59:37 Singular Exp $ */
 
 #ifndef MYYSTYPE
 #include "structs.h"
@@ -20,20 +20,6 @@ extern char     my_yylinebuf[80];
 
 #if defined(__cplusplus)
 extern int  yyparse(void);
-#endif
-
-#define loop for(;;)
-
-#ifndef ABS
-#define ABS(x) ((x)<0?(-(x)):(x))
-#endif
-
-#if defined(__cplusplus)
-inline int max(const int a, const int b)  { return (a>b) ? a : b; }
-inline int min(const int a, const int b)  { return (a<b) ? a : b; }
-#else
-#define max(A,B) ((A) > (B) ? (A) : (B))
-#define min(A,B) ((A) < (B) ? (A) : (B))
 #endif
 
 /* Define to use old mechanismen for saving currRing with procedures

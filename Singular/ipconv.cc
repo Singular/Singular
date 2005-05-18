@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipconv.cc,v 1.26 2002-06-03 12:14:27 Singular Exp $ */
+/* $Id: ipconv.cc,v 1.27 2005-05-18 15:59:35 Singular Exp $ */
 /*
 * ABSTRACT: automatic type conversions
 */
@@ -19,14 +19,17 @@
 #include "matpol.h"
 #include "silink.h"
 #include "syz.h"
+#include "attrib.h"
 #include "ipconv.h"
 
 typedef void *   (*iiConvertProc)(void * data);
+typedef void    (*iiConvertProcL)(leftv out,leftv in);
 struct sConvertTypes
 {
   int i_typ;
   int o_typ;
   iiConvertProc p;
+  iiConvertProcL pl;
 };
 
 // all of these static conversion routines work destructive on their input
@@ -178,10 +181,21 @@ static void * iiS2Link(void *data)
   return (void *)l;
 }
 
+/*
 static void * iiR2L(void * data)
 {
   syStrategy tmp=(syStrategy)data;
   return  (void *)syConvRes(tmp,TRUE);
+}
+*/
+static void iiR2L_l(leftv out, leftv in)
+{
+  int add_row_shift = 0;
+  intvec *weights=(intvec*)atGet(in,"isHomog",INTVEC_CMD);
+  if (weights!=NULL)  add_row_shift=weights->min_in();
+
+  syStrategy tmp=(syStrategy)in->CopyD();
+  out->data=(void *)syConvRes(tmp,TRUE,add_row_shift);
 }
 
 static void * iiL2R(void * data)
@@ -196,59 +210,59 @@ struct sConvertTypes dConvertTypes[] =
 {
 //   input type       output type     convert procedure
 //  int -> number
-   { INT_CMD,         NUMBER_CMD,     iiI2N },
+   { INT_CMD,         NUMBER_CMD,     iiI2N , NULL },
 //  int -> poly
-   { INT_CMD,         POLY_CMD,       iiI2P },
+   { INT_CMD,         POLY_CMD,       iiI2P , NULL },
 //  int -> vector
-   { INT_CMD,         VECTOR_CMD,     iiI2V },
+   { INT_CMD,         VECTOR_CMD,     iiI2V , NULL },
 //  int -> ideal
-   { INT_CMD,         IDEAL_CMD,      iiI2Id },
+   { INT_CMD,         IDEAL_CMD,      iiI2Id , NULL },
 //  int -> matrix
-   { INT_CMD,         MATRIX_CMD,     iiI2Id },
+   { INT_CMD,         MATRIX_CMD,     iiI2Id , NULL },
 //  int -> intvec
-   { INT_CMD,         INTVEC_CMD,     iiI2Iv },
+   { INT_CMD,         INTVEC_CMD,     iiI2Iv , NULL },
 //  intvec -> intmat
-   { INTVEC_CMD,      INTMAT_CMD,     iiDummy},
+   { INTVEC_CMD,      INTMAT_CMD,     iiDummy, NULL },
 //  intvec -> matrix
-   { INTVEC_CMD,      MATRIX_CMD,     iiIm2Ma },
+   { INTVEC_CMD,      MATRIX_CMD,     iiIm2Ma , NULL },
 //  intmat -> matrix
-   { INTMAT_CMD,      MATRIX_CMD,     iiIm2Ma },
+   { INTMAT_CMD,      MATRIX_CMD,     iiIm2Ma , NULL },
 //  number -> poly
-   { NUMBER_CMD,      POLY_CMD,       iiN2P  },
+   { NUMBER_CMD,      POLY_CMD,       iiN2P  , NULL },
 //  number -> matrix
-   { NUMBER_CMD,      MATRIX_CMD,     iiN2Ma  },
+   { NUMBER_CMD,      MATRIX_CMD,     iiN2Ma  , NULL },
 //  number -> ideal
 //  number -> vector
 //  number -> module
 //  poly -> number
 //  poly -> ideal
-   { POLY_CMD,        IDEAL_CMD,      iiP2Id },
+   { POLY_CMD,        IDEAL_CMD,      iiP2Id , NULL },
 //  poly -> vector
-   { POLY_CMD,        VECTOR_CMD,     iiP2V },
+   { POLY_CMD,        VECTOR_CMD,     iiP2V , NULL },
 //  poly -> matrix
-   { POLY_CMD,        MATRIX_CMD,     iiP2Id },
+   { POLY_CMD,        MATRIX_CMD,     iiP2Id , NULL },
 //  vector -> module
-   { VECTOR_CMD,      MODUL_CMD,      iiP2Id },
+   { VECTOR_CMD,      MODUL_CMD,      iiP2Id , NULL },
 //  vector -> matrix
-   { VECTOR_CMD,      MATRIX_CMD,     iiV2Ma },
+   { VECTOR_CMD,      MATRIX_CMD,     iiV2Ma , NULL },
 //  ideal -> module
-   { IDEAL_CMD,       MODUL_CMD,      iiMa2Mo },
+   { IDEAL_CMD,       MODUL_CMD,      iiMa2Mo , NULL },
 //  ideal -> matrix
-   { IDEAL_CMD,       MATRIX_CMD,     iiDummy },
+   { IDEAL_CMD,       MATRIX_CMD,     iiDummy , NULL },
 //  module -> matrix
-   { MODUL_CMD,       MATRIX_CMD,     iiMo2Ma },
+   { MODUL_CMD,       MATRIX_CMD,     iiMo2Ma , NULL },
 //  matrix -> ideal
 //  matrix -> module
-   { MATRIX_CMD,      MODUL_CMD,      iiMa2Mo },
+   { MATRIX_CMD,      MODUL_CMD,      iiMa2Mo , NULL },
 //  intvec
 //  link
-   { STRING_CMD,      LINK_CMD,       iiS2Link },
+   { STRING_CMD,      LINK_CMD,       iiS2Link , NULL },
 // resolution -> list
-   { RESOLUTION_CMD,  LIST_CMD,       iiR2L },
+   { RESOLUTION_CMD,  LIST_CMD,       NULL /*iiR2L*/ , iiR2L_l },
 // list -> resolution
-   { LIST_CMD,        RESOLUTION_CMD, iiL2R },
+   { LIST_CMD,        RESOLUTION_CMD, iiL2R , NULL },
 //  end of list
-   { 0,               0,              NULL }
+   { 0,               0,              NULL , NULL }
 };
 
 /*2
@@ -337,11 +351,19 @@ BOOLEAN iiConvert (int inputType, int outputType, int index, leftv input, leftv 
       if ((currRing==NULL) && (outputType>BEGIN_RING) && (outputType<END_RING))
         return TRUE;
       output->rtyp=outputType;
-      output->data=dConvertTypes[index].p(input->CopyD());
+      if (dConvertTypes[index].p!=NULL)
+      {
+        output->data=dConvertTypes[index].p(input->CopyD());
+      }
+      else
+      {
+        dConvertTypes[index].pl(output,input);
+      }
       if ((output->data==NULL)
       && ((outputType==IDEAL_CMD)
         ||(outputType==MODUL_CMD)
         ||(outputType==MATRIX_CMD)
+        ||(outputType==INTMAT_CMD)
         ||(outputType==INTVEC_CMD)))
       {
         return TRUE;
