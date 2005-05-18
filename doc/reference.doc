@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.255 2005-05-18 16:29:57 Singular Exp $
+@comment $Id: reference.doc,v 1.256 2005-05-18 18:00:36 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -7048,7 +7048,7 @@ be used instead.
 listvar(Top);
 load("inout.lib");
 listvar(Top);
-importfrom(Elim,pause);
+importfrom(Inout,pause);
 listvar(Top);
 @c example
 @end smallexample
