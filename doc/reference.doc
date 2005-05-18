@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.254 2005-05-18 09:50:10 anne Exp $
+@comment $Id: reference.doc,v 1.255 2005-05-18 16:29:57 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -5288,7 +5288,7 @@ the field descriptions in one of the following variants:
   the characteristic, type int (0 or prime number)
   @item real, complex:
   a list of:@*
-  the charcteristic, type int (always 0)@*
+  the characteristic, type int (always 0)@*
   the precision, type list (2 integers: external, internal precision)@*
   the name of the imaginary unit, type string
   @item transcendental or algebraic extensions:
