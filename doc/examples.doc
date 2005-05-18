@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.82 2005-05-13 16:19:40 Singular Exp $
+@comment $Id: examples.doc,v 1.83 2005-05-18 20:50:33 levandov Exp $
 @comment this file contains the examples
 
 @c The following directives are necessary for proper compilation
@@ -31,7 +31,7 @@ The following topics are treated:
 * Commutative Algebra::saturation, elimination, free resolution, factorization, primary decomposition, normalization, etc.
 * Singularity Theory::singular and critical points, invariants of hypersurface singularities, classification, resolution of singularities, etc.
 * Invariant Theory:: G_a-invariants, invariants of finite groups
-* Non-Commutative Algebra::
+* Non-Commutative Algebra:: Groebner bases and applications in G-algebras
 * Applications:: Solving systems of polynomial equations, AG codes
 @end menu
 @end ifset
