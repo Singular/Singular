@@ -1,5 +1,5 @@
   @comment -*-texinfo-*-
-@comment $Id: plureference.doc,v 1.34 2005-05-18 18:05:38 levandov Exp $
+@comment $Id: plureference.doc,v 1.35 2005-05-18 20:50:08 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -252,7 +252,7 @@ For the presentation, see explanation of @code{opposite} in @ref{opposite}.
 @smallexample
 @c example 
 LIB "ncalg.lib";
-def A = sl2();
+def A = makeUsl2();
 setring A; A;
 def Aenv = envelope(A);
 setring Aenv; 
@@ -294,11 +294,11 @@ variables, not their names.
 @smallexample
 @c example
 LIB "ncalg.lib";
-def Usl2 = sl2(); // this algebra is U(sl_2)
+def Usl2 = makeUsl2(); // this algebra is U(sl_2)
 setring Usl2;
 option(redSB); 
 option(redTail);
-poly  C  = 4*e*f+h^2-2*h; // the central element of U(sl2)
+poly  C  = 4*e*f+h^2-2*h; // the central element of Usl2
 ideal I  = e^3,f^3,h^3-4*h;
 ideal J  = twostd(I);
 print(matrix(J));  // print a compact presentation of J
@@ -345,7 +345,7 @@ Unlike @code{map} and @code{fetch}, @code{imap} can map parameters to variables.
 @c example
 LIB "ncalg.lib";
 ring ABP=0,(p4,p5,a,b),dp; //  a commutative ring
-def Usl3 = sl(3);
+def Usl3 = makeUsl(3);
 def BIG  = Usl3+ABP;
 setring BIG;
 poly P4 = 3*x(1)*y(1)+3*x(2)*y(2)+3*x(3)*y(3)+h(1)^2+h(1)*h(2)+h(2)^2-3*h(1)-3*h(2);  
@@ -550,7 +550,7 @@ If @code{m} is an ideal, @code{sm=ideal(transpose(T)*transpose(matrix(m)))}.
 @smallexample
 @c example
 LIB "ncalg.lib";
-def A = sl2();
+def A = makeUsl2();
 setring A;  // this algebra is U(sl_2)
 ideal i = e2,f;
 option(redSB);
@@ -593,7 +593,7 @@ given by the list_expression, resp.@: resolution_expression.
 @smallexample
 @c example
 LIB "ncalg.lib";
-def A = sl2();
+def A = makeUsl2();
 setring A; // this algebra is U(sl_2)
 ideal i=e,f,h;
 i=std(i);
@@ -694,7 +694,7 @@ the kernel of this induced map.
 @smallexample
 @c example
 LIB "ncalg.lib";
-def A = sl2();
+def A = makeUsl2();
 setring A; // this algebra is U(sl_2)
 option(redSB);
 option(redTail);
@@ -780,7 +780,7 @@ computations have to be finished and may therefore take some time.
 @smallexample
 @c example
 LIB "ncalg.lib";
-def A = sl2();
+def A = makeUsl2();
 setring A; // this algebra is U(sl_2)
 option(redSB);
 option(redTail);
@@ -939,7 +939,7 @@ from the second module on (by the Groebner basis method).
 @smallexample
 @c example
 LIB "ncalg.lib";
-def A = sl2();
+def A = makeUsl2();
 setring A; // this algebra is U(sl_2)
 option(redSB);
 option(redTail);
@@ -987,7 +987,7 @@ for any object
 @smallexample
 @c example 
 LIB "ncalg.lib";
-def r = sl2();
+def r = makeUsl2();
 setring r;
 matrix m[3][4];
 poly   p  = (h^2-1)*f*e;
@@ -1056,7 +1056,7 @@ with the reverse order of columns).
 @smallexample
 @c example 
 LIB "ncalg.lib";
-def B = Qso3(3); // this algebra is a quantum deformation of U(so_3), 
+def B = makeQso3(3); // this algebra is a quantum deformation of U(so_3), 
                  // where the quantum parameter is a 6th root of unity
 setring B; B;
 def Bopp = opposite(B);
@@ -1099,7 +1099,7 @@ In the noncommutative case, it is implemented only for maps @math{A} -> @math{B}
 @c example
 LIB "ncalg.lib";
 ring   R = 0,a,dp;
-def Usl2 = sl2();
+def Usl2 = makeUsl2();
 setring Usl2;
 poly  C = 4*e*f+h^2-2*h; // the central element of U(sl2)
 ideal I = e^3, f^3, h^3-4*h;
@@ -1192,7 +1192,7 @@ quotient(I,J);
 kill r;
 //------- a bit more complicated example
 LIB "ncalg.lib";
-def Usl2 = sl2(); // this algebra is U(sl_2)
+def Usl2 = makeUsl2(); // this algebra is U(sl_2)
 setring Usl2;
 ideal i = e3,f3,h3-4*h;
 ideal I = std(i);
@@ -1304,14 +1304,14 @@ To view the progress of long running computations, use
 @smallexample
 @c example
 LIB "ncalg.lib";
-def R = sl2(); // this algebra is U(sl_2)
+def R = makeUsl2(); // this algebra is U(sl_2)
 setring R;
 ideal I = e2, f2, h2-1;
 I=std(I);
 I;
 kill R;
 //------------------------------------------
-def RQ = Qso3(3); // this algebra is U'_q(so_3), 
+def RQ = makeQso3(3); // this algebra is U'_q(so_3), 
 setring RQ;       // where Q is a 6th root of unity
 RQ;
 ideal J=x2, y2, z2;
@@ -1348,7 +1348,7 @@ poly, vector, ideal or module (corresponding to the first argument)
 @smallexample
 @c example
 LIB "ncalg.lib";
-def R = sl2(); // this algebra is U(sl_2)
+def R = makeUsl2(); // this algebra is U(sl_2)
 setring R;
 poly C  = e*f*h;
 poly C1 = subst(C,e,h^3);
@@ -1382,7 +1382,7 @@ if @code{S} is a matrix of a left syzygy module of left submodule given by matri
 @smallexample
 @c example
 LIB "ncalg.lib";
-def R = Qso3(3);
+def R = makeQso3(3);
 setring R;
 option(redSB);
 option(redTail); // we wish to have completely reduced bases
@@ -1437,7 +1437,7 @@ whole algebra (like Weyl algebras).
 @smallexample
 @c example
 LIB "ncalg.lib";
-def U = sl2(); // this algebra is U(sl_2)
+def U = makeUsl2(); // this algebra is U(sl_2)
 setring U; 
 ideal i= e^3, f^3, h^3 - 4*h;
 option(redSB);
