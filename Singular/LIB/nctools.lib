@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: nctools.lib,v 1.13 2005-05-10 17:31:08 levandov Exp $";
+version="$Id: nctools.lib,v 1.14 2005-05-18 18:09:12 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: nctools.lib     General tools for noncommutative algebras
@@ -9,27 +9,25 @@ AUTHORS:   Levandovskyy V.,     levandov@mathematik.uni-kl.de,
 
 SUPPORT: DFG (Deutsche Forschungsgesellschaft) and Metodos algebraicos y efectivos en grupos cuanticos, BFM2001-3141, MCYT, Jose Gomez-Torrecillas (Main researcher).
 
-PROCEDURES:
-Gweights(r);                computes weights for a compatible ordering in a G-algebra,
-weightedRing(r);        changes the ordering of a ring to a weighted one,
-ndc([v]);               the ideal of non-degeneracy conditions in G-algebra,
-RootOfUnity(n);         the minimal polynomial for the n-th primitive root of unity,
-Weyl([p]);              creates Weyl algebra structure in a basering (two different realizations),
-CreateWeyl(n, [p]);     returns n-th Weyl algebra in (x(i),D(i)) presentation,
-Heisenberg(N, [p,d]);   returns n-th  Heisenberg algebra in (x(i),y(i),h) realization,
-Exterior();             returns qring, the exterior algebra of a basering,
-fin_dim_algebra(matrix M, list #); creates finite dimensional algebra structure from the basering and the multiplication matrix M,
+MAIN PROCEDURES:
+Gweights(r);              compute weights for a compatible ordering in a G-algebra,
+weightedRing(r);          change the ordering of a ring to a weighted one,
+ndcond();                 the ideal of non-degeneracy conditions in G-algebra,
+Weyl([p]);                create Weyl algebra structure in a basering (two different realizations),
+makeWeyl(n, [p]);         return n-th Weyl algebra in (x(i),D(i)) presentation,
+makeHeisenberg(N, [p,d]); return n-th Heisenberg algebra in (x(i),y(i),h) realization,
+Exterior();               return qring, the exterior algebra of a basering,
+findimAlgebra(M,[r]);     create finite dimensional algebra structure from the basering and the multiplication matrix M,
 
 AUXILIARY PROCEDURES:
-Newton(f);              Newton diagram of a polynomial,
-NCRelations(r);         recovers the non-commutative relations of a G-algebra,
-isCentral(p,[v]);       check for the commutativity of a polynomial in the G-algebra,
-isNC();                 checks whether basering is noncommutative,
-UpOneMatrix(N);         returns NxN matrix with 1's in the whole upper triagle,
-
-ALIAS PROCEDURES:
-wRing(r);               alias to weightedRing,
+ncRelations(r);         recover the non-commutative relations of a G-algebra,
+isCentral(p);           check for the commutativity of a polynomial in the G-algebra,
+isNC();                 check whether basering is noncommutative,
+UpOneMatrix(N);         return NxN matrix with 1's in the whole upper triagle,
 ";
+
+LIB "ring.lib"; // for rootofUnity
+LIB "poly.lib"; // for newtonDiag
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -37,20 +35,20 @@ wRing(r);               alias to weightedRing,
 
 proc Gweights(def r)
 "USAGE:   Gweights(r); r a ring or a square matrix
-PURPOSE: compute the weight vector for the G-algebra:
-          either r itself, if it is of the type ring,
-          or for a G-algebra, defined by the square matrix r
 RETURN:   intvec
-NOTE:    with Gweights you obtain a vector, which must be used to redefine the G-Algebra. If the input is a matrix and the output is the zero vector then there is not a G-algebra structure associated to these relations with respect to the given variables. Another possibility is to use wRing or weightedRing to obtain directly the G-Algebra.
+PURPOSE: compute the weight vector for the following G-algebra:
+@*       for r itself, if it is of the type ring,
+@*       or for a G-algebra, defined by the square polynomial matrix r
+THEORY:   @code{Gweights} returns a vector, which must be used to redefine the G-algebra. If the input is a matrix and the output is the zero vector then there is not a G-algebra structure associated to these relations with respect to the given variables. Another possibility is to use @code{weightedRing} to obtain directly the G-algebra with the new weighted ordering.
 EXAMPLE: example Gweights; shows examples
-SEE ALSO: wRing, weightedRing
+SEE ALSO: weightedRing
 "{
   matrix tails;
   int novalid=0;
   if (typeof(r)=="ring") //a ring is admissible as input
   {
     setring r;
-    def l = NCRelations(r);
+    def l = ncRelations(r);
     tails = l[2]; // l=C,D we need D, the tails of the relations
   }
   else
@@ -107,7 +105,7 @@ example
   matrix D[4][4];
   D[1,4]=(q-1/q)*b*c;
   ncalgebra(C,D);
-  setring r; r;
+  r;
   Gweights(r);
   Gweights(D);
 }
@@ -121,12 +119,11 @@ example
 
 proc weightedRing(def r)
 "USAGE:   weightedRing(r); r a ring
-PURPOSE:  equip a ring with such weights,that the relations of a new ring
-comply with the ordering condition for G-algebras
 RETURN:  ring
-NOTE:    you have to activate this ring with the \"setring\" command
+PURPOSE:  equip the variables of a ring with such weights,that the relations of new ring (with weighted variables) satisfies the ordering condition for G-algebras
+NOTE:    activate this ring with the \"setring\" command
 EXAMPLE: example weightedRing; shows examples
-SEE ALSO: wRing, Gweights
+SEE ALSO: Gweights
 "{
   def wv=Gweights(r);
   if (typeof(wv)=="intvec")
@@ -143,7 +140,7 @@ SEE ALSO: wRing, Gweights
       m[i,n+2-i]=1;
     }
     // End of generation.
-    def lr=NCRelations(r);
+    def lr=ncRelations(r);
     string newringstring="ring newring=("+charstr(r)+"),("+varstr(r)+"),M("+string(m)+")";
     execute (newringstring);
     def lnewring=imap(r,lr);
@@ -165,31 +162,9 @@ example
   matrix D[4][4];
   D[1,4]=(q-1/q)*b*c;
   ncalgebra(C,D);
-  setring r; r;
+  r;
   def t=weightedRing(r);
   setring t; t;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-proc wRing(def r)
-"USAGE:   see weightedRing
-"{
-  def a=weightedRing(r);
-  if (typeof(a)=="ring") { return(a); }
-  "Error";
-  return();
-}
-example
-{
-  "EXAMPLE:";echo=2;
-  LIB "qmatrix.lib";
-  def r = quantMat(2); // generate quantum matrix of order 2 and store it in r
-  setring r; // set the ring r the active ring
-  r;
-  def s=wRing(r);
-  setring s;
-  s;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -241,7 +216,7 @@ static proc Ct(matrix P)
       if ( P[i,j] != 0 )
       {
 //        notails=0;
-        S = Newton(P[i,j]);
+        S = newtonDiag(P[i,j]);
         S = Cij(S,i,j);
         if ( size(S)>1 )
         {
@@ -304,7 +279,7 @@ static proc SimplMat(matrix P)
 
 static proc weightvector(list l)
 "ASSUME:  l is the output of simplex.
-RETURNS: if there is a solution, an intvec with the solution."
+RETURN: if there is a solution, an intvec with it will be returned"
 {
   matrix m=l[1];
   intvec nv=l[3];
@@ -330,56 +305,21 @@ RETURNS: if there is a solution, an intvec with the solution."
   return (intvec(wv));
 }
 
-///////////////////////////////////////////////////////////////////////////////
 
-// This procedure calculates the Newton diagram of the polynomial f
-// The output is a intmat M, each row of M is the exp of a monomial in f
-
-proc Newton(poly f)
-"USAGE:   Newton(f); f a poly
-PURPOSE: compute the Newton diagram of f
-RETURN:  intmat
-NOTE:    each row is the exponent of a monomial of f
-EXAMPLE: example Newton; shows examples
-"{
-  int n=nvars(basering);
-  intvec N=0;
-  if ( f != 0 )
-  {
-    while ( f != 0 )
-    {
-      N = N, leadexp(f);
-      f = f-lead(f);
-    }
-  }
-  else
-  {
-    N=N, leadexp(f);
-  }
-  N = N[2..size(N)]; // Deletes the zero added in the definition of T
-  intmat M=intmat(N,(size(N)/n),n); // Conversion from vector to matrix
-  return (M);
-}
-example
-{
-  "EXAMPLE:";echo=2;
-  ring r = 0,(x,y,z),lp;
-  poly f=x2y+3xz-5y+3;
-  Newton(f);
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 
 // This procedure recover the non-conmutative relations (matrices C and D)
 
-proc NCRelations(def r)
-"USAGE:   NCRelations(r); r a ring
+proc ncRelations(def r)
+"USAGE:   ncRelations(r); r a ring
+RETURN:  list L with two elements, both elements are of type matrix:
+@*         L[1] = matrix of coefficients C,
+@*         L[2] = matrix of polynomials D
 PURPOSE: recover the noncommutative relations via matrices C and D from
 a noncommutative ring
-RETURN:  list L with two elements, both elements are of type matrix:
-         L[1] = matrix of coefficients C,
-         L[2] = matrix of polynomials D
-EXAMPLE: example NCRelations; shows examples
+SEE ALSO: ringlist, Setting up a G-algebra
+EXAMPLE: example ncRelations; shows examples
 "{
   list l;
   if (typeof(r)=="ring")
@@ -429,21 +369,25 @@ example
   print(D);
   ncalgebra(C,D);
   r;
-  def l=NCRelations(r);
+  def l=ncRelations(r);
   print (l[1]);
   print (l[2]);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc fin_dim_algebra(matrix M, list #)
-"USAGE:   fin_dim_algebra(M,[r]); M a matrix, r an optional ring.
-PURPOSE: creates a finite dimensional algebra structure in a ring r
-(if it is given) or in a basering (by default) from the matrix M.
-Exports the ideal called Quot for further qring definition.
+proc findimAlgebra(matrix M, list #)
+"USAGE:   findimAlgebra(M,[r]); M a matrix, r an optional ring
 RETURN:  nothing
-NOTE: matrix M will be read according to relations Xj*Xi = M[i,j]; Quot is not given in its two-sided Groebner basis.
-EXAMPLE: example fin_dim_algebra; shows examples
+PURPOSE: define a finite dimensional algebra structure on a ring
+NOTE:  the matrix M is used to define the relations x(j)*x(i) = M[i,j] in the
+basering (by default) or in the optional ring r.
+@* The procedure equips the ring with the noncommutative structure.
+@* The procedure exports the ideal (not a two-sided Groebner basis!), called @code{fdQuot}, for further qring definition.
+THEORY: finite dimensional algebra can be represented as a factor algebra
+of a G-algebra modulo certain two-sided ideal. The relations of a f.d. algebra are thus naturally divided into two groups: firstly, the relations
+on the variables of the ring, making it into G-algebra and the rest of them, which constitute the ideal which will be factored out.
+EXAMPLE: example findimAlgebra; shows examples
 "
 {
   if (size(#) >0)
@@ -485,8 +429,8 @@ EXAMPLE: example fin_dim_algebra; shows examples
     }
   }
   ncalgebra(C,D);
-  ideal Quot = I;
-  export Quot;
+  ideal fdQuot = I;
+  export fdQuot;
 }
 example
 {
@@ -494,20 +438,22 @@ example
   ring r=(0,a,b),(x(1..3)),dp;
   matrix S[3][3];
   S[2,3]=a*x(1); S[3,2]=-b*x(1);
-  fin_dim_algebra(S);
-  Quot = twostd(Quot);
-  qring Qr = Quot;
+  findimAlgebra(S);
+  fdQuot = twostd(fdQuot);
+  qring Qr = fdQuot;
   Qr;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 proc isCentral(poly p, list #)
-"USAGE:   isCentral(p,[v]); p poly, v an integer (with v!=0, procedure will be verbose)
-PURPOSE: check whether p is central in a basering (that is, commutes with everything)
-RETURN:  integer (1, if p commutes with all variables, 0 otherwise)
+"USAGE:   isCentral(p); p poly
+RETURN:  int, 1 if p commutes with all variables and 0 otherwise
+PURPOSE: check whether p is central in a basering (that is, commutes with every generator of a ring)
+NOTE: if @code{printlevel} > 0, the procedure displays intermediate information (by default, @code{printlevel}=0 )
 EXAMPLE: example isCentral; shows examples
 "{
+  //v an integer (with v!=0, procedure will be verbose)
   int N = nvars(basering);
   int in;
   int flag = 1;
@@ -517,7 +463,7 @@ EXAMPLE: example isCentral; shows examples
     q = p*var(in)-var(in)*p;
     if (q!=0)
     {
-      if (size(#) >0 )
+      if ( (size(#) >0 ) || (printlevel>0) )
       {
         "Noncentral at:", var(in);
       }
@@ -536,17 +482,19 @@ example
   D[2,3]=-2*y;
   ncalgebra(1,D); // this is U(sl_2)
   poly c = 4*x*y+z^2-2*z;
-  isCentral(c,0);
+  printlevel = 0;
+  isCentral(c);
   poly h = x*c;
-  isCentral(h,1);
+  printlevel = 1;
+  isCentral(h);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 proc UpOneMatrix(int N)
-"USAGE:   UpOneMatrix(N); N an integer, the number of columns
-PURPOSE: compute an NxN matrix with 1's in the whole upper triagle
+"USAGE:   UpOneMatrix(n); n an integer
 RETURN:  intmat
+PURPOSE: compute an  n x n matrix with 1's in the whole upper triangle
 NOTE: helpful for setting noncommutative algebras with complicated
 coefficient matrices
 EXAMPLE: example UpOneMatrix; shows examples
@@ -565,26 +513,31 @@ EXAMPLE: example UpOneMatrix; shows examples
 example
 {
   "EXAMPLE:";echo=2;
-  ring r=(0,q),(x,y,z),dp;
-  matrix C=UpOneMatrix(3);
-  C[1,3]=q;
+  ring   r = (0,q),(x,y,z),dp;
+  matrix C = UpOneMatrix(3);
+  C[1,3]   = q;
+  print(C);
   ncalgebra(C,0);
   r;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-proc ndc(list #)
-"USAGE:   ndc([v]); v an optional integer (if v!=0, procedure will be verbose)
-PURPOSE: compute the non-degeneracy conditions of the basering,
+proc ndcond(list #)
+"USAGE:   ndcond(); 
 RETURN:  ideal
-EXAMPLE: example ndc; shows examples
+PURPOSE: compute the non-degeneracy conditions of the basering
+NOTE: if @code{printlevel} > 0, the procedure displays intermediate information (by default, @code{printlevel}=0 )
+EXAMPLE: example ndcond; shows examples
 "
 {
+  // internal documentation, for tests etc
+  // 1st arg: v an optional integer (if v!=0, will be verbose)
   // if the second argument is given, produces ndc wrt powers x^N
   int N = 1;
   int Verbose = 0;
   if ( size(#)>=1 ) { Verbose = int(#[1]); }
   if ( size(#)>=2 ) { N = int(#[2]); }
+  Verbose = ((Verbose) || (printlevel>0));
   int cnt = 1;
   int numvars = nvars(basering);
   int a,b,c;
@@ -632,102 +585,32 @@ example
   D[1,2]=x; D[1,3]=z;
   ncalgebra(C,D);
   r;
-  ideal j=ndc(); // the silent version
+  ideal j=ndcond(); // the silent version
   j;
-  ideal i=ndc(1); // the verbose version
+  printlevel=1;
+  ideal i=ndcond(); // the verbose version
   i;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-proc RootOfUnity(int n)
-"USAGE:   RootOfUnity(n); n an integer
-PURPOSE: compute the minimal polynomial for the n-th primitive root of unity
-RETURN:  number
-NOTE: works only in field extensions by one element
-EXAMPLE: example RootOfUnity; shows examples
-"
-{
-  if ( npars(basering) !=1 )
-  {
-    "the procedure works only with one parameter";
-    return(0);
-  }
-  if (n<1) { return(0); }
-  number mp = par(1);
-  if (n==1) { return(mp-1); }
-  if (n==2) { return(mp+1); }
-  def OldRing = basering;
-  string CH = charstr(basering);
-  string MCH;
-  int j=1;
-  while ( (CH[j] !=",") && (j<=size(CH)))
-  {
-    MCH=MCH+CH[j]; j++;
-  }
-  string SR = "ring @@rR="+MCH+","+parstr(basering)+",dp;";
-  execute(SR);
-  poly @t=var(1)^n-1; // (x^2i-1)=(x^i-1)(x^i+1)
-  list l=factorize(@t);
-  ideal @l=l[1];
-  list @d;
-  int s=size(@l);
-  int d=deg(@l[s]);
-  int cnt=1;
-  poly res;
-  for (j=s-1; j>=1; j--)
-  {
-    if ( deg(@l[j]) > d) { d=deg(@l[j]); }
-  }
-  for (j=1; j<=s; j++)
-  {
-    if ( deg(@l[j]) == d) { @d[cnt]=@l[j]; cnt++; }
-  }
-  if ( size(@d)==1 )
-  {
-    res = poly(@d[1]);
-  }
-  else
-  {
-    j=1;
-    while  ( j <= size(@d) )
-    {
-      res = @d[j]-lead(@d[j]);
-      if ( leadcoef(res) >=0 ) { j++; }
-      else { break; }
-    }
-    res = @d[j];
-  }
-  setring OldRing;
-  poly I = imap(@@rR,res);
-  mp = leadcoef(I);
-  kill @@rR;
-  return(mp);
-}
-example
-{
-  "EXAMPLE:";echo=2;
-  ring r8 = (0,q),(x,y,z),dp;
-  minpoly = RootOfUnity(8);
-  r8;
-  ring r7 = (0,q),(x,y,z),dp;
-  minpoly = RootOfUnity(7);
-  r7;
-  ring r6 = (0,q),(x,y,z),dp;
-  minpoly = RootOfUnity(6);
-  r6;
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 proc Weyl(list #)
-"USAGE:   Weyl([p]); p an optional integer.
-PURPOSE: create a Weyl algebra structure on a basering. By default
-mimics (x(1..N),d(1..N)) realization. If p is given and is not zero,
-uses (x(1),d(1),x(2),d(2),... ) realization.
+"USAGE:   Weyl([p]); p an optional integer
 RETURN:  nothing
-SEE ALSO: CreateWeyl
+PURPOSE: create a Weyl algebra structure on a basering
+NOTE: suppose the number of variables of a basering is 2k. 
+(if this number is odd, an error message will be returned)
+@*    by default, the procedure treats first k variables as coordinates x_i and the last k as differentials d_i
+@*    if nonzero p is given, the procedure treats 2k variables of a basering as k pairs (x_i,d_i), i.e. variables with odd numbers are treated as coordinates and with even numbers as differentials
+SEE ALSO: makeWeyl
 EXAMPLE: example Weyl; shows examples
 "
 {
+  //there are two possibilities for choosing the PBW basis.
+  //The variables have names x(i) for coordinates and d(i) for partial
+  // differentiations. By default, the procedure 
+  //creates a ring, where the variables are ordered as x(1..n),d(1..n).  the 
+  // tensor product-like realization x(1),d(1),x(2),d(2),... is used.
   string rname=nameof(basering);
   if ( rname == "basering") // i.e. no ring has been set yet
   {
@@ -778,12 +661,14 @@ example
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-proc Heisenberg(int N, list #)
-"USAGE:   Heisenberg(N, [p,d]); N an integer (setting 2*N+1 variables), p an optional integer (field characteristic), d an optional integer (power of h in the commutator)
-PURPOSE: create a N-th  Heisenberg algebra in x(i),y(i),h realization
+proc makeHeisenberg(int N, list #)
+"USAGE:  makeHeisenberg(n, [p,d]); int n (setting 2n+1 variables), optional int p (field characteristic), optional int d (power of h in the commutator)
 RETURN: nothing
-NOTE: you have to activate this ring with the \"setring\" command
-EXAMPLE: example Heisenberg; shows examples
+PURPOSE: create an n-th Heisenberg algebra in the variables 
+x(1),y(1),...,x(n),y(n),h
+SEE ALSO: makeWeyl
+NOTE: activate this ring with the \"setring\" command
+EXAMPLE: example makeHeisenberg; shows examples
 "
 {
   int @chr = 0;
@@ -816,19 +701,19 @@ EXAMPLE: example Heisenberg; shows examples
 example
 {
   "EXAMPLE:";echo=2;
-  def a = Heisenberg(2);
+  def a = makeHeisenberg(2);
   setring a;   a;
-  def H3 = Heisenberg(3, 7, 2);
+  def H3 = makeHeisenberg(3, 7, 2);
   setring H3;  H3;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-
 proc Exterior(list #)
 "USAGE:   Exterior();
-PURPOSE:  create the exterior algebra of a basering,
 RETURN:  qring
-NOTE: you have to activate this qring with the \"setring\" command
+PURPOSE:  create the exterior algebra of a basering
+NOTE:  activate this qring with the \"setring\" command
+THEORY: given a basering, this procedure introduces the anticommutative relations x(j)x(i)=-x(i)x(j) for all j>i and, moreover, creates a factor algebra modulo the two-sided ideal, generated by x(i)^2 for all i
 EXAMPLE: example Exterior; shows examples
 "
 {
@@ -864,16 +749,15 @@ example
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-
-proc CreateWeyl(int n, list #)
-"USAGE:   CreateWeyl(n,[p]); n an integer, n>0; p an optional integer (field characteristic)
-PURPOSE: create a n-th Weyl algebra
+proc makeWeyl(int n, list #)
+"USAGE:  makeWeyl(n,[p]); n an integer, n>0; p an optional integer (field characteristic)
 RETURN:  ring
-NOTE:    you have to activate this ring with the \"setring\" command.
-         The presentation of n-th Weyl algebra is classical:
-         D(i)x(i)=x(i)D(i)+1
+PURPOSE: create an n-th Weyl algebra
+NOTE:    activate this ring with the \"setring\" command.
+@*       The presentation of an n-th Weyl algebra is classical: D(i)x(i)=x(i)D(i)+1, 
+@*       where x(i) correspond to coordinates and D(i) to partial differentiations, i=1,...,n.
 SEE ALSO: Weyl
-EXAMPLE: example CreateWeyl; shows examples
+EXAMPLE: example makeWeyl; shows examples
 "{
   if (n<1)
   {
@@ -902,17 +786,16 @@ EXAMPLE: example CreateWeyl; shows examples
 }
 example
 { "EXAMPLE:"; echo = 2;
-   def a = CreateWeyl(3);
+   def a = makeWeyl(3);
    setring a;
    a;
 }
 
 //////////////////////////////////////////////////////////////////////
-
 proc isNC()
 "USAGE:   isNC();
 PURPOSE: check whether a basering is commutative or not
-RETURN:   int (1, if basering is noncommutative; 0 otherwise)
+RETURN:   int, 1 if basering is noncommutative and 0 otherwise
 EXAMPLE: example isNC; shows examples
 "{
   string rname=nameof(basering);
@@ -936,7 +819,7 @@ EXAMPLE: example isNC; shows examples
 }
 example
 { "EXAMPLE:"; echo = 2;
-   def a = CreateWeyl(2);
+   def a = makeWeyl(2);
    setring a;
    isNC();
    kill a;

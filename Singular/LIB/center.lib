@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: center.lib,v 1.15 2005-05-10 17:31:08 levandov Exp $";
+version="$Id: center.lib,v 1.16 2005-05-18 18:09:10 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY:  center.lib      computation of central elements of G-algebras and their factor-algebras.
@@ -11,10 +11,10 @@ OVERVIEW:
 SUPPORT: Forschungsschwerpunkt 'Mathematik und Praxis', University of Kaiserslautern
 
 PROCEDURES:
-        center(MaxDeg[,N]);             computes the generators of the center of a basering,
-        centralizer(f, MaxDeg[,N]);     computes the generators of the centralizer of f in a basering,
-        inCenter(l);                    checks the centrality of elements of list/ideal/poly l
-        inCentralizer(l, f);            checks the commutativity wrt polynomial f of polynomials of list/ideal/poly l
+center(MaxDeg[,N]);             computes the generators of the center of a basering,
+centralizer(f, MaxDeg[,N]);     computes the generators of the centralizer of f in a basering,
+inCenter(l);                    checks the centrality of elements of list/ideal/poly l
+inCentralizer(l, f);            checks the commutativity wrt polynomial f of polynomials of list/ideal/poly l
 
 KEYWORDS:  inCenter; inCentralizer; center; centralizer
 ";

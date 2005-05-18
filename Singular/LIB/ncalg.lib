@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ncalg.lib,v 1.12 2005-05-06 14:38:48 hannes Exp $";
+version="$Id: ncalg.lib,v 1.13 2005-05-18 18:09:11 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY:  ncalg.lib      Definitions of important GR-algebras
@@ -19,7 +19,7 @@ GKZsystem(A, sord, alg [,v]);  returns a ring and an ideal, describing
 Gelfand-Kapranov-Zelevinsky system of differential equations
 ";
 
-LIB "nctools.lib";
+LIB "nctools.lib"; // rootofUnity, 
 LIB "general.lib";
 LIB "toric.lib"; // needed for GKZsystem
 
@@ -318,7 +318,7 @@ EXAMPLE: example Qso3; shows examples
 "{
   int @p = 2*defInt(#);
   ring @@@r=(0,Q),(x,y,z),dp;
-  minpoly = RootOfUnity(@p);
+  minpoly = rootofUnity(@p);
   matrix C[3][3];
   C[1,2]=Q2;
   C[1,3]=1/Q2;
@@ -412,7 +412,7 @@ EXAMPLE: example Qsl2; shows examples
   int @p = defInt(#);
   if (@p >1)
   {
-    minpoly = RootOfUnity(@p);
+    minpoly = rootofUnity(@p);
   }
   matrix C = UpOneMatrix(4);;
   matrix D[4][4];
@@ -451,7 +451,7 @@ EXAMPLE: example Qsl3; shows examples
   ring @@@rrr=(0, q), (f12, f13, f23, k1, k2, l1, l2, e12, e13, e23), wp(2, 3, 2, 1, 1, 1, 1, 2, 3, 2);
   if (@p >1)
   {
-    minpoly = RootOfUnity(@p);
+    minpoly = rootofUnity(@p);
   }
   int @n = nvars(@@@rrr);
   matrix C = UpOneMatrix(@n);
@@ -527,18 +527,19 @@ example
 }
 
 proc GKZsystem(intmat A, string sord, string alg, list #)
-"USAGE:   GKZsystem(A, sord, alg, [,v]), where
-@*        A    is an intmat, defining the system,
-@*        sord is a string with desired term ordering,
-@*        alg  is a string, saying which algorithm to use (exactly like in toric_lib),
-@*        v    is an optional intvec.
-PURPOSE: compute the ring and the GKZ system of equations in it
-RETURN:  ring (moreover, the ideal GKZid with equations is exported in it)
-NOTE:    you have to activate the ring with the 'setring' command;
-the procedure is elaborated by Oleksandr Yena
-OVERVIEW: this procedure uses toric_lib and therefore inherits its input requirements:
-@*        possible values for input variable 'alg' are: \"ect\",\"pt\",\"blr\", \"hs\", \"du\".
-@*        As for the term ordering, it should be a string in Singular format like \"lp\",\"dp\", etc. @*        Please consult with the toric_lib for allowed orderings and more details.
+"USAGE:   GKZsystem(A, sord, alg, [,v]); A intmat, sord, alg string, v intvec
+RETURN:  ring
+PURPOSE: define a ring (Weyl algebra) and create a Gelfand-Kapranov-Zelevinsky (GKZ) system of equations in a ring from the following data:
+@*        @code{A}    is an intmat, defining the system,
+@*        @code{sord} is a string with desired term ordering,
+@*        @code{alg}  is a string, saying which algorithm to use (exactly like in toric_lib),
+@*        @code{v}    is an optional intvec.
+@* In addition, the ideal called @code{GKZid} containing actual equations is calculated and exported to the ring.
+NOTE:    activate the ring with the \"setring\" command. This procedure is elaborated by Oleksandr Yena
+ASSUME: This procedure uses toric_lib and therefore inherits its input requirements:
+@*        possible values for input variable @code{alg} are: \"ect\",\"pt\",\"blr\", \"hs\", \"du\".
+@*        As for the term ordering, it should be a string @code{sord} in Singular format like \"lp\",\"dp\", etc. 
+@*        Please consult the toric_lib for allowed orderings and more details.
 SEE ALSO: toric_lib
 EXAMPLE: example GKZsystem; shows examples
 "{
@@ -596,5 +597,4 @@ example
   setring D2;
   print(GKZid);
 }
-
 ///////////////////////////////////////////////////////////////////////////////

@@ -1,4 +1,4 @@
-version="$Id: qmatrix.lib,v 1.11 2005-05-09 10:31:30 levandov Exp $";
+version="$Id: qmatrix.lib,v 1.12 2005-05-18 18:09:12 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: qmatrix.lib     Quantum matrices, quantum minors and symmetric groups
@@ -17,8 +17,8 @@ LengthSymElement(v);        calculates the length of the element v of S(n)
 LengthSym(M);               calculates the length of each element of M, being M a subset of S(n)
 ";
 
-LIB "ncalg.lib";
-LIB "nctools.lib";
+LIB "ncalg.lib"; 
+LIB "nctools.lib";  // for rootofUnity
 ///////////////////////////////////////////////////////////////////////////////
 
 proc SymGroup(int n)
@@ -139,7 +139,7 @@ proc quantMat(int n, list #)
 RETURN:  ring (of quantum matrices). If p is specified, the quantum parameter q
 @*       will be specialized at the p-th root of unity
 PURPOSE: compute the quantum matrix ring of order n
-NOTE:    activate this ring with the 'setring' command.
+NOTE:    activate this ring with the \"setring\" command.
 @*       The usual representation of the variables in this quantum
 @*       algebra is not used because double indexes are not allowed
 @*       in the variables. Instead the variables are listed by reading
@@ -165,7 +165,7 @@ EXAMPLE: example quantMat; shows examples
       }
     }
     ring @rrr=(0,q),(y(1..nv)),Dp;
-    minpoly = RootOfUnity(chr);
+    minpoly = rootofUnity(chr);
     matrix C[nv][nv]=0;
     matrix D[nv][nv]=0;
     intvec idyi, idyj;

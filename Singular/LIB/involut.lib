@@ -1,4 +1,4 @@
-version="$Id: involut.lib,v 1.5 2005-05-10 17:31:26 levandov Exp $";
+version="$Id: involut.lib,v 1.6 2005-05-18 18:09:11 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY:  involution.lib  Procedures for Computations and Operations with Involutions
@@ -16,11 +16,11 @@ NOTE: This library provides algebraic tools for computations and operations
 with algebraic involutions and linear automorphisms of noncommutative algebras
 
 PROCEDURES:
-find_invo();          describes a variety of linear involutions on a basering;
-find_invo_diag();     describes a variety of homothetic (diagonal) involutions on a basering;
-find_auto();          describes a variety of linear automorphisms of a basering;
-ncdetection();  computes an ideal, presenting an involution map on some particular noncommutative algebras;
-involution(m, map theta);  applies the involution to an object.
+findInvo();          computes linear involutions on a basering;
+findInvoDiag();     computes homothetic (diagonal) involutions on a basering;
+findAuto();          computes linear automorphisms of a basering;
+ncdetection();        computes an ideal, presenting an involution map on some particular noncommutative algebras;
+involution(m,theta);  applies the involution to an object.
 ";
 
 LIB "ncalg.lib";
@@ -48,7 +48,7 @@ EXAMPLE: example ncdetection; shows an example
   setring r;
   int i,j,k,LExp;
   int NVars  = nvars(r);
-  matrix rel = NCRelations(r)[2];
+  matrix rel = ncRelations(r)[2];
   intmat M[NVars][3];
   int NRows = nrows(rel);
   intvec v,w;
@@ -364,7 +364,8 @@ static proc new_var()
 
   int NVars=nvars(basering);
   int i,j;
-  string s="@_1_1";
+  //  string s="@_1_1";
+  string s="a11";
   for(i=1; i<=NVars; i++)
   {
     for(j=1; j<=NVars; j++)
@@ -380,7 +381,8 @@ static proc new_var()
 
 static proc NVAR(int i, int j)
 {
-  return("@_"+string(i)+"_"+string(j));
+  //  return("@_"+string(i)+"_"+string(j));
+  return("a"+string(i)+string(j));
 };
 ///////////////////////////////////////////////////////////////////////////////////
 static proc new_var_special()
@@ -388,7 +390,8 @@ static proc new_var_special()
 {
   int NVars=nvars(basering);
   int i;
-  string s="@_1_1";
+  //  string s="@_1_1";
+  string s="a11";
   for(i=2; i<=NVars; i++)
   {
     s = s+ ","+NVAR(i,i);
@@ -413,18 +416,17 @@ static proc RelMatr()
   return(Rel);
 };
 /////////////////////////////////////////////////////////////////
-proc find_invo()
-"USAGE: find_invo();
+proc findInvo()
+"USAGE: findInvo();
 RETURN: a ring containing a list L of pairs, where
 @*        L[i][1]  =  Groebner Basis of an i-th associated prime,
 @*        L[i][2]  =  matrix, defining a linear map, with entries, reduced with respect to L[i][1]
-
 PURPOSE: computed the ideal of linear involutions of the basering
-
 NOTE: for convenience, the full ideal of relations @code{idJ}
-and the initial matrix with indeterminates @code{matD} are exported in the output ring.
-EXAMPLE: example find_invo; shows examples
-SEE ALSO: find_invo_diag, involution
+and the initial matrix with indeterminates @code{matD} are exported in the output ring
+SEE ALSO: findInvoDiag, involution
+EXAMPLE: example findInvo; shows examples
+
 "{
   def @B    = basering; //save the name of basering
   int NVars = nvars(@B); //number of variables in basering
@@ -532,27 +534,26 @@ SEE ALSO: find_invo_diag, involution
 }
 example
 { "EXAMPLE:"; echo = 2;
- def a = CreateWeyl(1);
+ def a = makeWeyl(1);
  setring a; // this algebra is a first Weyl algebra
- def X = find_invo();
- setring X; // ring with new variables, corresponding to unknown coefficients
+ def X = findInvo();
+ setring X; // ring with new variables, corr. to unknown coefficients
  L;
- print(L[1][2]);  // L[i][2] is a matrix in new variables, defining the linear involution
+ // look at the matrix in the new variables, defining the linear involution
+ print(L[1][2]);
  L[1][1];  // where new variables obey these relations
 }
 ///////////////////////////////////////////////////////////////////////////
-proc find_invo_diag()
-"USAGE: find_invo_diag();
+proc findInvoDiag()
+"USAGE: findInvoDiag();
 RETURN: a ring together with a list of pairs L, where
 @*        L[i][1]  =  Groebner Basis of an i-th associated prime,
 @*        L[i][2]  =  matrix, defining a linear map, with entries, reduced with respect to L[i][1]
-
 PURPOSE: compute the ideal of homothetic (diagonal) involutions of the basering
-
 NOTE: for convenience, the full ideal of relations @code{idJ}
-and the initial matrix with indeterminates @code{matD} are exported in the output ring.
-EXAMPLE: example find_invo_diag; shows examples
-SEE ALSO: find_invo, involution
+and the initial matrix with indeterminates @code{matD} are exported in the output ring
+SEE ALSO: findInvo, involution
+EXAMPLE: example findInvoDiag; shows examples
 "{
   def @B    = basering; //save the name of basering
   int NVars = nvars(@B); //number of variables in basering
@@ -661,27 +662,26 @@ SEE ALSO: find_invo, involution
 }
 example
 { "EXAMPLE:"; echo = 2;
- def a = CreateWeyl(1);
+ def a = makeWeyl(1);
  setring a; // this algebra is a first Weyl algebra
- def X = find_invo_diag();
+ def X = findInvoDiag();
  setring X; // ring with new variables, corresponding to unknown coefficients
- print(L[1][2]);  // a first matrix, defining the linear involution: we see it is constant
+ // print matrices, defining linear involutions
+ print(L[1][2]);  // a first matrix: we see it is constant
  print(L[2][2]);  // and a second possible matrix; it is constant too
  L; // let us take a look on the whole list
 }
 /////////////////////////////////////////////////////////////////////
-proc find_auto()
-"USAGE: find_auto();
+proc findAuto()
+"USAGE: findAuto();
 RETURN: a ring together with a list of pairs L, where
 @*        L[i][1]  =  Groebner Basis of an i-th associated prime,
 @*        L[i][2]  =  matrix, defining a linear map, with entries, reduced with respect to L[i][1]
-
 PURPOSE: computes the ideal of linear automorphisms of the basering
-
 NOTE: for convenience, the full ideal of relations @code{idJ}
-and the initial matrix with indeterminates @code{matD} are exported in the output ring.
-EXAMPLE: example find_auto; shows examples
-SEE ALSO: find_invo
+and the initial matrix with indeterminates @code{matD} are exported in the output ring
+SEE ALSO: findInvo
+EXAMPLE: example findAuto; shows examples
 "{
   def @B    = basering; //save the name of basering
   int NVars = nvars(@B); //number of variables in basering
@@ -789,11 +789,12 @@ SEE ALSO: find_invo
 }
 example
 { "EXAMPLE:"; echo = 2;
- def a = CreateWeyl(1);
+ def a = makeWeyl(1);
  setring a; // this algebra is a first Weyl algebra
- def X = find_auto();
- setring X; // ring with new variables, corresponding to unknown coefficients
- print(L[1][2]);  // a first matrix, defining the linear automorphism : we see it is constant
+ def X = findAuto();
+ setring X; // ring with new variables - unknown coefficients
+ // look at matrices, defining linear automorphisms:
+ print(L[1][2]);  // a first one: we see it is constant
  print(L[2][2]);  // and a second possible matrix; it is constant too
  L; // let us take a look on the whole list
 }
