@@ -1,4 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
+version="$Id: sheafcoh.lib,v 1.2 2005-05-18 11:21:56 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  sheafcoh.lib   Procedures for Computing Sheaf Cohomology
