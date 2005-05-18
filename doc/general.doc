@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.201 2005-05-17 06:48:28 anne Exp $
+@comment $Id: general.doc,v 1.202 2005-05-18 09:13:25 anne Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -3487,7 +3487,7 @@ Names of procedures should not be shorter than 4 characters and should
 not contain any special characters, in particular the use of @code{_}
 in names of procedures is discourraged. If the name of the procedure is
 composed of more than one word, each new word should start with a 
-capital letter, all other letter should be lower case. 
+capital letter, all other letters should be lower case. 
 
 @item
 No procedures should be defined within the body of another procedure.
