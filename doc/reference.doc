@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.256 2005-05-18 18:00:36 Singular Exp $
+@comment $Id: reference.doc,v 1.257 2005-05-19 14:45:59 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -5280,47 +5280,53 @@ list
 @item @strong{Purpose:}
 decomposes a ring/qring into a list of 4 (or 6 in the noncommutative case)
 components:
-@itemize
+@enumerate
 @item
-the field descriptions in one of the following variants:
+the field description in the following format:
   @itemize
-  @item Q, Z/p:
+  @item for Q, Z/p:
   the characteristic, type int (0 or prime number)
-  @item real, complex:
+  @item for real, complex:
   a list of:@*
   the characteristic, type int (always 0)@*
   the precision, type list (2 integers: external, internal precision)@*
   the name of the imaginary unit, type string
-  @item transcendental or algebraic extensions:
-  described as a ringlist
+  @item for transcendental or algebraic extensions:
+  described as a ringlist (that is, as list L with 4 entries:
+  L[1] the characteristic, L[2] the names of the parameters, L[3] the monomial
+  ordering for the ring of parameters (default: lp), L[4] the minimal
+  polynomial (as ideal))
   @end itemize
 @item
-the variable names (a list of strings)
+the names of the variables (a list L of strings: L[i] is the name of the i-th
+variable)
 @item
-the ordering (a list of lists)
+the monomial ordering (a list L of lists): each block L[i] consists of
 @itemize
 @item
-ordering as string
+the name of the ordering ( string )
 @item
-parameter to the ordering (int or intvec)
+parameters specifying the ordering and the size of the block ( intvec : typically the weights for the variables [default: 1] )
 @end itemize
 @item
 the quotient ideal.
-@end itemize
+@end enumerate
 @item @strong{Example:}
 @smallexample
 @c example
- ring r = 0,(x,y),dp;
+ ring r = 0,(x(1..3)),dp;
  list l = ringlist(r);
  l;
  //  Now change l and create a new ring, by
  //- changing the base field to the function field with parameter a, 
- //- introducing one extra variable z, 
- //- defining the weighted ordering wp(2,3,4).
+ //- introducing one extra variable y, 
+ //- defining the block ordering (dp(2),wp(3,4)).
  //- define the minpoly after creating the function field 
  l[1]=list(0,list("a"),list(list("lp",1)),ideal(0));
- l[2][size(l[2])+1]="z";
- l[3][1]=list("wp",intvec(2,3,4));
+ l[2][size(l[2])+1]="y";
+ l[3][3]=l[3][2]; // save the module ordering
+ l[3][1]=list("dp",intvec(1,1));
+ l[3][2]=list("wp",intvec(3,4));
  def ra = ring(l);     //creates the newring
  ra; setring ra;
  list lra = ringlist(ra);

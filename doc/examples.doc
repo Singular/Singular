@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.83 2005-05-18 20:50:33 levandov Exp $
+@comment $Id: examples.doc,v 1.84 2005-05-19 14:45:58 Singular Exp $
 @comment this file contains the examples
 
 @c The following directives are necessary for proper compilation
@@ -1760,10 +1760,10 @@ for some ideal @math{i} and with an extra option.
   ideal  i = x2y,y2z,z3x;
   module E = Ext_R(2,i);
   print(E);
-  // if a 3-rd argument is given (of any type)
+  // if a 3-rd argument of type int is given,
   // a list of Ext^k(R/i,R), a SB of Ext^k(R/i,R) and a vector space basis
   // is returned:
-  list LE = Ext_R(3,i,"");
+  list LE = Ext_R(3,i,0);
   LE;
   print(LE[2]);
   print(kbase(LE[2]));
