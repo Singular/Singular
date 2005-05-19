@@ -1,0 +1,620 @@
+//////////////////////////////////////////////////////////////////////////////
+category="Commutative Algebra";
+info="
+LIBRARY:  SAGBI.lib  Compute Subalgebras bases Analogous to Groebner bases for ideals
+AUTHORS: Gerhard Pfister,        pfister@mathematik.uni-kl.de,
+@*       Anen Lakhal,            alakhal@mathematik.uni-kl.de
+PROCEDURES:
+ proc reduction(p,I); Perform one step subalgebra reducton (for short S-reduction) of p w.r.t I
+ proc S_poly(I);      Compute the S-polynomilas of the Subalgebra defined by the genartors of I
+ proc S_nf(id,I);     Perform iterated S-reductions in order to compute Subalgebras normal forms
+ proc Sagbi(I);       Construct SAGBI basis for the Subalgebra defined by I
+ proc Sagbi1(I);      Construct partial SAGBI basis for the Subalgebra defined by I
+";
+
+ LIB "algebra.lib";
+ LIB "elim.lib";
+
+///////////////////////////////////////////////////////////////////////////////
+proc S_poly(id ,list #)
+"USAGE: S_poly(id [,n]); id ideal, n positive integer.
+RETURN: an ideal
+@format
+      - If (n=0 or default) an ideal, whose generators are the S-polynomials.
+      - If (n=1) a  list of size 2:
+        the first element of this list is the ideal of S-polynomials.
+        the second element of this list is the ring in which is defined
+        the ideal of algebraic relations.
+@end format
+EXAMPLE: example S_poly; show an example "
+
+{
+  if(size(#)==0)
+    {
+      #[1]=0;
+    }
+  degBound=0;
+  def bsr=basering;
+  ideal vars=maxideal(1);
+  ideal B=ideal(bsr);//when the basering is quotient ring this "type casting"
+                    //gives th quotient ideal.
+  int b=size(B);
+
+
+  //In quotient rings,SINGULAR does not reduce polynomials w.r.t the
+  //quotient ideal,therefore we should first 'reduce';if it is necessary for
+  //computations to have a uniquely determined representant for each equivalent
+  //class,which is the case of this procedure.
+
+  if(b!=0)
+    {
+      id =reduce(id,std(0));
+    }
+  int n,m=nvars(bsr),ncols(id);
+  int z;
+  string mp=string(minpoly);
+  ideal P;
+  list L;
+
+  if(id==0)
+    {
+      if(#[1]==0)
+        {
+          return(P);
+        }
+      else
+        {
+          return(L);
+        }
+    }
+
+  else
+
+    {
+    //==================create anew ring with extra variables================
+
+      execute("ring R1="+charstr(bsr)+",("+varstr(bsr)+",y(1..m)),(dp(n),dp(m));");
+      execute("minpoly=number("+mp+");");
+      ideal id=imap(bsr,id);
+      ideal A;
+
+      for(z=1;z<=m;z++)
+        {
+          A[z]=lead(id[z])-y(z);
+        }
+
+      A=std(A);
+      ideal kern=nselect(A,1,n);// "kern" is the kernel of the ring map:
+                           // R1----->bsr ;y(z)----> lead(id[z]).
+                          //"kern" is the ideal of algebraic relations between
+                         // lead(id[z]).
+
+      export kern,A;// we export:* the ideal A  to avoid useless computations
+               //                  betwee 2 steps in Sagbi procedure.
+              //                 *the ideal kern : some times we can get intresting
+             //                    informations from this ideal.
+
+      setring bsr;
+      map phi=R1,vars,id;
+
+      // the S_polynomials are the image by phi of the generators of kern
+
+      P=simplify(phi(kern),1);
+      if(#[1]==0)
+        {
+          return(P);
+        }
+      else
+        {
+          L=P,R1;
+          kill phi,vars;
+
+                 dbprint(printlevel-voice+3,"
+// 'S_poly' created a ring as 2nd element of the list.
+// The ring contains the ideal 'kern'  of algebraic relations between the
+//leading terms of the generators of I.
+// To access to this ring and see 'kern' you should give the ring a name,
+// e.g.:
+               def S = L[2]; setring S; kern;
+        ");
+                 return(L);
+        }
+
+    }
+}
+example
+{ "EXAMPLE:"; echo = 2;
+ ring r=0, (x,y),dp;
+ poly f1,f2,f3,f4=x2,y2,xy+y,2xy2;
+ ideal I=f1,f2,f3,f4;
+ S_poly(I);
+ list L=S_poly(I,1);
+ L[1];
+ def S= L[2]; setring S; kern;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+static proc std1(ideal J,ideal I,list #)
+
+  // I is contained in J, and it is assumed to be a standard bases!
+  //This procedure computes a Standard basis for J from I one's
+  //This procedure is essential for Spoly1 procedure.
+{
+  def br=basering;
+  int tt;
+  ideal Res,@result;
+
+
+  if(size(#)>0)
+    {tt=#[1];}
+
+  if(size(I)==0)
+    {@result=std(J);}
+
+  if((size(I)!=0) && (size(J)-size(I)>=1))
+    {
+
+      qring Q=I;
+      ideal J=fetch(br,J);
+      J=std(J);
+      setring br;
+      Res=fetch(Q,J);// Res contains the generators that we add to I
+                      //to get the generators of std(J);
+      @result=Res+I;
+
+    }
+
+  if(tt==0)
+    {return(@result);}
+  else
+    {return(Res);}
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+static proc Spoly1(list l,ideal I,ideal J,int a)
+  //an implementation of SAGBI construction Algorithm using Spoly
+  //procedure leads to useless computations and affect the efficiency
+  //of SAGBI bases computations. This procedure is a variant of Spoly
+  //in order to avoid these useless compuations.
+{
+  degBound=0;
+  def br=basering;
+  ideal vars=maxideal(1);
+  ideal B=ideal(br);
+  int b=size(B);
+
+  if(b!=0)
+    {
+      I=reduce(I,std(0));
+      J=reduce(J,std(0));
+    }
+
+
+  int n,ii,jj=nvars(br),ncols(I),ncols(J);
+  int z;
+  list @L;
+  string mp =string(minpoly);
+
+  if(size(J)==0)
+    {
+      @L =S_poly(I,1);
+    }
+  else
+    {
+      ideal @sum=I+J;
+      ideal P1;
+      ideal P=l[1];//P is the ideal of spolynomials of I;
+      def R=l[2];setring R;int kk=nvars(R);
+      ideal J=fetch(br,J);
+
+
+
+      //================create a new ring with extra variables==============
+
+      execute("ring R1="+charstr(R)+",("+varstr(R)+",y((ii+1)..(ii+jj))),(dp(n),dp(kk+jj-n));");
+      ideal kern1;
+      ideal A=fetch(R,A);
+      attrib(A,"isSB",1);
+      ideal J=fetch(R,J);
+      ideal kern=fetch(R,kern);
+      ideal A1;
+      for(z=1;z<=jj;z++)
+        {
+          A1[z]=lead(J[z])-var(z+kk);
+        }
+      A1=A+A1;
+      ideal @Res=std1(A1,A,1);//the generators of @Res are whose we have to add
+                             //to A to get std(A1).
+      A=A+@Res;
+      kern1=nselect(@Res,1,n);
+      kern=kern+kern1;
+      export kern,kern1,A;
+      setring br;
+      map phi=R1,vars,@sum;
+      P1=simplify(phi(kern1),1);//P1 is th ideal we add to P to get the ideal
+                                //of Spolynomials of @sum.
+      P=P+P1;
+
+      if (a==1)
+        {
+          @L=P,R1;
+          kill phi,vars;
+          dbprint(printlevel-voice+3,"
+// 'Spoly1' created a ring as 2nd element of the list.
+// The ring contains the ideal 'kern'  of algebraic relations between the
+//generators of I+J.
+// To access to this ring and see 'kern' you should give the ring a name,
+// e.g.:
+               def @ring = L[2]; setring @ring ; kern;
+        ");
+        }
+      if(a==2)
+        {
+          @L=P1,R1;
+          kill phi,vars;
+        }
+    }
+
+  return(@L);
+
+
+
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc reduction(poly p,ideal dom,list #)//one step Subalgebra reduction
+
+"USAGE: reduction(p,dom[,n]); p poly , dom  ideal
+RETURN: a polynomial
+@format
+    Three Algorthim  variants  are used to perform Subalgebra reduction.
+    The positive interger n determine which variant should be used.
+    n may take the values (0 or default),1 or 2.
+@end format
+EXAMPLE: reduction; show an example"
+
+{
+  def bsr=basering;
+  ideal B=ideal(bsr);//When the basering is quotient ring  this type casting
+                     // gives the quotient ideal.
+  int b=size(B);
+  int n=nvars(bsr);
+
+  //In quotient rings, SINGULAR, usually does not reduce polynomials w.r.t the
+  //quotient ideal,therefore we should first  reduce ,when it is necessary for computations,
+  // to have a uniquely determined representant for each equivalent
+  //class,which is the case of this algorithm.
+
+
+
+  if(b !=0) //means that the basering is a quotient ring
+    {
+      p=reduce(p,std(0));
+      dom=reduce(dom,std(0));
+    }
+
+  int i,choose;
+  int z=ncols(dom);
+
+  if((size(#)>0) && (typeof(#[1])=="int"))
+    {
+      choose = #[1];
+    }
+  if (size(#)>1)
+    {
+      choose =#[2];
+    }
+
+
+
+  //=======================first algorithm(default)=========================
+   if ( choose == 0 )
+  {
+     list L = algebra_containment(lead(p),lead(dom),1);
+     if( L[1]==1 )
+     {
+  // the ring L[2] = char(bsr),(x(1..nvars(bsr)),y(1..z)),(dp(n),dp(m)),
+  // contains poly check s.t. LT(p) is of the form check(LT(f1),...,LT(fr))
+       def s1 = L[2];
+       map psi = s1,maxideal(1),dom;
+       poly re = p - psi(check);
+       // divide by the maximal power of #[1]
+          if ( (size(#)>0) && (typeof(#[1])=="poly") )
+
+            {  while ((re!=0) && (re!=#[1]) &&(subst(re,#[1],0)==0))
+             {
+               re=re/#[1];
+             }
+            }
+          return(re);
+     }
+  return(p);
+  }
+   //======================2end variant of algorithm=========================
+   //It uses two different commands for elimaination.
+   //if(choose==1):"elimainate"command.
+   //if (choose==2):"nselect" command.
+   else
+      {
+        poly v=product(maxideal(1));
+
+  //------------- change the basering bsr to bsr[@(0),...,@(z)] ----------
+  execute("ring s="+charstr(basering)+",("+varstr(basering)+",@(0..z)),dp;");
+// Ev hier die Reihenfolge der Vars aendern. Dazu muss unten aber entsprechend
+// geaendert werden:
+//  execute("ring s="+charstr(basering)+",(@(0..z),"+varstr(basering)+"),dp;");
+
+  //constructs the leading ideal of dom=(p-@(0),dom[1]-@(1),...,dom[z]-@(z))
+     ideal dom=imap(bsr,dom);
+     for (i=1;i<=z;i++)
+     {
+        dom[i]=lead(dom[i])-var(nvars(bsr)+i+1);
+     }
+     dom=lead(imap(bsr,p))-@(0),dom;
+
+      //---------- eliminate the variables of the basering bsr --------------
+  //i.e. computes dom intersected with K[@(0),...,@(z)].
+
+     if(choose==1)
+       {
+         ideal kern=eliminate(dom,imap(bsr,v));//eliminate does not need a
+                                              //standard basis as input.
+       }
+     if(choose==2)
+       {
+         ideal kern= nselect(std(dom),1,n);//"nselect" is combinatorial command
+                                         //which uses the internal command
+                                        // "simplify"
+       }
+
+  //---------  test wether @(0)-h(@(1),...,@(z)) is in ker ---------------
+  // for some poly h and divide by maximal power of q=#[1]
+     poly h;
+     z=size(kern);
+     for (i=1;i<=z;i++)
+     {
+        h=kern[i]/@(0);
+        if (deg(h)==0)
+        {  h=(1/h)*kern[i];
+        // define the map psi : s ---> bsr defined by @(i) ---> p,dom[i]
+           setring bsr;
+           map psi=s,maxideal(1),p,dom;
+           poly re=psi(h);
+           // divide by the maximal power of #[1]
+           if ((size(#)>0) && (typeof(#[1])== "poly") )
+           {  while ((re!=0) && (re!=#[1]) &&(subst(re,#[1],0)==0))
+              {  re=re/#[1];
+              }
+           }
+           return(re);
+        }
+     }
+     setring bsr;
+     return(p);
+  }
+
+
+}
+example
+{"EXAMPLE:"; echo = 2;
+  ring r= 0,(x,y),dp;
+  ideal dom =x2,y2,xy-y;
+  poly p=x4+x3y+xy2-y2;
+  reduction(p,dom);
+  reduction(p,dom,1);
+  reduction(p,dom,2);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+static proc completeReduction(poly p,ideal dom,list#)//reduction
+
+{
+  poly p1=p;
+  poly p2=reduction(p,dom,#);
+  while (p1!=p2)
+  {
+    p1=p2;
+    p2=reduction(p1,dom,#);
+  }
+  return(p2);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+ static proc completeReduction1(poly p,ideal dom,list #) //tail reduction
+{
+  poly p1,p2,re;
+  p1=p;
+  while(p1!=0)
+    {
+      p2=reduction(p1,dom,#);
+      if(p2!=p1)
+        {
+          p1=p2;
+        }
+      else
+        {
+          re=re+lead(p2);
+          p1=p2-lead(p2);
+        }
+    }
+  return(re);
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc S_nf(id,ideal dom,int k,list#)
+"USAGE: S_nf(id,dom,k[,n]); id either poly or ideal,dom ideal, k and n positive intergers.
+RETURN: depends On the type of id; ideal or polynomial.
+@format
+    The integer k determine waht kind of s-reduction is performad:
+    - if (k=0) no tail s-reduction is performaed.
+    - if (k=1) tail s-reduction is perofrmed.
+    Three Algorthim  variants  are used to perform Subalgebra reduction.
+    The positive integer n determine which variant should be used.
+    n may take the values (0 or default),1 or 2.
+@end format
+NOTE: computation of Subalgebras normal forms may be performed either
+      in polynomial rings or quotient polynomial rings
+EXAMPLE: example S_nf; show example "
+
+{
+  int z;
+  ideal Red;
+  poly re;
+  if(typeof(id)=="ideal")
+    {
+      int i=ncols(id);
+      for(z=1;z<=i;z++)
+    {
+      if(k==0)
+        {
+
+          id[z]=completeReduction(id[z],dom,#);
+        }
+      else
+        {
+          id[z]=completeReduction1(id[z],dom,#);//tail reduction.
+        }
+    }
+  Red=simplify(id,7);
+  return(Red);
+    }
+  if(typeof(id)=="poly")
+    {
+      if(k==0)
+        {
+          re=completeReduction(id,dom,#);
+        }
+      else
+        {
+          re=completeReduction1(id,dom,#);
+        }
+      return(re);
+    }
+}
+example
+{"EXAMPLE:"; echo = 2;
+ ring r=0,(x,y),dp;
+ ideal I x2-xy;
+ qring Q=std(I);
+ ideal dom =x2,x2y+y,x3y2;
+ poly p=x4+x2y+y;
+ S_nf(p,dom,0);
+ S_nf(p,dom,1);// tail subalgebra reduction is perofrmed
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+static proc intRed(id,int k, list #)
+{
+  int i,z;
+  ideal Rest,intRed;
+  z=ncols(id);
+  for(i=1;i<=z;i++)
+    {
+      Rest=id;
+      Rest[i]=0;
+      Rest=simplify(Rest,2);
+      if(k==0)
+        {
+          intRed[i]=completeReduction(id[i],Rest,#);
+        }
+      else
+        {
+          intRed[i]=completeReduction1(id[i],Rest,#);
+        }
+    }
+  intRed=simplify(intRed,7);//1+2+4 in simplify command
+  return(intRed);
+
+}
+//////////////////////////////////////////////////////////////////////////////
+
+proc Sagbi(id,int k,list#)
+"USAGE: Sagbi(id,k[,n]); id ideal, k and n positive integer.
+RETURN: A SAGBI basis for the subalgebra defined by the generators of id.
+@format
+    k determine waht kind of s-reduction is performad:
+     - if (k=0) no tail s-reduction is performaed.
+     - if (k=1) tail s-reduction is perofrmed, and S-intereduced SAGBI basis
+       is returned.
+    Three Algorthim  variants  are used to perform Subalgebra reduction.
+    The positive interger n determine which variant should be used.
+    n may take the values (0 or default),1 or 2.
+@end format
+NOTE: SAGBI bases computations may be performed either
+      in polynomial rings or quotient polynomial rings.
+EXAMPLE: example Sagbi; show example "
+
+{
+  degBound=0;
+  ideal S,oldS,Red;
+  list L;
+  S=intRed(id,k,#);
+  while(size(S)!=size(oldS))
+    {
+      L=Spoly1(L,S,Red,2);
+      Red=L[1];
+      Red=S_nf(Red,S,k,#);
+      oldS=S;
+      S=S+Red;
+    }
+  return(S);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+ ring r= 0,(x,y),dp;
+ ideal I=x2,y2,xy+y;
+ Sagbi(I,1,1);
+}
+///////////////////////////////////////////////////////////////////////////////
+proc Sagbi1(id,int k,int c,list #)
+"USAGE: Sagbi(id,k,c[,n]); id ideal, k, c and n positive integer.
+RETURN: A partial SAGBI basis for the subalgebra defined by the genrators of id.
+@format
+     should stop.k determine waht kind of s-reduction is performad:
+     - if (k=0) no tail s-reduction is performaed.
+     - if (k=1) tail s-reduction is perofrmed, and S-intereduced SAGBI basis
+      is returned.
+     c  determine; after which turn Sagbi basis computations should stop
+     Three Algorthim  variants  are used to perform Subalgebra reduction.
+     The positive interger n determine which variant should be used.
+     n may take the values (0 or default),1 or 2.
+@end format
+NOTE:- SAGBI bases computations may be performed either
+       in polynomial rings or quotient polynomial rings.
+     - This version of Sagbi procedure is interesting in the case of an Subalgebras
+       with infinte SAGBI basis. In this case, by means of this procedure,
+       we may check for example, if the elements of this basis have a particular form.
+EXAMPLE: example Sagbi1; show example "
+
+{
+  degBound=0;
+  ideal S,oldS,Red;
+  int counter;
+  list L;
+  S=intRed(id,k,#);
+  while((size(S)!=size(oldS))&&(counter<=c))
+    {
+      L=Spoly1(L,S,Red,2);
+      Red=L[1];
+      Red=S_nf(Red,S,k,#);
+      oldS=S;
+      S=S+Red;
+      counter=counter+1;
+    }
+  return(S);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+ ring r= 0,(x,y),dp;
+ ideal I=x,xy-y2,xy2;//the corresponding Subalgebra has an infinte SAGBI basis
+ Sagbi1(I,1,3)// computations should stop after 3 turns.
+}
+//////////////////////////////////////////////////////////////////////////////
+
