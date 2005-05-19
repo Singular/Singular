@@ -18,10 +18,10 @@
   ideal  i = x2y,y2z,z3x;
   module E = Ext_R(2,i);
   print(E);
-  // if a 3-rd argument is given (of any type)
+  // if a 3-rd argument is given (of type int)
   // a list of Ext^k(R/i,R), a SB of Ext^k(R/i,R) and a vector space basis
   // is returned:
-  list LE = Ext_R(3,i,"");
+  list LE = Ext_R(3,i,0);
   LE;
   print(LE[2]);
   print(kbase(LE[2]));
