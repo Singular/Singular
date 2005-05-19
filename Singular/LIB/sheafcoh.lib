@@ -1,5 +1,5 @@
 S///////////////////////////////////////////////////////////////////////////////
-version="$Id: sheafcoh.lib,v 1.4 2005-05-19 08:14:51 Singular Exp $";
+version="$Id: sheafcoh.lib,v 1.5 2005-05-19 13:32:35 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  sheafcoh.lib   Procedures for Computing Sheaf Cohomology
@@ -382,7 +382,7 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc sheafCoh(module M,int l,int h)
+proc sheafCoh(module M,int l,int h,list #)
 "USAGE:   sheafCoh(M,l,h);    M module, l,h int 
 ASSUME:  @code{M} is graded and is either 0 or comes assigned with an 
          admissible degree vector as an attribute, @code{h>=l}. The basering 
@@ -404,14 +404,21 @@ DISPLAY: The intmat is displayed in a diagram of the following form: @*
          A @code{'-'} in the diagram refers to a zero entry.
 NOTE:    The procedure is based on local duality as described in [Eisenbud:
          Computing cohomology. In Vasconcelos: Computational methods in
-         commutative algebra and algebraic geometry. Springer (1998)].
+         commutative algebra and algebraic geometry. Springer (1998)].@*
+         By default, the procedure uses @code{mres} to compute the Ext
+         modules. If called with the additional parameter @code{\"sres\"},
+         the @code{sres} command is used instead.
 SEE ALSO: dimH, sheafCohBGG
 EXAMPLE: example sheafCoh; shows an example
 "
 {
+  int use_sres;
   if( typeof(attrib(M,"isHomog"))!="intvec" ) {
      if (size(M)==0) { attrib(M,"isHomog",0); }
      else { ERROR("No admissible degree vector assigned"); }
+  }
+  if (size(#)>0) {
+    if (#[1]=="sres") { use_sres=1; }
   }
   int i,j;
   module N,N0,N1;
@@ -419,7 +426,8 @@ EXAMPLE: example sheafCoh; shows an example
   intvec v=0..n+1;
   int col=h-l+1;
   intmat newBetti[n+1][col];
-  list L=Ext_R(v,M,1)[2];     // list of GB for Ext_R
+  if (use_sres) { list L=Ext_R(v,M,1,"sres")[2]; }
+  else          { list L=Ext_R(v,M,1)[2]; }
   for (i=l; i<=h; i++) {
     N0=L[n+2];    
     N1=L[n+1];
@@ -564,8 +572,12 @@ Examples:
  resolution FI = mres(I,0);
  print(betti(FI),"betti");
  module F=FI[2];
- def A1=sheafCoh(F,-6,6);
- def A2=sheafCohBGG(F,-6,6);
+ int t=timer; 
+ def A1=sheafCoh(F,-8,8);
+ timer-t;
+ t=timer;
+ def A2=sheafCohBGG(F,-8,8);
+ timer-t;
 
  LIB "sheafcoh.lib";
  LIB "random.lib";

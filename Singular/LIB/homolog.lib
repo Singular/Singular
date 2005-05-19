@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: homolog.lib,v 1.17 2005-05-18 15:59:37 Singular Exp $";
+version="$Id: homolog.lib,v 1.18 2005-05-19 13:32:35 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  homolog.lib   Procedures for Homological Algebra
@@ -464,8 +464,11 @@ RETURN:  - module Ext, a presentation of Ext^k(M',R) if v is of type int@*
 @end format
 DISPLAY: printlevel >=0: (affine) dimension of Ext^k for each k  (default)
          printlevel >=1: Ak, Ak+1 and kbase of Ext^k in Fk*
-NOTE:    In order to compute Ext^k(M,R) use the command Ext_R(k,syz(M));
-         If the attribute \"isHomog\" has been set for the input module, it 
+NOTE:    In order to compute Ext^k(M,R) use the command Ext_R(k,syz(M));@*
+         By default, the procedure uses the @code{mres} command. If called 
+         with the additional parameter @code{\"sres\"}, the @code{sres} command
+         is used instead.@*
+         If the attribute @code{\"isHomog\"} has been set for the input module, it 
          is also set for the returned module (accordingly). 
 EXAMPLE: example Ext_R; shows an example
 "
@@ -477,7 +480,8 @@ EXAMPLE: example Ext_R; shows an example
   int withWeight;
   intvec weightR,ww;
   if ( typeof(attrib(M,"isHomog"))!="string" )
-  {  
+  { 
+    weightR=attrib(M,"isHomog"); 
     withWeight=1;
   }
 
@@ -485,8 +489,9 @@ EXAMPLE: example Ext_R; shows an example
   module m1t,m1,m2,m2t,ret,ret0,ker;
   vector leadCol;
   matrix kb;
+  module G;
   list L1,L2,L3,L,K;
-  resolution resl,resm2;
+  resolution resm2;
   int j,k,max,ii,t1,t2,di,leadComp,shift;
   intvec A1,A2,A3;
   int s = size(v);
@@ -496,10 +501,14 @@ EXAMPLE: example Ext_R; shows an example
   // --------------- Variante mit sres
   for( ii=1; ii<=size(#); ii++ )
   {
-    t2=1; // return a list if t2=1
-    if ( (typeof(#[ii])=="string") and (withWeight==0) )
-    { // NOTE: at this writing, sres does not return weights
-      if ( #[ii]=="sres" ) { t1=1; t2=0; } // use sres instead of mres if t1=1
+    if (typeof(#[ii])=="int") { // return a list if t2=1
+      t2=1; 
+    }
+    else {
+      if (typeof(#[ii])=="string") { 
+        // NOTE: at this writing, sres does not return weights
+        if ( #[ii]=="sres" ) { t1=1; } // use sres instead of mres if t1=1
+      }
     }
   }
 
@@ -522,11 +531,33 @@ EXAMPLE: example Ext_R; shows an example
     else       { return( list(Out,Out,KBOut) ); }
   }
   if( t1==1 )
-  {
+  { // compute resolution via sres command
     if( attrib(M,"isSB")==0 ) { M=std(M); }
-    resl = sres(M,max+1);
+    list resl = sres(M,max+1);
+    if (withWeight) { 
+      // **** at this writing, sres does not return weights, we try to
+      // **** compute them via homog for each syzygy module  
+      attrib(resl,"isHomog",weightR);
+      G=resl[1];
+      attrib(G,"isHomog",weightR);
+      resl[1]=G;
+      for (j=2; j<=size(resl); j++) {
+        if (size(resl[j])!=0) {
+          ww=0;
+          for (k=1; k<=ncols(G); k++) {
+            leadCol = leadmonom(G[k]);
+            leadComp = nrows(leadCol);
+            ww[k] = deg(leadCol)+weightR[leadComp];
+          }
+          G=resl[j];
+          attrib(G,"isHomog",ww);
+          resl[j]=G;          
+          weightR=ww;
+        }
+      }
+    }
   }
-  else { resl = mres(M,max+1); }
+  else { resolution resl = mres(M,max+1); }
   for( ii=1; ii<=s; ii++ )
   {
 //-----------------  apply Hom(_,R) at k-th place -----------------------------
@@ -570,6 +601,7 @@ EXAMPLE: example Ext_R; shows an example
         for (j=1; j<=size(weightR); j++) { weightR[j]=weightR[j]+shift; }
         attrib(m2t,"isHomog",weightR);
         // --------------------------------------------------------------------
+        ww=0;
         for (j=1; j<=nrows(m2); j++) {
           leadCol = leadmonom(m2t[j]);
           leadComp = nrows(leadCol);
