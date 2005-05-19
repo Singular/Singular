@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: COPYING.texi,v 1.23 2005-05-11 16:56:21 Singular Exp $
+@comment $Id: COPYING.texi,v 1.24 2005-05-19 16:28:25 levandov Exp $
 @comment this file contains the copyright notice on Singular
 @ifclear VERSION
 @include version.texi
@@ -116,6 +116,7 @@ Sch@"onemann.
 
 Currently, the @sc{Singular} team has the following members:
 Michael Brickenstein,
+Wolfram Decker,
 Anne Fr@"uhbis-Kr@"uger,
 Kai Kr@"uger,
 Christoph Lossen,
@@ -124,6 +125,7 @@ Wilfred Pohl
 and
 Oliver Wienand.
 @cindex Brickenstein, Michael 
+@cindex Decker, Wolfram
 @cindex Fr@"uhbis-Kr@"uger, Anne
 @cindex Kr@"uger, Kai
 @cindex Lossen, Christoph
@@ -133,19 +135,19 @@ Oliver Wienand.
 
 Former members of the @sc{Singular} team are:
 Olaf Bachmann,
-Hubert Grassmann,
 Wolfgang Neumann,
 Jens Schmidt,
 Mathias Schulze,
+Thomas Siebert,
 R@"udiger Stobbe,
 Eric Westenberger
 and
 Tim Wichmann.
 @cindex Bachmann, Olaf
-@cindex Grassmann, Hubert
 @cindex Neumann, Wolfgang
 @cindex Schmidt, Jens
 @cindex Schulze, Mathias
+@cindex Siebert, Thomas
 @cindex Stobbe, R@"udiger
 @cindex Westenberger, Eric
 @cindex Wichmann, Tim
@@ -154,27 +156,31 @@ Further contributions to @sc{Singular} were made by:
 Thomas Bayer,
 Isabelle Bermejo,
 Markus Becker,
+Kai Dehmann,
+Alexander Dreyer,
 Stephan Endra@ss{},
-Jose Ignacio Farran Martin,
-Wolfram Decker,
+Jose Ignacio Farran,
 Vladimir Gerdt,
 Philippe Gimenez,
 Christian Gorzel,
-Fernando Hernando Carrillo,
+Hubert Grassmann,
+Fernando Hernando,
 Agnes Heydtmann,
 Dietmar Hillebrand,
 Tobias Hirsch,
 Thomas Keilen,
+Anen Lakhal,
 Martin Lamm,
-Francisco Javier Lobillo Borrero,
+Francisco Javier Lobillo,
 Bernd Martin,
 Michael Me@ss{}ollen,
+Andrea Mindnich,
 Oleksandr Motsak,
 Thomas N@"u@ss{}ler,
 Carlos Rabelo,
 Alfredo Sanchez-Navarro,
 Henrik Strohmayer,
-I. Sulandra,
+Imade Sulandra,
 Christine Theis,
 Enrique Tobis,
 Alberto Vigneron-Tenorio,
@@ -184,27 +190,31 @@ Oleksandr Yena.
 @cindex Bayer, Thomas
 @cindex Bermejo, Isabelle
 @cindex Becker, Markus 
+@cindex Dehmann, Kai
+@cindex Dreyer, Alexander
 @cindex Endra@ss{}, Stephan
-@cindex Farran Martin, Jose Ignacio
-@cindex Decker, Wolfram
+@cindex Farran, Jose Ignacio
 @cindex Gerdt, Vladimir 
 @cindex Gimenez, Philippe
 @cindex Gorzel, Christian
+@cindex Grassmann, Hubert
 @cindex Hernando, Fernando 
 @cindex Heydtmann, Agnes
 @cindex Hillebrand, Dietmar
 @cindex Hirsch, Tobias
 @cindex Keilen, Thomas
+@cindex Lakhal, Anen
 @cindex Lamm, Martin
 @cindex Lobillo, Javier
 @cindex Martin, Bernd
 @cindex Me@ss{}ollen, Michael
+@cindex Mindnich, Andrea
 @cindex Motsak, Oleksandr 
 @cindex N@"u@ss{}ler, Thomas
 @cindex Rabelo, Carlos
 @cindex Sanchez-Navarro, Alfredo 
 @cindex Strohmayer, Henrik
-@cindex Sulandra, I.
+@cindex Sulandra, Imade
 @cindex Tobis, Enrique
 @cindex Theis, Christine 
 @cindex Vigneron-Tenorio, Alberto 

@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.134 2005-05-18 20:49:39 levandov Exp $
+@comment $Id: singular.doc,v 1.135 2005-05-19 16:28:25 levandov Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -50,11 +50,15 @@ This is the texinfo file describing Singular (version @value{VERSION})
 @center Singular is created and its development is directed and coordinated by
 @center G.-M. Greuel, G. Pfister, and H. Sch@"onemann
 @sp 2
-@center with contributions by
-@center O. Bachmann, W. Decker, S. Endra@ss{}, I. Farran, A. Fr@"uhbis-Kr@"uger, C. Gorzel,
-@center H. Grassmann, A. Heydtmann, D. Hillebrand, T. Keilen, U. Klein, K. Kr@"uger, M. Lamm, V. Levandovskyy
-@center C. Lossen, B. Martin, M. Me@ss{}ollen, W. Neumann, T. N@"u@ss{}ler, W. Pohl, T. Siebert,
-@center J. Schmidt, M. Schulze, R. Stobbe, M. Wenk, T. Wichmann, D. Yanovich
+@c @center with contributions by
+@center Principal developers:
+@center O. Bachmann, M. Brickenstein, W. Decker, A. Fr@"uhbis-Kr@"uger, K. Kr@"uger,
+@center V. Levandovskyy, C. Lossen, W. Neumann, W. Pohl, J. Schmidt, M. Schulze,
+@center T. Siebert, R. Stobbe, E. Westenberger, T. Wichmann, O. Wienand
+@c @center O. Bachmann, W. Decker, A. Fr@"uhbis-Kr@"uger, C. Gorzel,
+@c @center H. Grassmann, A. Heydtmann, D. Hillebrand, T. Keilen, U. Klein, K. Kr@"uger, M. Lamm, V. Levandovskyy
+@c @center C. Lossen, B. Martin, M. Me@ss{}ollen, W. Neumann, T. N@"u@ss{}ler, W. Pohl, T. Siebert,
+@c @center J. Schmidt, M. Schulze, R. Stobbe, M. Wenk, T. Wichmann, D. Yanovich
 @sp 2
 @author Fachbereich Mathematik
 @author Zentrum f@"ur Computeralgebra
