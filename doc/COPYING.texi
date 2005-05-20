@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: COPYING.texi,v 1.24 2005-05-19 16:28:25 levandov Exp $
+@comment $Id: COPYING.texi,v 1.25 2005-05-20 12:35:55 levandov Exp $
 @comment this file contains the copyright notice on Singular
 @ifclear VERSION
 @include version.texi
@@ -180,6 +180,7 @@ Thomas N@"u@ss{}ler,
 Carlos Rabelo,
 Alfredo Sanchez-Navarro,
 Henrik Strohmayer,
+Christian Stussak,
 Imade Sulandra,
 Christine Theis,
 Enrique Tobis,
@@ -214,6 +215,7 @@ Oleksandr Yena.
 @cindex Rabelo, Carlos
 @cindex Sanchez-Navarro, Alfredo 
 @cindex Strohmayer, Henrik
+@cindex Stussak, Christian
 @cindex Sulandra, Imade
 @cindex Tobis, Enrique
 @cindex Theis, Christine 
