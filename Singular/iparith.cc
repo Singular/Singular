@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.365 2005-05-18 16:24:42 Singular Exp $ */
+/* $Id: iparith.cc,v 1.366 2005-05-20 16:01:13 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2474,7 +2474,7 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
     if (weights!=NULL) (*ww) += add_row_shift;
     atSet(res,omStrDup("isHomog"),ww,INTVEC_CMD);
   }
-  else if (atGet(res,"isHomog",INTVEC_CMD)==NULL)
+  else
   {
     if (weights!=NULL)
     {
@@ -3383,8 +3383,11 @@ static BOOLEAN jjHOMOG1(leftv res, leftv v)
 {
   intvec *w;
   res->data=(void *)idHomModule((ideal)v->Data(),currQuotient,&w);
-  if ((v->rtyp==IDHDL)&&(w!=NULL))
+  if ((res->data!=NULL) && (v->rtyp==IDHDL))
+  {
     atSet((idhdl)v->data,omStrDup("isHomog"),w,INTVEC_CMD);
+  }
+  else if (w!=NULL) delete w;
   return FALSE;
 }
 static BOOLEAN jjIDEAL_Ma(leftv res, leftv v)
@@ -3820,6 +3823,7 @@ static BOOLEAN jjSort_Id(leftv res, leftv v)
   res->data = (char *)idSort((ideal)v->Data());
   return FALSE;
 }
+#if 1
 static BOOLEAN jjSYZYGY(leftv res, leftv v)
 {
   intvec *w=NULL;
@@ -3827,6 +3831,36 @@ static BOOLEAN jjSYZYGY(leftv res, leftv v)
   if (w!=NULL) delete w;
   return FALSE;
 }
+#else
+// activate, if idSyz hadle moduke weights correctly !
+static BOOLEAN jjSYZYGY(leftv res, leftv v)
+{
+  intvec *w=(intvec *)atGet(v,"isHomog",INTVEC_CMD);
+  ideal v_id=(ideal)v->Data();
+  tHomog hom=testHomog;
+  int add_row_shift=0;
+  if (w!=NULL)
+  {
+    w=ivCopy(w);
+    add_row_shift=w->min_in();
+    (*w)-=add_row_shift;
+    if (idHomModule(v_id,currQuotient,&w))
+      hom=isHomog;
+    else
+    {
+      //WarnS("wrong weights");
+      delete w; w=NULL;
+      hom=testHomog;
+    }
+  }
+  res->data = (char *)idSyzygies(v_id,hom,&w);
+  if (w!=NULL)
+  {
+    atSet(res,omStrDup("isHomog"),w,INTVEC_CMD);
+  }
+  return FALSE;
+}
+#endif
 static BOOLEAN jjTRACE_IV(leftv res, leftv v)
 {
   res->data = (char *)ivTrace((intvec*)(v->Data()));
