@@ -1,5 +1,5 @@
 S///////////////////////////////////////////////////////////////////////////////
-version="$Id: sheafcoh.lib,v 1.6 2005-05-20 18:34:16 Singular Exp $";
+version="$Id: sheafcoh.lib,v 1.7 2005-05-20 18:46:13 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  sheafcoh.lib   Procedures for Computing Sheaf Cohomology
@@ -511,7 +511,6 @@ NOTE:    The intmat is displayed in a diagram of the following form: @*
          where @code{F} refers to the associated sheaf of @code{M} on P^n.@*
          A @code{'-'} in the diagram refers to a zero entry,  a @code{'*'} 
          refers to a negative entry (= dimension not yet determined).
-EXAMPLE: example truncate; shows an example
 "
 {
   int i,j,k,dat,maxL;

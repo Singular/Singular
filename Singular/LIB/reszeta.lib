@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: reszeta.lib,v 1.3 2005-05-18 07:07:55 anne Exp $";
+version="$Id: reszeta.lib,v 1.4 2005-05-20 18:46:13 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  zeta.lib       Zeta-function of Denef and Loeser
@@ -1918,7 +1918,7 @@ example
    zetaDL(L,1);
 
 //===== expected zeta function =========
-// (130s+20s^2+87)/(1+s)/(3+4s)/(29+40s)
+// (20s^2+130s+87)/((1+s)*(3+4s)*(29+40s))
 //======================================
 }
 //////////////////////////////////////////////////////////////////////////////

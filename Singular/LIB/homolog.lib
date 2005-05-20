@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: homolog.lib,v 1.19 2005-05-20 18:34:15 Singular Exp $";
+version="$Id: homolog.lib,v 1.20 2005-05-20 18:46:13 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  homolog.lib   Procedures for Homological Algebra
@@ -656,7 +656,7 @@ EXAMPLE: example Ext_R; shows an example
         ker = syz(m2);
       }
 
-      if( k==0 ) { matrix MMM1[nrows(m2)][1]; 
+      if( k==0 ) { matrix MMM1[ncols(m2)][1]; 
         m1=MMM1;
       }
       else { // k>0
