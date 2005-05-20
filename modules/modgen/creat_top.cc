@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: creat_top.cc,v 1.21 2003-06-11 21:33:17 krueger Exp $ */
+/* $Id: creat_top.cc,v 1.22 2005-05-20 14:49:59 Singular Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -139,12 +139,13 @@ void write_mod_init(
   fprintf(fp, "  ret=stat(tempstr,&sb);\n");
   fprintf(fp, "  if(ret==0) { \n");
   fprintf(fp, "    if ((sb.st_mode & S_IFMT) == S_IFREG) { \n");
-  fprintf(fp, "      if (crccheck(tempstr)!=crcsum) ret=-1;\n");
+  fprintf(fp, "      if (crccheck(tempstr)!=crcsum)\n");
+  fprintf(fp, "      {   Warn(\"file %%s does not agree with module version - ignoring file\",tempstr);\n");
+  fprintf(fp, "          ret=-1;\n      }\n");
   fprintf(fp, "      if ((binfp = fopen(tempstr,\"r\")) == NULL) return -1;\n");
   fprintf(fp, "    } \n    else \n      ret=-1; \n  }\n\n");
   fprintf(fp, "  fill_help_package();\n");
   fprintf(fp, "  fill_example_package();\n\n");
-  fprintf(fp, "  if(ret==-1) Warn(\"file %%s does not agree with module version - ignoring file\",tempstr);\n");
 }
 
 /*========================================================================*/
