@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: intvec.cc,v 1.2 2004-05-27 12:05:41 Singular Exp $ */
+/* $Id: intvec.cc,v 1.3 2005-05-20 15:33:18 Singular Exp $ */
 /*
 * ABSTRACT: class intvec: lists/vectors of integers
 */
@@ -15,7 +15,8 @@
 
 /*0 implementation*/
 
-
+// omBin intvec_bin = omGetSpecBin(sizeof(intvec));
+#if 0
 intvec::intvec(intvec* iv)
 {
   row = iv->rows();
@@ -26,6 +27,7 @@ intvec::intvec(intvec* iv)
     v[i] = (*iv)[i];
   }
 }
+#endif
 
 intvec::intvec(int s, int e)
 {
@@ -215,11 +217,13 @@ int intvec::compare(int o)
   return 0;
 }
 
+#if 0
 intvec * ivCopy(intvec * o)
 {
   intvec * iv=new intvec(o);
   return iv;
 }
+#endif
 
 intvec * ivAdd(intvec * a, intvec * b)
 {

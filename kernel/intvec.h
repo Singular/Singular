@@ -3,13 +3,16 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: intvec.h,v 1.4 2005-05-04 14:08:54 Singular Exp $ */
+/* $Id: intvec.h,v 1.5 2005-05-20 15:33:19 Singular Exp $ */
 /*
 * ABSTRACT: class intvec: lists/vectors of integers
 */
 #include <string.h>
 #include "omalloc.h"
 #include "febase.h"
+
+
+//extern omBin intvec_bin;
 
 class intvec
 {
@@ -27,7 +30,16 @@ public:
     }
   intvec(int s, int e);
   intvec(int r, int c, int init);
-  intvec(intvec* iv);
+  intvec(intvec* iv)
+  {
+    row = iv->rows();
+    col = iv->cols();
+    v   = (int *)omAlloc(sizeof(int)*row*col);
+    for (int i=row*col-1;i>=0; i--)
+    {
+      v[i] = (*iv)[i];
+    }
+  }
 
   void resize(int new_length);
   inline int range(int i)
@@ -79,10 +91,28 @@ public:
     for (int i=row*col-1; i>0; i--) if (v[i]<m) m=v[i];
     return m;
   }
+#if 0
+  void* operator new ( size_t size )
+  {
+    void* addr;
+    //omTypeAlloc(void*, addr, size);
+    addr=omAlloc0Bin(intvec_bin);
+    return addr;
+  }
+  void operator delete ( void* block )
+  { //omfree( block ); 
+    omFreeBin((ADDRESS)block, intvec_bin);
+  }
+#endif
   // keiner (ausser obachman) darf das folgenden benutzen !!!
   inline int * ivGetVec() { return v; }
 };
-intvec * ivCopy(intvec * o);
+inline intvec * ivCopy(intvec * o)
+{
+  intvec * iv=new intvec(o);
+  return iv;
+}
+
 intvec * ivAdd(intvec * a, intvec * b);
 intvec * ivSub(intvec * a, intvec * b);
 intvec * ivTranp(intvec * o);
