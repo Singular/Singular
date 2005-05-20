@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_global.h,v 1.1.1.1 2003-10-06 12:15:58 Singular Exp $ */
+/* $Id: mpr_global.h,v 1.2 2005-05-20 14:35:44 Singular Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants -
@@ -24,10 +24,6 @@ typedef double mprfloat;
 
 #if !defined(NDEBUG) || defined(mprDEBUG_ALL)
 #define mprDEBUG_PROT
-#endif
-
-#if !defined(NDEBUG) && !defined(MPR_TIMING)
-#define MPR_TIMING
 #endif
 
 #define mprDEBUG_STICKY
