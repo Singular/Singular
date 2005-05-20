@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: lists.cc,v 1.27 2005-05-18 15:59:36 Singular Exp $ */
+/* $Id: lists.cc,v 1.28 2005-05-20 15:55:52 Singular Exp $ */
 /*
 * ABSTRACT: handling of the list type
 */
@@ -251,7 +251,7 @@ lists liMakeResolv(resolvente r, int length, int reallen,
         if ((weights!=NULL) && (weights[i]!=NULL))
         {
           intvec *w=ivCopy(weights[i]);
-          w += add_row_shift;
+          (*w) += add_row_shift;
           atSet((idhdl)&L->m[i],omStrDup("isHomog"),w,INTVEC_CMD);
           weights[i] = NULL;
         }
