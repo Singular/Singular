@@ -27,7 +27,6 @@ RETURN: an ideal
         the ideal of algebraic relations.
 @end format
 EXAMPLE: example S_poly; show an example "
-
 {
   if(size(#)==0)
     {
@@ -136,7 +135,6 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 static proc std1(ideal J,ideal I,list #)
-
   // I is contained in J, and it is assumed to be a standard bases!
   //This procedure computes a Standard basis for J from I one's
   //This procedure is essential for Spoly1 procedure.
@@ -265,16 +263,14 @@ static proc Spoly1(list l,ideal I,ideal J,int a)
 ///////////////////////////////////////////////////////////////////////////////
 
 proc reduction(poly p,ideal dom,list #)//one step Subalgebra reduction
-
 "USAGE: reduction(p,dom[,n]); p poly , dom  ideal
 RETURN: a polynomial
 @format
-    Three Algorthim  variants  are used to perform Subalgebra reduction.
+    Three algorithm variants are used to perform subalgebra reduction.
     The positive interger n determine which variant should be used.
     n may take the values (0 or default),1 or 2.
 @end format
 EXAMPLE: reduction; show an example"
-
 {
   def bsr=basering;
   ideal B=ideal(bsr);//When the basering is quotient ring  this type casting
@@ -286,8 +282,6 @@ EXAMPLE: reduction; show an example"
   //quotient ideal,therefore we should first  reduce ,when it is necessary for computations,
   // to have a uniquely determined representant for each equivalent
   //class,which is the case of this algorithm.
-
-
 
   if(b !=0) //means that the basering is a quotient ring
     {
@@ -306,8 +300,6 @@ EXAMPLE: reduction; show an example"
     {
       choose =#[2];
     }
-
-
 
   //=======================first algorithm(default)=========================
    if ( choose == 0 )
@@ -409,7 +401,6 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 static proc completeReduction(poly p,ideal dom,list#)//reduction
-
 {
   poly p1=p;
   poly p2=reduction(p,dom,#);
@@ -422,7 +413,7 @@ static proc completeReduction(poly p,ideal dom,list#)//reduction
 }
 ///////////////////////////////////////////////////////////////////////////////
 
- static proc completeReduction1(poly p,ideal dom,list #) //tail reduction
+static proc completeReduction1(poly p,ideal dom,list #) //tail reduction
 {
   poly p1,p2,re;
   p1=p;
@@ -460,7 +451,6 @@ RETURN: depends On the type of id; ideal or polynomial.
 NOTE: computation of Subalgebras normal forms may be performed either
       in polynomial rings or quotient polynomial rings
 EXAMPLE: example S_nf; show example "
-
 {
   int z;
   ideal Red;
@@ -550,7 +540,6 @@ RETURN: A SAGBI basis for the subalgebra defined by the generators of id.
 NOTE: SAGBI bases computations may be performed either
       in polynomial rings or quotient polynomial rings.
 EXAMPLE: example Sagbi; show example "
-
 {
   degBound=0;
   ideal S,oldS,Red;
@@ -592,7 +581,6 @@ NOTE:- SAGBI bases computations may be performed either
        with infinte SAGBI basis. In this case, by means of this procedure,
        we may check for example, if the elements of this basis have a particular form.
 EXAMPLE: example Sagbi1; show example "
-
 {
   degBound=0;
   ideal S,oldS,Red;

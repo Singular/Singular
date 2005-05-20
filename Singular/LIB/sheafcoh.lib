@@ -1,5 +1,5 @@
 S///////////////////////////////////////////////////////////////////////////////
-version="$Id: sheafcoh.lib,v 1.5 2005-05-19 13:32:35 Singular Exp $";
+version="$Id: sheafcoh.lib,v 1.6 2005-05-20 18:34:16 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  sheafcoh.lib   Procedures for Computing Sheaf Cohomology
@@ -49,8 +49,8 @@ static proc max(int i,int j)
 ///////////////////////////////////////////////////////////////////////////////
 proc truncate(module phi, int d)
 "USAGE:   truncate(M,d);  M module, d int 
-ASSUME:  @code{M} is graded and is either 0 or comes assigned with an 
-         admissible degree vector as an attribute 
+ASSUME:  @code{M} is graded, and it comes assigned with an admissible degree 
+         vector as an attribute 
 RETURN:  module
 NOTE:    Output is a presentation matrix for the truncation of coker(M) 
          at d.
@@ -59,14 +59,21 @@ KEYWORDS: truncated module
 "
 {
   if ( typeof(attrib(phi,"isHomog"))=="string" ) {  
-    if (size(phi)==0) { attrib(phi,"isHomog",0); }
-    ERROR("No admissible degree vector assigned");
+    if (size(phi)==0) {  
+      // assign weights 0 to generators of R^n (n=nrows(phi))
+      intvec v;
+      v[nrows(phi)]=0;
+      attrib(phi,"isHomog",v); 
+    }
+    else {
+      ERROR("No admissible degree vector assigned");
+    }
   }
   else {
    intvec v=attrib(phi,"isHomog");
   }
-  int s = nrows(phi);
   int i,m,dummy;
+  int s = nrows(phi);
   module L;
   for (i=1; i<=s; i++) {
     if (d>v[i]) { 
@@ -110,15 +117,14 @@ example
    M2=truncate(M,2);
    print(M2);
    dimGradedPart(M2,3);
-
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 proc dimGradedPart(module phi, int d)
 "USAGE:   dimGradedPart(M,d);  M module, d int 
-ASSUME:   @code{M} is graded and is either 0 or comes assigned with an 
-         admissible degree vector as an attribute 
+ASSUME:  @code{M} is graded, and it comes assigned with an admissible degree
+         vector as an attribute 
 RETURN:  int
 NOTE:    Output is the vector space dimension of the graded part of degree d
          of coker(M).
@@ -127,7 +133,11 @@ KEYWORDS: graded module, graded piece
 "
 {
   if ( typeof(attrib(phi,"isHomog"))=="string" ) {
-    if (size(phi)==0) { intvec v=0; }
+    if (size(phi)==0) { 
+      // assign weights 0 to generators of R^n (n=nrows(phi))
+      intvec v;
+      v[nrows(phi)]=0;
+    }
     else { ERROR("No admissible degree vector assigned"); }
   }
   else {
@@ -178,8 +188,8 @@ example
 
 proc CM_regularity (module M)
 "USAGE:   CM_regularity(M);    M module 
-ASSUME:   @code{M} is graded and is either 0 or comes assigned with an 
-         admissible degree vector as an attribute 
+ASSUME:   @code{M} is graded, and it comes assigned with an admissible degree
+         vector as an attribute 
 RETURN:  integer, the Castelnuovo-Mumford regularity of coker(M)
 NOTE:    procedure calls mres
 EXAMPLE: example CM_regularity; shows an example
@@ -187,8 +197,15 @@ KEYWORDS: Castelnuovo-Mumford regularity
 "
 {
   if ( typeof(attrib(M,"isHomog"))=="string" ) {  
-    if (size(M)==0) { attrib(M,"isHomog",0); }
-    ERROR("No admissible degree vector assigned");
+    if (size(M)==0) { 
+      // assign weights 0 to generators of R^n (n=nrows(M))
+      intvec v;
+      v[nrows(M)]=0;
+      attrib(M,"isHomog",v); 
+    }
+    else {
+      ERROR("No admissible degree vector assigned");
+    }
   }  
   def L = mres(M,0);
   intmat BeL = betti(L);
@@ -213,9 +230,9 @@ example
 
 proc sheafCohBGG(module M,int l,int h)
 "USAGE:   sheafCohBGG(M,l,h);    M module, l,h int 
-ASSUME:  @code{M} is graded and is either 0 or comes assigned with an 
-         admissible degree vector as an attribute, @code{h>=l}, and the 
-         basering has @code{n+1} variables.
+ASSUME:  @code{M} is graded, and it comes assigned with an admissible degree
+         vector as an attribute, @code{h>=l}, and the basering has @code{n+1} 
+         variables.
 RETURN:  intmat, cohomology of twists of the coherent sheaf F on P^n 
          associated to coker(M). The range of twists is determined by @code{l},
          @code{h}. 
@@ -302,7 +319,7 @@ EXAMPLE: example sheafCohBGG; shows an example
   }
   displayCohom(newBetti,l,h,n);
   setring R;
-  return(Betti);
+  return(newBetti);
   option(noredSB);
   option(noredTail);
 }
@@ -328,9 +345,9 @@ example
 
 proc dimH(int i,module M,int d)
 "USAGE:   dimH(i,M,d);    M module, i,d int 
-ASSUME:  @code{M} is graded and is either 0 or comes assigned with an 
-         admissible degree vector as an attribute, @code{h>=l}, and the 
-         basering @code{S} has @code{n+1} variables. 
+ASSUME:  @code{M} is graded, and it comes assigned with an admissible degree 
+         vector as an attribute, @code{h>=l}, and the basering @code{S} has 
+         @code{n+1} variables. 
 RETURN:  int,  vector space dimension of @math{H^i(F(d))} for F the coherent 
          sheaf on P^n associated to coker(M).
 NOTE:    The procedure is based on local duality as described in [Eisenbud:
@@ -340,9 +357,16 @@ SEE ALSO: sheafCoh, sheafCohBGG
 EXAMPLE: example dimH; shows an example
 "
 {
-  if( typeof(attrib(M,"isHomog"))!="intvec" ) {
-     if (size(M)==0) { attrib(M,"isHomog",0); }
-     else { ERROR("No admissible degree vector assigned"); }
+  if( typeof(attrib(M,"isHomog"))=="string" ) {
+    if (size(M)==0) {  
+      // assign weights 0 to generators of R^n (n=nrows(M))
+      intvec v;
+      v[nrows(M)]=0;
+      attrib(M,"isHomog",v);
+    }
+    else { 
+      ERROR("No admissible degree vector assigned"); 
+    }
   }
   int Result;
   int n=nvars(basering)-1;
@@ -384,9 +408,9 @@ example
 
 proc sheafCoh(module M,int l,int h,list #)
 "USAGE:   sheafCoh(M,l,h);    M module, l,h int 
-ASSUME:  @code{M} is graded and is either 0 or comes assigned with an 
-         admissible degree vector as an attribute, @code{h>=l}. The basering 
-         @code{S} has @code{n+1} variables. 
+ASSUME:  @code{M} is graded, and it comes assigned with an admissible degree 
+         vector as an attribute, @code{h>=l}. The basering @code{S} has 
+         @code{n+1} variables. 
 RETURN:  intmat, cohomology of twists of the coherent sheaf F on P^n 
          associated to coker(M). The range of twists is determined by @code{l},
          @code{h}.

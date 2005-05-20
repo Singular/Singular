@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: homolog.lib,v 1.18 2005-05-19 13:32:35 Singular Exp $";
+version="$Id: homolog.lib,v 1.19 2005-05-20 18:34:15 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  homolog.lib   Procedures for Homological Algebra
@@ -478,10 +478,10 @@ EXAMPLE: example Ext_R; shows an example
 
   //------------ check for weight vector (graded case) -----------------------
   int withWeight;
-  intvec weightR,ww;
+  intvec weightM,weightR,ww;
   if ( typeof(attrib(M,"isHomog"))!="string" )
   { 
-    weightR=attrib(M,"isHomog"); 
+    weightM=attrib(M,"isHomog"); 
     withWeight=1;
   }
 
@@ -532,22 +532,32 @@ EXAMPLE: example Ext_R; shows an example
   }
   if( t1==1 )
   { // compute resolution via sres command
-    if( attrib(M,"isSB")==0 ) { M=std(M); }
+    if( attrib(M,"isSB")==0 ) { 
+      if (size(M)==0) { attrib(M,"isSB")=1; } 
+      else { M=std(M); }
+    }
     list resl = sres(M,max+1);
-    if (withWeight) { 
-      // **** at this writing, sres does not return weights, we try to
-      // **** compute them via homog for each syzygy module  
-      attrib(resl,"isHomog",weightR);
+    if (withWeight) {
+      // **** 
+      // **** at this writing, sres does not return weights, we have to 
+      // **** go through the resolution to compute them 
+      // **** 
+      attrib(resl,"isHomog",weightM);  // weightM = weights of M
       G=resl[1];
-      attrib(G,"isHomog",weightR);
+      attrib(G,"isHomog",weightM);
       resl[1]=G;
+      weightR=weightM;
+
       for (j=2; j<=size(resl); j++) {
-        if (size(resl[j])!=0) {
+        if (size(G)!=0) {
           ww=0;
           for (k=1; k<=ncols(G); k++) {
-            leadCol = leadmonom(G[k]);
-            leadComp = nrows(leadCol);
-            ww[k] = deg(leadCol)+weightR[leadComp];
+            if (size(G[k])==0) { ww[k]=0; }
+            else {
+              leadCol = leadmonom(G[k]);
+              leadComp = nrows(leadCol);
+              ww[k] = deg(leadCol)+weightR[leadComp];
+            }
           }
           G=resl[j];
           attrib(G,"isHomog",ww);
@@ -557,7 +567,14 @@ EXAMPLE: example Ext_R; shows an example
       }
     }
   }
-  else { resolution resl = mres(M,max+1); }
+  else { list resl = mres(M,max+1); 
+    if ((withWeight) and (size(M)==0)) {
+      // ***** At this writing: special treatment for zero module needed
+      G=resl[1];
+      attrib(G,"isHomog",weightM);
+      resl[1]=G;
+    }
+  }
   for( ii=1; ii<=s; ii++ )
   {
 //-----------------  apply Hom(_,R) at k-th place -----------------------------
@@ -587,15 +604,15 @@ EXAMPLE: example Ext_R; shows an example
     {
       m2t = resl[k+1];
       m2 = transpose(m2t); 
-      if ((typeof(attrib(resl[k+1],"isHomog"))!="string" ) && (withWeight))
+      if ((typeof(attrib(m2t,"isHomog"))!="string" ) && (withWeight))
       { 
         // ------------- compute weights for dual -----------------------------
-        weightR=attrib(resl[k+1],"isHomog");
+        weightR=attrib(m2t,"isHomog");
         // --------------------------------------------------------------------
         // *** set correct weights (at this writing, shift in resolution 
         // *** is not considered when defining the weights for the 
         // *** modules in the resolution):
-        A1=attrib(resl,"isHomog");
+        A1=attrib(M,"isHomog");
         A2=attrib(resl[1],"isHomog");
         shift=A1[1]-A2[1];
         for (j=1; j<=size(weightR); j++) { weightR[j]=weightR[j]+shift; }
@@ -603,9 +620,12 @@ EXAMPLE: example Ext_R; shows an example
         // --------------------------------------------------------------------
         ww=0;
         for (j=1; j<=nrows(m2); j++) {
-          leadCol = leadmonom(m2t[j]);
-          leadComp = nrows(leadCol);
-          ww[j] = deg(leadCol)+weightR[leadComp];
+          if (size(m2t[j])==0) { ww[j]=0; }
+          else {
+            leadCol = leadmonom(m2t[j]);
+            leadComp = nrows(leadCol);
+            ww[j] = deg(leadCol)+weightR[leadComp];
+          }
         }
         attrib(m2,"isHomog",-ww);  // dualize --> negative weights
         // --------------------------------------------------------------------
@@ -613,23 +633,32 @@ EXAMPLE: example Ext_R; shows an example
         // *** but syz forgets weights.....
         resm2 = nres(m2,2);
         ker = resm2[2];
-        // --------------------------------------------------------------------
-        // *** set correct weights (at this writing, shift in resolution 
-        // *** is not considered when defining the weights for the 
-        // *** modules in the resolution):
-        A1=attrib(resm2,"isHomog");
-        A2=attrib(resm2[1],"isHomog");
-        A3=attrib(ker,"isHomog");
-        shift=A1[1]-A2[1];
-        for (j=1; j<=size(A3); j++) { A3[j]=A3[j]+shift; }
-        attrib(ker,"isHomog",A3);
-        // --------------------------------------------------------------------
+        if ((size(ker)>0) and (size(m2)>0)) {
+          // ------------------------------------------------------------------
+          // *** set correct weights (at this writing, shift in resolution 
+          // *** is not considered when defining the weights for the 
+          // *** modules in the resolution):
+          A1=attrib(resm2,"isHomog");
+          A2=attrib(resm2[1],"isHomog");
+          A3=attrib(ker,"isHomog");
+          shift=A1[1]-A2[1];
+          for (j=1; j<=size(A3); j++) { A3[j]=A3[j]+shift; }
+          // *** set correct weights where weights are undetermined due to
+          // *** zero columns in m2  (read weights from m2t)
+          for (j=1; j<=ncols(m2); j++) {
+            if (size(m2[j])==0) { A3[j]=-weightR[j]; }
+          } 
+          attrib(ker,"isHomog",A3);
+          // ------------------------------------------------------------------
+        }
       }      
       else {
         ker = syz(m2);
       }
 
-      if( k==0 ) { m1=0*gen(nrows(m2)); }
+      if( k==0 ) { matrix MMM1[nrows(m2)][1]; 
+        m1=MMM1;
+      }
       else { // k>0
         m1t = resl[k];
         m1 = transpose(resl[k]); 
@@ -640,7 +669,7 @@ EXAMPLE: example Ext_R; shows an example
           // *** set correct weights (at this writing, shift in resolution 
           // *** is not considered when defining the weights for the 
           // *** modules in the resolution):
-          A1=attrib(resl,"isHomog");
+          A1=attrib(M,"isHomog");
           A2=attrib(resl[1],"isHomog");
           shift=A1[1]-A2[1];
           for (j=1; j<=size(weightR); j++) { weightR[j]=weightR[j]+shift; }
@@ -648,16 +677,24 @@ EXAMPLE: example Ext_R; shows an example
           // ------------------------------------------------------------------
           ww=0;
           for (j=1; j<=nrows(m1); j++) {
-            leadCol = leadmonom(m1t[j]);
-            leadComp = nrows(leadCol);
-            ww[j] = deg(leadCol)+weightR[leadComp];
+            if (size(m1t[j])==0) { ww[j]=0; }
+            else {
+              leadCol = leadmonom(m1t[j]);
+              leadComp = nrows(leadCol);
+              ww[j] = deg(leadCol)+weightR[leadComp];
+            }
           }
           attrib(m1,"isHomog",-ww);  // dualize --> negative weights
         }
       }
-
       //----------------- presentation of ker(m2)/im(m1) ---------------------
-      ret = modulo(ker,m1);
+      if ((k==0) and (size(M)==0)) { 
+        ret = M;
+        if (withWeight) { attrib(ret,"isHomog",-weightM); }
+      } 
+      else {
+        ret = modulo(ker,m1);
+      }
       dbprint(p-1,
          "// Let 0<--coker(M)<--F0<--F1<--F2<--... be a resolution of M,",
          "// then F"+string(k)+"*-->F"+string(k+1)+"* is given by:",m2,
