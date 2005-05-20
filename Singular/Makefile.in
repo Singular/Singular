@@ -138,7 +138,7 @@ COMMON_SOURCES = $(MPSR_SOURCES) $(DBMSR_SOURCES)
 
 # special C++ source files (need extra compiling and/or linking), for which
 # dependencies should be generated
-ESOURCES=mmalloc.cc iparith.cc $(COMMON_SOURCES) \
+ESOURCES=iparith.cc $(COMMON_SOURCES) \
 	$(DL_KERNEL_SOURCES) $(DL_LIB_SOURCES) $(STATIC_SOURCES) 
 
 SOURCES=${CSOURCES} ${CXXSOURCES} \
@@ -270,12 +270,12 @@ Singular-static: version.h
 	${MAKE} LD_STATIC=1 S_EXT="-static" Singular-static
 	echo "#undef HAVE_STATIC" > static.h
 
-Singular${S_EXT}: mod2.h Makefile version.h scanner.cc  ${OBJS} mmalloc.o \
+Singular${S_EXT}: mod2.h Makefile version.h scanner.cc  ${OBJS} \
           iparith.o tesths.cc libparse.cc claptmpl.o mpsr_Tok.o $(DL_LIBS)
 	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} \
 	  -o Singular${S_EXT} \
 	  tesths.cc iparith.o mpsr_Tok.o claptmpl.o\
-	  ${OBJS} ${LDFLAGS} ${LIBS} -lomalloc_ndebug mmalloc.o
+	  ${OBJS} ${LDFLAGS} ${LIBS} -lomalloc_ndebug ../kernel/mmalloc.o
 
 %.static: version.h
 	${MAKE} DL_KERNEL=0 S_EXT=".static" $@
@@ -287,11 +287,11 @@ cntrlc.o cntrlc.og : feOptES.inc feOptTS.inc feOpt.inc
 claptmpl.o: claptmpl.cc mod2.h
 	${CXX} ${CXXFLAGS}  ${CPPFLAGS} ${DEFS} -c $<	
 
-iparith.inc mpsr_Tok.inc: claptmpl.o iparith.cc mmalloc.o\
+iparith.inc mpsr_Tok.inc: claptmpl.o iparith.cc \
                           ipconv.cc tok.h mpsr_Tok.cc grammar.h mod2.h
 	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} -DGENTABLE \
 	     -o gentable claptmpl.o iparith.cc tesths.cc mpsr_Tok.cc \
-	     ${OBJS} ${LDFLAGS} ${LIBS} -lomalloc_ndebug mmalloc.o
+	     ${OBJS} ${LDFLAGS} ${LIBS} -lomalloc_ndebug ../kernel/mmalloc.o
 	./gentable
 	/bin/rm -f gentable gentable.exe
 
@@ -317,14 +317,14 @@ libparse.cc: libparse.l
 # Hmm compiling with -fomit-frame-pointer resulted in access violation
 # under cygwin
 ESingular: fegetopt.o mod2.h feOpt.cc version.h emacs.cc \
-           feOptES.inc mmalloc.o
+           feOptES.inc
 	${CXX} -O2 ${CPPFLAGS} ${DEFS} -DESINGULAR -o ESingular emacs.cc fegetopt.o \
-	${LDFLAGS} -lomalloc_ndebug mmalloc.o
+	${LDFLAGS} -lomalloc_ndebug ../kernel/mmalloc.o
 
 TSingular: fegetopt.o mod2.h feOpt.cc version.h emacs.cc \
-           feOptTS.inc mmalloc.o
+           feOptTS.inc
 	${CXX} -O2 ${CPPFLAGS} ${DEFS} -DTSINGULAR -o TSingular emacs.cc fegetopt.o \
-	${LDFLAGS} -lomalloc_ndebug mmalloc.o
+	${LDFLAGS} -lomalloc_ndebug ../kernel/mmalloc.o
 
 feOpt.o: feOpt.inc feOptES.inc feOptTS.inc
 extra.o: feOpt.inc
@@ -607,10 +607,10 @@ claptmpl.og: claptmpl.cc mod2.h
 $(OBJG2) : %.og: %.c
 	$(CCG)  ${CFLAGSG} ${CPPFLAGS} ${DEFSG} -c $< -o $@
 
-Singularg${S_EXT}: scanner.cc  $(OBJG)  mmalloc.og $(DL_LIBSG)\
+Singularg${S_EXT}: scanner.cc  $(OBJG)  $(DL_LIBSG)\
            iparith.og mpsr_Tok.og claptmpl.og tesths.cc version.h 
 	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGSG} ${CPPFLAGS} ${DEFSG} -o Singularg${S_EXT} \
-	tesths.cc iparith.og mpsr_Tok.og claptmpl.og $(OBJG) ${LDFLAGSG} ${LIBS} -lomalloc mmalloc.og \
+	tesths.cc iparith.og mpsr_Tok.og claptmpl.og $(OBJG) ${LDFLAGSG} ${LIBS} -lomalloc ../kernel/mmalloc.og \
 	${LD_DYN_FLAGS} ${LD_LIBC}
 
 iparith.og: iparith.inc iparith.cc
@@ -624,8 +624,8 @@ installg: Singularg
 	${INSTALL_PROGRAM} Singularg ${bindir}	
 
 ESingularg: fegetopt.og mod2.h feOpt.cc version.h emacs.cc \
-           feOptES.inc mmalloc.og
-	${CXXG} ${CXXFLAGSG} ${CPPFLAGS} -DESINGULAR -g ${DEFSG} -o ESingularg emacs.cc fegetopt.og ${LDFLAGS} ${LIBS} -lomalloc mmalloc.og
+           feOptES.inc
+	${CXXG} ${CXXFLAGSG} ${CPPFLAGS} -DESINGULAR -g ${DEFSG} -o ESingularg emacs.cc fegetopt.og ${LDFLAGS} ${LIBS} -lomalloc ../kernel/mmalloc.og
 
 ##
 ## compiler and linker options for profile version
