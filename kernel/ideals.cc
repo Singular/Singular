@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.13 2005-05-18 15:42:57 Singular Exp $ */
+/* $Id: ideals.cc,v 1.14 2005-05-20 15:53:03 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1383,26 +1383,28 @@ ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
 {
   ideal s_h1;
   poly  p;
-  int   i, j, k, length=0,reg;
+  int   j, k, length=0,reg;
   BOOLEAN isMonomial=TRUE;
-  int ii;
+  int ii, idElemens_h1;
 
+  idElemens_h1=IDELEMS(h1);
 #ifdef PDEBUG
-  for(ii=0;ii<IDELEMS(h1);ii++) pTest(h1->m[ii]);
+  for(ii=0;ii<idElemens_h1 /*IDELEMS(h1)*/;ii++) pTest(h1->m[ii]);
 #endif
   if (idIs0(h1))
   {
-    ideal result=idFreeModule(IDELEMS(h1));
+    ideal result=idFreeModule(idElemens_h1/*IDELEMS(h1)*/);
     int curr_syz_limit=rGetCurrSyzLimit();
     if (curr_syz_limit>0)
-    for (ii=0;ii<IDELEMS(h1);ii++)
+    for (ii=0;ii<idElemens_h1/*IDELEMS(h1)*/;ii++)
     {
       if (h1->m[ii]!=NULL)
         pShift(&h1->m[ii],curr_syz_limit);
     }
     return result;
   }
-  k=si_max(1,(int)idRankFreeModule(h1));
+  int slength=(int)idRankFreeModule(h1);
+  k=si_max(1,slength /*idRankFreeModule(h1)*/);
 
   assume(currRing != NULL);
   ring orig_ring=currRing;
@@ -1424,7 +1426,7 @@ ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
 
   if (s_h3==NULL)
   {
-    return idFreeModule(IDELEMS(h1));
+    return idFreeModule( idElemens_h1 /*IDELEMS(h1)*/);
   }
 
   if (orig_ring != syz_ring)
@@ -2926,7 +2928,11 @@ BOOLEAN idHomModule(ideal m, ideal Q, intvec **w)
 {
   if (w!=NULL) *w=NULL;
   if ((Q!=NULL) && (!idHomIdeal(Q,NULL))) return FALSE;
-  if (idIs0(m)) return TRUE;
+  if (idIs0(m))
+  {
+    if (w!=NULL) (*w)=new intvec(1);
+    return TRUE;
+  }
 
   int i,j,cmax=2,order=0,ord,* diff,* iscom,diffmin=32000;
   poly p=NULL;
@@ -3251,11 +3257,15 @@ ideal idModulo (ideal h2,ideal h1, tHomog hom, intvec ** w)
       ((*wtmp)[i])=(**w)[i];
     for (i=0;i<IDELEMS(h2);i++)
     {
-      d = pDeg(h2->m[i]);
-      k= pGetComp(h2->m[i]);
-      if (slength>0) k--;
-      d +=((**w)[k]);
-      ((*wtmp)[i+length]) = d;
+      poly p=h2->m[i];
+      if (p!=NULL)
+      {
+        d = pDeg(p);
+        k= pGetComp(p);
+        if (slength>0) k--;
+        d +=((**w)[k]);
+        ((*wtmp)[i+length]) = d;
+      }
     }
     //Print("weights:");wtmp->show(1);PrintLn();
   }
