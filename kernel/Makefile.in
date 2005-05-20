@@ -173,6 +173,8 @@ DISTFILES=${SOURCES} ${HEADERS} ${ESOURCES} \
 	check_aso.pl prCopy.pl
 
 OBJS := $(CXXSOURCES:.cc=.o) $(CSOURCES:.c=.o)
+OBJS2 := $(ESOURCES:.cc=.o)
+OBJSG2 := $(ESOURCES:.cc=.og)
 
 P_PROCS_MODULES = FieldZp FieldIndep FieldQ FieldGeneral
 
@@ -266,7 +268,7 @@ DL_LIBST=
 
 endif
 
-all:	kversion.h libkernel.a libkernel-g.a ${DL_LIBS} ${DL_LIBSG}
+all:	kversion.h libkernel.a libkernel-g.a ${DL_LIBS} ${DL_LIBSG} ${OBJS2} ${OBJSG2}
 
 libkernel.a: ${OBJS}
 	ar cr $@ $^
