@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.14 2005-05-20 15:53:03 Singular Exp $ */
+/* $Id: ideals.cc,v 1.15 2005-05-20 18:56:29 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -2930,7 +2930,7 @@ BOOLEAN idHomModule(ideal m, ideal Q, intvec **w)
   if ((Q!=NULL) && (!idHomIdeal(Q,NULL))) return FALSE;
   if (idIs0(m))
   {
-    if (w!=NULL) (*w)=new intvec(1);
+    if (w!=NULL) (*w)=new intvec(m->rank);
     return TRUE;
   }
 
