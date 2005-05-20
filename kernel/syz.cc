@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.cc,v 1.9 2005-04-25 18:15:25 Singular Exp $ */
+/* $Id: syz.cc,v 1.10 2005-05-20 15:32:36 Singular Exp $ */
 
 /*
 * ABSTRACT: resolutions
@@ -444,7 +444,7 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
   {
     if (!idTestHomModule(res[0],currQuotient,(*weights)[0]))
     {
-      WarnS("1wrong weights given:"); (*weights)[0]->show();PrintLn();
+      WarnS("wrong weights given(1):"); (*weights)[0]->show();PrintLn();
       idHomModule(res[0],currQuotient,&w);
       w->show();PrintLn();
       *weights=NULL;
@@ -616,7 +616,7 @@ syStrategy syResolution(ideal arg, int maxlength,intvec * w, BOOLEAN minim)
 
   if ((w!=NULL) && (!idTestHomModule(arg,currQuotient,w)))
   {
-    WarnS("wrong weights given");w->show();PrintLn();
+    WarnS("wrong weights given(2):");w->show();PrintLn();
     idHomModule(arg,currQuotient,&w);
     w->show();PrintLn();
     w=NULL;
@@ -774,7 +774,7 @@ intvec * syBetti(resolvente res,int length, int * regularity,
   {
     if (!idTestHomModule(res[0],currQuotient,weights))
     {
-      WarnS("wrong weights given");weights->show();PrintLn();
+      WarnS("wrong weights given(3):");weights->show();PrintLn();
       idHomModule(res[0],currQuotient,&w);
       if (w!=NULL) { w->show();PrintLn();}
       weights=NULL;
