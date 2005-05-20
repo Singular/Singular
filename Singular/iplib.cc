@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.113 2005-05-18 16:24:43 Singular Exp $ */
+/* $Id: iplib.cc,v 1.114 2005-05-20 16:03:46 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -855,7 +855,7 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
   {
     if(IDTYP(pl)!=PACKAGE_CMD)
     {
-      WarnS("not of typ package.");
+      WarnS("not of type package.");
       fclose(fp);
       return TRUE;
     }
@@ -1085,7 +1085,7 @@ BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN tellerror)
   {
     if(IDTYP(pl)!=PACKAGE_CMD)
     {
-      Warn("not of typ package.");
+      Warn("not of type package.");
       goto load_modules_end;
     }
   }
