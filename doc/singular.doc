@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.135 2005-05-19 16:28:25 levandov Exp $
+@comment $Id: singular.doc,v 1.136 2005-05-20 18:06:55 levandov Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -314,15 +314,16 @@ LIB "all.lib";
 * elim_lib:: procedures for elimination, saturation and blowing up
 * grwalk_lib:: Groebner walk and Fraktal walk
 * homolog_lib:: procedures for homological algebra
+* intprog_lib:: Integer Programming
 * mprimdec_lib:: procedures for primary decomposition of modules
 * mregular_lib:: procedures for Castelnuovo-Mumford regularity
 * normal_lib:: procedure for normalization
 * primdec_lib:: procedures for primary decomposition
 * primitiv_lib:: procedures for finding a primitive element
 * reesclos_lib:: Rees Algebra and integral closure of an ideal
-* intprog_lib:: Integer Programming
-* toric_lib:: toric ideals
 * resol_lib:: Resolution of Singularities
+* sheafcoh_lib:: Procedures for Computing Sheaf Cohomology
+* toric_lib:: toric ideals
 * zeta_lib:: Applications of Resolution of Singularities
 @end menu
 
@@ -339,11 +340,15 @@ LIB "all.lib";
 @subsection grwalk_lib
 @c lib grwalk.lib
 @c ----------------------------------------------------------
-@node homolog_lib, mprimdec_lib, grwalk_lib, Commutative algebra
+@node homolog_lib, intprog_lib, grwalk_lib, Commutative algebra
 @subsection homolog_lib
 @c lib homolog.lib
 @c ----------------------------------------------------------
-@node mprimdec_lib, mregular_lib, homolog_lib, Commutative algebra
+@node intprog_lib, mprimdec_lib, homolog_lib, Commutative algebra
+@subsection intprog_lib
+@c lib intprog.lib
+@c ---------------------------------------------------------
+@node mprimdec_lib, mregular_lib, intprog_lib, Commutative algebra
 @subsection mprimdec_lib
 @c lib mprimdec.lib
 @c ----------------------------------------------------------
@@ -363,25 +368,26 @@ LIB "all.lib";
 @subsection primitiv_lib
 @c lib primitiv.lib
 @c ---------------------------------------------------------
-@node reesclos_lib, intprog_lib, primitiv_lib, Commutative algebra
+@node reesclos_lib, resol_lib, primitiv_lib, Commutative algebra
 @subsection reesclos_lib
 @c lib reesclos.lib
 @c ---------------------------------------------------------
-@node intprog_lib, toric_lib, reesclos_lib, Commutative algebra
-@subsection intprog_lib
-@c lib intprog.lib
-@c ---------------------------------------------------------
-@node toric_lib, resol_lib ,intprog_lib, Commutative algebra
-@subsection toric_lib
-@c lib toric.lib
-@c ---------------------------------------------------------
-@node resol_lib, zeta_lib ,toric_lib, Commutative algebra
+@node resol_lib, sheafcoh_lib, reesclos_lib, Commutative algebra
 @subsection resol_lib
 @c lib resol.lib
 @c ---------------------------------------------------------
-@node zeta_lib, ,resol_lib, Commutative algebra
+@node sheafcoh_lib, toric_lib, resol_lib, Commutative algebra
+@subsection sheafcoh_lib
+@c lib sheafcoh.lib
+@c ---------------------------------------------------------
+@node toric_lib, zeta_lib, sheafcoh_lib, Commutative algebra
+@subsection toric_lib
+@c lib toric.lib
+@c ---------------------------------------------------------
+@node zeta_lib,  , toric_lib, Commutative algebra
 @subsection zeta_lib
 @c lib zeta.lib
+
 @c ----------------------------------------------------------------------------
 @node Singularities, Invariant theory, Commutative algebra, SINGULAR libraries
 @section Singularities

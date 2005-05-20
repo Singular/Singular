@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.47 2005-05-11 16:11:52 Singular Exp $
+@comment $Id: NEWS.texi,v 1.48 2005-05-20 18:06:54 levandov Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -73,6 +73,8 @@ procedures for primary decomposition of modules
 procedures for the Gauss-Manin connection of a singularity
 @item @nref{rootsmr_lib}
 counting the number of real roots
+@item @nref{sheafcoh_lib}
+computing cohomology of sheaves and Tate resolution
 @item @nref{signcond_lib}
 computing realizable sign conditions
 @item @nref{rootsur_lib}
