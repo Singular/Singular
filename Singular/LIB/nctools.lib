@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: nctools.lib,v 1.15 2005-05-18 20:51:16 levandov Exp $";
+version="$Id: nctools.lib,v 1.16 2005-05-20 18:08:50 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: nctools.lib     General tools for noncommutative algebras
@@ -318,7 +318,7 @@ RETURN:  list L with two elements, both elements are of type matrix:
 @*         L[2] = matrix of polynomials D
 PURPOSE: recover the noncommutative relations via matrices C and D from
 a noncommutative ring
-SEE ALSO: ringlist, Setting up a G-algebra
+SEE ALSO: ringlist, G-algebras
 EXAMPLE: example ncRelations; shows examples
 "{
   list l;
