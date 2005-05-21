@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feread.cc,v 1.5 2005-04-30 16:38:26 Singular Exp $ */
+/* $Id: feread.cc,v 1.6 2005-05-21 09:16:24 Singular Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -94,7 +94,7 @@ char *command_generator (char *text, int state)
 /* =                      static readline                           = */
 /* ===================================================================*/
 /* some procedure are shared with "dynamic readline" */
-#if (defined(HAVE_READLINE) || defined(HAVE_LIBREADLINE) || defined(HAVE_DYN_RL)) && !defined(HAVE_FEREAD)
+#if (defined(HAVE_READLINE) || defined(HAVE_LIBREADLINE) || defined(HAVE_DYN_RL))
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -107,40 +107,42 @@ char *command_generator (char *text, int state)
 
 extern "C" {
   typedef char * (*RL_PROC)(const char*,int);
- #ifdef READLINE_READLINE_H_OK
-  #include <readline/readline.h>
-  #ifdef HAVE_READLINE_HISTORY_H
-   #include <readline/history.h>
-  
+  #ifdef READLINE_READLINE_H_OK
+    #include <readline/readline.h>
+    #ifdef HAVE_READLINE_HISTORY_H
+      #include <readline/history.h>
+    #endif
   #endif
-#endif
-#ifdef RL_VERSION_MAJOR
-#if (RL_VERSION_MAJOR >= 4)
-#define USE_READLINE4
-#endif
-#endif
-#ifndef USE_READLINE4
-#define rl_filename_completion_function filename_completion_function
-#define rl_completion_matches           completion_matches
-#endif
-#ifndef READLINE_READLINE_H_OK  
- /* declare everything we need explicitely and do not rely on includes */
-  extern char * rl_readline_name;
-  extern char *rl_line_buffer;
-  char *rl_filename_completion_function(const char*, int);
-  typedef char **CPPFunction ();
 
-  extern char ** rl_completion_matches (const char*, RL_PROC);
-  extern CPPFunction * rl_attempted_completion_function;
-  extern FILE * rl_outstream;
-  extern char * readline (char *);
-  extern void add_history (char *);
-  extern int write_history ();
-  extern void using_history();
-  extern int read_history(char *);
-  extern int history_total_bytes();
- #endif /* READLINE_READLINE_H_OK */
- typedef char * (*PROC)();
+  #ifdef RL_VERSION_MAJOR
+    #if (RL_VERSION_MAJOR >= 4)
+      #define USE_READLINE4
+    #endif
+  #endif
+
+  #ifndef USE_READLINE4
+    #define rl_filename_completion_function filename_completion_function
+    #define rl_completion_matches           completion_matches
+  #endif
+  #ifndef READLINE_READLINE_H_OK  
+    /* declare everything we need explicitely and do not rely on includes */
+    extern char * rl_readline_name;
+    extern char *rl_line_buffer;
+    char *rl_filename_completion_function(const char*, int);
+    typedef char **CPPFunction ();
+
+    extern char ** rl_completion_matches (const char*, RL_PROC);
+    extern CPPFunction * rl_attempted_completion_function;
+    extern FILE * rl_outstream;
+    extern char * readline (char *);
+    extern void add_history (char *);
+    extern int write_history ();
+    extern void using_history();
+    extern int read_history(char *);
+    extern int history_total_bytes();
+  #endif /* READLINE_READLINE_H_OK */
+
+  typedef char * (*PROC)();
 
   typedef char **RL_CPPFunction (const char*, int,int);
 }
@@ -165,7 +167,7 @@ extern "C"
   void (*fe_add_history) (char *);            /* 5 */
   char ** fe_rl_readline_name;                /* 6 */
   char **fe_rl_line_buffer;                   /* 7 */
-  char **(*fe_completion_matches)();          /* 8 */
+  char **(*fe_completion_matches)(...);          /* 8 */
   CPPFunction **fe_rl_attempted_completion_function; /* 9 */
   FILE ** fe_rl_outstream;                    /* 10 */
   int (*fe_write_history) ();                 /* 11 */
