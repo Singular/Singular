@@ -570,8 +570,11 @@ char * versionString()
               StringAppendS("Gauss-Manin system,");
 #endif
               StringAppend("random=%d\n",siRandomStart);
-              StringAppend("CC=%s, CXX=%s\n",CC,CXX);
-
+              StringAppend("\tCC=%s,\n\tCXX=%s"
+#ifdef __GNUC__
+              "(" __VERSION__ ")"
+#endif
+              "\n",CC,CXX);
               feStringAppendResources(0);
               feStringAppendBrowsers(0);
               StringAppend("\n");

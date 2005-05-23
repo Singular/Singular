@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.115 2005-05-18 18:01:59 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.116 2005-05-23 13:27:23 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1279,9 +1279,9 @@ BOOLEAN iiExport (leftv v, int toLev, idhdl root)
   checkall();
 #endif
   //  Print("iiExport1: pack=%s\n",IDID(root));
+  package pack=IDPACKAGE(root);
   BOOLEAN nok=FALSE;
   leftv rv=v;
-  package pack=IDPACKAGE(root);
   while (v!=NULL)
   {
     if ((v->name==NULL)||(v->rtyp==0)||(v->e!=NULL)
@@ -1295,7 +1295,12 @@ BOOLEAN iiExport (leftv v, int toLev, idhdl root)
       idhdl old=pack->idroot->get( v->name,toLev);
       if (old!=NULL)
       {
-        if (IDTYP(old)==v->Typ())
+        if ((pack==currPack) && (old==(idhdl)v->data))
+        {
+          Warn("`%s` is already global",IDID(old));
+          break;
+        }
+        else if (IDTYP(old)==v->Typ())
         {
           if (BVERBOSE(V_REDEFINE))
           {
