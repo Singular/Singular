@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.48 2005-05-20 18:06:54 levandov Exp $
+@comment $Id: NEWS.texi,v 1.49 2005-05-23 15:35:37 levandov Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -71,6 +71,8 @@ procedures for computing the Castelnuovo-Mumford regularity
 procedures for primary decomposition of modules
 @item @nref{gmspoly_lib}, @nref{gmssing_lib}   
 procedures for the Gauss-Manin connection of a singularity
+@item @nref{resol_lib}
+resolution of singularities
 @item @nref{rootsmr_lib}
 counting the number of real roots
 @item @nref{sheafcoh_lib}
