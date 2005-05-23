@@ -42,20 +42,6 @@ OUTPUT_MAKEFILES="Makefile"
 if test -d "doc"; then
    OUTPUT_MAKEFILES="$OUTPUT_MAKEFILES doc/Makefile doc/version.texi doc/uname.texi"
 fi
-dnl if test -d "rpm"; then
-dnl   OUTPUT_MAKEFILES=$OUTPUT_MAKEFILES" rpm/Makefile"
-dnl   OUTPUT_MAKEFILES=$OUTPUT_MAKEFILES" rpm/Singular.spec"
-dnl fi
-if test -d "modules"; then
-dnl    OUTPUT_MAKEFILES=$OUTPUT_MAKEFILES" modules/Makefile"
-   CONFIG_SUBDIRS=$CONFIG_SUBDIRS" modules"
-fi
-dnl if test -d "modules/tools"; then
-dnl    OUTPUT_MAKEFILES=$OUTPUT_MAKEFILES" modules/tools/Makefile"
-dnl fi
-dnl if test -d "modules/modgen"; then
-dnl    OUTPUT_MAKEFILES=$OUTPUT_MAKEFILES" modules/modgen/Makefile"
-dnl fi
 if test -d "emacs"; then
    OUTPUT_MAKEFILES=$OUTPUT_MAKEFILES" emacs/Makefile"
 fi
@@ -864,6 +850,11 @@ dnl  SUBDIRS="$SUBDIRS rpm"
 dnl fi
 if test -d modules; then
   SUBDIRS="$SUBDIRS modules"
+fi
+if test -d "modules"; then
+dnl    OUTPUT_MAKEFILES=$OUTPUT_MAKEFILES" modules/Makefile"
+   CONFIG_SUBDIRS=$CONFIG_SUBDIRS" modules"
+   BUILD_SUBDIRS=$BUILD_SUBDIRS" modules"
 fi
   
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
