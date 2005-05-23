@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: makefile.cc,v 1.15 2005-05-17 09:24:44 anne Exp $ */
+/* $Id: makefile.cc,v 1.16 2005-05-23 09:14:50 Singular Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -102,6 +102,7 @@ void build_head_section(
   fprintf(fp, "#LD\t=\n");
   fprintf(fp, "\n");
   fprintf(fp, "instdir          = %s\n", inst_dir );
+  fprintf(fp, "MKINSTALLDIRS\t\t= %s/modules/mkdinstalldirs\n", PREFIX);
 #warning "PROBLEM: do we also install install-sh when installing Singular?"
   fprintf(fp, "INSTALL\t\t= %s/Singular/install-sh -c\n", PREFIX);
   fprintf(fp, "INSTALL_PROGRAM\t= ${INSTALL}\n");
