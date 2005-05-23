@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: reszeta.lib,v 1.4 2005-05-20 18:46:13 Singular Exp $";
+version="$Id: reszeta.lib,v 1.5 2005-05-23 18:35:58 anne Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  zeta.lib       Zeta-function of Denef and Loeser
@@ -5236,7 +5236,7 @@ proc findInIVList(int pos, int val, list ivl)
    return(intvec(0));
 }
 /////////////////////////////////////////////////////////////////////////////
-static
+//static
 proc inIVList(intvec iv, list li)
 "Internal procedure - no help and no example available
 "
