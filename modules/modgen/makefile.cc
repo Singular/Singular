@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: makefile.cc,v 1.17 2005-05-23 11:10:46 Singular Exp $ */
+/* $Id: makefile.cc,v 1.18 2005-05-23 11:13:52 Singular Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -129,7 +129,7 @@ void build_install_section(
   moddefv module
   )
 {
-  fprintf(fp, "install:\n");
+  fprintf(fp, "install bindist:\n");
   fprintf(fp, "\t${MKINSTALLDIRS} ${instdir}\n");
   fprintf(fp, "\t${MKINSTALLDIRS} ${instdir}/MOD\n");
   fprintf(fp, "\t${INSTALL_PROGRAM} %s.so ${instdir}/MOD/%s.so\n",
