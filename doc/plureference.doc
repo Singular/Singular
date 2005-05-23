@@ -1,5 +1,5 @@
   @comment -*-texinfo-*-
-@comment $Id: plureference.doc,v 1.35 2005-05-18 20:50:08 levandov Exp $
+@comment $Id: plureference.doc,v 1.36 2005-05-23 15:36:06 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -1030,7 +1030,7 @@ ring
 @item @strong{Purpose:}
 creates an opposite algebra of a given algebra.
 @item @strong{Note:}
-You have to activate the ring with the @code{setring} command.
+activate the ring with the @code{setring} command.
 @* An opposite algebra of a given algebra (@math{A},.) is
 an algebra (@math{A},*) with the same vectorspace but with the opposite
 multiplication, i.e.
