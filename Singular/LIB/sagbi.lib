@@ -8,8 +8,8 @@ PROCEDURES:
  proc reduction(p,I); Perform one step subalgebra reducton (for short S-reduction) of p w.r.t I
  proc S_poly(I);      Compute the S-polynomilas of the Subalgebra defined by the genartors of I
  proc S_nf(id,I);     Perform iterated S-reductions in order to compute Subalgebras normal forms
- proc Sagbi(I);       Construct SAGBI basis for the Subalgebra defined by I
- proc Sagbi1(I);      Construct partial SAGBI basis for the Subalgebra defined by I
+ proc sagbi(I);       Construct SAGBI basis for the Subalgebra defined by I
+ proc sagbi1(I);      Construct partial SAGBI basis for the Subalgebra defined by I
 ";
 
  LIB "algebra.lib";
@@ -89,7 +89,7 @@ EXAMPLE: example S_poly; show an example "
                          // lead(id[z]).
 
       export kern,A;// we export:* the ideal A  to avoid useless computations
-               //                  betwee 2 steps in Sagbi procedure.
+               //                  betwee 2 steps in sagbi procedure.
               //                 *the ideal kern : some times we can get intresting
              //                    informations from this ideal.
 
@@ -525,8 +525,8 @@ static proc intRed(id,int k, list #)
 }
 //////////////////////////////////////////////////////////////////////////////
 
-proc Sagbi(id,int k,list#)
-"USAGE: Sagbi(id,k[,n]); id ideal, k and n positive integer.
+proc sagbi(id,int k,list#)
+"USAGE: sagbi(id,k[,n]); id ideal, k and n positive integer.
 RETURN: A SAGBI basis for the subalgebra defined by the generators of id.
 @format
     k determine waht kind of s-reduction is performad:
@@ -539,7 +539,7 @@ RETURN: A SAGBI basis for the subalgebra defined by the generators of id.
 @end format
 NOTE: SAGBI bases computations may be performed either
       in polynomial rings or quotient polynomial rings.
-EXAMPLE: example Sagbi; show example "
+EXAMPLE: example sagbi; show example "
 {
   degBound=0;
   ideal S,oldS,Red;
@@ -559,11 +559,11 @@ example
 { "EXAMPLE:"; echo = 2;
  ring r= 0,(x,y),dp;
  ideal I=x2,y2,xy+y;
- Sagbi(I,1,1);
+ sagbi(I,1,1);
 }
 ///////////////////////////////////////////////////////////////////////////////
-proc Sagbi1(id,int k,int c,list #)
-"USAGE: Sagbi(id,k,c[,n]); id ideal, k, c and n positive integer.
+proc sagbi1(id,int k,int c,list #)
+"USAGE: sagbi(id,k,c[,n]); id ideal, k, c and n positive integer.
 RETURN: A partial SAGBI basis for the subalgebra defined by the genrators of id.
 @format
      should stop.k determine waht kind of s-reduction is performad:
@@ -577,10 +577,10 @@ RETURN: A partial SAGBI basis for the subalgebra defined by the genrators of id.
 @end format
 NOTE:- SAGBI bases computations may be performed either
        in polynomial rings or quotient polynomial rings.
-     - This version of Sagbi procedure is interesting in the case of an Subalgebras
+     - This version of sagbi procedure is interesting in the case of an Subalgebras
        with infinte SAGBI basis. In this case, by means of this procedure,
        we may check for example, if the elements of this basis have a particular form.
-EXAMPLE: example Sagbi1; show example "
+EXAMPLE: example sagbi1; show example "
 {
   degBound=0;
   ideal S,oldS,Red;
@@ -602,7 +602,7 @@ example
 { "EXAMPLE:"; echo = 2;
  ring r= 0,(x,y),dp;
  ideal I=x,xy-y2,xy2;//the corresponding Subalgebra has an infinte SAGBI basis
- Sagbi1(I,1,3)// computations should stop after 3 turns.
+ sagbi1(I,1,3)// computations should stop after 3 turns.
 }
 //////////////////////////////////////////////////////////////////////////////
 
