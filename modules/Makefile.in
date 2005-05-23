@@ -2,7 +2,7 @@
 ###
 ### Makefile for Singular-modules
 ###
-### $Id: Makefile.in,v 1.12 2005-05-18 07:24:41 Singular Exp $
+### $Id: Makefile.in,v 1.13 2005-05-23 12:09:35 Singular Exp $
 ###
 #################################################################
 
@@ -18,9 +18,12 @@ exec_prefix 	= @exec_prefix@
 libdir 		= @libdir@
 # program executable goes here
 bindir		= @bindir@
+install_bindir	= @bindir@
 # Singular libs go here
 includedir	= @includedir@
 INC_SRC		= ${topsrcdir}/Singular
+SINGUNAME       = @SINGUNAME@
+install_bindir  = ${install_prefix}/${SINGUNAME}/MOD
 
 ## 
 ## various programs
@@ -129,10 +132,18 @@ distclean: clean mod_clean
 	done
 	rm -f Makefile
 
-install: all
-	(cd modgen; make install)
+install bindist: all
+	(cd modgen; make $@)
 	for SUBDIR in ${MOD_DIRS} ${MOD_FILES}; \
 	do \
 		echo ${MAKE} $@ in $${SUBDIR}; \
-		( cd $${SUBDIR} && ${MAKE} MKINSTALLDIRS=../mkinstalldirs $@;) \
+		( cd $${SUBDIR} && ${MAKE} $@;) \
+	done
+
+install-bindist: all
+	(cd modgen; make install_bindir=${install_bindir} $@)
+	for SUBDIR in ${MOD_DIRS} ${MOD_FILES}; \
+	do \
+		echo ${MAKE} install_bindir=${install_bindir} $@ in $${SUBDIR}; \
+		( cd $${SUBDIR} && ${MAKE} install_bindir=${install_bindir} $@;) \
 	done

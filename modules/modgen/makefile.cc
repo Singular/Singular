@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: makefile.cc,v 1.18 2005-05-23 11:13:52 Singular Exp $ */
+/* $Id: makefile.cc,v 1.19 2005-05-23 12:08:58 Singular Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -135,6 +135,12 @@ void build_install_section(
   fprintf(fp, "\t${INSTALL_PROGRAM} %s.so ${instdir}/MOD/%s.so\n",
           module->targetname, module->targetname);
   fprintf(fp, "\t${INSTALL_PROGRAM} %s.bin ${instdir}/MOD/%s.bin\n",
+          module->targetname, module->targetname);
+  fprintf(fp, "install-bindist:\n");
+  fprintf(fp, "\t${MKINSTALLDIRS} ${install_bindir}\n");
+  fprintf(fp, "\t${INSTALL_PROGRAM} %s.so ${install_bindir}/%s.so\n",
+          module->targetname, module->targetname);
+  fprintf(fp, "\t${INSTALL_PROGRAM} %s.bin ${install_bindir}/%s.bin\n",
           module->targetname, module->targetname);
 }
 

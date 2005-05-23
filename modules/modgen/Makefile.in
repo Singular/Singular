@@ -9,6 +9,7 @@ libdir 		= @libdir@
 includedir	= @includedir@
 # program executable goes here
 bindir		= @bindir@
+install_bindir	= @bindir@
 # Singular libs go here
 includedir	= @includedir@
 MOD_DEST	= ./include
@@ -63,11 +64,20 @@ all	= modgen
 modgen: pathnames.h ${OBJS} modgen.h decl.inc typmap.h stype.h
 	$(LD) -o $@ ${CFLAGS} ${OBJS} ${LIBS}
 
-install: modgen
+install bindist: modgen
 	${MKINSTALLDIRS} ${bindir}
 	${INSTALL_PROGRAM} modgen ${bindir}/modgen-${SINGULAR_VERSION}
 	rm -f ${bindir}/modgen
 	cd ${bindir}; ${LN_S} modgen-${SINGULAR_VERSION} modgen;\
+	if test ! -x ${MODGEN}; then \
+		${LN_S} modgen-${SINGULAR_VERSION} ${MODGEN};\
+	fi
+
+install-bindist: modgen
+	${MKINSTALLDIRS} ${install_bindir}
+	${INSTALL_PROGRAM} modgen ${install_bindir}/modgen-${SINGULAR_VERSION}
+	rm -f ${install_bindir}/modgen
+	cd ${install_bindir}; ${LN_S} modgen-${SINGULAR_VERSION} modgen;\
 	if test ! -x ${MODGEN}; then \
 		${LN_S} modgen-${SINGULAR_VERSION} ${MODGEN};\
 	fi
