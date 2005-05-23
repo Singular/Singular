@@ -570,6 +570,7 @@ char * versionString()
               StringAppendS("Gauss-Manin system,");
 #endif
               StringAppend("random=%d\n",siRandomStart);
+              StringAppend("CC=%s, CXX=%s\n",CC,CXX);
 
               feStringAppendResources(0);
               feStringAppendBrowsers(0);
