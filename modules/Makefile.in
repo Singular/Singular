@@ -2,7 +2,7 @@
 ###
 ### Makefile for Singular-modules
 ###
-### $Id: Makefile.in,v 1.13 2005-05-23 12:09:35 Singular Exp $
+### $Id: Makefile.in,v 1.14 2005-05-23 15:03:46 Singular Exp $
 ###
 #################################################################
 
@@ -137,7 +137,7 @@ install bindist: all
 	for SUBDIR in ${MOD_DIRS} ${MOD_FILES}; \
 	do \
 		echo ${MAKE} $@ in $${SUBDIR}; \
-		( cd $${SUBDIR} && ${MAKE} $@;) \
+		( cd $${SUBDIR} && ${MAKE} $@;) || true; \
 	done
 
 install-bindist: all
