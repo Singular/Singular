@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.88 2005-05-23 14:51:07 anne Exp $
+@comment $Id: examples.doc,v 1.89 2005-05-23 15:01:16 anne Exp $
 @comment this file contains the examples
 
 @c The following directives are necessary for proper compilation
@@ -781,7 +781,7 @@ which allows ignoring all but the first j entries of vectors when
 forming the pairs in the standard basis computation.
 
 @smallexample
-@c @c example
+@c example
 ring r=0,(x,y),dp;
 module mo=[x^2-y^2,1,0,0],[xy+y^2,0,1,0],[y^2,0,0,1];
 print(mo);
@@ -791,7 +791,7 @@ LIB("kstd.so");
 listvar(package);
 
 // set the number of components to be considered to 1
-module mostd=Kstd::kstd(mo,1);
+module mostd=kstd(mo,1);
                     // obviously computation ignored pairs with leading
                     // term in the second entry
 print(mostd);       
@@ -802,7 +802,7 @@ module mostd2=Kstd::kstd(mo,2);
                     // treated too
 print(mostd2);
 
-@c @c example
+@c example
 @end smallexample
 
 @c ----------------------------------------------------------------------------
