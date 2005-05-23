@@ -299,6 +299,8 @@ iparith.inc mpsr_Tok.inc: claptmpl.o iparith.cc \
 version.h: ${SOURCES} ${HEADERS} Makefile.in mod2.h.in \
            configure.in
 	echo "#define feVersionId "  `date '+%Y%m%d%H'` >version.h
+	echo "#define CC=\"" ${CC} ${CFLAGS} "\"" >>version.h
+	echo "#define CXX=\"" ${CXX} ${CXXFLAGS} "\"" >>version.h
 
 libparse: libparse_main.o utils.o fegetopt.o
 	${CXX}  ${CPPFLAGS} -DSTANDALONE_PARSER -o libparse libparse_main.o utils.o fegetopt.o ${LDFLAGS2} -lomalloc_ndebug
