@@ -1,4 +1,4 @@
-version="$Id: control.lib,v 1.32 2005-05-23 15:36:46 levandov Exp $";
+version="$Id: control.lib,v 1.33 2005-05-23 15:47:35 levandov Exp $";
 category="System and Control Theory";
 info="
 LIBRARY:  control.lib     Algebraic analysis tools for System and Control Theory
@@ -151,8 +151,8 @@ example
 //--------------------------------------------------------------------------
 proc rightKernel(matrix M)
 "USAGE:  rightKernel(M);   M a matrix
-PURPOSE: computes the right kernel of matrix M (a module of all elements v such that Mv=0)
 RETURN:  module
+PURPOSE: computes the right kernel of matrix M (a module of all elements v such that Mv=0)
 EXAMPLE: example rightKernel; shows an example
 "{
   return(modulo(M,std(0)));
@@ -170,8 +170,8 @@ example
 //-------------------------------------------------------------------------
 proc leftKernel(matrix M)
 "USAGE:  leftKernel(M);   M a matrix
-PURPOSE: computes left kernel of matrix M (a module of all elements v such that vM=0)
 RETURN:  module
+PURPOSE: computes left kernel of matrix M (a module of all elements v such that vM=0)
 EXAMPLE:  example leftKernel; shows an example
 "
 {
@@ -190,8 +190,8 @@ example
 //------------------------------------------------------------------------
 proc leftInverse(module M)
 "USAGE:  leftInverse(M);  M a module
-PURPOSE: computes such a matrix L, that LM = Id;
 RETURN:  module
+PURPOSE: computes such a matrix L, that LM = Id;
 EXAMPLE: example leftInverse; shows an example
 NOTE: exists only in the case when M is free submodule
 "
@@ -240,8 +240,8 @@ example
 //-----------------------------------------------------------------------
 proc rightInverse(module R)
 "USAGE:  rightInverse(M);  M a module
-PURPOSE: computes such a matrix L, that ML = Id
 RETURN:  module
+PURPOSE: computes such a matrix L, that ML = Id
 EXAMPLE: example rightInverse; shows an example
 NOTE: exists only in the case when M is free submodule
 "
@@ -396,8 +396,8 @@ NOTE:  this procedure is used in 'control' procedure
 
 proc control(module R)
 "USAGE:  control(R);  R a module (R is the matrix of the system of equations to be investigated)
-PURPOSE: compute the list of all the properties concerning controllability of the system (behavior), represented by the matrix R
 RETURN:  list
+PURPOSE: compute the list of all the properties concerning controllability of the system (behavior), represented by the matrix R
 EXAMPLE:  example control; shows an example
 "
 {
@@ -437,8 +437,8 @@ example
 //--------------------------------------------------------------------------
 proc controlDim(module R)
 "USAGE:  controlDim(R); R a module (R is the matrix of the system of equations to be investigated)
-PURPOSE: computes list of all the properties concerning controllability of the system (behavior), represented by the  matrix R
 RETURN: list
+PURPOSE: computes list of all the properties concerning controllability of the system (behavior), represented by the  matrix R
 EXAMPLE:  example controlDim; shows an example
 NOTE: this procedure is analogous to 'control' but uses dimension calculations.This approach works for full row rank matrices only.
 "
@@ -473,12 +473,10 @@ example
 //------------------------------------------------------------------------
 proc colrank(module M)
 "USAGE: colrank(M); M a matrix/module
-PURPOSE: compute the column rank of M as of matrix
 RETURN: int
+PURPOSE: compute the column rank of M as of matrix
 NOTE: this procedure uses Bareiss algorithm 
-
-"
-{
+"{
   // NOte continued:
   // which might not terminate in some cases
   module M_red  = bareiss(M)[1];
@@ -578,8 +576,8 @@ NOTE:  this procedure is used in 'autonom' procedure
 //--------------------------------------------------------------------------
 proc autonomDim(module R)
 "USAGE:  autonomDim(R);   R a module (R is a matrix of the system of equations which is to be investigated)
-PURPOSE: computes the list of all the properties concerning autonomy of the system (behavior), represented by the matrix R
 RETURN: list
+PURPOSE: computes the list of all the properties concerning autonomy of the system (behavior), represented by the matrix R
 NOTE:  this procedure is analogous to 'autonom' but uses dimension calculations
 EXAMPLE:  example autonomDim; shows an example
 "
@@ -613,8 +611,8 @@ example
 //----------------------------------------------------------
 proc autonom(module R)
 "USAGE:  autonom(R);   R a module (R is a matrix of the system of equations which is to be investigated)
-PURPOSE: find all the properties concerning autonomy of the system (behavior) represented by the  matrix R
 RETURN:  list
+PURPOSE: find all the properties concerning autonomy of the system (behavior) represented by the  matrix R
 EXAMPLE: example autonom; shows an example
 "
 {
@@ -654,8 +652,8 @@ example
 //----------------------------------------------------------
 proc genericity(matrix M)
 "USAGE:  genericity(M); M is a matrix/module
-PURPOSE: determine parametric expressions which have been assumed to be non-zero in the process of computing the Groebner basis
 RETURN:  list (of strings)
+PURPOSE: determine parametric expressions which have been assumed to be non-zero in the process of computing the Groebner basis
 NOTE: we strongly recommend to switch on the redSB and redTail options;
 @*    the procedure is effective with the lift procedure for modules with parameters
 EXAMPLE:  example genericity; shows an example
@@ -875,8 +873,8 @@ static proc evas_genericity(matrix M)
 //---------------------------------------------------------------
 proc canonize(list L)
 "USAGE:  canonize(L); L a list
-PURPOSE: modules in the list are canonized by computing their reduced minimal (= unique up to constant factor w.r.t. the given ordering) Groebner bases
 RETURN:  list
+PURPOSE: modules in the list are canonized by computing their reduced minimal (= unique up to constant factor w.r.t. the given ordering) Groebner bases
 ASSUME:  L is the output of control/autonomy procedures
 EXAMPLE:  example canonize; shows an example
 "
@@ -1363,8 +1361,8 @@ example
 //---------------------------------------------------------------
 proc findTorsion(module R, ideal TAnn)
 "USAGE:  findTorsion(R, I);   R an ideal/matrix/module, I an ideal
+RETURN:  module
 PURPOSE: computes the Groebner basis of the submodule of R, annihilated by I
-ETURN:  module
 NOTE: especially helpful, when I is the annihilator of the t(R) - the torsion submodule of R. In this case, the result is the explicit presentation of t(R) as
 the submodule of R
 EXAMPLE: example findTorsion; shows an example
@@ -1406,8 +1404,8 @@ example
 
 proc controlExample(string s)
 "USAGE:  controlExample(s);   s a string
-PURPOSE: set up an example from the mini database by initalizing a ring and a module in a ring
 RETURN:  ring
+PURPOSE: set up an example from the mini database by initalizing a ring and a module in a ring
 NOTE: in order to see the list of available examples, execute @code{controlExample(\"show\");}
 @* To use ab example, one has to do the following. Suppose one calls the ring, where the example will be activated, A. Then, by executing
 @*  @code{def A = controlExample(\"Antenna\");} and @code{setring A;},
