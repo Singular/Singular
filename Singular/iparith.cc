@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.366 2005-05-20 16:01:13 Singular Exp $ */
+/* $Id: iparith.cc,v 1.367 2005-05-23 15:28:14 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -3990,9 +3990,8 @@ static BOOLEAN jjVDIM(leftv res, leftv v)
 
 static BOOLEAN jjLOAD1(leftv res, leftv v)
 {
-  return jjLOAD(res, v);
+  return jjLOAD(res, v,iiOp==LIB_CMD);
 }
-
 static BOOLEAN jjLOAD(leftv res, leftv v, BOOLEAN autoexport)
 {
 #ifdef HAVE_NS
@@ -4000,7 +3999,7 @@ static BOOLEAN jjLOAD(leftv res, leftv v, BOOLEAN autoexport)
   char libnamebuf[256];
   lib_types LT = type_of_LIB(s, libnamebuf);
 #ifdef HAVE_DYNAMIC_LOADING
-  extern BOOLEAN load_modules(char *newlib, char *fullpath, BOOLEAN tellerror);
+  extern BOOLEAN load_modules(char *newlib, char *fullpath, BOOLEAN autoexport);
 #endif /* HAVE_DYNAMIC_LOADING */
 
   switch(LT)

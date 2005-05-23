@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.114 2005-05-20 16:03:46 Singular Exp $ */
+/* $Id: iplib.cc,v 1.115 2005-05-23 15:28:15 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -24,7 +24,7 @@
 #include "lists.h"
 
 #ifdef HAVE_DYNAMIC_LOADING
-BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN tellerror);
+BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN autoexport);
 #endif
 
 #ifdef HAVE_LIBPARSER
@@ -1042,8 +1042,19 @@ int iiAddCproc(char *libname, char *procname, BOOLEAN pstatic,
   return(0);
 }
 
+int iiAddCprocTop(char *libname, char *procname, BOOLEAN pstatic,
+               BOOLEAN(*func)(leftv res, leftv v))
+{
+  int r=iiAddCproc(libname,procname,pstatic,func);
+  package s=currPack;
+  currPack=basePack;
+  if (r) r=iiAddCproc(libname,procname,pstatic,func);
+  currPack=s;
+  return r;
+}
+
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
-BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN tellerror)
+BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN autoexport)
 {
 #ifdef HAVE_STATIC
   WerrorS("mod_init: static version can not load modules");
@@ -1102,7 +1113,11 @@ BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN tellerror)
     currPack=IDPACKAGE(pl);
 #endif
     fktn = (fktn_t)dynl_sym(IDPACKAGE(pl)->handle, "mod_init");
-    if( fktn!= NULL) (*fktn)(iiAddCproc);
+    if( fktn!= NULL)
+    {
+      if (autoexport) (*fktn)(iiAddCprocTop);
+      else            (*fktn)(iiAddCproc);
+    }
     else Werror("mod_init: %s\n", dynl_error());
     if (BVERBOSE(V_LOAD_LIB)) Print( "// ** loaded %s \n", fullname);
 #ifdef HAVE_NS
