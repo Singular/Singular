@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: platform.doc,v 1.13 2004-04-22 11:38:05 Singular Exp $
+@comment $Id: platform.doc,v 1.14 2005-05-23 16:24:41 Singular Exp $
 @comment this file contains Release notes and various howto's
 
 @c The following directives are necessary for proper compilation
@@ -52,10 +52,6 @@ downloaded with ftp from our FTP site
 or, using your favourite WWW browser, from
 @display
 @uref{http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/}.
-@end display
-Development version can be downloaded from
-@display
-@uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/Development}
 @end display
 
 @include README_download.texi
