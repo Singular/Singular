@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.90 2005-05-23 15:36:05 levandov Exp $
+@comment $Id: examples.doc,v 1.91 2005-05-23 18:31:07 anne Exp $
 @comment this file contains the examples
 
 @c The following directives are necessary for proper compilation
@@ -797,7 +797,7 @@ module mostd=kstd(mo,1);
 print(mostd);       
 
 // now consider 2 components
-module mostd2=Kstd::kstd(mo,2);
+module mostd2=kstd(mo,2);
                     // this time the previously unconsidered pair was
                     // treated too
 print(mostd2);
