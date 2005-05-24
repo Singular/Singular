@@ -2,7 +2,7 @@
 ###
 ### Makefile for Singular-modules
 ###
-### $Id: Makefile.in,v 1.16 2005-05-24 15:43:35 Singular Exp $
+### $Id: Makefile.in,v 1.17 2005-05-24 15:54:46 Singular Exp $
 ###
 #################################################################
 
@@ -81,7 +81,7 @@ mod_prepare: modgen/modgen
 	done
 
 modgen/modgen:
-	cd modgen; make install
+	cd modgen; ${MAKE} install
 
 modules: mod_prepare
 	for SUBDIR in ${MOD_DIRS} ${MOD_FILES}; \
@@ -97,7 +97,7 @@ modules: mod_prepare
 
 clean:
 	rm -f *.o *.lo *.so* *.la *~ core
-	( cd modgen && make $@; )
+	( cd modgen && ${MAKE} $@; )
 	for SUBDIR in ${MOD_DIRS} ${MOD_FILES}; \
 	do \
 		if test -d $${SUBDIR}; then \
@@ -124,7 +124,7 @@ mod_clean:
 	done
 
 distclean: clean mod_clean
-	( cd modgen && make clean )
+	( cd modgen && ${MAKE} clean )
 	for SUBDIR in ${MOD_DIRS}; \
 	do \
 		echo ${MAKE} $@ in $${SUBDIR}; \
@@ -133,7 +133,7 @@ distclean: clean mod_clean
 	rm -f Makefile
 
 install bindist: all
-	(cd modgen; make $@)
+	(cd modgen; ${MAKE} $@)
 	for SUBDIR in ${MOD_DIRS} ${MOD_FILES}; \
 	do \
 		echo ${MAKE} $@ in $${SUBDIR}; \
@@ -141,9 +141,9 @@ install bindist: all
 	done
 
 install-bindist: all
-	(cd modgen; make install_bindir=${install_bindir} $@)
+	(cd modgen; ${MAKE} install_bindir=${install_bindir} $@)
 	for SUBDIR in ${MOD_DIRS} ${MOD_FILES}; \
 	do \
 		echo ${MAKE} install_bindir=${install_bindir} $@ in $${SUBDIR}; \
-		( cd $${SUBDIR} && ${MAKE} install_bindir=${install_bindir} $@;) \
+		( cd $${SUBDIR} && ${MAKE} install_bindir=${install_bindir} $@;)|| true ;\
 	done
