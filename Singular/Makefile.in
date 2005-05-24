@@ -210,9 +210,9 @@ SLIB0 = COPYING \
         classify.lib control.lib   deform.lib    elim.lib      equising.lib \
         finvar.lib   gmspoly.lib   gmssing.lib   general.lib   graphics.lib \
         grwalk.lib   groups.lib    hnoether.lib  homolog.lib   inout.lib \
-        intprog.lib  latex.lib     linalg.lib    makedbm.lib   matrix.lib \
-	mprimdec.lib mondromy.lib  mregular.lib  rootsmr.lib   normal.lib \
-        ntsolve.lib  \
+        intprog.lib  latex.lib     linalg.lib    lll.lib       makedbm.lib \
+        matrix.lib   mprimdec.lib  mondromy.lib  mregular.lib  rootsmr.lib \
+        normal.lib   ntsolve.lib  \
         poly.lib     presolve.lib  primdec.lib   primitiv.lib   qhmoduli.lib \
         random.lib   reesclos.lib  resol.lib     resgraph.lib   ring.lib \
         rinvar.lib   sagbi.lib     sheafcoh.lib  sing.lib \
