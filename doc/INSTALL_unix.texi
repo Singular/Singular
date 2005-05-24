@@ -1,12 +1,12 @@
 @comment -*-texinfo-*-
-@comment $Id: INSTALL_unix.texi,v 1.20 2005-03-14 13:22:10 Singular Exp $
+@comment $Id: INSTALL_unix.texi,v 1.21 2005-05-24 16:14:22 Singular Exp $
 @c FILE: INSTALL_unix.texi
 @c PURPOSE: Installation instruction for Singular on Unix
 @c
 
-@ifclear VERSION
+@c @ifclear VERSION
 @include version.texi
-@end ifclear
+@c @end ifclear
 
 @ifclear singularmanual
 @majorheading Unix installation instructions for @sc{Singular} version @value{VERSION}
@@ -31,9 +31,7 @@ platform, you need the following two
 archives:
 @table @code
 @item Singular-@value{VERSION}-share.tar.gz
-contains architecture independent data like documentation and libraries
-(alternatively, you may also download
-@code{Singular-@value{VERSION}-share.zip}).
+contains architecture independent data like documentation and libraries.
 @item Singular-@value{VERSION}-@value{_UNAME}.tar.gz
 contains architecture dependent executables, like the @sc{Singular}
 program.
@@ -78,12 +76,6 @@ Unpack the archives:
 gzip -dc <path_to>/Singular-@value{VERSION}-@value{_UNAME}.tar.gz | tar -pxf -
 gzip -dc <path_to>/Singular-@value{VERSION}-share.tar.gz | tar -pxf -
 @end smallexample
-@c version 2-0-x does not have *-share.zip:
-@c If you have downloaded @code{Singular-@value{VERSION}-share.zip},
-@c unpack with
-@c @smallexample
-@c unzip -u Singular-@value{VERSION}-share.zip
-@c @end smallexample
 
 This creates the the directory Singular/@value{VERSION} with 
 @multitable @columnfractions .36 .64
