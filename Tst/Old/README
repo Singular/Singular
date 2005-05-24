@@ -1,5 +1,5 @@
 To install:
-- put the Singular binary to test into the current directory
+- put a link to the Singular binary to test into the current directory
 
 To run universal tests (i.e. those with no memory or timing output)
 - run "perl ./regress.cmd universal.lst"
