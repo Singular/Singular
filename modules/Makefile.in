@@ -2,7 +2,7 @@
 ###
 ### Makefile for Singular-modules
 ###
-### $Id: Makefile.in,v 1.15 2005-05-24 11:53:20 Singular Exp $
+### $Id: Makefile.in,v 1.16 2005-05-24 15:43:35 Singular Exp $
 ###
 #################################################################
 
@@ -90,7 +90,7 @@ modules: mod_prepare
 		   echo ${MAKE} $@ in $${SUBDIR}; \
 		   ( cd $${SUBDIR} && ${MAKE} ;) \
 		fi;\
-		if test !-d $${SUBDIR}; then \
+		if test ! -d $${SUBDIR}; then \
 		   echo directory $${SUBDIR} does not exist!; \
 		fi;\
 	done
