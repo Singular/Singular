@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: fereadl.c,v 1.1.1.1 2003-10-06 12:15:52 Singular Exp $ */
+/* $Id: fereadl.c,v 1.2 2005-05-24 08:05:07 Singular Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -295,12 +295,12 @@ void fe_init (void)
       char *t_buf=(char *)omAlloc(128); 
       /*char t_buf[128];*/
       char *temp;
-
+      char** t_buf_ptr= &t_buf;
       /* Extract information that termcap functions use.  */
-      temp = tgetstr ("pc", t_buf);
+      temp = tgetstr ("pc", t_buf_ptr);
       PC = (temp!=NULL) ? *temp : '\0';
-      BC=tgetstr("le",t_buf);
-      UP=tgetstr("up",t_buf);
+      BC=tgetstr("le",t_buf_ptr);
+      UP=tgetstr("up",t_buf_ptr);
 
       /* Extract information we will use */
       colmax=tgetnum("co");
@@ -308,7 +308,7 @@ void fe_init (void)
       fe_cursor_line=pagelength-1;
 
       /* init screen */
-      temp = tgetstr ("ti", t_buf);
+      temp = tgetstr ("ti", t_buf_ptr);
       #if 0
       if (temp!=NULL) tputs(temp,1,fe_out_char);
       #endif
@@ -958,3 +958,4 @@ void fe_reset_input_mode ()
   #endif
 #endif
 }
+
