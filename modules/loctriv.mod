@@ -16,11 +16,7 @@
 //#package="loctriv";
 package="kstd";
 version="$Id $";
-info="
-LIBRARY: partstd.lib  EXTERNALLY CONTROLLED GROEBNER
-
-   kstd(module i1, int i2);       externally controlled std.
-";
+info="LIBRARY: partstd.lib  EXTERNALLY CONTROLLED GROEBNER\n\n kstd(module i1, int i2);       externally controlled std.\n";
 
 %procedures
 
