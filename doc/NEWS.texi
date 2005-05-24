@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.49 2005-05-23 15:35:37 levandov Exp $
+@comment $Id: NEWS.texi,v 1.50 2005-05-24 08:02:57 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -20,7 +20,7 @@
 @end macro
 @end ifset
 
-The current version @value{VERSION} is a pre-release to the new
+The current version @value{VERSION} is the first in the new
 release series version 3-0. 
 
 Singular version 3 has a greater functionality and an improved architecture.
@@ -46,22 +46,23 @@ improved gcd of polynomials (including bug fixes)
 @item
 ports to more architectures including automatic building from source (fink on Mac, ebuild on Gentoo)
 @item
-more help browser supported, user extendable (help.cnf)
+more help browsers supported, user extendable (help.cnf)
+@item
+better support of graded modules
 @item
 many bugs fixed
 @end itemize
 Besides theses internal changes, Singular version 3 offers many new
 features and functionalities (which were partly already incorporated in
-the 2-0 series).
+the 2-1 pre-release series).
 
 @heading Factorizing algorithms revisited
 Starting with version 2-0-4, we use NTL (of Victor Shoup) for factoring
-univariate polynomials. The multivariate factoring code in libfac/factory
-does now also work over algebraic extension fields.
+univariate polynomials. The multivariate factorization code in libfac/factory
+now also works over algebraic extension fields.
 
 @heading New @sc{Singular} libraries
 
-Reorganisation of libraries into "Categories".
 @table @asis
 @item @nref{control_lib} 
 algebraic analysis tools for System and Control Theory
@@ -71,8 +72,8 @@ procedures for computing the Castelnuovo-Mumford regularity
 procedures for primary decomposition of modules
 @item @nref{gmspoly_lib}, @nref{gmssing_lib}   
 procedures for the Gauss-Manin connection of a singularity
-@item @nref{resol_lib}
-resolution of singularities
+@item @nref{resol_lib}, @nref{zeta_lib}
+resolution of singularities and applications
 @item @nref{rootsmr_lib}
 counting the number of real roots
 @item @nref{sheafcoh_lib}
@@ -102,8 +103,9 @@ manipulation of rings
 @item @nref{slimgb}
 variant of the F4 algorithm to compute Groebner bases
 @item @nref{exportto}
+transfer an identifier to the specified package
 @item @nref{importfrom}
-
+generate a copy of an identifier from the specified package in the current package
 @item @nref{frwalk}
 fractal walk to change monomial orderings
 @end table
@@ -149,7 +151,7 @@ procedures, related to quantum matrices and minors
 @table @asis
 @item new mapping code
 @c @item non-commutative extension (Plural)
-@item factory revisited
+@item factory revised
 (gcd, factorizing polynomial over algebraic extension fields,...)
 @end table
 
