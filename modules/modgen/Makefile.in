@@ -50,7 +50,7 @@ MODGEN		= $(bindir)/modgen
 CFLAGS	+= --no-rtti --no-exceptions -O3 -w -fomit-frame-pointer -pipe -fno-implicit-templates \
 	-g -I${includedir} -I../include -I../../kernel -I../../Singular -DNDEBUG -DMODULE_GENERATOR \
 	-D${SING_UNAME}
-LIBS	+= -L/usr/local/lib -lgmp
+LIBS	+= -L/usr/local/lib
 
 OBJS	= main.o mod_grammar.o scanner.o misc.o makefile.o utils.o \
 	creat_top.o proc.o proc_setup.o
