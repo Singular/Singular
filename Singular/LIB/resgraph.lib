@@ -631,7 +631,7 @@ proc prepareDcE(list re, list inter, list endCharts)
       if(defined(idlist1)){kill idlist1;}
       list idlist1;
       idlist1[1]=dcE[inter[3][ii][1][2]][inter[3][ii][1][3]][6];
-      export(idlist1);
+      exportto(Top,idlist1);
       for(j=2;j<=size(inter[3][ii]);j++)
       {
 //--- now do the comparison with the other occurrences
