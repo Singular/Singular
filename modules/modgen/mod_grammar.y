@@ -1,5 +1,5 @@
 /*
- * $Id: mod_grammar.y,v 1.1 2003-06-09 09:49:21 krueger Exp $
+ * $Id: mod_grammar.y,v 1.2 2005-05-24 11:34:32 Singular Exp $
  */
 
 %{
@@ -188,8 +188,8 @@ expr:   NAME '=' MSTRINGTOK
         {
           var_token vt;
           int rc = 0;
-          void (*write_cmd)(moddefv module, var_token type = VAR_NONE,
-                            idtyp t, void *arg1 = NULL, void *arg2 = NULL);
+          void (*write_cmd)(moddefv module, var_token type,
+                            idtyp t, void *arg1, void *arg2);
           
           switch(sectnum) {
               case 1: /* pass 1: */
@@ -224,8 +224,8 @@ expr:   NAME '=' MSTRINGTOK
         }
         | NAME '=' FILENAME
         { var_token vt;
-          void (*write_cmd)(moddefv module, var_token type = VAR_NONE,
-                            idtyp t, void *arg1 = NULL, void *arg2 = NULL);
+          void (*write_cmd)(moddefv module, var_token type,
+                            idtyp t, void *arg1, void *arg2);
           switch(sectnum) {
               case 1: /* pass 1: */
                 Add2files(&module_def, $3);
@@ -243,8 +243,8 @@ expr:   NAME '=' MSTRINGTOK
         }
         | NAME '=' files
         { var_token vt;
-          void (*write_cmd)(moddefv module, var_token type = VAR_NONE,
-                            idtyp t, void *arg1 = NULL, void *arg2 = NULL);
+          void (*write_cmd)(moddefv module, var_token type,
+                            idtyp t, void *arg1, void *arg2);
           switch(sectnum) {
               case 1: /* pass 1: */
                 break;
@@ -261,8 +261,8 @@ expr:   NAME '=' MSTRINGTOK
         }
         | NAME '=' NUMTOK
         { var_token vt;
-          void (*write_cmd)(moddefv module, var_token type = VAR_NONE,
-                            idtyp t, void *arg1 = NULL, void *arg2 = NULL);
+          void (*write_cmd)(moddefv module, var_token type,
+                            idtyp t, void *arg1, void *arg2);
           switch(sectnum) {
               case 1: /* pass 1: */
                 break;
@@ -280,8 +280,8 @@ expr:   NAME '=' MSTRINGTOK
         {
           var_token vt;
           int rc = 0;
-          void (*write_cmd)(moddefv module, var_token type = VAR_NONE,
-                            idtyp t, void *arg1 = NULL, void *arg2 = NULL);
+          void (*write_cmd)(moddefv module, var_token type,
+                            idtyp t, void *arg1, void *arg2);
           switch(sectnum) {
               case 1: /* pass 1: */
                 if( (vt=checkvar($1, VAR_BOOL, &write_cmd)) ) {
@@ -519,7 +519,7 @@ examplecodeline: CODEPART
 
 proccmd: '%' NAME ';'
         { cmd_token vt;
-          void (*write_cmd)(moddefv module, procdefv pi, void *arg = NULL);
+          void (*write_cmd)(moddefv module, procdefv pi, void *arg);
           
           switch(vt=checkcmd($2, &write_cmd, CMDT_SINGLE, 0)) {
               case CMD_NONE:
@@ -535,19 +535,19 @@ proccmd: '%' NAME ';'
               case CMD_CHECK:
                 procedure_decl.flags.auto_header = 0;
               case CMD_NODECL:
-                write_cmd(&module_def, &procedure_decl);
+                write_cmd(&module_def, &procedure_decl,NULL);
                 break;
 
               default:
                 write_function_header(&module_def, &procedure_decl);
-                write_cmd(&module_def, &procedure_decl);
+                write_cmd(&module_def, &procedure_decl,NULL);
           }
           free($2);
         }
         | '%' NAME '(' ')' ';'
         {
           cmd_token vt;
-          void (*write_cmd)(moddefv module, procdefv pi, void *arg = NULL);
+          void (*write_cmd)(moddefv module, procdefv pi, void *arg);
           
           switch(vt=checkcmd($2, &write_cmd, CMDT_0, 1)) {
               case CMD_NONE:
@@ -562,14 +562,14 @@ proccmd: '%' NAME ';'
                 write_function_header(&module_def, &procedure_decl);
               case CMD_DECL:
               case CMD_CHECK:
-                write_cmd(&module_def, &procedure_decl);
+                write_cmd(&module_def, &procedure_decl,NULL);
           }
           free($2);
         }
         | '%' NAME '(' NAME ')' ';'
         {
           cmd_token vt;
-          void (*write_cmd)(moddefv module, procdefv pi, void *arg = NULL);
+          void (*write_cmd)(moddefv module, procdefv pi, void *arg);
           
           switch(vt=checkcmd($2, &write_cmd, CMDT_ANY, 1)) {
               case CMD_NONE:
@@ -591,7 +591,7 @@ proccmd: '%' NAME ';'
         | '%' NAME '(' identifier '(' arglist ')' ')' ';'
         {
           cmd_token vt;
-          void (*write_cmd)(moddefv module, procdefv pi, void *arg = NULL);
+          void (*write_cmd)(moddefv module, procdefv pi, void *arg);
           
           switch(vt=checkcmd($2, &write_cmd, CMDT_ANY, 1)) {
               case CMD_NONE:
@@ -613,7 +613,7 @@ proccmd: '%' NAME ';'
         | '%' NAME MEQUAL ANYTOK
         {
           cmd_token vt;
-          void (*write_cmd)(moddefv module, procdefv pi, void *arg = NULL);
+          void (*write_cmd)(moddefv module, procdefv pi, void *arg);
           
           switch(vt=checkcmd($2, &write_cmd, CMDT_EQ, 0)) {
               case CMD_NONE:

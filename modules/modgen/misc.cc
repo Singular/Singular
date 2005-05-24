@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: misc.cc,v 1.23 2005-04-28 13:47:18 Singular Exp $ */
+/* $Id: misc.cc,v 1.24 2005-05-24 11:35:18 Singular Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -185,7 +185,7 @@ char * decl2str(int n, char *name)
 struct valid_cmds_def 
 {
   char *name;
-  void (*write_cmd)(moddefv module, procdefv pi, void *arg = NULL);
+  void (*write_cmd)(moddefv module, procdefv pi, void *arg);
   cmd_token id;
   cmd_type  type;
   int args;
@@ -228,8 +228,8 @@ struct valid_vars_def {
   char *name;
   var_type type;
   var_token id;
-  void (*write_cmd)(moddefv module, var_token type = VAR_NONE,
-                    idtyp t, void *arg1 = NULL, void *arg2 = NULL);
+  void (*write_cmd)(moddefv module, var_token type,
+                    idtyp t, void *arg1, void *arg2);
 } valid_vars[] = {
   { "help",         VAR_STRING,  VAR_HELP,     write_main_variable },
   { "info",         VAR_STRING,  VAR_INFO,     write_main_variable },
