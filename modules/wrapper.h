@@ -14,7 +14,7 @@ public:
       Werror("not the same ring");
       return *this;
     }
-    number nv=n_Mult(n,n2.n,r);
+    number nv=n_Add(n,n2.n,r);
     n_Delete(&n,r);
     n=nv;
     return *this;
