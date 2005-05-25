@@ -1,3 +1,4 @@
+//$Id: wrapper.h,v 1.3 2005-05-25 13:14:29 bricken Exp $
 #include "mod2.h"
 #include "numbers.h"
 #include "febase.h"
@@ -9,12 +10,51 @@ class Number{
   
 public:
     friend Number operator+(Number& n1, Number& n2);
-  Number& operator+=(const Number & n2){
+    friend Number operator-(Number& n1, Number& n2);
+    friend Number operator/(Number& n1, Number& n2);
+    friend Number operator*(Number& n1, Number& n2);
+    Number operator-(){
+      Number t(*this);
+      t.n=n_Copy(n,r);
+      t.n=n_Neg(t.n,r);
+      return t;
+    }
+      Number& operator+=(const Number & n2){
     if (r!=n2.r){
       Werror("not the same ring");
       return *this;
     }
     number nv=n_Add(n,n2.n,r);
+    n_Delete(&n,r);
+    n=nv;
+    return *this;
+  }
+  Number& operator*=(const Number & n2){
+    if (r!=n2.r){
+      Werror("not the same ring");
+      return *this;
+    }
+    number nv=n_Mult(n,n2.n,r);
+    n_Delete(&n,r);
+    n=nv;
+    return *this;
+  }
+  Number& operator-=(const Number & n2){
+    if (r!=n2.r){
+      Werror("not the same ring");
+      return *this;
+    }
+    number nv=n_Sub(n,n2.n,r);
+    n_Delete(&n,r);
+    n=nv;
+    return *this;
+  }
+  Number& operator/=(const Number & n2){
+    if (r!=n2.r){
+      Werror("not the same ring");
+      return *this;
+    }
+    number nv=n_Div(n,n2.n,r);
     n_Delete(&n,r);
     n=nv;
     return *this;
@@ -64,9 +104,28 @@ Number operator+(const Number &n1, const Number& n2){
   erg+=n2;
   return erg;
 }
+Number operator*(const Number &n1, const Number& n2){
+  Number erg(n1);
+  erg*=n2;
+  return erg;
+}
+Number operator-(const Number &n1, const Number& n2){
+  Number erg(n1);
+  erg-=n2;
+  return erg;
+}
+Number operator/(const Number &n1, const Number& n2){
+  Number erg(n1);
+  erg/=n2;
+  return erg;
+}
 BOOST_PYTHON_MODULE(Singular){
   boost::python::class_<Number>("number")
     .def(boost::python::init <int>())
     .def("__str__", as_str)
-    .def(self+self);
+    .def(-self)
+    .def(self+self)
+    .def(self*self)
+    .def(self/self)
+    .def(self-self);
 }
