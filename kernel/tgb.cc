@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.27 2005-05-30 07:41:59 bricken Exp $ */
+/* $Id: tgb.cc,v 1.28 2005-05-30 10:16:54 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -918,7 +918,7 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slim
     ENLARGE(c->T_deg, int);
     ENLARGE(c->tmp_pair_lm,poly);
     ENLARGE(c->tmp_spn,sorted_pair_node*);
-    ENLARGE(c->rep,int);
+
     ENLARGE(c->short_Exps,long);
     ENLARGE(c->lengths,int);
     ENLARGE(c->states, char*);
@@ -942,7 +942,7 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slim
   c->lengths[i]=pLength(h);
  
   c->gcd_of_terms[i]=gcd_of_terms(h,c->r);
-  c->rep[i]=i;
+  
   if (i>0)
     c->states[i]=(char*)  omalloc(i*sizeof(char));
   else
@@ -1924,9 +1924,9 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
   c->states=(char**) h;
   h=omalloc(n*sizeof(int));
   c->lengths=(int*) h;
-  h=omalloc(n*sizeof(int));
-        c->gcd_of_terms=(poly*) omalloc(n*sizeof(poly));
-  c->rep=(int*) h;
+  
+  c->gcd_of_terms=(poly*) omalloc(n*sizeof(poly));
+  
   c->short_Exps=(long*) omalloc(n*sizeof(long));
   c->S=idInit(n,1);
   c->strat=new skStrategy;
@@ -2112,7 +2112,7 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
     }
   }
   omfree(c->short_Exps);
-  omfree(c->rep);
+  
   for(i=0;i<I->idelems();i++)
   {
     I->m[i]=NULL;
@@ -2206,7 +2206,7 @@ static void shorten_tails(slimgb_alg* c, poly monom)
   for(int i=0;i<c->n;i++)
   {
     //enter tail
-    if (c->rep[i]!=i) continue;
+    
     if (c->S->m[i]==NULL) continue;
     poly tail=c->S->m[i]->next;
     poly prev=c->S->m[i];
