@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.26 2005-05-18 10:10:31 bricken Exp $ */
+/* $Id: tgb.cc,v 1.27 2005-05-30 07:41:59 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -1216,7 +1216,7 @@ static poly redTailShort(poly h, kStrategy strat){
   int i;
   int len=pLength(h);
   for(i=0;i<=strat->sl;i++){
-    if(strat->lenS[i]>2)
+    if((strat->lenS[i]>2) || ((strat->lenSw!=NULL) && (strat->lenSw[i]>2)))
       break;
   }
   return(redNFTail(h,i-1,strat, len));
