@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.28 2005-05-30 10:16:54 bricken Exp $ */
+/* $Id: tgb.cc,v 1.29 2005-05-30 11:44:07 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -1830,25 +1830,11 @@ static int poly_crit(const void* ap1, const void* ap2){
   if (l1>l2) return 1;
   return 0;
 }
-
-ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
-  if (TEST_OPT_PROT)
-    if (F4_mode)
-      PrintS("F4 Modus \n");
-    
-     
-  //debug_Ideal=arg_debug_Ideal;
-  //if (debug_Ideal) PrintS("DebugIdeal received\n");
-  // Print("Idelems %i \n----------\n",IDELEMS(arg_I));
-  ideal I=idCompactify(arg_I);
-  if (idIs0(I)) return I;
-
-  qsort(I->m,IDELEMS(I),sizeof(poly),poly_crit);
-  //Print("Idelems %i \n----------\n",IDELEMS(I));
-  slimgb_alg* c=(slimgb_alg*) omalloc(sizeof(slimgb_alg));
+slimgb_alg::slimgb_alg(ideal I){
   
-  c->r=currRing;
-  c->is_homog=TRUE;
+  
+  r=currRing;
+  is_homog=TRUE;
   {
     int hz;
     for(hz=0;hz<IDELEMS(I);hz++){
@@ -1857,107 +1843,106 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
       poly t=I->m[hz]->next;
       while(t)
       {
-	if (d!=pTotaldegree(t,c->r))
-	{
-	  c->is_homog=FALSE;
-	  break;
-	}
-	t=t->next;
+        if (d!=pTotaldegree(t,r))
+        {
+          is_homog=FALSE;
+          break;
+        }
+        t=t->next;
       }
-      if(!(c->is_homog)) break;
+      if(!(is_homog)) break;
     }
   }
   //  Print("is homog:%d",c->is_homog);
   void* h;
   poly hp;
   int i,j;
-  c->to_destroy=NULL;
-  c->easy_product_crit=0;
-  c->extended_product_crit=0;
-  if (rField_is_Zp(c->r))
-    c->is_char0=FALSE;
+  to_destroy=NULL;
+  easy_product_crit=0;
+  extended_product_crit=0;
+  if (rField_is_Zp(r))
+    is_char0=FALSE;
   else
-    c->is_char0=TRUE;
+    is_char0=TRUE;
   //not fully correct
+  //(rChar()==0);
+  F4_mode=F4_mode;
+  reduction_steps=0;
+  last_index=-1;
 
-//(rChar()==0);
-  c->F4_mode=F4_mode;
-  c->reduction_steps=0;
-  c->last_index=-1;
+  F=NULL;
+  F_minus=NULL;
 
-  c->F=NULL;
-  c->F_minus=NULL;
+  Rcounter=0;
 
-  c->Rcounter=0;
+  soon_free=NULL;
 
-  c->soon_free=NULL;
+  tmp_lm=pOne();
 
-  c->tmp_lm=pOne();
-
-  c->normal_forms=0;
-  c->current_degree=1;
+  normal_forms=0;
+  current_degree=1;
  
-  c->max_pairs=5*I->idelems();
+  max_pairs=5*I->idelems();
  
-  c->apairs=(sorted_pair_node**) omalloc(sizeof(sorted_pair_node*)*c->max_pairs);
-  c->pair_top=-1;
+  apairs=(sorted_pair_node**) omalloc(sizeof(sorted_pair_node*)*max_pairs);
+  pair_top=-1;
 
   int n=I->idelems();
-  c->array_lengths=n;
+  array_lengths=n;
 
   
   i=0;
-  c->n=0;
-  c->T_deg=(int*) omalloc(n*sizeof(int));
-  if((!(c->is_homog)) &&(pLexOrder))
-    c->T_deg_full=(int*) omalloc(n*sizeof(int));
+  this->n=0;
+  T_deg=(int*) omalloc(n*sizeof(int));
+  if((!(is_homog)) &&(pLexOrder))
+    T_deg_full=(int*) omalloc(n*sizeof(int));
   else
-    c->T_deg_full=NULL;
-  c->tmp_pair_lm=(poly*) omalloc(n*sizeof(poly));
-  c->tmp_spn=(sorted_pair_node**) omalloc(n*sizeof(sorted_pair_node*));
+    T_deg_full=NULL;
+  tmp_pair_lm=(poly*) omalloc(n*sizeof(poly));
+  tmp_spn=(sorted_pair_node**) omalloc(n*sizeof(sorted_pair_node*));
   lm_bin=omGetSpecBin(POLYSIZE + (r->ExpL_Size)*sizeof(long));
 #ifdef HEAD_BIN
-  c->HeadBin=omGetSpecBin(POLYSIZE + (currRing->ExpL_Size)*sizeof(long));
+  HeadBin=omGetSpecBin(POLYSIZE + (currRing->ExpL_Size)*sizeof(long));
 #endif
   /* omUnGetSpecBin(&(c->HeadBin)); */
   h=omalloc(n*sizeof(char*));
-  c->states=(char**) h;
+  states=(char**) h;
   h=omalloc(n*sizeof(int));
-  c->lengths=(int*) h;
+  lengths=(int*) h;
   
-  c->gcd_of_terms=(poly*) omalloc(n*sizeof(poly));
+  gcd_of_terms=(poly*) omalloc(n*sizeof(poly));
   
-  c->short_Exps=(long*) omalloc(n*sizeof(long));
-  c->S=idInit(n,1);
-  c->strat=new skStrategy;
-  c->strat->syzComp = 0;
-  initBuchMoraCrit(c->strat);
-  initBuchMoraPos(c->strat);
-  c->strat->initEcart = initEcartBBA;
-  c->strat->enterS = enterSBba;
-  c->strat->sl = -1;
+  short_Exps=(long*) omalloc(n*sizeof(long));
+  S=idInit(n,1);
+  strat=new skStrategy;
+  strat->syzComp = 0;
+  initBuchMoraCrit(strat);
+  initBuchMoraPos(strat);
+  strat->initEcart = initEcartBBA;
+  strat->enterS = enterSBba;
+  strat->sl = -1;
   i=n;
   i=1;//some strange bug else
   /* initS(c->S,NULL,c->strat); */
-/* intS start: */
+  /* intS start: */
   // i=((i+IDELEMS(c->S)+15)/16)*16;
-  c->strat->ecartS=(intset)omAlloc(i*sizeof(int)); /*initec(i);*/
-  c->strat->sevS=(unsigned long*)omAlloc0(i*sizeof(unsigned long));
+  strat->ecartS=(intset)omAlloc(i*sizeof(int)); /*initec(i);*/
+  strat->sevS=(unsigned long*)omAlloc0(i*sizeof(unsigned long));
   /*initsevS(i);*/
-  c->strat->S_2_R=(int*)omAlloc0(i*sizeof(int));/*initS_2_R(i);*/
-  c->strat->fromQ=NULL;
-  c->strat->Shdl=idInit(1,1);
-  c->strat->S=c->strat->Shdl->m;
-  c->strat->lenS=(int*)omAlloc0(i*sizeof(int));
-  if((c->is_char0)||((pLexOrder) &&(!c->is_homog)))
-    c->strat->lenSw=(int*)omAlloc0(i*sizeof(int));
+  strat->S_2_R=(int*)omAlloc0(i*sizeof(int));/*initS_2_R(i);*/
+  strat->fromQ=NULL;
+  strat->Shdl=idInit(1,1);
+  strat->S=strat->Shdl->m;
+  strat->lenS=(int*)omAlloc0(i*sizeof(int));
+  if((is_char0)||((pLexOrder) &&(!is_homog)))
+    strat->lenSw=(int*)omAlloc0(i*sizeof(int));
   else
-    c->strat->lenSw=NULL;
+    strat->lenSw=NULL;
   sorted_pair_node* si;
   assume(n>0);
-  add_to_basis_ideal_quotient(I->m[0],-1,-1,c,NULL);
+  add_to_basis_ideal_quotient(I->m[0],-1,-1,this,NULL);
 
-  assume(c->strat->sl==c->strat->Shdl->idelems()-1);
+  assume(strat->sl==strat->Shdl->idelems()-1);
   if(!(F4_mode))
   {
     for (i=1;i<n;i++)//the 1 is wanted, because first element is added to basis
@@ -1968,30 +1953,30 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
       si->j=-1;
       si->expected_length=pLength(I->m[i]);
       si->deg=pTotaldegree(I->m[i]);
-      if (!rField_is_Zp(c->r)){ 
-	pCleardenom(I->m[i]);
+      if (!rField_is_Zp(r)){ 
+        pCleardenom(I->m[i]);
       }
       si->lcm_of_lm=I->m[i];
       
       //      c->apairs[n-1-i]=si;
-      c->apairs[n-i-1]=si;
-      ++(c->pair_top);
+      apairs[n-i-1]=si;
+      ++(pair_top);
     }
   }
   else
   {
-     for (i=1;i<n;i++)//the 1 is wanted, because first element is added to basis
-       add_to_basis_ideal_quotient(I->m[i],-1,-1,c,NULL);
+    for (i=1;i<n;i++)//the 1 is wanted, because first element is added to basis
+      add_to_basis_ideal_quotient(I->m[i],-1,-1,this,NULL);
   }
-    
-
-  while(c->pair_top>=0)
+  for(i=0;i<I->idelems();i++)
   {
-    if(F4_mode)
-      go_on_F4(c);
-    else
-      go_on(c);
+    I->m[i]=NULL;
   }
+  idDelete(&I);
+}
+slimgb_alg::~slimgb_alg(){
+  int i,j;
+  slimgb_alg* c=this;
   while(c->to_destroy)
   {
     pDelete(&(c->to_destroy->p));
@@ -2070,8 +2055,8 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
     BOOLEAN found=FALSE;
     for(j=0;j<c->n;j++){
       if (c->S->m[j]==c->strat->S[i]){
-	found=TRUE;
-	break;
+        found=TRUE;
+        break;
       }
     }
     if(!found) pDelete(&c->strat->S[i]);
@@ -2096,29 +2081,25 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
     for(j=0;j<c->n;j++)
     {
       if((c->S->m[j]==NULL)||(i==j)) 
-	continue;
+        continue;
       assume(p_LmShortDivisibleBy(c->S->m[j],c->short_Exps[j],
-			       c->S->m[i],~c->short_Exps[i],
-				   c->r)==p_LmDivisibleBy(c->S->m[j],
-							c->S->m[i],
-							  c->r));
+             c->S->m[i],~c->short_Exps[i],
+             c->r)==p_LmDivisibleBy(c->S->m[j],
+             c->S->m[i],
+             c->r));
       if (p_LmShortDivisibleBy(c->S->m[j],c->short_Exps[j],
-			       c->S->m[i],~c->short_Exps[i],
-				   c->r))
+          c->S->m[i],~c->short_Exps[i],
+          c->r))
       {
-	pDelete(&c->S->m[i]);
-	break;
+        pDelete(&c->S->m[i]);
+        break;
       }
     }
   }
   omfree(c->short_Exps);
   
-  for(i=0;i<I->idelems();i++)
-  {
-    I->m[i]=NULL;
-  }
-  idDelete(&I);
-  I=c->S;
+
+  ideal I=c->S;
   
   IDELEMS(I)=c->n;
 
@@ -2129,7 +2110,36 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
   pDelete(&c->tmp_lm);
   omUnGetSpecBin(&lm_bin);
   delete c->strat;
-  omfree(c);
+}
+ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
+  if (TEST_OPT_PROT)
+    if (F4_mode)
+      PrintS("F4 Modus \n");
+    
+     
+  //debug_Ideal=arg_debug_Ideal;
+  //if (debug_Ideal) PrintS("DebugIdeal received\n");
+  // Print("Idelems %i \n----------\n",IDELEMS(arg_I));
+  ideal I=idCompactify(arg_I);
+  if (idIs0(I)) return I;
+
+  qsort(I->m,IDELEMS(I),sizeof(poly),poly_crit);
+  //Print("Idelems %i \n----------\n",IDELEMS(I));
+  //slimgb_alg* c=(slimgb_alg*) omalloc(sizeof(slimgb_alg));
+  slimgb_alg* c=new slimgb_alg(I);
+
+
+    
+  int i;
+  while(c->pair_top>=0)
+  {
+    if(F4_mode)
+      go_on_F4(c);
+    else
+      go_on(c);
+  }
+  I=c->S;
+  delete c;
   //qsort(I->m, IDELEMS(I),sizeof(poly),pLmCmp_func);
   return(I);
 }

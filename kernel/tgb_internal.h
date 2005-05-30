@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb_internal.h,v 1.12 2005-05-30 10:16:55 bricken Exp $ */
+/* $Id: tgb_internal.h,v 1.13 2005-05-30 11:44:08 bricken Exp $ */
 /*
  * ABSTRACT: tgb internal .h file
 */
@@ -85,7 +85,8 @@ struct poly_array_list{
 class slimgb_alg
 {
   public:
-
+    slimgb_alg(ideal I);
+    virtual ~slimgb_alg();
   char** states;
   ideal S;
   ring r;
