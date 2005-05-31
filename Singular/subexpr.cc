@@ -4,7 +4,7 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id: subexpr.cc,v 1.89 2005-01-18 15:42:03 Singular Exp $ */
+/* $Id: subexpr.cc,v 1.90 2005-05-31 07:42:21 bricken Exp $ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -13,6 +13,7 @@
 #include <unistd.h>
 
 #include "mod2.h"
+#include "intvec.h"
 #include "tok.h"
 #include "ipid.h"
 #include "intvec.h"

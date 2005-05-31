@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: walk.cc,v 1.7 2005-05-04 14:09:46 Singular Exp $ */
+/* $Id: walk.cc,v 1.8 2005-05-31 07:42:20 bricken Exp $ */
 /*
 * ABSTRACT: Implementation of the Groebner walk
 */
@@ -38,6 +38,7 @@
 #include <si_gmp.h>
 
 #include "mod2.h"
+#include "intvec.h"
 #include "cntrlc.h"
 #include "math.h"
 #include "structs.h"
