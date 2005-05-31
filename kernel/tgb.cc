@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.29 2005-05-30 11:44:07 bricken Exp $ */
+/* $Id: tgb.cc,v 1.30 2005-05-31 13:24:50 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -13,6 +13,7 @@
 #include "tgb_internal.h"
 #include "tgbgauss.h"
 #include "F4.h"
+#include "longrat.h"
 static const int bundle_size=100;
 #if 1
 static omBin lm_bin=NULL;
@@ -63,25 +64,89 @@ int kSBucketLength(kBucket* b, poly lm)
 
 #ifdef LEN_VAR3
 // 3.Variante: Laenge: Platz fuer Leitk * Monomanzahl
+
+int QlogSizeClassic(number bigint){
+  if(nlIsZero(bigint)) return 0;
+  number absv=nlCopy(bigint);
+  number two=nlInit(2);
+  if(!(nlGreaterZero(absv)))
+    absv=nlNeg(absv);
+  int ls=0;
+  number comp=nlInit(1);
+  BOOLEAN equal=FALSE;
+  while(!(nlGreater(comp,absv))) {
+    ls++;
+    if (nlEqual(comp,absv)){
+      equal=TRUE;
+      break;
+    }
+    number temp=comp;
+    comp=nlMult(comp,two);
+    nlDelete(&temp, currRing);
+    
+  }
+  if(!equal)
+    ls++;
+  nlDelete(&two,currRing);
+  nlDelete(&absv,currRing);
+  nlDelete(&comp,currRing);
+  //Print("%d\n",ls);
+  return ls;
+}
+int QlogSize(number bigint){
+  int size=nlSize(bigint);
+  if(size<=1) return QlogSizeClassic(bigint);
+  else return sizeof(mp_limb_t)*size*8;
+  }
 inline int pSLength(poly p,int l)
 {
-  int c=nSize(pGetCoeff(p));
+  int c;
+  number coef=pGetCoeff(p);
+  if (rField_is_Q(currRing)){
+    c=QlogSize(coef);
+  }
+  else
+    c=nSize(coef);
+  
   return c*l /*pLength(p)*/;
 }
+//! TODO CoefBuckets berücksichtigen
 int kSBucketLength(kBucket* b, poly lm=NULL)
 {
   int s=0;
   int c;
+  number coef;
   if(lm==NULL)
-    c=nSize(pGetCoeff(kBucketGetLm(b)));
+    coef=pGetCoeff(kBucketGetLm(b));
+    //c=nSize(pGetCoeff(kBucketGetLm(b)));
   else
-    c=nSize(pGetCoeff(lm));
+    coef=pGetCoeff(lm);
+    //c=nSize(pGetCoeff(lm));
+  if (rField_is_Q(currRing)){
+    c=QlogSize(coef);
+  }
+  else
+    c=nSize(coef);
+  
   int i;
   for (i=b->buckets_used;i>=0;i--)
   {
     assume((b->buckets_length[i]==0)||(b->buckets[i]!=NULL));
     s+=b->buckets_length[i] /*pLength(b->buckets[i])*/;
   }
+  #ifdef HAVE_COEF_BUCKETS
+  assume(b->buckets[0]==kBucketGetLm(b));
+  if (b->coef[0]!=NULL){
+    
+    if (rField_is_Q(currRing)){
+      int modifier=QlogSize(pGetCoeff(b->coef[0]));
+      c+=modifier;
+  }
+    else{
+      int modifier=nSize(pGetCoeff(b->coef[0]));
+      c*=modifier;}
+    }
+  #endif
   return s*c;
 }
 #endif
@@ -177,7 +242,8 @@ int red_object::guess_quality(slimgb_alg* c){
     //case, you have to look on coefs
     int s=0;
     if (c->is_char0)
-      s=kSBucketLength(bucket,this->p);
+      //s=kSBucketLength(bucket,this->p);
+      s=kSBucketLength(bucket,NULL);
     else 
     {
       if((pLexOrder) &&(!c->is_homog))
@@ -2112,6 +2178,11 @@ slimgb_alg::~slimgb_alg(){
   delete c->strat;
 }
 ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
+  
+  //  Print("QlogSize(0) %d, QlogSize(1) %d,QlogSize(-2) %d, QlogSize(5) %d\n", QlogSize(nlInit(0)),QlogSize(nlInit(1)),QlogSize(nlInit(-2)),QlogSize(nlInit(5)));
+  
+  
+  
   if (TEST_OPT_PROT)
     if (F4_mode)
       PrintS("F4 Modus \n");
