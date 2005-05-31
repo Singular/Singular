@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.30 2005-05-31 13:24:50 bricken Exp $ */
+/* $Id: tgb.cc,v 1.31 2005-05-31 18:41:21 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -1896,7 +1896,7 @@ static int poly_crit(const void* ap1, const void* ap2){
   if (l1>l2) return 1;
   return 0;
 }
-slimgb_alg::slimgb_alg(ideal I){
+slimgb_alg::slimgb_alg(ideal I, BOOLEAN F4){
   
   
   r=currRing;
@@ -1932,7 +1932,7 @@ slimgb_alg::slimgb_alg(ideal I){
     is_char0=TRUE;
   //not fully correct
   //(rChar()==0);
-  F4_mode=F4_mode;
+  BOOLEAN F4_mode=F4;
   reduction_steps=0;
   last_index=-1;
 
@@ -2197,7 +2197,7 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
   qsort(I->m,IDELEMS(I),sizeof(poly),poly_crit);
   //Print("Idelems %i \n----------\n",IDELEMS(I));
   //slimgb_alg* c=(slimgb_alg*) omalloc(sizeof(slimgb_alg));
-  slimgb_alg* c=new slimgb_alg(I);
+  slimgb_alg* c=new slimgb_alg(I, F4_mode);
 
 
     
