@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.32 2005-06-01 07:32:15 bricken Exp $ */
+/* $Id: tgb.cc,v 1.33 2005-06-01 09:06:04 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -1932,7 +1932,11 @@ slimgb_alg::slimgb_alg(ideal I, BOOLEAN F4){
     is_char0=TRUE;
   //not fully correct
   //(rChar()==0);
-  BOOLEAN F4_mode=F4;
+  F4_mode=F4;
+  if ((!F4_mode)&&(!is_homog) &&(pLexOrder)){
+    this->doubleSugar=TRUE;
+  }
+  else this->doubleSugar=FALSE;
   reduction_steps=0;
   last_index=-1;
 
@@ -2878,7 +2882,7 @@ static void multi_reduction_find(red_object* los, int losl,slimgb_alg* c,int sta
 	assume((i==losl-1)||(pLmCmp(los[i].p,los[i+1].p)==-1));
 	return;
       }
-      if(!(c->is_homog))
+      if((!(c->is_homog)) &&(!(c->doubleSugar)))
       {
 
 	for (i2=i+1;i2<losl;i2++){

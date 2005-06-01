@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb_internal.h,v 1.14 2005-05-31 18:41:22 bricken Exp $ */
+/* $Id: tgb_internal.h,v 1.15 2005-06-01 09:06:04 bricken Exp $ */
 /*
  * ABSTRACT: tgb internal .h file
 */
@@ -127,6 +127,7 @@ class slimgb_alg
   int average_length;
   BOOLEAN is_char0;
   BOOLEAN is_homog;
+  BOOLEAN doubleSugar;
   BOOLEAN F4_mode;
 };
 class red_object{
