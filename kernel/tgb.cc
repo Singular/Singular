@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.31 2005-05-31 18:41:21 bricken Exp $ */
+/* $Id: tgb.cc,v 1.32 2005-06-01 07:32:15 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -949,13 +949,13 @@ static int iq_crit(const void* ap,const void* bp){
   sorted_pair_node* b=*((sorted_pair_node**)bp);
   assume(a->i>a->j);
   assume(b->i>b->j);
+  
+  
+  if (a->deg<b->deg) return -1;
+  if (a->deg>b->deg) return 1;
   int comp=pLmCmp(a->lcm_of_lm, b->lcm_of_lm);
   if(comp!=0)
     return comp;
-  if (a->deg<b->deg) return -1;
-  if (a->deg>b->deg) return 1;
-
-
   if (a->expected_length<b->expected_length) return -1;
   if (a->expected_length>b->expected_length) return 1;
   if (a->j>b->j) return 1;
