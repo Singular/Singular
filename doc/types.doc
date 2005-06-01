@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.127 2005-05-09 14:50:27 Singular Exp $
+@comment $Id: types.doc,v 1.128 2005-06-01 12:05:17 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -1401,7 +1401,7 @@ ring.
 Currently, MP links are only available on Unix platforms and data is
 written without attributes (which is likely to change in future
 versions). For a general description of MP, see
-@code{http://symbolicnet.mcs.kent.edu/areas/mp.html}.
+@code{http://www.symbolicnet.org/areas/mp.html}.
 
 @menu
 * MPfile links::
