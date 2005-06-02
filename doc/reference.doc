@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.257 2005-05-19 14:45:59 Singular Exp $
+@comment $Id: reference.doc,v 1.258 2005-06-02 12:41:20 bricken Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -5657,7 +5657,7 @@ Currently best results are examples over function field (parameters).
 
 For the performance it is essential, that one of following is fullfilled: the ideal is homogeneous or the ordering is a degree ordering, maybe future version will improve here.
 
-The program only supports the option prot (which will give protocoll output).
+The program only supports the options prot (which will give protocoll output) and redSB (for returning a reduced Groebner basis).
 The Protocoll looks like that:
 M[n,m] means a parallel reduction of n elements with m non zero output elements.
 "b" notices an exchange trick described in the thesis and "e" adds reductor with non minimal leading term.

@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.33 2005-06-01 09:06:04 bricken Exp $ */
+/* $Id: tgb.cc,v 1.34 2005-06-02 12:38:51 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -2215,6 +2215,12 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
   }
   I=c->S;
   delete c;
+  if (TEST_OPT_REDSB){
+    ideal erg=kInterRed(I,NULL);
+    assume(I!=erg);
+    id_Delete(&I, currRing);
+    return erg;
+  }
   //qsort(I->m, IDELEMS(I),sizeof(poly),pLmCmp_func);
   return(I);
 }
