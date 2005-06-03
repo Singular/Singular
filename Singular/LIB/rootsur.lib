@@ -1,4 +1,4 @@
-// $Id: rootsur.lib,v 1.1 2005-05-11 16:06:11 Singular Exp $
+// $Id: rootsur.lib,v 1.2 2005-06-03 14:51:43 bricken Exp $
 // E. Tobis  12.Nov.2004, April 2004
 // last change 5. May 2005 (G.-M. Greuel)
 ///////////////////////////////////////////////////////////////////////////////
@@ -594,14 +594,13 @@ EXAMPLE:   example sturmseq; shows an example"
   stseq = list();
   stseq[1] = p;
   stseq[2] = diff(p,variable);
-  poly q = stseq[2];
+
+  poly q = -reduce(stseq[1],std(stseq[2]));
   i = 3;
 
-  while (q <>0) {
-    q=reduce(stseq[i-2],std(stseq[i-1]));
-    if (q<>0) {
-      stseq[i] = q;
-    }
+  while (q <> 0) {
+    stseq[i] = q;
+    q = -reduce(stseq[i-1],std(stseq[i]));
     i++;
   }
 
@@ -1027,6 +1026,7 @@ static proc W(list l)
   return (sc);
 }
 ///////////////////////////////////////////////////////////////////////////////
+
 
 
 
