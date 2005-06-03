@@ -1,4 +1,4 @@
-// $Id: slimgb_s.tst,v 1.4 2005-06-03 12:14:59 bricken Exp $
+// $Id: slimgb_s.tst,v 1.5 2005-06-03 12:19:08 bricken Exp $
 
 //
 //
@@ -9,7 +9,7 @@ LIB "tst.lib";
 LIB "poly.lib";
 
 tst_init();
-tst_ignore("CVS: $Id: slimgb_s.tst,v 1.4 2005-06-03 12:14:59 bricken Exp $");
+tst_ignore("CVS: $Id: slimgb_s.tst,v 1.5 2005-06-03 12:19:08 bricken Exp $");
 
 proc char_out(ideal i){
   return(sort(simplify(lead(i),1))[1]);
@@ -81,6 +81,6 @@ d*A-a*D+e*D-d*E-g*F+f*G,
 -b*A+a*B-e*B-h*C+b*E+c*H,
 -g*h*C*I+g*B+h*E+h*F-b*G-c*G-e*H-f*H+i*H;
 char_out(slimgb(@i));
-
+kill @r;
 
 tst_status(1);$
