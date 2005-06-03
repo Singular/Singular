@@ -1,4 +1,4 @@
-// $Id: slimgb_s.tst,v 1.3 2005-05-12 07:40:03 bricken Exp $
+// $Id: slimgb_s.tst,v 1.4 2005-06-03 12:14:59 bricken Exp $
 
 //
 //
@@ -9,7 +9,7 @@ LIB "tst.lib";
 LIB "poly.lib";
 
 tst_init();
-tst_ignore("CVS: $Id: slimgb_s.tst,v 1.3 2005-05-12 07:40:03 bricken Exp $");
+tst_ignore("CVS: $Id: slimgb_s.tst,v 1.4 2005-06-03 12:14:59 bricken Exp $");
 
 proc char_out(ideal i){
   return(sort(simplify(lead(i),1))[1]);
@@ -67,5 +67,20 @@ ring r=0,(x,y,z),lp;
 ideal i=x3-y,xy-z,x2-z6,yz-z7,xz-y;
 char_out(slimgb(i));
 kill r;
+
+
+//twomat3
+ring @r=32003,(a, b, c, d, e, f, g, h, i, A, B, C, D, E, F, G, H, I),lp;
+ideal @i=
+d*C-c*D-f*E+e*F-i*F+f*I,
+-d*B-g*C+b*D+c*G,
+d*B-b*D-h*F+f*H,
+g*A+h*D-a*G+i*G-d*H-g*I,
+d*A-a*D+e*D-d*E-g*F+f*G,
+-c*A-f*B+a*C-i*C+b*F+c*I,
+-b*A+a*B-e*B-h*C+b*E+c*H,
+-g*h*C*I+g*B+h*E+h*F-b*G-c*G-e*H-f*H+i*H;
+char_out(slimgb(@i));
+
 
 tst_status(1);$
