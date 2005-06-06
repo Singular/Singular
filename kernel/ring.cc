@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.38 2005-05-06 14:12:35 Singular Exp $ */
+/* $Id: ring.cc,v 1.39 2005-06-06 16:04:19 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -1315,7 +1315,7 @@ ring rCopy0(ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
     }
     if (r->minideal!=NULL)
     {
-      res->minideal-id_Copy(r->minideal,r->algring);
+      res->minideal=id_Copy(r->minideal,r->algring);
     }
   }
   if (copy_ordering == TRUE)
