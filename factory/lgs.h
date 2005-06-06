@@ -9,9 +9,9 @@
 #define lgs__H
 
  
-#ifdef HAVE_BIFAC
 
 #include "factory.h"
+#ifdef HAVE_BIFAC
 
   
 class LGS

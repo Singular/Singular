@@ -1,5 +1,7 @@
+#include "factory.h"
 #ifdef HAVE_BIFAC
-#include "bifac.h"
+#include "lgs.h"
+#include "bifacConfig.h"
 
 #define BIFAC_BASIS_OF_G_CHECK	1
 void Reduce( bool );
@@ -266,8 +268,13 @@ CFList BIFAC::matrix2basis(CFMatrix A, int dim, int m, int n, CanonicalForm f)
       h = ith.getItem();
       ff = f*(deriv(g,y)-deriv(h,x)) +h*deriv(f,x) -g*deriv(f,y);
       if( !ff.isZero()) {  
+      #ifndef NOSTREAMIO
 	AUSGABE_ERR("* Falsche Polynome!"); 
 	exit (1); 
+      #else
+        printf("wrong polys\n");
+        break;
+      #endif
       }
     } 
   }
@@ -1264,8 +1271,6 @@ void BIFAC::bifac(CanonicalForm f, bool abs)
 
     } else ;
   }
-
-  clock(); // Start measuring of time
 
  	Variable W('W');
   	CanonicalForm l;

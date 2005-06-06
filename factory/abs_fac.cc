@@ -1,6 +1,6 @@
 
-#ifdef HAVE_BIFAC
 #include "factory.h"
+#ifdef HAVE_BIFAC
 #ifndef NOSTREAMIO
 #include<fstream>
 #endif

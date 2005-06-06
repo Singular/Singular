@@ -1,11 +1,11 @@
 /* ===================================================================
     Dateiname:          lgs.cc
    =================================================================== */
-#ifdef HAVE_BIFAC
 
 #include "lgs.h"
 #include "bifacConfig.h"
 
+#ifdef HAVE_BIFAC
 
 //--<>---------------------------------
 LGS::LGS( int r, int c, bool inv )// KONSTRUKTOR

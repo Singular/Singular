@@ -10,10 +10,10 @@
 #ifndef bifac__H
 #define bifac__H
 
-#ifdef HAVE_BIFAC
 
 #include <time.h>
-#include <factory.h>
+#include <factoryconf.h>
+#ifdef HAVE_BIFAC
 
 #include "lgs.h"
 #include "bifacConfig.h"
