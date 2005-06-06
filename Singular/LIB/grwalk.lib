@@ -1,21 +1,21 @@
 ///////////////////////////////////////////////////////////////
-// $Id: grwalk.lib,v 1.2 2005-05-11 12:13:26 Singular Exp $   //
+// $Id: grwalk.lib,v 1.3 2005-06-06 11:26:46 Singular Exp $   //
 ///////////////////////////////////////////////////////////////
 
-version="$Id: grwalk.lib,v 1.2 2005-05-11 12:13:26 Singular Exp $";
-category="cc";
+version="$Id: grwalk.lib,v 1.3 2005-06-06 11:26:46 Singular Exp $";
+category="Commutative Algebra";
 
 info="
-LIBRARY: grwalk.lib: Groebner and Fractal walk
-AUTHOR: I. Sulandra
+LIBRARY: grwalk.lib   Groebner Walk Conversion Algorithms
+AUTHOR: I Made Sulandra
 
 PROCEDURES:
- gwalk(ideal[,intvec]);   standard basis of ideal via groebnerwalk alg
- pwalk(ideal[,intvec]);   standard basis of ideal via perturbation walk alg
  fwalk(ideal[,intvec]);   standard basis of ideal via fractalwalk alg
  twalk(ideal[,intvec]);   standard basis of ideal via Tran's alg
  awalk1(ideal[,intvec]);   standard basis of ideal via the first alt. alg
  awalk2(ideal[,intvec]);   standard basis of ideal via the second alt. alg
+ pwalk(ideal[,intvec]);   standard basis of ideal via perturbation walk alg
+ gwalk(ideal[,intvec]);   standard basis of ideal via groebnerwalk alg
 ";
 
 //////////////////////////////////////////////////////////////////////////////
@@ -252,6 +252,7 @@ EXAMPLE: example gwalk; shows an example"
 
    keepring basering;
    ideal result = fetch(old_ring, G);
+   attrib(result,"isSB",1);
    return (result);
 }
 example
@@ -341,6 +342,7 @@ proc awalk1_tmp(ideal Go, int n2, list #)
 
    keepring basering;
    ideal result = fetch(old_ring, G);
+   attrib(result,"isSB",1);
    return (result);
 }
 
@@ -377,6 +379,7 @@ EXAMPLE: example fwalk; shows an example"
 
    keepring basering;
    ideal result = fetch(old_ring, G);
+   attrib(result,"isSB",1);
    return (result);
 }
 example
@@ -422,6 +425,7 @@ EXAMPLE: example awalk2; shows an example"
 
    keepring basering;
    ideal result = fetch(old_ring, G);
+   attrib(result,"isSB",1);
    return (result);
 }
 example
@@ -478,6 +482,7 @@ EXAMPLE: example pwalk; shows an example"
 
   keepring basering;
   ideal result = fetch(old_ring, G);
+  attrib(result,"isSB",1);
   return (result);
 }
 example
@@ -522,9 +527,10 @@ EXAMPLE: example twalk; shows an example"
   setring xR;
    //kill Go;
 
-   keepring basering;
-   ideal result = fetch(old_ring, G);
-   return (result);
+  keepring basering;
+  ideal result = fetch(old_ring, G);
+  attrib(result,"isSB",1);
+  return (result);
 }
 example
 {
