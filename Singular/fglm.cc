@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglm.cc,v 1.26 2001-10-09 16:35:59 Singular Exp $
+// $Id: fglm.cc,v 1.27 2005-06-07 10:01:18 Singular Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -309,7 +309,7 @@ fglmProc( leftv result, leftv first, leftv second )
             destIdeal= idInit(0,0);
             break;
         case FglmNotReduced:
-            Werror( "The ideal %s has to be reduced", second->Name() );
+            Werror( "The ideal %s has to be given by a reduced SB", second->Name() );
             destIdeal= idInit(0,0);
             break;
         default:
