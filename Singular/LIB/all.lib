@@ -1,6 +1,6 @@
-// $Id: all.lib,v 1.47 2005-06-07 11:28:19 Singular Exp $
+// $Id: all.lib,v 1.48 2005-06-07 11:43:40 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: all.lib,v 1.47 2005-06-07 11:28:19 Singular Exp $";
+version="$Id: all.lib,v 1.48 2005-06-07 11:43:40 Singular Exp $";
 category = "General purpose";
 info="
 LIBRARY:  all.lib   Load all libraries (commutative case)
@@ -31,8 +31,8 @@ Commutative algebra
   primitiv_lib:    Computing a Primitive Element
   reesclos_lib:    Rees Algebra and Integral Closure of Ideals
   resolve_lib:     Resolution of Singularities
+  reszeta_lib:     Applications of Resolution of Singularities
   toric_lib:       Standard Basis of Toric Ideals
-  zeta_lib:        Applications of Resolution of Singularities
 
 Singularities
   alexpoly_lib:    Resolution Graph and Alexander Polynomial
@@ -110,7 +110,7 @@ LIB "primdec.lib";
 LIB "primitiv.lib";
 LIB "reesclos.lib";
 LIB "resolve.lib";
-LIB "zeta.lib";
+LIB "reszeta.lib";
 LIB "intprog.lib";
 LIB "toric.lib";
 LIB "grwalk.lib";

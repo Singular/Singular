@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.94 2005-06-07 11:28:31 Singular Exp $
+@comment $Id: examples.doc,v 1.95 2005-06-07 11:43:53 Singular Exp $
 @comment this file contains the examples
 
 @c The following directives are necessary for proper compilation
@@ -3068,7 +3068,7 @@ on the Hilbert polynomial of the Milnor algebra is made.
 @cindex singularities, resolution of
 
 Resolution of singularities and applications thereof are provided by the
-libraries @code{resolve.lib} and @code{zeta.lib}; graphical output may be
+libraries @code{resolve.lib} and @code{reszeta.lib}; graphical output may be
 generated automatically by using external programs @code{surf} and @code{dot}
 respectively to which a specialized interface is provided by the library
 @code{resgraph.lib}. In this example, the basic functionality of the
@@ -3082,7 +3082,7 @@ can be found at @code{http://www.singular.uni-kl.de/tutor_resol.ps}.
 @smallexample
 @c example
 LIB"resolve.lib";                   // load the resolution algorithm
-LIB"zeta.lib";                    // load its application algorithms
+LIB"reszeta.lib";                   // load its application algorithms
 
 ring R=0,(x,y,z),dp;              // define the ring Q[x,y,z]
 ideal I=x7+y2-z2;                 // an A6 surface singularity

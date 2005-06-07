@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.50 2005-05-24 08:02:57 Singular Exp $
+@comment $Id: NEWS.texi,v 1.51 2005-06-07 11:43:53 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -72,7 +72,7 @@ procedures for computing the Castelnuovo-Mumford regularity
 procedures for primary decomposition of modules
 @item @nref{gmspoly_lib}, @nref{gmssing_lib}   
 procedures for the Gauss-Manin connection of a singularity
-@item @nref{resol_lib}, @nref{zeta_lib}
+@item @nref{resolve_lib}, @nref{reszeta_lib}
 resolution of singularities and applications
 @item @nref{rootsmr_lib}
 counting the number of real roots
@@ -132,7 +132,7 @@ Together with @sc{Plural} come the following libraries:
 @item @nref{center_lib}
 computes generators of the center and centralizer subalgebras up
 to a given degree resp. up to a given number of generators
-@item @nref{involution_lib}
+@item @nref{involut_lib}
 determines linear antiautomorphisms (involutions) and automorphisms
 @item @nref{gkdim_lib}
 computes a Gel'fand-Kirillov dimension for modules

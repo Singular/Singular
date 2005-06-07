@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: reszeta.lib,v 1.6 2005-06-07 11:28:20 Singular Exp $";
+version="$Id: reszeta.lib,v 1.7 2005-06-07 11:43:40 Singular Exp $";
 category="Commutative Algebra";
 info="
-LIBRARY:  zeta.lib       Zeta-function of Denef and Loeser
+LIBRARY:  reszeta.lib       Zeta-function of Denef and Loeser
 
 AUTHORS:  A. Fruehbis-Krueger,  anne@mathematik.uni-kl.de,
 @*        G. Pfister,           pfister@mathematik.uni-kl.de

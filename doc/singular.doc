@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.137 2005-06-07 11:28:32 Singular Exp $
+@comment $Id: singular.doc,v 1.138 2005-06-07 11:43:54 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -322,9 +322,9 @@ LIB "all.lib";
 * primitiv_lib:: procedures for finding a primitive element
 * reesclos_lib:: Rees Algebra and integral closure of an ideal
 * resolve_lib:: Resolution of Singularities
+* reszeta_lib:: Applications of Resolution of Singularities
 * sheafcoh_lib:: Procedures for Computing Sheaf Cohomology
 * toric_lib:: toric ideals
-* zeta_lib:: Applications of Resolution of Singularities
 @end menu
 
 @c ---------------------------------------------------------
@@ -372,21 +372,21 @@ LIB "all.lib";
 @subsection reesclos_lib
 @c lib reesclos.lib
 @c ---------------------------------------------------------
-@node resolve_lib, sheafcoh_lib, reesclos_lib, Commutative algebra
+@node resolve_lib, reszeta_lib, reesclos_lib, Commutative algebra
 @subsection resolve_lib
 @c lib resolve.lib
 @c ---------------------------------------------------------
-@node sheafcoh_lib, toric_lib, resolve_lib, Commutative algebra
+@node reszeta_lib, sheafcoh_lib , resolve_lib, Commutative algebra
+@subsection reszeta_lib
+@c lib reszeta.lib
+@c ---------------------------------------------------------
+@node sheafcoh_lib, toric_lib, reszeta_lib, Commutative algebra
 @subsection sheafcoh_lib
 @c lib sheafcoh.lib
 @c ---------------------------------------------------------
-@node toric_lib, zeta_lib, sheafcoh_lib, Commutative algebra
+@node toric_lib, , sheafcoh_lib, Commutative algebra
 @subsection toric_lib
 @c lib toric.lib
-@c ---------------------------------------------------------
-@node zeta_lib,  , toric_lib, Commutative algebra
-@subsection zeta_lib
-@c lib zeta.lib
 
 @c ----------------------------------------------------------------------------
 @node Singularities, Invariant theory, Commutative algebra, SINGULAR libraries
