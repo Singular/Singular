@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.116 2005-05-23 13:27:23 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.117 2005-06-07 09:17:35 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -19,6 +19,7 @@
 #include "omalloc.h"
 #include "febase.h"
 #include "polys.h"
+#include "prCopy.h"
 #include "ideals.h"
 #include "matpol.h"
 #include "kstd1.h"
@@ -1966,11 +1967,13 @@ ring rCompose(const lists  L)
     goto rCompose_err;
   }
   // ------------------------ Q-IDEAL ------------------------
+  rComplete(R);
+
   if (L->m[3].Typ()==IDEAL_CMD)
   {
     ideal q=(ideal)L->m[3].Data();
     if (q->m[0]!=NULL)
-      R->qideal=idCopy(q);
+      R->qideal=idrCopyR(q,currRing,R);
   }
   else
   {
@@ -1978,8 +1981,6 @@ ring rCompose(const lists  L)
     goto rCompose_err;
   }
 
-  // todo
-  rComplete(R);
 
   // ---------------------------------------------------------------
   #ifdef HAVE_PLURAL
