@@ -1,23 +1,25 @@
 //////////////////////////////////////////////////////////////////////////////
+version="$Id: sagbi.lib,v 1.4 2005-06-07 10:05:19 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  SAGBI.lib  Compute Subalgebras bases Analogous to Groebner bases for ideals
 AUTHORS: Gerhard Pfister,        pfister@mathematik.uni-kl.de,
 @*       Anen Lakhal,            alakhal@mathematik.uni-kl.de
+
 PROCEDURES:
- proc reduction(p,I); Perform one step subalgebra reducton (for short S-reduction) of p w.r.t I
- proc S_poly(I);      Compute the S-polynomilas of the Subalgebra defined by the genartors of I
- proc S_nf(id,I);     Perform iterated S-reductions in order to compute Subalgebras normal forms
- proc sagbi(I);       Construct SAGBI basis for the Subalgebra defined by I
- proc sagbi1(I);      Construct partial SAGBI basis for the Subalgebra defined by I
+ proc reduction(p,I);  Perform one step subalgebra reducton (for short S-reduction) of p w.r.t I
+ proc sagbiSPoly(I);   Compute the S-polynomilas of the Subalgebra defined by the genartors of I
+ proc sagbiNF(id,I);   Perform iterated S-reductions in order to compute Subalgebras normal forms
+ proc sagbi(I);        Construct SAGBI basis for the Subalgebra defined by I
+ proc sagbiPart(I);    Construct partial SAGBI basis for the Subalgebra defined by I
 ";
 
  LIB "algebra.lib";
  LIB "elim.lib";
 
 ///////////////////////////////////////////////////////////////////////////////
-proc S_poly(id ,list #)
-"USAGE: S_poly(id [,n]); id ideal, n positive integer.
+proc sagbiSPoly(id ,list #)
+"USAGE: sagbiSPoly(id [,n]); id ideal, n positive integer.
 RETURN: an ideal
 @format
       - If (n=0 or default) an ideal, whose generators are the S-polynomials.
@@ -26,7 +28,7 @@ RETURN: an ideal
         the second element of this list is the ring in which is defined
         the ideal of algebraic relations.
 @end format
-EXAMPLE: example S_poly; show an example "
+EXAMPLE: example sagbiSPoly; show an example "
 {
   if(size(#)==0)
     {
@@ -96,7 +98,7 @@ EXAMPLE: example S_poly; show an example "
       setring bsr;
       map phi=R1,vars,id;
 
-      // the S_polynomials are the image by phi of the generators of kern
+      // the sagbiSPolynomials are the image by phi of the generators of kern
 
       P=simplify(phi(kern),1);
       if(#[1]==0)
@@ -109,7 +111,7 @@ EXAMPLE: example S_poly; show an example "
           kill phi,vars;
 
                  dbprint(printlevel-voice+3,"
-// 'S_poly' created a ring as 2nd element of the list.
+// 'sagbiSPoly' created a ring as 2nd element of the list.
 // The ring contains the ideal 'kern'  of algebraic relations between the
 //leading terms of the generators of I.
 // To access to this ring and see 'kern' you should give the ring a name,
@@ -126,8 +128,8 @@ example
  ring r=0, (x,y),dp;
  poly f1,f2,f3,f4=x2,y2,xy+y,2xy2;
  ideal I=f1,f2,f3,f4;
- S_poly(I);
- list L=S_poly(I,1);
+ sagbiSPoly(I);
+ list L=sagbiSPoly(I,1);
  L[1];
  def S= L[2]; setring S; kern;
 }
@@ -197,7 +199,7 @@ static proc Spoly1(list l,ideal I,ideal J,int a)
 
   if(size(J)==0)
     {
-      @L =S_poly(I,1);
+      @L =sagbiSPoly(I,1);
     }
   else
     {
@@ -437,8 +439,8 @@ static proc completeReduction1(poly p,ideal dom,list #) //tail reduction
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc S_nf(id,ideal dom,int k,list#)
-"USAGE: S_nf(id,dom,k[,n]); id either poly or ideal,dom ideal, k and n positive intergers.
+proc sagbiNF(id,ideal dom,int k,list#)
+"USAGE: sagbiNF(id,dom,k[,n]); id either poly or ideal,dom ideal, k and n positive intergers.
 RETURN: depends On the type of id; ideal or polynomial.
 @format
     The integer k determine waht kind of s-reduction is performad:
@@ -450,7 +452,7 @@ RETURN: depends On the type of id; ideal or polynomial.
 @end format
 NOTE: computation of Subalgebras normal forms may be performed either
       in polynomial rings or quotient polynomial rings
-EXAMPLE: example S_nf; show example "
+EXAMPLE: example sagbiNF; show example "
 {
   int z;
   ideal Red;
@@ -489,12 +491,12 @@ EXAMPLE: example S_nf; show example "
 example
 {"EXAMPLE:"; echo = 2;
  ring r=0,(x,y),dp;
- ideal I x2-xy;
+ ideal I= x2-xy;
  qring Q=std(I);
  ideal dom =x2,x2y+y,x3y2;
  poly p=x4+x2y+y;
- S_nf(p,dom,0);
- S_nf(p,dom,1);// tail subalgebra reduction is perofrmed
+ sagbiNF(p,dom,0);
+ sagbiNF(p,dom,1);// tail subalgebra reduction is perofrmed
 }
 
 
@@ -549,7 +551,7 @@ EXAMPLE: example sagbi; show example "
     {
       L=Spoly1(L,S,Red,2);
       Red=L[1];
-      Red=S_nf(Red,S,k,#);
+      Red=sagbiNF(Red,S,k,#);
       oldS=S;
       S=S+Red;
     }
@@ -562,7 +564,7 @@ example
  sagbi(I,1,1);
 }
 ///////////////////////////////////////////////////////////////////////////////
-proc sagbi1(id,int k,int c,list #)
+proc sagbiPart(id,int k,int c,list #)
 "USAGE: sagbi(id,k,c[,n]); id ideal, k, c and n positive integer.
 RETURN: A partial SAGBI basis for the subalgebra defined by the genrators of id.
 @format
@@ -580,7 +582,7 @@ NOTE:- SAGBI bases computations may be performed either
      - This version of sagbi procedure is interesting in the case of an Subalgebras
        with infinte SAGBI basis. In this case, by means of this procedure,
        we may check for example, if the elements of this basis have a particular form.
-EXAMPLE: example sagbi1; show example "
+EXAMPLE: example sagbiPart; show example "
 {
   degBound=0;
   ideal S,oldS,Red;
@@ -591,7 +593,7 @@ EXAMPLE: example sagbi1; show example "
     {
       L=Spoly1(L,S,Red,2);
       Red=L[1];
-      Red=S_nf(Red,S,k,#);
+      Red=sagbiNF(Red,S,k,#);
       oldS=S;
       S=S+Red;
       counter=counter+1;
@@ -602,7 +604,6 @@ example
 { "EXAMPLE:"; echo = 2;
  ring r= 0,(x,y),dp;
  ideal I=x,xy-y2,xy2;//the corresponding Subalgebra has an infinte SAGBI basis
- sagbi1(I,1,3)// computations should stop after 3 turns.
+ sagbiPart(I,1,3);// computations should stop after 3 turns.
 }
 //////////////////////////////////////////////////////////////////////////////
-
