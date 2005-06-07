@@ -1,7 +1,7 @@
-version="$Id: involut.lib,v 1.6 2005-05-18 18:09:11 levandov Exp $";
+version="$Id: involut.lib,v 1.7 2005-06-07 10:24:45 Singular Exp $";
 category="Noncommutative";
 info="
-LIBRARY:  involution.lib  Procedures for Computations and Operations with Involutions
+LIBRARY:  involut.lib  Procedures for Computations and Operations with Involutions
 AUTHORS:  Oleksandr Iena,       yena@mathematik.uni-kl.de,
 @*        Markus Becker,        mbecker@mathematik.uni-kl.de,
 @*        Viktor Levandovskyy,  levandov@mathematik.uni-kl.de

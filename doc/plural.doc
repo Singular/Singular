@@ -206,7 +206,7 @@ Use the @code{LIB} command for loading of single libraries.
 
 @menu
 * center_lib::
-* involution_lib::
+* involut_lib::
 * gkdim_lib::
 * ncall_lib::
 * ncalg_lib::
@@ -216,7 +216,7 @@ Use the @code{LIB} command for loading of single libraries.
 @end menu
 
 @c ----------------------------------------------------------
-@node center_lib, involution_lib, PLURAL libraries, PLURAL libraries
+@node center_lib, involut_lib, PLURAL libraries, PLURAL libraries
 @section center_lib
 @cindex center_lib
 @cindex center.lib
@@ -224,15 +224,15 @@ Use the @code{LIB} command for loading of single libraries.
 @c lib center.lib
 
 @c ----------------------------------------------------------
-@node involution_lib,  gkdim_lib, center_lib, PLURAL libraries
-@section involution_lib
-@cindex involution_lib
-@cindex involution.lib
+@node involut_lib,  gkdim_lib, center_lib, PLURAL libraries
+@section involut_lib
+@cindex involut_lib
+@cindex involut.lib
 
-@c lib involution.lib
+@c lib involut.lib
 
 @c ----------------------------------------------------------
-@node gkdim_lib, ncall_lib, involution_lib, PLURAL libraries
+@node gkdim_lib, ncall_lib, involut_lib, PLURAL libraries
 @section gkdim_lib
 @cindex gkdim_lib
 @cindex gkdim.lib
