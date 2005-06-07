@@ -1,7 +1,7 @@
 LIB "tst.lib";
 tst_init();
 
-LIB"zeta.lib";
+LIB"reszeta.lib";
 "============== A1";
 ring R=0,(x,y,z),dp;
 ideal I=x2+yz;   // A_1

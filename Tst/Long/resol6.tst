@@ -1,7 +1,7 @@
 //LIB "tst.lib";
 //tst_init();
 
-LIB"resol.lib";
+LIB"resolve.lib";
 
 
 //=====W#[1,2]        

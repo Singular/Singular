@@ -1,7 +1,7 @@
 LIB "tst.lib";
 tst_init();
 
-LIB"resol.lib";
+LIB"resolve.lib";
 
 ring r = 0,(x(1..2)),dp;                //A2             
 ideal J=x(2)^2-x(1)^3;                                   

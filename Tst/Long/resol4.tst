@@ -2,7 +2,7 @@
 LIB "tst.lib";
 tst_init();
 
-LIB"zeta.lib";
+LIB"reszeta.lib";
 
 
 ring r = 0,(x(1..3)),dp(3);               //U12               38 sec 33 Karten 

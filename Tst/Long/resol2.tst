@@ -1,7 +1,7 @@
 LIB "tst.lib";
 tst_init();
 
-LIB"zeta.lib";
+LIB"reszeta.lib";
 
 ring r = 0,(x(1..3)),dp(3);            //A10                 23 sec  30 Karten
 ideal J=x(3)^2+x(1)^2+x(2)^11;                                        

@@ -1,7 +1,7 @@
 LIB "tst.lib";
 tst_init();
 
-LIB"zeta.lib";
+LIB"reszeta.lib";
 
 "============== U16";
 ring R=0,(x,y,z),dp;
