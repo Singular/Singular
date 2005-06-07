@@ -1,6 +1,6 @@
-// $Id: all.lib,v 1.46 2005-06-06 11:26:46 Singular Exp $
+// $Id: all.lib,v 1.47 2005-06-07 11:28:19 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: all.lib,v 1.46 2005-06-06 11:26:46 Singular Exp $";
+version="$Id: all.lib,v 1.47 2005-06-07 11:28:19 Singular Exp $";
 category = "General purpose";
 info="
 LIBRARY:  all.lib   Load all libraries (commutative case)
@@ -30,7 +30,7 @@ Commutative algebra
   primdec_lib:     Primary Decomposition and Radical of Ideals
   primitiv_lib:    Computing a Primitive Element
   reesclos_lib:    Rees Algebra and Integral Closure of Ideals
-  resol_lib:       Resolution of Singularities
+  resolve_lib:     Resolution of Singularities
   toric_lib:       Standard Basis of Toric Ideals
   zeta_lib:        Applications of Resolution of Singularities
 
@@ -109,7 +109,7 @@ LIB "normal.lib";
 LIB "primdec.lib";
 LIB "primitiv.lib";
 LIB "reesclos.lib";
-LIB "resol.lib";
+LIB "resolve.lib";
 LIB "zeta.lib";
 LIB "intprog.lib";
 LIB "toric.lib";

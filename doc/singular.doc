@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.136 2005-05-20 18:06:55 levandov Exp $
+@comment $Id: singular.doc,v 1.137 2005-06-07 11:28:32 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -321,7 +321,7 @@ LIB "all.lib";
 * primdec_lib:: procedures for primary decomposition
 * primitiv_lib:: procedures for finding a primitive element
 * reesclos_lib:: Rees Algebra and integral closure of an ideal
-* resol_lib:: Resolution of Singularities
+* resolve_lib:: Resolution of Singularities
 * sheafcoh_lib:: Procedures for Computing Sheaf Cohomology
 * toric_lib:: toric ideals
 * zeta_lib:: Applications of Resolution of Singularities
@@ -368,15 +368,15 @@ LIB "all.lib";
 @subsection primitiv_lib
 @c lib primitiv.lib
 @c ---------------------------------------------------------
-@node reesclos_lib, resol_lib, primitiv_lib, Commutative algebra
+@node reesclos_lib, resolve_lib, primitiv_lib, Commutative algebra
 @subsection reesclos_lib
 @c lib reesclos.lib
 @c ---------------------------------------------------------
-@node resol_lib, sheafcoh_lib, reesclos_lib, Commutative algebra
-@subsection resol_lib
-@c lib resol.lib
+@node resolve_lib, sheafcoh_lib, reesclos_lib, Commutative algebra
+@subsection resolve_lib
+@c lib resolve.lib
 @c ---------------------------------------------------------
-@node sheafcoh_lib, toric_lib, resol_lib, Commutative algebra
+@node sheafcoh_lib, toric_lib, resolve_lib, Commutative algebra
 @subsection sheafcoh_lib
 @c lib sheafcoh.lib
 @c ---------------------------------------------------------

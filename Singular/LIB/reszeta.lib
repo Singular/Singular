@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: reszeta.lib,v 1.5 2005-05-23 18:35:58 anne Exp $";
+version="$Id: reszeta.lib,v 1.6 2005-06-07 11:28:20 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  zeta.lib       Zeta-function of Denef and Loeser
@@ -23,7 +23,7 @@ prepEmbDiv(L[,b])    prepare list of divisors (including components
                      of strict transform, embedded case)
 abstractR(L)         pass from embedded to non-embedded resolution
 ";
-LIB "resol.lib";
+LIB "resolve.lib";
 LIB "solve.lib";
 LIB "normal.lib";
 ///////////////////////////////////////////////////////////////////////////////
