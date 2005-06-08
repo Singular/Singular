@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hutil.cc,v 1.6 2005-06-08 12:34:59 Singular Exp $ */
+/* $Id: hutil.cc,v 1.7 2005-06-08 13:51:13 Singular Exp $ */
 /*
 * ABSTRACT: Utilities for staircase operations
 */
@@ -40,7 +40,7 @@ scfmon hInit(ideal S, ideal Q, int *Nexist, ring tailRing)
     hisModule = idRankFreeModule(S);
   if (hisModule < 0)
     hisModule = 0;
-  if (S)
+  if (S!=NULL)
   {
     si = S->m;
     sl = IDELEMS(S);
@@ -50,7 +50,7 @@ scfmon hInit(ideal S, ideal Q, int *Nexist, ring tailRing)
     si = NULL;
     sl = 0;
   }
-  if (Q)
+  if (Q!=NULL)
   {
     qi = Q->m;
     ql = IDELEMS(Q);
@@ -60,20 +60,20 @@ scfmon hInit(ideal S, ideal Q, int *Nexist, ring tailRing)
     qi = NULL;
     ql = 0;
   }
-  if (!(sl + ql))
+  if ((sl + ql) > 0)
   {
     *Nexist = 0;
     return NULL;
   }
   ss = si;
-  for (i = sl; i; i--)
+  for (i = sl; i>0; i--)
   {
     if (*ss!=0)
       k++;
     ss++;
   }
   ss = qi;
-  for (i = ql; i; i--)
+  for (i = ql; i>0; i--)
   {
     if (*ss!=0)
       k++;
@@ -88,17 +88,17 @@ scfmon hInit(ideal S, ideal Q, int *Nexist, ring tailRing)
   {
     if (*si!=NULL)
     {
-      *ek = (int*) omAlloc((pVariables+1)*sizeof(int));
+      *ek = (scmon) omAlloc((pVariables+1)*sizeof(int));
       pGetExpV(*si, *ek);
       ek++;
     }
     si++;
   }
-  for (i = ql; i; i--)
+  for (i = ql; i>0; i--)
   {
     if (*qi!=NULL)
     {
-      *ek = (int*) omAlloc((pVariables+1)*sizeof(int));
+      *ek = (scmon) omAlloc((pVariables+1)*sizeof(int));
       pGetExpV(*qi, *ek);
       ek++;
     }
@@ -120,7 +120,7 @@ void hWeight()
     i--;
     if (i == 0) return;
   }
-  for (i=pVariables; i; i--)
+  for (i=pVariables; i>0; i--)
   {
     x = pWeight(i);
     if (x != 1)
@@ -177,7 +177,7 @@ void hSupp(scfmon stc, int Nstc, varset var, int *Nvar)
     j = 0;
     loop
     {
-      if (stc[j][i])
+      if (stc[j][i]>0)
       {
         i1++;
         var[i1] = i;
