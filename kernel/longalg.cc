@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.9 2005-04-27 14:55:33 Singular Exp $ */
+/* $Id: longalg.cc,v 1.10 2005-06-08 13:52:12 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -64,6 +64,8 @@ static BOOLEAN napDivPoly(napoly p, napoly q);
 static int napExpi(int i, napoly a, napoly b);
 static ring nacRing;
 
+#define napCopy(p)       (napoly)p_Copy((poly)p,nacRing)
+
 static number nadGcd( number a, number b, const ring r) { return nacInit(1); }
 /*2
 *  sets the appropriate operators
@@ -85,6 +87,18 @@ void naSetChar(int i, ring r)
     naMinimalPoly=((lnumber)r->minpoly)->z;
   else
     naMinimalPoly = NULL;
+  if (r->minideal!=NULL)
+  {
+    naI=(naIdeal)omAllocBin(snaIdeal_bin);
+    naI->anz=IDELEMS(r->minideal);
+    naI->liste=(napoly*)omAlloc(naI->anz*sizeof(napoly));
+    int j;
+    for (j=naI->anz-1; j>=0; j--)
+    {
+      lnumber a = (lnumber)pGetCoeff(r->minideal->m[j]);
+      naI->liste[j]=napCopy(a->z);
+    }
+  }
 
   naNumbOfPar=rPar(r);
   if (i == 1)
@@ -146,7 +160,6 @@ static void napTest(napoly p)
 #define napInit(i)       (napoly)p_ISet(i,nacRing)
 #define napSetCoeff(p,n) {nacDelete(&napGetCoeff(p),nacRing);napGetCoeff(p)=n;}
 #define napDelete1(p)    p_LmDelete((poly *)p, nacRing)
-#define napCopy(p)       (napoly)p_Copy((poly)p,nacRing)
 #define nap_Copy(p,r)       (napoly)p_Copy((poly)p,r->algring)
 #define napComp(p,q)     p_LmCmp((poly)p,(poly)q, nacRing)
 #define napMultT(A,E)    A=(napoly)p_Mult_mm((poly)A,(poly)E,nacRing)

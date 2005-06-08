@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.39 2005-06-06 16:04:19 Singular Exp $ */
+/* $Id: ring.cc,v 1.40 2005-06-08 13:52:12 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -275,6 +275,12 @@ void rWrite(ring r)
       else
       {
         PrintS("...\n");
+      }
+      if (r->minideal!=NULL)
+      {
+        if (r==currRing) iiWriteMatrix((matrix)r->minideal,"//   minpolys",1,0);
+        else PrintS("//   minpolys=...");
+        PrintLn();
       }
     }
   }
