@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hutil.cc,v 1.5 2005-04-26 17:14:36 Singular Exp $ */
+/* $Id: hutil.cc,v 1.6 2005-06-08 12:34:59 Singular Exp $ */
 /*
 * ABSTRACT: Utilities for staircase operations
 */
@@ -80,10 +80,10 @@ scfmon hInit(ideal S, ideal Q, int *Nexist, ring tailRing)
     ss++;
   }
   *Nexist = k;
-  if (!k)
+  if (k==0)
     return NULL;
-  ek = ex = (scfmon)omAlloc(k * sizeof(scmon));
-  hsecure = (scfmon) omAlloc(k * sizeof(scmon));
+  ek = ex = (scfmon)omAlloc0(k * sizeof(scmon));
+  hsecure = (scfmon) omAlloc0(k * sizeof(scmon));
   for (i = sl; i>0; i--)
   {
     if (*si!=NULL)
@@ -140,7 +140,7 @@ void hDelete(scfmon ev, int ev_length)
   if (ev_length>0)
   {
     for (i=ev_length-1;i>=0;i--)
-      omFreeSize(hsecure[i],(pVariables+1)*sizeof(scmon));
+      omFreeSize(hsecure[i],(pVariables+1)*sizeof(int));
     omFreeSize(hsecure, ev_length*sizeof(scmon));
     omFreeSize(ev,  ev_length*sizeof(scmon));
   }
