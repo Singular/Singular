@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hutil.cc,v 1.7 2005-06-08 13:51:13 Singular Exp $ */
+/* $Id: hutil.cc,v 1.8 2005-06-09 08:30:02 Singular Exp $ */
 /*
 * ABSTRACT: Utilities for staircase operations
 */
@@ -60,7 +60,7 @@ scfmon hInit(ideal S, ideal Q, int *Nexist, ring tailRing)
     qi = NULL;
     ql = 0;
   }
-  if ((sl + ql) > 0)
+  if ((sl + ql) == 0)
   {
     *Nexist = 0;
     return NULL;
