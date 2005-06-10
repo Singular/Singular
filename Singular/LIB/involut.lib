@@ -1,4 +1,4 @@
-version="$Id: involut.lib,v 1.7 2005-06-07 10:24:45 Singular Exp $";
+version="$Id: involut.lib,v 1.8 2005-06-10 17:04:59 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY:  involut.lib  Procedures for Computations and Operations with Involutions
@@ -672,17 +672,22 @@ example
  L; // let us take a look on the whole list
 }
 /////////////////////////////////////////////////////////////////////
-proc findAuto()
-"USAGE: findAuto();
+proc findAuto(int n)
+"USAGE: findAuto(n); n an integer
 RETURN: a ring together with a list of pairs L, where
 @*        L[i][1]  =  Groebner Basis of an i-th associated prime,
 @*        L[i][2]  =  matrix, defining a linear map, with entries, reduced with respect to L[i][1]
-PURPOSE: computes the ideal of linear automorphisms of the basering
-NOTE: for convenience, the full ideal of relations @code{idJ}
+PURPOSE: computes the ideal of linear automorphisms of the basering, given by a matrix, n-th power of which gives identity (i.e. unipotent matrix)
+NOTE: if n=0, a matrix, defining an automorphism is not assumed to be unipotent. For convenience, the full ideal of relations @code{idJ}
 and the initial matrix with indeterminates @code{matD} are exported in the output ring
 SEE ALSO: findInvo
 EXAMPLE: example findAuto; shows examples
 "{
+  if ((n<0 ) || (n==1))
+  {
+    "The index of unipotency is too small.";
+    return(0);
+  }
   def @B    = basering; //save the name of basering
   int NVars = nvars(@B); //number of variables in basering
   int i, j;
@@ -762,7 +767,10 @@ EXAMPLE: example findAuto; shows examples
   string snv = "["+string(NVars)+"]";
   execute("matrix @@D"+snv+snv+"="+s+";"); // matrix with entries=new variables
 
-  J = J, ideal( @@D*@@D-matrix( freemodule(NVars) ) ); // add the condition that homomorphism to square is just identity
+  if (n>=2)
+  {
+    J = J, ideal( @@D*@@D-matrix( freemodule(NVars) ) ); // add the condition that homomorphism to square is just identity
+  }
   J       = simplify(J,2); // without extra zeros
   list mL = minAssGTZ(J); // components not in GB
   int sL  = size(mL);
@@ -791,7 +799,7 @@ example
 { "EXAMPLE:"; echo = 2;
  def a = makeWeyl(1);
  setring a; // this algebra is a first Weyl algebra
- def X = findAuto();
+ def X = findAuto(2);
  setring X; // ring with new variables - unknown coefficients
  // look at matrices, defining linear automorphisms:
  print(L[1][2]);  // a first one: we see it is constant
