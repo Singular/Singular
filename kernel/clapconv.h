@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapconv.h,v 1.1.1.1 2003-10-06 12:15:50 Singular Exp $
+// $Id: clapconv.h,v 1.2 2005-06-13 16:23:30 Singular Exp $
 /*
 * ABSTRACT: convert data between Singular and factory
 */
@@ -26,6 +26,7 @@ CanonicalForm conv_SingPClapP( poly p, ring r );
 
 CanonicalForm convSingAPClapAP ( poly p , const Variable & a );
 poly convClapAPSingAP ( const CanonicalForm & f );
+poly convClapAPSingAP_R ( const CanonicalForm & f, int par_start, int var_start );
 
 CanonicalForm convSingGFClapGF ( poly p );
 poly convClapGFSingGF ( const CanonicalForm & f );

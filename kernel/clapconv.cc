@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapconv.cc,v 1.4 2005-04-13 16:38:09 Singular Exp $
+// $Id: clapconv.cc,v 1.5 2005-06-13 16:23:30 Singular Exp $
 /*
 * ABSTRACT: convert data between Singular and factory
 */
@@ -29,8 +29,6 @@ static void convRecPP ( const CanonicalForm & f, int * exp, poly & result );
 static void conv_RecPP ( const CanonicalForm & f, int * exp, poly & result, ring r );
 
 static void convRecPTr ( const CanonicalForm & f, int * exp, napoly & result );
-
-static void convRecAP ( const CanonicalForm & f, int * exp, poly & result );
 
 static void convRecTrP ( const CanonicalForm & f, int * exp, poly & result, int offs );
 
@@ -461,31 +459,37 @@ CanonicalForm convSingAPClapAP ( poly p , const Variable & a)
   return result;
 }
 
-poly convClapAPSingAP ( const CanonicalForm & f )
+static void
+convRecAP_R ( const CanonicalForm & f, int * exp, poly & result, int par_start, int var_start) ;
+
+poly convClapAPSingAP_R ( const CanonicalForm & f, int par_start, int var_start )
 {
-  int n = pVariables+1+1/*rPar(currRing)*/;
+  int n = pVariables+1+rPar(currRing);
   int * exp = new int[n];
   // for ( int i = 0; i < n; i++ ) exp[i] = 0;
   memset(exp,0,n*sizeof(int));
   poly result = NULL;
-  convRecAP( f, exp, result );
+  convRecAP_R( f, exp, result,par_start, var_start );
   delete [] exp;
   return result;
 }
+poly convClapAPSingAP ( const CanonicalForm & f )
+{
+  return convClapAPSingAP_R(f,0,rPar(currRing));
+}
 
 static void
-convRecAP ( const CanonicalForm & f, int * exp, poly & result )
+convRecAP_R ( const CanonicalForm & f, int * exp, poly & result, int par_start, int var_start )
 {
   if (f == 0)
     return;
-  int off=rPar(currRing);
   if ( ! f.inCoeffDomain() )
   {
     int l = f.level();
     for ( CFIterator i = f; i.hasTerms(); i++ )
     {
       exp[l] = i.exp();
-      convRecAP( i.coeff(), exp, result );
+      convRecAP_R( i.coeff(), exp, result, par_start, var_start );
     }
     exp[l] = 0;
   }
@@ -498,11 +502,20 @@ convRecAP ( const CanonicalForm & f, int * exp, poly & result )
       pNext( term ) = NULL;
       int i;
       for ( i = 1; i <= pVariables; i++ )
-        pSetExp( term, i , exp[i+off]);
+        pSetExp( term, i , exp[i+var_start]);
       pSetComp(term, 0);
-      for ( i = 1; i <= off; i++ )
+      if (par_start==0)
+      {
+        for ( i = 1; i <= var_start; i++ )
         //z->e[i-1]+=exp[i];
-        napAddExp(z,i,exp[i]);
+          napAddExp(z,i,exp[i]);
+      }
+      else
+      {
+        for ( i = par_start+1; i <= var_start+rPar(currRing); i++ )
+        //z->e[i-1]+=exp[i];
+          napAddExp(z,i,exp[i-par_start]);
+      }
       pGetCoeff(term)=(number)omAlloc0Bin(rnumber_bin);
       ((lnumber)pGetCoeff(term))->z=z;
       pSetm( term );
