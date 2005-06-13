@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: claptmpl.cc,v 1.26 2005-05-06 14:44:28 hannes Exp $
+// $Id: claptmpl.cc,v 1.27 2005-06-13 16:24:43 Singular Exp $
 /*
 * ABSTRACT - instantiation of all templates
 */
@@ -54,6 +54,7 @@
     template ostream & operator<<(ostream &, const List<Factor<CanonicalForm> > &);
     template ostream & operator<<(ostream &, const List<List<CanonicalForm> > &);
     template ostream & operator<<(ostream &, const List<Variable> &);
+    template ostream & operator<<(ostream &, const Matrix<Variable> &);
     #endif
 
     #ifndef __MWERKS__
@@ -93,7 +94,7 @@ public:
     T factor() const { return _factor; }
     T exp() const { return _exp; }
 #ifndef NOSTREAMIO
-    friend ostream & operator <<<>(ostream &, Substitution<T> &);
+    //friend ostream & operator <<<>(ostream &, Substitution<T> &);
     void Substitution<T>::print ( ostream& s ) const
     {
       s << "("  << factor() << ")^" << exp();
