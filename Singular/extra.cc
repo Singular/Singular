@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.225 2005-05-09 15:54:54 Singular Exp $ */
+/* $Id: extra.cc,v 1.226 2005-06-13 16:26:03 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -59,11 +59,17 @@
 #ifdef HAVE_WALK
 #include "walk.h"
 #endif
+
 #include "weight.h"
 #include "fast_mult.h"
 #include "digitech.h"
+
 #ifdef HAVE_SPECTRUM
 #include "spectrum.h"
+#endif
+
+#ifdef HAVE_BIFAC
+#include <bifac.h>
 #endif
 
 #if defined(HPUX_10) || defined(HPUX_9)
@@ -2550,6 +2556,96 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       res->data=(void*) uni_subst_bits(outer, inner,r);
       return(FALSE);
     }
+    else
+/*==================== bifac =================*/
+#ifdef HAVE_BIFAC
+    if (strcmp(sys_cmd, "bifac")==0)
+    {
+      if (h->Typ()!=POLY_CMD)
+      {
+        WerrorS("`system(\"bifac\",<poly>) expected");
+        return TRUE;
+      }
+      if (!rField_is_Q())
+      {
+        WerrorS("coeff field must be Q");
+        return TRUE;
+      }
+      BIFAC B;
+      CFFList C;
+      int sw_rat=isOn(SW_RATIONAL);
+      On(SW_RATIONAL);
+      CanonicalForm F( convSingPClapP((poly)(h->Data())));
+      B.bifac(F, 1);
+      CFFList L=B.getFactors();
+      PrintS("factors:\n");
+      cout << L <<"\n";
+      // construct the ring ==============================================
+      int i;
+      int lev=ExtensionLevel();
+      char **names=(char**)omAlloc0(lev*sizeof(char_ptr));
+      for(i=1;i<=lev; i++)
+      {
+        StringSetS("");
+        names[i-1]=omStrDup(StringAppend("a(%d)",i));
+      }
+      ring alg_ring=rDefault(0,lev,names);
+      ring new_ring=rCopy0(currRing); // all variable names, ordering etc.
+      new_ring->P=lev;
+      new_ring->parameter=names;
+      new_ring->algring=alg_ring;
+      new_ring->ch=1;
+      rComplete(new_ring,TRUE);
+      // set the mipo ===============================================
+      ring save_currRing=currRing; idhdl save_currRingHdl=currRingHdl;
+      rChangeCurrRing(alg_ring);
+      ideal mipo_id=idInit(lev,1);
+      for (i=lev; i>0;i--)
+      {
+        CanonicalForm Mipo=getMipo(Variable(-i),Variable(i));
+        mipo_id->m[i-1]=convClapPSingP(Mipo);
+      }
+      idShow(mipo_id);
+      alg_ring->qideal=mipo_id;
+      rChangeCurrRing(new_ring);
+      for (i=lev-1; i>=0;i--)
+      {
+        poly p=pOne();
+        lnumber n=(lnumber)pGetCoeff(p);
+        // no need to delete nac 1
+        n->z=(napoly)mipo_id->m[i];
+        mipo_id->m[i]=p;
+      }
+      new_ring->minideal=id_Copy(alg_ring->qideal,new_ring); 
+      // convert factors =============================================
+      ideal fac_id=idInit(L.length(),1);
+      CFFListIterator J=L;
+      i=0;
+      intvec *v = new intvec( L.length() );
+      for ( ; J.hasItem(); J++,i++ )
+      {
+        fac_id->m[i]=convClapAPSingAP_R( J.getItem().factor(),pVariables,0 );
+        (*v)[i]=J.getItem().exp();
+      }
+      idhdl hh=enterid("factors",0,LIST_CMD,&(currRing->idroot),FALSE);
+      lists LL=(lists)omAllocBin( slists_bin);
+      LL->Init(2);
+      LL->m[0].rtyp=IDEAL_CMD;
+      LL->m[0].data=(char *)fac_id;
+      LL->m[1].rtyp=INTVEC_CMD; 
+      LL->m[1].data=(char *)v;
+      IDDATA(hh)=(char *)LL;
+  
+      rChangeCurrRing(save_currRing);
+      currRingHdl=save_currRingHdl;
+      if (!sw_rat) Off(SW_RATIONAL);
+
+      res->data=new_ring;
+      res->rtyp=RING_CMD;
+      return FALSE;
+    }
+    else
+#endif
 /*==================== Error =================*/
       Werror( "system(\"%s\",...) %s", sys_cmd, feNotImplemented );
   }
