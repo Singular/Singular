@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftmpl_matrix.h,v 1.10 2005-01-13 15:11:36 Singular Exp $ */
+/* $Id: ftmpl_matrix.h,v 1.11 2005-06-13 09:46:35 Singular Exp $ */
 
 #ifndef INCL_MATRIX_H
 #define INCL_MATRIX_H
@@ -18,7 +18,7 @@ class Matrix;
 
 #ifndef NOSTREAMIO
 template <class T>
-std::ostream& operator<< (std::ostream &, const Matrix<T> &);
+ostream& operator<< (ostream &, const Matrix<T> &);
 #endif
 
 template <class T>
