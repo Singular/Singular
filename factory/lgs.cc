@@ -202,7 +202,7 @@ int LGS::rank(void)
 void LGS::print(void)
 //--<>---------------------------------
 { // Return the current rank of the matrix
-#ifdef NOSTREAMIO
+#ifdef SINGULAR
   printf("LGS::print??\n");
 #else
   cout << "A = " << A << "\nb = " << b << endl;
