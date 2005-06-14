@@ -174,6 +174,8 @@ class SimpleValue(OMobject):
 
 class OMint(SimpleValue):
     def __init__(self,value):
+        if not isinstance(value,int):
+            value=self.parse(value)
         super(OMint,self).__init__(value)
     def parse(self,value):
         """FIXME: Not fully standard compliant,
