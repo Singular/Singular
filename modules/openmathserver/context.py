@@ -59,6 +59,9 @@ class Context(object):
         else:
             if isinstance(val, int):
                 return OMint(val)
+            if isinstance(val, float):
+                return OMfloat(val)
+            raise NotImplementedError
     def apply(self,func,args):
         try:
             return func(self,*args)

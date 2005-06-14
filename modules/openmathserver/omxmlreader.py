@@ -71,6 +71,13 @@ class OMFromXMLBuilder:
         if (node.nodeName=="OMBIND"):
             children=[self.buildFromNode(c) for c in node.childNodes]
             return OMbinding(children[0],children[1:-1],children[-1])
+        if (node.nodeName=="OMF"):
+            if (node.hasAttribute("dec")):
+                value=float(node.getAttribute("dec"))
+            else:
+                raise NotImplementedError
+            return OMfloat(value)
+            
         raise NotImplementedError
     def build(self, root):
         remove_white_space(root)
