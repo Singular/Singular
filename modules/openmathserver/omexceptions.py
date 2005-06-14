@@ -6,5 +6,5 @@ class EvaluationFailedError(Exception):
     pass
 class PackagingFailedError(Exception):
     pass
-class OperationNotPossibleError(Exception):
+class UnsupportedOperationError(Exception):
     pass

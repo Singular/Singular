@@ -94,7 +94,7 @@ class OMobject(object):
         opening="".join(["<", self.XMLtag, attrstr,">"])
         children=self.children
         if children:
-            body="".join([context.XMLencode(c) for c in children])
+            body="".join([context.XMLEncodeObject(c) for c in children])
         else:
             body=self.body
             if not body:
@@ -130,9 +130,15 @@ class OMapplication(OMobject):
             try:
                 return context.apply(efunc, eargs)
             except EvaluationFailedError, NotImplementedError:
-                return self
+                return OMapplication(efunc, eargs)
+                #return self
         else:
             return OMapplication(efunc, eargs)
+    XMLtag="OMA"
+    def getChildren(self):
+        return [self.func]+self.args
+    def setChildren(self):
+        raise UnsupportedOperationError
 class OMsymbol(OMobject):
     def __init__(self,name,cd=None):
         super(OMsymbol,self).__init__()
@@ -146,6 +152,13 @@ class OMsymbol(OMobject):
         return hash((self.name,self.cd.__hash__()))
     def evaluate(self,context):
         return context.evaluateSymbol(self)
+    XMLtag="OMS"
+    def getXMLattributes(self):
+        return [XMLattribute("name", self.name),\
+                 XMLattribute("cdbase",self.cd.base),\
+                 XMLattribute("cd",self.cd.name)]
+    def setXMLattributes(self):
+        raise UnsupportedOperationError
 class SimpleValue(OMobject):
     def __init__(self,value):
         super(SimpleValue,self).__init__()
@@ -171,7 +184,7 @@ class OMint(SimpleValue):
     def getBody(self):
         return str(self.value)
     def setBody(self, value):
-        raise OperationNotPossibleError
+        raise UnsupportedOperationError
     XMLtag="OMI"
 class OMfloat(SimpleValue):
     def __init__(self,value):
@@ -182,6 +195,9 @@ class OMfloat(SimpleValue):
         return float(value)
     def __str__(self):
         return "OMfloat("+repr(self.value)+")"
+    XMLtag="OMF"
+    def getXMLattributes(self):
+        return [XMLattribute("dec",str(self.value))]
         
 if __name__=='__main__':
     from context import *

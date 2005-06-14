@@ -42,7 +42,7 @@ class Context(object):
                 impl.attributes=copy(oms.attributes)
             return impl
         except NotImplementedError:
-            print "not found"
+            #TODO log this, report it
             return oms
     def evaluate(self,omobject):
         return omobject.evaluate(self)
@@ -60,11 +60,14 @@ class Context(object):
             if isinstance(val, int):
                 return OMint(val)
     def apply(self,func,args):
-        return func(self,*args)
+        try:
+            return func(self,*args)
+        except:
+            raise EvaluationFailedError
     def XMLEncodeBody(self,body):
         return self.XMLEncoder.encode(body)
-    def XMLEncode(self, obj):
-        obj.XMLencode(self)
+    def XMLEncodeObject(self, obj):
+        return obj.XMLencode(self)
 class SimpleXMLEncoder(object):
     def encode(self, string):
         return sub("<","&lt;",sub("&","&amp;",string))
