@@ -63,7 +63,8 @@ class Context(object):
         return func(self,*args)
     def XMLEncodeBody(self,body):
         return self.XMLEncoder.encode(body)
-
+    def XMLEncode(self, obj):
+        obj.XMLencode(self)
 class SimpleXMLEncoder(object):
     def encode(self, string):
         return sub("<","&lt;",sub("&","&amp;",string))

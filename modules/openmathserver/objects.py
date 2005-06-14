@@ -1,8 +1,14 @@
 from omexceptions import *
 from exceptions import *
-from cd import *
-
+#from cd import *
+class XMLattribute(object):
+    def __init__(self, name, value):
+        self.name=name
+        self.value=value
+    def encode(self, context):
+        return "".join([self.name,"=\"",self.value,"\""])
 class OMobject(object):
+    """ at the moment only a base class"""
     def __init__(self):
         self.attributes={}
     def __getChildren(self):
@@ -49,20 +55,46 @@ class OMobject(object):
             self.setBody(body)
         except AttributeError:
                 self.__body=body
+    def __getXMLattributes(self):
+        try:
+            return self.getXMLattributes()
+        except AttributeError:
+            try:
+                return self.__XMLattributes
+            except AttributeError:
+                #do return None, cause if modifiying a new list, changes will not be saved
+                return []
+    def __delXMLattributes(self):
+        try:
+            self.delXMLattributes()
+            return
+        except AttributeError:
+            try:
+                del self.__XMLattributes
+            except AttributeError:
+                pass
+    def __setXMLattributes(self,XMLattributes):
+        try:
+            self.setBody(XMLattributes)
+        except AttributeError:
+                self.__XMLattributes=XMLattributes
     children=property(__getChildren, __setChildren,__delChildren,\
                       """ children in an OMtree""")
     body=property(__getBody,__setBody,__delBody,\
         "xml body,FIXME: at the moment only char data")
+    XMLattributes=property(__getXMLattributes,__setXMLattributes,__delXMLattributes,\
+        "xml attributes")
     def XMLencode(self, context):
-        try:
-            attr=self.XMLAttributes()
+        
+        attr=self.XMLattributes
+        if attr:
             attrstr=" "+" ".join([a.encode(context) for a in attr])
-        except:
+        else:
             attrstr=""
         opening="".join(["<", self.XMLtag, attrstr,">"])
         children=self.children
         if children:
-            body="".join([c.XMLencode(context) for i in children])
+            body="".join([context.XMLencode(c) for c in children])
         else:
             body=self.body
             if not body:
@@ -83,6 +115,9 @@ class OMvar(OMobject):
             return self
     def __str__(self):
         return "OMV(" + self.name +")"
+    XMLtag="OMV"
+    def getXMLattributes(self):
+        return [XMLattribute("name", self.name)]
 class OMapplication(OMobject):
     def __init__(self, func, args):
         super(OMapplication,self).__init__()
