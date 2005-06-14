@@ -1,9 +1,75 @@
 from omexceptions import *
+from exceptions import *
 from cd import *
+
 class OMobject(object):
     def __init__(self):
         self.attributes={}
-    pass
+    def __getChildren(self):
+        try:
+            return self.getChildren()
+        except AttributeError:
+            try:
+                return self.children
+            except AttributeError:
+                return []
+    def __delChildren(self):
+        try:
+            self.delChildren()
+            return
+        except AttributeError:
+            try:
+                del self.children
+            except AttributeError:
+                pass
+    def __setChildren(self,children):
+        try:
+            self.setChildren(children)
+        except AttributeError:
+                self.children=children
+    def __getBody(self):
+        try:
+            return self.getBody()
+        except AttributeError:
+            try:
+                return self.body
+            except AttributeError:
+                return None
+    def __delBody(self):
+        try:
+            self.delBody()
+            return
+        except AttributeError:
+            try:
+                del self.body
+            except AttributeError:
+                pass
+    def __setBody(self,body):
+        try:
+            self.setBody(body)
+        except AttributeError:
+                self.body=body
+    children=property(__getChildren, __setChildren,__delChildren,\
+                      """ children in an OMtree""")
+    body=property(__getBody,__setBody,__delBody,\
+        "xml body,FIXME: at the moment only char data")
+    def XMLencode(self, context):
+        try:
+            attr=self.XMLAttributes()
+            attrstr=" ".join([a.encode(context) for a in attr])
+        except:
+            attrstr=""
+        opening="".join(["<", self.xmltag, " ", attrstr,">"])
+        children=self.children
+        if children:
+            body="".join([c.XMLencode(context) for i in children])
+        else:
+            body=self.body
+            if not body:
+                body=""
+            body=context.xmlEncodeBody(body)
+        closing="".join(["</"+self.xmltag+">"])
+        return "".join([opening,body,closing])
 class OMvar(OMobject):
     def __init__(self,name):
         super(OMvar,self).__init__()
@@ -65,8 +131,10 @@ class OMint(SimpleValue):
         return int(value,10)
     def __str__(self):
         return "OMint("+repr(self.value)+")"
-    
-
+    def getBody(self):
+        return str(self.value)
+    def setBody(self, value):
+        raise OperationNotPossibleError
 class OMfloat(SimpleValue):
     def __init__(self,value):
         super(OMfloat,self).__init__(value)
@@ -111,5 +179,7 @@ if __name__=='__main__':
     application=OMapplication(OMsymbol("plus",arith1.content),[x,x,x])
     
     print context.evaluate(application)
-    
+    i=OMint(22482489)
+    print i.body
+    i.body="dshj"
    

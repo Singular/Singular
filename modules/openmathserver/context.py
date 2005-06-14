@@ -1,3 +1,4 @@
+from exceptions import *
 from copy import copy
 from cd import *
 from omexceptions import *
