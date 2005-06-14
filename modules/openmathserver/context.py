@@ -3,11 +3,13 @@ from copy import copy
 from cd import *
 from omexceptions import *
 from objects import *
+from re import sub
 class Context(object):
     #TODO: Referenzen durch scope richtig behandeln
     def __init__(self):
         self.scope=Scope()
         self.implementations={}
+        self.XMLEncoder=SimpleXMLEncoder()
     def addCDImplementation(self, implementation):
         self.implementations[implementation.cd]=implementation
     def lookupImplementation(self, oms):
@@ -59,7 +61,13 @@ class Context(object):
                 return OMint(val)
     def apply(self,func,args):
         return func(self,*args)
-       
+    def XMLEncodeBody(self,body):
+        return self.XMLEncoder.encode(body)
+
+class SimpleXMLEncoder(object):
+    def encode(self, string):
+        return sub("<","&lt;",sub("&","&amp;",string))
+        
 class Scope(object):
     def __init__(self):
         self.dicts=[]

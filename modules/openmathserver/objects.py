@@ -10,7 +10,7 @@ class OMobject(object):
             return self.getChildren()
         except AttributeError:
             try:
-                return self.children
+                return self.__children
             except AttributeError:
                 return []
     def __delChildren(self):
@@ -19,20 +19,20 @@ class OMobject(object):
             return
         except AttributeError:
             try:
-                del self.children
+                del self.__children
             except AttributeError:
                 pass
     def __setChildren(self,children):
         try:
             self.setChildren(children)
         except AttributeError:
-                self.children=children
+                self.__children=children
     def __getBody(self):
         try:
             return self.getBody()
         except AttributeError:
             try:
-                return self.body
+                return self.__body
             except AttributeError:
                 return None
     def __delBody(self):
@@ -41,14 +41,14 @@ class OMobject(object):
             return
         except AttributeError:
             try:
-                del self.body
+                del self.__body
             except AttributeError:
                 pass
     def __setBody(self,body):
         try:
             self.setBody(body)
         except AttributeError:
-                self.body=body
+                self.__body=body
     children=property(__getChildren, __setChildren,__delChildren,\
                       """ children in an OMtree""")
     body=property(__getBody,__setBody,__delBody,\
@@ -56,10 +56,10 @@ class OMobject(object):
     def XMLencode(self, context):
         try:
             attr=self.XMLAttributes()
-            attrstr=" ".join([a.encode(context) for a in attr])
+            attrstr=" "+" ".join([a.encode(context) for a in attr])
         except:
             attrstr=""
-        opening="".join(["<", self.xmltag, " ", attrstr,">"])
+        opening="".join(["<", self.XMLtag, attrstr,">"])
         children=self.children
         if children:
             body="".join([c.XMLencode(context) for i in children])
@@ -67,8 +67,10 @@ class OMobject(object):
             body=self.body
             if not body:
                 body=""
-            body=context.xmlEncodeBody(body)
-        closing="".join(["</"+self.xmltag+">"])
+            assert body!=None
+            body=context.XMLEncodeBody(body)
+            assert body!=None
+        closing="".join(["</"+self.XMLtag+">"])
         return "".join([opening,body,closing])
 class OMvar(OMobject):
     def __init__(self,name):
@@ -135,6 +137,7 @@ class OMint(SimpleValue):
         return str(self.value)
     def setBody(self, value):
         raise OperationNotPossibleError
+    XMLtag="OMI"
 class OMfloat(SimpleValue):
     def __init__(self,value):
         super(OMfloat,self).__init__(value)
@@ -181,5 +184,6 @@ if __name__=='__main__':
     print context.evaluate(application)
     i=OMint(22482489)
     print i.body
-    i.body="dshj"
+    print i.XMLencode(context)
+    #i.body="dshj"
    
