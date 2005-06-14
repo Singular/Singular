@@ -33,5 +33,11 @@ class OMbinding(OMobject):
         erg=self.calcErg(context)
         self.unbind()
         #print "__call__ erg is", erg
-        return erg    
+        return erg   
+        
+    XMLtag="OMBIND"
+    def getChildren(self):
+        return [self.binder]+self.variables+[self.block]
+    def setChildren(self):
+        raise UnsupportedOperationError 
         

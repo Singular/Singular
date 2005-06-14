@@ -8,7 +8,9 @@ import re
 import sys
 import os.path
 from objects import *
+from binding import *
 from cd import *
+from exceptions import *
 def readFile(input_file_name):
     docstream = open(input_file_name)
     docIS=DOMInputSource()
@@ -66,6 +68,10 @@ class OMFromXMLBuilder:
         if (node.nodeName=="OMA"):
             children=[self.buildFromNode(c) for c in node.childNodes]
             return OMapplication(children[0],children[1:])
+        if (node.nodeName=="OMBIND"):
+            children=[self.buildFromNode(c) for c in node.childNodes]
+            return OMbinding(children[0],children[1:-1],children[-1])
+        raise NotImplementedError
     def build(self, root):
         remove_white_space(root)
         return self.buildFromNode(root)

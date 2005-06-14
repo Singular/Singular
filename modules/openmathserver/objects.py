@@ -118,6 +118,7 @@ class OMvar(OMobject):
     XMLtag="OMV"
     def getXMLattributes(self):
         return [XMLattribute("name", self.name)]
+        
 class OMapplication(OMobject):
     def __init__(self, func, args):
         super(OMapplication,self).__init__()
@@ -139,6 +140,7 @@ class OMapplication(OMobject):
         return [self.func]+self.args
     def setChildren(self):
         raise UnsupportedOperationError
+        
 class OMsymbol(OMobject):
     def __init__(self,name,cd=None):
         super(OMsymbol,self).__init__()
