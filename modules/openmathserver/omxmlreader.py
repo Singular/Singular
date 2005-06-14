@@ -70,17 +70,44 @@ class OMFromXMLBuilder:
         remove_white_space(root)
         return self.buildFromNode(root)
 #TODO: handle hex floats
+#TODO: handle floats
 #TODO: handle ancestors cdbase
 if __name__=='__main__':
-    if len(argv<=2):
+    import arith1
+    
+    if len(sys.argv)<=2:
         print "Usage: python omxmlreader [--evaluate] input output"
-    for arg in argv:
-        
+    state=0
+    eval=False
+    #TODO: use optparse
+    for arg in sys.argv[1:]:
+        if state==0:
+            if arg=="--evaluate":
+                eval=True
+            else:
+                inputf=arg
+                state=1
+            continue
+        if state==1:
+            outputf=arg
+            continue
+        if state==2:
+            print "argument ignored:", arg
     from context import Context
-    inputf=sys.argv[1]
+    #inputf=sys.argv[1]
     root=readFile(inputf)
     builder=OMFromXMLBuilder()
     context=Context()
-    
-    print context.XMLEncodeObject(builder.build(root))
+    context.addCDImplementation(arith1.implementation)
+    doc=builder.build(root)
+    if eval:
+        doc=context.evaluate(doc)
+    output=context.XMLEncodeObject(doc)
+    try:
+        out=open(outputf,"w")
+    except NameError:
+        print "no output file"
+        sys.exit(1)
+    out.write(output)
+    out.close()
     #print repr(root.getAttribute("blabla"))
