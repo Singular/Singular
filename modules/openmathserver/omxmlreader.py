@@ -50,7 +50,7 @@ class OMFromXMLBuilder:
         if (node.nodeName=="OMV"):
             name=node.getAttribute("name") #node.attributes["name"]
             #print dir(name)
-            erg= OMvar(name)
+            erg= OMVar(name)
         if (node.nodeName=="OMS"):
             if node.hasAttribute("cdbase"):
                 #FIXME: obtain from ancestors
@@ -66,7 +66,7 @@ class OMFromXMLBuilder:
                 cd=OMcd(cdname)
             else:
                 cd=OMcd(cdname,cdbase)
-            erg=OMsymbol(name,cd)
+            erg=OMSymbol(name,cd)
         if (node.nodeName=="OMA"):
             children=[self.buildFromNode(c) for c in node.childNodes]
             erg= OMapplication(children[0],children[1:])
@@ -81,7 +81,7 @@ class OMFromXMLBuilder:
             erg=OMfloat(value)
         if (node.nodeName=="OMR"):
             if node.hasAttribute("xref"):
-                erg=OMref(node.getAttribute("xref"))
+                erg=OMRef(node.getAttribute("xref"))
                 self.refs.append(erg)
             else:
                 raise UnresolvedReference

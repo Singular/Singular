@@ -1,7 +1,7 @@
 from omexceptions import *
 from exceptions import *
 #from cd import *
-class XMLattribute(object):
+class XMLAttribute(object):
     def __init__(self, name, value):
         self.name=name
         self.value=value
@@ -55,38 +55,38 @@ class OMObjectBase(object):
             self.setBody(body)
         except AttributeError:
                 raise UnsupportedOperationError
-    def __getXMLattributes(self):
+    def __getXMLAttributes(self):
         try:
-            return self.getXMLattributes()
+            return self.getXMLAttributes()
         except AttributeError:
             try:
-                return self.__XMLattributes
+                return self.__XMLAttributes
             except AttributeError:
                 #do return None, cause if modifiying a new list, changes will not be saved
                 return []
-    def __delXMLattributes(self):
+    def __delXMLAttributes(self):
         try:
-            self.delXMLattributes()
+            self.delXMLAttributes()
             return
         except AttributeError:
             try:
-                del self.__XMLattributes
+                del self.__XMLAttributes
             except AttributeError:
                 pass
-    def __setXMLattributes(self,XMLattributes):
+    def __setXMLAttributes(self,XMLAttributes):
         try:
-            self.setBody(XMLattributes)
+            self.setBody(XMLAttributes)
         except AttributeError:
             raise UnsupportedOperationError
     children=property(__getChildren, __setChildren,__delChildren,\
                       """ children in an OMtree""")
     body=property(__getBody,__setBody,__delBody,\
         "xml body,FIXME: at the moment only char data")
-    XMLattributes=property(__getXMLattributes,__setXMLattributes,__delXMLattributes,\
+    XMLAttributes=property(__getXMLAttributes,__setXMLAttributes,__delXMLAttributes,\
         "xml attributes")
     def XMLencode(self, context):
         
-        attr=self.XMLattributes
+        attr=self.XMLAttributes
         if attr:
             attrstr=" "+" ".join([a.encode(context) for a in attr])
         else:
@@ -116,12 +116,12 @@ class OMVar(OMObjectBase):
     def __str__(self):
         return "OMV(" + self.name +")"
     XMLtag="OMV"
-    def getXMLattributes(self):
-        return [XMLattribute("name", self.name)]
+    def getXMLAttributes(self):
+        return [XMLAttribute("name", self.name)]
         
-class OMapplication(OMObjectBase):
+class OMApply(OMObjectBase):
     def __init__(self, func, args):
-        super(OMapplication,self).__init__()
+        super(OMApply,self).__init__()
         self.func=func
         self.args=args
     def evaluate(self,context):
@@ -131,10 +131,10 @@ class OMapplication(OMObjectBase):
             try:
                 return context.apply(efunc, eargs)
             except EvaluationFailedError, NotImplementedError:
-                return OMapplication(efunc, eargs)
+                return OMApply(efunc, eargs)
                 #return self
         else:
-            return OMapplication(efunc, eargs)
+            return OMApply(efunc, eargs)
     XMLtag="OMA"
     def getChildren(self):
         return [self.func]+self.args
@@ -158,11 +158,11 @@ class OMSymbol(OMObjectBase):
     def evaluate(self,context):
         return context.evaluateSymbol(self)
     XMLtag="OMS"
-    def getXMLattributes(self):
-        return [XMLattribute("name", self.name),\
-                 XMLattribute("cdbase",self.cd.base),\
-                 XMLattribute("cd",self.cd.name)]
-    def setXMLattributes(self):
+    def getXMLAttributes(self):
+        return [XMLAttribute("name", self.name),\
+                 XMLAttribute("cdbase",self.cd.base),\
+                 XMLAttribute("cd",self.cd.name)]
+    def setXMLAttributes(self):
         raise UnsupportedOperationError
 class SimpleValue(OMObjectBase):
     def __init__(self,value):
@@ -203,8 +203,8 @@ class OMfloat(SimpleValue):
     def __str__(self):
         return "OMfloat("+repr(self.value)+")"
     XMLtag="OMF"
-    def getXMLattributes(self):
-        return [XMLattribute("dec",str(self.value))]
+    def getXMLAttributes(self):
+        return [XMLAttribute("dec",str(self.value))]
 class OMRef(OMObjectBase):
     def __init__(self, ref):
         self.ref=ref
@@ -232,19 +232,19 @@ if __name__=='__main__':
     print context.evaluate(y)
     firstArg=OMbinding(lambdasym,[OMVar("x"), OMVar("y")], OMVar("x"))
     #print context.evaluate(firstArg)
-    application=OMapplication(firstArg, [x,y])
+    application=OMApply(firstArg, [x,y])
     print context.evaluate(application)
-    application=OMapplication(firstArg,[y,x])
+    application=OMApply(firstArg,[y,x])
     print context.evaluate(application)
     import arith1
     context.addCDImplementation(arith1.implementation)
     #print type(context.lookupImplementation(arith1.plussym))
-    #application=OMapplication(arith1.plussym,[x])
-    #application=OMapplication(arith1.plussym,[x,x])
-    application=OMapplication(OMSymbol("plus",arith1.content),[x,x])
+    #application=OMApply(arith1.plussym,[x])
+    #application=OMApply(arith1.plussym,[x,x])
+    application=OMApply(OMSymbol("plus",arith1.content),[x,x])
     
     print context.evaluate(application)
-    application=OMapplication(OMSymbol("plus",arith1.content),[x,x,x])
+    application=OMApply(OMSymbol("plus",arith1.content),[x,x,x])
     
     print context.evaluate(application)
     i=OMint(22482489)
