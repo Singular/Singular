@@ -4,8 +4,8 @@ from objects import *
 from cd import *
 from omexceptions import *
 
-content=OMcd("arith1")
-implementation=OMcdImplementation(content)
+content=OMCD("arith1")
+implementation=OMCDImplementation(content)
 
 plussym=OMSymbol("plus",content)
 

@@ -3,7 +3,7 @@ from cd import *
 from omexceptions import *
 from itertools import izip
 from copy import copy
-cdFns1=OMcd("fns1")
+cdFns1=OMCD("fns1")
 lambdasym=OMSymbol("lambda",cdFns1)
 
 def islambda(sym):

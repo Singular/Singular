@@ -69,7 +69,7 @@ class OMFromXMLBuilder:
             erg=OMSymbol(name,cd)
         if (node.nodeName=="OMA"):
             children=[self.buildFromNode(c) for c in node.childNodes]
-            erg= OMapplication(children[0],children[1:])
+            erg= OMApply(children[0],children[1:])
         if (node.nodeName=="OMBIND"):
             children=[self.buildFromNode(c) for c in node.childNodes]
             erg= OMbinding(children[0],children[1:-1],children[-1])
