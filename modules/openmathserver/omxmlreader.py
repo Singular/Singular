@@ -11,6 +11,7 @@ from objects import *
 from binding import *
 from cd import *
 from exceptions import *
+from omexceptions import *
 def readFile(input_file_name):
     docstream = open(input_file_name)
     docIS=DOMInputSource()
@@ -42,13 +43,14 @@ def remove_white_space(node):
         
 class OMFromXMLBuilder:
     def buildFromNode(self, node):
+        erg=None
         if (node.nodeName=="OMI"):
             content=get_text_in_children(node)
-            return OMint(content)
+            erg=OMint(content)
         if (node.nodeName=="OMV"):
             name=node.getAttribute("name") #node.attributes["name"]
             #print dir(name)
-            return OMvar(name)
+            erg= OMvar(name)
         if (node.nodeName=="OMS"):
             if node.hasAttribute("cdbase"):
                 #FIXME: obtain from ancestors
@@ -64,24 +66,41 @@ class OMFromXMLBuilder:
                 cd=OMcd(cdname)
             else:
                 cd=OMcd(cdname,cdbase)
-            return OMsymbol(name,cd)
+            erg=OMsymbol(name,cd)
         if (node.nodeName=="OMA"):
             children=[self.buildFromNode(c) for c in node.childNodes]
-            return OMapplication(children[0],children[1:])
+            erg= OMapplication(children[0],children[1:])
         if (node.nodeName=="OMBIND"):
             children=[self.buildFromNode(c) for c in node.childNodes]
-            return OMbinding(children[0],children[1:-1],children[-1])
+            erg= OMbinding(children[0],children[1:-1],children[-1])
         if (node.nodeName=="OMF"):
             if (node.hasAttribute("dec")):
                 value=float(node.getAttribute("dec"))
             else:
                 raise NotImplementedError
-            return OMfloat(value)
-            
-        raise NotImplementedError
+            erg=OMfloat(value)
+        if (node.nodeName=="OMR"):
+            if node.hasAttribute("xref"):
+                erg=OMref(node.getAttribute("xref"))
+                self.refs.append(erg)
+            else:
+                raise UnresolvedReference
+        if None==erg:
+            raise NotImplementedError
+        else:
+            if node.hasAttribute("id"):
+                id=node.getAttribute("id")
+                self.ids[id]=erg
+            return erg
+    def __init__(self):
+        self.refs=[]
+        self.ids={}
     def build(self, root):
         remove_white_space(root)
-        return self.buildFromNode(root)
+        erg=self.buildFromNode(root)
+        for r in self.refs:
+            r.ref=self.ids[r.ref]
+        return erg
 #TODO: handle hex floats
 #TODO: handle floats
 #TODO: handle ancestors cdbase

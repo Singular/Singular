@@ -147,7 +147,10 @@ class OMsymbol(OMObjectBase):
         self.cd=cd
         self.name=name
     def __eq__(self, other):
-        return bool(other.name==self.name and self.cd==other.cd)
+        try:
+            return bool(other.name==self.name and self.cd==other.cd)
+        except:
+            return False
     def __str__(self):
         return "OMS("+self.name+", "+self.cd.name + ")"
     def __hash__(self):#
@@ -202,7 +205,14 @@ class OMfloat(SimpleValue):
     XMLtag="OMF"
     def getXMLattributes(self):
         return [XMLattribute("dec",str(self.value))]
-        
+class OMref(OMObjectBase):
+    def __init__(self, ref):
+        self.ref=ref
+    def evaluate(self, context):
+        return context.evaluate(self.ref)
+    def XMLencode(self, context):
+        "FIXME: maybe it should also be able to encode as reference"
+        return context.XMLEncodeObject(self.ref)
 if __name__=='__main__':
     from context import *
 

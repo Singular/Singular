@@ -5,7 +5,10 @@ class OMcd(object):
         self.name=name
         self.base=base
     def  __eq__(self, other):
-        return (self.name==other.name) and (self.base==other.base)
+        try:
+            return (self.name==other.name) and (self.base==other.base)
+        except:
+            return False
     def __hash__(self):
         return hash((self.name,self.base))
 

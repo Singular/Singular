@@ -8,3 +8,5 @@ class PackagingFailedError(Exception):
     pass
 class UnsupportedOperationError(Exception):
     pass
+class UnresolvedReference(Exception):
+    pass
