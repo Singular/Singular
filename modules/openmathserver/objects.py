@@ -104,9 +104,9 @@ class OMObjectBase(object):
             assert body!=None
         closing="".join(["</"+self.XMLtag+">"])
         return "".join([opening,body,closing])
-class OMvar(OMObjectBase):
+class OMVar(OMObjectBase):
     def __init__(self,name):
-        super(OMvar,self).__init__()
+        super(OMVar,self).__init__()
         self.name=name
     def evaluate(self,context):
         try:
@@ -141,9 +141,9 @@ class OMapplication(OMObjectBase):
     def setChildren(self):
         raise UnsupportedOperationError
         
-class OMsymbol(OMObjectBase):
+class OMSymbol(OMObjectBase):
     def __init__(self,name,cd=None):
-        super(OMsymbol,self).__init__()
+        super(OMSymbol,self).__init__()
         self.cd=cd
         self.name=name
     def __eq__(self, other):
@@ -205,7 +205,7 @@ class OMfloat(SimpleValue):
     XMLtag="OMF"
     def getXMLattributes(self):
         return [XMLattribute("dec",str(self.value))]
-class OMref(OMObjectBase):
+class OMRef(OMObjectBase):
     def __init__(self, ref):
         self.ref=ref
     def evaluate(self, context):
@@ -224,13 +224,13 @@ if __name__=='__main__':
 
     context["x"]=OMint(1)
 
-    x=OMvar("x")
+    x=OMVar("x")
 
-    y=OMvar("y")
+    y=OMVar("y")
 
     print context.evaluate(x)
     print context.evaluate(y)
-    firstArg=OMbinding(lambdasym,[OMvar("x"), OMvar("y")], OMvar("x"))
+    firstArg=OMbinding(lambdasym,[OMVar("x"), OMVar("y")], OMVar("x"))
     #print context.evaluate(firstArg)
     application=OMapplication(firstArg, [x,y])
     print context.evaluate(application)
@@ -241,10 +241,10 @@ if __name__=='__main__':
     #print type(context.lookupImplementation(arith1.plussym))
     #application=OMapplication(arith1.plussym,[x])
     #application=OMapplication(arith1.plussym,[x,x])
-    application=OMapplication(OMsymbol("plus",arith1.content),[x,x])
+    application=OMapplication(OMSymbol("plus",arith1.content),[x,x])
     
     print context.evaluate(application)
-    application=OMapplication(OMsymbol("plus",arith1.content),[x,x,x])
+    application=OMapplication(OMSymbol("plus",arith1.content),[x,x,x])
     
     print context.evaluate(application)
     i=OMint(22482489)

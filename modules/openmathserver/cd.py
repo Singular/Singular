@@ -1,4 +1,4 @@
-from objects import OMsymbol
+from objects import OMSymbol
 from omexceptions import *
 class OMcd(object):
     def __init__(self,name, base="http://www.openmath.org/cd"):
@@ -21,15 +21,15 @@ class OMcdImplementation(object):
     def __setitem__(self,name,value):
         self.implementations[name]=value
     def implement(self,symbolname, func):
-        symbol=OMsymbol(symbolname,self.cd)
-        impl=ImplementedOMsymbol(symbol,func)
+        symbol=OMSymbol(symbolname,self.cd)
+        impl=ImplementedOMSymbol(symbol,func)
         self[symbol]=impl
         
 
 
-class ImplementedOMsymbol(OMsymbol):
+class ImplementedOMSymbol(OMSymbol):
     def __init__(self,symbol, func):
-        super(ImplementedOMsymbol,self).__init__(symbol.name, symbol.cd)
+        super(ImplementedOMSymbol,self).__init__(symbol.name, symbol.cd)
         self.implementation=func
     def __str__(self):
         return "ImplementedOMS("+self.name+", " + self.cd.name +")"

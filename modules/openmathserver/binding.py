@@ -1,10 +1,10 @@
-from objects import OMObjectBase, OMsymbol
+from objects import OMObjectBase, OMSymbol
 from cd import *
 from omexceptions import *
 from itertools import izip
 from copy import copy
 cdFns1=OMcd("fns1")
-lambdasym=OMsymbol("lambda",cdFns1)
+lambdasym=OMSymbol("lambda",cdFns1)
 
 def islambda(sym):
     return lambdasym==sym

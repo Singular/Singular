@@ -7,7 +7,7 @@ from omexceptions import *
 content=OMcd("arith1")
 implementation=OMcdImplementation(content)
 
-plussym=OMsymbol("plus",content)
+plussym=OMSymbol("plus",content)
 
 def plusfunc(context, *args):
     #print "plusfunc", args
@@ -24,7 +24,7 @@ implementation.implement("plus", plusfunc)
 #print plussym
 #print sym==plussym
 #print implementation[plussym]
-#plusimpl=ImplementedOMsymbol(plussym,plusfunc)
+#plusimpl=ImplementedOMSymbol(plussym,plusfunc)
 #implementation[plussym]=plusimpl
 #print "Laenge", (len(implementation.implementations))
-#assert OMsymbol("plus",content)==OMsymbol("plus",content)
+#assert OMSymbol("plus",content)==OMSymbol("plus",content)
