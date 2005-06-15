@@ -54,7 +54,7 @@ class Context(object):
         #print "my erg is", erg
         return erg
     def package(self, val):
-        if isinstance(val, OMobject):
+        if isinstance(val, OMObjectBase):
             return val
         else:
             if isinstance(val, int):

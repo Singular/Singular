@@ -1,23 +1,33 @@
-from objects import OMobject, OMsymbol
+from objects import OMObjectBase, OMsymbol
 from cd import *
 from omexceptions import *
 from itertools import izip
+from copy import copy
 cdFns1=OMcd("fns1")
 lambdasym=OMsymbol("lambda",cdFns1)
 
 def islambda(sym):
     return lambdasym==sym
     
-class OMbinding(OMobject):
+class OMbinding(OMObjectBase):
+    """hopefully fixed possible problems: reevaluation writes new scope, if it isn't
+       meant so, references do not work correctly because of scopes
+       solve this by first evaluation to bounded OMbinding"""
     def __init__(self, binder,variables,block):
         super(OMbinding,self).__init__()
         self.block=block
         self.binder=binder
         self.variables=variables
+        self.bounded=False
     def evaluate(self,context):
         assert islambda(self.binder)
-        self.scope=context.scopeFromCurrentScope()
-        return self
+        if not self.bounded:
+            mycopy=copy(self)
+            mycopy.scope=context.scopeFromCurrentScope()
+            mycopy.bounded=True
+            return mycopy
+        else:
+            return self
     def bind(self, args):
         #print args, self.variables
         assert len(args)==len(self.variables)

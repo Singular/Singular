@@ -7,7 +7,7 @@ class XMLattribute(object):
         self.value=value
     def encode(self, context):
         return "".join([self.name,"=\"",self.value,"\""])
-class OMobject(object):
+class OMObjectBase(object):
     """ at the moment only a base class"""
     def __init__(self):
         self.attributes={}
@@ -32,7 +32,7 @@ class OMobject(object):
         try:
             self.setChildren(children)
         except AttributeError:
-                self.__children=children
+                raise UnsupportedOperationError
     def __getBody(self):
         try:
             return self.getBody()
@@ -54,7 +54,7 @@ class OMobject(object):
         try:
             self.setBody(body)
         except AttributeError:
-                self.__body=body
+                raise UnsupportedOperationError
     def __getXMLattributes(self):
         try:
             return self.getXMLattributes()
@@ -77,7 +77,7 @@ class OMobject(object):
         try:
             self.setBody(XMLattributes)
         except AttributeError:
-                self.__XMLattributes=XMLattributes
+            raise UnsupportedOperationError
     children=property(__getChildren, __setChildren,__delChildren,\
                       """ children in an OMtree""")
     body=property(__getBody,__setBody,__delBody,\
@@ -104,7 +104,7 @@ class OMobject(object):
             assert body!=None
         closing="".join(["</"+self.XMLtag+">"])
         return "".join([opening,body,closing])
-class OMvar(OMobject):
+class OMvar(OMObjectBase):
     def __init__(self,name):
         super(OMvar,self).__init__()
         self.name=name
@@ -119,7 +119,7 @@ class OMvar(OMobject):
     def getXMLattributes(self):
         return [XMLattribute("name", self.name)]
         
-class OMapplication(OMobject):
+class OMapplication(OMObjectBase):
     def __init__(self, func, args):
         super(OMapplication,self).__init__()
         self.func=func
@@ -141,7 +141,7 @@ class OMapplication(OMobject):
     def setChildren(self):
         raise UnsupportedOperationError
         
-class OMsymbol(OMobject):
+class OMsymbol(OMObjectBase):
     def __init__(self,name,cd=None):
         super(OMsymbol,self).__init__()
         self.cd=cd
@@ -161,7 +161,7 @@ class OMsymbol(OMobject):
                  XMLattribute("cd",self.cd.name)]
     def setXMLattributes(self):
         raise UnsupportedOperationError
-class SimpleValue(OMobject):
+class SimpleValue(OMObjectBase):
     def __init__(self,value):
         super(SimpleValue,self).__init__()
         if (isinstance(value, str)):
