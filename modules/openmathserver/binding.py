@@ -9,12 +9,12 @@ lambdasym=OMSymbol("lambda",cdFns1)
 def islambda(sym):
     return lambdasym==sym
     
-class OMbinding(OMObjectBase):
+class OMBinding(OMObjectBase):
     """hopefully fixed possible problems: reevaluation writes new scope, if it isn't
        meant so, references do not work correctly because of scopes
-       solve this by first evaluation to bounded OMbinding"""
+       solve this by first evaluation to bounded OMBinding"""
     def __init__(self, binder,variables,block):
-        super(OMbinding,self).__init__()
+        super(OMBinding,self).__init__()
         self.block=block
         self.binder=binder
         self.variables=variables

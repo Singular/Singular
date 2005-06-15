@@ -63,9 +63,9 @@ class OMFromXMLBuilder:
             #print node.attributes
             #print "cdbase", cdbase
             if cdbase==None:
-                cd=OMcd(cdname)
+                cd=OMCD(cdname)
             else:
-                cd=OMcd(cdname,cdbase)
+                cd=OMCD(cdname,cdbase)
             erg=OMSymbol(name,cd)
         if (node.nodeName=="OMA"):
             children=[self.buildFromNode(c) for c in node.childNodes]

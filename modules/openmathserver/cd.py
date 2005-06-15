@@ -1,6 +1,6 @@
 from objects import OMSymbol
 from omexceptions import *
-class OMcd(object):
+class OMCD(object):
     def __init__(self,name, base="http://www.openmath.org/cd"):
         self.name=name
         self.base=base
@@ -12,7 +12,7 @@ class OMcd(object):
     def __hash__(self):
         return hash((self.name,self.base))
 
-class OMcdImplementation(object):
+class OMCDImplementation(object):
     def __init__(self,cd):
         self.cd=cd
         self.implementations={}
