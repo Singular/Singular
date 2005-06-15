@@ -230,7 +230,7 @@ if __name__=='__main__':
 
     print context.evaluate(x)
     print context.evaluate(y)
-    firstArg=OMbinding(lambdasym,[OMVar("x"), OMVar("y")], OMVar("x"))
+    firstArg=OMBinding(lambdasym,[OMVar("x"), OMVar("y")], OMVar("x"))
     #print context.evaluate(firstArg)
     application=OMApply(firstArg, [x,y])
     print context.evaluate(application)

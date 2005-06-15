@@ -72,7 +72,7 @@ class OMFromXMLBuilder:
             erg= OMApply(children[0],children[1:])
         if (node.nodeName=="OMBIND"):
             children=[self.buildFromNode(c) for c in node.childNodes]
-            erg= OMbinding(children[0],children[1:-1],children[-1])
+            erg= OMBinding(children[0],children[1:-1],children[-1])
         if (node.nodeName=="OMF"):
             if (node.hasAttribute("dec")):
                 value=float(node.getAttribute("dec"))
