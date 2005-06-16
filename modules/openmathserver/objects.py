@@ -205,6 +205,14 @@ class OMfloat(SimpleValue):
     XMLtag="OMF"
     def getXMLAttributes(self):
         return [XMLAttribute("dec",str(self.value))]
+class OMString(SimpleValue):
+    def __init__(self,value):
+        super(OMString,self).__init__(value)
+    def __str__(self):
+        return "OMSTR("+repr(self.value)+")"
+    XMLtag="OMSTR"
+    def getBody(self):
+        return self.value
 class OMRef(OMObjectBase):
     def __init__(self, ref):
         self.ref=ref

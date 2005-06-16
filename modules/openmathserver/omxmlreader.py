@@ -47,6 +47,10 @@ class OMFromXMLBuilder:
         if (node.nodeName=="OMI"):
             content=get_text_in_children(node)
             erg=OMint(content)
+        if (node.nodeName=="OMSTR"):
+            content=get_text_in_children(node)
+            #print "data", content
+            erg=OMString(content)
         if (node.nodeName=="OMV"):
             name=node.getAttribute("name") #node.attributes["name"]
             #print dir(name)
