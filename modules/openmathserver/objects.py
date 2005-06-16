@@ -1,5 +1,7 @@
 from omexceptions import *
 from exceptions import *
+import base64
+#TODO: OMOBJ, OME, OMATTR
 #from cd import *
 class XMLAttribute(object):
     def __init__(self, name, value):
@@ -104,6 +106,17 @@ class OMObjectBase(object):
             assert body!=None
         closing="".join(["</"+self.XMLtag+">"])
         return "".join([opening,body,closing])
+class OMObject(OMObjectBase):
+    def __init__(self, children):
+        super(OMObject,self).__init__()
+        self.children=children
+    def getChildren(self):
+        return self.__children
+    def setChildren(self,children):
+        self.__children=children
+    XMLtag="OMOBJ"
+    def evaluate(self, context):
+        return OMObject([context.evaluate(c) for c in self.children])
 class OMVar(OMObjectBase):
     def __init__(self,name):
         super(OMVar,self).__init__()
@@ -213,6 +226,16 @@ class OMString(SimpleValue):
     XMLtag="OMSTR"
     def getBody(self):
         return self.value
+class OMByteArray(SimpleValue):
+    def __init__(self,value):
+        super(OMByteArray,self).__init__(value)
+    def __str__(self):
+        return "OMByteArray("+repr(self.value)+")"
+    def parse(self, value):
+        return value
+    XMLtag="OMB"
+    def getBody(self):
+        return base64.encodestring(self.value)
 class OMRef(OMObjectBase):
     def __init__(self, ref):
         self.ref=ref

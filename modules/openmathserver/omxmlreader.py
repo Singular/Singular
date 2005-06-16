@@ -2,6 +2,7 @@ from xml.dom.xmlbuilder import *
 #from xml.dom.ext import PrettyPrint
 from xml.dom import Node
 import xml.dom as dom
+import base64
 #from 
 from StringIO import StringIO
 import re
@@ -51,6 +52,10 @@ class OMFromXMLBuilder:
             content=get_text_in_children(node)
             #print "data", content
             erg=OMString(content)
+        if (node.nodeName=="OMB"):
+            content=get_text_in_children(node)
+            #print "data", content
+            erg=OMByteArray(base64.decodestring(content))
         if (node.nodeName=="OMV"):
             name=node.getAttribute("name") #node.attributes["name"]
             #print dir(name)
@@ -74,6 +79,9 @@ class OMFromXMLBuilder:
         if (node.nodeName=="OMA"):
             children=[self.buildFromNode(c) for c in node.childNodes]
             erg= OMApply(children[0],children[1:])
+        if (node.nodeName=="OMOBJ"):
+            children=[self.buildFromNode(c) for c in node.childNodes]
+            erg= OMObject(children)
         if (node.nodeName=="OMBIND"):
             children=[self.buildFromNode(c) for c in node.childNodes]
             erg= OMBinding(children[0],children[1:-1],children[-1])
