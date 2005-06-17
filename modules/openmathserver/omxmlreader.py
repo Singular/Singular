@@ -97,6 +97,13 @@ class OMFromXMLBuilder:
                 self.refs.append(erg)
             else:
                 raise UnresolvedReference
+        if (node.nodeName=="OMATP"):
+            children=[self.buildFromNode(c) for c in node.childNodes]
+            assert(len(children)==2)
+            erg=OMAttributePair(children[0],children[1])
+        if (node.nodeName=="OMATTR"):
+            children=[self.buildFromNode(c) for c in node.childNodes]
+            erg=OMAttribution(*children)
         if None==erg:
             raise NotImplementedError
         else:

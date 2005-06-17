@@ -70,7 +70,18 @@ class Context(object):
     def XMLEncodeBody(self,body):
         return self.XMLEncoder.encode(body)
     def XMLEncodeObject(self, obj):
-        return obj.XMLencode(self)
+        #TODO: Make Attribution List attributes
+        #TODO: Make all objects __hash__ and __eq__
+        if (len(obj.attributes)==0):
+            return obj.XMLencode(self)
+        else:
+            toencode=copy(obj)
+            toencode.attributes={}
+            #FIXME: look on order
+            attribution=OMAttribution(*([OMAttributePair(k,obj.attributes[k])\
+                for k in obj.attributes])+[toencode])
+            return attribution.XMLencode(self)
+            
 class SimpleXMLEncoder(object):
     def encode(self, string):
         return sub("<","&lt;",sub("&","&amp;",string))

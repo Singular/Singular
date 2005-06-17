@@ -1,5 +1,6 @@
 from omexceptions import *
 from exceptions import *
+from copy import copy
 import base64
 #TODO: OMOBJ, OME, OMATTR
 #from cd import *
@@ -244,6 +245,34 @@ class OMRef(OMObjectBase):
     def XMLencode(self, context):
         "FIXME: maybe it should also be able to encode as reference"
         return context.XMLEncodeObject(self.ref)
+class OMAttributePair(OMObjectBase):
+    def __init__(self,key, value):
+        super(OMAttributePair,self).__init__()
+        self.key=key
+        self.value=value
+    def getChildren(self):
+        return [self.key, self.value]
+    XMLtag = "OMATP"
+    def evaluate(self, context):
+        return OMAttributePair(context.evaluate(self.key),\
+            context.evaluate(self.value))
+class OMAttribution(OMObjectBase):
+    def __init__(self, *args):
+        super(OMAttribution,self).__init__()
+        self.attr=list(args[:-1])
+        self.value=args[-1]
+    def getChildren(self):
+        #print type(self.attr)
+        #print type(self.value)
+        return self.attr+[self.value]
+    def evaluate(self, context):
+        value=copy(self.value)
+        value.attributes=copy(value.attributes)
+        for a in self.attr:
+            ae=context.evaluate(a)
+            value.attributes[ae.key]=ae.value
+        return value
+    XMLtag="OMATTR"
 if __name__=='__main__':
     from context import *
 
