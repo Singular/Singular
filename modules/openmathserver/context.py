@@ -73,14 +73,14 @@ class Context(object):
         #TODO: Make Attribution List attributes
         #TODO: Make all objects __hash__ and __eq__
         if (len(obj.attributes)==0):
-            return obj.XMLencode(self)
+            return obj.XMLEncode(self)
         else:
             toencode=copy(obj)
             toencode.attributes={}
             #FIXME: look on order
             attribution=OMAttribution(*([OMAttributePair(k,obj.attributes[k])\
                 for k in obj.attributes])+[toencode])
-            return attribution.XMLencode(self)
+            return attribution.XMLEncode(self)
             
 class SimpleXMLEncoder(object):
     def encode(self, string):

@@ -87,7 +87,7 @@ class OMObjectBase(object):
         "xml body,FIXME: at the moment only char data")
     XMLAttributes=property(__getXMLAttributes,__setXMLAttributes,__delXMLAttributes,\
         "xml attributes")
-    def XMLencode(self, context):
+    def XMLEncode(self, context):
         
         attr=self.XMLAttributes
         if attr:
@@ -242,7 +242,7 @@ class OMRef(OMObjectBase):
         self.ref=ref
     def evaluate(self, context):
         return context.evaluate(self.ref)
-    def XMLencode(self, context):
+    def XMLEncode(self, context):
         "FIXME: maybe it should also be able to encode as reference"
         return context.XMLEncodeObject(self.ref)
 class OMAttributePair(OMObjectBase):
@@ -309,6 +309,6 @@ if __name__=='__main__':
     print context.evaluate(application)
     i=OMint(22482489)
     print i.body
-    print i.XMLencode(context)
+    print i.XMLEncode(context)
     #i.body="dshj"
    
