@@ -1,6 +1,6 @@
 
 //-*- mode:C++;-*-
-// $Id: lejeune.lib,v 1.1 2005-06-20 09:54:34 cremer Exp $
+// $Id: lejeune.lib,v 1.2 2005-06-20 10:02:16 cremer Exp $
 
 info="
 LIBRARY: lejeune1.4.lib  Arc space computations
@@ -16,7 +16,6 @@ PROCEDURES:
 
 LIB "ring.lib";
 LIB "general.lib";
-
 
 
 proc tpolys (int i,poly f)
