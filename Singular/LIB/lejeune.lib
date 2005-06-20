@@ -1,0 +1,97 @@
+
+//-*- mode:C++;-*-
+// $Id: lejeune.lib,v 1.1 2005-06-20 09:54:34 cremer Exp $
+
+info="
+LIBRARY: lejeune1.4.lib  Arc space computations
+AUTHOR:  Nadine Cremer,    nadine.cremer@gmx.de
+[SEE ALSO: <comma-separated words of cross references>]
+[KEYWORDS: <semicolon-separated phrases of index keys>]
+PROCEDURES:
+    variables(k,i);      creates k*i new var. t,a(1),..,a(i),..,x(1),..,x(i)
+    a_z(k);            returns kth letter of the alphabet
+    series(k,i);        creates polyn. a(1)*t+..+a(n)*t^n
+  ";
+
+
+LIB "ring.lib";
+LIB "general.lib";
+
+
+
+proc tpolys (int i,poly f)
+{
+  def r=basering;
+  int k=nvars(r);
+  string str=variables(k,i);
+  
+  def R=changevar(""+varstr(r)+",t,"+variables(k,i)+"");
+  setring R;
+  ideal I=series(i,k);
+  poly g=imap(r,f);
+  map h=r,I;
+  ideal J=h(f);
+  matrix output=coeffs(J[1],t);
+  output;
+  keepring R;
+  return();
+}
+
+
+
+
+
+
+
+
+proc variables (int k,int i)
+{
+  list l;
+  int s,u;                              // loop variables
+  string str;               
+  for (u=1;u<=k;u++) 
+   {
+     for (s=1;s<=i;s++)
+     {
+       str=""+a_z(u)+"("+string(s)+")";     
+       l[(u-1)*i+s]=str;
+     }
+   } 
+  //l=insert(l,"t");
+  string str1=string(l);
+  return(str1);
+}
+
+
+proc a_z (int n);                       // returns nth letter of the alphabet
+{ 
+  if((n<1)||(n>26))                     // input admissible?
+   { 
+     "n must range between 1 and 26!";
+      return(0); 
+   } 
+  string s="ring r=0,("+A_Z("a",n)+"),ds;"; 
+  execute(s); 
+  return (string(var(n))); 
+} 
+
+
+
+proc series (int i,int k)             // constructs polynomials a(1)*t+... 
+{                                     // has to be called from tpolys
+  int s,t;                             // loop variables
+  int v;           
+  poly sum; 
+  ideal I; 
+  for(t=1;t<=k;t++) 
+   {  
+     v=(t-1)*i; 
+     for(s=1;s<=i;s++) 
+      { 
+        sum=sum+var(1+k+v+s)*var(k+1)^s;    // clumsy: working with "var(1)"
+      } 
+     I[t]=sum; 
+     sum=0; 
+   }   
+  return(I); 
+} 
