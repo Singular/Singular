@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.75 2005-05-18 15:59:35 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.76 2005-06-20 08:17:00 bricken Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -99,7 +99,7 @@ static BOOLEAN jjSHORTOUT(leftv res, leftv a)
 {
   if (currRing != NULL)
   {
-    BOOLEAN shortOut = (BOOLEAN)a->Data();
+    BOOLEAN shortOut = (BOOLEAN)((int)a->Data());
 #if HAVE_CAN_SHORT_OUT
     if (!shortOut)
       currRing->ShortOut = 0;
