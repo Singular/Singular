@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: standard.lib,v 1.70 2005-05-10 17:56:16 Singular Exp $";
+version="$Id: standard.lib,v 1.71 2005-06-22 10:13:01 bricken Exp $";
 category="Miscellaneous";
 info="
 LIBRARY: standard.lib   Procedures which are always loaded at Start-up
@@ -247,7 +247,11 @@ EXAMPLE: example groebner;  shows an example"
     //spaeter den lokalen fall ueber lp oder aehnlich behandeln
     return(std(i));
   }
-
+  //if ordering is global, there are parameters and minpoly is 0
+  if ((npars(basering)>0) &&(minpoly==0))
+  {
+    return(slimgb(i));
+  }
   int IsSimple_P;
   if (system("nblocks") <= 2)
   {
