@@ -6,8 +6,8 @@ import base64
 #from cd import *
 class XMLAttribute(object):
     def __init__(self, name, value):
-        self.name=name
-        self.value=value
+        self.name = name
+        self.value = value
     def encode(self, context):
         return "".join([self.name,"=\"",self.value,"\""])
 class OMObjectBase(object):
@@ -35,7 +35,7 @@ class OMObjectBase(object):
         try:
             self.setChildren(children)
         except AttributeError:
-                raise UnsupportedOperationError
+            raise UnsupportedOperationError
     def __getBody(self):
         try:
             return self.getBody()
@@ -57,7 +57,7 @@ class OMObjectBase(object):
         try:
             self.setBody(body)
         except AttributeError:
-                raise UnsupportedOperationError
+            raise UnsupportedOperationError
     def __getXMLAttributes(self):
         try:
             return self.getXMLAttributes()
@@ -85,62 +85,63 @@ class OMObjectBase(object):
                       """ children in an OMtree""")
     body=property(__getBody,__setBody,__delBody,\
         "xml body,FIXME: at the moment only char data")
-    XMLAttributes=property(__getXMLAttributes,__setXMLAttributes,__delXMLAttributes,\
+    XMLAttributes=property(__getXMLAttributes,\
+        __setXMLAttributes,__delXMLAttributes,\
         "xml attributes")
     def XMLEncode(self, context):
         
         attr=self.XMLAttributes
         if attr:
-            attrstr=" "+" ".join([a.encode(context) for a in attr])
+            attrstr = " "+" ".join([a.encode(context) for a in attr])
         else:
-            attrstr=""
-        opening="".join(["<", self.XMLtag, attrstr,">"])
-        children=self.children
+            attrstr = ""
+        opening = "".join(["<", self.XMLtag, attrstr,">"])
+        children = self.children
         if children:
-            body="".join([context.XMLEncodeObject(c) for c in children])
+            body = "".join([context.XMLEncodeObject(c) for c in children])
         else:
-            body=self.body
+            body = self.body
             if not body:
-                body=""
-            assert body!=None
-            body=context.XMLEncodeBody(body)
-            assert body!=None
-        closing="".join(["</"+self.XMLtag+">"])
+                body = ""
+            assert body != None
+            body = context.XMLEncodeBody(body)
+            assert body != None
+        closing = "".join(["</"+self.XMLtag+">"])
         return "".join([opening,body,closing])
 class OMObject(OMObjectBase):
     def __init__(self, children):
-        super(OMObject,self).__init__()
-        self.children=children
+        super(OMObject, self).__init__()
+        self.children = children
     def getChildren(self):
         return self.__children
-    def setChildren(self,children):
+    def setChildren(self ,children):
         self.__children=children
-    XMLtag="OMOBJ"
+    XMLtag = "OMOBJ"
     def evaluate(self, context):
         return OMObject([context.evaluate(c) for c in self.children])
 class OMVar(OMObjectBase):
     def __init__(self,name):
-        super(OMVar,self).__init__()
-        self.name=name
-    def evaluate(self,context):
+        super(OMVar, self).__init__()
+        self.name = name
+    def evaluate(self, context):
         try:
             return context[self.name]
         except OutOfScopeError:
             return self
     def __str__(self):
         return "OMV(" + self.name +")"
-    XMLtag="OMV"
+    XMLtag = "OMV"
     def getXMLAttributes(self):
         return [XMLAttribute("name", self.name)]
         
 class OMApply(OMObjectBase):
     def __init__(self, func, args):
-        super(OMApply,self).__init__()
-        self.func=func
-        self.args=args
-    def evaluate(self,context):
-        efunc=context.evaluate(self.func)
-        eargs=[context.evaluate(a) for a in self.args]
+        super(OMApply, self).__init__()
+        self.func = func
+        self.args = args
+    def evaluate(self, context):
+        efunc = context.evaluate(self.func)
+        eargs = [context.evaluate(a) for a in self.args]
         if callable(efunc):
             try:
                 return context.apply(efunc, eargs)
@@ -156,17 +157,17 @@ class OMApply(OMObjectBase):
         raise UnsupportedOperationError
         
 class OMSymbol(OMObjectBase):
-    def __init__(self,name,cd=None):
+    def __init__(self,name,cd = None):
         super(OMSymbol,self).__init__()
-        self.cd=cd
-        self.name=name
+        self.cd = cd
+        self.name = name
     def __eq__(self, other):
         try:
-            return bool(other.name==self.name and self.cd==other.cd)
+            return bool(other.name == self.name and self.cd == other.cd)
         except:
             return False
     def __str__(self):
-        return "OMS("+self.name+", "+self.cd.name + ")"
+        return "OMS(" + self.name + ", " + self.cd.name + ")"
     def __hash__(self):#
         return hash((self.name,self.cd.__hash__()))
     def evaluate(self,context):
@@ -174,16 +175,16 @@ class OMSymbol(OMObjectBase):
     XMLtag="OMS"
     def getXMLAttributes(self):
         return [XMLAttribute("name", self.name),\
-                 XMLAttribute("cdbase",self.cd.base),\
-                 XMLAttribute("cd",self.cd.name)]
+                 XMLAttribute("cdbase", self.cd.base),\
+                 XMLAttribute("cd", self.cd.name)]
     def setXMLAttributes(self):
         raise UnsupportedOperationError
 class SimpleValue(OMObjectBase):
-    def __init__(self,value):
-        super(SimpleValue,self).__init__()
+    def __init__(self, value):
+        super(SimpleValue, self).__init__()
         if (isinstance(value, str)):
-            value=self.parse(value)
-        self.value=value
+            value = self.parse(value)
+        self.value = value
     def evaluate(self, context):
         return self
     def getValue(self):
@@ -194,7 +195,7 @@ class SimpleValue(OMObjectBase):
 class OMint(SimpleValue):
     def __init__(self,value):
         if not isinstance(value,int):
-            value=self.parse(value)
+            value = self.parse(value)
         super(OMint,self).__init__(value)
     def parse(self,value):
         """FIXME: Not fully standard compliant,
@@ -208,15 +209,15 @@ class OMint(SimpleValue):
         raise UnsupportedOperationError
     XMLtag="OMI"
 class OMfloat(SimpleValue):
-    def __init__(self,value):
-        super(OMfloat,self).__init__(value)
+    def __init__(self, value):
+        super(OMfloat, self).__init__(value)
     def parse(self, value):
         """FIXME: Not fully standard compliant,
         -> hex encodings"""
         return float(value)
     def __str__(self):
         return "OMfloat("+repr(self.value)+")"
-    XMLtag="OMF"
+    XMLtag = "OMF"
     def getXMLAttributes(self):
         return [XMLAttribute("dec",str(self.value))]
 class OMString(SimpleValue):
@@ -224,14 +225,14 @@ class OMString(SimpleValue):
         super(OMString,self).__init__(value)
     def __str__(self):
         return "OMSTR("+repr(self.value)+")"
-    XMLtag="OMSTR"
+    XMLtag = "OMSTR"
     def getBody(self):
         return self.value
 class OMByteArray(SimpleValue):
     def __init__(self,value):
         super(OMByteArray,self).__init__(value)
     def __str__(self):
-        return "OMByteArray("+repr(self.value)+")"
+        return "OMByteArray(" + repr(self.value) + ")"
     def parse(self, value):
         return value
     XMLtag="OMB"
@@ -246,10 +247,10 @@ class OMRef(OMObjectBase):
         "FIXME: maybe it should also be able to encode as reference"
         return context.XMLEncodeObject(self.ref)
 class OMAttributePair(OMObjectBase):
-    def __init__(self,key, value):
+    def __init__(self, key, value):
         super(OMAttributePair,self).__init__()
-        self.key=key
-        self.value=value
+        self.key = key
+        self.value = value
     def getChildren(self):
         return [self.key, self.value]
     XMLtag = "OMATP"
@@ -259,55 +260,55 @@ class OMAttributePair(OMObjectBase):
 class OMAttribution(OMObjectBase):
     def __init__(self, *args):
         super(OMAttribution,self).__init__()
-        self.attr=list(args[:-1])
-        self.value=args[-1]
+        self.attr = list(args[:-1])
+        self.value = args[-1]
     def getChildren(self):
         #print type(self.attr)
         #print type(self.value)
         return self.attr+[self.value]
     def evaluate(self, context):
-        value=copy(self.value)
-        value.attributes=copy(value.attributes)
+        value = copy(self.value)
+        value.attributes = copy(value.attributes)
         for a in self.attr:
             ae=context.evaluate(a)
-            value.attributes[ae.key]=ae.value
+            value.attributes[ae.key] = ae.value
         return value
-    XMLtag="OMATTR"
-if __name__=='__main__':
+    XMLtag = "OMATTR"
+if __name__ == '__main__':
     from context import *
 
     from binding import *
 
-    context=Context()
+    context = Context()
 
     context.push({})
 
-    context["x"]=OMint(1)
+    context["x"] = OMint(1)
 
-    x=OMVar("x")
+    x = OMVar("x")
 
-    y=OMVar("y")
+    y = OMVar("y")
 
     print context.evaluate(x)
     print context.evaluate(y)
     firstArg=OMBinding(lambdasym,[OMVar("x"), OMVar("y")], OMVar("x"))
     #print context.evaluate(firstArg)
-    application=OMApply(firstArg, [x,y])
+    application = OMApply(firstArg, [x,y])
     print context.evaluate(application)
-    application=OMApply(firstArg,[y,x])
+    application = OMApply(firstArg, [y,x])
     print context.evaluate(application)
     import arith1
     context.addCDImplementation(arith1.implementation)
     #print type(context.lookupImplementation(arith1.plussym))
     #application=OMApply(arith1.plussym,[x])
     #application=OMApply(arith1.plussym,[x,x])
-    application=OMApply(OMSymbol("plus",arith1.content),[x,x])
+    application = OMApply(OMSymbol("plus",arith1.content),[x, x])
     
     print context.evaluate(application)
-    application=OMApply(OMSymbol("plus",arith1.content),[x,x,x])
+    application=OMApply(OMSymbol("plus",arith1.content),[x, x, x])
     
     print context.evaluate(application)
-    i=OMint(22482489)
+    i =  sOMint(22482489)
     print i.body
     print i.XMLEncode(context)
     #i.body="dshj"
