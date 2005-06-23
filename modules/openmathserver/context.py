@@ -10,6 +10,7 @@ class Context(object):
         self.scope=Scope()
         self.implementations={}
         self.XMLEncoder=SimpleXMLEncoder()
+        self.errorHandler=SimpleErrorHandler()
     def addCDImplementation(self, implementation):
         self.implementations[implementation.cd]=implementation
     def lookupImplementation(self, oms):
@@ -81,7 +82,15 @@ class Context(object):
             attribution=OMAttribution(*([OMAttributePair(k,obj.attributes[k])\
                 for k in obj.attributes])+[toencode])
             return attribution.XMLEncode(self)
-            
+class SimpleErrorHandler(object):
+    def __init__(self):
+        super(SimpleErrorHandler,self).__init__()
+    def handle_unexpected_symbol(self, symbol):
+        pass
+    def handle_unsupported_cd(self, symbol):
+        pass
+    def handle_unexpected_symbol(self, symbol):
+        pass 
 class SimpleXMLEncoder(object):
     def encode(self, string):
         return sub("<","&lt;",sub("&","&amp;",string))
