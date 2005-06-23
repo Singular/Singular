@@ -302,10 +302,10 @@ if __name__ == '__main__':
     #print type(context.lookupImplementation(arith1.plussym))
     #application=OMApply(arith1.plussym,[x])
     #application=OMApply(arith1.plussym,[x,x])
-    application = OMApply(OMSymbol("plus",arith1.content),[x, x])
+    application = OMApply(OMSymbol("plus", arith1.content), [x, x])
     
     print context.evaluate(application)
-    application=OMApply(OMSymbol("plus",arith1.content),[x, x, x])
+    application = OMApply(OMSymbol("plus", arith1.content), [x, x, x])
     
     print context.evaluate(application)
     i =  OMint(22482489)
