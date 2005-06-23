@@ -1,6 +1,6 @@
 
 //-*- mode:C++;-*-
-// $Id: lejeune.lib,v 1.3 2005-06-20 10:18:00 cremer Exp $
+// $Id: lejeune.lib,v 1.4 2005-06-23 13:40:16 cremer Exp $
 
 info="
 LIBRARY: lejeune1.4.lib  Arc space computations
@@ -9,8 +9,13 @@ AUTHOR:  Nadine Cremer,    nadine.cremer@gmx.de
 [KEYWORDS: <semicolon-separated phrases of index keys>]
 PROCEDURES:
     variables(k,i);      creates k*i new var. t,a(1),..,a(i),..,x(1),..,x(i)
-    a_z(k);            returns kth letter of the alphabet
-    tpolys(k,i);        creates polyn. a(1)*t+..+a(n)*t^n
+    a_z(k);              returns kth letter of the alphabet
+    tpolys(k,i);         creates polyn. a(1)*t+..+a(n)*t^n
+    ringchange(i);       changes the ring to the one needed in ith step      
+    plugin_coeffs(i,f)   plugs tpolys into f, up to power i
+    maxidealstep(i,N);   returns ideal needed for contraction in ith step;
+                         N is number of variables of input f
+    formaldiff(f,k);     computes the formal derivatives D_I with |I|<k
   ";
 
 
@@ -18,27 +23,71 @@ LIB "ring.lib";
 LIB "general.lib";
 
 
-proc plugin_coeffs (int i,poly f)
+
+
+proc formaldiff (poly f,int i,int a,int k)
 {
-  def r=basering;
-  int k=nvars(r);
-  string str=variables(k,i);
+  int s,t,v;                          // loop variables
+  int u;                    
+  def R=plugin_coeffs(f,i);           // plugs the power series in...
+  setring R;                          // changes the ring 
+  def Coe=result;   
+  matrix coe=Coe;                     // gives the t-coeff. after plugging in 
+  poly fkv;                           // need this stuff for the following
+  ideal m;                            // loops...
+  ideal m1,m2,J,resultdiff;
+  for(v=0;v<=k-1;v++)                 // consider the different coeff.
+   { 
+     fkv=coe[a+v,1];
+     m=fkv;                           
+     J=fkv;                           // will save the result in this step
+     for(s=1;s<k;s++)
+       {
+         m1=maxidealstep(i,startvar); // computes the corresponding ideal
+         m1=m1^s;
+         u=size(m1);
+         for(t=1;t<=u;t++)
+          {
+            m2=contract(m1[t],m);     // actual differentiation
+	    J=J,m2;
+          }
+       }
+     resultdiff=resultdiff,J;
+   }
+  resultdiff;~
+  export(resultdiff);
+  return(R);
   
-  def R=changevar(""+varstr(r)+",t,"+variables(k,i)+"");
-  setring R;
-  ideal I=tpolys(i,k);
-  poly g=imap(r,f);
-  map h=r,I;
-  ideal J=h(f);
-  matrix output=coeffs(J[1],t);
-  keepring R;
-  return(output);
 }
 
 
 
+proc plugin_coeffs (poly f,int i)
+{
+  def r=basering;
+  def R=ringchange(i);
+  setring R; 
+  ideal I=tpolys(i,startvar);
+  poly g=imap(r,f);
+  export(g);
+  map h=r,I;
+  ideal J=h(f);
+  export(h);
+  matrix result=coeffs(J[1],t);
+  export result;
+  return(R);
+}
 
 
+
+proc ringchange (int i)
+{
+  int startvar=nvars(basering);
+  export(startvar);
+  string str=variables(startvar,i);
+  def R=changevar(""+varstr(r)+",t,"+variables(startvar,i)+"");
+  return(R);
+}
 
 
 
@@ -86,10 +135,24 @@ proc tpolys (int i,int k)             // constructs polynomials a(1)*t+...
      v=(t-1)*i; 
      for(s=1;s<=i;s++) 
       { 
-        sum=sum+var(1+k+v+s)*var(k+1)^s;    // clumsy: working with "var(1)"
-      } 
+        sum=sum+var(1+k+v+s)*var(k+1)^s;    // clumsy: working with "var(1)",
+      }                                     // depends on form of basering
      I[t]=sum; 
      sum=0; 
    }   
   return(I); 
 } 
+
+
+
+
+proc maxidealstep (int i,int N)   
+{
+  ideal I=var(N+1+i);
+  int j;
+  for(j=2;j<=N;j++)
+   {
+     I=I,var(N+1+j*i);
+   }
+return(I);
+}
