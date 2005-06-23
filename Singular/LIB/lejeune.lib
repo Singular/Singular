@@ -1,6 +1,7 @@
 
 //-*- mode:C++;-*-
-// $Id: lejeune.lib,v 1.4 2005-06-23 13:40:16 cremer Exp $
+// $Id: lejeune.lib,v 1.5 2005-06-23 13:52:12 cremer Exp $
+
 
 info="
 LIBRARY: lejeune1.4.lib  Arc space computations
@@ -13,7 +14,7 @@ PROCEDURES:
     tpolys(k,i);         creates polyn. a(1)*t+..+a(n)*t^n
     ringchange(i);       changes the ring to the one needed in ith step      
     plugin_coeffs(i,f)   plugs tpolys into f, up to power i
-    maxidealstep(i,N);   returns ideal needed for contraction in ith step;
+    maxidealstep(i,N);   returns ideal needed for contraction in ith step
                          N is number of variables of input f
     formaldiff(f,k);     computes the formal derivatives D_I with |I|<k
   ";
@@ -54,9 +55,8 @@ proc formaldiff (poly f,int i,int a,int k)
        }
      resultdiff=resultdiff,J;
    }
-  resultdiff;~
-  export(resultdiff);
-  return(R);
+  export(resultdiff);                // exports the result
+  return(R);                         // return the ring
   
 }
 
@@ -65,17 +65,17 @@ proc formaldiff (poly f,int i,int a,int k)
 proc plugin_coeffs (poly f,int i)
 {
   def r=basering;
-  def R=ringchange(i);
-  setring R; 
+  def R=ringchange(i);              // changes the ring
+  setring R;                        // makes it new basering;
   ideal I=tpolys(i,startvar);
-  poly g=imap(r,f);
-  export(g);
-  map h=r,I;
-  ideal J=h(f);
-  export(h);
-  matrix result=coeffs(J[1],t);
-  export result;
-  return(R);
+  poly g=imap(r,f);                 // maps f to new basering
+  export(g);                        // export it
+  map h=r,I;                        // define map according to our purpose
+  ideal J=h(f);                     // gives f with power series plugged in
+  export(h);                   
+  matrix result=coeffs(J[1],t);     // gives the t-coefficients
+  export result;                    // export it i.o. to use it later on
+  return(R);                        // return ring (ring change!)
 }
 
 
@@ -83,10 +83,10 @@ proc plugin_coeffs (poly f,int i)
 proc ringchange (int i)
 {
   int startvar=nvars(basering);
-  export(startvar);
+  export(startvar);         
   string str=variables(startvar,i);
-  def R=changevar(""+varstr(r)+",t,"+variables(startvar,i)+"");
-  return(R);
+  def R=changevar(""+varstr(r)+",t,"+variables(startvar,i)+"");  // change
+  return(R);                 // return the ring, needed in future proc
 }
 
 
@@ -100,17 +100,17 @@ proc variables (int k,int i)
    {
      for (s=1;s<=i;s++)
      {
-       str=""+a_z(u)+"("+string(s)+")";     
-       l[(u-1)*i+s]=str;
+       str=""+a_z(u)+"("+string(s)+")"; // creates new variables    
+       l[(u-1)*i+s]=str;                // saves them in a list
      }
    } 
   //l=insert(l,"t");
-  string str1=string(l);
-  return(str1);
+  string str1=string(l);                // makes the list into a string,
+  return(str1);                         // (needed for ring change)
 }
 
 
-proc a_z (int n)                      // returns nth letter of the alphabet
+proc a_z (int n)                        // returns nth letter of the alphabet
 { 
   if((n<1)||(n>26))                     // input admissible?
    { 
@@ -126,7 +126,7 @@ proc a_z (int n)                      // returns nth letter of the alphabet
 
 proc tpolys (int i,int k)             // constructs polynomials a(1)*t+... 
 {                                     // has to be called from tpolys
-  int s,t;                             // loop variables
+  int s,t;                            // loop variables
   int v;           
   poly sum; 
   ideal I; 
@@ -146,8 +146,8 @@ proc tpolys (int i,int k)             // constructs polynomials a(1)*t+...
 
 
 
-proc maxidealstep (int i,int N)   
-{
+proc maxidealstep (int i,int N)       // returns ideal needed for 
+{                                     // differentiation in ith step
   ideal I=var(N+1+i);
   int j;
   for(j=2;j<=N;j++)
