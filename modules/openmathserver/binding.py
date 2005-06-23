@@ -1,7 +1,7 @@
 """Definition of the OMBinding object"""
 from objects import OMObjectBase, OMSymbol
 from cd import OMCD
-from omexceptions import UnsupportedOperationError
+#from omexceptions import UnsupportedOperationError
 from itertools import izip
 from copy import copy
 cdFns1 = OMCD("fns1")
