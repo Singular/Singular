@@ -1,10 +1,10 @@
 
 //-*- mode:C++;-*-
-// $Id: lejeune.lib,v 1.5 2005-06-23 13:52:12 cremer Exp $
+// $Id: lejeune.lib,v 1.6 2005-06-23 15:45:54 cremer Exp $
 
 
 info="
-LIBRARY: lejeune1.4.lib  Arc space computations
+LIBRARY: lejeune.lib  Arc space computations
 AUTHOR:  Nadine Cremer,    nadine.cremer@gmx.de
 [SEE ALSO: <comma-separated words of cross references>]
 [KEYWORDS: <semicolon-separated phrases of index keys>]
@@ -17,11 +17,56 @@ PROCEDURES:
     maxidealstep(i,N);   returns ideal needed for contraction in ith step
                          N is number of variables of input f
     formaldiff(f,k);     computes the formal derivatives D_I with |I|<k
+    f_set(f,H);          returns the set F corresponding to H as described by
+                         M. Lejeune
   ";
 
 
-LIB "ring.lib";
+LIB "ring.lib";                       // need procedures from these libs
 LIB "general.lib";
+
+
+
+proc f_set (poly f,intvec H)
+{
+  int p;                              // loop variable
+  int m_0=ord(f);
+  int b=size(H);
+  int c=sum(H,1..b-1);
+  if(H[1]!=m_0)                       // input admissible?!
+    {
+     "H[1]=ord(f) notwendig!!";
+      return(0);
+    } 
+  for(p=1;p<b;p++)
+    {
+      if(H[p]<H[p+1])
+      {
+        "Unzulaessige Eingabe, H[1]<=...<=H[b] notwendig!";
+         return(0);
+      }
+    }
+  def r=basering;                      // need that in iteration
+  ideal resultf_set,step,I;            // save result resp. prelim. result
+  for(p=1;p<b-1;p++)                   // iterating steps
+    { 
+      def tmp=f_set(f,H[1..p+1]);
+      setring(tmp);
+      def tmp1=resultf_set;
+      step=tmp1;
+      export(step);
+      step;~
+      setring(r);     
+    }
+  def R=formaldiff(f,b-1,c,H[b]);      // actual step
+  setring R;
+  def T=resultdiff;
+  ideal resultf_set=T;
+  export(resultf_set);
+  resultf_set;
+  return(R);
+}
+
 
 
 
@@ -37,7 +82,7 @@ proc formaldiff (poly f,int i,int a,int k)
   poly fkv;                           // need this stuff for the following
   ideal m;                            // loops...
   ideal m1,m2,J,resultdiff;
-  for(v=0;v<=k-1;v++)                 // consider the different coeff.
+  for(v=1;v<=k;v++)                   // consider the different t-coeff.
    { 
      fkv=coe[a+v,1];
      m=fkv;                           
@@ -55,6 +100,7 @@ proc formaldiff (poly f,int i,int a,int k)
        }
      resultdiff=resultdiff,J;
    }
+  resultdiff=simplify(resultdiff,2);
   export(resultdiff);                // exports the result
   return(R);                         // return the ring
   
@@ -82,10 +128,11 @@ proc plugin_coeffs (poly f,int i)
 
 proc ringchange (int i)
 {
-  int startvar=nvars(basering);
-  export(startvar);         
+  int startvar;
+  startvar=nvars(basering);
+  export(startvar);       
   string str=variables(startvar,i);
-  def R=changevar(""+varstr(r)+",t,"+variables(startvar,i)+"");  // change
+  def R=changevar(""+varstr(basering)+",t,"+variables(startvar,i)+"");// change
   return(R);                 // return the ring, needed in future proc
 }
 
@@ -104,7 +151,6 @@ proc variables (int k,int i)
        l[(u-1)*i+s]=str;                // saves them in a list
      }
    } 
-  //l=insert(l,"t");
   string str1=string(l);                // makes the list into a string,
   return(str1);                         // (needed for ring change)
 }
@@ -125,7 +171,7 @@ proc a_z (int n)                        // returns nth letter of the alphabet
 
 
 proc tpolys (int i,int k)             // constructs polynomials a(1)*t+... 
-{                                     // has to be called from tpolys
+{                                     // has to be called from pluin_coeffs
   int s,t;                            // loop variables
   int v;           
   poly sum; 
