@@ -308,7 +308,7 @@ if __name__ == '__main__':
     application=OMApply(OMSymbol("plus",arith1.content),[x, x, x])
     
     print context.evaluate(application)
-    i =  sOMint(22482489)
+    i =  OMint(22482489)
     print i.body
     print i.XMLEncode(context)
     #i.body="dshj"
