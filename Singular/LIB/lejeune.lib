@@ -1,6 +1,6 @@
 
 //-*- mode:C++;-*-
-// $Id: lejeune.lib,v 1.7 2005-06-24 07:28:19 cremer Exp $
+// $Id: lejeune.lib,v 1.8 2005-06-24 08:45:04 cremer Exp $
 
 
 info="
@@ -28,7 +28,7 @@ LIB "general.lib";
 
 
 proc f_set (poly f,intvec H)
-{
+{ 
   int p;                              // loop variable
   int m_0=ord(f);
   int b=size(H);
@@ -46,15 +46,13 @@ proc f_set (poly f,intvec H)
          return(0);
       }
     }
-  def r=basering;                      // need that in iteration
-  ideal resultf_set,I;                 // save result resp. prelim. result
+  def r=basering;                     // need that in iteratio                 
   for(p=b-1;p>1;p--)                   // iterating steps
-    {
+    {    
       def tmp=f_set(f,intvec(H[1..p]));       
-      setring(tmp);
-      def tmp1=resultf_set;
-      export(tmp1);
-      setring(r);     
+      //setring tmp;
+      //def tmp1=resultf_set;
+      //setring r;     
     }
   def R=formaldiff(f,b-1,c,H[b]);      // actual step
   setring R;
@@ -129,7 +127,6 @@ proc ringchange (int i)
   int startvar;
   startvar=nvars(basering);
   export(startvar);       
-  variables(startvar,i);
   def R=changevar(""+varstr(basering)+",t,"+variables(startvar,i)+"");// change
   return(R);                 // return the ring, needed in future proc
 }
