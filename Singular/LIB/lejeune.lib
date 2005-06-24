@@ -1,6 +1,6 @@
 
 //-*- mode:C++;-*-
-// $Id: lejeune.lib,v 1.8 2005-06-24 08:45:04 cremer Exp $
+// $Id: lejeune.lib,v 1.9 2005-06-24 09:25:08 cremer Exp $
 
 
 info="
@@ -46,21 +46,36 @@ proc f_set (poly f,intvec H)
          return(0);
       }
     }
-  def r=basering;                     // need that in iteratio                 
-  for(p=b-1;p>1;p--)                   // iterating steps
-    {    
-      def tmp=f_set(f,intvec(H[1..p]));       
-      //setring tmp;
+  def r=basering; 
+   for(p=b-1;p>1;p--)                   // iterating steps
+    { 
+      if(p==2)
+	{   
+          def tmp=f_set(f,intvec(H[1..p]));
+          setring tmp;
+          def tmp1=resultf_set;
+          export(tmp1);
       //def tmp1=resultf_set;
-      //setring r;     
-    }
+      //setring r; 
+    } 
   def R=formaldiff(f,b-1,c,H[b]);      // actual step
   setring R;
   def T=resultdiff;
-  ideal resultf_set=T;
-  export(resultf_set);
+  ideal resultf_set;
+  //if(b==2)
+  //  {
+  //    ideal resultf_set;
+  //    resultf_set=T;
+  //    export(resultf_set);
+  //  }
+  //else
+  //  { ideal resultf_set=imap(tmp,tmp1);
+  //    resultf_set=resultf_set,T;
+  //    export(resultf_set);
+  //  }
+ 
   resultf_set;
-  return(R);
+  return(R);   
 }
 
 
