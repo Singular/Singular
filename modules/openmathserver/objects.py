@@ -1,5 +1,7 @@
-from omexceptions import *
-from exceptions import *
+"""Implementation of openmath basic objects"""
+from omexceptions import UnsupportedOperationError 
+from  omexceptions import OutOfScopeError, EvaluationFailedError
+from exceptions import NotImplementedError
 from copy import copy
 import base64
 #TODO: OMOBJ, OME, OMATTR
@@ -193,21 +195,21 @@ class SimpleValue(OMObjectBase):
         return "OM("+repr(self.value)+")"
 
 class OMint(SimpleValue):
-    def __init__(self,value):
-        if not isinstance(value,int):
+    def __init__(self, value):
+        if not isinstance(value, int):
             value = self.parse(value)
-        super(OMint,self).__init__(value)
-    def parse(self,value):
+        super(OMint, self).__init__(value)
+    def parse(self, value):
         """FIXME: Not fully standard compliant,
         -> hex encodings"""
-        return int(value,10)
+        return int(value, 10)
     def __str__(self):
         return "OMint("+repr(self.value)+")"
     def getBody(self):
         return str(self.value)
     def setBody(self, value):
         raise UnsupportedOperationError
-    XMLtag="OMI"
+    XMLtag = "OMI"
 class OMfloat(SimpleValue):
     def __init__(self, value):
         super(OMfloat, self).__init__(value)
@@ -219,7 +221,7 @@ class OMfloat(SimpleValue):
         return "OMfloat("+repr(self.value)+")"
     XMLtag = "OMF"
     def getXMLAttributes(self):
-        return [XMLAttribute("dec",str(self.value))]
+        return [XMLAttribute("dec" ,str(self.value))]
 class OMString(SimpleValue):
     def __init__(self,value):
         super(OMString,self).__init__(value)
@@ -229,13 +231,13 @@ class OMString(SimpleValue):
     def getBody(self):
         return self.value
 class OMByteArray(SimpleValue):
-    def __init__(self,value):
+    def __init__(self, value):
         super(OMByteArray,self).__init__(value)
     def __str__(self):
         return "OMByteArray(" + repr(self.value) + ")"
     def parse(self, value):
         return value
-    XMLtag="OMB"
+    XMLtag = "OMB"
     def getBody(self):
         return base64.encodestring(self.value)
 class OMRef(OMObjectBase):
@@ -275,9 +277,9 @@ class OMAttribution(OMObjectBase):
         return value
     XMLtag = "OMATTR"
 if __name__ == '__main__':
-    from context import *
+    from context import Context
 
-    from binding import *
+    from binding import OMBinding, lambdasym
 
     context = Context()
 
