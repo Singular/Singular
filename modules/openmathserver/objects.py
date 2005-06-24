@@ -269,9 +269,9 @@ class OMAttribution(OMObjectBase):
     def evaluate(self, context):
         value = copy(self.value)
         value.attributes = copy(value.attributes)
-        for a in self.attr:
-            ae=context.evaluate(a)
-            value.attributes[ae.key] = ae.value
+        for attribute in self.attr:
+            attribute_evaluated=context.evaluate(attribute)
+            value.attributes[attribute_evaluated.key] = attribute_evaluated.value
         return value
     XMLtag = "OMATTR"
 if __name__ == '__main__':
