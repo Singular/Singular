@@ -1,6 +1,6 @@
 
 //-*- mode:C++;-*-
-// $Id: lejeune.lib,v 1.10 2005-06-24 12:01:09 cremer Exp $
+// $Id: lejeune.lib,v 1.11 2005-06-24 13:40:06 cremer Exp $
 
 
 info="
@@ -17,15 +17,20 @@ PROCEDURES:
     maxidealstep(i,N);   returns ideal needed for contraction in ith step
                          N is number of variables of input f
     formaldiff(f,k);     computes the formal derivatives D_I with |I|<k
-    f_setstep(f,H);      iterates the steps given by H, saved in f_set      	   f_set(f,H);          returns the set F corresponding to H as described by
+    f_setstep(f,H);      iterates the steps given by H, saved in f_set    	  
+    f_set(f,H);          returns the set F corresponding to H as described by
                          M. Lejeune
   ";
 
 
-LIB "ring.lib";                       // need procedures from these libs
+LIB "ring.lib";
 LIB "general.lib";
+LIB "primdec.lib";
+LIB "standard.lib";
 
-
+////////////////////////////////////////////////////////////////////////////
+//                 COMPUTATION OF THE F's
+////////////////////////////////////////////////////////////////////////////
 
 proc f_set (poly f,intvec H)         // puts together the single steps from
 {                                    // f_setstep
@@ -34,24 +39,30 @@ proc f_set (poly f,intvec H)         // puts together the single steps from
   int i;
   def R=ringchange(b-1);
   setring R;
-  list l;
+  ideal J,I;
   for(i=2;i<=b;i++)
    {
      setring r;
      def tmp=f_setstep(f,intvec(H[1..i]));
      setring R;
-     ideal I=imap(tmp,resultf_set);
-     l[i-1]=I;
+     I=imap(tmp, resultf_set);
+     kill tmp;
+     J=J,I;
+     
    }
-  l;
+  J=simplify(J,2);
+  J=slimgb(radical(J));
+  J;
   return(R);
 }
+
 
 
   proc f_setstep (poly f,intvec H)
 { 
   int p;                              // loop variable
-  int m_0=ord(f);
+  int m_0=order(f); 
+  int startvar=nvars(basering);                        
   int b=size(H);
   int c=sum(H,1..b-1);
   if(H[1]!=m_0)                       // input admissible?!
@@ -75,8 +86,9 @@ proc f_set (poly f,intvec H)         // puts together the single steps from
 }
 
 
-
-
+////////////////////////////////////////////////////////////////////////////
+//              PREPARATORY WORK: plugging in and differentiating
+////////////////////////////////////////////////////////////////////////////
 
 proc formaldiff (poly f,int i,int a,int k)
 {
@@ -110,9 +122,10 @@ proc formaldiff (poly f,int i,int a,int k)
   resultdiff=simplify(resultdiff,2);
   export(resultdiff);                // exports the result
   return(R);                         // return the ring
-  
 }
 
+
+////////////////////////////////////////////////////////////////////////////
 
 
 proc plugin_coeffs (poly f,int i)
@@ -133,11 +146,31 @@ proc plugin_coeffs (poly f,int i)
 
 
 
+proc tpolys (int i,int k)             // constructs polynomials a(1)*t+... 
+{                                     // has to be called from pluin_coeffs
+  int s,t;                            // loop variables
+  int v;           
+  poly sum; 
+  ideal I; 
+  for(t=1;t<=k;t++) 
+   {  
+     v=(t-1)*i; 
+     for(s=1;s<=i;s++) 
+      { 
+        sum=sum+var(1+k+v+s)*var(k+1)^s;    // clumsy: working with "var(1)",
+      }                                     // depends on form of basering
+     I[t]=sum; 
+     sum=0; 
+   }   
+  return(I); 
+} 
+
+////////////////////////////////////////////////////////////////////////////
+//                     CONSTRUCTING the new ring(s)
+////////////////////////////////////////////////////////////////////////////
+
 proc ringchange (int i)
-{
-  int startvar;
-  startvar=nvars(basering);
-  export(startvar);       
+{    
   def R=changevar(""+varstr(basering)+",t,"+variables(startvar,i)+"");// change
   return(R);                 // return the ring, needed in future proc
 }
@@ -175,27 +208,9 @@ proc a_z (int n)                        // returns nth letter of the alphabet
 } 
 
 
-
-proc tpolys (int i,int k)             // constructs polynomials a(1)*t+... 
-{                                     // has to be called from pluin_coeffs
-  int s,t;                            // loop variables
-  int v;           
-  poly sum; 
-  ideal I; 
-  for(t=1;t<=k;t++) 
-   {  
-     v=(t-1)*i; 
-     for(s=1;s<=i;s++) 
-      { 
-        sum=sum+var(1+k+v+s)*var(k+1)^s;    // clumsy: working with "var(1)",
-      }                                     // depends on form of basering
-     I[t]=sum; 
-     sum=0; 
-   }   
-  return(I); 
-} 
-
-
+////////////////////////////////////////////////////////////////////////////
+//                        AUXILIARY procedures     
+////////////////////////////////////////////////////////////////////////////
 
 
 proc maxidealstep (int i,int N)       // returns ideal needed for 
@@ -207,4 +222,20 @@ proc maxidealstep (int i,int N)       // returns ideal needed for
      I=I,var(N+1+j*i);
    }
 return(I);
+}
+
+
+
+proc order (poly f)
+{
+  poly g=homog(f,var(1));
+  int k=deg(g);
+  int i;
+  for(i=1;i<k;i++)
+    {
+      if(jet(f,i)!=0)
+	{
+	  return(i);
+        }
+    }
 }
