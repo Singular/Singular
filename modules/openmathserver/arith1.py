@@ -1,23 +1,23 @@
-from binding import *
-from context import *
-from objects import *
-from cd import *
-from omexceptions import *
+"Implementation of arith1 content dictionary"
+from objects import OMSymbol
+from cd import OMCD, OMCDImplementation
+#from omexceptions import *
 
-content=OMCD("arith1")
-implementation=OMCDImplementation(content)
+content = OMCD("arith1")
+implementation = OMCDImplementation(content)
 
-plussym=OMSymbol("plus",content)
+plussym = OMSymbol("plus", content)
 
 def plusfunc(context, *args):
+    "tries, convert to generic and adding"
     #print "plusfunc", args
-    args=[context.toGeneric(o) for o in args]
-    if len(args)==0:
+    args = [context.toGeneric(omobj) for omobj in args]
+    if len(args) == 0:
         return content.package(0)
     else:
-        erg=args[0]
-        for i in xrange(1,len(args)):
-            erg=erg+args[i]
+        erg = args[0]
+        for i in xrange(1, len(args)):
+            erg = erg+args[i]
     return erg
 implementation.implement("plus", plusfunc)
 #print implementation[sym]
