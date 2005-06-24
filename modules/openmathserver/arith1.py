@@ -10,7 +10,6 @@ plussym = OMSymbol("plus", content)
 
 def plusfunc(context, *args):
     "tries, convert to generic and adding"
-    #print "plusfunc", args
     args = [context.toGeneric(omobj) for omobj in args]
     if len(args) == 0:
         return content.package(0)
@@ -20,11 +19,3 @@ def plusfunc(context, *args):
             erg = erg+args[i]
     return erg
 implementation.implement("plus", plusfunc)
-#print implementation[sym]
-#print plussym
-#print sym==plussym
-#print implementation[plussym]
-#plusimpl=ImplementedOMSymbol(plussym,plusfunc)
-#implementation[plussym]=plusimpl
-#print "Laenge", (len(implementation.implementations))
-#assert OMSymbol("plus",content)==OMSymbol("plus",content)
