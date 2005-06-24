@@ -1,6 +1,6 @@
 
 //-*- mode:C++;-*-
-// $Id: lejeune.lib,v 1.6 2005-06-23 15:45:54 cremer Exp $
+// $Id: lejeune.lib,v 1.7 2005-06-24 07:28:19 cremer Exp $
 
 
 info="
@@ -47,15 +47,13 @@ proc f_set (poly f,intvec H)
       }
     }
   def r=basering;                      // need that in iteration
-  ideal resultf_set,step,I;            // save result resp. prelim. result
-  for(p=1;p<b-1;p++)                   // iterating steps
-    { 
-      def tmp=f_set(f,H[1..p+1]);
+  ideal resultf_set,I;                 // save result resp. prelim. result
+  for(p=b-1;p>1;p--)                   // iterating steps
+    {
+      def tmp=f_set(f,intvec(H[1..p]));       
       setring(tmp);
       def tmp1=resultf_set;
-      step=tmp1;
-      export(step);
-      step;~
+      export(tmp1);
       setring(r);     
     }
   def R=formaldiff(f,b-1,c,H[b]);      // actual step
@@ -131,7 +129,7 @@ proc ringchange (int i)
   int startvar;
   startvar=nvars(basering);
   export(startvar);       
-  string str=variables(startvar,i);
+  variables(startvar,i);
   def R=changevar(""+varstr(basering)+",t,"+variables(startvar,i)+"");// change
   return(R);                 // return the ring, needed in future proc
 }
@@ -158,7 +156,7 @@ proc variables (int k,int i)
 
 proc a_z (int n)                        // returns nth letter of the alphabet
 { 
-  if((n<1)||(n>26))                     // input admissible?
+  if(1>n>26)                     // input admissible?
    { 
      "n must range between 1 and 26!";
       return(0); 
