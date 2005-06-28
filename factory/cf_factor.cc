@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_factor.cc,v 1.23 2004-01-20 15:39:52 Singular Exp $ */
+/* $Id: cf_factor.cc,v 1.24 2005-06-28 14:39:52 Singular Exp $ */
 
 //{{{ docu
 //
@@ -276,9 +276,10 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
   }
   else
   {
+    bool on_rational = isOn(SW_RATIONAL);
+    On(SW_RATIONAL);
     CanonicalForm cd = bCommonDen( f );
     CanonicalForm fz = f * cd;
-    bool on_rational = isOn(SW_RATIONAL);
     Off(SW_RATIONAL);
     if ( f.isUnivariate() )
     {

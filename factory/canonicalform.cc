@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.cc,v 1.33 2003-10-15 17:19:39 Singular Exp $ */
+/* $Id: canonicalform.cc,v 1.34 2005-06-28 14:39:52 Singular Exp $ */
 
 #include <config.h>
 
@@ -1544,6 +1544,12 @@ blcm ( const CanonicalForm & f, const CanonicalForm & g )
 {
     if ( f.isZero() || g.isZero() )
 	return CanonicalForm( 0 );
+/*
+    else if (f.isOne())
+        return g;
+    else if (g.isOne())
+        return f;
+*/
     else
 	return (f / bgcd( f, g )) * g;
 }

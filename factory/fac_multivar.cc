@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_multivar.cc,v 1.10 2002-10-24 12:17:49 Singular Exp $ */
+/* $Id: fac_multivar.cc,v 1.11 2005-06-28 14:39:52 Singular Exp $ */
 
 #include <config.h>
 
@@ -141,31 +141,51 @@ findEvaluation ( const CanonicalForm & U, const CanonicalForm & V, const Canonic
 
 #ifdef HAVE_NTL
 int prime_number=0;
-void find_good_prime(const CanonicalForm &f, const CanonicalForm &r,int &start)
+void find_good_prime(const CanonicalForm &f, int &start)
 {
   if (! f.inBaseDomain() )
   {
     int l = f.level();
-    for ( CFIterator i = f; i.hasTerms(); i++ )
+    CFIterator i = f;
+    for(;;)
     {
-      if((i.exp()!=0) && ((i.exp() % cf_getSmallPrime(start))==0))
+      if  ( i.hasTerms() )
       {
-        start++;
-        CanonicalForm ff=r;
-        find_good_prime(ff,r,start);
-	return;
+        find_good_prime(i.coeff(),start);
+        if((i.exp()!=0) && ((i.exp() % cf_getSmallPrime(start))==0))
+        {
+          start++;
+          i=f;
+        }
+        else  i++;
       }
-      find_good_prime(i.coeff(),r,start);
+      else break;
     }
   }
   else
   {
-    if(mod(f,cf_getSmallPrime(start))==0)
+    if (f.inZ())
     {
-      start++;
-      CanonicalForm ff=r;
-      find_good_prime(ff,r,start);
+      while((f!=0) && (mod(f,cf_getSmallPrime(start))==0))
+      {
+        start++;
+      }
     }
+/* should not happen!
+    else if (f.inQ())
+    {
+      while((f.den()!=0) && (mod(f.den(),cf_getSmallPrime(start))==0))
+      {
+        start++;
+      }
+      while((f.num()!=0) && (mod(f.num(),cf_getSmallPrime(start))==0))
+      {
+        start++;
+      }
+    }
+    else
+          cout <<"??"<< f <<"\n";
+*/
   }
 }
 #endif
@@ -233,12 +253,9 @@ ZFactorizeMulti ( const CanonicalForm & arg )
         #ifdef HAVE_NTL
         {
           int i=prime_number;
-	  CanonicalForm f=arg;
-	  find_good_prime(f,arg,i);
-	  f=U0;
-	  find_good_prime(f,U0,i);
-	  f=U;
-	  find_good_prime(f,U,i);
+	  find_good_prime(arg,i);
+	  find_good_prime(U0,i);
+	  find_good_prime(U,i);
 	  int p=cf_getSmallPrime(i);
 	  //printf("found:p=%d (%d)\n",p,i);
 	  if ((i==0)||(i!=prime_number))
