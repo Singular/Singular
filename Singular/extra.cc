@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.226 2005-06-13 16:26:03 Singular Exp $ */
+/* $Id: extra.cc,v 1.227 2005-06-28 14:41:37 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -2578,8 +2578,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       CanonicalForm F( convSingPClapP((poly)(h->Data())));
       B.bifac(F, 1);
       CFFList L=B.getFactors();
-      PrintS("factors:\n");
-      cout << L <<"\n";
       // construct the ring ==============================================
       int i;
       int lev=ExtensionLevel();
@@ -2624,7 +2622,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       intvec *v = new intvec( L.length() );
       for ( ; J.hasItem(); J++,i++ )
       {
-        fac_id->m[i]=convClapAPSingAP_R( J.getItem().factor(),pVariables,0 );
+        fac_id->m[i]=convClapAPSingAP( J.getItem().factor() );
         (*v)[i]=J.getItem().exp();
       }
       idhdl hh=enterid("factors",0,LIST_CMD,&(currRing->idroot),FALSE);
