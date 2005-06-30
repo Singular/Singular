@@ -1,6 +1,6 @@
 
 //-*- mode:C++;-*-
-// $Id: lejeune.lib,v 1.11 2005-06-24 13:40:06 cremer Exp $
+// $Id: lejeune.lib,v 1.12 2005-06-30 14:03:37 cremer Exp $
 
 
 info="
@@ -35,6 +35,8 @@ LIB "standard.lib";
 proc f_set (poly f,intvec H)         // puts together the single steps from
 {                                    // f_setstep
   def r=basering;
+  int startvar=nvars(basering);
+  export(startvar);
   int b=size(H);
   int i;
   def R=ringchange(b-1);
@@ -46,23 +48,27 @@ proc f_set (poly f,intvec H)         // puts together the single steps from
      def tmp=f_setstep(f,intvec(H[1..i]));
      setring R;
      I=imap(tmp, resultf_set);
+     I=simplify(I,2);
+     I=simplify(I,4);
+     I=idealsimplify(I);
+     I=idealsimplify(I);I;~;
      kill tmp;
      J=J,I;
-     
-   }
-  J=simplify(J,2);
-  J=slimgb(radical(J));
+   } 
+  //J=idealsimplify(J);J;~;
+  //J=simplify(J,4);
+  //J=simplify(J,2);
+  //J=std(J);
   J;
   return(R);
 }
 
 
 
-  proc f_setstep (poly f,intvec H)
+proc f_setstep (poly f,intvec H)      // returns the conditions for one step
 { 
   int p;                              // loop variable
   int m_0=order(f); 
-  int startvar=nvars(basering);                        
   int b=size(H);
   int c=sum(H,1..b-1);
   if(H[1]!=m_0)                       // input admissible?!
@@ -93,7 +99,7 @@ proc f_set (poly f,intvec H)         // puts together the single steps from
 proc formaldiff (poly f,int i,int a,int k)
 {
   int s,t,v;                          // loop variables
-  int u;                    
+  int u;                   
   def R=plugin_coeffs(f,i);           // plugs the power series in...
   setring R;                          // changes the ring 
   def Coe=result;   
@@ -238,4 +244,57 @@ proc order (poly f)
 	  return(i);
         }
     }
+}
+
+
+proc idealsimplify (ideal I)
+{ 
+  int i,j;
+  int divisornumber=0;
+  int pos;
+  for(j=1;j<=ncols(I);j++)
+    {
+      for(i=1;i<=nvars(basering);i++)     
+       {  
+	 if(modd(I[j],var(i))==0)
+           {
+             divisornumber++;
+             pos=i;
+           }
+       }
+      if(divisornumber==1)
+	{
+          I[j]=var(pos);
+        }
+      divisornumber=0;
+    }
+  return(I);
+}
+
+
+
+proc nonzerosize (intvec v)
+{
+  int k=size(v);
+  int i;
+  int zaehler=0;
+  int sum=0;
+  for(i=1;i<=k;i++)
+   {
+     if(v[i]!=0)
+      {
+        zaehler++;
+        sum=sum+v[i];
+      } 
+   }
+  list l=zaehler,sum;
+  return(l);
+}
+
+
+
+proc modd (poly f, poly g)
+{
+  poly result=f-(f/g)*g;
+  return(result);
 }
