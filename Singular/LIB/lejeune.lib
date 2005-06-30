@@ -1,6 +1,6 @@
 
 //-*- mode:C++;-*-
-// $Id: lejeune.lib,v 1.12 2005-06-30 14:03:37 cremer Exp $
+// $Id: lejeune.lib,v 1.13 2005-06-30 15:01:51 cremer Exp $
 
 
 info="
@@ -48,17 +48,16 @@ proc f_set (poly f,intvec H)         // puts together the single steps from
      def tmp=f_setstep(f,intvec(H[1..i]));
      setring R;
      I=imap(tmp, resultf_set);
-     I=simplify(I,2);
-     I=simplify(I,4);
-     I=idealsimplify(I);
-     I=idealsimplify(I);I;~;
      kill tmp;
      J=J,I;
    } 
-  //J=idealsimplify(J);J;~;
-  //J=simplify(J,4);
-  //J=simplify(J,2);
-  //J=std(J);
+  J=simplify(J,4);
+  J=simplify(J,2);
+  J=idealsimplify(J);
+  option(redSB);
+  J=std(J);
+  J=idealsimplify(J);
+  J=radical(simplify(J,4));
   J;
   return(R);
 }
@@ -253,14 +252,17 @@ proc idealsimplify (ideal I)
   int divisornumber=0;
   int pos;
   for(j=1;j<=ncols(I);j++)
-    {
-      for(i=1;i<=nvars(basering);i++)     
-       {  
-	 if(modd(I[j],var(i))==0)
-           {
-             divisornumber++;
-             pos=i;
-           }
+  {
+    if(size(I[j])==1)
+      {
+         for(i=1;i<=nvars(basering);i++)     
+         {  
+	    if(modd(I[j],var(i))==0)
+            {
+               divisornumber++;
+               pos=i;
+             }
+          }
        }
       if(divisornumber==1)
 	{
