@@ -1,6 +1,6 @@
 
 //-*- mode:C++;-*-
-// $Id: lejeune.lib,v 1.14 2005-07-01 09:36:55 cremer Exp $
+// $Id: lejeune.lib,v 1.15 2005-07-01 10:32:24 cremer Exp $
 
 
 info="
@@ -89,7 +89,6 @@ proc f_setstep (poly f,intvec H)      // returns the conditions for one step
   def R=formaldiff(f,b-1,c,H[b]);      // actual step
   setring R;
   def resultf_set=resultdiff;
-  //resultf_set;~;
   export(resultf_set);
   return(R);   
 }
@@ -131,7 +130,6 @@ proc formaldiff (poly f,int i,int a,int k)
    }
   resultdiff=simplify(resultdiff,2);
   export(resultdiff);                // exports the result
-  resultdiff;~;
   return(R);                         // return the ring
 }
 
@@ -209,7 +207,7 @@ proc variables (int k,int i)
 
 proc a_z (int n)                        // returns nth letter of the alphabet
 { 
-  if(1>n>26)                     // input admissible?
+  if(1>n>26)                           // input admissible?
    { 
      "n must range between 1 and 26!";
       return(0); 
@@ -224,8 +222,9 @@ proc a_z (int n)                        // returns nth letter of the alphabet
 ////////////////////////////////////////////////////////////////////////////
 
 
+
 proc g_set (poly f,intvec H)         // puts together the single steps from
-{                                    // f_setstep
+{                                    // g_setstep
   def r=basering;
   int startvar=nvars(basering);
   export(startvar);
@@ -234,15 +233,22 @@ proc g_set (poly f,intvec H)         // puts together the single steps from
   def R=ringchange(b-1);
   setring R;
   ideal J,I;
-  for(i=2;i<=b;i++)
+  for(i=2;i<b;i++)                    // the steps equal to F 
    {
      setring r;
-     def tmp=g_setstep(f,intvec(H[1..i]));
+     def tmp=f_setstep(f,intvec(H[1..i]));
      setring R;
-     I=imap(tmp, resultg_set);
+     I=imap(tmp,resultf_set);
      kill tmp;
      J=J,I;
    } 
+  setring r;                          // last step, special for G
+  def tmp=g_setstep(f,H);;
+  setring R;
+  I=imap(tmp,resultg_set);
+  kill tmp;
+  J=J,I;
+ 
   J=simplify(J,4);
   J=simplify(J,2);
   J=idealsimplify(J);
@@ -256,7 +262,7 @@ proc g_set (poly f,intvec H)         // puts together the single steps from
 
 
 
-proc g_setstep (poly f,intvec H)      // returns the conditions for one step
+proc g_setstep (poly f,intvec H)      // returns the conditions for the last step
 {
   int p;                              // loop variable
   int m_0=order(f); 
@@ -275,14 +281,12 @@ proc g_setstep (poly f,intvec H)      // returns the conditions for one step
          return(0);
       }
     }
-  def R=g_formaldiff(f,b-1,c,H[b]);      // actual step
+  def R=g_formaldiff(f,b-1,c,H[b]);  // actual computations
   setring R;
   def resultg_set=g_resultdiff;
   export(resultg_set);
   return(R);   
-}
-
-
+} 
 
 
 
@@ -297,7 +301,7 @@ proc g_setstep (poly f,intvec H)      // returns the conditions for one step
 
 
 proc g_formaldiff (poly f,int i,int a,int k)
-{ "k=";k;~;
+{ 
   int s,t,v;                          // loop variables
   int u;                   
   def R=plugin_coeffs(f,i);           // plugs the power series in...
@@ -309,29 +313,25 @@ proc g_formaldiff (poly f,int i,int a,int k)
   ideal m1=maxidealstep(i,startvar); 
   ideal m2,J,g_resultdiff;
   for(v=1;v<=k;v++)                   // consider the different t-coeff.
-    { "v=";v;~;
+    { 
      fkv=coe[a+v,1];
-     m=fkv; "m=";m;~;
-     if(v<k)
-     {                           
-       J=fkv; 
-     }                          
-     for(s=1;s<=k-v;s++)
-       { "s=";s;~;
-         m1=m1^s;"m1=";m1;~;
+     m=fkv;                          
+     J=fkv;                           
+     for(s=1;s<=k-v+1;s++)           // remark: "s<=k-v+1" special!for G!!!
+       { 
+         m1=m1^s;
          u=size(m1);
          for(t=1;t<=u;t++)
           {
             m2=contract(m1[t],m);     // actual differentiation
-	    J=J,m2;m2;~;
+	    J=J,m2;
           }
        }
      g_resultdiff=g_resultdiff,J;
    }
   g_resultdiff=simplify(g_resultdiff,2);
-  //g_resultdiff;~;
   export(g_resultdiff);                // exports the result
-  return(R);                         // return the ring
+  return(R);                           // return the ring
 }                       
 
 
@@ -360,7 +360,7 @@ return(I);
 
 
 
-proc order (poly f)
+proc order (poly f)                  // gives first elem. of Nash series
 {
   poly g=homog(f,var(1));
   int k=deg(g);
