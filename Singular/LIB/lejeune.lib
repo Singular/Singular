@@ -1,6 +1,6 @@
 
 //-*- mode:C++;-*-
-// $Id: lejeune.lib,v 1.15 2005-07-01 10:32:24 cremer Exp $
+// $Id: lejeune.lib,v 1.16 2005-07-04 07:58:23 cremer Exp $
 
 
 info="
@@ -108,8 +108,9 @@ proc formaldiff (poly f,int i,int a,int k)
   def Coe=resultplug;   
   matrix coe=Coe;                     // gives the t-coeff. after plugging in 
   poly fkv;                           // need this stuff for the following
-  ideal m;                            // loops...
-  ideal m1,m2,J,resultdiff;
+  ideal m; 
+  ideal m1=maxidealstep(i,startvar); // computes the corresponding ideal
+  ideal m3,m2,J,resultdiff;
   for(v=1;v<=k;v++)                   // consider the different t-coeff.
    { 
      fkv=coe[a+v,1];
@@ -117,12 +118,11 @@ proc formaldiff (poly f,int i,int a,int k)
      J=fkv;                           // will save the result in this step
      for(s=1;s<=k-v;s++)
        {
-         m1=maxidealstep(i,startvar); // computes the corresponding ideal
-         m1=m1^s;
-         u=size(m1);
+         m3=m1^s;
+         u=size(m3);
          for(t=1;t<=u;t++)
           {
-            m2=contract(m1[t],m);     // actual differentiation
+            m2=contract(m3[t],m);     // actual differentiation
 	    J=J,m2;
           }
        }
@@ -311,7 +311,7 @@ proc g_formaldiff (poly f,int i,int a,int k)
   poly fkv;                           // need this stuff for the following
   ideal m; 
   ideal m1=maxidealstep(i,startvar); 
-  ideal m2,J,g_resultdiff;
+  ideal m3,m2,J,g_resultdiff;
   for(v=1;v<=k;v++)                   // consider the different t-coeff.
     { 
      fkv=coe[a+v,1];
@@ -319,11 +319,11 @@ proc g_formaldiff (poly f,int i,int a,int k)
      J=fkv;                           
      for(s=1;s<=k-v+1;s++)           // remark: "s<=k-v+1" special!for G!!!
        { 
-         m1=m1^s;
-         u=size(m1);
+         m3=m1^s;
+         u=size(m3);
          for(t=1;t<=u;t++)
           {
-            m2=contract(m1[t],m);     // actual differentiation
+            m2=contract(m3[t],m);     // actual differentiation
 	    J=J,m2;
           }
        }
