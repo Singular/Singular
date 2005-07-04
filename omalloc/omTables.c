@@ -3,7 +3,7 @@
  *  Purpose: program which generates omTables.inc
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omTables.c,v 1.7 2001-04-30 09:02:11 Singular Exp $
+ *  Version: $Id: omTables.c,v 1.8 2005-07-04 14:36:44 Singular Exp $
  *******************************************************************/
 
 #ifndef MH_TABLE_C
@@ -12,7 +12,7 @@
 #define _POSIX_SOURCE 1
 
 #include <stdio.h>
-#include <stdlib.h>
+#include <unistd.h>
 #include <string.h>
 #include "omConfig.h"
 #include "omDerivedConfig.h"
