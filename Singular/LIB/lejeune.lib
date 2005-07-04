@@ -1,6 +1,6 @@
 
 //-*- mode:C++;-*-
-// $Id: lejeune.lib,v 1.16 2005-07-04 07:58:23 cremer Exp $
+// $Id: lejeune.lib,v 1.17 2005-07-04 09:02:47 cremer Exp $
 
 
 info="
@@ -17,13 +17,17 @@ PROCEDURES:
     tpolys(k,i);         creates polyn. a(1)*t+..+a(n)*t^n
     ringchange(i);       changes the ring to the one needed in ith step      
     plugin_coeffs(i,f)   plugs tpolys into f, up to power i
-    maxidealstep(i,N);   returns ideal needed for contraction in ith step
+    diffidealstep(i,N);  returns ideal needed for contraction in ith step
                          N is number of variables of input f
-    formaldiff(f,k);     computes the formal derivatives D_I with |I|<k
-    f_setstep(f,H);      iterates the steps given by H, saved in f_set    	  
+    formaldiff(f,H);     computes the formal derivatives corresponding to H
+                         and the desciption of F	  
     f_set(f,H);          returns the set F corresponding to H as described by
                          M. Lejeune
-  ";
+    g_formaldiff(f,H);   computes the formal derivatives corresponding to H
+                         and the description of G
+    g_set(f,H);          returns the set G corresponding to H as described by
+                         M. Lejeune
+    ";
 
 
 LIB "ring.lib";
@@ -35,44 +39,11 @@ LIB "standard.lib";
 //                 COMPUTATION OF THE F's
 ////////////////////////////////////////////////////////////////////////////
 
-proc f_set (poly f,intvec H)         // puts together the single steps from
-{                                    // f_setstep
-  def r=basering;
-  int startvar=nvars(basering);
-  export(startvar);
-  int b=size(H);
-  int i;
-  def R=ringchange(b-1);
-  setring R;
-  ideal J,I;
-  for(i=2;i<=b;i++)
-   {
-     setring r;
-     def tmp=f_setstep(f,intvec(H[1..i]));
-     setring R;
-     I=imap(tmp, resultf_set);
-     kill tmp;
-     J=J,I;
-   } 
-  J=simplify(J,4);
-  J=simplify(J,2);
-  J=idealsimplify(J);
-  option(redSB);
-  J=std(J);
-  J=idealsimplify(J);
-  J=radical(simplify(J,4));
-  J;
-  return(R);
-}
-
-
-
-proc f_setstep (poly f,intvec H)      // returns the conditions for one step
+proc f_set (poly f,intvec H) 
 {
   int p;                              // loop variable
   int m_0=order(f); 
   int b=size(H);
-  int c=sum(H,1..b-1);
   if(H[1]!=m_0)                       // input admissible?!
     {
      "H[1]=ord(f) notwendig!!";
@@ -86,12 +57,33 @@ proc f_setstep (poly f,intvec H)      // returns the conditions for one step
          return(0);
       }
     }
-  def R=formaldiff(f,b-1,c,H[b]);      // actual step
+
+  def r=basering;
+  int startvar=nvars(basering);
+  export(startvar);
+  def R=ringchange(b-1);
   setring R;
-  def resultf_set=resultdiff;
-  export(resultf_set);
-  return(R);   
+  ideal J,I;
+  for(p=2;p<=b;p++)
+  {
+    setring r;
+    def tmp=formaldiff(f,intvec(H[1..p]));
+    setring R;
+    I=imap(tmp,resultdiff);
+    kill tmp;
+    J=J,I;
+  }
+  J=simplify(J,4);
+  J=simplify(J,2);
+  J=idealsimplify(J);
+  option(redSB);
+  J=std(J);
+  J=idealsimplify(J);
+  J=radical(simplify(J,4));
+  J;
+  return(R);
 }
+
 
 
 ////////////////////////////////////////////////////////////////////////////
@@ -99,31 +91,33 @@ proc f_setstep (poly f,intvec H)      // returns the conditions for one step
 ////////////////////////////////////////////////////////////////////////////
 
 
-proc formaldiff (poly f,int i,int a,int k)
+proc formaldiff (poly f,intvec H)
 {
   int s,t,v;                          // loop variables
-  int u;                   
+  int u;   
+  int i=size(H)-1;                    // need those parameters for computation
+  int c=sum(H,1..i);
+  int k=H[i+1];
   def R=plugin_coeffs(f,i);           // plugs the power series in...
   setring R;                          // changes the ring 
   def Coe=resultplug;   
   matrix coe=Coe;                     // gives the t-coeff. after plugging in 
-  poly fkv;                           // need this stuff for the following
-  ideal m; 
-  ideal m1=maxidealstep(i,startvar); // computes the corresponding ideal
-  ideal m3,m2,J,resultdiff;
+  poly fkv;                        
+  ideal step=diffidealstep(i,startvar);  // computes the corresponding ideal
+  ideal m,power,diffstep,J,resultdiff;
   for(v=1;v<=k;v++)                   // consider the different t-coeff.
    { 
-     fkv=coe[a+v,1];
+     fkv=coe[c+v,1];
      m=fkv;                           
      J=fkv;                           // will save the result in this step
      for(s=1;s<=k-v;s++)
        {
-         m3=m1^s;
-         u=size(m3);
+         power=step^s;
+         u=size(power);
          for(t=1;t<=u;t++)
           {
-            m2=contract(m3[t],m);     // actual differentiation
-	    J=J,m2;
+            diffstep=contract(power[t],m);     // actual differentiation
+	    J=J,diffstep;
           }
        }
      resultdiff=resultdiff,J;
@@ -222,52 +216,11 @@ proc a_z (int n)                        // returns nth letter of the alphabet
 ////////////////////////////////////////////////////////////////////////////
 
 
-
-proc g_set (poly f,intvec H)         // puts together the single steps from
-{                                    // g_setstep
-  def r=basering;
-  int startvar=nvars(basering);
-  export(startvar);
-  int b=size(H);
-  int i;
-  def R=ringchange(b-1);
-  setring R;
-  ideal J,I;
-  for(i=2;i<b;i++)                    // the steps equal to F 
-   {
-     setring r;
-     def tmp=f_setstep(f,intvec(H[1..i]));
-     setring R;
-     I=imap(tmp,resultf_set);
-     kill tmp;
-     J=J,I;
-   } 
-  setring r;                          // last step, special for G
-  def tmp=g_setstep(f,H);;
-  setring R;
-  I=imap(tmp,resultg_set);
-  kill tmp;
-  J=J,I;
- 
-  J=simplify(J,4);
-  J=simplify(J,2);
-  J=idealsimplify(J);
-  option(redSB);
-  J=std(J);
-  J=idealsimplify(J);
-  J=radical(simplify(J,4));
-  J;
-  return(R);
-}
-
-
-
-proc g_setstep (poly f,intvec H)      // returns the conditions for the last step
+proc g_set (poly f,intvec H) 
 {
-  int p;                              // loop variable
+  int p;                             
   int m_0=order(f); 
   int b=size(H);
-  int c=sum(H,1..b-1);
   if(H[1]!=m_0)                       // input admissible?!
     {
      "H[1]=ord(f) notwendig!!";
@@ -281,14 +234,40 @@ proc g_setstep (poly f,intvec H)      // returns the conditions for the last ste
          return(0);
       }
     }
-  def R=g_formaldiff(f,b-1,c,H[b]);  // actual computations
+
+  def r=basering;
+  int startvar=nvars(basering);
+  export(startvar);
+  def R=ringchange(b-1);              // work in new ring
   setring R;
-  def resultg_set=g_resultdiff;
-  export(resultg_set);
-  return(R);   
-} 
+  ideal I,J;
+  for(p=2;p<=b-1;p++)                 // steps equal to f_set...
+  {
+    setring r;
+    def tmp=formaldiff(f,intvec(H[1..p]));
+    setring R;
+    I=imap(tmp,resultdiff);
+    kill tmp;
+    J=J,I;
+  }
 
-
+  setring r;                          // last step, special for G
+  def tmp=g_formaldiff(f,H);;
+  setring R;
+  I=imap(tmp,g_resultdiff);
+  kill tmp;
+  J=J,I;
+ 
+  J=simplify(J,4);                    // simplify, keep radical small
+  J=simplify(J,2);
+  J=idealsimplify(J);
+  option(redSB);
+  J=std(J);
+  J=idealsimplify(J);
+  J=radical(simplify(J,4));
+  J;
+  return(R);
+}
 
 
 
@@ -300,31 +279,33 @@ proc g_setstep (poly f,intvec H)      // returns the conditions for the last ste
 
 
 
-proc g_formaldiff (poly f,int i,int a,int k)
+proc g_formaldiff (poly f,intvec H)
 { 
   int s,t,v;                          // loop variables
-  int u;                   
+  int u;
+  int i=size(H)-1;
+  int c=sum(H,1..i);
+  int k=H[i+1];
   def R=plugin_coeffs(f,i);           // plugs the power series in...
   setring R;                          // changes the ring 
   def Coe=resultplug;   
   matrix coe=Coe;                     // gives the t-coeff. after plugging in 
   poly fkv;                           // need this stuff for the following
-  ideal m; 
-  ideal m1=maxidealstep(i,startvar); 
-  ideal m3,m2,J,g_resultdiff;
+  ideal step=diffidealstep(i,startvar); 
+  ideal m,power,diffstep,J,g_resultdiff;
   for(v=1;v<=k;v++)                   // consider the different t-coeff.
     { 
-     fkv=coe[a+v,1];
+     fkv=coe[c+v,1];
      m=fkv;                          
      J=fkv;                           
      for(s=1;s<=k-v+1;s++)           // remark: "s<=k-v+1" special!for G!!!
        { 
-         m3=m1^s;
-         u=size(m3);
+         power=step^s;
+         u=size(power);
          for(t=1;t<=u;t++)
           {
-            m2=contract(m3[t],m);     // actual differentiation
-	    J=J,m2;
+            diffstep=contract(power[t],m);     // actual differentiation
+	    J=J,diffstep;
           }
        }
      g_resultdiff=g_resultdiff,J;
@@ -347,7 +328,7 @@ proc g_formaldiff (poly f,int i,int a,int k)
 ////////////////////////////////////////////////////////////////////////////
 
 
-proc maxidealstep (int i,int N)       // returns ideal needed for 
+proc diffidealstep (int i,int N)       // returns ideal needed for 
 {                                     // differentiation in ith step
   ideal I=var(N+1+i);
   int j;
@@ -411,3 +392,7 @@ proc modd (poly f, poly g)      // the modulo-operation for polys
   poly result=f-(f/g)*g;
   return(result);
 }
+
+
+
+
