@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.95 2005-06-07 11:43:53 Singular Exp $
+@comment $Id: examples.doc,v 1.96 2005-07-04 14:50:16 Singular Exp $
 @comment this file contains the examples
 
 @c The following directives are necessary for proper compilation
@@ -687,7 +687,7 @@ Singular; Diplomarbeit Fachbereich Mathematik, Universitaet
 Kaiserslautern; 1997} for more details.
 
 @smallexample
-@c example unix_only
+@c example unix_only tag:MP
 ring r=0,(a,b,c,u,v,w,x,y,z),lp;
 ideal i=a+c+v+2x-1, ab+cu+2vw+2xy+2xz-2/3,  ab2+cu2+2vw2+2xy2+2xz2-2/5,
 ab3+cu3+2vw3+2xy3+2xz3-2/7, ab4+cu4+2vw4+2xy4+2xz4-2/9, vw2+2xyz-1/9,

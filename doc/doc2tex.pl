@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: doc2tex.pl,v 1.27 2003-04-25 13:23:46 levandov Exp $
+# $Id: doc2tex.pl,v 1.28 2005-07-04 14:50:16 Singular Exp $
 ###################################################################
 #  Computer Algebra System SINGULAR
 #
@@ -64,6 +64,7 @@ $clean = 0;
 $verbose = 1;
 $reuse = 1;
 $no_ex = 0;
+%exclude_ex = ();
 $no_fun = 0;
 $doc_subdir = "./d2t_singular";
 $ex_subdir = "./examples";
@@ -114,6 +115,7 @@ while (@ARGV && $ARGV[0] =~ /^-/)
   if (/^-no_r(euse)?$/)  { $reuse = 0; next;}
   if (/^-c(lean)?$/)     { $clean = 1; next;}
   if (/^-no_e(x)?$/)     { $no_ex = 1; next;}
+  if (/^-exclude$/)      { $exclude_ex{shift(@ARGV)} = 1;next;}
   if (/^-no_fu(n)?$/)    { $no_fun = 1;next;}
   if (/^-m(ake)?$/)      { $make =  shift(@ARGV);next;}
   if (/^-d(ocdir)?$/)    { $doc_subdir = shift(@ARGV); next;}
@@ -261,7 +263,7 @@ EOT
 sub HandleExample
 {
   my($inc_file, $ex_file, $lline, $thisexample, $error_ok, $cache, $no_comp,
-     $unix_only);
+     $unix_only, $tag);
   
   $lline = $line;
   $section = 'unknown' unless $section;
@@ -269,7 +271,16 @@ sub HandleExample
   $ex_prefix .= "_$examples{$section}" if $examples{$section};
   $examples{$section}++;
 
-  if ($no_ex)
+  if (/tag:(\w+)/)
+  {
+    $tag = $1;
+  }
+  else
+  {
+    $tag = 'NOTAG';
+  }
+  
+  if ($no_ex or $exclude_ex{$tag})
   {
     print "{$ex_prefix}" if ($verbose);
     print TEX "\@c skipped computation of example $ex_prefix $doc_file:$lline \n";
@@ -300,7 +311,7 @@ sub HandleExample
     $line++;
     last if (/^\@c\s*example\s*$/);
 #    s/^\s*//; # remove preceeding white spaces
-    if ($no_ex || $no_comp || $unix_only)
+    if ($no_ex || $exclude_ex{$tag} || $no_comp || $unix_only)
     {
       &protect_texi;
       print TEX $_;
@@ -320,7 +331,7 @@ sub HandleExample
     unless (/^\@c\s*example\s*$/);
 
   # done, if no examples
-  return if ($no_ex || $no_comp || $unix_only);
+  return if ($no_ex || $exclude_ex{$tag} || $no_comp || $unix_only);
 
   # check whether it can be reused
   if ($reuse && $cache)
