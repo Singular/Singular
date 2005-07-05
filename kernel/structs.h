@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.8 2005-05-12 13:50:36 Singular Exp $ */
+/* $Id: structs.h,v 1.9 2005-07-05 16:11:36 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -424,11 +424,11 @@ struct sip_sring
   ideal      qideal; /* extension to the ring structure: qring */
 
 
-  int      *VarOffset;
+  int*     VarOffset;
   int*     firstwv;
 
   struct omBin_s*   PolyBin; /* Bin from where monoms are allocated */
-  short      ch;     /* characteristic */
+  int        ch;     /* characteristic */
   short      float_len; /* additional char-flags */
   short      float_len2; /* additional char-flags */
 
