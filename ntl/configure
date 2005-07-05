@@ -1,5 +1,5 @@
 #!/bin/sh
-# version $Id: configure,v 1.21 2005-07-04 14:50:17 Singular Exp $
+# version $Id: configure,v 1.22 2005-07-05 16:11:08 Singular Exp $
 
 while [ $# -ne 0 ]; do
    case $1 in 
@@ -25,7 +25,7 @@ while [ $# -ne 0 ]; do
          includedir="$1";
          ;;
      *)
-         echo "Unknown option: $1";
+         : ignore all other options
          ;;
   esac;
   shift;
