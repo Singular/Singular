@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.117 2005-06-07 09:17:35 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.118 2005-07-05 16:13:16 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -28,6 +28,7 @@
 #include "maps.h"
 #include "syz.h"
 #include "numbers.h"
+#include "modulop.h"
 #include "lists.h"
 #include "attrib.h"
 #include "ipconv.h"
