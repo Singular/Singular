@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.cc,v 1.3 2005-07-05 16:33:47 Singular Exp $ */
+/* $Id: modulop.cc,v 1.4 2005-07-05 17:10:41 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
@@ -311,9 +311,6 @@ char * npRead (char *s, number *a)
 
 void npSetChar(int c, ring r)
 {
-#ifdef NV_OPS
-  if (r->cf->npPrimeM >NV_MAX_PRIME) return;
-#endif
 
 //  if (c==npPrimeM) return;
   if ((c>1) || (c<(-1)))
@@ -321,6 +318,9 @@ void npSetChar(int c, ring r)
     if (c>1) npPrimeM = c;
     else     npPrimeM = -c;
     npPminus1M = npPrimeM - 1;
+#ifdef NV_OPS
+    if (r->cf->npPrimeM >NV_MAX_PRIME) return;
+#endif
 #ifdef HAVE_DIV_MOD
     npInvTable=r->cf->npInvTable;
 #endif
