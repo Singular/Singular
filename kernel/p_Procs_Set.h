@@ -11,8 +11,9 @@
  *           have to be defined before this file is included
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: p_Procs_Set.h,v 1.1.1.1 2003-10-06 12:16:00 Singular Exp $
+ *  Version: $Id: p_Procs_Set.h,v 1.2 2005-07-05 16:12:52 Singular Exp $
  *******************************************************************/
+#include "modulop.h"
 
 // extract p_Procs properties from a ring
 static inline p_Field p_FieldIs(ring r)
