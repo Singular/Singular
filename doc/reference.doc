@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.258 2005-06-02 12:41:20 bricken Exp $
+@comment $Id: reference.doc,v 1.259 2005-07-06 13:31:34 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -4670,11 +4670,12 @@ See
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
-returns the largest prime less then 32004 smaller or equal to the argument;
+returns the largest prime less then or equal to the argument;
 @*returns 2 for all arguments smaller than 3.
 @item @strong{Example:}
 @smallexample
 @c example
+  prime(320000);
   prime(32004);
   prime(0);
   prime(-1);
