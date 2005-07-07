@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.76 2005-06-20 08:17:00 bricken Exp $ */
+/* $Id: ipassign.cc,v 1.77 2005-07-07 11:21:23 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -1209,7 +1209,7 @@ static BOOLEAN jiAssign_list(leftv l, leftv r)
   else
   {
     b=iiAssign(ld,r);
-    l->e->next=ld->e;
+    if (l->e!=NULL) l->e->next=ld->e;
     ld->e=NULL;
   }
   return b;
