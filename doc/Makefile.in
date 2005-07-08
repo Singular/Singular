@@ -1,7 +1,7 @@
 #####################################################################
 ###
 ### Makefile for Singular documentation
-### $Id: Makefile.in,v 1.99 2005-05-12 13:52:59 Singular Exp $
+### $Id: Makefile.in,v 1.100 2005-07-08 14:36:30 Singular Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -63,7 +63,7 @@ EX_SUBDIR       = ./examples
 CHKSUM_DB       = ${DOC_SUBDIR}/chksum
 DOC2TEX         = ${PERL} ./doc2tex.pl -docdir ${DOC_SUBDIR} \
                   -Singular ${SINGULAR} -verbose ${VERBOSE} -make ${MAKE} \
-		  -exdir ${EX_SUBDIR}
+		  -exdir ${EX_SUBDIR} @DOC2TEX_EXAMPLE_EXCLUSIONS@
 PL2DOC		= ${PERL} ./pl2doc.pl -db ${CHKSUM_DB}
 
 # t2h stuff
