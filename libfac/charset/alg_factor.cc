@@ -2,7 +2,7 @@
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
 ////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: alg_factor.cc,v 1.13 2004-12-10 10:15:05 Singular Exp $";
+static char * rcsid = "$Id: alg_factor.cc,v 1.14 2005-07-08 09:18:15 Singular Exp $";
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -108,7 +108,15 @@ mypsr ( const CanonicalForm &rr, const CanonicalForm &vv, const Variable & x ){
 // replacement for factory's broken resultant
 static CanonicalForm
 resultante( const CanonicalForm & f, const CanonicalForm& g, const Variable & v ){
-return resultant(f,g,v);
+  bool on_rational = isOn(SW_RATIONAL);
+  On(SW_RATIONAL);
+  CanonicalForm cd = bCommonDen( f );
+  CanonicalForm fz = f * cd;
+  cd = bCommonDen( g );
+  CanonicalForm gz = g * cd;
+  if (!on_rational)  Off(SW_RATIONAL);
+
+return resultant(fz,gz,v);
 
   CanonicalForm h, beta, help, F, G;
   int delta;
@@ -358,10 +366,12 @@ inseperable(const CFList & Astar){
 static CanonicalForm
 gcd0( CanonicalForm f, CanonicalForm g ){
   int charac= getCharacteristic();
+  int save=isOn(SW_RATIONAL);
   setCharacteristic(0); Off(SW_RATIONAL);
   CanonicalForm ff= mapinto(f), gg= mapinto(g);
   CanonicalForm result= gcd(ff,gg);
-  setCharacteristic(charac); On(SW_RATIONAL);
+  setCharacteristic(charac); 
+  if (save) On(SW_RATIONAL);
   return mapinto(result);
 }
 
@@ -808,6 +818,9 @@ newcfactor(const CanonicalForm & f, const CFList & as, int success ){
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.13  2004/12/10 10:15:05  Singular
+*pohl: AlgExtGenerator etc.
+
 Revision 1.12  2003/02/18 11:09:25  Singular
 * hannes: alg_gcd(f,f'=0) get a special handling
 
