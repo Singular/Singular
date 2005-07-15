@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gring.h,v 1.11 2005-04-22 18:09:42 levandov Exp $ */
+/* $Id: gring.h,v 1.12 2005-07-15 11:58:23 levandov Exp $ */
 /*
 * ABSTRACT additional defines etc for --with-plural
 */
@@ -79,6 +79,7 @@ ideal Approx_Step(ideal L);
 
 /* void nc_kBucketPolyRed(kBucket_pt b, poly p); */
 void nc_kBucketPolyRed(kBucket_pt b, poly p, number *c);
+void nc_kBucketPolyRed_Z(kBucket_pt b, poly p, number *c);
 void nc_PolyPolyRed(poly &b, poly p, number *c);
 
 matrix nc_PrintMat(int a, int b, ring r, int metric);

@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.25 2005-04-22 18:09:42 levandov Exp $
+ *  Version: $Id: gring.cc,v 1.26 2005-07-15 11:58:24 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -1227,7 +1227,7 @@ poly nc_CreateShortSpoly(poly p1, poly p2, const ring r)
 
 void nc_kBucketPolyRed(kBucket_pt b, poly p, number *c)
 {
-  // b will not by multiplied by any constant in this impl.
+  // b will not be multiplied by any constant in this impl.
   // ==> *c=1
   *c=nInit(1);
   poly m=pOne();
@@ -1254,6 +1254,20 @@ void nc_kBucketPolyRed(kBucket_pt b, poly p, number *c)
   nDelete(&MinusOne);
   int l=pLength(pp);
   kBucket_Add_q(b,pp,&l);
+}
+
+void nc_kBucketPolyRed_Z(kBucket_pt b, poly p, number *c)
+{
+  // b is multiplied by a constant in this impl.
+  poly m=pOne();
+  pExpVectorDiff(m,kBucketGetLm(b),p);
+  //pSetm(m);
+#ifdef PDEBUG
+  pTest(m);
+#endif
+  poly pp = nc_mm_Mult_p(m,pCopy(p),currRing);
+  pDelete(&m);
+  *c = kBucketPolyRed(b,pp,pLength(pp),NULL);
 }
 
 void nc_PolyPolyRed(poly &b, poly p, number *c)
