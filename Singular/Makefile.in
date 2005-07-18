@@ -37,6 +37,7 @@ CC		= @CC@
 LD              = @LD@
 CXX		= @CXX@
 LEX		= sh flexer.sh
+
 PERL		= @PERL@
 BISON		= bison
 INSTALL		= @INSTALL@
@@ -55,7 +56,11 @@ CXXTEMPLFLAGS	= @CXXTEMPLFLAGS@
 CPPFLAGS	= -I${srcdir} -I../kernel @CPPFLAGS@
 DEFS		= -DNDEBUG -DOM_NDEBUG -D@SING_UNAME@ @DEFS@
 LDFLAGS2	= @LDFLAGS@
+ifneq ($(SINGUNAME),ix86-Win)
 LDFLAGS		= -L../kernel -lkernel @LDFLAGS@
+else
+LDFLAGS		= -L../kernel -L/bin -lkernel @LDFLAGS@
+endif
 LDFLAGSG	= -L../kernel -lkernel-g @LDFLAGS@
 LD_DYN_FLAGS	= @LD_DYN_FLAGS@
 SFLAGS		= @SFLAGS@
@@ -69,7 +74,7 @@ STATIC_LDFLAGS	= @STATIC_LDFLAGS@
 ifneq ($(SINGUNAME),ix86-Win)
 LIBS		= -lm @NEED_LIBS@ 
 else
-LIBS		= -lsingfac -lsingcf -lntl -lgmp -static -lreadline -lncurses
+LIBS		= -lsingfac -lsingcf -lntl  -static -lreadline -Xlinker -Bdynamic -lgmp -lcygncurses6 
 endif
 MP_LIBS		= @MP_LIBS@
 DL_KERNEL	= @DL_KERNEL@
