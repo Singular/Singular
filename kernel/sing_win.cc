@@ -58,7 +58,7 @@ void *dynl_sym(void *handle, char *symbol)
 {
   FARPROC f;
   f = GetProcAddress((HINSTANCE)handle, TEXT (symbol));
-  return(f);
+  return((void*) f);
 }
 
 int dynl_close (void *handle)
