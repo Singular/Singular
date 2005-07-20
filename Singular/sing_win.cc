@@ -2,11 +2,35 @@
 #ifdef ix86_Win
 #include <windows.h>
 #include <winuser.h>
+#include <htmlhelp.h>
 #include <sys/cygwin.h>
 #include <stdio.h>
 #ifndef MAXPATHLEN
 #define MAXPATHLEN 1024
 #endif
+
+void heOpenWinHtmlHelp(const char* keyw, char* helppath )
+// API Call Sequence for Microsoft HTML Help System
+{
+  char path[MAXPATHLEN];
+#ifdef TEST
+  printf("keyw:%s\n", keyw);
+#endif
+  cygwin_conv_to_full_win32_path(helppath, path);
+#ifdef TEST
+  printf("path:%s\n", path);
+#endif
+HH_AKLINK link;
+   link.cbStruct =     sizeof(HH_AKLINK) ;
+   link.fReserved =    FALSE ;
+   link.pszKeywords =  keyw;
+   link.pszUrl =       NULL ;
+   link.pszMsgText =   NULL ;
+   link.pszMsgTitle =  NULL ;
+   link.pszWindow =    NULL ;
+   link.fIndexOnFail = TRUE ;
+  HtmlHelp(NULL, "..\\html\\Manual.chm", HH_KEYWORD_LOOKUP, (DWORD)&link);
+}
 
 void heOpenWinntHlp(const char* keyw, char* helppath )
 {

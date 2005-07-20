@@ -3,7 +3,7 @@
 ****************************************/
 /*
 * ABSTRACT: help system
-* versin $Id: fehelp.cc,v 1.43 2005-05-06 10:08:43 Singular Exp $
+* versin $Id: fehelp.cc,v 1.44 2005-07-20 08:00:28 wienand Exp $
 */
 
 #include <string.h>
@@ -74,6 +74,7 @@ static BOOLEAN heEmacsInit(int,int);   static void heEmacsHelp(heEntry hentry,in
 #ifdef ix86_Win
 static void heHtmlHelp(heEntry hentry,int);
 static void heWinHelp(heEntry hentry,int);
+static void heWinHtmlHelp(heEntry hentry,int);
 #include "sing_win.h"
 #endif
 
@@ -205,8 +206,13 @@ static void feBrowserFile()
       if ((buf[0]!='#') && (buf[0]>' ')) br++;
     }
     fseek(f,0,SEEK_SET);
+#ifdef ix86_Win
+    // for the 6(!) default browsers
+    heHelpBrowsers=(heBrowser_s*)omAlloc0((br+7)*sizeof(heBrowser_s));
+#else
     // for the 4(!) default browsers
     heHelpBrowsers=(heBrowser_s*)omAlloc0((br+4)*sizeof(heBrowser_s));
+#endif
     br=0;
     while (fgets( buf, sizeof(buf), f))
     {
@@ -231,50 +237,56 @@ static void feBrowserFile()
   else
   {
 #ifdef ix86_Win
-    // for the 6(!) default browsers
-    heHelpBrowsers=(heBrowser_s*)omAlloc0(6*sizeof(heBrowser_s));
+    // for the 7(!) default browsers
+    heHelpBrowsers=(heBrowser_s*)omAlloc0(7*sizeof(heBrowser_s));
 #else
     // for the 4(!) default browsers
     heHelpBrowsers=(heBrowser_s*)omAlloc0(4*sizeof(heBrowser_s));
 #endif
   }
 #ifdef ix86_Win
+  heHelpBrowsers[br].browser="htmlhelp";
+  heHelpBrowsers[br].init_proc=heGenInit;
+  heHelpBrowsers[br].help_proc=heWinHtmlHelp;
+  heHelpBrowsers[br].required="h";
+  heHelpBrowsers[br].action=NULL;
+  br++;
   heHelpBrowsers[br].browser="winhlp";
   heHelpBrowsers[br].init_proc=heGenInit;
   heHelpBrowsers[br].help_proc=heWinHelp;
   heHelpBrowsers[br].required="h";
-  //heHelpBrowsers[br].action=NULL;
+  heHelpBrowsers[br].action=NULL;
   br++;
   heHelpBrowsers[br].browser="html";
   heHelpBrowsers[br].init_proc=heGenInit;
   heHelpBrowsers[br].help_proc=heHtmlHelp;
   heHelpBrowsers[br].required="h";
-  //heHelpBrowsers[br].action=NULL;
+  heHelpBrowsers[br].action=NULL;
   br++;
 #endif
   heHelpBrowsers[br].browser="builtin";
   heHelpBrowsers[br].init_proc=heGenInit;
   heHelpBrowsers[br].help_proc=heBuiltinHelp;
   heHelpBrowsers[br].required="i";
-  //heHelpBrowsers[br].action=NULL;
+  heHelpBrowsers[br].action=NULL;
   br++;
   heHelpBrowsers[br].browser="dummy";
   heHelpBrowsers[br].init_proc=heDummyInit;
   heHelpBrowsers[br].help_proc=heDummyHelp;
-  //heHelpBrowsers[br].required=NULL;
-  //heHelpBrowsers[br].action=NULL;
+  heHelpBrowsers[br].required=NULL;
+  heHelpBrowsers[br].action=NULL;
   br++;
   heHelpBrowsers[br].browser="emacs";
   heHelpBrowsers[br].init_proc=heEmacsInit;
   heHelpBrowsers[br].help_proc=heEmacsHelp;
-  //heHelpBrowsers[br].required=NULL;
-  //heHelpBrowsers[br].action=NULL;
-  //br++;
-  //heHelpBrowsers[br].browser=NULL;
-  //heHelpBrowsers[br].init_proc=NULL;
-  //heHelpBrowsers[br].help_proc=NULL;
-  //heHelpBrowsers[br].required=NULL;
-  //heHelpBrowsers[br].action=NULL;
+  heHelpBrowsers[br].required=NULL;
+  heHelpBrowsers[br].action=NULL;
+  br++;
+  heHelpBrowsers[br].browser=NULL;
+  heHelpBrowsers[br].init_proc=NULL;
+  heHelpBrowsers[br].help_proc=NULL;
+  heHelpBrowsers[br].required=NULL;
+  heHelpBrowsers[br].action=NULL;
 }
 
 char* feHelpBrowser(char* which, int warn)
@@ -700,7 +712,7 @@ static BOOLEAN heOnlineHelp(char* s)
         idhdl hh=IDPACKAGE(h)->idroot->get(s_help,0);
         hePrintHelpStr(hh,s_help,s);
       }
-      else Print("package %s not found\n",s); 
+      else Print("package %s not found\n",s);
     }
     return FALSE;
   }
@@ -900,7 +912,9 @@ static BOOLEAN heGenInit(int warn, int br)
   }
   return TRUE;
 }
+
 #ifdef ix86_Win
+
 static void heHtmlHelp(heEntry hentry, int br)
 {
   char url[MAXPATHLEN];
@@ -910,6 +924,27 @@ static void heHtmlHelp(heEntry hentry, int br)
           (hentry!=NULL && *(hentry->url)!='\0' ? hentry->url : "index.htm"));
 
   heOpenWinntUrl(url, (html_dir != NULL ? 1 : 0));
+}
+
+static void heWinHtmlHelp(heEntry hentry, int br)
+// Function to call the Microsoft HTML Help System
+// Uses API Call Function in sing_win.cc
+{
+  char keyw[MAX_HE_ENTRY_LENGTH];
+  if ((hentry!=NULL)&&(hentry->key!=NULL))
+    strcpy(keyw,hentry->key);
+  else
+    strcpy(keyw," ");
+  char* helppath = feResource('h' /*"HtmlDir"*/);
+  const char *filename="/Manual.chm";
+  int helppath_len=0;
+  if (helppath!=NULL) helppath_len=strlen(helppath);
+  char *callpath=(char *)omAlloc0(helppath_len+strlen(filename)+1);
+  if ((helppath!=NULL) && (*helppath>' '))
+    strcpy(callpath,helppath);
+  strcat(callpath,filename);
+  heOpenWinHtmlHelp(keyw,callpath);
+  omfree(callpath);
 }
 
 static void heWinHelp(heEntry hentry, int br)

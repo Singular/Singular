@@ -3,6 +3,7 @@
 
 #ifdef ix86_Win
 
+void heOpenWinHtmlHelp(const char* keyw, char* helppath );
 void heOpenWinntHlp(const char* keyw, char* helppath );
 void heOpenWinntUrl(const char* url, int local);
 
