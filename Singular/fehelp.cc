@@ -3,7 +3,7 @@
 ****************************************/
 /*
 * ABSTRACT: help system
-* versin $Id: fehelp.cc,v 1.44 2005-07-20 08:00:28 wienand Exp $
+* versin $Id: fehelp.cc,v 1.45 2005-07-20 08:12:24 wienand Exp $
 */
 
 #include <string.h>
@@ -141,6 +141,17 @@ void feHelp(char *str)
   // Try to match approximately with key in index file
   if (idxfile != NULL)
   {
+    if (heCurrentHelpBrowser == NULL) feHelpBrowser(NULL, 0);
+    assume(heCurrentHelpBrowser != NULL);
+    if (heCurrentHelpBrowser->browser == "htmlhelp") {
+      // In Windows always let htmlhelp handle request, if standard
+      strcpy(hentry.key, str);
+      *hentry.node = '\0';
+      *hentry.url = '\0';
+      hentry.chksum = 0;
+      heBrowserHelp(&hentry);
+    }
+
     char* matches = StringSetS("");
     int found = heReKey2Entry(idxfile, str, &hentry);
 
