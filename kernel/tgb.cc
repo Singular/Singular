@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.34 2005-06-02 12:38:51 bricken Exp $ */
+/* $Id: tgb.cc,v 1.35 2005-07-20 11:12:43 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -13,6 +13,8 @@
 #include "tgb_internal.h"
 #include "tgbgauss.h"
 #include "F4.h"
+#include "gring.h"
+//#include "gr_kstd2.h"
 #include "longrat.h"
 static const int bundle_size=100;
 #if 1
@@ -219,14 +221,35 @@ static inline int pELength(poly p, slimgb_alg* c,int l){
 //   if (c->is_char0) return pSLength(p,len);
 //   return pLength(p);
 // }
+
+
+
+
+
+
+
+
 static inline int pQuality(poly p, slimgb_alg* c, int l=-1){
   
   if(l<0)
     l=pLength(p);
-  if(c->is_char0) return pSLength(p,l);
+  if(c->is_char0) {
+    if((pLexOrder) &&(!c->is_homog)){
+      int cs;
+      number coef=pGetCoeff(p);
+      if (rField_is_Q(currRing)){
+	cs=QlogSize(coef);
+      }
+      else
+	cs=nSize(coef);
+      return cs*pELength(p,c,l);
+    }
+    return pSLength(p,l);
+  }
   if((pLexOrder) &&(!c->is_homog)) return pELength(p,c,l);
   return l;
 }
+
 static inline int pTotaldegree_full(poly p){
   int r=0;
   while(p){
@@ -241,9 +264,34 @@ int red_object::guess_quality(slimgb_alg* c){
     //works at the moment only for lenvar 1, because in different
     //case, you have to look on coefs
     int s=0;
-    if (c->is_char0)
+    if (c->is_char0){
       //s=kSBucketLength(bucket,this->p);
+      if((pLexOrder) &&(!c->is_homog)){
+	  int cs;
+	  number coef;
+	  
+	  coef=pGetCoeff(kBucketGetLm(bucket));
+	  //c=nSize(pGetCoeff(kBucketGetLm(b)));
+	 
+	  //c=nSize(pGetCoeff(lm));
+	  if (rField_is_Q(currRing)){
+	    cs=QlogSize(coef);
+	  }
+	  else
+	    cs=nSize(coef);
+	  if (bucket->coef[0]!=NULL){
+	    if (rField_is_Q(currRing)){
+	      int modifier=QlogSize(pGetCoeff(bucket->coef[0]));
+	      cs+=modifier;
+	    }
+	    else{
+	      int modifier=nSize(pGetCoeff(bucket->coef[0]));
+	      cs*=modifier;}
+	  }
+	  return cs*kEBucketLength(this->bucket,this->p,c);
+      }
       s=kSBucketLength(bucket,NULL);
+    }
     else 
     {
       if((pLexOrder) &&(!c->is_homog))
@@ -254,6 +302,7 @@ int red_object::guess_quality(slimgb_alg* c){
  
     return s;
 }
+
 // static int guess_quality(const red_object & p, slimgb_alg* c){
 //   //looks only on bucket
 //   if (c->is_char0) return kSBucketLength(p.bucket,p.p);
@@ -582,6 +631,8 @@ static int add_to_reductors(slimgb_alg* c, poly h, int len){
 }
 static void length_one_crit(slimgb_alg* c, int pos, int len)
 {
+  if (c->nc)
+    return;
   if (len==1)
   {
     int i;
@@ -594,7 +645,8 @@ static void length_one_crit(slimgb_alg* c, int pos, int len)
       if (c->lengths[i]==1)
         c->states[i][pos]=HASTREP;
     }
-    shorten_tails(c,c->S->m[pos]);
+    if (!c->nc)
+      shorten_tails(c,c->S->m[pos]);
   }
 }
 static sorted_pair_node* find_next_pair2(slimgb_alg* c, BOOLEAN go_higher){
@@ -1035,9 +1087,9 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slim
       c->states[i][j]=UNIMPORTANT;
       continue;
     } else
-    if ((c->lengths[i]==1) && (c->lengths[j]==1))
+    if ((!c->nc) && (c->lengths[i]==1) && (c->lengths[j]==1))
       c->states[i][j]=HASTREP;
-    else if (pHasNotCF(c->S->m[i],c->S->m[j]))
+    else if ((!(c->nc)) &&  (pHasNotCF(c->S->m[i],c->S->m[j])))
     {
       c->easy_product_crit++;
       c->states[i][j]=HASTREP;
@@ -1164,9 +1216,10 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slim
 
   add_to_reductors(c, h, c->lengths[c->n-1]);
   //i=posInS(c->strat,c->strat->sl,h,0 ecart);
-
-  if (c->lengths[c->n-1]==1)
-    shorten_tails(c,c->S->m[c->n-1]);
+  if (!(c->nc)){
+    if (c->lengths[c->n-1]==1)
+      shorten_tails(c,c->S->m[c->n-1]);
+  }
   //you should really update c->lengths, c->strat->lenS, and the oder of polys in strat if you sort after lengths
 
   //for(i=c->strat->sl; i>0;i--)
@@ -1195,11 +1248,6 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slim
 }
 
 
-
-
-
-
-
 static poly redNF2 (poly h,slimgb_alg* c , int &len, number&  m,int n)
 {
   m=nInit(1);
@@ -1218,12 +1266,15 @@ static poly redNF2 (poly h,slimgb_alg* c , int &len, number&  m,int n)
   P.bucket = kBucketCreate(currRing);
   // BOOLEAN corr=lenS_correct(strat);
   kBucketInit(P.bucket,P.p,len /*pLength(P.p)*/);
+  intset lenSw=strat->lenS;
+  if (strat->lenSw!=NULL)
+    lenSw=strat->lenSw;
   //int max_pos=simple_posInS(strat,P.p);
   loop
     {
 
       j=kFindDivisibleByInS(strat->S,strat->sevS,strat->sl,&P);
-      if ((j>=0) && ((!n)||(strat->lenS[j]<=n)))
+      if ((j>=0) && ((!n)||(lenSw[j]<=n)))
       {
 
 	
@@ -1276,6 +1327,7 @@ static poly redNF2 (poly h,slimgb_alg* c , int &len, number&  m,int n)
 }
 
 
+
 static poly redTailShort(poly h, kStrategy strat){
 
   int sl=strat->sl;
@@ -1311,7 +1363,8 @@ static void line_of_extended_prod(int fixpos,slimgb_alg* c){
 }
 static void c_S_element_changed_hook(int pos, slimgb_alg* c){
   length_one_crit(c,pos, c->lengths[pos]);
-  line_of_extended_prod(pos,c);
+  if (!c->nc)
+    line_of_extended_prod(pos,c);
 }
 class poly_tree_node {
 public:
@@ -1526,6 +1579,7 @@ static void go_on (slimgb_alg* c){
     else curr_deg=s->deg;
     quick_pop_pair(c);
     if(s->i>=0){
+      //be careful replace_pair use createShortSpoly which is not noncommutative
       //replace_pair(s->i,s->j,c);
     if(s->i==s->j) {
       free_sorted_pair_node(s,c->r);
@@ -1533,18 +1587,23 @@ static void go_on (slimgb_alg* c){
 	}
     }
     poly h;
-    if(s->i>=0)
-      h=ksOldCreateSpoly(c->S->m[s->i], c->S->m[s->j], NULL, c->r);
+    if(s->i>=0){
+      if (!c->nc)
+	h=ksOldCreateSpoly(c->S->m[s->i], c->S->m[s->j], NULL, c->r);
+      else
+	h= nc_CreateSpoly(c->S->m[s->i], c->S->m[s->j], NULL, c->r);
+    } 
     else
       h=s->lcm_of_lm;
     if(s->i>=0)
       now_t_rep(s->j,s->i,c);
     number coef;
     int mlen=pLength(h);
-    h=redNF2(h,c,mlen,coef,2);
-    redTailShort(h,c->strat);
-    nDelete(&coef);
-
+    if (!c->nc){
+      h=redNF2(h,c,mlen,coef,2);
+      redTailShort(h,c->strat);
+      nDelete(&coef);
+    }
     free_sorted_pair_node(s,c->r);
     if(!h) continue;
     int len=pLength(h);
@@ -1647,7 +1706,8 @@ static void go_on (slimgb_alg* c){
     kBucketDestroy(&buf[j].bucket);
     // delete buf[j];
     //remember to free res here
-    p=redTailShort(p, c->strat);
+    if (!c->nc)
+      p=redTailShort(p, c->strat);
     sbuf[j]=add_to_basis_ideal_quotient(p,-1,-1,c,ibuf+j);
     //sbuf[j]=add_to_basis(p,-1,-1,c,ibuf+j);
   }
@@ -1682,64 +1742,7 @@ static void go_on (slimgb_alg* c){
   return;
 }
 
-static poly redNF (poly h,kStrategy strat, int &len)
-{
-  len=0;
-  if (h==NULL) return NULL;
-  int j;
 
-  len=pLength(h);
-  if (0 > strat->sl)
-  {
-    return h;
-  }
-  LObject P(h);
-  P.SetShortExpVector();
-  P.bucket = kBucketCreate(currRing);
-  kBucketInit(P.bucket,P.p,len /*pLength(P.p)*/);
-  //int max_pos=simple_posInS(strat,P.p);
-  loop
-    {
-      j=kFindDivisibleByInS(strat->S,strat->sevS,strat->sl,&P);
-      if (j>=0)
-      {
-        nNormalize(pGetCoeff(P.p));
-#ifdef KDEBUG
-        if (TEST_OPT_DEBUG)
-        {
-          PrintS("red:");
-          wrp(h);
-          PrintS(" with ");
-          wrp(strat->S[j]);
-        }
-#endif
-        number coef=kBucketPolyRed(P.bucket,strat->S[j],
-                                   strat->lenS[j]/*pLength(strat->S[j])*/,
-                                   strat->kNoether);
-        nDelete(&coef);
-        h = kBucketGetLm(P.bucket);
-        if (h==NULL) return NULL;
-        P.p=h;
-        P.t_p=NULL;
-        P.SetShortExpVector();
-#ifdef KDEBUG
-        if (TEST_OPT_DEBUG)
-        {
-          PrintS("\nto:");
-          wrp(h);
-          PrintLn();
-        }
-#endif
-      }
-      else
-      {
-        kBucketClear(P.bucket,&(P.p),&len);
-        kBucketDestroy(&P.bucket);
-        pNormalize(P.p);
-        return P.p;
-      }
-    }
-}
 
 #ifdef REDTAIL_S
 
@@ -1900,6 +1903,8 @@ slimgb_alg::slimgb_alg(ideal I, BOOLEAN F4){
   
   
   r=currRing;
+  nc=rIsPluralRing(r);
+  Print("nc %i",nc);
   is_homog=TRUE;
   {
     int hz;
@@ -1933,6 +1938,7 @@ slimgb_alg::slimgb_alg(ideal I, BOOLEAN F4){
   //not fully correct
   //(rChar()==0);
   F4_mode=F4;
+  
   if ((!F4_mode)&&(!is_homog) &&(pLexOrder)){
     this->doubleSugar=TRUE;
   }
@@ -2515,6 +2521,8 @@ static inline BOOLEAN pHasNotCFExtended(poly p1, poly p2, poly m)
 
 //for impl reasons may return false if the the normal product criterion matches
 static inline BOOLEAN extended_product_criterion(poly p1, poly gcd1, poly p2, poly gcd2, slimgb_alg* c){
+  if (c->nc)
+    return FALSE;
   if(gcd1==NULL) return FALSE;
         if(gcd2==NULL) return FALSE;
         gcd1->next=gcd2; //may ordered incorrect
@@ -3070,9 +3078,14 @@ int red_object::clear_to_poly(){
 
 void reduction_step::reduce(red_object* r, int l, int u){}
 void simple_reducer::target_is_no_sum_reduce(red_object & ro){
-  kBucketPolyRed(ro.bucket,p,
-		 p_len,
-		 c->strat->kNoether);
+  number coef;
+  if (!c->nc)
+    coef=kBucketPolyRed(ro.bucket,p,
+		   p_len,
+		   c->strat->kNoether);
+  else
+    nc_kBucketPolyRed_Z(ro.bucket, p, &coef);
+  nDelete(&coef);
 }
 
 
@@ -3145,14 +3158,18 @@ void multi_reduce_step(find_erg & erg, red_object* r, slimgb_alg* c){
     for(int i=1;i<=pVariables;i++)
       pSetExp(m,i,(pGetExp(r[erg.to_reduce_l].p, i)-pGetExp(red,i)));
     pSetm(m);
-    poly red_cp=ppMult_mm(red,m);
-    
+    poly red_cp;
+    if (!c->nc)
+      red_cp=ppMult_mm(red,m);
+    else
+      red_cp=nc_mm_Mult_p(m, pCopy(red), c->r);
     if(!erg.fromS){
       kBucketInit(r[rn].bucket,red,red_len);
     }
     //now reduce the copy
     //static poly redNF2 (poly h,slimgb_alg* c , int &len, number&  m,int n)
-    redTailShort(red_cp,c->strat);
+    if (!c->nc)
+      redTailShort(red_cp,c->strat);
     //number mul;
     // red_len--;
 //     red_cp->next=redNF2(red_cp->next,c,red_len,mul,c->average_length);

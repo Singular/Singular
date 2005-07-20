@@ -1,4 +1,62 @@
 #include "tgb_internal.h"
+static poly redNF (poly h,kStrategy strat, int &len)
+{
+  len=0;
+  if (h==NULL) return NULL;
+  int j;
+
+  len=pLength(h);
+  if (0 > strat->sl)
+  {
+    return h;
+  }
+  LObject P(h);
+  P.SetShortExpVector();
+  P.bucket = kBucketCreate(currRing);
+  kBucketInit(P.bucket,P.p,len /*pLength(P.p)*/);
+  //int max_pos=simple_posInS(strat,P.p);
+  loop
+    {
+      j=kFindDivisibleByInS(strat->S,strat->sevS,strat->sl,&P);
+      if (j>=0)
+      {
+        nNormalize(pGetCoeff(P.p));
+#ifdef KDEBUG
+        if (TEST_OPT_DEBUG)
+        {
+          PrintS("red:");
+          wrp(h);
+          PrintS(" with ");
+          wrp(strat->S[j]);
+        }
+#endif
+        number coef=kBucketPolyRed(P.bucket,strat->S[j],
+                                   strat->lenS[j]/*pLength(strat->S[j])*/,
+                                   strat->kNoether);
+        nDelete(&coef);
+        h = kBucketGetLm(P.bucket);
+        if (h==NULL) return NULL;
+        P.p=h;
+        P.t_p=NULL;
+        P.SetShortExpVector();
+#ifdef KDEBUG
+        if (TEST_OPT_DEBUG)
+        {
+          PrintS("\nto:");
+          wrp(h);
+          PrintLn();
+        }
+#endif
+      }
+      else
+      {
+        kBucketClear(P.bucket,&(P.p),&len);
+        kBucketDestroy(&P.bucket);
+        pNormalize(P.p);
+        return P.p;
+      }
+    }
+}
 int find_best(red_object* r,int l, int u, int &w, calc_dat* c){
 
   int sz=u-l+1;
