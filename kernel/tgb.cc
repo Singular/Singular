@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.35 2005-07-20 11:12:43 bricken Exp $ */
+/* $Id: tgb.cc,v 1.36 2005-07-21 11:22:45 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -1904,7 +1904,7 @@ slimgb_alg::slimgb_alg(ideal I, BOOLEAN F4){
   
   r=currRing;
   nc=rIsPluralRing(r);
-  Print("nc %i",nc);
+  
   is_homog=TRUE;
   {
     int hz;
@@ -2575,6 +2575,17 @@ static poly kBucketGcd(kBucket* b, ring r)
 static inline int quality_of_pos_in_strat_S(int pos, slimgb_alg* c){
   if (c->strat->lenSw!=NULL) return c->strat->lenSw[pos];
   return c->strat->lenS[pos];
+}
+static inline int quality_of_pos_in_strat_S_mult_high(int pos, poly high, slimgb_alg* c)
+  //meant only for nc
+{
+  poly m=pOne();
+  pExpVectorDiff(m,high ,c->strat->S[pos]);
+  poly product=nc_mm_Mult_p(m, pCopy(c->strat->S[pos]), c->r);
+  int erg=pQuality(product,c);
+  pDelete(&m);
+  pDelete(&product);
+  return erg;
 }
 
 static void multi_reduction_lls_trick(red_object* los, int losl,slimgb_alg* c,find_erg & erg){
