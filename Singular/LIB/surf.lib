@@ -1,6 +1,6 @@
-//last change: 02.03.2001 (Eric Westenberger)
+// last modified 21.07.2005, Oliver Wienand
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: surf.lib,v 1.24 2005-05-06 14:39:19 hannes Exp $";
+version="$Id: surf.lib,v 1.25 2005-07-21 09:19:42 wienand Exp $";
 category="Visualization";
 info="
 LIBRARY: surf.lib    Procedures for Graphics with Surf
@@ -38,16 +38,16 @@ static proc num_of_vars(ideal I)
   return(v);
 }
 
-proc  plot(ideal I,list #)
+proc plot(ideal I,list #)
 "USAGE:   plot(I);  I ideal or poly
 ASSUME: I defines a plane curve or a surface given by one equation
 RETURN: nothing
-NOTE: requires the external program 'surf' to be installed
+NOTE: requires the external program 'surf' to be installed, to close the graphical just press 'Q'
 EXAMPLE: example plot; shows an example
 "
 {
-  string extra_surf_opts=" -x "; // remove this line for surf 0.9
-  string l="/tmp/surf"+string(system("pid"));
+  string extra_surf_opts=" -x --auto-resize "; // remove this line for surf 0.9
+  string l = "/tmp/surf"+string(system("pid"));
   string err_mes; // string containing error messages
   def base=basering;
   intvec v=num_of_vars(I);
@@ -95,22 +95,21 @@ background_red=255; background_green=255; background_blue=255;");
   {
     if (ncols(I)==1 and (n==3 or nvars(base)==3)) // surface
     {
-      write(":w "+l,
-      "root_finder=d_chain_bisection;epsilon=0.0000000001;iterations=20000;");
-     write(l, "width=500; height=500; set_size; do_background=yes;
-background_red=255; background_green=255; background_blue=255;");
-      write(l,"rot_x=0.14; rot_y=-0.3;");
-     if (size(#)>0)
-       {
-         write(l,#[1]);
-       }
-      write(l,"surface=",I[1],";");
-      write(l,"draw_surface;");
+      write(":w " + l,
+            "root_finder=d_chain_bisection;epsilon=0.0000000001;iterations=20000;");
+      write(l, "width=500; height=500; set_size; do_background=yes; background_red=255; background_green=255; background_blue=255;");
+      write(l, "rot_x=0.14; rot_y=-0.3;");
+      if (size(#) > 0)
+      {
+          write(l, #[1]);
+      }
+      write(l, "surface=",I[1],";");
+      write(l, "draw_surface;");
     }
     else
     {
-      err_mes="cannot plot "+string(ncols(I))+" equations in "
-             +string(n)+" variables";
+      err_mes = "cannot plot " + string(ncols(I)) + " equations in "
+              + string(n) + " variables";
       ERROR(err_mes);
     }
   }
@@ -118,29 +117,29 @@ background_red=255; background_green=255; background_blue=255;");
   surf_call = "surf ";
   if (defined(extra_surf_opts))
   {
-    surf_call = surf_call + extra_surf_opts + " ";
+    surf_call = surf_call + " " + extra_surf_opts;
   }
-  surf_call =surf_call+ l +" >/dev/null 2>&1";
+  surf_call =surf_call + l + " >/dev/null 2>&1";
 
-  if("ppcMac-darwin"!=system("uname")){
-     i=system("sh",surf_call);
+  if ("ppcMac-darwin" != system("uname")) {
+     i=system("sh", surf_call);
   } else {
-    surf_call= surf_call + " || "+ "singularsurf " +
-      extra_surf_opts + " " +l +" >/dev/null 2>&1";
-      i=system("sh",surf_call);
+     surf_call = surf_call + " || " + "singularsurf "
+                 + extra_surf_opts + " " + l +" >/dev/null 2>&1";
+     i = system("sh", surf_call);
   }
 
-  if (i!=0)
+  if (i != 0)
   {
     err_mes = "calling `surf` failed. (the shell return the error code "
-          +string(i)+")."+newline+
-    "probably the executable `surf` is not found.";
+          + string(i) + ")." + newline +
+          "probably the executable `surf` is not found.";
     ERROR(err_mes);
   }
-  i=system("sh","/bin/rm "+l);
+  i = system("sh", "/bin/rm "+l);
 }
 example
-{ "EXAMPLE:"; echo =2;
+{ "EXAMPLE:"; echo = 2;
   // ---------  plane curves ------------
   ring rr0 = 0,(x1,x2),dp;
 
