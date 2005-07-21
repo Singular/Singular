@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.259 2005-07-06 13:31:34 Singular Exp $
+@comment $Id: reference.doc,v 1.260 2005-07-21 13:31:02 bricken Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -5656,12 +5656,12 @@ written 2004 under supervision of G.-M. Greuel in Kaiserslautern.
 It is designed to keep polynomials slim (short with small coefficients).
 Currently best results are examples over function field (parameters).
 
-For the performance it is essential, that one of following is fullfilled: the ideal is homogeneous or the ordering is a degree ordering, maybe future version will improve here.
+At this moment the implementation is not optimal for weighted degree orderings.
 
 The program only supports the options prot (which will give protocoll output) and redSB (for returning a reduced Groebner basis).
 The Protocoll looks like that:
 M[n,m] means a parallel reduction of n elements with m non zero output elements.
-"b" notices an exchange trick described in the thesis and "e" adds reductor with non minimal leading term.
+"b" notices an exchange trick described in the thesis and "e" adds a reductor with non minimal leading term.
 
 For an example see @ref{slim Groebner bases}.
 @end table
