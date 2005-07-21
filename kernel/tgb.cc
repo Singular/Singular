@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.36 2005-07-21 11:22:45 bricken Exp $ */
+/* $Id: tgb.cc,v 1.37 2005-07-21 12:48:30 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -2634,6 +2634,8 @@ static void multi_reduction_lls_trick(red_object* los, int losl,slimgb_alg* c,fi
 
 	int i;
 	int quality_a=quality_of_pos_in_strat_S(erg.reduce_by,c);
+	if (c->nc)
+	  quality_a=quality_of_pos_in_strat_S_mult_high(erg.reduce_by, los[erg.to_reduce_u].p, c);
 	int best=erg.to_reduce_u+1;
 	int qc;
 	best=find_best(los,erg.to_reduce_l,erg.to_reduce_u,qc,c);
@@ -3161,7 +3163,7 @@ void multi_reduce_step(find_erg & erg, red_object* r, slimgb_alg* c){
     pNormalize(red);
     red_len=pLength(red);
   }
-  if (erg.to_reduce_u-erg.to_reduce_l>5){
+  if ((c->nc)||(erg.to_reduce_u-erg.to_reduce_l>5)){
     work_on_copy=TRUE;
     // poly m=pOne();
     poly m=c->tmp_lm;
