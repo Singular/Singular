@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.260 2005-07-21 13:31:02 bricken Exp $
+@comment $Id: reference.doc,v 1.261 2005-07-22 15:51:52 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -2269,6 +2269,9 @@ See
 int
 @item @strong{Purpose:}
 tests for homogeneity: returns 1 for homogeneous input, 0 otherwise.
+@item @strong{Note:} If the current ring has a weighted monomial
+ordering @code{homog} tests for weighted homogeneity w.r.t. the given
+weights.
 @item @strong{Syntax:}
 @*@code{homog (} polynomial_expression@code{,} ring_variable @code{)}
 @*@code{homog (} vector_expression@code{,} ring_variable @code{)}
@@ -2278,8 +2281,11 @@ tests for homogeneity: returns 1 for homogeneous input, 0 otherwise.
 same as first argument
 @item @strong{Purpose:}
 homogenizes polynomials, vectors, ideals, or modules by multiplying
-each monomial with a suitable power of the given ring variable (which must have
-weight 1).
+each monomial with a suitable power of the given ring variable.
+@item @strong{Note:} If the current ring has a weighted monomial
+ordering @code{homog} computes the weighted homogenization w.r.t. the given
+weights.
+@*The homogenizing variable must have weight 1 in this case.
 @item @strong{Example:}
 @smallexample
 @c example
