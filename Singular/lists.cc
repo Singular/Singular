@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: lists.cc,v 1.28 2005-05-20 15:55:52 Singular Exp $ */
+/* $Id: lists.cc,v 1.29 2005-07-22 16:22:11 levandov Exp $ */
 /*
 * ABSTRACT: handling of the list type
 */
@@ -243,7 +243,7 @@ lists liMakeResolv(resolvente r, int length, int reallen,
           }
           else
           {
-            r[i]->rank=si_max(rank,idRankFreeModule(r[i]));
+            r[i]->rank=si_max(rank,(int)idRankFreeModule(r[i]));
           }
           idSkipZeroes(r[i]);
         }

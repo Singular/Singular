@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.77 2005-07-07 11:21:23 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.78 2005-07-22 16:22:10 levandov Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -1465,7 +1465,7 @@ BOOLEAN iiAssign(leftv l, leftv r)
             if (nok) break;
             lm->m[i]=(poly)t.CopyD(etyp);
             pNormalize(lm->m[i]);
-            if (module_assign) rk=si_max(rk,pMaxComp(lm->m[i]));
+            if (module_assign) rk=si_max(rk,(int)pMaxComp(lm->m[i]));
             i++;
           }
           else
@@ -1478,7 +1478,7 @@ BOOLEAN iiAssign(leftv l, leftv r)
             if (module_assign)
             {
               j = si_min(num,rm->cols());
-              rk=si_max(rk,rm->rank);
+              rk=si_max(rk,(int)rm->rank);
             }
             else
               j = si_min(num-i,rm->rows() * rm->cols());

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.368 2005-06-02 12:54:41 bricken Exp $ */
+/* $Id: iparith.cc,v 1.369 2005-07-22 16:22:09 levandov Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1568,7 +1568,7 @@ static BOOLEAN jjDEG_M_IV(leftv res, leftv u, leftv v)
   ideal I=(ideal)u->Data();
   int d=-1;
   int i;
-  for(i=IDELEMS(I);i>=0;i--) d=si_max(d,pDegW(I->m[i],iv));
+  for(i=IDELEMS(I);i>=0;i--) d=si_max(d,(int)pDegW(I->m[i],iv));
   omFreeSize((ADDRESS)iv,(pVariables+1)*sizeof(short));
   res->data = (char *)d;
   return FALSE;
@@ -3155,7 +3155,7 @@ static BOOLEAN jjDEG_M(leftv res, leftv u)
   int dummy;
   int i;
   for(i=IDELEMS(I);i>=0;i--)
-    if (I->m[i]!=NULL) d=si_max(d,pLDeg(I->m[i],&dummy,currRing));
+    if (I->m[i]!=NULL) d=si_max(d,(int)pLDeg(I->m[i],&dummy,currRing));
   res->data = (char *)d;
   return FALSE;
 }
@@ -4480,8 +4480,8 @@ struct sValCmd1 dArith1[]=
 ,{jjROWS,       ROWS_CMD,        INT_CMD,        MATRIX_CMD     ALLOW_PLURAL}
 ,{jjROWS_IV,    ROWS_CMD,        INT_CMD,        INTMAT_CMD     ALLOW_PLURAL}
 ,{jjCOUNT_IV,   ROWS_CMD,        INT_CMD,        INTVEC_CMD     ALLOW_PLURAL}
-,{jjSLIM_GB,    SLIM_GB_CMD,     IDEAL_CMD,      IDEAL_CMD      NO_PLURAL}
-,{jjSLIM_GB,    SLIM_GB_CMD,     MODUL_CMD,      MODUL_CMD      NO_PLURAL}
+,{jjSLIM_GB,    SLIM_GB_CMD,     IDEAL_CMD,      IDEAL_CMD      ALLOW_PLURAL}
+,{jjSLIM_GB,    SLIM_GB_CMD,     MODUL_CMD,      MODUL_CMD      ALLOW_PLURAL}
 ,{jjSort_Id,    SORTVEC_CMD,     INTVEC_CMD,     IDEAL_CMD      ALLOW_PLURAL}
 ,{jjSort_Id,    SORTVEC_CMD,     INTVEC_CMD,     MODUL_CMD      ALLOW_PLURAL}
 ,{jjSTD,        STD_CMD,         IDEAL_CMD,      IDEAL_CMD      ALLOW_PLURAL}
@@ -5615,7 +5615,7 @@ static BOOLEAN jjIDEAL_PL(leftv res, leftv v)
           pDelete(&p);
           return TRUE;
         }
-        rank=si_max(rank,pMaxComp(p));
+        rank=si_max(rank,(int)pMaxComp(p));
         break;
       }
       default:
