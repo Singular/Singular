@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: standard.lib,v 1.71 2005-06-22 10:13:01 bricken Exp $";
+version="$Id: standard.lib,v 1.72 2005-07-25 14:46:50 bricken Exp $";
 category="Miscellaneous";
 info="
 LIBRARY: standard.lib   Procedures which are always loaded at Start-up
@@ -248,7 +248,7 @@ EXAMPLE: example groebner;  shows an example"
     return(std(i));
   }
   //if ordering is global, there are parameters and minpoly is 0
-  if ((npars(basering)>0) &&(minpoly==0))
+  if (((npars(basering)>0) &&(minpoly==0)) &&(typeof(basering)=="ring"))
   {
     return(slimgb(i));
   }
