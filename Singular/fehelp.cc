@@ -3,7 +3,7 @@
 ****************************************/
 /*
 * ABSTRACT: help system
-* versin $Id: fehelp.cc,v 1.45 2005-07-20 08:12:24 wienand Exp $
+* versin $Id: fehelp.cc,v 1.46 2005-07-25 09:05:08 wienand Exp $
 */
 
 #include <string.h>
@@ -143,7 +143,8 @@ void feHelp(char *str)
   {
     if (heCurrentHelpBrowser == NULL) feHelpBrowser(NULL, 0);
     assume(heCurrentHelpBrowser != NULL);
-    if (heCurrentHelpBrowser->browser == "htmlhelp") {
+#ifdef ix86_Win
+    if (strcmp(heCurrentHelpBrowser->browser,"htmlhelp")==0) {
       // In Windows always let htmlhelp handle request, if standard
       strcpy(hentry.key, str);
       *hentry.node = '\0';
@@ -151,6 +152,7 @@ void feHelp(char *str)
       hentry.chksum = 0;
       heBrowserHelp(&hentry);
     }
+#endif
 
     char* matches = StringSetS("");
     int found = heReKey2Entry(idxfile, str, &hentry);
@@ -218,13 +220,20 @@ static void feBrowserFile()
     }
     fseek(f,0,SEEK_SET);
 #ifdef ix86_Win
-    // for the 6(!) default browsers
-    heHelpBrowsers=(heBrowser_s*)omAlloc0((br+7)*sizeof(heBrowser_s));
+    // for the 6(!) default browsers and make htmlhelp the default default
+    heHelpBrowsers=(heBrowser_s*)omAlloc0((br+9)*sizeof(heBrowser_s));
+    br = 0;
+    heHelpBrowsers[br].browser="htmlhelp";
+    heHelpBrowsers[br].init_proc=heGenInit;
+    heHelpBrowsers[br].help_proc=heWinHtmlHelp;
+    heHelpBrowsers[br].required="C";
+    // heHelpBrowsers[br].action=NULL;
+    br++;
 #else
     // for the 4(!) default browsers
     heHelpBrowsers=(heBrowser_s*)omAlloc0((br+4)*sizeof(heBrowser_s));
+    br = 0;
 #endif
-    br=0;
     while (fgets( buf, sizeof(buf), f))
     {
       if ((buf[0]!='#') && (buf[0]>' '))
@@ -256,48 +265,42 @@ static void feBrowserFile()
 #endif
   }
 #ifdef ix86_Win
-  heHelpBrowsers[br].browser="htmlhelp";
-  heHelpBrowsers[br].init_proc=heGenInit;
-  heHelpBrowsers[br].help_proc=heWinHtmlHelp;
-  heHelpBrowsers[br].required="h";
-  heHelpBrowsers[br].action=NULL;
-  br++;
   heHelpBrowsers[br].browser="winhlp";
   heHelpBrowsers[br].init_proc=heGenInit;
   heHelpBrowsers[br].help_proc=heWinHelp;
   heHelpBrowsers[br].required="h";
-  heHelpBrowsers[br].action=NULL;
+  //heHelpBrowsers[br].action=NULL;
   br++;
   heHelpBrowsers[br].browser="html";
   heHelpBrowsers[br].init_proc=heGenInit;
   heHelpBrowsers[br].help_proc=heHtmlHelp;
   heHelpBrowsers[br].required="h";
-  heHelpBrowsers[br].action=NULL;
+  //heHelpBrowsers[br].action=NULL;
   br++;
 #endif
   heHelpBrowsers[br].browser="builtin";
   heHelpBrowsers[br].init_proc=heGenInit;
   heHelpBrowsers[br].help_proc=heBuiltinHelp;
   heHelpBrowsers[br].required="i";
-  heHelpBrowsers[br].action=NULL;
+  //heHelpBrowsers[br].action=NULL;
   br++;
   heHelpBrowsers[br].browser="dummy";
   heHelpBrowsers[br].init_proc=heDummyInit;
   heHelpBrowsers[br].help_proc=heDummyHelp;
-  heHelpBrowsers[br].required=NULL;
-  heHelpBrowsers[br].action=NULL;
+  //heHelpBrowsers[br].required=NULL;
+  //heHelpBrowsers[br].action=NULL;
   br++;
   heHelpBrowsers[br].browser="emacs";
   heHelpBrowsers[br].init_proc=heEmacsInit;
   heHelpBrowsers[br].help_proc=heEmacsHelp;
-  heHelpBrowsers[br].required=NULL;
-  heHelpBrowsers[br].action=NULL;
-  br++;
-  heHelpBrowsers[br].browser=NULL;
-  heHelpBrowsers[br].init_proc=NULL;
-  heHelpBrowsers[br].help_proc=NULL;
-  heHelpBrowsers[br].required=NULL;
-  heHelpBrowsers[br].action=NULL;
+  //heHelpBrowsers[br].required=NULL;
+  //heHelpBrowsers[br].action=NULL;
+  //br++;
+  //heHelpBrowsers[br].browser=NULL;
+  //heHelpBrowsers[br].init_proc=NULL;
+  //heHelpBrowsers[br].help_proc=NULL;
+  //heHelpBrowsers[br].required=NULL;
+  //heHelpBrowsers[br].action=NULL;
 }
 
 char* feHelpBrowser(char* which, int warn)
@@ -882,6 +885,7 @@ static BOOLEAN heGenInit(int warn, int br)
       case ' ': break;
       case 'i': /* singular.hlp */
       case 'x': /* singular.idx */
+      case 'C': /* chm file Manual.chm */
       case 'h': /* html dir */
                if (feResource(*p, warn) == NULL)
                {
@@ -946,16 +950,8 @@ static void heWinHtmlHelp(heEntry hentry, int br)
     strcpy(keyw,hentry->key);
   else
     strcpy(keyw," ");
-  char* helppath = feResource('h' /*"HtmlDir"*/);
-  const char *filename="/Manual.chm";
-  int helppath_len=0;
-  if (helppath!=NULL) helppath_len=strlen(helppath);
-  char *callpath=(char *)omAlloc0(helppath_len+strlen(filename)+1);
-  if ((helppath!=NULL) && (*helppath>' '))
-    strcpy(callpath,helppath);
-  strcat(callpath,filename);
-  heOpenWinHtmlHelp(keyw,callpath);
-  omfree(callpath);
+  char* helppath = feResource('C' /*"CHM Datei"*/);
+  heOpenWinHtmlHelp(keyw,helppath);
 }
 
 static void heWinHelp(heEntry hentry, int br)
