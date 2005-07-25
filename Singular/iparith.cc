@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.369 2005-07-22 16:22:09 levandov Exp $ */
+/* $Id: iparith.cc,v 1.370 2005-07-25 13:01:28 bricken Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -3792,6 +3792,11 @@ static BOOLEAN jjRPAR(leftv res, leftv v)
 }
 static BOOLEAN jjSLIM_GB(leftv res, leftv u)
 {
+  if (currQuotient!=NULL)
+  {
+    Werror("qring not supported by slimgb at the moment");
+    return TRUE;
+  }
   if (pOrdSgn!=1)
   {
     Werror("ordering must be global for slimgb");
