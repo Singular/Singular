@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.27 2005-07-18 12:41:55 bricken Exp $
+ *  Version: $Id: gring.cc,v 1.28 2005-07-26 07:00:11 bricken Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -1161,6 +1161,7 @@ poly nc_CreateSpoly(poly p1, poly p2,poly spNoether, const ring r)
 #ifdef PDEBUG
   p_Test(M2,r);
 #endif
+  if (M2!=NULL) pCleardenom(M2);
   if (M2!=NULL) pContent(M2);
   return(M2);
 }
@@ -1271,8 +1272,14 @@ void nc_kBucketPolyRed_Z(kBucket_pt b, poly p, number *c)
     return;
   }
   poly pp = nc_mm_Mult_p(m,pCopy(p),currRing);
+  number c2,cc;
+  pCleardenom_n(pp,c2);
   pDelete(&m);
   *c = kBucketPolyRed(b,pp,pLength(pp),NULL);
+  cc=*c;
+  *c=nMult(*c,c2);
+  nDelete(&c2);
+  nDelete(&cc);
   pDelete(&pp);
 }
 
