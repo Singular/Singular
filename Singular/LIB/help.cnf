@@ -1,4 +1,4 @@
-# Singular help browser file $Id: help.cnf,v 1.7 2005-04-18 08:45:40 bricken Exp $
+# Singular help browser file $Id: help.cnf,v 1.8 2005-07-26 16:51:52 Singular Exp $
 # each line which start with an # is a comment
 # each other line defines a (possible) help browser
 # the format of the entries is: <name>!<requirements>!<shell command>
@@ -8,6 +8,7 @@
 #  i- requires singular.hlp
 #  h- requires html dir
 #  D- requires the enviroment variable DISPLAY
+#  C- requires Windows-help: Manual.chm
 #  E:executable:- requires the named exectable
 #----------------------------------------------------
 # shell commands substitute the following:
@@ -19,8 +20,9 @@
 #  %n: the info node
 #----------------------------------------------------
 # the default help browsers builtin, dummy and emacs are always 
-# available and should NOT be mentioned here
-# ix86_Win: has 2 additional default browsers: html and winhlp
+#   available and should NOT be mentioned here
+# ix86_Win: has additional default browsers: htmlhelp, html and winhlp
+#   also not mentioned here
 #----------------------------------------------------
 htmlview!xDhE:htmlview:!htmlview %h &
 mac!xhE:open:!open %f &

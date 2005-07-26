@@ -3,7 +3,7 @@
 ****************************************/
 /*
 * ABSTRACT: help system
-* versin $Id: fehelp.cc,v 1.46 2005-07-25 09:05:08 wienand Exp $
+* versin $Id: fehelp.cc,v 1.47 2005-07-26 16:51:39 Singular Exp $
 */
 
 #include <string.h>
@@ -144,7 +144,8 @@ void feHelp(char *str)
     if (heCurrentHelpBrowser == NULL) feHelpBrowser(NULL, 0);
     assume(heCurrentHelpBrowser != NULL);
 #ifdef ix86_Win
-    if (strcmp(heCurrentHelpBrowser->browser,"htmlhelp")==0) {
+    if (strcmp(heCurrentHelpBrowser->browser,"htmlhelp")==0)
+    {
       // In Windows always let htmlhelp handle request, if standard
       strcpy(hentry.key, str);
       *hentry.node = '\0';
@@ -220,20 +221,13 @@ static void feBrowserFile()
     }
     fseek(f,0,SEEK_SET);
 #ifdef ix86_Win
-    // for the 6(!) default browsers and make htmlhelp the default default
-    heHelpBrowsers=(heBrowser_s*)omAlloc0((br+9)*sizeof(heBrowser_s));
-    br = 0;
-    heHelpBrowsers[br].browser="htmlhelp";
-    heHelpBrowsers[br].init_proc=heGenInit;
-    heHelpBrowsers[br].help_proc=heWinHtmlHelp;
-    heHelpBrowsers[br].required="C";
-    // heHelpBrowsers[br].action=NULL;
-    br++;
+    // for the 7(!) default browsers and make htmlhelp the default default
+    heHelpBrowsers=(heBrowser_s*)omAlloc0((br+7)*sizeof(heBrowser_s));
 #else
     // for the 4(!) default browsers
     heHelpBrowsers=(heBrowser_s*)omAlloc0((br+4)*sizeof(heBrowser_s));
-    br = 0;
 #endif
+    br = 0;
     while (fgets( buf, sizeof(buf), f))
     {
       if ((buf[0]!='#') && (buf[0]>' '))
@@ -265,6 +259,12 @@ static void feBrowserFile()
 #endif
   }
 #ifdef ix86_Win
+  heHelpBrowsers[br].browser="htmlhelp";
+  heHelpBrowsers[br].init_proc=heGenInit;
+  heHelpBrowsers[br].help_proc=heWinHtmlHelp;
+  heHelpBrowsers[br].required="C";
+  // heHelpBrowsers[br].action=NULL;
+  br++;
   heHelpBrowsers[br].browser="winhlp";
   heHelpBrowsers[br].init_proc=heGenInit;
   heHelpBrowsers[br].help_proc=heWinHelp;
@@ -718,7 +718,7 @@ static BOOLEAN heOnlineHelp(char* s)
       ss+=2;
       h=ggetid(s);
       if (h!=NULL)
-      {      
+      {
         Print("help for %s from package %\n",ss,s);
         char s_help[200];
         strcpy(s_help,ss);
