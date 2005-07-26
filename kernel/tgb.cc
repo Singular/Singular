@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.37 2005-07-21 12:48:30 bricken Exp $ */
+/* $Id: tgb.cc,v 1.38 2005-07-26 07:17:40 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -1080,7 +1080,7 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slim
 	   p_LmShortDivisibleBy(c->S->m[i],c->short_Exps[i],c->S->m[j],~(c->short_Exps[j]),c->r));
     if(!c->F4_mode)
     {
-      assume(!(p_LmDivisibleBy(c->S->m[j],c->S->m[i],c->r)));
+      //      assume(!(p_LmDivisibleBy(c->S->m[j],c->S->m[i],c->r)));
     }
     
     if (_p_GetComp(c->S->m[i],c->r)!=_p_GetComp(c->S->m[j],c->r)){
