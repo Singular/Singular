@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: weight.cc,v 1.1.1.1 2003-10-06 12:15:56 Singular Exp $ */
+/* $Id: weight.cc,v 1.2 2005-07-26 17:04:15 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -18,7 +18,6 @@
 #include "weight.h"
 
 /*0 implementation*/
-#ifndef __MWERKS__
 extern "C" double (*wFunctional)(int *degw, int *lpol, int npol,
        double *rel, double wx);
 extern "C" double wFunctionalMora(int *degw, int *lpol, int npol,
@@ -33,9 +32,6 @@ extern "C" void wSecondSearch(int *A, int *x, int *lpol,
         int npol, int mons, double *rel, double *fk);
 extern "C" void wGcd(int *x, int n);
 extern double wNsqr;
-#else
-#include "weight0.c"
-#endif /* __MWERKS__ */
 
 static void wDimensions(polyset s, int sl, int *lpol, int *npol, int *mons)
 {

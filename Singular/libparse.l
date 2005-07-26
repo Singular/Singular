@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.l,v 1.57 2005-05-23 08:45:53 Singular Exp $ */
+/* $Id: libparse.l,v 1.58 2005-07-26 17:06:58 Singular Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -76,28 +76,6 @@ char *yylp_errlist[]= {
    NULL
 };
 int yylp_errno = 0;
-
-#ifdef __MWERKS__
-#ifdef __cplusplus
-extern "C" {
-#endif
-long   ftell(FILE *fp);
-#ifdef macintosh
-int    fileno(FILE *stream);
-FILE   *fdopen(int filedes, char *type);
-int    isatty(int filedes);
-#else
-int    _fileno(FILE *stream);
-FILE   *_fdopen(int filedes, char *type);
-int    _isatty(int filedes);
-#define fileno  _fileno
-#define fdopen  _fdopen
-#define isatty  _isatty
-#endif /* macintosh */
-#ifdef __cplusplus
-}
-#endif
-#endif
 
 #ifdef STANDALONE_PARSER
 procinfov pi;

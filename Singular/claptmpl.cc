@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: claptmpl.cc,v 1.27 2005-06-13 16:24:43 Singular Exp $
+// $Id: claptmpl.cc,v 1.28 2005-07-26 17:06:54 Singular Exp $
 /*
 * ABSTRACT - instantiation of all templates
 */
@@ -25,14 +25,6 @@
     #include <templates/ftmpl_factor.cc>
     #include <templates/ftmpl_functions.h>
     #include <templates/ftmpl_matrix.cc>
-    #ifdef __MWERKS__
-      template List<CanonicalForm> Difference<CanonicalForm>(const List<CanonicalForm>&,const List<CanonicalForm>&);
-      template List<CanonicalForm> Union<CanonicalForm>(const List<CanonicalForm>&,const List<CanonicalForm>&);
-      template List<CFFactor> Union<CFFactor>(const List<CFFactor>&,const List<CFFactor>&);
-      template List<Variable> Union<Variable> ( const List<Variable>&, const List<Variable>& );
-      template List<Variable> Difference<Variable> ( const List<Variable>&, const List<Variable>& );
-      template int operator==<CanonicalForm> ( const Factor<CanonicalForm>&, const Factor<CanonicalForm>& );
-    #endif
 
     template class Factor<CanonicalForm>;
     template class List<CFFactor>;
@@ -57,20 +49,18 @@
     template ostream & operator<<(ostream &, const Matrix<Variable> &);
     #endif
 
-    #ifndef __MWERKS__
-      template List<CFFactor> Union ( const List<CFFactor>&, const List<CFFactor>& );
-      template int operator == ( const Factor<CanonicalForm>&, const Factor<CanonicalForm>& );
+    template List<CFFactor> Union ( const List<CFFactor>&, const List<CFFactor>& );
+    template int operator == ( const Factor<CanonicalForm>&, const Factor<CanonicalForm>& );
 
-      template CanonicalForm tmax ( const CanonicalForm&, const CanonicalForm& );
-      template CanonicalForm tmin ( const CanonicalForm&, const CanonicalForm& );
+    template CanonicalForm tmax ( const CanonicalForm&, const CanonicalForm& );
+    template CanonicalForm tmin ( const CanonicalForm&, const CanonicalForm& );
 
-      template Variable tmax ( const Variable&, const Variable& );
-      template Variable tmin ( const Variable&, const Variable& );
+    template Variable tmax ( const Variable&, const Variable& );
+    template Variable tmin ( const Variable&, const Variable& );
 
-      template int tmax ( const int&, const int& );
-      template int tmin ( const int&, const int& );
-      template int tabs ( const int& );
-    #endif
+    template int tmax ( const int&, const int& );
+    template int tmin ( const int&, const int& );
+    template int tabs ( const int& );
 
   #endif
 // place here your own template stuff, not instantiated by factory
@@ -157,13 +147,11 @@ int operator== ( const Substitution<T> &f1, const Substitution<T> &f2 )
     template class List<Variable>;
     template class ListIterator<Variable> ;
 
-    #ifndef __MWERKS__
-      template List<Variable> Union ( const List<Variable>&, const List<Variable>& );
-      template List<Variable> Difference ( const List<Variable>&, const List<Variable>& );
+    template List<Variable> Union ( const List<Variable>&, const List<Variable>& );
+    template List<Variable> Difference ( const List<Variable>&, const List<Variable>& );
 
-      template List<CanonicalForm> Union ( const List<CanonicalForm>&, const List<CanonicalForm>& );
-      template List<CanonicalForm> Difference ( const List<CanonicalForm>&, const List<CanonicalForm>& );
-    #endif
+    template List<CanonicalForm> Union ( const List<CanonicalForm>&, const List<CanonicalForm>& );
+    template List<CanonicalForm> Difference ( const List<CanonicalForm>&, const List<CanonicalForm>& );
 
 // for charsets:
     template class ListIterator<CFList>;

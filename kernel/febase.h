@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.2 2005-05-04 07:50:49 Singular Exp $ */
+/* $Id: febase.h,v 1.3 2005-07-26 17:04:15 Singular Exp $ */
 /*
 * ABSTRACT: basic i/o
 */
@@ -210,7 +210,6 @@ void feStringAppendBrowsers(int warn = -1);
 FILE *  feFopen(char *path, char *mode, char *where=NULL, int useWerror=FALSE,
                 int path_only=FALSE);
 
-#ifndef __MWERKS__
 #ifdef HAVE_TCL
 
 inline void PrintTCL(const char c, int l,const char *s)
@@ -223,7 +222,6 @@ inline void PrintTCL(const char c, int l,const char *s)
 #else
 #define PrintTCL(A,B,C) Print("TCL-Err:%s",C)
 #endif /* HAVE_TCL */
-#endif /* __MWERKS__ */
 
 char *  StringAppend(char *fmt, ...);
 char *  StringAppendS(char *s);

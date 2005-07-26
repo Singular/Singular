@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.370 2005-07-25 13:01:28 bricken Exp $ */
+/* $Id: iparith.cc,v 1.371 2005-07-26 17:06:56 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -6032,7 +6032,6 @@ static BOOLEAN jjTEST(leftv res, leftv v)
   return FALSE;
 }
 
-#ifndef __MWERKS__
 #if defined(__alpha) && !defined(linux)
 extern "C"
 {
@@ -6071,7 +6070,6 @@ static BOOLEAN jjSTATUS_M(leftv res, leftv v)
 #endif
   return FALSE;
 }
-#endif
 static BOOLEAN jjSUBST_M(leftv res, leftv u)
 {
   leftv v = u->next; // number of args > 0
@@ -6145,9 +6143,7 @@ struct sValCmdM dArithM[]=
 ,{iiWRITE,     WRITE_CMD,       NONE,               -2       ALLOW_PLURAL}
 ,{jjCALL2ARG,  STATUS_CMD,      STRING_CMD,          2       ALLOW_PLURAL}
 ,{jjCALL3ARG,  STATUS_CMD,      INT_CMD,             3       ALLOW_PLURAL}
-#ifndef __MWERKS__
 ,{jjSTATUS_M,  STATUS_CMD,      INT_CMD,             4       ALLOW_PLURAL}
-#endif
 ,{loSimplex,   SIMPLEX_CMD,     LIST_CMD,            6       NO_PLURAL}
 ,{nuUResSolve, URSOLVE_CMD,     LIST_CMD,            4       NO_PLURAL}
 ,{NULL,        0,               0,                   0       NO_PLURAL}

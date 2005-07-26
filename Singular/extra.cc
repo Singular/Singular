@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.227 2005-06-28 14:41:37 Singular Exp $ */
+/* $Id: extra.cc,v 1.228 2005-07-26 17:06:54 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -15,7 +15,6 @@
 #include <signal.h>
 #include "mod2.h"
 
-#ifndef __MWERKS__
 #ifdef TIME_WITH_SYS_TIME
 # include <time.h>
 # ifdef HAVE_SYS_TIME_H
@@ -32,7 +31,6 @@
 #include <sys/times.h>
 #endif
 
-#endif
 #include <unistd.h>
 
 #include "tok.h"
@@ -215,15 +213,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     if(strcmp(sys_cmd,"sh")==0)
     {
       res->rtyp=INT_CMD;
-      #ifndef __MWERKS__
       if (h==NULL) res->data = (void *)system("sh");
       else if (h->Typ()==STRING_CMD)
         res->data = (void*) system((char*)(h->Data()));
       else
         WerrorS("string expected");
-      #else
-      res->data=(void *)0;
-      #endif
       return FALSE;
     }
     else
@@ -307,11 +301,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     {
       res->rtyp=INT_CMD;
     #ifndef MSDOS
-    #ifndef __MWERKS__
       res->data=(void *)getpid();
-    #else
-      res->data=(void *)1;
-    #endif
     #else
       res->data=(void *)1;
     #endif
@@ -2089,7 +2079,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     else
 #endif
 /*==================== alarm ==================================*/
-#ifndef __MWERKS__
 #ifndef MSDOS
 #ifndef atarist
 #ifdef unix
@@ -2110,7 +2099,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         WerrorS("int expected");
     }
     else
-#endif
 #endif
 #endif
 #endif

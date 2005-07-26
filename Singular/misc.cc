@@ -557,11 +557,7 @@ char * versionString()
               StringAppendS("KDEBUG,");
 #endif
 #ifndef __OPTIMIZE__
-#ifdef __MWERKS__
-              StringAppendS(" Codewarrior 2.0,");
-#else
               StringAppendS("-g,");
-#endif
 #endif
 #ifdef HAVE_EIGENVAL
               StringAppendS("eigenvalues,");

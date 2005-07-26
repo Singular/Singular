@@ -4,7 +4,7 @@
 
 //**************************************************************************/
 //
-// $Id: ndbm.cc,v 1.14 2000-11-22 16:38:54 Singular Exp $
+// $Id: ndbm.cc,v 1.15 2005-07-26 17:06:58 Singular Exp $
 //
 //**************************************************************************/
 // 'ndbm.cc' containes all low-level functions to manipulate dbm-files
@@ -38,17 +38,6 @@ static char sccsid[] = "@(#)ndbm.c        5.3 (Berkeley) 3/9/86";
 #   define ENOMEM 23
 #   define ENOSPC 28
 #   define L_SET SEEK_SET
-#ifdef macintosh
-#   include <stdlib.h>
-#   include <errno.h>
-#   include "fcntl.h"
-#   include <string.h>
-#   include <stat.h>
-//#   include <stat.h>
-#else
-#   include <unix.h>
-#   include <ThreadLocalData.h>
-#endif
 #else
 #   include <sys/types.h>
 #   include <sys/stat.h>
@@ -76,11 +65,7 @@ static  long hashinc(register DBM *db, long hash);
 static  long dcalchash(datum item);
 static  int delitem(char buf[PBLKSIZ], int n);
 static  int additem(char buf[PBLKSIZ], datum item, datum item1);
-#if defined(__MWERKS__) && ! defined(macintosh)
-#define errno (_GetThreadLocalData()->errno)
-#else
 extern  int errno;
-#endif
 
 DBM *
 dbm_open(char *file, int flags, int mode)
@@ -107,20 +92,12 @@ dbm_open(char *file, int flags, int mode)
     flags = (flags & ~03) | O_RDWR;
   strcpy(db->dbm_pagbuf, file);
   strcat(db->dbm_pagbuf, ".pag");
-#ifdef __MWERKS__
-  db->dbm_pagf = open(db->dbm_pagbuf, flags);
-#else /* not __MWERKS__ */
   db->dbm_pagf = open(db->dbm_pagbuf, flags, mode);
-#endif /* __MWERKS__ */
   if (db->dbm_pagf < 0)
     goto bad;
   strcpy(db->dbm_pagbuf, file);
   strcat(db->dbm_pagbuf, ".dir");
-#ifdef __MWERKS__
-  db->dbm_dirf = open(db->dbm_pagbuf, flags);
-#else /* not __MWERKS__ */
   db->dbm_dirf = open(db->dbm_pagbuf, flags, mode);
-#endif /* __MWERKS__ */
   if (db->dbm_dirf < 0)
     goto bad1;
   fstat(db->dbm_dirf, &statb);

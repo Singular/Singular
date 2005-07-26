@@ -4,10 +4,6 @@
 #include <ctype.h>
 #include "fegetopt.h"
 #include "utils.h"
-#ifdef __MWERKS__
-#define __GNU_LIBRARY__
-#include "fegetopt.h"
-#endif
 
 extern FILE *yylpin;
 extern char *optarg;

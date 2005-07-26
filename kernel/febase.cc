@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.4 2005-01-13 15:22:23 Singular Exp $ */
+/* $Id: febase.cc,v 1.5 2005-07-26 17:04:15 Singular Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -16,9 +16,7 @@
 #include <stdarg.h>
 #include <sys/stat.h>
 #include <ctype.h>
-#ifndef __MWERKS__
 #include <unistd.h>
-#endif
 #ifdef NeXT
 #include <sys/file.h>
 #endif
@@ -694,20 +692,6 @@ int feReadLine(char* b, int l)
   }
 }
 
-#ifdef __MWERKS__
-#ifdef __cplusplus
-extern "C" {
-#endif
-#ifdef macintosh
-int    isatty(int filedes);
-#else
-int    _isatty(int filedes);
-#define isatty  _isatty
-#endif /* macintosh */
-#ifdef __cplusplus
-}
-#endif
-#endif
 /*2
 * init all data structures
 */
@@ -924,7 +908,6 @@ char * StringSetS(char *st)
   return feBuffer;
 }
 
-#ifndef __MWERKS__
 #ifdef HAVE_TCL
 extern "C" {
 void PrintTCLS(const char c, const char *s)
@@ -933,7 +916,6 @@ void PrintTCLS(const char c, const char *s)
   if (l>0) PrintTCL(c,l,s);
 }
 }
-#endif
 #endif
 
 extern "C" {

@@ -5,7 +5,7 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id: mod2.h.in,v 1.110 2005-04-28 12:25:32 hannes Exp $
+ *  Version: $Id: mod2.h.in,v 1.111 2005-07-26 17:06:58 Singular Exp $
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H
@@ -161,10 +161,6 @@
 
 /* Undefine to disable Gerhard's and Wilfried's fast and dirty std computations */
 #define FAST_AND_DIRTY
-#ifdef __MWERKS__
-/* includes for Metrowerks */
-#include "mod2.mwerks.h"
-#endif
 
 /* eigenvalues */
 #ifndef HAVE_DYNAMIC_LOADING

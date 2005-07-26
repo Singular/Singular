@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: timer.cc,v 1.1.1.1 2003-10-06 12:16:04 Singular Exp $ */
+/* $Id: timer.cc,v 1.2 2005-07-26 17:04:15 Singular Exp $ */
 
 /*
 *  ABSTRACT - get the computing time
@@ -10,9 +10,6 @@
 #include "mod2.h"
 
 //the mpw timer is quite the same as the dos timer:
-#ifdef __MWERKS__
-#define MSDOS
-#endif
 
 int        timerv = 0;
 static double timer_resolution = TIMER_RESOLUTION;
