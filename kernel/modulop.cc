@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.cc,v 1.4 2005-07-05 17:10:41 Singular Exp $ */
+/* $Id: modulop.cc,v 1.5 2005-07-27 15:48:29 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
@@ -35,7 +35,7 @@ CARDINAL *npLogTable=NULL;
 
 BOOLEAN npGreaterZero (number k)
 {
-  int h = (int) k;
+  int h = (int)((long) k);
   return ((int)h !=0) && (h <= (npPrimeM>>1));
 }
 
@@ -72,7 +72,7 @@ number npInit (int i)
 int npInt(number &n)
 {
   if ((long)n > (npPrimeM >>1)) return (int)((long)n -npPrimeM);
-  else                          return (int)n;
+  else                          return (int)((long)n);
 }
 
 number npAdd (number a, number b)
@@ -234,7 +234,7 @@ BOOLEAN npEqual (number a,number b)
 void npWrite (number &a)
 {
   if ((long)a > (npPrimeM >>1)) StringAppend("-%d",(int)(npPrimeM-((long)a)));
-  else                          StringAppend("%d",(int)a);
+  else                          StringAppend("%d",(int)((long)a));
 }
 
 void npPower (number a, int i, number * result)
@@ -434,7 +434,8 @@ static number npMapLongR(number from)
   number res;
   lint *dest,*ndest;
   int size,i;
-  int e,al,bl,iz,in;
+  int e,al,bl,in;
+  long iz;
   mp_ptr qp,dd,nn;
 
   size = (*f)[0]._mp_size;
@@ -493,7 +494,7 @@ static number npMapLongR(number from)
   mpz_clear(dest);
   omFreeBin((ADDRESS)res, rnumber_bin);
   if(res->s==0)
-    iz=(int)npDiv((number)iz,(number)in);
+    iz=(long)npDiv((number)iz,(number)in);
   return (number)iz;
 }
 

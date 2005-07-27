@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ffields.cc,v 1.2 2005-07-27 09:46:20 Singular Exp $ */
+/* $Id: ffields.cc,v 1.3 2005-07-27 15:48:28 Singular Exp $ */
 /*
 * ABSTRACT: finite fields with a none-prime number of elements (via tables)
 */
@@ -122,9 +122,9 @@ short fftable[]={
 */
 BOOLEAN nfDBTest (number a, char *f, int l)
 {
-  if (((int)a<0) || ((int)a>nfCharQ))
+  if (((long)a<0L) || ((long)a>(long)nfCharQ))
   {
-    Print("wrong %d in %s:%d\n",(int)a,f,l);
+    Print("wrong %d in %s:%d\n",(int)((long)a),f,l);
     return FALSE;
   }
   int i=0;
@@ -162,10 +162,10 @@ number nfMult (number a,number b)
   nfTest(a);
   nfTest(b);
 #endif
-  if (((int)a == nfCharQ) || ((int)b == nfCharQ))
+  if (((long)a == (long)nfCharQ) || ((long)b == (long)nfCharQ))
     return (number)nfCharQ;
   /*else*/
-  int i=(int)a+(int)b;
+  int i=(int)((long)a+(long)b);
   if (i>=nfCharQ1) i-=nfCharQ1;
 #ifdef LDEBUG
   nfTest((number)i);
@@ -212,8 +212,8 @@ int nfParDeg(number n)
 #ifdef LDEBUG
   nfTest(n);
 #endif
-  if(nfCharQ == (int)n) return -1;
-  return (int)n;
+  if((long)nfCharQ == (long)n) return -1;
+  return (int)((long)n);
 }
 
 /*2
@@ -235,27 +235,27 @@ number nfAdd (number a, number b)
   nfTest(a);
   nfTest(b);
 #endif
-  if (nfCharQ == (int)a) return b;
-  if (nfCharQ == (int)b) return a;
-  int zb,zab,r;
-  if ((int)a >= (int)b)
+  if ((long)nfCharQ == (long)a) return b;
+  if ((long)nfCharQ == (long)b) return a;
+  long zb,zab,r;
+  if ((long)a >= (long)b)
   {
-    zb = (int)b;
-    zab = (int)a-(int)b;
+    zb = (long)b;
+    zab = (long)a-(long)b;
   }
   else
   {
-    zb = (int)a;
-    zab = (int)b-(int)a;
+    zb = (long)a;
+    zab = (long)b-(long)a;
   }
 #ifdef LDEBUG
   nfTest((number)zab);
 #endif
-  if (nfPlus1Table[zab]==nfCharQ) r=nfCharQ; /*if z^(a-b)+1 =0*/
+  if (nfPlus1Table[zab]==nfCharQ) r=(long)nfCharQ; /*if z^(a-b)+1 =0*/
   else
   {
-    r= zb+nfPlus1Table[zab];
-    if(r>=nfCharQ1) r-=nfCharQ1;
+    r= zb+(long)nfPlus1Table[zab];
+    if(r>=(long)nfCharQ1) r-=(long)nfCharQ1;
   }
 #ifdef LDEBUG
   nfTest((number)r);
@@ -280,7 +280,7 @@ BOOLEAN nfIsZero (number  a)
 #ifdef LDEBUG
   nfTest(a);
 #endif
-  return nfCharQ == (int)a;
+  return (long)nfCharQ == (long)a;
 }
 
 /*2
@@ -291,7 +291,7 @@ BOOLEAN nfIsOne (number a)
 #ifdef LDEBUG
   nfTest(a);
 #endif
-  return 0 == (int)a;
+  return 0L == (long)a;
 }
 
 /*2
@@ -302,8 +302,8 @@ BOOLEAN nfIsMOne (number a)
 #ifdef LDEBUG
   nfTest(a);
 #endif
-  if (0 == (int)a) return FALSE; /* special handling of char 2*/
-  return nfM1 == (int)a;
+  if (0L == (long)a) return FALSE; /* special handling of char 2*/
+  return (long)nfM1 == (long)a;
 }
 
 /*2
@@ -314,20 +314,20 @@ number nfDiv (number a,number b)
 #ifdef LDEBUG
   nfTest(b);
 #endif
-  if ((int)b==nfCharQ)
+  if ((long)b==(long)nfCharQ)
   {
     WerrorS("div. by 0");
-    return (number)nfCharQ;
+    return (number)((long)nfCharQ);
   }
 #ifdef LDEBUG
   nfTest(a);
 #endif
-  if ((int)a==nfCharQ)
-    return (number)nfCharQ;
+  if ((long)a==(long)nfCharQ)
+    return (number)((long)nfCharQ);
   /*else*/
-  int s = (int)a - (int)b;
-  if (s < 0)
-    s += nfCharQ1;
+  long s = (long)a - (long)b;
+  if (s < 0L)
+    s += (long)nfCharQ1;
 #ifdef LDEBUG
   nfTest((number)s);
 #endif
@@ -342,15 +342,15 @@ number  nfInvers (number c)
 #ifdef LDEBUG
   nfTest(c);
 #endif
-  if ((int)c==nfCharQ)
+  if ((long)c==(long)nfCharQ)
   {
     WerrorS("div. 1/0");
-    return (number)nfCharQ;
+    return (number)((long)nfCharQ);
   }
 #ifdef LDEBUG
-  nfTest(((number)(nfCharQ1-(int)c)));
+  nfTest(((number)((long)nfCharQ1-(long)c)));
 #endif
-  return (number)(nfCharQ1-(int)c);
+  return (number)((long)nfCharQ1-(long)c);
 }
 
 /*2
@@ -362,9 +362,9 @@ number nfNeg (number c)
 #ifdef LDEBUG
   nfTest(c);
 #endif
-  if (nfCharQ == (int)c) return c;
-  int i=(int)c+nfM1;
-  if (i>=nfCharQ1) i-=nfCharQ1;
+  if ((long)nfCharQ == (long)c) return c;
+  long i=(long)c+(long)nfM1;
+  if (i>=(long)nfCharQ1) i-=(long)nfCharQ1;
 #ifdef LDEBUG
   nfTest((number)i);
 #endif
@@ -380,7 +380,7 @@ BOOLEAN nfGreater (number a,number b)
   nfTest(a);
   nfTest(b);
 #endif
-  return (int)a != (int)b;
+  return (long)a != (long)b;
 }
 
 /*2
@@ -392,7 +392,7 @@ BOOLEAN nfEqual (number a,number b)
   nfTest(a);
   nfTest(b);
 #endif
-  return (int)a == (int)b;
+  return (long)a == (long)b;
 }
 
 /*2
@@ -403,16 +403,16 @@ void nfWrite (number &a)
 #ifdef LDEBUG
   nfTest(a);
 #endif
-  if ((int)a==nfCharQ)  StringAppendS("0");
-  else if ((int)a==0)   StringAppendS("1");
+  if ((long)a==(long)nfCharQ)  StringAppendS("0");
+  else if ((long)a==0L)   StringAppendS("1");
   else if (nfIsMOne(a))   StringAppendS("-1");
   else
   {
     StringAppendS(nfParameter);
-    if ((int)a!=1)
+    if ((long)a!=1L)
     {
       if(currRing->ShortOut==0)  StringAppendS("^");
-      StringAppend("%d",(int)a);
+      StringAppend("%d",(int)((long)a));
     }
   }
 }
@@ -426,15 +426,15 @@ char * nfName(number a)
   nfTest(a);
 #endif
   char *s;
-  if (((int)a==nfCharQ) || ((int)a==0)) return NULL;
-  else if ((int)a==1)
+  if (((long)a==(long)nfCharQ) || ((long)a==0L)) return NULL;
+  else if ((long)a==1L)
   {
     return omStrDup(nfParameter);
   }
   else
   {
     s=(char *)omAlloc(4+strlen(nfParameter));
-    sprintf(s,"%s%d",nfParameter,(int)a);
+    sprintf(s,"%s%d",nfParameter,(int)((long)a));
   }
   return s;
 }
@@ -449,7 +449,7 @@ void nfPower (number a, int i, number * result)
   if (i==0)
   {
     //*result=nfInit(1);
-    *result = (number)0;
+    *result = (number)0L;
   }
   else if (i==1)
   {
@@ -687,7 +687,7 @@ err:
 */
 number nfMapP(number c)
 {
-  return nfInit((int)c);
+  return nfInit((int)((long)c));
 }
 
 /*2

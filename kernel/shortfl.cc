@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: shortfl.cc,v 1.1.1.1 2003-10-06 12:16:03 Singular Exp $ */
+/* $Id: shortfl.cc,v 1.2 2005-07-27 15:48:29 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -406,7 +406,7 @@ static number nrMapQ(number from)
 
 static number nrMapP(number from)
 {
-  int i = (int)from;
+  int i = (int)((long)from);
   float r = (float)i;
   return nf(r).N();
 }

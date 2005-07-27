@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.371 2005-07-26 17:06:56 Singular Exp $ */
+/* $Id: iparith.cc,v 1.372 2005-07-27 15:47:55 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -404,7 +404,7 @@ cmdnames cmds[] =
 static BOOLEAN jjOP_IV_I(leftv res, leftv u, leftv v)
 {
   intvec* aa= (intvec *)u->CopyD(INTVEC_CMD);
-  int bb = (int)(v->Data());
+  int bb = (int)(long)(v->Data());
   if (errorreported) return TRUE;
   switch (iiOp)
   {
@@ -426,7 +426,7 @@ static BOOLEAN jjOP_I_IV(leftv res, leftv u, leftv v)
 static BOOLEAN jjOP_IM_I(leftv res, leftv u, leftv v)
 {
   intvec* aa= (intvec *)u->CopyD(INTVEC_CMD);
-  int bb = (int)(v->Data());
+  int bb = (int)(long)(v->Data());
   int i=si_min(aa->rows(),aa->cols());
   switch (iiOp)
   {
@@ -444,7 +444,7 @@ static BOOLEAN jjOP_I_IM(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjDOTDOT(leftv res, leftv u, leftv v)
 {
-  res->data=(char *)new intvec((int)u->Data(),(int)v->Data());
+  res->data=(char *)new intvec((int)(long)u->Data(),(int)(long)v->Data());
   return FALSE;
 }
 static void jjEQUAL_REST(leftv res,leftv u,leftv v)
@@ -458,7 +458,7 @@ static void jjEQUAL_REST(leftv res,leftv u,leftv v)
       iiExprArith2(res,u->next,iiOp,v->next);
     iiOp=save_iiOp;
   }
-  if (iiOp==NOTEQUAL) res->data=(char *)(!(int)res->data);
+  if (iiOp==NOTEQUAL) res->data=(char *)(!(long)res->data);
 }
 static BOOLEAN jjCOMPARE_IV(leftv res, leftv u, leftv v)
 {
@@ -490,7 +490,7 @@ static BOOLEAN jjCOMPARE_IV(leftv res, leftv u, leftv v)
 static BOOLEAN jjCOMPARE_IV_I(leftv res, leftv u, leftv v)
 {
   intvec* a = (intvec * )(u->Data());
-  int     b = (int )     (v->Data());
+  int     b = (int)(long)(v->Data());
   int r=a->compare(b);
   switch  (iiOp)
   {
@@ -614,8 +614,8 @@ static BOOLEAN jjOP_REST(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjPOWER_I(leftv res, leftv u, leftv v)
 {
-  int b=(int)u->Data();
-  int e=(int)v->Data();
+  int b=(int)(long)u->Data();
+  int e=(int)(long)v->Data();
   int rc = 1;
   BOOLEAN overflow=FALSE;
   if (e >= 0)
@@ -651,7 +651,7 @@ static BOOLEAN jjPOWER_I(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjPOWER_N(leftv res, leftv u, leftv v)
 {
-  int e=(int)v->Data();
+  int e=(int)(long)v->Data();
   number n=(number)u->CopyD(NUMBER_CMD);
   if (e<0)
   {
@@ -667,13 +667,13 @@ static BOOLEAN jjPOWER_N(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjPOWER_P(leftv res, leftv u, leftv v)
 {
-  res->data = (char *)pPower((poly)u->CopyD(POLY_CMD),(int)v->Data());
+  res->data = (char *)pPower((poly)u->CopyD(POLY_CMD),(int)(long)v->Data());
   if (u!=NULL) return jjOP_REST(res,u,v);
   return FALSE;
 }
 static BOOLEAN jjPOWER_ID(leftv res, leftv u, leftv v)
 {
-  res->data = (char *)idPower((ideal)(u->Data()),(int)(v->Data()));
+  res->data = (char *)idPower((ideal)(u->Data()),(int)(long)(v->Data()));
   if (u!=NULL) return jjOP_REST(res,u,v);
   return FALSE;
 }
@@ -791,8 +791,8 @@ static BOOLEAN jjCOLCOL(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjPLUS_I(leftv res, leftv u, leftv v)
 {
-  unsigned int a=(unsigned int)u->Data();
-  unsigned int b=(unsigned int)v->Data();
+  unsigned int a=(unsigned int)(unsigned long)u->Data();
+  unsigned int b=(unsigned int)(unsigned long)v->Data();
   unsigned int c=a+b;
   res->data = (char *)c;
   if (((Sy_bit(31)&a)==(Sy_bit(31)&b))&&((Sy_bit(31)&a)!=(Sy_bit(31)&c)))
@@ -863,8 +863,8 @@ static BOOLEAN jjPLUS_ID(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjMINUS_I(leftv res, leftv u, leftv v)
 {
-  unsigned int a=(unsigned int)u->Data();
-  unsigned int b=(unsigned int)v->Data();
+  unsigned int a=(unsigned int)(unsigned long)u->Data();
+  unsigned int b=(unsigned int)(unsigned long)v->Data();
   unsigned int c=a-b;
   if (((Sy_bit(31)&a)!=(Sy_bit(31)&b))&&((Sy_bit(31)&a)!=(Sy_bit(31)&c)))
   {
@@ -905,8 +905,8 @@ static BOOLEAN jjMINUS_MA(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjTIMES_I(leftv res, leftv u, leftv v)
 {
-  int a=(int)u->Data();
-  int b=(int)v->Data();
+  int a=(int)(long)u->Data();
+  int b=(int)(long)v->Data();
   int c=a * b;
   if ((b!=0) && (c/b !=a))
     WarnS("int overflow(*), result may be wrong");
@@ -993,7 +993,7 @@ static BOOLEAN jjTIMES_MA_N2(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjTIMES_MA_I1(leftv res, leftv u, leftv v)
 {
-  res->data = (char *)mpMultI((matrix)u->CopyD(MATRIX_CMD),(int)v->Data());
+  res->data = (char *)mpMultI((matrix)u->CopyD(MATRIX_CMD),(int)(long)v->Data());
   return FALSE;
 }
 static BOOLEAN jjTIMES_MA_I2(leftv res, leftv u, leftv v)
@@ -1014,7 +1014,7 @@ static BOOLEAN jjTIMES_MA(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjGE_I(leftv res, leftv u, leftv v)
 {
-  res->data = (char *)((int)u->Data() >= (int)v->Data());
+  res->data = (char *)((long)u->Data() >= (long)v->Data());
   return FALSE;
 }
 static BOOLEAN jjGE_N(leftv res, leftv u, leftv v)
@@ -1026,7 +1026,7 @@ static BOOLEAN jjGE_N(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjGT_I(leftv res, leftv u, leftv v)
 {
-  res->data = (char *)((int)u->Data()>(int)v->Data());
+  res->data = (char *)((long)u->Data()>(long)v->Data());
   return FALSE;
 }
 static BOOLEAN jjGT_N(leftv res, leftv u, leftv v)
@@ -1038,7 +1038,7 @@ static BOOLEAN jjGT_N(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjLE_I(leftv res, leftv u, leftv v)
 {
-  res->data = (char *)((int)u->Data() <= (int)v->Data());
+  res->data = (char *)((long)u->Data() <= (long)v->Data());
   return FALSE;
 }
 static BOOLEAN jjLE_N(leftv res, leftv u, leftv v)
@@ -1050,7 +1050,7 @@ static BOOLEAN jjLE_N(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjLT_I(leftv res, leftv u, leftv v)
 {
-  res->data = (char *)((int)u->Data() < (int)v->Data());
+  res->data = (char *)((int)(long)u->Data() < (int)(long)v->Data());
   return FALSE;
 }
 static BOOLEAN jjLT_N(leftv res, leftv u, leftv v)
@@ -1062,8 +1062,8 @@ static BOOLEAN jjLT_N(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjDIVMOD_I(leftv res, leftv u, leftv v)
 {
-  int a= (int) u->Data();
-  int b= (int) v->Data();
+  int a= (int)(long)u->Data();
+  int b= (int)(long)v->Data();
   if (b==0)
   {
     WerrorS(ii_div_by_0);
@@ -1201,7 +1201,7 @@ static BOOLEAN jjDIV_Ma(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjEQUAL_I(leftv res, leftv u, leftv v)
 {
-  res->data = (char *)((int)u->Data() == (int)v->Data());
+  res->data = (char *)((int)(long)u->Data() == (int)(long)v->Data());
   jjEQUAL_REST(res,u,v);
   return FALSE;
 }
@@ -1246,12 +1246,12 @@ static BOOLEAN jjEQUAL_P(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjAND_I(leftv res, leftv u, leftv v)
 {
-  res->data = (char *)((int)u->Data() && (int)v->Data());
+  res->data = (char *)((long)u->Data() && (long)v->Data());
   return FALSE;
 }
 static BOOLEAN jjOR_I(leftv res, leftv u, leftv v)
 {
-  res->data = (char *)((int)u->Data() || (int)v->Data());
+  res->data = (char *)((long)u->Data() || (long)v->Data());
   return FALSE;
 }
 static BOOLEAN jjINDEX_I(leftv res, leftv u, leftv v)
@@ -1309,7 +1309,7 @@ static BOOLEAN jjINDEX_IV(leftv res, leftv u, leftv v)
 static BOOLEAN jjINDEX_P(leftv res, leftv u, leftv v)
 {
   poly p=(poly)u->Data();
-  int i=(int)v->Data();
+  int i=(int)(long)v->Data();
   int j=0;
   while (p!=NULL)
   {
@@ -1357,7 +1357,7 @@ static BOOLEAN jjINDEX_V(leftv res, leftv u, leftv v)
   poly p=(poly)u->CopyD(VECTOR_CMD);
   poly r=p; // pointer to the beginning of component i
   poly o=NULL;
-  int i=(int)v->Data();
+  int i=(int)(long)v->Data();
   while (p!=NULL)
   {
     if (pGetComp(p)!=i)
@@ -1420,7 +1420,7 @@ static BOOLEAN jjKLAMMER(leftv res, leftv u, leftv v)
 {
   if(u->name==NULL) return TRUE;
   char * nn = (char *)omAlloc(strlen(u->name) + 14);
-  sprintf(nn,"%s(%d)",u->name,(int)v->Data());
+  sprintf(nn,"%s(%d)",u->name,(int)(long)v->Data());
   omFree((ADDRESS)u->name);
   u->name=NULL;
   char *n=omStrDup(nn);
@@ -1672,7 +1672,7 @@ static BOOLEAN jjERROR(leftv res, leftv u)
 }
 static BOOLEAN jjEXTGCD_I(leftv res, leftv u, leftv v)
 {
-  int uu=(int)u->Data();int vv=(int)v->Data();
+  int uu=(int)(long)u->Data();int vv=(int)(long)v->Data();
   int p0=ABS(uu),p1=ABS(vv);
   int f0 = 1, f1 = 0, g0 = 0, g1 = 1, q, r;
 
@@ -1688,8 +1688,8 @@ static BOOLEAN jjEXTGCD_I(leftv res, leftv u, leftv v)
   }
   int a = f0;
   int b = g0;
-  if ( uu /*(int)u->Data()*/ < 0 ) a=-a;
-  if ( vv /*(int)v->Data()*/ < 0 ) b=-b;
+  if ( uu /*(int)(long)u->Data()*/ < 0 ) a=-a;
+  if ( vv /*(int)(long)v->Data()*/ < 0 ) b=-b;
   lists L=(lists)omAllocBin(slists_bin);
   L->Init(3);
   L->m[0].rtyp=INT_CMD;   L->m[0].data=(void *)p0;
@@ -1862,7 +1862,7 @@ static BOOLEAN jjFWALK(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjGCD_I(leftv res, leftv u, leftv v)
 {
-  int uu=(int)u->Data();int vv=(int)v->Data();
+  int uu=(int)(long)u->Data();int vv=(int)(long)v->Data();
   int p0=ABS(uu),p1=ABS(vv);
   int r;
 
@@ -1904,7 +1904,7 @@ static BOOLEAN jjHILBERT2(leftv res, leftv u, leftv v)
   assumeStdFlag(u);
   intvec *module_w=(intvec*)atGet(u,"isHomog",INTVEC_CMD);
   intvec *iv=hFirstSeries((ideal)u->Data(),module_w,currQuotient);
-  switch((int)v->Data())
+  switch((int)(long)v->Data())
   {
     case 1:
       res->data=(void *)iv;
@@ -1943,7 +1943,7 @@ static BOOLEAN jjHOMOG_ID(leftv res, leftv u, leftv v)
 static BOOLEAN jjINDEPSET2(leftv res, leftv u, leftv v)
 {
   assumeStdFlag(u);
-  res->data=(void *)scIndIndset((ideal)(u->Data()),(int)(v->Data()),
+  res->data=(void *)scIndIndset((ideal)(u->Data()),(int)(long)(v->Data()),
                     currQuotient);
   return FALSE;
 }
@@ -1955,22 +1955,22 @@ static BOOLEAN jjINTERSECT(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjJanetBasis2(leftv res, leftv u, leftv v)
 {
-  return jjStdJanetBasis(res,u,(int)v->Data());
+  return jjStdJanetBasis(res,u,(int)(long)v->Data());
 }
 static BOOLEAN jjJET_P(leftv res, leftv u, leftv v)
 {
-  res->data = (char *)pJet((poly)u->CopyD(), (int)v->Data());
+  res->data = (char *)pJet((poly)u->CopyD(), (int)(long)v->Data());
   return FALSE;
 }
 static BOOLEAN jjJET_ID(leftv res, leftv u, leftv v)
 {
-  res->data = (char *)idJet((ideal)u->Data(),(int)v->Data());
+  res->data = (char *)idJet((ideal)u->Data(),(int)(long)v->Data());
   return FALSE;
 }
 static BOOLEAN jjKBASE2(leftv res, leftv u, leftv v)
 {
   assumeStdFlag(u);
-  res->data = (char *)scKBase((int)v->Data(),
+  res->data = (char *)scKBase((int)(long)v->Data(),
                               (ideal)(u->Data()),currQuotient);
   return FALSE;
 }
@@ -2009,7 +2009,7 @@ static BOOLEAN jjLIFTSTD(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjMINOR(leftv res, leftv u, leftv v)
 {
-  res->data = (char *)idMinors((matrix)u->Data(),(int)v->Data());
+  res->data = (char *)idMinors((matrix)u->Data(),(int)(long)v->Data());
   return (res->data==NULL);
 }
 static BOOLEAN jjMODULO(leftv res, leftv u, leftv v)
@@ -2087,7 +2087,7 @@ static BOOLEAN jjMONITOR2(leftv res, leftv u,leftv v)
 static BOOLEAN jjPARSTR2(leftv res, leftv u, leftv v)
 {
   idhdl h=(idhdl)u->data;
-  int i=(int)v->Data();
+  int i=(int)(long)v->Data();
   int p=0;
   if ((0<i)
   && (IDRING(h)->parameter!=NULL)
@@ -2216,8 +2216,8 @@ static BOOLEAN jjQUOT(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjRANDOM(leftv res, leftv u, leftv v)
 {
-  int i=(int)u->Data();
-  int j=(int)v->Data();
+  int i=(int)(long)u->Data();
+  int j=(int)(long)v->Data();
 #ifdef buildin_rand
   res->data =(char *)((i > j) ? i : (siRand() % (j-i+1)) + i);
 #else
@@ -2260,7 +2260,7 @@ static BOOLEAN jjREDUCE_ID(leftv res, leftv u, leftv v)
 #if 0
 static BOOLEAN jjRES(leftv res, leftv u, leftv v)
 {
-  int maxl=(int)v->Data();
+  int maxl=(int)(long)v->Data();
   if (maxl<0)
   {
     WerrorS("length for res must not be negative");
@@ -2378,7 +2378,7 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
 #else
 static BOOLEAN jjRES(leftv res, leftv u, leftv v)
 {
-  int maxl=(int)v->Data();
+  int maxl=(int)(long)v->Data();
   if (maxl<0)
   {
     WerrorS("length for res must not be negative");
@@ -2499,7 +2499,7 @@ static BOOLEAN jjRSUM(leftv res, leftv u, leftv v)
 #define SIMPL_NORM 1
 static BOOLEAN jjSIMPL_ID(leftv res, leftv u, leftv v)
 {
-  int sw = (int)v->Data();
+  int sw = (int)(long)v->Data();
   // CopyD for IDEAL_CMD and MODUL_CMD are identical:
   ideal id = (ideal)u->CopyD(IDEAL_CMD);
   if (sw & SIMPL_LMDIV)
@@ -2534,7 +2534,7 @@ extern int singclap_factorize_retry;
 static BOOLEAN jjSQR_FREE_DEC(leftv res, leftv u,leftv dummy)
 {
   intvec *v=NULL;
-  int sw=(int)dummy->Data();
+  int sw=(int)(long)dummy->Data();
   int fac_sw=sw;
   if ((sw<0)||(sw>2)) fac_sw=1;
   singclap_factorize_retry=0;
@@ -2586,7 +2586,7 @@ static BOOLEAN jjSTATUS2(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjSIMPL_P(leftv res, leftv u, leftv v)
 {
-  int sw = (int)v->Data();
+  int sw = (int)(long)v->Data();
   // CopyD for POLY_CMD and VECTOR_CMD are identical:
   poly p = (poly)u->CopyD(POLY_CMD);
   if (sw & SIMPL_NORM)
@@ -2644,7 +2644,7 @@ static BOOLEAN jjSTD_1(leftv res, leftv u, leftv v)
 static BOOLEAN jjVARSTR2(leftv res, leftv u, leftv v)
 {
   idhdl h=(idhdl)u->data;
-  int i=(int)v->Data();
+  int i=(int)(long)v->Data();
   if ((0<i) && (i<=IDRING(h)->N))
     res->data=omStrDup(IDRING(h)->names[i-1]);
   else
@@ -2656,7 +2656,7 @@ static BOOLEAN jjVARSTR2(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjWEDGE(leftv res, leftv u, leftv v)
 {
-  res->data = (char *)mpWedge((matrix)u->Data(),(int)v->Data());
+  res->data = (char *)mpWedge((matrix)u->Data(),(int)(long)v->Data());
   return FALSE;
 }
 #define jjWRONG2 (proc2)jjWRONG
@@ -3004,12 +3004,12 @@ static BOOLEAN jjNULL(leftv res, leftv u)
 }
 //static BOOLEAN jjPLUSPLUS(leftv res, leftv u)
 //{
-//  res->data = (char *)((int)u->Data()+1);
+//  res->data = (char *)((int)(long)u->Data()+1);
 //  return FALSE;
 //}
 //static BOOLEAN jjMINUSMINUS(leftv res, leftv u)
 //{
-//  res->data = (char *)((int)u->Data()-1);
+//  res->data = (char *)((int)(long)u->Data()-1);
 //  return FALSE;
 //}
 static BOOLEAN jjPLUSPLUS(leftv res, leftv u)
@@ -3024,7 +3024,7 @@ static BOOLEAN jjPLUSPLUS(leftv res, leftv u)
 }
 static BOOLEAN jjUMINUS_I(leftv res, leftv u)
 {
-  res->data = (char *)(-(int)u->Data());
+  res->data = (char *)(-(int)(long)u->Data());
   return FALSE;
 }
 static BOOLEAN jjUMINUS_N(leftv res, leftv u)
@@ -3245,7 +3245,7 @@ static BOOLEAN jjDUMP(leftv res, leftv v)
 static BOOLEAN jjE(leftv res, leftv v)
 {
   res->data = (char *)pOne();
-  pSetComp((poly)res->data,(int)v->Data());
+  pSetComp((poly)res->data,(int)(long)v->Data());
   pSetm((poly)res->data);
   return FALSE;
 }
@@ -3565,7 +3565,7 @@ static BOOLEAN jjLISTRING(leftv res, leftv v)
 static BOOLEAN jjMEMORY(leftv res, leftv v)
 {
   omUpdateInfo();
-  switch(((int)v->Data()))
+  switch(((int)(long)v->Data()))
   {
   case 0:
     res->data = (char *)om_Info.UsedBytes;
@@ -3644,7 +3644,7 @@ static BOOLEAN jjORD(leftv res, leftv v)
 }
 static BOOLEAN jjPAR1(leftv res, leftv v)
 {
-  int i=(int)v->Data();
+  int i=(int)(long)v->Data();
   int p=0;
   p=rPar(currRing);
   if ((0<i) && (i<=p))
@@ -3670,7 +3670,7 @@ static BOOLEAN jjPARSTR1(leftv res, leftv v)
     WerrorS("no ring active");
     return TRUE;
   }
-  int i=(int)v->Data();
+  int i=(int)(long)v->Data();
   int p=0;
   if ((0<i) && (currRing->parameter!=NULL) && (i<=(p=rPar(currRing))))
     res->data=omStrDup(currRing->parameter[i-1]);
@@ -3701,7 +3701,7 @@ static BOOLEAN jjPREIMAGE_R(leftv res, leftv v)
 }
 static BOOLEAN jjPRIME(leftv res, leftv v)
 {
-  int i = IsPrime((int)(v->Data()));
+  int i = IsPrime((int)(long)(v->Data()));
   res->data = (char *)(i > 1 ? i : 2);
   return FALSE;
 }
@@ -3926,7 +3926,7 @@ static BOOLEAN jjTWOSTD(leftv res, leftv a)
 
 static BOOLEAN jjTYPEOF(leftv res, leftv v)
 {
-  switch ((int)v->data)
+  switch ((int)(long)v->data)
   {
     case INT_CMD:     res->data=omStrDup("int"); break;
     case POLY_CMD:   res->data=omStrDup("poly"); break;
@@ -3954,7 +3954,7 @@ static BOOLEAN jjTYPEOF(leftv res, leftv v)
 }
 static BOOLEAN jjVAR1(leftv res, leftv v)
 {
-  int i=(int)v->Data();
+  int i=(int)(long)v->Data();
   if ((0<i) && (i<=currRing->N))
   {
     poly p=pOne();
@@ -3976,7 +3976,7 @@ static BOOLEAN jjVARSTR1(leftv res, leftv v)
     WerrorS("no ring active");
     return TRUE;
   }
-  int i=(int)v->Data();
+  int i=(int)(long)v->Data();
   if ((0<i) && (i<=currRing->N))
     res->data=omStrDup(currRing->names[i-1]);
   else
@@ -4121,7 +4121,7 @@ void jjInitTab1()
         case (int)jjMINRES_R:     dArith1[i].p=(proc1)syMinimize; break;
         case (int)jjidTransp:     dArith1[i].p=(proc1)idTransp; break;
 #ifdef GENTABLE
-        default: Werror("missing proc1-definition for %d",(int)dArith1[i].p);
+        default: Werror("missing proc1-definition for %d",(int)(long)dArith1[i].p);
 #endif
       }
     }
@@ -4152,7 +4152,7 @@ static BOOLEAN jjmpDetBareiss(leftv res, leftv v)
 }
 static BOOLEAN jjidFreeModule(leftv res, leftv v)
 {
-  res->data = (char *)idFreeModule((int)v->Data());
+  res->data = (char *)idFreeModule((int)(long)v->Data());
   return FALSE;
 }
 static BOOLEAN jjidVec2Ideal(leftv res, leftv v)
@@ -4179,7 +4179,7 @@ static BOOLEAN jjidHead(leftv res, leftv v)
 }
 static BOOLEAN jjidMaxIdeal(leftv res, leftv v)
 {
-  res->data = (char *)idMaxIdeal((int)v->Data());
+  res->data = (char *)idMaxIdeal((int)(long)v->Data());
   return FALSE;
 }
 static BOOLEAN jjidMinBase(leftv res, leftv v)
@@ -4529,8 +4529,8 @@ struct sValCmd1 dArith1[]=
 static BOOLEAN jjBRACK_S(leftv res, leftv u, leftv v,leftv w)
 {
   char *s= (char *)u->Data();
-  int   r = (int)v->Data();
-  int   c = (int)w->Data();
+  int   r = (int)(long)v->Data();
+  int   c = (int)(long)w->Data();
   int l = strlen(s);
 
   if ( (r<1) || (r>l) || (c<0) )
@@ -4545,8 +4545,8 @@ static BOOLEAN jjBRACK_S(leftv res, leftv u, leftv v,leftv w)
 static BOOLEAN jjBRACK_Im(leftv res, leftv u, leftv v,leftv w)
 {
   intvec *iv = (intvec *)u->Data();
-  int   r = (int)v->Data();
-  int   c = (int)w->Data();
+  int   r = (int)(long)v->Data();
+  int   c = (int)(long)w->Data();
   if ((r<1)||(r>iv->rows())||(c<1)||(c>iv->cols()))
   {
     Werror("wrong range[%d,%d] in intmat %s(%d x %d)",
@@ -4575,8 +4575,8 @@ static BOOLEAN jjBRACK_Im(leftv res, leftv u, leftv v,leftv w)
 static BOOLEAN jjBRACK_Ma(leftv res, leftv u, leftv v,leftv w)
 {
   matrix m= (matrix)u->Data();
-  int   r = (int)v->Data();
-  int   c = (int)w->Data();
+  int   r = (int)(long)v->Data();
+  int   c = (int)(long)w->Data();
   //Print("gen. elem %d, %d\n",r,c);
   if ((r<1)||(r>MATROWS(m))||(c<1)||(c>MATCOLS(m)))
   {
@@ -4772,10 +4772,10 @@ static BOOLEAN jjBAREISS3(leftv res, leftv u, leftv v, leftv w)
   intvec *iv;
   ideal m;
   lists l=(lists)omAllocBin(slists_bin);
-  int k=(int)w->Data();
+  int k=(int)(long)w->Data();
   if (k>=0)
   {
-    smCallNewBareiss((ideal)u->Data(),(int)v->Data(),(int)w->Data(),m,&iv);
+    smCallNewBareiss((ideal)u->Data(),(int)(long)v->Data(),(int)(long)w->Data(),m,&iv);
     l->Init(2);
     l->m[0].rtyp=MODUL_CMD;
     l->m[1].rtyp=INTVEC_CMD;
@@ -4854,7 +4854,7 @@ static BOOLEAN jjFIND3(leftv res, leftv u, leftv v, leftv w)
   * return the position of the first char of what in where
   * or 0
   */
-  int n=(int)w->Data();
+  int n=(int)(long)w->Data();
   char *where=(char *)u->Data();
   char *what=(char *)v->Data();
   char *found;
@@ -4879,7 +4879,7 @@ static BOOLEAN jjFIND3(leftv res, leftv u, leftv v, leftv w)
 }
 static BOOLEAN jjFWALK3(leftv res, leftv u, leftv v, leftv w)
 {
-  if ((int)w->Data()==0)
+  if ((int)(long)w->Data()==0)
     res->data=(char *)walkProc(u,v);
   else
     res->data=(char *)fractalWalkProc(u,v);
@@ -4898,7 +4898,7 @@ static BOOLEAN jjHILBERT3(leftv res, leftv u, leftv v, leftv w)
     return TRUE;
   }
   intvec *iv=hFirstSeries((ideal)u->Data(),module_w,currQuotient,wdegree);
-  switch((int)v->Data())
+  switch((int)(long)v->Data())
   {
     case 1:
       res->data=(void *)iv;
@@ -4914,7 +4914,7 @@ static BOOLEAN jjHILBERT3(leftv res, leftv u, leftv v, leftv w)
 }
 static BOOLEAN jjINTMAT3(leftv res, leftv u, leftv v,leftv w)
 {
-  intvec* im= new intvec((int)v->Data(),(int)w->Data(), 0);
+  intvec* im= new intvec((int)(long)v->Data(),(int)(long)w->Data(), 0);
   intvec* arg = (intvec*) u->Data();
   int i, n = si_min(im->cols()*im->rows(), arg->cols()*arg->rows());
 
@@ -4929,7 +4929,7 @@ static BOOLEAN jjINTMAT3(leftv res, leftv u, leftv v,leftv w)
 static BOOLEAN jjJET_P_IV(leftv res, leftv u, leftv v, leftv w)
 {
   short *iw=iv2array((intvec *)w->Data());
-  res->data = (char *)ppJetW((poly)u->Data(),(int)v->Data(),iw);
+  res->data = (char *)ppJetW((poly)u->Data(),(int)(long)v->Data(),iw);
   omFreeSize((ADDRESS)iw,(pVariables+1)*sizeof(short));
   return FALSE;
 }
@@ -4940,12 +4940,12 @@ static BOOLEAN jjJET_P_P(leftv res, leftv u, leftv v, leftv w)
     WerrorS("2nd argument must be a unit");
     return TRUE;
   }
-  res->data = (char *)pSeries((int)w->Data(),(poly)u->CopyD(),(poly)v->CopyD());
+  res->data = (char *)pSeries((int)(long)w->Data(),(poly)u->CopyD(),(poly)v->CopyD());
   return FALSE;
 }
 static BOOLEAN jjJET_ID_IV(leftv res, leftv u, leftv v, leftv w)
 {
-  res->data = (char *)idJetW((ideal)u->Data(),(int)v->Data(),
+  res->data = (char *)idJetW((ideal)u->Data(),(int)(long)v->Data(),
                              (intvec *)w->Data());
   return FALSE;
 }
@@ -4956,7 +4956,7 @@ static BOOLEAN jjJET_ID_M(leftv res, leftv u, leftv v, leftv w)
     WerrorS("2nd argument must be a diagonal matrix of units");
     return TRUE;
   }
-  res->data = (char *)idSeries((int)w->Data(),(ideal)u->CopyD(),
+  res->data = (char *)idSeries((int)(long)w->Data(),(ideal)u->CopyD(),
                                (matrix)v->CopyD());
   return FALSE;
 }
@@ -4964,7 +4964,7 @@ static BOOLEAN jjMINOR3(leftv res, leftv u, leftv v, leftv w)
 {
   assumeStdFlag(w);
   res->data = (char *)idMinors(
-                        (matrix)u->Data(),(int)v->Data(),(ideal)w->Data());
+                        (matrix)u->Data(),(int)(long)v->Data(),(ideal)w->Data());
   return FALSE;
 }
 static BOOLEAN jjPREIMAGE(leftv res, leftv u, leftv v, leftv w)
@@ -5035,9 +5035,9 @@ static BOOLEAN jjPREIMAGE(leftv res, leftv u, leftv v, leftv w)
 static BOOLEAN jjRANDOM_Im(leftv res, leftv u, leftv v, leftv w)
 {
   int di, k;
-  int i=(int)u->Data();
-  int r=(int)v->Data();
-  int c=(int)w->Data();
+  int i=(int)(long)u->Data();
+  int r=(int)(long)v->Data();
+  int c=(int)(long)w->Data();
   if ((r<=0) || (c<=0)) return TRUE;
   intvec *iv = new intvec(r, c, 0);
   if (iv->rows()==0)
@@ -5151,9 +5151,9 @@ static BOOLEAN jjSUBST_Id_X(leftv res, leftv u, leftv v,leftv w, int input_type)
 }
 static BOOLEAN jjMATRIX_Id(leftv res, leftv u, leftv v,leftv w)
 {
-  matrix m=mpNew((int)v->Data(),(int)w->Data());
+  matrix m=mpNew((int)(long)v->Data(),(int)(long)w->Data());
   ideal I=(ideal)u->CopyD(IDEAL_CMD);
-  int i=si_min(IDELEMS(I),(int)v->Data()*(int)w->Data());
+  int i=si_min(IDELEMS(I),(int)(long)v->Data()*(int)(long)w->Data());
   //for(i=i-1;i>=0;i--)
   //{
   //  m->m[i]=I->m[i];
@@ -5168,15 +5168,15 @@ static BOOLEAN jjMATRIX_Id(leftv res, leftv u, leftv v,leftv w)
 static BOOLEAN jjMATRIX_Mo(leftv res, leftv u, leftv v,leftv w)
 {
   res->data = (char *)idModule2formatedMatrix((ideal)u->CopyD(MODUL_CMD),
-           (int)v->Data(),(int)w->Data());
+           (int)(long)v->Data(),(int)(long)w->Data());
   return FALSE;
 }
 static BOOLEAN jjMATRIX_Ma(leftv res, leftv u, leftv v,leftv w)
 {
-  matrix m=mpNew((int)v->Data(),(int)w->Data());
+  matrix m=mpNew((int)(long)v->Data(),(int)(long)w->Data());
   matrix I=(matrix)u->CopyD(MATRIX_CMD);
-  int r=si_min(MATROWS(I),(int)v->Data());
-  int c=si_min(MATCOLS(I),(int)w->Data());
+  int r=si_min(MATROWS(I),(int)(long)v->Data());
+  int c=si_min(MATCOLS(I),(int)(long)w->Data());
   int i,j;
   for(i=r;i>0;i--)
   {
@@ -5231,14 +5231,14 @@ static BOOLEAN jjREDUCE3_P(leftv res, leftv u, leftv v, leftv w)
 {
   assumeStdFlag(v);
   res->data = (char *)kNF((ideal)v->Data(),currQuotient,(poly)u->Data(),
-    0,(int)w->Data());
+    0,(int)(long)w->Data());
   return FALSE;
 }
 static BOOLEAN jjREDUCE3_ID(leftv res, leftv u, leftv v, leftv w)
 {
   assumeStdFlag(v);
   res->data = (char *)kNF((ideal)v->Data(),currQuotient,(ideal)u->Data(),
-    0,(int)w->Data());
+    0,(int)(long)w->Data());
   return FALSE;
 }
 #ifdef OLD_RES
@@ -5424,7 +5424,7 @@ static BOOLEAN jjBREAK1(leftv res, leftv v)
     int lineno=0;
     if((v->next!=NULL) && (v->next->Typ()==INT_CMD))
     {
-      lineno=(int)v->next->Data();
+      lineno=(int)(long)v->next->Data();
     }
     return sdb_set_breakpoint(v->Name(),lineno);
   }
@@ -5498,7 +5498,7 @@ static BOOLEAN jjDIVISION4(leftv res, leftv v)
   ideal P=(ideal)w1.Data();
   ideal Q=(ideal)w2.Data();
 
-  int n=(int)v3->Data();
+  int n=(int)(long)v3->Data();
   short *w=NULL;
   if(v4!=NULL)
   {
@@ -5583,7 +5583,7 @@ static BOOLEAN jjIDEAL_PL(leftv res, leftv v)
       }
       case INT_CMD:
       {
-        number n=nInit((int)h->Data());
+        number n=nInit((int)(long)h->Data());
         if (!nIsZero(n))
         {
           p=pOne();
@@ -5726,7 +5726,7 @@ static BOOLEAN jjINTVEC_PL(leftv res, leftv v)
   {
     if(h->Typ()==INT_CMD)
     {
-      (*iv)[i]=(int)h->Data();
+      (*iv)[i]=(int)(long)h->Data();
     }
     else
     {
@@ -5756,7 +5756,7 @@ static BOOLEAN jjJET4(leftv res, leftv u)
       return TRUE;
     }
     res->rtyp=u1->Typ();
-    res->data=(char*)pSeries((int)u3->Data(),pCopy((poly)u1->Data()),
+    res->data=(char*)pSeries((int)(long)u3->Data(),pCopy((poly)u1->Data()),
                              pCopy((poly)u2->Data()),(intvec*)u4->Data());
     return FALSE;
   }
@@ -5772,7 +5772,7 @@ static BOOLEAN jjJET4(leftv res, leftv u)
       return TRUE;
     }
     res->rtyp=u1->Typ();
-    res->data=(char*)idSeries((int)u3->Data(),idCopy((ideal)u1->Data()),
+    res->data=(char*)idSeries((int)(long)u3->Data(),idCopy((ideal)u1->Data()),
                               mpCopy((matrix)u2->Data()),(intvec*)u4->Data());
     return FALSE;
   }
@@ -5878,7 +5878,7 @@ static BOOLEAN jjREDUCE4(leftv res, leftv u)
   if((u3->Typ()==INT_CMD)&&(u4->Typ()==INTVEC_CMD))
   {
     int save_d=Kstd1_deg;
-    Kstd1_deg=(int)u3->Data();
+    Kstd1_deg=(int)(long)u3->Data();
     kModW=(intvec *)u4->Data();
     BITSET save=verbose;
     verbose|=Sy_bit(V_DEG_STOP);
@@ -5902,7 +5902,7 @@ static BOOLEAN jjREDUCE4(leftv res, leftv u)
     }
     res->rtyp=IDEAL_CMD;
     res->data=(char*)redNF(idCopy((ideal)u3->Data()),idCopy((ideal)u1->Data()),
-                           mpCopy((matrix)u2->Data()),(int)u4->Data());
+                           mpCopy((matrix)u2->Data()),(int)(long)u4->Data());
     return FALSE;
   }
   else
@@ -5917,7 +5917,7 @@ static BOOLEAN jjREDUCE4(leftv res, leftv u)
     }
     res->rtyp=POLY_CMD;
     res->data=(char*)redNF(idCopy((ideal)u3->Data()),pCopy((poly)u1->Data()),
-                           pCopy((poly)u2->Data()),(int)u4->Data());
+                           pCopy((poly)u2->Data()),(int)(long)u4->Data());
     return FALSE;
   }
   else
@@ -5945,7 +5945,7 @@ static BOOLEAN jjREDUCE5(leftv res, leftv u)
     res->rtyp=IDEAL_CMD;
     res->data=(char*)redNF(idCopy((ideal)u3->Data()),idCopy((ideal)u1->Data()),
                            mpCopy((matrix)u2->Data()),
-                           (int)u4->Data(),(intvec*)u5->Data());
+                           (int)(long)u4->Data(),(intvec*)u5->Data());
     return FALSE;
   }
   else
@@ -5961,7 +5961,7 @@ static BOOLEAN jjREDUCE5(leftv res, leftv u)
     res->rtyp=POLY_CMD;
     res->data=(char*)redNF(idCopy((ideal)u3->Data()),pCopy((poly)u1->Data()),
                            pCopy((poly)u2->Data()),
-                           (int)u4->Data(),(intvec*)u5->Data());
+                           (int)(long)u4->Data(),(intvec*)u5->Data());
     return FALSE;
   }
   else
@@ -6025,7 +6025,7 @@ static BOOLEAN jjTEST(leftv res, leftv v)
   {
     if (v->Typ()!=INT_CMD)
       return TRUE;
-    test_cmd((int)v->Data());
+    test_cmd((int)(long)v->Data());
     v=v->next;
   }
   while (v!=NULL);
@@ -6048,12 +6048,12 @@ static BOOLEAN jjSTATUS_M(leftv res, leftv v)
     return TRUE;
   jjSTATUS3(res, v, v->next, v->next->next);
 #if defined(HAVE_USLEEP)
-  if (((int) res->data) == 0)
+  if (((long) res->data) == 0L)
   {
-    int i_s = (int) v->next->next->next->Data();
+    int i_s = (int)(long) v->next->next->next->Data();
     if (i_s > 0)
     {
-      usleep((int) v->next->next->next->Data());
+      usleep((int)(long) v->next->next->next->Data());
       jjSTATUS3(res, v, v->next, v->next->next);
     }
   }
@@ -6156,7 +6156,7 @@ static Subexpr jjMakeSub(leftv e)
 {
   assume( e->Typ()==INT_CMD );
   Subexpr r=(Subexpr)omAlloc0Bin(sSubexpr_bin);
-  r->start =(int)e->Data();
+  r->start =(int)(long)e->Data();
   return r;
 }
 

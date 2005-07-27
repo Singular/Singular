@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.78 2005-07-22 16:22:10 levandov Exp $ */
+/* $Id: ipassign.cc,v 1.79 2005-07-27 15:47:56 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -40,41 +40,41 @@
 /*=================== proc =================*/
 static BOOLEAN jjECHO(leftv res, leftv a)
 {
-  si_echo=(int)a->Data();
+  si_echo=(int)((long)(a->Data()));
   return FALSE;
 }
 static BOOLEAN jjPAGELENGTH(leftv res, leftv a)
 {
-  pagelength=(int)a->Data();
+  pagelength=(int)((long)(a->Data()));
   return FALSE;
 }
 static BOOLEAN jjPRINTLEVEL(leftv res, leftv a)
 {
-  printlevel=(int)a->Data();
+  printlevel=(int)((long)(a->Data()));
   return FALSE;
 }
 static BOOLEAN jjCOLMAX(leftv res, leftv a)
 {
-  colmax=(int)a->Data();
+  colmax=(int)((long)(a->Data()));
   return FALSE;
 }
 static BOOLEAN jjTIMER(leftv res, leftv a)
 {
-  timerv=(int)a->Data();
+  timerv=(int)((long)(a->Data()));
   initTimer();
   return FALSE;
 }
 #ifdef HAVE_RTIMER
 static BOOLEAN jjRTIMER(leftv res, leftv a)
 {
-  rtimerv=(int)a->Data();
+  rtimerv=(int)((long)(a->Data()));
   initRTimer();
   return FALSE;
 }
 #endif
 static BOOLEAN jjMAXDEG(leftv res, leftv a)
 {
-  Kstd1_deg=(int)a->Data();
+  Kstd1_deg=(int)((long)(a->Data()));
   if (Kstd1_deg!=0)
     test |=Sy_bit(24);
   else
@@ -83,7 +83,7 @@ static BOOLEAN jjMAXDEG(leftv res, leftv a)
 }
 static BOOLEAN jjMAXMULT(leftv res, leftv a)
 {
-  Kstd1_mu=(int)a->Data();
+  Kstd1_mu=(int)((long)(a->Data()));
   if (Kstd1_mu!=0)
     test |=Sy_bit(23);
   else
@@ -92,14 +92,14 @@ static BOOLEAN jjMAXMULT(leftv res, leftv a)
 }
 static BOOLEAN jjTRACE(leftv res, leftv a)
 {
-  traceit=(int)a->Data();
+  traceit=(int)((long)(a->Data()));
   return FALSE;
 }
 static BOOLEAN jjSHORTOUT(leftv res, leftv a)
 {
   if (currRing != NULL)
   {
-    BOOLEAN shortOut = (BOOLEAN)((int)a->Data());
+    BOOLEAN shortOut = (BOOLEAN)((long)a->Data());
 #if HAVE_CAN_SHORT_OUT
     if (!shortOut)
       currRing->ShortOut = 0;
@@ -254,14 +254,14 @@ static BOOLEAN jiA_INT(leftv res, leftv a, Subexpr e)
       if (i>=iv->length())
       {
         intvec *iv1=new intvec(i+1);
-        (*iv1)[i]=(int)a->Data();
+        (*iv1)[i]=(int)((long)(a->Data()));
         intvec *ivn=ivAdd(iv,iv1);
         delete iv;
         delete iv1;
         res->data=(void *)ivn;
       }
       else
-        (*iv)[i]=(int)a->Data();
+        (*iv)[i]=(int)((long)(a->Data()));
     }
     else
     {
@@ -272,7 +272,7 @@ static BOOLEAN jiA_INT(leftv res, leftv a, Subexpr e)
         return TRUE;
       }
       else
-        IMATELEM(*iv,i+1,c) = (int)a->Data();
+        IMATELEM(*iv,i+1,c) = (int)((long)(a->Data()));
     }
   }
   return FALSE;
@@ -969,7 +969,7 @@ static BOOLEAN jjA_L_INTVEC(leftv l,leftv r,intvec *iv)
     if (i>=iv->length()) break;
     if (hh->Typ() == INT_CMD)
     {
-      (*iv)[i++] = (int)(hh->Data());
+      (*iv)[i++] = (int)((long)(hh->Data()));
     }
     else if ((hh->Typ() == INTVEC_CMD)
             ||(hh->Typ() == INTMAT_CMD))

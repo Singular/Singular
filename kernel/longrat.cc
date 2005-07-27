@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.5 2004-09-14 10:27:20 Singular Exp $ */
+/* $Id: longrat.cc,v 1.6 2005-07-27 15:48:28 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -156,16 +156,16 @@ BOOLEAN nlDBTest(number a, char *f,int l)
     return FALSE;
   }
   //if ((int)a==1) Print("!! 0x1 as number ? %s %d\n",f,l);
-  if ((((int)a)&3)==3)
+  if ((((long)a)&3L)==3L)
   {
     Print(" !!longrat:ptr(3) in %s:%d\n",f,l);
     return FALSE;
   }
-  if ((((int)a)&3)==1)
+  if ((((long)a)&3L)==1L)
   {
-    if (((((int)a)<<1)>>1)!=((int)a))
+    if (((((long)a)<<1)>>1)!=((long)a))
     {
-      Print(" !!longrat:arith:%x in %s:%d\n",(int)a, f,l);
+      Print(" !!longrat:arith:%x in %s:%d\n",(long)a, f,l);
       return FALSE;
     }
     return TRUE;
@@ -474,7 +474,7 @@ number nlInvers(number a)
     n->debug=123456;
 #endif
     n->s=1;
-    if ((int)a>0)
+    if ((long)a>0L)
     {
       mpz_init_set_si(&n->z,(long)1);
       mpz_init_set_si(&n->n,(long)SR_TO_INT(a));
@@ -760,16 +760,16 @@ number nlIntMod (number a, number b)
   number u;
   if (SR_HDL(a) & SR_HDL(b) & SR_INT)
   {
-    if ((int)a>0)
+    if ((long)a>0L)
     {
-      if ((int)b>0)
+      if ((long)b>0L)
         return INT_TO_SR(SR_TO_INT(a)%SR_TO_INT(b));
       else
         return INT_TO_SR(SR_TO_INT(a)%(-SR_TO_INT(b)));
     }
     else
     {
-      if ((int)b>0)
+      if ((long)b>0L)
       {
         int i=(-SR_TO_INT(a))%SR_TO_INT(b);
         if ( i != 0 ) i = (SR_TO_INT(b))-i;
@@ -786,7 +786,7 @@ number nlIntMod (number a, number b)
   if (SR_HDL(a) & SR_INT)
   {
     /* a is a small and b is a large int: -> a or (a+b) or (a-b) */
-    if ((int)a<0)
+    if ((long)a<0L)
     {
       if (mpz_isNeg(&b->z))
         return nlSub(a,b);
@@ -906,7 +906,7 @@ number nlDiv (number a, number b)
       if (a->s<2)
       {
         mpz_init_set(&u->n,&a->n);
-        if ((int)b>0)
+        if ((long)b>0L)
           mpz_mul_ui(&u->n,&u->n,SR_TO_INT(b));
         else
         {
@@ -1292,11 +1292,11 @@ int nlModP(number n, int p)
     if (i<0) return (p-((-i)%p));
     return i%p;
   }
-  int iz=mpz_mmod_ui(NULL,&n->z,(unsigned long)p);
+  int iz=(int)mpz_mmod_ui(NULL,&n->z,(unsigned long)p);
   if (n->s!=3)
   {
     int in=mpz_mmod_ui(NULL,&n->n,(unsigned long)p);
-    return (int)npDiv((number)iz,(number)in);
+    return (int)((long)npDiv((number)iz,(number)in));
   }
   return iz;
 }
@@ -1395,9 +1395,9 @@ BOOLEAN _nlEqual_aNoImm_OR_bNoImm(number a, number b)
   {
     if (b->s!=0)
       return FALSE;
-    if (((int)a > 0) && (mpz_isNeg(&b->z)))
+    if (((long)a > 0L) && (mpz_isNeg(&b->z)))
       return FALSE;
-    if (((int)a < 0) && (!mpz_isNeg(&b->z)))
+    if (((long)a < 0L) && (!mpz_isNeg(&b->z)))
       return FALSE;
     MP_INT  bb;
     mpz_init_set(&bb,&b->n);
@@ -1536,7 +1536,7 @@ number _nlAdd_aNoImm_OR_bNoImm(number a, number b)
       }
       case 3:
       {
-        if ((int)a>0)
+        if ((long)a>0L)
           mpz_add_ui(&u->z,&b->z,SR_TO_INT(a));
         else
           mpz_sub_ui(&u->z,&b->z,-SR_TO_INT(a));
@@ -1727,7 +1727,7 @@ number _nlSub_aNoImm_OR_bNoImm(number a, number b)
       }
       case 3:
       {
-        if ((int)a>0)
+        if ((long)a>0L)
         {
           mpz_sub_ui(&u->z,&b->z,SR_TO_INT(a));
           mpz_neg(&u->z,&u->z);
@@ -1789,7 +1789,7 @@ number _nlSub_aNoImm_OR_bNoImm(number a, number b)
       }
       case 3:
       {
-        if ((int)b>0)
+        if ((long)b>0L)
         {
           mpz_sub_ui(&u->z,&a->z,SR_TO_INT(b));
         }
@@ -1983,7 +1983,7 @@ number _nlMult_aNoImm_OR_bNoImm(number a, number b)
   {
     u->s=b->s;
     if (u->s==1) u->s=0;
-    if ((int)a>0)
+    if ((long)a>0L)
     {
       mpz_mul_ui(&u->z,&b->z,(unsigned long)SR_TO_INT(a));
     }

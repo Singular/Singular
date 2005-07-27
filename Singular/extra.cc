@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.228 2005-07-26 17:06:54 Singular Exp $ */
+/* $Id: extra.cc,v 1.229 2005-07-27 15:47:53 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -420,9 +420,9 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
           Werror("Need string argument to set value of option %s", sys_cmd);
           return TRUE;
         }
-        errormsg = feSetOptValue(opt, (int) h->Data());
+        errormsg = feSetOptValue(opt, (int)((long) h->Data()));
         if (errormsg != NULL)
-          Werror("Option '--%s=%d' %s", sys_cmd, (int) h->Data(), errormsg);
+          Werror("Option '--%s=%d' %s", sys_cmd, (int) ((long)h->Data()), errormsg);
       }
       else
       {
@@ -447,7 +447,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     {
       if ((h!=NULL) &&(h->Typ()==INT_CMD))
       {
-        siRandomStart=(int)h->Data();
+        siRandomStart=(int)((long)h->Data());
 #ifdef buildin_rand
         siSeed=siRandomStart;
 #else
@@ -482,7 +482,8 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
           else
             {
               res->rtyp=INT_CMD;
-              res->data=(void*)complexNearZero((gmp_complex*)h->Data(),(int)h->next->Data());
+              res->data=(void*)complexNearZero((gmp_complex*)h->Data(),
+			                       (int)((long)(h->next->Data())));
               return FALSE;
             }
         }
@@ -612,7 +613,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
        WerrorS("poly,int expected");
        return TRUE;
      }
-     if(((int)h->next->Data())==1)
+     if(((long)h->next->Data())==1L)
        return spectrumfProc(res,h);
      return spectrumProc(res,h);
    }
@@ -684,13 +685,13 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         int metric;
         if ((h!=NULL) && (h->Typ()==INT_CMD))
         {
-          a=(int)h->CopyD();
+          a=(int)((long)(h->Data()));
           h=h->next;
         }
         else return TRUE;
         if ((h!=NULL) && (h->Typ()==INT_CMD))
         {
-          b=(int)h->CopyD();
+          b=(int)((long)(h->Data()));
           h=h->next;
         }
         else return TRUE;
@@ -702,7 +703,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         else return TRUE;
         if ((h!=NULL) && (h->Typ()==INT_CMD))
         {
-          metric=(int)h->CopyD();
+          metric=(int)((long)(h->Data()));
         }
         res->rtyp=MATRIX_CMD;
         if (rIsPluralRing(r)) res->data=nc_PrintMat(a,b,r,metric);
@@ -1125,13 +1126,13 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         Werror("system(\"Mivdp\", int) expected");
         return TRUE;
       }
-      if ((int) h->Data() != currRing->N)
+      if ((int) ((long)(h->Data())) != currRing->N)
       {
         Werror("system(\"Mivdp\" ...) intvecs not of length %d\n",
                currRing->N);
         return TRUE;
       }
-      int arg1 = (int) h->Data();
+      int arg1 = (int) ((long)(h->Data()));
 
       intvec* result = (intvec*) Mivdp(arg1);
 
@@ -1148,13 +1149,13 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         Werror("system(\"Mivlp\", int) expected");
         return TRUE;
       }
-      if ((int) h->Data() != currRing->N)
+      if ((int) ((long)(h->Data())) != currRing->N)
       {
         Werror("system(\"Mivlp\" ...) intvecs not of length %d\n",
                currRing->N);
         return TRUE;
       }
-      int arg1 = (int) h->Data();
+      int arg1 = (int) ((long)(h->Data()));
 
       intvec* result = (intvec*) Mivlp(arg1);
 
@@ -1311,7 +1312,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
           Werror("system(\"MivMatrixOrderdp\",intvec) expected");
           return TRUE;
         }
-        int arg1 = (int) h->Data();
+        int arg1 = (int) ((long)(h->Data()));
 
         intvec* result = (intvec*) MivMatrixOrderdp(arg1);
 
@@ -1333,7 +1334,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 
         ideal arg1 = (ideal) h->Data();
         intvec* arg2 = (intvec*) h->next->Data();
-        int arg3 = (int) h->next->next->Data();
+        int arg3 = (int) ((long)(h->next->next->Data()));
 
         intvec* result = (intvec*) MPertVectors(arg1, arg2, arg3);
 
@@ -1355,7 +1356,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 
         ideal arg1 = (ideal) h->Data();
         intvec* arg2 = (intvec*) h->next->Data();
-        int arg3 = (int) h->next->next->Data();
+        int arg3 = (int) ((long)(h->next->next->Data()));
 
         intvec* result = (intvec*) MPertVectorslp(arg1, arg2, arg3);
 
@@ -1384,7 +1385,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     else
      if(strcmp(sys_cmd, "MivUnit") == 0)
       {
-        int arg1 = (int) h->Data();
+        int arg1 = (int) ((long)(h->Data()));
 
         intvec* result = (intvec*) MivUnit(arg1);
 
@@ -1432,7 +1433,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
           Werror("system(\"MivMatrixOrderlp\",int) expected");
           return TRUE;
         }
-        int arg1 = (int) h->Data();
+        int arg1 = (int) ((long)(h->Data()));
 
         intvec* result = (intvec*) MivMatrixOrderlp(arg1);
 
@@ -1614,11 +1615,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         return TRUE;
       }
       ideal arg1 = (ideal) h->Data();
-      int arg2 = (int) h->next->Data();
-      int arg3 = (int) h->next->next->Data();
+      int arg2 = (int) ((long)(h->next->Data()));
+      int arg3 = (int) ((long)(h->next->next->Data()));
       intvec* arg4 = (intvec*) h->next->next->next->Data();
       intvec* arg5   =  (intvec*) h->next->next->next->next->Data();
-      int arg6   =  (int) h->next->next->next->next->next->Data();
+      int arg6   =  (int) ((long)(h->next->next->next->next->next->Data()));
 
 
       ideal result = (ideal) Mpwalk(arg1, arg2, arg3, arg4, arg5, arg6);
@@ -1651,8 +1652,8 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         return TRUE;
       }
       ideal arg1 = (ideal) h->Data();
-      int arg2 = (int) h->next->Data();
-      int arg3 = (int) h->next->next->Data();
+      int arg2 = (int) ((long)(h->next->Data()));
+      int arg3 = (int) ((long)(h->next->next->Data()));
       intvec* arg4 = (intvec*) h->next->next->next->Data();
       intvec* arg5   =  (intvec*) h->next->next->next->next->Data();
 
@@ -1811,7 +1812,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       ideal arg1 = (ideal) h->Data();
       intvec* arg2 = (intvec*) h->next->Data();
       intvec* arg3   =  (intvec*) h->next->next->Data();
-      int arg4   =  (int) h->next->next->next->Data();
+      int arg4   =  (int) ((long)(h->next->next->next->Data()));
 
       ideal result = (ideal) TranMImprovwalk(arg1, arg2, arg3, arg4);
 
@@ -1865,7 +1866,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
           h=h->next;
           if (h != NULL && h->Typ() == INT_CMD)
           {
-            int n=(int)h->Data();
+            int n=(int)((long)h->Data());
             h=h->next;
             if (h != NULL && h->Typ() == INTVEC_CMD)
             {
@@ -2091,7 +2092,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         // process time (user +system): SIGVTALARM
         struct itimerval t,o;
         memset(&t,0,sizeof(t));
-        t.it_value.tv_sec     =(unsigned)h->Data();
+        t.it_value.tv_sec     =(unsigned)((unsigned long)h->Data());
         setitimer(ITIMER_VIRTUAL,&t,&o);
         return FALSE;
       }
@@ -2221,7 +2222,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     if(strcmp(sys_cmd,"listall")==0)
     {
       int showproc=0;
-      if ((h!=NULL) && (h->Typ()==INT_CMD)) showproc=(int)h->Data();
+      if ((h!=NULL) && (h->Typ()==INT_CMD)) showproc=(int)((long)h->Data());
 #ifdef HAVE_NS
       listall(showproc);
 #else
@@ -2361,7 +2362,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     {
       if ((h!=NULL) && (h->Typ()==INT_CMD))
       {
-        sdb_flags=(int)h->Data();
+        sdb_flags=(int)((long)h->Data());
       }
       else
       {
@@ -2414,7 +2415,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       else return TRUE;
       if ((h!=NULL) && (h->Typ()==INT_CMD))
       {
-        i2=(int)h->Data();
+        i2=(int)((long)h->Data());
       }
       else return TRUE;
       res->rtyp=MODUL_CMD;
@@ -2506,7 +2507,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       ring r = currRing;
       poly f = (poly)h->Data();
       h=h->next;
-      int n=(int)h->Data();
+      int n=(int)((long)h->Data());
       res->rtyp=POLY_CMD ;
       res->data=(void*) pFastPower(f,n,r);
       return(FALSE);
@@ -2517,7 +2518,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       ring r = currRing;
       poly f = (poly)h->Data();
       h=h->next;
-      int n=(int)h->Data();
+      int n=(int)((long)h->Data());
       res->rtyp=POLY_CMD ;
       res->data=(void*) pPower(pCopy(f),n);
       return(FALSE);
@@ -2528,7 +2529,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       ring r = currRing;
       poly f = (poly)h->Data();
       h=h->next;
-      int n=(int)h->Data();
+      int n=(int)((long)h->Data());
       res->rtyp=POLY_CMD ;
       res->data=(void*) pFastPowerMC(f,n,r);
       return(FALSE);

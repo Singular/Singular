@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.113 2005-07-26 17:06:56 Singular Exp $ */
+/* $Id: grammar.y,v 1.114 2005-07-27 15:47:54 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -114,7 +114,7 @@ int        inerror = 0;
      WerrorS("no int expression");                     \
      YYERROR;                                          \
    }                                                   \
-   (i) = (int)(a).Data();
+   (i) = (int)((long)(a).Data());
 
 #define MYYERROR(a) { WerrorS(a); YYERROR; }
 
@@ -1047,7 +1047,7 @@ orderelem:
               {
                 if (sl->Typ() == INT_CMD)
                 {
-                  (*iv)[i++] = (int)(sl->Data());
+                  (*iv)[i++] = (int)((long)(sl->Data()));
                 }
                 else if ((sl->Typ() == INTVEC_CMD)
                 ||(sl->Typ() == INTMAT_CMD))

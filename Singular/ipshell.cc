@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.119 2005-07-26 17:04:44 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.120 2005-07-27 15:47:57 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -918,7 +918,7 @@ BOOLEAN jjBETTI2(leftv res, leftv u, leftv v)
 
   r=liFindRes(l,&len,&typ0);
   if (r==NULL) return TRUE;
-  res->data=(char *)syBetti(r,len,&reg,weights,(int)v->Data());
+  res->data=(char *)syBetti(r,len,&reg,weights,(int)(long)v->Data());
   omFreeSize((ADDRESS)r,(len)*sizeof(ideal));
   atSet(res,omStrDup("rowShift"),(void*)add_row_shift,INT_CMD);
   if (weights!=NULL) delete weights;
@@ -1733,8 +1733,8 @@ void rComposeC(lists L, ring R)
   if (L->m[1].rtyp!=LIST_CMD) 
     Werror("invald coeff. field description, expecting precision list");
   lists LL=(lists)L->m[1].data;
-  int r1=(int)LL->m[0].data;
-  int r2=(int)LL->m[1].data;
+  int r1=(int)(long)LL->m[0].data;
+  int r2=(int)(long)LL->m[1].data;
   if ((r1<=SHORT_REAL_LENGTH)
   && (r2=SHORT_REAL_LENGTH))
   {
@@ -1779,7 +1779,7 @@ ring rCompose(const lists  L)
   ring R=(ring) omAlloc0Bin(sip_sring_bin);
   if (L->m[0].Typ()==INT_CMD)
   {
-    R->ch=(int)L->m[0].Data();
+    R->ch=(int)(long)L->m[0].Data();
   }
   else if (L->m[0].Typ()==LIST_CMD)
   {
@@ -1896,7 +1896,7 @@ ring rCompose(const lists  L)
       else      R->block0[j]=R->block1[j-1]+1;
       intvec *iv;
       if (vv->m[1].Typ()==INT_CMD)
-        iv=new intvec((int)vv->m[1].Data(),(int)vv->m[1].Data());
+        iv=new intvec((int)(long)vv->m[1].Data(),(int)(long)vv->m[1].Data());
       else
         iv=ivCopy((intvec*)vv->m[1].Data()); //assume INTVEC
       R->block1[j]=si_max(R->block0[j],R->block0[j]+iv->length()-1);
@@ -2042,8 +2042,8 @@ BOOLEAN mpJacobi(leftv res,leftv a)
 */
 BOOLEAN mpKoszul(leftv res,leftv c/*ip*/, leftv b/*in*/, leftv id)
 {
-  int n=(int)b->Data();
-  int d=(int)c->Data();
+  int n=(int)(long)b->Data();
+  int d=(int)(long)c->Data();
   int     k,l,sign,row,col;
   matrix  result;
   ideal temp;
@@ -2098,7 +2098,7 @@ BOOLEAN mpKoszul(leftv res,leftv c/*ip*/, leftv b/*in*/, leftv id)
 BOOLEAN syBetti2(leftv res, leftv u, leftv w)
 {
   syStrategy syzstr=(syStrategy)u->Data();
-  BOOLEAN minim=(int)w->Data();
+  BOOLEAN minim=(int)(long)w->Data();
   int row_shift=0;
   int add_row_shift=0;
   intvec *weights=NULL;
@@ -2304,9 +2304,9 @@ void spectrum::copy_deep( const spectrum &spec )
 
 void spectrum::copy_deep( lists l )
 {
-    mu = (int)(l->m[0].Data( ));
-    pg = (int)(l->m[1].Data( ));
-    n  = (int)(l->m[2].Data( ));
+    mu = (int)(long)(l->m[0].Data( ));
+    pg = (int)(long)(l->m[1].Data( ));
+    n  = (int)(long)(l->m[2].Data( ));
 
     copy_new( n );
 
@@ -2912,9 +2912,9 @@ semicState  list_is_spectrum( lists l )
     //  check number of entries
     // -------------------------
 
-    int     mu = (int)(l->m[0].Data( ));
-    int     pg = (int)(l->m[1].Data( ));
-    int     n  = (int)(l->m[2].Data( ));
+    int     mu = (int)(long)(l->m[0].Data( ));
+    int     pg = (int)(long)(l->m[1].Data( ));
+    int     n  = (int)(long)(l->m[2].Data( ));
 
     if( n <= 0 )
     {
@@ -3006,7 +3006,7 @@ semicState  list_is_spectrum( lists l )
         mu += (*mul)[i];
     }
 
-    if( mu != (int)(l->m[0].Data( )) )
+    if( mu != (int)(long)(l->m[0].Data( )) )
     {
         return  semicListMilnorWrong;
     }
@@ -3023,7 +3023,7 @@ semicState  list_is_spectrum( lists l )
         }
     }
 
-    if( pg != (int)(l->m[1].Data( )) )
+    if( pg != (int)(long)(l->m[1].Data( )) )
     {
         return  semicListPGWrong;
     }
@@ -3090,7 +3090,7 @@ BOOLEAN spmulProc( leftv result,leftv first,leftv second )
     // -----------------
 
     lists   l = (lists)first->Data( );
-    int     k = (int)second->Data( );
+    int     k = (int)(long)second->Data( );
 
     if( (state=list_is_spectrum( l ))!=semicOK )
     {
@@ -3125,7 +3125,7 @@ BOOLEAN spmulProc( leftv result,leftv first,leftv second )
 BOOLEAN    semicProc3   ( leftv res,leftv u,leftv v,leftv w )
 {
   semicState  state;
-  BOOLEAN qh=(((int)w->Data())==1);
+  BOOLEAN qh=(((int)(long)w->Data())==1);
 
   // -----------------
   //  check arguments
@@ -3454,31 +3454,31 @@ BOOLEAN loSimplex( leftv res, leftv args )
   if ( v->Typ() != INT_CMD )    // 2: m = number of constraints
     return TRUE;
   else
-    LP->m= (int)(v->Data());
+    LP->m= (int)(long)(v->Data());
 
   v= v->next;
   if ( v->Typ() != INT_CMD )    // 3: n = number of variables
     return TRUE;
   else
-    LP->n= (int)(v->Data());
+    LP->n= (int)(long)(v->Data());
 
   v= v->next;
   if ( v->Typ() != INT_CMD )    // 4: m1 = number of <= constraints
     return TRUE;
   else
-    LP->m1= (int)(v->Data());
+    LP->m1= (int)(long)(v->Data());
 
   v= v->next;
   if ( v->Typ() != INT_CMD )    // 5: m2 = number of >= constraints
     return TRUE;
   else
-    LP->m2= (int)(v->Data());
+    LP->m2= (int)(long)(v->Data());
 
   v= v->next;
   if ( v->Typ() != INT_CMD )    // 6: m3 = number of == constraints
     return TRUE;
   else
-    LP->m3= (int)(v->Data());
+    LP->m3= (int)(long)(v->Data());
 
 #ifdef mprDEBUG_PROT
   Print("m (constraints) %d\n",LP->m);
@@ -3519,7 +3519,7 @@ BOOLEAN loSimplex( leftv res, leftv args )
 BOOLEAN nuMPResMat( leftv res, leftv arg1, leftv arg2 )
 {
   ideal gls = (ideal)(arg1->Data());
-  int imtype= (int)arg2->Data();
+  int imtype= (int)(long)arg2->Data();
 
   uResultant::resMatType mtype= determineMType( imtype );
 
@@ -3544,7 +3544,7 @@ BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
 
   poly gls;
   gls= (poly)(arg1->Data());
-  int howclean= (int)arg3->Data();
+  int howclean= (int)(long)arg3->Data();
 
   if ( !(rField_is_R() ||
          rField_is_Q() ||
@@ -3687,7 +3687,7 @@ BOOLEAN nuVanderSys( leftv res, leftv arg1, leftv arg2, leftv arg3)
 
   int n= IDELEMS( p );
   int m= IDELEMS( w );
-  int tdg= (int)arg3->Data();
+  int tdg= (int)(long)arg3->Data();
 
   res->data= (void*)NULL;
 
@@ -3789,7 +3789,7 @@ BOOLEAN nuUResSolve( leftv res, leftv args )
   // get resultant matrix type to use (0,1)
   if ( v->Typ() != INT_CMD )
     return TRUE;
-  else imtype= (int)v->Data();
+  else imtype= (int)(long)v->Data();
   v= v->next;
 
   // get and set precision in digits ( > 0 )
@@ -3805,7 +3805,7 @@ BOOLEAN nuUResSolve( leftv res, leftv args )
   // get interpolation steps (0,1,2)
   if ( v->Typ() != INT_CMD )
     return TRUE;
-  else howclean= (int)v->Data();
+  else howclean= (int)(long)v->Data();
 
   uResultant::resMatType mtype= determineMType( imtype );
   int i,c,count;
@@ -4301,7 +4301,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
 
   if (pn->Typ()==INT_CMD)
   {
-    ch=(int)pn->Data();
+    ch=(int)(long)pn->Data();
   }
   else if ((pn->name != NULL)
   && ((strcmp(pn->name,"real")==0) || (strcmp(pn->name,"complex")==0)))
@@ -4310,12 +4310,12 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
     ch=-1;
     if ((pn->next!=NULL) && (pn->next->Typ()==INT_CMD))
     {
-      float_len=(int)pn->next->Data();
+      float_len=(int)(long)pn->next->Data();
       float_len2=float_len;
       pn=pn->next;
       if ((pn->next!=NULL) && (pn->next->Typ()==INT_CMD))
       {
-        float_len2=(int)pn->next->Data();
+        float_len2=(int)(long)pn->next->Data();
         pn=pn->next;
       }
     }

@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: pcv.cc,v 1.34 2001-11-14 16:41:02 Singular Exp $ */
+/* $Id: pcv.cc,v 1.35 2005-07-27 15:47:58 Singular Exp $ */
 /*
 * ABSTRACT: conversion between polys and coef vectors
 */
@@ -329,11 +329,11 @@ BOOLEAN pcvP2CV(leftv res,leftv h)
       h=h->next;
       if(h&&h->Typ()==INT_CMD)
       {
-        int d0=(int)h->Data();
+        int d0=(int)(long)h->Data();
         h=h->next;
         if(h&&h->Typ()==INT_CMD)
         {
-          int d1=(int)h->Data();
+          int d1=(int)(long)h->Data();
           res->rtyp=LIST_CMD;
           res->data=(void*)pcvP2CV(p,d0,d1);
           return FALSE;
@@ -357,11 +357,11 @@ BOOLEAN pcvCV2P(leftv res,leftv h)
       h=h->next;
       if(h&&h->Typ()==INT_CMD)
       {
-        int d0=(int)h->Data();
+        int d0=(int)(long)h->Data();
         h=h->next;
         if(h&&h->Typ()==INT_CMD)
         {
-          int d1=(int)h->Data();
+          int d1=(int)(long)h->Data();
           res->rtyp=LIST_CMD;
           res->data=(void*)pcvCV2P(pl,d0,d1);
           return FALSE;
@@ -391,11 +391,11 @@ BOOLEAN pcvDim(leftv res,leftv h)
   {
     if(h&&h->Typ()==INT_CMD)
     {
-      int d0=(int)h->Data();
+      int d0=(int)(long)h->Data();
       h=h->next;
       if(h&&h->Typ()==INT_CMD)
       {
-        int d1=(int)h->Data();
+        int d1=(int)(long)h->Data();
         res->rtyp=INT_CMD;
         res->data=(void*)pcvDim(d0,d1);
         return FALSE;
@@ -447,11 +447,11 @@ BOOLEAN pcvBasis(leftv res,leftv h)
   {
     if(h&&h->Typ()==INT_CMD)
     {
-      int d0=(int)h->Data();
+      int d0=(int)(long)h->Data();
       h=h->next;
       if(h&&h->Typ()==INT_CMD)
       {
-        int d1=(int)h->Data();
+        int d1=(int)(long)h->Data();
         res->rtyp=LIST_CMD;
         res->data=(void*)pcvBasis(d0,d1);
         return FALSE;

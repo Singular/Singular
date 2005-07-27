@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feOpt.h,v 1.1.1.1 2003-10-06 12:15:51 Singular Exp $ */
+/* $Id: feOpt.h,v 1.2 2005-07-27 15:48:28 Singular Exp $ */
 /*
 * ABSTRACT: Declarations for working with Options
 */
@@ -59,7 +59,7 @@ inline int feOptValue(feOptIndex opt, int* val)
 {
   if (opt != FE_OPT_UNDEF && feOptSpec[(int)opt].type != feOptString)
   {
-    *val = (int) feOptSpec[(int)opt].value;
+    *val = (int) ((long)(feOptSpec[(int)opt].value));
     return TRUE;
   }
   *val = 0;

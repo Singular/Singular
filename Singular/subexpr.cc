@@ -4,7 +4,7 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id: subexpr.cc,v 1.90 2005-05-31 07:42:21 bricken Exp $ */
+/* $Id: subexpr.cc,v 1.91 2005-07-27 15:47:58 Singular Exp $ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -143,7 +143,7 @@ void sleftv::Print(leftv store, int spaces)
           ::Print("%-*.*s%s",spaces,spaces," ",(char *)d);
           break;
        case INT_CMD:
-          ::Print("%-*.*s%d",spaces,spaces," ",(int)d);
+          ::Print("%-*.*s%d",spaces,spaces," ",(int)(long)d);
           break;
        case PROC_CMD:
          {
@@ -661,12 +661,12 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
           if (typed)
           {
             s=(char *)omAlloc(MAX_INT_LEN+7);
-            sprintf(s,"int(%d)",(int)d);
+            sprintf(s,"int(%d)",(int)(long)d);
           }
           else
           {
             s=(char *)omAlloc(MAX_INT_LEN+2);
-            sprintf(s,"%d",(int)d);
+            sprintf(s,"%d",(int)(long)d);
           }
           return s;
 

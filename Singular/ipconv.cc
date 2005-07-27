@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipconv.cc,v 1.27 2005-05-18 15:59:35 Singular Exp $ */
+/* $Id: ipconv.cc,v 1.28 2005-07-27 15:47:57 Singular Exp $ */
 /*
 * ABSTRACT: automatic type conversions
 */
@@ -36,13 +36,13 @@ struct sConvertTypes
 
 static void * iiI2P(void *data)
 {
-  poly p=pISet((int)data);
+  poly p=pISet((int)(long)data);
   return (void *)p;
 }
 
 static void * iiI2V(void *data)
 {
-  poly p=pISet((int)data);
+  poly p=pISet((int)(long)data);
   if (p!=NULL) pSetComp(p,1);
   return (void *)p;
 }
@@ -50,7 +50,7 @@ static void * iiI2V(void *data)
 static void * iiI2Id(void *data)
 {
   ideal I=idInit(1,1);
-  I->m[0]=pISet((int)data);
+  I->m[0]=pISet((int)(long)data);
   return (void *)I;
 }
 
@@ -115,13 +115,14 @@ static void * iiMa2Mo(void *data)
 
 static void * iiI2Iv(void *data)
 {
-  intvec *iv=new intvec((int)data,(int)data);
+  int s=(int)(long)data;
+  intvec *iv=new intvec(s,s);
   return (void *)iv;
 }
 
 static void * iiI2N(void *data)
 {
-  number n=nInit((int)data);
+  number n=nInit((int)(long)data);
   return (void *)n;
 }
 

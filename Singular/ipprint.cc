@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipprint.cc,v 1.22 2005-05-18 15:59:35 Singular Exp $ */
+/* $Id: ipprint.cc,v 1.23 2005-07-27 15:47:57 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: printing
 */
@@ -262,7 +262,7 @@ BOOLEAN jjDBPRINT(leftv res, leftv u)
   BOOLEAN print=(printlevel>myynest);
   if ((u->next!=NULL)&&(u->Typ()==INT_CMD))
   {
-    print=((int)u->Data()>0);
+    print=  (((long)(u->Data()))>0L);
     u=u->next;
   }
   if (print)
@@ -285,7 +285,7 @@ BOOLEAN jjDBPRINT(leftv res, leftv u)
 static void ipPrintBetti(leftv u)
 {
   int i,j;
-  int row_shift=(int)atGet(u,"rowShift",INT_CMD);
+  int row_shift=(int)((long)(atGet(u,"rowShift",INT_CMD)));
   intvec * betti=(intvec *)u->Data();
   // head line --------------------------------------------------------
   PrintS("      "); // 6 spaces for no. and :

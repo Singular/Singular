@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.10 2005-06-08 13:52:12 Singular Exp $ */
+/* $Id: longalg.cc,v 1.11 2005-07-27 15:48:28 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -1987,7 +1987,7 @@ number naMapP0(number c)
   lnumber l=(lnumber)omAllocBin(rnumber_bin);
   l->s=2;
   l->z=(napoly)p_Init(nacRing);
-  int i=(int)c;
+  int i=(int)((long)c);
   if (i>(naPrimeM>>2)) i-=naPrimeM;
   napGetCoeff(l->z)=nlInit(i);
   l->n=NULL;
@@ -2028,7 +2028,7 @@ number naMapPP(number c)
 number naMapPP1(number c)
 {
   if (npIsZero(c)) return NULL;
-  int i=(int)c;
+  int i=(int)((long)c);
   if (i>naPrimeM) i-=naPrimeM;
   number n=npInit(i);
   if (npIsZero(n)) return NULL;

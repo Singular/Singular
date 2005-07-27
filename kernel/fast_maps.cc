@@ -6,7 +6,7 @@
  *  Purpose: implementation of fast maps
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 02/01
- *  Version: $Id: fast_maps.cc,v 1.3 2005-04-25 12:59:13 Singular Exp $
+ *  Version: $Id: fast_maps.cc,v 1.4 2005-07-27 15:48:28 Singular Exp $
  *******************************************************************/
 #include "mod2.h"
 #include <omalloc.h>
@@ -101,10 +101,10 @@ void maMonomial_Out(mapoly monomial, ring src_r, ring dest_r)
     printf(" dest:");
     p_wrp(monomial->dest, dest_r);
   }
-  if (monomial->f1!=NULL) { printf(" f1:%x", (unsigned int)monomial->f1->src);
+  if (monomial->f1!=NULL) { printf(" f1:%x", (long)monomial->f1->src);
                             // p_wrp(monomial->f1->src, src_r);
                           }
-  if (monomial->f2!=NULL) { printf(" f2:%x",(unsigned int)monomial->f2->src);
+  if (monomial->f2!=NULL) { printf(" f2:%x",(long)monomial->f2->src);
                             // p_wrp(monomial->f2->src, src_r);
                           }
   printf("\n");

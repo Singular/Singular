@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: attrib.cc,v 1.23 2005-05-18 15:59:33 Singular Exp $ */
+/* $Id: attrib.cc,v 1.24 2005-07-27 15:47:52 Singular Exp $ */
 
 /*
 * ABSTRACT: attributes to leftv and idhdl
@@ -367,7 +367,7 @@ BOOLEAN atATTRIB3(leftv res,leftv a,leftv b,leftv c)
       WerrorS("attrib isSB must be int");
       return TRUE;
     }
-    if (((int)c->Data())!=0)
+    if (((long)c->Data())!=0L)
     {
       if (h!=NULL) setFlag(h,FLAG_STD);
       setFlag(v,FLAG_STD);
@@ -386,7 +386,7 @@ BOOLEAN atATTRIB3(leftv res,leftv a,leftv b,leftv c)
       return TRUE;
     }
     ideal I=(ideal)v->Data();
-    I->rank=si_max((int)I->rank,(int)c->Data());
+    I->rank=si_max((int)I->rank,(int)((long)c->Data()));
   }
   else if ((strcmp(name,"global")==0)
   &&(((t=v->Typ())==RING_CMD)||(t==QRING_CMD)))

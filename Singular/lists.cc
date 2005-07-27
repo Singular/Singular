@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: lists.cc,v 1.29 2005-07-22 16:22:11 levandov Exp $ */
+/* $Id: lists.cc,v 1.30 2005-07-27 15:47:57 Singular Exp $ */
 /*
 * ABSTRACT: handling of the list type
 */
@@ -123,11 +123,11 @@ BOOLEAN lInsert(leftv res, leftv u, leftv v)
 BOOLEAN lInsert3(leftv res, leftv u, leftv v, leftv w)
 {
   lists ul=(lists)u->CopyD();
-  res->data=(char *)lInsert0(ul,v,(int)w->Data());
+  res->data=(char *)lInsert0(ul,v,(int)(long)w->Data());
   if (res->data==NULL)
   {
     Werror("cannot insert type `%s` at pos. %d",
-      Tok2Cmdname(v->Typ()),(int)w->Data());
+      Tok2Cmdname(v->Typ()),(int)(long)w->Data());
     return TRUE;
   }
   return FALSE;
@@ -149,7 +149,7 @@ BOOLEAN lAppend(leftv res, leftv u, leftv v)
 BOOLEAN lDelete(leftv res, leftv u, leftv v)
 {
   lists ul=(lists)u->Data();
-  int VIndex=(int)v->Data()-1;
+  int VIndex=(int)(long)v->Data()-1;
 
   if((0<=VIndex)&&(VIndex<=ul->nr))
   {

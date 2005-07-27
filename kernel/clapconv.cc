@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapconv.cc,v 1.5 2005-06-13 16:23:30 Singular Exp $
+// $Id: clapconv.cc,v 1.6 2005-07-27 15:48:28 Singular Exp $
 /*
 * ABSTRACT: convert data between Singular and factory
 */
@@ -47,9 +47,9 @@ convSingNClapN( number n )
   }
   else
   {
-    if ( ((int)n) & 1 )
+    if ( ((long)n) & 1L )
     {
-      term = ((int)n) >>2;
+      term = ((long)n) >>2;
     }
     else
     {
@@ -118,9 +118,9 @@ CanonicalForm conv_SingPClapP( poly p, ring r )
     }
     else
     {
-      if ( (int)(pGetCoeff( p )) & 1 )
+      if ( (long)(pGetCoeff( p )) & 1 )
       {
-        term = ((int)( pGetCoeff( p ) )>>2);
+        term = ((long)( pGetCoeff( p ) )>>2);
       }
       else
       {
@@ -323,7 +323,7 @@ convSingTrClapP( napoly p )
       //if ( (!(int)(napGetCoeff( p )) & 1 )
       //&&  ( napGetCoeff( p )->s == 0))
       //  naNormalize( naGetCoeff( p ) );
-      if ( (int)(napGetCoeff( p )) & 1 )
+      if ( (long)(napGetCoeff( p )) & 1L )
         term = nlInt( napGetCoeff( p ) );
       else
       {
@@ -542,7 +542,7 @@ CanonicalForm convSingAClapA ( napoly p , const Variable & a )
       //if ( (!(int)(napGetCoeff( p )) & 1 )
       //&&  ( napGetCoeff( p )->s == 0))
       //  naNormalize( naGetCoeff( p ) );
-      if ( (int)(napGetCoeff( p )) & SR_INT )
+      if ( (long)(napGetCoeff( p )) & SR_INT )
         term = nlInt( napGetCoeff( p ) );
         //term = SR_TO_INT(napGetCoeff( p )) ;
       else

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feOpt.cc,v 1.21 2003-02-20 13:49:32 Singular Exp $ */
+/* $Id: feOpt.cc,v 1.22 2005-07-27 15:47:54 Singular Exp $ */
 /*
 * ABSTRACT: Implementation of option buisness
 */
@@ -396,13 +396,14 @@ static char* feOptAction(feOptIndex opt)
 #endif
 
       case FE_OPT_ECHO:
-        si_echo = (int) feOptSpec[FE_OPT_ECHO].value;
+        si_echo = (int) ((long)(feOptSpec[FE_OPT_ECHO].value));
         if (si_echo < 0 || si_echo > 9)
           return "argument of option is not in valid range 0..9";
         return NULL;
 
       case FE_OPT_RANDOM:
-        siRandomStart = (unsigned int) feOptSpec[FE_OPT_RANDOM].value;
+        siRandomStart = (unsigned int) ((unsigned long)
+			                  (feOptSpec[FE_OPT_RANDOM].value));
 #ifdef buildin_rand
         siSeed=siRandomStart;
 #else
@@ -452,7 +453,7 @@ static char* feOptAction(feOptIndex opt)
 
       case FE_OPT_TICKS_PER_SEC:
       {
-        int ticks = (int) feOptSpec[FE_OPT_TICKS_PER_SEC].value;
+        int ticks = (int) ((long)(feOptSpec[FE_OPT_TICKS_PER_SEC].value));
         if (ticks <= 0)
           return "integer argument must be larger than 0";
         SetTimerResolution(ticks);

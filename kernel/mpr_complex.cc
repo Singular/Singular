@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_complex.cc,v 1.2 2005-02-03 16:43:37 Singular Exp $ */
+/* $Id: mpr_complex.cc,v 1.3 2005-07-27 15:48:29 Singular Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - real floating-point numbers using gmp
@@ -26,7 +26,6 @@
 // and will be used in numberToFloat.
 // Make sure that it is up to date!!
 #define SR_HDL(A) ((long)(A))
-#define SR_INT    1
 #define SR_TO_INT(SR) (((long)SR) >> 2)
 
 #define SIGN_PLUS  1
