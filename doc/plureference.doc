@@ -1,5 +1,5 @@
   @comment -*-texinfo-*-
-@comment $Id: plureference.doc,v 1.36 2005-05-23 15:36:06 levandov Exp $
+@comment $Id: plureference.doc,v 1.37 2005-07-27 12:40:26 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -1496,8 +1496,8 @@ vdim(I);
 @end table
 @c ref
 See also
-@ref{ideal @value{PSUFFIX} };
-@ref{std @value{PSUFFIX} };
+@ref{ideal @value{PSUFFIX}};
+@ref{std @value{PSUFFIX}};
 @ref{kbase @value{PSUFFIX}}.
 @c ref
 
