@@ -1,6 +1,6 @@
 // last modified 21.07.2005, Oliver Wienand
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: surf.lib,v 1.25 2005-07-21 09:19:42 wienand Exp $";
+version="$Id: surf.lib,v 1.26 2005-07-27 10:35:27 Singular Exp $";
 category="Visualization";
 info="
 LIBRARY: surf.lib    Procedures for Graphics with Surf
@@ -121,6 +121,7 @@ background_red=255; background_green=255; background_blue=255;");
   }
   surf_call =surf_call + l + " >/dev/null 2>&1";
 
+  "Press q to exit from 'surf'";
   if ("ppcMac-darwin" != system("uname")) {
      i=system("sh", surf_call);
   } else {
