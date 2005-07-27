@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.5 2005-07-26 17:04:15 Singular Exp $ */
+/* $Id: febase.cc,v 1.6 2005-07-27 09:46:19 Singular Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -37,12 +37,7 @@ extern FILE *stdin;
 #define fePutChar(c) fputc((uchar)(c),stdout)
 /*0 implementation */
 
-char fe_promptstr[]
-#ifdef macintosh
-                   =" \n";
-#else
-                   ="  ";
-#endif
+char fe_promptstr[] ="  ";
 
 #define INITIAL_PRINT_BUFFER 24*1024
 static int feBufferLength=INITIAL_PRINT_BUFFER;
@@ -50,11 +45,7 @@ static char * feBuffer=(char *)omAlloc(INITIAL_PRINT_BUFFER);
 
 int     si_echo = 0;
 int     printlevel = 0;
-#ifndef macintosh
 int     pagelength = 24;
-#else
-int     pagelength = -1;
-#endif
 int     colmax = 80;
 char    prompt_char = '>'; /*1 either '>' or '.'*/
 extern "C" {
@@ -70,11 +61,6 @@ char *  feErrors=NULL;
 int     feErrorsLen=0;
 BOOLEAN feWarn = TRUE;
 BOOLEAN feOut = TRUE;
-
-#ifdef macintosh
-static  int lines = 0;
-static  int cols = 0;
-#endif
 
 const char feNotImplemented[]="not implemented";
 
@@ -455,10 +441,6 @@ BOOLEAN exitVoice()
 static void feShowPrompt(void)
 {
   fe_promptstr[0]=prompt_char;
-#ifdef macintosh
-  cols = 0;
-  printf(fe_promptstr);mflush();
-#endif
 }
 
 /*2
@@ -796,12 +778,7 @@ FILE * feFopen(char *path, char *mode, char *where,int useWerror,
         *q = fePathSep;
         strcat(s, DIR_SEPP);
         strcat(s, path);
-        #ifndef macintosh
-          if(!access(s, R_OK)) { found++; break; }
-        #else
-          f=fopen(s,mode); /* do not need myfopen: we test only the access */
-          if (f!=NULL)  { found++; fclose(f); break; }
-        #endif
+        if(!access(s, R_OK)) { found++; break; }
         p = q+1;
       }
       if(!found)
@@ -1019,40 +996,6 @@ void Warn(const char *fmt, ...)
 }
 
 
-#ifdef macintosh
-static  int lines = 0;
-static  int cols = 0;
-
-void mwrite(uchar c)
-{
-  if (c == '\n')
-  {
-    cols = 0;
-    if (lines == pagelength)
-    {
-      lines = 0;
-      fputs("pause>\n",stderr);
-      uchar c = fgetc(stdin);
-    }
-    else
-    {
-      lines++;
-      fePutChar(c);
-    }
-  }
-  else
-  {
-    fePutChar(c);
-    cols++;
-    if (cols == colmax)
-    {
-      // cols = 0;   //will be done by mwrite('\n');
-      mwrite('\n');
-    }
-  }
-}
-#endif
-
 // some routines which redirect the output of print to a string
 static char* sprint = NULL;
 void SPrintStart()
@@ -1099,13 +1042,6 @@ void PrintS(char *s)
   if (feOut) /* do not print when option --no-out was given */
   {
 
-#ifdef macintosh
-    char c;
-    while ('\0' != (c = *s++))
-    {
-      mwrite(c);
-    }
-#else
 #ifdef HAVE_TCL
     if (tclmode)
     {
@@ -1121,7 +1057,6 @@ void PrintS(char *s)
         fwrite(s,1,strlen(s),feProtFile);
       }
     }
-#endif
   }
 }
 
@@ -1165,30 +1100,17 @@ void Print(char *fmt, ...)
 #ifdef HAVE_TCL
     if(tclmode)
 #endif
-#if (defined(HAVE_TCL) || defined(macintosh))
+#if defined(HAVE_TCL)
     {
       char *s=(char *)omAlloc(strlen(fmt)+256);
       vsprintf(s,fmt, ap);
 #ifdef HAVE_TCL
       PrintTCLS('N',s);
 #endif
-#ifdef macintosh
-      char c;
-      while ('\0' != (c = *s++))
-      {
-        mwrite(c);
-      }
-      if (feProt&PROT_O)
-      {
-        vfprintf(feProtFile,fmt,ap);
-      }
-#endif
     }
 #endif
-#if !defined(macintosh) || defined(HAVE_TCL)
 #ifdef HAVE_TCL
     else
-#endif
     {
       vfprintf(stdout, fmt, ap);
       fflush(stdout);

@@ -124,7 +124,6 @@ void m2_end(short i)
 * testet on : linux, HP 9.0
 *
 *#ifndef MSDOS
-*#ifndef macintosh
 *#include <sys/times.h>
 *#include <sys/resource.h>
 *extern "C" int setpriority(int,int,int);
@@ -135,9 +134,6 @@ void m2_end(short i)
 *#endif
 *  sleep(10);
 *}
-*#else
-*void very_nice(){}
-*#endif
 *#else
 *void very_nice(){}
 *#endif

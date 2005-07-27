@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feResource.cc,v 1.6 2005-07-25 09:09:41 wienand Exp $ */
+/* $Id: feResource.cc,v 1.7 2005-07-27 09:46:19 Singular Exp $ */
 /*
 * ABSTRACT: management of resources
 */
@@ -37,8 +37,6 @@ char* feResource(const char* key, int warn = -1);
 #if defined(MAKE_DISTRIBUTION)
 #if defined(ix86_Win) && ! defined(__CYGWIN__)
 #define SINGULAR_DEFAULT_DIR "/Singular/"S_VERSION1
-#elif defined(macintosh)
-#define SINGULAR_DEFAULT_DIR "Macintosh HD:Singular:"S_VERSION1
 #else // unix
 #define SINGULAR_DEFAULT_DIR "/usr/local/Singular/"S_VERSION1
 #endif
@@ -94,12 +92,7 @@ static feResourceConfig_s feResourceConfigs[] =
 #endif
   {"ManualUrl", 'u',    feResUrl,   "SINGULAR_URL",         "http://www.singular.uni-kl.de/Manual/"S_VERSION1,    ""},
   {"ExDir",      'm',   feResDir,   "SINGULAR_EXAMPLES_DIR","%r/examples",              ""},
-//#if !defined(macintosh)
-//  {"netscape",  'N',    feResBinary,"NETSCAPE",             "%b/netscape",          ""},
-//  {"info",      'I',    feResBinary,"INFO",                 "%b/info",              ""},
-//  {"tkinfo",    'T',    feResBinary,"TKINFO",               "%b/tkinfo",            ""},
   {"Path",      'p',    feResPath,  NULL,                   "%b;$PATH",         ""},
-//#endif // ! defined(macintosh)
 
 #ifdef ESINGULAR
   {"emacs",    'E',    feResBinary, "ESINGULAR_EMACS",      "%b/emacs",              ""},
@@ -132,8 +125,6 @@ char* feArgv0=NULL;
 char fePathSep =
 #if defined(ix86_Win)
 ';'
-#elif defined(macintosh)
-','
 #else
 ':'
 #endif
@@ -417,7 +408,6 @@ static char* feGetExpandedExecutable()
     else dReportBug("feArgv0 == ''");
     return NULL;
   }
-#ifndef macintosh
 #ifdef ix86_Win // stupid WINNT sometimes gives you argv[0] within ""
   if (*feArgv0 == '"')
   {
@@ -445,9 +435,6 @@ static char* feGetExpandedExecutable()
     return NULL;
   }
   return omStrDup(value);
-#else // macintosh
-  return feArgv0;
-#endif
 }
 
 
@@ -552,23 +539,6 @@ static char* feCleanUpFile(char* fname)
       }
     }
   }
-
-#ifdef macintosh
-  // replace / and .. by DIR_SEP and UP_DIR
-  fn = fname;
-  while (*fn != NULL)
-  {
-    if (*fn == '.' && *(fn + 1) == '.')
-    {
-      mystrcpy(fn , fn + 2);
-    }
-    else
-    {
-      if (*fn == '/') *fn = DIR_SEP;
-      fn++;
-    }
-  }
-#endif
 
 #ifdef RESOURCE_DEBUG
   printf("feCleanUpFile: leaving with =%s=\n", fname);

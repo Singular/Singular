@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.3 2005-07-26 17:04:15 Singular Exp $ */
+/* $Id: febase.h,v 1.4 2005-07-27 09:46:20 Singular Exp $ */
 /*
 * ABSTRACT: basic i/o
 */
@@ -12,15 +12,10 @@
 #include "structs.h"
 
 /* define DIR_SEPP, etc */
-#ifdef macintosh /* mac os 9 */
-#  define  DIR_SEP ':'
-#  define  DIR_SEPP ":"
-#  define  UP_DIR ""
-#else  /* unix , WINNT */
+/* unix , WINNT */
 #  define  DIR_SEP '/'
 #  define  DIR_SEPP "/"
 #  define  UP_DIR ".."
-#endif  /* macintosh */
 // this might still get reset by feInitResources
 extern char fePathSep;
 
