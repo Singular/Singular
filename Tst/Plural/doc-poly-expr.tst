@@ -10,7 +10,7 @@ cleardenom(g);
 int i = 102;
 poly(i);
 typeof(_);
-kill(r);
+kill r;
 ring r=0,(x,y),dp;
 system("PLURAL",1,1);
 // it is a Weyl algebra 

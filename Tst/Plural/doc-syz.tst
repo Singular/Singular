@@ -1,8 +1,8 @@
 LIB "tst.lib";
-LIB "nctools.lib";
+LIB "ring.lib";
 tst_init();
 ring Rq=(0,Q),(x,y,z),dp; // U_q(so_3)
-minpoly = RootOfUnity(6); // Q is a 6th root of unity
+minpoly = rootofUnity(6); // Q is a 6th root of unity
 matrix C[3][3];
 matrix D[3][3];
 C[1,2]=Q2;    C[1,3]=1/Q2;  C[2,3]=Q2;
