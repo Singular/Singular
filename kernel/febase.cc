@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.6 2005-07-27 09:46:19 Singular Exp $ */
+/* $Id: febase.cc,v 1.7 2005-07-27 16:51:02 Singular Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -1111,6 +1111,7 @@ void Print(char *fmt, ...)
 #endif
 #ifdef HAVE_TCL
     else
+#endif
     {
       vfprintf(stdout, fmt, ap);
       fflush(stdout);
@@ -1119,7 +1120,6 @@ void Print(char *fmt, ...)
         vfprintf(feProtFile,fmt,ap);
       }
     }
-#endif
     va_end(ap);
   }
 }
