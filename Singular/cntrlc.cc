@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: cntrlc.cc,v 1.48 2005-05-06 14:21:19 Singular Exp $ */
+/* $Id: cntrlc.cc,v 1.49 2005-07-27 09:59:26 Singular Exp $ */
 /*
 * ABSTRACT - interupt handling
 */
@@ -494,53 +494,17 @@ void sigint_handler(int sig)
 }
 #endif /* !MSDOS */
 
-//#ifdef macintosh
-//#include <Types.h>
-//#include <Events.h>
-//#include <OSEvents.h>
-//#include <CursorCtl.h>
-//
-///*3
-//* macintosh only:
-//* side effect of ^C is to insert EOF at the end of the current
-//* input selection. We must drain input, reach this EOF, then clear it
-//*/
-//static void flush_intr(void)
-//{
-//  int c;
-//
-//  while ((c=getchar())!=EOF);
-//  clearerr(stdin);
-//}
-//
-///*3
-//* macintosh only:
-//* spin beach ball in MPW, allows MPW-tool to go to the background
-//* so you can use the finder and interrupts
-//*/
-//static void beachball(void)
-//{
-//  Show_Cursor(HIDDEN_CURSOR);
-//  SpinCursor(10);
-//}
-//#endif
-
 #ifndef MSDOS
 //void test_int()
 //{
-//#ifndef macintosh
 //  if (siCntrlc!=0)
 //  {
 //    int saveecho = si_echo;
 //    siCntrlc = FALSE;
 //    si_set_signal(SIGINT ,sigint_handler);
-////#ifdef macintosh
-////    flush_intr();
-////#endif
 //    iiDebug();
 //    si_echo = saveecho;
 //  }
-//#endif
 //}
 #endif /* !MSDOS */
 

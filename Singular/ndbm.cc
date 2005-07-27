@@ -4,7 +4,7 @@
 
 //**************************************************************************/
 //
-// $Id: ndbm.cc,v 1.15 2005-07-26 17:06:58 Singular Exp $
+// $Id: ndbm.cc,v 1.16 2005-07-27 09:59:27 Singular Exp $
 //
 //**************************************************************************/
 // 'ndbm.cc' containes all low-level functions to manipulate dbm-files
@@ -32,22 +32,20 @@ static char sccsid[] = "@(#)ndbm.c        5.3 (Berkeley) 3/9/86";
 //**************************************************************************/
 
 #include <stdio.h>
-#ifdef __MWERKS__
-#   define bcopy(a,b,c) memmove(b,a,c)
-#   define EPERM 1
-#   define ENOMEM 23
-#   define ENOSPC 28
-#   define L_SET SEEK_SET
-#else
-#   include <sys/types.h>
-#   include <sys/stat.h>
-#   include <sys/file.h>
-#   include <errno.h>
-#   include <stdlib.h>
-#   include <string.h>
-#   include <unistd.h>
-#   include <fcntl.h>
-#endif
+/* alternative:
+* #   define EPERM 1
+* #   define ENOMEM 23
+* #   define ENOSPC 28
+* #   define L_SET SEEK_SET
+*/
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/file.h>
+#include <errno.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <fcntl.h>
 #ifndef HAVE_BCOPY
 #   define bcopy(a,b,c) memmove(b,a,c)
 #endif /* not HAVE_BCOPY */
@@ -77,12 +75,6 @@ dbm_open(char *file, int flags, int mode)
     errno = ENOMEM;
     return ((DBM *)0);
   }
-#ifdef macintosh
-  // It seems that the compile has some problems to commit the flags properly
-  // O_RDWR | O_CREAT = 0x102 change to 0x200. We don't know why.
-  // setting flags to O_RDWR | O_CREAT solved our problem. :-(
-  flags = O_RDWR | O_CREAT;
-#endif /* macintosh */
 #ifdef MSDOS
   // default mode of open is ascii, we need binary mode.
   flags |= O_BINARY;

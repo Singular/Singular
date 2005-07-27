@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_Tok.cc,v 1.30 2001-08-27 14:47:17 Singular Exp $ */
+/* $Id: mpsr_Tok.cc,v 1.31 2005-07-27 09:59:27 Singular Exp $ */
 
 /***************************************************************
  *
@@ -579,7 +579,7 @@ void mpsr_ttGen()
 #ifdef GENTABLE
 
 // simply touch mpsr_Tok.inc so that Make does not get confused
-#if !defined(macintosh) && !defined(HPUX_9)
+#if !defined(HPUX_9)
 extern "C" int system(char *);
 #else
 #include <stdio.h>
@@ -587,13 +587,7 @@ extern "C" int system(char *);
 
 void mpsr_ttGen()
 {
-#ifndef macintosh
   system("touch mpsr_Tok.inc");
-#else
-  // simulate touch on a macintosh
-  FILE *fd = fopen("mpsr_Tok.inc", "w");
-  close(fd);
-#endif
 }
 #endif
 

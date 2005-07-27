@@ -94,7 +94,6 @@ int inits(void)
 * testet on : linux, HP 9.0
 *
 *#ifndef MSDOS
-*#ifndef macintosh
 *#include <sys/times.h>
 *#include <sys/resource.h>
 *extern "C" int setpriority(int,int,int);
@@ -105,9 +104,6 @@ int inits(void)
 *#endif
 *  sleep(10);
 *}
-*#else
-*void very_nice(){}
-*#endif
 *#else
 *void very_nice(){}
 *#endif

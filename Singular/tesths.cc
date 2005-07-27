@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.99 2005-07-26 17:06:58 Singular Exp $ */
+/* $Id: tesths.cc,v 1.100 2005-07-27 09:59:27 Singular Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -149,11 +149,10 @@ int main(          /* main entry to Singular */
 #ifdef HAVE_SDB
     sdb_flags = 0;
 #endif
-#ifdef __MWERKS__
-    memcpy(stderr,stdout,sizeof(FILE));
-#else
     dup2(1,2);
-#endif
+    /* alternative:
+    *    memcpy(stderr,stdout,sizeof(FILE));
+    */
   }
   slStandardInit();
   dlInit(feArgv0);
