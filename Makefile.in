@@ -181,7 +181,7 @@ dist: ${SHAREDIST_NAME}.tar.gz  ${BINDIST_NAME}.tar.gz
 
 cygwin-dist-install: ${BINDIST_NAME}.tar.gz ${SHAREDIST_NAME}.tar.gz
 	rm -r /usr/local/Singular/${S_VERSION}
-        tar  --directory=/usr/local -x -z -f ${SHAREDIST_NAME}.tar.gz
+	tar  --directory=/usr/local -x -z -f ${SHAREDIST_NAME}.tar.gz
 	rm -r -f /usr/local/Singular/${S_VERSION}/html
 	tar  --directory=/usr/local -x -z -f ${BINDIST_NAME}.tar.gz
 	cp ${CYGWIN_AUX_FILES}/surf.exe /usr/local/Singular/${S_VERSION}/ix86-Win
