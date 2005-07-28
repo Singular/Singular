@@ -1,5 +1,5 @@
 # @configure_input@
-# $Id: GNUmakefile.in,v 1.43 2005-05-12 09:26:47 Singular Exp $
+# $Id: GNUmakefile.in,v 1.44 2005-07-28 17:21:40 Singular Exp $
 
 #
 # GNUmakefile.in - used by `configure' to create `GNUmakefile', the
@@ -394,7 +394,7 @@ distfiles :=	\
 		examples/factorize.cc examples/gcd.cc \
 		bin/folding.el bin/fold-docu.el \
 		bin/install-sh bin/mkinstalldirs \
-		bin/makeheader bin/makeheader.pl
+		bin/makeheader
 
 #
 # - phony targets.
