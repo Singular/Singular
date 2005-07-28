@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_base.h,v 1.1.1.1 2003-10-06 12:15:57 Singular Exp $ */
+/* $Id: mpr_base.h,v 1.2 2005-07-28 09:56:58 Singular Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - resultant matrices
@@ -115,7 +115,7 @@ ideal loNewtonPolytope( const ideal id );
 
 extern size_t gmp_output_digits;
 //%e
-#endif MPR_BASE_H
+#endif /*MPR_BASE_H*/
 
 // local Variables: ***
 // folded-file: t ***
