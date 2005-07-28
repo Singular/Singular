@@ -29,7 +29,7 @@ HH_AKLINK link;
    link.pszMsgTitle =  NULL ;
    link.pszWindow =    NULL ;
    link.fIndexOnFail = TRUE ;
-  HtmlHelp(NULL, "..\\html\\Manual.chm", HH_KEYWORD_LOOKUP, (DWORD)&link);
+  HtmlHelp(NULL, path, HH_KEYWORD_LOOKUP, (DWORD)&link);
 }
 
 void heOpenWinntHlp(const char* keyw, char* helppath )

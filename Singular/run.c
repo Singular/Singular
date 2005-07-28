@@ -96,8 +96,8 @@ WinMain (HINSTANCE hSelf, HINSTANCE hPrev, LPSTR cmdline, int nShow)
 
 #if defined(__CYGWIN__)
    /* this insures that we search for symlinks before .exe's */
-   if (compact_invocation)
-      strip_exe(execname);
+//   if (compact_invocation)
+//      strip_exe(execname);
 #endif
 
    process_execname(exec,execname,execpath);
