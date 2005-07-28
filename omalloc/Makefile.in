@@ -3,7 +3,7 @@
 ### Purpose: Makefile for omalloc
 ### Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
 ### Created: 11/99
-### Version: $Id: Makefile.in,v 1.16 2004-03-17 15:57:35 Singular Exp $
+### Version: $Id: Makefile.in,v 1.17 2005-07-28 15:02:28 Singular Exp $
 #################################################################
 
 SHELL		= /bin/sh
@@ -94,7 +94,7 @@ SOURCES=${CSOURCES} omGetPageSize.h omMallocSystem.h gmalloc.c dlmalloc.h dlmall
 
 ASO_OBJS := $(ASO_SOURCES:.aso.cc=.aso)
 
-DISTFILES=$(SOURCES) $(HEADERS) omtTest.h makeheader.pl Makefile.in \
+DISTFILES=$(SOURCES) $(HEADERS) omtTest.h makeheader Makefile.in \
            omConfig.h.in omlimits.h.in mylimits.h configure.in mkinstalldirs install-sh configure
 
 ##
@@ -128,7 +128,7 @@ libomalloc_ndebug.a: $(OBJS_NDEBUG) Makefile omConfig.h omlimits.h mylimits.h
 	$(RANLIB) $@
 
 omalloc.h: $(HEADERS)
-	$(PERL) makeheader.pl -a om_Alloc.h $@
+	./makeheader om_Alloc.h $@
 
 omalloc.o: omalloc.c
 	${CC} ${CFLAGS} ${CPPFLAGS} ${DEFS} -DOM_NDEBUG -c $< -o $@
