@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr.h,v 1.20 2000-12-06 11:03:22 Singular Exp $ */
+/* $Id: mpsr.h,v 1.21 2005-07-28 17:25:25 Singular Exp $ */
 /***************************************************************
  *
  * File:       mpsr.h
@@ -260,7 +260,6 @@ while (0)
 // in a header file
 
 #define SR_HDL(A) ((long)(A))
-#define SR_INT    1
 #define INT_TO_SR(INT)  ((number) (((long)INT << 2) + SR_INT))
 #define SR_TO_INT(SR)   (((long)SR) >> 2)
 
