@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.38 2005-07-26 07:17:40 bricken Exp $ */
+/* $Id: tgb.cc,v 1.39 2005-07-28 19:14:49 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -1041,8 +1041,10 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slim
     ENLARGE(c->lengths,int);
     ENLARGE(c->states, char*);
     ENLARGE(c->gcd_of_terms,poly);
-    ENLARGE(c->S->m,poly);
+    //ENLARGE(c->S->m,poly);
+    
   }
+  pEnlargeSet(&c->S->m,c->n-1,1);
   if (c->T_deg_full)
     ENLARGE(c->T_deg_full,int);
   c->T_deg[i]=pTotaldegree(h);
