@@ -1,4 +1,4 @@
-/* $Id: mp_gmp.h,v 1.1 2002-11-05 12:01:36 Singular Exp $ */
+/* $Id: mp_gmp.h,v 1.2 2005-07-29 10:57:05 Singular Exp $ */
 
 #ifndef MP_GMP_H
 #define MP_GMP_H
@@ -7,7 +7,7 @@
 extern "C" {
 #undef __cplusplus
 #include <gmp.h>
-#define __cplusplus
+#define __cplusplus 1
 }
 #else
 #include <gmp.h>
