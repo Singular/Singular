@@ -306,7 +306,6 @@ cygwin-dist-pack:
 	      /usr/local/Singular/${S_VERSION}/ix86-Win/SURF_COPYING
 	tar cjf ${CYGWIN_REP_DIR}/release/singular-helper/singular-helper-${CYGWIN_PORT_VER}.tar.bz2 \
 	      /usr/local/Singular/${S_VERSION}/ix86-Win/cygwin-setup.exe                \
-	      /usr/local/Singular/${S_VERSION}/ix86-Win/get_startmenu.exe               \
 	      /usr/X11R6/bin/startxserver.bat                                    \
 	      /etc/postinstall/singular-helper.sh
 	cp ${CYGWIN_AUX_FILES}/singular-surf-${CYGWIN_PORT_VER}-src.tar.bz2 ${CYGWIN_REP_DIR}/release/singular-surf/
