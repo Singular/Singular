@@ -72,6 +72,17 @@ int do_create_makefile = 1;
 int do_create_srcdir = 1;
 char* inst_dir = EXEC_PREFIX;
 
+#ifdef IRIX_6
+struct option
+{
+  const char *name;
+  /* has_arg can't be an enum because some compilers complain about
+     type mismatches in all the code that assumes it is an int.  */
+  int has_arg;
+  int *flag;
+  int val;
+};
+#endif
 static struct option long_options[] =
 {
   {"debug", 0, 0, 'd'},
@@ -82,6 +93,7 @@ static struct option long_options[] =
   {"verbose", 0, 0, 'v'},
   {0, 0, 0, 0}
 };
+
 
 void usage(char *name)
 {
@@ -115,8 +127,13 @@ main( int argc, char *argv[] )
   int option_index = 0;
   unsigned long cksm;
 
+#ifdef IRIX_6
+  while( (c=getopt (argc,argv, "dmvsi:")) != -1)
+#else
   while( (c=getopt_long (argc, argv, "dmvsi:",
-                         long_options, &option_index))>=0) {
+                         long_options, &option_index))>=0)
+#endif
+ {
     switch (c)
     {
         case 'd' : debug++; break;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: makefile.cc,v 1.21 2005-05-25 12:14:59 bricken Exp $ */
+/* $Id: makefile.cc,v 1.22 2005-08-02 14:06:18 Singular Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -160,7 +160,7 @@ static char *object_name(char *p)
 /*========================================================================*/
 /*===  Machine depend Makefile creation                                ===*/
 /*========================================================================*/
-#if defined(ix86_Linux) || defined(ix86_Linux_libc5) || defined(ix86_freebsd)|| defined(x86_64_Linux)
+#if defined(ix86_Linux) || defined(ix86_Linux_libc5) || defined(ix86_freebsd)|| defined(x86_64_Linux) || defined(IRIX_6)
 void build_compile_section(
   FILE *fp,
   moddefv module
@@ -239,18 +239,6 @@ void build_compile_section(
   fprintf(fp, "\techo \"don't know how to build library\"\n");
 }
 #  endif /* AIX_4 */
-
-/*========================================================================*/
-#  ifdef IRIX_6
-void build_compile_section(
-  FILE *fp,
-  moddefv module
-  )
-{
-  fprintf(fp, "all:\t\n");
-  fprintf(fp, "\techo \"don't know how to build library\"\n");
-}
-#  endif /* IRIX_6 */
 
 /*========================================================================*/
 #  ifdef Sun3OS_4
