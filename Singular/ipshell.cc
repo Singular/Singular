@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.120 2005-07-27 15:47:57 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.121 2005-08-03 12:14:16 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -412,7 +412,7 @@ void killlocals(int v)
   if (changed)
   {
     currRingHdl=rFindHdl(cr,NULL,NULL);
-    if (currRingHdl==NULL) 
+    if (currRingHdl==NULL)
       currRing=NULL;
     else
       rChangeCurrRing(cr);
@@ -605,7 +605,7 @@ int IsPrime(int p)  /* brute force !!!! */
   int end_i=cf_getNumSmallPrimes()-1;
 #else
   int end_i=p/2;
-#endif  
+#endif
   int end_p=(int)sqrt((double)p);
 restart:
   for (i=0; i<end_i; i++)
@@ -615,12 +615,12 @@ restart:
 #else
     if (i==0) j=2;
     else j=2*i-1;
-#endif    
+#endif
     if ((p%j) == 0)
     {
     #ifdef HAVE_FACTORY
       if (p<=32751) return IsPrime(p-2);
-    #endif  
+    #endif
       p-=2;
       goto restart;
     }
@@ -853,7 +853,7 @@ BOOLEAN jjMINRES(leftv res, leftv v)
   intvec *weights=(intvec*)atGet(v,"isHomog",INTVEC_CMD);
   int add_row_shift = 0;
   if (weights==NULL)
-    weights=(intvec*)atGet(&(L->m[0]),"isHomog",INTVEC_CMD); 
+    weights=(intvec*)atGet(&(L->m[0]),"isHomog",INTVEC_CMD);
   if (weights!=NULL)  add_row_shift=weights->min_in();
   resolvente rr=liFindRes(L,&len,&typ0);
   if (rr==NULL) return TRUE;
@@ -871,7 +871,7 @@ BOOLEAN jjBETTI(leftv res, leftv u)
   sleftv tmp;
   memset(&tmp,0,sizeof(tmp));
   tmp.rtyp=INT_CMD;
-  tmp.data=(void *)1;  
+  tmp.data=(void *)1;
   if ((u->Typ()==IDEAL_CMD)
   || (u->Typ()==MODUL_CMD))
     return jjBETTI2_ID(res,u,&tmp);
@@ -907,7 +907,7 @@ BOOLEAN jjBETTI2(leftv res, leftv u, leftv v)
 
   intvec *weights=NULL;
   int add_row_shift=0;
-  intvec *ww=(intvec *)atGet(&(l->m[0]),"isHomog",INTVEC_CMD); 
+  intvec *ww=(intvec *)atGet(&(l->m[0]),"isHomog",INTVEC_CMD);
   if (ww!=NULL)
   {
      weights=ivCopy(ww);
@@ -1197,7 +1197,7 @@ BOOLEAN iiInternalExport (leftv v, int toLev, idhdl roothdl)
     Warn("'%s': no such identifier\n", v->name);
     return FALSE;
   }
-  package frompack=v->req_packhdl; 
+  package frompack=v->req_packhdl;
   if (frompack==NULL) frompack=currPack;
   package rootpack = IDPACKAGE(roothdl);
 //  Print("iiInternalExport('%s',%d,%s->%s) typ:%d\n", v->name, toLev, IDID(currPackHdl),IDID(roothdl),v->Typ());
@@ -1516,6 +1516,7 @@ void rDecomposeCF(leftv h,const ring r,const ring R)
     if (r->block1[i]-r->block0[i] >=0 )
     {
       j=r->block1[i]-r->block0[i];
+      if(r->order[i]==ringorder_M) j=(j+1)*(j+1)-1;
       iv=new intvec(j+1);
       if ((r->wvhdl!=NULL) && (r->wvhdl[i]!=NULL))
       {
@@ -1573,7 +1574,7 @@ void rDecomposeC(leftv h,const ring R)
   L->m[0].rtyp=INT_CMD;
   L->m[0].data=(void *)0;
   // ----------------------------------------
-  // 1: 
+  // 1:
   lists LL=(lists)omAlloc0Bin(slists_bin);
   LL->Init(2);
     LL->m[0].rtyp=INT_CMD;
@@ -1595,7 +1596,7 @@ void rDecomposeC(leftv h,const ring R)
 lists rDecompose(const ring r)
 {
   // sanity check: require currRing==r for rings with polynomial data
-  if ((r!=currRing) 
+  if ((r!=currRing)
   && ((r->minpoly!=NULL) || (r->qideal!=NULL) || (r->minideal!=NULL)
 #ifdef HAVE_PLURAL
   || (rIsPluralRing(r))
@@ -1729,8 +1730,8 @@ void rComposeC(lists L, ring R)
   }
   R->ch=-1;
   // ----------------------------------------
-  // 1: 
-  if (L->m[1].rtyp!=LIST_CMD) 
+  // 1:
+  if (L->m[1].rtyp!=LIST_CMD)
     Werror("invald coeff. field description, expecting precision list");
   lists LL=(lists)L->m[1].data;
   int r1=(int)(long)LL->m[0].data;
@@ -2120,7 +2121,7 @@ BOOLEAN syBetti1(leftv res, leftv u)
   sleftv tmp;
   memset(&tmp,0,sizeof(tmp));
   tmp.rtyp=INT_CMD;
-  tmp.data=(void *)1;  
+  tmp.data=(void *)1;
   return syBetti2(res,u,&tmp);
 }
 

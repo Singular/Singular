@@ -1,3 +1,8 @@
+
+Wed Aug  3 14:12:13 CEST 2005 hannes
+* ipshell.cc: rDecompose: order M fixed
+* libparse.l: handling of >>url="....";<< in lib header
+-------------------------------------------------------------------------
 Fri Jan 19 17:56:20 CET 2001 hannes:
 * mod, div for intvec fixed
 * highcorner for global case fixed

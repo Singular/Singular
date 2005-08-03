@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.l,v 1.58 2005-07-26 17:06:58 Singular Exp $ */
+/* $Id: libparse.l,v 1.59 2005-08-03 12:14:17 Singular Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -27,7 +27,7 @@
 #ifdef HAVE_LIBPARSER
 #define YY_SKIP_YYWRAP
 
-typedef enum { LP_NONE, LP_INFO, LP_CATEGORY, LP_VERSION} lib_cmds;
+typedef enum { LP_NONE, LP_INFO, LP_CATEGORY, LP_URL, LP_VERSION} lib_cmds;
 
 int libread(FILE* f, char* buf, int max_size);
 int current_pos(int i);
@@ -231,6 +231,7 @@ eqnl           ([ \t\n\r]*+=[ \t\n\r]*)
 %x comment
 %x info
 %x category
+%x url
 %x version
 
 %%
@@ -243,6 +244,27 @@ eqnl           ([ \t\n\r]*+=[ \t\n\r]*)
 (category+{eqnl}+{quote}+{strings}+{quote}) {
          yyless(8); old_state = YYSTATE; BEGIN(category);
        }
+(url+{eqnl}+{quote}+{strings}+{quote}) {
+             if ( mode != GET_INFO )
+             {
+               #ifdef STANDALONE_PARSER
+               if (texinfo_out)
+               {
+                 char *c = yytext;
+                 printf("$url = \"");
+                 while ((*c != '\0') && (*c != '"')) c++;
+                 c++;
+                 while ((*c != '\0') && (*c != '"'))
+                 {
+                    if (*c != '\r') putchar(*c);
+                    c++;
+                 }
+                 printf("\";\n");
+               }
+               #endif
+             }
+       }
+
 (version+{eqnl}+{quote}+{strings}+{quote}) {
              found_version++;
              if ( mode != GET_INFO )
@@ -392,7 +414,7 @@ LIB[ \t]*"(\"" { quote++; brace2++;
              BEGIN(INITIAL);
              yymore();
            }
-<header>(info+{eqnl}+{quote})|(version+{eqnl}+{quote})|(category+{eqnl}+{quote}) {
+<header>(info+{eqnl}+{quote})|(version+{eqnl}+{quote})|(category+{eqnl}+{quote})|(url+{eqnl}+{quote}) {
              yyless(0);
              *lib_style = NEW_LIBSTYLE;
              BEGIN(INITIAL);
@@ -424,7 +446,7 @@ LIB[ \t]*"(\"" { quote++; brace2++;
              #endif
              BEGIN(INITIAL);
            }
-<help>(info+{eqnl}+{quote})|(version+{eqnl}+{quote})|(category+{eqnl}+{quote}) {
+<help>(info+{eqnl}+{quote})|(version+{eqnl}+{quote})|(category+{eqnl}+{quote})|(url+{eqnl}+{quote}) {
              yyless(0);
              *lib_style = NEW_LIBSTYLE;
              BEGIN(INITIAL);
@@ -716,6 +738,7 @@ LIB[ \t]*"(\"" { quote++; brace2++;
 <category>\n { yylplineno++; }
 <category>.  { }
 
+
 <string>"\""             { quote--;
                            copy_string(mode);
                            last_cmd = LP_NONE;
@@ -859,8 +882,10 @@ void make_version(char *p,int what)
 void copy_string(lp_modes mode)
 {
 #ifdef STANDALONE_PARSER
-  if ((texinfo_out && (last_cmd == LP_INFO || last_cmd == LP_CATEGORY)) ||
-      (category_out && last_cmd == LP_CATEGORY))
+  if ((texinfo_out 
+     && (last_cmd == LP_INFO || last_cmd == LP_CATEGORY || last_cmd == LP_URL))
+  || (category_out && last_cmd == LP_CATEGORY)
+)
   {
     long current_location = ftell(yylpin), i = string_start, quote = 0;
     char c;
@@ -869,6 +894,10 @@ void copy_string(lp_modes mode)
      if (last_cmd == LP_INFO)
      {
        printf("$info = <<EOT;\n");
+     }
+     else if (last_cmd == LP_URL)
+     {
+       printf("$url = <<EOT;\n");
      }
      else
      {
