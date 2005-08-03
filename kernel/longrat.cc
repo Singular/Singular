@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.6 2005-07-27 15:48:28 Singular Exp $ */
+/* $Id: longrat.cc,v 1.7 2005-08-03 12:51:07 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -73,11 +73,7 @@
 #define mpz_limb_size(A) ((A)->_mp_size)
 #define mpz_limb_d(A) ((A)->_mp_d)
 #define MPZ_DIV(A,B,C) mpz_tdiv_q((A),(B),(C))
-#ifdef HAVE_SMALLGMP
-#define MPZ_EXACTDIV(A,B,C) mpz_tdiv_q((A),(B),(C))
-#else
 #define MPZ_EXACTDIV(A,B,C) mpz_divexact((A),(B),(C))
-#endif
 
 #ifdef LDEBUG
 #define nlTest(a) nlDBTest(a,__FILE__,__LINE__)
