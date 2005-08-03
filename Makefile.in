@@ -234,28 +234,28 @@ install-root:
 # targets for the windows distribution
 #
 
-cygwin-dist-src:
+cygwin-dist-src ${SHAREDIST_NAME}.tar.bz2:
 	-rm -rf ${TMPDIR}
 	${MKINSTALLDIRS} ${TMPDIR}/singular-${CYGWIN_PORT_VER}
 	cd ${TMPDIR}/singular-${CYGWIN_PORT_VER}; cvs co All
 	cd  ${TMPDIR}; \
-	tar cjf singular-${CYGWIN_PORT_VER}-src.tar.bz2 singular-${CYGWIN_PORT_VER};
-	cp singular-${CYGWIN_PORT_VER}-src.tar.bz2 ${CYGWIN_REP_DIR}/release/singular-base/
+	tar cjf singular-base-${CYGWIN_PORT_VER}-src.tar.bz2 singular-${CYGWIN_PORT_VER};
+	mv ${TMPDIR}/singular-base-${CYGWIN_PORT_VER}-src.tar.bz2 .
 	-rm -rf ${TMPDIR}
 
-cygwin-dist-install: ${BINDIST_NAME}.tar.gz ${SHAREDIST_NAME}.tar.gz
-	-rm -r /usr/local/Singular/${S_VERSION}
-	tar  --directory=/usr/local -x -z -f ${SHAREDIST_NAME}.tar.gz
-	-rm -r -f /usr/local/Singular/${S_VERSION}/html
-	tar  --directory=/usr/local -x -z -f ${BINDIST_NAME}.tar.gz
-	cp ${CYGWIN_AUX_FILES}/surf.exe /usr/local/Singular/${S_VERSION}/ix86-Win
-	cp ${CYGWIN_AUX_FILES}/SURF_AUTHORS /usr/local/Singular/${S_VERSION}/ix86-Win
-	cp ${CYGWIN_AUX_FILES}/SURF_README /usr/local/Singular/${S_VERSION}/ix86-Win
-	cp ${CYGWIN_AUX_FILES}/SURF_COPYING /usr/local/Singular/${S_VERSION}/ix86-Win
-	cp ${CYGWIN_AUX_FILES}/Manual.chm /usr/local/Singular/${S_VERSION}/doc
-	cp ${CYGWIN_AUX_FILES}/startxserver.bat /usr/local/Singular/${S_VERSION}/ix86-Win
-	cp ${CYGWIN_AUX_FILES}/get_startmenu.exe /usr/local/Singular/${S_VERSION}/ix86-Win
-	cp ${CYGWIN_AUX_FILES}/cygwin-setup.exe /usr/local/Singular/${S_VERSION}/ix86-Win
+cygwin-dist-install: ${BINDIST_NAME}.tar.gz
+	-rm -r /usr/Singular/${S_VERSION}
+	tar  --directory=/usr -x -z -f ${SHAREDIST_NAME}.tar.gz
+	-rm -r -f /usr/Singular/${S_VERSION}/html
+	tar  --directory=/usr -x -z -f ${BINDIST_NAME}.tar.gz
+	cp ${CYGWIN_AUX_FILES}/surf.exe /usr/Singular/${S_VERSION}/ix86-Win
+	cp ${CYGWIN_AUX_FILES}/SURF_AUTHORS /usr/Singular/${S_VERSION}/ix86-Win
+	cp ${CYGWIN_AUX_FILES}/SURF_README /usr/Singular/${S_VERSION}/ix86-Win
+	cp ${CYGWIN_AUX_FILES}/SURF_COPYING /usr/Singular/${S_VERSION}/ix86-Win
+	cp ${CYGWIN_AUX_FILES}/Manual.chm /usr/Singular/${S_VERSION}/doc
+	cp ${CYGWIN_AUX_FILES}/startxserver.bat /usr/Singular/${S_VERSION}/ix86-Win
+	cp ${CYGWIN_AUX_FILES}/get_startmenu.exe /usr/Singular/${S_VERSION}/ix86-Win
+	wget http://cygwin.com/setup.exe -O /usr/Singular/${S_VERSION}/ix86-Win/cygwin-setup.exe
 	cp ${CYGWIN_AUX_FILES}/singular-helper.sh /etc/postinstall/
 	cp ${CYGWIN_AUX_FILES}/startxserver.bat /usr/X11R6/bin/
 	cp ${CYGWIN_AUX_FILES}/Singular /usr/bin
@@ -265,7 +265,7 @@ cygwin-dist-install: ${BINDIST_NAME}.tar.gz ${SHAREDIST_NAME}.tar.gz
 	cp ${CYGWIN_AUX_FILES}/singular-help.README /usr/share/doc/Cygwin/singular-help-${CYGWIN_PORT_VER}.README
 	cp ${CYGWIN_AUX_FILES}/singular-surf.README /usr/share/doc/Cygwin/singular-surf-${CYGWIN_PORT_VER}.README
 
-cygwin-dist-pack:
+cygwin-dist-pack: ${SHAREDIST_NAME}.tar.bz2
 	-rm -r -f ${CYGWIN_REP_DIR}
 	mkdir ${CYGWIN_REP_DIR}
 	mkdir ${CYGWIN_REP_DIR}/release
@@ -275,39 +275,40 @@ cygwin-dist-pack:
 	mkdir ${CYGWIN_REP_DIR}/release/singular-surf
 	mkdir ${CYGWIN_REP_DIR}/release/singular-helper
 	tar cjf ${CYGWIN_REP_DIR}/release/singular-base/singular-base-${CYGWIN_PORT_VER}.tar.bz2 \
-	      /usr/local/Singular/${S_VERSION}/COPYING  \
-	      /usr/local/Singular/${S_VERSION}/INSTALL  \
-	      /usr/local/Singular/${S_VERSION}/NEWS     \
-	      /usr/local/Singular/${S_VERSION}/README   \
+	      /usr/Singular/${S_VERSION}/COPYING  \
+	      /usr/Singular/${S_VERSION}/INSTALL  \
+	      /usr/Singular/${S_VERSION}/NEWS     \
+	      /usr/Singular/${S_VERSION}/README   \
 	      /usr/bin/Singular                  \
 	      /usr/bin/ESingular                 \
-	      /usr/local/Singular/${S_VERSION}/ix86-Win/*Singular*       \
-	      /usr/local/Singular/${S_VERSION}/ix86-Win/solve_IP.exe     \
-	      /usr/local/Singular/${S_VERSION}/ix86-Win/toric_ideal.exe  \
-	      /usr/local/Singular/${S_VERSION}/ix86-Win/change_cost.exe  \
-	      /usr/local/Singular/${S_VERSION}/ix86-Win/LLL.exe	  \
-	      /usr/local/Singular/${S_VERSION}/ix86-Win/libparse.exe     \
-	      /usr/local/Singular/${S_VERSION}/ix86-Win/gen_test.exe
+	      /usr/Singular/${S_VERSION}/ix86-Win/*Singular*       \
+	      /usr/Singular/${S_VERSION}/ix86-Win/solve_IP.exe     \
+	      /usr/Singular/${S_VERSION}/ix86-Win/toric_ideal.exe  \
+	      /usr/Singular/${S_VERSION}/ix86-Win/change_cost.exe  \
+	      /usr/Singular/${S_VERSION}/ix86-Win/LLL.exe	  \
+	      /usr/Singular/${S_VERSION}/ix86-Win/libparse.exe     \
+	      /usr/Singular/${S_VERSION}/ix86-Win/gen_test.exe
 	tar cjf ${CYGWIN_REP_DIR}/release/singular-share/singular-share-${CYGWIN_PORT_VER}.tar.bz2 \
-	      /usr/local/Singular/${S_VERSION}/COPYING  \
-	      /usr/local/Singular/${S_VERSION}/INSTALL  \
-	      /usr/local/Singular/${S_VERSION}/NEWS     \
-	      /usr/local/Singular/${S_VERSION}/README   \
-	      /usr/local/Singular/${S_VERSION}/emacs    \
-	      /usr/local/Singular/${S_VERSION}/LIB      \
-	      /usr/local/Singular/${S_VERSION}/examples
+	      /usr/Singular/${S_VERSION}/COPYING  \
+	      /usr/Singular/${S_VERSION}/INSTALL  \
+	      /usr/Singular/${S_VERSION}/NEWS     \
+	      /usr/Singular/${S_VERSION}/README   \
+	      /usr/Singular/${S_VERSION}/emacs    \
+	      /usr/Singular/${S_VERSION}/LIB      \
+	      /usr/Singular/${S_VERSION}/examples
 	tar cjf ${CYGWIN_REP_DIR}/release/singular-help/singular-help-${CYGWIN_PORT_VER}.tar.bz2 \
-	      /usr/local/Singular/${S_VERSION}/doc      \
-	      /usr/local/Singular/${S_VERSION}/info
+	      /usr/Singular/${S_VERSION}/doc      \
+	      /usr/Singular/${S_VERSION}/info
 	tar cjf ${CYGWIN_REP_DIR}/release/singular-surf/singular-surf-${CYGWIN_PORT_VER}.tar.bz2 \
-	      /usr/local/Singular/${S_VERSION}/ix86-Win/surf.exe       \
-	      /usr/local/Singular/${S_VERSION}/ix86-Win/SURF_AUTHORS   \
-	      /usr/local/Singular/${S_VERSION}/ix86-Win/SURF_README    \
-	      /usr/local/Singular/${S_VERSION}/ix86-Win/SURF_COPYING
+	      /usr/Singular/${S_VERSION}/ix86-Win/surf.exe       \
+	      /usr/Singular/${S_VERSION}/ix86-Win/SURF_AUTHORS   \
+	      /usr/Singular/${S_VERSION}/ix86-Win/SURF_README    \
+	      /usr/Singular/${S_VERSION}/ix86-Win/SURF_COPYING
 	tar cjf ${CYGWIN_REP_DIR}/release/singular-helper/singular-helper-${CYGWIN_PORT_VER}.tar.bz2 \
-	      /usr/local/Singular/${S_VERSION}/ix86-Win/cygwin-setup.exe                \
+	      /usr/Singular/${S_VERSION}/ix86-Win/cygwin-setup.exe                \
 	      /usr/X11R6/bin/startxserver.bat                                    \
 	      /etc/postinstall/singular-helper.sh
+	cp singular-base-${CYGWIN_PORT_VER}-src.tar.bz2 ${CYGWIN_REP_DIR}/release/singular-base/
 	cp ${CYGWIN_AUX_FILES}/singular-surf-${CYGWIN_PORT_VER}-src.tar.bz2 ${CYGWIN_REP_DIR}/release/singular-surf/
 	cp ${CYGWIN_AUX_FILES}/setup-base.hint ${CYGWIN_REP_DIR}/release/singular-base/setup.hint
 	cp ${CYGWIN_AUX_FILES}/setup-share.hint ${CYGWIN_REP_DIR}/release/singular-share/setup.hint
@@ -315,7 +316,7 @@ cygwin-dist-pack:
 	cp ${CYGWIN_AUX_FILES}/setup-surf.hint ${CYGWIN_REP_DIR}/release/singular-surf/setup.hint
 	cp ${CYGWIN_AUX_FILES}/setup-helper.hint ${CYGWIN_REP_DIR}/release/singular-helper/setup.hint
 
-cygwin-dist: cygwin-dist-install cygwin-dist-pack cygwin-dist-src cygwin-setup
+cygwin-dist: cygwin-dist-install cygwin-dist-pack cygwin-setup
 
 cygwin-setup-init:
 	echo "# This file is automatically generated by Makefile." > ${CYGWIN_REP_DIR}/setup.ini
@@ -326,7 +327,6 @@ cygwin-setup-init:
 	echo >> ${CYGWIN_REP_DIR}/setup.ini
 	cat ${CYGWIN_AUX_FILES}/setup.ini ${CYGWIN_REP_DIR}/setup.ini
 	echo >> ${CYGWIN_REP_DIR}/setup.ini
-#	cp ${CYGWIN_AUX_FILES}/setup.exe ${CYGWIN_REP_DIR}/setup.exe
 	wget http://cygwin.com/setup.exe -O ${CYGWIN_REP_DIR}/setup.exe
 
 cygwin-setup: cygwin-setup-init cygwin-setup-base cygwin-setup-share cygwin-setup-help cygwin-setup-surf cygwin-setup-helper
@@ -355,7 +355,7 @@ cygwin-setup-%:
 	fi;
 	echo >> ${CYGWIN_REP_DIR}/setup.ini
 
-cygwin-pfw: cygwin-pfw-Full cygwin-pfw-Small
+cygwin-pfw: cygwin-pfw-Full ## cygwin-pfw-Small
 
 cygwin-pfw-%:
 	if test -d ${TMPDIR}; then rm -rf ${TMPDIR}; fi
@@ -369,6 +369,8 @@ cygwin-pfw-%:
 	  cp -r ${CYGWIN_REP_DIR}/release/singular-help ${TMPDIR}/Files/release/; \
 	  cp -r ${CYGWIN_REP_DIR}/release/singular-share ${TMPDIR}/Files/release/; \
 	fi;
+	-rm -f  ${TMPDIR}/Files/release/singular-base/*src.tar.bz2
+	-rm -f  ${TMPDIR}/Files/release/singular-surf/*src.tar.bz2
 	cat ${CYGWIN_REP_DIR}/setup.ini | sed -e 's/setup-version:.*//' | sed -e 's/setup-timestamp:.*//' >> ${TMPDIR}/Files/setup.ini
 	@echo Writing Singular.pfw ...
 	@echo "Version=2.0" >> ${TMPDIR}/Singular.pfw
@@ -390,7 +392,7 @@ cygwin-pfw-%:
 	@echo "Version=3-0-0" >> ${TMPDIR}/Singular.pfw
 	@echo -n "OutputSpec=" >> ${TMPDIR}/Singular.pfw
 	@echo -n "`cygpath -a -w .`" >> ${TMPDIR}/Singular.pfw
-	@echo "\Singualar-${S_VERSION}-$*.exe" >> ${TMPDIR}/Singular.pfw
+	@echo "\Singular-${S_VERSION}-$*.exe" >> ${TMPDIR}/Singular.pfw
 	@echo "GUIDs=0" >> ${TMPDIR}/Singular.pfw
 	@echo "Type=2" >> ${TMPDIR}/Singular.pfw
 	@echo "Compress=1" >> ${TMPDIR}/Singular.pfw
