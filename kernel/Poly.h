@@ -1,19 +1,28 @@
-//$Id: Poly.h,v 1.1 2005-08-04 15:50:07 bricken Exp $
+//$Id: Poly.h,v 1.2 2005-08-04 19:33:24 bricken Exp $
 
-#include "mod2.h"
+
 
 #ifndef POLYCPP_HEADER
 #define POLYCPP_HEADER
+#include "mod2.h"
+
 #include "numbers.h"
 #include "febase.h"
 #include "polys.h"
 #include "ring.h"
+
+
 #include <boost/shared_ptr.hpp>
+
+#include <vector>
+
 #define BOOST_DISABLE_THREADS
+
+
 //PolyImpl is a 08/15 poly wrapper
 //Poly wraps around PolyImpl with reference counting using boost
 class PolyImpl{
-  
+  friend class Poly;
  public:
   ring getRing() const{
     return r;
@@ -136,6 +145,10 @@ class PolyImpl{
     this->p=p_Copy(p,r);
     this->r=r;
   }
+  PolyImpl(poly p, ring r,int){
+    this->p=p;
+    this->r=r;
+  }
   PolyImpl(int n, ring r){
     this->p=p_ISet(n,r);
     this->r=r;
@@ -234,6 +247,61 @@ PolyImpl operator*(int p1, const PolyImpl& p2){
   }*/
 using namespace boost;
 
+
+template<class T> class ConstTermReference{
+ private:
+  ring r;
+  poly t;
+ public:
+  operator T(){
+    return T(p_Head(t,r),r);
+  }
+  ConstTermReference(poly p, ring r){
+    this->t=p;
+    this->r=r;
+  }
+  
+};
+template<class T> class PolyInputIterator:
+public std::iterator<std::input_iterator_tag,T,int, shared_ptr<T>,ConstTermReference<T> >
+{
+
+  
+ private:
+  poly t;
+  ring r;
+  public:
+  bool operator==(const PolyInputIterator& t2){
+    return t2.t==t;
+  }
+  bool operator!=(const PolyInputIterator& t2){
+    return t2.t!=t;
+  }
+  PolyInputIterator(poly p, ring r){
+    t=p;
+    this->r=r;
+  }
+  PolyInputIterator(const PolyInputIterator& it){
+    t=it.t;
+    r=it.r;
+  }
+  PolyInputIterator& operator++(){
+    t=t->next;
+    return *this;
+  }
+  PolyInputIterator operator++(int){
+    PolyInputIterator it(*this);
+    ++(*this);
+    return it;
+  }
+  const ConstTermReference<T> operator*(){
+    return ConstTermReference<T> (t,r);
+  }
+  shared_ptr<T> operator->(){
+    return shared_ptr<T>(new T(p_Head(t,r),r,0));
+  }
+
+};
 class Poly{
  public:
   void copy_on_write(){
@@ -251,6 +319,16 @@ class Poly{
   Poly(int n, ring r):ptr(new PolyImpl(n,r)){
     
   }
+  Poly(std::vector<int> v, ring r):ptr(new PolyImpl((poly) NULL,r)){
+    unsigned int i;
+    int s=v.size();
+    poly p=p_ISet(1,r);
+    for(i=0;i<v.size();i++){
+      pSetExp(p,i+1,v[i]);
+    }
+    pSetm(p);
+    ptr->p=p;
+  }
   Poly& operator+=(Poly p2){
     copy_on_write();
     *ptr+=*p2.ptr;
@@ -263,7 +341,21 @@ class Poly{
      Print(StringAppendS(""));
      }*/
   virtual ~Poly(){}
-
+  Poly(poly p, ring r):ptr(new PolyImpl(p,r)){
+  }
+  Poly(poly p, ring r,int):ptr(new PolyImpl(p,r,0)){
+  }
+  Poly(Poly& p){
+    ptr=p.ptr;
+  }
+  Poly(const Poly&p):ptr(new PolyImpl(*p.ptr)){
+  }
+  PolyInputIterator<Poly> begin(){
+    return PolyInputIterator<Poly>(ptr->p,ptr->r);
+  }
+  PolyInputIterator<Poly> end(){
+    return PolyInputIterator<Poly>(NULL, ptr->r);
+  }
  protected:
   Poly(PolyImpl& impl):ptr(&impl){
    
@@ -279,4 +371,8 @@ inline Poly operator+(Poly p1, Poly p2){
     *res+=*p2.ptr;
     return(Poly(*res));
 }
+
+
+
+
 #endif
