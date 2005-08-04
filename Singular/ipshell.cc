@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.123 2005-08-04 12:29:33 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.124 2005-08-04 13:01:42 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1872,7 +1872,7 @@ ring rCompose(const lists  L)
     R->block1=(int *)omAlloc0(n*sizeof(int));
     R->wvhdl=(int**)omAlloc0(n*sizeof(int_ptr));
     // init order, so that rBlocks works correctly
-    for (j=0; j < n-2; j++)
+    for (j=0; j < n-1; j++)
       R->order[j] = (int) ringorder_unspec;
     // orderings
     R->OrdSgn=1;
@@ -1897,14 +1897,17 @@ ring rCompose(const lists  L)
       else 
       {
          int jj=j-1;
-         while((jj>0)
+         while((jj>=0)
          && ((R->order[jj]== ringorder_a) 
             || (R->order[jj]== ringorder_aa)
             || (R->order[jj]== ringorder_c)
             || (R->order[jj]== ringorder_C)
          ))
+         {
+           //Print("jj=%, skip %s\n",rSimpleOrdStr(R->order[jj]));
            jj--;
-         if (jj==0) R->block0[j]=1;
+         }
+         if (jj<0) R->block0[j]=1;
          else       R->block0[j]=R->block1[jj]+1;
       }
       intvec *iv;
@@ -1946,13 +1949,15 @@ ring rCompose(const lists  L)
          // todo
            break;
          case 0:
+         case ringorder_unspec:
            break;
       }
     }
     // sanity check
     j=n-2;
     if ((R->order[j]==ringorder_c)
-    || (R->order[j]==ringorder_C)) j--;
+    || (R->order[j]==ringorder_C)
+    || (R->order[j]==ringorder_unspec)) j--;
     if (R->block1[j] != R->N)
     {
       if (((R->order[j]==ringorder_dp) ||
