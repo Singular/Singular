@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.122 2005-08-04 12:21:37 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.123 2005-08-04 12:29:33 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1898,9 +1898,14 @@ ring rCompose(const lists  L)
       {
          int jj=j-1;
          while((jj>0)
-         && ((R->order[jj]== ringorder_a) || (R->order[jj]== ringorder_aa)))
+         && ((R->order[jj]== ringorder_a) 
+            || (R->order[jj]== ringorder_aa)
+            || (R->order[jj]== ringorder_c)
+            || (R->order[jj]== ringorder_C)
+         ))
            jj--;
-         R->block0[j]=R->block1[jj]+1;
+         if (jj==0) R->block0[j]=1;
+         else       R->block0[j]=R->block1[jj]+1;
       }
       intvec *iv;
       if (vv->m[1].Typ()==INT_CMD)
