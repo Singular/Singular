@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.121 2005-08-03 12:14:16 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.122 2005-08-04 12:21:37 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1894,19 +1894,29 @@ ring rCompose(const lists  L)
       }
       R->order[j]=rOrderName(omStrDup((char*)vv->m[0].Data())); // assume STRING
       if (j==0) R->block0[0]=1;
-      else      R->block0[j]=R->block1[j-1]+1;
+      else 
+      {
+         int jj=j-1;
+         while((jj>0)
+         && ((R->order[jj]== ringorder_a) || (R->order[jj]== ringorder_aa)))
+           jj--;
+         R->block0[j]=R->block1[jj]+1;
+      }
       intvec *iv;
       if (vv->m[1].Typ()==INT_CMD)
         iv=new intvec((int)(long)vv->m[1].Data(),(int)(long)vv->m[1].Data());
       else
         iv=ivCopy((intvec*)vv->m[1].Data()); //assume INTVEC
       R->block1[j]=si_max(R->block0[j],R->block0[j]+iv->length()-1);
+      //Print("block %d from %d to %d\n",j,R->block0[j], R->block1[j]);
       int i;
       switch (R->order[j])
       {
          case ringorder_ws:
          case ringorder_Ws:
             R->OrdSgn=-1;
+         case ringorder_aa:
+         case ringorder_a:
          case ringorder_wp:
          case ringorder_Wp:
            R->wvhdl[j] =( int *)omAlloc((iv->length())*sizeof(int));
@@ -1927,14 +1937,10 @@ ring rCompose(const lists  L)
          case ringorder_C:
            R->block1[j]=R->block0[j]-1;
            break;
-         case ringorder_aa:
-         case ringorder_a:
-           R->wvhdl[j] =( int *)omAlloc((iv->length())*sizeof(int));
-           for (i=0; i<iv->length();i++) R->wvhdl[j][i]=(*iv)[i];
-         // todo
-           break;
          case ringorder_M:
          // todo
+           break;
+         case 0:
            break;
       }
     }

@@ -1,4 +1,7 @@
 
+Thu Aug  4 14:20:27 CEST 2005 hannes
+*ipshell.cc: rCompose: fixed counting block start after order a
+
 Wed Aug  3 14:12:13 CEST 2005 hannes
 * ipshell.cc: rDecompose: order M fixed
 * libparse.l: handling of >>url="....";<< in lib header
