@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.15 2005-05-20 18:56:29 Singular Exp $ */
+/* $Id: ideals.cc,v 1.16 2005-08-04 13:59:19 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -2968,7 +2968,7 @@ BOOLEAN idHomModule(ideal m, ideal Q, intvec **w)
         if (i>=length) break;
         p = F[i];
       }
-      if (pLexOrder)
+      if (pLexOrder && (currRing->order[0]==ringorder_lp))
         order=pTotaldegree(p);
       else
       //  order = p->order;
