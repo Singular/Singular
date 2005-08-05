@@ -1,4 +1,4 @@
-//$Id: Poly.h,v 1.3 2005-08-05 07:12:55 bricken Exp $
+//$Id: Poly.h,v 1.4 2005-08-05 12:34:33 bricken Exp $
 
 
 
@@ -263,7 +263,7 @@ template<class T> class ConstTermReference{
   
 };
 template<class T> class PolyInputIterator:
-public std::iterator<std::input_iterator_tag,T,int, shared_ptr<T>,ConstTermReference<T> >
+public std::iterator<std::input_iterator_tag,T,int, shared_ptr<const T>,ConstTermReference<T> >
 {
 
   
@@ -297,8 +297,8 @@ public std::iterator<std::input_iterator_tag,T,int, shared_ptr<T>,ConstTermRefer
   const ConstTermReference<T> operator*(){
     return ConstTermReference<T> (t,r);
   }
-  shared_ptr<T> operator->(){
-    return shared_ptr<T>(new T(p_Head(t,r),r,0));
+  shared_ptr<const T> operator->(){
+    return shared_ptr<const T>(new T(p_Head(t,r),r,0));
   }
 
 };
@@ -309,7 +309,7 @@ class Poly{
       ptr.reset(new PolyImpl(*ptr));
     }
   }
-  void print(){
+  void print() const {
     ptr->print();
   }
 
@@ -351,10 +351,10 @@ class Poly{
   }
   Poly(poly p, ring r,int):ptr(new PolyImpl(p,r,0)){
   }
-  Poly(Poly& p){
+  /*Poly(Poly& p){
     ptr=p.ptr;
-  }
-  Poly(const Poly&p):ptr(new PolyImpl(*p.ptr)){
+    }*/
+  Poly(const Poly&p):ptr(p.ptr){
   }
   PolyInputIterator<Poly> begin(){
     return PolyInputIterator<Poly>(ptr->p,ptr->r);
