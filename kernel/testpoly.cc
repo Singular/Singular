@@ -24,4 +24,12 @@ void testPoly(){
 
     it++;
   }
+
+  p4*=p4;
+  p4.print();
+  p2=p*p4;
+  p2.print();
+  p.print();
+  p4.print();
+  
 }

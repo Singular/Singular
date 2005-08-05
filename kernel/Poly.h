@@ -1,4 +1,4 @@
-//$Id: Poly.h,v 1.2 2005-08-04 19:33:24 bricken Exp $
+//$Id: Poly.h,v 1.3 2005-08-05 07:12:55 bricken Exp $
 
 
 
@@ -331,7 +331,13 @@ class Poly{
   }
   Poly& operator+=(Poly p2){
     copy_on_write();
-    *ptr+=*p2.ptr;
+    *ptr += *p2.ptr;
+    
+    return *this;
+  }
+  Poly& operator*=(Poly p2){
+    copy_on_write();
+    *ptr *= *p2.ptr;
     
     return *this;
   }
@@ -362,16 +368,21 @@ class Poly{
   }
  private:
   shared_ptr<PolyImpl> ptr;
-  friend   inline Poly operator+(Poly p1, Poly p2);
+  friend inline Poly operator+(const Poly& p1, const Poly& p2);
+  friend inline Poly operator*(const Poly& p1, const Poly& p2);
   
 };
 
-inline Poly operator+(Poly p1, Poly p2){
+inline Poly operator+(const Poly& p1, const Poly& p2){
     PolyImpl* res=new PolyImpl(*p1.ptr);
     *res+=*p2.ptr;
     return(Poly(*res));
 }
-
+inline Poly operator*(const Poly& p1, const Poly& p2){
+    PolyImpl* res=new PolyImpl(*p1.ptr);
+    *res *= *p2.ptr;
+    return(Poly(*res));
+}
 
 
 
