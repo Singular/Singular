@@ -1,18 +1,22 @@
 
 //-*- mode:C++;-*-
-// $Id: lejeune.lib,v 1.17 2005-07-04 09:02:47 cremer Exp $
+// $Id: lejeune.lib,v 1.18 2005-08-09 10:02:57 cremer Exp $
 
 
 info="
-LIBRARY: lejeune.lib  Arc space computations
-AUTHOR:  Nadine Cremer,    nadine.cremer@gmx.de
+LIBRARY: lejeune.lib     Arc space computations
+AUTHOR:  Nadine Cremer,  nadine.cremer@gmx.de
 [SEE ALSO: <comma-separated words of cross references>]
 [KEYWORDS: <semicolon-separated phrases of index keys>]
 PROCEDURES:
     variables(k,i);      creates k*i new var. t,a(1),..,a(i),..,x(1),..,x(i)
-    a_z(k);              returns kth letter of the alphabet
+    atoz(k);             returns kth letter of the alphabet
     modd(f,g);           modulo-operator for polys
     idealsimplify(I)     simplifies ideal- i.o. to avoid/keep small radical
+    Hnew(H);             creates 'next' intvec, called from 'trunc' 
+    idealequality(I,J);  tests if I==J, using quotient
+    order(f);            returns i, where f_i is smallest nonzero homog. part
+    minpower(f);         returns minimal ny s.t. x(i)^ny in J(f) for all i
 
     tpolys(k,i);         creates polyn. a(1)*t+..+a(n)*t^n
     ringchange(i);       changes the ring to the one needed in ith step      
@@ -20,13 +24,16 @@ PROCEDURES:
     diffidealstep(i,N);  returns ideal needed for contraction in ith step
                          N is number of variables of input f
     formaldiff(f,H);     computes the formal derivatives corresponding to H
-                         and the desciption of F	  
-    f_set(f,H);          returns the set F corresponding to H as described by
+                         and the desciption of F resp. G, list	  
+    fset(f,H);           returns the set F corresponding to H as described by
                          M. Lejeune
-    g_formaldiff(f,H);   computes the formal derivatives corresponding to H
-                         and the description of G
-    g_set(f,H);          returns the set G corresponding to H as described by
+    gset(f,H);           returns the set G corresponding to H as described by
                          M. Lejeune
+    fgset(f,H);          returns simultaneously the sets F and G corresponding
+                         to H as described by M. Lejeune
+    hset(f,H);           returns the set F\G  corresponding to H as 
+                         described by M. Lejeune
+    trunc(f,i);          returns the set Tr(i) as described by M. Lejeune
     ";
 
 
@@ -34,55 +41,343 @@ LIB "ring.lib";
 LIB "general.lib";
 LIB "primdec.lib";
 LIB "standard.lib";
+LIB "sing.lib";
 
-////////////////////////////////////////////////////////////////////////////
-//                 COMPUTATION OF THE F's
-////////////////////////////////////////////////////////////////////////////
 
-proc f_set (poly f,intvec H) 
+
+
+proc trunc (poly f, int i)
 {
-  int p;                              // loop variable
-  int m_0=order(f); 
+ def r=basering;
+ int m=milnor(f);
+ int mi=m*i;                  // make sure we obtain Tr(i)
+ int k,v,j,u,w;
+ int l=order(f);
+ int s0=mi+1;
+ int s=l*(mi+1);
+ int z1=nvars(r)*(i+1)+2;
+ int z2=nvars(r)*k+1;
+ intvec H=l;
+ for(k=1;k<=mi;k++)          // initialize H
+ {
+   H[k+1]=1; 
+ }
+ def R1=ringchange(i);        // ring in which result lies, plus decl. of var. 
+ setring R1;
+ ideal I,J;
+ list intersec=I,J;           // initialization
+ list result=intersec;
+ setring r;
+ while(sum(H)<=s)      // consider all possible H's
+ {
+   for(k=2;k<=s0;k++)       // computes result ror all H[1..k]
+   {   
+     setring r;
+     def tmp=fgset(f,intvec(H[1..k]));
+     setring tmp;
+     if(k>i+1)              // if we have to apply rho...
+     { 
+       u=ncols(fgresult[1]);         
+       w=ncols(fgresult[2]);
+       for(j=1;j<=u;j++)     // cutting terms -F
+       {
+        for(v=z1;v<=z2;v++)
+        { 
+         matrix A=coeffs(fgresult[1][j],var(v));
+         if(A!=0)
+	 {
+          fgresult[1][j]=0;
+         }
+         kill A;
+        } 
+       }
+       for(j=1;j<=w;j++)     // cutting terms -G
+       {
+        for(v=z1;v<=z2;v++)             
+        { 
+	  matrix A=coeffs(fgresult[2][j],var(v));
+          if(A!=0)
+	  {
+           fgresult[2][j]=0;
+          }
+          kill A;
+        } 
+       }
+      }  
+      setring R1;
+      def step=imap(tmp,fgresult);
+      intersec[1]=intersec[1],step[1];
+      intersec[2]=intersec[2],step[2];      
+      kill step; 
+      kill tmp;    
+   }
+   setring R1;
+   result[1]=result[1],intersec[1];     // put together results of all H's
+   result[2]=result[2],intersec[2];
+   intersec[1]=I;
+   intersec[2]=J;
+   H=Hnew(H);
+ }
+ result[1]=simplify(result[1],6);
+ result[2]=simplify(result[2],6); 
+"Result=";result;
+ return(R1);                           // return the ring
+}
+
+ 
+
+
+
+////////////////////////////////////////////////////////////////////////////
+//                 COMPUTATION of H = F\G
+////////////////////////////////////////////////////////////////////////////
+
+proc hset (poly f,intvec H)
+{ 
+  int i;                             
   int b=size(H);
-  if(H[1]!=m_0)                       // input admissible?!
+  def r=basering;
+  def R=ringchange(b-1);
+  def tmp1=fgset(f,H);
+  setring R;
+  poly red;
+  list hresult=imap(tmp1,fgresult);
+  //hresult;
+  export(hresult);
+  return(R);
+}
+
+
+////////////////////////////////////////////////////////////////////////////
+//          COMPUTATION of F,G and H simultaneously
+////////////////////////////////////////////////////////////////////////////
+
+proc hset1 (poly f, intvec H)
+{ 
+  int i,p;
+  int b=size(H);
+  def r=basering;                           
+  int m0=order(f); 
+
+  if(H[1]!=m0)                           // input admissible?!
     {
-     "H[1]=ord(f) notwendig!!";
+     "H[1]=ord(f) necessary!!";
       return(0);
     } 
   for(p=1;p<b;p++)
     {
       if(H[p]<H[p+1])
       {
-        "Unzulaessige Eingabe, H[1]<=...<=H[b] notwendig!";
+        "Inadmissible input, H[1]<=...<=H[b] necessary!";
          return(0);
       }
     }
 
-  def r=basering;
-  int startvar=nvars(basering);
-  export(startvar);
   def R=ringchange(b-1);
-  setring R;
-  ideal J,I;
+  setring R;                            // compute F
+  poly red;                           
+  list l;
+  ideal fresult,gresult,I;
+  list fgresult;
   for(p=2;p<=b;p++)
   {
     setring r;
     def tmp=formaldiff(f,intvec(H[1..p]));
     setring R;
-    I=imap(tmp,resultdiff);
+    l=imap(tmp,resultdiff);
+    I=l[1];           
     kill tmp;
-    J=J,I;
+    fresult=fresult,I;
   }
-  J=simplify(J,4);
-  J=simplify(J,2);
-  J=idealsimplify(J);
-  option(redSB);
-  J=std(J);
-  J=idealsimplify(J);
-  J=radical(simplify(J,4));
-  J;
+  gresult=fresult;                     // use computation of F for G...
+
+
+  setring r;                           // last step, special for G
+  def tmp=formaldiff(f,H);;
+  setring R;
+  l=imap(tmp,resultdiff);
+  I=l[2];
+  kill tmp;
+  gresult=gresult,I;
+
+
+
+  ideal nonzero,aux;                  // make the result look better...
+  option(redSB);                      // i.e. compute H explicitly
+  aux=std(fresult);
+  for(i=1;i<=size(gresult);i++) 
+  {
+    red=reduce(gresult[i],aux);
+    if (red!=0)
+    {
+      nonzero=nonzero,red;
+    }    
+  }
+  list hresult=aux,nonzero;
+  //hresult;
+  export(hresult);
   return(R);
 }
+
+
+
+
+proc fgset (poly f,intvec H) 
+{
+  def r=basering;
+  int p;                             
+  int m0=order(f); 
+  int b=size(H);
+  if(H[1]!=m0)                       // input admissible?!
+    {
+     "H[1]=ord(f) necessary!!";
+      return(0);
+    } 
+  for(p=1;p<b;p++)
+    {
+      if(H[p]<H[p+1])
+      {
+        "Inadmissible input, H[1]<=...<=H[b] necessary!";
+         return(0);
+      }
+    }
+
+  def R=ringchange(b-1);
+  setring R;
+  list l;
+  ideal fresult,gresult;
+  list fgresult;
+  for(p=2;p<=b;p++)
+  {
+    setring r;
+    def tmp=formaldiff(f,intvec(H[1..p]));
+    setring R;
+    l=imap(tmp,resultdiff);              
+    kill tmp;
+    fresult=fresult,l[1];
+  }
+  gresult=fresult;                     // use computation of f for g
+
+  setring r;                           // last step, special for G
+  def tmp=formaldiff(f,H);;
+  setring R;
+  l=imap(tmp,resultdiff);
+  kill tmp;
+  gresult=gresult,l[2];
+  fresult=simplify(fresult,6);
+  gresult=simplify(gresult,6);
+  fgresult=fresult,gresult;
+  export(fgresult);
+  //fgresult;
+  return(R);
+}
+
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////
+//                 COMPUTATION OF THE F's
+////////////////////////////////////////////////////////////////////////////
+
+proc fset (poly f,intvec H) 
+{
+  int p;                            
+  int m0=order(f); 
+  int b=size(H);
+  if(H[1]!=m0)                       // input admissible?!
+    {
+     "H[1]=ord(f) necessary!!";
+      return(0);
+    } 
+  for(p=1;p<b;p++)
+    {
+      if(H[p]<H[p+1])
+      {
+        "Inadmissible input, H[1]<=...<=H[b] necessary!";
+         return(0);
+      }
+    }
+
+  def R=ringchange(b-1);
+  setring R;
+  list l;
+  ideal fresult,I;
+  for(p=2;p<=b;p++)
+  {
+    setring r;
+    def tmp=formaldiff(f,intvec(H[1..p]));
+    setring R;
+    l=imap(tmp,resultdiff);
+    I=l[1];
+    kill tmp;
+    fresult=fresult,I;
+  }
+  fresult=simplify(fresult,6);          // simplify
+  //fresult;
+  export(fresult);
+  return(R);
+}
+
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////
+//                      COMPUTING the G's                                 
+////////////////////////////////////////////////////////////////////////////
+
+
+proc gset (poly f,intvec H) 
+{
+  int p;                             
+  int m0=order(f); 
+  int b=size(H);
+  if(H[1]!=m0)                       // input admissible?!
+    {
+     "H[1]=ord(f) necessary!!";
+      return(0);
+    } 
+  for(p=1;p<b;p++)
+    {
+      if(H[p]<H[p+1])
+      {
+        "Inadmissible input, H[1]<=...<=H[b] necessary!";
+         return(0);
+      }
+    }
+
+  def r=basering;
+  def R=ringchange(b-1);              // work in new ring
+  setring R;
+  list l;
+  ideal I,gresult;
+  for(p=2;p<=b-1;p++)                 // steps equal to fset...
+  {
+    setring r;
+    def tmp=formaldiff(f,intvec(H[1..p]));
+    setring R;
+    l=imap(tmp,resultdiff);
+    I=l[1];
+    kill tmp;
+    gresult=gresult,I;
+  }
+
+  setring r;                          // last step, special for G
+  def tmp=formaldiff(f,H);
+  setring R;
+  l=imap(tmp,resultdiff);
+  I=l[2];
+  kill tmp;
+  gresult=gresult,I; 
+  gresult=simplify(gresult,6);          // simplify
+  export(gresult);
+  //gresult;
+  return(R);
+}
+
 
 
 
@@ -91,49 +386,9 @@ proc f_set (poly f,intvec H)
 ////////////////////////////////////////////////////////////////////////////
 
 
-proc formaldiff (poly f,intvec H)
-{
-  int s,t,v;                          // loop variables
-  int u;   
-  int i=size(H)-1;                    // need those parameters for computation
-  int c=sum(H,1..i);
-  int k=H[i+1];
-  def R=plugin_coeffs(f,i);           // plugs the power series in...
-  setring R;                          // changes the ring 
-  def Coe=resultplug;   
-  matrix coe=Coe;                     // gives the t-coeff. after plugging in 
-  poly fkv;                        
-  ideal step=diffidealstep(i,startvar);  // computes the corresponding ideal
-  ideal m,power,diffstep,J,resultdiff;
-  for(v=1;v<=k;v++)                   // consider the different t-coeff.
-   { 
-     fkv=coe[c+v,1];
-     m=fkv;                           
-     J=fkv;                           // will save the result in this step
-     for(s=1;s<=k-v;s++)
-       {
-         power=step^s;
-         u=size(power);
-         for(t=1;t<=u;t++)
-          {
-            diffstep=contract(power[t],m);     // actual differentiation
-	    J=J,diffstep;
-          }
-       }
-     resultdiff=resultdiff,J;
-   }
-  resultdiff=simplify(resultdiff,2);
-  export(resultdiff);                // exports the result
-  return(R);                         // return the ring
-}
 
-
-////////////////////////////////////////////////////////////////////////////
-
-
-
-proc plugin_coeffs (poly f,int i)
-{
+proc plugincoeffs (poly f,int i)
+{ int startvar=nvars(basering);
   def r=basering;
   def R=ringchange(i);              // changes the ring
   setring R;                        // makes it new basering;
@@ -143,8 +398,8 @@ proc plugin_coeffs (poly f,int i)
   map h=r,I;                        // define map according to our purpose
   ideal J=h(f);                     // gives f with power series plugged in
   export(h);                   
-  matrix resultplug=coeffs(J[1],t);     // gives the t-coefficients
-  export resultplug;                    // export it i.o. to use it later on
+  matrix resultplug=coeffs(J[1],t); // gives the t-coefficients
+  export resultplug;                // export it i.o. to use it later on
   return(R);                        // return ring (ring change!)
 }
 
@@ -169,13 +424,62 @@ proc tpolys (int i,int k)             // constructs polynomials a(1)*t+...
   return(I); 
 } 
 
+
+
+
+proc formaldiff (poly f,intvec H)
+{ 
+  int startvar=nvars(basering);
+  int s,t,v;                          // loop variables
+  int u;
+  int i=size(H)-1;
+  int c=sum(H,1..i);
+  int k=H[i+1];
+  def R=plugincoeffs(f,i);           // plugs the power series in...
+  setring R;                          // changes the ring 
+  matrix coe=resultplug;            // gives the t-coeff. after plugging in 
+  poly fkv;                           // need this stuff for the following
+  ideal step=diffidealstep(i,startvar); 
+  list resultdiff;
+  ideal m,power,diffstep,J,gresultdiff,fresultdiff;
+  for(v=1;v<=k;v++)                   // consider the different t-coeff.
+    { 
+     fkv=coe[c+v,1];
+     m=fkv;                          
+     J=fkv;                           
+     for(s=1;s<=k-v+1;s++)           // "s<=k-v+1" special for G, ONLY DIFF.!
+       { 
+	 if(s==k-v+1)                // equations for F!
+	 {
+	   fresultdiff=fresultdiff,J;      
+	 }
+         power=step^s;
+         u=size(power);
+         for(t=1;t<=u;t++)
+          {
+            diffstep=contract(power[t],m);     // actual differentiation
+	    J=J,diffstep;
+          }
+          
+       }
+     gresultdiff=gresultdiff,J;
+   }
+  resultdiff=fresultdiff,gresultdiff;
+  export(resultdiff);                  // exports the result
+  return(R);                           // return the ring
+}                       
+
+
+
+
+
 ////////////////////////////////////////////////////////////////////////////
-//                     CONSTRUCTING the new ring(s)
+//                     CONSTRUCTING the new ring
 ////////////////////////////////////////////////////////////////////////////
 
 proc ringchange (int i)
 {    
-  def R=changevar(""+varstr(basering)+",t,"+variables(startvar,i)+"");// change
+  def R=changevar(""+varstr(basering)+",t,"+variables(nvars(basering),i)+"");// change
   return(R);                 // return the ring, needed in future proc
 }
 
@@ -190,7 +494,7 @@ proc variables (int k,int i)
    {
      for (s=1;s<=i;s++)
      {
-       str=""+a_z(u)+"("+string(s)+")"; // creates new variables    
+       str=""+atoz(u)+"("+string(s)+")"; // creates new variables    
        l[(u-1)*i+s]=str;                // saves them in a list
      }
    } 
@@ -199,7 +503,7 @@ proc variables (int k,int i)
 }
 
 
-proc a_z (int n)                        // returns nth letter of the alphabet
+proc atoz (int n)                        // returns nth letter of the alphabet
 { 
   if(1>n>26)                           // input admissible?
    { 
@@ -211,114 +515,6 @@ proc a_z (int n)                        // returns nth letter of the alphabet
   return (string(var(n))); 
 } 
 
-////////////////////////////////////////////////////////////////////////////
-//                      COMPUTING the G's                                 //
-////////////////////////////////////////////////////////////////////////////
-
-
-proc g_set (poly f,intvec H) 
-{
-  int p;                             
-  int m_0=order(f); 
-  int b=size(H);
-  if(H[1]!=m_0)                       // input admissible?!
-    {
-     "H[1]=ord(f) notwendig!!";
-      return(0);
-    } 
-  for(p=1;p<b;p++)
-    {
-      if(H[p]<H[p+1])
-      {
-        "Unzulaessige Eingabe, H[1]<=...<=H[b] notwendig!";
-         return(0);
-      }
-    }
-
-  def r=basering;
-  int startvar=nvars(basering);
-  export(startvar);
-  def R=ringchange(b-1);              // work in new ring
-  setring R;
-  ideal I,J;
-  for(p=2;p<=b-1;p++)                 // steps equal to f_set...
-  {
-    setring r;
-    def tmp=formaldiff(f,intvec(H[1..p]));
-    setring R;
-    I=imap(tmp,resultdiff);
-    kill tmp;
-    J=J,I;
-  }
-
-  setring r;                          // last step, special for G
-  def tmp=g_formaldiff(f,H);;
-  setring R;
-  I=imap(tmp,g_resultdiff);
-  kill tmp;
-  J=J,I;
- 
-  J=simplify(J,4);                    // simplify, keep radical small
-  J=simplify(J,2);
-  J=idealsimplify(J);
-  option(redSB);
-  J=std(J);
-  J=idealsimplify(J);
-  J=radical(simplify(J,4));
-  J;
-  return(R);
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////////////
-//               PREPARATORY work: differentiating                        //
-////////////////////////////////////////////////////////////////////////////
-
-
-
-
-proc g_formaldiff (poly f,intvec H)
-{ 
-  int s,t,v;                          // loop variables
-  int u;
-  int i=size(H)-1;
-  int c=sum(H,1..i);
-  int k=H[i+1];
-  def R=plugin_coeffs(f,i);           // plugs the power series in...
-  setring R;                          // changes the ring 
-  def Coe=resultplug;   
-  matrix coe=Coe;                     // gives the t-coeff. after plugging in 
-  poly fkv;                           // need this stuff for the following
-  ideal step=diffidealstep(i,startvar); 
-  ideal m,power,diffstep,J,g_resultdiff;
-  for(v=1;v<=k;v++)                   // consider the different t-coeff.
-    { 
-     fkv=coe[c+v,1];
-     m=fkv;                          
-     J=fkv;                           
-     for(s=1;s<=k-v+1;s++)           // remark: "s<=k-v+1" special!for G!!!
-       { 
-         power=step^s;
-         u=size(power);
-         for(t=1;t<=u;t++)
-          {
-            diffstep=contract(power[t],m);     // actual differentiation
-	    J=J,diffstep;
-          }
-       }
-     g_resultdiff=g_resultdiff,J;
-   }
-  g_resultdiff=simplify(g_resultdiff,2);
-  export(g_resultdiff);                // exports the result
-  return(R);                           // return the ring
-}                       
-
-
-
-
-
 
 
 
@@ -328,7 +524,7 @@ proc g_formaldiff (poly f,intvec H)
 ////////////////////////////////////////////////////////////////////////////
 
 
-proc diffidealstep (int i,int N)       // returns ideal needed for 
+proc diffidealstep (int i, int N)       // returns ideal needed for 
 {                                     // differentiation in ith step
   ideal I=var(N+1+i);
   int j;
@@ -357,29 +553,30 @@ proc order (poly f)                  // gives first elem. of Nash series
 
 
 proc idealsimplify (ideal I)      // simplifies the ideal according to our
-{                                 // purposes - to avoid the radical or at 
-  int i,j;                        // least to keep the computations small!
+{                                 // purposes 
+  int i,j;
   int divisornumber=0;
   int pos;
+  I=simplify(I,6);
   for(j=1;j<=ncols(I);j++)
   {
     if(size(I[j])==1)
-      {
-         for(i=1;i<=nvars(basering);i++)     
-         {  
-	    if(modd(I[j],var(i))==0)
-            {
-               divisornumber++;
-               pos=i;
-             }
+    {
+       for(i=1;i<=nvars(basering);i++)     
+       {  
+	  if(modd(I[j],var(i))==0)
+          {
+             divisornumber++;
+             pos=i;
           }
        }
-      if(divisornumber==1)
-	{
-          I[j]=var(pos);
-        }
-      divisornumber=0;
     }
+    if(divisornumber==1)
+      {
+        I[j]=var(pos);
+      }
+    divisornumber=0;
+  }
   return(I);
 }
 
@@ -393,6 +590,152 @@ proc modd (poly f, poly g)      // the modulo-operation for polys
   return(result);
 }
 
+
+
+proc Hnew (intvec H)           // creates next intvec, called from trunc
+{
+  intvec H1=H;
+  int k;
+  int l=size(H);
+  for(k=0;k<=l-2;k++)
+  {
+    if(H[l-k]<H[l-k-1])
+    {
+      H[l-k]=H[l-k]+1;
+      break;
+    }
+  }
+  if(H==H1)
+  {
+    H[l]=H[l]+1;
+  }
+  return(intvec(H));
+}
+
+
+
+proc idealequality (ideal I,ideal J)
+{
+  I=slimgb(I);
+  J=slimgb(J);
+  int n=ncols(I);
+  int m=ncols(J);
+  int i,j;
+  for(i=1;i<=n;i++)
+  {
+    if(reduce(I[i],J)!=0)
+    {
+      return(0);
+    }
+  }
+  for(j=1;j<=m;j++)
+  { 
+    if(reduce(J[j],I)!=0)
+    {
+      return(0);
+    }
+  } 
+  return(1);
+}
+
+
+proc idealsimplify1 (ideal I)       // simplify - and aviod the radical!
+{
+  int i,j;
+  I=simplify(I,6);
+  for(j=2;j<=ncols(I);j++)          // reduce with higher element
+  { 
+    for(i=1;i<j;i++)
+    { 
+      if(I[i]!=0)
+      {
+        I[j]=modd(I[j],I[i]);
+      }
+    }
+  }
+  for(j=ncols(I)-1;j>=1;j--)        // reduce with lower elements
+  { 
+    for(i=ncols(I);i>j;i--)
+    { 
+      if(I[i]!=0)
+      {
+        I[j]=modd(I[j],I[i]);
+      }
+    }
+  }
+  I=simplify(idealsimplify(I),6);
+  return(I);
+}
+
+
+
+
+proc testHempty ( poly f,int i)
+{
+ def r=basering;
+ int k;
+ int m=milnor(f);
+ int mi=m*i;
+ int l=order(f);
+ int s0=mi+1;
+ int s=l*(mi+1);
+ intvec H=l;
+ for(k=1;k<=mi;k++)          // initialize H
+ {
+   H[k+1]=1; 
+ }
+ while(sum(H)<=s)
+ {
+  for(k=2;k<=s0;k++)      
+   { 
+     setring r;
+     def tmp=hset1(f,intvec(H[1..k]));
+     setring tmp;
+     "current H:";H[1..k];hresult;~;
+   }
+  H=Hnew(H);
+ }  
+}
+
+
+
+
+
+proc minpower (poly f)   
+{
+ ideal J=jacob(f);
+ int s=ncols(J);
+ int control=0;                // control if conditions for ny are fulfilled
+ int control1=0;
+ int n=nvars(basering);
+ int ny=1;
+ int i,j;
+ while (control==0)           // while var(i)^ny not in J(f)...
+ {
+   for(i=1;i<=n;i++)          // consider all variables 
+  {
+    control1=0;
+    for(j=1;j<=s;j++)         // consider all elements of J
+    { 
+      if (modd(var(i)^ny,J[j])==0)  // var(i)^ny in J(f)?
+      {
+        control1=1;
+        break;
+      }
+    }
+    if (control1==0)          // increment ny if no var(i)^nt in J(f)
+    {
+      ny++;
+      break;
+    }
+  }
+   if (control1==1)           // if each step was successful...
+  {
+    control=1;
+  }
+ } 
+ return(ny);
+}
 
 
 
