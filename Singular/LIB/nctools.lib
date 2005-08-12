@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: nctools.lib,v 1.16 2005-05-20 18:08:50 levandov Exp $";
+version="$Id: nctools.lib,v 1.17 2005-08-12 16:47:08 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: nctools.lib     General tools for noncommutative algebras
@@ -761,7 +761,7 @@ EXAMPLE: example makeWeyl; shows examples
 "{
   if (n<1)
   {
-    Print("Incorrect input");
+    print("Incorrect input");
     return();
   }
   int @p = 0;

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ncalg.lib,v 1.14 2005-05-18 20:51:15 levandov Exp $";
+version="$Id: ncalg.lib,v 1.15 2005-08-12 16:47:08 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY:  ncalg.lib      Definitions of important GR-algebras
@@ -80,7 +80,7 @@ EXAMPLE: example makeUsl; shows examples
 "{
   if (n<2)
   {
-    Print("Incorrect input");
+    print("Incorrect input");
     return(0);
   }
   if (n==2)
@@ -591,15 +591,19 @@ EXAMPLE: example GKZsystem; shows examples
 }
 example
 {"EXAMPLE:"; echo = 2;
+  // example 3.1.4 from the [SST] without vector w
   intmat A[2][4]=3,2,1,0,0,1,2,3;
   print(A);
   def D1 = GKZsystem(A,"lp","ect");
   setring D1;
   D1;
   print(GKZid);
+  // now, consider A with the vector w=1,1,1,1
   intvec v=1,1,1,1;
   def D2 = GKZsystem(A,"lp","blr",v);
   setring D2;
   print(GKZid);
 }
+// easier example: 3.1.1 from SST
+//   intmat A[2][3]=2,1,0,0,1,2;
 ///////////////////////////////////////////////////////////////////////////////
