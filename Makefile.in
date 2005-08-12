@@ -239,14 +239,14 @@ install-root:
 cygwin-dist-src singular-base-${CYGWIN_PORT_VER}-src.tar.bz2:
 	-rm -rf ${TMPDIR}
 	${MKINSTALLDIRS} ${TMPDIR}/singular-${CYGWIN_PORT_VER}
-	export CVS_RSH=ssh; export CVSROOT==:ext:Singular@wienand.mathematik.uni-kl.de:/usr/local/Singular/cvsroot; \
-	cd ${TMPDIR}/singular-${CYGWIN_PORT_VER}; cvs co All
+	export CVS_RSH=ssh; export CVSROOT=:ext:wienand@urmel-g.mathematik.uni-kl.de:/usr/local/Singular/cvsroot; \
+	cd ${TMPDIR}/singular-${CYGWIN_PORT_VER}; cvs co All; rm -rf modules
 	cd  ${TMPDIR}; \
 	tar cjf singular-base-${CYGWIN_PORT_VER}-src.tar.bz2 singular-${CYGWIN_PORT_VER};
 	mv ${TMPDIR}/singular-base-${CYGWIN_PORT_VER}-src.tar.bz2 .
 	-rm -rf ${TMPDIR}
 
-cygwin-dist-install: ${BINDIST_NAME}.tar.gz
+cygwin-dist-install: ## ${BINDIST_NAME}.tar.gz
 	if test -d ${TMPDIR}; then rm -fr ${TMPDIR}; fi
 	${MKINSTALLDIRS} ${TMPDIR}
 	tar  --directory=${TMPDIR} -x -z -f ${SHAREDIST_NAME}.tar.gz
@@ -360,7 +360,7 @@ cygwin-dist-install: ${BINDIST_NAME}.tar.gz
 	cp ${CYGWIN_AUX_FILES}/singular-surf.README /usr/share/doc/Cygwin/singular-surf-${CYGWIN_PORT_VER}.README
 	cp ${CYGWIN_AUX_FILES}/singular-icons.README /usr/share/doc/Cygwin/singular-icons-${CYGWIN_PORT_VER}.README
 
-cygwin-dist-pack: singular-base-${CYGWIN_PORT_VER}-src.tar.bz2
+cygwin-dist-pack: ## singular-base-${CYGWIN_PORT_VER}-src.tar.bz2
 	-rm -r -f ${CYGWIN_REP_DIR}
 	mkdir ${CYGWIN_REP_DIR}
 	mkdir ${CYGWIN_REP_DIR}/release
@@ -437,7 +437,7 @@ cygwin-setup-init:
 ##	or copy from local folder
 #	cp ${CYGWIN_AUX_FILES}/cygwin-setup.exe ${CYGWIN_REP_DIR}/setup.exe
 
-cygwin-setup: cygwin-setup-init cygwin-setup-base cygwin-setup-share cygwin-setup-help cygwin-setup-surf cygwin-setup-helper
+cygwin-setup: cygwin-setup-init cygwin-setup-base cygwin-setup-share cygwin-setup-icons cygwin-setup-help cygwin-setup-surf cygwin-setup-helper
 	cp ${CYGWIN_REP_DIR}/setup.ini ${CYGWIN_REP_DIR}/setup
 	cd ${CYGWIN_REP_DIR} && bzip2 -f setup
 	cd ${CYGWIN_REP_DIR} && md5sum setup.* | sed -e 's/*//g' > md5.sum
