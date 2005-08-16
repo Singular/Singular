@@ -1,3 +1,5 @@
+#ifndef NUMBERCPP_HEADER
+#define NUMBERCPP_HEADER
 #include "mod2.h"
 #include "numbers.h"
 #include "febase.h"
@@ -22,6 +24,8 @@ class Number{
   friend Number operator/(int n1, const Number& n2);
   friend Number operator*(int n1, const Number& n2);
   friend bool operator==(int n1, const Number& n2);
+  friend class Poly;
+  friend class PolyImpl;
   Number& operator=(const Number& n2){
     //durch Reihenfolge Selbstzuweisungen berücksichtigt
     number nc=n_Copy(n2.n,n2.r);
@@ -232,3 +236,4 @@ Number operator*(int n1, const Number& n2){
 bool operator==(int n1, const Number& n2){
   return n2==Number(n1,n2.r);
 }
+#endif

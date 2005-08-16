@@ -1,4 +1,4 @@
-//$Id: Poly.h,v 1.4 2005-08-05 12:34:33 bricken Exp $
+//$Id: Poly.h,v 1.5 2005-08-16 12:20:23 bricken Exp $
 
 
 
@@ -7,6 +7,7 @@
 #include "mod2.h"
 
 #include "numbers.h"
+#include "Number.h"
 #include "febase.h"
 #include "polys.h"
 #include "ring.h"
@@ -23,6 +24,11 @@
 //Poly wraps around PolyImpl with reference counting using boost
 class PolyImpl{
   friend class Poly;
+  //friend class Number;
+ protected:
+  poly getInternalReference() const{
+    return p;
+  }
  public:
   ring getRing() const{
     return r;
@@ -77,6 +83,15 @@ class PolyImpl{
       return *this;
     }
     p=p_Mult_q(p,p_Copy(p2.p,p2.r),r);
+    return *this;
+  }
+  PolyImpl& operator*=(const Number & n){
+    if (r!=n.r){
+      Werror("not the same ring");
+      return *this;
+    }
+    
+    p=p_Mult_nn(p,n.n,r);
     return *this;
   }
   PolyImpl& operator-=(const PolyImpl & p2){
@@ -303,6 +318,7 @@ public std::iterator<std::input_iterator_tag,T,int, shared_ptr<const T>,ConstTer
 
 };
 class Poly{
+ 
  public:
   void copy_on_write(){
     if (!ptr.unique()){
@@ -312,14 +328,25 @@ class Poly{
   void print() const {
     ptr->print();
   }
+  //* ressource managed by Singular
+  char* c_string(){
 
-
-  Poly(){
+    return p_String(ptr->p,ptr->r,ptr->r);
   }
-  Poly(int n, ring r):ptr(new PolyImpl(n,r)){
+
+  Poly(ring r=currRing):ptr(new PolyImpl((poly) NULL,r)){
+  }
+  Poly(int n, ring r=currRing):ptr(new PolyImpl(n,r)){
     
   }
-  Poly(std::vector<int> v, ring r):ptr(new PolyImpl((poly) NULL,r)){
+  Poly(const char* c, ring r=currRing):ptr(new PolyImpl((poly)NULL,r)){
+    //p_Read takes no const so do
+    char* cp=(char*) omalloc((strlen(c)+1)*sizeof(char));
+    strcpy(cp,c);
+    p_Read(cp,ptr->p,r);
+    omfree(cp);
+  }
+  Poly(std::vector<int> v, ring r=currRing):ptr(new PolyImpl((poly) NULL,r)){
     unsigned int i;
     int s=v.size();
     poly p=p_ISet(1,r);
@@ -338,6 +365,12 @@ class Poly{
   Poly& operator*=(Poly p2){
     copy_on_write();
     *ptr *= *p2.ptr;
+    
+    return *this;
+  }
+  Poly& operator*=(Number n){
+    copy_on_write();
+    *ptr *=n;
     
     return *this;
   }
@@ -362,9 +395,15 @@ class Poly{
   PolyInputIterator<Poly> end(){
     return PolyInputIterator<Poly>(NULL, ptr->r);
   }
+  ring getRing(){
+    return ptr->getRing();
+  }
  protected:
   Poly(PolyImpl& impl):ptr(&impl){
    
+  }
+  poly getInternalReference(){
+    return ptr->getInternalReference();
   }
  private:
   shared_ptr<PolyImpl> ptr;
