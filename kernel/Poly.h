@@ -1,4 +1,4 @@
-//$Id: Poly.h,v 1.6 2005-08-16 13:40:57 bricken Exp $
+//$Id: Poly.h,v 1.7 2005-08-16 14:36:10 bricken Exp $
 
 
 
@@ -274,7 +274,7 @@ template<class T> class ConstTermReference{
   ring r;
   poly t;
  public:
-  operator T(){
+  operator T() const {
     return T(p_Head(t,r),r);
   }
   ConstTermReference(poly p, ring r){
@@ -326,6 +326,7 @@ public std::iterator<std::input_iterator_tag,T,int, shared_ptr<const T>,ConstTer
 class Poly{
  
  public:
+  typedef PolyInputIterator<Poly> iterator;
   void copy_on_write(){
     if (!ptr.unique()){
       ptr.reset(new PolyImpl(*ptr));

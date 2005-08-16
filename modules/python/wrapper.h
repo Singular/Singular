@@ -1,4 +1,4 @@
-//$Id: wrapper.h,v 1.2 2005-08-16 13:40:44 bricken Exp $
+//$Id: wrapper.h,v 1.3 2005-08-16 14:35:59 bricken Exp $
 #ifndef PYTHON_SINGULAR_WRAPPER_HEADER
 #define PYTHON_SINGULAR_WRAPPER_HEADER
 #include <Python.h>
@@ -63,7 +63,7 @@ BOOST_PYTHON_MODULE(Singular){
     .def(boost::python::init <std::vector<int> >())
     .def(boost::python::init <Number>())
     .def("__str__", Poly_as_str)
-    
+    .def("__iter__", boost::python::iterator<Poly>())
     //read monomials (only) from string
     .def(boost::python::init <const char* >())
     
@@ -81,7 +81,7 @@ BOOST_PYTHON_MODULE(Singular){
     .def(self+=Number())
     .def(self*=Number())
     .def(self*self);
-  
+  //boost::python::class_<TermReference>("termreference");
     //.def(self/self)
       //.def(self-self)
       //.def(int()==self)
