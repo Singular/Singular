@@ -1,0 +1,15 @@
+ring r=0,x,lp;
+timer=1;
+
+proc fac(number n){
+  number erg=1;
+  while(n!=0){
+    erg=erg*n;
+    n=n-1;
+   
+  }
+  return(erg);
+ 
+}
+number erg=(fac(number(70000)));
+$

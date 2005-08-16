@@ -1,0 +1,17 @@
+ring r=0,x,lp;
+timer=1;
+python_module::python("from Singular import number,  polynomial
+zero=number(0)
+one=number(1)
+def fac(n):
+ if n==zero:
+   return one
+ else:
+   return n*fac(n-one)
+prod=polynomial(1)
+for i in xrange(1,501):
+   prod=prod*polynomial(i);
+print prod
+print fac(number(500))
+");
+$

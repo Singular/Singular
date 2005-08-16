@@ -1,0 +1,4 @@
+ring r;
+timer=1;
+python_module::python("import perf")
+$

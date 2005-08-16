@@ -1,0 +1,13 @@
+ring r=0,x,lp;
+timer=1;
+
+proc fac(number n){
+  if(n==0){
+    return(1);
+  } else {
+    return(n*fac(n-1));
+  }
+}
+print(fac(number(500)));
+
+$

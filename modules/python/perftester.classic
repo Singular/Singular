@@ -1,0 +1,13 @@
+ring r;
+timer=1;
+proc sum(int n){
+  number one=1;
+  number sum=0;
+  int i;
+  for(i=0;i<n;i++){
+    sum=sum+one;
+  }
+  return(sum);
+}
+sum(1000000);
+$

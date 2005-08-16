@@ -1,0 +1,25 @@
+ring r=0,x,lp;
+python_module::python("from Singular import number
+n=number(6)
+m=number(7)
+print \"+\", n+m
+print \"*\", n*m
+print \"-\", n-m
+print \"/\", n/m
+print -n
+print ((number(4)/number(2))==number(2))
+print number(6)/number(5)+1;
+n+=3
+print n
+n*=2
+print n
+n/=2
+print n
+n-=3
+print n
+print 2+n
+print 2*n
+print 12/n
+print 10-n
+");
+$
