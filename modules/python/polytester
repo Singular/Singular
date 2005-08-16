@@ -14,5 +14,10 @@ print comp
 z=polynomial(xy);
 z*=number(3);
 print z,xy
+print xy+number(1)
+print z+xy
+print z,xy
+print xy+xy*xy
+print xy
 ");
 $

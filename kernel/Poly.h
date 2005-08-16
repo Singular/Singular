@@ -1,4 +1,4 @@
-//$Id: Poly.h,v 1.5 2005-08-16 12:20:23 bricken Exp $
+//$Id: Poly.h,v 1.6 2005-08-16 13:40:57 bricken Exp $
 
 
 
@@ -167,6 +167,12 @@ class PolyImpl{
   PolyImpl(int n, ring r){
     this->p=p_ISet(n,r);
     this->r=r;
+  }
+  PolyImpl(const Number & n){
+    
+    r=n.r;
+    this->p=p_NSet(n_Copy(n.n,r),r);
+    
   }
   explicit PolyImpl(int n){
     r=currRing;
@@ -346,6 +352,11 @@ class Poly{
     p_Read(cp,ptr->p,r);
     omfree(cp);
   }
+  Poly(const Poly&p):ptr(p.ptr){
+  }
+  Poly(const Number& n):ptr(new PolyImpl(n)){
+    
+  }
   Poly(std::vector<int> v, ring r=currRing):ptr(new PolyImpl((poly) NULL,r)){
     unsigned int i;
     int s=v.size();
@@ -387,8 +398,7 @@ class Poly{
   /*Poly(Poly& p){
     ptr=p.ptr;
     }*/
-  Poly(const Poly&p):ptr(p.ptr){
-  }
+
   PolyInputIterator<Poly> begin(){
     return PolyInputIterator<Poly>(ptr->p,ptr->r);
   }
@@ -409,6 +419,8 @@ class Poly{
   shared_ptr<PolyImpl> ptr;
   friend inline Poly operator+(const Poly& p1, const Poly& p2);
   friend inline Poly operator*(const Poly& p1, const Poly& p2);
+  friend inline Poly operator*(const Poly& p1, const Number& n);
+  // friend inline Poly operator*(const Poly& p1, const Number& n);
   
 };
 
@@ -422,7 +434,11 @@ inline Poly operator*(const Poly& p1, const Poly& p2){
     *res *= *p2.ptr;
     return(Poly(*res));
 }
-
+inline Poly operator*(const Poly& p1, const Number& n){
+    PolyImpl* res=new PolyImpl(*p1.ptr);
+    *res *= n;
+    return(Poly(*res));
+}
 
 
 #endif

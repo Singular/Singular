@@ -14,6 +14,7 @@
 
 #include <unistd.h>
 #include <sys/stat.h>
+#include <Python.h>
 #include <mod2.h>
 #include <tok.h>
 #include <structs.h>
@@ -130,7 +131,7 @@ void fill_example_package();
 
 #line 2 "python.mod"
 /*
- *  $Id: python.cc,v 1.1 2005-08-16 12:32:12 bricken Exp $
+ *  $Id: python.cc,v 1.2 2005-08-16 13:40:43 bricken Exp $
  *
  *  Test mod fuer modgen
  */
@@ -182,7 +183,7 @@ int mod_init(
 #line 20 "python.mod"
   enter_id("category","tests", STRING_CMD);
 #line 22 "python.mod"
-  enter_id("version","$Id: python.cc,v 1.1 2005-08-16 12:32:12 bricken Exp $", STRING_CMD);
+  enter_id("version","$Id: python.cc,v 1.2 2005-08-16 13:40:43 bricken Exp $", STRING_CMD);
 #line 23 "python.mod"
   enter_id("info","LIBRARY: kernel.lib  PROCEDURES OF GENERAL TYPE WRITEN IN C python(input); eval a string  in python", STRING_CMD);
 #line 26 "python.mod"

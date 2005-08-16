@@ -1,11 +1,14 @@
-//$Id: wrapper.h,v 1.1 2005-08-16 12:32:13 bricken Exp $
+//$Id: wrapper.h,v 1.2 2005-08-16 13:40:44 bricken Exp $
+#ifndef PYTHON_SINGULAR_WRAPPER_HEADER
+#define PYTHON_SINGULAR_WRAPPER_HEADER
+#include <Python.h>
+#include <boost/python.hpp>
 #include "mod2.h"
 #include "numbers.h"
 #include "febase.h"
 #include "Poly.h"
 #include "Number.h"
-#include <Python.h>
-#include <boost/python.hpp>
+
 
 using namespace boost::python;
 static boost::python::object Number_as_str(Number n)
@@ -58,7 +61,9 @@ BOOST_PYTHON_MODULE(Singular){
     .def(boost::python::init <int>())
     .def(boost::python::init <Poly>())
     .def(boost::python::init <std::vector<int> >())
+    .def(boost::python::init <Number>())
     .def("__str__", Poly_as_str)
+    
     //read monomials (only) from string
     .def(boost::python::init <const char* >())
     
@@ -71,7 +76,12 @@ BOOST_PYTHON_MODULE(Singular){
       //.def(self==self)
     .def(self+self)
     .def(self*=Number())
+    .def(self*Number())
+    .def(self+Number())
+    .def(self+=Number())
+    .def(self*=Number())
     .def(self*self);
+  
     //.def(self/self)
       //.def(self-self)
       //.def(int()==self)
@@ -89,3 +99,4 @@ BOOST_PYTHON_MODULE(Singular){
 /*     .def(self-=int()) */
 /*     .def(self/=int()); */
 }
+#endif

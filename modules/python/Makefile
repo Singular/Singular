@@ -25,7 +25,7 @@ DOBJS	= python.og wrapper.o
 
 all:	python_module.so python_module_g.so 
 
-%.o: %.cc Makefile
+%.o: %.cc Makefile wrapper.h
 	${CC} ${CFLAGS} -c -fPIC -DPIC $< -o $*.o
 
 %.og: %.cc Makefile
