@@ -9,8 +9,8 @@ enum poly_variant{
   POLY_VARIANT_RING,
   POLY_VARIANT_MODUL
 };
-template<poly_variant> class PolyBase;
-
+template<poly_variant,class> class PolyBase;
+class Poly;
 class Number{
   
  public:
@@ -29,8 +29,9 @@ class Number{
   friend Number operator/(int n1, const Number& n2);
   friend Number operator*(int n1, const Number& n2);
   friend bool operator==(int n1, const Number& n2);
-  friend class PolyBase<POLY_VARIANT_RING>;
-  friend class PolyBase<POLY_VARIANT_MODUL>;
+  friend class Poly;
+  friend class PolyBase<POLY_VARIANT_RING,Poly>;
+ 
   friend class PolyImpl;
   Number& operator=(const Number& n2){
     //durch Reihenfolge Selbstzuweisungen berücksichtigt
