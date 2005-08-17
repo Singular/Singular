@@ -1,4 +1,4 @@
-//$Id: Poly.h,v 1.7 2005-08-16 14:36:10 bricken Exp $
+//$Id: Poly.h,v 1.8 2005-08-17 06:34:16 bricken Exp $
 
 
 
@@ -23,7 +23,8 @@
 //PolyImpl is a 08/15 poly wrapper
 //Poly wraps around PolyImpl with reference counting using boost
 class PolyImpl{
-  friend class Poly;
+  friend class PolyBase<RING>;
+  friend class PolyBase<MODUL>;
   //friend class Number;
  protected:
   poly getInternalReference() const{
@@ -323,10 +324,15 @@ public std::iterator<std::input_iterator_tag,T,int, shared_ptr<const T>,ConstTer
   }
 
 };
-class Poly{
+
+template <poly_variant variant> class PolyBase;
+template <poly_variant v> inline PolyBase<v> operator+(const PolyBase<v>& p1, const PolyBase<v>& p2);
+template <poly_variant v> inline PolyBase<v> operator*(const PolyBase<v>& p1, const PolyBase<v>& p2);
+template <poly_variant v>inline PolyBase<v> operator*(const PolyBase<v>& p1, const Number& n);
+template<poly_variant variant> class PolyBase{
  
  public:
-  typedef PolyInputIterator<Poly> iterator;
+  typedef PolyInputIterator<PolyBase> iterator;
   void copy_on_write(){
     if (!ptr.unique()){
       ptr.reset(new PolyImpl(*ptr));
@@ -341,24 +347,24 @@ class Poly{
     return p_String(ptr->p,ptr->r,ptr->r);
   }
 
-  Poly(ring r=currRing):ptr(new PolyImpl((poly) NULL,r)){
+  PolyBase(ring r=currRing):ptr(new PolyImpl((poly) NULL,r)){
   }
-  Poly(int n, ring r=currRing):ptr(new PolyImpl(n,r)){
+  PolyBase(int n, ring r=currRing):ptr(new PolyImpl(n,r)){
     
   }
-  Poly(const char* c, ring r=currRing):ptr(new PolyImpl((poly)NULL,r)){
+  PolyBase(const char* c, ring r=currRing):ptr(new PolyImpl((poly)NULL,r)){
     //p_Read takes no const so do
     char* cp=(char*) omalloc((strlen(c)+1)*sizeof(char));
     strcpy(cp,c);
     p_Read(cp,ptr->p,r);
     omfree(cp);
   }
-  Poly(const Poly&p):ptr(p.ptr){
+  PolyBase(const PolyBase&p):ptr(p.ptr){
   }
-  Poly(const Number& n):ptr(new PolyImpl(n)){
+  PolyBase(const Number& n):ptr(new PolyImpl(n)){
     
   }
-  Poly(std::vector<int> v, ring r=currRing):ptr(new PolyImpl((poly) NULL,r)){
+  PolyBase(std::vector<int> v, ring r=currRing):ptr(new PolyImpl((poly) NULL,r)){
     unsigned int i;
     int s=v.size();
     poly p=p_ISet(1,r);
@@ -368,19 +374,19 @@ class Poly{
     pSetm(p);
     ptr->p=p;
   }
-  Poly& operator+=(Poly p2){
+  PolyBase& operator+=(PolyBase p2){
     copy_on_write();
     *ptr += *p2.ptr;
     
     return *this;
   }
-  Poly& operator*=(Poly p2){
+  PolyBase& operator*=(PolyBase p2){
     copy_on_write();
     *ptr *= *p2.ptr;
     
     return *this;
   }
-  Poly& operator*=(Number n){
+  PolyBase& operator*=(Number n){
     copy_on_write();
     *ptr *=n;
     
@@ -391,26 +397,26 @@ class Poly{
      write();
      Print(StringAppendS(""));
      }*/
-  virtual ~Poly(){}
-  Poly(poly p, ring r):ptr(new PolyImpl(p,r)){
+  virtual ~PolyBase(){}
+  PolyBase(poly p, ring r):ptr(new PolyImpl(p,r)){
   }
-  Poly(poly p, ring r,int):ptr(new PolyImpl(p,r,0)){
+  PolyBase(poly p, ring r,int):ptr(new PolyImpl(p,r,0)){
   }
   /*Poly(Poly& p){
     ptr=p.ptr;
     }*/
 
-  PolyInputIterator<Poly> begin(){
-    return PolyInputIterator<Poly>(ptr->p,ptr->r);
+  PolyInputIterator<PolyBase> begin(){
+    return PolyInputIterator<PolyBase>(ptr->p,ptr->r);
   }
-  PolyInputIterator<Poly> end(){
-    return PolyInputIterator<Poly>(NULL, ptr->r);
+  PolyInputIterator<PolyBase> end(){
+    return PolyInputIterator<PolyBase>(NULL, ptr->r);
   }
   ring getRing(){
     return ptr->getRing();
   }
  protected:
-  Poly(PolyImpl& impl):ptr(&impl){
+  PolyBase(PolyImpl& impl):ptr(&impl){
    
   }
   poly getInternalReference(){
@@ -418,27 +424,30 @@ class Poly{
   }
  private:
   shared_ptr<PolyImpl> ptr;
-  friend inline Poly operator+(const Poly& p1, const Poly& p2);
-  friend inline Poly operator*(const Poly& p1, const Poly& p2);
-  friend inline Poly operator*(const Poly& p1, const Number& n);
+  //friend inline Poly operator+(const Poly& p1, const Poly& p2);
+  ///friend inline PolyBase operator*(const Poly& p1, const Poly& p2);
+  //friend inline PolyBase operator*(const Poly& p1, const Number& n);
   // friend inline Poly operator*(const Poly& p1, const Number& n);
-  
+  //  friend inline template PolyBase<poly_variant variant> operator+(const PolyBase<v>& p1, const PolyBase<v>& p2);
+  friend PolyBase<variant> operator+<>(const PolyBase<variant>& p1, const PolyBase<variant>& p2);
+  friend PolyBase<variant> operator*<>(const PolyBase<variant>& p1, const PolyBase<variant>& p2);
+  friend PolyBase<variant> operator*<>(const PolyBase<variant>& p1, const Number& p2);
 };
-
-inline Poly operator+(const Poly& p1, const Poly& p2){
+typedef PolyBase<RING> Poly;
+template <poly_variant v> inline PolyBase<v> operator+(const PolyBase<v>& p1, const PolyBase<v>& p2){
     PolyImpl* res=new PolyImpl(*p1.ptr);
     *res+=*p2.ptr;
-    return(Poly(*res));
+    return(PolyBase<v>(*res));
 }
-inline Poly operator*(const Poly& p1, const Poly& p2){
+template <poly_variant v> inline PolyBase<v> operator*(const PolyBase<v>& p1, const PolyBase<v>& p2){
     PolyImpl* res=new PolyImpl(*p1.ptr);
     *res *= *p2.ptr;
-    return(Poly(*res));
+    return(PolyBase<v> (*res));
 }
-inline Poly operator*(const Poly& p1, const Number& n){
+template <poly_variant v>inline PolyBase<v> operator*(const PolyBase<v>& p1, const Number& n){
     PolyImpl* res=new PolyImpl(*p1.ptr);
     *res *= n;
-    return(Poly(*res));
+    return(PolyBase<v>(*res));
 }
 
 

@@ -5,6 +5,11 @@
 #include "febase.h"
 
 
+enum poly_variant{
+  RING,
+  MODUL
+};
+template<poly_variant> class PolyBase;
 
 class Number{
   
@@ -24,7 +29,7 @@ class Number{
   friend Number operator/(int n1, const Number& n2);
   friend Number operator*(int n1, const Number& n2);
   friend bool operator==(int n1, const Number& n2);
-  friend class Poly;
+  friend class PolyBase<RING>;
   friend class PolyImpl;
   Number& operator=(const Number& n2){
     //durch Reihenfolge Selbstzuweisungen berücksichtigt
