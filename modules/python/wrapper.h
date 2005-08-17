@@ -1,4 +1,4 @@
-//$Id: wrapper.h,v 1.6 2005-08-17 09:41:49 bricken Exp $
+//$Id: wrapper.h,v 1.7 2005-08-17 10:19:35 bricken Exp $
 #ifndef PYTHON_SINGULAR_WRAPPER_HEADER
 #define PYTHON_SINGULAR_WRAPPER_HEADER
 #include <Python.h>
@@ -83,20 +83,20 @@ BOOST_PYTHON_MODULE(Singular){
     .def(self+=Number())
     .def(self*=Number())
     .def(self*self);
-    /* boost::python::class_<PolyBase<POLY_VARIANT_MODUL> >("vector")
+     boost::python::class_<Vector>("vector")
     
     .def(boost::python::init <>())
     
     
     .def("__str__", Poly_as_str)
-    .def("__iter__", boost::python::iterator<PolyBase<POLY_VARIANT_MODUL> >())
+    .def("__iter__", boost::python::iterator<Vector>())
    
     .def(self+=self)
    
     .def(self+self)
     .def(self*=Number())
-      .def(self*Number());
-    */
+      .def(Number() * self);
+    
 
 }
 #endif
