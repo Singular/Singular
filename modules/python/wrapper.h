@@ -1,4 +1,4 @@
-//$Id: wrapper.h,v 1.8 2005-08-17 13:35:29 bricken Exp $
+//$Id: wrapper.h,v 1.9 2005-08-17 16:26:57 bricken Exp $
 #ifndef PYTHON_SINGULAR_WRAPPER_HEADER
 #define PYTHON_SINGULAR_WRAPPER_HEADER
 #include <Python.h>
@@ -11,7 +11,9 @@
 #include "Poly.h"
 #include "PowerSeries.h"
 using namespace boost::python;
-
+Vector unitVector0(int i){
+  return unitVector(i,currRing);
+}
 static boost::python::object Number_as_str(Number n)
 {
   using boost::python::str;
@@ -96,14 +98,13 @@ BOOST_PYTHON_MODULE(Singular){
     .def(self+self)
     .def(self*=Number())
     .def(Number() * self);
-  boost::python::class_<PowerSeries>("power_series")
-       
-    .def(boost::python::init <const Poly&,const Poly&>())
-       
-    
- 
+  boost::python::class_<PowerSeries>("power_series")       
+    .def(boost::python::init <const PowerSeries::numerator_type &,const PowerSeries::denominator_type&>())
     .def("__iter__", boost::python::iterator<PowerSeries>());
-     
+  boost::python::class_<VectorPowerSeries>("vector_power_series")
+    .def(boost::python::init <const VectorPowerSeries::numerator_type&,const VectorPowerSeries::denominator_type &>())
+    .def("__iter__", boost::python::iterator<VectorPowerSeries>());
+  def("gen",unitVector0);
   //    .def(self+=self)
    
   //   .def(self+self)
