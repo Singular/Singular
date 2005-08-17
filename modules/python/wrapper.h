@@ -1,4 +1,4 @@
-//$Id: wrapper.h,v 1.9 2005-08-17 16:26:57 bricken Exp $
+//$Id: wrapper.h,v 1.10 2005-08-17 16:30:46 bricken Exp $
 #ifndef PYTHON_SINGULAR_WRAPPER_HEADER
 #define PYTHON_SINGULAR_WRAPPER_HEADER
 #include <Python.h>
@@ -26,12 +26,19 @@ static boost::python::object Number_as_str(Number n)
 static boost::python::object Poly_as_str(Poly& p)
 {
   using boost::python::str;
-  ring r=p.getRing();
+  //ring r=p.getRing();
  
   char* out=p.c_string();
   return boost::python::str(out,strlen(out));
 }
-
+static boost::python::object Vector_as_str(Vector& p)
+{
+  using boost::python::str;
+  //ring r=p.getRing();
+ 
+  char* out=p.c_string();
+  return boost::python::str(out,strlen(out));
+}
 
 BOOST_PYTHON_MODULE(Singular){
   boost::python::class_<Number>("number")
@@ -88,7 +95,7 @@ BOOST_PYTHON_MODULE(Singular){
   boost::python::class_<Vector>("vector")
     
     .def(boost::python::init <>())
-    
+    .def("__str__", Vector_as_str)
     
     //    .def("__str__", Poly_as_str)
     .def("__iter__", boost::python::iterator<Vector>())
