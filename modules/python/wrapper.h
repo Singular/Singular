@@ -1,4 +1,4 @@
-//$Id: wrapper.h,v 1.5 2005-08-17 09:14:21 bricken Exp $
+//$Id: wrapper.h,v 1.6 2005-08-17 09:41:49 bricken Exp $
 #ifndef PYTHON_SINGULAR_WRAPPER_HEADER
 #define PYTHON_SINGULAR_WRAPPER_HEADER
 #include <Python.h>
@@ -83,47 +83,20 @@ BOOST_PYTHON_MODULE(Singular){
     .def(self+=Number())
     .def(self*=Number())
     .def(self*self);
-    boost::python::class_<PolyBase<POLY_VARIANT_MODUL> >("vector")
+    /* boost::python::class_<PolyBase<POLY_VARIANT_MODUL> >("vector")
     
     .def(boost::python::init <>())
     
     
     .def("__str__", Poly_as_str)
     .def("__iter__", boost::python::iterator<PolyBase<POLY_VARIANT_MODUL> >())
-    //read monomials (only) from string
-    //.def(boost::python::init <const char* >())
-    
-      //.def("__str__", as_str)
-      //.def(-self)
-
+   
     .def(self+=self)
-      //    .def(self-=self)
-      //.def(self/=self)
-      //.def(self==self)
+   
     .def(self+self)
     .def(self*=Number())
       .def(self*Number());
-      //.def(self+Number())
-      //.def(self+=Number())
-      //.def(self*=Number());
-
-  //boost::python::class_<TermReference>("termreference");
-    //.def(self/self)
-      //.def(self-self)
-      //.def(int()==self)
-      //.def(int()+self)
-      //.def(int()*self)
-      //.def(int()/self)
-      //.def(int()-self)
-      //.def(self==int())
-      //.def(self+int())
-    /* .def(self*int()) */
-/*     .def(self/int()) */
-/*     .def(self-int()) */
-/*     .def(self*=int()) */
-/*     .def(self+=int()) */
-/*     .def(self-=int()) */
-/*     .def(self/=int()); */
+    */
 
 }
 #endif
