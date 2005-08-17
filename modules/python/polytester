@@ -17,7 +17,7 @@ print z,xy
 print xy+number(1)
 print z+xy
 print z,xy
-print xy+xy*xy
+#print xy+xy*xy
 print xy
 for t in (xy*xy+xy+polynomial(1)):
   print t

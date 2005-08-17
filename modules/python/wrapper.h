@@ -1,4 +1,4 @@
-//$Id: wrapper.h,v 1.4 2005-08-17 06:33:04 bricken Exp $
+//$Id: wrapper.h,v 1.5 2005-08-17 09:14:21 bricken Exp $
 #ifndef PYTHON_SINGULAR_WRAPPER_HEADER
 #define PYTHON_SINGULAR_WRAPPER_HEADER
 #include <Python.h>
@@ -21,7 +21,7 @@ static boost::python::object Number_as_str(Number n)
   return boost::python::str(out,strlen(out));
 }
 
-static boost::python::object Poly_as_str(Poly p)
+static boost::python::object Poly_as_str(Poly& p)
 {
   using boost::python::str;
   ring r=p.getRing();
@@ -29,6 +29,7 @@ static boost::python::object Poly_as_str(Poly p)
   char* out=p.c_string();
   return boost::python::str(out,strlen(out));
 }
+
 
 BOOST_PYTHON_MODULE(Singular){
   boost::python::class_<Number>("number")
@@ -82,6 +83,30 @@ BOOST_PYTHON_MODULE(Singular){
     .def(self+=Number())
     .def(self*=Number())
     .def(self*self);
+    boost::python::class_<PolyBase<POLY_VARIANT_MODUL> >("vector")
+    
+    .def(boost::python::init <>())
+    
+    
+    .def("__str__", Poly_as_str)
+    .def("__iter__", boost::python::iterator<PolyBase<POLY_VARIANT_MODUL> >())
+    //read monomials (only) from string
+    //.def(boost::python::init <const char* >())
+    
+      //.def("__str__", as_str)
+      //.def(-self)
+
+    .def(self+=self)
+      //    .def(self-=self)
+      //.def(self/=self)
+      //.def(self==self)
+    .def(self+self)
+    .def(self*=Number())
+      .def(self*Number());
+      //.def(self+Number())
+      //.def(self+=Number())
+      //.def(self*=Number());
+
   //boost::python::class_<TermReference>("termreference");
     //.def(self/self)
       //.def(self-self)
