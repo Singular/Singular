@@ -1,4 +1,4 @@
-//$Id: Poly.h,v 1.9 2005-08-17 06:36:36 bricken Exp $
+//$Id: Poly.h,v 1.10 2005-08-17 06:38:14 bricken Exp $
 
 
 
@@ -23,8 +23,8 @@
 //PolyImpl is a 08/15 poly wrapper
 //Poly wraps around PolyImpl with reference counting using boost
 class PolyImpl{
-  friend class PolyBase<RING>;
-  friend class PolyBase<MODUL>;
+  friend class PolyBase<POLY_VARIANT_RING>;
+  friend class PolyBase<POLY_VARIANT_MODUL>;
   //friend class Number;
  protected:
   poly getInternalReference() const{
