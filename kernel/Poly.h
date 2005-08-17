@@ -1,4 +1,4 @@
-//$Id: Poly.h,v 1.8 2005-08-17 06:34:16 bricken Exp $
+//$Id: Poly.h,v 1.9 2005-08-17 06:36:36 bricken Exp $
 
 
 
@@ -433,7 +433,7 @@ template<poly_variant variant> class PolyBase{
   friend PolyBase<variant> operator*<>(const PolyBase<variant>& p1, const PolyBase<variant>& p2);
   friend PolyBase<variant> operator*<>(const PolyBase<variant>& p1, const Number& p2);
 };
-typedef PolyBase<RING> Poly;
+typedef PolyBase<POLY_VARIANT_RING> Poly;
 template <poly_variant v> inline PolyBase<v> operator+(const PolyBase<v>& p1, const PolyBase<v>& p2){
     PolyImpl* res=new PolyImpl(*p1.ptr);
     *res+=*p2.ptr;
