@@ -1,4 +1,4 @@
-//$Id: Poly.h,v 1.16 2005-08-17 13:35:47 bricken Exp $
+//$Id: Poly.h,v 1.17 2005-08-17 16:27:35 bricken Exp $
 
 
 
@@ -415,10 +415,14 @@ template<poly_variant variant, class create_type_input> class PolyBase{
   ring getRing() const{
     return ptr->getRing();
   }
+  int lmTotalDegree() const{
+    return pTotaldegree(ptr->p);
+  }
   Number leadCoef(){
     return ptr->leadCoef();
   }
  protected:
+  
   PolyBase(PolyImpl& impl):ptr(&impl){
    
   }
@@ -426,6 +430,7 @@ template<poly_variant variant, class create_type_input> class PolyBase{
     return ptr->getInternalReference();
   }
  protected:
+
   shared_ptr<PolyImpl> ptr;
   //friend inline Poly operator+(const Poly& p1, const Poly& p2);
   ///friend inline PolyBase operator*(const Poly& p1, const Poly& p2);
@@ -438,7 +443,8 @@ template<poly_variant variant, class create_type_input> class PolyBase{
 };
 
 class Poly: public PolyBase<POLY_VARIANT_RING, Poly>{
- 
+  friend class Vector;
+  friend class PolyBase<POLY_VARIANT_MODUL,Vector>;
  public:
 
   Poly(ring r=currRing):PolyBase<POLY_VARIANT_RING, Poly> ((poly)NULL,r,0){
@@ -485,9 +491,7 @@ class Poly: public PolyBase<POLY_VARIANT_RING, Poly>{
     ((PolyBase<POLY_VARIANT_RING, Poly>&)*this)+=p;
     return *this;
   }
-  int lmTotalDegree() const{
-    return pTotaldegree(ptr->p);
-  }
+
 
 };
 class Vector: public PolyBase<POLY_VARIANT_MODUL, Vector>{
@@ -505,9 +509,7 @@ class Vector: public PolyBase<POLY_VARIANT_MODUL, Vector>{
   Vector(const PolyBase<POLY_VARIANT_MODUL, Vector>& p):PolyBase<POLY_VARIANT_MODUL, Vector>(p){
   }
   
-  Vector(const Number& n):PolyBase<POLY_VARIANT_MODUL, Vector>(*(new PolyImpl(n))){
-    
-  }
+
   Vector(poly p, ring r):PolyBase<POLY_VARIANT_MODUL, Vector>(p,r){
     
   }
@@ -567,6 +569,11 @@ Vector operator*(const Number& n, const Vector& v){
   res*=n;
   return res;
 }
+Vector operator*(const Poly& p, const Vector& v){
+  Vector res(v);
+  res*=p;
+  return res;
+}
 Poly operator+(const Poly& p1, const Number& n){
  Poly f(p1);
   f+=n;
@@ -582,5 +589,9 @@ template <poly_variant variant, class create_type>
   erg+=b2;
   return erg;
 }
-
+Vector unitVector(int i,ring r=currRing){
+  poly p=p_ISet(1,r);
+  p_SetComp(p,i,r);
+  return Vector(p,r,0);
+}
 #endif
