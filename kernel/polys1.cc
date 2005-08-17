@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.13 2005-04-18 14:50:56 Singular Exp $ */
+/* $Id: polys1.cc,v 1.14 2005-08-17 13:54:36 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -494,6 +494,87 @@ void pContent(poly ph)
   {
     nNormalize(pGetCoeff(ph));
     if(!nGreaterZero(pGetCoeff(ph))) ph = pNeg(ph);
+    if (rField_is_Q_a())
+    {
+      h = nlInit(1);
+      p=ph;
+      while (p!=NULL)
+      { // each monom: coeff in Q_a
+        lnumber c_n_n=(lnumber)pGetCoeff(p);
+        napoly c_n=c_n_n->z;
+        while (c_n!=NULL)
+        { // each monom: coeff in Q
+          d=nlLcm(h,pGetCoeff(c_n),currRing->algring);
+          n_Delete(&h,currRing->algring);
+          h=d;
+          pIter(c_n);
+        }
+        pIter(p);
+      }
+      /* contains the 1/lcm of all denominators in c_n_n->z*/
+      number hz=h;
+      h = nlInit(1);
+      p=ph;
+      while (p!=NULL)
+      { // each monom: coeff in Q_a
+        lnumber c_n_n=(lnumber)pGetCoeff(p);
+        napoly c_n=c_n_n->n;
+        while (c_n!=NULL)
+        { // each monom: coeff in Q
+          d=nlLcm(h,pGetCoeff(c_n),currRing->algring);
+          n_Delete(&h,currRing->algring);
+          h=d;
+          pIter(c_n);
+        }
+        pIter(p);
+      }
+      /* contains the 1/lcm of all denominators in c_n_n->n*/
+      number htmp=nlInvers(h);
+      number hztmp=nlInvers(hz);
+      number hh=nlMult(hz,h);
+      nlDelete(&hz,currRing->algring);
+      nlDelete(&h,currRing->algring);
+      number hg=nlGcd(hztmp,htmp,currRing->algring);
+      nlDelete(&hztmp,currRing->algring);
+      nlDelete(&htmp,currRing->algring);
+      h=nlMult(hh,hg);
+      nlDelete(&hg,currRing->algring);
+      nlDelete(&hh,currRing->algring);
+      if(!nlIsOne(h))
+      {
+        p=ph;
+        while (p!=NULL)
+        { // each monom: coeff in Q_a
+          lnumber c_n_n=(lnumber)pGetCoeff(p);
+          napoly c_n=c_n_n->z;
+          while (c_n!=NULL)
+          { // each monom: coeff in Q
+            d=nlMult(h,pGetCoeff(c_n));
+            nlNormalize(d);
+            nlDelete(&pGetCoeff(c_n),currRing->algring);
+            pGetCoeff(c_n)=d;
+            pIter(c_n);
+          }
+          pIter(p);
+        }
+        p=ph;
+        while (p!=NULL)
+        { // each monom: coeff in Q_a
+          lnumber c_n_n=(lnumber)pGetCoeff(p);
+          napoly c_n=c_n_n->n;
+          while (c_n!=NULL)
+          { // each monom: coeff in Q
+            d=nlMult(h,pGetCoeff(c_n));
+            nlNormalize(d);
+            nlDelete(&pGetCoeff(c_n),currRing->algring);
+            pGetCoeff(c_n)=d;
+            pIter(c_n);
+          }
+          pIter(p);
+        }
+      }
+      nlDelete(&h,currRing->algring);
+    }
     if (rField_is_Q())
     {
       h=pInitContent(ph);
@@ -550,6 +631,87 @@ void pContent(poly ph)
       if(!nGreaterZero(pGetCoeff(ph))) ph = pNeg(ph);
     }
 #endif
+    if (rField_is_Q_a())
+    {
+      h = nlInit(1);
+      p=ph;
+      while (p!=NULL)
+      { // each monom: coeff in Q_a
+        lnumber c_n_n=(lnumber)pGetCoeff(p);
+        napoly c_n=c_n_n->z;
+        while (c_n!=NULL)
+        { // each monom: coeff in Q
+          d=nlLcm(h,pGetCoeff(c_n),currRing->algring);
+          n_Delete(&h,currRing->algring);
+          h=d;
+          pIter(c_n);
+        }
+        pIter(p);
+      }
+      /* contains the 1/lcm of all denominators in c_n_n->z*/
+      number hz=h;
+      h = nlInit(1);
+      p=ph;
+      while (p!=NULL)
+      { // each monom: coeff in Q_a
+        lnumber c_n_n=(lnumber)pGetCoeff(p);
+        napoly c_n=c_n_n->n;
+        while (c_n!=NULL)
+        { // each monom: coeff in Q
+          d=nlLcm(h,pGetCoeff(c_n),currRing->algring);
+          n_Delete(&h,currRing->algring);
+          h=d;
+          pIter(c_n);
+        }
+        pIter(p);
+      }
+      /* contains the 1/lcm of all denominators in c_n_n->n*/
+      number htmp=nlInvers(h);
+      number hztmp=nlInvers(hz);
+      number hh=nlMult(hz,h);
+      nlDelete(&hz,currRing->algring);
+      nlDelete(&h,currRing->algring);
+      number hg=nlGcd(hztmp,htmp,currRing->algring);
+      nlDelete(&hztmp,currRing->algring);
+      nlDelete(&htmp,currRing->algring);
+      h=nlMult(hh,hg);
+      nlDelete(&hg,currRing->algring);
+      nlDelete(&hh,currRing->algring);
+      if(!nlIsOne(h))
+      {
+        p=ph;
+        while (p!=NULL)
+        { // each monom: coeff in Q_a
+          lnumber c_n_n=(lnumber)pGetCoeff(p);
+          napoly c_n=c_n_n->z;
+          while (c_n!=NULL)
+          { // each monom: coeff in Q
+            d=nlMult(h,pGetCoeff(c_n));
+            nlNormalize(d);
+            nlDelete(&pGetCoeff(c_n),currRing->algring);
+            pGetCoeff(c_n)=d;
+            pIter(c_n);
+          }
+          pIter(p);
+        }
+        p=ph;
+        while (p!=NULL)
+        { // each monom: coeff in Q_a
+          lnumber c_n_n=(lnumber)pGetCoeff(p);
+          napoly c_n=c_n_n->n;
+          while (c_n!=NULL)
+          { // each monom: coeff in Q
+            d=nlMult(h,pGetCoeff(c_n));
+            nlNormalize(d);
+            nlDelete(&pGetCoeff(c_n),currRing->algring);
+            pGetCoeff(c_n)=d;
+            pIter(c_n);
+          }
+          pIter(p);
+        }
+      }
+      nlDelete(&h,currRing->algring);
+    }
   }
 }
 void pSimpleContent(poly ph,int smax)

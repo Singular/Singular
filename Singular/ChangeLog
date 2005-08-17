@@ -1,3 +1,7 @@
+Wed Aug 17 15:52:46 CEST 2005 hannes
+* polys1.cc: pContent for Q_a improved
+Thu Aug  4 15:59:39 CEST 2005 hannes
+*ideals.cc: idHomModule: use pTotaldegree only for ordering starting with lp
 
 Thu Aug  4 14:20:27 CEST 2005 hannes
 *ipshell.cc: rCompose: fixed counting block start after order a
