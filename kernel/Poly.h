@@ -1,4 +1,4 @@
-//$Id: Poly.h,v 1.15 2005-08-17 10:20:03 bricken Exp $
+//$Id: Poly.h,v 1.16 2005-08-17 13:35:47 bricken Exp $
 
 
 
@@ -48,6 +48,9 @@ class PolyImpl{
   friend PolyImpl operator/(const PolyImpl& p1, int n2);
   friend PolyImpl operator*(const PolyImpl& p1, int n2);
   friend bool operator==(const PolyImpl& p1, int n2);
+  Number leadCoef(){
+    return Number(p->coef,r);
+  }
   PolyImpl& operator=(const PolyImpl& p2){
     //durch Reihenfolge Selbstzuweisungen berücksichtigt
     if (this==&p2) return *this;
@@ -286,6 +289,9 @@ template<class T> class ConstTermReference{
     this->t=p;
     this->r=r;
   }
+  bool isConstant() const{
+    return p_LmIsConstant(t,r);
+  }
   
 };
 
@@ -406,8 +412,11 @@ template<poly_variant variant, class create_type_input> class PolyBase{
   PolyInputIterator<create_type> end(){
     return PolyInputIterator<create_type>(NULL, ptr->r);
   }
-  ring getRing(){
+  ring getRing() const{
     return ptr->getRing();
+  }
+  Number leadCoef(){
+    return ptr->leadCoef();
   }
  protected:
   PolyBase(PolyImpl& impl):ptr(&impl){
@@ -475,6 +484,9 @@ class Poly: public PolyBase<POLY_VARIANT_RING, Poly>{
 
     ((PolyBase<POLY_VARIANT_RING, Poly>&)*this)+=p;
     return *this;
+  }
+  int lmTotalDegree() const{
+    return pTotaldegree(ptr->p);
   }
 
 };
