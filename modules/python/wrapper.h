@@ -1,4 +1,4 @@
-//$Id: wrapper.h,v 1.3 2005-08-16 14:35:59 bricken Exp $
+//$Id: wrapper.h,v 1.4 2005-08-17 06:33:04 bricken Exp $
 #ifndef PYTHON_SINGULAR_WRAPPER_HEADER
 #define PYTHON_SINGULAR_WRAPPER_HEADER
 #include <Python.h>
@@ -6,11 +6,12 @@
 #include "mod2.h"
 #include "numbers.h"
 #include "febase.h"
-#include "Poly.h"
-#include "Number.h"
 
+#include "Number.h"
+#include "Poly.h"
 
 using namespace boost::python;
+
 static boost::python::object Number_as_str(Number n)
 {
   using boost::python::str;
@@ -57,7 +58,7 @@ BOOST_PYTHON_MODULE(Singular){
     .def(self+=int())
     .def(self-=int())
     .def(self/=int());
-  boost::python::class_<Poly>("polynomial")
+    boost::python::class_<Poly>("polynomial")
     .def(boost::python::init <int>())
     .def(boost::python::init <Poly>())
     .def(boost::python::init <std::vector<int> >())
@@ -98,5 +99,6 @@ BOOST_PYTHON_MODULE(Singular){
 /*     .def(self+=int()) */
 /*     .def(self-=int()) */
 /*     .def(self/=int()); */
+
 }
 #endif
