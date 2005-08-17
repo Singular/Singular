@@ -1,4 +1,4 @@
-//$Id: Poly.h,v 1.14 2005-08-17 10:12:11 bricken Exp $
+//$Id: Poly.h,v 1.15 2005-08-17 10:20:03 bricken Exp $
 
 
 
@@ -550,7 +550,11 @@ Poly operator*(const Poly& p, const Poly& p2){
   erg*=p2;
   return erg;
 }
-
+Vector operator*(const Number& n, const Vector& v){
+  Vector res=v;
+  res*=n;
+  return res;
+}
 Poly operator+(const Poly& p1, const Number& n){
  Poly f(p1);
   f+=n;
