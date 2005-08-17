@@ -11,6 +11,7 @@ enum poly_variant{
 };
 template<poly_variant,class> class PolyBase;
 class Poly;
+class Vector;
 class Number{
   
  public:
@@ -30,6 +31,7 @@ class Number{
   friend Number operator*(int n1, const Number& n2);
   friend bool operator==(int n1, const Number& n2);
   friend class Poly;
+  friend class Vector;
   friend class PolyBase<POLY_VARIANT_RING,Poly>;
  
   friend class PolyImpl;

@@ -1,4 +1,4 @@
-//$Id: Poly.h,v 1.13 2005-08-17 09:42:15 bricken Exp $
+//$Id: Poly.h,v 1.14 2005-08-17 10:12:11 bricken Exp $
 
 
 
@@ -25,8 +25,10 @@
 
 class PolyImpl{
   friend class PolyBase<POLY_VARIANT_RING,Poly>;
+  friend class PolyBase<POLY_VARIANT_MODUL,Vector>;
   //friend class PolyBase<POLY_VARIANT_MODUL>;
   friend class Poly;
+  friend class Vector;
   //friend class Number;
  protected:
   poly getInternalReference() const{
@@ -476,6 +478,56 @@ class Poly: public PolyBase<POLY_VARIANT_RING, Poly>{
   }
 
 };
+class Vector: public PolyBase<POLY_VARIANT_MODUL, Vector>{
+ 
+ public:
+
+  Vector(ring r=currRing):PolyBase<POLY_VARIANT_MODUL, Vector> ((poly)NULL,r,0){
+  }
+  Vector(int n, ring r=currRing):PolyBase<POLY_VARIANT_MODUL, Vector>(*(new PolyImpl(n,r))){
+    
+  }
+  Vector(const char* c, ring r=currRing):PolyBase<POLY_VARIANT_MODUL, Vector>(c,r){
+
+  }
+  Vector(const PolyBase<POLY_VARIANT_MODUL, Vector>& p):PolyBase<POLY_VARIANT_MODUL, Vector>(p){
+  }
+  
+  Vector(const Number& n):PolyBase<POLY_VARIANT_MODUL, Vector>(*(new PolyImpl(n))){
+    
+  }
+  Vector(poly p, ring r):PolyBase<POLY_VARIANT_MODUL, Vector>(p,r){
+    
+  }
+  Vector(poly p, ring r, int):PolyBase<POLY_VARIANT_MODUL, Vector>(p,r,0){
+  }
+  Vector(std::vector<int> v, ring r=currRing):PolyBase<POLY_VARIANT_MODUL, Vector>(*(new PolyImpl((poly) NULL,r))){
+    unsigned int i;
+    int s=v.size();
+    poly p=p_ISet(1,r);
+    for(i=0;i<v.size();i++){
+      pSetExp(p,i+1,v[i]);
+    }
+    pSetm(p);
+    ptr.reset(new PolyImpl(p,r));
+  }
+  /*  Poly& operator+=(const Number& n){
+  Poly p2(n);
+  ((PolyBase<POLY_VARIANT_MODUL, Poly>&) (*this))+=p2;
+  return *this;
+  }*/
+  Vector& operator+=(const Vector& p ){
+
+    ((PolyBase<POLY_VARIANT_MODUL, Vector>&)*this)+=p;
+    return *this;
+  }
+  Vector& operator+=(const PolyBase<POLY_VARIANT_MODUL, Vector>& p ){
+
+    ((PolyBase<POLY_VARIANT_MODUL, Vector>&)*this)+=p;
+    return *this;
+  }
+
+};
 
 //typedef Poly PolyBase<POLY_VARIANT_RING>::create_type;
 /*template <poly_variant v, class c> inline PolyBase<v> operator+(const PolyBase<v,c>& p1, const PolyBase<v,c>& p2){
@@ -499,10 +551,20 @@ Poly operator*(const Poly& p, const Poly& p2){
   return erg;
 }
 
-Poly operator+(const Poly& p1, const Poly& p2){
-  Poly f(p1);
-  f+=p2;
+Poly operator+(const Poly& p1, const Number& n){
+ Poly f(p1);
+  f+=n;
   return f;
+  }
+template <poly_variant variant, class create_type> 
+  typename PolyBase<variant,create_type>::create_type 
+  operator+
+  (const PolyBase<variant,create_type>& b1, 
+   const PolyBase<variant,create_type>& b2)
+{
+  typename PolyBase<variant, create_type>::create_type erg(b1);
+  erg+=b2;
+  return erg;
 }
 
 #endif
