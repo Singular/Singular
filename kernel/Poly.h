@@ -1,4 +1,4 @@
-//$Id: Poly.h,v 1.10 2005-08-17 06:38:14 bricken Exp $
+//$Id: Poly.h,v 1.11 2005-08-17 08:34:44 bricken Exp $
 
 
 
@@ -284,6 +284,7 @@ template<class T> class ConstTermReference{
   }
   
 };
+
 template<class T> class PolyInputIterator:
 public std::iterator<std::input_iterator_tag,T,int, shared_ptr<const T>,ConstTermReference<T> >
 {
@@ -349,9 +350,7 @@ template<poly_variant variant> class PolyBase{
 
   PolyBase(ring r=currRing):ptr(new PolyImpl((poly) NULL,r)){
   }
-  PolyBase(int n, ring r=currRing):ptr(new PolyImpl(n,r)){
-    
-  }
+
   PolyBase(const char* c, ring r=currRing):ptr(new PolyImpl((poly)NULL,r)){
     //p_Read takes no const so do
     char* cp=(char*) omalloc((strlen(c)+1)*sizeof(char));
@@ -361,26 +360,16 @@ template<poly_variant variant> class PolyBase{
   }
   PolyBase(const PolyBase&p):ptr(p.ptr){
   }
-  PolyBase(const Number& n):ptr(new PolyImpl(n)){
-    
-  }
-  PolyBase(std::vector<int> v, ring r=currRing):ptr(new PolyImpl((poly) NULL,r)){
-    unsigned int i;
-    int s=v.size();
-    poly p=p_ISet(1,r);
-    for(i=0;i<v.size();i++){
-      pSetExp(p,i+1,v[i]);
-    }
-    pSetm(p);
-    ptr->p=p;
-  }
-  PolyBase& operator+=(PolyBase p2){
+  typedef PolyBase<variant> create_type;
+
+
+  PolyBase& operator+=(const PolyBase& p2){
     copy_on_write();
     *ptr += *p2.ptr;
     
     return *this;
   }
-  PolyBase& operator*=(PolyBase p2){
+  PolyBase& operator*=(const PolyBase<POLY_VARIANT_RING> & p2){
     copy_on_write();
     *ptr *= *p2.ptr;
     
@@ -398,7 +387,7 @@ template<poly_variant variant> class PolyBase{
      Print(StringAppendS(""));
      }*/
   virtual ~PolyBase(){}
-  PolyBase(poly p, ring r):ptr(new PolyImpl(p,r)){
+  PolyBase(poly p, ring r):ptr(new PolyImpl(p_Copy(p,r),r)){
   }
   PolyBase(poly p, ring r,int):ptr(new PolyImpl(p,r,0)){
   }
@@ -422,7 +411,7 @@ template<poly_variant variant> class PolyBase{
   poly getInternalReference(){
     return ptr->getInternalReference();
   }
- private:
+ protected:
   shared_ptr<PolyImpl> ptr;
   //friend inline Poly operator+(const Poly& p1, const Poly& p2);
   ///friend inline PolyBase operator*(const Poly& p1, const Poly& p2);
@@ -433,7 +422,53 @@ template<poly_variant variant> class PolyBase{
   friend PolyBase<variant> operator*<>(const PolyBase<variant>& p1, const PolyBase<variant>& p2);
   friend PolyBase<variant> operator*<>(const PolyBase<variant>& p1, const Number& p2);
 };
-typedef PolyBase<POLY_VARIANT_RING> Poly;
+
+class Poly: public PolyBase<POLY_VARIANT_RING>{
+ public:
+  Poly(ring r=currRing):PolyBase<POLY_VARIANT_RING> ((poly)NULL,r,0){
+  }
+  Poly(int n, ring r=currRing):PolyBase<POLY_VARIANT_RING>(*(new PolyImpl(n,r))){
+    
+  }
+  Poly(const char* c, ring r=currRing):PolyBase<POLY_VARIANT_RING>(c,r){
+
+  }
+  Poly(const PolyBase<POLY_VARIANT_RING>& p):PolyBase<POLY_VARIANT_RING>(p){
+  }
+  
+  Poly(const Number& n):PolyBase<POLY_VARIANT_RING>(*(new PolyImpl(n))){
+    
+  }
+  Poly(std::vector<int> v, ring r=currRing):PolyBase<POLY_VARIANT_RING>(*(new PolyImpl((poly) NULL,r))){
+    unsigned int i;
+    int s=v.size();
+    poly p=p_ISet(1,r);
+    for(i=0;i<v.size();i++){
+      pSetExp(p,i+1,v[i]);
+    }
+    pSetm(p);
+    ptr.reset(new PolyImpl(p,r));
+  }
+  /*  Poly& operator+=(const Number& n){
+  Poly p2(n);
+  ((PolyBase<POLY_VARIANT_RING>&) (*this))+=p2;
+  return *this;
+  }*/
+  Poly& operator+=(const Poly& p ){
+
+    ((PolyBase<POLY_VARIANT_RING>&)*this)+=p;
+    return *this;
+  }
+  Poly& operator+=(const PolyBase<POLY_VARIANT_RING>& p ){
+
+    ((PolyBase<POLY_VARIANT_RING>&)*this)+=p;
+    return *this;
+  }
+};
+void foo(Poly p, Number n){
+    p+=(Poly) n;
+  }
+//typedef Poly PolyBase<POLY_VARIANT_RING>::create_type;
 template <poly_variant v> inline PolyBase<v> operator+(const PolyBase<v>& p1, const PolyBase<v>& p2){
     PolyImpl* res=new PolyImpl(*p1.ptr);
     *res+=*p2.ptr;
@@ -449,6 +484,10 @@ template <poly_variant v>inline PolyBase<v> operator*(const PolyBase<v>& p1, con
     *res *= n;
     return(PolyBase<v>(*res));
 }
-
+Poly operator+(const Poly& p1, const Poly& p2){
+  Poly f(p1);
+  f+=p2;
+  return f;
+}
 
 #endif
