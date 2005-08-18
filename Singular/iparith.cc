@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.372 2005-07-27 15:47:55 Singular Exp $ */
+/* $Id: iparith.cc,v 1.373 2005-08-18 14:48:58 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -447,19 +447,7 @@ static BOOLEAN jjDOTDOT(leftv res, leftv u, leftv v)
   res->data=(char *)new intvec((int)(long)u->Data(),(int)(long)v->Data());
   return FALSE;
 }
-static void jjEQUAL_REST(leftv res,leftv u,leftv v)
-{
-  if ((res->data) && (u->next!=NULL) && (v->next!=NULL))
-  {
-    int save_iiOp=iiOp;
-    if (iiOp==NOTEQUAL)
-      iiExprArith2(res,u->next,EQUAL_EQUAL,v->next);
-    else
-      iiExprArith2(res,u->next,iiOp,v->next);
-    iiOp=save_iiOp;
-  }
-  if (iiOp==NOTEQUAL) res->data=(char *)(!(long)res->data);
-}
+static void jjEQUAL_REST(leftv res,leftv u,leftv v);
 static BOOLEAN jjCOMPARE_IV(leftv res, leftv u, leftv v)
 {
   intvec*    a = (intvec * )(u->Data());
@@ -820,6 +808,7 @@ static BOOLEAN jjPLUS_IV(leftv res, leftv u, leftv v)
      return TRUE;
   }
   return jjPLUSMINUS_Gen(res,u,v);
+  return FALSE;
 }
 static BOOLEAN jjPLUS_MA(leftv res, leftv u, leftv v)
 {
@@ -902,6 +891,7 @@ static BOOLEAN jjMINUS_MA(leftv res, leftv u, leftv v)
      return TRUE;
   }
   return jjPLUSMINUS_Gen(res,u,v);
+  return FALSE;
 }
 static BOOLEAN jjTIMES_I(leftv res, leftv u, leftv v)
 {
@@ -1244,6 +1234,19 @@ static BOOLEAN jjEQUAL_P(leftv res, leftv u, leftv v)
   jjEQUAL_REST(res,u,v);
   return FALSE;
 }
+static void jjEQUAL_REST(leftv res,leftv u,leftv v)
+{
+  if ((res->data) && (u->next!=NULL) && (v->next!=NULL))
+  {
+    int save_iiOp=iiOp;
+    if (iiOp==NOTEQUAL)
+      iiExprArith2(res,u->next,EQUAL_EQUAL,v->next);
+    else
+      iiExprArith2(res,u->next,iiOp,v->next);
+    iiOp=save_iiOp;
+  }
+  if (iiOp==NOTEQUAL) res->data=(char *)(!(long)res->data);
+}
 static BOOLEAN jjAND_I(leftv res, leftv u, leftv v)
 {
   res->data = (char *)((long)u->Data() && (long)v->Data());
@@ -1416,6 +1419,7 @@ static BOOLEAN jjINDEX_V_IV(leftv res, leftv u, leftv v)
   }
   return FALSE;
 }
+static BOOLEAN jjKLAMMER_rest(leftv res, leftv u, leftv v);
 static BOOLEAN jjKLAMMER(leftv res, leftv u, leftv v)
 {
   if(u->name==NULL) return TRUE;
@@ -1426,6 +1430,7 @@ static BOOLEAN jjKLAMMER(leftv res, leftv u, leftv v)
   char *n=omStrDup(nn);
   omFree((ADDRESS)nn);
   syMake(res,n);
+  if (u->next!=NULL) return jjKLAMMER_rest(res,u->next,v);
   return FALSE;
 }
 static BOOLEAN jjKLAMMER_IV(leftv res, leftv u, leftv v)
@@ -1453,6 +1458,26 @@ static BOOLEAN jjKLAMMER_IV(leftv res, leftv u, leftv v)
   omFree((ADDRESS)u->name);
   u->name = NULL;
   omFreeSize(n, slen);
+  if (u->next!=NULL) return jjKLAMMER_rest(res,u->next,v);
+  return FALSE;
+}
+static BOOLEAN jjKLAMMER_rest(leftv res, leftv u, leftv v)
+{
+  leftv tmp=(leftv)omAllocBin(sleftv_bin);
+  memset(tmp,0,sizeof(sleftv));
+  BOOLEAN b;
+  if (v->Typ()==INTVEC_CMD)
+    b=jjKLAMMER_IV(tmp,u,v);
+  else
+    b=jjKLAMMER(tmp,u,v);
+  if (b)
+  {
+    omFreeBin(tmp,sleftv_bin);
+    return TRUE;
+  }
+  leftv h=res;
+  while (h->next!=NULL) h=h->next;
+  h->next=tmp;
   return FALSE;
 }
 static BOOLEAN jjPROC(leftv res, leftv u, leftv v)
@@ -3709,7 +3734,7 @@ static BOOLEAN jjPRUNE(leftv res, leftv v)
 {
   intvec *w=(intvec *)atGet(v,"isHomog",INTVEC_CMD);
   ideal v_id=(ideal)v->Data();
-  if (w!=NULL) 
+  if (w!=NULL)
   {
     w=ivCopy(w);
     intvec **ww=&w;

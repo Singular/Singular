@@ -1,3 +1,5 @@
+Thu Aug 18 16:37:32 CEST 2005 hannes
+* identifier with many indices: a(1)(2)(3): grammar.y, iparith.cc
 Wed Aug 17 15:52:46 CEST 2005 hannes
 * polys1.cc: pContent for Q_a improved
 Thu Aug  4 15:59:39 CEST 2005 hannes

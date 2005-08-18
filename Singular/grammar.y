@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.115 2005-07-27 18:16:00 Singular Exp $ */
+/* $Id: grammar.y,v 1.116 2005-08-18 14:48:56 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -516,9 +516,16 @@ elemexpr:
             }
             else
             {
-              $1.next=(leftv)omAllocBin(sleftv_bin);
-              memcpy($1.next,&$3,sizeof(sleftv));
-              if(iiExprArithM(&$$,&$1,'(')) YYERROR;
+              if ($1.Typ()==UNKNOWN)
+              {
+                if(iiExprArith2(&$$,&$1,'(',&$3)) YYERROR;
+              }
+              else
+              {
+                $1.next=(leftv)omAllocBin(sleftv_bin);
+                memcpy($1.next,&$3,sizeof(sleftv));
+                if(iiExprArithM(&$$,&$1,'(')) YYERROR;
+              }
             }
           }
         | '[' exprlist ']'
