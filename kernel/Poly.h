@@ -1,4 +1,4 @@
-//$Id: Poly.h,v 1.18 2005-08-18 07:15:32 bricken Exp $
+//$Id: Poly.h,v 1.19 2005-08-18 07:43:57 bricken Exp $
 
 
 
@@ -420,6 +420,11 @@ template<poly_variant variant, class create_type_input> class PolyBase{
   }
   Number leadCoef(){
     return ptr->leadCoef();
+  }
+  create_type operator-(){
+    create_type erg(*this);
+    erg*=Number(-1,ptr->r);
+    return erg;
   }
  protected:
   
