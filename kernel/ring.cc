@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.40 2005-06-08 13:52:12 Singular Exp $ */
+/* $Id: ring.cc,v 1.41 2005-08-18 07:53:47 bricken Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -194,7 +194,7 @@ BOOLEAN rSleftvList2StringArray(sleftv* sl, char** p);
  s: name, chr: ch, varnames: rv, ordering: ord, typ: typ
  */
 
-int r_IsRingVar(char *n, ring r)
+int r_IsRingVar(const char *n, ring r)
 {
   if ((r!=NULL) && (r->names!=NULL))
   {
