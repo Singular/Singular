@@ -5,7 +5,7 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id: mod2.h.in,v 1.6 2005-07-27 09:38:52 Singular Exp $
+ *  Version: $Id: mod2.h.in,v 1.7 2005-08-18 14:45:32 Singular Exp $
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H
@@ -23,8 +23,6 @@
 #undef HAVE_DYN_RL
 /* Define to have dbm links */
 #undef HAVE_DBM
-/* Define to have smallgmp */
-#undef HAVE_SMALLGMP
 /* Define to have MP links */
 #undef HAVE_MPSR
 /* Define to have factory functionality added */
