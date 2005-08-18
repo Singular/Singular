@@ -11,8 +11,9 @@ CXX	= gcc
 PYTHON_VERSION=2.3
 SINGULAR_BASE=../..
 SING_ARCH=ix86
-CFLAGS	= -DNDEBUG -DBUILD_MODULE -I. -I${SINGULAR_BASE}/kernel -I${SINGULAR_BASE}/Singular -I/home/michael/sing/${SING_ARCH}-Linux/include -lpython${PYTHON_VERSION} -I/usr/include/python${PYTHON_VERSION} -lboost_python
-DCFLAGS	= -DBUILD_MODULE -I. -I/home/michael/sing/kernel -I${SINGULAR_BASE}/Singular -I/home/michael/sing/${SING_ARCH}-Linux/include -lpython${PYTHON_VERSION} -I/usr/include/python${PYTHON_VERSION} -lboost_python
+CFLAGS	= -DNDEBUG -DBUILD_MODULE -I. -I${SINGULAR_BASE}/kernel -I${SINGULAR_BASE}/Singular -I/home/michael/sing/${SING_ARCH}-Linux/include  -I/usr/include/python${PYTHON_VERSION}
+DCFLAGS	= -DBUILD_MODULE -I. -I/home/michael/sing/kernel -I${SINGULAR_BASE}/Singular -I/home/michael/sing/${SING_ARCH}-Linux/include -I/usr/include/python${PYTHON_VERSION}
+LDFLAGS= -lboost_python -lpython${PYTHON_VERSION} -lpython${PYTHON_VERSION}
 #LD	=
 MKINSTALLDIRS=mkdir -p
 instdir          = /home/michael/sing/ix86-Linux
@@ -32,13 +33,13 @@ all:	python_module.so python_module_g.so
 	${CC} ${DCFLAGS} -c -fPIC -DPIC $< -o $*.og
 
 python_module.so: ${OBJS}
-	${CC} ${CFLAGS} -shared -Wl,-soname -Wl,python_module.so.1 \
+	${CC} ${CFLAGS} ${LDFLAGS} -shared -Wl,-soname -Wl,python_module.so.1 \
 		-o python_module.so.1.2.0 ${OBJS}
 	rm -f python_module.so
 	ln -s python_module.so.1.2.0 python_module.so
 
 python_module_g.so: ${DOBJS}
-	${CC} ${DCFLAGS} -shared -Wl,-soname -Wl,python_module_g.so.1 \
+	${CC} ${DCFLAGS} ${LDFLAGS} -shared -Wl,-soname -Wl,python_module_g.so.1 \
 		-o python_module_g.so.1.2.0 ${DOBJS}
 	rm -f python_module_g.so
 	ln -s python_module_g.so.1.2.0 python_module_g.so
