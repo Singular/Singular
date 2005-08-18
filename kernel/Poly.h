@@ -1,4 +1,4 @@
-//$Id: Poly.h,v 1.17 2005-08-17 16:27:35 bricken Exp $
+//$Id: Poly.h,v 1.18 2005-08-18 07:15:32 bricken Exp $
 
 
 
@@ -569,6 +569,19 @@ Vector operator*(const Number& n, const Vector& v){
   res*=n;
   return res;
 }
+
+//assumes monomials commute with numbers
+template <poly_variant variant, class create_type> 
+  typename PolyBase<variant,create_type>::create_type 
+  operator*
+  (const Number& n, 
+   const PolyBase<variant,create_type>& p)
+{
+  typename PolyBase<variant, create_type>::create_type erg(p);
+  erg*=n;
+  return erg;
+}
+
 Vector operator*(const Poly& p, const Vector& v){
   Vector res(v);
   res*=p;
