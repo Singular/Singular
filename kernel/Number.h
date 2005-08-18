@@ -45,7 +45,7 @@ class Number{
   }
   Number operator-(){
     Number t(*this);
-    t.n=n_Copy(n,r);
+    //t.n=n_Copy(n,r);
     t.n=n_Neg(t.n,r);
     return t;
   }
