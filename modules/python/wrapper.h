@@ -1,4 +1,4 @@
-//$Id: wrapper.h,v 1.11 2005-08-19 12:49:57 bricken Exp $
+//$Id: wrapper.h,v 1.12 2005-08-19 13:23:41 bricken Exp $
 #ifndef PYTHON_SINGULAR_WRAPPER_HEADER
 #define PYTHON_SINGULAR_WRAPPER_HEADER
 #include <Python.h>
@@ -52,8 +52,14 @@ static boost::python::object Vector_as_str(Vector& p)
 }
 
 BOOST_PYTHON_MODULE(Singular){
+  boost::python::class_<Variable>("variable")
+      .def(boost::python::init <const int, char>())
+      .def(boost::python::init <char>())
+    
+      .def(boost::python::init <const int>());
   boost::python::class_<CanonicalForm>("canonical_form")
     .def(boost::python::init <const int>())
+    .def(boost::python::init <const Variable>())
     .def("__str__", CF_as_str)
     .def(-self)
     .def(self*=self)

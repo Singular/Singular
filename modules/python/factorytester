@@ -1,7 +1,14 @@
 ring r=0,(x,y,z),lp;
 timer=1;
-python_module::python("from Singular import number,  polynomial, canonical_form
+python_module::python("from Singular import number,  polynomial, canonical_form, variable
 p=canonical_form(1)
-print p
+v=variable(0,'a')
+p2=canonical_form(v)
+print p+1
+print p*p
+print p/p
+print p2+1
+print p2*p2
+print p2/p2
 ");
 $

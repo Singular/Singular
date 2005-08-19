@@ -20,6 +20,6 @@ print z,xy
 print xy*xy
 print xy
 for t in ((xy+number(1))*(xy+number(-1))):
-  print t
+  print t,-t,t
 ");
 $
