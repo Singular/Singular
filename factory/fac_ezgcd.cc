@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_ezgcd.cc,v 1.19 2005-05-03 09:35:34 Singular Exp $ */
+/* $Id: fac_ezgcd.cc,v 1.20 2005-08-19 10:59:19 pohl Exp $ */
 
 #include <config.h>
 
@@ -16,6 +16,11 @@
 #include "fac_distrib.h"
 #include "ftmpl_functions.h"
 
+#define OPTIMALVAR 1
+
+#ifdef OPTIMALVAR
+static Variable getOptimalVar( const CanonicalForm & FF, const CanonicalForm & GG );
+#endif
 
 static void findeval( const CanonicalForm & F, const CanonicalForm & G, CanonicalForm & Fb, CanonicalForm & Gb, CanonicalForm & Db, REvaluation & b, int delta, int degF, int degG );
 
@@ -27,12 +32,25 @@ static modpk findBound ( const CanonicalForm & F, const CanonicalForm & G, const
 
 static modpk enlargeBound ( const CanonicalForm & F, const CanonicalForm & Lb, const CanonicalForm & Db, const modpk & pk );
 
+#ifdef OPTIMALVAR
+CanonicalForm ezgcd( const CanonicalForm & FF, const CanonicalForm & GG )
+{
+  CanonicalForm F,G;  REvaluation b;
+  Variable Z=getOptimalVar(FF,GG);
+//Test:  return Z;
+  if(Z==Variable(1)){return ezgcd( FF, GG, b, false );}
+  F=swapvar(FF,Z,Variable(1));
+  G=swapvar(GG,Z,Variable(1));
+  return swapvar(ezgcd( F, G, b, false ),Z,Variable(1));
+}
+#else
 CanonicalForm
 ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG )
 {
     REvaluation b;
     return ezgcd( FF, GG, b, false );
 }
+#endif
 
 static CanonicalForm
 ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b, bool internal )
@@ -358,3 +376,37 @@ findBound ( const CanonicalForm & F, const CanonicalForm & G, const CanonicalFor
     }
     return modpk( p, i );
 }
+
+#ifdef OPTIMALVAR
+static Variable getOptimalVar( const CanonicalForm & FF, const CanonicalForm & GG )
+{
+  int ii,tt,d,dd,s,so;
+  CanonicalForm F,G,Fbz,Gbz,Dbz;
+  Variable opt=Variable(1);
+  if((FF.level()<3)||(GG.level()<3)){return opt;}
+  REvaluation bz=REvaluation(2,tmax(FF.level(),GG.level()),IntRandom(50));
+  Fbz=bz(FF);
+  Gbz=bz(GG);
+  Dbz=gcd(Fbz,Gbz);
+  dd=degree(Dbz);
+  so=size(Dbz);
+  tt=FF.level();
+  if(GG.level()<tt){tt=GG.level();}
+  for(ii=2;ii<=tt;ii++)
+  {
+    F=swapvar(FF,Variable(ii),Variable(1));
+    G=swapvar(GG,Variable(ii),Variable(1));
+    Fbz=bz(F);
+    Gbz=bz(G);
+    Dbz=gcd(Fbz,Gbz);
+    d=degree(Dbz);
+    if(d==dd)
+    {
+      s=size(Dbz);
+      if(s>so){so=s;opt=Variable(ii);}
+    }
+    if(d>dd){dd=d;so=size(Dbz);opt=Variable(ii);}
+  }
+  return opt;
+}
+#endif
