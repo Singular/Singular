@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_random.cc,v 1.6 1997-12-08 18:24:25 schmidt Exp $ */
+/* $Id: cf_random.cc,v 1.7 2005-08-22 17:24:01 Singular Exp $ */
 
 #include <config.h>
 
@@ -75,7 +75,7 @@ CFRandom * GFRandom::clone () const
 
 IntRandom::IntRandom()
 {
-    max = 100;
+    max = 50;
 }
 
 IntRandom::IntRandom( int m )
@@ -87,7 +87,7 @@ IntRandom::~IntRandom() {}
 
 CanonicalForm IntRandom::generate() const
 {
-    return factoryrandom( max );
+    return factoryrandom( 2*max )-max;
 }
 
 CFRandom * IntRandom::clone() const

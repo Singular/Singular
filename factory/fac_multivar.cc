@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_multivar.cc,v 1.11 2005-06-28 14:39:52 Singular Exp $ */
+/* $Id: fac_multivar.cc,v 1.12 2005-08-22 17:24:02 Singular Exp $ */
 
 #include <config.h>
 
@@ -202,7 +202,7 @@ ZFactorizeMulti ( const CanonicalForm & arg )
     CFFListIterator I, J;
     CFArray G, lcG, D;
     int i, j, k, m, r, maxdeg, h;
-    REvaluation A( 2, t, IntRandom( 100 ) );
+    REvaluation A( 2, t, IntRandom( 50 ) );
     CanonicalForm U0;
     CanonicalForm ft, ut, gt, d;
     modpk b;

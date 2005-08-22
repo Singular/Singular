@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_factor.cc,v 1.25 2005-07-08 14:36:31 Singular Exp $ */
+/* $Id: cf_factor.cc,v 1.26 2005-08-22 17:24:01 Singular Exp $ */
 
 //{{{ docu
 //
@@ -26,6 +26,7 @@
 #include "fac_multivar.h"
 #include "fac_sqrfree.h"
 #include "cf_algorithm.h"
+#include "cf_map.h"
 
 #include "int_int.h"
 #ifdef HAVE_NTL
@@ -332,7 +333,9 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
       }
     }
     else
+    {
       F = ZFactorizeMultivariate( fz, issqrfree );
+    }
 
     if ( on_rational )
       On(SW_RATIONAL);

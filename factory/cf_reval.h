@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_reval.h,v 1.3 1997-06-19 12:23:56 schmidt Exp $ */
+/* $Id: cf_reval.h,v 1.4 2005-08-22 17:24:01 Singular Exp $ */
 
 #ifndef INCL_CF_REVAL_H
 #define INCL_CF_REVAL_H
@@ -16,13 +16,15 @@ class REvaluation : public Evaluation
 {
 private:
     CFRandom * gen;
+    int cnt;
 public:
     REvaluation() : Evaluation(), gen(0) {}
-    REvaluation( int min, int max, const CFRandom & sample ) : Evaluation( min, max ), gen( sample.clone() ) {}
+    REvaluation( int min, int max, const CFRandom & sample ) : Evaluation( min, max ), gen( sample.clone() ) { cnt=1;}
     REvaluation( const REvaluation & e );
     ~REvaluation();
     REvaluation& operator= ( const REvaluation & e );
     void nextpoint();
+    void nextpoint_0();
 };
 
 /*ENDPUBLIC*/
