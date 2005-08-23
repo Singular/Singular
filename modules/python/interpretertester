@@ -56,5 +56,8 @@ l.append(7)
 
 testproc5=get_idhdl('testproc5')
 print call_interpreter_method(testproc5, l)
+from interpreter import global_functions
+functions=global_functions()
+print functions.testproc5(4895)
 ");
 $
