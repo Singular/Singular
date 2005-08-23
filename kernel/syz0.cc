@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz0.cc,v 1.5 2005-04-22 16:31:51 Singular Exp $ */
+/* $Id: syz0.cc,v 1.6 2005-08-23 09:07:00 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -361,7 +361,7 @@ static ideal sySchreyersSyzygiesFM(ideal arg,intvec ** modcomp)
           }
           if (p==NULL)
           {
-            WerrorS("ideal not a standardbasis");//no polynom for reduction
+            WerrorS("ideal not a standard basis");//no polynom for reduction
             pDelete(&toRed);
             for(k=j;k<Fl;k++) pDelete(&(pairs[k]));
             omFreeSize((ADDRESS)pairs,Fl*sizeof(poly));
@@ -662,7 +662,7 @@ if (modcomp!=NULL) (*modcomp)->show(0,0);
             else
             {
               //no polynom for reduction
-              WerrorS("ideal not a standardbasis");
+              WerrorS("ideal not a standard basis");
               pDelete(&toRed);
               pDelete(&syz);
               for(k=j;k<Fl;k++) pDelete(&(pairs[k]));

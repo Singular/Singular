@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpr_numeric.cc,v 1.4 2005-05-04 07:25:22 Singular Exp $ */
+/* $Id: mpr_numeric.cc,v 1.5 2005-08-23 09:11:08 Singular Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - numeric stuff
@@ -499,7 +499,7 @@ bool rootContainer::laguer_driver(gmp_complex ** a, gmp_complex ** roots, bool p
     mprSTICKYPROT(ST_ROOTS_LGSTEP);
     if ( its > MAXIT )
     {  // error
-      WarnS("rootContainer::laguer_driver: To many iterations!");
+      WarnS("Laguerre solver: To many iterations!");
       ret= false;
       goto theend;
     }
@@ -508,7 +508,7 @@ bool rootContainer::laguer_driver(gmp_complex ** a, gmp_complex ** roots, bool p
       laguer( a, tdg, &x, &its , type);
       if ( its > MAXIT )
       {  // error
-        WarnS("rootContainer::laguer_driver: To many iterations in polish!");
+        WarnS("Laguerre solver: To many iterations in polish!");
         ret= false;
         goto theend;
       }
