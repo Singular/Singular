@@ -1,4 +1,4 @@
-//$Id: Poly.h,v 1.20 2005-08-23 09:53:46 bricken Exp $
+//$Id: Poly.h,v 1.21 2005-08-23 12:13:35 bricken Exp $
 
 
 
@@ -343,7 +343,7 @@ public std::iterator<std::input_iterator_tag,T,int, shared_ptr<const T>,ConstTer
 template<poly_variant variant, class create_type_input> class PolyBase{
  
  public:
-  poly as_poly(){
+  poly as_poly() const{
     return p_Copy(ptr->p,ptr->r);
   }
   typedef create_type_input create_type;
