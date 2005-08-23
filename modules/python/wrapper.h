@@ -1,4 +1,4 @@
-//$Id: wrapper.h,v 1.13 2005-08-23 09:55:55 bricken Exp $
+//$Id: wrapper.h,v 1.14 2005-08-23 12:45:19 bricken Exp $
 #ifndef PYTHON_SINGULAR_WRAPPER_HEADER
 #define PYTHON_SINGULAR_WRAPPER_HEADER
 #include <Python.h>
@@ -79,10 +79,28 @@ class arg_list{
       args->CleanUp();
     }
   }
-  void append(Poly p){
+  void appendPoly(const Poly& p){
     leftv v=initArg();
     v->data=p.as_poly();
     v->rtyp=POLY_CMD;
+    internal_append(v);
+  }
+  void appendint(int p){
+      leftv v=initArg();
+    v->data=(void*)p;
+    v->rtyp=INT_CMD;
+    internal_append(v);
+  }
+  void appendNumber(const Number& p){
+      leftv v=initArg();
+    v->data=(void*) p.as_number();
+    v->rtyp=NUMBER_CMD;
+    internal_append(v);
+  }
+  void appendVector(const Vector& p){
+    leftv v=initArg();
+    v->data=p.as_poly();
+    v->rtyp=VECTOR_CMD;
     internal_append(v);
   }
  protected:
@@ -103,8 +121,8 @@ class arg_list{
   }
   
 };
-void call_interpreter_method(idhdl_wrap& proc, arg_list& args){
-  iiPStart(proc.id, args.args);
+boost::python::object call_interpreter_method(const idhdl_wrap& proc, const arg_list& args){
+  int err=iiPStart(proc.id, args.args);
 }
 static boost::python::str idhdl_as_str(idhdl_wrap iw){
   idhdl i=iw.id;
@@ -122,7 +140,10 @@ static idhdl_wrap get_idhdl(const char *n){
 }
 BOOST_PYTHON_MODULE(Singular){
   boost::python::class_<arg_list>("i_arg_list")
-    .def("append", &arg_list::append);
+    .def("append", &arg_list::appendPoly)
+    .def("append", &arg_list::appendNumber)
+   .def("append", &arg_list::appendint)
+   .def("append", &arg_list::appendVector);
   boost::python::class_<idhdl_wrap>("interpreter_id")
     .def("__str__", idhdl_as_str);
   boost::python::class_<Variable>("variable")
@@ -219,6 +240,7 @@ BOOST_PYTHON_MODULE(Singular){
    
     .def(self+self)
     .def(self*=Number())
+    .def(Poly() * self)
     .def(Number() * self);
   boost::python::class_<PowerSeries>("power_series")       
     .def(boost::python::init <const PowerSeries::numerator_type &,const PowerSeries::denominator_type&>())
