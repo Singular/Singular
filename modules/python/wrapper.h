@@ -1,18 +1,23 @@
-//$Id: wrapper.h,v 1.12 2005-08-19 13:23:41 bricken Exp $
+//$Id: wrapper.h,v 1.13 2005-08-23 09:55:55 bricken Exp $
 #ifndef PYTHON_SINGULAR_WRAPPER_HEADER
 #define PYTHON_SINGULAR_WRAPPER_HEADER
 #include <Python.h>
 #include <boost/python.hpp>
 #include <sstream>
 #include "mod2.h"
+//shouldn't be necessary but it is for structs.h::idrec
+#define __cplusplus 1
+#include "structs.h"
 #include "numbers.h"
-#include "febase.h"
 
+#include "febase.h"
+#include "ipid.h"
+#include "ipshell.h"
+//#include "util.h"
 #include "Number.h"
 #include "Poly.h"
 #include "PowerSeries.h"
 #include <factory.h>
-
 using namespace boost::python;
 typedef std::basic_stringstream<char>  mysstream;
 Vector unitVector0(int i){
@@ -51,12 +56,80 @@ static boost::python::object Vector_as_str(Vector& p)
   return boost::python::str(out,strlen(out));
 }
 
+
+//typedef void * idhdl;
+class idhdl_wrap{
+ public:
+  idhdl id;
+  idhdl_wrap(idhdl id){
+    this->id=id;
+  }
+  idhdl_wrap(){
+    id=(idhdl) NULL;
+  }
+};
+class arg_list{
+ public:
+  leftv args;
+  arg_list(){
+    args=(leftv) NULL;
+  }
+  ~arg_list(){
+    if (args!=NULL){
+      args->CleanUp();
+    }
+  }
+  void append(Poly p){
+    leftv v=initArg();
+    v->data=p.as_poly();
+    v->rtyp=POLY_CMD;
+    internal_append(v);
+  }
+ protected:
+  leftv initArg(){
+    leftv res=(leftv)omAllocBin(sleftv_bin);
+    res->Init();
+    return res;
+  }
+  void internal_append(leftv v){
+    if (args!=NULL){
+      leftv last=args;
+      while(last->next!=NULL){
+	last=last->next;
+      }
+      last->next=v;
+    } else
+      args=v;
+  }
+  
+};
+void call_interpreter_method(idhdl_wrap& proc, arg_list& args){
+  iiPStart(proc.id, args.args);
+}
+static boost::python::str idhdl_as_str(idhdl_wrap iw){
+  idhdl i=iw.id;
+  using boost::python::str;
+  //ring r=p.getRing();
+  
+
+  mysstream s;
+  s<<i;
+  return boost::python::str(s.str());
+}
+static idhdl_wrap get_idhdl(const char *n){
+  //idhdl ggetid(const char *n, BOOLEAN local = FALSE);
+  return idhdl_wrap(ggetid(n, FALSE));
+}
 BOOST_PYTHON_MODULE(Singular){
+  boost::python::class_<arg_list>("i_arg_list")
+    .def("append", &arg_list::append);
+  boost::python::class_<idhdl_wrap>("interpreter_id")
+    .def("__str__", idhdl_as_str);
   boost::python::class_<Variable>("variable")
-      .def(boost::python::init <const int, char>())
-      .def(boost::python::init <char>())
+    .def(boost::python::init <const int, char>())
+    .def(boost::python::init <char>())
     
-      .def(boost::python::init <const int>());
+    .def(boost::python::init <const int>());
   boost::python::class_<CanonicalForm>("canonical_form")
     .def(boost::python::init <const int>())
     .def(boost::python::init <const Variable>())
@@ -154,6 +227,8 @@ BOOST_PYTHON_MODULE(Singular){
     .def(boost::python::init <const VectorPowerSeries::numerator_type&,const VectorPowerSeries::denominator_type &>())
     .def("__iter__", boost::python::iterator<VectorPowerSeries>());
   def("gen",unitVector0);
+  def("get_idhdl", get_idhdl);
+  def("call_interpreter_method",call_interpreter_method);
   //    .def(self+=self)
    
   //   .def(self+self)

@@ -7,7 +7,7 @@
 #
 #
 CC	= gcc
-CXX	= gcc
+CXX	= g++
 PYTHON_VERSION=2.3
 SINGULAR_BASE=../..
 SING_ARCH=ix86
@@ -27,19 +27,19 @@ DOBJS	= python.og wrapper.o
 all:	python_module.so python_module_g.so 
 
 %.o: %.cc Makefile wrapper.h
-	${CC} ${CFLAGS} -c -fPIC -DPIC $< -o $*.o
+	${CXX} ${CFLAGS} -c -fPIC -DPIC $< -o $*.o
 
 %.og: %.cc Makefile
-	${CC} ${DCFLAGS} -c -fPIC -DPIC $< -o $*.og
+	${CXX} ${DCFLAGS} -c -fPIC -DPIC $< -o $*.og
 
 python_module.so: ${OBJS}
-	${CC} ${CFLAGS} ${LDFLAGS} -shared -Wl,-soname -Wl,python_module.so.1 \
+	${CXX} ${CFLAGS} ${LDFLAGS} -shared -Wl,-soname -Wl,python_module.so.1 \
 		-o python_module.so.1.2.0 ${OBJS}
 	rm -f python_module.so
 	ln -s python_module.so.1.2.0 python_module.so
 
 python_module_g.so: ${DOBJS}
-	${CC} ${DCFLAGS} ${LDFLAGS} -shared -Wl,-soname -Wl,python_module_g.so.1 \
+	${CXX} ${DCFLAGS} ${LDFLAGS} -shared -Wl,-soname -Wl,python_module_g.so.1 \
 		-o python_module_g.so.1.2.0 ${DOBJS}
 	rm -f python_module_g.so
 	ln -s python_module_g.so.1.2.0 python_module_g.so

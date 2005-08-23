@@ -1,0 +1,24 @@
+ring r=0,(x,y,z),lp;
+timer=1;
+proc testproc1(){
+print("Hallo Welt");
+}
+proc testproc2(poly p){
+print("Hallo Welt");
+print(p*p);
+}
+python_module::python("from Singular import number,  polynomial, interpreter_id, get_idhdl,call_interpreter_method, i_arg_list
+print get_idhdl('r');
+print get_idhdl('sdgjhgdshjsgdjh');
+l=i_arg_list()
+testproc1=get_idhdl('testproc1')
+call_interpreter_method(testproc1, l);
+x=polynomial('x')
+y=polynomial('y')
+xy=x*y;
+print xy;
+l.append(xy)
+testproc2=get_idhdl('testproc2')
+call_interpreter_method(testproc2, l);
+");
+$
