@@ -35,6 +35,9 @@ class Number{
   friend class PolyBase<POLY_VARIANT_RING,Poly>;
  
   friend class PolyImpl;
+  number as_number() const{
+    return n_Copy(n,r);
+  }
   Number& operator=(const Number& n2){
     //durch Reihenfolge Selbstzuweisungen berücksichtigt
     number nc=n_Copy(n2.n,n2.r);
