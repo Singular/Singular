@@ -1,4 +1,4 @@
-//$Id: wrapper.h,v 1.14 2005-08-23 12:45:19 bricken Exp $
+//$Id: wrapper.h,v 1.15 2005-08-23 15:55:35 bricken Exp $
 #ifndef PYTHON_SINGULAR_WRAPPER_HEADER
 #define PYTHON_SINGULAR_WRAPPER_HEADER
 #include <Python.h>
@@ -18,6 +18,8 @@
 #include "Poly.h"
 #include "PowerSeries.h"
 #include <factory.h>
+extern BOOLEAN errorreported;
+extern int inerror;
 using namespace boost::python;
 typedef std::basic_stringstream<char>  mysstream;
 Vector unitVector0(int i){
@@ -121,8 +123,28 @@ class arg_list{
   }
   
 };
-boost::python::object call_interpreter_method(const idhdl_wrap& proc, const arg_list& args){
+PyObject* buildPyObjectFromLeftv(leftv v){
+  if (v->rtyp==INT_CMD)
+    return PyInt_FromLong((int)v->data);
+  else {
+    if (v->rtyp==POLY_CMD){
+      Poly p=Poly((poly) v->data, (ring) currRing);
+      //boost::python::wrapper<Poly>* wp=new wrapper<Poly>(Poly((poly) v->data, currRing));
+      //return boost::python::get_managed_object(*wp, boost::python::tag);
+      return to_python_value<Poly>()(p);
+    }
+    //Werror("not supported return value");
+
+  }
+      Py_INCREF(Py_None);
+    return Py_None;
+}
+PyObject* call_interpreter_method(const idhdl_wrap& proc, const arg_list& args){
   int err=iiPStart(proc.id, args.args);
+  int voice=myynest+1;
+  PyObject* res=buildPyObjectFromLeftv(&iiRETURNEXPR[voice]);
+  errorreported=inerror=0;
+  return res;
 }
 static boost::python::str idhdl_as_str(idhdl_wrap iw){
   idhdl i=iw.id;

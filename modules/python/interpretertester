@@ -6,6 +6,7 @@ print("Hallo Welt");
 proc testproc2(poly p){
 print("Hallo Welt");
 print(p*p);
+return(p*p+p*p*p);
 }
 proc testproc3(vector p){
 print("Hallo Welt ihr Vektoren");
@@ -18,6 +19,7 @@ print(p);
 proc testproc5(int p){
 print("Hallo Welt ihr ints");
 print(p);
+return(p);
 }
 python_module::python("from Singular import number,  polynomial, interpreter_id, get_idhdl,call_interpreter_method, i_arg_list, gen
 print get_idhdl('r');
@@ -37,7 +39,7 @@ l.append(xy)
 testproc2=get_idhdl('testproc2')
 print type(testproc2), type(l)
 
-call_interpreter_method(testproc2, l)
+print call_interpreter_method(testproc2, l)
 l=i_arg_list()
 l.append(xye1)
 
@@ -47,12 +49,12 @@ l=i_arg_list()
 l.append(number(3243287))
 
 testproc4=get_idhdl('testproc4')
-call_interpreter_method(testproc4, l)
+print call_interpreter_method(testproc4, l)
 l=i_arg_list()
 
 l.append(7)
 
 testproc5=get_idhdl('testproc5')
-call_interpreter_method(testproc5, l)
+print call_interpreter_method(testproc5, l)
 ");
 $
