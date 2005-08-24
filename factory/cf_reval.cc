@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_reval.cc,v 1.5 2005-08-23 13:41:01 Singular Exp $ */
+/* $Id: cf_reval.cc,v 1.6 2005-08-24 13:31:55 Singular Exp $ */
 
 #define MORE_ZEROES
 
@@ -65,7 +65,7 @@ REvaluation::nextpoint_0()
     int m=values.min();
     if (m<n)
     {
-      t=factoryrandom(n-m)+m;
+      t=factoryrandom(n-m+1)+m;
     }
     else t=n;
     values[t]=gen->generate();
