@@ -1,4 +1,4 @@
-//$Id: wrapper.h,v 1.16 2005-08-24 06:43:26 bricken Exp $
+//$Id: wrapper.h,v 1.17 2005-08-24 09:27:07 bricken Exp $
 #ifndef PYTHON_SINGULAR_WRAPPER_HEADER
 #define PYTHON_SINGULAR_WRAPPER_HEADER
 #include <Python.h>
@@ -6,7 +6,7 @@
 #include <sstream>
 #include "mod2.h"
 //shouldn't be necessary but it is for structs.h::idrec
-#define __cplusplus 1
+
 #include "structs.h"
 #include "numbers.h"
 
@@ -18,6 +18,7 @@
 #include "Poly.h"
 #include "PowerSeries.h"
 #include <factory.h>
+#include "poly_wrap.h"
 extern BOOLEAN errorreported;
 extern int inerror;
 using namespace boost::python;
@@ -41,14 +42,7 @@ static boost::python::object CF_as_str(const CanonicalForm& f)
   s<<f;
   return boost::python::str(s.str());
 }
-static boost::python::object Poly_as_str(Poly& p)
-{
-  using boost::python::str;
-  //ring r=p.getRing();
- 
-  char* out=p.c_string();
-  return boost::python::str(out,strlen(out));
-}
+
 static boost::python::object Vector_as_str(Vector& p)
 {
   using boost::python::str;
@@ -68,6 +62,9 @@ class idhdl_wrap{
   }
   idhdl_wrap(){
     id=(idhdl) NULL;
+  }
+  bool is_zero(){
+    return id==NULL;
   }
 };
 class arg_list{
@@ -164,12 +161,14 @@ static idhdl_wrap get_idhdl(const char *n){
   return idhdl_wrap(ggetid(n, FALSE));
 }
 BOOST_PYTHON_MODULE(Singular){
+  export_poly();
   boost::python::class_<arg_list>("i_arg_list")
     .def("append", &arg_list::appendPoly)
     .def("append", &arg_list::appendNumber)
    .def("append", &arg_list::appendint)
    .def("append", &arg_list::appendVector);
   boost::python::class_<idhdl_wrap>("interpreter_id")
+    .def("is_zero", &idhdl_wrap::is_zero)
     .def("__str__", idhdl_as_str);
   boost::python::class_<Variable>("variable")
     .def(boost::python::init <const int, char>())
@@ -231,29 +230,7 @@ BOOST_PYTHON_MODULE(Singular){
     .def(self+=int())
     .def(self-=int())
     .def(self/=int());
-  boost::python::class_<Poly>("polynomial")
-    .def(boost::python::init <int>())
-    .def(boost::python::init <Poly>())
-    .def(boost::python::init <std::vector<int> >())
-    .def(boost::python::init <Number>())
-    .def("__str__", Poly_as_str)
-    .def("__iter__", boost::python::iterator<Poly>())
-    //read monomials (only) from string
-    .def(boost::python::init <const char* >())
-    
-    .def(-self)
-    .def(self*=self)
-    .def(self+=self)
-    //    .def(self-=self)
-    //.def(self/=self)
-    //.def(self==self)
-    .def(self+self)
-    .def(self*=Number())
-    .def(self*Number())
-    .def(self+Number())
-    .def(self+=Number())
-    .def(self*=Number())
-    .def(self*self);
+
   boost::python::class_<Vector>("vector")
     .def(boost::python::init <>())
     .def("__str__", Vector_as_str)

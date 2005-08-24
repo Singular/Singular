@@ -39,7 +39,7 @@ print functions.testproc2(xy)
 print functions.testproc3(xye1)
 print functions.testproc4(number(3243287))
 print functions.testproc4(325)
-
+print functions.sfksfdkjgsjk()
 
 ");
 $

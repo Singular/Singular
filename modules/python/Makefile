@@ -20,16 +20,16 @@ instdir          = /home/michael/sing/ix86-Linux
 INSTALL		= /home/michael/sing/Singular/install-sh -c
 INSTALL_PROGRAM	= ${INSTALL}
 INSTALL_DATA	= ${INSTALL} -m 644
-SRCS	= python.cc wrapper.cc
-OBJS	= python.o wrapper.o
-DOBJS	= python.og wrapper.o
+SRCS	= python.cc poly_wrap.cc
+OBJS	= python.o poly_wrap.o
+DOBJS	= python.og poly_wrap.og
 
 all:	python_module.so python_module_g.so 
 
 %.o: %.cc Makefile wrapper.h
 	${CXX} ${CFLAGS} -c -fPIC -DPIC $< -o $*.o
 
-%.og: %.cc Makefile
+%.og: %.cc Makefile wrapper.h
 	${CXX} ${DCFLAGS} -c -fPIC -DPIC $< -o $*.og
 
 python_module.so: ${OBJS}
