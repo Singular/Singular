@@ -1,4 +1,4 @@
-//$Id: wrapper.h,v 1.17 2005-08-24 09:27:07 bricken Exp $
+//$Id: wrapper.h,v 1.18 2005-08-24 10:06:46 bricken Exp $
 #ifndef PYTHON_SINGULAR_WRAPPER_HEADER
 #define PYTHON_SINGULAR_WRAPPER_HEADER
 #include <Python.h>
@@ -19,6 +19,7 @@
 #include "PowerSeries.h"
 #include <factory.h>
 #include "poly_wrap.h"
+#include "vector_wrap.h"
 extern BOOLEAN errorreported;
 extern int inerror;
 using namespace boost::python;
@@ -43,14 +44,7 @@ static boost::python::object CF_as_str(const CanonicalForm& f)
   return boost::python::str(s.str());
 }
 
-static boost::python::object Vector_as_str(Vector& p)
-{
-  using boost::python::str;
-  //ring r=p.getRing();
- 
-  char* out=p.c_string();
-  return boost::python::str(out,strlen(out));
-}
+
 
 
 //typedef void * idhdl;
@@ -231,19 +225,7 @@ BOOST_PYTHON_MODULE(Singular){
     .def(self-=int())
     .def(self/=int());
 
-  boost::python::class_<Vector>("vector")
-    .def(boost::python::init <>())
-    .def("__str__", Vector_as_str)
-    
-    //    .def("__str__", Poly_as_str)
-    .def("__iter__", boost::python::iterator<Vector>())
-    .def(-self)
-    .def(self+=self)
-   
-    .def(self+self)
-    .def(self*=Number())
-    .def(Poly() * self)
-    .def(Number() * self);
+  export_vector();
   boost::python::class_<PowerSeries>("power_series")       
     .def(boost::python::init <const PowerSeries::numerator_type &,const PowerSeries::denominator_type&>())
     .def("__iter__", boost::python::iterator<PowerSeries>());
