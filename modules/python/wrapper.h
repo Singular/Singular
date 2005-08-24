@@ -1,4 +1,4 @@
-//$Id: wrapper.h,v 1.15 2005-08-23 15:55:35 bricken Exp $
+//$Id: wrapper.h,v 1.16 2005-08-24 06:43:26 bricken Exp $
 #ifndef PYTHON_SINGULAR_WRAPPER_HEADER
 #define PYTHON_SINGULAR_WRAPPER_HEADER
 #include <Python.h>
@@ -124,20 +124,23 @@ class arg_list{
   
 };
 PyObject* buildPyObjectFromLeftv(leftv v){
-  if (v->rtyp==INT_CMD)
+ 
+  switch (v->rtyp){
+  case INT_CMD:
     return PyInt_FromLong((int)v->data);
-  else {
-    if (v->rtyp==POLY_CMD){
-      Poly p=Poly((poly) v->data, (ring) currRing);
-      //boost::python::wrapper<Poly>* wp=new wrapper<Poly>(Poly((poly) v->data, currRing));
-      //return boost::python::get_managed_object(*wp, boost::python::tag);
-      return to_python_value<Poly>()(p);
-    }
-    //Werror("not supported return value");
-
-  }
-      Py_INCREF(Py_None);
+  case POLY_CMD:
+    
+    return to_python_value<Poly>()(Poly((poly) v->data, currRing));
+  case  VECTOR_CMD:
+   
+    return to_python_value<Vector>()( Vector((poly) v->data, currRing));
+  case  NUMBER_CMD:
+  
+    return to_python_value<Number>()(Number((number) v->data, currRing));
+  default:
+    Py_INCREF(Py_None);
     return Py_None;
+  }
 }
 PyObject* call_interpreter_method(const idhdl_wrap& proc, const arg_list& args){
   int err=iiPStart(proc.id, args.args);
