@@ -20,9 +20,9 @@ instdir          = /home/michael/sing/ix86-Linux
 INSTALL		= /home/michael/sing/Singular/install-sh -c
 INSTALL_PROGRAM	= ${INSTALL}
 INSTALL_DATA	= ${INSTALL} -m 644
-SRCS	= python.cc poly_wrap.cc vector_wrap.cc
-OBJS	= python.o poly_wrap.o vector_wrap.o
-DOBJS	= python.og poly_wrap.og vector_wrap.og
+SRCS	= python.cc poly_wrap.cc vector_wrap.cc CF_wrap.cc
+OBJS	= python.o poly_wrap.o vector_wrap.o CF_wrap.o
+DOBJS	= python.og poly_wrap.og vector_wrap.og CF_wrap.og
 
 all:	python_module.so python_module_g.so 
 

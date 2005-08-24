@@ -1,4 +1,4 @@
-//$Id: wrapper.h,v 1.18 2005-08-24 10:06:46 bricken Exp $
+//$Id: wrapper.h,v 1.19 2005-08-24 10:36:26 bricken Exp $
 #ifndef PYTHON_SINGULAR_WRAPPER_HEADER
 #define PYTHON_SINGULAR_WRAPPER_HEADER
 #include <Python.h>
@@ -20,10 +20,11 @@
 #include <factory.h>
 #include "poly_wrap.h"
 #include "vector_wrap.h"
+#include "CF_wrap.h"
 extern BOOLEAN errorreported;
 extern int inerror;
 using namespace boost::python;
-typedef std::basic_stringstream<char>  mysstream;
+
 Vector unitVector0(int i){
   return unitVector(i,currRing);
 }
@@ -36,13 +37,7 @@ static boost::python::object Number_as_str(Number n)
   char* out=StringAppendS("");
   return boost::python::str(out,strlen(out));
 }
-static boost::python::object CF_as_str(const CanonicalForm& f)
-{
-  using boost::python::str;
-  mysstream s;
-  s<<f;
-  return boost::python::str(s.str());
-}
+
 
 
 
@@ -146,7 +141,7 @@ static boost::python::str idhdl_as_str(idhdl_wrap iw){
   //ring r=p.getRing();
   
 
-  mysstream s;
+  std::basic_stringstream<char>  s;
   s<<i;
   return boost::python::str(s.str());
 }
@@ -169,34 +164,7 @@ BOOST_PYTHON_MODULE(Singular){
     .def(boost::python::init <char>())
     
     .def(boost::python::init <const int>());
-  boost::python::class_<CanonicalForm>("canonical_form")
-    .def(boost::python::init <const int>())
-    .def(boost::python::init <const Variable>())
-    .def("__str__", CF_as_str)
-    .def(-self)
-    .def(self*=self)
-    .def(self+=self)
-    .def(self-=self)
-    .def(self/=self)
-    .def(self==self)
-    .def(self+self)
-    .def(self*self)
-    .def(self/self)
-    .def(self-self)
-    .def(int()==self)
-    .def(int()+self)
-    .def(int()*self)
-    .def(int()/self)
-    .def(int()-self)
-    .def(self==int())
-    .def(self+int())
-    .def(self*int())
-    .def(self/int())
-    .def(self-int())
-    .def(self*=int())
-    .def(self+=int())
-    .def(self-=int())
-    .def(self/=int());
+  export_CF();
   boost::python::class_<Number>("number")
     .def(boost::python::init <int>())
     .def("__str__", Number_as_str)
