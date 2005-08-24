@@ -1,5 +1,0 @@
-ring r=0,(x,y,z),lp;
-timer=1;
-python_module::python("import bla
-");
-$
