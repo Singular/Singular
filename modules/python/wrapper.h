@@ -1,4 +1,4 @@
-//$Id: wrapper.h,v 1.19 2005-08-24 10:36:26 bricken Exp $
+//$Id: wrapper.h,v 1.20 2005-08-24 11:37:55 bricken Exp $
 #ifndef PYTHON_SINGULAR_WRAPPER_HEADER
 #define PYTHON_SINGULAR_WRAPPER_HEADER
 #include <Python.h>
@@ -21,6 +21,7 @@
 #include "poly_wrap.h"
 #include "vector_wrap.h"
 #include "CF_wrap.h"
+#include "number_wrap.h"
 extern BOOLEAN errorreported;
 extern int inerror;
 using namespace boost::python;
@@ -29,14 +30,7 @@ Vector unitVector0(int i){
   return unitVector(i,currRing);
 }
 
-static boost::python::object Number_as_str(Number n)
-{
-  using boost::python::str;
-  StringSetS("");
-  n.write();
-  char* out=StringAppendS("");
-  return boost::python::str(out,strlen(out));
-}
+
 
 
 
@@ -165,34 +159,8 @@ BOOST_PYTHON_MODULE(Singular){
     
     .def(boost::python::init <const int>());
   export_CF();
-  boost::python::class_<Number>("number")
-    .def(boost::python::init <int>())
-    .def("__str__", Number_as_str)
-    .def(-self)
-    .def(self*=self)
-    .def(self+=self)
-    .def(self-=self)
-    .def(self/=self)
-    .def(self==self)
-    .def(self+self)
-    .def(self*self)
-    .def(self/self)
-    .def(self-self)
-    .def(int()==self)
-    .def(int()+self)
-    .def(int()*self)
-    .def(int()/self)
-    .def(int()-self)
-    .def(self==int())
-    .def(self+int())
-    .def(self*int())
-    .def(self/int())
-    .def(self-int())
-    .def(self*=int())
-    .def(self+=int())
-    .def(self-=int())
-    .def(self/=int());
 
+  export_number();
   export_vector();
   boost::python::class_<PowerSeries>("power_series")       
     .def(boost::python::init <const PowerSeries::numerator_type &,const PowerSeries::denominator_type&>())
