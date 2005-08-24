@@ -11,10 +11,12 @@ return(p*p+p*p*p);
 proc testproc3(vector p){
 print("Hallo Welt ihr Vektoren");
 print(p);
+return(p);
 }
 proc testproc4(number p){
 print("Hallo Welt ihr Numbers");
 print(p);
+return(p);
 }
 proc testproc5(int p){
 print("Hallo Welt ihr ints");
@@ -22,42 +24,22 @@ print(p);
 return(p);
 }
 python_module::python("from Singular import number,  polynomial, interpreter_id, get_idhdl,call_interpreter_method, i_arg_list, gen
-print get_idhdl('r');
-print get_idhdl('sdgjhgdshjsgdjh');
-l=i_arg_list()
-testproc1=get_idhdl('testproc1')
-call_interpreter_method(testproc1, l)
+
+from interpreter import global_functions
+functions=global_functions()
+print functions.testproc1()
 x=polynomial('x')
 y=polynomial('y')
 xy=x*y
-print xy
-print gen(1)
+
+
 xye1=xy*gen(1)
-print xy
-print xye1
-l.append(xy)
-testproc2=get_idhdl('testproc2')
-print type(testproc2), type(l)
 
-print call_interpreter_method(testproc2, l)
-l=i_arg_list()
-l.append(xye1)
+print functions.testproc2(xy)
+print functions.testproc3(xye1)
+print functions.testproc4(number(3243287))
+print functions.testproc4(325)
 
-testproc3=get_idhdl('testproc3')
-call_interpreter_method(testproc3, l)
-l=i_arg_list()
-l.append(number(3243287))
 
-testproc4=get_idhdl('testproc4')
-print call_interpreter_method(testproc4, l)
-l=i_arg_list()
-
-l.append(7)
-
-testproc5=get_idhdl('testproc5')
-print call_interpreter_method(testproc5, l)
-from interpreter import global_functions
-functions=global_functions()
-print functions.testproc5(4895)
 ");
 $
