@@ -177,75 +177,75 @@ class Number{
 
 };
 
-Number operator+(const Number &n1, const Number& n2){
+inline Number operator+(const Number &n1, const Number& n2){
   Number erg(n1);
   erg+=n2;
   return erg;
 }
-Number operator*(const Number &n1, const Number& n2){
+inline Number operator*(const Number &n1, const Number& n2){
   Number erg(n1);
   erg*=n2;
   return erg;
 }
-Number operator-(const Number &n1, const Number& n2){
+inline Number operator-(const Number &n1, const Number& n2){
   Number erg(n1);
   erg-=n2;
   return erg;
 }
-Number operator/(const Number &n1, const Number& n2){
+inline Number operator/(const Number &n1, const Number& n2){
   Number erg(n1);
   erg/=n2;
   return erg;
 }
-bool operator==(const Number &n1, const Number& n2){
+inline bool operator==(const Number &n1, const Number& n2){
   if(n1.r!=n2.r)
     return false;
   return n_Equal(n1.n,n2.n,n1.r);
 }
 
 
-Number operator+(const Number &n1, int n2){
+inline Number operator+(const Number &n1, int n2){
   Number erg(n1);
   erg+=Number(n2,n1.r);
   return erg;
 }
-Number operator*(const Number &n1, int n2){
+inline Number operator*(const Number &n1, int n2){
   Number erg(n1);
   erg*=Number(n2,n1.r);
   return erg;
 }
-Number operator-(const Number &n1, int n2){
+inline Number operator-(const Number &n1, int n2){
   Number erg(n1);
   erg-=Number(n2,n1.r);
   return erg;
 }
-Number operator/(const Number &n1, int n2){
+inline Number operator/(const Number &n1, int n2){
   Number erg(n1);
   erg/=Number(n2,n1.r);
   return erg;
 }
-bool operator==(const Number &n1, int n2){
+inline bool operator==(const Number &n1, int n2){
   return n_Equal(n1.n,Number(n2,n1.r).n,n1.r);
 }
-Number operator+(int n1, const Number& n2){
+inline Number operator+(int n1, const Number& n2){
   Number erg(n2);
   return erg+=Number(n1,n2.r);
 }
-Number operator-(int n1, const Number& n2){
+inline Number operator-(int n1, const Number& n2){
 
   Number erg(n1,n2.r);
   return erg-=n2;
 }
-Number operator/(int n1, const Number& n2){
+inline Number operator/(int n1, const Number& n2){
   Number erg(n1,n2.r);
   return erg/=n2;
 }
 
-Number operator*(int n1, const Number& n2){
+inline Number operator*(int n1, const Number& n2){
   Number erg(n2);
   return erg*=Number(n1,n2.r);
 }
-bool operator==(int n1, const Number& n2){
+inline bool operator==(int n1, const Number& n2){
   return n2==Number(n1,n2.r);
 }
 #endif

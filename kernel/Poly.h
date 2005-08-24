@@ -1,4 +1,4 @@
-//$Id: Poly.h,v 1.21 2005-08-23 12:13:35 bricken Exp $
+//$Id: Poly.h,v 1.22 2005-08-24 09:27:48 bricken Exp $
 
 
 
@@ -200,17 +200,17 @@ class PolyImpl{
 
 };
 
-PolyImpl operator+(const PolyImpl &p1, const PolyImpl& p2){
+inline PolyImpl operator+(const PolyImpl &p1, const PolyImpl& p2){
   PolyImpl erg(p1);
   erg+=p2;
   return erg;
 }
-PolyImpl operator*(const PolyImpl &p1, const PolyImpl& p2){
+inline PolyImpl operator*(const PolyImpl &p1, const PolyImpl& p2){
   PolyImpl erg(p1);
   erg*=p2;
   return erg;
 }
-PolyImpl operator-(const PolyImpl &p1, const PolyImpl& p2){
+inline PolyImpl operator-(const PolyImpl &p1, const PolyImpl& p2){
   PolyImpl erg(p1);
   erg-=p2;
   return erg;
@@ -229,17 +229,17 @@ bool operator==(const PolyImpl &p1, const PolyImpl& p2){
 //Equal Polys not available for oth. rings than currRing
 
 
-PolyImpl operator+(const PolyImpl &p1, int p2){
+inline PolyImpl operator+(const PolyImpl &p1, int p2){
   PolyImpl erg(p1);
   erg+=PolyImpl(p2,p1.r);
   return erg;
 }
-PolyImpl operator*(const PolyImpl &p1, int p2){
+inline PolyImpl operator*(const PolyImpl &p1, int p2){
   PolyImpl erg(p1);
   erg*=PolyImpl(p2,p1.r);
   return erg;
 }
-PolyImpl operator-(const PolyImpl &p1, int p2){
+inline PolyImpl operator-(const PolyImpl &p1, int p2){
   PolyImpl erg(p1);
   erg-=PolyImpl(p2,p1.r);
   return erg;
@@ -253,7 +253,7 @@ PolyImpl operator-(const PolyImpl &p1, int p2){
 /*bool operator==(const PolyImpl &p1, int p2){
   return n_Equal(p1.n,PolyImpl(p2,p1.r).n,p1.r);
   }*/
-PolyImpl operator+(int p1, const PolyImpl& p2){
+inline PolyImpl operator+(int p1, const PolyImpl& p2){
   PolyImpl erg(p2);
   return erg+=PolyImpl(p1,p2.getRing());
 }
@@ -267,7 +267,7 @@ PolyImpl operator+(int p1, const PolyImpl& p2){
   return erg/=p2;
   }*/
 
-PolyImpl operator*(int p1, const PolyImpl& p2){
+inline PolyImpl operator*(int p1, const PolyImpl& p2){
   PolyImpl erg(p2);
   return erg*=PolyImpl(p1,p2.getRing());
 }
@@ -440,10 +440,10 @@ template<poly_variant variant, class create_type_input> class PolyBase{
  protected:
 
   shared_ptr<PolyImpl> ptr;
-  //friend inline Poly operator+(const Poly& p1, const Poly& p2);
+  //friend inline inline Poly operator+(const Poly& p1, const Poly& p2);
   ///friend inline PolyBase operator*(const Poly& p1, const Poly& p2);
   //friend inline PolyBase operator*(const Poly& p1, const Number& n);
-  // friend inline Poly operator*(const Poly& p1, const Number& n);
+  // friend inline inline Poly operator*(const Poly& p1, const Number& n);
   //  friend inline template PolyBase<poly_variant variant> operator+(const PolyBase<v>& p1, const PolyBase<v>& p2);
   //friend PolyBase<variant> operator+<>(const PolyBase<variant>& p1, const PolyBase<variant>& p2);
   //friend PolyBase<variant> operator*<>(const PolyBase<variant>& p1, const PolyBase<variant>& p2);
@@ -567,12 +567,12 @@ class Vector: public PolyBase<POLY_VARIANT_MODUL, Vector>{
   erg*=n;
   return erg;
   }*/
-Poly operator*(const Poly& p, const Poly& p2){
+inline Poly operator*(const Poly& p, const Poly& p2){
   Poly erg=p;
   erg*=p2;
   return erg;
 }
-Vector operator*(const Number& n, const Vector& v){
+inline Vector operator*(const Number& n, const Vector& v){
   Vector res=v;
   res*=n;
   return res;
@@ -580,7 +580,7 @@ Vector operator*(const Number& n, const Vector& v){
 
 //assumes monomials commute with numbers
 template <poly_variant variant, class create_type> 
-  typename PolyBase<variant,create_type>::create_type 
+  inline typename PolyBase<variant,create_type>::create_type 
   operator*
   (const Number& n, 
    const PolyBase<variant,create_type>& p)
@@ -590,18 +590,18 @@ template <poly_variant variant, class create_type>
   return erg;
 }
 
-Vector operator*(const Poly& p, const Vector& v){
+inline Vector operator*(const Poly& p, const Vector& v){
   Vector res(v);
   res*=p;
   return res;
 }
-Poly operator+(const Poly& p1, const Number& n){
+inline Poly operator+(const Poly& p1, const Number& n){
  Poly f(p1);
   f+=n;
   return f;
   }
 template <poly_variant variant, class create_type> 
-  typename PolyBase<variant,create_type>::create_type 
+  inline typename PolyBase<variant,create_type>::create_type 
   operator+
   (const PolyBase<variant,create_type>& b1, 
    const PolyBase<variant,create_type>& b2)
@@ -610,7 +610,7 @@ template <poly_variant variant, class create_type>
   erg+=b2;
   return erg;
 }
-Vector unitVector(int i,ring r=currRing){
+inline Vector unitVector(int i,ring r=currRing){
   poly p=p_ISet(1,r);
   p_SetComp(p,i,r);
   return Vector(p,r,0);
