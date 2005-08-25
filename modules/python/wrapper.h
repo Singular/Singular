@@ -1,4 +1,4 @@
-//$Id: wrapper.h,v 1.20 2005-08-24 11:37:55 bricken Exp $
+//$Id: wrapper.h,v 1.21 2005-08-25 07:52:58 bricken Exp $
 #ifndef PYTHON_SINGULAR_WRAPPER_HEADER
 #define PYTHON_SINGULAR_WRAPPER_HEADER
 #include <Python.h>
@@ -22,6 +22,7 @@
 #include "vector_wrap.h"
 #include "CF_wrap.h"
 #include "number_wrap.h"
+#include "playground.h"
 extern BOOLEAN errorreported;
 extern int inerror;
 using namespace boost::python;
@@ -162,6 +163,7 @@ BOOST_PYTHON_MODULE(Singular){
 
   export_number();
   export_vector();
+  export_playground();
   boost::python::class_<PowerSeries>("power_series")       
     .def(boost::python::init <const PowerSeries::numerator_type &,const PowerSeries::denominator_type&>())
     .def("__iter__", boost::python::iterator<PowerSeries>());
