@@ -1,0 +1,13 @@
+SING_ROOT="../.."
+SING_ARCH="ix86-Linux"
+PYTHON_VERSION="2.3"
+SharedLibrary("python_module", 
+              ["python.cc", "poly_wrap.cc", "vector_wrap.cc", "CF_wrap.cc",\
+             "number_wrap.cc", "playground.cc"],
+           
+              CPPPATH=[".", SING_ROOT+"/kernel",\
+                       SING_ROOT+"/Singular", SING_ROOT+"/"+SING_ARCH +"/include",\
+                       "/usr/include/python"+PYTHON_VERSION],
+              LIBS=["boost_python","python"+PYTHON_VERSION], CPPDEFINES=["NDEBUG","DBUILD_MODULE"], SHLIBPREFIX="")
+
+
