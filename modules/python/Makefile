@@ -13,7 +13,7 @@ SINGULAR_BASE=../..
 SING_ARCH=ix86
 CFLAGS	= -DNDEBUG -DBUILD_MODULE -I. -I${SINGULAR_BASE}/kernel -I${SINGULAR_BASE}/Singular -I/home/michael/sing/${SING_ARCH}-Linux/include  -I/usr/include/python${PYTHON_VERSION}
 DCFLAGS	= -DBUILD_MODULE -I. -I/home/michael/sing/kernel -I${SINGULAR_BASE}/Singular -I/home/michael/sing/${SING_ARCH}-Linux/include -I/usr/include/python${PYTHON_VERSION}
-LDFLAGS= -lboost_python -lpython${PYTHON_VERSION} -lpython${PYTHON_VERSION}
+LDFLAGS= -lboost_python -lpython${PYTHON_VERSION}
 #LD	=
 MKINSTALLDIRS=mkdir -p
 instdir          = /home/michael/sing/ix86-Linux
@@ -21,11 +21,13 @@ INSTALL		= /home/michael/sing/Singular/install-sh -c
 INSTALL_PROGRAM	= ${INSTALL}
 INSTALL_DATA	= ${INSTALL} -m 644
 SRCS	= python.cc poly_wrap.cc vector_wrap.cc CF_wrap.cc\
-             ņumber_wrap.cc
+             ņumber_wrap.cc playground.cc
 OBJS	= python.o poly_wrap.o vector_wrap.o CF_wrap.o\
-             number_wrap.o
+             number_wrap.o playground.o
 DOBJS	= python.og poly_wrap.og vector_wrap.og CF_wrap.og\
-             number_wrap.og
+             number_wrap.og playground.og
+default:
+	echo "use scons for building this project"
 
 all:	python_module.so python_module_g.so 
 
