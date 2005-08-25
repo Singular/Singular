@@ -1,4 +1,4 @@
-//$Id: wrapper.h,v 1.21 2005-08-25 07:52:58 bricken Exp $
+//$Id: wrapper.h,v 1.22 2005-08-25 10:26:39 bricken Exp $
 #ifndef PYTHON_SINGULAR_WRAPPER_HEADER
 #define PYTHON_SINGULAR_WRAPPER_HEADER
 #include <Python.h>
@@ -23,6 +23,7 @@
 #include "CF_wrap.h"
 #include "number_wrap.h"
 #include "playground.h"
+#include "matpol.h"
 extern BOOLEAN errorreported;
 extern int inerror;
 using namespace boost::python;
@@ -118,6 +119,35 @@ PyObject* buildPyObjectFromLeftv(leftv v){
   case  NUMBER_CMD:
   
     return to_python_value<Number>()(Number((number) v->data, currRing));
+  case MATRIX_CMD:
+    {
+      using boost::python::numeric::array;
+      using boost::python::self;
+      using boost::python::make_tuple;
+      using boost::python::tuple;
+      using boost::python::object;
+      using boost::python::list;
+      matrix m=(matrix) v->data;
+      list l;
+
+
+      for(int i=0;i<MATROWS(m);i++){
+	list row;
+	for(int j=0;j<MATCOLS(m);j++){
+	  Poly ip(MATELEM(m,i,j),currRing);//copy it
+	  row.append(ip);
+	  //a[boost::python::make_tuple(i%2,i%5)]=ip;
+	  //a[boost::python::make_tuple(i%2,i%5)]=ip;
+	}
+	l.append(row);
+      }
+      //FIXME: should call this only once
+      array::set_module_and_type("Numeric",
+			     "ArrayType"
+			     );
+
+      return to_python_value<array>()(array(l));
+    }
   default:
     Py_INCREF(Py_None);
     return Py_None;

@@ -7,19 +7,28 @@ using boost::python::self;
 using boost::python::make_tuple;
 using boost::python::tuple;
 using boost::python::object;
+using boost::python::list;
 object foo(){
-  array::set_module_and_type("Numeric",
-		      "ArrayType"
-		      );
-  Poly n=Poly();
-  array a(boost::python::make_tuple());
-  a.resize(boost::python::make_tuple(2,5));
-  for(int i=0;i<10;i++){
-    Poly ip(i);
-    //a[boost::python::make_tuple(i%2,i%5)]=ip;
-    //a[boost::python::make_tuple(i%2,i%5)]=ip;
+  list l;
+  for(int j=0;j<2;j++){
+    list row;
+    for(int i=0;i<10;i++){
+      Poly ip(i*(j+1),currRing);
+      row.append(ip);
+      //a[boost::python::make_tuple(i%2,i%5)]=ip;
+      //a[boost::python::make_tuple(i%2,i%5)]=ip;
+    }
+    l.append(row);
   }
+  array::set_module_and_type("Numeric",
+			     "ArrayType"
+			     );
+  array a(l);
   return a;
+  
+
+
+ 
 }
 
 void export_playground(){

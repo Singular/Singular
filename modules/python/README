@@ -6,6 +6,24 @@ install boost
 dynamic modules working
 have a working Singular build directory
 NOSTREAMIO disabled in factory (rebuild also claptmpl.o in Singular)
+install python-numeric (for matrix report)
+
+supported interpreter values:
+
+INPUT:
+int
+poly
+vector
+number
+
+Output:
+int
+poly
+vector
+number
+matrix
+
+
 
 BUILD:
 --------

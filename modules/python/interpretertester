@@ -23,6 +23,17 @@ print("Hallo Welt ihr ints");
 print(p);
 return(p);
 }
+proc testproc6(poly p, poly q){
+  matrix m[3][10];
+  int i;
+  int j;
+  for(i=1;i<=3;i++){
+    for(j=1;j<=10;j++){
+	m[i,j]=p^i*q^j;
+    }
+  }
+  return(m);
+}
 python_module::python("from Singular import number,  polynomial, interpreter_id, get_idhdl,call_interpreter_method, i_arg_list, gen
 
 from interpreter import global_functions
@@ -38,7 +49,8 @@ xye1=xy*gen(1)
 print functions.testproc2(xy)
 print functions.testproc3(xye1)
 print functions.testproc4(number(3243287))
-print functions.testproc4(325)
+print functions.testproc5(325)
+print functions.testproc6(x,y)
 print functions.sfksfdkjgsjk()
 
 ");
