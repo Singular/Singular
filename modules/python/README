@@ -19,7 +19,8 @@ so either
 export PYTHONPATH="<singroot>/modules/python"
 but
 for me simply
-export PYTHONPATH also works
+export PYTHONPATH=
+ also works
 
 Test:
 -----
