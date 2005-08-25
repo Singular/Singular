@@ -1,4 +1,4 @@
-//$Id: wrapper.h,v 1.22 2005-08-25 10:26:39 bricken Exp $
+//$Id: wrapper.h,v 1.23 2005-08-25 11:20:34 bricken Exp $
 #ifndef PYTHON_SINGULAR_WRAPPER_HEADER
 #define PYTHON_SINGULAR_WRAPPER_HEADER
 #include <Python.h>
@@ -131,9 +131,9 @@ PyObject* buildPyObjectFromLeftv(leftv v){
       list l;
 
 
-      for(int i=0;i<MATROWS(m);i++){
+      for(int i=1;i<=MATROWS(m);i++){
 	list row;
-	for(int j=0;j<MATCOLS(m);j++){
+	for(int j=1;j<=MATCOLS(m);j++){
 	  Poly ip(MATELEM(m,i,j),currRing);//copy it
 	  row.append(ip);
 	  //a[boost::python::make_tuple(i%2,i%5)]=ip;
