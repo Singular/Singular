@@ -1,15 +1,16 @@
 Requirements:
 ------------
-
+install scons (the build tool)
 install boost::python
 install boost
 dynamic modules working
 have a working Singular build directory
 NOSTREAMIO disabled in factory (rebuild also claptmpl.o in Singular)
 
-INSTALL:
+BUILD:
 --------
-make
+just type:
+scons
 
 adjust PYTHONPATH:
 -----------------
