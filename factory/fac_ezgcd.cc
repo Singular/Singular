@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_ezgcd.cc,v 1.21 2005-08-22 17:24:01 Singular Exp $ */
+/* $Id: fac_ezgcd.cc,v 1.22 2005-08-26 17:43:34 Singular Exp $ */
 
 #include <config.h>
 
@@ -16,7 +16,7 @@
 #include "fac_distrib.h"
 #include "ftmpl_functions.h"
 
-#define OPTIMALVAR 1
+//#define OPTIMALVAR 1
 
 static void findeval( const CanonicalForm & F, const CanonicalForm & G, CanonicalForm & Fb, CanonicalForm & Gb, CanonicalForm & Db, REvaluation & b, int delta, int degF, int degG );
 
