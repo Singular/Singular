@@ -30,7 +30,10 @@ object foo(){
 
  
 }
-
+boost::python::str foo2(array f){
+  return boost::python::str("suc");
+}
 void export_playground(){
   def("foo",foo);
+  def("foo2",foo2);
 }

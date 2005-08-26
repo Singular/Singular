@@ -52,7 +52,9 @@ print functions.testproc3(xye1)
 print functions.testproc4(number(3243287))
 print functions.testproc5(325)
 print functions.testproc6(x,y)
-print functions.sfksfdkjgsjk()
+from Singular import foo2;
+m=functions.testproc6(x,y)
+print foo2(m)
 
 ");
 $
