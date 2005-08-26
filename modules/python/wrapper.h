@@ -1,4 +1,4 @@
-//$Id: wrapper.h,v 1.23 2005-08-25 11:20:34 bricken Exp $
+//$Id: wrapper.h,v 1.24 2005-08-26 10:39:08 bricken Exp $
 #ifndef PYTHON_SINGULAR_WRAPPER_HEADER
 #define PYTHON_SINGULAR_WRAPPER_HEADER
 #include <Python.h>
@@ -24,6 +24,8 @@
 #include "number_wrap.h"
 #include "playground.h"
 #include "matpol.h"
+using boost::python::numeric::array;
+using boost::python::extract;
 extern BOOLEAN errorreported;
 extern int inerror;
 using namespace boost::python;
@@ -86,6 +88,32 @@ class arg_list{
     v->data=p.as_poly();
     v->rtyp=VECTOR_CMD;
     internal_append(v);
+  }
+  void appendArray(const array& f){
+    
+    
+    object o=f.attr("shape");
+  
+    object o1=o[0];
+    
+    object o2=o[1];
+    int l1=extract<int>(o1);
+   
+
+    int l2=extract<int>(o2);
+    matrix m=mpNew(l1,l2);
+    for(int i=0;i<l1;i++){
+      for(int j=0;j<l2;j++){
+	Poly& x = boost::python::extract<Poly&>(f[boost::python::make_tuple(i,j)]);
+	poly p=x.as_poly();
+	MATELEM(m,i+1,j+1)=p;
+      }
+    }
+    leftv v=initArg();
+    v->data=m;
+    v->rtyp=MATRIX_CMD;
+    internal_append(v);
+    
   }
  protected:
   leftv initArg(){
@@ -178,6 +206,7 @@ BOOST_PYTHON_MODULE(Singular){
   export_poly();
   boost::python::class_<arg_list>("i_arg_list")
     .def("append", &arg_list::appendPoly)
+    .def("append", &arg_list::appendArray)
     .def("append", &arg_list::appendNumber)
    .def("append", &arg_list::appendint)
    .def("append", &arg_list::appendVector);

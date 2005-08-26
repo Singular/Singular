@@ -30,7 +30,21 @@ object foo(){
 
  
 }
-boost::python::str foo2(array f){
+boost::python::object foo2(array f){
+  using boost::python::extract;
+  object o=f.attr("shape");
+  
+  object o1=o[0];
+  
+  object o2=o[1];
+  int l1=extract<int>(o1);
+
+  Print("%d",l1);
+  int l2=extract<int>(o2);
+  Print("%d",l2);
+  Poly& x = boost::python::extract<Poly&>(f[boost::python::make_tuple(0,0)]);
+  x.print();
+  
   return boost::python::str("suc");
 }
 void export_playground(){

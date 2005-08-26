@@ -1,5 +1,8 @@
 ring r=0,(x,y,z),lp;
 timer=1;
+proc myprintmat(matrix m){
+  print(m);
+}
 proc testproc1(){
 print("Hallo Welt");
 }
@@ -32,7 +35,7 @@ proc testproc6(poly p, poly q){
 	m[i,j]=p^i*q^j;
     }
   }
-  print(m);
+
   return(m);
 }
 python_module::python("from Singular import number,  polynomial, interpreter_id, get_idhdl,call_interpreter_method, i_arg_list, gen
@@ -54,7 +57,7 @@ print functions.testproc5(325)
 print functions.testproc6(x,y)
 from Singular import foo2;
 m=functions.testproc6(x,y)
-print foo2(m)
+functions.myprintmat(m)
 
 ");
 $
