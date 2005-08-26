@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.375 2005-08-22 15:36:08 Singular Exp $ */
+/* $Id: iparith.cc,v 1.376 2005-08-26 17:34:24 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -3643,6 +3643,14 @@ static BOOLEAN jjMULT(leftv res, leftv v)
   res->data = (char *)scMultInt((ideal)(v->Data()),currQuotient);
   return FALSE;
 }
+static BOOLEAN jjMINRES_R(leftv res, leftv v)
+{
+  intvec *weights=(intvec*)atGet(v,"isHomog",INTVEC_CMD);
+  res->data=(char *)syMinimize((syStrategy)v->Data());
+  if (weights!=NULL) 
+    atSet(res, "isHomog",weights,INTVEC_CMD);
+  return FALSE;
+}
 static BOOLEAN jjNAMEOF(leftv res, leftv v)
 {
   res->data = (char *)v->name;
@@ -4111,8 +4119,7 @@ static BOOLEAN jjLOAD(leftv res, leftv v, BOOLEAN autoexport)
 #define jjrParStr      (proc1)19
 #define jjCOUNT_RES    (proc1)22
 #define jjDIM_R        (proc1)23
-#define jjMINRES_R     (proc1)24
-#define jjidTransp     (proc1)25
+#define jjidTransp     (proc1)24
 
 extern struct sValCmd1 dArith1[];
 void jjInitTab1()
@@ -4148,7 +4155,6 @@ void jjInitTab1()
         case (int)jjrParStr:      dArith1[i].p=(proc1)rParStr; break;
         case (int)jjCOUNT_RES:    dArith1[i].p=(proc1)syLength; break;
         case (int)jjDIM_R:        dArith1[i].p=(proc1)syDim; break;
-        case (int)jjMINRES_R:     dArith1[i].p=(proc1)syMinimize; break;
         case (int)jjidTransp:     dArith1[i].p=(proc1)idTransp; break;
 #ifdef GENTABLE
         default: Werror("missing proc1-definition for %d",(int)(long)dArith1[i].p);
@@ -4262,11 +4268,6 @@ static BOOLEAN jjDIM_R(leftv res, leftv v)
   res->data = (char *)syDim((syStrategy)v->Data());
   return FALSE;
 }
-static BOOLEAN jjMINRES_R(leftv res, leftv v)
-{
-  res->data=(char *)syMinimize((syStrategy)v->Data());
-  return FALSE;
-}
 static BOOLEAN jjidTransp(leftv res, leftv v)
 {
   res->data = (char *)idTransp((ideal)v->Data());
@@ -4296,7 +4297,6 @@ static BOOLEAN jjidTransp(leftv res, leftv v)
 #define jjrParStr      (proc1)rParStr
 #define jjCOUNT_RES    (proc1)syLength
 #define jjDIM_R        (proc1)syDim
-#define jjMINRES_R     (proc1)syMinimize
 #define jjidTransp     (proc1)idTransp
 #endif
 #endif
@@ -4463,7 +4463,7 @@ struct sValCmd1 dArith1[]=
 ,{jjidMinBase,  MINBASE_CMD,     XS(IDEAL_CMD),  IDEAL_CMD      NO_PLURAL}
 ,{jjidMinBase,  MINBASE_CMD,     XS(MODUL_CMD),  MODUL_CMD      NO_PLURAL}
 ,{jjMINRES,     MINRES_CMD,      LIST_CMD,       LIST_CMD       ALLOW_PLURAL}
-,{jjMINRES_R,   MINRES_CMD,      XS(RESOLUTION_CMD), RESOLUTION_CMD ALLOW_PLURAL}
+,{jjMINRES_R,   MINRES_CMD,      RESOLUTION_CMD, RESOLUTION_CMD ALLOW_PLURAL}
 ,{jjDUMMY,      MODUL_CMD,       MODUL_CMD,      MODUL_CMD      ALLOW_PLURAL}
 ,{jjMONITOR1,   MONITOR_CMD,     NONE,           STRING_CMD     ALLOW_PLURAL}
 ,{jjMULT,       MULTIPLICITY_CMD,  INT_CMD,      IDEAL_CMD      NO_PLURAL}
