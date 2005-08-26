@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpr_numeric.cc,v 1.5 2005-08-23 09:11:08 Singular Exp $ */
+/* $Id: mpr_numeric.cc,v 1.6 2005-08-26 12:33:27 Singular Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - numeric stuff
@@ -895,9 +895,9 @@ void rootArranger::arrange()
   int xkoord, r, rtest, xk, mtest;
   bool found;
   //gmp_complex mprec(1.0/pow(10,gmp_output_digits-5),1.0/pow(10,gmp_output_digits-5));
-  gmp_float mprec(1.0/pow(10.0,(int)(gmp_output_digits/3)));
 
   for ( xkoord= 0; xkoord < anzm; xkoord++ ) {    // für x1,x2, x1,x2,x3, x1,x2,...,xn
+    gmp_float mprec(1.0/pow(10.0,(int)(gmp_output_digits/3)));
     for ( r= 0; r < anzr; r++ ) {                 // für jede Nullstelle
       // (x1-koordinate) * evp[1] + (x2-koordinate) * evp[2] +
       //                                  ... + (xkoord-koordinate) * evp[xkoord]
@@ -907,27 +907,35 @@ void rootArranger::arrange()
         tmp -= (*roots[xk])[r] * mu[xkoord]->evPointCoord(xk+1); //xk+1
       }
       found= false;
-      for ( rtest= r; rtest < anzr; rtest++ ) {   // für jede Nullstelle
-        zwerg = tmp - (*roots[xk])[rtest] * mu[xkoord]->evPointCoord(xk+1); // xk+1, xkoord+2
-        for ( mtest= 0; mtest < anzr; mtest++ )
+      do { // while not found
+        for ( rtest= r; rtest < anzr; rtest++ ) {   // für jede Nullstelle
+           zwerg = tmp - (*roots[xk])[rtest] * mu[xkoord]->evPointCoord(xk+1); // xk+1, xkoord+2
+          for ( mtest= 0; mtest < anzr; mtest++ )
+          {
+            //          if ( tmp == (*mu[xkoord])[mtest] )
+            //          {
+            if ( ((zwerg.real() <= (*mu[xkoord])[mtest].real() + mprec) &&
+                  (zwerg.real() >= (*mu[xkoord])[mtest].real() - mprec)) &&
+                 ((zwerg.imag() <= (*mu[xkoord])[mtest].imag() + mprec) &&
+                  (zwerg.imag() >= (*mu[xkoord])[mtest].imag() - mprec)) )
+            {
+              roots[xk]->swapRoots( r, rtest );
+              found= true;
+              break;
+            }
+          }
+        } // rtest
+        if (!found) 
         {
-          //          if ( tmp == (*mu[xkoord])[mtest] )
-          //          {
-          if ( ((zwerg.real() <= (*mu[xkoord])[mtest].real() + mprec) &&
-                (zwerg.real() >= (*mu[xkoord])[mtest].real() - mprec)) &&
-               ((zwerg.imag() <= (*mu[xkoord])[mtest].imag() + mprec) &&
-                (zwerg.imag() >= (*mu[xkoord])[mtest].imag() - mprec)) )
-           {
-             roots[xk]->swapRoots( r, rtest );
-             found= true;
-             break;
-           }
-        }
-      } // rtest
+          WarnS("rootArranger::arrange: precision lost");
+          mprec*=10;
+	}
+      } while(!found);
+#if 0
       if ( !found )
       {
         Warn("rootArranger::arrange: No match? coord %d, root %d.",xkoord,r);
-#ifdef mprDEBUG_PROT
+//#ifdef mprDEBUG_PROT
         WarnS("One of these ...");
         for ( rtest= r; rtest < anzr; rtest++ )
         {
@@ -944,8 +952,9 @@ void rootArranger::arrange()
         {
           Warn("                  %s",complexToStr((*mu[xkoord])[mtest],gmp_output_digits+1));
         }
-#endif
+//#endif
       }
+#endif      
     } // r
   } // xkoord
 }
