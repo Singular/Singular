@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_base.cc,v 1.2 2005-05-03 13:03:46 Singular Exp $ */
+/* $Id: mpr_base.cc,v 1.3 2005-08-26 16:02:24 Singular Exp $ */
 
 /*
  * ABSTRACT - multipolynomial resultants - resultant matrices
@@ -1581,7 +1581,7 @@ resMatrixSparse::resMatrixSparse( const ideal _gls, const int special )
 
   if ( pVariables > MAXVARS )
   {
-    WerrorS("resMatrixSparse::resMatrixSparse: To many variables!");
+    WerrorS("resMatrixSparse::resMatrixSparse: Too many variables!");
     return;
   }
 
