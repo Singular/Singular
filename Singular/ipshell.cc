@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.125 2005-08-26 11:30:54 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.126 2005-08-26 12:31:52 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -3801,11 +3801,21 @@ BOOLEAN nuUResSolve( leftv res, leftv args )
   if ( v->Typ() != IDEAL_CMD )
     return TRUE;
   else gls= (ideal)(v->Data());
-  intvec *dummy_w=idQHomWeight(gls);
-  if (dummy_w==NULL)
+  ideal test_id=idInit(1,1);
+  int j;
+  for(j=IDELEMS(gls)-1;j>=0;j--)
   {
-    WerrorS("newton polytop not of full dimension");
-    return TRUE;
+    if (gls->m[j]!=NULL)
+    {
+      test_id->m[0]=gls->m[j];
+      intvec *dummy_w=idQHomWeight(test_id);
+      if (dummy_w!=NULL)
+      {
+        WerrorS("Newton polytope not of expected dimension");
+        delete dummy_w;
+        return TRUE;
+      }
+    }
   }
   v= v->next;
 
