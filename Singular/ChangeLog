@@ -1,3 +1,10 @@
+Fri Aug 26 19:57:43 CEST 2005 hannes/lossen:
+* uresolve(i,0,..) has to check for dimension of Newton polytope of each poly in i
+* minres keeps isHomog attribute
+* gcd: factory: IntRandom(n) is now -n..n instead of 0..n 
+       factory/cf_reval.cc (MORE_ZEROES)
+       factory/fac_ezgcd (OPTIMALVAR): has  problems with Short/facstd.tst : 
+                                      => currently not used
 Thu Aug 18 16:37:32 CEST 2005 hannes
 * identifier with many indices: a(1)(2)(3): grammar.y, iparith.cc
 Wed Aug 17 15:52:46 CEST 2005 hannes
