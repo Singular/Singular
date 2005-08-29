@@ -1,4 +1,5 @@
-
+import os
+import re
 #include <Python.h>
 #include <boost/python.hpp>
 env = Environment()
@@ -23,7 +24,7 @@ if not conf.CheckCHeader('mod2.h'):
 env = conf.Finish()
 
 SING_ROOT="../.."
-SING_ARCH="ix86-Linux"
+SING_ARCH=re.sub("\r|\n","",os.popen("../../singuname.sh").read())
 PYTHON_VERSION="2.3"
 SharedLibrary("python_module", 
               ["python.cc", "poly_wrap.cc", "vector_wrap.cc", "CF_wrap.cc",\
