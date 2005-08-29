@@ -1,3 +1,23 @@
+
+#include <Python.h>
+#include <boost/python.hpp>
+env = Environment()
+conf = Configure(env)
+if not conf.CheckCHeader('/usr/include/python2.3/Python.h'):
+    print 'Python 2.3 must be installed'
+    Exit(1)
+
+conf.env.Append(CPPPATH=["/usr/include/python2.3"])
+if not conf.CheckCXXHeader('boost/python.hpp'):
+    print 'Boost/python must be installed'
+    Exit(1)
+    
+conf.env.Append(CPPPATH=["../../kernel"])
+if not conf.CheckCHeader('mod2.h'):
+    print 'must have a Singular build directory'
+    Exit(1)
+env = conf.Finish()
+
 SING_ROOT="../.."
 SING_ARCH="ix86-Linux"
 PYTHON_VERSION="2.3"
