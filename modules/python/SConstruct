@@ -11,6 +11,10 @@ conf.env.Append(CPPPATH=["/usr/include/python2.3"])
 if not conf.CheckCXXHeader('boost/python.hpp'):
     print 'Boost/python must be installed'
     Exit(1)
+
+if not conf.CheckCXXHeader('boost/shared_ptr.hpp'):
+    print 'Boost must be installed'
+    Exit(1)
     
 conf.env.Append(CPPPATH=["../../kernel"])
 if not conf.CheckCHeader('mod2.h'):
