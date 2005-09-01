@@ -3,7 +3,7 @@
 ****************************************/
 /*
 * ABSTRACT: help system
-* versin $Id: fehelp.cc,v 1.47 2005-07-26 16:51:39 Singular Exp $
+* versin $Id: fehelp.cc,v 1.48 2005-09-01 08:30:25 wienand Exp $
 */
 
 #include <string.h>
@@ -223,11 +223,18 @@ static void feBrowserFile()
 #ifdef ix86_Win
     // for the 7(!) default browsers and make htmlhelp the default default
     heHelpBrowsers=(heBrowser_s*)omAlloc0((br+7)*sizeof(heBrowser_s));
+    br = 0;
+    heHelpBrowsers[br].browser="htmlhelp";
+    heHelpBrowsers[br].init_proc=heGenInit;
+    heHelpBrowsers[br].help_proc=heWinHtmlHelp;
+    heHelpBrowsers[br].required="C";
+    // heHelpBrowsers[br].action=NULL;
+    br++;
 #else
     // for the 4(!) default browsers
     heHelpBrowsers=(heBrowser_s*)omAlloc0((br+4)*sizeof(heBrowser_s));
-#endif
     br = 0;
+#endif
     while (fgets( buf, sizeof(buf), f))
     {
       if ((buf[0]!='#') && (buf[0]>' '))
@@ -253,18 +260,18 @@ static void feBrowserFile()
 #ifdef ix86_Win
     // for the 7(!) default browsers
     heHelpBrowsers=(heBrowser_s*)omAlloc0(7*sizeof(heBrowser_s));
+    heHelpBrowsers[br].browser="htmlhelp";
+    heHelpBrowsers[br].init_proc=heGenInit;
+    heHelpBrowsers[br].help_proc=heWinHtmlHelp;
+    heHelpBrowsers[br].required="C";
+    // heHelpBrowsers[br].action=NULL;
+    br++;
 #else
     // for the 4(!) default browsers
     heHelpBrowsers=(heBrowser_s*)omAlloc0(4*sizeof(heBrowser_s));
 #endif
   }
 #ifdef ix86_Win
-  heHelpBrowsers[br].browser="htmlhelp";
-  heHelpBrowsers[br].init_proc=heGenInit;
-  heHelpBrowsers[br].help_proc=heWinHtmlHelp;
-  heHelpBrowsers[br].required="C";
-  // heHelpBrowsers[br].action=NULL;
-  br++;
   heHelpBrowsers[br].browser="winhlp";
   heHelpBrowsers[br].init_proc=heGenInit;
   heHelpBrowsers[br].help_proc=heWinHelp;
