@@ -127,16 +127,22 @@ S_VERSION             = $${SINGULAR_VERSION-@SINGULAR_VERSION@}
 SINGUNAME	      = @SINGUNAME@
 localdir              = /usr/local
 install_prefix        = ${localdir}/Singular/${S_VERSION}
+
+##############################################################
+# cygwin related stuff
+#
 CYGWIN_PORT_VER       = @SINGULAR_RPM_VERSION@-1
 CYGWIN_SETUP_VER      = 2.457.2.2
 CYGWIN_REP_DIR        = cygwin_pkg
 CYGWIN_AUX_FILES      = rpm/cygwin
 CYGWIN_PFW_DIR        = /cygdrive/c/Programme/InstallShield/PackageForTheWeb\ 4/
 CYGWIN_PFW_EXEC       = pftwwiz.exe
-#CYGWIN_MAKE_DIR      := $(shell cygpath -a -w .)
 CYGWIN_ORIG           = external-cygwin
-CYGWIN_SINGULAR_BASE  = /opt
 CYGWIN_SINGULAR_DIR   = Singular
+CYGWIN_SINGULAR_ROOT  = /usr/share/${CYGWIN_SINGULAR_DIR}
+CYGWIN_SINGULAR_BIN   = /usr/lib/${CYGWIN_SINGULAR_DIR}
+CYGWIN_SINGULAR_DOC   = /usr/share/doc/${CYGWIN_SINGULAR_DIR}-${CYGWIN_PORT_VER}
+
 
 BINDIST_DIRS        = kernel Singular doc IntegerProgramming modules
 PLU_BINDIST_DIRS    = ${BINDIST_DIRS}
@@ -246,27 +252,7 @@ cygwin-dist-src singular-base-${CYGWIN_PORT_VER}-src.tar.bz2:
 	mv ${TMPDIR}/singular-base-${CYGWIN_PORT_VER}-src.tar.bz2 .
 	-rm -rf ${TMPDIR}
 
-cygwin-dist-install: ## ${BINDIST_NAME}.tar.gz
-	if test -d ${TMPDIR}; then rm -fr ${TMPDIR}; fi
-	${MKINSTALLDIRS} ${TMPDIR}
-	tar  --directory=${TMPDIR} -x -z -f ${SHAREDIST_NAME}.tar.gz
-	-rm -r -f ${TMPDIR}/html
-	tar  --directory=${TMPDIR} -x -z -f ${BINDIST_NAME}.tar.gz
-	-rm -rf ${CYGWIN_SINGULAR_BASE}/${CYGWIN_SINGULAR_DIR}
-	${MKINSTALLDIRS} ${CYGWIN_SINGULAR_BASE}/${CYGWIN_SINGULAR_DIR}
-	mv ${TMPDIR}/Singular/${S_VERSION}/* ${CYGWIN_SINGULAR_BASE}/${CYGWIN_SINGULAR_DIR}
-	cp ${CYGWIN_AUX_FILES}/surf.exe ${CYGWIN_SINGULAR_BASE}/${CYGWIN_SINGULAR_DIR}/ix86-Win
-	cp ${CYGWIN_AUX_FILES}/SURF_AUTHORS ${CYGWIN_SINGULAR_BASE}/${CYGWIN_SINGULAR_DIR}/ix86-Win
-	cp ${CYGWIN_AUX_FILES}/SURF_README ${CYGWIN_SINGULAR_BASE}/${CYGWIN_SINGULAR_DIR}/ix86-Win
-	cp ${CYGWIN_AUX_FILES}/SURF_COPYING ${CYGWIN_SINGULAR_BASE}/${CYGWIN_SINGULAR_DIR}/ix86-Win
-	cp ${CYGWIN_AUX_FILES}/Manual.chm ${CYGWIN_SINGULAR_BASE}/${CYGWIN_SINGULAR_DIR}/doc
-	cp ${CYGWIN_AUX_FILES}/startxserver.bat ${CYGWIN_SINGULAR_BASE}/${CYGWIN_SINGULAR_DIR}/ix86-Win
-	unix2dos ${CYGWIN_SINGULAR_BASE}/${CYGWIN_SINGULAR_DIR}/ix86-Win/startxserver.bat
-##	Download setup exe
-	export http_proxy=http://positron:3128; \
-	wget http://cygwin.com/setup.exe -O ${CYGWIN_SINGULAR_BASE}/${CYGWIN_SINGULAR_DIR}/ix86-Win/cygwin-setup.exe
-##	or copy from local folder
-#	cp ${CYGWIN_AUX_FILES}/cygwin-setup.exe ${CYGWIN_SINGULAR_BASE}/${CYGWIN_SINGULAR_DIR}/ix86-Win/cygwin-setup.exe
+cygwin-dist-scripts:
 	@echo -e  "Writing /etc/postinstall/singular-icons.sh"
 	@echo -e  '#!/bin/sh' > /etc/postinstall/singular-icons.sh
 	@echo -e  '' >> /etc/postinstall/singular-icons.sh
@@ -276,14 +262,14 @@ cygwin-dist-install: ## ${BINDIST_NAME}.tar.gz
 	@echo -e  '##################### Singular CAS\Cygwin' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '# Cygwin - Setup' >> /etc/postinstall/singular-icons.sh
 	@echo -e  'mkshortcut -A -a \047\047 \' >> /etc/postinstall/singular-icons.sh
-	@echo -e  '       -i ${CYGWIN_SINGULAR_BASE}/${CYGWIN_SINGULAR_DIR}/ix86-Win/cygwin-setup.exe -n "Singular CAS\\Cygwin\\Setup (Cygwin)" \' >> /etc/postinstall/singular-icons.sh
-	@echo -e  '       -P ${CYGWIN_SINGULAR_BASE}/${CYGWIN_SINGULAR_DIR}/ix86-Win/cygwin-setup.exe \' >> /etc/postinstall/singular-icons.sh
+	@echo -e  '       -i ${CYGWIN_SINGULAR_BIN}/cygwin-setup.exe -n "Singular CAS\\Cygwin\\Setup (Cygwin)" \' >> /etc/postinstall/singular-icons.sh
+	@echo -e  '       -P ${CYGWIN_SINGULAR_BIN}/cygwin-setup.exe \' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '       -d "Use this program to update, modify or remove your Singular and Cygwin installation"' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '# Bash Shell' >> /etc/postinstall/singular-icons.sh
 	@echo -e  'mkshortcut -A -a \047\047 \' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '       -P /cygwin.bat -n "Singular CAS\\Cygwin\\Bash shell" \' >> /etc/postinstall/singular-icons.sh
-	@echo -e  '       -i ${CYGWIN_SINGULAR_BASE}/${CYGWIN_SINGULAR_DIR}/ix86-Win/cygwin-setup.exe \' >> /etc/postinstall/singular-icons.sh
+	@echo -e  '       -i ${CYGWIN_SINGULAR_BIN}/cygwin-setup.exe \' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '       -d "A simple bash shell"' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '# Rxvt Terminal' >> /etc/postinstall/singular-icons.sh
@@ -305,32 +291,33 @@ cygwin-dist-install: ## ${BINDIST_NAME}.tar.gz
 	@echo -e  '' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '##################### Singular CAS' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '# Emacs + Singular EXP' >> /etc/postinstall/singular-icons.sh
-	@echo -e  'mkshortcut -A -a \047-c "${CYGWIN_SINGULAR_BASE}/${CYGWIN_SINGULAR_DIR}/ix86-Win/startxserver.bat && export PATH=/usr/X11R6/bin:/bin:$PATH && export DISPLAY=127.0.0.1:0.0 && ${CYGWIN_SINGULAR_BASE}/${CYGWIN_SINGULAR_DIR}/ix86-Win/runESingular.exe"\047 \' >> /etc/postinstall/singular-icons.sh
-	@echo -e  '       -i ${CYGWIN_SINGULAR_BASE}/${CYGWIN_SINGULAR_DIR}/ix86-Win/runESingular.exe -n "Singular CAS\\Singular (Emacs and X-Server) (experimental)" \' >> /etc/postinstall/singular-icons.sh
-	@echo -e  '       -w /usr/X11R6/bin \' >> /etc/postinstall/singular-icons.sh
-	@echo -e  '       -P /bin/bash -d "Start Singular in emacs and starting the x-server"' >> /etc/postinstall/singular-icons.sh
+	@echo -e  'mkshortcut -A -a \047bash -l -c "/usr/share/lib/Singular/startxserver.bat && sleep 1 &&  ESingular"\047 \' >> /etc/postinstall/singular-icons.sh
+	@echo -e  '       -i ${CYGWIN_SINGULAR_BIN}/runESingular.exe -n "Singular CAS\\Singular (Emacs and X-Server) (experimental)" \' >> /etc/postinstall/singular-icons.sh
+	@echo -e  '       -w /bin \' >> /etc/postinstall/singular-icons.sh
+	@echo -e  '       -P /usr/X11R6/bin/run.exe -d "Start Singular in emacs after starting the x-server"' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '# Singular in rxvt' >> /etc/postinstall/singular-icons.sh
 	@echo -e  'mkshortcut -A -a \047-rv -fn "FixedSys" -e /bin/bash --login -i -c Singular\047 \' >> /etc/postinstall/singular-icons.sh
-	@echo -e  '       -i ${CYGWIN_SINGULAR_BASE}/${CYGWIN_SINGULAR_DIR}/ix86-Win/runTSingular.exe -n "Singular CAS\\Singular (rxvt)" \' >> /etc/postinstall/singular-icons.sh
+	@echo -e  '       -i ${CYGWIN_SINGULAR_BIN}/runTSingular.exe -n "Singular CAS\\Singular (rxvt)" \' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '       -P /bin/rxvt -d "Start Singular in a rxvt terminal"' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '# Singular in Dos mode' >> /etc/postinstall/singular-icons.sh
-	@echo -e  'mkshortcut -A -a \047--login -i -c "export DISPLAY=127.0.0.1:0.0 && export PATH=/bin:$PATH && Singular"\047 \' >> /etc/postinstall/singular-icons.sh
-	@echo -e  '       -i ${CYGWIN_SINGULAR_BASE}/${CYGWIN_SINGULAR_DIR}/ix86-Win/Singular.exe -n "Singular CAS\\Singular (Terminal)" \' >> /etc/postinstall/singular-icons.sh
+	@echo -e  'mkshortcut -A -a Singular \' >> /etc/postinstall/singular-icons.sh
+	@echo -e  '       -i ${CYGWIN_SINGULAR_BIN}/Singular.exe -n "Singular CAS\\Singular (Terminal)" \' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '       -P /bin/bash -d "Start Singular in a Microsoft terminal"' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '# Singular in Emacs' >> /etc/postinstall/singular-icons.sh
-	@echo -e  'mkshortcut -A -a \047-c "export DISPLAY=127.0.0.1:0.0 && export PATH=/usr/X11R6/bin:/bin:$PATH && ${CYGWIN_SINGULAR_BASE}/${CYGWIN_SINGULAR_DIR}/ix86-Win/runESingular.exe"\047 \' >> /etc/postinstall/singular-icons.sh
-	@echo -e  '       -i ${CYGWIN_SINGULAR_BASE}/${CYGWIN_SINGULAR_DIR}/ix86-Win/runESingular.exe -n "Singular CAS\\Singular (Emacs)" \' >> /etc/postinstall/singular-icons.sh
-	@echo -e  '       -w /usr/X11R6/bin \' >> /etc/postinstall/singular-icons.sh
-	@echo -e  '       -P /bin/bash -d "Start Singular in emacs"' >> /etc/postinstall/singular-icons.sh
+	@echo -e  'mkshortcut -A -a \047bash -l ESingular\047 \' >> /etc/postinstall/singular-icons.sh
+	@echo -e  '       -i ${CYGWIN_SINGULAR_BIN}/runESingular.exe -n "Singular CAS\\Singular (Emacs)" \' >> /etc/postinstall/singular-icons.sh
+	@echo -e  '       -w /bin \' >> /etc/postinstall/singular-icons.sh
+	@echo -e  '       -P /usr/X11R6/bin/run.exe \' >> /etc/postinstall/singular-icons.sh
+	@echo -e  '       -d "Start Singular in emacs"' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '# Only XServer' >> /etc/postinstall/singular-icons.sh
 	@echo -e  'mkshortcut -A -a \047\047 \' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '       -i /usr/X11R6/bin/XWin.exe \' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '       -w /usr/X11R6/bin \' >> /etc/postinstall/singular-icons.sh
-	@echo -e  '       -P ${CYGWIN_SINGULAR_BASE}/${CYGWIN_SINGULAR_DIR}/ix86-Win/startxserver.bat -n "Singular CAS\\Start X - Server (needed for emacs and surf)" \' >> /etc/postinstall/singular-icons.sh
+	@echo -e  '       -P ${CYGWIN_SINGULAR_BIN}/startxserver.bat -n "Singular CAS\\Start X - Server (needed for emacs and surf)" \' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '       -d "This starts the cygwin X-Server. Without XServer Emacs and Surf do work."' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '##################### Desktop' >> /etc/postinstall/singular-icons.sh
@@ -338,25 +325,79 @@ cygwin-dist-install: ## ${BINDIST_NAME}.tar.gz
 	@echo -e  'mkshortcut -A -a \047\047 \' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '       -i /usr/X11R6/bin/XWin.exe \' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '       -w /usr/X11R6/bin \' >> /etc/postinstall/singular-icons.sh
-	@echo -e  '       -D ${CYGWIN_SINGULAR_BASE}/${CYGWIN_SINGULAR_DIR}/ix86-Win/startxserver.bat -n "Start X - Server (needed for emacs and surf)" \' >> /etc/postinstall/singular-icons.sh
+	@echo -e  '       -D ${CYGWIN_SINGULAR_BIN}/startxserver.bat -n "Start X - Server (needed for emacs and surf)" \' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '       -d "This starts the cygwin X-Server. Without XServer Emacs and Surf do work."' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '' >> /etc/postinstall/singular-icons.sh
-	@echo -e  '# Singular in Emacs' >> /etc/postinstall/singular-icons.sh
-	@echo -e  'mkshortcut -A -a \047-c "export DISPLAY=127.0.0.1:0.0 && export PATH=/usr/X11R6/bin:/bin:$PATH && ${CYGWIN_SINGULAR_BASE}/${CYGWIN_SINGULAR_DIR}/ix86-Win/runESingular.exe"\047 \' >> /etc/postinstall/singular-icons.sh
-	@echo -e  '       -i ${CYGWIN_SINGULAR_BASE}/${CYGWIN_SINGULAR_DIR}/ix86-Win/runESingular.exe -n "Singular (Emacs)" \' >> /etc/postinstall/singular-icons.sh
-	@echo -e  '       -w /usr/X11R6/bin \' >> /etc/postinstall/singular-icons.sh
-	@echo -e  '       -D /bin/bash -d "Start Singular in Emacs"' >> /etc/postinstall/singular-icons.sh
+	@echo -e  'mkshortcut -A -a \047bash -l ESingular\047 \' >> /etc/postinstall/singular-icons.sh
+	@echo -e  '       -i ${CYGWIN_SINGULAR_BIN}/runESingular.exe -n "Singular (Emacs)" \' >> /etc/postinstall/singular-icons.sh
+	@echo -e  '       -w /bin \' >> /etc/postinstall/singular-icons.sh
+	@echo -e  '       -D /usr/X11R6/bin/run.exe \'  >> /etc/postinstall/singular-icons.sh
+	@echo -e  '       -d "Start Singular in emacs"' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '# Singular in rxvt' >> /etc/postinstall/singular-icons.sh
 	@echo -e  'mkshortcut -A -a \047-rv -fn "FixedSys" -e /bin/bash --login -i -c Singular\047 \' >> /etc/postinstall/singular-icons.sh
-	@echo -e  '       -i ${CYGWIN_SINGULAR_BASE}/${CYGWIN_SINGULAR_DIR}/ix86-Win/runTSingular.exe -n "Singular (rxvt)" \' >> /etc/postinstall/singular-icons.sh
+	@echo -e  '       -i ${CYGWIN_SINGULAR_BIN}/runTSingular.exe -n "Singular (rxvt)" \' >> /etc/postinstall/singular-icons.sh
 	@echo -e  '       -D /bin/rxvt -d "Start Singular in a rxvt terminal"' >> /etc/postinstall/singular-icons.sh
 	@echo -e  Writing /usr/bin/ESingular
 	@echo -e  "#! /bin/bash" > /usr/bin/ESingular
-	@echo -e  "${CYGWIN_SINGULAR_BASE}/${CYGWIN_SINGULAR_DIR}/ix86-Win/ESingular.exe \$$*" >> /usr/bin/ESingular
+	@echo -e  "export SINGULAR_BIN_DIR=${CYGWIN_SINGULAR_BIN}" >> /usr/bin/ESingular
+	@echo -e  "export SINGULAR_ROOT_DIR=${CYGWIN_SINGULAR_ROOT}" >> /usr/bin/ESingular
+	@echo -e  "export SINGULAR_INFO_FILE=${CYGWIN_SINGULAR_DOC}/info/singular.hlp" >> /usr/bin/ESingular
+	@echo -e  "export SINGULAR_IDX_FILE=${CYGWIN_SINGULAR_DOC}/doc/singular.idx" >> /usr/bin/ESingular
+	@echo -e  "export SINGULAR_HTML_DIR=${CYGWIN_SINGULAR_DOC}/html" >> /usr/bin/ESingular
+	@echo -e  "export SINGULAR_CHM_FILE=${CYGWIN_SINGULAR_DOC}/doc/Manual.chm" >> /usr/bin/ESingular
+	@echo -e  "export SINGULAR_EXAMPLES_DIR=${CYGWIN_SINGULAR_DOC}/examples" >> /usr/bin/ESingular
+	@echo -e  'export PATH="${CYGWIN_SINGULAR_BIN}:/usr/X11R6/bin:$$PATH"' >> /usr/bin/ESingular
+	@echo -e  'if [ -z $$DISPLAY ]; then export DISPLAY=:0.0; fi' >> /usr/bin/ESingular
+	@echo -e  "${CYGWIN_SINGULAR_BIN}/ESingular.exe \$$*" >> /usr/bin/ESingular
 	@echo -e  Writing /usr/bin/Singular
 	@echo -e  "#! /bin/bash" > /usr/bin/Singular
-	@echo -e  "${CYGWIN_SINGULAR_BASE}/${CYGWIN_SINGULAR_DIR}/ix86-Win/Singular.exe \$$*" >> /usr/bin/Singular
+	@echo -e  "export SINGULAR_BIN_DIR=${CYGWIN_SINGULAR_BIN}" >> /usr/bin/Singular
+	@echo -e  "export SINGULAR_ROOT_DIR=${CYGWIN_SINGULAR_ROOT}" >> /usr/bin/Singular
+	@echo -e  "export SINGULAR_INFO_FILE=${CYGWIN_SINGULAR_DOC}/info/singular.hlp" >> /usr/bin/Singular
+	@echo -e  "export SINGULAR_IDX_FILE=${CYGWIN_SINGULAR_DOC}/doc/singular.idx" >> /usr/bin/Singular
+	@echo -e  "export SINGULAR_HTML_DIR=${CYGWIN_SINGULAR_DOC}/html" >> /usr/bin/Singular
+	@echo -e  "export SINGULAR_CHM_FILE=${CYGWIN_SINGULAR_DOC}/doc/Manual.chm" >> /usr/bin/Singular
+	@echo -e  "export SINGULAR_EXAMPLES_DIR=${CYGWIN_SINGULAR_DOC}/examples" >> /usr/bin/Singular
+	@echo -e  'export PATH="${CYGWIN_SINGULAR_BIN}:$$PATH"' >> /usr/bin/Singular
+	@echo -e  'if [ -z $$DISPLAY ]; then export DISPLAY=:0.0; fi' >> /usr/bin/Singular
+	@echo -e  "${CYGWIN_SINGULAR_BIN}/Singular.exe \$$*" >> /usr/bin/Singular
+
+
+cygwin-dist-install: cygwin-dist-scripts ## ${BINDIST_NAME}.tar.gz
+	if test -d ${TMPDIR}; then rm -fr ${TMPDIR}; fi
+	${MKINSTALLDIRS} ${TMPDIR}
+	tar  --directory=${TMPDIR} -x -z -f ${SHAREDIST_NAME}.tar.gz
+	-rm -rf ${TMPDIR}/Singular/${S_VERSION}/html
+	tar  --directory=${TMPDIR} -x -z -f ${BINDIST_NAME}.tar.gz
+	-rm -rf ${CYGWIN_SINGULAR_ROOT} ${CYGWIN_SINGULAR_DOC} ${CYGWIN_SINGULAR_BIN}
+	${MKINSTALLDIRS} ${CYGWIN_SINGULAR_ROOT} ${CYGWIN_SINGULAR_DOC} ${CYGWIN_SINGULAR_BIN}
+## Copy documentation files
+	${MKINSTALLDIRS} /usr/share/doc/Singular-${CYGWIN_PORT_VER}
+	cp ${TMPDIR}/Singular/${S_VERSION}/README /usr/share/doc/Singular-${CYGWIN_PORT_VER}/
+	cp ${TMPDIR}/Singular/${S_VERSION}/INSTALL /usr/share/doc/Singular-${CYGWIN_PORT_VER}/
+	cp ${TMPDIR}/Singular/${S_VERSION}/COPYING /usr/share/doc/Singular-${CYGWIN_PORT_VER}/
+	cp ${TMPDIR}/Singular/${S_VERSION}/NEWS /usr/share/doc/Singular-${CYGWIN_PORT_VER}/
+	cp ${TMPDIR}/Singular/${S_VERSION}/GPL /usr/share/doc/Singular-${CYGWIN_PORT_VER}/
+## Install Cygwin specific structure
+	mv ${TMPDIR}/Singular/${S_VERSION}/ix86-Win/* ${CYGWIN_SINGULAR_BIN}/
+	-rmdir ${TMPDIR}/Singular/${S_VERSION}/ix86-Win
+	mv ${TMPDIR}/Singular/${S_VERSION}/LIB ${CYGWIN_SINGULAR_ROOT}/
+	mv ${TMPDIR}/Singular/${S_VERSION}/emacs ${CYGWIN_SINGULAR_ROOT}/
+	mv ${TMPDIR}/Singular/${S_VERSION}/* ${CYGWIN_SINGULAR_DOC}/
+## Copy auxiliar files
+	cp ${CYGWIN_AUX_FILES}/surf.exe ${CYGWIN_SINGULAR_BIN}/
+	cp ${CYGWIN_AUX_FILES}/SURF_AUTHORS ${CYGWIN_SINGULAR_BIN}/
+	cp ${CYGWIN_AUX_FILES}/SURF_README ${CYGWIN_SINGULAR_BIN}/
+	cp ${CYGWIN_AUX_FILES}/SURF_COPYING ${CYGWIN_SINGULAR_BIN}/
+	cp ${CYGWIN_AUX_FILES}/Manual.chm ${CYGWIN_SINGULAR_DOC}/doc
+	cp ${CYGWIN_AUX_FILES}/startxserver.bat ${CYGWIN_SINGULAR_BIN}/
+	unix2dos ${CYGWIN_SINGULAR_BIN}/startxserver.bat
+##	Download setup exe
+	export http_proxy=http://positron:3128; \
+	wget http://cygwin.com/setup.exe -O ${CYGWIN_SINGULAR_BIN}/cygwin-setup.exe
+##	or copy from local folder
+#	cp ${CYGWIN_AUX_FILES}/cygwin-setup.exe ${CYGWIN_SINGULAR_BIN}/cygwin-setup.exe
 	cp ${CYGWIN_AUX_FILES}/singular-base.README /usr/share/doc/Cygwin/singular-base-${CYGWIN_PORT_VER}.README
 	cp ${CYGWIN_AUX_FILES}/singular-share.README /usr/share/doc/Cygwin/singular-share-${CYGWIN_PORT_VER}.README
 	cp ${CYGWIN_AUX_FILES}/singular-help.README /usr/share/doc/Cygwin/singular-help-${CYGWIN_PORT_VER}.README
@@ -375,42 +416,36 @@ cygwin-dist-pack: ## singular-base-${CYGWIN_PORT_VER}-src.tar.bz2
 	mkdir ${CYGWIN_REP_DIR}/release/singular-helper
 	tar cjf ${CYGWIN_REP_DIR}/release/singular-base/singular-base-${CYGWIN_PORT_VER}.tar.bz2 \
 	      /usr/share/doc/Cygwin/singular-base-${CYGWIN_PORT_VER}.README \
-	      ${CYGWIN_SINGULAR_BASE}/${CYGWIN_SINGULAR_DIR}/COPYING  \
-	      ${CYGWIN_SINGULAR_BASE}/${CYGWIN_SINGULAR_DIR}/INSTALL  \
-	      ${CYGWIN_SINGULAR_BASE}/${CYGWIN_SINGULAR_DIR}/NEWS     \
-	      ${CYGWIN_SINGULAR_BASE}/${CYGWIN_SINGULAR_DIR}/README   \
+	      /usr/share/doc/Singular-${CYGWIN_PORT_VER}/COPYING  \
+	      /usr/share/doc/Singular-${CYGWIN_PORT_VER}/INSTALL  \
+	      /usr/share/doc/Singular-${CYGWIN_PORT_VER}/NEWS     \
+	      /usr/share/doc/Singular-${CYGWIN_PORT_VER}/README   \
+	      /usr/share/doc/Singular-${CYGWIN_PORT_VER}/GPL   \
 	      /usr/bin/Singular                  \
 	      /usr/bin/ESingular                 \
-	      ${CYGWIN_SINGULAR_BASE}/${CYGWIN_SINGULAR_DIR}/ix86-Win/*Singular*       \
-	      ${CYGWIN_SINGULAR_BASE}/${CYGWIN_SINGULAR_DIR}/ix86-Win/solve_IP.exe     \
-	      ${CYGWIN_SINGULAR_BASE}/${CYGWIN_SINGULAR_DIR}/ix86-Win/toric_ideal.exe  \
-	      ${CYGWIN_SINGULAR_BASE}/${CYGWIN_SINGULAR_DIR}/ix86-Win/change_cost.exe  \
-	      ${CYGWIN_SINGULAR_BASE}/${CYGWIN_SINGULAR_DIR}/ix86-Win/LLL.exe	  \
-	      ${CYGWIN_SINGULAR_BASE}/${CYGWIN_SINGULAR_DIR}/ix86-Win/libparse.exe     \
-	      ${CYGWIN_SINGULAR_BASE}/${CYGWIN_SINGULAR_DIR}/ix86-Win/gen_test.exe
+	      ${CYGWIN_SINGULAR_BIN}/*Singular*       \
+	      ${CYGWIN_SINGULAR_BIN}/solve_IP.exe     \
+	      ${CYGWIN_SINGULAR_BIN}/toric_ideal.exe  \
+	      ${CYGWIN_SINGULAR_BIN}/change_cost.exe  \
+	      ${CYGWIN_SINGULAR_BIN}/LLL.exe          \
+	      ${CYGWIN_SINGULAR_BIN}/libparse.exe     \
+	      ${CYGWIN_SINGULAR_BIN}/gen_test.exe
 	tar cjf ${CYGWIN_REP_DIR}/release/singular-share/singular-share-${CYGWIN_PORT_VER}.tar.bz2 \
 	      /usr/share/doc/Cygwin/singular-share-${CYGWIN_PORT_VER}.README \
-	      ${CYGWIN_SINGULAR_BASE}/${CYGWIN_SINGULAR_DIR}/COPYING  \
-	      ${CYGWIN_SINGULAR_BASE}/${CYGWIN_SINGULAR_DIR}/INSTALL  \
-	      ${CYGWIN_SINGULAR_BASE}/${CYGWIN_SINGULAR_DIR}/NEWS     \
-	      ${CYGWIN_SINGULAR_BASE}/${CYGWIN_SINGULAR_DIR}/README   \
-	      ${CYGWIN_SINGULAR_BASE}/${CYGWIN_SINGULAR_DIR}/emacs    \
-	      ${CYGWIN_SINGULAR_BASE}/${CYGWIN_SINGULAR_DIR}/LIB      \
-	      ${CYGWIN_SINGULAR_BASE}/${CYGWIN_SINGULAR_DIR}/examples
+	      ${CYGWIN_SINGULAR_ROOT}/*
 	tar cjf ${CYGWIN_REP_DIR}/release/singular-help/singular-help-${CYGWIN_PORT_VER}.tar.bz2 \
 	      /usr/share/doc/Cygwin/singular-help-${CYGWIN_PORT_VER}.README \
-	      ${CYGWIN_SINGULAR_BASE}/${CYGWIN_SINGULAR_DIR}/doc      \
-	      ${CYGWIN_SINGULAR_BASE}/${CYGWIN_SINGULAR_DIR}/info
+	      ${CYGWIN_SINGULAR_DOC}/*
 	tar cjf ${CYGWIN_REP_DIR}/release/singular-surf/singular-surf-${CYGWIN_PORT_VER}.tar.bz2 \
 	      /usr/share/doc/Cygwin/singular-surf-${CYGWIN_PORT_VER}.README \
-	      ${CYGWIN_SINGULAR_BASE}/${CYGWIN_SINGULAR_DIR}/ix86-Win/surf.exe       \
-	      ${CYGWIN_SINGULAR_BASE}/${CYGWIN_SINGULAR_DIR}/ix86-Win/SURF_AUTHORS   \
-	      ${CYGWIN_SINGULAR_BASE}/${CYGWIN_SINGULAR_DIR}/ix86-Win/SURF_README    \
-	      ${CYGWIN_SINGULAR_BASE}/${CYGWIN_SINGULAR_DIR}/ix86-Win/SURF_COPYING
+	      ${CYGWIN_SINGULAR_BIN}/surf.exe       \
+	      ${CYGWIN_SINGULAR_BIN}/SURF_AUTHORS   \
+	      ${CYGWIN_SINGULAR_BIN}/SURF_README    \
+	      ${CYGWIN_SINGULAR_BIN}/SURF_COPYING
 	tar cjf ${CYGWIN_REP_DIR}/release/singular-icons/singular-icons-${CYGWIN_PORT_VER}.tar.bz2  \
 	      /usr/share/doc/Cygwin/singular-icons-${CYGWIN_PORT_VER}.README \
-	      ${CYGWIN_SINGULAR_BASE}/${CYGWIN_SINGULAR_DIR}/ix86-Win/cygwin-setup.exe                \
-	      ${CYGWIN_SINGULAR_BASE}/${CYGWIN_SINGULAR_DIR}/ix86-Win/startxserver.bat                \
+	      ${CYGWIN_SINGULAR_BIN}/cygwin-setup.exe                \
+	      ${CYGWIN_SINGULAR_BIN}/startxserver.bat                \
 	      /etc/postinstall/singular-icons.sh
 	touch ${CYGWIN_REP_DIR}/release/singular-helper/singular-helper-${CYGWIN_PORT_VER}.tar.bz2
 	cp singular-base-${CYGWIN_PORT_VER}-src.tar.bz2 ${CYGWIN_REP_DIR}/release/singular-base/
@@ -467,15 +502,17 @@ cygwin-setup-%:
 	fi;
 	@echo >> ${CYGWIN_REP_DIR}/setup.ini
 
-cygwin-pfw: cygwin-pfw-Full ## cygwin-pfw-Small
+cygwin-pfw: cygwin-pfw-Small cygwin-pfw-Full
 
 cygwin-pfw-%:
 	if test -d ${TMPDIR}; then rm -rf ${TMPDIR}; fi
 	${MKINSTALLDIRS} ${TMPDIR}/Files
 	cp -r ${CYGWIN_ORIG}/$*/* ${TMPDIR}/Files/
-	if test "$$*" = Full; then \
+	@if test "$*" = "Full"; then \
+	  echo "Create Full distribution"; \
 	  cp -r ${CYGWIN_REP_DIR}/release/singular* ${TMPDIR}/Files/release/; \
 	else \
+	  echo "Create Small distribution"; \
 	  cp -r ${CYGWIN_REP_DIR}/release/singular-base ${TMPDIR}/Files/release/; \
 	  cp -r ${CYGWIN_REP_DIR}/release/singular-helper ${TMPDIR}/Files/release/; \
 	  cp -r ${CYGWIN_REP_DIR}/release/singular-help ${TMPDIR}/Files/release/; \
@@ -484,6 +521,8 @@ cygwin-pfw-%:
 	fi;
 	-rm -f  ${TMPDIR}/Files/release/singular-base/*src.tar.bz2
 	-rm -f  ${TMPDIR}/Files/release/singular-surf/*src.tar.bz2
+	-rm -f  ${TMPDIR}/Files/setup.exe
+	cp ${CYGWIN_AUX_FILES}/setup-pfw.exe ${TMPDIR}/Files/setup.exe
 	cat ${CYGWIN_REP_DIR}/setup.ini | sed -e 's/setup-version:.*//' | sed -e 's/setup-timestamp:.*//' >> ${TMPDIR}/Files/setup.ini
 	@echo Writing Singular.pfw ...
 	@echo "Version=2.0" >> ${TMPDIR}/Singular.pfw
