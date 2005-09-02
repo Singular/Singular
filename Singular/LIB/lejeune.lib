@@ -1,38 +1,14 @@
 
 //-*- mode:C++;-*-
-// $Id: lejeune.lib,v 1.18 2005-08-09 10:02:57 cremer Exp $
+// $Id: lejeune.lib,v 1.19 2005-09-02 12:25:06 cremer Exp $
 
 
 info="
 LIBRARY: lejeune.lib     Arc space computations
 AUTHOR:  Nadine Cremer,  nadine.cremer@gmx.de
-[SEE ALSO: <comma-separated words of cross references>]
-[KEYWORDS: <semicolon-separated phrases of index keys>]
 PROCEDURES:
-    variables(k,i);      creates k*i new var. t,a(1),..,a(i),..,x(1),..,x(i)
-    atoz(k);             returns kth letter of the alphabet
-    modd(f,g);           modulo-operator for polys
-    idealsimplify(I)     simplifies ideal- i.o. to avoid/keep small radical
-    Hnew(H);             creates 'next' intvec, called from 'trunc' 
-    idealequality(I,J);  tests if I==J, using quotient
-    order(f);            returns i, where f_i is smallest nonzero homog. part
-    minpower(f);         returns minimal ny s.t. x(i)^ny in J(f) for all i
-
-    tpolys(k,i);         creates polyn. a(1)*t+..+a(n)*t^n
-    ringchange(i);       changes the ring to the one needed in ith step      
-    plugin_coeffs(i,f)   plugs tpolys into f, up to power i
-    diffidealstep(i,N);  returns ideal needed for contraction in ith step
-                         N is number of variables of input f
-    formaldiff(f,H);     computes the formal derivatives corresponding to H
-                         and the desciption of F resp. G, list	  
-    fset(f,H);           returns the set F corresponding to H as described by
-                         M. Lejeune
-    gset(f,H);           returns the set G corresponding to H as described by
-                         M. Lejeune
     fgset(f,H);          returns simultaneously the sets F and G corresponding
                          to H as described by M. Lejeune
-    hset(f,H);           returns the set F\G  corresponding to H as 
-                         described by M. Lejeune
     trunc(f,i);          returns the set Tr(i) as described by M. Lejeune
     ";
 
@@ -45,184 +21,164 @@ LIB "sing.lib";
 
 
 
-
+//////////////////////////////////////////////////////////////////////
 proc trunc (poly f, int i)
+"USAGE:   trunc(f,i); (f polynomial, i integer)
+ CREATE:  list, contains lists, each one consisting of two ideals: 
+          the first one giving equations, the second one giving 
+          inequations for a part of Tr(i). All of them together give a 
+          complete description of Tr(i) 
+ RETURN:  ring, corresponds to f and i, i.e. plugging in a polynomial 
+          in t of degree i for each variable of f yields a ring whose 
+          variables are the original variables of f, t and the 
+          according t-coefficients
+ EXAMPLE: example trunc; shows an example"
 {
  def r=basering;
- int m=milnor(f);
- int mi=m*i;                  // make sure we obtain Tr(i)
- int k,v,j,u,w;
+
+ // we make sure that we obtain Tr(i), which requires 
+ // computations up to m*i, where m is minimal s.th.
+ // x(j)^m in J(f) for each variable x(j) involved in f 
+ int m=minpower(f);
+ int mi=m*i;                 
+ int k;
  int l=order(f);
  int s0=mi+1;
  int s=l*(mi+1);
  int z1=nvars(r)*(i+1)+2;
  int z2=nvars(r)*k+1;
  intvec H=l;
- for(k=1;k<=mi;k++)          // initialize H
+
+ // initialization of an intvec H of size m*i
+ for(k=1;k<=mi;k++)         
  {
    H[k+1]=1; 
  }
- def R1=ringchange(i);        // ring in which result lies, plus decl. of var. 
+ // this is the ring in which result lies
+ def R1=ringchange(i);        
  setring R1;
  ideal I,J;
- list intersec=I,J;           // initialization
- list result=intersec;
- setring r;
- while(sum(H)<=s)      // consider all possible H's
- {
-   for(k=2;k<=s0;k++)       // computes result ror all H[1..k]
-   {   
-     setring r;
-     def tmp=fgset(f,intvec(H[1..k]));
-     setring tmp;
-     if(k>i+1)              // if we have to apply rho...
-     { 
-       u=ncols(fgresult[1]);         
-       w=ncols(fgresult[2]);
-       for(j=1;j<=u;j++)     // cutting terms -F
-       {
-        for(v=z1;v<=z2;v++)
-        { 
-         matrix A=coeffs(fgresult[1][j],var(v));
-         if(A!=0)
-	 {
-          fgresult[1][j]=0;
-         }
-         kill A;
-        } 
-       }
-       for(j=1;j<=w;j++)     // cutting terms -G
-       {
-        for(v=z1;v<=z2;v++)             
-        { 
-	  matrix A=coeffs(fgresult[2][j],var(v));
-          if(A!=0)
-	  {
-           fgresult[2][j]=0;
-          }
-          kill A;
-        } 
-       }
-      }  
-      setring R1;
-      def step=imap(tmp,fgresult);
-      intersec[1]=intersec[1],step[1];
-      intersec[2]=intersec[2],step[2];      
-      kill step; 
-      kill tmp;    
-   }
+ list intersec=I,J; 
+
+ // will save the results:
+ list fresult,gresult;          
+ list result;
+
+ // consider all possible H's
+ while(sum(H)<=s)
+ { 
+   setring r; 
+   def tmp=fgset(f,H);
    setring R1;
-   result[1]=result[1],intersec[1];     // put together results of all H's
-   result[2]=result[2],intersec[2];
-   intersec[1]=I;
-   intersec[2]=J;
+   intersec=imap(tmp,fgresult);
+   kill tmp;
+
+   // simplifications
+   intersec[1]=simplifymodd(interred(intersec[1])); 
+   intersec[2]=simplifymodd(interred(intersec[2])); 
+   //option(redSB);
+   //intersec[1]=std(intersec[1]);
+   //intersec[2]=std(intersec[2]); 
+   intersec[1]=simplifymodd(intersec[1]);
+   intersec[2]=simplifymodd(intersec[2]);    
+   intersec[1]=simplifymodd(intersec[1]);
+   intersec[2]=simplifymodd(intersec[2]); 
+
+   // remove lists which contain
+   // the same ideal twice and
+   // therefore define the empty
+   // set
+   if(equalitytest(intersec[1],intersec[2])==1) 
+     {                                           
+       H=Hnew(H);                                
+       continue;                                 
+   }
+   intersec[1]=radical(intersec[1]);
+   intersec[2]=radical(intersec[2]);
+
+   // remove lists which contain
+   // the same ideal twice and
+   // therefore define the empty
+   // set
+   if(equalitytest(intersec[1],intersec[2])==1) 
+     {                                          
+       H=Hnew(H);                               
+       continue;                                 
+     }
+   result=insert(result,intersec);
    H=Hnew(H);
  }
- result[1]=simplify(result[1],6);
- result[2]=simplify(result[2],6); 
-"Result=";result;
- return(R1);                           // return the ring
+ // output:
+ int u=size(result);
+ newline;
+ " We obtain the following sets of equations
+ and inequations for Tr(" +string(i)+"). In order to be
+ contained in Tr(" +string(i)+"), a point has to fulfill
+ the conditions of one of those set, i.e. it has to be 
+ in the zero-set of the first ideal without 
+ the zero-set of the second ideal.";
+ newline;
+ string ending;
+ 
+ for(k=1;k<=u;k++)
+ {
+   if((k mod 10==1) && (k mod 100!=11))
+   {ending="st";}
+   else
+   {
+     if((k mod 10==2) && (k mod 100!=12))
+     {ending="nd";}
+     else
+     {
+       if((k mod 10==3) && (k mod 100!=13))
+       {ending="rd";}
+       else
+       {ending="th";}
+     }
+   }
+   print(string(k)+ending+" set of equations:"+newline);
+   print(result[k]);
+   newline;
+ }
+ // return the ring
+ return(R1);                    
 }
 
+example
+{
+  "EXAMPLE:"; echo=2;
+  def r=basering;
+  poly f=y2-x3;
+  def R=trunc(f,3);
+  setring R;
+  print(result);
+  setring r;
+  def R1=trunc(f,6);
+  setring R1;
+  print(result);
+}
  
 
 
 
-////////////////////////////////////////////////////////////////////////////
-//                 COMPUTATION of H = F\G
-////////////////////////////////////////////////////////////////////////////
 
-proc hset (poly f,intvec H)
-{ 
-  int i;                             
-  int b=size(H);
-  def r=basering;
-  def R=ringchange(b-1);
-  def tmp1=fgset(f,H);
-  setring R;
-  poly red;
-  list hresult=imap(tmp1,fgresult);
-  //hresult;
-  export(hresult);
-  return(R);
-}
+//////////////////////////////////////////////////////////////////////
+//                                                                  //
+//             COMPUTATION OF F AND G SIMULTANEOUSLY                //
+//                                                                  //
+//////////////////////////////////////////////////////////////////////
 
-
-////////////////////////////////////////////////////////////////////////////
-//          COMPUTATION of F,G and H simultaneously
-////////////////////////////////////////////////////////////////////////////
-
-proc hset1 (poly f, intvec H)
-{ 
-  int i,p;
-  int b=size(H);
-  def r=basering;                           
-  int m0=order(f); 
-
-  if(H[1]!=m0)                           // input admissible?!
-    {
-     "H[1]=ord(f) necessary!!";
-      return(0);
-    } 
-  for(p=1;p<b;p++)
-    {
-      if(H[p]<H[p+1])
-      {
-        "Inadmissible input, H[1]<=...<=H[b] necessary!";
-         return(0);
-      }
-    }
-
-  def R=ringchange(b-1);
-  setring R;                            // compute F
-  poly red;                           
-  list l;
-  ideal fresult,gresult,I;
-  list fgresult;
-  for(p=2;p<=b;p++)
-  {
-    setring r;
-    def tmp=formaldiff(f,intvec(H[1..p]));
-    setring R;
-    l=imap(tmp,resultdiff);
-    I=l[1];           
-    kill tmp;
-    fresult=fresult,I;
-  }
-  gresult=fresult;                     // use computation of F for G...
-
-
-  setring r;                           // last step, special for G
-  def tmp=formaldiff(f,H);;
-  setring R;
-  l=imap(tmp,resultdiff);
-  I=l[2];
-  kill tmp;
-  gresult=gresult,I;
-
-
-
-  ideal nonzero,aux;                  // make the result look better...
-  option(redSB);                      // i.e. compute H explicitly
-  aux=std(fresult);
-  for(i=1;i<=size(gresult);i++) 
-  {
-    red=reduce(gresult[i],aux);
-    if (red!=0)
-    {
-      nonzero=nonzero,red;
-    }    
-  }
-  list hresult=aux,nonzero;
-  //hresult;
-  export(hresult);
-  return(R);
-}
-
-
-
-
+//////////////////////////////////////////////////////////////////////
 proc fgset (poly f,intvec H) 
+"USAGE:   fgset(f,H);  f polynomial, H integer vector
+ CREATE:  list, consists two ideals, the first one giving equations, 
+          the second one giving inequations to be satisfied by the set 
+          corresponding to H
+ RETURN:  ring, corresponds to f and size(H)-1, i.e. plugging in a 
+          polynomial in t of degree size(H)-1 for each variable of f 
+          yields a ring whose variables are the original variables of f,
+          t and the according t-coefficients
+ EXAMPLE: example fgset; shows an example"
 {
   def r=basering;
   int p;                             
@@ -230,15 +186,13 @@ proc fgset (poly f,intvec H)
   int b=size(H);
   if(H[1]!=m0)                       // input admissible?!
     {
-     "H[1]=ord(f) necessary!!";
-      return(0);
+      ERROR("H[1]=ord(f) necessary");
     } 
   for(p=1;p<b;p++)
     {
       if(H[p]<H[p+1])
       {
-        "Inadmissible input, H[1]<=...<=H[b] necessary!";
-         return(0);
+        ERROR("Inadmissible input, H[1]<=...<=H[b] necessary");
       }
     }
 
@@ -248,7 +202,7 @@ proc fgset (poly f,intvec H)
   ideal fresult,gresult;
   list fgresult;
   for(p=2;p<=b;p++)
-  {
+  { 
     setring r;
     def tmp=formaldiff(f,intvec(H[1..p]));
     setring R;
@@ -271,124 +225,42 @@ proc fgset (poly f,intvec H)
   //fgresult;
   return(R);
 }
-
-
-
-
-
-
-////////////////////////////////////////////////////////////////////////////
-//                 COMPUTATION OF THE F's
-////////////////////////////////////////////////////////////////////////////
-
-proc fset (poly f,intvec H) 
+example
 {
-  int p;                            
-  int m0=order(f); 
-  int b=size(H);
-  if(H[1]!=m0)                       // input admissible?!
-    {
-     "H[1]=ord(f) necessary!!";
-      return(0);
-    } 
-  for(p=1;p<b;p++)
-    {
-      if(H[p]<H[p+1])
-      {
-        "Inadmissible input, H[1]<=...<=H[b] necessary!";
-         return(0);
-      }
-    }
-
-  def R=ringchange(b-1);
-  setring R;
-  list l;
-  ideal fresult,I;
-  for(p=2;p<=b;p++)
-  {
-    setring r;
-    def tmp=formaldiff(f,intvec(H[1..p]));
-    setring R;
-    l=imap(tmp,resultdiff);
-    I=l[1];
-    kill tmp;
-    fresult=fresult,I;
-  }
-  fresult=simplify(fresult,6);          // simplify
-  //fresult;
-  export(fresult);
-  return(R);
+  "EXAMPLE:"; echo=2;
+  def r= basering;
+  poly f=y2-x3;
+  intvec H1=2,2,2;
+  intvec H2=2,2,2,1;
+  def R1=fgset(f,H1);
+  def R2=fgset(f,H2);
+  setring R1;
+  print(fgresult);
+  setring R2;
+  print(fgresult); 
 }
 
 
 
+//////////////////////////////////////////////////////////////////////
+//                                                                  //
+//      PREPARATORY WORK: PLUGGING IN AND DIFFERENTIATING           //
+//                                                                  //
+//////////////////////////////////////////////////////////////////////
 
 
-
-////////////////////////////////////////////////////////////////////////////
-//                      COMPUTING the G's                                 
-////////////////////////////////////////////////////////////////////////////
-
-
-proc gset (poly f,intvec H) 
-{
-  int p;                             
-  int m0=order(f); 
-  int b=size(H);
-  if(H[1]!=m0)                       // input admissible?!
-    {
-     "H[1]=ord(f) necessary!!";
-      return(0);
-    } 
-  for(p=1;p<b;p++)
-    {
-      if(H[p]<H[p+1])
-      {
-        "Inadmissible input, H[1]<=...<=H[b] necessary!";
-         return(0);
-      }
-    }
-
-  def r=basering;
-  def R=ringchange(b-1);              // work in new ring
-  setring R;
-  list l;
-  ideal I,gresult;
-  for(p=2;p<=b-1;p++)                 // steps equal to fset...
-  {
-    setring r;
-    def tmp=formaldiff(f,intvec(H[1..p]));
-    setring R;
-    l=imap(tmp,resultdiff);
-    I=l[1];
-    kill tmp;
-    gresult=gresult,I;
-  }
-
-  setring r;                          // last step, special for G
-  def tmp=formaldiff(f,H);
-  setring R;
-  l=imap(tmp,resultdiff);
-  I=l[2];
-  kill tmp;
-  gresult=gresult,I; 
-  gresult=simplify(gresult,6);          // simplify
-  export(gresult);
-  //gresult;
-  return(R);
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////////////
-//              PREPARATORY WORK: plugging in and differentiating
-////////////////////////////////////////////////////////////////////////////
-
-
-
-proc plugincoeffs (poly f,int i)
-{ int startvar=nvars(basering);
+//////////////////////////////////////////////////////////////////////
+static proc plugincoeffs (poly f,int i)
+"USAGE:   plugincoeffs(f,i); f polynomial, i integer
+ CREATE:  matrix, the t-coefficients obtained by plugging in a 
+          polynomial in t of degree i in each variable of f
+ RETURN:  ring, corresponds to f and i, i.e. plugging in a polynomial 
+          in t of degree i for each variable of f yields a ring whose 
+          variables are the original variables of f, t and the 
+          according t-coefficients"
+          
+{ 
+  int startvar=nvars(basering);
   def r=basering;
   def R=ringchange(i);              // changes the ring
   setring R;                        // makes it new basering;
@@ -405,7 +277,13 @@ proc plugincoeffs (poly f,int i)
 
 
 
-proc tpolys (int i,int k)             // constructs polynomials a(1)*t+... 
+//////////////////////////////////////////////////////////////////////
+static proc tpolys (int i,int k)  
+"USAGE:   tpolys(i,i); i,k integer
+ RETURN:  ideal, generated by k general polynomials in t of degree i 
+          without constant term
+ NOTE:    called from plugincoeffs"
+
 {                                     // has to be called from pluin_coeffs
   int s,t;                            // loop variables
   int v;           
@@ -426,8 +304,21 @@ proc tpolys (int i,int k)             // constructs polynomials a(1)*t+...
 
 
 
-
-proc formaldiff (poly f,intvec H)
+//////////////////////////////////////////////////////////////////////
+static proc formaldiff (poly f,intvec H)
+"USAGE:   formaldiff(f,H); f polynomial, H integer vector
+ CREATE:  list, containing two ideals. Polynomials in t of 
+          degree size(H)-1 are plugged into f. H defines, if and how 
+          often we differentiate each t-coefficient. We distinguish 
+          two different cases, the only difference being that we 
+          diffentiate more often in the second case (this is still 
+          defined by H). This leads to two systems of equations,
+          each one defining a Zariski-closed set and the second one 
+          being contained in the first one  
+ RETURN:  ring, corresponds to f and size(H)-1, i.e. plugging in a 
+          polynomial in t of degree size(H)-1 for each variable of f 
+          yields a ring whose variables are the original variables of f,
+          t and the according t-coefficients"
 { 
   int startvar=nvars(basering);
   int s,t,v;                          // loop variables
@@ -443,8 +334,15 @@ proc formaldiff (poly f,intvec H)
   list resultdiff;
   ideal m,power,diffstep,J,gresultdiff,fresultdiff;
   for(v=1;v<=k;v++)                   // consider the different t-coeff.
-    { 
-     fkv=coe[c+v,1];
+    {
+     if(c+v>nrows(coe))
+     {
+       fkv=0;
+     }
+     else
+     {  
+       fkv=coe[c+v,1];
+     }
      m=fkv;                          
      J=fkv;                           
      for(s=1;s<=k-v+1;s++)           // "s<=k-v+1" special for G, ONLY DIFF.!
@@ -465,27 +363,37 @@ proc formaldiff (poly f,intvec H)
      gresultdiff=gresultdiff,J;
    }
   resultdiff=fresultdiff,gresultdiff;
-  export(resultdiff);                  // exports the result
+  export(resultdiff);                 // exports the result
   return(R);                           // return the ring
 }                       
 
 
 
 
+//////////////////////////////////////////////////////////////////////
+//                                                                  //
+//                   CONSTRUCTING THE NEW RING                      //
+//                                                                  //
+//////////////////////////////////////////////////////////////////////
 
-////////////////////////////////////////////////////////////////////////////
-//                     CONSTRUCTING the new ring
-////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
+static proc ringchange (int i)
+"USAGE:   ringchange(i); i integer
+ RETURN:  ring, extends basering by variables t and 
+          #(variables of basering)*i new variables"
 
-proc ringchange (int i)
 {    
-  def R=changevar(""+varstr(basering)+",t,"+variables(nvars(basering),i)+"");// change
-  return(R);                 // return the ring, needed in future proc
+  def R=changevar(""+varstr(basering)+",t,"+variables(nvars(basering),i)+"");
+  return(R);                 
 }
 
 
-
-proc variables (int k,int i)
+//////////////////////////////////////////////////////////////////////
+static proc variables (int k,int i)
+"USAGE:   variables(k,i); k,i integer
+ RETURN:  string of the names of the additional variables
+ NOTE:    called from ringchange, we use this procedure to obtain 
+          a convenient shape of the ring created in ringchange" 
 {
   list l;
   int s,u;                              // loop variables
@@ -503,12 +411,15 @@ proc variables (int k,int i)
 }
 
 
-proc atoz (int n)                        // returns nth letter of the alphabet
+//////////////////////////////////////////////////////////////////////
+static proc atoz (int n) 
+"USAGE:   atoz(n); n integer
+ RETURN:  string, the nth letter of the alphabet"
+ 
 { 
-  if(1>n>26)                           // input admissible?
+  if(1>n>26)                           
    { 
-     "n must range between 1 and 26!";
-      return(0); 
+     ERROR("n must range between 1 and 26!");
    } 
   string s="ring r=0,("+A_Z("a",n)+"),ds;"; 
   execute(s); 
@@ -517,15 +428,19 @@ proc atoz (int n)                        // returns nth letter of the alphabet
 
 
 
+//////////////////////////////////////////////////////////////////////
+//                                                                  //
+//                  AUXILIARY PROCEDURES                            //
+//                                                                  //
+//////////////////////////////////////////////////////////////////////
 
-
-////////////////////////////////////////////////////////////////////////////
-//                        AUXILIARY procedures     
-////////////////////////////////////////////////////////////////////////////
-
-
-proc diffidealstep (int i, int N)       // returns ideal needed for 
-{                                     // differentiation in ith step
+//////////////////////////////////////////////////////////////////////
+static proc diffidealstep (int i, int N) 
+"USAGE:   diffidealstep(i,N); i,N integer
+ RETURN:  ideal, generated by variables specified by i,N
+ NOTE:    called from formaldiff, gives the variables by which is 
+          differentiated in a certain step" 
+{                                    
   ideal I=var(N+1+i);
   int j;
   for(j=2;j<=N;j++)
@@ -536,13 +451,18 @@ return(I);
 }
 
 
-
-proc order (poly f)                  // gives first elem. of Nash series
+//////////////////////////////////////////////////////////////////////
+static proc order (poly f) 
+"USAGE:   order(f); f polynomial
+ RETURN:  int, the multiplicity of V(f) in 0
+ NOTE:    this order partly directs the differentiation in formaldiff 
+          and, together with minpower, gives the size of the 
+          integer vector in fgset"                  
 {
   poly g=homog(f,var(1));
   int k=deg(g);
   int i;
-  for(i=1;i<k;i++)
+  for(i=1;i<=k;i++)
     {
       if(jet(f,i)!=0)
 	{
@@ -552,8 +472,16 @@ proc order (poly f)                  // gives first elem. of Nash series
 }
 
 
-proc idealsimplify (ideal I)      // simplifies the ideal according to our
-{                                 // purposes 
+//////////////////////////////////////////////////////////////////////
+static proc simplifyvar (ideal I)
+"USAGE:   simplifyvar(I); I ideal
+ RETURN:  ideal defining the same zeroset as I: if any generator
+          of I is a power of one single variable, replace it by the 
+          variable
+ NOTE:    this procedure is supposed to simplify and clarify the 
+          output of the calculations made in fgset, trunc a.o. 
+          without using radical"        
+{
   int i,j;
   int divisornumber=0;
   int pos;
@@ -581,18 +509,24 @@ proc idealsimplify (ideal I)      // simplifies the ideal according to our
 }
 
 
-
-
-
-proc modd (poly f, poly g)      // the modulo-operation for polys
+//////////////////////////////////////////////////////////////////////
+static proc modd (poly f, poly g)  
+"USAGE:   modd(f,g); f,g polynomials
+ RETURN:  poly, f mod g modulo operation in the polynomial ring
+ NOTE:    called from idealsimplify1 where it is used to simplify 
+          a generating set of an ideal"      
+    
 {
   poly result=f-(f/g)*g;
   return(result);
 }
 
 
+//////////////////////////////////////////////////////////////////////
+static proc Hnew (intvec H)           
+"USAGE:   Hnew(H); H integer vector
+ RETURN:  intvec, the vector needed in the following step of trunc"        
 
-proc Hnew (intvec H)           // creates next intvec, called from trunc
 {
   intvec H1=H;
   int k;
@@ -613,33 +547,14 @@ proc Hnew (intvec H)           // creates next intvec, called from trunc
 }
 
 
-
-proc idealequality (ideal I,ideal J)
-{
-  I=slimgb(I);
-  J=slimgb(J);
-  int n=ncols(I);
-  int m=ncols(J);
-  int i,j;
-  for(i=1;i<=n;i++)
-  {
-    if(reduce(I[i],J)!=0)
-    {
-      return(0);
-    }
-  }
-  for(j=1;j<=m;j++)
-  { 
-    if(reduce(J[j],I)!=0)
-    {
-      return(0);
-    }
-  } 
-  return(1);
-}
-
-
-proc idealsimplify1 (ideal I)       // simplify - and aviod the radical!
+//////////////////////////////////////////////////////////////////////
+static proc simplifymodd (ideal I) 
+"USAGE:   simplifymodd(I); I ideal
+ RETURN:  ideal defining the same zeroset as I: replace certain 
+          generators of I by the generator modulo the other generators. 
+ NOTE:    this procedure is supposed to simplify and clarify the 
+          output of the calculations made in fgset, trunc a.o. 
+          without using radical"           
 {
   int i,j;
   I=simplify(I,6);
@@ -663,45 +578,18 @@ proc idealsimplify1 (ideal I)       // simplify - and aviod the radical!
       }
     }
   }
-  I=simplify(idealsimplify(I),6);
+  I=simplify(simplifyvar(I),6);
   return(I);
 }
 
 
-
-
-proc testHempty ( poly f,int i)
-{
- def r=basering;
- int k;
- int m=milnor(f);
- int mi=m*i;
- int l=order(f);
- int s0=mi+1;
- int s=l*(mi+1);
- intvec H=l;
- for(k=1;k<=mi;k++)          // initialize H
- {
-   H[k+1]=1; 
- }
- while(sum(H)<=s)
- {
-  for(k=2;k<=s0;k++)      
-   { 
-     setring r;
-     def tmp=hset1(f,intvec(H[1..k]));
-     setring tmp;
-     "current H:";H[1..k];hresult;~;
-   }
-  H=Hnew(H);
- }  
-}
-
-
-
-
-
-proc minpower (poly f)   
+//////////////////////////////////////////////////////////////////////
+static proc minpower (poly f)  
+"USAGE:   minpower(f); f polynomial
+ RETURN:  int, the minimal z>=1 s.th. v^z in J(f) for each variable v
+          of the basering
+ NOTE:    called from trunc, gives; together with i, the size of the 
+          integer vectors to be considered in trunc(f,i)"         
 {
  ideal J=jacob(f);
  int s=ncols(J);
@@ -713,7 +601,7 @@ proc minpower (poly f)
  while (control==0)           // while var(i)^ny not in J(f)...
  {
    for(i=1;i<=n;i++)          // consider all variables 
-  {
+   {
     control1=0;
     for(j=1;j<=s;j++)         // consider all elements of J
     { 
@@ -728,7 +616,7 @@ proc minpower (poly f)
       ny++;
       break;
     }
-  }
+   }
    if (control1==1)           // if each step was successful...
   {
     control=1;
@@ -738,4 +626,27 @@ proc minpower (poly f)
 }
 
 
+
+static proc equalitytest (ideal I,ideal J)
+"USAGE:   equalitytest(I,J); I,J ideals
+ RETURN:  1, if I=J, 0 else
+ NOTE:    we assume I contained in J already"        
+{
+  int s=ncols(J);
+  int i;
+  int p=0;
+  I=std(I);
+  for(i=1;i<=s;i++)
+  {
+    if(reduce(J[i],I)!=0)
+    {
+      p=1;
+    }
+  }
+  if(p==1)
+  {
+    return(0);
+  }
+  else{return(1);}
+}
 
