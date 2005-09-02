@@ -1,4 +1,4 @@
-//$Id: Poly.h,v 1.22 2005-08-24 09:27:48 bricken Exp $
+//$Id: Poly.h,v 1.23 2005-09-02 12:46:36 Singular Exp $
 
 
 
@@ -383,12 +383,7 @@ template<poly_variant variant, class create_type_input> class PolyBase{
     
     return *this;
   }
-  PolyBase& operator*=(const Poly & p2){
-    copy_on_write();
-    *ptr *= *p2.ptr;
-    
-    return *this;
-  }
+  PolyBase& operator*=(const Poly & p2);
   PolyBase& operator*=(Number n){
     copy_on_write();
     *ptr *=n;
@@ -615,4 +610,14 @@ inline Vector unitVector(int i,ring r=currRing){
   p_SetComp(p,i,r);
   return Vector(p,r,0);
 }
+
+template <poly_variant variant, class create_type> 
+   
+inline PolyBase<variant, create_type>& 
+PolyBase<variant, create_type>::operator*=(const Poly & p2){
+    copy_on_write();
+    *ptr *= *p2.ptr;
+    
+    return *this;
+  }
 #endif
