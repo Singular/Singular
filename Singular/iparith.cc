@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.376 2005-08-26 17:34:24 Singular Exp $ */
+/* $Id: iparith.cc,v 1.377 2005-09-05 12:30:27 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -5048,6 +5048,7 @@ static BOOLEAN jjPREIMAGE(leftv res, leftv u, leftv v, leftv w)
         WarnS("preimage in local qring may be wrong: use Ring::preimageLoc instead");
       }
       res->data=(char *)maGetPreimage(rr,mapping,IDIDEAL(h));
+      if (res->data==NULL/* is of type ideal, should not be NULL*/) return TRUE;
     }
     else
     {

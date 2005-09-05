@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: maps.cc,v 1.4 2004-05-25 12:01:50 levandov Exp $ */
+/* $Id: maps.cc,v 1.5 2005-09-05 12:30:29 Singular Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */
@@ -275,6 +275,7 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id)
   if (nSetMap(theImageRing) != nCopy)
   {
     Werror("Coefficient fields must be equal");
+    return NULL;
   }
 #endif
 
