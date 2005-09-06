@@ -1,4 +1,4 @@
-version="$Id: absfact.lib,v 1.1 2005-09-06 13:34:49 Singular Exp $";
+version="$Id: absfact.lib,v 1.2 2005-09-06 13:44:20 Singular Exp $";
 category="Factorization";
 info="
 LIBRARY: absfact.lib   Absolute factorization for characteristic 0
@@ -341,7 +341,7 @@ NOTE:   All factors are presented denominator- and content-free. The constant
         factor (first entry) is chosen such that the product of all (!) the
         (denominator- and content-free) absolute factors of @code{p} equals 
         @code{p / absolute_factors[1][1]}.    
-SEE ALSO: factorize, absPrimdecGTZ
+SEE ALSO: factorize
 EXAMPLE: example absFactorize; shows an example
 "
 {
