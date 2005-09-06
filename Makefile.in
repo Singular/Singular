@@ -43,13 +43,13 @@ all install uninstall:
 		do \
 		  if test "$@" = uninstall; then\
 		    echo rm -f doc/$${FILE};\
-                    rm -f doc/$${FILE}; \
-                  else \
+	            rm -f doc/$${FILE}; \
+	          else \
 		    echo cp ${TEXINFO_TEX_DIR}/$${FILE} doc; \
 		    cp ${TEXINFO_TEX_DIR}/$${FILE} doc; \
-                  fi; \
-                done;\
-          fi;); \
+	          fi; \
+	        done;\
+	   fi;); \
 	done
 
 install-doc:
