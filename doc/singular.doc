@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.138 2005-06-07 11:43:54 Singular Exp $
+@comment $Id: singular.doc,v 1.139 2005-09-06 13:38:16 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -310,6 +310,7 @@ LIB "all.lib";
 @cindex Commutative algebra
 
 @menu
+* absfact_lib:: absolute factorization for characteristic 0
 * algebra_lib:: procedures for computing with algebras and maps
 * elim_lib:: procedures for elimination, saturation and blowing up
 * grwalk_lib:: Groebner walk and Fraktal walk
@@ -328,7 +329,11 @@ LIB "all.lib";
 @end menu
 
 @c ---------------------------------------------------------
-@node algebra_lib, elim_lib, Commutative algebra, Commutative algebra
+@node absfact_lib, algebra_lib, Commutative algebra, Commutative algebra
+@subsection absfact_lib
+@c lib absfact.lib
+@c ---------------------------------------------------------
+@node algebra_lib, elim_lib, absfact_lib, Commutative algebra
 @subsection algebra_lib
 @c lib algebra.lib
 @c ----------------------------------------------------------
