@@ -1,3 +1,4 @@
+Tue Sep  6 15:38:40 CEST 2005 added absfact.lib
 Tue Sep  6 12:04:08 CEST 2005 hannes/lossen: remove examples for uresolve
                               which fail the Newton polytope test
                               (reference.doc, solve.lib)
