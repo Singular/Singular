@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.261 2005-07-22 15:51:52 Singular Exp $
+@comment $Id: reference.doc,v 1.262 2005-09-06 08:58:36 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -6373,16 +6373,16 @@ Laguerre's algorithm (with corrupted roots), leading to better results.
 @item @strong{Note:}
 If the ground field is the field of complex numbers, the elements of the list
 are of type number, otherwise of type string.
-@item @strong{Example:}
-@smallexample
-@c example
-ring rsc=(real,20,I),(x,y),lp;
-ideal i=(2+3*I)*x2+(0.35+I*45.0e-2)*y2-8,x2+xy+(42.7)*y2;
-list l=uressolve(i,0,0,2);
-l[1];
-subst(subst(i[1],x,l[1][1]),y,l[1][2]);
-@c example
-@end smallexample
+@c @item @strong{Example:}
+@c @smallexample
+@c @c example
+@c ring rsc=(real,20,I),(x,y),lp;
+@c ideal i=(2+3*I)*x2+(0.35+I*45.0e-2)*y2-8,x2+xy+(42.7)*y2;
+@c list l=uressolve(i,0,0,2);
+@c l[1];
+@c subst(subst(i[1],x,l[1][1]),y,l[1][2]);
+@c @c example
+@c @end smallexample
 @end table
 @c ref
 See
