@@ -1,0 +1,32 @@
+ring r=0,(x,y,z),lp;
+timer=1;
+python_module::python("from Singular import number,  polynomial, ideal
+i=ideal()
+zero=number(0)
+one=number(1)
+zerop=polynomial(0)
+i.append(zerop)
+print len(i)
+onep=polynomial(1)
+i.append(onep)
+print len(i)
+for p in i:
+  print p
+xy=polynomial('xy')
+print xy
+comp=polynomial('xy+1')
+print comp
+#the same as only monomials are build
+
+z=polynomial(xy);
+z*=number(3);
+print z,xy
+print xy+number(1)
+print z+xy
+print z,xy
+print xy*xy
+print xy
+for t in ((xy+number(1))*(xy+number(-1))):
+  print t,-t,t
+");
+$

@@ -1,4 +1,4 @@
-//$Id: wrapper.h,v 1.24 2005-08-26 10:39:08 bricken Exp $
+//$Id: wrapper.h,v 1.25 2005-09-08 11:45:23 bricken Exp $
 #ifndef PYTHON_SINGULAR_WRAPPER_HEADER
 #define PYTHON_SINGULAR_WRAPPER_HEADER
 #include <Python.h>
@@ -17,6 +17,7 @@
 #include "Number.h"
 #include "Poly.h"
 #include "PowerSeries.h"
+#include "ideal_wrap.h"
 #include <factory.h>
 #include "poly_wrap.h"
 #include "vector_wrap.h"
@@ -24,6 +25,7 @@
 #include "number_wrap.h"
 #include "playground.h"
 #include "matpol.h"
+
 using boost::python::numeric::array;
 using boost::python::extract;
 extern BOOLEAN errorreported;
@@ -223,6 +225,7 @@ BOOST_PYTHON_MODULE(Singular){
   export_number();
   export_vector();
   export_playground();
+  export_ideal();
   boost::python::class_<PowerSeries>("power_series")       
     .def(boost::python::init <const PowerSeries::numerator_type &,const PowerSeries::denominator_type&>())
     .def("__iter__", boost::python::iterator<PowerSeries>());

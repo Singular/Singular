@@ -28,7 +28,7 @@ SING_ARCH=re.sub("\r|\n","",os.popen("../../singuname.sh").read())
 PYTHON_VERSION="2.3"
 SharedLibrary("python_module", 
               ["python.cc", "poly_wrap.cc", "vector_wrap.cc", "CF_wrap.cc",\
-             "number_wrap.cc", "playground.cc"],
+             "number_wrap.cc", "playground.cc", "ideal_wrap.cc"],
            
               CPPPATH=[".", SING_ROOT+"/kernel",\
                        SING_ROOT+"/Singular", SING_ROOT+"/"+SING_ARCH +"/include",\
