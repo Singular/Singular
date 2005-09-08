@@ -15,13 +15,13 @@ static boost::python::object Ideal_as_str(Ideal& p)
   list tojoin;
   int i;
   int s=p.size();
-  tojoin.append("[");
+  //tojoin.append("[");
   for(i=0;i<s;i++){
     tojoin.append(Poly_as_str(p[i]));
     if (i<s-1)
       tojoin.append(", ");
   }
-  tojoin.append("]");
+  //tojoin.append("]");
   str res=helper.join(tojoin);
   return res;
 }

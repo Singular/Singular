@@ -1,4 +1,4 @@
-//$Id: wrapper.h,v 1.25 2005-09-08 11:45:23 bricken Exp $
+//$Id: wrapper.h,v 1.26 2005-09-08 12:47:18 bricken Exp $
 #ifndef PYTHON_SINGULAR_WRAPPER_HEADER
 #define PYTHON_SINGULAR_WRAPPER_HEADER
 #include <Python.h>
@@ -17,6 +17,7 @@
 #include "Number.h"
 #include "Poly.h"
 #include "PowerSeries.h"
+#include "Ideal.h"
 #include "ideal_wrap.h"
 #include <factory.h>
 #include "poly_wrap.h"
@@ -71,6 +72,12 @@ class arg_list{
     leftv v=initArg();
     v->data=p.as_poly();
     v->rtyp=POLY_CMD;
+    internal_append(v);
+  }
+  void appendIdeal(const Ideal& p){
+    leftv v=initArg();
+    v->data=p.as_ideal();
+    v->rtyp=IDEAL_CMD;
     internal_append(v);
   }
   void appendint(int p){
@@ -146,6 +153,8 @@ PyObject* buildPyObjectFromLeftv(leftv v){
   case  VECTOR_CMD:
    
     return to_python_value<Vector>()( Vector((poly) v->data, currRing));
+  case IDEAL_CMD:
+    return to_python_value<Ideal>()(Ideal((ideal) v->data, currRing));
   case  NUMBER_CMD:
   
     return to_python_value<Number>()(Number((number) v->data, currRing));
@@ -210,8 +219,9 @@ BOOST_PYTHON_MODULE(Singular){
     .def("append", &arg_list::appendPoly)
     .def("append", &arg_list::appendArray)
     .def("append", &arg_list::appendNumber)
-   .def("append", &arg_list::appendint)
-   .def("append", &arg_list::appendVector);
+    .def("append", &arg_list::appendint)
+    .def("append", &arg_list::appendIdeal)
+    .def("append", &arg_list::appendVector);
   boost::python::class_<idhdl_wrap>("interpreter_id")
     .def("is_zero", &idhdl_wrap::is_zero)
     .def("__str__", idhdl_as_str);

@@ -38,13 +38,18 @@ proc testproc6(poly p, poly q){
 
   return(m);
 }
-python_module::python("from Singular import number,  polynomial, interpreter_id, get_idhdl,call_interpreter_method, i_arg_list, gen
+python_module::python("from Singular import number,  polynomial, interpreter_id, get_idhdl,call_interpreter_method, i_arg_list, gen, ideal
 
 from interpreter import global_functions
 functions=global_functions()
 print functions.testproc1()
 x=polynomial('x')
 y=polynomial('y')
+i=ideal()
+i.append(x)
+i.append(x+y)
+print i
+print functions.groebner(i);
 xy=x*y
 
 

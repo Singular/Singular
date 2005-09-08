@@ -1,7 +1,8 @@
 #ifndef IDEAL_CPP_HEADER
 #define IDEAL_CPP_HEADER
-//$Id: Ideal.h,v 1.1 2005-09-08 12:07:20 bricken Exp $
+//$Id: Ideal.h,v 1.2 2005-09-08 12:47:04 bricken Exp $
 #include "Poly.h"
+#include "ideals.h"
 //base for ideals as well for modules
 
 template <class poly_type> class IdealBase {
@@ -42,7 +43,7 @@ template <class poly_type> class IdealBase {
  iterator end(){
    return storage.end();
  }
- size_type size(){
+ size_type size() const{
    return storage.size();
  }
  iterator
@@ -60,6 +61,7 @@ template <class poly_type> class IdealBase {
  void insert(iterator __pos, iterator __first, iterator __last){
    return insert(__pos,__first,__last);
  }
+
 };
 
 class Ideal:
@@ -67,11 +69,26 @@ public IdealBase<Poly>{
  public:
   Ideal(){
   }
+  Ideal(ideal i, ring r){
+    for(int j=0;j<IDELEMS(i);j++){
+      storage.push_back(Poly(i->m[j],r));
+    }
+  }
   Ideal(iterator first, 
 	iterator last,
 	const allocator_type& __a = allocator_type()):
     IdealBase<Poly>(first,last,__a){
   }
+ ideal as_ideal() const{
+   //no checks for rings
+   int s=size();
+   ideal result=idInit(s);
+   
+   for(int i=0;i<s;i++){
+     result->m[i]=storage[i].as_poly();
+   }
+   return result;
+ }
 };
 class Modul:
 public IdealBase<Vector>{
