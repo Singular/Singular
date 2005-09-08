@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.5 2005-04-20 17:25:52 Singular Exp $ */
+/* $Id: polys.h,v 1.6 2005-09-08 11:14:09 bricken Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials of the
              currRing
@@ -421,7 +421,7 @@ int   p_Var(poly mi,const ring r);
 
 /*-----------specials for spoly-computations--------------*/
 BOOLEAN pCompareChain (poly p,poly p1,poly p2,poly lcm);
-BOOLEAN pEqualPolys(poly p1,poly p2);
+#define  pEqualPolys(p1,p2) p_EqualPolys(p1,p2,currRing)
 BOOLEAN pComparePolys(poly p1,poly p2);
 
 

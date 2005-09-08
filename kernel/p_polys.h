@@ -7,7 +7,7 @@
  *           currRing
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
- *  Version: $Id: p_polys.h,v 1.1.1.1 2003-10-06 12:16:00 Singular Exp $
+ *  Version: $Id: p_polys.h,v 1.2 2005-09-08 11:14:09 bricken Exp $
  *******************************************************************/
 #ifndef P_POLYS_H
 #define P_POLYS_H
@@ -388,7 +388,7 @@ long pLDeg1_Totaldegree(poly p,int *l, ring r);
 long pLDeg1c_Totaldegree(poly p,int *l, ring r);
 long pLDeg1_WFirstTotalDegree(poly p,int *l, ring r);
 long pLDeg1c_WFirstTotalDegree(poly p,int *l, ring r);
-
+BOOLEAN p_EqualPolys(poly p1, poly p2, ring r);
 /***************************************************************
  *
  * PDEBUG stuff
@@ -414,6 +414,8 @@ BOOLEAN p_CheckPolyRing(poly p, ring r);
 // check if r != NULL and initialized
 BOOLEAN p_CheckRing(ring r);
 // only do check if cond
+
+
 #define pIfThen(cond, check) do {if (cond) {check;}} while (0)
 
 BOOLEAN _p_Test(poly p, ring r, int level);

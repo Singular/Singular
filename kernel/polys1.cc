@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.14 2005-08-17 13:54:36 Singular Exp $ */
+/* $Id: polys1.cc,v 1.15 2005-09-08 11:14:10 bricken Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -1883,13 +1883,13 @@ void   pVectorHasUnit(poly p, int * k, int * len)
 /*2
 * returns TRUE if p1 = p2
 */
-BOOLEAN pEqualPolys(poly p1,poly p2)
+BOOLEAN p_EqualPolys(poly p1,poly p2, ring r)
 {
   while ((p1 != NULL) && (p2 != NULL))
   {
-    if (! pLmEqual(p1, p2))
+    if (! p_LmEqual(p1, p2,r))
       return FALSE;
-    if (! nEqual(pGetCoeff(p1), pGetCoeff(p2)))
+    if (! n_Equal(p_GetCoeff(p1,r), p_GetCoeff(p2,r),r ))
       return FALSE;
     pIter(p1);
     pIter(p2);
