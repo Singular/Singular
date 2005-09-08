@@ -1,4 +1,4 @@
-//$Id: Poly.h,v 1.23 2005-09-02 12:46:36 Singular Exp $
+//$Id: Poly.h,v 1.24 2005-09-08 12:07:20 bricken Exp $
 
 
 
@@ -38,6 +38,7 @@ class PolyImpl{
   ring getRing() const{
     return r;
   }
+  friend inline bool operator==(const Poly& p1, const Poly& p2);
   friend PolyImpl operator+(const PolyImpl& p1, const PolyImpl& n2);
   friend PolyImpl operator-(const PolyImpl& p1, const PolyImpl& n2);
   friend PolyImpl operator/(const PolyImpl& p1, const PolyImpl& n2);
@@ -494,7 +495,7 @@ class Poly: public PolyBase<POLY_VARIANT_RING, Poly>{
     ((PolyBase<POLY_VARIANT_RING, Poly>&)*this)+=p;
     return *this;
   }
-
+  friend inline bool operator==(const Poly& p1, const Poly& p2);
 
 };
 class Vector: public PolyBase<POLY_VARIANT_MODUL, Vector>{
@@ -595,6 +596,12 @@ inline Poly operator+(const Poly& p1, const Number& n){
   f+=n;
   return f;
   }
+inline bool operator==(const Poly& p1, const Poly& p2){
+  ring r1=p1.getRing();
+  ring r2=p2.getRing();
+  if (r1!=r2) return false;
+  return p_EqualPolys(p1.ptr->p,p2.ptr->p,r1);
+}
 template <poly_variant variant, class create_type> 
   inline typename PolyBase<variant,create_type>::create_type 
   operator+

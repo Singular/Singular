@@ -6,19 +6,34 @@
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 using boost::python::self;
 using namespace boost::python;
-static boost::python::object Poly_as_str(Poly& p)
+
+static boost::python::object Ideal_as_str(Ideal& p)
 {
   using boost::python::str;
   //ring r=p.getRing();
- 
-  char* out=p.c_string();
-  return boost::python::str(out,strlen(out));
+  str helper;
+  list tojoin;
+  int i;
+  int s=p.size();
+  tojoin.append("[");
+  for(i=0;i<s;i++){
+    tojoin.append(Poly_as_str(p[i]));
+    if (i<s-1)
+      tojoin.append(", ");
+  }
+  tojoin.append("]");
+  str res=helper.join(tojoin);
+  return res;
 }
+
+
 void export_ideal()
 {
    boost::python::class_<Ideal>("ideal")
-    .def(boost::python::init <>())
+     .def("__str__", Ideal_as_str)
+     .def(boost::python::init <>())
      .def(vector_indexing_suite<Ideal >());
+   
 }
 
 

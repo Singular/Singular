@@ -12,6 +12,7 @@ i.append(onep)
 print len(i)
 for p in i:
   print p
+print i
 xy=polynomial('xy')
 print xy
 comp=polynomial('xy+1')
