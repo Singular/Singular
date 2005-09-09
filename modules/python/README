@@ -16,6 +16,7 @@ poly
 vector
 number
 matrix
+ideal
 
 Output:
 int
@@ -23,7 +24,7 @@ poly
 vector
 number
 matrix
-
+ideal
 
 
 BUILD:
