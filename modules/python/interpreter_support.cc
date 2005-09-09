@@ -29,6 +29,12 @@ class idhdl_wrap{
   bool is_zero(){
     return id==NULL;
   }
+  bool id_is_proc(){
+    return (id->typ==PROC_CMD);
+  }
+  bool print_type(){
+    Print("type:%d\n",id->typ);
+  }
 };
 class arg_list{
  public:
@@ -115,6 +121,34 @@ class arg_list{
   }
   
 };
+static PyObject* buildPythonMatrix(matrix m, ring r){
+  using boost::python::numeric::array;
+  using boost::python::self;
+  using boost::python::make_tuple;
+  using boost::python::tuple;
+  using boost::python::object;
+  using boost::python::list;
+ 
+  list l;
+  
+  
+  for(int i=1;i<=MATROWS(m);i++){
+    list row;
+    for(int j=1;j<=MATCOLS(m);j++){
+      Poly ip(MATELEM(m,i,j),r);//copy it
+      row.append(ip);
+      //a[boost::python::make_tuple(i%2,i%5)]=ip;
+      //a[boost::python::make_tuple(i%2,i%5)]=ip;
+    }
+    l.append(row);
+  }
+  //FIXME: should call this only once
+  array::set_module_and_type("Numeric",
+			     "ArrayType"
+			     );
+  
+  return to_python_value<array>()(array(l));
+}
 PyObject* buildPyObjectFromLeftv(leftv v){
  
   switch (v->rtyp){
@@ -133,32 +167,33 @@ PyObject* buildPyObjectFromLeftv(leftv v){
     return to_python_value<Number>()(Number((number) v->data, currRing));
   case MATRIX_CMD:
     {
-      using boost::python::numeric::array;
-      using boost::python::self;
-      using boost::python::make_tuple;
-      using boost::python::tuple;
-      using boost::python::object;
-      using boost::python::list;
-      matrix m=(matrix) v->data;
-      list l;
-
-
-      for(int i=1;i<=MATROWS(m);i++){
-	list row;
-	for(int j=1;j<=MATCOLS(m);j++){
-	  Poly ip(MATELEM(m,i,j),currRing);//copy it
-	  row.append(ip);
-	  //a[boost::python::make_tuple(i%2,i%5)]=ip;
-	  //a[boost::python::make_tuple(i%2,i%5)]=ip;
-	}
-	l.append(row);
-      }
-      //FIXME: should call this only once
-      array::set_module_and_type("Numeric",
-			     "ArrayType"
-			     );
-
-      return to_python_value<array>()(array(l));
+      return buildPythonMatrix((matrix) v->data,currRing);
+    }
+  default:
+    Py_INCREF(Py_None);
+    return Py_None;
+  }
+}
+PyObject* buildPyObjectFromIdhdl(const idhdl_wrap&  id){
+  
+ 
+  switch (id.id->typ){
+  case INT_CMD:
+    return PyInt_FromLong((int)id.id->data.i);
+  case POLY_CMD:
+    
+    return to_python_value<Poly>()(Poly((poly) id.id->data.p, currRing));
+  case  VECTOR_CMD:
+   
+    return to_python_value<Vector>()( Vector((poly) id.id->data.p, currRing));
+  case IDEAL_CMD:
+    return to_python_value<Ideal>()(Ideal((ideal) id.id->data.uideal, currRing));
+  case  NUMBER_CMD:
+  
+    return to_python_value<Number>()(Number((number) id.id->data.n, currRing));
+  case MATRIX_CMD:
+    {
+      return buildPythonMatrix((matrix) id.id->data.umatrix,currRing);
     }
   default:
     Py_INCREF(Py_None);
@@ -198,8 +233,11 @@ void export_interpreter()
     .def("append", &arg_list::appendVector);
   boost::python::class_<idhdl_wrap>("interpreter_id")
     .def("is_zero", &idhdl_wrap::is_zero)
+    .def("is_proc", &idhdl_wrap::id_is_proc)
+    .def("print_type", &idhdl_wrap::print_type)
     .def("__str__", idhdl_as_str);
   def("call_interpreter_method",call_interpreter_method);
+  def("transfer_to_python",buildPyObjectFromIdhdl);
 }
 
 

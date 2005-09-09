@@ -1,4 +1,5 @@
 ring r=0,(x,y,z),lp;
+int a=12345;
 timer=1;
 proc myprintmat(matrix m){
   print(m);
@@ -63,6 +64,6 @@ print functions.testproc6(x,y)
 from Singular import foo2;
 m=functions.testproc6(x,y)
 functions.myprintmat(m)
-
+print functions.a
 ");
 $
