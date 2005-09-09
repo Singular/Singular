@@ -1,5 +1,6 @@
 ring r=0,(x,y,z),lp;
 int a=12345;
+poly f=0;
 timer=1;
 proc myprintmat(matrix m){
   print(m);
@@ -52,7 +53,7 @@ i.append(x+y)
 print i
 print functions.groebner(i);
 xy=x*y
-
+functions.f=xy
 
 xye1=xy*gen(1)
 
@@ -66,4 +67,5 @@ m=functions.testproc6(x,y)
 functions.myprintmat(m)
 print functions.a
 ");
+print(f);
 $

@@ -17,6 +17,26 @@ extern int inerror;
 using namespace boost::python;
 using boost::python::numeric::array;
 using boost::python::extract;
+matrix matrixFromArray(const array& f){
+  object o=f.attr("shape");
+  
+  object o1=o[0];
+  
+  object o2=o[1];
+  int l1=extract<int>(o1);
+
+  
+  int l2=extract<int>(o2);
+  matrix m=mpNew(l1,l2);
+  for(int i=0;i<l1;i++){
+    for(int j=0;j<l2;j++){
+      Poly& x = boost::python::extract<Poly&>(f[boost::python::make_tuple(i,j)]);
+      poly p=x.as_poly();
+      MATELEM(m,i+1,j+1)=p;
+    }
+  }
+  return m;
+}
 class idhdl_wrap{
  public:
   idhdl id;
@@ -35,7 +55,50 @@ class idhdl_wrap{
   bool print_type(){
     Print("type:%d\n",id->typ);
   }
+  void writePoly(const Poly& p){
+    
+    if (id->typ==POLY_CMD){
+      p_Delete(&id->data.p, currRing);
+      id->data.p=p.as_poly();
+    }
+    
+  }
+  void writeIdeal(const Ideal& p){
+    if (id->typ==IDEAL_CMD){
+      id_Delete(&id->data.uideal, currRing);
+      
+      id->data.uideal=p.as_ideal();
+    }
+  }
+  void writeint(int p){
+    if (id->typ==INT_CMD){
+      id->data.i=p;
+    }
+  }
+  void writeNumber(const Number& p){
+     
+ if (id->typ==NUMBER_CMD){
+      n_Delete(&id->data.n, currRing);
+      id->data.n=p.as_number();
+    }
+  }
+  void writeVector(const Vector& p){
+       
+    if (id->typ==VECTOR_CMD){
+      p_Delete(&id->data.p, currRing);
+      id->data.p=p.as_poly();
+    }
+  }
+  void writeArray(const array& f){
+    if(id->typ=MATRIX_CMD){
+      matrix m=matrixFromArray(f);
+      id_Delete((ideal*) &id->data.umatrix,currRing);
+      id->data.umatrix;
+    }
+  }
 };
+
+
 class arg_list{
  public:
   leftv args;
@@ -78,26 +141,8 @@ class arg_list{
     internal_append(v);
   }
   void appendArray(const array& f){
-    
-    
-    object o=f.attr("shape");
-  
-    object o1=o[0];
-    
-    object o2=o[1];
-    int l1=extract<int>(o1);
-   
-
-    int l2=extract<int>(o2);
-    matrix m=mpNew(l1,l2);
-    for(int i=0;i<l1;i++){
-      for(int j=0;j<l2;j++){
-	Poly& x = boost::python::extract<Poly&>(f[boost::python::make_tuple(i,j)]);
-	poly p=x.as_poly();
-	MATELEM(m,i+1,j+1)=p;
-      }
-    }
     leftv v=initArg();
+    matrix m=matrixFromArray(f);
     v->data=m;
     v->rtyp=MATRIX_CMD;
     internal_append(v);
@@ -235,6 +280,12 @@ void export_interpreter()
     .def("is_zero", &idhdl_wrap::is_zero)
     .def("is_proc", &idhdl_wrap::id_is_proc)
     .def("print_type", &idhdl_wrap::print_type)
+    .def("write", &idhdl_wrap::writePoly)
+    .def("write", &idhdl_wrap::writeArray)
+    .def("write", &idhdl_wrap::writeNumber)
+    .def("write", &idhdl_wrap::writeint)
+    .def("write", &idhdl_wrap::writeIdeal)
+    .def("write", &idhdl_wrap::writeVector)
     .def("__str__", idhdl_as_str);
   def("call_interpreter_method",call_interpreter_method);
   def("transfer_to_python",buildPyObjectFromIdhdl);

@@ -20,6 +20,11 @@ class singular_globals_proxy(object):
             if res is None:
                 raise AttributeError("Global variable "+name+" has unknown type")
             return res
-
+    def __setattr__(self,name,value):
+        id=get_idhdl(name)
+        if id.is_zero():
+            raise Expception
+        else:
+            id.write(value)
 #for compatibility the old name
 global_functions=singular_globals_proxy

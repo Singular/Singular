@@ -74,7 +74,14 @@ If you want to help, which would make me happy, follow some simple rules:
 - regularly check in, check out from CVS
 
 
+NEWS:
+*global_functions has be renamed to singular_globals_proxy
+the old name exists for short time for compat.
 
+*it is now possible to use the singular_globals_proxy for 
+    -reading global variables 
+    -writing global variables, if the var exists with the correct type in the interpreter
+    -calling global interpreter functions (not builtins, for example groebner but not std
 
 
 
