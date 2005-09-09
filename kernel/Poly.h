@@ -1,4 +1,4 @@
-//$Id: Poly.h,v 1.24 2005-09-08 12:07:20 bricken Exp $
+//$Id: Poly.h,v 1.25 2005-09-09 07:52:04 bricken Exp $
 
 
 
@@ -56,7 +56,8 @@ class PolyImpl{
     //durch Reihenfolge Selbstzuweisungen berücksichtigt
     if (this==&p2) return *this;
     poly pc=p_Copy(p2.p,p2.r);
-    p_Delete(&p,r);
+    if(r!=NULL)
+      p_Delete(&p,r);
     r=p2.r;
     p=pc;
     return *this;
@@ -192,7 +193,8 @@ class PolyImpl{
   }
 
   virtual ~PolyImpl(){
-    p_Delete(&p,r);
+    if (r!=NULL)
+      p_Delete(&p,r);
   }
 
  protected:

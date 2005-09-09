@@ -146,7 +146,10 @@ class Number{
 
   Number(){
     r=currRing;
-    n=n_Init(0,r);
+    if (r!=NULL)
+      n=n_Init(0,r);
+    else
+      n=(number) NULL;
   }
   Number(const Number & n){
     r=n.r;
@@ -168,7 +171,8 @@ class Number{
     n_Write(n,r);
   }
   virtual ~Number(){
-    n_Delete(&n,r);
+    if (r!=NULL)
+      n_Delete(&n,r);
   }
 
  protected:
