@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: claptmpl.cc,v 1.28 2005-07-26 17:06:54 Singular Exp $
+// $Id: claptmpl.cc,v 1.29 2005-09-12 16:04:17 bricken Exp $
 /*
 * ABSTRACT - instantiation of all templates
 */
@@ -85,7 +85,7 @@ public:
     T exp() const { return _exp; }
 #ifndef NOSTREAMIO
     //friend ostream & operator <<<>(ostream &, Substitution<T> &);
-    void Substitution<T>::print ( ostream& s ) const
+    void print ( ostream& s ) const
     {
       s << "("  << factor() << ")^" << exp();
     }
