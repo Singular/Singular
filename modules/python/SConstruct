@@ -1,13 +1,50 @@
 import os
 import re
+import SCons.Tool.applelink as applelink
 #include <Python.h>
 #include <boost/python.hpp>
+PYTHONPREFIX="/usr"
+class PythonConfig(object):
+    def __init__(self, version="2.3", prefix="/usr", libdir=None, incdir=None, libname=None):
+        self.version=version
+        if libdir:
+            self.libdir=libdir
+        else:
+            self.libdir=prefix+"/lib"
+        self.prefix=prefix
+        if libname:
+            self.libname=libname
+        else:
+            self.libname="python"+self.version
+        if incdir:
+            self.incdir=incdir
+        else:
+            self.incdir=self.prefix+"/include/python"+self.version
+PYTHONSEARCH=[\
+    PythonConfig(version="2.4", prefix="/sw",\
+        libdir="/sw/lib/python2.4/config/"),\
+    PythonConfig(version="2.4",\
+                    libdir="/Library/Frameworks/Python.framework/Versions/2.4/lib",\
+                    libname="python",\
+                    incdir="/Library/Frameworks/Python.framework/Versions/2.4/include/python2.4"),\
+                    PythonConfig(version="2.3"),\
+                    PythonConfig(version="2.4")]
+
 env = Environment()
 conf = Configure(env)
-if not conf.CheckCHeader('/usr/include/python2.3/Python.h'):
-    print 'Python 2.3 must be installed'
+PYTHON_CONFIG=None
+for c in PYTHONSEARCH:
+    if conf.CheckCHeader(c.incdir+"/Python.h"):
+        PYTHON_CONFIG=c
+        break
+if not PYTHON_CONFIG:
+    print 'Python header not found'
     Exit(1)
-
+#if not conf.CheckCHeader('/usr/include/python2.3/Python.h'):
+#    print 'Python 2.3 must be installed'
+#    Exit(1)
+BOOST_PREFIX="/sw"
+env.Append(CPPPATH=BOOST_PREFIX+"/include")
 conf.env.Append(CPPPATH=["/usr/include/python2.3"])
 if not conf.CheckCXXHeader('boost/python.hpp'):
     print 'Boost/python must be installed'
@@ -22,17 +59,28 @@ if not conf.CheckCHeader('mod2.h'):
     print 'must have a Singular build directory'
     Exit(1)
 env = conf.Finish()
-
+env=Environment()
+applelink.generate(env)
 SING_ROOT="../.."
 SING_ARCH=re.sub("\r|\n","",os.popen("../../singuname.sh").read())
-PYTHON_VERSION="2.3"
+#PYTHON_VERSION="2.3"
 sources=["python.cc", "poly_wrap.cc", "vector_wrap.cc", "CF_wrap.cc",\
              "number_wrap.cc", "playground.cc", "ideal_wrap.cc", "interpreter_support.cc"]
-SharedLibrary("python_module", 
-	      sources,\
+#Program("boosttest", 
+#	          "boost.cpp",\
+#	          CXX="g++-3.3",\
+#              CPPPATH=[".", SING_ROOT+"/kernel",\
+#                       SING_ROOT+"/Singular", SING_ROOT+"/"+SING_ARCH +"/include",\
+#                       PYTHON_CONFIG.incdir, BOOST_PREFIX+"/include", "/sw/include"],
+#              LIBS=["boost_python",PYTHON_CONFIG.libname], CPPDEFINES=["NDEBUG","DBUILD_MODULE"], SHLIBPREFIX="")
+env['LDMODULESUFFIX'] = '.so'
+env.LoadableModule("python_module", 
+	          sources,\
+	          CXX="g++-3.3",\
               CPPPATH=[".", SING_ROOT+"/kernel",\
                        SING_ROOT+"/Singular", SING_ROOT+"/"+SING_ARCH +"/include",\
-                       "/usr/include/python"+PYTHON_VERSION],
-              LIBS=["boost_python","python"+PYTHON_VERSION], CPPDEFINES=["NDEBUG","DBUILD_MODULE"], SHLIBPREFIX="")
+                       PYTHON_CONFIG.incdir, BOOST_PREFIX+"/include", "/sw/include"],\
+              LIBPATH=[BOOST_PREFIX+"/lib", PYTHON_CONFIG.libdir],\
+              LIBS=["boost_python",PYTHON_CONFIG.libname], CPPDEFINES=["NDEBUG","DBUILD_MODULE"], SHLIBPREFIX="", LINKFLAGS="-bundle_loader ../../Singular/Singular")
 
 
