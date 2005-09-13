@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.9 2005-07-05 16:11:36 Singular Exp $ */
+/* $Id: structs.h,v 1.10 2005-09-13 19:15:23 bricken Exp $ */
 /*
 * ABSTRACT
 */
@@ -86,7 +86,7 @@ enum nc_type
 };
 #endif
 
-typedef enum { LT_NONE, LT_NOTFOUND, LT_SINGULAR, LT_ELF, LT_HPUX} lib_types;
+typedef enum { LT_NONE, LT_NOTFOUND, LT_SINGULAR, LT_ELF, LT_HPUX, LT_MACH_O} lib_types;
 
 /* C++-part */
 #ifdef __cplusplus

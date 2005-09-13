@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mod_raw.cc,v 1.7 2005-05-12 12:47:14 Singular Exp $ */
+/* $Id: mod_raw.cc,v 1.8 2005-09-13 19:15:23 bricken Exp $ */
 /*
  * ABSTRACT: machine depend code for dynamic modules
  *
@@ -31,6 +31,7 @@
 
 lib_types type_of_LIB(char *newlib, char *libnamebuf)
 {
+  const char mach_o[]={0xfe,0xed,0xfa,0xce,0};
   char        buf[BYTES_TO_CHECK+1];        /* one extra for terminating '\0' */
   struct stat sb;
   int nbytes = 0;
@@ -62,6 +63,16 @@ lib_types type_of_LIB(char *newlib, char *libnamebuf)
   if( (strncmp(buf, "\177ELF", 4)==0)) /* generic ELF */
   {
     LT = LT_ELF;
+    //omFree(newlib);
+    //newlib = omStrDup(libnamebuf);
+    goto lib_type_end;
+  }
+
+  
+  
+  if( (strncmp(buf, &mach_o[0], 4)==0)) /* generic Mach-O module */
+  {
+    LT = LT_MACH_O;
     //omFree(newlib);
     //newlib = omStrDup(libnamebuf);
     goto lib_type_end;
