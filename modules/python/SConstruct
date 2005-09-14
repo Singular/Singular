@@ -1,9 +1,19 @@
 import os
 import re
-import SCons.Tool.applelink as applelink
+try:
+	import SCons.Tool.applelink as applelink
+except:
+	pass
 #include <Python.h>
 #include <boost/python.hpp>
 PYTHONPREFIX="/usr"
+FINKPREFIX=None
+opts = Options('custom.py')
+opts.Add('CXX', 'The C++ compiler.')
+opts.Add('FINK_PREFIX', 'Prefix for fink on Mac OS X, usually /sw')
+
+
+
 class PythonConfig(object):
     def __init__(self, version="2.3", prefix="/usr", libdir=None, incdir=None, libname=None):
         self.version=version
@@ -21,8 +31,8 @@ class PythonConfig(object):
         else:
             self.incdir=self.prefix+"/include/python"+self.version
 PYTHONSEARCH=[\
-    PythonConfig(version="2.4", prefix="/sw",\
-        libdir="/sw/lib/python2.4/config/"),\
+    PythonConfig(version="2.3"),\
+    PythonConfig(version="2.4"),\
     PythonConfig(version="2.4",\
                     libdir="/Library/Frameworks/Python.framework/Versions/2.4/lib",\
                     libname="python",\
@@ -30,7 +40,15 @@ PYTHONSEARCH=[\
                     PythonConfig(version="2.3"),\
                     PythonConfig(version="2.4")]
 
-env = Environment()
+
+env = Environment(options=opts)
+try:
+    PYTHONSEARCH.prepend(PythonConfig(version="2.4", prefix=env['FINK_PREFIX'],\
+        libdir=env['FINK_PREFIX']+"/lib/python2.4/config/"))
+except:
+    pass
+
+print env['PLATFORM']
 conf = Configure(env)
 PYTHON_CONFIG=None
 for c in PYTHONSEARCH:
@@ -59,8 +77,10 @@ if not conf.CheckCHeader('mod2.h'):
     print 'must have a Singular build directory'
     Exit(1)
 env = conf.Finish()
-env=Environment()
-applelink.generate(env)
+
+env = Environment(options=opts)
+if (env['PLATFORM']=="darwin"):
+    applelink.generate(env)
 SING_ROOT="../.."
 SING_ARCH=re.sub("\r|\n","",os.popen("../../singuname.sh").read())
 #PYTHON_VERSION="2.3"
@@ -74,13 +94,23 @@ sources=["python.cc", "poly_wrap.cc", "vector_wrap.cc", "CF_wrap.cc",\
 #                       PYTHON_CONFIG.incdir, BOOST_PREFIX+"/include", "/sw/include"],
 #              LIBS=["boost_python",PYTHON_CONFIG.libname], CPPDEFINES=["NDEBUG","DBUILD_MODULE"], SHLIBPREFIX="")
 env['LDMODULESUFFIX'] = '.so'
-env.LoadableModule("python_module", 
-	          sources,\
-	          CXX="g++-3.3",\
+def module_target(*args,**keywords):
+    if env['PLATFORM']=="darwin":
+        keywords['LINKFLAGS']="-bundle_loader ../../Singular/Singular"
+        try:
+            keywords('LIBPATH').append(env['FINK_PREFIX']+"/lib")
+            keywords('CPPPATH').append(env['FINK_PREFIX']+"/include")
+        except:
+            pass
+        return env.LoadableModule(*args,**keywords)
+    else:
+        return env.SharedLibrary(*args,**keywords)
+module_target("python_module", 
+              sources,\
               CPPPATH=[".", SING_ROOT+"/kernel",\
                        SING_ROOT+"/Singular", SING_ROOT+"/"+SING_ARCH +"/include",\
-                       PYTHON_CONFIG.incdir, BOOST_PREFIX+"/include", "/sw/include"],\
-              LIBPATH=[BOOST_PREFIX+"/lib", PYTHON_CONFIG.libdir],\
-              LIBS=["boost_python",PYTHON_CONFIG.libname], CPPDEFINES=["NDEBUG","DBUILD_MODULE"], SHLIBPREFIX="", LINKFLAGS="-bundle_loader ../../Singular/Singular")
+                       PYTHON_CONFIG.incdir],\
+              LIBPATH=[PYTHON_CONFIG.libdir],\
+              LIBS=["boost_python",PYTHON_CONFIG.libname], CPPDEFINES=["NDEBUG","DBUILD_MODULE"], SHLIBPREFIX="")
 
 
