@@ -2,6 +2,7 @@ ring r=0,(x,y,z),lp;
 int a=12345;
 poly f=10;
 ideal i=x,y;
+list l=f,i;
 timer=1;
 proc myprintmat(matrix m){
   print(m);
@@ -49,6 +50,10 @@ from interpreter import global_functions
 functions=global_functions()
 print functions.f
 print functions.i
+firstl=functions.l
+print firstl
+for i in firstl:
+    print i
 #print functions.testproc1()
 print 'hi'
 x=polynomial('x')

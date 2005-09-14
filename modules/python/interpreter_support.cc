@@ -222,6 +222,19 @@ static array buildPythonMatrix(matrix m, ring r){
   
   return array(l);
 }
+boost::python::object buildPyObjectFromLeftv(leftv v);
+boost::python::list buildPythonList(lists l, ring r){
+    using boost::python::list;
+    list res;
+    
+    for(int i=0;i<=l->nr;i++){
+        leftv lv=&l->m[i];
+        object o=buildPyObjectFromLeftv(lv);
+        res.append(o);
+    }
+    return res;
+}
+
 boost::python::object buildPyObjectFromLeftv(leftv v){
   using boost::python::object;
   switch (v->rtyp){
@@ -242,22 +255,13 @@ boost::python::object buildPyObjectFromLeftv(leftv v){
     {
       return buildPythonMatrix((matrix) v->data,currRing);
     }
+  case LIST_CMD:
+    return buildPythonList((lists) v->data, currRing);
   default:
     
     return object();
   }
 }
-//boost::python::list buildPythonList(lists l, ring r){
-//    using boost::python::list;
-//    list res;
-//    
-//    for(int i=0;i<=l->nr;i++){
-//        leftv lv=&l->m[i];
-//        PyObject* o=buildPyObjectFromLeftv(lv);
-//        res.append(o);
-//    }
-//    return res;
-//}
 boost::python::object buildPyObjectFromIdhdl(const idhdl_wrap&  id){
   using boost::python::object;
  
@@ -281,37 +285,8 @@ boost::python::object buildPyObjectFromIdhdl(const idhdl_wrap&  id){
     {
       return buildPythonMatrix((matrix) id.id->data.umatrix,currRing);
     }
-  //case LIST_CMD:
-  //  return to_python_value<boost::python::list>()(buildPythonList((lists) id.id->data.l, currRing));
-  default:
-    return object();    
-    //Py_INCREF(Py_None);
-    //return Py_None;
-  }
-}
-object buildBPyObjectFromIdhdl(const idhdl_wrap&  id){
-  using boost::python::object;
- 
-  switch (id.id->typ){
-  case INT_CMD:
-    return object((int) id.id->data.i);//PyInt_FromLong((int)id.id->data.i);
-  //case POLY_CMD:
-  //  
-  //  return to_python_value<Poly>()(Poly((poly) id.id->data.p, currRing));
-  //case  VECTOR_CMD:
-  // 
-  //  return to_python_value<Vector>()( Vector((poly) id.id->data.p, currRing));
-  //case IDEAL_CMD:
-  //  return to_python_value<Ideal>()(Ideal((ideal) id.id->data.uideal, currRing));
-  //case  NUMBER_CMD:
-  //
-  //  return to_python_value<Number>()(Number((number) id.id->data.n, currRing));
-  //case MATRIX_CMD:
-  //  {
-  //    return buildPythonMatrix((matrix) id.id->data.umatrix,currRing);
-  //  }
-  //case LIST_CMD:
-  //  return to_python_value<boost::python::list>()(buildPythonList((lists) id.id->data.l, currRing));
+  case LIST_CMD:
+    return buildPythonList((lists) id.id->data.l, currRing);
   default:
     return object();    
     //Py_INCREF(Py_None);
