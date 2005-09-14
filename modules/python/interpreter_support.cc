@@ -5,7 +5,7 @@
 #include "Poly.h"
 #include "Ideal.h"
 #include "structs.h"
-
+#include "ipshell.h"
 #include "numbers.h"
 
 #include "febase.h"
@@ -108,7 +108,9 @@ class arg_list{
   ~arg_list(){
     if (args!=NULL){
       args->CleanUp();
+      omFreeBin(args, sleftv_bin);
     }
+    
   }
   void appendPoly(const Poly& p){
     leftv v=initArg();
@@ -252,6 +254,25 @@ PyObject* call_interpreter_method(const idhdl_wrap& proc, const arg_list& args){
   errorreported=inerror=0;
   return res;
 }
+PyObject* call_builtin_method(const char* name, Ideal i){
+  arg_list l;
+  l.appendIdeal(i);
+  leftv a=l.args;
+  int cmd_n=-1;
+  IsCmd(name,cmd_n);
+  if (cmd_n<0){
+  Py_INCREF(Py_None);
+  PrintS("is not a cmd");
+  return Py_None;
+ 
+  } else {
+    leftv res=(leftv)omAllocBin(sleftv_bin);
+    res->Init();
+    iiExprArith1(res,a,cmd_n);
+    buildPyObjectFromLeftv(res);
+    //cleanup not to forget
+  }
+}
 static boost::python::str idhdl_as_str(idhdl_wrap iw){
   idhdl i=iw.id;
   using boost::python::str;
@@ -288,6 +309,7 @@ void export_interpreter()
     .def("write", &idhdl_wrap::writeVector)
     .def("__str__", idhdl_as_str);
   def("call_interpreter_method",call_interpreter_method);
+  def("cbm",call_builtin_method);
   def("transfer_to_python",buildPyObjectFromIdhdl);
 }
 
