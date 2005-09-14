@@ -4,6 +4,7 @@
 #include "factory.h"
 
 using boost::python::self;
+#ifndef NOSTREAMIO
 static boost::python::object CF_as_str(const CanonicalForm& f)
 {
   using boost::python::str;
@@ -11,11 +12,14 @@ static boost::python::object CF_as_str(const CanonicalForm& f)
   s<<f;
   return boost::python::str(s.str());
 }
+#endif
 void export_CF(){
     boost::python::class_<CanonicalForm>("canonical_form")
     .def(boost::python::init <const int>())
     .def(boost::python::init <const Variable>())
+#ifndef NOSTREAMIO
     .def("__str__", CF_as_str)
+#endif
     .def(-self)
     .def(self*=self)
     .def(self+=self)
