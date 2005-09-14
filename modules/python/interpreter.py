@@ -51,6 +51,8 @@ class singular_globals_proxy(object):
         if id.is_zero():
             raise Expception
         else:
+            if isinstance(value,list):
+                value=list2arg_list(value)
             id.write(value)
 #for compatibility the old name
 global_functions=singular_globals_proxy

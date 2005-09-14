@@ -47,68 +47,6 @@ bool is_builtin(const char* name){
   IsCmd(name,cmd_n);
   return (cmd_n!=-1);
 }
-class idhdl_wrap{
- public:
-  idhdl id;
-  idhdl_wrap(idhdl id){
-    this->id=id;
-  }
-  idhdl_wrap(){
-    id=(idhdl) NULL;
-  }
-  bool is_zero(){
-    return id==NULL;
-  }
-  bool id_is_proc(){
-    return (id->typ==PROC_CMD);
-  }
-  bool print_type(){
-    Print("type:%d\n",id->typ);
-  }
-  void writePoly(const Poly& p){
-    
-    if (id->typ==POLY_CMD){
-      p_Delete(&id->data.p, currRing);
-      id->data.p=p.as_poly();
-    }
-    
-  }
-  void writeIdeal(const Ideal& p){
-    if (id->typ==IDEAL_CMD){
-      id_Delete(&id->data.uideal, currRing);
-      
-      id->data.uideal=p.as_ideal();
-    }
-  }
-  void writeint(int p){
-    if (id->typ==INT_CMD){
-      id->data.i=p;
-    }
-  }
-  void writeNumber(const Number& p){
-     
- if (id->typ==NUMBER_CMD){
-      n_Delete(&id->data.n, currRing);
-      id->data.n=p.as_number();
-    }
-  }
-  void writeVector(const Vector& p){
-       
-    if (id->typ==VECTOR_CMD){
-      p_Delete(&id->data.p, currRing);
-      id->data.p=p.as_poly();
-    }
-  }
-  void writeArray(const array& f){
-    if(id->typ=MATRIX_CMD){
-      matrix m=matrixFromArray(f);
-      id_Delete((ideal*) &id->data.umatrix,currRing);
-      id->data.umatrix;
-    }
-  }
-};
-
-
 class arg_list{
  public:
   leftv args;
@@ -216,6 +154,76 @@ class arg_list{
   }
   
 };
+
+class idhdl_wrap{
+ public:
+  idhdl id;
+  idhdl_wrap(idhdl id){
+    this->id=id;
+  }
+  idhdl_wrap(){
+    id=(idhdl) NULL;
+  }
+  bool is_zero(){
+    return id==NULL;
+  }
+  bool id_is_proc(){
+    return (id->typ==PROC_CMD);
+  }
+  bool print_type(){
+    Print("type:%d\n",id->typ);
+  }
+  void writePoly(const Poly& p){
+    
+    if (id->typ==POLY_CMD){
+      p_Delete(&id->data.p, currRing);
+      id->data.p=p.as_poly();
+    }
+    
+  }
+  void writeIdeal(const Ideal& p){
+    if (id->typ==IDEAL_CMD){
+      id_Delete(&id->data.uideal, currRing);
+      
+      id->data.uideal=p.as_ideal();
+    }
+  }
+  void writeint(int p){
+    if (id->typ==INT_CMD){
+      id->data.i=p;
+    }
+  }
+  void writeNumber(const Number& p){
+     
+ if (id->typ==NUMBER_CMD){
+      n_Delete(&id->data.n, currRing);
+      id->data.n=p.as_number();
+    }
+  }
+  void writeVector(const Vector& p){
+       
+    if (id->typ==VECTOR_CMD){
+      p_Delete(&id->data.p, currRing);
+      id->data.p=p.as_poly();
+    }
+  }
+  void writeArray(const array& f){
+    if(id->typ=MATRIX_CMD){
+      matrix m=matrixFromArray(f);
+      id_Delete((ideal*) &id->data.umatrix,currRing);
+      id->data.umatrix;
+    }
+}
+  void writeList(arg_list& f){
+    //warning f gets empty
+    if(id->typ=LIST_CMD){
+        id->data.l->Clean(currRing);
+        id->data.l=f.dumpToLists();
+    }
+}
+};
+
+
 static array buildPythonMatrix(matrix m, ring r){
   using boost::python::numeric::array;
   using boost::python::self;
@@ -416,6 +424,7 @@ void export_interpreter()
     .def("write", &idhdl_wrap::writeint)
     .def("write", &idhdl_wrap::writeIdeal)
     .def("write", &idhdl_wrap::writeVector)
+    .def("write", &idhdl_wrap::writeList)
     .def("__str__", idhdl_as_str);
   def("call_interpreter_method",call_interpreter_method);
   def("cbm",call_builtin_method_general);

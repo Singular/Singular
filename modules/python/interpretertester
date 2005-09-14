@@ -48,11 +48,15 @@ proc testproc6(poly p, poly q){
 
   return(m);
 }
+list mylist=1,2,3;
 LIB("python_module.so");
 Python_module::python("from Singular import number,  polynomial, interpreter_id, get_idhdl,call_interpreter_method, i_arg_list, gen, ideal
 print call_interpreter_method
 from interpreter import global_functions
 functions=global_functions()
+print functions.mylist;
+functions.mylist=[1,2,[5,6]]
+print functions.mylist
 print functions.f
 print functions.i
 firstl=functions.l
