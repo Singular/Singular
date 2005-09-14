@@ -8,9 +8,16 @@ except:
 #include <boost/python.hpp>
 PYTHONPREFIX="/usr"
 FINKPREFIX=None
+env=Environment()
+platform=env['PLATFORM']
+
 opts = Options('custom.py')
-opts.Add('CXX', 'The C++ compiler.')
-opts.Add('FINK_PREFIX', 'Prefix for fink on Mac OS X, usually /sw')
+if platform=="darwin":
+    opts.Add('CXX', 'The C++ compiler.',"g++-3.3")
+    opts.Add('FINK_PREFIX', 'Prefix for fink on Mac OS X, usually /sw','/sw')
+else:
+    opts.Add('CXX', 'The C++ compiler.')
+
 
 
 
@@ -42,8 +49,9 @@ PYTHONSEARCH=[\
 
 
 env = Environment(options=opts)
+
 try:
-    PYTHONSEARCH.prepend(PythonConfig(version="2.4", prefix=env['FINK_PREFIX'],\
+    PYTHONSEARCH.insert(0,PythonConfig(version="2.4", prefix=env['FINK_PREFIX'],\
         libdir=env['FINK_PREFIX']+"/lib/python2.4/config/"))
 except:
     pass
@@ -81,6 +89,7 @@ env = conf.Finish()
 env = Environment(options=opts)
 if (env['PLATFORM']=="darwin"):
     applelink.generate(env)
+    
 SING_ROOT="../.."
 SING_ARCH=re.sub("\r|\n","",os.popen("../../singuname.sh").read())
 #PYTHON_VERSION="2.3"
@@ -96,10 +105,11 @@ sources=["python.cc", "poly_wrap.cc", "vector_wrap.cc", "CF_wrap.cc",\
 env['LDMODULESUFFIX'] = '.so'
 def module_target(*args,**keywords):
     if env['PLATFORM']=="darwin":
+        print "Hello this is a Mac"
         keywords['LINKFLAGS']="-bundle_loader ../../Singular/Singular"
         try:
-            keywords('LIBPATH').append(env['FINK_PREFIX']+"/lib")
-            keywords('CPPPATH').append(env['FINK_PREFIX']+"/include")
+            keywords['LIBPATH'].append(env['FINK_PREFIX']+"/lib")
+            keywords['CPPPATH'].append(env['FINK_PREFIX']+"/include")
         except:
             pass
         return env.LoadableModule(*args,**keywords)
