@@ -7,7 +7,7 @@
 using boost::python::self;
 using namespace boost::python;
 
-static boost::python::object Ideal_as_str(Ideal& p)
+static boost::python::object Ideal_as_str(const Ideal& p)
 {
   using boost::python::str;
   //ring r=p.getRing();

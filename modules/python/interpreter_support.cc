@@ -17,6 +17,10 @@ extern int inerror;
 using namespace boost::python;
 using boost::python::numeric::array;
 using boost::python::extract;
+static void free_leftv(leftv args){
+    args->CleanUp();
+    omFreeBin(args, sleftv_bin);
+}
 matrix matrixFromArray(const array& f){
   object o=f.attr("shape");
   
@@ -36,6 +40,11 @@ matrix matrixFromArray(const array& f){
     }
   }
   return m;
+}
+bool is_builtin(const char* name){
+  int cmd_n=-1;
+  IsCmd(name,cmd_n);
+  return (cmd_n!=-1);
 }
 class idhdl_wrap{
  public:
@@ -111,6 +120,22 @@ class arg_list{
       omFreeBin(args, sleftv_bin);
     }
     
+  }
+  leftv pop_front(){
+    assume(args!=NULL);
+    leftv res=args;
+    args=args->next;
+    res->next=NULL;
+    return res;
+  }
+  int length(){
+    leftv v=args;
+    int l=0;
+    while(v!=NULL){
+      l++;
+      v=v->next;
+    }
+    return l;
   }
   void appendPoly(const Poly& p){
     leftv v=initArg();
@@ -260,6 +285,9 @@ PyObject* call_builtin_method(const char* name, Ideal i){
   leftv a=l.args;
   int cmd_n=-1;
   IsCmd(name,cmd_n);
+//     Py_INCREF(Py_None);
+
+//   return Py_None;
   if (cmd_n<0){
   Py_INCREF(Py_None);
   PrintS("is not a cmd");
@@ -269,7 +297,66 @@ PyObject* call_builtin_method(const char* name, Ideal i){
     leftv res=(leftv)omAllocBin(sleftv_bin);
     res->Init();
     iiExprArith1(res,a,cmd_n);
-    buildPyObjectFromLeftv(res);
+    PyObject* real_res=buildPyObjectFromLeftv(res);
+    res->CleanUp();
+    omFreeBin(res, sleftv_bin);
+    errorreported=inerror=0;
+    return real_res;
+    //cleanup not to forget
+  }
+}
+PyObject* call_builtin_method_general(const char* name, arg_list& l){
+  
+
+  int cmd_n=-1;
+  IsCmd(name,cmd_n);
+//     Py_INCREF(Py_None);
+
+//   return Py_None;
+  if (cmd_n<0){
+  Py_INCREF(Py_None);
+  PrintS("is not a cmd");
+  return Py_None;
+ 
+  } else {
+
+
+    leftv res=(leftv)omAllocBin(sleftv_bin);
+    res->Init();
+    switch(l.length()){
+    case 1:
+      iiExprArith1(res,l.args,cmd_n);
+      break;
+    case 2:
+      {
+	leftv arg1=l.pop_front();
+	leftv arg2=l.pop_front();
+	iiExprArith2(res,arg1,cmd_n,arg2,TRUE);
+	free_leftv(arg1);
+	free_leftv(arg2);
+	break;
+      }
+    case 3:
+      {
+	leftv arg1=l.pop_front();
+	leftv arg2=l.pop_front();
+	leftv arg3=l.pop_front();
+	free_leftv(arg1);
+	free_leftv(arg2);
+	free_leftv(arg3);
+	
+	iiExprArith3(res,cmd_n,arg1,arg2,arg3);
+	break;
+      }
+    default:
+      iiExprArithM(res, l.args, cmd_n);
+    }
+
+    PyObject* real_res=buildPyObjectFromLeftv(res);
+    res->CleanUp();
+    omFreeBin(res, sleftv_bin);
+    errorreported=inerror=0;
+    return real_res;
     //cleanup not to forget
   }
 }
@@ -309,8 +396,9 @@ void export_interpreter()
     .def("write", &idhdl_wrap::writeVector)
     .def("__str__", idhdl_as_str);
   def("call_interpreter_method",call_interpreter_method);
-  def("cbm",call_builtin_method);
+  def("cbm",call_builtin_method_general);
   def("transfer_to_python",buildPyObjectFromIdhdl);
+  def("is_builtin", is_builtin);
 }
 
 

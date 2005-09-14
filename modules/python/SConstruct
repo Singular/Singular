@@ -101,7 +101,7 @@ sources=["python.cc", "poly_wrap.cc", "vector_wrap.cc", "CF_wrap.cc",\
 #              CPPPATH=[".", SING_ROOT+"/kernel",\
 #                       SING_ROOT+"/Singular", SING_ROOT+"/"+SING_ARCH +"/include",\
 #                       PYTHON_CONFIG.incdir, BOOST_PREFIX+"/include", "/sw/include"],
-#              LIBS=["boost_python",PYTHON_CONFIG.libname], CPPDEFINES=["NDEBUG","DBUILD_MODULE"], SHLIBPREFIX="")
+#              LIBS=["boost_python",PYTHON_CONFIG.libname], CPPDEFINES=["NDEBUG","BUILD_MODULE"], SHLIBPREFIX="")
 env['LDMODULESUFFIX'] = '.so'
 def module_target(*args,**keywords):
     if env['PLATFORM']=="darwin":
@@ -121,6 +121,6 @@ module_target("python_module",
                        SING_ROOT+"/Singular", SING_ROOT+"/"+SING_ARCH +"/include",\
                        PYTHON_CONFIG.incdir],\
               LIBPATH=[PYTHON_CONFIG.libdir],\
-              LIBS=["boost_python",PYTHON_CONFIG.libname], CPPDEFINES=["NDEBUG","DBUILD_MODULE"], SHLIBPREFIX="")
+              LIBS=["boost_python",PYTHON_CONFIG.libname], CPPDEFINES=["NDEBUG","BUILD_MODULE"], SHLIBPREFIX="")
 
 

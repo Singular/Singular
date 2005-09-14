@@ -3,7 +3,7 @@
 #include "mod2.h"
 #include "Poly.h"
 using boost::python::self;
-boost::python::str Poly_as_str(Poly& p)
+boost::python::str Poly_as_str(const Poly& p)
 {
   using boost::python::str;
   //ring r=p.getRing();
