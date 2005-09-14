@@ -56,13 +56,5 @@ class singular_globals_proxy(object):
 global_functions=singular_globals_proxy
 
 def mycbm(name,*args):
-    l=i_arg_list()
-    for a in args:
-        if isinstance(a,list):
-            at=i_arg_list()
-            for a2 in a:
-                at.append(a2)
-            l.append(at)
-        else:
-            l.append(a)
+    l=list2arg_list(args)
     return cbm(name,l)

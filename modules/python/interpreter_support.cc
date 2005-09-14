@@ -176,19 +176,25 @@ class arg_list{
     internal_append(v);
     
   }
-  void appendPrelist(arg_list& l){
-    int n=l.length();
-    leftv v=initArg();
+  lists dumpToLists(){
+    int n=length();
+    
     lists res=(lists)omAlloc0Bin(slists_bin);
     res->Init(n);
     for(int i=0;i<n;i++){
-        leftv iv=l.pop_front();
+        leftv iv=pop_front();
         //swap the content
         memcpy(&res->m[i],iv,sizeof(sleftv));
         //iv->Init();
         omFreeBin(iv, sleftv_bin);
     }
-    v->data=res;
+    return res;
+    
+  }
+  void appendPrelist(arg_list& l){
+    leftv v=initArg();
+    v->data=l.dumpToLists();
+
     v->rtyp=LIST_CMD;
     internal_append(v);
   }
