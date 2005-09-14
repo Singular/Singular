@@ -176,7 +176,7 @@ class arg_list{
     internal_append(v);
     
   }
- protected:
+   protected:
   leftv initArg(){
     leftv res=(leftv)omAllocBin(sleftv_bin);
     res->Init();
