@@ -1,4 +1,4 @@
-//$Id: Poly.h,v 1.25 2005-09-09 07:52:04 bricken Exp $
+//$Id: Poly.h,v 1.26 2005-09-14 08:42:50 bricken Exp $
 
 
 
@@ -360,7 +360,7 @@ template<poly_variant variant, class create_type_input> class PolyBase{
     ptr->print();
   }
   //* ressource managed by Singular
-  char* c_string(){
+  char* c_string() const{
 
     return p_String(ptr->p,ptr->r,ptr->r);
   }
