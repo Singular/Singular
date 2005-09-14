@@ -7,6 +7,11 @@ timer=1;
 proc myprintmat(matrix m){
   print(m);
 }
+proc listproc1(list l){
+    print(l);
+    list erg=1,list(2,2784);
+    return(erg);
+}
 proc testproc1(){
 print("Hallo Welt");
 return(1);
@@ -52,6 +57,7 @@ print functions.f
 print functions.i
 firstl=functions.l
 print firstl
+print functions.listproc1([1,[3,6]])
 for i in firstl:
     print i
 #print functions.testproc1()

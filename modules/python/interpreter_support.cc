@@ -176,6 +176,22 @@ class arg_list{
     internal_append(v);
     
   }
+  void appendPrelist(arg_list& l){
+    int n=l.length();
+    leftv v=initArg();
+    lists res=(lists)omAlloc0Bin(slists_bin);
+    res->Init(n);
+    for(int i=0;i<n;i++){
+        leftv iv=l.pop_front();
+        //swap the content
+        memcpy(&res->m[i],iv,sizeof(sleftv));
+        //iv->Init();
+        omFreeBin(iv, sleftv_bin);
+    }
+    v->data=res;
+    v->rtyp=LIST_CMD;
+    internal_append(v);
+  }
    protected:
   leftv initArg(){
     leftv res=(leftv)omAllocBin(sleftv_bin);
@@ -304,32 +320,6 @@ boost::python::object call_interpreter_method(const idhdl_wrap& proc, const arg_
   
   //return res;
 }
-//PyObject* call_builtin_method(const char* name, Ideal i){
-//  arg_list l;
-//  l.appendIdeal(i);
-//  leftv a=l.args;
-//  int cmd_n=-1;
-//  IsCmd(name,cmd_n);
-////     Py_INCREF(Py_None);
-//
-////   return Py_None;
-//  if (cmd_n<0){
-//  Py_INCREF(Py_None);
-//  PrintS("is not a cmd");
-//  return Py_None;
-// 
-//  } else {
-//    leftv res=(leftv)omAllocBin(sleftv_bin);
-//    res->Init();
-//    iiExprArith1(res,a,cmd_n);
-//    PyObject* real_res=buildPyObjectFromLeftv(res);
-//    res->CleanUp();
-//    omFreeBin(res, sleftv_bin);
-//    errorreported=inerror=0;
-//    return real_res;
-//    //cleanup not to forget
-//  }
-//}
 boost::python::object call_builtin_method_general(const char* name, arg_list& l){
   
 
@@ -408,6 +398,7 @@ void export_interpreter()
     .def("append", &arg_list::appendNumber)
     .def("append", &arg_list::appendint)
     .def("append", &arg_list::appendIdeal)
+    .def("append", &arg_list::appendPrelist)
     .def("append", &arg_list::appendVector);
   boost::python::class_<idhdl_wrap>("interpreter_id")
     .def("is_zero", &idhdl_wrap::is_zero)
