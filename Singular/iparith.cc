@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.378 2005-09-13 19:15:00 bricken Exp $ */
+/* $Id: iparith.cc,v 1.379 2005-09-14 07:41:58 bricken Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -7340,7 +7340,7 @@ BOOLEAN iiExprArithM(leftv res, leftv a, int op)
 }
 
 /*=================== general utilities ============================*/
-int IsCmd(char *n, int & tok)
+int IsCmd(const char *n, int & tok)
 {
   int an=1;
   int i,v;

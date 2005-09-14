@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.h,v 1.41 2005-05-18 16:24:44 Singular Exp $ */
+/* $Id: ipshell.h,v 1.42 2005-09-14 07:41:57 bricken Exp $ */
 /*
 * ABSTRACT
 */
@@ -33,7 +33,7 @@ extern char *singular_date;
 
 extern BOOLEAN yyInRingConstruction; /* 1: during ring construction */
 
-int     IsCmd(char *n, int & tok);
+int     IsCmd(const char *n, int & tok);
 BOOLEAN iiPStart(idhdl pn, sleftv * sl);
 BOOLEAN iiEStart(char* example, procinfo *pi);
 void    type_cmd(idhdl h);
