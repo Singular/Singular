@@ -1,12 +1,14 @@
 ring r=0,(x,y,z),lp;
 int a=12345;
-poly f=0;
+poly f=10;
+ideal i=x,y;
 timer=1;
 proc myprintmat(matrix m){
   print(m);
 }
 proc testproc1(){
 print("Hallo Welt");
+return(1);
 }
 proc testproc2(poly p){
 print("Hallo Welt");
@@ -42,10 +44,12 @@ proc testproc6(poly p, poly q){
 }
 LIB("python_module.so");
 Python_module::python("from Singular import number,  polynomial, interpreter_id, get_idhdl,call_interpreter_method, i_arg_list, gen, ideal
-
+print call_interpreter_method
 from interpreter import global_functions
 functions=global_functions()
-print functions.testproc1()
+print functions.f
+print functions.i
+#print functions.testproc1()
 print 'hi'
 x=polynomial('x')
 y=polynomial('y')

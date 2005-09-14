@@ -4,6 +4,7 @@
 #include "subexpr.h"
 #include "Poly.h"
 #include "Ideal.h"
+#include "lists.h"
 #include "structs.h"
 #include "ipshell.h"
 #include "numbers.h"
@@ -193,7 +194,7 @@ class arg_list{
   }
   
 };
-static PyObject* buildPythonMatrix(matrix m, ring r){
+static array buildPythonMatrix(matrix m, ring r){
   using boost::python::numeric::array;
   using boost::python::self;
   using boost::python::make_tuple;
@@ -219,93 +220,142 @@ static PyObject* buildPythonMatrix(matrix m, ring r){
 			     "ArrayType"
 			     );
   
-  return to_python_value<array>()(array(l));
+  return array(l);
 }
-PyObject* buildPyObjectFromLeftv(leftv v){
- 
+boost::python::object buildPyObjectFromLeftv(leftv v){
+  using boost::python::object;
   switch (v->rtyp){
   case INT_CMD:
-    return PyInt_FromLong((int)v->data);
+    return object((int)v->data);
   case POLY_CMD:
     
-    return to_python_value<Poly>()(Poly((poly) v->data, currRing));
+    return object(Poly((poly) v->data, currRing));
   case  VECTOR_CMD:
    
-    return to_python_value<Vector>()( Vector((poly) v->data, currRing));
+    return object( Vector((poly) v->data, currRing));
   case IDEAL_CMD:
-    return to_python_value<Ideal>()(Ideal((ideal) v->data, currRing));
+    return object(Ideal((ideal) v->data, currRing));
   case  NUMBER_CMD:
   
-    return to_python_value<Number>()(Number((number) v->data, currRing));
+    return object(Number((number) v->data, currRing));
   case MATRIX_CMD:
     {
       return buildPythonMatrix((matrix) v->data,currRing);
     }
   default:
-    Py_INCREF(Py_None);
-    return Py_None;
+    
+    return object();
   }
 }
-PyObject* buildPyObjectFromIdhdl(const idhdl_wrap&  id){
-  
+//boost::python::list buildPythonList(lists l, ring r){
+//    using boost::python::list;
+//    list res;
+//    
+//    for(int i=0;i<=l->nr;i++){
+//        leftv lv=&l->m[i];
+//        PyObject* o=buildPyObjectFromLeftv(lv);
+//        res.append(o);
+//    }
+//    return res;
+//}
+boost::python::object buildPyObjectFromIdhdl(const idhdl_wrap&  id){
+  using boost::python::object;
  
   switch (id.id->typ){
   case INT_CMD:
-    return PyInt_FromLong((int)id.id->data.i);
+    return object((int)id.id->data.i);
   case POLY_CMD:
     
-    return to_python_value<Poly>()(Poly((poly) id.id->data.p, currRing));
+    return object(Poly((poly) id.id->data.p, currRing));
   case  VECTOR_CMD:
    
-    return to_python_value<Vector>()( Vector((poly) id.id->data.p, currRing));
+    return object( Vector((poly) id.id->data.p, currRing));
   case IDEAL_CMD:
-    return to_python_value<Ideal>()(Ideal((ideal) id.id->data.uideal, currRing));
+    //object res;
+
+    return object(Ideal((ideal) id.id->data.uideal, currRing));
   case  NUMBER_CMD:
   
-    return to_python_value<Number>()(Number((number) id.id->data.n, currRing));
+    return object(Number((number) id.id->data.n, currRing));
   case MATRIX_CMD:
     {
       return buildPythonMatrix((matrix) id.id->data.umatrix,currRing);
     }
+  //case LIST_CMD:
+  //  return to_python_value<boost::python::list>()(buildPythonList((lists) id.id->data.l, currRing));
   default:
-    Py_INCREF(Py_None);
-    return Py_None;
+    return object();    
+    //Py_INCREF(Py_None);
+    //return Py_None;
   }
 }
-PyObject* call_interpreter_method(const idhdl_wrap& proc, const arg_list& args){
+object buildBPyObjectFromIdhdl(const idhdl_wrap&  id){
+  using boost::python::object;
+ 
+  switch (id.id->typ){
+  case INT_CMD:
+    return object((int) id.id->data.i);//PyInt_FromLong((int)id.id->data.i);
+  //case POLY_CMD:
+  //  
+  //  return to_python_value<Poly>()(Poly((poly) id.id->data.p, currRing));
+  //case  VECTOR_CMD:
+  // 
+  //  return to_python_value<Vector>()( Vector((poly) id.id->data.p, currRing));
+  //case IDEAL_CMD:
+  //  return to_python_value<Ideal>()(Ideal((ideal) id.id->data.uideal, currRing));
+  //case  NUMBER_CMD:
+  //
+  //  return to_python_value<Number>()(Number((number) id.id->data.n, currRing));
+  //case MATRIX_CMD:
+  //  {
+  //    return buildPythonMatrix((matrix) id.id->data.umatrix,currRing);
+  //  }
+  //case LIST_CMD:
+  //  return to_python_value<boost::python::list>()(buildPythonList((lists) id.id->data.l, currRing));
+  default:
+    return object();    
+    //Py_INCREF(Py_None);
+    //return Py_None;
+  }
+}
+
+boost::python::object call_interpreter_method(const idhdl_wrap& proc, const arg_list& args){
+
   int err=iiPStart(proc.id, args.args);
   int voice=myynest+1;
-  PyObject* res=buildPyObjectFromLeftv(&iiRETURNEXPR[voice]);
   errorreported=inerror=0;
-  return res;
-}
-PyObject* call_builtin_method(const char* name, Ideal i){
-  arg_list l;
-  l.appendIdeal(i);
-  leftv a=l.args;
-  int cmd_n=-1;
-  IsCmd(name,cmd_n);
-//     Py_INCREF(Py_None);
 
-//   return Py_None;
-  if (cmd_n<0){
-  Py_INCREF(Py_None);
-  PrintS("is not a cmd");
-  return Py_None;
- 
-  } else {
-    leftv res=(leftv)omAllocBin(sleftv_bin);
-    res->Init();
-    iiExprArith1(res,a,cmd_n);
-    PyObject* real_res=buildPyObjectFromLeftv(res);
-    res->CleanUp();
-    omFreeBin(res, sleftv_bin);
-    errorreported=inerror=0;
-    return real_res;
-    //cleanup not to forget
-  }
+  return buildPyObjectFromLeftv(&iiRETURNEXPR[voice]);
+  
+  //return res;
 }
-PyObject* call_builtin_method_general(const char* name, arg_list& l){
+//PyObject* call_builtin_method(const char* name, Ideal i){
+//  arg_list l;
+//  l.appendIdeal(i);
+//  leftv a=l.args;
+//  int cmd_n=-1;
+//  IsCmd(name,cmd_n);
+////     Py_INCREF(Py_None);
+//
+////   return Py_None;
+//  if (cmd_n<0){
+//  Py_INCREF(Py_None);
+//  PrintS("is not a cmd");
+//  return Py_None;
+// 
+//  } else {
+//    leftv res=(leftv)omAllocBin(sleftv_bin);
+//    res->Init();
+//    iiExprArith1(res,a,cmd_n);
+//    PyObject* real_res=buildPyObjectFromLeftv(res);
+//    res->CleanUp();
+//    omFreeBin(res, sleftv_bin);
+//    errorreported=inerror=0;
+//    return real_res;
+//    //cleanup not to forget
+//  }
+//}
+boost::python::object call_builtin_method_general(const char* name, arg_list& l){
   
 
   int cmd_n=-1;
@@ -314,9 +364,9 @@ PyObject* call_builtin_method_general(const char* name, arg_list& l){
 
 //   return Py_None;
   if (cmd_n<0){
-  Py_INCREF(Py_None);
-  PrintS("is not a cmd");
-  return Py_None;
+  
+
+  return object();
  
   } else {
 
@@ -352,7 +402,7 @@ PyObject* call_builtin_method_general(const char* name, arg_list& l){
       iiExprArithM(res, l.args, cmd_n);
     }
 
-    PyObject* real_res=buildPyObjectFromLeftv(res);
+    boost::python::object real_res=buildPyObjectFromLeftv(res);
     res->CleanUp();
     omFreeBin(res, sleftv_bin);
     errorreported=inerror=0;
