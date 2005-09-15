@@ -18,6 +18,7 @@ number
 matrix
 ideal
 list
+string
 
 Output:
 int
@@ -27,6 +28,18 @@ number
 matrix
 ideal
 list
+string
+
+typemappings:
+interpreter, python internal, python official name
+int -> int
+poly -> Poly ->polynomial
+vector -> Vector -> vector
+number -> Number ->number
+matrix -> Numeric.array
+ideal -> Ideal ->ideal
+list -> list
+string -> str
 
 BUILD:
 --------

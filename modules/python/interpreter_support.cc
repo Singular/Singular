@@ -114,6 +114,12 @@ class arg_list{
     internal_append(v);
     
   }
+  void appendString(const char* s){
+    leftv v=initArg();
+    v->data=omStrDup(s);
+    v->rtyp=STRING_CMD;
+    internal_append(v);
+  }
   lists dumpToLists(){
     int n=length();
     
@@ -213,7 +219,13 @@ class idhdl_wrap{
       id_Delete((ideal*) &id->data.umatrix,currRing);
       id->data.umatrix;
     }
-}
+  }
+  void writeString(const char* s){
+    if(id->typ=STRING_CMD){
+        omFree((ADDRESS) id->data.ustring);
+        id->data.ustring=omStrDup(s);
+    }
+  }
   void writeList(arg_list& f){
     //warning f gets empty
     if(id->typ=LIST_CMD){
@@ -273,6 +285,8 @@ boost::python::object buildPyObjectFromLeftv(leftv v){
   case POLY_CMD:
     
     return object(Poly((poly) v->data, currRing));
+  case STRING_CMD:
+    return str((const char*) v->data);
   case  VECTOR_CMD:
    
     return object( Vector((poly) v->data, currRing));
@@ -296,6 +310,9 @@ boost::python::object buildPyObjectFromIdhdl(const idhdl_wrap&  id){
   using boost::python::object;
  
   switch (id.id->typ){
+  case STRING_CMD:
+    return str((const char*) id.id->data.ustring);
+
   case INT_CMD:
     return object((int)id.id->data.i);
   case POLY_CMD:
@@ -413,7 +430,8 @@ void export_interpreter()
     .def("append", &arg_list::appendint)
     .def("append", &arg_list::appendIdeal)
     .def("append", &arg_list::appendPrelist)
-    .def("append", &arg_list::appendVector);
+    .def("append", &arg_list::appendVector)
+    .def("append", &arg_list::appendString);
   boost::python::class_<idhdl_wrap>("interpreter_id")
     .def("is_zero", &idhdl_wrap::is_zero)
     .def("is_proc", &idhdl_wrap::id_is_proc)
@@ -425,6 +443,7 @@ void export_interpreter()
     .def("write", &idhdl_wrap::writeIdeal)
     .def("write", &idhdl_wrap::writeVector)
     .def("write", &idhdl_wrap::writeList)
+    .def("write", &idhdl_wrap::writeString)
     .def("__str__", idhdl_as_str);
   def("call_interpreter_method",call_interpreter_method);
   def("cbm",call_builtin_method_general);

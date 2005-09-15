@@ -4,8 +4,12 @@ poly f=10;
 ideal i=x,y;
 list l=f,i;
 timer=1;
+string s="sdgjgdksdgjs";
 proc myprintmat(matrix m){
   print(m);
+}
+proc stringproc1(){
+    return("blubber");
 }
 proc listproc1(list l){
     print(l);
@@ -57,11 +61,16 @@ functions=global_functions()
 print functions.mylist;
 functions.mylist=[1,2,[5,6]]
 print functions.mylist
+print functions.s
+functions.s='only a example'
+print functions.s
+functions.__getattr__('print')('Python ist fun und fun und fun')
 print functions.f
 print functions.i
 firstl=functions.l
 print firstl
 print functions.listproc1([1,[3,6]])
+print functions.stringproc1()
 for i in firstl:
     print i
 #print functions.testproc1()
