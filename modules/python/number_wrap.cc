@@ -3,7 +3,7 @@
 #include "mod2.h"
 #include "Number.h"
 using boost::python::self;
-static boost::python::object Number_as_str(Number n)
+static boost::python::object Number_as_str(const Number& n)
 {
   using boost::python::str;
   StringSetS("");

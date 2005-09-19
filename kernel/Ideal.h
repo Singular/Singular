@@ -1,10 +1,10 @@
 #ifndef IDEAL_CPP_HEADER
 #define IDEAL_CPP_HEADER
-//$Id: Ideal.h,v 1.3 2005-09-09 07:52:04 bricken Exp $
+//$Id: Ideal.h,v 1.4 2005-09-19 14:01:31 bricken Exp $
 #include "Poly.h"
 #include "ideals.h"
 //base for ideals as well for modules
-
+//doesn't need a destructor, as Polys will destroy itself
 template <class poly_type> class IdealBase {
  protected:
   std::vector<poly_type> storage;
@@ -16,6 +16,7 @@ template <class poly_type> class IdealBase {
   typedef typename std::vector<poly_type>::allocator_type allocator_type;
  IdealBase(){
  }
+  
  IdealBase(iterator first, 
 	     iterator last,
 	     const typename

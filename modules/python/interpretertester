@@ -107,7 +107,15 @@ print cbm('std', i)
 print cbm('random',1,10)
 print functions.std(i)
 print functions.random(1,10)
+print 'hallo'
 print functions.intersect(i,i,i,i)
+from Singular import ring
+ring()
+ring()
+print 'calling print'
+functions.__getattr__('print')(ring());
+print 'the end'
+print functions.ringlist(ring())
 ");
 print(f);
 

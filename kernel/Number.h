@@ -167,8 +167,9 @@ class Number{
     r=currRing;
     this->n=n_Init(n,r);
   }
-  void write(){
-    n_Write(n,r);
+  void write() const{
+    number towrite=n;
+    n_Write(towrite,r);
   }
   virtual ~Number(){
     if (r!=NULL)

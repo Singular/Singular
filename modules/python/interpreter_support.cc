@@ -13,6 +13,7 @@
 #include "ipid.h"
 #include "ipshell.h"
 #include "matpol.h"
+#include "ring_wrap.h"
 extern BOOLEAN errorreported;
 extern int inerror;
 using namespace boost::python;
@@ -120,6 +121,14 @@ class arg_list{
     v->rtyp=STRING_CMD;
     internal_append(v);
   }
+  void appendRing(const Ring& r){
+    leftv v=initArg();
+    v->data=r.pimpl;
+    r.pimpl->ref++;
+    v->rtyp=RING_CMD;
+    internal_append(v);
+  }
+
   lists dumpToLists(){
     int n=length();
     
@@ -217,7 +226,16 @@ class idhdl_wrap{
     if(id->typ=MATRIX_CMD){
       matrix m=matrixFromArray(f);
       id_Delete((ideal*) &id->data.umatrix,currRing);
-      id->data.umatrix;
+      id->data.umatrix=m;
+    }
+  }
+   void writeRing(const Ring& r){
+    if(id->typ=RING_CMD){
+      r.pimpl->ref++;
+
+      ((ring) id->data.uring)->ref--;//FIXME: destruct it
+      ring r2=r.pimpl;
+            id->data.uring=r2;
     }
   }
   void writeString(const char* s){
@@ -301,6 +319,8 @@ boost::python::object buildPyObjectFromLeftv(leftv v){
     }
   case LIST_CMD:
     return buildPythonList((lists) v->data, currRing);
+  case RING_CMD:
+    return object(Ring((ring) v->data));
   default:
     
     return object();
@@ -334,6 +354,8 @@ boost::python::object buildPyObjectFromIdhdl(const idhdl_wrap&  id){
     }
   case LIST_CMD:
     return buildPythonList((lists) id.id->data.l, currRing);
+  case RING_CMD:
+    return object(Ring((ring) id.id->data.uring));
   default:
     return object();    
     //Py_INCREF(Py_None);
@@ -397,7 +419,6 @@ boost::python::object call_builtin_method_general(const char* name, arg_list& l)
     default:
       iiExprArithM(res, l.args, cmd_n);
     }
-
     boost::python::object real_res=buildPyObjectFromLeftv(res);
     res->CleanUp();
     omFreeBin(res, sleftv_bin);
@@ -431,6 +452,7 @@ void export_interpreter()
     .def("append", &arg_list::appendIdeal)
     .def("append", &arg_list::appendPrelist)
     .def("append", &arg_list::appendVector)
+    .def("append", &arg_list::appendRing)
     .def("append", &arg_list::appendString);
   boost::python::class_<idhdl_wrap>("interpreter_id")
     .def("is_zero", &idhdl_wrap::is_zero)
@@ -444,6 +466,7 @@ void export_interpreter()
     .def("write", &idhdl_wrap::writeVector)
     .def("write", &idhdl_wrap::writeList)
     .def("write", &idhdl_wrap::writeString)
+    .def("write", &idhdl_wrap::writeRing)
     .def("__str__", idhdl_as_str);
   def("call_interpreter_method",call_interpreter_method);
   def("cbm",call_builtin_method_general);

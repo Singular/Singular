@@ -19,6 +19,7 @@ matrix
 ideal
 list
 string
+ring
 
 Output:
 int
@@ -29,6 +30,7 @@ matrix
 ideal
 list
 string
+ring
 
 typemappings:
 interpreter, python internal, python official name
@@ -40,7 +42,7 @@ matrix -> Numeric.array
 ideal -> Ideal ->ideal
 list -> list
 string -> str
-
+ring -> ring(in a Ring, but this does nothing) ->ring
 BUILD:
 --------
 just type:
@@ -66,6 +68,7 @@ if an exceptions occurs, review the code it may be wanted for examples the last 
 
 TASKS:
 ------
+- push and pop rings, automatically change rings, if Singular functions are executed
 -Map more types
 -throw Python exception if something fails
 -testing
