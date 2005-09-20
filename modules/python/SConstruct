@@ -1,3 +1,4 @@
+#$Id: SConstruct,v 1.13 2005-09-20 08:39:44 bricken Exp $
 import os
 import re
 try:

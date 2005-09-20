@@ -1,3 +1,4 @@
+//$Id: ring_wrap.cc,v 1.2 2005-09-20 08:39:44 bricken Exp $
 #include <poly_wrap.h>
 #include <boost/python.hpp>
 #include "mod2.h"
