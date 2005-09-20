@@ -1,0 +1,15 @@
+ring r=0,(x,y,z),lp;
+poly f=37x3y+x2yz;
+LIB("python_module.so");
+Python_module::python("from interpreter import singular_globals_proxy
+from singularom import *
+from context import *
+inter=singular_globals_proxy()
+doc= encodePoly(inter.f)
+#print doc
+#print doc.children
+context=Context()
+output=context.XMLEncodeObject(doc)
+print output
+");
+$
