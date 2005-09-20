@@ -20,6 +20,7 @@ ideal
 list
 string
 ring
+intvec
 
 Output:
 int
@@ -31,6 +32,7 @@ ideal
 list
 string
 ring
+intvec
 
 typemappings:
 interpreter, python internal, python official name

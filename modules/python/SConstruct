@@ -95,7 +95,7 @@ SING_ARCH=re.sub("\r|\n","",os.popen("../../singuname.sh").read())
 #PYTHON_VERSION="2.3"
 sources=["python.cc", "poly_wrap.cc", "vector_wrap.cc", "CF_wrap.cc",\
              "number_wrap.cc", "playground.cc", "ideal_wrap.cc", "interpreter_support.cc",\
-             "ring_wrap.cc"]
+             "ring_wrap.cc", "intvec_wrap.cc"]
 #Program("boosttest", 
 #	          "boost.cpp",\
 #	          CXX="g++-3.3",\

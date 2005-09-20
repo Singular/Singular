@@ -1,5 +1,7 @@
 #include <poly_wrap.h>
+#include <sstream>
 #include <boost/python.hpp>
+#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include "mod2.h"
 #include "subexpr.h"
 #include "Poly.h"
@@ -14,6 +16,7 @@
 #include "ipshell.h"
 #include "matpol.h"
 #include "ring_wrap.h"
+#include "intvec_wrap.h"
 extern BOOLEAN errorreported;
 extern int inerror;
 using namespace boost::python;
@@ -23,6 +26,7 @@ static void free_leftv(leftv args){
     args->CleanUp();
     omFreeBin(args, sleftv_bin);
 }
+
 matrix matrixFromArray(const array& f){
   object o=f.attr("shape");
   
@@ -151,6 +155,14 @@ class arg_list{
     v->rtyp=LIST_CMD;
     internal_append(v);
   }
+  void appendIntvec(better_intvec& iv){
+    leftv v=initArg();
+    v->data=iv.allocate_legacy_intvec_copy();
+
+    v->rtyp=INTVEC_CMD;
+    internal_append(v);
+  }
+
    protected:
   leftv initArg(){
     leftv res=(leftv)omAllocBin(sleftv_bin);
@@ -244,6 +256,12 @@ class idhdl_wrap{
         id->data.ustring=omStrDup(s);
     }
   }
+  void writeIntvec(const better_intvec& iv){
+    if(id->typ=INTVEC_CMD){
+        delete id->data.iv;
+        id->data.iv=iv.allocate_legacy_intvec_copy();;
+    }
+  }
   void writeList(arg_list& f){
     //warning f gets empty
     if(id->typ=LIST_CMD){
@@ -321,6 +339,8 @@ boost::python::object buildPyObjectFromLeftv(leftv v){
     return buildPythonList((lists) v->data, currRing);
   case RING_CMD:
     return object(Ring((ring) v->data));
+  case INTVEC_CMD:
+    return object(better_intvec(*(intvec*) v->data));
   default:
     
     return object();
@@ -356,6 +376,8 @@ boost::python::object buildPyObjectFromIdhdl(const idhdl_wrap&  id){
     return buildPythonList((lists) id.id->data.l, currRing);
   case RING_CMD:
     return object(Ring((ring) id.id->data.uring));
+  case INTVEC_CMD:
+    return object(better_intvec(*(intvec*) id.id->data.iv));
   default:
     return object();    
     //Py_INCREF(Py_None);
@@ -453,6 +475,7 @@ void export_interpreter()
     .def("append", &arg_list::appendPrelist)
     .def("append", &arg_list::appendVector)
     .def("append", &arg_list::appendRing)
+    .def("append", &arg_list::appendIntvec)
     .def("append", &arg_list::appendString);
   boost::python::class_<idhdl_wrap>("interpreter_id")
     .def("is_zero", &idhdl_wrap::is_zero)
@@ -466,12 +489,14 @@ void export_interpreter()
     .def("write", &idhdl_wrap::writeVector)
     .def("write", &idhdl_wrap::writeList)
     .def("write", &idhdl_wrap::writeString)
+    .def("write", &idhdl_wrap::writeIntvec)
     .def("write", &idhdl_wrap::writeRing)
     .def("__str__", idhdl_as_str);
   def("call_interpreter_method",call_interpreter_method);
   def("cbm",call_builtin_method_general);
   def("transfer_to_python",buildPyObjectFromIdhdl);
   def("is_builtin", is_builtin);
+  
 }
 
 

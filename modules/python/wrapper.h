@@ -1,4 +1,4 @@
-//$Id: wrapper.h,v 1.28 2005-09-19 14:01:08 bricken Exp $
+//$Id: wrapper.h,v 1.29 2005-09-20 07:16:01 bricken Exp $
 #ifndef PYTHON_SINGULAR_WRAPPER_HEADER
 #define PYTHON_SINGULAR_WRAPPER_HEADER
 #include <Python.h>
@@ -27,7 +27,7 @@
 #include "playground.h"
 #include "interpreter_support.h"
 #include "ring_wrap.h"
-
+#include "intvec_wrap.h"
 using boost::python::numeric::array;
 using boost::python::extract;
 
@@ -61,6 +61,7 @@ BOOST_PYTHON_MODULE(Singular){
   export_ideal();
   export_interpreter();
   export_ring();
+  export_intvec();
   boost::python::class_<PowerSeries>("power_series")       
     .def(boost::python::init <const PowerSeries::numerator_type &,const PowerSeries::denominator_type&>())
     .def("__iter__", boost::python::iterator<PowerSeries>());

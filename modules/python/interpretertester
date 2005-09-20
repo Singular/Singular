@@ -3,6 +3,7 @@ int a=12345;
 poly f=10;
 ideal i=x,y;
 list l=f,i;
+intvec iv=1,2,3,45,5,6,7,8;
 timer=1;
 string s="sdgjgdksdgjs";
 proc myprintmat(matrix m){
@@ -109,13 +110,21 @@ print functions.std(i)
 print functions.random(1,10)
 print 'hallo'
 print functions.intersect(i,i,i,i)
-from Singular import ring
+from Singular import ring, intvec
+v=intvec()
+v.append(12)
+v.append(13)
+print len(v)
+print v
 ring()
 ring()
 print 'calling print'
 functions.__getattr__('print')(ring());
 print 'the end'
 print functions.ringlist(ring())
+print functions.iv
+functions.iv=v
+print functions.iv
 ");
 print(f);
 
