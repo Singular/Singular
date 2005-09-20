@@ -1,6 +1,7 @@
 #ifndef IDEAL_CPP_HEADER
 #define IDEAL_CPP_HEADER
-//$Id: Ideal.h,v 1.4 2005-09-19 14:01:31 bricken Exp $
+//$Id: Ideal.h,v 1.5 2005-09-20 07:18:18 bricken Exp $
+#include <vector>
 #include "Poly.h"
 #include "ideals.h"
 //base for ideals as well for modules
