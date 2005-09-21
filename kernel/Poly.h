@@ -1,4 +1,4 @@
-//$Id: Poly.h,v 1.26 2005-09-14 08:42:50 bricken Exp $
+//$Id: Poly.h,v 1.27 2005-09-21 10:32:03 bricken Exp $
 
 
 
@@ -472,7 +472,7 @@ class Poly: public PolyBase<POLY_VARIANT_RING, Poly>{
   }
   Poly(poly p, ring r, int):PolyBase<POLY_VARIANT_RING, Poly>(p,r,0){
   }
-  Poly(std::vector<int> v, ring r=currRing):PolyBase<POLY_VARIANT_RING, Poly>(*(new PolyImpl((poly) NULL,r))){
+  Poly(const std::vector<int>& v, ring r=currRing):PolyBase<POLY_VARIANT_RING, Poly>(*(new PolyImpl((poly) NULL,r))){
     unsigned int i;
     int s=v.size();
     poly p=p_ISet(1,r);
