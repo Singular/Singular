@@ -1,6 +1,6 @@
 #ifndef IDEAL_CPP_HEADER
 #define IDEAL_CPP_HEADER
-//$Id: Ideal.h,v 1.6 2005-09-21 07:13:10 bricken Exp $
+//$Id: Ideal.h,v 1.7 2005-09-21 09:51:10 bricken Exp $
 #include <vector>
 #include "Poly.h"
 #include "ideals.h"
@@ -92,8 +92,13 @@ public IdealBase<Poly>{
  ideal as_ideal() const{
    //no checks for rings
    int s=size();
-   ideal result=idInit(s,1);
    
+   if (s==0)
+    s=1;
+   
+   ideal result=idInit(s,1);
+   result->m[0]=NULL;
+   s=size();
    for(int i=0;i<s;i++){
      result->m[i]=storage[i].as_poly();
    }
