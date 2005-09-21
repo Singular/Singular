@@ -49,13 +49,43 @@ def encodeRing(r):
     f=encodeField(r)
     return OMApply(poly_ring_dsym,[f,OMint(nv)])   
 
-def ringFromOM(ring_desc):
+def ringFromOM(ring_desc, ordering="dp"):
   if not isinstance(ring_desc, OMApply):
     raise SingularException("ringFromOM expects instance of OMApply")
   if (ring_desc.args[0]==Rationals):
     i=ring_desc.args[1].getValue()
-    return create_ring(char=0, nvars=i)
+    return create_ring(char=0, nvars=i, ordering=ordering)
   raise SingularException("ring not supported")
+def polyFromOM(poly_desc):
+  """assumes the right ring is set"""
+  if not isinstance(poly_desc, OMApply):
+    raise SingularException("polyFromOM expects instance of OMApply")
+  terms=[termFromOM(t) for t in poly_desc.args]
+  res=polynomial(number(0))
+  for t in terms:
+    res=res+t
+    #res+=t
+  return res
+def termFromOM(term_desc):
+  if not isinstance(term_desc, OMApply):
+    raise SingularException("polyFromOM expects instance of OMApply")
+  coef=number(term_desc.args[0].getValue())
+  exp=intvec()
+  for e in term_desc.args[1:]:
+    exp.append(e.getValue())
+  #print coef, polynomial(exp)
+  return coef*polynomial(exp)
+
+def idealFromDMPL(dmpl):
+  """assumes that the right ring is set"""
+  i=ideal()
+  ps=[polyFromOM(d) for d in dmpl.args[1:]]
+  for p in ps:
+    i.append(p)
+  return i
+def ringFromDMPLOrd(dmpl,o):
+  print OrderingTableBack[o]
+  return ringFromOM(dmpl.args[0], ordering=OrderingTableBack[o])
 def encodeTerm(t):
   """FIXME: ugly because it uses slow interpreter interface and setting of rings for this should be automatically"""
   t.ring().set()
@@ -63,3 +93,18 @@ def encodeTerm(t):
   c=singular.leadcoef(t)
   exponents=[OMint(i) for i in exponents]
   return OMApply(termsym,[OMint(str(c))]+exponents)
+def groebnerfunc(context, *args):
+  assert len(args)==2
+  ordering=args[0]
+  dmpl=args[1]
+  r=ringFromDMPLOrd(dmpl,ordering)
+  r.set()
+  i=idealFromDMPL(dmpl)
+  print "myarg",i
+  singular.__getattr__("print")(i)
+  res=singular.std(i)
+  #FIXME: singular.groebner does not work may because of bad ring changes
+  print "myres",res
+  return encodeGB(res)
+implementation.implement("groebner", groebnerfunc)
+  

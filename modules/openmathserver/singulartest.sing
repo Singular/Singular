@@ -1,22 +1,33 @@
 ring r=0,(x,y,z),lp;
 poly f=37x3y+x2yz;
 ideal i=f,f*f,f*f*f;
+LIB "poly.lib";
+ideal i2=cyclic(3);
+print(groebner(i2));
+print(i2);
 LIB("python_module.so");
 Python_module::python("from interpreter import singular_globals_proxy
 from singularom import *
 from context import *
+import polyd
+from polyd import groebnersym
+
 inter=singular_globals_proxy()
-inter.r.set()
-print inter.ring(inter.ringlist(inter.r))
-print inter.random(1,10000)
-inter.__getattr__('print')(inter.f.ring())
+print 'here it does work?', inter.groebner(inter.i2)
+print singular.i
+print 3, singular.i2
+
+
 doc= encodePoly(inter.f)
+print polyFromOM(doc)
 context=Context()
+context.addCDImplementation(polyd.implementation)
 output=context.XMLEncodeObject(doc)
 print output
 doc=encodeOrdering(singular.r)
 output=context.XMLEncodeObject(doc)
 print output
+print 1, singular.i2;
 doc=encodeRing(singular.r)
 output=context.XMLEncodeObject(doc)
 print output
@@ -24,13 +35,32 @@ doc=encodePolyWithRing(singular.f)
 output=context.XMLEncodeObject(doc)
 print output
 doc=encodeIdeal(singular.i)
+print idealFromDMPL(doc)
 output=context.XMLEncodeObject(doc)
 print output
 print 'semi encoding groebner basis'
+print 2, singular.i2;
+
 doc=encodeGB(singular.groebner(singular.i))
 output=context.XMLEncodeObject(doc)
 print output
+print ringFromDMPLOrd(doc.args[1],doc.args[0])
 r=encodeRing(singular.r)
 print ringFromOM(r)
+cyc3=encodeIdeal(singular.i2)
+ord=encodeOrdering(singular.r)
+gcall=OMApply(groebnersym,[ord,cyc3])
+gcout=open('cyc3om','w')
+gcout.write(context.XMLEncodeObject(gcall))
+gcout.close()
+print 'now calculating GB'
+output=groebnerfunc(context, gcall.args[0],gcall.args[1])
+outxml=context.XMLEncodeObject(output)
+print outxml
+print idealFromDMPL(output.args[1])
+print context.XMLEncodeObject(context.evaluate(gcall))
+gcout=open('cyc3om.out','w')
+gcout.write(context.XMLEncodeObject(context.evaluate(gcall)))
+gcout.close()
 ");
 $

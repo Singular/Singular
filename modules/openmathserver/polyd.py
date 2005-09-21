@@ -17,14 +17,13 @@ lpsym=OMSymbol("lexicographic", content)
 groebnerdsym=OMSymbol("groebnerd", content)
 
 poly_ring_dsym=OMSymbol("poly_ring_d",content)
-def groebnerfunc(context, *args):
-    #print "plusfunc", args
-    args=[context.toGeneric(o) for o in args]
-    if len(args)==0:
-        return content.package(0)
-    else:
-        erg=args[0]
-        for i in xrange(1,len(args)):
-            erg=erg+args[i]
-    return erg
-implementation.implement("groebnerfunc", groebnerfunc)
+#def groebnerfunc(context, *args):
+#    #print "plusfunc", args
+#    args=[context.toGeneric(o) for o in args]
+#    if len(args)==0:
+#        return content.package(0)
+#    else:
+#        erg=args[0]
+#        for i in xrange(1,len(args)):
+#            erg=erg+args[i]
+#    return erg
