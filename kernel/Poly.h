@@ -1,4 +1,4 @@
-//$Id: Poly.h,v 1.27 2005-09-21 10:32:03 bricken Exp $
+//$Id: Poly.h,v 1.28 2005-09-21 14:12:45 bricken Exp $
 
 
 
@@ -619,7 +619,11 @@ inline Vector unitVector(int i,ring r=currRing){
   p_SetComp(p,i,r);
   return Vector(p,r,0);
 }
-
+inline Poly operator*(const Number& n, const Poly & p){
+  Poly res=p;
+  res*=n;
+  return res;
+}
 template <poly_variant variant, class create_type> 
    
 inline PolyBase<variant, create_type>& 
