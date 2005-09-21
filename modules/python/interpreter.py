@@ -1,4 +1,6 @@
 from Singular import *
+def debug_out(s):
+  print s
 #def build_arg_list(*args)
 def list2arg_list(args):
     l=i_arg_list()
@@ -34,8 +36,11 @@ class singular_globals_proxy(object):
                 if not proc.is_proc():
                     proc.print_type()
                     raise Exception
+                prepare_ring(args)
                 l=list2arg_list(args)
-                return call_interpreter_method(proc, l)
+                erg= call_interpreter_method(proc, l)
+                finish_ring()
+                return erg
             try:
                 fun_wrapper.__name__=name
             except:
@@ -60,3 +65,31 @@ global_functions=singular_globals_proxy
 def mycbm(name,*args):
     l=list2arg_list(args)
     return cbm(name,l)
+
+def find_rings(arglist):
+  """FIXME: doesn't handle everything and depth"""
+  for item in arglist:
+    if isinstance(item,polynomial) or isinstance(item,ideal):
+      return [item.ring()]
+  return []
+  
+
+oldrings=[]
+def prepare_ring(arglist):
+  rl=find_rings(arglist)
+  debug_out("rl is" +str(rl))
+  if len(rl)==1:
+    r=rl[0]
+    oldrings.append(ring())
+    r.set()
+  else:
+    if len(rl)==0:
+      oldrings.append(None)
+    else:
+      debug_out("Warning to many rings in call")
+      oldrings.append(None)
+def finish_ring():
+  r=oldrings.pop()
+  if r:
+    r.set()
+    
