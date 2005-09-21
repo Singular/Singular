@@ -12,10 +12,9 @@ def encodePoly(p):
   return OMApply(SDMPsym,terms)
 
 def encodePolyWithRing(p):
-  """FIXME: just encodes currentRing"""
-  p=encodePoly(p)
-  r=encodeRing(ring())
-  return OMApply(DMPsym,[r,p])
+  pe=encodePoly(p)
+  r=encodeRing(p.ring())
+  return OMApply(DMPsym,[r,pe])
   
   
 orderingTable={
@@ -35,7 +34,7 @@ def encodeField(r):
 
 def encodeIdeal(i):
   """FIXME: uses only currentRing"""
-  r=encodeRing(ring())
+  r=encodeRing(i.ring())
   return OMApply(DMPLsym,[r]+[encodePoly(p) for p in i])
 def encodeRing(r):
     nv=singular.nvars(r)
@@ -43,7 +42,8 @@ def encodeRing(r):
     return OMApply(poly_ring_dsym,[f,OMint(nv)])   
   
 def encodeTerm(t):
-  """FIXME: ugly because it uses slow interpreter interface"""
+  """FIXME: ugly because it uses slow interpreter interface and setting of rings for this should be automatically"""
+  t.ring().set()
   exponents=singular.leadexp(t)
   c=singular.leadcoef(t)
   exponents=[OMint(i) for i in exponents]
