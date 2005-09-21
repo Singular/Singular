@@ -64,7 +64,10 @@ global_functions=singular_globals_proxy
 
 def mycbm(name,*args):
     l=list2arg_list(args)
-    return cbm(name,l)
+    prepare_ring(args)
+    res= cbm(name,l)
+    finish_ring()
+    return res
 
 def find_rings(arglist):
   """FIXME: doesn't handle everything and depth"""
