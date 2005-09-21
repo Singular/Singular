@@ -1,6 +1,7 @@
 from Singular import *
 def debug_out(s):
-  print s
+  pass
+  #print s
 #def build_arg_list(*args)
 def list2arg_list(args):
     l=i_arg_list()
