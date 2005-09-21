@@ -59,6 +59,7 @@ Python_module::python("from Singular import number,  polynomial, interpreter_id,
 print call_interpreter_method
 from interpreter import global_functions
 functions=global_functions()
+functions.setring(functions.r)
 print functions.mylist;
 functions.mylist=[1,2,[5,6]]
 print functions.mylist
