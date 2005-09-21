@@ -7,6 +7,8 @@ from singularom import *
 from context import *
 inter=singular_globals_proxy()
 inter.r.set()
+print inter.ring(inter.ringlist(inter.r))
+print inter.random(1,10000)
 inter.__getattr__('print')(inter.f.ring())
 doc= encodePoly(inter.f)
 context=Context()
@@ -25,8 +27,10 @@ doc=encodeIdeal(singular.i)
 output=context.XMLEncodeObject(doc)
 print output
 print 'semi encoding groebner basis'
-doc=encodeIdeal(singular.groebner(singular.i))
+doc=encodeGB(singular.groebner(singular.i))
 output=context.XMLEncodeObject(doc)
 print output
+r=encodeRing(singular.r)
+print ringFromOM(r)
 ");
 $
