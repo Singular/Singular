@@ -1,14 +1,31 @@
 ring r=0,(x,y,z),lp;
 poly f=37x3y+x2yz;
+ideal i=f,f*f,f*f*f;
 LIB("python_module.so");
 Python_module::python("from interpreter import singular_globals_proxy
 from singularom import *
 from context import *
 inter=singular_globals_proxy()
+inter.r.set()
+inter.__getattr__('print')(inter.f.ring())
 doc= encodePoly(inter.f)
-#print doc
-#print doc.children
 context=Context()
+output=context.XMLEncodeObject(doc)
+print output
+doc=encodeOrdering(singular.r)
+output=context.XMLEncodeObject(doc)
+print output
+doc=encodeRing(singular.r)
+output=context.XMLEncodeObject(doc)
+print output
+doc=encodePolyWithRing(singular.f)
+output=context.XMLEncodeObject(doc)
+print output
+doc=encodeIdeal(singular.i)
+output=context.XMLEncodeObject(doc)
+print output
+print 'semi encoding groebner basis'
+doc=encodeIdeal(singular.groebner(singular.i))
 output=context.XMLEncodeObject(doc)
 print output
 ");

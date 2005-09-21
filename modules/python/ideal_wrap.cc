@@ -1,9 +1,10 @@
-//$Id: ideal_wrap.cc,v 1.5 2005-09-20 08:39:44 bricken Exp $
+//$Id: ideal_wrap.cc,v 1.6 2005-09-21 07:12:48 bricken Exp $
 #include <poly_wrap.h>
 #include <boost/python.hpp>
 #include "mod2.h"
 #include "Poly.h"
 #include "Ideal.h"
+#include "ring_wrap.h"
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 using boost::python::self;
 using namespace boost::python;
@@ -26,12 +27,16 @@ static boost::python::object Ideal_as_str(const Ideal& p)
   str res=helper.join(tojoin);
   return res;
 }
+static Ring Ideal_get_Ring(const Ideal & p){
+  return p.getRing();
+}
 
 
 void export_ideal()
 {
    boost::python::class_<Ideal>("ideal")
      .def("__str__", Ideal_as_str)
+     .def("ring",Ideal_get_Ring)
      .def(boost::python::init <>())
      .def(vector_indexing_suite<Ideal >());
    

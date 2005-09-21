@@ -1,6 +1,6 @@
 #ifndef IDEAL_CPP_HEADER
 #define IDEAL_CPP_HEADER
-//$Id: Ideal.h,v 1.5 2005-09-20 07:18:18 bricken Exp $
+//$Id: Ideal.h,v 1.6 2005-09-21 07:13:10 bricken Exp $
 #include <vector>
 #include "Poly.h"
 #include "ideals.h"
@@ -25,6 +25,14 @@ template <class poly_type> class IdealBase {
    storage(first,last,__a)
    {
    
+ }
+ ring getRing() const{
+  //FIXME: is a hack
+  if (size()>0){
+    return storage[0].getRing();
+  }
+  else
+  return (ring) NULL;
  }
  poly_type& operator[] (int n){
    return storage[n];

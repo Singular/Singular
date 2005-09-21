@@ -1,6 +1,7 @@
-//$Id: ring_wrap.h,v 1.4 2005-09-20 12:22:59 bricken Exp $
+//$Id: ring_wrap.h,v 1.5 2005-09-21 07:12:48 bricken Exp $
 #ifndef RING_WRAP_HEADER
 #define RING_WRAP_HEADER
+#include "ring.h"
 class Ring{
   public:
     ring pimpl;
@@ -14,6 +15,9 @@ class Ring{
     ~Ring(){
       if (pimpl!=NULL)
         --(pimpl->ref);
+    }
+    void set(){
+      rChangeCurrRing(pimpl);
     }
 };
 void export_ring();

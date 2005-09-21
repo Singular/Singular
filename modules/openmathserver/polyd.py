@@ -9,8 +9,12 @@ implementation=OMCDImplementation(content)
 
 groebnersym=OMSymbol("groebner",content)
 DMPsym=OMSymbol("DMP",content)
+DMPLsym=OMSymbol("DMPL",content)
 SDMPsym=OMSymbol("SDMP",content)
 termsym=OMSymbol("term", content)
+dpsym=OMSymbol("graded_reverse_lexicographic", content)
+lpsym=OMSymbol("lexicographic", content)
+
 poly_ring_dsym=OMSymbol("poly_ring_d",content)
 def groebnerfunc(context, *args):
     #print "plusfunc", args
