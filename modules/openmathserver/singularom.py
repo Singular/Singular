@@ -33,7 +33,6 @@ def encodeField(r):
     raise SingularException("unknown field to encode")
 
 def encodeIdeal(i):
-  """FIXME: uses only currentRing"""
   r=encodeRing(i.ring())
   return OMApply(DMPLsym,[r]+[encodePoly(p) for p in i])
 def encodeRing(r):
