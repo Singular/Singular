@@ -2,9 +2,9 @@ from Singular import *
 from interpreter import *
 from objects import *
 from util import create_ring
-import polyd
-from polyd import DMPsym, SDMPsym, termsym, lpsym,dpsym,poly_ring_dsym, DMPLsym, implementation, groebnerdsym
-from fieldname1 import Qsym as Rationals
+import CD.polyd
+from CD.polyd import DMPsym, SDMPsym, termsym, lpsym,dpsym,poly_ring_dsym, DMPLsym, implementation, groebnerdsym
+from CD.fieldname1 import Qsym as Rationals
 singular=singular_globals_proxy()
 class SingularException(Exception):
   pass

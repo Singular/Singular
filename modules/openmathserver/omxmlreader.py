@@ -124,7 +124,7 @@ class OMFromXMLBuilder:
 #TODO: handle floats
 #TODO: handle ancestors cdbase
 if __name__=='__main__':
-    import arith1
+    import CD.arith1 as arith1
     
     if len(sys.argv)<=2:
         print "Usage: python omxmlreader [--evaluate] input output"

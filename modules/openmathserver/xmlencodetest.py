@@ -1,6 +1,6 @@
 from objects import *
 from context import *
-import arith1
+import CD.arith1 as arith1
 context=Context()
 context.push({})
 i=OMint(22482489)

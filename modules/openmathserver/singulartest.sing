@@ -9,8 +9,8 @@ LIB("python_module.so");
 Python_module::python("from interpreter import singular_globals_proxy
 from singularom import *
 from context import *
-import polyd
-from polyd import groebnersym
+import CD.polyd as polyd
+from CD.polyd import groebnersym
 
 inter=singular_globals_proxy()
 print 'here it does work?', inter.groebner(inter.i2)

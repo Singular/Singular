@@ -299,7 +299,7 @@ if __name__ == '__main__':
     print context.evaluate(application)
     application = OMApply(firstArg, [y,x])
     print context.evaluate(application)
-    import arith1
+    import CD.arith1 as arith1
     context.addCDImplementation(arith1.implementation)
     #print type(context.lookupImplementation(arith1.plussym))
     #application=OMApply(arith1.plussym,[x])
