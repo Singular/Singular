@@ -1,13 +1,13 @@
-ring r=0,(x,y,z),lp;
+ring r=0,(x,y,z,a,b),lp;
 poly f=37x3y+x2yz;
 ideal i=f,f*f,f*f*f;
 LIB "poly.lib";
-ideal i2=cyclic(3);
+ideal i2=cyclic(5);
 print(groebner(i2));
 print(i2);
 LIB("python_module.so");
 Python_module::python("from interpreter import singular_globals_proxy
-from singularom import *
+from CAS.singular import *
 from context import *
 import CD.polyd as polyd
 from CD.polyd import groebnersym
