@@ -1,4 +1,4 @@
-//$Id: intvec_wrap.cc,v 1.2 2005-09-20 08:39:44 bricken Exp $
+//$Id: intvec_wrap.cc,v 1.3 2005-09-23 12:59:30 bricken Exp $
 #include <boost/python.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include "mod2.h"
@@ -6,7 +6,7 @@
 
 
 using namespace boost::python;
-static boost::python::object intvec_as_str(const better_intvec& p)
+static boost::python::object intvec_as_str(const Intvec& p)
 {  
   using boost::python::str;
   //ring r=p.getRing();
@@ -27,8 +27,8 @@ static boost::python::object intvec_as_str(const better_intvec& p)
 }
 
 void export_intvec(){
-boost::python::class_<better_intvec>("intvec")
+boost::python::class_<Intvec>("intvec")
       .def("__str__", intvec_as_str)
      .def(boost::python::init <>())
-     .def(boost::python::vector_indexing_suite<better_intvec>());
+     .def(boost::python::vector_indexing_suite<Intvec>());
 }

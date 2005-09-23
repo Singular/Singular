@@ -1,4 +1,4 @@
-//$Id: interpreter_support.cc,v 1.15 2005-09-20 08:39:44 bricken Exp $
+//$Id: interpreter_support.cc,v 1.16 2005-09-23 12:59:30 bricken Exp $
 #include <poly_wrap.h>
 #include <sstream>
 #include <boost/python.hpp>
@@ -156,7 +156,7 @@ class arg_list{
     v->rtyp=LIST_CMD;
     internal_append(v);
   }
-  void appendIntvec(better_intvec& iv){
+  void appendIntvec(Intvec& iv){
     leftv v=initArg();
     v->data=iv.allocate_legacy_intvec_copy();
 
@@ -257,7 +257,7 @@ class idhdl_wrap{
         id->data.ustring=omStrDup(s);
     }
   }
-  void writeIntvec(const better_intvec& iv){
+  void writeIntvec(const Intvec& iv){
     if(id->typ=INTVEC_CMD){
         delete id->data.iv;
         id->data.iv=iv.allocate_legacy_intvec_copy();;
@@ -341,7 +341,7 @@ boost::python::object buildPyObjectFromLeftv(leftv v){
   case RING_CMD:
     return object(Ring((ring) v->data));
   case INTVEC_CMD:
-    return object(better_intvec(*(intvec*) v->data));
+    return object(Intvec(*(intvec*) v->data));
   default:
     
     return object();
@@ -378,7 +378,7 @@ boost::python::object buildPyObjectFromIdhdl(const idhdl_wrap&  id){
   case RING_CMD:
     return object(Ring((ring) id.id->data.uring));
   case INTVEC_CMD:
-    return object(better_intvec(*(intvec*) id.id->data.iv));
+    return object(Intvec(*(intvec*) id.id->data.iv));
   default:
     return object();    
     //Py_INCREF(Py_None);

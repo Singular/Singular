@@ -1,11 +1,11 @@
-//$Id: Poly.h,v 1.28 2005-09-21 14:12:45 bricken Exp $
+//$Id: Poly.h,v 1.29 2005-09-23 12:59:51 bricken Exp $
 
 
 
 #ifndef POLYCPP_HEADER
 #define POLYCPP_HEADER
 #include "mod2.h"
-
+#include "IIntvec.h"
 #include "numbers.h"
 #include "Number.h"
 #include "febase.h"
@@ -351,6 +351,14 @@ template<poly_variant variant, class create_type_input> class PolyBase{
   }
   typedef create_type_input create_type;
   typedef PolyInputIterator<create_type> iterator;
+  Intvec leadExp(){
+    int nvars=rVar(ptr->r);
+    Intvec res(nvars);
+    for(int i=0;i<nvars;i++){
+      res[i]=p_GetExp(ptr->p,i+1,ptr->r);
+    }
+    return res;
+  }  
   void copy_on_write(){
     if (!ptr.unique()){
       ptr.reset(new PolyImpl(*ptr));

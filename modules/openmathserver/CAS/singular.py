@@ -94,8 +94,10 @@ leadexp=singular.leadexp
 def encodeTerm(t):
   """FIXME: ugly because it uses slow interpreter interface and setting of rings for this should be automatically"""
   #t.ring().set()
-  exponents=leadexp(t)
-  c=leadcoef(t)
+  #exponents=leadexp(t)
+  #c=leadcoef(t)
+  exponents=t.leadExp()
+  c=t.leadCoef()
   exponents=[OMint(i) for i in exponents]
   return OMApply(termsym,[OMint(str(c))]+exponents)
 def groebnerfunc(context, ordering, dmpl):
