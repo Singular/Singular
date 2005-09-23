@@ -54,6 +54,17 @@ gcout=open('cyc3om','w')
 gcout.write(context.XMLEncodeObject(gcall))
 gcout.close()
 print 'now calculating GB'
+omin=context.XMLEncodeObject(gcall)
+from omxmlreader import *
+def inout(context, infn):
+  doc=readFile(infn)
+  builder=OMFromXMLBuilder()
+  doc=builder.build(doc)
+  doc=context.evaluate(doc)
+  output=context.XMLEncodeObject(doc)
+import profile
+profile.run('inout(context,\"cyc3om\")','omprof')
+inout(context,'cyc3om')
 output=groebnerfunc(context, gcall.args[0],gcall.args[1])
 outxml=context.XMLEncodeObject(output)
 print outxml
