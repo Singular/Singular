@@ -6,6 +6,14 @@ from copy import copy
 import base64
 #TODO: OMOBJ, OME, OMATTR
 #from cd import *
+try:
+    import psyco
+    def optimize(f):
+        psyco.bind(f)
+except:
+    def optimize(f):
+        pass
+
 class XMLAttribute(object):
     def __init__(self, name, value):
         self.name = name
@@ -131,7 +139,7 @@ class OMObjectBase(object):
                 encodingList.append(context.XMLEncodeBody(body))
         encodingList.extend(["</"+self.XMLtag+">"])
         return encodingList
-        
+
 class OMObject(OMObjectBase):
     def __init__(self, children):
         super(OMObject, self).__init__()
@@ -337,3 +345,8 @@ if __name__ == '__main__':
     print i.XMLEncode(context)
     #i.body="dshj"
    
+optimize(OMObjectBase.__init__)
+optimize(OMObjectBase.XMLPreEncode)
+optimize(SimpleValue.__init__)
+optimize(OMint.__init__)
+optimize(OMApply.__init__)

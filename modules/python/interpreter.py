@@ -1,4 +1,11 @@
 from Singular import *
+try:
+    import psyco
+    def optimize(f):
+        psyco.bind(f)
+except:
+    def optimize(f):
+        pass
 def debug_out(s):
   pass
   #print s
@@ -92,8 +99,11 @@ def prepare_ring(arglist):
     else:
       debug_out("Warning to many rings in call")
       oldrings.append(None)
+
 def finish_ring():
   r=oldrings.pop()
   if r:
     r.set()
-    
+#optimize(prepare_ring)
+#optimize(mycbm)
+#optimize(finish_ring)
