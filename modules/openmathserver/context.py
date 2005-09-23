@@ -74,7 +74,7 @@ class Context(object):
         #TODO: Make Attribution List attributes
         #TODO: Make all objects __hash__ and __eq__
         if (len(obj.attributes)==0):
-            return obj.XMLEncode(self)
+            return "".join(obj.XMLPreEncode(self))
         else:
             toencode=copy(obj)
             toencode.attributes={}

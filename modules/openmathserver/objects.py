@@ -110,6 +110,28 @@ class OMObjectBase(object):
             assert body != None
         closing = "".join(["</"+self.XMLtag+">"])
         return "".join([opening,body,closing])
+    def XMLPreEncode(self, context, encodingList=None):
+        #works not for attp
+        if encodingList==None:
+            encodingList=[]
+        encodingList.extend(["<", self.XMLtag])
+        attr=self.XMLAttributes
+        if attr:
+            for a in attr:
+                encodingList.append(" ")
+                encodingList.append(a.encode(context))
+        encodingList.append(">")
+        children = self.children
+        if children:
+            for c in children:
+                c.XMLPreEncode(context, encodingList)
+        else:
+            body = self.body
+            if body:
+                encodingList.append(context.XMLEncodeBody(body))
+        encodingList.extend(["</"+self.XMLtag+">"])
+        return encodingList
+        
 class OMObject(OMObjectBase):
     def __init__(self, children):
         super(OMObject, self).__init__()
