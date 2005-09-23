@@ -3,7 +3,7 @@ from copy import copy
 from cd import *
 from omexceptions import *
 from objects import *
-from re import sub
+from re import compile
 class Context(object):
     #TODO: Referenzen durch scope richtig behandeln
     def __init__(self):
@@ -92,9 +92,12 @@ class SimpleErrorHandler(object):
     def handle_unexpected_symbol(self, symbol):
         pass 
 class SimpleXMLEncoder(object):
+    def __init__(self):
+      self.re_inner=compile("&")
+      self.re_outer=compile("<")
     def encode(self, string):
-        return sub("<","&lt;",sub("&","&amp;",string))
-        
+        #return sub("<","&lt;",sub("&","&amp;",string))
+      return self.re_outer.sub("&lt", self.re_inner.sub("&amp", string)) 
 class Scope(object):
     def __init__(self):
         self.dicts=[]
