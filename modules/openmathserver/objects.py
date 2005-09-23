@@ -22,8 +22,11 @@ class XMLAttribute(object):
         return "".join([self.name,"=\"",self.value,"\""])
 class OMObjectBase(object):
     """ at the moment only a base class"""
-    def __init__(self):
-        self.attributes={}
+    #def __init__(self):
+    #    self.attributes={}
+    attributes={}
+    #dangerous, if you change attributes, always copy attributes
+    
     def __getChildren(self):
         try:
             return self.getChildren()
@@ -142,7 +145,7 @@ class OMObjectBase(object):
 
 class OMObject(OMObjectBase):
     def __init__(self, children):
-        super(OMObject, self).__init__()
+        #super(OMObject, self).__init__()
         self.children = children
     def getChildren(self):
         return self.__children
@@ -153,7 +156,7 @@ class OMObject(OMObjectBase):
         return OMObject([context.evaluate(c) for c in self.children])
 class OMVar(OMObjectBase):
     def __init__(self,name):
-        super(OMVar, self).__init__()
+        #super(OMVar, self).__init__()
         self.name = name
     def evaluate(self, context):
         try:
@@ -168,7 +171,7 @@ class OMVar(OMObjectBase):
         
 class OMApply(OMObjectBase):
     def __init__(self, func, args):
-        super(OMApply, self).__init__()
+        #super(OMApply, self).__init__()
         self.func = func
         self.args = args
     def evaluate(self, context):
@@ -190,7 +193,7 @@ class OMApply(OMObjectBase):
         
 class OMSymbol(OMObjectBase):
     def __init__(self,name,cd = None):
-        super(OMSymbol,self).__init__()
+        #super(OMSymbol,self).__init__()
         self.cd = cd
         self.name = name
     def __eq__(self, other):
@@ -213,7 +216,7 @@ class OMSymbol(OMObjectBase):
         raise UnsupportedOperationError
 class SimpleValue(OMObjectBase):
     def __init__(self, value):
-        super(SimpleValue, self).__init__()
+        #super(SimpleValue, self).__init__()
         if (isinstance(value, str)):
             value = self.parse(value)
         self.value = value
@@ -228,7 +231,8 @@ class OMint(SimpleValue):
     def __init__(self, value):
         if not isinstance(value, int):
             value = self.parse(value)
-        super(OMint, self).__init__(value)
+        #super(OMint, self).__init__(value)
+        self.value=value
     def parse(self, value):
         """FIXME: Not fully standard compliant,
         -> hex encodings"""
@@ -242,7 +246,8 @@ class OMint(SimpleValue):
     XMLtag = "OMI"
 class OMfloat(SimpleValue):
     def __init__(self, value):
-        super(OMfloat, self).__init__(value)
+        #super(OMfloat, self).__init__(value)
+        self.value=value
     def parse(self, value):
         """FIXME: Not fully standard compliant,
         -> hex encodings"""
@@ -254,7 +259,8 @@ class OMfloat(SimpleValue):
         return [XMLAttribute("dec" ,str(self.value))]
 class OMString(SimpleValue):
     def __init__(self,value):
-        super(OMString,self).__init__(value)
+        #super(OMString,self).__init__(value)
+        self.value=value
     def __str__(self):
         return "OMSTR("+repr(self.value)+")"
     XMLtag = "OMSTR"
@@ -262,7 +268,8 @@ class OMString(SimpleValue):
         return self.value
 class OMByteArray(SimpleValue):
     def __init__(self, value):
-        super(OMByteArray,self).__init__(value)
+        #super(OMByteArray,self).__init__(value)
+        self.value=value
     def __str__(self):
         return "OMByteArray(" + repr(self.value) + ")"
     def parse(self, value):
@@ -291,7 +298,7 @@ class OMAttributePair(OMObjectBase):
             context.evaluate(self.value))
 class OMAttribution(OMObjectBase):
     def __init__(self, *args):
-        super(OMAttribution,self).__init__()
+        #super(OMAttribution,self).__init__()
         self.attr = list(args[:-1])
         self.value = args[-1]
     def getChildren(self):
@@ -345,7 +352,7 @@ if __name__ == '__main__':
     print i.XMLEncode(context)
     #i.body="dshj"
    
-optimize(OMObjectBase.__init__)
+#optimize(OMObjectBase.__init__)
 optimize(OMObjectBase.XMLPreEncode)
 optimize(SimpleValue.__init__)
 optimize(OMint.__init__)

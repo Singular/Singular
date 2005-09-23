@@ -7,9 +7,11 @@ print(groebner(i2));
 print(i2);
 LIB("python_module.so");
 Python_module::python("from interpreter import singular_globals_proxy
-import psyco
+#import psyco
 import sys
 sys.argv=['Singular']
+#import sre_compile
+#psyco.bind(sre_compile._optimize_charset)
 #psyco.log()
 #psyco.profile()
 from CAS.singular import *
