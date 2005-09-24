@@ -1,4 +1,5 @@
 from Singular import *
+from _Singular import *
 try:
     import psyco
     def optimize(f):

@@ -1,4 +1,4 @@
-//$Id: wrapper.h,v 1.29 2005-09-20 07:16:01 bricken Exp $
+//$Id: wrapper.h,v 1.30 2005-09-24 14:12:46 bricken Exp $
 #ifndef PYTHON_SINGULAR_WRAPPER_HEADER
 #define PYTHON_SINGULAR_WRAPPER_HEADER
 #include <Python.h>
@@ -59,7 +59,7 @@ BOOST_PYTHON_MODULE(Singular){
   export_vector();
   export_playground();
   export_ideal();
-  export_interpreter();
+  //export_interpreter();
   export_ring();
   export_intvec();
   boost::python::class_<PowerSeries>("power_series")       
@@ -76,6 +76,10 @@ BOOST_PYTHON_MODULE(Singular){
   //   .def(self+self)
   //.def(self*=Number())
   //.def(Number() * self);
+
+}
+BOOST_PYTHON_MODULE(_Singular){
+export_interpreter();
 
 }
 #endif

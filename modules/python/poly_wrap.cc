@@ -18,7 +18,7 @@ static Ring Poly_get_Ring(const Poly & p){
 }
 void export_poly()
 {
-   boost::python::class_<Poly>("polynomial")
+   boost::python::class_<Poly>("polynomial", "Wrapper for poly of Singular")
     .def("ring",Poly_get_Ring)
     .def(boost::python::init <int>())
     .def(boost::python::init <Poly>())
