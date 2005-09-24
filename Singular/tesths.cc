@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.100 2005-07-27 09:59:27 Singular Exp $ */
+/* $Id: tesths.cc,v 1.101 2005-09-24 15:02:10 Singular Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -161,7 +161,7 @@ int main(          /* main entry to Singular */
   {
     int vv=verbose;
     verbose &= ~Sy_bit(V_LOAD_LIB);
-    iiLibCmd(omStrDup("standard.lib"), TRUE);
+    iiLibCmd(omStrDup("standard.lib"), TRUE,TRUE,TRUE);
     verbose=vv;
   }
   errorreported = 0;

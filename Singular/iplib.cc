@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.116 2005-07-27 09:59:26 Singular Exp $ */
+/* $Id: iplib.cc,v 1.117 2005-09-24 15:02:07 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -686,7 +686,7 @@ BOOLEAN iiTryLoadLib(leftv v, char *id)
       char libnamebuf[256];
 
       if (LT==LT_SINGULAR)
-        LoadResult = iiLibCmd(s, FALSE);
+        LoadResult = iiLibCmd(s, FALSE, FALSE,TRUE);
       #ifdef HAVE_DYNAMIC_LOADING
       else if ((LT==LT_ELF) || (LT==LT_HPUX))
         LoadResult = load_modules(s,libnamebuf,FALSE);
@@ -699,8 +699,7 @@ BOOLEAN iiTryLoadLib(leftv v, char *id)
     }
   }
   omFree(libname);
-#else /* HAVE_NAMESPACES */
-#endif /* HAVE_NAMESPACES */
+#endif /* HAVE_NS */
   return LoadResult;
 }
 
@@ -763,7 +762,7 @@ BOOLEAN iiLocateLib(const char* lib, char* where)
   return TRUE;
 }
 
-BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
+BOOLEAN iiLibCmd( char *newlib, BOOLEAN autoexport, BOOLEAN tellerror, BOOLEAN force )
 {
   char buf[256];
   char libnamebuf[128];
@@ -859,8 +858,9 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
       fclose(fp);
       return TRUE;
     }
+    if (!force) return FALSE;
   }
-  LoadResult = iiLoadLIB(fp, libnamebuf, newlib, pl, TRUE, tellerror);
+  LoadResult = iiLoadLIB(fp, libnamebuf, newlib, pl, autoexport, tellerror);
 #else /* HAVE_NS */
   LoadResult = iiLoadLIB(fp, libnamebuf, newlib, NULL, FALSE, tellerror);
 #endif /* HAVE_NS */
@@ -962,7 +962,7 @@ BOOLEAN iiLoadLIB(FILE *fp, char *libnamebuf, char*newlib,
       if(ls->to_be_done)
       {
         ls->to_be_done=FALSE;
-        iiLibCmd(ls->get());
+        iiLibCmd(ls->get(),autoexport,tellerror,FALSE);
         ls = ls->pop(newlib);
       }
     }
@@ -1046,10 +1046,12 @@ int iiAddCprocTop(char *libname, char *procname, BOOLEAN pstatic,
                BOOLEAN(*func)(leftv res, leftv v))
 {
   int r=iiAddCproc(libname,procname,pstatic,func);
+  #ifdef HAVE_NS
   package s=currPack;
   currPack=basePack;
   if (r) r=iiAddCproc(libname,procname,pstatic,func);
   currPack=s;
+  #endif
   return r;
 }
 

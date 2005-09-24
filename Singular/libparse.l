@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.l,v 1.59 2005-08-03 12:14:17 Singular Exp $ */
+/* $Id: libparse.l,v 1.60 2005-09-24 15:02:09 Singular Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -331,7 +331,7 @@ static     { p_static=TRUE; }
                h0 = enterid( proc, 0 /*myynest*/, PROC_CMD,
                                  &(IDPACKAGE(pl)->idroot), TRUE);
                if (h0==NULL) return(1);
-               if(!p_static && autoexport)
+               if((!p_static) && autoexport)
                {
                   h_top = enterid( proc, 0 /*myynest*/, PROC_CMD,
                                  &(basePack->idroot), FALSE );
@@ -347,7 +347,7 @@ static     { p_static=TRUE; }
                  iiInitSingularProcinfo(IDPROC(h0), newlib, proc,
                                 yylplineno, current_pos(0),p_static);
                  #ifdef HAVE_NS
-                 if (!p_static && h_top != NULL && autoexport)
+                 if ((!p_static) && (h_top != NULL) && autoexport)
                  {
                    if(IDPROC(h_top)!=NULL) piCleanUp((procinfo *)IDPROC(h_top));
                    IDPROC(h_top)=IDPROC(h0);

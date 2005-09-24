@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.h,v 1.42 2005-09-14 07:41:57 bricken Exp $ */
+/* $Id: ipshell.h,v 1.43 2005-09-24 15:02:07 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -57,7 +57,7 @@ char *  iiGetLibName(procinfov v);
 char *  iiGetLibProcBuffer( procinfov pi, int part=1 );
 char *  iiProcName(char *buf, char & ct, char* &e);
 char *  iiProcArgs(char *e,BOOLEAN withParenth);
-BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror=TRUE );
+BOOLEAN iiLibCmd( char *newlib, BOOLEAN autoexport, BOOLEAN tellerror, BOOLEAN force );
 /* sees wheter library lib has already been loaded
    if yes, writes filename of lib into where and returns TRUE,
    if  no, returns FALSE
