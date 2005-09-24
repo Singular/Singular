@@ -1,5 +1,6 @@
 from Singular import *
-from _Singular import *
+#from _Singular import *
+import _Singular
 try:
     import psyco
     def optimize(f):
@@ -12,7 +13,7 @@ def debug_out(s):
   #print s
 #def build_arg_list(*args)
 def list2arg_list(args):
-    l=i_arg_list()
+    l=_Singular.i_arg_list()
     for a in args:
         if isinstance(a,list):
             l.append(list2arg_list(a))
@@ -24,12 +25,19 @@ def list2arg_list(args):
             l.append(a)
     return l
 class singular_globals_proxy(object):
+    def __mycbm(self,name,*args):
+      l=list2arg_list(args)
+      prepare_ring(args)
+      res= _Singular.cbm(name,l)
+      finish_ring()
+      return res
+
     def __getattr__(self,name):
-        proc=get_idhdl(name)
+        proc=_Singular.get_idhdl(name)
         if proc.is_zero():
-            if is_builtin(name):
+            if _Singular.is_builtin(name):
                 def fun_wrapper(*args):
-                    return mycbm(name,*args)
+                    return self.__mycbm(name,*args)
                 try:
                     fun_wrapper.__name__=name
                 except:
@@ -41,13 +49,13 @@ class singular_globals_proxy(object):
             def fun_wrapper(*args):
                 
                 
-                proc=get_idhdl(name)
+                proc=_Singular.get_idhdl(name)
                 if not proc.is_proc():
                     proc.print_type()
                     raise Exception
                 prepare_ring(args)
                 l=list2arg_list(args)
-                erg= call_interpreter_method(proc, l)
+                erg= _Singular.call_interpreter_method(proc, l)
                 finish_ring()
                 return erg
             try:
@@ -56,12 +64,12 @@ class singular_globals_proxy(object):
                 pass
             return fun_wrapper
         else:
-            res=transfer_to_python(proc)
+            res=_Singular.transfer_to_python(proc)
             if res is None:
                 raise AttributeError("Global variable "+name+" has unknown type")
             return res
     def __setattr__(self,name,value):
-        id=get_idhdl(name)
+        id=_Singular.get_idhdl(name)
         if id.is_zero():
             raise Expception
         else:
@@ -71,12 +79,6 @@ class singular_globals_proxy(object):
 #for compatibility the old name
 global_functions=singular_globals_proxy
 
-def mycbm(name,*args):
-    l=list2arg_list(args)
-    prepare_ring(args)
-    res= cbm(name,l)
-    finish_ring()
-    return res
 
 def find_rings(arglist):
   """FIXME: doesn't handle everything and depth"""

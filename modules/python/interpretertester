@@ -55,8 +55,8 @@ proc testproc6(poly p, poly q){
 }
 list mylist=1,2,3;
 LIB("python_module.so");
-Python_module::python("from Singular import number,  polynomial, interpreter_id, get_idhdl,call_interpreter_method, i_arg_list, gen, ideal
-print call_interpreter_method
+Python_module::python("from Singular import number,  polynomial, gen, ideal
+
 from interpreter import global_functions
 functions=global_functions()
 functions.setring(functions.r)
