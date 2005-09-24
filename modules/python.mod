@@ -1,6 +1,6 @@
 %{
 /*
- *  $Id: python.mod,v 1.1 2005-05-22 12:38:19 bricken Exp $
+ *  $Id: python.mod,v 1.2 2005-09-24 14:14:35 bricken Exp $
  *
  *  Python module
  */
@@ -19,12 +19,14 @@ void mbpython(char* in);
 
 category="tests";
 package="python_module";
-version	= "$Id: python.mod,v 1.1 2005-05-22 12:38:19 bricken Exp $";
+version	= "$Id: python.mod,v 1.2 2005-09-24 14:14:35 bricken Exp $";
 info	="LIBRARY: kernel.lib  PROCEDURES OF GENERAL TYPE WRITEN IN C python(input); eval a string  in python";
 //files= wrapper.cc;
 %modinitial
   Py_Initialize();
   initSingular();
+  init_Singular();
+
 %endinitial
 
 %procedures
