@@ -1,0 +1,118 @@
+
+<!doctype html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module interpreter</title>
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>interpreter</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/Users/michael/sing3/modules/python/interpreter.py">/Users/michael/sing3/modules/python/interpreter.py</a></font></td></tr></table>
+    <p></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#fffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="_Singular.html">_Singular</a><br>
+</td><td width="25%" valign=top></td><td width="25%" valign=top></td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ee77aa">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="__builtin__.html#object">__builtin__.object</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="interpreter.html#singular_globals_proxy">singular_globals_proxy</a>
+</font></dt><dt><font face="helvetica, arial"><a href="interpreter.html#singular_globals_proxy">singular_globals_proxy</a>
+</font></dt></dl>
+</dd>
+</dl>
+ <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><strong>global_functions</strong> = <a name="global_functions">class singular_globals_proxy</a>(<a href="__builtin__.html#object">__builtin__.object</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>The&nbsp;Most&nbsp;import&nbsp;class<br>
+singular=<a href="#singular_globals_proxy">singular_globals_proxy</a>()<br>
+for&nbsp;some&nbsp;ideal<br>
+&nbsp;&nbsp;singular.groebner(i)<br>
+&nbsp;&nbsp;singular.std(i)<br>
+in&nbsp;general&nbsp;all&nbsp;interpreter&nbsp;and&nbsp;kernel&nbsp;functions<br>
+with&nbsp;supported&nbsp;data&nbsp;type&nbsp;work<br>
+for&nbsp;some&nbsp;global&nbsp;poly&nbsp;variable&nbsp;p&nbsp;in&nbsp;the&nbsp;interpreter&nbsp;and&nbsp;p&nbsp;in&nbsp;python<br>
+&nbsp;&nbsp;singular.p=p<br>
+&nbsp;&nbsp;p=singular.p<br>
+this&nbsp;is&nbsp;always&nbsp;a&nbsp;copy&nbsp;as&nbsp;this&nbsp;<a href="__builtin__.html#object">object</a>&nbsp;is&nbsp;only&nbsp;some&nbsp;magic&nbsp;proxy<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="singular_globals_proxy-__getattr__"><strong>__getattr__</strong></a>(self, name)</dt></dl>
+
+<dl><dt><a name="singular_globals_proxy-__setattr__"><strong>__setattr__</strong></a>(self, name, value)</dt></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>__dict__</strong> = &lt;dictproxy object&gt;<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dl>
+
+<dl><dt><strong>__weakref__</strong> = &lt;attribute '__weakref__' of 'singular_globals_proxy' objects&gt;<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;<a href="__builtin__.html#object">object</a>&nbsp;(if&nbsp;defined)</tt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="singular_globals_proxy">class <strong>singular_globals_proxy</strong></a>(<a href="__builtin__.html#object">__builtin__.object</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>The&nbsp;Most&nbsp;import&nbsp;class<br>
+singular=<a href="#singular_globals_proxy">singular_globals_proxy</a>()<br>
+for&nbsp;some&nbsp;ideal<br>
+&nbsp;&nbsp;singular.groebner(i)<br>
+&nbsp;&nbsp;singular.std(i)<br>
+in&nbsp;general&nbsp;all&nbsp;interpreter&nbsp;and&nbsp;kernel&nbsp;functions<br>
+with&nbsp;supported&nbsp;data&nbsp;type&nbsp;work<br>
+for&nbsp;some&nbsp;global&nbsp;poly&nbsp;variable&nbsp;p&nbsp;in&nbsp;the&nbsp;interpreter&nbsp;and&nbsp;p&nbsp;in&nbsp;python<br>
+&nbsp;&nbsp;singular.p=p<br>
+&nbsp;&nbsp;p=singular.p<br>
+this&nbsp;is&nbsp;always&nbsp;a&nbsp;copy&nbsp;as&nbsp;this&nbsp;<a href="__builtin__.html#object">object</a>&nbsp;is&nbsp;only&nbsp;some&nbsp;magic&nbsp;proxy<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="singular_globals_proxy-__getattr__"><strong>__getattr__</strong></a>(self, name)</dt></dl>
+
+<dl><dt><a name="singular_globals_proxy-__setattr__"><strong>__setattr__</strong></a>(self, name, value)</dt></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>__dict__</strong> = &lt;dictproxy object&gt;<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dl>
+
+<dl><dt><strong>__weakref__</strong> = &lt;attribute '__weakref__' of 'singular_globals_proxy' objects&gt;<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;<a href="__builtin__.html#object">object</a>&nbsp;(if&nbsp;defined)</tt></dl>
+
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-debug_out"><strong>debug_out</strong></a>(s)</dt></dl>
+ <dl><dt><a name="-find_rings"><strong>find_rings</strong></a>(arglist)</dt><dd><tt>FIXME:&nbsp;doesn't&nbsp;handle&nbsp;everything&nbsp;and&nbsp;depth</tt></dd></dl>
+ <dl><dt><a name="-finish_ring"><strong>finish_ring</strong></a>()</dt></dl>
+ <dl><dt><a name="-list2arg_list"><strong>list2arg_list</strong></a>(args)</dt><dd><tt>#def&nbsp;build_arg_list(*args)</tt></dd></dl>
+ <dl><dt><a name="-optimize"><strong>optimize</strong></a>(f)</dt></dl>
+ <dl><dt><a name="-prepare_ring"><strong>prepare_ring</strong></a>(arglist)</dt></dl>
+</td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>oldrings</strong> = []</td></tr></table>
+</body></html>

@@ -25,6 +25,17 @@ def list2arg_list(args):
             l.append(a)
     return l
 class singular_globals_proxy(object):
+    """The Most import class
+      singular=singular_globals_proxy()
+      for some ideal
+        singular.groebner(i)
+        singular.std(i)
+      in general all interpreter and kernel functions
+      with supported data type work
+      for some global poly variable p in the interpreter and p in python
+        singular.p=p
+        p=singular.p
+      this is always a copy as this object is only some magic proxy"""
     def __mycbm(self,name,*args):
       l=list2arg_list(args)
       prepare_ring(args)
