@@ -153,6 +153,8 @@ if __name__=='__main__':
     doc=builder.build(root)
     if eval:
         doc=context.evaluate(doc)
+    #import profile
+    #profile.run('output=context.XMLEncodeObject(doc)','encodeprof')
     output=context.XMLEncodeObject(doc)
     try:
         out=open(outputf,"w")

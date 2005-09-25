@@ -3,6 +3,7 @@ from omexceptions import UnsupportedOperationError
 from  omexceptions import OutOfScopeError, EvaluationFailedError
 from exceptions import NotImplementedError
 from copy import copy
+from xml.sax.xmlreader import AttributesImpl as attr
 import base64
 #TODO: OMOBJ, OME, OMATTR
 #from cd import *
@@ -72,14 +73,14 @@ class OMObjectBase(object):
         except AttributeError:
             raise UnsupportedOperationError
     def __getXMLAttributes(self):
-        try:
+        if hasattr(self, "getXMLAttributes"):
             return self.getXMLAttributes()
-        except AttributeError:
-            try:
-                return self.__XMLAttributes
-            except AttributeError:
+        if hasattr(self,"__XMLAttributes"):
+            return self.__XMLAttributes
+        return {}
+            #except AttributeError:
                 #do return None, cause if modifiying a new list, changes will not be saved
-                return []
+            #    return {}
     def __delXMLAttributes(self):
         try:
             self.delXMLAttributes()
@@ -142,7 +143,16 @@ class OMObjectBase(object):
                 encodingList.append(context.XMLEncodeBody(body))
         encodingList.extend(["</"+self.XMLtag+">"])
         return encodingList
-
+    def XMLSAXEncode(self, context, generator):
+        #works not for attp
+        generator.startElement(self.XMLtag, attr(self.XMLAttributes))
+        for c in self.children:
+          c.XMLSAXEncode(context, generator)
+        if not self.children:
+          body=self.body
+          if body:
+            generator.characters(self.body)
+        generator.endElement(self.XMLtag)
 class OMObject(OMObjectBase):
     def __init__(self, children):
         #super(OMObject, self).__init__()
@@ -209,9 +219,10 @@ class OMSymbol(OMObjectBase):
         return context.evaluateSymbol(self)
     XMLtag="OMS"
     def getXMLAttributes(self):
-        return [XMLAttribute("name", self.name),\
-                 XMLAttribute("cdbase", self.cd.base),\
-                 XMLAttribute("cd", self.cd.name)]
+        #return [XMLAttribute("name", self.name),\
+        #         XMLAttribute("cdbase", self.cd.base),\
+        #         XMLAttribute("cd", self.cd.name)]
+        return {"name":self.name, "cdbase":self.cd.base, "cd": self.cd.name}
     def setXMLAttributes(self):
         raise UnsupportedOperationError
 class SimpleValue(OMObjectBase):
@@ -256,7 +267,7 @@ class OMfloat(SimpleValue):
         return "OMfloat("+repr(self.value)+")"
     XMLtag = "OMF"
     def getXMLAttributes(self):
-        return [XMLAttribute("dec" ,str(self.value))]
+        return {"dec":str(self.value)}
 class OMString(SimpleValue):
     def __init__(self,value):
         #super(OMString,self).__init__(value)

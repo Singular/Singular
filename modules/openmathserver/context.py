@@ -4,6 +4,8 @@ from cd import *
 from omexceptions import *
 from objects import *
 from re import compile
+import StringIO
+from xml.sax.saxutils import XMLGenerator
 class Context(object):
     #TODO: Referenzen durch scope richtig behandeln
     def __init__(self):
@@ -73,6 +75,10 @@ class Context(object):
     def XMLEncodeObject(self, obj):
         #TODO: Make Attribution List attributes
         #TODO: Make all objects __hash__ and __eq__
+        out=StringIO.StringIO()
+        G=XMLGenerator(out)
+        obj.XMLSAXEncode(self,G)
+        return out.getvalue()
         if (len(obj.attributes)==0):
             return "".join(obj.XMLPreEncode(self))
         else:
