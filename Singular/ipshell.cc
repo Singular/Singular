@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.127 2005-08-26 16:02:49 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.128 2005-09-26 13:31:01 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1781,6 +1781,20 @@ ring rCompose(const lists  L)
   if (L->m[0].Typ()==INT_CMD)
   {
     R->ch=(int)(long)L->m[0].Data();
+    if (R->ch!=-1)
+    {
+      int l;
+      if (((R->ch!=0) && (R->ch<2))
+      #ifndef NV_OPS
+      || (R->ch > 32003)
+      #endif
+      || ((l=IsPrime(R->ch))!=R->ch)
+      )
+      {
+        Warn("%d is invalid characteristic of ground field. %d is used.", R->ch,l);
+        R->ch=l;
+      }
+    }
   }
   else if (L->m[0].Typ()==LIST_CMD)
   {
@@ -4387,7 +4401,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   {
     int l = 0;
 
-    if (ch!=0 && (ch<2)
+    if (((ch!=0) && (ch<2))
     #ifndef NV_OPS
     || (ch > 32003)
     #endif
