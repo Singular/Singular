@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: standard.lib,v 1.72 2005-07-25 14:46:50 bricken Exp $";
+version="$Id: standard.lib,v 1.73 2005-09-27 16:52:57 Singular Exp $";
 category="Miscellaneous";
 info="
 LIBRARY: standard.lib   Procedures which are always loaded at Start-up
@@ -137,6 +137,7 @@ example
 }
 //////////////////////////////////////////////////////////////////////////
 
+//////////////////////////////////////////////////////////////////////////
 proc groebner(def i, list #)
 "SYNTAX: @code{groebner (} ideal_expression @code{)} @*
          @code{groebner (} module_expression @code{)} @*
@@ -292,54 +293,77 @@ EXAMPLE: example groebner;  shows an example"
   { option(intStrategy); }
 
   // construct ring in which first std computation is done
-  string varstr_P = varstr(P);
-  string parstr_P = parstr(P);
-  int is_homog = (homog(i) && (npars_P <= 1));
+  // CL: 21/09/05 for Singular 3-0 with ringlists....
+
+  list BRlist = ringlist(P);
   int add_vars = 0;
-  string ri = "ring Phelp =";
+  int nvarP = nvars(P);
+  int k;
+  ideal Qideal = ideal(P);  
+  string ri;
 
   if (npars_P > 0)
   {
-    for(int k=ncols(i); k>0; k--) { i[k]=cleardenom(i[k]); }
+    for(k=ncols(i); k>0; k--) { i[k]=cleardenom(i[k]); }
   }
   // more than one parameters are converted to ring variables
   if (npars_P > 1)
   {
-    ri = ri + string(char(P)) + ",(" + varstr_P + "," + parstr_P;
+    for (k=1; k<=npars_P; k++) 
+    {
+      BRlist[2][nvarP+k] = BRlist[1][2][k]; 
+    }
+    BRlist[1]=BRlist[1][1];
     add_vars = npars_P;
   }
-  else
+
+    
+  // for Hilbert driven approach, Qring structure is removed (defining ideal
+  // will be added to the ideal under consideration in the process).  
+  if (size(BRlist[4])>0)
   {
-    ri = ri + "(" + charstr(P) + "),(" + varstr_P;
-  }
+    int was_qring = 1;
+    BRlist[4] = ideal(0);
+  } 
 
   // a homogenizing variable is added, if necessary
+  int is_homog = (homog(i) && (npars_P <= 1));
   if (! is_homog)
   {
-    ri = ri + ",@t";
     add_vars = add_vars + 1;
+    BRlist[2][nvarP+add_vars] = "@t@"; 
   }
+  // save ordering for later use
+  list ord_P = BRlist[3];   // should be ring independent
+
   // ordering is set to (dp, C)
-  ri = ri + "),(dp,C);";
+  intvec weight_dp = 1;
+  for (k=2; k<=nvarP+add_vars; k++) { weight_dp = weight_dp,1; } 
+  BRlist[3] = list();
+  BRlist[3][1]=list("dp",weight_dp);
+  BRlist[3][2]=list("C",intvec(0));
 
   // change the ring
-  execute(ri);
+  def Phelp = ring(BRlist);
+  kill BRlist;
+  setring Phelp;
 
   // get ideal from previous ring
   if (is_homog)
   {
-    ideal qh = imap(P, i);
+    ideal qh = imap(P, i), imap(P,Qideal);
   }
   else
   {
     // and homogenize
-    ideal qh=homog(imap(P,i),@t);
+    ideal qh = homog(imap(P,i),@t@), homog(imap(P,Qideal),@t@);
   }
 
   // compute std and hilbert series
   if (p_opt)
   {
-    "std in " + ri[13, size(ri) - 13];
+    ri = string(Phelp);
+    "std in " + ri;
   }
   intvec hi=hilb(std(qh),1);
 
@@ -358,24 +382,47 @@ EXAMPLE: example groebner;  shows an example"
   {
     // additional variables were introduced
     // need another intermediate ring
-    ri = "ring Phelp1 = (" + charstr(Phelp)
-      + "),(" + varstr(Phelp) + "),(" + ordstr_P;
-
-    // for lp wit at most one parameter, we do not need a block ordering
-    if ( ! (IsSimple_P && (add_vars <2) && find(ordstr_P, "l")))
+    list BRlist = ringlist(Phelp);
+    BRlist[3] = list();
+    for (k=1; k<=size(ord_P); k++)
     {
-      // need block ordering
-      ri = ri + ", dp(" + string(add_vars) + ")";
+      BRlist[3][k] = ord_P[k];
     }
-    ri = ri + ");";
+
+    if ( IsSimple_P && (add_vars==1) && (size(ord_P)==2) && (ord_P[1][1]=="lp") )
+    {
+      // for lp with at most one parameter, we do not need a block ordering
+      intvec OW = BRlist[3][1][2];
+      OW = OW,1;
+      BRlist[3][1][2] = OW;
+    }
+    else 
+    {
+      if ( IsSimple_P && (add_vars==1) && (size(ord_P)==2) && (ord_P[2][1]=="lp") )
+      {
+        // for lp with at most one parameter, we do not need a block ordering
+        intvec OW = BRlist[3][2][2];
+        OW = OW,1;
+        BRlist[3][2][2] = OW;
+      }
+      else
+      {
+        intvec OW = 1;
+        for (k=2; k<=add_vars; k++) { OW = OW,1; }
+        BRlist[3][size(ord_P)+1] = list("dp",OW);
+      }
+    }
 
     // change to intermediate ring
-    execute(ri);
+    def Phelp1 = ring(BRlist);
+    setring Phelp1;
+
     ideal qh = imap(Phelp, qh);
     kill Phelp;
     if (p_opt)
     {
-      "std with hilb in " + ri[14,size(ri)-14];
+      ri = string(Phelp1);
+      "std with hilb in " + ri;
     }
     // compute std with Hilbert series
     qh = std(qh, hi);
@@ -386,7 +433,7 @@ EXAMPLE: example groebner;  shows an example"
       {
         "dehomogenization";
       }
-      qh = subst(qh, @t, 1);
+      qh = subst(qh, @t@, 1);
     }
 
     // go back to original ring
@@ -432,7 +479,6 @@ example
   if (system("with","MP")) {groebner(i,0);}
   defined(groebner_error);
 }
-//////////////////////////////////////////////////////////////////////////
 
 proc res(list #)
 "@c we do texinfo here:

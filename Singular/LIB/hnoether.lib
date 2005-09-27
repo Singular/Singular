@@ -1,4 +1,4 @@
-version="$Id: hnoether.lib,v 1.49 2005-05-18 17:55:57 Singular Exp $";
+version="$Id: hnoether.lib,v 1.50 2005-09-27 16:52:55 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  hnoether.lib   Hamburger-Noether (Puiseux) Expansion
@@ -512,7 +512,7 @@ NOTE:    The optional parameter @code{n} affects only the computation of
          @code{printlevel=0}).
 SEE ALSO: hnexpansion, extdevelop, displayHNE
 EXAMPLES: example develop;         shows an example
-          example paramametrize;   shows an example for using the 2nd parameter
+          example parametrize;     shows an example for using the 2nd parameter
 "
 {
  //--------- Abfangen unzulaessiger Ringe: 1) nur eine Unbestimmte ------------
@@ -922,7 +922,7 @@ RETURN: If L are the HN data of an irreducible plane curve singularity f: a
         polynomials p[1],p[2]: if the HNE was finite then f(p[1],p[2])=0};
         if not, the true parametrization will be given by two power series,
         and p[1],p[2] are truncations of these series.@*
-        - if the optional parameter x is given, the result is a list l:
+        - if the optional parameter s is given, the result is a list l:
         l[1]=param(L) (ideal) and l[2]=intvec with two entries indicating
         the highest degree up to which the coefficients of the monomials in
         l[1] are exact (entry -1 means that the corresponding parametrization

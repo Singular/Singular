@@ -1,4 +1,4 @@
-version="$Id: brnoeth.lib,v 1.16 2005-05-10 17:48:25 Singular Exp $";
+version="$Id: brnoeth.lib,v 1.17 2005-09-27 16:52:54 Singular Exp $";
 category="Coding theory";
 info="
 LIBRARY:   brnoeth.lib  Brill-Noether Algorithm, Weierstrass-SG and AG-codes
@@ -900,11 +900,11 @@ static proc rationalize (lf,string datum,string rel)
   //   and larger coefficients field, where the generator of current ring is
   //   given by string "rel" and "datum" is actually defined over the small
   //   field
-  // warning : "ring lf must have only variables (x,y) and basering must have
+  // warning : ring lf must have only variables (x,y) and basering must have
   //           at least (x,y)
   // warning : the case of minpoly=0 is supposed unnecessary, since then
-  //           "datum" should be
-  //   already written only int the right way, i.e. in terms of the prime field
+  //           "datum" should be already written in the right way, i.e. in 
+  //           terms of the prime field
   def base_r=basering;
   if (rel=="a")
   {
@@ -919,11 +919,18 @@ static proc rationalize (lf,string datum,string rel)
     setring lf;
     execute("string sdatum=string("+datum+");");
     ring auxring=char(basering),(a,b,x,y,t),lp;
+//  execute("poly pdatum="+datum+";");
     execute("poly pdatum="+sdatum+";");
-    execute("poly prel=b-"+rel+";");
-    ideal I=pdatum,prel;
-    I=eliminate(I,a);
-    poly newdatum=I[1];   // hopefully it was done correctly and size(I)=1 !!!!
+    execute("poly prel=b-("+rel+");");
+// was before:
+//    ideal I=pdatum,prel;
+//    I=eliminate(I,a);
+//    if (size(I)<=1){ poly newdatum=I[1]; }
+//    else { ERROR("Elimination error"); }
+// CL 09/05 new:
+    poly newdatum=reduce(pdatum,std(prel));
+newdatum;
+//
     newdatum=subst(newdatum,b,a);
     string snewdatum=string(newdatum);
     setring base_r;
@@ -1147,16 +1154,20 @@ static proc place (intvec Pp,int sing,list CURVE)
   export(CHI);
   int i,j,k;
   int m,n;
-//  list L@HNE=essdevelop(CHI);
   list LLL=ratdevelop(CHI);
+//  list LLL=hnexpansion(CHI,"ess");
   if (typeof(LLL[1])=="ring") {
     def altring=basering;
     def HNEring = LLL[1]; setring HNEring;
-    def L@HNE = hne;
-    kill hne;
+    def L@HNE = HND;
+    kill HND;
+//    def L@HNE = hne;
+//    kill hne;
+
   }
   else {
     def L@HNE=LLL;
+//    def L@HNE=LLL[1];
     def HNEring=basering;
     setring HNEring;
   }
@@ -1275,10 +1286,10 @@ check=0;
     else
     {
       // we start with a rational point but we get non-rational branches
-      // they may have different degrees and then we may need reduce the
+      // they may have different degrees and then we may need to reduce the
       // field extensions for each one, and finally check if the minpoly
-      // fetchs with S(i) or not
-      // if one of the branches is rational, we may trust that is is written
+      // fetches with S(i) or not
+      // if one of the branches is rational, we may trust that it is written
       // correctly
       if (sing==1)
       {
@@ -1393,7 +1404,7 @@ check=0;
         }
         else
         {
-          // rationalize branche
+          // rationalize branch
           setring HNEring;
           newa=subfield(S(ext_0));
           m=nrows(L@HNE[i][1]);
@@ -2340,7 +2351,7 @@ NOTE:       W,V must be given with maximal rank
 }
 ///////////////////////////////////////////////////////////////////////////////
 static proc supplem (matrix M)
-"USAGE:      suplement(M), where M is a matrix of numbers with maximal rank
+"USAGE:      supplem(M), where M is a matrix of numbers with maximal rank
 RETURN:     matrix whose rows generate a supplementary vector space of <M> in
             k^n, where k is the base field and n is the number of columns
 SEE ALSO:   supplement
@@ -2506,7 +2517,7 @@ static proc interpolating_forms (intvec D,int n,list CURVE)
         nr=ncols(BRANCHES[ip][1]);
         if ( ordx>-1 || ordy>-1 )
         {
-          while ( ( RR>ordx && ordx>-1 ) || ( RR>ordy && ordy>-1 ) )
+          while ( ( RR>=ordx && ordx>-1 ) || ( RR>=ordy && ordy>-1 ) )
           {
             BRANCHES[ip]=extdevelop(BRANCHES[ip],2*nr);
             nr=ncols(BRANCHES[ip][1]);
@@ -2606,7 +2617,7 @@ static proc interpolating_forms (intvec D,int n,list CURVE)
         nr=ncols(BRANCHES[ip][1]);
         if ( ordx>-1 || ordy>-1 )
         {
-          while ( ( RR>ordx && ordx>-1 ) || ( RR>ordy && ordy>-1 ) )
+          while ( ( RR>=ordx && ordx>-1 ) || ( RR>=ordy && ordy>-1 ) )
           {
             BRANCHES[ip]=extdevelop(BRANCHES[ip],2*nr);
             nr=ncols(BRANCHES[ip][1]);
@@ -2704,9 +2715,9 @@ static proc interpolating_forms (intvec D,int n,list CURVE)
       nr=ncols(BRANCH[1]);
       if ( ordx>-1 || ordy>-1 )
       {
-        while ( ( RR>ordx && ordx>-1 ) || ( RR>ordy && ordy>-1 ) )
+        while ( ( RR>=ordx && ordx>-1 ) || ( RR>=ordy && ordy>-1 ) )
         {
-          BRANCH[1]=extdevelop(BRANCH,2*nr);
+          BRANCH=extdevelop(BRANCH,2*nr);
           nr=ncols(BRANCH[1]);
           PARAMETRIZATION=param(BRANCH,0);
           xt=PARAMETRIZATION[1][1];
@@ -2794,7 +2805,7 @@ static proc local_IN (poly h,int m)
     int inum=mindeg(ht);
     if ( ordx>-1 || ordy>-1 )
     {
-      while ( ( inum>ordx && ordx>-1 ) || ( inum>ordy && ordy>-1 ) )
+      while (((inum>ordx||inum==-1) && ordx>-1) || ((inum>ordy||inum==-1) && ordy>-1))
       {
         BRANCHES[m]=extdevelop(BRANCHES[m],2*nr);
         nr=ncols(BRANCHES[m][1]);
@@ -2803,6 +2814,7 @@ static proc local_IN (poly h,int m)
         yt=PARAMETRIZATIONS[m][1][2];
         ordx=PARAMETRIZATIONS[m][2][1];
         ordy=PARAMETRIZATIONS[m][2][2];
+        phi=BR,xt,yt,1;
         ht=phi(h);
         inum=mindeg(ht);
       }
@@ -2820,7 +2832,7 @@ static proc local_IN (poly h,int m)
     int inum=mindeg(ht);
     if ( ordx>-1 || ordy>-1 )
     {
-      while ( ( inum>ordx && ordx>-1 ) || ( inum>ordy && ordy>-1 ) )
+      while (((inum>ordx||inum==-1) && ordx>-1) || ((inum>ordy||inum==-1) && ordy>-1))
       {
         BRANCH=extdevelop(BRANCH,2*nr);
         nr=ncols(BRANCH[1]);
@@ -2829,6 +2841,7 @@ static proc local_IN (poly h,int m)
         yt=PARAMETRIZATION[1][2];
         ordx=PARAMETRIZATION[2][1];
         ordy=PARAMETRIZATION[2][2];
+        phi=BR,xt,yt,1;
         ht=phi(h);
         inum=mindeg(ht);
       }
@@ -2914,7 +2927,7 @@ static proc extra_place (ideal P)
   map phi=base_r,x+A,y+B;
   poly LOC_EQ=phi(CHI);
   kill A,B,phi;
-  list LLL=essdevelop(LOC_EQ);
+  list LLL=hnexpansion(LOC_EQ,"ess");
   if (typeof(LLL[1])=="ring") {
     def altring=basering;
     def HNEring = LLL[1];
@@ -4757,12 +4770,12 @@ example
   print(L[1]*transpose(L[2]));
 }
 
-////////////// this procedure should move in hnoether.lib /////////
+////////////// this procedure should be moved to hnoether.lib /////////
 static proc ratdevelop (poly chi)
 {
   int ring_is_changed;
   int k1=res_deg();
-  list L=essdevelop(chi);
+  list L=hnexpansion(chi,"ess");
   if (typeof(L[1])=="ring") {
     def altring=basering;
     def HNring = L[1]; setring HNring;
