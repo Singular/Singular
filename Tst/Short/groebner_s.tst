@@ -9,4 +9,12 @@ gls[3]=9x3+10y2+5z3+6;
 option(prot);
 groebner(gls);
 
+//----------------------------------------------
+ring r=0,(x,y),lp;
+ideal i=x+1;
+qring q=std(i);
+ideal j=x,y;
+groebner(j);
+kill r;
+
 tst_status(1);$

@@ -1,6 +1,6 @@
 LIB "tst.lib";
 tst_init();
-tst_ignore("CVS ID $Id: brnoeth_s.tst,v 1.3 2005-05-10 18:02:50 Singular Exp $");
+tst_ignore("CVS ID $Id: brnoeth_s.tst,v 1.4 2005-09-27 17:46:29 Singular Exp $");
 
 // tst_status();
 
@@ -187,6 +187,27 @@ y[1,26]=a+1;
 print(decodeSV(y,SV3));
 
 // killall();
+
+// char 3 !
+
+ring r=3,(x,y),dp;
+list C=Adj_div(2x+x3+2x5+(1+x2+x4)*y4+x6y12);
+C=NSplaces(1..2,C);
+C=extcurve(2,C);
+
+def SS1=C[1][5];
+setring SS1;
+POINTS;
+
+setring r;
+def SS2=C[5][2][1];
+setring SS2;
+
+
+def RR=C[1][2];
+setring RR;
+list WS=Weierstrass(17,6,C);
+WS;
 
 
 tst_status(1);
