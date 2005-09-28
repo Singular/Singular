@@ -25,7 +25,7 @@ def list2arg_list(args):
             l.append(a)
     return l
 class singular_globals_proxy(object):
-    """The Most import class
+    """The Most important class
       singular=singular_globals_proxy()
       for some ideal
         singular.groebner(i)
