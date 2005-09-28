@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.11 2005-08-18 07:53:48 bricken Exp $ */
+/* $Id: ring.h,v 1.12 2005-09-28 15:00:37 Singular Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -28,6 +28,7 @@ void   rKill(idhdl h);
 void   rKill(ring r);
 ring   rCopy(ring r);
 ring rCopy0(ring r, BOOLEAN copy_qideal = TRUE, BOOLEAN copy_ordering = TRUE);
+void   rNameCheck(ring R);
 ring   rOpposite(ring r);
 ring   rEnvelope(ring r);
 

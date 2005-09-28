@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.128 2005-09-26 13:31:01 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.129 2005-09-28 15:01:20 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1874,6 +1874,7 @@ ring rCompose(const lists  L)
     WerrorS("variable must be given as `list`");
     goto rCompose_err;
   }
+  rNameCheck(R);
   // ------------------------ ORDER ------------------------------
   if (L->m[2].Typ()==LIST_CMD)
   {
@@ -4504,6 +4505,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
       }
     }
   }
+  rNameCheck(R);
   /* ordering -------------------------------------------------------------*/
   if (rSleftvOrdering2Ordering(ord, R))
     goto rInitError;

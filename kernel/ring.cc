@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.41 2005-08-18 07:53:47 bricken Exp $ */
+/* $Id: ring.cc,v 1.42 2005-09-28 15:00:18 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -85,8 +85,6 @@ static void rOptimizeLDeg(ring r);
 
 // internally changes the gloabl ring and resets the relevant
 // global variables:
-// complete == FALSE : only delete operations are enabled
-// complete == TRUE  : full reset of all variables
 void rChangeCurrRing(ring r)
 {
   /*------------ set global ring vars --------------------------------*/
@@ -106,6 +104,23 @@ void rChangeCurrRing(ring r)
   }
 }
 
+void rNameCheck(ring R)
+{
+  int i,j;
+  for(i=0;i<R->N-1;i++)
+  {
+    for(j=i+1;j<R->N;j++)
+    {
+      if (strcmp(R->names[i],R->names[j])==0)
+      {
+        Warn("name conflict var(d) and var(%d): `%s`",i+1,j+1,R->names[i]);
+        omFree(R->names[j]);
+        R->names[j]=(char *)omAlloc(10);
+        sprintf(R->names[j],"@(%d)",j+1);
+      }
+    }
+  }
+}
 
 ring rDefault(int ch, int N, char **n)
 {
