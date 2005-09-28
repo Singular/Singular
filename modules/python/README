@@ -8,6 +8,9 @@ have a working Singular build directory
 NOSTREAMIO disabled in factory (rebuild also claptmpl.o in Singular)
 install python-numeric (for matrix report)
 
+Suggested additional modules:
+probstat: fast (C-Impl.) combinatorics (permutations, cartesian products)
+
 supported interpreter values:
 
 INPUT:
