@@ -1,4 +1,4 @@
-% $Id: usercard.tex,v 1.6 1998-06-18 20:27:38 schmidt Exp $
+% $Id: usercard.tex,v 1.7 2005-09-29 13:10:32 Singular Exp $
 
 %
 % usercard.tex - Singular user quick reference card.
@@ -8,7 +8,7 @@
 
 \centerline{\hbf SINGULAR Quick Reference}
 
-\centerline{\srm {\ssc Singular} Version 1.2.0}
+\centerline{\srm {\ssc Singular} Version 3-0}
 
 \bigskip
 
@@ -39,7 +39,7 @@ quit;&				exit \Singular; also {\tt exit;} or {\tt \$}\cr
 \sec Getting help()
 help;&				enter online help system\cr
 help {\it topic\/};&		describe {\it topic\/}; also {\tt? {\it topic\/};}\cr
-\subsec{Inside the online help system:}
+\subsec{Inside the info help system:}
 \ctl h&				get help on help system\cr
 q&				exit from help system\cr
 n\rmslash p\rmslash u&		go to next/previous/upper node\cr
@@ -89,7 +89,7 @@ parentheses, resulting in so-called {\it indexed names}.\cr
 \endsec
 
 \vfill
-\centerline{\srm \copyright 1998 \qquad Permissions on back}
+\centerline{\srm \copyright 1998-2005 \qquad Permissions on back}
 
 \eject
 
@@ -105,11 +105,11 @@ parentheses, resulting in so-called {\it indexed names}.\cr
 				current base\-ring with respect to {\it
 				ideal\/}.  {\it ideal\/} has to be a standard
 				basis.  Make {\it name\/} the new basering.\cr
-\subsec{Available {\bit basefields\/}:}
+\subsec{Examples of available {\bit basefields\/}:}
 0&				the rational numbers\cr
 \it p&				the finite field $Z_p$ with {\it p\/}
 				elements,\par
-				$2 \le p \le 32003$ a prime\cr
+				$2 \le p \le 2147483629$ a prime\cr
 ({\it p\/}\^{}{\it n}, {\it gen\/})&
 				the finite field with $p^n$ elements, {\it p\/}
 				a prime and\par $4 \le p^n \le 32671$. The name
@@ -125,8 +125,8 @@ parentheses, resulting in so-called {\it indexed names}.\cr
 ({\it p}, $t_1$, $\ldots$)&	transcendental extension of $Q$ or $Z_p$
 				($p = 0$ or as above) by~$t_i$.  The $t_i$ have
 				to be names.\cr
-real&				the real numbers represented by floating point
-				numbers\cr
+real,{\it len}&			the real numbers represented by long floating 
+                                point numbers of length{\it len}\cr
 \endsec
 
 \sec Term orderings()
