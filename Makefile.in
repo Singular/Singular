@@ -131,7 +131,8 @@ install_prefix        = ${localdir}/Singular/${S_VERSION}
 ##############################################################
 # cygwin related stuff
 #
-CYGWIN_PORT_VER       = @SINGULAR_RPM_VERSION@-1
+CYGWIN_SING_VER       = @SINGULAR_RPM_VERSION@
+CYGWIN_PORT_VER       = ${CYGWIN_SING_VER}-1
 CYGWIN_SETUP_VER      = 2.457.2.2
 CYGWIN_REP_DIR        = cygwin_pkg
 CYGWIN_AUX_FILES      = rpm/cygwin
@@ -141,7 +142,7 @@ CYGWIN_ORIG           = external-cygwin
 CYGWIN_SINGULAR_DIR   = Singular
 CYGWIN_SINGULAR_ROOT  = /usr/share/${CYGWIN_SINGULAR_DIR}
 CYGWIN_SINGULAR_BIN   = /usr/lib/${CYGWIN_SINGULAR_DIR}
-CYGWIN_SINGULAR_DOC   = /usr/share/doc/${CYGWIN_SINGULAR_DIR}-${CYGWIN_PORT_VER}
+CYGWIN_SINGULAR_DOC   = /usr/share/doc/${CYGWIN_SINGULAR_DIR}-${CYGWIN_SING_VER}
 
 
 BINDIST_DIRS        = kernel Singular doc IntegerProgramming modules
@@ -253,6 +254,11 @@ cygwin-dist-src singular-base-${CYGWIN_PORT_VER}-src.tar.bz2:
 	-rm -rf ${TMPDIR}
 
 cygwin-dist-scripts:
+	@echo -e  "Writing /etc/postinstall/singular-help.sh"
+	@echo -e  '#!/bin/sh' > /etc/postinstall/singular-help.sh
+	@echo -e  '' >> /etc/postinstall/singular-icons.sh
+	@echo -e  'install-info' >> /etc/postinstall/singular-icons.sh
+	@echo -e  'mkdir "`cygpath -u -A -P`/Singular CAS"' >> /etc/postinstall/singular-icons.sh
 	@echo -e  "Writing /etc/postinstall/singular-icons.sh"
 	@echo -e  '#!/bin/sh' > /etc/postinstall/singular-icons.sh
 	@echo -e  '' >> /etc/postinstall/singular-icons.sh
@@ -342,7 +348,7 @@ cygwin-dist-scripts:
 	@echo -e  "#! /bin/bash" > /usr/bin/ESingular
 	@echo -e  "export SINGULAR_BIN_DIR=${CYGWIN_SINGULAR_BIN}" >> /usr/bin/ESingular
 	@echo -e  "export SINGULAR_ROOT_DIR=${CYGWIN_SINGULAR_ROOT}" >> /usr/bin/ESingular
-	@echo -e  "export SINGULAR_INFO_FILE=${CYGWIN_SINGULAR_DOC}/info/singular.hlp" >> /usr/bin/ESingular
+	@echo -e  "export SINGULAR_INFO_FILE=/usr/share/info/singular.info" >> /usr/bin/ESingular
 	@echo -e  "export SINGULAR_IDX_FILE=${CYGWIN_SINGULAR_DOC}/doc/singular.idx" >> /usr/bin/ESingular
 	@echo -e  "export SINGULAR_HTML_DIR=${CYGWIN_SINGULAR_DOC}/html" >> /usr/bin/ESingular
 	@echo -e  "export SINGULAR_CHM_FILE=${CYGWIN_SINGULAR_DOC}/doc/Manual.chm" >> /usr/bin/ESingular
@@ -354,7 +360,7 @@ cygwin-dist-scripts:
 	@echo -e  "#! /bin/bash" > /usr/bin/Singular
 	@echo -e  "export SINGULAR_BIN_DIR=${CYGWIN_SINGULAR_BIN}" >> /usr/bin/Singular
 	@echo -e  "export SINGULAR_ROOT_DIR=${CYGWIN_SINGULAR_ROOT}" >> /usr/bin/Singular
-	@echo -e  "export SINGULAR_INFO_FILE=${CYGWIN_SINGULAR_DOC}/info/singular.hlp" >> /usr/bin/Singular
+	@echo -e  "export SINGULAR_INFO_FILE=/usr/share/info/singular.info" >> /usr/bin/Singular
 	@echo -e  "export SINGULAR_IDX_FILE=${CYGWIN_SINGULAR_DOC}/doc/singular.idx" >> /usr/bin/Singular
 	@echo -e  "export SINGULAR_HTML_DIR=${CYGWIN_SINGULAR_DOC}/html" >> /usr/bin/Singular
 	@echo -e  "export SINGULAR_CHM_FILE=${CYGWIN_SINGULAR_DOC}/doc/Manual.chm" >> /usr/bin/Singular
@@ -373,18 +379,18 @@ cygwin-dist-install: cygwin-dist-scripts ## ${BINDIST_NAME}.tar.gz
 	-rm -rf ${CYGWIN_SINGULAR_ROOT} ${CYGWIN_SINGULAR_DOC} ${CYGWIN_SINGULAR_BIN}
 	${MKINSTALLDIRS} ${CYGWIN_SINGULAR_ROOT} ${CYGWIN_SINGULAR_DOC} ${CYGWIN_SINGULAR_BIN}
 ## Copy documentation files
-	${MKINSTALLDIRS} /usr/share/doc/Singular-${CYGWIN_PORT_VER}
-	cp ${TMPDIR}/Singular/${S_VERSION}/README /usr/share/doc/Singular-${CYGWIN_PORT_VER}/
-	cp ${TMPDIR}/Singular/${S_VERSION}/INSTALL /usr/share/doc/Singular-${CYGWIN_PORT_VER}/
-	cp ${TMPDIR}/Singular/${S_VERSION}/COPYING /usr/share/doc/Singular-${CYGWIN_PORT_VER}/
-	cp ${TMPDIR}/Singular/${S_VERSION}/NEWS /usr/share/doc/Singular-${CYGWIN_PORT_VER}/
-	cp ${TMPDIR}/Singular/${S_VERSION}/GPL /usr/share/doc/Singular-${CYGWIN_PORT_VER}/
+	cp ${TMPDIR}/Singular/${S_VERSION}/README /usr/share/doc/Singular-${CYGWIN_SING_VER}/
+	cp ${TMPDIR}/Singular/${S_VERSION}/INSTALL /usr/share/doc/Singular-${CYGWIN_SING_VER}/
+	cp ${TMPDIR}/Singular/${S_VERSION}/COPYING /usr/share/doc/Singular-${CYGWIN_SING_VER}/
+	cp ${TMPDIR}/Singular/${S_VERSION}/NEWS /usr/share/doc/Singular-${CYGWIN_SING_VER}/
+	cp ${TMPDIR}/Singular/${S_VERSION}/GPL /usr/share/doc/Singular-${CYGWIN_SING_VER}/
 ## Install Cygwin specific structure
 	mv ${TMPDIR}/Singular/${S_VERSION}/ix86-Win/* ${CYGWIN_SINGULAR_BIN}/
 	-rmdir ${TMPDIR}/Singular/${S_VERSION}/ix86-Win
 	mv ${TMPDIR}/Singular/${S_VERSION}/LIB ${CYGWIN_SINGULAR_ROOT}/
 	mv ${TMPDIR}/Singular/${S_VERSION}/emacs ${CYGWIN_SINGULAR_ROOT}/
 	mv ${TMPDIR}/Singular/${S_VERSION}/* ${CYGWIN_SINGULAR_DOC}/
+	mv ${CYGWIN_SINGULAR_DOC}/info/singular.hlp /usr/share/info/singular.info
 ## Copy auxiliar files
 	cp ${CYGWIN_AUX_FILES}/surf.exe ${CYGWIN_SINGULAR_BIN}/
 	cp ${CYGWIN_AUX_FILES}/SURF_AUTHORS ${CYGWIN_SINGULAR_BIN}/
@@ -398,11 +404,11 @@ cygwin-dist-install: cygwin-dist-scripts ## ${BINDIST_NAME}.tar.gz
 	wget http://cygwin.com/setup.exe -O ${CYGWIN_SINGULAR_BIN}/cygwin-setup.exe
 ##	or copy from local folder
 #	cp ${CYGWIN_AUX_FILES}/cygwin-setup.exe ${CYGWIN_SINGULAR_BIN}/cygwin-setup.exe
-	cp ${CYGWIN_AUX_FILES}/singular-base.README /usr/share/doc/Cygwin/singular-base-${CYGWIN_PORT_VER}.README
-	cp ${CYGWIN_AUX_FILES}/singular-share.README /usr/share/doc/Cygwin/singular-share-${CYGWIN_PORT_VER}.README
-	cp ${CYGWIN_AUX_FILES}/singular-help.README /usr/share/doc/Cygwin/singular-help-${CYGWIN_PORT_VER}.README
-	cp ${CYGWIN_AUX_FILES}/singular-surf.README /usr/share/doc/Cygwin/singular-surf-${CYGWIN_PORT_VER}.README
-	cp ${CYGWIN_AUX_FILES}/singular-icons.README /usr/share/doc/Cygwin/singular-icons-${CYGWIN_PORT_VER}.README
+	cp ${CYGWIN_AUX_FILES}/singular-base.README /usr/share/doc/Cygwin/singular-base-${CYGWIN_SING_VER}.README
+	cp ${CYGWIN_AUX_FILES}/singular-share.README /usr/share/doc/Cygwin/singular-share-${CYGWIN_SING_VER}.README
+	cp ${CYGWIN_AUX_FILES}/singular-help.README /usr/share/doc/Cygwin/singular-help-${CYGWIN_SING_VER}.README
+	cp ${CYGWIN_AUX_FILES}/singular-surf.README /usr/share/doc/Cygwin/singular-surf-${CYGWIN_SING_VER}.README
+	cp ${CYGWIN_AUX_FILES}/singular-icons.README /usr/share/doc/Cygwin/singular-icons-${CYGWIN_SING_VER}.README
 
 cygwin-dist-pack: ## singular-base-${CYGWIN_PORT_VER}-src.tar.bz2
 	-rm -r -f ${CYGWIN_REP_DIR}
@@ -415,12 +421,12 @@ cygwin-dist-pack: ## singular-base-${CYGWIN_PORT_VER}-src.tar.bz2
 	mkdir ${CYGWIN_REP_DIR}/release/singular-icons
 	mkdir ${CYGWIN_REP_DIR}/release/singular-helper
 	tar cjf ${CYGWIN_REP_DIR}/release/singular-base/singular-base-${CYGWIN_PORT_VER}.tar.bz2 \
-	      /usr/share/doc/Cygwin/singular-base-${CYGWIN_PORT_VER}.README \
-	      /usr/share/doc/Singular-${CYGWIN_PORT_VER}/COPYING  \
-	      /usr/share/doc/Singular-${CYGWIN_PORT_VER}/INSTALL  \
-	      /usr/share/doc/Singular-${CYGWIN_PORT_VER}/NEWS     \
-	      /usr/share/doc/Singular-${CYGWIN_PORT_VER}/README   \
-	      /usr/share/doc/Singular-${CYGWIN_PORT_VER}/GPL   \
+	      /usr/share/doc/Cygwin/singular-base-${CYGWIN_SING_VER}.README \
+	      /usr/share/doc/Singular-${CYGWIN_SING_VER}/COPYING  \
+	      /usr/share/doc/Singular-${CYGWIN_SING_VER}/INSTALL  \
+	      /usr/share/doc/Singular-${CYGWIN_SING_VER}/NEWS     \
+	      /usr/share/doc/Singular-${CYGWIN_SING_VER}/README   \
+	      /usr/share/doc/Singular-${CYGWIN_SING_VER}/GPL   \
 	      /usr/bin/Singular                  \
 	      /usr/bin/ESingular                 \
 	      ${CYGWIN_SINGULAR_BIN}/*Singular*       \
@@ -431,19 +437,20 @@ cygwin-dist-pack: ## singular-base-${CYGWIN_PORT_VER}-src.tar.bz2
 	      ${CYGWIN_SINGULAR_BIN}/libparse.exe     \
 	      ${CYGWIN_SINGULAR_BIN}/gen_test.exe
 	tar cjf ${CYGWIN_REP_DIR}/release/singular-share/singular-share-${CYGWIN_PORT_VER}.tar.bz2 \
-	      /usr/share/doc/Cygwin/singular-share-${CYGWIN_PORT_VER}.README \
+	      /usr/share/doc/Cygwin/singular-share-${CYGWIN_SING_VER}.README \
 	      ${CYGWIN_SINGULAR_ROOT}/*
 	tar cjf ${CYGWIN_REP_DIR}/release/singular-help/singular-help-${CYGWIN_PORT_VER}.tar.bz2 \
-	      /usr/share/doc/Cygwin/singular-help-${CYGWIN_PORT_VER}.README \
+	      /usr/share/doc/Cygwin/singular-help-${CYGWIN_SING_VER}.README \
+	      /usr/share/info/singular.info                                 \
 	      ${CYGWIN_SINGULAR_DOC}/*
 	tar cjf ${CYGWIN_REP_DIR}/release/singular-surf/singular-surf-${CYGWIN_PORT_VER}.tar.bz2 \
-	      /usr/share/doc/Cygwin/singular-surf-${CYGWIN_PORT_VER}.README \
+	      /usr/share/doc/Cygwin/singular-surf-${CYGWIN_SING_VER}.README \
 	      ${CYGWIN_SINGULAR_BIN}/surf.exe       \
 	      ${CYGWIN_SINGULAR_BIN}/SURF_AUTHORS   \
 	      ${CYGWIN_SINGULAR_BIN}/SURF_README    \
 	      ${CYGWIN_SINGULAR_BIN}/SURF_COPYING
 	tar cjf ${CYGWIN_REP_DIR}/release/singular-icons/singular-icons-${CYGWIN_PORT_VER}.tar.bz2  \
-	      /usr/share/doc/Cygwin/singular-icons-${CYGWIN_PORT_VER}.README \
+	      /usr/share/doc/Cygwin/singular-icons-${CYGWIN_SING_VER}.README \
 	      ${CYGWIN_SINGULAR_BIN}/cygwin-setup.exe                \
 	      ${CYGWIN_SINGULAR_BIN}/startxserver.bat                \
 	      /etc/postinstall/singular-icons.sh
@@ -457,9 +464,15 @@ cygwin-dist-pack: ## singular-base-${CYGWIN_PORT_VER}-src.tar.bz2
 	cp ${CYGWIN_AUX_FILES}/setup-icons.hint ${CYGWIN_REP_DIR}/release/singular-icons/setup.hint
 	cp ${CYGWIN_AUX_FILES}/setup-helper.hint ${CYGWIN_REP_DIR}/release/singular-helper/setup.hint
 
-cygwin-dist: cygwin-dist-install cygwin-dist-pack cygwin-setup
+cygwin-helper: cygwin-setup-init cygwin-setup-helper
+	mkinstalldirs ${CYGWIN_REP_DIR}/release/singular-helper
+	touch ${CYGWIN_REP_DIR}/release/singular-helper/singular-helper-${CYGWIN_PORT_VER}.tar.bz2
+	cp ${CYGWIN_AUX_FILES}/setup-helper.hint ${CYGWIN_REP_DIR}/release/singular-helper/setup.hint
+
+cygwin-dist: cygwin-dist-install cygwin-dist-pack cygwin-helper
 
 cygwin-setup-init:
+	mkinstalldirs ${CYGWIN_REP_DIR}
 	@echo "Writing ${CYGWIN_REP_DIR}/setup.ini"
 	@echo "# This file is automatically generated by Makefile." > ${CYGWIN_REP_DIR}/setup.ini
 	@echo "# Special for Singular Distribution." >> ${CYGWIN_REP_DIR}/setup.ini
@@ -494,11 +507,6 @@ cygwin-setup-%:
 	  echo -n `du -b ${CYGWIN_REP_DIR}/release/singular-$*/singular-$*-${CYGWIN_PORT_VER}-src.tar.bz2 | sed -e 's/\([0-9]*\).*/\1/g'` >> ${CYGWIN_REP_DIR}/setup.ini; \
 	  echo -n " " >> ${CYGWIN_REP_DIR}/setup.ini; \
 	  echo `md5sum ${CYGWIN_REP_DIR}/release/singular-$*/singular-$*-${CYGWIN_PORT_VER}-src.tar.bz2 | sed -e 's/\([a-zA-Z0-9]*\).*/\1/g'` >> ${CYGWIN_REP_DIR}/setup.ini; \
-	else \
-	  echo -n "source: release/singular-base/singular-base-${CYGWIN_PORT_VER}-src.tar.bz2 "  >> ${CYGWIN_REP_DIR}/setup.ini; \
-	  echo -n `du -b ${CYGWIN_REP_DIR}/release/singular-base/singular-base-${CYGWIN_PORT_VER}-src.tar.bz2 | sed -e 's/\([0-9]*\).*/\1/g'` >> ${CYGWIN_REP_DIR}/setup.ini; \
-	  echo -n " " >> ${CYGWIN_REP_DIR}/setup.ini; \
-	  echo `md5sum ${CYGWIN_REP_DIR}/release/singular-base/singular-base-${CYGWIN_PORT_VER}-src.tar.bz2 | sed -e 's/\([a-zA-Z0-9]*\).*/\1/g'` >> ${CYGWIN_REP_DIR}/setup.ini; \
 	fi;
 	@echo >> ${CYGWIN_REP_DIR}/setup.ini
 
@@ -508,19 +516,21 @@ cygwin-pfw-%:
 	if test -d ${TMPDIR}; then rm -rf ${TMPDIR}; fi
 	${MKINSTALLDIRS} ${TMPDIR}/Files
 	cp -r ${CYGWIN_ORIG}/$*/* ${TMPDIR}/Files/
-	@if test "$*" = "Full"; then \
-	  echo "Create Full distribution"; \
-	  cp -r ${CYGWIN_REP_DIR}/release/singular* ${TMPDIR}/Files/release/; \
-	else \
-	  echo "Create Small distribution"; \
-	  cp -r ${CYGWIN_REP_DIR}/release/singular-base ${TMPDIR}/Files/release/; \
-	  cp -r ${CYGWIN_REP_DIR}/release/singular-helper ${TMPDIR}/Files/release/; \
-	  cp -r ${CYGWIN_REP_DIR}/release/singular-help ${TMPDIR}/Files/release/; \
-	  cp -r ${CYGWIN_REP_DIR}/release/singular-icons ${TMPDIR}/Files/release/; \
-	  cp -r ${CYGWIN_REP_DIR}/release/singular-share ${TMPDIR}/Files/release/; \
-	fi;
-	-rm -f  ${TMPDIR}/Files/release/singular-base/*src.tar.bz2
-	-rm -f  ${TMPDIR}/Files/release/singular-surf/*src.tar.bz2
+	cp -r ${CYGWIN_REP_DIR}/release/singular-helper ${TMPDIR}/Files/release/
+	@echo "Creating $* distribution ..."
+#	@if test "$*" = "Full"; then \
+#	  echo "Create Full distribution"; \
+#	  cp -r ${CYGWIN_REP_DIR}/release/singular* ${TMPDIR}/Files/release/; \
+#	else \
+#	  echo "Create Small distribution"; \
+#	  cp -r ${CYGWIN_REP_DIR}/release/singular-base ${TMPDIR}/Files/release/; \
+#	  cp -r ${CYGWIN_REP_DIR}/release/singular-helper ${TMPDIR}/Files/release/; \
+#	  cp -r ${CYGWIN_REP_DIR}/release/singular-help ${TMPDIR}/Files/release/; \
+#	  cp -r ${CYGWIN_REP_DIR}/release/singular-icons ${TMPDIR}/Files/release/; \
+#	  cp -r ${CYGWIN_REP_DIR}/release/singular-share ${TMPDIR}/Files/release/; \
+#	fi;
+#	-rm -f  ${TMPDIR}/Files/release/singular-base/*src.tar.bz2
+#	-rm -f  ${TMPDIR}/Files/release/singular-surf/*src.tar.bz2
 	-rm -f  ${TMPDIR}/Files/setup.exe
 	cp ${CYGWIN_AUX_FILES}/setup-pfw.exe ${TMPDIR}/Files/setup.exe
 	cat ${CYGWIN_REP_DIR}/setup.ini | sed -e 's/setup-version:.*//' | sed -e 's/setup-timestamp:.*//' >> ${TMPDIR}/Files/setup.ini
@@ -574,24 +584,25 @@ cygwin-pfw-%:
 	cd ${CYGWIN_PFW_DIR}; \
 	${CYGWIN_PFW_EXEC} -a -s "`cygpath -a -w ${TMPDIR}/Singular.pfw`"
 
-cygwin-cd-repository:
-	${MKINSTALLDIRS} Repository
-	cp -r ${CYGWIN_ORIG}/cd-repository/* Repository/
-	cp -r ${CYGWIN_REP_DIR}/release/singular* Repository/release/; \
-	cat ${CYGWIN_REP_DIR}/setup.ini | sed -e 's/setup-version:.*//' | sed -e 's/setup-timestamp:.*//' >> Repository/setup.ini
+#cygwin-cd-repository:
+#	${MKINSTALLDIRS} Repository
+#	cp -r ${CYGWIN_ORIG}/cd-repository/* Repository/
+#	cp -r ${CYGWIN_REP_DIR}/release/singular-helper Repository/release/
+#	cat ${CYGWIN_REP_DIR}/setup.ini | sed -e 's/setup-version:.*//' | sed -e 's/setup-timestamp:.*//' >> Repository/setup.ini
 
 singular-cd-windows:
 	@echo Building cd directories and web interface
 	${MKINSTALLDIRS} singular-cd/WINDOWS/Files/Repository
-	echo WEBPAGE FEATURE NOT INTRODUCED
+	@echo WEBPAGE FEATURE NOT INTRODUCED
 	@echo Buidling cd autostart
-	echo AUTOSTART FEATURE NOT INTRODUCED
+	@echo AUTOSTART FEATURE NOT INTRODUCED
 	@echo Copying PackageForTheWeb
-	cp Singualar-${S_VERSION}-$*.exe singular-cd/WINDOWS/Files/
-	cp Singualar/singular.ico singular-cd/WINDOWS/Files/
+	cp Singular-${S_VERSION}-*.exe singular-cd/WINDOWS/Files/
+	cp Singular/singular.ico singular-cd/WINDOWS/Files/
 	@echo Building cygwin-cd-repository
 	cp -r ${CYGWIN_ORIG}/cd-repository/* singular-cd/WINDOWS/Files/Repository/
-	cp -r ${CYGWIN_REP_DIR}/release/singular* singular-cd/WINDOWS/Files/Repository/release/; \
+	cp -r ${CYGWIN_REP_DIR}/release/singular-helper singular-cd/WINDOWS/Files/Repository/release/
+	cp ${CYGWIN_AUX_FILES}/setup-cd.exe singular-cd/WINDOWS/Files/Repository/
 	cat ${CYGWIN_REP_DIR}/setup.ini | sed -e 's/setup-version:.*//' | sed -e 's/setup-timestamp:.*//' >> singular-cd/WINDOWS/Files/Repository/setup.ini
 
 ##
