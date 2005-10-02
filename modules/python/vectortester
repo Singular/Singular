@@ -1,13 +1,14 @@
 ring r=0,(x,y,z),lp;
 timer=1;
-python_module::python("from Singular import number,  polynomial, power_series, gen, vector_power_series
+LIB("python_module.so");
+Python_module::python("from Singular import number,  polynomial, power_series, gen, vector_power_series
 zero=number(0)
 one=number(1)
 zerop=polynomial(0)
 onep=polynomial(1)
 unit1=gen(1)
 x=polynomial('x')
-g=x*number(-1)+polynomial(1)
+g=number(-1)*x+polynomial(1)
 print g
 f=polynomial(1)
 s=vector_power_series(unit1,g);
@@ -25,7 +26,7 @@ for t in s:
   if i>10:
    break
 g=polynomial('x')+polynomial('y')
-g = g * number(-1)
+g = number(-1) *g
 g=g+polynomial(1)
 print g
 s=power_series(polynomial(1),g)
