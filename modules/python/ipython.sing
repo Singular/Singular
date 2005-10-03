@@ -1,0 +1,37 @@
+LIB("python_module.so");
+Python_module::python("
+# This code loads IPython but modifies a few things if it detects it's running
+# embedded in another IPython session (helps avoid confusion)
+
+try:
+    __IPYTHON__
+except NameError:
+    argv = ['']
+    banner = exit_msg = ''
+else:
+    # Command-line options for IPython (a list like sys.argv)
+    argv = ['-pi1','In <\\#>:','-pi2','   .\\D.:','-po','Out<\\#>:']
+    banner = '*** Nested interpreter ***'
+    exit_msg = '*** Back in main IPython ***'
+
+# First import the embeddable shell class
+from IPython.Shell import IPShellEmbed
+# Now create the IPython shell instance. Put ipshell() anywhere in your code
+# where you want it to open.
+ipshell = IPShellEmbed(argv,banner=banner,exit_msg=exit_msg)
+ipshell()                            
+#---------------------------------------------------------------------------
+# This code will load an embeddable IPython shell always with no changes for
+# nested embededings.
+
+# Now ipshell() will open IPython anywhere in the code.
+
+#---------------------------------------------------------------------------
+# This code loads an embeddable shell only if NOT running inside
+# IPython. Inside IPython, the embeddable shell variable ipshell is just a
+# dummy function.
+
+
+#******************* End of file <example-embed-short.py> ********************
+");
+$;
