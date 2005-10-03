@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: makefile.cc,v 1.22 2005-08-02 14:06:18 Singular Exp $ */
+/* $Id: makefile.cc,v 1.23 2005-10-03 14:54:03 wienand Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -265,7 +265,7 @@ void build_compile_section(
 #  endif /* SunOS_4 or SunOS_5 */
 
 /*========================================================================*/
-#  ifdef ix86_win
+#  ifdef ix86_Win
 void build_compile_section(
   FILE *fp,
   moddefv module
@@ -295,7 +295,7 @@ void build_compile_section(
   fprintf(fp, "all:\t\n");
   fprintf(fp, "\techo \"don't know how to build library\"\n");
 }
-#  endif /* ix86_win */
+#  endif /* ix86_Win */
 
 /*========================================================================*/
 #  ifdef ppc_MPW
