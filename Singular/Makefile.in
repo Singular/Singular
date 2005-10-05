@@ -57,14 +57,14 @@ ifneq ($(SINGUNAME),ix86-Win)
 CPPFLAGS	= -I${srcdir} -I../kernel @CPPFLAGS@
 else
 ## Dirs after @CPPFLAGS@ are for PySingular
-CPPFLAGS	= -I${srcdir} -I../kernel @CPPFLAGS@ -I/usr/include/python2.4 -I/usr/local/include/boost-1_32 -I/home/Singular/singular-python/modules/python
+CPPFLAGS	= -I${srcdir} -I../kernel @CPPFLAGS@ -I/usr/include/python2.4 -I/usr/local/include/boost-1_32 -I../modules/python
 endif
 DEFS		= -DNDEBUG -DOM_NDEBUG -D@SING_UNAME@ @DEFS@
 LDFLAGS2	= @LDFLAGS@
 ifneq ($(SINGUNAME),ix86-Win)
 LDFLAGS		= -L../kernel -lkernel @LDFLAGS@
 else
-## -L/usr/local/lib -L/home/Singular/singular-python/modules/python --> PySingular
+## -L/usr/local/lib -L../modules/python --> PySingular
 LDFLAGS		= -L../kernel -L/bin -lkernel @LDFLAGS@ -L/usr/local/lib -L../modules/python
 endif
 LDFLAGSG	= -L../kernel -lkernel-g @LDFLAGS@
