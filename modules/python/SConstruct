@@ -1,4 +1,4 @@
-#$Id: SConstruct,v 1.15 2005-10-05 07:17:15 bricken Exp $
+#$Id: SConstruct,v 1.16 2005-10-05 07:18:59 bricken Exp $
 import os
 import re
 try:
@@ -51,11 +51,11 @@ PYTHONSEARCH=[\
 
 env = Environment(options=opts)
 
-#if platform=="darwin" and 'FINK_PREFIX' in env:
-PYTHONSEARCH.insert(0,PythonConfig(version="2.4", prefix=env['FINK_PREFIX'],\
+try:
+  PYTHONSEARCH.insert(0,PythonConfig(version="2.4", prefix=env['FINK_PREFIX'],\
         libdir=env['FINK_PREFIX']+"/lib/python2.4/config/"))
-#except:
-#    pass
+except:
+    pass
 
 print env['PLATFORM']
 conf = Configure(env)
