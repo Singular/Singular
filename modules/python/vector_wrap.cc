@@ -1,7 +1,8 @@
-#include <vector_wrap.h>
 #include <boost/python.hpp>
 #include "mod2.h"
 #include "Poly.h"
+#include "vector_wrap.h"
+
 using boost::python::self;
 
 static boost::python::object Vector_as_str(Vector& p)

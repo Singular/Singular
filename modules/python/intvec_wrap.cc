@@ -1,8 +1,8 @@
-//$Id: intvec_wrap.cc,v 1.3 2005-09-23 12:59:30 bricken Exp $
+//$Id: intvec_wrap.cc,v 1.4 2005-10-05 06:46:59 bricken Exp $
 #include <boost/python.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include "mod2.h"
-#include <intvec_wrap.h>
+#include "intvec_wrap.h"
 
 
 using namespace boost::python;

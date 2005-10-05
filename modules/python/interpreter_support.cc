@@ -1,5 +1,5 @@
-//$Id: interpreter_support.cc,v 1.16 2005-09-23 12:59:30 bricken Exp $
-#include <poly_wrap.h>
+//$Id: interpreter_support.cc,v 1.17 2005-10-05 06:46:59 bricken Exp $
+
 #include <sstream>
 #include <boost/python.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
@@ -18,6 +18,7 @@
 #include "matpol.h"
 #include "ring_wrap.h"
 #include "intvec_wrap.h"
+#include "poly_wrap.h"
 extern BOOLEAN errorreported;
 extern int inerror;
 using namespace boost::python;

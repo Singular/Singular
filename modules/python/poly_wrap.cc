@@ -1,9 +1,10 @@
-#include <poly_wrap.h>
 #include <boost/python.hpp>
 #include "mod2.h"
 #include "Poly.h"
 #include "ring_wrap.h"
 #include "intvec_wrap.h"
+#include "poly_wrap.h"
+
 using boost::python::self;
 boost::python::str Poly_as_str(const Poly& p)
 {

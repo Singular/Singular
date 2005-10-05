@@ -1,4 +1,4 @@
-#$Id: SConstruct,v 1.13 2005-09-20 08:39:44 bricken Exp $
+#$Id: SConstruct,v 1.14 2005-10-05 06:46:59 bricken Exp $
 import os
 import re
 try:
@@ -105,6 +105,9 @@ sources=["python.cc", "poly_wrap.cc", "vector_wrap.cc", "CF_wrap.cc",\
 #                       PYTHON_CONFIG.incdir, BOOST_PREFIX+"/include", "/sw/include"],
 #              LIBS=["boost_python",PYTHON_CONFIG.libname], CPPDEFINES=["NDEBUG","BUILD_MODULE"], SHLIBPREFIX="")
 env['LDMODULESUFFIX'] = '.so'
+if platform=="cygwin":
+  sources.append("mywrapper.cc")
+  sources.remove("python.cc")
 def module_target(*args,**keywords):
     if env['PLATFORM']=="darwin":
         print "Hello this is a Mac"
@@ -116,10 +119,16 @@ def module_target(*args,**keywords):
             pass
         return env.LoadableModule(*args,**keywords)
     else:
-        return env.SharedLibrary(*args,**keywords)
+        if platform=="cygwin":
+          keywords['CPPPATH'].append("/usr/local/include/boost-1_32")
+          keywords['LIBPATH'].append("/usr/local/lib")
+          keywords['LIBPATH'].append("/bin")
+          return env.StaticLibrary(*args,**keywords)
+        else:
+          return env.SharedLibrary(*args,**keywords)
 module_target("python_module", 
               sources,\
-              CPPPATH=[".", SING_ROOT+"/kernel",\
+              CPPPATH=[SING_ROOT+"/kernel",\
                        SING_ROOT+"/Singular", SING_ROOT+"/"+SING_ARCH +"/include",\
                        PYTHON_CONFIG.incdir],\
               LIBPATH=[PYTHON_CONFIG.libdir],\

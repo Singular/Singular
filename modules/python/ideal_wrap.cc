@@ -1,10 +1,11 @@
-//$Id: ideal_wrap.cc,v 1.6 2005-09-21 07:12:48 bricken Exp $
-#include <poly_wrap.h>
+//$Id: ideal_wrap.cc,v 1.7 2005-10-05 06:46:59 bricken Exp $
 #include <boost/python.hpp>
 #include "mod2.h"
 #include "Poly.h"
 #include "Ideal.h"
 #include "ring_wrap.h"
+
+#include "poly_wrap.h"
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 using boost::python::self;
 using namespace boost::python;

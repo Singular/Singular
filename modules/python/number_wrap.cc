@@ -1,7 +1,7 @@
-#include <poly_wrap.h>
 #include <boost/python.hpp>
 #include "mod2.h"
 #include "Number.h"
+#include "number_wrap.h"
 using boost::python::self;
 static boost::python::object Number_as_str(const Number& n)
 {
