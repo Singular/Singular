@@ -72,6 +72,13 @@ LD_DYN_FLAGS	= @LD_DYN_FLAGS@
 SFLAGS		= @SFLAGS@
 SLDFLAGS	= @SLDFLAGS@
 
+## For PYSingular
+ifneq ($(SINGUNAME),ix86-Win)
+WIN_LIBS        =
+else
+WIN_LIBS        = ../modules/python_module.bin
+endif
+
 LD_LIBC	        = -lc
 STATIC_LDFLAGS	= @STATIC_LDFLAGS@
 # under cygwin, do not explicitly link against -lm, for it is the cygwin
@@ -132,7 +139,7 @@ MPSR_SOURCES = mpsr_Put.cc mpsr_PutPoly.cc mpsr_GetPoly.cc mpsr_sl.cc\
 DBMSR_SOURCES =  ndbm.cc sing_dbm.cc
 
 # normal C source files
-CSOURCES= 
+CSOURCES=
 
 # C++ sources which are used if part of the kernel are dynamically linked
 DL_KERNEL_SOURCES=slInit_Dynamic.cc 
@@ -142,7 +149,7 @@ DL_KERNEL_SOURCES=slInit_Dynamic.cc
 DL_LIB_SOURCES= 
 
 # C++ sources which are used if no parts of the kernel are dynamically linked
-STATIC_SOURCES=slInit_Static.cc 
+STATIC_SOURCES=slInit_Static.cc
 
 # C++ sources for which both, shared and static object files are needed
 COMMON_SOURCES = $(MPSR_SOURCES) $(DBMSR_SOURCES)
@@ -282,11 +289,14 @@ Singular-static: version.h
 	echo "#undef HAVE_STATIC" > static.h
 
 Singular${S_EXT}: mod2.h Makefile version.h scanner.cc  ${OBJS} \
-          iparith.o tesths.cc libparse.cc claptmpl.o mpsr_Tok.o $(DL_LIBS)
+          iparith.o tesths.cc libparse.cc claptmpl.o mpsr_Tok.o $(DL_LIBS) $(WIN_LIBS)
 	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} \
 	  -o Singular${S_EXT} \
 	  tesths.cc iparith.o mpsr_Tok.o claptmpl.o\
 	  ${OBJS} ${LDFLAGS} ${LIBS} -lomalloc_ndebug ../kernel/mmalloc.o
+
+../modules/python_module.bin:
+	cd ../modules/python; scons
 
 %.static: version.h
 	${MAKE} DL_KERNEL=0 S_EXT=".static" $@
@@ -296,7 +306,7 @@ iparith.o mpsr_Tok.o : iparith.inc mpsr_Tok.inc
 cntrlc.o cntrlc.og : feOptES.inc feOptTS.inc feOpt.inc
 
 claptmpl.o: claptmpl.cc mod2.h
-	${CXX} ${CXXFLAGS}  ${CPPFLAGS} ${DEFS} -c $<	
+	${CXX} ${CXXFLAGS}  ${CPPFLAGS} ${DEFS} -c $<
 
 iparith.inc mpsr_Tok.inc: claptmpl.o iparith.cc \
                           ipconv.cc tok.h mpsr_Tok.cc grammar.h mod2.h
@@ -363,7 +373,7 @@ mpsr.so: $(MPSR_SOURCES:.cc=.dl_o)
 dbmsr.so: $(DBMSR_SOURCES:.cc=.dl_o)
 	$(LD) ${SLDFLAGS} -o $@ $^
 
-src: scanner.cc grammar.h grammar.cc libparse.cc 
+src: scanner.cc grammar.h grammar.cc libparse.cc
 
 mod2.h: stamp-h
 
