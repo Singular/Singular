@@ -2,7 +2,7 @@
 ###
 ### Makefile for Singular-modules
 ###
-### $Id: Makefile.in,v 1.17 2005-05-24 15:54:46 Singular Exp $
+### $Id: Makefile.in,v 1.18 2005-10-05 07:45:30 wienand Exp $
 ###
 #################################################################
 
@@ -60,9 +60,14 @@ LDFLAGS		= @LDFLAGS@ # @LD_DYNAMIC@
 ##
 CFLAGS		+= ${DEFS}
 
+#ifndef ix86-Win
 MOD_FILES = loctriv
 #MOD_DIRS = kernel
 MOD_DIRS =
+#else
+MOD_FILES =
+MOD_DIRS =
+#endif
 
 ##
 ##
