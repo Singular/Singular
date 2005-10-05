@@ -1,4 +1,4 @@
-#$Id: SConstruct,v 1.14 2005-10-05 06:46:59 bricken Exp $
+#$Id: SConstruct,v 1.15 2005-10-05 07:17:15 bricken Exp $
 import os
 import re
 try:
@@ -51,11 +51,11 @@ PYTHONSEARCH=[\
 
 env = Environment(options=opts)
 
-try:
-    PYTHONSEARCH.insert(0,PythonConfig(version="2.4", prefix=env['FINK_PREFIX'],\
+#if platform=="darwin" and 'FINK_PREFIX' in env:
+PYTHONSEARCH.insert(0,PythonConfig(version="2.4", prefix=env['FINK_PREFIX'],\
         libdir=env['FINK_PREFIX']+"/lib/python2.4/config/"))
-except:
-    pass
+#except:
+#    pass
 
 print env['PLATFORM']
 conf = Configure(env)
@@ -71,8 +71,13 @@ if not PYTHON_CONFIG:
 #    print 'Python 2.3 must be installed'
 #    Exit(1)
 BOOST_PREFIX="/sw"
-env.Append(CPPPATH=BOOST_PREFIX+"/include")
-conf.env.Append(CPPPATH=["/usr/include/python2.3"])
+env.Append(CPPPATH=[PYTHON_CONFIG.incdir])
+if platform =="cygwin":
+  env.Append(CPPPATH="/usr/local/include/boost-1_32")
+else:
+  env.Append(CPPPATH=BOOST_PREFIX+"/include")
+print PYTHON_CONFIG.incdir
+print env['CPPPATH']
 if not conf.CheckCXXHeader('boost/python.hpp'):
     print 'Boost/python must be installed'
     Exit(1)
