@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.229 2005-07-27 15:47:53 Singular Exp $ */
+/* $Id: extra.cc,v 1.230 2005-10-05 07:23:21 wienand Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -130,6 +130,12 @@ extern "C" int setenv(const char *name, const char *value, int overwrite);
 
 //#endif /* not HAVE_DYNAMIC_LOADING */
 
+#ifdef ix86_Win
+#include <Python.h>
+#include <python_wrapper.h>
+#endif
+
+
 // see clapsing.cc for a description of the `FACTORY_*' options
 
 #ifdef FACTORY_GCD_STAT
@@ -151,6 +157,9 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h);
 
 extern BOOLEAN jjJanetBasis(leftv res, leftv v);
 
+#ifdef ix86_Win  /* PySingular initialized? */
+static int PyInitialized = 0;
+#endif
 
 //void emStart();
 /*2
@@ -2603,7 +2612,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         n->z=(napoly)mipo_id->m[i];
         mipo_id->m[i]=p;
       }
-      new_ring->minideal=id_Copy(alg_ring->qideal,new_ring); 
+      new_ring->minideal=id_Copy(alg_ring->qideal,new_ring);
       // convert factors =============================================
       ideal fac_id=idInit(L.length(),1);
       CFFListIterator J=L;
@@ -2619,10 +2628,10 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       LL->Init(2);
       LL->m[0].rtyp=IDEAL_CMD;
       LL->m[0].data=(char *)fac_id;
-      LL->m[1].rtyp=INTVEC_CMD; 
+      LL->m[1].rtyp=INTVEC_CMD;
       LL->m[1].data=(char *)v;
       IDDATA(hh)=(char *)LL;
-  
+
       rChangeCurrRing(save_currRing);
       currRingHdl=save_currRingHdl;
       if (!sw_rat) Off(SW_RATIONAL);
@@ -2633,9 +2642,63 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 #endif
+#ifdef ix86_Win
+/*==================== Python Singular =================*/
+    if (strcmp(sys_cmd, "python") == 0)
+    {
+      const char* c;
+      if ((h!=NULL) && (h->Typ()==STRING_CMD))
+      {
+        c=(const char*)h->Data();
+        if (!PyInitialized) {
+          PyInitialized = 1;
+          Py_Initialize();
+          initPySingular();
+        }
+	PyRun_SimpleString(c);
+        return FALSE;
+      }
+      else return TRUE;
+    }
+    else
+/*==================== Python Singular =================*/
+    if (strcmp(sys_cmd, "ipython") == 0)
+    {
+      const char* c;
+      {
+        if (!PyInitialized) {
+          PyInitialized = 1;
+          Py_Initialize();
+          initPySingular();
+        }
+	PyRun_SimpleString(
+"try:                                                                                       \n\
+    __IPYTHON__                                                                             \n\
+except NameError:                                                                           \n\
+    argv = ['']                                                                             \n\
+    banner = exit_msg = ''                                                                  \n\
+else:                                                                                       \n\
+    # Command-line options for IPython (a list like sys.argv)                               \n\
+    argv = ['-pi1','In <\\#>:','-pi2','   .\\D.:','-po','Out<\\#>:']                        \n\
+    banner = '*** Nested interpreter ***'                                                   \n\
+    exit_msg = '*** Back in main IPython ***'                                               \n\
+											    \n\
+# First import the embeddable shell class                                                   \n\
+from IPython.Shell import IPShellEmbed                                                      \n\
+# Now create the IPython shell instance. Put ipshell() anywhere in your code                \n\
+# where you want it to open.                                                                \n\
+ipshell = IPShellEmbed(argv,banner=banner,exit_msg=exit_msg)                                \n\
+ipshell()");
+        return FALSE;
+      }
+    }
+    else
+
+#endif
 /*==================== Error =================*/
       Werror( "system(\"%s\",...) %s", sys_cmd, feNotImplemented );
   }
   return TRUE;
 }
 #endif // HAVE_EXTENDED_SYSTEM
+

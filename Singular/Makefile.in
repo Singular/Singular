@@ -41,7 +41,7 @@ LEX		= sh flexer.sh
 PERL		= @PERL@
 BISON		= bison
 INSTALL		= @INSTALL@
-INSTALL_PROGRAM	= @INSTALL_PROGRAM@ 
+INSTALL_PROGRAM	= @INSTALL_PROGRAM@
 INSTALL_DATA	= @INSTALL_DATA@
 MKINSTALLDIRS   = ./mkinstalldirs
 LN_S		= @LN_S@
@@ -53,13 +53,19 @@ PIPE		= @PIPE@
 CFLAGS		= @CFLAGS@ ${PIPE}
 CXXFLAGS	= @CXXFLAGS@ ${PIPE}
 CXXTEMPLFLAGS	= @CXXTEMPLFLAGS@
+ifneq ($(SINGUNAME),ix86-Win)
 CPPFLAGS	= -I${srcdir} -I../kernel @CPPFLAGS@
+else
+## Dirs after @CPPFLAGS@ are for PySingular
+CPPFLAGS	= -I${srcdir} -I../kernel @CPPFLAGS@ -I/usr/include/python2.4 -I/usr/local/include/boost-1_32 -I/home/Singular/singular-python/modules/python
+endif
 DEFS		= -DNDEBUG -DOM_NDEBUG -D@SING_UNAME@ @DEFS@
 LDFLAGS2	= @LDFLAGS@
 ifneq ($(SINGUNAME),ix86-Win)
 LDFLAGS		= -L../kernel -lkernel @LDFLAGS@
 else
-LDFLAGS		= -L../kernel -L/bin -lkernel @LDFLAGS@
+## -L/usr/local/lib -L/home/Singular/singular-python/modules/python --> PySingular
+LDFLAGS		= -L../kernel -L/bin -lkernel @LDFLAGS@ -L/usr/local/lib -L../modules/python
 endif
 LDFLAGSG	= -L../kernel -lkernel-g @LDFLAGS@
 LD_DYN_FLAGS	= @LD_DYN_FLAGS@
@@ -72,21 +78,21 @@ STATIC_LDFLAGS	= @STATIC_LDFLAGS@
 # lib -- if you really want to do this, use -lm as the _last_ thing on the
 # arguments to link
 ifneq ($(SINGUNAME),ix86-Win)
-LIBS		= -lm @NEED_LIBS@ 
+LIBS		= -lm @NEED_LIBS@
 else
-LIBS		= -lsingfac -lsingcf -lntl  -static -lreadline -lhtmlhelp -Xlinker -Bdynamic -lgmp -lcygncurses6 
+LIBS		= -lsingfac -lsingcf -lntl  -static -lreadline -lhtmlhelp -Xlinker -Bdynamic -lgmp -lcygncurses6 -lpython_module -lpython2.4 /usr/local/lib/libboost_python-gcc-d-1_32.dll
 endif
 MP_LIBS		= @MP_LIBS@
 DL_KERNEL	= @DL_KERNEL@
 HAVE_MPSR       = @HAVE_MPSR@
 
 ifdef LD_STATIC
-LDFLAGS  := ${STATIC_LDFLAGS} ${LDFLAGS} 
+LDFLAGS  := ${STATIC_LDFLAGS} ${LDFLAGS}
 SING_EXEC = Singular-static
-LIBS := ${MP_LIBS} ${LIBS} 
+LIBS := ${MP_LIBS} ${LIBS}
 DL_KERNEL =
 else
-LDFLAGS  := ${LD_DYN_FLAGS} ${LDFLAGS} 
+LDFLAGS  := ${LD_DYN_FLAGS} ${LDFLAGS}
 SING_EXEC = Singular
 endif
 
@@ -173,7 +179,7 @@ HEADERS=lists.h attrib.h \
 	dbm_sl.h libparse.h \
 	gms.h pcv.h eigenval_ip.h \
 	fegetopt.h distrib.h walk.h \
-        static.h\
+        static.h \
         omSingularConfig.h
 
 DISTFILES=${SOURCES} ${HEADERS} ${ESOURCES} \
