@@ -76,7 +76,7 @@ SLDFLAGS	= @SLDFLAGS@
 ifneq ($(SINGUNAME),ix86-Win)
 WIN_LIBS        =
 else
-WIN_LIBS        = ../modules/python_module.bin
+WIN_LIBS        = ../modules/python/libpython_module.a
 endif
 
 LD_LIBC	        = -lc
@@ -295,7 +295,7 @@ Singular${S_EXT}: mod2.h Makefile version.h scanner.cc  ${OBJS} \
 	  tesths.cc iparith.o mpsr_Tok.o claptmpl.o\
 	  ${OBJS} ${LDFLAGS} ${LIBS} -lomalloc_ndebug ../kernel/mmalloc.o
 
-../modules/python_module.bin:
+../modules/python/libpython_module.a:
 	cd ../modules/python; scons
 
 %.static: version.h
