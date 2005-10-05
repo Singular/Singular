@@ -1,4 +1,4 @@
-//$Id: ring_wrap.cc,v 1.4 2005-10-05 06:46:59 bricken Exp $
+//$Id: ring_wrap.cc,v 1.5 2005-10-05 07:26:39 bricken Exp $
 
 #include <boost/python.hpp>
 #include "mod2.h"
