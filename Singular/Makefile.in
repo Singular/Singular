@@ -288,8 +288,8 @@ Singular-static: version.h
 	${MAKE} LD_STATIC=1 S_EXT="-static" Singular-static
 	echo "#undef HAVE_STATIC" > static.h
 
-Singular${S_EXT}: mod2.h Makefile version.h scanner.cc  ${OBJS} \
-          iparith.o tesths.cc libparse.cc claptmpl.o mpsr_Tok.o $(DL_LIBS) $(WIN_LIBS)
+Singular${S_EXT}: mod2.h Makefile version.h $(WIN_LIBS) scanner.cc  ${OBJS} \
+          iparith.o tesths.cc libparse.cc claptmpl.o mpsr_Tok.o $(DL_LIBS) 
 	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} \
 	  -o Singular${S_EXT} \
 	  tesths.cc iparith.o mpsr_Tok.o claptmpl.o\
