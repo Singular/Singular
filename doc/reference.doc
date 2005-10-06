@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.262 2005-09-06 08:58:36 Singular Exp $
+@comment $Id: reference.doc,v 1.263 2005-10-06 17:03:09 levandov Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -5285,8 +5285,8 @@ See
 @item @strong{Type:}
 list
 @item @strong{Purpose:}
-decomposes a ring/qring into a list of 4 (or 6 in the noncommutative case)
-components:
+decomposes a ring/qring into a list of 4 (or 6 in the noncommutative case, 
+see @ref{ringlist (plural)}) components:
 @enumerate
 @item
 the field description in the following format:
@@ -5650,24 +5650,24 @@ See
 @item @strong{Type:}
 ideal
 @item @strong{Purpose:}
-returns a groeber basis of an ideal with respect to the
+returns a Groebner basis of an ideal with respect to the
 monomial ordering of the basering, which has to be global.
-A groebner basis is a set of generators such that
-the leading terms generate the leading ideal.
 @item @strong{Note:}
 The algorithm is described in the diploma thesis of Michael Brickenstein
 "Neue Varianten zur Berechnung von Groebnerbasen",
 written 2004 under supervision of G.-M. Greuel in Kaiserslautern.
 
 It is designed to keep polynomials slim (short with small coefficients).
-Currently best results are examples over function field (parameters).
+Currently best results are examples over function fields (parameters).
 
 At this moment the implementation is not optimal for weighted degree orderings.
 
-The program only supports the options prot (which will give protocoll output) and redSB (for returning a reduced Groebner basis).
-The Protocoll looks like that:
-M[n,m] means a parallel reduction of n elements with m non zero output elements.
-"b" notices an exchange trick described in the thesis and "e" adds a reductor with non minimal leading term.
+The program only supports the options @code{prot}, which will give protocol output 
+and @code{redSB} for returning a reduced Groebner basis.
+The protocol messages of @code{slimgb} mean the following:
+@* @code{M[n,m]} means a parallel reduction of @code{n} elements with @code{m} non-zero output elements,
+@* @code{b} notices an exchange trick described in the thesis and 
+@* @code{e} adds a reductor with non-minimal leading term.
 
 For an example see @ref{slim Groebner bases}.
 @end table
@@ -5680,6 +5680,7 @@ See
 @ref{option};
 @ref{std}.
 @c ref
+
 @c ---------------------------------------
 @node sortvec, sprintf, slimgb, Functions
 @subsection sortvec

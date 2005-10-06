@@ -1,5 +1,5 @@
   @comment -*-texinfo-*-
-@comment $Id: plureference.doc,v 1.38 2005-09-23 21:25:10 levandov Exp $
+@comment $Id: plureference.doc,v 1.39 2005-10-06 17:03:08 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -62,7 +62,9 @@ Note, that both @strong{Control structures} and @strong{System variables} of
 * opposite::                    
 * preimage @value{PSUFFIX}::    
 * quotient @value{PSUFFIX}::    
-* reduce @value{PSUFFIX}::      
+* reduce @value{PSUFFIX}::
+* ringlist @value{PSUFFIX}::
+* slimgb @value{PSUFFIX}::
 * std @value{PSUFFIX}::         
 * subst  @value{PSUFFIX}::      
 * syz @value{PSUFFIX}::         
@@ -1252,7 +1254,7 @@ See
 @c ref
 
 @c ---------------------------------------
-@node reduce @value{PSUFFIX}, std @value{PSUFFIX}, quotient @value{PSUFFIX}, Functions @value{PSUFFIX}
+@node reduce @value{PSUFFIX}, ringlist @value{PSUFFIX}, quotient @value{PSUFFIX}, Functions @value{PSUFFIX}
 @section reduce @value{PSUFFIX}
 @cindex reduce @value{PSUFFIX}
 @cindex NF
@@ -1315,9 +1317,117 @@ See also
 @ref{std @value{PSUFFIX}}.
 @c ref
 
+@c ---------------------------------------
+@node ringlist @value{PSUFFIX}, slimgb @value{PSUFFIX}, reduce @value{PSUFFIX}, Functions @value{PSUFFIX}
+@section ringlist @value{PSUFFIX}
+@cindex ringlist @value{PSUFFIX}
+@table @code
+@item @strong{Syntax:}
+@code{ringlist (} ring_expression @code{)}
+@*@code{ringlist (} qring_expression @code{)}
+@item @strong{Type:}
+list
+@item @strong{Purpose:}
+decomposes a ring/qring into a list of 6 (or 4 in the commutative case)
+components. 
+@* The first 4 components are common both for the commutative and for the
+non-commutative cases, the 5th and the 6th appear only in the non-commutative case.
+
+@enumerate 5
+@item square matrix with nonzero upper triangle, containing 
+structural coefficients of a G-algebra (this corresponds to the 
+matrix C from the definition of @ref{G-algebras})
+@item square matrix, containing structural polynomials of a G-algebra 
+(this corresponds to the matrix D from the definition of @ref{G-algebras})
+@end enumerate
+@item @strong{Example:}
+@smallexample
+@c example
+// consider the quantized Weyl algebra
+ring r = (0,q),(x,d),Dp;
+ncalgebra(q,1);
+list l = ringlist(r);
+l;
+// now, change the relation d*x = q*x*d +1
+// into the relation d*x=(q2+1)*x*d + q*d + 1
+matrix S = l[5]; // matrix of coefficients
+S[1,2] = q^2+1;
+l[5] = S;
+matrix T = l[6]; // matrix of polynomials
+T[1,2] = q*d+1;
+l[6] = T;
+def rr = ring(l);
+setring rr; rr;
+// compare with the ring we started with:
+setring r; r;
+@c example
+@end smallexample
+@end table
+
+@c ref
+See also
+@ref{ring @value{PSUFFIX}};
+@ref{ringlist}.
+@c ref
+
 
 @c ---------------------------------------
-@node std @value{PSUFFIX}, subst  @value{PSUFFIX}, reduce @value{PSUFFIX}, Functions @value{PSUFFIX}
+@node slimgb @value{PSUFFIX}, std @value{PSUFFIX}, ringlist @value{PSUFFIX}, Functions @value{PSUFFIX}
+@section slimgb @value{PSUFFIX}
+@cindex slimgb @value{PSUFFIX}
+@table @code
+@item @strong{Syntax:}
+@code{slimgb (} ideal_expression@code{)}
+
+@item @strong{Type:}
+ideal
+@item @strong{Purpose:}
+returns a left Groebner basis of a left ideal with respect to the
+global monomial ordering of the basering.
+@item @strong{Note:}
+The commutative algorithm is described in the diploma thesis of Michael Brickenstein "Neue Varianten zur Berechnung von Groebnerbasen",
+written 2004 under supervision of G.-M. Greuel in Kaiserslautern.
+
+It is designed to keep polynomials slim (short with small coefficients).
+Currently best results are examples over function fields (parameters).
+
+The current implementation may not be optimal for weighted degree orderings.
+
+The program only supports the options @code{prot}, which will give protocol output and @code{redSB} for returning a reduced Groebner basis.
+The protocol messages of @code{slimgb} mean the following:
+@* @code{M[n,m]} means a parallel reduction of @code{n} elements with @code{m} non-zero output elements,
+@* @code{b} notices an exchange trick described in the thesis and 
+@* @code{e} adds a reductor with non-minimal leading term.
+
+For a detailed commutative example see @ref{slim Groebner bases}.
+
+@item @strong{Example:}
+@smallexample
+@c example
+LIB "ncalg.lib";
+def U = makeUsl(2);
+// U is the U(sl_2) algebra
+setring U;
+ideal I = e^3, f^3, h^3-4*h;
+option(redSB);
+ideal J = slimgb(I);
+J;
+// compare slimgb with std:
+ideal K = std(I);
+print(matrix(NF(K,J)));
+print(matrix(NF(J,K)));
+// hence both Groebner bases are equal
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{option};
+@ref{std @value{PSUFFIX}}.
+@c ref
+
+@c ---------------------------------------
+@node std @value{PSUFFIX}, subst  @value{PSUFFIX}, slimgb @value{PSUFFIX}, Functions @value{PSUFFIX}
 @section std @value{PSUFFIX}
 @cindex std @value{PSUFFIX}
 @table @code

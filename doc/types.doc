@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.128 2005-06-01 12:05:17 Singular Exp $
+@comment $Id: types.doc,v 1.129 2005-10-06 17:03:11 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -379,6 +379,8 @@ free resolution of an ideal resp.@: module but not changing the given ideal resp
 simplify a set of polynomials (see @ref{simplify})
 @item size
 number of non-zero generators (see @ref{size})
+@item slimgb
+Groebner basis computation with slim technique (see @ref{slimgb})
 @item sortvec
 permutation for sorting ideals resp@:. modules (see @ref{sortvec})
 @item sres
@@ -388,7 +390,7 @@ standard basis computation (see @ref{std})
 @item stdfglm
 standard basis computation with fglm technique (see @ref{stdfglm})
 @item stdhilb
-Hilbert driven standard basis computation (see @ref{stdhilb}
+Hilbert driven standard basis computation (see @ref{stdhilb})
 @item subst
 substitute a ring variable (see @ref{subst})
 @item syz
@@ -3523,6 +3525,8 @@ names of all ring parameters or the
 name of the n-th ring parameter (see @ref{parstr})
 @item qring
 quotient ring (see @ref{qring})
+@item ringlist
+decomposes a ring into a list of its components (see @ref{ringlist})
 @item setring
 set a new basering (see @ref{setring})
 @item varstr
