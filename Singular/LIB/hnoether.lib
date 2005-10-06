@@ -1,4 +1,4 @@
-version="$Id: hnoether.lib,v 1.50 2005-09-27 16:52:55 Singular Exp $";
+version="$Id: hnoether.lib,v 1.51 2005-10-06 16:19:28 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  hnoether.lib   Hamburger-Noether (Puiseux) Expansion
@@ -3462,7 +3462,7 @@ RETURN: list: first entry = list of HNErings,
    faktoren=list(ideal(charPoly(redleit(fneu,Newton[i],Newton[i+1])
                        /(x^Newton[i][1]*y^Newton[i+1][2]),M,N)  ),
                  intvec(1));                  // = (zu faktoriserendes Poly, 1)
-   conjugates=1;
+   conjugates=conj_factor;
 
    //-- wechsle so lange in Ringerweiterungen, bis Leitform vollstaendig
    //   in Linearfaktoren zerfaellt -----
@@ -3474,22 +3474,46 @@ RETURN: list: first entry = list of HNErings,
     if (delt==0) {
      //---------- Sonderbehandlung: faktorisiere einige Polynome ueber Q(a): --
      if ((charstr(basering)=="0,a") and (essential==0)) {
-        faktoren=factorize(charPoly(leitf,M,N));
-        conjugates=1;
-        for (k=2;k<=size(faktoren[2]);k++) {conjugates=conjugates,1;}
+        // ====================================================
+        // neu CL:  06.10.05 
+        poly CHPOLY=charPoly(leitf,M,N);
+        poly tstpoly;
+        if (defined(faktoren)!=0) { 
+          // Test, damit kein Fehler eingebaut (vermutlich nicht notwendig)
+          tstpoly = faktoren[1][1]^faktoren[2][1];
+          for (k=2; k<=size(faktoren[1]); k++) {
+            tstpoly = tstpoly * faktoren[1][k]^faktoren[2][k];
+          }
+          tstpoly = CHPOLY-tstpoly*(CHPOLY/tstpoly);
+          kill CHPOLY;
+        }                                  
+        if ((numberofRingchanges>1) and (defined(faktoren)!=0) and (tstpoly==0)) {
+          def L_help=factorlist(faktoren,conjugates);
+          faktoren=L_help[1];
+          conjugates=L_help[2];
+          kill L_help;
+        }
+        else {
+          faktoren=factorize(charPoly(leitf,M,N));
+          conjugates=conj_factor;
+          for (k=2;k<=size(faktoren[2]);k++) {conjugates=conjugates,conj_factor;}
+        }
+        kill tstpoly;
+        // Ende neu (vorher nur else Fall)
+        // ====================================================
      }
      else {
        //------------------ faktorisiere das charakt. Polynom: ----------------
        if ((numberofRingchanges==1) or (essential==0)) {
          def L_help=factorlist(faktoren,conjugates);
          faktoren=L_help[1];
-         conjugates=L_help[2]*conj_factor;
+         conjugates=L_help[2];
          kill L_help;
        }
        else {     // eliminiere alle konjugierten Nullstellen bis auf eine:
          ideal hilf_id;
          for (zaehler=1; zaehler<=size(faktoren[1]); zaehler++) {
-           hilf_id=factorize(faktoren[1][zaehler],1);  // war vorher ...)[1];
+           hilf_id=factorize(faktoren[1][zaehler],1); 
            if (size(hilf_id)>1) {
              poly fac=hilf_id[1];
              dd=deg(fac);
@@ -3501,11 +3525,13 @@ RETURN: list: first entry = list of HNErings,
              }
              faktoren[1][zaehler]=fac;
              kill fac;
-             conjugates[zaehler]=conj_factor*dd;
+             if (conjugates[zaehler]==conj_factor) {
+               // number of conjugates not yet determined for this factor
+               conjugates[zaehler]=conjugates[zaehler]*dd;
+             }
            }
            else {
              faktoren[1][zaehler]=hilf_id[1];
-             conjugates[zaehler]=conj_factor;
            }
          }
        }
@@ -3629,9 +3655,10 @@ RETURN: list: first entry = list of HNErings,
       if (not(defined(hole))) { map hole; }
       hole=HNE_noparam,transf,x,y;
       poly fneu=hole(fneu);
-      if (not defined(faktoren)) {list faktoren;}
-      faktoren=hole(faktoren);
-
+      if (not defined(faktoren)) {
+        list faktoren;
+        faktoren=hole(faktoren);
+      }
       if (not(defined(f)))
       {
         poly f=hole(f);

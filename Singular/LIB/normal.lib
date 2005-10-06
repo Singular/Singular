@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: normal.lib,v 1.45 2005-05-10 17:56:14 Singular Exp $";
+version="$Id: normal.lib,v 1.46 2005-10-06 16:19:30 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  normal.lib     Normalization of Affine Rings
@@ -1844,7 +1844,7 @@ EXAMPLE: example deltaLoc;  shows an example
       if(w>=1){"Newton-Polygon is degenerated";"";}
 
       // the following can certainly be made more efficient when replacing
-      // 'reddevelop' (used only for computing number of branches) by
+      // 'hnexpansion' (used only for computing number of branches) by
       // successive blowing-up + test if Newton polygon degenerate:
       if(s>2)    //  splitting of f
       {
@@ -1886,10 +1886,18 @@ EXAMPLE: example deltaLoc;  shows an example
          setring R;
          return(list(d*(mu+nb-1)/2,d*tau,d*nb));
       }
-      list hne=reddevelop(f);
-      nb=size(hne);
-      setring R;
-      kill HNEring;
+      list HNEXP=hnexpansion(f);
+      if (typeof(HNEXP[1])=="ring") {
+        def altring = basering;
+        def HNEring = HNEXP[1]; setring HNEring;
+        nb=size(hne);
+        setring R;
+        kill HNEring;
+      }
+      else 
+      {
+        nb=size(HNEXP);
+      }
       return(list(d*(mu+nb-1)/2,d*tau,d*nb));
    }
    else             //the case of small characteristic
