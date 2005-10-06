@@ -1,6 +1,6 @@
 LIB "tst.lib";
+tst_ignore("CVS ID $Id: brnoeth_s.tst,v 1.5 2005-10-06 16:21:28 Singular Exp $");
 tst_init();
-tst_ignore("CVS ID $Id: brnoeth_s.tst,v 1.4 2005-09-27 17:46:29 Singular Exp $");
 
 // tst_status();
 
@@ -203,13 +203,10 @@ setring r;
 def SS2=C[5][2][1];
 setring SS2;
 
-
 def RR=C[1][2];
 setring RR;
 list WS=Weierstrass(17,6,C);
 WS;
 
-
-tst_status(1);
-$
+tst_status(1);$
 
