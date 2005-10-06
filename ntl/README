@@ -17,3 +17,8 @@ documentation:
    * doc/tour-win.html for Windows and other systems
 
 The latest version of NTL is available at http://www.shoup.net.
+
+The sources have been modified for Singular-2-0-7 / Singular-3-0-1
+- for errors blame singular@mathematik.uni-kl.de,
+not Victor Shoup (victor@shoup.net)
+
