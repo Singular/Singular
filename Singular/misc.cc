@@ -475,13 +475,12 @@ char * versionString()
 #endif
 #if defined (__GNU_MP_VERSION) && defined (__GNU_MP_VERSION_MINOR)
               StringAppend("GMP(%d.%d),",__GNU_MP_VERSION,__GNU_MP_VERSION_MINOR);
-#elif defined (HAVE_SMALLGMP)
-              StringAppendS("SmallGMP(2.0.2.0),");
 #else
               StringAppendS("GMP(1.3),");
 #endif
 #ifdef HAVE_NTL
-              StringAppendS("NTL,");
+#include "NTL/version.h"
+              StringAppend("NTL(%s),",NTL_VERSION);
 #endif
 #ifdef HAVE_MPSR
               StringAppend("MP(%s),",MP_VERSION);
