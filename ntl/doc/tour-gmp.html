@@ -85,48 +85,33 @@ so that you can write portable code and avoid deprecated constructs.
 Downloading and building GMP
 </h2>
 <p>
-To dowload and build GMP on your machine, do the following:
-<p>
-<b> Step 1.</b>
+
 Download GMP from <a href="http://www.swox.com/gmp">here.</a>
 You will get a file <tt>gmp-XXX.tar.gz</tt>.
 <p>
-<b>Step 2.</b>
-Unpack GMP as follows:
+Now do the following:
 <pre>
    % gunzip gmp-XXX.tar.gz
    % tar xf gmp-XXX.tar
-</pre>
-This creates a directory <tt>gmp-XXX</tt>.
-Go there now:
-<pre>
    % cd gmp-XXX
-</pre>
-<p>
-<b>Step 3.</b>
-Build GMP as follows:
-<pre>
-   % ./configure --disable-shared --prefix=&lt;gmp_prefix&gt;
+   % ./configure --disable-shared --prefix=$HOME/sw
    % make
+   % make check
    % make install
 </pre>
-Here, <tt>&lt;gmp_prefix&gt;</tt> should be the name of 
-a directory where you would like to store 
-the GMP library components.
-This builds and installs GMP, creating files
-<tt>&lt;gmp_prefix&gt;/include/gmp.h</tt> and 
-<tt>&lt;gmp_prefix&gt;/lib/libgmp.a</tt>.
+This will build, test, and install GMP in $HOME/sw.
+Of course, change $HOME/sw to whatever you want (the default is 
+<tt>/usr/local</tt>).
+You will find the GMP header files in <tt>$HOME/sw/include</tt> 
+and the compiled binary in <tt>$HOME/sw/lib/libgmp.a</tt>.
 
 <p>
-The options <tt>--disable-shared</tt> and <tt>--prefix=&lt;gmp_prefix&gt;</tt>
-to <tt>configure</tt>
-are both optional.
-The first option disables the creation of shared libraries,
+The option <tt>--disable-shared</tt> is optional.
+It disables the creation of shared libraries,
 which simplifies things just a bit (in particular, this documentation).
-If you don't  pass the second option, then 
-<tt>&lt;gmp_prefix&gt;</tt> defaults to 
-<tt>/usr/local</tt>, and 
-and you have to have root permissions to run <tt>make install</tt>.
+Shared libraries have their advantages, but the use of
+such libraries seems to vary a bit across different Unix flavors.
+
 
 <p>
 Executing <tt>make uninstall</tt> undoes the <tt>make install</tt>.
@@ -144,25 +129,24 @@ When building NTL with GMP, you have to tell NTL that you want to
 use GMP as the primary long integer package, 
 and where the include files and library are.
 The easiest way to do this is by passing the argument 
-<tt>NTL_GMP_LIP=on</tt> to the configuration script
+<tt>NTL_GMP_LIP=on</tt> to the NTL configuration script
 when you are <a href="tour-unix.html">installing NTL</a>.
-That is, you execute:
+Assuming you installed GMP in <tt>$HOME/sw</tt> as above,
+and you also want to install NTL in <tt>$HOME/sw</tt>,
+you execute:
 <pre>
-   % ./configure NTL_GMP_LIP=on  GMP_PREFIX=&lt;gmp_prefix&gt;
+   % ./configure PREFIX=$HOME/sw NTL_GMP_LIP=on  GMP_PREFIX=$HOME/sw
 </pre>
-where <tt>&lt;gmp_prefix&gt;</tt> is the name of the directory in
-which GMP was installed above.
+
 <p>
-If you need more fine-grained control, you can execute:
+If you installed GMP in <tt>/usr/local</tt> (or some other
+standard system directory where your compiler will look by default)
+then simply
 <pre>
-   % ./configure NTL_GMP_LIP=on GMP_INCDIR=-I&lt;gmp_prefix&gt;/include GMP_LIBDIR=-L&lt;gmp_prefix&gt;/lib
+   % ./configure PREFIX=$HOME/sw NTL_GMP_LIP=on
 </pre>
-Alternatively, the following achieves more or less the same thing:
-<pre>
-   % ./configure NTL_GMP_LIP=on CPPFLAGS=-I&lt;gmp_prefix&gt;/include LDFLAGS=-L&lt;gmp_prefix&gt;/lib
-</pre>
-<p>
-If you installed GMP in a standard system directory,
+does the job.
+Moreover, if NTL is also to be installed in <tt>/usr/local</tt>,
 then
 <pre>
    % ./configure NTL_GMP_LIP=on
@@ -184,13 +168,18 @@ The documentation in these files should be self-explanatory.
 <p>
 When compiling programs that use NTL with GMP,
 you need to link with the GMP library.
-If GMP is not installed in a standard place, this just means adding
-<tt>-L&lt;gmp_prefix&gt;/lib -lgmp</tt> to the compilation command.
+If GMP is not installed as above in 
+<tt>$HOME/sw</tt>, rather than in a standard system directory,
+ this just means adding
+<tt>-L$HOME/sw/lib -lgmp</tt> to the compilation command.
 If you installed GMP in a standard system directory,
 then just <tt>-lgmp</tt> does the job.
+Note that <tt>-lgmp</tt> must come <i>after</i> <tt>-lntl</tt>
+on the command line.
 
 <p>
-NTL has been tested and works correctly with GMP versions 3.1 and 3.1.1
+NTL has been tested and works correctly with GMP versions 3.1,  3.1.1,
+and 4.1.4 (among others)
 as the primary long integer package.
 It is not possible to use versions of GMP prior to 3.1 as the
 primary long integer package.
@@ -198,7 +187,8 @@ primary long integer package.
 <p>
 
 NTL has been tested and works correctly
-with versions 2.0.2, 3.0.1, 3.1, and 3.1.1 of GMP as a supplemental 
+with versions 2.0.2, 3.0.1, 3.1, 3.1.1, and 4.1.4
+(among otheers) of GMP as a supplemental 
 long integer package.
 It is not recommended to use versions of GMP prior to 3.1.1,
 as these are generally more buggy and less efficient.

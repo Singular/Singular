@@ -447,6 +447,8 @@ void EDF(vec_zz_pEX& factors, const zz_pEX& ff, const zz_pEX& bb,
    }
 
    
+   double t;
+
    factors.SetLength(0);
 
    RecEDF(factors, f, b, d, verbose);
@@ -536,6 +538,7 @@ void CanZass(vec_pair_zz_pEX_long& factors, const zz_pEX& f, long verbose)
    long i, j;
 
    for (i = 0; i < sfd.length(); i++) {
+
       SFCanZass(x, sfd[i].a, verbose);
 
       for (j = 0; j < x.length(); j++)
@@ -1067,6 +1070,7 @@ void GenerateBabySteps(zz_pEX& h1, const zz_pEX& f, const zz_pEX& h, long k,
                        long verbose)
 
 {
+   double t;
 
    zz_pEXModulus F;
    build(F, f);
@@ -1104,6 +1108,8 @@ void GenerateBabySteps(zz_pEX& h1, const zz_pEX& f, const zz_pEX& h, long k,
 static
 void GenerateGiantSteps(const zz_pEX& f, const zz_pEX& h, long l, long verbose)
 {
+
+   double t;
 
    zz_pEXModulus F;
    build(F, f);
@@ -1240,6 +1246,8 @@ void GiantRefine(vec_pair_zz_pEX_long& u, const zz_pEX& ff, long k, long l,
                  long verbose)
 
 {
+   double t;
+
    u.SetLength(0);
 
    vec_zz_pEX BabyStep;
@@ -1368,6 +1376,8 @@ void BabyRefine(vec_pair_zz_pEX_long& factors, const vec_pair_zz_pEX_long& u,
                 long k, long l, long verbose)
 
 {
+   double t;
+
    factors.SetLength(0);
 
    vec_zz_pEX BabyStep;

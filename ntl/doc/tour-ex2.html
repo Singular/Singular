@@ -28,6 +28,8 @@ numbers in a vector of <tt>ZZ</tt>'s.
 <pre>
 #include &lt;NTL/vec_ZZ.h&gt;
 
+NTL_CLIENT
+
 ZZ sum(const vec_ZZ&amp; v)
 {
    ZZ acc;
@@ -61,6 +63,8 @@ the above example could be written as follows.
 <pre>
 #include &lt;NTL/vec_ZZ.h&gt;
 
+NTL_CLIENT
+
 ZZ sum(ZZ&amp; s, const vec_ZZ&amp; v)
 {
    ZZ acc;
@@ -90,6 +94,8 @@ and then creates and prints a "palindrome".
 
 <pre>
 #include &lt;NTL/vec_ZZ.h&gt;
+
+NTL_CLIENT
 
 int main()
 {
@@ -156,6 +162,8 @@ which in fact is already provided by NTL.
 
 <pre>
 #include &lt;NTL/mat_ZZ.h&gt;
+
+NTL_CLIENT
 
 void mul(mat_ZZ&amp; X, const mat_ZZ&amp; A, const mat_ZZ&amp; B)
 {

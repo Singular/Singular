@@ -181,37 +181,483 @@ void print2k(FILE *f, long k, long bpl)
 }
 
 
+
+
+
+
+void print_mul_body(FILE *f, long n1, long k, long fn,
+                    long half_flag, long short_flag)
+{
+
+  long n, i, chop, r;
+  unsigned long mask, mask2;
+
+  if (half_flag)
+    n = n1/2;
+  else
+    n = n1;
+
+  chop = n % k; /* first block */
+  if (chop == 0)
+    chop = k;
+  r = n - k;
+  mask = (1UL << k) - 1UL;
+
+  fprintf(f, "\n\n#define NTL_");
+  if (half_flag) fprintf(f, "HALF_");
+  if (short_flag) fprintf(f, "SHORT_");
+
+  fprintf(f, "BB_MUL_CODE%ld \\\n", fn);
+
+  
+  if (fn > 0) /* Mul1/AddMul1 */
+    {
+      fprintf(f, "   long i;\\\n");
+      fprintf(f, "   _ntl_ulong carry = 0, b;\\\n");
+    }
+  fprintf(f, "   _ntl_ulong hi, lo, t;\\\n");
+  fprintf(f, "   _ntl_ulong A[%ld];\\\n", 1L << k);
+  fprintf(f, "   A[0] = 0;\\\n");
+
+  fprintf(f, "   A[1] = a;\\\n");
+
+  for (i = 2; i < (1L << k); i++)
+    {
+      if (i % 2 == 0)
+        fprintf(f, "   A[%ld] = A[%ld] << 1;\\\n", i, i / 2);
+      else
+        fprintf(f, "   A[%ld] = A[%ld] ^ A[1];\\\n", i, i - 1);
+    }
+
+  if (fn > 0)
+    {
+      fprintf(f, "   for (i = 0; i < sb; i++) {\\\n");
+      fprintf(f, "      b = bp[i];\\\n");
+      fprintf(f, "   ");
+    }
+
+  fprintf(f, "   lo = A[b & %lu]; ", mask);
+  fprintf(f, "t = A[(b >> %ld) & %lu]; ", k, mask);
+  fprintf(f, "hi = t >> %ld; lo ^= t << %ld;\\\n", n1-k, k);
+
+  for (i = 2*k; i < n - chop; i += k) {
+    if (fn > 0) fprintf(f, "   ");
+    fprintf(f, "   t = A[(b >> %ld) & %lu]; ", i, mask);
+    fprintf(f, "hi ^= t >> %ld; lo ^= t << %ld;\\\n", n1-i, i);
+  }
+
+  if (fn > 0) fprintf(f, "   ");
+  fprintf(f, "   t = A[b >> %ld]; ", n-chop);
+  fprintf(f, "hi ^= t >> %ld; lo ^= t << %ld;\\\n", n1-i, i);
+
+  mask = 0;
+  for (i = 0; i < n; i += k)
+    mask |= 1UL << i;
+  mask = ~mask;
+  if (half_flag) mask &= (1UL << n) - 1UL;
+  mask2 = mask;
+  
+  if (!short_flag) {
+    for (i = 1; i < k; i++)
+      {
+	if (fn > 0) fprintf(f, "   ");
+
+        if (i == 1)
+	   fprintf(f, "   if (a >> %ld) ", n1-i);
+        else
+           fprintf(f, "   if ((a >> %ld) & 1) ", n1-i);
+
+	/* bit n1-i from a was not considered in blocks of
+           k bits from b for index j >= i */
+	fprintf(f, "hi ^= ((b & 0x%lxUL) >> %ld);\\\n", mask2, i);
+	mask2 = (mask2 << 1) & mask;
+      }
+   }
+
+  if (fn > 0) fprintf(f, "   ");
+
+  if (fn == 0)
+    {
+      fprintf(f, "   c[0] = lo; ");
+      fprintf(f, "   c[1] = hi;\\\n");
+    }
+  else if (fn == 1 || fn == 3)
+    {
+      fprintf(f, "   cp[i] = carry ^ lo; ");
+      fprintf(f, "   carry = hi;\\\n");
+    }
+  else if (fn == 2)
+    {
+      fprintf(f, "   cp[i] ^= (carry ^ lo); ");
+      fprintf(f, "   carry = hi;\\\n");
+    }
+  if (fn > 0)
+    {
+
+      fprintf(f, "   }\\\n");
+
+      if (fn == 1 || fn == 3) 
+        fprintf(f, "   cp[sb] = carry;\\\n");
+      else
+        fprintf(f, "   cp[sb] ^= carry;\\\n");
+
+    }
+  fprintf(f, "\n\n\n");
+
+
+}
+
+
+
+
+
+/*
+ * This generates anternative code that runs significantly faster 
+ * on some machines, like a PowerPC (and probably other RISC machines).
+ * It makes it easier for the compiler to schedule instrucyions better,
+ * and it avoids branches.  It seems like this does not help
+ * on x86 machines (and can even make things worse).
+ */
+
+
+void print_alt_mul_body(FILE *f, long n1, long k, long fn, 
+                        long half_flag, long short_flag)
+{
+
+  long n, i, chop, r;
+  unsigned long mask, mask2;
+
+  if (half_flag)
+    n = n1/2;
+  else
+    n = n1;
+
+  chop = n % k; /* first block */
+  if (chop == 0)
+    chop = k;
+  r = n - k;
+  mask = (1UL << k) - 1UL;
+
+  fprintf(f, "\n\n#define NTL_ALT_");
+  if (half_flag) fprintf(f, "HALF_");
+  if (short_flag) fprintf(f, "SHORT_");
+
+  fprintf(f, "BB_MUL_CODE%ld \\\n", fn);
+  
+  if (fn > 0) /* Mul1/AddMul1 */
+    {
+      fprintf(f, "   long i;\\\n");
+      fprintf(f, "   _ntl_ulong carry = 0;\\\n");
+    }
+  fprintf(f, "   _ntl_ulong A[%ld];\\\n", 1L << k);
+  fprintf(f, "   A[0] = 0;\\\n");
+
+  fprintf(f, "   A[1] = a;\\\n");
+
+  for (i = 2; i < (1L << k); i++)
+    {
+      if (i % 2 == 0)
+        fprintf(f, "   A[%ld] = A[%ld] << 1;\\\n", i, i / 2);
+      else
+        fprintf(f, "   A[%ld] = A[%ld] ^ A[1];\\\n", i, i - 1);
+    }
+
+  if (fn > 0)
+    {
+      fprintf(f, "   for (i = 0; i < sb; i++) {\\\n");
+      fprintf(f, "      const _ntl_ulong b = bp[i];\\\n");
+    }
+
+  for (i = k; i < n - chop; i += k) {
+    if (fn > 0) fprintf(f, "   ");
+    fprintf(f, "   const _ntl_ulong t%ld = A[(b >> %ld) & %lu]; \\\n", i, i, mask);
+
+  }
+  if (fn > 0) fprintf(f, "   ");
+  fprintf(f, "   const _ntl_ulong t%ld = A[b >> %ld]; \\\n", n-chop, n-chop);
+
+  if (fn > 0) fprintf(f, "   ");
+  fprintf(f, "   const _ntl_ulong lo = A[b & %lu] \\\n", mask);
+
+  for (i = k; i < n; i += k) {
+    if (fn > 0) fprintf(f, "   ");
+    fprintf(f, "      ^ (t%ld << %ld)", i, i);
+    if (i == n - chop)
+      fprintf(f, ";\\\n");
+    else
+      fprintf(f, "\\\n");
+  }
+
+  for (i = k; i < n; i += k) {
+    if (fn > 0) fprintf(f, "   ");
+    if (i == k)
+      fprintf(f, "   const _ntl_ulong hi = ");
+    else
+      fprintf(f, "      ^ ");
+    fprintf(f, "(t%ld >> %ld)", i, n1-i);
+    if (i == n - chop && short_flag)
+      fprintf(f, ";\\\n");
+    else
+      fprintf(f, "\\\n");
+      
+      
+  }
+ 
+  mask = 0;
+  for (i = 0; i < n; i += k)
+    mask |= 1UL << i;
+  mask = ~mask;
+  if (half_flag) mask &= (1UL << n) - 1UL;
+  mask2 = mask;
+  
+  if (!short_flag) {
+    for (i = 1; i < k; i++)
+      {
+
+        /* bit n1-i from a was not considered in blocks of
+           k bits from b for index j >= i */
+
+        if (fn > 0) fprintf(f, "   ");
+
+	
+        if (i == 1)
+          fprintf(f, 
+             "      ^ (((b & 0x%lxUL) >> %ld) & (-(a >> %ld)))", 
+        	mask2, i, n1-1);
+        else {
+          fprintf(f, 
+             "      ^ (((b & 0x%lxUL) >> %ld) & (-((a >> %ld) & 1UL)))",  
+                  mask2, i, n1-i);
+        }
+        if (i == k-1) 
+           fprintf(f, ";\\\n");
+        else
+            fprintf(f, "\\\n");
+
+
+	
+	mask2 = (mask2 << 1) & mask;
+      }
+   }
+
+  if (fn > 0) fprintf(f, "   ");
+
+  if (fn == 0)
+    {
+      fprintf(f, "   c[0] = lo; ");
+      fprintf(f, "   c[1] = hi;\\\n");
+    }
+  else if (fn == 1)
+    {
+      fprintf(f, "   cp[i] = carry ^ lo; ");
+      fprintf(f, "   carry = hi;\\\n");
+    }
+  else if (fn == 2)
+    {
+      fprintf(f, "   cp[i] ^= (carry ^ lo); ");
+      fprintf(f, "   carry = hi;\\\n");
+    }
+  if (fn > 0)
+    {
+
+      fprintf(f, "   }\\\n");
+
+      if (fn == 1 || fn == 3) 
+        fprintf(f, "   cp[sb] = carry;\\\n");
+      else
+        fprintf(f, "   cp[sb] ^= carry;\\\n");
+
+    }
+  fprintf(f, "\n\n\n");
+
+
+}
+
+
+
+
+void print_alt1_mul_body(FILE *f, long n1, long k, long fn,
+                    long half_flag, long short_flag)
+{
+
+  long n, i, chop, r;
+  unsigned long mask, mask2;
+
+  if (half_flag)
+    n = n1/2;
+  else
+    n = n1;
+
+  chop = n % k; /* first block */
+  if (chop == 0)
+    chop = k;
+  r = n - k;
+  mask = (1UL << k) - 1UL;
+
+  fprintf(f, "\n\n#define NTL_ALT1_");
+  if (half_flag) fprintf(f, "HALF_");
+  if (short_flag) fprintf(f, "SHORT_");
+
+  fprintf(f, "BB_MUL_CODE%ld \\\n", fn);
+
+  
+  if (fn > 0) /* Mul1/AddMul1 */
+    {
+      fprintf(f, "   long i;\\\n");
+      fprintf(f, "   _ntl_ulong carry = 0, b;\\\n");
+    }
+  fprintf(f, "   _ntl_ulong hi, lo, t;\\\n");
+  fprintf(f, "   _ntl_ulong A[%ld];\\\n", 1L << k);
+  fprintf(f, "   A[0] = 0;\\\n");
+
+  fprintf(f, "   A[1] = a;\\\n");
+
+  for (i = 2; i < (1L << k); i++)
+    {
+      if (i % 2 == 0)
+        fprintf(f, "   A[%ld] = A[%ld] << 1;\\\n", i, i / 2);
+      else
+        fprintf(f, "   A[%ld] = A[%ld] ^ A[1];\\\n", i, i - 1);
+    }
+
+  if (fn > 0)
+    {
+      fprintf(f, "   for (i = 0; i < sb; i++) {\\\n");
+      fprintf(f, "      b = bp[i];\\\n");
+      fprintf(f, "   ");
+    }
+
+  fprintf(f, "   lo = A[b & %lu]; ", mask);
+  fprintf(f, "t = A[(b >> %ld) & %lu]; ", k, mask);
+  fprintf(f, "hi = t >> %ld; lo ^= t << %ld;\\\n", n1-k, k);
+
+  for (i = 2*k; i < n - chop; i += k) {
+    if (fn > 0) fprintf(f, "   ");
+    fprintf(f, "   t = A[(b >> %ld) & %lu]; ", i, mask);
+    fprintf(f, "hi ^= t >> %ld; lo ^= t << %ld;\\\n", n1-i, i);
+  }
+
+  if (fn > 0) fprintf(f, "   ");
+  fprintf(f, "   t = A[b >> %ld]; ", n-chop);
+  fprintf(f, "hi ^= t >> %ld; lo ^= t << %ld;\\\n", n1-i, i);
+
+  mask = 0;
+  for (i = 0; i < n; i += k)
+    mask |= 1UL << i;
+  mask = ~mask;
+  if (half_flag) mask &= (1UL << n) - 1UL;
+  mask2 = mask;
+
+  
+  if (!short_flag) {
+    for (i = 1; i < k; i++)
+      {
+
+        /* bit n1-i from a was not considered in blocks of
+           k bits from b for index j >= i */
+
+        if (fn > 0) fprintf(f, "   ");
+
+	
+        if (i == 1)
+          fprintf(f, 
+             "   hi ^= (((b & 0x%lxUL) >> %ld) & (-(a >> %ld)))", 
+        	mask2, i, n1-1);
+        else {
+          fprintf(f, 
+             "      ^ (((b & 0x%lxUL) >> %ld) & (-((a >> %ld) & 1UL)))",  
+                  mask2, i, n1-i);
+        }
+        if (i == k-1) 
+           fprintf(f, ";\\\n");
+        else
+            fprintf(f, "\\\n");
+
+
+	
+	mask2 = (mask2 << 1) & mask;
+      }
+   }
+
+  
+
+
+  if (fn > 0) fprintf(f, "   ");
+
+  if (fn == 0)
+    {
+      fprintf(f, "   c[0] = lo; ");
+      fprintf(f, "   c[1] = hi;\\\n");
+    }
+  else if (fn == 1 || fn == 3)
+    {
+      fprintf(f, "   cp[i] = carry ^ lo; ");
+      fprintf(f, "   carry = hi;\\\n");
+    }
+  else if (fn == 2)
+    {
+      fprintf(f, "   cp[i] ^= (carry ^ lo); ");
+      fprintf(f, "   carry = hi;\\\n");
+    }
+  if (fn > 0)
+    {
+
+      fprintf(f, "   }\\\n");
+
+      if (fn == 1 || fn == 3) 
+        fprintf(f, "   cp[sb] = carry;\\\n");
+      else
+        fprintf(f, "   cp[sb] ^= carry;\\\n");
+
+    }
+  fprintf(f, "\n\n\n");
+
+
+}
+
+
+
+
+
+
+
 void print_BB_mul_code(FILE *f, long n)
 {
-   long i;
+   long k;
 
-   fprintf(f, "\n\n");
+   if (n >= 64)
+      k = 4;
+   else
+      k = 3;
 
-   fprintf(f, "#define NTL_BB_MUL_CODE \\\n");
 
-   for (i = n-6; i >= 2; i -= 2) {
-      fprintf(f, "hi=(hi<<2)|(lo>>%ld); ", n-2);
-      fprintf(f, "lo=(lo<<2)^A[(b>>%ld)&3];\\\n", i); 
-   }
+   print_mul_body(f, n, k, 0, 0, 0);
+   print_mul_body(f, n, 4, 1, 0, 0);
+   print_mul_body(f, n, 4, 2, 0, 0);
+   print_mul_body(f, n, 4, 1, 0, 1);
+   print_mul_body(f, n, 2, 0, 1, 0);
 
-   fprintf(f, "\n\n");
+
+
+   print_alt_mul_body(f, n, k, 0, 0, 0);
+   print_alt_mul_body(f, n, 4, 1, 0, 0);
+   print_alt_mul_body(f, n, 4, 2, 0, 0);
+   print_alt_mul_body(f, n, 4, 1, 0, 1);
+   print_alt_mul_body(f, n, 2, 0, 1, 0);
+
+
+
+   print_alt1_mul_body(f, n, k, 0, 0, 0);
+   print_alt1_mul_body(f, n, 4, 1, 0, 0);
+   print_alt1_mul_body(f, n, 4, 2, 0, 0);
+   print_alt1_mul_body(f, n, 4, 1, 0, 1);
+   print_alt1_mul_body(f, n, 2, 0, 1, 0);
+
+   fprintf(f, "#define NTL_BB_MUL1_BITS (4)\n\n");
 }
 
-void print_BB_half_mul_code(FILE *f, long n)
-{
-   long i;
 
-   fprintf(f, "\n\n");
 
-   fprintf(f, "#define NTL_BB_HALF_MUL_CODE \\\n");
-
-   for (i = n/2-6; i >= 2; i -= 2) {
-      fprintf(f, "hi=(hi<<2)|(lo>>%ld); ", n-2);
-      fprintf(f, "lo=(lo<<2)^A[(b>>%ld)&3];\\\n", i); 
-   }
-
-   fprintf(f, "\n\n");
-}
 
 
 void print_BB_sqr_code(FILE *f, long n)
@@ -564,7 +1010,8 @@ int main()
       fprintf(stderr, "IEEE standard is 53 bits.\n"); 
    }
 
-#if (defined(__sparc__) && !defined(__sparc_v8__))
+#if (defined(__sparc__) && !defined(__sparc_v8__) && \
+    !defined(__sparcv8) && !defined(__sparc_v9__) && !defined(__sparcv9))
 
    warnings = 1;
 
@@ -634,7 +1081,6 @@ int main()
    fprintf(f, "#define NTL_SINGLE_MUL_OK (%d)\n", single_mul_ok != 0);
    fprintf(f, "#define NTL_DOUBLES_LOW_HIGH (%d)\n\n\n", single_mul_ok < 0);
    print_BB_mul_code(f, bpl);
-   print_BB_half_mul_code(f, bpl);
    print_BB_sqr_code(f, bpl);
    print_BB_rev_code(f, bpl);
 

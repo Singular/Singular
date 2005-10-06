@@ -1,246 +1,220 @@
+# This is a perl script, invoked from a shell
 
-cp ../include/NTL/config.h ../include/NTL/old_config.h
-
-rm GMP_LIP 
-rm NO_GMP_LIP
-
-make InitSettings
-./InitSettings > isettings
-
-make WizComp
-
-cat clr_LONG_LONG clr_AVOID_FLOAT > best1
-cat clr_LONG_LONG clr_AVOID_FLOAT clr_TBL_REM clr_AVOID_BRANCHING clr_FFT_PIPELINE set_WIZARD_HACK isettings > isettings1
-sed -f isettings1 config_template > ../include/NTL/config.h
-make wntl.a
-sh RemoveProg MulTimeTest
-
-if test -f NO_GMP_LIP
-then
-
-   make MulTimeTest
-   if test -f MulTimeTest
-   then
-   ./MulTimeTest > XXX1
-   else
-   echo "999999999999999 DEFAULT" > XXX1
-   fi
-   
-   cat mul_banner XXX1
-   
-   
-   
-   cat clr_LONG_LONG set_AVOID_FLOAT clr_TBL_REM clr_AVOID_BRANCHING clr_FFT_PIPELINE set_WIZARD_HACK isettings > isettings1
-   sed -f isettings1 config_template > ../include/NTL/config.h
-   rm lip.o
-   make wntl.a
-   sh RemoveProg MulTimeTest
-   make MulTimeTest
-   if test -f MulTimeTest
-   then
-   ./MulTimeTest > XXX2
-   else
-   echo "999999999999999 AVOID_FLOAT" > XXX2
-   fi
-   
-   cat mul_banner XXX2
-   
-   if ./WizComp XXX2 XXX1
-   then
-   cat clr_LONG_LONG set_AVOID_FLOAT > best1
-   cp XXX2 XXX1
-   fi
-   
-   
-   cat set_LONG_LONG clr_AVOID_FLOAT clr_TBL_REM clr_AVOID_BRANCHING clr_FFT_PIPELINE set_WIZARD_HACK isettings > isettings1
-   sed -f isettings1 config_template > ../include/NTL/config.h
-   rm lip.o
-   make wntl.a
-   sh RemoveProg MulTimeTest
-   make MulTimeTest
-   if test -f MulTimeTest
-   then
-   ./MulTimeTest > XXX2
-   else
-   echo "999999999999999 LONG_LONG" > XXX2
-   fi
-   
-   cat mul_banner XXX2
-   
-   if ./WizComp XXX2 XXX1
-   then
-   cat set_LONG_LONG clr_AVOID_FLOAT > best1
-   cp XXX2 XXX1
-   fi
+# use warnings;  # this doesn't work on older versions of perl
 
 
-fi
+sub GenConfigHeader {
 
-cat best1 clr_TBL_REM clr_AVOID_BRANCHING clr_FFT_PIPELINE set_WIZARD_HACK isettings > isettings1
-sed -f isettings1 config_template > ../include/NTL/config.h
-rm lip.o
-make wntl.a
-sh RemoveProg PolyTimeTest
-make PolyTimeTest
-if test -f PolyTimeTest
-then
-./PolyTimeTest > XXX1
-else
-echo "999999999999999" > XXX1
-fi
+   my $line;
+   local *CFILE;
+   local *CFILEOUT;
 
-cat poly_banner XXX1
-cat clr_FFT_PIPELINE > best2
+   open(CFILE, "< cfile");
+   open(CFILEOUT, "> cfileout");
 
-cat best1 clr_TBL_REM clr_AVOID_BRANCHING set_FFT_PIPELINE set_WIZARD_HACK isettings > isettings1
-sed -f isettings1 config_template > ../include/NTL/config.h
-rm FFT.o
-make wntl.a
-sh RemoveProg PolyTimeTest
-make PolyTimeTest
-if test -f PolyTimeTest
-then
-./PolyTimeTest > XXX2
-else
-echo "999999999999999 FFT_PIPELINE" > XXX2
-fi
+   while ($line = <CFILE>) {
 
-cat poly_banner XXX2
+      $line =~ s/@\{(.*?)\}/$Config{$1}/ge;
 
-if ./WizComp XXX2 XXX1
-then
-cat set_FFT_PIPELINE  > best2
-cp XXX2 XXX1
-else
-rm FFT.o
-fi
+      print CFILEOUT $line;
 
-cat clr_TBL_REM  > best3
+   }
 
-if test -f NO_GMP_LIP
-then
+   close(CFILE);
+   close(CFILEOUT);
 
-   cat best1 set_TBL_REM clr_AVOID_BRANCHING best2 set_WIZARD_HACK isettings > isettings1
-   sed -f isettings1 config_template > ../include/NTL/config.h
-   rm lip.o 
-   make wntl.a
-   sh RemoveProg PolyTimeTest
-   make PolyTimeTest
-   if test -f PolyTimeTest
-   then
-   ./PolyTimeTest > XXX2
-   else
-   echo "999999999999999 TBL_REM" > XXX2
-   fi
-   
-   cat poly_banner XXX2
-   
-   if ./WizComp XXX2 XXX1
-   then
-   cat set_TBL_REM  > best3
-   cp XXX2 XXX1
-   fi
+   system("cp cfileout ../include/NTL/config.h");
 
-fi
-
-cp XXX1 XXX1a
-cp best2 best2a
-cp best3 best3a
-
-
-cat best1 clr_TBL_REM set_AVOID_BRANCHING clr_FFT_PIPELINE set_WIZARD_HACK isettings > isettings1
-sed -f isettings1 config_template > ../include/NTL/config.h
-rm *.o
-make wntl.a
-sh RemoveProg PolyTimeTest
-make PolyTimeTest
-if test -f PolyTimeTest
-then
-./PolyTimeTest > XXX1
-else
-echo "999999999999999 AVOID_BRANCHING" > XXX1
-fi
-
-cat poly_banner XXX1
-cat clr_FFT_PIPELINE > best2
-
-cat best1 clr_TBL_REM set_AVOID_BRANCHING set_FFT_PIPELINE set_WIZARD_HACK isettings > isettings1
-sed -f isettings1 config_template > ../include/NTL/config.h
-rm FFT.o
-make wntl.a
-sh RemoveProg PolyTimeTest
-make PolyTimeTest
-if test -f PolyTimeTest
-then
-./PolyTimeTest > XXX2
-else
-echo "999999999999999 AVOID_BRANCHING FFT_PIPELINE" > XXX2
-fi
-
-cat poly_banner XXX2
-
-if ./WizComp XXX2 XXX1
-then
-cat set_FFT_PIPELINE  > best2
-cp XXX2 XXX1
-else
-rm FFT.o
-fi
-
-
-cat clr_TBL_REM  > best3
-
-if test -f NO_GMP_LIP
-then
-
-   cat best1 set_TBL_REM set_AVOID_BRANCHING best2 set_WIZARD_HACK isettings > isettings1
-   sed -f isettings1 config_template > ../include/NTL/config.h
-   rm lip.o 
-   make wntl.a
-   sh RemoveProg PolyTimeTest
-   make PolyTimeTest
-   if test -f PolyTimeTest
-   then
-   ./PolyTimeTest > XXX2
-   else
-   echo "999999999999999 AVOID_BRANCHING TBL_REM" > XXX2
-   fi
-   
-   cat poly_banner XXX2
-   
-   if ./WizComp XXX2 XXX1
-   then
-   cat set_TBL_REM  > best3
-   cp XXX2 XXX1
-   fi
-   
-fi
+}
 
 
 
-cat set_AVOID_BRANCHING > best4
 
-if ./WizComp XXX1 XXX1a
-then
-echo "" > XXX
-else
-cat best2a > best2
-cat best3a > best3
-cat clr_AVOID_BRANCHING > best4
-fi
+sub RemoveProg {
 
-cat best1 best2 best3 best4 > best
+# This should work on unix and cygwin on windows
+
+   my ($name) = @_;
+
+   unlink($name);  unlink("$name.exe");
+
+}
 
 
-cat isettings best clr_WIZARD_HACK > isettings1
-sed -f isettings1 config_template > ../include/NTL/config.h
+sub RunProg {
 
-make DispSettings
+   my ($name) = @_;
+   my $val;
+   my $res;
 
-echo "*"
-echo "*"
-echo "* The wizard is done!"
-echo "*"
-echo "*"
+   system("make wntl.a");
+   RemoveProg($name);
+   system("make $name");
 
-./DispSettings
+   print "\n*** running $name...";
+
+   $val = `./$name`;
+
+   if ($? != 0) {
+      $res = "999999999999999";
+   }
+   else {
+      ($res) = ( $val =~ /^([0-9]*)/ );
+   }
+
+   print $val, "\n";
+
+   return $res;
+
+}
+
+
+############################################################
+
+
+
+system("make InitSettings");
+
+@lines = `./InitSettings`;
+
+%Config = (
+
+'NTL_LONG_LONG'        => 0,
+'NTL_AVOID_FLOAT'      => 0,
+'NTL_SPMM_UL'          => 0,
+'NTL_SPMM_ULL'         => 0,
+'NTL_SPMM_ASM'         => 0,
+'NTL_TBL_REM'          => 0,
+'NTL_AVOID_BRANCHING'  => 0,
+'NTL_GF2X_ALTCODE'     => 0,
+'NTL_GF2X_ALTCODE1'    => 0,
+'NTL_GF2X_NOINLINE'    => 0,
+
+'WIZARD_HACK'          => '#define NTL_OLD_ZZ_pX_MUL',
+
+);
+
+foreach $line (@lines) {
+   chomp($line);
+   ($name, $val) = ($line =~ /(.*?)=(.*)/);
+   $Config{$name} = $val;
+}
+
+
+
+
+
+#  set AVOID_BRANCHING and SPMM flags...try all pairs
+
+
+$time = "999999999999999";
+$aflag = "default";
+$bflag = "default";
+
+foreach $aflag1 ("default", "NTL_AVOID_BRANCHING") {
+   foreach $bflag1 ("default", "NTL_SPMM_UL", "NTL_SPMM_ULL", "NTL_SPMM_ASM") {
+
+      $Config{$aflag1} = 1;
+      $Config{$bflag1} = 1;
+      GenConfigHeader();
+      $time1 = RunProg("Poly1TimeTest");
+
+      if ($time1 < $time) {
+	 $aflag = $aflag1;
+	 $bflag = $bflag1;
+	 $time = $time1;
+      }
+
+      $Config{$aflag1} = 0;
+      $Config{$bflag1} = 0;
+      unlink("FFT.o");  
+   }
+}
+
+$Config{$aflag} = 1;
+$Config{$bflag} = 1;
+unlink("lip.o");   #  AVOID_BRANCHING affects this too
+
+
+# set the flags GF2X_NOINLINE and GF2X_ALTCODE...try all pairs
+
+$time = "999999999999999";
+$aflag = "default";
+$bflag = "default";
+
+foreach $aflag1 ("default", "NTL_GF2X_NOINLINE") {
+   foreach $bflag1 ("default", "NTL_GF2X_ALTCODE", "NTL_GF2X_ALTCODE1") {
+
+      $Config{$aflag1} = 1;
+      $Config{$bflag1} = 1;
+      GenConfigHeader();
+      $time1 = RunProg("GF2XTimeTest");
+
+      if ($time1 < $time) {
+	 $aflag = $aflag1;
+	 $bflag = $bflag1;
+	 $time = $time1;
+      }
+
+      $Config{$aflag1} = 0;
+      $Config{$bflag1} = 0;
+      unlink("GF2X.o");
+   }
+}
+
+$Config{$aflag} = 1;
+$Config{$bflag} = 1;
+
+
+
+if ($Config{"NTL_GMP_LIP"} == 0) {
+
+   # GMP is not the primary long integer package
+   # Choose between default, AVOID_FLOAT, and LONG_LONG implementatsions
+
+   $time = "999999999999999";
+   $flag = "default";
+
+   foreach $flag1 ("default", "NTL_AVOID_FLOAT", "NTL_LONG_LONG") {
+      $Config{$flag1} = 1;
+      GenConfigHeader(); 
+      $time1 = RunProg("MulTimeTest");
+
+      if ($time1 < $time) {
+	 $flag = $flag1;
+	 $time = $time1;
+      }
+
+      $Config{$flag1} = 0;
+      unlink("lip.o");
+   }
+
+   $Config{$flag} = 1;
+
+
+   # finally, now set TBL_REM
+
+   GenConfigHeader();
+   $time = RunProg("PolyTimeTest");
+
+   $Config{"NTL_TBL_REM"} = 1;
+   GenConfigHeader();
+   unlink("lip.o");
+
+   $time1 = RunProg("PolyTimeTest");
+
+   if ($time1 >= $time) {
+      $Config{"NTL_TBL_REM"} = 0;
+   } 
+
+}
+
+$Config{'WIZARD_HACK'} = "";
+GenConfigHeader();
+
+print "\n\n*** the wizard is done!!\n\n"; 
+
+system("make DispSettings");
+system("./DispSettings");
+
+

@@ -561,11 +561,13 @@ void SFBerlekamp(vec_GF2EX& factors, const GF2EX& ff, long verbose)
    NullSpace(r, D, M, verbose);
 
 
+
    if (r == 1) {
       factors.SetLength(1);
       factors[0] = f;
       return;
    }
+
 
    vec_GF2E roots;
 
@@ -602,6 +604,7 @@ void SFBerlekamp(vec_GF2EX& factors, const GF2EX& ff, long verbose)
       }
       swap(factors, S);
    }
+
 
 }
 
@@ -1582,7 +1585,6 @@ double GF2EXFileThresh = 256;
 static vec_GF2EX BabyStepFile;
 static vec_GF2EX GiantStepFile;
 
-
 static
 double CalcTableSize(long n, long k)
 {
@@ -1601,6 +1603,7 @@ void GenerateBabySteps(GF2EX& h1, const GF2EX& f, const GF2EX& h, long k,
                        long verbose)
 
 {
+   double t;
 
    GF2EXModulus F;
    build(F, f);
@@ -1635,7 +1638,6 @@ void GenerateBabySteps(GF2EX& h1, const GF2EX& f, const GF2EX& h, long k,
       CompMod(h1, h1, H, F);
    }
 
-
    GF2X::HexOutput = HexOutput;
 }
 
@@ -1643,6 +1645,9 @@ void GenerateBabySteps(GF2EX& h1, const GF2EX& f, const GF2EX& h, long k,
 static
 void GenerateGiantSteps(const GF2EX& f, const GF2EX& h, long l, long verbose)
 {
+
+   double t;
+
 
    GF2EXModulus F;
    build(F, f);
@@ -1754,7 +1759,7 @@ void NewProcessTable(vec_pair_GF2EX_long& u, GF2EX& f, const GF2EXModulus& F,
 static
 void FetchGiantStep(GF2EX& g, long gs, const GF2EXModulus& F)
 {
-   g = GiantStepFile(gs);
+      g = GiantStepFile(gs);
 
    rem(g, g, F);
 }
@@ -1780,7 +1785,6 @@ void GiantRefine(vec_pair_GF2EX_long& u, const GF2EX& ff, long k, long l,
                  long verbose)
 
 {
-
    u.SetLength(0);
 
    vec_GF2EX BabyStep;

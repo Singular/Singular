@@ -24,8 +24,8 @@ CFLAGS=-O2
 # Some useful flags:
 #   -O2   --  recommended level of optimization
 #   -g    --  debugging
-#   -mv8  --  needed with gcc/g++ to get the full instruction set
-#             of a SparcStation
+#   -mcpu=v8  --  needed with gcc/g++ to get the full instruction set
+#                 of a SparcStation
 #   -qarch=ppc  -- needed with xlc/C to get the full instruction set
 #                  of a PowerPC
 
@@ -179,8 +179,8 @@ SINC = c_lip_impl.h g_lip_impl.h
 
 IN01= FFT.h FacVec.h GF2.h GF2E.h GF2EX.h GF2EXFactoring.h GF2X.h
 IN02=$(IN01) GF2XFactoring.h GF2XVec.h HNF.h ctools.h LLL.h 
-IN03=$(IN02) RR.h WordVector.h ZZ.h ZZVec.h ZZX.h ZZXFactoring.h ZZ_p.h
-IN04=$(IN03) ZZ_pE.h ZZ_pEX.h ZZ_pEXFactoring.h ZZ_pX.h ZZ_pXFactoring.h
+IN03=$(IN02) RR.h SPMM_ASM.h WordVector.h ZZ.h ZZVec.h ZZX.h ZZXFactoring.h 
+IN04=$(IN03) ZZ_p.h ZZ_pE.h ZZ_pEX.h ZZ_pEXFactoring.h ZZ_pX.h ZZ_pXFactoring.h
 IN05=$(IN04) fileio.h lip.h lzz_p.h lzz_pE.h lzz_pEX.h lzz_pEXFactoring.h
 IN06=$(IN05) lzz_pX.h lzz_pXFactoring.h mat_GF2.h mat_GF2E.h mat_RR.h
 IN07=$(IN06) mat_ZZ.h mat_ZZ_p.h mat_ZZ_pE.h mat_lzz_p.h mat_lzz_pE.h
@@ -219,8 +219,8 @@ TS = $(TS3)
 
 # scripts
 
-SCRIPTS1=MakeGetTime TestScript dosify unixify RemoveProg Select Select1 Select2
-SCRIPTS2=$(SCRIPTS1) Check1 Check2 configure make.config flags.config make.tail
+SCRIPTS1=MakeGetTime TestScript dosify unixify RemoveProg 
+SCRIPTS2=$(SCRIPTS1) configure DoConfig mfile cfile
 
 SCRIPTS=$(SCRIPTS2)
 
@@ -267,12 +267,9 @@ PROGS = $(PROG3)
 # things to save to a tar file
 
 SFI1=makefile $(SRC) $(SINC) $(SCRIPTS) $(MD) $(GT) $(TS) $(TD) mach_desc.win 
-SFI2=$(SFI1) MulTimeTest.c PolyTimeTest.c clr_AVOID_BRANCHING clr_AVOID_FLOAT
-SFI3=$(SFI2) clr_FFT_PIPELINE clr_LONG_LONG clr_TBL_REM clr_WIZARD_HACK 
-SFI4=$(SFI3) InitSettings.c mul_banner poly_banner set_AVOID_BRANCHING set_AVOID_FLOAT
-SFI5=$(SFI4) set_FFT_PIPELINE set_LONG_LONG set_TBL_REM set_WIZARD_HACK
-SFI6=$(SFI5) WizComp.c DispSettings.c config_template WizardAux Wizard def_makefile
-SFILES=$(SFI6)
+SFI2=$(SFI1) MulTimeTest.c PolyTimeTest.c Poly1TimeTest.c GF2XTimeTest.c  
+SFI3=$(SFI2) InitSettings.c DispSettings.c  WizardAux Wizard def_makefile
+SFILES=$(SFI3)
 
 
 #################################################################
@@ -370,7 +367,11 @@ check:
 #
 # Rule for installing
 # make install just does a simple copy of the include file
-#   and library
+#   and library.  The -p option is used to preserve file attributes.
+#   This helps avoid some problems (especially when copying ntl.a).
+#   Also, an attempt is made to make everything that is
+#   installed readable by everyone.
+#   
 # make uninstall removes these files
 #   
 #################################################################
@@ -379,19 +380,21 @@ check:
 
 
 install:
-	mkdir -p $(LIBDIR)
-	cp ntl.a $(LIBDIR)/libntl.a
-	- $(RANLIB) $(LIBDIR)/libntl.a
-	mkdir -p $(INCLUDEDIR)
+	mkdir -p -m 755 $(LIBDIR)
+	cp -p ntl.a $(LIBDIR)/libntl.a
+	- chmod a+r $(LIBDIR)/libntl.a
+	mkdir -p -m 755 $(INCLUDEDIR)
 	- rm -r $(INCLUDEDIR)/NTL
-	mkdir $(INCLUDEDIR)/NTL
-	cp ../include/NTL/*.h $(INCLUDEDIR)/NTL
-	mkdir -p $(DOCDIR)
+	mkdir -m 755 $(INCLUDEDIR)/NTL
+	cp -p ../include/NTL/*.h $(INCLUDEDIR)/NTL
+	- chmod -R a+r $(INCLUDEDIR)/NTL
+	mkdir -p -m 755 $(DOCDIR)
 	- rm -r $(DOCDIR)/NTL
-	mkdir $(DOCDIR)/NTL
-	cp ../doc/*.txt $(DOCDIR)/NTL
-	cp ../doc/*.html $(DOCDIR)/NTL
-	cp ../doc/*.gif $(DOCDIR)/NTL
+	mkdir -m 755 $(DOCDIR)/NTL
+	cp -p ../doc/*.txt $(DOCDIR)/NTL
+	cp -p ../doc/*.html $(DOCDIR)/NTL
+	cp -p ../doc/*.gif $(DOCDIR)/NTL
+	- chmod -R a+r $(DOCDIR)/NTL
 
 
 uninstall:
@@ -433,8 +436,8 @@ clean:
 #################################################################
 
 
-DIRNAME=ntl-5.3.2
-WINDIR=WinNTL-5_3_2
+DIRNAME=ntl-5.4
+WINDIR=WinNTL-5_4
 
 package:
 	sh unixify "$(SFILES)" "$(INCL)" "$(DOC)" 
@@ -464,8 +467,9 @@ winpack:
 
 WO1 = FFT.o  GetTime.o ctools.o ZZ.o ZZVec.o ZZ_p.o ZZ_pX.o
 WO2 = $(WO1) ZZ_pX1.o lip.o tools.o vec_ZZ.o vec_ZZ_p.o vec_long.o
+WO3 = $(WO2) GF2.o WordVector.o vec_GF2.o GF2X.o GF2X1.o
 
-WOBJ = $(WO2)
+WOBJ = $(WO3)
 
 
 wntl.a:	$(WOBJ) 
@@ -480,11 +484,16 @@ MulTimeTest:
 PolyTimeTest:
 	$(LINK_CXX) -o PolyTimeTest PolyTimeTest.c wntl.a  $(GMP_LIBDIR) $(GMP_LIB) $(LDLIBS_CXX)
 
+Poly1TimeTest:
+	$(LINK_CXX) -o Poly1TimeTest Poly1TimeTest.c wntl.a  $(GMP_LIBDIR) $(GMP_LIB) $(LDLIBS_CXX)
+
+
+GF2XTimeTest:
+	$(LINK_CXX) -o GF2XTimeTest GF2XTimeTest.c wntl.a  $(GMP_LIBDIR) $(GMP_LIB) $(LDLIBS_CXX)
+
 InitSettings:
 	$(LINK_CXX) -o InitSettings InitSettings.c  $(LDLIBS_CXX)
 
-WizComp:
-	$(LINK_CXX) -o WizComp WizComp.c $(LDLIBS_CXX)
 
 DispSettings:
 	$(LINK_CXX) -o DispSettings DispSettings.c $(LDLIBS_CXX)

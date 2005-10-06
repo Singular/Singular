@@ -132,25 +132,45 @@ long CRT(vec_ZZ& gg, ZZ& a, const vec_zz_p& G)
 }
 
 
+
 void mul(vec_zz_p& x, const vec_zz_p& a, zz_p b)
 {
    long n = a.length();
    x.SetLength(n);
+
    long i;
-   for (i = 0; i < n; i++)
-      mul(x[i], a[i], b);
+
+   if (n <= 1) {
+
+      for (i = 0; i < n; i++)
+	 mul(x[i], a[i], b);
+
+   }
+   else {
+ 
+      long p = zz_p::modulus();
+      double pinv = zz_p::ModulusInverse();
+      long bb = rep(b);
+      mulmod_precon_t bpinv = PrepMulModPrecon(bb, p, pinv);
+      
+      
+      const zz_p *ap = a.elts();
+      zz_p *xp = x.elts();
+
+      for (i = 0; i < n; i++)
+         xp[i].LoopHole() = MulModPrecon(rep(ap[i]), bb, p, bpinv);
+
+   }
 }
 
 void mul(vec_zz_p& x, const vec_zz_p& a, long b_in)
 {
-   NTL_zz_pRegister(b);
+   zz_p b;
    b = b_in;
-   long n = a.length();
-   x.SetLength(n);
-   long i;
-   for (i = 0; i < n; i++)
-      mul(x[i], a[i], b);
+   mul(x, a, b);
 }
+
+
 
 void add(vec_zz_p& x, const vec_zz_p& a, const vec_zz_p& b)
 {

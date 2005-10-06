@@ -20,7 +20,7 @@ The Performance Options can be set either by hand, by editing this
 file, or (on most Unix platforms) can be set automatically using
 the configuration wizard which runs when NTL is installed.
 
-All NTL include (".h") files include this file.
+All NTL header files include this file.
 By setting these flags here, instead of on the compiler command line,
 it is easier to guarantee that NTL library and client code use
 consistent settings.  
@@ -29,11 +29,14 @@ consistent settings.
                                 How to do it
                                 ------------
 
-You override NTL's default code generation strategies by setting
-various flags, as described below.  To set a flag, just replace the
-pre-processor directive 'if 0' by 'if 1' for that flag, 
-which causes the appropriate macro to be defined.  Of course, 
-to unset a flag, just replace the 'if 1' by an 'if 0'.
+To set a flag, just replace the pre-processor directive 
+'if 0' by 'if 1' for that flag, which causes the appropriate macro 
+to be defined.  Of course,  to unset a flag, just replace the 
+'if 1' by an 'if 0'.
+
+You can also do this more conveniently via the command line
+using the configure script.
+
 
  *************************************************************************/
 
@@ -51,7 +54,7 @@ to unset a flag, just replace the 'if 1' by an 'if 0'.
   */
 
 
-#if 0
+#if 1
 #define NTL_STD_CXX
 
 /* 
@@ -167,13 +170,34 @@ to unset a flag, just replace the 'if 1' by an 'if 0'.
 #define NTL_LONG_LONG_TYPE long long
 
 /*
- *   If you set NTL_LONG_LONG, you may need to override the default
- *   name of this "nonstandard" type.  For example, under MS C++,
- *   the right name is __int64.
- *   
- *   This flag is irrelevant when NTL_GMP_LIP is set.
+ *   If you set the flag NTL_LONG_LONG, then the value of
+ *   NTL_LONG_LONG_TYPE will be used
+ *   to declare 'double word' signed integer types.
+ *   Irrelevant when NTL_GMP_LIP is set.
+ *   If left undefined, some "ifdef magic" will attempt
+ *   to find the best choice for your platform, depending
+ *   on the compiler and wordsize.  On 32-bit machines,
+ *   this is usually 'long long'.
  *
  *   To re-build after changing this flag: rm lip.o; make ntl.a
+ */
+
+#endif
+
+
+#if 0
+#define NTL_UNSIGNED_LONG_LONG_TYPE unsigned long long
+
+/*
+ *   If you set the flag NTL_SPMM_ULL, then the value of
+ *   NTL_UNSIGNED_LONG_LONG_TYPE will be used
+ *   to declare 'double word' unsigned integer types.
+ *   If left undefined, some "ifdef magic" will attempt
+ *   to find the best choice for your platform, depending
+ *   on the compiler and wordsize.  On 32-bit machines,
+ *   this is usually 'unsigned long long'.
+ *
+ *   To re-build after changing this flag: rm *.o; make ntl.a
  */
 
 #endif
@@ -314,17 +338,13 @@ to unset a flag, just replace the 'if 1' by an 'if 0'.
 #define NTL_LONG_LONG
 
 /*
- *   RECOMMENDED FOR some x86  PLATFORMS
  *
  *   For platforms that support it, this flag can be set to cause
  *   the low-level multiplication code to use the type "long long",
- *   which on some platforms yields a significant performance gain,
+ *   which may yield a significant performance gain,
  *   but on others, it can yield no improvement and can even
  *   slow things down.
  *
- *   The only platform where I know this helps is Linux/Pentium,
- *   but even here, the gcc compiler is less than impressive with 
- *   it code generation.
  *
  *   See below (NTL_LONG_LONG_TYPE) for how to use a type name 
  *   other than "long long".
@@ -339,17 +359,9 @@ to unset a flag, just replace the 'if 1' by an 'if 0'.
 #define NTL_AVOID_FLOAT
 
 /*
- *   RECOMMENDED FOR AIX/PowerPC and some x86 PLATFORMS
  *
  *   On machines with slow floating point or---more comminly---slow int/float
  *   conversions, this flag can lead to faster code.
- *
- *   I get much better code on the AIX/PowerPC platform than with the
- *   default setting or with NTL_LONG_LONG flag.  
- *
- *   I also get slightly better code on the Linux/Pentium-II platform 
- *   with this flag than with the NTL_LONG_LONG flag; 
- *   however, on a Pentium-I, NTL_LONG_LONG is much better.
  *
  *   If you set NTL_AVOID_FLOAT, you should probably also
  *   set NTL_TBL_REM (see below).
@@ -373,10 +385,82 @@ to unset a flag, just replace the 'if 1' by an 'if 0'.
 #endif
 
 
+/* There are four strategies to implmement single-precision
+ * modular multiplication with precondinition (see the MulModPrecon
+ * function in the ZZ module): the default, NTL_SPMM_UL, and NTL_SPMM_ULL,
+ * and NTL_SPMM_ASM.
+ * This plays a crucial role in the  "small prime FFT" used to 
+ * implement polynomial arithmetic, and in other CRT-based methods 
+ * (such as linear  algebra over ZZ), as well as polynomial andd matrix 
+ * arithmetic over zz_p.  
+ */
 
-/* The next three flags, NTL_TBL_REM, NTL_AVOID_BRANCHING, NTL_FFT_PIPELINE,
+
+#if 0
+#define NTL_SPMM_UL
+
+/*    The default MulModPrecon implementation uses a mix of
+ *    int and float arithmetic, which may be slow on certain machines.
+ *    This flag causes an "all integer" implementation to be used.
+ *    It is entirely portable.
+ *    To re-build after changing this flag: rm *.o; make ntl.a
+ */
+
+
+
+#elif 0
+#define NTL_SPMM_ULL
+
+/*    Like this previous flag, this also causes an "all integer"
+ *    implementation of MulModPrecon to be used.
+ *    It us usually a faster implementation,
+ *    but it is not enturely portable.
+ *    It relies on double-word unsigned multiplication
+ *    (see NTL_UNSIGNED_LONG_LONG_TYPE above). 
+ *
+ *    To re-build after changing this flag: rm *.o; make ntl.a
+ */
+
+#elif 0
+#define NTL_SPMM_ASM
+
+/*    Like this previous two flag, this also causes an "all integer"
+ *    implementation of MulModPrecon to be used.
+ *    It relies assembler code to do double-word unsigned multiplication.
+ *    This is only supported on a select mechines under GCC. 
+ *
+ *    To re-build after changing this flag: rm *.o; make ntl.a
+ */
+
+
+#endif
+
+
+
+
+
+/* The next five flags NTL_AVOID_BRANCHING, NTL_TBL_REM,
+ * NTL_GF2X_ALTCODE, NTL_GF2X_ALTCODE1, and NTL_GF2X_NOINLINE
  * are also set by the configuration wizard.  
  */
+
+
+
+#if 0
+#define NTL_AVOID_BRANCHING
+
+/*
+ *   With this option, branches are replaced at several 
+ *   key points with equivalent code using shifts and masks.
+ *   It may speed things up on machines with 
+ *   deep pipelines and high branch penalities.
+ *   This flag mainly affects the implementation of the
+ *   single-precision modular arithmetic routines.
+ *
+ *   To re-build after changing this flag: rm *.o; make ntl.a
+ */
+
+#endif
 
 
 
@@ -384,7 +468,6 @@ to unset a flag, just replace the 'if 1' by an 'if 0'.
 #define NTL_TBL_REM
 
 /*
- *   RECOMMENDED FOR AIX/PowerPC and some x86 PLATFORMS
  *
  *   With this flag, some divisions are avoided in the
  *   ZZ_pX multiplication routines.  If you use the NTL_AVOID_FLOAT 
@@ -400,33 +483,46 @@ to unset a flag, just replace the 'if 1' by an 'if 0'.
 
 
 #if 0
-#define NTL_AVOID_BRANCHING
+#define NTL_GF2X_ALTCODE
 
 /*
- *   With this option, branches are replaced at several 
- *   key points with equivalent code using shifts and masks.
- *   Recommended for use with RISC architectures, especially
- *   ones with deep pipelines and high branch penalities.
- *   This flag is becoming less helpful as newer machines
- *   have much smaller branch penalties, but still may be worth a try.
+ * With this option, the default strategy for implmenting low-level
+ * GF2X multiplication is replaced with an alternative strategy.
+ * This alternative strategy seems to work better on RISC machines
+ * with deep pipelines and high branch penalties (like a powerpc),
+ * but does no better (or even worse) on x86s.
  *
- *   To re-build after changing this flag: rm *.o; make ntl.a
+ * To re-build after changing this flag: rm GF2X.o; make ntl.a
  */
 
-#endif
+#elif 0
+#define NTL_GF2X_ALTCODE1
 
+
+/*
+ * Yest another alternative strategy for implementing GF2X
+ * multiplication.
+ *
+ * To re-build after changing this flag: rm GF2X.o; make ntl.a
+ */
+
+
+#endif
 
 #if 0
-#define NTL_FFT_PIPELINE
+#define NTL_GF2X_NOINLINE
 
 /*
- *   If using NTL_AVOID_BRANCHING, you might want to try this as well.
- *   This causes the FFT routine to use a software pipeline.
+ * By default, the low-level GF2X multiplication routine in inlined.
+ * This can potentially lead to some trouble on some platforms,
+ * and you can override the default by setting this flag.
  *
- *   To re-build after changing this flag: rm FFT.o; make ntl.a
+ * To re-build after changing this flag: rm GF2X.o; make ntl.a
  */
 
 #endif
+
+
 
 
 /* The following flag is not set by the configuration wizard;  its use

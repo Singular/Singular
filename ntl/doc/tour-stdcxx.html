@@ -23,27 +23,20 @@ A Tour of NTL: Traditional and ISO Modes
 
 As of version 4.1,
 NTL can be compiled and used in one of two modes: Traditional or ISO.
-To get ISO mode, you can pass <tt>NTL_STD_CXX=on</tt>
+<i>As of NTL version 5.4, ISO mode is the default.</i>
+
+<p>
+To revert to traditional mode, you can pass <tt>NTL_STD_CXX=off</tt>
 as an argument to the configuration script
-when <a href="tour-unix.html">installing NTL on a Unix or Unix-like system</a>.
-This will set the flag <tt>NTL_STD_CXX</tt> in the <tt>config.h</tt>
+when <a href="tour-unix.html">installing NTL on a Unix or Unix-like system</a>,
+which will unset the flag <tt>NTL_STD_CXX</tt> in the <tt>config.h</tt>
 file.
 Alternatively (and especially on non-Unix systems),
-you can set this flag  by hand by editing 
+you can unset this flag  by hand by editing 
 the the <tt>config.h</tt> file.
 <p>
 
-Traditional mode provides the same interface as that provided 
-in versions 4.0 and earlier.
-Traditional mode is also the default, so old programs that used NTL
-should continue to work without any changes.
-So if you wish, you can completely ignore the new ISO mode, and ignore
-the rest of this page.
-However, if you want to fully exploit some important,
-new features of <tt>C++</tt>, in particular <i>namespaces</i>, read on.
-Also, it is likely that in future distributions of NTL, ISO mode will become
-the default mode, although Traditional mode will continue to
-be supported indefinitely.
+
 
 <p>
 In Traditional mode, the NTL header files include the traditional
@@ -79,19 +72,6 @@ The NTL implementation files use the <tt>nothrow</tt> version of <tt>new</tt>.
 </ol>
 
 
-<p>
-ISO mode uses <tt>C++</tt> features that are new to
-the new ISO <tt>C++</tt> standard.
-I know of no compiler that truly implements all of the standard,
-but some come pretty close.
-If your complier is too old, you will not be able to use NTL in ISO 
-mode;  otherwise, you are free to use either ISO or Traditional mode,
-but I would recommend ISO mode for code that you expect to
-be around for a long time.
-In particular, if you want to develop and distribute a library that
-builds on top of NTL, it would be preferable to make it compatible
-with NTL in ISO mode, and even better, to make it compatible with
-either mode.
 
 <p>
 If your complier is not up to date, but you want some of the benefits
@@ -113,6 +93,8 @@ For example, to just wrap NTL in a namepsace, just pass
 <tt>NTL_PSTD_NNS=on</tt>
 as an argument to the configuration script
 when installing NTL.
+However, make sure you also turn off the <tt>NTL_STD_CXX</tt> flag;
+otherwise, these have no effect.
 
 <p>
 
@@ -639,41 +621,14 @@ Standard C++ and the Real World
 </h3>
 
 <p>
-At the time of this writing, I know of no compiler that actually
-implements the new <tt>C++</tt> standard.
-Some come closer than others.
+Compilers still vary in their ability to correctly implement
+Standard C++ in all its glory.
 
 <p>
-The compiler that comes the closest is 
-the one available (for a price) from 
-<a href="http://www.kai.com">www.kai.com</a>.
-One of the things it does not do correctly is that the global
-namespace is partially polluted with some function names from the standard
-<tt>C</tt> library, even if you use header files that are supposed
-to wrap them in namespace <tt>std</tt> (these names are also
-in namespace <tt>std</tt>).
-Besides this problem, and the fact there are a couple of <i>very</i>
-esoteric language features not yet implemented, the <i>KAI</i>
-compiler does a reasonable job.
+NTL  compiles correctly in in either Traditional or ISO
+mode using recent versions (2.95 and later)
+ of the <i>GNU</i> compiler (which is free).
 
-<p>
-I used this compiler (version 3.4g,  with the "--strict" flag) 
-to make sure NTL
-worked correctly under the new standard (which was not entirely trivial),
-in either Traditional or ISO mode.
-
-<p>
-NTL also compiles correctly in in either Traditional or ISO
-mode using recent versions of the <i>GNU</i> compiler (which is free);
-I checked it with <i>egcs-2.91.66</i> and <i>gcc-2.95.2</i>.
-This compiler is still some distance
-from implementing standard <tt>C++</tt>, but is getting closer.
-There are several language features that are not yet implemented
-correctly, and also the <i>entire</i> contents of the standard <tt>C++</tt>
-library are visible in the global namespace (as well as namespace <i>std</i>).
-Nevertheless, NTL can still be used in ISO mode with the
-<i>GNU</i> compiler,
-as long as one is aware of the limitations of this compiler.
 
 <p>
 It has also been reported that
@@ -697,8 +652,9 @@ Further, it appears that Koenig lookup is not properly
 implemented in MSVC++ 6, but luckily, NTL does not rely on this.
 
 <p>
-I do not yet know how NTL in ISO mode works on other compilers.
-Feedback is always welcome.
+It appears that some later versions of Microsoft C++ are much
+more standards compliant, and may in fact work with NTL in ISO mode.
+
 
 <p>
 As usual, 

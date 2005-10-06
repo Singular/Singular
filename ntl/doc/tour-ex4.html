@@ -38,6 +38,8 @@ and a polynomial <tt>f</tt> modulo <tt>p</tt>, and factors it.
 <pre>
 #include &lt;NTL/ZZ_pXFactoring.h&gt;
 
+NTL_CLIENT
+
 int main()
 {
    ZZ p;
@@ -49,10 +51,10 @@ int main()
 
    vec_pair_ZZ_pX_long factors;
 
-   CanZass(factors, f);
+   CanZass(factors, f);  // calls "Cantor/Zassenhaus" algorithm
 
    cout &lt;&lt; factors &lt;&lt; "\n";
-   // calls "Cantor/Zassenhaus" algorithm 
+    
 }
 </pre>
 
@@ -82,6 +84,8 @@ The first is a vector addition routine (already supplied by NTL):
 <pre>
 #include &lt;NTL/vec_ZZ_p.h&gt;
 
+NTL_CLIENT
+
 void add(vec_ZZ_p&amp; x, const vec_ZZ_p&amp; a, const vec_ZZ_p&amp; b)
 {
    long n = a.length();
@@ -101,6 +105,8 @@ The second example is an inner product routine (also supplied by NTL):
 <p>
 <pre>
 #include &lt;NTL/vec_ZZ_p.h&gt;
+
+NTL_CLIENT
 
 void InnerProduct(ZZ_p&amp; x, const vec_ZZ_p&amp; a, const vec_ZZ_p&amp; b)
 {
@@ -172,10 +178,12 @@ the prime.
 #include &lt;NTL/ZZX.h&gt;
 #include &lt;NTL/ZZ_pXFactoring.h&gt;
 
+NTL_CLIENT
+
 long IrredTestMod(const ZZX&amp; f, const ZZ&amp; p)
 {
-   ZZ_pBak bak;  // save current modulus in bak
-   bak.save();
+   ZZ_pBak bak;  
+   bak.save();  // save current modulus in bak
 
    ZZ_p::init(p);  // set the current modulus to p
 
@@ -227,6 +235,8 @@ as follows.
 #include &lt;NTL/ZZX.h&gt;
 #include &lt;NTL/lzz_pXFactoring.h&gt;
 
+NTL_CLIENT
+
 long IrredTestMod(const ZZX&amp; f, long p)
 {
    zz_pBak bak; 
@@ -250,6 +260,8 @@ a special form that allows for particular fast polynomial arithmetic.
 <p>
 <pre>
 #include &lt;NTL/ZZX.h&gt;
+
+NTL_CLIENT
 
 void GCD(ZZX&amp; d, const ZZX&amp; a, const ZZX&amp; b)
 {
@@ -366,6 +378,8 @@ NTL's built-in irreducibility test is to be preferred, however.
 
 #include &lt;NTL/GF2X.h&gt;
 #include &lt;NTL/mat_GF2.h&gt;
+
+NTL_CLIENT
 
 long MatIrredTest(const GF2X& f)
 {

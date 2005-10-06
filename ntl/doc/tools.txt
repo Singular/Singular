@@ -9,12 +9,14 @@ Some useful tools that are used throughout NTL.
 
 \**************************************************************************/
 
+#include <cstdlib>
+#include <cmath>
+#include <iostream>
 
 #include <NTL/config.h>
+#include <NTL/mach_desc.h>
 
-#include <stdlib.h>
-#include <math.h>
-#include <iostream.h>
+
 
 
 double GetTime();

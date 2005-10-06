@@ -576,22 +576,6 @@ static double LastTime = 0;
 
 
 
-static void G_LLLStatus(long max_k, double t, long m, const mat_ZZ& B)
-{
-   ZZ t1;
-   long i;
-   double prodlen = 0;
-
-   for (i = 1; i <= m; i++) {
-      InnerProduct(t1, B(i), B(i));
-      if (!IsZero(t1))
-         prodlen += log(t1);
-   }
-
-   LastTime = t;
-   
-}
-
 static void init_red_fudge()
 {
    long i;
@@ -613,20 +597,6 @@ static void inc_red_fudge()
    if (log_red < 4)
       Error("G_LLL_FP: too much loss of precision...stop!");
 }
-
-
-#if 0
-
-static void print_mus(double **mu, long k)
-{
-   long i;
-
-   for (i = k-1; i >= 1; i--)
-      cerr << mu[k][i] << " ";
-   cerr << "\n";
-}
-
-#endif
 
 
 
@@ -686,19 +656,7 @@ long ll_G_LLL_FP(mat_ZZ& B, mat_ZZ* U, double delta, long deep,
          swap_cnt = 0;
       }
 
-      if (verbose) {
-         tt = GetTime();
-
-         if (tt > LastTime + LLLStatusInterval)
-            G_LLLStatus(max_k, tt, m, B);
-      }
-
       GivensComputeGS(B1, mu, aux, k, n, cache);
-
-      if (swap_cnt > 200000) {
-         //cerr << "G_LLL_FP: swap loop?\n";
-         swap_cnt = 0;
-      }
 
       counter = 0;
       trigger_index = k;
@@ -720,9 +678,6 @@ long ll_G_LLL_FP(mat_ZZ& B, mat_ZZ* U, double delta, long deep,
             if ((counter >> 7) == 1 || new_sz < sz) {
                sz = new_sz;
             }
-            //else {
-            //   cerr << "G_LLL_FP: warning--infinite loop? (" << k << ")\n";
-            //}
          }
 
          Fc1 = 0;
@@ -849,11 +804,6 @@ long ll_G_LLL_FP(mat_ZZ& B, mat_ZZ* U, double delta, long deep,
       }
 
    }
-
-   if (verbose) {
-      G_LLLStatus(m+1, GetTime(), m, B);
-   }
-
 
    delete [] max_b;
 
@@ -1065,29 +1015,6 @@ void ComputeG_BKZThresh(double *c, long beta)
    }
 }
 
-static 
-void G_BKZStatus(double tt, double enum_time, unsigned long NumIterations, 
-               unsigned long NumTrivial, unsigned long NumNonTrivial, 
-               unsigned long NumNoOps, long m, 
-               const mat_ZZ& B)
-{
-
-   ZZ t1;
-   long i;
-   double prodlen = 0;
-
-   for (i = 1; i <= m; i++) {
-      InnerProduct(t1, B(i), B(i));
-      if (!IsZero(t1))
-         prodlen += log(t1);
-   }
-
-   LastTime = tt;
-   
-}
-
-
-
 static
 long G_BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta, 
          long beta, long prune, LLLCheckFct check)
@@ -1254,14 +1181,6 @@ long G_BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta,
             clean = 1;
          }
 
-         if (verb) {
-            tt = GetTime();
-            if (tt > LastTime + LLLStatusInterval)
-               G_BKZStatus(tt, enum_time, NumIterations, NumTrivial,
-                         NumNonTrivial, NumNoOps, m, B);
-         }
-
-   
          // ENUM
 
          double tt1;
@@ -1298,19 +1217,6 @@ long G_BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta,
          long enum_cnt = 0;
    
          while (t <= kk) {
-            if (verb) {
-               enum_cnt++;
-               if (enum_cnt > 100000) {
-                  enum_cnt = 0;
-                  tt = GetTime();
-                  if (tt > LastTime + LLLStatusInterval) {
-                     enum_time += tt - tt1;
-                     tt1 = tt;
-                     G_BKZStatus(tt, enum_time, NumIterations, NumTrivial,
-                               NumNonTrivial, NumNoOps, m, B);
-                  }
-               }
-            }
 
             ctilda[t] = ctilda[t+1] + 
                (yvec[t]+utildavec[t])*(yvec[t]+utildavec[t])*c[t];
@@ -1494,11 +1400,6 @@ long G_BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta,
       }
    }
 
-
-   if (verb) {
-      G_BKZStatus(GetTime(), enum_time, NumIterations, NumTrivial, NumNonTrivial, 
-                NumNoOps, m, B);
-   }
 
    // clean up
 

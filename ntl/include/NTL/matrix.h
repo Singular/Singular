@@ -63,7 +63,6 @@ long operator!=(const mat_T& l__a, const mat_T& l__b); \
 
 
 
-
 #define NTL_matrix_impl(T,vec_T,vec_vec_T,mat_T)  \
 mat_T::mat_T(const mat_T& l__a)  \
 {  \
@@ -168,6 +167,7 @@ long operator!=(const mat_T& l__a, const mat_T& l__b)  \
 {  \
    return !(l__a == l__b);  \
 }  \
+
 
 
 

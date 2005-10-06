@@ -707,7 +707,6 @@ NTL_eq_vector_decl(ZZ_pEX,vec_ZZ_pEX)
 
 
 
-
 /*******************************************************
 
               Evaluation and related problems

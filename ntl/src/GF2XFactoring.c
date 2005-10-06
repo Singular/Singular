@@ -338,6 +338,8 @@ void EDF(vec_GF2X& factors, const GF2X& ff, long d, long verbose)
    }
 
    
+   double t;
+
    factors.SetLength(0);
 
    RecEDF(factors, f, d);

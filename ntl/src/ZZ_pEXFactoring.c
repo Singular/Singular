@@ -1067,6 +1067,7 @@ void GenerateBabySteps(ZZ_pEX& h1, const ZZ_pEX& f, const ZZ_pEX& h, long k,
                        long verbose)
 
 {
+   double t;
 
    ZZ_pEXModulus F;
    build(F, f);

@@ -2337,6 +2337,7 @@ NTL_vector_impl(ZZX,vec_ZZX)
 NTL_eq_vector_impl(ZZX,vec_ZZX)
 
 
+
 void CopyReverse(ZZX& x, const ZZX& a, long hi)
 
    // x[0..hi] = reverse(a[0..hi]), with zero fill

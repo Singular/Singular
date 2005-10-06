@@ -1,100 +1,16 @@
 #!/bin/sh
 
+# This is just a shell script that calls perl.
+# Since perl may be located in a wierd place, this
+# should be more portable than using a direct "shebang".
+
+# Also, some shells do not handle "$@" correctly when
+# no options are supplied, so this is handled as a special case.
+
 if test $# -ne 0
-then 
-
-   for i in "$@"
-   do
-      case $i in
-	 CC=*) ;;
-	 CXX=*) ;;
-	 CFLAGS=*) ;;
-	 CXXFLAGS=*) ;;
-	 AR=*) ;;
-	 ARFLAGS=*) ;;
-	 RANLIB=*) ;;
-	 LDFLAGS=*) ;;
-	 LDFLAGS_CXX=*) ;;
-	 LDLIBS=*) ;;
-	 LDLIBS_CXX=*) ;;
-	 CPPFLAGS=*) ;;
-	 PREFIX=*) ;;
-	 LIBDIR=*) ;;
-	 INCLUDEDIR=*) ;;
-	 DOCDIR=*) ;;
-	 GMP_PREFIX=*) ;;
-	 GMP_INCDIR=*) ;;
-	 GMP_LIBDIR=*) ;;
-	 NTL_STD_CXX=*) ;;
-	 NTL_PSTD_NNS=*) ;;
-	 NTL_PSTD_NHF=*) ;;
-	 NTL_PSTD_NTN=*) ;;
-	 NTL_GMP_LIP=*) ;;
-	 NTL_GMP_HACK=*) ;;
-	 NTL_CXX_ONLY=*) ;;
-	 NTL_X86_FIX=*) ;;
-	 NTL_NO_X86_FIX=*) ;;
-	 NTL_AVOID_FLOAT=*) ;;
-	 NTL_LONG_LONG=*) ;;
-	 NTL_AVOID_BRANCHING=*) ;;
-	 NTL_FFT_PIPELINE=*) ;;
-	 NTL_TBL_REM=*) ;;
-	 NTL_NO_INIT_TRANS=*) ;;
-	 NTL_CLEAN_INT=*) ;;
-	 NTL_CLEAN_PTR=*) ;;
-	 NTL_RANGE_CHECK=*) ;;
-	 NTL_LONG_LONG_TYPE=*) ;;
-	 WIZARD=*) ;;
-	 -h) more ../doc/config.txt; exit 0 ;;
-	 help) more ../doc/config.txt; exit 0 ;;
-	 -help) more ../doc/config.txt; exit 0 ;;
-	 --help) more ../doc/config.txt; exit 0 ;;
-	 *) echo "error: unrecognized option $i"; exit 1 ;;
-      esac
-   done
-
-   if make -s -f make.config "$@" > make.head 
-   then
-      echo make.config OK
-   else
-      cat make.head
-      exit 1
-   fi
-
-   if make -s -f flags.config "$@" > flags.sed
-   then
-      echo flags.config OK
-   else
-      cat flags.sed
-      exit 1
-   fi
-
+then
+   perl DoConfig "$@"
 else
-
-#  we special case $# == 0, because some shells do not handle
-#  the "$@" construction in the right way in this case.
-
-   if make -s -f make.config > make.head 
-   then
-      echo make.config OK
-   else
-      cat make.head
-      exit 1
-   fi
-
-   if make -s -f flags.config > flags.sed
-   then
-      echo flags.config OK
-   else
-      cat flags.sed
-      exit 1
-   fi
-   
-
+   perl DoConfig
 fi
 
-echo "writing makefile"
-cat make.head make.tail > makefile
-
-echo "writing ../include/NTL/config.h"
-sed -f flags.sed config_template > ../include/NTL/config.h

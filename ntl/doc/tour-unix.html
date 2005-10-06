@@ -19,12 +19,80 @@ A Tour of NTL: Obtaining and Installing NTL for UNIX
 
 <p> <hr> <p>
 
+This procedure should work on most Unix or Unix-like platorms
+(including MAC OSX, and Windows with Cygwin tools).
+
+<p>
+
+
 To obtain the source code and documentation for NTL,
 <a href="http://www.shoup.net/ntl/download.html">
 download <tt>ntl-xxx.tar.gz</tt></a>,
 placing it a directory, and then, working in this directory,
 do the following.
 Here, "<tt>xxx</tt>" denotes the current version number.
+
+
+
+<p>
+<pre>
+   % gunzip ntl-xxx.tar.gz
+   % tar xf ntl-xxx.tar
+   % cd ntl-xxx/src
+   % ./configure PREFIX=$HOME/sw
+   % make
+   % make check
+   % make install
+</pre>
+
+This will build, test, and install NTL in <tt>$HOME/sw</tt>.
+Of course, change <tt>$HOME/sw</tt> to whatever you want (the default is 
+<tt>/usr/local</tt>).
+You will find the NTL header files in <tt>$HOME/sw/include/NTL</tt>
+ and the compiled binary 
+in <tt>$HOME/sw/lib/libntl.a</tt>.
+<p>
+If you really are interested in high-performace, you will
+<i>definitely</i> want to build NTL
+using  GMP (the GNU Multi-Precision package).
+If GMP has already been installed in a standard
+system library, like <tt>/usr/local</tt>, then invoke <tt>configure</tt>
+above as
+<pre>
+   % ./configure PREFIX=$HOME/sw NTL_GMP_LIP=on
+</pre>
+and if GMP is installed somewhere else, say <tt>$HOME/sw</tt>, then
+<pre>
+   % ./configure PREFIX=$HOME/sw NTL_GMP_LIP=on GMP_PREFIX=$HOME/sw
+</pre>
+does the job.
+<a href="tour-gmp.html">This page</a> provides more
+details.
+
+
+<p>
+Now suppose you want to compile a program that uses NTL.
+Suppose you are working in some directory and <tt>foo.c</tt>
+is your program.
+Assume that you have installed NTL in <tt>$HOME/sw</tt> as above.
+The following should work:
+<pre>
+   % g++ -I$HOME/sw/include -L$HOME/sw/lib foo.c -o foo -lntl -lm
+</pre>
+If you are using GMP, then:
+<pre>
+   % g++ -I$HOME/sw/include -L$HOME/sw/lib foo.c -o foo -lntl -lgmp -lm
+</pre>
+
+<p>
+<h2>
+More Details
+</h2>
+<p>
+What follows is a more detailed description of the installation process.
+
+
+
 
 <p>
 <b>Step 1.</b>
@@ -83,11 +151,9 @@ Here are the most important variables, and their default values.
 
    PREFIX=/usr/local    # Directory in which to install NTL library components
 
-   NTL_STD_CXX=off      # ISO Mode switch
+   NTL_STD_CXX=on       # ISO Mode switch
 
    NTL_GMP_LIP=off      # Switch 'on' to enable the use of GMP as the primary
-                        # long integer package
-   NTL_GMP_HACK=off     # Switch 'on' to enable the use of GMP as a supplemental
                         # long integer package
 
    GMP_PREFIX=none      # Directory in which GMP components have been installed
@@ -131,29 +197,28 @@ to obtain better performance for long integer arithemtic, run:
 <pre>
    % ./configure NTL_GMP_LIP=on
 </pre>
-If GMP was installed in a non-standard directory <tt>&lt;gmp_prefix&gt;</tt>,
-so that <tt>&lt;gmp_prefix&gt;/include</tt> contains <tt>gmp.h</tt>
-and <tt>&lt;gmp_prefix&gt;/lib</tt> contains <tt>libgmp.a</tt>,
+If GMP was installed in 
+ <tt>$HOME/sw</tt>,
 run:
 <pre>
-   % ./configure NTL_GMP_LIP=on GMP_PREFIX=&lt;gmp_prefix&gt;
+   % ./configure NTL_GMP_LIP=on GMP_PREFIX=$HOME/sw
 </pre>
 Go <a href="tour-gmp.html">here</a> for complete details.
 
 <p>
 <li>
 If you want to use 
-<a href="tour-stdcxx.html">ISO mode to enable namespaces</a>, run:
+<a href="tour-stdcxx.html">traditional rather than ISO mode</a>, run:
 <pre>
-   % ./configure NTL_STD_CXX=on
+   % ./configure NTL_STD_CXX=off
 </pre>
 
 <p>
 <li>
-If you want to install NTL in directory <tt>&lt;prefix&gt;</tt>,
+If you want to install NTL in the directory <tt>$HOME/sw</tt>,
 run:
 <pre>
-   % ./configure PREFIX=&lt;prefix&gt;
+   % ./configure PREFIX=$HOME/sw
 </pre>
 </ul>
 
@@ -244,7 +309,8 @@ will be in
 effect while the wizard runs, and will be retained in the updated
 <tt>config.h</tt> file, with the exception of the flags
 <pre>
-   NTL_LONG_LONG NTL_AVOID_FLOAT NTL_TBL_REM NTL_AVOID_BRANCHING NTL_FFT_PIPELINE
+   NTL_LONG_LONG NTL_AVOID_FLOAT NTL_TBL_REM NTL_AVOID_BRANCHING 
+   NTL_SPMM_UL NTL_SPMM_ULL NTL_SPMM_ASM NTL_GF2X_NOINLINE NTL_GF2X_ALTCODE
 </pre>
 which are set by the wizard. 
 Also note that if you <i>do not</i> want the wizard to run,

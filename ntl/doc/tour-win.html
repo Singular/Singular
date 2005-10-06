@@ -9,7 +9,7 @@ and other Platforms </title>
 <center>
 <a href="tour-unix.html"><img src="arrow1.gif" alt="[Previous]" align=bottom></a>
  <a href="tour.html"><img src="arrow2.gif" alt="[Up]" align=bottom></a> 
-<a href="tour-impl.html"> <img src="arrow3.gif" alt="[Next]" align=bottom></a>
+<a href="tour-tips.html"> <img src="arrow3.gif" alt="[Next]" align=bottom></a>
 </center>
 
 <h1> 
@@ -31,6 +31,13 @@ are made about the program development environment.
 Thus, it should be possible to install WinNTL on
 other operating systems (e.g., Macintosh, OS/2)
 with little difficulty.
+
+<p>
+<b>MAC OSX Users:</b>
+since MAC OSX is essentially just a (rather funny) flavor of Unix,
+you will be much better served using the 
+<a href="tour-unix.html">Unix distribution</a>.
+
 
 <p>
 <b>
@@ -124,8 +131,8 @@ ignored.
 
 One exception to this is the <tt>NTL_STD_CXX</tt>  flag
 (or perhaps just the <tt>NTL_PSTD_NNS</tt> flag) which
-you will want to set if you want to take advantage of
-the new <i>namespace</i> feature of <tt>C++</tt>.
+you will want to unset if your compiler is too old
+to handle it.
 <a href="tour-stdcxx.html">Go here</a> for details.
 
 <p>
@@ -142,8 +149,9 @@ If you really want to use GMP, use Unix or Linux!
 <i>Performance options.</i>
 <dd>
 These flags let you fine tune for best performance.
-can let the <i>configuration wizard</i>
-set them for you.
+(If you were using Unix, you could run a script that
+automatically selects the best settings for your platform.)
+
 
 <p>
 <i>TIP for Pentium platforms:</i> 
@@ -157,6 +165,8 @@ to get the best performance for long integer arithmetic.
 If you set either of these flags, you should also set the
 <tt>NTL_TBL_REM</tt> flag as well, to get the best 
 performance for <tt>ZZ_pX</tt> arithmetic.
+You might also want to set the <tt>NTL_SPMM_ULL</tt> or <tt>NTL_SMPP_UL</tt>
+flags.
 
 <li>
 These flags can be useful on other platforms as well,
@@ -365,7 +375,7 @@ Of course, an even better approach is to install
 <center>
 <a href="tour-unix.html"><img src="arrow1.gif" alt="[Previous]" align=bottom></a>
  <a href="tour.html"><img src="arrow2.gif" alt="[Up]" align=bottom></a> 
-<a href="tour-impl.html"> <img src="arrow3.gif" alt="[Next]" align=bottom></a>
+<a href="tour-tips.html"> <img src="arrow3.gif" alt="[Next]" align=bottom></a>
 </center>
 
 

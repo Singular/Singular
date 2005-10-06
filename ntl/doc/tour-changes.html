@@ -19,7 +19,88 @@ A Tour of NTL: Summary of Changes
 
 <p> <hr> <p>
 <h3>
-Changes between NTL 5.3.1 and 5.3.2
+2005.03.24: Changes between NTL 5.3.2 and 5.4  
+</h3>
+
+<ul>
+<li>
+By default, NTL now compiles in ISO mode (using namespaces, etc.).
+You can always revert to traditional mode by unsetting
+the flag <tt>NTL_STD_CXX</tt> 
+(either pass <tt>NTL_STD_CXX=off</tt> to the configure script,
+or manually edit the <tt>config.h</tt> file).
+<p>
+
+<li>
+Some bug fixes:
+
+<ul>
+<li>
+The <tt>sqrt</tt> and <tt>log1p</tt> routines
+for the <tt>RR</tt> class would produce incorrectly rounded
+results in certain circumstances (although this only affected the relative
+error of the result very marginally).
+<li>
+The <tt>SqrRootPrec</tt> routine for the <tt>RR</tt> class
+could not be called, because it was defined incorrectly.
+</ul>
+
+<p>
+
+Thanks to Paul Zimmermann for finding (and fixing) these bugs!
+Paul has also validated NTL's <tt>RR</tt> class by cross-checking it with the
+<a href="http://www.mpfr.org">MPFR</a> library.
+
+<p>
+<li>
+Some performance enhancements:
+
+<ul>
+<li>
+Added a new <tt>MulModPrecon</tt> inline function for 
+computing <tt>(a * b) % n</tt> for single precision numbers,
+when <tt>b</tt> and <tt>n</tt> are fixed for several computations.
+On some platforms this can be twice as fast or more than the
+old <tt>MulMod2</tt> routine.
+This indirectly affects a lot of computations that are done via
+homomorphic imaging (polynomial multiplication
+over <tt>zz_p</tt>, <tt>ZZ_p</tt>, and <tt>ZZ</tt>,
+matrix computations over <tt>zz_p</tt> and <tt>ZZ</tt>).
+
+<li>
+Rewrote the small prime FFT to take advantage of the new
+<tt>MulModPrecon</tt>, and to be more cache friendly.
+
+<li>
+Improved the performance of the <tt>GF2X</tt> multiplication routine.
+On some platforms, it can be twice as fast as the old one.
+Thanks (again) to Paul Zimmermann for suggesting some of these
+improvements and supplying some of the code.
+
+</ul>
+
+<p>
+<li>
+Miscellany:
+
+<ul>
+<li>
+Rewrote several of the installation scripts in Perl (the old shell
+scripts were getting too messy to maintain).
+However, the syntax for all of the command-line interfaces
+remains identical.
+
+</ul>
+ 
+
+
+
+
+</ul>
+
+<p> <hr> <p>
+<h3>
+2004.05.21: Changes between NTL 5.3.1 and 5.3.2
 </h3>
 
 <ul>
@@ -36,7 +117,7 @@ Re-wrote <tt>SqrRootMod</tt> to make it run faster.
 
 <p> <hr> <p>
 <h3>
-Changes between NTL 5.3 and 5.3.1
+2002.12.17: Changes between NTL 5.3 and 5.3.1
 </h3>
 
 <ul>
@@ -47,7 +128,7 @@ for <tt>ZZ_pEX</tt> and <tt>zz_pEX</tt>.
 
 <p> <hr> <p>
 <h3>
-Changes between NTL 5.2 and 5.3
+2002.07.05: Changes between NTL 5.2 and 5.3
 </h3>
 
 <ul>
@@ -96,7 +177,7 @@ Fixed a number of minor bugs.
 
 <p> <hr> <p>
 <h3>
-Changes between NTL 5.1a and 5.2
+2001.07.19: Changes between NTL 5.1a and 5.2
 </h3>
 
 <p>
@@ -152,7 +233,7 @@ of the version number are available to the programmer.
 
 <p> <hr> <p>
 <h3>
-Changes between NTL 5.0c and 5.1a
+2001.06.08: Changes between NTL 5.0c and 5.1a
 </h3>
 
 <p>
@@ -224,7 +305,7 @@ Other minor, internal modifications.
 
 <p> <hr> <p>
 <h3>
-Changes between NTL 5.0b and 5.0c
+2001.02.19: Changes between NTL 5.0b and 5.0c
 </h3>
 
 <p>
@@ -234,7 +315,7 @@ The Unix distribution is unaffected.
 
 <p> <hr> <p>
 <h3>
-Changes between NTL 5.0a and 5.0b
+2001.02.19: Changes between NTL 5.0a and 5.0b
 </h3>
 
 <p>
@@ -244,7 +325,7 @@ on some platforms.
 
 <p> <hr> <p>
 <h3>
-Changes between NTL 4.3a and 5.0a
+2001.02.19: Changes between NTL 4.3a and 5.0a
 </h3>
 
 <p>

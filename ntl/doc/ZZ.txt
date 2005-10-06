@@ -324,6 +324,8 @@ long MulMod(long a, long b, long n, double ninv);
 long MulMod2(long a, long b, long n, double bninv);
 // return (a*b)%n.  bninv = ((double) b)/((double) n).  This is faster
 // if both n and b are fixed for many multiplications.
+// Note: This is OBSOLETE -- use MulModPrecon (see below) for 
+// better performance.
 
 
 long MulDivRem(long& q, long a, long b, long n, double bninv);
@@ -334,6 +336,35 @@ long InvMod(long a, long n);
 
 long PowerMod(long a, long e, long n);
 // computes a^e mod n (e may be negative)
+
+
+
+// The following are variants of MulMod2 above that may be significantly 
+// faster on certain machines.  The implmentation varies depending
+// on the settings of the flags NTL_SPMM_ULL and NTL_SPMM_UL.
+// By default (no flags), the implementation is the same as MulMod2 above.
+// It is best to let the Wizard script select the optimal flag.
+
+typedef mulmod_precon_t  /*  depends on implementation */ ;
+
+mulmod_precon_t PrepMulModPrecon(long b, long n, double ninv);
+// Prepares preconditioning. ninv = 1/((double) n)
+
+long MulModPrecon(long a, long b, long n, mulmod_precon_t bninv);
+// return (a*b)%n.  bninv = MulModPrecon(b, n, ninv).
+
+// Example of use:
+//    long a, b, n, c;
+//      ...
+//    double ninv = 1/((double) n);
+//    mulmod_precon_t bninv = PrepMulModPrecon(b, n, ninv);
+//     ...
+//    c = MulModPrecon(a, b, n, bninv);  // c = (a*b) % n
+
+
+
+
+
 
 /**************************************************************************\
 

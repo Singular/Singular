@@ -31,6 +31,8 @@ and prints <tt>(a+1)*(b+1)</tt>.
 <pre>
 #include &lt;NTL/ZZ.h&gt;
 
+NTL_CLIENT
+
 int main()
 {
    ZZ a, b, c; 
@@ -59,6 +61,17 @@ automatically take care
 of all the bookkeeping involved
 with memory management and temporary objects.
 
+<p>
+Note the macro <tt>NTL_CLIENT</tt>.
+When compiling NTL is ISO mode (the default), this
+expands to 
+<pre>
+   using namespace std;
+   using namespace NTL;
+</pre>
+When compiling NTL in traditional mode, this expands
+to the empty string.
+
 <p> <hr> <p>
 
 Here's a program that reads a list of integers from standard 
@@ -67,6 +80,8 @@ input and prints the sum of their squares.
 <p>
 <pre>
 #include &lt;NTL/ZZ.h&gt;
+
+NTL_CLIENT
 
 int main()
 {
@@ -196,6 +211,8 @@ prime test.
 <p>
 <pre>
 #include &lt;NTL/ZZ.h&gt;
+
+NTL_CLIENT
 
 long witness(const ZZ&amp; n, const ZZ&amp; x)
 {

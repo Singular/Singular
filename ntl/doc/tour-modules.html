@@ -36,36 +36,39 @@ a source file <tt>foo.c</tt>, found in subdirectory <tt>src</tt>.
 </ul>
 
 <p>
-
 Note that all of the header files for NTL modules include the header file
-<tt>&lt;NTL/tools.h&gt;</tt>, and this header file includes
+<tt>&lt;NTL/tools.h&gt;</tt>, and by default, this header file includes
 the standard headers 
-<ul>
-<li>
-<tt>&lt;stdlib.h&gt;</tt>,
-<li>
-<tt>&lt;math.h&gt;</tt>, and
-<li>
-<tt>&lt;iostream.h&gt;</tt>;
-</ul>
-Moreover, 
-these are the only standard header files included by NTL header files.
-
-<p>
-Also 
-note that in <a href="tour-stdcxx.html">ISO mode</a>,
-<tt>&lt;NTL/tools.h&gt;</tt> instead includes the standard header files
 <ul>
 <li>
 <tt>&lt;cstdlib&gt;</tt>,
 <li>
 <tt>&lt;cmath&gt;</tt>, and
 <li>
-<tt>&lt;iostream&gt;</tt>;
+<tt>&lt;iostream&gt</tt>.
 </ul>
-moreover, in <a href="tour-stdcxx.html">ISO mode</a>,
+Moreover, 
 the standard library is wrapped in namespace <tt>std</tt>
 and NTL is wrapped in namespace <tt>NTL</tt>.
+
+
+<p>
+
+However, if you compiled NTL in traditional (non-ISO mode),
+then <tt>&lt;NTL/tools.h&gt;</tt>
+includes the traditional (pre-ISO) headers
+<ul>
+<li>
+<tt>&lt;stdlib.h&gt;</tt>,
+<li>
+<tt>&lt;math.h&gt;</tt>, and
+<li>
+<tt>&lt;iostream.h&gt</tt>.
+</ul>
+Moreover, 
+all of names of the standard library and NTL are defined
+in the global namespace.
+
 
 <p>
 
@@ -74,6 +77,9 @@ but stripped of implementation
 details and declarations of some of the more esoteric 
 routines and data structures, and it contains more complete
 and usually clearer documentation than in the header file.
+Also, note that the documentation files do not explicitly
+mention anything about namespaces <tt>std</tt> and <tt>NTL</tt>.
+
 
 <p>
 

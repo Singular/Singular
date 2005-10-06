@@ -110,6 +110,26 @@ ZZ_pX& operator=(const ZZ_p& a);
 
 
 
+/********************************************************************
+
+                           input and output
+
+I/O format:
+
+   [a_0 a_1 ... a_n],
+
+represents the polynomial a_0 + a_1*X + ... + a_n*X^n.
+
+On output, all coefficients will be integers between 0 and p-1,
+amd a_n not zero (the zero polynomial is [ ]).
+On input, the coefficients are arbitrary integers which are
+then reduced modulo p, and leading zeros stripped.
+
+*********************************************************************/
+
+
+
+
 /**********************************************************
 
                    Some utility routines
@@ -975,7 +995,6 @@ inline ZZ_pX interpolate(const vec_ZZ_p& a, const vec_ZZ_p& b)
 NTL_vector_decl(ZZ_pX,vec_ZZ_pX)
 
 NTL_eq_vector_decl(ZZ_pX,vec_ZZ_pX)
-
 
 
 /**********************************************************

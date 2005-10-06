@@ -394,6 +394,7 @@ void DivPrec(RR& x, const RR& a, const RR& b, long p)
    RR::prec = old_p;
 }
 
+
 void SqrRoot(RR& z, const RR& a)
 {
    if (sign(a) < 0)
@@ -415,14 +416,21 @@ void SqrRoot(RR& z, const RR& a)
    if ((a.e - k) & 1) k++;
 
    LeftShift(T1, a.x, k);
-   SqrRoot(t.x, T1);
-   t.e = (a.e - k)/2;
-   sqr(T2, T1);
+   // since k >= 2*prec - bits(a) + 1, T1 has at least 2*prec+1 bits,           
+   // thus T1 >= 2^(2*prec)                                                     
 
+   SqrRoot(t.x, T1); // t.x >= 2^prec thus t.x contains the round bit           
+   t.e = (a.e - k)/2;
+   sqr(T2, t.x);  
+
+   // T1-T2 is the (lower part of the) sticky bit                               
    normalize(z, t, T2 < T1);
 }
 
-void SqrRootPrec(RR& x, const RR& a, const RR& b, long p)
+
+
+
+void SqrRootPrec(RR& x, const RR& a, long p)
 {
    if (p < 1 || NTL_OVERFLOW(p, 1, 0))
       Error("SqrRootPrec: bad precsion");
@@ -1419,16 +1427,20 @@ void expm1(RR& res, const RR& x)
 
 void log1p(RR& res, const RR& x)
 {
+   long p = RR::precision();
+   RR y;
+
    if (x < -0.5 || x > 0.5) {
-      log(res, 1 + x);
+      RR::SetPrecision(p + 10);
+      log(y, 1 + x);
+      RR::SetPrecision(p);
+      xcopy(res, y);
       return;
    }
 
-   long p = RR::precision();
 
    RR::SetPrecision(p + NumBits(p) + 10);
 
-   RR y;
 
    negate(y, x);
 

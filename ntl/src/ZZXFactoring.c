@@ -417,10 +417,14 @@ void MultiLift(vec_ZZX& A, const vec_zz_pX& a, const ZZX& f, long e,
    vec_ZZX v, w;
    vec_long link;
 
+   double t;
+
    BuildTree(link, v, w, a);
 
    for (i = l-1; i > 0; i--) {
+      
       TreeLift(link, v, w, E[i], E[i-1], f, i != 1);
+
    }
 
    A.SetLength(k);
@@ -603,6 +607,7 @@ SmallPrimeFactorization(LocalInfoT& LocalInfo, const ZZX& f,
       if (!IsOne(d)) {
          continue;
       }
+
 
 
       vec_pair_zz_pX_long thisfac;
@@ -814,6 +819,8 @@ void UpdateLocalInfo(LocalInfoT& LocalInfo, vec_ZZ& pdeg,
                      const vec_ZZ_pX& W, const vec_ZZX& factors,
                      const ZZX& f, long k, long verbose)
 {
+   static long cnt = 0;
+
    double t;
    long i, j;
 
@@ -965,7 +972,7 @@ void CardinalitySearch(vec_ZZX& factors, ZZX& f,
       bit_and(pd, pdeg[I[0]], LocalInfo.PossibleDegrees);
 
       if (IsZero(pd)) {
-         return; //goto done;
+         goto done;
       }
 
       unpack(upd, pd, LocalInfo.n);
@@ -987,7 +994,7 @@ void CardinalitySearch(vec_ZZX& factors, ZZX& f,
                UpdateLocalInfo(LocalInfo, pdeg, W, factors, f, k, verbose);
                bit_and(pd, pdeg[I[0]], LocalInfo.PossibleDegrees);
                if (IsZero(pd)) {
-                  return; //goto done;
+                  goto done;
                }
                unpack(upd, pd, LocalInfo.n);
             }
@@ -1055,7 +1062,7 @@ void CardinalitySearch(vec_ZZX& factors, ZZX& f,
             cnt = 0;
 
             if (2*k > r) 
-               return; //goto done;
+               goto done;
             else 
                break;
          }
@@ -1079,8 +1086,10 @@ void CardinalitySearch(vec_ZZX& factors, ZZX& f,
       }
    }
 
-   //done: 
 
+   done: 
+
+   1;
 }
 
 
@@ -2609,6 +2618,7 @@ long GotThem(vec_ZZX& factors,
       append(fac, g);
    }
 
+
    // finally...trial division
 
    ZZX f1 = f;
@@ -3006,6 +3016,7 @@ void FindTrueFactors_vH(vec_ZZX& factors, const ZZX& ff,
             }
          }
 
+   
          tt0 = GetTime();
    
          vec_ZZ D;
@@ -3015,11 +3026,13 @@ void FindTrueFactors_vH(vec_ZZX& factors, const ZZX& ff,
 
          lll_time += (tt1-tt0);
    
+   
          if (rnk != s + d1) {
             Error("van Hoeij -- bad rank");
          }
    
          mat_ZZ B1;
+   
    
          tt0 = GetTime();
    
@@ -3408,6 +3421,7 @@ void SFFactor(vec_ZZX& factors, const ZZX& ff,
       res1.SetLength(0);
       for (j = 0; j < res.length(); j++) {
          vec_ZZX res2;
+         double t;
 
          if (k < 0)
             ok_to_abandon = 0;

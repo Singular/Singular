@@ -587,24 +587,6 @@ static double LastTime = 0;
 
 
 
-static void G_LLLStatus(long max_k, double t, long m, const mat_ZZ& B)
-{
-
-   ZZ t1;
-   long i;
-   double prodlen = 0;
-
-   for (i = 1; i <= m; i++) {
-      InnerProduct(t1, B(i), B(i));
-      if (!IsZero(t1))
-         prodlen += log(t1);
-   }
-
-   LastTime = t;
-   
-}
-
-
 static void init_red_fudge()
 {
    long i;
@@ -686,14 +668,6 @@ long ll_G_LLL_QP(mat_ZZ& B, mat_ZZ* U, quad_float delta, long deep,
          max_k = k;
       }
 
-      if (verbose) {
-         tt = GetTime();
-
-         if (tt > LastTime + LLLStatusInterval)
-            G_LLLStatus(max_k, tt, m, B);
-      }
-
-
       GivensComputeGS(B1, mu, aux, k, n, cache);
 
       counter = 0;
@@ -705,10 +679,6 @@ long ll_G_LLL_QP(mat_ZZ& B, mat_ZZ* U, quad_float delta, long deep,
          // size reduction
 
          counter++;
-         if (counter > 10000) {
-            //cerr << "G_LLL_QP: warning--possible infinite loop\n";
-            counter = 0;
-         }
 
 
          Fc1 = 0;
@@ -835,11 +805,6 @@ long ll_G_LLL_QP(mat_ZZ& B, mat_ZZ* U, quad_float delta, long deep,
          // cout << "+ " << k << "\n";
       }
    }
-
-   if (verbose) {
-      G_LLLStatus(m+1, GetTime(), m, B);
-   }
-
 
    delete [] max_b;
 
@@ -1058,27 +1023,6 @@ void ComputeG_BKZThresh(quad_float *c, long beta)
 }
 
 
-static 
-void G_BKZStatus(double tt, double enum_time, unsigned long NumIterations, 
-               unsigned long NumTrivial, unsigned long NumNonTrivial, 
-               unsigned long NumNoOps, long m, 
-               const mat_ZZ& B)
-{
-   ZZ t1;
-   long i;
-   double prodlen = 0;
-
-   for (i = 1; i <= m; i++) {
-      InnerProduct(t1, B(i), B(i));
-      if (!IsZero(t1))
-         prodlen += log(t1);
-   }
-
-   LastTime = tt;
-   
-}
-
-
 static
 long G_BKZ_QP(mat_ZZ& BB, mat_ZZ* UU, quad_float delta, 
          long beta, long prune, LLLCheckFct check)
@@ -1243,15 +1187,6 @@ long G_BKZ_QP(mat_ZZ& BB, mat_ZZ* UU, quad_float delta,
             clean = 1;
          }
 
-         if (verb) {
-            tt = GetTime();
-            if (tt > LastTime + LLLStatusInterval)
-               G_BKZStatus(tt, enum_time, NumIterations, NumTrivial,
-                         NumNonTrivial, NumNoOps, m, B);
-         }
-
-
-
    
          // ENUM
 
@@ -1290,19 +1225,6 @@ long G_BKZ_QP(mat_ZZ& BB, mat_ZZ* UU, quad_float delta,
          long enum_cnt = 0;
    
          while (t <= kk) {
-            if (verb) {
-               enum_cnt++;
-               if (enum_cnt > 100000) {
-                  enum_cnt = 0;
-                  tt = GetTime();
-                  if (tt > LastTime + LLLStatusInterval) {
-                     enum_time += tt - tt1;
-                     tt1 = tt;
-                     G_BKZStatus(tt, enum_time, NumIterations, NumTrivial,
-                               NumNonTrivial, NumNoOps, m, B);
-                  }
-               }
-            }
 
             ctilda[t] = ctilda[t+1] + 
                (yvec[t]+utildavec[t])*(yvec[t]+utildavec[t])*c[t];
@@ -1491,12 +1413,6 @@ long G_BKZ_QP(mat_ZZ& BB, mat_ZZ* UU, quad_float delta,
             z++;
          }
       }
-   }
-
-
-   if (verb) {
-      G_BKZStatus(GetTime(), enum_time, NumIterations, NumTrivial, NumNonTrivial,
-                NumNoOps, m, B);
    }
 
 
@@ -1758,16 +1674,6 @@ long G_BKZ_QP1(mat_ZZ& BB, mat_ZZ* UU, quad_float delta,
             clean = 1;
          }
 
-         if (verb) {
-            tt = GetTime();
-            if (tt > LastTime + LLLStatusInterval)
-               G_BKZStatus(tt, enum_time, NumIterations, NumTrivial,
-                         NumNonTrivial, NumNoOps, m, B);
-         }
-
-
-
-   
          // ENUM
 
          double tt1;
@@ -1805,19 +1711,6 @@ long G_BKZ_QP1(mat_ZZ& BB, mat_ZZ* UU, quad_float delta,
          long enum_cnt = 0;
    
          while (t <= kk) {
-            if (verb) {
-               enum_cnt++;
-               if (enum_cnt > 100000) {
-                  enum_cnt = 0;
-                  tt = GetTime();
-                  if (tt > LastTime + LLLStatusInterval) {
-                     enum_time += tt - tt1;
-                     tt1 = tt;
-                     G_BKZStatus(tt, enum_time, NumIterations, NumTrivial,
-                               NumNonTrivial, NumNoOps, m, B);
-                  }
-               }
-            }
 
             ctilda[t] = ctilda[t+1] + 
                (yvec[t]+utildavec[t])*(yvec[t]+utildavec[t])*to_double(c[t]);
@@ -2012,11 +1905,6 @@ long G_BKZ_QP1(mat_ZZ& BB, mat_ZZ* UU, quad_float delta,
       }
    }
 
-
-   if (verb) {
-      G_BKZStatus(GetTime(), enum_time, NumIterations, NumTrivial, NumNonTrivial,
-                NumNoOps, m, B);
-   }
 
 
    // clean up

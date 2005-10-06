@@ -1984,7 +1984,9 @@ void swap(_ntl_ulong_ptr& a, _ntl_ulong_ptr& b)
 
 
 
-void GCD(GF2X& d, const GF2X& a_in, const GF2X& b_in)
+
+static
+void BaseGCD(GF2X& d, const GF2X& a_in, const GF2X& b_in)
 {
    GF2XRegister(a);
    GF2XRegister(b);
@@ -2060,6 +2062,32 @@ void GCD(GF2X& d, const GF2X& a_in, const GF2X& b_in)
       d = b;
    }
 }
+
+
+void GCD(GF2X& d, const GF2X& a, const GF2X& b)
+{
+   long sa = a.xrep.length();
+   long sb = b.xrep.length();
+
+   if (sb >= 10 && 2*sa > 3*sb) {
+      GF2XRegister(r);
+
+      rem(r, a, b);
+      BaseGCD(d, b, r);
+   }
+   else if (sa >= 10 && 2*sb > 3*sa) {
+      GF2XRegister(r);
+
+      rem(r, b, a);
+      BaseGCD(d, a, r);
+   }
+   else {
+      BaseGCD(d, a, b);
+   }
+}
+
+
+
 
 
 #define XX_STEP(ap,da,wa,ba,rp,sr,bp,db,wb,bb,sp,ss)  \
@@ -2150,7 +2178,7 @@ void GCD(GF2X& d, const GF2X& a_in, const GF2X& b_in)
 
 
 
-
+static
 void XXGCD(GF2X& d, GF2X& r_out, const GF2X& a_in, const GF2X& b_in)
 {
    GF2XRegister(a);
@@ -2237,7 +2265,9 @@ void XXGCD(GF2X& d, GF2X& r_out, const GF2X& a_in, const GF2X& b_in)
 }
 
 
-void XGCD(GF2X& d, GF2X& s, GF2X& t, const GF2X& a, const GF2X& b)
+
+static
+void BaseXGCD(GF2X& d, GF2X& s, GF2X& t, const GF2X& a, const GF2X& b)
 {
    if (IsZero(b)) {
       d = a;
@@ -2256,26 +2286,97 @@ void XGCD(GF2X& d, GF2X& s, GF2X& t, const GF2X& a, const GF2X& b)
    }
 }
 
-void InvMod(GF2X& c, const GF2X& a, const GF2X& f)
+
+
+
+void XGCD(GF2X& d, GF2X& s, GF2X& t, const GF2X& a, const GF2X& b)
+{
+   long sa = a.xrep.length();
+   long sb = b.xrep.length();
+
+
+   if (sb >= 10 && 2*sa > 3*sb) {
+      GF2XRegister(r);
+      GF2XRegister(q);
+      GF2XRegister(s1);
+      GF2XRegister(t1);
+
+
+      DivRem(q, r, a, b);
+      BaseXGCD(d, s1, t1, b, r);
+
+      
+      mul(r, t1, q);
+      add(r, r, s1);  // r = s1 - t1*q, but sign doesn't matter
+
+      s = t1;
+      t = r;   
+   }
+   else if (sa >= 10 && 2*sb > 3*sa) {
+      GF2XRegister(r);
+      GF2XRegister(q);
+      GF2XRegister(s1);
+      GF2XRegister(t1);
+
+
+      DivRem(q, r, b, a);
+      BaseXGCD(d, s1, t1, a, r);
+
+      
+      mul(r, t1, q);
+      add(r, r, s1);  // r = s1 - t1*q, but sign doesn't matter
+
+      t = t1;
+      s = r;  
+   }
+   else {
+      BaseXGCD(d, s, t, a, b);
+   }
+
+}
+
+
+
+
+static
+void BaseInvMod(GF2X& d, GF2X& s, const GF2X& a, const GF2X& f)
 {
    if (deg(a) >= deg(f) || deg(f) == 0) Error("InvMod: bad args");
-   
+
+   long sa = a.xrep.length();
+   long sf = f.xrep.length();
+
+   if (sa >= 10 && 2*sf > 3*sa) {
+      GF2XRegister(t);
+
+      XGCD(d, s, t, a, f);
+   }
+   else {
+      XXGCD(d, s, a, f);
+   }
+
+}
+
+
+
+void InvMod(GF2X& c, const GF2X& a, const GF2X& f)
+{ 
    GF2XRegister(d);
    GF2XRegister(s);
-   XXGCD(d, s, a, f);
+   BaseInvMod(d, s, a, f);
 
    if (!IsOne(d)) Error("InvMod: inverse undefined");
 
    c = s;
 }
 
+
+
 long InvModStatus(GF2X& c, const GF2X& a, const GF2X& f)
-{
-   if (deg(a) >= deg(f) || deg(f) == 0) Error("InvMod: bad args");
-   
+{ 
    GF2XRegister(d);
    GF2XRegister(s);
-   XXGCD(d, s, a, f);
+   BaseInvMod(d, s, a, f);
 
    if (!IsOne(d)) {
       c = d;
@@ -2285,6 +2386,8 @@ long InvModStatus(GF2X& c, const GF2X& a, const GF2X& f)
    c = s;
    return 0;
 }
+
+
 
    
 void diff(GF2X& c, const GF2X& a)

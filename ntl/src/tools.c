@@ -1,9 +1,9 @@
 
 #include <NTL/tools.h>
 
-#include <stdio.h>
-
 #include <ctype.h>
+
+#include <stdio.h>
 
 #include <NTL/new.h>
 
@@ -92,6 +92,29 @@ long IsWhiteSpace(long a)
       return 1;
    else 
       return 0;
+}
+
+void PrintTime(double t)
+{
+   long hh, mm, ss;
+
+   ss = long(t + 0.5);
+
+   hh = ss/3600;
+   ss = ss - hh*3600;
+   mm = ss/60;
+   ss = ss - mm*60;
+
+   if (hh > 0)
+      printf("%d:",hh);
+
+   if (hh > 0 || mm > 0) {
+      if (hh > 0 && mm < 10) printf("0");
+      printf("%d:",mm);
+   }
+
+   if ((hh > 0 || mm > 0) && ss < 10) printf("0");
+   printf("%d:",ss);
 }
 
 NTL_END_IMPL

@@ -219,7 +219,6 @@ long operator==(const vec_GF2& a, const vec_GF2& b)
    return a.length() == b.length() && a.rep == b.rep;
 }
 
-
 // math operations:
 
 void mul(vec_GF2& x, const vec_GF2& a, GF2 b)

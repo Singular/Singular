@@ -3,7 +3,6 @@
 #define NTL_vector__H
 
 #include <NTL/tools.h>
-#include <stdio.h>
 
 struct _ntl_VectorHeader {
    long length;
@@ -345,11 +344,7 @@ void vec_T::kill()  \
   \
 void vec_T::RangeError(long l__i) const  \
 {  \
-   printf( "index out of range in vector: %d", l__i );  \
-   if (!_vec__rep)  \
-      printf( "(0)\n");  \
-   else  \
-      printf( "(%d)\n" ,NTL_VEC_HEAD(_vec__rep)->length );  \
+   Error( "index out of range in vector ");  \
    abort();  \
 }  \
   \

@@ -5,20 +5,46 @@
 
 NTL_CLIENT
 
+
+double clean_data(double *t)
+{
+   double x, y, z;
+   long i, ix, iy, n;
+
+   x = t[0]; ix = 0;
+   y = t[0]; iy = 0;
+
+   for (i = 1; i < 5; i++) {
+      if (t[i] < x) {
+         x = t[i];
+         ix = i;
+      }
+      if (t[i] > y) {
+         y = t[i];
+         iy = i;
+      }
+   }
+
+   z = 0; n = 0;
+   for (i = 0; i < 5; i++) {
+      if (i != ix && i != iy) z+= t[i], n++;
+   }
+
+   z = z/n;  
+
+   return z;
+}
+
 void print_flag()
 {
 
-#ifdef NTL_AVOID_BRANCHING
-printf("AVOID_BRANCHING ");
-#endif
 
 #ifdef NTL_TBL_REM
 printf("TBL_REM ");
+#else
+printf("DEFAULT ");
 #endif
 
-#ifdef NTL_FFT_PIPELINE
-printf("FFT_PIPELINE ");
-#endif
 
 printf("\n");
 
@@ -29,19 +55,6 @@ int main()
 {
    _ntl_gmp_hack = 0;
 
-#ifdef NTL_LONG_LONG
-
-#ifndef NTL_LONG_LONG_TYPE
-#define NTL_LONG_LONG_TYPE long long
-#endif
-
-   if (sizeof(NTL_LONG_LONG_TYPE) != 2*sizeof(long)) {
-      printf("999999999999999 ");
-      print_flag();
-      return 0;
-   }
-
-#endif
 
    long n, k;
 
@@ -50,7 +63,7 @@ int main()
 
    ZZ p;
 
-   GenPrime(p, k);
+   RandomLen(p, k);
 
 
    ZZ_p::init(p);         // initialization
@@ -61,15 +74,7 @@ int main()
    random(h, n);    // h =             "   "
    random(f, n);    // f =             "   "
 
-   // SetCoeff(f, n);  // Sets coefficient of X^n to 1
-   
-   ZZ_p lc;
-
-   do {
-      random(lc);
-   } while (IsZero(lc));
-
-   SetCoeff(f, n, lc);
+   SetCoeff(f, n);  // Sets coefficient of X^n to 1
 
    // For doing arithmetic mod f quickly, one must pre-compute
    // some information.
@@ -118,20 +123,40 @@ int main()
 
    do {
      t = GetTime();
-     for (i = 0; i < iter; i++)
+     for (i = 0; i < iter; i++) {
         FFTMul(j3, j1, j2);
+     }
      t = GetTime() - t;
      iter = 2*iter;
    } while(t < 1);
 
    iter = iter/2;
 
-   t = floor((t/iter)*1e9);
+   iter = long((2/t)*iter) + 1;
+
+   double tvec[5];
+   long w;
+
+   for (w = 0; w < 5; w++) {
+     t = GetTime();
+     for (i = 0; i < iter; i++) {
+        FFTMul(j3, j1, j2);
+     }
+     t = GetTime() - t;
+     tvec[w] = t;
+   } 
+
+
+   t = clean_data(tvec);
+
+   t = floor((t/iter)*1e12);
 
    if (t < 0 || t >= 1e15)
       printf("999999999999999 ");
    else
       printf("%015.0f ", t);
+
+   printf(" [%ld] ", iter);
 
    print_flag();
 

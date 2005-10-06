@@ -67,6 +67,7 @@ long operator==(const mat_GF2& a, const mat_GF2& b);
 long operator!=(const mat_GF2& a, const mat_GF2& b); 
 
 
+
 void add(mat_GF2& X, const mat_GF2& A, const mat_GF2& B); 
 
 inline void sub(mat_GF2& X, const mat_GF2& A, const mat_GF2& B)

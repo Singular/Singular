@@ -5,6 +5,7 @@
 
 
 
+
 /********************************************************
 
    LIP INTERFACE 
@@ -1015,6 +1016,7 @@ inline long SqrRoot(long a) { return NTL_zsqrts(a); }
 // All args (other than exponents) are assumed to be in the range 0..n-1.
 
 
+
 inline void AddMod(ZZ& x, const ZZ& a, const ZZ& b, const ZZ& n)
 // x = (a+b)%n
    { NTL_zaddmod(a.rep, b.rep, n.rep, &x.rep); }
@@ -1209,9 +1211,21 @@ If n is the modulus, all inputs should be in the range 0..n-1.
 The number n itself should be in the range 1..2^{NTL_SP_NBITS}-1.
 */
 
+// I've declared these "static" so that the installation wizard
+// has more flexibility, without worrying about the (rather esoteric)
+// possibility of the linker complaining when the definitions
+// are inconsistent across severeal files.
+// Maybe an unnamed namespace would be better.
 
 
-inline long AddMod(long a, long b, long n)
+
+
+
+
+
+
+
+static inline long AddMod(long a, long b, long n)
 // return (a+b)%n
 
 {
@@ -1219,6 +1233,10 @@ inline long AddMod(long a, long b, long n)
 #if (NTL_ARITH_RIGHT_SHIFT && defined(NTL_AVOID_BRANCHING) && !defined(NTL_CLEAN_INT))
    res -= n;
    res += (res >> (NTL_BITS_PER_LONG-1)) & n;
+   return res;
+#elif (defined(NTL_AVOID_BRANCHING))
+   res -= n;
+   res += (long) ((-(((unsigned long) res) >> (NTL_BITS_PER_LONG-1))) & ((unsigned long) n));
    return res;
 #else
    if (res >= n)
@@ -1228,13 +1246,16 @@ inline long AddMod(long a, long b, long n)
 #endif
 }
 
-inline long SubMod(long a, long b, long n)
+static inline long SubMod(long a, long b, long n)
 // return (a-b)%n
 
 {
    long res = a - b;
 #if (NTL_ARITH_RIGHT_SHIFT && defined(NTL_AVOID_BRANCHING) && !defined(NTL_CLEAN_INT))
    res += (res >> (NTL_BITS_PER_LONG-1)) & n;
+   return res;
+#elif (defined(NTL_AVOID_BRANCHING))
+   res += (long) ((-(((unsigned long) res) >> (NTL_BITS_PER_LONG-1))) & ((unsigned long) n));
    return res;
 #else
    if (res < 0)
@@ -1244,10 +1265,16 @@ inline long SubMod(long a, long b, long n)
 #endif
 }
 
-inline long NegateMod(long a, long n)
+static inline long NegateMod(long a, long n)
 {
    return SubMod(0, a, n);
 }
+
+
+
+#if (defined(NTL_CLEAN_INT) || (defined(NTL_AVOID_BRANCHING)  && !NTL_ARITH_RIGHT_SHIFT))
+#define NTL_CLEAN_SPMM
+#endif
 
 
 #if (defined(NTL_SINGLE_MUL))
@@ -1256,7 +1283,7 @@ inline long NegateMod(long a, long n)
 #if (!defined(NTL_FAST_INT_MUL))
 
 
-inline long MulMod(long a, long b, long n)
+static inline long MulMod(long a, long b, long n)
 // return (a*b)%n
 
 {
@@ -1285,7 +1312,7 @@ which is assumed to equal 1/((double) n).
 It is usually faster than the above.
 */
 
-inline long MulMod(long a, long b, long n, double ninv)
+static inline long MulMod(long a, long b, long n, double ninv)
 {
    double ab;
    long q, res;
@@ -1311,7 +1338,7 @@ Yet another MulMod.
 This time, the 4th argument should be ((double) b)/((double) n).
 */
 
-inline long MulMod2(long a, long b, long n, double bninv)
+static inline long MulMod2(long a, long b, long n, double bninv)
 {
    double ab;
    long q, res;
@@ -1332,7 +1359,7 @@ inline long MulMod2(long a, long b, long n, double bninv)
    return res;
 }
 
-inline long MulDivRem(long& qq, long a, long b, long n, double bninv)
+static inline long MulDivRem(long& qq, long a, long b, long n, double bninv)
 {
    double ab;
    long q, res;
@@ -1354,7 +1381,7 @@ inline long MulDivRem(long& qq, long a, long b, long n, double bninv)
 
 #else
 
-inline long MulMod(long a, long b, long n)
+static inline long MulMod(long a, long b, long n)
 // return (a*b)%n
 
 {
@@ -1388,7 +1415,7 @@ which is assumed to equal 1/((double) n).
 It is usually faster than the above.
 */
 
-inline long MulMod(long a, long b, long n, double ninv)
+static inline long MulMod(long a, long b, long n, double ninv)
 {
    double ab, xx;
    long iab, q, res;
@@ -1418,7 +1445,7 @@ Yet another MulMod.
 This time, the 4th argument should be ((double) b)/((double) n).
 */
 
-inline long MulMod2(long a, long b, long n, double bninv)
+static inline long MulMod2(long a, long b, long n, double bninv)
 {
    long q, res;
 
@@ -1438,7 +1465,7 @@ inline long MulMod2(long a, long b, long n, double bninv)
 }
 
 
-inline long MulDivRem(long& qq, long a, long b, long n, double bninv)
+static inline long MulDivRem(long& qq, long a, long b, long n, double bninv)
 {
    long q, res;
 
@@ -1459,9 +1486,14 @@ inline long MulDivRem(long& qq, long a, long b, long n, double bninv)
 #endif
 
 
-#elif (!defined(NTL_CLEAN_INT))
+#elif (!defined(NTL_CLEAN_SPMM))
 
-inline long MulMod(long a, long b, long n)
+
+/*
+ * The default MulMod code.
+ */
+
+static inline long MulMod(long a, long b, long n)
 {
    long q, res;
 
@@ -1480,7 +1512,7 @@ inline long MulMod(long a, long b, long n)
    return res;
 }
 
-inline long MulMod(long a, long b, long n, double ninv)
+static inline long MulMod(long a, long b, long n, double ninv)
 {
    long q, res;
 
@@ -1500,7 +1532,7 @@ inline long MulMod(long a, long b, long n, double ninv)
 }
 
 
-inline long MulMod2(long a, long b, long n, double bninv)
+static inline long MulMod2(long a, long b, long n, double bninv)
 {
    long q, res;
 
@@ -1519,7 +1551,7 @@ inline long MulMod2(long a, long b, long n, double bninv)
    return res;
 }
 
-inline long MulDivRem(long& qq, long a, long b, long n, double bninv)
+static inline long MulDivRem(long& qq, long a, long b, long n, double bninv)
 {
    long q, res;
 
@@ -1544,8 +1576,8 @@ inline long MulDivRem(long& qq, long a, long b, long n, double bninv)
  * assuming IEEE floating point arithmetic.
  */
 
-inline long MulMod(long a, long b, long n)
-{
+static inline long MulMod(long a, long b, long n)
+{  
    long q;
    unsigned long res;
 
@@ -1554,15 +1586,21 @@ inline long MulMod(long a, long b, long n)
    res = ((unsigned long) a)*((unsigned long) b) - 
          ((unsigned long) q)*((unsigned long) n);
 
+#if (defined(NTL_AVOID_BRANCHING))
+   res += (-(res >> (NTL_BITS_PER_LONG-1))) & ((unsigned long) n);
+   res -= ((unsigned long) n);
+   res += (-(res >> (NTL_BITS_PER_LONG-1))) & ((unsigned long) n);
+#else
    if (res >> (NTL_BITS_PER_LONG-1))
-      res += n;
+      res += ((unsigned long) n);
    else if (((long) res) >= n)
-      res -= n;
+      res -= ((unsigned long) n);
+#endif
  
    return ((long) res);
 }
 
-inline long MulMod(long a, long b, long n, double ninv)
+static inline long MulMod(long a, long b, long n, double ninv)
 {
    long q; 
    unsigned long res;
@@ -1572,16 +1610,22 @@ inline long MulMod(long a, long b, long n, double ninv)
    res = ((unsigned long) a)*((unsigned long) b) - 
          ((unsigned long) q)*((unsigned long) n);
 
+#if (defined(NTL_AVOID_BRANCHING))
+   res += (-(res >> (NTL_BITS_PER_LONG-1))) & ((unsigned long) n);
+   res -= ((unsigned long) n);
+   res += (-(res >> (NTL_BITS_PER_LONG-1))) & ((unsigned long) n);
+#else
    if (res >> (NTL_BITS_PER_LONG-1))
-      res += n;
+      res += ((unsigned long) n);
    else if (((long) res) >= n)
-      res -= n;
+      res -= ((unsigned long) n);
+#endif
  
    return ((long) res);
 }
 
 
-inline long MulMod2(long a, long b, long n, double bninv)
+static inline long MulMod2(long a, long b, long n, double bninv)
 {
    long q;
    unsigned long res;
@@ -1591,15 +1635,22 @@ inline long MulMod2(long a, long b, long n, double bninv)
    res = ((unsigned long) a)*((unsigned long) b) - 
          ((unsigned long) q)*((unsigned long) n);
 
+#if (defined(NTL_AVOID_BRANCHING))
+   res += (-(res >> (NTL_BITS_PER_LONG-1))) & ((unsigned long) n);
+   res -= ((unsigned long) n);
+   res += (-(res >> (NTL_BITS_PER_LONG-1))) & ((unsigned long) n);
+#else
    if (res >> (NTL_BITS_PER_LONG-1))
-      res += n;
+      res += ((unsigned long) n);
    else if (((long) res) >= n)
-      res -= n;
+      res -= ((unsigned long) n);
+#endif
+
  
    return ((long) res);
 }
 
-inline long MulDivRem(long& qq, long a, long b, long n, double bninv)
+static inline long MulDivRem(long& qq, long a, long b, long n, double bninv)
 {
    long q; 
    unsigned long res;
@@ -1618,6 +1669,297 @@ inline long MulDivRem(long& qq, long a, long b, long n, double bninv)
 
    qq = q;
    return ((long) res);
+}
+
+
+#endif
+
+
+
+
+// These MulMod routines (with preconditioning) are sometimes
+// significantly faster.  There are four possible implementations:
+//  - default: uses MulMod2 above (lots of floating point)
+//  - NTL_SPMM_ULL: uses unsigned long long (if possible)
+//  - NTL_SMPP_ASM: uses assembly language (if possible)
+//  - NTL_SPMM_UL: uses only unsigned long arithmetic (portable, slower).
+
+#if (!defined(NTL_SINGLE_MUL) && (defined(NTL_SPMM_ULL) || defined(NTL_SPMM_ASM)))
+
+
+// unsigned long long / asm versions
+
+typedef unsigned long mulmod_precon_t;
+
+#define NTL_SPMM_VEC_T vec_ulong
+
+#if (!defined(NTL_CLEAN_SPMM))
+
+static inline unsigned long PrepMulModPrecon(long b, long n, double ninv)
+{
+   long q, r;
+
+   q  = (long) ( (((double) b) * NTL_SP_FBOUND) * ninv ); 
+   r = (b << NTL_SP_NBITS) - q*n;
+
+#if (NTL_ARITH_RIGHT_SHIFT && defined(NTL_AVOID_BRANCHING))
+   q += 1 + (r >> (NTL_BITS_PER_LONG-1)) + ((r - n) >> (NTL_BITS_PER_LONG-1));
+#else
+   if (r >= n)
+      q++;
+   else if (r < 0)
+      q--;
+#endif
+
+   return ((unsigned long) q) << (NTL_BITS_PER_LONG - NTL_SP_NBITS);
+}
+
+
+#else
+
+/*
+ * clean int version -- this should be completely portable.
+ */
+
+
+static inline unsigned long PrepMulModPrecon(long b, long n, double ninv)
+{
+   unsigned long q, r;
+
+   q = (long) ( (((double) b) * NTL_SP_FBOUND) * ninv ); 
+   r = (((unsigned long) b) << NTL_SP_NBITS ) - q * ((unsigned long) n);
+
+#if (defined(NTL_AVOID_BRANCHING))
+   q += 1UL - (r >> (NTL_BITS_PER_LONG-1)) - ((r - ((unsigned long) n)) >> (NTL_BITS_PER_LONG-1));
+#else
+   if (r >> (NTL_BITS_PER_LONG-1))
+      q--;
+   else if (((long) r) >= n)
+      q++;
+#endif
+
+   return q << (NTL_BITS_PER_LONG - NTL_SP_NBITS);
+}
+
+
+
+#endif
+
+
+
+
+#if (defined(NTL_SPMM_ULL))
+
+static inline unsigned long MulHiUL(unsigned long a, unsigned long b)
+{
+   return (((NTL_ULL_TYPE)(a)) * ((NTL_ULL_TYPE)(b))) >> NTL_BITS_PER_LONG;
+} 
+
+#else 
+
+// assmbly code versions
+
+#include <NTL/SPMM_ASM.h>
+
+
+#endif
+
+
+
+
+
+   
+
+#if (!defined(NTL_CLEAN_SPMM))
+
+
+
+static inline long MulModPrecon(long a, long b, long n, unsigned long bninv)
+{
+   long q, res;
+   
+   q = (long) MulHiUL(a, bninv);
+
+   res = a*b - q*n;
+#if (NTL_ARITH_RIGHT_SHIFT && defined(NTL_AVOID_BRANCHING))
+   res -= n;
+   res += (res >> (NTL_BITS_PER_LONG-1)) & n;
+#else
+   if (res >= n)
+      res -= n;
+#endif
+   return res;
+}
+
+
+#else
+
+static inline long MulModPrecon(long a, long b, long n, unsigned long bninv)
+{
+   unsigned long q, res;
+
+   
+   q = MulHiUL(a, bninv);
+
+   res = ((unsigned long) a)*((unsigned long) b) - q*((unsigned long) n);
+
+#if (defined(NTL_AVOID_BRANCHING))
+   res -= ((unsigned long) n);
+   res += (-(res >> (NTL_BITS_PER_LONG-1))) & ((unsigned long) n);
+#else
+   if (((long) res) >= n)
+      res -= ((unsigned long) n);
+#endif
+
+   return (long) res;
+}
+
+#endif
+
+
+
+#elif (!defined(NTL_SINGLE_MUL) && defined(NTL_SPMM_UL))
+
+// plain, portable (but slower) int version
+
+typedef long mulmod_precon_t;
+
+#define NTL_SPMM_VEC_T vec_long
+
+
+#if (!defined(NTL_CLEAN_SPMM))
+
+static inline long PrepMulModPrecon(long b, long n, double ninv)
+{
+   long q, r;
+
+   q  = (long) ( (((double) b) * NTL_SP_FBOUND) * ninv ); 
+   r = (b << NTL_SP_NBITS) - q*n;
+
+
+#if (NTL_ARITH_RIGHT_SHIFT && defined(NTL_AVOID_BRANCHING))
+   q += 1 + (r >> (NTL_BITS_PER_LONG-1)) + ((r - n) >> (NTL_BITS_PER_LONG-1));
+#else
+   if (r >= n)
+      q++;
+   else if (r < 0)
+      q--;
+#endif
+
+   return q;
+}
+
+
+#else
+
+static inline long PrepMulModPrecon(long b, long n, double ninv)
+{
+   unsigned long q, r;
+
+   q = (long) ( (((double) b) * NTL_SP_FBOUND) * ninv ); 
+   r = (((unsigned long) b) << NTL_SP_NBITS ) - q * ((unsigned long) n);
+
+#if (defined(NTL_AVOID_BRANCHING))
+   q += 1UL - (r >> (NTL_BITS_PER_LONG-1)) - ((r - ((unsigned long) n)) >> (NTL_BITS_PER_LONG-1));
+#else
+   if (r >> (NTL_BITS_PER_LONG-1))
+      q--;
+   else if (((long) r) >= n)
+      q++;
+#endif
+
+   return ((long) q);
+}
+
+
+#endif
+
+
+
+
+static inline long MulHiSP(long b, long d)
+{
+   unsigned long _b1 = b & ((1UL << (NTL_SP_NBITS/2)) - 1UL);
+   unsigned long _d1 = d & ((1UL << (NTL_SP_NBITS/2)) - 1UL);
+   unsigned long _bd,_b1d1,_m,_aa;
+   unsigned long _ld = (d>>(NTL_SP_NBITS/2));
+   unsigned long _lb = (b>>(NTL_SP_NBITS/2));
+
+   _bd=_lb*_ld;
+   _b1d1=_b1*_d1;
+   _m=(_lb+_b1)*(_ld+_d1) - _bd - _b1d1;
+   _aa = ( _b1d1+ ((_m&((1UL << (NTL_SP_NBITS/2)) - 1UL))<<(NTL_SP_NBITS/2)));
+   return (_aa >> NTL_SP_NBITS) + _bd + (_m>>(NTL_SP_NBITS/2));
+}
+
+
+#if (!defined(NTL_CLEAN_SPMM))
+
+static inline long MulModPrecon(long a, long b, long n, long bninv)
+{
+
+   long q, res;
+
+   q = MulHiSP(a, bninv);
+
+   res = a*b - q*n;
+#if (NTL_ARITH_RIGHT_SHIFT && defined(NTL_AVOID_BRANCHING))
+   res -= n;
+   res += (res >> (NTL_BITS_PER_LONG-1)) & n;
+#else
+   if (res >= n)
+      res -= n;
+#endif
+   return res;
+}
+
+
+
+#else
+
+
+static inline long MulModPrecon(long a, long b, long n, long bninv)
+{
+
+   unsigned long q, res;
+
+   q = MulHiSP(a, bninv);
+
+   res = ((unsigned long) a)*((unsigned long) b) - q*((unsigned long) n);
+
+#if (defined(NTL_AVOID_BRANCHING))
+   res -= ((unsigned long) n);
+   res += (-(res >> (NTL_BITS_PER_LONG-1))) & ((unsigned long) n);
+#else
+   if (((long) res) >= n)
+      res -= ((unsigned long) n);
+#endif
+
+   return (long) res;
+}
+
+
+#endif
+
+
+
+
+#else
+
+// default, double version
+
+typedef double mulmod_precon_t;
+
+#define NTL_SPMM_VEC_T vec_double
+
+static inline double PrepMulModPrecon(long b, long n, double ninv)
+{
+   return ((double) b) * ninv;
+}
+
+static inline long MulModPrecon(long a, long b, long n, double bninv)
+{
+   return MulMod2(a, b, n, bninv);
 }
 
 

@@ -1,12 +1,7 @@
 
 for i in $*
 do
-   if test -f $i.exe
-   then 
-      rm $i.exe
-   elif test -f $i
-   then
-      rm $i
-   fi
+   rm -f $i 
+   rm -f $i.exe
 done
 

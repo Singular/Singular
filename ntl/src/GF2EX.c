@@ -2197,8 +2197,6 @@ NTL_vector_impl(GF2EX,vec_GF2EX)
 NTL_eq_vector_impl(GF2EX,vec_GF2EX)
 
 
-
-
 void IterBuild(GF2E* a, long n)
 {
    long i, k;

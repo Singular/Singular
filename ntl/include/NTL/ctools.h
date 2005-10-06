@@ -6,6 +6,79 @@
 #include <NTL/mach_desc.h>
 
 
+/*
+ * Resolve double-word integer types.
+ *
+ * Unfortunately, there is no "standard" way to do this.
+ * On 32-bit machines, 'long long' usually works (but not
+ * on MSVC++ or BORLAND), and on 64-bit machines, there is
+ * no standard.  However, most compilers do offer *some*
+ * non-standard double-word type.  
+ *
+ * Note that C99 creates a standard header <stdint.h>,
+ * but it is not clear how widely this is implemented yet,
+ * and for example, GCC does not provide a type int128_t 
+ * in <stdint.h> on 64-bit machines.
+ */
+
+
+#if (defined(NTL_LONG_LONG_TYPE))
+
+#define NTL_LL_TYPE NTL_LONG_LONG_TYPE
+
+#elif (NTL_BITS_PER_LONG == 64 && defined(__GNUC__))
+
+#define NTL_LL_TYPE __int128_t
+
+#elif (NTL_BITS_PER_LONG == 32 && (defined(_MSC_VER) || defined(__BORLANDC__)))
+
+#define NTL_LL_TYPE __int64
+
+#elif (NTL_BITS_PER_LONG == 64 && (defined(_MSC_VER) || defined(__BORLANDC__)))
+
+#define NTL_LL_TYPE __int128
+
+#endif
+
+#if (!defined(NTL_LL_TYPE))
+
+#define NTL_LL_TYPE long long
+
+#endif
+
+
+
+#if (defined(NTL_UNSIGNED_LONG_LONG_TYPE))
+
+#define NTL_ULL_TYPE NTL_UNSIGNED_LONG_LONG_TYPE
+
+#elif (NTL_BITS_PER_LONG == 64 && defined(__GNUC__))
+
+#define NTL_ULL_TYPE __uint128_t
+
+#elif (NTL_BITS_PER_LONG == 32 && (defined(_MSC_VER) || defined(__BORLANDC__)))
+
+#define NTL_ULL_TYPE unsigned __int64
+
+#elif (NTL_BITS_PER_LONG == 64 && (defined(_MSC_VER) || defined(__BORLANDC__)))
+
+#define NTL_ULL_TYPE unsigned __int128
+
+#endif
+
+#if (!defined(NTL_ULL_TYPE))
+
+#define NTL_ULL_TYPE unsigned long long
+
+#endif
+
+
+/********************************************************/
+
+
+
+
+
 
 
 #define NTL_OVFBND (1L << (NTL_BITS_PER_LONG-4))

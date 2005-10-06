@@ -16,6 +16,12 @@
 #include <NTL/new.h>
 
 
+#if (defined(NTL_GMP_LIP) || defined(NTL_GMP_HACK))
+#define KARX 200
+#else
+#define KARX 80
+#endif
+
 
 NTL_START_IMPL
 
@@ -442,7 +448,7 @@ void mul(ZZ_pX& c, const ZZ_pX& a, const ZZ_pX& b)
                  (k <= 12 && s < 4) )  {
       PlainMul(c, a, b);
    }
-   else if (s < 80) {
+   else if (s < KARX) {
       ZZX A, B, C;
       conv(A, a);
       conv(B, b);

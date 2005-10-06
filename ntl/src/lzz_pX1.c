@@ -894,6 +894,7 @@ NTL_vector_impl(zz_pX,vec_zz_pX)
 NTL_eq_vector_impl(zz_pX,vec_zz_pX)
 
 
+
    
 void InnerProduct(zz_pX& x, const vec_zz_p& v, long low, long high, 
                    const vec_zz_pX& H, long n, vec_zz_p& t)
@@ -917,11 +918,11 @@ void InnerProduct(zz_pX& x, const vec_zz_p& v, long low, long high,
       zz_p w = (v[i]);
 
       long W = rep(w);
-      double Wpinv = ((double) W)*pinv;
+      mulmod_precon_t Wpinv = PrepMulModPrecon(W, p, pinv); // ((double) W)*pinv;
       const zz_p *hp = h.elts();
 
       for (j = 0; j < m; j++) {
-         long S = MulMod2(rep(hp[j]), W, p, Wpinv);
+         long S = MulModPrecon(rep(hp[j]), W, p, Wpinv);
          S = AddMod(S, rep(tp[j]), p);
          tp[j].LoopHole() = S;
       }

@@ -220,6 +220,8 @@ inline long compare(const quad_float& x, double y)
 inline long compare(double x, const quad_float& y)
    { return compare(to_quad_float(x), y); }
 
+
+
 quad_float sqrt(const quad_float&);
 quad_float floor(const quad_float&);
 quad_float ceil(const quad_float&);

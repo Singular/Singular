@@ -1,5 +1,5 @@
 
-#include <NTL/config.h>
+#include <NTL/ctools.h>
 
 #if (defined(NTL_STD_CXX) || defined(NTL_PSTD_NHF))
 #include <iostream>
@@ -49,6 +49,11 @@ int main()
    cout << make_string(NTL_LONG_LONG_TYPE) << "\n";
 #endif
 
+#ifdef NTL_UNSIGNED_LONG_LONG_TYPE
+   cout << "NTL_UNSIGNED_LONG_LONG_TYPE: ";
+   cout << make_string(NTL_UNSIGNED_LONG_LONG_TYPE) << "\n";
+#endif
+
 #ifdef NTL_CXX_ONLY
    cout << "NTL_CXX_ONLY\n";
 #endif
@@ -78,6 +83,13 @@ int main()
    cout << "NTL_RANGE_CHECK\n";
 #endif
 
+
+cout << "\n";
+cout << "Resolution of double-word types:\n";
+cout << make_string(NTL_LL_TYPE) << "\n";
+cout << make_string(NTL_ULL_TYPE) << "\n";
+
+
 cout << "\n";
 cout << "Performance Options:\n";
 
@@ -89,17 +101,46 @@ cout << "Performance Options:\n";
    cout << "NTL_AVOID_FLOAT\n";
 #endif
 
+#ifdef NTL_SPMM_UL
+   cout << "NTL_SPMM_UL\n";
+#endif
+
+
+#ifdef NTL_SPMM_ULL
+   cout << "NTL_SPMM_ULL\n";
+#endif
+
+
+#ifdef NTL_SPMM_ASM
+   cout << "NTL_SPMM_ASM\n";
+#endif
+
+
+
+
 #ifdef NTL_AVOID_BRANCHING
    cout << "NTL_AVOID_BRANCHING\n";
 #endif
 
-#ifdef NTL_FFT_PIPELINE
-   cout << "NTL_FFT_PIPELINE\n";
-#endif
 
 
 #ifdef NTL_TBL_REM
    cout << "NTL_TBL_REM\n";
+#endif
+
+
+#ifdef NTL_GF2X_ALTCODE
+   cout << "NTL_GF2X_ALTCODE\n";
+#endif
+
+
+#ifdef NTL_GF2X_ALTCODE1
+   cout << "NTL_GF2X_ALTCODE1\n";
+#endif
+
+
+#ifdef NTL_GF2X_NOINLINE
+   cout << "NTL_GF2X_NOINLINE\n";
 #endif
 
    cout << "\n\n";

@@ -295,9 +295,6 @@ int _ntl_gmp_hack = 0;
 
 #elif (defined(NTL_LONG_LONG))
 
-#ifndef NTL_LONG_LONG_TYPE
-#define NTL_LONG_LONG_TYPE long long
-#endif
 
 #if (!defined(NTL_CLEAN_INT))
 
@@ -306,20 +303,20 @@ int _ntl_gmp_hack = 0;
  */
 
 #define zaddmulp(a, b, d, t) { \
-   NTL_LONG_LONG_TYPE _pp = ((NTL_LONG_LONG_TYPE) (b)) * ((NTL_LONG_LONG_TYPE) (d)) + ((t)+(a)); \
+   NTL_LL_TYPE _pp = ((NTL_LL_TYPE) (b)) * ((NTL_LL_TYPE) (d)) + ((t)+(a)); \
    (a) = ((long)(_pp)) & NTL_RADIXM; \
    (t) = (long) (_pp >> NTL_NBITS); \
 } 
 
 
 #define zxmulp(a, b, d, t) { \
-   NTL_LONG_LONG_TYPE _pp = ((NTL_LONG_LONG_TYPE) (b)) * ((NTL_LONG_LONG_TYPE) (d)) + (t); \
+   NTL_LL_TYPE _pp = ((NTL_LL_TYPE) (b)) * ((NTL_LL_TYPE) (d)) + (t); \
    (a) = ((long)(_pp)) & NTL_RADIXM; \
    (t) = (long) (_pp >> NTL_NBITS); \
 } 
 
 #define zaddmulpsq(a,b,t) { \
-   NTL_LONG_LONG_TYPE _pp = ((NTL_LONG_LONG_TYPE) (b)) * ((NTL_LONG_LONG_TYPE) (b)) + (a); \
+   NTL_LL_TYPE _pp = ((NTL_LL_TYPE) (b)) * ((NTL_LL_TYPE) (b)) + (a); \
    (a) = ((long)(_pp)) & NTL_RADIXM; \
    (t) = (long) (_pp >> NTL_NBITS); \
 }
@@ -334,20 +331,20 @@ int _ntl_gmp_hack = 0;
 
 
 #define zaddmulp(a, b, d, t) { \
-   NTL_LONG_LONG_TYPE _pp = ((NTL_LONG_LONG_TYPE) (b)) * ((NTL_LONG_LONG_TYPE) (d)) + ((t)+(a)); \
+   NTL_LL_TYPE _pp = ((NTL_LL_TYPE) (b)) * ((NTL_LL_TYPE) (d)) + ((t)+(a)); \
    (a) = (long) (_pp & NTL_RADIXM); \
    (t) = (long) (_pp >> NTL_NBITS); \
 } 
 
 
 #define zxmulp(a, b, d, t) { \
-   NTL_LONG_LONG_TYPE _pp = ((NTL_LONG_LONG_TYPE) (b)) * ((NTL_LONG_LONG_TYPE) (d)) + (t); \
+   NTL_LL_TYPE _pp = ((NTL_LL_TYPE) (b)) * ((NTL_LL_TYPE) (d)) + (t); \
    (a) = (long) (_pp & NTL_RADIXM); \
    (t) = (long) (_pp >> NTL_NBITS); \
 } 
 
 #define zaddmulpsq(a,b,t) { \
-   NTL_LONG_LONG_TYPE _pp = ((NTL_LONG_LONG_TYPE) (b)) * ((NTL_LONG_LONG_TYPE) (b)) + (a); \
+   NTL_LL_TYPE _pp = ((NTL_LL_TYPE) (b)) * ((NTL_LL_TYPE) (b)) + (a); \
    (a) = (long) (_pp & NTL_RADIXM); \
    (t) = (long) (_pp >> NTL_NBITS); \
 }
@@ -697,6 +694,7 @@ int _ntl_gmp_hack = 0;
 
 #else
 /* clean int version */
+
 
 /* value right-shifted is 0..2 */
 #define zaddmulp(a, b, d, t) \
@@ -1734,8 +1732,11 @@ void zsubmul(long lams, long *lama, long *lamb)
  * zrem21 behaves just like zdiv21, except the only the remainder is computed.
  */
 
+#if (defined(NTL_CLEAN_INT) || (defined(NTL_AVOID_BRANCHING)  && !NTL_ARITH_RIGHT_SHIFT))
+#define NTL_CLEAN_SPMM
+#endif
 
-#if (defined(NTL_CLEAN_INT))
+#if (defined(NTL_CLEAN_SPMM)  && !defined(NTL_AVOID_BRANCHING))
 
 #define zrem21(numhigh, numlow, denom, deninv) \
 { \
@@ -1751,6 +1752,22 @@ void zsubmul(long lams, long *lama, long *lamb)
    else if (lr21 >= udenom) { \
       lr21 -= udenom; \
    } \
+   numhigh = (long) lr21; \
+}
+
+#elif (defined(NTL_CLEAN_SPMM)  && defined(NTL_AVOID_BRANCHING))
+
+
+#define zrem21(numhigh, numlow, denom, deninv) \
+{ \
+   unsigned long udenom = denom; \
+   unsigned long lq21 = (long) (((NTL_FRADIX * (double) (numhigh)) + \
+                        (double) (numlow)) * (deninv)); \
+   unsigned long lr21 = (((unsigned long) numhigh) << NTL_NBITS) + \
+                        ((unsigned long) numlow)  - udenom*lq21 ; \
+   lr21 += (-(lr21 >> (NTL_BITS_PER_LONG-1))) & udenom; \
+   lr21 -= udenom; \
+   lr21 += (-(lr21 >> (NTL_BITS_PER_LONG-1))) & udenom; \
    numhigh = (long) lr21; \
 }
 
@@ -3862,6 +3879,80 @@ void _ntl_zmultirem2(_ntl_verylong a, long n, long* dd, double **ttbl, long *rr)
 
 #elif (defined(NTL_TBL_REM))
 
+#if (defined(NTL_LONG_LONG))
+
+/* This version uses the double-word long type directly.
+ * It's a little faster that the other one.
+ * It accumlates 8 double-word products before stepping
+ * a higher-level accumulator.
+ */
+
+
+
+void _ntl_zmultirem3(_ntl_verylong a, long n, long* dd, long **ttbl, long *rr)
+{
+   long sa, i, j, d, *tbl, ac0, ac1, ac2, *ap, *tp, k, carry;
+   double dinv;
+   NTL_LL_TYPE acc;
+
+   if (!a || a[0] < 8 || a[0] >= NTL_RADIX) {
+      _ntl_zmultirem(a, n, dd, rr);
+      return;
+   }
+
+   sa = a[0];
+ 
+   for (i = 0; i < n; i++) {
+      d = dd[i];
+      tbl = ttbl[i];
+      acc = a[1];
+      ac2 = 0;
+      ap = &a[2];
+      tp = &tbl[1];
+
+      k = sa - 7;
+
+      for (j = 0; j < k; j += 7) {
+         acc += ((NTL_LL_TYPE) ap[j+0]) * ((NTL_LL_TYPE) tp[j+0]);
+         acc += ((NTL_LL_TYPE) ap[j+1]) * ((NTL_LL_TYPE) tp[j+1]);
+         acc += ((NTL_LL_TYPE) ap[j+2]) * ((NTL_LL_TYPE) tp[j+2]);
+         acc += ((NTL_LL_TYPE) ap[j+3]) * ((NTL_LL_TYPE) tp[j+3]);
+         acc += ((NTL_LL_TYPE) ap[j+4]) * ((NTL_LL_TYPE) tp[j+4]);
+         acc += ((NTL_LL_TYPE) ap[j+5]) * ((NTL_LL_TYPE) tp[j+5]);
+         acc += ((NTL_LL_TYPE) ap[j+6]) * ((NTL_LL_TYPE) tp[j+6]);
+         ac2 += (long) (acc >> (2*NTL_NBITS));
+         acc &= (((NTL_LL_TYPE) 1) << (2*NTL_NBITS)) - ((NTL_LL_TYPE) 1);
+      }
+
+      k = sa - 1;
+
+      for (; j < k; j++)
+         acc += ((NTL_LL_TYPE) ap[j+0]) * ((NTL_LL_TYPE) tp[j+0]);
+
+      ac2 += (long) (acc >> (2*NTL_NBITS));
+      acc &= (((NTL_LL_TYPE) 1) << (2*NTL_NBITS)) - ((NTL_LL_TYPE) 1);
+
+      ac0 = (long) (acc & ( (((NTL_LL_TYPE) 1) << (NTL_NBITS)) - ((NTL_LL_TYPE) 1) ));
+      ac1 = (long) (acc >> NTL_NBITS);
+      
+
+      carry = 0;
+      dinv = ((double) 1)/((double) d);
+      if (ac2 >= d) {
+         zrem21(carry, ac2, d, dinv);
+      }
+      else
+         carry = ac2;
+
+      zrem21(carry, ac1, d, dinv);
+      zrem21(carry, ac0, d, dinv);
+
+      rr[i] = carry;
+   }
+}
+
+#else
+
 void _ntl_zmultirem3(_ntl_verylong a, long n, long* dd, long **ttbl, long *rr)
 {
    long sa, i, d, *tbl, ac0, ac1, ac2, *ap, *tp, k, t, carry;
@@ -3909,6 +4000,13 @@ void _ntl_zmultirem3(_ntl_verylong a, long n, long* dd, long **ttbl, long *rr)
       rr[i] = carry;
    }
 }
+
+
+
+
+#endif
+
+
 
 #endif
 

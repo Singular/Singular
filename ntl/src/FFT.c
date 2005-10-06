@@ -8,6 +8,8 @@ NTL_START_IMPL
 
 long NumFFTPrimes = 0;
 
+
+
 long *FFTPrime = 0;
 long **RootTable = 0;
 long **RootInvTable = 0;
@@ -238,227 +240,179 @@ void BitReverseCopy(long *A, const long *a, long k)
 }
 
 
-#ifdef NTL_FFT_PIPELINE
 
-/*****************************************************
 
-   This version of the FFT is written with an explicit
-   "software pipeline", which sometimes speeds things up.
 
-*******************************************************/
+/*
+ * Our FFT is based on the routine in Cormen, Leiserson, Rivest, and Stein.
+ * For very large inputs, it should be relatively cache friendly.
+ * The inner loop has been unrolled and pipelined, to exploit any
+ * low-level parallelism in the machine.
+ */
+
+
 
 void FFT(long* A, const long* a, long k, long q, const long* root)
 
 // performs a 2^k-point convolution modulo q
 
 {
-   if (k == 0) {
-      A[0] = a[0];
-      return;
-   }
-
-   if (k == 1) {
-      A[0] = AddMod(a[0], a[1], q);
-      A[1] = SubMod(a[0], a[1], q);
-      return;
+   if (k <= 1) {
+      if (k == 0) {
+	 A[0] = a[0];
+	 return;
+      }
+      if (k == 1) {
+	 A[0] = AddMod(a[0], a[1], q);
+	 A[1] = SubMod(a[0], a[1], q);
+	 return;
+      }
    }
 
    // assume k > 1
 
-   long n = 1L << k;
-   long s, m, m2, j;
-   long t, u, v, w, z, tt;
-   long *p1, *p, *ub, *ub1;
-   double qinv = ((double) 1)/((double) q);
-   double wqinv, zqinv;
+   
+
+   static long tab_size = 0;
+   static long *wtab = 0;
+   static mulmod_precon_t *wqinvtab = 0;
+
+   if (!tab_size) {
+      tab_size = k;
+
+      wtab = (long *) NTL_MALLOC(1L << (k-2), sizeof(long), 0);
+      wqinvtab = (mulmod_precon_t *) 
+                 NTL_MALLOC(1L << (k-2), sizeof(mulmod_precon_t), 0);
+      if (!wtab || !wqinvtab) Error("out of space");
+   }
+   else if (tab_size < k) {
+      tab_size = k;
+
+      wtab = (long *) NTL_REALLOC(wtab, 1L << (k-2), sizeof(long), 0);
+      wqinvtab = (mulmod_precon_t *) 
+                 NTL_REALLOC(wqinvtab, 1L << (k-2), sizeof(mulmod_precon_t), 0);
+      if (!wtab || !wqinvtab) Error("out of space");
+   }
+
+
+   double qinv = 1/((double) q);
+
+   wtab[0] = 1;
+   wqinvtab[0] = PrepMulModPrecon(1, q, qinv);
+
 
    BitReverseCopy(A, a, k);
 
-   ub = A+n;
+   long n = 1L << k;
 
-   p = A;
-   while (p < ub) {
-      u = *p;
-      v = *(p+1);
-      *p = AddMod(u, v, q);
-      *(p+1) = SubMod(u, v, q);
-      p += 2;
+   long s, m, m_half, m_fourth, i, j, t, u, t1, u1, uu, uu1, tt, tt1;
+
+   long w;
+   mulmod_precon_t wqinv;
+
+   // s = 1
+
+   for (i = 0; i < n; i += 2) {
+      t = A[i + 1];
+      u = A[i];
+      A[i] = AddMod(u, t, q);
+      A[i+1] = SubMod(u, t, q);
    }
 
+   
+  
    for (s = 2; s < k; s++) {
       m = 1L << s;
-      m2 = m >> 1;
+      m_half = 1L << (s-1);
+      m_fourth = 1L << (s-2);
 
-      p = A;
-      while (p < ub) {
-         u = *p;
-         v = *(p+m2);
-         *p = AddMod(u, v, q);
-         *(p+m2) = SubMod(u, v, q);
-         p += m;
+      // prepare wtab...
+
+      w = root[s];
+      wqinv = PrepMulModPrecon(w, q, qinv);
+
+      for (i = m_half-1, j = m_fourth-1; i >= 0; i -= 2, j--) {
+         wtab[i-1] = wtab[j];
+         wqinvtab[i-1] = wqinvtab[j];
+         wtab[i] = MulModPrecon(wtab[i-1], w, q, wqinv);
+         wqinvtab[i] = PrepMulModPrecon(wtab[i], q, qinv);
       }
 
-      z = root[s];
-      w = z;
-      for (j = 1; j < m2; j++) {
-         wqinv = ((double) w)*qinv;
-         p = A + j;
-         p1 = p + m2;
+      for (i = 0; i < n; i+= m) {
 
-         ub1 = ub-m;
+          
+         t = A[i + m_half];
+         u = A[i];
+         t1 = MulModPrecon(A[i + 1+ m_half], w, q, wqinv);
+         u1 = A[i+1];
 
-         u = *p;
-         t = MulMod2(*p1, w, q, wqinv);
+         for (j = 0; j < m_half-2; j += 2) {
+            tt = MulModPrecon(A[i + j + 2 + m_half], wtab[j+2], q, wqinvtab[j+2]);
+            uu = A[i + j + 2];
 
-         while (p < ub1) {
-            tt = MulMod2(*(p1+m), w, q, wqinv);
-            *p = AddMod(u, t, q);
-            *p1 = SubMod(u, t, q);
-            p1 += m;
-            p += m;
-            u = *p;
+
+            tt1 = MulModPrecon(A[i + j + 3+ m_half], wtab[j+3], q, wqinvtab[j+3]);
+            uu1 = A[i + j + 3];
+
+            A[i + j] = AddMod(u, t, q);
+            A[i + j + m_half] = SubMod(u, t, q);
+            A[i + j + 1] = AddMod(u1, t1, q);
+            A[i + j + 1 + m_half] = SubMod(u1, t1, q);
             t = tt;
-         }
-         *p = AddMod(u, t, q);
-         *p1 = SubMod(u, t, q);
-         
-         w = MulMod2(z, w, q, wqinv);
-      }
-   }
-
-   m2 = n >> 1;
-   z = root[k];
-   zqinv = ((double) z)*qinv;
-   w = 1;
-   p = A;
-   p1 = A + m2;
-   m2--;
-   u = *p;
-   t = *p1;
-   while (m2) {
-      w = MulMod2(w, z, q, zqinv);
-      tt = MulMod(*(p1+1), w, q, qinv);
-      *p = AddMod(u, t, q);
-      *p1 = SubMod(u, t, q);
-      p++;
-      p1++;
-      u = *p;
-      t = tt;
-      m2--;
-   }
-   *p = AddMod(u, t, q);
-   *p1 = SubMod(u, t, q);
-}
-
-
-
-#else
-
-
-/*****************************************************
-
-   This version of the FFT has no "software pipeline".
-
-******************************************************/
-
-
-
-void FFT(long* A, const long* a, long k, long q, const long* root)
-
-// performs a 2^k-point convolution modulo q
-
-{
-   if (k == 0) {
-      A[0] = a[0];
-      return;
-   }
-
-   if (k == 1) {
-      A[0] = AddMod(a[0], a[1], q);
-      A[1] = SubMod(a[0], a[1], q);
-      return;
-   }
-
-   // assume k > 1
-
-   long n = 1L << k;
-   long s, m, m2, j;
-   long t, u, v, w, z;
-   long *p, *ub, *p1, *ub1;
-   double qinv = ((double) 1)/((double) q);
-   double wqinv, zqinv;
-
-   BitReverseCopy(A, a, k);
-
-   ub = A+n;
-
-   p = A;
-   while (p < ub) {
-      u = *p;
-      v = *(p+1);
-      *p = AddMod(u, v, q);
-      *(p+1) = SubMod(u, v, q);
-      p += 2;
-   }
-
-   for (s = 2; s < k; s++) {
-      m = 1L << s;
-      m2 = m >> 1;
-
-      p = A;
-      while (p < ub) {
-         u = *p;
-         v = *(p+m2);
-         *p = AddMod(u, v, q);
-         *(p+m2) = SubMod(u, v, q);
-         p += m;
-      }
-
-      z = root[s];
-      w = z;
-      for (j = 1; j < m2; j++) {
-         wqinv = ((double) w)*qinv;
-         p = A + j;
-         p1 = p + m2;
-         ub1 = ub-m;
-
-         while (p < ub1) {
-            u = *p;
-            v = *p1;
-            t = MulMod2(v, w, q, wqinv);
-            *p = AddMod(u, t, q);
-            *p1 = SubMod(u, t, q);
-            p += m;
-            p1 += m;
+            t1 = tt1;
+            u = uu;
+            u1 = uu1;
          }
 
-	 u = *p;
-	 v = *p1;
-	 t = MulMod2(v, w, q, wqinv);
-	 *p = AddMod(u, t, q);
-	 *p1 = SubMod(u, t, q);
 
-         w = MulMod2(z, w, q, wqinv);
+         A[i + j] = AddMod(u, t, q);
+         A[i + j + m_half] = SubMod(u, t, q);
+         A[i + j + 1] = AddMod(u1, t1, q);
+         A[i + j + 1 + m_half] = SubMod(u1, t1, q);
+
+
+
       }
    }
 
-   m2 = n >> 1;
-   z = root[k];
-   zqinv = ((double) z)*qinv;
-   w = 1;
-   p = A;
-   for (j = 0; j < m2; j++) {
-      u = *p;
-      v = *(p+m2);
-      t = MulMod(v, w, q, qinv);
-      *p = AddMod(u, t, q);
-      *(p+m2) = SubMod(u, t, q);
-      w = MulMod2(w, z, q, zqinv);
-      p++;
+
+   // s == k...special case
+
+   m = 1L << s;
+   m_half = 1L << (s-1);
+   m_fourth = 1L << (s-2);
+
+
+   w = root[s];
+   wqinv = PrepMulModPrecon(w, q, qinv);
+
+   // j = 0, 1
+
+   t = A[m_half];
+   u = A[0];
+   t1 = MulModPrecon(A[1+ m_half], w, q, wqinv);
+   u1 = A[1];
+
+   A[0] = AddMod(u, t, q);
+   A[m_half] = SubMod(u, t, q);
+   A[1] = AddMod(u1, t1, q);
+   A[1 + m_half] = SubMod(u1, t1, q);
+
+   for (j = 2; j < m_half; j += 2) {
+      t = MulModPrecon(A[j + m_half], wtab[j >> 1], q, wqinvtab[j >> 1]);
+      u = A[j];
+      t1 = MulModPrecon(A[j + 1+ m_half], wtab[j >> 1], q, 
+                        wqinvtab[j >> 1]);
+      t1 = MulModPrecon(t1, w, q, wqinv);
+      u1 = A[j + 1];
+
+      A[j] = AddMod(u, t, q);
+      A[j + m_half] = SubMod(u, t, q);
+      A[j + 1] = AddMod(u1, t1, q);
+      A[j + 1 + m_half] = SubMod(u1, t1, q);
+     
    }
 }
 
-
-#endif
 
 NTL_END_IMPL

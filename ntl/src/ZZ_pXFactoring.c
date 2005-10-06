@@ -398,7 +398,6 @@ void SFBerlekamp(vec_ZZ_pX& factors, const ZZ_pX& ff, long verbose)
 
    NullSpace(r, D, M, verbose);
 
-
    if (r == 1) {
       factors.SetLength(1);
       factors[0] = f;
@@ -815,7 +814,6 @@ void EDF(vec_ZZ_pX& factors, const ZZ_pX& ff, const ZZ_pX& bb,
       return;
    }
 
-   
    factors.SetLength(0);
 
    RecEDF(factors, f, b, d, verbose);
@@ -1421,6 +1419,7 @@ static vec_ZZ_pX BabyStepFile;
 static vec_ZZ_pX GiantStepFile;
 
 
+
 static 
 double CalcTableSize(long n, long k)
 {
@@ -1438,6 +1437,8 @@ void GenerateBabySteps(ZZ_pX& h1, const ZZ_pX& f, const ZZ_pX& h, long k,
                        long verbose)
 
 {
+   double t;
+
    ZZ_pXModulus F;
    build(F, f);
 
@@ -1464,6 +1465,9 @@ void GenerateBabySteps(ZZ_pX& h1, const ZZ_pX& f, const ZZ_pX& h, long k,
 static
 void GenerateGiantSteps(const ZZ_pX& f, const ZZ_pX& h, long l, long verbose)
 {
+
+   double t;
+
 
    ZZ_pXModulus F;
    build(F, f);
@@ -1733,6 +1737,7 @@ void BabyRefine(vec_pair_ZZ_pX_long& factors, const vec_pair_ZZ_pX_long& u,
          IntervalRefine(factors, g, k, gs, BabyStep, verbose);
       }
    }
+
 }
 
       
@@ -1768,6 +1773,7 @@ void NewDDF(vec_pair_ZZ_pX_long& factors,
    long l = (B+k-1)/k;
 
    ZZ_pX h1;
+
 
    GenerateBabySteps(h1, f, h, k, verbose);
 

@@ -6,7 +6,7 @@ A Tour of NTL: NTL Implementation and Portability  </title>
 
 <body bgcolor="#fff9e6">
 <center>
-<a href="tour-win.html"><img src="arrow1.gif" alt="[Previous]" align=bottom></a>
+<a href="tour-tips.html"><img src="arrow1.gif" alt="[Previous]" align=bottom></a>
  <a href="tour.html"><img src="arrow2.gif" alt="[Up]" align=bottom></a> 
 <a href="tour-gmp.html"> <img src="arrow3.gif" alt="[Next]" align=bottom></a>
 </center>
@@ -86,13 +86,41 @@ since it is a very reasonable behavior, and since many programs
 implicitly rely on this behavior.
 
 <p>
-Making this "wrap around" assumption can lead to somewhat more efficient code
+Making this "wrap around" assumption can lead to slightly more efficient code
 on some platforms.
 It seems fairly unlikely that one would ever have to turn the
 <tt>NTL_CLEAN_INT</tt> flag <i>on</i>, but it seems a good idea
 to make this possible, and at the very least 
 to identify and isolate the code that
 relies on this assumption.
+
+
+
+
+<p>
+Actually, with <tt>NTL_CLEAN_INT</tt> off, it is also assumed
+that right shifts of signed integers are consistent,
+in the sense that if it is sometimes an arithmetic shift,
+then it is always an arithmetic shift (the installation
+scripts check if right shift appears to be arithmetic, and if so,
+this assumption is made elsewhere). 
+
+<p>
+It is hard to imagine that there is a platform existing today
+(or in the foreseeable future) where these assumptions
+are not meet.
+However,
+ as of version 5.4 of NTL, all of the most 
+performance-critical code now works almost as well
+with  <tt>NTL_CLEAN_INT</tt> set as without.
+The differences are not very significant (maybe 10%).
+Therefore, there is hardly any reason to not set this flag.
+Also, note that the only code affected by this flag
+is the traditional long integer package (which, if you use
+GMP as the primary long integer package, is not involved),
+and the single-precision modular multiplication routines
+defined in <tt>ZZ.h</tt>.
+
 <p>
 
 <h3>The <tt>NTL_CLEAN_PTR</tt> flag</h3>
@@ -125,6 +153,9 @@ penalty should be negligible for most applications.
 
 
 <p>
+NTL uses floating point arithmetic in a number of places,
+including a number of exact computations, where one might
+not expect to see floating point.
 Relying on floating point may seem prone to errors,
 but with the guarantees provided by the IEEE standard,
 one can prove the correctness of the NTL code that uses floating point.
@@ -184,9 +215,20 @@ rest of NTL should work fine.
 
 
 <p>
-Note that NTL <i>does</i> require that the IEEE floating point 
+Mostly, NTL does not 
+ require that the IEEE floating point 
 special quantities "infinity"
 and "not a number" are implemented correctly.
+This is certainly the case for core code where
+floating point arithmetic is used for exact (but fast)
+computations, as the numbers involved never get too big (or small).
+However, the behavior of
+certain explicit floating point computations
+(e.g., the <tt>xdouble</tt> and <tt>quad_float</tt> classes,
+and the floating point versions of LLL) will be
+much more predictable and reliable if "infinity"
+and "not a number" are implemented correctly.
+
 
 <p>
 <h3>Implementing long integer arithmetic</h3>
@@ -301,7 +343,7 @@ and I have heard no complaints yet about its effects.
 <p>
 
 <center>
-<a href="tour-win.html"><img src="arrow1.gif" alt="[Previous]" align=bottom></a>
+<a href="tour-tips.html"><img src="arrow1.gif" alt="[Previous]" align=bottom></a>
  <a href="tour.html"><img src="arrow2.gif" alt="[Up]" align=bottom></a> 
 <a href="tour-gmp.html"> <img src="arrow3.gif" alt="[Next]" align=bottom></a>
 </center>

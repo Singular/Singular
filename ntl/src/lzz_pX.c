@@ -342,11 +342,11 @@ void PlainMul(zz_p *xp, const zz_p *ap, long sa, const zz_p *bp, long sb)
 
    for (i = 0; i < sb; i++) {
       long t1 = rep(bp[i]);
-      double bpinv = ((double) t1)*pinv;
+      mulmod_precon_t bpinv = PrepMulModPrecon(t1, p, pinv); // ((double) t1)*pinv;
       zz_p *xp1 = xp+i;
       for (j = 0; j < sa; j++) {
          long t2;
-         t2 = MulMod2(rep(ap[j]), t1, p, bpinv);
+         t2 = MulModPrecon(rep(ap[j]), t1, p, bpinv);
          xp1[j].LoopHole() = AddMod(t2, rep(xp1[j]), p);
       }
    }
@@ -741,10 +741,10 @@ void PlainSqr(zz_p *xp, const zz_p *ap, long sa)
       const zz_p *ap1 = ap+(j+1);
       zz_p *xp1 = xp+i;
       t1 = rep(ap[j]);
-      double tpinv = ((double) t1)*pinv;
+      mulmod_precon_t tpinv = PrepMulModPrecon(t1, p, pinv); // ((double) t1)*pinv;
 
       for (k = 0; k < cnt; k++) {
-         t2 = MulMod2(rep(ap1[k]), t1, p, tpinv);
+         t2 = MulModPrecon(rep(ap1[k]), t1, p, tpinv);
          t2 = AddMod(t2, rep(xp1[k]), p);
          xp1[k].LoopHole() = t2;
       }
@@ -948,10 +948,10 @@ void PlainDivRem(zz_pX& q, zz_pX& r, const zz_pX& a, const zz_pX& b)
       negate(t, t);
 
       long T = rep(t);
-      double Tpinv = ((double) T)*pinv;
+      mulmod_precon_t Tpinv = PrepMulModPrecon(T, p, pinv); // ((double) T)*pinv;
 
       for (j = db-1; j >= 0; j--) {
-         long S = MulMod2(rep(bp[j]), T, p, Tpinv);
+         long S = MulModPrecon(rep(bp[j]), T, p, Tpinv);
          S = AddMod(S, rep(xp[i+j]), p);
          xp[i+j].LoopHole() = S;
       }
@@ -1026,12 +1026,12 @@ void PlainDiv(zz_pX& q, const zz_pX& a, const zz_pX& b)
       negate(t, t);
 
       long T = rep(t);
-      double Tpinv = ((double) T)*pinv;
+      mulmod_precon_t Tpinv = PrepMulModPrecon(T, p, pinv); // ((double) T)*pinv;
 
       long lastj = max(0, db-i);
 
       for (j = db-1; j >= lastj; j--) {
-         long S = MulMod2(rep(bp[j]), T, p, Tpinv);
+         long S = MulModPrecon(rep(bp[j]), T, p, Tpinv);
          S = AddMod(S, rep(xp[i+j-db]), p);
          xp[i+j-db].LoopHole() = S;
       }
@@ -1089,10 +1089,10 @@ void PlainRem(zz_pX& r, const zz_pX& a, const zz_pX& b)
       negate(t, t);
 
       long T = rep(t);
-      double Tpinv = ((double) T)*pinv;
+      mulmod_precon_t Tpinv = PrepMulModPrecon(T, p, pinv); // ((double) T)*pinv;
 
       for (j = db-1; j >= 0; j--) {
-         long S = MulMod2(rep(bp[j]), T, p, Tpinv);
+         long S = MulModPrecon(rep(bp[j]), T, p, Tpinv);
          S = AddMod(S, rep(xp[i+j]), p);
          xp[i+j].LoopHole() = S;
       }
@@ -1128,7 +1128,7 @@ void mul(zz_pX& x, const zz_pX& a, zz_p b)
    t = rep(b);
    long p = zz_p::modulus();
    double pinv = zz_p::ModulusInverse();
-   double bpinv = t*pinv;
+   mulmod_precon_t bpinv = PrepMulModPrecon(t, p, pinv); // t*pinv;
 
    da = deg(a);
    x.rep.SetLength(da+1);
@@ -1136,7 +1136,7 @@ void mul(zz_pX& x, const zz_pX& a, zz_p b)
    xp = x.rep.elts();
 
    for (i = 0; i <= da; i++) 
-      xp[i].LoopHole() = MulMod2(rep(ap[i]), t, p, bpinv);
+      xp[i].LoopHole() = MulModPrecon(rep(ap[i]), t, p, bpinv);
 
    x.normalize();
 }

@@ -211,23 +211,6 @@ static double LastTime = 0;
 
 
 
-static void LLLStatus(long max_k, double t, long m, const mat_ZZ& B)
-{
-   ZZ t1;
-   long i;
-   double prodlen = 0;
-
-   for (i = 1; i <= m; i++) {
-      InnerProduct(t1, B(i), B(i));
-      if (!IsZero(t1))
-         prodlen += log(t1);
-   }
-
-   LastTime = t;
-   
-}
-
-
 static
 long ll_LLL_XD(mat_ZZ& B, mat_ZZ* U, xdouble delta, long deep, 
            LLLCheckFct check, xdouble **B1, xdouble **mu, 
@@ -297,14 +280,6 @@ long ll_LLL_XD(mat_ZZ& B, mat_ZZ* U, xdouble delta, long deep,
          max_k = k;
       }
 
-      if (verbose) {
-         tt = GetTime();
-
-         if (tt > LastTime + LLLStatusInterval)
-            LLLStatus(max_k, tt, m, B);
-      }
-
-
       if (st[k] == k)
          rst = 1;
       else
@@ -324,7 +299,6 @@ long ll_LLL_XD(mat_ZZ& B, mat_ZZ* U, xdouble delta, long deep,
 
          counter++;
          if (counter > 10000) {
-            //cerr << "LLL_XD: warning--possible infinite loop\n";
             counter = 0;
          }
 
@@ -467,11 +441,6 @@ long ll_LLL_XD(mat_ZZ& B, mat_ZZ* U, xdouble delta, long deep,
       }
    }
 
-   if (verbose) {
-      LLLStatus(m+1, GetTime(), m, B);
-   }
-
-
    delete [] buf;
 
    return m;
@@ -586,10 +555,6 @@ long LLL_XD(mat_ZZ& B, double delta, long deep,
 {
    verbose = verb;
    NumSwaps = 0;
-   if (verbose) {
-      StartTime = GetTime();
-      LastTime = StartTime;
-   }
 
    if (delta < 0.50 || delta >= 1) Error("LLL_XD: bad delta");
    if (deep < 0) Error("LLL_XD: bad deep");
@@ -601,11 +566,6 @@ long LLL_XD(mat_ZZ& B, mat_ZZ& U, double delta, long deep,
 {
    verbose = verb;
    NumSwaps = 0;
-   if (verbose) {
-      StartTime = GetTime();
-      LastTime = StartTime;
-   }
-
 
    if (delta < 0.50 || delta >= 1) Error("LLL_XD: bad delta");
    if (deep < 0) Error("LLL_XD: bad deep");
@@ -685,28 +645,6 @@ void ComputeBKZThresh(xdouble *c, long beta)
       x += log(c[i-1]);
       BKZThresh(i) = xexp(x/double(i))*BKZConstant(i);
    }
-}
-
-
-static 
-void BKZStatus(double tt, double enum_time, unsigned long NumIterations, 
-               unsigned long NumTrivial, unsigned long NumNonTrivial, 
-               unsigned long NumNoOps, long m, 
-               const mat_ZZ& B)
-{
-
-   ZZ t1;
-   long i;
-   double prodlen = 0;
-
-   for (i = 1; i <= m; i++) {
-      InnerProduct(t1, B(i), B(i));
-      if (!IsZero(t1))
-         prodlen += log(t1);
-   }
-
-   LastTime = tt;
-   
 }
 
 
@@ -874,13 +812,6 @@ long BKZ_XD(mat_ZZ& BB, mat_ZZ* UU, xdouble delta,
             clean = 1;
          }
 
-         if (verb) {
-            tt = GetTime();
-            if (tt > LastTime + LLLStatusInterval)
-               BKZStatus(tt, enum_time, NumIterations, NumTrivial,
-                         NumNonTrivial, NumNoOps, m, B);
-         }
-
          // ENUM
 
          double tt1;
@@ -912,20 +843,6 @@ long BKZ_XD(mat_ZZ& BB, mat_ZZ* UU, xdouble delta,
          long enum_cnt = 0;
    
          while (t <= kk) {
-            if (verb) {
-               enum_cnt++;
-               if (enum_cnt > 100000) {
-                  enum_cnt = 0;
-                  tt = GetTime();
-                  if (tt > LastTime + LLLStatusInterval) {
-                     enum_time += tt - tt1;
-                     tt1 = tt;
-                     BKZStatus(tt, enum_time, NumIterations, NumTrivial,
-                               NumNonTrivial, NumNoOps, m, B);
-                  }
-               }
-            }
-
 
             ctilda[t] = ctilda[t+1] + 
                (yvec[t]+utildavec[t])*(yvec[t]+utildavec[t])*c[t];
@@ -1115,12 +1032,6 @@ long BKZ_XD(mat_ZZ& BB, mat_ZZ* UU, xdouble delta,
       }
    }
 
-   if (verb) {
-      BKZStatus(GetTime(), enum_time, NumIterations, NumTrivial, NumNonTrivial,
-                NumNoOps, m, B);
-   }
-
-
    // clean up
 
    if (m_orig > m) {
@@ -1176,10 +1087,6 @@ long BKZ_XD(mat_ZZ& BB, mat_ZZ& UU, double delta,
 {
    verbose = verb;
    NumSwaps = 0;
-   if (verbose) {
-      StartTime = GetTime();
-      LastTime = StartTime;
-   }
 
 
    if (delta < 0.50 || delta >= 1) Error("BKZ_XD: bad delta");
@@ -1193,11 +1100,6 @@ long BKZ_XD(mat_ZZ& BB, double delta,
 {
    verbose = verb;
    NumSwaps = 0;
-   if (verbose) {
-      StartTime = GetTime();
-      LastTime = StartTime;
-   }
-
 
 
    if (delta < 0.50 || delta >= 1) Error("BKZ_XD: bad delta");
