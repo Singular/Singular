@@ -193,7 +193,6 @@ AC_CHECK_LIB(bsd, socket)
 AC_CHECK_LIB(socket, listen)
 AC_CHECK_LIB(nsl, gethostbyname)
 AC_CHECK_LIB(gmp, main)
-AC_CHECK_LIB(smallgmp, mpz_init)
 AC_CHECK_LIB(MP, IMP_PutGmpInt)
 AC_CHECK_LIB(MPT, MPT_GetTree)
 AC_CHECK_LIB(singcf, atof)
@@ -201,17 +200,11 @@ AC_CHECK_LIB(singfac, atof)
 AC_CHECK_LIB(omalloc, omTestAddr)
 AC_CHECK_LIB(omalloc_ndebug, main)
 
-AC_CHECK_HEADERS(gmp.h smallgmp.h MP.h  MPT.h factory.h factor.h omalloc.h)
+AC_CHECK_HEADERS(gmp.h MP.h  MPT.h factory.h factor.h omalloc.h)
 
 if test "$ac_cv_lib_gmp_main" = yes && \
  test "$ac_cv_header_gmp_h" = yes; then
   ac_gmp_ok=yes
-fi
-
-if test "$ac_cv_lib_smallgmp_mpz_init" = yes && \
- test "$ac_cv_header_smallgmp_h" = yes && \
- test "$ac_cv_header_gmp_h" = yes; then
-  ac_smallgmp_ok=yes
 fi
 
 if test "$ac_cv_lib_MP_IMP_PutGmpInt" = yes && \
@@ -247,13 +240,11 @@ AC_SUBST(DOC2TEX_EXAMPLE_EXCLUSIONS)
 
 AC_ARG_WITH(tmpdir, \
  [ --with-tmpdir=DIR       use DIR as temporary directory])
-AC_ARG_ENABLE(smallgmp, \
+AC_ARG_ENABLE(omalloc, \
  [ --enable-PACKAGE        configure and/or build PACKAGE
   --disable-PACKAGE       do not configure and/or build PACKAGE
    where PACKAGE can be:
-     smallgmp             minimal version of gmp written in C only])
-AC_ARG_ENABLE(omalloc,\
- [    omalloc              omalloc memory managment])
+     omalloc               omalloc memory managment])
 AC_ARG_ENABLE(gmp, \
  [    gmp                  Gnu Multiple Precision package])
 AC_ARG_ENABLE(MP, \
@@ -289,7 +280,7 @@ AC_ARG_WITH(libfac, \
  [    libfac               char set and modp poly factorization library])
 AC_ARG_WITH(gmp, \
  [ --with-apint=PACKAGE    use PACKAGE for arbitary integer arithmetic
-                          where PACKAGE can be gmp or smallgmp
+                          where PACKAGE can be gmp
 All additional --enable and --with options are passed to subsequent calls 
 to configure of the packages to be built. See also configure --help in 
 these packages (resp. subdirs). ])
@@ -333,6 +324,7 @@ else
       ac_configure_args="$ac_configure_args --enable-omalloc --with-external-config_h='$pwd/Singular/omSingularConfig.h' --with-track-custom"
     fi
     CONFIG_SUBDIRS="$CONFIG_SUBDIRS omalloc"
+    BUILD1_SUBDIRS="$BUILD1_SUBDIRS omalloc"
     if test "${with_malloc+set}" != set; then
 case "$ac_cv_singuname" in 
 # under windows, it is best to use the provided malloc
@@ -357,6 +349,7 @@ if test "$enable_gmp" != yes && test "$enable_gmp" != no; then
     AC_MSG_RESULT(yes)
     enable_gmp=yes
     CONFIG_SUBDIRS="$CONFIG_SUBDIRS gmp"
+    BUILD1_SUBDIRS="$BUILD1_SUBDIRS gmp"
     ac_configure_args="$ac_configure_args --enable-gmp"
     enable_gmp=yes
 #    This we used to need for our patched version of gmp 2.x
@@ -372,6 +365,7 @@ elif test "$enable_gmp" = yes; then
   else
     AC_MSG_RESULT(yes)
     CONFIG_SUBDIRS="$CONFIG_SUBDIRS gmp"
+    BUILD1_SUBDIRS="$BUILD1_SUBDIRS gmp"
 #    This we used to need for our patched version of gmp 2.x
 #    OUTPUT_MAKEFILES="$OUTPUT_MAKEFILES gmp/Makefile.in"
   fi
@@ -396,43 +390,13 @@ if test "$enable_shared" != no; then
 fi
 fi
 
-AC_MSG_CHECKING(whether to configure and build smallgmp lib)
-if test "$enable_smallgmp" != yes && test "$enable_smallgmp" != no; then
-  if test "$ac_smallgmp_ok" != yes && test "$ac_gmp_ok" != yes && \
-     test "$enable_gmp" != yes && test -d smallgmp; then
-    AC_MSG_RESULT(yes)
-    enable_smallgmp=yes
-    CONFIG_SUBDIRS="$CONFIG_SUBDIRS smallgmp"
-    ac_configure_args="$ac_configure_args --enable-smallgmp --enable-gmp"
-    enable_gmp=yes
-  else
-    AC_MSG_RESULT(no)
-    enable_smallgmp=no
-  fi
-elif test "$enable_smallgmp" = yes; then
-  if test ! -d smallgmp; then
-    AC_MSG_RESULT(no)
-    AC_MSG_ERROR(Can not find smallgmp subdir)
-  else
-    AC_MSG_RESULT(yes)
-    CONFIG_SUBDIRS="$CONFIG_SUBDIRS smallgmp"
-    if test "$ac_gmp_ok" != yes && test "$enable_gmp" != yes; then
-      ac_configure_args="$ac_configure_args --enable-gmp"
-      enable_gmp=yes
-    fi
-  fi
-else 
-  AC_MSG_RESULT(${enable_smallgmp})
-fi
-
-# Check whether we have at least one of smallgmp or gmp
-if test "$ac_smallgmp_ok" != yes && test "$ac_gmp_ok" != yes && \
-   test "$enable_smallgmp" != yes && test "$enable_gmp" != yes; then
-  AC_MSG_ERROR(can neither find nor built gmp or smallgmp)
+# Check whether we have gmp
+if test "$ac_gmp_ok" != yes && test "$enable_gmp" != yes; then
+  AC_MSG_ERROR(can neither find nor built gmp)
 fi
 
 # Check whether we need to cheat subsequent configures with --enable-gmp
-if test "$ac_smallgmp_ok" != yes && test "$ac_gmp_ok" != yes && test "$enable_gmp" != yes; then
+if test "$ac_gmp_ok" != yes && test "$enable_gmp" != yes; then
   ac_configure_args="$ac_configure_args --enable-gmp"
 fi
 
@@ -443,6 +407,7 @@ if test "$enable_MP" != yes && test "$enable_MP" != no; then
     AC_MSG_RESULT(yes)
     enable_MP=yes
     CONFIG_SUBDIRS="$CONFIG_SUBDIRS MP"
+    BUILD1_SUBDIRS="$BUILD1_SUBDIRS MP"
     ac_configure_args="$ac_configure_args --enable-MP"
   else
     AC_MSG_RESULT(no)
@@ -456,6 +421,7 @@ elif test "$enable_MP" = yes; then
   if test "$enable_gmp" = yes || test "$ac_gmp_ok" = yes; then
     AC_MSG_RESULT(yes)
     CONFIG_SUBDIRS="$CONFIG_SUBDIRS MP"
+    BUILD1_SUBDIRS="$BUILD1_SUBDIRS MP"
   else
     AC_MSG_RESULT(no)
     AC_MSG_ERROR(can not build MP without gmp)
@@ -476,6 +442,7 @@ if test "$enable_NTL" != yes && test "$enable_NTL" != no; then
     enable_NTL=yes
     AC_MSG_RESULT(yes)
     CONFIG_SUBDIRS="$CONFIG_SUBDIRS ntl"
+    BUILD1_SUBDIRS="$BUILD1_SUBDIRS ntl"
     ac_configure_args="$ac_configure_args --enable-NTL"
   else
     enable_NTL=no
@@ -485,6 +452,7 @@ elif test "$enable_NTL" = yes; then
   if test -d ntl; then
     AC_MSG_RESULT(yes)
     CONFIG_SUBDIRS="$CONFIG_SUBDIRS ntl"
+    BUILD1_SUBDIRS="$BUILD1_SUBDIRS ntl"
   else
     AC_MSG_RESULT(no)
     AC_MSG_ERROR(can not build NTL without ntl directory)
@@ -500,6 +468,7 @@ if test "$enable_factory" != yes && test "$enable_factory" != no; then
     enable_factory=yes
     AC_MSG_RESULT(yes)
     CONFIG_SUBDIRS="$CONFIG_SUBDIRS factory"
+    BUILD1_SUBDIRS="$BUILD1_SUBDIRS factory"
     ac_configure_args="$ac_configure_args --enable-factory"
   else
     enable_factory=no
@@ -509,6 +478,7 @@ elif test "$enable_factory" = yes; then
   if test -d factory; then
     AC_MSG_RESULT(yes)
     CONFIG_SUBDIRS="$CONFIG_SUBDIRS factory"
+    BUILD1_SUBDIRS="$BUILD1_SUBDIRS factory"
   else
     AC_MSG_RESULT(no)
     AC_MSG_ERROR(can not build factory without factory directory)
@@ -525,6 +495,7 @@ if test "$enable_libfac" != yes && test "$enable_libfac" != no; then
     enable_libfac=yes
     AC_MSG_RESULT(yes)
     CONFIG_SUBDIRS="$CONFIG_SUBDIRS libfac"
+    BUILD1_SUBDIRS="$BUILD1_SUBDIRS libfac"
     ac_configure_args="$ac_configure_args --enable-libfac"
   else
     enable_libfac=no
@@ -538,6 +509,7 @@ elif  test "$enable_libfac" = yes; then
   if test "$ac_factory_ok" = yes || test "$enable_factory" = yes; then
     AC_MSG_RESULT(yes)
     CONFIG_SUBDIRS="$CONFIG_SUBDIRS libfac"
+    BUILD1_SUBDIRS="$BUILD1_SUBDIRS libfac"
   else
     AC_MSG_RESULT(no)
     AC_MSG_ERROR(Can not build libfac without factory)
@@ -570,6 +542,7 @@ if test "$enable_sgroup" = yes; then
   if test "$ac_MP_ok" = yes || test "$enable_MP" = yes; then
     AC_MSG_RESULT(yes)
     CONFIG_SUBDIRS="$CONFIG_SUBDIRS sgroup"
+    BUILD1_SUBDIRS="$BUILD1_SUBDIRS sgroup"
   else
     AC_MSG_RESULT(no)
     AC_MSG_ERROR(Can not build sgroup without MP)
@@ -587,6 +560,7 @@ if test "$enable_Singular" != yes && test "$enable_Singular" != no; then
     AC_MSG_RESULT(yes)
     CONFIG_SUBDIRS="$CONFIG_SUBDIRS Singular"
     BUILD_SUBDIRS="$BUILD_SUBDIRS kernel Singular"	
+    BUILD1_SUBDIRS="$BUILD1_SUBDIRS kernel Singular"	
     ac_configure_args="$ac_configure_args --enable-Singular"
   else
     enable_Singular=no
@@ -597,6 +571,7 @@ elif test "$enable_Singular" = yes; then
     AC_MSG_RESULT(yes)
     CONFIG_SUBDIRS="$CONFIG_SUBDIRS Singular"
     BUILD_SUBDIRS="$BUILD_SUBDIRS kernel Singular"	
+    BUILD1_SUBDIRS="$BUILD1_SUBDIRS kernel Singular"	
   else
     AC_MSG_RESULT(no)
     AC_MSG_ERROR(can not build Singular without Singular directory)
@@ -716,21 +691,11 @@ if test "$with_apint" = gmp; then
     AC_MSG_RESULT(none)
     AC_MSG_ERROR(can not use with gmp without finding or building it)
   fi
-elif test "$with_apint" = smallgmp; then
-  if test "$ac_smallgmp_ok" = yes || test "$enable_smallgmp" = yes; then
-    AC_MSG_RESULT(smallgmp)
-  else
-    AC_MSG_RESULT(none)
-    AC_MSG_ERROR(can not use with smallgmp without finding or building it)
-  fi
 elif test "$ac_gmp_ok" = yes || test "$enable_gmp"; then
     AC_MSG_RESULT(gmp)
     ac_configure_args="$ac_configure_args --with-apint=gmp"
-else 
-dnl now we are sure that we have the smallgmp --otherwise enable
-dnl checks had thrown an error
-   AC_MSG_RESULT(smallgmp)
-   ac_configure_args="$ac_configure_args --with-apint=smallgmp"
+else
+  AC_MSG_ERROR(gmp required)
 fi
 
 AC_MSG_CHECKING(whether to use with MP)
@@ -814,9 +779,6 @@ SUBDIRS=""
 if test -d omalloc; then
   SUBDIRS="$SUBDIRS omalloc"
 fi
-if test -d smallgmp; then
-  SUBDIRS="$SUBDIRS smallgmp"
-fi
 if test -d gmp; then
   SUBDIRS="$SUBDIRS gmp"
 fi
@@ -868,6 +830,7 @@ dnl
 AC_PROG_MAKE_SET
 AC_SUBST(SUBDIRS)
 AC_SUBST(BUILD_SUBDIRS)
+AC_SUBST(BUILD1_SUBDIRS)
 AC_SUBST(CONFIG_SUBDIRS)
 AC_CONFIG_SUBDIRS($CONFIG_SUBDIRS) 
 

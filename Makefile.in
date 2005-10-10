@@ -14,6 +14,7 @@ SHELL		= /bin/sh
 SINGULAR	= @SINGULAR@
 
 BUILD_SUBDIRS	= @BUILD_SUBDIRS@
+BUILD_SUBDIRS1	= @BUILD1_SUBDIRS@
 SUBDIRS		= @SUBDIRS@
 
 PERL		= @PERL@
@@ -33,7 +34,26 @@ ${SINGULAR}:
 
 TEXINFO_TEX_FILES = epsf.tex texinfo.tex txi-cs.tex txi-de.tex txi-no.tex
 TEXINFO_TEX_DIR = Texinfo/doc
-all install uninstall:
+all install:
+	@ for SUBDIR in ${BUILD1_SUBDIRS}; \
+	do \
+	  echo ${MAKE} $@ in $${SUBDIR}; \
+	  ( cd $${SUBDIR} && ${MAKE} $@;); \
+	  (if test "$${SUBDIR}" = Texinfo && test -d doc; then \
+		for FILE in ${TEXINFO_TEX_FILES}; \
+		do \
+		  if test "$@" = uninstall; then\
+		    echo rm -f doc/$${FILE};\
+	            rm -f doc/$${FILE}; \
+	          else \
+		    echo cp ${TEXINFO_TEX_DIR}/$${FILE} doc; \
+		    cp ${TEXINFO_TEX_DIR}/$${FILE} doc; \
+	          fi; \
+	        done;\
+	   fi;); \
+	done
+
+maintainer-install uninstall:
 	@ for SUBDIR in ${BUILD_SUBDIRS}; \
 	do \
 	  echo ${MAKE} $@ in $${SUBDIR}; \
