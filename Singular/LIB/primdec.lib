@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: primdec.lib,v 1.105 2005-05-06 16:01:50 Singular Exp $";
+version="$Id: primdec.lib,v 1.106 2005-10-10 17:39:54 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -43,6 +43,7 @@ LIB "random.lib";
 LIB "inout.lib";
 LIB "matrix.lib";
 LIB "triang.lib";
+LIB "absfact.lib";
 ///////////////////////////////////////////////////////////////////////////////
 //
 //                      Gianni/Trager/Zacharias
@@ -1132,9 +1133,7 @@ EXAMPLE: example zero_decomp; shows an example
 //=============================================================
 
        ser1=phi1(ser);
-
        @lh=zero_decomp (@qh,phi(ser1),@wr);
-
 
        kill lres0;
        list lres0;
@@ -2523,6 +2522,7 @@ static proc decomp(ideal i,list #)
 "USAGE:  decomp(i); i ideal  (for primary decomposition)   (resp.
          decomp(i,1);        (for the associated primes of dimension of i) )
          decomp(i,2);        (for the minimal associated primes) )
+         decomp(i,3);        (for the absolute primary decomposition) )
 RETURN:  list = list of primary ideals and their associated primes
          (at even positions in the list)
          (resp. a list of the minimal associated primes)
@@ -2534,16 +2534,18 @@ EXAMPLE: example decomp; shows an example
   def  @P = basering;
   list primary,indep,ltras;
   intvec @vh,isat,@w;
-  int @wr,@k,@n,@m,@n1,@n2,@n3,homo,seri,keepdi;
+  int @wr,@k,@n,@m,@n1,@n2,@n3,homo,seri,keepdi,abspri,ab,nn;
   ideal peek=i;
   ideal ser,tras;
   int isS=(attrib(i,"isSB")==1);
 
+
   if(size(#)>0)
   {
-     if((#[1]==1)||(#[1]==2))
+     if((#[1]==1)||(#[1]==2)||(#[1]==3))
      {
         @wr=#[1];
+        if(@wr==3){abspri=1;@wr=0;}
         if(size(#)>1)
         {
           seri=1;
@@ -2558,7 +2560,10 @@ EXAMPLE: example decomp; shows an example
         ser=#[2];
       }
   }
-
+  if(abspri)
+  {
+     list absprimary,abskeep,absprimarytmp,abskeeptmp;
+  }
   homo=homog(i);
   if(homo==1)
   {
@@ -2651,7 +2656,7 @@ EXAMPLE: example decomp; shows an example
   {
     ideal peek=@j;
   }
-  if(size(ser)==0)
+  if((size(ser)==0)&&(!abspri))
   {
     ideal fried;
     @n=size(@j);
@@ -2750,6 +2755,19 @@ EXAMPLE: example decomp; shows an example
      setring @P;
      primary=fetch(gnir,gprimary);
 
+//HIER
+    if(abspri)
+    {
+       list resu,tempo;
+       string absotto;
+       for(ab=1;ab<=size(primary)/2;ab++)
+       {
+          absotto= absFactorize(primary[2*ab][1],77);
+          tempo=primary[2*ab-1],primary[2*ab],absotto,string(var(nvars(basering)));
+          resu[ab]=tempo;
+       }
+       primary=resu;
+     }
      return(primary);
   }
 
@@ -2760,14 +2778,27 @@ EXAMPLE: example decomp; shows an example
   {
     op=option(get);
     option(redSB);
-
     list gprimary= zero_decomp(@j,ser,@wr);
-    option(set,op);
+
     setring @P;
     primary=fetch(gnir,gprimary);
+
     if(size(ser)>0)
     {
       primary=cleanPrimary(primary);
+    }
+//HIER
+    if(abspri)
+    {
+       list resu,tempo;
+       string absotto;
+       for(ab=1;ab<=size(primary)/2;ab++)
+       {
+          absotto= absFactorize(primary[2*ab][1],77);
+          tempo=primary[2*ab-1],primary[2*ab],absotto,string(var(nvars(basering)));
+          resu[ab]=tempo;
+       }
+       primary=resu;
     }
     return(primary);
   }
@@ -2936,6 +2967,32 @@ EXAMPLE: example decomp; shows an example
         option(redSB);
 
         list uprimary= zero_decomp(@j,ser,@wr);
+//HIER
+        if(abspri)
+        {
+           ideal II;
+           ideal jmap;
+           map sigma;
+           nn=nvars(basering);
+           map invsigma=basering,maxideal(1);
+           for(ab=1;ab<=size(uprimary)/2;ab++)
+           {
+              II=uprimary[2*ab];
+              attrib(II,"isSB",1);
+              if(deg(II[1])!=vdim(II))
+              {
+                 jmap=randomLast(50);
+                 sigma=basering,jmap;
+                 jmap[nn]=2*var(nn)-jmap[nn];
+                 invsigma=basering,jmap;
+                 II=groebner(sigma(II));
+               }
+               absprimarytmp[ab]= absFactorize(II[1],77);
+               II=var(nn);
+               abskeeptmp[ab]=string(invsigma(II));
+               invsigma=basering,maxideal(1);
+           }
+        }
         option(set,op);
      }
      else
@@ -2990,9 +3047,13 @@ EXAMPLE: example decomp; shows an example
            @n2++;
            lnew[@n2]=lsau[2*@n1];
            quprimary[@n2]=collectprimary[2*@n1];
+           if(abspri)
+           {
+              absprimary[@n2/2]=absprimarytmp[@n1];
+              abskeep[@n2/2]=abskeeptmp[@n1];
+           }
         }
      }
-
      //here the intersection with the polynomialring
      //mentioned above is really computed
      for(@n=@n3/2+1;@n<=@n2/2;@n++)
@@ -3201,6 +3262,32 @@ EXAMPLE: example decomp; shows an example
            op=option(get);
            option(redSB);
            list uprimary= zero_decomp(@j,ser,@wr);
+//HIER
+           if(abspri)
+           {
+              ideal II;
+              ideal jmap;
+              map sigma;
+              nn=nvars(basering);
+              map invsigma=basering,maxideal(1);
+              for(ab=1;ab<=size(uprimary)/2;ab++)
+              {
+                 II=uprimary[2*ab];
+                 attrib(II,"isSB",1);
+                 if(deg(II[1])!=vdim(II))
+                 {
+                    jmap=randomLast(50);
+                    sigma=basering,jmap;
+                    jmap[nn]=2*var(nn)-jmap[nn];
+                    invsigma=basering,jmap;
+                    II=groebner(sigma(II));
+                  }
+                  absprimarytmp[ab]= absFactorize(II[1],77);
+                  II=var(nn);
+                  abskeeptmp[ab]=string(invsigma(II));
+                  invsigma=basering,maxideal(1);
+              }
+           }
            option(set,op);
 
            //we need the intersection of the ideals in the list quprimary with
@@ -3228,7 +3315,6 @@ EXAMPLE: example decomp; shows an example
            //back to the polynomialring
            //------------------------------------------------------------------
            setring gnir;
-
            collectprimary=imap(quring,uprimary);
            lsau=imap(quring,saturn);
            @h=imap(quring,@h);
@@ -3249,6 +3335,11 @@ EXAMPLE: example decomp; shows an example
                  @n2++;
                  lnew[@n2]=lsau[2*@n1];
                  quprimary[@n2]=collectprimary[2*@n1];
+                 if(abspri)
+                 {
+                   absprimary[@n2/2]=absprimarytmp[@n1];
+                   abskeep[@n2/2]=abskeeptmp[@n1];
+                 }
               }
            }
 
@@ -3294,6 +3385,19 @@ EXAMPLE: example decomp; shows an example
 
          // }
         }
+//HIER
+        if(abspri)
+        {
+          list resu,tempo;
+          for(ab=1;ab<=size(quprimary)/2;ab++)
+          {
+             tempo=quprimary[2*ab-1],quprimary[2*ab],
+                       absprimary[ab],abskeep[ab];
+             resu[ab]=tempo;
+          }
+          quprimary=resu;
+          @wr=3;
+        }
         if(size(reduce(ser,peek,1))!=0)
         {
            if(@wr>0)
@@ -3314,6 +3418,20 @@ EXAMPLE: example decomp; shows an example
         }
      }
 
+   }
+   else
+   {
+      if(abspri)
+      {
+        list resu,tempo;
+        for(ab=1;ab<=size(quprimary)/2;ab++)
+        {
+           tempo=quprimary[2*ab-1],quprimary[2*ab],
+                   absprimary[ab],abskeep[ab];
+           resu[ab]=tempo;
+        }
+        quprimary=resu;
+      }
    }
   //---------------------------------------------------------------------------
   //back to the ring we started with
@@ -5039,6 +5157,114 @@ example
    ideal i = p*q^2,y-z2;
    list pr = primdecGTZ(i);
    pr;
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc absPrimdecGTZ(ideal I)
+"USAGE:   absPrimdecGTZ(I); I ideal
+ASSUME:  Ground field has characteristic 0.
+RETURN:  a ring containing two lists: @code{absolute_primes} (the absolute
+         prime components of I) and @code{primary_decomp} (the output of
+         @code{primdecGTZ(I)}).
+         The list absolute_primes has to be interpreted as follows:
+         each entry describes a class of conjugated absolute primes,
+@format
+   absolute_primes[i][1]   the abolute prime component,
+   absolute_primes[i][2]   the number of conjugates.
+@end format
+         The first entry of @code{absolute_primes[i][1]} is the minimal
+         polynomial of a minimal finite field extension over which the
+         absolute prime component is defined.
+NOTE:    Algorithm of Gianni/Trager/Zacharias combined with the
+         @code{absFactorize} command.
+SEE ALSO: primdecGTZ; absFactorize
+EXAMPLE: example absPrimdecGTZ; shows an example
+"
+{
+    if (char(basering) != 0) {
+    ERROR("primdec.lib::absPrimdecGTZ is only implemented for "+
+           +"characteristic 0");
+  }
+
+   if(ord_test(basering)!=1)
+   {
+      ERROR(
+      "// Not implemented for this ordering, please change to global ordering."
+      );
+   }
+   if(minpoly!=0)
+   {
+      //return(algeDeco(i,0));
+      ERROR(
+      "// Not implemented yet for algebraic extensions.Simulate the ring extension by adding the minpoly to the ideal"
+      );
+   }
+  def R=basering;
+  int n=nvars(R);
+  list L=decomp(I,3);
+  string newvar=L[1][3];
+  int k=find(newvar,",",find(newvar,",")+1);
+  newvar=newvar[k+1..size(newvar)];
+  list lR=ringlist(R);
+  int i,d;
+  intvec vv;
+  for(i=1;i<=n;i++){vv[i]=1;}
+
+  list orst;
+  orst[1]=list("dp",vv);
+  orst[2]=list("dp",intvec(1));
+  orst[3]=list("C",0);
+  lR[3]=orst;
+  lR[2][n+1] = newvar;
+  def Rz = ring(lR);
+  setring Rz;
+  list L=imap(R,L);
+  list absolute_primes,primary_decomp;
+  ideal I,M,N,K;
+  M=maxideal(1);
+  N=maxideal(1);
+  poly p,q,f,g;
+  map phi,psi;
+  for(i=1;i<=size(L);i++)
+  {
+    I=L[i][2];
+    execute("K="+L[i][3]+";");
+    p=K[1];
+    q=K[2];
+    execute("f="+L[i][4]+";");
+    g=2*var(n)-f;
+    M[n]=f;
+    N[n]=g;
+    d=deg(p);
+    phi=Rz,M;
+    psi=Rz,N;
+    I=phi(I),p,q;
+    I=std(I);
+    absolute_primes[i]=list(psi(I),d);
+    primary_decomp[i]=list(L[i][1],L[i][2]);
+  }
+  export(primary_decomp);
+  export(absolute_primes);
+  setring R;
+  dbprint( printlevel-voice+3,"
+// 'absPrimdecGTZ' created a ring, in which two lists absolute_primes (the
+// absolute prime components) and primary_decomp (the primary and prime
+// components over the current basering) are stored.
+// To access the list of absolute prime components, type (if the name S was
+// assigned to the return value):
+        setring S; absolute_primes; ");
+
+  return(Rz);
+}
+example
+{ "EXAMPLE:";  echo = 2;
+   ring  r = 0,(x,y,z),lp;
+   poly  p = z2+1;
+   poly  q = z3+2;
+   ideal i = p*q^2,y-z2;
+   def S = absPrimdecGTZ(i);
+   setring S;
+   absolute_primes;
 }
 ///////////////////////////////////////////////////////////////////////////////
 
