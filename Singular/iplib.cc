@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.117 2005-09-24 15:02:07 Singular Exp $ */
+/* $Id: iplib.cc,v 1.118 2005-10-11 11:31:08 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -196,7 +196,10 @@ char* iiGetLibProcBuffer(procinfo *pi, int part )
     long head = pi->data.s.def_end - pi->data.s.proc_start;
     procbuflen = pi->data.s.help_end - pi->data.s.help_start;
     if (procbuflen<5)
+    {
+      fclose(fp);
       return NULL; // help part does not exist
+    }
     //Print("Help=%ld-%ld=%d\n", pi->data.s.body_start,
     //    pi->data.s.proc_start, procbuflen);
     s = (char *)omAlloc(procbuflen+head+3);
@@ -204,6 +207,7 @@ char* iiGetLibProcBuffer(procinfo *pi, int part )
     s[head] = '\n';
     fseek(fp, pi->data.s.help_start, SEEK_SET);
     myfread(s+head+1, procbuflen, 1, fp);
+    fclose(fp);
     s[procbuflen+head+1] = '\n';
     s[procbuflen+head+2] = '\0';
     offset=0;
@@ -243,10 +247,10 @@ char* iiGetLibProcBuffer(procinfo *pi, int part )
     fseek(fp, pi->data.s.body_start, SEEK_SET);
     strcpy(pi->data.s.body,argstr);
     myfread( pi->data.s.body+strlen(argstr), procbuflen, 1, fp);
+    fclose( fp );
     procbuflen+=strlen(argstr);
     omFree(argstr);
     omFree(ss);
-    fclose( fp );
     pi->data.s.body[procbuflen] = '\0';
     strcat( pi->data.s.body+procbuflen, "\n;return();\n\n" );
     strcat( pi->data.s.body+procbuflen+13,pi->libname);
