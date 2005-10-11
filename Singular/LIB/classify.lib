@@ -1,6 +1,6 @@
 // KK,GMG last modified: 17.12.00
 ///////////////////////////////////////////////////////////////////////////////
-version  = "$Id: classify.lib,v 1.50 2005-05-06 14:38:10 hannes Exp $";
+version  = "$Id: classify.lib,v 1.51 2005-10-11 14:08:18 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  classify.lib  Arnold Classifier of Singularities
@@ -43,8 +43,7 @@ proc classify_init
     {
       "(classify.lib): Need to create database...";
     }
-    LIB"makedbm.lib";
-    create_sing_dbm();
+    Makedbm::create_sing_dbm();
   }
   close(l);
   l="DBM:r NFlist";
