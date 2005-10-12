@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: algebra.lib,v 1.11 2005-05-06 14:38:03 hannes Exp $";
+version="$Id: algebra.lib,v 1.12 2005-10-12 09:39:56 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  algebra.lib   Compute with Algbras and Algebra Maps
@@ -39,7 +39,7 @@ RETURN:
          - k=1 : a list, say l, of size 2, l[1] integer, l[2] ring, satisfying
            l[1]=1 if p is in the subalgebra K[A[1],...,A[m]] and then the ring
            l[2] contains poly check = h(y(1),...,y(m)) if p=h(A[1],...,A[m])
-           l[1]=0 if p is in not the subalgebra K[A[1],...,A[m]] and then
+           l[1]=0 if p is not in the subalgebra K[A[1],...,A[m]] and then
            l[2] contains the poly check = h(x,y(1),...,y(m)) if p satisfies
            the nonlinear relation p = h(x,A[1],...,A[m]) where
            x = x(1),...,x(n) denote the variables of the basering
@@ -64,7 +64,15 @@ EXAMPLE: example algebra_containment; shows an example
     int m = ncols(A);
     int i;
     string mp=string(minpoly);
-  // ---------- create new ring with extra variables --------------------
+    //-----------------
+    // neu CL 10/05:
+    int is_qring;
+    if (size(ideal(br))>0) { 
+      is_qring=1; 
+      ideal IdQ = ideal(br); 
+    }
+    //-----------------
+    // ---------- create new ring with extra variables --------------------
     execute ("ring R=("+charstr(br)+"),(x(1..n),y(1..m)),(dp(n),dp(m));");
     execute ("minpoly=number("+mp+");");
     ideal vars=x(1..n);
@@ -74,6 +82,10 @@ EXAMPLE: example algebra_containment; shows an example
     for (i=1;i<=m;i=i+1)
     { A[i]=A[i]-y(i);
     }
+    //-----------------
+    // neu CL 10/05:
+    if (is_qring) { A = A,emb(IdQ); }
+    //-----------------
     A=std(A);
     check=reduce(check,A);
     /*alternatively we could use reduce(check,A,1) which is a little faster
@@ -243,6 +255,12 @@ EXAMPLE: example inSubring; shows an example
   int n = nvars(gnir);
   string mp=string(minpoly);
   list l;
+  // neu CL 10/05:
+  int is_qring;
+  if (size(ideal(gnir))>0) { 
+    is_qring=1; 
+    ideal IdQ = ideal(gnir); 
+  }
   // ---------- create new ring with extra variables --------------------
   //the intersection of ideal nett=(p-y(0),I[1]-y(1),...)
   //with the ring k[y(0),...,y(n)] is computed, the result is ker
@@ -256,6 +274,9 @@ EXAMPLE: example inSubring; shows an example
   { nett[i]=nett[i]-y(i);
   }
   nett=emb(p)-y(0),nett;
+  // neu CL 10/05:
+  if (is_qring) { nett = nett,emb(IdQ); }
+  //-----------------
   ideal ker=eliminate(nett,product(va));
   //---------- test wether y(0)-h(y(1),...,y(z)) is in ker --------------
   l[1]=0;
