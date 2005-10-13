@@ -14,7 +14,7 @@ SHELL		= /bin/sh
 SINGULAR	= @SINGULAR@
 
 BUILD_SUBDIRS	= @BUILD_SUBDIRS@
-BUILD_SUBDIRS1	= @BUILD1_SUBDIRS@
+BUILD1_SUBDIRS	= @BUILD1_SUBDIRS@
 SUBDIRS		= @SUBDIRS@
 
 PERL		= @PERL@
@@ -38,7 +38,7 @@ all install:
 	@ for SUBDIR in ${BUILD1_SUBDIRS}; \
 	do \
 	  echo ${MAKE} $@ in $${SUBDIR}; \
-	  ( cd $${SUBDIR} && ${MAKE} $@;); \
+	  cd $${SUBDIR} && ${MAKE} $@ && cd ..; \
 	  (if test "$${SUBDIR}" = Texinfo && test -d doc; then \
 		for FILE in ${TEXINFO_TEX_FILES}; \
 		do \
@@ -52,6 +52,10 @@ all install:
 	        done;\
 	   fi;); \
 	done
+	echo "***********************************************"
+	echo "* do not forget to install Singular-@SINGULAR_VERSION@-share.tar.gz"
+	echo "***********************************************"
+
 
 maintainer-install uninstall:
 	@ for SUBDIR in ${BUILD_SUBDIRS}; \

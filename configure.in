@@ -586,6 +586,7 @@ fi
 AC_MSG_CHECKING(whether to build IntegerProgramming)
 if test "$enable_IntegerProgramming" != no && test -d "IntegerProgramming"; then
    BUILD_SUBDIRS="$BUILD_SUBDIRS IntegerProgramming"
+   BUILD1_SUBDIRS="$BUILD1_SUBDIRS IntegerProgramming"
    AC_MSG_RESULT(yes)
    if test "$enable_IntegerProgramming" != yes; then
      ac_configure_args="$ac_configure_args --enable-IntegerProgramming"
