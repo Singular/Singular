@@ -52,9 +52,7 @@ all install:
 	        done;\
 	   fi;); \
 	done
-	echo "***********************************************"
 	echo "* do not forget to install Singular-@SINGULAR_VERSION@-share.tar.gz"
-	echo "***********************************************"
 
 
 maintainer-install uninstall:
