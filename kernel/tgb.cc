@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.39 2005-07-28 19:14:49 bricken Exp $ */
+/* $Id: tgb.cc,v 1.40 2005-10-14 19:40:05 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -1991,7 +1991,10 @@ slimgb_alg::slimgb_alg(ideal I, BOOLEAN F4){
   gcd_of_terms=(poly*) omalloc(n*sizeof(poly));
   
   short_Exps=(long*) omalloc(n*sizeof(long));
-  S=idInit(n,1);
+  if (F4_mode)
+    S=idInit(n,1);
+  else
+    S=idInit(1,1);
   strat=new skStrategy;
   strat->syzComp = 0;
   initBuchMoraCrit(strat);
