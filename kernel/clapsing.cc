@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.8 2005-04-14 12:30:11 Singular Exp $
+// $Id: clapsing.cc,v 1.9 2005-10-17 13:35:58 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -817,15 +817,8 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
         CanonicalForm G( convSingTrPClapP( f ) );
         T_F=G;
 #ifdef HAVE_LIBFAC_P
-        if (rField_is_Q_a())
-        {
-          CFList as(mipo);
-          L = newfactoras( G, as, 1);
-        }
-        else
-        {
-          L=Factorize(G, mipo);
-        }
+        //  over Q(a) / Fp(a)
+        L=Factorize(G, mipo);
 #else
         WarnS("complete factorization only for univariate polynomials");
         if (rField_is_Q_a()||(!F.isUnivariate()) /* Q(a) */
@@ -851,7 +844,6 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
       {
 #ifdef HAVE_LIBFAC_P
         L = Factorize( F );
-        //L = factorize( F );
 #else
         goto notImpl;
 #endif
