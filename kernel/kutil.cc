@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.9 2005-04-30 16:41:20 Singular Exp $ */
+/* $Id: kutil.cc,v 1.10 2005-10-17 13:41:45 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -838,7 +838,7 @@ void deleteInS (int i,kStrategy strat)
   if (strat->lenSw!=NULL)
   {
 #ifdef ENTER_USE_MEMMOVE
-    memmove(&(strat->lenSw[i]),&(strat->lenSw[i+1]),(strat->sl - i)*sizeof(int));
+    memmove(&(strat->lenSw[i]),&(strat->lenSw[i+1]),(strat->sl - i)*sizeof(wlen_type));
 #else
     for (j=i; j<strat->sl; j++) strat->lenSw[j] = strat->lenSw[j+1];
 #endif
@@ -2440,8 +2440,8 @@ int posInL110 (const LSet set, const int length,
   int op = set[length].GetpFDeg();
 
   if ((op > o)
-  || ((op == o) && (set[length].length >2*p->length))
-  || ((op == o) && (set[length].length <= 2*p->length)
+  || ((op == o) && (set[length].length >p->length))
+  || ((op == o) && (set[length].length <= p->length)
      && (pLmCmp(set[length].p,p->p) != -pOrdSgn)))
     return length+1;
   int i;
@@ -2453,8 +2453,8 @@ int posInL110 (const LSet set, const int length,
     {
       op = set[an].GetpFDeg();
       if ((op > o)
-      || ((op == o) && (set[an].length >2*p->length))
-      || ((op == o) && (set[an].length <=2*p->length)
+      || ((op == o) && (set[an].length >p->length))
+      || ((op == o) && (set[an].length <=p->length)
          && (pLmCmp(set[an].p,p->p) != -pOrdSgn)))
         return en;
       return an;
@@ -2462,8 +2462,8 @@ int posInL110 (const LSet set, const int length,
     i=(an+en) / 2;
     op = set[i].GetpFDeg();
     if ((op > o)
-    || ((op == o) && (set[i].length > 2*p->length))
-    || ((op == o) && (set[i].length <= 2*p->length)
+    || ((op == o) && (set[i].length > p->length))
+    || ((op == o) && (set[i].length <= p->length)
        && (pLmCmp(set[i].p,p->p) != -pOrdSgn)))
       an=i;
     else
@@ -3726,10 +3726,10 @@ void enterSBba (LObject p,int atS,kStrategy strat, int atR)
                                        (IDELEMS(strat->Shdl)+setmaxTinc)
                                                  *sizeof(int));
     if (strat->lenSw!=NULL)
-      strat->lenSw=(int*)omRealloc0Size(strat->lenSw,
-                                       IDELEMS(strat->Shdl)*sizeof(int),
+      strat->lenSw=(wlen_type*)omRealloc0Size(strat->lenSw,
+                                       IDELEMS(strat->Shdl)*sizeof(wlen_type),
                                        (IDELEMS(strat->Shdl)+setmaxTinc)
-                                                 *sizeof(int));
+                                                 *sizeof(wlen_type));
     if (strat->fromQ!=NULL)
     {
       strat->fromQ = (intset)omReallocSize(strat->fromQ,
@@ -3757,7 +3757,7 @@ void enterSBba (LObject p,int atS,kStrategy strat, int atR)
             (strat->sl - atS + 1)*sizeof(int));
     if (strat->lenSw!=NULL)
     memmove(&(strat->lenSw[atS+1]), &(strat->lenSw[atS]),
-            (strat->sl - atS + 1)*sizeof(int));
+            (strat->sl - atS + 1)*sizeof(wlen_type));
 #else
     for (i=strat->sl+1; i>=atS+1; i--)
     {
@@ -3942,6 +3942,11 @@ void initBuchMoraPos (kStrategy strat)
       strat->posInT = posInT0;
     }
     //if (strat->minim>0) strat->posInL =posInLSpecial;
+    if (strat->homog)
+    {
+       strat->posInL = posInL110;
+       strat->posInT = posInT110;
+    }
   }
   else
   {

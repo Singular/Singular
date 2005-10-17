@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.40 2005-10-14 19:40:05 bricken Exp $ */
+/* $Id: tgb.cc,v 1.41 2005-10-17 13:41:46 Singular Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -623,7 +623,7 @@ static int add_to_reductors(slimgb_alg* c, poly h, int len){
 
   c->strat->lenS[i]=len;
   assume(pLength(c->strat->S[i])==c->strat->lenS[i]);
-  if(c->strat->lenSw)
+  if(c->strat->lenSw!=NULL)
     c->strat->lenSw[i]=pq;
  
   return i;
@@ -666,8 +666,8 @@ static void move_forward_in_S(int old_pos, int new_pos,kStrategy strat)
   int s_2_r=strat->S_2_R[old_pos];
   int length=strat->lenS[old_pos];
   assume(length==pLength(strat->S[old_pos]));
-  int length_w;
-  if(strat->lenSw)
+  wlen_type length_w;
+  if(strat->lenSw!=NULL)
     length_w=strat->lenSw[old_pos];
   int i;
   for (i=old_pos; i>new_pos; i--)
@@ -689,7 +689,7 @@ static void move_forward_in_S(int old_pos, int new_pos,kStrategy strat)
   strat->sevS[new_pos]=sev;
   strat->S_2_R[new_pos]=s_2_r;
   strat->lenS[new_pos]=length;
-  if(strat->lenSw)
+  if(strat->lenSw!=NULL)
     strat->lenSw[new_pos]=length_w;
   //assume(lenS_correct(strat));
 }
@@ -1665,7 +1665,7 @@ static void go_on (slimgb_alg* c){
     if (c->modifiedS[z2])
     {
       int qal;
-      if (c->strat->lenSw)
+      if (c->strat->lenSw!=NULL)
 	qal=c->strat->lenSw[z2];
       else
 	qal=c->strat->lenS[z2];
@@ -2016,7 +2016,7 @@ slimgb_alg::slimgb_alg(ideal I, BOOLEAN F4){
   strat->S=strat->Shdl->m;
   strat->lenS=(int*)omAlloc0(i*sizeof(int));
   if((is_char0)||((pLexOrder) &&(!is_homog)))
-    strat->lenSw=(int*)omAlloc0(i*sizeof(int));
+    strat->lenSw=(int*)omAlloc0(i*sizeof(wlen_type));
   else
     strat->lenSw=NULL;
   sorted_pair_node* si;
@@ -2786,7 +2786,7 @@ static void multi_reduction_lls_trick(red_object* los, int losl,slimgb_alg* c,fi
     c->strat->S[j]=clear_into;
     c->strat->lenS[j]=new_length;
     assume(pLength(clear_into)==new_length);
-    if(c->strat->lenSw)
+    if(c->strat->lenSw!=NULL)
       c->strat->lenSw[j]=qal;
     if (!rField_is_Zp(c->r))
     {
