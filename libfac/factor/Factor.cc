@@ -1,6 +1,6 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: Factor.cc,v 1.18 2005-10-17 13:17:39 Singular Exp $ ";
+static char * rcsid = "$Id: Factor.cc,v 1.19 2005-10-17 13:18:44 Singular Exp $ ";
 static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) michael@math.uni-sb.de \nPlease include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -53,7 +53,7 @@ void out_cf(char *s1,const CanonicalForm &f,char *s2);
 * before calling factorize(f,alpha)
 * ( in factorize, alpha.level() must be < 0 )
 */
-CFFList factorize2 ( const CanonicalForm & f, 
+CFFList factorize2 ( const CanonicalForm & f,
                      const Variable & alpha, const CanonicalForm & mipo )
 {
   if (alpha.level() <0)
@@ -64,7 +64,7 @@ CFFList factorize2 ( const CanonicalForm & f,
     {
       return Factorize(f,mipo);
     }
-  }  
+  }
   else
   {
     bool repl=(f.mvar() != alpha);
@@ -611,7 +611,7 @@ Factorized( const CanonicalForm & F, const CanonicalForm & alpha, int Mainvar){
       if (Extension.level()<0)
       DEBOUTLN(cout, "Univ. Factorization over extension of degree ",
                degree(getMipo(Extension,'x')) );
-      else	       
+      else
       DEBOUTLN(cout, "Univ. Factorization over extension of level ??",
                 Extension.level());
       TIMING_START(evaluate_time);
@@ -975,7 +975,7 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
       CanonicalForm fac;
       int d;
       ListIterator<CFFactor> i,k;
-      for ( i = sqF; i.hasItem(); ++i ) 
+      for ( i = sqF; i.hasItem(); ++i )
       {
         d = i.getItem().exp();
         fac = i.getItem().factor();
@@ -1114,6 +1114,9 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.18  2005/10/17 13:17:39  Singular
+*hannes: aplly sqrFree before newfactoras (Factorize in Q(a))
+
 Revision 1.17  2004/12/10 10:15:06  Singular
 *pohl: AlgExtGenerator etc.
 
@@ -1123,7 +1126,7 @@ Revision 1.16  2003/05/28 11:52:52  Singular
 Revision 1.15  2003/02/14 15:51:15  Singular
 * hannes: bugfix
           could not factorize x2+xy+y2 in Fp(a)[x,y], a2+a+1=0
-	  (factorize2 does nor sanity checks)
+          (factorize2 does nor sanity checks)
 
 Revision 1.14  2002/08/19 11:11:32  Singular
 * hannes/pfister: alg_gcd etc.
