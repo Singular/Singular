@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.2 2005-02-17 09:42:20 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.3 2005-10-17 13:42:48 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -119,6 +119,7 @@ int redHomog (LObject* h,kStrategy strat)
   }
 #endif
   int j;
+  int pass = 0;
   loop
   {
     // find a poly with which we can reduce
@@ -148,6 +149,21 @@ int redHomog (LObject* h,kStrategy strat)
       h->lcm=NULL;
 #endif
       return 0;
+    }
+    if (!K_TEST_OPT_REDTHROUGH &&
+        (strat->Ll >= 0) && (pass > strat->LazyPass))
+    {
+      h->SetLmCurrRing();
+      int at = strat->posInL(strat->L,strat->Ll,h,strat);
+      if (at <= strat->Ll)
+      {
+#ifdef KDEBUG
+        if (TEST_OPT_DEBUG) Print(" ->L[%d]\n",at);
+#endif
+        enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
+        h->Clear();
+        return -1;
+      }
     }
   }
 }
@@ -209,11 +225,13 @@ int redLazy (LObject* h,kStrategy strat)
         (strat->Ll >= 0) && ((d > reddeg) || (pass > strat->LazyPass)))
     {
       h->SetLmCurrRing();
-      at = posInL11(strat->L,strat->Ll,h,strat);
+      at = strat->posInL(strat->L,strat->Ll,h,strat);
       if (at <= strat->Ll)
       {
+#if 0
         if (kFindDivisibleByInS(strat->S, strat->sevS, strat->sl, h) < 0)
           return 1;
+#endif
 #ifdef KDEBUG
         if (TEST_OPT_DEBUG) Print(" ->L[%d]\n",at);
 #endif
