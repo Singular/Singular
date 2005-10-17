@@ -2,7 +2,7 @@
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
 ////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: alg_factor.cc,v 1.14 2005-07-08 09:18:15 Singular Exp $";
+static char * rcsid = "$Id: alg_factor.cc,v 1.15 2005-10-17 13:16:18 Singular Exp $";
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -694,10 +694,8 @@ newfactoras( const CanonicalForm & f, const CFList & as, int success){
     elem= i.getItem();
     x= elem.mvar();
     if ( degree(elem,x) > 1){ // otherwise it's not an extension
-      //if ( degree(f,x) > 0 ){ // does it occure in f? RICHTIG?
-        Astar.append(elem);
-        ord.append(x);
-        //}
+      Astar.append(elem);
+      ord.append(x);
     }
   }
   uord= Difference(uord,ord);
@@ -818,6 +816,9 @@ newcfactor(const CanonicalForm & f, const CFList & as, int success ){
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.14  2005/07/08 09:18:15  Singular
+*hannes: fixed call of resultant
+
 Revision 1.13  2004/12/10 10:15:05  Singular
 *pohl: AlgExtGenerator etc.
 
