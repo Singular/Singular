@@ -99,14 +99,10 @@ from Singular import foo2;
 m=functions.testproc6(x,y)
 functions.myprintmat(m)
 print functions.a
-from interpreter import mycbm as cbm
 
 print i
-cbm('std', i)
 print 'suc1'
 print i
-print cbm('std', i)
-print cbm('random',1,10)
 print functions.std(i)
 print functions.random(1,10)
 print 'hallo'
