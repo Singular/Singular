@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.3 2005-02-17 09:42:21 Singular Exp $ */
+/* $Id: kutil.h,v 1.4 2005-10-17 13:37:39 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -56,6 +56,9 @@
 #endif
 
 typedef int* intset;
+typedef int  wlen_type;
+typedef wlen_type* wlen_set;
+
 typedef class sTObject TObject;
 typedef class sLObject LObject;
 typedef TObject * TSet;
@@ -248,7 +251,7 @@ public:
   polyset S;
   intset ecartS;
   intset lenS;
-  intset lenSw; /* for tgb.ccc */
+  wlen_set lenSw; /* for tgb.ccc */
   intset fromQ;
   unsigned long* sevS;
   unsigned long* sevT;
