@@ -1,6 +1,6 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: Factor.cc,v 1.17 2004-12-10 10:15:06 Singular Exp $ ";
+static char * rcsid = "$Id: Factor.cc,v 1.18 2005-10-17 13:17:39 Singular Exp $ ";
 static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) michael@math.uni-sb.de \nPlease include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -970,7 +970,25 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
     if (minpoly!=0)
     {
       CFList as(minpoly);
-      Outputlist = newfactoras( F, as, 1);
+      CFFList sqF=sqrFree(F); // sqrFreeZ
+      CFFList G,H;
+      CanonicalForm fac;
+      int d;
+      ListIterator<CFFactor> i,k;
+      for ( i = sqF; i.hasItem(); ++i ) 
+      {
+        d = i.getItem().exp();
+        fac = i.getItem().factor();
+        G = newfactoras( fac, as, 1);
+        for ( k = G; k.hasItem(); ++k )
+        {
+          fac = k.getItem().factor();
+          int dd = k.getItem().exp();
+          H.append( CFFactor( fac , d*dd ) );
+        }
+      }
+      //Outputlist = newfactoras( F, as, 1);
+      Outputlist = H;
     }
     else
       Outputlist=factorize(F);
@@ -1096,6 +1114,9 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.17  2004/12/10 10:15:06  Singular
+*pohl: AlgExtGenerator etc.
+
 Revision 1.16  2003/05/28 11:52:52  Singular
 *pfister/hannes: newfactoras, alg_gcd, divide (see bug_33)
 
