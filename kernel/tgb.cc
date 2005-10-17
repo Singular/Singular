@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.41 2005-10-17 13:41:46 Singular Exp $ */
+/* $Id: tgb.cc,v 1.42 2005-10-17 17:12:36 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -14,6 +14,7 @@
 #include "tgbgauss.h"
 #include "F4.h"
 #include "gring.h"
+//#include "Number.h"
 //#include "gr_kstd2.h"
 #include "longrat.h"
 static const int bundle_size=100;
@@ -615,8 +616,8 @@ static int add_to_reductors(slimgb_alg* c, poly h, int len){
   else                     
     pNorm(P.p);
   pNormalize(P.p);
-  int pq=pQuality(h,c,len);
-  i=simple_posInS(c->strat,h,pq);
+  wlen_type pq=pQuality(h,c,len);
+  i=simple_posInS(c->strat,h,len,pq);
   c->strat->enterS(P,i,c->strat,-1);
  
  
@@ -938,41 +939,47 @@ static inline poly p_MoveHead(poly p, omBin b)
 #endif
 
 
-
+static int simple_posInS_whelper(kStrategy strat, poly p, int len){
+  return 0;
+}
 //len should be weighted length in char 0
-static int simple_posInS (kStrategy strat, poly p,int len)
+
+
+static int simple_posInS (kStrategy strat, poly p,int len, wlen_type wlen)
 {
 
 
   if(strat->sl==-1) return 0;
-  polyset set=strat->S;
-  intset setL=strat->lenS;
-  if (strat->lenSw) setL=strat->lenSw;
-  int length=strat->sl;
-  int i;
-  int an = 0;
-  int en= length;
-
-  if ((len>setL[length])
-      || ((len==setL[length]) && (pLmCmp(set[length],p)== -1)))
-    return length+1;
-
-  loop
-  {
-    if (an >= en-1)
-    {
-      if ((len<setL[an])
-          || ((len==setL[an]) && (pLmCmp(set[an],p) == 1))) return an;
-      return en;
-    }
-    i=(an+en) / 2;
-    if ((len<setL[i])
-        || ((len==setL[i]) && (pLmCmp(set[i],p) == 1))) en=i;
-    //else if ((len>setL[i])
-    //|| ((len==setL[i]) && (pLmCmp(set[i],p) == -1))) an=i;
-    else an=i;
-  }
+  if (strat->lenSw) return pos_helper(strat,p,wlen,strat->lenSw,strat->S);
+  return pos_helper(strat,p,len,strat->lenS,strat->S);
+  //
+  //if (strat->lenSw) setL=strat->lenSw;
+  //int length=strat->sl;
+  //int i;
+  //int an = 0;
+  //int en= length;
+  //
+  //if ((len>setL[length])
+  //    || ((len==setL[length]) && (pLmCmp(set[length],p)== -1)))
+  //  return length+1;
+  //
+  //loop
+  //{
+  //  if (an >= en-1)
+  //  {
+  //    if ((len<setL[an])
+  //        || ((len==setL[an]) && (pLmCmp(set[an],p) == 1))) return an;
+  //    return en;
+  //  }
+  //  i=(an+en) / 2;
+  //  if ((len<setL[i])
+  //      || ((len==setL[i]) && (pLmCmp(set[i],p) == 1))) en=i;
+  //  //else if ((len>setL[i])
+  //  //|| ((len==setL[i]) && (pLmCmp(set[i],p) == -1))) an=i;
+  //  else an=i;
+  //}
 }
+
 /*2
  *if the leading term of p
  *divides the leading term of some S[i] it will be canceled
@@ -1268,7 +1275,7 @@ static poly redNF2 (poly h,slimgb_alg* c , int &len, number&  m,int n)
   P.bucket = kBucketCreate(currRing);
   // BOOLEAN corr=lenS_correct(strat);
   kBucketInit(P.bucket,P.p,len /*pLength(P.p)*/);
-  intset lenSw=strat->lenS;
+  wlen_set lenSw=strat->lenS;
   if (strat->lenSw!=NULL)
     lenSw=strat->lenSw;
   //int max_pos=simple_posInS(strat,P.p);
@@ -1664,16 +1671,19 @@ static void go_on (slimgb_alg* c){
   {
     if (c->modifiedS[z2])
     {
-      int qal;
+      wlen_type qual;
+      int new_pos;
       if (c->strat->lenSw!=NULL)
-	qal=c->strat->lenSw[z2];
+          new_pos=simple_posInS(c->strat,c->strat->S[z2],strat->lenS[z2],strat->Sw[z2]);
       else
-	qal=c->strat->lenS[z2];
-      int new_pos=simple_posInS(c->strat,c->strat->S[z2],qal);
+	        new_pos=simple_posInS(c->strat,c->strat->S[z2],strat->lenS[z2],lenS[z2]);
+      
       if (new_pos<z2)
       { 
-	move_forward_in_S(z2,new_pos,c->strat);
+	       move_forward_in_S(z2,new_pos,c->strat);
       }
+      
+      assume(new_pos<=z2);
     }
   }
   for(z2=0;c->expandS[z2]!=NULL;z2++)
@@ -2331,9 +2341,9 @@ static void shorten_tails(slimgb_alg* c, poly monom)
     if (did_something)
     {
       int new_pos;
-      int q;
+      wlen_type q;
       q=pQuality(c->S->m[i],c,c->lengths[i]);
-      new_pos=simple_posInS(c->strat,c->S->m[i],q);
+      new_pos=simple_posInS(c->strat,c->S->m[i],c->lengths[i],q);
 
       int old_pos=-1;
       //assume new_pos<old_pos
@@ -2665,7 +2675,7 @@ static void multi_reduction_lls_trick(red_object* los, int losl,slimgb_alg* c,fi
       {
 	assume(erg.to_reduce_u==erg.to_reduce_l);
 	int quality_a=quality_of_pos_in_strat_S(erg.reduce_by,c);
-	int qc=los[erg.to_reduce_u].guess_quality(c);
+	wlen_type qc=los[erg.to_reduce_u].guess_quality(c);
 	if(qc<quality_a){
 	  int best=erg.to_reduce_u;
 	  los[best].flatten();
@@ -2709,7 +2719,7 @@ static void multi_reduction_lls_trick(red_object* los, int losl,slimgb_alg* c,fi
       //then lm(rb)>= lm(tru) so =
       assume(erg.reduce_by==erg.to_reduce_u+1);
       int best=erg.reduce_by;
-      int quality_a=los[erg.reduce_by].guess_quality(c);
+      wlen_type quality_a=los[erg.reduce_by].guess_quality(c);
       int qc;
       best=find_best(los,erg.to_reduce_l,erg.to_reduce_u,qc,c);
       
@@ -2761,11 +2771,11 @@ static void multi_reduction_lls_trick(red_object* los, int losl,slimgb_alg* c,fi
     int old_length=c->strat->lenS[j];// in view of S
     los[bp].p=p;
     kBucketInit(los[bp].bucket,p,old_length);
-    int qal=pQuality(clear_into,c,new_length);
+    wlen_type qal=pQuality(clear_into,c,new_length);
     int pos_in_c=-1;    
     int z;
     int new_pos;
-    new_pos=simple_posInS(c->strat,clear_into,qal);
+    new_pos=simple_posInS(c->strat,clear_into,new_length, qal);
     assume(new_pos<=j);
     for (z=c->n;z;z--)
     {

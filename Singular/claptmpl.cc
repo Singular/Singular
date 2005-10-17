@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: claptmpl.cc,v 1.29 2005-09-12 16:04:17 bricken Exp $
+// $Id: claptmpl.cc,v 1.30 2005-10-17 17:12:50 bricken Exp $
 /*
 * ABSTRACT - instantiation of all templates
 */
@@ -200,3 +200,6 @@ template    static  void    print_rational( ostream&,int,const Rational& );
 //  kmatrix.cc
 //  end of file
 // ----------------------------------------------------------------------------
+#include "tgb_internal.h"
+template int pos_helper(kStrategy strat, poly p, wlen_type len, wlen_set setL, polyset set);
+//template int pos_helper(kStrategy strat, poly p, int len, intset setL, polyset set);

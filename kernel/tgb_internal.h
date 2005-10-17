@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb_internal.h,v 1.16 2005-07-20 11:12:43 bricken Exp $ */
+/* $Id: tgb_internal.h,v 1.17 2005-10-17 17:12:37 bricken Exp $ */
 /*
  * ABSTRACT: tgb internal .h file
 */
@@ -152,7 +152,7 @@ enum calc_state
     UNIMPORTANT,
     SOONTREP
   };
-
+template <class len_type, class set_type>  int pos_helper(kStrategy strat, poly p, len_type len, set_type setL, polyset set);
 static int add_to_reductors(slimgb_alg* c, poly h, int len);
 static int bucket_guess(kBucket* bucket);
 static poly redNFTail (poly h,const int sl,kStrategy strat, int len);
@@ -169,7 +169,7 @@ static int* make_connections(int from, int to, poly bound, slimgb_alg* c);
 void now_t_rep(const int & arg_i, const int & arg_j, slimgb_alg* c);
 static void soon_t_rep(const int & arg_i, const int & arg_j, slimgb_alg* c);
 static int pLcmDeg(poly a, poly b);
-static int simple_posInS (kStrategy strat, poly p,int len);
+static int simple_posInS (kStrategy strat, poly p,int len, wlen_type wlen);
 static BOOLEAN find_next_pair(slimgb_alg* c, BOOLEAN go_higher=TRUE);
 
 static sorted_pair_node* pop_pair(slimgb_alg* c);
@@ -240,6 +240,33 @@ struct find_erg{
 static void multi_reduce_step(find_erg & erg, red_object* r, slimgb_alg* c);
 static void finalize_reduction_step(reduction_step* r);
 
+template <class len_type, class set_type>  int pos_helper(kStrategy strat, poly p, len_type len, set_type setL, polyset set){
+  int length=strat->sl;
+  int i;
+  int an = 0;
+  int en= length;
+
+  if ((len>setL[length])
+      || ((len==setL[length]) && (pLmCmp(set[length],p)== -1)))
+    return length+1;
+
+  loop
+  {
+    if (an >= en-1)
+    {
+      if ((len<setL[an])
+          || ((len==setL[an]) && (pLmCmp(set[an],p) == 1))) return an;
+      return en;
+    }
+    i=(an+en) / 2;
+    if ((len<setL[i])
+        || ((len==setL[i]) && (pLmCmp(set[i],p) == 1))) en=i;
+    //else if ((len>setL[i])
+    //|| ((len==setL[i]) && (pLmCmp(set[i],p) == -1))) an=i;
+    else an=i;
+  }
+
+}
 
 
 
