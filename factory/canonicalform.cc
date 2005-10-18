@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.cc,v 1.34 2005-06-28 14:39:52 Singular Exp $ */
+/* $Id: canonicalform.cc,v 1.35 2005-10-18 12:33:00 Singular Exp $ */
 
 #include <config.h>
 
@@ -72,11 +72,13 @@ CanonicalForm::deepCopy() const
 //}}}
 
 //{{{ predicates
+#if 0
 bool
 CanonicalForm::isImm() const
 {
     return is_imm( value );
 }
+#endif
 
 bool
 CanonicalForm::inZ() const
@@ -920,6 +922,7 @@ CanonicalForm::operator () ( const CanonicalForm & f ) const
     if ( is_imm( value ) || value->inBaseDomain() )
 	return *this;
     else {
+#if 0
 	CFIterator i = *this;
 	int lastExp = i.exp();
 	CanonicalForm result = i.coeff();
@@ -935,6 +938,25 @@ CanonicalForm::operator () ( const CanonicalForm & f ) const
 	}
 	if ( lastExp != 0 )
 	    result *= power( f, lastExp );
+#else
+	CFIterator i = *this;
+	int lastExp = i.exp();
+	CanonicalForm result = i.coeff();
+	i++;
+	while ( i.hasTerms() )
+        {
+            int i_exp=i.exp();
+	    if ( (lastExp - i_exp /* i.exp()*/) == 1 )
+		result *= f;
+	    else
+		result *= power( f, lastExp - i_exp /*i.exp()*/ );
+	    result += i.coeff();
+	    lastExp = i_exp /*i.exp()*/;
+	    i++;
+	}
+	if ( lastExp != 0 )
+	    result *= power( f, lastExp );
+#endif
 	return result;
     }
 }
