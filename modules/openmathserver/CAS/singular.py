@@ -29,7 +29,7 @@ orderingTable={
 OrderingTableBack={}
 for k in orderingTable:
   OrderingTableBack[orderingTable[k]]=k
-print OrderingTableBack
+
 def encodeOrdering(r):
   rl=singular.ringlist(r)
   return orderingTable[rl[2][0][0]]
@@ -87,7 +87,6 @@ def idealFromDMPL(dmpl):
   return i
 def ringFromDMPLOrd(dmpl,o):
   assert len(dmpl.args)>=1
-  print OrderingTableBack[o]
   return ringFromOM(dmpl.args[0], ordering=OrderingTableBack[o])
 leadcoef=singular.leadcoef
 leadexp=singular.leadexp
@@ -104,11 +103,8 @@ def groebnerfunc(context, ordering, dmpl):
   r=ringFromDMPLOrd(dmpl,ordering)
   r.set()
   i=idealFromDMPL(dmpl)
-  print "myarg",i
-  singular.__getattr__("print")(i)
   res=singular.std(i)
   #FIXME: singular.groebner does not work may because of bad ring changes
-  print "myres",res
   return encodeGB(res)
 implementation.implement("groebner", groebnerfunc)
 optimize(encodePoly)

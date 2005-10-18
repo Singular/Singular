@@ -8,6 +8,10 @@ kuchenessen.install_kuchenessen_plugin()
 from context import Context
 from omxmlreader import *
 import sys
+
+
+
+
 root=readStream(sys.stdin)
 builder=OMFromXMLBuilder()
 context=Context()
@@ -20,4 +24,4 @@ doc=context.evaluate(doc)
 output=context.XMLEncodeObject(doc)
 
 sys.stdout.write(output)
-sys.stdout.close()
+

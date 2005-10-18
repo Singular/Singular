@@ -12,7 +12,7 @@ context=Context()
 
 #our cake
 rectangle_list=[(4,3),(3,3),(1,1),(2,4),(4,2)]
-
+print "Eingabeliste", rectangle_list
 #create Openmath representation
 cake=gametheory.cake_to_OM(rectangle_list)
 task=OMApply(gametheory.left_wins_sym,[cake])
