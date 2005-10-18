@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: imm.h,v 1.18 2001-06-27 13:20:37 Singular Exp $ */
+/* $Id: imm.h,v 1.19 2005-10-18 13:16:15 Singular Exp $ */
 
 #ifndef INCL_IMM_H
 #define INCL_IMM_H
@@ -41,7 +41,7 @@ const INT64 MAXIMMEDIATELL = 268435454LL;
 
 inline int imm2int ( const InternalCF * const imm )
 {
-    return (int)imm >> 2;
+    return (long)imm >> 2;
 }
 
 inline InternalCF * int2imm ( int i )
@@ -54,10 +54,10 @@ inline InternalCF * int2imm ( int i )
 inline int imm2int ( const InternalCF * const imm )
 {
     // this could be better done by masking the sign bit
-    if ( (int)imm < 0 )
-        return -((-(int)imm) >> 2);
+    if ( (long)imm < 0 )
+        return -((-(long)imm) >> 2);
     else
-        return (int)imm >> 2;
+        return (long)imm >> 2;
 }
 
 inline InternalCF * int2imm ( int i )
@@ -82,11 +82,13 @@ inline InternalCF * int2imm_gf ( int i )
 //}}}
 
 // predicates
+#if 0
 inline int is_imm ( const InternalCF * const ptr )
 {
     // returns 0 if ptr is not immediate
-    return ( (int)ptr & 3 );
+    return ( (long)ptr & 3 );
 }
+#endif
 
 //{{{ inline int imm_isone, imm_isone_p, imm_isone_gf ( const InternalCF * const ptr )
 // docu: see CanonicalForm::isOne()

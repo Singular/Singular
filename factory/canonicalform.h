@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.h,v 1.28 2003-10-15 17:19:39 Singular Exp $ */
+/* $Id: canonicalform.h,v 1.29 2005-10-18 13:16:14 Singular Exp $ */
 
 #ifndef INCL_CANONICALFORM_H
 #define INCL_CANONICALFORM_H
@@ -36,11 +36,18 @@
 
 /*BEGINPUBLIC*/
 
+class InternalCF;
+
+inline int is_imm ( const InternalCF * const ptr )
+{
+    // returns 0 if ptr is not immediate       
+    return ( (long)ptr & 3 );
+}
+
+
 int initCanonicalForm( void );
 
 static int cf_is_initialized_now = initCanonicalForm();
-
-class InternalCF;
 
 //{{{ class CanonicalForm
 class CanonicalForm
@@ -66,7 +73,7 @@ public:
     // predicates
     CF_NO_INLINE bool isOne() const;
     CF_NO_INLINE bool isZero() const;
-    bool isImm() const;
+    inline bool isImm() const { return is_imm( value ); };
 
     bool inZ() const;
     bool inQ() const;
@@ -312,6 +319,8 @@ head ( const CanonicalForm & f )
 
 inline int
 headdegree ( const CanonicalForm & f ) { return totaldegree( head( f ) ); }
+
+
 //}}}
 
 //{{{ other function declarations
