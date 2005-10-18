@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: normal.lib,v 1.46 2005-10-06 16:19:30 Singular Exp $";
+version="$Id: normal.lib,v 1.47 2005-10-18 12:31:55 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  normal.lib     Normalization of Affine Rings
@@ -503,12 +503,12 @@ EXAMPLE: example normal; shows an example
          }
          else
          {
-            prim=minAssPrimes(id);
+            prim=minAssGTZ(id);
          }
       }
       else
       {
-         prim=minAssPrimes(id);
+         prim=minAssGTZ(id);
       }
       if(y>=1)
       {
