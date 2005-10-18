@@ -1,6 +1,6 @@
 // last change: 98/11/05
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: finvar.lib,v 1.36 2005-05-18 17:54:55 Singular Exp $"
+version="$Id: finvar.lib,v 1.37 2005-10-18 12:45:34 Singular Exp $"
 category="Invariant theory";
 info="
 LIBRARY:  finvar.lib    Invariant Rings of Finite Groups
@@ -1089,7 +1089,7 @@ EXAMPLE: example reynolds_molien; shows an example
     if (v)
     { "";
       "  Generating the entire matrix group. Whenever a new group element is found,";
-      "  the coressponding ring homomorphism of the Reynolds operator and the";
+      "  the corresponding ring homomorphism of the Reynolds operator and the";
       "  corresponding term of the Molien series is generated.";
       "";
     }
@@ -1299,7 +1299,7 @@ EXAMPLE: example reynolds_molien; shows an example
     if (v)
     { "";
       "  Generating the entire matrix group. Whenever a new group element is found,";
-      "  the coressponding ring homomorphism of the Reynolds operator and the";
+      "  the corresponding ring homomorphism of the Reynolds operator and the";
       "  corresponding term of the Molien series is generated.";
       "";
     }
@@ -1995,6 +1995,7 @@ proc p_search (int n,int d,ideal B,int cd,ideal P,ideal sP,int i,int dif,int dB,
   setring br;
   intvec h;                            // Hilbert series
   int k=i+1;
+  if (ncols(B)<cd) { B[cd]=0; }
   matrix tB=transpose(B);
   ideal TEST;
   while (k<=i+dif)
@@ -2294,6 +2295,10 @@ EXAMPLE: example primary_charp; shows an example
     }
     B=invariant_basis_reynolds(REY,d,intvec(cd,6)); // basis of invariants of
                                        // degree d
+    if (ncols(B)<cd)
+    {
+      " warning: expected ",cd," invars, found ",ncols(B);
+    }
     if (B[1]<>0)
     { Pplus=P+B;
       sPplus=std(Pplus);
