@@ -16,6 +16,7 @@ class Context(object):
     def addCDImplementation(self, implementation):
         self.implementations[implementation.cd]=implementation
     def lookupImplementation(self, oms):
+    	#print self.implementations
         try:
             return self.implementations[oms.cd][oms]
         except KeyError:
@@ -69,6 +70,8 @@ class Context(object):
         try:
             return func(self,*args)
         except:
+            from traceback import print_exc
+            print_exc()
             raise EvaluationFailedError
     def XMLEncodeBody(self,body):
         return self.XMLEncoder.encode(body)

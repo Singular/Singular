@@ -5,6 +5,7 @@ from exceptions import NotImplementedError
 from copy import copy
 from xml.sax.xmlreader import AttributesImpl as attr
 import base64
+raiseException=True
 #TODO: OMOBJ, OME, OMATTR
 #from cd import *
 try:
@@ -145,6 +146,7 @@ class OMObjectBase(object):
         return encodingList
     def XMLSAXEncode(self, context, generator):
         #works not for attp
+        #print "attr", self.XMLAttributes
         generator.startElement(self.XMLtag, attr(self.XMLAttributes))
         for c in self.children:
           c.XMLSAXEncode(context, generator)
@@ -188,12 +190,16 @@ class OMApply(OMObjectBase):
         efunc = context.evaluate(self.func)
         eargs = [context.evaluate(a) for a in self.args]
         if callable(efunc):
-            try:
-                return context.apply(efunc, eargs)
-            except EvaluationFailedError, NotImplementedError:
-                return OMApply(efunc, eargs)
+        	if raiseException:
+        		return context.apply(efunc,eargs)
+        	else:
+				try:
+					return context.apply(efunc, eargs)
+				except EvaluationFailedError, NotImplementedError:
+					return OMApply(efunc, eargs)
                 #return self
         else:
+            #print efunc
             return OMApply(efunc, eargs)
     XMLtag="OMA"
     def getChildren(self):
@@ -266,6 +272,7 @@ class OMfloat(SimpleValue):
     def __str__(self):
         return "OMfloat("+repr(self.value)+")"
     XMLtag = "OMF"
+    
     def getXMLAttributes(self):
         return {"dec":str(self.value)}
 class OMString(SimpleValue):
@@ -361,6 +368,7 @@ if __name__ == '__main__':
     i =  OMint(22482489)
     print i.body
     print i.XMLEncode(context)
+    print context.XMLEncodeObject(OMSymbol("plus", arith1.content))
     #i.body="dshj"
    
 #optimize(OMObjectBase.__init__)

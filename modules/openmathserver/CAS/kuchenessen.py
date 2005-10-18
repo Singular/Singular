@@ -317,3 +317,27 @@ class kuchen:
         return k.greater_equal_zero()
     def negative(self):
         return kuchen([(m[1],m[0]) for m in self.gebiete])
+
+
+try:
+	from objects import *
+	import CD.gametheory
+	def decode_kuchen_OM(kOM):
+		assert isinstance(kOM,OMApply)
+		sizes=[a.getValue() for a in kOM.args]
+		regions=[(sizes[i],sizes[i+1]) for i in xrange(0, len(sizes),2)]
+		return kuchen(regions)
+	def left_wins_func(context, kuchen):
+		kuchen=decode_kuchen_OM(kuchen)
+		erg=kuchen.greater_equal_zero()
+		if erg:
+			return OMint(1)
+		else:
+			return OMint(0)
+	def install_kuchenessen_plugin():
+		CD.gametheory.implementation.implement("left_wins", left_wins_func)
+except:
+	print "no openmath library available"
+
+
+	

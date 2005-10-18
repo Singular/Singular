@@ -22,7 +22,14 @@ def readFile(input_file_name):
     
     root=doc.lastChild
     return root
+
+def readStream(input_stream):
+    docIS=DOMInputSource()
+    docIS.byteStream=input_stream
+    doc= DOMBuilder().parse(docIS)
     
+    root=doc.lastChild
+    return root
 def  get_text_in_children(n):
     t = ""
     for c in n.childNodes:
