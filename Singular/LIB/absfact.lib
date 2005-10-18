@@ -1,4 +1,4 @@
-version="$Id: absfact.lib,v 1.3 2005-09-27 16:52:54 Singular Exp $";
+version="$Id: absfact.lib,v 1.4 2005-10-18 13:02:56 Singular Exp $";
 category="Factorization";
 info="
 LIBRARY: absfact.lib   Absolute factorization for characteristic 0
@@ -341,7 +341,7 @@ NOTE:   All factors are presented denominator- and content-free. The constant
         factor (first entry) is chosen such that the product of all (!) the
         (denominator- and content-free) absolute factors of @code{p} equals 
         @code{p / absolute_factors[1][1]}.    
-SEE ALSO: factorize
+SEE ALSO: factorize, absPrimdecGTZ
 EXAMPLE: example absFactorize; shows an example
 "
 {
@@ -399,10 +399,17 @@ EXAMPLE: example absFactorize; shows an example
 	{
 	  newvar=#[1];
 	}
+      else 
+      {
+        newvar = "a";
+      }
     }
   else
     {
       newvar = "a";
+    }
+  if (newvar=="a")
+    {
       if(belongTo(newvar, lMP[2])||defined(a)){newvar = "b";}
       if(belongTo(newvar, lMP[2])||defined(b)){newvar = "c";}
       if(belongTo(newvar, lMP[2])||defined(c)){newvar = "@c";}
@@ -495,7 +502,10 @@ EXAMPLE: example absFactorize; shows an example
 	{
 	  if(#[1]==77)
 	    {  // undocumented feature for Gerhard's absPrimdecGTZ
-	      return(string(list(tmpf[2..size(tmpf)],newvar)));
+              if (size(tmpf)<2){ list abs_fac = list(var(n+1),poly(1)); }
+              else { list abs_fac=tmpf[2..size(tmpf)]; }
+              abs_fac=abs_fac,newvar;
+	      return(string(abs_fac));
 	    }
 	}
     }
@@ -549,16 +559,6 @@ EXAMPLE: example absFactorize; shows an example
   export absolute_factors;
   setring(MP);
 
-  if(size(#)>0)
-  {
-    if(typeof(#[1])=="int")
-    {
-       if(#[1]==77)
-       {
-          return(s1);
-       }
-    }
-  }
   dbprint( printlevel-voice+3,"
 // 'absFactorize' created a ring, in which a list absolute_factors (the
 // absolute factors) is stored.
