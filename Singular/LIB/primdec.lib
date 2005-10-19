@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: primdec.lib,v 1.106 2005-10-10 17:39:54 Singular Exp $";
+version="$Id: primdec.lib,v 1.107 2005-10-19 14:08:21 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -5334,11 +5334,8 @@ EXAMPLE: example minAssGTZ; shows an example
    if(minpoly!=0)
    {
       return(algeDeco(i,2));
-      ERROR(
-      "// Not implemented for algebraic extensions. Simulate the ring extension by adding the minpoly to the ideal"
-      );
    }
-  if(size(#)==0)
+   if(size(#)==0)
    {
       return(minAssPrimes(i,1));
    }
