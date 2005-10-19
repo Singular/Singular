@@ -1,7 +1,6 @@
 #ifndef ITERATABLE_INTVEC_H
 #define ITERATABLE_INTVEC_H
 #include <vector>
-#include "mod2.h"
 #include "intvec.h"
 class Intvec: public std::vector<int>{
 public:

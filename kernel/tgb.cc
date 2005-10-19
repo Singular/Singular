@@ -4,11 +4,12 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.42 2005-10-17 17:12:36 bricken Exp $ */
+/* $Id: tgb.cc,v 1.43 2005-10-19 16:10:19 Singular Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
 
+#include "mod2.h"
 #include "tgb.h"
 #include "tgb_internal.h"
 #include "tgbgauss.h"

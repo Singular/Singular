@@ -3,14 +3,13 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.4 2005-10-17 13:37:39 Singular Exp $ */
+/* $Id: kutil.h,v 1.5 2005-10-19 16:12:39 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
 
 
 #include <string.h>
-#include "mod2.h"
 #include <mylimits.h>
 
 #include "structs.h"

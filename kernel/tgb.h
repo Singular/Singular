@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.h,v 1.7 2005-05-11 10:11:54 bricken Exp $ */
+/* $Id: tgb.h,v 1.8 2005-10-19 16:10:19 Singular Exp $ */
 /*
 * ABSTRACT: trepgb interface
 */
@@ -11,7 +11,6 @@
 //! \file tgb.h
 //#define OM_CHECK 3
 //#define OM_TRACK 5
-#include "mod2.h"
 
 #include "ring.h"
 

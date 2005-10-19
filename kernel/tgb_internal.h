@@ -4,11 +4,10 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb_internal.h,v 1.17 2005-10-17 17:12:37 bricken Exp $ */
+/* $Id: tgb_internal.h,v 1.18 2005-10-19 16:10:19 Singular Exp $ */
 /*
  * ABSTRACT: tgb internal .h file
 */
-#include "mod2.h"
 #include <omalloc.h>
 #include "p_polys.h"
 
