@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: primdec.lib,v 1.107 2005-10-19 14:08:21 Singular Exp $";
+version="$Id: primdec.lib,v 1.108 2005-10-19 15:51:19 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -34,6 +34,7 @@ PROCEDURES:
  equidimMax(I);    equidimensional locus of I
  equidimMaxEHV(I); equidimensional locus of I via Eisenbud,Huneke,Vasconcelos
  zerodec(I);       zerodimensional decomposition via Monico
+ absPrimdecGTZ(I); the absolute prime components of I
 ";
 
 LIB "general.lib";
@@ -5169,7 +5170,7 @@ RETURN:  a ring containing two lists: @code{absolute_primes} (the absolute
          The list absolute_primes has to be interpreted as follows:
          each entry describes a class of conjugated absolute primes,
 @format
-   absolute_primes[i][1]   the abolute prime component,
+   absolute_primes[i][1]   the absolute prime component,
    absolute_primes[i][2]   the number of conjugates.
 @end format
          The first entry of @code{absolute_primes[i][1]} is the minimal
