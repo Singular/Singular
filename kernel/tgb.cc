@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.44 2005-10-20 11:51:28 Singular Exp $ */
+/* $Id: tgb.cc,v 1.45 2005-10-20 12:36:45 Singular Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -2239,7 +2239,7 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
     return erg;
   }
   //qsort(I->m, IDELEMS(I),sizeof(poly),pLmCmp_func);
-  assume(I->rank==idRankFreeModule(I));
+  assume(I->rank>=idRankFreeModule(I));
   return(I);
 }
 void now_t_rep(const int & arg_i, const int & arg_j, slimgb_alg* c){
