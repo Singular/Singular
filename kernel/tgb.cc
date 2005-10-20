@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.43 2005-10-19 16:10:19 Singular Exp $ */
+/* $Id: tgb.cc,v 1.44 2005-10-20 11:51:28 Singular Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -1149,7 +1149,7 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slim
 	//}
   }
   
-  assume(spc==i);
+  assume(spc<=i);
   //now ideal quotient crit
   qsort(nodes,spc,sizeof(sorted_pair_node*),iq_crit);
   
@@ -2003,9 +2003,9 @@ slimgb_alg::slimgb_alg(ideal I, BOOLEAN F4){
   
   short_Exps=(long*) omalloc(n*sizeof(long));
   if (F4_mode)
-    S=idInit(n,1);
+    S=idInit(n,I->rank);
   else
-    S=idInit(1,1);
+    S=idInit(1,I->rank);
   strat=new skStrategy;
   strat->syzComp = 0;
   initBuchMoraCrit(strat);
@@ -2207,12 +2207,9 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
   
   //  Print("QlogSize(0) %d, QlogSize(1) %d,QlogSize(-2) %d, QlogSize(5) %d\n", QlogSize(nlInit(0)),QlogSize(nlInit(1)),QlogSize(nlInit(-2)),QlogSize(nlInit(5)));
   
-  
-  
   if (TEST_OPT_PROT)
     if (F4_mode)
       PrintS("F4 Modus \n");
-    
      
   //debug_Ideal=arg_debug_Ideal;
   //if (debug_Ideal) PrintS("DebugIdeal received\n");
@@ -2224,8 +2221,6 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
   //Print("Idelems %i \n----------\n",IDELEMS(I));
   //slimgb_alg* c=(slimgb_alg*) omalloc(sizeof(slimgb_alg));
   slimgb_alg* c=new slimgb_alg(I, F4_mode);
-
-
     
   int i;
   while(c->pair_top>=0)
@@ -2244,6 +2239,7 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
     return erg;
   }
   //qsort(I->m, IDELEMS(I),sizeof(poly),pLmCmp_func);
+  assume(I->rank==idRankFreeModule(I));
   return(I);
 }
 void now_t_rep(const int & arg_i, const int & arg_j, slimgb_alg* c){
