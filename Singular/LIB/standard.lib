@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: standard.lib,v 1.73 2005-09-27 16:52:57 Singular Exp $";
+version="$Id: standard.lib,v 1.74 2005-10-20 13:13:53 Singular Exp $";
 category="Miscellaneous";
 info="
 LIBRARY: standard.lib   Procedures which are always loaded at Start-up
@@ -248,11 +248,14 @@ EXAMPLE: example groebner;  shows an example"
     //spaeter den lokalen fall ueber lp oder aehnlich behandeln
     return(std(i));
   }
+
   //if ordering is global, there are parameters and minpoly is 0
   if (((npars(basering)>0) &&(minpoly==0)) &&(typeof(basering)=="ring"))
-  {
-    return(slimgb(i));
-  }
+  { return(slimgb(i)); }
+
+  // for module case, not already hadled by slimgb:
+  if (nrows(i)>1)
+  { return(std(i)); }
   int IsSimple_P;
   if (system("nblocks") <= 2)
   {
@@ -299,7 +302,7 @@ EXAMPLE: example groebner;  shows an example"
   int add_vars = 0;
   int nvarP = nvars(P);
   int k;
-  ideal Qideal = ideal(P);  
+  ideal Qideal = ideal(P);
   string ri;
 
   if (npars_P > 0)
@@ -309,36 +312,36 @@ EXAMPLE: example groebner;  shows an example"
   // more than one parameters are converted to ring variables
   if (npars_P > 1)
   {
-    for (k=1; k<=npars_P; k++) 
+    for (k=1; k<=npars_P; k++)
     {
-      BRlist[2][nvarP+k] = BRlist[1][2][k]; 
+      BRlist[2][nvarP+k] = BRlist[1][2][k];
     }
     BRlist[1]=BRlist[1][1];
     add_vars = npars_P;
   }
 
-    
+
   // for Hilbert driven approach, Qring structure is removed (defining ideal
-  // will be added to the ideal under consideration in the process).  
+  // will be added to the ideal under consideration in the process).
   if (size(BRlist[4])>0)
   {
     int was_qring = 1;
     BRlist[4] = ideal(0);
-  } 
+  }
 
   // a homogenizing variable is added, if necessary
   int is_homog = (homog(i) && (npars_P <= 1));
   if (! is_homog)
   {
     add_vars = add_vars + 1;
-    BRlist[2][nvarP+add_vars] = "@t@"; 
+    BRlist[2][nvarP+add_vars] = "@t@";
   }
   // save ordering for later use
   list ord_P = BRlist[3];   // should be ring independent
 
   // ordering is set to (dp, C)
   intvec weight_dp = 1;
-  for (k=2; k<=nvarP+add_vars; k++) { weight_dp = weight_dp,1; } 
+  for (k=2; k<=nvarP+add_vars; k++) { weight_dp = weight_dp,1; }
   BRlist[3] = list();
   BRlist[3][1]=list("dp",weight_dp);
   BRlist[3][2]=list("C",intvec(0));
@@ -396,7 +399,7 @@ EXAMPLE: example groebner;  shows an example"
       OW = OW,1;
       BRlist[3][1][2] = OW;
     }
-    else 
+    else
     {
       if ( IsSimple_P && (add_vars==1) && (size(ord_P)==2) && (ord_P[2][1]=="lp") )
       {
