@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.51 2005-06-07 11:43:53 Singular Exp $
+@comment $Id: NEWS.texi,v 1.52 2005-10-20 12:39:46 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -162,4 +162,17 @@ procedures, related to quantum matrices and minors
 SunOS-5, IRIX-6, ix86-Win (runs on Windows 95/98/NT4/2000/XP),
 FreeBSD, MacOS X, DecAlpha-Linux, x86_64-Linux (AMD64/Opteron/EM64T),
 IA64-Linux
+@end itemize
+
+@heading Updates for version 3-0-1
+@itemize @bullet
+@item
+NTL upgraded to version 5.4
+@item
+new library: absfac.lib @nref{absfac_lib}
+@item
+new procedures in primdec.lib: @nref{absPrimdecGTZ}
+@item
+build process improved: new make target @code{install_all}
+@item
 @end itemize
