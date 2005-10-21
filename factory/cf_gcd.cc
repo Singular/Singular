@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_gcd.cc,v 1.30 2005-05-03 09:35:34 Singular Exp $ */
+/* $Id: cf_gcd.cc,v 1.31 2005-10-21 09:48:13 Singular Exp $ */
 
 #include <config.h>
 
@@ -607,8 +607,8 @@ gcd ( const CanonicalForm & f, const CanonicalForm & g )
             }
             else {
                 CanonicalForm d = gcd_poly( f, g, getCharacteristic()==0 );
-                //if ((f%d!=0) || (g % d !=0))
-                //  d = gcd_poly( f, g, getCharacteristic()==0  );
+                if ((f%d!=0) || (g % d !=0))
+                  d = gcd_poly( f, g, getCharacteristic()==0  );
                 if ( d.lc().sign() < 0 )
                     return -d;
                 else
