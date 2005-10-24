@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.80 2005-09-24 15:02:06 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.81 2005-10-24 12:21:41 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -938,6 +938,7 @@ static BOOLEAN jjA_L_LIST(leftv l, leftv r)
     //  ((ring)L->m[i].data)->ref++;
     //}
     //else
+      L->m[i].CleanUp();
       L->m[i].Copy(h);
       if(errorreported)
       {
