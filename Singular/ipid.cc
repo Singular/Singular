@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.71 2005-05-06 12:39:46 Singular Exp $ */
+/* $Id: ipid.cc,v 1.72 2005-10-24 11:54:53 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -569,6 +569,7 @@ void killhdl2(idhdl h, idhdl * ih, ring r)
         hdh = temp;
       }
       killhdl2(*hd,hd,NULL);
+      if (IDPACKAGE(h)->libname!=NULL) omFree((ADDRESS)(IDPACKAGE(h)->libname));
     }
     paKill(IDPACKAGE(h));
     if (currPackHdl==h) currPackHdl=packFindHdl(currPack);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.129 2005-09-28 15:01:20 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.130 2005-10-24 11:55:34 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1125,6 +1125,7 @@ BOOLEAN iiParameter(leftv p)
     h->next=NULL;
   }
   BOOLEAN res=iiAssign(p,h);
+  h->CleanUp();
   omFreeBin((ADDRESS)h, sleftv_bin);
   return res;
 }
