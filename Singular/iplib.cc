@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.118 2005-10-11 11:31:08 Singular Exp $ */
+/* $Id: iplib.cc,v 1.119 2005-10-25 17:14:12 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -323,24 +323,32 @@ BOOLEAN iiPStart(idhdl pn, sleftv  * v)
   }
   /* start interpreter ======================================*/
   myynest++;
-  err=yyparse();
-#ifdef HAVE_NS
-#ifndef NDEBUG
-  checkall();
-#endif
-#endif
-  if (sLastPrinted.rtyp!=0)
+  if (myynest > 1000)
   {
-    sLastPrinted.CleanUp();
+    WerrorS("nesting too deep (>1000)");
+    err=TRUE;
   }
-  //Print("kill locals for %s (level %d)\n",IDID(pn),myynest);
-  killlocals(myynest);
+  else
+  {
+    err=yyparse();
 #ifdef HAVE_NS
 #ifndef NDEBUG
-  checkall();
+    checkall();
 #endif
 #endif
-  //Print("end kill locals for %s (%d)\n",IDID(pn),myynest);
+    if (sLastPrinted.rtyp!=0)
+    {
+      sLastPrinted.CleanUp();
+    }
+    //Print("kill locals for %s (level %d)\n",IDID(pn),myynest);
+    killlocals(myynest);
+#ifdef HAVE_NS
+#ifndef NDEBUG
+    checkall();
+#endif
+#endif
+    //Print("end kill locals for %s (%d)\n",IDID(pn),myynest);
+  }
   myynest--;
   si_echo=old_echo;
   if (pi!=NULL)
