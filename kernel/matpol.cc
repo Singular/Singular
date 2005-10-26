@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.cc,v 1.4 2005-10-26 14:52:10 Singular Exp $ */
+/* $Id: matpol.cc,v 1.5 2005-10-26 15:35:35 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -886,7 +886,8 @@ BOOLEAN mpEqual(matrix a, matrix b)
       if (b->m[i]!=NULL) return FALSE;
     }
     else
-      if (pCmp(a->m[i],b->m[i])!=0) return FALSE;
+      if (b->m[i]==NULL) return FALSE;
+      else if (pCmp(a->m[i],b->m[i])!=0) return FALSE;
     i--;
   }
   i=MATCOLS(a)*MATROWS(b)-1;
