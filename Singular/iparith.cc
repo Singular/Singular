@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.382 2005-10-20 12:19:59 Singular Exp $ */
+/* $Id: iparith.cc,v 1.383 2005-10-26 10:42:40 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1211,26 +1211,7 @@ static BOOLEAN jjEQUAL_P(leftv res, leftv u, leftv v)
 {
   poly p=(poly)u->Data();
   poly q=(poly)v->Data();
-  if (p==NULL)
-  {
-    res->data=(char *)(q==NULL);
-  }
-  else
-  {
-    if (q==NULL) res->data=(char *)FALSE;
-    else
-    {
-      int r=pCmp(p,q);
-      if (r==0)
-      {
-        p=pSub(pCopy(p),pCopy(q));
-        res->data = (char *) (p==NULL);
-        pDelete(&p);
-      }
-      else
-        res->data = (char *) FALSE;
-    }
-  }
+  res->data = (char *) (pEqualPolys(p,q));
   jjEQUAL_REST(res,u,v);
   return FALSE;
 }
