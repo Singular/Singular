@@ -1,6 +1,6 @@
 // last change: 98/11/05
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: finvar.lib,v 1.37 2005-10-18 12:45:34 Singular Exp $"
+version="$Id: finvar.lib,v 1.38 2005-10-26 14:11:34 Singular Exp $"
 category="Invariant theory";
 info="
 LIBRARY:  finvar.lib    Invariant Rings of Finite Groups
@@ -1948,8 +1948,9 @@ proc search (int n,int d,ideal B,int cd,ideal P,ideal sP,int i,int dif,int dB,id
         break;
       }
       // degBound=dB;
-      TEST=std(sP+ideal(test_poly));   // should soon be replaced by next line
-      // TEST=std(sP,test_poly,h);        // Hilbert driven std-calculation
+      //TEST=std(sP+ideal(test_poly));   // should soon be replaced by next line
+      TEST=std(sP,test_poly);            // or, better:
+      //TEST=std(sP,test_poly,h);        // Hilbert driven std-calculation
       test_dim=dim(TEST);
       // degBound=0;
       if (n-test_dim==j)               // the dimension has been lowered by one
@@ -2026,8 +2027,9 @@ proc p_search (int n,int d,ideal B,int cd,ideal P,ideal sP,int i,int dif,int dB,
           break;
         }
         // degBound=dB;
-        TEST=std(sP+ideal(test_poly)); // should soon to be replaced by next
+        //TEST=std(sP+ideal(test_poly)); // should soon to be replaced by next
                                        // line
+        TEST=std(sP,test_poly);        // or, better:
         // TEST=std(sP,test_poly,h);      // Hilbert driven std-calculation
         test_dim=dim(TEST);
         // degBound=0;
@@ -2528,8 +2530,7 @@ EXAMPLE: example primary_charp_no_molien; shows an example
       return();
     }
     else
-    { int v=#[1];
-    }
+    { int v=#[1]; }
   }
   else
   { int v=0;
@@ -2548,8 +2549,7 @@ EXAMPLE: example primary_charp_no_molien; shows an example
     "";
   }
   if (v && voice==2)
-  { "";
-  }
+  { ""; }
  //-------------------- initializing variables --------------------------------
   int dB;
   int j,d,cd,newdim,dif;               // d: current degree, cd: dimension of
@@ -4337,9 +4337,9 @@ EXAMPLE: example secondary_char0; shows an example
             { "  We find: "+string(pp);
             }
             if (int(dimmat[i,1])<>counter)
-            { TEST=std(TEST+ideal(NF(pp,TEST))); // should be replaced by next
+            { // TEST=std(TEST+ideal(NF(pp,TEST))); // should be replaced by next
                                                  // line soon
-            // TEST=std(TEST,NF(pp,TEST));
+              TEST=std(TEST,NF(pp,TEST));
             }
             else
             { break;
@@ -4397,9 +4397,9 @@ EXAMPLE: example secondary_char0; shows an example
               { "  We find: "+string(B[j]);
               }
               if (int(dimmat[i,1])<>counter)
-              { TEST=std(TEST+ideal(NF(B[j],TEST))); // should be replaced by
+              { //TEST=std(TEST+ideal(NF(B[j],TEST))); // should be replaced by
                                                      // next line
-              // TEST=std(TEST,NF(B[j],TEST));
+                TEST=std(TEST,NF(B[j],TEST));
               }
             }
           }
@@ -4557,9 +4557,9 @@ EXAMPLE: example secondary_charp; shows an example
             { "  We find: "+string(pp);
             }
             if (deg_dim_vec[i]<>counter)
-            { TEST=std(TEST+ideal(NF(pp,TEST))); // should be soon replaced by
+            { //TEST=std(TEST+ideal(NF(pp,TEST))); // should be soon replaced by
                                                  // next line
-            // TEST=std(TEST,NF(pp,TEST));
+              TEST=std(TEST,NF(pp,TEST));
             }
             else
             { break;
@@ -4617,9 +4617,9 @@ EXAMPLE: example secondary_charp; shows an example
               { "  We find: "+string(B[j]);
               }
               if (deg_dim_vec[i]<>counter)
-              { TEST=std(TEST+ideal(NF(B[j],TEST))); // should be soon replaced
+              { //TEST=std(TEST+ideal(NF(B[j],TEST))); // should be soon replaced
                                                      // by next line
-              // TEST=std(TEST,NF(B[j],TEST));
+                TEST=std(TEST,NF(B[j],TEST));
               }
             }
           }
@@ -4773,9 +4773,9 @@ EXAMPLE: example secondary_no_molien; shows an example
           }
           else
           { if (j<>ncols(B))
-            { TEST=std(TEST+ideal(NF(B[j],TEST))); // should soon be replaced by
+            { //TEST=std(TEST+ideal(NF(B[j],TEST))); // should soon be replaced by
                                                    // next line
-            // TEST=std(TEST,NF(B[j],TEST));
+              TEST=std(TEST,NF(B[j],TEST));
             }
           }
         }
@@ -4783,20 +4783,15 @@ EXAMPLE: example secondary_no_molien; shows an example
     }
     else
     { if (size(deg_vec)==k)
-      { k=1;
-      }
+      { k=1; }
       else
-      { k++;
-      }
+      { k++; }
     }
   }
   if (v)
-  { "";
-  }
+  { ""; }
   if (v)
-  { "  We're done!";
-    "";
-  }
+  { "  We're done!"; ""; }
   return(matrix(S));
 }
 example
@@ -4934,9 +4929,9 @@ EXAMPLE: example secondary_and_irreducibles_no_molien; shows an example
             { "  We find: "+string(pp);
             }
             if (counter<>max)
-            { TEST=std(TEST+ideal(NF(pp,TEST))); // should soon be replaced by
+            { //TEST=std(TEST+ideal(NF(pp,TEST))); // should soon be replaced by
                                                  // next line
-            // TEST=std(TEST,NF(pp,TEST));
+              TEST=std(TEST,NF(pp,TEST));
             }
             else
             { break;
@@ -4968,9 +4963,9 @@ EXAMPLE: example secondary_and_irreducibles_no_molien; shows an example
             }
             else
             { if (j<>ncols(B))
-              { TEST=std(TEST+ideal(NF(B[j],TEST))); // should soon be replaced
+              { //TEST=std(TEST+ideal(NF(B[j],TEST))); // should soon be replaced
                                                      // by next line
-              // TEST=std(TEST,NF(B[j],TEST));
+                 TEST=std(TEST,NF(B[j],TEST));
               }
             }
           }
