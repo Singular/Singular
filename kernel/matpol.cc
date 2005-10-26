@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.cc,v 1.3 2005-10-26 10:42:04 Singular Exp $ */
+/* $Id: matpol.cc,v 1.4 2005-10-26 14:52:10 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -892,12 +892,16 @@ BOOLEAN mpEqual(matrix a, matrix b)
   i=MATCOLS(a)*MATROWS(b)-1;
   while (i>=0)
   {
+#if 0
     poly tt=pSub(pCopy(a->m[i]),pCopy(b->m[i]));
     if (tt!=NULL)
     {
       pDelete(&tt);
       return FALSE;
     }
+#else
+    if(!pEqualPolys(a->m[i],b->m[i])) return FALSE;
+#endif
     i--;
   }
   return TRUE;
