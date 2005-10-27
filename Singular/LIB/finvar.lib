@@ -1,6 +1,6 @@
 // last change: 98/11/05
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: finvar.lib,v 1.38 2005-10-26 14:11:34 Singular Exp $"
+version="$Id: finvar.lib,v 1.39 2005-10-27 09:09:53 Singular Exp $"
 category="Invariant theory";
 info="
 LIBRARY:  finvar.lib    Invariant Rings of Finite Groups
@@ -70,10 +70,10 @@ LIB "algebra.lib";
 // parameters, also being matrices
 ///////////////////////////////////////////////////////////////////////////////
 proc unique (list #)
-{ for (int i=1;i<size(#);i++)
-  { if (#[i]==#[size(#)])
-    { return(0);
-    }
+{ int s=size(#); def m=#[s];
+  for (int i=1;i<s;i++)
+  { if (#[i]==m)
+    { return(0); }
   }
   return(1);
 }
