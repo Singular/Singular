@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: INSTALL_unix.texi,v 1.21 2005-05-24 16:14:22 Singular Exp $
+@comment $Id: INSTALL_unix.texi,v 1.22 2005-10-28 14:05:46 Singular Exp $
 @c FILE: INSTALL_unix.texi
 @c PURPOSE: Installation instruction for Singular on Unix
 @c
@@ -45,14 +45,14 @@ you can not find an appropriate architecture dependent archive.
 
 You can obtain these (and other) archives from
 @display
-@uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular}.
+@uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/UNIX/}.
 @end display
 
 @include register.texi
 
 @heading To install SINGULAR
 
-Make sure that you have approximately 12MByte of free disk space and follow
+Make sure that you have approximately 20 MByte of free disk space and follow
 these steps.
 @enumerate
 @item

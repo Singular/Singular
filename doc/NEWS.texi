@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.52 2005-10-20 12:39:46 Singular Exp $
+@comment $Id: NEWS.texi,v 1.53 2005-10-28 14:05:46 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -20,7 +20,7 @@
 @end macro
 @end ifset
 
-The current version @value{VERSION} is the first in the new
+The version 3-0-0 is the first in the new
 release series version 3-0. 
 
 Singular version 3 has a greater functionality and an improved architecture.
@@ -164,15 +164,23 @@ FreeBSD, MacOS X, DecAlpha-Linux, x86_64-Linux (AMD64/Opteron/EM64T),
 IA64-Linux
 @end itemize
 
-@heading Updates for version 3-0-1
+@heading Updates for version @value{VERSION}
+
+The current version @value{VERSION} is mainly a bug fix release,
+but it contains also some new features:
 @itemize @bullet
 @item
 NTL upgraded to version 5.4
 @item
-new library: absfac.lib @nref{absfac_lib}
+new library: absfact.lib @nref{absfact_lib}
 @item
 new procedures in primdec.lib: @nref{absPrimdecGTZ}
 @item
+new procedures in standard.lib: @nref{weightKB}
+@item
 build process improved: new make target @code{install_all}
 @item
+improved version of @nref{slimgb}, incorporated into @nref{groebner}
+@item
+arithmetic in Z/pZ for architecture x84_64 improved (by 25 %)
 @end itemize

@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.263 2005-10-06 17:03:09 levandov Exp $
+@comment $Id: reference.doc,v 1.264 2005-10-28 14:05:47 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -195,6 +195,7 @@ and @code{LIB} no brackets are allowed.
 * vdim::
 * wedge::
 * weight::
+* weightKB::
 * write::
 @end menu
 @c ---------------------------------------
@@ -6591,7 +6592,7 @@ See
 @ref{int}.
 @c ref
 @c ---------------------------------------
-@node weight, write, wedge, Functions
+@node weight, weightKB, wedge, Functions
 @subsection weight
 @cindex weight
 @table @code
@@ -6628,7 +6629,13 @@ See
 @ref{qhweight}.
 @c ref
 @c ---------------------------------------
-@node  write,  , weight, Functions
+@node weightKB, write, weight, Functions
+@subsection weightKB
+@cindex weightKB
+@c lib standard.lib:weightKB lib_fun lib_ex subsection
+
+@c ---------------------------------------
+@node  write,  , weightKB, Functions
 @subsection write
 @cindex write
 @table @code
