@@ -1,0 +1,85 @@
+version = "1.0";
+info = "solution to Exercise 2.4";
+// 
+proc ideal_intersect (ideal I, ideal J)
+"USAGE:   ideal_intersect(I,J);    I,J ideals 
+RETURN:  ideal
+NOTE:    Output is generating set for the intersection of I and J.
+EXAMPLE: example ideal_intersect; shows an example
+"
+{
+  int r = size(I);
+  int s = size(J);
+  if ((r==0) or (s==0)) { return(ideal(0)); }
+  module M = gen(1)+gen(2);
+  for ( int i=1;i<=r;i++ ) { M = M, I[i]*gen(1); }
+  for ( i=1;i<=s;i++ ) { M = M, J[i]*gen(2); }
+  module S = syz(M);
+  ideal result;
+  for ( i=ncols(S);i>0;i-- ) { result[i] = S[i][1]; }
+  return(simplify(result,2));      // remove zeros in result
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring R = 0, (x,y), dp;
+  ideal I = x2, y;
+  ideal J = x, y2;
+  ideal_intersect(I,J);
+}
+//
+proc ideal_quotient (ideal I, ideal J)
+"USAGE:   ideal_quotient(I,J);    I,J ideals 
+RETURN:  ideal
+NOTE:    Output is generating set for the quotient I:J.
+EXAMPLE: example ideal_quotient; shows an example
+"
+{
+  int r = size(I);
+  int s = size(J);
+  if ((r==0)) { return(ideal(0)); }
+  if ((s==0)) { return(I); }
+  vector v;
+  for ( int i=1;i<=s;i++ ) { v = v+J[i]*gen(i); }
+  module M = v;
+  for ( int j=1;j<=s;j++ ) 
+  { 
+    for ( i=1;i<=r;i++ ) { M = M, I[i]*gen(j); }
+  }
+  module S = syz(M);
+  ideal result;
+  for ( i=ncols(S);i>0;i-- ) { result[i] = S[i][1]; }
+  return(simplify(result,2));
+  return(result);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring R = 0, (x,y), dp;
+  ideal I = x2, y;
+  ideal J = x, y2;
+  ideal_quotient(I,J);
+}
+// 
+proc saturate (ideal I, ideal J)
+"USAGE:   saturate(I,J);    I,J ideals 
+RETURN:  ideal
+NOTE:    Output is generating set for the saturation of I with 
+         respect to J.
+EXAMPLE: example saturate; shows an example
+"
+{
+  ideal I_old = groebner(I);
+  ideal I_new;
+  while (1)
+  { 
+    I_new = groebner(ideal_quotient(I_old,J)); 
+    if (size(reduce(I_new,I_old))==0) { return(I_new); }
+    I_old = I_new; 
+  }
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring R = 0, (x,y), dp;
+  ideal I = x5*(x-1), y3;
+  ideal J = x, y2;
+  saturate(I,J);
+}

@@ -1,0 +1,56 @@
+version = "1.0";
+info = "solution to Exercise 3.4";
+//
+LIB "matrix.lib";
+// 
+proc ker_Mod (matrix alp, module phi,psi)
+"USAGE:   ker_Mod(alp,phi,psi);   alp matrix, phi,psi modules
+RETURN:  module
+NOTE:    The generators for the output module are the columns of a
+         presentation matrix for the kernel of the homomorphism 
+         coker(phi)->coker(psi) induced by alp.
+EXAMPLE: example ker_Mod; shows an example
+"
+{
+  module A = modulo(alp,psi);
+  module B = modulo(A,phi);
+  return(B);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring R = 0, (x,y,z), dp;
+  module phi = [y3,-xy2];
+  module psi = [0,y,0],[0,0,z];
+  module alp = [x+xy,z,0],[y+y2,xyz,z];
+  print(ker_Mod(alp,phi,psi));
+}
+
+proc Ext_Mod (int i, module phi,psi)
+"USAGE:   Ext_Mod(i,phi,psi);    i int, phi,psi modules
+RETURN:  module
+NOTE:    The generators for the output module are the columns of a 
+         presentation matrix for Ext^i(coker(phi),coker(psi)).
+EXAMPLE: example Ext_Mod; shows an example
+"
+{
+  if (i<0) {return([1]);}
+  def ResPhi = mres(phi,i+1);
+  module M1,M2;
+  M2 = ResPhi[i+1];
+  if (i==0) {M1 = 0;} else {M1 = ResPhi[i];}
+  int row = nrows(psi); 
+  module a1 = transpose( tensor( diag(1,row), M1 ) );
+  module a2 = transpose( tensor( diag(1,row), M2 ) );
+  module b1 = tensor( psi, diag(1,ncols(M1)) );
+  module b2 = tensor( psi, diag(1,ncols(M2)) );
+  module A = modulo(a2,b2);
+  module B = modulo(A,a1+b1);
+  return(B);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring R = 0, (x,y,z), dp;
+  module phi,psi = [x2-y3],[x2-y5];
+  print(Ext_Mod(0,phi,psi));
+  print(Ext_Mod(1,phi,psi));
+}
