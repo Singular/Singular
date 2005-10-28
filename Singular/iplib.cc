@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.119 2005-10-25 17:14:12 Singular Exp $ */
+/* $Id: iplib.cc,v 1.120 2005-10-28 14:56:12 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -306,6 +306,9 @@ BOOLEAN iiPStart(idhdl pn, sleftv  * v)
         iiGetLibProcBuffer(pi);
         if (pi->data.s.body==NULL) return TRUE;
       }
+//      omUpdateInfo();
+//      int m=om_Info.UsedBytes;
+//      Print("proc %s, mem=%d\n",IDID(pn),m);
       newBuffer( omStrDup(pi->data.s.body), BT_proc,
                  pi, pi->data.s.body_lineno-(v!=NULL) );
     }
@@ -353,6 +356,9 @@ BOOLEAN iiPStart(idhdl pn, sleftv  * v)
   si_echo=old_echo;
   if (pi!=NULL)
     pi->trace_flag=save_flags;
+//  omUpdateInfo();
+//  int m=om_Info.UsedBytes;
+//  Print("exit %s, mem=%d\n",IDID(pn),m);
   return err;
 }
 
