@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: standard.lib,v 1.74 2005-10-20 13:13:53 Singular Exp $";
+version="$Id: standard.lib,v 1.75 2005-10-28 13:22:28 Singular Exp $";
 category="Miscellaneous";
 info="
 LIBRARY: standard.lib   Procedures which are always loaded at Start-up
@@ -13,6 +13,7 @@ PROCEDURES:
  sprintf(fmt,...)       returns fomatted string
  fprintf(link,fmt,..)   writes formatted string to link
  printf(fmt,...)        displays formatted string
+ weightKB(stc,dd,vl)    degree dd part of a kbase wrt. some weigths
 ";
 
 //////////////////////////////////////////////////////////////////////////////
@@ -1108,3 +1109,187 @@ proc minres(list #)
 
 }
 */
+///////////////////////////////////////////////////////////////////////////////
+
+proc weightKB(def stc, int dd, list wim)
+"USAGE:   weightKB(stc,dd,wim);
+          stc ideal/module (standard basis),
+          dd int (degree of the result),
+          wim list of intvec (weights of the degree):
+            wim[1] for all variables (>0),
+            wim[2] only for module for the generators.
+RETURN:  same type as stc
+         (the terms of the kbase w.r.t. stc with
+          weighted degree equals dd)
+EXAMPLE: example weightKB; shows an example
+"
+{
+  if(checkww(wim)){ERROR("wrong weights";);}
+  kbclass();
+  wwtop=wim[1];
+  stc=interred(lead(stc));
+  if(typeof(stc)=="ideal")
+  {
+    stdtop=stc;
+    ideal out=widkbase(dd);
+    delkbclass();
+    return(out);
+  }
+  list mbase=kbprepare(stc);
+  module mout;
+  int im,ii;
+  if(size(wim)>1){mmtop=wim[2];}
+  else{mmtop=0;}
+  for(im=size(mbase);im>0;im--)
+  {
+    stdtop=mbase[im];
+    if(im>size(mmtop)){ii=dd;}
+    else{ii=dd-mmtop[im];}
+    mout=mout+widkbase(ii)*gen(im);
+  }
+  delkbclass();
+  return(mout);
+}
+///////////////////////////////////////////////////////////////////////////////
+// construct global values
+static proc kbclass()
+{
+  intvec wwtop,mmtop;
+  export (wwtop,mmtop);
+  ideal stdtop,kbtop;
+  export (stdtop,kbtop);
+  return();
+}
+// delete global values
+static proc delkbclass()
+{
+  kill wwtop,mmtop;
+  kill stdtop,kbtop;
+  return();
+}
+//  select parts of the modul
+static proc kbprepare(module mstc)
+{
+  list rr;
+  ideal kk;
+  int i1,i2;
+  mstc=transpose(mstc);
+  for(i1=ncols(mstc);i1>0;i1--)
+  {
+    kk=0;
+    for(i2=nrows(mstc[i1]);i2>0;i2--)
+    {
+      kk=kk+mstc[i1][i2];
+    }
+    rr[i1]=kk;
+  }
+  return(rr);
+}
+//  check for weights
+static proc checkww(list vv)
+{
+  if(typeof(vv[1])!="intvec"){return(1);}
+  intvec ww=vv[1];
+  int mv=nvars(basering);
+  if(size(ww)<mv){return(1);}
+  while(mv>0)
+  {
+    if(ww[mv]<=0){return(1);}
+    mv--;
+  }
+  if(size(vv)>1)
+  {
+    if(typeof(vv[2])!="intvec"){return(1);}
+  }
+  return(0);
+}
+// The "Caller" for ideals
+//    dd   - the degree of the result
+static proc widkbase(int dd)
+{
+  if((size(stdtop)==1)&&(deg(stdtop[1])==0)){return(0);}
+  if(dd<=0)
+  {
+    if(dd<0){return(0);}
+    else{return(1);}
+  }
+  int m1,m2;
+  m1=nvars(basering);
+  while(wwtop[m1]>dd)
+  {
+    m1--;
+    if(m1==0){return(0);}
+  }
+  attrib(stdtop,"isSB",1);
+  poly mo=1;
+  if(m1==1)
+  {
+    m2=dd/wwtop[1];
+    if((m2*wwtop[1])==dd)
+    {
+      mo=var(1)^m2;
+      if(reduce(mo,stdtop)==mo){return(mo);}
+      else{return(0);}
+    }
+  }
+  kbtop=0;
+  m2=dd;
+  weightmon(m1-1,m2,mo);
+  while(m2>=wwtop[m1])
+  {
+    m2=m2-wwtop[m1];
+    mo=mo*var(m1);
+    if(m2==0)
+    {
+      if(reduce(mo,stdtop)==mo)
+      {
+        kbtop=kbtop+mo;
+        return(kbtop);
+      }
+    }
+    weightmon(m1-1,m2,mo);
+  }
+  return(kbtop);
+}
+// the recursive prozedur
+//    va     - number of the variable
+//    drest  - rest of the degree
+//    mm     - the candidate
+static proc weightmon(int va, int drest, poly mm)
+{
+  while(wwtop[va]>drest)
+  {
+    va--;
+    if(va==0){return();}
+  }
+  int m2;
+  if(va==1)
+  {
+    m2=drest/wwtop[1];
+    if((m2*wwtop[1])==drest)
+    {
+      mm=mm*var(1)^m2;
+      if(reduce(mm,stdtop)==mm){kbtop=kbtop+mm;}
+    }
+    return();
+  }
+  m2=drest;
+  weightmon(va-1,m2,mm);
+  while(m2>=wwtop[va])
+  {
+    m2=m2-wwtop[va];
+    mm=mm*var(va);
+    if(m2==0)
+    {
+      if(reduce(mm,stdtop)==mm)
+      {
+        kbtop=kbtop+mm;
+        return();
+      }
+    }
+    weightmon(va-1,m2,mm);
+  }
+  return();
+}
+///////////////////////////////////////////////////////////////////////////////
+
