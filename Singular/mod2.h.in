@@ -5,7 +5,7 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id: mod2.h.in,v 1.113 2005-08-18 14:47:04 Singular Exp $
+ *  Version: $Id: mod2.h.in,v 1.114 2005-10-31 17:23:23 Singular Exp $
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H
@@ -237,17 +237,6 @@
 #define BIT_SIZEOF_LONG CHAR_BIT*SIZEOF_LONG
 
 #define SINGULAR_VERSION (SINGULAR_MAJOR_VERSION*1000 + SINGULAR_MINOR_VERSION*100 + SINGULAR_SUB_VERSION)
-
-#if SIZEOF_EXPONENT == 1
-#define MAX_EXPONENT 0x7f
-#define MAX_COMPONENT 0xff
-#elif SIZEOF_EXPONENT == 2
-#define MAX_EXPONENT 0x7fff
-#define MAX_COMPONENT 0xffff
-#else /* SIZEOF_EXPONENT == 4 */
-#define MAX_EXPONENT 0x7fffffff
-#define MAX_COMPONENT 0xffffffff
-#endif
 
 /*******************************************************************
  * Miscellanous Defines
