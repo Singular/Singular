@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipprint.cc,v 1.25 2005-10-31 14:04:54 Singular Exp $ */
+/* $Id: ipprint.cc,v 1.26 2005-10-31 17:40:00 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: printing
 */
@@ -259,10 +259,10 @@ BOOLEAN jjPRINT(leftv res, leftv u)
 */
 BOOLEAN jjDBPRINT(leftv res, leftv u)
 {
-  int print=(printlevel>myynest);
+  BOOLEAN print=(printlevel>myynest);
   if ((u->next!=NULL)&&(u->Typ()==INT_CMD))
   {
-    print=  (((long)(u->Data()))>0L);
+    print=  (((int)((long)(u->Data()))) > 0);
     u=u->next;
   }
   if (print)
