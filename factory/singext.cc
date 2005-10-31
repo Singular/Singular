@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: singext.cc,v 1.3 1999-06-15 08:34:18 Singular Exp $ */
+/* $Id: singext.cc,v 1.4 2005-10-31 09:38:46 Singular Exp $ */
 
 #include <config.h>
 
@@ -56,7 +56,7 @@ gmp_denominator ( const CanonicalForm & f )
 int gf_value (const CanonicalForm & f )
 {
     InternalCF * ff = f.getval();
-    return ((int)ff) >>2; 
+    return ((long)ff) >>2; 
 }
 
 CanonicalForm
