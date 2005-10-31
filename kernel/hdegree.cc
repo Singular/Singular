@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hdegree.cc,v 1.5 2005-04-26 17:15:21 Singular Exp $ */
+/* $Id: hdegree.cc,v 1.6 2005-10-31 17:35:36 Singular Exp $ */
 /*
 *  ABSTRACT -  dimension, multiplicity, HC, kbase
 */
@@ -1057,7 +1057,7 @@ static int scRestrict( int &Nstc, scfmon stc, int Nvar)
   int x, y;
   int i, j, Istc = Nstc;
 
-  y = MAX_EXPONENT;
+  y = INT_MAX;
   for (i=Nstc-1; i>=0; i--)
   {
     j = Nvar-1;

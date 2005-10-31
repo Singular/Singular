@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: pcv.cc,v 1.1.1.1 2003-10-06 12:16:01 Singular Exp $ */
+/* $Id: pcv.cc,v 1.2 2005-10-31 17:35:36 Singular Exp $ */
 /*
 * ABSTRACT: conversion between polys and coef vectors
 */
@@ -212,7 +212,8 @@ int pcvM2N(poly m)
   {
     d+=pGetExp(m,i+1);
     dn=pcvIndex[i][d];
-    if(dn>MAX_COMPONENT-n)
+    if(dn>INT_MAX-n) // we do not know the max. comp. number here, but
+		     // it is INT_MAX or larger
     {
       i=pVariables;
       WerrorS("component overflow");
