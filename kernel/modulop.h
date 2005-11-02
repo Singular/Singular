@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.h,v 1.1.1.1 2003-10-06 12:15:58 Singular Exp $ */
+/* $Id: modulop.h,v 1.2 2005-11-02 08:39:36 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
@@ -89,7 +89,7 @@ static inline number npMultM(number a, number b)
 #else
 static inline number npMultM(number a, number b)
 {
-  int x = npLogTable[(long)a]+npLogTable[(long)b];
+  long x = (long)npLogTable[(long)a]+npLogTable[(long)b];
   return (number)npExpTable[x<npPminus1M ? x : x-npPminus1M];
 }
 #endif
@@ -122,21 +122,29 @@ static inline number npAddM(number a, number b)
 }
 static inline number npSubM(number a, number b)
 {
-  return (number)((int)a<(int)b ?
-                       npPrimeM-(int)b+(int)a : (int)a-(int)b);
+  return (number)((long)a<(long)b ?
+                       npPrimeM-(long)b+(long)a : (long)a-(long)b);
 }
 #else
 static inline number npAddM(number a, number b)
 {
-   int res = (int)((long)a + (long)b);
+   long res = ((long)a + (long)b);
    res -= npPrimeM;
+#if SIZEOF_LONG == 8
+   res += (res >> 63) & npPrimeM;
+#else
    res += (res >> 31) & npPrimeM;
+#endif
    return (number)res;
 }
 static inline number npSubM(number a, number b)
 {
-   int res = (int)((long)a - (long)b);
+   long res = ((long)a - (long)b);
+#if SIZEOF_LONG == 8
+   res += (res >> 63) & npPrimeM;
+#else
    res += (res >> 31) & npPrimeM;
+#endif
    return (number)res;
 }
 #endif
