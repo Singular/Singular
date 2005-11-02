@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.12 2005-11-02 07:35:57 Singular Exp $ */
+/* $Id: structs.h,v 1.13 2005-11-02 08:43:28 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -543,6 +543,9 @@ struct sideal_list
 {
   ideal_list next;
   ideal      d;
+#ifndef NDEBUG
+  int nr;
+#endif
 };
 #endif /* __cplusplus */
 

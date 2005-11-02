@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.5 2005-10-19 16:12:39 Singular Exp $ */
+/* $Id: kutil.h,v 1.6 2005-11-02 08:43:57 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -141,6 +141,11 @@ public:
 #endif
 };
 
+#ifndef NDEBUG
+extern int strat_nr;
+extern int strat_fac_debug;
+#endif
+
 class sLObject : public sTObject
 {
 
@@ -276,6 +281,9 @@ public:
   ring tailRing;
   omBin lmBin;
   omBin tailBin;
+#ifndef NDEBUG
+  int nr;
+#endif
   int cp,c3;
   int sl,mu;
   int tl,tmax;

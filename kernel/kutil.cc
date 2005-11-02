@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.10 2005-10-17 13:41:45 Singular Exp $ */
+/* $Id: kutil.cc,v 1.11 2005-11-02 08:44:46 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -4429,6 +4429,11 @@ void kStratInitChangeTailRing(kStrategy strat)
 skStrategy::skStrategy()
 {
   memset(this, 0, sizeof(skStrategy));
+#ifndef NDEBUG
+  strat_nr++;
+  nr=strat_nr;
+  if (strat_fac_debug) Print("s(%d) created\n",nr);
+#endif
   tailRing = currRing;
   P.tailRing = currRing;
   tl = -1;
