@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.11 2005-10-27 17:14:45 hannes Exp $ */
+/* $Id: structs.h,v 1.12 2005-11-02 07:35:57 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -25,10 +25,19 @@ typedef void * Sy_reference;
 
 
 #if defined(i386) || defined(x86_64_Linux)
-// seems to be better on i386 and x86_64 processors
+// the following settings seems to be better on i386 and x86_64 processors
 // define if a*b is with mod instead of tables
 #define HAVE_MULT_MOD
 // #define HAVE_GENERIC_ADD
+// #ifdef HAVE_MULT_MOD
+// #define HAVE_DIV_MOD
+// #endif
+#endif
+
+#ifdef IA64_Linux
+// the following settings seems to be better on itanium processors
+// #define HAVE_MULT_MOD
+#define HAVE_GENERIC_ADD
 // #ifdef HAVE_MULT_MOD
 // #define HAVE_DIV_MOD
 // #endif
