@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.53 2005-10-28 14:05:46 Singular Exp $
+@comment $Id: NEWS.texi,v 1.54 2005-11-04 18:42:04 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -19,6 +19,29 @@
 @ref{\what\}
 @end macro
 @end ifset
+
+@heading Updates for version @value{VERSION}
+
+The current version @value{VERSION} is mainly a bug fix release,
+but it contains also some new features:
+@itemize @bullet
+@item
+NTL upgraded to version 5.4
+@item
+new library: absfact.lib @nref{absfact_lib}
+@item
+new procedures in primdec.lib: @nref{absPrimdecGTZ}
+@item
+new procedures in standard.lib: @nref{weightKB}
+@item
+build process improved: new make target @code{install_all}
+@item
+improved version of @nref{slimgb}, incorporated into @nref{groebner}
+@item
+arithmetic in Z/pZ for architecture x84_64 improved (by 25 %)
+@end itemize
+
+@heading NEWS in version 3-0-0
 
 The version 3-0-0 is the first in the new
 release series version 3-0. 
@@ -164,23 +187,3 @@ FreeBSD, MacOS X, DecAlpha-Linux, x86_64-Linux (AMD64/Opteron/EM64T),
 IA64-Linux
 @end itemize
 
-@heading Updates for version @value{VERSION}
-
-The current version @value{VERSION} is mainly a bug fix release,
-but it contains also some new features:
-@itemize @bullet
-@item
-NTL upgraded to version 5.4
-@item
-new library: absfact.lib @nref{absfact_lib}
-@item
-new procedures in primdec.lib: @nref{absPrimdecGTZ}
-@item
-new procedures in standard.lib: @nref{weightKB}
-@item
-build process improved: new make target @code{install_all}
-@item
-improved version of @nref{slimgb}, incorporated into @nref{groebner}
-@item
-arithmetic in Z/pZ for architecture x84_64 improved (by 25 %)
-@end itemize
