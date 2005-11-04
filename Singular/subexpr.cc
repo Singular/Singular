@@ -4,7 +4,7 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id: subexpr.cc,v 1.91 2005-07-27 15:47:58 Singular Exp $ */
+/* $Id: subexpr.cc,v 1.92 2005-11-04 08:48:34 Singular Exp $ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -908,9 +908,11 @@ int  sleftv::Typ()
       else             l=(lists)data;
       if ((0<e->start)&&(e->start<=l->nr+1))
       {
+        Subexpr tmp=l->m[e->start-1].e;
         l->m[e->start-1].e=e->next;
         r=l->m[e->start-1].Typ();
-        l->m[e->start-1].e=NULL;
+        e->next=l->m[e->start-1].e;
+        l->m[e->start-1].e=tmp;
       }
       else
       {
@@ -1154,9 +1156,11 @@ void * sleftv::Data()
         }
         else
         {
+          Subexpr tmp=l->m[index-1].e;
           l->m[index-1].e=e->next;
           r=(char *)l->m[index-1].Data();
-          l->m[index-1].e=NULL;
+          e->next=l->m[index-1].e;
+          l->m[index-1].e=tmp;
         }
       }
       else //if (!errorreported)
