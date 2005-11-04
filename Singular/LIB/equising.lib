@@ -1,4 +1,4 @@
-version="$Id: equising.lib,v 1.12 2005-05-06 14:38:17 hannes Exp $";
+version="$Id: equising.lib,v 1.13 2005-11-04 14:01:18 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  equising.lib  Equisingularity Stratum of a Family of Plane Curves
@@ -1774,7 +1774,7 @@ EXAMPLE: example esIdeal; shows examples.
     poly g;
     ideal ES_Id,ES_Id_all_triv;
 
-    poly p_Ftriv=p_F
+    poly p_Ftriv=p_F;
 
     p_F=reduce(p_F,std(ES));
     p_Ftriv=reduce(p_Ftriv,std(ES_all_triv));
