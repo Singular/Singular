@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: standard.lib,v 1.75 2005-10-28 13:22:28 Singular Exp $";
+version="$Id: standard.lib,v 1.76 2005-11-04 14:23:10 Singular Exp $";
 category="Miscellaneous";
 info="
 LIBRARY: standard.lib   Procedures which are always loaded at Start-up
@@ -250,10 +250,15 @@ EXAMPLE: example groebner;  shows an example"
     return(std(i));
   }
 
-  //if ordering is global, there are parameters and minpoly is 0
-  if (((npars(basering)>0) &&(minpoly==0)) &&(typeof(basering)=="ring"))
-  { return(slimgb(i)); }
-
+  if (typeof(basering)=="ring") // slimgb does not know qrings
+  {
+     //if ordering is global, there are parameters and minpoly is 0
+     if (((npars(basering)>0) &&(minpoly==0)))
+     { return(slimgb(i)); }
+     // oerdering dp, char 0
+     if((char(P)==0) && (system("nblocks") <= 2) && (find(ordstr_P,"dp")>0))
+     { return(slimgb(i)); }
+  }
   // for module case, not already hadled by slimgb:
   if (nrows(i)>1)
   { return(std(i)); }
