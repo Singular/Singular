@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.230 2005-10-05 07:23:21 wienand Exp $ */
+/* $Id: extra.cc,v 1.231 2005-11-04 08:45:01 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -2478,6 +2478,18 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     if(strcmp(sys_cmd,"gmsnf")==0)
     {
       return gmsNF(res,h);
+    }
+    else
+#endif
+/*==================== facstd_debug ==================================*/
+#if !defined(NDEBUG)
+    if(strcmp(sys_cmd,"facstd")==0)
+    {
+      extern int strat_nr;
+      extern int strat_fac_debug;
+      strat_fac_debug=(int)h->Data(); 
+      strat_nr=0;
+      return FALSE;
     }
     else
 #endif

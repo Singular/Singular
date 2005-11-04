@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstdfac.cc,v 1.4 2005-11-02 08:43:57 Singular Exp $ */
+/* $Id: kstdfac.cc,v 1.5 2005-11-04 08:44:00 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
@@ -408,12 +408,16 @@ static void completeReduceFac (kStrategy strat, ideal_list FL)
       if(strat_fac_debug)
       {
         int ii;
-        Print("s(%d), set S\n",n->nr);
+        Print("---------------------------------------------------------------\ns(%d), set S\n",n->nr);
         for(ii=0;ii<n->sl;ii++)
-        { Print("s(%d->S[%d]= ",n->nr,ii);pWrite(n->S[i]);}
+        { Print("s(%d->S[%d]= ",n->nr,ii);pWrite(n->S[ii]);}
         Print("s(%d), set D\n",n->nr);
-        for(ii=0;ii<IDELEMS(n->D);ii++)
-        { Print("s(%d->D[%d]= ",n->nr,ii);pWrite(n->D->m[i]);}
+        if (n->D!=NULL)
+        {
+          for(ii=0;ii<IDELEMS(n->D);ii++)
+          { Print("s(%d->D[%d]= ",n->nr,ii);pWrite(n->D->m[ii]);}
+        }
+        else PrintS(" empty\n");
       }
 #endif
 
@@ -720,12 +724,16 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, ideal_list FL)
         if(strat_fac_debug)
         {
           int ii;
-          Print("s(%d), set S\n",n->nr);
+          Print("-------------------------------------------------------------\ns(%d), set S\n",n->nr);
           for(ii=0;ii<n->sl;ii++)
-          { Print("s(%d->S[%d]= ",n->nr,ii);pWrite(n->S[i]);}
+          { Print("s(%d->S[%d]= ",n->nr,ii);pWrite(n->S[ii]);}
           Print("s(%d), set D\n",n->nr);
-          for(ii=0;ii<IDELEMS(n->D);ii++)
-          { Print("s(%d->D[%d]= ",n->nr,ii);pWrite(n->D->m[i]);}
+          if (n->D!=NULL)
+          {
+            for(ii=0;ii<IDELEMS(n->D);ii++)
+            { Print("s(%d->D[%d]= ",n->nr,ii);pWrite(n->D->m[ii]);}
+          }
+          else PrintS(" empty\n");
         }
 #endif
 
