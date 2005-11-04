@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.9 2005-10-17 13:35:58 Singular Exp $
+// $Id: clapsing.cc,v 1.10 2005-11-04 08:44:25 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -663,7 +663,7 @@ static int primepower(int c)
 }
 
 int singclap_factorize_retry;
-extern int si_factor_reminder;
+//extern int si_factor_reminder;
 
 ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
 {
@@ -893,52 +893,72 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
       poly n_f_m=pMult_nn(pCopy(f),n_T);
       T_F_conv=pMult_nn(T_F_conv,n_f);
       T_F_conv=pSub(T_F_conv,n_f_m);
-      if ((T_F_conv!=NULL) && (singclap_factorize_retry<1))
+      if (T_F_conv!=NULL)
       {
-        singclap_factorize_retry++;
-        if( si_factor_reminder) Print("problem with factorize, retrying\n");
-      #ifdef FEHLER_FACTORIZE
-        Print("Problem....:");pWrite(f);
-        J=L;
-        for ( ; J.hasItem(); J++ )
+        if (singclap_factorize_retry<3)
         {
+          singclap_factorize_retry++;
+          //if( si_factor_reminder) Print("problem with factorize, retrying\n");
+        #ifdef FEHLER_FACTORIZE
+          Print("Problem....:");pWrite(f);
+          J=L;
+          for ( ; J.hasItem(); J++ )
+          {
+            if (rField_is_Zp() || rField_is_Q())           /* Q, Fp */
+              pWrite0( convClapPSingP( J.getItem().factor() ));
+            else if (rField_is_Extension())     /* Q(a), Fp(a) */
+            {
+              if (currRing->minpoly==NULL)
+                pWrite0( convClapPSingTrP( J.getItem().factor() ));
+              else
+                pWrite0( convClapAPSingAP( J.getItem().factor() ));
+            }
+            Print(" exp: %d\n", J.getItem().exp());
+          }
+          Print("mult:");
           if (rField_is_Zp() || rField_is_Q())           /* Q, Fp */
-            pWrite0( convClapPSingP( J.getItem().factor() ));
+            pWrite( convClapPSingP( T ));
           else if (rField_is_Extension())     /* Q(a), Fp(a) */
           {
             if (currRing->minpoly==NULL)
-              pWrite0( convClapPSingTrP( J.getItem().factor() ));
+              pWrite( convClapPSingTrP( T ));
             else
-              pWrite0( convClapAPSingAP( J.getItem().factor() ));
+              pWrite( convClapAPSingAP( T ));
           }
-          Print(" exp: %d\n", J.getItem().exp());
+          Print("diff: sing:"); pWrite(T_F_conv);
+          Print("diff: factory:");
+          if (rField_is_Zp() || rField_is_Q())           /* Q, Fp */
+            pWrite( convClapPSingP( T_F ));
+          else if (rField_is_Extension())     /* Q(a), Fp(a) */
+          {
+            if (currRing->minpoly==NULL)
+              pWrite( convClapPSingTrP( T_F ));
+            else
+              pWrite( convClapAPSingAP( T_F ));
+          }
+        #endif
+          ideal T_i=singclap_factorize ( f, v , with_exps);
+          if (N!=NULL) nDelete(&N);
+          pDelete(&T_F_conv);
+          return T_i;
         }
-        Print("mult:");
-        if (rField_is_Zp() || rField_is_Q())           /* Q, Fp */
-          pWrite( convClapPSingP( T ));
-        else if (rField_is_Extension())     /* Q(a), Fp(a) */
+        else
         {
-          if (currRing->minpoly==NULL)
-            pWrite( convClapPSingTrP( T ));
-          else
-            pWrite( convClapAPSingAP( T ));
+          singclap_factorize_retry=0;
+          WarnS("problem with factorize: irreducibility assumed");
+          ideal T_i=idInit(2,1);
+          T_i->m[0]=pOne();
+          T_i->m[1]=pCopy(f);
+          if (N!=NULL) nDelete(&N);
+          pDelete(&T_F_conv);
+          if (with_exps!=1)
+          {
+            (*v)=new intvec(2);
+            (**v)[0]=1;
+            (**v)[1]=1;
+          }
+          return T_i;
         }
-        Print("diff: sing:"); pWrite(T_F_conv);
-        Print("diff: factory:");
-        if (rField_is_Zp() || rField_is_Q())           /* Q, Fp */
-          pWrite( convClapPSingP( T_F ));
-        else if (rField_is_Extension())     /* Q(a), Fp(a) */
-        {
-          if (currRing->minpoly==NULL)
-            pWrite( convClapPSingTrP( T_F ));
-          else
-            pWrite( convClapAPSingAP( T_F ));
-        }
-      #endif
-        ideal T_i=singclap_factorize ( f, v , with_exps);
-        if (N!=NULL) nDelete(&N);
-        pDelete(&T_F_conv);
-        return T_i;
       }
     }
     J=L;
