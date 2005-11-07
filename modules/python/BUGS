@@ -3,11 +3,12 @@ which might affect you (I am heavily working on it):
 
 - pass only matrices with number type polynomial back to Singular
 
-- a Ring change with r.set() doesn't work properly at the moment, so don't do it
-
 - LIB loading is equivalent to LIB("dgsjkgjs") and not LIB "djksdgsjkdjks"
  the former fails generally in Singular, so load your libs, before you go to python
 
 - Although it would be quite analogous, there exists currently no possibility of accessing local Singular variables
 
 - don't use polynomial(<string>) this is only in for testing purposes and does only work for monomials
+
+Fixed bugs
+- 7.11 a Ring change with r.set() doesn't work properly at the moment, so don't do it

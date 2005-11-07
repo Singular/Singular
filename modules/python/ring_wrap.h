@@ -1,7 +1,10 @@
-//$Id: ring_wrap.h,v 1.5 2005-09-21 07:12:48 bricken Exp $
+//$Id: ring_wrap.h,v 1.6 2005-11-07 08:39:16 bricken Exp $
 #ifndef RING_WRAP_HEADER
 #define RING_WRAP_HEADER
 #include "ring.h"
+#include "grammar.h"
+#include "subexpr.h"
+#include "ipid.h"
 class Ring{
   public:
     ring pimpl;
@@ -17,7 +20,17 @@ class Ring{
         --(pimpl->ref);
     }
     void set(){
+      //FIXME: only a hack, no solution
+      char name_buffer[100];
+      static int ending=0;
+      ending++;
+      sprintf(name_buffer, "PYTHON_RING_VAR%d",ending);
+      idhdl shadow_hdl=enterid(name_buffer,0,RING_CMD,&IDROOT);
+      pimpl->ref++;
+      shadow_hdl->data.uring=pimpl;
       rChangeCurrRing(pimpl);
+      currRingHdl=shadow_hdl;
+      
     }
 };
 void export_ring();
