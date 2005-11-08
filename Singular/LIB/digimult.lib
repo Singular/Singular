@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: digimult.lib,v 1.3 2005-05-11 11:40:37 bricken Exp $";
+version="$Id: digimult.lib,v 1.4 2005-11-08 07:07:16 bricken Exp $";
 category="Logic";
 info="
 LIBRARY: digimult.lib   Satisfiability of prop. logical expressions
@@ -170,7 +170,7 @@ static proc simple_gps(ideal i, list var_order, int step){
   if (simple_gps(j0,var_order,step)==1){
     return(1);
   } else{
-    j0=subst(j,v,0);
+    j0=subst(j,v,1);
     j0=simplify(j0,2);
     j0=simplify(j0,8);
     return(simple_gps(j0,var_order, step));
