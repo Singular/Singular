@@ -3,7 +3,7 @@
  *  Purpose: declarations for dlmalloc
  *  This was obtained by taking cutting out the beginning of malloc.c
  *
- *  Version: $Id: dlmalloc.h,v 1.9 2001-05-15 12:19:38 Singular Exp $
+ *  Version: $Id: dlmalloc.h,v 1.10 2005-11-08 13:53:37 bricken Exp $
  *******************************************************************/
 #ifndef DL_MALLOC_H
 #define DL_MALLOC_H
@@ -847,7 +847,11 @@ Void_t *(*__morecore)() = __default_morecore_init;
 #else /* INTERNAL_LINUX_C_LIB */
 
 #if __STD_C
-extern Void_t*     sbrk(ptrdiff_t);
+  #ifndef __MACH__ 
+    extern Void_t*     sbrk(ptrdiff_t);
+  #else 
+    extern void    *sbrk(int);
+  #endif
 #else
 extern Void_t*     sbrk();
 #endif
