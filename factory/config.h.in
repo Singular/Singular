@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C -*- */
-/* $Id: config.h.in,v 1.11 2002-07-30 15:21:48 Singular Exp $ */
+/* $Id: config.h.in,v 1.12 2005-11-08 18:08:58 Singular Exp $ */
 
 #ifndef INCL_CONFIG_H
 #define INCL_CONFIG_H
@@ -74,13 +74,7 @@
 #undef DEBUGOUTPUT
 
 /* define type of your compilers 64 bit integer type */
-#ifdef __MWERKS__
-struct Int_64;
-typedef struct Int_64 _Int_64;
-typedef _Int_64* INT64;
-#else
 #define INT64 long long int
-#endif
 
 #undef HAVE_NTL
 

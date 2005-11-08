@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: imm.h,v 1.19 2005-10-18 13:16:15 Singular Exp $ */
+/* $Id: imm.h,v 1.20 2005-11-08 18:08:58 Singular Exp $ */
 
 #ifndef INCL_IMM_H
 #define INCL_IMM_H
@@ -26,7 +26,6 @@ const int GFMARK = 3;
 
 const int MINIMMEDIATE = -268435454; // -2^28-2
 const int MAXIMMEDIATE = 268435454;  // 2^28-2
-#ifndef __MWERKS__
 #if defined(WINNT) && ! defined(__GNUC__)
 const INT64 MINIMMEDIATELL = -268435454i64;
 const INT64 MAXIMMEDIATELL = 268435454i64;
@@ -34,7 +33,6 @@ const INT64 MAXIMMEDIATELL = 268435454i64;
 const INT64 MINIMMEDIATELL = -268435454LL;
 const INT64 MAXIMMEDIATELL = 268435454LL;
 #endif
-#endif /* __MWERKS__ */
 
 //{{{ conversion functions
 #ifdef HAS_ARITHMETIC_SHIFT
@@ -279,9 +277,6 @@ inline InternalCF * imm_sub_gf ( const InternalCF * const lhs, const InternalCF 
     return int2imm_gf( gf_sub( imm2int( lhs ), imm2int( rhs ) ) );
 }
 
-#ifdef __MWERKS__
-InternalCF * imm_mul ( InternalCF * lhs, InternalCF * rhs );
-#else
 inline InternalCF *
 imm_mul ( InternalCF * lhs, InternalCF * rhs )
 {
@@ -293,7 +288,6 @@ imm_mul ( InternalCF * lhs, InternalCF * rhs )
     else
         return int2imm( (int)result );
 }
-#endif /* ! __MWERKS__ */
 
 inline InternalCF * imm_mul_p ( const InternalCF * const lhs, const InternalCF * const rhs )
 {

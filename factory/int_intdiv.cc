@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_intdiv.cc,v 1.6 1998-07-07 16:34:35 schmidt Exp $ */
+/* $Id: int_intdiv.cc,v 1.7 2005-11-08 18:08:58 Singular Exp $ */
 
 //{{{ docu
 //
@@ -226,12 +226,7 @@ InternalInteger::modulocoeff ( InternalCF * c, bool invert )
     } else {
 	MP_INT dummy;
 	mpz_init( &dummy );
-#ifdef __MWERKS__
-	mpz_mod_ui( &dummy, &thempi, tabs( intC ) );
-	InternalCF * result = int2imm( mpz_get_ui( &dummy ) );
-#else
 	InternalCF * result = int2imm( mpz_mod_ui( &dummy, &thempi, tabs( intC ) ) );
-#endif
 	mpz_clear( &dummy );
 	if ( deleteObject() ) delete this;
 	return result;

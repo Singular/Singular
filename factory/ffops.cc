@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ffops.cc,v 1.9 2000-08-04 11:10:15 obachman Exp $ */
+/* $Id: ffops.cc,v 1.10 2005-11-08 18:08:58 Singular Exp $ */
 
 #include <config.h>
 
@@ -14,31 +14,6 @@ int ff_prime = 0;
 int ff_halfprime = 0;
 bool ff_big = false;
 short * ff_invtab = new short [32767];
-
-#ifdef __MWERKS__
-#include <stuff_64.h>
-int ff_mul( const int a, const int b )
-{
-  Int_64 c;
-  unsigned int ua, ub;
-  int res;
-  
-  if ((!a) || (!b)) return 0;
-  if (a>0)
-    ua = a;
-  else
-    ua = -a;
-  if (b>0)
-    ub = b;
-  else
-    ub = -b;
-  mul_64(&c, ua, ub);
-  res = rem_64(&c, ff_prime);
-  if ((a>0) != (b>0))
-    res = ff_prime-res;
-  return res;
-}
-#endif
 
 void ff_setprime ( const int p )
 {

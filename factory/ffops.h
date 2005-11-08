@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ffops.h,v 1.8 2005-11-08 16:03:18 Singular Exp $ */
+/* $Id: ffops.h,v 1.9 2005-11-08 18:08:58 Singular Exp $ */
 
 #ifndef INCL_FFOPS_H
 #define INCL_FFOPS_H
@@ -43,7 +43,6 @@ inline int ff_longnorm ( const long a )
 	return n;
 }
 
-#ifndef __MWERKS__
 inline int ff_bignorm ( const INT64 a )
 {
     int n = (int)(a % (INT64)ff_prime);
@@ -52,34 +51,42 @@ inline int ff_bignorm ( const INT64 a )
     else
 	return n;
 }
-#endif
 
 inline int ff_add ( const int a, const int b )
 {
     //return ff_norm( a + b );
+#ifdef i386
+    int r=( a + b );
+    r -= ff_prime;
+    r += (r >> 31) & ff_prime; 
+    return r;
+#else
     int r=( a + b );
     if (r >= ff_prime) r -= ff_prime;
     return r;
+#endif
 }
 
 inline int ff_sub ( const int a, const int b )
 {
     //return ff_norm( a - b );
+#ifdef i386
+    int r=( a - b );
+    r += (r >> 31) & ff_prime; 
+    return r;
+#else
     int r=( a - b );
     if (r <0) r += ff_prime;
     return r;
+#endif
 }
 
 inline int ff_neg ( const int a )
 {
     //return ff_norm( -a );
-    if (a==0) return 0;
-    return ff_prime-a;
+    return ( a == 0 ? 0 : ff_prime-a );
 }
 
-#ifdef __MWERKS__
-int ff_mul ( const int a, const int b );
-#else
 inline int ff_mul ( const int a, const int b )
 {
     if ( ff_big )
@@ -87,7 +94,6 @@ inline int ff_mul ( const int a, const int b )
     else
 	return ff_longnorm ( (long)a * (long)b );
 }
-#endif
 
 inline int ff_inv ( const int a )
 {
