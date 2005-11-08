@@ -3,7 +3,7 @@ dnl File: configure.in
 dnl Purpose: Process this file with autoconf to produce configure
 dnl Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
 dnl Created: 11/99
-dnl Version: $Id: configure.in,v 1.15 2001-08-21 13:59:31 Singular Exp $
+dnl Version: $Id: configure.in,v 1.16 2005-11-08 08:49:16 bricken Exp $
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 
 AC_INIT(om_Alloc.c)
@@ -36,7 +36,7 @@ AC_ARG_WITH(
 		    use C_FILE for external malloc implementation])
 AC_ARG_WITH(
   valloc,
-  [ --with-valloc=mmap|malloc|emulate
+  [ --with-valloc=mmap|system|emulate
                     how to get page-aligned memory, default: use first possible])
 AC_ARG_WITH(
   provide-malloc,
