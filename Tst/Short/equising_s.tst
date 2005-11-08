@@ -134,8 +134,28 @@ reduce(F,std(M[1][1]));
 M=esStratum(F,L);
 reduce(F,std(M[1][1]));
 kill LL,Px,r;
-/////////////////////////////////////////////////
 
+/////////////////////////////////////////////////
+//              MEGA 05 Example
+ring R = 0, (x,y), ls;
+poly f = (y4-x4)^2 - x10;
+list L = versal(f);        //compute semiuniversal deformation
+def Px=L[1]; setring Px;
+poly F = Fs[1,1];          
+list M=esStratum(F);       //compute the equisingularity stratum
+def ESSring = M[1]; setring ESSring;
+option(redSB);
+ES = std(ES);
+size(ES);    //-> 42
+ES[1];       //-> 8*A(1)+8*A(22)+A(1)^3
+ES[34];      //-> 8*A(40)-A(1)^2+A(1)*A(22)
+poly F = reduce(imap(Px,F),ES);  //A(1),A(22) both appear in F
+poly g = subst(F, A(22), -A(1)-(1/8)*A(1)^3); 
+for (int ii=1; ii<=44; ii++){ g = subst(g,A(ii),random(1,100)); }
+setring R;
+milnor(f);                //-> 57
+milnor(imap(ESSring,g));  //-> 57
+kill R,L,Px,M,ESSring,ii;
 
 
 tst_status(1);$
