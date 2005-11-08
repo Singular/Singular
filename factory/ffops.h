@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ffops.h,v 1.7 2000-04-27 10:07:30 obachman Exp $ */
+/* $Id: ffops.h,v 1.8 2005-11-08 16:03:18 Singular Exp $ */
 
 #ifndef INCL_FFOPS_H
 #define INCL_FFOPS_H
@@ -56,17 +56,25 @@ inline int ff_bignorm ( const INT64 a )
 
 inline int ff_add ( const int a, const int b )
 {
-    return ff_norm( a + b );
+    //return ff_norm( a + b );
+    int r=( a + b );
+    if (r >= ff_prime) r -= ff_prime;
+    return r;
 }
 
 inline int ff_sub ( const int a, const int b )
 {
-    return ff_norm( a - b );
+    //return ff_norm( a - b );
+    int r=( a - b );
+    if (r <0) r += ff_prime;
+    return r;
 }
 
 inline int ff_neg ( const int a )
 {
-    return ff_norm( -a );
+    //return ff_norm( -a );
+    if (a==0) return 0;
+    return ff_prime-a;
 }
 
 #ifdef __MWERKS__
