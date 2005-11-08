@@ -1,5 +1,5 @@
 # @configure_input@
-# $Id: GNUmakefile.in,v 1.44 2005-07-28 17:21:40 Singular Exp $
+# $Id: GNUmakefile.in,v 1.45 2005-11-08 15:58:10 Singular Exp $
 
 #
 # GNUmakefile.in - used by `configure' to create `GNUmakefile', the
@@ -707,7 +707,10 @@ endif
 # - configure stuff.
 #
 $(srcdir)/configure: configure.in
-		-cd $(srcdir) && autoconf
+		@echo "WARNING: You need to rerun autoconf. I am proceeding, for now."
+		touch configure
+
+#		-cd $(srcdir) && autoconf
 
 # seems gmake needs at least a trivial command.  otherwise all
 # files which depend on config.h will be remade even if congig.h
