@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.13 2005-11-02 08:43:28 Singular Exp $ */
+/* $Id: structs.h,v 1.14 2005-11-08 07:28:59 bricken Exp $ */
 /*
 * ABSTRACT
 */
@@ -439,6 +439,8 @@ struct sip_sring
 
   struct omBin_s*   PolyBin; /* Bin from where monoms are allocated */
   int        ch;     /* characteristic */
+  int        ref; /* reference counter to the ring */
+  
   short      float_len; /* additional char-flags */
   short      float_len2; /* additional char-flags */
 
@@ -477,8 +479,6 @@ struct sip_sring
 
   short      OrdSize; /* size of ord vector (in sro_ord) */
 
-
-  short      ref; /* reference counter to the ring */
 
   /* if >= 0, long vars in exp vector are consecutive and start there
      if <  0, long vars in exp vector are not consecutive */
