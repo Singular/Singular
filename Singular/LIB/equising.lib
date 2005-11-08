@@ -1,4 +1,4 @@
-version="$Id: equising.lib,v 1.13 2005-11-04 14:01:18 Singular Exp $";
+version="$Id: equising.lib,v 1.14 2005-11-08 18:18:04 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  equising.lib  Equisingularity Stratum of a Family of Plane Curves
@@ -1079,14 +1079,16 @@ static proc esComputation (int typ, poly p_F, list #)
       }
     }
   }
-
-  // computation for all equimultiple sections being trivial (I^s(f))
+ 
+  // Computation for all equimultiple sections being trivial (I^s(f))
   ideal Jtriv=J;
   for (i=1;i<=no_b; i++)
   {
     Jtriv=subst(Jtriv,b(i),0);
   }
   Jtriv=std(Jtriv);
+
+
 
   dbprint(i_print,"// ");
   dbprint(i_print,"// Elimination starts:");
@@ -1117,6 +1119,51 @@ static proc esComputation (int typ, poly p_F, list #)
       return(0);
     }
   }
+
+  //new CL 11/06:  check in which equations b(k) appears and remove those b(k) 
+  //               which appear in exactly one of the equations (by removing this
+  //               equation)
+  dbprint(i_print,"// ");
+  dbprint(i_print,"// Remove superfluous equations:");
+  dbprint(i_print,"// -----------------------------");
+  int Z,App_in;
+  ideal J_Tmp;
+  int ncJ=ncols(J);
+
+  intmat Mdet[ncJ][1];
+  for (Z=1;Z<=ncJ;Z++){ Mdet[Z,1]=Z; }
+
+  for (i=1;i<=no_b; i++)
+  {
+    ideal b_appears_in(i);            // Eintraege sind spaeter 1 oder 0 
+    intmat b_app_in(i)[1][ncJ];       // Eintraege sind spaeter 1 oder 0 
+    b_appears_in(i)[ncJ]=0;  
+    J_Tmp = J-subst(J,b(i),0);
+    for (Z=1; Z<=ncJ; Z++) { 
+      if (J_Tmp[Z]<>0) {      // b(i) appear in J_Tmp[Z]
+        b_appears_in(i)[Z]=1;
+        b_app_in(i)[1,Z]=1;
+      }
+    }
+    if (size(b_appears_in(i))==1) { //b(i) appears only in one J_Tmp[Z]
+      App_in = (b_app_in(i)*Mdet)[1,1];  // determines Z
+      J[App_in]=0;
+      b_appears_in(i)[App_in]=0;
+      b_app_in(i)[1,App_in]=0;
+    }
+  }
+
+  for (i=1;i<=no_b; i++)
+  {
+    if (size(b_appears_in(i))==1) { //b(i) appears only in one J_Tmp[Z]
+      App_in = (b_app_in(i)*Mdet)[1,1];  // determines Z
+      J[App_in]=0;
+      b_appears_in(i)[App_in]=0;
+      b_app_in(i)[1,Z]=1;
+      i=0;
+    }
+  }
+
 
   ideal J_no_b = nselect(J,1,no_b);
   if (size(J) > size(J_no_b))
@@ -1982,7 +2029,7 @@ LIB "equising.lib";
 printlevel=2;
 option(prot);
 timer=1;
-ring r=32003,(x,y),ds;
+ring r=0,(x,y),ls;
 poly f=(x4-y4)^2-x10;
 list L=versal(f);
 def Px=L[1];
@@ -2019,7 +2066,7 @@ LIB "equising.lib";
 ring r=0,(w,v),ds;
 poly f=w2-v199;
 list L=hnexpansion(f);
-List LL=versal(f);
+list LL=versal(f);
 def Px=LL[1];
 setring Px;
 list L=imap(r,L);
