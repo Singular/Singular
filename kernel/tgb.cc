@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.45 2005-10-20 12:36:45 Singular Exp $ */
+/* $Id: tgb.cc,v 1.46 2005-11-15 17:29:38 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -1641,7 +1641,9 @@ static void go_on (slimgb_alg* c){
   qsort(buf,i,sizeof(red_object),red_object_better_gen);
 //    Print("\ncurr_deg:%i\n",curr_deg);
   if (TEST_OPT_PROT)
-    Print("M[%i, ",i);
+  {
+    Print("%dM[%d,",curr_deg,i);
+  }
 #ifdef FIND_DETERMINISTIC
   c->modifiedS=(BOOLEAN*) omalloc((c->strat->sl+1)*sizeof(BOOLEAN));
   c->expandS=(poly*) omalloc((1)*sizeof(poly));
@@ -1752,6 +1754,8 @@ static void go_on (slimgb_alg* c){
     assume(pair_better(c->apairs[z],c->apairs[z-1],c));
   }
 #endif
+  if (TEST_OPT_PROT)
+      Print("(%d)",c->pair_top+1); 
   return;
 }
 
