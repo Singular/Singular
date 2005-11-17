@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.7 2005-08-03 12:51:07 Singular Exp $ */
+/* $Id: longrat.cc,v 1.8 2005-11-17 16:50:57 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -187,7 +187,7 @@ BOOLEAN nlDBTest(number a, char *f,int l)
     omCheckIf(omCheckAddrSize(a->n._mp_d,a->n._mp_alloc*BYTES_PER_MP_LIMB), return FALSE);
     if (a->z._mp_alloc==0)
       Print("!!longrat:n->alloc=0 in %s:%l\n",f,l);
-    if (mpz_cmp_si(&a->n,(long)1)==0)
+    if ((mpz_size1(&a->n) ==1) && (mpz_cmp_si(&a->n,(long)1)==0))
     {
       Print("!!longrat:integer as rational in %s:%d\n",f,l);
       return FALSE;
@@ -969,6 +969,8 @@ void nlPower (number x,int exp,number * u)
       aa=nlRInit(SR_TO_INT(x));
       x=aa;
     }
+    else if (x->s==0)
+      nlNormalize(x);
     *u=(number)omAllocBin(rnumber_bin);
 #if defined(LDEBUG)
     (*u)->debug=123456;
@@ -1133,7 +1135,7 @@ void nlNormalize (number &x)
   if ((SR_HDL(x) & SR_INT) ||(x==NULL))
     return;
 #ifdef LDEBUG
-  if (!nlTest(x)) return;
+  if (!nlTest(x)) { x->s=1; return; }
 #endif
   if (x->s==3)
   {
