@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.42 2005-09-28 15:00:18 Singular Exp $ */
+/* $Id: ring.cc,v 1.43 2005-11-17 16:51:39 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -28,6 +28,9 @@
 #include "gring.h"
 #include "matpol.h"
 #include "maps.h"
+#endif
+#ifdef HAVE_FACTORY
+#include "factory.h"
 #endif
 
 #define BITS_PER_LONG 8*SIZEOF_LONG
@@ -101,6 +104,12 @@ void rChangeCurrRing(ring r)
 
     /*------------ global variables related to polys -------------------*/
     pSetGlobals(r);
+    /*------------ global variables related to factory -------------------*/
+#ifdef HAVE_FACTORY
+    int c=ABS(nGetChar());
+    if (c==1) c=0;
+    setCharacteristic( c );
+#endif
   }
 }
 
