@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_reval.cc,v 1.6 2005-08-24 13:31:55 Singular Exp $ */
+/* $Id: cf_reval.cc,v 1.7 2005-11-18 10:03:50 pohl Exp $ */
 
 #define MORE_ZEROES
 
@@ -18,7 +18,6 @@ REvaluation::REvaluation( const REvaluation & e )
     else
 	gen = e.gen->clone();
     values = e.values;
-    cnt = e.cnt;
 }
 
 REvaluation::~REvaluation()
@@ -34,7 +33,6 @@ REvaluation::operator= ( const REvaluation & e )
         if (gen!=0)
 	  delete gen;
 	values = e.values;
-        cnt = e.cnt;
 	if ( e.gen == 0 )
 	    gen = 0;
 	else
@@ -49,31 +47,4 @@ REvaluation::nextpoint()
     int n = values.max();
     for ( int i = values.min(); i <= n; i++ )
 	values[i] = gen->generate();
-}
-
-void
-REvaluation::nextpoint_0()
-{
-    int n = values.max();
-#ifdef MORE_ZEROES
-   // for ( int i = values.min(); i <= n; i++ )
-//	values[i] = gen->generate();
-  if (cnt<=n /* values.max() */ )
-  {
-    cnt++;
-    int t;
-    int m=values.min();
-    if (m<n)
-    {
-      t=factoryrandom(n-m+1)+m;
-    }
-    else t=n;
-    values[t]=gen->generate();
-  }
-  else
-#endif
-  {
-    for ( int i = values.min(); i <= n; i++ )
-	values[i] = gen->generate();
-  }
 }

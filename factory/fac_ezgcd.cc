@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_ezgcd.cc,v 1.22 2005-08-26 17:43:34 Singular Exp $ */
+/* $Id: fac_ezgcd.cc,v 1.23 2005-11-18 10:03:49 pohl Exp $ */
 
 #include <config.h>
 
@@ -74,7 +74,9 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b, boo
     if ( F.isUnivariate() && G.isUnivariate() )
     {
         DEBDECLEVEL( cerr, "ezgcd" );
-        return d * gcd( F, G );
+        if(F.mvar()==G.mvar())
+          d*=gcd(F,G);
+        return d;
     }
     else  if ( gcd_test_one( F, G, false ) )
     {
@@ -235,7 +237,7 @@ ezgcd_specialcase ( const CanonicalForm & F, const CanonicalForm & G, REvaluatio
         // gcd.debug -ocr /+USE_EZGCD/@12/CB \
         //     '(16*B^8-208*B^6*C+927*B^4*C^2-1512*B^2*C^3+432*C^4)' \
         //     '(4*B^7*C^2-50*B^5*C^3+208*B^3*C^4-288*B*C^5)'
-        b.nextpoint_0();
+        b.nextpoint();
         return ezgcd( F, G, b, true );
     }
 #if 1
@@ -313,7 +315,7 @@ findeval( const CanonicalForm & F, const CanonicalForm & G, CanonicalForm & Fb, 
     int i;
     bool ok;
     if ( delta != 0 )
-        b.nextpoint_0();
+        b.nextpoint();
     DEBOUTLN( cerr, "ezgcd: (findeval) F = " << F  <<", G="<< G);
     DEBOUTLN( cerr, "ezgcd: (findeval) degF = " << degF << ", degG="<<degG );
     do {
@@ -333,7 +335,7 @@ findeval( const CanonicalForm & F, const CanonicalForm & G, CanonicalForm & Fb, 
         }
         if ( ! ok )
         {
-            b.nextpoint_0();
+            b.nextpoint();
         }
     } while ( ! ok );
 }
