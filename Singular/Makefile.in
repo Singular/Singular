@@ -57,7 +57,8 @@ ifneq ($(SINGUNAME),ix86-Win)
 CPPFLAGS	= -I${srcdir} -I../kernel @CPPFLAGS@
 else
 ## Dirs after @CPPFLAGS@ are for PySingular
-CPPFLAGS	= -I${srcdir} -I../kernel @CPPFLAGS@ -I/usr/include/python2.4 -I/usr/local/include/boost-1_32 -I../modules/python
+CPPFLAGS	= -I${srcdir} -I../kernel @CPPFLAGS@ 
+## -I/usr/include/python2.4 -I/usr/local/include -I../modules/python
 endif
 DEFS		= -DNDEBUG -DOM_NDEBUG -D@SING_UNAME@ @DEFS@
 LDFLAGS2	= @LDFLAGS@
@@ -76,7 +77,8 @@ SLDFLAGS	= @SLDFLAGS@
 ifneq ($(SINGUNAME),ix86-Win)
 WIN_LIBS        =
 else
-WIN_LIBS        = ../modules/python/libpython_module.a
+WIN_LIBS        = 
+##../modules/python/libpython_module.a
 endif
 
 LD_LIBC	        = -lc
@@ -87,7 +89,8 @@ STATIC_LDFLAGS	= @STATIC_LDFLAGS@
 ifneq ($(SINGUNAME),ix86-Win)
 LIBS		= -lm @NEED_LIBS@
 else
-LIBS		= -lsingfac -lsingcf -lntl  -static -lreadline -lhtmlhelp -Xlinker -Bdynamic -lgmp -lcygncurses6 -lpython_module -lpython2.4 /usr/local/lib/libboost_python-gcc-d-1_32.dll
+LIBS		= -lsingfac -lsingcf -lntl  -static -lreadline -lhtmlhelp -Xlinker -Bdynamic -lgmp -lcygncurses6 
+## -lpython_module -lpython2.4 /usr/local/lib/libboost_python-gcc-d-1_32.dll
 endif
 MP_LIBS		= @MP_LIBS@
 DL_KERNEL	= @DL_KERNEL@

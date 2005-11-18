@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.231 2005-11-04 08:45:01 Singular Exp $ */
+/* $Id: extra.cc,v 1.232 2005-11-18 12:42:43 wienand Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -131,8 +131,8 @@ extern "C" int setenv(const char *name, const char *value, int overwrite);
 //#endif /* not HAVE_DYNAMIC_LOADING */
 
 #ifdef ix86_Win
-#include <Python.h>
-#include <python_wrapper.h>
+//#include <Python.h>
+//#include <python_wrapper.h>
 #endif
 
 
@@ -2664,16 +2664,16 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         c=(const char*)h->Data();
         if (!PyInitialized) {
           PyInitialized = 1;
-          Py_Initialize();
-          initPySingular();
+//          Py_Initialize();
+//          initPySingular();
         }
-	PyRun_SimpleString(c);
+//	    PyRun_SimpleString(c);
         return FALSE;
       }
       else return TRUE;
     }
     else
-/*==================== Python Singular =================*/
+/*==================== Python Singular =================
     if (strcmp(sys_cmd, "ipython") == 0)
     {
       const char* c;
@@ -2705,7 +2705,7 @@ ipshell()");
       }
     }
     else
-
+              */
 #endif
 /*==================== Error =================*/
       Werror( "system(\"%s\",...) %s", sys_cmd, feNotImplemented );
