@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.383 2005-10-26 10:42:40 Singular Exp $ */
+/* $Id: iparith.cc,v 1.384 2005-11-22 15:23:46 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2017,6 +2017,10 @@ static BOOLEAN jjLIFTSTD(leftv res, leftv u, leftv v)
   setFlag(res,FLAG_STD);
   return FALSE;
 }
+static BOOLEAN jjLOAD2(leftv res, leftv v, leftv w)
+{
+  return jjLOAD(res, v,(int)w->Data());
+}
 static BOOLEAN jjMINOR(leftv res, leftv u, leftv v)
 {
   res->data = (char *)idMinors((matrix)u->Data(),(int)(long)v->Data());
@@ -2943,6 +2947,7 @@ struct sValCmd2 dArith2[]=
 ,{jjLIFTSTD,   LIFTSTD_CMD,    IDEAL_CMD,      IDEAL_CMD,  MATRIX_CMD ALLOW_PLURAL}
 ,{jjLIFTSTD,   LIFTSTD_CMD,    MODUL_CMD,      MODUL_CMD,  MATRIX_CMD ALLOW_PLURAL}
 ,{jjCALL2MANY, LIST_CMD,       LIST_CMD,       DEF_CMD,    DEF_CMD ALLOW_PLURAL}
+,{jjLOAD2,     LOAD_CMD,       NONE,           STRING_CMD, INT_CMD ALLOW_PLURAL}
 ,{jjRES,       LRES_CMD,       RESOLUTION_CMD, IDEAL_CMD,  INT_CMD NO_PLURAL}
 ,{jjMINOR,     MINOR_CMD,      IDEAL_CMD,      MATRIX_CMD, INT_CMD NO_PLURAL}
 ,{jjCALL2MANY, MODUL_CMD,      MODUL_CMD,      DEF_CMD,    DEF_CMD ALLOW_PLURAL}
