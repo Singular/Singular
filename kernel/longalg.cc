@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.11 2005-07-27 15:48:28 Singular Exp $ */
+/* $Id: longalg.cc,v 1.12 2005-11-22 15:25:40 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -19,7 +19,9 @@
 #include "ideals.h"
 #include "ring.h"
 #ifdef HAVE_FACTORY
+#include "factory.h"
 #include "clapsing.h"
+#include "clapconv.h"
 #endif
 #include "longalg.h"
 
@@ -1039,12 +1041,16 @@ number naSub(number la, number lb)
     return (number)lu;
   }
 
-  napoly x, y;
   lnumber a = (lnumber)la;
   lnumber b = (lnumber)lb;
+  if (a->n !=NULL) naNormalize(la);
+  if (b->n !=NULL) naNormalize(lb);
+
 
   omCheckAddrSize(a,sizeof(snumber));
   omCheckAddrSize(b,sizeof(snumber));
+
+  napoly x, y;
   lu = (lnumber)omAllocBin(rnumber_bin);
   if (b->n!=NULL) x = napMultCopy(a->z, b->n);
   else            x = napCopy(a->z);
@@ -1149,13 +1155,15 @@ number naMult(number la, number lb)
     omFreeBin((ADDRESS)lo, rnumber_bin);
     lo=NULL;
   }
-#if 0
-  if (lo->n!=NULL)
+#if 1
+  else if (lo->n!=NULL)
   {
-     number luu=(number)lo;
-     naNormalize(luu);
-     lo=(lnumber)luu;
+    number luu=(number)lo;
+    naNormalize(luu);
+    lo=(lnumber)luu;
   }
+  else
+    lo->s=2;
 #endif
   naTest((number)lo);
   return (number)lo;
@@ -1168,15 +1176,14 @@ number naIntDiv(number la, number lb)
   lnumber b = (lnumber)lb;
   if (a==NULL)
   {
-    assume(a->z!=NULL);
     return NULL;
   }
   if (b==NULL)
   {
-    assume(b->z!=NULL);
     WerrorS("div. by 0");
     return NULL;
   }
+  naNormalize(la);
   assume(a->z!=NULL && b->z!=NULL);
   assume(a->n==NULL && b->n==NULL);
   res = (lnumber)omAllocBin(rnumber_bin);
@@ -1600,20 +1607,29 @@ number naGcd(number a, number b, const ring r)
 
   x = (lnumber)a;
   y = (lnumber)b;
-  if (naNumbOfPar == 1)
+  if ((naNumbOfPar == 1) && (naMinimalPoly!=NULL))
   {
-    if (naMinimalPoly!=NULL)
-    {
-      if (napNext(x->z)!=NULL)
-        result->z = napCopy(x->z);
-      else
-        result->z = napGcd0(x->z, y->z);
-    }
+    if (napNext(x->z)!=NULL)
+      result->z = napCopy(x->z);
     else
-      result->z = napGcd(x->z, y->z);
+      result->z = napGcd0(x->z, y->z);
   }
-  else
+  else if ((x->n==NULL) && (y->n==NULL))
     result->z = napGcd(x->z, y->z); // change from napGcd0
+    
+#if 0
+  else
+  {
+    CanonicalForm F, G;
+    napNormalize(x->z);
+    F=convSingTrClapP(x->z); 
+    napNormalize(y->z);
+    G=convSingTrClapP(y->z); 
+    result->z=convClapPSingTr( gcd( F, G ) );
+    napNormalize(result->z);
+  }
+#endif
+
   naTest((number)result);
   return (number)result;
 }
