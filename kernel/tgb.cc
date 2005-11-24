@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.46 2005-11-15 17:29:38 bricken Exp $ */
+/* $Id: tgb.cc,v 1.47 2005-11-24 10:24:19 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -39,6 +39,9 @@ static inline poly pOne_Special(const ring r=currRing)
 //#define inDebug(p) assume((debug_Ideal==NULL)||(kNF(debug_Ideal,NULL,p,0,0)==0))
 
 //die meisten Varianten stossen sich an coef_buckets
+
+
+
 #ifdef LEN_VAR1
 // erste Variante: Laenge: Anzahl der Monome
 inline int pSLength(poly p, int l) {
@@ -66,7 +69,7 @@ int kSBucketLength(kBucket* b, poly lm)
 }
 #endif
 
-#ifdef LEN_VAR3
+
 // 3.Variante: Laenge: Platz fuer Leitk * Monomanzahl
 
 int QlogSizeClassic(number bigint){
@@ -102,6 +105,8 @@ int QlogSize(number bigint){
   if(size<=1) return QlogSizeClassic(bigint);
   else return sizeof(mp_limb_t)*size*8;
   }
+
+#ifdef LEN_VAR3
 inline int pSLength(poly p,int l)
 {
   int c;
@@ -152,6 +157,66 @@ int kSBucketLength(kBucket* b, poly lm=NULL)
     }
   #endif
   return s*c;
+}
+#endif
+#ifdef LEN_VAR5
+inline wlen_type pSLength(poly p,int l)
+{
+  int c;
+  number coef=pGetCoeff(p);
+  if (rField_is_Q(currRing)){
+    c=QlogSize(coef);
+  }
+  else
+    c=nSize(coef);
+  wlen_type erg=l;
+  erg*=c;
+  erg*=c;
+  //PrintS("lenvar 5");
+  assume(erg>=0);
+  return erg; /*pLength(p)*/;
+}
+//! TODO CoefBuckets berücksichtigen
+wlen_type kSBucketLength(kBucket* b, poly lm=NULL)
+{
+  wlen_type s=0;
+  int c;
+  number coef;
+  if(lm==NULL)
+    coef=pGetCoeff(kBucketGetLm(b));
+    //c=nSize(pGetCoeff(kBucketGetLm(b)));
+  else
+    coef=pGetCoeff(lm);
+    //c=nSize(pGetCoeff(lm));
+  if (rField_is_Q(currRing)){
+    c=QlogSize(coef);
+  }
+  else
+    c=nSize(coef);
+  
+  int i;
+  for (i=b->buckets_used;i>=0;i--)
+  {
+    assume((b->buckets_length[i]==0)||(b->buckets[i]!=NULL));
+    s+=b->buckets_length[i] /*pLength(b->buckets[i])*/;
+  }
+  #ifdef HAVE_COEF_BUCKETS
+  assume(b->buckets[0]==kBucketGetLm(b));
+  if (b->coef[0]!=NULL){
+    
+    if (rField_is_Q(currRing)){
+      int modifier=QlogSize(pGetCoeff(b->coef[0]));
+      c+=modifier;
+  }
+    else{
+      int modifier=nSize(pGetCoeff(b->coef[0]));
+      c*=modifier;}
+    }
+  #endif
+  wlen_type erg=s;
+  erg*=c;
+  erg*=c;
+  return erg;
 }
 #endif
 
@@ -231,7 +296,7 @@ static inline int pELength(poly p, slimgb_alg* c,int l){
 
 
 
-static inline int pQuality(poly p, slimgb_alg* c, int l=-1){
+static inline wlen_type pQuality(poly p, slimgb_alg* c, int l=-1){
   
   if(l<0)
     l=pLength(p);
@@ -240,13 +305,21 @@ static inline int pQuality(poly p, slimgb_alg* c, int l=-1){
       int cs;
       number coef=pGetCoeff(p);
       if (rField_is_Q(currRing)){
-	cs=QlogSize(coef);
+	       cs=QlogSize(coef);
       }
       else
 	cs=nSize(coef);
-      return cs*pELength(p,c,l);
+	   wlen_type erg=cs;
+	   //erg*=cs;//for quadratic
+	   erg*=pELength(p,c,l);
+	  //FIXME: not quadratic coeff size
+      //return cs*pELength(p,c,l);
+      return erg;
     }
-    return pSLength(p,l);
+    //Print("I am here");
+    wlen_type r=pSLength(p,l);
+    assume(r>=0);
+    return r;
   }
   if((pLexOrder) &&(!c->is_homog)) return pELength(p,c,l);
   return l;
@@ -262,10 +335,10 @@ static inline int pTotaldegree_full(poly p){
   return r;
 }
 
-int red_object::guess_quality(slimgb_alg* c){
+wlen_type red_object::guess_quality(slimgb_alg* c){
     //works at the moment only for lenvar 1, because in different
     //case, you have to look on coefs
-    int s=0;
+    wlen_type s=0;
     if (c->is_char0){
       //s=kSBucketLength(bucket,this->p);
       if((pLexOrder) &&(!c->is_homog)){
@@ -290,7 +363,12 @@ int red_object::guess_quality(slimgb_alg* c){
 	      int modifier=nSize(pGetCoeff(bucket->coef[0]));
 	      cs*=modifier;}
 	  }
-	  return cs*kEBucketLength(this->bucket,this->p,c);
+	  //FIXME:not quadratic
+	  wlen_type erg=kEBucketLength(this->bucket,this->p,c);
+	  //erg*=cs;//for quadratic
+	  erg*=cs;
+	  //return cs*kEBucketLength(this->bucket,this->p,c);
+	  return erg;
       }
       s=kSBucketLength(bucket,NULL);
     }
@@ -440,8 +518,7 @@ static BOOLEAN trivial_syzygie(int pos1,int pos2,poly bound,slimgb_alg* c){
 
   poly p1=c->S->m[pos1];
   poly p2=c->S->m[pos2];
-  ring r=c->r;
-  
+    
 
   if (pGetComp(p1) > 0 || pGetComp(p2) > 0)
     return FALSE;
@@ -453,7 +530,7 @@ static BOOLEAN trivial_syzygie(int pos1,int pos2,poly bound,slimgb_alg* c){
   if((gcd1!=NULL) && (gcd2!=NULL)) 
     {
       gcd1->next=gcd2; //may ordered incorrect
-      poly m=gcd_of_terms(gcd1,c->r);
+      m=gcd_of_terms(gcd1,c->r);
       gcd1->next=NULL;
       
     } 
@@ -651,13 +728,7 @@ static void length_one_crit(slimgb_alg* c, int pos, int len)
       shorten_tails(c,c->S->m[pos]);
   }
 }
-static sorted_pair_node* find_next_pair2(slimgb_alg* c, BOOLEAN go_higher){
-  clean_top_of_pair_list(c);
-  sorted_pair_node* s=pop_pair(c);
 
-
-  return s;
-}
 
 static void move_forward_in_S(int old_pos, int new_pos,kStrategy strat)
 {
@@ -705,8 +776,7 @@ static void replace_pair(int & i, int & j, slimgb_alg* c)
   pSetm(lm);
   int deciding_deg= pTotaldegree(lm);
   int* i_con =make_connections(i,j,lm,c);
-  int z=0;
-
+  
   for (int n=0;((n<c->n) && (i_con[n]>=0));n++){
     if (i_con[n]==j){
       now_t_rep(i,j,c);
@@ -843,7 +913,6 @@ static int* make_connections(int from, poly bound, slimgb_alg* c)
 static int* make_connections(int from, int to, poly bound, slimgb_alg* c)
 {
   ideal I=c->S;
-  int s=pTotaldegree(bound);
   int* cans=(int*) omalloc(c->n*sizeof(int));
   int* connected=(int*) omalloc(c->n*sizeof(int));
   cans[0]=to;
@@ -856,13 +925,14 @@ static int* make_connections(int from, int to, poly bound, slimgb_alg* c)
   int not_yet_found=cans_length;
   int con_checked=0;
   int pos;
-  BOOLEAN can_find_more=TRUE;
+  
   while(TRUE){
     if ((con_checked<connected_length)&& (not_yet_found>0)){
       pos=connected[con_checked];
       for(int i=0;i<cans_length;i++){
         if (cans[i]<0) continue;
-        if (has_t_rep(pos,cans[i],c))//||(trivial_syzygie(pos,cans[i],bound,c))
+        //FIXME: triv. syz. does not hold on noncommutative, check it for modules
+        if ((has_t_rep(pos,cans[i],c)) ||((!rIsPluralRing(c->r))&&(trivial_syzygie(pos,cans[i],bound,c))))
 {
 
           connected[connected_length]=cans[i];
@@ -940,10 +1010,6 @@ static inline poly p_MoveHead(poly p, omBin b)
 #endif
 
 
-static int simple_posInS_whelper(kStrategy strat, poly p, int len){
-  return 0;
-}
-//len should be weighted length in char 0
 
 
 static int simple_posInS (kStrategy strat, poly p,int len, wlen_type wlen)
@@ -951,7 +1017,7 @@ static int simple_posInS (kStrategy strat, poly p,int len, wlen_type wlen)
 
 
   if(strat->sl==-1) return 0;
-  if (strat->lenSw) return pos_helper(strat,p,wlen,strat->lenSw,strat->S);
+  if (strat->lenSw) return pos_helper(strat,p,(wlen_type) wlen,(wlen_set) strat->lenSw,strat->S);
   return pos_helper(strat,p,len,strat->lenS,strat->S);
   //
   //if (strat->lenSw) setL=strat->lenSw;
@@ -1276,15 +1342,20 @@ static poly redNF2 (poly h,slimgb_alg* c , int &len, number&  m,int n)
   P.bucket = kBucketCreate(currRing);
   // BOOLEAN corr=lenS_correct(strat);
   kBucketInit(P.bucket,P.p,len /*pLength(P.p)*/);
-  wlen_set lenSw=strat->lenS;
-  if (strat->lenSw!=NULL)
-    lenSw=strat->lenSw;
+  //wlen_set lenSw=(wlen_set) c->strat->lenS;
+  //FIXME: plainly wrong
+  //strat->lenS;
+  //if (strat->lenSw!=NULL)
+  //  lenSw=strat->lenSw;
   //int max_pos=simple_posInS(strat,P.p);
   loop
     {
 
       j=kFindDivisibleByInS(strat->S,strat->sevS,strat->sl,&P);
-      if ((j>=0) && ((!n)||(lenSw[j]<=n)))
+      if ((j>=0) && ((!n)||
+        ((strat->lenS[j]<=n) &&
+         ((strat->lenSw==NULL)||
+         (strat->lenSw[j]<=n)))))
       {
 
 	
@@ -2031,7 +2102,7 @@ slimgb_alg::slimgb_alg(ideal I, BOOLEAN F4){
   strat->S=strat->Shdl->m;
   strat->lenS=(int*)omAlloc0(i*sizeof(int));
   if((is_char0)||((pLexOrder) &&(!is_homog)))
-    strat->lenSw=(int*)omAlloc0(i*sizeof(wlen_type));
+    strat->lenSw=(wlen_type*)omAlloc0(i*sizeof(wlen_type));
   else
     strat->lenSw=NULL;
   sorted_pair_node* si;
@@ -2395,10 +2466,7 @@ sorted_pair_node* quick_pop_pair(slimgb_alg* c){
   if(c->pair_top<0) return NULL;
   else return (c->apairs[c->pair_top--]);
 }
-static BOOLEAN no_pairs(slimgb_alg* c){
-  clean_top_of_pair_list(c);
-  return (c->pair_top==-1);
-}
+
 
 
 static void super_clean_top_of_pair_list(slimgb_alg* c){
@@ -2628,7 +2696,7 @@ static void multi_reduction_lls_trick(red_object* los, int losl,slimgb_alg* c,fi
 	los[best].flatten();
 	int b_pos=kBucketCanonicalize(los[best].bucket);
 	los[best].p=los[best].bucket->buckets[b_pos];
-	qc==pQuality(los[best].bucket->buckets[b_pos],c);
+	qc=pQuality(los[best].bucket->buckets[b_pos],c);
 	if(qc<quality_a){
 	  red_object h=los[erg.to_reduce_u];
 	  los[erg.to_reduce_u]=los[best];
@@ -2675,24 +2743,30 @@ static void multi_reduction_lls_trick(red_object* los, int losl,slimgb_alg* c,fi
       else 
       {
 	assume(erg.to_reduce_u==erg.to_reduce_l);
-	int quality_a=quality_of_pos_in_strat_S(erg.reduce_by,c);
+	wlen_type quality_a=
+        quality_of_pos_in_strat_S(erg.reduce_by,c);
 	wlen_type qc=los[erg.to_reduce_u].guess_quality(c);
+	if (qc<0) PrintS("Wrong wlen_type");
 	if(qc<quality_a){
 	  int best=erg.to_reduce_u;
 	  los[best].flatten();
 	  int b_pos=kBucketCanonicalize(los[best].bucket);
 	  los[best].p=los[best].bucket->buckets[b_pos];
-	  qc==pQuality(los[best].bucket->buckets[b_pos],c);
+	  qc=pQuality(los[best].bucket->buckets[b_pos],c);
+	  assume(qc>=0);
 	  if(qc<quality_a){
 	    BOOLEAN exp=FALSE;
-	    if(qc<=2)
-	      exp=TRUE;
+	    if(qc<=2){
+	       //Print("\n qc is %lld \n",qc);
+	       exp=TRUE;
+	    }
+	      
 	    else {
-	      if (qc<quality_a/2)
-		exp=TRUE;
-	      else
-		if(erg.reduce_by<c->n/4)
-		  exp=TRUE;
+	       if (qc<quality_a/2)
+		      exp=TRUE;
+	       else
+		   if(erg.reduce_by<c->n/4)
+		      exp=TRUE;
 	    }
 	    if (exp){
 	      poly clear_into;
@@ -3045,8 +3119,7 @@ static void multi_reduction(red_object* los, int & losl, slimgb_alg* c)
     //if ((!erg.fromS)&&(d>100)){
     
     multi_reduction_lls_trick(los,losl,c,erg);
-    int sum=0;
-
+    
     
     int i;
     int len;

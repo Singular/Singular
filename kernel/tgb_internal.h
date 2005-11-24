@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb_internal.h,v 1.18 2005-10-19 16:10:19 Singular Exp $ */
+/* $Id: tgb_internal.h,v 1.19 2005-11-24 10:25:58 bricken Exp $ */
 /*
  * ABSTRACT: tgb internal .h file
 */
@@ -138,7 +138,7 @@ class red_object{
   void flatten();
   void validate();
   void adjust_coefs(number c_r, number c_ac_r);
-  int guess_quality(slimgb_alg* c);
+  wlen_type guess_quality(slimgb_alg* c);
   int clear_to_poly();
   void canonicalize();
 };
@@ -240,6 +240,7 @@ static void multi_reduce_step(find_erg & erg, red_object* r, slimgb_alg* c);
 static void finalize_reduction_step(reduction_step* r);
 
 template <class len_type, class set_type>  int pos_helper(kStrategy strat, poly p, len_type len, set_type setL, polyset set){
+  //Print("POSHELER:%d",sizeof(wlen_type));
   int length=strat->sl;
   int i;
   int an = 0;
