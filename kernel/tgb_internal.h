@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb_internal.h,v 1.19 2005-11-24 10:25:58 bricken Exp $ */
+/* $Id: tgb_internal.h,v 1.20 2005-11-24 11:28:29 bricken Exp $ */
 /*
  * ABSTRACT: tgb internal .h file
 */
@@ -220,7 +220,7 @@ class simple_reducer:public reduction_step{
   ~simple_reducer();
 
 
-  virtual void target_is_no_sum_reduce(red_object & ro);
+  virtual void do_reduce(red_object & ro);
 };
 
 //class sum_canceling_reducer:public reduction_step {

@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.47 2005-11-24 10:24:19 bricken Exp $ */
+/* $Id: tgb.cc,v 1.48 2005-11-24 11:28:30 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -3179,7 +3179,7 @@ int red_object::clear_to_poly(){
 
 
 void reduction_step::reduce(red_object* r, int l, int u){}
-void simple_reducer::target_is_no_sum_reduce(red_object & ro){
+void simple_reducer::do_reduce(red_object & ro){
   number coef;
   if (!c->nc)
     coef=kBucketPolyRed(ro.bucket,p,
@@ -3206,7 +3206,7 @@ void simple_reducer::reduce(red_object* r, int l, int u){
   
 
 
-    this->target_is_no_sum_reduce(r[i]);
+    this->do_reduce(r[i]);
  
   }
   for(i=l;i<=u;i++){
