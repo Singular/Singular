@@ -1,4 +1,4 @@
-//$Id: Poly.h,v 1.29 2005-09-23 12:59:51 bricken Exp $
+//$Id: Poly.h,v 1.30 2005-11-24 15:57:10 bricken Exp $
 
 
 
@@ -22,10 +22,16 @@
 
 //PolyImpl is a 08/15 poly wrapper
 //Poly wraps around PolyImpl with reference counting using boost
-
+class TrivialErrorHandler{
+    public:
+    static const bool handle_errors=false;
+    static void handle(){
+    }
+};
 class PolyImpl{
-  friend class PolyBase<POLY_VARIANT_RING,Poly>;
-  friend class PolyBase<POLY_VARIANT_MODUL,Vector>;
+  template <poly_variant,class,class> friend class PolyBase;
+  //friend class PolyBase<POLY_VARIANT_RING,Poly,TrivialErrorHandler>;
+  //friend class PolyBase<POLY_VARIANT_MODUL,Vector, TrivialErrorHandler>;
   //friend class PolyBase<POLY_VARIANT_MODUL>;
   friend class Poly;
   friend class Vector;
@@ -343,12 +349,14 @@ public std::iterator<std::input_iterator_tag,T,int, shared_ptr<const T>,ConstTer
 //template <poly_variant v> inline PolyBase<v> operator+(const PolyBase<v>& p1, const PolyBase<v>& p2);
 //template <poly_variant v> inline PolyBase<v> operator*(const PolyBase<v>& p1, const PolyBase<v>& p2);
 //template <poly_variant v>inline PolyBase<v> operator*(const PolyBase<v>& p1, const Number& n);
-template<poly_variant variant, class create_type_input> class PolyBase{
- 
+template<poly_variant variant, class create_type_input, class error_handle_traits> class PolyBase{
+ private:
+    typedef PolyBase<variant,create_type_input,error_handle_traits> ThisType;
  public:
   poly as_poly() const{
     return p_Copy(ptr->p,ptr->r);
   }
+  
   typedef create_type_input create_type;
   typedef PolyInputIterator<create_type> iterator;
   Intvec leadExp(){
@@ -456,31 +464,33 @@ template<poly_variant variant, class create_type_input> class PolyBase{
   //friend PolyBase<variant> operator*<>(const PolyBase<variant>& p1, const Number& p2);
 };
 
-class Poly: public PolyBase<POLY_VARIANT_RING, Poly>{
+class Poly: public PolyBase<POLY_VARIANT_RING, Poly, TrivialErrorHandler>{
+ private:
+    typedef PolyBase<POLY_VARIANT_RING, Poly,TrivialErrorHandler> Base;
   friend class Vector;
-  friend class PolyBase<POLY_VARIANT_MODUL,Vector>;
+  friend class PolyBase<POLY_VARIANT_MODUL,Vector,TrivialErrorHandler>;
  public:
 
-  Poly(ring r=currRing):PolyBase<POLY_VARIANT_RING, Poly> ((poly)NULL,r,0){
+  Poly(ring r=currRing):Base ((poly)NULL,r,0){
   }
-  Poly(int n, ring r=currRing):PolyBase<POLY_VARIANT_RING, Poly>(*(new PolyImpl(n,r))){
+  Poly(int n, ring r=currRing):Base(*(new PolyImpl(n,r))){
     
   }
-  Poly(const char* c, ring r=currRing):PolyBase<POLY_VARIANT_RING, Poly>(c,r){
+  Poly(const char* c, ring r=currRing):Base(c,r){
 
   }
-  Poly(const PolyBase<POLY_VARIANT_RING, Poly>& p):PolyBase<POLY_VARIANT_RING, Poly>(p){
+  Poly(const Base& p):Base(p){
   }
   
-  Poly(const Number& n):PolyBase<POLY_VARIANT_RING, Poly>(*(new PolyImpl(n))){
+  Poly(const Number& n):Base(*(new PolyImpl(n))){
     
   }
-  Poly(poly p, ring r):PolyBase<POLY_VARIANT_RING, Poly>(p,r){
+  Poly(poly p, ring r):Base(p,r){
     
   }
-  Poly(poly p, ring r, int):PolyBase<POLY_VARIANT_RING, Poly>(p,r,0){
+  Poly(poly p, ring r, int):Base(p,r,0){
   }
-  Poly(const std::vector<int>& v, ring r=currRing):PolyBase<POLY_VARIANT_RING, Poly>(*(new PolyImpl((poly) NULL,r))){
+  Poly(const std::vector<int>& v, ring r=currRing):Base(*(new PolyImpl((poly) NULL,r))){
     unsigned int i;
     int s=v.size();
     poly p=p_ISet(1,r);
@@ -497,39 +507,40 @@ class Poly: public PolyBase<POLY_VARIANT_RING, Poly>{
   }*/
   Poly& operator+=(const Poly& p ){
 
-    ((PolyBase<POLY_VARIANT_RING, Poly>&)*this)+=p;
+    ((Base&)*this)+=p;
     return *this;
   }
-  Poly& operator+=(const PolyBase<POLY_VARIANT_RING, Poly>& p ){
+  Poly& operator+=(const Base& p ){
 
-    ((PolyBase<POLY_VARIANT_RING, Poly>&)*this)+=p;
+    ((Base&)*this)+=p;
     return *this;
   }
   friend inline bool operator==(const Poly& p1, const Poly& p2);
 
 };
-class Vector: public PolyBase<POLY_VARIANT_MODUL, Vector>{
- 
+class Vector: public PolyBase<POLY_VARIANT_MODUL, Vector, TrivialErrorHandler>{
+ private:
+    typedef PolyBase<POLY_VARIANT_MODUL, Vector, TrivialErrorHandler> Base;
  public:
 
-  Vector(ring r=currRing):PolyBase<POLY_VARIANT_MODUL, Vector> ((poly)NULL,r,0){
+  Vector(ring r=currRing):Base ((poly)NULL,r,0){
   }
-  Vector(int n, ring r=currRing):PolyBase<POLY_VARIANT_MODUL, Vector>(*(new PolyImpl(n,r))){
+  Vector(int n, ring r=currRing):Base(*(new PolyImpl(n,r))){
     
   }
-  Vector(const char* c, ring r=currRing):PolyBase<POLY_VARIANT_MODUL, Vector>(c,r){
+  Vector(const char* c, ring r=currRing):Base(c,r){
 
   }
-  Vector(const PolyBase<POLY_VARIANT_MODUL, Vector>& p):PolyBase<POLY_VARIANT_MODUL, Vector>(p){
+  Vector(const Base& p):Base(p){
   }
   
 
-  Vector(poly p, ring r):PolyBase<POLY_VARIANT_MODUL, Vector>(p,r){
+  Vector(poly p, ring r):Base(p,r){
     
   }
-  Vector(poly p, ring r, int):PolyBase<POLY_VARIANT_MODUL, Vector>(p,r,0){
+  Vector(poly p, ring r, int):Base(p,r,0){
   }
-  Vector(std::vector<int> v, ring r=currRing):PolyBase<POLY_VARIANT_MODUL, Vector>(*(new PolyImpl((poly) NULL,r))){
+  Vector(std::vector<int> v, ring r=currRing):Base(*(new PolyImpl((poly) NULL,r))){
     unsigned int i;
     int s=v.size();
     poly p=p_ISet(1,r);
@@ -546,12 +557,12 @@ class Vector: public PolyBase<POLY_VARIANT_MODUL, Vector>{
   }*/
   Vector& operator+=(const Vector& p ){
 
-    ((PolyBase<POLY_VARIANT_MODUL, Vector>&)*this)+=p;
+    ((Base&)*this)+=p;
     return *this;
   }
-  Vector& operator+=(const PolyBase<POLY_VARIANT_MODUL, Vector>& p ){
+  Vector& operator+=(const Base& p ){
 
-    ((PolyBase<POLY_VARIANT_MODUL, Vector>&)*this)+=p;
+    ((Base&)*this)+=p;
     return *this;
   }
 
@@ -585,13 +596,13 @@ inline Vector operator*(const Number& n, const Vector& v){
 }
 
 //assumes monomials commute with numbers
-template <poly_variant variant, class create_type> 
-  inline typename PolyBase<variant,create_type>::create_type 
+template <poly_variant variant, class create_type, class error_traits> 
+  inline typename PolyBase<variant,create_type, error_traits>::create_type 
   operator*
   (const Number& n, 
-   const PolyBase<variant,create_type>& p)
+   const PolyBase<variant,create_type, class error_tratis>& p)
 {
-  typename PolyBase<variant, create_type>::create_type erg(p);
+  typename PolyBase<variant, create_type,error_traits>::create_type erg(p);
   erg*=n;
   return erg;
 }
@@ -612,13 +623,13 @@ inline bool operator==(const Poly& p1, const Poly& p2){
   if (r1!=r2) return false;
   return p_EqualPolys(p1.ptr->p,p2.ptr->p,r1);
 }
-template <poly_variant variant, class create_type> 
-  inline typename PolyBase<variant,create_type>::create_type 
+template <poly_variant variant, class create_type,class error_traits> 
+  inline typename PolyBase<variant,create_type,error_traits>::create_type 
   operator+
-  (const PolyBase<variant,create_type>& b1, 
-   const PolyBase<variant,create_type>& b2)
+  (const PolyBase<variant,create_type,error_traits>& b1, 
+   const PolyBase<variant,create_type,error_traits>& b2)
 {
-  typename PolyBase<variant, create_type>::create_type erg(b1);
+  typename PolyBase<variant, create_type, error_traits>::create_type erg(b1);
   erg+=b2;
   return erg;
 }
@@ -632,10 +643,10 @@ inline Poly operator*(const Number& n, const Poly & p){
   res*=n;
   return res;
 }
-template <poly_variant variant, class create_type> 
+template <poly_variant variant, class create_type, class error_traits> 
    
-inline PolyBase<variant, create_type>& 
-PolyBase<variant, create_type>::operator*=(const Poly & p2){
+inline PolyBase<variant, create_type, error_traits>& 
+PolyBase<variant, create_type, error_traits>::operator*=(const Poly & p2){
     copy_on_write();
     *ptr *= *p2.ptr;
     

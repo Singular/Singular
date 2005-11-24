@@ -9,8 +9,9 @@ enum poly_variant{
   POLY_VARIANT_RING,
   POLY_VARIANT_MODUL
 };
-template<poly_variant,class> class PolyBase;
+template<poly_variant,class,class> class PolyBase;
 class Poly;
+//class TrivialErrorHandler;
 class Vector;
 class Number{
   
@@ -32,8 +33,11 @@ class Number{
   friend bool operator==(int n1, const Number& n2);
   friend class Poly;
   friend class Vector;
-  friend class PolyBase<POLY_VARIANT_RING,Poly>;
- 
+  //friend class PolyBase<POLY_VARIANT_RING,Poly,TrivialErrorHandler>;
+//   friend class PolyBase <poly_variant variant,
+//   class create_type_input,
+//   class error_handle_traits>;
+   template <poly_variant,class,class> friend class PolyBase;
   friend class PolyImpl;
   number as_number() const{
     return n_Copy(n,r);
