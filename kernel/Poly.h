@@ -1,4 +1,4 @@
-//$Id: Poly.h,v 1.30 2005-11-24 15:57:10 bricken Exp $
+//$Id: Poly.h,v 1.31 2005-11-25 10:17:58 bricken Exp $
 
 
 
@@ -16,16 +16,29 @@
 #include <boost/shared_ptr.hpp>
 
 #include <vector>
+#include <exception>
+using std::exception;
 
 #define BOOST_DISABLE_THREADS
 
+class DifferentDomainException: public exception{
+
+};
+class ExceptionBasedErrorHandler{
+    public:
+        static const bool handleErrors=true;
+        static void handleDifferentRing(ring r, ring s){
+        PrintS("throwing");
+        throw DifferentDomainException();
+    }
+};
 
 //PolyImpl is a 08/15 poly wrapper
 //Poly wraps around PolyImpl with reference counting using boost
 class TrivialErrorHandler{
     public:
-    static const bool handle_errors=false;
-    static void handle(){
+    static const bool handleErrors=false;
+    static void handleDifferentRing(ring r, ring s){
     }
 };
 class PolyImpl{
@@ -356,7 +369,16 @@ template<poly_variant variant, class create_type_input, class error_handle_trait
   poly as_poly() const{
     return p_Copy(ptr->p,ptr->r);
   }
-  
+  template<class T> void checkIsSameRing(T& p){
+    if (error_handle_traits::handleErrors){
+                 if (p.getRing()!=this->getRing()){
+   error_handle_traits::handleDifferentRing(
+    this->getRing(),
+    p.getRing()
+   );
+        }
+    }
+  }
   typedef create_type_input create_type;
   typedef PolyInputIterator<create_type> iterator;
   Intvec leadExp(){
@@ -397,6 +419,7 @@ template<poly_variant variant, class create_type_input, class error_handle_trait
 
 
   PolyBase& operator+=(const PolyBase& p2){
+    checkIsSameRing(p2);
     copy_on_write();
     *ptr += *p2.ptr;
     
@@ -464,11 +487,11 @@ template<poly_variant variant, class create_type_input, class error_handle_trait
   //friend PolyBase<variant> operator*<>(const PolyBase<variant>& p1, const Number& p2);
 };
 
-class Poly: public PolyBase<POLY_VARIANT_RING, Poly, TrivialErrorHandler>{
+class Poly: public PolyBase<POLY_VARIANT_RING, Poly, ExceptionBasedErrorHandler>{
  private:
-    typedef PolyBase<POLY_VARIANT_RING, Poly,TrivialErrorHandler> Base;
+    typedef PolyBase<POLY_VARIANT_RING, Poly,ExceptionBasedErrorHandler> Base;
   friend class Vector;
-  friend class PolyBase<POLY_VARIANT_MODUL,Vector,TrivialErrorHandler>;
+  friend class PolyBase<POLY_VARIANT_MODUL,Vector,ExceptionBasedErrorHandler>;
  public:
 
   Poly(ring r=currRing):Base ((poly)NULL,r,0){
@@ -518,9 +541,9 @@ class Poly: public PolyBase<POLY_VARIANT_RING, Poly, TrivialErrorHandler>{
   friend inline bool operator==(const Poly& p1, const Poly& p2);
 
 };
-class Vector: public PolyBase<POLY_VARIANT_MODUL, Vector, TrivialErrorHandler>{
+class Vector: public PolyBase<POLY_VARIANT_MODUL, Vector, ExceptionBasedErrorHandler>{
  private:
-    typedef PolyBase<POLY_VARIANT_MODUL, Vector, TrivialErrorHandler> Base;
+    typedef PolyBase<POLY_VARIANT_MODUL, Vector, ExceptionBasedErrorHandler> Base;
  public:
 
   Vector(ring r=currRing):Base ((poly)NULL,r,0){
