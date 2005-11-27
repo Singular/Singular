@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.131 2005-11-27 13:56:03 wienand Exp $ */
+/* $Id: ipshell.cc,v 1.132 2005-11-27 15:41:50 wienand Exp $ */
 /*
 * ABSTRACT:
 */
@@ -4352,7 +4352,9 @@ BOOLEAN rSleftvList2StringArray(sleftv* sl, char** p)
 ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
 {
   int ch;
+#ifdef HAVE_RING2TOM
   int cring = 0;
+#endif  
   int float_len=0;
   int float_len2=0;
   ring R = NULL;
@@ -4452,7 +4454,9 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   // allocated ring and set ch
   R = (ring) omAlloc0Bin(sip_sring_bin);
   R->ch = ch;
+#ifdef HAVE_RING2TOM
   R->cring = cring;
+#endif
   if (ch == -1)
   {
     R->float_len= si_min(float_len,32767);
