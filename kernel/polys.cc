@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.6 2005-04-21 17:15:49 Singular Exp $ */
+/* $Id: polys.cc,v 1.7 2005-11-27 15:28:45 wienand Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -650,6 +650,15 @@ BOOLEAN pHasNotCF(poly p1, poly p2)
   }
 }
 
+#ifdef HAVE_RING2TOM
+number nGetUnit(number k) {
+  long test = (long) k;
+  while (test%2 == 0) {
+    test = test / 2;
+  }
+  return (number) test;
+}
+#endif
 
 /*2
 *divides p1 by its leading coefficient
@@ -658,7 +667,30 @@ void pNorm(poly p1)
 {
   poly h;
   number k, c;
-
+#ifdef HAVE_RING2TOM
+  if (currRing->cring != 0)
+  {
+    if (p1!=NULL)
+    {
+      k = nGetUnit(pGetCoeff(p1));
+      if (!nIsOne(k))
+      {
+        k = nGetUnit(pGetCoeff(p1));
+        c = nDiv(pGetCoeff(p1), k);
+        pSetCoeff0(p1, c);
+        h = pNext(p1);
+        while (h != NULL)
+        {
+          c = nDiv(pGetCoeff(h), k);
+          pSetCoeff(h, c);
+          pIter(h);
+        }
+        nDelete(&k);
+      }
+     return;
+    }
+  }
+#endif  
   if (p1!=NULL)
   {
     if (pNext(p1)==NULL)
@@ -669,7 +701,7 @@ void pNorm(poly p1)
     if (!nIsOne(pGetCoeff(p1)))
     {
       nNormalize(pGetCoeff(p1));
-      k=pGetCoeff(p1);
+      k = pGetCoeff(p1);
       c = nInit(1);
       pSetCoeff0(p1,c);
       h = pNext(p1);
@@ -700,7 +732,7 @@ void pNorm(poly p1)
 /*2
 *normalize all coefficients
 */
-void p_Normalize(poly p, ring r) 
+void p_Normalize(poly p, ring r)
 {
   if (rField_has_simple_inverse(r)) return; /* Z/p, GF(p,n), R, long R/C */
   while (p!=NULL)

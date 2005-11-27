@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.11 2005-11-02 08:44:46 Singular Exp $ */
+/* $Id: kutil.cc,v 1.12 2005-11-27 15:28:45 wienand Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -2756,6 +2756,77 @@ kFindDivisibleByInS(kStrategy strat, int pos, LObject* L, TObject *T,
   }
 }
 
+#ifdef HAVE_RING2TOM
+TObject*
+kRingFindDivisibleByInS(kStrategy strat, int pos, LObject* L, TObject *T,
+                    long ecart)
+{
+  int j = 0;
+  const unsigned long not_sev = ~L->sev;
+  const unsigned long* sev = strat->sevS;
+  poly p;
+  ring r;
+  L->GetLm(p, r);
+
+  assume(~not_sev == p_GetShortExpVector(p, r));
+
+  if (r == currRing)
+  {
+    loop
+    {
+      if (j > pos) return NULL;
+#if defined(PDEBUG) || defined(PDIV_DEBUG)
+      if (p_LmRingShortDivisibleBy(strat->S[j], sev[j], p, not_sev, r) &&
+          (ecart== LONG_MAX || ecart>= strat->ecartS[j]))
+        break;
+#else
+      if (!(sev[j] & not_sev) &&
+          (ecart== LONG_MAX || ecart>= strat->ecartS[j]) &&
+          p_LmRingDivisibleBy(strat->S[j], p, r))
+        break;
+
+#endif
+      j++;
+    }
+    // if called from NF, T objects do not exist:
+    if (strat->tl < 0 || strat->S_2_R[j] == -1)
+    {
+      T->Set(strat->S[j], r, strat->tailRing);
+      return T;
+    }
+    else
+    {
+      assume (j >= 0 && j <= strat->tl && strat->S_2_T(j) != NULL &&
+              strat->S_2_T(j)->p == strat->S[j]);
+      return strat->S_2_T(j);
+    }
+  }
+  else
+  {
+    TObject* t;
+    loop
+    {
+      if (j > pos) return NULL;
+      assume(strat->S_2_R[j] != -1);
+#if defined(PDEBUG) || defined(PDIV_DEBUG)
+      t = strat->S_2_T(j);
+      assume(t != NULL && t->t_p != NULL && t->tailRing == r);
+      if (p_LmRingShortDivisibleBy(t->t_p, sev[j], p, not_sev, r) &&
+          (ecart== LONG_MAX || ecart>= strat->ecartS[j]))
+        return t;
+#else
+      if (! (sev[j] & not_sev) && (ecart== LONG_MAX || ecart>= strat->ecartS[j]))
+      {
+        t = strat->S_2_T(j);
+        assume(t != NULL && t->t_p != NULL && t->tailRing == r && t->p == strat->S[j]);
+        if (p_LmRingDivisibleBy(t->t_p, p, r)) return t;
+      }
+#endif
+      j++;
+    }
+  }
+}
+#endif
 
 poly redtail (LObject* L, int pos, kStrategy strat)
 {
@@ -2835,6 +2906,9 @@ poly redtail (poly p, int pos, kStrategy strat)
 
 poly redtailBba (LObject* L, int pos, kStrategy strat, BOOLEAN withT)
 {
+#ifdef HAVE_RING2TOM
+  PrintS("Warning, redtail Bba not fully ring checked"); PrintLn();
+#endif
   strat->redTailChange=FALSE;
   if (strat->noTailReduction) return L->GetLmCurrRing();
   poly h, p;
@@ -2862,12 +2936,23 @@ poly redtailBba (LObject* L, int pos, kStrategy strat, BOOLEAN withT)
       Ln.SetShortExpVector();
       if (! withT)
       {
-        With = kFindDivisibleByInS(strat, pos, &Ln, &With_s);
+#ifdef HAVE_RING2TOM
+        if (currRing->cring == 1) {
+            With = kRingFindDivisibleByInS(strat, pos, &Ln, &With_s);
+        } else
+#endif
+            With = kFindDivisibleByInS(strat, pos, &Ln, &With_s);
         if (With == NULL) break;
       }
       else
       {
-        int j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, &Ln);
+        int j;
+#ifdef HAVE_RING2TOM
+        if (currRing->cring == 1) {
+           j = kRingFindDivisibleByInT(strat->T, strat->sevT, strat->tl, &Ln);
+        } else
+#endif
+           j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, &Ln);
         if (j < 0) break;
         With = &(strat->T[j]);
       }

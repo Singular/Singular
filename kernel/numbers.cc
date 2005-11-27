@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.1.1.1 2003-10-06 12:15:58 Singular Exp $ */
+/* $Id: numbers.cc,v 1.2 2005-11-27 15:28:45 wienand Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -22,6 +22,9 @@
 #include "ring.h"
 #include "ffields.h"
 #include "shortfl.h"
+#ifdef HAVE_RING2TOM
+#include "rmodulo2m.h"
+#endif
 
 //static int characteristic = 0;
 extern int IsPrime(int p);
@@ -106,6 +109,13 @@ void nSetChar(ring r)
   {
     naSetChar(c,r);
   }
+#ifdef HAVE_RING2TOM
+  /*----------------------ring Z / 2^m----------------*/
+  else if (rField_is_Ring_2toM(r))
+  {
+    nr2mSetExp(c, r);
+  }
+#endif  
   else if (rField_is_Zp(r))
   /*----------------------char. p----------------*/
   {
@@ -269,6 +279,39 @@ void nInitChar(ring r)
     //n->nDBTest     = naDBTest;
 #endif
   }
+#ifdef HAVE_RING2TOM
+  /* -------------- Z/2^m ----------------------- */
+  else if (rField_is_Ring_2toM(r))
+  {
+     nr2mInitExp(c,r);
+     n->nInit  = nr2mInit;
+     n->nCopy  = ndCopy;
+     n->nInt   = nr2mInt;
+     n->nAdd   = nr2mAdd;
+     n->nSub   = nr2mSub;
+     n->nMult  = nr2mMult;
+     n->nDiv   = nr2mDiv;
+     n->nExactDiv= nr2mDiv;
+     n->nNeg   = nr2mNeg;
+     n->nInvers= nr2mInvers;
+     n->nGreater = nr2mGreater;
+     n->nEqual = nr2mEqual;
+     n->nIsZero = nr2mIsZero;
+     n->nIsOne = nr2mIsOne;
+     n->nIsMOne = nr2mIsMOne;
+     n->nGreaterZero = nr2mGreaterZero;
+     n->nWrite = nr2mWrite;
+     n->nRead = nr2mRead;
+     n->nPower = nr2mPower;
+     n->cfSetMap = nr2mSetMap;
+     n->nNormalize = nDummy2;
+//     n->nGetUnit = nr2mGetUnit; //TODO OLIVER
+     n->nName= ndName;
+#ifdef LDEBUG
+//     n->nDBTest=nr2mDBTest;
+#endif
+  }
+#endif
   else if (rField_is_Q(r))
   {
     n->cfDelete= nlDelete;

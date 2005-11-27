@@ -6,7 +6,7 @@
  *  Purpose: template for p_Mult_n
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pp_Mult_mm__T.cc,v 1.1.1.1 2003-10-06 12:16:02 Singular Exp $
+ *  Version: $Id: pp_Mult_mm__T.cc,v 1.2 2005-11-27 15:28:46 wienand Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -32,15 +32,22 @@ LINKAGE poly pp_Mult_mm(poly p, const poly m, const ring ri, poly &last)
   const unsigned long* m_e = m->exp;
   pAssume(!n_IsZero(ln,ri));
   pAssume1(p_GetComp(m, ri) == 0 || p_MaxComp(p, ri) == 0);
-
+  number tmp;
 
   do
   {
-    p_AllocBin( pNext(q), bin, ri);
-    q = pNext(q);
-    pSetCoeff0(q, n_Mult(ln, pGetCoeff(p), ri));
-    p_MemSum(q->exp, p->exp, m_e, length);
-    p_MemAddAdjust(q, ri);
+    tmp = n_Mult(ln, pGetCoeff(p), ri);
+#ifdef HAVE_RING2TOM
+    if (ri->cring==0 || (ri->cring ==1 && (long) tmp != 0)){
+#endif
+      p_AllocBin( pNext(q), bin, ri);
+      q = pNext(q);
+      pSetCoeff0(q, tmp);
+      p_MemSum(q->exp, p->exp, m_e, length);
+      p_MemAddAdjust(q, ri);
+#ifdef HAVE_RING2TOM
+    }
+#endif
     p = pNext(p);
   }
   while (p != NULL);

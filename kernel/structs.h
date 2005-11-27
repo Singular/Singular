@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.14 2005-11-08 07:28:59 bricken Exp $ */
+/* $Id: structs.h,v 1.15 2005-11-27 15:28:46 wienand Exp $ */
 /*
 * ABSTRACT
 */
@@ -439,8 +439,11 @@ struct sip_sring
 
   struct omBin_s*   PolyBin; /* Bin from where monoms are allocated */
   int        ch;     /* characteristic */
+#ifdef HAVE_RING2TOM
+  int        cring;  /* cring = 0 => coefficient field, cring = 1 => coeffs from Z/2^m */
+#endif
   int        ref; /* reference counter to the ring */
-  
+
   short      float_len; /* additional char-flags */
   short      float_len2; /* additional char-flags */
 

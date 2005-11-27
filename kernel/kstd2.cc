@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.3 2005-10-17 13:42:48 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.4 2005-11-27 15:28:44 wienand Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -102,6 +102,145 @@ int kFindDivisibleByInS(const polyset &S, const unsigned long* sev, const int sl
     j++;
   }
 }
+
+#ifdef HAVE_RING2TOM
+// return -1 if no divisor is found
+//        number of first divisor, otherwise
+int kRingFindDivisibleByInT(const TSet &T, const unsigned long* sevT,
+                        const int tl, const LObject* L, const int start)
+{
+  unsigned long not_sev = ~L->sev;
+  int j = start;
+  poly p;
+  ring r;
+  L->GetLm(p, r);
+
+  pAssume(~not_sev == p_GetShortExpVector(p, r));
+
+  {
+    loop
+    {
+      if (j > tl) return -1;
+#if defined(PDEBUG) || defined(PDIV_DEBUG)
+      if (p_LmRingShortDivisibleBy(T[j].p, sevT[j],
+                               p, not_sev, r))
+        return j;
+#else
+      if ( !(sevT[j] & not_sev) &&
+           p_LmRingDivisibleBy(T[j].p, p, r) )
+        return j;
+#endif
+      j++;
+    }
+  }
+  return -1;
+}
+
+// same as above, only with set S
+int kRingFindDivisibleByInS(const polyset &S, const unsigned long* sev, const int sl, LObject* L)
+{
+  unsigned long not_sev = ~L->sev;
+  poly p = L->GetLmCurrRing();
+  int j = 0;
+  //PrintS("FindDiv: p="); wrp(p); PrintLn();
+  pAssume(~not_sev == p_GetShortExpVector(p, currRing));
+  loop
+  {
+    //PrintS("FindDiv: S[j]="); wrp(S[j]); PrintLn();
+    if (j > sl) return -1;
+#if defined(PDEBUG) || defined(PDIV_DEBUG)
+    if (p_LmRingShortDivisibleBy(S[j], sev[j],
+                             p, not_sev, currRing))
+        return j;
+#else
+    if ( !(sev[j] & not_sev) &&
+         p_LmRingDivisibleBy(S[j], p, currRing) )
+      return j;
+#endif
+    j++;
+  }
+}
+
+/*2
+*  reduction procedure for the ring Z/2^m
+*/
+int redRing2toM (LObject* h,kStrategy strat)
+{
+//  PrintS("redRing2toM");
+//  PrintLn();
+  if (strat->tl<0) return 1;
+  int at,d,i;
+  int j = 0;
+  int pass = 0;
+  assume(h->pFDeg() == h->FDeg);
+  long reddeg = h->GetpFDeg();
+
+  h->SetShortExpVector();
+  loop
+  {
+    j = kRingFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h);
+    if (j < 0) return 1;
+
+#ifdef KDEBUG
+    if (TEST_OPT_DEBUG)
+    {
+      PrintS("red:");
+      h->wrp();
+      PrintS(" with ");
+      strat->T[j].wrp();
+    }
+#endif
+
+    ksRingReducePoly(h, &(strat->T[j]), NULL, NULL, strat);
+
+#ifdef KDEBUG
+    if (TEST_OPT_DEBUG)
+    {
+      PrintS("\nto ");
+      h->wrp();
+      PrintLn();
+    }
+#endif
+
+    if (h->GetLmTailRing() == NULL)
+    {
+      if (h->lcm!=NULL) pLmFree(h->lcm);
+#ifdef KDEBUG
+      h->lcm=NULL;
+#endif
+      return 0;
+    }
+    h->SetShortExpVector();
+    d = h->SetpFDeg();
+    /*- try to reduce the s-polynomial -*/
+    pass++;
+    if (!K_TEST_OPT_REDTHROUGH &&
+        (strat->Ll >= 0) && ((d > reddeg) || (pass > strat->LazyPass)))
+    {
+      h->SetLmCurrRing();
+      at = strat->posInL(strat->L,strat->Ll,h,strat);
+      if (at <= strat->Ll)
+      {
+#if 0
+        if (kRingFindDivisibleByInS(strat->S, strat->sevS, strat->sl, h) < 0)
+          return 1;
+#endif
+#ifdef KDEBUG
+        if (TEST_OPT_DEBUG) Print(" ->L[%d]\n",at);
+#endif
+        enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
+        h->Clear();
+        return -1;
+      }
+    }
+    else if ((TEST_OPT_PROT) && (strat->Ll < 0) && (d != reddeg))
+    {
+      Print(".%d",d);mflush();
+      reddeg = d;
+    }
+  }
+}
+#endif
 
 /*2
 *  reduction procedure for the homogeneous case
@@ -416,7 +555,13 @@ poly redNF (poly h,kStrategy strat)
   kBucketInit(P.bucket,P.p,pLength(P.p));
   loop
   {
-    j=kFindDivisibleByInS(strat->S,strat->sevS,strat->sl,&P);
+#ifdef HAVE_RING2TOM
+    if (currRing->cring == 1) {
+      j=kRingFindDivisibleByInS(strat->S,strat->sevS,strat->sl,&P);
+    }
+    else
+#endif
+      j=kFindDivisibleByInS(strat->S,strat->sevS,strat->sl,&P);
     if (j>=0)
     {
       nNormalize(pGetCoeff(P.p));
@@ -519,6 +664,9 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     if (strat->Ll > lrmax) lrmax =strat->Ll;/*stat.*/
 #ifdef KDEBUG
     loop_count++;
+#ifdef HAVE_RING2TOM
+    if (TEST_OPT_DEBUG) PrintS("--- next step ---\n");
+#endif    
     if (TEST_OPT_DEBUG) messageSets(strat);
 #endif
     if (strat->Ll== 0) strat->interpt=TRUE;

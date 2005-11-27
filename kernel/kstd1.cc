@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.8 2005-04-26 08:58:52 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.9 2005-11-27 15:28:44 wienand Exp $ */
 /*
 * ABSTRACT:
 */
@@ -998,6 +998,11 @@ void initBba(ideal F,kStrategy strat)
     strat->red = redLazy;
   else
     strat->red = redHomog;
+#ifdef HAVE_RING2TOM
+  if (currRing->cring == 1) {
+    strat->red = redRing2toM;
+  }
+#endif
   if (pLexOrder && strat->honey)
     strat->initEcart = initEcartNormal;
   else

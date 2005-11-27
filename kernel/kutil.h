@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.6 2005-11-02 08:43:57 Singular Exp $ */
+/* $Id: kutil.h,v 1.7 2005-11-27 15:28:45 wienand Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -102,6 +102,15 @@ public:
   // this returns Lm and ring r (preferably from tailRing), but does not
   // allocate a new poly
   KINLINE void GetLm(poly &p, ring &r) const;
+
+#ifdef OLIVER_PRIVAT_LT
+  // routines for calc. with rings
+  KINLINE poly GetLtCurrRing();
+  KINLINE poly GetLtTailRing();
+  KINLINE poly GetLt(ring r);
+  KINLINE void GetLt(poly &p, ring &r) const;
+#endif
+
   KINLINE BOOLEAN IsNull() const;
 
   KINLINE int GetpLength();
@@ -379,6 +388,9 @@ poly redNF (poly h,kStrategy strat);
 int redNF0 (LObject *P,kStrategy strat);
 poly redNFTail (poly h,const int sl,kStrategy strat);
 int redHoney (LObject* h, kStrategy strat);
+#ifdef HAVE_RING2TOM
+int redRing2toM (LObject* h,kStrategy strat);
+#endif
 int redLazy (LObject* h,kStrategy strat);
 int redHomog (LObject* h,kStrategy strat);
 void enterpairs (poly h, int k, int ec, int pos,kStrategy strat, int atR = -1);
@@ -425,6 +437,18 @@ TObject*
 kFindDivisibleByInS(kStrategy strat, int pos, LObject* L, TObject *T,
                     long ecart = LONG_MAX);
 
+#ifdef HAVE_RING2TOM
+// same for rings
+int kRingFindDivisibleByInT(const TSet &T, const unsigned long* sevT,
+                        const int tl, const LObject* L, const int start=0);
+int kRingFindDivisibleByInS(const polyset &S, const unsigned long* sev,
+                        const int sl, LObject* L);
+
+
+TObject*
+kRingFindDivisibleByInS(kStrategy strat, int pos, LObject* L, TObject *T,
+                    long ecart = LONG_MAX);
+#endif
 
 /***************************************************************
  *
@@ -506,6 +530,15 @@ int ksReducePoly(LObject* PR,
                  poly spNoether = NULL,
                  number *coef = NULL,
                  kStrategy strat = NULL);
+
+#ifdef HAVE_RING2TOM
+// same for rings
+int ksRingReducePoly(LObject* PR,
+                 TObject* PW,
+                 poly spNoether = NULL,
+                 number *coef = NULL,
+                 kStrategy strat = NULL);
+#endif
 
 // Reduces PR at Current->next with PW
 // Assumes PR != NULL, Current contained in PR

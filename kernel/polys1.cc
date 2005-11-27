@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.15 2005-09-08 11:14:10 bricken Exp $ */
+/* $Id: polys1.cc,v 1.16 2005-11-27 15:28:46 wienand Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -482,6 +482,9 @@ number pInitContent_a(poly ph);
 
 void pContent(poly ph)
 {
+#ifdef HAVE_RING2TOM
+  if (currRing->cring!=0) return;  //TODO OLIVER
+#endif
   number h,d;
   poly p;
 
@@ -1011,6 +1014,12 @@ void pCleardenom(poly ph)
   number d, h;
   poly p;
 
+#ifdef HAVE_RING2TOM
+  if (currRing->cring == 1) {
+    pNorm(ph);
+    return;
+  }
+#endif
   p = ph;
   if(pNext(p)==NULL)
   {
