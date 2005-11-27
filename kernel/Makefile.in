@@ -99,7 +99,6 @@ CXXSOURCES=clapconv.cc \
     kstd1.cc kstd2.cc kutil.cc \
     longalg.cc longrat.cc longrat0.cc \
     maps.cc matpol.cc misc.cc gnumpfl.cc gnumpc.cc \
-#    rmodulo2m.cc \
     modulop.cc mpr_complex.cc sparsmat.cc fast_maps.cc \
     fglmzero.cc fglmvec.cc fglmgauss.cc fglmhom.cc fglmcomb.cc \
     numbers.cc polys.cc p_polys.cc polys0.cc polys1.cc polys-impl.cc \
@@ -157,7 +156,6 @@ HEADERS=hutil.h stairc.h ideals.h \
 	gring.h walkProc.h walkMain.h walkSupport.h\
 	ffields.h khstd.h sparsmat.h gnumpfl.h gnumpc.h \
 	fglm.h kstd1.h \
-#    rmodulo2m.h \
     modulop.h sing_dbm.h weight.h \
 	fglmgauss.h fglmvec.h \
 	kstdfac.h kmatrix.h\
