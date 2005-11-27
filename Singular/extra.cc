@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.232 2005-11-18 12:42:43 wienand Exp $ */
+/* $Id: extra.cc,v 1.233 2005-11-27 13:56:02 wienand Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -53,6 +53,10 @@
 #include "distrib.h"
 #include "prCopy.h"
 #include "mpr_complex.h"
+
+#ifdef HAVE_RING2TOM
+#include "ringgb.h"
+#endif
 
 #ifdef HAVE_WALK
 #include "walk.h"
@@ -2490,6 +2494,40 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       strat_fac_debug=(int)h->Data(); 
       strat_nr=0;
       return FALSE;
+    }
+    else
+#endif
+#ifdef HAVE_RING2TOM
+/*==================== ring-GB ==================================*/
+    if (strcmp(sys_cmd, "NF_ring")==0)
+    {
+      ring r = currRing;
+      poly f = (poly) h->Data();
+      h = h->next;
+      ideal G = (ideal) h->Data();
+      res->rtyp=POLY_CMD;
+      res->data=(poly) ringNF(f, G, r);
+      return(FALSE);
+    }
+    else
+    if (strcmp(sys_cmd, "redNF_ring")==0)
+    {
+      ring r = currRing;
+      poly f = (poly) h->Data();
+      h = h->next;
+      ideal G = (ideal) h->Data();
+      res->rtyp=POLY_CMD;
+      res->data=(poly) ringRedNF(f, G, r);
+      return(FALSE);
+    }
+    else
+    if (strcmp(sys_cmd, "reduce_fct")==0)
+    {
+      ring r = currRing;
+      poly f = (poly)h->Data();
+      res->rtyp=POLY_CMD;
+      res->data=NULL;
+      return(FALSE);
     }
     else
 #endif

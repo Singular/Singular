@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.130 2005-10-24 11:55:34 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.131 2005-11-27 13:56:03 wienand Exp $ */
 /*
 * ABSTRACT:
 */
@@ -575,6 +575,17 @@ int exprlist_length(leftv v)
   }
   return rc;
 }
+
+#ifdef HAVE_RING2TOM
+BOOLEAN Is2toM(int p)  /* brute force !!!! */
+{
+  int test = p;
+  while (p%2 == 0) {
+    p = p / 2;
+  }
+  return (p == 1);
+}
+#endif
 
 int IsPrime(int p)  /* brute force !!!! */
 {
@@ -4341,6 +4352,7 @@ BOOLEAN rSleftvList2StringArray(sleftv* sl, char** p)
 ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
 {
   int ch;
+  int cring = 0;
   int float_len=0;
   int float_len2=0;
   ring R = NULL;
@@ -4425,12 +4437,22 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
         else ffChar=TRUE;
       }
     }
-    else
-      ch = IsPrime(ch);
+    else {
+#ifdef HAVE_RING2TOM
+      if (Is2toM(ch)) {
+        cring = 1; // Use Z/2^ch
+        Print("Beta: using Z/2^%d", ch);
+        PrintLn();
+      }
+      else
+#endif
+        ch = IsPrime(ch);
+    }
   }
   // allocated ring and set ch
   R = (ring) omAlloc0Bin(sip_sring_bin);
   R->ch = ch;
+  R->cring = cring;
   if (ch == -1)
   {
     R->float_len= si_min(float_len,32767);

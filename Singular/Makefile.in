@@ -64,11 +64,12 @@ DEFS		= -DNDEBUG -DOM_NDEBUG -D@SING_UNAME@ @DEFS@
 LDFLAGS2	= @LDFLAGS@
 ifneq ($(SINGUNAME),ix86-Win)
 LDFLAGS		= -L../kernel -lkernel @LDFLAGS@
+LDFLAGSG	= -L../kernel -lkernel-g @LDFLAGS@
 else
 ## -L/usr/local/lib -L../modules/python --> PySingular
 LDFLAGS		= -L../kernel -L/bin -lkernel @LDFLAGS@ -L/usr/local/lib -L../modules/python
+LDFLAGSG	= -L../kernel -L/bin -lkernel-g @LDFLAGS@
 endif
-LDFLAGSG	= -L../kernel -lkernel-g @LDFLAGS@
 LD_DYN_FLAGS	= @LD_DYN_FLAGS@
 SFLAGS		= @SFLAGS@
 SLDFLAGS	= @SLDFLAGS@
