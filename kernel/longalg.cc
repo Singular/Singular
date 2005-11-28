@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.12 2005-11-22 15:25:40 Singular Exp $ */
+/* $Id: longalg.cc,v 1.13 2005-11-28 12:44:15 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -1524,7 +1524,14 @@ BOOLEAN naIsOne(number za)
 #endif
   if (a->n==NULL)
   {
-    if (napIsConstant(a->z)) return nacIsOne(napGetCoeff(a->z));
+    if (napIsConstant(a->z)) 
+    {
+#ifdef LDEBUG
+       if (a->z==NULL) return FALSE;
+       else 
+#endif 
+         return nacIsOne(napGetCoeff(a->z));
+    }
     else                 return FALSE;
   }
   x = a->z;
@@ -1614,19 +1621,27 @@ number naGcd(number a, number b, const ring r)
     else
       result->z = napGcd0(x->z, y->z);
   }
-  else if ((x->n==NULL) && (y->n==NULL))
-    result->z = napGcd(x->z, y->z); // change from napGcd0
-    
-#if 0
   else
+#if 0
+    result->z = napGcd(x->z, y->z); // change from napGcd0
+#else
   {
-    CanonicalForm F, G;
+    napoly rz=napGcd(x->z, y->z);
+    CanonicalForm F, G, R;
+    R=convSingTrClapP(rz); 
     napNormalize(x->z);
-    F=convSingTrClapP(x->z); 
+    F=convSingTrClapP(x->z)/R; 
     napNormalize(y->z);
-    G=convSingTrClapP(y->z); 
-    result->z=convClapPSingTr( gcd( F, G ) );
-    napNormalize(result->z);
+    G=convSingTrClapP(y->z)/R; 
+    F = gcd( F, G );
+    if (F.isOne()) 
+      result->z= rz;
+    else
+    {
+      napDelete(&rz);
+      result->z=convClapPSingTr( F*R );
+      napNormalize(result->z);
+    }
   }
 #endif
 
