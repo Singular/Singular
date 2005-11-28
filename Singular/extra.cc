@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.233 2005-11-27 13:56:02 wienand Exp $ */
+/* $Id: extra.cc,v 1.234 2005-11-28 15:47:00 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -2692,6 +2692,32 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 #endif
+/*==================== gcd-varianten =================*/
+    if (strcmp(sys_cmd, "gcd") == 0)
+    {
+      if (h==NULL)
+      {
+        Print("NTL_0:%d (use NTL for gcd of polynomials in char 0)\n",isOn(SW_USE_NTL_GCD_0));
+        Print("NTL_p:%d (use NTL for gcd of polynomials in char p)\n",isOn(SW_USE_NTL_GCD_P));
+        Print("EZGCD:%d (use EZGCD for gcd of polynomials in char 0)\n",isOn(SW_USE_EZGCD));
+        Print("SPARSEMOD:%d (use SPARSEMOD for gcd of polynomials in char 0)\n",isOn(SW_USE_SPARSEMOD));
+        return FALSE;
+      }
+      else
+      if ((h!=NULL) && (h->Typ()==STRING_CMD)
+      && (h->next!=NULL) && (h->next->Typ()==INT_CMD))
+      {
+        int d=(int)h->next->Data();
+        char *s=(char *)h->Data();
+        if (strcmp(s,"NTL_0")==0) { if (d) On(SW_USE_NTL_GCD_0); else Off(SW_USE_NTL_GCD_0); }
+        if (strcmp(s,"NTL_p")==0) { if (d) On(SW_USE_NTL_GCD_P); else Off(SW_USE_NTL_GCD_P); }
+        if (strcmp(s,"EZGCD")==0) { if (d) On(SW_USE_EZGCD); else Off(SW_USE_EZGCD); }
+        if (strcmp(s,"SPARSEMOD")==0) { if (d) On(SW_USE_SPARSEMOD); else Off(SW_USE_SPARSEMOD); }
+        return FALSE;
+      }
+      else return TRUE;
+    }
+    else
 #ifdef ix86_Win
 /*==================== Python Singular =================*/
     if (strcmp(sys_cmd, "python") == 0)
