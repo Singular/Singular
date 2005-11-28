@@ -1,3 +1,6 @@
+Mon Nov 28 18:11:47 CET 2005  naGcd revisited, uses factory now
+                              - should possibly splitted into naGcd/naEasyGcd
+                              pContent should be rewritten according to that.
 Tue Sep  6 15:38:40 CEST 2005 added absfact.lib
 Tue Sep  6 12:04:08 CEST 2005 hannes/lossen: remove examples for uresolve
                               which fail the Newton polytope test
