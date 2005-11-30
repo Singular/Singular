@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.385 2005-11-24 09:42:35 Singular Exp $ */
+/* $Id: iparith.cc,v 1.386 2005-11-30 14:17:42 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1004,7 +1004,7 @@ static BOOLEAN jjTIMES_MA(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjGE_I(leftv res, leftv u, leftv v)
 {
-  res->data = (char *)((long)u->Data() >= (long)v->Data());
+  res->data = (char *)((int)((long)u->Data()) >= (int)((long)v->Data()));
   return FALSE;
 }
 static BOOLEAN jjGE_N(leftv res, leftv u, leftv v)
@@ -1016,7 +1016,7 @@ static BOOLEAN jjGE_N(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjGT_I(leftv res, leftv u, leftv v)
 {
-  res->data = (char *)((long)u->Data()>(long)v->Data());
+  res->data = (char *)((int)((long)u->Data()) > (int)((long)v->Data()));
   return FALSE;
 }
 static BOOLEAN jjGT_N(leftv res, leftv u, leftv v)
@@ -1028,7 +1028,7 @@ static BOOLEAN jjGT_N(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjLE_I(leftv res, leftv u, leftv v)
 {
-  res->data = (char *)((long)u->Data() <= (long)v->Data());
+  res->data = (char *)((int)((long)u->Data()) <= (int)((long)v->Data()));
   return FALSE;
 }
 static BOOLEAN jjLE_N(leftv res, leftv u, leftv v)
@@ -1040,7 +1040,7 @@ static BOOLEAN jjLE_N(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjLT_I(leftv res, leftv u, leftv v)
 {
-  res->data = (char *)((int)(long)u->Data() < (int)(long)v->Data());
+  res->data = (char *)((int)((long)u->Data()) < (int)((long)v->Data()));
   return FALSE;
 }
 static BOOLEAN jjLT_N(leftv res, leftv u, leftv v)
@@ -1191,7 +1191,7 @@ static BOOLEAN jjDIV_Ma(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjEQUAL_I(leftv res, leftv u, leftv v)
 {
-  res->data = (char *)((int)(long)u->Data() == (int)(long)v->Data());
+  res->data = (char *)((int)((long)u->Data()) == (int)((long)v->Data()));
   jjEQUAL_REST(res,u,v);
   return FALSE;
 }
