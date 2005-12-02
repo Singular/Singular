@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.cc,v 1.1.1.1 2003-10-06 12:16:01 Singular Exp $ */
+/* $Id: polys-impl.cc,v 1.2 2005-12-02 12:25:43 Singular Exp $ */
 
 /***************************************************************
  *
@@ -64,12 +64,14 @@ poly pHeadProc(poly p)
 static inline unsigned long GetBitFields(Exponent_t e,
                                          unsigned int s, unsigned int n)
 {
-  unsigned int i = 0, ev = 0;
+#define Sy_bit_L(x)     (((unsigned long)1L)<<(x))
+  unsigned int i = 0;
+  unsigned long  ev = 0L;
   assume(n > 0 && s < BIT_SIZEOF_LONG);
   do
   {
     assume(s+i < BIT_SIZEOF_LONG);
-    if (e > (Exponent_t) i) ev |= Sy_bit(s+i);
+    if (e > (Exponent_t) i) ev |= Sy_bit_L(s+i);
     else break;
     i++;
   }
