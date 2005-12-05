@@ -1,6 +1,6 @@
 /* Copyright 1997 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
-// static char * rcsid = "$Id: homogfactor.cc,v 1.4 2002-08-19 11:11:34 Singular Exp $ ";
+// static char * rcsid = "$Id: homogfactor.cc,v 1.5 2005-12-05 15:47:32 Singular Exp $ ";
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -55,6 +55,7 @@ get_Terms( const CanonicalForm & f ){
   return result;
 }
 
+#if 0
 ///////////////////////////////////////////////////////////////
 // is_homogeneous returns 1 iff f is homogeneous, 0 otherwise//
 ///////////////////////////////////////////////////////////////
@@ -67,7 +68,9 @@ is_homogeneous( const CanonicalForm & f){
   for ( i=termlist; i.hasItem(); i++ )
     if ( totaldegree(i.getItem()) != deg ) return 0;
   return 1;
+  // now: return f.isHomogeneous();
 }
+#endif
 
 ///////////////////////////////////////////////////////////////
 // get_max_degree_Variable returns Variable with             //
@@ -153,6 +156,9 @@ HomogFactor( const CanonicalForm & g, const CanonicalForm  & minpoly, const int 
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.4  2002/08/19 11:11:34  Singular
+* hannes/pfister: alg_gcd etc.
+
 Revision 1.3  1997/09/12 07:19:57  Singular
 * hannes/michael: libfac-0.3.0
 

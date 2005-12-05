@@ -1,6 +1,6 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: Factor.cc,v 1.19 2005-10-17 13:18:44 Singular Exp $ ";
+static char * rcsid = "$Id: Factor.cc,v 1.20 2005-12-05 15:47:32 Singular Exp $ ";
 static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) michael@math.uni-sb.de \nPlease include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -877,7 +877,7 @@ Factorize(const CanonicalForm & F, int is_SqrFree ){
           Outputlist.append( CFFactor( m(j.getItem().factor()),exp*j.getItem().exp()));
       }
       else{ // multivariate polynomial
-        if ( is_homogeneous(g) ){
+        if ( g.isHomogeneous() ){
           DEBOUTLN(cout, "Poly is homogeneous! : ", g);
           // Now we can substitute one variable to 1, factorize and then
           // look on the resulting factors and their monomials for
@@ -1053,7 +1053,7 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
              exp*j.getItem().exp()));
       }
       else{ // multivariate polynomial
-        if ( is_homogeneous(g) ){
+        if ( g.isHomogeneous() ){
           DEBOUTLN(cout, "Poly is homogeneous! : ", g);
           // Now we can substitute one variable to 1, factorize and then
           // look on the resulting factors and their monomials for
@@ -1114,6 +1114,9 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.19  2005/10/17 13:18:44  Singular
+*hannes: apply sqrFree before newfactoras (Factorize in Q(a))
+
 Revision 1.18  2005/10/17 13:17:39  Singular
 *hannes: aplly sqrFree before newfactoras (Factorize in Q(a))
 
