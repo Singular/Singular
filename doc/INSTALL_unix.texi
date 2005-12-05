@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: INSTALL_unix.texi,v 1.22 2005-10-28 14:05:46 Singular Exp $
+@comment $Id: INSTALL_unix.texi,v 1.23 2005-12-05 14:20:47 Singular Exp $
 @c FILE: INSTALL_unix.texi
 @c PURPOSE: Installation instruction for Singular on Unix
 @c
@@ -30,9 +30,11 @@ Unix
 platform, you need the following two
 archives:
 @table @code
-@item Singular-@value{VERSION}-share.tar.gz
+@item 
+Singular-@value{VERSION}-share.tar.gz
 contains architecture independent data like documentation and libraries.
-@item Singular-@value{VERSION}-@value{_UNAME}.tar.gz
+@item 
+Singular-@value{VERSION}-@value{_UNAME}.tar.gz
 contains architecture dependent executables, like the @sc{Singular}
 program.
 @end table
