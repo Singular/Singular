@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb_internal.h,v 1.20 2005-11-24 11:28:29 bricken Exp $ */
+/* $Id: tgb_internal.h,v 1.21 2005-12-08 09:00:20 bricken Exp $ */
 /*
  * ABSTRACT: tgb internal .h file
 */
@@ -137,6 +137,7 @@ class red_object{
   unsigned long sev;
   void flatten();
   void validate();
+  wlen_type initial_quality;
   void adjust_coefs(number c_r, number c_ac_r);
   wlen_type guess_quality(slimgb_alg* c);
   int clear_to_poly();
