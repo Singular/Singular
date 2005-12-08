@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.cc,v 1.2 2004-10-07 18:10:01 bricken Exp $ */
+/* $Id: kbuckets.cc,v 1.3 2005-12-08 11:14:04 Singular Exp $ */
 
 #include "mod2.h"
 #include "structs.h"
@@ -429,7 +429,7 @@ void kBucket_Mult_n(kBucket_pt bucket, number n)
       }
       else
       {
-        bucket->coef[i] = p_NSet(n_Copy(n,bucket->bucket_ring),r);
+        bucket->coef[i] = p_NSet(n_Copy(n,r),r);
       }
 #else
       bucket->buckets[i] = p_Mult_nn(bucket->buckets[i], n, r);
