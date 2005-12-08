@@ -4,11 +4,12 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.48 2005-11-24 11:28:30 bricken Exp $ */
+/* $Id: tgb.cc,v 1.49 2005-12-08 08:59:41 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
-
+#include <vector>
+using namespace std;
 #include "mod2.h"
 #include "tgb.h"
 #include "tgb_internal.h"
@@ -19,6 +20,7 @@
 //#include "gr_kstd2.h"
 #include "longrat.h"
 static const int bundle_size=100;
+static const int delay_factor=3;
 #if 1
 static omBin lm_bin=NULL;
 static inline poly p_Init_Special(const ring r)
@@ -1516,126 +1518,7 @@ BOOLEAN is_valid_ro(red_object & ro){
   return TRUE;
 }
 
-//*obsolete
-void pre_comp(poly* p,int & pn,slimgb_alg* c){
-  if(!(pn))
-    return;
-  mac_poly* q=(mac_poly*) omalloc(pn*sizeof(mac_poly)); 
-  int i;
-  exp_number_builder e;
-  for(i=0;i<pn;i++){
-    assume(p[i]!=NULL);
-    q[i]=new mac_poly_r();
-    q[i]->exp=e.get_n(p[i]);
-    q[i]->coef=nCopy(p[i]->coef);
-    
-    mac_poly qa=q[i];
-    poly pa=p[i];
-    while(pa->next!=NULL){
-      qa->next = new mac_poly_r();
-      qa=qa->next;
-      pa=pa->next,
-      qa->exp=e.get_n(pa);
-      qa->coef=nCopy(pa->coef);
-     
-      
-    }
-    qa->next=NULL;
-    pDelete(&p[i]);
-  }
-  poly* ip= (poly*)omalloc (e.n*sizeof(poly));
-  int* ia=(int*) omalloc (e.n*sizeof(int));
-  t2ippa(ip,ia,e);
-  for(i=0;i<pn;i++){
-    mac_poly mp=q[i];
-    while(mp!=NULL){
-      mp->exp=ia[mp->exp];
-      mp=mp->next;
-    }
-    
-  }
-//gaus reduction start
-  int col, row;
-  col=0;
-  row=0;
-  assume(pn>0);
-  while(row<pn-1){
-    //row is the row where pivot should be
-    // row== pn-1 means we have only to act on one row so no red nec.
-    //we assume further all rows till the pn-1 row are non-zero
-    
-    //select column
-    int i;
-    col=q[row]->exp;
-    int found_in_row=row;
-    for(i=row;i<pn;i++){
-      if(q[i]->exp<col){
-	col=q[i]->exp;
-	found_in_row=i;
-      }
-      
-    }
-    //select pivot
-    int act_l=mac_length(q[found_in_row]);
-    for(i=row+1;i<pn;i++){
-      if((q[i]->exp==col)&&(mac_length(q[i])<act_l)){
-	found_in_row=i;
-	act_l=mac_length(q[i]);//should be optimized here
-      }
-    }
-    mac_poly h=q[row];
-    q[row]=q[found_in_row];
-    q[found_in_row]=h;
 
-    //reduction
-    for(i=row+1;i<pn;i++){
-      if(q[i]->exp==q[row]->exp){
-	
-	number c1=nNeg(nCopy(q[i]->coef));
-	number c2=q[row]->coef;
-	//use checkcoeff later
-	mac_mult_cons(q[i],c2);
-	q[i]=mac_p_add_ff_qq(q[i],c1,q[row]);
-      }
-	  
-	
-	
-    }
-    for(i=row+1;i<pn;i++){
-      if(q[i]==NULL){
-	q[i]=q[pn-1];
-	pn--;
-	if(i!=pn){i--;}
-      }
-    }
-  
-    row++;
-  }
-
-
-//gaus reduction end  
-
-  for(i=0;i<pn;i++){
-    poly pa;
-    mac_poly qa;
-    p[i]=pLmInit(ip[q[i]->exp]);
-    pSetCoeff(p[i],q[i]->coef);
-    pa=p[i];
-    qa=q[i];
-    while(qa->next!=NULL){
-      qa=qa->next;
-      pa->next=pLmInit(ip[qa->exp]);
-      pa=pa->next;
-      pa->coef=qa->coef;
-    }
-    pa->next=NULL;
-  }
-  for(i=0;i<e.n;i++){
-    pDelete(&ip[i]);  
-  }
-  omfree(ip);
-  omfree(ia);
-}
 
 static void go_on (slimgb_alg* c){
   //set limit of 1000 for multireductions, at the moment for
@@ -1705,8 +1588,11 @@ static void go_on (slimgb_alg* c){
     buf[j].p=p[j];
     buf[j].sev=pGetShortExpVector(p[j]);
     buf[j].bucket = kBucketCreate(currRing);
+    
     int len=pLength(p[j]);
     kBucketInit(buf[j].bucket,buf[j].p,len);
+    buf[j].initial_quality=buf[j].guess_quality(c);
+    assume(buf[j].initial_quality>=0);
   }
   omfree(p);
   qsort(buf,i,sizeof(red_object),red_object_better_gen);
@@ -2992,6 +2878,7 @@ static void multi_reduction_find(red_object* los, int losl,slimgb_alg* c,int sta
       assume(i>=i2);
       if(i2!=i){
 	
+	
 	erg.to_reduce_u=i-1;
 	erg.to_reduce_l=i2;
 	erg.reduce_by=i;
@@ -3084,15 +2971,22 @@ static void sort_region_down(red_object* los, int l, int u, slimgb_alg* c)
 //assume that los is ordered ascending by leading term, all non zero
 static void multi_reduction(red_object* los, int & losl, slimgb_alg* c)
 {
-  
+  vector<poly> delay;
   //initialize;
   assume(c->strat->sl>=0);
   assume(losl>0);
   int i;
+  wlen_type max_initial_quality=0;
+  
   for(i=0;i<losl;i++){
     los[i].sev=pGetShortExpVector(los[i].p);
 //SetShortExpVector();
     los[i].p=kBucketGetLm(los[i].bucket);
+    if (los[i].initial_quality>max_initial_quality)
+        max_initial_quality=los[i].initial_quality;
+    // else
+//         Print("init2_qal=%lld;", los[i].initial_quality);
+//     Print("initial_quality=%lld;",max_initial_quality);
   }
 
   kStrategy strat=c->strat;
@@ -3130,7 +3024,34 @@ static void multi_reduction(red_object* los, int & losl, slimgb_alg* c)
 //     reduction_step *rs=create_reduction_step(erg, los, c);
 //     rs->reduce(los,erg.to_reduce_l,erg.to_reduce_u);
 //     finalize_reduction_step(rs);
-		 
+    if(!K_TEST_OPT_REDTHROUGH){
+	for(i=erg.to_reduce_l;i<=erg.to_reduce_u;i++){
+	   if (los[i].p!=NULL)
+	   {
+	       //kBucketSimpleContent(los[i].bucket);
+	       assume(los[i].initial_quality>0);
+	       
+               if(los[i].guess_quality(c)
+                  >1.5*delay_factor*max_initial_quality){
+                       if (TEST_OPT_PROT)
+                           PrintS("v");
+                       los[i].canonicalize();
+                       if(los[i].guess_quality(c)
+                           >delay_factor*max_initial_quality){
+                               if (TEST_OPT_PROT)
+                                   PrintS(".");
+                               los[i].clear_to_poly();
+                               delay.push_back(los[i].p);
+                               //add_to_basis_ideal_quotient(
+                               //   los[i].p,-1,-1,c,NULL);
+                               los[i].p=NULL;
+                      
+                      }
+                  }
+	          
+	          }
+	   }
+	}
     int deleted=multi_reduction_clear_zeroes(los, losl, erg.to_reduce_l, erg.to_reduce_u);
     if(erg.fromS==FALSE)
       curr_pos=si_max(erg.to_reduce_u,erg.reduce_by);
@@ -3157,6 +3078,32 @@ static void multi_reduction(red_object* los, int & losl, slimgb_alg* c)
     }
       
   }
+  
+  int delay_s=delay.size();
+  //int i;
+  sorted_pair_node** pairs=(sorted_pair_node**)
+    omalloc(delay_s*sizeof(sorted_pair_node*)); 
+  for(i=0;i<delay_s;i++){
+      poly p=delay[i];
+      sorted_pair_node* si=(sorted_pair_node*) omalloc(sizeof(sorted_pair_node));
+      si->i=-1;
+      si->j=-1;
+       if (!rField_is_Zp(c->r)){
+        if (!c->nc)
+            p=redTailShort(p, c->strat);
+        pCleardenom(p);
+        pContent(p);
+      }
+      si->expected_length=pLength(p);
+      si->deg=pTotaldegree(p);
+     
+      si->lcm_of_lm=p;
+      pairs[i]=si;
+  }
+  qsort(pairs,delay_s,sizeof(sorted_pair_node*),tgb_pair_better_gen2);
+  c->apairs=spn_merge(c->apairs,c->pair_top+1,pairs,delay_s,c);
+  c->pair_top+=delay_s;
+  
   return;
 }
 void red_object::flatten(){
