@@ -4,12 +4,12 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.49 2005-12-08 08:59:41 bricken Exp $ */
+/* $Id: tgb.cc,v 1.50 2005-12-09 09:28:48 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
-#include <vector>
-using namespace std;
+//#include <vector>
+//using namespace std;
 #include "mod2.h"
 #include "tgb.h"
 #include "tgb_internal.h"
@@ -2971,7 +2971,8 @@ static void sort_region_down(red_object* los, int l, int u, slimgb_alg* c)
 //assume that los is ordered ascending by leading term, all non zero
 static void multi_reduction(red_object* los, int & losl, slimgb_alg* c)
 {
-  vector<poly> delay;
+  poly* delay=(poly*) omalloc(losl*sizeof(poly));
+  int delay_s=0;
   //initialize;
   assume(c->strat->sl>=0);
   assume(losl>0);
@@ -3041,7 +3042,9 @@ static void multi_reduction(red_object* los, int & losl, slimgb_alg* c)
                                if (TEST_OPT_PROT)
                                    PrintS(".");
                                los[i].clear_to_poly();
-                               delay.push_back(los[i].p);
+                               //delay.push_back(los[i].p);
+                               delay[delay_s]=los[i].p;
+                               delay_s++;
                                //add_to_basis_ideal_quotient(
                                //   los[i].p,-1,-1,c,NULL);
                                los[i].p=NULL;
@@ -3079,7 +3082,7 @@ static void multi_reduction(red_object* los, int & losl, slimgb_alg* c)
       
   }
   
-  int delay_s=delay.size();
+  //int delay_s=delay.size();
   //int i;
   sorted_pair_node** pairs=(sorted_pair_node**)
     omalloc(delay_s*sizeof(sorted_pair_node*)); 
@@ -3103,7 +3106,7 @@ static void multi_reduction(red_object* los, int & losl, slimgb_alg* c)
   qsort(pairs,delay_s,sizeof(sorted_pair_node*),tgb_pair_better_gen2);
   c->apairs=spn_merge(c->apairs,c->pair_top+1,pairs,delay_s,c);
   c->pair_top+=delay_s;
-  
+  omfree(delay);
   return;
 }
 void red_object::flatten(){
