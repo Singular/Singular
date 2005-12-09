@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.h,v 1.29 2005-10-18 13:16:14 Singular Exp $ */
+/* $Id: canonicalform.h,v 1.30 2005-12-09 08:35:37 Singular Exp $ */
 
 #ifndef INCL_CANONICALFORM_H
 #define INCL_CANONICALFORM_H
@@ -88,6 +88,7 @@ public:
 
     bool isFFinGF() const;
     bool isUnivariate() const;
+    bool isHomogeneous() const;
 
     // conversion functions
     int intval() const;

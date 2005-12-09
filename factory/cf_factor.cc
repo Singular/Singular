@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_factor.cc,v 1.26 2005-08-22 17:24:01 Singular Exp $ */
+/* $Id: cf_factor.cc,v 1.27 2005-12-09 08:35:38 Singular Exp $ */
 
 //{{{ docu
 //
@@ -171,15 +171,153 @@ bool isPurePoly(const CanonicalForm & f)
   return true;
 }
 
+///////////////////////////////////////////////////////////////
+// get_max_degree_Variable returns Variable with             //
+// highest degree. We assume f is *not* a constant!          //
+///////////////////////////////////////////////////////////////
+Variable
+get_max_degree_Variable(const CanonicalForm & f)
+{
+  ASSERT( ( ! f.inCoeffDomain() ), "no constants" );
+  int max=0, maxlevel=0, n=level(f);
+  for ( int i=1; i<=n; i++ )
+  {
+    if (degree(f,Variable(i)) >= max)
+    {
+      max= degree(f,Variable(i)); maxlevel= i;
+    }
+  }
+  return Variable(maxlevel);
+}
+
+///////////////////////////////////////////////////////////////
+// get_Terms: Split the polynomial in the containing terms.  //
+// getTerms: the real work is done here.                     //
+///////////////////////////////////////////////////////////////
+void
+getTerms( const CanonicalForm & f, const CanonicalForm & t, CFList & result )
+{
+  if ( getNumVars(f) == 0 ) result.append(f*t);
+  else{
+    Variable x(level(f));
+    for ( CFIterator i=f; i.hasTerms(); i++ )
+      getTerms( i.coeff(), t*power(x,i.exp()), result);
+  }
+}
+CFList
+get_Terms( const CanonicalForm & f ){
+  CFList result,dummy,dummy2;
+  CFIterator i;
+  CFListIterator j;
+
+  if ( getNumVars(f) == 0 ) result.append(f);
+  else{
+    Variable _x(level(f));
+    for ( i=f; i.hasTerms(); i++ ){
+      getTerms(i.coeff(), 1, dummy);
+      for ( j=dummy; j.hasItem(); j++ )
+        result.append(j.getItem() * power(_x, i.exp()));
+
+      dummy= dummy2; // have to initalize new
+    }
+  }
+  return result;
+}
+
+
+///////////////////////////////////////////////////////////////
+// homogenize homogenizes f with Variable x                  //
+///////////////////////////////////////////////////////////////
+
+CanonicalForm
+homogenize( const CanonicalForm & f, const Variable & x)
+{
+#if 0
+  int maxdeg=totaldegree(f), deg;
+  CFIterator i;
+  CanonicalForm elem, result=f.genZero();
+  
+  for (i=f; i.hasTerms(); i++)
+  {
+    elem= i.coeff()*power(f.mvar(),i.exp());
+    deg = totaldegree(elem);
+    if ( deg < maxdeg )
+      result += elem * power(x,maxdeg-deg);
+    else 
+      result+=elem;
+  }
+  return result;
+#else
+  CFList Newlist, Termlist= get_Terms(f);
+  int maxdeg=totaldegree(f), deg;
+  CFListIterator i;
+  CanonicalForm elem, result=f.genZero();
+
+  for (i=Termlist; i.hasItem(); i++){
+    elem= i.getItem();
+    deg = totaldegree(elem);
+    if ( deg < maxdeg )
+      Newlist.append(elem * power(x,maxdeg-deg));
+    else
+      Newlist.append(elem);
+  }
+  for (i=Newlist; i.hasItem(); i++) // rebuild
+    result += i.getItem();
+
+  return result;
+#endif
+}
+
+#ifdef SINGULAR
+extern int singular_homog_flag;
+#else
+#define singular_homog_flag 1
+#endif
+static int cmpCF( const CFFactor & f, const CFFactor & g )
+{
+  if (f.exp() > g.exp()) return 1;
+  if (f.exp() < g.exp()) return 0;
+  if (f.factor() > g.factor()) return 1;
+  return 0;
+}
+
 CFFList factorize ( const CanonicalForm & f, bool issqrfree )
 {
   if ( f.inCoeffDomain() )
         return CFFList( f );
-  //out_cf("factorize:",f,"==================================\n");
   int mv=f.level();
   int org_v=mv;
+  //out_cf("factorize:",f,"==================================\n");
   if (! f.isUnivariate() )
   {
+    if ( singular_homog_flag && f.isHomogeneous())
+    {
+      Variable xn = get_max_degree_Variable(f);
+      int d_xn = degree(f,xn);
+      CFMap n;
+      CanonicalForm F = compress(f(1,xn),n);
+      CFFList Intermediatelist;
+      Intermediatelist = factorize(F);
+      CFFList Homoglist;
+      CFFListIterator j;
+      for ( j=Intermediatelist; j.hasItem(); j++ )
+      {
+        Homoglist.append(
+            CFFactor( n(j.getItem().factor()), j.getItem().exp()) );
+      }
+      CFFList Unhomoglist;
+      CanonicalForm unhomogelem;
+      for ( j=Homoglist; j.hasItem(); j++ )
+      {
+        unhomogelem= homogenize(j.getItem().factor(),xn);
+        Unhomoglist.append(CFFactor(unhomogelem,j.getItem().exp()));
+        d_xn -= (degree(unhomogelem,xn)*j.getItem().exp());
+      }
+      if ( d_xn != 0 ) // have to append xn^(d_xn)
+        Unhomoglist.append(CFFactor(CanonicalForm(xn),d_xn));  
+      if(isOn(SW_USE_NTL_SORT)) Unhomoglist.sort(cmpCF); 
+      return Unhomoglist;
+    }
     mv=find_mvar(f);
     if ( getCharacteristic() == 0 )
     {
@@ -364,6 +502,7 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
     swapvar(f,Variable(mv),Variable(org_v));
   }
   //out_cff(F);
+  if(isOn(SW_USE_NTL_SORT)) F.sort(cmpCF); 
   return F;
 }
 

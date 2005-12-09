@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_algorithm.h,v 1.11 1998-06-30 16:31:24 schmidt Exp $ */
+/* $Id: cf_algorithm.h,v 1.12 2005-12-09 08:35:37 Singular Exp $ */
 
 #ifndef INCL_CF_ALGORITHM_H
 #define INCL_CF_ALGORITHM_H
@@ -60,6 +60,13 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha );
 CFFList sqrFree ( const CanonicalForm & f, bool sort = false );
 
 bool isSqrFree ( const CanonicalForm & f );
+
+CanonicalForm homogenize( const CanonicalForm & f, const Variable & x);
+Variable get_max_degree_Variable(const CanonicalForm & f);
+CFList get_Terms( const CanonicalForm & f );
+void getTerms( const CanonicalForm & f, const CanonicalForm & t, CFList & result );
+
+
 //}}}
 
 //{{{ function declarations from cf_linsys.cc

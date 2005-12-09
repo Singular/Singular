@@ -1,4 +1,4 @@
-/* $Id: NTLconvert.cc,v 1.13 2004-01-19 11:26:19 Singular Exp $ */
+/* $Id: NTLconvert.cc,v 1.14 2005-12-09 08:35:37 Singular Exp $ */
 #include <config.h>
 
 #include "cf_gmp.h"
@@ -418,14 +418,6 @@ CanonicalForm convertNTLGF2X2CF(GF2X poly,Variable x)
   return bigone;
 }
 
-int NTLcmpCF( const CFFactor & f, const CFFactor & g )
-{
-  if (f.exp() > g.exp()) return 1;
-  if (f.exp() < g.exp()) return 0;
-  if (f.factor() > g.factor()) return 1;
-  return 0;
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 // NAME: convertNTLvec_pair_ZZpX_long2FacCFFList                              //
 //                                                                            //
@@ -467,7 +459,6 @@ CFFList convertNTLvec_pair_ZZpX_long2FacCFFList
   {
     rueckgabe.append(CFFactor(convertNTLZZpX2CF(e[i].a,x),e[i].b));
   }
-  if(isOn(SW_USE_NTL_SORT)) rueckgabe.sort(NTLcmpCF);
   // the multiplicity at pos 1
   if (!IsOne(multi))
     rueckgabe.insert(CFFactor(CanonicalForm(to_long(rep(multi))),1));
@@ -494,7 +485,6 @@ CFFList convertNTLvec_pair_zzpX_long2FacCFFList
   {
     rueckgabe.append(CFFactor(convertNTLzzpX2CF(e[i].a,x),e[i].b));
   }
-  if(isOn(SW_USE_NTL_SORT)) rueckgabe.sort(NTLcmpCF);
   // the multiplicity at pos 1
   if (!IsOne(multi))
     rueckgabe.insert(CFFactor(CanonicalForm(to_long(rep(multi))),1));
@@ -555,7 +545,6 @@ CFFList convertNTLvec_pair_GF2X_long2FacCFFList
     //append the converted polynomial to the CFFList
     rueckgabe.append(CFFactor(bigone,exponent));
   }
-  if(isOn(SW_USE_NTL_SORT)) rueckgabe.sort(NTLcmpCF);
   return rueckgabe;
 }
 
@@ -776,7 +765,6 @@ CFFList convertNTLvec_pair_ZZX_long2FacCFFList(vec_pair_ZZX_long e,ZZ multi,Vari
     //append the converted polynomial to the list
     rueckgabe.append(CFFactor(bigone,exponent));
   }
-  if(isOn(SW_USE_NTL_SORT)) rueckgabe.sort(NTLcmpCF);
   // the multiplicity at pos 1
   //if (!IsOne(multi))
     rueckgabe.insert(CFFactor(convertZZ2CF(multi),1));
@@ -868,7 +856,6 @@ CFFList convertNTLvec_pair_ZZpEX_long2FacCFFList(vec_pair_ZZ_pEX_long e,ZZ_pE mu
     //append the computed polynomials together with its exponent to the CFFList
     rueckgabe.append(CFFactor(bigone,exponent));
   }
-  if(isOn(SW_USE_NTL_SORT)) rueckgabe.sort(NTLcmpCF);
   // Start by appending the multiplicity
   if (!IsOne(multi))
     rueckgabe.insert(CFFactor(convertNTLZZpE2CF(multi,alpha),1));
@@ -913,7 +900,6 @@ CFFList convertNTLvec_pair_zzpEX_long2FacCFFList(vec_pair_zz_pEX_long e,zz_pE mu
     //append the computed polynomials together with its exponent to the CFFList
     rueckgabe.append(CFFactor(bigone,exponent));
   }
-  if(isOn(SW_USE_NTL_SORT)) rueckgabe.sort(NTLcmpCF);
   // Start by appending the multiplicity
   if (!IsOne(multi))
     rueckgabe.insert(CFFactor(convertNTLzzpE2CF(multi,alpha),1));
@@ -1006,7 +992,6 @@ CFFList convertNTLvec_pair_GF2EX_long2FacCFFList(vec_pair_GF2EX_long e,GF2E mult
     rueckgabe.append(CFFactor(bigone,exponent));
 
   }
-  if(isOn(SW_USE_NTL_SORT)) rueckgabe.sort(NTLcmpCF);
   // return the computed CFFList
   return rueckgabe;
 }

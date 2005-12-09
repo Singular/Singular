@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.cc,v 1.35 2005-10-18 12:33:00 Singular Exp $ */
+/* $Id: canonicalform.cc,v 1.36 2005-12-09 08:35:37 Singular Exp $ */
 
 #include <config.h>
 
@@ -11,6 +11,7 @@
 #include "cf_iter.h"
 #include "int_cf.h"
 #include "cf_factory.h"
+#include "cf_algorithm.h"
 #include "imm.h"
 #include "gfops.h"
 #include "cf_binom.h"
@@ -180,6 +181,40 @@ CanonicalForm::isUnivariate() const
     else
 	return value->isUnivariate();
 }
+
+// is_homogeneous returns 1 iff f is homogeneous, 0 otherwise//
+bool
+CanonicalForm::isHomogeneous() const
+{
+  if (this->isZero()) return true;
+  else if (this->inCoeffDomain()) return true;
+  else
+  {
+#if 0
+    CFIterator i;
+    int cdeg = -2, dummy;
+    for ( i = *this; i.hasTerms(); i++ )
+    {
+      if (!(i.coeff().isHomogeneous())) return false;
+      if ( (dummy = totaldegree( i.coeff() ) + i.exp()) != cdeg )
+      {
+         if (cdeg == -2) cdeg = dummy;
+         else return false;
+      }
+    }
+    return true;
+#else
+    CFList termlist= get_Terms(*this);
+    CFListIterator i;
+    int deg= totaldegree(termlist.getFirst());
+
+    for ( i=termlist; i.hasItem(); i++ )
+      if ( totaldegree(i.getItem()) != deg ) return false;
+    return true;
+#endif
+  }
+}
+
 //}}}
 
 //{{{ conversion functions

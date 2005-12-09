@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_cantzass.cc,v 1.7 2004-10-11 10:49:20 Singular Exp $ */
+/* $Id: fac_cantzass.cc,v 1.8 2005-12-09 08:35:38 Singular Exp $ */
 
 #include <config.h>
 
@@ -104,10 +104,6 @@ CFFList FpFactorizeUnivariateCZ( const CanonicalForm& f, bool issqrfree, int num
     }
     if ( numext > 0 )
         mpz_clear( &qq );
-#ifdef HAVE_NTL
-    extern  int NTLcmpCF( const CFFactor & f, const CFFactor & g );
-    if(isOn(SW_USE_NTL_SORT)) H.sort(NTLcmpCF);
-#endif    
     return H;
 }
 
