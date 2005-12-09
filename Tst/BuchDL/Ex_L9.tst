@@ -149,12 +149,12 @@ dim(G);                    // local dimension at (0,0,-1)
 setring R;
 if (not(defined(minAssGTZ))){ LIB "primdec.lib"; }
 list L = minAssGTZ(G); L;
-//->   [1]:
+//->   [2]:
 //->      _[1]=y-z
 //->      _[2]=x
-//->   [2]:
+//->   [1]:
 //->      _[1]=-y2z+x2
-ideal SLoc = L[2][1], jacob(L[2][1]);
+ideal SLoc = L[1][1], jacob(L[1][1]);
 radical(SLoc);
 //->   _[1]=y
 //->   _[2]=x

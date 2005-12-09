@@ -13,7 +13,7 @@ ideal id=s,g;
 poly g1=eliminate(id,y)[1];g1;
 poly h=resultant(f1,g1,x);h;
 factorize(h);
-poly zpol=_[1][4];
+poly zpol=_[1][2];
 int i; int j; int k;
 for (i=6; i>=0; i=i-1)
 {

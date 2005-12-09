@@ -14,7 +14,7 @@ ideal I = f1^2,f2^2,f3,f4,f5;
 list L = facstd(I);
 size(L);     // number of sets in the decomposition
 //->   12
-L[3];
+L[10];
 //->   _[1]=5*x(5)-1
 //->   _[2]=5*x(4)-1
 //->   _[3]=5*x(3)-1
