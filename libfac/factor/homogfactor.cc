@@ -1,6 +1,6 @@
 /* Copyright 1997 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
-// static char * rcsid = "$Id: homogfactor.cc,v 1.5 2005-12-05 15:47:32 Singular Exp $ ";
+// static char * rcsid = "$Id: homogfactor.cc,v 1.6 2005-12-09 08:36:11 Singular Exp $ ";
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -20,6 +20,7 @@
 #include "timing.h"
 TIMING_DEFINE_PRINT(hfactorize_time);
 
+#if 0
 ///////////////////////////////////////////////////////////////
 // get_Terms: Split the polynomial in the containing terms.  //
 // getTerms: the real work is done here.                     // 
@@ -54,6 +55,7 @@ get_Terms( const CanonicalForm & f ){
   }
   return result;
 }
+#endif
 
 #if 0
 ///////////////////////////////////////////////////////////////
@@ -72,6 +74,7 @@ is_homogeneous( const CanonicalForm & f){
 }
 #endif
 
+#if 0
 ///////////////////////////////////////////////////////////////
 // get_max_degree_Variable returns Variable with             //
 // highest degree. We assume f is *not* a constant!          //
@@ -86,7 +89,9 @@ get_max_degree_Variable(const CanonicalForm & f){
     }
   return Variable(maxlevel);
 }
+#endif
 
+#if 0
 ///////////////////////////////////////////////////////////////
 // homogenize homogenizes f with Variable x                  //
 ///////////////////////////////////////////////////////////////
@@ -110,6 +115,7 @@ homogenize( const CanonicalForm & f, const Variable & x){
     
   return result;
 }
+#endif
 
 // we assume g is square-free
 CFFList
@@ -144,7 +150,7 @@ HomogFactor( const CanonicalForm & g, const CanonicalForm  & minpoly, const int 
     unhomogelem= homogenize(j.getItem().factor(),xn);
     DEBOUTLN(cout, "      that is ", unhomogelem);
     Unhomoglist.append(CFFactor(unhomogelem,j.getItem().exp()));
-    d_xn -= degree(unhomogelem,xn);
+    d_xn -= degree(unhomogelem,xn)*j.getItem().exp();
   }
   DEBOUTLN(cout, "Power of xn to append is ", d_xn);
   if ( d_xn != 0 ) // have to append xn^(d_xn)
@@ -156,6 +162,9 @@ HomogFactor( const CanonicalForm & g, const CanonicalForm  & minpoly, const int 
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.5  2005/12/05 15:47:32  Singular
+*hannes: is_homogeneous -> factory: isHomogeneous
+
 Revision 1.4  2002/08/19 11:11:34  Singular
 * hannes/pfister: alg_gcd etc.
 
