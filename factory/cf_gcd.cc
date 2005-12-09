@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_gcd.cc,v 1.33 2005-11-28 12:36:44 Singular Exp $ */
+/* $Id: cf_gcd.cc,v 1.34 2005-12-09 09:49:28 pohl Exp $ */
 
 #include <config.h>
 
@@ -114,6 +114,35 @@ icontent ( const CanonicalForm & f, const CanonicalForm & c )
     }
 }
 //}}}
+
+//{{{ static CanonicalForm bcontent ( const CanonicalForm & f, const CanonicalForm & b )
+//{{{ docu
+//
+// bcontent() - return gcd of b and all coefficients of f which
+//   are in a basic domain.
+//
+// Used by gcd().
+//
+//}}}
+static CanonicalForm
+bcontent ( const CanonicalForm & f, const CanonicalForm & c )
+{
+    if ( f.inBaseDomain() )
+        return bgcd( f, c );
+    else if ( f.inCoeffDomain() )
+        return f.genOne();
+    else {
+        CanonicalForm g = c;
+        for ( CFIterator i = f; i.hasTerms() && ! g.isOne(); i++ )
+            g = bcontent( i.coeff(), g );
+        if( g.lc().sign() < 0 )
+            return -g;
+        else
+            return g;
+    }
+}
+//}}}
+
 
 //{{{ CanonicalForm icontent ( const CanonicalForm & f )
 //{{{ docu
@@ -568,12 +597,9 @@ gcd ( const CanonicalForm & f, const CanonicalForm & g )
         else
             return f;
     else  if ( f.inBaseDomain() )
-        if ( g.inBaseDomain() )
-            return bgcd( f, g );
-        else
-            return cf_content( g, f );
+        return bcontent( g, f );
     else  if ( g.inBaseDomain() )
-        return cf_content( f, g );
+        return bcontent( f, g );
     else  if ( f.mvar() == g.mvar() )
         if ( f.inExtension() && getReduce( f.mvar() ) )
             return 1;
