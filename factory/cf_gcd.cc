@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_gcd.cc,v 1.34 2005-12-09 09:49:28 pohl Exp $ */
+/* $Id: cf_gcd.cc,v 1.35 2005-12-09 15:00:59 Singular Exp $ */
 
 #include <config.h>
 
@@ -443,7 +443,7 @@ gcd_poly ( const CanonicalForm & f, const CanonicalForm & g, bool modularflag )
            return r;
 #else
          return N( ezgcd( M(f), M(g) ) );
-#endif    
+#endif
     }
     else if ( isOn( SW_USE_SPARSEMOD )
     && ! ( f.isUnivariate() && g.isUnivariate() ) )
@@ -454,7 +454,7 @@ gcd_poly ( const CanonicalForm & f, const CanonicalForm & g, bool modularflag )
         {
            if (si_factor_reminder)
            printf("sparsemod failed, trying gcd_poly1\n");
-	   return r;
+           return r;
            //return gcd_poly1( f, g, modularflag);
         }
         else
@@ -493,10 +493,13 @@ cf_content ( const CanonicalForm & f, const CanonicalForm & g )
         return result;
     }
     else
+    {
+        ASSERT(g==0,"invalid call of cf_gcd");
         if ( f.sign() < 0 )
             return -f;
         else
             return f;
+    }
 }
 //}}}
 
@@ -587,15 +590,19 @@ CanonicalForm
 gcd ( const CanonicalForm & f, const CanonicalForm & g )
 {
     if ( f.isZero() )
-        if ( g.lc().sign() < 0 )
-            return -g;
-        else
-            return g;
+    {
+      if ( g.lc().sign() < 0 )
+        return -g;
+      else
+       return g;
+    }
     else  if ( g.isZero() )
-        if ( f.lc().sign() < 0 )
-            return -f;
-        else
-            return f;
+    {
+      if ( f.lc().sign() < 0 )
+        return -f;
+      else
+        return f;
+    }
     else  if ( f.inBaseDomain() )
         return bcontent( g, f );
     else  if ( g.inBaseDomain() )

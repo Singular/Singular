@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.cc,v 1.37 2005-12-09 09:12:53 pohl Exp $ */
+/* $Id: canonicalform.cc,v 1.38 2005-12-09 15:00:59 Singular Exp $ */
 
 #include <config.h>
 
@@ -36,13 +36,13 @@ initCanonicalForm( void )
     static bool initialized = false;
     if ( ! initialized ) {
 #if (defined (USE_MEMUTIL) && ! defined (USE_OLD_MEMMAN)) || defined (SINGULAR)
-	(void)mmInit();
+        (void)mmInit();
 #endif
 
-	(void)initializeCharacteristic();
-	(void)initializeGMP();
-	initPT();
-	initialized = true;
+        (void)initializeCharacteristic();
+        (void)initializeGMP();
+        initPT();
+        initialized = true;
     }
     return 1;
 }
@@ -57,18 +57,18 @@ InternalCF*
 CanonicalForm::getval() const
 {
     if ( is_imm( value ) )
-	return value;
+        return value;
     else
-	return value->copyObject();
+        return value->copyObject();
 }
 
 CanonicalForm
 CanonicalForm::deepCopy() const
 {
     if ( is_imm( value ) )
-	return *this;
+        return *this;
     else
-	return CanonicalForm( value->deepCopyObject() );
+        return CanonicalForm( value->deepCopyObject() );
 }
 //}}}
 
@@ -85,23 +85,23 @@ bool
 CanonicalForm::inZ() const
 {
     if ( is_imm( value ) == INTMARK )
-	return true;
+        return true;
     else if ( is_imm( value ) )
-	return false;
+        return false;
     else
-	return value->levelcoeff() == IntegerDomain;
+        return value->levelcoeff() == IntegerDomain;
 }
 
 bool
 CanonicalForm::inQ() const
 {
     if ( is_imm( value ) == INTMARK )
-	return true;
+        return true;
     else if ( is_imm( value ) )
-	return false;
+        return false;
     else
-	return value->levelcoeff() == IntegerDomain ||
-	    value->levelcoeff() == RationalDomain;
+        return value->levelcoeff() == IntegerDomain ||
+            value->levelcoeff() == RationalDomain;
 }
 
 bool
@@ -126,45 +126,45 @@ bool
 CanonicalForm::inBaseDomain() const
 {
     if ( is_imm( value ) )
-	return true;
+        return true;
     else
-	return value->inBaseDomain();
+        return value->inBaseDomain();
 }
 
 bool
 CanonicalForm::inExtension() const
 {
     if ( is_imm( value ) )
-	return false;
+        return false;
     else
-	return value->inExtension();
+        return value->inExtension();
 }
 
 bool
 CanonicalForm::inCoeffDomain() const
 {
     if ( is_imm( value ) )
-	return true;
+        return true;
     else
-	return value->inCoeffDomain();
+        return value->inCoeffDomain();
 }
 
 bool
 CanonicalForm::inPolyDomain() const
 {
     if ( is_imm( value ) )
-	return false;
+        return false;
     else
-	return value->inPolyDomain();
+        return value->inPolyDomain();
 }
 
 bool
 CanonicalForm::inQuotDomain() const
 {
     if ( is_imm( value ) )
-	return false;
+        return false;
     else
-	return value->inQuotDomain();
+        return value->inQuotDomain();
 }
 
 bool
@@ -177,9 +177,9 @@ bool
 CanonicalForm::isUnivariate() const
 {
     if ( is_imm( value ) )
-	return false;
+        return false;
     else
-	return value->isUnivariate();
+        return value->isUnivariate();
 }
 
 // is_homogeneous returns 1 iff f is homogeneous, 0 otherwise//
@@ -222,9 +222,9 @@ int
 CanonicalForm::intval() const
 {
     if ( is_imm( value ) )
-	return imm_intval( value );
+        return imm_intval( value );
     else
-	return value->intval();
+        return value->intval();
 }
 
 CanonicalForm
@@ -232,53 +232,53 @@ CanonicalForm::mapinto () const
 {
     ASSERT( is_imm( value ) ||  ! value->inExtension(), "cannot map into different Extension" );
     if ( is_imm( value ) )
-	if ( getCharacteristic() == 0 )
-	    if ( is_imm( value ) == FFMARK )
-		return CanonicalForm( int2imm( ff_symmetric( imm2int( value ) ) ) );
-	    else  if ( is_imm( value ) == GFMARK )
-		return CanonicalForm( int2imm( ff_symmetric( gf_gf2ff( imm2int( value ) ) ) ) );
-	    else
-		return *this;
-	else  if ( CFFactory::gettype() == PrimePowerDomain )
-	    return CanonicalForm( CFFactory::basic( imm2int( value ) ) );
-	else  if ( getGFDegree() == 1 )
-	    return CanonicalForm( int2imm_p( ff_norm( imm2int( value ) ) ) );
-	else
-	    return CanonicalForm( int2imm_gf( gf_int2gf( imm2int( value ) ) ) );
+        if ( getCharacteristic() == 0 )
+            if ( is_imm( value ) == FFMARK )
+                return CanonicalForm( int2imm( ff_symmetric( imm2int( value ) ) ) );
+            else  if ( is_imm( value ) == GFMARK )
+                return CanonicalForm( int2imm( ff_symmetric( gf_gf2ff( imm2int( value ) ) ) ) );
+            else
+                return *this;
+        else  if ( CFFactory::gettype() == PrimePowerDomain )
+            return CanonicalForm( CFFactory::basic( imm2int( value ) ) );
+        else  if ( getGFDegree() == 1 )
+            return CanonicalForm( int2imm_p( ff_norm( imm2int( value ) ) ) );
+        else
+            return CanonicalForm( int2imm_gf( gf_int2gf( imm2int( value ) ) ) );
     else  if ( value->inBaseDomain() )
-	if ( getCharacteristic() == 0 )
-	    if ( value->levelcoeff() == PrimePowerDomain )
-		return CFFactory::basic( getmpi( value, true ) );
-	    else
-		return *this;
-	else  if ( CFFactory::gettype() == PrimePowerDomain ) {
-	    ASSERT( value->levelcoeff() == PrimePowerDomain || value->levelcoeff() == IntegerDomain, "no proper map defined" );
-	    if ( value->levelcoeff() == PrimePowerDomain )
-		return *this;
-	    else
-		return CFFactory::basic( getmpi( value ) );
-	}
-	else {
-	    int val;
-	    if ( value->levelcoeff() == IntegerDomain )
-		val = value->intmod( ff_prime );
-	    else  if ( value->levelcoeff() == RationalDomain )
-		return num().mapinto() / den().mapinto();
-	    else {
-		ASSERT( 0, "illegal domain" );
-		return 0;
-	    }
-	    if ( getGFDegree() > 1 )
-		return CanonicalForm( int2imm_gf( gf_int2gf( val ) ) );
-	    else
-		return CanonicalForm( int2imm_p( val ) );
-	}
+        if ( getCharacteristic() == 0 )
+            if ( value->levelcoeff() == PrimePowerDomain )
+                return CFFactory::basic( getmpi( value, true ) );
+            else
+                return *this;
+        else  if ( CFFactory::gettype() == PrimePowerDomain ) {
+            ASSERT( value->levelcoeff() == PrimePowerDomain || value->levelcoeff() == IntegerDomain, "no proper map defined" );
+            if ( value->levelcoeff() == PrimePowerDomain )
+                return *this;
+            else
+                return CFFactory::basic( getmpi( value ) );
+        }
+        else {
+            int val;
+            if ( value->levelcoeff() == IntegerDomain )
+                val = value->intmod( ff_prime );
+            else  if ( value->levelcoeff() == RationalDomain )
+                return num().mapinto() / den().mapinto();
+            else {
+                ASSERT( 0, "illegal domain" );
+                return 0;
+            }
+            if ( getGFDegree() > 1 )
+                return CanonicalForm( int2imm_gf( gf_int2gf( val ) ) );
+            else
+                return CanonicalForm( int2imm_p( val ) );
+        }
     else {
-	Variable x = value->variable();
-	CanonicalForm result;
-	for ( CFIterator i = *this; i.hasTerms(); i++ )
-	    result += power( x, i.exp() ) * i.coeff().mapinto();
-	return result;
+        Variable x = value->variable();
+        CanonicalForm result;
+        for ( CFIterator i = *this; i.hasTerms(); i++ )
+            result += power( x, i.exp() ) * i.coeff().mapinto();
+        return result;
     }
 }
 //}}}
@@ -300,7 +300,7 @@ CanonicalForm::mapinto () const
 // lexicographic ordering.  In contrast to lc() elements in an
 // algebraic extension are considered coefficients so Lc() always
 // returns a leading coefficient in a coefficient domain.
-// 
+//
 // LC() returns the leading coefficient of CO where CO is
 // considered a univariate polynomial in its main variable.  An
 // element of an algebraic extension is considered an univariate
@@ -334,47 +334,47 @@ CanonicalForm
 CanonicalForm::lc () const
 {
     if ( is_imm( value ) )
-	return *this;
+        return *this;
     else
-	return value->lc();
+        return value->lc();
 }
 
 CanonicalForm
 CanonicalForm::Lc () const
 {
     if ( is_imm( value ) || value->inCoeffDomain() )
-	return *this;
+        return *this;
     else
-	return value->Lc();
+        return value->Lc();
 }
 
 CanonicalForm
 CanonicalForm::LC () const
 {
     if ( is_imm( value ) )
-	return *this;
+        return *this;
     else
-	return value->LC();
+        return value->LC();
 }
 
 CanonicalForm
 CanonicalForm::LC ( const Variable & v ) const
 {
     if ( is_imm( value ) || value->inCoeffDomain() )
-	return *this;
+        return *this;
 
     Variable x = value->variable();
     if ( v > x )
-	return *this;
+        return *this;
     else if ( v == x )
-	return value->LC();
+        return value->LC();
     else {
-	CanonicalForm f = swapvar( *this, v, x );
- 	if ( f.mvar() == x )
- 	    return swapvar( f.value->LC(), v, x );
- 	else
-	    // v did not occur in f
-	    return *this;
+        CanonicalForm f = swapvar( *this, v, x );
+         if ( f.mvar() == x )
+             return swapvar( f.value->LC(), v, x );
+         else
+            // v did not occur in f
+            return *this;
     }
 }
 //}}}
@@ -403,14 +403,14 @@ CanonicalForm::degree() const
 {
     int what = is_imm( value );
     if ( what )
-	if ( what == FFMARK )
-	    return imm_iszero_p( value ) ? -1 : 0;
-	else if ( what == INTMARK )
-	    return imm_iszero( value ) ? -1 : 0;
-	else
-	    return imm_iszero_gf( value ) ? -1 : 0;
+        if ( what == FFMARK )
+            return imm_iszero_p( value ) ? -1 : 0;
+        else if ( what == INTMARK )
+            return imm_iszero( value ) ? -1 : 0;
+        else
+            return imm_iszero_gf( value ) ? -1 : 0;
     else
-	return value->degree();
+        return value->degree();
 }
 
 int
@@ -418,30 +418,30 @@ CanonicalForm::degree( const Variable & v ) const
 {
     int what = is_imm( value );
     if ( what )
-	if ( what == FFMARK )
-	    return imm_iszero_p( value ) ? -1 : 0;
-	else if ( what == INTMARK )
-	    return imm_iszero( value ) ? -1 : 0;
-	else
-	    return imm_iszero_gf( value ) ? -1 : 0;
+        if ( what == FFMARK )
+            return imm_iszero_p( value ) ? -1 : 0;
+        else if ( what == INTMARK )
+            return imm_iszero( value ) ? -1 : 0;
+        else
+            return imm_iszero_gf( value ) ? -1 : 0;
     else if ( value->inBaseDomain() )
-	return value->degree();
+        return value->degree();
 
     Variable x = value->variable();
     if ( v == x )
-	return value->degree();
+        return value->degree();
     else  if ( v > x )
-	// relatively to v, f is in a coefficient ring
-	return 0;
+        // relatively to v, f is in a coefficient ring
+        return 0;
     else {
-	int coeffdeg, result = 0;
-	// search for maximum of coefficient degree
-	for ( CFIterator i = *this; i.hasTerms(); i++ ) {
-	    coeffdeg = i.coeff().degree( v );
-	    if ( coeffdeg > result )
-		result = coeffdeg;
-	}
-	return result;
+        int coeffdeg, result = 0;
+        // search for maximum of coefficient degree
+        for ( CFIterator i = *this; i.hasTerms(); i++ ) {
+            coeffdeg = i.coeff().degree( v );
+            if ( coeffdeg > result )
+                result = coeffdeg;
+        }
+        return result;
     }
 }
 //}}}
@@ -473,9 +473,9 @@ CanonicalForm
 CanonicalForm::tailcoeff () const
 {
     if ( is_imm( value ) || value->inCoeffDomain() )
-	return *this;
+        return *this;
     else
-	return value->tailcoeff();
+        return value->tailcoeff();
 }
 
 int
@@ -483,14 +483,14 @@ CanonicalForm::taildegree () const
 {
     int what = is_imm( value );
     if ( what )
-	if ( what == FFMARK )
-	    return imm_iszero_p( value ) ? -1 : 0;
-	else if ( what == INTMARK )
-	    return imm_iszero( value ) ? -1 : 0;
-	else
-	    return imm_iszero_gf( value ) ? -1 : 0;
+        if ( what == FFMARK )
+            return imm_iszero_p( value ) ? -1 : 0;
+        else if ( what == INTMARK )
+            return imm_iszero( value ) ? -1 : 0;
+        else
+            return imm_iszero_gf( value ) ? -1 : 0;
     else
-	return value->taildegree();
+        return value->taildegree();
 }
 //}}}
 
@@ -508,24 +508,24 @@ CanonicalForm::taildegree () const
 // See also: InternalCF::level(), InternalCF::variable(),
 // InternalPoly::level(), InternalPoly::variable(), ::level(),
 // ::mvar()
-// 
+//
 //}}}
 int
 CanonicalForm::level () const
 {
     if ( is_imm( value ) )
-	return LEVELBASE;
+        return LEVELBASE;
     else
-	return value->level();
+        return value->level();
 }
 
 Variable
 CanonicalForm::mvar () const
 {
     if ( is_imm( value ) )
-	return Variable();
+        return Variable();
     else
-	return value->variable();
+        return value->variable();
 }
 //}}}
 
@@ -549,18 +549,18 @@ CanonicalForm
 CanonicalForm::num () const
 {
     if ( is_imm( value ) )
-	return *this;
+        return *this;
     else
-	return CanonicalForm( value->num() );
+        return CanonicalForm( value->num() );
 }
 
 CanonicalForm
 CanonicalForm::den () const
 {
     if ( is_imm( value ) )
-	return CanonicalForm( 1 );
+        return CanonicalForm( 1 );
     else
-	return CanonicalForm( value->den() );
+        return CanonicalForm( value->den() );
 }
 //}}}
 
@@ -570,39 +570,39 @@ CanonicalForm::operator += ( const CanonicalForm & cf )
 {
     int what = is_imm( value );
     if ( what ) {
-	ASSERT ( ! is_imm( cf.value ) || (what==is_imm( cf.value )), "illegal base coefficients" );
-	if ( (what = is_imm( cf.value )) == FFMARK )
-	    value = imm_add_p( value, cf.value );
-	else  if ( what == GFMARK )
-	    value = imm_add_gf( value, cf.value );
-	else  if ( what )
-	    value = imm_add( value, cf.value );
-	else {
-	    InternalCF * dummy = cf.value->copyObject();
-	    value = dummy->addcoeff( value );
-	}
+        ASSERT ( ! is_imm( cf.value ) || (what==is_imm( cf.value )), "illegal base coefficients" );
+        if ( (what = is_imm( cf.value )) == FFMARK )
+            value = imm_add_p( value, cf.value );
+        else  if ( what == GFMARK )
+            value = imm_add_gf( value, cf.value );
+        else  if ( what )
+            value = imm_add( value, cf.value );
+        else {
+            InternalCF * dummy = cf.value->copyObject();
+            value = dummy->addcoeff( value );
+        }
     }
     else  if ( is_imm( cf.value ) )
-	value = value->addcoeff( cf.value );
+        value = value->addcoeff( cf.value );
     else  if ( value->level() == cf.value->level() ) {
-	if ( value->levelcoeff() == cf.value->levelcoeff() )
-	    value = value->addsame( cf.value );
-	else  if ( value->levelcoeff() > cf.value->levelcoeff() )
-	    value = value->addcoeff( cf.value );
-	else {
-	    InternalCF * dummy = cf.value->copyObject();
-	    dummy = dummy->addcoeff( value );
-	    if ( value->deleteObject() ) delete value;
-	    value = dummy;
-	}
+        if ( value->levelcoeff() == cf.value->levelcoeff() )
+            value = value->addsame( cf.value );
+        else  if ( value->levelcoeff() > cf.value->levelcoeff() )
+            value = value->addcoeff( cf.value );
+        else {
+            InternalCF * dummy = cf.value->copyObject();
+            dummy = dummy->addcoeff( value );
+            if ( value->deleteObject() ) delete value;
+            value = dummy;
+        }
     }
     else  if ( level() > cf.level() )
-	value = value->addcoeff( cf.value );
+        value = value->addcoeff( cf.value );
     else {
-	InternalCF * dummy = cf.value->copyObject();
-	dummy = dummy->addcoeff( value );
-	if ( value->deleteObject() ) delete value;
-	value = dummy;
+        InternalCF * dummy = cf.value->copyObject();
+        dummy = dummy->addcoeff( value );
+        if ( value->deleteObject() ) delete value;
+        value = dummy;
     }
     return *this;
 }
@@ -612,39 +612,39 @@ CanonicalForm::operator -= ( const CanonicalForm & cf )
 {
     int what = is_imm( value );
     if ( what ) {
-	ASSERT ( ! is_imm( cf.value ) || (what==is_imm( cf.value )), "illegal base coefficients" );
-	if ( (what = is_imm( cf.value )) == FFMARK )
-	    value = imm_sub_p( value, cf.value );
-	else  if ( what == GFMARK )
-	    value = imm_sub_gf( value, cf.value );
-	else  if ( what )
-	    value = imm_sub( value, cf.value );
-	else {
-	    InternalCF * dummy = cf.value->copyObject();
-	    value = dummy->subcoeff( value, true );
-	}
+        ASSERT ( ! is_imm( cf.value ) || (what==is_imm( cf.value )), "illegal base coefficients" );
+        if ( (what = is_imm( cf.value )) == FFMARK )
+            value = imm_sub_p( value, cf.value );
+        else  if ( what == GFMARK )
+            value = imm_sub_gf( value, cf.value );
+        else  if ( what )
+            value = imm_sub( value, cf.value );
+        else {
+            InternalCF * dummy = cf.value->copyObject();
+            value = dummy->subcoeff( value, true );
+        }
     }
     else  if ( is_imm( cf.value ) )
-	value = value->subcoeff( cf.value, false );
+        value = value->subcoeff( cf.value, false );
     else  if ( value->level() == cf.value->level() ) {
-	if ( value->levelcoeff() == cf.value->levelcoeff() )
-	    value = value->subsame( cf.value );
-	else  if ( value->levelcoeff() > cf.value->levelcoeff() )
-	    value = value->subcoeff( cf.value, false );
-	else {
-	    InternalCF * dummy = cf.value->copyObject();
-	    dummy = dummy->subcoeff( value, true );
-	    if ( value->deleteObject() ) delete value;
-	    value = dummy;
-	}
+        if ( value->levelcoeff() == cf.value->levelcoeff() )
+            value = value->subsame( cf.value );
+        else  if ( value->levelcoeff() > cf.value->levelcoeff() )
+            value = value->subcoeff( cf.value, false );
+        else {
+            InternalCF * dummy = cf.value->copyObject();
+            dummy = dummy->subcoeff( value, true );
+            if ( value->deleteObject() ) delete value;
+            value = dummy;
+        }
     }
     else  if ( level() > cf.level() )
-	value = value->subcoeff( cf.value, false );
+        value = value->subcoeff( cf.value, false );
     else {
-	InternalCF * dummy = cf.value->copyObject();
-	dummy = dummy->subcoeff( value, true );
-	if ( value->deleteObject() ) delete value;
-	value = dummy;
+        InternalCF * dummy = cf.value->copyObject();
+        dummy = dummy->subcoeff( value, true );
+        if ( value->deleteObject() ) delete value;
+        value = dummy;
     }
     return *this;
 }
@@ -654,39 +654,39 @@ CanonicalForm::operator *= ( const CanonicalForm & cf )
 {
     int what = is_imm( value );
     if ( what ) {
-	ASSERT ( ! is_imm( cf.value ) || (what==is_imm( cf.value )), "illegal base coefficients" );
-	if ( (what = is_imm( cf.value )) == FFMARK )
-	    value = imm_mul_p( value, cf.value );
-	else  if ( what == GFMARK )
-	    value = imm_mul_gf( value, cf.value );
-	else  if ( what )
-	    value = imm_mul( value, cf.value );
-	else {
-	    InternalCF * dummy = cf.value->copyObject();
-	    value = dummy->mulcoeff( value );
-	}
+        ASSERT ( ! is_imm( cf.value ) || (what==is_imm( cf.value )), "illegal base coefficients" );
+        if ( (what = is_imm( cf.value )) == FFMARK )
+            value = imm_mul_p( value, cf.value );
+        else  if ( what == GFMARK )
+            value = imm_mul_gf( value, cf.value );
+        else  if ( what )
+            value = imm_mul( value, cf.value );
+        else {
+            InternalCF * dummy = cf.value->copyObject();
+            value = dummy->mulcoeff( value );
+        }
     }
     else  if ( is_imm( cf.value ) )
-	value = value->mulcoeff( cf.value );
+        value = value->mulcoeff( cf.value );
     else  if ( value->level() == cf.value->level() ) {
-	if ( value->levelcoeff() == cf.value->levelcoeff() )
-	    value = value->mulsame( cf.value );
-	else  if ( value->levelcoeff() > cf.value->levelcoeff() )
-	    value = value->mulcoeff( cf.value );
-	else {
-	    InternalCF * dummy = cf.value->copyObject();
-	    dummy = dummy->mulcoeff( value );
-	    if ( value->deleteObject() ) delete value;
-	    value = dummy;
-	}
+        if ( value->levelcoeff() == cf.value->levelcoeff() )
+            value = value->mulsame( cf.value );
+        else  if ( value->levelcoeff() > cf.value->levelcoeff() )
+            value = value->mulcoeff( cf.value );
+        else {
+            InternalCF * dummy = cf.value->copyObject();
+            dummy = dummy->mulcoeff( value );
+            if ( value->deleteObject() ) delete value;
+            value = dummy;
+        }
     }
     else  if ( level() > cf.level() )
-	value = value->mulcoeff( cf.value );
+        value = value->mulcoeff( cf.value );
     else {
-	InternalCF * dummy = cf.value->copyObject();
-	dummy = dummy->mulcoeff( value );
-	if ( value->deleteObject() ) delete value;
-	value = dummy;
+        InternalCF * dummy = cf.value->copyObject();
+        dummy = dummy->mulcoeff( value );
+        if ( value->deleteObject() ) delete value;
+        value = dummy;
     }
     return *this;
 }
@@ -696,39 +696,39 @@ CanonicalForm::operator /= ( const CanonicalForm & cf )
 {
     int what = is_imm( value );
     if ( what ) {
-	ASSERT ( ! is_imm( cf.value ) || (what==is_imm( cf.value )), "illegal base coefficients" );
-	if ( (what = is_imm( cf.value )) == FFMARK )
-	    value = imm_div_p( value, cf.value );
-	else  if ( what == GFMARK )
-	    value = imm_div_gf( value, cf.value );
-	else  if ( what )
-	    value = imm_divrat( value, cf.value );
-	else {
-	    InternalCF * dummy = cf.value->copyObject();
-	    value = dummy->dividecoeff( value, true );
-	}
+        ASSERT ( ! is_imm( cf.value ) || (what==is_imm( cf.value )), "illegal base coefficients" );
+        if ( (what = is_imm( cf.value )) == FFMARK )
+            value = imm_div_p( value, cf.value );
+        else  if ( what == GFMARK )
+            value = imm_div_gf( value, cf.value );
+        else  if ( what )
+            value = imm_divrat( value, cf.value );
+        else {
+            InternalCF * dummy = cf.value->copyObject();
+            value = dummy->dividecoeff( value, true );
+        }
     }
     else  if ( is_imm( cf.value ) )
-	value = value->dividecoeff( cf.value, false );
+        value = value->dividecoeff( cf.value, false );
     else  if ( value->level() == cf.value->level() ) {
-	if ( value->levelcoeff() == cf.value->levelcoeff() )
-	    value = value->dividesame( cf.value );
-	else  if ( value->levelcoeff() > cf.value->levelcoeff() )
-	    value = value->dividecoeff( cf.value, false );
-	else {
-	    InternalCF * dummy = cf.value->copyObject();
-	    dummy = dummy->dividecoeff( value, true );
-	    if ( value->deleteObject() ) delete value;
-	    value = dummy;
-	}
+        if ( value->levelcoeff() == cf.value->levelcoeff() )
+            value = value->dividesame( cf.value );
+        else  if ( value->levelcoeff() > cf.value->levelcoeff() )
+            value = value->dividecoeff( cf.value, false );
+        else {
+            InternalCF * dummy = cf.value->copyObject();
+            dummy = dummy->dividecoeff( value, true );
+            if ( value->deleteObject() ) delete value;
+            value = dummy;
+        }
     }
     else  if ( level() > cf.level() )
-	value = value->dividecoeff( cf.value, false );
+        value = value->dividecoeff( cf.value, false );
     else {
-	InternalCF * dummy = cf.value->copyObject();
-	dummy = dummy->dividecoeff( value, true );
-	if ( value->deleteObject() ) delete value;
-	value = dummy;
+        InternalCF * dummy = cf.value->copyObject();
+        dummy = dummy->dividecoeff( value, true );
+        if ( value->deleteObject() ) delete value;
+        value = dummy;
     }
     return *this;
 }
@@ -738,39 +738,39 @@ CanonicalForm::div ( const CanonicalForm & cf )
 {
     int what = is_imm( value );
     if ( what ) {
-	ASSERT ( ! is_imm( cf.value ) || (what==is_imm( cf.value )), "illegal base coefficients" );
-	if ( (what = is_imm( cf.value )) == FFMARK )
-	    value = imm_div_p( value, cf.value );
-	else  if ( what == GFMARK )
-	    value = imm_div_gf( value, cf.value );
-	else  if ( what )
-	    value = imm_div( value, cf.value );
-	else {
-	    InternalCF * dummy = cf.value->copyObject();
-	    value = dummy->divcoeff( value, true );
-	}
+        ASSERT ( ! is_imm( cf.value ) || (what==is_imm( cf.value )), "illegal base coefficients" );
+        if ( (what = is_imm( cf.value )) == FFMARK )
+            value = imm_div_p( value, cf.value );
+        else  if ( what == GFMARK )
+            value = imm_div_gf( value, cf.value );
+        else  if ( what )
+            value = imm_div( value, cf.value );
+        else {
+            InternalCF * dummy = cf.value->copyObject();
+            value = dummy->divcoeff( value, true );
+        }
     }
     else  if ( is_imm( cf.value ) )
-	value = value->divcoeff( cf.value, false );
+        value = value->divcoeff( cf.value, false );
     else  if ( value->level() == cf.value->level() ) {
-	if ( value->levelcoeff() == cf.value->levelcoeff() )
-	    value = value->divsame( cf.value );
-	else  if ( value->levelcoeff() > cf.value->levelcoeff() )
-	    value = value->divcoeff( cf.value, false );
-	else {
-	    InternalCF * dummy = cf.value->copyObject();
-	    dummy = dummy->divcoeff( value, true );
-	    if ( value->deleteObject() ) delete value;
-	    value = dummy;
-	}
+        if ( value->levelcoeff() == cf.value->levelcoeff() )
+            value = value->divsame( cf.value );
+        else  if ( value->levelcoeff() > cf.value->levelcoeff() )
+            value = value->divcoeff( cf.value, false );
+        else {
+            InternalCF * dummy = cf.value->copyObject();
+            dummy = dummy->divcoeff( value, true );
+            if ( value->deleteObject() ) delete value;
+            value = dummy;
+        }
     }
     else  if ( level() > cf.level() )
-	value = value->divcoeff( cf.value, false );
+        value = value->divcoeff( cf.value, false );
     else {
-	InternalCF * dummy = cf.value->copyObject();
-	dummy = dummy->divcoeff( value, true );
-	if ( value->deleteObject() ) delete value;
-	value = dummy;
+        InternalCF * dummy = cf.value->copyObject();
+        dummy = dummy->divcoeff( value, true );
+        if ( value->deleteObject() ) delete value;
+        value = dummy;
     }
     return *this;
 }
@@ -780,39 +780,39 @@ CanonicalForm::operator %= ( const CanonicalForm & cf )
 {
     int what = is_imm( value );
     if ( what ) {
-	ASSERT ( ! is_imm( cf.value ) || (what==is_imm( cf.value )), "illegal base coefficients" );
-	if ( (what = is_imm( cf.value )) == FFMARK )
-	    value = imm_mod_p( value, cf.value );
-	else  if ( what == GFMARK )
-	    value = imm_mod_gf( value, cf.value );
-	else  if ( what )
-	    value = imm_mod( value, cf.value );
-	else {
-	    InternalCF * dummy = cf.value->copyObject();
-	    value = dummy->modulocoeff( value, true );
-	}
+        ASSERT ( ! is_imm( cf.value ) || (what==is_imm( cf.value )), "illegal base coefficients" );
+        if ( (what = is_imm( cf.value )) == FFMARK )
+            value = imm_mod_p( value, cf.value );
+        else  if ( what == GFMARK )
+            value = imm_mod_gf( value, cf.value );
+        else  if ( what )
+            value = imm_mod( value, cf.value );
+        else {
+            InternalCF * dummy = cf.value->copyObject();
+            value = dummy->modulocoeff( value, true );
+        }
     }
     else  if ( is_imm( cf.value ) )
-	value = value->modulocoeff( cf.value, false );
+        value = value->modulocoeff( cf.value, false );
     else  if ( value->level() == cf.value->level() ) {
-	if ( value->levelcoeff() == cf.value->levelcoeff() )
-	    value = value->modulosame( cf.value );
-	else  if ( value->levelcoeff() > cf.value->levelcoeff() )
-	    value = value->modulocoeff( cf.value, false );
-	else {
-	    InternalCF * dummy = cf.value->copyObject();
-	    dummy = dummy->modulocoeff( value, true );
-	    if ( value->deleteObject() ) delete value;
-	    value = dummy;
-	}
+        if ( value->levelcoeff() == cf.value->levelcoeff() )
+            value = value->modulosame( cf.value );
+        else  if ( value->levelcoeff() > cf.value->levelcoeff() )
+            value = value->modulocoeff( cf.value, false );
+        else {
+            InternalCF * dummy = cf.value->copyObject();
+            dummy = dummy->modulocoeff( value, true );
+            if ( value->deleteObject() ) delete value;
+            value = dummy;
+        }
     }
     else  if ( level() > cf.level() )
-	value = value->modulocoeff( cf.value, false );
+        value = value->modulocoeff( cf.value, false );
     else {
-	InternalCF * dummy = cf.value->copyObject();
-	dummy = dummy->modulocoeff( value, true );
-	if ( value->deleteObject() ) delete value;
-	value = dummy;
+        InternalCF * dummy = cf.value->copyObject();
+        dummy = dummy->modulocoeff( value, true );
+        if ( value->deleteObject() ) delete value;
+        value = dummy;
     }
     return *this;
 }
@@ -822,39 +822,39 @@ CanonicalForm::mod ( const CanonicalForm & cf )
 {
     int what = is_imm( value );
     if ( what ) {
-	ASSERT ( ! is_imm( cf.value ) || (what==is_imm( cf.value )), "illegal base coefficients" );
-	if ( (what = is_imm( cf.value )) == FFMARK )
-	    value = imm_mod_p( value, cf.value );
-	else  if ( what == GFMARK )
-	    value = imm_mod_gf( value, cf.value );
-	else  if ( what )
-	    value = imm_mod( value, cf.value );
-	else {
-	    InternalCF * dummy = cf.value->copyObject();
-	    value = dummy->modcoeff( value, true );
-	}
+        ASSERT ( ! is_imm( cf.value ) || (what==is_imm( cf.value )), "illegal base coefficients" );
+        if ( (what = is_imm( cf.value )) == FFMARK )
+            value = imm_mod_p( value, cf.value );
+        else  if ( what == GFMARK )
+            value = imm_mod_gf( value, cf.value );
+        else  if ( what )
+            value = imm_mod( value, cf.value );
+        else {
+            InternalCF * dummy = cf.value->copyObject();
+            value = dummy->modcoeff( value, true );
+        }
     }
     else  if ( is_imm( cf.value ) )
-	value = value->modcoeff( cf.value, false );
+        value = value->modcoeff( cf.value, false );
     else  if ( value->level() == cf.value->level() ) {
-	if ( value->levelcoeff() == cf.value->levelcoeff() )
-	    value = value->modsame( cf.value );
-	else  if ( value->levelcoeff() > cf.value->levelcoeff() )
-	    value = value->modcoeff( cf.value, false );
-	else {
-	    InternalCF * dummy = cf.value->copyObject();
-	    dummy = dummy->modcoeff( value, true );
-	    if ( value->deleteObject() ) delete value;
-	    value = dummy;
-	}
+        if ( value->levelcoeff() == cf.value->levelcoeff() )
+            value = value->modsame( cf.value );
+        else  if ( value->levelcoeff() > cf.value->levelcoeff() )
+            value = value->modcoeff( cf.value, false );
+        else {
+            InternalCF * dummy = cf.value->copyObject();
+            dummy = dummy->modcoeff( value, true );
+            if ( value->deleteObject() ) delete value;
+            value = dummy;
+        }
     }
     else  if ( level() > cf.level() )
-	value = value->modcoeff( cf.value, false );
+        value = value->modcoeff( cf.value, false );
     else {
-	InternalCF * dummy = cf.value->copyObject();
-	dummy = dummy->modcoeff( value, true );
-	if ( value->deleteObject() ) delete value;
-	value = dummy;
+        InternalCF * dummy = cf.value->copyObject();
+        dummy = dummy->modcoeff( value, true );
+        if ( value->deleteObject() ) delete value;
+        value = dummy;
     }
     return *this;
 }
@@ -865,29 +865,29 @@ divrem ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & q, Ca
     InternalCF * qq = 0, * rr = 0;
     int what = is_imm( f.value );
     if ( what )
-	if ( is_imm( g.value ) ) {
-	    if ( what == FFMARK )
-		imm_divrem_p( f.value, g.value, qq, rr );
-	    else  if ( what == GFMARK )
-		imm_divrem_gf( f.value, g.value, qq, rr );
-	    else
-		imm_divrem( f.value, g.value, qq, rr );
-	}
-	else
-	    g.value->divremcoeff( f.value, qq, rr, true );
+        if ( is_imm( g.value ) ) {
+            if ( what == FFMARK )
+                imm_divrem_p( f.value, g.value, qq, rr );
+            else  if ( what == GFMARK )
+                imm_divrem_gf( f.value, g.value, qq, rr );
+            else
+                imm_divrem( f.value, g.value, qq, rr );
+        }
+        else
+            g.value->divremcoeff( f.value, qq, rr, true );
     else  if ( (what=is_imm( g.value )) )
-	f.value->divremcoeff( g.value, qq, rr, false );
+        f.value->divremcoeff( g.value, qq, rr, false );
     else  if ( f.value->level() == g.value->level() )
-	if ( f.value->levelcoeff() == g.value->levelcoeff() )
-	    f.value->divremsame( g.value, qq, rr );
-	else  if ( f.value->levelcoeff() > g.value->levelcoeff() )
-	    f.value->divremcoeff( g.value, qq, rr, false );
-	else
-	    g.value->divremcoeff( f.value, qq, rr, true );
+        if ( f.value->levelcoeff() == g.value->levelcoeff() )
+            f.value->divremsame( g.value, qq, rr );
+        else  if ( f.value->levelcoeff() > g.value->levelcoeff() )
+            f.value->divremcoeff( g.value, qq, rr, false );
+        else
+            g.value->divremcoeff( f.value, qq, rr, true );
     else  if ( f.value->level() > g.value->level() )
-	f.value->divremcoeff( g.value, qq, rr, false );
+        f.value->divremcoeff( g.value, qq, rr, false );
     else
-	g.value->divremcoeff( f.value, qq, rr, true );
+        g.value->divremcoeff( f.value, qq, rr, true );
     ASSERT( qq != 0 && rr != 0, "error in divrem" );
     q = CanonicalForm( qq );
     r = CanonicalForm( rr );
@@ -900,36 +900,36 @@ divremt ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & q, C
     int what = is_imm( f.value );
     bool result = true;
     if ( what )
-	if ( is_imm( g.value ) ) {
-	    if ( what == FFMARK )
-		imm_divrem_p( f.value, g.value, qq, rr );
-	    else  if ( what == GFMARK )
-		imm_divrem_gf( f.value, g.value, qq, rr );
-	    else
-		imm_divrem( f.value, g.value, qq, rr );
-	}
-	else
-	    result = g.value->divremcoefft( f.value, qq, rr, true );
+        if ( is_imm( g.value ) ) {
+            if ( what == FFMARK )
+                imm_divrem_p( f.value, g.value, qq, rr );
+            else  if ( what == GFMARK )
+                imm_divrem_gf( f.value, g.value, qq, rr );
+            else
+                imm_divrem( f.value, g.value, qq, rr );
+        }
+        else
+            result = g.value->divremcoefft( f.value, qq, rr, true );
     else  if ( (what=is_imm( g.value )) )
-	result = f.value->divremcoefft( g.value, qq, rr, false );
+        result = f.value->divremcoefft( g.value, qq, rr, false );
     else  if ( f.value->level() == g.value->level() )
-	if ( f.value->levelcoeff() == g.value->levelcoeff() )
-	    result = f.value->divremsamet( g.value, qq, rr );
-	else  if ( f.value->levelcoeff() > g.value->levelcoeff() )
-	    result = f.value->divremcoefft( g.value, qq, rr, false );
-	else
-	    result = g.value->divremcoefft( f.value, qq, rr, true );
+        if ( f.value->levelcoeff() == g.value->levelcoeff() )
+            result = f.value->divremsamet( g.value, qq, rr );
+        else  if ( f.value->levelcoeff() > g.value->levelcoeff() )
+            result = f.value->divremcoefft( g.value, qq, rr, false );
+        else
+            result = g.value->divremcoefft( f.value, qq, rr, true );
     else  if ( f.value->level() > g.value->level() )
-	result = f.value->divremcoefft( g.value, qq, rr, false );
+        result = f.value->divremcoefft( g.value, qq, rr, false );
     else
-	result = g.value->divremcoefft( f.value, qq, rr, true );
+        result = g.value->divremcoefft( f.value, qq, rr, true );
     if ( result ) {
-	ASSERT( qq != 0 && rr != 0, "error in divrem" );
-	q = CanonicalForm( qq );
-	r = CanonicalForm( rr );
+        ASSERT( qq != 0 && rr != 0, "error in divrem" );
+        q = CanonicalForm( qq );
+        r = CanonicalForm( rr );
     }
     else {
-	q = 0; r = 0;
+        q = 0; r = 0;
     }
     return result;
 }
@@ -955,44 +955,44 @@ CanonicalForm
 CanonicalForm::operator () ( const CanonicalForm & f ) const
 {
     if ( is_imm( value ) || value->inBaseDomain() )
-	return *this;
+        return *this;
     else {
 #if 0
-	CFIterator i = *this;
-	int lastExp = i.exp();
-	CanonicalForm result = i.coeff();
-	i++;
-	while ( i.hasTerms() ) {
-	    if ( (lastExp - i.exp()) == 1 )
-		result *= f;
-	    else
-		result *= power( f, lastExp - i.exp() );
-	    result += i.coeff();
-	    lastExp = i.exp();
-	    i++;
-	}
-	if ( lastExp != 0 )
-	    result *= power( f, lastExp );
+        CFIterator i = *this;
+        int lastExp = i.exp();
+        CanonicalForm result = i.coeff();
+        i++;
+        while ( i.hasTerms() ) {
+            if ( (lastExp - i.exp()) == 1 )
+                result *= f;
+            else
+                result *= power( f, lastExp - i.exp() );
+            result += i.coeff();
+            lastExp = i.exp();
+            i++;
+        }
+        if ( lastExp != 0 )
+            result *= power( f, lastExp );
 #else
-	CFIterator i = *this;
-	int lastExp = i.exp();
-	CanonicalForm result = i.coeff();
-	i++;
-	while ( i.hasTerms() )
+        CFIterator i = *this;
+        int lastExp = i.exp();
+        CanonicalForm result = i.coeff();
+        i++;
+        while ( i.hasTerms() )
         {
             int i_exp=i.exp();
-	    if ( (lastExp - i_exp /* i.exp()*/) == 1 )
-		result *= f;
-	    else
-		result *= power( f, lastExp - i_exp /*i.exp()*/ );
-	    result += i.coeff();
-	    lastExp = i_exp /*i.exp()*/;
-	    i++;
-	}
-	if ( lastExp != 0 )
-	    result *= power( f, lastExp );
+            if ( (lastExp - i_exp /* i.exp()*/) == 1 )
+                result *= f;
+            else
+                result *= power( f, lastExp - i_exp /*i.exp()*/ );
+            result += i.coeff();
+            lastExp = i_exp /*i.exp()*/;
+            i++;
+        }
+        if ( lastExp != 0 )
+            result *= power( f, lastExp );
 #endif
-	return result;
+        return result;
     }
 }
 
@@ -1000,19 +1000,19 @@ CanonicalForm
 CanonicalForm::operator () ( const CanonicalForm & f, const Variable & v ) const
 {
     if ( is_imm( value ) || value->inBaseDomain() )
-	return *this;
+        return *this;
 
     Variable x = value->variable();
     if ( v > x )
-	return *this;
+        return *this;
     else  if ( v == x )
-	return (*this)( f );
+        return (*this)( f );
     else {
-	// v is less than main variable of f
-	CanonicalForm result = 0;
-	for ( CFIterator i = *this; i.hasTerms(); i++ )
-	    result += i.coeff()( f, v ) * power( x, i.exp() );
-	return result;
+        // v is less than main variable of f
+        CanonicalForm result = 0;
+        for ( CFIterator i = *this; i.hasTerms(); i++ )
+            result += i.coeff()( f, v ) * power( x, i.exp() );
+        return result;
     }
 }
 //}}}
@@ -1055,12 +1055,12 @@ CanonicalForm::operator [] ( int i ) const
 {
     ASSERT( i >= 0, "index to operator [] less than zero" );
     if ( is_imm( value ) )
-	if ( i == 0 )
-	    return *this;
-	else
-	    return CanonicalForm( 0 );
+        if ( i == 0 )
+            return *this;
+        else
+            return CanonicalForm( 0 );
     else
-	return value->coeff( i );
+        return value->coeff( i );
 }
 //}}}
 
@@ -1083,14 +1083,14 @@ CanonicalForm
 CanonicalForm::deriv () const
 {
     if ( is_imm( value ) || value->inCoeffDomain() )
-	return CanonicalForm( 0 );
+        return CanonicalForm( 0 );
     else {
-	CanonicalForm result = 0;
-	Variable x = value->variable();
-	for ( CFIterator i = *this; i.hasTerms(); i++ )
-	    if ( i.exp() > 0 )
-		result += power( x, i.exp()-1 ) * i.coeff() * i.exp();
-	return result;
+        CanonicalForm result = 0;
+        Variable x = value->variable();
+        for ( CFIterator i = *this; i.hasTerms(); i++ )
+            if ( i.exp() > 0 )
+                result += power( x, i.exp()-1 ) * i.coeff() * i.exp();
+        return result;
     }
 }
 
@@ -1099,18 +1099,18 @@ CanonicalForm::deriv ( const Variable & x ) const
 {
     ASSERT( x.level() > 0, "cannot derive with respect to algebraic variables" );
     if ( is_imm( value ) || value->inCoeffDomain() )
-	return CanonicalForm( 0 );
+        return CanonicalForm( 0 );
 
     Variable y = value->variable();
     if ( x > y )
-	return CanonicalForm( 0 );
+        return CanonicalForm( 0 );
     else if ( x == y )
-	return deriv();
+        return deriv();
     else {
-	CanonicalForm result = 0;
-	for ( CFIterator i = *this; i.hasTerms(); i++ )
-	    result += i.coeff().deriv( x ) * power( y, i.exp() );
-	return result;
+        CanonicalForm result = 0;
+        for ( CFIterator i = *this; i.hasTerms(); i++ )
+            result += i.coeff().deriv( x ) * power( y, i.exp() );
+        return result;
     }
 }
 //}}}
@@ -1140,9 +1140,9 @@ int
 CanonicalForm::sign () const
 {
     if ( is_imm( value ) )
-	return imm_sign( value );
+        return imm_sign( value );
     else
-	return value->sign();
+        return value->sign();
 }
 //}}}
 
@@ -1165,24 +1165,24 @@ CanonicalForm
 CanonicalForm::sqrt () const
 {
     if ( is_imm( value ) ) {
-	ASSERT( is_imm( value ) == INTMARK, "sqrt() not implemented" );
-	int n = imm2int( value );
-	ASSERT( n >= 0, "arg to sqrt() less than zero" );
-	if ( n == 0 || n == 1 )
-	    return CanonicalForm( n );
-	else {
-	    int x, y = n;
-	    do {
-		x = y;
-		// the intermediate result may not fit into an
-		// integer, but the result does
-		y = (unsigned int)(x + n/x)/2;
-	    } while ( y < x );
-	    return CanonicalForm( x );
-	}
+        ASSERT( is_imm( value ) == INTMARK, "sqrt() not implemented" );
+        int n = imm2int( value );
+        ASSERT( n >= 0, "arg to sqrt() less than zero" );
+        if ( n == 0 || n == 1 )
+            return CanonicalForm( n );
+        else {
+            int x, y = n;
+            do {
+                x = y;
+                // the intermediate result may not fit into an
+                // integer, but the result does
+                y = (unsigned int)(x + n/x)/2;
+            } while ( y < x );
+            return CanonicalForm( x );
+        }
     }
     else
-	return CanonicalForm( value->sqrt() );
+        return CanonicalForm( value->sqrt() );
 }
 //}}}
 
@@ -1201,18 +1201,18 @@ int
 CanonicalForm::ilog2 () const
 {
     if ( is_imm( value ) ) {
-	ASSERT( is_imm( value ) == INTMARK, "ilog2() not implemented" );
-	int a = imm2int( value );
-	ASSERT( a > 0, "arg to ilog2() less or equal zero" );
-	int n = -1;
-	while ( a != 0 ) {
-	    n++;
-	    a /= 2;
-	}
-	return n;
+        ASSERT( is_imm( value ) == INTMARK, "ilog2() not implemented" );
+        int a = imm2int( value );
+        ASSERT( a > 0, "arg to ilog2() less or equal zero" );
+        int n = -1;
+        while ( a != 0 ) {
+            n++;
+            a /= 2;
+        }
+        return n;
     }
     else
-	return value->ilog2();
+        return value->ilog2();
 }
 //}}}
 
@@ -1258,39 +1258,39 @@ bool
 operator == ( const CanonicalForm & lhs, const CanonicalForm & rhs )
 {
     if ( lhs.value == rhs.value )
-	return true;
+        return true;
     else if ( is_imm( rhs.value ) || is_imm( lhs.value ) ) {
-	ASSERT( ! is_imm( rhs.value ) ||
-		! is_imm( lhs.value ) ||
-		is_imm( rhs.value ) == is_imm( lhs.value ),
-		"incompatible operands" );
-	return false;
+        ASSERT( ! is_imm( rhs.value ) ||
+                ! is_imm( lhs.value ) ||
+                is_imm( rhs.value ) == is_imm( lhs.value ),
+                "incompatible operands" );
+        return false;
     }
     else  if ( lhs.value->level() != rhs.value->level() )
-	return false;
+        return false;
     else  if ( lhs.value->levelcoeff() != rhs.value->levelcoeff() )
-	return false;
+        return false;
     else
-	return rhs.value->comparesame( lhs.value ) == 0;
+        return rhs.value->comparesame( lhs.value ) == 0;
 }
 
 bool
 operator != ( const CanonicalForm & lhs, const CanonicalForm & rhs )
 {
     if ( lhs.value == rhs.value )
-	return false;
+        return false;
     else if ( is_imm( rhs.value ) || is_imm( lhs.value ) ) {
-	ASSERT( ! is_imm( rhs.value ) ||
-		! is_imm( lhs.value ) ||
-		is_imm( rhs.value ) == is_imm( lhs.value ),
-		"incompatible operands" );
-	return true;
+        ASSERT( ! is_imm( rhs.value ) ||
+                ! is_imm( lhs.value ) ||
+                is_imm( rhs.value ) == is_imm( lhs.value ),
+                "incompatible operands" );
+        return true;
     }
     else  if ( lhs.value->level() != rhs.value->level() )
-	return true;
+        return true;
     else  if ( lhs.value->levelcoeff() != rhs.value->levelcoeff() )
-	return true;
-    else	return rhs.value->comparesame( lhs.value ) != 0;
+        return true;
+    else        return rhs.value->comparesame( lhs.value ) != 0;
 }
 //}}}
 
@@ -1320,7 +1320,7 @@ operator != ( const CanonicalForm & lhs, const CanonicalForm & rhs )
 // lexicographical ordering of monomials.  E.g. if lm(f) < lm(g)
 // w.r.t. lexicographic ordering, then f < g.  For more details,
 // refer to the documentation of `InternalPoly::operator <()'.
-// 
+//
 // Both operands should have coefficients from the same base domain.
 //
 // The scheme how both operators are implemented is allmost the
@@ -1344,27 +1344,27 @@ operator > ( const CanonicalForm & lhs, const CanonicalForm & rhs )
 {
     int what = is_imm( rhs.value );
     if ( is_imm( lhs.value ) ) {
-	ASSERT( ! what || (what == is_imm( lhs.value )), "incompatible operands" );
-	if ( what == 0 )
-	    return rhs.value->comparecoeff( lhs.value ) < 0;
-	else if ( what == INTMARK )
-	    return imm_cmp( lhs.value, rhs.value ) > 0;
-	else if ( what == FFMARK )
-	    return imm_cmp_p( lhs.value, rhs.value ) > 0;
-	else
-	    return imm_cmp_gf( lhs.value, rhs.value ) > 0;
+        ASSERT( ! what || (what == is_imm( lhs.value )), "incompatible operands" );
+        if ( what == 0 )
+            return rhs.value->comparecoeff( lhs.value ) < 0;
+        else if ( what == INTMARK )
+            return imm_cmp( lhs.value, rhs.value ) > 0;
+        else if ( what == FFMARK )
+            return imm_cmp_p( lhs.value, rhs.value ) > 0;
+        else
+            return imm_cmp_gf( lhs.value, rhs.value ) > 0;
     }
     else  if ( what )
-	return lhs.value->comparecoeff( rhs.value ) > 0;
+        return lhs.value->comparecoeff( rhs.value ) > 0;
     else  if ( lhs.value->level() == rhs.value->level() )
-	if ( lhs.value->levelcoeff() == rhs.value->levelcoeff() )
-	    return lhs.value->comparesame( rhs.value ) > 0;
-	else  if ( lhs.value->levelcoeff() > rhs.value->levelcoeff() )
-	    return lhs.value->comparecoeff( rhs.value ) > 0;
-	else
-	    return rhs.value->comparecoeff( lhs.value ) < 0;
+        if ( lhs.value->levelcoeff() == rhs.value->levelcoeff() )
+            return lhs.value->comparesame( rhs.value ) > 0;
+        else  if ( lhs.value->levelcoeff() > rhs.value->levelcoeff() )
+            return lhs.value->comparecoeff( rhs.value ) > 0;
+        else
+            return rhs.value->comparecoeff( lhs.value ) < 0;
     else
-	return lhs.value->level() > rhs.value->level();
+        return lhs.value->level() > rhs.value->level();
 }
 
 bool
@@ -1372,27 +1372,27 @@ operator < ( const CanonicalForm & lhs, const CanonicalForm & rhs )
 {
     int what = is_imm( rhs.value );
     if ( is_imm( lhs.value ) ) {
-	ASSERT( ! what || (what == is_imm( lhs.value )), "incompatible operands" );
-	if ( what == 0 )
-	    return rhs.value->comparecoeff( lhs.value ) > 0;
-	else if ( what == INTMARK )
-	    return imm_cmp( lhs.value, rhs.value ) < 0;
-	else if ( what == FFMARK )
-	    return imm_cmp_p( lhs.value, rhs.value ) < 0;
-	else
-	    return imm_cmp_gf( lhs.value, rhs.value ) < 0;
+        ASSERT( ! what || (what == is_imm( lhs.value )), "incompatible operands" );
+        if ( what == 0 )
+            return rhs.value->comparecoeff( lhs.value ) > 0;
+        else if ( what == INTMARK )
+            return imm_cmp( lhs.value, rhs.value ) < 0;
+        else if ( what == FFMARK )
+            return imm_cmp_p( lhs.value, rhs.value ) < 0;
+        else
+            return imm_cmp_gf( lhs.value, rhs.value ) < 0;
     }
     else  if ( what )
-	return lhs.value->comparecoeff( rhs.value ) < 0;
+        return lhs.value->comparecoeff( rhs.value ) < 0;
     else  if ( lhs.value->level() == rhs.value->level() )
-	if ( lhs.value->levelcoeff() == rhs.value->levelcoeff() )
-	    return lhs.value->comparesame( rhs.value ) < 0;
-	else  if ( lhs.value->levelcoeff() > rhs.value->levelcoeff() )
-	    return lhs.value->comparecoeff( rhs.value ) < 0;
-	else
-	    return rhs.value->comparecoeff( lhs.value ) > 0;
+        if ( lhs.value->levelcoeff() == rhs.value->levelcoeff() )
+            return lhs.value->comparesame( rhs.value ) < 0;
+        else  if ( lhs.value->levelcoeff() > rhs.value->levelcoeff() )
+            return lhs.value->comparecoeff( rhs.value ) < 0;
+        else
+            return rhs.value->comparecoeff( lhs.value ) > 0;
     else
-	return lhs.value->level() < rhs.value->level();
+        return lhs.value->level() < rhs.value->level();
 }
 //}}}
 
@@ -1410,7 +1410,7 @@ operator < ( const CanonicalForm & lhs, const CanonicalForm & rhs )
 // f and g should come from one base domain which should be not
 // the prime power domain.
 //
-// Implementation: 
+// Implementation:
 //
 // CanonicalForm::bgcd() handles the immediate case with a
 //   standard euclidean algorithm.  For the non-immediate cases
@@ -1437,61 +1437,61 @@ bgcd ( const CanonicalForm & f, const CanonicalForm & g )
     // check immediate cases
     int what = is_imm( g.value );
     if ( is_imm( f.value ) ) {
-	ASSERT( ! what || (what == is_imm( f.value )), "incompatible operands" );
-	if ( what == 0 )
-	    return g.value->bgcdcoeff( f.value );
-	else if ( what == INTMARK && ! cf_glob_switches.isOn( SW_RATIONAL ) ) {
-	    // calculate gcd using standard integer
-	    // arithmetic
-	    int fInt = imm2int( f.value );
-	    int gInt = imm2int( g.value );
+        ASSERT( ! what || (what == is_imm( f.value )), "incompatible operands" );
+        if ( what == 0 )
+            return g.value->bgcdcoeff( f.value );
+        else if ( what == INTMARK && ! cf_glob_switches.isOn( SW_RATIONAL ) ) {
+            // calculate gcd using standard integer
+            // arithmetic
+            int fInt = imm2int( f.value );
+            int gInt = imm2int( g.value );
 
-	    if ( fInt < 0 ) fInt = -fInt;
-	    if ( gInt < 0 ) gInt = -gInt;
-	    // swap fInt and gInt
-	    if ( gInt > fInt ) {
-		int swap = gInt;
-		gInt = fInt;
-		fInt = swap;
-	    }
+            if ( fInt < 0 ) fInt = -fInt;
+            if ( gInt < 0 ) gInt = -gInt;
+            // swap fInt and gInt
+            if ( gInt > fInt ) {
+                int swap = gInt;
+                gInt = fInt;
+                fInt = swap;
+            }
 
-	    // now, 0 <= gInt <= fInt.  Start the loop.
-	    while ( gInt ) {
-		// calculate (fInt, gInt) = (gInt, fInt%gInt)
-		int r = fInt % gInt;
-		fInt = gInt;
-		gInt = r;
-	    }
+            // now, 0 <= gInt <= fInt.  Start the loop.
+            while ( gInt ) {
+                // calculate (fInt, gInt) = (gInt, fInt%gInt)
+                int r = fInt % gInt;
+                fInt = gInt;
+                gInt = r;
+            }
 
-	    return CanonicalForm( fInt );
-	} else
-	    // we do not go for maximal speed for these stupid
-	    // special cases
-	    return CanonicalForm( f.isZero() && g.isZero() ? 0 : 1 );
+            return CanonicalForm( fInt );
+        } else
+            // we do not go for maximal speed for these stupid
+            // special cases
+            return CanonicalForm( f.isZero() && g.isZero() ? 0 : 1 );
     }
     else if ( what )
-	return f.value->bgcdcoeff( g.value );
+        return f.value->bgcdcoeff( g.value );
 
     int fLevel = f.value->level();
     int gLevel = g.value->level();
 
     // check levels
     if ( fLevel == gLevel ) {
-	fLevel = f.value->levelcoeff();
-	gLevel = g.value->levelcoeff();
+        fLevel = f.value->levelcoeff();
+        gLevel = g.value->levelcoeff();
 
-	// check levelcoeffs
-	if ( fLevel == gLevel )
-	    return f.value->bgcdsame( g.value );
-	else if ( fLevel < gLevel )
-	    return g.value->bgcdcoeff( f.value );
-	else
-	    return f.value->bgcdcoeff( g.value );
+        // check levelcoeffs
+        if ( fLevel == gLevel )
+            return f.value->bgcdsame( g.value );
+        else if ( fLevel < gLevel )
+            return g.value->bgcdcoeff( f.value );
+        else
+            return f.value->bgcdcoeff( g.value );
     }
     else if ( fLevel < gLevel )
-	return g.value->bgcdcoeff( f.value );
+        return g.value->bgcdcoeff( f.value );
     else
-	return f.value->bgcdcoeff( g.value );
+        return f.value->bgcdcoeff( g.value );
 }
 //}}}
 
@@ -1507,92 +1507,92 @@ bextgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, C
     // check immediate cases
     int what = is_imm( g.value );
     if ( is_imm( f.value ) ) {
-	ASSERT( ! what || (what == is_imm( f.value )), "incompatible operands" );
-	if ( what == 0 )
-	    return g.value->bextgcdcoeff( f.value, b, a );
-	else if ( what == INTMARK && ! cf_glob_switches.isOn( SW_RATIONAL ) ) {
-	    // calculate extended gcd using standard integer
-	    // arithmetic
-	    int fInt = imm2int( f.value );
-	    int gInt = imm2int( g.value );
+        ASSERT( ! what || (what == is_imm( f.value )), "incompatible operands" );
+        if ( what == 0 )
+            return g.value->bextgcdcoeff( f.value, b, a );
+        else if ( what == INTMARK && ! cf_glob_switches.isOn( SW_RATIONAL ) ) {
+            // calculate extended gcd using standard integer
+            // arithmetic
+            int fInt = imm2int( f.value );
+            int gInt = imm2int( g.value );
 
-	    // to avoid any system dpendencies with `%', we work
-	    // with positive numbers only.  To a pity, we have to
-	    // redo all the checks when assigning to a and b.
-	    if ( fInt < 0 ) fInt = -fInt;
-	    if ( gInt < 0 ) gInt = -gInt;
-	    // swap fInt and gInt
-	    if ( gInt > fInt ) {
-		int swap = gInt;
-		gInt = fInt;
-		fInt = swap;
-	    }
+            // to avoid any system dpendencies with `%', we work
+            // with positive numbers only.  To a pity, we have to
+            // redo all the checks when assigning to a and b.
+            if ( fInt < 0 ) fInt = -fInt;
+            if ( gInt < 0 ) gInt = -gInt;
+            // swap fInt and gInt
+            if ( gInt > fInt ) {
+                int swap = gInt;
+                gInt = fInt;
+                fInt = swap;
+            }
 
-	    int u = 1; int v = 0;
-	    int uNext = 0; int vNext = 1;
+            int u = 1; int v = 0;
+            int uNext = 0; int vNext = 1;
 
-	    // at any step, we have:
-	    // fInt_0 * u + gInt_0 * v = fInt
-	    // fInt_0 * uNext + gInt_0 * vNext = gInt
-	    // where fInt_0 and gInt_0 denote the values of fint
-	    // and gInt, resp., at the beginning
-	    while ( gInt ) {
-		int r = fInt % gInt;
-		int q = fInt / gInt;
-		int uSwap = u - q * uNext;
-		int vSwap = v - q * vNext;
+            // at any step, we have:
+            // fInt_0 * u + gInt_0 * v = fInt
+            // fInt_0 * uNext + gInt_0 * vNext = gInt
+            // where fInt_0 and gInt_0 denote the values of fint
+            // and gInt, resp., at the beginning
+            while ( gInt ) {
+                int r = fInt % gInt;
+                int q = fInt / gInt;
+                int uSwap = u - q * uNext;
+                int vSwap = v - q * vNext;
 
-		// update variables
-		fInt = gInt;
-		gInt = r;
-		u = uNext; v = vNext;
-		uNext = uSwap; vNext = vSwap;
-	    }
+                // update variables
+                fInt = gInt;
+                gInt = r;
+                u = uNext; v = vNext;
+                uNext = uSwap; vNext = vSwap;
+            }
 
-	    // now, assign to a and b
-	    int fTest = imm2int( f.value );
-	    int gTest = imm2int( g.value );
-	    if ( gTest > fTest ) {
-		a = v; b = u;
-	    } else {
-		a = u; b = v;
-	    }
-	    if ( fTest < 0 ) a = -a;
-	    if ( gTest < 0 ) b = -b;
-	    return CanonicalForm( fInt );
-	} else
-	    // stupid special cases
-	    if ( ! f.isZero() ) {
-		a = 1/f; b = 0; return CanonicalForm( 1 );
-	    } else if ( ! g.isZero() ) {
-		a = 0; b = 1/g; return CanonicalForm( 1 );
-	    } else {
-		a = 0; b = 0; return CanonicalForm( 0 );
-	    }
+            // now, assign to a and b
+            int fTest = imm2int( f.value );
+            int gTest = imm2int( g.value );
+            if ( gTest > fTest ) {
+                a = v; b = u;
+            } else {
+                a = u; b = v;
+            }
+            if ( fTest < 0 ) a = -a;
+            if ( gTest < 0 ) b = -b;
+            return CanonicalForm( fInt );
+        } else
+            // stupid special cases
+            if ( ! f.isZero() ) {
+                a = 1/f; b = 0; return CanonicalForm( 1 );
+            } else if ( ! g.isZero() ) {
+                a = 0; b = 1/g; return CanonicalForm( 1 );
+            } else {
+                a = 0; b = 0; return CanonicalForm( 0 );
+            }
     }
     else if ( what )
-	return f.value->bextgcdcoeff( g.value, a, b );
+        return f.value->bextgcdcoeff( g.value, a, b );
 
     int fLevel = f.value->level();
     int gLevel = g.value->level();
 
     // check levels
     if ( fLevel == gLevel ) {
-	fLevel = f.value->levelcoeff();
-	gLevel = g.value->levelcoeff();
+        fLevel = f.value->levelcoeff();
+        gLevel = g.value->levelcoeff();
 
-	// check levelcoeffs
-	if ( fLevel == gLevel )
-	    return f.value->bextgcdsame( g.value, a, b );
-	else if ( fLevel < gLevel )
-	    return g.value->bextgcdcoeff( f.value, b, a );
-	else
-	    return f.value->bextgcdcoeff( g.value, a, b );
+        // check levelcoeffs
+        if ( fLevel == gLevel )
+            return f.value->bextgcdsame( g.value, a, b );
+        else if ( fLevel < gLevel )
+            return g.value->bextgcdcoeff( f.value, b, a );
+        else
+            return f.value->bextgcdcoeff( g.value, a, b );
     }
     else if ( fLevel < gLevel )
-	return g.value->bextgcdcoeff( f.value, b, a );
+        return g.value->bextgcdcoeff( f.value, b, a );
     else
-	return f.value->bextgcdcoeff( g.value, a, b );
+        return f.value->bextgcdcoeff( g.value, a, b );
 }
 //}}}
 
@@ -1600,7 +1600,7 @@ CanonicalForm
 blcm ( const CanonicalForm & f, const CanonicalForm & g )
 {
     if ( f.isZero() || g.isZero() )
-	return CanonicalForm( 0 );
+        return CanonicalForm( 0 );
 /*
     else if (f.isOne())
         return g;
@@ -1608,7 +1608,7 @@ blcm ( const CanonicalForm & f, const CanonicalForm & g )
         return f;
 */
     else
-	return (f / bgcd( f, g )) * g;
+        return (f / bgcd( f, g )) * g;
 }
 
 //{{{ input/output
@@ -1617,18 +1617,18 @@ void
 CanonicalForm::print( ostream & os, char * str ) const
 {
     if ( is_imm( value ) )
-	imm_print( os, value, str );
+        imm_print( os, value, str );
     else
-	value->print( os, str );
+        value->print( os, str );
 }
 
 void
 CanonicalForm::print( ostream & os ) const
 {
     if ( is_imm( value ) )
-	imm_print( os, value, "" );
+        imm_print( os, value, "" );
     else
-	value->print( os, "" );
+        value->print( os, "" );
 }
 
 ostream&
@@ -1663,13 +1663,13 @@ CanonicalForm::genZero() const
 {
     int what = is_imm( value );
     if ( what == FFMARK )
-	return CanonicalForm( CFFactory::basic( FiniteFieldDomain, 0 ) );
+        return CanonicalForm( CFFactory::basic( FiniteFieldDomain, 0 ) );
     else  if ( what == GFMARK )
-	return CanonicalForm( CFFactory::basic( GaloisFieldDomain, 0 ) );
+        return CanonicalForm( CFFactory::basic( GaloisFieldDomain, 0 ) );
     else  if ( what )
-	return CanonicalForm( CFFactory::basic( IntegerDomain, 0 ) );
+        return CanonicalForm( CFFactory::basic( IntegerDomain, 0 ) );
     else
-	return CanonicalForm( value->genZero() );
+        return CanonicalForm( value->genZero() );
 }
 
 CanonicalForm
@@ -1677,13 +1677,13 @@ CanonicalForm::genOne() const
 {
     int what = is_imm( value );
     if ( what == FFMARK )
-	return CanonicalForm( CFFactory::basic( FiniteFieldDomain, 1 ) );
+        return CanonicalForm( CFFactory::basic( FiniteFieldDomain, 1 ) );
     else  if ( what == GFMARK )
-	return CanonicalForm( CFFactory::basic( GaloisFieldDomain, 1 ) );
+        return CanonicalForm( CFFactory::basic( GaloisFieldDomain, 1 ) );
     else  if ( what )
-	return CanonicalForm( CFFactory::basic( IntegerDomain, 1 ) );
+        return CanonicalForm( CFFactory::basic( IntegerDomain, 1 ) );
     else
-	return CanonicalForm( value->genOne() );
+        return CanonicalForm( value->genOne() );
 }
 //}}}
 
@@ -1693,19 +1693,21 @@ power ( const CanonicalForm & f, int n )
 {
     ASSERT( n >= 0, "illegal exponent" );
     if ( f.isZero() || f.isOne() )
-	return f;
-    else  if ( (-f).isOne() ) {
-	if ( n % 2 == 0 )
-	    return -f;
-	else
-	    return f;
+        return f;
+    else  if ( (-f).isOne() )
+    {
+        if ( n % 2 == 0 )
+            return -f;
+        else
+            return f;
     }
     else  if ( n == 0 )
-	return f.genOne();
+        return f.genOne();
     //else if (f.inGF())
     //{
     //}
-    else {
+    else
+    {
         CanonicalForm g,h;
         h=f;
         while(n%2==0)
@@ -1730,15 +1732,16 @@ power ( const Variable & v, int n )
 {
     ASSERT( n >= 0, "illegal exponent" );
     if ( n == 0 )
-	return 1;
+        return 1;
     else  if ( n == 1 )
-	return v;
-    else  if ( v.level() < 0 ) {
-	CanonicalForm result( v, n-1 );
-	return result * v;
+        return v;
+    else  if ( v.level() < 0 )
+    {
+        CanonicalForm result( v, n-1 );
+        return result * v;
     }
     else
-	return CanonicalForm( v, n );
+        return CanonicalForm( v, n );
 }
 //}}}
 
