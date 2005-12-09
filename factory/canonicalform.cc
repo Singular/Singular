@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.cc,v 1.36 2005-12-09 08:35:37 Singular Exp $ */
+/* $Id: canonicalform.cc,v 1.37 2005-12-09 09:12:53 pohl Exp $ */
 
 #include <config.h>
 
@@ -1692,26 +1692,36 @@ CanonicalForm
 power ( const CanonicalForm & f, int n )
 {
     ASSERT( n >= 0, "illegal exponent" );
-    if ( f == 0 )
-	return 0;
-    else  if ( f == 1 )
+    if ( f.isZero() || f.isOne() )
 	return f;
-    else  if ( f == -1 ) {
+    else  if ( (-f).isOne() ) {
 	if ( n % 2 == 0 )
-	    return 1;
+	    return -f;
 	else
-	    return -1;
+	    return f;
     }
     else  if ( n == 0 )
-	return 1;
+	return f.genOne();
     //else if (f.inGF())
     //{
     //}
     else {
-	CanonicalForm result = f;
-	for ( int i = 1; i < n; i++ )
-	    result *= f;
-	return result;
+        CanonicalForm g,h;
+        h=f;
+        while(n%2==0)
+        {
+          h*=h;
+          n/=2;
+        }
+        g=h;
+        while(1)
+        {
+          n/=2;
+          if(n==0)
+            return g;
+          h*=h;
+          if(n%2!=0) g*=h;
+        }
     }
 }
 
