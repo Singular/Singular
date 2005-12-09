@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.234 2005-11-28 15:47:00 Singular Exp $ */
+/* $Id: extra.cc,v 1.235 2005-12-09 08:52:48 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -164,6 +164,8 @@ extern BOOLEAN jjJanetBasis(leftv res, leftv v);
 #ifdef ix86_Win  /* PySingular initialized? */
 static int PyInitialized = 0;
 #endif
+
+int singular_homog_flag=1;
 
 //void emStart();
 /*2
@@ -2701,6 +2703,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         Print("NTL_p:%d (use NTL for gcd of polynomials in char p)\n",isOn(SW_USE_NTL_GCD_P));
         Print("EZGCD:%d (use EZGCD for gcd of polynomials in char 0)\n",isOn(SW_USE_EZGCD));
         Print("SPARSEMOD:%d (use SPARSEMOD for gcd of polynomials in char 0)\n",isOn(SW_USE_SPARSEMOD));
+        Print("homog:%d (use homog. test for factorization of polynomials)\n",singular_homog_flag);
         return FALSE;
       }
       else
@@ -2709,10 +2712,12 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       {
         int d=(int)h->next->Data();
         char *s=(char *)h->Data();
-        if (strcmp(s,"NTL_0")==0) { if (d) On(SW_USE_NTL_GCD_0); else Off(SW_USE_NTL_GCD_0); }
-        if (strcmp(s,"NTL_p")==0) { if (d) On(SW_USE_NTL_GCD_P); else Off(SW_USE_NTL_GCD_P); }
-        if (strcmp(s,"EZGCD")==0) { if (d) On(SW_USE_EZGCD); else Off(SW_USE_EZGCD); }
-        if (strcmp(s,"SPARSEMOD")==0) { if (d) On(SW_USE_SPARSEMOD); else Off(SW_USE_SPARSEMOD); }
+        if (strcmp(s,"NTL_0")==0) { if (d) On(SW_USE_NTL_GCD_0); else Off(SW_USE_NTL_GCD_0); } else
+        if (strcmp(s,"NTL_p")==0) { if (d) On(SW_USE_NTL_GCD_P); else Off(SW_USE_NTL_GCD_P); } else
+        if (strcmp(s,"EZGCD")==0) { if (d) On(SW_USE_EZGCD); else Off(SW_USE_EZGCD); } else
+        if (strcmp(s,"SPARSEMOD")==0) { if (d) On(SW_USE_SPARSEMOD); else Off(SW_USE_SPARSEMOD); } else
+        if (strcmp(s,"homog")==0) { if (d) singular_homog_flag=1; else singular_homog_flag=0; } else
+        return TRUE;
         return FALSE;
       }
       else return TRUE;
