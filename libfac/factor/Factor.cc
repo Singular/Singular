@@ -1,6 +1,6 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: Factor.cc,v 1.20 2005-12-05 15:47:32 Singular Exp $ ";
+static char * rcsid = "$Id: Factor.cc,v 1.21 2005-12-12 18:02:03 Singular Exp $ ";
 static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) michael@math.uni-sb.de \nPlease include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -791,6 +791,9 @@ Factorized( const CanonicalForm & F, const CanonicalForm & alpha, int Mainvar){
   }
 }
 
+// for debuggig:
+int cmpCF( const CFFactor & f, const CFFactor & g );
+
 ///////////////////////////////////////////////////////////////
 // The user front-end for a uni/multivariate factorization   //
 // routine. F needs not to be SqrFree.                       //
@@ -933,6 +936,9 @@ Factorize(const CanonicalForm & F, int is_SqrFree ){
   TIMING_PRINT(hensel_time, "time used for hensel-lift   : ");
   TIMING_PRINT(truefactor_time, "time used for truefactors   : ");
   TIMING_PRINT(factorize_time, "\ntime used for factorization   : ");
+
+  if(isOn(SW_USE_NTL_SORT)) Outputlist2.sort(cmpCF);
+
   return Outputlist2;
 }
 
@@ -1109,11 +1115,17 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
   TIMING_PRINT(hensel_time, "time used for hensel-lift   : ");
   TIMING_PRINT(truefactor_time, "time used for truefactors   : ");
   TIMING_PRINT(factorize_time, "\ntime used for factorization   : ");
+
+  if(isOn(SW_USE_NTL_SORT)) Outputlist2.sort(cmpCF);
+
   return Outputlist2;
 }
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.20  2005/12/05 15:47:32  Singular
+*hannes: is_homogeneous -> factory: isHomogeneous
+
 Revision 1.19  2005/10/17 13:18:44  Singular
 *hannes: apply sqrFree before newfactoras (Factorize in Q(a))
 
