@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapconv.cc,v 1.6 2005-07-27 15:48:28 Singular Exp $
+// $Id: clapconv.cc,v 1.7 2005-12-12 18:05:33 Singular Exp $
 /*
 * ABSTRACT: convert data between Singular and factory
 */
@@ -215,6 +215,7 @@ static void convRecPP ( const CanonicalForm & f, int * exp, poly & result )
           z->n = gmp_denominator( f );
           z->s = 0;
         }
+        nlNormalize(z);
         pGetCoeff( term ) = z;
       }
     }
@@ -289,6 +290,7 @@ conv_RecPP ( const CanonicalForm & f, int * exp, poly & result, ring r )
           z->s = 0;
         }
         pGetCoeff( term ) = z;
+        nlNormalize(z);
       }
     }
     p_Setm( term, r );
@@ -434,7 +436,14 @@ convRecPTr ( const CanonicalForm & f, int * exp, napoly & result )
         napGetCoeff( term ) = z;
       }
     }
-    result = napAdd( result, term );
+    if (nacIsZero(pGetCoeff(term)))
+    {
+      napDelete(&term);
+    }
+    else
+    {
+      result = napAdd( result, term );
+    }
   }
 }
 
@@ -599,6 +608,7 @@ static number convClapNSingAN( const CanonicalForm &f)
       z->n = gmp_denominator( f );
       z->s = 0;
     }
+    nlNormalize(z);
     #ifdef LDEBUG
     nlDBTest(z,__FILE__,__LINE__);
     #endif
