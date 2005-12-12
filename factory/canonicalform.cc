@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.cc,v 1.38 2005-12-09 15:00:59 Singular Exp $ */
+/* $Id: canonicalform.cc,v 1.39 2005-12-12 12:17:35 Singular Exp $ */
 
 #include <config.h>
 
@@ -1691,40 +1691,43 @@ CanonicalForm::genOne() const
 CanonicalForm
 power ( const CanonicalForm & f, int n )
 {
-    ASSERT( n >= 0, "illegal exponent" );
-    if ( f.isZero() || f.isOne() )
-        return f;
-    else  if ( (-f).isOne() )
-    {
-        if ( n % 2 == 0 )
-            return -f;
-        else
-            return f;
-    }
-    else  if ( n == 0 )
-        return f.genOne();
-    //else if (f.inGF())
-    //{
-    //}
+  ASSERT( n >= 0, "illegal exponent" );
+  if ( f.isZero() )
+    return 0;
+  else  if ( f.isOne() )
+    return f;
+  else  if ( f == -1 )
+  {
+    if ( n % 2 == 0 )
+      return 1;
     else
+      return -1;
+  }
+  else  if ( n == 0 )
+    return 1;
+
+  //else if (f.inGF())
+  //{
+  //}
+  else
+  {
+    CanonicalForm g,h;
+    h=f;
+    while(n%2==0)
     {
-        CanonicalForm g,h;
-        h=f;
-        while(n%2==0)
-        {
-          h*=h;
-          n/=2;
-        }
-        g=h;
-        while(1)
-        {
-          n/=2;
-          if(n==0)
-            return g;
-          h*=h;
-          if(n%2!=0) g*=h;
-        }
+      h*=h;
+      n/=2;
     }
+    g=h;
+    while(1)
+    {
+      n/=2;
+      if(n==0)
+        return g;
+      h*=h;
+      if(n%2!=0) g*=h;
+    }
+  }
 }
 
 CanonicalForm
