@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_factor.cc,v 1.27 2005-12-09 08:35:38 Singular Exp $ */
+/* $Id: cf_factor.cc,v 1.28 2005-12-12 17:59:47 Singular Exp $ */
 
 //{{{ docu
 //
@@ -273,7 +273,7 @@ extern int singular_homog_flag;
 #else
 #define singular_homog_flag 1
 #endif
-static int cmpCF( const CFFactor & f, const CFFactor & g )
+int cmpCF( const CFFactor & f, const CFFactor & g )
 {
   if (f.exp() > g.exp()) return 1;
   if (f.exp() < g.exp()) return 0;
