@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_gcd.cc,v 1.35 2005-12-09 15:00:59 Singular Exp $ */
+/* $Id: cf_gcd.cc,v 1.36 2005-12-12 15:42:36 Singular Exp $ */
 
 #include <config.h>
 
@@ -629,8 +629,13 @@ gcd ( const CanonicalForm & f, const CanonicalForm & g )
                 On( SW_RATIONAL );
                 CanonicalForm F = f * l, G = g * l;
                 Off( SW_RATIONAL );
-                do { l = gcd_poly( F, G, true ); }
-                while ((!divides(l,F)) || (!divides(l,G)));
+                do { l = gcd_poly( F, G, true ); 
+                //if ((!divides(l,F)) || (!divides(l,G))) 
+                //{printf("fehler\n"); 
+                //cout<<"F="<<F<<"\nG="<<G<<"wrong gcd="<<l<<"\n";
+                //}
+                }
+                while (0); //((!divides(l,F)) || (!divides(l,G)));
                 On( SW_RATIONAL );
                 if ( l.lc().sign() < 0 )
                     return -l;
@@ -639,8 +644,12 @@ gcd ( const CanonicalForm & f, const CanonicalForm & g )
             }
             else {
                 CanonicalForm d;
-                do{ d = gcd_poly( f, g, getCharacteristic()==0 ); }
-                while ((!divides(d,f)) || (!divides(d,g)));
+                do{ d = gcd_poly( f, g, getCharacteristic()==0 ); 
+                //if ((!divides(d,f)) || (!divides(d,g)))
+                //{printf("fehler2\n"); cout<<"F="<<f<<"\nG="<<g<<"wrong gcd="<<d<<"\n";
+                //}
+                }
+                while (0);//((!divides(d,f)) || (!divides(d,g)));
                 if ( d.lc().sign() < 0 )
                     return -d;
                 else

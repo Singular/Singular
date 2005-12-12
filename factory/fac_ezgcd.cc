@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_ezgcd.cc,v 1.23 2005-11-18 10:03:49 pohl Exp $ */
+/* $Id: fac_ezgcd.cc,v 1.24 2005-12-12 15:42:36 Singular Exp $ */
 
 #include <config.h>
 
@@ -197,6 +197,9 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b, boo
             if (gcdfound)
             {
               CanonicalForm cand=DD[2] / content(DD[2],Variable(1));
+#if 1
+              gcdfound= divides(cand,G) &&  divides(cand,F);
+#else
               if (B==F)
               {
                 DEBOUTLN( cerr, "(test) G: "<<G<<" % gcd:"<<cand<<" -> " << G%cand );
@@ -207,6 +210,7 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b, boo
                 DEBOUTLN( cerr, "(test) F: "<<F<<" % gcd:"<<cand<<" -> " << F%cand);
                 gcdfound= divides(cand,F);
               }
+#endif
             }
             /// ---> A8 (gcdfound)
         }
