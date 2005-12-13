@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.cc,v 1.4 2005-12-13 12:22:45 bricken Exp $ */
+/* $Id: kbuckets.cc,v 1.5 2005-12-13 13:46:08 bricken Exp $ */
 
 #include "mod2.h"
 #include "structs.h"
@@ -379,15 +379,16 @@ void kBucketClear(kBucket_pt bucket, poly *p, int *length)
   int i = kBucketCanonicalize(bucket);
   if (i > 0)
   {
+  #ifdef USE_COEF_BUCKETS
+    MULTIPLY_BUCKET(bucket,i);
+    //bucket->coef[i]=NULL;
+#endif
     *p = bucket->buckets[i];
     *length = bucket->buckets_length[i];
     bucket->buckets[i] = NULL;
     bucket->buckets_length[i] = 0;
     bucket->buckets_used = 0;
-#ifdef USE_COEF_BUCKETS
-    MULTIPLY_BUCKET(bucket,i);
-    //bucket->coef[i]=NULL;
-#endif
+
   }
   else
   {
@@ -689,7 +690,7 @@ void kBucket_Plus_mm_Mult_pp(kBucket_pt bucket, poly m, poly p, int l)
   kBucketMergeLm(bucket);
   kbTest(bucket);
   i = pLogLength(l1);
-
+  number n=n_Init(1,r);
   if (i <= bucket->buckets_used && bucket->buckets[i] != NULL)
   {
     MULTIPLY_BUCKET(bucket,i);
@@ -702,11 +703,29 @@ void kBucket_Plus_mm_Mult_pp(kBucket_pt bucket, poly m, poly p, int l)
   }
   else
   {
+    number swap_n=p_GetCoeff(m,r);
+    
+    assume(n_IsOne(n,r));
+    p_SetCoeff0(m,n,r);
+    n=swap_n;
+    //p_SetCoeff0(n, swap_n, r);
+    //p_GetCoeff0(n, swap_n,r);
+    
     p1 = r->p_Procs->pp_Mult_mm(p1, m, r, last);
   }
 
   while (bucket->buckets[i] != NULL)
   {
+
+    
+    
+    //don't do that, pull out gcd
+    if(!(n_IsOne(n,r))) {
+        p1=p_Mult_nn(p1, n, r);
+        n_Delete(&n,r);
+        n=n_Init(1,r);
+    }
+    
     MULTIPLY_BUCKET(bucket,i);
     p1 = p_Add_q(p1, bucket->buckets[i],
                  l1, bucket->buckets_length[i], r);
@@ -715,7 +734,17 @@ void kBucket_Plus_mm_Mult_pp(kBucket_pt bucket, poly m, poly p, int l)
     i = pLogLength(l1);
   }
 
+  
   bucket->buckets[i] = p1;
+  
+  assume(bucket->coef[i]==NULL);
+  if (!(n_IsOne(n,r))){
+    bucket->coef[i]=p_NSet(n,r);
+  } else {
+    bucket->coef[i]=NULL;
+    n_Delete(&n,r);
+  }
+  
   bucket->buckets_length[i]=l1;
   if (i >= bucket->buckets_used)
     bucket->buckets_used = i;
