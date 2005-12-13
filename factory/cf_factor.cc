@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_factor.cc,v 1.28 2005-12-12 17:59:47 Singular Exp $ */
+/* $Id: cf_factor.cc,v 1.29 2005-12-13 13:59:54 Singular Exp $ */
 
 //{{{ docu
 //
@@ -235,7 +235,7 @@ homogenize( const CanonicalForm & f, const Variable & x)
 #if 0
   int maxdeg=totaldegree(f), deg;
   CFIterator i;
-  CanonicalForm elem, result=f.genZero();
+  CanonicalForm elem, result(0);
   
   for (i=f; i.hasTerms(); i++)
   {
@@ -251,7 +251,7 @@ homogenize( const CanonicalForm & f, const Variable & x)
   CFList Newlist, Termlist= get_Terms(f);
   int maxdeg=totaldegree(f), deg;
   CFListIterator i;
-  CanonicalForm elem, result=f.genZero();
+  CanonicalForm elem, result(0);
 
   for (i=Termlist; i.hasItem(); i++){
     elem= i.getItem();
