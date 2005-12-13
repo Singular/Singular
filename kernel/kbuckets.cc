@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.cc,v 1.3 2005-12-08 11:14:04 Singular Exp $ */
+/* $Id: kbuckets.cc,v 1.4 2005-12-13 12:22:45 bricken Exp $ */
 
 #include "mod2.h"
 #include "structs.h"
@@ -29,7 +29,7 @@
 #define MULTIPLY_BUCKET(B,I)
 #endif
 static omBin kBucket_bin = omGetSpecBin(sizeof(kBucket));
-
+static int coef_start=1;
 //////////////////////////////////////////////////////////////////////////
 ///
 /// Some internal stuff
@@ -60,7 +60,7 @@ inline unsigned int pLogLength(poly p)
 
 #ifndef HAVE_PSEUDO_BUCKETS
 BOOLEAN kbTest_i(kBucket_pt bucket, int i)
-{
+{//sBucketSortMerge
   #ifdef USE_COEF_BUCKETS
   assume(bucket->coef[0]==NULL);
   if ((bucket->coef[i]!=NULL) && (bucket->buckets[i]==NULL))
@@ -68,7 +68,10 @@ BOOLEAN kbTest_i(kBucket_pt bucket, int i)
     dReportError("Bucket %d coef not NULL", i);
   }
   if (bucket->coef[i]!=NULL)
+  {
+    assume(bucket->buckets[i]!=NULL);
     _p_Test(bucket->coef[i],bucket->bucket_ring,PDEBUG);
+    }
   #endif
   pFalseReturn(p_Test(bucket->buckets[i], bucket->bucket_ring));
   if (bucket->buckets_length[i] != pLength(bucket->buckets[i]))
@@ -91,6 +94,7 @@ BOOLEAN kbTest_i(kBucket_pt bucket, int i)
 
 BOOLEAN kbTest(kBucket_pt bucket)
 {
+  assume(bucket->coef[0]==NULL);
   int i;
   poly lm = bucket->buckets[0];
 
@@ -118,6 +122,29 @@ BOOLEAN kbTest(kBucket_pt bucket)
     {
       dReportError("Bucket %d not zero", i);
       return FALSE;
+    }
+  }
+  for(i=0;i<=MAX_BUCKET;i++){
+    if (bucket->buckets[i]!=NULL){
+        int j;
+        for(j=i+1;j<=MAX_BUCKET;j++){
+            if (bucket->buckets[j]==bucket->buckets[i])
+                dReportError("Bucket %d %d equal", i,j);
+                return FALSE;
+        }
+    }
+    if (bucket->coef[i]!=NULL){
+        int j;
+        for(j=i+1;j<=MAX_BUCKET;j++){
+            if (bucket->coef[j]==bucket->coef[i])
+                dReportError("internal coef %d %d equal", i,j);
+                return FALSE;
+        }
+        for(j=0;j<=MAX_BUCKET;j++){
+            if (bucket->coef[j]==bucket->coef[i])
+                dReportError("internal coef %d equals bucket %d", i,j);
+                return FALSE;
+        }
     }
   }
   return TRUE;
@@ -177,6 +204,7 @@ void kBucketDeleteAndDestroy(kBucket_pt *bucket_pt)
 
 inline void kBucketMergeLm(kBucket_pt bucket)
 {
+
   if (bucket->buckets[0] != NULL)
   {
     poly lm = bucket->buckets[0];
@@ -196,6 +224,7 @@ inline void kBucketMergeLm(kBucket_pt bucket)
       l = l << 2;
     }
 #endif
+#if 0
     MULTIPLY_BUCKET(bucket,i);
     pNext(lm) = bucket->buckets[i];
     bucket->buckets[i] = lm;
@@ -204,6 +233,42 @@ inline void kBucketMergeLm(kBucket_pt bucket)
     if (i > bucket->buckets_used)  bucket->buckets_used = i;
     bucket->buckets[0] = NULL;
     bucket->buckets_length[0] = 0;
+#endif
+    if (i > bucket->buckets_used)  bucket->buckets_used = i;
+    assume(i!=0);
+    if (bucket->buckets[i]!=NULL){
+       MULTIPLY_BUCKET(bucket,i);
+       pNext(lm) = bucket->buckets[i];
+       bucket->buckets[i] = lm;
+       bucket->buckets_length[i]++;
+       assume(i <= bucket->buckets_used+1);
+       
+    } else {
+      #if 1
+       assume(bucket->buckets[i]==NULL);
+       assume(bucket->coef[0]==NULL);
+       assume(pLength(lm)==1);
+       assume(pNext(lm)==NULL);
+       number coef=p_GetCoeff(lm,bucket->bucket_ring);
+       p_SetCoeff0(lm, n_Init(1,bucket->bucket_ring), bucket->bucket_ring);
+       bucket->buckets[i]=lm;
+       bucket->buckets_length[i]=1;
+       bucket->coef[i]=p_NSet(n_Copy(coef,bucket->bucket_ring),bucket->bucket_ring);
+       
+       bucket->buckets[i]=lm;
+       bucket->buckets_length[i]=1;
+       #else
+       MULTIPLY_BUCKET(bucket,i);
+       pNext(lm) = bucket->buckets[i];
+       bucket->buckets[i] = lm;
+       bucket->buckets_length[i]++;
+       assume(i <= bucket->buckets_used+1);
+       #endif
+    }
+    bucket->buckets[0]=NULL;
+    bucket->buckets_length[0] = 0;
+    bucket->coef[0]=NULL;
+    kbTest(bucket);
   }
 }
 
@@ -221,6 +286,7 @@ static BOOLEAN kBucketIsCleared(kBucket_pt bucket)
 
 void kBucketInit(kBucket_pt bucket, poly lm, int length)
 {
+  //assume(false);
   assume(bucket != NULL);
   assume(length <= 0 || length == pLength(lm));
   assume(kBucketIsCleared(bucket));
@@ -248,6 +314,7 @@ void kBucketInit(kBucket_pt bucket, poly lm, int length)
 
 int kBucketCanonicalize(kBucket_pt bucket)
 {
+  MULTIPLY_BUCKET(bucket,1);
   kbTest(bucket);
   poly p = bucket->buckets[1];
   poly lm;
@@ -257,11 +324,12 @@ int kBucketCanonicalize(kBucket_pt bucket)
   ring r=bucket->bucket_ring;
 
 
-  for (i=2; i<=bucket->buckets_used; i++)
+  for (i=1; i<=bucket->buckets_used; i++)
   {
   #ifdef USE_COEF_BUCKETS
     if (bucket->coef[i]!=NULL)
     {
+      assume(bucket->buckets[i]!=NULL);
       p = p_Plus_mm_Mult_qq(p, bucket->coef[i], bucket->buckets[i],
                  pl, bucket->buckets_length[i], r);
       p_Delete(&bucket->coef[i],r);
@@ -274,6 +342,7 @@ int kBucketCanonicalize(kBucket_pt bucket)
     p = p_Add_q(p, bucket->buckets[i],
                  pl, bucket->buckets_length[i], r);
   #endif
+    if (i==1) continue;
     bucket->buckets[i] = NULL;
     bucket->buckets_length[i] = 0;
   }
@@ -298,6 +367,8 @@ int kBucketCanonicalize(kBucket_pt bucket)
     i = 0;
   }
   bucket->buckets_used = i;
+  assume(bucket->coef[0]==NULL);
+  assume(bucket->coef[i]==NULL);
   assume(pLength(p) == (int) pl);
   kbTest(bucket);
   return i;
@@ -314,7 +385,8 @@ void kBucketClear(kBucket_pt bucket, poly *p, int *length)
     bucket->buckets_length[i] = 0;
     bucket->buckets_used = 0;
 #ifdef USE_COEF_BUCKETS
-    bucket->coef[i]=NULL;
+    MULTIPLY_BUCKET(bucket,i);
+    //bucket->coef[i]=NULL;
 #endif
   }
   else
@@ -420,7 +492,7 @@ void kBucket_Mult_n(kBucket_pt bucket, number n)
     if (bucket->buckets[i] != NULL)
     {
 #ifdef USE_COEF_BUCKETS
-      if (i<2)
+      if (i<coef_start)
         bucket->buckets[i] = p_Mult_nn(bucket->buckets[i], n, r);
       else
       if (bucket->coef[i]!=NULL)
@@ -445,7 +517,7 @@ void kBucket_Mult_n(kBucket_pt bucket, number n)
 
 //////////////////////////////////////////////////////////////////////////
 ///
-/// Add to Bucket a poly ,i.e. Bpoly == n*Bpoly
+/// Add to Bucket a poly ,i.e. Bpoly == q+Bpoly
 ///
 void kBucket_Add_q(kBucket_pt bucket, poly q, int *l)
 {
@@ -810,6 +882,63 @@ number kBucketPolyRed(kBucket_pt bucket,
   if (reset_vec) p_SetCompP(a1, 0, bucket->bucket_ring);
   kbTest(bucket);
   return rn;
+}
+static BOOLEAN nIsPseudoUnit(number n, ring r){
+    if (rField_is_Zp(r))
+        return TRUE;
+        
+    //if (r->parameter!=NULL)
+    number one=n_Init(1,r);
+    if (n_Equal(n,one,r)) {
+    n_Delete(&one,r);
+    return TRUE;
+    }
+    n_Delete(&one,r);
+    number minus_one=n_Init(-1,r);
+    if (n_Equal(n,minus_one,r)){
+        n_Delete(&minus_one,r);
+        return TRUE;
+    }
+
+    return FALSE;
+    
+}
+void kBucketSimpleContent(kBucket_pt bucket){
+    int i;
+    //PrintS("HHHHHHHHHHHHH");
+    for (i=0;i<=MAX_BUCKET;i++){
+        if ((bucket->buckets[i]!=NULL) && (bucket->coef[i]!=NULL))
+            PrintS("H2H2H2");
+        if ((bucket->buckets[i]!=NULL) && (bucket->coef[i]==NULL)){
+            
+         }
+    }
+    return;
+    ring r=bucket->bucket_ring;
+    number coef=n_Init(0,r);
+    //ATTENTION: will not work correct for GB over ring
+    PrintS("CCCCCCCCCCCCC");
+    for (i=0;i<=MAX_BUCKET;i++){
+    
+        if (bucket->buckets[i]!=NULL){
+            assume(bucket->coef[i]!=NULL);
+            //in this way it should crash on programming errors, yeah
+            number temp=nGcd(coef, pGetCoeff(bucket->buckets[i]),r);
+            n_Delete(&coef,r );
+            coef=temp;
+            if (nIsPseudoUnit(coef,r))
+            {
+                n_Delete(&coef,r);
+            }
+            return;
+         }
+    }
+    PrintS("SSSSSSSSSSSSS");
+    for(i=0;i<=MAX_BUCKET;i++){
+        number lc=pGetCoeff(bucket->coef[i]);
+        p_SetCoeff(bucket->coef[i], n_IntDiv(lc,coef,r),r);
+    }
+    return;
 }
 
 
