@@ -114,7 +114,7 @@ ideal I10 = DEG[10][1]; I10;
 degree(std(I10));
 //->   // dimension (proj.)  = 2
 //->   // degree (proj.)   = 2
-ideal IX = intersect(DEG[3][1],DEG[4][1],DEG[8][1],DEG[9][1], 
+ideal IX = intersect(DEG[3][1],DEG[5][1],DEG[8][1],DEG[9][1], 
                      DEG[10][1]);
 degree(std(IX));
 //->   // dimension (proj.)  = 2
