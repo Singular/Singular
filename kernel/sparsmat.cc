@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sparsmat.cc,v 1.2 2004-02-05 14:29:48 Singular Exp $ */
+/* $Id: sparsmat.cc,v 1.3 2005-12-15 08:52:19 bricken Exp $ */
 
 /*
 * ABSTRACT: operations with sparse matrices (bareiss, ...)
@@ -1859,7 +1859,9 @@ void smPolyDiv(poly a, poly b)
   pLmFree(dummy);
 }
 
-#define X_MAS
+
+//disable that, as it fails with coef buckets
+//#define X_MAS
 #ifdef X_MAS
 
 /*
@@ -1971,6 +1973,7 @@ poly smMultDiv(poly a, poly b, const poly c)
     } while (b != NULL);
     pNext(append) = kBucketClear(bucket);
     kBucketDestroy(&bucket);
+    pTest(append);
   }
   else
   {
