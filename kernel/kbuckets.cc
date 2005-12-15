@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.cc,v 1.5 2005-12-13 13:46:08 bricken Exp $ */
+/* $Id: kbuckets.cc,v 1.6 2005-12-15 08:02:26 bricken Exp $ */
 
 #include "mod2.h"
 #include "structs.h"
@@ -272,13 +272,14 @@ inline void kBucketMergeLm(kBucket_pt bucket)
   }
 }
 
-static BOOLEAN kBucketIsCleared(kBucket_pt bucket)
+BOOLEAN kBucketIsCleared(kBucket_pt bucket)
 {
   int i;
 
   for (i = 0;i<=MAX_BUCKET;i++)
   {
     if (bucket->buckets[i] != NULL) return FALSE;
+    if (bucket->coef[i] != NULL) return FALSE;
     if (bucket->buckets_length[i] != 0) return FALSE;
   }
   return TRUE;
@@ -297,7 +298,12 @@ void kBucketInit(kBucket_pt bucket, poly lm, int length)
     length = pLength(lm);
 
   bucket->buckets[0] = lm;
-  bucket->buckets_length[0] = 1;
+  assume(bucket->coef[0]==NULL);
+  bucket->coef[0]=NULL;
+  if (lm!=NULL)
+    bucket->buckets_length[0] = 1;
+  else
+    bucket->buckets_length[0]= 0;
   if (length > 1)
   {
     unsigned int i = pLogLength(length-1);
@@ -318,9 +324,11 @@ int kBucketCanonicalize(kBucket_pt bucket)
   kbTest(bucket);
   poly p = bucket->buckets[1];
   poly lm;
-  int pl = bucket->buckets_length[1], i;
+  int pl = bucket->buckets_length[1];//, i;
+  int i;
   bucket->buckets[1] = NULL;
   bucket->buckets_length[1] = 0;
+  assume(bucket->coef[1]==NULL);
   ring r=bucket->bucket_ring;
 
 
@@ -346,7 +354,7 @@ int kBucketCanonicalize(kBucket_pt bucket)
     bucket->buckets[i] = NULL;
     bucket->buckets_length[i] = 0;
   }
-
+  assume(bucket->coef[0]==NULL);
   lm = bucket->buckets[0];
   if (lm != NULL)
   {
@@ -712,12 +720,14 @@ void kBucket_Plus_mm_Mult_pp(kBucket_pt bucket, poly m, poly p, int l)
     //p_GetCoeff0(n, swap_n,r);
     
     p1 = r->p_Procs->pp_Mult_mm(p1, m, r, last);
+    //m may not be changed
+    p_SetCoeff(m,n_Copy(n,r),r);
   }
 
   while (bucket->buckets[i] != NULL)
   {
 
-    
+    assume(i!=0);
     
     //don't do that, pull out gcd
     if(!(n_IsOne(n,r))) {

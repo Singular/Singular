@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.h,v 1.2 2005-12-13 12:22:45 bricken Exp $ */
+/* $Id: kbuckets.h,v 1.3 2005-12-15 08:02:27 bricken Exp $ */
 #include "structs.h"
 #include "p_Procs.h"
 #include "pShallowCopyDelete.h"
@@ -205,8 +205,10 @@ inline void kBucketAdjustBucketsUsed(kBucket_pt bucket)
 
 inline const poly kBucketGetLm(kBucket_pt bucket)
 {
+  assume(bucket->coef[0]==NULL);
   if (bucket->buckets[0] == NULL)
     bucket->bucket_ring->p_Procs->p_kBucketSetLm(bucket);
+  assume(bucket->coef[0]==NULL);
   return bucket->buckets[0];
 }
 
@@ -220,4 +222,5 @@ inline poly kBucketExtractLm(kBucket_pt bucket)
   return lm;
 }
 void kBucketSimpleContent(kBucket_pt bucket);
+BOOLEAN kBucketIsCleared(kBucket_pt bucket);
 #endif /* KBUCKETS_H */
