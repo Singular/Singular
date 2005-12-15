@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.cc,v 1.6 2005-12-15 08:02:26 bricken Exp $ */
+/* $Id: kbuckets.cc,v 1.7 2005-12-15 10:55:51 bricken Exp $ */
 
 #include "mod2.h"
 #include "structs.h"
@@ -700,7 +700,51 @@ void kBucket_Plus_mm_Mult_pp(kBucket_pt bucket, poly m, poly p, int l)
   i = pLogLength(l1);
   number n=n_Init(1,r);
   if (i <= bucket->buckets_used && bucket->buckets[i] != NULL)
-  {
+  { 
+    //if (FALSE){
+    if ((bucket->coef[i]!=NULL) &&(i>=coef_start)){
+        number orig_coef=p_GetCoeff(bucket->coef[i],r);
+        //we take ownership:
+        p_SetCoeff0(bucket->coef[i],n_Init(0,r),r);
+        number add_coef=n_Copy(p_GetCoeff(m,r),r);
+        number gcd=n_Gcd(add_coef, orig_coef,r);
+        
+        if (!(n_IsOne(gcd,r))) {
+            number orig_coef2=n_IntDiv(orig_coef,gcd,r);
+            number add_coef2=n_IntDiv(add_coef, gcd,r);
+            n_Delete(&orig_coef,r);
+            n_Delete(&add_coef,r);
+            orig_coef=orig_coef2;
+            add_coef=add_coef2;
+         
+            //p_Mult_nn(bucket->buckets[i], orig_coef,r);
+            n_Delete(&n,r);
+            n=gcd;
+            
+        }
+        
+        //assume(n_IsOne(n,r));
+        number backup=p_GetCoeff(m,r);
+        
+        p_SetCoeff0(m,add_coef,r);
+        bucket->buckets[i]=p_Mult_nn(bucket->buckets[i],orig_coef,r);
+        
+        n_Delete(&orig_coef,r);
+        p_Delete(&bucket->coef[i],r);
+        
+
+        p1 = p_Plus_mm_Mult_qq(bucket->buckets[i], m, p1,
+                           bucket->buckets_length[i], l1, r);
+        bucket->buckets[i]=NULL;
+        l1=bucket->buckets_length[i];
+        assume(l1==pLength(p1));
+        
+        p_SetCoeff(m,backup,r); //deletes add_coef
+        
+        
+    }
+    else {
+    
     MULTIPLY_BUCKET(bucket,i);
     p1 = p_Plus_mm_Mult_qq(bucket->buckets[i], m, p1,
                            bucket->buckets_length[i], l1, r);
@@ -708,9 +752,11 @@ void kBucket_Plus_mm_Mult_pp(kBucket_pt bucket, poly m, poly p, int l)
     bucket->buckets[i] = NULL;
     bucket->buckets_length[i] = 0;
     i = pLogLength(l1);
+    }
   }
   else
   {
+    
     number swap_n=p_GetCoeff(m,r);
     
     assume(n_IsOne(n,r));
