@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.72 2005-10-24 11:54:53 Singular Exp $ */
+/* $Id: ipid.cc,v 1.73 2005-12-16 08:58:56 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -59,7 +59,7 @@ void paCleanUp(package pack);
 idhdl idrec::get(const char * s, int lev)
 {
   assume(s!=NULL);
-  assume((lev>=0) && (lev<1000)); //not really, but if it isnt in that bounds..
+  assume((lev>=0) && (lev<=1000)); //not really, but if it isnt in that bounds..
   idhdl h = this;
   idhdl found=NULL;
   int l;
