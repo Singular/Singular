@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.cc,v 1.7 2005-12-15 10:55:51 bricken Exp $ */
+/* $Id: kbuckets.cc,v 1.8 2005-12-16 08:29:15 bricken Exp $ */
 
 #include "mod2.h"
 #include "structs.h"
@@ -770,17 +770,55 @@ void kBucket_Plus_mm_Mult_pp(kBucket_pt bucket, poly m, poly p, int l)
     p_SetCoeff(m,n_Copy(n,r),r);
   }
 
-  while (bucket->buckets[i] != NULL)
+  while ((bucket->buckets[i] != NULL) && (p1!=NULL))
   {
 
     assume(i!=0);
+    if ((bucket->coef[i]!=NULL) &&(i>=coef_start)){
+        number orig_coef=p_GetCoeff(bucket->coef[i],r);
+        //we take ownership:
+        p_SetCoeff0(bucket->coef[i],n_Init(0,r),r);
+        number add_coef=n;
+        number gcd=n_Gcd(add_coef, orig_coef,r);
+        
+        if (!(n_IsOne(gcd,r))) {
+            number orig_coef2=n_IntDiv(orig_coef,gcd,r);
+            number add_coef2=n_IntDiv(add_coef, gcd,r);
+            n_Delete(&orig_coef,r);
+            n_Delete(&add_coef,r);
+            orig_coef=orig_coef2;
+            add_coef=add_coef2;
+            //p_Mult_nn(bucket->buckets[i], orig_coef,r);
+            n_Delete(&n,r);
+            n=gcd;
+        }
+        
+        //assume(n_IsOne(n,r));
+        bucket->buckets[i]=p_Mult_nn(bucket->buckets[i],orig_coef,r);
+        p1=p_Mult_nn(p1,add_coef,r);
+       
+      
+        
+
+        p1 = p_Add_q(p1, bucket->buckets[i],r);
+        l1=pLength(p1);
+        
+        bucket->buckets[i]=NULL;
+        n_Delete(&orig_coef,r);
+        p_Delete(&bucket->coef[i],r);
+        //l1=bucket->buckets_length[i];
+        assume(l1==pLength(p1));
+        
+
+        
+    } else {    
     
     //don't do that, pull out gcd
     if(!(n_IsOne(n,r))) {
         p1=p_Mult_nn(p1, n, r);
         n_Delete(&n,r);
         n=n_Init(1,r);
-    }
+    } 
     
     MULTIPLY_BUCKET(bucket,i);
     p1 = p_Add_q(p1, bucket->buckets[i],
@@ -788,6 +826,7 @@ void kBucket_Plus_mm_Mult_pp(kBucket_pt bucket, poly m, poly p, int l)
     bucket->buckets[i] = NULL;
     bucket->buckets_length[i] = 0;
     i = pLogLength(l1);
+    }
   }
 
   
@@ -800,7 +839,7 @@ void kBucket_Plus_mm_Mult_pp(kBucket_pt bucket, poly m, poly p, int l)
     bucket->coef[i]=NULL;
     n_Delete(&n,r);
   }
-  
+  if ((p1==NULL) && (bucket->coef[i]!=NULL)) p_Delete(&bucket->coef[i],r);
   bucket->buckets_length[i]=l1;
   if (i >= bucket->buckets_used)
     bucket->buckets_used = i;
@@ -992,20 +1031,32 @@ void kBucketSimpleContent(kBucket_pt bucket){
     int i;
     //PrintS("HHHHHHHHHHHHH");
     for (i=0;i<=MAX_BUCKET;i++){
-        if ((bucket->buckets[i]!=NULL) && (bucket->coef[i]!=NULL))
-            PrintS("H2H2H2");
-        if ((bucket->buckets[i]!=NULL) && (bucket->coef[i]==NULL)){
+        //if ((bucket->buckets[i]!=NULL) && (bucket->coef[i]!=NULL))
+        //    PrintS("H2H2H2");
+          if (i==0)
             
+           {
+           
+           assume(bucket->buckets[i]==NULL);
+           }
+        if ((bucket->buckets[i]!=NULL) && (bucket->coef[i]==NULL)){
+            return;
          }
     }
-    return;
+    //return;
     ring r=bucket->bucket_ring;
     number coef=n_Init(0,r);
     //ATTENTION: will not work correct for GB over ring
     PrintS("CCCCCCCCCCCCC");
     for (i=0;i<=MAX_BUCKET;i++){
-    
+        if (i==0)
+            
+           {
+           
+           assume(bucket->buckets[i]==NULL);
+           }
         if (bucket->buckets[i]!=NULL){
+            
             assume(bucket->coef[i]!=NULL);
             //in this way it should crash on programming errors, yeah
             number temp=nGcd(coef, pGetCoeff(bucket->buckets[i]),r);
@@ -1015,13 +1066,17 @@ void kBucketSimpleContent(kBucket_pt bucket){
             {
                 n_Delete(&coef,r);
             }
-            return;
+            
          }
     }
     PrintS("SSSSSSSSSSSSS");
     for(i=0;i<=MAX_BUCKET;i++){
-        number lc=pGetCoeff(bucket->coef[i]);
+        if (bucket->buckets[i]!=NULL)
+        {
+        assume(bucket->coef[i]!=NULL);
+        number lc=p_GetCoeff(bucket->coef[i],r);
         p_SetCoeff(bucket->coef[i], n_IntDiv(lc,coef,r),r);
+        }
     }
     return;
 }
