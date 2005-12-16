@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_ezgcd.cc,v 1.24 2005-12-12 15:42:36 Singular Exp $ */
+/* $Id: fac_ezgcd.cc,v 1.25 2005-12-16 11:21:30 Singular Exp $ */
 
 #include <config.h>
 
@@ -140,6 +140,7 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b, boo
             return d*G;
         }
         if ( delta != degF && delta != degG ) {
+            bool B_is_F;
             /// ---> A6
             CanonicalForm xxx;
             //if ( gcd( (DD[1] = Fb / Db), Db ) == 1 ) {
@@ -154,6 +155,7 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b, boo
                 lcDD[1] = lcF;
                 lcDD[2] = lcF;
                 B *= lcF;
+		B_is_F=true;
             }
             //else  if ( gcd( (DD[1] = Gb / Db), Db ) == 1 ) {
             else
@@ -170,6 +172,7 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b, boo
                 lcDD[1] = lcG;
                 lcDD[2] = lcG;
                 B *= lcG;
+		B_is_F=false;
               }
               else
               {
@@ -196,11 +199,12 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b, boo
 
             if (gcdfound)
             {
-              CanonicalForm cand=DD[2] / content(DD[2],Variable(1));
-#if 1
+              CanonicalForm xxx=content(DD[2],Variable(1));
+              CanonicalForm cand=DD[2] / xxx; //content(DD[2],Variable(1));
+#if 0
               gcdfound= divides(cand,G) &&  divides(cand,F);
 #else
-              if (B==F)
+              if (B_is_F /*B==F*lcF*/)
               {
                 DEBOUTLN( cerr, "(test) G: "<<G<<" % gcd:"<<cand<<" -> " << G%cand );
                 gcdfound= divides(cand,G);
