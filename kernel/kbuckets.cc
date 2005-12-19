@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.cc,v 1.9 2005-12-19 12:11:15 bricken Exp $ */
+/* $Id: kbuckets.cc,v 1.10 2005-12-19 12:39:51 bricken Exp $ */
 
 #include "mod2.h"
 #include "structs.h"
@@ -1068,6 +1068,7 @@ void kBucketSimpleContent(kBucket_pt bucket){
             if (nIsPseudoUnit(coef,r))
             {
                 n_Delete(&coef,r);
+                return;
             }
             
          }

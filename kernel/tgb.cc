@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.50 2005-12-09 09:28:48 bricken Exp $ */
+/* $Id: tgb.cc,v 1.51 2005-12-19 12:39:50 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -3027,9 +3027,9 @@ static void multi_reduction(red_object* los, int & losl, slimgb_alg* c)
 //     finalize_reduction_step(rs);
     if(!K_TEST_OPT_REDTHROUGH){
 	for(i=erg.to_reduce_l;i<=erg.to_reduce_u;i++){
-	   if (los[i].p!=NULL)
+	   if  (los[i].p!=NULL)  //the check (los[i].p!=NULL) might be invalid
 	   {
-	       //kBucketSimpleContent(los[i].bucket);
+	       //
 	       assume(los[i].initial_quality>0);
 	       
                if(los[i].guess_quality(c)
@@ -3160,6 +3160,8 @@ void simple_reducer::reduce(red_object* r, int l, int u){
  
   }
   for(i=l;i<=u;i++){
+  
+    kBucketSimpleContent(r[i].bucket);
     r[i].validate();
     #ifdef TGB_DEBUG
     #endif
