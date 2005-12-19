@@ -6,7 +6,7 @@
  *  Purpose: template for setting the Lm of a bucket
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: p_kBucketSetLm__T.cc,v 1.2 2005-12-19 12:11:15 bricken Exp $
+ *  Version: $Id: p_kBucketSetLm__T.cc,v 1.3 2005-12-19 13:33:36 bricken Exp $
  *******************************************************************/
 #undef USE_COEF_BUCKETS
 #ifdef HAVE_COEF_BUCKETS
