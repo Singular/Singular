@@ -2,13 +2,14 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: claptmpl.cc,v 1.30 2005-10-17 17:12:50 bricken Exp $
+// $Id: claptmpl.cc,v 1.31 2005-12-19 13:57:30 bricken Exp $
 /*
 * ABSTRACT - instantiation of all templates
 */
 
 #include "mod2.h"
-
+//#include <vector>
+//using namespace std;
 #ifdef HAVE_FACTORY
   #define SINGULAR 1
   #include <factory.h>
@@ -41,7 +42,7 @@
     template class Matrix<CanonicalForm>;
     template class SubMatrix<CanonicalForm>;
     template class Array<REvaluation>;
-
+    //template class vector<poly>;
     #ifndef NOSTREAMIO
     template ostream & operator<<(ostream &, const List<Factor<CanonicalForm> > &);
     template ostream & operator<<(ostream &, const List<List<CanonicalForm> > &);
@@ -201,5 +202,6 @@ template    static  void    print_rational( ostream&,int,const Rational& );
 //  end of file
 // ----------------------------------------------------------------------------
 #include "tgb_internal.h"
+template int pos_helper(kStrategy strat, poly p, int len, intset  setL, polyset set);
 template int pos_helper(kStrategy strat, poly p, wlen_type len, wlen_set setL, polyset set);
 //template int pos_helper(kStrategy strat, poly p, int len, intset setL, polyset set);

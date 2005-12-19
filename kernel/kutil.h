@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.7 2005-11-27 15:28:45 wienand Exp $ */
+/* $Id: kutil.h,v 1.8 2005-12-19 13:56:05 bricken Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -55,7 +55,7 @@
 #endif
 
 typedef int* intset;
-typedef int  wlen_type;
+typedef int64  wlen_type;
 typedef wlen_type* wlen_set;
 
 typedef class sTObject TObject;
