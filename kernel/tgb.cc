@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.51 2005-12-19 12:39:50 bricken Exp $ */
+/* $Id: tgb.cc,v 1.52 2005-12-19 16:56:08 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -3161,7 +3161,7 @@ void simple_reducer::reduce(red_object* r, int l, int u){
   }
   for(i=l;i<=u;i++){
   
-    kBucketSimpleContent(r[i].bucket);
+    //kBucketSimpleContent(r[i].bucket);
     r[i].validate();
     #ifdef TGB_DEBUG
     #endif
