@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.cc,v 1.8 2005-12-16 08:29:15 bricken Exp $ */
+/* $Id: kbuckets.cc,v 1.9 2005-12-19 12:11:15 bricken Exp $ */
 
 #include "mod2.h"
 #include "structs.h"
@@ -106,7 +106,9 @@ BOOLEAN kbTest(kBucket_pt bucket)
     if (lm != NULL &&  bucket->buckets[i] != NULL
         && p_LmCmp(lm, bucket->buckets[i], bucket->bucket_ring) != 1)
     {
-      dReportError("Bucket %d larger than lm", i);
+      dReportError("Bucket %d larger or equal than lm", i);
+      if (p_LmCmp(lm, bucket->buckets[i], bucket->bucket_ring) ==0)
+      dReportError("Bucket %d equal to lm", i);
       return FALSE;
     }
     if (!p_Test(bucket->buckets[i],bucket->bucket_ring))
@@ -1047,7 +1049,8 @@ void kBucketSimpleContent(kBucket_pt bucket){
     ring r=bucket->bucket_ring;
     number coef=n_Init(0,r);
     //ATTENTION: will not work correct for GB over ring
-    PrintS("CCCCCCCCCCCCC");
+    if (TEST_OPT_PROT)
+        PrintS("CCCCCCCCCCCCC");
     for (i=0;i<=MAX_BUCKET;i++){
         if (i==0)
             
@@ -1069,7 +1072,8 @@ void kBucketSimpleContent(kBucket_pt bucket){
             
          }
     }
-    PrintS("SSSSSSSSSSSSS");
+    if (TEST_OPT_PROT)
+        PrintS("SSSSSSSSSSSSS");
     for(i=0;i<=MAX_BUCKET;i++){
         if (bucket->buckets[i]!=NULL)
         {
@@ -1082,3 +1086,34 @@ void kBucketSimpleContent(kBucket_pt bucket){
 }
 
 
+poly kBucketExtractLmOfBucket(kBucket_pt bucket, int i){
+    assume(bucket->buckets[i]!=NULL);
+    
+    ring r=bucket->bucket_ring;
+    poly p=bucket->buckets[i];
+    bucket->buckets_length[i]--;
+    if (bucket->coef[i]!=NULL){
+        poly next=pNext(p);
+        if (next==NULL){
+            MULTIPLY_BUCKET(bucket,i);
+            p=bucket->buckets[i];
+            bucket->buckets[i]=NULL;
+            return p;
+        } else {
+            bucket->buckets[i]=next;
+            number c=p_GetCoeff(bucket->coef[i],r);
+            pNext(p)=NULL;
+            p=p_Mult_nn(p,c,r);
+            assume(p!=NULL);
+            return p;
+        }
+        
+    } else {
+        
+        bucket->buckets[i]=pNext(bucket->buckets[i]);
+        pNext(p)=NULL;
+        assume(p!=NULL);
+        return p;
+    }
+    
+}

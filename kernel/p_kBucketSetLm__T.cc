@@ -6,7 +6,7 @@
  *  Purpose: template for setting the Lm of a bucket
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: p_kBucketSetLm__T.cc,v 1.1.1.1 2003-10-06 12:16:00 Singular Exp $
+ *  Version: $Id: p_kBucketSetLm__T.cc,v 1.2 2005-12-19 12:11:15 bricken Exp $
  *******************************************************************/
 #undef USE_COEF_BUCKETS
 #ifdef HAVE_COEF_BUCKETS
@@ -24,6 +24,7 @@
 #else
 #define MULTIPLY_BUCKET(B,I)
 #endif
+#if 0
 LINKAGE void p_kBucketSetLm(kBucket_pt bucket)
 {
   int j = 0;
@@ -109,3 +110,78 @@ LINKAGE void p_kBucketSetLm(kBucket_pt bucket)
 
   kBucketAdjustBucketsUsed(bucket);
 }
+#else
+LINKAGE void p_kBucketSetLm(kBucket_pt bucket)
+{
+  //int j = 0;
+  poly lt;
+  BOOLEAN zero = FALSE;
+  ring r = bucket->bucket_ring;
+  assume((bucket->buckets[0] == NULL) && (bucket->buckets_length[0] == 0) && (bucket->coef[0]==0));
+  DECLARE_LENGTH(const unsigned long length = r->ExpL_Size);
+  DECLARE_ORDSGN(const long* ordsgn = r->ordsgn);
+  poly p=NULL;
+  while(p==NULL){
+      int found=-1000;
+       for (int i = 1; i<=bucket->buckets_used; i++)
+        {
+          if (bucket->buckets[i] != NULL)
+          {
+           
+            if (p == NULL)
+            {
+                p=bucket->buckets[i];
+                found=i;
+                continue;
+            }
+            assume(p != NULL);
+            p_MemCmp(bucket->buckets[i]->exp, p->exp, length, ordsgn, goto Continue, goto Greater, goto Continue);
+            //assume(p_LmCmp(bucket->buckets[i],p,r)==1);
+          Greater:
+            //if (p_LmCmp(bucket->buckets[i],p,r)!=1) continue;
+            found=i;
+            p=bucket->buckets[i];
+          Continue:;
+          }
+        }
+      
+      
+      if (found<0) return;
+      assume(p==bucket->buckets[found]);
+      assume(p!=NULL);
+      
+      p=kBucketExtractLmOfBucket(bucket, found);
+      assume(p!=NULL);
+      p_Test(p,r);
+      poly copy=p_LmInit(p, r);
+      
+      for (int i = found+1; i<=bucket->buckets_used; i++)
+        {
+          
+          if (bucket->buckets[i] != NULL)
+          {
+            if(p_LmEqual(bucket->buckets[i], copy,r)){
+                poly q=kBucketExtractLmOfBucket(bucket,i);
+                assume(p!=q);
+                p=p_Add_q(p, q,r);
+                assume(pLength(bucket->buckets[i])==bucket->buckets_length[i]);
+            }
+            
+    
+            
+          }
+        }
+        p_Delete(&copy, r);
+  }
+ 
+  //assume(bucket->buckets[j] != NULL);
+  assume(pLength(p)==1);
+  lt = p;
+  
+  bucket->buckets[0] = lt;
+  bucket->buckets_length[0] = 1;
+
+  kBucketAdjustBucketsUsed(bucket);
+  kbTest(bucket);
+  }
+#endif
