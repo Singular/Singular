@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.cc,v 1.10 2005-12-19 12:39:51 bricken Exp $ */
+/* $Id: kbuckets.cc,v 1.11 2005-12-19 13:33:50 bricken Exp $ */
 
 #include "mod2.h"
 #include "structs.h"
@@ -1049,8 +1049,8 @@ void kBucketSimpleContent(kBucket_pt bucket){
     ring r=bucket->bucket_ring;
     number coef=n_Init(0,r);
     //ATTENTION: will not work correct for GB over ring
-    if (TEST_OPT_PROT)
-        PrintS("CCCCCCCCCCCCC");
+    //if (TEST_OPT_PROT)
+    //    PrintS("CCCCCCCCCCCCC");
     for (i=0;i<=MAX_BUCKET;i++){
         if (i==0)
             
@@ -1074,7 +1074,7 @@ void kBucketSimpleContent(kBucket_pt bucket){
          }
     }
     if (TEST_OPT_PROT)
-        PrintS("SSSSSSSSSSSSS");
+        PrintS("S");
     for(i=0;i<=MAX_BUCKET;i++){
         if (bucket->buckets[i]!=NULL)
         {
