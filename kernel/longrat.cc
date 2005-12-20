@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.9 2005-12-20 09:49:23 Singular Exp $ */
+/* $Id: longrat.cc,v 1.10 2005-12-20 10:13:49 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -679,6 +679,8 @@ number nlIntDiv (number a, number b)
 #if defined(LDEBUG)
   u->debug=123456;
 #endif
+  assume(a->s==3);
+  assume(b->s==3);
   mpz_init_set(&u->z,&a->z);
   /* consider the signs of a and b:
   *  + + -> u=a+b-1
