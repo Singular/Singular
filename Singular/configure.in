@@ -352,10 +352,10 @@ case "$ac_cv_singuname" in
 	SunOS-5)
 	  AC_CHECK_LIB(dl, dlopen)
           if test "$ac_cv_lib_dl_dlopen" = yes; then
-	  	LD_DYN_FLAGS="-ldl -Xlinker -E"
+	  	LD_DYN_FLAGS="-ldl"
 	  	SFLAGS="-fpic -DPIC"
 	  	SLDFLAGS=-shared
-                LD=ld
+                LD=$CC
 	        ac_lib_dl=yes
 	  fi
 	;;
