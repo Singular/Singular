@@ -299,7 +299,7 @@ p_Procs_Dynamic.inc p_Procs_Lib.inc: p_Procs_Dynamic.h
 
 # here is how p_Procs_[Static|Dynamic].inc is generated
 p_Procs_%.inc: p_Procs_Generate.cc p_Procs_Impl.h mod2.h
-	$(CXX) -g -Wall -Dp_Procs_$* p_Procs_Generate.cc -o p_Procs_$*
+	$(CXX) -g -Dp_Procs_$* p_Procs_Generate.cc -o p_Procs_$*
 	./p_Procs_$* > p_Procs_$*.inc
 	-rm -f p_Procs_$* p_Procs_$*.exe
 
