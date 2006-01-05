@@ -1,5 +1,5 @@
 #!/bin/sh
-# version $Id: configure,v 1.22 2005-07-05 16:11:08 Singular Exp $
+# version $Id: configure,v 1.23 2006-01-05 13:36:14 Singular Exp $
 
 while [ $# -ne 0 ]; do
    case $1 in 
@@ -46,12 +46,12 @@ else
   fi
 fi
 
-if test x$SING_CC = x
+if test "x$SING_CC" = x
 then
   SING_CC=gcc
 fi
 
-if test x$SING_CXX = x
+if test "x$SING_CXX" = x
 then
   SING_CXX=g++
 fi
