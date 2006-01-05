@@ -1,5 +1,5 @@
 # @configure_input@
-# $Id: GNUmakefile.in,v 1.45 2005-11-08 15:58:10 Singular Exp $
+# $Id: GNUmakefile.in,v 1.46 2006-01-05 13:38:18 Singular Exp $
 
 #
 # GNUmakefile.in - used by `configure' to create `GNUmakefile', the
@@ -586,6 +586,7 @@ installcf:	cf
 		$(MKINSTALLDIRS) $(templatedir)
 		$(INSTALL_DATA) $(libfactory) $(libdir)/$(libfactory)
 		$(INSTALL_DATA) factory.h $(includedir)/factory.h
+		$(INSTALL_DATA) cf_gmp.h $(includedir)/cf_gmp.h
 		$(INSTALL_DATA) factoryconf.h $(includedir)/factoryconf.h
 		$(INSTALL_DATA) $(srcdir)/ftmpl_inst.cc $(templatedir)/ftmpl_inst.cc
 		for file in $(templatesrc) $(templateincl); do \
