@@ -99,12 +99,12 @@ void m2_end(short i)
         else
           printf("\n$Bye.\n");
       }
-    #ifdef sun
-      #ifndef __svr4__
-        _cleanup();
-        _exit(0);
-      #endif
-    #endif
+    //#ifdef sun
+    //  #ifndef __svr4__
+    //    _cleanup();
+    //    _exit(0);
+    //  #endif
+    //#endif
     exit(0);
   }
   else
