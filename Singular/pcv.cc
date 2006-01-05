@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: pcv.cc,v 1.36 2005-10-31 19:02:27 Singular Exp $ */
+/* $Id: pcv.cc,v 1.37 2006-01-05 15:58:11 Singular Exp $ */
 /*
 * ABSTRACT: conversion between polys and coef vectors
 */
@@ -226,7 +226,7 @@ poly pcvN2M(int n)
 {
   n--;
   poly m=pOne();
-  int i,j,k;
+  int i,j=0,k;
   for(i=pVariables-1;i>=0;i--)
   {
     k=j;
