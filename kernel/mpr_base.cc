@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_base.cc,v 1.3 2005-08-26 16:02:24 Singular Exp $ */
+/* $Id: mpr_base.cc,v 1.4 2006-01-05 13:50:42 Singular Exp $ */
 
 /*
  * ABSTRACT - multipolynomial resultants - resultant matrices
@@ -2782,8 +2782,8 @@ poly uResultant::interpolateDense( const number subDetVal )
   // long mdg= (facul(tdg+n-1) / facul( tdg )) / facul( n - 1 );
   long mdg= over( n-1, tdg );
 
-  // maxiaml number of terms in a polynom of degree tdg
-  long l=(long)pow( tdg+1, n );
+  // maximal number of terms in a polynom of degree tdg
+  long l=(long)pow( (double)(tdg+1), n );
 
 #ifdef mprDEBUG_PROT
   Print("// total deg of D: tdg %d\n",tdg);
