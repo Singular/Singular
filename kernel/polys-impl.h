@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.2 2004-09-28 16:04:45 Singular Exp $ */
+/* $Id: polys-impl.h,v 1.3 2006-01-05 13:42:57 Singular Exp $ */
 
 /***************************************************************
  *
@@ -27,7 +27,11 @@
 #ifndef NDEBUG
 #define VARS (10)   /*max. number of variables as constant*/
 #else
+#ifdef __GNUC__
 #define VARS (0)
+#else
+#define VARS (1)
+#endif
 #endif
 
 typedef Exponent_t* Exponent_pt;
