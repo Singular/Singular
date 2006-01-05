@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: gms.cc,v 1.9 2004-04-03 17:25:04 levandov Exp $ */
+/* $Id: gms.cc,v 1.10 2006-01-05 15:56:17 Singular Exp $ */
 /*
 * ABSTRACT: Gauss-Manin system normal form
 */
@@ -118,11 +118,11 @@ BOOLEAN gmsNF(leftv res,leftv h)
           h=h->next;
           if(h&&h->Typ()==INT_CMD)
           {
-            int D=(int)h->Data();
+            int D=(int)(long)h->Data();
             h=h->next;
             if(h&&h->Typ()==INT_CMD)
             {
-              int K=(int)h->Data();
+              int K=(int)(long)h->Data();
               res->rtyp=LIST_CMD;
               res->data=(void *)gmsNF(idCopy(p),g,B,D,K);
               return FALSE;

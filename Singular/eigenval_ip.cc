@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: eigenval_ip.cc,v 1.2 2004-04-30 09:58:19 Singular Exp $ */
+/* $Id: eigenval_ip.cc,v 1.3 2006-01-05 15:55:08 Singular Exp $ */
 /*
 * ABSTRACT: eigenvalues of constant square matrices
 */
@@ -34,11 +34,11 @@ BOOLEAN evSwap(leftv res,leftv h)
       h=h->next;
       if(h&&h->Typ()==INT_CMD)
       {
-        int i=(int)h->Data();
+        int i=(int)(long)h->Data();
         h=h->next;
         if(h&&h->Typ()==INT_CMD)
         {
-          int j=(int)h->Data();
+          int j=(int)(long)h->Data();
           res->rtyp=MATRIX_CMD;
           res->data=(void *)evSwap(mpCopy(M),i,j);
           return FALSE;
@@ -62,15 +62,15 @@ BOOLEAN evRowElim(leftv res,leftv h)
       h=h->next;
       if(h&&h->Typ()==INT_CMD)
       {
-        int i=(int)h->Data();
+        int i=(int)(long)h->Data();
         h=h->next;
         if(h&&h->Typ()==INT_CMD)
         {
-          int j=(int)h->Data();
+          int j=(int)(long)h->Data();
           h=h->next;
           if(h&&h->Typ()==INT_CMD)
           {
-            int k=(int)h->Data();
+            int k=(int)(long)h->Data();
             res->rtyp=MATRIX_CMD;
             res->data=(void *)evRowElim(mpCopy(M),i,j,k);
             return FALSE;
@@ -95,15 +95,15 @@ BOOLEAN evColElim(leftv res,leftv h)
       h=h->next;
       if(h&&h->Typ()==INT_CMD)
       {
-        int i=(int)h->Data();
+        int i=(int)(long)h->Data();
         h=h->next;
         if(h&&h->Typ()==INT_CMD)
         {
-          int j=(int)h->Data();
+          int j=(int)(long)h->Data();
           h=h->next;
           if(h&&h->Typ()==INT_CMD)
           {
-            int k=(int)h->Data();
+            int k=(int)(long)h->Data();
             res->rtyp=MATRIX_CMD;
             res->data=(void *)evColElim(mpCopy(M),i,j,k);
             return FALSE;
