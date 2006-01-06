@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.11 2005-12-20 12:18:34 Singular Exp $ */
+/* $Id: longrat.cc,v 1.12 2006-01-06 11:22:50 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -1072,8 +1072,8 @@ number nlGcd(number a, number b, const ring r)
 #endif
   //nlNormalize(a);
   //nlNormalize(b);
-  if ((SR_HDL(a)==5)||(a==INT_TO_SR(-1))
-  ||  (SR_HDL(b)==5)||(b==INT_TO_SR(-1)))
+  if ((a==INT_TO_SR(1))||(a==INT_TO_SR(-1))
+  ||  (b==INT_TO_SR(1))||(b==INT_TO_SR(-1)))
     return INT_TO_SR(1);
   if (a==INT_TO_SR(0)) /* gcd(0,b) ->b */
     return nlCopy(b);
