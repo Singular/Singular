@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.16 2006-01-06 10:56:45 Singular Exp $ */
+/* $Id: structs.h,v 1.17 2006-01-06 11:14:07 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -41,6 +41,14 @@ typedef void * Sy_reference;
 // #ifdef HAVE_MULT_MOD
 // #define HAVE_DIV_MOD
 // #endif
+#endif
+
+#ifdef SunOS_5
+// #define HAVE_GENERIC_ADD
+#define HAVE_MULT_MOD
+#ifdef HAVE_MULT_MOD
+#define HAVE_DIV_MOD
+#endif
 #endif
 
 #if SIZEOF_LONG == 4
@@ -765,7 +773,7 @@ class idrec
 #define IDID(a)      ((a)->id)
 #define IDATTR(a)    ((a)->attribute)
 
-#define IDINT(a)    ((int)((a)->data.ustring))
+#define IDINT(a)    ((int)(long)((a)->data.ustring))
 #define IDDATA(a)   ((a)->data.ustring)
 #define IDRING(a)   ((a)->data.uring)
 #define IDINTVEC(a) ((a)->data.iv)
