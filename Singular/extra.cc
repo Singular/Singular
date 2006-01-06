@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.236 2006-01-05 15:40:55 Singular Exp $ */
+/* $Id: extra.cc,v 1.237 2006-01-06 11:31:36 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -2008,7 +2008,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         }
         if (h->Typ() == INT_CMD)
         {
-          max = (int) h->Data();
+          max = (int)(long)h->Data();
         }
         h = h->Next();
       }
@@ -2493,7 +2493,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     {
       extern int strat_nr;
       extern int strat_fac_debug;
-      strat_fac_debug=(int)h->Data(); 
+      strat_fac_debug=(int)(long)h->Data(); 
       strat_nr=0;
       return FALSE;
     }
