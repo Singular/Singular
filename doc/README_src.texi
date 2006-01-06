@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: README_src.texi,v 1.3 2006-01-06 15:36:56 Singular Exp $
+@comment $Id: README_src.texi,v 1.4 2006-01-06 15:40:52 Singular Exp $
 @c FILE: README_src.texi
 @c PURPOSE: This should reside as README file in the src directory of the
 @c          Singular ftp site.
@@ -59,7 +59,10 @@ Make sure that you have the following software (the list may be incomplete):
   gnu-make
   @item
   gcc, g++ (version 2.95.3 preferred,
-  but version 2.7.2 to gcc 3.4 should work)
+  but version 2.7.2 to gcc 2.95.4 should work)
+  gcc 2.96 does not work 
+  gcc 3.0 does not work, gcc 3.1.x, gcc 3.2.x, gcc 3.3.x/3.4.x should
+  gcc 4.x: beginnig with Singular-3-0-0-4, for some architectures
   @item
   bison (version >= 1.2.2)
   @item
