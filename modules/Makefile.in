@@ -2,7 +2,7 @@
 ###
 ### Makefile for Singular-modules
 ###
-### $Id: Makefile.in,v 1.18 2005-10-05 07:45:30 wienand Exp $
+### $Id: Makefile.in,v 1.19 2006-01-06 10:59:56 Singular Exp $
 ###
 #################################################################
 
@@ -107,7 +107,7 @@ clean:
 	do \
 		if test -d $${SUBDIR}; then \
 		   echo ${MAKE} $@ in $${SUBDIR}; \
-		  if [ -e "$${SUBDIR}/Makefile" ]; then (cd $${SUBDIR}; $(MAKE) $@;) fi \
+		  if [ -e "$${SUBDIR}/Makefile" ]; then (cd $${SUBDIR}; $(MAKE) $@) fi \
 		fi; \
 	done
 
