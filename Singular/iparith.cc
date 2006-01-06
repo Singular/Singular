@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.387 2006-01-05 15:40:29 Singular Exp $ */
+/* $Id: iparith.cc,v 1.388 2006-01-06 10:56:15 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -3031,8 +3031,10 @@ static BOOLEAN jjPLUSPLUS(leftv res, leftv u)
 {
   if (IDTYP((idhdl)u->data)==INT_CMD)
   {
-    if (iiOp==PLUSPLUS) IDINT((idhdl)u->data)++;
-    else                IDINT((idhdl)u->data)--;
+    int i=IDINT((idhdl)u->data);
+    if (iiOp==PLUSPLUS) i++;
+    else                i--;
+    (idhdl)u->data=(void *)i;
     return FALSE;
   }
   return TRUE;
