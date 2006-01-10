@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.cc,v 1.13 2006-01-10 10:17:29 Singular Exp $ */
+/* $Id: kbuckets.cc,v 1.14 2006-01-10 11:00:46 Singular Exp $ */
 
 #include "mod2.h"
 #include "structs.h"
@@ -779,7 +779,7 @@ void kBucket_Plus_mm_Mult_pp(kBucket_pt bucket, poly m, poly p, int l)
       number orig_coef=p_GetCoeff(bucket->coef[i],r);
       //we take ownership:
       p_SetCoeff0(bucket->coef[i],n_Init(0,r),r);
-      number add_coef=n;
+      number add_coef=n_Copy(n,r);
       number gcd=n_Gcd(add_coef, orig_coef,r);
 
       if (!(n_IsOne(gcd,r)))
@@ -787,7 +787,7 @@ void kBucket_Plus_mm_Mult_pp(kBucket_pt bucket, poly m, poly p, int l)
         number orig_coef2=n_IntDiv(orig_coef,gcd,r);
         number add_coef2=n_IntDiv(add_coef, gcd,r);
         n_Delete(&orig_coef,r);
-        if (n!=add_coef) n_Delete(&n,r);
+        n_Delete(&n,r);
         n_Delete(&add_coef,r);
         orig_coef=orig_coef2;
         add_coef=add_coef2;
