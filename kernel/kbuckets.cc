@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.cc,v 1.14 2006-01-10 11:00:46 Singular Exp $ */
+/* $Id: kbuckets.cc,v 1.15 2006-01-12 14:12:41 bricken Exp $ */
 
 #include "mod2.h"
 #include "structs.h"
@@ -1046,7 +1046,7 @@ void kBucketSimpleContent(kBucket_pt bucket)
   //ATTENTION: will not work correct for GB over ring
   //if (TEST_OPT_PROT)
   //    PrintS("CCCCCCCCCCCCC");
-  for (i=0;i<=MAX_BUCKET;i++)
+  for (i=MAX_BUCKET;i>=0;i--)
   {
     if (i==0)
     {
@@ -1055,8 +1055,11 @@ void kBucketSimpleContent(kBucket_pt bucket)
     if (bucket->buckets[i]!=NULL)
     {
       assume(bucket->coef[i]!=NULL);
+      assume(!(n_IsZero(pGetCoeff(bucket->coef[i]),r)));
+      
+      
       //in this way it should crash on programming errors, yeah
-      number temp=nGcd(coef, pGetCoeff(bucket->buckets[i]),r);
+      number temp=nGcd(coef, pGetCoeff(bucket->coef[i]),r);
       n_Delete(&coef,r );
       coef=temp;
       if (nIsPseudoUnit(coef,r))
@@ -1064,17 +1067,21 @@ void kBucketSimpleContent(kBucket_pt bucket)
         n_Delete(&coef,r);
         return;
       }
+      assume(!(n_IsZero(coef,r)));
     }
   }
   if (TEST_OPT_PROT)
     PrintS("S");
   for(i=0;i<=MAX_BUCKET;i++)
   {
+    
     if (bucket->buckets[i]!=NULL)
     {
+      assume(!(n_IsZero(coef,r)));
       assume(bucket->coef[i]!=NULL);
       number lc=p_GetCoeff(bucket->coef[i],r);
       p_SetCoeff(bucket->coef[i], n_IntDiv(lc,coef,r),r);
+      assume(!(n_IsZero(p_GetCoeff(bucket->coef[i],r),r)));
     }
   }
 }
