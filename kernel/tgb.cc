@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.52 2005-12-19 16:56:08 bricken Exp $ */
+/* $Id: tgb.cc,v 1.53 2006-01-12 14:13:02 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -2003,7 +2003,7 @@ slimgb_alg::slimgb_alg(ideal I, BOOLEAN F4){
       //     add_to_basis(I->m[i],-1,-1,c);
       si=(sorted_pair_node*) omalloc(sizeof(sorted_pair_node));
       si->i=-1;
-      si->j=-1;
+      si->j=-2;
       si->expected_length=pLength(I->m[i]);
       si->deg=pTotaldegree(I->m[i]);
       if (!rField_is_Zp(r)){ 
@@ -3161,7 +3161,7 @@ void simple_reducer::reduce(red_object* r, int l, int u){
   }
   for(i=l;i<=u;i++){
   
-    //kBucketSimpleContent(r[i].bucket);
+    kBucketSimpleContent(r[i].bucket);
     r[i].validate();
     #ifdef TGB_DEBUG
     #endif
