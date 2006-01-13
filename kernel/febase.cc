@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.7 2005-07-27 16:51:02 Singular Exp $ */
+/* $Id: febase.cc,v 1.8 2006-01-13 18:10:04 wienand Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -616,8 +616,18 @@ int feReadLine(char* b, int l)
     }
     else if (currentVoice->sw==BI_file)
     {
+#ifdef DEFECT_SINGULAR
+      feShowPrompt();
+      s=fe_fgets_stdin(fe_promptstr,
+                       &(currentVoice->buffer[offset]),
+                       (4096-1-sizeof(ADDRESS))-offset);
+      int i=0;
+      if (s!=NULL)
+        while((s[i]!='\0') && (i<4096)) {s[i] &= (char)127;i++;}
+#else
       s=fgets(currentVoice->buffer+offset,(4096-1-sizeof(ADDRESS))-offset,
               currentVoice->files);
+#endif
     }
     //else /* BI_buffer */ s==NULL  => return 0
     // done by the default return

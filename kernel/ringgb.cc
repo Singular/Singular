@@ -1,11 +1,11 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ringgb.cc,v 1.2 2005-11-27 15:28:46 wienand Exp $ */
+/* $Id: ringgb.cc,v 1.3 2006-01-13 18:10:05 wienand Exp $ */
 /*
 * ABSTRACT: ringgb interface
 */
-#define HAVE_TAIL_RING
+//#define HAVE_TAIL_RING
 #define NO_BUCKETS
 
 #include "mod2.h"

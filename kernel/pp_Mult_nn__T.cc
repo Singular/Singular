@@ -6,7 +6,7 @@
  *  Purpose: template for pp_Mult_nn
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pp_Mult_nn__T.cc,v 1.1.1.1 2003-10-06 12:16:02 Singular Exp $
+ *  Version: $Id: pp_Mult_nn__T.cc,v 1.2 2006-01-13 18:10:05 wienand Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -27,11 +27,18 @@ LINKAGE poly pp_Mult_nn(poly p, const number n, const ring r)
 
   do
   {
-    p_AllocBin(pNext(q), bin, r);
-    q = pNext(q);
     number nc = pGetCoeff(p);
-    pSetCoeff0(q, n_Mult(n, nc, r));
-    p_MemCopy(q->exp, p->exp, length);
+    number tmp = n_Mult(n, nc, r);
+#ifdef HAVE_RING2TOM
+    if (r->cring==0 || (r->cring ==1 && (long) tmp != 0)){
+#endif
+      p_AllocBin(pNext(q), bin, r);
+      q = pNext(q);
+      pSetCoeff0(q, tmp);
+      p_MemCopy(q->exp, p->exp, length);
+#ifdef HAVE_RING2TOM
+    }
+#endif
     pIter(p);
   }
   while (p != NULL);

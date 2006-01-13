@@ -6,7 +6,7 @@
  *  Purpose: template for p_Mult_n
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Mult_mm__T.cc,v 1.1.1.1 2003-10-06 12:16:00 Singular Exp $
+ *  Version: $Id: p_Mult_mm__T.cc,v 1.2 2006-01-13 18:10:05 wienand Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -18,6 +18,7 @@
  ***************************************************************/
 LINKAGE poly p_Mult_mm(poly p, const poly m, const ring ri)
 {
+  poly before = p;
   p_Test(p, ri);
   p_LmTest(m, ri);
   if (p == NULL) return NULL;
@@ -32,11 +33,32 @@ LINKAGE poly p_Mult_mm(poly p, const poly m, const ring ri)
   while (p != NULL)
   {
     pn = pGetCoeff(p);
-    pSetCoeff0(p, n_Mult(ln, pn, ri));
-    n_Delete(&pn, ri);
-    p_MemAdd(p->exp, m_e, length);
-    p_MemAddAdjust(p, ri);
-    p = pNext(p);
+    number tmp = n_Mult(ln, pn, ri);
+#ifdef HAVE_RING2TOM
+    if (n_IsZero(tmp, ri)) {
+      if (before == p) {
+        p = pNext(p);
+        before = p;
+        q = p;
+      }
+      else {
+        pNext(before) = pNext(p);
+        p_LmFree(p, ri);
+        p = pNext(before);
+      }
+    }
+    else
+#endif
+    {
+      pSetCoeff0(p, tmp);
+      n_Delete(&pn, ri);
+      p_MemAdd(p->exp, m_e, length);
+      p_MemAddAdjust(p, ri);
+#ifdef HAVE_RING_2TOM
+      before = p;
+#endif
+      p = pNext(p);
+    }
   }
   p_Test(q, ri);
   return q;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.4 2005-11-27 15:28:44 wienand Exp $ */
+/* $Id: kstd2.cc,v 1.5 2006-01-13 18:10:04 wienand Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -104,6 +104,7 @@ int kFindDivisibleByInS(const polyset &S, const unsigned long* sev, const int sl
 }
 
 #ifdef HAVE_RING2TOM
+/*        Obsolute since changes to pLmDiv
 // return -1 if no divisor is found
 //        number of first divisor, otherwise
 int kRingFindDivisibleByInT(const TSet &T, const unsigned long* sevT,
@@ -160,38 +161,146 @@ int kRingFindDivisibleByInS(const polyset &S, const unsigned long* sev, const in
     j++;
   }
 }
+*/
+
+long factorial(long arg) {
+   long tmp = 1;
+   for (int i = 2; i < arg + 1; i++) {
+     tmp = tmp * i;
+   }
+   return tmp;
+}
+
+poly kFindDivisibleByZeroPoly(LObject* h) {
+  // m = currRing->ch
+
+  int k_ind2 = 0;
+  int a_ind2 = 0;
+
+  poly p = h->GetLmCurrRing();
+  poly zeroPoly = NULL;
+  long a = (long) pGetCoeff(p);
+  long k = 1;
+
+  while (a%2 == 0) {
+    a = a / 2;
+    a_ind2++;
+  }
+
+  for (int i = 1; i <= currRing->N; i++) {
+    a = factorial(pGetExp(p, i));
+    k = k * a;
+    while (a%2 == 0) {
+      a = a / 2;
+      k_ind2++;
+    }
+  }
+  a = (long) pGetCoeff(p);
+
+  number tmp1;
+  poly tmp2, tmp3;
+  if (currRing->ch <= k_ind2 + a_ind2) {
+    zeroPoly = p_ISet(a, h->tailRing);
+    for (int i = 1; i <= currRing->N; i++) {
+      for (long j = 1; j <= pGetExp(p, i); j++) {
+        tmp1 = nInit(j);
+        tmp2 = p_ISet(1, h->tailRing);
+        p_SetExp(tmp2, i, 1, h->tailRing);
+        p_Setm(tmp2, h->tailRing);
+        if (nIsZero(tmp1)) {
+          zeroPoly = p_Mult_q(zeroPoly, tmp2, h->tailRing);
+        }
+        else {
+          tmp3 = p_ISet((long) tmp1, h->tailRing);
+          zeroPoly = p_Mult_q(zeroPoly, p_Add_q(tmp2, tmp3, h->tailRing), h->tailRing);
+        }
+      }
+    }
+    zeroPoly = p_LmDeleteAndNext(zeroPoly, h->tailRing);
+    tmp2 = pISet(a);
+    for (int i = 1; i <= currRing->N; i++) {
+      pSetExp(tmp2, i, pGetExp(p, i));
+    }
+    pSetm(tmp2);
+    pNext(tmp2) = zeroPoly;
+    return tmp2;
+  }
+  if (currRing->ch - k_ind2 <= a_ind2) {
+    PrintS("Case not implented yet !!!"); PrintLn();
+    PrintS("But it should not mae any difference."); PrintLn();
+    return zeroPoly;
+  }
+  return NULL;
+}
 
 /*2
 *  reduction procedure for the ring Z/2^m
 */
 int redRing2toM (LObject* h,kStrategy strat)
 {
-//  PrintS("redRing2toM");
-//  PrintLn();
+  if (h->p == NULL && h->t_p == NULL) return 0; // spoly is zero (can only occure with zero divisors)
+
   if (strat->tl<0) return 1;
   int at,d,i;
   int j = 0;
   int pass = 0;
+  poly zeroPoly;
+
+#ifdef HAVE_RING2TOM
+  h->SetpFDeg();
+  assume(h->pFDeg() == h->FDeg);
+  if (h->pFDeg() != h->FDeg) {
+    Print("h->pFDeg()=%d =!= h->FDeg=%d\n", h->pFDeg(), h->FDeg);
+  }
+  long reddeg = h->SetpFDeg();
+#else
   assume(h->pFDeg() == h->FDeg);
   long reddeg = h->GetpFDeg();
+#endif
 
   h->SetShortExpVector();
   loop
   {
-    j = kRingFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h);
-    if (j < 0) return 1;
+    zeroPoly = NULL; //kFindDivisibleByZeroPoly(h);
+    if (zeroPoly != NULL) {
+#ifdef KDEBUG
+      if (TEST_OPT_DEBUG)
+      {
+        PrintS("zero red:");
+      }
+#endif
+      LObject tmp_h(zeroPoly, currRing, strat->tailRing);
+      tmp_h.SetShortExpVector();
+      strat->initEcart(&tmp_h);
+      tmp_h.sev = pGetShortExpVector(tmp_h.p);
+      tmp_h.SetpFDeg();
 
+      enterT(tmp_h, strat, strat->tl + 1);
+      j = strat->tl;
+    }
+    else {
+      j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h);
+      if (j < 0) return 1;
+#ifdef KDEBUG
+      if (TEST_OPT_DEBUG)
+      {
+        PrintS("T red:");
+      }
+#endif
+    }
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG)
     {
-      PrintS("red:");
       h->wrp();
       PrintS(" with ");
       strat->T[j].wrp();
     }
 #endif
 
-    ksRingReducePoly(h, &(strat->T[j]), NULL, NULL, strat);
+    ksReducePoly(h, &(strat->T[j]), NULL, NULL, strat);
+//    if (zeroPoly != NULL) {
+//      strat->tl--;
+//    }
 
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG)
@@ -228,7 +337,7 @@ int redRing2toM (LObject* h,kStrategy strat)
 #ifdef KDEBUG
         if (TEST_OPT_DEBUG) Print(" ->L[%d]\n",at);
 #endif
-        enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
+        enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);     // NOT RING CHECKED OLIVER
         h->Clear();
         return -1;
       }
@@ -555,12 +664,14 @@ poly redNF (poly h,kStrategy strat)
   kBucketInit(P.bucket,P.p,pLength(P.p));
   loop
   {
+/* Obsolete since change in pLmDiv
 #ifdef HAVE_RING2TOM
     if (currRing->cring == 1) {
       j=kRingFindDivisibleByInS(strat->S,strat->sevS,strat->sl,&P);
     }
     else
 #endif
+*/
       j=kFindDivisibleByInS(strat->S,strat->sevS,strat->sl,&P);
     if (j>=0)
     {
@@ -577,9 +688,9 @@ poly redNF (poly h,kStrategy strat)
 #ifdef HAVE_PLURAL
       if (rIsPluralRing(currRing))
       {
-	number coef;
+	    number coef;
         nc_kBucketPolyRed(P.bucket,strat->S[j],&coef);
-	nDelete(&coef);
+	    nDelete(&coef);
       }
       else
 #endif
@@ -588,7 +699,7 @@ poly redNF (poly h,kStrategy strat)
         coef=kBucketPolyRed(P.bucket,strat->S[j],pLength(strat->S[j]),strat->kNoether);
         nDelete(&coef);
       }
-      h = kBucketGetLm(P.bucket);
+      h = kBucketGetLm(P.bucket);   // FRAGE OLIVER
       if (h==NULL)
       {
         kBucketDestroy(&P.bucket);
@@ -666,7 +777,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     loop_count++;
 #ifdef HAVE_RING2TOM
     if (TEST_OPT_DEBUG) PrintS("--- next step ---\n");
-#endif    
+#endif
     if (TEST_OPT_DEBUG) messageSets(strat);
 #endif
     if (strat->Ll== 0) strat->interpt=TRUE;
@@ -714,12 +825,20 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       strat->P.PrepareRed(strat->use_buckets);
     }
 
-    if (TEST_OPT_PROT)
-      message((strat->honey ? strat->P.ecart : 0) + strat->P.pFDeg(),
-              &olddeg,&reduc,strat, red_result);
+#ifdef HAVE_RING2TOM
+    if (strat->P.p == NULL && strat->P.t_p == NULL) {
+      red_result = 0;
+    }
+    else
+#endif
+    {
+      if (TEST_OPT_PROT)
+        message((strat->honey ? strat->P.ecart : 0) + strat->P.pFDeg(),
+                &olddeg,&reduc,strat, red_result);
 
-    /* reduction of the element choosen from L */
-    red_result = strat->red(&strat->P,strat);
+      /* reduction of the element choosen from L */
+      red_result = strat->red(&strat->P,strat);
+    }
 
     // reduction to non-zero new poly
     if (red_result == 1)

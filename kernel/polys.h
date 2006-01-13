@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.7 2005-11-27 15:28:45 wienand Exp $ */
+/* $Id: polys.h,v 1.8 2006-01-13 18:10:05 wienand Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials of the
              currRing
@@ -173,6 +173,8 @@ extern poly pHeadProc(poly p);
 // not_sev_b == ~ pGetShortExpVector(b)
 #define pLmShortDivisibleBy(a, sev_a, b, not_sev_b) \
   p_LmShortDivisibleBy(a, sev_a, b, not_sev_b, currRing)
+#define pLmRingShortDivisibleBy(a, sev_a, b, not_sev_b) \
+  p_LmRingShortDivisibleBy(a, sev_a, b, not_sev_b, currRing)
 // returns the "Short Exponent Vector" -- used to speed up divisibility
 // tests (see polys-impl.cc )
 #define pGetShortExpVector(a)   p_GetShortExpVector(a, currRing)

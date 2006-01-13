@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feOpt.cc,v 1.1.1.1 2003-10-06 12:15:51 Singular Exp $ */
+/* $Id: feOpt.cc,v 1.2 2006-01-13 18:10:04 wienand Exp $ */
 /*
 * ABSTRACT: Implementation of option buisness
 */
@@ -348,8 +348,10 @@ static char* feOptAction(feOptIndex opt)
   {
 #ifdef HAVE_MPSR
       case FE_OPT_BATCH:
+#ifndef DEFECT_SINGULAR_OUT
         if (feOptSpec[FE_OPT_BATCH].value)
           fe_fgets_stdin=fe_fgets_dummy;
+#endif
         return NULL;
 #endif
 

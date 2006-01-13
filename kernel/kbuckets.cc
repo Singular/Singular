@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.cc,v 1.16 2006-01-13 10:56:40 bricken Exp $ */
+/* $Id: kbuckets.cc,v 1.17 2006-01-13 18:10:04 wienand Exp $ */
 
 #include "mod2.h"
 #include "structs.h"
@@ -18,6 +18,16 @@
 #endif
 
 #ifdef USE_COEF_BUCKETS
+#ifdef HAVE_RING_2TOM
+#define MULTIPLY_BUCKET(B,I) do                                        \
+  { if (B->coef[I]!=NULL)                                              \
+    {                                                                  \
+      B->buckets[I]=p_Mult_q(B->buckets[I],B->coef[I],B->bucket_ring); \
+      B->coef[I]=NULL;                                                 \
+    }                                                                  \
+  } while(0)                                                           \
+    if (r->cring == 1) bucket->buckets_length[i] = pLength(bucket->buckets[i]);
+#else
 #define MULTIPLY_BUCKET(B,I) do                                        \
   { if (B->coef[I]!=NULL)                                              \
     {                                                                  \
@@ -25,6 +35,7 @@
       B->coef[I]=NULL;                                                 \
     }                                                                  \
   } while(0)
+#endif
 #else
 #define MULTIPLY_BUCKET(B,I)
 #endif
@@ -486,7 +497,38 @@ void kBucketShallowCopyDelete(kBucket_pt bucket,
   bucket->bucket_ring = new_tailRing;
 }
 
+//////////////////////////////////////////////////////////////////////////
+///
+/// Bucket number i from bucket is out of length sync, resync
+///
+void kBucketAdjust(kBucket_pt bucket, int i) {
 
+  MULTIPLY_BUCKET(bucket,i);
+
+  int l1 = bucket->buckets_length[i];
+  poly p1 = bucket->buckets[i];
+  bucket->buckets[i] = NULL;
+  bucket->buckets_length[i] = 0;
+  i = pLogLength(l1);
+
+  while (bucket->buckets[i] != NULL)
+  {
+    //kbTest(bucket);
+    MULTIPLY_BUCKET(bucket,i);
+    p1 = p_Add_q(p1, bucket->buckets[i],
+                 l1, bucket->buckets_length[i], bucket->bucket_ring);
+    bucket->buckets[i] = NULL;
+    bucket->buckets_length[i] = 0;
+    i = pLogLength(l1);
+  }
+
+  bucket->buckets[i] = p1;
+  bucket->buckets_length[i]=l1;
+  if (i >= bucket->buckets_used)
+    bucket->buckets_used = i;
+  else
+    kBucketAdjustBucketsUsed(bucket);
+}
 
 //////////////////////////////////////////////////////////////////////////
 ///
@@ -506,10 +548,23 @@ void kBucket_Mult_n(kBucket_pt bucket, number n)
 #ifdef USE_COEF_BUCKETS
       if (i<coef_start)
         bucket->buckets[i] = p_Mult_nn(bucket->buckets[i], n, r);
+#ifdef HAVE_RING2TOM
+        if (r->cring == 1) {
+          bucket->buckets_length[i] = pLength(bucket->buckets[i]);
+          kBucketAdjust(bucket, i);
+        }
+#endif
       else
       if (bucket->coef[i]!=NULL)
       {
         bucket->coef[i] = p_Mult_nn(bucket->coef[i],n,r);
+#ifdef HAVE_RING_2TOM
+        if (r->cring == 1 && (long) bucket->coef[i] == 0) {
+          bucket->coef[i] = NULL;
+          bucket->buckets[i] = NULL;
+          bucket->buckets_length[i] = 0;
+        }
+#endif
       }
       else
       {
@@ -517,12 +572,21 @@ void kBucket_Mult_n(kBucket_pt bucket, number n)
       }
 #else
       bucket->buckets[i] = p_Mult_nn(bucket->buckets[i], n, r);
+#ifdef HAVE_RING2TOM
+      if (r->cring == 1) {
+        bucket->buckets_length[i] = pLength(bucket->buckets[i]);
+        kBucketAdjust(bucket, i);
+      }
+#endif
 #endif
     }
   }
   kbTest(bucket);
 #else
   bucket->p = p_Mult_nn(bucket->p, n, bucket->bucket_ring);
+#ifdef HAVE_RING_2TOM
+  if (r->cring == 1) bucket->buckets_length[i] = pLength(bucket->buckets[i]);
+#endif
 #endif
 }
 
@@ -635,6 +699,10 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
     l1 = bucket->buckets_length[i];
     bucket->buckets[i] = NULL;
     bucket->buckets_length[i] = 0;
+#ifdef HAVE_RING2TOM
+    l1 = pLength(p1);
+    assume(pLength(p1) == l1);
+#endif    
     i = pLogLength(l1);
   }
   else
@@ -646,8 +714,13 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
       p1 = r->p_Procs->pp_Mult_mm_Noether(p1, m, spNoether, l1, r, last);
       i = pLogLength(l1);
     }
-    else
+    else {
       p1 = r->p_Procs->pp_Mult_mm(p1, m, r, last);
+#ifdef HAVE_RING2TOM
+      l1 = pLength(p1);
+      i = pLogLength(l1);
+#endif
+    }
     pSetCoeff0(m, nNeg(pGetCoeff(m)));
   }
 
@@ -997,7 +1070,7 @@ number kBucketPolyRed(kBucket_pt bucket,
     p_Setm(lm, bucket->bucket_ring);
   }
 
-  p_ExpVectorSub(lm,p1, bucket->bucket_ring);
+  p_ExpVectorSub(lm, p1, bucket->bucket_ring);
   l1--;
 
   assume(l1==pLength(a1));

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kspoly.cc,v 1.2 2005-11-27 15:28:44 wienand Exp $ */
+/* $Id: kspoly.cc,v 1.3 2006-01-13 18:10:04 wienand Exp $ */
 /*
 *  ABSTRACT -  Routines for Spoly creation and reductions
 */
@@ -48,10 +48,10 @@ int ksReducePoly(LObject* PR,
   kTest_L(PR);
   kTest_T(PW);
 
-  poly p1 = PR->GetLmTailRing();
-  poly p2 = PW->GetLmTailRing();
-  poly t2 = pNext(p2), lm = p1;
-  assume(p1 != NULL && p2 != NULL);
+  poly p1 = PR->GetLmTailRing();   // p2 | p1
+  poly p2 = PW->GetLmTailRing();   // i.e. will reduce p1 with p2; lm = LT(p1) / LM(p2)
+  poly t2 = pNext(p2), lm = p1;    // t2 = p2 - LT(p2); really compute P = LC(p2)*p1 - LT(p1)/LM(p2)*p2
+  assume(p1 != NULL && p2 != NULL);// Attention, we have rings and there LC(p2) and LC(p1) are special
   p_CheckPolyRing(p1, tailRing);
   p_CheckPolyRing(p2, tailRing);
 
@@ -82,14 +82,14 @@ int ksReducePoly(LObject* PR,
     return 0;
   }
 
-  if (t2==NULL)
-  {
+  if (t2==NULL)           // Divisor is just one term, therefore it will
+  {                       // just cancel the leading term
     PR->LmDeleteAndIter();
     if (coef != NULL) *coef = n_Init(1, tailRing);
     return 0;
   }
 
-  p_ExpVectorSub(lm, p2, tailRing);
+  p_ExpVectorSub(lm, p2, tailRing); // Calculate the Monomial we must multiply to p2
 
   if (tailRing != currRing)
   {
@@ -115,16 +115,8 @@ int ksReducePoly(LObject* PR,
   {
     number bn = pGetCoeff(lm);
     number an = pGetCoeff(p2);
-#ifdef HAVE_RING2TOM
-    if (currRing->cring == 1) {
-      while (((long) an)%2 == 0 && ((long) bn)%2 == 0) {
-        an = (number) (((long) an) / 2);
-        bn = (number) (((long) bn) / 2);
-      }
-    }
-#endif
-    int ct = ksCheckCoeff(&an, &bn);
-    p_SetCoeff(lm, bn,tailRing);
+    int ct = ksCheckCoeff(&an, &bn);    // Calculate special LC
+    p_SetCoeff(lm, bn, tailRing);
     if ((ct == 0) || (ct == 2))
       PR->Tail_Mult_nn(an);
     if (coef != NULL) *coef = an;
@@ -138,6 +130,7 @@ int ksReducePoly(LObject* PR,
 
   // and finally,
   PR->Tail_Minus_mm_Mult_qq(lm, t2, PW->GetpLength() - 1, spNoether);
+  assume(PW->GetpLength() == pLength(PW->p != NULL ? PW->p : PW->t_p));
   PR->LmDeleteAndIter();
 #if defined(KDEBUG) && defined(TEST_OPT_DEBUG_RED)
   if (TEST_OPT_DEBUG)
@@ -147,112 +140,6 @@ int ksReducePoly(LObject* PR,
 #endif
   return ret;
 }
-
-#ifdef HAVE_RING2TOM
-/***************************************************************
- *
- * Reduces PR with PW
- * Assumes PR != NULL, PW != NULL, Lm(PW) divides Lm(PR)
- * as above, just for rings
- *
- ***************************************************************/
-int ksRingReducePoly(LObject* PR,
-                 TObject* PW,
-                 poly spNoether,
-                 number *coef,
-                 kStrategy strat)
-{
-#ifdef KDEBUG
-  red_count++;
-#ifdef TEST_OPT_DEBUG_RED
-  if (TEST_OPT_DEBUG)
-  {
-    Print("Red %d:", red_count); PR->wrp(); Print(" with:");
-    PW->wrp();
-  }
-#endif
-#endif
-  int ret = 0;
-  ring tailRing = PR->tailRing;
-  kTest_L(PR);
-  kTest_T(PW);
-
-  poly p1 = PR->GetLmTailRing();
-  poly p2 = PW->GetLmTailRing();
-  poly t2 = pNext(p2), lm = p1;
-  assume(p1 != NULL && p2 != NULL);
-  p_CheckPolyRing(p1, tailRing);
-  p_CheckPolyRing(p2, tailRing);
-
-  pAssume1(p2 != NULL && p1 != NULL &&
-           p_RingDivisibleBy(p2,  p1, tailRing));
-
-  pAssume1(p_GetComp(p1, tailRing) == p_GetComp(p2, tailRing) ||
-           (p_GetComp(p2, tailRing) == 0 &&
-            p_MaxComp(pNext(p2),tailRing) == 0));
-
-  if (t2==NULL)
-  {
-    PR->LmDeleteAndIter();
-    if (coef != NULL) *coef = n_Init(1, tailRing);
-    return 0;
-  }
-
-  p_ExpVectorSub(lm, p2, tailRing);
-
-  if (tailRing != currRing)
-  {
-    // check that reduction does not violate exp bound
-    while (PW->max != NULL && !p_LmExpVectorAddIsOk(lm, PW->max, tailRing))
-    {
-      // undo changes of lm
-      p_ExpVectorAdd(lm, p2, tailRing);
-      if (strat == NULL) return 2;
-      if (! kStratChangeTailRing(strat, PR, PW)) return -1;
-      tailRing = strat->tailRing;
-      p1 = PR->GetLmTailRing();
-      p2 = PW->GetLmTailRing();
-      t2 = pNext(p2);
-      lm = p1;
-      p_ExpVectorSub(lm, p2, tailRing);
-      ret = 1;
-    }
-  }
-
-  // take care of coef buisness
-  if (! n_IsOne(pGetCoeff(p2), tailRing))
-  {
-    number bn = pGetCoeff(lm);
-    number an = pGetCoeff(p2);
-    while (((long) an)%2 == 0 && ((long) bn)%2 == 0) {
-      an = (number) (((long) an) / 2);
-      bn = (number) (((long) bn) / 2);
-    }
-    int ct = ksCheckCoeff(&an, &bn);
-    p_SetCoeff(lm, bn,tailRing);
-    if ((ct == 0) || (ct == 2))
-      PR->Tail_Mult_nn(an);
-    if (coef != NULL) *coef = an;
-    else n_Delete(&an, tailRing);
-  }
-  else
-  {
-    if (coef != NULL) *coef = n_Init(1, tailRing);
-  }
-
-
-  // and finally,
-  PR->Tail_Minus_mm_Mult_qq(lm, t2, PW->GetpLength() - 1, spNoether);
-  PR->LmDeleteAndIter();
-#if defined(KDEBUG) && defined(TEST_OPT_DEBUG_RED)
-  if (TEST_OPT_DEBUG)
-  {
-    Print(" to: "); PR->wrp(); Print("\n");
-  }
-#endif
-  return ret;
-}
-#endif
 
 /***************************************************************
  *
@@ -279,15 +166,7 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
 
   poly a1 = pNext(p1), a2 = pNext(p2);
   number lc1 = pGetCoeff(p1), lc2 = pGetCoeff(p2);
-#ifdef HAVE_RING2TOM
-  if (currRing->cring == 1) {
-    while (((long) lc1)%2 == 0 && ((long) lc2)%2 == 0) {
-      lc1 = (number) (((long) lc1) / 2);
-      lc2 = (number) (((long) lc2) / 2);
-    }
-  }
-#endif  
-  int co=0, ct = ksCheckCoeff(&lc1, &lc2);
+  int co=0, ct = ksCheckCoeff(&lc1, &lc2); // gcd and zero divisors
 
   int l1=0, l2=0;
 
@@ -328,6 +207,10 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
   }
   else
     a2 = tailRing->p_Procs->pp_Mult_mm(a2, m2, tailRing,last);
+#ifdef HAVE_RING2TOM
+  if (currRing->cring == 1) l2 = pLength(a2);
+#endif
+
   Pair->SetLmTail(m2, a2, l2, use_buckets, tailRing, last);
 
   // get m2*a2 - m1*a1
@@ -428,6 +311,14 @@ int ksCheckCoeff(number *a, number *b)
     an = nIntDiv(an, cn);
     bn = nIntDiv(bn, cn);
   }
+#ifdef HAVE_RING2TOM
+  if (currRing->cring == 1) {
+    while (((long) an)%2 == 0 && ((long) bn)%2 == 0) {
+      an = (number) (((long) an) / 2);
+      bn = (number) (((long) bn) / 2);
+    }
+  }
+#endif
   nDelete(&cn);
   if (nIsOne(an))
   {

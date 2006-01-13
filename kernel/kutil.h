@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.8 2005-12-19 13:56:05 bricken Exp $ */
+/* $Id: kutil.h,v 1.9 2006-01-13 18:10:05 wienand Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -437,6 +437,7 @@ TObject*
 kFindDivisibleByInS(kStrategy strat, int pos, LObject* L, TObject *T,
                     long ecart = LONG_MAX);
 
+/*Obsolete since changes to pLmDiv
 #ifdef HAVE_RING2TOM
 // same for rings
 int kRingFindDivisibleByInT(const TSet &T, const unsigned long* sevT,
@@ -449,7 +450,7 @@ TObject*
 kRingFindDivisibleByInS(kStrategy strat, int pos, LObject* L, TObject *T,
                     long ecart = LONG_MAX);
 #endif
-
+*/
 /***************************************************************
  *
  * stuff to be inlined

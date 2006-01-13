@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.12 2005-11-27 15:28:45 wienand Exp $ */
+/* $Id: kutil.cc,v 1.13 2006-01-13 18:10:04 wienand Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -929,6 +929,7 @@ void enterL (LSet *set,int *length, int *LSetmax, LObject p,int at)
   int i;
   // this should be corrected
   assume(p.FDeg == p.pFDeg());
+
   if ((*length)>=0)
   {
     if ((*length) == (*LSetmax)-1) enlargeL(set,LSetmax,setmaxLinc);
@@ -1003,7 +1004,11 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR 
 
   pLcm(p,strat->S[i],Lp.lcm);
   pSetm(Lp.lcm);
+#ifdef HAVE_RING2TOM
+  if (strat->sugarCrit && currRing->cring == 0)
+#else
   if (strat->sugarCrit)
+#endif
   {
     if(
     (!((strat->ecartS[i]>0)&&(ecart>0)))
@@ -1074,8 +1079,7 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR 
   else /*sugarcrit*/
   {
 #ifdef HAVE_PLURAL
-    if (!rIsPluralRing(currRing))
-    {
+    if (!rIsPluralRing(currRing)) {
     // if currRing->nc_type!=quasi (or skew)
 #endif
 
@@ -1352,8 +1356,8 @@ void chainCrit (poly p,int ecart,kStrategy strat)
         {
           if (strat->L[j].p == strat->tail)
           {
-            deleteInL(strat->L,&strat->Ll,j,strat);
-            strat->c3++;
+              deleteInL(strat->L,&strat->Ll,j,strat);
+              strat->c3++;
           }
         }
       }
@@ -2755,7 +2759,7 @@ kFindDivisibleByInS(kStrategy strat, int pos, LObject* L, TObject *T,
     }
   }
 }
-
+/*
 #ifdef HAVE_RING2TOM
 TObject*
 kRingFindDivisibleByInS(kStrategy strat, int pos, LObject* L, TObject *T,
@@ -2827,6 +2831,7 @@ kRingFindDivisibleByInS(kStrategy strat, int pos, LObject* L, TObject *T,
   }
 }
 #endif
+*/
 
 poly redtail (LObject* L, int pos, kStrategy strat)
 {
@@ -2906,9 +2911,6 @@ poly redtail (poly p, int pos, kStrategy strat)
 
 poly redtailBba (LObject* L, int pos, kStrategy strat, BOOLEAN withT)
 {
-#ifdef HAVE_RING2TOM
-  PrintS("Warning, redtail Bba not fully ring checked"); PrintLn();
-#endif
   strat->redTailChange=FALSE;
   if (strat->noTailReduction) return L->GetLmCurrRing();
   poly h, p;
@@ -2936,22 +2938,26 @@ poly redtailBba (LObject* L, int pos, kStrategy strat, BOOLEAN withT)
       Ln.SetShortExpVector();
       if (! withT)
       {
+/* obsolete
 #ifdef HAVE_RING2TOM
         if (currRing->cring == 1) {
             With = kRingFindDivisibleByInS(strat, pos, &Ln, &With_s);
         } else
 #endif
+*/
             With = kFindDivisibleByInS(strat, pos, &Ln, &With_s);
         if (With == NULL) break;
       }
       else
       {
         int j;
+/* Obsolete
 #ifdef HAVE_RING2TOM
         if (currRing->cring == 1) {
            j = kRingFindDivisibleByInT(strat->T, strat->sevT, strat->tl, &Ln);
         } else
 #endif
+*/
            j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, &Ln);
         if (j < 0) break;
         With = &(strat->T[j]);
@@ -3536,7 +3542,12 @@ static poly redBba (poly h,int maxIndex,kStrategy strat)
 
   while (j <= maxIndex)
   {
+#ifdef HAVE_RING2TOM
+    if ((currRing->cring == 1 && pLmRingShortDivisibleBy(strat->S[j],strat->sevS[j], h, not_sev)) ||
+        (currRing->cring == 0 && pLmShortDivisibleBy(strat->S[j],strat->sevS[j], h, not_sev)))
+#else
     if (pLmShortDivisibleBy(strat->S[j],strat->sevS[j], h, not_sev))
+#endif
     {
       h = ksOldSpolyRed(strat->S[j],h,strat->kNoetherTail());
       if (h==NULL) return NULL;
@@ -3600,13 +3611,14 @@ void updateS(BOOLEAN toT,kStrategy strat)
   LObject h;
   int i, suc=0;
   poly redSi=NULL;
-//Print("nach initS: updateS start mit sl=%d\n",(strat->sl));
+//  Print("nach initS: updateS start mit sl=%d\n",(strat->sl));
 //  for (i=0; i<=(strat->sl); i++)
 //  {
 //    Print("s%d:",i);
 //    if (strat->fromQ!=NULL) Print("(Q:%d) ",strat->fromQ[i]);
 //    pWrite(strat->S[i]);
 //  }
+//  Print("pOrdSgn=%d\n", pOrdSgn);
   if (pOrdSgn==1)
   {
     while (suc != -1)

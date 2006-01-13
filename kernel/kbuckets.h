@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.h,v 1.4 2005-12-19 12:11:15 bricken Exp $ */
+/* $Id: kbuckets.h,v 1.5 2006-01-13 18:10:04 wienand Exp $ */
 #include "structs.h"
 #include "p_Procs.h"
 #include "pShallowCopyDelete.h"
@@ -68,6 +68,12 @@ inline poly kBucketExtractLm(kBucket_pt bucket);
 // assumes that m is larger than all monomials of Bpoly
 void kBucketSetLm(kBucket_pt bucket, poly lm);
 
+
+//////////////////////////////////////////////////////////////////////////
+///
+/// Bucket number i from bucket is out of length sync, resync
+///
+void kBucketAdjust(kBucket_pt bucket, int i);
 
 /////////////////////////////////////////////////////////////////////////////
 // Reduces Bpoly (say, q) with p, i.e.:

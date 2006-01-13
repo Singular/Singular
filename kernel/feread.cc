@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feread.cc,v 1.6 2005-05-21 09:16:24 Singular Exp $ */
+/* $Id: feread.cc,v 1.7 2006-01-13 18:10:04 wienand Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -309,6 +309,9 @@ char * fe_fgets(char *pr,char *s, int size)
   if (BVERBOSE(V_PROMPT))
   {
     fprintf(stdout,pr);
+#ifdef DEFECT_SINGULAR
+    fprintf(stdout,"\n");
+#endif
   }
   mflush();
   return fgets(s,size,stdin);

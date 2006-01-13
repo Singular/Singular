@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulo2m.cc,v 1.1 2005-11-27 16:30:09 wienand Exp $ */
+/* $Id: rmodulo2m.cc,v 1.2 2006-01-13 18:10:06 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo 2^m
 */
@@ -113,7 +113,7 @@ BOOLEAN nr2mGreaterZero (number k)
   return ((int)h !=0) && (h <= (nr2mModul>>1));
 }
 
-#ifdef HAVE_DIV_MOD
+//#ifdef HAVE_DIV_MOD
 #if 1 //ifdef HAVE_NTL // in ntl.a
 //extern void XGCD(long& d, long& s, long& t, long a, long b);
 #include <NTL/ZZ.h>
@@ -177,17 +177,14 @@ long InvMod(long a)
    else
       return s;
 }
-#endif
+//#endif
 
 inline number nr2mInversM (number c)
 {
-  long a = (long) c;
-  long b = 1;
-  while (a != 1) {
-    a = a * (long) c % nr2mModul;
-    b = b * (long) c;
-  }
-  return (number) b;
+  // Table !!!
+  long inv;
+  inv = InvMod((long)c);
+  return (number) inv;
 }
 
 number nr2mDiv (number a,number b)

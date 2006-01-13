@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which iter over ExpVector
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline1.h,v 1.3 2005-11-27 15:28:45 wienand Exp $
+ *  Version: $Id: pInline1.h,v 1.4 2006-01-13 18:10:05 wienand Exp $
  *******************************************************************/
 #ifndef PINLINE1_H
 #define PINLINE1_H
@@ -365,6 +365,19 @@ static inline BOOLEAN _p_LmDivisibleByNoComp(poly a, poly b, ring r)
     while (i>=0);
   }
   pDivAssume(p_DebugLmDivisibleByNoComp(a, b, r) == TRUE);
+#ifdef HAVE_RING2TOM
+  if (r->cring == 1) {
+    long lside = (long) p_GetCoeff(a, r);
+    long rside = (long) p_GetCoeff(b, r);
+    // Später durch bitvergleiche viel schneller TODO OLIVER
+    while (lside%2 == 0 && rside%2 == 0) {
+      lside = lside / 2;
+      rside = rside / 2;
+    }
+    return (lside%2 != 0);
+  }
+  else
+#endif
   return TRUE;
 }
 
@@ -384,56 +397,18 @@ static inline BOOLEAN _p_LmDivisibleByNoComp(poly a, poly b, ring r)
 //               la ^ lb != la - lb
 static inline BOOLEAN _p_LmRingDivisibleByNoComp(poly a, poly b, ring r)
 {
-  int i=r->VarL_Size - 1;
-  unsigned long divmask = r->divmask;
-  unsigned long la, lb;
-
-  if (r->VarL_LowIndex >= 0)
-  {
-    i += r->VarL_LowIndex;
-    do
-    {
-      la = a->exp[i];
-      lb = b->exp[i];
-      if ((la > lb) ||
-          (((la & divmask) ^ (lb & divmask)) != ((lb - la) & divmask)))
-      {
-        pDivAssume(p_DebugLmDivisibleByNoComp(a, b, r) == FALSE);
-        return FALSE;
-      }
-      i--;
+  BOOLEAN mDiv = _p_LmDivisibleByNoComp(a, b, r);
+  if (mDiv) {
+    long lside = (long) p_GetCoeff(a,r);
+    long rside = (long) p_GetCoeff(b,r);
+    // Später durch bitvergleiche viel schneller  TODO OLIVER
+    while (lside%2 == 0 && rside%2 == 0) {
+      lside = lside / 2;
+      rside = rside / 2;
     }
-    while (i>=r->VarL_LowIndex);
+    return (lside%2 != 0);
   }
-  else
-  {
-    do
-    {
-      la = a->exp[r->VarL_Offset[i]];
-      lb = b->exp[r->VarL_Offset[i]];
-      if ((la > lb) ||
-          (((la & divmask) ^ (lb & divmask)) != ((lb - la) & divmask)))
-      {
-        pDivAssume(p_DebugLmDivisibleByNoComp(a, b, r) == FALSE);
-        return FALSE;
-      }
-      i--;
-    }
-    while (i>=0);
-  }
-  pDivAssume(p_DebugLmDivisibleByNoComp(a, b, r) == TRUE);
-  long lside = (long) p_GetCoeff(a,r);
-  long rside = (long) p_GetCoeff(b,r);
-  // Später durch bitvergleiche viel schneller  TODO OLIVER
-  //Print("lside=%d", lside); PrintLn();
-  //Print("rside=%d", rside); PrintLn();
-  while (lside%2 == 0 && rside%2 == 0) {
-    lside = lside / 2;
-    rside = rside / 2;
-  }
-  //Print("lside=%d", lside); PrintLn();
-  //Print("rside=%d", rside); PrintLn();
-  return (lside%2 != 0);
+  return false;
 }
 #endif
 
@@ -449,34 +424,37 @@ static inline BOOLEAN _p_LmDivisibleByNoComp(poly a, ring r_a, poly b, ring r_b)
     i--;
   }
   while (i);
-  return TRUE;
+#ifdef HAVE_RING2TOM
+  if (r_a->cring == 1 || r_b->cring == 1) {
+    long lside = (long) p_GetCoeff(a, r_a);
+    long rside = (long) p_GetCoeff(b, r_b);
+    // Später durch bitvergleiche viel schneller TODO OLIVER
+    while (lside%2 == 0 && rside%2 == 0) {
+      lside = lside / 2;
+      rside = rside / 2;
+    }
+    return (lside%2 != 0);
+  }
+  else
+#endif
+    return TRUE;
 }
 
 #ifdef HAVE_RING2TOM
 static inline BOOLEAN _p_LmRingDivisibleByNoComp(poly a, ring r_a, poly b, ring r_b)
 {
-  int i=r_a->N;
-  pAssume1(r_a->N == r_b->N);
-
-  do
-  {
-    if (p_GetExp(a,i,r_a) > p_GetExp(b,i,r_b))
-      return FALSE;
-    i--;
+  BOOLEAN mDiv = _p_LmDivisibleByNoComp(a, r_a, b, r_b);
+  if (mDiv) {
+    long lside = (long) p_GetCoeff(a, r_a);
+    long rside = (long) p_GetCoeff(b, r_b);
+    // Später durch bitvergleiche viel schneller TODO OLIVER
+    while (lside%2 == 0 && rside%2 == 0) {
+      lside = lside / 2;
+      rside = rside / 2;
+    }
+    return (lside%2 != 0);
   }
-  while (i);
-  long lside = (long) p_GetCoeff(a, r_a);
-  long rside = (long) p_GetCoeff(b, r_b);
-  // Später durch bitvergleiche viel schneller TODO OLIVER
-  //Print("lside=%d", lside); PrintLn();
-  //Print("rside=%d", rside); PrintLn();
-  while (lside%2 == 0 && rside%2 == 0) {
-    lside = lside / 2;
-    rside = rside / 2;
-  }
-  //Print("lside=%d", lside); PrintLn();
-  //Print("rside=%d", rside); PrintLn();
-  return (lside%2 != 0);
+  return false;
 }
 #endif
 
@@ -524,14 +502,28 @@ PINLINE1 BOOLEAN p_DivisibleBy(poly a, poly b, ring r)
   pIfThen1(a!=NULL, p_LmCheckPolyRing1(a, r));
 
   if (a != NULL && (p_GetComp(a, r) == 0 || p_GetComp(a,r) == p_GetComp(b,r)))
-    return _p_LmDivisibleByNoComp(a,b,r);
+#ifdef HAVE_RING2TOM
+    if (r->cring == 1) {
+      return _p_LmRingDivisibleByNoComp(a,b,r);
+    }
+    else
+#endif
+      return _p_LmDivisibleByNoComp(a,b,r);
   return FALSE;
 }
 PINLINE1 BOOLEAN p_DivisibleBy(poly a, ring r_a, poly b, ring r_b)
 {
   pIfThen1(b!=NULL, p_LmCheckPolyRing1(b, r_b));
   pIfThen1(a!=NULL, p_LmCheckPolyRing1(a, r_a));
-  if (a != NULL) return _p_LmDivisibleBy(a, r_a, b, r_b);
+  if (a != NULL) {
+#ifdef HAVE_RING2TOM
+    if (r_a->cring == 1) {
+      return _p_LmRingDivisibleByNoComp(a, r_a, b, r_b);
+    }
+    else
+#endif
+      return _p_LmDivisibleBy(a, r_a, b, r_b);
+  }
   return FALSE;
 }
 PINLINE1 BOOLEAN p_LmDivisibleBy(poly a, ring r_a, poly b, ring r_b)

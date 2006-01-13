@@ -6,7 +6,7 @@
  *  Purpose: multiplication of polynomials
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Mult_q.cc,v 1.1.1.1 2003-10-06 12:16:00 Singular Exp $
+ *  Version: $Id: p_Mult_q.cc,v 1.2 2006-01-13 18:10:05 wienand Exp $
  *******************************************************************/
 #include "mod2.h"
 
@@ -164,6 +164,12 @@ static poly _p_Mult_q_Normal(poly p, poly q, const int copy, const ring r)
   p_Test(q, r);
 
   poly res = pp_Mult_mm(p,q,r);     // holds initially q1*p
+#ifdef HAVE_RING2TOM
+  if (res == NULL) {
+    res = p_ISet(1, r);
+    p_SetCoeff(res, (number) 0, r);
+  }
+#endif
   poly qq = pNext(q);               // we iter of this
   poly qn = pp_Mult_mm(qq, p,r);    // holds p1*qi
   poly pp = pNext(p);               // used for Lm(qq)*pp
@@ -173,6 +179,10 @@ static poly _p_Mult_q_Normal(poly p, poly q, const int copy, const ring r)
 
   // now the main loop
   Top:
+#ifdef HAVE_RING2TOM
+  if (qn == NULL && rn == NULL) goto Work;
+  if (qn == NULL) goto Greater;
+#endif
   if (rn == NULL) goto Smaller;
   p_LmCmpAction(rn, qn, r, goto Equal, goto Greater, goto Smaller);
 
@@ -187,6 +197,7 @@ static poly _p_Mult_q_Normal(poly p, poly q, const int copy, const ring r)
   pNext(rr) = qn;
   rr = qn;
   pIter(qn);
+
   Work: // compute res + Lm(qq)*pp
   if (rn == NULL)
     pNext(rr) = pp_Mult_mm(pp, qq, r);
@@ -225,6 +236,11 @@ static poly _p_Mult_q_Normal(poly p, poly q, const int copy, const ring r)
     p_Delete(&p, r);
     p_Delete(&q, r);
   }
+#ifdef HAVE_RING2TOM
+  if (n_IsZero(p_GetCoeff(res, r), r)) {
+    res = p_LmDeleteAndNext(res, r);
+  }
+#endif
   p_Test(res, r);
   return res;
 }
