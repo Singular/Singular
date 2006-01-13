@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.cc,v 1.17 2006-01-13 18:10:04 wienand Exp $ */
+/* $Id: kbuckets.cc,v 1.18 2006-01-13 19:35:48 bricken Exp $ */
 
 #include "mod2.h"
 #include "structs.h"
@@ -1104,7 +1104,13 @@ number kBucketPolyRed(kBucket_pt bucket,
 static BOOLEAN nIsPseudoUnit(number n, ring r){
     if (rField_is_Zp(r))
         return TRUE;
-
+    if (r->parameter==NULL)
+    {
+        if (r->cf->nSize(n)==1)
+            return TRUE;
+        else
+            return FALSE;
+    }
     //if (r->parameter!=NULL)
     number one=n_Init(1,r);
     if (n_Equal(n,one,r)) {
@@ -1122,6 +1128,7 @@ static BOOLEAN nIsPseudoUnit(number n, ring r){
 
 void kBucketSimpleContent(kBucket_pt bucket)
 {
+  ring r=bucket->bucket_ring;
   int i;
   //PrintS("HHHHHHHHHHHHH");
   for (i=0;i<=MAX_BUCKET;i++)
@@ -1135,8 +1142,20 @@ void kBucketSimpleContent(kBucket_pt bucket)
     if ((bucket->buckets[i]!=NULL) && (bucket->coef[i]==NULL))
       return;
   }
+  for (i=0;i<=MAX_BUCKET;i++)
+  {
+    //if ((bucket->buckets[i]!=NULL) && (bucket->coef[i]!=NULL))
+    //    PrintS("H2H2H2");
+    if (i==0)
+    {
+      assume(bucket->buckets[i]==NULL);
+    }
+    if ((bucket->buckets[i]!=NULL) &&     (nIsPseudoUnit(p_GetCoeff(bucket->coef[i],r),r)))
+
+      return;
+  }
   //return;
-  ring r=bucket->bucket_ring;
+  
   number coef=n_Init(0,r);
   //ATTENTION: will not work correct for GB over ring
   //if (TEST_OPT_PROT)
