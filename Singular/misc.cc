@@ -289,8 +289,11 @@ BOOLEAN setOption(leftv res, leftv v)
         verbose=(*w)[1];
 
         if (TEST_OPT_INTSTRATEGY && (currRing!=NULL)
-        && rField_has_simple_inverse())
-        {
+        && rField_has_simple_inverse()
+#ifdef HAVE_RING2TOM
+        && !rField_is_Ring_2toM(currRing)
+#endif
+        ) {
           test &=~Sy_bit(OPT_INTSTRATEGY);
         }
         goto okay;
@@ -316,8 +319,11 @@ BOOLEAN setOption(leftv res, leftv v)
         else
           Warn("cannot set option");
         if (TEST_OPT_INTSTRATEGY && (currRing!=NULL)
-        && rField_has_simple_inverse())
-        {
+        && rField_has_simple_inverse()
+#ifdef HAVE_RING2TOM
+        && !rField_is_Ring_2toM(currRing)
+#endif
+        ) {
           test &=~Sy_bit(OPT_INTSTRATEGY);
         }
         goto okay;

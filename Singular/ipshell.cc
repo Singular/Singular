@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.132 2005-11-27 15:41:50 wienand Exp $ */
+/* $Id: ipshell.cc,v 1.133 2006-01-13 16:46:48 wienand Exp $ */
 /*
 * ABSTRACT:
 */
@@ -577,13 +577,19 @@ int exprlist_length(leftv v)
 }
 
 #ifdef HAVE_RING2TOM
-BOOLEAN Is2toM(int p)  /* brute force !!!! */
+int Is2toM(int p)  /* brute force !!!! */
 {
+  if (p <= 0) return 0;
   int test = p;
+  int i = 0;
   while (p%2 == 0) {
     p = p / 2;
+    i++;
   }
-  return (p == 1);
+  if (p == 1) {
+    return i;
+  }
+  return 0;
 }
 #endif
 
@@ -4441,8 +4447,10 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
     }
     else {
 #ifdef HAVE_RING2TOM
-      if (Is2toM(ch)) {
+      int blupp = Is2toM(ch);
+      if (blupp != 0) {
         cring = 1; // Use Z/2^ch
+        ch = blupp;
         Print("Beta: using Z/2^%d", ch);
         PrintLn();
       }
