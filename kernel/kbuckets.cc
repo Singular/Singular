@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.cc,v 1.15 2006-01-12 14:12:41 bricken Exp $ */
+/* $Id: kbuckets.cc,v 1.16 2006-01-13 10:56:40 bricken Exp $ */
 
 #include "mod2.h"
 #include "structs.h"
@@ -252,6 +252,7 @@ inline void kBucketMergeLm(kBucket_pt bucket)
        assume(pLength(lm)==1);
        assume(pNext(lm)==NULL);
        number coef=p_GetCoeff(lm,bucket->bucket_ring);
+       //WARNING: not thread_safe
        p_SetCoeff0(lm, n_Init(1,bucket->bucket_ring), bucket->bucket_ring);
        bucket->buckets[i]=lm;
        bucket->buckets_length[i]=1;
@@ -999,8 +1000,29 @@ number kBucketPolyRed(kBucket_pt bucket,
   p_ExpVectorSub(lm,p1, bucket->bucket_ring);
   l1--;
 
-  kBucket_Minus_m_Mult_p(bucket, lm, a1, &l1, spNoether);
+  assume(l1==pLength(a1));
+  BOOLEAN backuped=FALSE;
+  number coef;
+  if(l1==1) {
+    
+    //if (rField_is_Q(bucket->bucket_ring)) {
+      //avoid this for function fields, as gcds are expensive at the moment
+      
+     
+      coef=p_GetCoeff(a1,bucket->bucket_ring);
+      lm=p_Mult_nn(lm, coef, bucket->bucket_ring);
+      p_SetCoeff0(a1, n_Init(1,bucket->bucket_ring), bucket->bucket_ring);
+      backuped=TRUE;
+      //WARNING: not thread_safe
+    //deletes coef as side effect
+    //}
+  }
 
+  
+  kBucket_Minus_m_Mult_p(bucket, lm, a1, &l1, spNoether);
+  
+  if (backuped)
+    p_SetCoeff0(a1,coef,bucket->bucket_ring);
   p_DeleteLm(&lm, bucket->bucket_ring);
   if (reset_vec) p_SetCompP(a1, 0, bucket->bucket_ring);
   kbTest(bucket);
@@ -1084,6 +1106,7 @@ void kBucketSimpleContent(kBucket_pt bucket)
       assume(!(n_IsZero(p_GetCoeff(bucket->coef[i],r),r)));
     }
   }
+  n_Delete(&coef,r);
 }
 
 
