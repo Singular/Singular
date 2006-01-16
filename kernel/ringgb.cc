@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ringgb.cc,v 1.3 2006-01-13 18:10:05 wienand Exp $ */
+/* $Id: ringgb.cc,v 1.4 2006-01-16 03:27:10 wienand Exp $ */
 /*
 * ABSTRACT: ringgb interface
 */
@@ -29,7 +29,7 @@
 #include "ringgb.h"
 
 poly reduce_poly_fct(poly p, ring r) {
-   return NULL;
+   return kFindZeroPoly(p, r, r);
 }
 
 /*

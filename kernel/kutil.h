@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.9 2006-01-13 18:10:05 wienand Exp $ */
+/* $Id: kutil.h,v 1.10 2006-01-16 03:27:10 wienand Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -503,6 +503,7 @@ BOOLEAN kTest_S(kStrategy strat);
  * From kstd2.cc
  *
  ***************************************************************/
+poly kFindZeroPoly(poly input_p, ring leadRing, ring tailRing);
 ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat);
 poly kNF2 (ideal F, ideal Q, poly q, kStrategy strat, int lazyReduce);
 ideal kNF2 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulo2m.cc,v 1.2 2006-01-13 18:10:06 wienand Exp $ */
+/* $Id: rmodulo2m.cc,v 1.3 2006-01-16 03:27:10 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo 2^m
 */
@@ -243,8 +243,8 @@ void nr2mSetExp(int m, ring r)
     nr2mExp=0;
     nr2mModul=0;
   }
-  PrintS("Modul: ");
-  Print("%d\n", nr2mModul);
+//  PrintS("Modul: ");
+//  Print("%d\n", nr2mModul);
 }
 
 void nr2mInitExp(int m, ring r)
