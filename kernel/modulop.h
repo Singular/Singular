@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.h,v 1.2 2005-11-02 08:39:36 Singular Exp $ */
+/* $Id: modulop.h,v 1.3 2006-01-16 14:03:43 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
@@ -90,7 +90,7 @@ static inline number npMultM(number a, number b)
 static inline number npMultM(number a, number b)
 {
   long x = (long)npLogTable[(long)a]+npLogTable[(long)b];
-  return (number)npExpTable[x<npPminus1M ? x : x-npPminus1M];
+  return (number)(long)npExpTable[x<npPminus1M ? x : x-npPminus1M];
 }
 #endif
 
