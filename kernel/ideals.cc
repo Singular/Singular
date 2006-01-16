@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.16 2005-08-04 13:59:19 Singular Exp $ */
+/* $Id: ideals.cc,v 1.17 2006-01-16 14:04:30 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -904,7 +904,7 @@ static poly pDivByT (poly * p,int size)
     pSetCoeff0(resultp,pGetCoeff(*p));
     pSetm(resultp);
     pp = (*p)->next;
-    omFreeSize((ADDRESS)*p,size);
+    omFreeSize((ADDRESS)(*p),size);
     *p = pp;
   }
   return result;
