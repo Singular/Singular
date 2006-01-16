@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.237 2006-01-06 11:31:36 Singular Exp $ */
+/* $Id: extra.cc,v 1.238 2006-01-16 03:28:10 wienand Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -2501,6 +2501,15 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 #endif
 #ifdef HAVE_RING2TOM
 /*==================== ring-GB ==================================*/
+    if (strcmp(sys_cmd, "findZeroPoly")==0)
+    {
+      ring r = currRing;
+      poly f = (poly) h->Data();
+      res->rtyp=POLY_CMD;
+      res->data=(poly) kFindZeroPoly(f, r, r);
+      return(FALSE);
+    }
+    else
     if (strcmp(sys_cmd, "NF_ring")==0)
     {
       ring r = currRing;
