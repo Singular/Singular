@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.13 2006-01-13 18:10:04 wienand Exp $ */
+/* $Id: kutil.cc,v 1.14 2006-01-16 14:02:51 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -1079,67 +1079,64 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR 
   else /*sugarcrit*/
   {
 #ifdef HAVE_PLURAL
-    if (!rIsPluralRing(currRing)) {
-    // if currRing->nc_type!=quasi (or skew)
-#endif
-
-    if(/*(strat->ak==0) && productCrit(p,strat->S[i])*/
-    pHasNotCF(p,strat->S[i]))
+    if (!rIsPluralRing(currRing))
     {
-    /*
-    *the product criterion has applied for (s,p),
-    *i.e. lcm(s,p)=product of the leading terms of s and p.
-    *Suppose (s,r) is in L and the leading term
-    *of p devides lcm(s,r)
-    *(==> the leading term of p devides the leading term of r)
-    *but the leading term of s does not devide the leading term of r
-    *(notice that tis condition is automatically satisfied if r is still
-    *in S), then (s,r) can be canceled.
-    *This should be done here because the
-    *case lcm(s,r)=lcm(s,p) is not covered by chainCrit.
-    */
-      if (!rIsPluralRing(currRing))
+      // if currRing->nc_type!=quasi (or skew)
+#endif
+      if(/*(strat->ak==0) && productCrit(p,strat->S[i])*/
+      pHasNotCF(p,strat->S[i]))
       {
-        strat->cp++;
+      /*
+      *the product criterion has applied for (s,p),
+      *i.e. lcm(s,p)=product of the leading terms of s and p.
+      *Suppose (s,r) is in L and the leading term
+      *of p devides lcm(s,r)
+      *(==> the leading term of p devides the leading term of r)
+      *but the leading term of s does not devide the leading term of r
+      *(notice that tis condition is automatically satisfied if r is still
+      *in S), then (s,r) can be canceled.
+      *This should be done here because the
+      *case lcm(s,r)=lcm(s,p) is not covered by chainCrit.
+      */
+          strat->cp++;
+          pLmFree(Lp.lcm);
+          Lp.lcm=NULL;
+          return;
+      }
+      if (strat->fromT && (strat->ecartS[i]>ecart))
+      {
         pLmFree(Lp.lcm);
         Lp.lcm=NULL;
         return;
+        /*the pair is (s[i],t[.]), discard it if the ecart is too big*/
       }
-    }
-    if (strat->fromT && (strat->ecartS[i]>ecart))
-    {
-      pLmFree(Lp.lcm);
-      Lp.lcm=NULL;
-      return;
-      /*the pair is (s[i],t[.]), discard it if the ecart is too big*/
-    }
-    /*
-    *the set B collects the pairs of type (S[j],p)
-    *suppose (r,p) is in B and (s,p) is the new pair and lcm(s,p)#lcm(r,p)
-    *if the leading term of s devides lcm(r,p) then (r,p) will be canceled
-    *if the leading term of r devides lcm(s,p) then (s,p) will not enter B
-    */
-    for(j = strat->Bl;j>=0;j--)
-    {
-      compare=pDivComp(strat->B[j].lcm,Lp.lcm);
-      if (compare==1)
+      /*
+      *the set B collects the pairs of type (S[j],p)
+      *suppose (r,p) is in B and (s,p) is the new pair and lcm(s,p)#lcm(r,p)
+      *if the leading term of s devides lcm(r,p) then (r,p) will be canceled
+      *if the leading term of r devides lcm(s,p) then (s,p) will not enter B
+      */
+      for(j = strat->Bl;j>=0;j--)
       {
-        strat->c3++;
-        if ((strat->fromQ==NULL) || (isFromQ==0) || (strat->fromQ[i]==0))
+        compare=pDivComp(strat->B[j].lcm,Lp.lcm);
+        if (compare==1)
         {
-          pLmFree(Lp.lcm);
-          return;
+          strat->c3++;
+          if ((strat->fromQ==NULL) || (isFromQ==0) || (strat->fromQ[i]==0))
+          {
+            pLmFree(Lp.lcm);
+            return;
+          }
+          break;
         }
-        break;
-      }
-      else
-      if (compare ==-1)
-      {
-        deleteInL(strat->B,&strat->Bl,j,strat);
-        strat->c3++;
+        else
+        if (compare ==-1)
+        {
+          deleteInL(strat->B,&strat->Bl,j,strat);
+          strat->c3++;
+        }
       }
     }
-  }
 #ifdef HAVE_PLURAL
   }
 #endif

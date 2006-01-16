@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.17 2006-01-13 18:10:05 wienand Exp $ */
+/* $Id: polys1.cc,v 1.18 2006-01-16 14:02:51 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -1035,7 +1035,8 @@ void pCleardenom(poly ph)
   poly p;
 
 #ifdef HAVE_RING2TOM
-  if (currRing->cring == 1) {
+  if (currRing->cring == 1)
+  {
     pContent(ph);
     return;
   }

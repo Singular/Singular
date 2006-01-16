@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.6 2006-01-16 03:27:10 wienand Exp $ */
+/* $Id: kstd2.cc,v 1.7 2006-01-16 14:02:51 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -163,15 +163,18 @@ int kRingFindDivisibleByInS(const polyset &S, const unsigned long* sev, const in
 }
 */
 
-long factorial(long arg) {
-   long tmp = 1;
-   for (int i = 2; i < arg + 1; i++) {
+long factorial(long arg)
+{
+   long tmp = 1; arg++;
+   for (int i = 2; i < arg; i++)
+   {
      tmp = tmp * i;
    }
    return tmp;
 }
 
-poly kFindZeroPoly(poly input_p, ring leadRing, ring tailRing) {
+poly kFindZeroPoly(poly input_p, ring leadRing, ring tailRing)
+{
   // m = currRing->ch
 
   if (input_p == NULL) return NULL;
@@ -184,15 +187,18 @@ poly kFindZeroPoly(poly input_p, ring leadRing, ring tailRing) {
   long a = (long) pGetCoeff(p);
   long k = 1;
 
-  while (a%2 == 0) {
+  while (a%2 == 0)
+  {
     a = a / 2;
     a_ind2++;
   }
 
-  for (int i = 1; i <= leadRing->N; i++) {
+  for (int i = 1; i <= leadRing->N; i++)
+  {
     a = factorial(pGetExp(p, i));
     k = k * a;
-    while (a%2 == 0) {
+    while (a%2 == 0)
+    {
       a = a / 2;
       k_ind2++;
     }
@@ -201,18 +207,23 @@ poly kFindZeroPoly(poly input_p, ring leadRing, ring tailRing) {
 
   number tmp1;
   poly tmp2, tmp3;
-  if (leadRing->ch <= k_ind2 + a_ind2) {
+  if (leadRing->ch <= k_ind2 + a_ind2)
+  {
     zeroPoly = p_ISet(a, tailRing);
-    for (int i = 1; i <= leadRing->N; i++) {
-      for (long j = 1; j <= pGetExp(p, i); j++) {
+    for (int i = 1; i <= leadRing->N; i++)
+    {
+      for (long j = 1; j <= pGetExp(p, i); j++)
+      {
         tmp1 = nInit(j);
         tmp2 = p_ISet(1, tailRing);
         p_SetExp(tmp2, i, 1, tailRing);
         p_Setm(tmp2, tailRing);
-        if (nIsZero(tmp1)) {
+        if (nIsZero(tmp1))
+        {
           zeroPoly = p_Mult_q(zeroPoly, tmp2, tailRing);
         }
-        else {
+        else
+        {
           tmp3 = p_ISet((long) tmp1, tailRing);
           zeroPoly = p_Mult_q(zeroPoly, p_Add_q(tmp2, tmp3, tailRing), tailRing);
         }
@@ -220,25 +231,29 @@ poly kFindZeroPoly(poly input_p, ring leadRing, ring tailRing) {
     }
     zeroPoly = p_LmDeleteAndNext(zeroPoly, tailRing);
     tmp2 = pISet(a);
-    for (int i = 1; i <= leadRing->N; i++) {
+    for (int i = 1; i <= leadRing->N; i++)
+    {
       pSetExp(tmp2, i, pGetExp(p, i));
     }
     pSetm(tmp2);
     pNext(tmp2) = zeroPoly;
     return tmp2;
   }
-  if (leadRing->ch - k_ind2 <= a_ind2) {
-    PrintS("Case not implented yet !!!"); PrintLn();
-    PrintS("But it should not mae any difference."); PrintLn();
+  if (leadRing->ch - k_ind2 <= a_ind2)
+  {
+    PrintS("Case not implented yet !!!\n");
+    PrintS("But it should not mae any difference.\n");
     return zeroPoly;
   }
   return NULL;
 }
 
-poly kFindDivisibleByZeroPoly(LObject* h) {
+poly kFindDivisibleByZeroPoly(LObject* h)
+{
   return kFindZeroPoly(h->GetLmCurrRing(), currRing, h->tailRing);
 }
 
+#ifdef HAVE_RING2TOM
 /*2
 *  reduction procedure for the ring Z/2^m
 */
@@ -252,23 +267,25 @@ int redRing2toM (LObject* h,kStrategy strat)
   int pass = 0;
   poly zeroPoly;
 
-#ifdef HAVE_RING2TOM
+//#ifdef HAVE_RING2TOM
   h->SetpFDeg();
   assume(h->pFDeg() == h->FDeg);
-  if (h->pFDeg() != h->FDeg) {
+  if (h->pFDeg() != h->FDeg)
+  {
     Print("h->pFDeg()=%d =!= h->FDeg=%d\n", h->pFDeg(), h->FDeg);
   }
   long reddeg = h->SetpFDeg();
-#else
-  assume(h->pFDeg() == h->FDeg);
-  long reddeg = h->GetpFDeg();
-#endif
+//#else
+//  assume(h->pFDeg() == h->FDeg);
+//  long reddeg = h->GetpFDeg();
+//#endif
 
   h->SetShortExpVector();
   loop
   {
     zeroPoly = kFindDivisibleByZeroPoly(h);
-    if (zeroPoly != NULL) {
+    if (zeroPoly != NULL)
+    {
 #ifdef KDEBUG
       if (TEST_OPT_DEBUG)
       {
@@ -287,7 +304,8 @@ int redRing2toM (LObject* h,kStrategy strat)
       enterT(tmp_h, strat, strat->tl + 1);
       j = strat->tl;
     }
-    else {
+    else
+    {
       j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h);
       if (j < 0) return 1;
 #ifdef KDEBUG
@@ -358,6 +376,7 @@ int redRing2toM (LObject* h,kStrategy strat)
     }
   }
 }
+#endif
 #endif
 
 /*2

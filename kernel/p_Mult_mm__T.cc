@@ -6,7 +6,7 @@
  *  Purpose: template for p_Mult_n
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Mult_mm__T.cc,v 1.2 2006-01-13 18:10:05 wienand Exp $
+ *  Version: $Id: p_Mult_mm__T.cc,v 1.3 2006-01-16 14:02:51 Singular Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -35,13 +35,16 @@ LINKAGE poly p_Mult_mm(poly p, const poly m, const ring ri)
     pn = pGetCoeff(p);
     number tmp = n_Mult(ln, pn, ri);
 #ifdef HAVE_RING2TOM
-    if (n_IsZero(tmp, ri)) {
-      if (before == p) {
+    if (n_IsZero(tmp, ri))
+    {
+      if (before == p)
+      {
         p = pNext(p);
         before = p;
         q = p;
       }
-      else {
+      else
+      {
         pNext(before) = pNext(p);
         p_LmFree(p, ri);
         p = pNext(before);
