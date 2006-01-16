@@ -268,8 +268,8 @@ install-root:
 cygwin-dist-src singular-base-${CYGWIN_PORT_VER}-src.tar.bz2:
 	-rm -rf ${TMPDIR}
 	${MKINSTALLDIRS} ${TMPDIR}/singular-${CYGWIN_PORT_VER}
-	export CVS_RSH=ssh; export CVSROOT=:ext:wienand@urmel-g.mathematik.uni-kl.de:/usr/local/Singular/cvsroot; \
-	cd ${TMPDIR}/singular-${CYGWIN_PORT_VER}; cvs co All; rm -rf modules
+	export CVS_RSH=ssh; export CVSROOT=:ext:wienand@monty.mathematik.uni-kl.de:/usr/local/Singular/cvsroot; \
+	cd ${TMPDIR}/singular-${CYGWIN_PORT_VER}; cvs co All; 
 	cd  ${TMPDIR}; \
 	tar cjf singular-base-${CYGWIN_PORT_VER}-src.tar.bz2 singular-${CYGWIN_PORT_VER};
 	mv ${TMPDIR}/singular-base-${CYGWIN_PORT_VER}-src.tar.bz2 .
