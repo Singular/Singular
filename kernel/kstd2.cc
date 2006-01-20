@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.7 2006-01-16 14:02:51 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.8 2006-01-20 01:15:07 wienand Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -163,6 +163,16 @@ int kRingFindDivisibleByInS(const polyset &S, const unsigned long* sev, const in
 }
 */
 
+long twoPow(long arg) {
+  long t = arg;
+  long result = 1;
+  while (t > 0) {
+    result = 2 * result;
+    t--;
+  }
+  return result;
+}
+
 long factorial(long arg)
 {
    long tmp = 1; arg++;
@@ -193,9 +203,9 @@ poly kFindZeroPoly(poly input_p, ring leadRing, ring tailRing)
     a_ind2++;
   }
 
-  for (int i = 1; i <= leadRing->N; i++)
+  for (int i = 1; i <= leadRing->N; i++) 
   {
-    a = factorial(pGetExp(p, i));
+    a = factorial(p_GetExp(p, i, leadRing));
     k = k * a;
     while (a%2 == 0)
     {
@@ -212,7 +222,7 @@ poly kFindZeroPoly(poly input_p, ring leadRing, ring tailRing)
     zeroPoly = p_ISet(a, tailRing);
     for (int i = 1; i <= leadRing->N; i++)
     {
-      for (long j = 1; j <= pGetExp(p, i); j++)
+      for (long j = 1; j <= p_GetExp(p, i,leadRing); j++)
       {
         tmp1 = nInit(j);
         tmp2 = p_ISet(1, tailRing);
@@ -229,21 +239,41 @@ poly kFindZeroPoly(poly input_p, ring leadRing, ring tailRing)
         }
       }
     }
-    zeroPoly = p_LmDeleteAndNext(zeroPoly, tailRing);
-    tmp2 = pISet(a);
-    for (int i = 1; i <= leadRing->N; i++)
-    {
-      pSetExp(tmp2, i, pGetExp(p, i));
+    tmp2 = p_ISet((long) pGetCoeff(zeroPoly), leadRing);
+    for (int i = 1; i <= leadRing->N; i++) {
+      pSetExp(tmp2, i, p_GetExp(zeroPoly, i, leadRing));
     }
-    pSetm(tmp2);
+    p_Setm(tmp2, leadRing);
+    zeroPoly = p_LmDeleteAndNext(zeroPoly, tailRing);
     pNext(tmp2) = zeroPoly;
     return tmp2;
   }
-  if (leadRing->ch - k_ind2 <= a_ind2)
-  {
-    PrintS("Case not implented yet !!!\n");
-    PrintS("But it should not mae any difference.\n");
-    return zeroPoly;
+  long alpha_k = twoPow(leadRing->ch - k_ind2);
+  if (alpha_k <= a) {
+    zeroPoly = p_ISet((a / alpha_k)*alpha_k, tailRing);
+    for (int i = 1; i <= leadRing->N; i++) {
+      for (long j = 1; j <= p_GetExp(p, i, leadRing); j++) {
+        tmp1 = nInit(j);
+        tmp2 = p_ISet(1, tailRing);
+        p_SetExp(tmp2, i, 1, tailRing);
+        p_Setm(tmp2, tailRing);
+        if (nIsZero(tmp1)) {
+          zeroPoly = p_Mult_q(zeroPoly, tmp2, tailRing);
+        }
+        else {
+          tmp3 = p_ISet((long) tmp1, tailRing);
+          zeroPoly = p_Mult_q(zeroPoly, p_Add_q(tmp2, tmp3, tailRing), tailRing);
+        }
+      }
+    }
+    tmp2 = p_ISet((long) pGetCoeff(zeroPoly), leadRing);
+    for (int i = 1; i <= leadRing->N; i++) {
+      pSetExp(tmp2, i, p_GetExp(zeroPoly, i, leadRing));
+    }
+    p_Setm(tmp2, leadRing);
+    zeroPoly = p_LmDeleteAndNext(zeroPoly, tailRing);
+    pNext(tmp2) = zeroPoly;
+    return tmp2;
   }
   return NULL;
 }
@@ -283,7 +313,7 @@ int redRing2toM (LObject* h,kStrategy strat)
   h->SetShortExpVector();
   loop
   {
-    zeroPoly = kFindDivisibleByZeroPoly(h);
+    zeroPoly = NULL;// kFindDivisibleByZeroPoly(h);
     if (zeroPoly != NULL)
     {
 #ifdef KDEBUG

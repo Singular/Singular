@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.14 2006-01-16 14:02:51 Singular Exp $ */
+/* $Id: kutil.cc,v 1.15 2006-01-20 01:15:07 wienand Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -1078,6 +1078,9 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR 
   }
   else /*sugarcrit*/
   {
+#ifdef HAVE_RING2TOM
+    if (currRing->cring == 0) {
+#endif
 #ifdef HAVE_PLURAL
     if (!rIsPluralRing(currRing))
     {
@@ -1138,6 +1141,9 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR 
       }
     }
 #ifdef HAVE_PLURAL
+  }
+#endif
+#ifdef HAVE_RING2TOM
   }
 #endif
   /*
