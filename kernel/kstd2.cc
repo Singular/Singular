@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.8 2006-01-20 01:15:07 wienand Exp $ */
+/* $Id: kstd2.cc,v 1.9 2006-01-22 04:29:37 wienand Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -163,6 +163,7 @@ int kRingFindDivisibleByInS(const polyset &S, const unsigned long* sev, const in
 }
 */
 
+/* now in kutil.cc
 long twoPow(long arg) {
   long t = arg;
   long result = 1;
@@ -172,6 +173,7 @@ long twoPow(long arg) {
   }
   return result;
 }
+*/
 
 long factorial(long arg)
 {
@@ -241,7 +243,7 @@ poly kFindZeroPoly(poly input_p, ring leadRing, ring tailRing)
     }
     tmp2 = p_ISet((long) pGetCoeff(zeroPoly), leadRing);
     for (int i = 1; i <= leadRing->N; i++) {
-      pSetExp(tmp2, i, p_GetExp(zeroPoly, i, leadRing));
+      pSetExp(tmp2, i, p_GetExp(zeroPoly, i, tailRing));
     }
     p_Setm(tmp2, leadRing);
     zeroPoly = p_LmDeleteAndNext(zeroPoly, tailRing);
@@ -268,7 +270,7 @@ poly kFindZeroPoly(poly input_p, ring leadRing, ring tailRing)
     }
     tmp2 = p_ISet((long) pGetCoeff(zeroPoly), leadRing);
     for (int i = 1; i <= leadRing->N; i++) {
-      pSetExp(tmp2, i, p_GetExp(zeroPoly, i, leadRing));
+      pSetExp(tmp2, i, p_GetExp(zeroPoly, i, tailRing));
     }
     p_Setm(tmp2, leadRing);
     zeroPoly = p_LmDeleteAndNext(zeroPoly, tailRing);
@@ -310,12 +312,16 @@ int redRing2toM (LObject* h,kStrategy strat)
 //  long reddeg = h->GetpFDeg();
 //#endif
 
-  h->SetShortExpVector();
+  h->SetShortExpVector(); 
   loop
   {
-    zeroPoly = NULL;// kFindDivisibleByZeroPoly(h);
+    zeroPoly = kFindDivisibleByZeroPoly(h);
     if (zeroPoly != NULL)
     {
+      if (TEST_OPT_PROT)
+      {
+        PrintS("z");
+      }
 #ifdef KDEBUG
       if (TEST_OPT_DEBUG)
       {
@@ -330,6 +336,17 @@ int redRing2toM (LObject* h,kStrategy strat)
       strat->initEcart(&tmp_h);
       tmp_h.sev = pGetShortExpVector(tmp_h.p);
       tmp_h.SetpFDeg();
+/*      if (TEST_OPT_PROT)
+      {
+        tstcount ++;
+        if (tstcount > 49)
+        {
+          PrintLn();
+          p_wrp(zeroPoly,currRing);
+          PrintLn();
+          tstcount = 0;
+        }
+      } */
 
       enterT(tmp_h, strat, strat->tl + 1);
       j = strat->tl;

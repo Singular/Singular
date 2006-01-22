@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.10 2006-01-16 03:27:10 wienand Exp $ */
+/* $Id: kutil.h,v 1.11 2006-01-22 04:29:37 wienand Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -390,6 +390,7 @@ poly redNFTail (poly h,const int sl,kStrategy strat);
 int redHoney (LObject* h, kStrategy strat);
 #ifdef HAVE_RING2TOM
 int redRing2toM (LObject* h,kStrategy strat);
+long twoPow(long arg);
 #endif
 int redLazy (LObject* h,kStrategy strat);
 int redHomog (LObject* h,kStrategy strat);

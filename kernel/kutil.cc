@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.15 2006-01-20 01:15:07 wienand Exp $ */
+/* $Id: kutil.cc,v 1.16 2006-01-22 04:29:37 wienand Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -1004,7 +1004,7 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR 
 
   pLcm(p,strat->S[i],Lp.lcm);
   pSetm(Lp.lcm);
-#ifdef HAVE_RING2TOM
+#ifdef HAVE_RING2TOM_DEACT
   if (strat->sugarCrit && currRing->cring == 0)
 #else
   if (strat->sugarCrit)
@@ -1078,7 +1078,7 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR 
   }
   else /*sugarcrit*/
   {
-#ifdef HAVE_RING2TOM
+#ifdef HAVE_RING2TOM_DEACT
     if (currRing->cring == 0) {
 #endif
 #ifdef HAVE_PLURAL
@@ -1143,7 +1143,7 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR 
 #ifdef HAVE_PLURAL
   }
 #endif
-#ifdef HAVE_RING2TOM
+#ifdef HAVE_RING2TOM_DEACT
   }
 #endif
   /*
@@ -1594,12 +1594,80 @@ void initenterpairs (poly h,int k,int ecart,int isFromQ,kStrategy strat, int atR
   }
 }
 
+long twoPow(long arg) {
+  long t = arg;
+  long result = 1;
+  while (t > 0) {
+    result = 2 * result;
+    t--;
+  }
+  return result;
+}
+
 /*2
 *(s[0],h),...,(s[k],h) will be put to the pairset L(via initenterpairs)
 *superfluous elements in S will be deleted
 */
 void enterpairs (poly h,int k,int ecart,int pos,kStrategy strat, int atR)
 {
+#ifdef HAVE_RING2TOM
+  // enter also zero divisor * poly, if this is non zero and of smaller degree
+  if (currRing->cring == 1)
+  {
+    if (((long) ((h)->coef)) % 2 == 0)
+    {
+      long a = ((long) ((h)->coef)) / 2;
+      long b = currRing->ch - 1;
+      poly p = p_Copy(h->next, strat->tailRing);
+      while (a % 2 == 0)
+      {
+        a = a / 2;
+        b--;
+      }
+      p = p_Mult_nn(p, (number) twoPow(b), strat->tailRing);
+
+      if (p != NULL)
+      {
+        if (TEST_OPT_PROT)
+        {
+          PrintS("Z");
+        }
+        poly tmp = p_ISet((long) ((p)->coef), currRing);
+        for (int i = 1; i <= currRing->N; i++) {
+          pSetExp(tmp, i, p_GetExp(p, i, strat->tailRing));
+        }
+        p_Setm(tmp, currRing);
+        p = p_LmDeleteAndNext(p, strat->tailRing);
+        pNext(tmp) = p;
+
+        LObject h;
+        h.p = tmp;
+        h.tailRing = strat->tailRing;
+        if (TEST_OPT_INTSTRATEGY)
+        {
+          //pContent(h.p);
+          h.pCleardenom(); // also does a pContent
+        }
+        else
+        {
+          h.pNorm();
+        }
+        strat->initEcart(&h);
+        int posx;
+        if (h.p!=NULL)
+        {
+          if (strat->Ll==-1)
+            posx =0;
+          else
+              posx = strat->posInL(strat->L,strat->Ll,&h,strat);
+          h.sev = pGetShortExpVector(h.p);
+          h.t_p = k_LmInit_currRing_2_tailRing(h.p, strat->tailRing);
+          enterL(&strat->L,&strat->Ll,&strat->Lmax,h,posx);
+        }
+      }
+    }
+  }
+#endif
   int j=pos;
 
   initenterpairs(h,k,ecart,0,strat, atR);
@@ -3277,7 +3345,7 @@ void initSL (ideal F, ideal Q,kStrategy strat)
         if (strat->Ll==-1)
           pos =0;
         else
-            pos = strat->posInL(strat->L,strat->Ll,&h,strat);
+          pos = strat->posInL(strat->L,strat->Ll,&h,strat);
         h.sev = pGetShortExpVector(h.p);
         enterL(&strat->L,&strat->Ll,&strat->Lmax,h,pos);
       }
