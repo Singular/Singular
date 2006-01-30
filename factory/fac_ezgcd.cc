@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_ezgcd.cc,v 1.25 2005-12-16 11:21:30 Singular Exp $ */
+/* $Id: fac_ezgcd.cc,v 1.26 2006-01-30 09:06:18 pohl Exp $ */
 
 #include <config.h>
 
@@ -16,8 +16,6 @@
 #include "fac_distrib.h"
 #include "ftmpl_functions.h"
 
-//#define OPTIMALVAR 1
-
 static void findeval( const CanonicalForm & F, const CanonicalForm & G, CanonicalForm & Fb, CanonicalForm & Gb, CanonicalForm & Db, REvaluation & b, int delta, int degF, int degG );
 
 static CanonicalForm ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b, bool internal );
@@ -28,30 +26,12 @@ static modpk findBound ( const CanonicalForm & F, const CanonicalForm & G, const
 
 static modpk enlargeBound ( const CanonicalForm & F, const CanonicalForm & Lb, const CanonicalForm & Db, const modpk & pk );
 
-#ifdef OPTIMALVAR
-static Variable ezgcd_getOptimalVar( const CanonicalForm & FF, const CanonicalForm & GG );
-
-
-CanonicalForm ezgcd( const CanonicalForm & FF, const CanonicalForm & GG )
-{
-  CanonicalForm F,G;
-  REvaluation b;
-  Variable Z=ezgcd_getOptimalVar(FF,GG);
-//Test:  return Z;
-  if(Z==Variable(1))
-     return ezgcd( FF, GG, b, false );
-  F=swapvar(FF,Z,Variable(1));
-  G=swapvar(GG,Z,Variable(1));
-  return swapvar(ezgcd( F, G, b, false ),Z,Variable(1));
-}
-#else
 CanonicalForm
 ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG )
 {
     REvaluation b;
     return ezgcd( FF, GG, b, false );
 }
-#endif
 
 static CanonicalForm
 ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b, bool internal )
@@ -389,55 +369,3 @@ findBound ( const CanonicalForm & F, const CanonicalForm & G, const CanonicalFor
     }
     return modpk( p, i );
 }
-
-#ifdef OPTIMALVAR
-static Variable ezgcd_getOptimalVar( const CanonicalForm & FF, const CanonicalForm & GG )
-{
-  int ii,tt,d,s,dd,so;
-  CanonicalForm F,G;
-  Variable opt=Variable(1);
-  tt=FF.level();
-  if(GG.level()<tt)
-    tt=GG.level();
-  if(tt<3 /*(FF.level()<3)||(GG.level()<3)*/)
-    return opt;
-  REvaluation bz=REvaluation(2,tmax(FF.level(),GG.level()),IntRandom(1));
-  CanonicalForm Fbz=bz(FF);
-  CanonicalForm Gbz=bz(GG);
-  CanonicalForm Dbz0=gcd(Fbz,Gbz);
-  dd=degree(Dbz0);
-  so=-1;
-  for(ii=2;ii<=tt;ii++)
-  {
-    //bz.nextpoint();
-    F=swapvar(FF,Variable(ii),Variable(1));
-    G=swapvar(GG,Variable(ii),Variable(1));
-    Fbz=bz(F);
-    Gbz=bz(G);
-    CanonicalForm Dbz=gcd(Fbz,Gbz);
-    d=degree(Dbz);
-    if(d==dd)
-    {
-      s=size(Dbz);
-      if (so==-1)
-      {
-        so=size(Dbz0); 
-      }
-      if(s>so)
-      {
-        so=s;
-        opt=Variable(ii);
-        Dbz0=Dbz;
-      }
-    }
-    else if(d>dd)
-    {
-      dd=d;
-      so=-1;
-      opt=Variable(ii);
-      Dbz0=Dbz;
-    }
-  }
-  return opt;
-}
-#endif
