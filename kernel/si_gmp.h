@@ -1,9 +1,9 @@
-/* $Id: si_gmp.h,v 1.2 2005-07-29 10:57:49 Singular Exp $ */
+/* $Id: si_gmp.h,v 1.3 2006-01-31 16:32:43 Singular Exp $ */
 
 #ifndef INCL_CF_GMP_H
 #define INCL_CF_GMP_H
 
-#ifdef __cplusplus
+#if defined(__cplusplus) && defined(__GNUC__)
 extern "C" {
 #undef __cplusplus
 #include <gmp.h>
