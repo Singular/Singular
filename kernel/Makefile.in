@@ -418,13 +418,13 @@ endif
 ## compiler and linker options for debug version
 ##
 
-CCG		= gcc
-CXXG		= gcc
+CCG		= ${CC}
+CXXG		= ${CXX}
 CXXM		= gcc -MM -MG -DGENERATE_DEPEND
 CCM		= gcc -MM -MG -DGENERATE_DEPEND
 
-CFLAGSG		= -g -Wall -Wno-unused ${PIPE}
-CXXFLAGSG	= -g -Wall -Wno-unused ${PIPE}
+CFLAGSG		= -g ${PIPE}
+CXXFLAGSG	= -g ${PIPE}
 CXXTEMPLFLAGSG	= -fno-implicit-templates
 DEFSG		= -D@SING_UNAME@ @DEFS@ -DDL_TAIL=$(DL_TAILG)
 
