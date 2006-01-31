@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_gcd.cc,v 1.36 2005-12-12 15:42:36 Singular Exp $ */
+/* $Id: cf_gcd.cc,v 1.37 2006-01-31 09:42:23 pohl Exp $ */
 
 #include <config.h>
 
@@ -426,7 +426,13 @@ static CanonicalForm
 gcd_poly ( const CanonicalForm & f, const CanonicalForm & g, bool modularflag )
 {
     if ( getCharacteristic() != 0 ) {
-        return gcd_poly1( f, g, false );
+        if (! ( f.isUnivariate() && g.isUnivariate() ) ) {
+            CFMap M, N;
+            compress( f, g, M, N );
+            return N( gcd_poly1( M(f), M(g), false ) );
+        }
+        else
+            return gcd_poly1( f, g, false );
     }
     else if ( isOn( SW_USE_EZGCD ) && ! ( f.isUnivariate() && g.isUnivariate() ) ) {
         CFMap M, N;
