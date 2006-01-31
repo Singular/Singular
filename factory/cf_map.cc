@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_map.cc,v 1.12 2000-05-29 15:05:21 Singular Exp $ */
+/* $Id: cf_map.cc,v 1.13 2006-01-31 09:40:48 pohl Exp $ */
 
 //{{{ docu
 //
@@ -305,10 +305,55 @@ compress ( const CFArray & a, CFMap & M, CFMap & N )
 }
 //}}}
 
+/*
+*  compute positions p1 and pe of optimal variables:
+*    pe is used in "ezgcd" and
+*    p1 in "gcd_poly1"
+*/
+static
+void optvalues ( const int * df, const int * dg, const int n, int & p1, int &pe )
+{
+    int i, o1, oe;
+    i = p1 = pe = 0;
+    do
+    {
+        i++;
+        if ( i > n ) return;
+    } while ( ( df[i] == 0 ) || ( dg[i] == 0 ) );
+    p1 = pe = i;
+    if ( df[i] > dg[i] )
+    {
+        o1 = df[i]; oe = dg[i];
+    }
+    else
+    {
+        o1 = dg[i]; oe = df[i];
+    }
+    while ( i < n )
+    {
+        i++;
+        if ( ( df[i] != 0 ) && ( dg[i] != 0 ) )
+        {
+            if ( df[i] > dg[i] )
+            {
+                if ( o1 >= df[i]) { o1 = df[i]; p1 = i; }
+                if ( oe < dg[i]) { oe = dg[i]; pe = i; }
+            }
+            else
+            {
+                if ( o1 >= dg[i]) { o1 = dg[i]; p1 = i; }
+                if ( oe < df[i]) { oe = df[i]; pe = i; }
+            }
+        }
+    }
+}
+
+
 //{{{ void compress ( const CanonicalForm & f, const CanonicalForm & g, CFMap & M, CFMap & N )
 //{{{ docu
 //
-// compress() - compress the variables occurring in f and g.
+// compress() - compress the variables occurring in f and g with respect
+// to optimal variables
 //
 // Compress the polynomial variables occurring in f and g so that
 // the levels of variables common to f and g are ordered without
@@ -316,13 +361,14 @@ compress ( const CFArray & a, CFMap & M, CFMap & N )
 // in only one of f or g are moved to levels higher than the
 // levels of the common variables.  Return the CFMap M to realize
 // the compression and its inverse, the CFMap N.
+// N needs only variables common to f and g.
 //
 //}}}
 void
 compress ( const CanonicalForm & f, const CanonicalForm & g, CFMap & M, CFMap & N )
 {
     int n = tmax( f.level(), g.level() );
-    int i, k, m;
+    int i, k, p1, pe;
     int * degsf = new int[n+1];
     int * degsg = new int[n+1];
 
@@ -332,21 +378,42 @@ compress ( const CanonicalForm & f, const CanonicalForm & g, CFMap & M, CFMap & 
 
     degsf = degrees( f, degsf );
     degsg = degrees( g, degsg );
-    i = 1; k = 1; m = n;
+    optvalues( degsf, degsg, n, p1, pe );
+    
+    i = 1; k = 1;
+    if ( pe > 1 ){
+	M.newpair( Variable(pe), Variable(k) );
+	N.newpair( Variable(k), Variable(pe) );
+        k++;
+    }
     while ( i <= n ) {
 	if ( degsf[i] > 0 && degsg[i] > 0 ) {
-	    // store common variables at the beginning
-	    if ( i != k ) {
+	    if ( ( i != k ) && ( i != pe ) && ( i != p1 ) ) {
 		M.newpair( Variable(i), Variable(k) );
 		N.newpair( Variable(k), Variable(i) );
 	    }
 	    k++;
 	}
-	else {
-	    // all others at the end
-	    M.newpair( Variable(i), Variable(m) );
-	    N.newpair( Variable(m), Variable(i) );
-	    m--;
+	i++;
+    }
+    if ( p1 != pe ){
+	M.newpair( Variable(p1), Variable(k) );
+	N.newpair( Variable(k), Variable(p1) );
+        k++;
+    }
+    i = 1;
+    while ( i <= n ) {
+	if ( degsf[i] > 0 && degsg[i] == 0 ) {
+	    if ( i != k ) {
+	        M.newpair( Variable(i), Variable(k) );
+	        k++;
+            }
+	}
+	else if ( degsf[i] == 0 && degsg[i] > 0 ) {
+	    if ( i != k ) {
+	        M.newpair( Variable(i), Variable(k) );
+	        k++;
+            }
 	}
 	i++;
     }
