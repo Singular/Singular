@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: walk.cc,v 1.9 2006-01-05 18:32:19 Singular Exp $ */
+/* $Id: walk.cc,v 1.10 2006-01-31 15:23:38 Singular Exp $ */
 /*
 * ABSTRACT: Implementation of the Groebner walk
 */
@@ -35,7 +35,16 @@
 /* includes */
 
 #include <stdio.h>
-#include <si_gmp.h>
+// === Zeit & System (Holger Croeni ===
+#include <time.h>
+#include <sys/time.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <float.h>
+#include <limits.h>
+#include <sys/types.h>
+
 
 #include "mod2.h"
 #include "intvec.h"
@@ -59,16 +68,6 @@
 /** kstd2.cc */
 #include "kutil.h"
 #include "khstd.h"
-
-// === Zeit & System (Holger Croeni ===
-#include <time.h>
-#include <sys/time.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <float.h>
-#include <limits.h>
-#include <sys/types.h>
 
 #include "walk.h"
 #include "polys.h"
