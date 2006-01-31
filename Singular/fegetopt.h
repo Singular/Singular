@@ -100,7 +100,7 @@ struct fe_option
 #define required_argument        1
 #define optional_argument        2
 
-#if __STDC__ || defined(PROTO) || defined(__cplusplus)
+#if defined(__STDC__) || defined(PROTO) || defined(__cplusplus)
 /* #if defined(__GNU_LIBRARY__)*/
 /* Many other libraries have conflicting prototypes for getopt, with
    differences in the consts, in stdlib.h.  To avoid compilation
