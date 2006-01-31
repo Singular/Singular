@@ -1137,6 +1137,7 @@ list_iterator& list_iterator::extract_element()
 list_iterator& list_iterator::mark_element_done()
 {
   actual->done=TRUE;
+  return *this;
 }
 
 

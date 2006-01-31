@@ -1433,6 +1433,7 @@ BOOLEAN binomial::drop_elimination_variables(const term_ordering& w)
 
 
 #endif  // SUPPORT_DRIVEN_METHODS
+  return TRUE;
 
 }
 
@@ -1518,7 +1519,7 @@ BOOLEAN binomial::drop_last_weighted_variable(const term_ordering& w)
 #endif  // SUPPORT_VARIABLES_LAST
 
 #endif  // SUPPORT_DRIVEN_METHODS
-
+  return TRUE;
 }
 
 
