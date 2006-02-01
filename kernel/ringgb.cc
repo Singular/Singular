@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ringgb.cc,v 1.4 2006-01-16 03:27:10 wienand Exp $ */
+/* $Id: ringgb.cc,v 1.5 2006-02-01 13:49:35 Singular Exp $ */
 /*
 * ABSTRACT: ringgb interface
 */
@@ -110,7 +110,8 @@ BOOLEAN ring2toM_GetLeadTerms(const poly p1, const poly p2, const ring p_r,
   return TRUE;
 }
 
-void printPolyMsg(char * start, poly f, char * end){
+void printPolyMsg(const char * start, poly f, const char * end)
+{
   PrintS(start);
   wrp(f);
   PrintS(end);
