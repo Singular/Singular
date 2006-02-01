@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.4 2005-07-27 09:46:20 Singular Exp $ */
+/* $Id: febase.h,v 1.5 2006-02-01 13:38:45 Singular Exp $ */
 /*
 * ABSTRACT: basic i/o
 */
@@ -111,17 +111,17 @@ extern BOOLEAN feOut;
 extern "C" {
 #endif
 
-void    Werror(char *fmt, ...);
+void    Werror(const char *fmt, ...);
 void    WerrorS(const char *s);
 void    WarnS(const char *s);
-void    Print(char* fmt, ...);
+void    Print(const char* fmt, ...);
 void    PrintLn();
 #ifdef HAVE_TCL
 void    PrintTCLS(const char c, const char * s);
 #else
 #define PrintTCLS(A,B) Print("TCL-ErrS:%s",B)
 #endif
-void    PrintS(char* s);
+void    PrintS(const char* s);
 char*   feGetResource(const char id);
 
 #ifdef HAVE_FEREAD
@@ -218,9 +218,9 @@ inline void PrintTCL(const char c, int l,const char *s)
 #define PrintTCL(A,B,C) Print("TCL-Err:%s",C)
 #endif /* HAVE_TCL */
 
-char *  StringAppend(char *fmt, ...);
-char *  StringAppendS(char *s);
-char *  StringSetS(char* s);
+char *  StringAppend(const char *fmt, ...);
+char *  StringAppendS(const char *s);
+char *  StringSetS(const char* s);
 const  char * VoiceName();
 void    VoiceBackTrack();
 void    Warn(const char *fmt, ...);

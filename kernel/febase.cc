@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.8 2006-01-13 18:10:04 wienand Exp $ */
+/* $Id: febase.cc,v 1.9 2006-02-01 13:38:45 Singular Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -818,7 +818,7 @@ FILE * feFopen(char *path, char *mode, char *where,int useWerror,
 
 static char * feBufferStart;
   /* only used in StringSet(S)/StringAppend(S)*/
-char * StringAppend(char *fmt, ...)
+char * StringAppend(const char *fmt, ...)
 {
   va_list ap;
   char *s = feBufferStart; /*feBuffer + strlen(feBuffer);*/
@@ -862,7 +862,7 @@ char * StringAppend(char *fmt, ...)
   return feBuffer;
 }
 
-char * StringAppendS(char *st)
+char * StringAppendS(const char *st)
 {
   /* feBufferStart is feBuffer + strlen(feBuffer);*/
   int more,l;
@@ -880,7 +880,7 @@ char * StringAppendS(char *st)
   return feBuffer;
 }
 
-char * StringSetS(char *st)
+char * StringSetS(const char *st)
 {
   int more,l;
   if ((l=strlen(st))>feBufferLength)
@@ -955,7 +955,7 @@ void WerrorS(const char *s)
   errorreported = TRUE;
 }
 
-void Werror(char *fmt, ...)
+void Werror(const char *fmt, ...)
 {
   va_list ap;
   va_start(ap, fmt);
@@ -1013,7 +1013,7 @@ void SPrintStart()
   sprint = omStrDup("");
 }
 
-static void SPrintS(char* s)
+static void SPrintS(const char* s)
 {
   omCheckAddr(sprint);
   if (s == NULL) return;
@@ -1041,7 +1041,7 @@ char* SPrintEnd()
 
 // Print routines
 extern "C" {
-void PrintS(char *s)
+void PrintS(const char *s)
 {
   if (sprint != NULL)
   {
@@ -1075,7 +1075,7 @@ void PrintLn()
   PrintS("\n");
 }
 
-void Print(char *fmt, ...)
+void Print(const char *fmt, ...)
 {
   if (sprint != NULL)
   {
@@ -1199,6 +1199,8 @@ FILE* myfopen(char *path, char *mode)
   {
     mmode[i] = mode[i];
     if (mode[i] == '\0') break;
+    if (mode[i] == 'w') done = 1;
+    if (mode[i] == 'a') done = 1;
     if (mode[i] == 'b') done = 1;
   }
 
