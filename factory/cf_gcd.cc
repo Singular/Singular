@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_gcd.cc,v 1.37 2006-01-31 09:42:23 pohl Exp $ */
+/* $Id: cf_gcd.cc,v 1.38 2006-02-01 09:37:07 pohl Exp $ */
 
 #include <config.h>
 
@@ -24,6 +24,7 @@ bool isPurePoly(const CanonicalForm & f);
 #endif
 
 static CanonicalForm gcd_poly( const CanonicalForm & f, const CanonicalForm& g, bool modularflag );
+static CanonicalForm cf_content ( const CanonicalForm & f, const CanonicalForm & g );
 
 bool
 gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g, bool swap )
@@ -429,7 +430,16 @@ gcd_poly ( const CanonicalForm & f, const CanonicalForm & g, bool modularflag )
         if (! ( f.isUnivariate() && g.isUnivariate() ) ) {
             CFMap M, N;
             compress( f, g, M, N );
-            return N( gcd_poly1( M(f), M(g), false ) );
+            CanonicalForm fM = M(f);
+            CanonicalForm gM = M(g);
+            if ( fM.mvar() != gM.mvar() ) {
+                if ( fM.mvar() > gM.mvar() )
+                    return N( cf_content( fM, gM ) );
+                else
+                    return N( cf_content( gM, fM ) );
+            }
+            else
+                return N( gcd_poly1( fM, gM, false ) );
         }
         else
             return gcd_poly1( f, g, false );
