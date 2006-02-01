@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.h,v 1.43 2005-09-24 15:02:07 Singular Exp $ */
+/* $Id: ipshell.h,v 1.44 2006-02-01 13:55:24 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -38,8 +38,8 @@ BOOLEAN iiPStart(idhdl pn, sleftv * sl);
 BOOLEAN iiEStart(char* example, procinfo *pi);
 void    type_cmd(idhdl h);
 void    test_cmd(int i);
-void    list_cmd(int typ, const char* what, char * prefix, BOOLEAN iterate,
-                 BOOLEAN fullname=FALSE);
+void    list_cmd(int typ, const char* what, const char * prefix,
+                 BOOLEAN iterate, BOOLEAN fullname=FALSE);
 //char *  iiStringMatrix(matrix im, int dim, char ch=',');
 void    killlocals(int v);
 int     exprlist_length(leftv v);

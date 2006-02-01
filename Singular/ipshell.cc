@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.133 2006-01-13 16:46:48 wienand Exp $ */
+/* $Id: ipshell.cc,v 1.134 2006-02-01 13:55:24 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -126,7 +126,7 @@ char * iiTwoOps(int t)
   }
 }
 
-static void list1(char* s, idhdl h,BOOLEAN c, BOOLEAN fullname)
+static void list1(const char* s, idhdl h,BOOLEAN c, BOOLEAN fullname)
 {
   char buffer[22];
   int l;
@@ -424,7 +424,7 @@ void killlocals(int v)
 }
 #endif
 
-void list_cmd(int typ, const char* what, char *prefix,BOOLEAN iterate, BOOLEAN fullname)
+void list_cmd(int typ, const char* what, const char *prefix,BOOLEAN iterate, BOOLEAN fullname)
 {
   idhdl h,start;
   BOOLEAN all = typ<0;
