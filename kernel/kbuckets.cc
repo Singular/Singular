@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.cc,v 1.18 2006-01-13 19:35:48 bricken Exp $ */
+/* $Id: kbuckets.cc,v 1.19 2006-02-02 15:12:18 bricken Exp $ */
 
 #include "mod2.h"
 #include "structs.h"
@@ -1184,6 +1184,10 @@ void kBucketSimpleContent(kBucket_pt bucket)
       assume(!(n_IsZero(coef,r)));
     }
   }
+  if (n_IsZero(coef,r)){
+    n_Delete(&coef,r);
+    return;
+    }
   if (TEST_OPT_PROT)
     PrintS("S");
   for(i=0;i<=MAX_BUCKET;i++)
