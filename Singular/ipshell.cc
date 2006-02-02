@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.135 2006-02-01 13:57:02 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.136 2006-02-02 10:11:18 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -93,7 +93,7 @@ char * Tok2Cmdname(int tok)
   return cmds[0].name;
 }
 
-const char * iiTwoOps(int t)
+char * iiTwoOps(int t)
 {
   if (t<127)
   {

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.h,v 1.45 2006-02-01 13:57:02 Singular Exp $ */
+/* $Id: ipshell.h,v 1.46 2006-02-02 10:11:19 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -44,7 +44,7 @@ void    list_cmd(int typ, const char* what, const char * prefix,
 void    killlocals(int v);
 int     exprlist_length(leftv v);
 char *  Tok2Cmdname(int i);
-const char *  iiTwoOps(int t);
+char *  iiTwoOps(int t);
 int     IsPrime(int i);
 
 BOOLEAN iiWRITE(leftv res,leftv exprlist);
