@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: primdec.lib,v 1.108 2005-10-19 15:51:19 Singular Exp $";
+version="$Id: primdec.lib,v 1.109 2006-02-02 10:11:45 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -1869,29 +1869,29 @@ EXAMPLE: example minAssPrimes; shows an example
    ideal ser;
    option(redSB);
    list @pr=facstd(i);
-   if(size(@pr)==1)
-   {
-      attrib(@pr[1],"isSB",1);
-      if((dim(@pr[1])==0)&&(homog(@pr[1])==1))
-      {
-         setring @P;
-         list @res=maxideal(1);
-         return(phi(@res));
-      }
-      if(dim(@pr[1])>1)
-      {
-         setring @P;
-        // kill gnir;
-         execute ("ring gnir1 = ("+charstr(basering)+"),
-                              ("+varstr(basering)+"),(C,lp);");
-         ideal i=fetch(@P,i);
-         list @pr=facstd(i);
-        // ideal ser;
-         setring gnir;
-         @pr=fetch(gnir1,@pr);
-         kill gnir1;
-      }
-   }
+   //if(size(@pr)==1)
+//   {
+//      attrib(@pr[1],"isSB",1);
+//      if((dim(@pr[1])==0)&&(homog(@pr[1])==1))
+//      {
+//         setring @P;
+//         list @res=maxideal(1);
+//         return(phi(@res));
+//      }
+//      if(dim(@pr[1])>1)
+//      {
+//         setring @P;
+//        // kill gnir;
+//         execute ("ring gnir1 = ("+charstr(basering)+"),
+//                              ("+varstr(basering)+"),(C,lp);");
+//         ideal i=fetch(@P,i);
+//         list @pr=facstd(i);
+//        // ideal ser;
+//         setring gnir;
+//         @pr=fetch(gnir1,@pr);
+//         kill gnir1;
+//      }
+//   }
     option(noredSB);
    int j,k,odim,ndim,count;
    attrib(@pr[1],"isSB",1);
@@ -2410,7 +2410,7 @@ proc algeDeco(ideal i, int w)
    int n=nvars(R);
 
 //---Anfang Provisorium
-   if(size(i)==2)
+   if((size(i)==2) && (w==2))
    {
       option(redSB);
       ideal J=std(i);
@@ -2570,7 +2570,9 @@ EXAMPLE: example decomp; shows an example
   {
     if(attrib(i,"isSB")!=1)
     {
-      ltras=mstd(i);
+      //ltras=mstd(i);
+      tras=groebner(i);
+      ltras=tras,tras;
       attrib(ltras[1],"isSB",1);
     }
     else
@@ -3129,6 +3131,8 @@ EXAMPLE: example decomp; shows an example
   if((size(quprimary)==0))
   {
     keepdi=di-1;
+    quprimary[1]=ideal(1);
+    quprimary[2]=ideal(1);
   }
   //---------------------------------------------------------------
   //notice that j=sat(j,gh) intersected with (j,gh^n)
