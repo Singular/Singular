@@ -4,7 +4,7 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id: subexpr.cc,v 1.92 2005-11-04 08:48:34 Singular Exp $ */
+/* $Id: subexpr.cc,v 1.93 2006-02-10 13:12:38 Singular Exp $ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -429,7 +429,7 @@ BOOLEAN sleftv::RingDependend()
   return FALSE;
 }
 
-void * slInternalCopy(leftv source, int t, void *d, Subexpr e)
+static inline void * s_internalCopy(const int t,  void *d)
 {
   switch (t)
   {
@@ -442,24 +442,7 @@ void * slInternalCopy(leftv source, int t, void *d, Subexpr e)
     case MODUL_CMD:
       return  (void *)idCopy((ideal)d);
     case STRING_CMD:
-      if ((e==NULL)
-      || (source->rtyp==LIST_CMD)
-      || ((source->rtyp==IDHDL)&&(IDTYP((idhdl)source->data)==LIST_CMD)))
         return (void *)omStrDup((char *)d);
-      else if (e->next==NULL)
-      {
-        char *s=(char*)omAllocBin(size_two_bin);
-        s[0]=*(char *)d;
-        s[1]='\0';
-        return s;
-      }
-      #ifdef TEST
-      else
-      {
-        Werror("not impl. string-op in `%s`",my_yylinebuf);
-        return NULL;
-      }
-      #endif
     case POINTER_CMD:
       return d;
     case PACKAGE_CMD:
@@ -494,11 +477,37 @@ void * slInternalCopy(leftv source, int t, void *d, Subexpr e)
       break; /* error recovery: do nothing */
     //case COMMAND:
     default:
-      Warn("InternalCopy: cannot copy type %s(%d)",
-            Tok2Cmdname(source->rtyp),source->rtyp);
+      Warn("internalCopy: cannot copy type %s(%d)",
+            Tok2Cmdname(t),t);
 #endif
   }
   return NULL;
+}
+
+void * slInternalCopy(leftv source, const int t, void *d, Subexpr e)
+{
+  if (t==STRING_CMD)
+  {
+      if ((e==NULL)
+      || (source->rtyp==LIST_CMD)
+      || ((source->rtyp==IDHDL)&&(IDTYP((idhdl)source->data)==LIST_CMD)))
+        return (void *)omStrDup((char *)d);
+      else if (e->next==NULL)
+      {
+        char *s=(char*)omAllocBin(size_two_bin);
+        s[0]=*(char *)d;
+        s[1]='\0';
+        return s;
+      }
+      #ifdef TEST
+      else
+      {
+        Werror("not impl. string-op in `%s`",my_yylinebuf);
+        return NULL;
+      }
+      #endif
+  }
+  return s_internalCopy(t,d);
 }
 
 void sleftv::Copy(leftv source)
@@ -508,74 +517,7 @@ void sleftv::Copy(leftv source)
   void *d=source->Data();
   if(!errorreported)
   {
-    switch (rtyp)
-    {
-      case INTVEC_CMD:
-      case INTMAT_CMD:
-        data=(void *)ivCopy((intvec *)d);
-        break;
-      case MATRIX_CMD:
-        data=(void *)mpCopy((matrix)d);
-        break;
-      case IDEAL_CMD:
-      case MODUL_CMD:
-        data= (void *)idCopy((ideal)d);
-        break;
-      case STRING_CMD:
-        data= (void *)omStrDup((char *)d);
-        break;
-      case POINTER_CMD:
-        data=d;
-        break;
-      case PROC_CMD:
-        data= (void *)piCopy((procinfov) d);
-        break;
-      case POLY_CMD:
-      case VECTOR_CMD:
-        data= (void *)pCopy((poly)d);
-        break;
-      case INT_CMD:
-        data= d;
-        break;
-      case NUMBER_CMD:
-        data= (void *)nCopy((number)d);
-        break;
-      case MAP_CMD:
-        data= (void *)maCopy((map)d);
-        break;
-      case LIST_CMD:
-        data= (void *)lCopy((lists)d);
-        break;
-      case LINK_CMD:
-        data = (void *)slCopy((si_link)d);
-        break;
-      case RING_CMD:
-      case QRING_CMD:
-        {
-          if (d!=NULL)
-          {
-            ring r=(ring)d;
-            r->ref++;
-            data=d;
-          }
-          else
-          {
-            WerrorS("invalid ring description");
-          }
-          break;
-        }
-      case RESOLUTION_CMD:
-        data=(void*)syCopy((syStrategy)d);
-        break;
-      #ifdef TEST
-      case DEF_CMD:
-      case NONE:
-        break; /* error recovery: do nothing */
-      //case COMMAND:
-      default:
-        Warn("Copy: cannot copy type %s(%d)",Tok2Cmdname(rtyp),rtyp);
-      #endif
-    }
+    data=s_internalCopy(rtyp,d);
     if ((source->attribute!=NULL)||(source->e!=NULL))
       attribute=source->CopyA();
     if(source->e==NULL)
