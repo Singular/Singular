@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.cc,v 1.19 2006-02-02 15:12:18 bricken Exp $ */
+/* $Id: kbuckets.cc,v 1.20 2006-02-13 09:59:55 bricken Exp $ */
 
 #include "mod2.h"
 #include "structs.h"
@@ -22,6 +22,7 @@
 #define MULTIPLY_BUCKET(B,I) do                                        \
   { if (B->coef[I]!=NULL)                                              \
     {                                                                  \
+      assume(p_IsConstant(b->Coef[i],bucket->bucket->ring));           \
       B->buckets[I]=p_Mult_q(B->buckets[I],B->coef[I],B->bucket_ring); \
       B->coef[I]=NULL;                                                 \
     }                                                                  \
@@ -755,6 +756,7 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
 /// assume (l <= 0 || pLength(p) == l)
 void kBucket_Plus_mm_Mult_pp(kBucket_pt bucket, poly m, poly p, int l)
 {
+    assume((!rIsPluralRing(bucket->bucket_ring))||p_IsConstant(m, bucket->bucket_ring)); 
   assume(l <= 0 || pLength(p) == l);
   int i, l1;
   poly p1 = p;
@@ -1035,6 +1037,7 @@ number kBucketPolyRed(kBucket_pt bucket,
                       poly p1, int l1,
                       poly spNoether)
 {
+  assume((!rIsPluralRing(bucket->bucket_ring))||p_LmEqual(p1,kBucketGetLm(bucket), bucket->bucket_ring)); 
   assume(p1 != NULL &&
          p_DivisibleBy(p1,  kBucketGetLm(bucket), bucket->bucket_ring));
   assume(pLength(p1) == (int) l1);
