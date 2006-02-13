@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.cc,v 1.24 2006-02-13 17:12:28 bricken Exp $ */
+/* $Id: kbuckets.cc,v 1.25 2006-02-13 19:52:26 bricken Exp $ */
 
 #include "mod2.h"
 #include "structs.h"
@@ -106,7 +106,9 @@ BOOLEAN kbTest_i(kBucket_pt bucket, int i)
 
 BOOLEAN kbTest(kBucket_pt bucket)
 {
+  #ifdef HAVE_COEF_BUCKETS
   assume(bucket->coef[0]==NULL);
+  #endif
   int i;
   poly lm = bucket->buckets[0];
 
@@ -157,6 +159,7 @@ BOOLEAN kbTest(kBucket_pt bucket)
         }
       }
     }
+    #ifdef HAVE_COEF_BUCKETS
     if (bucket->coef[i]!=NULL)
     {
       int j;
@@ -169,6 +172,7 @@ BOOLEAN kbTest(kBucket_pt bucket)
         }
       }
     }
+    #endif
   }
   return TRUE;
 }
@@ -207,6 +211,7 @@ void kBucketDeleteAndDestroy(kBucket_pt *bucket_pt)
   int i;
   for (i=0; i<= bucket->buckets_used; i++)
   {
+
     if (bucket->buckets[i] != NULL)
     {
       p_Delete(&(bucket->buckets[i]), bucket->bucket_ring);
@@ -308,7 +313,9 @@ BOOLEAN kBucketIsCleared(kBucket_pt bucket)
   for (i = 0;i<=MAX_BUCKET;i++)
   {
     if (bucket->buckets[i] != NULL) return FALSE;
+    #ifdef HAVE_COEF_BUCKETS
     if (bucket->coef[i] != NULL) return FALSE;
+    #endif
     if (bucket->buckets_length[i] != 0) return FALSE;
   }
   return TRUE;
@@ -327,8 +334,12 @@ void kBucketInit(kBucket_pt bucket, poly lm, int length)
     length = pLength(lm);
 
   bucket->buckets[0] = lm;
+  #ifdef HAVE_COEF_BUCKETS
   assume(bucket->coef[0]==NULL);
+  #endif
+  #ifdef USE_COEF_BUCKETS
   bucket->coef[0]=NULL;
+  #endif
   if (lm!=NULL)
     bucket->buckets_length[0] = 1;
   else
@@ -386,7 +397,9 @@ int kBucketCanonicalize(kBucket_pt bucket)
     bucket->buckets[i] = NULL;
     bucket->buckets_length[i] = 0;
   }
+  #ifdef HAVE_COEF_BUCKETS
   assume(bucket->coef[0]==NULL);
+  #endif
   lm = bucket->buckets[0];
   if (lm != NULL)
   {
@@ -945,9 +958,10 @@ void kBucket_Plus_mm_Mult_pp(kBucket_pt bucket, poly m, poly p, int l)
     bucket->coef[i]=NULL;
     n_Delete(&n,r);
   }
-  #endif
+  
   if ((p1==NULL) && (bucket->coef[i]!=NULL))
     p_Delete(&bucket->coef[i],r);
+#endif
   bucket->buckets_length[i]=l1;
   if (i >= bucket->buckets_used)
     bucket->buckets_used = i;
@@ -1164,6 +1178,7 @@ static BOOLEAN nIsPseudoUnit(number n, ring r){
 
 void kBucketSimpleContent(kBucket_pt bucket)
 {
+  #ifdef USE_COEF_BUCKETS
   ring r=bucket->bucket_ring;
   int i;
   //PrintS("HHHHHHHHHHHHH");
@@ -1239,6 +1254,7 @@ void kBucketSimpleContent(kBucket_pt bucket)
     }
   }
   n_Delete(&coef,r);
+  #endif
 }
 
 
@@ -1249,6 +1265,7 @@ poly kBucketExtractLmOfBucket(kBucket_pt bucket, int i)
   ring r=bucket->bucket_ring;
   poly p=bucket->buckets[i];
   bucket->buckets_length[i]--;
+#ifdef USE_COEF_BUCKETS
   if (bucket->coef[i]!=NULL)
   {
     poly next=pNext(p);
@@ -1270,6 +1287,7 @@ poly kBucketExtractLmOfBucket(kBucket_pt bucket, int i)
     }
   }
   else
+#endif
   {
     bucket->buckets[i]=pNext(bucket->buckets[i]);
     pNext(p)=NULL;

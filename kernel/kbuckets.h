@@ -3,12 +3,12 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.h,v 1.5 2006-01-13 18:10:04 wienand Exp $ */
+/* $Id: kbuckets.h,v 1.6 2006-02-13 19:52:32 bricken Exp $ */
 #include "structs.h"
 #include "p_Procs.h"
 #include "pShallowCopyDelete.h"
 
-#define HAVE_COEF_BUCKETS
+//#define HAVE_COEF_BUCKETS
 
 /////////////////////////////////////////////////////////////////////////
 // configuration
@@ -211,17 +211,23 @@ inline void kBucketAdjustBucketsUsed(kBucket_pt bucket)
 
 inline const poly kBucketGetLm(kBucket_pt bucket)
 {
+  #ifdef   HAVE_COEF_BUCKETS
   assume(bucket->coef[0]==NULL);
+  #endif
   if (bucket->buckets[0] == NULL)
     bucket->bucket_ring->p_Procs->p_kBucketSetLm(bucket);
+  #ifdef  HAVE_COEF_BUCKETS
   assume(bucket->coef[0]==NULL);
+  #endif
   return bucket->buckets[0];
 }
 
 inline poly kBucketExtractLm(kBucket_pt bucket)
 {
   poly lm = kBucketGetLm(bucket);
+  #ifdef   HAVE_COEF_BUCKETS
   assume(bucket->coef[0]==NULL);
+  #endif
   bucket->buckets[0] = NULL;
   bucket->buckets_length[0] = 0;
   
