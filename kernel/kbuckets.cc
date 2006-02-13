@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.cc,v 1.23 2006-02-13 14:54:59 Singular Exp $ */
+/* $Id: kbuckets.cc,v 1.24 2006-02-13 17:12:28 bricken Exp $ */
 
 #include "mod2.h"
 #include "structs.h"
@@ -247,7 +247,7 @@ inline void kBucketMergeLm(kBucket_pt bucket)
       l = l << 2;
     }
 #endif
-#if 0
+#ifndef USE_COEF_BUCKETS
     MULTIPLY_BUCKET(bucket,i);
     pNext(lm) = bucket->buckets[i];
     bucket->buckets[i] = lm;
@@ -256,7 +256,8 @@ inline void kBucketMergeLm(kBucket_pt bucket)
     if (i > bucket->buckets_used)  bucket->buckets_used = i;
     bucket->buckets[0] = NULL;
     bucket->buckets_length[0] = 0;
-#endif
+    kbTest(bucket);
+#else
     if (i > bucket->buckets_used)  bucket->buckets_used = i;
     assume(i!=0);
     if (bucket->buckets[i]!=NULL)
@@ -295,7 +296,9 @@ inline void kBucketMergeLm(kBucket_pt bucket)
     bucket->buckets_length[0] = 0;
     bucket->coef[0]=NULL;
     kbTest(bucket);
+    #endif
   }
+
 }
 
 BOOLEAN kBucketIsCleared(kBucket_pt bucket)
@@ -800,6 +803,7 @@ void kBucket_Plus_mm_Mult_pp(kBucket_pt bucket, poly m, poly p, int l)
   if (i <= bucket->buckets_used && bucket->buckets[i] != NULL)
   {
     //if (FALSE){
+    #ifdef USE_COEF_BUCKETS
     if ((bucket->coef[i]!=NULL) &&(i>=coef_start))
     {
       number orig_coef=p_GetCoeff(bucket->coef[i],r);
@@ -842,6 +846,7 @@ void kBucket_Plus_mm_Mult_pp(kBucket_pt bucket, poly m, poly p, int l)
       p_SetCoeff(m,backup,r); //deletes add_coef
     }
     else
+    #endif
     {
       MULTIPLY_BUCKET(bucket,i);
       p1 = p_Plus_mm_Mult_qq(bucket->buckets[i], m, p1,
@@ -852,6 +857,7 @@ void kBucket_Plus_mm_Mult_pp(kBucket_pt bucket, poly m, poly p, int l)
       i = pLogLength(l1);
     }
   }
+  #ifdef USE_COEF_BUCKETS
   else
   {
     number swap_n=p_GetCoeff(m,r);
@@ -866,10 +872,12 @@ void kBucket_Plus_mm_Mult_pp(kBucket_pt bucket, poly m, poly p, int l)
     //m may not be changed
     p_SetCoeff(m,n_Copy(n,r),r);
   }
+  #endif
 
   while ((bucket->buckets[i] != NULL) && (p1!=NULL))
   {
     assume(i!=0);
+    #ifdef USE_COEF_BUCKETS
     if ((bucket->coef[i]!=NULL) &&(i>=coef_start))
     {
       number orig_coef=p_GetCoeff(bucket->coef[i],r);
@@ -904,14 +912,17 @@ void kBucket_Plus_mm_Mult_pp(kBucket_pt bucket, poly m, poly p, int l)
       assume(l1==pLength(p1));
     }
     else
+    #endif
     {
       //don't do that, pull out gcd
+      #ifdef USE_COEF_BUCKETS
       if(!(n_IsOne(n,r)))
       {
         p1=p_Mult_nn(p1, n, r);
         n_Delete(&n,r);
         n=n_Init(1,r);
       }
+      #endif
       MULTIPLY_BUCKET(bucket,i);
       p1 = p_Add_q(p1, bucket->buckets[i],
                  l1, bucket->buckets_length[i], r);
@@ -922,8 +933,9 @@ void kBucket_Plus_mm_Mult_pp(kBucket_pt bucket, poly m, poly p, int l)
   }
 
   bucket->buckets[i] = p1;
-
+#ifdef USE_COEF_BUCKETS
   assume(bucket->coef[i]==NULL);
+  
   if (!(n_IsOne(n,r)))
   {
     bucket->coef[i]=p_NSet(n,r);
@@ -933,6 +945,7 @@ void kBucket_Plus_mm_Mult_pp(kBucket_pt bucket, poly m, poly p, int l)
     bucket->coef[i]=NULL;
     n_Delete(&n,r);
   }
+  #endif
   if ((p1==NULL) && (bucket->coef[i]!=NULL))
     p_Delete(&bucket->coef[i],r);
   bucket->buckets_length[i]=l1;
