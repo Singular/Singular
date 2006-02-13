@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.cc,v 1.22 2006-02-13 12:37:02 Singular Exp $ */
+/* $Id: kbuckets.cc,v 1.23 2006-02-13 14:54:59 Singular Exp $ */
 
 #include "mod2.h"
 #include "structs.h"
@@ -125,7 +125,7 @@ BOOLEAN kbTest(kBucket_pt bucket)
     {
       dReportError("Bucket %d larger or equal than lm", i);
       if (p_LmCmp(lm, bucket->buckets[i], bucket->bucket_ring) ==0)
-      dReportError("Bucket %d equal to lm", i);
+        dReportError("Bucket %d equal to lm", i);
       return FALSE;
     }
     if (!p_Test(bucket->buckets[i],bucket->bucket_ring))
@@ -143,30 +143,33 @@ BOOLEAN kbTest(kBucket_pt bucket)
       return FALSE;
     }
   }
-  for(i=0;i<=MAX_BUCKET;i++){
-    if (bucket->buckets[i]!=NULL){
-        int j;
-        for(j=i+1;j<=MAX_BUCKET;j++){
-            if (bucket->buckets[j]==bucket->buckets[i])
-                dReportError("Bucket %d %d equal", i,j);
-                return FALSE;
+  for(i=0;i<=MAX_BUCKET;i++)
+  {
+    if (bucket->buckets[i]!=NULL)
+    {
+      int j;
+      for(j=i+1;j<=MAX_BUCKET;j++)
+      {
+        if (bucket->buckets[j]==bucket->buckets[i])
+        {
+          dReportError("Bucket %d %d equal", i,j);
+          return FALSE;
         }
+      }
     }
-    if (bucket->coef[i]!=NULL){
-        int j;
-        for(j=i+1;j<=MAX_BUCKET;j++){
-            if (bucket->coef[j]==bucket->coef[i])
-                dReportError("internal coef %d %d equal", i,j);
-                return FALSE;
+    if (bucket->coef[i]!=NULL)
+    {
+      int j;
+      for(j=i+1;j<=MAX_BUCKET;j++)
+      {
+        if (bucket->coef[j]==bucket->coef[i])
+        {
+          dReportError("internal coef %d %d equal", i,j);
+          return FALSE;
         }
-        for(j=0;j<=MAX_BUCKET;j++){
-            if (bucket->coef[j]==bucket->coef[i])
-                dReportError("internal coef %d equals bucket %d", i,j);
-                return FALSE;
-        }
+      }
     }
   }
-  assume(bucket->buckets_used<=MAX_BUCKET);
   return TRUE;
 }
 
@@ -224,7 +227,7 @@ void kBucketDeleteAndDestroy(kBucket_pt *bucket_pt)
 
 inline void kBucketMergeLm(kBucket_pt bucket)
 {
-
+  kbTest(bucket);
   if (bucket->buckets[0] != NULL)
   {
     poly lm = bucket->buckets[0];
@@ -256,14 +259,16 @@ inline void kBucketMergeLm(kBucket_pt bucket)
 #endif
     if (i > bucket->buckets_used)  bucket->buckets_used = i;
     assume(i!=0);
-    if (bucket->buckets[i]!=NULL){
+    if (bucket->buckets[i]!=NULL)
+    {
        MULTIPLY_BUCKET(bucket,i);
        pNext(lm) = bucket->buckets[i];
        bucket->buckets[i] = lm;
        bucket->buckets_length[i]++;
        assume(i <= bucket->buckets_used+1);
-
-    } else {
+    }
+    else
+    {
       #if 1
        assume(bucket->buckets[i]==NULL);
        assume(bucket->coef[0]==NULL);
@@ -278,13 +283,13 @@ inline void kBucketMergeLm(kBucket_pt bucket)
 
        bucket->buckets[i]=lm;
        bucket->buckets_length[i]=1;
-       #else
+      #else
        MULTIPLY_BUCKET(bucket,i);
        pNext(lm) = bucket->buckets[i];
        bucket->buckets[i] = lm;
        bucket->buckets_length[i]++;
        assume(i <= bucket->buckets_used+1);
-       #endif
+      #endif
     }
     bucket->buckets[0]=NULL;
     bucket->buckets_length[0] = 0;
@@ -350,7 +355,9 @@ int kBucketCanonicalize(kBucket_pt bucket)
   int i;
   bucket->buckets[1] = NULL;
   bucket->buckets_length[1] = 0;
-  assume(bucket->coef[1]==NULL);
+  #ifdef USE_COEF_BUCKETS
+    assume(bucket->coef[1]==NULL);
+  #endif
   ring r=bucket->bucket_ring;
 
 
@@ -397,8 +404,11 @@ int kBucketCanonicalize(kBucket_pt bucket)
     i = 0;
   }
   bucket->buckets_used = i;
-  assume(bucket->coef[0]==NULL);
-  assume(bucket->coef[i]==NULL);
+  assume(bucket->buckets_used <= MAX_BUCKET);
+  #ifdef USE_COEF_BUCKETS
+    assume(bucket->coef[0]==NULL);
+    assume(bucket->coef[i]==NULL);
+  #endif
   assume(pLength(p) == (int) pl);
   kbTest(bucket);
   return i;
@@ -644,10 +654,13 @@ void kBucket_Add_q(kBucket_pt bucket, poly q, int *l)
     bucket->buckets[i] = NULL;
     bucket->buckets_length[i] = 0;
     i = pLogLength(l1);
+    assume(i<= MAX_BUCKET);
+    assume(bucket->buckets_used<= MAX_BUCKET);
   }
 
   bucket->buckets[i] = q;
   bucket->buckets_length[i]=l1;
+  kbTest(bucket);
   if (i >= bucket->buckets_used)
     bucket->buckets_used = i;
   else
