@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.53 2006-01-12 14:13:02 bricken Exp $ */
+/* $Id: tgb.cc,v 1.54 2006-02-13 19:59:58 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -356,6 +356,7 @@ wlen_type red_object::guess_quality(slimgb_alg* c){
 	  }
 	  else
 	    cs=nSize(coef);
+	  #ifdef HAVE_COEF_BUCKETS
 	  if (bucket->coef[0]!=NULL){
 	    if (rField_is_Q(currRing)){
 	      int modifier=QlogSize(pGetCoeff(bucket->coef[0]));
@@ -365,6 +366,7 @@ wlen_type red_object::guess_quality(slimgb_alg* c){
 	      int modifier=nSize(pGetCoeff(bucket->coef[0]));
 	      cs*=modifier;}
 	  }
+	  #endif
 	  //FIXME:not quadratic
 	  wlen_type erg=kEBucketLength(this->bucket,this->p,c);
 	  //erg*=cs;//for quadratic
