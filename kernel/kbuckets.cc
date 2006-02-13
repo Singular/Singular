@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.cc,v 1.20 2006-02-13 09:59:55 bricken Exp $ */
+/* $Id: kbuckets.cc,v 1.21 2006-02-13 11:24:16 bricken Exp $ */
 
 #include "mod2.h"
 #include "structs.h"
@@ -161,6 +161,7 @@ BOOLEAN kbTest(kBucket_pt bucket)
         }
     }
   }
+  assume(bucket->buckets_used<=MAX_BUCKET);
   return TRUE;
 }
 
@@ -335,6 +336,7 @@ void kBucketInit(kBucket_pt bucket, poly lm, int length)
 
 int kBucketCanonicalize(kBucket_pt bucket)
 {
+  assume(bucket->buckets_used<=MAX_BUCKET);
   MULTIPLY_BUCKET(bucket,1);
   kbTest(bucket);
   poly p = bucket->buckets[1];
