@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ringgb.cc,v 1.5 2006-02-01 13:49:35 Singular Exp $ */
+/* $Id: ringgb.cc,v 1.6 2006-02-14 13:45:48 Singular Exp $ */
 /*
 * ABSTRACT: ringgb interface
 */
@@ -28,7 +28,9 @@
 
 #include "ringgb.h"
 
-poly reduce_poly_fct(poly p, ring r) {
+#ifdef HAVE_RING2TOM
+poly reduce_poly_fct(poly p, ring r)
+{
    return kFindZeroPoly(p, r, r);
 }
 
@@ -171,3 +173,4 @@ poly ringRedNF (poly f, ideal G, ring r) {
   }
   return h;
 }
+#endif
