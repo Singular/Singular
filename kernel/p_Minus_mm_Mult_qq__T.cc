@@ -6,7 +6,7 @@
  *  Purpose: template for p_Minus_m_Mult_q
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Minus_mm_Mult_qq__T.cc,v 1.3 2006-01-13 18:10:05 wienand Exp $
+ *  Version: $Id: p_Minus_mm_Mult_qq__T.cc,v 1.4 2006-02-15 13:01:22 Singular Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -98,12 +98,15 @@ LINKAGE poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int& Shorter, const poly
   Greater:
 #ifdef HAVE_RING2TOM
   tb = n_Mult(pGetCoeff(q), tneg, r);
-  if ((long) tb != 0) {
+  if ((long) tb != 0)
+  {
 #endif
   pSetCoeff0(qm, n_Mult(pGetCoeff(q), tneg, r));
   a = pNext(a) = qm;       // append qm to result and advance q
 #ifdef HAVE_RING2TOM
-  } else { shorter =+ 1; }
+  }
+  else
+  { shorter++; }
   n_Delete(&tb, r);
 #endif  
   pIter(q);
