@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which iter over ExpVector
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline1.h,v 1.4 2006-01-13 18:10:05 wienand Exp $
+ *  Version: $Id: pInline1.h,v 1.5 2006-02-15 13:00:21 Singular Exp $
  *******************************************************************/
 #ifndef PINLINE1_H
 #define PINLINE1_H
@@ -408,7 +408,7 @@ static inline BOOLEAN _p_LmRingDivisibleByNoComp(poly a, poly b, ring r)
     }
     return (lside%2 != 0);
   }
-  return false;
+  return FALSE;
 }
 #endif
 
@@ -454,7 +454,7 @@ static inline BOOLEAN _p_LmRingDivisibleByNoComp(poly a, ring r_a, poly b, ring 
     }
     return (lside%2 != 0);
   }
-  return false;
+  return FALSE;
 }
 #endif
 
