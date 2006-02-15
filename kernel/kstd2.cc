@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.9 2006-01-22 04:29:37 wienand Exp $ */
+/* $Id: kstd2.cc,v 1.10 2006-02-15 14:08:17 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -180,7 +180,7 @@ long factorial(long arg)
    long tmp = 1; arg++;
    for (int i = 2; i < arg; i++)
    {
-     tmp = tmp * i;
+     tmp *= i;
    }
    return tmp;
 }
@@ -579,6 +579,7 @@ int redLazy (LObject* h,kStrategy strat)
 int redHoney (LObject* h, kStrategy strat)
 {
   if (strat->tl<0) return 1;
+  //if (h->GetLmTailRing()==NULL) return 0; // HS: SHOULD NOT BE NEEDED!
   assume(h->FDeg == h->pFDeg());
 
   poly h_p;
@@ -737,6 +738,7 @@ poly redNF (poly h,kStrategy strat)
   P.SetShortExpVector();
   P.bucket = kBucketCreate(currRing);
   kBucketInit(P.bucket,P.p,pLength(P.p));
+  kbTest(P.bucket);
   loop
   {
 /* Obsolete since change in pLmDiv
@@ -763,9 +765,9 @@ poly redNF (poly h,kStrategy strat)
 #ifdef HAVE_PLURAL
       if (rIsPluralRing(currRing))
       {
-	    number coef;
+        number coef;
         nc_kBucketPolyRed(P.bucket,strat->S[j],&coef);
-	    nDelete(&coef);
+        nDelete(&coef);
       }
       else
 #endif
@@ -780,6 +782,7 @@ poly redNF (poly h,kStrategy strat)
         kBucketDestroy(&P.bucket);
         return NULL;
       }
+      kbTest(P.bucket);
       P.p=h;
       P.t_p=NULL;
       P.SetShortExpVector();

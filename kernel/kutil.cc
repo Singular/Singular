@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.17 2006-02-15 12:59:03 Singular Exp $ */
+/* $Id: kutil.cc,v 1.18 2006-02-15 14:08:17 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -1594,10 +1594,12 @@ void initenterpairs (poly h,int k,int ecart,int isFromQ,kStrategy strat, int atR
   }
 }
 
+#ifdef HAVE_RING2TOM
 long twoPow(long arg)
 {
   return 1L << arg;
 }
+#endif
 
 /*2
 *(s[0],h),...,(s[k],h) will be put to the pairset L(via initenterpairs)
