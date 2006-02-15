@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.16 2006-01-22 04:29:37 wienand Exp $ */
+/* $Id: kutil.cc,v 1.17 2006-02-15 12:59:03 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -1594,14 +1594,9 @@ void initenterpairs (poly h,int k,int ecart,int isFromQ,kStrategy strat, int atR
   }
 }
 
-long twoPow(long arg) {
-  long t = arg;
-  long result = 1;
-  while (t > 0) {
-    result = 2 * result;
-    t--;
-  }
-  return result;
+long twoPow(long arg)
+{
+  return 1L << arg;
 }
 
 /*2
