@@ -239,6 +239,7 @@ struct soptionStruct verboseStruct[]=
   {"notWarnSB",Sy_bit(V_NSB),       ~Sy_bit(V_NSB)        },
   {"contentSB",Sy_bit(V_CONTENTSB), ~Sy_bit(V_CONTENTSB)  },
   {"cancelunit",Sy_bit(V_CANCELUNIT),~Sy_bit(V_CANCELUNIT)},
+  {"modpsolve",Sy_bit(V_MODPSOLVSB),~Sy_bit(V_MODPSOLVSB)},
 /*special for "none" and also end marker for showOption:*/
   {"ne",         0,          0 }
 };

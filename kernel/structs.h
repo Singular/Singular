@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.17 2006-01-06 11:14:07 Singular Exp $ */
+/* $Id: structs.h,v 1.18 2006-02-16 10:53:49 bricken Exp $ */
 /*
 * ABSTRACT
 */
@@ -652,6 +652,7 @@ inline long si_min(const long a, const long b)  { return (a<b) ? a : b; }
 #define V_NSB       14
 #define V_CONTENTSB 15
 #define V_CANCELUNIT 16
+#define V_MODPSOLVSB 17
 #define V_DEG_STOP  31
 
 
@@ -706,7 +707,7 @@ inline long si_min(const long a, const long b)  { return (a<b) ? a : b; }
 
 #define TEST_VERB_NSB              BVERBOSE(V_NSB)
 #define TEST_V_DEG_STOP            BVERBOSE(V_DEG_STOP)
-
+#define TEST_V_MODPSOLVSB          BVERBOSE(V_MODPSOLVSB)
 
 #ifdef HAVE_LIBPARSER
 #ifdef __cplusplus
