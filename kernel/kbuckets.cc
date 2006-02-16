@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.cc,v 1.25 2006-02-13 19:52:26 bricken Exp $ */
+/* $Id: kbuckets.cc,v 1.26 2006-02-16 10:20:33 bricken Exp $ */
 
 #include "mod2.h"
 #include "structs.h"
@@ -870,9 +870,10 @@ void kBucket_Plus_mm_Mult_pp(kBucket_pt bucket, poly m, poly p, int l)
       i = pLogLength(l1);
     }
   }
-  #ifdef USE_COEF_BUCKETS
+  
   else
   {
+    #ifdef USE_COEF_BUCKETS
     number swap_n=p_GetCoeff(m,r);
 
     assume(n_IsOne(n,r));
@@ -880,12 +881,14 @@ void kBucket_Plus_mm_Mult_pp(kBucket_pt bucket, poly m, poly p, int l)
     n=swap_n;
     //p_SetCoeff0(n, swap_n, r);
     //p_GetCoeff0(n, swap_n,r);
-
+    #endif
     p1 = r->p_Procs->pp_Mult_mm(p1, m, r, last);
+    #ifdef USE_COEF_BUCKETS
     //m may not be changed
     p_SetCoeff(m,n_Copy(n,r),r);
+    #endif
   }
-  #endif
+  
 
   while ((bucket->buckets[i] != NULL) && (p1!=NULL))
   {
