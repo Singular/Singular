@@ -1,4 +1,11 @@
 #include "tgb_internal.h"
+#if 0
+static void notice_miss(int i, int j, slimgb_alg* c){
+  if (TEST_OPT_PROT)
+    PrintS("-");
+ 
+}
+#endif
 static poly redNF (poly h,kStrategy strat, int &len)
 {
   len=0;
@@ -390,3 +397,175 @@ static void do_this_spoly_stuff(int i,int j,calc_dat* c){
     add_to_basis(hr, i,j,c);
 }
 }
+
+#if 0
+static void replace_pair(int & i, int & j, slimgb_alg* c)
+{
+  c->soon_free=NULL;
+  int curr_deg;
+  poly lm=pOne();
+
+  pLcm(c->S->m[i], c->S->m[j], lm);
+  pSetm(lm);
+  int deciding_deg= pTotaldegree(lm);
+  int* i_con =make_connections(i,j,lm,c);
+  
+  for (int n=0;((n<c->n) && (i_con[n]>=0));n++){
+    if (i_con[n]==j){
+      now_t_rep(i,j,c);
+      omfree(i_con);
+      p_Delete(&lm,c->r);
+      return;
+    }
+  }
+
+  int* j_con =make_connections(j,lm,c);
+  i= i_con[0];
+  j=j_con[0];
+  if(c->n>1){
+    if (i_con[1]>=0)
+      i=i_con[1];
+    else {
+      if (j_con[1]>=0)
+        j=j_con[1];
+    }
+  }
+  pLcm(c->S->m[i], c->S->m[j], lm);
+  pSetm(lm);
+  poly short_s;
+  curr_deg=pTotaldegree(lm);
+  int_pair_node* last=NULL;
+
+  for (int n=0;((n<c->n) && (j_con[n]>=0));n++){
+    for (int m=0;((m<c->n) && (i_con[m]>=0));m++){
+      pLcm(c->S->m[i_con[m]], c->S->m[j_con[n]], lm);
+      pSetm(lm);
+      if (pTotaldegree(lm)>=deciding_deg)
+      {
+        soon_t_rep(i_con[m],j_con[n],c);
+        int_pair_node* h= (int_pair_node*)omalloc(sizeof(int_pair_node));
+        if (last!=NULL)
+          last->next=h;
+        else
+          c->soon_free=h;
+        h->next=NULL;
+        h->a=i_con[m];
+        h->b=j_con[n];
+        last=h;
+      }
+      //      if ((comp_deg<curr_deg)
+      //  ||
+      //  ((comp_deg==curr_deg) &&
+      short_s=ksCreateShortSpoly(c->S->m[i_con[m]],c->S->m[j_con[n]],c->r);
+      if (short_s==NULL) {
+        i=i_con[m];
+        j=j_con[n];
+        now_t_rep(i_con[m],j_con[n],c);
+        p_Delete(&lm,c->r);
+        omfree(i_con);
+        omfree(j_con);
+
+        return;
+      }
+#ifdef QUICK_SPOLY_TEST
+      for (int dz=0;dz<=c->n;dz++){
+        if (dz==c->n) {
+          //have found not head reducing pair
+          i=i_con[m];
+          j=j_con[n];
+          p_Delete(&short_s,c->r);
+          p_Delete(&lm,c->r);
+          omfree(i_con);
+          omfree(j_con);
+
+          return;
+        }
+        if (p_LmDivisibleBy(c->S->m[dz],short_s,c->r)) break;
+      }
+#endif
+      int comp_deg(pTotaldegree(short_s));
+      p_Delete(&short_s,c->r);
+      if ((comp_deg<curr_deg))
+         
+      {
+        curr_deg=comp_deg;
+        i=i_con[m];
+        j=j_con[n];
+      }
+    }
+  }
+  p_Delete(&lm,c->r);
+  omfree(i_con);
+  omfree(j_con);
+  return;
+}
+#endif
+
+#if 0
+//not needed any more, but should work
+static int* make_connections(int from, poly bound, slimgb_alg* c)
+{
+  ideal I=c->S;
+  int s=pTotaldegree(bound);
+  int* cans=(int*) omalloc(c->n*sizeof(int));
+  int* connected=(int*) omalloc(c->n*sizeof(int));
+  int cans_length=0;
+  connected[0]=from;
+  int connected_length=1;
+  long neg_bounds_short= ~p_GetShortExpVector(bound,c->r);
+  for (int i=0;i<c->n;i++){
+    if (c->T_deg[i]>s) continue;
+    if (i!=from){
+      if(p_LmShortDivisibleBy(I->m[i],c->short_Exps[i],bound,neg_bounds_short,c->r)){
+        cans[cans_length]=i;
+        cans_length++;
+      }
+    }
+  }
+  int not_yet_found=cans_length;
+  int con_checked=0;
+  int pos;
+  while((not_yet_found>0) && (con_checked<connected_length)){
+    pos=connected[con_checked];
+    for(int i=0;i<cans_length;i++){
+      if (cans[i]<0) continue;
+      if (has_t_rep(pos,cans[i],c))
+      {
+        connected[connected_length]=cans[i];
+        connected_length++;
+        cans[i]=-1;
+        --not_yet_found;
+      }
+    }
+    con_checked++;
+  }
+  if (connected_length<c->n){
+    connected[connected_length]=-1;
+  }
+  omfree(cans);
+  return connected;
+}
+#endif
+#if 0
+static void soon_t_rep(const int& arg_i, const int& arg_j, slimgb_alg* c)
+{
+  assume(0<=arg_i);
+  assume(0<=arg_j);
+  assume(arg_i<c->n);
+  assume(arg_j<c->n);
+  int i,j;
+  if (arg_i==arg_j){
+    return;
+  }
+  if (arg_i>arg_j){
+    i=arg_j;
+    j=arg_i;
+  } else {
+    i=arg_i;
+    j=arg_j;
+  }
+  if (!
+      (c->states[j][i]==HASTREP))
+    c->states[j][i]=SOONTREP;
+}
+#endif
