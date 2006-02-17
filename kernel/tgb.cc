@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.56 2006-02-17 11:23:58 bricken Exp $ */
+/* $Id: tgb.cc,v 1.57 2006-02-17 11:32:58 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -17,9 +17,7 @@
 #include "F4.h"
 #include "digitech.h"
 #include "gring.h"
-//#include "Number.h"
-//#include "gr_kstd2.h"
-//static BOOLEAN BIT_REDUCE=TRUE;
+
 #include "longrat.h"
 static const int bundle_size=100;
 static const int delay_factor=3;
@@ -329,14 +327,6 @@ static inline int pELength(poly p, slimgb_alg* c,int l){
   if (p==NULL) return 0;
   return do_pELength(p,c);
 }
-// static int quality(poly p, int len, slimgb_alg* c){
-//   if (c->is_char0) return pSLength(p,len);
-//   return pLength(p);
-// }
-
-
-
-
 
 
 
@@ -350,14 +340,14 @@ static inline wlen_type pQuality(poly p, slimgb_alg* c, int l=-1){
       int cs;
       number coef=pGetCoeff(p);
       if (rField_is_Q(currRing)){
-	       cs=QlogSize(coef);
+         cs=QlogSize(coef);
       }
       else
-	cs=nSize(coef);
-	   wlen_type erg=cs;
-	   //erg*=cs;//for quadratic
-	   erg*=pELength(p,c,l);
-	  //FIXME: not quadratic coeff size
+  cs=nSize(coef);
+     wlen_type erg=cs;
+     //erg*=cs;//for quadratic
+     erg*=pELength(p,c,l);
+    //FIXME: not quadratic coeff size
       //return cs*pELength(p,c,l);
       return erg;
     }
@@ -387,55 +377,50 @@ wlen_type red_object::guess_quality(slimgb_alg* c){
     if (c->is_char0){
       //s=kSBucketLength(bucket,this->p);
       if((pLexOrder) &&(!c->is_homog)){
-	  int cs;
-	  number coef;
-	  
-	  coef=pGetCoeff(kBucketGetLm(bucket));
-	  //c=nSize(pGetCoeff(kBucketGetLm(b)));
-	 
-	  //c=nSize(pGetCoeff(lm));
-	  if (rField_is_Q(currRing)){
-	    cs=QlogSize(coef);
-	  }
-	  else
-	    cs=nSize(coef);
-	  #ifdef HAVE_COEF_BUCKETS
-	  if (bucket->coef[0]!=NULL){
-	    if (rField_is_Q(currRing)){
-	      int modifier=QlogSize(pGetCoeff(bucket->coef[0]));
-	      cs+=modifier;
-	    }
-	    else{
-	      int modifier=nSize(pGetCoeff(bucket->coef[0]));
-	      cs*=modifier;}
-	  }
-	  #endif
-	  //FIXME:not quadratic
-	  wlen_type erg=kEBucketLength(this->bucket,this->p,c);
-	  //erg*=cs;//for quadratic
-	  erg*=cs;
-	  //return cs*kEBucketLength(this->bucket,this->p,c);
-	  return erg;
+    int cs;
+    number coef;
+    
+    coef=pGetCoeff(kBucketGetLm(bucket));
+    //c=nSize(pGetCoeff(kBucketGetLm(b)));
+   
+    //c=nSize(pGetCoeff(lm));
+    if (rField_is_Q(currRing)){
+      cs=QlogSize(coef);
+    }
+    else
+      cs=nSize(coef);
+    #ifdef HAVE_COEF_BUCKETS
+    if (bucket->coef[0]!=NULL){
+      if (rField_is_Q(currRing)){
+        int modifier=QlogSize(pGetCoeff(bucket->coef[0]));
+        cs+=modifier;
+      }
+      else{
+        int modifier=nSize(pGetCoeff(bucket->coef[0]));
+        cs*=modifier;}
+    }
+    #endif
+    //FIXME:not quadratic
+    wlen_type erg=kEBucketLength(this->bucket,this->p,c);
+    //erg*=cs;//for quadratic
+    erg*=cs;
+    //return cs*kEBucketLength(this->bucket,this->p,c);
+    return erg;
       }
       s=kSBucketLength(bucket,NULL);
     }
     else 
     {
       if((pLexOrder) &&(!c->is_homog))
-	//if (false)
-	s=kEBucketLength(this->bucket,this->p,c);
+  //if (false)
+  s=kEBucketLength(this->bucket,this->p,c);
       else s=bucket_guess(bucket);
     }
  
     return s;
 }
 
-// static int guess_quality(const red_object & p, slimgb_alg* c){
-//   //looks only on bucket
-//   if (c->is_char0) return kSBucketLength(p.bucket,p.p);
-//   if((pLexOrder) &&(!c->is_homog)) return kEBucketLength(p.bucket,p.p,c);
-//   return (bucket_guess(p.bucket));
-// }
+
 
 static void finalize_reduction_step(reduction_step* r){
   delete r;
@@ -586,25 +571,25 @@ static BOOLEAN trivial_syzygie(int pos1,int pos2,poly bound,slimgb_alg* c){
   {
      loop
       {
-	if (pGetExp(p1, i)+ pGetExp(p2, i) > pGetExp(bound,i))   return FALSE;
-	if (i == pVariables){
-	  //PrintS("trivial");
-	  return TRUE;
-	}
-	i++;
+  if (pGetExp(p1, i)+ pGetExp(p2, i) > pGetExp(bound,i))   return FALSE;
+  if (i == pVariables){
+    //PrintS("trivial");
+    return TRUE;
+  }
+  i++;
       }
   }
   else 
   {
     loop
       {
-	if (pGetExp(p1, i)-pGetExp(m,i) + pGetExp(p2, i) > pGetExp(bound,i))   return FALSE;
-	if (i == pVariables){
-	  pDelete(&m);
-	  //PrintS("trivial");
-	  return TRUE;
-	}
-	i++;
+  if (pGetExp(p1, i)-pGetExp(m,i) + pGetExp(p2, i) > pGetExp(bound,i))   return FALSE;
+  if (i == pVariables){
+    pDelete(&m);
+    //PrintS("trivial");
+    return TRUE;
+  }
+  i++;
       }
   }
 
@@ -686,13 +671,13 @@ static void cleanS(kStrategy strat, slimgb_alg* c){
       BOOLEAN found=FALSE;
       int j;
       for(j=0;j<c->n;j++)
-	if(c->S->m[j]==P.p)
-	{
-	  found=TRUE;
-	  break;
-	}
+  if(c->S->m[j]==P.p)
+  {
+    found=TRUE;
+    break;
+  }
       if (!found)
-	pDelete(&P.p);
+  pDelete(&P.p);
       //remember additional reductors
     }
     else i++;
@@ -1059,7 +1044,7 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slim
     
     c->states[i][j]=UNCALCULATED;
     assume(p_LmDivisibleBy(c->S->m[i],c->S->m[j],c->r)==
-	   p_LmShortDivisibleBy(c->S->m[i],c->short_Exps[i],c->S->m[j],~(c->short_Exps[j]),c->r));
+     p_LmShortDivisibleBy(c->S->m[i],c->short_Exps[i],c->S->m[j],~(c->short_Exps[j]),c->r));
     if(!c->F4_mode)
     {
       //      assume(!(p_LmDivisibleBy(c->S->m[j],c->S->m[i],c->r)));
@@ -1158,11 +1143,11 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slim
     nodes[spc]=s;
     spc++;
   
-	// }
-	//else
-	//{
+  // }
+  //else
+  //{
         //c->states[i][j]=HASTREP;
-	//}
+  //}
   }
   
   assume(spc<=i);
@@ -1182,10 +1167,10 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slim
       
       if(!pLmEqual(nodes[lower]->lcm_of_lm,nodes[upper]->lcm_of_lm))
       {
-	break;
+  break;
       }
       if (has_t_rep(nodes[upper]->i,nodes[upper]->j,c))
-	has=TRUE;
+  has=TRUE;
 
     }
     upper=upper-1;
@@ -1195,8 +1180,8 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slim
     {
       if(p_LmDivisibleBy(nodes_final[z]->lcm_of_lm,nodes[lower]->lcm_of_lm,c->r))
       {
-	has=TRUE;
-	break;
+  has=TRUE;
+  break;
       }
     }
     
@@ -1204,9 +1189,9 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slim
     {
       for(;lower<=upper;lower++)
       {
-	//free_sorted_pair_node(nodes[lower],c->r);
-	//omfree(nodes[lower]);
-	nodes[lower]=NULL;
+  //free_sorted_pair_node(nodes[lower],c->r);
+  //omfree(nodes[lower]);
+  nodes[lower]=NULL;
       }
       j=upper+1;
       continue;
@@ -1222,9 +1207,9 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slim
       nodes[lower]=NULL;
       for(lower=lower+1;lower<=upper;lower++)
       {
-	//	free_sorted_pair_node(nodes[lower],c->r);
-	//omfree(nodes[lower]);
-	nodes[lower]=NULL;
+  //  free_sorted_pair_node(nodes[lower],c->r);
+  //omfree(nodes[lower]);
+  nodes[lower]=NULL;
       }
       j=upper+1;
       continue;
@@ -1308,7 +1293,7 @@ static poly redNF2 (poly h,slimgb_alg* c , int &len, number&  m,int n)
          (strat->lenSw[j]<=n)))))
       {
 
-	
+  
         nNormalize(pGetCoeff(P.p));
 #ifdef KDEBUG
         if (TEST_OPT_DEBUG)
@@ -1323,17 +1308,17 @@ static poly redNF2 (poly h,slimgb_alg* c , int &len, number&  m,int n)
         number coef=kBucketPolyRed(P.bucket,strat->S[j],
                                    strat->lenS[j]/*pLength(strat->S[j])*/,
                                    strat->kNoether);
-	number m2=nMult(m,coef);
-	nDelete(&m);
-	m=m2;
+  number m2=nMult(m,coef);
+  nDelete(&m);
+  m=m2;
         nDelete(&coef);
         h = kBucketGetLm(P.bucket);
-	
-	if (h==NULL) {
-	  len=0;
-	  kBucketDestroy(&P.bucket);
-	  return 
-	  NULL;}
+  
+  if (h==NULL) {
+    len=0;
+    kBucketDestroy(&P.bucket);
+    return 
+    NULL;}
         P.p=h;
         P.t_p=NULL;
         P.SetShortExpVector();
@@ -1351,7 +1336,7 @@ static poly redNF2 (poly h,slimgb_alg* c , int &len, number&  m,int n)
         kBucketClear(P.bucket,&(P.p),&len);
         kBucketDestroy(&P.bucket);
         pNormalize(P.p);
-	assume(len==(pLength(P.p)));
+  assume(len==(pLength(P.p)));
         return P.p;
       }
     }
@@ -1385,13 +1370,13 @@ static void line_of_extended_prod(int fixpos,slimgb_alg* c){
         if((c->states[fixpos][i]!=HASTREP)&& (extended_product_criterion(c->S->m[fixpos],c->gcd_of_terms[fixpos], c->S->m[i],c->gcd_of_terms[i],c)))
 {
           c->states[fixpos][i]=HASTREP;
-	  c->extended_product_crit++;
+    c->extended_product_crit++;
 }     
       for(i=fixpos+1;i<c->n;i++)
         if((c->states[i][fixpos]!=HASTREP)&& (extended_product_criterion(c->S->m[fixpos],c->gcd_of_terms[fixpos], c->S->m[i],c->gcd_of_terms[i],c)))
-	{        c->states[i][fixpos]=HASTREP;
-	c->extended_product_crit++;
-	}
+  {        c->states[i][fixpos]=HASTREP;
+  c->extended_product_crit++;
+  }
     }
   }
 }
@@ -1499,14 +1484,14 @@ static void go_on (slimgb_alg* c){
     if(s->i==s->j) {
       free_sorted_pair_node(s,c->r);
       continue;
-	}
+  }
     }
     poly h;
     if(s->i>=0){
       if (!c->nc)
-	h=ksOldCreateSpoly(c->S->m[s->i], c->S->m[s->j], NULL, c->r);
+  h=ksOldCreateSpoly(c->S->m[s->i], c->S->m[s->j], NULL, c->r);
       else
-	h= nc_CreateSpoly(c->S->m[s->i], c->S->m[s->j], NULL, c->r);
+  h= nc_CreateSpoly(c->S->m[s->i], c->S->m[s->j], NULL, c->r);
     } 
     else
       h=s->lcm_of_lm;
@@ -1587,11 +1572,11 @@ static void go_on (slimgb_alg* c){
       if (c->strat->lenSw!=NULL)
           new_pos=simple_posInS(c->strat,c->strat->S[z2],strat->lenS[z2],strat->Sw[z2]);
       else
-	        new_pos=simple_posInS(c->strat,c->strat->S[z2],strat->lenS[z2],lenS[z2]);
+          new_pos=simple_posInS(c->strat,c->strat->S[z2],strat->lenS[z2],lenS[z2]);
       
       if (new_pos<z2)
       { 
-	       move_forward_in_S(z2,new_pos,c->strat);
+         move_forward_in_S(z2,new_pos,c->strat);
       }
       
       assume(new_pos<=z2);
@@ -1609,15 +1594,7 @@ static void go_on (slimgb_alg* c){
 #endif
   if (TEST_OPT_PROT)
       Print("%i]",i); 
- //  for(j=0;j<i;j++){
-//     if(buf[j].p==NULL) PrintS("\n ZERO ALERT \n");
-//     int z;
-//      for(z=0;z<j;z++){
-//       if (pLmEqual(buf[z].p, buf[j].p))
-// 	PrintS("\n Critical Warning!!!! \n");
-      
-//     }
-//   }
+
   int* ibuf=(int*) omalloc(i*sizeof(int));
   sorted_pair_node*** sbuf=(sorted_pair_node***) omalloc(i*sizeof(sorted_pair_node**));
   for(j=0;j<i;j++)
@@ -1627,8 +1604,7 @@ static void go_on (slimgb_alg* c){
     buf[j].flatten();
     kBucketClear(buf[j].bucket,&p, &len);
     kBucketDestroy(&buf[j].bucket);
-    // delete buf[j];
-    //remember to free res here
+
     if (!c->nc)
       p=redTailShort(p, c->strat);
     sbuf[j]=add_to_basis_ideal_quotient(p,-1,-1,c,ibuf+j);
@@ -1741,7 +1717,7 @@ static poly redNFTail (poly h,const int sl,kStrategy strat, int len)
 #ifdef REDTAIL_PROT
               PrintS(" ");
 #endif
-	      kBucketDestroy(&P.bucket);
+        kBucketDestroy(&P.bucket);
               return res;
             }
             pTest(h);
@@ -1774,7 +1750,7 @@ static poly redNFTail (poly h,const int sl,kStrategy strat, int len)
 #ifdef REDTAIL_PROT
         PrintS(" ");
 #endif
-	kBucketDestroy(&P.bucket);
+  kBucketDestroy(&P.bucket);
         return res;
       }
       pTest(h);
@@ -2087,10 +2063,10 @@ slimgb_alg::~slimgb_alg(){
 //   for(i=0;i<c->n;i++){
 //     if (c->rep[i]!=i){
 // //       for(j=0;j<=c->strat->sl;j++){
-// // 	if(c->strat->S[j]==c->S->m[i]){
-// // 	  c->strat->S[j]=NULL;
-// // 	  break;
-// // 	}
+// //   if(c->strat->S[j]==c->S->m[i]){
+// //     c->strat->S[j]=NULL;
+// //     break;
+// //   }
 // //       }
 // //      PrintS("R_delete");
 //       pDelete(&c->S->m[i]);
@@ -2394,8 +2370,8 @@ static poly gcd_of_terms(poly p, ring r){
   {
       pSetExp(m,i, pGetExp(p,i));
       if (max_g_0==0)
-	if (pGetExp(m,i)>0)
-	  max_g_0=i;
+  if (pGetExp(m,i)>0)
+    max_g_0=i;
   }
   
   t=p->next;
@@ -2406,19 +2382,15 @@ static poly gcd_of_terms(poly p, ring r){
     {
       pSetExp(m,i, si_min(pGetExp(t,i),pGetExp(m,i)));
       if (max_g_0==i)
-	if (pGetExp(m,i)==0)
-	  max_g_0=0;
+  if (pGetExp(m,i)==0)
+    max_g_0=0;
       if ((max_g_0==0) && (pGetExp(m,i)>0)){
-	max_g_0=i;
+  max_g_0=i;
       }
     }
     t=t->next;
   }
-  // for (i=pVariables;i;i--)
-//   {
-//     if(pGetExp(m,i)>0)
-//       return m;
-//   }
+
   if (max_g_0>0)
     return m;
   pDelete(&m);
@@ -2464,26 +2436,26 @@ static poly kBucketGcd(kBucket* b, ring r)
   { 
     if (b->buckets[i]!=NULL){
       if (!initialized){
-	m=gcd_of_terms(b->buckets[i],r);
-	initialized=TRUE;
-	if (m==NULL) return NULL;
+  m=gcd_of_terms(b->buckets[i],r);
+  initialized=TRUE;
+  if (m==NULL) return NULL;
       }
       else
-	{
-	  n=gcd_of_terms(b->buckets[i],r);
-	  if (n==NULL) {
-	    pDelete(&m);
-	    return NULL;    
-	  }
-	  n->next=m;
-	  poly t=gcd_of_terms(n,r);
-	  n->next=NULL;
-	  pDelete(&m);
-	  pDelete(&n);
-	  m=t;
-	  if (m==NULL) return NULL;
-	  
-	}
+  {
+    n=gcd_of_terms(b->buckets[i],r);
+    if (n==NULL) {
+      pDelete(&m);
+      return NULL;    
+    }
+    n->next=m;
+    poly t=gcd_of_terms(n,r);
+    n->next=NULL;
+    pDelete(&m);
+    pDelete(&n);
+    m=t;
+    if (m==NULL) return NULL;
+    
+  }
     }
   }
   return m;
@@ -2519,32 +2491,32 @@ static void multi_reduction_lls_trick(red_object* los, int losl,slimgb_alg* c,fi
       int best=erg.to_reduce_u+1;
 /*
       for (i=erg.to_reduce_u;i>=erg.to_reduce_l;i--){
-	int qc=los[i].guess_quality(c);
-	if (qc<quality_a){
-	  best=i;
-	  quality_a=qc;
-	}
+  int qc=los[i].guess_quality(c);
+  if (qc<quality_a){
+    best=i;
+    quality_a=qc;
+  }
       }
       if(best!=erg.to_reduce_u+1){*/
       int qc;
       best=find_best(los,erg.to_reduce_l,erg.to_reduce_u,qc,c);
       if(qc<quality_a){
-	los[best].flatten();
-	int b_pos=kBucketCanonicalize(los[best].bucket);
-	los[best].p=los[best].bucket->buckets[b_pos];
-	qc=pQuality(los[best].bucket->buckets[b_pos],c);
-	if(qc<quality_a){
-	  red_object h=los[erg.to_reduce_u];
-	  los[erg.to_reduce_u]=los[best];
-	  los[best]=h;
-	  swap_roles=TRUE;
-	}
-	else
-	  swap_roles=FALSE;
+  los[best].flatten();
+  int b_pos=kBucketCanonicalize(los[best].bucket);
+  los[best].p=los[best].bucket->buckets[b_pos];
+  qc=pQuality(los[best].bucket->buckets[b_pos],c);
+  if(qc<quality_a){
+    red_object h=los[erg.to_reduce_u];
+    los[erg.to_reduce_u]=los[best];
+    los[best]=h;
+    swap_roles=TRUE;
+  }
+  else
+    swap_roles=FALSE;
       }
       else{
-	
-	swap_roles=FALSE;
+  
+  swap_roles=FALSE;
       }
   
     }
@@ -2552,72 +2524,72 @@ static void multi_reduction_lls_trick(red_object* los, int losl,slimgb_alg* c,fi
     {
       if (erg.to_reduce_u>erg.to_reduce_l){
 
-	int i;
-	int quality_a=quality_of_pos_in_strat_S(erg.reduce_by,c);
-	if (c->nc)
-	  quality_a=quality_of_pos_in_strat_S_mult_high(erg.reduce_by, los[erg.to_reduce_u].p, c);
-	int best=erg.to_reduce_u+1;
-	int qc;
-	best=find_best(los,erg.to_reduce_l,erg.to_reduce_u,qc,c);
-	assume(qc==los[best].guess_quality(c));
-	if(qc<quality_a){
-	  los[best].flatten();
-	  int b_pos=kBucketCanonicalize(los[best].bucket);
-	  los[best].p=los[best].bucket->buckets[b_pos];
-	  qc==pQuality(los[best].bucket->buckets[b_pos],c);
-	  //(best!=erg.to_reduce_u+1)
-	  if(qc<quality_a){
-	  red_object h=los[erg.to_reduce_u];
-	  los[erg.to_reduce_u]=los[best];
-	  los[best]=h;
-	  erg.reduce_by=erg.to_reduce_u;
-	  erg.fromS=FALSE;
-	  erg.to_reduce_u--;
-	  }
-	}
+  int i;
+  int quality_a=quality_of_pos_in_strat_S(erg.reduce_by,c);
+  if (c->nc)
+    quality_a=quality_of_pos_in_strat_S_mult_high(erg.reduce_by, los[erg.to_reduce_u].p, c);
+  int best=erg.to_reduce_u+1;
+  int qc;
+  best=find_best(los,erg.to_reduce_l,erg.to_reduce_u,qc,c);
+  assume(qc==los[best].guess_quality(c));
+  if(qc<quality_a){
+    los[best].flatten();
+    int b_pos=kBucketCanonicalize(los[best].bucket);
+    los[best].p=los[best].bucket->buckets[b_pos];
+    qc==pQuality(los[best].bucket->buckets[b_pos],c);
+    //(best!=erg.to_reduce_u+1)
+    if(qc<quality_a){
+    red_object h=los[erg.to_reduce_u];
+    los[erg.to_reduce_u]=los[best];
+    los[best]=h;
+    erg.reduce_by=erg.to_reduce_u;
+    erg.fromS=FALSE;
+    erg.to_reduce_u--;
+    }
+  }
       }
       else 
       {
-	assume(erg.to_reduce_u==erg.to_reduce_l);
-	wlen_type quality_a=
+  assume(erg.to_reduce_u==erg.to_reduce_l);
+  wlen_type quality_a=
         quality_of_pos_in_strat_S(erg.reduce_by,c);
-	wlen_type qc=los[erg.to_reduce_u].guess_quality(c);
-	if (qc<0) PrintS("Wrong wlen_type");
-	if(qc<quality_a){
-	  int best=erg.to_reduce_u;
-	  los[best].flatten();
-	  int b_pos=kBucketCanonicalize(los[best].bucket);
-	  los[best].p=los[best].bucket->buckets[b_pos];
-	  qc=pQuality(los[best].bucket->buckets[b_pos],c);
-	  assume(qc>=0);
-	  if(qc<quality_a){
-	    BOOLEAN exp=FALSE;
-	    if(qc<=2){
-	       //Print("\n qc is %lld \n",qc);
-	       exp=TRUE;
-	    }
-	      
-	    else {
-	       if (qc<quality_a/2)
-		      exp=TRUE;
-	       else
-		   if(erg.reduce_by<c->n/4)
-		      exp=TRUE;
-	    }
-	    if (exp){
-	      poly clear_into;
-	      los[erg.to_reduce_u].flatten();
-	      kBucketClear(los[erg.to_reduce_u].bucket,&clear_into,&erg.expand_length);
-	      erg.expand=pCopy(clear_into);
-	      kBucketInit(los[erg.to_reduce_u].bucket,clear_into,erg.expand_length);
-	      if (TEST_OPT_PROT)
-		PrintS("e");
-	      
-	    }
-	  }
-	}
+  wlen_type qc=los[erg.to_reduce_u].guess_quality(c);
+  if (qc<0) PrintS("Wrong wlen_type");
+  if(qc<quality_a){
+    int best=erg.to_reduce_u;
+    los[best].flatten();
+    int b_pos=kBucketCanonicalize(los[best].bucket);
+    los[best].p=los[best].bucket->buckets[b_pos];
+    qc=pQuality(los[best].bucket->buckets[b_pos],c);
+    assume(qc>=0);
+    if(qc<quality_a){
+      BOOLEAN exp=FALSE;
+      if(qc<=2){
+         //Print("\n qc is %lld \n",qc);
+         exp=TRUE;
+      }
+        
+      else {
+         if (qc<quality_a/2)
+          exp=TRUE;
+         else
+       if(erg.reduce_by<c->n/4)
+          exp=TRUE;
+      }
+      if (exp){
+        poly clear_into;
+        los[erg.to_reduce_u].flatten();
+        kBucketClear(los[erg.to_reduce_u].bucket,&clear_into,&erg.expand_length);
+        erg.expand=pCopy(clear_into);
+        kBucketInit(los[erg.to_reduce_u].bucket,clear_into,erg.expand_length);
+        if (TEST_OPT_PROT)
+    PrintS("e");
+        
+      }
+    }
+  }
 
-	
+  
       }
       
       swap_roles=FALSE;
@@ -2636,14 +2608,14 @@ static void multi_reduction_lls_trick(red_object* los, int losl,slimgb_alg* c,fi
       
       int i;
       if(qc<quality_a){
-	  red_object h=los[erg.reduce_by];
-	  los[erg.reduce_by]=los[best];
-	  los[best]=h;
-	}
-	swap_roles=FALSE;
-	return;
-	
-	  
+    red_object h=los[erg.reduce_by];
+    los[erg.reduce_by]=los[best];
+    los[best]=h;
+  }
+  swap_roles=FALSE;
+  return;
+  
+    
     }
     else
     {
@@ -2655,12 +2627,12 @@ static void multi_reduction_lls_trick(red_object* los, int losl,slimgb_alg* c,fi
       int quality_a =los[erg.reduce_by].guess_quality(c);
       int qc;
       while((il>0) && pLmEqual(los[il-1].p,los[il].p)){
-	il--;
-	qc=los[il].guess_quality(c);
-	if (qc<quality_a){
-	  quality_a=qc;
-	  erg.reduce_by=il;
-	}
+  il--;
+  qc=los[il].guess_quality(c);
+  if (qc<quality_a){
+    quality_a=qc;
+    erg.reduce_by=il;
+  }
       }
       swap_roles=FALSE;
     }
@@ -2692,8 +2664,8 @@ static void multi_reduction_lls_trick(red_object* los, int losl,slimgb_alg* c,fi
     {
       if(p==c->S->m[z-1])
       {
-	pos_in_c=z-1;
-	break;
+  pos_in_c=z-1;
+  break;
       }
     }
     if(pos_in_c>=0)
@@ -2701,7 +2673,7 @@ static void multi_reduction_lls_trick(red_object* los, int losl,slimgb_alg* c,fi
       c->S->m[pos_in_c]=clear_into;
       c->lengths[pos_in_c]=new_length;
       if (c->T_deg_full)
-	c->T_deg_full[pos_in_c]=pTotaldegree_full(clear_into);
+  c->T_deg_full[pos_in_c]=pTotaldegree_full(clear_into);
       c_S_element_changed_hook(pos_in_c,c);
     }
     c->strat->S[j]=clear_into;
@@ -2745,15 +2717,15 @@ static int fwbw(red_object* los, int i){
        step=si_min(i2,step);
        if (step==0) break;
        i2-=step;
-	  
+    
        if(!pLmEqual(los[i].p,los[i2].p))
        {
-	 bw=TRUE;
-	 incr=FALSE;
+   bw=TRUE;
+   incr=FALSE;
        }
        else
        {
-	 if ((!incr) &&(step==1)) break;
+   if ((!incr) &&(step==1)) break;
        }
        
        
@@ -2765,11 +2737,11 @@ static int fwbw(red_object* los, int i){
        if (step==0) break;
        i2+=step;
        if(pLmEqual(los[i].p,los[i2].p)){
-	 if(step==1) break;
-	 else
-	 {
-	   bw=FALSE;
-	 }
+   if(step==1) break;
+   else
+   {
+     bw=FALSE;
+   }
        }
        
      }
@@ -2778,9 +2750,9 @@ static int fwbw(red_object* los, int i){
      else
      {
        if (step%2==1)
-	 step=(step+1)/2;
+   step=(step+1)/2;
        else
-	 step/=2;
+   step/=2;
        
      }
    }
@@ -2816,13 +2788,7 @@ static void multi_reduction_find(red_object* los, int losl,slimgb_alg* c,int sta
       assume((i2==0)||(!pLmEqual(los[i2].p,los[i2-1].p)));
       assume(i>=i2);
 
-//       int i2;
-//       for(i2=i-1;i2>=0;i2--){
-// 	if(!pLmEqual(los[i].p,los[i2].p))
-// 	  break;
-//      }
-      
-//      erg.to_reduce_l=i2+1;
+
       erg.to_reduce_l=i2;
       assume((i==losl-1)||(pLmCmp(los[i].p,los[i+1].p)==-1));
       canonicalize_region(los,erg.to_reduce_u+1,startf,c);
@@ -2836,35 +2802,35 @@ static void multi_reduction_find(red_object* los, int losl,slimgb_alg* c,int sta
       assume((i2==0)||(!pLmEqual(los[i2].p,los[i2-1].p)));
       assume(i>=i2);
       if(i2!=i){
-	
-	
-	erg.to_reduce_u=i-1;
-	erg.to_reduce_l=i2;
-	erg.reduce_by=i;
-	erg.fromS=FALSE;
-	assume((i==losl-1)||(pLmCmp(los[i].p,los[i+1].p)==-1));
-	canonicalize_region(los,erg.to_reduce_u+1,startf,c);
-	return;
+  
+  
+  erg.to_reduce_u=i-1;
+  erg.to_reduce_l=i2;
+  erg.reduce_by=i;
+  erg.fromS=FALSE;
+  assume((i==losl-1)||(pLmCmp(los[i].p,los[i+1].p)==-1));
+  canonicalize_region(los,erg.to_reduce_u+1,startf,c);
+  return;
       }
       if((!(c->is_homog)) &&(!(c->doubleSugar)))
       {
 
-	for (i2=i+1;i2<losl;i2++){
-	  if (p_LmShortDivisibleBy(los[i].p,los[i].sev,los[i2].p,~los[i2].sev,
-				   c->r)){
-	    int i3=i2;
-	    while((i3+1<losl) && (pLmEqual(los[i2].p, los[i3+1].p)))
-	      i3++;
-	    erg.to_reduce_u=i3;
-	    erg.to_reduce_l=i2;
-	    erg.reduce_by=i;
-	    erg.fromS=FALSE;
-	    assume((i==losl-1)||(pLmCmp(los[i].p,los[i+1].p)==-1));
-	    canonicalize_region(los,erg.to_reduce_u+1,startf,c);
-	    return;
-	  }
-	  //	else {assume(!p_LmDivisibleBy(los[i].p, los[i2].p,c->r));}
-	}
+  for (i2=i+1;i2<losl;i2++){
+    if (p_LmShortDivisibleBy(los[i].p,los[i].sev,los[i2].p,~los[i2].sev,
+           c->r)){
+      int i3=i2;
+      while((i3+1<losl) && (pLmEqual(los[i2].p, los[i3+1].p)))
+        i3++;
+      erg.to_reduce_u=i3;
+      erg.to_reduce_l=i2;
+      erg.reduce_by=i;
+      erg.fromS=FALSE;
+      assume((i==losl-1)||(pLmCmp(los[i].p,los[i+1].p)==-1));
+      canonicalize_region(los,erg.to_reduce_u+1,startf,c);
+      return;
+    }
+    //  else {assume(!p_LmDivisibleBy(los[i].p, los[i2].p,c->r));}
+  }
       }
       i--;
     }
@@ -2918,10 +2884,10 @@ static void sort_region_down(red_object* los, int l, int u, slimgb_alg* c)
     for(j=i;j;j--)
     {
       if(pLmCmp(los[j].p,los[j-1].p)==-1){
-	red_object h=los[j];
-	los[j]=los[j-1];
-	los[j-1]=h;
-	moved=TRUE;
+  red_object h=los[j];
+  los[j]=los[j-1];
+  los[j-1]=h;
+  moved=TRUE;
       }
       else break;
     }
@@ -2961,18 +2927,13 @@ static void multi_reduction(red_object* los, int & losl, slimgb_alg* c)
     
     find_erg erg;
     multi_reduction_find(los, losl,c,curr_pos,erg);//last argument should be curr_pos
-   //  PrintS("\n erg:\n");
-//     Print("upper:%i\n",erg.to_reduce_u);
-//     Print("lower:%i\n",erg.to_reduce_l);
-//     Print("reduce_by:%i\n",erg.reduce_by);
-//     Print("fromS:%i\n",erg.fromS);
     if(erg.reduce_by<0) break;
 
 
 
     erg.expand=NULL;
     int d=erg.to_reduce_u-erg.to_reduce_l+1;
-    //if ((!erg.fromS)&&(d>100)){
+   
     
     multi_reduction_lls_trick(los,losl,c,erg);
     
@@ -2983,16 +2944,14 @@ static void multi_reduction(red_object* los, int & losl, slimgb_alg* c)
     //Print("\n");
     multi_reduce_step(erg,los,c);
    
-//     reduction_step *rs=create_reduction_step(erg, los, c);
-//     rs->reduce(los,erg.to_reduce_l,erg.to_reduce_u);
-//     finalize_reduction_step(rs);
+
     if(!K_TEST_OPT_REDTHROUGH){
-	for(i=erg.to_reduce_l;i<=erg.to_reduce_u;i++){
-	   if  (los[i].p!=NULL)  //the check (los[i].p!=NULL) might be invalid
-	   {
-	       //
-	       assume(los[i].initial_quality>0);
-	       
+  for(i=erg.to_reduce_l;i<=erg.to_reduce_u;i++){
+     if  (los[i].p!=NULL)  //the check (los[i].p!=NULL) might be invalid
+     {
+         //
+         assume(los[i].initial_quality>0);
+         
                if(los[i].guess_quality(c)
                   >1.5*delay_factor*max_initial_quality){
                        if (TEST_OPT_PROT)
@@ -3006,16 +2965,15 @@ static void multi_reduction(red_object* los, int & losl, slimgb_alg* c)
                                //delay.push_back(los[i].p);
                                delay[delay_s]=los[i].p;
                                delay_s++;
-                               //add_to_basis_ideal_quotient(
-                               //   los[i].p,-1,-1,c,NULL);
+
                                los[i].p=NULL;
                       
                       }
                   }
-	          
-	          }
-	   }
-	}
+            
+            }
+     }
+  }
     int deleted=multi_reduction_clear_zeroes(los, losl, erg.to_reduce_l, erg.to_reduce_u);
     if(erg.fromS==FALSE)
       curr_pos=si_max(erg.to_reduce_u,erg.reduce_by);
@@ -3030,8 +2988,7 @@ static void multi_reduction(red_object* los, int & losl, slimgb_alg* c)
     else    
     sort_region_down(los, erg.to_reduce_l, erg.to_reduce_u-deleted, c);
 
-//   sort_region_down(los, 0, losl-1, c);
-    //  qsort(los,losl,sizeof(red_object),red_object_better_gen);
+
     if(erg.expand)
     {
 #ifdef FIND_DETERMINISTIC
@@ -3047,8 +3004,7 @@ static void multi_reduction(red_object* los, int & losl, slimgb_alg* c)
       
   }
   
-  //int delay_s=delay.size();
-  //int i;
+
   sorted_pair_node** pairs=(sorted_pair_node**)
     omalloc(delay_s*sizeof(sorted_pair_node*)); 
   for(i=0;i<delay_s;i++){
@@ -3098,8 +3054,8 @@ void simple_reducer::do_reduce(red_object & ro){
   number coef;
   if (!c->nc)
     coef=kBucketPolyRed(ro.bucket,p,
-		   p_len,
-		   c->strat->kNoether);
+       p_len,
+       c->strat->kNoether);
   else
     nc_kBucketPolyRed_Z(ro.bucket, p, &coef);
   nDelete(&coef);
@@ -3111,11 +3067,7 @@ void simple_reducer::reduce(red_object* r, int l, int u){
   int i;
 //debug start
   int im;
-//  for(im=l;im<=u;im++)
-  //  assume(is_valid_ro(r[im]));
-  
 
-//debug end
 
   for(i=l;i<=u;i++){
   
