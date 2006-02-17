@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.54 2006-02-13 19:59:58 bricken Exp $ */
+/* $Id: tgb.cc,v 1.55 2006-02-17 10:25:32 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -15,14 +15,57 @@
 #include "tgb_internal.h"
 #include "tgbgauss.h"
 #include "F4.h"
+#include "digitech.h"
 #include "gring.h"
 //#include "Number.h"
 //#include "gr_kstd2.h"
+//static BOOLEAN BIT_REDUCE=TRUE;
 #include "longrat.h"
 static const int bundle_size=100;
 static const int delay_factor=3;
 #if 1
 static omBin lm_bin=NULL;
+//static const BOOLEAN up_to_radical=TRUE;
+
+static BOOLEAN monomial_root(poly m, ring r){
+    BOOLEAN changed=FALSE;
+    int i;
+    for(i=1;i<=rVar(r);i++){
+        int e=p_GetExp(m,i,r);
+        if (e>1){
+            p_SetExp(m,i,1,r);
+            changed=TRUE;
+        }
+    }
+    if (changed) {
+        p_Setm(m,r);
+    }
+    return changed;
+}
+static BOOLEAN polynomial_root(poly h, ring r){
+  poly got=gcd_of_terms(h,r);
+  BOOLEAN changed=FALSE;
+  if((got!=NULL) &&(TEST_V_UPTORADICAL)) {
+    poly copy=p_Copy(got,r);
+    //p_wrp(got,c->r);
+    changed=monomial_root(got,r);
+    if (changed)
+    {
+         poly div_by=pDivide(copy, got);
+         poly iter=h;
+         while(iter){
+            pExpVectorSub(iter,div_by);
+            pIter(iter);
+         }
+         p_Delete(&div_by, r);
+         if (TEST_OPT_PROT)
+             PrintS("U");
+    }
+    p_Delete(&copy,r);
+  }
+  p_Delete(&got,r);
+  return changed;
+}
 static inline poly p_Init_Special(const ring r)
 {
   return p_Init(r,lm_bin);
@@ -1015,7 +1058,20 @@ static inline poly p_MoveHead(poly p, omBin b)
 
 
 
-
+static void add_later(poly p, char* prot, slimgb_alg* c){
+    int i=0;
+    //check, if it is already in the queue
+   
+    
+    while(c->add_later->m[i]!=NULL){
+        if (p_LmEqual(c->add_later->m[i],p,c->r))
+            return;
+        i++;
+    }
+    if (TEST_OPT_PROT)
+        PrintS(prot);
+    c->add_later->m[i]=p;
+}
 static int simple_posInS (kStrategy strat, poly p,int len, wlen_type wlen)
 {
 
@@ -1097,6 +1153,25 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slim
 {
 
   assume(h!=NULL);
+  poly got=gcd_of_terms(h,c->r);
+  if((got!=NULL) &&(TEST_V_UPTORADICAL)) {
+    poly copy=p_Copy(got,c->r);
+    //p_wrp(got,c->r);
+    BOOLEAN changed=monomial_root(got,c->r);
+    if (changed)
+    {
+         poly div_by=pDivide(copy, got);
+         poly iter=h;
+         while(iter){
+            pExpVectorSub(iter,div_by);
+            pIter(iter);
+         }
+         p_Delete(&div_by, c->r);
+         PrintS("U");
+    }
+    p_Delete(&copy,c->r);
+  }
+
 #define ENLARGE(pointer, type) pointer=(type*) omrealloc(pointer, c->array_lengths*sizeof(type))
 //  BOOLEAN corr=lenS_correct(c->strat);
   BOOLEAN R_found=FALSE;
@@ -1139,7 +1214,7 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slim
 
   c->lengths[i]=pLength(h);
  
-  c->gcd_of_terms[i]=gcd_of_terms(h,c->r);
+  c->gcd_of_terms[i]=got;
   
   if (i>0)
     c->states[i]=(char*)  omalloc(i*sizeof(char));
@@ -1165,25 +1240,69 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slim
     
     if (_p_GetComp(c->S->m[i],c->r)!=_p_GetComp(c->S->m[j],c->r)){
       c->states[i][j]=UNIMPORTANT;
+      //WARNUNG: be careful
       continue;
     } else
-    if ((!c->nc) && (c->lengths[i]==1) && (c->lengths[j]==1))
+    if ((!c->nc) && (c->lengths[i]==1) && (c->lengths[j]==1)){
       c->states[i][j]=HASTREP;
+      
+      }
     else if ((!(c->nc)) &&  (pHasNotCF(c->S->m[i],c->S->m[j])))
     {
       c->easy_product_crit++;
       c->states[i][j]=HASTREP;
+      continue;
     }
     else if(extended_product_criterion(c->S->m[i],c->gcd_of_terms[i],c->S->m[j],c->gcd_of_terms[j],c))
     {
       c->states[i][j]=HASTREP;
       c->extended_product_crit++;
+      
       //PrintS("E");
     }
       //  if (c->states[i][j]==UNCALCULATED){
 
-      
-//      poly short_s=ksCreateShortSpoly(c->S->m[i],c->S->m[j],c->r);
+    if ((TEST_V_FINDMONOM) &&(!c->nc)) {
+        //PrintS("COMMU");
+       //  if (c->lengths[i]==c->lengths[j]){
+//             poly short_s=ksCreateShortSpoly(c->S->m[i],c->S->m[j],c->r);
+//             if (short_s==NULL){
+//                 c->states[i][j]=HASTREP;
+//             } else
+//             {
+//                 p_Delete(&short_s, currRing);
+//             }
+//         }
+        if (c->lengths[i]+c->lengths[j]==3){
+            poly                 short_s=ksCreateShortSpoly(c->S->m[i],c->S->m[j],c->r);
+            if (short_s==NULL){
+                c->states[i][j]=HASTREP;
+            } else
+            {
+                assume(pLength(short_s)==1);
+                if (TEST_V_UPTORADICAL)
+                   monomial_root(short_s,c->r);
+                int iS=
+                   kFindDivisibleByInS_easy(c->strat,short_s, p_GetShortExpVector(short_s,c->r));
+                if (iS<0){
+                    //PrintS("N");
+                    c->states[i][j]=HASTREP;
+                    add_later(short_s,"N",c);
+                }
+                else {
+                    if (c->strat->lenS[iS]>1){
+                        //PrintS("O");
+                        c->states[i][j]=HASTREP;
+                        add_later(short_s,"O",c);
+                    }
+                    else
+                     p_Delete(&short_s, currRing);
+                }
+                
+               
+            }
+        }
+    }
       //    if (short_s)
       //    {
     assume(spc<=j);
@@ -1414,7 +1533,10 @@ static poly redNF2 (poly h,slimgb_alg* c , int &len, number&  m,int n)
 
 
 static poly redTailShort(poly h, kStrategy strat){
-
+  if (h==NULL) return NULL;//n_Init(1,currRing);
+  if (TEST_V_MODPSOLVSB){
+    bit_reduce(pNext(h), strat->tailRing);
+  }
   int sl=strat->sl;
   int i;
   int len=pLength(h);
@@ -1715,6 +1837,21 @@ static void go_on (slimgb_alg* c){
 #endif
   if (TEST_OPT_PROT)
       Print("(%d)",c->pair_top+1); 
+  while(!(idIs0(c->add_later))){
+    ideal add=c->add_later;
+    
+    ideal add2=kInterRed(add,NULL);
+    id_Delete(&add,currRing);
+    idSkipZeroes(add2);
+    c->add_later=idInit(5000,c->S->rank);
+    memset(c->add_later->m,0,5000*sizeof(poly));
+    for(i=0;i<add2->idelems();i++){
+      if (add2->m[i]!=NULL)
+          add_to_basis_ideal_quotient(add2->m[i],-1,-1,c,NULL);
+      add2->m[i]=NULL;
+    }
+    id_Delete(&add2, c->r);
+  }
   return;
 }
 
@@ -1974,6 +2111,7 @@ slimgb_alg::slimgb_alg(ideal I, BOOLEAN F4){
   initBuchMoraCrit(strat);
   initBuchMoraPos(strat);
   strat->initEcart = initEcartBBA;
+  strat->tailRing=r;
   strat->enterS = enterSBba;
   strat->sl = -1;
   i=n;
@@ -2028,8 +2166,11 @@ slimgb_alg::slimgb_alg(ideal I, BOOLEAN F4){
     I->m[i]=NULL;
   }
   idDelete(&I);
+  add_later=idInit(5000,S->rank);
+  memset(add_later->m,0,5000*sizeof(poly));
 }
 slimgb_alg::~slimgb_alg(){
+  id_Delete(&add_later,r);
   int i,j;
   slimgb_alg* c=this;
   while(c->to_destroy)
@@ -2619,12 +2760,12 @@ static void multi_reduction_lls_trick(red_object* los, int losl,slimgb_alg* c,fi
 	  qc==pQuality(los[best].bucket->buckets[b_pos],c);
 	  //(best!=erg.to_reduce_u+1)
 	  if(qc<quality_a){
-	  red_object h=los[erg.to_reduce_l];
-	  los[erg.to_reduce_l]=los[best];
+	  red_object h=los[erg.to_reduce_u];
+	  los[erg.to_reduce_u]=los[best];
 	  los[best]=h;
-	  erg.reduce_by=erg.to_reduce_l;
+	  erg.reduce_by=erg.to_reduce_u;
 	  erg.fromS=FALSE;
-	  erg.to_reduce_l++;
+	  erg.to_reduce_u--;
 	  }
 	}
       }
@@ -2838,6 +2979,14 @@ static int fwbw(red_object* los, int i){
    }
    return i2;
 }
+static void canonicalize_region(red_object* los, int l, int u,slimgb_alg* c){
+    assume(l<=u+1);
+    int i;
+    for(i=l;i<=u;i++){
+        kBucketCanonicalize(los[i].bucket);
+    }
+
+}
 static void multi_reduction_find(red_object* los, int losl,slimgb_alg* c,int startf,find_erg & erg){
   kStrategy strat=c->strat;
 
@@ -2869,6 +3018,7 @@ static void multi_reduction_find(red_object* los, int losl,slimgb_alg* c,int sta
 //      erg.to_reduce_l=i2+1;
       erg.to_reduce_l=i2;
       assume((i==losl-1)||(pLmCmp(los[i].p,los[i+1].p)==-1));
+      canonicalize_region(los,erg.to_reduce_u+1,startf,c);
       return;
     }
     if (j<0){
@@ -2886,6 +3036,7 @@ static void multi_reduction_find(red_object* los, int losl,slimgb_alg* c,int sta
 	erg.reduce_by=i;
 	erg.fromS=FALSE;
 	assume((i==losl-1)||(pLmCmp(los[i].p,los[i+1].p)==-1));
+	canonicalize_region(los,erg.to_reduce_u+1,startf,c);
 	return;
       }
       if((!(c->is_homog)) &&(!(c->doubleSugar)))
@@ -2902,6 +3053,7 @@ static void multi_reduction_find(red_object* los, int losl,slimgb_alg* c,int sta
 	    erg.reduce_by=i;
 	    erg.fromS=FALSE;
 	    assume((i==losl-1)||(pLmCmp(los[i].p,los[i+1].p)==-1));
+	    canonicalize_region(los,erg.to_reduce_u+1,startf,c);
 	    return;
 	  }
 	  //	else {assume(!p_LmDivisibleBy(los[i].p, los[i2].p,c->r));}
@@ -3066,7 +3218,11 @@ static void multi_reduction(red_object* los, int & losl, slimgb_alg* c)
     curr_pos -= deleted;
 
     //Print("deleted %i \n",deleted);
+    if ((TEST_V_UPTORADICAL) &&(!(erg.fromS)))
+        sort_region_down(los,si_min(erg.to_reduce_l,erg.reduce_by),(si_max(erg.to_reduce_u,erg.reduce_by))-deleted,c);
+    else    
     sort_region_down(los, erg.to_reduce_l, erg.to_reduce_u-deleted, c);
+
 //   sort_region_down(los, 0, losl-1, c);
     //  qsort(los,losl,sizeof(red_object),red_object_better_gen);
     if(erg.expand)
@@ -3182,7 +3338,8 @@ simple_reducer::~simple_reducer(){
 void multi_reduce_step(find_erg & erg, red_object* r, slimgb_alg* c){
   static int id=0;
   id++;
-
+  unsigned long sev;
+    BOOLEAN lt_changed=FALSE;
   int rn=erg.reduce_by;
   poly red;
   int red_len;
@@ -3197,6 +3354,7 @@ void multi_reduce_step(find_erg & erg, red_object* r, slimgb_alg* c){
   {
     r[rn].flatten();
     kBucketClear(r[rn].bucket,&red,&red_len);
+    
     if (!rField_is_Zp(c->r))
     {
       pContent(red);
@@ -3204,9 +3362,16 @@ void multi_reduce_step(find_erg & erg, red_object* r, slimgb_alg* c){
      
     }
     pNormalize(red);
+    
+
+    if ((!(erg.fromS))&&(TEST_V_UPTORADICAL)){
+         
+         if (polynomial_root(red,c->r))
+            lt_changed=TRUE;
+            sev=p_GetShortExpVector(red,c->r);}
     red_len=pLength(red);
   }
-  if ((c->nc)||(erg.to_reduce_u-erg.to_reduce_l>5)){
+  if (((TEST_V_MODPSOLVSB)&&(red_len>1))||((c->nc)||(erg.to_reduce_u-erg.to_reduce_l>5))){
     work_on_copy=TRUE;
     // poly m=pOne();
     poly m=c->tmp_lm;
@@ -3224,6 +3389,7 @@ void multi_reduce_step(find_erg & erg, red_object* r, slimgb_alg* c){
     }
     //now reduce the copy
     //static poly redNF2 (poly h,slimgb_alg* c , int &len, number&  m,int n)
+
     if (!c->nc)
       redTailShort(red_cp,c->strat);
     //number mul;
@@ -3255,6 +3421,10 @@ void multi_reduce_step(find_erg & erg, red_object* r, slimgb_alg* c){
   pointer->reduce(r,erg.to_reduce_l, erg.to_reduce_u);
   if(work_on_copy) pDelete(&pointer->p);
   delete pointer;
+  if (lt_changed){
+    assume(!erg.fromS);
+    r[erg.reduce_by].sev=sev;
+  }
   
 };
 
