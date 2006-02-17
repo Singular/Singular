@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_gcd.cc,v 1.38 2006-02-01 09:37:07 pohl Exp $ */
+/* $Id: cf_gcd.cc,v 1.39 2006-02-17 11:28:43 Singular Exp $ */
 
 #include <config.h>
 
@@ -43,11 +43,13 @@ gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g, bool swap )
         lcf = LC( f, Variable(1) );
         lcg = LC( g, Variable(1) );
     }
-    while ( ( e( lcf ).isZero() || e( lcg ).isZero() ) && count < 100 ) {
+    #define TEST_ONE_MAX 50
+    while ( ( e( lcf ).isZero() || e( lcg ).isZero() ) && count < TEST_ONE_MAX )
+    {
         e.nextpoint();
         count++;
     }
-    if ( count == 100 )
+    if ( count == TEST_ONE_MAX )
         return false;
     CanonicalForm F, G;
     if ( swap ) {
@@ -356,28 +358,33 @@ gcd_poly_univar0( const CanonicalForm & F, const CanonicalForm & G, bool primiti
 CanonicalForm
 gcd_poly1( const CanonicalForm & f, const CanonicalForm & g, bool modularflag )
 {
-    CanonicalForm C, Ci, Ci1, Hi, bi, pi, pi1, pi2;
-    int delta;
+    CanonicalForm pi, pi1;
     Variable v = f.mvar();
 
-    if ( f.degree( v ) >= g.degree( v ) ) {
+    if ( f.degree( v ) >= g.degree( v ) )
+    {
         pi = f; pi1 = g;
     }
-    else {
+    else
+    {
         pi = g; pi1 = f;
     }
+    CanonicalForm C, Ci, Ci1, Hi, bi, pi2;
+    int delta;
     Ci = content( pi ); Ci1 = content( pi1 );
-    C = gcd( Ci, Ci1 );
     pi1 = pi1 / Ci1; pi = pi / Ci;
+    C = gcd( Ci, Ci1 );
     if ( pi.isUnivariate() && pi1.isUnivariate() )
     {
 #ifdef HAVE_NTL
-      if ((isOn(SW_USE_NTL_GCD_P)||isOn(SW_USE_NTL_GCD_0))
-       && isPurePoly(pi) && isPurePoly(pi1))
-         return gcd_poly_univar0(f, g, true);
-#endif
+      if (( modularflag) ||
+      ((isOn(SW_USE_NTL_GCD_P)||isOn(SW_USE_NTL_GCD_0))
+       && isPurePoly(pi) && isPurePoly(pi1)))
+         return gcd_poly_univar0(pi, pi1, true) * C;
+#else
       if ( modularflag)
         return gcd_poly_univar0( pi, pi1, true ) * C;
+#endif
     }
     else if ( gcd_test_one( pi1, pi, true ) )
       return C;
@@ -402,9 +409,8 @@ gcd_poly1( const CanonicalForm & f, const CanonicalForm & g, bool modularflag )
     }
     if ( degree( pi1, v ) == 0 )
         return C;
-    else {
+    else
         return C * pp( pi );
-    }
 }
 
 //{{{ static CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g, bool modularflag )
