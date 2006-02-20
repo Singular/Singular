@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.58 2006-02-20 11:57:03 bricken Exp $ */
+/* $Id: tgb.cc,v 1.59 2006-02-20 12:28:25 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -993,6 +993,10 @@ static wlen_type pair_weighted_length(int i, int j, slimgb_alg* c){
         int cs=slim_nsize(p_GetCoeff(c->S->m[i],c->r),c->r)+
             slim_nsize(p_GetCoeff(c->S->m[j],c->r),c->r);
         return (c->lengths[i]+c->lengths[j]-2)*cs;
+    }
+    if (pLexOrder) {
+
+        return (c->weighted_lengths[i]+c->weighted_lengths[j]-2);
     }
     return c->lengths[i]+c->lengths[j]-2;
     
@@ -1996,7 +2000,7 @@ slimgb_alg::slimgb_alg(ideal I, BOOLEAN F4){
       si=(sorted_pair_node*) omalloc(sizeof(sorted_pair_node));
       si->i=-1;
       si->j=-2;
-      si->expected_length=pLength(I->m[i]);
+      si->expected_length=pQuality(I->m[i],this,pLength(I->m[i]));
       si->deg=pTotaldegree(I->m[i]);
       if (!rField_is_Zp(r)){ 
         pCleardenom(I->m[i]);
@@ -2059,6 +2063,7 @@ slimgb_alg::~slimgb_alg(){
   }
   omfree(c->states);
   omfree(c->lengths);
+  omfree(c->weighted_lengths);
   for(int z=0;z<c->n;z++)
   {
     pDelete(&c->tmp_pair_lm[z]);
@@ -3067,7 +3072,7 @@ static void multi_reduction(red_object* los, int & losl, slimgb_alg* c)
         pCleardenom(p);
         pContent(p);
       }
-      si->expected_length=pLength(p);
+      si->expected_length=pQuality(p,c,pLength(p));
       si->deg=pTotaldegree(p);
      
       si->lcm_of_lm=p;
