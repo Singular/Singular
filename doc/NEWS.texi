@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.54 2005-11-04 18:42:04 Singular Exp $
+@comment $Id: NEWS.texi,v 1.55 2006-02-20 16:11:57 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -60,7 +60,7 @@ easy manipulation of rings (@nref{ringlist})
 @item
 improved speed of maps (@nref{subst}, @nref{map})
 @item
-variant of Faugeres F4: @nref{slimgb}.
+a new algorithm for Groebner base computations: @nref{slimgb}.
 @item
 improved factorization (integration of NTL, factorization over algebraic extensions,
 zeroset.lib)
@@ -124,7 +124,7 @@ the newly created ring.
 @item @nref{ringlist}
 manipulation of rings
 @item @nref{slimgb}
-variant of the F4 algorithm to compute Groebner bases
+a new algorithm to compute Groebner bases
 @item @nref{exportto}
 transfer an identifier to the specified package
 @item @nref{importfrom}
