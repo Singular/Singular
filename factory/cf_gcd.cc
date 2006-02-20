@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_gcd.cc,v 1.39 2006-02-17 11:28:43 Singular Exp $ */
+/* $Id: cf_gcd.cc,v 1.40 2006-02-20 15:00:59 Singular Exp $ */
 
 #include <config.h>
 
@@ -23,7 +23,7 @@
 bool isPurePoly(const CanonicalForm & f);
 #endif
 
-static CanonicalForm gcd_poly( const CanonicalForm & f, const CanonicalForm& g, bool modularflag );
+static CanonicalForm gcd_poly( const CanonicalForm & f, const CanonicalForm& g, const bool modularflag );
 static CanonicalForm cf_content ( const CanonicalForm & f, const CanonicalForm & g );
 
 bool
@@ -117,35 +117,6 @@ icontent ( const CanonicalForm & f, const CanonicalForm & c )
     }
 }
 //}}}
-
-//{{{ static CanonicalForm bcontent ( const CanonicalForm & f, const CanonicalForm & b )
-//{{{ docu
-//
-// bcontent() - return gcd of b and all coefficients of f which
-//   are in a basic domain.
-//
-// Used by gcd().
-//
-//}}}
-static CanonicalForm
-bcontent ( const CanonicalForm & f, const CanonicalForm & c )
-{
-    if ( f.inBaseDomain() )
-        return bgcd( f, c );
-    else if ( f.inCoeffDomain() )
-        return f.genOne();
-    else {
-        CanonicalForm g = c;
-        for ( CFIterator i = f; i.hasTerms() && ! g.isOne(); i++ )
-            g = bcontent( i.coeff(), g );
-        if( g.lc().sign() < 0 )
-            return -g;
-        else
-            return g;
-    }
-}
-//}}}
-
 
 //{{{ CanonicalForm icontent ( const CanonicalForm & f )
 //{{{ docu
@@ -356,7 +327,7 @@ gcd_poly_univar0( const CanonicalForm & F, const CanonicalForm & G, bool primiti
 }
 
 CanonicalForm
-gcd_poly1( const CanonicalForm & f, const CanonicalForm & g, bool modularflag )
+gcd_poly1( const CanonicalForm & f, const CanonicalForm & g, const bool modularflag )
 {
     CanonicalForm pi, pi1;
     Variable v = f.mvar();
@@ -430,27 +401,32 @@ gcd_poly1( const CanonicalForm & f, const CanonicalForm & g, bool modularflag )
 //}}}
 int si_factor_reminder=1;
 static CanonicalForm
-gcd_poly ( const CanonicalForm & f, const CanonicalForm & g, bool modularflag )
+gcd_poly ( const CanonicalForm & f, const CanonicalForm & g, const bool modularflag )
 {
-    if ( getCharacteristic() != 0 ) {
-        if (! ( f.isUnivariate() && g.isUnivariate() ) ) {
-            CFMap M, N;
-            compress( f, g, M, N );
-            CanonicalForm fM = M(f);
-            CanonicalForm gM = M(g);
-            if ( fM.mvar() != gM.mvar() ) {
-                if ( fM.mvar() > gM.mvar() )
-                    return N( cf_content( fM, gM ) );
-                else
-                    return N( cf_content( gM, fM ) );
-            }
-            else
-                return N( gcd_poly1( fM, gM, false ) );
-        }
-        else
-            return gcd_poly1( f, g, false );
+    if ( getCharacteristic() != 0 )
+    {
+      if ( f.mvar() != g.mvar() )
+      {
+        CFMap M, N;
+        compress( f, g, M, N );
+        CanonicalForm fM = M(f);
+        CanonicalForm gM = M(g);
+        //if ( fM.mvar() != gM.mvar() )
+        //{
+        // 
+        //  if ( fM.mvar() > gM.mvar() )
+        //    return N( cf_content( fM, gM ) );
+        //  else
+        //    return N( cf_content( gM, fM ) );
+        //}
+        //else
+            return N( gcd_poly1( fM, gM, false ) );
+      }
+      else
+        return gcd_poly1( f, g, false );
     }
-    else if ( isOn( SW_USE_EZGCD ) && ! ( f.isUnivariate() && g.isUnivariate() ) ) {
+    else if ( isOn( SW_USE_EZGCD ) && ! ( f.isUnivariate() && g.isUnivariate() ) )
+    {
         CFMap M, N;
         compress( f, g, M, N );
 #if 0
@@ -515,13 +491,10 @@ cf_content ( const CanonicalForm & f, const CanonicalForm & g )
         return result;
     }
     else
-    {
-        ASSERT(g==0,"invalid call of cf_gcd");
         if ( f.sign() < 0 )
             return -f;
         else
             return f;
-    }
 }
 //}}}
 
@@ -612,23 +585,22 @@ CanonicalForm
 gcd ( const CanonicalForm & f, const CanonicalForm & g )
 {
     if ( f.isZero() )
-    {
-      if ( g.lc().sign() < 0 )
-        return -g;
-      else
-       return g;
-    }
+        if ( g.lc().sign() < 0 )
+            return -g;
+        else
+            return g;
     else  if ( g.isZero() )
-    {
-      if ( f.lc().sign() < 0 )
-        return -f;
-      else
-        return f;
-    }
+        if ( f.lc().sign() < 0 )
+            return -f;
+        else
+            return f;
     else  if ( f.inBaseDomain() )
-        return bcontent( g, f );
+        if ( g.inBaseDomain() )
+            return bgcd( f, g );
+        else
+            return cf_content( g, f );
     else  if ( g.inBaseDomain() )
-        return bcontent( f, g );
+        return cf_content( f, g );
     else  if ( f.mvar() == g.mvar() )
         if ( f.inExtension() && getReduce( f.mvar() ) )
             return 1;
@@ -651,13 +623,8 @@ gcd ( const CanonicalForm & f, const CanonicalForm & g )
                 On( SW_RATIONAL );
                 CanonicalForm F = f * l, G = g * l;
                 Off( SW_RATIONAL );
-                do { l = gcd_poly( F, G, true ); 
-                //if ((!divides(l,F)) || (!divides(l,G))) 
-                //{printf("fehler\n"); 
-                //cout<<"F="<<F<<"\nG="<<G<<"wrong gcd="<<l<<"\n";
-                //}
-                }
-                while (0); //((!divides(l,F)) || (!divides(l,G)));
+                do { l = gcd_poly( F, G, true ); }
+                while ((!divides(l,F)) || (!divides(l,G)));
                 On( SW_RATIONAL );
                 if ( l.lc().sign() < 0 )
                     return -l;
@@ -666,12 +633,8 @@ gcd ( const CanonicalForm & f, const CanonicalForm & g )
             }
             else {
                 CanonicalForm d;
-                do{ d = gcd_poly( f, g, getCharacteristic()==0 ); 
-                //if ((!divides(d,f)) || (!divides(d,g)))
-                //{printf("fehler2\n"); cout<<"F="<<f<<"\nG="<<g<<"wrong gcd="<<d<<"\n";
-                //}
-                }
-                while (0);//((!divides(d,f)) || (!divides(d,g)));
+                do{ d = gcd_poly( f, g, getCharacteristic()==0 ); }
+                while ((!divides(d,f)) || (!divides(d,g)));
                 if ( d.lc().sign() < 0 )
                     return -d;
                 else
