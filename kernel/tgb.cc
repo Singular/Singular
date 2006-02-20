@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.59 2006-02-20 12:28:25 bricken Exp $ */
+/* $Id: tgb.cc,v 1.60 2006-02-20 12:40:13 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -980,8 +980,8 @@ static wlen_type pair_weighted_length(int i, int j, slimgb_alg* c){
         int c2=slim_nsize(p_GetCoeff(c->S->m[j],c->r),c->r);
         wlen_type el1=c->weighted_lengths[i]/c1;
         assume(el1!=0);
-        assume(c->weighted_lengths[j] %c1==0);
-        wlen_type el2=c->weighted_lengths[i]/c2;
+        assume(c->weighted_lengths[i] %c1==0);
+        wlen_type el2=c->weighted_lengths[j]/c2;
         assume(el2!=0);
         assume(c->weighted_lengths[j] %c2==0);
         //should be * for function fields
