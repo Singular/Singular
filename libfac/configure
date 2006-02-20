@@ -533,9 +533,9 @@ fi
 
 libfac_name="\"Factorization and characteristic sets library\""
 
-libfac_version="0.3.3"
+libfac_version="3.0.1"
 
-libfac_date="\"Aug 22 2001\""
+libfac_date="\"Feb 2006\""
 
 libfac_author="\"M. Messollen\""
 
