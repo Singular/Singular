@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.57 2006-02-17 11:32:58 bricken Exp $ */
+/* $Id: tgb.cc,v 1.58 2006-02-20 11:57:03 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -21,10 +21,24 @@
 #include "longrat.h"
 static const int bundle_size=100;
 static const int delay_factor=3;
+int QlogSize(number n);
 #if 1
 static omBin lm_bin=NULL;
 //static const BOOLEAN up_to_radical=TRUE;
 
+static int slim_nsize(number n, ring r) {
+    if (rField_is_Zp(r)){
+        return 1;
+    }
+ if (rField_is_Q(r)){
+      return QlogSize(n);
+
+  }
+    else{
+      return n_Size(n,r);
+     
+    }
+}
 static BOOLEAN monomial_root(poly m, ring r){
     BOOLEAN changed=FALSE;
     int i;
@@ -960,7 +974,29 @@ static int iq_crit(const void* ap,const void* bp){
   if (a->j<b->j) return -1;
   return 0;
 }
-
+static wlen_type pair_weighted_length(int i, int j, slimgb_alg* c){
+    if ((c->is_char0) && (pLexOrder))  {
+        int c1=slim_nsize(p_GetCoeff(c->S->m[i],c->r),c->r);
+        int c2=slim_nsize(p_GetCoeff(c->S->m[j],c->r),c->r);
+        wlen_type el1=c->weighted_lengths[i]/c1;
+        assume(el1!=0);
+        assume(c->weighted_lengths[j] %c1==0);
+        wlen_type el2=c->weighted_lengths[i]/c2;
+        assume(el2!=0);
+        assume(c->weighted_lengths[j] %c2==0);
+        //should be * for function fields
+        return (c1+c2) * (el1+el2-2);
+        
+        
+    }
+    if (c->is_char0) {
+        int cs=slim_nsize(p_GetCoeff(c->S->m[i],c->r),c->r)+
+            slim_nsize(p_GetCoeff(c->S->m[j],c->r),c->r);
+        return (c->lengths[i]+c->lengths[j]-2)*cs;
+    }
+    return c->lengths[i]+c->lengths[j]-2;
+    
+}
 sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slimgb_alg* c, int* ip)
 {
 
@@ -1006,6 +1042,9 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slim
     ENLARGE(c->lengths,int);
     ENLARGE(c->states, char*);
     ENLARGE(c->gcd_of_terms,poly);
+    //if (c->weighted_lengths!=NULL) {
+    ENLARGE(c->weighted_lengths,wlen_type);
+    //}
     //ENLARGE(c->S->m,poly);
     
   }
@@ -1025,7 +1064,17 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slim
 
 
   c->lengths[i]=pLength(h);
- 
+  
+  //necessary for correct weighted length
+  
+   if (!rField_is_Zp(c->r)){ 
+    pCleardenom(h);
+    pContent(h); //is a duplicate call, but belongs here
+    
+  }
+  else                     
+    pNorm(h);
+  c->weighted_lengths[i]=pQuality(h, c, c->lengths[i]);
   c->gcd_of_terms[i]=got;
   
   if (i>0)
@@ -1122,7 +1171,7 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slim
     s->i=si_max(i,j);
     s->j=si_min(i,j);
     assume(s->j==j);
-    s->expected_length=c->lengths[i]+c->lengths[j]-2;
+    s->expected_length=pair_weighted_length(i,j,c);//c->lengths[i]+c->lengths[j]-2;
       
     poly lm=c->tmp_pair_lm[spc];//=pOne_Special();
       
@@ -1901,7 +1950,7 @@ slimgb_alg::slimgb_alg(ideal I, BOOLEAN F4){
   states=(char**) h;
   h=omalloc(n*sizeof(int));
   lengths=(int*) h;
-  
+  weighted_lengths=(wlen_type*)omalloc(n*sizeof(wlen_type));
   gcd_of_terms=(poly*) omalloc(n*sizeof(poly));
   
   short_Exps=(long*) omalloc(n*sizeof(long));

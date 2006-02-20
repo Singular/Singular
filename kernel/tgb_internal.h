@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb_internal.h,v 1.22 2006-02-17 10:26:35 bricken Exp $ */
+/* $Id: tgb_internal.h,v 1.23 2006-02-20 11:57:04 bricken Exp $ */
 /*
  * ABSTRACT: tgb internal .h file
 */
@@ -91,6 +91,7 @@ class slimgb_alg
   ideal S;
   ring r;
   int* lengths;
+  wlen_type* weighted_lengths;
   long* short_Exps;
   kStrategy strat;
   int* T_deg;
@@ -151,7 +152,7 @@ enum calc_state
     UNCALCULATED,
     HASTREP,
     UNIMPORTANT,
-    SOONTREP
+    //SOONTREP
   };
 template <class len_type, class set_type>  int pos_helper(kStrategy strat, poly p, len_type len, set_type setL, polyset set);
 static int add_to_reductors(slimgb_alg* c, poly h, int len);

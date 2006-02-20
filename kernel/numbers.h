@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: numbers.h,v 1.4 2005-05-25 13:03:31 bricken Exp $ */
+/* $Id: numbers.h,v 1.5 2006-02-20 11:57:03 bricken Exp $ */
 /*
 * ABSTRACT: interface to coefficient aritmetics
 */
@@ -32,7 +32,7 @@
 
 #define n_InpMult(a, b, r)    (r)->cf->nInpMult(a,b,r)
 #define n_Power(a, b, res, r) (r)->cf->nPower(a,b,res)
-
+#define n_Size(n,r)           (r)->cf->nSize(n)
 
 /* variables */
 extern short fftable[];
