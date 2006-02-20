@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_gcd.cc,v 1.41 2006-02-20 15:07:31 Singular Exp $ */
+/* $Id: cf_gcd.cc,v 1.42 2006-02-20 15:47:16 Singular Exp $ */
 
 #include <config.h>
 
@@ -407,7 +407,18 @@ gcd_poly ( const CanonicalForm & f, const CanonicalForm & g, const bool modularf
 {
     if ( getCharacteristic() != 0 )
     {
-      if ( f.mvar() != g.mvar() )
+      if ( f.isUnivariate() && g.isUnivariate() )
+      {
+#ifdef HAVE_NTL
+        if ( (isOn(SW_USE_NTL_GCD_P))
+        && isPurePoly(f) && isPurePoly(g))
+           return gcd_poly_univar0(f, g, true);
+#else
+        return gcd_poly_univar0( f, g, true );
+#endif
+      }
+      // now: f or g is not univariate
+      if (f.level() != g.level())
       {
         CFMap M, N;
         compress( f, g, M, N );
