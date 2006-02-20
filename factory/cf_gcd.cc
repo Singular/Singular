@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_gcd.cc,v 1.40 2006-02-20 15:00:59 Singular Exp $ */
+/* $Id: cf_gcd.cc,v 1.41 2006-02-20 15:07:31 Singular Exp $ */
 
 #include <config.h>
 
@@ -399,7 +399,9 @@ gcd_poly1( const CanonicalForm & f, const CanonicalForm & g, const bool modularf
 // Used by gcd() and gcd_poly_univar0().
 //
 //}}}
+#if 0
 int si_factor_reminder=1;
+#endif
 static CanonicalForm
 gcd_poly ( const CanonicalForm & f, const CanonicalForm & g, const bool modularflag )
 {
@@ -411,16 +413,15 @@ gcd_poly ( const CanonicalForm & f, const CanonicalForm & g, const bool modularf
         compress( f, g, M, N );
         CanonicalForm fM = M(f);
         CanonicalForm gM = M(g);
-        //if ( fM.mvar() != gM.mvar() )
-        //{
-        // 
-        //  if ( fM.mvar() > gM.mvar() )
-        //    return N( cf_content( fM, gM ) );
-        //  else
-        //    return N( cf_content( gM, fM ) );
-        //}
-        //else
-            return N( gcd_poly1( fM, gM, false ) );
+        if ( fM.mvar() != gM.mvar() )
+        {
+          if ( fM.mvar() > gM.mvar() )
+            return N( cf_content( fM, gM ) );
+          else
+            return N( cf_content( gM, fM ) );
+        }
+        else
+          return N( gcd_poly1( fM, gM, false ) );
       }
       else
         return gcd_poly1( f, g, false );
