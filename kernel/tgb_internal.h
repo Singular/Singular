@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb_internal.h,v 1.23 2006-02-20 11:57:04 bricken Exp $ */
+/* $Id: tgb_internal.h,v 1.24 2006-02-20 13:14:00 bricken Exp $ */
 /*
  * ABSTRACT: tgb internal .h file
 */
@@ -155,7 +155,7 @@ enum calc_state
     //SOONTREP
   };
 template <class len_type, class set_type>  int pos_helper(kStrategy strat, poly p, len_type len, set_type setL, polyset set);
-static int add_to_reductors(slimgb_alg* c, poly h, int len);
+static int add_to_reductors(slimgb_alg* c, poly h, int len, BOOLEAN simplified=FALSE);
 static int bucket_guess(kBucket* bucket);
 static poly redNFTail (poly h,const int sl,kStrategy strat, int len);
 static poly redNF2 (poly h,slimgb_alg* c , int &len, number&  m,int n=0);

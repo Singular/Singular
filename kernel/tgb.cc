@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.60 2006-02-20 12:40:13 bricken Exp $ */
+/* $Id: tgb.cc,v 1.61 2006-02-20 13:13:59 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -712,7 +712,7 @@ static int bucket_guess(kBucket* bucket){
 
 
 
-static int add_to_reductors(slimgb_alg* c, poly h, int len){
+static int add_to_reductors(slimgb_alg* c, poly h, int len, BOOLEAN simplified){
   //inDebug(h);
   assume(lenS_correct(c->strat));
   assume(len==pLength(h));
@@ -726,15 +726,16 @@ static int add_to_reductors(slimgb_alg* c, poly h, int len){
   P.tailRing=c->r;
   P.p=h; /*p_Copy(h,c->r);*/
   P.FDeg=pFDeg(P.p,c->r);
- 
-  if (!rField_is_Zp(c->r)){ 
-    pCleardenom(P.p);
-    pContent(P.p); //is a duplicate call, but belongs here
-    
+  if (!simplified){
+      if (!rField_is_Zp(c->r)){ 
+        pCleardenom(P.p);
+        pContent(P.p); //is a duplicate call, but belongs here
+        
+      }
+      else                     
+        pNorm(P.p);
+    pNormalize(P.p);
   }
-  else                     
-    pNorm(P.p);
-  pNormalize(P.p);
   wlen_type pq=pQuality(h,c,len);
   i=simple_posInS(c->strat,h,len,pq);
   c->strat->enterS(P,i,c->strat,-1);
@@ -1078,6 +1079,8 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slim
   }
   else                     
     pNorm(h);
+  pNormalize(h);
+  
   c->weighted_lengths[i]=pQuality(h, c, c->lengths[i]);
   c->gcd_of_terms[i]=got;
   
@@ -1278,7 +1281,7 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slim
   omfree(nodes);
   nodes=NULL;
 
-  add_to_reductors(c, h, c->lengths[c->n-1]);
+  add_to_reductors(c, h, c->lengths[c->n-1], TRUE);
   //i=posInS(c->strat,c->strat->sl,h,0 ecart);
   if (!(c->nc)){
     if (c->lengths[c->n-1]==1)
