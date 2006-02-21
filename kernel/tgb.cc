@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.61 2006-02-20 13:13:59 bricken Exp $ */
+/* $Id: tgb.cc,v 1.62 2006-02-21 06:41:24 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -726,7 +726,7 @@ static int add_to_reductors(slimgb_alg* c, poly h, int len, BOOLEAN simplified){
   P.tailRing=c->r;
   P.p=h; /*p_Copy(h,c->r);*/
   P.FDeg=pFDeg(P.p,c->r);
-  if (!simplified){
+  if (!(simplified)){
       if (!rField_is_Zp(c->r)){ 
         pCleardenom(P.p);
         pContent(P.p); //is a duplicate call, but belongs here
@@ -975,6 +975,10 @@ static int iq_crit(const void* ap,const void* bp){
   if (a->j<b->j) return -1;
   return 0;
 }
+static wlen_type coeff_mult_size_estimate(int s1, int s2, ring r){
+    if (rField_is_Q(r)) return s1+s2;
+    else return s1*s2;
+}
 static wlen_type pair_weighted_length(int i, int j, slimgb_alg* c){
     if ((c->is_char0) && (pLexOrder))  {
         int c1=slim_nsize(p_GetCoeff(c->S->m[i],c->r),c->r);
@@ -986,14 +990,21 @@ static wlen_type pair_weighted_length(int i, int j, slimgb_alg* c){
         assume(el2!=0);
         assume(c->weighted_lengths[j] %c2==0);
         //should be * for function fields
-        return (c1+c2) * (el1+el2-2);
-        
+        //return (c1+c2) * (el1+el2-2);
+        wlen_type res=coeff_mult_size_estimate(c1,c2,c->r);
+        res*=el1+el2-2;
+        return res;
         
     }
     if (c->is_char0) {
-        int cs=slim_nsize(p_GetCoeff(c->S->m[i],c->r),c->r)+
-            slim_nsize(p_GetCoeff(c->S->m[j],c->r),c->r);
-        return (c->lengths[i]+c->lengths[j]-2)*cs;
+        //int cs=slim_nsize(p_GetCoeff(c->S->m[i],c->r),c->r)+
+        //    slim_nsize(p_GetCoeff(c->S->m[j],c->r),c->r);
+        wlen_type cs=
+            coeff_mult_size_estimate(
+                slim_nsize(p_GetCoeff(c->S->m[i],c->r),c->r),
+                slim_nsize(p_GetCoeff(c->S->m[j],c->r),c->r),c->r);
+        return (wlen_type)(c->lengths[i]+c->lengths[j]-2)*
+            (wlen_type)cs;
     }
     if (pLexOrder) {
 
