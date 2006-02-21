@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.62 2006-02-21 06:41:24 bricken Exp $ */
+/* $Id: tgb.cc,v 1.63 2006-02-21 11:08:37 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -980,7 +980,7 @@ static wlen_type coeff_mult_size_estimate(int s1, int s2, ring r){
     else return s1*s2;
 }
 static wlen_type pair_weighted_length(int i, int j, slimgb_alg* c){
-    if ((c->is_char0) && (pLexOrder))  {
+    if ((c->is_char0) && (pLexOrder) &&(!c->is_homog))  {
         int c1=slim_nsize(p_GetCoeff(c->S->m[i],c->r),c->r);
         int c2=slim_nsize(p_GetCoeff(c->S->m[j],c->r),c->r);
         wlen_type el1=c->weighted_lengths[i]/c1;
@@ -1006,7 +1006,7 @@ static wlen_type pair_weighted_length(int i, int j, slimgb_alg* c){
         return (wlen_type)(c->lengths[i]+c->lengths[j]-2)*
             (wlen_type)cs;
     }
-    if (pLexOrder) {
+    if ((pLexOrder) &&(!c->is_homog)) {
 
         return (c->weighted_lengths[i]+c->weighted_lengths[j]-2);
     }
