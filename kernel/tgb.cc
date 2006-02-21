@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.63 2006-02-21 11:08:37 bricken Exp $ */
+/* $Id: tgb.cc,v 1.64 2006-02-21 11:21:37 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -1118,7 +1118,7 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slim
     }
     
     if (_p_GetComp(c->S->m[i],c->r)!=_p_GetComp(c->S->m[j],c->r)){
-      c->states[i][j]=UNIMPORTANT;
+      c->states[i][j]=UNCALCULATED;
       //WARNUNG: be careful
       continue;
     } else

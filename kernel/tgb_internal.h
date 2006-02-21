@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb_internal.h,v 1.24 2006-02-20 13:14:00 bricken Exp $ */
+/* $Id: tgb_internal.h,v 1.25 2006-02-21 11:21:37 bricken Exp $ */
 /*
  * ABSTRACT: tgb internal .h file
 */
@@ -150,8 +150,8 @@ class red_object{
 enum calc_state
   {
     UNCALCULATED,
-    HASTREP,
-    UNIMPORTANT,
+    HASTREP//,
+    //UNIMPORTANT,
     //SOONTREP
   };
 template <class len_type, class set_type>  int pos_helper(kStrategy strat, poly p, len_type len, set_type setL, polyset set);
