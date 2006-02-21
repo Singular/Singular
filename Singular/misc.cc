@@ -240,7 +240,7 @@ struct soptionStruct verboseStruct[]=
   {"contentSB",Sy_bit(V_CONTENTSB), ~Sy_bit(V_CONTENTSB)  },
   {"cancelunit",Sy_bit(V_CANCELUNIT),~Sy_bit(V_CANCELUNIT)},
   {"modpsolve",Sy_bit(V_MODPSOLVSB),~Sy_bit(V_MODPSOLVSB)},
-  {"geometricGB",Sy_bit(V_UPTORADICAL),~Sy_bit(V_UPTORADICAL)},
+  {"geometricSB",Sy_bit(V_UPTORADICAL),~Sy_bit(V_UPTORADICAL)},
   {"findMonomials",Sy_bit(V_FINDMONOM),~Sy_bit(V_FINDMONOM)},
 /*special for "none" and also end marker for showOption:*/
   {"ne",         0,          0 }
