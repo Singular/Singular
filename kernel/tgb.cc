@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.64 2006-02-21 11:21:37 bricken Exp $ */
+/* $Id: tgb.cc,v 1.65 2006-02-22 11:13:03 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -19,6 +19,7 @@
 #include "gring.h"
 
 #include "longrat.h"
+#define SR_HDL(A) ((long)(A))
 static const int bundle_size=100;
 static const int delay_factor=3;
 int QlogSize(number n);
@@ -157,12 +158,32 @@ int QlogSizeClassic(number bigint){
   //Print("%d\n",ls);
   return ls;
 }
-int QlogSize(number bigint){
-  int size=nlSize(bigint);
-  if(size<=1) return QlogSizeClassic(bigint);
-  else return sizeof(mp_limb_t)*size*8;
-  }
 
+  
+  
+int QlogSizeNew(number n){
+    
+    if (SR_HDL(n) & SR_INT){
+       long i=SR_TO_INT(n);
+       if (i==0) return 0;
+       
+       unsigned long v;
+       v=(i>=0)?i:-i;
+       int r = 0;
+
+       while (v >>= 1)
+       {
+        r++;
+       }
+       return r+1;
+    }
+    //assume denominator is 0
+    return mpz_sizeinbase(&n->z,2);
+}
+
+inline int QlogSize(number bigint){
+    return QlogSizeNew(bigint);
+  }
 #ifdef LEN_VAR3
 inline int pSLength(poly p,int l)
 {
@@ -1107,15 +1128,12 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slim
 #undef ENLARGE
   for (j=0;j<i;j++){
     
-    //check product criterion
+
     
     c->states[i][j]=UNCALCULATED;
     assume(p_LmDivisibleBy(c->S->m[i],c->S->m[j],c->r)==
      p_LmShortDivisibleBy(c->S->m[i],c->short_Exps[i],c->S->m[j],~(c->short_Exps[j]),c->r));
-    if(!c->F4_mode)
-    {
-      //      assume(!(p_LmDivisibleBy(c->S->m[j],c->S->m[i],c->r)));
-    }
+
     
     if (_p_GetComp(c->S->m[i],c->r)!=_p_GetComp(c->S->m[j],c->r)){
       c->states[i][j]=UNCALCULATED;
@@ -2383,6 +2401,8 @@ static BOOLEAN state_is(calc_state state, const int & arg_i, const  int & arg_j,
   }
   else return(c->states[arg_j][arg_i]==state);
 }
+
+
 void free_sorted_pair_node(sorted_pair_node* s, ring r){
   if (s->i>=0)
     p_Delete(&s->lcm_of_lm,r);
