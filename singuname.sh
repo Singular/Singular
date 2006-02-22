@@ -192,6 +192,17 @@ then
         echo ${prefix}-Unknown
         exit 1
     fi
+elif (echo $uname_a | $egrep "hppa" > $devnull)
+then
+    prefix=hppa
+    if (echo $uname_a | $egrep "Linux" > $devnull)
+    then
+        echo ${prefix}-Linux
+        exit 0
+    else
+        echo ${prefix}-Unknown
+        exit 1
+    fi
 else # Unknown ########################################################
     echo Unknown
     exit 2
