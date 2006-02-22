@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.65 2006-02-22 11:13:03 bricken Exp $ */
+/* $Id: tgb.cc,v 1.66 2006-02-22 12:50:44 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -25,6 +25,17 @@ static const int delay_factor=3;
 int QlogSize(number n);
 #if 1
 static omBin lm_bin=NULL;
+
+static void simplify_poly(poly p, ring r) {
+     assume(r==currRing);
+     if (!rField_is_Zp(r)){ 
+        pCleardenom(p);
+        pContent(p); //is a duplicate call, but belongs here
+        
+      }
+      else                     
+        pNorm(p);
+}
 //static const BOOLEAN up_to_radical=TRUE;
 
 static int slim_nsize(number n, ring r) {
@@ -130,34 +141,6 @@ int kSBucketLength(kBucket* b, poly lm)
 
 // 3.Variante: Laenge: Platz fuer Leitk * Monomanzahl
 
-int QlogSizeClassic(number bigint){
-  if(nlIsZero(bigint)) return 0;
-  number absv=nlCopy(bigint);
-  number two=nlInit(2);
-  if(!(nlGreaterZero(absv)))
-    absv=nlNeg(absv);
-  int ls=0;
-  number comp=nlInit(1);
-  BOOLEAN equal=FALSE;
-  while(!(nlGreater(comp,absv))) {
-    ls++;
-    if (nlEqual(comp,absv)){
-      equal=TRUE;
-      break;
-    }
-    number temp=comp;
-    comp=nlMult(comp,two);
-    nlDelete(&temp, currRing);
-    
-  }
-  if(!equal)
-    ls++;
-  nlDelete(&two,currRing);
-  nlDelete(&absv,currRing);
-  nlDelete(&comp,currRing);
-  //Print("%d\n",ls);
-  return ls;
-}
 
   
   
@@ -2199,7 +2182,7 @@ slimgb_alg::~slimgb_alg(){
 ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
   
   //  Print("QlogSize(0) %d, QlogSize(1) %d,QlogSize(-2) %d, QlogSize(5) %d\n", QlogSize(nlInit(0)),QlogSize(nlInit(1)),QlogSize(nlInit(-2)),QlogSize(nlInit(5)));
-  
+ 
   if (TEST_OPT_PROT)
     if (F4_mode)
       PrintS("F4 Modus \n");
@@ -2208,6 +2191,10 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
   //if (debug_Ideal) PrintS("DebugIdeal received\n");
   // Print("Idelems %i \n----------\n",IDELEMS(arg_I));
   ideal I=idCompactify(arg_I);
+   int i;
+  for(i=0;i<IDELEMS(I);i++){
+    simplify_poly(I->m[i],currRing);
+  }
   if (idIs0(I)) return I;
 
   qsort(I->m,IDELEMS(I),sizeof(poly),poly_crit);
@@ -2215,7 +2202,7 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
   //slimgb_alg* c=(slimgb_alg*) omalloc(sizeof(slimgb_alg));
   slimgb_alg* c=new slimgb_alg(I, F4_mode);
     
-  int i;
+
   while(c->pair_top>=0)
   {
     if(F4_mode)
@@ -3096,7 +3083,10 @@ static void multi_reduction(red_object* los, int & losl, slimgb_alg* c)
   sorted_pair_node** pairs=(sorted_pair_node**)
     omalloc(delay_s*sizeof(sorted_pair_node*)); 
   for(i=0;i<delay_s;i++){
+       
       poly p=delay[i];
+      //if (rPar(c->r)==0)
+      simplify_poly(p,c->r);
       sorted_pair_node* si=(sorted_pair_node*) omalloc(sizeof(sorted_pair_node));
       si->i=-1;
       si->j=-1;
