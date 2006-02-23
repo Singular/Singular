@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: claptmpl.cc,v 1.31 2005-12-19 13:57:30 bricken Exp $
+// $Id: claptmpl.cc,v 1.32 2006-02-23 12:39:35 bricken Exp $
 /*
 * ABSTRACT - instantiation of all templates
 */
@@ -202,6 +202,15 @@ template    static  void    print_rational( ostream&,int,const Rational& );
 //  end of file
 // ----------------------------------------------------------------------------
 #include "tgb_internal.h"
+#ifdef HAVE_BOOST
+#include <boost/dynamic_bitset.hpp>
+#include <vector>
+using std::vector;
+using boost::dynamic_bitset;
+template class dynamic_bitset<>;
+template class vector<dynamic_bitset<> >;
+#endif
+
 template int pos_helper(kStrategy strat, poly p, int len, intset  setL, polyset set);
 template int pos_helper(kStrategy strat, poly p, wlen_type len, wlen_set setL, polyset set);
 //template int pos_helper(kStrategy strat, poly p, int len, intset setL, polyset set);

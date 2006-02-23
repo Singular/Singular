@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb_internal.h,v 1.25 2006-02-21 11:21:37 bricken Exp $ */
+/* $Id: tgb_internal.h,v 1.26 2006-02-23 12:39:22 bricken Exp $ */
 /*
  * ABSTRACT: tgb internal .h file
 */
@@ -17,6 +17,13 @@
 #include "structs.h"
 #include "polys.h"
 #include "stdlib.h"
+//#define HAVE_BOOST 1
+#ifdef HAVE_BOOST
+#include "boost/dynamic_bitset.hpp"
+#include <vector>
+using boost::dynamic_bitset;
+using std::vector;
+#endif
 
 
 #include "kutil.h"
@@ -86,7 +93,11 @@ class slimgb_alg
   public:
     slimgb_alg(ideal I, BOOLEAN F4);
     virtual ~slimgb_alg();
+  #ifndef HAVE_BOOST
   char** states;
+  #else
+  vector<dynamic_bitset<> > states;
+  #endif
   ideal add_later;
   ideal S;
   ring r;

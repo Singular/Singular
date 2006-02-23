@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.68 2006-02-23 05:31:29 bricken Exp $ */
+/* $Id: tgb.cc,v 1.69 2006-02-23 12:39:22 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -1060,7 +1060,9 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slim
 
     ENLARGE(c->short_Exps,long);
     ENLARGE(c->lengths,int);
+    #ifndef HAVE_BOOST
     ENLARGE(c->states, char*);
+    #endif
     ENLARGE(c->gcd_of_terms,poly);
     //if (c->weighted_lengths!=NULL) {
     ENLARGE(c->weighted_lengths,wlen_type);
@@ -1098,12 +1100,15 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slim
   
   c->weighted_lengths[i]=pQuality(h, c, c->lengths[i]);
   c->gcd_of_terms[i]=got;
+  #ifdef HAVE_BOOST
+    c->states.push_back(dynamic_bitset<>(i));
   
+  #else
   if (i>0)
     c->states[i]=(char*)  omalloc(i*sizeof(char));
   else
     c->states[i]=NULL;
-  
+  #endif
   
   c->S->m[i]=h;
   c->short_Exps[i]=p_GetShortExpVector(h,c->r);
@@ -1112,14 +1117,15 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slim
   for (j=0;j<i;j++){
     
 
-    
+    #ifndef HAVE_BOOST
     c->states[i][j]=UNCALCULATED;
+    #endif
     assume(p_LmDivisibleBy(c->S->m[i],c->S->m[j],c->r)==
      p_LmShortDivisibleBy(c->S->m[i],c->short_Exps[i],c->S->m[j],~(c->short_Exps[j]),c->r));
 
     
     if (_p_GetComp(c->S->m[i],c->r)!=_p_GetComp(c->S->m[j],c->r)){
-      c->states[i][j]=UNCALCULATED;
+      //c->states[i][j]=UNCALCULATED;
       //WARNUNG: be careful
       continue;
     } else
@@ -1965,8 +1971,11 @@ slimgb_alg::slimgb_alg(ideal I, BOOLEAN F4){
   HeadBin=omGetSpecBin(POLYSIZE + (currRing->ExpL_Size)*sizeof(long));
 #endif
   /* omUnGetSpecBin(&(c->HeadBin)); */
+  #ifndef HAVE_BOOST
   h=omalloc(n*sizeof(char*));
+  
   states=(char**) h;
+  #endif
   h=omalloc(n*sizeof(int));
   lengths=(int*) h;
   weighted_lengths=(wlen_type*)omalloc(n*sizeof(wlen_type));
@@ -2073,10 +2082,13 @@ slimgb_alg::~slimgb_alg(){
     c->F_minus=c->F_minus->next;
     omfree(old);
   }
+  #ifndef HAVE_BOOST
   for(int z=1 /* zero length at 0 */;z<c->n;z++){
     omfree(c->states[z]);
   }
   omfree(c->states);
+  #endif
+
   omfree(c->lengths);
   omfree(c->weighted_lengths);
   for(int z=0;z<c->n;z++)
