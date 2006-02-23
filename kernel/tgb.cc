@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.67 2006-02-22 13:09:35 bricken Exp $ */
+/* $Id: tgb.cc,v 1.68 2006-02-23 05:31:29 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -2747,13 +2747,16 @@ static void multi_reduction_lls_trick(red_object* los, int losl,slimgb_alg* c,fi
     {
       c->S->m[pos_in_c]=clear_into;
       c->lengths[pos_in_c]=new_length;
+      c->weighted_lengths[pos_in_c]=qal;
+      if (c->gcd_of_terms[pos_in_c]==NULL)
+        c->gcd_of_terms[pos_in_c]=gcd_of_terms(clear_into,c->r);
       if (c->T_deg_full)
   c->T_deg_full[pos_in_c]=pTotaldegree_full(clear_into);
       c_S_element_changed_hook(pos_in_c,c);
     }
     c->strat->S[j]=clear_into;
     c->strat->lenS[j]=new_length;
-    c->weighted_lengths[pos_in_c]=qal;
+    
     assume(pLength(clear_into)==new_length);
     if(c->strat->lenSw!=NULL)
       c->strat->lenSw[j]=qal;
