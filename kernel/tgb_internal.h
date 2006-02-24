@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb_internal.h,v 1.26 2006-02-23 12:39:22 bricken Exp $ */
+/* $Id: tgb_internal.h,v 1.27 2006-02-24 06:55:05 bricken Exp $ */
 /*
  * ABSTRACT: tgb internal .h file
 */
@@ -51,11 +51,13 @@ using std::vector;
 //#define QUICK_SPOLY_TEST
 struct sorted_pair_node{
   //criterium, which is stable 0. small lcm 1. small i 2. small j
+  wlen_type expected_length;
+  poly lcm_of_lm;
   int i;
   int j;
   int deg;
-  int expected_length;
-  poly lcm_of_lm;
+ 
+  
 };
 
 
@@ -114,7 +116,11 @@ class slimgb_alg
   poly* gcd_of_terms;
   int_pair_node* soon_free;
   sorted_pair_node** apairs;
+  #if 0
   BOOLEAN* modifiedS;
+  #endif
+  bool* replaced;
+ 
   poly_list_node* to_destroy;
   //for F4
   mp_array_list* F;
@@ -142,6 +148,7 @@ class slimgb_alg
   BOOLEAN doubleSugar;
   BOOLEAN F4_mode;
   BOOLEAN nc;
+  BOOLEAN used_b;
 };
 class red_object{
  public:
