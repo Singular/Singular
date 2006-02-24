@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb_internal.h,v 1.28 2006-02-24 07:25:34 bricken Exp $ */
+/* $Id: tgb_internal.h,v 1.29 2006-02-24 10:12:32 bricken Exp $ */
 /*
  * ABSTRACT: tgb internal .h file
 */
@@ -210,7 +210,7 @@ static void multi_reduction(red_object* los, int & losl, slimgb_alg* c);
 
 sorted_pair_node* quick_pop_pair(slimgb_alg* c);
 sorted_pair_node* top_pair(slimgb_alg* c);
-sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slimgb_alg* c, int* ip);
+sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slimgb_alg* c, int* ip, BOOLEAN new_pairs=TRUE);
 sorted_pair_node**  spn_merge(sorted_pair_node** p, int pn,sorted_pair_node **q, int qn,slimgb_alg* c);
 int kFindDivisibleByInS_easy(kStrategy strat,const red_object & obj);
 int tgb_pair_better_gen2(const void* ap,const void* bp);
