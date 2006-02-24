@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.73 2006-02-24 11:19:36 bricken Exp $ */
+/* $Id: tgb.cc,v 1.74 2006-02-24 11:39:20 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -1133,7 +1133,7 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slim
     } else
     if ((!c->nc) && (c->lengths[i]==1) && (c->lengths[j]==1)){
       c->states[i][j]=HASTREP;
-      continue;
+      //continue;
       }
     else if ((!(c->nc)) &&  (pHasNotCF(c->S->m[i],c->S->m[j])))
     {
