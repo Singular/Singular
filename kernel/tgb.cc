@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.70 2006-02-24 06:55:04 bricken Exp $ */
+/* $Id: tgb.cc,v 1.71 2006-02-24 07:25:33 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -1591,9 +1591,10 @@ static void go_on (slimgb_alg* c){
     omfree(p);
     return;
   }
+  #ifdef TGB_RESORT_PAIRS
   c->replaced=new bool[c->n];
   c->used_b=FALSE;
-  
+  #endif
   red_object* buf=(red_object*) omalloc(i*sizeof(red_object));
   c->normal_forms+=i;
   int j;
@@ -1623,6 +1624,7 @@ static void go_on (slimgb_alg* c){
     c->modifiedS[z2]=FALSE;
 #endif
   multi_reduction(buf, i, c);
+  #ifdef TGB_RESORT_PAIRS
   if (c->used_b) {
     if (TEST_OPT_PROT)
         PrintS("B");
@@ -1637,6 +1639,7 @@ static void go_on (slimgb_alg* c){
     }
     qsort(c->apairs,c->pair_top+1,sizeof(sorted_pair_node*),tgb_pair_better_gen2);
   }
+  #endif
 #ifdef TGB_DEBUG
  {
    int k;
@@ -1746,9 +1749,11 @@ static void go_on (slimgb_alg* c){
     }
     id_Delete(&add2, c->r);
   }
+  #ifdef TGB_RESORT_PAIRS
   delete c->replaced;
   c->replaced=NULL;
   c->used_b=FALSE;
+  #endif
   return;
 }
 
@@ -2777,8 +2782,10 @@ static void multi_reduction_lls_trick(red_object* los, int losl,slimgb_alg* c,fi
     }
     if(pos_in_c>=0)
     {
+      #ifdef TGB_RESORT_PAIRS
       c->used_b=TRUE;
       c->replaced[pos_in_c]=TRUE;
+      #endif
       c->S->m[pos_in_c]=clear_into;
       c->lengths[pos_in_c]=new_length;
       c->weighted_lengths[pos_in_c]=qal;

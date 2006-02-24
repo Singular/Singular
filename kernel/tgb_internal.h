@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb_internal.h,v 1.27 2006-02-24 06:55:05 bricken Exp $ */
+/* $Id: tgb_internal.h,v 1.28 2006-02-24 07:25:34 bricken Exp $ */
 /*
  * ABSTRACT: tgb internal .h file
 */
@@ -119,8 +119,9 @@ class slimgb_alg
   #if 0
   BOOLEAN* modifiedS;
   #endif
+  #ifdef TGB_RESORT_PAIRS
   bool* replaced;
- 
+  #endif
   poly_list_node* to_destroy;
   //for F4
   mp_array_list* F;
@@ -148,7 +149,9 @@ class slimgb_alg
   BOOLEAN doubleSugar;
   BOOLEAN F4_mode;
   BOOLEAN nc;
+  #ifdef TGB_RESORT_PAIRS
   BOOLEAN used_b;
+  #endif
 };
 class red_object{
  public:
