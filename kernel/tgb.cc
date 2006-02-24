@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.74 2006-02-24 11:39:20 bricken Exp $ */
+/* $Id: tgb.cc,v 1.75 2006-02-24 11:53:50 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -1554,7 +1554,7 @@ static void go_on (slimgb_alg* c){
       
     }
     
-    else curr_deg=s->deg;
+    else {curr_deg=s->deg;
     if ((TEST_OPT_DEGBOUND) && (curr_deg>Kstd1_deg)){
         int j;
         for(j=c->pair_top;j>=0;j--){
@@ -1572,7 +1572,7 @@ static void go_on (slimgb_alg* c){
         }
         c->pair_top=-1;
         break;
-    }
+    }}
     quick_pop_pair(c);
     if(s->i>=0){
       //be careful replace_pair use createShortSpoly which is not noncommutative
