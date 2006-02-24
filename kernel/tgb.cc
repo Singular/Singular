@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.75 2006-02-24 11:53:50 bricken Exp $ */
+/* $Id: tgb.cc,v 1.76 2006-02-24 12:57:38 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -1017,7 +1017,7 @@ static wlen_type pair_weighted_length(int i, int j, slimgb_alg* c){
     return c->lengths[i]+c->lengths[j]-2;
     
 }
-sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slimgb_alg* c, int* ip, BOOLEAN new_pairs)
+sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slimgb_alg* c, int* ip)
 {
 
   assume(h!=NULL);
@@ -1114,14 +1114,12 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slim
   c->short_Exps[i]=p_GetShortExpVector(h,c->r);
  
 #undef ENLARGE
-  
   for (j=0;j<i;j++){
     
 
     #ifndef HAVE_BOOST
     c->states[i][j]=UNCALCULATED;
     #endif
-    if (!new_pairs) continue;
     assume(p_LmDivisibleBy(c->S->m[i],c->S->m[j],c->r)==
      p_LmShortDivisibleBy(c->S->m[i],c->short_Exps[i],c->S->m[j],~(c->short_Exps[j]),c->r));
 
@@ -1133,14 +1131,13 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slim
     } else
     if ((!c->nc) && (c->lengths[i]==1) && (c->lengths[j]==1)){
       c->states[i][j]=HASTREP;
-      //continue;
+      
       }
     else if ((!(c->nc)) &&  (pHasNotCF(c->S->m[i],c->S->m[j])))
     {
       c->easy_product_crit++;
       c->states[i][j]=HASTREP;
-      
-      //continue;
+      continue;
     }
     else if(extended_product_criterion(c->S->m[i],c->gcd_of_terms[i],c->S->m[j],c->gcd_of_terms[j],c))
     {
@@ -1150,7 +1147,7 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slim
       //PrintS("E");
     }
       //  if (c->states[i][j]==UNCALCULATED){
-    
+
     if ((TEST_V_FINDMONOM) &&(!c->nc)) {
         //PrintS("COMMU");
        //  if (c->lengths[i]==c->lengths[j]){
@@ -1162,7 +1159,7 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slim
 //                 p_Delete(&short_s, currRing);
 //             }
 //         }
-        if ((c->lengths[i]+c->lengths[j]==3) &&( (pHasNotCF(c->S->m[i],c->S->m[j])))){
+        if (c->lengths[i]+c->lengths[j]==3){
             poly                 short_s=ksCreateShortSpoly(c->S->m[i],c->S->m[j],c->r);
             if (short_s==NULL){
                 c->states[i][j]=HASTREP;
@@ -1551,28 +1548,9 @@ static void go_on (slimgb_alg* c){
     if (!s) break;
     if(curr_deg>=0){
       if (s->deg >curr_deg) break;
-      
     }
-    
-    else {curr_deg=s->deg;
-    if ((TEST_OPT_DEGBOUND) && (curr_deg>Kstd1_deg)){
-        int j;
-        for(j=c->pair_top;j>=0;j--){
-            s=c->apairs[j];
-            if (s->i<0){
-                
-                               add_to_basis_ideal_quotient(s->lcm_of_lm,-1,-1,c,NULL,FALSE);
-                s->lcm_of_lm=NULL;
-                free_sorted_pair_node(s,c->r);
-            }
-            else
-                free_sorted_pair_node(s,c->r);
-            c->pair_top--;
-            assume(c->pair_top=j-1);
-        }
-        c->pair_top=-1;
-        break;
-    }}
+
+    else curr_deg=s->deg;
     quick_pop_pair(c);
     if(s->i>=0){
       //be careful replace_pair use createShortSpoly which is not noncommutative
@@ -1723,7 +1701,7 @@ static void go_on (slimgb_alg* c){
 
     if (!c->nc)
       p=redTailShort(p, c->strat);
-    sbuf[j]=add_to_basis_ideal_quotient(p,-1,-1,c,ibuf+j, TRUE);
+    sbuf[j]=add_to_basis_ideal_quotient(p,-1,-1,c,ibuf+j);
     //sbuf[j]=add_to_basis(p,-1,-1,c,ibuf+j);
   }
   int sum=0;
@@ -1766,7 +1744,7 @@ static void go_on (slimgb_alg* c){
     memset(c->add_later->m,0,5000*sizeof(poly));
     for(i=0;i<add2->idelems();i++){
       if (add2->m[i]!=NULL)
-          add_to_basis_ideal_quotient(add2->m[i],-1,-1,c,NULL, TRUE);
+          add_to_basis_ideal_quotient(add2->m[i],-1,-1,c,NULL);
       add2->m[i]=NULL;
     }
     id_Delete(&add2, c->r);
@@ -2060,7 +2038,7 @@ slimgb_alg::slimgb_alg(ideal I, BOOLEAN F4){
     strat->lenSw=NULL;
   sorted_pair_node* si;
   assume(n>0);
-  add_to_basis_ideal_quotient(I->m[0],-1,-1,this,NULL, TRUE);
+  add_to_basis_ideal_quotient(I->m[0],-1,-1,this,NULL);
 
   assume(strat->sl==strat->Shdl->idelems()-1);
   if(!(F4_mode))
@@ -2086,7 +2064,7 @@ slimgb_alg::slimgb_alg(ideal I, BOOLEAN F4){
   else
   {
     for (i=1;i<n;i++)//the 1 is wanted, because first element is added to basis
-      add_to_basis_ideal_quotient(I->m[i],-1,-1,this,NULL, TRUE);
+      add_to_basis_ideal_quotient(I->m[i],-1,-1,this,NULL);
   }
   for(i=0;i<I->idelems();i++)
   {
@@ -2200,30 +2178,28 @@ slimgb_alg::~slimgb_alg(){
 //       pDelete(&c->S->m[i]);
 //     }
 //   }
-  if (!(TEST_OPT_DEGBOUND)){
 
-  //FIXME: not minimal when using find monomials
-      for(i=0;i<c->n;i++)
+ 
+  for(i=0;i<c->n;i++)
+  {
+    assume(c->S->m[i]!=NULL);
+    for(j=0;j<c->n;j++)
+    {
+      if((c->S->m[j]==NULL)||(i==j)) 
+        continue;
+      assume(p_LmShortDivisibleBy(c->S->m[j],c->short_Exps[j],
+             c->S->m[i],~c->short_Exps[i],
+             c->r)==p_LmDivisibleBy(c->S->m[j],
+             c->S->m[i],
+             c->r));
+      if (p_LmShortDivisibleBy(c->S->m[j],c->short_Exps[j],
+          c->S->m[i],~c->short_Exps[i],
+          c->r))
       {
-        assume(c->S->m[i]!=NULL);
-        for(j=0;j<c->n;j++)
-        {
-          if((c->S->m[j]==NULL)||(i==j)) 
-            continue;
-          assume(p_LmShortDivisibleBy(c->S->m[j],c->short_Exps[j],
-                 c->S->m[i],~c->short_Exps[i],
-                 c->r)==p_LmDivisibleBy(c->S->m[j],
-                 c->S->m[i],
-                 c->r));
-          if (p_LmShortDivisibleBy(c->S->m[j],c->short_Exps[j],
-              c->S->m[i],~c->short_Exps[i],
-              c->r))
-          {
-            pDelete(&c->S->m[i]);
-            break;
-          }
-        }
+        pDelete(&c->S->m[i]);
+        break;
       }
+    }
   }
   omfree(c->short_Exps);
   
@@ -2241,7 +2217,7 @@ slimgb_alg::~slimgb_alg(){
   delete c->strat;
 }
 ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
-  //Print("degb ound%d\n",Kstd1_deg);
+  
   //  Print("QlogSize(0) %d, QlogSize(1) %d,QlogSize(-2) %d, QlogSize(5) %d\n", QlogSize(nlInit(0)),QlogSize(nlInit(1)),QlogSize(nlInit(-2)),QlogSize(nlInit(5)));
  
   if (TEST_OPT_PROT)
