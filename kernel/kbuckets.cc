@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.cc,v 1.26 2006-02-16 10:20:33 bricken Exp $ */
+/* $Id: kbuckets.cc,v 1.27 2006-02-27 14:42:05 bricken Exp $ */
 
 #include "mod2.h"
 #include "structs.h"
@@ -1129,6 +1129,8 @@ number kBucketPolyRed(kBucket_pt bucket,
   assume(l1==pLength(a1));
   BOOLEAN backuped=FALSE;
   number coef;
+  #if 0
+  //@Viktor, don't ignore coefficients on monomials
   if(l1==1) {
     
     //if (rField_is_Q(bucket->bucket_ring)) {
@@ -1143,7 +1145,7 @@ number kBucketPolyRed(kBucket_pt bucket,
     //deletes coef as side effect
     //}
   }
-
+  #endif
   
   kBucket_Minus_m_Mult_p(bucket, lm, a1, &l1, spNoether);
   
