@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.77 2006-02-28 12:02:52 bricken Exp $ */
+/* $Id: tgb.cc,v 1.78 2006-02-28 12:20:37 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -322,6 +322,28 @@ static int do_pELength(poly p, slimgb_alg* c, int dlm=-1){
   }
   return s;
 }
+
+wlen_type pELength(poly p, ring r){
+  if(p==NULL) return 0;
+  int s=0;
+  poly pi=p;
+  int dlm;
+    dlm=pTotaldegree(p,r);
+    s=1;
+    pi=p->next;
+ 
+  
+  while(pi){
+    int d=pTotaldegree(pi,r);
+    if(d>dlm)
+      s+=1+d-dlm;
+    else
+      ++s;
+    pi=pi->next;
+  }
+  return s;
+}
+
 int kEBucketLength(kBucket* b, poly lm,slimgb_alg* ca)
 {
   int s=0;

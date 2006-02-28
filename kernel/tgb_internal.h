@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb_internal.h,v 1.32 2006-02-28 12:02:53 bricken Exp $ */
+/* $Id: tgb_internal.h,v 1.33 2006-02-28 12:20:38 bricken Exp $ */
 /*
  * ABSTRACT: tgb internal .h file
 */
@@ -295,6 +295,6 @@ template <class len_type, class set_type>  int pos_helper(kStrategy strat, poly 
 
 
 
-
+wlen_type pELength(poly p, ring r);
 
 #endif
