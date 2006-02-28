@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb_internal.h,v 1.31 2006-02-24 12:58:19 bricken Exp $ */
+/* $Id: tgb_internal.h,v 1.32 2006-02-28 12:02:53 bricken Exp $ */
 /*
  * ABSTRACT: tgb internal .h file
 */
@@ -207,7 +207,7 @@ static poly gcd_of_terms(poly p, ring r);
 static BOOLEAN extended_product_criterion(poly p1, poly gcd1, poly p2, poly gcd2, slimgb_alg* c);
 static poly kBucketGcd(kBucket* b, ring r);
 static void multi_reduction(red_object* los, int & losl, slimgb_alg* c);
-
+int slim_nsize(number n, ring r);
 sorted_pair_node* quick_pop_pair(slimgb_alg* c);
 sorted_pair_node* top_pair(slimgb_alg* c);
 sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slimgb_alg* c, int* ip);//, BOOLEAN new_pairs=TRUE);

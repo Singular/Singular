@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.76 2006-02-24 12:57:38 bricken Exp $ */
+/* $Id: tgb.cc,v 1.77 2006-02-28 12:02:52 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -38,7 +38,7 @@ static void simplify_poly(poly p, ring r) {
 }
 //static const BOOLEAN up_to_radical=TRUE;
 
-static int slim_nsize(number n, ring r) {
+int slim_nsize(number n, ring r) {
     if (rField_is_Zp(r)){
         return 1;
     }
@@ -144,7 +144,7 @@ int kSBucketLength(kBucket* b, poly lm)
 
   
   
-int QlogSizeNew(number n){
+int QlogSize(number n){
     
     if (SR_HDL(n) & SR_INT){
        long i=SR_TO_INT(n);
@@ -164,9 +164,7 @@ int QlogSizeNew(number n){
     return mpz_sizeinbase(&n->z,2);
 }
 
-inline int QlogSize(number bigint){
-    return QlogSizeNew(bigint);
-  }
+
 #ifdef LEN_VAR3
 inline int pSLength(poly p,int l)
 {
