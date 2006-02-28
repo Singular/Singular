@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.10 2006-02-15 14:08:17 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.11 2006-02-28 17:50:33 wienand Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -185,62 +185,93 @@ long factorial(long arg)
    return tmp;
 }
 
+long ind2(long arg)
+{
+  long ind = 0;
+  if (arg <= 0) return 0;
+  while (arg%2 == 0)
+  {
+    arg = arg / 2;
+    ind++;
+  }
+  return ind;
+}
+
+long ind_fact_2(long arg)
+{
+  long ind = 0;
+  if (arg <= 0) return 0;
+  if (arg%2 == 1) { arg--; }
+  while (arg > 0)
+  {
+    ind += ind2(arg);
+    arg = arg - 2;
+  }
+  return ind;
+}
+
 poly kFindZeroPoly(poly input_p, ring leadRing, ring tailRing)
 {
   // m = currRing->ch
 
   if (input_p == NULL) return NULL;
 
-  int k_ind2 = 0;
-  int a_ind2 = 0;
-
   poly p = input_p;
   poly zeroPoly = NULL;
   long a = (long) pGetCoeff(p);
+
+  int k_ind2 = 0;
+  int a_ind2 = ind2(a);
+
   long k = 1;
-
-  while (a%2 == 0)
+  // of interest is only k_ind2, special routine for improvement ... TOTO OLIVER
+  for (int i = 1; i <= leadRing->N; i++)
   {
-    a = a / 2;
-    a_ind2++;
+    k_ind2 = k_ind2 + ind_fact_2(p_GetExp(p, i, leadRing));
   }
 
-  for (int i = 1; i <= leadRing->N; i++) 
-  {
-    a = factorial(p_GetExp(p, i, leadRing));
-    k = k * a;
-    while (a%2 == 0)
-    {
-      a = a / 2;
-      k_ind2++;
-    }
-  }
   a = (long) pGetCoeff(p);
 
   number tmp1;
   poly tmp2, tmp3;
+  poly lead_mult = p_ISet(1, tailRing);
   if (leadRing->ch <= k_ind2 + a_ind2)
   {
+    int too_much = k_ind2 + a_ind2 - leadRing->ch;
+    int s_exp;
     zeroPoly = p_ISet(a, tailRing);
     for (int i = 1; i <= leadRing->N; i++)
     {
-      for (long j = 1; j <= p_GetExp(p, i,leadRing); j++)
+      s_exp = p_GetExp(p, i,leadRing);
+/*      if (s_exp % 2 != 0)
+      {
+        s_exp = s_exp - 1;
+      }
+      while ( (0 < ind2(s_exp)) && (ind2(s_exp) <= too_much) )
+      {
+        too_much = too_much - ind2(s_exp);
+        s_exp = s_exp - 2;
+      }
+      p_SetExp(lead_mult, i, p_GetExp(p, i,leadRing) - s_exp, tailRing);*/
+      for (long j = 1; j <= s_exp; j++)
       {
         tmp1 = nInit(j);
         tmp2 = p_ISet(1, tailRing);
         p_SetExp(tmp2, i, 1, tailRing);
         p_Setm(tmp2, tailRing);
         if (nIsZero(tmp1))
-        {
+        { // should nowbe obsolet, test ! TODO OLIVER
           zeroPoly = p_Mult_q(zeroPoly, tmp2, tailRing);
         }
         else
         {
           tmp3 = p_ISet((long) tmp1, tailRing);
-          zeroPoly = p_Mult_q(zeroPoly, p_Add_q(tmp2, tmp3, tailRing), tailRing);
+          zeroPoly = p_Mult_q(zeroPoly, p_Add_q(tmp3, tmp2, tailRing), tailRing);
         }
       }
     }
+    p_Setm(lead_mult, tailRing);
+//    zeroPoly = p_Mult_mm(zeroPoly, lead_mult, tailRing);
     tmp2 = p_ISet((long) pGetCoeff(zeroPoly), leadRing);
     for (int i = 1; i <= leadRing->N; i++) {
       pSetExp(tmp2, i, p_GetExp(zeroPoly, i, tailRing));
@@ -251,7 +282,7 @@ poly kFindZeroPoly(poly input_p, ring leadRing, ring tailRing)
     return tmp2;
   }
   long alpha_k = twoPow(leadRing->ch - k_ind2);
-  if (alpha_k <= a) {
+  if (1 == 0 && alpha_k <= a) {  // Temporarly disabled, reducing coefficients not compatible with std TODO Oliver
     zeroPoly = p_ISet((a / alpha_k)*alpha_k, tailRing);
     for (int i = 1; i <= leadRing->N; i++) {
       for (long j = 1; j <= p_GetExp(p, i, leadRing); j++) {
@@ -311,8 +342,9 @@ int redRing2toM (LObject* h,kStrategy strat)
 //  assume(h->pFDeg() == h->FDeg);
 //  long reddeg = h->GetpFDeg();
 //#endif
+  int count_zp = 0;
 
-  h->SetShortExpVector(); 
+  h->SetShortExpVector();
   loop
   {
     zeroPoly = kFindDivisibleByZeroPoly(h);
@@ -320,7 +352,12 @@ int redRing2toM (LObject* h,kStrategy strat)
     {
       if (TEST_OPT_PROT)
       {
-        PrintS("z");
+//        count_zp++;
+//        if (count_zp >= 50)
+//        {
+//          count_zp = 0;
+          PrintS("z");
+//        }
       }
 #ifdef KDEBUG
       if (TEST_OPT_DEBUG)
@@ -372,9 +409,9 @@ int redRing2toM (LObject* h,kStrategy strat)
 #endif
 
     ksReducePoly(h, &(strat->T[j]), NULL, NULL, strat);
-//    if (zeroPoly != NULL) {
-//      strat->tl--;
-//    }
+    if (zeroPoly != NULL) {
+      strat->tl--;
+    }
 
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG)

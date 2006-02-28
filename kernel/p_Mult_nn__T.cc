@@ -6,7 +6,7 @@
  *  Purpose: template for p_Mult_n
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Mult_nn__T.cc,v 1.4 2006-01-19 14:23:01 Singular Exp $
+ *  Version: $Id: p_Mult_nn__T.cc,v 1.5 2006-02-28 17:50:33 wienand Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -39,6 +39,7 @@ LINKAGE poly p_Mult_nn(poly p, const number n, const ring r)
     else
     {
       n_Delete(&tmp, r);
+      if (p == q) { q = pNext(q); }
       p = pNext(p);    // TODO Free Monom OLIVER
     }
 #endif
