@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.78 2006-02-28 12:20:37 bricken Exp $ */
+/* $Id: tgb.cc,v 1.79 2006-03-04 06:57:06 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -23,6 +23,7 @@
 static const int bundle_size=100;
 static const int delay_factor=3;
 int QlogSize(number n);
+#define ADD_LATER_SIZE 500
 #if 1
 static omBin lm_bin=NULL;
 
@@ -166,7 +167,7 @@ int QlogSize(number n){
 
 
 #ifdef LEN_VAR3
-inline int pSLength(poly p,int l)
+inline wlen_type pSLength(poly p,int l)
 {
   int c;
   number coef=pGetCoeff(p);
@@ -175,11 +176,17 @@ inline int pSLength(poly p,int l)
   }
   else
     c=nSize(coef);
-  
-  return c*l /*pLength(p)*/;
+  if (!(TEST_V_COEFSTRAT))
+      return c*l /*pLength(p)*/;
+  else {
+    wlen_type res=l;
+    res*=c;
+    res*=c;
+    return res;
+  }
 }
 //! TODO CoefBuckets berücksichtigen
-int kSBucketLength(kBucket* b, poly lm=NULL)
+wlen_type kSBucketLength(kBucket* b, poly lm=NULL)
 {
   int s=0;
   int c;
@@ -215,7 +222,15 @@ int kSBucketLength(kBucket* b, poly lm=NULL)
       c*=modifier;}
     }
   #endif
+  if (!(TEST_V_COEFSTRAT)){
   return s*c;
+  } else
+  {
+    wlen_type res=s;
+    res*=c;
+    res*=c;
+    return res;
+  }
 }
 #endif
 #ifdef LEN_VAR5
@@ -381,7 +396,7 @@ static inline wlen_type pQuality(poly p, slimgb_alg* c, int l=-1){
          cs=QlogSize(coef);
       }
       else
-  cs=nSize(coef);
+     cs=nSize(coef);
      wlen_type erg=cs;
      //erg*=cs;//for quadratic
      erg*=pELength(p,c,l);
@@ -1023,12 +1038,23 @@ static wlen_type pair_weighted_length(int i, int j, slimgb_alg* c){
     if (c->is_char0) {
         //int cs=slim_nsize(p_GetCoeff(c->S->m[i],c->r),c->r)+
         //    slim_nsize(p_GetCoeff(c->S->m[j],c->r),c->r);
+        if(!(TEST_V_COEFSTRAT)){
         wlen_type cs=
             coeff_mult_size_estimate(
                 slim_nsize(p_GetCoeff(c->S->m[i],c->r),c->r),
                 slim_nsize(p_GetCoeff(c->S->m[j],c->r),c->r),c->r);
         return (wlen_type)(c->lengths[i]+c->lengths[j]-2)*
+            (wlen_type)cs;}
+            else {
+            
+            wlen_type cs=
+            coeff_mult_size_estimate(
+                slim_nsize(p_GetCoeff(c->S->m[i],c->r),c->r),
+                slim_nsize(p_GetCoeff(c->S->m[j],c->r),c->r),c->r);
+            cs*=cs;
+        return (wlen_type)(c->lengths[i]+c->lengths[j]-2)*
             (wlen_type)cs;
+            }
     }
     if ((pLexOrder) &&(!c->is_homog)) {
 
@@ -1180,7 +1206,9 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slim
 //             }
 //         }
         if (c->lengths[i]+c->lengths[j]==3){
-            poly                 short_s=ksCreateShortSpoly(c->S->m[i],c->S->m[j],c->r);
+            
+            
+             poly short_s=ksCreateShortSpoly(c->S->m[i],c->S->m[j],c->r);
             if (short_s==NULL){
                 c->states[i][j]=HASTREP;
             } else
@@ -1192,17 +1220,22 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slim
                    kFindDivisibleByInS_easy(c->strat,short_s, p_GetShortExpVector(short_s,c->r));
                 if (iS<0){
                     //PrintS("N");
+                    if (TRUE) {
                     c->states[i][j]=HASTREP;
                     add_later(short_s,"N",c);
+                    } else p_Delete(&short_s,currRing);
                 }
                 else {
                     if (c->strat->lenS[iS]>1){
                         //PrintS("O");
+                        if (TRUE) {
                         c->states[i][j]=HASTREP;
                         add_later(short_s,"O",c);
+                        } else p_Delete(&short_s,currRing);
                     }
                     else
                      p_Delete(&short_s, currRing);
+                     c->states[i][j]=HASTREP;
                 }
                 
                
@@ -1756,17 +1789,60 @@ static void go_on (slimgb_alg* c){
       Print("(%d)",c->pair_top+1); 
   while(!(idIs0(c->add_later))){
     ideal add=c->add_later;
-    
+    idSkipZeroes(add);
+    for(j=0;j<add->idelems();j++){
+        assume(pLength(add->m[j])==1);
+        p_SetCoeff(add->m[j],n_Init(1,currRing),currRing);
+        
+    }
     ideal add2=kInterRed(add,NULL);
     id_Delete(&add,currRing);
     idSkipZeroes(add2);
-    c->add_later=idInit(5000,c->S->rank);
-    memset(c->add_later->m,0,5000*sizeof(poly));
-    for(i=0;i<add2->idelems();i++){
-      if (add2->m[i]!=NULL)
-          add_to_basis_ideal_quotient(add2->m[i],-1,-1,c,NULL);
-      add2->m[i]=NULL;
-    }
+    c->add_later=idInit(ADD_LATER_SIZE,c->S->rank);
+    memset(c->add_later->m,0,ADD_LATER_SIZE*sizeof(poly));
+//     for(i=0;i<add2->idelems();i++){
+//       if (add2->m[i]!=NULL)
+//           add_to_basis_ideal_quotient(add2->m[i],-1,-1,c,NULL);
+//       add2->m[i]=NULL;
+//     }
+    int i=add2->idelems();
+    int* ibuf=(int*) omalloc(i*sizeof(int));
+  sorted_pair_node*** sbuf=(sorted_pair_node***) omalloc(i*sizeof(sorted_pair_node**));
+  
+  for(j=0;j<i;j++)
+  {
+    int len;
+    poly p;
+    //buf[j].flatten();
+    //kBucketClear(buf[j].bucket,&p, &len);
+    //kBucketDestroy(&buf[j].bucket);
+    p=add2->m[j];
+    add2->m[j]=NULL;
+  
+    sbuf[j]=add_to_basis_ideal_quotient(p,-1,-1,c,ibuf+j);
+    //sbuf[j]=add_to_basis(p,-1,-1,c,ibuf+j);
+  }
+  int sum=0;
+  for(j=0;j<i;j++){
+    sum+=ibuf[j];
+  }
+  sorted_pair_node** big_sbuf=(sorted_pair_node**) omalloc(sum*sizeof(sorted_pair_node*));
+  int partsum=0;
+  for(j=0;j<i;j++)
+  {
+    memmove(big_sbuf+partsum, sbuf[j],ibuf[j]*sizeof(sorted_pair_node*));
+    omfree(sbuf[j]);
+    partsum+=ibuf[j];
+  }
+
+  qsort(big_sbuf,sum,sizeof(sorted_pair_node*),tgb_pair_better_gen2);
+  c->apairs=spn_merge(c->apairs,c->pair_top+1,big_sbuf,sum,c);
+  c->pair_top+=sum;
+  clean_top_of_pair_list(c);
+  omfree(big_sbuf);
+  omfree(sbuf);
+  omfree(ibuf);
+  //omfree(buf);
     id_Delete(&add2, c->r);
   }
   #ifdef TGB_RESORT_PAIRS
@@ -2091,8 +2167,8 @@ slimgb_alg::slimgb_alg(ideal I, BOOLEAN F4){
     I->m[i]=NULL;
   }
   idDelete(&I);
-  add_later=idInit(5000,S->rank);
-  memset(add_later->m,0,5000*sizeof(poly));
+  add_later=idInit(ADD_LATER_SIZE,S->rank);
+  memset(add_later->m,0,ADD_LATER_SIZE*sizeof(poly));
 }
 slimgb_alg::~slimgb_alg(){
   id_Delete(&add_later,r);
