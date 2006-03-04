@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.79 2006-03-04 06:57:06 bricken Exp $ */
+/* $Id: tgb.cc,v 1.80 2006-03-04 19:29:28 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -947,6 +947,73 @@ static inline poly p_MoveHead(poly p, omBin b)
 }
 #endif
 
+static void replace_pair(int & i, int & j,slimgb_alg* c)
+{
+  if (i<0) return;
+  c->soon_free=NULL;
+  int syz_deg;
+  poly lm=pOne();
+
+  pLcm(c->S->m[i], c->S->m[j], lm);
+  pSetm(lm);
+  
+  int* i_con =make_connections(i,j,lm,c);
+  
+  for (int n=0;((n<c->n) && (i_con[n]>=0));n++){
+    if (i_con[n]==j){
+      now_t_rep(i,j,c);
+      omfree(i_con);
+      p_Delete(&lm,c->r);
+      return;
+    }
+  }
+
+  int* j_con =make_connections(j,i,lm,c);
+
+//   if(c->n>1){
+//     if (i_con[1]>=0)
+//       i=i_con[1];
+//     else {
+//       if (j_con[1]>=0)
+//         j=j_con[1];
+//     }
+ // }
+
+  int sugar=pTotaldegree(lm);
+  p_Delete(&lm, c->r);
+    if(c->T_deg_full)//Sugar
+    {
+      int t_i=c->T_deg_full[i]-c->T_deg[i];
+      int t_j=c->T_deg_full[j]-c->T_deg[j];
+      sugar+=si_max(t_i,t_j);
+      //Print("\n max: %d\n",max(t_i,t_j));
+    }
+  
+  
+  
+
+
+  for (int m=0;((m<c->n) && (i_con[m]>=0));m++){
+    if(c->T_deg_full!=NULL){
+        int s1=c->T_deg_full[i_con[m]]+syz_deg-c->T_deg[i_con[m]];
+        if (s1>sugar) continue;
+    }
+    if (c->weighted_lengths[i_con[m]]<c->weighted_lengths[i])
+        i=i_con[m];
+    }
+    for (int m=0;((m<c->n) && (j_con[m]>=0));m++){
+        if (c->T_deg_full!=NULL){
+        int s1=c->T_deg_full[j_con[m]]+syz_deg-c->T_deg[j_con[m]];
+        if (s1>sugar) continue;}
+        if (c->weighted_lengths[j_con[m]]<c->weighted_lengths[j])
+            j=j_con[m];
+    } 
+    
+     //can also try dependend search
+  omfree(i_con);
+  omfree(j_con);
+  return;
+}
 
 
 static void add_later(poly p, char* prot, slimgb_alg* c){
@@ -1598,7 +1665,10 @@ static void go_on (slimgb_alg* c){
   int curr_deg=-1;
   while(i<PAR_N){
     sorted_pair_node* s=top_pair(c);//here is actually chain criterium done
+    
+   
     if (!s) break;
+    
     if(curr_deg>=0){
       if (s->deg >curr_deg) break;
     }
@@ -1607,11 +1677,14 @@ static void go_on (slimgb_alg* c){
     quick_pop_pair(c);
     if(s->i>=0){
       //be careful replace_pair use createShortSpoly which is not noncommutative
-      //replace_pair(s->i,s->j,c);
+      now_t_rep(s->i,s->j,c);
+    replace_pair(s->i,s->j,c);
+    
     if(s->i==s->j) {
       free_sorted_pair_node(s,c->r);
       continue;
-  }
+    }
+    now_t_rep(s->i,s->j,c);
     }
     poly h;
     if(s->i>=0){
@@ -1622,8 +1695,8 @@ static void go_on (slimgb_alg* c){
     } 
     else
       h=s->lcm_of_lm;
-    if(s->i>=0)
-      now_t_rep(s->j,s->i,c);
+    // if(s->i>=0)
+//       now_t_rep(s->j,s->i,c);
     number coef;
     int mlen=pLength(h);
     if (!c->nc){

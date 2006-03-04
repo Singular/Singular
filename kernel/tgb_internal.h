@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb_internal.h,v 1.34 2006-03-04 06:57:06 bricken Exp $ */
+/* $Id: tgb_internal.h,v 1.35 2006-03-04 19:29:28 bricken Exp $ */
 /*
  * ABSTRACT: tgb internal .h file
 */
@@ -17,7 +17,7 @@
 #include "structs.h"
 #include "polys.h"
 #include "stdlib.h"
-#define HAVE_BOOST 1
+//#define HAVE_BOOST 1
 #ifdef HAVE_BOOST
 #include "boost/dynamic_bitset.hpp"
 #include <vector>
@@ -294,7 +294,7 @@ template <class len_type, class set_type>  int pos_helper(kStrategy strat, poly 
 }
 
 
-
+static wlen_type pair_weighted_length(int i, int j, slimgb_alg* c);
 wlen_type pELength(poly p, ring r);
 
 #endif
