@@ -1,0 +1,69 @@
+ring r=0,(x,y,z,a,b),lp;
+poly f=37x3y+x2yz;
+ideal i=x*(x-1),y;
+LIB "primdec.lib";
+//LIB "poly.lib";
+
+ideal i2=cyclic(5);
+
+print(i2);
+LIB("/Users/michael/sing2/modules/python/python_module.so");
+Python_module::python("from interpreter import singular_globals_proxy
+#import psyco
+import sys
+sys.argv=['Singular']
+#import sre_compile
+#psyco.bind(sre_compile._optimize_charset)
+#psyco.log()
+#psyco.profile()
+from cas.singular import *
+from context import *
+context=Context()
+
+
+import cd.polyd as polyd
+import cd.fieldname1 as fieldname1
+import cas.singular
+import cd.list1
+import cd.primdec
+context.addCDImplementation(cd.list1.implementation)
+context.addCDImplementation(cd.primdec.implementation)
+context.addCDImplementation(polyd.implementation)
+context.addCDImplementation(fieldname1.implementation)
+from cd.polyd import groebnersym
+r=singular.r
+inter=singular_globals_proxy()
+easy=ideal2OM(singular.i)
+call=OMA(cd.primdec.implementation.minAss, [easy])
+print call
+print context.evaluate(call)
+
+r.set()
+
+cyc5=ideal2OM(singular.i2)
+ord=ordering2OM(singular.r)
+gcall=OMA(groebnersym,[ord,cyc5])
+print gcall
+print context.evaluate(gcall)
+#gcout=open('cyc3om','w')
+#gcout.write(context.XMLEncodeObject(gcall))
+#gcout.close()
+
+#print 'now calculating GB'
+#omin=context.XMLEncodeObject(gcall)
+#from omxmlreader import *
+def inout(context, infn):
+  doc=readFile(infn)
+  builder=OMFromXMLBuilder()
+  doc=builder.build(doc)
+  doc=context.evaluate(doc)
+  output=context.XMLEncodeObject(doc)
+  gcout=open('cyc3om.out','w')
+  gcout.write(output)
+  gcout.close()
+
+#inout(context,'cyc3om')
+
+
+");
+$

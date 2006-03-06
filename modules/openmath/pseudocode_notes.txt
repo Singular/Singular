@@ -1,0 +1,2 @@
+symbols in a CD shouldn't be member variables, but  be listed in global array belonging to every CD with same name
+there should also be the possibility of dynamic CDs
