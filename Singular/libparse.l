@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.l,v 1.60 2005-09-24 15:02:09 Singular Exp $ */
+/* $Id: libparse.l,v 1.61 2006-03-06 14:11:20 Singular Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -333,8 +333,11 @@ static     { p_static=TRUE; }
                if (h0==NULL) return(1);
                if((!p_static) && autoexport)
                {
+                  package save=currPack;
+                  currPack=basePack;
                   h_top = enterid( proc, 0 /*myynest*/, PROC_CMD,
                                  &(basePack->idroot), FALSE );
+                  currPack=save;
                   if (h_top==NULL) return(1);
                }
                #else

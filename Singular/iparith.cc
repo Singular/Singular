@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.389 2006-01-06 11:18:19 Singular Exp $ */
+/* $Id: iparith.cc,v 1.390 2006-03-06 14:11:19 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -4060,7 +4060,7 @@ static BOOLEAN jjLOAD(leftv res, leftv v, BOOLEAN autoexport)
         idhdl pl = IDROOT->get(plib,0);
         if (pl==NULL)
         {
-          pl = enterid( plib,0, PACKAGE_CMD, &IDROOT, TRUE );
+          pl = enterid( plib,0, PACKAGE_CMD, &(basePack->idroot), TRUE );
           IDPACKAGE(pl)->language = LANG_SINGULAR;
           IDPACKAGE(pl)->libname=omStrDup(plib);
         }
@@ -4075,7 +4075,7 @@ static BOOLEAN jjLOAD(leftv res, leftv v, BOOLEAN autoexport)
         IDPACKAGE(pl)->loaded=TRUE;
         char libnamebuf[256];
         FILE * fp = feFopen( s, "r", libnamebuf, TRUE );
-        BOOLEAN bo=iiLoadLIB(fp, libnamebuf, s, pl, FALSE, TRUE);
+        BOOLEAN bo=iiLoadLIB(fp, libnamebuf, s, pl, autoexport, TRUE);
         currPack=savepack;
         IDPACKAGE(pl)->loaded=(!bo);
         return bo;
