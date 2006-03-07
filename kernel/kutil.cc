@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.18 2006-02-15 14:08:17 Singular Exp $ */
+/* $Id: kutil.cc,v 1.19 2006-03-07 04:48:28 wienand Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -4480,7 +4480,11 @@ BOOLEAN kStratChangeTailRing(kStrategy strat, LObject *L, TObject* T, unsigned l
   ring new_tailRing = rModifyRing(currRing,
                                   // Hmmm .. the condition pFDeg == pDeg
                                   // might be too strong
+#ifdef HAVE_RING2TOM
+                                  (strat->homog && pFDeg == pDeg && currRing->cring == 0), // TODO Oliver
+#else
                                   (strat->homog && pFDeg == pDeg),
+#endif
                                   !strat->ak,
                                   expbound);
   if (new_tailRing == currRing) return TRUE;

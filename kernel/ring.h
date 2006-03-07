@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.13 2005-11-27 15:28:46 wienand Exp $ */
+/* $Id: ring.h,v 1.14 2006-03-07 04:48:29 wienand Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -182,7 +182,7 @@ inline BOOLEAN rField_is_long_C(ring r=currRing)
 inline BOOLEAN rField_has_simple_inverse(ring r=currRing)
 /* { return (r->ch>1) || (r->ch== -1); } *//* Z/p, GF(p,n), R, long_R, long_C*/
 #ifdef HAVE_RING2TOM
-{ return (r->cring==1) || (r->ch>1) || ((r->ch== -1) && (r->float_len < 10)); } /* Z/p, GF(p,n), R, long_R, long_C*/
+{ return (r->cring==1) || (r->ch>1) || ((r->ch== -1) && (r->float_len < 10)); } /* Z/2^n, Z/p, GF(p,n), R, long_R, long_C*/
 #else
 { return (r->ch>1) || ((r->ch== -1) && (r->float_len < 10)); } /* Z/p, GF(p,n), R, long_R, long_C*/
 #endif

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.11 2006-02-28 17:50:33 wienand Exp $ */
+/* $Id: kstd2.cc,v 1.12 2006-03-07 04:48:28 wienand Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -243,7 +243,7 @@ poly kFindZeroPoly(poly input_p, ring leadRing, ring tailRing)
     for (int i = 1; i <= leadRing->N; i++)
     {
       s_exp = p_GetExp(p, i,leadRing);
-/*      if (s_exp % 2 != 0)
+      if (s_exp % 2 != 0)
       {
         s_exp = s_exp - 1;
       }
@@ -252,7 +252,7 @@ poly kFindZeroPoly(poly input_p, ring leadRing, ring tailRing)
         too_much = too_much - ind2(s_exp);
         s_exp = s_exp - 2;
       }
-      p_SetExp(lead_mult, i, p_GetExp(p, i,leadRing) - s_exp, tailRing);*/
+      p_SetExp(lead_mult, i, p_GetExp(p, i,leadRing) - s_exp, tailRing);
       for (long j = 1; j <= s_exp; j++)
       {
         tmp1 = nInit(j);
@@ -271,7 +271,7 @@ poly kFindZeroPoly(poly input_p, ring leadRing, ring tailRing)
       }
     }
     p_Setm(lead_mult, tailRing);
-//    zeroPoly = p_Mult_mm(zeroPoly, lead_mult, tailRing);
+    zeroPoly = p_Mult_mm(zeroPoly, lead_mult, tailRing);
     tmp2 = p_ISet((long) pGetCoeff(zeroPoly), leadRing);
     for (int i = 1; i <= leadRing->N; i++) {
       pSetExp(tmp2, i, p_GetExp(zeroPoly, i, tailRing));
@@ -330,19 +330,14 @@ int redRing2toM (LObject* h,kStrategy strat)
   int pass = 0;
   poly zeroPoly;
 
-//#ifdef HAVE_RING2TOM
+// TODO warum SetpFDeg notwendig?
   h->SetpFDeg();
   assume(h->pFDeg() == h->FDeg);
-  if (h->pFDeg() != h->FDeg)
-  {
-    Print("h->pFDeg()=%d =!= h->FDeg=%d\n", h->pFDeg(), h->FDeg);
-  }
-  long reddeg = h->SetpFDeg();
-//#else
-//  assume(h->pFDeg() == h->FDeg);
-//  long reddeg = h->GetpFDeg();
-//#endif
-  int count_zp = 0;
+//  if (h->pFDeg() != h->FDeg)
+//  {
+//    Print("h->pFDeg()=%d =!= h->FDeg=%d\n", h->pFDeg(), h->FDeg);
+//  }
+  long reddeg = h->GetpFDeg();
 
   h->SetShortExpVector();
   loop
@@ -352,20 +347,12 @@ int redRing2toM (LObject* h,kStrategy strat)
     {
       if (TEST_OPT_PROT)
       {
-//        count_zp++;
-//        if (count_zp >= 50)
-//        {
-//          count_zp = 0;
-          PrintS("z");
-//        }
+        PrintS("z");
       }
 #ifdef KDEBUG
       if (TEST_OPT_DEBUG)
       {
-        PrintS("zero poly created: ");
-        wrp(zeroPoly);
-        PrintLn();
-        PrintS("zero red:");
+        PrintS("zero red: ");
       }
 #endif
       LObject tmp_h(zeroPoly, currRing, strat->tailRing);
@@ -373,17 +360,6 @@ int redRing2toM (LObject* h,kStrategy strat)
       strat->initEcart(&tmp_h);
       tmp_h.sev = pGetShortExpVector(tmp_h.p);
       tmp_h.SetpFDeg();
-/*      if (TEST_OPT_PROT)
-      {
-        tstcount ++;
-        if (tstcount > 49)
-        {
-          PrintLn();
-          p_wrp(zeroPoly,currRing);
-          PrintLn();
-          tstcount = 0;
-        }
-      } */
 
       enterT(tmp_h, strat, strat->tl + 1);
       j = strat->tl;
@@ -410,6 +386,7 @@ int redRing2toM (LObject* h,kStrategy strat)
 
     ksReducePoly(h, &(strat->T[j]), NULL, NULL, strat);
     if (zeroPoly != NULL) {
+      // TODO Free memory of zeropoly and last element of L
       strat->tl--;
     }
 
@@ -527,7 +504,6 @@ int redHomog (LObject* h,kStrategy strat)
     }
   }
 }
-
 
 /*2
 *  reduction procedure for the inhomogeneous case
