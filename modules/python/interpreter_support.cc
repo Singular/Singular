@@ -1,4 +1,4 @@
-//$Id: interpreter_support.cc,v 1.17 2005-10-05 06:46:59 bricken Exp $
+//$Id: interpreter_support.cc,v 1.18 2006-03-08 10:02:55 bricken Exp $
 
 #include <sstream>
 #include <boost/python.hpp>
@@ -388,8 +388,17 @@ boost::python::object buildPyObjectFromIdhdl(const idhdl_wrap&  id){
 }
 
 boost::python::object call_interpreter_method(const idhdl_wrap& proc, const arg_list& args){
+  //idhdl oldPackHDL=currPackHdl;
+ 
+  //package oldPack=currPack;
+  //currPack=proc.id->data.pinf->pack;
+  //currPackHdl=packFindHdl(currPack);
+  //FIXME: will call procedure from different package, maybe use iiMakeProc
 
+  return buildPyObjectFromLeftv(iiMake_proc(proc.id,NULL,args.args));
   int err=iiPStart(proc.id, args.args);
+  //currPack=oldPack;
+  //currPackHdl=oldPackHDL;
   int voice=myynest+1;
   errorreported=inerror=0;
 

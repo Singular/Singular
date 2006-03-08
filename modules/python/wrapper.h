@@ -1,4 +1,4 @@
-//$Id: wrapper.h,v 1.30 2005-09-24 14:12:46 bricken Exp $
+//$Id: wrapper.h,v 1.31 2006-03-08 10:02:55 bricken Exp $
 #ifndef PYTHON_SINGULAR_WRAPPER_HEADER
 #define PYTHON_SINGULAR_WRAPPER_HEADER
 #include <Python.h>
@@ -44,8 +44,13 @@ Vector unitVector0(int i){
 
 
 //typedef void * idhdl;
-
+void different_ring_translator(DifferentDomainException const& x) {
+    PrintS("hoho");
+    PyErr_SetString(PyExc_UserWarning, "Objects didn't have the same ring");
+}
 BOOST_PYTHON_MODULE(Singular){
+  register_exception_translator<
+          DifferentDomainException>(different_ring_translator);
   export_poly();
 
   boost::python::class_<Variable>("variable")
