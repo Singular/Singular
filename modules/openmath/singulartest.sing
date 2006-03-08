@@ -3,7 +3,10 @@ poly f=37x3y+x2yz;
 ideal i=x*(x-1),y;
 LIB "primdec.lib";
 //LIB "poly.lib";
-
+ideal p1=x2,y;
+ideal p2=(x-1),(y-5)^2;
+ideal p3=(x)^2;
+ideal big=intersect(intersect(p1,p2),p3);
 ideal i2=cyclic(5);
 
 print(i2);
@@ -33,13 +36,34 @@ context.addCDImplementation(fieldname1.implementation)
 from cd.polyd import groebnersym
 r=singular.r
 inter=singular_globals_proxy()
+
+
+
 easy=ideal2OM(singular.i)
 call=OMA(cd.primdec.implementation.minAss, [easy])
 print call
 print context.evaluate(call)
-
 r.set()
 
+
+easy=ideal2OM(singular.i)
+call=OMA(cd.primdec.implementation.primdecGTZ, [easy])
+print call
+print context.evaluate(call)
+r.set()
+
+
+easy=ideal2OM(singular.i)
+call=OMA(cd.primdec.implementation.minAssGTZ, [ideal2OM(singular.big)])
+print call
+print context.evaluate(call)
+r.set()
+
+easy=ideal2OM(singular.i)
+call=OMA(cd.primdec.implementation.primdecGTZ, [ideal2OM(singular.big)])
+print call
+print context.evaluate(call)
+r.set()
 cyc5=ideal2OM(singular.i2)
 ord=ordering2OM(singular.r)
 gcall=OMA(groebnersym,[ord,cyc5])

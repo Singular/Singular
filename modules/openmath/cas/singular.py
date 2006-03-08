@@ -113,12 +113,76 @@ def groebnerfunc(ordering, dmpl):
   return gb2OM(res)
 implementation.groebner=groebnerfunc
 
+def dmplQ(a):
+    if isinstance(a,OMA) and a.func==DMPLsym:
+        return True
+    else:
+        return False
+
+
+def input_convert(f):
+    def my2OM(a):
+        """FIXME: very dirty"""
+        global save_ring
+
+
+        if (dmplQ(a)):
+            dmpl=a
+            r=OM2ring(dmpl.args[0])
+            r.set()
+            i=OM2ideal_raw(dmpl)
+            safe_ring=r
+            return i
+        
+        return a
+            
+    def wrapper(*args):
+        return f(*[my2OM(a) for a in args])
+    
+    
+    wrapper.__name__=f.__name__
+    return wrapper
+    
+def output_convert(f):
+    def my2om(a):
+        """FIXME: very dirty"""
+        global save_ring
+
+        if isinstance(a,ideal):
+            return ideal2OM(a)
+        if (isinstance(a,list)):
+            return cd.list1.list2OM([my2om(a2) for a2 in a])
+        
+        return a
+            
+    def wrapper(*args):
+        return my2om(f(*args))
+    
+    
+    wrapper.__name__=f.__name__
+    return wrapper
+    
 def min_ass_func(dmpl):
     r=OM2ring(dmpl.args[0])
     r.set()
     i=OM2ideal_raw(dmpl)
     l=singular.minAssGTZ(i)
+    return cd.list1.OM2list([ideal2OM(i) for i in l])
+@input_convert
+def min_ass_func2(i):
+
+    l=singular.minAssGTZ(i)
     return cd.list1.list2OM([ideal2OM(i) for i in l])
-cd.primdec.implementation.minAss=min_ass_func
+    
+
+
+#cd.primdec.implementation.minAss=min_ass_func2
+cd.primdec.implementation.minAss=input_convert(output_convert(singular.minAssGTZ))
+
+cd.primdec.implementation.minAssGTZ=input_convert(output_convert(singular.minAssGTZ))
+
+cd.primdec.implementation.primdecGTZ=input_convert(output_convert(singular.primdecGTZ))
+
+
 optimize(poly2OM)
 optimize(term2OM)
