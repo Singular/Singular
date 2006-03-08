@@ -33,14 +33,28 @@ class OMCD(object):
 
         
 class OMCDImplementation(object):
+    converter=None
     def __init__(self, cd):
         object.__setattr__(self,"cd",cd)
+        #object.__setattr__(self,"converter",None)
     def support(self,symbol):
         setattr(self,symbol,OMS(symbol, self.cd))
     def __setattr__(self, name,value):
+        if name=="converter":
+            object.__setattr__(self,name,value)
+            return
         "FIXME: implements this later safer against name conflicts"
         if callable(value) and (not isinstance(value, ImplementedSymbol)):
-            object.__setattr__(self, name, ImplementedSymbol(OMS(name,self.cd), value))
+            
+            if self.converter!=None:
+                object.__setattr__(
+                    self, 
+                    name, 
+                    ImplementedSymbol(
+                        OMS(name,self.cd), 
+                        self.converter(value)))
+            else:
+                object.__setattr__(self, name, ImplementedSymbol(OMS(name,self.cd), value))
         else:
             object.__setattr__(self,name,value)
 

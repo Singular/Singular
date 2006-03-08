@@ -175,14 +175,17 @@ def min_ass_func2(i):
     return cd.list1.list2OM([ideal2OM(i) for i in l])
     
 
-
+def singular_default_converter(f):
+    return output_convert(input_convert(f))
+cd.primdec.implementation.converter=singular_default_converter
 #cd.primdec.implementation.minAss=min_ass_func2
-cd.primdec.implementation.minAss=input_convert(output_convert(singular.minAssGTZ))
+cd.primdec.implementation.minAss=singular.minAssGTZ#input_convert(output_convert(singular.minAssGTZ))
 
-cd.primdec.implementation.minAssGTZ=input_convert(output_convert(singular.minAssGTZ))
+cd.primdec.implementation.minAssGTZ=singular.minAssGTZ
+#input_convert(output_convert(singular.minAssGTZ))
 
-cd.primdec.implementation.primdecGTZ=input_convert(output_convert(singular.primdecGTZ))
-
+cd.primdec.implementation.primdecGTZ=singular.primdecGTZ#input_convert(output_convert(singular.primdecGTZ))
+cd.primdec.implementation.radical=singular.radical
 
 optimize(poly2OM)
 optimize(term2OM)
