@@ -91,7 +91,7 @@ class ImplementedSymbol(OMS):
         super(ImplementedSymbol,self).__init__(symbol.name, symbol.cd)
         self.implementation = func
     def __str__(self):
-        return "ImplementedOMS("+self.name+", " + self.cd.name +")"
+        return "OMS("+self.name+", " + self.cd.name +")"
     def __call__(self, context, *args):
         try:
             erg=self.implementation(*args)

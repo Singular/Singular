@@ -8,6 +8,10 @@ def encodeSub(om, parent):
         sub=et.SubElement(parent, "OMI")
         sub.text=str(om)
         return
+    if isinstance(om, long):
+        sub=et.SubElement(parent, "OMI")
+        sub.text=str(om)
+        return
     if isinstance(om, OMV):
         sub=et.SubElement(parent, "OMV")
         sub.set("name",om.name)
@@ -37,6 +41,10 @@ def encodeSub(om, parent):
         
 def encodeTop(om):
     if isinstance(om, int):
+        sub=et.Element("OMI")
+        sub.text=str(om)
+        return sub
+    if isinstance(om, long):
         sub=et.Element("OMI")
         sub.text=str(om)
         return sub
