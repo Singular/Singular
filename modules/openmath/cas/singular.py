@@ -61,27 +61,27 @@ def OM2poly(poly_desc):
   """assumes the right ring is set"""
   assert isinstance(poly_desc, OMA)
   terms=[OM2term(t) for t in poly_desc.args]
-  res=polynomial(number(0))
+  res=Polynomial(Number(0))
   for t in terms:
     res=res+t
     #res+=t
   return res
 def OM2term(term_desc):
   assert isinstance(term_desc, OMA)
-  assert len(term_desc.args)==singular.nvars(ring())+1
+  assert len(term_desc.args)==singular.nvars(Ring())+1
   assert isinstance(term_desc.args[0], int)
   
-  coef=number(term_desc.args[0])
-  exp=intvec()
+  coef=Number(term_desc.args[0])
+  exp=IntVector()
   for e in term_desc.args[1:]:
     assert isinstance(e,int)
     exp.append(e)
   #print coef, polynomial(exp)
-  return coef*polynomial(exp)
+  return coef*Polynomial(exp)
 
 def OM2ideal_raw(dmpl):
   """assumes that the right ring is set"""
-  i=ideal()
+  i=Ideal()
   assert len(dmpl.args)>=1
   ps=[OM2poly(d) for d in dmpl.args[1:]]
   for p in ps:
@@ -148,7 +148,7 @@ def output_convert(f):
         """FIXME: very dirty"""
         global save_ring
 
-        if isinstance(a,ideal):
+        if isinstance(a,Ideal):
             return ideal2OM(a)
         if (isinstance(a,list)):
             return cd.list1.list2OM([my2om(a2) for a2 in a])
