@@ -152,7 +152,9 @@ class OMBIND(object):
     def getChildren(self):
         "get children for (XML) representation"
         return [self.binder]+self.variables+[self.block]
-             
+    
+    def __str__(self):
+        return "OMBIND(self.binder"+", "+str(self.variables) +", " + str(self.block) +")"
         
 
 class OMOBJ(object):
