@@ -1,4 +1,4 @@
-//$Id: ring_wrap.cc,v 1.5 2005-10-05 07:26:39 bricken Exp $
+//$Id: ring_wrap.cc,v 1.6 2006-03-09 14:49:17 bricken Exp $
 
 #include <boost/python.hpp>
 #include "mod2.h"
@@ -14,7 +14,7 @@ static boost::python::object Ring_as_str(const Ring& r)
   return boost::python::str(out,strlen(out));
 }
 void export_ring(){
-boost::python::class_<Ring>("ring")
+boost::python::class_<Ring>("Ring")
      .def("__str__", Ring_as_str)
      .def("set", &Ring::set)
      .def(boost::python::init <>());

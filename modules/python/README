@@ -10,6 +10,8 @@ install python-numeric (for matrix report)
 
 Suggested additional modules:
 probstat: fast (C-Impl.) combinatorics (permutations, cartesian products)
+lxml for openmath
+
 
 supported interpreter values:
 
@@ -40,11 +42,11 @@ intvec
 typemappings:
 interpreter, python internal, python official name
 int -> int
-poly -> Poly ->polynomial
-vector -> Vector -> vector
-number -> Number ->number
+poly -> Poly ->Polynomial
+vector -> Vector -> Vector
+number -> Number ->Number
 matrix -> Numeric.array
-ideal -> Ideal ->ideal
+ideal -> Ideal ->Ideal
 list -> list
 string -> str
 ring -> ring(in a Ring, but this does nothing) ->ring

@@ -13,7 +13,7 @@ static boost::python::object Number_as_str(const Number& n)
 }
 void export_number()
 {
-   boost::python::class_<Number>("number")
+   boost::python::class_<Number>("Number")
     .def(boost::python::init <int>())
     .def("__str__", Number_as_str)
     .def(-self)

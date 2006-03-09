@@ -94,7 +94,7 @@ global_functions=singular_globals_proxy
 def find_rings(arglist):
   """FIXME: doesn't handle everything and depth"""
   for item in arglist:
-    if isinstance(item,polynomial) or isinstance(item,ideal):
+    if isinstance(item,Polynomial) or isinstance(item,Ideal):
       return [item.ring()]
   return []
   
@@ -105,7 +105,7 @@ def prepare_ring(arglist):
   debug_out("rl is" +str(rl))
   if len(rl)==1:
     r=rl[0]
-    oldrings.append(ring())
+    oldrings.append(Ring())
     r.set()
   else:
     if len(rl)==0:

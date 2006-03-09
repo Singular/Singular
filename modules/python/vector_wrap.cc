@@ -15,7 +15,7 @@ static boost::python::object Vector_as_str(Vector& p)
 }  
 
 void export_vector(){
-  boost::python::class_<Vector>("vector")
+  boost::python::class_<Vector>("Vector")
     .def(boost::python::init <>())
     .def("__str__", Vector_as_str)
     

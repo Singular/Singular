@@ -1,4 +1,4 @@
-//$Id: intvec_wrap.cc,v 1.4 2005-10-05 06:46:59 bricken Exp $
+//$Id: intvec_wrap.cc,v 1.5 2006-03-09 14:49:17 bricken Exp $
 #include <boost/python.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include "mod2.h"
@@ -27,7 +27,7 @@ static boost::python::object intvec_as_str(const Intvec& p)
 }
 
 void export_intvec(){
-boost::python::class_<Intvec>("intvec")
+boost::python::class_<Intvec>("IntVector")
       .def("__str__", intvec_as_str)
      .def(boost::python::init <>())
      .def(boost::python::vector_indexing_suite<Intvec>());
