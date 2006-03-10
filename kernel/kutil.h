@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.12 2006-03-07 20:39:48 Singular Exp $ */
+/* $Id: kutil.h,v 1.13 2006-03-10 12:53:20 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -22,8 +22,9 @@
 #define setmax 16
 #define setmaxL ((4096-12)/sizeof(LObject))
 #define setmaxLinc ((4096)/sizeof(LObject))
-#define setmaxT ((4096-12)/sizeof(TObject))
-#define setmaxTinc ((4096)/sizeof(TObject))
+
+#define setmaxT 64
+#define setmaxTinc 32
 #else
 #define setmax 16
 #define setmaxL 16

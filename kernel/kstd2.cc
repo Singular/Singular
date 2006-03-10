@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.12 2006-03-07 04:48:28 wienand Exp $ */
+/* $Id: kstd2.cc,v 1.13 2006-03-10 12:53:19 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -881,7 +881,13 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
        * 24 IN test and the degree +ecart of L[strat->Ll] is bigger then
        *a predefined number Kstd1_deg
        */
-      while (strat->Ll >= 0) deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
+      while ((strat->Ll >= 0)
+	&& (strat->L[strat->Ll].p1!=NULL) && (strat->L[strat->Ll].p2!=NULL)
+        && ((strat->honey && (strat->L[strat->Ll].ecart+pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))
+            || ((!strat->honey) && (pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg)))
+	)
+
+      deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
       break;
     }
     /* picks the last element from the lazyset L */

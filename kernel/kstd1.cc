@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.9 2005-11-27 15:28:44 wienand Exp $ */
+/* $Id: kstd1.cc,v 1.10 2006-03-10 12:53:19 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1178,8 +1178,9 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       *   && upper degree is bigger than Kstd1_deg
       */
       while ((strat->Ll >= 0)
+        && (strat->L[strat->Ll].p1!=NULL) && (strat->L[strat->Ll].p2!=NULL)
         && (strat->L[strat->Ll].ecart+strat->L[strat->Ll].GetpFDeg()> Kstd1_deg)
-        && (strat->L[strat->Ll].p1!=NULL) && (strat->L[strat->Ll].p2!=NULL))
+      )
       {
         deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
         //if (TEST_OPT_PROT)
