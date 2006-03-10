@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstdfac.cc,v 1.6 2006-03-07 17:54:10 Singular Exp $ */
+/* $Id: kstdfac.cc,v 1.7 2006-03-10 10:53:58 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
@@ -195,8 +195,6 @@ kStrategy kStratCopy(kStrategy o)
   s->tail = pInit();
   copyL(o,s);//s->L=...
   s->B=initL();
-  s->Bl=-1;
-  s->Bmax=setmaxL;
   s->kHEdge=pCopy(o->kHEdge);
   s->kNoether=pCopy(o->kNoether);
   if (o->NotUsedAxis!=NULL)
@@ -221,6 +219,8 @@ kStrategy kStratCopy(kStrategy o)
   s->tmax=o->tmax;
   s->Ll=o->Ll;
   s->Lmax=o->Lmax;
+  s->Bl=-1;
+  s->Bmax=setmaxL;
   s->ak=o->ak;
   s->syzComp=o->syzComp;
   s->LazyPass=o->LazyPass;
