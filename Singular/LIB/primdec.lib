@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: primdec.lib,v 1.109 2006-02-02 10:11:45 Singular Exp $";
+version="$Id: primdec.lib,v 1.110 2006-03-10 12:24:28 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -3396,9 +3396,12 @@ EXAMPLE: example decomp; shows an example
           list resu,tempo;
           for(ab=1;ab<=size(quprimary)/2;ab++)
           {
-             tempo=quprimary[2*ab-1],quprimary[2*ab],
-                       absprimary[ab],abskeep[ab];
-             resu[ab]=tempo;
+             if (deg(quprimary[2*ab][1])!=0)
+             {
+               tempo=quprimary[2*ab-1],quprimary[2*ab],
+                         absprimary[ab],abskeep[ab];
+               resu[ab]=tempo;
+             }
           }
           quprimary=resu;
           @wr=3;
