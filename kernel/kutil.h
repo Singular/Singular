@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.13 2006-03-10 12:53:20 Singular Exp $ */
+/* $Id: kutil.h,v 1.14 2006-03-10 16:34:17 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -69,8 +69,8 @@ class sTObject
 public:
   poly p;       // Lm(p) \in currRing Tail(p) \in tailRing
   poly t_p;     // t_p \in tailRing: as monomials Lm(t_p) == Lm(p)
-  ring tailRing;
   poly max;     // p_GetMaxExpP(pNext(p))
+  ring tailRing;
   long FDeg;    // pFDeg(p)
   int ecart,
     length,     // as of pLDeg
@@ -342,7 +342,8 @@ void deleteHC(poly *p, int *e, int *l, kStrategy strat);
 void deleteHC(LObject* L, kStrategy strat, BOOLEAN fromNext = FALSE);
 void deleteInS (int i,kStrategy strat);
 void cleanT (kStrategy strat);
-LSet initL ();
+static inline LSet initL ()
+{ return (LSet)omAlloc(setmaxL*sizeof(LObject)); };
 void deleteInL(LSet set, int *length, int j,kStrategy strat);
 void enterL (LSet *set,int *length, int *LSetmax, LObject p,int at);
 void enterSBba (LObject p,int atS,kStrategy strat, int atR = -1);

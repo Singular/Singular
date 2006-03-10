@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.19 2006-03-07 04:48:28 wienand Exp $ */
+/* $Id: kutil.cc,v 1.20 2006-03-10 16:37:01 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -95,7 +95,6 @@ inline void _my_memmove(void* d, void* s, long l)
 #undef memmove
 #define memmove(d,s,l) _my_memmove(d, s, l)
 #endif
-
 
 static poly redMora (poly h,int maxIndex,kStrategy strat);
 static poly redBba (poly h,int maxIndex,kStrategy strat);
@@ -416,19 +415,12 @@ void cleanT (kStrategy strat)
   strat->tl=-1;
 }
 
-LSet initL ()
-{
-  int i;
-  LSet l = (LSet)omAlloc(setmaxL*sizeof(LObject));
-  for (i=setmaxL-1;i>=0;i--)
-  {
-    l[i].tailRing = currRing;
-    l[i].i_r1 = -1;
-    l[i].i_r2 = -1;
-    l[i].i_r = -1;
-  }
-  return l;
-}
+//LSet initL ()
+//{
+//  int i;
+//  LSet l = (LSet)omAlloc(setmaxL*sizeof(LObject));
+//  return l;
+//}
 
 static inline void enlargeL (LSet* L,int* length,const int incr)
 {
@@ -992,10 +984,12 @@ BOOLEAN sugarDivisibleBy(int ecart1, int ecart2)
 void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR = -1)
 {
   assume(i<=strat->sl);
+  if (strat->interred_flag) return;
+
   int      l,j,compare;
   LObject  Lp;
+  Lp.i_r = -1;
 
-  if (strat->interred_flag) return;
 #ifdef KDEBUG
   Lp.ecart=0; Lp.length=0;
 #endif
@@ -1214,8 +1208,13 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR 
 
     if (atR >= 0)
     {
-      Lp.i_r2 = atR;
       Lp.i_r1 = strat->S_2_R[i];
+      Lp.i_r2 = atR;
+    }
+    else
+    {
+      Lp.i_r1 = -1;
+      Lp.i_r2 = -1;
     }
     strat->initEcartPair(&Lp,strat->S[i],p,strat->ecartS[i],ecart);
     if (TEST_OPT_INTSTRATEGY)
@@ -1257,6 +1256,7 @@ void enterOnePairSpecial (int i,poly p,int ecart,kStrategy strat, int atR = -1)
 
   int      l,j,compare;
   LObject  Lp;
+  Lp.i_r = -1;
 
   Lp.lcm = pInit();
   pLcm(p,strat->S[i],Lp.lcm);
@@ -1294,6 +1294,11 @@ void enterOnePairSpecial (int i,poly p,int ecart,kStrategy strat, int atR = -1)
     {
       Lp.i_r1 = strat->S_2_R[i];
       Lp.i_r2 = atR;
+    }
+    else
+    {
+      Lp.i_r1 = -1;
+      Lp.i_r2 = -1;
     }
     pNext(Lp.p) = strat->tail;
     strat->initEcartPair(&Lp,strat->S[i],p,strat->ecartS[i],ecart);
