@@ -1,2634 +1,1608 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: center.lib,v 1.16 2005-05-18 18:09:10 levandov Exp $";
-category="Noncommutative";
+version="$Id: center.lib,v 1.17 2006-03-13 14:31:42 motsak Exp $"
+category="Noncommutative"
 info="
-LIBRARY:  center.lib      computation of central elements of G-algebras and their factor-algebras.
+LIBRARY:  center.lib      computation of central elements of GR-algebras
 AUTHOR:  Oleksandr Motsak,        motsak@mathematik.uni-kl.de.
 OVERVIEW:
- This is a library for computing the central elements and centralizers of elements in various noncommutative algebras.
- Implementation is based on algorithms, written in the frame of the diploma thesis by O. Motsak (advisor: Prof. S.A. Ovsienko, support: V. Levandovskyy), at Kyiv Taras Shevchenko University (Ukraine) with the title 'An algorithm for the computation of the center of noncommutative polynomial algebra'.
+This is a library for computing the central elements and centralizers of elements in various non-commutative algebras.
+Implementation is based on algorithms written in the frame of the diploma thesis by O. Motsak (adviser: Prof. S.A. Ovsienko, support: V. Levandovskyy), at Kyiv Taras Shevchenko University (Ukraine) with the title 'An algorithm for the computation of the center of a non-commutative polynomial algebra'.
 
 SUPPORT: Forschungsschwerpunkt 'Mathematik und Praxis', University of Kaiserslautern
 
-PROCEDURES:
-center(MaxDeg[,N]);             computes the generators of the center of a basering,
-centralizer(f, MaxDeg[,N]);     computes the generators of the centralizer of f in a basering,
-inCenter(l);                    checks the centrality of elements of list/ideal/poly l
-inCentralizer(l, f);            checks the commutativity wrt polynomial f of polynomials of list/ideal/poly l
+MAIN PROCEDURES:
+CENTRALIZE_SET(F, V); computes a VS basis of the centralizer of F within V,
+CENTRALIZER_VECTORSPACE(F, d); computes a VS basis of the centralizer of F up to degree D,
+CENTRALIZER_SUBALGEBRA(F, D[, N]); computes a SA base of the centralizer of F up to degree D,
+CENTER_VECTORSPACE(D); computes a VS basis of the center up to degree D,
+CENTER_SUBALGEBRA(D[, k]); computes a SA base of the center up to degree D,
 
-KEYWORDS:  inCenter; inCentralizer; center; centralizer
-";
+center(D[,k]); computes a SA generators of the center,
+centralizer(S, D[, k]); computes a SA generators of the centralizer of S,
 
-/******************************************************/
-// stuff
+sa_reduce(V); 'subalgebra reduction' of a set of pairwise commuting polynomials,
+sa_poly_reduce(p,V); 'subalgebra reduction' of a polynomial p wrt a set of pairwise commuting polynomials.
 
-/******************************************************/
-static proc myValue ( def s, list # )
+AUXILIARY PROCEDURES:
+ApplyAd( Basis, f); Computes images of basis elements under the linear map Ad_{f},
+KER(Images); Computes the kernel of a linear map given by its images on certain basis vectors,
+LinearCombinations(Basis, C); computes linear combinations of Basis vectors with the coefficients from C,
+
+inCenter(T); checks the centrality of polynomials of a list/ideal/poly T,
+inCentralizer(T, S); checks whether polynomials of list/ideal/poly T commute with polynomials of S,
+isCartan(p); checks whether polynomial p is a Cartan element,
+
+standard_variables(); computes the set of algebra generators in their natural order,
+sorted_variables(); computes the sorted set of algebra generators,
+
+PBW_basis_byDeg( Deg ); computes monomials of a given degree Deg,
+PBW_basis_byMaxDeg( MaxDeg ); computes monomials up to a given degree MaxDeg,
+PBW_basis_byMaxMonom( MaxMonom ); computes monomials up to a given maximal monomial MaxMonom.
+
+KEYWORDS:  center; centralizer; cartan; reduce; centralize; PBW
 "
-        return s or (typeof(s))(#)
+
+LIB "general.lib" // for "sort" 
+LIB "poly.lib" // for "maxdeg" 
+
+
+/******************************************************/
+// ::DefaultStuff:: Shortcuts to useful short functions. Just to avoid if( if( if( ... ))).
+/******************************************************/
+
+
+/******************************************************/
+static proc DefaultValue ( def s, list # ) // Process general variable parameters list
+"
+RETURN: s or (typeof(s))(#)
 "
 {
-  def @p = s;
-  if ( size(#) > 0 )
+    def @p = s;
+    if ( size(#) > 0 )
     {
-      if ( typeof( #[1] ) == typeof(s) )
+        if ( typeof(#[1]) == typeof(s) )
         {
-          @p = #[1];
-        };
-    };
-  return (@p);
-};
+            @p = #[1];
+        }
+    }
+    return( @p );
+}
 
 /******************************************************/
-static proc myInt ( list # )
-  "
-        return 0 or int(#)
+static proc DefaultInt( list # ) // Process variable parameters list with 'int' default value
+"
+RETURN: 0 or int(#)
 "
 {
-  int @p = 0;
-  return (myValue ( @p, # ));
-};
+    int @p = 0;
+    return( DefaultValue( @p, # ) );
+}
 
 /******************************************************/
-static proc myPoly ( list # )
-  "
-        return 0 or poly(#)
+static proc DefaultIdeal ( list # ) // Process variable parameters list with 'ideal' default value
+"
+RETURN: 0 or ideal(#)
 "
 {
-  poly @p = 0;
-  return (myValue( @p, # ));
-};
+    ideal @p = 0;
+    return( DefaultValue( @p, # ) );
+}
+
+
 
 /******************************************************/
-static proc myRing ( list # )
-  "
-        return basring or ring(#)
+// ::Debug:: Shortcuts to used debugging functions.
+/******************************************************/
+
+
+/******************************************************/
+static proc toprint( int pl ) // To print or not to print?!? The answer is here!
+"
+RETURN: 1 means to print, otherwise 0.
 "
 {
-  def @p = basering;
-  return (myValue ( @p, # ));
-};
+    return( printlevel >= ( 3 -  pl) ); // voice + ?
+}
 
 /******************************************************/
-static proc myString ( list # )
-  "
-        return basring or ring(#)
+static proc DBPrint( int pl, list # ) // My 'dbprint' which uses toprint(i).
+"
+    USAGE:     
 "
 {
-  string @p = "";
-  return (myValue ( @p, # ));
-};
+    if( toprint(pl) )
+    {
+        dbprint(1, #);
+    }
+}
 
 /******************************************************/
-static proc myIdeal ( list # )
-  "
-        return 0 or ideal(#)
+static proc BCall( string Name, list # ) // This function must be called at the beginning of every 'mathematical' function.
+"
+USAGE: Name is a name of a mathematical function to trace. # means parameters into the function.
 "
 {
-  ideal @p;
-  return (myValue ( @p, # ));
-};
-
-/******************************************************/
-// for debug
-
-/******************************************************/
-static proc toprint()
-{
-  return (0);
-};
-
-/******************************************************/
-static proc Print( list # )
-{
-  if ( toprint() )
+    if( toprint(0) )
     {
-      print (#);
-    };
-};
+        "CALL: ", Name, "( "; 
+        dbprint(1, #);
+        "     )";
+    }
+}
 
 /******************************************************/
-static proc BCall(string Name, list #)
-{
-  if( toprint() )
-    {
-      "CALL: ", Name, "( ", string(#), " )";
-    };
-};
-
-/******************************************************/
-static proc ECall(string Name, list #)
-{
-  if( toprint() )
-    {
-      "RET : ", Name, "(...)={ ", string(#), " }";
-    };
-};
-
-
-/******************************************************/
-// "my" degres functions and lie procedures...
-
-/******************************************************/
-static proc maxDeg( def z )
-  "
-        returns: int : max of givendeg( z_i ), among all z_i \in z
-                returns -1 if z is empty or contain only 0 polynomial
+static proc ECall(string Name, list #) // This function must be called at the end of every 'mathematical' function.
+"
+USAGE: Name is a name of a mathematical function to trace. # means result of the function.
 "
 {
-  int max = -1;
-  int d;
-
-  for(int i=size(z); i>0; i-- )
+    if( toprint(0) )
     {
-      d = deg(z[i]);
-      if( d > max )
-        {
-          max = d;
-        };
-    };
+        "RET : ", Name, " => Result: {";
+        dbprint(1, #);
+        "    }";
+    }
+}
 
-  return(max);
-};
+
 
 /******************************************************/
-// some business for my_var
+// ::Helpers:: Small functions used in this library.
+/******************************************************/
 
 /******************************************************/
-static proc myCoeff ( poly f, poly m )
-  "
-        input: poly f,
-        return: coeff at m
+static proc makeNice( def l )
+"
+RETURN: the same as input
+PURPOSE: make 'nice' polynomials, kill scalars
 "
 {
-  m = leadmonom(m);
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "makeNice", l ); }; /*4DEBUG*/
 
-  int i = size(f);
-
-  while ( (i>0) and (leadmonom(f[i])<m) )
+    poly p;
+    
+    if( typeof(l) == "poly" )
     {
-      i--;
-    };
-  if( i == 0 )
-    {
-      return ( 0 );
-    };
-
-  if(leadmonom(f[i]) == m)
-    {
-      return ( leadcoef(f[i]) );
-    };
-
-  return ( 0 );
-};
-
-/******************************************************/
-static proc my_vars ()
-{
-  int  N = nvars( basering );
-  list V = list();
-
-  for ( int k = 1; k <= N; k++ )
-    {
-      V[k] = var(k);
-    };
-
-  return (V);
-};
-
-/******************************************************/
-static proc my_commutators ()
-{
-  list V = my_vars();
-  int  N = size( V );
-
-  matrix M[N][N] = 0;
-
-  poly v, d; int i;
-
-  for ( int k = 2; k <= N; k++ )
-    {
-      v = V[k];
-      for ( i = 1; i < k; i++ )
-        {
-          d = V[i];
-          M[k,i] =  v*d - d*v;        // [var(k),var(i)]
-          M[i,k] = -M[k,i];        // [var(i),var(k)] ==  -[var(k),var(i)]
-        };
-    };
-
-  return (M);
-};
-
-/******************************************************/
-static proc my_associated ()
-"
-    return list of records:
-     [1] - poly: variable,
-     [2] - bool: isCartan
-     [3] - matrix: associated matrix (basering should be compatible)
-"
-{
-  int i, j; poly a; poly d;
-
-  int N          = nvars( basering );
-  list V         = my_vars();
-  matrix M = my_commutators();
-
-  matrix A[N][N];
-
-  int cartan;
-
-  list RESULT = list();
-  int  r_begin = 1;
-  int  r_end   = N;
-
-
-  for ( int k = 1; k <= N; k++ )
-    {
-      A = 0;
-      cartan = 1;
-      for ( i = 1; i <= N; i++ )
-        {
-          d = M[k,i];
-          for ( j = 1; j <= N; j++ )
-            {
-              a = myCoeff( d, V[j] );
-              A[i,j] =  a;
-
-              if( (i!=j) and (a!=0) )
-                {
-                  cartan = 0;
-                };
-            };
-        };
-
-      if ( cartan )
-        {
-          RESULT[r_begin] = list( V[k], cartan, A );
-          r_begin++;
-        } else
-          {
-            RESULT[r_end] = list( V[k], cartan, A );
-            r_end--;
-          };
-
-    };
-
-  return (RESULT);
-
-};
-
-/******************************************************/
-static proc my_var_init()
-"
-  must be called once before using my_var!!!
-"
-{
-  if( defined( @@@SORTEDVARARRAY ) )
-    {
-      kill @@@SORTEDVARARRAY;
-    };
-
-  list @@@SORTEDVARARRAY;
-  list V = my_associated();
-
-  // cartans - first then others...
-
-  for ( int i = 1; i<= size(V); i++ )
-    {
-      @@@SORTEDVARARRAY[i] = V[i][1];
-    };
-
-  Print( "@@@SORTEDVARARRAY: " + string(@@@SORTEDVARARRAY) );
-
-  export(@@@SORTEDVARARRAY);
-};
-
-/******************************************************/
-static proc my_var(int @number )
-  "
-  'my' var (with my order of variables),
-  before use call my_var_init()
-"
-{
-  if( defined( @@@SORTEDVARARRAY ) )
-    {
-      return( @@@SORTEDVARARRAY[@number] );
-    };
-
-  Print( "Error: my_var_init() was not called before this..." );
-  return( var(@number) );
-
-};
-
-/******************************************************/
-static proc my_var_done()
-  "
-  this procedure should be called after finishing using my_var in order to clean up.
-"
-{
-  if( defined( @@@SORTEDVARARRAY ) )
-    {
-      kill @@@SORTEDVARARRAY;
-    };
-};
-
-
-/******************************************************/
-// QNF stuff
-
-/******************************************************/
-static proc myBitParam( int param, int n )
-  "
-    return: string: param in bin within no less then n digits (adding zeroes)
-"
-{
-  string s = "";
-
-  while ( param != 0 )
-    {
-      s = string ( param % 2 ) + s;
-      param = param / 2;
-      n --;
-    };
-  while ( n > 0 )
-    {
-      s = "0" + s;
-      n --;
-    };
-  return ( s );
-};
-
-/******************************************************/
-static proc QNF_init(list #)
-{
-  if( defined(@@@MY_QIDEAL) )
-    {
-      kill @@@MY_QIDEAL;
-    };
-
-  if( typeof(basering) == "qring" )
-    {
-      ideal @@@MY_QIDEAL = twostd(myIdeal(#));
-      // setup redSB, redTail options
-      export(@@@MY_QIDEAL);
-
-      option(redSB);
-      option(redTail);
-
-    };
-};
-
-/******************************************************/
-static proc QNF_done()
-{
-  if( defined(@@@MY_QIDEAL) )
-    {
-      kill @@@MY_QIDEAL;
-    };
-};
-
-/******************************************************/
-static proc QNF_poly ( poly p, list # )
-{
-  if( defined(@@@MY_QIDEAL) )
-    {
-      /*
-        int param = 1 ; // by def: reduce both 1st and 2nd entries
-        param = myValue(param, #);
-        string bits = myBitParam( param, 8 );
-      */
-      BCall( "QNF_poly", p );
-
-      p = NF( p, @@@MY_QIDEAL );
-
-      ECall( "QNF_poly", p );
-    }; // QRing
-
-  return(p);
-};
-
-
-/******************************************************/
-static proc QNF_list ( list l, list # )
-  "
-    expects list of records with two polynomial entries
-    and in case of Qring allpies NF( * , std(0) ) to entries (depends on parameter)
-
-    1234 5678
-
-+1    8 => reduce every 1st entry
-+2    7 => reduce every 2nd entry
-
-        --- (for PBW in qrings) ---
-
-+4    6 => kill out pbw entries where pbw monom (1) was affected
-
-//?? wofuer?
-+8    5 => reduce every 3rd entry
-
-"
-{
-
-  if( defined(@@@MY_QIDEAL) )
-    {
-
-      int param = 1 + 2; // by def: reduce both 1st and 2nd entries
-      param = myValue(param, #);
-
-      string bits = myBitParam( param, 8 );
-
-      BCall( "QNF_list", "list, " + bits );
-
-      poly temp;
-
-      for ( int i = size(l); i>0 ; i -- )
-        {
-
-          if ( typeof( l[i] ) == "poly" )
-            {
-
-              if ( (bits[8] == "1") or (bits[6] == "1") )
-                {
-                  temp = NF( l[i], @@@MY_QIDEAL );
-
-                  if ( bits[6] == "1" )
-                    {// for PBW in qrings: kill out pbw entries where pbw monom was reduced
-
-                      if( temp != l[i] )
-                        {
-                          l = delete( l, i );
-                          i --;
-                          continue;
-                        };
-                    };
-
-                  if ( bits[8] == "1" )
-                    {
-                      l[i] = temp;
-                    };
-                };
-            };
-
-          if ( typeof( l[i] ) == "list" )
-            {
-              // 1st
-
-              if ( size(l[i])>0 )
-                {
-                  if ( (bits[8] == "1") or (bits[6] == "1") )
-                    {
-                      if( typeof( l[i][1] ) == "poly" )
-                        {
-
-                          temp = NF( l[i][1], @@@MY_QIDEAL );
-
-                          if ( bits[6] == "1" )
-                            {// for PBW in qrings: kill out pbw entries where pbw monom was reduced
-
-                              if( temp != l[i][1] )
-                                {
-                                  l = delete( l, i );
-                                  i --;
-                                  continue;
-                                };
-                            };
-
-                          if ( bits[8] == "1" )
-                            {
-                              l[i][1] = temp;
-                            };
-
-                        };
-                    };
-                };
-
-              // 2nd
-
-              if ( size(l[i])>1 )
-                {
-                  if ( bits[7] == "1" )
-                    {
-                      if( typeof( l[i][2] ) == "poly" )
-                        {
-                          temp = NF( l[i][2], @@@MY_QIDEAL );
-
-                          l[i][2] = temp;
-                        };
-                    };
-                };
-            };
-        };
-
-      ECall( "QNF_list", "list" );
-
-    }; // Qring
-
-  return ( l );
-};
-
-/******************************************************/
-// things for zCommon
-
-/******************************************************/
-static proc index( int i )
-  "
-  i need indexing of arrays from 0 => ARRAY[ index(i) ] - everywhere...
-"
-{
-  return (i + 1);
-};
-
-/******************************************************/
-static proc uni_poly( poly p )
-  "
-        returns polynomial with the same monomials but without coefficients.
-"
-{
-  poly @tt = poly(0);
-  for ( int @k = size(p); @k > 0; @k -- )
-    {
-      @tt = @tt + leadmonom(p[@k]);
-    };
-  return (@tt);
-};
-
-/******************************************************/
-static proc get_max ( poly @t, number @def )
-{
-  int @n = size( @t );
-
-  if ( @n == 0 )
-    {
-      return (@def);
-    };
-
-  number @max = leadcoef(@t[1]);
-  number @mm;
-
-  if ( @n > 1)
-    {
-      for ( int @i = 2; @i <= @n ;@i ++ )
-        {
-          @mm = leadcoef ( @t[@i] );
-          if ( @mm < 0 )
-            {
-              @mm = -@mm;
-            };
-
-          if( @mm > @max )
-            {
-              @max = @mm;
-            };
-        };
-    };
-
-  @max = @max + 1;
-  if ( @max == 0 )
-    {
-      @max = @max + 1;
-    };
-  return ( 1/@max );
-};
-
-
-/******************************************************/
-static proc get_uni_sum(list @given, int @num)
-{
-  int @l, @k;
-
-  poly @t, @tt;
-
-  @l = size (@given);
-
-  @t = poly(0);
-  for ( @k = @l; @k > 0; @k -- )
-    {
-      if (@num == 1)
-        {
-          @tt = @given[@k];
-        } else
-          {
-            @tt = @given[@k][2];
-          };
-
-      @t = @t + uni_poly( @tt );
-    };
-
-  return ( uni_poly(@t) );
-};
-
-
-
-/******************************************************/
-static proc LM ( intvec exp )
-  "
-        input : given exponent
-        return: monom with this exponent...
-"
-{
-  poly @f = 1; int @deg;
-  for( int @i = 1; @i <= size(exp); @i ++ )
-    {
-      @deg = exp[@i];
-      if ( @deg > 0 )
-        {
-          @f = @f * (var(@i)^(@deg));
-        };
-    };
-
-  return (@f);
-};
-
-/******************************************************/
-// reduced centers - computation of "minimal" set of generators
-
-LIB "general.lib"; // for sort
-
-/******************************************************/
-static proc zSort ( list @z )
-  "
-        Sort elements of a list of polynoms,
-        and normalize
-"
-{
-  int n = size(@z);
-  if ( n < 1 )
-    {// empty list
-      return( @z );
-    };
-
-  if ( n == 1 )
-    {
-      if ( @z[1] == 0 ) // if zero => empty list
-        {
-          return(list());
-        };
-
-      @z[1] =  @z[1] * ( 1/leadcoef(@z[1]) ) ;
-
-      return( @z );
-    };
-
-  int i = 1;
-
-  while ( i<=n )
-    {
-      if (size( @z[i] ) != 0)
-        {
-          break;
-        };
-      i++;
-    };
-
-  if ( i > n )
-    { // all zeroes
-      return(list());
-    };
-
-  ideal id = @z[i];
-  i++;
-
-  while ( i<= n )
-    {
-      if( @z[i] != 0 )
-        {
-          id=@z[i],id;
-        };
-      i++;
-    };
-
-  // can sort only ideal generators:-(
-  list srt = sort(id);
-
-  poly p;
-  // convert srt[1]:ideal to result:list.
-  list result = list();
-  for ( i = size(srt[1]); i>0; i-- )
-    {
-      p = srt[1][i];
-      if ( p == 0 )
-        {
-          i --;
-          continue;
-        };
-      p = p* (1/leadcoef(p));                // normalize
-      result = list(p) + result;
-    };
-
-  //        "OUT SORT::";
-  //        result;
-
-  return ( result );
-};
-
-
-
-/******************************************************/
-static proc zRefine ( list @z )
-  "
-        kill terms by leading monomials...
-        Note: based on myCoeff
-"
-{
-  BCall("zRefine", "list");
-
-  int @i, @j;
-
-  poly @f  = 0; // leadmonom
-
-  poly @ff = 0; // polyes
-  poly @gg = 0;
-  number @nf, @ng;
-
-  int flag = 1;
-
-  while ( flag == 1 )
-    {
-      flag = 0;
-
-      @z = zSort(@z); // sort out, < ...
-
-      if( size(@z) < 2 )
-        {
-          return (@z);
-        };
-
-      for ( @i = size(@z); @i > 0; @i -- ) // at 1st the biggest ... then smallest...
-        {
-
-          @ff    = @z[@i];
-
-          if( size(@ff) == 0 )
-            {
-              @z = delete ( @z , @i );
-              @i --;
-              continue;
-            };
-
-          @ff    = @ff*(1/leadcoef(@ff));
-          @z[@i] = @ff;
-          @f         = leadmonom(@ff);
-
-          for ( @j = (@i-1); (@j>0); @j --  )
-            {
-              @gg = @z[@j];
-              @ng = myCoeff(@gg, @f); // leads?
-              if( @ng!=0 )
-                {
-                  @z[@j] = @gg - @ng * @ff;
-                  flag = 1;
-                };
-            };
-          for ( @j = (@i+1); (@j<=size(@z)); @j ++ )
-            {
-              @gg = @z[@j];
-              @ng = myCoeff(@gg, @f);
-              if( @ng!=0 )
-                {
-                  @z[@j] = @gg - @ng * @ff;
-                  flag = 1;
-                };
-            };
-
-        };
-    };
-
-  ECall("zRefine", "list");
-
-  return         ( @z );
-
-};
-
-
-/******************************************************/
-// procedures for building "bad leadmonomials" set
-
-
-/******************************************************/
-static proc checkPolyUniq( list l, poly p )
-  "
-        check whether p sits already in l, assume l to be size-sorted <
-        return: -1 if present
-                 1 if we need to add
-"
-{
-  BCall( "checkPolyUniq", "{ " + string(l) + " }, " + string(p) );
-  int n = size(l);
-  int i = 1;
-
-  int s = size(p);
-
-  while( i<= n )
-    {
-      if ( size(l[i]) >= s )
-        {
-          break;
-        };
-
-      i ++;
-    };
-
-  // now: size(l[i]) >= s
-  while( i<= n )
-    {
-      if ( size(l[i]) == s )
-        {
-          break;
-
-        };
-      if ( l[i] == p )
-        {
-          ECall( "checkPolyUniq", -1 );
-          return (-1);
-        };
-      i ++;
-    };
-
-  ECall( "checkPolyUniq", 1 );
-  return ( 1 );
-
-};
-
-/******************************************************/
-static proc addPolyUniq( list l, poly p )
-  "
-        add p into l uniquely, and keep l size-sorted <
-"
-{
-  BCall( "addPolyUniq", " { " + string(l) + " }, " + string(p) );
-
-  int n = size(l);
-
-  if ( n == 0 )
-    {
-      l = list(p);
-
-      ECall( "addPolyUniq", l );
-
-      return (l);
-    };
-
-  int s = size(p);
-
-  int i = 1;
-  while( i<= n )
-    {
-      if( size(l[i]) > s )
-        {
-          l = insert( l, p, i-1 ) ;
-          break;
-        };
-
-      if( size(l[i]) == s )
-        {
-          if ( l[i] == p )
-            {
-              break;
-            };
-        };
-
-      i++;
-    };
-
-  if( i > n )
-    {
-      l = l + list(p);
-    };
-
-  ECall( "addPolyUniq", l );
-  return(l);
-};
-
-
-/******************************************************/
-static proc mergePolysUniq( list a, list b )
-  "
-        merge lists uniq
-"
-{
-  BCall( "mergePolysUniq", "{ " + string(a) + " }, { " + string(b) + "} " );
-
-  for( int i = 1; i <= size(b); i ++ )
-    {
-      a = addPolyUniq(a, b[i]);
-    };
-
-  ECall( "mergePolysUniq", a );
-
-  return (a);
-};
-
-
-/******************************************************/
-static proc sortPolysUniq( list a )
-  "
-        sort list uniq
-"
-{
-  BCall( "sortPolysUniq", a );
-
-  if( size(a) < 2 )
-    {
-      ECall( "sortPolysUniq", a );
-      return(a);
-    };
-
-  list b = list(a[1]);
-
-  for( int i = 2; i <= size(a); i ++ )
-    {
-      b = addPolyUniq(b, a[i]);
-    };
-
-  ECall( "sortPolysUniq", b );
-
-  return (b);
-};
-
-/******************************************************/
-static proc addRecordUniq ( list leadD, list newD, intvec texp, poly tm, int kind, list prs )
-  "
-        if kind = 0 => for PBW - no products
-        if kind = 1 => with products
-"
-{
-  BCall ("addRecordUniq", "{old leads}, {new lead}, [" + string(texp) + "], " + string(tm) + ", " + string(kind) + ", {" + string(prs) + "}");
-
-  int i;
-  int f_add = 0;
-
-  prs = sortPolysUniq(prs);
-
-  // trick:
-  //  check for presens of a monomial @tm in current index poly of @leads (=> in list @leads)
-  //  if char = 0 then new_size > (if not present) or =  (if already present)
-  //  if char > 0 then new_size > (if not present) or =< (if already present)
-  // !!!!!
-  if( size(tm + leadD[2]) > size(leadD[2]) )
-    {
-      f_add = 1;
+        // "normal" polynomial form == no denominators, gcd of coeffs is a unit
+        p = cleardenom( l );
+        l = cleardenom( p / leadcoef(p) );
     } else
-      {
-        if ( kind != 0 )
-          {
-            for ( i = 1; i<= size(leadD[1]); i++ )
-              {
-                if ( leadD[1][i][2] == tm )
-                  {
-                    for ( i = size(prs); i>0; i-- )
-                      {
-                        f_add = checkPolyUniq( leadD[1][i][3], prs[i] );
-                        if( f_add == -1 )
-                          {
-                            prs = delete(prs, i);
-                          };
-                      };
-
-                    break;
-                  };
-              };
-          };
-      };
-
-  if ( f_add == 1 )
     {
-
-      list newlist ;
-      if ( kind != 0 )
+        if( typeof(l) == "ideal" )
         {
-          newlist =  list ( list ( texp, tm, prs ) );
-        } else
-          {
-            newlist =  list ( list ( texp, tm ) );
-          };
-
-
-      if ( size(newD[1]) == 0 )
-        {
-          newD[1] =  newlist;
-          newD[2] =  tm;
-        } else
-          {
-
-            if( size(tm + newD[2]) > size(newD[2]) )
-              {
-                newD[1] = newD[1] + newlist;
-                newD[2] = newD[2] + tm;
-              } else
+            for( int i = 1; i <= size(l); i++ )
+            {   
+                p = l[i];
+        
+                // Now make polynomials look nice:
+                if ( deg(p) > 0 ) // throw away scalars!
                 {
-                  if ( kind != 0 )
-                    {
-                      for ( i = 1; i<= size(newD[1]); i++ )
-                        {
-                          if ( newD[1][i][2] == tm )
-                            {
-                              newD[1][i][3] = mergePolysUniq( newD[1][i][3], prs );
-                              break;
-                            };
-                        };
-                    };
-                };
-          };
-    };
-
-  ECall("addRecordUniq", "{new leads}");
-  return (newD);
-};
-
-
-/******************************************************/
-static proc mergeRecordsUniq ( list old, list new, int kind )
-{
-  BCall ("mergeRecordsUniq", "{old leads}, {new leads}, " + string(kind) );
-
-  if(  size(new[1]) > 0 )
-    {
-      if ( size (old[1]) == 0 )
-        {
-          old = new;
-        } else
-          {
-            if ( kind != 0 )
-              {
-                int io;
-                for ( int in = 1; in <= size( new[1] ); in ++ )
-                  {
-                    if( size( new[1][in][2] + old[2] ) > size( old[2] ) )
-                      {
-                        old[1] = old[1] + list(new[1][in]);
-                        old[2] = old[2] + new[1][in][2];
-                      } else
-                        {
-                          for( io = 1; io <= size( old[1] ); io ++ )
-                            {
-                              if( old[1][io][2] == new[1][in][2] )
-                                {
-                                  old[1][io][3] = mergePolysUniq( old[1][io][3], new[1][in][3] );
-                                  break;
-                                };
-                            };
-                        };
-                  };
-              } else
+                    // "normal" polynomial form == no denominators, gcd of coeffs is a unit
+                    p = cleardenom( p );
+                    l[i] = cleardenom( p / leadcoef(p) );
+                } else
                 {
-                  old[1] = old[1] + new[1];
-                  old[2] = old[2] + new[2];
-                };
-          };
-    };
-
-  ECall ("mergeRecordsUniq", "{new leads}");
-  return (old);
-};
-
-
-
-/******************************************************/
-static proc init_bads(int @deg)
-"
-    initialization of an empty 'badleads' list
-"
-{
-  list @l = list();
-  for( int @i = 0; @i <= @deg; @i ++ )
-    {
-      @l[index(@i)]         = list( list() , 0);
-      // new items:
-      // {
-      //        list of leads,    - empty list
-      //        sum poly "index", - poly(0)
-      // }
-    };
-  return (@l);
-};
-
-/******************************************************/
-static proc zAddBad ( list @leads, list @newz, int @maxDeg, int kind )
-  "
-        input:
-                @leads: graded by deg list of
-                        rec:
-                        {
-                                [1] - list of
-                                        rec:
-                                        {
-                                                [1] - leadexp.
-                                                [2] - leadmonom([1])
-                                        if kind != 0 (for zReduce) =>
-                                                [3] - !list! of all possible products which give this leadexp
-                                        },
-                                [2] - summ of all in [1] ('index' poly)
-                        }
-                @newz: new elements for adding to @leads
-                @maxDeg: maximal degree
-
-                if kind != 0 => keeps also list of all possible products which give leadexp of a record
-
-        return:
-                updated @leads list
-
-"
-{
-  BCall ("zAddBad", "{old leads}, { " + string(@newz) + " }, " + string(@maxDeg) + ", " + string(kind) + "");
-
-  int @newSize = size(@newz);
-  if ( @newSize < 1 )
-    {
-      return (@leads);
-    };
-
-  int @i, @j, @k, @dd, @deg;
-
-
-  poly         @m, @tm, @ttm;
-  intvec @exp, @texp, @ttexp;
-
-  list @newzz;
-  int @size, @newdeg, @mydeg;
-
-  poly @sum_old, @sum_new;
-
-  poly a, b, @temp;
-
-  /*
-    if kind = 0 => for PBW - no products
-    if kind = 1 => for zReduce - with products
-  */
-
-  poly pr = 0; int pri; list prs;
-
-  for ( @i = @newSize; @i > 0; @i -- )
-    {// for every new poly (@newz[@i]) do
-
-      @m   = leadmonom( @newz[@i] );
-      @deg = deg(@m);
-      @exp = leadexp(@m);
-
-      // newzz void new list
-      @newzz = init_bads(@maxDeg );
-
-      for( @mydeg = @deg; @mydeg <= @maxDeg;  @mydeg = @mydeg + @deg )
-        {// adding all possiblities for @newz[@i]^@j;
-
-          if ( @mydeg > @deg )
-            {
-              @texp         = @texp + @exp;
-              @tm         = LM ( @texp );
-              if ( kind != 0)
-                {
-                  pr = QNF_poly( pr * @newz[@i] ); // degrees must be there!!!
-                };
-            } else
-              {
-                @texp         = @exp;
-                @tm         = @m;
-                if ( kind != 0)
-                  {
-                    pr = @newz[@i];
-                  };
-              };
-
-          @temp =  QNF_poly(@tm);
-          if( @temp != @tm )
-            {
-              break;
-            };
-
-          /*!!*/                        @newzz[index(@mydeg)] =
-                                          /*!!*/        addRecordUniq( @leads[index(@mydeg)], @newzz[index(@mydeg)], @texp, @tm, kind, list(pr) );
-
-          for ( @dd = 1; (@dd <= @maxDeg) and ((@dd + @mydeg) <= @maxDeg ); @dd ++ )
-            { // for every good "deg"
-
-              @newdeg = @dd + @mydeg; // any deg should be additive!!!
-
-              for ( @k = size(@leads[index(@dd)][1]); @k > 0; @k -- )
-                {
-
-                  @ttexp         = (@leads[index(@dd)][1][@k][1]) + @texp;
-                  @ttm         = LM (@ttexp);
-
-                  if ( kind != 0 )
-                    {
-                      prs = list();
-
-                      for( pri = 1; pri <= size(@leads[index(@dd)][1][@k][3]); pri++)
-                        {
-                          // to do products into list and add one list !!!
-                          a = QNF_poly( pr*@leads[index(@dd)][1][@k][3][pri]);
-                          b = QNF_poly( @leads[index(@dd)][1][@k][3][pri]*pr);
-
-                          prs= prs + list(a);
-
-                          if ( a!=b )
-                            {
-                              prs= prs + list(b);
-                            };
-                        };
-
-                    } else
-                      {
-                        prs = list(pr);
-                      };
-
-                  @temp =  QNF_poly(@ttm);
-                  if( @temp == @ttm )
-                    {
-
-                      /*!!*/                                                @newzz[index(@newdeg)] =
-                                                                          /*!!*/        addRecordUniq( @leads[index(@newdeg)], @newzz[index(@newdeg)], @ttexp, @ttm, kind, prs );
-                    };
-
-
-                };
-            }; // for
-
-          if ( @deg == 0 )
-            {
-              break;
-            };
-        };
-
-      for ( @mydeg = 0; @mydeg <= @maxDeg; @mydeg ++ )
-        { // adding currently generated to result
-          @leads[index(@mydeg)] = mergeRecordsUniq ( @leads[index(@mydeg)], @newzz[index(@mydeg)], kind );
-        };
-
-    };
-
-  ECall ("zAddBad", "{new leads}");
-
-  return (@leads);
-};
-
-
-/******************************************************/
-// procedure for reducing a given poly wrt already calculated "badleadings"
-
-/******************************************************/
-static proc zReducePoly ( list leads, poly new, poly anfang )
-  "
-        reduce poly new wrt found leads,
-        return: list of all possible reductions...
-"
-{
-  poly temp = new;
-  poly rest = anfang;
-
-  poly   lm;
-  number lc;
-
-  list LEADS;
-
-  int i, n;
-  list prs;
-
-  while ( size(temp) > 0 )
-    {
-      // do for every term... beginning with leading... 'till smallest
-      lm = leadmonom( temp );
-
-      LEADS = leads[index(deg( lm ))]; // currently users bad leading products...
-
-      if( size(LEADS[2] + lm ) <=  size(LEADS[2]) )
-        { // need to reduce, since leacmonom already in LEADS
-
-          for ( i = 1; i <= size(LEADS[1]); i++ )
-            {
-              if( LEADS[1][i][2] == lm )
-                {
-
-                  lc = leadcoef( temp ); // no need be the unit
-
-                  prs = LEADS[1][i][3]; // shouldbe generated by zAddBad with kind == 1
-                  n = size(prs) ;
-
-                  if ( n == 1 )
-                    { // no recursion
-
-                      temp = leadcoef(prs[1]) * temp - lc * prs[1]; // leadmonom goes down
-
-                    } else
-                      { // do recursion
-
-                        list result = list();
-                        poly newnew;
-                        int f_addrest = 0;
-
-                        for( int pri = 1; pri <= n ; pri ++ )
-                          {
-                            newnew = leadcoef(prs[pri]) * temp - lc * prs[pri]; // leadmonom goes down
-
-                            if( size( newnew ) > 0 )
-                              {
-                                result = result + zReducePoly(leads, newnew, rest);
-                              } else
-                                {
-                                  f_addrest = 1;
-                                };
-                          };
-
-                        if ( f_addrest == 1 )
-                          {
-                            result = result + list(rest);
-                          };
-                        return ( result );
-
-                      };
-                  break;
-                };
-            };
-
-        } else
-          { // no such leadmonom in leads
-
-            rest = rest + lead ( temp );
-            temp = temp - lead ( temp ); // leadcoeff goes down
-          };
-    };
-
-  return (list(rest));
-
-};
-
-
-/******************************************************/
-static proc zCancel ( list @tt, list @leads )
-  "
-        just kill entries of plane PBW base with leading monomials in @leads...
-"
-{
-  int @i;
-
-  if ( (size(@tt) == 0) )
-    {
-      return (@tt);
-    };
-
-  list result = list();
-  poly g, f;
-
-  for ( @i = size(@tt); @i > 0 ; @i -- )
-    // for all PBW entries:
-    {
-      g = leadmonom(@tt[@i][1]);    // pbw entry
-      f = @leads[index(deg(g))][2]; // 'index' poly from @leads
-
-      if ( size(f + g) > size(f) ) // if g not in @leads (works only for monomials)
-        {
-          result = list( @tt[@i] ) + result;
-        };
-    };
-
-  return (result);
-
-};
-
-/******************************************************/
-// procedure for computing "minimal" set of generators...
-
-/******************************************************/
-static proc zReduce( list @z )
-  "
-        reduce a set @z - base of Center as V.S.
-        into a minimal set!!
-"
-{
-  BCall( "zReduce", @z );
-
-  @z = zRefine ( @z );
-  int n = size( @z );
-
-  if ( n < 2 )
-    {
-      return (@z);
-    };
-
-  int d = maxDeg( @z );
-
-  if( d== -1 )
-    {
-      return (@z);
-    };
-
-  list leads = init_bads( d );
-
-  list @red;
-
-  int f_add; int j;
-
-  list result = list();
-
-  poly p;
-
-  for ( int i = 1; i <= n ; i++ )
-    {// in this order... from least to maximal...
-
-      p = @z[i];
-
-      @red = zReducePoly ( leads, p, 0 );
-
-      f_add = 1;
-
-      for( j = 1; j <= size(@red); j++ )
-        {
-          if ( @red[j] == 0 )
-            {
-              f_add = 0;
-              break; // nothing new....
-            };
-        };
-
-      @red = zRefine( @red ); // there will be no zeroes after ???
-
-      if( size(@red) > 0 )
-        {
-          leads = zAddBad( leads, @red, d, 1);
-        };
-
-      if ( f_add == 1 )
-        {
-          // we got something new....
-          result = result + list(@red); // ??? which one to add? => trying to add all
-        };
-    };
-
-  ECall( "zReduce", result );
-
-  return (result);
-};
-
-
-/******************************************************/
-// PBW procedures ....
-
-/*
-  PBW: graded by deg list of lists of PBW terms.
-  PBW term: list of 2 polynoms: [1] = PBW monom, [2] = Ad_p( [1] ), [3] = last variable in [1] (for speed)
-*/
-
-/******************************************************/
-static proc PBW_init()
-  "
-PBW[ index(0) ] = PBW part of degree 0:
-record:
-        [1] : 1                // var(0) ;-)
-        [2] : 0
-        [3] : 1
-"
-{
-  BCall( "PBW_init" );
-  return (list(list(1, 0, 1)));
-};
-
-
-/******************************************************/
-static proc PBW_sys(list VARS, poly p)
-  "
-        calculate the array [1..NVARS] of records:
-record[i] =
-                [1] = var(i)                 // i^{th} variable
-                [2] = p*[1]-[1]*p         // [ p, var(i) ]
-                [3] = deg(var(i))         // i^{th} variable's deg
-
-        ?? need debug ??
-"
-{
-
-  BCall( "PBW_sys" );
-
-  poly t;
-  for (int v = size(VARS); v>0; v -- )
-    {
-      t            = VARS[v];
-      VARS[v] = list( t, QNF_poly( p*t - t*p ), deg(t) ) ;
-    };
-
-  return (VARS);
-};
-
-/******************************************************/
-static proc PBW_done( list PBW )
-  "
-        collects all together, from graded lists into plane list.
-
-        Note: also the last vars...
-"
-{
-  BCall( "PBW_done" );
-
-  list result = list();
-
-  int n = size(PBW);
-  for ( int i = 1; i <= n; i++)
-    {
-      result = result + PBW[i];
-    };
-
-  return (result);
-};
-
-/******************************************************/
-static proc PBW_next ( list PBW, int k, list sys)
-{
-  BCall( "PBW_next", k );
-
-  list temp;
-  int kk, nn, ii;
-  list result = list(); // PBW[ index(k) ] ought to be empty ??
-  int N = size(sys);
-
-  for ( int i = 1; i <= N; i ++ ) // for all vars
-    {
-      kk = (k - sys[i][3]);   // any deg should be additive function wrt multiplication
-      if ( kk >= 0 )
-        {
-          nn = size( PBW[ index(kk) ] );
-          for ( ii = 1; ii <= nn; ii ++ )
-            {
-              temp = PBW[ index(kk) ][ii];
-
-              if ( temp[3] <= i )
-                {
-                  temp[2] = temp[2]*sys[i][1] + temp[1]*sys[i][2]; // recursive [,]
-                  temp[1] = temp[1]*sys[i][1];
-                  temp[3] = i;
-
-                  result = result + list ( temp );
-                };
-            };
-        };
-    };
-
-  result = QNF_list( result, 2 + 4);
-  ECall( "PBW_next", "list result" );
-  return (result);
-
-};
-
-/******************************************************/
-static proc PBW_base( int MaxDeg, poly p )
-{
-  BCall( "PBW_base", MaxDeg, p );
-
-  list PBW = list();
-  list SYS = PBW_sys( my_vars(), p );
-
-  PBW[index(0)] = PBW_init();
-
-  for (int k = 1; k <= MaxDeg; k ++ )
-    {
-      PBW[index(k)] = PBW_next( PBW, k, SYS );
-    };
-
-  return (PBW_done( PBW ));
-};
-
-
-/******************************************************/
-// standard center procedures...
-
-/******************************************************/
-static proc FSS (list @given, poly @BASE_POLY)
-"
-    Gauss with computation of kernel v.s basis
-    to be optimized
-"
-{
-  BCall( "FSS", "list", "basepoly: ", @BASE_POLY);
-
-  list @nums = list ();
-  intvec @ones;
-  int @j, @k,
-    @n, @v,
-    @a, @nn;
-
-  @n = size( @BASE_POLY );
-  @v = size( @given );
-
-  if ( (@v == 0) or (@n == 0) )
-    {
-      return (@given);
-    };
-
-  matrix MD[@n][@v];
-
-  number @max;
-  poly @test;
-  poly @t;
-
-  list LM = list(); // rec: { exp, poly }
-
-  for( @k = @v; @k > 0; @k -- )
-    {
-      LM[@k] = list();
-      @t =  @given[@k][2];
-      LM[@k][2]= @t;
-      LM[@k][1]= leadexp( @t );
-    };
-
-
-  intvec @w;
-  for ( @a = 1 ; @a <= @n ; @a ++ )
-    {
-      @w = leadexp(@BASE_POLY[@a]);
-      for( @k = @v; @k > 0; @k -- )
-        {
-          if( @w == LM[@k][1] )
-            {
-              @t = LM[@k][2];
-              MD[@a, @k] = leadcoef( @t );
-              @t = @t - lead ( @t );
-              LM[@k][2]  = @t;
-
-              LM[@k][1]  = leadexp(@t);
-            };
-        };
-
-    };
-
-  int @x, @y;
-  number @min;
-
-  number @div;
-  //    @nums = list();
-
-  // Gauss
-//  print("Before Gauss, Matrix: ");
-//  print( MD );
-
-
-  @x = 1;
-  @y = 1;
-  while ( (@y <= @n) && (@x <= @v))
-    // main Gauss loop...
-    {
-      @min =  leadcoef( MD[@y, @x] ); // curr diag.
-
-      if ( @min == 0 )
-        // if zero on diag...
-        {
-          @j = 0;
-
-          // let's find the minimal
-          for ( @k = @y+1; @k <= @n; @k ++ )
-            {
-              @max = leadcoef( MD[ @k, @x ] );
-              if ( @max != 0 )
-                {
-                  @j = @k;
-                  @min = @max;
-                  //                    @k ++;
-                  break; // this pure for
-                  // continue;
-                  // for find min
-                };
-            }; // for (@k) // found minimal
-
-          if ( @j == 0 )
-            {
-              // das ist gut! //
-              @nums = @nums + list ( list ( @x, @y ) );
-              @x ++;
-              continue; // while
-            } ;
-
-          for ( @k = @x ; @k <= @v ; @k ++ )
-            {
-              @t =  MD[ @j, @k ];
-              MD[ @j, @k ] = MD[ @y, @k ];
-              MD[ @y, @k ] = @t;
-            };
-
-        }; // if diag === zero.
-      @ones[@y] = @x;
-
-      if ( @min == 0 )
-        {
-          //            write_latex_str ( " ******************* ERROR ******************* " );
-          quit;
-        };
-
-
-      if ( @min != 1) // let's norm the row... to make the '1' !
-        {
-          @min = 1 / @min;
-          for ( @k = @x; @k <= @v; @k++ )
-            {
-              @max = leadcoef( MD[@y, @k] );
-
-              if ( @max == 0)
-                {
-                  @k ++ ;
-                  continue; // for : norming the row...
-                };
-
-              MD[@y, @k] = @max * @min;  // here must be Field ...
-            };
-
-          //            @min = 1;
-
-        };
-
-      // here must be @min != 0;
-      for ( @k = 1; @k <= @n; @k++ )
-        {
-          @max = leadcoef( MD[@k, @x] );
-
-          if ( ( @k == @y) || (@max == 0) )
-            {
-              @k ++ ;
-              continue;
-            };
-
-          for ( @j = @x; @j <= @v ; @j ++ )
-            {
-              MD[ @k, @j ] = MD[ @k, @j ] - @max * MD[ @y, @j ];
-            };
-
-        }; //killing
-
-      @x ++;
-      @y ++;
-    }; //main while.
-  /******************************************************/
-
-//  print("Gaussed Matrix: ");
-//  print( MD );
-
-  // computation of kernel's basis
-
-  if ( @x <= @v )
-    {
-      for ( @k = @x; @k <= @v ; @k ++ )
-        {
-          @nums = @nums + list ( list ( @k, @n+1 ) );
+                    l[i] = 0;
+                }
+            }
+            
+            l = simplify(l, 2 + 8);
         }
     }
 
-//  print("Nums: " );
-//  print (@nums);
-
-  list result = list();
-
-  // real calculations of the Base of a Ker as V.S.
-
-  for ( @k = 1; @k <= size(@nums) ; @k ++ )
-    {
-      @x = @nums[@k][1];
-      @j  = @nums[@k][2];
-
-      @t = @given[@x][1];
-
-      for ( @y = 1; @y < @j ; @y ++ )
-        // for every "@x" column
-        {
-          @max = leadcoef( MD[@y, @x] );
-          if ( (@max != 0) )
-            {
-              @a = @ones[@y];
-              @t = @t - @max * @given[@a][1];
-            };
-        };
-
-      result[@k] = @t;
-    };
-
-  ECall( "FSS", "list" );
-  return ( result );
-};
-
-/******************************************************/
-static proc reduce_one_per_row(list @given)
-{
-  BCall( "reduce_one_per_row" );
-
-  int @k;
-  int @l = size (@given);
-
-  if( @l == 0 )
-    {
-      return (@given);
-    };
-
-  int @char = char(basering);
-
-  intvec @marks;
-
-  if ( @char == 0 )
-    {
-      poly @t = poly(0);
-    };
-
-  list @unis = list ();
-  poly p;
-
-  for ( @k = @l; @k > 0; @k -- )
-    {
-      p = uni_poly( @given[@k][2] );
-      @unis[@k] = p;
-
-      if( p == 0 )
-        {
-          @marks[@k] = 2;
-        } else
-          {
-            @marks[@k] = 1;
-            if ( @char == 0 )
-              {
-                @t = @t + p;
-              };
-          };
-    };
-
-  if ( @char != 0 )
-    {
-      def save = basering;
-      execute( "ring NewRingWithGoodField = (0), (" + varstr(save) + "), (" + ordstr(save) + "); ");
-      poly @t = 0;
-
-      if(! defined (@unis) )
-        {
-          list @unis = imap( save, @unis );
-        };
-
-      for ( @k = @l; @k > 0; @k -- )
-        {
-          if( @marks[@k] == 1 )
-            {
-              @t = @t + @unis[@k];
-            };
-        };
-    };
-
-  int @loop_size = size(@t);
-  poly @for_delete, @tt;
-  int @ll;
-
-  while( @loop_size > 0 )
-    {
-      @for_delete = poly(0);
-      @ll = size(@t);
-
-      for ( @k = @ll; @k > 0; @k -- )
-        {
-          if ( leadcoef(@t[@k]) == 1 )
-            {
-              @for_delete = @for_delete + @t[@k];
-            };
-        };
-
-      @loop_size = size( @for_delete );
-
-      if ( @loop_size>0 )
-        {
-          for( @k = @l ; @k > 0 ; @k -- )
-            {
-              if ( @marks[@k] == 1)
-                {
-                  @tt = @unis[@k];
-
-                  if( size( @for_delete + @tt ) != ( size( @for_delete )  + size( @tt ) ) )
-                    {
-                      @t = @t - @tt;
-                      @marks[@k] = 0;
-                    };
-                };
-            };
-        };
-    };
-
-  if ( @char != 0 )
-    {
-      setring(save);
-      kill NewRingWithGoodField;
-    };
-
-  list @reduced = list();
-
-  for ( @k = @l ; @k>0 ; @k --)
-    {
-      if (@marks[@k]==2)
-        {
-          @reduced = list ( @given[@k] ) + @reduced ;
-        } else
-          {
-            if (@marks[@k]==1)
-              {
-                @reduced = @reduced + list ( @given[@k] );
-              };
-          };
-    };
-
-  ECall( "reduce_one_per_row", "structured list" );
-  return (@reduced);
-};
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "makeNice", l ); }; /*4DEBUG*/
+    return( l );
+}
 
 
 
 /******************************************************/
-static proc calc_base (list @AD_GIVEN)
-  "
-    sort out given 'pbw' into groups due to common monoms in images = ([2])s
+static proc monomialForm( def p )
+"
+: p is either poly or ideal
+RETURN: polynomial with all monomials from p but without coefficients.
 "
 {
-  BCall( "calc_base" );
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "monomialForm", p ); }; /*4DEBUG*/
 
-  list @AD_CALC = list();
-  int @ll, @k, @j, @loop_size;
-
-  poly @t = poly(0);
-  poly @tt, @for_delete;
-
-  int @t_size;
-
-  list @GR, @GR_TEMP;
-
-  int @number = size(@AD_GIVEN);
-
-  while ( @number > 0 )
+    poly result = 0; int k, j; poly m;
+    
+    if( typeof(p) == "ideal" ) //
     {
-      @tt = @AD_GIVEN[@number][2];
-      if ( size (@tt) == 0)
+        if( ncols(p) > 0 )
         {
-          @AD_CALC = @AD_CALC + list ( @AD_GIVEN[@number][1] );
-        } else
-          {
-            @t = uni_poly( @tt );
-            @t_size = size(@t);
-
-            @GR_TEMP = list ();
-            @GR_TEMP[1] = @t;
-            @GR_TEMP[2] = list ( @AD_GIVEN[@number] );
-
-            @loop_size = size(@GR);
-            if ( @loop_size == 0 )
-              {
-                @GR = list(@GR_TEMP);
-              } else
+            result = uni_poly( p[1] );
+        
+            for ( k = ncols(p); k > 1; k -- )
+            {            
+                for( j = size(p[k]); j > 0; j-- )
                 {
-                  for ( @k = @loop_size; @k > 0 ; @k -- )
+                    m = leadmonom( p[k][j] );
+                    
+                    if( size(result + m) > size(result) ) // trick!
                     {
-                      @tt = @GR[@k][1];
-                      if ( size( @t + @tt ) != ( @t_size + size(@tt) ) )
-                        // whether @tt and @i intersencts? ( will not work in char == 2 !!!)
+                        result = result + m;
+                    }
+                }
+                
+            }
+        }
+    }
+    else
+    {
+        if( typeof(p) == "poly" ) //
+        {
+            result = uni_poly(p);
+        } else
+        {
+            ERROR( "ERROR: Wrong input! Expected polynomial or ideal!" );
+        }
+    }
+    
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "monomialForm", result ); }; /*4DEBUG*/
+    return( result );
+}
+
+/******************************************************/
+static proc uni_poly( poly p )
+"
+    returns polynomial with the same monomials but without coefficients.
+"
+{
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "uni_poly", p ); }; /*4DEBUG*/
+
+    poly result = 0;
+    
+    for ( int k = size(p); k > 0; k -- )
+    {
+        result = result + leadmonom( p[k] );
+    }
+    
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "uni_poly", result ); }; /*4DEBUG*/
+    return( result );
+}
+
+
+
+
+
+/******************************************************/
+static proc smoothQideal( ideal I, list #)
+"
+PURPOSE: smooths the ideal in a current QUOTIENT(!) ring.
+"
+{
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "smoothQideal", I ); }; /*4DEBUG*/
+    
+    ideal A = NF( I, twostd(DefaultIdeal(#)), 1 );
+    
+    ideal D = I - A;
+    
+    if( size(D) > 0 ) // Were there any changes???
+    {
+        ideal T = ideal(); int j = 1;
+    
+        for( int i = 1; i <= ncols(I); i++ )
+        {
+            if( size(D[i]) == 0 ) // keep only unchanged elements
+            {
+                T[ j ] = I[i]; j++;
+            }
+        }
+        
+        kill A;
+        
+        ideal A = T;
+        
+        kill T;
+    }
+    
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "smoothQideal", A ); }; /*4DEBUG*/
+    
+    return( A );    
+}
+
+
+
+
+/******************************************************/
+// ::PBW:: PBW basis construction.
+/******************************************************/
+
+
+
+
+/******************************************************/
+proc PBW_basis_byMaxDeg( int MaxDeg )
+"USAGE: PBW_basis_byMaxDeg(MaxDeg); int MaxDeg
+PURPOSE: Compute the PBW basis (up to a given maximal degree) of a current algebra.
+RETURN: ideal consisting of PBW elements.
+NOTE: unit is omitted. Weights are ignored!
+"
+{
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "PBW_basis_byMaxDeg", MaxDeg ); }; /*4DEBUG*/
+    
+    ideal Basis = ideal();
+    
+    for (int k = 1; k <= MaxDeg; k ++ )
+    {
+        ideal T = Basis + maxideal(k); kill Basis; ideal Basis = T; kill T; // ?
+    }
+    
+    ideal T = smoothQideal( Basis ); kill Basis;
+    
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "PBW_basis_byMaxDeg", T ); }; /*4DEBUG*/
+    return( T );
+}
+example
+{
+"EXAMPLE:"; echo = 2;
+ring A = 0,(e,f,h),dp;
+matrix D[3][3]=0;
+D[1,2]=-h;  D[1,3]=2*e;  D[2,3]=-2*f;
+ncalgebra(1,D); // this algebra is U(sl_2)
+
+// PBW Basis of A_2 - monomials of degree <= 2, without unit:
+PBW_basis_byMaxDeg( 2 ); 
+}
+
+
+/******************************************************/
+proc PBW_basis_byDeg( int Deg )
+"USAGE: PBW_basis_byDeg(Deg); int Deg
+PURPOSE: Compute the PBW basis (of a given degree) of a current algebra.
+RETURN: ideal consisting of PBW elements.
+NOTE: Unit is omitted. Weights are ignored!
+"
+{
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "PBW_basis_byDeg", Deg ); }; /*4DEBUG*/
+    
+    ideal Basis = smoothQideal( maxideal( Deg ) );
+    
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "PBW_basis_byDeg", Basis ); }; /*4DEBUG*/
+    return( Basis );
+}
+example
+{
+"EXAMPLE:"; echo = 2;
+ring A = 0,(e,f,h),dp;
+matrix D[3][3]=0;
+D[1,2]=-h;  D[1,3]=2*e;  D[2,3]=-2*f;
+ncalgebra(1,D); // this algebra is U(sl_2)
+
+// PBW Basis of A_2 \ A_1 - monomials of degree == 2:
+PBW_basis_byDeg( 2 ); 
+}
+
+
+/******************************************************/
+proc PBW_basis_byMaxMonom( poly MaxMonom )
+"USAGE: PBW_basis_byMaxMonom(m); poly m
+PURPOSE: Compute the PBW basis, up to a given maximal exponent, of a current algebra.
+INPUT: Maximal exponent is given by the corresponding monomial.
+RETURN: ideal consisting of PBW elements.
+NOTE: Unit is omitted. Weights are ignored!
+"
+{
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "PBW_basis_byMaxMonom", MaxMonom ); }; /*4DEBUG*/
+    
+    ideal K = ideal();
+    
+    intvec exp = leadexp( MaxMonom );
+    
+    for ( int k = 1; k <= size(exp); k ++ )
+    {
+        K[ 1 + size(K) ] = var(k)^( 1 + exp[k] );
+    }
+    
+    attrib(K, "isSB", 1);
+    
+    ideal Basis = kbase( K );
+    
+    kill K;
+    
+    ideal K = Basis[ (ncols(Basis)-1)..1]; // reverse, kill last 1
+    
+    kill Basis;
+    
+    ideal T = smoothQideal( K ); kill K;
+
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "PBW_basis_byMaxMonom", T ); }; /*4DEBUG*/
+    
+    return( T );
+}
+example
+{
+"EXAMPLE:"; echo = 2;
+ring A = 0,(e,f,h),dp;
+matrix D[3][3]=0;
+D[1,2]=-h;  D[1,3]=2*e;  D[2,3]=-2*f;
+ncalgebra(1,D); // this algebra is U(sl_2)
+
+// At most 1st degree in e, h and at most 2nd degree in f, unit is omitted:
+PBW_basis_byMaxMonom( e*(f^2)* h ); 
+}
+
+
+
+
+/******************************************************/
+// ::CORE:: Core procedures...
+/******************************************************/
+
+
+
+/******************************************************/
+proc ApplyAd( ideal I, poly p )
+"
+USAGE: ApplyAd( Basis, f); ideal Basis, poly f
+PURPOSE: Apply Ad_{f} to every element of Basis
+RETURN: ideal, Ad_{f}(Basis)
+SEE ALSO:   KER; LinearCombinations
+"
+{
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "ApplyAd", I, p ); }; /*4DEBUG*/
+
+    poly t;
+
+    ideal II = ideal();
+
+    for ( int k = ncols(I); k > 0; k --)
+    {
+        t = I[k];
+        II[k] = p * t - t * p; // we have to reduce smooth images in Qrings...
+    }
+    
+    ideal J = NF( II, twostd(0) ); // ... now!
+    
+    kill II;
+    
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "ApplyAd", J ); }; /*4DEBUG*/
+    return( J );
+}
+example
+{
+"EXAMPLE:"; echo = 2;
+ring A = 0,(e,f,h),dp;
+matrix D[3][3]=0;
+D[1,2]=-h;  D[1,3]=2*e;  D[2,3]=-2*f;
+ncalgebra(1,D); // this algebra is U(sl_2)
+
+// Let us consider the linear map Ad_{e} from A_2 into A.
+
+// Compute the PBW basis of A_2:
+ideal Basis = PBW_basis_byMaxDeg( 2 ); Basis;
+
+// Compute images of basis elements under the linear map Ad_e:
+ideal Image = ApplyAd( Basis, e ); Image;
+
+// Now we have a linear map given by: Basis_i --> Image_i
+// Let's compute its kernel:
+module C = KER( Image ); C;
+
+// Now we can compute the kernel of Ad_e by means of basis vectors:
+ideal K = LinearCombinations(Basis, C); K;
+
+// Let's check that Ad_e(K) is zero:
+ApplyAd( K, e );
+}
+
+
+
+/******************************************************/
+proc KER( ideal Images )
+"USAGE: KER( Images ); ideal Images
+PURPOSE: Computes the kernel of a linear map given by its images on certain basis vectors
+RETURN: syzygy module, or 0 if all images are zeroes
+SEE ALSO:   ApplyAd; LinearCombinations
+"
+{
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "KER", Images ); }; /*4DEBUG*/
+
+    // This must be a list of monomials in a form of polynomial (sum with coeffs == 1)    
+    poly Monomials = monomialForm( Images ); 
+
+    int N = size( Monomials ); // number of different monomials   
+    
+    if ( N == 0 ) // & ncols( Images ) > 0 => all Images == 0
+    {
+        int result = 0;
+        
+/*4DEBUG*/        if( defined( @@@DEBUG ) ){ ECall( "KER", result ); }; /*4DEBUG*/
+        return( result );
+    }
+
+    // Compute matrix MD
+    module MD; // zero
+
+    int x, y;
+    
+    vector w;
+    
+    poly p, m;
+    
+    int V = ncols(Images); // must be equal to ncols(Basis) and size(Basis)!
+    
+    // We take monomials as vector space basis of <Image>_k...
+    
+    // TODO: Is there any other way to compute a basis of it and represent images as 
+    // linear combination of them???
+    
+    // Maybe some 'free resolution' stuff??? But we need linear maps only!!!
+    
+    for ( x = 1; x <= V; x++ ) // For every Image vector
+    {
+        w = 0; 
+        
+        
+        p = Images[x];
+        
+        y = 1; // from 1st monomial in Monomials...
+        
+        while( size(p) > 0 )
+        {
+            m = leadmonom(p);
+            
+            // y < N!
+            while( Monomials[y] != m ) 
+            // There MUST be this monomial because of the construction of Monomials polynomial!
+            {
+                y++; // to size()
+            }
+            
+            // found monomial m at position y.
+            
+            w = w + leadcoef(p) * gen(y); // leadcoef(p) MUST be nonzero!
+            p = p - lead(p); // kill lead term            
+        }
+        
+        MD[x] = w;
+    }
+    
+    /*******************************************/
+    
+    // save options
+    intvec v = option( get );
+    
+    // set right options
+    option( redSB );
+    option( redTail );
+    
+    // compute everything in a right form
+    module KER = simplify( std( syz(MD) ), 1 + 2 + 8 ); 
+    // note that MD is a matrix of numbers - no polynomials... 
+    
+    // restore options
+    option( set, v ); 
+    
+    // kill used structure       
+    kill MD; 
+    
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "KER", KER ); }; /*4DEBUG*/
+
+    return( KER );
+}
+example
+{
+"EXAMPLE:"; echo = 2;
+ring A = 0,(e,f,h),dp;
+matrix D[3][3]=0;
+D[1,2]=-h;  D[1,3]=2*e;  D[2,3]=-2*f;
+ncalgebra(1,D); // this algebra is U(sl_2)
+
+// Let us consider the linear map Ad_{e} from A_2 into A.
+
+// Compute the PBW basis of A_2:
+ideal Basis = PBW_basis_byMaxDeg( 2 ); Basis;
+
+// Compute images of basis elements under the linear map Ad_e:
+ideal Image = ApplyAd( Basis, e ); Image;
+
+// Now we have a linear map given by: Basis_i --> Image_i
+// Let's compute its kernel:
+module C = KER( Image ); C;
+
+// Now we can compute the kernel of Ad_e by means of basis vectors:
+ideal K = LinearCombinations(Basis, C); K;
+
+// Let's check that Ad_e(K) is zero:
+ideal Z = ApplyAd( K, e ); Z;
+
+// Now KER will return a single integer 0:
+def CC  = KER(Z); typeof(CC); CC;
+}
+
+
+/******************************************************/
+proc LinearCombinations( ideal Basis, module KER )
+"
+USAGE:  LinearCombinations( Basis, C ); ideal Basis, module C
+PURPOSE: computes linear combinations of Basis vectors with the coefficients from C.
+RETURN: ideal of linear combinations of Basis vectors with the coefficients from C.
+SEE ALSO:   KER; ApplyAd
+"
+{
+    
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "LinearCombinations", Basis, KER ); }; /*4DEBUG*/
+
+
+    number c;    
+    
+    int x, y; 
+    
+    vector w;
+    
+    poly p;
+    
+    ideal result = ideal();
+    
+    // Kernel' basis translation
+    for ( x = 1; x <= ncols(KER); x++ )
+    {
+        p = 0;
+        w = KER[x];
+        
+        for ( y = 1; y <= nrows(w); y++ )
+        {
+            c = leadcoef( w[y] );
+
+            if ( c != 0 )
+            {
+                p = p + c * Basis[y]; // linear combination of base vectors { Basis[y] }
+            }
+        }
+        
+        result[ 1 + size(result) ]  = p;
+    }
+    
+    // no reduction in quotient algebras is needed. No multiplications were done!
+    
+    
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "LinearCombinations", result ); }; /*4DEBUG*/
+    
+    return( result );
+}
+example
+{
+"EXAMPLE:"; echo = 2;
+ring A = 0,(e,f,h),dp;
+matrix D[3][3]=0;
+D[1,2]=-h;  D[1,3]=2*e;  D[2,3]=-2*f;
+ncalgebra(1,D); // this algebra is U(sl_2)
+
+// Let us consider the linear map Ad_{e} from A_2 into A.
+
+// Compute the PBW basis of A_2:
+ideal Basis = PBW_basis_byMaxDeg( 2 ); Basis;
+
+// Compute images of basis elements under the linear map Ad_e:
+ideal Image = ApplyAd( Basis, e ); Image;
+
+// Now we have a linear map given by: Basis_i --> Image_i
+// Let's compute its kernel:
+module C = KER( Image ); C;
+
+// Now we can compute the kernel of Ad_e by means of basis vectors:
+ideal K = LinearCombinations(Basis, C); K;
+
+// Let's check that Ad_e(K) is zero:
+ApplyAd( K, e );
+}
+
+
+
+/******************************************************/
+static proc LINEAR_MAP_KERNEL(ideal Basis, ideal Images ) // Ker of the linear map given by its values on basis vectors
+"
+PURPOSE: Computation of the kernel basis of the linear map given by the list @given
+"
+{
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "LINEAR_MAP_KERNEL", Basis, Images ); }; /*4DEBUG*/
+    
+    ideal result = ideal(); 
+    
+    if ( size( Basis ) == 0 )
+    {
+/*4DEBUG*/        if( defined( @@@DEBUG ) ){ ECall( "LINEAR_MAP_KERNEL", result ); }; /*4DEBUG*/
+        return( result );
+    }
+    
+    // compute fundamental solutions system
+    def T = KER( Images );
+    
+    
+    // check result of KER
+    if( (typeof(T) == "int") and (T == 0) )
+    {
+        // All zeroes! Return Basis:
+/*4DEBUG*/        if( defined( @@@DEBUG ) ){ ECall( "LINEAR_MAP_KERNEL", Basis ); }; /*4DEBUG*/
+        return( Basis );
+    } 
+    else
+    {
+        if( typeof(T) != "module" )
+        {
+            ERROR( "Wrong output from the 'KER' function!" );
+        }    
+    }
+    
+    result = LinearCombinations( Basis, T );
+    
+    kill T;
+
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "LINEAR_MAP_KERNEL", result ); }; /*4DEBUG*/
+    return( result );
+}
+
+
+/******************************************************/
+static proc ZeroKer( ideal Basis, ideal Images ) // VS Basis of a Kernel of the linear map AD_h, h is a Cartan element
+"
+PURPOSE: Computes VS Basis of a Kernel of the linear map AD_h, when h is a Cartan element
+NOTE: the result is a set of all basis vectors having a zero image
+"
+{
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "ZeroKer", Basis, Images ); }; /*4DEBUG*/
+
+    ideal result = ideal();
+
+    for( int i = 1; i <= ncols( Basis ); i++ )
+    {
+        if( size( Images[i] ) == 0 ) // zero image?
+        {
+            result[ 1 + size(result) ] = Basis[i]; // take this basis vector!
+        }
+    }
+    
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "ZeroKer", result ); }; /*4DEBUG*/
+    return( result );
+}
+
+
+
+
+/******************************************************/
+// ::Variables:: Computes a set of variables
+/******************************************************/
+
+
+
+/******************************************************/
+proc standard_variables() // Returns an ideal of variables in a current base ring.
+"USAGE:      standard_variables();
+RETURN:     ideal, generated by algebra variables
+PURPOSE:    computes the ideal generated by algebra variables taken in their natural order
+SEE ALSO:   sorted_variables
+EXAMPLE:    example standard_variables; shows an example
+"
+{
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "standard_variables" ); }; /*4DEBUG*/
+
+    ideal result = maxideal(1);
+
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "standard_variables", result ); }; /*4DEBUG*/
+    return( result );
+}
+example
+{
+"EXAMPLE:"; echo = 2;
+ring A = 0,(x,y,z),dp;
+matrix D[3][3]=0;
+D[1,2]=-z;  D[1,3]=2*x;  D[2,3]=-2*y;
+ncalgebra(1,D); // this algebra is U(sl_2)
+// Variables in their natural order:
+standard_variables(); 
+}
+
+/******************************************************/
+proc sorted_variables() // Sorts variables into an ideal. This is a kind of heuristics!
+"USAGE:      sorted_variables();
+RETURN:     ideal, generated by sorted algebra variables
+PURPOSE:    computes the ideal generated by algebra variables sorted so that Cartan variables are first and all other variables are behind.
+NOTE:       This is a heuristics for the computation of center: it is better to compute centralizers of Cartan variables first since we can omit solving the system of equations. 
+SEE ALSO:   standard_variables
+EXAMPLE:    example sorted_variables; shows an example
+"{
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "sorted_variables" ); }; /*4DEBUG*/
+
+    ideal V   = standard_variables();
+    int  N    = size( V ); // == nvars( basering )
+
+    ideal result;
+
+    int  r_begin = 1;
+    int  r_end   = N;
+
+    poly v;
+
+    for( int k = 1; k <= N; k++ )
+    {
+        v = V[k];
+
+        if( isCartan(v) == 1 ) // Cartan elements go 1st
+        {
+            result[r_begin] = v;
+            r_begin++;
+        } else // Other - in the end...
+        {
+            result[r_end] = v;
+            r_end--;
+        }
+    }
+
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "sorted_variables", result ); }; /*4DEBUG*/
+    return( result );
+}
+example
+{
+"EXAMPLE:"; echo = 2;
+ring A = 0,(x,y,z),dp;
+matrix D[3][3]=0;
+D[1,2]=-z;  D[1,3]=2*x;  D[2,3]=-2*y;
+ncalgebra(1,D); // this algebra is U(sl_2)
+// There is only one Cartan variable - z in U(sl_2), 
+// it must go 1st:
+sorted_variables(); 
+}
+
+
+
+
+
+/******************************************************/
+/******************************************************/
+// ::BasicCentralizerComputation:: Basic functions for centralize' computation.
+/******************************************************/
+/******************************************************/
+
+
+
+
+
+/******************************************************/
+proc CENTRALIZE_SET( ideal F, ideal V ) // HL 'core' function
+"USAGE:      CENTRALIZE_SET( F, V ); ideal F, ideal V
+INPUT:       a finite set of elements F, vector space basis V
+RETURN:     ideal, generated by base elements
+PURPOSE:    computes the vector space basis of the centralizer of F in the vector space spanned by V, that is, Cen(F[N],Cen(F[N-1],...,Cen(F[1],V)...))
+SEE ALSO:   CENTRALIZER_VECTORSPACE; centralizer; inCentralizer
+EXAMPLE:    example CENTRALIZER_VECTORSPACE; shows an example
+"
+{
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "CENTRALIZE_SET", F, V ); }; /*4DEBUG*/
+
+    int  N = size(F);
+
+    if( N == 0)
+    {
+        ERROR( "F MUST be non empty!!!" );
+    }
+    
+    DBPrint(1, "BasisSize: " + string(size(V)) );
+    
+    for( int v = 1; (v <= N) and (size(V) > 0); v++ )
+    {
+        DBPrint(1, "Centralizing " + string(F[v]) );
+        
+        //
+        ideal Images = ApplyAd( V, F[v] ); 
+        
+        ideal K;        
+        if( (isCartan(F[v]) == 1) or (size(V) == 1) ) 
+        {
+            K = ZeroKer( V, Images );
+        } else
+        {
+            K = LINEAR_MAP_KERNEL( V, Images );
+        }
+        
+        kill Images;        
+        kill V; ideal V = K; kill K;
+        
+        // Printing...
+        DBPrint(1, "Progress: [ " + string(v) + " / " + string(N) + " ]"+
+                   " => BasisSize: " + string(size(V)) );        
+    }
+    
+    ideal result = makeNice(V); kill V;
+    
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "CENTRALIZE_SET", result ); }; /*4DEBUG*/
+    
+    return( result );
+}
+example
+{
+"EXAMPLE:"; echo = 2;
+ ring A_4_1 = 0,(e(1..4)),dp;
+ matrix D[4][4]=0;
+ D[2,4] = -e(1);
+ D[3,4] = -e(2);
+ // This is $A_{41}$ - the first real Lie algebra of dimension $4$.
+ ncalgebra(1,D); 
+  
+ ideal F = sorted_variables(); F;
+ 
+ // if we know that the center of $A_{41}$ is generated by 
+ // $e(1)$ and $-1/2*e(2)^2+e(1)*e(3)$ 
+ // therefore one may consider computing it in the following way:
+ 
+ // 1. Compute PBW basis consisting of 
+ //    monomials of exponent <= (1,2,1,0)
+ ideal V = PBW_basis_byMaxMonom( e(1) * e(2)^ 2 * e(3) ); 
+ 
+ // 2. Compute the centralizer of F within vector space 
+ //    spanned by these monomials:
+ ideal C = CENTRALIZE_SET( F, V ); C;
+ 
+ inCenter(C);
+}
+
+
+
+/******************************************************/
+proc CENTRALIZER_VECTORSPACE( ideal F, int d )
+"USAGE:      CENTRALIZER_VECTORSPACE( F, D ); ideal F, int D
+RETURN:     ideal, generated by elements of degree <= D
+PURPOSE:    computes a vector space basis of the centralizer of F up to degree D.
+NOTE:       D must be non-negative
+SEE ALSO:   CENTER_VECTORSPACE; centralizer; inCentralizer
+EXAMPLE:    example CENTER_VECTORSPACE; shows an example
+"
+{
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "CENTRALIZER_VECTORSPACE", F, d ); }; /*4DEBUG*/
+    
+    if( size(F) == 0)
+    {
+        ERROR( "F MUST be non-empty!!!" );
+    } 
+
+    ideal V = PBW_basis_byMaxDeg( d ); // PBW basis
+    
+    ideal result = CENTRALIZE_SET( F, V ); // basis of the Centralizer of S in VS <V>
+    
+    kill V;
+
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "CENTRALIZER_VECTORSPACE", result ); }; /*4DEBUG*/
+    
+    return( result );
+}
+example
+{
+"EXAMPLE:"; echo = 2;
+ring A = 0,(x,y,z),dp;
+matrix D[3][3]=0;
+D[1,2]=-z;  D[1,3]=2*x;  D[2,3]=-2*y;
+ncalgebra(1,D); // this algebra is U(sl_2)
+ideal F = x, y;
+// find all elements commuting with x and y of degree <= 4:
+ideal C = CENTRALIZER_VECTORSPACE(F, 4); 
+C; 
+inCentralizer(C, F);
+}
+
+
+
+
+/******************************************************/
+// ::CenterAliases:: Basic functions/aliases for center' computation.
+/******************************************************/
+
+
+
+
+/******************************************************/
+proc CENTER_VECTORSPACE( int D )
+"USAGE:      CENTER_VECTORSPACE( D ); int D
+RETURN:     ideal, generated by elements of degree <= D
+PURPOSE:    computes a vector space basis of the center of the current algebra up to degree D.
+NOTE:       D must be non-negative
+SEE ALSO:   CENTRALIZER_VECTORSPACE; center; inCenter
+EXAMPLE:    example CENTER_VECTORSPACE; shows an example
+"
+{
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "CENTER_VECTORSPACE", D ); }; /*4DEBUG*/
+
+
+    if( nameof( basering ) == "basering" )
+    {
+        ERROR( "No current ring!" );
+    }
+    
+    if( D < 0 )
+    {
+        ERROR( "Degree D must be non-negative!" );
+    }
+    
+    ideal result = CENTRALIZER_VECTORSPACE( sorted_variables(), D );
+     
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "CENTER_VECTORSPACE", result ); }; /*4DEBUG*/
+
+    return( result );
+}
+example
+{
+ "EXAMPLE:"; echo = 2;
+ring A = 0,(x,y,z),dp;
+matrix D[3][3]=0;
+D[1,2]=-z;  D[1,3]=2*x;  D[2,3]=-2*y;
+ncalgebra(1,D); // this algebra is U(sl_2)
+// find all central elements of degree <= 4
+ideal Z = CENTER_VECTORSPACE(4); 
+Z; 
+// note that the second element is the square of the first 
+// plus the multiple of the first:
+Z[2] - Z[1]^2 + 8*Z[1];
+inCenter(Z);
+}
+
+
+/******************************************************/
+proc CENTRALIZER_SUBALGEBRA( ideal F, int D, list # )
+"USAGE:      CENTRALIZER_SUBALGEBRA( F, D[, N] ); ideal F, int D[, int N]
+RETURN:     ideal, generated by computed generators
+PURPOSE:    if N is absent and D >= 0 computes a subalgebra generators of the centralizer of F up to degree D, otherwise if N is present computes N(at least) first generators of the centralizer, if moreover D > 0 it will be used as the first maximal degree estimation.
+NOTE:       Current ordering must be a degree compatible well-ordering.
+SEE ALSO:   CENTRALIZER_VECTORSPACE; CENTER_SUBALGEBRA; centralizer; inCentralizer
+EXAMPLE:    example CENTRALIZER_SUBALGEBRA; shows an example
+"
+{
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "CENTRALIZER_SUBALGEBRA", F, D, # ); }; /*4DEBUG*/
+    
+    if( nameof( basering ) == "basering" )
+    {
+        ERROR( "No current ring!" );
+    }    
+    
+    if( size(F) == 0)
+    {
+        ERROR( "F MUST be non-empty!!!" );
+    } 
+    
+    def NCRING = basering; // Non-commutative ring
+    list L = ringlist( NCRING );
+    def L1, L2, L3, L4 = L[1..4]; // General components    
+    def COMMRING = ring( list( L1, L2, L3, L4 ) ); // Underlying commutative ring
+    kill L1, L2, L3, L4, L;   
+    
+    
+    int k = DefaultInt(#);
+    
+    
+    int m = (k > 0);
+        
+    int MinDeg = 6; // starting guess for Maximal Bounding Degree, 6
+    int Delta  = 4; // increment of it, 4
+        
+    if( m and (D <= 0) )
+    {
+        // minimal guess
+        D = MinDeg;
+    }
+    
+    if( !m and D < 0)
+    {
+        ERROR("Wrong bounding condition!");
+    }
+    
+    ideal result = ideal();
+    
+    int i, j, l, d;
+    
+    // we keep the list of found leading monomials in the commutative ring!
+    setring COMMRING;
+    
+    // Init
+    list FOUND_LEADING_MONOMIALS = list();
+        
+    for( i = 1; i <= D; i++ )
+    {
+        FOUND_LEADING_MONOMIALS[i] = ideal();
+    }
+    
+    setring NCRING;
+    
+    // Main loop:
+    i = 1;
+    
+    ideal PBW = ideal();
+    ideal NEW;
+    
+    while( i <= D )
+    {
+        DBPrint( 1, "Current degree is " + string(i) );
+        
+        // Compute current "reduced" PBW basis...
+        
+        // Prepare current found leading monomials
+        setring COMMRING;
+        
+        if( defined(FLM) )
+        {
+            kill FLM;
+        }
+        
+        ideal FLM = FOUND_LEADING_MONOMIALS[i];
+
+        // And back to NCRing
+        setring NCRING;
+        
+        
+        // just to avoid "no standard basis" warning.
+        ideal FLM = imap(COMMRING, FLM);
+        attrib(FLM, "isSB", 1);
+
+        // degrees should not change
+        // no monomials should be multiplied here
+        ideal T = reduce( PBW_basis_byDeg( i ), FLM, 1 ); 
+
+        kill FLM;
+                        
+        // we simply kill in T monomials occurring in FOUND_LEADING_MONOMIALS[i]
+        ideal P = PBW + T; // here we simplify T        
+        
+        // Compute current centralizer
+        NEW = CENTRALIZE_SET( F, P ); 
+        
+        if( size(NEW) > 0 )
+        {
+            // In order to speedup multiplications we are going into a commutative ring:
+            setring COMMRING;
+            
+            if( defined(NEW) )
+            {
+                kill NEW;
+            }
+            
+            // we can perform commutative interreduction
+            // since no monomials should be multiplied!
+            // degrees should not change
+            ideal NEW = interred( imap( NCRING, NEW ) );
+            
+            // Go back!
+            setring NCRING;
+            
+            kill NEW; ideal NEW = imap( COMMRING, NEW );
+            
+            DBPrint( 1, "Found: ", NEW );
+            
+            // Add them to result...
+            result = result + NEW;
+        }
+        
+        // Did we find needed number of generators? Or reached the bound?
+        if( (m and (size(result) >= k)) or (!m and (i == D)) ) 
+        {
+            break; // Get out of here!!!
+        }
+        
+        // otherwise we must update FOUND_LEADING_MONOMIALS
+        if( size(NEW) > 0 )
+        {
+            setring COMMRING;
+            
+            if( defined(FLM) )
+            {
+                kill FLM;
+            }
+            
+            ideal FLM = ideal();
+            
+            // We must update FOUND_LEADING_MONOMIALS!!!
+            for( j = 1; j <= size(NEW); j++ )
+            {
+                FLM[j] = leadmonom( NEW[j] ); // we are interested in leading monomials only!
+            }
+            
+            kill NEW;            
+            
+            FOUND_LEADING_MONOMIALS[i] = FOUND_LEADING_MONOMIALS[i] + FLM;
+            
+            for( j = 1; j <= D; j = j + i ) // For every degree (j*i) of LNEW, do:
+            {            
+                for( l = j; (l+i) <= D; l++ )
+                {
+                    FOUND_LEADING_MONOMIALS[l+i] = 
+                        FOUND_LEADING_MONOMIALS[l+i] + FOUND_LEADING_MONOMIALS[l] * FLM;
+                }
+            }
+            
+            // Return to NCRING
+            setring NCRING;
+                
+            // And refine T one more:
+        
+            // just to avoid "no standard basis" warning.
+            ideal FLM = imap(COMMRING, FLM);
+            attrib(FLM, "isSB", 1);
+    
+            // we simply kill in T monomials occurring in FOUND_LEADING_MONOMIALS[i]
+            kill P; ideal P = PBW + reduce( T, FLM, 1 );
+            kill FLM;            
+        }
+        
+        kill T, PBW; ideal PBW = P; kill P;
+        
+        if( m and (i == D) ) // Was the previous estimation too small???
+        {            
+            // We must update FOUND_LEADING_MONOMIALS in their world:
+            setring COMMRING;
+
+            // Init new grades:
+            for( j = D + 1; j <= (D + Delta); j++ )
+            {
+                FOUND_LEADING_MONOMIALS[j] = ideal();
+            }
+                        
+            if( defined(FLM) )
+            {
+                kill FLM;
+            }            
+            
+            ideal FLM = ideal();
+            
+            // All previously computed elements in their order!
+            ideal NEW = imap( NCRING, result );
+            
+            for( j = 1; j <= size(NEW); j++ )
+            {
+                FLM[j] = leadmonom( NEW[j] ); // we are interested in leading monomials only!
+            }
+            
+            kill NEW;
+            
+            while( size(FLM) > 0 )
+            {
+                // minimal degree:
+                d = mindeg(FLM);  
+                
+                // take all of minimal degree:               
+                ideal T = jet( FLM, d ); 
+                
+                // there are size(T) elements of smallest degree (deg(FLM[1])) in FLM!
+                
+                // Add them in the same way:
+                for( j = 1; j <= (D + Delta); j = j + d ) // For every degree (j*d) of T, do:
+                {            
+                    for( l = j; (l + d) <= (D + Delta); l++ )
+                    {
+                        if( (l + d) > D ) // Only new should be updated!
                         {
-
-                          if ( char(basering) == 0 )
-                            {
-                              @GR_TEMP[1] = @GR_TEMP[1] + @tt;
-                            } else
-                              {
-                                @GR_TEMP[1] = uni_poly( @GR_TEMP[1] + @tt );
-                              };
-
-                          @GR_TEMP[2] = @GR_TEMP[2] + @GR[@k][2];
-                          @GR = delete ( @GR, @k );
-                        };
-                    };
-                  @GR = @GR + list(@GR_TEMP);
-                };
-          };
-      @number --;
-    }; //  main while
-
-  list @res;
-
-  for ( @k = size(@GR); @k > 0 ; @k -- )
-    {
-      if ( size (@GR[@k][2]) > 1 ) // ! zeroes in AD_CALC so here must be non zero
-        {
-          @res = FSS ( @GR[@k][2], uni_poly(@GR[@k][1]));
-
-          if ( size (@res) > 0 )
-            {
-              @AD_CALC = @AD_CALC + @res;
-            };
-        };
-    };
-
-  ECall( "calc_base" );
-  return (@AD_CALC);
-
-};
-
-
-/******************************************************/
-static proc ApplyAd( list l, list # )
-"
-  Apply Ad_{#} to every element of a list of polynomils
-"
-{
-  BCall( "ApplyAd", l, # );
-
-  if( (size(l) == 0) or (size(#) == 0) )
-    {
-      return (l);
-    };
-
-  poly f, t;
-
-  if ( typeof(#[1]) == "int")
-    {
-      int next = #[1];
-      f = my_var (next);
-    } else
-      {
-        if ( typeof(#[1]) == "poly")
-          {
-            f = #[1];
-          } else
-            {
-              print("Error: cannot differentiate with '" + string(#)+"'");
-              return ();
-            };
-      };
-
-  for ( int k = size(l); k > 0; k --)
-    {
-      t = l[k];
-      l[k] = list( t, f * t - t * f );
-    };
-
-  ECall("ApplyAd", l );
-  return (l);
-};
-
-
-/******************************************************/
-static proc calc_k_base (list l, list #)
-  "
-     calculation of Kernel of an Ad operator as a K-Vector Space
-"
-{
-  BCall( "calc_k_base", "list, " + string(#) );
-
-  list t = reduce_one_per_row( l, 0); // optimization (a1)
-  return( QNF_list ( ApplyAd( calc_base(t), # ), 2) );          // calculation of groupps (a2) + gauss.
-
-};
-
-LIB "poly.lib"; // for content in proc makeIdeal
-
-/******************************************************/
-static proc makeIdeal ( list l )
-  "
-        return: ideal: where the generators are polynomials from list, without 1 and zeroes
-"
-{
-  ideal I; poly p;
-
-  for( int i = 1; i <= size(l); i++ )
-    {
-      if ( typeof( l[i] ) == "list" )
-        {
-          p = l[i][1]; // just take the 1st polynom...
-        } else
-          {
-            p = l[i];
-          };
-
-      p = cleardenom( p* (1/content(p)) );
-      if ( (p != 1) and (p != 0) )
-        {
-          I = I, p;
-        };
-    };
-
-  I = simplify ( I, 2 ); // no zeroes
-
-  return(I);
-};
-
-/******************************************************/
-static proc inCenter_poly( poly p )
-  "
-  if p in center => return 1
-      otherwise     return 0
-"
-{
-  poly t;
-  for (int k = nvars(basering); k>0; k-- )
-    {
-      t = var(k);
-      if ( QNF_poly(t * p - p * t) != 0 )
-        {
-          if( toprint() )
-            {
-              "POLY: ", string (p), " is NOT in center";
-            };
-          return (0);
-        };
-    };
-
-  if( toprint() )
-    {
-      "POLY: ", string (p), " is in center";
-    };
-  return (1);
-};
-
-/******************************************************/
-static proc inCenter_list(def l)
-{
-  for ( int @i = 1; @i <= size(l); @i++ )
-    {
-      if ( typeof(l[@i])=="poly" )
-        {
-          if (! inCenter_poly(l[@i]) )
-            {
-              return(0);
-            };
-
-        } else
-          {
-            if ( (typeof(l[@i])=="list") or (typeof(l[@i])=="ideal") )
-              {
-                if (! inCenter_list(l[@i]) )
-                  {
-                    return(0);
-                  };
-              };
-          };
-    };
-  return(1);
-};
-
-/******************************************************/
-static proc inCentralizer_poly( poly p, poly f )
-  "
-  if p in centralizer(f) => return 1
-      otherwise     return 0
-"
-{
-  if ( QNF_poly(f * p - p * f) != 0 )
-    {
-      if( toprint() )
-        {
-          "POLY: ", string (p), " is NOT in centralizer(f)";
-        };
-      return (0);
-    };
-
-  if( toprint() )
-    {
-      "POLY: ", string (p), " is in centralizer(f)";
-    };
-  return (1);
-};
-
-/******************************************************/
-static proc inCentralizer_list( def l, poly f )
-{
-  for ( int @i = 1; @i <= size(l); @i++ )
-    {
-      if ( typeof(l[@i])=="poly" )
-        {
-          if (! inCentralizer_poly(l[@i], f) )
-            {
-              return(0);
-            };
-
-        } else
-          {
-            if ( (typeof(l[@i])=="list") or (typeof(l[@i])=="ideal") )
-              {
-                if (! inCentralizer_list(l[@i], f) )
-                  {
-                    return(0);
-                  };
-              };
-          };
-    };
-  return(1);
-};
-
-
-/******************************************************/
-/******************************************************/
-// main algorithms
-
-
-/******************************************************/
-/******************************************************/
-// center's computation
-
-/******************************************************/
-/* static */ proc center_min_iterative( int MaxDeg, list # )
-  "
-        computes the 'minimal' set of central elements (of deg <= MaxDeg) in iterative way
-        Note: based on calc_k_base, zAddBad, zRefine, zCancel, PBW_*
-"
-{
-  BCall("center_min_iterative", MaxDeg, #);
-
-  int n = myInt(#);
-  int m = ( MaxDeg < 0 ); // no bound on Degree
-
-  int MinDeg = 6; // starting guess for MaxDeg
-  int Delta  = 4; // increment of MaxDeg
-
-  if( m )
-    {
-      // minimal guess
-      MaxDeg = MinDeg;
-    };
-
-  list @q; int @i; int N = nvars(basering);
-
-  my_var_init(); // setup for my_var(n)
-  QNF_init();
-
-  list PBW = list();
-  list PBW_PLAIN = list();
-
-  PBW[ index(0) ] = PBW_init();
-
-  list SYS = PBW_sys( my_vars(), my_var(1) );
-
-
-  list @z = list ();                                         // center list
-  list @l = init_bads( MaxDeg );         // verbotten leadexps...
-
-  @q = PBW[ index(0) ];
-
-  int k = 1;
-  while( k <= ( MaxDeg+1 ) )
-    {
-      for ( @i = 2; @i <= N; @i ++ )
-        {
-          @q = calc_k_base (@q, my_var(@i));
-        };
-
-      @q = zRefine (calc_k_base(@q)); // new center!
-
-
-      if ( size(@q) > 0 )
-        {
-          @z = @z + @q; // computed central elements
-
-          if( (n > 0) and (size(@z) > n) )
-            {
-              break; // found all central elements
-            };
-        };
-
-      if( k == ( MaxDeg+1 ) )
-        {
-          if( (n == 0) and ( !m ) )
-            {
-              break; // that's all
-            };
-
-          MaxDeg = MaxDeg + Delta;
-
-          // renew bad list
-          @l = init_bads( MaxDeg );
-          @l = zAddBad( @l, @z, MaxDeg, 0 );
-
-        } else
-          {
-
-            if ( size(@q) > 0 )
-              {
-                @l = zAddBad( @l, @q, MaxDeg, 0 ); // add all possible 'leadexps' !
-              };
-
-          };
-
-      PBW[index(k)] = PBW_next( PBW, k, SYS );
-
-      PBW_PLAIN = PBW_PLAIN + zCancel( PBW[index(k-1)] , @l );
-
-      @q = PBW_PLAIN + zCancel( PBW[index(k)] , @l ); // kill from @tt all entries with leadexp in @l[@d]
-
-      k ++;
-    };
-
-  QNF_done();
-  my_var_done();
-
-  return (makeIdeal(@z));
-};
-
-/******************************************************/
-static proc center_vectorspace( int MaxDeg )
-  "
-        pure calculation of center as a finitely dimensional Vector Space (deg <= MaxDeg )
-"
-{
-  my_var_init();
-
-  int  N = nvars( basering );
-  list P = PBW_base( MaxDeg, my_var(1) );
-
-  for( int v = 2; v <= N; v++ )
-    {
-      P = calc_k_base( P, my_var(v) );
-    };
-
-  my_var_done();
-
-  return( calc_k_base ( P ) );
-};
-
-/******************************************************/
-/* static */ proc center_min_vectorspace( int MaxDeg )
-  "
-    computes the 'minimal' set of central elements (of deg <= MaxDeg)
-    by reducing the set of it's generators as vector space
-
-    Note: based on center_vectorspace.
-    Note: reduction by zReduce.
-"
-{
-
-  QNF_init();
-  ideal res = makeIdeal( zReduce( center_vectorspace( MaxDeg)));
-  QNF_done();
-
-  return( res );
-};
-
-
-/******************************************************/
-/******************************************************/
-// centralizer's computations
-
-/******************************************************/
-static proc centralizer_vectorspace( poly p, int MaxDeg )
-{
-  return( calc_k_base( PBW_base( MaxDeg, p )));
-};
-
-/******************************************************/
-/* static */ proc centralizer_min_vectorspace( poly p, int MaxDeg )
-{
-
-  QNF_init();
-  ideal res = makeIdeal( zReduce( centralizer_vectorspace( p, MaxDeg)));
-  QNF_done();
-
-  return( res );
-};
-
-/******************************************************/
-/* static */ proc centralizer_min_iterative( poly p, int MaxDeg, list # )
-  "
-  computes the 'minimal' set of elements (of deg <= MaxDeg) generating centralizer of p in iterative way
-  Note: based on calc_k_base
-
-  !!! NEED DEBUG !!!
-  Note: no proof that it is really centralizer and moreover 'minimal' centralizer
-"
-{
-  QNF_init();
-
-  int n = myInt(#);
-  int m = (MaxDeg < 0);
-
-  int MinDeg = 6; // starting guess for MaxDeg
-  int Delta  = 4; // increment of MaxDeg
-
-  if( m )
-    {
-      // minimal guess
-      MaxDeg = MinDeg;
-    };
-
-  list @q;
-
-  list PBW = list();
-  list PBW_PLAIN = list();
-
-  PBW[ index(0) ] = PBW_init();
-
-  list SYS = PBW_sys( my_vars(), p );
-
-  list @z  = list ();             // result list
-  list @l  = init_bads( MaxDeg ); // verbotten loeadexps...
-
-  @q = PBW[ index(0) ];
-
-  for (int k = 1; k <= ( MaxDeg+1 ); k ++ )
-    {
-      @q = zRefine( calc_k_base(@q), 1 );
-
-      if ( size(@q) > 0 )
-        {
-          @z = @z + @q; // computed desired elements
-
-          if( (n > 0) and (size(@z) > n) )
-            {
-              break; // found needed elements
-            };
-        };
-
-      if( k == ( MaxDeg+1 ) )
-        {
-          if( (n == 0) or ( !m ) )
-            {
-              break; // that's all
-            };
-
-          MaxDeg = MaxDeg + Delta;
-
-          // renew bad list
-          @l = init_bads( MaxDeg );
-          @l = zAddBad( @l, @z, MaxDeg, 0 );
-
-        } else
-          {
-
-            if ( size(@q) > 0 )
-              {
-                @l = zAddBad( @l, @q, MaxDeg, 0 ); // add all possible 'leadexps' !
-              };
-
-          };
-
-      PBW[index(k)] = PBW_next( PBW, k, SYS );
-      PBW_PLAIN = PBW_PLAIN + zCancel( PBW[index(k-1)] , @l );
-      @q = PBW_PLAIN + zCancel( PBW[index(k)] , @l );  // kill from @tt all entries with leadexp in @l[@d]
-
-    };
-
-  QNF_done();
-  return (makeIdeal(@z));
-};
-
-
-
-/******************************************************/
-/******************************************************/
-// main aliases
-
-/******************************************************/
-proc inCenter( def a )
-"USAGE:   inCenter(a); a poly/list/ideal
-RETURN:  integer, 1 if a in the center, 0 otherwise
-PURPOSE: check whether a given element is central
-EXAMPLE: example inCenter; shows examples
-"{
-  QNF_init();
-  def res;
-
-  if ( typeof(a) == "poly" )
-    {
-      res = inCenter_poly(a);
-    } else
-      {
-        if ( (typeof(a)=="list") or (typeof(a)=="ideal") )
-          {
-            res = inCenter_list(a);
-          } else
-            {
-              res = a;
-            };
-      };
-
-  QNF_done();
-  return (res);
+                            FOUND_LEADING_MONOMIALS[l+d] = 
+                                FOUND_LEADING_MONOMIALS[l+d] + FOUND_LEADING_MONOMIALS[l] * T;
+                        }
+                    }
+                }
+                
+                // Kill them from FLM:
+                if( size(T) < size(FLM) )
+                {
+                    FLM = FLM[ (size(T)+1) .. size(FLM) ];
+                } else
+                {
+                    FLM = ideal(0); // break;
+                }
+                
+                kill T;
+            }    
+            
+            // Go back...
+            setring NCRING;
+
+            // And set new Bound
+            D = D + Delta;
+        }
+                
+        i++;
+    }
+    
+    kill COMMRING;
+    
+    result = makeNice(result);
+
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "CENTRALIZER_SUBALGEBRA", result ); }; /*4DEBUG*/
+    
+    return( result );
 }
 example
 {
-  "EXAMPLE:";echo=2;
-  ring r=0,(x,y,z),dp;
-  matrix D[3][3]=0;
-  D[1,2]=-z;
-  D[1,3]=2*x;
-  D[2,3]=-2*y;
-  ncalgebra(1,D); // this is U(sl_2)
-  poly p=4*x*y+z^2-2*z;
-  inCenter(p);
-  poly f=4*x*y;
-  inCenter(f);
-  list l= list( 1, p, p^2, p^3);
-  inCenter(l);
-  ideal I= p, f;
-  inCenter(I);
-};
+ "EXAMPLE:"; echo = 2;
+ ring A = 0,(x,y,z),dp;
+ matrix D[3][3]=0;
+ D[1,2]=-z;  D[1,3]=2*x;  D[2,3]=-2*y;
+ ncalgebra(1,D); // this algebra is U(sl_2)
+ ideal F = x, y;
+ // find subalgebra generators degree <= 4 of an algebra of
+ // all elements commuting with x and y:
+ ideal C = CENTRALIZER_SUBALGEBRA(F, 4); 
+ C; 
+ inCentralizer(C, F);
+}
 
 
-/******************************************************************************/
-proc inCentralizer( def a, poly f )
-"USAGE:   inCentralizer(a, f); a poly/list/ideal, f poly
-RETURN:  integer, 1 if a in the centralizer(f), 0 otherwise
-PURPOSE: check whether a given element is centralizing with respect to f
-EXAMPLE: example inCentralizer; shows examples
-"{
-  QNF_init();
-  def res;
+/******************************************************/
+proc CENTER_SUBALGEBRA( int D, list # )
+"USAGE:      CENTER_SUBALGEBRA( D[, k] ); int D[, int k]
+RETURN:     ideal, generated by computed generators
+PURPOSE:    if N is absent and D >= 0 computes a subalgebra generators of the center up to degree D, otherwise if N is present computes N(at least) first generators of the center, if moreover D > 0 it will be used as the first maximal degree estimation.
+NOTE:       Current ordering must be a degree compatible well-ordering.
+SEE ALSO:   CENTRALIZER_SUBALGEBRA; CENTER_VECTORSPACE; center; inCenter
+EXAMPLE:    example CENTER_SUBALGEBRA; shows an example
+"
+{
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "CENTER_SUBALGEBRA", D ); }; /*4DEBUG*/
 
-  if ( typeof(a) == "poly" )
+    if( nameof( basering ) == "basering" )
     {
-      res = inCentralizer_poly(a, f);
-    } else
-      {
-        if ( (typeof(a)=="list") or (typeof(a)=="ideal") )
-          {
-            res = inCentralizer_list(a, f);
-          } else
-            {
-              res = a;
-            };
-      };
+        ERROR( "No current ring!" );
+    }
+    
+    ideal result = CENTRALIZER_SUBALGEBRA( sorted_variables(), D, # );
+     
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "CENTER_SUBALGEBRA", result ); }; /*4DEBUG*/
 
-  QNF_done();
-  return (res);
+    return( result );
 }
 example
 {
-  "EXAMPLE:";echo=2;
-  ring r=0,(x,y,z),dp;
-  matrix D[3][3]=0;
-  D[1,2]=-z;
-  ncalgebra(1,D); // the Heisenberg algebra
-  poly f = x^2;
-  poly a = z; // we know this element if central
-  poly b = y^2;
-  inCentralizer(a, f);
-  inCentralizer(b, f);
-  list  l = list(1, a);
-  inCentralizer(l, f);
-  ideal I = a, b;
-  inCentralizer(I, f);
-};
-
-/******************************************************/
-proc center(int MaxDeg, list # )
-"USAGE:      center(MaxDeg[, N]); int MaxDeg, int N
-RETURN:     ideal, generated by elements of degree at most MaxDeg
-PURPOSE:    computes a minimal set of central elements up to degree MaxDeg.
-NOTE:       In general, one cannot predict the number or the heighest degree of
- central elements. Hence, one has to specify a termination condition via arguments MaxDeg and/or N.
-@*   If MaxDeg is positive, the computation stops after all central elements of degree at most MaxDeg has been found.
-@*   If MaxDeg is negative, the termination is determined by N only.
-@*   If N is given, the computation stops if at least N central elements has been found. 
-@* Warning: if N is given and bigger than the real number of generators, the procedure may not terminate.
-SEE ALSO:   centralizer; inCenter
-EXAMPLE:    example center; shows an example
-"{
-  if ( myInt(#) > 0 ) // given a number of central elements to compute
-    {
-      return ( center_min_iterative( MaxDeg, # ) );
-    };
-
-  if( MaxDeg >= 0 ) // standard computation - the fastest one (often)
-    {
-      // return ( center_min_iterative( MaxDeg, # ) );
-      return ( center_min_vectorspace ( MaxDeg ) );
-    };
-
-  print( "Error: wrong arguments." );
-  return();
+ "EXAMPLE:"; echo = 2;
+ring A = 0,(x,y,z),dp;
+matrix D[3][3]=0;
+D[1,2]=z;
+ncalgebra(1,D); // it is a Heisenberg algebra
+// find vector space basis of center of degree <= 3
+ideal VSZ = CENTER_VECTORSPACE(3); 
+// There should be 3 degrees of z.
+VSZ;
+inCenter(VSZ);
+// find "minimal" central elements of degree <= 3
+ideal SAZ = CENTER_SUBALGEBRA(3); 
+// Only 'z' must be computed
+SAZ; 
+inCenter(SAZ);
 }
-example
-{ "EXAMPLE:"; echo = 2;
-  ring A = 0,(x,y,z,t),dp;
-  matrix D[4][4]=0;
-  D[1,2]=-z;  D[1,3]=2*x;  D[2,3]=-2*y;
-  ncalgebra(1,D); // this algebra is U(sl_2) tensored with K[t]
-  ideal Z = center(3); // find all central elements of degree <= 3
-  Z;
-  inCenter(Z);
-  ideal ZZ = center(-1, 1); // find one central element of the lowest degree
-  ZZ;
-  inCenter(ZZ);
-};
 
 
 /******************************************************/
-proc centralizer( poly p, int MaxDeg, list # )
-"USAGE:      centralizer(F, MaxDeg[, N]); poly F, int MaxDeg, int N
-RETURN:     ideal, generated by elements of degree <= MaxDeg
-PURPOSE:    computes a minimal set of elements centralizer(F) up to degree MaxDeg.
-NOTE:       In general, one cannot predict the number or the heighest degree of
- centralizing elements. Hence, one has to specify a termination condition via arguments MaxDeg and/or N.
-@*   If MaxDeg is positive, the computation stops after all centralizing elements of degree at most MaxDeg has been found.
-@*   If MaxDeg is negative, the termination is determined by N only.
-@*   If N is given, the computation stops if at least N centralizing elements has been found. 
-@* Warning: if N is given and bigger than the real number of generators, the procedure may not terminate.
-SEE ALSO:   center; inCentralizer
-EXAMPLE:    example centralizer; shows an example
-"{
+/******************************************************/
+// ::SubAlgebraReduction:: A kind of subalgebra reduction...
+/******************************************************/
+/******************************************************/
 
-  if( myInt(#) > 0 )
+/******************************************************/
+static proc INTERRED( ideal S )
+"USAGE:      INTERRED( S ); ideal S
+RETURN:      ideal, interreduced S
+PURPOSE:     interreduction without monomial multiplication, just make every leading monomial occur in a single polynomial
+"
+{
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "INTERRED", S ); }; /*4DEBUG*/
+
+    ideal result = S;
+    
+    int flag = 1; 
+    
+    int i, j, N; 
+    
+    poly p, lm; 
+    
+    while( flag == 1 )
+    {    
+        flag = 0;
+        
+        result = sort( simplify( result, 1 + 2 + 8) )[1];        
+        // sorting w.r.t. actual monomial ordering 
+        // generators with SMALLER(!) leading term come FIRST
+        
+        N = size(result);
+        
+        // kill leading monomials:
+        
+        i = 1;       
+        while( i < N )
+        {
+            p = result[i];
+            lm = leadmonom(p);
+            
+            j = i + 1;
+            while( leadmonom(result[j]) == lm )
+            {
+                result[j] = result[j] - p; // leadcoefs are 1 because of simplify.
+                flag = 1; // we have changed something => we do still need to care about it...
+                j++;
+                
+                if( j > N )
+                {
+                    break;
+                }
+            }
+                        
+            i = j;            
+        }
+    } 
+    
+    // We are done! No common leading monomials!
+    // The result is sorted 
+
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "INTERRED", result ); }; /*4DEBUG*/
+
+    return( result );
+}
+
+
+/******************************************************/
+static proc SANF( poly p, list FOUND_LEADING_MONOMIALS )
+"
+    reduce p wrt found multiples without ANY polynomial multiplications!
+"
+{
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "SANF", p, FOUND_LEADING_MONOMIALS); }; /*4DEBUG*/
+    
+    poly q = p;
+    poly head = 0;
+    
+    int d; int N = size(FOUND_LEADING_MONOMIALS);
+    
+    while( size(q) > 0 )
     {
-      return( centralizer_min_iterative( p, MaxDeg, # ) );
-    };
+        d = maxdeg(p);
+        
+        if( (0 < d) and (d <= N) )
+        {
+            if( size(FOUND_LEADING_MONOMIALS[d]) > 0 )
+            {
+                attrib( FOUND_LEADING_MONOMIALS[d], "isSB", 1);
+                q = reduce( p, FOUND_LEADING_MONOMIALS[d] ); 
+            }
+            
+            DBPrint(1, string(p) + " --> " + string(q) );
+        }        
+                
+        if( q == p )
+        {
+            p = lead(q);
+            
+            if( d > 0 )
+            {
+                // No scalars!
+                head = head + p;
+            }
+            
+            q = q - p;
+        }
+        
+        p = q;
+    }
+    
+    
 
-  if( MaxDeg >= 0 )
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "SANF", head ); }; /*4DEBUG*/
+
+    return( head );
+}
+
+
+/******************************************************/
+static proc maxdegInt( ideal I )
+{    
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "maxdegInt", I ); }; /*4DEBUG*/
+
+    intmat D = maxdeg(I);
+    
+    int max = D[1, 1]; int m;
+    
+    for( int c = 2; c <= ncols(D); c++ )
     {
-      // return( centralizer_min_iterative( p, MaxDeg, # ) );
-      return( centralizer_min_vectorspace( p, MaxDeg ) );
-    };
+        m = D[1, c];
+        
+        if( m > max )
+        {
+            max = m;
+        }
+    }
+    
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "maxdegInt", max ); }; /*4DEBUG*/
 
-  print( "Error: wrong arguments." );
-  return();
+    return( max );    
+}
 
+/******************************************************/
+proc sa_reduce( ideal V ) // 'subalgebra basis' computation
+"USAGE:     sa_reduce(V); ideal V
+RETURN:     ideal, generated by found elements
+PURPOSE:    compute a subalgebra basis of an algebra generated by polynomial from V
+NOTE:       May produce wrong result in quotient algebras.
+SEE ALSO:   sa_poly_reduce
+EXAMPLE:    example sa_reduce; shows an example
+"
+{
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "sa_reduce", V ); }; /*4DEBUG*/
+    
+    ideal result = ideal();
+    
+    ideal FLM = INTERRED( V ); // The output is sorted "[1]<[2]<[3]<..."
+    
+    // We are bounded by maximal degree!!!
+    int D = maxdegInt( FLM );
+    
+    // Init
+    list FOUND_LEADING_MONOMIALS = list();
+    
+    int i;
+    
+    for( i = 1; i <= D; i++ )
+    {
+        FOUND_LEADING_MONOMIALS[i] = ideal();
+    }    
+    
+    int d, j, l;
+    
+    poly p, q; ideal T;
+    
+    
+    int c = 1;  // polynomials in FLM commute pairwise
+    
+    for( j = 1; (j < size(FLM)) and (c == 1); j++ )
+    {
+        p = FLM[j];
+        
+        for( l = j+1; (l <= size(FLM)) and (c == 1); l++ )
+        {
+            q = FLM[l];
+        
+            if( NF(p*q - q*p, twostd(0)) != 0  )
+            {
+                c = 0; // There exists non-commuting pair
+            }            
+        }
+    }
+
+    while( size(FLM) > 0 )
+    {
+        // Take the 1st element of FLM...
+        p = FLM[1]; // SANF( FLM[1], FOUND_LEADING_MONOMIALS );
+        
+        FLM[1] = 0; // ...and kill it from FLM
+        
+        d = maxdeg( p );
+        T = ideal(p); 
+        
+        FOUND_LEADING_MONOMIALS[d] = FOUND_LEADING_MONOMIALS[d] + T;
+        
+        for( j = 1; j <= D; j = j + d ) // For every degree (j*d) of T, do:
+        {            
+            for( l = j; (l + d) <= D; l++ )
+            {
+                FOUND_LEADING_MONOMIALS[l+d] = 
+                    FOUND_LEADING_MONOMIALS[l+d] + FOUND_LEADING_MONOMIALS[l] * T;
+                    
+                if( c != 1 )
+                {
+                    FOUND_LEADING_MONOMIALS[l+d] = 
+                        FOUND_LEADING_MONOMIALS[l+d] + T * FOUND_LEADING_MONOMIALS[l];
+                }   
+            }
+        }
+        
+        if( size(FLM) > 0 )
+        {
+            for( i = 2; i <= ncols(FLM); i++ )
+            {
+                FLM[i] = SANF( FLM[i], FOUND_LEADING_MONOMIALS );
+            }
+            FLM = INTERRED( FLM );            
+        } 
+        
+        DBPrint(1, "Found: " + string(T) );
+        
+        result = result + T;
+        
+    }
+    
+    result = makeNice(result);
+    
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "sa_reduce", result ); }; /*4DEBUG*/
+    
+    return( result );
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -2637,21 +1611,494 @@ example
  D[1,2]=-z; D[1,3]=2*x; D[2,3]=-2*y;
  ncalgebra(1,D); // this algebra is U(sl_2)
  poly f = 4*x*y+z^2-2*z; // a central polynomial
- f;
- ideal c = centralizer(f, 2); // find all elements of the centralizer of f
-                              // of degree <= 2
- c;  // since f is central, the answer consists of generators of A 
- inCentralizer(c, f);
- ideal cc = centralizer(f,-1,2); // find at least two elements of the centralizer of f
- cc;
- inCentralizer(cc, f);
- poly g = z^2-2*z; // some non-central polynomial
- c = centralizer(g, 2); // find all elements of the centralizer of g
+ ideal I = f, f*f, f*f*f - 10*f*f, f+3*z^3; I;
+ sa_reduce(I); // should be just f and z^3
+}
+
+
+
+/******************************************************/
+proc sa_poly_reduce( poly p, ideal V ) // subalgebra reduction of a polynomial
+"USAGE:      sa_poly_reduce(p, V); poly p, ideal V
+RETURN:     polynomial, a reduction of p wrt V
+PURPOSE:    computes a reduction of a given polynomial p wrt a set of polynomials V
+NOTE:       May produce wrong result in quotient algebras.
+SEE ALSO:   sa_reduce
+EXAMPLE:    example sa_poly_reduce; shows an example
+"
+{
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "sa_poly_reduce", p, V ); }; /*4DEBUG*/
+    // As previous...
+    
+    ideal FLM = INTERRED( V ); // The output is sorted "[1]<[2]<[3]<..."
+    
+    // We are bounded by maximal degree!!!
+    int D = maxdegInt( FLM + ideal(p)  );
+
+    // Init
+    list FOUND_LEADING_MONOMIALS = list();
+    
+    int i;
+    
+    for( i = 1; i <= D; i++ )
+    {
+        FOUND_LEADING_MONOMIALS[i] = ideal();
+    }    
+    
+    int d, j, l;
+    
+    poly f, q; ideal T;
+
+    
+    int c = 1;  // polynomials in FLM commute pairwise
+    
+    for( j = 1; (j < size(FLM)) and (c == 1); j++ )
+    {
+        f = FLM[j];
+        
+        for( l = j+1; (l <= size(FLM)) and (c == 1); l++ )
+        {
+            q = FLM[l];
+        
+            if( NF(f*q - q*f, twostd(0)) != 0 )
+            {
+                c = 0;
+            }            
+        }
+    }
+
+        
+    while( size(FLM) > 0 )
+    {
+        // Take the 1st element of FLM...
+        q = SANF( FLM[1], FOUND_LEADING_MONOMIALS );
+        
+        FLM[1] = 0; // ...and kill it from FLM
+        
+        d = maxdeg(q);
+        T = ideal(q); 
+        
+        FOUND_LEADING_MONOMIALS[d] = FOUND_LEADING_MONOMIALS[d] + T;
+        
+        for( j = 1; j <= D; j = j + d ) // For every degree (j*d) of T, do:
+        {            
+            for( l = j; (l + d) <= D; l++ )
+            {
+                FOUND_LEADING_MONOMIALS[l+d] = 
+                    FOUND_LEADING_MONOMIALS[l+d] + FOUND_LEADING_MONOMIALS[l] * T;
+                    
+                if( c != 1 )
+                {
+                    FOUND_LEADING_MONOMIALS[l+d] = 
+                        FOUND_LEADING_MONOMIALS[l+d] + T * FOUND_LEADING_MONOMIALS[l];
+                }   
+            }
+        }
+        
+        if( size(FLM) > 0 )
+        {
+            for( i = 2; i <= ncols(FLM); i++ )
+            {
+                FLM[i] = SANF( FLM[i], FOUND_LEADING_MONOMIALS );
+            }
+            FLM = INTERRED( FLM );            
+        }
+    }
+    
+    poly result = SANF(p, FOUND_LEADING_MONOMIALS);
+    
+    result = makeNice( result );
+
+    
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "sa_poly_reduce", result ); }; /*4DEBUG*/
+
+    return( result );
+}
+example
+{ "EXAMPLE:"; echo = 2;
+ ring A = 0,(x,y,z),dp;
+ matrix D[3][3]=0;
+ D[1,2]=-z; D[1,3]=2*x; D[2,3]=-2*y;
+ ncalgebra(1,D); // this algebra is U(sl_2)
+ poly f = 4*x*y+z^2-2*z; // a central polynomial
+ sa_poly_reduce(f + 3*f*f + x, ideal(f) ); // should be just 'x'
+}
+
+
+
+
+
+
+
+/******************************************************/
+// ::inStuff:: inCentralizer, inCenter, isCartan helpers
+/******************************************************/
+
+
+/******************************************************/
+static proc inCentralizer_poly( poly p, ideal S )
+"
+    if p in centralizer(S) => return 1, otherwise return 0
+"
+{
+    poly f;
+    
+    for( int k = 1; k <= size(S); k++ )
+    {
+        f = S[k];
+
+        if( NF( f * p - p * f, twostd(0) ) != 0 )
+        {
+            DBPrint( 1, "POLY: " + string (p) + 
+                " is NOT in the centralizer of poly {" + string(f) + "}" );
+            return (0);
+        }
+    }
+
+    return( 1 );
+}
+
+/******************************************************/
+static proc inCentralizer_list( def l, ideal S )
+{    
+    for( int @i = 1; @i <= size(l); @i++ )
+    {
+        if( (typeof(l[@i])=="poly") or (typeof(l[@i]) == "int") or (typeof(l[@i]) == "number") )
+        {
+            if(! inCentralizer_poly(l[@i], S) )
+            {
+                return(0);
+            }
+
+        } else
+        {
+            if( (typeof(l[@i])=="list") or (typeof(l[@i])=="ideal") )
+            {
+                if(! inCentralizer_list(l[@i], S) )
+                {
+                    return(0);
+                }
+            }
+        }
+    }
+    return(1);
+}
+
+
+/******************************************************************************/
+proc inCentralizer( def a, ideal S ) // Checks the commutativity of polynomials of a with the polynomials in S
+"USAGE:   inCentralizer(a, S); a poly/list/ideal, S poly/ideal
+RETURN:  integer, 1 if a in the centralizer(S), 0 otherwise
+PURPOSE: check whether a given element is centralizing with respect to elements of S
+EXAMPLE: example inCentralizer; shows examples
+"
+{
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "inCentralizer", a, S ); }; /*4DEBUG*/
+
+    if( nameof( basering ) == "basering" )
+    {
+        ERROR( "No current ring!" );
+    }
+    
+
+    int res;
+    
+    if( (typeof(a) == "poly") or (typeof(a) == "int") or (typeof(a) == "number") )
+    {
+        res = inCentralizer_poly(a, S);
+    } else
+    {
+        if( (typeof(a)=="list") or (typeof(a)=="ideal") )
+        {
+            res = inCentralizer_list(a, S);
+        } else
+        {
+            res = -1;
+        }
+    }
+    
+    if( res == -1 )
+    {
+        ERROR( "Wrong argument!" );
+    }
+
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "inCentralizer", res ); }; /*4DEBUG*/
+
+    return (res);
+}
+example
+{
+"EXAMPLE:";echo=2;
+ring r=0,(x,y,z),dp;
+matrix D[3][3]=0;
+D[1,2]=-z;
+ncalgebra(1,D); // the Heisenberg algebra
+poly f = x^2;
+poly a = z; // we know this element if central
+poly b = y^2;
+inCentralizer(a, f);
+inCentralizer(b, f);
+list  l = list(1, a);
+inCentralizer(l, f);
+ideal I = a, b;
+inCentralizer(I, f);
+printlevel = 1;
+inCentralizer(a, f); // yes
+inCentralizer(b, f); // no
+}
+
+/******************************************************/
+proc inCenter( def a ) // Checks the centrality of a
+"USAGE:   inCenter(a); a poly/list/ideal
+RETURN:  integer, 1 if a in the center, 0 otherwise
+PURPOSE: check whether a given element is central
+EXAMPLE: example inCenter; shows examples
+"
+{
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "inCenter", a ); }; /*4DEBUG*/
+
+    if( nameof( basering ) == "basering" )
+    {
+        ERROR( "No current ring!" );
+    }
+        
+    int result = inCentralizer( a, standard_variables() );
+
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "inCenter", result ); }; /*4DEBUG*/
+
+    return( result );
+}
+example
+{
+"EXAMPLE:";echo=2;
+ring r=0,(x,y,z),dp;
+matrix D[3][3]=0;
+D[1,2]=-z;
+D[1,3]=2*x;
+D[2,3]=-2*y;
+ncalgebra(1,D); // this is U(sl_2)
+poly p=4*x*y+z^2-2*z;
+inCenter(p);
+poly f=4*x*y;
+inCenter(f);
+list l= list( 1, p, p^2, p^3);
+inCenter(l);
+ideal I= p, f;
+inCenter(I);
+}
+
+
+/******************************************************/
+proc isCartan( poly f ) // Checks whether f is a Cartan element.
+"
+PURPOSE: check whether f is a Cartan element.
+RETURN: 1 if f is a Cartan element and 0 otherwise.
+NOTE: f is a Cartan element iff for all g in A there exists C in K such that [f, g] = C * g
+iff for all variables v_i of A there exist C in K such that [f, v_i] = C * v_i.
+"
+{
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "isCartan", f ); }; /*4DEBUG*/
+
+    if( nameof( basering ) == "basering" )
+    {
+        ERROR( "No current ring!" );
+    }
+    
+
+    ideal V = standard_variables();
+
+    int r = 1; poly v, g;
+
+    for( int i = size(V); i > 0; i-- )
+    {
+        v = leadmonom(V[i]); // V[i] must be just a variable, but...
+
+        g = NF( f*v - v*f, twostd(0) ); // [f, V[i]]
+
+        if( size(g) > 0 )
+        {
+            if( size(g) > 1 ) // it is not just \alpha * v_i.
+            {
+                r = 0;
+                break;
+            }
+
+            if( leadmonom(g) != v ) // g = \alpha * v_j, j != i.
+            {
+                r = 0;
+                break;
+            }
+
+        } // else \alpha = 0
+    }
+    
+/*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "isCartan", r ); }; /*4DEBUG*/
+    return( r );
+}
+example
+{
+"EXAMPLE:";echo=2;
+ring r=0,(x,y,z),dp;
+matrix D[3][3]=0;
+D[1,2]=-z;
+D[1,3]=2*x;
+D[2,3]=-2*y;
+ncalgebra(1,D); // this is U(sl_2) with cartan - z
+isCartan(z); // yes!
+poly p=4*x*y+z^2-2*z;
+isCartan(p); // central elements are Cartan elements!
+poly f=4*x*y;
+isCartan(f); // no way!
+isCartan( 10 + p + z ); // scalar + central + cartan
+}
+
+
+
+
+/******************************************************/
+/******************************************************/
+// ::MainAliases:: The only non-static functions, visible to user are here. And they are high level wrappers around basic static functions.
+/******************************************************/
+/******************************************************/
+
+
+
+
+/******************************************************/
+proc center( int D, list # ) // Computes the generators of the center of a basering
+"USAGE:      center(D[, N]); int D, int N
+RETURN:     ideal, generated by elements of degree at most D
+PURPOSE:    computes a minimal set of central elements up to degree D.
+NOTE:       In general, one cannot predict the number or the highest degree of
+central elements. Hence, one has to specify a termination condition via arguments D and/or N.
+@*   If D is positive, the computation stops after all central elements of degree at most D has been found.
+@*   If D is negative, the termination is determined by N only.
+@*   If N is given, the computation stops if at least N central elements has been found.
+@* Warning: if N is given and bigger than the actual number of generators, the procedure may not terminate.
+SEE ALSO:   centralizer; inCenter
+EXAMPLE:    example center; shows an example
+"
+{
+    if( nameof( basering ) == "basering" ) 
+    {
+        ERROR( "No current ring!" );  
+    }
+    
+    if( DefaultInt( # ) > 0 )
+    {
+        return( CENTER_SUBALGEBRA( D, # ) );
+    }
+    
+    if( D >= 0 )
+    {
+        return( sa_reduce( CENTER_VECTORSPACE(D) ) ); // Experimental! May be wrong!!!
+    }
+    
+    ERROR( "Wrong arguments!" );
+}
+example
+{
+"EXAMPLE:"; echo = 2;
+ring A = 0,(x,y,z,t),dp;
+matrix D[4][4]=0;
+D[1,2]=-z;  D[1,3]=2*x;  D[2,3]=-2*y;
+ncalgebra(1,D); // this algebra is U(sl_2) tensored with K[t]
+ideal Z = center(3); // find all central elements of degree <= 3
+Z;
+inCenter(Z);
+ideal ZZ = center(-1, 1); // find one central element of the lowest degree
+ZZ;
+inCenter(ZZ);
+}
+
+/******************************************************/
+proc centralizer( ideal S, int D, list # ) // Computes the generators of the centralizer of S in a basering
+"USAGE:      centralizer(S, MaxDeg[, N]); poly/ideal S, int MaxDeg, int N
+RETURN:     ideal, generated by elements of degree <= MaxDeg
+PURPOSE:    computes a minimal set of elements centralizer(S) up to degree MaxDeg.
+NOTE:       In general, one cannot predict the number or the highest degree of
+centralizing elements. Hence, one has to specify a termination condition via arguments MaxDeg and/or N.
+@*   If MaxDeg is positive, the computation stops after all centralizing elements of degree at most MaxDeg has been found.
+@*   If MaxDeg is negative, the termination is determined by N only.
+@*   If N is given, the computation stops if at least N centralizing elements has been found.
+@* Warning: if N is given and bigger than the actual number of generators, the procedure may not terminate.
+SEE ALSO:   center; inCentralizer
+EXAMPLE:    example centralizer; shows an example
+"
+{
+    if( nameof( basering ) == "basering" ) 
+    {
+        ERROR( "No current ring!" );  
+    }
+    
+    if( DefaultInt( # ) > 0 )
+    {
+        return( CENTRALIZER_SUBALGEBRA( S, D, # ) );
+    }
+    
+    if( D >= 0 )
+    {
+        return( sa_reduce( CENTRALIZER_VECTORSPACE(S, D), 1) ); // Experimental! May be wrong!!!
+    }
+    
+    ERROR( "Wrong arguments!" );
+}
+example
+{
+"EXAMPLE:"; echo = 2;
+ring A = 0,(x,y,z),dp;
+matrix D[3][3]=0;
+D[1,2]=-z; D[1,3]=2*x; D[2,3]=-2*y;
+ncalgebra(1,D); // this algebra is U(sl_2)
+poly f = 4*x*y+z^2-2*z; // a central polynomial
+f;
+ideal c = centralizer(f, 2); // find all elements of the centralizer of f
+                            // of degree <= 2
+c;  // since f is central, the answer consists of generators of A
+inCentralizer(c, f);
+ideal cc = centralizer(f,-1,2); // find at least two elements of the centralizer of f
+cc;
+inCentralizer(cc, f);
+poly g = z^2-2*z; // some non-central polynomial
+c = centralizer(g, 2); // find all elements of the centralizer of g
                         // of degree <= 2
- c;
- inCentralizer(c, g);
- centralizer(g,-1,1); // find the element of the lowest degree in the centralizer 
- cc = centralizer(g,-1,2); // find at least two elements of the centralizer of g
- cc;
- inCentralizer(cc, g);
-};
+c;
+inCentralizer(c, g);
+centralizer(g,-1,1); // find the element of the lowest degree in the centralizer
+cc = centralizer(g,-1,2); // find at least two elements of the centralizer of g
+cc;
+inCentralizer(cc, g);
+}
+
+
+/*******************************************************
+// normally one should use this library together with ncalg.lib in the following way:
+
+LIB "ncalg.lib";
+def Usl3 = makeUsl(3); // U(sl_3)
+setring Usl3;
+
+// show current ring:
+basering;
+
+LIB "center.lib";
+
+// easy example(few seconds), must compute two polynomials of degrees 2 and 3.
+center(3);
+
+kill Usl3;
+
+def Ug2 = makeUg2(); // U(g_2)
+setring Ug2;
+
+// show current ring:
+basering;
+
+// easy example(few seconds), must compute one polynomial of degree 2.
+center(2);
+
+// hard example(some minutes), must compute two polynomials of degrees 2 and 6.
+center(6);
+
+quit;
+*******************************************************/

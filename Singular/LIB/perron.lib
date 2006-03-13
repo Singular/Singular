@@ -1,0 +1,233 @@
+///////////////////////////////////////////////////////////////////////////////
+version="$Id: perron.lib,v 1.1 2006-03-13 14:31:44 motsak Exp $";
+category="Noncommutative";
+info="
+LIBRARY:  perron.lib      
+AUTHORS:  Oleksandr Motsak,        motsak@mathematik.uni-kl.de.
+
+PROCEDURES:
+perron(L[, d]);    computes relations between pairwise commuting polynomials of L[, up to a given degree bound D]
+
+KEYWORDS:  algebraic dependence; relations
+";
+
+LIB "center.lib"; 
+
+//////////////////////////////////////////////////////////////////////////////
+proc perron( ideal L, list # )
+"USAGE:     perron( L [, D] )
+RETURN:     a commutative ring, containing an exported ideal with polynomial relations with the name Relations.
+PURPOSE:     computes relations between pairwise commuting polynomials of L[, up to a given degree bound D]
+NOTE:     The perron relation is know to exit and be minimal only if size(L) = (1+nvars(basering))!
+EXAMPLE:    example sa_reduce; shows an example
+"
+{
+    int N, D, i;
+    
+    if( nameof( basering ) == "basering" )
+    {
+        ERROR( "No current ring!" );
+    }
+
+
+    N = size(L);
+
+    if( N == 0 )
+    {
+        ERROR( "Zero ideal!" );
+    }
+    
+    intvec W; // weights
+    
+    for ( i = size(L); i > 0 ; i-- )
+    {
+        W[i] = deg(L[i]);
+    }
+    
+
+////////////////////////////////////////////////////////////////////////
+    D = -1;
+    
+    // Check whether the bound degree D is given:
+    if( size(#)>0 )
+    {
+        if ( typeof(#[1]) == typeof(D) )
+        {
+            D = #[1];
+            
+            if( D <= 0 )
+            {
+                ERROR( "An optional parameter D must be positive!" );
+            }
+        }    
+    }
+    
+    // , otherwise we try to estimate it after Perron Th:
+    if( D < 0 )
+    {
+        D = 1; 
+        int d, min;
+        
+        min = -1;
+        
+        for ( i = size(L); i > 0 ; i-- )
+        {
+            d = W[i];
+            
+            D = D * d;
+            if( min == -1)
+            {
+                min = d;
+            } else
+            {
+                if( min > d )
+                {
+                    min = d;                
+                }
+            }            
+        }
+        
+        if( (D == 0) or (min <= 0) )
+        {
+            ERROR( "Wrong set of polynomials!" );
+        }
+        
+        D = D / min;        
+        
+        kill d;
+    }
+    
+////////////////////////////////////////////////////////////////////////
+    
+    def NCRING = basering;
+    
+    def CurrentField = ringlist( NCRING )[1]; 
+    
+    // We are going to construct a commutative ring in N variables:
+    
+    ring TEMPRING = 0, ( F(1..N) ), dp;
+    
+    list RingList = ringlist( TEMPRING );
+    
+    RingList[1] = CurrentField; // Take the Field from NC Ring!
+    
+    kill CurrentField; // !
+    
+    // New Commutative Ring with correct field!
+    
+    def COMMUTATIVERING = ring( RingList );
+    
+    setring COMMUTATIVERING;
+    
+    kill TEMPRING;
+
+////////////////////////////////////////////////////////////////////////
+
+    // we are in COMMUTATIVERING now:   
+    
+    ideal PBWBasis = PBW_basis_byMaxDeg( D ); // All monomials of degree(!) <= D.
+    // TODO: it would be better to compute weighted monomials of weight <= W[1] \cdot ... W[N].
+    
+//    PBWBasis;
+        
+    setring NCRING;
+    
+//    kill CurrentField; // we cleanup every bit of it.
+    
+    map Psi = COMMUTATIVERING, L; // F(i) \mapsto L[i]
+    
+    ideal Images = Psi( PBWBasis ); // Corresponding products of polynomials from L
+    
+//    Images;
+    
+    def T = KER( Images ); // Compute relations in NC ring
+    
+//    T;
+
+    
+    // We check the output:
+    
+    if( (typeof(T) != "module") and (typeof(T) != "int" ) )
+    {
+        ERROR( "Wrong output from the 'KER' function!" );
+    }
+    
+    if( typeof(T) == "int" )
+    {
+        if( T != 0 )
+        {
+            ERROR( "Wrong output from the 'KER' function!" );
+        }
+    }        
+    
+        
+    // , and go back to commutative case in both cases:        
+    if( typeof(T) == "module" )
+    {
+        // Back to 
+        setring COMMUTATIVERING;        
+        module KER = imap( NCRING, T );
+        
+        // some clean up:
+        setring NCRING;
+        kill T;
+        kill Psi;
+        
+        setring COMMUTATIVERING;
+        ideal result = LinearCombinations( PBWBasis, KER );
+        
+        kill KER;
+        
+            
+    } else
+    {
+        // If all images are zero...        
+        kill T;
+        kill Psi;
+        setring COMMUTATIVERING;
+        ideal result = PBWBasis;        
+    }
+    
+    // now we must be in COMMUTATIVERING and there must be an ideal result.
+    kill PBWBasis;
+
+//    listvar(all);        
+
+////////////////////////////////////////////////////////////////////////
+    // we compute an std basis of the relations:    
+    
+    // save options
+    intvec v = option( get );
+    
+    // set right options
+    option( redSB );
+    option( redTail );
+    
+    // compute everything in a right form
+    ideal Relations = simplify( std( result ), 1 + 2 + 8 ); 
+    
+    // restore options
+    option( set, v ); 
+    
+    kill result;
+    
+//    Relations;
+    export Relations;
+    
+    return( COMMUTATIVERING );    
+}
+example
+{
+"EXAMPLE:"; echo = 2;
+int p = 3;
+ring A = p,(x,y,z),dp;
+matrix D[3][3]=0;
+D[1,2]=-z; D[1,3]=2*x; D[2,3]=-2*y;
+ncalgebra(1,D); // this algebra is U(sl_2)
+ideal L = x^p, y^p, z^p-z, 4*x*y+z^2-2*z; // the [p]-Center
+def R = perron( L, p );
+setring R; 
+R;
+Relations; // it was exported from perron to be in a returned ring.
+}
+
