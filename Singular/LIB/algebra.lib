@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: algebra.lib,v 1.12 2005-10-12 09:39:56 Singular Exp $";
+version="$Id: algebra.lib,v 1.13 2006-03-13 09:24:08 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  algebra.lib   Compute with Algbras and Algebra Maps
@@ -788,6 +788,11 @@ NOTE:    Designed for characteristic 0.It works also in char k > 0 if it
 EXAMPLE: example noetherNormal; shows an example
 "
 {
+   if ( deg(i[1]) <= 0)
+   {
+     list l = ideal(0),i;
+     return( l );
+   }
    int p;
    if( size(#) != 0 )
    {
