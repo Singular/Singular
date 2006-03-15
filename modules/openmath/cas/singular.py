@@ -5,7 +5,7 @@ from util import create_ring
 import cd.polyd, cd.primdec, cd.list1
 from cd.polyd import DMPsym, SDMPsym, termsym, lpsym,dpsym,poly_ring_dsym, DMPLsym, implementation, groebnerdsym
 from cd.fieldname1 import Qsym as Rationals
-singular=singular_globals_proxy()
+singular=SingularGlobalsProxy()
 import cd.primdec
 class SingularException(Exception):
   pass

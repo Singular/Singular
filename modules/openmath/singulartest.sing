@@ -11,7 +11,7 @@ ideal i2=cyclic(5);
 
 print(i2);
 LIB("/Users/michael/sing2/modules/python/python_module.so");
-Python_module::python("from interpreter import singular_globals_proxy
+Python_module::python("from interpreter import SingularGlobalsProxy
 #import psyco
 import sys
 sys.argv=['Singular']
@@ -35,7 +35,7 @@ context.addCDImplementation(polyd.implementation)
 context.addCDImplementation(fieldname1.implementation)
 from cd.polyd import groebnersym
 r=singular.r
-inter=singular_globals_proxy()
+inter=SingularGlobalsProxy()
 
 
 
