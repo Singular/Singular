@@ -29,8 +29,7 @@
 <dt><font face="helvetica, arial"><a href="__builtin__.html#object">__builtin__.object</a>
 </font></dt><dd>
 <dl>
-<dt><font face="helvetica, arial"><a href="interpreter.html#singular_globals_proxy">singular_globals_proxy</a>
-</font></dt><dt><font face="helvetica, arial"><a href="interpreter.html#singular_globals_proxy">singular_globals_proxy</a>
+<dt><font face="helvetica, arial"><a href="interpreter.html#SingularGlobalsProxy">SingularGlobalsProxy</a>
 </font></dt></dl>
 </dd>
 </dl>
@@ -38,11 +37,11 @@
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ffc8d8">
 <td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><strong>global_functions</strong> = <a name="global_functions">class singular_globals_proxy</a>(<a href="__builtin__.html#object">__builtin__.object</a>)</font></td></tr>
+<font color="#000000" face="helvetica, arial"><a name="SingularGlobalsProxy">class <strong>SingularGlobalsProxy</strong></a>(<a href="__builtin__.html#object">__builtin__.object</a>)</font></td></tr>
     
 <tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
 <td colspan=2><tt>The&nbsp;Most&nbsp;important&nbsp;class<br>
-singular=<a href="#singular_globals_proxy">singular_globals_proxy</a>()<br>
+singular=singular_globals_proxy()<br>
 for&nbsp;some&nbsp;ideal<br>
 &nbsp;&nbsp;singular.groebner(i)<br>
 &nbsp;&nbsp;singular.std(i)<br>
@@ -54,45 +53,15 @@ for&nbsp;some&nbsp;global&nbsp;poly&nbsp;variable&nbsp;p&nbsp;in&nbsp;the&nbsp;i
 this&nbsp;is&nbsp;always&nbsp;a&nbsp;copy&nbsp;as&nbsp;this&nbsp;<a href="__builtin__.html#object">object</a>&nbsp;is&nbsp;only&nbsp;some&nbsp;magic&nbsp;proxy<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
 <td width="100%">Methods defined here:<br>
-<dl><dt><a name="singular_globals_proxy-__getattr__"><strong>__getattr__</strong></a>(self, name)</dt></dl>
+<dl><dt><a name="SingularGlobalsProxy-__getattr__"><strong>__getattr__</strong></a>(self, name)</dt></dl>
 
-<dl><dt><a name="singular_globals_proxy-__setattr__"><strong>__setattr__</strong></a>(self, name, value)</dt></dl>
-
-<hr>
-Data and other attributes defined here:<br>
-<dl><dt><strong>__dict__</strong> = &lt;dictproxy object&gt;<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dl>
-
-<dl><dt><strong>__weakref__</strong> = &lt;attribute '__weakref__' of 'singular_globals_proxy' objects&gt;<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;<a href="__builtin__.html#object">object</a>&nbsp;(if&nbsp;defined)</tt></dl>
-
-</td></tr></table> <p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#ffc8d8">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="singular_globals_proxy">class <strong>singular_globals_proxy</strong></a>(<a href="__builtin__.html#object">__builtin__.object</a>)</font></td></tr>
-    
-<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>The&nbsp;Most&nbsp;important&nbsp;class<br>
-singular=<a href="#singular_globals_proxy">singular_globals_proxy</a>()<br>
-for&nbsp;some&nbsp;ideal<br>
-&nbsp;&nbsp;singular.groebner(i)<br>
-&nbsp;&nbsp;singular.std(i)<br>
-in&nbsp;general&nbsp;all&nbsp;interpreter&nbsp;and&nbsp;kernel&nbsp;functions<br>
-with&nbsp;supported&nbsp;data&nbsp;type&nbsp;work<br>
-for&nbsp;some&nbsp;global&nbsp;poly&nbsp;variable&nbsp;p&nbsp;in&nbsp;the&nbsp;interpreter&nbsp;and&nbsp;p&nbsp;in&nbsp;python<br>
-&nbsp;&nbsp;singular.p=p<br>
-&nbsp;&nbsp;p=singular.p<br>
-this&nbsp;is&nbsp;always&nbsp;a&nbsp;copy&nbsp;as&nbsp;this&nbsp;<a href="__builtin__.html#object">object</a>&nbsp;is&nbsp;only&nbsp;some&nbsp;magic&nbsp;proxy<br>&nbsp;</tt></td></tr>
-<tr><td>&nbsp;</td>
-<td width="100%">Methods defined here:<br>
-<dl><dt><a name="singular_globals_proxy-__getattr__"><strong>__getattr__</strong></a>(self, name)</dt></dl>
-
-<dl><dt><a name="singular_globals_proxy-__setattr__"><strong>__setattr__</strong></a>(self, name, value)</dt></dl>
+<dl><dt><a name="SingularGlobalsProxy-__setattr__"><strong>__setattr__</strong></a>(self, name, value)</dt></dl>
 
 <hr>
 Data and other attributes defined here:<br>
 <dl><dt><strong>__dict__</strong> = &lt;dictproxy object&gt;<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dl>
 
-<dl><dt><strong>__weakref__</strong> = &lt;attribute '__weakref__' of 'singular_globals_proxy' objects&gt;<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;<a href="__builtin__.html#object">object</a>&nbsp;(if&nbsp;defined)</tt></dl>
+<dl><dt><strong>__weakref__</strong> = &lt;attribute '__weakref__' of 'SingularGlobalsProxy' objects&gt;<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;<a href="__builtin__.html#object">object</a>&nbsp;(if&nbsp;defined)</tt></dl>
 
 </td></tr></table></td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">

@@ -24,7 +24,7 @@ def list2arg_list(args):
         else:
             l.append(a)
     return l
-class singular_globals_proxy(object):
+class SingularGlobalsProxy(object):
     """The Most important class
       singular=singular_globals_proxy()
       for some ideal
@@ -88,7 +88,7 @@ class singular_globals_proxy(object):
                 value=list2arg_list(value)
             id.write(value)
 #for compatibility the old name
-global_functions=singular_globals_proxy
+#global_functions=singular_globals_proxy
 
 
 def find_rings(arglist):

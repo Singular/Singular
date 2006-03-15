@@ -1,6 +1,6 @@
 from Singular import *
 from interpreter import *
-singular=singular_globals_proxy()
+singular=SingularGlobalsProxy()
 
 def create_ring(char=0, nvars=1, varNames=None, ordering="dp", degvec=None):
   if not varNames:

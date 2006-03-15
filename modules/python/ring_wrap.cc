@@ -1,4 +1,4 @@
-//$Id: ring_wrap.cc,v 1.6 2006-03-09 14:49:17 bricken Exp $
+//$Id: ring_wrap.cc,v 1.7 2006-03-15 10:53:58 bricken Exp $
 
 #include <boost/python.hpp>
 #include "mod2.h"
@@ -14,9 +14,9 @@ static boost::python::object Ring_as_str(const Ring& r)
   return boost::python::str(out,strlen(out));
 }
 void export_ring(){
-boost::python::class_<Ring>("Ring")
+boost::python::class_<Ring>("Ring", "reference to a Singular ring")
      .def("__str__", Ring_as_str)
-     .def("set", &Ring::set)
+     .def("set", &Ring::set,"equivalent to the singular command setring, which is not mapped as it is a command")
      .def(boost::python::init <>());
 
 }
