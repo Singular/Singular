@@ -85,6 +85,7 @@ TASKS:
 - make the functionality available build in the kernel for the windows platform
 - documentation
 - provide feedback for missing functionality
+-smart pointer for ring in Poly
 
 RULES:
 -----
@@ -109,7 +110,8 @@ the old name exists for short time for compat.
 
 successfully tested systems:
 linux: x86, x86_64
-Mac OS X:G4
+Mac OS X:G4, 
+windows (ask Oliver)
 
 
 

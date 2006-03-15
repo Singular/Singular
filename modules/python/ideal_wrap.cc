@@ -1,4 +1,4 @@
-//$Id: ideal_wrap.cc,v 1.8 2006-03-09 14:49:17 bricken Exp $
+//$Id: ideal_wrap.cc,v 1.9 2006-03-15 10:40:43 bricken Exp $
 #include <boost/python.hpp>
 #include "mod2.h"
 #include "Poly.h"
@@ -35,7 +35,9 @@ static Ring Ideal_get_Ring(const Ideal & p){
 
 void export_ideal()
 {
-   boost::python::class_<Ideal>("Ideal")
+   boost::python::class_<Ideal>("Ideal", "supports most operation a\
+    python list supports with the expception, that elements must\
+    be Polynomials")
      .def("__str__", Ideal_as_str)
      .def("ring",Ideal_get_Ring)
      .def(boost::python::init <>())

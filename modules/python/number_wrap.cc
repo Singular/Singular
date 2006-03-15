@@ -14,7 +14,7 @@ static boost::python::object Number_as_str(const Number& n)
 void export_number()
 {
    boost::python::class_<Number>("Number")
-    .def(boost::python::init <int>())
+    .def(boost::python::init <int>("creates a number in currRing by default, more complex constructs can be fetched from the interpreter"))
     .def("__str__", Number_as_str)
     .def(-self)
     .def(self*=self)

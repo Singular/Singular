@@ -1,0 +1,10 @@
+ring r;
+LIB("python_module.so");
+Python_module::python("
+import Singular
+import interpreter
+import util
+import pydoc
+for m in [util, interpreter,Singular]:
+    pydoc.writedoc(m)
+");
