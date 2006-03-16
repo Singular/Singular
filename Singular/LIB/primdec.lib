@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: primdec.lib,v 1.110 2006-03-10 12:24:28 Singular Exp $";
+version="$Id: primdec.lib,v 1.111 2006-03-16 15:50:39 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -1633,6 +1633,64 @@ example
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+static proc clearSBNeu (ideal i,list #)
+"USAGE:   clearSB(i); i ideal which is SB ordered by monomial ordering
+RETURN:  ideal = minimal SB
+NOTE:
+EXAMPLE: example clearSB; shows an example
+"
+{
+ int k,j;
+ intvec m,n,v,w;
+ int c=size(i);
+ w=leadexp(0);
+ v[size(i)]=0;
+ 
+ j=0;
+ while(j<c-1)
+ {
+   j++;
+   if(deg(i[j])==0)
+   {
+     i=ideal(1);
+     return(i);
+   }
+   if(deg(i[j])>0)
+   {
+      m=leadexp(i[j]);
+      for(k=j+1;k<=c;k++)
+      {
+        n=leadexp(i[k]);
+        if(n!=w)
+        {
+           if(((m==n)&&(#[j]>#[k]))||((teilt(n,m))&&(n!=m)))
+           {
+             i[j]=0;
+             v[j]=1;
+             break;
+           }
+           if(((m==n)&&(#[j]<=#[k]))||((teilt(m,n))&&(n!=m)))
+           {
+             i[k]=0;
+             v[k]=1;
+           }
+        }
+      }
+    }
+  }
+  return(v);
+}
+
+static proc teilt(intvec a, intvec b)
+{
+   int i;
+   for(i=1;i<=size(a);i++)
+   {
+      if(a[i]>b[i]){return(0);}
+   }
+   return(1);
+}
+///////////////////////////////////////////////////////////////////////////////
 
 static proc independSet (ideal j)
 "USAGE:   independentSet(i); i ideal
@@ -1999,8 +2057,22 @@ EXAMPLE: example minAssPrimes; shows an example
 
    if(npars(P)==0){option(redSB);}
 
-   i=std(q[1]);
-   if(dim(i)==-1){re=ideal(1);return(re);}
+   if(attrib(i,"isSB")!=1)
+   {
+      i=groebner(q[1]);
+   }
+   else
+   {
+      for(j=1;j<=nvars(basering);j++)
+      {
+         if(q[2][j]!=var(j)){k=1;break;}
+      }
+      if(k)
+      {
+         i=groebner(q[1]);
+      }
+   }
+   if(dim(i)==-1){return(ideal(1));}
    if((dim(i)==0)&&(npars(P)==0))
    {
       int di=vdim(i);
@@ -2046,6 +2118,7 @@ EXAMPLE: example minAssPrimes; shows an example
 
    q=facstd(i);
 
+/*
    if((size(q)==1)&&(dim(i)>1))
    {
       execute ("ring gnir=("+charstr(P)+"),("+varstr(P)+"),lp;");
@@ -2063,6 +2136,7 @@ EXAMPLE: example minAssPrimes; shows an example
       }
       kill gnir;
    }
+*/
 
    option(set,op);
    for(j=1;j<=size(q);j++)
@@ -2943,10 +3017,25 @@ EXAMPLE: example decomp; shows an example
      //we pass to the quotientring   K(var(nnp+1),..,var(nva))[..the rest..]
      //---------------------------------------------------------------------
 
+     ideal @jj=lead(@j);               //!! vorn vereinbaren
      execute(quotring);
-
-    // @j considered in the quotientring
+   
+     ideal @jj=imap(gnir1,@jj);
+     intvec @vv=clearSBNeu(@jj,fett);  //!! vorn vereinbaren
+     setring gnir1;
+     @k=size(@j);
+     for (lauf=1;lauf<=@k;lauf++)
+     {
+         if(@vv[lauf]==1)
+         {
+            @j[lauf]=0;
+         }
+     }
+     @j=simplify(@j,2);
+     setring quring;
+      // @j considered in the quotientring
      ideal @j=imap(gnir1,@j);
+
      ideal ser=imap(gnir1,ser);
 
      kill gnir1;
@@ -2954,7 +3043,6 @@ EXAMPLE: example decomp; shows an example
      //j is a standardbasis in the quotientring but usually not minimal
      //here it becomes minimal
 
-     @j=clearSB(@j,fett);
      attrib(@j,"isSB",1);
 
      //we need later ggt(h[1],...)=gh for saturation
