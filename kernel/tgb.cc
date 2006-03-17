@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.80 2006-03-04 19:29:28 bricken Exp $ */
+/* $Id: tgb.cc,v 1.81 2006-03-17 10:48:23 Singular Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -29,28 +29,30 @@ static omBin lm_bin=NULL;
 
 static void simplify_poly(poly p, ring r) {
      assume(r==currRing);
-     if (!rField_is_Zp(r)){ 
+     if (!rField_is_Zp(r))
+     {
         pCleardenom(p);
         pContent(p); //is a duplicate call, but belongs here
-        
-      }
-      else                     
-        pNorm(p);
+     }
+     else
+       pNorm(p);
 }
 //static const BOOLEAN up_to_radical=TRUE;
 
-int slim_nsize(number n, ring r) {
-    if (rField_is_Zp(r)){
-        return 1;
-    }
- if (rField_is_Q(r)){
-      return QlogSize(n);
-
+int slim_nsize(number n, ring r)
+{
+  if (rField_is_Zp(r))
+  {
+    return 1;
   }
-    else{
-      return n_Size(n,r);
-     
-    }
+  if (rField_is_Q(r))
+  {
+    return QlogSize(n);
+  }
+  else
+  {
+    return n_Size(n,r);
+  }
 }
 static BOOLEAN monomial_root(poly m, ring r){
     BOOLEAN changed=FALSE;
@@ -143,14 +145,14 @@ int kSBucketLength(kBucket* b, poly lm)
 // 3.Variante: Laenge: Platz fuer Leitk * Monomanzahl
 
 
-  
-  
+
+
 int QlogSize(number n){
-    
+
     if (SR_HDL(n) & SR_INT){
        long i=SR_TO_INT(n);
        if (i==0) return 0;
-       
+
        unsigned long v;
        v=(i>=0)?i:-i;
        int r = 0;
@@ -202,7 +204,7 @@ wlen_type kSBucketLength(kBucket* b, poly lm=NULL)
   }
   else
     c=nSize(coef);
-  
+
   int i;
   for (i=b->buckets_used;i>=0;i--)
   {
@@ -212,7 +214,7 @@ wlen_type kSBucketLength(kBucket* b, poly lm=NULL)
   #ifdef HAVE_COEF_BUCKETS
   assume(b->buckets[0]==kBucketGetLm(b));
   if (b->coef[0]!=NULL){
-    
+
     if (rField_is_Q(currRing)){
       int modifier=QlogSize(pGetCoeff(b->coef[0]));
       c+=modifier;
@@ -267,7 +269,7 @@ wlen_type kSBucketLength(kBucket* b, poly lm=NULL)
   }
   else
     c=nSize(coef);
-  
+
   int i;
   for (i=b->buckets_used;i>=0;i--)
   {
@@ -277,7 +279,7 @@ wlen_type kSBucketLength(kBucket* b, poly lm=NULL)
   #ifdef HAVE_COEF_BUCKETS
   assume(b->buckets[0]==kBucketGetLm(b));
   if (b->coef[0]!=NULL){
-    
+
     if (rField_is_Q(currRing)){
       int modifier=QlogSize(pGetCoeff(b->coef[0]));
       c+=modifier;
@@ -326,7 +328,7 @@ static int do_pELength(poly p, slimgb_alg* c, int dlm=-1){
     s=1;
     pi=p->next;
   }
-  
+
   while(pi){
     int d=pTotaldegree(pi,c->r);
     if(d>dlm)
@@ -346,8 +348,8 @@ wlen_type pELength(poly p, ring r){
     dlm=pTotaldegree(p,r);
     s=1;
     pi=p->next;
- 
-  
+
+
   while(pi){
     int d=pTotaldegree(pi,r);
     if(d>dlm)
@@ -385,7 +387,7 @@ static inline int pELength(poly p, slimgb_alg* c,int l){
 
 
 static inline wlen_type pQuality(poly p, slimgb_alg* c, int l=-1){
-  
+
   if(l<0)
     l=pLength(p);
   if(c->is_char0) {
@@ -432,10 +434,10 @@ wlen_type red_object::guess_quality(slimgb_alg* c){
       if((pLexOrder) &&(!c->is_homog)){
     int cs;
     number coef;
-    
+
     coef=pGetCoeff(kBucketGetLm(bucket));
     //c=nSize(pGetCoeff(kBucketGetLm(b)));
-   
+
     //c=nSize(pGetCoeff(lm));
     if (rField_is_Q(currRing)){
       cs=QlogSize(coef);
@@ -462,14 +464,14 @@ wlen_type red_object::guess_quality(slimgb_alg* c){
       }
       s=kSBucketLength(bucket,NULL);
     }
-    else 
+    else
     {
       if((pLexOrder) &&(!c->is_homog))
   //if (false)
   s=kEBucketLength(this->bucket,this->p,c);
       else s=bucket_guess(bucket);
     }
- 
+
     return s;
 }
 
@@ -603,7 +605,7 @@ static BOOLEAN trivial_syzygie(int pos1,int pos2,poly bound,slimgb_alg* c){
 
   poly p1=c->S->m[pos1];
   poly p2=c->S->m[pos2];
-    
+
 
   if (pGetComp(p1) > 0 || pGetComp(p2) > 0)
     return FALSE;
@@ -611,16 +613,16 @@ static BOOLEAN trivial_syzygie(int pos1,int pos2,poly bound,slimgb_alg* c){
   poly m=NULL;
   poly gcd1=c->gcd_of_terms[pos1];
   poly gcd2=c->gcd_of_terms[pos2];
-  
-  if((gcd1!=NULL) && (gcd2!=NULL)) 
+
+  if((gcd1!=NULL) && (gcd2!=NULL))
     {
       gcd1->next=gcd2; //may ordered incorrect
       m=gcd_of_terms(gcd1,c->r);
       gcd1->next=NULL;
-      
-    } 
 
-  if (m==NULL) 
+    }
+
+  if (m==NULL)
   {
      loop
       {
@@ -632,7 +634,7 @@ static BOOLEAN trivial_syzygie(int pos1,int pos2,poly bound,slimgb_alg* c){
   i++;
       }
   }
-  else 
+  else
   {
     loop
       {
@@ -646,9 +648,9 @@ static BOOLEAN trivial_syzygie(int pos1,int pos2,poly bound,slimgb_alg* c){
       }
   }
 
-  
 
-  
+
+
 }
 
 //! returns position sets w as weight
@@ -662,7 +664,7 @@ int find_best(red_object* r,int l, int u, int &w, slimgb_alg* c){
       w=w2;
       best=i;
     }
-   
+
   }
  return best;
 }
@@ -670,8 +672,8 @@ int find_best(red_object* r,int l, int u, int &w, slimgb_alg* c){
 
 void red_object::canonicalize(){
   kBucketCanonicalize(bucket);
-  
-  
+
+
 }
 BOOLEAN good_has_t_rep(int i, int j,slimgb_alg* c){
   assume(i>=0);
@@ -766,28 +768,28 @@ static int add_to_reductors(slimgb_alg* c, poly h, int len, BOOLEAN simplified){
   P.p=h; /*p_Copy(h,c->r);*/
   P.FDeg=pFDeg(P.p,c->r);
   if (!(simplified)){
-      if (!rField_is_Zp(c->r)){ 
+      if (!rField_is_Zp(c->r)){
         pCleardenom(P.p);
         pContent(P.p); //is a duplicate call, but belongs here
-        
+
       }
-      else                     
+      else
         pNorm(P.p);
     pNormalize(P.p);
   }
   wlen_type pq=pQuality(h,c,len);
   i=simple_posInS(c->strat,h,len,pq);
   c->strat->enterS(P,i,c->strat,-1);
- 
- 
+
+
 
   c->strat->lenS[i]=len;
   assume(pLength(c->strat->S[i])==c->strat->lenS[i]);
   if(c->strat->lenSw!=NULL)
     c->strat->lenSw[i]=pq;
- 
+
   return i;
- 
+
 }
 static void length_one_crit(slimgb_alg* c, int pos, int len)
 {
@@ -863,7 +865,7 @@ static int* make_connections(int from, int to, poly bound, slimgb_alg* c)
   int not_yet_found=cans_length;
   int con_checked=0;
   int pos;
-  
+
   while(TRUE){
     if ((con_checked<connected_length)&& (not_yet_found>0)){
       pos=connected[con_checked];
@@ -956,9 +958,9 @@ static void replace_pair(int & i, int & j,slimgb_alg* c)
 
   pLcm(c->S->m[i], c->S->m[j], lm);
   pSetm(lm);
-  
+
   int* i_con =make_connections(i,j,lm,c);
-  
+
   for (int n=0;((n<c->n) && (i_con[n]>=0));n++){
     if (i_con[n]==j){
       now_t_rep(i,j,c);
@@ -988,9 +990,9 @@ static void replace_pair(int & i, int & j,slimgb_alg* c)
       sugar+=si_max(t_i,t_j);
       //Print("\n max: %d\n",max(t_i,t_j));
     }
-  
-  
-  
+
+
+
 
 
   for (int m=0;((m<c->n) && (i_con[m]>=0));m++){
@@ -1007,8 +1009,8 @@ static void replace_pair(int & i, int & j,slimgb_alg* c)
         if (s1>sugar) continue;}
         if (c->weighted_lengths[j_con[m]]<c->weighted_lengths[j])
             j=j_con[m];
-    } 
-    
+    }
+
      //can also try dependend search
   omfree(i_con);
   omfree(j_con);
@@ -1019,8 +1021,8 @@ static void replace_pair(int & i, int & j,slimgb_alg* c)
 static void add_later(poly p, char* prot, slimgb_alg* c){
     int i=0;
     //check, if it is already in the queue
-   
-    
+
+
     while(c->add_later->m[i]!=NULL){
         if (p_LmEqual(c->add_later->m[i],p,c->r))
             return;
@@ -1068,8 +1070,8 @@ static int iq_crit(const void* ap,const void* bp){
   sorted_pair_node* b=*((sorted_pair_node**)bp);
   assume(a->i>a->j);
   assume(b->i>b->j);
-  
-  
+
+
   if (a->deg<b->deg) return -1;
   if (a->deg>b->deg) return 1;
   int comp=pLmCmp(a->lcm_of_lm, b->lcm_of_lm);
@@ -1100,7 +1102,7 @@ static wlen_type pair_weighted_length(int i, int j, slimgb_alg* c){
         wlen_type res=coeff_mult_size_estimate(c1,c2,c->r);
         res*=el1+el2-2;
         return res;
-        
+
     }
     if (c->is_char0) {
         //int cs=slim_nsize(p_GetCoeff(c->S->m[i],c->r),c->r)+
@@ -1113,7 +1115,7 @@ static wlen_type pair_weighted_length(int i, int j, slimgb_alg* c){
         return (wlen_type)(c->lengths[i]+c->lengths[j]-2)*
             (wlen_type)cs;}
             else {
-            
+
             wlen_type cs=
             coeff_mult_size_estimate(
                 slim_nsize(p_GetCoeff(c->S->m[i],c->r),c->r),
@@ -1128,7 +1130,7 @@ static wlen_type pair_weighted_length(int i, int j, slimgb_alg* c){
         return (c->weighted_lengths[i]+c->weighted_lengths[j]-2);
     }
     return c->lengths[i]+c->lengths[j]-2;
-    
+
 }
 sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slimgb_alg* c, int* ip)
 {
@@ -1181,7 +1183,7 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slim
     ENLARGE(c->weighted_lengths,wlen_type);
     //}
     //ENLARGE(c->S->m,poly);
-    
+
   }
   pEnlargeSet(&c->S->m,c->n-1,1);
   if (c->T_deg_full)
@@ -1190,7 +1192,7 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slim
   if(c->T_deg_full){
     c->T_deg_full[i]=pTotaldegree_full(h);
   }
-  
+
 
   c->tmp_pair_lm[i]=pOne_Special(c->r);
 
@@ -1199,36 +1201,36 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slim
 
 
   c->lengths[i]=pLength(h);
-  
+
   //necessary for correct weighted length
-  
-   if (!rField_is_Zp(c->r)){ 
+
+   if (!rField_is_Zp(c->r)){
     pCleardenom(h);
     pContent(h); //is a duplicate call, but belongs here
-    
+
   }
-  else                     
+  else
     pNorm(h);
   pNormalize(h);
-  
+
   c->weighted_lengths[i]=pQuality(h, c, c->lengths[i]);
   c->gcd_of_terms[i]=got;
   #ifdef HAVE_BOOST
     c->states.push_back(dynamic_bitset<>(i));
-  
+
   #else
   if (i>0)
     c->states[i]=(char*)  omalloc(i*sizeof(char));
   else
     c->states[i]=NULL;
   #endif
-  
+
   c->S->m[i]=h;
   c->short_Exps[i]=p_GetShortExpVector(h,c->r);
- 
+
 #undef ENLARGE
   for (j=0;j<i;j++){
-    
+
 
     #ifndef HAVE_BOOST
     c->states[i][j]=UNCALCULATED;
@@ -1236,7 +1238,7 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slim
     assume(p_LmDivisibleBy(c->S->m[i],c->S->m[j],c->r)==
      p_LmShortDivisibleBy(c->S->m[i],c->short_Exps[i],c->S->m[j],~(c->short_Exps[j]),c->r));
 
-    
+
     if (_p_GetComp(c->S->m[i],c->r)!=_p_GetComp(c->S->m[j],c->r)){
       //c->states[i][j]=UNCALCULATED;
       //WARNUNG: be careful
@@ -1244,7 +1246,7 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slim
     } else
     if ((!c->nc) && (c->lengths[i]==1) && (c->lengths[j]==1)){
       c->states[i][j]=HASTREP;
-      
+
       }
     else if ((!(c->nc)) &&  (pHasNotCF(c->S->m[i],c->S->m[j])))
     {
@@ -1256,7 +1258,7 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slim
     {
       c->states[i][j]=HASTREP;
       c->extended_product_crit++;
-      
+
       //PrintS("E");
     }
       //  if (c->states[i][j]==UNCALCULATED){
@@ -1273,8 +1275,8 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slim
 //             }
 //         }
         if (c->lengths[i]+c->lengths[j]==3){
-            
-            
+
+
              poly short_s=ksCreateShortSpoly(c->S->m[i],c->S->m[j],c->r);
             if (short_s==NULL){
                 c->states[i][j]=HASTREP;
@@ -1304,8 +1306,8 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slim
                      p_Delete(&short_s, currRing);
                      c->states[i][j]=HASTREP;
                 }
-                
-               
+
+
             }
         }
     }
@@ -1317,9 +1319,9 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slim
     s->j=si_min(i,j);
     assume(s->j==j);
     s->expected_length=pair_weighted_length(i,j,c);//c->lengths[i]+c->lengths[j]-2;
-      
+
     poly lm=c->tmp_pair_lm[spc];//=pOne_Special();
-      
+
     pLcm(c->S->m[i], c->S->m[j], lm);
     pSetm(lm);
     s->deg=pTotaldegree(lm);
@@ -1336,18 +1338,18 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slim
     //assume(lm!=NULL);
     nodes[spc]=s;
     spc++;
-  
+
   // }
   //else
   //{
         //c->states[i][j]=HASTREP;
   //}
   }
-  
+
   assume(spc<=i);
   //now ideal quotient crit
   qsort(nodes,spc,sizeof(sorted_pair_node*),iq_crit);
-  
+
     sorted_pair_node** nodes_final=(sorted_pair_node**) omalloc(sizeof(sorted_pair_node*)*i);
   int spc_final=0;
   j=0;
@@ -1358,7 +1360,7 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slim
     BOOLEAN has=FALSE;
     for(upper=lower+1;upper<spc;upper++)
     {
-      
+
       if(!pLmEqual(nodes[lower]->lcm_of_lm,nodes[upper]->lcm_of_lm))
       {
   break;
@@ -1378,7 +1380,7 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slim
   break;
       }
     }
-    
+
     if(has)
     {
       for(;lower<=upper;lower++)
@@ -1395,7 +1397,7 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slim
       nodes[lower]->lcm_of_lm=pCopy(nodes[lower]->lcm_of_lm);
       assume(_p_GetComp(c->S->m[nodes[lower]->i],c->r)==_p_GetComp(c->S->m[nodes[lower]->j],c->r));
       nodes_final[spc_final]=(sorted_pair_node*) omalloc(sizeof(sorted_pair_node));
-      
+
       *(nodes_final[spc_final++])=*(nodes[lower]);
       //c->tmp_spn[nodes[lower]->j]=(sorted_pair_node*) omalloc(sizeof(sorted_pair_node));
       nodes[lower]=NULL;
@@ -1435,8 +1437,8 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slim
   }
   if(!ip){
     qsort(nodes_final,spc_final,sizeof(sorted_pair_node*),tgb_pair_better_gen2);
- 
-    
+
+
     c->apairs=spn_merge(c->apairs,c->pair_top+1,nodes_final,spc_final,c);
     c->pair_top+=spc_final;
     clean_top_of_pair_list(c);
@@ -1448,7 +1450,7 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slim
     return nodes_final;
   }
 
-  
+
 
 }
 
@@ -1465,7 +1467,7 @@ static poly redNF2 (poly h,slimgb_alg* c , int &len, number&  m,int n)
     return h;
   }
   int j;
- 
+
   LObject P(h);
   P.SetShortExpVector();
   P.bucket = kBucketCreate(currRing);
@@ -1487,7 +1489,7 @@ static poly redNF2 (poly h,slimgb_alg* c , int &len, number&  m,int n)
          (strat->lenSw[j]<=n)))))
       {
 
-  
+
         nNormalize(pGetCoeff(P.p));
 #ifdef KDEBUG
         if (TEST_OPT_DEBUG)
@@ -1498,7 +1500,7 @@ static poly redNF2 (poly h,slimgb_alg* c , int &len, number&  m,int n)
           wrp(strat->S[j]);
         }
 #endif
-       
+
         number coef=kBucketPolyRed(P.bucket,strat->S[j],
                                    strat->lenS[j]/*pLength(strat->S[j])*/,
                                    strat->kNoether);
@@ -1507,11 +1509,11 @@ static poly redNF2 (poly h,slimgb_alg* c , int &len, number&  m,int n)
   m=m2;
         nDelete(&coef);
         h = kBucketGetLm(P.bucket);
-  
+
   if (h==NULL) {
     len=0;
     kBucketDestroy(&P.bucket);
-    return 
+    return
     NULL;}
         P.p=h;
         P.t_p=NULL;
@@ -1565,7 +1567,7 @@ static void line_of_extended_prod(int fixpos,slimgb_alg* c){
 {
           c->states[fixpos][i]=HASTREP;
     c->extended_product_crit++;
-}     
+}
       for(i=fixpos+1;i<c->n;i++)
         if((c->states[i][fixpos]!=HASTREP)&& (extended_product_criterion(c->S->m[fixpos],c->gcd_of_terms[fixpos], c->S->m[i],c->gcd_of_terms[i],c)))
   {        c->states[i][fixpos]=HASTREP;
@@ -1665,10 +1667,10 @@ static void go_on (slimgb_alg* c){
   int curr_deg=-1;
   while(i<PAR_N){
     sorted_pair_node* s=top_pair(c);//here is actually chain criterium done
-    
-   
+
+
     if (!s) break;
-    
+
     if(curr_deg>=0){
       if (s->deg >curr_deg) break;
     }
@@ -1679,7 +1681,7 @@ static void go_on (slimgb_alg* c){
       //be careful replace_pair use createShortSpoly which is not noncommutative
       now_t_rep(s->i,s->j,c);
     replace_pair(s->i,s->j,c);
-    
+
     if(s->i==s->j) {
       free_sorted_pair_node(s,c->r);
       continue;
@@ -1692,7 +1694,7 @@ static void go_on (slimgb_alg* c){
   h=ksOldCreateSpoly(c->S->m[s->i], c->S->m[s->j], NULL, c->r);
       else
   h= nc_CreateSpoly(c->S->m[s->i], c->S->m[s->j], NULL, c->r);
-    } 
+    }
     else
       h=s->lcm_of_lm;
     // if(s->i>=0)
@@ -1708,7 +1710,7 @@ static void go_on (slimgb_alg* c){
     if(!h) continue;
     int len=pLength(h);
     p[i]=h;
-    
+
     i++;
   }
   p[i]=NULL;
@@ -1728,7 +1730,7 @@ static void go_on (slimgb_alg* c){
     buf[j].p=p[j];
     buf[j].sev=pGetShortExpVector(p[j]);
     buf[j].bucket = kBucketCreate(currRing);
-    
+
     int len=pLength(p[j]);
     kBucketInit(buf[j].bucket,buf[j].p,len);
     buf[j].initial_quality=buf[j].guess_quality(c);
@@ -1793,12 +1795,12 @@ static void go_on (slimgb_alg* c){
           new_pos=simple_posInS(c->strat,c->strat->S[z2],strat->lenS[z2],strat->Sw[z2]);
       else
           new_pos=simple_posInS(c->strat,c->strat->S[z2],strat->lenS[z2],lenS[z2]);
-      
+
       if (new_pos<z2)
-      { 
+      {
          move_forward_in_S(z2,new_pos,c->strat);
       }
-      
+
       assume(new_pos<=z2);
     }
   }
@@ -1813,7 +1815,7 @@ static void go_on (slimgb_alg* c){
   c->expandS=NULL;
 #endif
   if (TEST_OPT_PROT)
-      Print("%i]",i); 
+      Print("%i]",i);
 
   int* ibuf=(int*) omalloc(i*sizeof(int));
   sorted_pair_node*** sbuf=(sorted_pair_node***) omalloc(i*sizeof(sorted_pair_node**));
@@ -1859,14 +1861,14 @@ static void go_on (slimgb_alg* c){
   }
 #endif
   if (TEST_OPT_PROT)
-      Print("(%d)",c->pair_top+1); 
+      Print("(%d)",c->pair_top+1);
   while(!(idIs0(c->add_later))){
     ideal add=c->add_later;
     idSkipZeroes(add);
     for(j=0;j<add->idelems();j++){
         assume(pLength(add->m[j])==1);
         p_SetCoeff(add->m[j],n_Init(1,currRing),currRing);
-        
+
     }
     ideal add2=kInterRed(add,NULL);
     id_Delete(&add,currRing);
@@ -1881,7 +1883,7 @@ static void go_on (slimgb_alg* c){
     int i=add2->idelems();
     int* ibuf=(int*) omalloc(i*sizeof(int));
   sorted_pair_node*** sbuf=(sorted_pair_node***) omalloc(i*sizeof(sorted_pair_node**));
-  
+
   for(j=0;j<i;j++)
   {
     int len;
@@ -1891,7 +1893,7 @@ static void go_on (slimgb_alg* c){
     //kBucketDestroy(&buf[j].bucket);
     p=add2->m[j];
     add2->m[j]=NULL;
-  
+
     sbuf[j]=add_to_basis_ideal_quotient(p,-1,-1,c,ibuf+j);
     //sbuf[j]=add_to_basis(p,-1,-1,c,ibuf+j);
   }
@@ -2054,7 +2056,7 @@ poly free_row_to_poly(tgb_sparse_matrix* mat, int row, poly* monoms, int monom_i
     mac_poly old=r;
     r=r->next;
     delete old;
-    
+
   }
   return p;
 
@@ -2084,11 +2086,11 @@ static int poly_crit(const void* ap1, const void* ap2){
   return 0;
 }
 slimgb_alg::slimgb_alg(ideal I, BOOLEAN F4){
-  
-  
+
+
   r=currRing;
   nc=rIsPluralRing(r);
-  
+
   is_homog=TRUE;
   {
     int hz;
@@ -2122,7 +2124,7 @@ slimgb_alg::slimgb_alg(ideal I, BOOLEAN F4){
   //not fully correct
   //(rChar()==0);
   F4_mode=F4;
-  
+
   if ((!F4_mode)&&(!is_homog) &&(pLexOrder)){
     this->doubleSugar=TRUE;
   }
@@ -2141,16 +2143,16 @@ slimgb_alg::slimgb_alg(ideal I, BOOLEAN F4){
 
   normal_forms=0;
   current_degree=1;
- 
+
   max_pairs=5*I->idelems();
- 
+
   apairs=(sorted_pair_node**) omalloc(sizeof(sorted_pair_node*)*max_pairs);
   pair_top=-1;
 
   int n=I->idelems();
   array_lengths=n;
 
-  
+
   i=0;
   this->n=0;
   T_deg=(int*) omalloc(n*sizeof(int));
@@ -2167,14 +2169,14 @@ slimgb_alg::slimgb_alg(ideal I, BOOLEAN F4){
   /* omUnGetSpecBin(&(c->HeadBin)); */
   #ifndef HAVE_BOOST
   h=omalloc(n*sizeof(char*));
-  
+
   states=(char**) h;
   #endif
   h=omalloc(n*sizeof(int));
   lengths=(int*) h;
   weighted_lengths=(wlen_type*)omalloc(n*sizeof(wlen_type));
   gcd_of_terms=(poly*) omalloc(n*sizeof(poly));
-  
+
   short_Exps=(long*) omalloc(n*sizeof(long));
   if (F4_mode)
     S=idInit(n,I->rank);
@@ -2220,11 +2222,11 @@ slimgb_alg::slimgb_alg(ideal I, BOOLEAN F4){
       si->j=-2;
       si->expected_length=pQuality(I->m[i],this,pLength(I->m[i]));
       si->deg=pTotaldegree(I->m[i]);
-      if (!rField_is_Zp(r)){ 
+      if (!rField_is_Zp(r)){
         pCleardenom(I->m[i]);
       }
       si->lcm_of_lm=I->m[i];
-      
+
       //      c->apairs[n-1-i]=si;
       apairs[n-i-1]=si;
       ++(pair_top);
@@ -2292,7 +2294,7 @@ slimgb_alg::~slimgb_alg(){
   }
   omfree(c->tmp_pair_lm);
   omfree(c->tmp_spn);
- 
+
   omfree(c->T_deg);
   if(c->T_deg_full)
     omfree(c->T_deg_full);
@@ -2301,7 +2303,7 @@ slimgb_alg::~slimgb_alg(){
   omFree(c->strat->sevS);
 //   initsevS(i);
   omFree(c->strat->S_2_R);
-   
+
 
   omFree(c->strat->lenS);
 
@@ -2323,7 +2325,7 @@ slimgb_alg::~slimgb_alg(){
     Print("applied %i product crit, %i extended_product crit \n", c->easy_product_crit, c->extended_product_crit);
   }
   int deleted_form_c_s=0;
-  
+
   for(i=0;i<=c->strat->sl;i++){
     if (!c->strat->S[i]) continue;
     BOOLEAN found=FALSE;
@@ -2348,13 +2350,13 @@ slimgb_alg::~slimgb_alg(){
 //     }
 //   }
 
- 
+
   for(i=0;i<c->n;i++)
   {
     assume(c->S->m[i]!=NULL);
     for(j=0;j<c->n;j++)
     {
-      if((c->S->m[j]==NULL)||(i==j)) 
+      if((c->S->m[j]==NULL)||(i==j))
         continue;
       assume(p_LmShortDivisibleBy(c->S->m[j],c->short_Exps[j],
              c->S->m[i],~c->short_Exps[i],
@@ -2371,10 +2373,10 @@ slimgb_alg::~slimgb_alg(){
     }
   }
   omfree(c->short_Exps);
-  
+
 
   ideal I=c->S;
-  
+
   IDELEMS(I)=c->n;
 
   idSkipZeroes(I);
@@ -2386,20 +2388,21 @@ slimgb_alg::~slimgb_alg(){
   delete c->strat;
 }
 ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
-  
+
   //  Print("QlogSize(0) %d, QlogSize(1) %d,QlogSize(-2) %d, QlogSize(5) %d\n", QlogSize(nlInit(0)),QlogSize(nlInit(1)),QlogSize(nlInit(-2)),QlogSize(nlInit(5)));
- 
+
   if (TEST_OPT_PROT)
     if (F4_mode)
       PrintS("F4 Modus \n");
-     
+
   //debug_Ideal=arg_debug_Ideal;
   //if (debug_Ideal) PrintS("DebugIdeal received\n");
   // Print("Idelems %i \n----------\n",IDELEMS(arg_I));
   ideal I=idCompactify(arg_I);
    int i;
-  for(i=0;i<IDELEMS(I);i++){
-    simplify_poly(I->m[i],currRing);
+  for(i=0;i<IDELEMS(I);i++)
+  {
+    if (I->m[i]!=NULL) simplify_poly(I->m[i],currRing);
   }
   if (idIs0(I)) return I;
 
@@ -2407,7 +2410,7 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
   //Print("Idelems %i \n----------\n",IDELEMS(I));
   //slimgb_alg* c=(slimgb_alg*) omalloc(sizeof(slimgb_alg));
   slimgb_alg* c=new slimgb_alg(I, F4_mode);
-    
+
 
   while(c->pair_top>=0)
   {
@@ -2481,7 +2484,7 @@ static void shorten_tails(slimgb_alg* c, poly monom)
   for(int i=0;i<c->n;i++)
   {
     //enter tail
-    
+
     if (c->S->m[i]==NULL) continue;
     poly tail=c->S->m[i]->next;
     poly prev=c->S->m[i];
@@ -2630,7 +2633,7 @@ static int tgb_pair_better_gen(const void* ap,const void* bp){
 //  if (a->expected_length<b->expected_length) return -1;
   // if (a->expected_length>b->expected_length) return 1;
  int comp=pLmCmp(a->lcm_of_lm, b->lcm_of_lm);
-  
+
   if (comp==1) return 1;
   if (-1==comp) return -1;
   if (a->i+a->j<b->i+b->j) return -1;
@@ -2654,10 +2657,10 @@ static poly gcd_of_terms(poly p, ring r){
   if (pGetExp(m,i)>0)
     max_g_0=i;
   }
-  
+
   t=p->next;
   while (t!=NULL){
-    
+
     if (max_g_0==0) break;
     for (i=max_g_0; i; i--)
     {
@@ -2714,7 +2717,7 @@ static poly kBucketGcd(kBucket* b, ring r)
   poly m, n;
   BOOLEAN initialized=FALSE;
   for (i=MAX_BUCKET-1;i>=0;i--)
-  { 
+  {
     if (b->buckets[i]!=NULL){
       if (!initialized){
   m=gcd_of_terms(b->buckets[i],r);
@@ -2726,7 +2729,7 @@ static poly kBucketGcd(kBucket* b, ring r)
     n=gcd_of_terms(b->buckets[i],r);
     if (n==NULL) {
       pDelete(&m);
-      return NULL;    
+      return NULL;
     }
     n->next=m;
     poly t=gcd_of_terms(n,r);
@@ -2735,7 +2738,7 @@ static poly kBucketGcd(kBucket* b, ring r)
     pDelete(&n);
     m=t;
     if (m==NULL) return NULL;
-    
+
   }
     }
   }
@@ -2796,10 +2799,10 @@ static void multi_reduction_lls_trick(red_object* los, int losl,slimgb_alg* c,fi
     swap_roles=FALSE;
       }
       else{
-  
+
   swap_roles=FALSE;
       }
-  
+
     }
       else
     {
@@ -2829,7 +2832,7 @@ static void multi_reduction_lls_trick(red_object* los, int losl,slimgb_alg* c,fi
     }
   }
       }
-      else 
+      else
       {
   assume(erg.to_reduce_u==erg.to_reduce_l);
   wlen_type quality_a=
@@ -2849,7 +2852,7 @@ static void multi_reduction_lls_trick(red_object* los, int losl,slimgb_alg* c,fi
          //Print("\n qc is %lld \n",qc);
          exp=TRUE;
       }
-        
+
       else {
          if (qc<quality_a/2)
           exp=TRUE;
@@ -2865,18 +2868,18 @@ static void multi_reduction_lls_trick(red_object* los, int losl,slimgb_alg* c,fi
         kBucketInit(los[erg.to_reduce_u].bucket,clear_into,erg.expand_length);
         if (TEST_OPT_PROT)
     PrintS("e");
-        
+
       }
     }
   }
 
-  
+
       }
-      
+
       swap_roles=FALSE;
       return;
       }
-    
+
   }
   else{
     if(erg.reduce_by>erg.to_reduce_u){
@@ -2886,7 +2889,7 @@ static void multi_reduction_lls_trick(red_object* los, int losl,slimgb_alg* c,fi
       wlen_type quality_a=los[erg.reduce_by].guess_quality(c);
       int qc;
       best=find_best(los,erg.to_reduce_l,erg.to_reduce_u,qc,c);
-      
+
       int i;
       if(qc<quality_a){
     red_object h=los[erg.reduce_by];
@@ -2895,8 +2898,8 @@ static void multi_reduction_lls_trick(red_object* los, int losl,slimgb_alg* c,fi
   }
   swap_roles=FALSE;
   return;
-  
-    
+
+
     }
     else
     {
@@ -2917,7 +2920,7 @@ static void multi_reduction_lls_trick(red_object* los, int losl,slimgb_alg* c,fi
       }
       swap_roles=FALSE;
     }
-  
+
   }
   if(swap_roles)
   {
@@ -2936,7 +2939,7 @@ static void multi_reduction_lls_trick(red_object* los, int losl,slimgb_alg* c,fi
     los[bp].p=p;
     kBucketInit(los[bp].bucket,p,old_length);
     wlen_type qal=pQuality(clear_into,c,new_length);
-    int pos_in_c=-1;    
+    int pos_in_c=-1;
     int z;
     int new_pos;
     new_pos=simple_posInS(c->strat,clear_into,new_length, qal);
@@ -2966,7 +2969,7 @@ static void multi_reduction_lls_trick(red_object* los, int losl,slimgb_alg* c,fi
     }
     c->strat->S[j]=clear_into;
     c->strat->lenS[j]=new_length;
-    
+
     assume(pLength(clear_into)==new_length);
     if(c->strat->lenSw!=NULL)
       c->strat->lenSw[j]=qal;
@@ -2975,7 +2978,7 @@ static void multi_reduction_lls_trick(red_object* los, int losl,slimgb_alg* c,fi
       pContent(clear_into);
       pCleardenom(clear_into);//should be unnecessary
     }
-    else                     
+    else
       pNorm(clear_into);
 #ifdef FIND_DETERMINISTIC
     erg.reduce_by=j;
@@ -2983,9 +2986,9 @@ static void multi_reduction_lls_trick(red_object* los, int losl,slimgb_alg* c,fi
     //during multireduction if spolys are only in the span of the
     //input polys
 #else
-    
+
     if (new_pos<j)
-    { 
+    {
       move_forward_in_S(j,new_pos,c->strat);
       erg.reduce_by=new_pos;
     }
@@ -2995,10 +2998,10 @@ static void multi_reduction_lls_trick(red_object* los, int losl,slimgb_alg* c,fi
 static int fwbw(red_object* los, int i){
    int i2=i;
    int step=1;
-   
+
    BOOLEAN bw=FALSE;
    BOOLEAN incr=TRUE;
-   
+
    while(1)
    {
      if(!bw)
@@ -3006,7 +3009,7 @@ static int fwbw(red_object* los, int i){
        step=si_min(i2,step);
        if (step==0) break;
        i2-=step;
-    
+
        if(!pLmEqual(los[i].p,los[i2].p))
        {
    bw=TRUE;
@@ -3016,12 +3019,12 @@ static int fwbw(red_object* los, int i){
        {
    if ((!incr) &&(step==1)) break;
        }
-       
-       
+
+
      }
      else
      {
-       
+
        step=si_min(i-i2,step);
        if (step==0) break;
        i2+=step;
@@ -3032,7 +3035,7 @@ static int fwbw(red_object* los, int i){
      bw=FALSE;
    }
        }
-       
+
      }
      if (incr)
        step*=2;
@@ -3042,7 +3045,7 @@ static int fwbw(red_object* los, int i){
    step=(step+1)/2;
        else
    step/=2;
-       
+
      }
    }
    return i2;
@@ -3061,14 +3064,14 @@ static void multi_reduction_find(red_object* los, int losl,slimgb_alg* c,int sta
   assume(startf<=losl);
   assume((startf==losl-1)||(pLmCmp(los[startf].p,los[startf+1].p)==-1));
   int i=startf;
-  
+
   int j;
   while(i>=0){
     assume((i==losl-1)||(pLmCmp(los[i].p,los[i+1].p)<=0));
     assume(is_valid_ro(los[i]));
     j=kFindDivisibleByInS_easy(strat,los[i]);
     if(j>=0){
-     
+
       erg.to_reduce_u=i;
       erg.reduce_by=j;
       erg.fromS=TRUE;
@@ -3084,15 +3087,15 @@ static void multi_reduction_find(red_object* los, int losl,slimgb_alg* c,int sta
       return;
     }
     if (j<0){
-      
+
       //not reduceable, try to use this for reducing higher terms
       int i2=fwbw(los,i);
       assume(pLmEqual(los[i].p,los[i2].p));
       assume((i2==0)||(!pLmEqual(los[i2].p,los[i2-1].p)));
       assume(i>=i2);
       if(i2!=i){
-  
-  
+
+
   erg.to_reduce_u=i-1;
   erg.to_reduce_l=i2;
   erg.reduce_by=i;
@@ -3131,7 +3134,7 @@ static void multi_reduction_find(red_object* los, int losl,slimgb_alg* c,int sta
  //  nicht reduzierbare eintraege in ergebnisliste schreiben
 //   nullen loeschen
 //   while(finde_groessten leitterm reduzierbar(c,erg)){
-  
+
 static int multi_reduction_clear_zeroes(red_object* los, int  losl, int l, int u)
 {
 
@@ -3141,11 +3144,11 @@ static int multi_reduction_clear_zeroes(red_object* los, int  losl, int l, int u
   int last=-1;
   while(i<=u)
   {
-    
+
     if(los[i].p==NULL){
       kBucketDestroy(&los[i].bucket);
 //      delete los[i];//here we assume los are constructed with new
-      //destroy resources, must be added here   
+      //destroy resources, must be added here
      if (last>=0)
      {
        memmove(los+(int)(last+1-deleted),los+(last+1),sizeof(red_object)*(i-1-last));
@@ -3158,7 +3161,7 @@ static int multi_reduction_clear_zeroes(red_object* los, int  losl, int l, int u
   if((last>=0)&&(last!=losl-1))
       memmove(los+(int)(last+1-deleted),los+last+1,sizeof(red_object)*(losl-1-last));
   return deleted;
-  
+
 }
 
 static void sort_region_down(red_object* los, int l, int u, slimgb_alg* c)
@@ -3194,7 +3197,7 @@ static void multi_reduction(red_object* los, int & losl, slimgb_alg* c)
   assume(losl>0);
   int i;
   wlen_type max_initial_quality=0;
-  
+
   for(i=0;i<losl;i++){
     los[i].sev=pGetShortExpVector(los[i].p);
 //SetShortExpVector();
@@ -3213,7 +3216,7 @@ static void multi_reduction(red_object* los, int & losl, slimgb_alg* c)
 //  nicht reduzierbare einträge in ergebnisliste schreiben
   // nullen loeschen
   while(curr_pos>=0){
-    
+
     find_erg erg;
     multi_reduction_find(los, losl,c,curr_pos,erg);//last argument should be curr_pos
     if(erg.reduce_by<0) break;
@@ -3222,17 +3225,17 @@ static void multi_reduction(red_object* los, int & losl, slimgb_alg* c)
 
     erg.expand=NULL;
     int d=erg.to_reduce_u-erg.to_reduce_l+1;
-   
-    
+
+
     multi_reduction_lls_trick(los,losl,c,erg);
-    
-    
+
+
     int i;
     int len;
     //    wrp(los[erg.to_reduce_u].p);
     //Print("\n");
     multi_reduce_step(erg,los,c);
-   
+
 
     if(!K_TEST_OPT_REDTHROUGH){
   for(i=erg.to_reduce_l;i<=erg.to_reduce_u;i++){
@@ -3240,7 +3243,7 @@ static void multi_reduction(red_object* los, int & losl, slimgb_alg* c)
      {
          //
          assume(los[i].initial_quality>0);
-         
+
                if(los[i].guess_quality(c)
                   >1.5*delay_factor*max_initial_quality){
                        if (TEST_OPT_PROT)
@@ -3256,10 +3259,10 @@ static void multi_reduction(red_object* los, int & losl, slimgb_alg* c)
                                delay_s++;
 
                                los[i].p=NULL;
-                      
+
                       }
                   }
-            
+
             }
      }
   }
@@ -3274,7 +3277,7 @@ static void multi_reduction(red_object* los, int & losl, slimgb_alg* c)
     //Print("deleted %i \n",deleted);
     if ((TEST_V_UPTORADICAL) &&(!(erg.fromS)))
         sort_region_down(los,si_min(erg.to_reduce_l,erg.reduce_by),(si_max(erg.to_reduce_u,erg.reduce_by))-deleted,c);
-    else    
+    else
     sort_region_down(los, erg.to_reduce_l, erg.to_reduce_u-deleted, c);
 
 
@@ -3290,14 +3293,14 @@ static void multi_reduction(red_object* los, int & losl, slimgb_alg* c)
       add_to_reductors(c,erg.expand,erg.expand_length);
 #endif
     }
-      
+
   }
-  
+
 
   sorted_pair_node** pairs=(sorted_pair_node**)
-    omalloc(delay_s*sizeof(sorted_pair_node*)); 
+    omalloc(delay_s*sizeof(sorted_pair_node*));
   for(i=0;i<delay_s;i++){
-       
+
       poly p=delay[i];
       //if (rPar(c->r)==0)
       simplify_poly(p,c->r);
@@ -3312,7 +3315,7 @@ static void multi_reduction(red_object* los, int & losl, slimgb_alg* c)
       }
       si->expected_length=pQuality(p,c,pLength(p));
       si->deg=pTotaldegree(p);
-     
+
       si->lcm_of_lm=p;
       pairs[i]=si;
   }
@@ -3337,7 +3340,7 @@ int red_object::clear_to_poly(){
   return l;
 }
 
-  
+
 
 
 
@@ -3362,14 +3365,14 @@ void simple_reducer::reduce(red_object* r, int l, int u){
 
 
   for(i=l;i<=u;i++){
-  
+
 
 
     this->do_reduce(r[i]);
- 
+
   }
   for(i=l;i<=u;i++){
-  
+
     kBucketSimpleContent(r[i].bucket);
     r[i].validate();
     #ifdef TGB_DEBUG
@@ -3383,9 +3386,9 @@ simple_reducer::~simple_reducer(){
     kBucketInit(fill_back,p,p_len);
   }
   fill_back=NULL;
-    
+
 }
- 
+
 void multi_reduce_step(find_erg & erg, red_object* r, slimgb_alg* c){
   static int id=0;
   id++;
@@ -3405,18 +3408,18 @@ void multi_reduce_step(find_erg & erg, red_object* r, slimgb_alg* c){
   {
     r[rn].flatten();
     kBucketClear(r[rn].bucket,&red,&red_len);
-    
+
     if (!rField_is_Zp(c->r))
     {
       pContent(red);
       pCleardenom(red);//should be unnecessary
-     
+
     }
     pNormalize(red);
-    
+
 
     if ((!(erg.fromS))&&(TEST_V_UPTORADICAL)){
-         
+
          if (polynomial_root(red,c->r))
             lt_changed=TRUE;
             sev=p_GetShortExpVector(red,c->r);}
@@ -3452,14 +3455,14 @@ void multi_reduce_step(find_erg & erg, red_object* r, slimgb_alg* c){
     red=red_cp;
     red_len=pLength(red);
     // pDelete(&m);
-    
+
   }
   int i;
 
 
 
   assume(red_len==pLength(red));
- 
+
   pointer=new simple_reducer(red,red_len,c);
 
   if ((!work_on_copy) && (!erg.fromS))
@@ -3476,11 +3479,11 @@ void multi_reduce_step(find_erg & erg, red_object* r, slimgb_alg* c){
     assume(!erg.fromS);
     r[erg.reduce_by].sev=sev;
   }
-  
+
 };
 
 
 
- 
+
 void simple_reducer:: pre_reduce(red_object* r, int l, int u){}
 
