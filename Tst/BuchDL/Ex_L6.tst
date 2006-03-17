@@ -63,7 +63,7 @@ if (not(defined(triang_solve))){ LIB "solve.lib"; }
 triang_solve(T,20);      // 20 digits should be displayed
 //->   // ** Laguerre: Too many iterations!
 //->   // ** rootContainer::solver: No roots found!
-LIB "primdec.lib";
+if (not(defined(primdecGTZ))){ LIB "primdec.lib"; }
 list TR;
 int k,j;
 for (k=1; k<=size(T); k++) 

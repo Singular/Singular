@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: primdec.lib,v 1.111 2006-03-16 15:50:39 Singular Exp $";
+version="$Id: primdec.lib,v 1.112 2006-03-17 14:22:16 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -1650,12 +1650,7 @@ EXAMPLE: example clearSB; shows an example
  while(j<c-1)
  {
    j++;
-   if(deg(i[j])==0)
-   {
-     i=ideal(1);
-     return(i);
-   }
-   if(deg(i[j])>0)
+   if(deg(i[j])>=0)
    {
       m=leadexp(i[j]);
       for(k=j+1;k<=c;k++)
@@ -2077,7 +2072,7 @@ EXAMPLE: example minAssPrimes; shows an example
    {
       int di=vdim(i);
       execute ("ring gnir=("+charstr(P)+"),("+varstr(P)+"),lp;");
-      ideal J=interred(imap(P,i));
+      ideal J=std(imap(P,i));
       attrib(J,"isSB",1);
       if(vdim(J)!=di)
       {
@@ -2605,7 +2600,7 @@ NOTE:    Algorithm of Gianni/Trager/Zacharias
 EXAMPLE: example decomp; shows an example
 "
 {
-  intvec op;
+  intvec op,@vv;
   def  @P = basering;
   list primary,indep,ltras;
   intvec @vh,isat,@w;
@@ -3021,7 +3016,7 @@ EXAMPLE: example decomp; shows an example
      execute(quotring);
    
      ideal @jj=imap(gnir1,@jj);
-     intvec @vv=clearSBNeu(@jj,fett);  //!! vorn vereinbaren
+     @vv=clearSBNeu(@jj,fett);  //!! vorn vereinbaren
      setring gnir1;
      @k=size(@j);
      for (lauf=1;lauf<=@k;lauf++)
