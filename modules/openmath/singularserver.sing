@@ -1,0 +1,41 @@
+ring r=0,(x,y,z,a,b),lp;
+poly f=37x3y+x2yz;
+ideal i=x*(x-1),y;
+LIB "primdec.lib";
+//LIB "poly.lib";
+ideal p1=x2,y;
+ideal p2=(x-1),(y-5)^2;
+ideal p3=(x)^2;
+ideal big=intersect(intersect(p1,p2),p3);
+ideal i2=cyclic(5);
+
+print(i2);
+LIB("/Users/michael/sing2/modules/python/python_module.so");
+Python_module::python("from interpreter import SingularGlobalsProxy
+#import psyco
+import sys
+sys.argv=['Singular']
+#import sre_compile
+#psyco.bind(sre_compile._optimize_charset)
+#psyco.log()
+#psyco.profile()
+from cas.singular import *
+from context import *
+context=Context()
+from lxmlencoder import encode as xml
+
+import cd.polyd as polyd
+import cd.fieldname1 as fieldname1
+import cas.singular
+import cd.list1
+import cd.arith1
+import cd.primdec
+context.addCDImplementation(cd.list1.implementation)
+context.addCDImplementation(cd.primdec.implementation)
+context.addCDImplementation(polyd.implementation)
+context.addCDImplementation(fieldname1.implementation)
+context.addCDImplementation(cd.arith1.implementation)
+import server
+server.run_OM_server(context)
+");
+$
