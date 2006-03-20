@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.13 2006-03-10 12:53:19 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.14 2006-03-20 20:33:56 wienand Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -265,14 +265,14 @@ poly kFindZeroPoly(poly input_p, ring leadRing, ring tailRing)
         }
         else
         {
-          tmp3 = p_ISet((long) tmp1, tailRing);
+          tmp3 = p_NSet(nCopy(tmp1), tailRing);
           zeroPoly = p_Mult_q(zeroPoly, p_Add_q(tmp3, tmp2, tailRing), tailRing);
         }
       }
     }
     p_Setm(lead_mult, tailRing);
     zeroPoly = p_Mult_mm(zeroPoly, lead_mult, tailRing);
-    tmp2 = p_ISet((long) pGetCoeff(zeroPoly), leadRing);
+    tmp2 = p_NSet(nCopy(pGetCoeff(zeroPoly)), leadRing);
     for (int i = 1; i <= leadRing->N; i++) {
       pSetExp(tmp2, i, p_GetExp(zeroPoly, i, tailRing));
     }
@@ -992,7 +992,12 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
       // enter into S, L, and T
       enterT(strat->P, strat);
-      enterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
+#ifdef HAVE_RING2TOM
+      if (currRing->cring == 1)
+        superenterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
+      else
+#endif
+        enterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
       // posInS only depends on the leading term
       strat->enterS(strat->P, pos, strat, strat->tl);
       if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);

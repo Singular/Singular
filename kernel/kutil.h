@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.14 2006-03-10 16:34:17 Singular Exp $ */
+/* $Id: kutil.h,v 1.15 2006-03-20 20:33:57 wienand Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -393,6 +393,8 @@ int redHoney (LObject* h, kStrategy strat);
 #ifdef HAVE_RING2TOM
 int redRing2toM (LObject* h,kStrategy strat);
 long twoPow(long arg);
+void enterExtendedSpoly(poly h,kStrategy strat);
+void superenterpairs (poly h,int k,int ecart,int pos,kStrategy strat, int atR = -1);
 #endif
 int redLazy (LObject* h,kStrategy strat);
 int redHomog (LObject* h,kStrategy strat);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.20 2006-03-10 16:37:01 Singular Exp $ */
+/* $Id: kutil.cc,v 1.21 2006-03-20 20:33:56 wienand Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -977,6 +977,155 @@ BOOLEAN sugarDivisibleBy(int ecart1, int ecart2)
   return (ecart1 <= ecart2);
 }
 
+#ifdef HAVE_RING2TOM
+/* TODO move to numbers.cc
+ */
+inline int nComp(long a, long b)
+{
+  assume(a != 0 && b != 0);
+  while (a % 2 == 0 && b % 2 == 0)
+  {
+    a = a / 2;
+    b = b / 2;
+  }
+  if (a % 2 == 0)
+  {
+    return -1;
+  }
+  else
+  {
+    if (b % 2 == 1) 
+    {
+      return 0;
+    }
+    else
+    {
+      return 1;
+    }
+  }
+}
+
+/*2
+* put the pair (s[i],p)  into the set B, ecart=ecart(p) (ring case)
+*/
+void enterOnePairRing (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR = -1)
+{
+  assume(i<=strat->sl);
+  int      l,j,compare,compareCoeff;
+  LObject  Lp;
+
+  if (strat->interred_flag) return;
+#ifdef KDEBUG
+  Lp.ecart=0; Lp.length=0;
+#endif
+  /*- computes the lcm(s[i],p) -*/
+  Lp.lcm = pInit();
+
+  pLcm(p,strat->S[i],Lp.lcm);
+  pSetm(Lp.lcm);
+  pSetCoeff(Lp.lcm, nLcm(pGetCoeff(p), pGetCoeff(strat->S[i]), currRing));
+  if (strat->sugarCrit)
+  {
+  	WarnS("Sugar Criterion not yet available on in the ring case");
+  }
+  else /*sugarcrit*/
+  {
+      // basic product criterion
+      if (pHasNotCF(p,strat->S[i]) && (long) pGetCoeff(p) % 2 == 1 && (long) pGetCoeff(strat->S[i]) % 2 == 1)
+      {
+          strat->cp++;
+          pLmFree(Lp.lcm);
+          Lp.lcm=NULL;
+          return;
+      }
+      if (strat->fromT) // && (strat->ecartS[i]>ecart))
+      {
+          WarnS("Sugar Criterion not yet available on in the ring case");
+      }
+      /*
+      *the set B collects the pairs of type (S[j],p)
+      *suppose (r,p) is in B and (s,p) is the new pair and lcm(s,p)#lcm(r,p)
+      *if the leading term of s devides lcm(r,p) then (r,p) will be canceled
+      *if the leading term of r devides lcm(s,p) then (s,p) will not enter B
+      */
+      for(j = strat->Bl;j>=0;j--)
+      {
+        compare=pDivComp(strat->B[j].lcm,Lp.lcm);
+        compareCoeff = nComp((long) pGetCoeff(strat->B[j].lcm), (long) pGetCoeff(Lp.lcm));
+        if (compareCoeff == 0 || compare == compareCoeff)
+        {
+          if (compare==1)
+          {
+            strat->c3++;
+            if ((strat->fromQ==NULL) || (isFromQ==0) || (strat->fromQ[i]==0))
+            {
+              pLmFree(Lp.lcm);
+              return;
+            }
+            break;
+          }
+          else
+          if (compare ==-1)
+          {
+            deleteInL(strat->B,&strat->Bl,j,strat);
+            strat->c3++;
+          }
+        }
+      }
+    }
+  /*
+  *the pair (S[i],p) enters B if the spoly != 0
+  */
+  /*-  compute the short s-polynomial -*/
+  if ((strat->S[i]==NULL) || (p==NULL)) return;
+  pNorm(p);
+  if ((strat->fromQ!=NULL) && (isFromQ!=0) && (strat->fromQ[i]!=0))
+  {
+    WarnS("Oliver weiss nicht, was dieses genau macht.");
+    Lp.p=NULL;
+  }
+  else
+  {
+    Lp.p = ksCreateShortSpoly(strat->S[i],p, strat->tailRing);
+  }
+  if (Lp.p == NULL)
+  {
+    /*- the case that the s-poly is 0 -*/
+    if (strat->pairtest==NULL) initPairtest(strat);
+    strat->pairtest[i] = TRUE;/*- hint for spoly(S^[i],p)=0 -*/
+    strat->pairtest[strat->sl+1] = TRUE;
+    /*hint for spoly(S[i],p) == 0 for some i,0 <= i <= sl*/
+    /*
+    *suppose we have (s,r),(r,p),(s,p) and spoly(s,p) == 0 and (r,p) is
+    *still in B (i.e. lcm(r,p) == lcm(s,p) or the leading term of s does not
+    *devide lcm(r,p)). In the last case (s,r) can be canceled if the leading
+    *term of p devides the lcm(s,r)
+    *(this canceling should be done here because
+    *the case lcm(s,p) == lcm(s,r) is not covered in chainCrit)
+    *the first case is handeled in chainCrit
+    */
+    if (Lp.lcm!=NULL) pLmFree(Lp.lcm);
+  }
+  else
+  {
+    /*- the pair (S[i],p) enters B -*/
+    Lp.p1 = strat->S[i];
+    Lp.p2 = p;
+
+    pNext(Lp.p) = strat->tail;
+
+    if (atR >= 0)
+    {
+      Lp.i_r2 = atR;
+      Lp.i_r1 = strat->S_2_R[i];
+    }
+    strat->initEcartPair(&Lp,strat->S[i],p,strat->ecartS[i],ecart);
+    l = strat->posInL(strat->B,strat->Bl,&Lp,strat);
+    enterL(&strat->B,&strat->Bl,&strat->Bmax,Lp,l);
+  }
+}
+#endif
+
 /*2
 * put the pair (s[i],p)  into the set B, ecart=ecart(p)
 */
@@ -998,11 +1147,7 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR 
 
   pLcm(p,strat->S[i],Lp.lcm);
   pSetm(Lp.lcm);
-#ifdef HAVE_RING2TOM_DEACT
-  if (strat->sugarCrit && currRing->cring == 0)
-#else
   if (strat->sugarCrit)
-#endif
   {
     if(
     (!((strat->ecartS[i]>0)&&(ecart>0)))
@@ -1072,9 +1217,6 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR 
   }
   else /*sugarcrit*/
   {
-#ifdef HAVE_RING2TOM_DEACT
-    if (currRing->cring == 0) {
-#endif
 #ifdef HAVE_PLURAL
     if (!rIsPluralRing(currRing))
     {
@@ -1135,9 +1277,6 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR 
       }
     }
 #ifdef HAVE_PLURAL
-  }
-#endif
-#ifdef HAVE_RING2TOM_DEACT
   }
 #endif
   /*
@@ -1600,9 +1739,349 @@ void initenterpairs (poly h,int k,int ecart,int isFromQ,kStrategy strat, int atR
 }
 
 #ifdef HAVE_RING2TOM
+/*2
+*the pairset B of pairs of type (s[i],p) is complete now. It will be updated
+*using the chain-criterion in B and L and enters B to L
+*/
+void chainCritRing (poly p,int ecart,kStrategy strat)
+{
+  int i,j,l;
+
+  /*
+  *pairtest[i] is TRUE if spoly(S[i],p) == 0.
+  *In this case all elements in B such
+  *that their lcm is divisible by the leading term of S[i] can be canceled
+  */
+  if (strat->pairtest!=NULL)
+  {
+    {
+      /*- i.e. there is an i with pairtest[i]==TRUE -*/
+      for (j=0; j<=strat->sl; j++)
+      {
+        if (strat->pairtest[j])
+        {
+          for (i=strat->Bl; i>=0; i--)
+          {
+            if (pDivisibleBy(strat->S[j],strat->B[i].lcm))
+            {
+              deleteInL(strat->B,&strat->Bl,i,strat);
+              strat->c3++;
+            }
+          }
+        }
+      }
+    }
+    omFreeSize(strat->pairtest,(strat->sl+2)*sizeof(BOOLEAN));
+    strat->pairtest=NULL;
+  }
+  if (strat->Gebauer || strat->fromT)
+  {
+    WarnS("Gebauer or fromT not tested yet in chainCritRing.");
+    if (strat->sugarCrit)
+    {
+        WarnS("Sugar Criterion not yet available for coefficient rings.");
+    }
+    else /*sugarCrit*/
+    {
+      /*
+      *suppose L[j] == (s,r) and p/lcm(s,r)
+      *and lcm(s,r)#lcm(s,p) and lcm(s,r)#lcm(r,p)
+      *and in case the sugar is o.k. then L[j] can be canceled
+      */
+      for (j=strat->Ll; j>=0; j--)
+      {
+        if (pCompareChain(p,strat->L[j].p1,strat->L[j].p2,strat->L[j].lcm))
+        {
+          if ((pNext(strat->L[j].p) == strat->tail)||(pOrdSgn==1))
+          {
+            deleteInL(strat->L,&strat->Ll,j,strat);
+            strat->c3++;
+          }
+        }
+      }
+      /*
+      *this is GEBAUER-MOELLER:
+      *in B all elements with the same lcm except the "best"
+      *(i.e. the last one in B with this property) will be canceled
+      */
+      j = strat->Bl;
+      loop   /*cannot be changed into a for !!! */
+      {
+        if (j <= 0) break;
+        for(i=j-1; i>=0; i--)
+        {
+          if (pLmEqual(strat->B[j].lcm,strat->B[i].lcm))
+          {
+            strat->c3++;
+            deleteInL(strat->B,&strat->Bl,i,strat);
+            j--;
+          }
+        }
+        j--;
+      }
+    }
+    /*
+    *the elements of B enter L/their order with respect to B is kept
+    *j = posInL(L,j,B[i]) would permutate the order
+    *if once B is ordered different from L
+    *then one should use j = posInL(L,Ll,B[i])
+    */
+    j = strat->Ll+1;
+    for (i=strat->Bl; i>=0; i--)
+    {
+      j = strat->posInL(strat->L,j-1,&(strat->B[i]),strat);
+      enterL(&strat->L,&strat->Ll,&strat->Lmax,strat->B[i],j);
+    }
+    strat->Bl = -1;
+  }
+  else /* Gebauer or fromT */
+  {
+    for (j=strat->Ll; j>=0; j--)
+    {
+      if (pCompareChain(p,strat->L[j].p1,strat->L[j].p2,strat->L[j].lcm))
+      {
+        if ((pNext(strat->L[j].p) == strat->tail)||(pOrdSgn==1))
+        {
+          deleteInL(strat->L,&strat->Ll,j,strat);
+          strat->c3++;
+        }
+      }
+    }
+    /*
+    *this is our MODIFICATION of GEBAUER-MOELLER:
+    *First the elements of B enter L,
+    *then we fix a lcm and the "best" element in L
+    *(i.e the last in L with this lcm and of type (s,p))
+    *and cancel all the other elements of type (r,p) with this lcm
+    *except the case the element (s,r) has also the same lcm
+    *and is on the worst position with respect to (s,p) and (r,p)
+    */
+    /*
+    *B enters to L/their order with respect to B is permutated for elements
+    *B[i].p with the same leading term
+    */
+    j = strat->Ll;
+    for (i=strat->Bl; i>=0; i--)
+    {
+      j = strat->posInL(strat->L,j,&(strat->B[i]),strat);
+      enterL(&strat->L,&strat->Ll,&strat->Lmax,strat->B[i],j);
+    }
+    strat->Bl = -1;
+    j = strat->Ll;
+    loop  /*cannot be changed into a for !!! */
+    {
+      if (j <= 0)
+      {
+        /*now L[0] cannot be canceled any more and the tail can be removed*/
+        if (strat->L[0].p2 == strat->tail) strat->L[0].p2 = p;
+        break;
+      }
+      if (strat->L[j].p2 == p)
+      {
+        i = j-1;
+        loop
+        {
+          if (i < 0)  break;
+          if ((strat->L[i].p2 == p) && pLmEqual(strat->L[j].lcm,strat->L[i].lcm))
+          {
+            /*L[i] could be canceled but we search for a better one to cancel*/
+            strat->c3++;
+            if (isInPairsetL(i-1,strat->L[j].p1,strat->L[i].p1,&l,strat)
+            && (pNext(strat->L[l].p) == strat->tail)
+            && (!pLmEqual(strat->L[i].p,strat->L[l].p))
+            && pDivisibleBy(p,strat->L[l].lcm))
+            {
+              /*
+              *"NOT equal(...)" because in case of "equal" the element L[l]
+              *is "older" and has to be from theoretical point of view behind
+              *L[i], but we do not want to reorder L
+              */
+              strat->L[i].p2 = strat->tail;
+              /*
+              *L[l] will be canceled, we cannot cancel L[i] later on,
+              *so we mark it with "tail"
+              */
+              deleteInL(strat->L,&strat->Ll,l,strat);
+              i--;
+            }
+            else
+            {
+              deleteInL(strat->L,&strat->Ll,i,strat);
+            }
+            j--;
+          }
+          i--;
+        }
+      }
+      else if (strat->L[j].p2 == strat->tail)
+      {
+        /*now L[j] cannot be canceled any more and the tail can be removed*/
+        strat->L[j].p2 = p;
+      }
+      j--;
+    }
+  }
+}
+
 long twoPow(long arg)
 {
   return 1L << arg;
+}
+
+/*2
+*(s[0],h),...,(s[k],h) will be put to the pairset L
+*/
+void initenterpairsRing (poly h,int k,int ecart,int isFromQ,kStrategy strat, int atR = -1)
+{
+
+  if ((strat->syzComp==0) || (pGetComp(h)<=strat->syzComp))
+  {
+    int j;
+    BOOLEAN new_pair=FALSE;
+
+    if (pGetComp(h)==0)
+    {
+      /* for Q!=NULL: build pairs (f,q),(f1,f2), but not (q1,q2)*/
+      if ((isFromQ)&&(strat->fromQ!=NULL))
+      {
+        for (j=0; j<=k; j++)
+        {
+          if (!strat->fromQ[j])
+          {
+            new_pair=TRUE;
+            enterOnePairRing(j,h,ecart,isFromQ,strat, atR);
+            //Print("j:%d, Ll:%d\n",j,strat->Ll);
+          }
+        }
+      }
+      else
+      {
+        new_pair=TRUE;
+        for (j=0; j<=k; j++)
+        {
+          enterOnePairRing(j,h,ecart,isFromQ,strat, atR);
+          //Print("j:%d, Ll:%d\n",j,strat->Ll);
+        }
+      }
+    }
+    else
+    {
+      for (j=0; j<=k; j++)
+      {
+        if ((pGetComp(h)==pGetComp(strat->S[j])) || (pGetComp(strat->S[j])==0))
+        {
+          new_pair=TRUE;
+          enterOnePairRing(j,h,ecart,isFromQ,strat, atR);
+          //Print("j:%d, Ll:%d\n",j,strat->Ll);
+        }
+      }
+    }
+
+    if (new_pair) chainCrit(h,ecart,strat);
+
+  }
+/*
+ring r=256,(x,y,z),dp;
+ideal I=12xz-133y, 2xy-z;
+*/
+
+}
+
+/*2
+* Generates spoly(0, h) if applicable. Assumes ring in Z/2^n.
+*/
+void enterExtendedSpoly(poly h,kStrategy strat)
+{
+  if (((long) ((h)->coef)) % 2 == 0)
+  {
+    long a = ((long) ((h)->coef)) / 2;
+    long b = currRing->ch - 1;
+    poly p = p_Copy(h->next, strat->tailRing);
+    while (a % 2 == 0)
+    {
+      a = a / 2;
+      b--;
+    }
+    p = p_Mult_nn(p, (number) twoPow(b), strat->tailRing);
+
+    if (p != NULL)
+    {
+      if (TEST_OPT_PROT)
+      {
+        PrintS("Z");
+      }
+      poly tmp = p_ISet((long) ((p)->coef), currRing);
+      for (int i = 1; i <= currRing->N; i++) {
+        pSetExp(tmp, i, p_GetExp(p, i, strat->tailRing));
+      }
+      p_Setm(tmp, currRing);
+      p = p_LmDeleteAndNext(p, strat->tailRing);
+      pNext(tmp) = p;
+
+      LObject h;
+      h.p = tmp;
+      h.tailRing = strat->tailRing;
+      if (TEST_OPT_INTSTRATEGY)
+      {
+        //pContent(h.p);
+        h.pCleardenom(); // also does a pContent
+      }
+      else
+      {
+        h.pNorm();
+      }
+      strat->initEcart(&h);
+      int posx;
+      if (h.p!=NULL)
+      {
+        if (strat->Ll==-1)
+          posx =0;
+        else
+          posx = strat->posInL(strat->L,strat->Ll,&h,strat);
+        h.sev = pGetShortExpVector(h.p);
+        h.t_p = k_LmInit_currRing_2_tailRing(h.p, strat->tailRing);
+        enterL(&strat->L,&strat->Ll,&strat->Lmax,h,posx);
+      }
+    }
+  }
+}
+
+void clearSbatch (poly h,int k,int pos,kStrategy strat)
+{
+  int j = pos;
+  if ( (!strat->fromT)
+  && ((strat->syzComp==0)
+    ||(pGetComp(h)<=strat->syzComp)))
+  {
+    //Print("start clearS k=%d, pos=%d, sl=%d\n",k,pos,strat->sl);
+    unsigned long h_sev = pGetShortExpVector(h);
+    loop
+    {
+      if (j > k) break;
+      clearS(h,h_sev, &j,&k,strat);
+      j++;
+    }
+    //Print("end clearS sl=%d\n",strat->sl);
+  }
+}
+
+/*2
+* Generates a sufficient set of spolys (maybe just a finite generating
+* set of the syzygys)
+*/
+void superenterpairs (poly h,int k,int ecart,int pos,kStrategy strat, int atR)
+{
+  if (currRing->cring == 1)
+  {
+    // enter also zero divisor * poly, if this is non zero and of smaller degree
+    enterExtendedSpoly(h, strat);
+    initenterpairsRing(h, k, ecart, 0, strat, atR);
+  }
+  else 
+  {
+    initenterpairs(h, k, ecart, 0, strat, atR);
+  }
+  clearSbatch(h, k, pos, strat);
 }
 #endif
 
@@ -1612,64 +2091,6 @@ long twoPow(long arg)
 */
 void enterpairs (poly h,int k,int ecart,int pos,kStrategy strat, int atR)
 {
-#ifdef HAVE_RING2TOM
-  // enter also zero divisor * poly, if this is non zero and of smaller degree
-  if (currRing->cring == 1)
-  {
-    if (((long) ((h)->coef)) % 2 == 0)
-    {
-      long a = ((long) ((h)->coef)) / 2;
-      long b = currRing->ch - 1;
-      poly p = p_Copy(h->next, strat->tailRing);
-      while (a % 2 == 0)
-      {
-        a = a / 2;
-        b--;
-      }
-      p = p_Mult_nn(p, (number) twoPow(b), strat->tailRing);
-
-      if (p != NULL)
-      {
-        if (TEST_OPT_PROT)
-        {
-          PrintS("Z");
-        }
-        poly tmp = p_ISet((long) ((p)->coef), currRing);
-        for (int i = 1; i <= currRing->N; i++) {
-          pSetExp(tmp, i, p_GetExp(p, i, strat->tailRing));
-        }
-        p_Setm(tmp, currRing);
-        p = p_LmDeleteAndNext(p, strat->tailRing);
-        pNext(tmp) = p;
-
-        LObject h;
-        h.p = tmp;
-        h.tailRing = strat->tailRing;
-        if (TEST_OPT_INTSTRATEGY)
-        {
-          //pContent(h.p);
-          h.pCleardenom(); // also does a pContent
-        }
-        else
-        {
-          h.pNorm();
-        }
-        strat->initEcart(&h);
-        int posx;
-        if (h.p!=NULL)
-        {
-          if (strat->Ll==-1)
-            posx =0;
-          else
-              posx = strat->posInL(strat->L,strat->Ll,&h,strat);
-          h.sev = pGetShortExpVector(h.p);
-          h.t_p = k_LmInit_currRing_2_tailRing(h.p, strat->tailRing);
-          enterL(&strat->L,&strat->Ll,&strat->Lmax,h,posx);
-        }
-      }
-    }
-  }
-#endif
   int j=pos;
 
   initenterpairs(h,k,ecart,0,strat, atR);
@@ -1863,6 +2284,46 @@ int posInS (kStrategy strat, int length,poly p, int ecart_p)
   }
   else
   {
+#ifdef HAVE_RING2TOM
+    if (currRing->cring == 1)
+    {
+      if (pLmCmp(set[length],p)== -cmp_int)
+        return length+1;
+
+      loop
+      {
+        if (an >= en-1)
+        {
+          if (pLmCmp(set[an],p) == cmp_int)  return an;
+          if (pLmCmp(set[an],p) == -cmp_int) return en;
+          if (currRing->cring == 1) {
+              if (nGreater(pGetCoeff(p), pGetCoeff(set[an]))) return en;
+              return an;
+          }
+          if ((cmp_int!=1) && ((strat->ecartS[an])>ecart_p)) return an;
+          return en;
+        }
+        i=(an+en) / 2;
+        if (pLmCmp(set[i],p) == cmp_int)         en=i;
+        else if (pLmCmp(set[i],p) == -cmp_int)   an=i;
+        else
+        {
+          if (currRing->cring == 1) {
+              if (nGreater(pGetCoeff(p), pGetCoeff(set[i]))) an = i;
+              else en = i;
+          }
+          else
+          {
+            if ((cmp_int!=1) && ((strat->ecartS[i])<ecart_p))
+              en=i;
+            else
+              an=i;
+          }
+        }
+      }
+    }
+    else
+#endif
     if (pLmCmp(set[length],p)== -cmp_int)
       return length+1;
 

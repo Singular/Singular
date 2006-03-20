@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.2 2005-11-27 15:28:45 wienand Exp $ */
+/* $Id: numbers.cc,v 1.3 2006-03-20 20:33:57 wienand Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -291,6 +291,7 @@ void nInitChar(ring r)
      n->nSub   = nr2mSub;
      n->nMult  = nr2mMult;
      n->nDiv   = nr2mDiv;
+     n->nIntDiv       = nr2mIntDiv;
      n->nExactDiv= nr2mDiv;
      n->nNeg   = nr2mNeg;
      n->nInvers= nr2mInvers;
@@ -305,6 +306,8 @@ void nInitChar(ring r)
      n->nPower = nr2mPower;
      n->cfSetMap = nr2mSetMap;
      n->nNormalize = nDummy2;
+     n->nLcm          = nr2mLcm;
+     n->nGcd          = nr2mGcd;
 //     n->nGetUnit = nr2mGetUnit; //TODO OLIVER
      n->nName= ndName;
 #ifdef LDEBUG

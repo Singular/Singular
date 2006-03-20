@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kspoly.cc,v 1.3 2006-01-13 18:10:04 wienand Exp $ */
+/* $Id: kspoly.cc,v 1.4 2006-03-20 20:33:56 wienand Exp $ */
 /*
 *  ABSTRACT -  Routines for Spoly creation and reductions
 */
@@ -13,6 +13,9 @@
 #include "p_polys.h"
 #include "p_Procs.h"
 #include "gring.h"
+#ifdef HAVE_RING2TOM
+#include "polys.h"
+#endif
 
 #ifdef KDEBUG
 int red_count = 0;
@@ -311,14 +314,6 @@ int ksCheckCoeff(number *a, number *b)
     an = nIntDiv(an, cn);
     bn = nIntDiv(bn, cn);
   }
-#ifdef HAVE_RING2TOM
-  if (currRing->cring == 1) {
-    while (((long) an)%2 == 0 && ((long) bn)%2 == 0) {
-      an = (number) (((long) an) / 2);
-      bn = (number) (((long) bn) / 2);
-    }
-  }
-#endif
   nDelete(&cn);
   if (nIsOne(an))
   {
@@ -338,6 +333,7 @@ int ksCheckCoeff(number *a, number *b)
 * do not destroy p1 and p2
 * remarks:
 *   1. the coefficient is 0 (nNew)
+*   1. a) in the case of coefficient ring, the coefficient is calculated
 *   2. pNext is undefined
 */
 //static void bbb() { int i=0; }
@@ -350,6 +346,26 @@ poly ksCreateShortSpoly(poly p1, poly p2, ring tailRing)
   number t1,t2;
   int cm,i;
   BOOLEAN equal;
+
+#ifdef HAVE_RING2TOM
+  number lc1 = pGetCoeff(p1), lc2 = pGetCoeff(p2);
+  int ct = ksCheckCoeff(&lc1, &lc2); // gcd and zero divisors
+  if (currRing->cring == 1)
+  {
+    if (a1 != NULL) t2 = nMult(pGetCoeff(a1),lc2);
+    if (a2 != NULL) t1 = nMult(pGetCoeff(a2),lc1);
+    while (a1 != NULL && nIsZero(t2))
+    {
+      pIter(a1);
+      if (a1 != NULL) t2 = nMult(pGetCoeff(a1),lc2);
+    }
+    while (a2 != NULL && nIsZero(t1))
+    {
+      pIter(a2);
+      if (a2 != NULL) t1 = nMult(pGetCoeff(a2),lc1);
+    }
+  }
+#endif
 
   if (a1==NULL)
   {
@@ -378,7 +394,12 @@ x2:
         p_SetComp(m2,c1,currRing);
       }
       p_Setm(m2, currRing);
-      nNew(&(pGetCoeff(m2)));
+#ifdef HAVE_RING2TOM
+      if (currRing->cring == 1)
+          pSetCoeff(m2, t1);
+      else
+#endif
+        nNew(&(pGetCoeff(m2)));
       return m2;
     }
     else
@@ -409,7 +430,12 @@ x1:
       p_SetComp(m1,c2,currRing);
     }
     p_Setm(m1, currRing);
-    nNew(&(pGetCoeff(m1)));
+#ifdef HAVE_RING2TOM
+    if (currRing->cring == 1)
+        pSetCoeff(m1, t2);
+    else
+#endif
+      nNew(&(pGetCoeff(m1)));
     return m1;
   }
   m1 = p_Init(currRing);
@@ -466,19 +492,53 @@ x1:
         return m2;
       }
     }
-    t1 = nMult(pGetCoeff(a2),pGetCoeff(p1));
-    t2 = nMult(pGetCoeff(a1),pGetCoeff(p2));
-    equal = nEqual(t1,t2);
-    nDelete(&t2);
-    nDelete(&t1);
+#ifdef HAVE_RING2TOM
+    if (currRing->cring == 1)
+    {
+      t1 = nAdd(t1, t2);
+      equal = nIsZero(t1);
+      nDelete(&t2);
+    }
+    else
+#endif
+    {
+      t1 = nMult(pGetCoeff(a2),pGetCoeff(p1));
+      t2 = nMult(pGetCoeff(a1),pGetCoeff(p2));
+      equal = nEqual(t1,t2);
+      nDelete(&t2);
+      nDelete(&t1);
+    }
     if (!equal)
     {
       p_LmFree(m2,currRing);
-      nNew(&(pGetCoeff(m1)));
+#ifdef HAVE_RING2TOM
+      if (currRing->cring == 1)
+          pSetCoeff(m1, t1);
+      else
+#endif
+        nNew(&(pGetCoeff(m1)));
       return m1;
     }
     pIter(a1);
     pIter(a2);
+#ifdef HAVE_RING2TOM
+    if (currRing->cring == 1)
+    {
+      nDelete(&t1);
+      if (a2 != NULL) t1 = nMult(pGetCoeff(a2),lc1);
+      if (a1 != NULL) t2 = nMult(pGetCoeff(a1),lc2);
+      while (a1 != NULL && nIsZero(t2))
+      {
+        pIter(a1);
+        if (a1 != NULL) t2 = nMult(pGetCoeff(a1),lc2);
+      }
+      while (a2 != NULL && nIsZero(t1))
+      {
+        pIter(a2);
+        if (a2 != NULL) t1 = nMult(pGetCoeff(a2),lc1);
+      }
+    }
+#endif
     if (a2==NULL)
     {
       p_LmFree(m2,currRing);

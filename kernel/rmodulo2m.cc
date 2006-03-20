@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulo2m.cc,v 1.3 2006-01-16 03:27:10 wienand Exp $ */
+/* $Id: rmodulo2m.cc,v 1.4 2006-03-20 20:33:57 wienand Exp $ */
 /*
 * ABSTRACT: numbers modulo 2^m
 */
@@ -31,6 +31,52 @@ number nr2mMult (number a,number b)
     return (number)0;
   else
     return nr2mMultM(a,b);
+}
+
+/*
+ * Give the smallest non unit k, such that a * x = k = b * y has a solution
+ */
+number nr2mLcm (number a,number b,ring r)
+{
+  long res = 0;
+  if ((long) a == 0) a = (number) 1;
+  if ((long) b == 0) b = (number) 1;
+  while ((long) a % 2 == 0)
+  {
+    a = (number) ((long) a / 2);
+    if ((long) b % 2 == 0) b = (number) ((long) b / 2);
+    res++;
+  }
+  while ((long) b % 2 == 0)
+  {
+    b = (number) ((long) b / 2);
+    res++;
+  }
+  return (number) (1L << res);  // (2**res)
+}
+
+/*
+ * Give the largest non unit k, such that a = x * k, b = y * k has
+ * a solution. 
+ */
+number nr2mGcd (number a,number b,ring r)
+{
+  long res = 0;
+  if ((long) a == 0 && (long) b == 0) return (number) 1;
+  while ((long) a % 2 == 0 && (long) b % 2 == 0)
+  {
+    a = (number) ((long) a / 2);
+    b = (number) ((long) b / 2);
+    res++;
+  }
+  if ((long) b % 2 == 0)
+  {
+    return (number) ((1L << res));// * (long) a);  // (2**res)*a    a ist Einheit
+  }
+  else
+  {
+    return (number) ((1L << res));// * (long) b);  // (2**res)*b    b ist Einheit
+  }
 }
 
 void nr2mPower (number a, int i, number * result)
@@ -103,8 +149,14 @@ BOOLEAN nr2mEqual (number a,number b)
 
 BOOLEAN nr2mGreater (number a,number b)
 {
-  //return (long)a != (long)b;
-  return (long)a > (long)b;
+  if ((long) a == 0) return TRUE;
+  if ((long) b == 0) return FALSE;
+  while ((long) a % 2 == 0 && (long) b % 2 == 0)
+  {
+    a = (number) ((long) a / 2);
+    b = (number) ((long) b / 2);
+}
+  return ((long) b % 2 == 1);
 }
 
 BOOLEAN nr2mGreaterZero (number k)
@@ -199,6 +251,18 @@ number nr2mDiv (number a,number b)
   else
   {
     return (number) nr2mMult(a, nr2mInversM(b));
+  }
+}
+
+number nr2mIntDiv (number a,number b)
+{
+  if ((long)a==0)
+  {
+    return (number) 0;
+  }
+  else
+  {
+    return (number) ((long) a / (long) b);
   }
 }
 
