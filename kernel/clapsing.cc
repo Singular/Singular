@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.10 2005-11-04 08:44:25 Singular Exp $
+// $Id: clapsing.cc,v 1.11 2006-03-21 15:25:10 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -224,6 +224,7 @@ poly singclap_gcd ( poly f, poly g )
     else               setCharacteristic( -nGetChar() );
     if (currRing->minpoly!=NULL)
     {
+    #ifdef HAVE_LIBFAC_P
       if ( nGetChar()==1 ) /* Q(a) */
       {
       //  WerrorS( feNotImplemented );
@@ -239,6 +240,7 @@ poly singclap_gcd ( poly f, poly g )
         res= convClapAPSingAP( alg_gcd( F, G, as) );
       }
       else
+      #endif
       {
         CanonicalForm mipo=convSingTrClapP(((lnumber)currRing->minpoly)->z);
         Variable a=rootOf(mipo);
