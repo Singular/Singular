@@ -1,6 +1,12 @@
 from probstat import Cartesian
 from itertools import repeat,imap, ifilter
 from util import EquivalenceRelation
+from interpreter import *
+singular=SingularGlobalsProxy()
+from util import *
+from Singular import *
+
+singular_var=singular.var
 
 class modPNumber:
   """simple class for Turaev/Viro colors,
@@ -31,7 +37,7 @@ weights_canonical_to_index=dict((weight,i+1) \
         wrel.isCanonical,value_range)))
 wtrans=dict((weight,weights_canonical_to_index[wrel.canonical(weight)]) for weight in \
     value_range)
-weights=max([wtrans[i] for i in weights_canonical_to_index])
+weights=len(weights_canonical_to_index)
 
 
 def constr_variations():
@@ -45,16 +51,10 @@ canonical_to_index=dict((symbol,weights+i+1) for (i,symbol) in \
        relation.isCanonical,constr_variations())))
 vartrans=dict((symbol,canonical_to_index[relation.canonical(symbol)]) for symbol in \
     constr_variations())
-symbols=max([vartrans[i] for i in canonical_to_index])
-
-from interpreter import *
-singular=SingularGlobalsProxy()
-from util import *
-from Singular import *
-singular_var=singular.var
+symbols=len(canonical_to_index)
 
 def six_j_symbol(v):
-  i=vartrans[v]+weights
+  i=vartrans[v]
   return var_cache[i-1]
   
 
@@ -70,7 +70,6 @@ def polysum(l):
     acc+=p
   return acc
 
-
 var_cache=[singular_var(x+1) for x in range(singular.nvars(Ring()))]
 for (j1,j2,j3,j4,j5,j6,j7,j8,j9) in Cartesian(list(repeat(value_range,9))):
   p=\
@@ -83,7 +82,6 @@ for (j1,j2,j3,j4,j5,j6,j7,j8,j9) in Cartesian(list(repeat(value_range,9))):
       six_j_symbol((j,j3,j1,-j6,-j4,-j8))\
       for j in value_range])
   myideal.append(p)
-
 
 back_table_v=dict((canonical_to_index[s],s) for s\
     in canonical_to_index)
