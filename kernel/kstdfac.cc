@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstdfac.cc,v 1.7 2006-03-10 10:53:58 Singular Exp $ */
+/* $Id: kstdfac.cc,v 1.8 2006-03-21 15:28:45 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
@@ -251,7 +251,7 @@ BOOLEAN k_factorize(poly p,ideal &rfac, ideal &fac_copy)
   if (fac==NULL)
   {
     fac=idInit(1,1);
-    fac->m[0]=pCopy(strat->P.p);
+    fac->m[0]=pCopy(p);
     fac_elems=1;
   }
   else
