@@ -1,0 +1,4 @@
+ring r;
+LIB("python_module.so");
+Python_module::python("import symm");
+$;
