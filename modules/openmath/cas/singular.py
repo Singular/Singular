@@ -131,7 +131,7 @@ def input_convert(f):
             r=OM2ring(dmpl.args[0])
             r.set()
             i=OM2ideal_raw(dmpl)
-            safe_ring=r
+            save_ring=r
             return i
         
         return a

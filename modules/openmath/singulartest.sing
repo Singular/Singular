@@ -69,6 +69,8 @@ r.set()
 easy=ideal2OM(singular.i)
 call=OMA(cd.primdec.implementation.primdecGTZ, [ideal2OM(singular.big)])
 print call
+#print lxmlencoder.encode(call).tostring
+xml(context.evaluate(call)).write(open('primdec.in', 'w'))
 print context.evaluate(call)
 r.set()
 cyc5=ideal2OM(singular.i2)
