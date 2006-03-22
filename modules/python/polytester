@@ -1,4 +1,4 @@
-#ring s=0,(x,y,z),lp;
+//ring s=0,(x,y,z),lp;
 
 ring r=0,(x,y,z),lp;
 timer=1;

@@ -1,4 +1,4 @@
-//$Id: wrapper.h,v 1.31 2006-03-08 10:02:55 bricken Exp $
+//$Id: wrapper.h,v 1.32 2006-03-22 13:12:32 bricken Exp $
 #ifndef PYTHON_SINGULAR_WRAPPER_HEADER
 #define PYTHON_SINGULAR_WRAPPER_HEADER
 #include <Python.h>
@@ -49,6 +49,7 @@ void different_ring_translator(DifferentDomainException const& x) {
     PyErr_SetString(PyExc_UserWarning, "Objects didn't have the same ring");
 }
 BOOST_PYTHON_MODULE(Singular){
+  //Print("ref count after add: %d", currRing->ref);
   register_exception_translator<
           DifferentDomainException>(different_ring_translator);
   export_poly();

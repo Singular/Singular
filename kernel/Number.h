@@ -1,9 +1,23 @@
 #ifndef NUMBERCPP_HEADER
 #define NUMBERCPP_HEADER
+#include <boost/intrusive_ptr.hpp>
 #include "mod2.h"
 #include "numbers.h"
 #include "febase.h"
-
+#include "ring.h"
+using namespace boost;
+inline void intrusive_ptr_add_ref(ring r){
+    r->ref++;
+    //Print("ref count after add: %d", r->ref);
+}
+inline void intrusive_ptr_release(ring r){
+    if (r->ref<=0) rDelete(r);
+    else {
+    r->ref--;
+    
+    }
+    //Print("ref count after release: %d", r->ref);
+}
 
 enum poly_variant{
   POLY_VARIANT_RING,
@@ -40,12 +54,12 @@ class Number{
    template <poly_variant,class,class> friend class PolyBase;
   friend class PolyImpl;
   number as_number() const{
-    return n_Copy(n,r);
+    return n_Copy(n,r.get());
   }
   Number& operator=(const Number& n2){
     //durch Reihenfolge Selbstzuweisungen berücksichtigt
-    number nc=n_Copy(n2.n,n2.r);
-    n_Delete(&n,r);
+    number nc=n_Copy(n2.n,n2.r.get());
+    n_Delete(&n,r.get());
     r=n2.r;
     n=nc;
     return *this;
@@ -53,7 +67,7 @@ class Number{
   Number operator-(){
     Number t(*this);
     //t.n=n_Copy(n,r);
-    t.n=n_Neg(t.n,r);
+    t.n=n_Neg(t.n,r.get());
     return t;
   }
   Number& operator+=(const Number & n2){
@@ -61,8 +75,8 @@ class Number{
       Werror("not the same ring");
       return *this;
     }
-    number nv=n_Add(n,n2.n,r);
-    n_Delete(&n,r);
+    number nv=n_Add(n,n2.n,r.get());
+    n_Delete(&n,r.get());
     n=nv;
     return *this;
   }
@@ -71,8 +85,8 @@ class Number{
       Werror("not the same ring");
       return *this;
     }
-    number nv=n_Mult(n,n2.n,r);
-    n_Delete(&n,r);
+    number nv=n_Mult(n,n2.n,r.get());
+    n_Delete(&n,r.get());
     n=nv;
     return *this;
   }
@@ -81,8 +95,8 @@ class Number{
       Werror("not the same ring");
       return *this;
     }
-    number nv=n_Sub(n,n2.n,r);
-    n_Delete(&n,r);
+    number nv=n_Sub(n,n2.n,r.get());
+    n_Delete(&n,r.get());
     n=nv;
     return *this;
   }
@@ -91,40 +105,31 @@ class Number{
       Werror("not the same ring");
       return *this;
     }
-    number nv=n_Div(n,n2.n,r);
-    n_Delete(&n,r);
+    number nv=n_Div(n,n2.n,r.get());
+    n_Delete(&n,r.get());
     n=nv;
     return *this;
   }
 
-
-
-
-
-
-
-
-
-
   Number& operator=(int n2){
-    n_Delete(&n,r);
-    n=n_Init(n2,r);
+    n_Delete(&n,r.get());
+    n=n_Init(n2,r.get());
     return *this;
   }
   
   Number& operator+=(int n2){
-    number n2n=n_Init(n2,r);
-    number nv=n_Add(n,n2n,r);
-    n_Delete(&n,r);
-    n_Delete(&n2n,r);
+    number n2n=n_Init(n2,r.get());
+    number nv=n_Add(n,n2n,r.get());
+    n_Delete(&n,r.get());
+    n_Delete(&n2n,r.get());
     n=nv;
     return *this;
   }
   Number& operator*=(int n2){
-    number n2n=n_Init(n2,r);
-    number nv=n_Mult(n,n2n,r);
-    n_Delete(&n,r);
-    n_Delete(&n2n,r);
+    number n2n=n_Init(n2,r.get());
+    number nv=n_Mult(n,n2n,r.get());
+    n_Delete(&n,r.get());
+    n_Delete(&n2n,r.get());
     n=nv;
     return *this;
   }
@@ -132,16 +137,16 @@ class Number{
 
     number n2n=n_Init(n2,r);
     number nv=n_Sub(n,n2n,r);
-    n_Delete(&n,r);
-    n_Delete(&n2n,r);
+    n_Delete(&n,r.get());
+    n_Delete(&n2n,r.get());
     n=nv;
     return *this;
   }
   Number& operator/=(int n2){  
-    number n2n=n_Init(n2,r);
-    number nv=n_Div(n,n2n,r);
-    n_Delete(&n,r);
-    n_Delete(&n2n,r);
+    number n2n=n_Init(n2,r.get());
+    number nv=n_Div(n,n2n,r.get());
+    n_Delete(&n,r.get());
+    n_Delete(&n2n,r.get());
     n=nv;
     return *this;
   }
@@ -150,39 +155,46 @@ class Number{
 
   Number(){
     r=currRing;
-    if (r!=NULL)
-      n=n_Init(0,r);
+    if (r.get()!=NULL)
+      n=n_Init(0,r.get());
     else
       n=(number) NULL;
   }
   Number(const Number & n){
     r=n.r;
-    this->n=n_Copy(n.n,r);
+    this->n=n_Copy(n.n,r.get());
   }
   Number(number n, ring r){
     this->n=n_Copy(n,r);
     this->r=r;
   }
   Number(int n, ring r){
-    this->n=n_Init(n,r);
+
     this->r=r;
+    this->n=n_Init(n,r);
+  }
+  Number(int n, intrusive_ptr<ip_sring> r){
+    this->r=r;
+    this->n=n_Init(n,r.get());
+
   }
   explicit Number(int n){
     r=currRing;
-    this->n=n_Init(n,r);
+    this->n=n_Init(n,r.get());
   }
   void write() const{
     number towrite=n;
-    n_Write(towrite,r);
+    n_Write(towrite,r.get());
   }
-  virtual ~Number(){
+  
+  ~Number(){
     if (r!=NULL)
-      n_Delete(&n,r);
+      n_Delete(&n,r.get());
   }
 
  protected:
   number n;
-  ring r;
+  intrusive_ptr<ip_sring> r;
 
 };
 

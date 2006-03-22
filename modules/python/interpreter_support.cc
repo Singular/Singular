@@ -1,4 +1,4 @@
-//$Id: interpreter_support.cc,v 1.18 2006-03-08 10:02:55 bricken Exp $
+//$Id: interpreter_support.cc,v 1.19 2006-03-22 13:12:32 bricken Exp $
 
 #include <sstream>
 #include <boost/python.hpp>
@@ -129,7 +129,7 @@ class arg_list{
   }
   void appendRing(const Ring& r){
     leftv v=initArg();
-    v->data=r.pimpl;
+    v->data=r.pimpl.get();
     r.pimpl->ref++;
     v->rtyp=RING_CMD;
     internal_append(v);
@@ -248,7 +248,7 @@ class idhdl_wrap{
       r.pimpl->ref++;
 
       ((ring) id->data.uring)->ref--;//FIXME: destruct it
-      ring r2=r.pimpl;
+      ring r2=r.pimpl.get();
             id->data.uring=r2;
     }
   }

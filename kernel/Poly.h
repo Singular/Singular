@@ -1,4 +1,4 @@
-//$Id: Poly.h,v 1.31 2005-11-25 10:17:58 bricken Exp $
+//$Id: Poly.h,v 1.32 2006-03-22 13:12:58 bricken Exp $
 
 
 
@@ -141,31 +141,6 @@ class PolyImpl{
     
     return *this;
   }
-  //Div not available for rings other than currRing
-/*   PolyImpl& operator/=(const PolyImpl & p2){ */
-/*     if (r!=p2.r){ */
-/*       Werror("not the same ring"); */
-/*       return *this; */
-/*     } */
-/*     if (this==&p2){ */
-/*       poly one=p_ISet(1,r); */
-/*       p_Delete(&p,r); */
-/*       p=one; */
-/*       return *this; */
-/*     } */
-/*     number nv=n_Div(n,p2.n,r); */
-/*     n_Delete(&n,r); */
-/*     n=nv; */
-/*     return *this; */
-/*   } */
-
-
-
-
-
-
-
-
 
 
   PolyImpl& operator=(int n){
@@ -199,7 +174,7 @@ class PolyImpl{
   }
   PolyImpl(const Number & n){
     
-    r=n.r;
+    r=n.r.get();
     this->p=p_NSet(n_Copy(n.n,r),r);
     
   }
@@ -237,18 +212,7 @@ inline PolyImpl operator-(const PolyImpl &p1, const PolyImpl& p2){
   erg-=p2;
   return erg;
 }
-/*PolyImpl operator/(const PolyImpl &p1, const PolyImpl& p2){
-  PolyImpl erg(p1);
-  erg/=p2;
-  return erg;
-  }*/
-/*
-bool operator==(const PolyImpl &p1, const PolyImpl& p2){
-  if(p1.r!=p2.r)
-    return false;
-  return n_Equal(p1.n,p2.n,p1.r);
-  }*/
-//Equal Polys not available for oth. rings than currRing
+
 
 
 inline PolyImpl operator+(const PolyImpl &p1, int p2){
@@ -266,36 +230,18 @@ inline PolyImpl operator-(const PolyImpl &p1, int p2){
   erg-=PolyImpl(p2,p1.r);
   return erg;
 }
-/*PolyImpl operator/(const PolyImpl &p1, int p2){
-  PolyImpl erg(p1);
-  erg/=PolyImpl(p2,p1.r);
-  return erg;
-  }*/
 
-/*bool operator==(const PolyImpl &p1, int p2){
-  return n_Equal(p1.n,PolyImpl(p2,p1.r).n,p1.r);
-  }*/
+
 inline PolyImpl operator+(int p1, const PolyImpl& p2){
   PolyImpl erg(p2);
   return erg+=PolyImpl(p1,p2.getRing());
 }
-/*PolyImpl operator-(int p1, const PolyImpl& p2){
-
-  PolyImpl erg(p1,p2.r);
-  return erg-=p2;
-  }*/
-/*PolyImpl operator/(int p1, const PolyImpl& p2){
-  PolyImpl erg(p1,p2.r);
-  return erg/=p2;
-  }*/
 
 inline PolyImpl operator*(int p1, const PolyImpl& p2){
   PolyImpl erg(p2);
   return erg*=PolyImpl(p1,p2.getRing());
 }
-/*bool operator==(int p1, const PolyImpl& p2){
-  return p2==PolyImpl(p1,p2.r);
-  }*/
+
 using namespace boost;
 
 
@@ -358,10 +304,6 @@ public std::iterator<std::input_iterator_tag,T,int, shared_ptr<const T>,ConstTer
 
 };
 
-
-//template <poly_variant v> inline PolyBase<v> operator+(const PolyBase<v>& p1, const PolyBase<v>& p2);
-//template <poly_variant v> inline PolyBase<v> operator*(const PolyBase<v>& p1, const PolyBase<v>& p2);
-//template <poly_variant v>inline PolyBase<v> operator*(const PolyBase<v>& p1, const Number& n);
 template<poly_variant variant, class create_type_input, class error_handle_traits> class PolyBase{
  private:
     typedef PolyBase<variant,create_type_input,error_handle_traits> ThisType;
@@ -477,14 +419,7 @@ template<poly_variant variant, class create_type_input, class error_handle_trait
  protected:
 
   shared_ptr<PolyImpl> ptr;
-  //friend inline inline Poly operator+(const Poly& p1, const Poly& p2);
-  ///friend inline PolyBase operator*(const Poly& p1, const Poly& p2);
-  //friend inline PolyBase operator*(const Poly& p1, const Number& n);
-  // friend inline inline Poly operator*(const Poly& p1, const Number& n);
-  //  friend inline template PolyBase<poly_variant variant> operator+(const PolyBase<v>& p1, const PolyBase<v>& p2);
-  //friend PolyBase<variant> operator+<>(const PolyBase<variant>& p1, const PolyBase<variant>& p2);
-  //friend PolyBase<variant> operator*<>(const PolyBase<variant>& p1, const PolyBase<variant>& p2);
-  //friend PolyBase<variant> operator*<>(const PolyBase<variant>& p1, const Number& p2);
+
 };
 
 class Poly: public PolyBase<POLY_VARIANT_RING, Poly, ExceptionBasedErrorHandler>{
