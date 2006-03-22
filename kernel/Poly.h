@@ -1,4 +1,4 @@
-//$Id: Poly.h,v 1.32 2006-03-22 13:12:58 bricken Exp $
+//$Id: Poly.h,v 1.33 2006-03-22 14:14:29 bricken Exp $
 
 
 
@@ -41,6 +41,7 @@ class TrivialErrorHandler{
     static void handleDifferentRing(ring r, ring s){
     }
 };
+typedef TrivialErrorHandler MyErrorHandler;
 class PolyImpl{
   template <poly_variant,class,class> friend class PolyBase;
   //friend class PolyBase<POLY_VARIANT_RING,Poly,TrivialErrorHandler>;
@@ -55,7 +56,7 @@ class PolyImpl{
   }
  public:
   ring getRing() const{
-    return r;
+    return r.get();
   }
   friend inline bool operator==(const Poly& p1, const Poly& p2);
   friend PolyImpl operator+(const PolyImpl& p1, const PolyImpl& n2);
@@ -69,22 +70,22 @@ class PolyImpl{
   friend PolyImpl operator*(const PolyImpl& p1, int n2);
   friend bool operator==(const PolyImpl& p1, int n2);
   Number leadCoef(){
-    return Number(p->coef,r);
+    return Number(p->coef,r.get());
   }
   PolyImpl& operator=(const PolyImpl& p2){
     //durch Reihenfolge Selbstzuweisungen berücksichtigt
     if (this==&p2) return *this;
-    poly pc=p_Copy(p2.p,p2.r);
+    poly pc=p_Copy(p2.p,p2.r.get());
     if(r!=NULL)
-      p_Delete(&p,r);
+      p_Delete(&p,r.get());
     r=p2.r;
     p=pc;
     return *this;
   }
   PolyImpl operator-(){
     PolyImpl t(*this);
-    t.p=p_Copy(p,r);
-    t.p=p_Neg(t.p,r);
+    t.p=p_Copy(p,r.get());
+    t.p=p_Neg(t.p,r.get());
     return t;
   }
   PolyImpl& operator+=(const PolyImpl & p2){
@@ -93,11 +94,11 @@ class PolyImpl{
       return *this;
     }
     if (this==&p2){
-      number two=n_Init(2,r);
-      p_Mult_nn(p,two,r);
+      number two=n_Init(2,r.get());
+      p_Mult_nn(p,two,r.get());
       return *this;
     }
-    p=p_Add_q(p,p_Copy(p2.p,p2.r),r);
+    p=p_Add_q(p,p_Copy(p2.p,p2.r.get()),r.get());
    
     return *this;
   }
@@ -107,11 +108,11 @@ class PolyImpl{
       return *this;
     }
     if (this==&p2){
-      poly pc=p_Copy(p,r);
-      p=p_Mult_q(p,p2.p,r);
+      poly pc=p_Copy(p,r.get());
+      p=p_Mult_q(p,p2.p,r.get());
       return *this;
     }
-    p=p_Mult_q(p,p_Copy(p2.p,p2.r),r);
+    p=p_Mult_q(p,p_Copy(p2.p,p2.r.get()),r.get());
     return *this;
   }
   PolyImpl& operator*=(const Number & n){
@@ -120,7 +121,7 @@ class PolyImpl{
       return *this;
     }
     
-    p=p_Mult_nn(p,n.n,r);
+    p=p_Mult_nn(p,n.n,r.get());
     return *this;
   }
   PolyImpl& operator-=(const PolyImpl & p2){
@@ -129,14 +130,14 @@ class PolyImpl{
       return *this;
     }
     if (this==&p2){
-      p_Delete(&p,r);
+      p_Delete(&p,r.get());
       p=NULL;
       return *this;
     }
 
-    poly pc=p_Copy(p2.p,p2.r);
-    pc=p_Neg(pc,r);
-    p=p_Add_q(p,pc,r);
+    poly pc=p_Copy(p2.p,p2.r.get());
+    pc=p_Neg(pc,r.get());
+    p=p_Add_q(p,pc,r.get());
 
     
     return *this;
@@ -145,8 +146,8 @@ class PolyImpl{
 
   PolyImpl& operator=(int n){
  
-    p_Delete(&p,r);
-    p=p_ISet(n,r);
+    p_Delete(&p,r.get());
+    p=p_ISet(n,r.get());
     return *this;
  
   }
@@ -158,42 +159,42 @@ class PolyImpl{
   }
   PolyImpl(const PolyImpl & p){
     r=p.r;
-    this->p=p_Copy(p.p,r);
+    this->p=p_Copy(p.p,r.get());
   }
-  PolyImpl(poly p, ring r){
-    this->p=p_Copy(p,r);
+  PolyImpl(poly p, intrusive_ptr<ip_sring> r){
+    this->p=p_Copy(p,r.get());
     this->r=r;
   }
-  PolyImpl(poly p, ring r,int){
+  PolyImpl(poly p, intrusive_ptr<ip_sring> r,int){
     this->p=p;
     this->r=r;
   }
-  PolyImpl(int n, ring r){
-    this->p=p_ISet(n,r);
+  PolyImpl(int n, intrusive_ptr<ip_sring> r){
+    this->p=p_ISet(n,r.get());
     this->r=r;
   }
   PolyImpl(const Number & n){
     
     r=n.r.get();
-    this->p=p_NSet(n_Copy(n.n,r),r);
+    this->p=p_NSet(n_Copy(n.n,r.get()),r.get());
     
   }
   explicit PolyImpl(int n){
     r=currRing;
-    this->p=p_ISet(n,r);
+    this->p=p_ISet(n,r.get());
   }
   void print(){
-    p_Write(p,r,r);
+    p_Write(p,r.get(),r.get());
   }
 
   virtual ~PolyImpl(){
     if (r!=NULL)
-      p_Delete(&p,r);
+      p_Delete(&p,r.get());
   }
 
  protected:
   poly p;
-  ring r;
+  intrusive_ptr<ip_sring> r;
 
 };
 
@@ -217,12 +218,12 @@ inline PolyImpl operator-(const PolyImpl &p1, const PolyImpl& p2){
 
 inline PolyImpl operator+(const PolyImpl &p1, int p2){
   PolyImpl erg(p1);
-  erg+=PolyImpl(p2,p1.r);
+  erg+=PolyImpl(p2,p1.r.get());
   return erg;
 }
 inline PolyImpl operator*(const PolyImpl &p1, int p2){
   PolyImpl erg(p1);
-  erg*=PolyImpl(p2,p1.r);
+  erg*=PolyImpl(p2,p1.r.get());
   return erg;
 }
 inline PolyImpl operator-(const PolyImpl &p1, int p2){
@@ -309,7 +310,7 @@ template<poly_variant variant, class create_type_input, class error_handle_trait
     typedef PolyBase<variant,create_type_input,error_handle_traits> ThisType;
  public:
   poly as_poly() const{
-    return p_Copy(ptr->p,ptr->r);
+    return p_Copy(ptr->p,ptr->getRing());
   }
   template<class T> void checkIsSameRing(T& p){
     if (error_handle_traits::handleErrors){
@@ -327,7 +328,7 @@ template<poly_variant variant, class create_type_input, class error_handle_trait
     int nvars=rVar(ptr->r);
     Intvec res(nvars);
     for(int i=0;i<nvars;i++){
-      res[i]=p_GetExp(ptr->p,i+1,ptr->r);
+      res[i]=p_GetExp(ptr->p,i+1,ptr->getRing());
     }
     return res;
   }  
@@ -342,7 +343,7 @@ template<poly_variant variant, class create_type_input, class error_handle_trait
   //* ressource managed by Singular
   char* c_string() const{
 
-    return p_String(ptr->p,ptr->r,ptr->r);
+    return p_String(ptr->p,ptr->getRing(),ptr->getRing());
   }
 
   PolyBase(ring r=currRing):ptr(new PolyImpl((poly) NULL,r)){
@@ -389,10 +390,10 @@ template<poly_variant variant, class create_type_input, class error_handle_trait
     }*/
 
   PolyInputIterator<create_type> begin(){
-    return PolyInputIterator<create_type>(ptr->p,ptr->r);
+    return PolyInputIterator<create_type>(ptr->p,ptr->getRing());
   }
   PolyInputIterator<create_type> end(){
-    return PolyInputIterator<create_type>(NULL, ptr->r);
+    return PolyInputIterator<create_type>(NULL, ptr->getRing());
   }
   ring getRing() const{
     return ptr->getRing();
@@ -405,7 +406,7 @@ template<poly_variant variant, class create_type_input, class error_handle_trait
   }
   create_type operator-(){
     create_type erg(*this);
-    erg*=Number(-1,ptr->r);
+    erg*=Number(-1,ptr->getRing());
     return erg;
   }
  protected:
@@ -422,11 +423,11 @@ template<poly_variant variant, class create_type_input, class error_handle_trait
 
 };
 
-class Poly: public PolyBase<POLY_VARIANT_RING, Poly, ExceptionBasedErrorHandler>{
+class Poly: public PolyBase<POLY_VARIANT_RING, Poly, MyErrorHandler>{
  private:
-    typedef PolyBase<POLY_VARIANT_RING, Poly,ExceptionBasedErrorHandler> Base;
+    typedef PolyBase<POLY_VARIANT_RING, Poly,MyErrorHandler> Base;
   friend class Vector;
-  friend class PolyBase<POLY_VARIANT_MODUL,Vector,ExceptionBasedErrorHandler>;
+  friend class PolyBase<POLY_VARIANT_MODUL,Vector,MyErrorHandler>;
  public:
 
   Poly(ring r=currRing):Base ((poly)NULL,r,0){
@@ -476,9 +477,9 @@ class Poly: public PolyBase<POLY_VARIANT_RING, Poly, ExceptionBasedErrorHandler>
   friend inline bool operator==(const Poly& p1, const Poly& p2);
 
 };
-class Vector: public PolyBase<POLY_VARIANT_MODUL, Vector, ExceptionBasedErrorHandler>{
+class Vector: public PolyBase<POLY_VARIANT_MODUL, Vector, MyErrorHandler>{
  private:
-    typedef PolyBase<POLY_VARIANT_MODUL, Vector, ExceptionBasedErrorHandler> Base;
+    typedef PolyBase<POLY_VARIANT_MODUL, Vector, MyErrorHandler> Base;
  public:
 
   Vector(ring r=currRing):Base ((poly)NULL,r,0){
