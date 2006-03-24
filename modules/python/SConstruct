@@ -1,4 +1,4 @@
-#$Id: SConstruct,v 1.16 2005-10-05 07:18:59 bricken Exp $
+#$Id: SConstruct,v 1.17 2006-03-24 18:08:35 bricken Exp $
 import os
 import re
 try:
@@ -137,6 +137,7 @@ module_target("python_module",
                        SING_ROOT+"/Singular", SING_ROOT+"/"+SING_ARCH +"/include",\
                        PYTHON_CONFIG.incdir],\
               LIBPATH=[PYTHON_CONFIG.libdir],\
+              CXXFLAGS="-O1",\
               LIBS=["boost_python",PYTHON_CONFIG.libname], CPPDEFINES=["NDEBUG","BUILD_MODULE"], SHLIBPREFIX="")
 
 
