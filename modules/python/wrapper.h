@@ -1,4 +1,4 @@
-//$Id: wrapper.h,v 1.32 2006-03-22 13:12:32 bricken Exp $
+//$Id: wrapper.h,v 1.33 2006-03-24 17:36:58 bricken Exp $
 #ifndef PYTHON_SINGULAR_WRAPPER_HEADER
 #define PYTHON_SINGULAR_WRAPPER_HEADER
 #include <Python.h>
@@ -54,12 +54,7 @@ BOOST_PYTHON_MODULE(Singular){
           DifferentDomainException>(different_ring_translator);
   export_poly();
 
-  boost::python::class_<Variable>("variable")
-    .def(boost::python::init <const int, char>())
-    .def(boost::python::init <char>())
-    
-    .def(boost::python::init <const int>());
-  export_CF();
+  
 
   export_number();
   export_vector();
@@ -83,6 +78,14 @@ BOOST_PYTHON_MODULE(Singular){
   //.def(self*=Number())
   //.def(Number() * self);
 
+}
+BOOST_PYTHON_MODULE(factory){
+  boost::python::class_<Variable>("variable")
+    .def(boost::python::init <const int, char>())
+    .def(boost::python::init <char>())
+    
+    .def(boost::python::init <const int>());
+  export_CF();
 }
 BOOST_PYTHON_MODULE(_Singular){
 export_interpreter();
