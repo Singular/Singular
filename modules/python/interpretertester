@@ -55,10 +55,10 @@ proc testproc6(poly p, poly q){
 }
 list mylist=1,2,3;
 LIB("python_module.so");
-Python_module::python("from Singular import number,  polynomial, gen, ideal
+Python_module::python("from Singular import *
 
-from interpreter import global_functions
-functions=global_functions()
+from interpreter import *
+functions=SingularGlobalsProxy()
 functions.setring(functions.r)
 print functions.mylist;
 functions.mylist=[1,2,[5,6]]
@@ -75,11 +75,10 @@ print functions.listproc1([1,[3,6]])
 print functions.stringproc1()
 for i in firstl:
     print i
-#print functions.testproc1()
-print 'hi'
-x=polynomial('x')
-y=polynomial('y')
-i=ideal()
+
+x=functions.var(1)
+y=functions.var(2)
+i=Ideal()
 i.append(x)
 i.append(x+y)
 print i
@@ -92,7 +91,7 @@ xye1=xy*gen(1)
 
 print functions.testproc2(xy)
 print functions.testproc3(xye1)
-print functions.testproc4(number(3243287))
+print functions.testproc4(Number(3243287))
 print functions.testproc5(325)
 print functions.testproc6(x,y)
 from Singular import foo2;
@@ -107,18 +106,17 @@ print functions.std(i)
 print functions.random(1,10)
 print 'hallo'
 print functions.intersect(i,i,i,i)
-from Singular import ring, intvec
-v=intvec()
+
+v=IntVector()
 v.append(12)
 v.append(13)
 print len(v)
 print v
-ring()
-ring()
+
 print 'calling print'
-functions.__getattr__('print')(ring());
+functions.__getattr__('print')(Ring());
 print 'the end'
-print functions.ringlist(ring())
+print functions.ringlist(Ring())
 print functions.iv
 functions.iv=v
 print functions.iv

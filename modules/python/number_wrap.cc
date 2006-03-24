@@ -2,6 +2,7 @@
 #include "mod2.h"
 #include "Number.h"
 #include "number_wrap.h"
+#include "ring_wrap.h"
 using boost::python::self;
 static boost::python::object Number_as_str(const Number& n)
 {
@@ -10,6 +11,9 @@ static boost::python::object Number_as_str(const Number& n)
   n.write();
   char* out=StringAppendS("");
   return boost::python::str(out,strlen(out));
+}
+static Ring Number_get_Ring(const Number & n){
+  return n.getRing();
 }
 void export_number()
 {
@@ -39,7 +43,8 @@ void export_number()
     .def(self*=int())
     .def(self+=int())
     .def(self-=int())
-    .def(self/=int());
+    .def(self/=int())
+    .def("ring",Number_get_Ring);
 }
 
 
