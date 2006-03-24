@@ -2,7 +2,7 @@
 #include "mod2.h"
 #include "Poly.h"
 #include "vector_wrap.h"
-
+#include "ring_wrap.h"
 using boost::python::self;
 
 static boost::python::object Vector_as_str(Vector& p)
@@ -13,7 +13,9 @@ static boost::python::object Vector_as_str(Vector& p)
   char* out=p.c_string();
   return boost::python::str(out,strlen(out));
 }  
-
+static Ring Vector_get_Ring(const Vector & p){
+  return p.getRing();
+}
 void export_vector(){
   boost::python::class_<Vector>("Vector")
     .def(boost::python::init <>())
@@ -27,5 +29,6 @@ void export_vector(){
     .def(self+self)
     .def(self*=Number())
     .def(Poly() * self)
-    .def(Number() * self);
+    .def(Number() * self)
+    .def("ring",Vector_get_Ring);
 }

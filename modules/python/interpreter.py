@@ -94,7 +94,7 @@ class SingularGlobalsProxy(object):
 def find_rings(arglist):
   """FIXME: doesn't handle everything and depth"""
   for item in arglist:
-    if isinstance(item,Polynomial) or isinstance(item,Ideal):
+    if isinstance(item,Polynomial) or isinstance(item,Ideal) or isinstance(item, Number) or isinstance(item, Vector):
       return [item.ring()]
   return []
   

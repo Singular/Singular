@@ -3,36 +3,39 @@
 ring r=0,(x,y,z),lp;
 timer=1;
 LIB("python_module.so");
-Python_module::python("from Singular import number,  polynomial, intvec
-iv=intvec()
+Python_module::python("from Singular import *
+iv=IntVector()
 iv.append(1)
 iv.append(2)
 iv.append(3)
-print polynomial(iv)
-zero=number(0)
-one=number(1)
-zerop=polynomial(0)
-onep=polynomial(1)
-xy=polynomial('xy')
+print Polynomial(iv)
+zero=Number(0)
+one=Number(1)
+zerop=Polynomial(0)
+onep=Polynomial(1)
+
+#deprecated
+xy=Polynomial('xy')
 print xy
-comp=polynomial('xy+1')
+comp=Polynomial('xy+1')
 print comp
 #the same as only monomials are build
 
-z=polynomial('z');
-z*=number(3);
+z=Polynomial('z');
+z*=Number(3);
 print z,xy
-print xy+number(1)
+print xy+Number(1)
 print z+xy
 print z,xy
 print xy*xy
 print xy
-for t in ((xy+number(1))*(xy+number(-1))):
+for t in ((xy+Number(1))*(xy+Number(-1))):
   print t,-t,t
 import util
 r=util.create_ring(char=0,nvars=3, ordering='lp')
 r.set()
-z2=polynomial('z')
-print z+z2
+z2=Polynomial('z')
+#the following should fail
+#print z+z2
 ");
 $
