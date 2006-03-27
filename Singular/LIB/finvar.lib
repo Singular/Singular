@@ -1,6 +1,6 @@
 // last change: 98/11/05
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: finvar.lib,v 1.41 2006-03-16 15:50:37 Singular Exp $"
+version="$Id: finvar.lib,v 1.42 2006-03-27 12:45:25 bricken Exp $"
 category="Invariant theory";
 info="
 LIBRARY:  finvar.lib    Invariant Rings of Finite Groups
@@ -5679,6 +5679,17 @@ example
          basering;
 }
 ///////////////////////////////////////////////////////////////////////////////
+static proc degvec(ideal I)
+"USAGE:  degvec(I);
+         I an <ideal>.
+RETURN:  the <intvec> of degrees of the generators of I.
+"
+{ intvec v;
+  for (int j = 1;j<=ncols(I);j++)
+  { v[j]=deg(I[j]);
+  }
+  return(v);
+}
 
 proc relative_orbit_variety(ideal I,matrix F,string newring)
 "USAGE:   relative_orbit_variety(I,F,s);
@@ -5704,7 +5715,9 @@ EXAMPLE: example relative_orbit_variety; shows an example
     int n=nvars(br);
     int m=ncols(F);
     string mp=string(minpoly);
-    execute("ring R=("+charstr(br)+"),("+varstr(br)+",y(1..m)),lp;");
+    intvec v = degvec(ideal(F));
+    execute("ring
+    R=("+charstr(br)+"),("+varstr(br)+",y(1..m)),(dp(n),wp(v));");
     execute("minpoly=number("+mp+");");
     ideal J=ideal(imap(br,F));
     ideal I=imap(br,I);
@@ -5730,6 +5743,9 @@ EXAMPLE: example relative_orbit_variety; shows an example
       }
     }
     G=compress(G);
+    //better return wp ordering, then the last GB calculation is not needed
+    
+    //execute("ring "+newring+"=("+charstr(br)+"),(y(1..m)),wp(v);");
     execute("ring "+newring+"=("+charstr(br)+"),(y(1..m)),lp;");
     execute("minpoly=number("+mp+");");
     ideal vars;
@@ -5739,6 +5755,7 @@ EXAMPLE: example relative_orbit_variety; shows an example
     vars=vars,y(1..m);
     map emb=R,vars;
     ideal G=emb(G);
+    G=groebner(G);
     kill vars, emb;
     keepring `newring`;
     return();
