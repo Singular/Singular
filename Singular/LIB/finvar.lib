@@ -1,6 +1,6 @@
 // last change: 98/11/05
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: finvar.lib,v 1.42 2006-03-27 12:45:25 bricken Exp $"
+version="$Id: finvar.lib,v 1.43 2006-03-27 12:56:27 bricken Exp $"
 category="Invariant theory";
 info="
 LIBRARY:  finvar.lib    Invariant Rings of Finite Groups
@@ -5755,6 +5755,7 @@ EXAMPLE: example relative_orbit_variety; shows an example
     vars=vars,y(1..m);
     map emb=R,vars;
     ideal G=emb(G);
+    //if you use a wp(v) Ordering, you don't need the following line
     G=groebner(G);
     kill vars, emb;
     keepring `newring`;
