@@ -2,7 +2,7 @@
 //anne, added deleteSublist and watchdog 12.12.2000
 //eric, added absValue 11.04.2002
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: general.lib,v 1.48 2005-10-27 07:53:08 Singular Exp $";
+version="$Id: general.lib,v 1.49 2006-03-27 13:53:00 Singular Exp $";
 category="General purpose";
 info="
 LIBRARY:  general.lib   Elementary Computations of General Type
@@ -829,8 +829,8 @@ example
 proc sort (id, list #)
 "USAGE:   sort(id[v,o,n]); id = ideal/module/intvec/list(of intvec's or int's)
 @*       sort may be called with 1, 2 or 3 arguments in the following way:
-@*       sort(id[v,n]); v=intvec of positive integers, n=integer,
-@*       sort(id[o,n]); o=string (any allowed ordstr of a ring), n=integer
+@*       sort(id[,v,n]); v=intvec of positive integers, n=integer,
+@*       sort(id[,o,n]); o=string (any allowed ordstr of a ring), n=integer
 RETURN:  a list l of two elements:
 @format
         l[1]: object of same type as input but sorted in the following way:
