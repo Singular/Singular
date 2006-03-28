@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.17 2006-01-16 14:04:30 Singular Exp $ */
+/* $Id: ideals.cc,v 1.18 2006-03-28 13:00:51 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -866,47 +866,6 @@ static poly pMultWithT (poly p,BOOLEAN cas)
   */
   if (cas)  qresult->next = pp;
   /*  else      qresult->next = NULL;*/
-  return result;
-}
-
-/*3
-*deletes the place of t in p (t: variable with index 1)
-*p is NOT in the actual ring: it has pVariables+1 variables
-*/
-static poly pDivByT (poly * p,int size)
-{
-
-  poly result=NULL,
-       resultp=NULL , /** working pointer in result **/
-       pp;
-  int  i,j;
-
-  while (*p != NULL)
-  {
-    i = 0;
-    if (result == NULL)
-    {/*the first monomial*/
-      result = pInit();
-      resultp = result;
-      resultp->next = NULL;
-    }
-    else
-    {
-      resultp->next = pInit();
-      pIter(resultp);
-      resultp->next = NULL;
-    }
-    for (j=1; j<=pVariables; j++)
-    {
-      pSetExp(resultp,j,pGetExp(*p,j+1));
-    }
-    pSetComp(resultp,pGetComp(*p));
-    pSetCoeff0(resultp,pGetCoeff(*p));
-    pSetm(resultp);
-    pp = (*p)->next;
-    omFreeSize((ADDRESS)(*p),size);
-    *p = pp;
-  }
   return result;
 }
 
