@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.82 2006-03-28 05:19:49 bricken Exp $ */
+/* $Id: tgb.cc,v 1.83 2006-03-28 05:25:03 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -1132,7 +1132,7 @@ static wlen_type pair_weighted_length(int i, int j, slimgb_alg* c){
     return c->lengths[i]+c->lengths[j]-2;
 
 }
-sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_pos,slimgb_alg* c, int* ip)
+sorted_pair_node** add_to_basis_ideal_quotient(poly h, slimgb_alg* c, int* ip)
 {
 
   assume(h!=NULL);
@@ -1829,7 +1829,7 @@ static void go_on (slimgb_alg* c){
 
     if (!c->nc)
       p=redTailShort(p, c->strat);
-    sbuf[j]=add_to_basis_ideal_quotient(p,-1,-1,c,ibuf+j);
+    sbuf[j]=add_to_basis_ideal_quotient(p,c,ibuf+j);
     //sbuf[j]=add_to_basis(p,-1,-1,c,ibuf+j);
   }
   int sum=0;
@@ -1894,7 +1894,7 @@ static void go_on (slimgb_alg* c){
     p=add2->m[j];
     add2->m[j]=NULL;
 
-    sbuf[j]=add_to_basis_ideal_quotient(p,-1,-1,c,ibuf+j);
+    sbuf[j]=add_to_basis_ideal_quotient(p,c,ibuf+j);
     //sbuf[j]=add_to_basis(p,-1,-1,c,ibuf+j);
   }
   int sum=0;
@@ -2209,7 +2209,7 @@ slimgb_alg::slimgb_alg(ideal I, BOOLEAN F4){
     strat->lenSw=NULL;
   sorted_pair_node* si;
   assume(n>0);
-  add_to_basis_ideal_quotient(I->m[0],-1,-1,this,NULL);
+  add_to_basis_ideal_quotient(I->m[0],this,NULL);
 
   assume(strat->sl==strat->Shdl->idelems()-1);
   if(!(F4_mode))
@@ -2235,7 +2235,7 @@ slimgb_alg::slimgb_alg(ideal I, BOOLEAN F4){
   else
   {
     for (i=1;i<n;i++)//the 1 is wanted, because first element is added to basis
-      add_to_basis_ideal_quotient(I->m[i],-1,-1,this,NULL);
+      add_to_basis_ideal_quotient(I->m[i],this,NULL);
   }
   for(i=0;i<I->idelems();i++)
   {

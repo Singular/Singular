@@ -5,7 +5,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: F4.cc,v 1.3 2005-05-17 15:26:27 bricken Exp $ */
+/* $Id: F4.cc,v 1.4 2006-03-28 05:25:03 bricken Exp $ */
 /*
 * ABSTRACT: F4 implementation
 */
@@ -836,7 +836,7 @@ void go_on_F4 (slimgb_alg* c){
     // delete buf[j];
     //remember to free res here
     //    p=redTailShort(p, c->strat);
-    sbuf[j]=add_to_basis_ideal_quotient(p,-1,-1,c,ibuf+j);
+    sbuf[j]=add_to_basis_ideal_quotient(p,c,ibuf+j);
     
   }
   int sum=0;
