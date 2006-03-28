@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.81 2006-03-17 10:48:23 Singular Exp $ */
+/* $Id: tgb.cc,v 1.82 2006-03-28 05:19:49 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -2400,11 +2400,13 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
   // Print("Idelems %i \n----------\n",IDELEMS(arg_I));
   ideal I=idCompactify(arg_I);
    int i;
+  if (idIs0(I)) return I;
   for(i=0;i<IDELEMS(I);i++)
   {
-    if (I->m[i]!=NULL) simplify_poly(I->m[i],currRing);
+    assume(I->m[i]==NULL);
+    simplify_poly(I->m[i],currRing);
   }
-  if (idIs0(I)) return I;
+  
 
   qsort(I->m,IDELEMS(I),sizeof(poly),poly_crit);
   //Print("Idelems %i \n----------\n",IDELEMS(I));
