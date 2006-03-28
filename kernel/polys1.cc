@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.18 2006-01-16 14:02:51 Singular Exp $ */
+/* $Id: polys1.cc,v 1.19 2006-03-28 12:56:06 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -190,7 +190,8 @@ static poly pMonMultC(poly p, poly q)
 */
 static poly pTwoMonPower(poly p, int exp)
 {
-  int eh, e, al;
+  int eh, e;
+  long al;
   poly *a;
   poly tail, b, res, h;
   number x;
@@ -1763,13 +1764,14 @@ poly pInvers(int n,poly u,intvec *w)
   return v;
 }
 
-long pDegW(poly p, short *w)
+long pDegW(poly p, const short *w)
 {
   long r=-LONG_MAX;
 
   while (p!=NULL)
   {
-    r=si_max(r, totaldegreeWecart_IV(p,currRing,w));
+    long t=totaldegreeWecart_IV(p,currRing,w);
+    if (t>r) r=t;
     pIter(p);
   }
   return r;

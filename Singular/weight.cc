@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: weight.cc,v 1.24 2005-07-26 17:06:59 Singular Exp $ */
+/* $Id: weight.cc,v 1.25 2006-03-28 12:56:05 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -270,8 +270,8 @@ long totaldegreeWecart_IV(poly p, ring r, const short *w)
   int i;
   long j =0;
 
-  for (i=r->N; i; i--)
-    j += (int)(p_GetExp(p,i,r) * w[i]);
+  for (i=r->N; i>0; i--)
+    j += (long)((int)(p_GetExp(p,i,r) * (int)w[i]));
   return  j;
 }
 
