@@ -191,7 +191,9 @@ class Number{
     if (r!=NULL)
       n_Delete(&n,r.get());
   }
-
+ ring getRing() const{
+    return r.get();
+ }
  protected:
   number n;
   intrusive_ptr<ip_sring> r;
