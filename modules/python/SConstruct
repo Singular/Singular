@@ -1,4 +1,4 @@
-#$Id: SConstruct,v 1.18 2006-03-31 08:31:59 bricken Exp $
+#$Id: SConstruct,v 1.19 2006-03-31 09:21:49 Singular Exp $
 import os
 import re
 try:
@@ -39,8 +39,8 @@ class PythonConfig(object):
         else:
             self.incdir=self.prefix+"/include/python"+self.version
 PYTHONSEARCH=[\
-    PythonConfig(version="2.3"),\
     PythonConfig(version="2.4"),\
+    PythonConfig(version="2.3"),\
     PythonConfig(version="2.4",\
                     libdir="/Library/Frameworks/Python.framework/Versions/2.4/lib",\
                     libname="python",\

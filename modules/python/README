@@ -1,5 +1,13 @@
-Requirements:
-------------
+For binary distributions remember to set the environment vraiable 
+PYTHONPATH to the directories containing the Singular python modules
+(interpreter.py, utils.py, usually the Singular LIB directory)
+and to your python directory (usually .)
+
+Example for bash etc.:
+export PYTHONPATH=".:/usr/local/Singular/3-0-2/LIB"
+
+Requirements for building:
+--------------------------
 install scons (the build tool)
 install boost::python
 install boost
