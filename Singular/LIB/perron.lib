@@ -1,8 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: perron.lib,v 1.1 2006-03-13 14:31:44 motsak Exp $";
+version="$Id: perron.lib,v 1.2 2006-04-03 13:14:05 motsak Exp $";
 category="Noncommutative";
 info="
-LIBRARY:  perron.lib      
+LIBRARY:  perron.lib         computation of algebraic dependences
 AUTHORS:  Oleksandr Motsak,        motsak@mathematik.uni-kl.de.
 
 PROCEDURES:
@@ -16,10 +16,10 @@ LIB "center.lib";
 //////////////////////////////////////////////////////////////////////////////
 proc perron( ideal L, list # )
 "USAGE:     perron( L [, D] )
-RETURN:     a commutative ring, containing an exported ideal with polynomial relations with the name Relations.
-PURPOSE:     computes relations between pairwise commuting polynomials of L[, up to a given degree bound D]
-NOTE:     The perron relation is know to exit and be minimal only if size(L) = (1+nvars(basering))!
-EXAMPLE:    example sa_reduce; shows an example
+RETURN:     a commutative ring, containing an exported ideal `Relations` with found polynomial relations.
+PURPOSE:    computes relations between pairwise commuting polynomials of L[, up to a given degree bound D]
+NOTE:       the implementation was partially inspired by the Perron's theorem. 
+EXAMPLE:    example perron; shows an example
 "
 {
     int N, D, i;
@@ -39,11 +39,10 @@ EXAMPLE:    example sa_reduce; shows an example
     
     intvec W; // weights
     
-    for ( i = size(L); i > 0 ; i-- )
+    for ( i = N; i > 0; i-- )
     {
         W[i] = deg(L[i]);
     }
-    
 
 ////////////////////////////////////////////////////////////////////////
     D = -1;
@@ -125,7 +124,7 @@ EXAMPLE:    example sa_reduce; shows an example
 
     // we are in COMMUTATIVERING now:   
     
-    ideal PBWBasis = PBW_basis_byMaxDeg( D ); // All monomials of degree(!) <= D.
+    ideal PBWBasis = PBW_maxDeg( D ); // All monomials of degree(!) <= D.
     // TODO: it would be better to compute weighted monomials of weight <= W[1] \cdot ... W[N].
     
 //    PBWBasis;
@@ -140,7 +139,7 @@ EXAMPLE:    example sa_reduce; shows an example
     
 //    Images;
     
-    def T = KER( Images ); // Compute relations in NC ring
+    def T = linearMapKernel( Images ); // Compute relations in NC ring
     
 //    T;
 
@@ -149,14 +148,14 @@ EXAMPLE:    example sa_reduce; shows an example
     
     if( (typeof(T) != "module") and (typeof(T) != "int" ) )
     {
-        ERROR( "Wrong output from the 'KER' function!" );
+        ERROR( "Wrong output from the 'linearMapKernel' function!" );
     }
     
     if( typeof(T) == "int" )
     {
         if( T != 0 )
         {
-            ERROR( "Wrong output from the 'KER' function!" );
+            ERROR( "Wrong output from the 'linearMapKernel' function!" );
         }
     }        
     
@@ -174,7 +173,7 @@ EXAMPLE:    example sa_reduce; shows an example
         kill Psi;
         
         setring COMMUTATIVERING;
-        ideal result = LinearCombinations( PBWBasis, KER );
+        ideal result = linearCombinations( PBWBasis, KER );
         
         kill KER;
         
@@ -224,10 +223,17 @@ ring A = p,(x,y,z),dp;
 matrix D[3][3]=0;
 D[1,2]=-z; D[1,3]=2*x; D[2,3]=-2*y;
 ncalgebra(1,D); // this algebra is U(sl_2)
-ideal L = x^p, y^p, z^p-z, 4*x*y+z^2-2*z; // the [p]-Center
+ideal L = x^p, y^p, z^p-z, 4*x*y+z^2-2*z; // the center
 def R = perron( L, p );
 setring R; 
 R;
-Relations; // it was exported from perron to be in a returned ring.
+Relations; // it was exported from perron to be in the returned ring.
+kill R;
+// perron can be also used in a commutative case, for example:
+ring r=0,(x,y,z),dp;
+ideal J = xy+z2, z2+y2, x2y2-2xy3+y4;
+def R = perron(J);
+setring R; 
+Relations;
 }
 
